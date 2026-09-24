@@ -5,6 +5,7 @@
 
 #include "game_types.h"
 #include "platform.h"
+#include "engine.h"
 
 #define GBA_NUM_CHANNELS 4
 
@@ -32,10 +33,10 @@ typedef struct GbaChannel {
     s32  n4C;                   // 0x4C  the word the GBA answers the handshake with
     s32  n50;                   // 0x50
     u32  uKey;                  // 0x54  0x40 + port, two port bits and their check byte (fn_801228E0)
-    u8   unk58[0x5C - 0x58];
-    s32  n5C;                   // 0x5C  0x40 at start
+    u32  u58;                   // 0x58  from the GBA: four d-pad bits (20-23) and a check byte
+    s32  n5C;                   // 0x5C  what SIProbe finds on the port (0x40000: a GBA); 0x40 at start
     u8   unk60[0x64 - 0x60];
-    s32  n64;                   // 0x64
+    s32  n64;                   // 0x64  set when u58 is new
     s32  n68;                   // 0x68
     s32  n6C;                   // 0x6C
     s32  n70;                   // 0x70
@@ -46,6 +47,8 @@ LAYOUT_ASSERT(GbaChannel, 0x78);
 extern GbaChannel lbl_80260E18[GBA_NUM_CHANNELS];
 extern DVDDiskID* lbl_8028255C;  // the disc's ID: its game code goes to the GBA in the handshake
 extern u32 lbl_80282560;        // the tick the link code started at (fn_80123FF8)
+extern PadStatus lbl_80260FF8[GBA_NUM_CHANNELS];   // the pads as fn_80123E34 reads them
+extern const u32 lbl_80184E30[GBA_NUM_CHANNELS];   // each port's PADReset bit (0x80000000 >> port)
 
 // Time-base ticks in a millisecond (the time base runs at a quarter of the bus clock, which the OS
 // keeps at 0x800000F8). A GBA command waits 100 ms for the GBA.

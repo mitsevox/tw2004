@@ -5,6 +5,7 @@
 #include "game_types.h"
 #include "platform.h"
 #include "engine.h"
+#include "pad.h"
 #include "core/gbacable.h"
 
 s32  fn_80176200(s32 nChan, u8* pStatus);  // the GBA library: read a port's status
@@ -20,6 +21,8 @@ void fn_80123ABC(s32 nChan);
 void fn_80123C2C(s32 nChan);
 void fn_80123CBC(s32 a, s32 b);
 void fn_800A4BDC(void);
+void fn_80123E34(void);
+s32  fn_80176280(s32 nChan, u8* pOut);  // the GBA library: 2 while the port is busy
 s32  fn_80122FD8(s32 nChan);
 void fn_8012311C(s32 nChan);
 void fn_8012408C(s32 v);
@@ -420,6 +423,61 @@ void fn_80123CBC(s32 a, s32 b) {
     } while (nChan < GBA_NUM_CHANNELS);
 }
 
+// Reads the pads. A linked GBA's d-pad (u58, when new and its check byte holds) replaces its port's
+// buttons. An unlinked port is probed for what is plugged in (waiting up to 800 ms for a GBA while
+// no port is being worked on); ports with a pad (types 8 and 0x40) are reset.
+void fn_80123E34(void) {
+    u32 uReset = 0;
+    s32 nChan = 0;
+    GbaChannel* pCh = lbl_80260E18;
+    PadStatus* pPad;
+    const u32* pMask;
+    u32 uKey;
+    u32 uStart;
+    u8 uProc;
+
+    PADRead(lbl_80260FF8);
+    PADClamp(lbl_80260FF8);
+    pPad = lbl_80260FF8;
+    pMask = lbl_80184E30;
+    do {
+        if (pCh->n0 == 2) {
+            if (pCh->n64 != 0) {
+                if ((u8)pCh->u58 == fn_801228E0((pCh->u58 & 0xFF00) | ((pCh->u58 >> 16) & 0xFF))) {
+                    uKey = pCh->u58;
+                    pPad->uButtons = (((uKey >> 23) & 1) ? 4 : 0) |
+                                     ((((uKey >> 22) & 1) ? 8 : 0) |
+                                      ((((uKey >> 20) & 1) ? 2 : 0) | ((uKey >> 21) & 1)));
+                }
+            }
+            pCh->n64 = 0;
+        } else {
+            if (pCh->n0 == 0 && fn_80176280(nChan, &uProc) != 2) {
+                if (lbl_80281984 == -1) {
+                    uStart = OSGetTick();
+                    do {
+                        fn_800A4BDC();
+                        fn_800B7490();
+                        pCh->n5C = SIProbe(nChan);
+                    } while (pCh->n5C != 0x40000 && OSGetTick() - uStart < GBA_TICKS_PER_MS * 800);
+                } else if (nChan != lbl_80281984) {
+                    pCh->n5C = SIProbe(nChan);
+                }
+            }
+            if (pCh->n5C == 8 || pCh->n5C == 0x40) {
+                uReset |= *pMask;
+            }
+        }
+        nChan++;
+        pPad++;
+        pMask++;
+        pCh++;
+    } while (nChan < GBA_NUM_CHANNELS);
+    if (uReset != 0) {
+        PADReset(uReset);
+    }
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_801229F8();
@@ -427,7 +485,6 @@ void fn_80175FB8();
 void fn_80123FF8(void);
 s32 OSGetResetButtonState();
 s32 OSResetSystem(s32, s32, s32);
-s32 fn_80123E34();
 extern s32 lbl_80282540;
 void fn_8012402C(void);
 extern s32 lbl_80281980;
