@@ -103,7 +103,11 @@ typedef struct CharModel {
     struct DynChain* pF8;       // 0x0F8  }
     struct DynChain* apFC[6];   // 0x0FC  }
     struct DynChain* ap114[6];  // 0x114  }
-    u8        unk12C[0x140 - 0x12C];
+    f32       f12C;             // 0x12C  } five floats of the CHR object's header (fn_8001A9F4)
+    f32       f130;             // 0x130  }
+    f32       f134;             // 0x134  }
+    f32       f138;             // 0x138  }
+    f32       f13C;             // 0x13C  }
     f32       a140[128][3];     // 0x140  per bone, a factor for each axis: reset to 1 by fn_80028A3C,
                                 //        multiplied by fn_80028A70 (the next field is at 0x740)
     f32       q740[4];          // 0x740  } rotations (quaternions) fn_80029968 fills in
@@ -260,6 +264,25 @@ typedef struct AnimPlayer {
     f32   fEnd;                 // 0x20  }
 } AnimPlayer;
 
+// An entry of Character.p44 (0x30 bytes), read from the CHR object by fn_8001A9F4.
+typedef struct CharEntry44 {
+    f32   v0[3];                // 0x00
+    f32   fC;                   // 0x0C  1 when loaded
+    u32   a10[6];               // 0x10
+    u8    unk28[0x30 - 0x28];
+} CharEntry44;
+LAYOUT_ASSERT(CharEntry44, 0x30);
+
+// What fn_8001A9F4 hands the skeleton loader (fn_80028564) for a golfer's model (our name):
+// lbl_80280E10, or lbl_80280E18 in split screen; a table of 0x10-byte entries and their count.
+typedef struct CharModelDefs {
+    void* pDefs;                // 0x0
+    s32   nDefs;                // 0x4
+} CharModelDefs;
+
+extern CharModelDefs lbl_80280E10;
+extern CharModelDefs lbl_80280E18;
+
 // The golfer's character object (0x1798 bytes or more); only the fields read so far. Anim_SetRate,
 // Anim_SetTime and fn_8007326C take the address of its animation player at 0x164, whose fields
 // from 0x168 on are named here directly.
@@ -286,10 +309,10 @@ typedef struct Character {
                                 //        get an 'f' in front when it is 1
     CharModel* pModel;          // 0x038
     struct Skin* pSkin;         // 0x03C  its body's skin (Skin.c), the first of apSkins
-    s32   n40;                  // 0x040  how many 0x30-byte entries p44 holds (fn_8001A9F4)
-    void* p44;                  // 0x044  } freed with the character (fn_8001C0E0)
+    s32   n40;                  // 0x040  how many entries p44 holds (fn_8001A9F4)
+    struct CharEntry44* p44;    // 0x044  } freed with the character (fn_8001C0E0)
     s32   n48;                  // 0x048  a texture bank slot (LLTexGrp.c), freed with it when >= 0
-    u8    unk4C[0x50 - 0x4C];
+    u8*   p4C;                  // 0x04C  where its CHR object's data ends (fn_8001A9F4)
     u8    a50[4];               // 0x050  LLDynTex.c is given its address (fn_80019DE8)
     s32   hFile;                // 0x054  a file closed with it (fn_8001971C), -1 none
     u8    unk58[0x60 - 0x58];
@@ -321,7 +344,8 @@ typedef struct Character {
     f32   fAnimEnd;             // 0x184  the animation's end time
     u8    unk188[0x29C - 0x188];
     AnimPlayer anim29C;         // 0x29C  a second animation player
-    u8    unk2C0[0x3D8 - 0x2C0];
+    u8    unk2C0[0x3D4 - 0x2C0];
+    s32   n3D4;                 // 0x3D4  the bytes of its CHR object before the animation library
     AnimLib* pLib;              // 0x3D8  its animation library
     struct ClipRecord* pRecords;    // 0x3DC  records for its merged library (skalib)
     u8    node3E0[0x40C - 0x3E0];   // 0x3E0  a blend node for anim29C (fn_800732F4 takes it as it takes blend)

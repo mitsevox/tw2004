@@ -191,6 +191,8 @@ typedef struct Skin {
     u32* p10D0;                 // 0x10D0  }
     u32  u10D4;                 // 0x10D4  bit 1 set by fn_80019CEC and when the choices change; bit 2
                                 //         tested by fn_80037708
+    f32  f10D8;                 // 0x10D8  from the CHR object's header (fn_8001A9F4)
+    f32  f10DC;                 // 0x10DC  1 when loaded
 } Skin;
 
 // The iterator fn_80113B34 builds in a buffer: its first word points at its next function.

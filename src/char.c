@@ -23,8 +23,22 @@ void  fn_8001A58C(int nPlayer);
 void  fn_8001A75C(UStreamObject* pObject);
 void  fn_8001A798(void);
 void  fn_8001A7C8(void);
-Character* fn_8001A9F4(u8* pData, int a, int nPlayer, u32 uId, u8 b, void* p);
+Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, SkinChoices* pChoices);
 void* fn_8001B208(u8* pData);
+Character* fn_8001942C(void);
+void  fn_800184E4(Character* pChar, Skin* pSkin);
+void  fn_80018710(Character* pChar);
+void  fn_8001DC64(Character* pChar, SkinChoices* pChoices);
+void  ClipBank_Restore(int nSlot);                  // skalib.c
+ClipBank* ClipBank_Get(u32 nSlot);                  // skalib.c
+AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank);  // skalib.c
+CharModel* fn_80028564(u8* pData, int n, CharModelDefs* pDefs, u8 b);   // Skeleton.c
+Skin* fn_800377FC(u8* pData, u8 b);                 // Skin.c
+s32   fn_80037708(void* pSkin);                     // Skin.c
+void  fn_800375AC(Skin* pSkin, int n);              // Skin.c
+void  fn_80037AB8(Skin* pSkin, CharModel* pModel, int nBone, int nId);   // Skin.c
+void  fn_800CC4EC(Character* pChar);                // SkinPart.c
+void* CharSlider_CreateDefinitionsFromMem(u8** ppData);
 void  fn_8001B58C(CharSkinSet* pSet);
 void  fn_8001B878(Character* pChar, int n);
 void  fn_8001C0E0(Character* pChar);
@@ -554,6 +568,188 @@ void fn_8001A870(void) {
         sprintf(pChar->szE1, "%sdata\\CharStrm\\CharTex\\%02dalltex.fxg", "", pChar->nC + 1);
         pChar->hFile = fn_800060E0(pChar->szE1);
     }
+}
+
+// Builds a character from its CHR object: a header (its animation slot and a few values), its
+// skin, the p44 entries, its model (fn_80028564), its own animation library, and its slider
+// definitions; then a golfer's club skins and, with bLook, its look from pChoices. Every value read
+// is followed by 12 bytes it skips.
+// port: the object is little-endian on disc and fn_80076158 swaps each value as it reads it: a
+//       little-endian port does not swap there.
+Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, SkinChoices* pChoices) {
+    int nSize;
+    int bLib;
+    int nFlag400;
+    int nModel;
+    f32 fSkin;
+    f32 f12C;
+    f32 f130;
+    f32 f134;
+    f32 f138;
+    f32 f13C;
+    int nBank;
+    u32 uLibFlags;
+    u8* pPeek;
+    Character* pChar;
+    CharModelDefs* pDefs = NULL;
+    u8* pStart;
+    u8* pCopy;
+    AnimLib* pLib;
+    Skin* pSkin;
+    u8 bGolfer;
+    u8 bModel;
+    int i;
+
+    pChar = fn_8001942C();
+    if (pChar == NULL) {
+        return NULL;
+    }
+    pChar->nC = nId;
+    pStart = pData;
+    fn_80076158(&pData, (u8*)&pChar->nSlot, 4, 4);
+    fn_80076158(&pData, (u8*)&fSkin, 4, 4);
+    fn_80076158(&pData, (u8*)&nFlag400, 4, 4);
+    fn_80076158(&pData, (u8*)&nModel, 4, 4);
+    fn_80076158(&pData, (u8*)&f134, 4, 4);
+    fn_80076158(&pData, (u8*)&f138, 4, 4);
+    fn_80076158(&pData, (u8*)&f13C, 4, 4);
+    fn_80076158(&pData, (u8*)&f12C, 4, 4);
+    fn_80076158(&pData, (u8*)&f130, 4, 4);
+    if (gSession.nGameType == 3) {
+        ClipBank_Restore(pChar->nSlot);
+    }
+    pData += 0xC;
+    if (nFlag400 == 1) {
+        pChar->u10 |= 0x400;
+    }
+    bGolfer = fn_8001EC48(pChar);
+
+    // its skin
+    fn_80076158(&pData, (u8*)&nSize, 4, 4);
+    pData += 0xC;
+    if (nSize == 0) {
+        pChar->pSkin = NULL;
+    } else {
+        pChar->pSkin = fn_800377FC(pData, bLook);
+        pChar->pSkin->f10D8 = fSkin;
+        pChar->pSkin->f10DC = 1.0f;
+        if (gSession.nGameType != 10 && gSession.nGameType != 3 && fn_8001EC48(pChar)) {
+            fn_80037708(pChar->pSkin);
+        }
+    }
+    pData += nSize;
+
+    // the p44 entries
+    fn_80076158(&pData, (u8*)&pChar->n40, 4, 4);
+    pData += 0xC;
+    pChar->p44 = fn_80009B34(pChar->n40 * sizeof(CharEntry44), 2, 0x40, "char.c", 0xE04);
+    for (i = 0; i < pChar->n40; i++) {
+        fn_80076158(&pData, (u8*)pChar->p44[i].v0, 0xC, 4);
+        pChar->p44[i].fC = 1.0f;
+        fn_80076158(&pData, (u8*)&pChar->p44[i].a10[0], 4, 4);
+        fn_80076158(&pData, (u8*)&pChar->p44[i].a10[1], 4, 4);
+        fn_80076158(&pData, (u8*)&pChar->p44[i].a10[2], 4, 4);
+        fn_80076158(&pData, (u8*)&pChar->p44[i].a10[3], 4, 4);
+        fn_80076158(&pData, (u8*)&pChar->p44[i].a10[4], 4, 4);
+        fn_80076158(&pData, (u8*)&pChar->p44[i].a10[5], 4, 4);
+        pData += 0xC;
+    }
+
+    // its model
+    fn_80076158(&pData, (u8*)&nSize, 4, 4);
+    pData += 0xC;
+    if (bGolfer && gSession.nGameType != 10 && gSession.nGameType != 3) {
+        if (gSession.nSplitScreen) {
+            pDefs = &lbl_80280E18;
+        } else {
+            pDefs = &lbl_80280E10;
+        }
+    }
+    bModel = nModel == 1;
+    if (bLook && pChoices != NULL) {
+        bModel = pChoices->n113;
+    }
+    fn_80018484(pChar, fn_80028564(pData, 1, pDefs, bModel));
+    if (pChar->pSkin != NULL) {
+        fn_800184E4(pChar, pChar->pSkin);
+    }
+    pChar->pModel->f12C = f12C;
+    pChar->pModel->f130 = f130;
+    pChar->pModel->f134 = f134;
+    pChar->pModel->f138 = f138;
+    pChar->pModel->f13C = f13C;
+    pData += nSize;
+    pChar->n3D4 = pData - pStart;
+
+    // its own animation library: kept when its clips are its own or in a bank, otherwise merged over
+    // its slot's library as an overlay
+    fn_80076158(&pData, (u8*)&bLib, 4, 4);
+    pData += 0xC;
+    if (bLib != 0) {
+        fn_80076158(&pData, (u8*)&nSize, 4, 4);
+        pData += 0xC;
+        pPeek = pData + 0x138;
+        fn_80076158(&pPeek, (u8*)&nBank, 4, 4);
+        pPeek = pData + 0x13C;
+        fn_80076158(&pPeek, (u8*)&uLibFlags, 4, 4);
+        if (pChar->nSlot == 2 || nBank != 0 || (uLibFlags & 1)) {
+            pCopy = fn_80009B34(nSize, 2, 0x40, "char.c", 0xE54);
+        } else {
+            pCopy = fn_80009B34(nSize, 1, 0x40, "char.c", 0xE57);
+        }
+        Mem_cpy(pCopy, pData, nSize);
+        pLib = AnimLib_Load(pCopy, ClipBank_Get(pChar->nSlot));
+        if (pLib->pBank != NULL || (pLib->uFlags & 1)) {
+            pChar->pLib = pLib;
+        } else {
+            lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].pWork = pLib;
+            lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].pCopy =
+                fn_80009B34(nSize, 2, 0x40, "char.c", 0xE68);
+            Mem_cpy(lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].pCopy,
+                    pData, nSize);
+            lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].nSize = nSize;
+            lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].pChar = pChar;
+            lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].n10 = nId + 3;
+            lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].bActive = bLook;
+            lbl_801C6068[pChar->nSlot].nOverlays++;
+            pChar->pLib = fn_80009B34(0x2800, 2, 0x40, "char.c", 0xE75);
+        }
+        pData += nSize;
+    } else {
+        pChar->pLib = NULL;
+    }
+
+    pChar->p17AC = CharSlider_CreateDefinitionsFromMem(&pData);
+    pChar->p4C = pData;
+    fn_80018710(pChar);
+    if (bGolfer) {
+        pChar->p16D8 = lbl_80280E24[nSet];
+        pChar->nClubHeadBone = fn_8001EED8(pChar->pModel, 0x53);
+        pChar->f165C = 100.0f;
+        pChar->f1660 = 200.0f;
+    } else {
+        pChar->nClubHeadBone = 0;
+        pChar->f165C = 50.0f;
+        pChar->f1660 = 100.0f;
+    }
+    if (pChar->p16D8 != NULL) {
+        for (i = 0; i < 6; i++) {
+            pSkin = pChar->p16D8->apSkins[i];
+            if (pSkin != NULL) {
+                fn_80037AB8(pSkin, pChar->pModel, fn_8001EED8(pChar->pModel, 0x52) - 0x52, 0x52);
+            }
+        }
+    }
+    pChar->pChoices = pChoices;
+    if (bLook) {
+        fn_8001DC64(pChar, pChoices);
+        fn_800CC4EC(pChar);
+    }
+    if (gSession.nSplitScreen && fn_8001EC48(pChar)) {
+        fn_800375AC(pChar->pSkin, 0);
+        fn_80018710(pChar);
+    }
+    return pChar;
 }
 
 // Frees the club skin sets (lbl_80280E24): each one's skins and a9C blocks, then the set. pSet is
