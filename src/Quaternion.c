@@ -249,14 +249,14 @@ void fn_800090E4(f32* pA, f32* pB, f32* pOut) {
 // The rotation matrix (3 rows of 4, no translation) of a unit quaternion.
 void fn_8000914C(f32* pQ, f32 (*m)[4]) {
     f32 fY2;
-    f32 fZ2;
-    f32 fX2;
     f32 fYY;
     f32 fZZ;
     f32 fXX;
+    f32 fZ2;
     f32 fXY;
     f32 fWZ;
     f32 fXZ;
+    f32 fX2;
     f32 fWY;
     f32 fYZ;
     f32 fWX;
