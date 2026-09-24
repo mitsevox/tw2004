@@ -68,7 +68,7 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
     u16* pNew;
     u8* pOldStep;
     u8* pNewStep;
-    s32 nCount;
+    u32 nCount;
     s32 nPrev;
     s32 nBit;
     s32 nNewBit;
