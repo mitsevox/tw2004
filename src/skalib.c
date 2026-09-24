@@ -596,7 +596,7 @@ int AnimLib_KeepBestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLe
                     }
                 }
             }
-            for (; nMarked < nExtra; nMarked++) {
+            for (i = nMarked; i < nExtra; i++) {
                 pBest = NULL;
                 for (j = 0; j < pLeaf->nCount; j++) {
                     pRec = &pLib->pRecords[pIdx[j]];

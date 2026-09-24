@@ -48,8 +48,8 @@ LAYOUT_ASSERT(SurfaceType, 0x44);
 #define NUM_SURFACE_TYPES 156   // rows in gSurfaceTypes
 
 extern SurfaceType gSurfaceTypes[NUM_SURFACE_TYPES];   // 0x8017E9B8
-extern f32 gRealBallRadiusIn;           // 0x80283300  0.84: a real golf ball, in inches
-extern f32 lbl_80283304;                // 0.7056 (0.84 squared); GoDynObj.c fn_8004731C
+extern const f32 gRealBallRadiusIn;     // 0x80283300  0.84: a real golf ball, in inches
+extern const f32 lbl_80283304;          // 0.7056 (0.84 squared); GoDynObj.c fn_8004731C
 
 // A point on the course: x, y (up), z, and w = 1.
 typedef struct PinPos {

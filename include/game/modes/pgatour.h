@@ -82,7 +82,7 @@ int  fn_800F009C(void);                 // the leader's score in the current tou
 int  fn_800F018C(s32 nEvent);           // the player's own score in it (nEvent is not used)
 
 // GameModeDriverPGATour.c, as the tour simulation (PGATourSimulation.c) uses it
-void fn_800EF094(s32 a, s32 n);         // the player's prize: n, at the player's place
+void fn_800EF094(int a, s32 n);       // the player's prize: n, at the player's place
 s32  GameModeDriverPGATour_GetNextEvent(void);  // -1 when the season is over
 s32  GameModeDriverPGATour_ComputeFirstPrizeForBracket(s32 i, s32 k);
 s32  GameModeDriverPGATour_ComputePurseForBracket(s32 i, s32 k);

@@ -307,7 +307,7 @@ void fn_801180C4(int nPlayer, u8 bUser, u8 bFirst) {
     nAhead = 0;
     for (i = 0; i < PGA_NUM_PROS; i++) {
         if (gpSaveData[nPlayer].tour.aStats[i].nCareerWinnings >
-            pProfile->tour.aStats[PGA_USER_GOLFER].nCareerWinnings) {
+            gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER].nCareerWinnings) {
             nAhead++;
         }
     }
@@ -330,7 +330,8 @@ void fn_801180C4(int nPlayer, u8 bUser, u8 bFirst) {
 
     nNext = GameModeDriverPGATour_GetNextEvent();
     if (nNext == -1) {
-        if (gpSaveData[nPlayer].tour.nSeason == 0 && pProfile->tour.aStats[PGA_USER_GOLFER].nSeasonWins > 1
+        if (gpSaveData[nPlayer].tour.nSeason == 0
+            && gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER].nSeasonWins > 1
             && fn_800D7770(nPlayer, &gpSaveData[nPlayer].a1C0[12])) {
             fn_8011C054(12, 2);
         }
@@ -1318,17 +1319,14 @@ void fn_8011AC40(int nPlayer, GM_Pga_StatTypes_t nStat) {
 }
 
 // Works out a golfer's simple statistics from the counts in the player's profile, with their text.
-static inline PgaStatValue* StatValue(GM_Pga_StatTypes_t nStat, int nGolfer) {
-    return &lbl_80226870[nStat].aValue[nGolfer];
-}
-
 void fn_8011AE1C(int nPlayer, int nGolfer) {
-    s32 nStat;
+    GM_Pga_StatTypes_t nStat;
 
     for (nStat = 0; nStat < GM_PGA_STAT_SIMPLE_COUNT; nStat++) {
-        lbl_80193F88[nStat](&gpSaveData[nPlayer].tour.aStats[nGolfer], &StatValue(nStat, nGolfer)->fValue);
-        GM_PgaTourSim_GetStatValString(nStat, StatValue(nStat, nGolfer)->fValue,
-                                       StatValue(nStat, nGolfer)->szValue);
+        lbl_80193F88[nStat](&gpSaveData[nPlayer].tour.aStats[nGolfer],
+                            &lbl_80226870[nStat].aValue[nGolfer].fValue);
+        GM_PgaTourSim_GetStatValString(nStat, lbl_80226870[nStat].aValue[nGolfer].fValue,
+                                       lbl_80226870[nStat].aValue[nGolfer].szValue);
     }
 }
 
