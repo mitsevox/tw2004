@@ -156,7 +156,7 @@ void fn_80065E9C(int nPlayer, int nEvent, void* pData, int nArg) {
 
     if (fn_80101AA8(nPlayer, 13) || Game_GetMode() == 22 || Game_GetMode() == 26) return;
     nOldClub = gPlayers[nPlayer].nClub;
-    if (nOldClub == CLUB_PUTTER_e) return;
+    if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) return;
     nTries = 0;
     do {
         if (gPlayers[nPlayer].nClub > 0) {
@@ -199,7 +199,7 @@ void fn_80066058(int nPlayer, int nEvent, void* pData, int nArg) {
 
     if (fn_80101AA8(nPlayer, 13) || Game_GetMode() == 22 || Game_GetMode() == 26) return;
     nOldClub = gPlayers[nPlayer].nClub;
-    if (nOldClub == CLUB_PUTTER_e) return;
+    if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) return;
     nTries = 0;
     do {
         if (gPlayers[nPlayer].nClub < CLUB_PUTTER_e) {

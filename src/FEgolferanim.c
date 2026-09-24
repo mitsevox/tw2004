@@ -60,9 +60,10 @@ FEGolferState lbl_80189AA0[FE_NUM_GOLFER_STATES] = {
     { fn_8008B61C, fn_8008B694, fn_8008B674, fn_8008B6E4, 1 },
 };
 
-FEGolferMachine lbl_801D8708;
-GxTexture lbl_801D8714;         // the screen copy (fn_8002A624's pixels)
+// .bss and .sbss are defined in reverse address order: CodeWarrior lays them out last-defined-first.
 GxTexture lbl_801D8744[2];      // lbl_80281BA4's two buffers
+GxTexture lbl_801D8714;         // the screen copy (fn_8002A624's pixels)
+FEGolferMachine lbl_801D8708;
 
 s32 lbl_80281330 = 1;           // draw the golfer into the menu's texture (fn_8008E358)
 f32 lbl_80281334 = 0.17f;       // with b83: the most f14C may be
@@ -72,9 +73,9 @@ s32 lbl_80281340 = -1;          // } the golfer and profile slot last drawn (fn_
 s32 lbl_80281344 = -1;          // }
 f32 lbl_80281348 = 0.918f;      // the share of the 448-line frame fn_8008CE88 sets for screen kind 3
 
-CrAPState* lbl_80281EE0;
-CourseLights* lbl_80281EE4;     // the lights of the golfer display ('LITE' stream object)
 Character* lbl_80281EE8[CRAP_NUM_GOLFERS];
+CourseLights* lbl_80281EE4;     // the lights of the golfer display ('LITE' stream object)
+CrAPState* lbl_80281EE0;
 
 void fn_8008B00C(void);
 void fn_8008B704(void);
@@ -134,6 +135,13 @@ void fn_8010B098(void* p);
 void fn_8010B9BC(void);
 u8   fn_8010BFE0(void);
 void UStream_Stop(void);
+
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0, before the 0.5 and 0.0 fn_8008AD80 uses first; its body is unknown, this one only
+// reproduces the order.
+static void FEgolferanim_StrippedFn(f32* pValue) {
+    *pValue += 1.0f;
+}
 
 // Make the golfer display's state and start the loader.
 void fn_8008AD80(void) {
@@ -479,11 +487,11 @@ void fn_8008B864(void) {
         ((void (*)(int))lbl_80189AA0[lbl_801D8708.nState].pfnUpdate)(0);
         if (lbl_801D8708.bDone) {
             ((void (*)(int))lbl_80189AA0[lbl_801D8708.nState].pfnExit)(0);
-            lbl_801D8708.bDone = 0;
             lbl_801D8708.nState = lbl_801D8708.nNext;
+            lbl_801D8708.nNext = lbl_80189AA0[lbl_801D8708.nState].nNext;
+            lbl_801D8708.bDone = 0;
             lbl_801D8708.bEnter = 1;
             lbl_801D8708.bAbort = 0;
-            lbl_801D8708.nNext = lbl_80189AA0[lbl_801D8708.nNext].nNext;
         }
     }
 }
