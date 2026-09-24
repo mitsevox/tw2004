@@ -248,7 +248,8 @@ typedef struct Skin {
                                 //         matrix (fn_800184E4: bones 0x3A, 0x48, 0x39, 0x47)
     f32  (*p1088)[4][4];        // 0x1088  } matrices fn_80018710 hands the model (fn_80029A88,
     f32  (*p108C)[4][4];        // 0x108C  } fn_80029A7C)
-    u8   unk1090[0x10A0 - 0x1090];
+    u8   unk1090[0x1098 - 0x1090];
+    struct HwsMemBlock* a1098[2];   // 0x1098  indexed like a10A0 (fn_8011CB5C)
     void* a10A0[2];             // 0x10A0  indexed by fn_800CE02C's argument; Skin.c sets [0]
     SkinChoice* aParts[4];      // 0x10A8  a choice per part, four copies (fn_800CEE04 copies one
                                 //         over another); [3] is set while lbl_80282238 is clear
@@ -497,6 +498,10 @@ void  fn_800CEEC8(SkinIter* pIter);
 SkinMesh* fn_800CEEF4(SkinIter* pIter);
 SkinIter* fn_80113B34(u8* pBuf, SkinIterArgs* pArgs);
 void  fn_80113BAC(SkinIter* pIter);
+
+// hwsOverride_Gc.c: a mesh table and a memory block for a skin description's morphed meshes.
+HwsMemBlock* fn_801128EC(SkinDesc* pDesc, s32 nSize);
+HwsOverrideTable* fn_80112A34(SkinDesc* pDesc, s32 nMeshes);
 
 // SkinBurn.c: burns a skin (aParts and aList each end with -1).
 void  fn_80127B98(Skin* pSkin, s32* aParts, s32* aList);

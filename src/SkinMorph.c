@@ -8,6 +8,8 @@
 
 void fn_8011C068(SkinMorphWork* pWork, SkinMeshBit* aVerts, u8* pExtra, u32 nVerts);
 void fn_8011C1FC(SkinMorphWork* pWork, u8* pVerts, u8* pExtra, u32 nVerts);
+void fn_8011C68C(SkinMorphWork* pWork, int n);
+s32  fn_8011CDE8(Skin* pSkin);
 
 // Swaps the work area's two buffers.
 void fn_8011C46C(SkinMorphWork* pWork) {
@@ -165,6 +167,64 @@ void fn_8011CADC(Skin* pSkin, int nMorph, f32 fWeight) {
         fn_8001EA34(pMorph->aChanged[0], nMorph);
         fn_8001EA34(pMorph->aChanged[1], nMorph);
     }
+}
+
+// Blends the morph targets that changed for view nView into the skin's meshes.
+void fn_8011CB5C(Skin* pSkin, int nView) {
+    SkinMorphWork* pWork;
+    s32 i;
+    s32 nEntries;
+
+    if (pSkin->pMorph == NULL) {
+        return;
+    }
+    pWork = fn_8011C564();
+    fn_8011C580(pWork, pSkin->pModel->pDesc);
+    fn_8011C58C(pWork, pSkin->pMorph->afWeights, pSkin->pMorph->nMorphs);
+    fn_8011C59C(pWork, pSkin->a10A0[nView]);
+    fn_8011C5A8(pWork, pSkin->a1098[nView]);
+    nEntries = pSkin->pModel->pDesc->n40;
+    for (i = 0; i < nEntries; i++) {
+        if (fn_8011C8B0(pSkin, nView, i)) {
+            fn_8011C68C(pWork, i);
+        }
+    }
+    fn_8011C84C(pWork);
+    fn_8001E938(pSkin->pMorph->aChanged[nView], pSkin->pMorph->nMorphs);
+}
+
+// Makes a mesh table and a memory block for the skin's morphed meshes and blends every morph
+// target into them; gives both (NULL without a morph state or such meshes).
+void fn_8011CC40(Skin* pSkin, HwsMemBlock** ppBlock, HwsOverrideTable** ppTable) {
+    s32 nSize;
+    SkinDesc* pDesc;
+    SkinMorphWork* pWork;
+    HwsOverrideTable* pTable;
+    HwsMemBlock* pBlock;
+    s32 i;
+    s32 nEntries;
+
+    nSize = fn_8011CDE8(pSkin);
+    *ppBlock = NULL;
+    *ppTable = NULL;
+    if (pSkin->pMorph == NULL || nSize == 0) {
+        return;
+    }
+    pTable = fn_80112A34(pSkin->pModel->pDesc, 0);
+    pBlock = fn_801128EC(pSkin->pModel->pDesc, nSize);
+    pDesc = pSkin->pModel->pDesc;
+    pWork = fn_8011C564();
+    fn_8011C580(pWork, pDesc);
+    fn_8011C58C(pWork, pSkin->pMorph->afWeights, pSkin->pMorph->nMorphs);
+    fn_8011C59C(pWork, pTable);
+    fn_8011C5A8(pWork, pBlock);
+    nEntries = pDesc->n40;
+    for (i = 0; i < nEntries; i++) {
+        fn_8011C68C(pWork, i);
+    }
+    fn_8011C84C(pWork);
+    *ppBlock = pBlock;
+    *ppTable = pTable;
 }
 
 // Frees the skin's morph state (Skin.c calls it).
