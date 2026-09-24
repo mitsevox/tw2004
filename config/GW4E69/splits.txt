@@ -293,6 +293,8 @@ GoFrameBuf.c:
 
 GoLighting.c:
 	.text       start:0x8006E2A4 end:0x8006F154
+	.data       start:0x801888F0 end:0x80188900
+	.sdata2     start:0x80283900 end:0x80283958
 
 Code8006F154.c:
 	.text       start:0x8006F154 end:0x8006F438
