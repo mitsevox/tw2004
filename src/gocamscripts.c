@@ -54,6 +54,7 @@ f32  fn_8001EFFC(u8* pLens);            // the lens's fB0 (char.c: its parameter
 f32  fn_80014278(u8* pLens);            // the lens's field of view (GoRenderCtx_Gc.c: u8*)
 u8   fn_8004561C(void);
 u8   fn_80044E2C(int n);
+u8   fn_80044AA8(SurfaceType* pSurface);
 void fn_80038010(u8 a, int n, f32* pVec);
 void fn_800386F0(int n, f32* pVec);
 f32  fn_8003F194(CamShot* pShot, f32 fA, f32 fB, f32 fTime);
@@ -2020,33 +2021,119 @@ void fn_80044768(f32* pPos, f32* pOut) {
     }
 }
 
-// ---- sweep code (not yet cleaned up) ----
+// The height of the ground the camera would stand on at pPos (0 with no course, TER_NO_GROUND with
+// no ground at all), and its surface in ppSurface. From the top down (starting just above the
+// highest layer), it takes the first standing surface (fn_80044AA8) with a gap of more than
+// CamTuning.f130 above it; a layer under another kind of surface (water, say) starts a region
+// whose top counts unless a standing surface is found below it. Surface 149 and, on course 7's
+// hole 2, anything above 10 are passed over; there a region's lower standing surface wins.
+f32 Terrain_HeightAt(f32* pPos, SurfaceType** ppSurface) {
+    f32 vPos[4];
+    SurfaceType* aSurfaces[20];
+    f32 aHeights[20];
+    u8 bRegion = 0;
+    int nLower = -1;
+    CourseInfo* pCourse;
+    u32 nHeights;
+    u32 i;
+    int nIdx;
+    int nTop;
+    int j;
+    f32 fCeiling;
+    f32 fBest;
+    f32 fTop;
+    f32 fLower;
+    f32 fLast = 10000000.0f;
 
-s32 fn_80044AA8(void* arg0);
+    pCourse = fn_8000C594();
+    if (pCourse == NULL) return 0.0f;
+    Vec3Copy(pPos, vPos);
+    nHeights = fn_8004DCC4(pCourse, vPos, aSurfaces, aHeights, 20);
+    if (nHeights == 0) return TER_NO_GROUND;
+    if (nHeights == 1) {
+        fTop = aHeights[0];
+        nTop = 0;
+    } else {
+        fTop = aHeights[0];
+        nIdx = 0;
+        nTop = 0;
+        for (j = 1; j < (int)nHeights; j++) {
+            if (aHeights[j] > fTop) {
+                fTop = aHeights[j];
+                nTop = j;
+                nIdx = j;
+            }
+        }
+        fCeiling = 0.1f + (fTop + lbl_80281F78->f130);
+        for (i = 0; i < nHeights; i++) {
+            fBest = -10000000.0f;
+            for (j = 0; j < (int)nHeights; j++) {
+                if (aHeights[j] < fCeiling && aHeights[j] > fBest) {
+                    nIdx = j;
+                    fBest = aHeights[j];
+                }
+            }
+            // fake match: the row number through u32 addresses (not 64-bit safe); the u8* spelling
+            // swaps two registers
+            if ((int)(((u32)aSurfaces[nIdx] - (u32)gSurfaceTypes) / sizeof(SurfaceType)) != 149
+                && !(Game_GetCourse() == 7 && fn_80015464() == 2 && fBest > 10.0f)) {
+                if (fn_80044AA8(aSurfaces[nIdx])) {
+                    if (!bRegion && fLast - aHeights[nIdx] > lbl_80281F78->f130) {
+                        fTop = aHeights[nIdx];
+                        nTop = nIdx;
+                        break;
+                    }
+                    // EA bug: fLower is read before it is set when no region has started yet
+                    if (fLast - aHeights[nIdx] > lbl_80281F78->f130 && fLower < aHeights[nIdx]) {
+                        fLower = aHeights[nIdx];
+                        nLower = nIdx;
+                    }
+                } else if (bRegion) {
+                    bRegion = 0;
+                } else {
+                    fLower = -100000000.0f;
+                    fTop = aHeights[nIdx];
+                    nTop = nIdx;
+                    bRegion = 1;
+                    nLower = -1;
+                }
+                fLast = aHeights[nIdx];
+            }
+            fCeiling = aHeights[nIdx];
+        }
+    }
+    if (Game_GetCourse() == 7 && fn_80015464() == 2 && bRegion && nLower >= 0) {
+        nTop = nLower;
+        fTop = fLower;
+    }
+    if (ppSurface != NULL) {
+        *ppSurface = aSurfaces[nTop];
+    }
+    return fTop;
+}
 
-s32 fn_80044AA8(void* arg0) {
-    u32 temp_r0;
+// The surface is ground the camera stands on: classes 1..12 but 9 and 10, and 18.
+u8 fn_80044AA8(SurfaceType* pSurface) {
+    u32 nClass;
 
-    if (arg0 == NULL) {
+    if (pSurface == NULL) {
         return 0;
     }
-    temp_r0 = (*(u32*)((u8*)(arg0) + 0x2C));
-    if (temp_r0 == 0xAU) {
+    nClass = pSurface->nClass;
+    if (nClass == 10) {
         return 0;
     }
-    if (temp_r0 == 9U) {
+    if (nClass == 9) {
         return 0;
     }
-    if ((temp_r0 >= 1U) && (temp_r0 <= 0xCU)) {
+    if (nClass >= 1 && nClass <= 12) {
         return 1;
     }
-    if (temp_r0 == 0x12U) {
+    if (nClass == 18) {
         return 1;
     }
     return 0;
 }
-
-// ---- end of sweep code ----
 
 // The highest of the nCount heights that is not above fMax, or TER_NO_GROUND.
 f32 fn_80044B0C(f32* pHeights, u32 nCount, f32 fMax) {

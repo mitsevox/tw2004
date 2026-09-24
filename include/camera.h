@@ -299,7 +299,8 @@ typedef struct CamTuning {
     f32  f124;                  // 0x124  ... and less than this above it counts as in the way
     f32  f128;                  // 0x128  CamScript_GetLookAtPoint: the least level distance for the
                                 //        steep-aim limit
-    u8   unk12C[0x134 - 0x12C];
+    u8   unk12C[0x130 - 0x12C];
+    f32  f130;                  // 0x130  Terrain_HeightAt: the headroom a camera needs over a ground layer
     f32  f134;                  // 0x134  fn_800422C4: the look-at point eases in slower within this share
                                 //        of the (field-of-view scaled) camera distance
     u8   unk138[0x144 - 0x138];
