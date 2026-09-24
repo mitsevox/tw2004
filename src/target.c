@@ -312,8 +312,8 @@ void fn_80067DAC(int nPlayer) {
     fn_80012F34(1);
     fn_80012EF8();
 
-    nY = 416.0f * fY;
     nX = 512.0f * fX;
+    nY = 416.0f * fY;
     if (nY > 285) {
         nY = 285;
     }
