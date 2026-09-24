@@ -292,7 +292,7 @@ void Swing_ApplyForgiveness(int nPlayer) {
     {
     f32  fError = gPlayers[nPlayer].swing.fMishitAngle;
     int  nRowScale, nRowThresh;
-    int  nAttr;
+    s8   nAttr;
     f32  fThresh, fScale;
 
     if (gPlayers[nPlayer].ball.nLie == 6 || gPlayers[nPlayer].ball.nLie == 7 ||
