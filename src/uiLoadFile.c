@@ -128,10 +128,12 @@ void fn_8008EEB8(UStreamObject* pObject) {
 // port: the data stores 32-bit offsets where the code expects pointers, as the GameCube's are.
 void fn_8008EFC0(UINamedList* pList) {
     u32 i;
+    char** ppName;
 
     lbl_80281F04 = pList;
     for (i = 0; i < lbl_80281F04->nCount; i++) {
-        lbl_80281F04->apNames[i] = (char*)((uptr)lbl_80281F04->apNames[i] + (uptr)pList);
+        ppName = &lbl_80281F04->apNames[i];
+        *ppName = (char*)((uptr)*ppName + (uptr)pList);
     }
 }
 
