@@ -95,13 +95,17 @@ LAYOUT_ASSERT(SunFlrView, 0xA8);
 // SunFlr_Gc.c's weights for fn_8009A754 (6 rows of 8).
 extern f32 lbl_80189DA8[6][8];
 
+// An element of a SunFlrSet (0x40 bytes; our name).
+typedef struct SunFlrDesc {
+    u8   unk0[0x24];
+    f32  f24;                   // 0x24
+    u8   unk28[0x40 - 0x28];
+} SunFlrDesc;
+LAYOUT_ASSERT(SunFlrDesc, 0x40);
+
 // An entry of Code8009AA28.c's table lbl_80189E78 (0x90 bytes; our name): up to two elements.
 typedef struct SunFlrSet {
-    struct {
-        u8   unk0[0x24];
-        f32  f24;               // +0x24
-        u8   unk28[0x40 - 0x28];
-    } a[2];                     // 0x00
+    SunFlrDesc a[2];            // 0x00
     s32  nCount;                // 0x80  how many of a[] are used
     u8   unk84[0x90 - 0x84];
 } SunFlrSet;

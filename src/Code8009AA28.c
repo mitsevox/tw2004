@@ -85,9 +85,10 @@ void fn_8009AA28(void) {
 // GoTerrain.c's values (v4 = (0, 150, -400), v14 = (0.8, 0.8, 0.4)).
 void fn_8009AF30(s32 nViews) {
     s32 i;
+    s32 j;
     s32 k;
     SunFlrSet* pSet;
-    s32 j;
+    SunFlrDesc* pDesc;
     SunFlrView* pView;
     f32 v14[4];
     f32 v4[4];
@@ -101,9 +102,10 @@ void fn_8009AF30(s32 nViews) {
     for (i = 0; i < 3; i++) {
         lbl_802813B8->af193C[i] = 0.0f;
         pSet = &lbl_802813B8->p1924[i];
-        for (j = 0; j < pSet->nCount; j++) {
-            if (lbl_802813B8->af193C[i] < pSet->a[j].f24) {
-                lbl_802813B8->af193C[i] = pSet->a[j].f24;
+        pDesc = pSet->a;
+        for (j = 0; j < pSet->nCount; j++, pDesc++) {
+            if (lbl_802813B8->af193C[i] < pDesc->f24) {
+                lbl_802813B8->af193C[i] = pDesc->f24;
             }
         }
     }
