@@ -222,7 +222,9 @@ typedef struct HwsRender10 {
 
 // The GameCube renderer's state (lbl_80223BB0; hwsRender_Gc.c, hwsOverride_Gc.c).
 typedef struct HwsRenderState {
-    u8   unk0[0xC];
+    void* p0;                   // 0x00  fn_801138CC sets it
+    s32  n4;                    // 0x04  } cleared by fn_80113844
+    s32  n8;                    // 0x08  }
     HwsOverrideTable* pOverride;    // 0x0C  fn_801138D8
     HwsRender10 s10;            // 0x10
 } HwsRenderState;
