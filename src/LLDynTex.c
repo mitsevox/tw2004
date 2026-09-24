@@ -259,6 +259,30 @@ s32 fn_8010B754(DynTexObj* pObj) {
     return nBytes;
 }
 
+// The same level's size in 16-byte units, rounded up.
+u32 fn_8010B548(DynTexObj* pObj, int nLevel) {
+    u32 nA = pObj->n3A;
+    u32 nB = pObj->n38;
+    int i;
+
+    for (i = 0; i < nLevel; i++) {
+        nA >>= 1;
+        nB >>= 1;
+    }
+    return (((nA * nB * fn_8010C458(pObj->n40) + 7) >> 3) + 15) >> 4;
+}
+
+// The 16-byte units of all of a texture's levels.
+s32 fn_8010B5F8(DynTexObj* pObj) {
+    int i;
+    s32 nUnits = 0;
+
+    for (i = 0; i < pObj->n41; i++) {
+        nUnits += fn_8010B548(pObj, i);
+    }
+    return nUnits;
+}
+
 // Bits per pixel of texture format nFormat (0 for the formats it does not list).
 int fn_8010C458(int nFormat) {
     int nBits = 0;
