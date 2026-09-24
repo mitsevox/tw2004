@@ -23,9 +23,6 @@ f32 fn_800BA504(f32 fAlpha);
 void fn_800BA550(void);
 f32 fn_800BA6CC(void);
 f32 fn_800BA700(void);
-TexBank* fn_800106C4(int nSlot);                                    // LLTexGrp.c
-int fn_800107C0(UStreamObject* pObject, TexBank* pBank, int n);     // LLTexGrp.c
-TexEntry* fn_800922A0(TexBank* pBank);                              // fe_movies.c: its first texture
 void fn_80012898(s32 v);
 void fn_80012B9C(f32 fX, f32 fY);
 void fn_8006A9AC(f32* pColor);

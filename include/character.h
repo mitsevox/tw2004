@@ -59,6 +59,24 @@ typedef struct SkelPose {
 } SkelPose;
 LAYOUT_ASSERT(SkelPose, 0x1040);
 
+// A format 1 pose buffer (0x114C bytes; animblender.c copies it whole): three blocks from 0x4, each
+// starting with a bit per morph (20: fn_80072ACC clears them all; FE_PGATourMessages.c clears morph
+// m's in every block with fn_800736D8).
+// fn_80071C28 sets each block's bits and its 20 floats, and clears the SkelPose's first bit arrays.
+typedef struct SkelPoseBlock {
+    u32  aBits[1];              // 0x00
+    u8   unk4[4];
+    f32  af8[20];               // 0x08  one per morph, 0 when the buffer is taken (fn_80071C28)
+} SkelPoseBlock;
+LAYOUT_ASSERT(SkelPoseBlock, 0x58);
+
+typedef struct SkelPose1 {
+    u8   unk0[4];
+    SkelPoseBlock aBlocks[3];   // 0x004
+    SkelPose pose;              // 0x10C  as a format 0 buffer
+} SkelPose1;
+LAYOUT_ASSERT(SkelPose1, 0x114C);
+
 // A character's skeleton data (CharModel.pSkel; the SKEL_ functions take it): its IK chains and
 // how strongly their solution is applied (the IK weight, 0..1); only what the code reads.
 typedef struct Skeleton {
@@ -217,7 +235,16 @@ void AnimLib_Free(AnimLib* pLib);       // skalib.c
 void ClipBank_Release(int nSlot);       // skalib.c
 void fn_8001F66C(void);                 // mtalib.c
 void fn_80071B94(void);                 // animblender.c
-void fn_80071F58(struct SKABlendNode** ppNode, int n);   // animblender.c: gives a blend tree back
+
+// animblender.c's pools (fn_80071AD0 creates them, fn_80071B94 destroys them): blend tree nodes by
+// type (0x34, 0x2C and 0x20 bytes), then pose buffers of format 0 (0x1040) and format 1 (0x114C).
+extern UMemPool* lbl_80281E98;
+extern UMemPool* lbl_80281E94;
+extern UMemPool* lbl_80281E90;
+extern UMemPool* lbl_80281E8C;
+extern UMemPool* lbl_80281E88;
+void fn_80071F58(struct SKABlendNode** ppNode, u8 bFreeSources);   // animblender.c: gives a blend
+                                        // tree back (bFreeSources: the sources' clips too)
 
 // animblender.c: whether a source under pNode plays pSrc (format 0, format 1).
 u8 fn_80073554(SKABlendNode* pNode, void* pSrc);
