@@ -7,15 +7,33 @@
 #include "unsorted/cull.h"
 
 // Skin.c
-void fn_800360A0(void* pMesh);
-void fn_800360D4(u8* pMesh);
-void fn_80036100(u8* pMesh, void* pDesc, int n);
+void fn_80036054(ShaderObject* pObj, int nRow, const void* pDesc);
+void fn_800360A0(ShaderObject* pObj);
+void fn_800360D4(ShaderObject* pObj);
+void fn_80036100(ShaderObject* pObj, const void* pData, int n);
 
 void fn_80098BDC(PsEmitter* pEmitter);
 u32  fn_8009912C(PsEmitter* pEmitter, int n, f32 fTime, f32 f);  // not yet decompiled
 // Sort the list (next pointer in word n of each emitter?) by pfnCompare; not yet decompiled.
 PsEmitter* fn_80099C50(PsEmitter* pList, int n, int (*pfnCompare)(PsEmitter*, PsEmitter*));
 int  fn_80099E34(PsEmitter* pA, PsEmitter* pB);
+
+// Make the six fixed emitters, each with a 128-particle system (row 9, the particle shader).
+void fn_80098A98(void) {
+    ParticleCreate create;
+    ParticleParams params;
+    int i;
+
+    for (i = 0; i < 6; i++) {
+        lbl_801DB888[i] = fn_80009B34(sizeof(PsEmitter), 2, 64, "UFstPart.c", 408);
+        lbl_801DB888[i]->b5C = 0;
+        memset(&params, 0, sizeof(ParticleParams));
+        params.nCount = 128;
+        create.bAlloc = 1;
+        create.pParams = &params;
+        fn_80036054(&lbl_801DB888[i]->mesh, 9, &create);
+    }
+}
 
 // Free every emitter on the list, then the six fixed ones.
 void fn_80098B5C(void) {
@@ -31,15 +49,15 @@ void fn_80098B5C(void) {
     }
     lbl_80281F88 = NULL;
     for (i = 0; i < 6; i++) {
-        fn_800360A0(lbl_801DB888[i]->mesh);
+        fn_800360A0(&lbl_801DB888[i]->mesh);
         fn_80009E70(lbl_801DB888[i]);
     }
 }
 
 void fn_80098BDC(PsEmitter* pEmitter) {
     pEmitter->b5C = 0;
-    if (pEmitter->nB4 < 0) {
-        fn_800360A0(pEmitter->mesh);
+    if (pEmitter->params.n54 < 0) {
+        fn_800360A0(&pEmitter->mesh);
         fn_80009E70(pEmitter);
     }
 }
@@ -59,25 +77,25 @@ void fn_80098C28(void) {
 }
 
 void fn_80098C70(void) {
-    lbl_801DB888[0]->uB8 |= 0x80000000;
-    lbl_801DB888[1]->uB8 |= 0x80000000;
-    lbl_801DB888[2]->uB8 |= 0x80000000;
-    lbl_801DB888[3]->uB8 |= 0x80000000;
-    lbl_801DB888[4]->uB8 |= 0x80000000;
-    lbl_801DB888[5]->uB8 |= 0x80000000;
+    lbl_801DB888[0]->params.u58 |= 0x80000000;
+    lbl_801DB888[1]->params.u58 |= 0x80000000;
+    lbl_801DB888[2]->params.u58 |= 0x80000000;
+    lbl_801DB888[3]->params.u58 |= 0x80000000;
+    lbl_801DB888[4]->params.u58 |= 0x80000000;
+    lbl_801DB888[5]->params.u58 |= 0x80000000;
 }
 
-// Draw the emitter's mesh (with n and the two floats), and add n to its n50.
-void fn_800990BC(PsEmitter* pEmitter, int n, f32 fA, f32 fB) {
-    PsEmitterDraw draw;
+// Emit n particles through the emitter's matrix (ages spread over fAgeSpread), and add n to its n50.
+void fn_800990BC(PsEmitter* pEmitter, int n, f32 f10, f32 fAgeSpread) {
+    ParticleMsg msg;
 
-    draw.n0 = 1;
-    draw.p4 = pEmitter->a60;
-    draw.pEmitter = pEmitter;
-    draw.nC = n;
-    draw.f10 = fA;
-    draw.f14 = fB;
-    fn_80036100(pEmitter->mesh, &draw, 1);
+    msg.nWhat = 1;
+    msg.pParams = &pEmitter->params;
+    msg.u.emit.pMtx = pEmitter->mtx;
+    msg.u.emit.nCount = n;
+    msg.u.emit.f10 = f10;
+    msg.u.emit.fAgeSpread = fAgeSpread;
+    fn_80036100(&pEmitter->mesh, &msg, 1);
     pEmitter->n50 += n;
 }
 
@@ -92,7 +110,7 @@ void fn_80099344(f32 fTime) {
     pEmitter = lbl_80281F88;
     pPrev = NULL;
     while (pEmitter != NULL) {
-        uFlags = pEmitter->uB8;
+        uFlags = pEmitter->params.u58;
         pNext = pEmitter->p40;
         if (uFlags & 0x80000000) {
             if (uFlags & 0x40000000) {
@@ -104,12 +122,12 @@ void fn_80099344(f32 fTime) {
                 }
             } else {
                 pPrev = pEmitter;
-                pEmitter->uB8 = uFlags | 0x40000000;
+                pEmitter->params.u58 = uFlags | 0x40000000;
             }
         } else {
             if (!(uFlags & 0x2000) || pEmitter->n58 < 119) {
                 if (fn_8009912C(pEmitter, pEmitter->n58++, fTime, fTime + pEmitter->f4C)) {
-                    pEmitter->uB8 |= 0x80000000;
+                    pEmitter->params.u58 |= 0x80000000;
                 }
                 pEmitter->f4C = fTime;
             }
@@ -120,23 +138,23 @@ void fn_80099344(f32 fTime) {
 }
 
 // Whether fn_80099BA0 passes the emitter: always with a radius over 1000, else unless
-// fn_80007D74 gives 2 for its sphere (vD0 in view space, radius f84).
+// fn_80007D74 gives 2 for its sphere (params.v70 in view space, radius params.f24).
 u32 fn_80099AE4(PsEmitter* pEmitter, Camera* pCamera) {
     Vec4 vView;
     Sphere sphere;
 
-    if (pEmitter->f84 > 1000.0f) {
+    if (pEmitter->params.f24 > 1000.0f) {
         return 1;
     }
-    fn_800BAD60(pCamera->viewMtx, (Vec4*)pEmitter->vD0, &vView);
+    fn_800BAD60(pCamera->viewMtx, (Vec4*)pEmitter->params.v70, &vView);
     Vec3Copy(&vView.x, &sphere.x);
-    sphere.radius = pEmitter->f84;
+    sphere.radius = pEmitter->params.f24;
     return fn_80007D74(&sphere, pCamera, 0) != 2;
 }
 
 void fn_80099B74(PsEmitter* pEmitter) {
     pEmitter->n58 = 0;
-    fn_800360D4(pEmitter->mesh);
+    fn_800360D4(&pEmitter->mesh);
 }
 
 // Sort the emitters by their distance from pCamera's lens (fn_80099E34), then fn_80099B74 each
@@ -151,7 +169,7 @@ void fn_80099BA0(Camera* pCamera) {
     lbl_801DB878[3] = 1.0f;
     lbl_80281F88 = fn_80099C50(lbl_80281F88, 16, fn_80099E34);
     for (pEmitter = lbl_80281F88; pEmitter != NULL; pEmitter = pEmitter->p40) {
-        if (!(pEmitter->uB8 & 0x80000000) && fn_80099AE4(pEmitter, pCamera)) {
+        if (!(pEmitter->params.u58 & 0x80000000) && fn_80099AE4(pEmitter, pCamera)) {
             fn_80099B74(pEmitter);
         }
     }
@@ -159,8 +177,8 @@ void fn_80099BA0(Camera* pCamera) {
 
 // fn_80099BA0's sort order: pB's squared distance from lbl_801DB878 minus pA's.
 int fn_80099E34(PsEmitter* pA, PsEmitter* pB) {
-    f32 fA = fn_800BB028(lbl_801DB878, pA->vE0);
-    return fn_800BB028(lbl_801DB878, pB->vE0) - fA;
+    f32 fA = fn_800BB028(lbl_801DB878, pA->params.v80);
+    return fn_800BB028(lbl_801DB878, pB->params.v80) - fA;
 }
 
 void fn_80099EA4(PsEmitter* pEmitter) {

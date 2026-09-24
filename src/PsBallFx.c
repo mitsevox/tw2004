@@ -7,23 +7,23 @@
 #include "golfer.h"
 #include "dynobj.h"
 
-void fn_80036054(void* pMesh, int n, s32* pDesc);  // Skin.c
-void fn_800360A0(void* pMesh);     // Skin.c
+void fn_80036054(ShaderObject* pObj, int nRow, const void* pDesc);  // Skin.c
+void fn_800360A0(ShaderObject* pObj);                               // Skin.c
 void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer);   // below; Ball.c declares it too
 void fn_800A34C0(int n, Ball* pBall, f32* pDir);          // not yet decompiled
 
 // Set up the mesh and its buffers (50 quads; the second buffer gets each quad's texture corners),
 // clear the emitters and find the "sandtrl" texture.
 void PsBallFx_InitModule(void) {
-    s32 desc[2];
+    DynRenderSize size;
     int i;
     f32 fZero = 0.0f;
     f32 fOne = 1.0f;
     u64 uHash;
 
-    desc[0] = 400;
-    desc[1] = 2;
-    fn_80036054(lbl_80281408->mesh, 0, desc);
+    size.nMaxVerts = 400;
+    size.nMaxDraws = 2;
+    fn_80036054(&lbl_80281408->mesh, 0, &size);
     lbl_80281408->p2C = fn_80009B34(0x640, 2, 16, "PsBallFx.c", 1435);
     lbl_80281408->p30 = fn_80009B34(0x320, 2, 16, "PsBallFx.c", 1440);
     lbl_80281408->p28 = fn_80009B34(0x960, 2, 16, "PsBallFx.c", 1445);
@@ -47,7 +47,7 @@ void PsBallFx_InitModule(void) {
 }
 
 void fn_800A2E14(void) {
-    fn_800360A0(lbl_80281408->mesh);
+    fn_800360A0(&lbl_80281408->mesh);
     fn_80009E70(lbl_80281408->p28);
     fn_80009E70(lbl_80281408->p2C);
     fn_80009E70(lbl_80281408->p30);
@@ -81,7 +81,7 @@ void fn_800A2E68(void) {
 // Start the effects of emitters 9 and 10 at nPlayer's ball (only with a club up to 8).
 void fn_800A2FFC(int nPlayer, int bOn) {
     f32 vPos[4];
-    PsEmitterDef* pDef;
+    ParticleParams* pDef;
     PsEmitter* pEmitter;
     int nView;
 
@@ -104,7 +104,7 @@ void fn_800A2FFC(int nPlayer, int bOn) {
 }
 
 void fn_800A30E4(int nKind, Ball* pBall, int nPlayer, u8 bFlight, f32 fValue) {
-    PsEmitterDef* pDef;
+    ParticleParams* pDef;
     int i;
     PsEmitter* pEmitter;
 
@@ -242,15 +242,15 @@ void fn_800A3CB0(f32* pPos, int nPlayer) {
 // Move the emitter of nPlayer's view to pPos.
 void fn_800A3D6C(f32* pPos, int nPlayer) {
     int nView = gPlayers[nPlayer].nView[0];
-    if (lbl_80281408->apEmitter[nView] != NULL && (lbl_80281408->apEmitter[nView]->uB8 & 0x20000)) {
-        Vec_Copy(pPos, lbl_80281408->apEmitter[nView]->vE0);
-        Vec_Copy(pPos, lbl_80281408->apEmitter[nView]->v30);
+    if (lbl_80281408->apEmitter[nView] != NULL && (lbl_80281408->apEmitter[nView]->params.u58 & 0x20000)) {
+        Vec_Copy(pPos, lbl_80281408->apEmitter[nView]->params.v80);
+        Vec_Copy(pPos, lbl_80281408->apEmitter[nView]->mtx[3]);
     }
 }
 
 void fn_800A3DF4(int nPlayer) {
     PsEmitter* pEmitter = lbl_80281408->apEmitter[gPlayers[nPlayer].nView[0]];
-    if (pEmitter != NULL && (pEmitter->uB8 & 0x20000)) {
+    if (pEmitter != NULL && (pEmitter->params.u58 & 0x20000)) {
         pEmitter->n50 = 1000000;
     }
 }

@@ -499,18 +499,29 @@ typedef struct SD_SShaderObject_Static {
 } SD_SShaderObject_Static;
 
 // A particle system's settings, as the particle shader's create callback (fn_8009428C) reads
-// them. Only the fields read there are named.
+// them. Only the fields read there are named. 0x120 bytes: UFstPart.c's emitters (PsEmitter.params,
+// psmgr.h) are started from these, and PsBallFx.c's 25 at lbl_8018CA98 are its settings.
 typedef struct ParticleParams {
     u8   unk0[4];
     f32  f4;                    // 0x04  the particles' lifetime: older ones are dropped (fn_80094B84)
-    u8   unk8[0x58 - 0x8];
-    u32  u58;                   // 0x58  flags; 0x80 and 0x100 pick the blend (fn_800949D0)
+    u8   unk8[0x24 - 0x8];
+    f32  f24;                   // 0x24  the radius fn_80099AE4 tests an emitter with (over 1000: always)
+    u8   unk28[0x40 - 0x28];
+    f32  f40;                   // 0x40  written by fn_800A30E4
+    u8   unk44[0x54 - 0x44];
+    s32  n54;                   // 0x54  below 0 in an emitter: fn_80098BDC frees it
+    u32  u58;                   // 0x58  flags; 0x80 and 0x100 pick the blend (fn_800949D0); in an
+                                //       emitter 0x80000000 marks it done (fn_80098C70, fn_80099344)
     u8   unk5C[2];
     s16  nCount;                // 0x5E  how many particles
     u8   unk60[0x6C - 0x60];
     s16  nTexture;              // 0x6C  the texture: its name in lbl_801F1640
-    u8   unk6E[0xA0 - 0x6E];
-    f32  vA0[4];                // 0xA0  } ParticleShape.v60 = vB0 + vA0 x f110
+    u8   unk6E[0x70 - 0x6E];
+    f32  v70[4];                // 0x70  a point fn_80099AE4 puts through the camera's view matrix
+    f32  v80[4];                // 0x80  a position (the ball's, fn_800A2FFC; fn_800A3D6C)
+    u8   unk90[0x10];
+    f32  vA0[4];               // 0xA0  } ParticleShape.v60 = vB0 + vA0 x f110; fn_800A3CB0
+                                //       puts the wind vector x 0.1 here
     f32  vB0[4];                // 0xB0  }
     f32  vC0[4];                // 0xC0  -> ParticleShape.v10 (each of these / 256)
     f32  vD0[4];                // 0xD0  -> ParticleShape.v20
@@ -523,7 +534,9 @@ typedef struct ParticleParams {
     f32  f110;                  // 0x110  a time: ParticleShape.f50 is a quarter of it, f54 its inverse
     f32  f114;                  // 0x114
     f32  f118;                  // 0x118
+    u8   unk11C[4];
 } ParticleParams;
+LAYOUT_ASSERT(ParticleParams, 0x120);
 
 // What the particle shader's create callback is handed. It is called twice: with bAlloc set to
 // allocate the system, then clear to fill it in.
@@ -576,7 +589,7 @@ typedef struct ParticleMsg {
         struct {
             f32 (*pMtx)[4];     // 0x08  the new particles' positions and velocities go through it
             u32  nCount;        // 0x0C  how many to emit; counted down to 0
-            u8   unk10[4];
+            f32  f10;           // 0x10  UFstPart.c's fn_800990BC passes a float here
             f32  fAgeSpread;    // 0x14  the new particles' ages run from this down to 0
         } emit;
     } u;
