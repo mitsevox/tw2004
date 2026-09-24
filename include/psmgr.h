@@ -49,16 +49,17 @@ typedef struct PsEmitter {
 // PsBallFx.c's state (lbl_801F1708, 0x88 bytes), reached through lbl_80281408.
 typedef struct PsBallFxState {
     u8   mesh[0x28];            // 0x00  a mesh object (Skin.c's fn_80036054; fn_800A2E14 frees it)
-    void* p28;                  // 0x28  } freed by fn_800A2E14
-    void* p2C;                  // 0x2C  }
-    void* p30;                  // 0x30  }
+    void* p28;                  // 0x28  } freed by fn_800A2E14; PsBallFx_InitModule allocates
+    f32*  p2C;                  // 0x2C  } 0x960, 0x640 and 0x320 bytes; p2C holds the corners
+    void* p30;                  // 0x30  } (0,0) (1,0) (0,1) (1,1) of 50 quads
     s32  n34;                   // 0x34  } cleared by fn_800A2E68
     s32  n38;                   // 0x38  }
     s32  n3C;                   // 0x3C  }
     s32  n40;                   // 0x40  }
     s32  n44;                   // 0x44  }
-    u8   unk48[0x50 - 0x48];
-    void* p50;                  // 0x50  freed by fn_800A2E14
+    TexBank*  pBank;            // 0x48  the "sandtrl" texture's bank (PsBallFx_InitModule)
+    TexEntry* pTex;             // 0x4C  and the texture
+    void* p50;                  // 0x50  freed by fn_800A2E14 (0x4B0 bytes)
     f32  a54[8];                // 0x54  cleared by fn_800A2E68
     PsEmitter* ap74[2];         // 0x74  one per view (Player.nView[0]); fn_800A2FFC
     PsEmitter* apEmitter[(0x88 - 0x7C) / 4];    // 0x7C  one per view (Player.nView[0])

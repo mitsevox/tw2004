@@ -7,9 +7,44 @@
 #include "golfer.h"
 #include "dynobj.h"
 
+void fn_80036054(void* pMesh, int n, s32* pDesc);  // Skin.c
 void fn_800360A0(void* pMesh);     // Skin.c
 void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer);   // below; Ball.c declares it too
 void fn_800A34C0(int n, Ball* pBall, f32* pDir);          // not yet decompiled
+
+// Set up the mesh and its buffers (50 quads; the second buffer gets each quad's texture corners),
+// clear the emitters and find the "sandtrl" texture.
+void PsBallFx_InitModule(void) {
+    s32 desc[2];
+    int i;
+    f32 fZero = 0.0f;
+    f32 fOne = 1.0f;
+    u64 uHash;
+
+    desc[0] = 400;
+    desc[1] = 2;
+    fn_80036054(lbl_80281408->mesh, 0, desc);
+    lbl_80281408->p2C = fn_80009B34(0x640, 2, 16, "PsBallFx.c", 1435);
+    lbl_80281408->p30 = fn_80009B34(0x320, 2, 16, "PsBallFx.c", 1440);
+    lbl_80281408->p28 = fn_80009B34(0x960, 2, 16, "PsBallFx.c", 1445);
+    lbl_80281408->p50 = fn_80009B34(0x4B0, 2, 16, "PsBallFx.c", 1450);
+    for (i = 0; i < 50; i++) {
+        lbl_80281408->p2C[i * 8 + 0] = fZero;
+        lbl_80281408->p2C[i * 8 + 1] = fZero;
+        lbl_80281408->p2C[i * 8 + 2] = fOne;
+        lbl_80281408->p2C[i * 8 + 3] = fZero;
+        lbl_80281408->p2C[i * 8 + 4] = fZero;
+        lbl_80281408->p2C[i * 8 + 5] = fOne;
+        lbl_80281408->p2C[i * 8 + 6] = fOne;
+        lbl_80281408->p2C[i * 8 + 7] = fOne;
+    }
+    lbl_80281408->ap74[0] = NULL;
+    lbl_80281408->ap74[1] = NULL;
+    lbl_80281408->apEmitter[0] = NULL;
+    lbl_80281408->apEmitter[1] = NULL;
+    uHash = fn_8000BEE4("sandtrl");
+    fn_800102DC(uHash, &lbl_80281408->pBank, &lbl_80281408->pTex);
+}
 
 void fn_800A2E14(void) {
     fn_800360A0(lbl_80281408->mesh);
