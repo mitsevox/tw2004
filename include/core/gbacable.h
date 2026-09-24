@@ -10,7 +10,7 @@
 #define GBA_NUM_CHANNELS 4
 
 // The link's context block (0x20 bytes): the GameCube sends its own and reads the GBA's back in
-// 4-byte parts (fn_8012311C, "GbaOpen"; fn_80122FD8, "GbaReadContext").
+// 4-byte parts (GbaOpen, "GbaOpen"; GbaReadContext, "GbaReadContext").
 typedef struct GbaContext {
     u8   b0;                    // 0x00  in the GBA's: 0 before the link is opened
     u8   nChan;                 // 0x01  the port
@@ -37,10 +37,10 @@ typedef struct GbaChannel {
     u32  u5C;                   // 0x5C  what SIProbe finds on the port (0x40000: a GBA); 0x40 at start
     u8   unk60[0x64 - 0x60];
     s32  n64;                   // 0x64  set when u58 is new
-    u32  u68;                   // 0x68  the cash the GBA holds (fn_80123398, "FROMGBA_CASHDATA")
-    s32  n6C;                   // 0x6C  cash to move between GBA and GameCube (fn_80123398)
-    s32  n70;                   // 0x70  the GBA's answer to a stats request (fn_80123398)
-    s32  n74;                   // 0x74  the GBA's unlock mask (fn_80123398, "FROMGBA_UNLOCKMASK")
+    u32  u68;                   // 0x68  the cash the GBA holds (GbaCommunication, "FROMGBA_CASHDATA")
+    s32  n6C;                   // 0x6C  cash to move between GBA and GameCube (GbaCommunication)
+    s32  n70;                   // 0x70  the GBA's answer to a stats request (GbaCommunication)
+    s32  n74;                   // 0x74  the GBA's unlock mask (GbaCommunication, "FROMGBA_UNLOCKMASK")
 } GbaChannel;
 LAYOUT_ASSERT(GbaChannel, 0x78);
 

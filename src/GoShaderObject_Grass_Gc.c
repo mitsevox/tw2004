@@ -2,7 +2,7 @@
 // siblings): the grass shader object, one row of the shader object table. Builds the shells of
 // grass over the hole's terrain into a vertex buffer (the GrassPacket calls) and draws them through
 // GX. GoGrass.c hands it the grass parameters once per hole (SD_vSetGrassParamsOnce).
-// Partly decompiled: the builder (SD_vShaderObject_Grass_Static_Init) is a draft.
+// The builder (SD_vShaderObject_Grass_Static_Init) is a draft.
 
 #include "grassshader.h"
 #include "camera.h"

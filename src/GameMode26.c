@@ -151,7 +151,7 @@ u8 fn_8010C8D8(u8 bCheck) {
     return 0;
 }
 
-// Nobody plays after the current player: the mode switches players itself.
+// Always 5: no player has the honor.
 s32 fn_8010C8E0(int nPlayer) {
     return 5;
 }
@@ -484,7 +484,8 @@ void fn_8010D3B8(void) {
     }
 }
 
-// The ball came to rest on surface 155.
+// A track (fn_800A746C kind 1, track 0) when the player's ball is on surface 155 (GameAudio.c
+// calls it when the ball hits a surface).
 void fn_8010D3D8(int nPlayer) {
     Player* pPlayer = &gPlayers[nPlayer];
 

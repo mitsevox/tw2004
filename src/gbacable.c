@@ -1,6 +1,6 @@
 // gbacable.c (EA's name, from its asserts): the Game Boy Advance link cable: the four ports' link
 // state (lbl_80260E18), the commands sent over the cable and the getters and setters the front end
-// uses. Only partly decompiled.
+// uses.
 
 #include "game_types.h"
 #include "platform.h"
@@ -12,15 +12,15 @@
 
 s32  fn_80122AF0(s32 nChan);
 s32  fn_80122BCC(s32 nChan);
-s32  fn_80122E68(s32 nChan, u32* pWord);
-s32  fn_80122CFC(s32 nChan, u32* pCmd);
-void fn_80123398(s32 nChan, s32 nCmd, s32 nStat);
-void fn_80123ABC(s32 nChan);
+s32  GbaReadOnline(s32 nChan, u32* pWord);
+s32  GbaWriteOnline(s32 nChan, u32* pCmd);
+void GbaCommunication(s32 nChan, s32 nCmd, s32 nStat);
+void GbaSetport(s32 nChan);
 void fn_80123C2C(s32 nChan);
 void fn_80123CBC(s32 a, s32 b);
 void fn_80123E34(void);
-s32  fn_80122FD8(s32 nChan);
-void fn_8012311C(s32 nChan);
+s32  GbaReadContext(s32 nChan);
+void GbaOpen(s32 nChan);
 void fn_8012408C(s32 v);
 
 // The check byte of a port's key: a CRC-style sum over its two bytes, with the polynomial 0xCD.
@@ -140,7 +140,7 @@ s32 fn_80122BCC(s32 nChan) {
 }
 
 // Sends the GBA one word once it can take one ("GbaWriteOnline").
-s32 fn_80122CFC(s32 nChan, u32* pCmd) {
+s32 GbaWriteOnline(s32 nChan, u32* pCmd) {
     u32 uStart = OSGetTick();
 
     for (;;) {
@@ -172,7 +172,7 @@ s32 fn_80122CFC(s32 nChan, u32* pCmd) {
 }
 
 // Reads one word from the GBA once it has one ("GbaReadOnline").
-s32 fn_80122E68(s32 nChan, u32* pWord) {
+s32 GbaReadOnline(s32 nChan, u32* pWord) {
     u32 uStart = OSGetTick();
 
     for (;;) {
@@ -205,7 +205,7 @@ s32 fn_80122E68(s32 nChan, u32* pWord) {
 
 // The handshake: the GBA answers with the disc's game code or 0x42545745, is sent the game code,
 // asked for its context and read it in eight words ("GbaReadContext").
-s32 fn_80122FD8(s32 nChan) {
+s32 GbaReadContext(s32 nChan) {
     u32* pWord;
     u32 uCmd;
     GbaChannel* pCh;
@@ -222,12 +222,12 @@ s32 fn_80122FD8(s32 nChan) {
         return 0;
     }
     uCmd = 0x60000000;
-    if (fn_80122CFC(nChan, &uCmd) == 0) {
+    if (GbaWriteOnline(nChan, &uCmd) == 0) {
         OSReport("GbaReadContext: An error occurred to command 'FROMGC_REQUEST_CONTEXT' (chan=%d).\n", nChan);
         return 0;
     }
     for (i = 0, pWord = (u32*)&pCh->got; i < sizeof(GbaContext); i += 4) {
-        if (fn_80122E68(nChan, pWord) == 0) {
+        if (GbaReadOnline(nChan, pWord) == 0) {
             OSReport("GbaReadContext: An error occurred in reading the %d(th) part of %d (chan=%d).\n", i + 1,
                      sizeof(GbaContext), nChan);
             return 0;
@@ -237,9 +237,10 @@ s32 fn_80122FD8(s32 nChan) {
     return 1;
 }
 
-// Opens the link on a port from the GBA's context: a GBA with none gets a new one; one whose
-// context is ours keeps it; any other is sent ours back. The GBA must echo the tick sent.
-void fn_8012311C(s32 nChan) {
+// Opens the link on a port from the GBA's context: a GBA with none gets a new one (sent in state 3,
+// fn_80123ABC); one whose context is ours is sent a new tick and is linked once it echoes it; any
+// other is sent its own tick back and the port goes to state 4 (the contexts differ).
+void GbaOpen(s32 nChan) {
     GbaChannel* pCh;
     u32* pSentTick;
     u32 uOld;
@@ -285,11 +286,11 @@ void fn_8012311C(s32 nChan) {
             uCmd = OSGetTick();
             *pSentTick = uCmd;
         }
-        if (fn_80122CFC(nChan, &uCmd) == 0) {
+        if (GbaWriteOnline(nChan, &uCmd) == 0) {
             OSReport("GbaOpen: An error occurred in writing (chan=%d).\n", nChan);
             return;
         }
-        if (fn_80122E68(nChan, &uReply) == 0 || bOther || uCmd != uReply) {
+        if (GbaReadOnline(nChan, &uReply) == 0 || bOther || uCmd != uReply) {
             if (!bOther) {
                 OSReport("GbaOpen: An error occurred in reading (chan=%d).\n", nChan);
             }
@@ -304,8 +305,8 @@ void fn_8012311C(s32 nChan) {
 
 void fn_8012332C(s32 nChan) {
     if (GBAReset(nChan, &lbl_80260E18[nChan].uStatus) == 0) {
-        if (fn_80122FD8(nChan)) {
-            fn_8012311C(nChan);
+        if (GbaReadContext(nChan)) {
+            GbaOpen(nChan);
         } else {
             fn_8012408C(3);
         }
@@ -316,20 +317,20 @@ void fn_8012332C(s32 nChan) {
 // then runs one request: 0x70 reads the cash the GBA holds, 0x90 also moves n6C of it to the
 // GameCube, 0xD0 sends n6C of cash to the GBA, 0xB0 sends stat nStat (0-3), 0x71 and 0xD3 ask the
 // GBA to save its cash and stats, and 0xD1 reads its unlock mask. Any failed command unlinks the port.
-void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
+void GbaCommunication(s32 nChan, s32 nCmd, s32 nStat) {
     u32 uCmd = 0x10000000;
     u32 uWord;
     s32 i;
     s32 nWhich;
 
-    if (fn_80122CFC(nChan, &uCmd) == 0) {
+    if (GbaWriteOnline(nChan, &uCmd) == 0) {
         OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_PADDATA' (chan=%d).\n",
                  nChan);
         lbl_80260E18[nChan].n0 = 0;
         fn_8012408C(0x12);
         return;
     }
-    if (fn_80122E68(nChan, &uWord) == 0 || uWord >> 24 != 0x20) {
+    if (GbaReadOnline(nChan, &uWord) == 0 || uWord >> 24 != 0x20) {
         OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_PADDATA' (chan=%d).\n", nChan);
         lbl_80260E18[nChan].n0 = 0;
         fn_8012408C(0x12);
@@ -339,7 +340,7 @@ void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
     lbl_80260E18[nChan].u58 = uWord;
     lbl_80260E18[nChan].n64 = 1;
     for (i = 0; i < GBA_NUM_CHANNELS; i++) {
-        if (fn_80122CFC(nChan, &lbl_80260E18[i].uKey) == 0) {
+        if (GbaWriteOnline(nChan, &lbl_80260E18[i].uKey) == 0) {
             OSReport("GbaCommunication: POSITION DATA: An error occurred in writing the %d(th) part of %d "
                      "(chan=%d).\n",
                      i + 1, GBA_NUM_CHANNELS, nChan);
@@ -355,14 +356,14 @@ void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
     case 0x70:
     case 0x90:
         uCmd = 0x70000000;
-        if (fn_80122CFC(nChan, &uCmd) == 0) {
+        if (GbaWriteOnline(nChan, &uCmd) == 0) {
             OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_CASHDATA' (chan=%d).\n",
                      nChan);
             lbl_80260E18[nChan].n0 = 0;
             fn_8012408C(0x12);
             return;
         }
-        if (fn_80122E68(nChan, &uWord) == 0 || uWord >> 24 != 0x80) {
+        if (GbaReadOnline(nChan, &uWord) == 0 || uWord >> 24 != 0x80) {
             OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_CASHDATA' (chan=%d).\n", nChan);
             lbl_80260E18[nChan].n0 = 0;
             fn_8012408C(0x12);
@@ -377,14 +378,14 @@ void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
             break;
         }
         uCmd = lbl_80260E18[nChan].n6C | 0x90000000;
-        if (fn_80122CFC(nChan, &uCmd) == 0) {
+        if (GbaWriteOnline(nChan, &uCmd) == 0) {
             OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_CASHXFER' (chan=%d).\n",
                      nChan);
             lbl_80260E18[nChan].n0 = 0;
             fn_8012408C(0x12);
             return;
         }
-        if (fn_80122E68(nChan, &uWord) == 0 || uWord >> 24 != 0xA0) {
+        if (GbaReadOnline(nChan, &uWord) == 0 || uWord >> 24 != 0xA0) {
             OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_CASHXFER_CONFIRM' (chan=%d).\n",
                      nChan);
             lbl_80260E18[nChan].n0 = 0;
@@ -395,14 +396,14 @@ void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
         break;
     case 0xD0:
         uCmd = lbl_80260E18[nChan].n6C | 0xD0000000;
-        if (fn_80122CFC(nChan, &uCmd) == 0) {
+        if (GbaWriteOnline(nChan, &uCmd) == 0) {
             OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_CASH2GBA' (chan=%d).\n",
                      nChan);
             lbl_80260E18[nChan].n0 = 0;
             fn_8012408C(0x12);
             return;
         }
-        if (fn_80122E68(nChan, &uWord) == 0 || uWord >> 24 != 0xE0) {
+        if (GbaReadOnline(nChan, &uWord) == 0 || uWord >> 24 != 0xE0) {
             OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_CASH2GBA_CONFIRM' (chan=%d).\n",
                      nChan);
             lbl_80260E18[nChan].n0 = 0;
@@ -432,14 +433,14 @@ void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
             break;
         }
         uCmd = ((nWhich + 0xB0) << 24) | nStat;
-        if (fn_80122CFC(nChan, &uCmd) == 0) {
+        if (GbaWriteOnline(nChan, &uCmd) == 0) {
             OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_STATS' (chan=%d).\n",
                      nChan);
             lbl_80260E18[nChan].n0 = 0;
             fn_8012408C(0x12);
             return;
         }
-        if (fn_80122E68(nChan, &uWord) == 0 || uWord >> 24 != nWhich + 0xC0) {
+        if (GbaReadOnline(nChan, &uWord) == 0 || uWord >> 24 != nWhich + 0xC0) {
             OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_STAT_TRANSFER' (chan=%d).\n",
                      nChan);
             lbl_80260E18[nChan].n0 = 0;
@@ -450,14 +451,14 @@ void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
         break;
     case 0x71:
         uCmd = 0x71000000;
-        if (fn_80122CFC(nChan, &uCmd) == 0) {
+        if (GbaWriteOnline(nChan, &uCmd) == 0) {
             OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_SAVE_CASH' (chan=%d).\n",
                      nChan);
             lbl_80260E18[nChan].n0 = 0;
             fn_8012408C(0x12);
             return;
         }
-        if (fn_80122E68(nChan, &uWord) == 0 || uWord >> 24 != 0x81) {
+        if (GbaReadOnline(nChan, &uWord) == 0 || uWord >> 24 != 0x81) {
             OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_CASH_SAVED' (chan=%d).\n",
                      nChan);
             lbl_80260E18[nChan].n0 = 0;
@@ -467,14 +468,14 @@ void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
         break;
     case 0xD3:
         uCmd = 0xD3000000;
-        if (fn_80122CFC(nChan, &uCmd) == 0) {
+        if (GbaWriteOnline(nChan, &uCmd) == 0) {
             OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_SAVE_STAT' (chan=%d).\n",
                      nChan);
             lbl_80260E18[nChan].n0 = 0;
             fn_8012408C(0x12);
             return;
         }
-        if (fn_80122E68(nChan, &uWord) == 0 || uWord >> 24 != 0xD4) {
+        if (GbaReadOnline(nChan, &uWord) == 0 || uWord >> 24 != 0xD4) {
             OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_STAT_SAVED' (chan=%d).\n",
                      nChan);
             lbl_80260E18[nChan].n0 = 0;
@@ -484,7 +485,7 @@ void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
         break;
     case 0xD1:
         uCmd = 0xD1ABCDEF;
-        if (fn_80122CFC(nChan, &uCmd) == 0) {
+        if (GbaWriteOnline(nChan, &uCmd) == 0) {
             OSReport(
                 "GbaCommunication: An error occurred to command 'FROMGC_REQUEST_UNLOCKMASK' (chan=%d).\n",
                 nChan);
@@ -492,7 +493,7 @@ void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
             fn_8012408C(0x12);
             return;
         }
-        if (fn_80122E68(nChan, &uWord) == 0 || uWord >> 24 != 0xD2) {
+        if (GbaReadOnline(nChan, &uWord) == 0 || uWord >> 24 != 0xD2) {
             OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_UNLOCKMASK' (chan=%d).\n",
                      nChan);
             lbl_80260E18[nChan].n0 = 0;
@@ -506,18 +507,18 @@ void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
 
 // Sends the GBA the "set port" command and our context in eight words, then reads its context
 // back: the port is linked ("GbaSetport").
-void fn_80123ABC(s32 nChan) {
+void GbaSetport(s32 nChan) {
     u32 uCmd = 0x30000000;
     u32 i;
 
-    if (fn_80122CFC(nChan, &uCmd) == 0) {
+    if (GbaWriteOnline(nChan, &uCmd) == 0) {
         OSReport("GbaSetport: An error occurred to command 'FROMGC_SETPORT' (chan=%d).\n", nChan);
         lbl_80260E18[nChan].n0 = 0;
         fn_8012408C(0x12);
         return;
     }
     for (i = 0; i < sizeof(GbaContext); i += 4) {
-        if (fn_80122CFC(nChan, (u32*)((u8*)&lbl_80260E18[nChan].sent + i)) == 0) {
+        if (GbaWriteOnline(nChan, (u32*)((u8*)&lbl_80260E18[nChan].sent + i)) == 0) {
             OSReport("GbaSetport: An error occurred in writing  the %d(th) part of %d (chan=%d).\n", i + 1,
                      sizeof(GbaContext), nChan);
             lbl_80260E18[nChan].n0 = 0;
@@ -526,7 +527,7 @@ void fn_80123ABC(s32 nChan) {
         }
     }
     for (i = 0; i < sizeof(GbaContext); i += 4) {
-        if (fn_80122E68(nChan, (u32*)((u8*)&lbl_80260E18[nChan].got + i)) == 0) {
+        if (GbaReadOnline(nChan, (u32*)((u8*)&lbl_80260E18[nChan].got + i)) == 0) {
             OSReport("GbaSetport: An error occurred in reading (chan=%d).\n", nChan);
             lbl_80260E18[nChan].n0 = 0;
             fn_8012408C(0x12);
@@ -542,7 +543,7 @@ void fn_80123ABC(s32 nChan) {
 void fn_80123C2C(s32 nChan) {
     u32 uCmd = 0x50000000;
 
-    if (fn_80122CFC(nChan, &uCmd) == 0) {
+    if (GbaWriteOnline(nChan, &uCmd) == 0) {
         OSReport("GbaSetport: An error occurred to command 'FROMGC_CONTEXT_DIFFER' (chan=%d).\n", nChan);
         lbl_80260E18[nChan].n0 = 0;
         fn_8012408C(0x10);
@@ -554,8 +555,8 @@ void fn_80123C2C(s32 nChan) {
 
 // Moves every port's link on by one step. A port without a GBA (SIProbe type 0x40000), or other
 // than the port already being worked on, is unlinked. An unlinked port waits up to 800 ms for the
-// GBA to answer, then the port is opened (fn_8012332C), run (fn_80123398), given our context
-// (fn_80123ABC) or told the contexts differ (fn_80123C2C).
+// GBA to answer, then the port is opened (fn_8012332C), run (GbaCommunication), given our context
+// (GbaSetport) or told the contexts differ (fn_80123C2C).
 void fn_80123CBC(s32 a, s32 b) {
     GbaChannel* pCh;
     s32 nChan = 0;
@@ -588,10 +589,10 @@ void fn_80123CBC(s32 a, s32 b) {
                 fn_8012332C(nChan);
                 break;
             case 2:
-                fn_80123398(nChan, a, b);
+                GbaCommunication(nChan, a, b);
                 break;
             case 3:
-                fn_80123ABC(nChan);
+                GbaSetport(nChan);
                 break;
             case 4:
                 fn_80123C2C(nChan);
@@ -888,11 +889,12 @@ s32 fn_80124280(s32 arg0) {
 // ---- end of sweep code ----
 
 // Runs the link for the front end once a frame, by the state fn_8012408C sets. 0 starts it (15
-// frames' grace, the port free); 1 polls until a GBA links, giving up (0x11) after 4 seconds; 4 and
-// 5 poll the linked GBA, and in 5 a pending request is sent (cash to the GBA, the stats copied into
-// the profile, the save-cash and save-stats requests); 0x12 (a failed command) undoes what the
-// pending request did to the profile; 6 takes cash from the GBA; 8 swaps stats with it, keeping the
-// best of each, and asks it to save them. 0xC to 0xF raise a request and go back to 5.
+// frames' grace, the port free); 1 polls until a GBA links, giving up (0x11) after 4 seconds; 2, 4,
+// 5, 7 and 9 poll the linked GBA (4 clears the amount and goes to 5), and in 5 a pending request is
+// sent (cash to the GBA, the stats copied into the profile, the save-cash and save-stats requests);
+// 0x12 (a failed command) undoes what the pending request did to the profile; 6 takes cash from the
+// GBA and has it save its cash (7); 8 swaps stats with it (below) and, when none failed, asks it to
+// save them (9). 0xC to 0xF raise a request and go back to 5.
 void fn_801242D0(void) {
     SaveProfile* pProfile;
     s32 bFailed;
@@ -975,7 +977,8 @@ void fn_801242D0(void) {
         fn_80124238(2, pProfile->nA0);
         fn_80124238(3, pProfile->nA4);
 
-        // the best round: the lower, where the GBA's is set (0 and 0xFF: none)
+        // the best round: when ours is unset (<= 0), the GBA's if it is set (not 0 or 0xFF);
+        // else the lower of the two
         fn_80123CBC(0xB0, 0);
         if (fn_80124094() == 0x12) {
             bFailed = 1;
