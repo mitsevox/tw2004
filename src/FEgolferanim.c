@@ -472,14 +472,15 @@ void fn_8008B850(void) {
 // Run the state machine once: enter the state, update it, and when it is finished leave it for
 // the next one.
 void fn_8008B864(void) {
+    // port: EA passes an argument the state handlers (lbl_80189AA0) ignore
     if (lbl_801D8708.bPaused == 0 && lbl_801D8708.nState != 0) {
         if (lbl_801D8708.bEnter) {
-            lbl_80189AA0[lbl_801D8708.nState].pfnEnter();
+            ((void (*)(int))lbl_80189AA0[lbl_801D8708.nState].pfnEnter)(0);
             lbl_801D8708.bEnter = 0;
         }
-        lbl_80189AA0[lbl_801D8708.nState].pfnUpdate();
+        ((void (*)(int))lbl_80189AA0[lbl_801D8708.nState].pfnUpdate)(0);
         if (lbl_801D8708.bDone) {
-            lbl_80189AA0[lbl_801D8708.nState].pfnExit();
+            ((void (*)(int))lbl_80189AA0[lbl_801D8708.nState].pfnExit)(0);
             lbl_801D8708.bDone = 0;
             lbl_801D8708.nState = lbl_801D8708.nNext;
             lbl_801D8708.bEnter = 1;
