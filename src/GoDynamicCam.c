@@ -30,6 +30,11 @@ void fn_80039554(UStreamObject* pObject);
 void fn_80039690(UStreamObject* pObject);
 void fn_80039754(UStreamObject* pObject);
 void fn_800397EC(UStreamObject* pObject);
+void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScript, CamShot* pShot, f32* pCam,
+                            f32* pSub);
+void fn_8003D324(f32* pPos, f32* pDir, CamScript* pScript, CamShot* pShot, int nPlayer, f32 fSide, f32 fY);
+void fn_8003D414(f32* pPos, CamScript* pScript, CamShot* pShot, int nPlayer, f32 fY);
+void fn_8003D9AC(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pOut, u8 bKeep);
 
 // Registers the handlers of the camera files ('CAMS', 'CAMV', 'CAMA').
 void fn_80039454(void) {
@@ -435,6 +440,56 @@ u8 fn_8003ABEC(CamChoice* pChoice, int nPlayer) {
     return 1;
 }
 
+// The ball-flight camera's position for the shot: from the point DynamicCam_GetLocation gives for
+// kind 0, along the ball's flight by the shot's f60 (changed by CamTuning.f18C times how far the
+// ball is above the shot's f6C over the script's ground height fD8, or f190 times how far below its
+// f68), then
+// moved sideways by its f64 (fn_8003D324). Nothing happens while the ball is slower than
+// CamTuning.f198.
+void fn_8003B534(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub) {
+    f32 vFrom[4];
+    f32 vDir[4];
+    f32 vPos[4];
+    f32 fY = pOut[1];
+    f32 fHeight;
+    f32 fMax;
+    f32 fMin;
+    f32 fDist;
+
+    DynamicCam_GetLocation(0, nPlayer, vFrom, pScript, pShot, pCam, pSub);
+    Vec3Copy(gPlayers[nPlayer].ball.vVel, vDir);
+    if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
+        fn_800BAF04(vDir, vDir);
+    }
+    if (gPlayers[nPlayer].ball.fSpeed < lbl_80281F78->f198) return;
+    if (pScript->pNextShot != NULL && pScript->pShot->bB1 == pScript->pNextShot->bB1) {
+        fMax = pScript->pShot->f6C;
+        fMin = pScript->pShot->f68;
+    } else {
+        fMax = pShot->f6C;
+        fMin = pShot->f68;
+    }
+    fHeight = gPlayers[nPlayer].ball.vPos[1] - pScript->fD8;
+    if (fHeight > fMax) {
+        fDist = lbl_80281F78->f18C * (fMax - fHeight) + pShot->f60;
+    } else if (fHeight < fMin) {
+        fDist = lbl_80281F78->f190 * (fHeight - fMin) + pShot->f60;
+    } else {
+        fDist = pShot->f60;
+    }
+    fn_8000C5D4(vFrom, vDir, fDist, vPos);
+    fn_8003D324(vPos, vDir, pScript, pShot, nPlayer, pShot->f64, fY);
+    Vec3Copy(vPos, pOut);
+}
+
+// The point DynamicCam_GetLocation gives for the shot's bAF.
+void fn_8003B6D0(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub) {
+    f32 vPos[4];
+
+    DynamicCam_GetLocation(pShot->bAF, nPlayer, vPos, pScript, pShot, pCam, pSub);
+    Vec3Copy(vPos, pOut);
+}
+
 // The set named szName (case ignored) gives a sequence (*ppSeq) or a shot (*ppShot): its p20
 // 39 times in 100 when that has shot choices, else by its kind: 14 one of p14, p18 and p1C at
 // random (the next one when the pick is missing), 13 its shot. 0: no set gave one.
@@ -748,6 +803,20 @@ u8 fn_8003D294(CamShot* pShot) {
     return 0;
 }
 
+// Moves pPos fSide sideways, square to pDir on the level, then hands it on to fn_8003D414.
+void fn_8003D324(f32* pPos, f32* pDir, CamScript* pScript, CamShot* pShot, int nPlayer, f32 fSide, f32 fY) {
+    f32 vDir[4];
+
+    Vec3Copy(pDir, vDir);
+    vDir[1] = 0.0f;
+    if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
+        fn_800BAF04(vDir, vDir);
+    }
+    pPos[0] += fSide * -vDir[2];
+    pPos[2] += fSide * vDir[0];
+    fn_8003D414(pPos, pScript, pShot, nPlayer, fY);
+}
+
 // The sequence suits the player's club and shot kind.
 u8 fn_8003D7A0(CamSequence* pSequence, int nPlayer) {
     if (pSequence == NULL) return 0;
@@ -789,6 +858,32 @@ void fn_8003D810(f32* pDir, f32* pA, f32* pB) {
         if (0.0f != pDir[0] || 0.0f != pDir[1] || 0.0f != pDir[2]) {
             fn_800BAF04(pDir, pDir);
         }
+    }
+}
+
+// The ball's position into pOut; but when the ball is in the cup (lie 12) or on surface 0x62 or
+// 0x69, more than 0.005 below the pin and within 2 of the script's v70, v70 instead. With bKeep,
+// v70 takes the ball's position whenever it is not used.
+void fn_8003D9AC(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pOut, u8 bKeep) {
+    u8 bNear = 0;
+    CourseInfo* pCourse = fn_8000C594();
+    int nPin = Game_CurrentPinSet();
+
+    if ((gPlayers[nPlayer].ball.nSurface == 0x62 || gPlayers[nPlayer].ball.nSurface == 0x69
+         || gPlayers[nPlayer].ball.nLie == 12)
+        && pCourse != NULL) {
+        if (pCourse->pin[nPin].y - gPlayers[nPlayer].ball.vPos[1] > 0.005f
+            && Vec_Distance(pScript->v70, gPlayers[nPlayer].ball.vPos) < 2.0f) {
+            bNear = 1;
+        }
+    }
+    if (bNear) {
+        Vec3Copy(pScript->v70, pOut);
+    } else {
+        Vec3Copy(gPlayers[nPlayer].ball.vPos, pOut);
+    }
+    if (bKeep && !bNear) {
+        Vec3Copy(gPlayers[nPlayer].ball.vPos, pScript->v70);
     }
 }
 
