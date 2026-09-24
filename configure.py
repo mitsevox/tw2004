@@ -481,9 +481,23 @@ config.libs = [
             Object(Matching, "src/os/OSLink.c"),
             Object(Matching, "src/os/OSSemaphore.c"),
             Object(Matching, "src/os/__ppc_eabi_init.c"),
-            Object(Matching, "src/gba/GBA.c"),
             Object(Matching, "src/card/CARDBios.c"),
             Object(Matching, "src/card/CARDRdwr.c"),
+        ],
+    },
+    {
+        # The GBA library (link cable). This game links its debug build: no optimization, code
+        # sized for space, no inlining, asserts on (OSPanic with the source file and line).
+        "lib": "gba",
+        "mw_version": "GC/1.2.5n",
+        "cflags": [*cflags_sdk, "-opt level=0,space", "-schedule off", "-inline off", "-D_DEBUG"],
+        "progress_category": "sdk",
+        "objects": [
+            Object(NonMatching, "dolphin/gba/GBA.c"),
+            Object(NonMatching, "dolphin/gba/GBAGetProcessStatus.c"),
+            Object(NonMatching, "dolphin/gba/GBARead.c"),
+            Object(NonMatching, "dolphin/gba/GBAWrite.c"),
+            Object(NonMatching, "dolphin/gba/GBAXfer.c"),
         ],
     },
     {

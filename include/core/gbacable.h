@@ -25,7 +25,7 @@ typedef struct GbaContext {
 // One port's link state (lbl_80260E18[4], 0x78 bytes each). Only what the cleaned code uses.
 typedef struct GbaChannel {
     s32  n0;                    // 0x00  cleared at start and when a command fails; 2 once linked
-    u8   uStatus;               // 0x04  the port's status byte (fn_80176200 reads it)
+    u8   uStatus;               // 0x04  the port's status byte (GBAReset reads it)
     u8   unk5[0x8 - 0x5];
     GbaContext sent;            // 0x08  the GameCube's context
     GbaContext got;             // 0x28  the GBA's, as read

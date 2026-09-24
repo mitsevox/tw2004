@@ -1657,9 +1657,25 @@ Common/TagFile/TagFile.c:
 	.rodata     start:0x8018655C end:0x801866D4
 	.sbss       start:0x80282A30 end:0x80282A38
 
-src/gba/GBA.c:
-	.text       start:0x80176270 end:0x80176280
+dolphin/gba/GBA.c:
+	.text       start:0x80175F54 end:0x80176280
+	.data       start:0x8019D2C0 end:0x8019D300
+	.bss        start:0x80280660 end:0x80280B60
+	.sdata      start:0x80281B60 end:0x80281B68
 	.sbss       start:0x80282A38 end:0x80282A40
+
+dolphin/gba/GBAGetProcessStatus.c:
+	.text       start:0x80176280 end:0x8017641C
+
+dolphin/gba/GBARead.c:
+	.text       start:0x8017641C end:0x8017658C
+
+dolphin/gba/GBAWrite.c:
+	.text       start:0x8017658C end:0x801766E0
+
+dolphin/gba/GBAXfer.c:
+	.text       start:0x801766E0 end:0x80176A38
+	.data       start:0x8019D300 end:0x8019D338
 
 src/card/CARDBios.c:
 	.text       start:0x80176A38 end:0x80177DA4
