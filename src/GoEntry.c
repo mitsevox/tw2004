@@ -136,7 +136,7 @@ void fn_800083A4(void) {
             AI_TargetsClear();
             fn_800918A4();
             // one listener per view
-            fn_800A7A34(Game_GetCourse() + 1, 1, (gSession.nSplitScreen != 0) + 1, 0);
+            fn_800A7A34(Game_GetCourse() + 1, 1, gSession.nSplitScreen ? 2 : 1, 0);
             if (!fn_800E1734()) {
                 fn_8000882C();
                 fn_8001A81C();
