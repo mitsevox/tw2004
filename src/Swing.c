@@ -515,10 +515,10 @@ f32 fn_8005CC84(f32 fTan) {
 // threshold, all of it above. Putts, chips and pitches skip the error; a putt over 75% on the
 // meter counts as full power.
 f32 SW_vCalculateShotPower(int nPlayer) {
-    int     nAttr;
     f32     fPower, fError;
-    int     nRowScale, nRowThresh;
     f32*    pPower;
+    int     nRowScale, nRowThresh;
+    s8      nAttr;
     int     nKind;
     f32     fThresh, fScale;
 
