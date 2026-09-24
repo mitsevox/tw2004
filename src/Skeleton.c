@@ -31,7 +31,7 @@ void fn_8000ADC0(f32 (*pMtx)[4]);                        // identity
 void fn_80021980(u32* aA, u32* aB, u32* aOut, u32 nBits);   // aOut = aA | aB, bit arrays
 void fn_80029A00(CharModel* pModel, int nA, int nB, f32* pRot);
 void fn_80029BF4(f32* pA, f32* pB, f32* pOut);
-void fn_80029C60(u32* aSrc, u32* aDst, u32 n, u32 nShift);
+void fn_80029C60(u32* aSrc, u32* aDst, u32 nBits, u32 nShift);
 void fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits);
 void fn_80029664(CharModel* pModel);
 void fn_80029804(CharModel* pModel);
@@ -784,6 +784,28 @@ void fn_80029C3C(f32* pA, f32* pB, f32* pOut) {
     pOut[3] = pA[3] - pB[3];
 }
 #endif
+
+// Shifts a bit array of nBits bits (whole words) from aSrc into aDst by nShift bits: each word's top
+// nShift bits carry into the bottom of the next word.
+void fn_80029C60(u32* aSrc, u32* aDst, u32 nBits, u32 nShift) {
+    u32 uCarry = 0;
+    u32 uMask = 0;
+    u32 i;
+    u32 j;
+    u32 nWords;
+    u32 uWord;
+
+    for (i = 0; i < nShift; i++) {
+        uMask |= 1 << (31 - i);
+    }
+    nWords = (nBits + 31) >> 5;
+    for (j = 0; j < nWords; j++) {
+        uWord = aSrc[j];
+        aDst[j] = uWord << nShift;
+        aDst[j] |= uCarry >> (32 - nShift);
+        uCarry = uMask & uWord;
+    }
+}
 
 // Copies a bit array of nBits bits (whole words) from pSrc to pDst, when both are given.
 void fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits) {
