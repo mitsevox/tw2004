@@ -234,15 +234,25 @@ CamShot* fn_80064F7C(int nPlayer, int nKind, u8 bNotKind5, CamShot* pNot) {
 // paths (p40 the next shot, p44 the one before), finds each path's first shot and measures the
 // paths.
 CamShot* fn_8006509C(int nPath) {
-    u8 abEnds[NUM_FLYBY_PATHS] = { 0 };   // the path ends on a camera marked -99
+    u8 abEnds[NUM_FLYBY_PATHS];   // the path ends on a camera marked -99
     CamShot* pShot;
-    CamShot* pPrev;
     CamShot* pNext;
+    CamShot* pPrev;
     CamShot* pAfter;
     int i;
     int j;
     u8 bFound;
 
+    abEnds[0] = 0;
+    abEnds[1] = 0;
+    abEnds[2] = 0;
+    abEnds[3] = 0;
+    abEnds[4] = 0;
+    abEnds[5] = 0;
+    abEnds[6] = 0;
+    abEnds[7] = 0;
+    abEnds[8] = 0;
+    abEnds[9] = 0;
     if (!lbl_80281E18->bLinked) {
         for (i = 0; i < lbl_80281E18->nFlyBy; i++) {
             bFound = 0;
@@ -276,13 +286,12 @@ CamShot* fn_8006509C(int nPath) {
             }
         }
         for (i = 0; i < lbl_80281E18->nFlyBy; i++) {
-            pShot = &lbl_80281E18->aFlyBy[i];
-            if (!pShot->bAD && !pShot->bA9 && pShot->p40 != NULL) {
-                lbl_80281E18->apPath[pShot->nA4] = pShot;
+            if (!lbl_80281E18->aFlyBy[i].bAD && !lbl_80281E18->aFlyBy[i].bA9
+                && lbl_80281E18->aFlyBy[i].p40 != NULL) {
+                lbl_80281E18->apPath[lbl_80281E18->aFlyBy[i].nA4] = &lbl_80281E18->aFlyBy[i];
             }
-            pShot = &lbl_80281E18->aFlyBy[i];
-            if (abEnds[pShot->nA4]) {
-                pShot->bAA = 0;
+            if (abEnds[lbl_80281E18->aFlyBy[i].nA4]) {
+                lbl_80281E18->aFlyBy[i].bAA = 0;
             }
         }
         for (i = 0; i < NUM_FLYBY_PATHS; i++) {
@@ -451,46 +460,33 @@ void fn_80065488(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov,
     pScript->fA0 = fT;
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
+// The four shots a fly-by spline runs through around pShot: the one before (pShot itself at the
+// path's start), pShot, the next one and the one after that (each repeating the last at the end).
 void fn_8006596C(CamShot* pShot, CamShot** ppPrev, CamShot** ppNext, CamShot** ppAfter) {
-    void* temp_r0;
-    void* temp_r4;
-    void* temp_r5;
-    void* temp_r7;
-
-    temp_r0 = (*(void**)((u8*)(pShot) + 0x44));
-    if (temp_r0 != NULL) {
-        *ppPrev = temp_r0;
+    if (pShot->p44 != NULL) {
+        *ppPrev = pShot->p44;
     } else {
         *ppPrev = pShot;
     }
-    temp_r7 = (*(void**)((u8*)(pShot) + 0x40));
-    if (temp_r7 != NULL) {
-        if ((s32) (*(s32*)((u8*)(pShot) + 0xA4)) == (s32) (*(s32*)((u8*)(temp_r7) + 0xA4))) {
-            *ppNext = temp_r7;
+    if (pShot->p40 != NULL) {
+        if (pShot->nA4 == pShot->p40->nA4) {
+            *ppNext = pShot->p40;
         } else {
             *ppNext = pShot;
         }
     } else {
         *ppNext = pShot;
     }
-    temp_r4 = *ppNext;
-    if (temp_r4 != NULL) {
-        temp_r5 = (*(void**)((u8*)(temp_r4) + 0x40));
-        if (temp_r5 != NULL) {
-            if ((s32) (*(s32*)((u8*)(pShot) + 0xA4)) == (s32) (*(s32*)((u8*)(temp_r5) + 0xA4))) {
-                *ppAfter = temp_r5;
-                return;
-            }
-            *ppAfter = temp_r4;
-            return;
+    if (*ppNext != NULL && (*ppNext)->p40 != NULL) {
+        if (pShot->nA4 == (*ppNext)->p40->nA4) {
+            *ppAfter = (*ppNext)->p40;
+        } else {
+            *ppAfter = *ppNext;
         }
+    } else {
+        *ppAfter = *ppNext;
     }
-    *ppAfter = temp_r4;
 }
-
-// ---- end of sweep code ----
 
 // nPlayer's golfer or ball is inside the shot's area.
 u8 fn_800659F4(CamShot* pShot, int nPlayer) {
