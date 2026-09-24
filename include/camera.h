@@ -54,7 +54,8 @@ typedef struct CamShot {
     f32  f94;                   // 0x94
     f32  f98;                   // 0x98
     f32  f9C;                   // 0x9C
-    u8   unkA0[0xA4 - 0xA0];
+    s32  nA0;                   // 0xA0  CameraScript_InterpToNewScript: 0 fn_80045494 on, 2 fn_80045558
+                                //       on (else both off); 3 calls fn_800C7140(1)
     s32  nA4;                   // 0xA4
     u8   bA8;                   // 0xA8
     u8   bA9;                   // 0xA9  another shot's p40 leads here (fn_80039C5C)
@@ -280,7 +281,10 @@ typedef struct CamTuning {
     u8   unk110[0x128 - 0x110];
     f32  f128;                  // 0x128  CamScript_GetLookAtPoint: the least level distance for the
                                 //        steep-aim limit
-    u8   unk12C[0x164 - 0x12C];
+    u8   unk12C[0x15C - 0x12C];
+    f32  f15C;                  // 0x15C  CameraScript_InterpToNewScript puts it in CamScript.f88 (0 for
+                                //        the default swing camera)
+    u8   unk160[0x164 - 0x160];
     f32  f164;                  // 0x164  CamScript_GetLookAtPoint: kind 13's share of the height change
                                 //        a frame
     f32  f168;                  // 0x168  the ground clearance for CamScript_KeepAboveGround

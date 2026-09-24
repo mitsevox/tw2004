@@ -448,6 +448,138 @@ void fn_8004255C(f32* pPos, f32* pTarget, f32 fUp, f32 fSide) {
     pPos[2] += fSide * vDir[0];
 }
 
+// Starts pShot on the script. Blend kind nA 4 (the swing camera's cut) takes it outright unless
+// the current shot is a kind-3 shot that is not the default swing camera; a blend with time f1
+// makes pShot the next shot (first recording the current camera into pB4 when both shots are
+// script shots), its length f1 at least the move's distance over speed f2; otherwise pShot and
+// its follow-on start at once. nB and f3 go to nE0/fE4; single-view play sets fn_80045494,
+// fn_80045558 and fn_800C7140 from the shot's nA0.
+void CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pCam, f32* pSub,
+                                    int nA, f32 f1, f32 f2, int nB, f32 f3) {
+    f32 vDiff[4];
+    f32 vPos[4];
+    f32 fDist;
+
+    if (pShot == NULL) return;
+    if (nA == 4) {
+        if (pScript->pShot == NULL) {
+            nA = 5;
+            pScript->f88 = lbl_80281F78->f15C;
+        } else if (pScript->pShot->bAD == 3) {
+            if (pScript->pShot->p44 == NULL) {
+                nA = 5;
+                pScript->f88 = lbl_80281F78->f15C;
+            } else if (CameraScript_IsDefaultSwingCam(pScript->pShot, nPlayer, pCam)) {
+                pScript->f88 = 0.0f;
+            } else {
+                nA = 5;
+                pScript->f88 = lbl_80281F78->f15C;
+            }
+        }
+    } else {
+        pScript->f88 = lbl_80281F78->f15C;
+    }
+    if (pShot->bAC == 0) {
+        if (nA != 5 || pShot->bAF == 0 || pShot->bB0 == 0) {
+            pScript->bCD = 0;
+        } else {
+            pScript->bCD = 1;
+        }
+    } else {
+        pScript->bCD = 0;
+    }
+    if (nA == 4) {
+        pScript->pShot = pShot;
+        pScript->fDC = PI;
+        pScript->pNextShot = pShot->p40;
+        if (pShot->p40 != NULL) {
+            f1 = pShot->p40->f48;
+        }
+        // both branches are the same in the original
+        if (pScript->nBC == 4) {
+            pScript->fCamTime = 0.01f;
+            pScript->nBC = nA;
+            pScript->f8C = f1;
+        } else {
+            pScript->fCamTime = 0.01f;
+            pScript->nBC = nA;
+            pScript->f8C = f1;
+        }
+    } else if (f1 > 0.0f && pScript->pShot != NULL) {
+        if (pScript->pNextShot != NULL && pScript->pShot != pScript->pB4 && pScript->pNextShot != pScript->pB4
+            && pShot != pScript->pB4) {
+            CameraScript_RecordCurrentCam(pScript->pB4, pCam, pSub, nPlayer, pScript, 0);
+            pScript->pShot = pScript->pB4;
+        }
+        pScript->pNextShot = pShot;
+        pScript->fCamTime = 0.0f;
+        pScript->nBC = nA;
+        pScript->f8C = f1;
+        pScript->bCC = 1;
+        if (pShot->bB1 == 5) {
+            if (pScript->pShot->bB1 == 5) {
+                Vec3Copy(pScript->v0, pScript->v10);
+            } else {
+                Vec3Copy(pCam, pScript->v10);
+            }
+        } else if (pShot->bAF == 16) {
+            Vec3Copy(gPlayers[nPlayer].ball.vPos, pScript->v10);
+        } else {
+            Vec3Copy(pCam, pScript->v10);
+        }
+        if (nA != 5) {
+            Vec_Copy(pScript->v10, vPos);
+            fn_8003A148(pScript->pNextShot, nPlayer, pScript, vPos, pSub, pCam, 0.0f);
+            fn_80045428(vPos, pCam, vDiff);
+            fDist = fn_80009680(fn_80009744(vDiff));
+            if (fDist / f1 > f2) {
+                pScript->f8C = fDist / f2;
+            }
+        }
+    } else {
+        pScript->fDC = PI;
+        pScript->pShot = pShot;
+        pScript->pNextShot = pShot->p40;
+        pScript->f98 = 0.0f;
+        if (pShot->p40 != NULL) {
+            nA = pShot->p40->bAB;
+            f1 = pShot->p40->f48;
+        }
+        if (pShot->bAF == 16) {
+            Vec3Copy(gPlayers[nPlayer].ball.vPos, pScript->v0);
+        }
+        if (pScript->pNextShot != NULL && pScript->pShot->bB0 == 16) {
+            Vec3Copy(gPlayers[nPlayer].ball.vPos, pScript->v10);
+        }
+        pScript->fCamTime = 0.0f;
+        pScript->nBC = nA;
+        pScript->f8C = f1;
+        pScript->bCC = 0;
+        pScript->fEC = GameEffects_BallUpdatesThisFrame(nPlayer);
+    }
+    pScript->bCE = 1;
+    pScript->nE0 = nB;
+    pScript->fE4 = f3;
+    if (gSession.nSplitScreen == 0 && pScript->pShot != NULL) {
+        if (pScript->pShot->nA0 == 0) {
+            fn_80045558(0, nPlayer);
+            fn_80045494(1, nPlayer);
+        } else if (pScript->pShot->nA0 == 2) {
+            fn_80045558(1, nPlayer);
+            fn_80045494(0, nPlayer);
+        } else {
+            fn_80045558(0, nPlayer);
+            fn_80045494(0, nPlayer);
+        }
+        if (pScript->pShot->nA0 == 3) {
+            fn_800C7140(1);
+        } else {
+            fn_800C7140(0);
+        }
+    }
+    pScript->fF8 = 0.0f;
+}
+
 // The script's shot, or else its next one (unless the next kind is 5), has bAC 0 or 13 while the
 // ball makes no update this frame.
 u8 fn_80043920(CamScript* pScript, int nPlayer) {
