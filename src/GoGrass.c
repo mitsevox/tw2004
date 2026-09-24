@@ -39,7 +39,8 @@ s32  fn_8003505C(s32 n);           // sets a value, returns the old one
 void fn_80034AE4(void);
 void fn_80035138();
 void fn_800352BC();
-void GrassRender_vBuildAndUploadOneTimeData();
+void GrassRender_vBuildAndUploadOneTimeData(void);
+void fn_800738DC(TexBank* pBank, TexEntry* pTex, u8 bFirst);   // GoShaderObjectCommon
 void fn_8011FDC4(GrassBuffer* pBuffer);
 void fn_8011E3B4(void);
 void fn_80008380(void);
@@ -423,6 +424,65 @@ void fn_8011EF88(void) {
     fn_80014118(80);
     fn_80012EF8();
     GrassRender_vBuildAndUploadOneTimeData();
+}
+
+// Sets up the grass's texture stages (its texture by n3A4, and the grass texture) and works out
+// the shader parameters from the grass lens and the settings.
+void GrassRender_vBuildAndUploadOneTimeData(void) {
+    u64 uHash = fn_8000BEE4(lbl_80194598[lbl_80281900->n3A4]);
+    f32 fX;
+    f32 fZ;
+
+    fn_800102DC(uHash, &lbl_80281900->pBank, &lbl_80281900->pTex);
+    fn_800738DC(lbl_80281900->pBank, lbl_80281900->pTex, 1);
+    GXLoadTexObj(&lbl_8026038C, 2);
+    GXSetNumTexGens(2);
+    GXSetNumTevStages(3);
+    GXSetTevOrder(0, 1, 2, 4);
+    GXSetTevOrder(1, 0, 0, 4);
+    GXSetTevOrder(2, 0, 1, 4);
+    GXSetTevColorIn(0, 15, 8, 12, 15);
+    GXSetTevColorOp(0, 0, 0, 0, 1, 0);
+    GXSetTevAlphaIn(0, 7, 6, 6, 7);
+    GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
+    GXSetTevColorIn(1, 15, 8, 12, 0);
+    GXSetTevColorOp(1, 0, 0, 0, 1, 0);
+    GXSetTevAlphaIn(1, 7, 6, 6, 7);
+    GXSetTevAlphaOp(1, 0, 0, 1, 1, 0);
+    GXSetTevColorIn(2, 15, 0, 12, 15);
+    GXSetTevColorOp(2, 0, 0, 0, 1, 0);
+    GXSetTevAlphaIn(2, 7, 4, 5, 7);
+    GXSetTevAlphaOp(2, 0, 0, 1, 1, 0);
+    fX = lbl_80281900->pLens->v34[0] - 0.5f * lbl_80281900->pLens->fB4;
+    fZ = lbl_80281900->pLens->v34[2] - 0.5f * lbl_80281900->pLens->fB8;
+    lbl_80281900->af108[0][0] = 1.0f + fX / lbl_80281900->pLens->fB4;
+    lbl_80281900->af108[0][1] = 1.0f + fZ / lbl_80281900->pLens->fB8;
+    lbl_80281900->af108[0][2] = 1.0f;
+    lbl_80281900->af108[0][3] = 1.0f;
+    lbl_80281900->af108[1][0] = -1.0f / lbl_80281900->pLens->fB4;
+    lbl_80281900->af108[1][1] = -1.0f / lbl_80281900->pLens->fB8;
+    lbl_80281900->af108[1][2] = 0.0f;
+    lbl_80281900->af108[1][3] = 0.0f;
+    lbl_80281900->af148[0][0] = 0.0f;
+    lbl_80281900->af148[0][1] = 0.0f;
+    lbl_80281900->af148[0][2] = 0.0f;
+    lbl_80281900->af148[0][3] = 1.0f + lbl_80281900->f3C8;
+    lbl_80281900->af148[1][0] = 1.0f;
+    lbl_80281900->af148[1][1] = 1.0f;
+    lbl_80281900->af148[1][2] = 1.0f;
+    lbl_80281900->af148[1][3] = -1.0f / lbl_80281900->f3C4;
+    lbl_80281900->af218[0] = lbl_80281900->f3C0 * lbl_80281900->f3F8 / 255.0f;
+    lbl_80281900->af218[1] = lbl_80281900->f3C0 * lbl_80281900->f3F8 / 255.0f;
+    lbl_80281900->af218[2] = lbl_80281900->f3C0 * lbl_80281900->f3F8 / 255.0f;
+    lbl_80281900->af218[3] = 0.5f;
+    lbl_80281900->af208[0] = lbl_80281900->f3BC / 255.0f;
+    lbl_80281900->af208[1] = lbl_80281900->f3BC / 255.0f;
+    lbl_80281900->af208[2] = lbl_80281900->f3BC / 255.0f;
+    lbl_80281900->af208[3] = 0.5f;
+    SD_vSetGrassParamsOnce(lbl_80281900->af208, lbl_80281900->af218, lbl_80281900->af108,
+                           lbl_80281900->af168, lbl_80281900->af148, lbl_80281900->av230,
+                           lbl_80281900->f228, lbl_80281900->f22C);
+    fn_80012EF8();
 }
 
 void fn_8011F374(void) {

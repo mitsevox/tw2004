@@ -120,7 +120,8 @@ LAYOUT_ASSERT(GrassBuffer, 0x4C);
 
 // GoGrass.c's state (*lbl_80281900). Only the fields the decompiled code uses; its size is not known.
 typedef struct GrassManager {
-    u8           unk0[0x8];
+    TexEntry*    pTex;          // 0x00  } the grass texture named by n3A4 (akgrass1..4), found by
+    TexBank*     pBank;         // 0x04  } GrassRender_vBuildAndUploadOneTimeData
     s16*         p8;            // 0x08  the grass file's n0 halfwords (fn_8011E584)
     struct GrassTile* pC;       // 0x0C  the grass file's n10 records
     s32          n10;           // 0x10
@@ -153,9 +154,16 @@ typedef struct GrassManager {
     s32          anF8[2];       // 0xF8  their lengths
     s32          n100;          // 0x100
     s32          n104;          // 0x104
-    u8           unk108[0x168 - 0x108];
+    // 0x108..0x230: the parameters GrassRender_vBuildAndUploadOneTimeData hands to
+    // SD_vSetGrassParamsOnce.
+    f32          af108[2][4];   // 0x108  from the grass lens: 1 + (its position - half its view) /
+                                //        its view, then -1 / its view
+    u8           unk128[0x148 - 0x128];
+    f32          af148[2][4];   // 0x148  0, 0, 0, 1 + f3C8, then 1, 1, 1, -1 / f3C4
     f32          af168[8];      // 0x168  eight tuning values set at start (fn_8011E170)
-    u8           unk188[0x228 - 0x188];
+    u8           unk188[0x208 - 0x188];
+    f32          af208[4];      // 0x208  f3BC / 255 three times, then 0.5
+    f32          af218[4];      // 0x218  f3C0 * f3F8 / 255 three times, then 0.5
     f32          f228;          // 0x228  16 * f410 * cos(f40C) (fn_8011E6E8)
     f32          f22C;          // 0x22C  16 * f410 * sin(f40C)
     f32          av230[16][4];  // 0x230  16 points around a circle of radius f41C, phase f414
@@ -194,7 +202,8 @@ typedef struct GrassManager {
     f32          f3E8;          // 0x3E8  4.9
     f32          f3EC;          // 0x3EC  0
     s32          n3F0;          // 0x3F0  1
-    u8           unk3F4[0x3FC - 0x3F4];
+    u8           unk3F4[0x3F8 - 0x3F4];
+    f32          f3F8;          // 0x3F8
     f32          f3FC;          // 0x3FC  0
     f32          f400;          // 0x400  -0.36
     s32          n404;          // 0x404  } buffers placed with nC 1 / otherwise (fn_8011F544)
@@ -212,11 +221,15 @@ extern void* lbl_80282510;      // the grass's 256x256 texture buffer (fn_8011EB
 extern GXTexObj lbl_8026038C;   // its texture
 
 // GoGrass.c's draw data (not in C yet).
+extern char lbl_80194598[4][8]; // the grass textures' names, "akgrass1".."akgrass4" (by n3A4)
 extern f32 lbl_801945B8[4];     // a colour: 0.21, 0.31, 0.1, 1 (fn_8011EC84)
 extern f32 lbl_801945C8[8];     // the unit square's corners (fn_8011EC84)
 extern f32 lbl_801945E8[4];     // a colour: 0.5 each (fn_8011EE4C)
 extern f32 lbl_801945F8[8];     // (fn_8011EE4C)
 extern f32 lbl_80194618[8];     // (fn_8011EE4C)
+
+void SD_vSetGrassParamsOnce(f32* pUnused0, f32* pUnused1, f32 (*a2)[4], f32* p8, f32 (*b2)[4],
+                            f32 (*a16)[4], f32 fA, f32 fB);
 
 // The grass parameters GoGrass.c hands over once per hole (SD_vSetGrassParamsOnce).
 extern f32 lbl_802607D0[16][4];
