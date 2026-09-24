@@ -202,13 +202,13 @@ void fn_800B4FA4(RainObject* pRain) {
         nAlpha = 128.0f * pData->apB[nBuf][i].fAlpha;
         pSplash = &pData->apB[nBuf][i];
         fn_800B58C0(pSplash->av[0][0], pSplash->av[0][1], pSplash->av[0][2]);
-        fn_800B58E4(0x80, 0x80, 0x80, (u8)nAlpha);
+        fn_800B58E4(0x80, 0x80, 0x80, nAlpha & 0xFF);
         fn_800B58D4(0.0f, 0.0f);
         fn_800B58C0(pSplash->av[1][0], pSplash->av[1][1], pSplash->av[1][2]);
-        fn_800B58E4(0x80, 0x80, 0x80, (u8)nAlpha);
+        fn_800B58E4(0x80, 0x80, 0x80, nAlpha & 0xFF);
         fn_800B58D4(0.0f, 1.0f);
         fn_800B58C0(pSplash->av[2][0], pSplash->av[2][1], pSplash->av[2][2]);
-        fn_800B58E4(0x80, 0x80, 0x80, (u8)nAlpha);
+        fn_800B58E4(0x80, 0x80, 0x80, nAlpha & 0xFF);
         fn_800B58D4(1.0f, 0.0f);
     }
     fn_800124A8();
