@@ -32,8 +32,6 @@ void SD_vShaderObject_Rain_Dynamic_Init(RainObject* pRain, f32* pStrength);
 void fn_800B4F24(RainObject* pRain);
 void fn_800B4FA4(RainObject* pRain);
 void fn_800B52D4(RainObject* pRain, f32* pTime);
-CamLens* fn_8001F004(void);             // the current camera's lens
-void fn_800B5918(f32* pSrc, f32* pDst); // copy three floats
 
 void fn_800B4B5C(void) {
     lbl_802814B8->n0 = 0;
