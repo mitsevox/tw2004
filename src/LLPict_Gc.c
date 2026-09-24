@@ -21,9 +21,7 @@ void fn_8002FE70(void* arg0);
 void fn_8002FEAC(void);
 void fn_800B90F4();
 void fn_800B91B8();
-void fn_8002FEB0(u8* p0, u8* p1, s32 p2, s32 p3);
 s32 fn_800B920C();
-void fn_8002FF94(void);
 
 void fn_8002F4FC(void) {
     void* t1;
@@ -47,14 +45,12 @@ void fn_8002FE70(void* arg0) {
 void fn_8002FEAC(void) {
 }
 
-void fn_8002FEB0(u8* p0, u8* p1, s32 p2, s32 p3) {
-    void* t0;
-    *(s32*)(p0 + 0x60) = 0;
-    t0 = fn_80009B34(80, 1, 32, (const char*)lbl_801876C8, 278);
-    *(void**)p1 = t0;
-    *(s32*)(p1 + 0x4) = 0;
-    fn_800B90F4(p2, p3);
-    fn_800B91B8(*(s32*)p1);
+void fn_8002FEB0(LLPict* pPict, PictStream* pStream, void* (*pfnRead)(void* pArg), void* pArg) {
+    pPict->pPixels = NULL;
+    pStream->pDecoder = fn_80009B34(80, 1, 32, (const char*)lbl_801876C8, 278);
+    pStream->pFrame = NULL;
+    fn_800B90F4(pfnRead, pArg);
+    fn_800B91B8(pStream->pDecoder);
 }
 
 // ---- end of sweep code ----
@@ -73,19 +69,17 @@ void fn_8002FF38(LLPict* pPict, PictStream* pStream) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8002FF94(void) {
+void fn_8002FF94(LLPict* pPict, PictStream* pStream) {
 }
 
 // ---- end of sweep code ----
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_800B9930();
-void fn_8003001C(s32 p0, u8* p1);
-void fn_8003009C(void);
+u8 fn_800B9930(u8* p0);
 
-void fn_8003001C(s32 p0, u8* p1) {
-    fn_800B9930(*(s32*)(p1 + 0x0));
+u8 fn_8003001C(LLPict* pPict, PictStream* pStream) {
+    return fn_800B9930(pStream->pDecoder);
 }
 
 // ---- end of sweep code ----
@@ -101,7 +95,7 @@ u8 fn_80030040(LLPict* pPict, PictStream* pStream) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8003009C(void) {
+void fn_8003009C(LLPict* pPict, PictStream* pStream, int n2) {
 }
 
 // ---- end of sweep code ----

@@ -23,7 +23,7 @@ void* fn_800B9700(s32 arg0);
 void* fn_800B97A8(s32 arg0);
 s32 fn_800B9864();
 void fn_800B9808(s32 arg0, void* arg1);
-s32 fn_800B9930(u8* p0);
+u8 fn_800B9930(u8* p0);
 extern s32 lbl_802821D4;
 void UStream_UnregisterHandler();
 s32 fn_8000FB88();
@@ -133,7 +133,7 @@ void fn_800B9808(s32 arg0, void* arg1) {
     }
 }
 
-s32 fn_800B9930(u8* p0) {
+u8 fn_800B9930(u8* p0) {
     return (((u32)__cntlzw((2 - *(u8*)(p0 + 0x14))) >> 5) & 0xFF);
 }
 
