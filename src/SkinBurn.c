@@ -191,11 +191,11 @@ void fn_801276E4(Skin* pSkin) {
     u8* pBase;
     SkinModel* pNew;
     s32* aIndexes;
-    s32 nFirst;
     SkinModel44* pEntry;
     s32 j;
     s32 n;
     s32 nEntries;
+    s32 nFirst;
 
     pOld = pSkin->pModel;
     // EA passes &pOld where an array is expected: never NULL, so the model always counts
@@ -206,7 +206,8 @@ void fn_801276E4(Skin* pSkin) {
     nSize += fn_801275F0(pOld->p54, pOld->n50, sizeof(SkinModel54), 16);
     nSize += fn_801275F0(pOld->p44, pOld->n40, sizeof(SkinModel44), 16);
     nIndexes = 0;
-    for (i = 0; i < pOld->n40; i++) {
+    nEntries = pOld->n40;
+    for (i = 0; i < nEntries; i++) {
         nIndexes += pOld->p44[i].n8;
     }
     nSize += fn_801275F0(&pOld, nIndexes, sizeof(s32), 16);
