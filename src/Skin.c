@@ -678,6 +678,7 @@ void fn_800368FC(SkinDesc* pDesc) {
     SkinDesc14* pEntry;
     SkinMesh* pMesh;
     u8* pData;
+    int j;
     int i;
     u8* p;
     void* pSrc;                 // port: BYTESWAP_SWAPDATA takes it as a u8** too (one stack slot in EA's code)
@@ -755,11 +756,11 @@ void fn_800368FC(SkinDesc* pDesc) {
     }
 
     // Each mesh's bit data: its layout depends on the mesh's flags.
-    for (i = 0; i < pDesc->n2C; i++) {
-        if (pDesc->p34[i].pBits != NULL) {
-            pDesc->p34[i].pBits = (SkinMeshBit*)((u8*)pDesc + (uptr)pDesc->p34[i].pBits);
+    for (j = 0; j < pDesc->n2C; j++) {
+        if (pDesc->p34[j].pBits != NULL) {
+            pDesc->p34[j].pBits = (SkinMeshBit*)((u8*)pDesc + (uptr)pDesc->p34[j].pBits);
         }
-        pMesh = &pDesc->p34[i];
+        pMesh = &pDesc->p34[j];
         pData = (u8*)pMesh->pBits;
         n = pMesh->n8;
         if (pData == NULL) {
