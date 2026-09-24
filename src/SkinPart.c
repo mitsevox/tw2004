@@ -837,7 +837,8 @@ void fn_800CDF80(Skin* pSkin, int nPart, int nVariant, int nLink) {
 
     if (pSkin == NULL) return;
     pDesc = pSkin->pModel->pDesc;
-    pLink = &pDesc->pLinks[pDesc->pVariants[nVariant + pDesc->pParts[nPart].nFirst].nFirstLink + nLink];
+    // fake match: the cast, as in fn_800CCAC0
+    pLink = &pDesc->pLinks[nLink + ((SkinVariant*)pDesc->pVariants)[nVariant + pDesc->pParts[nPart].nFirst].nFirstLink];
     nOther = fn_800CDAFC(pSkin, pLink->uPart);
     if (nOther >= 0 && nOther < fn_800CCA40(pSkin)) {
         fn_800CCC1C(pSkin, nOther, pLink->nOption);
