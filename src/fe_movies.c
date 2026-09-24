@@ -25,8 +25,6 @@ void fn_800913EC(s16 nTable, s16 nEntry);
 void fn_80091460(s16 nTable, s16 nEntry);
 f32* fn_80093268(void);             // uiTransform.c
 void fn_8009222C(f32* pOut, LLPict* pPict);
-void fn_80090940(int nEntry);      // makes the picture of entry nEntry (lbl_801D87C0's table)
-void fn_800909B4(int nEntry);       // sets flag 0x10 on entry nEntry (lbl_801D87C0's table)
 
 // ---- sweep code (not yet cleaned up) ----
 

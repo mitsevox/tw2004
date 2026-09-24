@@ -20,6 +20,14 @@ typedef struct UIFileEntry {
     char szC[4];                // 0xC  its name (fn_8008FFF0 reads it); the length is not known
 } UIFileEntry;
 
+// A movie entry's data (UIFileEntry.p4; our name): uSize bytes of a picture file at aData, which
+// fn_80090940 turns into the entry's LLPict.
+typedef struct UIMovieData {
+    u8   unk0[0x1C];
+    u32  uSize;                 // 0x1C
+    u8   aData[1];              // 0x20  uSize of them
+} UIMovieData;
+
 typedef struct UIColorTable {
     s32  nCount;                // 0x0  read as an s16
     UIFileEntry* apEntries[1];  // 0x4  nCount of them
@@ -264,5 +272,9 @@ FrontEnd* fn_8009005C(char* szSet);
 
 // uiProcessInterface.c: for a UI name starting "tu", 1 in a lesson and -1 otherwise; else 0.
 int fn_8008FFF0(const char* szName);
+
+// Code80090940.c: the movie entries' pictures (fe_movies.c).
+UIFileEntry* fn_80090940(int nEntry);   // make entry nEntry's picture
+void fn_800909B4(int nEntry);           // mark entry nEntry (flag 0x10) to be freed
 
 #endif

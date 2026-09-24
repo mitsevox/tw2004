@@ -146,7 +146,7 @@ void fn_8008EFFC(UStreamObject* pObject) {
     Mem_cpy(pData, pObject->pData, pObject->uSize);
     lbl_80281F08 = pData;
     for (i = 0; i < lbl_80281F08[0]; i++) {
-        lbl_80281F08[1 + i] += (uptr)pData;
+        lbl_80281F08[1 + i] = lbl_80281F08[1 + i] + (uptr)pData;
         nSlot = fn_80012D04();
         fn_800127D8(nSlot, &((UIFont*)lbl_80281F08[1 + i])->nSlot, 0);
         ((UIFont*)lbl_80281F08[1 + i])->nSlot = nSlot;

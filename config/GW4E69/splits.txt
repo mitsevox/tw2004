@@ -329,11 +329,8 @@ GoShaderObjectContainer_OBFData_Gc.c:
 unsorted/sweep_8006FF2C.c:
 	.text       start:0x8006FF2C end:0x8006FF80
 
-unsorted/sweep_8006FF80.c:
-	.text       start:0x8006FF80 end:0x8006FFD4
-
-unsorted/sweep_8006FFD4.c:
-	.text       start:0x8006FFD4 end:0x8006FFF8
+ShaderRow0.c:
+	.text       start:0x8006FF80 end:0x80070168
 
 unsorted/sweep_80070168.c:
 	.text       start:0x80070168 end:0x8007018C
@@ -343,6 +340,7 @@ DynamicRenderingBuffer.c:
 
 Code80070EC4.c:
 	.text       start:0x80070EC4 end:0x8007110C
+	.sdata2     start:0x802839C8 end:0x802839D0
 
 GoShaderObject_PrelitUVAnimation_Gc.c:
 	.text       start:0x8007110C end:0x80071AD0
@@ -398,6 +396,9 @@ uiLoadFile.c:
 
 uiProcessInterface.c:
 	.text       start:0x8008F39C end:0x80090940
+
+Code80090940.c:
+	.text       start:0x80090940 end:0x80090B80
 
 fe_movies.c:
 	.text       start:0x80090B80 end:0x800922A8
