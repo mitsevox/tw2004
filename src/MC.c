@@ -200,6 +200,78 @@ s32 fn_8009FCFC(MCCardPos* pPos) {
     return nResult;
 }
 
+// Save the options and the records to the card at pPos: a new save file when there is none (if the
+// card has room), else into the save already there.
+s32 fn_8009FE90(MCCardPos* pPos) {
+    s32 nMount;
+    s32 nResult;
+    s32 nPort;
+    s32 nSlot;
+
+    nSlot = pPos->nSlot;
+    nPort = pPos->nPort;
+    nMount = fn_8009D74C(nPort, nSlot);
+    if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
+    // EA bug: this return and the failed writes below leave a card it mounted mounted
+    nResult = fn_8009F734(nPort, nSlot);
+    if (nResult != 0) return nResult;
+    if (fn_8009DD44(nPort, nSlot, MC_DIR_NAME) != 0) {
+        if (lbl_801F1510[nPort][nSlot].nFreeBlocks < fn_8009D1D8(nPort, nSlot, 0, 0)) {
+            return MC_ERR_INSSPACE;
+        }
+        nResult = fn_8009F514(nPort, nSlot, MC_DIR_NAME, 0);
+        if (nResult != 0) return nResult;
+        fn_8009DD44(nPort, nSlot, MC_DIR_NAME);
+        fn_8009E544(lbl_80281FDC->szGameName, lbl_80281FDC->szComment, lbl_80281FDC->aIcon,
+                    lbl_80281FDC->aBanner);
+        lbl_80281FDC->uFlags = 0;
+        lbl_80281FDC->uFlags |= MC_SAVE_OPTIONS;
+        lbl_80281FDC->uFlags |= MC_SAVE_RECORDS;
+        Mem_cpy(&lbl_80281FDC->options, &gSession.options, sizeof(GameOptions));
+        Mem_cpy(&lbl_80281FDC->records, gSession.aCourseRecord, sizeof(SaveRecords));
+        lbl_80281FDC->trailer.aMagic[0] = '@';
+        lbl_80281FDC->trailer.aMagic[1] = 'B';
+        lbl_80281FDC->trailer.aMagic[2] = 'E';
+        lbl_80281FDC->trailer.uChecksum = fn_800A23BC(lbl_80281FDC, &lbl_80281FDC->trailer);
+        nResult = fn_8009E604(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE, NULL);
+        if (nResult != 0) {
+            fn_8009F5E4(nPort, nSlot, MC_DIR_NAME);
+            return nResult;
+        }
+    } else {
+        if (fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FE8, MC_BUFFER_SIZE) != 0) {
+            lbl_80281FE8->uFlags = 0;
+            if (nMount == 0) {
+                fn_8009DBAC(nPort, nSlot);
+            }
+            return MC_ERR_BADDATA;
+        }
+        if (!fn_800A233C(lbl_80281FE8, &lbl_80281FE8->trailer)) {
+            lbl_80281FE8->uFlags = 0;
+            if (nMount == 0) {
+                fn_8009DBAC(nPort, nSlot);
+            }
+            return MC_ERR_BADDATA;
+        }
+        Mem_cpy(lbl_80281FDC, lbl_80281FE8, MC_BUFFER_SIZE);
+        lbl_80281FDC->uFlags |= MC_SAVE_OPTIONS;
+        lbl_80281FDC->uFlags |= MC_SAVE_RECORDS;
+        Mem_cpy(&lbl_80281FDC->options, &gSession.options, sizeof(GameOptions));
+        Mem_cpy(&lbl_80281FDC->records, gSession.aCourseRecord, sizeof(SaveRecords));
+        lbl_80281FDC->trailer.aMagic[0] = '@';
+        lbl_80281FDC->trailer.aMagic[1] = 'B';
+        lbl_80281FDC->trailer.aMagic[2] = 'E';
+        lbl_80281FDC->trailer.uChecksum = fn_800A23BC(lbl_80281FDC, &lbl_80281FDC->trailer);
+        nResult = fn_8009E604(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE,
+                              MC_BACKUP_NAME);
+        if (nResult != 0) return nResult;
+    }
+    if (nMount == 0) {
+        fn_8009DBAC(nPort, nSlot);
+    }
+    return 0;
+}
+
 // Load replay pPos->n8 of the save on the card into gReplayData: -16 when the save has none there.
 s32 fn_800A0230(MCCardPos* pPos) {
     s32 nMount;
