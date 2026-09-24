@@ -389,7 +389,7 @@ u8 fn_800AFAB0(void) {
     return 1;
 }
 
-int fn_800AFB48(void) {
+u8 fn_800AFB48(void) {
     return 1;
 }
 
@@ -651,7 +651,7 @@ u8 fn_800B0438(void) {
     return 1;
 }
 
-int fn_800B0440(void) {
+u8 fn_800B0440(void) {
     return 1;
 }
 
@@ -714,7 +714,7 @@ u8 fn_800B0568(void) {
 }
 
 // Free the DMA buffer once the DMA is done.
-int fn_800B0624(void) {
+u8 fn_800B0624(void) {
     if (lbl_80282110) {
         lbl_80282110 = 0;
         fn_8009527C(lbl_80282104);

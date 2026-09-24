@@ -461,7 +461,7 @@ void  fn_800B5C04(void* p);
 
 // AudTable.c
 u8             fn_800A7AF0(void);
-s32            fn_800A7C24(void);
+u8             fn_800A7C24(void);
 void           fn_800A7C2C(void);
 AudSource*     fn_800A7C30(u8 nEntry, s16 nSound);
 void           fn_800A7CA4(u8 nEntry, u8 uMaskA, u8 uMaskB, u32* auStreams, f32 (*aPos)[3], u16 uMask);
@@ -495,7 +495,7 @@ extern AudTrack* lbl_802820AC;          // the track whose block is being DMA'd 
 // hlaudtrack.c
 void fn_800A9808(AudTrack* pTrack);
 u8   fn_800A98B4(void);
-s32  fn_800A9A50(u8 a, u8 b);          // fn_800A8DC8's a and b, unused
+u8   fn_800A9A50(u8 a, u8 b);          // fn_800A8DC8's a and b, unused
 void fn_800A9AC4(void);
 void fn_800A9AC8(void);
 AudTrack* fn_800A9BC8(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 fPriority);
@@ -548,7 +548,7 @@ void Stm_SetPlayList(AudTrack* pTrack, u8 nPlayList);
 void Stm_SetStream(AudTrack* pTrack, u16 nStream, int nMode);
 
 // hlaudvoice.c
-s32  fn_800AC494(void);
+u8   fn_800AC494(void);
 void fn_800AC49C(void);
 AudVoice* fn_800AC4A0(AudVoiceRequest* pRequest);
 void fn_800AC6D0(AudVoice* pVoice, AudVoiceParams* pParams, u8 nVolume, f32 fPitch);
