@@ -63,15 +63,15 @@ void fn_8008F3A4(u32* p, uptr uBase, int nStride, u32 n) {
 // Turn the UI file's offsets into pointers.
 // port: the file stores 32-bit offsets in its pointer fields, as the GameCube's pointers are.
 void fn_8008F488(FrontEnd* pFE) {
-    UIFile* pFile = pFE->pFile;
     u32 i;
+    uptr uBase = (uptr)pFE->pFile;
 
-    pFE->pFile->p4 = (UIFilePairs*)((uptr)pFE->pFile->p4 + (uptr)pFile);
-    pFE->pFile->p8 = (UIFileTables*)((uptr)pFE->pFile->p8 + (uptr)pFile);
-    fn_8008F3A4((u32*)pFE->pFile->p4->aPairs, (uptr)pFile, 1, pFE->pFile->p4->nCount * 2);
-    fn_8008F3A4((u32*)pFE->pFile->p8->apTables, (uptr)pFile, 1, pFE->pFile->p8->nCount);
+    pFE->pFile->p4 = (UIFilePairs*)((uptr)pFE->pFile->p4 + uBase);
+    pFE->pFile->p8 = (UIFileTables*)((uptr)pFE->pFile->p8 + uBase);
+    fn_8008F3A4((u32*)pFE->pFile->p4->aPairs, uBase, 1, pFE->pFile->p4->nCount * 2);
+    fn_8008F3A4((u32*)pFE->pFile->p8->apTables, uBase, 1, pFE->pFile->p8->nCount);
     for (i = 0; i < pFE->pFile->p8->nCount; i++) {
-        fn_8008F3A4((u32*)pFE->pFile->p8->apTables[i]->apEntries, (uptr)pFile, 1,
+        fn_8008F3A4((u32*)pFE->pFile->p8->apTables[i]->apEntries, uBase, 1,
                     pFE->pFile->p8->apTables[i]->nCount);
     }
 }
