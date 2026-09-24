@@ -20,7 +20,6 @@ void fn_80103EFC(CrAPAsset* pAsset);
 void sTurnOnLogo(s16 nPart, int b, int i);
 void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset);
 u8   fn_801048B0(int nPart);
-int  fn_80104AF4(s16 nPart, int n);     // the category of a part's entry n (-1 or 0x40: none)
 int  fn_80104F7C(CrAPAsset* pAsset);
 int  fn_80105140(s16 nPart);
 void fn_80105188(UStreamObject* pObject);
@@ -1589,14 +1588,15 @@ s32 fn_80107084(s32 nKind, s32 nAfter) {
 s32 fn_801070F4(void) {
     SaveProfile* pProfile = fn_80077ACC();
     s32 aAssets[64];
-    int nAssets = 0;
+    s32* pBase = aAssets;
     s16 nSlot;
     int nAsset;
     s32* p;
     int i;
     int j;
+    int nAssets = 0;
 
-    p = aAssets;
+    p = pBase;
     for (nSlot = 0; nSlot < 53; nSlot++) {
         nAsset = fn_80103D14(nSlot);
         if (nAsset >= 0 && nAssets < 64) {
@@ -1607,15 +1607,13 @@ s32 fn_801070F4(void) {
     lbl_8028246C = 0;
     for (i = 0; i < 11; i++) {
         if (pProfile->a1054C[i].b) {
-            p = aAssets;
             for (j = 0; j < nAssets; j++) {
-                if (pProfile->a1054C[i].n == lbl_80282460->pAssets[*p].n2C) {
+                if (pProfile->a1054C[i].n == lbl_80282460->pAssets[pBase[j]].n2C) {
                     lbl_80282470[lbl_8028246C].n0 = pProfile->a1054C[i].n;
                     lbl_80282470[lbl_8028246C].n4 = fn_800F0304(i);
-                    strcpy(lbl_80282470[lbl_8028246C].sz8, lbl_80282460->pAssets[*p].szName);
+                    strcpy(lbl_80282470[lbl_8028246C].sz8, lbl_80282460->pAssets[pBase[j]].szName);
                     lbl_8028246C++;
                 }
-                p++;
             }
         }
     }

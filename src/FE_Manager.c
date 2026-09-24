@@ -58,19 +58,11 @@ void fn_800773F8(void);
 void fn_80077428(void);
 void fn_8007744C(void);
 void Golfer_LoadCreatedFromSave(void);
-int  fn_80077BDC(int n);
 void fn_80077C1C(int a, int b);
-void fn_80078680(SaveProfile* pProfile);
-void fn_8007873C(SaveProfile* pProfile);
 u8   FE_CrAP_IsAssetUndesirable(s16 nPart, CrAPAsset* pAsset);
-void fn_80078A2C(s16 nPart, int nChance);
 u8   fn_80078B84(CrAPAsset* pAsset);
 u8   FE_CrAP_IsCrazyHat(CrAPAsset* pAsset);
 u8   fn_80078D24(CrAPAsset* pAsset);
-void fn_80078E34(SaveProfile* pProfile);
-void fn_80079664(SaveProfile* pProfile);
-void fn_8007975C(SaveProfile* pProfile, s16 nPart, int nChance);
-int  fn_800797E0(SaveProfile* pProfile, s16 nPart, int b, int nChance);
 void fn_80079974(void);
 void fn_80079D30(void);
 void fn_80079DAC(void);
@@ -1127,8 +1119,9 @@ void fn_80079664(SaveProfile* pProfile) {
     fn_80078E34(pProfile);
 }
 
-// Part nPart at a random b (fn_801049C8 counts them), then at a random choice (fn_800797E0).
-void fn_8007975C(SaveProfile* pProfile, s16 nPart, int nChance) {
+// Part nPart at a random b (fn_801049C8 counts them), then at a random choice (fn_800797E0), which
+// is returned (FE_CrAPMessages.c fn_80109FB4 uses it).
+int fn_8007975C(SaveProfile* pProfile, s16 nPart, int nChance) {
     int nCount = fn_801049C8(nPart);
     int nPick;
     if (nCount > 0) {
@@ -1136,7 +1129,7 @@ void fn_8007975C(SaveProfile* pProfile, s16 nPart, int nChance) {
     } else {
         nPick = 0;
     }
-    fn_800797E0(pProfile, nPart, nPick, nChance);
+    return fn_800797E0(pProfile, nPart, nPick, nChance);
 }
 
 // Part nPart, b at a random choice, which is returned; with a chance of nChance percent, its first

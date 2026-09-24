@@ -275,6 +275,9 @@ LAYOUT_ASSERT(TexGrpList, 0x20);
 
 // ---- the renderer ----------------------------------------------------------------------------
 
+void fn_80006EDC(void);                 // LLDisp_Gc.c: set the viewport (DiscCheck.c, ScreenClear.c)
+void fn_80006FE8(void);                 // LLDisp_Gc.c: end the frame (returns nothing)
+
 // The renderer's state (lbl_801B8980, 0x118 bytes); only what the game code writes.
 // GoTerrain.c's setters write one group of fields each and set that group's bit in u110.
 typedef struct RenderState {
@@ -537,7 +540,7 @@ void fn_80012F34(int a);
 void fn_80012F50(int a, int b, int c);
 void fn_80013030(void);
 u32  fn_80013050(int nChan);            // the pad's device type (SIProbe)
-s32  fn_80013070(int nChan);            // a controller the game takes is plugged in
+u8   fn_80013070(int nChan);            // a controller the game takes is plugged in
 void fn_800130EC(u8 bOn);               // the main stick also presses the D-pad
 void fn_800130F8(int nController, int bOn);         // rumble on or off
 void fn_80013130(int nController, int nStrength);   // rumble strength
@@ -557,6 +560,9 @@ u32  fn_800142AC(int nButton, int a);   // a button's mask
 u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 
 // ---- events, sound, effects ------------------------------------------------------------------
+
+void fn_800A7A98(s32 n);                // GameAudio.c
+void fn_800B7490(void);                 // DiscError.c: yield / pump (UStream.c, DiscCheck.c)
 
 // A node of Code8009B340.c's list (lbl_80281FA0): glows queued by fn_8009B260 that fade out
 // (fAlpha falls by fAlphaSpeed a second) and is freed once it has faded.

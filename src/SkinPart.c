@@ -7,7 +7,6 @@
 #include "terrain.h"
 #include "camera.h"
 
-void  fn_8001E938(u32* aBits, u32 nBits);               // clears a bit array
 SkinIter* fn_80113B34(u8* pBuf, SkinIterArgs* pArgs);
 void  fn_80113BAC(SkinIter* pIter);
 void  fn_80127B98(Skin* pSkin, s32* aParts, s32* aList);

@@ -90,7 +90,7 @@ void fn_80075C68(void);
 s32 UStream_Close(s32);
 s32 UStream_OpenFileByName(s32);
 s32 UStream_SetAutoRead(s32);
-s32 fn_80006FE8();
+void fn_80006FE8(void);
 u8 fn_80007258();
 s32 fn_800755F0(s32);
 s32 fn_80075800();

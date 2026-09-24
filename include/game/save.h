@@ -185,10 +185,14 @@ typedef struct SkinChoices {
     SkinChoice aSets[116];      // 0x254  the body's, per set
     SkinChoice aSkinParts[6][10];   // 0x5F4  the six skins' of CharSkinSet
     SkinChoice aSkinSets[6][10];    // 0x7D4
-    u8   a9B4[26];              // 0x9B4  set to 50 each when FE_CrAP_InitCrAPInfo clears the
-                                //        profile's 0x5500..0xB634 (fn_80058208)
+    u8   a9B4[26];              // 0x9B4  the 26 sliders (fn_8010E4DC; a menu message reads slider n
+                                //        signed); set to 50 each when FE_CrAP_InitCrAPInfo clears
+                                //        the profile's 0x5500..0xB634 (fn_80058208)
     u8   unk9CE[2];
     LogoRecord aLogo[5];        // 0x9D0  the user logos ("_usrtextr0".."_usrtextr4")
+    u8   n5A7A;                 // 0x5A7A  (the profile's 0xAF7A) set by a menu message, which passes
+                                //         it to fn_80103B8C (s8); read back signed
+    u8   unk5A7B;
 } SkinChoices;
 LAYOUT_ASSERT(SkinChoices, 0x5A7C);
 
@@ -265,10 +269,12 @@ typedef struct SaveProfile {
     u8   nGolferBallType;       // 0x054F9  -> PlayerProfile.nBallType
     u8   unk54FA[0x5500 - 0x54FA];
     // The created golfer's look: the body's parts and sets (fn_80103D6C), its six other skins'
-    // (fn_80103DE0) and its logos. char.c hands it to the character (fn_8001D4A4 passes
-    // fn_80077ACC() + 0x5500 as a SkinChoices*).
+    // (fn_80103DE0), its sliders and its logos. char.c hands it to the character (fn_8001D4A4
+    // passes fn_80077ACC() + 0x5500 as a SkinChoices*).
     SkinChoices choices;        // 0x05500
-    u8   unkAF7C[0xAF80 - 0xAF7C];
+    s8   nDateMonth;            // 0x0AF7C  } a date, set and read by menu messages packed as
+    s8   nDateDay;              // 0x0AF7D  } fn_80078604 packs it (FE_CrAPMessages.c
+    s16  nDateYear;             // 0x0AF7E  } fn_80108178, fn_80108244)
     s32  aAF80[53];             // 0x0AF80  per slot: a Create-A-Player asset (FE_CrAPDB.c
                                 //          fn_80103D14), -1 for none; an asset's n2E is its slot
     // Four bit arrays with a bit per Create-A-Player asset (0x80057F18's loop over them all, which
@@ -301,6 +307,7 @@ extern s32 lbl_801894D0[6];             // the courses GM_GetGameProgress counts
 // The password manager (0x80056480-0x80057F18; TW06's passwordmanager.cpp)
 void fn_80056B8C(void);
 void fn_80057364(int nSlot);    // sets up save profile nSlot
+void fn_80057ED0(SaveProfile* pProfile, const char* pName);     // PasswordManager.c: name it
 
 // GameManager.c: the profile's completion score (fn_800D439C raises the TOUR card level with it)
 f32  GM_GetGameProgress(SaveProfile* pProfile);
