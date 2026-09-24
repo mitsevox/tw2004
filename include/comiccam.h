@@ -41,4 +41,10 @@ LAYOUT_ASSERT(ComicCam, 0x204);
 
 extern ComicCam* lbl_80282178;
 
+void fn_800B34F0(void);                                         // allocate the state
+void fn_800B352C(void);                                         // free it
+void fn_800B3550(int nKind, View* pView, int nPlayer);          // start with layout nKind
+u8   fn_800B36F4(View* pView, int nPlayer, f32 fFrameTime);     // a frame; 1 when finished
+u8   fn_800B4AE0(void);
+
 #endif

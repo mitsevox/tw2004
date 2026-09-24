@@ -9,7 +9,7 @@
 
 // A voice of the sound engine (hlaudvoice.c's), wrapping one of startUp.c's hardware voices.
 typedef struct AudVoice {
-    u8   unk0[0x8];
+    UListNode link;             // 0x0    in one of its pool's lists (AudVoicePool.aLists)
     u16  nHwVoice;              // 0x8    the startUp.c voice it plays on
     u8   bHalf : 1;             // 0xA    which half of its ARAM buffer the next stream block fills
     u8   unkA_6 : 2;
@@ -17,20 +17,38 @@ typedef struct AudVoice {
     u8   unkA_3 : 2;
     u8   bA_1 : 1;              //        fn_800AA5A0 keeps the channel's event when it is set
     u8   unkA_0 : 1;
-    u8   unkB_7 : 1;            // 0xB
+    u8   bStopped : 1;          // 0xB    fn_800ACA94 has stopped it and taken it off its list
     u8   bB_6 : 1;              //        paused; Stm_Tick resumes it once the drive is fine
     u8   unkB : 6;
-    u8   unkC[0x10 - 0xC];
-    s32  n10;                   // 0x10   the request's n4: a voice with a lower one can be stolen
+    u32  uC;                    // 0xC
+    s32  n10;                   // 0x10   the request's n4, and the pool list it is on: a voice with
+                                //        a lower one can be stolen
     u8   n14;                   // 0x14   its own volume (0-127; fn_800A9590 scales it by 128)
-    u8   unk15[0x18 - 0x15];
+    s8   n15;                   // 0x15   frames left before fn_800ACB98 checks whether it has ended
+    u8   unk16[0x18 - 0x16];
     struct AudSeqTone* pTone;   // 0x18   the tone a sequenced track plays on it
     void (*pfnCallback)(struct AudVoice* pVoice, int nReason);  // 0x1C   the request's
     void* pUser;                // 0x20   the request's (the track)
     s32  nIndex;                // 0x24   the request's (the track's channel)
     u32  uAram;                 // 0x28   its ARAM buffer (two halves of 0x7F00 bytes)
     u32  uPlayPos;              // 0x2C   where it is playing in that buffer, in bytes
+    u8   unk30[0x3E - 0x30];
+    u16  n3E;                   // 0x3E   cleared when the voice is taken (fn_800AC4A0)
 } AudVoice;
+LAYOUT_ASSERT(AudVoice, 0x40);
+
+#define AUD_NUM_VOICES 50
+
+// The sound engine's voices (lbl_801F19B8, a single pool).
+typedef struct AudVoicePool {
+    AudVoice aVoices[AUD_NUM_VOICES];   // 0x000
+    UList    aLists[3];         // 0xC80  the voices in use, by their n10
+    UPool    free;              // 0xCA4  the free voices
+} AudVoicePool;
+LAYOUT_ASSERT(AudVoicePool, 0xCAC);
+
+extern AudVoicePool lbl_801F19B8[1];
+extern s32 lbl_802820B4;                // flipped by each pause: the order fn_800ACCF4 goes through
 
 // Settings for a voice; the flags say which fields are set. fn_800AC91C sets them on a voice;
 // a sequenced track's events change its own copy (AudTrack 0x30), handed to fn_800AC6D0 with each

@@ -5,6 +5,7 @@
 #include "golfer.h"
 #include "comiccam.h"
 
+void fn_800352BC(void);
 void fn_80038624(f32* pColour);
 void fn_800A6AC8(u8 nPlayer, u8 n);     // GameAudio.c
 
