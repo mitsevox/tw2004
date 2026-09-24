@@ -445,6 +445,10 @@ They will be sorted into the sections below.
 - **[verified] Link: `.sbss` defined last-first also flips chained assignments.** With the globals in
   reverse address order, `a = b = c = 0` stores in the opposite order; write the chain low address first
   to keep EA's store order (ShaderObjectsData: the only DOL differences were two chains).
+- **[verified] Some register rotations need a type change AND a declaration move together;** each alone
+  scores no better, so one-change sweeps miss them. Sweep the pair (type x declaration order): GameMode26
+  fn_8010CA2C 39 diffs -> 0 (parameter as `PlayerNumber_t`, nLead after nLength), GoDynObj fn_8004731C
+  38 -> 0 (`s32 i`, pLogoA before pLogoB).
 - Other compiler versions (GC 2.0, 2.0p1, 2.6, 2.7, 1.3.2) gave output identical to 2.5 on 18 near-miss
   functions tried today: not a lever for these.
 

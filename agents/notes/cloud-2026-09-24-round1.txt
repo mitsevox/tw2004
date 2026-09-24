@@ -102,3 +102,25 @@ TRIED, NO GAIN
   .sbss 0x80281EA0-0x80281EB8 (reverse order), .sdata2 0x80283A30-0x80283A50; with the .sbss defined
   last-first the chained assignments `a = b = c = 0` store in the other order, so the chains are written
   low address first.
+
+== cam-01 round 2 ==
+- GameMode26 fn_8010CA2C -> exact, unit linked: parameter `PlayerNumber_t nPlayer` AND nLead declared
+  after nLength (each alone does nothing: 39). pfn244 assignment cast with a port: note. Tried before:
+  inlines for lead/length/Player pointer (74)/score, pPlayer-> as gPlayers[nPlayer]. (40-480), all 720
+  orders of the first six declarations (nLead first stays 39), nLead last alone 124, a PlayerNumber_t
+  copy of the parameter (registers right, 8 scheduling diffs). .sdata 0x80281760-88 by hand.
+- GoDynObj fn_8004731C -> exact, unit linked: `s32 i` (was int) AND pLogoA declared before pLogoB (only
+  the pair). No change (38+): logo/pBall getters, pState-store inline, u8* parameter spellings, else
+  order, chained NULLs, ternary, locals in the loop block, a `u8* p = pState` copy (13 positions); a
+  PlayerNumber_t counter fixes pState but stops the pointer walk (344). Link: .data 0x80187B98-0x80187D48
+  (logo-name tables defined; lbl_80187D38 after fn_800461A8), .sbss 0x80281DA0-A8, .sdata2
+  0x80283168-0x802831E0 with a GoDynObj_StrippedFn stand-in (10.0, 0.5, 1.0, 0.0).
+- LLFileIO_Gc File_ReadAsyncEx 99.55 (6; queue base / entry pointers swap r4/r5): inline queue base or
+  entry (54), sum inlines, sum reversed, pQueue[nPrio], `nPrio + lbl` (13), ++/+1/count local; list
+  insert/remove as inlines; parameter types u8/int/s32/u32/enum; global as [2]/[3]/[]; orders of
+  pPool/pReq/pQueue x 4 count forms; nCount int/u32/long; pQueue for the whole insert 45/11; GC/2.0 6.
+- startUp fn_800B0748 99.44 (2; shift result in r4, EA r0): the shift as a new value (`~(uBit << n)`,
+  `uBit = 1 << n`, uMask, (u32)1, 1u) moves it to r0 but swaps the flags load / divide result r3/r5 (5);
+  inlines for bit/mask/clear 2-10; statement orders x 3 `&=` spellings (2); flags local 2-11; offset
+  local 8 forms (7+); pointer or int parameter (8); lbl_802820F0/F4/lbl_80282108 int/s32/u32 in every
+  combination (2).
