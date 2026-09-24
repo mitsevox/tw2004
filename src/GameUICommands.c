@@ -1168,8 +1168,17 @@ void fn_80087420(MsgArg* pArgs, MsgArg* pResult) {
     fn_800C9038(gPlayers[pArgs[0].i].nView[0], (f32*)pArgs[1].i, (f32*)pArgs[2].i);
 }
 
+// A tournament entrant in a profile: GetEntrantMCPtr's body (PGATourSimulation.c), pasted in.
+// Written out as gpSaveData[nPlayer].tour.field.aEntrant[n] it adds the entrant's offset last.
+static inline PgaEntrantMC* Tour_EntrantMC(PlayerNumber_t nPlayer, int nEntrant) {
+    return &gpSaveData[nPlayer].tour.field.aEntrant[nEntrant];
+}
+
+// The n18 of the PGA TOUR entrant on leaderboard row pArgs[0], in profile 0.
 void fn_80087460(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = gpSaveData->tour.field.aEntrant[fn_801197CC(0, pArgs[0].i)].n18;
+    PlayerNumber_t nPlayer = PLR_1_e;
+
+    pResult->i = Tour_EntrantMC(nPlayer, fn_801197CC(0, pArgs[0].i))->n18;
 }
 
 void fn_800874C8(MsgArg* pArgs, MsgArg* pResult) {
