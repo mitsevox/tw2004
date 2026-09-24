@@ -116,6 +116,76 @@ u8 fn_800B36F4(View* pView, int nPlayer, f32 fFrameTime) {
     return 0;
 }
 
+// Layout 1's ending: once the last panel is reached, grow it a little each frame, keeping it centred,
+// until it fills the screen. nPlayer is not used.
+void fn_800B39B8(ComicPanel* pPanel, f32* pRect, int nPlayer, f32 fFrameTime) {
+    f32 fX;
+    f32 fY;
+    f32 fHeight;
+    f32 fWidth;
+    f32 fFrames;
+    f32 fRight;
+    f32 fBottom;
+    u8 bGrowX;
+    u8 bGrowY;
+
+    fFrames = FRAME_RATE * fFrameTime;
+    switch (lbl_80282178->nKind) {
+    case 0:
+        break;
+    case 1:
+        if ((pPanel->nNext == -1 ||
+             (lbl_80282178->nShown >= lbl_80282178->nPanels - 1 && 0.0f == lbl_80282178->fTime)) &&
+            fFrameTime > 0.0f) {
+            pPanel->nNext = -1;
+            fX = pRect[0];
+            fWidth = pRect[2];
+            fHeight = pRect[3];
+            fY = pRect[1];
+            fRight = 1.0f - (fX + fWidth);
+            fBottom = 1.0f - (fY + fHeight);
+            if (fabsf(fWidth - fHeight) < 0.001f) {
+                bGrowY = 1;
+                bGrowX = 1;
+            } else if (fWidth < fHeight) {
+                bGrowX = 1;
+                bGrowY = 0;
+            } else {
+                bGrowX = 0;
+                bGrowY = 1;
+            }
+            if (bGrowX) {
+                if (fabsf(fX - fRight) < 0.001f) {
+                    fWidth += 0.1f * fFrames;
+                    fX -= 0.05f * fFrames;
+                } else if (fX < fRight) {
+                    fWidth += 0.05f * fFrames;
+                } else {
+                    fWidth += 0.05f * fFrames;
+                    fX -= 0.05f * fFrames;
+                }
+            }
+            if (bGrowY) {
+                if (fabsf(fY - fBottom) < 0.001f) {
+                    fHeight += 0.1f * fFrames;
+                    fY -= 0.05f * fFrames;
+                } else if (fY < fBottom) {
+                    fHeight += 0.05f * fFrames;
+                } else {
+                    fY -= 0.05f * fFrames;
+                    fHeight += 0.05f * fFrames;
+                }
+            }
+            fX = fX < 0.0f ? 0.0f : (fX > 1.0f ? 1.0f : fX);
+            fY = fY < 0.0f ? 0.0f : (fY > 1.0f ? 1.0f : fY);
+            fHeight = fHeight < 0.0f ? 0.0f : (fHeight > 1.0f - fY ? 1.0f - fY : fHeight);
+            fWidth = fWidth < 0.0f ? 0.0f : (fWidth > 1.0f - fX ? 1.0f - fX : fWidth);
+            fn_800B3F4C(pRect, fY, fX, fWidth, fHeight);
+        }
+        break;
+    }
+}
+
 // Has the panel run its course? Kinds 0 and 1 wait for the golfer's animation events 1 and 2, kind
 // 2 for the panel's time.
 u8 fn_800B3C64(ComicPanel* pPanel, int nPlayer) {
