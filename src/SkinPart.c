@@ -185,9 +185,9 @@ void fn_800CC710(Character* pChar, int nSkin, u64 uPart, u64 uVariant) {
 
 // Picks a set's variant and option of one of the six skins by their name codes.
 void fn_800CC7DC(Character* pChar, int nSkin, u64 uSet, u64 uVariant, u64 uOption) {
-    Skin* pSkin;
     int nSet;
     int nVariant;
+    Skin* pSkin;
     int nOption;
 
     if (pChar == NULL || pChar->p16D8 == NULL || pChar->p16D8->apSkins == NULL || nSkin < 0 || nSkin >= 6) {
