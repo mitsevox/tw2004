@@ -205,6 +205,7 @@ unsorted/sweep_80045D5C.c:
 
 UObject3D.c:
 	.text       start:0x80045D80 end:0x80045E3C
+	.data       start:0x80187B88 end:0x80187B98
 
 unsorted/sweep_80045E3C.c:
 	.text       start:0x80045E3C end:0x80045EC0
