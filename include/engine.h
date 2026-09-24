@@ -279,6 +279,8 @@ void fn_80010544(int nSlot);            // frees the bank in slot nSlot and empt
 
 void fn_80006EDC(void);                 // LLDisp_Gc.c: set the viewport (DiscCheck.c, ScreenClear.c)
 void fn_80006FE8(void);                 // LLDisp_Gc.c: end the frame (returns nothing)
+extern void* lbl_80281BA4[2];           // LLDisp_Gc.c: two image buffers (DepthField.c and
+                                        //       FEgolferanim.c make textures of them)
 
 // The renderer's state (lbl_801B8980, 0x118 bytes); only what the game code writes.
 // GoTerrain.c's setters write one group of fields each and set that group's bit in u110.

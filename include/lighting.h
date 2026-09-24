@@ -113,6 +113,7 @@ void fn_8006EDC0(LightGroup* pGroup);               // the default lights
 
 LightSet* fn_8003532C(void);    // lbl_80281380->pCur
 void fn_80035338(s32 nSet);     // make aSet[nSet] the current set
+void fn_8003534C(void);         // reset the current set's terrain colours to the defaults
 void fn_80035308(void);
 void fn_800352E4(void);
 

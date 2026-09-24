@@ -9,6 +9,7 @@
 #include "frontend/fe.h"
 #include "game/frontend.h"
 #include "gx.h"
+#include "lighting.h"
 #include "ustream.h"
 
 // The golfers the menus show in turn when none is picked: four rows of five golfer ids, the row
@@ -53,6 +54,8 @@ FEGolferState lbl_80189AA0[FE_NUM_GOLFER_STATES] = {
 };
 
 FEGolferMachine lbl_801D8708;
+GxTexture lbl_801D8714;         // the screen copy (fn_8002A624's pixels)
+GxTexture lbl_801D8744[2];      // lbl_80281BA4's two buffers
 
 s32 lbl_80281330 = 1;           // draw the golfer into the menu's texture (fn_8008E358)
 u8  lbl_8028133C = 1;
@@ -60,6 +63,7 @@ s32 lbl_80281340 = -1;          // } the golfer and profile slot last drawn (fn_
 s32 lbl_80281344 = -1;          // }
 
 CrAPState* lbl_80281EE0;
+CourseLights* lbl_80281EE4;     // the lights of the golfer display ('LITE' stream object)
 Character* lbl_80281EE8[CRAP_NUM_GOLFERS];
 
 void fn_8008B00C(void);
@@ -77,6 +81,7 @@ void fn_8008CC30(void);
 void fn_8008CE2C(void);
 void fn_8008CE88(u8 b);
 void fn_8008D8F4(void);
+void fn_8008D9DC(UStreamObject* pObject);
 void fn_8008DBE8(void);
 void fn_8008DC10(void);
 u8   fn_8008DCF0(int nGolfer, CrAPGolfer* pGolfer);
@@ -91,7 +96,11 @@ void fn_8008AD80(void);
 void fn_80007254(void);
 void fn_80008380(void);
 void fn_8000ADC0(f32 (*m)[4]);          // identity matrix
+void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80014DFC(s32 a, s32 b);
+void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
+void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
+void fn_80035098(u8 b);
 void fn_80016E90(int nView);
 void fn_80018484(Character* pChar, CharModel* pModel);
 void fn_800192D4(f32 fAngle);
@@ -532,6 +541,84 @@ void fn_8008C8C4(void) {
 void fn_8008C938(void) {
 }
 
+// Draw a quad in colour (0, 0, 0, 0) in a 512 x 448 frame set up for it, then set the frame up
+// again the usual way (mode 8, as gomainloop.c does).
+void fn_8008C93C(void) {
+    f32 xy[8] = { 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+    f32 colour[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+    fn_80012F50(0, 6, 0x80);
+    fn_80012F18(7);
+    fn_80012F34(1);
+    fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 1, 1);
+    fn_80013EEC(fn_8001614C());
+    fn_8001425C(0);
+    fn_80014194(colour);
+    fn_80014118(0);
+    fn_80012EF8();
+    fn_8001644C(0xA1, xy, 0, NULL, 2);
+    fn_80012F18(3);
+    fn_80012F34(1);
+    fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
+    fn_80013EEC(fn_8001614C());
+    fn_80012EF8();
+}
+
+// Draw the screen-copy texture (lbl_801D8714) as a quad in grey, its alpha lbl_80281EE0->f14C.
+void fn_8008CA88(void) {
+    f32 xy[8] = { 0.25f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+    f32 colour[4] = { 0.5f, 0.5f, 0.5f, 0.5f };
+    f32 uv[8] = { 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+
+    fn_80012F50(0, 6, 0x80);
+    fn_80012F18(7);
+    fn_80035098(0);
+    fn_80035118(4, 5);
+    fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
+    fn_80013EEC(fn_8001614C());
+    fn_80014118(0x50);
+    fn_8001425C(0);
+    colour[3] = lbl_80281EE0->f14C;
+    fn_80014194(colour);
+    fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
+    fn_8002A608(&lbl_801D8714);
+    fn_80012EF8();
+    fn_8001644C(0xA1, xy, 0, uv, 2);
+    fn_80016B54(512, 448, 1.0f, 1.0f);
+    fn_80012EF8();
+}
+
+// Draw two quads, the first in black at half alpha, the second in (0, 0, 0, 0), then set the
+// frame up again the usual way.
+void fn_8008CC30(void) {
+    f32 xy2[8] = { 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+    f32 xy1[8] = { 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+    f32 colour1[4] = { 0.0f, 0.0f, 0.0f, 0.5f };
+    f32 colour2[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+    fn_80012F50(0, 6, 0x80);
+    fn_80012F18(7);
+    fn_80012F34(0);
+    fn_80035118(4, 5);
+    fn_80035098(0);
+    fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 4, 1);
+    fn_80013EEC(fn_8001614C());
+    fn_8001425C(0);
+    fn_80014194(colour1);
+    fn_80014118(0);
+    fn_80012EF8();
+    fn_8001644C(0xA1, xy1, 0, NULL, 2);
+    fn_80014194(colour2);
+    fn_80012F18(3);
+    fn_80012EF8();
+    fn_8001644C(0xA1, xy2, 0, NULL, 2);
+    fn_80012F18(3);
+    fn_80012F34(1);
+    fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
+    fn_80013EEC(fn_8001614C());
+    fn_80012EF8();
+}
+
 // Copy the frame buffer's golfer (from (128, 0), 384 x 448) into the screen-copy texture.
 void fn_8008CE2C(void) {
     GXPixModeSync();
@@ -546,6 +633,46 @@ void fn_8008D8CC(void) {
     fn_8001D238();
     fn_8008AD80();
     fn_8008D8F4();
+}
+
+// Make the display's textures: one of each of lbl_80281BA4's buffers and one of the screen copy,
+// all 384 x 448 RGBA8.
+void fn_8008D8F4(void) {
+    fn_8002A528(&lbl_801D8744[0], 384, 448, lbl_80281BA4[0], NULL, 6, 0, 0, 0);
+    fn_8002A528(&lbl_801D8744[1], 384, 448, lbl_80281BA4[1], NULL, 6, 0, 0, 0);
+    fn_8002A528(&lbl_801D8714, 384, 448, fn_8002A624(), NULL, 6, 0, 0, 0);
+}
+
+// Register the 'LITE' stream handler.
+void fn_8008D9AC(void) {
+    UStream_RegisterHandler('LITE', fn_8008D9DC);
+}
+
+// A 'LITE' object: copy its lights (little-endian) into lbl_80281EE4, swapping each value's
+// bytes, and make them light set 0's.
+void fn_8008D9DC(UStreamObject* pObject) {
+    SwapField aHeader[] = {
+        { 4, 4 },                                           // nLights
+        { 12, 4 },
+    };
+    SwapField aLight[] = {
+        { 1, 1 },                                           // nType
+        { 15, 1 },
+        { 16, 4 },                                          // vColor
+        { 16, 4 },                                          // vPos
+    };
+    void* pSrc;
+    void* pDst;
+
+    lbl_80281EE4 = fn_80009B34(pObject->uSize, 2, 16, "FEgolferanim.c", 3143);
+    pSrc = pObject->pData;
+    pDst = lbl_80281EE4;
+    fn_8001F08C(&pSrc, &pDst, aHeader, sizeof(aHeader) / sizeof(aHeader[0]), 1);
+    fn_8001F08C(&pSrc, &pDst, aLight, sizeof(aLight) / sizeof(aLight[0]), lbl_80281EE4->nLights);
+    fn_80035338(0);
+    fn_800935CC(lbl_80281EE4);
+    fn_8003534C();
+    fn_80009E70(pObject);
 }
 
 // Stop loading, and show the next golfer of lbl_801899E0 (screen 0) or none (screen 4).
