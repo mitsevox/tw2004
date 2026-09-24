@@ -50,6 +50,33 @@ void fn_80026B4C(Skeleton* pSkel, IKChain* pChain) {
     }
 }
 
+// Poses the chain from its first link on: the first link's bone takes the link's rotation and
+// offset; each later one is placed and turned from the link before it, through the skeleton's p20.
+void fn_80026BF4(CharModel* pModel, IKChain* pChain) {
+    f32 vOffset[4];
+    f32 qRot[4];
+    int i;
+    IKLink* pLink;
+    BonePose* pPose;
+    BonePose* pPrev;
+    int nBone;
+    Skeleton* pSkel = pModel->pSkel;
+
+    fn_8001E85C(pChain->pLinks[0].q18, pModel->pPoses[pChain->pLinks[0].nBone].q0);
+    fn_8001E85C(pChain->pLinks[0].v28, pModel->pPoses[pChain->pLinks[0].nBone].v10);
+    for (i = 1; i < pChain->nLinks; i++) {
+        pLink = &pChain->pLinks[i];
+        nBone = pLink->nBone;
+        pPose = &pModel->pPoses[nBone];
+        pPrev = &pModel->pPoses[pChain->pLinks[pLink->nPrev].nBone];
+        fn_800090E4(pPrev->q0, pLink->v28, vOffset);
+        fn_800090A0(pPrev->v10, vOffset, pPose->v10);
+        pPose->v10[3] = 0.0f;
+        fn_80008FCC(pSkel->p20[nBone], pLink->q18, qRot);
+        fn_80008FCC(qRot, pPrev->q0, pPose->q0);
+    }
+}
+
 // Resets the chain's links (all of them with bAll, else those with f4 above 0) to no rotation and
 // clears their bones' bits.
 void fn_80026F90(Skeleton* pSkel, IKChain* pChain, u8 bAll) {

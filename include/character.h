@@ -22,8 +22,11 @@ typedef struct IKLink {
     s32  n8;                    // 0x08
     f32  fC;                    // 0x0C
     f32  f10;                   // 0x10
-    s32  nPrev;                 // 0x14  the link before it in the chain, -1 for the first
-    u8   unk18[0x58 - 0x18];
+    s8   nPrev;                 // 0x14  the link before it in the chain, -1 for the first (every
+    u8   pad15[3];              //       access is a byte: fn_80026BF4, fn_80028208)
+    f32  q18[4];                // 0x18  its rotation (quaternion) from the link before it
+    f32  v28[4];                // 0x28  its offset from the link before it
+    u8   unk38[0x58 - 0x38];
     f32  v58[3];                // 0x58  its rotation as a vector (axis * angle)
     u8   unk64[0x78 - 0x64];
 } IKLink;
