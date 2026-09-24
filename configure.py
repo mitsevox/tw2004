@@ -883,7 +883,7 @@ config.libs = [
             Object(NonMatching, "GoStaticCam.c"),
             Object(NonMatching, "target.c"),
             Object(NonMatching, "emotion.c"),
-            Object(NonMatching, "Replay.c"),
+            Object(Matching, "Replay.c"),
             Object(NonMatching, "gomainloop.c"),
             Object(NonMatching, "GoFrameBuf.c"),
             Object(NonMatching, "GoLighting.c"),

@@ -305,6 +305,16 @@ typedef struct SaveProfile {
 } SaveProfile;
 LAYOUT_ASSERT(SaveProfile, 0x10600);
 
+// The session's record tables as the save file keeps them: a copy of gSession from aCourseRecord
+// to recC (0xF00..0x5B2C, the same layout). The replay recorder (Replay.c) keeps one too.
+typedef struct SaveRecords {
+    CourseRecord aCourseRecord[NUM_COURSE_RECORDS];    // 0x0000
+    RecordEntry recA[8][5];     // 0x41A0
+    RecordEntry recB[3][3][5];  // 0x44C0
+    RecordEntry recC[5][2][5];  // 0x4844
+} SaveRecords;
+LAYOUT_ASSERT(SaveRecords, 0x4C2C);
+
 extern SaveProfile* gpSaveData;
 extern SaveProfile* lbl_80281DF4;       // unlocks that hold for every profile (the cheat codes set them)
 extern SaveLockEntry lbl_80281DF0;
