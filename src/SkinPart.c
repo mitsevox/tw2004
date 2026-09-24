@@ -648,15 +648,14 @@ void fn_800CD7D4(Skin* pSkin, SkinMesh* pMesh) {
 
 // Marks the bits of the entries fn_80113B34 walks for option n.
 void fn_800CD844(Skin* pSkin, int n) {
-    u8 aBuf[0x48];
+    u8 aBuf[0x38];              // the iterator's work space; its real size is not known
     SkinIterArgs args;
     SkinMesh* pMesh;
     SkinIter* pIter;
     SkinDesc* pDesc;
 
     pDesc = pSkin->pModel->pDesc;
-    if (n < 0) return;
-    if (n >= pDesc->n58) return;
+    if (n < 0 || n >= pDesc->n58) return;
     args.n = n;
     args.pDesc = pDesc;
     for (pIter = fn_80113B34(aBuf, &args); fn_800CEEC0(pIter); fn_800CEEC8(pIter)) {
