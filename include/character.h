@@ -100,6 +100,8 @@ typedef struct SkelPose1 {
 } SkelPose1;
 LAYOUT_ASSERT(SkelPose1, 0x114C);
 
+void fn_80036180(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fWeight);  // Skin.c: blends morphs
+
 // A character's skeleton data (CharModel.pSkel; the SKEL_ functions take it): its IK chains and
 // how strongly their solution is applied (the IK weight, 0..1); only what the code reads.
 typedef struct Skeleton {

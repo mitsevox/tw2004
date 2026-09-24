@@ -153,7 +153,6 @@ void  Swing_BoostInput(int nPlayer);
 void  fn_8005AD20(Character* pObj, SwingData* pSw, int nStickX);
 int   fn_8005CC5C(void);
 void  fn_800AE3F8(int nView);
-void  fn_80036100(u8* pMesh, void* pDesc, int n);
 void  fn_800360D4(u8* pMesh);
 void  fn_80098C70(void);
 void  GOLFERSTATE_Pop(int nPlayer);
@@ -1889,7 +1888,7 @@ void fn_8005A850(int nPlayer) {
             mesh.pPos     = gpSwing->p94[nView];
             mesh.pColour  = gpSwing->p9C[nView];
             mesh.pUV      = gpSwing->pA4[nView];
-            fn_80036100(gpSwing->mesh[nView], &mesh, 1);
+            fn_80036100((ShaderObject*)gpSwing->mesh[nView], &mesh, 1);
             fn_800360D4(gpSwing->mesh[nView]);
             fn_80012F50(1, 6, 0x80);
             fn_80012F34(1);

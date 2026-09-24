@@ -23,7 +23,6 @@ void fn_8006F430(f32 f);
 void fn_80036054(void* pMesh, int n, s32* pDesc);
 void fn_800360A0(void* pMesh);
 void fn_800360D4(u8* pMesh);
-void fn_80036100(u8* pMesh, void* pDesc, int n);
 
 // GoTerrainCollision.c
 f32 fn_8004D80C(CourseInfo* pCourse, f32* pPos);
@@ -290,7 +289,7 @@ void fn_80093AE0(Ball* pBall, int nPlayer) {
         desc.pPos = pPos;
         desc.pColour = pColour;
         desc.pUV = pUV;
-        fn_80036100(lbl_801D94B0, &desc, lbl_80281F40);
+        fn_80036100((ShaderObject*)lbl_801D94B0, &desc, lbl_80281F40);
         fn_800360D4(lbl_801D94B0);
         lbl_80281F40 = 0;
     }

@@ -316,7 +316,6 @@ void fn_80098910(void) {
 // ---- end of sweep code ----
 
 // Skin.c
-void fn_80036100(u8* pMesh, void* pDesc, int n);
 void fn_800360D4(u8* pMesh);
 
 // Draws the queued glows through the glow mesh in two passes, with the lens's matrices, then puts
@@ -341,14 +340,14 @@ void fn_80098938(void) {
         desc.pQueue = lbl_80281F80;
         desc.bFirst = 1;
         desc.pMtx = pMtx;
-        fn_80036100(lbl_801D9A40, &desc, 1);
+        fn_80036100((ShaderObject*)lbl_801D9A40, &desc, 1);
         fn_800360D4(lbl_801D9A40);
         fn_80012F18(7);
         fn_80012EF8();
         desc.pQueue = lbl_80281F80;
         desc.bFirst = 0;
         desc.pMtx = pMtx;
-        fn_80036100(lbl_801D9A40, &desc, 1);
+        fn_80036100((ShaderObject*)lbl_801D9A40, &desc, 1);
         fn_800360D4(lbl_801D9A40);
         fn_80013D9C(pCamera, NULL);
         fn_80013EEC(fn_8001614C());

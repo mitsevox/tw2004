@@ -38,7 +38,6 @@ void fn_800B2470(void);
 void fn_800B281C(void);
 void fn_800B3460(f32* pA, f32* pB, f32* pOut);
 void fn_800B3484(CamLens* pLens, f32 (*pMtx)[4]);
-void fn_80036100(u8* pMesh, void* pDesc, int n);
 void fn_800360D4(u8* pMesh);
 
 // Where the frame buffer is copied to: the screen copy's buffer.
@@ -414,7 +413,7 @@ void fn_800B2DB0(f32* pCentre, f32 (*pQuad)[4], f32 fHalfX, f32 fHalfZ) {
     desc.pPos = aPos[0];
     desc.pColour = (u8*)aColour;
     desc.pUV = aUV[0];
-    fn_80036100(p->aMesh[0], &desc, 1);
+    fn_80036100((ShaderObject*)p->aMesh[0], &desc, 1);
     fn_800360D4(p->aMesh[0]);
     fn_80012F50(1, 6, 0x80);
     fn_80012F18(6);
@@ -550,7 +549,7 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     desc.pPos = lbl_80282170;
     desc.pColour = lbl_8028216C;
     desc.pUV = lbl_80282168;
-    fn_80036100(p->aMesh[nView], &desc, 1);
+    fn_80036100((ShaderObject*)p->aMesh[nView], &desc, 1);
     fn_800360D4(p->aMesh[nView]);
     fn_80012F18(3);
     fn_80012F50(1, 6, 0x80);

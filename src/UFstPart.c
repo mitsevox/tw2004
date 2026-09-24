@@ -9,7 +9,6 @@
 // Skin.c
 void fn_800360A0(void* pMesh);
 void fn_800360D4(u8* pMesh);
-void fn_80036100(u8* pMesh, void* pDesc, int n);
 
 void fn_80098BDC(PsEmitter* pEmitter);
 u32  fn_8009912C(PsEmitter* pEmitter, int n, f32 fTime, f32 f);  // not yet decompiled
@@ -77,7 +76,7 @@ void fn_800990BC(PsEmitter* pEmitter, int n, f32 fA, f32 fB) {
     draw.nC = n;
     draw.f10 = fA;
     draw.f14 = fB;
-    fn_80036100(pEmitter->mesh, &draw, 1);
+    fn_80036100((ShaderObject*)pEmitter->mesh, &draw, 1);
     pEmitter->n50 += n;
 }
 
