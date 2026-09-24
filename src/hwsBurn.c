@@ -9,7 +9,7 @@ SkinIter* fn_80113A9C(u8* pBuf, SkinIterArgs* pArgs);   // hwsRender_Gc.c
 void  fn_80113B14(SkinIter* pIter);                     // hwsRender_Gc.c: ends the iterator
 s32   fn_800CF104(SkinDesc* pDesc, u64 uId);
 void  fn_80110A38(HwsBurn* pBurn, int n);
-void  fn_80111850(HwsBurn* pBurn);
+SkinDesc* fn_80111850(HwsBurn* pBurn);
 
 // A burn of pDesc: every table sized from the description and cleared (no variant or option
 // chosen yet).
@@ -129,9 +129,9 @@ void fn_801108B0(HwsBurn* pBurn) {
     fn_80009E70(pBurn);
 }
 
-void fn_801109F0(HwsBurn* pBurn, void (*pfn)(s32 nArg, SkinDesc14* pEntry), s32 nArg) {
+void fn_801109F0(HwsBurn* pBurn, void (*pfn)(Skin* pSkin, SkinDesc14* pEntry), Skin* pSkin) {
     pBurn->pfn68 = pfn;
-    pBurn->n6C = nArg;
+    pBurn->pSkin = pSkin;
 }
 
 void fn_801109FC(HwsBurn* pBurn, int nPart, s32 nVariant) {
@@ -310,7 +310,7 @@ s32* fn_801114AC(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
     *pOffset += n * 4;
     *pOffset = (*pOffset + nAlign - 1) & ~(nAlign - 1);
     for (i = 0; i < n; i++) {
-        v = ((s32*)pDesc->p3C)[pBurn->a58[i]];
+        v = pDesc->p3C[pBurn->a58[i]];
         if (v != -1) {
             v = pBurn->a30[v];
         }
@@ -419,14 +419,14 @@ void fn_801115C4(HwsBurn* pBurn) {
     memcpy(pBurn->a64, pBurn->pDesc->p14, n * sizeof(SkinDesc14));
     for (i = 0; i < n; i++) {
         if (pBurn->pfn68 != NULL) {
-            pBurn->pfn68(pBurn->n6C, &pBurn->a64[i]);
+            pBurn->pfn68(pBurn->pSkin, &pBurn->a64[i]);
         }
     }
 }
 
 // Everything the chosen variants of every part use (all variants of a part without a choice),
-// then fn_80111850.
-void fn_80111EB0(HwsBurn* pBurn) {
+// then fn_80111850 makes the burnt description.
+SkinDesc* fn_80111EB0(HwsBurn* pBurn) {
     SkinDesc* pDesc = pBurn->pDesc;
     s32 nChosen;
     int i;
@@ -440,5 +440,5 @@ void fn_80111EB0(HwsBurn* pBurn) {
             }
         }
     }
-    fn_80111850(pBurn);
+    return fn_80111850(pBurn);
 }
