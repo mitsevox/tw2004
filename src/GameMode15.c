@@ -12,8 +12,8 @@
 
 extern s32 lbl_80281690;                    // the options saved while the game runs
 extern s32 lbl_80282378;
-extern u8  lbl_8028237C;                    // a new leader was just set
-extern u8  lbl_8028237D;                    // the round was ended
+extern u8  lbl_8028237C;                    // a closer shot just took the lead (not set for the first leader)
+extern u8  lbl_8028237D;                    // set by fn_800F48C4: the shot then scores nothing
 extern s32 lbl_80282380;                    // the points of the last shot
 extern s8  lbl_80282384;                    // the leader's target
 extern s32 lbl_80282388;                    // the leader's rank (0 best .. 4)
@@ -332,8 +332,9 @@ void fn_800F3EBC(int nPlayer) {
     }
 }
 
-// Hole start: when the turn comes back to the leader, the lead is lost. While there is a leader,
-// everyone aims at the leader's target.
+// Next golfer: lbl_8028237D clears, and a golfer ready to play (state 1) gets fn_800F39CC(900).
+// When the turn comes back to the leader, the lead is lost. While there is a leader the golfer
+// aims at the leader's target; otherwise, on his first shot, at his own.
 void fn_800F4584(void) {
     int i;
     lbl_8028237D = 0;
@@ -436,7 +437,9 @@ void fn_800F4894(int nPlayer) {
     lbl_8028237C = 0;
 }
 
-// End the round now (from the pause menu): with a leader, the other player takes a letter.
+// The current golfer goes to state 12 and lbl_8028237D is set, so the shot scores nothing and
+// shows text 0xD1 (through GameTargets fn_800F1E1C, from a UI command). With a leader, a letter
+// goes to player 1 if the leader is player 0, else to player 0.
 void fn_800F48C4(void) {
     GOLFERSTATE_Switch(12, lbl_80282278);   // GS_SIMULATE
     fn_800E3D90();
@@ -482,7 +485,8 @@ s32 fn_800F4B00(void) {
     return ((u32)((-lbl_8028237C) | lbl_8028237C) >> 31);
 }
 
-// A target's state for the HUD: 1 for the leader's target.
+// A target's state for its marker (GoDynObj): with a leader, 1 for every target but the leader's
+// (0 for it); 0 for all without a leader.
 s32 fn_800F4B14(int a, int i) {
     if (lbl_8028238C == 5 || i == lbl_80282384) {
         return 0;

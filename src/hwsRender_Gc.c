@@ -10,7 +10,7 @@
 #include "unsorted/cull.h"
 
 void fn_80036460(int n);                // Skin.c
-void PostFx_CopyScreenToBuffer(void);   // gomainloop.c
+void fn_80037DD8(void);   // GoPostFx.c
 void fn_8011EB80(void);
 void fn_80112B34(void);                 // hwsOverride_Gc.c
 void fn_80112DD8(s32 nEntry);
@@ -98,7 +98,7 @@ void fn_80112D20(void) {
     if (fn_80112B80()) {
         fn_8011EB80();
     }
-    PostFx_CopyScreenToBuffer();
+    fn_80037DD8();
     if (gSession.nSplitScreen) {
         fn_80036460(3600);
         return;

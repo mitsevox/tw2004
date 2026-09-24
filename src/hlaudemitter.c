@@ -1,6 +1,6 @@
 // hlaudemitter.c (TW06's name, by structure: golf/audio/engine/hl/hlaudemitter.c, after
 // hlaudvoice.c and before UAudContainers.c): the sound engine's emitter instances, a pool of 256
-// (0x34 bytes each, lbl_801F2740) found by id (fn_800AD674). Most calls check the instance exists,
+// (0x34 bytes each, lbl_801F2740) found by id (fn_800AD674). Most calls check the id (0xFF: none),
 // then pass on to the functions at 0x800A8200-0x800A8524. Its extent is its data: it is the first
 // to use the .bss at 0x801F2668 and the .sdata2 block 0x80284008-0x80284018.
 // An instance's pCmd is its AudTable.c entry (fn_800A7C30's AudSource, the same number).
@@ -307,7 +307,8 @@ void fn_800AD800(u8 nId, f32* pPos, f32* pLast, u8 nView) {
     }
 }
 
-// The calls below pass on to AudTable.c's entry nId (the same number as the instance).
+// The calls below pass on to AudTable.c's entry nId (the same number as the instance);
+// fn_800ADA08 passes a sound number instead (its definition, shared by all its instances).
 void fn_800AD950(u8 nId, u8 nTrack, u8 n) {
     if (fn_800AD674(nId) != NULL) {
         fn_800A8248(nId, nTrack, n);

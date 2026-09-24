@@ -929,7 +929,7 @@ s32  fn_8002F454(s32 nSurface);     // the surface's buffer size, 0 if the slot 
 void* fn_8002A624(void);            // the screen copy's pixels (lbl_80281100->pPixels)
 
 // The screen copy (our name; what lbl_80281100 points at): render surface 1, set up by gomainloop
-// fn_8006DCA8 for each game type and filled by PostFx_CopyScreenToBuffer.
+// fn_8006DCA8 for each game type; screen copies fill it (fn_8002A164, DepthField, FEgolferanim).
 typedef struct ScreenCopy {
     void* pPixels;              // 0x00  surface 1's buffer, NULL without a size
     s32   nWidth;               // 0x04
