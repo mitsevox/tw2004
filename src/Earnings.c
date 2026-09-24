@@ -924,6 +924,193 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
     }
 }
 
+// The marked holes (fn_800E1CE8's items, kind 0). Without bCheck: whether the profile has all 71.
+// With it: whether this par 5 was played in eagle or better with 70 held and this hole the one
+// missing.
+u8 fn_800D61E4(int nPlayer, u8 bCheck) {
+    int nProfile;
+    u8 bAll;
+    int i;
+    int nHave;
+    int nItem;
+
+    nProfile = gPlayers[nPlayer].nIndex;
+    if (!gpSaveData[nProfile].bActive) return 0;
+    if (!bCheck) {
+        bAll = 1;
+        for (i = 0; i < 71; i++) {
+            if (!fn_800588F4(&gpSaveData[nProfile], 0, i)) {
+                bAll = 0;
+            }
+        }
+        return bAll;
+    }
+    if (fn_800D2ABC(Game_GetCourse(), fn_80015464()) == 5 &&
+        gPlayers[nPlayer].nStrokes[fn_80015464()] <= fn_800D2ABC(gpGame->nCurCourse, fn_80015464()) - 2) {
+        nHave = 0;
+        for (i = 0; i < 71; i++) {
+            if (fn_800588F4(&gpSaveData[nPlayer], 0, i)) {
+                nHave++;
+            }
+        }
+        if (nHave == 70) {
+            nItem = -1;
+            switch (Game_GetCourse()) {
+            case 0:
+                switch (fn_80015464() + 1) {
+                case 2: nItem = 0; break;
+                case 6: nItem = 1; break;
+                case 14: nItem = 2; break;
+                case 18: nItem = 3; break;
+                }
+                break;
+            case 1:
+                switch (fn_80015464() + 1) {
+                case 2: nItem = 4; break;
+                case 4: nItem = 5; break;
+                case 10: nItem = 6; break;
+                case 15: nItem = 7; break;
+                }
+                break;
+            case 2:
+                switch (fn_80015464() + 1) {
+                case 2: nItem = 8; break;
+                case 9: nItem = 9; break;
+                case 11: nItem = 10; break;
+                case 16: nItem = 11; break;
+                }
+                break;
+            case 3:
+                switch (fn_80015464() + 1) {
+                case 2: nItem = 12; break;
+                case 9: nItem = 13; break;
+                case 13: nItem = 14; break;
+                case 18: nItem = 15; break;
+                }
+                break;
+            case 6:
+                switch (fn_80015464() + 1) {
+                case 6: nItem = 16; break;
+                case 15: nItem = 17; break;
+                case 17: nItem = 18; break;
+                }
+                break;
+            case 12:
+                switch (fn_80015464() + 1) {
+                case 2: nItem = 19; break;
+                case 6: nItem = 20; break;
+                case 11: nItem = 21; break;
+                case 18: nItem = 22; break;
+                }
+                break;
+            case 9:
+                switch (fn_80015464() + 1) {
+                case 4: nItem = 23; break;
+                case 6: nItem = 24; break;
+                case 12: nItem = 25; break;
+                case 16: nItem = 26; break;
+                }
+                break;
+            // EA left out course 10 (items 27..30), which fn_800E1CE8 has.
+            case 11:
+                switch (fn_80015464() + 1) {
+                case 4: nItem = 31; break;
+                case 9: nItem = 32; break;
+                case 10: nItem = 33; break;
+                case 12: nItem = 34; break;
+                case 18: nItem = 35; break;
+                }
+                break;
+            case 13:
+                switch (fn_80015464() + 1) {
+                case 3: nItem = 36; break;
+                case 13: nItem = 37; break;
+                case 15: nItem = 38; break;
+                }
+                break;
+            case 15:
+                switch (fn_80015464() + 1) {
+                case 5: nItem = 39; break;
+                case 14: nItem = 40; break;
+                }
+                break;
+            case 14:
+                switch (fn_80015464() + 1) {
+                case 6: nItem = 41; break;
+                case 9: nItem = 42; break;
+                case 13: nItem = 43; break;
+                case 18: nItem = 44; break;
+                }
+                break;
+            case 16:
+                switch (fn_80015464() + 1) {
+                case 2: nItem = 45; break;
+                case 6: nItem = 46; break;
+                case 11: nItem = 47; break;
+                }
+                break;
+            case 17:
+                switch (fn_80015464() + 1) {
+                case 1: nItem = 48; break;
+                case 6: nItem = 49; break;
+                case 7: nItem = 50; break;
+                case 11: nItem = 51; break;
+                case 15: nItem = 52; break;
+                }
+                break;
+            case 18:
+                switch (fn_80015464() + 1) {
+                case 5: nItem = 53; break;
+                case 8: nItem = 54; break;
+                case 13: nItem = 55; break;
+                case 18: nItem = 56; break;
+                }
+                break;
+            case 19:
+                switch (fn_80015464() + 1) {
+                case 5: nItem = 57; break;
+                case 9: nItem = 58; break;
+                case 15: nItem = 59; break;
+                case 18: nItem = 60; break;
+                }
+                break;
+            case 20:
+                switch (fn_80015464() + 1) {
+                case 4: nItem = 61; break;
+                case 10: nItem = 62; break;
+                case 16: nItem = 63; break;
+                }
+                break;
+            case 5:
+                switch (fn_80015464() + 1) {
+                case 4: nItem = 64; break;
+                case 7: nItem = 65; break;
+                case 13: nItem = 66; break;
+                }
+                break;
+            case 8:
+                switch (fn_80015464() + 1) {
+                case 4: nItem = 67; break;
+                case 6: nItem = 68; break;
+                case 12: nItem = 69; break;
+                case 16: nItem = 70; break;
+                }
+                break;
+            case 4:
+                switch (fn_80015464() + 1) {
+                case 1: nItem = 71; break;
+                case 7: nItem = 72; break;
+                case 10: nItem = 73; break;
+                case 18: nItem = 74; break;
+                }
+                break;
+            }
+            if (nItem >= 0 && !fn_800588F4(&gpSaveData[nPlayer], 0, nItem)) return 1;
+        }
+    }
+    return 0;
+}
+
 // Without bCheck: whether the profile has won all 31 PGA TOUR tournaments. With it: whether this is
 // game mode 23 with 30 won and fn_800CF450 agrees.
 u8 fn_800D68CC(int nPlayer, u8 bCheck) {
