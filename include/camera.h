@@ -272,7 +272,12 @@ typedef struct CamTuning {
     f32  fE4;                   // 0x0E4  CamScript_GetLookAtPoint: the aim's lag on the ball (fn_800422C4,
                                 //        fn_8004349C); also put in CamScript.fDC
     f32  fE8;                   // 0x0E8  ... its lag on a bone of the golfer (fn_800422C4)
-    u8   unkEC[0x128 - 0xEC];
+    u8   unkEC[0xF4 - 0xEC];
+    f32  fF4;                   // 0x0F4  fn_80043C74: a spot is taken when the dot product of its level
+                                //        direction to the ball with the camera's is below this
+    u8   unkF8[0x10C - 0xF8];
+    f32  f10C;                  // 0x10C  fn_80043C74: the camera's height over the ground at the spot
+    u8   unk110[0x128 - 0x110];
     f32  f128;                  // 0x128  CamScript_GetLookAtPoint: the least level distance for the
                                 //        steep-aim limit
     u8   unk12C[0x164 - 0x12C];
@@ -510,7 +515,8 @@ void     CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int 
 u8       fn_80043388(CamScript* pScript, CamShot* pShot);
 void     CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot, int a, int b, f32 f1,
                                    f32 f2, f32 f3);
-void     fn_80043C74(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot* pShot, f32* pSub, int a);
+void     fn_80043C74(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot* pShot, f32* pSub,
+                     f32* pHeight);
 void     CamScript_PutBackOnFairway(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot* pShot,
                                     f32* pSub);
 f32      fn_80044EA8(int nPlayer, CamScript* pScript);   // how far the ball's flight has run

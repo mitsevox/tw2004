@@ -46,6 +46,7 @@ void CamScript_UpdateFairwayCam(CamScript* pScript, f32* pCam, f32* pSub, int nP
 void fn_800441E4(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pSaved, f32* pPrev);
 u8   fn_800439E4(f32* pCam, int nPlayer);
 u8   fn_80043920(CamScript* pScript, int nPlayer);
+void fn_80044768(f32* pPos, f32* pOut);
 
 // The camera script's frame (a view's &View.script; pShot is the view's hand-built shot19C). Unless
 // paused (or b), it eases the ball-update rate fEC, places the camera for the current and next
@@ -465,6 +466,151 @@ u8 fn_80043920(CamScript* pScript, int nPlayer) {
         return 1;
     }
     return 0;
+}
+
+// A spot for the camera by the green: of the AI targets nearest the ball, nearest the player's
+// target and 3 past the pin (as seen from Player.vBall), taken nearest the ball first, the first
+// whose level direction to the ball is far enough from the camera's (pSub to the ball); else the
+// target nearest the point halfway from tee 0 to the pin. Kept at least 2 from the pin, raised
+// CamTuning.f10C over the ground there into pOut (not when there is no ground); the ground height
+// goes to *pHeight when it is not NULL.
+void fn_80043C74(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot* pShot, f32* pSub,
+                 f32* pHeight) {
+    f32 vNearBall[4];
+    f32 vNearTarget[4];
+    f32 vPastPin[4];
+    f32 vSpot[4];
+    f32 vCamDir[4];
+    f32 vDir[4];
+    f32 vHalf[4];
+    f32 vFirst[4];
+    f32 vSecond[4];
+    f32 vThird[4];
+    f32 vDiff[4];
+    u8 bFound = 0;
+    CourseInfo* pCourse = fn_8000C594();
+    f32* pBall;
+    f32* pPin;
+    int nPin;
+    f32 fBall;
+    f32 fTarget;
+    f32 fPin;
+    f32 fHeight;
+
+    if (pCourse == NULL) return;
+    nPin = Game_CurrentPinSet();
+    pBall = gPlayers[nPlayer].ball.vPos;
+    fn_80045428(pBall, pSub, vCamDir);
+    vCamDir[1] = 0.0f;
+    if (0.0f != vCamDir[0] || 0.0f != vCamDir[1] || 0.0f != vCamDir[2]) {
+        fn_800BAF04(vCamDir, vCamDir);
+    }
+    fn_80044768(pBall, vNearBall);
+    fn_80044768(gPlayers[nPlayer].vTarget, vNearTarget);
+    pPin = &pCourse->pin[nPin].x;
+    fn_80045428(pPin, gPlayers[nPlayer].vBall, vPastPin);
+    vSpot[1] = 0.0f;    // EA bug: meant vPastPin[1]; the direction past the pin is not levelled
+    if (0.0f != vPastPin[0] || 0.0f != vPastPin[1] || 0.0f != vPastPin[2]) {
+        fn_800BAF04(vPastPin, vPastPin);
+    }
+    fn_8001EF34(vPastPin, 3.0f, vPastPin);
+    fn_8004544C(pPin, vPastPin, vPastPin);
+
+    fn_80045428(pBall, vNearBall, vDiff);
+    vDiff[1] = 0.0f;
+    fBall = fn_80009680(fn_80009744(vDiff));
+    fn_80045428(pBall, vNearTarget, vDiff);
+    vDiff[1] = 0.0f;
+    fTarget = fn_80009680(fn_80009744(vDiff));
+    fn_80045428(pBall, vPastPin, vDiff);
+    vDiff[1] = 0.0f;
+    fPin = fn_80009680(fn_80009744(vDiff));
+    // the three spots in order of their distance from the ball
+    if (fBall <= fTarget) {
+        if (fBall <= fPin) {
+            Vec3Copy(vNearBall, vFirst);
+            if (fPin <= fTarget) {
+                Vec3Copy(vPastPin, vSecond);
+                Vec3Copy(vNearTarget, vThird);
+            } else {
+                Vec3Copy(vNearTarget, vSecond);
+                Vec3Copy(vPastPin, vThird);
+            }
+        } else {
+            Vec3Copy(vPastPin, vFirst);
+            Vec3Copy(vNearBall, vSecond);
+            Vec3Copy(vNearTarget, vThird);
+        }
+    } else if (fBall <= fPin) {
+        Vec3Copy(vNearTarget, vFirst);
+        Vec3Copy(vNearBall, vSecond);
+        Vec3Copy(vPastPin, vThird);
+    } else if (fPin <= fTarget) {
+        Vec3Copy(vPastPin, vFirst);
+        Vec3Copy(vNearTarget, vSecond);
+        Vec3Copy(vNearBall, vThird);
+    } else {
+        Vec3Copy(vNearTarget, vFirst);
+        Vec3Copy(vPastPin, vSecond);
+        Vec3Copy(vNearBall, vThird);
+    }
+
+    Vec3Copy(vFirst, vSpot);
+    fn_80045428(pBall, vSpot, vDir);
+    vDir[1] = 0.0f;
+    if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
+        fn_800BAF04(vDir, vDir);
+    }
+    if (fn_8000C5FC(vDir, vCamDir) < lbl_80281F78->fF4) {
+        bFound = 1;
+    }
+    if (!bFound) {
+        Vec3Copy(vSecond, vSpot);
+        fn_80045428(pBall, vSpot, vDir);
+        vDir[1] = 0.0f;
+        if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
+            fn_800BAF04(vDir, vDir);
+        }
+        if (fn_8000C5FC(vDir, vCamDir) < lbl_80281F78->fF4) {
+            bFound = 1;
+        }
+    }
+    if (!bFound) {
+        Vec3Copy(vThird, vSpot);
+        fn_80045428(pBall, vSpot, vDir);
+        vDir[1] = 0.0f;
+        if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
+            fn_800BAF04(vDir, vDir);
+        }
+        if (fn_8000C5FC(vDir, vCamDir) < lbl_80281F78->fF4) {
+            bFound = 1;
+        }
+    }
+    if (!bFound) {
+        fn_80045428(pPin, &pCourse->tee[0].x, vHalf);
+        fn_8001EF34(vHalf, 0.5f, vHalf);
+        fn_8004544C(&pCourse->tee[0].x, vHalf, vHalf);
+        fn_80044768(vHalf, vSpot);
+    }
+    fn_80045428(pPin, vSpot, vPastPin);
+    vPastPin[1] = 0.0f;
+    if ((f32)fn_80009680(fn_80009744(vPastPin)) < 2.0f) {
+        fn_80045428(pPin, pBall, vNearBall);
+        vNearBall[1] = 0.0f;
+        if (0.0f != vNearBall[0] || 0.0f != vNearBall[1] || 0.0f != vNearBall[2]) {
+            fn_800BAF04(vNearBall, vNearBall);
+        }
+        fn_8001EF34(vNearBall, 2.0f, vNearBall);
+        fn_8004544C(pPin, vNearBall, vSpot);
+    }
+    fHeight = Terrain_HeightAt(vSpot, NULL);
+    if (pHeight != NULL) {
+        *pHeight = fHeight;
+    }
+    if (!(fHeight < -60000.0f)) {
+        vSpot[1] = fHeight + lbl_80281F78->f10C;
+        Vec_Copy(vSpot, pOut);
+    }
 }
 
 // The pin, when pPos is near no AI target: pOut gets the nearest target, or the current pin

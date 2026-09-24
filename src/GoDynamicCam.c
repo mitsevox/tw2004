@@ -595,7 +595,7 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
     case 16:
         if (fn_80043388(pScript, pShot)) {
             if (pShot == pScript->pShot) {
-                fn_80043C74(pScript, pOut, pCam, nPlayer, pScript->pB4, pSub, 0);
+                fn_80043C74(pScript, pOut, pCam, nPlayer, pScript->pB4, pSub, NULL);
                 Vec3Copy(pOut, pScript->v0);
                 pScript->bCF = 1;
             } else if (pShot == pScript->pNextShot) {
