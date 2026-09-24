@@ -457,8 +457,8 @@ s32 fn_8009D74C(s32 nPort, s32 nSlot) {
         return MC_ERR_BROKEN;
     case CARD_RESULT_READY:
         // the free bytes in whole sectors, rounded up
-        lbl_801F1510[nPort][nSlot].nFreeBlocks =
-            (lbl_801F1510[nPort][nSlot].nSectorSize - 1 + nFreeBytes) / lbl_801F1510[nPort][nSlot].nSectorSize;
+        lbl_801F1510[nPort][nSlot].nFreeBlocks = (lbl_801F1510[nPort][nSlot].nSectorSize - 1 + nFreeBytes)
+                                               / lbl_801F1510[nPort][nSlot].nSectorSize;
         lbl_801F1510[nPort][nSlot].nFreeFiles = nFreeFiles;
         break;
     default:
