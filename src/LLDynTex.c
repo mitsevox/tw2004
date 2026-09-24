@@ -21,7 +21,8 @@ void fn_8000FBAC();
 // ---- end of sweep code ----
 
 void fn_8010B7C0(void);
-void fn_8010A930(DynTexObj* pObj, u8* pBuf, void* p, s32 n);
+void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode);
+s32  fn_8010B754(DynTexObj* pObj);
 s32  fn_8010B338(DynTex* pTex, DynTexObj* pObj, DynTexPalette* pPal, u8* pPixels, u8* pPalette,
                  void* p, s32 n);   // adds a texture; gives its index
 DynTexJob* fn_8010B960(void);
@@ -156,6 +157,112 @@ void fn_8010A788(f32* pIn, f32* pOut, f32 (*pMtx)[3], s32 nMode) {
     pOut[0] = (pOut[0] < 0.0f) ? 0.0f : ((pOut[0] > 1.0f) ? 1.0f : pOut[0]);
     pOut[1] = (pOut[1] < 0.0f) ? 0.0f : ((pOut[1] > 1.0f) ? 1.0f : pOut[1]);
     pOut[2] = (pOut[2] < 0.0f) ? 0.0f : ((pOut[2] > 1.0f) ? 1.0f : pOut[2]);
+}
+
+// Recolour a compressed (GX_TF_CMPR) texture through a colour matrix (fn_8010A788): in each 4x4
+// block, both key colours (RGB565) go through it; when that flips which one is larger, which
+// switches the block between its four- and three-colour modes, they are stored the other way
+// round and the block's 2-bit indices are remapped to match.
+void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
+    u8* pPixels = pBuf + pObj->aBlocks[0].nOffset;
+    u16* pBlock = (u16*)pPixels;
+    int y;
+    int x;
+    f32 aIn[3];
+    f32 aOut[3];
+    u16 uOld0;
+    u16 uOld1;
+    u16 uNew0;
+    u16 uNew1;
+    u8 bSwap;
+    u8 bThree;
+    int i;
+    int nShift;
+    u8 uIndices;
+    u8 uIndex;
+
+    if (pObj->n40 != 14) {      // GX_TF_CMPR
+        return;
+    }
+    for (y = 0; y < pObj->n3A / 4; y++) {
+        for (x = 0; x < pObj->n38 / 4; x++, pBlock += 4) {
+            uOld0 = pBlock[0];
+            aIn[0] = (f32)((uOld0 >> 8) & 0xF8) / 255.0f;
+            aIn[1] = (f32)((uOld0 >> 3) & 0xFC) / 255.0f;
+            aIn[2] = (f32)((uOld0 << 3) & 0xF8) / 255.0f;
+            fn_8010A788(aIn, aOut, pMtx, nMode);
+            uNew0 = (u16)((((u8)(int)(aOut[0] * 255.0f + 0.5f) >> 3) << 11) |
+                          (((u8)(int)(aOut[1] * 255.0f + 0.5f) >> 2) << 5) |
+                          ((u8)(int)(aOut[2] * 255.0f + 0.5f) >> 3));
+            uOld1 = pBlock[1];
+            aIn[0] = (f32)((uOld1 >> 8) & 0xF8) / 255.0f;
+            aIn[1] = (f32)((uOld1 >> 3) & 0xFC) / 255.0f;
+            aIn[2] = (f32)((uOld1 << 3) & 0xF8) / 255.0f;
+            fn_8010A788(aIn, aOut, pMtx, nMode);
+            uNew1 = (u16)((((u8)(int)(aOut[0] * 255.0f + 0.5f) >> 3) << 11) |
+                          (((u8)(int)(aOut[1] * 255.0f + 0.5f) >> 2) << 5) |
+                          ((u8)(int)(aOut[2] * 255.0f + 0.5f) >> 3));
+            if (uOld0 > uOld1) {
+                // Four colours: the first key colour must stay the larger.
+                if (uNew0 > uNew1) {
+                    pBlock[0] = uNew0;
+                    bSwap = 0;
+                    pBlock[1] = uNew1;
+                } else {
+                    pBlock[0] = uNew1;
+                    bSwap = 1;
+                    bThree = 0;
+                    pBlock[1] = uNew0;
+                }
+            } else if (uNew0 > uNew1) {
+                // Three colours: the first key colour must stay the smaller.
+                pBlock[0] = uNew1;
+                bSwap = 1;
+                bThree = 1;
+                pBlock[1] = uNew0;
+            } else {
+                pBlock[0] = uNew0;
+                bSwap = 0;
+                pBlock[1] = uNew1;
+            }
+            if (!bSwap) {
+                continue;
+            }
+            for (i = 0; i < 4; i++) {
+                uIndices = 0;
+                for (nShift = 0; nShift < 8; nShift += 2) {
+                    // EA bug: the mask keeps every bit from nShift up, not just the index's two,
+                    // and the indices are compared as if 0x10 and 0x11 were binary 10 and 11;
+                    // only the top index of a row is read right.
+                    uIndex = (((u8*)pBlock)[4 + i] & (0xFF << nShift)) >> nShift;
+                    if (bThree) {
+                        if (uIndex == 0) {
+                            uIndices |= 1 << nShift;
+                        } else if (uIndex == 1) {
+                            // becomes 0
+                        } else if (uIndex == 0x10) {
+                            uIndices |= 0x10 << nShift;
+                        } else if (uIndex == 0x11) {
+                            uIndices |= 0x11 << nShift;
+                        }
+                    } else {
+                        if (uIndex == 0) {
+                            uIndices |= 1 << nShift;
+                        } else if (uIndex == 1) {
+                            // becomes 0
+                        } else if (uIndex == 0x10) {
+                            uIndices |= 0x11 << nShift;
+                        } else if (uIndex == 0x11) {
+                            uIndices |= 0x10 << nShift;
+                        }
+                    }
+                }
+                ((u8*)pBlock)[4 + i] = uIndices;
+            }
+        }
+    }
+    DCFlushRange(pPixels, fn_8010B754(pObj));
+    GXInvalidateTexAll();
 }
 
 // ---- sweep code (not yet cleaned up) ----
