@@ -3826,6 +3826,118 @@ void fn_80081FA8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80281ED4->n1;
 }
 
+// Build the list of pairs fn_80082620 reads back, n10620 of them: slot pArgs[0]'s created golfer's
+// saved attributes against six values (pArgs[1..6]). Where the saved attribute has reached 50, 75
+// or 100 and the value passed for it is still under that mark, the pair (group, 2, 3 or 4 by mark)
+// is added. Groups: 1 power (50 and 75 only), 2 ball striking and approach (both reached, either
+// value under), 3 putting, 4 spin, 5 recovery.
+void fn_80081FBC(MsgArg* pArgs, MsgArg* pResult) {
+    int n = 0;
+    int i;
+    f32 fPower = pArgs[1].f;
+    f32 fStriking = pArgs[2].f;
+    f32 fApproach = pArgs[3].f;
+    f32 fPutting = pArgs[4].f;
+    f32 fSpin = pArgs[5].f;
+    f32 fRecovery = pArgs[6].f;
+    s8 nPower = gpSaveData[pArgs[0].i].createdGolfer.attr[ATTR_POWER];
+    s8 nStriking = gpSaveData[pArgs[0].i].createdGolfer.attr[ATTR_BALL_STRIKING];
+    s8 nApproach = gpSaveData[pArgs[0].i].createdGolfer.attr[ATTR_APPROACH];
+    s8 nPutting = gpSaveData[pArgs[0].i].createdGolfer.attr[ATTR_PUTTING];
+    s8 nSpin = gpSaveData[pArgs[0].i].createdGolfer.attr[ATTR_SPIN];
+    s8 nRecovery = gpSaveData[pArgs[0].i].createdGolfer.attr[ATTR_RECOVERY];
+
+    lbl_80281ED4->n10620 = 0;
+    for (i = 0; i < 15; i++) {
+        lbl_80281ED4->a10621[i][0] = -1;
+        lbl_80281ED4->a10621[i][1] = -1;
+    }
+    if (fPower < 50.0f && nPower >= 50) {
+        lbl_80281ED4->n10620++;
+        lbl_80281ED4->a10621[n][0] = 1;
+        lbl_80281ED4->a10621[n][1] = 2;
+        n++;
+    }
+    if (fPower < 75.0f && nPower >= 75) {
+        lbl_80281ED4->n10620++;
+        lbl_80281ED4->a10621[n][0] = 1;
+        lbl_80281ED4->a10621[n][1] = 3;
+        n++;
+    }
+    if (nStriking >= 50 && nApproach >= 50 && (fStriking < 50.0f || fApproach < 50.0f)) {
+        lbl_80281ED4->n10620++;
+        lbl_80281ED4->a10621[n][0] = 2;
+        lbl_80281ED4->a10621[n][1] = 2;
+        n++;
+    }
+    if (nStriking >= 75 && nApproach >= 75 && (fStriking < 75.0f || fApproach < 75.0f)) {
+        lbl_80281ED4->n10620++;
+        lbl_80281ED4->a10621[n][0] = 2;
+        lbl_80281ED4->a10621[n][1] = 3;
+        n++;
+    }
+    if (nStriking >= 100 && nApproach >= 100 && (fStriking < 100.0f || fApproach < 100.0f)) {
+        lbl_80281ED4->n10620++;
+        lbl_80281ED4->a10621[n][0] = 2;
+        lbl_80281ED4->a10621[n][1] = 4;
+        n++;
+    }
+    if (fPutting < 50.0f && nPutting >= 50) {
+        lbl_80281ED4->n10620++;
+        lbl_80281ED4->a10621[n][0] = 3;
+        lbl_80281ED4->a10621[n][1] = 2;
+        n++;
+    }
+    if (fPutting < 75.0f && nPutting >= 75) {
+        lbl_80281ED4->n10620++;
+        lbl_80281ED4->a10621[n][0] = 3;
+        lbl_80281ED4->a10621[n][1] = 3;
+        n++;
+    }
+    if (fPutting < 100.0f && nPutting >= 100) {
+        lbl_80281ED4->n10620++;
+        lbl_80281ED4->a10621[n][0] = 3;
+        lbl_80281ED4->a10621[n][1] = 4;
+        n++;
+    }
+    if (fSpin < 50.0f && nSpin >= 50) {
+        lbl_80281ED4->n10620++;
+        lbl_80281ED4->a10621[n][0] = 4;
+        lbl_80281ED4->a10621[n][1] = 2;
+        n++;
+    }
+    if (fSpin < 75.0f && nSpin >= 75) {
+        lbl_80281ED4->n10620++;
+        lbl_80281ED4->a10621[n][0] = 4;
+        lbl_80281ED4->a10621[n][1] = 3;
+        n++;
+    }
+    if (fSpin < 100.0f && nSpin >= 100) {
+        lbl_80281ED4->n10620++;
+        lbl_80281ED4->a10621[n][0] = 4;
+        lbl_80281ED4->a10621[n][1] = 4;
+        n++;
+    }
+    if (fRecovery < 50.0f && nRecovery >= 50) {
+        lbl_80281ED4->n10620++;
+        lbl_80281ED4->a10621[n][0] = 5;
+        lbl_80281ED4->a10621[n][1] = 2;
+        n++;
+    }
+    if (fRecovery < 75.0f && nRecovery >= 75) {
+        lbl_80281ED4->n10620++;
+        lbl_80281ED4->a10621[n][0] = 5;
+        lbl_80281ED4->a10621[n][1] = 3;
+        n++;
+    }
+    if (fRecovery < 100.0f && nRecovery >= 100) {
+        lbl_80281ED4->n10620++;
+        lbl_80281ED4->a10621[n][0] = 5;
+        lbl_80281ED4->a10621[n][1] = 4;
+        n++;
+    }
+}
+
 void fn_80082608(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80281ED4->n10620;
 }
