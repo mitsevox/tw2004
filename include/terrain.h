@@ -199,6 +199,9 @@ void fn_8006F334(TerSettings* pSettings);   // Code8006F154.c: the default colou
 extern f32 lbl_801876D8[21][3];     // rows fn_80034648 copies into fDefaultObjectMipmapBias
 extern f32 lbl_802810C8;
 extern s8  lbl_802810CC;
+extern u8  lbl_802810EC;            // } 1: fn_80033F94 draws object list 0, list 2
+extern u8  lbl_802810ED;            // }
+extern s32 lbl_80281D64;            // how many of list 2's last objects fn_80033F94 leaves out
 extern s32 lbl_802810D0;            // } fn_80031938's arguments (the LOD planes); 26 and 16 once
 extern s32 lbl_802810D4;            // } unloaded, else set by fn_80031A08 from the 'tLOD' chunk
 extern f32 lbl_802810D8;            // }

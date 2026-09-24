@@ -33,7 +33,7 @@ void  fn_80031E58(void);
 void  fn_80032518(int nRenderPass);
 void  fn_80032770(void);
 void  fn_80032954(void);
-void  fn_80033F94(void* pHoleData, int nList);
+void  fn_80033F94(void* pHoleData, u32 nList);
 void  fn_8003546C(f32* pA, f32* pB, f32* pOut);
 f32   fn_8001EFFC(CamLens* pLens);
 f32   fn_800351D8(u32 n, f32 fPeriod);
@@ -59,7 +59,8 @@ void  fn_80034DE4(void);
 void  fn_80034F28(void* pUnused);
 void  fn_80035490(f32* pA, f32* pB, f32* pOut);
 
-void*     fn_800354BC(UObjMesh* pNode);
+UObjMesh* fn_800354BC(UObjMesh* pNode);
+f32       fn_80035560(UObjMesh* pMesh);
 f32*      fn_800354C4(UObjMesh* pNode);
 s32       fn_800354D0(UObjMesh* pNode, s32 n);
 UObjMesh* fn_800354E4(UObjMesh* pNode, s32 n);
@@ -669,6 +670,67 @@ void fn_80033704(u16 nPatch, u16 nObject) {
     }
 }
 
+// Draws object list nList of the hole data (0 before the patches, 2 after them) when its switch is
+// on, as panorama items: each object that is not off screen, except (list 0) objects 0-1 or 2-3 by
+// lbl_802811F0's flag 0x2, (list 2) the last lbl_80281D64, and in split screen those with flag 8.
+void fn_80033F94(void* pHoleData, u32 nList) {
+    UObjMesh* pRoot;
+    UObjMesh* pList;
+    UObjMesh* pMesh;
+    View* pView;
+    s32 nItems;
+    s32 nCount;
+    s32 uFlags;
+    s32 nClip;
+    int i;
+
+    if ((nList != 0 || lbl_802810EC) && (nList != 2 || lbl_802810ED)) {
+        pRoot = fn_80035500(pHoleData);
+        nItems = 0;
+        if (fn_800354F4(pRoot) >= (s32)(nList + 1)) {
+            pList = fn_800354E4(pRoot, nList);
+            nCount = fn_800354F4(pList);
+            pMesh = fn_800354E4(pList, 0);
+            for (i = 0; i < nCount; i++) {
+                if (nList == 0) {
+                    if (fn_80035574()) {
+                        if (i >= 0 && i <= 1) {
+                            pMesh = fn_800354BC(pMesh);
+                            continue;
+                        }
+                    } else if (i >= 2 && i <= 3) {
+                        pMesh = fn_800354BC(pMesh);
+                        continue;
+                    }
+                }
+                if (nList == 2 && i >= nCount - lbl_80281D64) {
+                    pMesh = fn_800354BC(pMesh);
+                    continue;
+                }
+                uFlags = fn_800354D0(pMesh, 2);
+                if (!gSession.nSplitScreen || !(uFlags & 8)) {
+                    pView = fn_80017028(lbl_801D3CB0.iCurrentViewContext);
+                    nClip = fn_80007B2C(pMesh, fn_8001614C(), 0.0f, lbl_801D3CB0.fCameraMinHalfFieldOfViewTan,
+                                        pView->f54);
+                    if (nClip != 3) {
+                        // fake match: uFlags is reused for bUseFog (fog unless flag 0x20); a new local
+                        // is computed after the call to fn_80035560, the original before it
+                        uFlags = ((uFlags & 0x20) >> 5) ^ 1;
+                        fn_8003241C(&lbl_801D3CB0.pPanoramaItemsList[nItems], &nItems, 300, pMesh, 0x289 - i,
+                                    nClip, uFlags, 0, 1.0f,
+                                    lbl_801D3CB0.fDefaultObjectMipmapBias[0] * fn_80035560(pMesh), 0.0f);
+                    }
+                }
+                pMesh = fn_800354BC(pMesh);
+            }
+        }
+        fn_80032F88(lbl_801D3CB0.pPanoramaItemsList, nItems, lbl_801D3CB0.eTerrainFilterMin,
+                    lbl_801D3CB0.eTerrainFilterMag);
+        fn_8003272C(1);
+        fn_80012EF8();
+    }
+}
+
 // The 'tLOD' chunk arrived: two values, made whole numbers and, when the second is the larger and
 // both are at least lbl_802810DC x lbl_802810D8, turned into lbl_802810D0 and lbl_802810D4.
 void fn_800341A4(UStreamObject* pObject) {
@@ -1125,7 +1187,6 @@ void fn_80035398(void) {
 void fn_8006F154();
 void fn_800082CC(void* p);
 s32 fn_80035508(u8* p0);
-f32 fn_80035560(u8* p0);
 void fn_80035584(s32 v);
 void fn_80035590(f32* p0);
 void fn_800355B8(f32* p0);
@@ -1201,7 +1262,7 @@ void fn_800354B4(u8* p, f32 v) {
 
 // ---- end of sweep code ----
 
-void* fn_800354BC(UObjMesh* pNode) {
+UObjMesh* fn_800354BC(UObjMesh* pNode) {
     return pNode->p14;
 }
 
@@ -1250,8 +1311,8 @@ s32 fn_80035554(UObjMesh* pMesh) {
     return pMesh->pInfo->b8B;
 }
 
-f32 fn_80035560(u8* p0) {
-    return *(f32*)(((u8*)*(s32*)p0) + 0x54);
+f32 fn_80035560(UObjMesh* pMesh) {
+    return pMesh->pInfo->f54;
 }
 
 // The mesh drawn for a patch's ground.

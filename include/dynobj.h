@@ -81,7 +81,8 @@ typedef struct DynObjPair {
 typedef struct UObjMeshInfo {
     s16  n0;                    // 0x00  how many meshes UObjMesh.p8 holds (GoTerrain.c fn_800354F4)
     u8   unk2[0x24 - 0x2];
-    s8   a24[0x58 - 0x24];      // 0x24  fn_80048AD4, GoTerrain.c fn_800354D0 (length unknown, at most this)
+    s8   a24[0x54 - 0x24];      // 0x24  fn_80048AD4, GoTerrain.c fn_800354D0 (length unknown, at most this)
+    f32  f54;                   // 0x54  scales a terrain object's mipmap bias (GoTerrain.c fn_80035560)
     f32  v58[3];                // 0x58  copied to UObjModel.v2C by type 0's setup; with f64 the
                                 //       bounding sphere GoTerrain.c's fn_800354C4 returns
     f32  f64;                   // 0x64  copied to UObjModel.f5C by type 0's setup
@@ -106,7 +107,8 @@ typedef struct UObjMesh {
                                 //       mesh's children (fn_800354E4)
     struct UObjMesh* pC;        // 0x0C  in a terrain patch's ground: the mesh drawn for it (fn_8003556C)
     u8   unk10[0x14 - 0x10];
-    void* p14;                  // 0x14  a terrain patch's Ter_PatchReference.pObjects (fn_800354BC)
+    struct UObjMesh* p14;       // 0x14  the next terrain mesh of a list (fn_800354BC); a patch's
+                                //       ground's is its objects (Ter_PatchReference.pObjects)
     struct UObjMeshPart* p18;   // 0x18  fn_80048A84 passes entry n28 to fn_800082CC
     u8   a1C[0x28 - 0x1C];      // 0x1C  nonzero: entry i of p18 is used
     s32  n28;                   // 0x28
