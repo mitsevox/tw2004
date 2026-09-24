@@ -1494,15 +1494,14 @@ void fn_80033744(void) {
     s32 i;
     s32 v;
     s32 k;
-    u32 uFlags0;
-    u32 uFlags3;
+    s32 uFlags0;
+    s32 uFlags3;
     f32 fPeriod;
     f32 fStep;
     f32 fNoise;
     f32 fSum;
     f32 fScale;
     f32 fWave;
-    Ter_ObjectState* pState;
 
     fTime = gSession.fFrameTime;
     if (fTime > 1.0f / 30.0f) {
@@ -1547,42 +1546,50 @@ void fn_80033744(void) {
                 }
             }
         }
-        pState = &lbl_801D3CB0.pObjectStateList[i];
-        uFlags0 = pState->a20[0];
-        uFlags3 = pState->a20[3];
+        uFlags0 = lbl_801D3CB0.pObjectStateList[i].a20[0];
+        uFlags3 = lbl_801D3CB0.pObjectStateList[i].a20[3];
         if (!(uFlags0 & 1)) {
             continue;
         }
         if ((uFlags0 & 2) && lbl_801D3CB0.iCrowdPose != 0) {
             if (lbl_801D3CB0.iCrowdPose == 1) {
-                pState->n18 = 0;
-                pState->n1C = 0;
+                lbl_801D3CB0.pObjectStateList[i].n18 = 0;
+                lbl_801D3CB0.pObjectStateList[i].n1C = 0;
             } else {
-                pState->n18 = 3;
-                pState->n1C = 3;
+                lbl_801D3CB0.pObjectStateList[i].n18 = 3;
+                lbl_801D3CB0.pObjectStateList[i].n1C = 3;
             }
-            pState->f4 = lbl_801D3CB0.fCrowdInterpValue;
+            lbl_801D3CB0.pObjectStateList[i].f4 = lbl_801D3CB0.fCrowdInterpValue;
         } else if ((uFlags0 & 2) && !(uFlags3 & 0x40)) {
-            pState->nC += nFrames;
-            if (pState->n18 == pState->n1C || pState->f14 > 0.0f) {
-                fPeriod = 4.0f * (pState->f0 - lbl_801D3CB0.fTreeMinPeriod) + 1.5f;
-                if (pState->n18 == 3) {
-                    pState->f4 =
-                        0.5f * fn_800095F0(10.0f * (6.2831855f * fn_800351D8(pState->nC, fPeriod / 10.0f))
-                                           / fPeriod)
+            lbl_801D3CB0.pObjectStateList[i].nC += nFrames;
+            if (lbl_801D3CB0.pObjectStateList[i].n18 == lbl_801D3CB0.pObjectStateList[i].n1C
+                || lbl_801D3CB0.pObjectStateList[i].f14 > 0.0f) {
+                fPeriod = 4.0f * (lbl_801D3CB0.pObjectStateList[i].f0 - lbl_801D3CB0.fTreeMinPeriod) + 1.5f;
+                if (lbl_801D3CB0.pObjectStateList[i].n18 == 3) {
+                    lbl_801D3CB0.pObjectStateList[i].f4 =
+                        0.5f * fn_800095F0(10.0f
+                                           * (6.2831855f
+                                              * fn_800351D8(lbl_801D3CB0.pObjectStateList[i].nC,
+                                                            fPeriod / 10.0f)
+                                              / fPeriod))
                         + 0.5f;
                 } else {
-                    pState->f4 =
-                        0.5f * fn_800095F0(0.5f * (6.2831855f * fn_800351D8(pState->nC, fPeriod / 0.5f))
-                                           / fPeriod)
+                    lbl_801D3CB0.pObjectStateList[i].f4 =
+                        0.5f * fn_800095F0(0.5f
+                                           * (6.2831855f
+                                              * fn_800351D8(lbl_801D3CB0.pObjectStateList[i].nC,
+                                                            fPeriod / 0.5f)
+                                              / fPeriod))
                         + 0.5f;
                 }
-                pState->f14 -= fTime;
+                lbl_801D3CB0.pObjectStateList[i].f14 -= fTime;
             } else {
                 for (k = 0; k < 6; k++) {
-                    if (pState->n18 == lbl_801877E0[k].n0 && pState->n1C == lbl_801877E0[k].n4) {
-                        fStep = lbl_801877E0[k].fC - pState->f4;
-                        if (pState->n18 == 2 || pState->n18 == 3) {
+                    if (lbl_801D3CB0.pObjectStateList[i].n18 == lbl_801877E0[k].n0
+                        && lbl_801D3CB0.pObjectStateList[i].n1C == lbl_801877E0[k].n4) {
+                        fStep = lbl_801877E0[k].fC - lbl_801D3CB0.pObjectStateList[i].f4;
+                        if (lbl_801D3CB0.pObjectStateList[i].n18 == 2
+                            || lbl_801D3CB0.pObjectStateList[i].n18 == 3) {
                             if (fStep > fUpFast) {
                                 fStep = fUpFast;
                             }
@@ -1597,45 +1604,55 @@ void fn_80033744(void) {
                                 fStep = fDown;
                             }
                         }
-                        pState->f4 += fStep;
-                        if (fabsf(pState->f4 - lbl_801877E0[k].fC) < 0.01f) {
-                            pState->n18 = lbl_801877E0[k].n8;
-                            pState->f4 = lbl_801877E0[k].f10;
-                            pState->nC = 0;
+                        lbl_801D3CB0.pObjectStateList[i].f4 += fStep;
+                        if (fabsf(lbl_801D3CB0.pObjectStateList[i].f4 - lbl_801877E0[k].fC) < 0.01f) {
+                            lbl_801D3CB0.pObjectStateList[i].n18 = lbl_801877E0[k].n8;
+                            lbl_801D3CB0.pObjectStateList[i].f4 = lbl_801877E0[k].f10;
+                            lbl_801D3CB0.pObjectStateList[i].nC = 0;
                             break;
                         }
                     }
                 }
             }
         } else if ((uFlags0 & 2) && (uFlags3 & 0x40)) {
-            pState->nC += nFrames;
-            if (pState->n18 == pState->n1C || pState->f14 > 0.0f) {
-                if (pState->n18 == 0) {
-                    pState->f4 -= fDrop;
-                    if (pState->f4 < 0.0f) {
-                        pState->f4 = 0.0f;
+            lbl_801D3CB0.pObjectStateList[i].nC += nFrames;
+            if (lbl_801D3CB0.pObjectStateList[i].n18 == lbl_801D3CB0.pObjectStateList[i].n1C
+                || lbl_801D3CB0.pObjectStateList[i].f14 > 0.0f) {
+                if (lbl_801D3CB0.pObjectStateList[i].n18 == 0) {
+                    lbl_801D3CB0.pObjectStateList[i].f4 -= fDrop;
+                    if (lbl_801D3CB0.pObjectStateList[i].f4 < 0.0f) {
+                        lbl_801D3CB0.pObjectStateList[i].f4 = 0.0f;
                     }
-                    pState->f14 -= fTime;
+                    lbl_801D3CB0.pObjectStateList[i].f14 -= fTime;
                 } else {
-                    fPeriod = 4.0f * (pState->f0 - lbl_801D3CB0.fTreeMinPeriod) + 1.5f;
-                    if (pState->n18 == 1) {
-                        pState->f4 =
-                            0.5f * fn_800095F0(10.0f * (6.2831855f * fn_800351D8(pState->nC, fPeriod / 10.0f))
-                                               / fPeriod)
+                    fPeriod =
+                        4.0f * (lbl_801D3CB0.pObjectStateList[i].f0 - lbl_801D3CB0.fTreeMinPeriod) + 1.5f;
+                    if (lbl_801D3CB0.pObjectStateList[i].n18 == 1) {
+                        lbl_801D3CB0.pObjectStateList[i].f4 =
+                            0.5f * fn_800095F0(10.0f
+                                               * (6.2831855f
+                                                  * fn_800351D8(lbl_801D3CB0.pObjectStateList[i].nC,
+                                                                fPeriod / 10.0f)
+                                                  / fPeriod))
                             + 0.5f;
                     } else {
-                        pState->f4 =
-                            0.5f * fn_800095F0(0.5f * (6.2831855f * fn_800351D8(pState->nC, fPeriod / 0.5f))
-                                               / fPeriod)
+                        lbl_801D3CB0.pObjectStateList[i].f4 =
+                            0.5f * fn_800095F0(0.5f
+                                               * (6.2831855f
+                                                  * fn_800351D8(lbl_801D3CB0.pObjectStateList[i].nC,
+                                                                fPeriod / 0.5f)
+                                                  / fPeriod))
                             + 0.5f;
                     }
-                    pState->f14 -= fTime;
+                    lbl_801D3CB0.pObjectStateList[i].f14 -= fTime;
                 }
             } else {
                 for (k = 0; k < 2; k++) {
-                    if (pState->n18 == lbl_80187858[k].n0 && pState->n1C == lbl_80187858[k].n4) {
-                        fStep = lbl_80187858[k].fC - pState->f4;
-                        if (pState->n18 == 2 || pState->n18 == 3) {
+                    if (lbl_801D3CB0.pObjectStateList[i].n18 == lbl_80187858[k].n0
+                        && lbl_801D3CB0.pObjectStateList[i].n1C == lbl_80187858[k].n4) {
+                        fStep = lbl_80187858[k].fC - lbl_801D3CB0.pObjectStateList[i].f4;
+                        if (lbl_801D3CB0.pObjectStateList[i].n18 == 2
+                            || lbl_801D3CB0.pObjectStateList[i].n18 == 3) {
                             if (fStep > fUpFast) {
                                 fStep = fUpFast;
                             }
@@ -1650,24 +1667,24 @@ void fn_80033744(void) {
                                 fStep = fDown;
                             }
                         }
-                        pState->f4 += fStep;
-                        if (fabsf(pState->f4 - lbl_80187858[k].fC) < 0.01f) {
-                            pState->n18 = lbl_80187858[k].n8;
-                            pState->f4 = lbl_80187858[k].f10;
-                            pState->nC = 0;
+                        lbl_801D3CB0.pObjectStateList[i].f4 += fStep;
+                        if (fabsf(lbl_801D3CB0.pObjectStateList[i].f4 - lbl_80187858[k].fC) < 0.01f) {
+                            lbl_801D3CB0.pObjectStateList[i].n18 = lbl_80187858[k].n8;
+                            lbl_801D3CB0.pObjectStateList[i].f4 = lbl_80187858[k].f10;
+                            lbl_801D3CB0.pObjectStateList[i].nC = 0;
                             break;
                         }
                     }
                 }
             }
         } else if (uFlags3 & 1) {
-            if (pState->n1C == 1) {
-                pState->f4 += fTime;
-                if (pState->f4 > 1.0f) {
-                    pState->f4 = 1.0f;
+            if (lbl_801D3CB0.pObjectStateList[i].n1C == 1) {
+                lbl_801D3CB0.pObjectStateList[i].f4 += fTime;
+                if (lbl_801D3CB0.pObjectStateList[i].f4 > 1.0f) {
+                    lbl_801D3CB0.pObjectStateList[i].f4 = 1.0f;
                 }
             } else {
-                pState->f4 = 0.0f;
+                lbl_801D3CB0.pObjectStateList[i].f4 = 0.0f;
             }
         } else {
             fNoise = lbl_801D3CB0.fTreeNoiseAmplitudeScale;
@@ -1676,14 +1693,19 @@ void fn_80033744(void) {
             fWave = 0.5f * (fScale * fNoise)
                     * fn_800095F0(6.2831855f
                                   * fn_800351D8(gSession.nFrameCount,
-                                                lbl_801D3CB0.fTreeNoisePeriodScale * pState->f0)
-                                  / (lbl_801D3CB0.fTreeNoisePeriodScale * pState->f0));
-            pState->f4 = 0.5f * fScale
-                             * fn_800095F0(6.2831855f * fn_800351D8(gSession.nFrameCount, pState->f0)
-                                           / pState->f0)
-                       + fWave;
-            pState->f4 = pState->f4 * lbl_801D3CB0.fTreeOverdrive;
-            pState->f4 = pState->f4 + 0.5f;
+                                                lbl_801D3CB0.fTreeNoisePeriodScale
+                                                    * lbl_801D3CB0.pObjectStateList[i].f0)
+                                  / (lbl_801D3CB0.fTreeNoisePeriodScale
+                                     * lbl_801D3CB0.pObjectStateList[i].f0));
+            lbl_801D3CB0.pObjectStateList[i].f4 =
+                0.5f * fScale
+                    * fn_800095F0(6.2831855f
+                                  * fn_800351D8(gSession.nFrameCount, lbl_801D3CB0.pObjectStateList[i].f0)
+                                  / lbl_801D3CB0.pObjectStateList[i].f0)
+                + fWave;
+            lbl_801D3CB0.pObjectStateList[i].f4 =
+                lbl_801D3CB0.pObjectStateList[i].f4 * lbl_801D3CB0.fTreeOverdrive;
+            lbl_801D3CB0.pObjectStateList[i].f4 = lbl_801D3CB0.pObjectStateList[i].f4 + 0.5f;
         }
     }
 }
