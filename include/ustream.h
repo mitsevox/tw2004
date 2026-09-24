@@ -114,6 +114,13 @@ typedef struct UStreamNode {
     UStreamObject* pObject;
 } UStreamNode;
 
+// The object the parser is filling and how much of its data has arrived (one 8-byte static: the
+// parser reaches both fields off one base register, and UStream_BeginObject sets both).
+typedef struct UStreamFill {
+    UStreamObject* pObject;
+    u32 uPos;
+} UStreamFill;
+
 // The calls the movie player (LLVideo.c) makes on the loader's buffers.
 u8   UStream_Update(void);              // runs the loader once; 0 when nothing is left to read
 void UStream_AddBufferRef(UStreamBuffer** ppList);          // a chunk of the buffer is kept

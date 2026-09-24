@@ -1408,10 +1408,7 @@ void GetGolferName(int nGolfer, char* szName) {
     GolferRecord* pRecord;
 
     pRecord = fn_80077A80(nGolfer);
-    bNick = 0;
-    if (strcmp(pRecord->szNick, "NA") != 0 && strlen(pRecord->szNick) > 1 && nGolfer != 18) {
-        bNick = 1;
-    }
+    bNick = strcmp(pRecord->szNick, "NA") != 0 && strlen(pRecord->szNick) > 1 && nGolfer != 18;
     if (bNick != 0) {
         sprintf(szName, "%s \"%s\" %s", pRecord->szFirst, pRecord->szNick, pRecord->szLast);
     } else {
