@@ -439,7 +439,7 @@ void fn_800EEF88(s32 nPlayer) {
     }
 }
 
-void fn_800EF094(s32 a, s32 n) {
+void fn_800EF094(int a, s32 n) {
     lbl_80205F30.b0 = 1;
     lbl_80205F30.n4 = fn_801190D8(a, 0);
     lbl_80205F30.n8 = n;
