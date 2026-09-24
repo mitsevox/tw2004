@@ -171,6 +171,7 @@ void fn_8008F820(void) {
     u32 uMask;
     int i;
     int j;
+    int k;
     UIButtonEvent* pEvent;
 
     fOne = 1.0f;
@@ -250,34 +251,34 @@ void fn_8008F820(void) {
     }
     aArgs[0] = 0;
     if (lbl_801D87C0.b0 == 0 && fn_80077148() && lbl_801D87C0.b40 == 0) {
-        for (i = 0; i < 4; i++) {
-            if (lbl_801D87C0.a1[i] && lbl_801D87C0.a30[i]) {
+        for (k = 0; k < 4; k++) {
+            if (lbl_801D87C0.a1[k] && lbl_801D87C0.a30[k]) {
                 if (gSession.nGameType != 6 || (gSession.nPaused != 2 && gSession.nPaused != 3)) {
                     pEvent = lbl_80189B58;
                     for (j = 0; j < UI_NUM_BUTTON_EVENTS; j++) {
-                        if (pEvent->uMask & aPressed[i]) {
-                            fn_80168DB0(lbl_80281F1C->pHandler, i, pEvent->nEvent, 1, &fOne, 0);
+                        if (pEvent->uMask & aPressed[k]) {
+                            fn_80168DB0(lbl_80281F1C->pHandler, k, pEvent->nEvent, 1, &fOne, 0);
                         }
                         pEvent++;
                     }
-                    if (aButtons[i] != 0 && gSession.nGameType == 3) {
+                    if (aButtons[k] != 0 && gSession.nGameType == 3) {
                         fn_8016B09C(lbl_80281F1C->pHandler, 0x22, 1, aArgs);
                     }
                 }
                 if (gSession.nGameType == 6) {
-                    fn_800E5240(i);
+                    fn_800E5240(k);
                 }
                 if (gSession.nGameType == 6) {
                     uMask = fn_800142AC(0x20, 1);
-                    if (fn_800136DC(i) & uMask) {
-                        lbl_80189B38[i]++;
+                    if (fn_800136DC(k) & uMask) {
+                        lbl_80189B38[k]++;
                     } else {
-                        lbl_80189B38[i] = 0;
+                        lbl_80189B38[k] = 0;
                     }
                 }
-                if (lbl_80189B38[i] > 10) {
-                    fn_800E4F88(i);
-                    lbl_80189B38[i] = 0;
+                if (lbl_80189B38[k] > 10) {
+                    fn_800E4F88(k);
+                    lbl_80189B38[k] = 0;
                 }
             }
         }
