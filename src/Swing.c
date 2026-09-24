@@ -126,7 +126,6 @@ extern u8            lbl_80281E11;
 extern u8            lbl_80281E12;
 extern Vec4          lbl_80183690;          // 0, 0, 0, 0.5 (assigned, not an initialiser: as one,
                                                 //   STATEFUNC_RemoveBallExit drops to 42.5%)
-extern f32           gRealBallRadiusIn;          // 0x80283300  0.84: a real golf ball, in inches
 extern Vec4          lbl_80183620;          // 0, 0, 0, 0.5 (assigned)
 
 void  Swing_FaceVector(int nPlayer, f32* pOut);
