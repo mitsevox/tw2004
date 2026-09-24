@@ -12,6 +12,24 @@ AudInstance* fn_800AD674(u8 nId);
 void fn_800AD1C4(void) {
 }
 
+// Whether bit nTrack of an instance's u22 is set; 0 for no instance.
+u8 fn_800AD618(u8 nId, u8 nTrack) {
+    AudInstance* pInst = fn_800AD674(nId);
+    if (pInst == NULL) {
+        return 0;
+    }
+    return (pInst->u22 & (1 << nTrack)) != 0;
+}
+
+// The instance with an id; id 0xFF is none.
+AudInstance* fn_800AD674(u8 nId) {
+    AudInstance* pInst = &lbl_801F2740[nId];
+    if (nId == 0xFF) {
+        return NULL;
+    }
+    return pInst;
+}
+
 // The calls below pass on to AudTable.c's entry nId (the same number as the instance).
 void fn_800AD950(u8 nId, u8 nTrack, u8 n) {
     if (fn_800AD674(nId) != NULL) {
@@ -60,4 +78,12 @@ void fn_800ADDC8(u8 nId, u8 nBit, s32 n) {
             pfnCallback(nId, nBit, n);
         }
     }
+}
+
+// Sets a four-float vector to (0, 0, 0, 1).
+void fn_800ADE54(f32* pVec) {
+    pVec[2] = 0.0f;
+    pVec[1] = 0.0f;
+    pVec[0] = 0.0f;
+    pVec[3] = 1.0f;
 }

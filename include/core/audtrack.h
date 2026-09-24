@@ -326,6 +326,8 @@ typedef struct AudInstance {
 } AudInstance;
 LAYOUT_ASSERT(AudInstance, 0x34);
 
+extern AudInstance lbl_801F2740[256];   // the instances, by id (0xFF: none)
+
 // The two track lists: [0] in start order, [1] sorted on f48, highest first.
 extern UList lbl_801F1868[2];
 extern UPool lbl_80282098;              // the free tracks
