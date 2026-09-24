@@ -449,6 +449,10 @@ They will be sorted into the sections below.
   scores no better, so one-change sweeps miss them. Sweep the pair (type x declaration order): GameMode26
   fn_8010CA2C 39 diffs -> 0 (parameter as `PlayerNumber_t`, nLead after nLength), GoDynObj fn_8004731C
   38 -> 0 (`s32 i`, pLogoA before pLogoB).
+- **[verified] A list walked with a signed index gets folded into one walking pointer; EA's code keeps the
+  list start and a byte offset apart.** The cast in the index, `list[(u32)i]`, brings EA's form back;
+  declaring the variable `u32` does not (GoTerrain fn_80032518 96.27 -> 100, fn_80032770 89.62 -> 100;
+  also GameHoleContests).
 - Other compiler versions (GC 2.0, 2.0p1, 2.6, 2.7, 1.3.2) gave output identical to 2.5 on 18 near-miss
   functions tried today: not a lever for these.
 
