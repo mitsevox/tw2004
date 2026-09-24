@@ -287,7 +287,7 @@ u8    fn_800CEE90(void);
 // Bit n of a bit array of 32-bit words: test, set, clear.
 u8    fn_8001E9CC(u32* aBits, u32 n);
 void  fn_8001EA34(u32* aBits, u32 n);
-void  fn_8001EA54(u32* aA, u32* aB, u32* aOut, u32 nBits);  // aOut = aA & aB
+void  fn_8001EA54(u32* aA, u32* aB, u32* aOut, u32 nBits);  // the bits set in both
 void  fn_8001EB6C(u32* aBits, u32 n);
 u8    fn_8001E9F4(u32* aA, u32* aB, u32 nBits);  // two bit arrays share a set bit
 
