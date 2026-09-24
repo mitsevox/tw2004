@@ -41,7 +41,6 @@ void  fn_800CC4EC(Character* pChar);                // SkinPart.c
 void* CharSlider_CreateDefinitionsFromMem(u8** ppData);
 void  fn_8001B58C(CharSkinSet* pSet);
 void  fn_8001B878(Character* pChar, int n);
-void  fn_8001C0E0(Character* pChar);
 Character* fn_8001C21C(Character* pChar);
 void  Character_UpdateAnimation(Character* pChar, int a, f32 f);
 void  Character_UpdateTestPoints(Character* pChar);
@@ -58,7 +57,6 @@ void  fn_8001CE5C(UStreamObject* pObject);
 void  fn_8001D020(UStreamObject* pObject);
 void  fn_8001D3EC(UStreamObject* pObject);
 void  fn_8001D7EC(Character* pChar);
-void  fn_8001C5B4(Character* pChar, int n);
 void  fn_800BBADC(int nValue);         // SitDevFile.c
 void  fn_8001EBD8(Character* pChar, int nBone, f32* pPos);
 u8    fn_8001EC48(Character* pChar);
@@ -1372,6 +1370,35 @@ void fn_8001C350(void) {
     fn_800CCA3C();
     fn_80036464();
     fn_80112CEC();
+}
+
+// Starts the character system (called once from the main loop): the animation libraries up, no
+// club skin sets, the club names read as 64-bit ids, no characters in the menu or player slots,
+// and no player marked.
+// port: the names are read as big-endian 64-bit words from their strings (FEgolferanim compares
+//       them with ids read the same way)
+void fn_8001C37C(void) {
+    int i;
+
+    Skalib_Init();
+    fn_8001F64C();
+    fn_80029530();
+    fn_80071AD0();
+    for (i = 0; i < 2; i++) {
+        lbl_80280E24[i] = NULL;
+    }
+    lbl_801B9638[0] = *(u64*)"IGdriver";
+    lbl_801B9638[2] = *(u64*)"IGputter";
+    lbl_801B9638[3] = *(u64*)"IGiron3";
+    lbl_801B9638[4] = *(u64*)"IGiron7";
+    lbl_801B9638[5] = *(u64*)"IGwedge";
+    for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
+        lbl_80281EE8[i] = NULL;
+    }
+    for (i = 0; i < 5; i++) {
+        gViewSlots[i].pChar = NULL;
+    }
+    lbl_80281CAC = -1;
 }
 
 // Frees the club skin sets and every character made, then shuts down the animation libraries.

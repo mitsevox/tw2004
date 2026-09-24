@@ -408,8 +408,6 @@ s32   fn_800CDCA0(Skin* pSkin, const char* pName);
 s32   fn_800CDCE0(Skin* pSkin, int nSet, u64 uId);
 s32   fn_800CDD5C(Skin* pSkin, int nSet, const char* pName);
 s32   fn_800CDDB0(Skin* pSkin, int nSet, int nVariant, u64 uId);
-void  fn_8001D4A4(Character* pChar, int nSlot);   // dresses the character (its skins and clubs)
-void  fn_8001EE98(Character* pChar, u8 b);    // sets the model's bEE
 void  fn_8010E4DC(CharSliderDefs* pDefs, CharModel* pModel, Skin* pSkin, int nSliders, u8* aValues,
                   u8* pNode);
                                         // applies slider values (Character.p17AC's definitions)

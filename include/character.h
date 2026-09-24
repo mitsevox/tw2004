@@ -180,7 +180,10 @@ void* fn_80020DD4(void* pClip, void* pOut, int nAlign);
 
 typedef struct SKABlendNode SKABlendNode;
 
+void Skalib_Init(void);                 // skalib.c
 void Skalib_Shutdown(void);             // skalib.c
+void fn_8001F64C(void);                 // mtalib.c
+void fn_80071AD0(void);                 // animblender.c
 void AnimLib_Free(AnimLib* pLib);       // skalib.c
 void ClipBank_Release(int nSlot);       // skalib.c
 void fn_8001F66C(void);                 // mtalib.c
@@ -441,6 +444,10 @@ typedef struct ViewSlot {
 
 extern ViewSlot gViewSlots[5];          // 0x80187124  per player
 
+// Club names as 64-bit ids ("IGdriver", [1] unset, "IGputter", "IGiron3", "IGiron7", "IGwedge"),
+// set by fn_8001C37C; FEgolferanim compares ids against them.
+extern u64 lbl_801B9638[6];
+
 // char.c: the club skins' part and set names, one per club kind (0 drivers, 1 fairway woods,
 // 2 putters, 3 and 4 the 3 and 7 irons, 5 wedges), for Character_SetClubStatesForCharacter
 extern char lbl_80186EC0[6][13];        // the parts: "Drivers" ...
@@ -519,6 +526,12 @@ void  fn_800CA9DC(int nSlot);
 
 void  fn_800177A0(Character* pChar, SkelPose* pPose);   // a blend node's pose from the body skin
 void  fn_80017864(Character* pChar, SkelPose* pPose);   // only its bit arrays
+void  fn_80018484(Character* pChar, CharModel* pModel);
+void  fn_8001C0E0(Character* pChar);    // frees the character
+void  fn_8001C5B4(Character* pChar, int n);
+void  fn_8001D238(void);
+void  fn_8001D4A4(Character* pChar, int nSlot);   // dresses the character (its skins and clubs)
+void  fn_8001EE98(Character* pChar, u8 b);    // sets the model's bEE
 void  Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace);
 int   fn_8001C558(int nPlayer);          // the model id of the player's golfer
 void  fn_8001C724(Character* pChar, int nKind);
