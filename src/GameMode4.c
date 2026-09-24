@@ -25,23 +25,23 @@ typedef struct LadderEvent {
     s32 nName;                  // 0x3C  the name's offset in the 'TCMS' text
     s32 n40;                    // 0x40
 } LadderEvent;
-extern LadderEvent lbl_802124B8[25];
+LadderEvent lbl_802124B8[25];
 
 // The 'TCMS' text: the events' names.
 typedef struct LadderNames {
     char* pText;
     u32   uSize;
 } LadderNames;
-extern LadderNames lbl_8028243C;
 
-extern s32 lbl_802816E0;                    // the options' unkC, saved while a match is played
-extern s32 lbl_80282430;                    // the wind option, saved
-extern u8  lbl_80282434;                    // a ladder event is being played
-extern s32 lbl_80282438;                    // the current event
-extern s32 lbl_80282444;                    // the event's reward plus 1
-extern s32 lbl_80282448;                    // the event's opponent
-extern s32 lbl_8028244C;                    // money to add to the course tracking when the event ends
-extern void (*lbl_80282450)(void);          // the challenge's own end-of-mode callback
+s32 lbl_802816E0 = 4;                    // the options' unkC, saved while a match is played
+void (*lbl_80282450)(void);          // the challenge's own end-of-mode callback
+s32 lbl_8028244C;                    // money to add to the course tracking when the event ends
+s32 lbl_80282448;                    // the event's opponent
+s32 lbl_80282444;                    // the event's reward plus 1
+LadderNames lbl_8028243C;
+s32 lbl_80282438;                    // the current event
+u8  lbl_80282434;                    // a ladder event is being played
+s32 lbl_80282430;                    // the wind option, saved
 
 void  fn_800D39B4(int nPlayer, int nMoney);
 
