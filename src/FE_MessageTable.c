@@ -5386,6 +5386,11 @@ void fn_80084AA8(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 0:
         switch (pArgs[1].i) {
+        case 0:
+        default:
+            nMode = 26;
+            n = 0;
+            break;
         case 1:
             nMode = 22;
             n = 0;
@@ -5393,10 +5398,6 @@ void fn_80084AA8(MsgArg* pArgs, MsgArg* pResult) {
         case 2:
             nMode = 22;
             n = 1;
-            break;
-        default:
-            nMode = 26;
-            n = 0;
             break;
         }
         fn_800E0B38(nMode);
@@ -5407,14 +5408,15 @@ void fn_80084AA8(MsgArg* pArgs, MsgArg* pResult) {
         return;
     case 1:
         switch (pArgs[1].i) {
+        case 0:
+        default:
+            n = 5;
+            break;
         case 1:
             n = 10;
             break;
         case 2:
             n = 15;
-            break;
-        default:
-            n = 5;
             break;
         }
         fn_80126F84(n);
