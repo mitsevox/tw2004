@@ -18,6 +18,7 @@ void fn_80039C5C(int nSize);
 void fn_80039D0C(int nSequences);
 void fn_80039E58(void);
 u8   fn_8003C800(char* szName, CamSequence** ppSeq, CamShot** ppShot);
+void fn_8003DC30(f32* pA, f32* pB, f32* pOut);         // a + b
 void fn_8003DC54(f32* pA, f32* pB, f32* pOut);
 void fn_800090E4(f32* pTurn, f32* pVec, f32* pOut);     // the vector turned by it
 void fn_80039EB8(int nSize);
@@ -30,6 +31,11 @@ void fn_80039554(UStreamObject* pObject);
 void fn_80039690(UStreamObject* pObject);
 void fn_80039754(UStreamObject* pObject);
 void fn_800397EC(UStreamObject* pObject);
+void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScript, CamShot* pShot, f32* pCam,
+                            f32* pSub);
+void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
+void fn_8003D324(f32* pPos, f32* pDir, CamScript* pScript, CamShot* pShot, int nPlayer, f32 fSide, f32 fY);
+void fn_8003D414(f32* pPos, CamScript* pScript, CamShot* pShot, int nPlayer, f32 fY);
 
 // Registers the handlers of the camera files ('CAMS', 'CAMV', 'CAMA').
 void fn_80039454(void) {
@@ -435,6 +441,255 @@ u8 fn_8003ABEC(CamChoice* pChoice, int nPlayer) {
     return 1;
 }
 
+// The camera's position for a shot between two points: DynamicCam_GetLocation's points for the
+// shot's bAF and bB0, turned into a position by the shot's f60 and f64 (f64 the other way when
+// fn_800453C8 holds; level unless bB1), then fn_8003D414. A shot with a point of kind 0 or 23
+// waits for a frame in which the ball moves.
+void fn_8003AC50(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub) {
+    f32 vFrom[4];
+    f32 vTo[4];
+    f32 fY = pOut[1];
+
+    if ((pShot->bAF == 0 || pShot->bB0 == 0 || pShot->bAF == 23 || pShot->bB0 == 23)
+        && GameEffects_BallUpdatesThisFrame(nPlayer) < 1) {
+        return;
+    }
+    DynamicCam_GetLocation(pShot->bAF, nPlayer, vFrom, pScript, pShot, pCam, pSub);
+    DynamicCam_GetLocation(pShot->bB0, nPlayer, vTo, pScript, pShot, pCam, pSub);
+    if (pShot->bB1 == 0) {
+        if (fn_800453C8(nPlayer, pShot)) {
+            fn_800C7D14(vFrom, vTo, 0, 1, pOut, pShot->f60, -pShot->f64);
+        } else {
+            fn_800C7D14(vFrom, vTo, 0, 1, pOut, pShot->f60, pShot->f64);
+        }
+    } else if (fn_800453C8(nPlayer, pShot)) {
+        fn_800C7D14(vFrom, vTo, 1, 1, pOut, pShot->f60, -pShot->f64);
+    } else {
+        fn_800C7D14(vFrom, vTo, 1, 1, pOut, pShot->f60, pShot->f64);
+    }
+    fn_8003D414(pOut, pScript, pShot, nPlayer, fY);
+}
+
+// The ball-flight camera's position for the shot: from the point DynamicCam_GetLocation gives for
+// kind 0, along the ball's flight by the shot's f60 (changed by CamTuning.f18C times how far the
+// ball is above the shot's f6C over the script's ground height fD8, or f190 times how far below its
+// f68), then
+// moved sideways by its f64 (fn_8003D324). Nothing happens while the ball is slower than
+// CamTuning.f198.
+void fn_8003B534(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub) {
+    f32 vFrom[4];
+    f32 vDir[4];
+    f32 vPos[4];
+    f32 fY = pOut[1];
+    f32 fHeight;
+    f32 fMax;
+    f32 fMin;
+    f32 fDist;
+
+    DynamicCam_GetLocation(0, nPlayer, vFrom, pScript, pShot, pCam, pSub);
+    Vec3Copy(gPlayers[nPlayer].ball.vVel, vDir);
+    if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
+        fn_800BAF04(vDir, vDir);
+    }
+    if (gPlayers[nPlayer].ball.fSpeed < lbl_80281F78->f198) return;
+    if (pScript->pNextShot != NULL && pScript->pShot->bB1 == pScript->pNextShot->bB1) {
+        fMax = pScript->pShot->f6C;
+        fMin = pScript->pShot->f68;
+    } else {
+        fMax = pShot->f6C;
+        fMin = pShot->f68;
+    }
+    fHeight = gPlayers[nPlayer].ball.vPos[1] - pScript->fD8;
+    if (fHeight > fMax) {
+        fDist = lbl_80281F78->f18C * (fMax - fHeight) + pShot->f60;
+    } else if (fHeight < fMin) {
+        fDist = lbl_80281F78->f190 * (fHeight - fMin) + pShot->f60;
+    } else {
+        fDist = pShot->f60;
+    }
+    fn_8000C5D4(vFrom, vDir, fDist, vPos);
+    fn_8003D324(vPos, vDir, pScript, pShot, nPlayer, pShot->f64, fY);
+    Vec3Copy(vPos, pOut);
+}
+
+// The point DynamicCam_GetLocation gives for the shot's bAF.
+void fn_8003B6D0(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub) {
+    f32 vPos[4];
+
+    DynamicCam_GetLocation(pShot->bAF, nPlayer, vPos, pScript, pShot, pCam, pSub);
+    Vec3Copy(vPos, pOut);
+}
+
+// A point of kind nKind for the shot into pOut: 0 the ball (or the script's v70 near the pin,
+// fn_8003D9AC), 1 Player.vBall, 2 halfway between bones 0x39 and 0x47 of the golfer, 4, 6 and 8
+// bones 1, 10 and 7, 9 Player.vTarget2, 10 the pin, 11 the player's tee, 12 the script's v50,
+// 16 the script's own points (kept on the fairway when fn_80043388 says so), 17..19 bones 10, 7
+// and 1 moved along their matrix's third row, 20 and 21 the shot's other point (bone 0 when that
+// is 20 or 21 too) moved along bone 0's first or third row, 24 the shot's v20, 25 (0, 0, 100).
+void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScript, CamShot* pShot, f32* pCam,
+                            f32* pSub) {
+    f32 vBone47[4];
+    f32 vBone39[4];
+    f32 vMid[4];
+    f32 vBone10[4];
+    f32 vBone1[4];
+    f32 vBone7[4];
+    f32 vDir7[4];
+    f32 vDir10[4];
+    f32 vDir1[4];
+    f32 vFrom[4];
+    f32 vDir[4];
+    f32 (*pMatrix)[4];
+    int nOther;
+    int nPin;
+    int nTee;
+
+    if (nKind == pShot->bAF) {
+        nOther = pShot->bB0;
+    } else {
+        nOther = pShot->bAF;
+    }
+    switch (nKind) {
+    case 0:
+        fn_8003D9AC(pScript, pShot, nPlayer, pOut, 0);
+        break;
+    case 2:
+        fn_8001EB8C(gPlayers[nPlayer].pChar, 0x39, vBone39);
+        fn_8001EB8C(gPlayers[nPlayer].pChar, 0x47, vBone47);
+        fn_8003DC30(vBone39, vBone47, vMid);
+        fn_8001EF34(vMid, 0.5f, vMid);
+        Vec3Copy(vMid, pOut);
+        break;
+    case 6:
+        fn_8001EB8C(gPlayers[nPlayer].pChar, 10, vBone10);
+        Vec3Copy(vBone10, pOut);
+        break;
+    case 8:
+        fn_8001EB8C(gPlayers[nPlayer].pChar, 7, vBone7);
+        Vec3Copy(vBone7, pOut);
+        break;
+    case 4:
+        fn_8001EB8C(gPlayers[nPlayer].pChar, 1, vBone1);
+        Vec3Copy(vBone1, pOut);
+        break;
+    case 1:
+        Vec3Copy(gPlayers[nPlayer].vBall, pOut);
+        break;
+    case 9:
+        Vec3Copy(gPlayers[nPlayer].vTarget2, pOut);
+        break;
+    case 12:
+        Vec3Copy(pScript->v50, pOut);
+        break;
+    case 10:
+        nPin = Game_CurrentPinSet();
+        Vec3Copy(&fn_8000C594()->pin[nPin].x, pOut);
+        break;
+    case 11:
+        nTee = gSession.nTeeSet[nPlayer];
+        Vec3Copy(&fn_8000C594()->tee[nTee].x, pOut);
+        break;
+    case 24:
+        Vec3Copy(pShot->v20, pOut);
+        break;
+    case 16:
+        if (fn_80043388(pScript, pShot)) {
+            if (pShot == pScript->pShot) {
+                fn_80043C74(pScript, pOut, pCam, nPlayer, pScript->pB4, pSub, NULL);
+                Vec3Copy(pOut, pScript->v0);
+                pScript->bCF = 1;
+            } else if (pShot == pScript->pNextShot) {
+                CamScript_PutBackOnFairway(pScript, pOut, pCam, nPlayer, pScript->pB4, pSub);
+                Vec3Copy(pOut, pScript->v10);
+            }
+        } else if (pShot == pScript->pShot) {
+            Vec3Copy(pScript->v0, pOut);
+        } else if (pShot == pScript->pNextShot) {
+            // the script's v0 for the next shot too (v10 is where the fairway branch keeps it)
+            Vec3Copy(pScript->v0, pOut);
+        }
+        break;
+    case 17:
+        fn_8001EB8C(gPlayers[nPlayer].pChar, 10, vBone10);
+        pMatrix = fn_8001ED08(gPlayers[nPlayer].pChar, 10);
+        if (pMatrix == NULL) {
+            Vec3Copy(vBone10, pOut);
+            break;
+        }
+        Vec3Copy(pMatrix[2], vDir10);
+        if (0.0f != vDir10[0] || 0.0f != vDir10[1] || 0.0f != vDir10[2]) {
+            fn_800BAF04(vDir10, vDir10);
+        }
+        fn_8003DC30(vBone10, vDir10, pOut);
+        break;
+    case 18:
+        fn_8001EB8C(gPlayers[nPlayer].pChar, 7, vBone7);
+        pMatrix = fn_8001ED08(gPlayers[nPlayer].pChar, 7);
+        if (pMatrix == NULL) {
+            Vec3Copy(vBone7, pOut);
+            break;
+        }
+        Vec3Copy(pMatrix[2], vDir7);
+        if (0.0f != vDir7[0] || 0.0f != vDir7[1] || 0.0f != vDir7[2]) {
+            fn_800BAF04(vDir7, vDir7);
+        }
+        fn_8003DC30(vBone7, vDir7, pOut);
+        break;
+    case 19:
+        fn_8001EB8C(gPlayers[nPlayer].pChar, 1, vBone1);
+        pMatrix = fn_8001ED08(gPlayers[nPlayer].pChar, 1);
+        if (pMatrix == NULL) {
+            Vec3Copy(vBone1, pOut);
+            break;
+        }
+        Vec3Copy(pMatrix[2], vDir1);
+        if (0.0f != vDir1[0] || 0.0f != vDir1[1] || 0.0f != vDir1[2]) {
+            fn_800BAF04(vDir1, vDir1);
+        }
+        fn_8003DC30(vBone1, vDir1, pOut);
+        break;
+    case 20:
+        if (nOther != 20 && nOther != 21) {
+            DynamicCam_GetLocation(nOther, nPlayer, vFrom, pScript, pShot, pCam, pSub);
+        } else {
+            fn_8001EB8C(gPlayers[nPlayer].pChar, 0, vFrom);
+        }
+        pMatrix = fn_8001ED08(gPlayers[nPlayer].pChar, 0);
+        if (pMatrix == NULL) {
+            Vec3Copy(vFrom, pOut);
+            break;
+        }
+        Vec3Copy(pMatrix[0], vDir);
+        if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
+            fn_800BAF04(vDir, vDir);
+        }
+        fn_8003DC30(vFrom, vDir, pOut);
+        break;
+    case 21:
+        if (nOther != 20 && nOther != 21) {
+            DynamicCam_GetLocation(nOther, nPlayer, vFrom, pScript, pShot, pCam, pSub);
+        } else {
+            fn_8001EB8C(gPlayers[nPlayer].pChar, 0, vFrom);
+        }
+        pMatrix = fn_8001ED08(gPlayers[nPlayer].pChar, 0);
+        if (pMatrix == NULL) {
+            Vec3Copy(vFrom, pOut);
+            break;
+        }
+        Vec3Copy(pMatrix[2], vDir);
+        if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
+            fn_800BAF04(vDir, vDir);
+        }
+        fn_8003DC30(vFrom, vDir, pOut);
+        break;
+    case 25:
+        pOut[0] = 0.0f;
+        pOut[1] = 0.0f;
+        pOut[2] = 100.0f;
+        break;
+    }
+}
+
 // The set named szName (case ignored) gives a sequence (*ppSeq) or a shot (*ppShot): its p20
 // 39 times in 100 when that has shot choices, else by its kind: 14 one of p14, p18 and p1C at
 // random (the next one when the pick is missing), 13 its shot. 0: no set gave one.
@@ -748,6 +1003,20 @@ u8 fn_8003D294(CamShot* pShot) {
     return 0;
 }
 
+// Moves pPos fSide sideways, square to pDir on the level, then hands it on to fn_8003D414.
+void fn_8003D324(f32* pPos, f32* pDir, CamScript* pScript, CamShot* pShot, int nPlayer, f32 fSide, f32 fY) {
+    f32 vDir[4];
+
+    Vec3Copy(pDir, vDir);
+    vDir[1] = 0.0f;
+    if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
+        fn_800BAF04(vDir, vDir);
+    }
+    pPos[0] += fSide * -vDir[2];
+    pPos[2] += fSide * vDir[0];
+    fn_8003D414(pPos, pScript, pShot, nPlayer, fY);
+}
+
 // The sequence suits the player's club and shot kind.
 u8 fn_8003D7A0(CamSequence* pSequence, int nPlayer) {
     if (pSequence == NULL) return 0;
@@ -789,6 +1058,32 @@ void fn_8003D810(f32* pDir, f32* pA, f32* pB) {
         if (0.0f != pDir[0] || 0.0f != pDir[1] || 0.0f != pDir[2]) {
             fn_800BAF04(pDir, pDir);
         }
+    }
+}
+
+// The ball's position into pOut; but when the ball is in the cup (lie 12) or on surface 0x62 or
+// 0x69, more than 0.005 below the pin and within 2 of the script's v70, v70 instead. With bKeep,
+// v70 takes the ball's position whenever it is not used.
+void fn_8003D9AC(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pOut, u8 bKeep) {
+    u8 bNear = 0;
+    CourseInfo* pCourse = fn_8000C594();
+    int nPin = Game_CurrentPinSet();
+
+    if ((gPlayers[nPlayer].ball.nSurface == 0x62 || gPlayers[nPlayer].ball.nSurface == 0x69
+         || gPlayers[nPlayer].ball.nLie == 12)
+        && pCourse != NULL) {
+        if (pCourse->pin[nPin].y - gPlayers[nPlayer].ball.vPos[1] > 0.005f
+            && Vec_Distance(pScript->v70, gPlayers[nPlayer].ball.vPos) < 2.0f) {
+            bNear = 1;
+        }
+    }
+    if (bNear) {
+        Vec3Copy(pScript->v70, pOut);
+    } else {
+        Vec3Copy(gPlayers[nPlayer].ball.vPos, pOut);
+    }
+    if (bKeep && !bNear) {
+        Vec3Copy(gPlayers[nPlayer].ball.vPos, pScript->v70);
     }
 }
 

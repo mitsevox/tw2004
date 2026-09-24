@@ -48,13 +48,14 @@ typedef struct CamShot {
     f32  f7C;                   // 0x7C
     f32  f80;                   // 0x80
     f32  f84;                   // 0x84
-    u8   unk88[4];
-    f32  f8C;                   // 0x8C
-    u8   unk90[4];
+    f32  f88;                   // 0x88  fn_8003DCE8 hands it (plus fn_800DC45C of it) to fn_800457B8
+    f32  f8C;                   // 0x8C  } fn_8003DCE8 passes both to fn_80038054 (slow motion) when
+    f32  f90;                   // 0x90  } either is above 0
     f32  f94;                   // 0x94
     f32  f98;                   // 0x98
     f32  f9C;                   // 0x9C
-    u8   unkA0[0xA4 - 0xA0];
+    s32  nA0;                   // 0xA0  CameraScript_InterpToNewScript: 0 fn_80045494 on, 2 fn_80045558
+                                //       on (else both off); 3 calls fn_800C7140(1)
     s32  nA4;                   // 0xA4
     u8   bA8;                   // 0xA8
     u8   bA9;                   // 0xA9  another shot's p40 leads here (fn_80039C5C)
@@ -99,7 +100,7 @@ typedef struct CamSequence {
 } CamSequence;
 LAYOUT_ASSERT(CamSequence, 0x50);
 
-// A view's camera script (0xD0 bytes at View + 0x84): the shot the camera plays, the one after it,
+// A view's camera script (0x108 bytes at View + 0x84): the shot the camera plays, the one after it,
 // and the move it makes between them. The camera script functions (gocamscripts.c) and
 // DynamicCam_GetLocation take it as pScript; every caller passes &pView->script.
 typedef struct CamScript {
@@ -109,18 +110,20 @@ typedef struct CamScript {
     f32  v40[4];                // 0x40  the move's vector (fn_80063B98, fn_80063BF4, fn_80063CBC)
     f32  v50[4];                // 0x50  the ball-flight camera: where the shot should land (the aim, at
                                 //       the club's full distance)
-    u8   unk60[0x70 - 0x60];
+    f32  v60[4];                // 0x60  fn_8003DCE8: how far the camera moved this frame (0 when
+                                //       fn_80043388 holds)
     f32  v70[4];                // 0x70  (0, 0, 0, 1) when the view is set up (fn_80062E40)
     f32  fCamTime;              // 0x80  time on this camera
-    u8   unk84[0x8C - 0x84];
+    f32  f84;                   // 0x84  fCamTime before this frame's step (fn_8003DCE8)
+    f32  f88;                   // 0x88  a second clock, stepped with fCamTime
     f32  f8C;                   // 0x8C  how long the next shot lasts (its f48; fn_8006351C)
     f32  f90;                   // 0x90  } the move's time so far and its length: fn_80063B98 sets
     f32  f94;                   // 0x94  } 0 and its time
     f32  f98;                   // 0x98
-    u8   unk9C[0xA0 - 0x9C];
+    f32  f9C;                   // 0x9C  CamScript_GetLookAtPoint hands it to fn_800418B0 (f98 at its end)
     f32  fA0;                   // 0xA0
     f32  fA4;                   // 0xA4
-    u8   unkA8[0xAC - 0xA8];
+    f32  fA8;                   // 0xA8  the current shot's f9C (fn_8003DCE8)
     CamShot* pShot;             // 0xAC  the current shot
     CamShot* pNextShot;         // 0xB0  the next one (the current shot's p40; fn_8006351C)
     CamShot* pB4;               // 0xB4  where SwitchCrAPCamera records the current camera
@@ -130,10 +133,32 @@ typedef struct CamScript {
     s32  nC4;                   // 0xC4  the shot kind asked for
     s32  nC8;                   // 0xC8  the shot kind last started
     u8   bCC;                   // 0xCC
-    u8   unkCD[0xCF - 0xCD];
+    u8   bCD;                   // 0xCD
+    u8   bCE;                   // 0xCE
     u8   bCF;                   // 0xCF
+    s32  nD0;                   // 0xD0
+    f32  fD4;                   // 0xD4  the camera's speed when the script moves to the next shot
+                                //       (fn_8003DCE8)
+    f32  fD8;                   // 0xD8  camera 8: the ground height it follows (fn_8003B534 measures
+                                //       the ball's height over it)
+    f32  fDC;                   // 0xDC
+    s32  nE0;                   // 0xE0  a shot kind for fn_8003A950 (25 = none)
+    f32  fE4;                   // 0xE4
+    u8   bE8;                   // 0xE8
+    u8   unkE9[0xEC - 0xE9];
+    f32  fEC;                   // 0xEC
+    f32  fF0;                   // 0xF0  } set together by fn_800642A4
+    f32  fF4;                   // 0xF4  }
+    f32  fF8;                   // 0xF8
+    u8   unkFC[0x100 - 0xFC];
+    f32  f100;                  // 0x100
+    f32  f104;                  // 0x104
+    f32  f108;                  // 0x108
+    f32  f10C;                  // 0x10C
+    s32  n110;                  // 0x110
+    s32  n114;                  // 0x114
 } CamScript;
-LAYOUT_ASSERT(CamScript, 0xD0);
+LAYOUT_ASSERT(CamScript, 0x118);    // CameraScript_WillGolferBeOccludedInThisView copies 0x118 bytes
 
 // A view's camera controller (View_SetCamera is TW06's CameraController_SetCameraMode): the
 // camera mode, its shots and script. It sits at +4 in a ViewController; only the fields read so far.
@@ -158,21 +183,6 @@ typedef struct View {
     CamSequence* p7C;           // 0x07C  the swing camera's sequence, kept for the replay
     CamShot* p80;               // 0x080
     CamScript script;           // 0x084  the camera script the camera functions drive
-    s32      n154;              // 0x154
-    u8       unk158[4];
-    f32      f15C;              // 0x15C  camera 8: the ground height it follows
-    u8       unk160[4];
-    s32      n164;              // 0x164  a shot kind for fn_8003A950 (25 = none)
-    f32      f168;              // 0x168
-    u8       b16C;              // 0x16C
-    u8       unk16D[0x174 - 0x16D];
-    f32      f174;              // 0x174  } set together by fn_800642A4
-    f32      f178;              // 0x178  }
-    u8       unk17C[0x18C - 0x17C];
-    f32      f18C;              // 0x18C
-    f32      f190;              // 0x190
-    s32      n194;              // 0x194
-    s32      n198;              // 0x198
     CamShot  shot19C;           // 0x19C  a shot built by hand (the knee, steep-slope and elevator cameras)
     s32      nSavedCamera;      // 0x25C
     s32      n260;              // 0x260  set by the swing camera and the game modes
@@ -209,7 +219,7 @@ typedef struct CamTuning {
     f32  f8;                    // 0x008  the zoom-to-aim camera slows down over this last distance
     f32  fC;                    // 0x00C  ... closer in when the ball is within this of it plus f4
     f32  f10;                   // 0x010  ... as a share of the ball's distance
-    f32  f14;                   // 0x014  the zoom-to-aim camera's height over View.f15C
+    f32  f14;                   // 0x014  the zoom-to-aim camera's height over View.script.fD8
     f32  f18;                   // 0x018  the zoom-to-aim camera's creep and aim-marker lag
     f32  f1C;                   // 0x01C  both zoom-to-aim cameras' slow motion at full speed
     f32  f20;                   // 0x020  the zoom-to-aim camera's slow motion before it sets off
@@ -256,18 +266,50 @@ typedef struct CamTuning {
     f32  fC4;                   // 0x0C4
     f32  fC8;                   // 0x0C8
     f32  fCC;                   // 0x0CC
-    u8   unkD0[0xDC - 0xD0];
+    f32  fD0;                   // 0x0D0  fn_80043420: how fast the aim comes down to a shot's f6C height
+    u8   unkD4[0xD8 - 0xD4];
+    f32  fD8;                   // 0x0D8  CamScript_GetLookAtPoint: CameraScript_LagAimMarker's first lag
     f32  fDC;                   // 0x0DC  the green zoom-to-aim camera's aim marker (CameraScript_LagAimMarker)
-    u8   unkE0[0x168 - 0xE0];
+    u8   unkE0[0xE4 - 0xE0];
+    f32  fE4;                   // 0x0E4  CamScript_GetLookAtPoint: the aim's lag on the ball (fn_800422C4,
+                                //        fn_8004349C); also put in CamScript.fDC
+    f32  fE8;                   // 0x0E8  ... its lag on a bone of the golfer (fn_800422C4)
+    u8   unkEC[0xF4 - 0xEC];
+    f32  fF4;                   // 0x0F4  fn_80043C74: a spot is taken when the dot product of its level
+                                //        direction to the ball with the camera's is below this
+    u8   unkF8[0xFC - 0xF8];
+    f32  fFC;                   // 0x0FC  CameraScript_IsDefaultSwingCam: the least dot product of the
+                                //        camera's and the aim's level directions from the ball
+    u8   unk100[0x10C - 0x100];
+    f32  f10C;                  // 0x10C  fn_80043C74: the camera's height over the ground at the spot
+    u8   unk110[0x120 - 0x110];
+    f32  f120;                  // 0x120  fn_800439E4: a camera closer to the pin than this (level, times
+                                //        the lens's fB0) ...
+    f32  f124;                  // 0x124  ... and less than this above it counts as in the way
+    f32  f128;                  // 0x128  CamScript_GetLookAtPoint: the least level distance for the
+                                //        steep-aim limit
+    u8   unk12C[0x15C - 0x12C];
+    f32  f15C;                  // 0x15C  CameraScript_InterpToNewScript puts it in CamScript.f88 (0 for
+                                //        the default swing camera)
+    u8   unk160[0x164 - 0x160];
+    f32  f164;                  // 0x164  CamScript_GetLookAtPoint: kind 13's share of the height change
+                                //        a frame
     f32  f168;                  // 0x168  the ground clearance for CamScript_KeepAboveGround
     f32  f16C;                  // 0x16C  the obstruction radius around the ball for the pre-shot routine
     f32  f170;                  // 0x170  a blend for fn_80063B98 / fn_80063BF4
     u8   unk174[0x178 - 0x174];
     f32  f178;                  // 0x178
     f32  v17C[4];               // 0x17C
-    u8   unk18C[0x19C - 0x18C];
+    f32  f18C;                  // 0x18C  fn_8003B534: the ball-flight camera closes in by this share of
+                                //        the height above the shot's f6C ...
+    f32  f190;                  // 0x190  ... and backs off by this share of the height below its f68
+    u8   unk194[0x198 - 0x194];
+    f32  f198;                  // 0x198  fn_8003B534: the least ball speed it follows the flight at
     f32  f19C;                  // 0x19C  the steepest a camera direction may tilt (fn_8003D810, radians)
-    u8   unk1A0[0x1C0 - 0x1A0];
+    u8   unk1A0[0x1A8 - 0x1A0];
+    f32  f1A8;                  // 0x1A8  fn_8003DCE8: how fast CamScript.fEC follows the ball's updates
+                                //        per frame
+    u8   unk1AC[0x1C0 - 0x1AC];
     s32  n1C0;                  // 0x1C0  nonzero enables camera 19
     u8   unk1C4[0x1C8 - 0x1C4];
     s32  bCheckSlope;           // 0x1C8  fn_800C4650 tests the slope to the target (fn_800C4520)
@@ -451,6 +493,7 @@ void   fn_8006A8D4(void* pCamera, f32* pX, f32* pY);
 // ---- camera shots and sequences (0x8003A7C8..) ----------------------------------------------
 
 CamShot* fn_8003A7C8(int nPlayer, int nKind, CamShot* pShot);
+u8       fn_8003A76C(CamShot* pShot);    // the shot is one of kinds 1, 3, 13, 28..34 or 40..45
 CamShot* fn_8003A8C4(char* szName);     // the shot with this name (case ignored), or NULL
 // A shot of kind nKind from the sequence, picked at random, and its blend values (each out
 // pointer may be NULL).
@@ -462,6 +505,8 @@ CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind
 u8       fn_8003C9D0(int nPlayer, u8 b, CamSequence** ppSeq, CamShot** ppShot);
 u8       fn_8003D7A0(CamSequence* pSequence, int nPlayer);   // it suits the player's club and shot
 u8     fn_8003DC78(CamShot* pShot);     // the shot's bAC is 1..6 or 7
+// The ball's position, or the script's v70 when the ball is by the pin (with bKeep v70 follows it).
+void   fn_8003D9AC(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pOut, u8 bKeep);
 // 0 when gSession.nGameType is 3, else fn_8001EDF4 of the player's golfer (Player.pChar) as a flag;
 // the shot is not read.
 u8     fn_800453C8(int nPlayer, CamShot* pShot);
@@ -469,7 +514,7 @@ u8     fn_800453C8(int nPlayer, CamShot* pShot);
 // ---- the camera scripts (gocamscripts.c, 0x8003DCE8..) ----------------------------------------
 
 // pCam and pSub are the view's camera position and where it looks (fn_8001731C, fn_80017314).
-void     fn_8003DCE8(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, int a,
+void     fn_8003DCE8(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b,
                      f32 fFrameTime);
 void     fn_8003E624(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, int a,
                      f32 fFrameTime);
@@ -480,13 +525,20 @@ void     CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int
                                        int a);
 void     CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pCam, f32* pSub,
                                         int nA, f32 f1, f32 f2, int nB, f32 f3);
+u8       fn_80043388(CamScript* pScript, CamShot* pShot);
+void     CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot, int a, int b, f32 f1,
+                                   f32 f2, f32 f3);
+void     fn_80043C74(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot* pShot, f32* pSub,
+                     f32* pHeight);
+void     CamScript_PutBackOnFairway(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot* pShot,
+                                    f32* pSub);
 f32      fn_80044EA8(int nPlayer, CamScript* pScript);   // how far the ball's flight has run
 u8       fn_800451A8(CamScript* pScript, CamShot* pShot, int nPlayer);
 void     CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer);
 u8       CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam);
 // Keep pNew above the ground (by fClearance); the out values are optional (NULL): two flags and a
 // float.
-u8       CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, int a, u8* pb1, f32* pf, u8* pb2,
+u8       CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, u8 a, u8* pb1, f32* pf, u8* pb2,
                                    f32 fClearance);
 u8       CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, CamScript* pScript);
 void     fn_80045470(CamLens* pLens, f32 fFov);   // sets the lens's field of view
