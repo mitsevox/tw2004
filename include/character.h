@@ -202,17 +202,26 @@ typedef struct BlendClip {
     u8   unk0[8];
     f32  f08;                   // 0x08  added to the time fn_800204A0 samples the clip at
     f32  f0C;                   // 0x0C
-    u8   unk10[0x24 - 0x10];
-    f32  f24;                   // 0x24  the swing measures the ball-hit time from it
 } BlendClip;
+
+// One of a ClipBlend's timed events (fn_8001F02C finds one by its id). Event 2's time is the
+// ball-hit time the swing measures.
+typedef struct ClipEvent {
+    u32  uId;                   // 0x0
+    f32  fTime;                 // 0x4
+    u8   unk8[8];
+} ClipEvent;
+LAYOUT_ASSERT(ClipEvent, 0x10);
 
 // What Character.pBlend points at: two clips and how far along the blend is; only what the swing
 // reads.
 typedef struct ClipBlend {
-    u8   unk0[0xCC];
+    u8   unk0[0x48];
+    s16  nEvents;               // 0x48  how many pEvents holds
+    u8   unk4A[0xCC - 0x4A];
     f32  fCC;                   // 0xCC  how far along it is, 0..1 (Character.fBackswing copies it)
     u8   unkD0[4];
-    BlendClip* pD4;             // 0xD4
+    ClipEvent* pEvents;         // 0xD4
     BlendClip* pD8;             // 0xD8  fn_800204A0 samples it
 } ClipBlend;
 
@@ -270,9 +279,11 @@ typedef struct Character {
                                 //        get an 'f' in front when it is 1
     CharModel* pModel;          // 0x038
     struct Skin* pSkin;         // 0x03C  its body's skin (Skin.c), the first of apSkins
-    u8    unk40[0x54 - 0x40];
+    u8    unk40[0x50 - 0x40];
+    u8    a50[4];               // 0x050  LLDynTex.c is given its address (fn_80019DE8)
     s32   hFile;                // 0x054  a file closed with it (fn_8001971C), -1 none
-    u8    unk58[0x64 - 0x58];
+    u8    unk58[0x60 - 0x58];
+    void* p60;                  // 0x060  the entry of a64 fn_80019DE8 set up
     void* a64[2];               // 0x064  } entries taken from lbl_801B95E8 (fn_8001A418), and their
     s8    a6C[2];               // 0x06C  } indices there (-1 once given back)
     u8    unk6E[2];

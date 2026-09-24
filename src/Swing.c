@@ -1363,7 +1363,8 @@ int Swing_UpdateBackswing(int nPlayer) {
             fn_80095744(pObj, 7);
             if (fn_800204A0(pObj->pBlend, pObj->v1638,
                             pObj->pBlend->pD8->f08 + (pObj->fAnimTime - pSw->fTimeSwingStart))) {
-                pSw->fTimeBallHit = pObj->fAnimTime + (pObj->pBlend->pD4->f24 - pObj->v1638[1]) + pObj->f1644;
+                pSw->fTimeBallHit = pObj->fAnimTime + (pObj->pBlend->pEvents[2].fTime - pObj->v1638[1])
+                                  + pObj->f1644;
             }
             CharacterState_UpdateSKAState(pObj);
             pObj->n5CC = 2;
@@ -1441,7 +1442,8 @@ int Swing_UpdateBackswing(int nPlayer) {
         fn_80095744(pObj, 7);
         if (fn_800204A0(pObj->pBlend, pObj->v1638,
                         pObj->pBlend->pD8->f08 + (pObj->fAnimTime - pSw->fTimeSwingStart))) {
-            pSw->fTimeBallHit = pObj->fAnimTime + (pObj->pBlend->pD4->f24 - pObj->v1638[1]) + pObj->f1644;
+            pSw->fTimeBallHit = pObj->fAnimTime + (pObj->pBlend->pEvents[2].fTime - pObj->v1638[1])
+                              + pObj->f1644;
         }
         CharacterState_UpdateSKAState(pObj);
         pObj->n5CC = 2;

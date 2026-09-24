@@ -283,6 +283,8 @@ s32   fn_800CDCA0(Skin* pSkin, const char* pName);
 s32   fn_800CDCE0(Skin* pSkin, int nSet, u64 uId);
 s32   fn_800CDD5C(Skin* pSkin, int nSet, const char* pName);
 s32   fn_800CDDB0(Skin* pSkin, int nSet, int nVariant, u64 uId);
+void  fn_800CEB1C(Skin** apSkins, int nSkins, u8* p);
+void  fn_800CEBE8(Skin** apSkins, int nSkins, u8* p, u64* aIds, int nIds);
 void  fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, u8* p);
 u8    fn_800CEE90(void);
 

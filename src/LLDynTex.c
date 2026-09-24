@@ -66,8 +66,8 @@ void fn_8010BC64(u8* p) {
     fn_8000FBAC(*(s32*)(p + 0x4));
 }
 
-void fn_8010BC88(s32 n) {
-    lbl_80282488->n8 = n;
+void fn_8010BC88(void* p) {
+    lbl_80282488->p8 = p;
 }
 
 void fn_8010BEC4(void) {

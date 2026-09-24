@@ -5,6 +5,7 @@
 
 #include "game.h"
 #include "charstate.h"
+#include "lldyntex.h"
 #include "unsorted/cull.h"
 #include "game_types.h"
 #include "endian.h"
@@ -254,6 +255,22 @@ void fn_80019CEC(Character* pChar) {
         fn_800CEE04(pChar->apSkins[i], 1, 0);
         pChar->apSkins[i]->u10D4 |= 1;
     }
+}
+
+// Sets up the dynamic textures (LLDynTex.c) for the character's model in use.
+void fn_80019DE8(Character* pChar) {
+    void* pModel = pChar->a64[pChar->n74];
+
+    fn_8008EAC8(0);
+    pChar->p60 = pModel;
+    fn_8010BC88(pChar->a50);
+    // not exact: the original passes pModel here and to fn_8010BED4, whose definitions take
+    // nothing (FEgolferanim.c calls fn_8010BEC4 with no argument)
+    fn_8010BEC4();
+    fn_80019C1C(pChar);
+    fn_800CEB1C(pChar->apSkins, pChar->nSkins, pModel);
+    fn_800CEBE8(pChar->apSkins, pChar->nSkins, pModel, NULL, 0);
+    fn_8010BED4();
 }
 
 void fn_8001A0FC(Character* pChar) {
@@ -1041,6 +1058,18 @@ f32 fn_8001EFFC(CamLens* pLens) {
 // The current render camera's lens.
 CamLens* fn_8001F004(void) {
     return fn_80008370(*lbl_80280DF0);
+}
+
+// The time of the blend's event uEvent, 0 when it has none.
+f32 fn_8001F02C(ClipBlend* pBlend, u64 uEvent) {
+    int i;
+
+    for (i = 0; i < pBlend->nEvents; i++) {
+        if (pBlend->pEvents[i].uId == uEvent) {
+            return pBlend->pEvents[i].fTime;
+        }
+    }
+    return 0.0f;
 }
 
 // ---- sweep code (not yet cleaned up) ----
