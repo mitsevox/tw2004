@@ -88,11 +88,12 @@ void fn_8001F558(void* pItem) {
 // records after the header, each record's entries after those, then each entry's data.
 void fn_8001F578(MtaLib* pLib) {
     int i;
-    int j;
     int nPad;
     MtaRecord* pRecord;
     MtaEntry* pEntry;
     int nOffset;
+    int j;
+    MtaRecord* pRecord2;
 
     pLib->pRecords = (MtaRecord*)(pLib + 1);
     nOffset = sizeof(MtaLib) + pLib->nRecords * sizeof(MtaRecord);
@@ -102,9 +103,9 @@ void fn_8001F578(MtaLib* pLib) {
         nOffset += pRecord->nEntries * sizeof(MtaEntry);
     }
     for (i = 0; i < pLib->nRecords; i++) {
-        pRecord = &pLib->pRecords[i];
-        for (j = 0; j < pRecord->nEntries; j++) {
-            pEntry = &pRecord->pEntries[j];
+        pRecord2 = &pLib->pRecords[i];
+        for (j = 0; j < pRecord2->nEntries; j++) {
+            pEntry = &pRecord2->pEntries[j];
             pEntry->pData = (u8*)pLib + nOffset;
             nOffset += pEntry->nBytes;
             nPad = nOffset % 4;

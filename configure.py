@@ -870,7 +870,7 @@ config.libs = [
             Object(Matching, "ViewController.c"),
             Object(Matching, "char_tex_manager.c"),
             Object(NonMatching, "char.c"),
-            Object(NonMatching, "mtalib.c"),
+            Object(Matching, "mtalib.c"),
             Object(NonMatching, "ska_shared.c"),
             Object(Matching, "Skeleton.c"),
             Object(NonMatching, "Golfer.c"),
