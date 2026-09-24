@@ -611,7 +611,7 @@ void fn_80123CBC(s32 a, s32 b) {
 // no port is being worked on); ports whose probe gave 8 or 0x40 are reset.
 void fn_80123E34(void) {
     u32 uReset = 0;
-    s32 nChan;
+    int nChan;
     GbaChannel* pCh;
     PadStatus* pPad;
     const u32* pMask;

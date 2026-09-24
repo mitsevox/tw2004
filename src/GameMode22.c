@@ -381,14 +381,17 @@ void fn_8012645C(int nPlayer) {
 // wins (n8 = the player, bC set). A tie for the highest leaves no winner, and with n0 1 clears
 // every nEBC.
 void fn_801264B8(void) {
+    s32 i;
     s32 nWinner = 5;
     s32 nBest = -0x7FFFFFFF - 1;
     u8 bTie = 0;
-    s32 i;
     s32* pScore;
 
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        if (PLAYER(i)->nEA0 < lbl_80195498.n4 || gPlayers[0].nEA0 != PLAYER(i)->nEA0) {
+        if (PLAYER(i)->nEA0 < lbl_80195498.n4) {
+            return;
+        }
+        if (gPlayers[0].nEA0 != PLAYER(i)->nEA0) {
             return;
         }
         pScore = &gPlayers[i].nEBC;
