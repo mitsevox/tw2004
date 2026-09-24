@@ -71,6 +71,8 @@ u8*  fn_80030214(PictFrame* pFrame);    // V
 u8*  fn_80030234(PictFrame* pFrame);    // U
 u8*  fn_8003024C(PictFrame* pFrame);    // Y
 // A movie's picture and decoder (LLVideo.c): pfnRead(pArg) hands the decoder its next data.
+void fn_8002FE70(LLPict* pPict);        // frees the picture and its pixels (NULL: nothing)
+void fn_8002FEAC(void);                 // empty
 void fn_8002FEB0(LLPict* pPict, PictStream* pStream, void* (*pfnRead)(void* pArg), void* pArg);
 void fn_8002FF38(LLPict* pPict, PictStream* pStream);
 void fn_8002FF94(LLPict* pPict, PictStream* pStream);                     // empty
