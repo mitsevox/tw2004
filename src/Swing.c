@@ -926,17 +926,16 @@ void GOLFERSTATE_Pop(int nPlayer) {
 
 // Pop everything and start again from one state.
 void GOLFERSTATE_Set(int nState, int nPlayer) {
-    s8*         pTop;
-    SwingStack* pStack = &gSwingStacks[nPlayer];
     void (*pfn)(int);
-    pTop = &pStack->nTop;
-    while (*pTop > -1) {
-        if (sGolferStateEngineTable[(s8)pStack->nState[*pTop]].pfnExit != NULL) {
+    while (gSwingStacks[nPlayer].nTop > -1) {
+        if (sGolferStateEngineTable[(s8)gSwingStacks[nPlayer].nState[gSwingStacks[nPlayer].nTop]].pfnExit !=
+            NULL) {
             gInSwingExit = 1;
-            sGolferStateEngineTable[(s8)pStack->nState[*pTop]].pfnExit(nPlayer);
+            sGolferStateEngineTable[(s8)gSwingStacks[nPlayer].nState[gSwingStacks[nPlayer].nTop]].pfnExit(
+                nPlayer);
             gInSwingExit = 0;
         }
-        (*pTop)--;
+        gSwingStacks[nPlayer].nTop--;
     }
     gSwingStacks[nPlayer].nTop = 0;
     gSwingStacks[nPlayer].nState[gSwingStacks[nPlayer].nTop] = nState;
