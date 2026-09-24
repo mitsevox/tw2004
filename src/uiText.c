@@ -78,10 +78,10 @@ void fn_800922A8(UIText* pText) {
     fn_800BAD60(m, &vPos, &vOut);
     UFont_SetFont(pText->n4);
     fW = 1.0f;
-    vEnd.x = 0.0f;
     fH = fW;
-    vEnd.y = 0.0f;
     fX = vOut.x / 512.0f;
+    vEnd.x = 0.0f;
+    vEnd.y = 0.0f;
     vEnd.z = 0.0f;
     vEnd.w = fW;
     fY = vOut.y * (1.0f / 448.0f);
