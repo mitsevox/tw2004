@@ -65,6 +65,7 @@ s32  CARDFreeBlocks(s32 nChan, s32* pnFreeBytes, s32* pnFreeFiles);
 s32  CARDGetAttributes(s32 nChan, s32 nFileNo, u8* puAttr);
 s32  CARDGetResultCode(s32 nChan);
 s32  CARDSetAttributes(s32 nChan, s32 nFileNo, u8 uAttr);
+s32  CARDReadAsync(CARDFileInfo* pFile, void* pBuf, s32 nLen, s32 nOffset, CARDCallback pfnCallback);
 s32  CARDRenameAsync(s32 nChan, const char* pOldName, const char* pNewName, CARDCallback pfnCallback);
 s32  CARDWriteAsync(CARDFileInfo* pFile, const void* pBuf, s32 nLen, s32 nOffset, CARDCallback pfnCallback);
 s32  CARDGetStatus(s32 nChan, s32 nFileNo, CARDStat* pStat);

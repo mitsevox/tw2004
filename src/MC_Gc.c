@@ -16,6 +16,7 @@ void fn_8009DCE8(void);
 void fn_8009EB30(UStreamObject* pObject);
 void fn_8009EB38(UStreamObject* pObject);
 void fn_8009EB40(s32 nPort, s32 nSlot);
+s32  fn_8009E280(s32 nPort, s32 nSlot, s32 nFile, CARDStat* pStat);
 s32  fn_8009ED34(s32 nPort, s32 nSlot, const char* pName, const char* pBackupName);
 s32  fn_8009EECC(s32 nPort, s32 nSlot, const char* pName);
 s32  fn_8009EF68(s32 nPort, s32 nSlot);
@@ -407,6 +408,61 @@ s32 fn_8009DD44(s32 nPort, s32 nSlot, const char* pName) {
     s32 nResult = fn_8009F734(nPort, nSlot);
     if (nResult != 0) return nResult;
     return fn_8009D6CC(nPort, nSlot);
+}
+
+// Read the whole of file pName (nLen bytes) into pBuf, then check that it is one of the game's
+// saves: its banner and icon at 0x40 and its comments at the start, else MC_ERR_BADDATA. A card
+// with an I/O error is not touched.
+s32 fn_8009DD94(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen) {
+    CARDFileInfo file;
+    CARDStat stat;
+    int nChan;
+    s32 nResult;
+    if (lbl_80281FD0[nPort] != 0) return MC_ERR_IOERROR;
+    nResult = fn_8009F734(nPort, nSlot);
+    if (nResult != 0) return nResult;
+    nResult = fn_8009D0D4(nPort, nSlot);
+    if (nResult != 0) return nResult;
+    nResult = fn_8009CEF8(nPort, nSlot, pName, &file);
+    if (nResult != 0) return nResult;
+    fn_8009CB9C(nPort, nSlot, nLen);
+    CARDReadAsync(&file, pBuf, nLen, 0, NULL);
+    nChan = nPort;
+    while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
+        fn_800A4BDC();
+        fn_8009EB40(nPort, nSlot);
+        fn_8006C63C();
+    }
+    switch (nResult) {
+    case CARD_RESULT_FATAL_ERROR:
+        fn_8009D010(nPort, nSlot, &file);
+        return MC_ERR_FATAL;
+    case CARD_RESULT_NOCARD:
+        fn_8009D010(nPort, nSlot, &file);
+        lbl_801F1510[nPort][nSlot].uFlags &= ~MC_CARD_PRESENT;
+        return MC_ERR_NOCARD;
+    case CARD_RESULT_NOFILE:
+        fn_8009D010(nPort, nSlot, &file);
+        return MC_ERR_NOFILE;
+    case CARD_RESULT_LIMIT:
+        fn_8009D010(nPort, nSlot, &file);
+        return MC_ERR_LIMIT;
+    case CARD_RESULT_CANCELED:
+        fn_8009D010(nPort, nSlot, &file);
+        return MC_ERR_CANCELED;
+    default:
+        return MC_ERR_UNKNOWN;
+    case CARD_RESULT_READY:
+        nResult = fn_8009E280(nPort, nSlot, file.fileNo, &stat);
+        if (nResult != 0) return nResult;
+        if (stat.iconAddr != 0x40 || stat.commentAddr != 0) {
+            fn_8009D010(nPort, nSlot, &file);
+            return MC_ERR_BADDATA;
+        }
+        nResult = fn_8009D010(nPort, nSlot, &file);
+        if (nResult != 0) return nResult;
+        return 0;
+    }
 }
 
 // Create file pName of uSize bytes on the card, open in pFile.
