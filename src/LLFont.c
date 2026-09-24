@@ -444,8 +444,9 @@ int fn_80011D0C(LLFont* pFont, UFontContext* pCtx, u8 bDraw, char* sz) {
 // Unless a gradient is on, it is the colour passed in. Across (n10 bit 1) the position runs
 // fX * fXScale from f04 to f08 and wraps, and the colour blends between the two stops around it;
 // down (bit 2) fY * fYScale wraps the same way and blends a14[4] into a14[5].
-u32 fn_8001208C(UFontContext* pCtx, u8 r, u8 g, u8 b, u8 a, f32 fX, f32 fY, f32 fXScale,
-                f32 fYScale) {
+// (fn_8001144C's calls load only pCtx and the four floats, and drop the result.)
+u32 fn_8001208C(UFontContext* pCtx, u8 r, u8 g, u8 b, u8 a, f32 fXScale, f32 fYScale, f32 fX,
+                f32 fY) {
     GXColor color;
     UFontStop* pStop;
     UFontStop* pNext;
@@ -454,8 +455,8 @@ u32 fn_8001208C(UFontContext* pCtx, u8 r, u8 g, u8 b, u8 a, f32 fX, f32 fY, f32 
     f32 fT;
     s32 i;
 
-    fU = fXScale * fX;
-    fV = fYScale * fY;
+    fU = fX * fXScale;
+    fV = fY * fYScale;
     pStop = pCtx->a14;
     pNext = pStop + 1;
     fU = pCtx->f0C * (fU - pCtx->f04);
