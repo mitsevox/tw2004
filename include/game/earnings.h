@@ -99,7 +99,7 @@ typedef struct PuttGoal {
 typedef struct HoleGoal {
     s32  nId;                   // 0x00  goals with the same nonzero id compete: the biggest nValue is kept
     u32  uModes;                // 0x04  the game modes it counts in, a bit per mode
-    s8   bRoundOver;            // 0x08  checked only when the round is over (else only before)
+    s8   bEachHole;             // 0x08  checked after each hole (else only when the round is over)
     s8   aToPar[5];             // 0x09  holes finished at par, -1, -2, -3 and -5 or better (fn_800D0DC8)
     s8   aRun[5];               // 0x0E  the same as runs of holes in a row (fn_800D0F04)
     s8   n13;                   // 0x13  holes counted by fn_800D0FBC (at most the course's fn_800D3208)
@@ -108,7 +108,8 @@ typedef struct HoleGoal {
     s8   n16;                   // 0x16  the run fn_800D1250 finds
     s8   n17;                   // 0x17  putts over the round (fn_800D1330)
     s8   nMaxStrokes;           // 0x18  the most strokes over the round (fn_800E17AC)
-    u8   b19;                   // 0x19  also counts at the end: the full round's 18th hole or bRoundOver
+    u8   b19;                   // 0x19  counts on every hole; clear, only at the end (the full round's 18th
+                                //       hole, or after the round)
     u8   unk1A;                 // 0x1A
     s8   nKind;                 // 0x1B  a whole-round test: 1 fn_800D61E4, 2 fn_800D68CC, 3 never,
                                 //       4 fn_800D69B8, 5 no hole over par, 6 under the course's par

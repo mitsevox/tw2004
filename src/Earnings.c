@@ -935,12 +935,12 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
     bMore = nNeed;
 
     for (i = 0; i < NUM_HOLE_GOALS; i++) {
-        if (lbl_80200538.aHoleGoal[i].bRoundOver && !bRoundOver) continue;
-        if (!lbl_80200538.aHoleGoal[i].bRoundOver && bRoundOver) continue;
+        if (lbl_80200538.aHoleGoal[i].bEachHole && bRoundOver) continue;
+        if (!lbl_80200538.aHoleGoal[i].bEachHole && !bRoundOver) continue;
         if (!lbl_80200538.aHoleGoal[i].bEnabled) continue;
         if (!fn_800D4EF8(lbl_80200538.aHoleGoal[i].uModes, Game_GetMode())) continue;
         if (fn_800EC550() && !fn_801025F4() && !fn_800D4EF8(lbl_80200538.aHoleGoal[i].uModes, 5)) continue;
-        if (!lbl_80200538.aHoleGoal[i].b19 && !bMore) continue;
+        if (!lbl_80200538.aHoleGoal[i].b19 && bMore) continue;
         if (lbl_80200538.aHoleGoal[i].aToPar[0] != 0 &&
             lbl_80200538.aHoleGoal[i].aToPar[0] > fn_800D0DC8(nPlayer, 0)) continue;
         if (lbl_80200538.aHoleGoal[i].aToPar[1] != 0 &&
