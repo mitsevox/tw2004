@@ -282,6 +282,34 @@ void fn_8006A6C4(int nPlayer) {
     lbl_801D5BF0[nPlayer].f24 = 0.2f;
 }
 
+// The hole's chunk 3 loader: the placement outline. Each node is listed in lbl_801D5CCC, and any
+// of its links that names the node itself is cleared.
+void fn_8006A7A8(u8* pChunk) {
+    TNetNode* pNode;
+    int i;
+    int j;
+
+    lbl_80281E30 = (TNetwork*)pChunk;
+    pNode = lbl_80281E30->aNodes;
+    lbl_80281E44 = 0;
+    for (i = 0; i < lbl_80281E30->nNumNodes; i++) {
+        lbl_801D5CCC[i].pNode = pNode;
+        if (pNode->nLink10 == i) {
+            pNode->nLink10 = -1;
+        }
+        if (pNode->nLink12 == i) {
+            pNode->nLink12 = -1;
+        }
+        for (j = 0; j < 8; j++) {
+            if (pNode->a14[j] == i) {
+                pNode->a14[j] = -1;
+            }
+        }
+        pNode++;
+        lbl_80281E44++;
+    }
+}
+
 void fn_8006A89C(void) {
     lbl_80281E30 = NULL;
 }
