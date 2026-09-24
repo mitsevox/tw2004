@@ -249,7 +249,8 @@ u32 fn_8009912C(PsEmitter* pEmitter, int n, f32 fStep, f32 fLiveStep) {
         pEmitter->params.f40 += pEmitter->params.f4C * fStep;
         fn_8000A194(pEmitter->mtx, pEmitter->params.f40, pEmitter->params.f44, pEmitter->params.f48);
     }
-    if ((pEmitter->params.u58 & 0x10000) && pEmitter->n50 == 0) {
+    // fake match: 0U, as EA compares n50 unsigned here (cmplwi) but signed against n54 below
+    if ((pEmitter->params.u58 & 0x10000) && pEmitter->n50 == 0U) {
         fLife = pEmitter->params.f4;
         fCycles = fLife / (0.5f * pEmitter->params.f1C + pEmitter->params.f18);
         fRate = (pEmitter->params.f20 <= 1.0f / 60.0f) ? 1.0f / 60.0f : pEmitter->params.f20;
