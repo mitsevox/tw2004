@@ -8,6 +8,10 @@
 #include "core/audtrack.h"
 
 AudInstance* fn_800AD674(u8 nId);
+void fn_800AD800(u8 nId, f32* pPos, f32* pLast, u8 nView);
+void fn_800ACB98(void);                 // hlaudvoice.c
+void fn_800AF320(void);
+void fn_800B0434(void);                 // startUp.c
 
 // Runs fn_800AD450 on every instance in use, then empties every emitter. Always 1.
 int fn_800AD0C4(void) {
@@ -27,6 +31,28 @@ int fn_800AD0C4(void) {
 }
 
 void fn_800AD1C4(void) {
+}
+
+// Once a frame: hands every instance's commands to its entry and clears them (an instance with
+// n24 1 sends its position again), then runs the rest of the sound engine.
+void fn_800AD1C8(void) {
+    AudInstance* pInst;
+
+    for (pInst = lbl_801F2668.pActive; pInst != NULL; pInst = pInst->pNextActive) {
+        fn_800A7CA4(pInst->nId, pInst->pCmd->uOn, pInst->pCmd->uOff, pInst->pCmd->auParams,
+                    pInst->pCmd->aPos, pInst->pCmd->uChanged);
+        pInst->pCmd->uOn = 0;
+        pInst->pCmd->uOff = 0;
+        pInst->pCmd->uChanged = 0;
+        if (pInst->n24 == 1) {
+            fn_800AD800(pInst->nId, pInst->vPos, NULL, 0);
+        }
+    }
+    fn_800A9AC8();
+    fn_800ACB98();
+    fn_800AF320();
+    fn_800B0434();
+    lbl_80282018++;
 }
 
 // Whether bit nTrack of an instance's u22 is set; 0 for no instance.
@@ -122,6 +148,13 @@ void fn_800ADB4C(s16 nEmitter, u8 nTrack, u8 bOn) {
     AudInstance* pInst;
     for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
         fn_800AD698(pInst->nId, nTrack, bOn);
+    }
+}
+
+void fn_800ADBC0(s16 nEmitter, f32* pPos, f32* pLast, u8 nView) {
+    AudInstance* pInst;
+    for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
+        fn_800AD800(pInst->nId, pPos, pLast, nView);
     }
 }
 
