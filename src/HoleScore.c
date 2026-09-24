@@ -32,10 +32,10 @@ u8 fn_800CF158(int nPlayer) {
     int anTotal[4];   // one per player set up, as in fn_800CFE74
     int i;
     int nKind;
+    int nMineStrokes;
     int nMine;
     int nBest;
     int nOther;
-    int nMineStrokes;
     int nBestStrokes;
 
     nKind = fn_8008AB40();
@@ -134,13 +134,13 @@ u8 fn_800CF158(int nPlayer) {
 // winning this hole's skin lifts the player past the best.
 u8 fn_800CF450(int nPlayer) {
     int anTotal[4];   // one per player set up, as in fn_800CFE74
+    int nMineStrokes;
     int i;
     int nKind;
     int nLeft;
     int nMine;
     int nBest;
     int nOther;
-    int nMineStrokes;
     int nBestStrokes;
 
     nKind = fn_8008AB40();
@@ -996,6 +996,7 @@ int fn_800D1530(int nPlayer) {
     f32 fSin;
     f32 fCos;
     f32 fDegrees;
+    f32 fEpsilon;
 
     if (!Ter_GetSupportingGroundNormal(fn_8000C594(), gPlayers[nPlayer].ball.vPos, vNormal)) {
         return 0;
@@ -1009,7 +1010,8 @@ int fn_800D1530(int nPlayer) {
     fCos = fn_80009638(fAim);
     Vec3Copy(vNormal, vTurned);
     fn_80055D70(&vTurned[2], &vTurned[0], fSin, fCos);
-    if (vTurned[1] < 0.000001f && vTurned[1] > -0.000001f) {
+    fEpsilon = 0.000001f;
+    if (vTurned[1] < fEpsilon && vTurned[1] > -fEpsilon) {
         if (vTurned[0] < 0.0f) {
             fDegrees = -90.0f;
         } else {

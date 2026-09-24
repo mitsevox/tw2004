@@ -250,8 +250,8 @@ void fn_800AAB8C(AudSeqEvent* pEvent, AudTrack* pTrack) {
 
     n = pEvent->n3;
     pSource = pTrack->pSource;
-    pTarget = pSource->apTracks[n];
     nPlayList = pEvent->n4;
+    pTarget = pSource->apTracks[n];
     if (pTarget == NULL) {
         pTarget = fn_800A9BC8(pSource, &pSource->pSound->aTracks[n], n, pTrack->f48);
     }
@@ -269,8 +269,8 @@ void fn_800AAC00(AudSeqEvent* pEvent, AudTrack* pTrack) {
 
     n = pEvent->n3;
     pSource = pTrack->pSource;
-    pTarget = pSource->apTracks[n];
     nStream = pEvent->n4;
+    pTarget = pSource->apTracks[n];
     if (pTarget == NULL) {
         pTarget = fn_800A9BC8(pSource, &pSource->pSound->aTracks[n], n, pTrack->f48);
     }
