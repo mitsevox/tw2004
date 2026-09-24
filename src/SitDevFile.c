@@ -361,8 +361,8 @@ void FE_GolferAttributes(int nPlayer, u8 nKind) {
     u32* pSetBits = lbl_802811B8->aSetBits;
     u16 nRound = fn_800BCD5C();
     s32 nValue;
-    int nMode;
-    int nHole;
+    u16 nMode;
+    u16 nHole;
     int nDeg;
     f32 fAngle;
 
@@ -438,15 +438,17 @@ void FE_GolferAttributes(int nPlayer, u8 nKind) {
                 fn_80067B1C(pValues, 45, gSession.nGolfer[0], pSetBits);
             }
         }
-        fn_80067B1C(pValues, 68, Golfer_GetAttribute(pPlayer, 0, 2), pSetBits);
-        fn_80067B1C(pValues, 69, Golfer_GetAttribute(pPlayer, 1, 2), pSetBits);
-        fn_80067B1C(pValues, 70, Golfer_GetAttribute(pPlayer, 3, 2), pSetBits);
-        fn_80067B1C(pValues, 71, Golfer_GetAttribute(pPlayer, 4, 2), pSetBits);
-        fn_80067B1C(pValues, 72, Golfer_GetAttribute(pPlayer, 5, 2), pSetBits);
-        fn_80067B1C(pValues, 73, Golfer_GetAttribute(pPlayer, 6, 2), pSetBits);
-        fn_80067B1C(pValues, 74, Golfer_GetAttribute(pPlayer, 7, 2), pSetBits);
-        fn_80067B1C(pValues, 77, Golfer_GetAttribute(pPlayer, 10, 2), pSetBits);
-        fn_80067B1C(pValues, 78, Golfer_GetAttribute(pPlayer, 11, 2), pSetBits);
+        // the attributes as signed bytes (fake match: the (s16) gives the original's extsb + clrlwi;
+        // with (s8) alone CW drops the mask)
+        fn_80067B1C(pValues, 68, (s16)(s8)Golfer_GetAttribute(pPlayer, 0, 2), pSetBits);
+        fn_80067B1C(pValues, 69, (s16)(s8)Golfer_GetAttribute(pPlayer, 1, 2), pSetBits);
+        fn_80067B1C(pValues, 70, (s16)(s8)Golfer_GetAttribute(pPlayer, 3, 2), pSetBits);
+        fn_80067B1C(pValues, 71, (s16)(s8)Golfer_GetAttribute(pPlayer, 4, 2), pSetBits);
+        fn_80067B1C(pValues, 72, (s16)(s8)Golfer_GetAttribute(pPlayer, 5, 2), pSetBits);
+        fn_80067B1C(pValues, 73, (s16)(s8)Golfer_GetAttribute(pPlayer, 6, 2), pSetBits);
+        fn_80067B1C(pValues, 74, (s16)(s8)Golfer_GetAttribute(pPlayer, 7, 2), pSetBits);
+        fn_80067B1C(pValues, 77, (s16)(s8)Golfer_GetAttribute(pPlayer, 10, 2), pSetBits);
+        fn_80067B1C(pValues, 78, (s16)(s8)Golfer_GetAttribute(pPlayer, 11, 2), pSetBits);
         fn_80067B1C(pValues, 93, fn_800E81A0(nPlayer), pSetBits);
     case 3:
     case 4:
@@ -539,9 +541,9 @@ void FE_GolferAttributes(int nPlayer, u8 nKind) {
                  (u32)(100.0f * (pBall->f70 + gSurfaceTypes[pBall->nStartSurface].f00)) : 100;
         fn_80067B1C(pValues, 58, nValue, pSetBits);
         fn_80067B1C(pValues, 59, nValue, pSetBits);
-        nValue = pBall->pHitSurface != NULL ? pBall->pHitSurface->nClass : 0;
+        nValue = pBall->pHitSurface == NULL ? 0 : pBall->pHitSurface->nClass;
         fn_80067B1C(pValues, 63, nValue, pSetBits);
-        nValue = pBefore->pHitSurface != NULL ? pBefore->pHitSurface->nClass : 0;
+        nValue = pBefore->pHitSurface == NULL ? 0 : pBefore->pHitSurface->nClass;
         fn_80067B1C(pValues, 64, nValue, pSetBits);
         if (nKind == 29) {
             lbl_80282218 = nValue;
