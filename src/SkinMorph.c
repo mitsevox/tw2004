@@ -5,6 +5,9 @@
 #include "engine.h"
 #include "charstate.h"
 
+SkinMorphWork lbl_80250080;
+SkinMorphWork* lbl_80281880 = &lbl_80250080;
+
 // Unpacks nVerts vertices into the work area: positions (four s16 each) and normals (four s8
 // each) to 16.16 fixed point.
 void fn_8011C068(SkinMorphWork* pWork, s16* pPos, s8* pNrm, u32 nVerts) {
