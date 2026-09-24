@@ -12,9 +12,9 @@
 void fn_8001052C(s16 n);
 void fn_8010A668(DynTex* pTex);
 void* fn_8010A780(DynTex* pTex);
-void fn_8010B098(void* arg0);
+void fn_8010B098(void* p);
 int fn_8010C458(int nFormat);
-s32 fn_8010B664(void* arg0);
+s32 fn_8010B664(DynTexPalette* pPal);
 void fn_8000FBAC();
 
 // ---- end of sweep code ----
@@ -293,28 +293,26 @@ void fn_8010B9BC(void) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8010B098(void* arg0) {
-    if (arg0 != NULL) {
-        (*(s32*)((u8*)(arg0) + 8)) = 0;
-        (*(s16*)((u8*)((*(void**)((u8*)(arg0) + 4))) + 2)) = 0;
-        (*(s16*)((u8*)((*(void**)((u8*)(arg0) + 4))) + 4)) = 0;
-        (*(s32*)((u8*)(arg0) + 0x14)) = 0;
+// Empties pTex: no textures, nothing of p18 used (char.c and FEgolferanim.c pass it as a void*).
+void fn_8010B098(void* p) {
+    DynTex* pTex = p;
+
+    if (pTex != NULL) {
+        pTex->n8 = 0;
+        pTex->p4->n2 = 0;
+        pTex->p4->n4 = 0;
+        pTex->n14 = 0;
     }
 }
 
-s32 fn_8010B664(void* arg0) {
-    s32 var_r3;
-
-    if ((s16) (*(s16*)((u8*)(arg0) + 8)) > 0x10) {
-        var_r3 = 0x40;
-        if (fn_8010C458((*(s16*)((u8*)(arg0) + 0xA))) == 0x10) {
+s32 fn_8010B664(DynTexPalette* pPal) {
+    if (pPal->nEntries > 16) {
+        if (fn_8010C458(pPal->nFormat) == 16) {
             return 0x20;
         }
-        /* Duplicate return node #4. Try simplifying control flow for better match */
-        return var_r3;
+        return 0x40;
     }
-    var_r3 = 4;
-    return var_r3;
+    return 4;
 }
 
 void fn_8010BC64(u8* p) {
