@@ -157,8 +157,8 @@ void AI_ChooseTarget(int nPlayer) {
         fDumb = 100.0f - (f32)(s8)nIQ;
         for (k = 0; k < NUM_AI_LINKS; k++) {
             nCand = (s8)gAITargets[nZone].pDef->nLinks[k];
-            if (nCand == -1) continue;
             t = &gAITargets[nCand];
+            if (nCand == -1) continue;
             if (!t->bEnabled) continue;
             fDZ    = pCourse->pin[nPinSet].z - t->pDef->z;
             fDX    = pCourse->pin[nPinSet].x - t->pDef->x;
@@ -183,18 +183,21 @@ void AI_ChooseTarget(int nPlayer) {
                 // Low IQ makes the golfer think it is better than it is.
                 if (p->bLowIQPenalty) {
                     nSkill += (int)(10.0f * (powf(fDumb, 2.0f) / 100.0f) / 100.0f);
+                    if ((s8)nSkill > 100) {
+                        nSkill = 100;
+                    }
                 } else {
                     nSkill += (int)(40.0f * (powf(fDumb, 2.0f) / 100.0f) / 100.0f);
-                }
-                if ((s8)nSkill > 100) {
-                    nSkill = 100;
+                    if ((s8)nSkill > 100) {
+                        nSkill = 100;
+                    }
                 }
             }
-            if (t->nSkillReq < 0 && (s8)nSkill > IABS((int)t->nSkillReq)) continue;
+            if (t->nSkillReq < 0 && (s8)nSkill > __abs(t->nSkillReq)) continue;
             if ((s8)nSkill < t->nSkillReq) continue;
-            if (t->nAggrReq < 0 && (s8)nAggr > IABS((int)t->nAggrReq)) continue;
+            if (t->nAggrReq < 0 && (s8)nAggr > __abs(t->nAggrReq)) continue;
             if ((s8)nAggr < t->nAggrReq) continue;
-            if (t->nPowerReq < 0 && (s8)nPower > IABS((int)t->nPowerReq)) continue;
+            if (t->nPowerReq < 0 && (s8)nPower > __abs(t->nPowerReq)) continue;
             if ((s8)nPower < t->nPowerReq) continue;
             if (fDist > AI_MaxDistance(nPlayer, nKind, AI_FirstUsableClub(nPlayer, nKind))) continue;
 
@@ -215,19 +218,19 @@ void AI_ChooseTarget(int nPlayer) {
                 nBest      = nCand;
                 continue;
             }
-            if (pBest->nPowerReq != IABS((int)t->nPowerReq)) continue;
+            if (pBest->nPowerReq != __abs(t->nPowerReq)) continue;
             if (t->nAggrReq > pBest->nAggrReq) {
                 fBestDist2 = fDist2;
                 nBest      = nCand;
                 continue;
             }
-            if (pBest->nAggrReq != IABS((int)t->nAggrReq)) continue;
+            if (pBest->nAggrReq != __abs(t->nAggrReq)) continue;
             if (t->nSkillReq > pBest->nSkillReq) {
                 fBestDist2 = fDist2;
                 nBest      = nCand;
                 continue;
             }
-            if (pBest->nSkillReq != IABS((int)t->nSkillReq)) continue;
+            if (pBest->nSkillReq != __abs(t->nSkillReq)) continue;
             if (fDist2 < fBestDist2) {
                 nBest      = nCand;
                 fBestDist2 = fDist2;
