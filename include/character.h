@@ -101,7 +101,8 @@ typedef struct Skeleton {
     u8   unk10C8[0x10D4 - 0x10C8];
     f32  q10D4[4];              // 0x10D4  a rotation (quaternion) given by fn_80027808
     s32  n10E4;                 // 0x10E4  set to 4 as a swing starts
-    u8   unk10E8[0x112C - 0x10E8];
+    f32  a10E8[4][4];           // 0x10E8  per leg, the last good bend axis (Character_IKLegToGround)
+    u8   unk1128[0x112C - 0x1128];
     s32  n112C;                 // 0x112C  } the character's club class and n16D4 (fn_8001C860)
     s32  n1130;                 // 0x1130  }
 } Skeleton;
