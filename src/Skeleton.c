@@ -31,6 +31,7 @@ void fn_80114398(struct DynChain* pChain);              // DynChain.c: frees a c
 void fn_8011443C(CharModel* pModel, struct DynChain* pChain, f32 f);   // DynChain.c
 void fn_800090A0(f32* pA, f32* pB, f32* pOut);           // Quaternion.c
 void fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);       // Quaternion.c: a vector turned by it
+void fn_800092F8(f32* pAxis, f32* pOut, f32 fAngle);     // Quaternion.c: an axis-angle rotation
 void fn_8000914C(f32* pQ, f32 (*pMtx)[4]);               // Quaternion.c: a rotation's matrix
 void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies a matrix
 void fn_8000ADC0(f32 (*pMtx)[4]);                        // identity
@@ -83,6 +84,71 @@ void fn_80026BF4(CharModel* pModel, IKChain* pChain) {
         fn_80008FCC(pSkel->p20[nBone], pLink->q18, qRot);
         fn_80008FCC(qRot, pPrev->q0, pPose->q0);
     }
+}
+
+// One IK step (cyclic coordinate descent): from link nLink back to link n, turns each posed link
+// (f4 above 0) so the chain's end swings toward pTarget, by f4 of the angle between them and never
+// about the link's locked axis n8; the turn adds up in the link's rotation vector v58. Returns how
+// far the chain's end then is from pTarget.
+f32 fn_80026D18(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLink, int n) {
+    f32 vEnd[4];
+    f32 vDiff[4];
+    f32 vToEnd[4];
+    f32 vToTarget[4];
+    f32 qInv[4];
+    f32 vAxis[4];
+    f32 qTurn[4];
+    f32 vTurned[4];
+    f32 qRot[4];
+    f32 vLocal[4];
+    Skeleton* pSkel = pModel->pSkel;
+    IKLink* pLink;
+    int nBone;
+    f32 fLen;
+    f32 fAngle;
+    f32 fCos;
+    int i;
+
+    fn_8001E880(pModel->pPoses[pChain->pLinks[pChain->nLinks - 1].nBone].v10, vEnd);
+    vToEnd[3] = 0.0f;
+    vEnd[3] = 1.0f;
+    for (i = nLink; i >= n; i--) {
+        pLink = &pChain->pLinks[i];
+        if (pLink->f4 > 0.0f) {
+            nBone = pLink->nBone;
+            fn_80029C18(vEnd, pModel->pPoses[nBone].v10, vToEnd);
+            fn_80029C18(pTarget, pModel->pPoses[nBone].v10, vToTarget);
+            fLen = fn_80029B64(fn_80009744(vToEnd) * fn_80009744(vToTarget));
+            fCos = fn_8000C5FC(vToEnd, vToTarget) / fLen;
+            if (fCos > 1.0f || fCos < -1.0f) {
+                fAngle = 0.0f;
+            } else {
+                fAngle = pLink->f4 * fn_80009614(fCos);
+            }
+            if (fabsf(fAngle) > PI / 5000.0f) {
+                // the turn's axis in the bone's own frame, without its locked component
+                vec4flt_CrossProduct(vToEnd, vToTarget, vAxis);
+                fn_80008F20(pModel->pPoses[nBone].q0, qInv);
+                fn_800090E4(qInv, vAxis, vLocal);
+                vLocal[3] = 0.0f;
+                vLocal[1] = 0.0f;
+                if (pLink->n8 >= 0) {
+                    vLocal[pLink->n8] = 0.0f;
+                }
+                fn_800BAF04(vLocal, vLocal);
+                fn_8001EF34(vLocal, fAngle, vLocal);
+                fn_80029BF4(vLocal, pLink->v58, pLink->v58);
+                fn_800092F8(vLocal, qTurn, fAngle);
+                fn_800090E4(pModel->pPoses[nBone].q0, qTurn, qRot);
+                fn_800090E4(qRot, vToEnd, vTurned);
+                fn_80029BF4(pModel->pPoses[nBone].v10, vTurned, vEnd);
+            }
+        }
+    }
+    fn_80026B4C(pSkel, pChain);
+    Vec3Copy(vEnd, pChain->v8);
+    fn_80029C18(vEnd, pTarget, vDiff);
+    return (f32)fn_80009680(fn_80009744(vDiff));
 }
 
 // Resets the chain's links (all of them with bAll, else those with f4 above 0) to no rotation and
@@ -574,6 +640,47 @@ void fn_80028208(CharModel* pModel, IKChain* pChain, IKChainDef* pDef) {
     }
 }
 
+// Makes a model's skeleton: an IK chain per setup in pDefs, a rotation per bone in each set, and
+// the IK state at rest (weight 0, no swing started).
+Skeleton* fn_80028314(CharModel* pModel, CharModelDefs* pDefs) {
+    int i;
+    Skeleton* pSkel;
+    IKChainDef* pChainDefs = pDefs->pDefs;
+    s8 nChains = pDefs->nDefs;
+
+    pSkel = fn_80009B34(sizeof(Skeleton), 2, 64, "Skeleton.c", 1148);
+    pSkel->nChains = nChains;
+    pSkel->pChains = fn_80009B34(nChains * sizeof(IKChain), 2, 64, "Skeleton.c", 1151);
+    for (i = 0; i < pSkel->nChains; i++) {
+        fn_80028208(pModel, &pSkel->pChains[i], &pChainDefs[i]);
+    }
+    pSkel->pDefs = pChainDefs;
+    pSkel->p20 = fn_80009B34(pModel->nBones * sizeof(f32[4]), 2, 64, "Skeleton.c", 1159);
+    pSkel->p24 = fn_80009B34(pModel->nBones * sizeof(f32[4]), 2, 64, "Skeleton.c", 1160);
+    pSkel->p28 = pSkel->p20;
+    pSkel->n112C = -1;
+    pSkel->n1130 = -1;
+    fn_8001E938(pSkel->a10, 0x80);
+    pSkel->n0 = 0;
+    pSkel->f109C = 0.1f;
+    pSkel->f10A0 = 0.2f;
+    fn_80029BC8(pSkel->v10A4);
+    fn_80029BC8(pSkel->v10B4);
+    pSkel->f10C4 = 1.0f;
+    pSkel->f10C8 = 0.0f;
+    pSkel->f10CC = 1.0f;
+    pSkel->pClip = NULL;
+    pSkel->f1074 = 0.0f;
+    pSkel->a1108[0] = fn_8001EEE4(pModel, 0x24);
+    pSkel->a1108[1] = fn_8001EEE4(pModel, 0x25);
+    pSkel->a1108[2] = fn_8001EEE4(pModel, 0x11);
+    pSkel->a1108[3] = fn_8001EEE4(pModel, 0x12);
+    SKEL_SetIKSolutionWeight(pSkel, 0.0f);
+    fn_80009710(pSkel->q10D4);
+    pSkel->n10E4 = 0;
+    return pSkel;
+}
+
 // Frees a skeleton: its chains' links, the chains, and both rotation sets.
 void fn_800284DC(Skeleton* pSkel) {
     int i;
@@ -931,6 +1038,48 @@ void fn_8002957C(CharModel* pModel) {
         fn_800284DC(pModel->pSkel);
     }
     fn_80009E70(pModel);
+}
+
+// Fills in aBone: finds each model bone's id by its name (the first 8 bytes of its uId). Of the
+// bones with no known name (up to 30), the first named after a club becomes bone 0x52, the club.
+void fn_80029664(CharModel* pModel) {
+    char szName[9];
+    u8 aUnknown[30];
+    int nUnknown = 0;
+    int i;
+    int j;
+    s32 nId;
+
+    pModel->aBone[0] = 0;
+    for (nId = 1; nId < 0x59; nId++) {
+        pModel->aBone[nId] = 0xFF;
+    }
+    for (i = 1; i < pModel->nBones; i++) {
+        strncpy(szName, (char*)&pModel->pBones[i].uId, 8);
+        szName[8] = '\0';
+        for (j = 0; j < 0x59; j++) {
+            if (strcmp(szName, lbl_80187278[j]) == 0) {
+                pModel->aBone[j] = i;
+                break;
+            }
+        }
+        if (j == 0x59 && nUnknown < 30) {
+            aUnknown[nUnknown] = i;
+            nUnknown++;
+        }
+    }
+    if (nUnknown != 0) {
+        for (i = 0; i < nUnknown; i++) {
+            strncpy(szName, (char*)&pModel->pBones[aUnknown[i]].uId, 8);
+            szName[8] = '\0';
+            for (j = 0; j < sizeof(lbl_80187418) / sizeof(lbl_80187418[0]); j++) {
+                if (strcmp(lbl_80187418[j], szName) == 0) {
+                    pModel->aBone[0x52] = aUnknown[i];
+                    return;
+                }
+            }
+        }
+    }
 }
 
 // Fills in aBone2: each bone maps to itself, except the pairs in lbl_8018742C, where the model's
