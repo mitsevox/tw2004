@@ -114,8 +114,8 @@ void fn_8010E890(MsgArg* pArgs, MsgArg* pResult) {
     u8 bOneCourse;
     int i;
 
-    fn_800D293C(nStart, szStart);
-    fn_800D293C(nEnd, szEnd);
+    CalDate_ToStringMD(nStart, szStart);
+    CalDate_ToStringMD(nEnd, szEnd);
     sprintf(szDates, "%s\nthru\n%s", szStart, szEnd);
     pTournament = fn_800EFA70(nEvent);
     sprintf(szName, "%s", GameModeDriverPGATour_GetName(nEvent));
@@ -329,7 +329,7 @@ void fn_8010EF8C(MsgArg* pArgs, MsgArg* pResult) {
         n8 = fn_800F0304(i);
         if (!pProfile->a1054C[i].b && nProgress <= (s32)GM_GetGameProgress(pProfile)) {
         retry:
-            nKind = lbl_80193CFC[Rand_Next(0) % 11];
+            nKind = lbl_80193CFC[Misc_RandFunc(0) % 11];
             for (j = 0; j < i; j++) {
                 if (pProfile->a1054C[j].n == nKind && pProfile->a1054C[j].b) {
                     // fake match: EA jumps straight back (a do-while adds a test)
@@ -383,7 +383,7 @@ void fn_8010F1B4(MsgArg* pArgs, MsgArg* pResult) {
     s32* p4 = (s32*)pArgs[1].p;
     s32* p8 = (s32*)pArgs[2].p;
 
-    fn_800588D4(lbl_80193CFC[Rand_Next(0) % 11]);
+    fn_800588D4(lbl_80193CFC[Misc_RandFunc(0) % 11]);
     *pKind = fn_800588E8();
     *p4 = fn_800F02EC(0);
     *p8 = fn_800F0304(0);
@@ -432,7 +432,7 @@ void fn_8010F2FC(MsgArg* pArgs, MsgArg* pResult) {
     *pOut = fn_800EFE3C(nEvent);
     bWon = gpSaveData[nPlayer].aC8[nEvent].award.bWon;
     if (bWon) {
-        fn_800D28DC(gpSaveData[nPlayer].aC8[nEvent].award.nDate, szDate);
+        CalDate_ToString(gpSaveData[nPlayer].aC8[nEvent].award.nDate, szDate);
     } else {
         szDate[0] = '\0';
     }
@@ -451,7 +451,7 @@ void fn_8010F3A4(MsgArg* pArgs, MsgArg* pResult) {
     *pOut = 0;
     bWon = gpSaveData[nPlayer].a1C0[n].bWon;
     if (bWon) {
-        fn_800D28DC(gpSaveData[nPlayer].a1C0[n].nDate, szDate);
+        CalDate_ToString(gpSaveData[nPlayer].a1C0[n].nDate, szDate);
     } else {
         szDate[0] = '\0';
     }
@@ -467,7 +467,7 @@ void fn_8010F440(MsgArg* pArgs, MsgArg* pResult) {
     char* szMoney = ((MsgString*)pArgs[4].p)->pStr;
     s32* pScore = (s32*)pArgs[5].p;
 
-    fn_800D28DC(fn_80077ACC()->aC8[nEvent].award.nDate, ((MsgString*)pArgs[1].p)->pStr);
+    CalDate_ToString(fn_80077ACC()->aC8[nEvent].award.nDate, ((MsgString*)pArgs[1].p)->pStr);
     strcpy(szName, fn_80077ACC()->szName);
     GameModeDriverPGATour_GetPurseString(nEvent, szEarnings);
     fn_800907AC(fn_80077ACC()->aC8[nEvent].n6 * 1000, szMoney);

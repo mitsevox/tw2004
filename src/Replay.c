@@ -1,6 +1,6 @@
-// Replay.c (EA's name, from its asserts; TW06): the shot replay. Records a shot while it plays
-// (into the buffer at lbl_80281E48) and keeps the saved shot (gReplayData, game.h): the player
-// as he was, and the spin he put on the ball. Only part of the file is decompiled so far.
+// Replay.c (EA's name, from its asserts; TW06): the shot replay. Before a shot it saves the
+// player as he was and the conditions (gReplayData, game.h, and the buffer at lbl_80281E48),
+// keeps the spin he put on the ball, and puts it all back to replay the shot or to take it back.
 
 #include "game.h"
 #include "terrain.h"
@@ -28,7 +28,7 @@ void fn_8006BF4C(void) {
 
 // Before nPlayer's shot: save everything a replay of it needs (a new random seed, the player, his
 // save profile, the record tables, the UI queues and the conditions), unless a saved replay is
-// playing. A CPU's shot, or a scripted one (uFlags bit 3), turns in-flight replays off.
+// playing. A CPU's shot, or one with uFlags bit 3 set, turns in-flight replays off.
 void fn_8006BF60(int nPlayer) {
     s32 nMode;
 
@@ -41,8 +41,8 @@ void fn_8006BF60(int nPlayer) {
         gReplayData.bF10 = 0;
         return;
     }
-    gSession.nSeed = Rand_Next(0);
-    fn_8000B1D4(0, gSession.nSeed);
+    gSession.nSeed = Misc_RandFunc(0);
+    Misc_SetSeedFunc(0, gSession.nSeed);
     gReplayData.nSeed = gSession.nSeed;
     Mem_cpy(&gReplayData.player, &gPlayers[nPlayer], sizeof(Player));
     Mem_cpy(&lbl_80281E48->profile, &gpSaveData[nPlayer], sizeof(SaveProfile));
@@ -113,13 +113,13 @@ void fn_8006C2C8(int nPlayer, f32* pForwardSpin, f32* pSideSpin) {
 
 // Starts replaying nPlayer's saved shot: the seed, the player (keeping his ball, uFlags and fEEC,
 // and setting uFlags bit 0), the record tables, his save profile and the UI queues come back.
-void fn_8006C300(int nPlayer) {
+void REPLAY_Play(int nPlayer) {
     Ball ball;
     u32 uFlags;
     f32 fEEC;
 
     if (gReplayData.bF10) {
-        fn_8000B1D4(0, gReplayData.nSeed);
+        Misc_SetSeedFunc(0, gReplayData.nSeed);
         Mem_cpy(&ball, &gPlayers[nPlayer].ballBefore, sizeof(Ball));
         uFlags = gPlayers[nPlayer].uFlags;
         fEEC = gPlayers[nPlayer].fEEC;
@@ -156,7 +156,7 @@ void fn_8006C4A0(void) {
 
 // Puts back what fn_8006BF60 saved before nPlayer's shot (the player whole, his save profile, the
 // record tables and the UI queues), then fn_800335F8(1).
-void fn_8006C4C0(int nPlayer) {
+void REPLAY_Restore(int nPlayer) {
     if (gReplayData.bF10) {
         Mem_cpy(&gPlayers[nPlayer], &gReplayData.player, sizeof(Player));
         Mem_cpy(&gpSaveData[nPlayer], &lbl_80281E48->profile, sizeof(SaveProfile));

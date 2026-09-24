@@ -62,10 +62,10 @@ extern ReplayBuffer* lbl_80281E48;      // 0x80281E48
 extern u8    lbl_80281B8E;              // the reset button was pressed (OSGetResetButtonState)
 extern u8    lbl_80281E50;              // set after a create-a-player frame, cleared otherwise
 extern void*       lbl_80281E54;        // the render camera made from the three below (fn_8001371C)
-extern void*       lbl_80281E58;        // } made by fn_80076ACC,
-extern GoFrameBuf* lbl_80281E5C;        // }   fn_8006E1C8
+extern void*       lbl_80281E58;        // } made by VM_spCreateViewport,
+extern GoFrameBuf* lbl_80281E5C;        // }   FB_spCreateFrameBuffer
 extern void*       lbl_80281E60;        // }   and CA_spCreateCamera when a game type starts
-extern u8*   lbl_802811E8;              // [1]: the round is over (fn_8006DC34)
+extern u8*   lbl_802811E8;              // [1]: a hole load is asked for (fn_8006F4B4)
 
 // Replay.c
 void fn_8006BED4(void);                 // make the replay buffer
@@ -241,18 +241,18 @@ s32  fn_800E81A0(int nPlayer);          // GameModeBattle.c
 s32  fn_800BCCCC(int nPlayer);          // SitDevFile.c: gpGame->pfn208
 s32  fn_800BCCF8(int nPlayer);          // SitDevFile.c: strokes behind the leader (gpGame->pfn200)
 u8   fn_800BCD50(void);                 // SitDevFile.c: gpGame->bD4
-void fn_800D2714(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
-void fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, u32 nYear);    // make a date
-void fn_800D27CC(u16* pDate, s32 nDays);        // move a date on by nDays
-s32  fn_800D27E0(u16* pDate);                   // its day of the week, 1..7
-s32  fn_800D2814(u32 nMonth, u32 nYear);        // the days in a month (compared unsigned: cmplwi)
-void fn_800D2884(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month before
-void fn_800D28B0(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month after
-void fn_800D28DC(u16 nDate, char* szOut);       // a date as text
-void fn_800D293C(u16 nDate, char* szOut);       // a date as month/day
-s32  fn_800D2608(u16 nDate);            // Calendar.c
-u32  fn_800D2640(u16 nDate);            // Calendar.c (unsigned: callers compare it with cmplw)
-u16  fn_800D2994(void);                 // today's date
+void CalDate_GetMDY(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
+void CalDate_SetMDY(u16* pDate, s32 nMonth, s32 nDay, u32 nYear);    // make a date
+void CalDate_AddDays(u16* pDate, s32 nDays);        // move a date on by nDays
+s32  CalDate_GetDayOfWeek(u16* pDate);                   // its day of the week, 1..7
+s32  DaysInMonth(u32 nMonth, u32 nYear);        // the days in a month (compared unsigned: cmplwi)
+void CalDate_GetPrevMonth(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month before
+void CalDate_GetNextMonth(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month after
+void CalDate_ToString(u16 nDate, char* szOut);       // a date as text
+void CalDate_ToStringMD(u16 nDate, char* szOut);       // a date as month/day
+s32  CalDate_GetDay(u16 nDate);            // Calendar.c
+u32  CalDate_GetMonth(u16 nDate);            // Calendar.c (unsigned: callers compare it with cmplw)
+u16  CalDate_GetToday(void);                 // today's date
 int  fn_800D2ABC(int nCourse, int nHole);   // a hole's par on a course
 int  fn_800D2AD8(int nHole);            // a hole's par
 s32  fn_800D2C30(int nHole, int nTee);  // CourseData.c: a round hole's length from tee set nTee
@@ -346,7 +346,7 @@ void fn_800DB4E8(int nPlayer);
 void fn_800DB714(int nPlayer);
 void fn_800DBDA8(int nPlayer);
 void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate);
-f32  fn_800DC3A4(void);                 // the letterbox's field-of-view change
+f32  GameEffects_FieldOfViewChange(void);                 // the GameBreaker's field-of-view change
 u8   fn_800DC514(int nPlayer);         // super slow motion is on (nPlayer unused)
 void fn_800DC9D4(int a);                // pause or resume a GameBreaker
 u8   fn_8003DCAC(void);                 // GoDynamicCam.c: the letterbox is up (predicted, or b19)
@@ -368,7 +368,7 @@ u8   GM_CheckForBallOOB(int nPlayer);
 void GM_BumpBallForObstructions(int nPlayer);
 void GM_PlayerTookShot(int nPlayer);
 u8   GM_PlayerTakeMulligan(int nPlayer);
-int  fn_800DDFB4(int nPlayer);
+int  GM_DoPreshotAnimation(int nPlayer);
 int  GM_ShowPostShotAnimation(int nPlayer);
 u8   GM_ShowPostShotCrowdFlyby(void);
 void GM_FlyByMode_Init(void);
@@ -440,7 +440,7 @@ void fn_800E4204(void);
 u8   fn_800E4254(int nPlayer);          // whether a message or screen still holds the player
 u8   fn_800E430C(int nPlayer);
 void fn_800E4364(u32 nQueue, int a, int b, int c);    // add an item to a display queue
-void fn_800E45C0(void);
+void GUI_GolfersTiedUIMessage(void);
 u8   fn_800E45CC(void);                 // whether a queued item, message or deferred screen waits
 u8   fn_800E46B4(void);                 // the display pump; nonzero while anything is showing
 u8   fn_800E4BF8(void);
@@ -696,7 +696,7 @@ void fn_800F39CC(s32 a);                // GameMode14.c
 void fn_800F48C4(void);                 // GameMode15.c
 void fn_800F7DE8(void);                 // GameMode13.c
 void fn_800F80D4(s32 a);                // GameMode13.c
-s32  fn_800F9254(void);                 // GameMode2.c: the skin on this hole
+s32  GameModeSkins_CurrentHoleValue(void);                 // GameMode2.c: the skin on this hole
 s32  fn_800F9328(void);                 // GameMode2.c: the first selected hole (-1: none)
 s32  fn_800F93D8(int h);                // the next selected hole after h (-1: none)
 s32  fn_800F9414(int h);                // the selected hole before h (-1: none)

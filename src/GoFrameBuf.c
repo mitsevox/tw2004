@@ -4,10 +4,10 @@
 
 #include "camera.h"
 
-void fn_8006E1C0(void);
-void fn_8006E1C4(void);
+void FB_vInitModule(void);
+void FB_vCloseModule(void);
 
-void fn_8006E150(GoFrameBuf* pBuf) {
+void FB_vUpdateInternalFrameBufferData(GoFrameBuf* pBuf) {
     pBuf->f18 = pBuf->fWidth * pBuf->f10;
     pBuf->f1C = pBuf->fHeight * pBuf->f14;
     pBuf->f28 = 1.0f / pBuf->f10;
@@ -17,33 +17,33 @@ void fn_8006E150(GoFrameBuf* pBuf) {
     pBuf->fAspect = pBuf->fHeight / pBuf->fWidth;
 }
 
-void fn_8006E1C0(void) {
+void FB_vInitModule(void) {
 }
 
-void fn_8006E1C4(void) {
+void FB_vCloseModule(void) {
 }
 
-GoFrameBuf* fn_8006E1C8(void) {
+GoFrameBuf* FB_spCreateFrameBuffer(void) {
     GoFrameBuf* pBuf = fn_80009B34(sizeof(GoFrameBuf), 2, 16, "GoFrameBuf.c", 137);
 
-    fn_8006E234(pBuf);
+    FB_vSetDefaultFrameBuffer(pBuf);
     return pBuf;
 }
 
-void fn_8006E214(GoFrameBuf* pBuf) {
+void FB_vReleaseFrameBuffer(GoFrameBuf* pBuf) {
     fn_80009E70(pBuf);
 }
 
-void fn_8006E234(GoFrameBuf* pBuf) {
-    fn_8006E26C(pBuf, 0.0f, 0.0f, 512.0f, 448.0f, 1.0f, 1.0f);
+void FB_vSetDefaultFrameBuffer(GoFrameBuf* pBuf) {
+    FB_vSetFrameBuffer(pBuf, 0.0f, 0.0f, 512.0f, 448.0f, 1.0f, 1.0f);
 }
 
-void fn_8006E26C(GoFrameBuf* pBuf, f32 f0, f32 f4, f32 fWidth, f32 fHeight, f32 f10, f32 f14) {
+void FB_vSetFrameBuffer(GoFrameBuf* pBuf, f32 f0, f32 f4, f32 fWidth, f32 fHeight, f32 f10, f32 f14) {
     pBuf->f0 = f0;
     pBuf->f4 = f4;
     pBuf->fWidth = fWidth;
     pBuf->fHeight = fHeight;
     pBuf->f10 = f10;
     pBuf->f14 = f14;
-    fn_8006E150(pBuf);
+    FB_vUpdateInternalFrameBufferData(pBuf);
 }

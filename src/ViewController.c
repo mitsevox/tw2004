@@ -18,7 +18,7 @@ void  CA_vSetLookAtSide(CamLens* pLens, f32* pPos, f32* pAt, f32* pUp);
 void  fn_80076664_SetScaledLookAt(CamLens* pLens, f32* pPos, f32* pAt, f32* pF5C, f32* pF50);
 void  fn_80017208(CamLens* pLens, f32* pPos, f32* pAngles);
 void  fn_80013D68(void* pCamera);
-void  fn_80076A54(f32* pRect);
+void  VM_vUpdateInternalViewportRectData(f32* pRect);
 void  fn_8000A194(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC);  // UMemPool.c: a rotation matrix from three angles
 void  fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);          // UMemPool.c: inverts a rotation+translation
 void  fn_8001728C(CamLens* pLens);
@@ -61,7 +61,7 @@ void fn_80016D18(int nView, f32 x, f32 y, f32 w, f32 h) {
 
     pCtrl = fn_80016E28(nView);
     pLens = CA_spCreateCamera();
-    pRect = fn_80076ACC();
+    pRect = VM_spCreateViewport();
     fn_800171D8(pRect, x, y, w, h);
     // port: fn_800171B0 is typed s32, but its value is the frame buffer
     pCtrl->pCamera = fn_8001371C(pLens, (GoFrameBuf*)fn_800171B0(), pRect);
@@ -82,7 +82,7 @@ void fn_80016E3C(int nView) {
 
     pCtrl = fn_80016E28(nView);
     CA_vDestroyCamera(fn_80008370(pCtrl->pCamera));
-    fn_80076B18(fn_80012EF0(pCtrl->pCamera));
+    VM_vReleaseViewport(fn_80012EF0(pCtrl->pCamera));
     fn_800137B0(pCtrl->pCamera);
     pCtrl->b274 = 0;
 }
@@ -165,7 +165,7 @@ void fn_800171D8(f32* pRect, f32 x, f32 y, f32 w, f32 h) {
     pRect[1] = y;
     pRect[2] = w;
     pRect[3] = h;
-    fn_80076A54(pRect);
+    VM_vUpdateInternalViewportRectData(pRect);
 }
 
 // Points the lens from pPos with the view's angles: builds its camera-to-world matrix (rotation from

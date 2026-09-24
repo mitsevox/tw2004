@@ -225,7 +225,7 @@ CamShot* fn_80064F7C(int nPlayer, int nKind, u8 bNotKind5, CamShot* pNot) {
     if (nFound == 0) {
         return NULL;
     }
-    i = Rand_Next(1) % nFound;
+    i = Misc_RandFunc(1) % nFound;
     return &lbl_80281E18->aStatic[aFound[i]];
 }
 

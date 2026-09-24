@@ -211,7 +211,7 @@ void fn_800F08A8(void) {
         break;
     }
     if (!bFirst && !bSaid) {
-        switch (Rand_Next(0) & 3) {
+        switch (Misc_RandFunc(0) & 3) {
         case 0:
             fn_800E4364(10, 2, 0, 0);
             return;
@@ -265,7 +265,7 @@ u8 GameModeDriverRTE_GetEventByDate(u16 nDate, s32* pId, s32* pRound) {
     s32 d;
     s32 nSeason;
     u8 bFound;
-    fn_800D2714(&nDate, &nMonth, &nDay, &nYear);
+    CalDate_GetMDY(&nDate, &nMonth, &nDay, &nYear);
     bFound = 0;
     nSeason = nYear - 2003;
     // EA bug: nSeason is not checked against the ten seasons (GameModeDriverRTE_GetNextEvent checks
@@ -290,7 +290,7 @@ u8 GameModeDriverRTE_GetEventByDate(u16 nDate, s32* pId, s32* pRound) {
 
 u8 fn_800F0DB8(s32 nMonth, s32 nDay, s32 nYear, s32* pId, s32* pRound) {
     u16 nDate;
-    fn_800D2678(&nDate, nMonth, nDay, nYear);
+    CalDate_SetMDY(&nDate, nMonth, nDay, nYear);
     return GameModeDriverRTE_GetEventByDate(nDate, pId, pRound);
 }
 
@@ -397,7 +397,7 @@ s32 GameModeDriverRTE_GetNextEvent(void) {
     u8 bFound;
     GameModeDriverRTE_GetCurrentDate(&nMonth, &nDay, &nYear);
     nSeason = nYear - 2003;
-    fn_800D2678(&nToday, nMonth, nDay, nYear);
+    CalDate_SetMDY(&nToday, nMonth, nDay, nYear);
     if (nSeason >= 0 && nSeason < 10) {
         bFound = 0;
         for (i = 0; i < 118; i++) {

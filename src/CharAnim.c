@@ -35,8 +35,8 @@ static f32 CharAnim_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// Clear the queued state change and stop the second player; with bReset, rebuild its blend node as
-// a half-and-half blend. In game type 3 the created golfer's sliders are applied again.
+// Clear the second player's state and its queued state change; with bReset, rebuild its blend
+// node as a half-and-half blend. In game type 3 the created golfer's sliders are applied again.
 void fn_800957FC(Character* pChar, u8 bReset) {
     SKABlendNode* pNode;
 
@@ -62,12 +62,12 @@ void fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f) {
     pAnim->f10 = f;
 }
 
-// Work out a clip's blend window aBlend: [0] its start and [1] its end in the clip, [2] the ball-hit
-// time (-1 if none), [3] and [4] the start and end on the player's clock, [5] fOffset. fFrom and
-// fTo may be markers: -40000 and -50000 take the clip's pD8 times, -90000 (fFrom) fn_800971B8,
-// -70000 (fFrom) where the golfer stands in the swing; other negatives take 0 and the clip's
-// length. fStart -10000 starts the window at the blend tree's end. With aPrev, the window lines up
-// with the previous one's. The result is the window's length on the player's clock.
+// Work out a clip's blend window aBlend: [0] its start and [1] its end in the clip, [2] its event
+// 2's time (fFrom -70000 only, else [1]), [3] and [4] the start and end on the player's clock,
+// [5] fOffset. fFrom and fTo may be markers: -40000 and -50000 take the clip's pD8 times, -90000
+// (fFrom) fn_800971B8, -70000 (fFrom) v1638[1], resyncing the first player; other negatives take
+// 0 and the clip's length. fStart -10000 starts the window at the blend tree's end. With aPrev,
+// the window lines up with the previous one's. The result is the window's length on the clock.
 f32 fn_800958F8(Character* pChar, f32* aPrev, Clip* pClip, f32* aBlend, f32 fFrom, f32 fTo, f32 fStart,
                 f32 fOffset) {
     aBlend[2] = -1.0f;
@@ -228,8 +228,8 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
 // Play pLib (a MAL bank's library) on the second player from fFrom to fTo, starting at fStart on
 // the player's clock; with bReset its blend node is rebuilt first. fStart -20000 means the
 // player's time; negative fFrom and fTo mean 0 and the library's end. fTime (-20000 the player's
-// time, -10000 the node's end, -30000 its start) plus a negative fOffset is where the player
-// starts, running animation nAnim. In game type 3 the created golfer's sliders are applied again.
+// time, -10000 the node's end, -30000 its start) plus a negative fOffset is when the queued
+// state nAnim runs (fn_800958EC). In game type 3 the created golfer's sliders are applied again.
 // nGroup is not used; every caller passes it (fn_80096F0C: the MAL group pLib came from).
 void fn_80095FD0(Character* pChar, MtaLib* pLib, u8 bReset, int nGroup, SKABlendFn pfnBlend, int nC,
                  int nAnim, f32 fStart, f32 fFrom, f32 fTo, f32 fOffset, f32 fTime) {
@@ -310,7 +310,7 @@ s32 fn_800962F8(Character* pChar) {
 
 // A random wait of 8 to 10.
 s8 fn_80096338(void) {
-    return Rand_Next(1) % 3 + 8;
+    return Misc_RandFunc(1) % 3 + 8;
 }
 
 u8 fn_8009637C(Character* pChar) {
@@ -375,7 +375,7 @@ s32 fn_80096398(Character* pChar) {
 }
 
 s32 fn_80096508(void) {
-    Rand_Next(1);
+    Misc_RandFunc(1);
     return 1;
 }
 
@@ -391,7 +391,7 @@ int fn_80096530(Character* pChar) {
 // tap-in will give (under par 6, par 5, over par 2; the style-0 branch repeats the par test and can
 // never be taken), then clip group 9 plays. Which clip that is comes from the golfer's animation
 // library (AnimLib_Pick): the two standard tap-ins, plus the pool-cue tap-in for a few golfers.
-void CharAnim_StartTapIn(Character* pChar) {
+void CharacterState_SetTapInState(Character* pChar) {
     int nScore;
     if (pChar == NULL) return;
     nScore = Hole_ScoreAfterTapIn(pChar->nPlayer);
@@ -435,7 +435,7 @@ void CharacterState_UpdateSKAState(Character* pChar) {
             gSession.options.nWind >= 1 && pChar->nSlot == 0) {
             nGroup = 16;
         } else if (gPlayers[pChar->nPlayer].ball.nLie == 0 && gPlayers[pChar->nPlayer].nClub >= 0 &&
-                   gPlayers[pChar->nPlayer].nClub <= 5 && Rand_Next(1) % 100 < 10 && pChar->nSlot == 0) {
+                   gPlayers[pChar->nPlayer].nClub <= 5 && Misc_RandFunc(1) % 100 < 10 && pChar->nSlot == 0) {
             nGroup = 16;
         }
         CharacterState_AddSKABlendData(pChar, 1, nGroup, fn_80072ACC, 1, 2, -10000.0f, -30000.0f, -10000.0f,
@@ -634,7 +634,7 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         }
         break;
     case 11:
-        CharAnim_StartTapIn(pChar);
+        CharacterState_SetTapInState(pChar);
         bTransition = 1;
         break;
     case 12:
@@ -659,7 +659,7 @@ void CharacterState_UpdateSKAState(Character* pChar) {
 }
 
 // The second player's state change: once its time reaches f10, the state nC queued runs. State 5
-// stops the player (in game type 6 it signals event 0x2A and stays waiting); states 1 to 3 play a
+// clears the queue (in game type 6 it signals event 0x2A and stays waiting); states 1 to 3 play a
 // clip from MAL group 0 to 2 on it when n30 is not 4 and n20 is 6 or 7.
 void fn_80096F0C(Character* pChar) {
     MtaLib* pLib;

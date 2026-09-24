@@ -245,7 +245,7 @@ void fn_800ABA28(AudTrack* pTrack) {
     request.flags.b.b11 = (pList->nId >> 2) & 1;
     for (; i < pList->nChannels; i++) {
         request.nIndex = i;
-        pVoice = fn_800AC4A0(&request);
+        pVoice = Voc_Alloc(&request);
         if (pVoice == NULL) return;
         pTrack->apVoices[i] = pVoice;
     }
@@ -341,7 +341,7 @@ u8 Stm_Tick(AudTrack* pTrack) {
         for (i = 0; i < pList->nChannels; i++) {
             if (pTrack->apVoices[i] != NULL && pTrack->apVoices[i]->flags.b.bB_6) {
                 pTrack->apVoices[i]->flags.b.bB_6 = 0;
-                fn_800ACA5C(pTrack->apVoices[i], 0);
+                Voc_Pause(pTrack->apVoices[i], 0);
             }
         }
     }
@@ -383,13 +383,13 @@ u8 Stm_Tick(AudTrack* pTrack) {
             if (!pTrack->u.stm.flags.b.bStarved) {
                 pTrack->u.stm.flags.b.bStarved = 1;
                 for (i = 0; i < pList->nChannels; i++) {
-                    fn_800ACA5C(pTrack->apVoices[i], 1);
+                    Voc_Pause(pTrack->apVoices[i], 1);
                 }
             }
         } else if (pTrack->u.stm.flags.b.bStarved) {
             pTrack->u.stm.flags.b.bStarved = 0;
             for (i = 0; i < pList->nChannels; i++) {
-                fn_800ACA5C(pTrack->apVoices[i], 0);
+                Voc_Pause(pTrack->apVoices[i], 0);
             }
         }
         break;

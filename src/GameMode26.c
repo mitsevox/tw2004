@@ -401,7 +401,7 @@ void fn_8010CA2C(int nPlayer) {
     if (pPlayer->nEBC >= lbl_80281760) {
         lbl_80281764 = nPlayer;
         nMsgs = 0;
-        nPick = Rand_Next(1) % 3;
+        nPick = Misc_RandFunc(1) % 3;
         if (nPick == 0) {
             fn_8010D428(1, 0);
         } else if (nPick == 1) {
@@ -413,7 +413,7 @@ void fn_8010CA2C(int nPlayer) {
         }
     }
     if (nMsgs > 0 && lbl_80281764 == 5) {
-        fn_8010D428(aMsgs[Rand_Next(1) % nMsgs], 0);
+        fn_8010D428(aMsgs[Misc_RandFunc(1) % nMsgs], 0);
     }
 }
 

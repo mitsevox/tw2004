@@ -326,7 +326,7 @@ s32   fn_800F3668(int n);
 s8    fn_800F4878(void);
 s32   fn_800F4B00(void);
 void  fn_800F7DA4(void);
-s32   fn_800F9308(void);
+s32   GameModeSkins_CurrentHoleNumberSkins(void);
 s32   fn_800FA4B8(int nPlayer);
 s32   fn_800FD704(int nPlayer, int nHole, s32* pWon);
 s32   fn_800FD8D0(char* szName1, s32* pPoints1, char* szName2, s32* pPoints2);
@@ -1048,11 +1048,11 @@ void fn_80086DDC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80086DFC(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800F9254();
+    pResult->i = GameModeSkins_CurrentHoleValue();
 }
 
 void fn_80086E2C(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800F9308();
+    pResult->i = GameModeSkins_CurrentHoleNumberSkins();
 }
 
 // How much the lie can vary: the surface's range, less RECOVERY.
@@ -2088,7 +2088,7 @@ void fn_80089600(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80089648(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = Rand_Next(1);
+    pResult->i = Misc_RandFunc(1);
 }
 
 void fn_8008967C(MsgArg* pArgs, MsgArg* pResult) {
@@ -2518,7 +2518,7 @@ void fn_8008A2E0(MsgArg* pArgs, MsgArg* pResult) {
     ((MsgString*)pArgs[1].p)->pStr[0] = '$';
     fn_800907AC(pTour->n8, ((MsgString*)pArgs[1].p)->pStr + 1);
     strcpy(((MsgString*)pArgs[2].p)->pStr, GameModeDriverPGATour_GetName(gpSaveData->tour.nEvent));
-    fn_800D28DC(GameModeDriverPGATour_GetEndDate(gpSaveData->tour.nEvent), ((MsgString*)pArgs[3].p)->pStr);
+    CalDate_ToString(GameModeDriverPGATour_GetEndDate(gpSaveData->tour.nEvent), ((MsgString*)pArgs[3].p)->pStr);
     nPlace = pTour->n4;
     if (nPlace > 100) {
         nPlace = pTour->n4 % 100;

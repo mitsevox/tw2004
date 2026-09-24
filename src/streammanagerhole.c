@@ -73,8 +73,8 @@ void fn_80076F58();
 void fn_8008D9AC();
 void fn_800B9944();
 void fn_800B9988();
-void fn_800BA0A0();
-void fn_800BA0E4();
+void UI_vEATraxRegisterStreamClients();
+void UI_vEATraxUnRegisterStreamClients();
 void fn_8010508C();
 void fn_80105154();
 void fn_80124A40();
@@ -224,7 +224,7 @@ void fn_80014668(void) {
     fn_8010508C();
     fn_80124A40();
     fn_8000B9E4();
-    fn_800BA0A0();
+    UI_vEATraxRegisterStreamClients();
 }
 
 void fn_800146C4(void) {
@@ -241,7 +241,7 @@ void fn_800146C4(void) {
     fn_80105154();
     fn_80124A70();
     fn_8009EAF0();
-    fn_800BA0E4();
+    UI_vEATraxUnRegisterStreamClients();
 }
 
 void fn_800147A4(void) {
@@ -279,7 +279,7 @@ void fn_80014834(void) {
 void fn_80014864(void) {
     Golfer_RegisterStatsHandler();
     Session_RegisterRecordsHandler();
-    fn_800BA0A0();
+    UI_vEATraxRegisterStreamClients();
     fn_800D29EC();
     fn_800EAE74();
     fn_800D33F4();
@@ -292,7 +292,7 @@ void fn_80014864(void) {
 void fn_800148A8(void) {
     Golfer_UnregisterStatsHandler();
     Session_UnregisterRecordsHandler();
-    fn_800BA0E4();
+    UI_vEATraxUnRegisterStreamClients();
     fn_800D2A30();
     fn_800EAEB8();
     fn_800D3424();

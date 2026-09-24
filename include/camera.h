@@ -197,7 +197,7 @@ typedef struct CamScript {
     f32  v0[4];                 // 0x00  camera 4 puts the ball here
     f32  v10[4];                // 0x10  and the pin here
     f32  a20[8];                // 0x20  cleared with the rest by fn_80062E40
-    f32  v40[4];                // 0x40  the move's vector (fn_80063B98, fn_80063BF4, fn_80063CBC)
+    f32  v40[4];                // 0x40  the move's vector (CameraController_FadeIn, CameraController_FadeOut, fn_80063CBC)
     f32  v50[4];                // 0x50  the ball-flight camera: where the shot should land (the aim, at
                                 //       the club's full distance)
     f32  v60[4];                // 0x60  fn_8003DCE8: how far the camera moved this frame (0 when
@@ -207,7 +207,7 @@ typedef struct CamScript {
     f32  f84;                   // 0x84  fCamTime before this frame's step (fn_8003DCE8)
     f32  f88;                   // 0x88  a second clock, stepped with fCamTime
     f32  f8C;                   // 0x8C  how long the next shot lasts (its f48; fn_8006351C)
-    f32  f90;                   // 0x90  } the move's time so far and its length: fn_80063B98 sets
+    f32  f90;                   // 0x90  } the move's time so far and its length: CameraController_FadeIn sets
     f32  f94;                   // 0x94  } 0 and its time
     f32  f98;                   // 0x98
     f32  f9C;                   // 0x9C  CamScript_GetLookAtPoint hands it to fn_800418B0 (f98 at its end)
@@ -250,7 +250,7 @@ typedef struct CamScript {
 } CamScript;
 LAYOUT_ASSERT(CamScript, 0x118);    // CameraScript_WillGolferBeOccludedInThisView copies 0x118 bytes
 
-// A view's camera controller (View_SetCamera is TW06's CameraController_SetCameraMode): the
+// A view's camera controller (CameraController_SetCameraMode, EA's name in TW06 and TW07): the
 // camera mode, its shots and script. It sits at +4 in a ViewController; only the fields read so far.
 typedef struct View {
     f32      v0[4];             // 0x000  what fn_8001731C returns: the camera's position (inferred)
@@ -302,7 +302,7 @@ typedef struct ViewController {
 } ViewController;
 LAYOUT_ASSERT(ViewController, 0x288);
 
-// The camera tuning values (GoGolfCam.c), allocated and set by GoCamTuningVars.c's fn_800977F8.
+// The camera tuning values (GoGolfCam.c), allocated and set by GoCamTuningVars.c's CameraTuning_Init.
 typedef struct CamTuning {
     f32  f0;                    // 0x000  the zoom-to-aim camera's base speed
     f32  f4;                    // 0x004  the zoom-to-aim camera's distance back from the target
@@ -410,7 +410,7 @@ typedef struct CamTuning {
                                 //        a frame
     f32  f168;                  // 0x168  the ground clearance for CamScript_KeepAboveGround
     f32  f16C;                  // 0x16C  the obstruction radius around the ball for the pre-shot routine
-    f32  f170;                  // 0x170  a blend for fn_80063B98 / fn_80063BF4
+    f32  f170;                  // 0x170  a blend for CameraController_FadeIn / CameraController_FadeOut
     f32  f174;                  // 0x174  fn_8003A148: how softly a camera eases in under its height limit
     f32  f178;                  // 0x178
     f32  v17C[4];               // 0x17C
@@ -726,7 +726,7 @@ FlyByPath* fn_80065424(u32 uPath);      // a fly-by path's spline (NULL: none)
 void     fn_80065488(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov, int nPlayer,
                      f32 fShare);
 
-// ---- the camera modes' setups (GoGolfCam.c), one per View_SetCamera mode --------------------
+// ---- the camera modes' setups (GoGolfCam.c), one per CameraController_SetCameraMode mode --------------------
 
 void   fn_800BDA30(View* pView, int nPlayer);                       // camera 0
 void   GolfCamera_InitZoomToAimCamera(View* pView, int nPlayer);    // 1
@@ -783,11 +783,11 @@ void   fn_800C3EDC(View* pView, int nPlayer);                       // 24
 
 // ---- the camera controller (0x80062F38..) ---------------------------------------------------
 
-void   View_SetCamera(View* pView, int nCamera, int nPlayer, int nView);
+void   CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int nView);
 void   fn_80062F1C(View* pView);
 void   fn_80063920(int nView, f32* pBounds);    // the view's camera is inside an object's bounds
-void   fn_80063B98(View* pView, f32 f, f32* pVec);
-void   fn_80063BF4(View* pView, f32 f, f32* pVec);
+void   CameraController_FadeIn(View* pView, f32 f, f32* pVec);
+void   CameraController_FadeOut(View* pView, f32 f, f32* pVec);
 u8     fn_80063C50(View* pView);
 u8     fn_80063C7C(View* pView);
 u8     fn_80063C90(View* pView);        // script.nCamera 1, 2 or 4: a colour fade running or held
@@ -849,8 +849,8 @@ u8     fn_800C7340(View* pView, int nPlayer);
 
 // ---- frame buffers (GoFrameBuf.c) -----------------------------------------------------------
 
-// A frame buffer's size and scale (0x34 bytes; fn_8006E1C8 makes one). The last seven fields are
-// worked out from the first six by fn_8006E150.
+// A frame buffer's size and scale (0x34 bytes; FB_spCreateFrameBuffer makes one). The last seven fields are
+// worked out from the first six by FB_vUpdateInternalFrameBufferData.
 typedef struct GoFrameBuf {
     f32  f0;                    // 0x00  0 by default
     f32  f4;                    // 0x04  0 by default
@@ -868,11 +868,11 @@ typedef struct GoFrameBuf {
 } GoFrameBuf;
 LAYOUT_ASSERT(GoFrameBuf, 0x34);
 
-void        fn_8006E150(GoFrameBuf* pBuf);   // work out the derived fields
-GoFrameBuf* fn_8006E1C8(void);               // a new frame buffer with the default size
-void        fn_8006E214(GoFrameBuf* pBuf);   // free it
-void        fn_8006E234(GoFrameBuf* pBuf);   // the default size: 512 x 448, scale 1
-void        fn_8006E26C(GoFrameBuf* pBuf, f32 f0, f32 f4, f32 fWidth, f32 fHeight, f32 f10, f32 f14);
+void        FB_vUpdateInternalFrameBufferData(GoFrameBuf* pBuf);   // work out the derived fields
+GoFrameBuf* FB_spCreateFrameBuffer(void);               // a new frame buffer with the default size
+void        FB_vReleaseFrameBuffer(GoFrameBuf* pBuf);   // free it
+void        FB_vSetDefaultFrameBuffer(GoFrameBuf* pBuf);   // the default size: 512 x 448, scale 1
+void        FB_vSetFrameBuffer(GoFrameBuf* pBuf, f32 f0, f32 f4, f32 fWidth, f32 fHeight, f32 f10, f32 f14);
 f32         fn_8001415C(GoFrameBuf* pBuf);   // GoRenderCtx_Gc.c: fHeight
 f32         fn_80014164(GoFrameBuf* pBuf);   // f4
 f32         fn_8001416C(GoFrameBuf* pBuf);   // fWidth
@@ -886,8 +886,8 @@ void     CA_vSetLookAt(CamLens* pLens, f32* pPos, f32* pTarget);   // aims the l
 void     CA_vInitCamera(CamLens* pLens);
 void     fn_80076948(CamLens* pLens, f32 fB4, f32 fB8);   // sets fB4 and fB8
 void     fn_80076A0C_SetType(CamLens* pLens, s32 nType);          // sets nType
-f32*     fn_80076ACC(void);                     // a new screen rectangle
-void     fn_80076B18(f32* pRect);               // free it
+f32*     VM_spCreateViewport(void);                     // a new screen rectangle
+void     VM_vReleaseViewport(f32* pRect);               // free it
 void     fn_800B3438(f32* pRect, f32 x, f32 y); // shadow.c
 CamLens* fn_8001F004(void);                     // char.c
 

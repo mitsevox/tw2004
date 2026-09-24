@@ -187,7 +187,7 @@ u8 GameModeStableford_GameFinished(u8 bCheck) {
     return 1;
 }
 
-// No playoff (the GoToPlayoff slot of GameModeMatch.c).
+// No playoff (the pfnGoToPlayoff slot).
 u8 fn_800FE8A0(u8 bCheck) {
     return 0;
 }
@@ -211,9 +211,9 @@ void GameModeStableford_EndHole(void) {
     }
 }
 
-// Empty there. Each human with a profile who finished the round
-// in fewer strokes than a CPU player wins money: the prize for the best earnings rating among those
-// CPU players, its base plus its per-stroke prize for up to 5 strokes of margin.
+// TW06's EndGame is empty. Each human with a profile whose round total (fn_800E1788: in this
+// mode the Stableford points) is below a CPU player's wins money: the prize for the best earnings
+// rating among those CPU players, its base plus its per-stroke prize for up to 5 of margin.
 void GameModeStableford_EndGame(void) {
     int i;
     int j;

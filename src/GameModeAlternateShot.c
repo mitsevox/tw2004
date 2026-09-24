@@ -15,7 +15,7 @@ u8  fn_800E6A98(int nPlayer);
 int fn_800E6AF8(int nPlayer);
 int GameModeAlternateShot_TeamBestPossibleScore(int nTeam);
 int GameModeAlternateShot_TeamMatchWins(int nTeam);
-void fn_800E6C10(void);
+void GameModeAlternateShot_SetupNextGolfer(void);
 s32  GameModeAlternateShot_GetHonors(int nPlayer);
 void GameModeAlternateShot_EndGolferTurn(int nPlayer);
 u8   GameModeAlternateShot_HoleFinished(int nPlayer, u8 bCheck);
@@ -24,10 +24,10 @@ u8   GameModeAlternateShot_GoToPlayoff(u8 bCheck);
 void GameModeAlternateShot_EndHole(void);
 void GameModeAlternateShot_EndGame(void);
 
-// Four players, no mulligans, no gimmes, one view.
+// No mulligans, no gimmes, one view.
 void GameModeAlternateShot_Init(void) {
     gpGame->pfnInit = GameModeAlternateShot_Init;
-    gpGame->pfnSetupNextGolfer = fn_800E6C10;
+    gpGame->pfnSetupNextGolfer = GameModeAlternateShot_SetupNextGolfer;
     gpGame->pfnGetHonors = GameModeAlternateShot_GetHonors;
     gpGame->pfnEndGolferTurn = GameModeAlternateShot_EndGolferTurn;
     gpGame->pfnHoleFinished = GameModeAlternateShot_HoleFinished;
@@ -127,8 +127,8 @@ int GameModeAlternateShot_TeamMatchWins(int nTeam) {
     return gPlayers[a].nHolesWon + gPlayers[b].nHolesWon;
 }
 
-// The hole starts: the first golfer to play gets ready, the others wait.
-void fn_800E6C10(void) {
+// Whoever plays next (the mode's honors) gets ready, the others wait.
+void GameModeAlternateShot_SetupNextGolfer(void) {
     int i;
     lbl_80282278 = gpGame->pfnGetHonors(5);
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -317,7 +317,7 @@ u8 GameModeAlternateShot_GameFinished(u8 bCheck) {
             gpGame->nD8++;
             fn_800E2BA4();
             CLEAR_ROUNDS(PLAYER_AT);
-            fn_800E45C0();
+            GUI_GolfersTiedUIMessage();
         }
     } else {
         nLeft = 0;
@@ -361,7 +361,7 @@ u8 GameModeAlternateShot_GoToPlayoff(u8 bCheck) {
         CLEAR_ROUNDS(PLAYER);
         gpGame->bD4 = 1;
         gpGame->nD8++;
-        fn_800E45C0();
+        GUI_GolfersTiedUIMessage();
         return 1;
     }
     return 0;

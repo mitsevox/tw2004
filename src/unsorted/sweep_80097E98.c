@@ -15,7 +15,7 @@ void fn_80097E98(void) {
     lbl_80281F78 = 0;
 }
 
-// Two vertices at pPos: through matrix 3 in white, through matrix 0 transparent black.
+// Two vertices at pPos, each after a byte (3, then 0): white, then transparent black.
 void fn_80097EC4(f32* pPos) {
     fn_800988CC(3);
     fn_800988B8(pPos[0], pPos[1], pPos[2]);

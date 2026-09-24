@@ -113,7 +113,7 @@ u8 fn_800CF158(int nPlayer) {
                 }
             }
         }
-        if (nMine <= nBest && nMineStrokes < nBestStrokes - 1 && nMine + fn_800F9254() > nBest) {
+        if (nMine <= nBest && nMineStrokes < nBestStrokes - 1 && nMine + GameModeSkins_CurrentHoleValue() > nBest) {
             return 1;
         }
         return 0;
@@ -220,7 +220,7 @@ u8 fn_800CF450(int nPlayer) {
                 }
             }
         }
-        if (nMineStrokes < nBestStrokes - 1 && nMine + fn_800F9254() > nBest) {
+        if (nMineStrokes < nBestStrokes - 1 && nMine + GameModeSkins_CurrentHoleValue() > nBest) {
             return 1;
         }
         return 0;
@@ -490,10 +490,10 @@ s32 fn_800D0098(int nPlayer) {
             return nLead;
         }
         if (nHole == 2) {
-            return nLead + fn_800F9254();
+            return nLead + GameModeSkins_CurrentHoleValue();
         }
         if (nHole == 0) {
-            nLead -= fn_800F9254();
+            nLead -= GameModeSkins_CurrentHoleValue();
         }
         return nLead;
     }

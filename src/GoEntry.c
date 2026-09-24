@@ -19,7 +19,7 @@ s32  OSResetSystem(s32, s32, s32);
 void fn_8006C6F0(void);
 void fn_8006C720(void);
 void fn_8006C770(void);
-void fn_8006C9EC(void);
+void GO_vInitFE(void);
 void fn_8006CB2C(void);
 void fn_8006CDC4(void);
 void fn_8006CEFC(void);
@@ -99,7 +99,7 @@ void fn_800083A4(void) {
             }
             break;
         case 10:
-            fn_8006C9EC();
+            GO_vInitFE();
             gSession.nGameType = 3;
             break;
         case 3:
@@ -233,7 +233,7 @@ void fn_800083A4(void) {
     fn_8006C770();
 }
 
-// The round is over (lbl_802811E8[1], set by fn_8006DC34).
+// A hole load is asked for (lbl_802811E8[1], set by fn_8006F4B4): the loop loads another hole.
 u8 fn_80008820(void) {
     return lbl_802811E8[1];
 }

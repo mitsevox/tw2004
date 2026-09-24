@@ -32,7 +32,7 @@ void fn_8010F718(void) {
     lbl_802824C0 = 0;
 }
 
-// Start editing: a cleared logo, and the palette if it is not loaded yet.
+// Start editing: the editor state (LogoEdit) cleared, and the palette if it is not loaded yet.
 void fn_8010F748(void) {
     lbl_802824B8 = fn_80009B34(sizeof(LogoEdit), 2, 0, "FE_LogoDesign.c", 67);
     fn_80005AE8(lbl_802824B8, 0, sizeof(LogoEdit));

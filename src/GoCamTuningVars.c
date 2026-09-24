@@ -1,16 +1,16 @@
 // GoCamTuningVars.c (EA's name, from its asserts): the camera tuning values (camera.h's
-// CamTuning), allocated and set once by fn_800977F8.
+// CamTuning), allocated and set once by CameraTuning_Init.
 
 #include "game_types.h"
 #include "engine.h"
 #include "camera.h"
 
-void fn_800977F8(void);
+void CameraTuning_Init(void);
 
 CamTuning* lbl_80281F78;
 
 // Allocate the camera tuning values and set every one.
-void fn_800977F8(void) {
+void CameraTuning_Init(void) {
     lbl_80281F78 = fn_80009B34(sizeof(CamTuning), 2, 0, "GoCamTuningVars.c", 24);
     lbl_80281F78->f0 = 10.0f;
     lbl_80281F78->f4 = 15.0f;

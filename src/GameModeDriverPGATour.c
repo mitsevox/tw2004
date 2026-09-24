@@ -312,7 +312,7 @@ void fn_800EE8C4(void) {
             if (nWins >= 3) {
                 fn_800E4364(5, 8, 0, 0);
             } else {
-                fn_800E4364(5, (Rand_Next(1) & 3) + 27, 0, 0);
+                fn_800E4364(5, (Misc_RandFunc(1) & 3) + 27, 0, 0);
             }
         } else if (gpSaveData[nPlayer].tour.nEvent == 9) {
             fn_800E4364(5, 9, 0, 0);
@@ -635,7 +635,7 @@ u8 GameModeDriverPGATour_GoToPlayoff(u8 bCheck) {
         fn_800E1260(0);
         fn_800E1404(lbl_80282340);
         gpGame->bD4 = 1;
-        fn_800E45C0();
+        GUI_GolfersTiedUIMessage();
     }
     return bPlayoff;
 }
@@ -654,7 +654,7 @@ u8 GameModeDriverPGATour_GetEventByDate(u16 nDate, s32* pId, s32* pRound) {
     s32 nYear;
     s32 nSeason;
     u8 bFound;
-    fn_800D2714(&nDate, &nMonth, &nDay, &nYear);
+    CalDate_GetMDY(&nDate, &nMonth, &nDay, &nYear);
     bFound = 0;
     nSeason = nYear - 2004;
     if (nSeason >= 0 && nSeason < 10) {
@@ -812,7 +812,7 @@ u16 GameModeDriverPGATour_GetEndDate(s32 i) {
         return 0xFFFF;
     }
     nDate = p->aStartDate[GameModeDriverPGATour_GetCurrentSeason()];
-    fn_800D27CC(&nDate, GameModeDriverPGATour_GetRounds(i) - 1);
+    CalDate_AddDays(&nDate, GameModeDriverPGATour_GetRounds(i) - 1);
     return nDate;
 }
 

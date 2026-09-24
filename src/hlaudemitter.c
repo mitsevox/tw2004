@@ -12,7 +12,7 @@
 AudInstance* fn_800AD674(u8 nId);
 void fn_800ADE54(f32* pVec);
 void fn_800AD800(u8 nId, f32* pPos, f32* pLast, u8 nView);
-void fn_800ACB98(void);                 // hlaudvoice.c
+void Voc_Cycle(void);                 // hlaudvoice.c
 void fn_800AF320(void);
 void fn_800B0434(void);                 // startUp.c
 
@@ -85,7 +85,7 @@ void fn_800AD1C8(void) {
         }
     }
     fn_800A9AC8();
-    fn_800ACB98();
+    Voc_Cycle();
     fn_800AF320();
     fn_800B0434();
     lbl_80282018++;

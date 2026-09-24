@@ -1,5 +1,5 @@
 // GameAnalysis.c (TW06's name, GameAnalysis_*): round statistics per player (putts, pars, birdies,
-// fairways, greens) and the loading-screen tip that quotes one of them.
+// two per-hole flags, probably fairways and greens) and the pick of a tip quoting one of them.
 
 #include "golfer.h"
 #include "game.h"
@@ -8,7 +8,7 @@ u8  fn_800E6020(int nMode, int nTip);
 u8  fn_800E60E4(u32 nTip);
 f32 fn_800E6578(int nPlayer, u32 nStat);
 
-// Picks a tip for the loading screen: 14 means none. Only in modes 0, 1, 2, 4 and 23 (which shows
+// Picks a statistic tip to show: 14 means none. Only in modes 0, 1, 2, 4 and 23 (which shows
 // tip 12 three times in four); otherwise a random tip that fits the mode, has a nonzero statistic
 // for someone and has not been shown yet.
 int fn_800E5E54(void) {
@@ -20,7 +20,7 @@ int fn_800E5E54(void) {
                           Game_GetMode() != 4 && Game_GetMode() != 23)) {
         return 14;
     }
-    if (Game_GetMode() == 23 && Rand_Next(1) % 100 < 75) {
+    if (Game_GetMode() == 23 && Misc_RandFunc(1) % 100 < 75) {
         return 12;
     }
     bAny = 0;
@@ -33,7 +33,7 @@ int fn_800E5E54(void) {
         return 14;
     }
     bFound = 0;
-    nTip = Rand_Next(1) % 14;
+    nTip = Misc_RandFunc(1) % 14;
     while (!bFound) {
         if (fn_800E6020(Game_GetMode(), nTip) && fn_800E60E4(nTip) && !lbl_80203138[nTip]) {
             bFound = 1;
@@ -45,7 +45,7 @@ int fn_800E5E54(void) {
 }
 
 // Whether a tip fits a game mode: never tip 11; mode 0 all but tip 12; modes 1, 2 and 4 only tips
-// 0, 1 and 5; mode 23 all.
+// 0, 1, 5 and 13; mode 23 all; other modes none.
 u8 fn_800E6020(int nMode, int nTip) {
     if (nTip == 11) {
         return 0;

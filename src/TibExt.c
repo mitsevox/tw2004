@@ -32,6 +32,9 @@ void fn_80122868(int uHandle, u32 uValue);
 int  fn_8012288C(int* pProcess, int* pResult);
 void fn_801228AC(char* pFileName);
 
+TibExtCard lbl_80260D88;
+TibExtCard* lbl_80281970 = &lbl_80260D88;
+
 void* TibExtMemAlloc(u32 uHeapID, u32 uSize, u32 uAlign) {
     return fn_80009B34(uSize, fn_8000A0B4(), uAlign, "TibExt.c", 42);
 }
@@ -55,13 +58,16 @@ u32 TibExtCurrentTimeGet(void) {
     s32 nMsec;
     u16 uEpoch;
     u16 uToday;
-    s32 nDays;
+    int nDays;
+    int nSeconds;
 
     fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
-    fn_800D2678(&uEpoch, 0, 0, 1970);
-    fn_800D2678(&uToday, nMonth, nDay, nYear);
+    CalDate_SetMDY(&uEpoch, 0, 0, 1970);
+    CalDate_SetMDY(&uToday, nMonth, nDay, nYear);
     nDays = uToday - uEpoch - 1;
-    return nMinute * 60 + nHour * 3600 + nSecond + 86400 * nDays;
+    nSeconds = 86400 * nDays;
+    nSeconds += nMinute * 60 + nHour * 3600 + nSecond;
+    return nSeconds;
 }
 
 SFIOFuncTable* fn_801221F0(void) {
@@ -113,6 +119,14 @@ void fn_80122330(char* pSearchName, int eDevice) {
     }
     fn_80122468(0);
 }
+
+// The file library's error code for each card error, by -error: 0 for none, 17 for most.
+// fake match: EA's table starts 8-aligned after the 9-byte "TibExt.c"; plain s32 data is only
+// 4-aligned, and the cause is not known.
+s32 lbl_80194758[46] __attribute__((aligned(8))) = {
+    0,  17, 17, 3,  17, 17, 17, 17, 17, 17, 17, 17, 4,  17, 4,  17, 17, 17, 17, 17, 17, 17, 17,
+    17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 14, 3,  14, 17, 17, 17, 17, 17, 17, 17, 17, 17,
+};
 
 void fn_80122468(s32 nCardError) {
     lbl_80281970->nError = lbl_80194758[-nCardError];

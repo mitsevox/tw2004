@@ -3,7 +3,7 @@
 // Line numbers are reproduced with #line so the assert calls match.
 //
 // The GameCube layer under SharedFileIO.c: maps SFIO devices to memory card slots, builds the
-// save's file name, sets the banner and icon of a new save, and runs the save and load sequences
+// save's file name, sets the banner and icon of a new save, and runs the save and delete sequences
 // (probe, check free space, mount, write the header block). The library itself is cross-platform
 // (the icon names "View.ico" and "icon.sys" are the PlayStation 2's).
 
@@ -329,8 +329,8 @@ int fn_80171E94(int eError, int* pProcess, int* pResult) {
     return 0;
 }
 
-// Continuation for a load (states 2 and 5): probe for the file, which must exist, open it and
-// select the device again. When searching, a failure moves on to the next device.
+// Continuation for a delete (states 2 and 5): probe for the file, which must exist, delete it
+// (pfn44, pfn24, pfn28), then select the device again. Searching, a failure tries the next device.
 int fn_801727C8(int eError, int* pProcess, int* pResult) {
     char szSearchName[0x20];
     if (pProcess == NULL) return 0x12;
@@ -345,7 +345,7 @@ int fn_801727C8(int eError, int* pProcess, int* pResult) {
             _SFIO_pData->eOperation = 2;
             _SFIO_pDevice->fn.pfnProbe(szSearchName, _SFIO_pData->Session.eDevice);
         } else if (eError == 3) {
-            // EA bug: tests the save state (1) in the load continuation (states 2 and 5), so a
+            // EA bug: tests the save state (1) in the delete continuation (states 2 and 5), so a
             // failed probe ends the search instead of moving on to the next device.
             if (_SFIO_pData->eState == 1) {
                 _SFIO_pData->Session.eDevice = SFIONextDeviceFromMask(_SFIO_pDevice->uAvailableMask, _SFIO_pData->uSearchDirection);

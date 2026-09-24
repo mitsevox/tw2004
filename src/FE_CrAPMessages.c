@@ -13,7 +13,7 @@
 void fn_80103B74(u8 b);                 // FE_CrAPDB.c: set the database's b14
 void fn_801073DC(s16 nSlot);            // FE_CrAPDB.c
 void fn_800A73F0(s32 n);
-u8   fn_800D256C(u32 nYear);            // Calendar.c: a leap year (1900 counts as one)
+u8   IsLeapYear(u32 nYear);            // Calendar.c: a leap year (1900 counts as one)
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -781,7 +781,7 @@ void fn_80109120(MsgArg* pArgs, MsgArg* pResult) {
     u32 n = 0;
 
     while (n == 0) {
-        n = (u32)(100.0f * fn_8000B318(0)) % 100;
+        n = (u32)(100.0f * Misc_RandFuncg(0)) % 100;
     }
     pResult->f = n;
 }
@@ -998,10 +998,10 @@ void fn_801098AC(MsgArg* pArgs, MsgArg* pResult) {
 // does, part 7 at b 1 or 2, then its equipment tiers again (fn_8007873C).
 void fn_801098B0(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = fn_80077ACC();
-    int nRoll = Rand_Next(0) % 100;
+    int nRoll = Misc_RandFunc(0) % 100;
     int nChoice;
 
-    Rand_Next(0);                       // drawn, not used
+    Misc_RandFunc(0);                       // drawn, not used
     fn_80103B74(0);
     fn_801073DC(2);
     fn_801073DC(5);
@@ -1029,25 +1029,25 @@ void fn_801098B0(MsgArg* pArgs, MsgArg* pResult) {
     fn_8007975C(pProfile, 20, 70);
     fn_8007975C(pProfile, 8, 70);
     nChoice = fn_8007975C(pProfile, 14, 0);
-    if (Rand_Next(0) % 100 < 95) {
+    if (Misc_RandFunc(0) % 100 < 95) {
         FE_CrAP_TurnOnPart(15, 0, nChoice);
     } else {
         fn_8007975C(pProfile, 15, 0);
     }
     if (nRoll < 75) {
-        FE_CrAP_TurnOnPart(9, 0, Rand_Next(0) % 3);
+        FE_CrAP_TurnOnPart(9, 0, Misc_RandFunc(0) % 3);
     } else if (nRoll >= 75 && nRoll < 85) {
-        Rand_Next(0);                   // drawn, not used
+        Misc_RandFunc(0);                   // drawn, not used
         FE_CrAP_TurnOnPart(9, 0, 6);
     } else if (nRoll >= 85 && nRoll < 95) {
-        Rand_Next(0);                   // drawn, not used
+        Misc_RandFunc(0);                   // drawn, not used
         FE_CrAP_TurnOnPart(9, 0, 4);
     } else {
-        Rand_Next(0);                   // drawn, not used
+        Misc_RandFunc(0);                   // drawn, not used
         FE_CrAP_TurnOnPart(9, 0, 8);
     }
     fn_80078A2C(10, 95);
-    fn_800797E0(pProfile, 7, (Rand_Next(0) & 1) + 1, 0);
+    fn_800797E0(pProfile, 7, (Misc_RandFunc(0) & 1) + 1, 0);
     fn_8007873C(pProfile);
 }
 
@@ -1070,7 +1070,7 @@ void fn_80109BA4(MsgArg* pArgs, MsgArg* pResult) {
     fn_8007975C(pProfile, 19, 70);
     fn_8007975C(pProfile, 20, 70);
     fn_8007975C(pProfile, 8, 70);
-    fn_800797E0(pProfile, 7, (Rand_Next(0) & 1) + 1, 0);
+    fn_800797E0(pProfile, 7, (Misc_RandFunc(0) & 1) + 1, 0);
     fn_8007873C(pProfile);
 }
 
@@ -1079,7 +1079,7 @@ void fn_80109BA4(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80109CBC(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = fn_80077ACC();
     View* pView = fn_80017028(fn_80016D10());
-    fn_800A73F0((Rand_Next(0) & 7) + 11);
+    fn_800A73F0((Misc_RandFunc(0) & 7) + 11);
     fn_8008E244();
     fn_8008E364(0);
     GolfCamera_SwitchCrAPCamera(pView, "Crap Idle", lbl_80281EE0->n4, 0, 0, 0);
@@ -1146,11 +1146,11 @@ void fn_80109EE8(MsgArg* pArgs, MsgArg* pResult) {
 // choices (with the chance in percent of the first one); part 15 follows part 14's choice 95% of
 // the time, and part 9 is one of choices 0..2 (75%), 6 (10%), 4 (10%) or 8 (5%).
 void fn_80109FB4(MsgArg* pArgs, MsgArg* pResult) {
-    int nRoll = Rand_Next(0) % 100;
+    int nRoll = Misc_RandFunc(0) % 100;
     int nChoice;
     SaveProfile* pProfile;
 
-    Rand_Next(0);                       // drawn, not used
+    Misc_RandFunc(0);                       // drawn, not used
     pProfile = fn_80077ACC();
     fn_80103B74(0);
     FE_CrAP_TurnOnPart(5, 0, 0);
@@ -1167,21 +1167,21 @@ void fn_80109FB4(MsgArg* pArgs, MsgArg* pResult) {
     fn_8007975C(pProfile, 21, 0);
     fn_8007975C(pProfile, 11, 0);
     nChoice = fn_8007975C(pProfile, 14, 0);
-    if (Rand_Next(0) % 100 < 95) {
+    if (Misc_RandFunc(0) % 100 < 95) {
         FE_CrAP_TurnOnPart(15, 0, nChoice);
     } else {
         fn_8007975C(pProfile, 15, 0);
     }
     if (nRoll < 75) {
-        FE_CrAP_TurnOnPart(9, 0, Rand_Next(0) % 3);
+        FE_CrAP_TurnOnPart(9, 0, Misc_RandFunc(0) % 3);
     } else if (nRoll >= 75 && nRoll < 85) {
-        Rand_Next(0);                   // drawn, not used
+        Misc_RandFunc(0);                   // drawn, not used
         FE_CrAP_TurnOnPart(9, 0, 6);
     } else if (nRoll >= 85 && nRoll < 95) {
-        Rand_Next(0);                   // drawn, not used
+        Misc_RandFunc(0);                   // drawn, not used
         FE_CrAP_TurnOnPart(9, 0, 4);
     } else {
-        Rand_Next(0);                   // drawn, not used
+        Misc_RandFunc(0);                   // drawn, not used
         FE_CrAP_TurnOnPart(9, 0, 8);
     }
     fn_80078A2C(10, 95);
@@ -1246,7 +1246,7 @@ void fn_8010A3C4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8010A3C8(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800D256C(pArgs[0].i);
+    pResult->i = IsLeapYear(pArgs[0].i);
 }
 
 // ---- end of sweep code ----

@@ -53,12 +53,12 @@ u8 fn_800BA080(void) {
     return ((u32)((-1 - lbl_801F8458.nLogo) | (lbl_801F8458.nLogo + 1)) >> 31);
 }
 
-void fn_800BA0A0(void) {
+void UI_vEATraxRegisterStreamClients(void) {
     UStream_RegisterHandler('TRAX', fn_800BA118);
     UStream_RegisterHandler('TRXT', fn_800BA15C);
 }
 
-void fn_800BA0E4(void) {
+void UI_vEATraxUnRegisterStreamClients(void) {
     UStream_UnregisterHandler('TRAX');
     UStream_UnregisterHandler('TRXT');
 }

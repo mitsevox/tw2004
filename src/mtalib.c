@@ -171,7 +171,7 @@ void* fn_8001F79C(MalBank* pBank, int nGroup, int n) {
 
     apItem = fn_8001F780(pBank, nGroup, &nNum, n);
     if (nNum != 0) {
-        return apItem[Rand_Next(1) % nNum];
+        return apItem[Misc_RandFunc(1) % nNum];
     }
     return NULL;
 }

@@ -1,5 +1,5 @@
-// GameMode6.c (our name): game mode 6, a two-player mode that runs on the shared head-to-head code
-// after mode 8's setup (0x800F986C on). Only the setup is here.
+// GameMode6.c (our name): game mode 6, a two-player mode on GameMode8.c's callbacks (from mode 8's
+// setup 0x800F986C on; pfn1E4 is GameMode7.c's fn_800F9824). Only the setup is here.
 
 #include "golfer.h"
 #include "game.h"

@@ -112,7 +112,7 @@ void fn_800AA744(AudSeqEvent* pEvent, AudTrack* pTrack) {
     AudTrackTmpl* pTmpl;
     AudSeqTone* pTone;
     s16 nVolume;
-    u32 bLoops;
+    u8 bLoops;
     u8 nChannel;
     u8 i;
     AudVoice* pVoice;
@@ -124,7 +124,8 @@ void fn_800AA744(AudSeqEvent* pEvent, AudTrack* pTrack) {
     nVolume = fn_800A85FC((f32)(pEvent->n4 << 7),
                           fn_800A85FC(pTrack->f48, fn_800AA44C(pTmpl->data.pBank->n3)));
     bLoops = pTone->n10 & 1;
-    if (nVolume == 0 || pTone == NULL) return;
+    if (nVolume == 0) return;
+    if (pTone == NULL) return;
     nChannel = pTrack->u.seq.n65;
     request.n4 = bLoops != 0;
     if (!fn_800AB374() && pTrack->pSource->nSound == 1 && pTrack->nChannel == 0) {
@@ -135,7 +136,7 @@ void fn_800AA744(AudSeqEvent* pEvent, AudTrack* pTrack) {
         if (pVoice == NULL) {
             if (pTrack->u.seq.apEvents[nChannel] == NULL) break;
         } else if (request.n4 > pVoice->n10 || pVoice->n10 == 0) {
-            fn_800ACB28(pVoice);
+            Voc_Delete(pVoice);
             pTrack->u.seq.apEvents[nChannel] = NULL;
             pTrack->apVoices[nChannel] = NULL;
             pTrack->n5D--;
@@ -159,13 +160,13 @@ void fn_800AA744(AudSeqEvent* pEvent, AudTrack* pTrack) {
     request.flags.b.b9 = bLoops;
     request.n2 = 0x40;
     request.n3 = 0x7F;
-    pVoice = fn_800AC4A0(&request);
+    pVoice = Voc_Alloc(&request);
     if (pVoice == NULL) return;
     pVoice->pTone = pTone;
     if (pParams->flags.b.bPitch) {
         f = pParams->fPitch;
     }
-    fn_800AC6D0(pVoice, pParams, pEvent->n4, f);
+    Voc_Start(pVoice, pParams, pEvent->n4, f);
     pTrack->n5D++;
     pTrack->apVoices[nChannel] = pVoice;
     pTrack->u.seq.apEvents[nChannel] = pEvent;
@@ -197,7 +198,7 @@ void fn_800AA9EC(AudSeqEvent* pEvent, AudTrack* pTrack) {
         }
         pVoice = pTrack->apVoices[nChannel];
         if (pVoice != NULL && pVoice->pTone == pTone) {
-            fn_800ACA94(pVoice);
+            Voc_Stop(pVoice);
         }
     }
 }
@@ -494,7 +495,7 @@ void fn_800AB1B8(AudTrackTmpl* pTmpl) {
 
 u32 fn_800AB32C(u32 nRange) {
     if (nRange != 0) {
-        return Rand_Next(1) % nRange;
+        return Misc_RandFunc(1) % nRange;
     }
     return 0;
 }

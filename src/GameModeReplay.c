@@ -17,7 +17,7 @@ u8   GameModeReplay_HoleFinished(int nPlayer, u8 bCheck);
 u8   GameModeReplay_GameFinished(u8 bCheck);
 void GameModeReplay_EndGame(void);
 
-// Mode 10 starts: one player, no mulligans, the saved shot's hole.
+// Mode 10 starts: one player, no mulligans, no split screen; hole 0 of the round is made current.
 void GameModeReplay_Init(void) {
     gpGame->pfnInit = GameModeReplay_Init;
     gpGame->pfnSetupNextGolfer = GameModeReplay_SetupNextGolfer;
@@ -143,7 +143,7 @@ void GameModeReplay_SetupNextGolfer(void) {
     gReplayData.nWindSpeed = nWindSpeed;
     gReplayData.nF12 = nF12;
     gReplayData.nF14 = nF14;
-    fn_8000B1D4(0, nSeed);
+    Misc_SetSeedFunc(0, nSeed);
     GOLFERSTATE_Switch(1, 0);
 }
 

@@ -19,7 +19,7 @@ u8   GameModeFourBall_GoToPlayoff(u8 bCheck);
 void GameModeFourBall_EndHole(void);
 void GameModeFourBall_EndGame(void);
 
-// Four players; the CPU may concede.
+// The CPU may concede; no mulligans, and split screen is turned off.
 void GameModeFourBall_Init(void) {
     gpGame->pfnInit = GameModeFourBall_Init;
     gpGame->pfnSetupNextGolfer = fn_800E90FC;
@@ -140,7 +140,7 @@ int GameModeFourBall_TeamMatchWins(int nTeam) {
     return gPlayers[a].nHolesWon;
 }
 
-// The hole starts: the first golfer to play gets ready, the others wait.
+// The golfer pfnGetHonors picks (nobody excluded) gets ready to play; the others wait.
 void fn_800E90FC(void) {
     int i;
     lbl_80282278 = gpGame->pfnGetHonors(5);
@@ -153,9 +153,9 @@ void fn_800E90FC(void) {
     }
 }
 
-// On the tee the team that won the last decided hole, and (on
-// team 0 only) the better score of the pair; otherwise the player farthest from the pin (off the
-// green first) whose team is still playing.
+// On the tee the team that won the last decided hole, and within that team only the better
+// score of the pair; otherwise the player farthest from the pin (off the green first) whose team
+// is still playing.
 s32 GameModeFourBall_GetHonors(int nPlayer) {
     s32 aOrder[4] = {0, 1, 2, 3};  // the tee order before anyone has won a hole
     s32* pOrder;        // fake match: the within-team compare reads aOrder through a pointer
@@ -326,7 +326,7 @@ u8 GameModeFourBall_GameFinished(u8 bCheck) {
             gpGame->nD8++;
             fn_800E2BA4();
             CLEAR_ROUNDS(PLAYER_AT);
-            fn_800E45C0();
+            GUI_GolfersTiedUIMessage();
         }
     } else {
         nLeft = 0;
@@ -370,7 +370,7 @@ u8 GameModeFourBall_GoToPlayoff(u8 bCheck) {
         CLEAR_ROUNDS(PLAYER);
         gpGame->bD4 = 1;
         gpGame->nD8++;
-        fn_800E45C0();
+        GUI_GolfersTiedUIMessage();
         return 1;
     }
     return 0;

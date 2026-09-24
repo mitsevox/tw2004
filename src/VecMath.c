@@ -167,12 +167,12 @@ void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows) {
 // r = frsqrte(s); r = 0.5 * r * (3 - s * r * r).
 
 #ifdef __MWERKS__
-static const f32 kVecEpsilon = 1.0f / 1073741824.0f;   // 2^-30: shorter than this is not scaled
+static const f32 kVecEpsilon = 1.0f / 1073741824.0f;   // no scaling when length^2 <= 2^-30
 static const f32 kHalf = 0.5f;
 static const f32 kThree = 3.0f;
 static const f32 kZero = 0.0f;
 
-// Normalise a four-float vector (a quaternion) from pSrc into pDst; a near-zero one is copied.
+// Normalise a four-float vector from pSrc into pDst; a near-zero one is copied.
 asm void Vec_Normalize(register f32* pSrc, register f32* pDst) {
     nofralloc
     psq_l    f3, 0(pSrc), 0, 0

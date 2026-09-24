@@ -31,7 +31,7 @@ void  GM_CheckBallForUIHints(int nPlayer);
 u8    fn_8008AC40(void);
 void  fn_800D9350(int nPlayer);
 void  fn_800BB0A8(void);
-void  fn_8006C4C0(int nPlayer);
+void  REPLAY_Restore(int nPlayer);
 
 u8    GM_bIsZoomButtonPressed(int nPlayer);
 u8    GM_bIsElevatorCamButtonPressed(int nPlayer);
@@ -260,7 +260,7 @@ void GM_EndOfGolferTurn_GameFinished(int nPlayer) {
         }
         GOLFERSTATE_Set(GS_WAIT, nPlayer);
         nView = gPlayers[nPlayer].nView[0];
-        View_SetCamera(fn_80017028(nView), 0x11, nPlayer, nView);
+        CameraController_SetCameraMode(fn_80017028(nView), 0x11, nPlayer, nView);
         return;
     }
     gSession.b12 = 1;
@@ -279,7 +279,7 @@ void GM_HoleFinished_GameNotFinished(int nPlayer) {
     }
     GOLFERSTATE_Set(GS_WAIT, nPlayer);
     nView = gPlayers[nPlayer].nView[0];
-    View_SetCamera(fn_80017028(nView), 0x11, nPlayer, nView);
+    CameraController_SetCameraMode(fn_80017028(nView), 0x11, nPlayer, nView);
     fn_800E3D90();
 }
 
@@ -546,7 +546,7 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     fn_800E4204();
     fn_800335F8(1);
     fn_800A76E4();
-    fn_8006C4C0(nPlayer);
+    REPLAY_Restore(nPlayer);
     gPlayers[nPlayer].bC2E = 1;
     gPlayers[nPlayer].bC2F = 1;
     gpGame->pfn254(nPlayer);
@@ -569,11 +569,11 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     return 1;
 }
 
-// Whether to play the pre-shot routine (our reading; TW06's name for this one is not certain).
+// Whether to play the pre-shot animation.
 // The mode's setting 0x290: 0 never, 1 always; otherwise always off the tee, never with clubs 0-8
 // (the drivers and woods) from elsewhere, never with an obstruction nearby, else 85% of the time.
 // On course 18, hole 10, not within 40 yards of the tee.
-int fn_800DDFB4(int nPlayer) {
+int GM_DoPreshotAnimation(int nPlayer) {
     f32 v[4];
     if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
         return gPlayers[nPlayer].ball.nLie == 0;
@@ -601,7 +601,7 @@ int fn_800DDFB4(int nPlayer) {
                                             0.577f)) {
         return 0;
     }
-    return (Rand_Next(1) % 100) < 85;
+    return (Misc_RandFunc(1) % 100) < 85;
 }
 
 // TW06: GM_ShowPostShotAnimation. Whether the golfer plays a reaction after the shot. Never when
@@ -701,21 +701,21 @@ int GM_ShowPostShotAnimation(int nPlayer) {
     }
     if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
         switch (nResult) {
-        case 0:  return Rand_Next(1) % 100 < 80;
-        case 1:  return Rand_Next(1) % 100 < 100;
+        case 0:  return Misc_RandFunc(1) % 100 < 80;
+        case 1:  return Misc_RandFunc(1) % 100 < 100;
         case 2:  return 1;
-        case 3:  return Rand_Next(1) % 100 < 70;
-        case 4:  return Rand_Next(1) % 100 < 90;
-        default: return Rand_Next(1) % 100 < 50;
+        case 3:  return Misc_RandFunc(1) % 100 < 70;
+        case 4:  return Misc_RandFunc(1) % 100 < 90;
+        default: return Misc_RandFunc(1) % 100 < 50;
         }
     } else {
         switch (fn_8006AA9C(nPlayer)) {
-        case 0:  return Rand_Next(1) % 100 < 35;
-        case 1:  return Rand_Next(1) % 100 < 100;
+        case 0:  return Misc_RandFunc(1) % 100 < 35;
+        case 1:  return Misc_RandFunc(1) % 100 < 100;
         case 2:  return 1;
-        case 3:  return Rand_Next(1) % 100 < 70;
-        case 4:  return Rand_Next(1) % 100 < 90;
-        default: return Rand_Next(1) % 100 < 50;
+        case 3:  return Misc_RandFunc(1) % 100 < 70;
+        case 4:  return Misc_RandFunc(1) % 100 < 90;
+        default: return Misc_RandFunc(1) % 100 < 50;
         }
     }
 }
@@ -982,7 +982,7 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
         fn_80062B78(nPlayer);
         fn_80062B74(nPlayer);
         fn_80062B70();
-        fn_80063BF4(pView, lbl_80281F78->f170, vOffset);
+        CameraController_FadeOut(pView, lbl_80281F78->f170, vOffset);
         return;
     }
     if (Player_IsNotCPU(nPlayer) && gSession.nSplitScreen == 0) {
@@ -997,7 +997,7 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
             gpGame->b287 && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED && !fn_800E53B8() &&
             !(gPlayers[nPlayer].pChar->u10 & 0x40)) {
             fn_80062D0C(nPlayer);
-            fn_8006C300(nPlayer);
+            REPLAY_Play(nPlayer);
             GOLFERSTATE_Switch(GS_REPLAY_SWING, nPlayer);
             return;
         }
@@ -1057,10 +1057,10 @@ int GM_ChooseRemoveBallState(int nPlayer) {
         return (gPlayers[nPlayer].uFlags >> 1) & 1;
     }
     if (fn_800D2B08() - gPlayers[nPlayer].nStrokes[gpGame->nCurHole] > 1) {
-        if (Rand_Next(1) % 10 == 0) {
+        if (Misc_RandFunc(1) % 10 == 0) {
             return 1;
         }
-    } else if (!(Rand_Next(1) & 3)) {
+    } else if (!(Misc_RandFunc(1) & 3)) {
         return 1;
     }
     return 0;
@@ -1141,7 +1141,7 @@ void GM_SimulateBallMovement(int nPlayer) {
                         fDist - gPlayers[nPlayer].ball.fClosest < 0.3f) {
                         if (gPlayers[nPlayer].ballBefore.nLie == LIE_INCUP_e &&
                             Hole_ScoreAfterTapIn(nPlayer) <= 0) {
-                            if (Rand_Next(1) % 100 < 50) {
+                            if (Misc_RandFunc(1) % 100 < 50) {
                                 gPlayers[nPlayer].uFlags |= 4;
                                 gPlayers[nPlayer].fEEC = fDist;
                                 fn_80095744(gPlayers[nPlayer].pChar, 9);
@@ -1161,7 +1161,7 @@ void GM_SimulateBallMovement(int nPlayer) {
 }
 
 // TW06: GM_CheckControllerPulled (by position). When the mode's pfn234 says yes and player
-// 0's view is not on camera 1, 2 or 4, calls fn_800E5228 (an empty function).
+// 0's view is not in colour fade state 1, 2 or 4, calls fn_800E5228 (an empty function).
 void fn_800DFC18(void) {
     if (gpGame->pfn234()) {
         if (!fn_80063C90(fn_80017028(gPlayers[0].nView[0]))) {

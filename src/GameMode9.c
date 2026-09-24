@@ -1,12 +1,12 @@
-// GameMode9.c (our name): game mode 9, one player playing holes with no opponent and a restart
-// option; probably TW06's GameModePractice. It borrows mode 0's GetHonors and GoToPlayoff
+// GameMode9.c (our name): game mode 9, one player playing holes with no opponent, who can end a
+// hole early; probably TW06's GameModePractice. It borrows mode 0's GetHonors and GoToPlayoff
 // (GameModeStroke_GetHonors, fn_800FFDB0).
 
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
 
-extern u8 lbl_80282330;                     // the hole is being restarted
+extern u8 lbl_80282330;                     // the hole was ended early (fn_800ED974)
 
 void fn_800ED890(void);
 void fn_800ED8B8(void);
@@ -19,7 +19,8 @@ void fn_800EDA08(void);
 void fn_800EDA34(int nPlayer);
 void fn_800EDA74(void);
 
-// Mode 9 starts: one player, any number of mulligans, no gimmes, no GameBreakers.
+// Mode 9 starts on the round's first hole: any number of mulligans, no gimmes, no stroke limit
+// and no fly-by.
 void fn_800ED738(void) {
     gpGame->pfnInit = fn_800ED738;
     gpGame->pfnSetupNextGolfer = fn_800ED8E0;
@@ -71,7 +72,7 @@ u8 fn_800ED900(void) {
     return lbl_80282330;
 }
 
-// Hole finished: on a restart, or once every player has holed out.
+// Hole finished: when ended early (fn_800ED974), or once every player has holed out.
 u8 fn_800ED908(int nPlayer, u8 bCheck) {
     int i;
     if (fn_800ED900()) {
@@ -85,7 +86,7 @@ u8 fn_800ED908(int nPlayer, u8 bCheck) {
     return 1;
 }
 
-// Restart the hole (from the pause menu).
+// End the hole early (a GameUICommands command, from the pause menu).
 void fn_800ED974(void) {
     lbl_80282330 = 1;
     GM_EndOfGolferTurn(0);
@@ -106,13 +107,13 @@ u8 fn_800ED9AC(u8 bCheck) {
     return 1;
 }
 
-// Game over: the end-of-hole screen.
+// Game over: counted as won (EASBio), then the end-of-round screen.
 void fn_800EDA08(void) {
     EASBio_SetCurrentGameWon(1);
     fn_800E4D94(0);
 }
 
-// The hole is over: after a restart the game unpauses; otherwise the end-of-round screen.
+// The hole is over: if ended early, unpause and move on (fn_800E3EE0); else the end-of-hole screen.
 void fn_800EDA34(int nPlayer) {
     if (fn_800ED900()) {
         fn_800E4D88();
@@ -127,7 +128,7 @@ void fn_800EDA34(int nPlayer) {
 void fn_800EDA74(void) {
     f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     GOLFERSTATE_Set(GS_PLACE_BALL, 0);
-    fn_80063B98(fn_80017028(gPlayers[0].nView[0]), 0.5f, v);
+    CameraController_FadeIn(fn_80017028(gPlayers[0].nView[0]), 0.5f, v);
 }
 
 // The pad's sticks (beyond the 96..160 dead zone) scaled to -1..1 into the player's fA7C..fA84.

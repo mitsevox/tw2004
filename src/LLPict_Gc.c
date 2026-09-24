@@ -38,19 +38,19 @@ void fn_8002F540(void) {
 // fn_8002F898 in place: each band of four rows is copied to pWork first and tiled back from there.
 // The first 8 bytes are already where they belong.
 void fn_8002F56C(u8* pPlane, void* pWork, int nWidth, int nHeight) {
-    int nRow = nWidth * 4;      // a band of four rows
     int i;
     int y;
     int nOff;
 
     for (y = 0; y < nHeight; y += 4) {
-        memcpy(pWork, pPlane, nRow);
+        // a band of four rows: nWidth words
+        memcpy(pWork, pPlane, nWidth * sizeof(u32));
         for (i = 1; i < nWidth / 2; i++) {
             nOff = (i / 4) * 2 + (nWidth / 4) * (i % 4);
             ((u32*)pPlane)[i * 2] = ((u32*)pWork)[nOff];
             ((u32*)pPlane)[i * 2 + 1] = ((u32*)pWork)[nOff + 1];
         }
-        pPlane += nRow;
+        pPlane += nWidth * sizeof(u32);
     }
 }
 
