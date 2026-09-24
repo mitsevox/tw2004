@@ -439,21 +439,9 @@ static inline f32 Ball_Clamp(f32 x, f32 fLo, f32 fHi) {
             EVENT_Trigger((pBall)->nPlayer, 0x23, (pBall), !gSimulating);                            \
         }                                                                                          \
     } else if ((pBall)->nCollideCount == 0) {                                                                \
-        int     nOwner;                                                                            \
-        Player* pP = gPlayers;                                                                     \
-        nOwner = 0;                                                                                \
-        if ((pBall) != &pP[0].ballBefore) {                                                        \
-            nOwner = 1;                                                                            \
-            if ((pBall) != &pP[1].ballBefore) {                                                    \
-                nOwner = 2;                                                                        \
-                if ((pBall) != &pP[2].ballBefore) {                                                \
-                    nOwner = 3;                                                                    \
-                    if ((pBall) != &pP[3].ballBefore) {                                            \
-                        nOwner = 4;                                                                \
-                        if ((pBall) != &pP[4].ballBefore) nOwner = 5;                              \
-                    }                                                                              \
-                }                                                                                  \
-            }                                                                                      \
+        int nOwner;                                                                                \
+        for (nOwner = 0; nOwner < 5; nOwner++) {                                                   \
+            if ((pBall) == &PLAYER(nOwner)->ballBefore) break;                                     \
         }                                                                                          \
         EVENT_Trigger(nOwner, 0x49, (pBall), 1);                                                     \
     }

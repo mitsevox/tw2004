@@ -36,7 +36,7 @@ static GXColor lbl_801869C0[3][16] = {
     },
 };
 
-void fn_80012444(f32* pViewport);
+void fn_80012444(const f32* pViewport);
 void fn_8001247C(s32 eDst, s32 eFunc, s32 eSrc, s32 nMtx);
 u32 fn_8001208C(UFontContext* pCtx, u8 r, u8 g, u8 b, u8 a, f32 fXScale, f32 fYScale, f32 fX,
                 f32 fY);
@@ -790,7 +790,7 @@ void fn_80012438(LLFont* pFont) {
     pFont->n474 = 0;
 }
 
-void fn_80012444(f32* pViewport) {
+void fn_80012444(const f32* pViewport) {
     GXSetViewport(pViewport[0], pViewport[1], pViewport[2], pViewport[3], pViewport[4], pViewport[5]);
 }
 

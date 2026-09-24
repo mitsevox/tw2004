@@ -82,6 +82,9 @@ UMemPool.c:
 
 urandom.c:
 	.text       start:0x8000B130 end:0x8000B46C
+	.bss        start:0x801A24B8 end:0x801A25B8
+	.sbss       start:0x80281BE0 end:0x80281BF0
+	.sdata2     start:0x80282AE0 end:0x80282AF0
 
 ObjList.c:
 	.text       start:0x8000B46C end:0x8000B884
@@ -205,6 +208,7 @@ unsorted/sweep_80045D5C.c:
 
 UObject3D.c:
 	.text       start:0x80045D80 end:0x80045E3C
+	.data       start:0x80187B88 end:0x80187B98
 
 unsorted/sweep_80045E3C.c:
 	.text       start:0x80045E3C end:0x80045EC0
@@ -242,6 +246,7 @@ GoDynObjBase.c:
 
 GoAnimalActors.c:
 	.text       start:0x80049B40 end:0x8004ABBC
+	.sdata2     start:0x80283218 end:0x80283280
 
 GoDynObjTypes.c:
 	.text       start:0x8004ABBC end:0x8004AFA0

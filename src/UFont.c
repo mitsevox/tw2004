@@ -315,20 +315,11 @@ s32 fn_80012E4C(LLFont* pFont) {
 }
 
 // A colour of four 0-1 floats as four bytes.
-void fn_80012E54(f32* pColor, u8* pOut) {
-    f32 fR;
-    f32 fG;
-    f32 fB;
-    f32 fA;
-
-    fR = 255.0f * pColor[0];
-    fG = 255.0f * pColor[1];
-    fB = 255.0f * pColor[2];
-    fA = 255.0f * pColor[3];
-    pOut[0] = fR;
-    pOut[1] = fG;
-    pOut[2] = fB;
-    pOut[3] = fA;
+void fn_80012E54(const f32* pColor, u8* pOut) {
+    pOut[0] = (int)(255.0f * pColor[0]);
+    pOut[1] = (int)(255.0f * pColor[1]);
+    pOut[2] = (int)(255.0f * pColor[2]);
+    pOut[3] = (int)(255.0f * pColor[3]);
 }
 
 UFontContext* fn_80012EC4(void) {

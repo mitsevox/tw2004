@@ -70,8 +70,7 @@ u32 fn_8000B264(void) {
     u32 uSeed;
 
     OSTicksToCalendarTime(OSGetTime(), &time);
-    uSeed = time.nSec + time.nMin + time.nHour;
-    uSeed += 10;
+    uSeed = 10 + time.nSec + time.nMin + time.nHour;
     uSeed ^= fn_8000B3E8();
     return uSeed;
 }
