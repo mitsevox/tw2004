@@ -7,6 +7,7 @@
 
 #include "engine.h"
 #include "camera.h"
+#include "unsorted/cull.h"
 #include "gx.h"
 
 // One word of the grass vertex buffer. A vertex is four words: x, y, z, then four bytes: n374 at
@@ -86,7 +87,9 @@ typedef struct GrassFileHeader {
 
 typedef struct GrassTile {
     s32 n0;                     // 0x0  its buffer needs (n0 * 32 + 0x580) / 16 vertices (fn_8011F544)
-    u8  unk4[0x10 - 0x4];
+    f32 f4;                     // 0x4  } heights: the cell's bounding sphere spans f4 to f8 + f3B8
+    f32 f8;                     // 0x8  } (fn_8011F7F8)
+    u8  unkC[0x10 - 0xC];
     u32 u10;                    // 0x10  } offsets from the file's start (after its first 16 bytes),
     u32 u14;                    // 0x14  } made into addresses on load
 } GrassTile;
@@ -219,6 +222,11 @@ extern GrassManager* lbl_80281900;
 extern s32 lbl_80282514;        // cleared when the grass is freed (fn_8011E3B4)
 extern void* lbl_80282510;      // the grass's 256x256 texture buffer (fn_8011EB80)
 extern GXTexObj lbl_8026038C;   // its texture
+
+// The render object fn_8011F7F8 culls each grass cell with: its bounding sphere is set to the
+// cell's before the test.
+extern RenderObj     lbl_80260360;
+extern RenderObjData lbl_802602C0;
 
 // GoGrass.c's draw data (not in C yet).
 extern char lbl_80194598[4][8]; // the grass textures' names, "akgrass1".."akgrass4" (by n3A4)

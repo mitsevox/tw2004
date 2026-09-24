@@ -24,6 +24,10 @@ void fn_8011F3AC(void);
 void fn_800082CC(void* p);
 void fn_8000827C(void* pObject, int n24, int nType, void* pArg);
 void fn_8011F544(int nX, int nZ, f32 f);
+f32 fn_80120244(f32 fX, f32 fM);
+void fn_80120268(f32* pA, f32* pB, f32* pOut);
+Sphere* fn_8012028C(RenderObj* pObj);
+int fn_80007CE8(RenderObj* pObj, Camera* pCamera, int nMode, f32 fScale);   // LLObj_Gc.c
 void fn_8003519C(int nRow, void* pData);   // GoTerrain.c: calls row nRow's function with pData
 void fn_8011E974(void);
 void fn_8011EAB8(void);
@@ -600,6 +604,116 @@ void fn_8011F544(int nX, int nZ, f32 f) {
     }
 }
 
+// Builds the other list of grass buffers for this frame: every grid cell within f3E8 of the point
+// f3EC ahead of the camera (snapped to the 2.5 grid) whose bounding sphere is in view gets placed
+// (fn_8011F544), the list is sorted, and the old list's buffers not placed again are freed.
+void fn_8011F7F8(void) {
+    f32 vFlat[4];
+    f32 vLook[4];
+    f32 vAhead[4];
+    f32 vPos[4];
+    f32 vCentre[4];
+    f32 vSphere[4];
+    CamLens* pLens;
+    Sphere* pSphere;
+    GrassTile* pTile;
+    s32 nOther;
+    int nRadius;
+    int nCellX;
+    int nCellZ;
+    int nX;
+    int nZ;
+    int i;
+    int nCull;
+    f32 fX;
+    f32 fZ;
+    f32 fCellX;
+
+    pLens = fn_8001F004();
+    lbl_80281900->n100 = 1 - lbl_80281900->n100;
+    lbl_80281900->anF8[lbl_80281900->n100] = 0;
+    nOther = 1 - lbl_80281900->n100;
+    lbl_80281900->fMinX = 10000.0f;
+    lbl_80281900->fMaxX = -10000.0f;
+    lbl_80281900->fMinZ = 10000.0f;
+    lbl_80281900->fMaxZ = -10000.0f;
+    for (i = 0; i < lbl_80281900->anF8[nOther]; i++) {
+        lbl_80281900->apF0[nOther][i]->b10 = 0;
+    }
+    lbl_80281900->n404 = 0;
+    lbl_80281900->n408 = 0;
+    nRadius = 1.0f + lbl_80281900->f3E8 / 2.5f;
+    Vec3Copy(pLens->v24, vLook);
+    Vec3Copy(vLook, vFlat);
+    if (vLook[0] != 0.0f || vLook[1] != 0.0f || vLook[2] != 0.0f) {
+        fn_800BAF04(vLook, vLook);
+    }
+    lbl_80281900->f3F8 =
+        (vLook[1] - lbl_80281900->f400) / (lbl_80281900->f3FC - lbl_80281900->f400);
+    if (lbl_80281900->f3F8 < 0.0f) {
+        lbl_80281900->f3F8 = 0.0f;
+    }
+    if (lbl_80281900->f3F8 > 1.0f) {
+        lbl_80281900->f3F8 = 1.0f;
+    }
+    vFlat[1] = 0.0f;
+    if (vFlat[0] != 0.0f || vFlat[1] != 0.0f || vFlat[2] != 0.0f) {
+        fn_800BAF04(vFlat, vFlat);
+    }
+    Vec_Copy(pLens->v34, vPos);
+    fn_8000AE28(vFlat, lbl_80281900->f3EC, vAhead);
+    fn_80120268(vAhead, vPos, vCentre);
+    if (vCentre[0] < 0.0f) {
+        fX = vCentre[0] - (2.5f - (f32)fabs(fn_80120244(vCentre[0], 2.5f)));
+    } else {
+        fX = vCentre[0] - (f32)fabs(fn_80120244(vCentre[0], 2.5f));
+    }
+    if (vCentre[2] < 0.0f) {
+        fZ = vCentre[2] - (2.5f - (f32)fabs(fn_80120244(vCentre[2], 2.5f)));
+    } else {
+        fZ = vCentre[2] - (f32)fabs(fn_80120244(vCentre[2], 2.5f));
+    }
+    nCellX = (fX - (f32)lbl_80281900->n14) / 2.5f;
+    nCellZ = (fZ - (f32)lbl_80281900->n16) / 2.5f;
+    lbl_80260360.data = &lbl_802602C0;
+    pSphere = fn_8012028C(&lbl_80260360);
+    for (nX = nCellX - nRadius; nX < nCellX + nRadius; nX++) {
+        fCellX = 2.5f * (f32)nX;
+        for (nZ = nCellZ - nRadius; nZ < nCellZ + nRadius; nZ++) {
+            if (nX < 0 || nX >= lbl_80281900->n18 || nZ < 0 || nZ >= lbl_80281900->n1A) {
+                continue;
+            }
+            if (lbl_80281900->p8[nX + nZ * lbl_80281900->n18] == -1) {
+                continue;
+            }
+            pTile = &lbl_80281900->pC[lbl_80281900->p8[nX + nZ * lbl_80281900->n18]];
+            // the cell's sphere: its centre, and the radius over half its height and the
+            // 1.25 x 1.25 half cell
+            pSphere->radius = fn_80009680(
+                3.125f + (0.5f * (pTile->f8 + lbl_80281900->f3B8 - pTile->f4)) *
+                             (0.5f * (pTile->f8 + lbl_80281900->f3B8 - pTile->f4)));
+            pSphere->x = 1.25f + ((f32)lbl_80281900->n14 + fCellX);
+            pSphere->y = 0.5f * (lbl_80281900->f3B8 + (pTile->f4 + pTile->f8));
+            pSphere->z = 1.25f + (2.5f * (f32)nZ + (f32)lbl_80281900->n16);
+            nCull = fn_80007CE8(&lbl_80260360, fn_8001614C(),
+                                0, fn_80017028(lbl_801D3CB0.iCurrentViewContext)->f54);
+            if (nCull == 2) {
+                continue;
+            }
+            Vec3Copy(&pSphere->x, vSphere);
+            fn_8011F544(nX, nZ, fn_800BB028(vSphere, vPos));
+        }
+    }
+    // port: fn_8011E6B0 compares two GrassBuffer pointers' f8 (the larger first)
+    qsort(lbl_80281900->apF0[lbl_80281900->n100], lbl_80281900->anF8[lbl_80281900->n100], 4,
+          (s32 (*)(const void*, const void*))fn_8011E6B0);
+    for (i = 0; i < lbl_80281900->anF8[nOther]; i++) {
+        if (lbl_80281900->apF0[nOther][i]->b10 == 0) {
+            fn_8011FDC4(lbl_80281900->apF0[nOther][i]);
+        }
+    }
+}
+
 // Puts pBuffer in the first free one of the 16 apDC slots.
 void fn_8011FD74(GrassBuffer* pBuffer) {
     int i;
@@ -705,9 +819,6 @@ void fn_80120194(void) {
 }
 
 s32 fn_8012022C(void);
-f32 fn_80120244(f32 fX, f32 fM);
-void fn_80120268(f32* pA, f32* pB, f32* pOut);
-s32 fn_8012028C(u8* p0);
 
 s32 fn_8012022C(void) {
     return lbl_80281900->p370 != NULL;
@@ -741,8 +852,9 @@ void fn_80120268(f32* pA, f32* pB, f32* pOut) {
 }
 #endif
 
-s32 fn_8012028C(u8* p0) {
-    return (*(s32*)p0 + 88);
+// The object's bounding sphere.
+Sphere* fn_8012028C(RenderObj* pObj) {
+    return &pObj->data->bounds;
 }
 
 // ---- end of sweep code ----
