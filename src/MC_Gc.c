@@ -15,6 +15,7 @@ void fn_8009DC80(s32 nPort, s32 nSlot, s32 nResult);
 void fn_8009DCE8(void);
 void fn_8009EB30(UStreamObject* pObject);
 void fn_8009EB38(UStreamObject* pObject);
+void fn_8009EB40(s32 nPort, s32 nSlot);
 s32  fn_8009ED34(s32 nPort, s32 nSlot, const char* pName, const char* pBackupName);
 s32  fn_8009EECC(s32 nPort, s32 nSlot, const char* pName);
 s32  fn_80125194(s32 a, s32 b);         // EA Sports Bio (0x80125194)
@@ -88,6 +89,40 @@ void fn_8009CD7C(void) {
 
 void fn_8009CD80(s32 nPort, s32 nSlot) {
     fn_8009DCEC(nPort, nSlot);
+}
+
+// Rename file pOldName on the card to pNewName.
+s32 fn_8009CDA0(s32 nPort, s32 nSlot, const char* pOldName, const char* pNewName) {
+    s32 nChan = nPort;
+    s32 nResult;
+    CARDRenameAsync(nChan, pOldName, pNewName, NULL);
+    while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
+        fn_8009EB40(nPort, nSlot);
+        fn_8006C63C();
+        fn_800A4BDC();
+    }
+    switch (nResult) {
+    case CARD_RESULT_FATAL_ERROR:
+        return MC_ERR_FATAL;
+    case CARD_RESULT_NOCARD:
+        lbl_801F1510[nPort][nSlot].uFlags &= ~MC_CARD_PRESENT;
+        return MC_ERR_NOCARD;
+    case CARD_RESULT_NOFILE:
+        return MC_ERR_NOFILE;
+    case CARD_RESULT_NOPERM:
+        return MC_ERR_NOPERM;
+    case CARD_RESULT_EXIST:
+        return MC_ERR_EXIST;
+    case CARD_RESULT_NAMETOOLONG:
+        return MC_ERR_NAMETOOLONG;
+    case CARD_RESULT_IOERROR:
+        lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_IOERROR;
+        return MC_ERR_IOERROR;
+    default:
+        return MC_ERR_UNKNOWN;
+    case CARD_RESULT_READY:
+        return 0;
+    }
 }
 
 // Open file pName on the card into pFile.
@@ -294,6 +329,73 @@ s32 fn_8009DD44(s32 nPort, s32 nSlot, const char* pName) {
     return fn_8009D6CC(nPort, nSlot);
 }
 
+// Create file pName of uSize bytes on the card, open in pFile.
+s32 fn_8009DFD8(s32 nPort, s32 nSlot, const char* pName, u32 uSize, CARDFileInfo* pFile) {
+    s32 nResult;
+    CARDCreateAsync(nPort, pName, uSize, pFile, NULL);
+    while ((nResult = CARDGetResultCode(nPort)) == CARD_RESULT_BUSY) {
+        fn_800A4BDC();
+        fn_8009EB40(nPort, nSlot);
+        fn_8006C63C();
+    }
+    switch (nResult) {
+    case CARD_RESULT_FATAL_ERROR:
+        return MC_ERR_FATAL;
+    case CARD_RESULT_NOCARD:
+        lbl_801F1510[nPort][nSlot].uFlags &= ~MC_CARD_PRESENT;
+        return MC_ERR_NOCARD;
+    case CARD_RESULT_EXIST:
+        return MC_ERR_EXIST;
+    case CARD_RESULT_NOENT:
+        return MC_ERR_NOENT;
+    case CARD_RESULT_INSSPACE:
+        return MC_ERR_INSSPACE;
+    case CARD_RESULT_NAMETOOLONG:
+        return MC_ERR_NAMETOOLONG;
+    case CARD_RESULT_IOERROR:
+        lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_IOERROR;
+        return MC_ERR_IOERROR;
+    default:
+        return MC_ERR_UNKNOWN;
+    case CARD_RESULT_READY:
+        return 0;
+    }
+}
+
+// Write nLen bytes from pBuf to open file pFile at nOffset.
+s32 fn_8009E130(s32 nPort, s32 nSlot, CARDFileInfo* pFile, const void* pBuf, s32 nLen, s32 nOffset) {
+    s32 nChan = nPort;
+    s32 nResult;
+    CARDWriteAsync(pFile, pBuf, nLen, nOffset, NULL);
+    while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
+        fn_800A4BDC();
+        fn_8009EB40(nPort, nSlot);
+        fn_8006C63C();
+    }
+    switch (nResult) {
+    case CARD_RESULT_FATAL_ERROR:
+        return MC_ERR_FATAL;
+    case CARD_RESULT_NOCARD:
+        lbl_801F1510[nPort][nSlot].uFlags &= ~MC_CARD_PRESENT;
+        return MC_ERR_NOCARD;
+    case CARD_RESULT_NOFILE:
+        return MC_ERR_NOFILE;
+    case CARD_RESULT_NOPERM:
+        return MC_ERR_NOPERM;
+    case CARD_RESULT_IOERROR:
+        lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_IOERROR;
+        return MC_ERR_IOERROR;
+    case CARD_RESULT_LIMIT:
+        return MC_ERR_LIMIT;
+    case CARD_RESULT_CANCELED:
+        return MC_ERR_CANCELED;
+    default:
+        return MC_ERR_UNKNOWN;
+    case CARD_RESULT_READY:
+        return 0;
+    }
+}
+
 // Read the directory entry of file nFile into pStat.
 s32 fn_8009E280(s32 nPort, s32 nSlot, s32 nFile, CARDStat* pStat) {
     s32 nResult;
@@ -317,6 +419,53 @@ s32 fn_8009E280(s32 nPort, s32 nSlot, s32 nFile, CARDStat* pStat) {
     case CARD_RESULT_READY:
         return 0;
     }
+}
+
+// Write pStat back as the directory entry of file nFile.
+s32 fn_8009E360(s32 nPort, s32 nSlot, s32 nFile, CARDStat* pStat) {
+    s32 nResult;
+    CARDSetStatus(nPort, nFile, pStat);
+    while ((nResult = CARDGetResultCode(nPort)) == CARD_RESULT_BUSY) {
+        fn_800A4BDC();
+        fn_8006C63C();
+    }
+    switch (nResult) {
+    case CARD_RESULT_FATAL_ERROR:
+        return MC_ERR_FATAL;
+    case CARD_RESULT_NOCARD:
+        lbl_801F1510[nPort][nSlot].uFlags &= ~MC_CARD_PRESENT;
+        return MC_ERR_NOCARD;
+    case CARD_RESULT_NOFILE:
+        return MC_ERR_NOFILE;
+    case CARD_RESULT_NOPERM:
+        return MC_ERR_NOPERM;
+    case CARD_RESULT_IOERROR:
+        lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_IOERROR;
+        return MC_ERR_IOERROR;
+    default:
+        return MC_ERR_UNKNOWN;
+    case CARD_RESULT_READY:
+        return 0;
+    }
+}
+
+// Describe the open file's banner and icon in its directory entry: the banner and icon images
+// start at 0x40 (SaveImage.aBanner), both in format 2, the icon shown at speed 3 and looping, and
+// the comment strings at the start.
+s32 fn_8009E47C(s32 nPort, s32 nSlot, CARDFileInfo* pFile) {
+    CARDStat stat;
+    s32 nFile = pFile->fileNo;
+    s32 nResult = fn_8009E280(nPort, nSlot, nFile, &stat);
+    if (nResult != 0) return nResult;
+    stat.commentAddr = 0;
+    stat.iconAddr = 0x40;
+    stat.bannerFormat = (stat.bannerFormat & ~3) | 2;
+    stat.iconFormat = (stat.iconFormat & ~3) | 2;
+    stat.iconSpeed = (stat.iconSpeed & ~3) | 3;
+    stat.bannerFormat &= ~4;
+    nResult = fn_8009E360(nPort, nSlot, nFile, &stat);
+    if (nResult != 0) return nResult;
+    return 0;
 }
 
 // Take the stream objects: the save file's icon ('MCI ') and banner ('MCB '), and MC.c's 'eagm'.

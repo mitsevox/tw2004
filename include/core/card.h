@@ -52,7 +52,14 @@ typedef struct CARDStat {
 } CARDStat;
 LAYOUT_ASSERT(CARDStat, 0x6C);
 
+// Called when an asynchronous operation ends, with the channel and the result.
+typedef void (*CARDCallback)(s32 nChan, s32 nResult);
+
 s32  CARDClose(CARDFileInfo* pFile);
+s32  CARDCreateAsync(s32 nChan, const char* pName, u32 uSize, CARDFileInfo* pFile, CARDCallback pfnCallback);
+s32  CARDGetResultCode(s32 nChan);
+s32  CARDRenameAsync(s32 nChan, const char* pOldName, const char* pNewName, CARDCallback pfnCallback);
+s32  CARDWriteAsync(CARDFileInfo* pFile, const void* pBuf, s32 nLen, s32 nOffset, CARDCallback pfnCallback);
 s32  CARDGetStatus(s32 nChan, s32 nFileNo, CARDStat* pStat);
 s32  CARDGetXferredBytes(s32 nChan);
 s32  CARDOpen(s32 nChan, const char* pName, CARDFileInfo* pFile);
