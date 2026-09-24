@@ -17,7 +17,7 @@ void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix fro
 f32  fn_800351D8(u32 n, f32 fPeriod);                   // GoTerrain.c
 
 void fn_80098BDC(PsEmitter* pEmitter);
-u32  fn_8009912C(PsEmitter* pEmitter, int n, f32 fTime, f32 f);  // not yet decompiled
+u32  fn_8009912C(PsEmitter* pEmitter, int n, f32 fStep, f32 fLiveStep);
 // Sort the list (next pointer in word n of each emitter?) by pfnCompare; not yet decompiled.
 PsEmitter* fn_80099C50(PsEmitter* pList, int n, int (*pfnCompare)(PsEmitter*, PsEmitter*));
 int  fn_80099E34(PsEmitter* pA, PsEmitter* pB);
@@ -222,6 +222,58 @@ void fn_800990BC(PsEmitter* pEmitter, int n, f32 f10, f32 fAgeSpread) {
     msg.u.emit.fAgeSpread = fAgeSpread;
     fn_80036100(&pEmitter->mesh, &msg, 1);
     pEmitter->n50 += n;
+}
+
+// Move the emitter on by fStep: age its particles, turn it by f4C, then emit what is due (a
+// timed burst with flag 0x10000 on the first pass; a stream while f44 runs, restarted each time
+// f48 runs out). Returns 1 when it has no live particles left and has emitted all it may (n54).
+// n is not used (fn_80099344 passes the emitter's n58).
+u32 fn_8009912C(PsEmitter* pEmitter, int n, f32 fStep, f32 fLiveStep) {
+    u32 nLive;
+    ParticleMsg msg;
+    u32 bEmpty;
+    f32 fLife;
+    f32 fCycles;
+    f32 fRate;
+    u32 nCount;
+
+    msg.nWhat = 0;
+    msg.pParams = &pEmitter->params;
+    bEmpty = 0;
+    msg.u.age.fCarried = fStep;
+    msg.u.age.fStep = fLiveStep;
+    msg.u.age.pnLive = &nLive;
+    fn_80036100(&pEmitter->mesh, &msg, 1);
+    if (nLive == 0) {
+        bEmpty = 1;
+    }
+    if (pEmitter->params.f4C != 0.0f) {
+        pEmitter->params.f40 += pEmitter->params.f4C * fStep;
+        fn_8000A194(pEmitter->mtx, pEmitter->params.f40, pEmitter->params.f44, pEmitter->params.f48);
+    }
+    if ((pEmitter->params.u58 & 0x10000) && pEmitter->n50 == 0) {
+        fLife = pEmitter->params.f4;
+        fCycles = fLife / (0.5f * pEmitter->params.f1C + pEmitter->params.f18);
+        fRate = (pEmitter->params.f20 <= 1.0f / 60.0f) ? 1.0f / 60.0f : pEmitter->params.f20;
+        nCount = pEmitter->params.u5C * (fCycles * (60.0f * fRate));
+        if (nCount != 0) {
+            fn_800990BC(pEmitter, nCount, fStep, fLife);
+            bEmpty = 0;
+        }
+    }
+    pEmitter->f48 -= fStep;
+    if (pEmitter->f48 < 0.0f) {
+        pEmitter->f48 += pEmitter->params.f1C * Rand_Float(1) + pEmitter->params.f18;
+        pEmitter->f44 = pEmitter->params.f20;
+    }
+    if (pEmitter->f44 >= 0.0f) {
+        pEmitter->f44 = pEmitter->f44 - fStep;
+        if (pEmitter->params.n54 < 0 || pEmitter->n50 < pEmitter->params.n54) {
+            fn_800990BC(pEmitter, pEmitter->params.u5C, fStep, 0.0f);
+            bEmpty = 0;
+        }
+    }
+    return bEmpty && pEmitter->params.n54 >= 0 && pEmitter->n50 >= pEmitter->params.n54;
 }
 
 // Move every emitter on the list on to fTime. One that fn_8009912C reports (flag 0x80000000) is

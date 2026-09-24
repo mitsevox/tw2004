@@ -43,7 +43,7 @@ typedef struct PsEmitter {
     f32  f44;                   // 0x44  -1 from fn_80099758
     f32  f48;                   // 0x48
     f32  f4C;                   // 0x4C  the last time fn_80099344 moved it on
-    s32  n50;                   // 0x50  fn_800A3DF4 sets 1000000
+    s32  n50;                   // 0x50  how many particles it has emitted; fn_800A3DF4 sets 1000000
     s32  n54;                   // 0x54  -1 from fn_80099758
     s32  n58;                   // 0x58  cleared by fn_80099B74; counted up by fn_80099344
     u8   b5C;                   // 0x5C  in use: set by fn_80099758, cleared by fn_80098BDC

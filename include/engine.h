@@ -508,9 +508,9 @@ typedef struct ParticleParams {
     f32  fC;                    // 0x0C  } a new particle's two values after its velocity:
     f32  f10;                   // 0x10  } fC (with flag 2 times a random -1..1), f10 (with flag 4
     f32  f14;                   // 0x14  } plus up to f14; fn_80098CDC)
-    f32  f18;                   // 0x18  at least 1/60 (fn_80099758)
-    u8   unk1C[4];
-    f32  f20;                   // 0x20
+    f32  f18;                   // 0x18  } at least 1/60 (fn_80099758); an emitter's f48 counts down
+    f32  f1C;                   // 0x1C  } from f18 plus up to f1C, then its f44 restarts at f20
+    f32  f20;                   // 0x20  } (fn_8009912C)
     f32  f24;                   // 0x24  the radius fn_80099AE4 tests an emitter with (over 1000: always);
                                 //       fn_80099758 works it out when f4 is not 0
     f32  f28;                   // 0x28  a new particle's speed (flag 8: plus up to f2C; fn_80098CDC)
@@ -523,7 +523,8 @@ typedef struct ParticleParams {
     f32  f40;                   // 0x40  } three angles fn_80099758 makes the emitter's matrix from;
     f32  f44;                   // 0x44  } f40 is written by fn_800A30E4
     f32  f48;                   // 0x48  }
-    u8   unk4C[0x54 - 0x4C];
+    f32  f4C;                   // 0x4C  added to f40 per unit of time (fn_8009912C)
+    u8   unk50[4];
     s32  n54;                   // 0x54  below 0 in an emitter: fn_80098BDC frees it
     u32  u58;                   // 0x58  flags; 0x80 and 0x100 pick the blend (fn_800949D0); in an
                                 //       emitter 0x80000000 marks it done (fn_80098C70, fn_80099344)
@@ -601,7 +602,7 @@ typedef struct ParticleMsg {
         struct {
             f32  fCarried;      // 0x08  added to the age of each particle carried over
             f32  fStep;         // 0x0C  added to the age of each live one
-            s32* pnLive;        // 0x10  gets how many are live after
+            u32* pnLive;        // 0x10  gets how many are live after
         } age;
         struct {
             f32 (*pMtx)[4];     // 0x08  the new particles' positions and velocities go through it
