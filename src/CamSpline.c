@@ -11,6 +11,101 @@ f32  fn_800C7970(f32 fA, f32 fB, f32 fC, f32 fD, f32 fE, f32 fF);
 f32  fn_800C79BC(f32* p0, f32* p1, f32* p2, f32* p3);
 void fn_800C8068(f32* pA, f32* pB, f32* pOut);
 
+// The splined camera: the camera position on the spline through pPos0..3, the look angles on the
+// one through pLook0..3 (each angle first unwrapped to within half a turn of the one before), and
+// the field of view between fFov1 and fFov2, at share fT between the middle two.
+void fn_800C7480(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3, f32* pLook0, f32* pLook1, f32* pLook2,
+                 f32* pLook3, f32* pCam, f32* pSub, f32* pFov, f32 fFov1, f32 fFov2, f32 fT) {
+    f32 aPoints[4][4];
+    Vec4 vT;
+    Vec4 vOut;
+    Vec4 vWeights;
+    Vec4 v1;
+    Vec4 v2;
+    Vec4 v3;
+    f32 fT2;
+
+    fT2 = fT * fT;
+    vT.x = 1.0f;
+    vT.y = fT;
+    vT.z = fT2;
+    vT.w = fT * fT2;
+    fn_800C7898(pPos0, pPos1, pPos2, pPos3, pCam, fT);
+
+    Vec3Copy(pLook1, &v1.x);
+    while (v1.x - pLook0[0] > PI) {
+        v1.x -= 2.0f * PI;
+    }
+    while (pLook0[0] - v1.x > PI) {
+        v1.x += 2.0f * PI;
+    }
+    while (v1.y - pLook0[1] > PI) {
+        v1.y -= 2.0f * PI;
+    }
+    while (pLook0[1] - v1.y > PI) {
+        v1.y += 2.0f * PI;
+    }
+    while (v1.z - pLook0[2] > PI) {
+        v1.z -= 2.0f * PI;
+    }
+    while (pLook0[2] - v1.z > PI) {
+        v1.z += 2.0f * PI;
+    }
+
+    Vec3Copy(pLook2, &v2.x);
+    while (v2.x - v1.x > PI) {
+        v2.x -= 2.0f * PI;
+    }
+    while (v1.x - v2.x > PI) {
+        v2.x += 2.0f * PI;
+    }
+    while (v2.y - v1.y > PI) {
+        v2.y -= 2.0f * PI;
+    }
+    while (v1.y - v2.y > PI) {
+        v2.y += 2.0f * PI;
+    }
+    while (v2.z - v1.z > PI) {
+        v2.z -= 2.0f * PI;
+    }
+    while (v1.z - v2.z > PI) {
+        v2.z += 2.0f * PI;
+    }
+
+    Vec3Copy(pLook3, &v3.x);
+    while (v3.x - v2.x > PI) {
+        v3.x -= 2.0f * PI;
+    }
+    while (v2.x - v3.x > PI) {
+        v3.x += 2.0f * PI;
+    }
+    while (v3.y - v2.y > PI) {
+        v3.y -= 2.0f * PI;
+    }
+    while (v2.y - v3.y > PI) {
+        v3.y += 2.0f * PI;
+    }
+    while (v3.z - v2.z > PI) {
+        v3.z -= 2.0f * PI;
+    }
+    while (v2.z - v3.z > PI) {
+        v3.z += 2.0f * PI;
+    }
+
+    Vec3Copy(pLook0, aPoints[0]);
+    Vec3Copy(&v1.x, aPoints[1]);
+    Vec3Copy(&v2.x, aPoints[2]);
+    Vec3Copy(&v3.x, aPoints[3]);
+    aPoints[0][3] = 0.0f;
+    aPoints[1][3] = 0.0f;
+    aPoints[2][3] = 0.0f;
+    aPoints[3][3] = 0.0f;
+    fn_800BAD60(lbl_80191440, &vT, &vWeights);
+    fn_800BAD60(aPoints, &vWeights, &vOut);
+    Vec3Copy(&vOut.x, pSub);
+    *pFov = fT * (fFov2 - fFov1) + fFov1;
+}
+
 // The point at share fT between p1 and p2 on the Catmull-Rom spline through p0..p3.
 void fn_800C7898(f32* p0, f32* p1, f32* p2, f32* p3, f32* pOut, f32 fT) {
     Vec4 vT;
@@ -71,6 +166,89 @@ f32 fn_800C79BC(f32* p0, f32* p1, f32* p2, f32* p3) {
         Vec3Copy(&vPoint.x, &vLast.x);
     }
     return fLength;
+}
+
+// A point fDist along the direction from pA to pB (flattened unless bKeepY, normalised unless
+// bRaw), then moved fSide sideways (across the flat direction).
+void fn_800C7D14(f32* pA, f32* pB, u8 bKeepY, u8 bRaw, f32* pOut, f32 fDist, f32 fSide) {
+    f32 aDir[3];
+
+    fn_800C8068(pB, pA, aDir);
+    if (!bKeepY) {
+        aDir[1] = 0.0f;
+    }
+    if (!bRaw && (0.0f != aDir[0] || 0.0f != aDir[1] || 0.0f != aDir[2])) {
+        fn_800BAF04(aDir, aDir);
+    }
+    fn_8000C5D4(pA, aDir, fDist, pOut);
+    aDir[1] = 0.0f;
+    if (0.0f != aDir[0] || 0.0f != aDir[1] || 0.0f != aDir[2]) {
+        fn_800BAF04(aDir, aDir);
+    }
+    pOut[0] = fSide * -aDir[2] + pOut[0];
+    pOut[2] = fSide * aDir[0] + pOut[2];
+}
+
+// A point swung around pC from pA towards pB, at share fT: the flat angle and distance from pC and
+// the height are each blended. nDir picks the way round: 0 the short way, 1 decreasing, else
+// increasing.
+void fn_800C7E50(f32* pA, f32* pB, f32* pC, int nDir, f32* pOut, f32 fT) {
+    Vec4 vFrom;
+    Vec4 vTo;
+    f32 fAngleFrom;
+    f32 fAngleTo;
+    f32 fDistTo;
+    f32 fDistFrom;
+    f32 fAngle;
+    f32 fDist;
+
+    fn_800C8068(pA, pC, &vFrom.x);
+    fn_800C8068(pB, pC, &vTo.x);
+    vFrom.y = 0.0f;
+    vTo.y = 0.0f;
+    if (0.0f == vFrom.x) {
+        if (vFrom.z > 0.0f) {
+            fAngleFrom = PI / 2.0f;
+        } else {
+            fAngleFrom = 3.0f * PI / 2.0f;
+        }
+    } else {
+        fAngleFrom = fn_8000AD78(vFrom.z, vFrom.x);
+    }
+    if (0.0f == vTo.x) {
+        if (vTo.z > 0.0f) {
+            fAngleTo = PI / 2.0f;
+        } else {
+            fAngleTo = 3.0f * PI / 2.0f;
+        }
+    } else {
+        fAngleTo = fn_8000AD78(vTo.z, vTo.x);
+    }
+    if (fAngleFrom < -PI / 2.0f && fAngleTo > PI / 2.0f) {
+        fAngleFrom += 2.0f * PI;
+    } else if (fAngleFrom > PI / 2.0f && fAngleTo < -PI / 2.0f) {
+        fAngleTo += 2.0f * PI;
+    }
+    if (nDir == 0) {
+        if (fAngleTo - fAngleFrom > PI) {
+            fAngleFrom += 2.0f * PI;
+        }
+    } else if (nDir == 1) {
+        while (fAngleTo > fAngleFrom) {
+            fAngleTo -= 2.0f * PI;
+        }
+    } else {
+        while (fAngleTo < fAngleFrom) {
+            fAngleTo += 2.0f * PI;
+        }
+    }
+    fDistFrom = fn_80009680(fn_80009744(&vFrom.x));
+    fDistTo = fn_80009680(fn_80009744(&vTo.x));
+    fAngle = fT * (fAngleTo - fAngleFrom) + fAngleFrom;
+    fDist = fT * (fDistTo - fDistFrom) + fDistFrom;
+    pOut[0] = fDist * fn_80009638(fAngle) + pC[0];
+    pOut[1] = fT * (pB[1] - pA[1]) + pA[1];
+    pOut[2] = fDist * fn_800095F0(fAngle) + pC[2];
 }
 
 // Three floats: pOut gets pA minus pB.
