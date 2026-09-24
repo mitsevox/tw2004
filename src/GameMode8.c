@@ -8,6 +8,7 @@
 #include "engine.h"
 #include "game/save.h"
 #include "frontend/fe.h"
+#include "unsorted/cull.h"
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState and the (u8) on GOLFERSTATE_Set's player (see game.h).
 
@@ -71,7 +72,6 @@ f32 lbl_802816C4 = 0.25f;
 // fake match: a one-entry array, so the compiler loads it where fn_800FBD2C compares with it
 // instead of folding in its own 1.0f (the original has this constant first in the file's .sdata2)
 const f32 lbl_80284708[1] = {1.0f};
-u8*   fn_80008370(u8* p);
 
 void  fn_800FE100(s32 p0, s32 p1, s32 p2);
 void  fn_800FA554(int nPlayer);
@@ -1223,10 +1223,9 @@ void fn_800FBD2C(int nPlayer) {
         fn_800FE0AC(gPlayers[nPlayer].nC58, n);
         fn_800FE190(pBall->vPos, pTarget, vDir);
         fToPlace = fn_80009680(vDir[0] * vDir[0] + vDir[2] * vDir[2]);
-        // the distance to a position in the view's object (+0x34), if that is nearer; the second
-        // square root is written twice, as a MIN() macro would expand
-        fn_800FE190(pBall->vPos, (f32*)(fn_80008370(*(u8**)fn_80016CFC(gPlayers[nPlayer].nView[0])) + 0x34),
-                    vDir);
+        // the distance to the view's camera lens position, if that is nearer; the second square
+        // root is written twice, as a MIN() macro would expand
+        fn_800FE190(pBall->vPos, fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera)->v34, vDir);
         fDist = (fToPlace <= (f32)fn_80009680(vDir[0] * vDir[0] + vDir[2] * vDir[2]))
 
                     ? fToPlace

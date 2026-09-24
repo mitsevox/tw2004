@@ -382,7 +382,8 @@ void fn_80032770(void) {
                 for (pPatch = *ppHead; pPatch != NULL; pPatch = pPatch->pNext[3]) {
                     if (!gSession.nSplitScreen || !(pPatch->n1C & 8)) {
                         fn_80032B7C(pPatch->pGround, nClip, 3, pPatch->n1C, pPatch->n18, pPatch->n20, &bFirst,
-                                    0, 0, pPatch->fDistance, pPatch->fDistance + 2.0f * pPatch->fBoundingRadius);
+                                    0, 0, pPatch->fDistance,
+                                    pPatch->fDistance + 2.0f * pPatch->fBoundingRadius);
                     }
                 }
             }
