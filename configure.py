@@ -1019,7 +1019,7 @@ config.libs = [
             Object(NonMatching, "PGATourSimulation.c"),
             Object(NonMatching, "SkinMorph.c"),
             Object(Matching, "fe_stats.c"),
-            Object(NonMatching, "EventInfo.c"),
+            Object(Matching, "EventInfo.c"),
             Object(Matching, "llrtclock.c"),
             Object(NonMatching, "GoGrass.c"),
             Object(NonMatching, "GoShaderObject_Grass_Gc.c"),

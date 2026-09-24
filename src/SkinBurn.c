@@ -105,9 +105,9 @@ void fn_801272B4(Skin* pSkin) {
     s32* pOld;
     s32* pNew;
     u32* pSaved;
-    s32 nFixed;
-    s32 j;
     s32 n;
+    s32 j;
+    s32 k;
     SkinModel44* pEntry;
 
     pModel = pSkin->pModel;
@@ -124,11 +124,11 @@ void fn_801272B4(Skin* pSkin) {
     memset(aNew, -1, nBits * sizeof(s32));
 
     // The first n14 bits always stay.
-    nFixed = pModel->n14;
-    if (nFixed > pModel->n50) {
-        nFixed = pModel->n50;
+    n = pModel->n14;
+    if (n > pModel->n50) {
+        n = pModel->n50;
     }
-    for (i = 0; i < nFixed; i++) {
+    for (i = 0; i < n; i++) {
         fn_8001EA34(aBits, i);
     }
 
@@ -160,8 +160,9 @@ void fn_801272B4(Skin* pSkin) {
         fn_80127218(pSkin, i);
     }
 
-    for (i = 0; i < nEntries; i++) {
-        pEntry = &pModel->p44[i];
+    // n is reused for each entry's count, and this loop has its own counter.
+    for (k = 0; k < nEntries; k++) {
+        pEntry = &pModel->p44[k];
         if (nKept < pEntry->n8) {
             pEntry->n8 = nKept;
         }
@@ -169,8 +170,8 @@ void fn_801272B4(Skin* pSkin) {
         for (j = 0; j < n; j++) {
             pEntry->p4[j] = j;
         }
-        pSkin->pModel->pDesc->p34[i].n8 = n;
-        pSkin->pModel->pDesc->p34[i].nSize = n << 6;
+        pSkin->pModel->pDesc->p34[k].n8 = n;
+        pSkin->pModel->pDesc->p34[k].nSize = n << 6;
     }
 
     pModel->n50 = nKept;
