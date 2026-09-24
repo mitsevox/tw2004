@@ -193,10 +193,10 @@ void fn_800AC7DC(AudVoice* pVoice, u32 uLen, u32 nRate, u8 bLoud) {
     hdr.uC = 1;
     // the buffer's start and end in 4-bit units, past the first frame's header
     hdr.u0 = hdr.u4 = pVoice->uAram;
-    hdr.u4 += uLen;
     hdr.u0 *= 2;
-    hdr.u4 *= 2;
     hdr.u0 += 2;
+    hdr.u4 += uLen;
+    hdr.u4 *= 2;
     hdr.u4 -= 1;
     hdr.u8 = hdr.u0;
     pVoice->uC = (f32)pVoice->uC * 2.048f;

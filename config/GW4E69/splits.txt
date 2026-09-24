@@ -553,6 +553,7 @@ hlaudtrackstm.c:
 
 hlaudvoice.c:
 	.text       start:0x800AC330 end:0x800ACECC
+	.sdata2     start:0x80283FF8 end:0x80284008
 
 hlaudemitter.c:
 	.text       start:0x800ACECC end:0x800ADE70

@@ -1070,7 +1070,7 @@ config.libs = [
             Object(Matching, "Code80070EC4.c"),
             Object(Matching, "unsorted/sweep_80097E98.c"),
             Object(Matching, "Code8009A928.c"),
-            Object(NonMatching, "hlaudvoice.c"),
+            Object(Matching, "hlaudvoice.c"),
             Object(Matching, "AudLock.c"),
             Object(Matching, "unsorted/sweep_8010FF5C.c"),
             Object(Matching, "unsorted/sweep_801654F4.c"),
