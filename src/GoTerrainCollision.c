@@ -488,6 +488,7 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
     f32 fTurn;
     f32 fSin;
     f32 fHeading;
+    f32 fCos;
     int nRing;
     Player* p;
     SurfaceType* pGround;
@@ -528,7 +529,8 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
             for (fTurn = 0.0f; fTurn <= 6.265732f; fTurn += 0.7853982f) {
                 fAngle = fHeading + fTurn;
                 fSin = fn_800095F0(fAngle);
-                vPos[0] = fn_80009638(fAngle) * fRadius + p->ball.vPos[0];
+                fCos = fn_80009638(fAngle);
+                vPos[0] = fCos * fRadius + p->ball.vPos[0];
                 vPos[2] = fSin * fRadius + p->ball.vPos[2];
                 // from water, only straight towards the pin
                 if (gSurfaceTypes[p->ball.nSurface].nClass == 7 && fTurn > 0.0f) continue;
