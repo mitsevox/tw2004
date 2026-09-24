@@ -621,7 +621,7 @@ void Swing_Launch(int nPlayer) {
         Luck_TakePerfectShot(nPlayer);
         fn_8006BF60(nPlayer);
     } else {
-        fn_8006C300(nPlayer);
+        REPLAY_Play(nPlayer);
     }
     pLaunchA    = p->vLaunchA;
     nClub       = p->nClub;
@@ -3225,7 +3225,7 @@ void STATEFUNC_ReplaySwingInit(int nPlayer) {
     gPlayers[nPlayer].pChar->n20 = 7;
     gPlayers[nPlayer].pChar->nAnim = 7;
     if (gPlayers[nPlayer].uFlags & 8) {
-        CharAnim_StartTapIn(gPlayers[nPlayer].pChar);
+        CharacterState_SetTapInState(gPlayers[nPlayer].pChar);
     } else {
         if (fn_800C6D80() || fn_800C44A8(pV, nPlayer) || fn_800C44CC(pV, nPlayer) ||
             fn_800C44E0(pV, nPlayer)) {
@@ -3656,7 +3656,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
             if (fn_800C6D64()) {
                 fn_800C6DFC();
             }
-            fn_8006C300(nPlayer);
+            REPLAY_Play(nPlayer);
             GOLFERSTATE_Switch(GS_REPLAY_SWING, nPlayer);
             return;
         }
@@ -3924,7 +3924,7 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
                 !(gPlayers[nPlayer].pChar->u10 & 0x40)) {
                 lbl_80281E10 = 1;
                 fn_80062D0C(nPlayer);
-                fn_8006C300(nPlayer);
+                REPLAY_Play(nPlayer);
                 GOLFERSTATE_Switch(GS_REPLAY_SWING, nPlayer);
                 return;
             }
