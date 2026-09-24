@@ -81,6 +81,36 @@ void fn_8010AD50(DynTex* pTex, u64 uId) {
     }
 }
 
+// Fills pEntry for pObj and its palette pPal (if any): the id, each level's bytes and the
+// palette's, each rounded up to 16. Returns them all added up.
+s32 fn_8010B0C0(DynTexObj* pObj, DynTexPalObj* pPal, DynTexEntry* pEntry) {
+    u32 nA = pObj->n38;
+    u32 nB = pObj->n3A;
+    s32 nTotal = 0;
+    int nBits;
+    int i;
+
+    memset(pEntry, 0, sizeof(DynTexEntry));
+    pEntry->uId = pObj->uId;
+    pEntry->n8 = pObj->n41;
+    nBits = fn_8010C458(pObj->n40);
+    for (i = 0; i < pEntry->n8; i++) {
+        pEntry->aC[i] = (nB * (nBits * nA) + 7) >> 3;
+        nA >>= 1;
+        nB >>= 1;
+        pEntry->aC[i] = (pEntry->aC[i] + 15) & ~15;
+        nTotal += pEntry->aC[i];
+    }
+    if (pPal != NULL) {
+        pEntry->n1C = (pPal->nEntries * (u32)fn_8010C458(pPal->nFormat) + 7) >> 3;
+    } else {
+        pEntry->n1C = 0;
+    }
+    pEntry->n1C = (pEntry->n1C + 15) & ~15;
+    nTotal += pEntry->n1C;
+    return nTotal;
+}
+
 // New pixels for texture nTex (pPixels holds its blocks back to back), each block flushed to the
 // GPU; p and n are handed to fn_8010A930 when p is set.
 void fn_8010B1D4(DynTex* pTex, int nTex, u8* pPixels, void* p, s32 n) {

@@ -69,15 +69,15 @@ LAYOUT_ASSERT(DynTexEntry, 0x20);
 
 // Where a pixel block sits in DynTex.p18 (0xC bytes).
 typedef struct DynTexBlock {
-    u8    unk0[8];
-    s32   nOffset;              // 0x8
+    s32   nOffset;              // 0x0
+    u8    unk4[8];
 } DynTexBlock;
 LAYOUT_ASSERT(DynTexBlock, 0xC);
 
-// Per texture (0x50 bytes, DynTexHeader.p8): its blocks, then more not read yet.
+// Per texture (0x50 bytes, DynTexHeader.p8): its id, its blocks, then more not read yet.
 typedef struct DynTexObj {
-    DynTexBlock aBlocks[4];     // 0x00  DynTexEntry.n8 of them
-    u8    unk30[8];
+    u64   uId;                  // 0x00  copied to DynTexEntry.uId (fn_8010B0C0)
+    DynTexBlock aBlocks[4];     // 0x08  DynTexEntry.n8 of them
     u16   n38;                  // 0x38  } its size in pixels, halved per level (fn_8010B6AC)
     u16   n3A;                  // 0x3A  }
     s16   n3C;                  // 0x3C  set by fn_8010ADA4
@@ -87,6 +87,14 @@ typedef struct DynTexObj {
     u8    unk42[0x50 - 0x42];
 } DynTexObj;
 LAYOUT_ASSERT(DynTexObj, 0x50);
+
+// A texture's palette as fn_8010B0C0 and fn_8010B664 read it (our name; only what they read,
+// size unknown).
+typedef struct DynTexPalObj {
+    u8    unk0[8];
+    s16   nEntries;             // 0x8
+    s16   nFormat;              // 0xA  a pixel format, as DynTexObj.n40
+} DynTexPalObj;
 
 // Per texture (0xC bytes, DynTexHeader.pC): where its palette sits in DynTex.p18.
 typedef struct DynTexPalette {
