@@ -328,19 +328,28 @@ extern void* lbl_80281BA4[2];           // LLDisp_Gc.c: two image buffers (Depth
 // The renderer's state (lbl_801B8980, 0x118 bytes); only what the game code writes.
 // GoTerrain.c's setters write one group of fields each and set that group's bit in u110.
 typedef struct RenderState {
-    u8   unk0[0x10];
+    s32  n0;                    // 0x000  3 at reset (fn_80015540)
+    u8   b4;                    // 0x004  1 at reset
+    u8   unk5[0x8 - 0x5];
+    s32  n8;                    // 0x008  6 at reset
+    u8   bC;                    // 0x00C  100 at reset
+    u8   bD;                    // 0x00D  0 at reset
+    u8   unkE[0x10 - 0xE];
     s32  n10;                   // 0x010  } set together, bit 0x10
     s32  n14;                   // 0x014  }
-    u8   unk18[0x1C - 0x18];
+    s32  n18;                   // 0x018  1 at reset
     u8   b1C;                   // 0x01C  bit 0x80
     u8   b1D;                   // 0x01D  bit 0x80
     u8   unk1E[0x20 - 0x1E];
     u32  u20;                   // 0x020  bits cleared and set by fn_80035170, bit 0x20
-    u8   unk24[0x28 - 0x24];
+    s32  n24;                   // 0x024  2 at reset
     f32  f28;                   // 0x028  } bit 0x8, with a30. fn_80035398 sets all three from
     f32  f2C;                   // 0x02C  } lbl_802811E0
-    u8   a30[4];                // 0x030  a colour: three bytes given, the fourth always 0x80
-    u8   unk34[0xBC - 0x34];
+    u8   a30[4];                // 0x030  a colour: three bytes given, the fourth always 0x80;
+                                //        all 0xFF at reset
+    f32  m34[4][4];             // 0x034  } set to identity at reset
+    f32  m74[4][4];             // 0x074  }
+    u8   unkB4[0xBC - 0xB4];
     s32  nBC;                   // 0x0BC  } a rectangle, bit 0x200 (LLVideo.c fn_800760B0: x,
     s32  nC0;                   // 0x0C0  } width, y, height; the movies give 0, 512, 0, 448)
     s32  nC4;                   // 0x0C4  }

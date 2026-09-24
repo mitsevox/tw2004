@@ -8,6 +8,7 @@
 #include "golfer.h"
 #include "character.h"
 #include "frontend/fe.h"
+#include "gx.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -44,6 +45,7 @@ void fn_800918A4(void);     // fe_movies.c: set up the loading screen
 void fn_8009198C(int nMode);    // fe_movies.c: update the loading screen
 void fn_80091818(void);     // fe_movies.c
 void fn_80091778(void);     // fe_movies.c
+void fn_8000ADC0(f32 (*m)[4]);          // identity matrix
 void fn_8001529C(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
 void fn_8001462C(void);
 void fn_8000B9E4();
@@ -642,6 +644,38 @@ void fn_800154F4(void) {
         lbl_80280E00->nNext++;
     }
     lbl_80280E00->n4++;
+}
+
+// Reset the renderer's state and free the buffer pool.
+void fn_80015540(void) {
+    lbl_801B8980.n0 = 3;
+    lbl_801B8980.b4 = 1;
+    lbl_801B8980.n8 = 6;
+    lbl_801B8980.bC = 100;
+    lbl_801B8980.bD = 0;
+    lbl_801B8980.n10 = 4;
+    lbl_801B8980.n14 = 5;
+    lbl_801B8980.n18 = 1;
+    lbl_801B8980.b1C = 0xFF;
+    lbl_801B8980.b1D = 0;
+    lbl_801B8980.u20 = 0x70;
+    lbl_801B8980.nFC = 0;
+    lbl_801B8980.n24 = 2;
+    lbl_801B8980.f28 = 100.0f;
+    lbl_801B8980.f2C = 2048.0f;
+    // the original stores the colour as one word (-1)
+    lbl_801B8980.a30[0] = 0xFF;
+    lbl_801B8980.a30[1] = 0xFF;
+    lbl_801B8980.a30[2] = 0xFF;
+    lbl_801B8980.a30[3] = 0xFF;
+    fn_8000ADC0(lbl_801B8980.m34);
+    fn_8000ADC0(lbl_801B8980.m74);
+    lbl_801B8980.p100 = NULL;
+    lbl_801B8980.p104 = NULL;
+    lbl_801B8980.u110 = 0;
+    lbl_801B8980.uFlags = 0;
+    GXSetCurrentMtx(0);
+    fn_80015470();
 }
 
 // Refill stream list 0 with the global data and character files and every player's golfer's
