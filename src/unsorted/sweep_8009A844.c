@@ -13,8 +13,8 @@ f32 fn_80014164();
 f32 fn_8001416C();
 f32 fn_80014174();
 
-void fn_8009A844(s32 p0, u8* p1, u8* p2);
-void fn_8009A844(s32 p0, u8* p1, u8* p2) {
+void fn_8009A844(void* p0, u8* p1, u8* p2);
+void fn_8009A844(void* p0, u8* p1, u8* p2) {
     s32 t0;
     f32 t1;
     f32 t2;

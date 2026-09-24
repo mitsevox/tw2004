@@ -2,6 +2,8 @@
 // matched small functions.
 
 #include "glows.h"
+#include "camera.h"
+#include "core/startup.h"
 
 // Sets lbl_802813B8->f0 so that all of lbl_80189DA8's weights together make 1.
 void fn_8009A250(void) {
@@ -24,6 +26,7 @@ void fn_8009A340(void);
 void fn_8009A344(s32 nView, SunFlrView* pView);
 void fn_8009A3D0(s32 nView, SunFlrView* pView);
 void fn_8009A704(s32 nView);
+void fn_8009A844(void* pCamera, u8* pIn, u8* pOut);
 
 void fn_8009A340(void) {
 }
@@ -43,6 +46,153 @@ void fn_8009A344(s32 nView, SunFlrView* pView) {
 void fn_8009A3D0(s32 nView, SunFlrView* pView) {
     fn_80009E70(pView->pBuffer);
 }
+
+// ---- end of sweep code ----
+
+// Copies the depth buffer around the sun into view nView's part for the field three ahead: an 8 x 6
+// window of pixels centred on the sun, clipped to the view, in a 12 x 12 Z24X8 texture. u18 is the
+// sun's own depth, so fn_8009A754 later counts the pixels nothing is drawn in front of.
+void fn_8009A3F4(s32 nView) {
+    SunFlrView* pView;
+    SunFlrPart* pPart;
+    void* pCamera;
+    int iPart;
+    f32 v[4];
+    int nSunX;
+    int nSunY;
+    int nLeft;
+    int nTop;
+    int nRight;
+    int nBottom;
+    int nX;
+    int nY;
+    int nEndX;
+    int nEndY;
+    int nCopyX;
+    int nCopyY;
+    int nReadX;
+    int nReadY;
+    int nWeightX;
+    int nWeightY;
+    int nWidth;
+    int nHeight;
+
+    pView = &lbl_802813B8->aView[nView];
+    iPart = (lbl_80281B88 + 3) % 4;
+    pCamera = fn_80017004(nView);
+
+    // The sun on the screen, kept within +-500000.
+    v[0] = pView->f98;
+    v[1] = pView->f9C;
+    v[2] = pView->fA0;
+    v[3] = 1.0f;
+    fn_8009A844(pCamera, (u8*)v, (u8*)v);
+    if (v[0] < -500000.0f || v[0] > 500000.0f) {
+        v[0] = 500000.0f;
+    }
+    if (v[1] < -500000.0f || v[1] > 500000.0f) {
+        v[1] = 500000.0f;
+    }
+    nSunX = v[0];
+    nSunY = v[1];
+
+    // The view's corners on the screen.
+    v[0] = 0.0f;
+    v[1] = 0.0f;
+    fn_8009A844(pCamera, (u8*)v, (u8*)v);
+    nLeft = v[0];
+    nTop = v[1];
+    v[0] = 1.0f;
+    v[1] = 1.0f;
+    fn_8009A844(pCamera, (u8*)v, (u8*)v);
+    nRight = v[0];
+    nBottom = v[1];
+
+    if (nLeft < 0) {
+        nLeft = 0;
+    }
+    if (nTop < 0) {
+        nTop = 0;
+    }
+    if (nRight > 512) {
+        nBottom = 512; // EA bug: clamps nBottom where nRight is meant
+    }
+    if (nBottom > 448) {
+        nBottom = 448;
+    }
+
+    // Columns: the copy starts on a multiple of 4 and stays inside the 512-wide screen.
+    nX = nSunX - 4;
+    nY = nSunY - 3;
+    nEndX = nX + 8;
+    nEndY = nY + 6;
+    if (nX < nLeft) {
+        nCopyX = nLeft & ~3;
+        nWeightX = nLeft - nX;
+        nReadX = nLeft - nCopyX;
+        nWidth = 8 - nWeightX;
+    } else if (nEndX >= 512) {
+        nReadX = nX - 500;
+        nCopyX = 500;
+        nWeightX = 0;
+        nWidth = 8;
+    } else {
+        nCopyX = nX & ~3;
+        nWeightX = 0;
+        nReadX = nX - nCopyX;
+        nWidth = 8;
+    }
+    if (nEndX > nRight) {
+        nWidth -= nEndX - nRight;
+    }
+
+    // Rows, the same within the 448-high screen.
+    if (nY < nTop) {
+        nCopyY = nTop & ~3;
+        nWeightY = nTop - nY;
+        nReadY = nTop - nCopyY;
+        nHeight = 6 - nWeightY;
+    } else if (nEndY >= 448) {
+        nReadY = nY - 436;
+        nCopyY = 436;
+        nWeightY = 0;
+        nHeight = 6;
+    } else {
+        nCopyY = nY & ~3;
+        nWeightY = 0;
+        nReadY = nY - nCopyY;
+        nHeight = 6;
+    }
+    if (nEndY > nBottom) {
+        nHeight -= nEndY - nBottom;
+    }
+
+    pPart = &pView->aPart[iPart];
+    pPart->n8 = nWeightX;
+    pPart->nC = nWeightY;
+    pPart->n0 = nReadX;
+    pPart->n4 = nReadY;
+    pPart->n10 = nWidth;
+    pPart->n14 = nHeight;
+
+    // The sun's depth as a 24-bit Z value.
+    pPart->u18 = 16777216.0f * (1.0f - pView->fA0);
+    if (pPart->u18 & 0x80000000) {
+        pPart->u18 = 0;
+    }
+    if (pPart->u18 & 0x7F000000) {
+        pPart->u18 = 0x0FFFFFFF;
+    }
+
+    if (nHeight > 0 && nWidth > 0) {
+        DCFlushRange(pPart->p1C, pView->nC);
+        GXSetTexCopySrc(nCopyX, nCopyY, 12, 12);
+        GXSetTexCopyDst(12, 12, 0x16, 0); // 0x16: GX's Z24X8 format
+        GXCopyTex(pPart->p1C, 0);
+    }
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 // Does nothing (the view number is not used).
 void fn_8009A704(s32 nView) {
