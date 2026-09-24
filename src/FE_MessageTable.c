@@ -61,7 +61,7 @@ s32  fn_800EAE6C(void);                 // GameMode5.c
 char* fn_800ED280(int nId);             // GameMode5.c
 char* fn_800ED2C8(int nId);             // GameMode5.c
 void fn_800ED650(int i, s32* pA, s32* pB, s32* pC);     // GameMode5.c
-int  fn_801020C0(void);                 // GameMode4.c
+int  GameMode4_GetNumEventsWon(void);                 // GameMode4.c
 void fn_80102308(s32 n);                // GameMode4.c
 void fn_8010D334(s32 v);                // CharSliders.c
 void fn_8008DD34(int nSlot, int n);
@@ -2060,7 +2060,7 @@ void fn_8007D3B4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007D3D8(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_801020C0();
+    pResult->i = GameMode4_GetNumEventsWon();
 }
 
 void fn_8007D408(MsgArg* pArgs, MsgArg* pResult) {
@@ -3348,7 +3348,7 @@ void fn_800801D4(MsgArg* pArgs, MsgArg* pResult) {
 // 1, the skins value in mode 2, the ladder event's in mode 4 (the last event's past event 24);
 // the golfer's rating picks the row. Other modes leave pResult alone.
 void fn_80080208(MsgArg* pArgs, MsgArg* pResult) {
-    int nEvent = fn_801020C0();
+    int nEvent = GameMode4_GetNumEventsWon();
 
     switch (Game_GetMode()) {
     case 4:

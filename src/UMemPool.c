@@ -158,10 +158,10 @@ void fn_8000A4E0(f32 (*pMtx)[4], f32* pA, f32* pB, f32* pC) {
     f32 fC;
 
     if (pMtx[2][2] != 0.0f) {
-        fA = fn_8000AD78(pMtx[2][0], pMtx[2][2]);
+        fA = atan2f(pMtx[2][0], pMtx[2][2]);
         fB = -fn_8000965C(pMtx[2][1]);
         if (pMtx[1][1] != 0.0f) {
-            fC = fn_8000AD78(pMtx[0][1], pMtx[1][1]);
+            fC = atan2f(pMtx[0][1], pMtx[1][1]);
         } else if (pMtx[0][1] != 0.0f) {
             if (pMtx[0][1] * fn_80009638(fB) > 0.0f) {
                 fC = PI / 2.0f;
@@ -184,7 +184,7 @@ void fn_8000A4E0(f32 (*pMtx)[4], f32* pA, f32* pB, f32* pC) {
             }
         } else {
             // both arguments are m[0][0], as in the original
-            fA = -fn_8000AD78(pMtx[0][0], pMtx[0][0]);
+            fA = -atan2f(pMtx[0][0], pMtx[0][0]);
         }
     } else {
         fB = -fn_8000965C(pMtx[2][1]);
@@ -194,7 +194,7 @@ void fn_8000A4E0(f32 (*pMtx)[4], f32* pA, f32* pB, f32* pC) {
             fA = -PI / 2.0f;
         }
         if (pMtx[1][1] != 0.0f) {
-            fC = fn_8000AD78(pMtx[0][1], pMtx[1][1]);
+            fC = atan2f(pMtx[0][1], pMtx[1][1]);
         } else if (pMtx[0][1] * fn_80009638(fB) > 0.0f) {
             fC = PI / 2.0f;
         } else {
@@ -416,7 +416,7 @@ void fn_8000AD34(f32* pA, f32* pB) {
     pB[3] = f;
 }
 
-f32 fn_8000AD78(f32 y, f32 x) {
+f32 atan2f(f32 y, f32 x) {
     return atan2(y, x);
 }
 
@@ -556,7 +556,7 @@ void fn_8000AE9C(void) {
     do {
         // port: builds the float from its bits through a u32 pointer (see Rand_Float).
         *(u32*)&f = uMantissa | 0x3F800000;
-        *pEntry = 1.442695f * fn_8000AF7C(f);
+        *pEntry = 1.442695f * logf(f);
         i++;
         uMantissa += 0x2000;
         pEntry++;
@@ -576,13 +576,13 @@ void fn_8000AF58(void) {
     fn_8009527C(lbl_80281BD8);
 }
 
-f32 fn_8000AF7C(f32 x) {
+f32 logf(f32 x) {
     return log(x);
 }
 
 // Makes a pool of nNodes nodes of uNodeSize bytes each, every node aligned to uAlign (a power of
 // two). The nodes are filled with 0xDD and chained into the free list, the last one first.
-UMemPool* fn_8000AFA0(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign) {
+UMemPool* UMemPool_Create(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign) {
     UMemPool* pPool;
     u32 uSize;
     u8* pNode;
@@ -612,12 +612,12 @@ UMemPool* fn_8000AFA0(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign) {
     return pPool;
 }
 
-void fn_8000B058(UMemPool* pPool) {
+void UMemPool_Destroy(UMemPool* pPool) {
     fn_80009E70(pPool);
 }
 
 // Takes a node off the free list and fills it with 0xBB; NULL when the pool is empty.
-void* fn_8000B078(UMemPool* pPool) {
+void* UMemPool_Alloc(UMemPool* pPool) {
     UMemPoolNode* pNode;
 
     pNode = pPool->pFree;
@@ -630,7 +630,7 @@ void* fn_8000B078(UMemPool* pPool) {
 }
 
 // Fills a node with 0x99 and puts it back on the free list.
-void fn_8000B0D4(UMemPool* pPool, void* p) {
+void UMemPool_Free(UMemPool* pPool, void* p) {
     UMemPoolNode* pNode;
 
     pNode = p;

@@ -41,11 +41,11 @@ void fn_8001FC0C(u16* pPacked, f32* aRange, f32* pOut) {
 
 // Starts copying uSize bytes from ARAM address uAram to pDst; fn_8001FCD4 waits for it.
 ARAMTransfer* fn_8001FCA8(u32 uAram, void* pDst, u32 uSize) {
-    return fn_800B68B4(pDst, uAram, uSize);
+    return GoARAM_CopyFromAram(pDst, uAram, uSize);
 }
 
 void fn_8001FCD4(ARAMTransfer* pTransfer) {
-    fn_800B67EC(pTransfer);
+    GoARAM_WaitTransfer(pTransfer);
 }
 
 void fn_80021134(u16* pFrame, f32* pOut, s32 nBones, u32* pBits);
@@ -247,7 +247,8 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
 // Always returns 1.
 u8 fn_80020328(Clip* pClip, int nFrame, f32* pPose2, f32* pPose1, u8* pExtra) {
     ARAMTransfer* pTransfer = NULL;
-    u8* pFrame;
+    u8* pFrame2;
+    u16* pFrame1;
     int nSize;
 
     if (pClip->n36 != 0) {
@@ -255,14 +256,14 @@ u8 fn_80020328(Clip* pClip, int nFrame, f32* pPose2, f32* pPose1, u8* pExtra) {
             // port: pE4 holds an ARAM address here
             fn_8001FCD4(fn_8001FCA8((uptr)pClip->pE4 + pClip->n8E * nFrame, lbl_80281CC4, pClip->n8E));
             pTransfer = NULL;
-            pFrame = lbl_80281CC4;
+            pFrame2 = lbl_80281CC4;
             if (pClip->n0A != 0) {
                 pTransfer = fn_8001FCA8(pClip->uAram + pClip->n8C * nFrame * 2, lbl_80281CC8, pClip->n8C * 2);
             }
         } else {
-            pFrame = pClip->pE4 + pClip->n8E * nFrame;
+            pFrame2 = pClip->pE4 + pClip->n8E * nFrame;
         }
-        fn_8002148C(pFrame, pPose2, pClip->n58, (u32*)pClip->pF8, (u16*)pClip->pE0);
+        fn_8002148C(pFrame2, pPose2, pClip->n58, (u32*)pClip->pF8, (u16*)pClip->pE0);
     }
     if (pClip->n0A != 0) {
         if (pClip->uFlags & 4) {
@@ -271,14 +272,15 @@ u8 fn_80020328(Clip* pClip, int nFrame, f32* pPose2, f32* pPose1, u8* pExtra) {
                 pTransfer = fn_8001FCA8(pClip->uAram + pClip->n8C * nFrame * 2, lbl_80281CC8, nSize);
             }
             fn_8001FCD4(pTransfer);
-            pFrame = lbl_80281CC8;
+            pFrame1 = (u16*)lbl_80281CC8;
             if (pClip->pF0 != NULL) {
-                Mem_cpy(pExtra, pFrame + pClip->n2A, pClip->n28);
+                Mem_cpy(pExtra, lbl_80281CC8 + pClip->n2A, pClip->n28);
             }
         } else {
-            pFrame = (u8*)pClip->uAram + pClip->n8C * nFrame * 2;
+            // port: uAram holds a RAM address here
+            pFrame1 = (u16*)(pClip->uAram + pClip->n8C * nFrame * 2);
         }
-        fn_80021134((u16*)pFrame, pPose1, pClip->n5C, (u32*)pClip->pFC);
+        fn_80021134(pFrame1, pPose1, pClip->n5C, (u32*)pClip->pFC);
     }
     return 1;
 }

@@ -130,7 +130,7 @@ void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
     fn_8001416C(pBuf);
     pCamera->f1E0 = pCamera->f228 * (fn_80012ED8(pRect) * fn_8001416C(pBuf) * 0.5f);
     pCamera->n22C = 0;
-    pCamera->f230 = -(fn_8000AF7C(pCamera->f1E0 * (1.0f / 554.256f)) * 1.442695f);
+    pCamera->f230 = -(logf(pCamera->f1E0 * (1.0f / 554.256f)) * 1.442695f);
     pCamera->f1E4 = fn_80012EE8(pRect) + fn_80012ED8(pRect) * 0.5f;
     pCamera->f1E8 = 1.0f - (fn_80012EE0(pRect) + fn_80012ED0(pRect) * 0.5f);
     pCamera->unk1F4 = pCamera->f1E0 * (fn_80014270((u8*)pLens) / 554.256f);

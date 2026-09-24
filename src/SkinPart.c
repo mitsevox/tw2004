@@ -96,8 +96,8 @@ void fn_800CC1EC(Character* pChar, SkinChoices* pChoices) {
 
 // Gives the six skins of p16D8 their choices from pChoices, in all four copies.
 void fn_800CC408(Character* pChar, SkinChoices* pChoices) {
-    int i;
     int j;
+    int i;
 
     if (pChar == NULL || pChoices == NULL || pChar->p16D8 == NULL) return;
     for (i = 0; i < 6; i++) {
@@ -138,24 +138,28 @@ void fn_800CC588(Character* pChar, int nPart, int nVariant) {
 void fn_800CC5C0(Character* pChar, char* pPart, char* pVariant) {
     u64 uId;
     int nPart;
+    int nVariant;
 
     if (pChar == NULL || pChar->pSkin == NULL) return;
     fn_800CB700(&uId, pPart);
     nPart = fn_800CDAFC(pChar->pSkin, uId);
     fn_800CB700(&uId, pVariant);
-    fn_800CC588(pChar, nPart, fn_800CDBB0(pChar->pSkin, nPart, uId));
+    nVariant = fn_800CDBB0(pChar->pSkin, nPart, uId);
+    fn_800CC588(pChar, nPart, nVariant);
 }
 
 // Picks a set's variant and option of the body's skin by their names.
 void fn_800CC658(Character* pChar, char* pSet, char* pVariant, char* pOption) {
     int nSet;
     int nVariant;
+    int nOption;
 
     if (pChar == NULL || pChar->pSkin == NULL) return;
     if (pChar->pSkin->pModel != NULL) {
         nSet = fn_800CDCA0(pChar->pSkin, pSet);
         nVariant = fn_800CDD5C(pChar->pSkin, nSet, pVariant);
-        fn_800CC9D8(pChar, nSet, nVariant, fn_800CDE80(pChar->pSkin, nSet, nVariant, pOption));
+        nOption = fn_800CDE80(pChar->pSkin, nSet, nVariant, pOption);
+        fn_800CC9D8(pChar, nSet, nVariant, nOption);
     }
 }
 
@@ -181,9 +185,9 @@ void fn_800CC710(Character* pChar, int nSkin, u64 uPart, u64 uVariant) {
 
 // Picks a set's variant and option of one of the six skins by their name codes.
 void fn_800CC7DC(Character* pChar, int nSkin, u64 uSet, u64 uVariant, u64 uOption) {
-    Skin* pSkin;
     int nSet;
     int nVariant;
+    Skin* pSkin;
     int nOption;
 
     if (pChar == NULL || pChar->p16D8 == NULL || pChar->p16D8->apSkins == NULL || nSkin < 0 || nSkin >= 6) {
@@ -204,8 +208,8 @@ void fn_800CC7DC(Character* pChar, int nSkin, u64 uSet, u64 uVariant, u64 uOptio
 // Sets every set of the six skins that has a "DefaultL" variant to it (bOn) or to its first
 // variant, keeping the option.
 void fn_800CC8BC(Character* pChar, u8 bOn) {
-    int i;
     int j;
+    int i;
     int nSets;
     int nVariant;
     int nOption;
@@ -416,8 +420,7 @@ s32 fn_800CCF10(Skin* pSkin, int nSet, int nVariant) {
 
 // Picks a set's variant (0 when out of range) and option (-1 when out of range).
 void fn_800CCF90(Skin* pSkin, int nSet, int nVariant, int nOption) {
-    if (pSkin == NULL || nSet < 0) return;
-    if (nSet >= fn_800CCEA0(pSkin)) return;
+    if (pSkin == NULL || nSet < 0 || nSet >= fn_800CCEA0(pSkin)) return;
     if (nVariant < 0 || nVariant >= fn_800CCED0(pSkin, nSet)) {
         nVariant = 0;
     }
@@ -450,9 +453,9 @@ s32 fn_800CD124(Skin* pSkin, int nSet, int nVariant) {
     SkinDesc74* pSet;
 
     if (pSkin->pModel->pDesc == NULL || nSet < 0 || nSet >= fn_800CCEA0(pSkin)) return -1;
-    pDesc = pSkin->pModel->pDesc;
-    if (nVariant < 0 || nVariant >= (pSet = &pDesc->p74[nSet])->n08) return -1;
-    return pDesc->p7C[nVariant + pSet->n10].n10;
+    if (nVariant < 0 || nVariant >= (pSet = &(pDesc = pSkin->pModel->pDesc)->p74[nSet])->n08) return -1;
+    nVariant += pSet->n10;
+    return pDesc->p7C[nVariant].n10;
 }
 
 // A set's option in one copy of the choices.
@@ -499,8 +502,8 @@ u64 fn_800CD388(Skin* pSkin, int nSet, int nVariant) {
 // Allocates the four copies of the skin's choices: parts with nothing picked, sets on their
 // "Defaults" variant (or the first) and their first option (-1 when a variant has none).
 void fn_800CD404(Skin* pSkin) {
-    int i;
     int j;
+    int i;
     s32 nParts;
     s32 nSets;
     u32 nBytes;
@@ -518,7 +521,9 @@ void fn_800CD404(Skin* pSkin) {
         }
         nSets = fn_800CCEA0(pSkin);
         if (nSets != 0) {
-            pSkin->aSets[i] = fn_80009B34(nSets * sizeof(SkinChoice), 2, 16, "SkinPart.c", 670);
+            // nSets * 8 is nSets SkinChoices; an int product here, so it is not shared with the
+            // memset's size (sizeof makes that one unsigned)
+            pSkin->aSets[i] = fn_80009B34(nSets * 8, 2, 16, "SkinPart.c", 670);
             memset(pSkin->aSets[i], 0, nSets * sizeof(SkinChoice));
             for (j = 0; j < nSets; j++) {
                 if (fn_800CCF10(pSkin, j, 0) >= 1) {
@@ -562,8 +567,9 @@ s32 fn_800CD5D0(SkinDesc* pDesc, int n) {
 
     args.pDesc = pDesc;
     args.n = n;
+    pIter = fn_80113B34(aBuf, &args);
     nBytes = 0;
-    for (pIter = fn_80113B34(aBuf, &args); fn_800CEEC0(pIter); fn_800CEEC8(pIter)) {
+    for (; fn_800CEEC0(pIter); fn_800CEEC8(pIter)) {
         pMesh = fn_800CEEF4(pIter);
         if ((pMesh->uFlags & 0x300000) == 0x300000) {
             nBytes += pMesh->nSize;
@@ -577,9 +583,9 @@ s32 fn_800CD5D0(SkinDesc* pDesc, int n) {
 s32 fn_800CD664(SkinDesc* pDesc, int nPart) {
     SkinPartDef* pPart;
     SkinVariant* pVariant;
+    s32 nMax;
     int i;
     int j;
-    s32 nMax;
     s32 nBytes;
 
     nMax = 0;
@@ -600,9 +606,10 @@ s32 fn_800CD664(SkinDesc* pDesc, int nPart) {
 // the counted entries of p34 together.
 s32 fn_800CD700(Skin* pSkin) {
     SkinDesc* pDesc;
-    int i;
     s32 nBytes;
+    int i;
     s32 nAll;
+    int j;
 
     nBytes = 0;
     pDesc = pSkin->pModel->pDesc;
@@ -611,9 +618,9 @@ s32 fn_800CD700(Skin* pSkin) {
         nBytes += fn_800CD664(pDesc, i);
     }
     nAll = 0;
-    for (i = 0; i < pDesc->n30; i++) {
-        if ((pDesc->p34[i].uFlags & 0x300000) == 0x300000) {
-            nAll += pDesc->p34[i].nSize;
+    for (j = 0; j < pDesc->n30; j++) {
+        if ((pDesc->p34[j].uFlags & 0x300000) == 0x300000) {
+            nAll += pDesc->p34[j].nSize;
         }
     }
     if (nBytes > nAll) {
@@ -640,15 +647,14 @@ void fn_800CD7D4(Skin* pSkin, SkinMesh* pMesh) {
 
 // Marks the bits of the entries fn_80113B34 walks for option n.
 void fn_800CD844(Skin* pSkin, int n) {
-    u8 aBuf[0x48];
+    u8 aBuf[0x38];              // the iterator's work space; its real size is not known
     SkinIterArgs args;
-    SkinIter* pIter;
     SkinMesh* pMesh;
+    SkinIter* pIter;
     SkinDesc* pDesc;
 
     pDesc = pSkin->pModel->pDesc;
-    if (n < 0) return;
-    if (n >= pDesc->n58) return;
+    if (n < 0 || n >= pDesc->n58) return;
     args.n = n;
     args.pDesc = pDesc;
     for (pIter = fn_80113B34(aBuf, &args); fn_800CEEC0(pIter); fn_800CEEC8(pIter)) {
@@ -682,12 +688,10 @@ void fn_800CD944(Skin* pSkin, int nPart) {
 // Marks the bits of every option.
 void fn_800CD9EC(Skin* pSkin) {
     SkinDesc* pDesc;
-    s32 n;
     int i;
+    s32 n;
 
-    if (pSkin == NULL || pSkin->pModel == NULL) return;
-    pDesc = pSkin->pModel->pDesc;
-    if (pDesc == NULL) return;
+    if (pSkin == NULL || pSkin->pModel == NULL || (pDesc = pSkin->pModel->pDesc) == NULL) return;
     n = pDesc->n58;
     for (i = 0; i < n; i++) {
         fn_800CD844(pSkin, i);
@@ -796,6 +800,7 @@ s32 fn_800CDDB0(Skin* pSkin, int nSet, int nVariant, u64 uId) {
     SkinDesc74* pSet;
     SkinDesc7C* pVariant;
     int i;
+    s32 nFirst;
 
     if (nSet < 0 || pSkin == NULL || pSkin->pModel == NULL || (pDesc = pSkin->pModel->pDesc) == NULL
         || nSet >= pDesc->n70 || nSet < 0) {
@@ -803,8 +808,9 @@ s32 fn_800CDDB0(Skin* pSkin, int nSet, int nVariant, u64 uId) {
     }
     if (nVariant < 0 || nVariant >= (pSet = &pDesc->p74[nSet])->n08) return 0;
     pVariant = &pDesc->p7C[nVariant + pSet->n10];
+    nFirst = pVariant->n0C;
     for (i = 0; i < pVariant->n08; i++) {
-        if (pDesc->p8C[pVariant->n0C + i].uId == uId) {
+        if (pDesc->p8C[nFirst + i].uId == uId) {
             return i;
         }
     }
@@ -1165,10 +1171,10 @@ void fn_800CEB1C(Skin** apSkins, int nSkins, DynTex* pTex) {
 void fn_800CEBE8(Skin** apSkins, int nSkins, DynTex* pTex, u64* aIds, int nIds) {
     SkinListEntry* pList;
     s32 nList;
-    TexBank* pBank;
-    s32 nC;
     int i;
+    s32 nC;
     u64 uId;
+    TexBank* pBank;
 
     pList = NULL;
     if (pTex == NULL) return;
@@ -1190,20 +1196,17 @@ void fn_800CEBE8(Skin** apSkins, int nSkins, DynTex* pTex, u64* aIds, int nIds) 
 
 // Hands fn_800CEDE0 the name codes a set's variant uses.
 void fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, DynTex* pTex) {
-    SkinDesc* pDesc;
-    SkinDesc74* pSet;
     int i;
+    SkinDesc74* pSet;
+    SkinDesc* pDesc;
 
-    if (pSkin == NULL || pSkin->pModel == NULL || nSet < 0) return;
-    if (nSet >= fn_800CCEA0(pSkin)) return;
-    if (nVariant < 0) return;
-    if (nVariant >= fn_800CCED0(pSkin, nSet)) return;
-    if (nOption < 0) return;
-    if (nOption >= fn_800CCF10(pSkin, nSet, nVariant)) return;
+    if (pSkin == NULL || pSkin->pModel == NULL || nSet < 0 || nSet >= fn_800CCEA0(pSkin)) return;
+    if (nVariant < 0 || nVariant >= fn_800CCED0(pSkin, nSet)) return;
+    if (nOption < 0 || nOption >= fn_800CCF10(pSkin, nSet, nVariant)) return;
     pDesc = pSkin->pModel->pDesc;
     pSet = &pDesc->p74[nSet];
     for (i = 0; i < pSet->n0C; i++) {
-        fn_800CEDE0(pSkin, pTex, pDesc->p84[i + (nVariant * pSet->n0C + pSet->n14)]);
+        fn_800CEDE0(pSkin, pTex, pDesc->p84[i + nVariant * pSet->n0C + pSet->n14]);
     }
 }
 

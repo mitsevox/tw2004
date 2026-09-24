@@ -10,15 +10,15 @@
 #define NUM_LADDER_EVENTS 25
 
 // GameMode4.c
-int  fn_801020EC(int nEvent);                   // the event's opponent (a golfer id)
-int  fn_80102104(int nEvent);                   // its course
-int  fn_8010211C(int nEvent);                   // its hole-selection preset
-u8   fn_80102204(int nProfile, int nEvent);     // the profile has won it
-u8   fn_80102228(int nProfile, int nEvent);     // the profile has won every event it needs
-u8   fn_801022BC(int nProfile, int nEvent);     // makes it the current event if it may be played
-void fn_80102468(void);                         // sets the session up for the current event
+int  GameMode4_GetEventOpponent(int nEvent);                   // the event's opponent (a golfer id)
+int  GameMode4_GetEventCourse_80102104(int nEvent);                   // its course
+int  GameMode4_GetEventHoles_8010211C(int nEvent);                   // its hole-selection preset
+u8   GameMode4_HasWonEvent(int nProfile, int nEvent);     // the profile has won it
+u8   GameMode4_IsEventOpen(int nProfile, int nEvent);     // the profile has won every event it needs
+u8   GameMode4_SelectEvent(int nProfile, int nEvent);     // makes it the current event if it may be played
+void GameMode4_StartEvent(void);                         // sets the session up for the current event
 int  fn_80102A44(int nEvent);
-void fn_80102A58(int nEvent, char* szOut);      // its name
+void GameMode4_GetEventName(int nEvent, char* szOut);      // its name
 int  fn_80102AAC(int nEvent);                   // its tour stop number
 
 // GameMode4Menu.c and LadderMap.c: the map. Each event has a node on it; the menus place the

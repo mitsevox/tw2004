@@ -34,11 +34,11 @@ void fn_8012141C(f32 fX, f32 fY, f32 fZ);
 
 // The grass type starts: a pool of 32 render records of 32 bytes.
 void SD_vShaderObject_Grass_Type_Init(void) {
-    SD_gpGrassTypeData->pPool = fn_8000AFA0(32, 32, 2, 16);
+    SD_gpGrassTypeData->pPool = UMemPool_Create(32, 32, 2, 16);
 }
 
 void SD_vShaderObject_Grass_Type_Close(void) {
-    fn_8000B058(SD_gpGrassTypeData->pPool);
+    UMemPool_Destroy(SD_gpGrassTypeData->pPool);
 }
 
 void SD_vShaderObject_Grass_Type_SetParameters(void* pParams) {
@@ -52,7 +52,7 @@ void SD_vShaderObject_Grass_Type_SetParameters(void* pParams) {
 void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassBufferDesc* pDesc) {
     f32 (*pVerts)[3] = fn_8000C594()->pVerts;
     u8* pTriFlags = fn_8000C594()->pTriFlags;
-    GrassRenderData* pRender = fn_8000B078(SD_gpGrassTypeData->pPool);
+    GrassRenderData* pRender = UMemPool_Alloc(SD_gpGrassTypeData->pPool);
     s32 nSet;
     s32 nRow;
     s32 i;
@@ -308,8 +308,7 @@ void GrassPacket_vFlushRow(void) {
 void GrassPacket_vAddVert(f32* pPos, int nInRow) {
     GrassWord* pVert = SD_gpGrassTypeData->pCur;
     if (nInRow == 0) {
-        GrassWord* pRow = SD_gpGrassTypeData->pRow;
-        pRow[3].b[2] = (pVert - pRow) / 4;
+        SD_gpGrassTypeData->pRow[3].b[2] = (SD_gpGrassTypeData->pCur - SD_gpGrassTypeData->pRow) / 4;
         SD_gpGrassTypeData->pRow = SD_gpGrassTypeData->pCur;
         pVert[3].b[2] = 0;
     }
@@ -393,7 +392,7 @@ void GrassPacket_vSetBuffer(GrassWord* pBuffer, int nVerts) {
 
 // A grass object goes: its render record back to the pool.
 void SD_vShaderObject_Grass_Static_Close(SD_SShaderObject_Static* pObject) {
-    fn_8000B0D4(SD_gpGrassTypeData->pPool, pObject->pData);
+    UMemPool_Free(SD_gpGrassTypeData->pPool, pObject->pData);
 }
 
 // GoGrass.c hands over the hole's grass parameters: copies of its vectors and eight floats, and
@@ -427,8 +426,9 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
     GrassRenderData* pData = pObject->pData;
     GrassParams* pParams = SD_gpGrassTypeData->pParams;
     s32 nSet = pParams->n24;
-    s32 nVerts = pData->anVerts[nSet][pParams->a18[nSet]];
-    GrassWord* pVert = pData->apVerts[nSet][pParams->a18[nSet]];
+    s32 nRun = pParams->a18[nSet];
+    s32 nVerts = pData->anVerts[nSet][nRun];
+    GrassWord* pVert = pData->apVerts[nSet][nRun];
     f32 vEye[3];
     f32 vAt[3];
     f32 fDist;
@@ -447,7 +447,7 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
     int nDone;
     int nInRow;
     int nPass;
-    s8 nRow;
+    int nRow;
     u8 nAlpha;
 
     if (nVerts <= 0) {
@@ -508,7 +508,7 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
             }
             fTexS = pVert[0].f * lbl_80260920[1][0] + lbl_80260920[0][0];
             fTexT = pVert[2].f * lbl_80260920[1][1] + lbl_80260920[0][1];
-            fShade = fInvScale * ((pAxis->f - fBase) + lbl_802608E0[(s8)pVert[3].b[0]]);
+            fShade = fInvScale * ((pAxis->f - fBase) + lbl_802608E0[pVert[3].b[0]]);
             nAlpha = 255.0f * pParams->a10[nSet] * fFade;
             for (nPass = 0; nPass < 2; nPass++) {
                 if (nPass == 1) {

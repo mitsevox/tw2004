@@ -30,33 +30,33 @@ void fn_80071AD0(void) {
     } else {
         nCount = 50;
     }
-    lbl_80281E98 = fn_8000AFA0(nCount, 0x34, 2, 16);
-    lbl_80281E94 = fn_8000AFA0(nCount, 0x2C, 2, 16);
-    lbl_80281E90 = fn_8000AFA0(nCount, 0x20, 2, 16);
-    lbl_80281E8C = fn_8000AFA0(nCount, sizeof(SkelPose), 2, 16);
-    lbl_80281E88 = fn_8000AFA0(nCount, 0x114C, 2, 16);
+    lbl_80281E98 = UMemPool_Create(nCount, 0x34, 2, 16);
+    lbl_80281E94 = UMemPool_Create(nCount, 0x2C, 2, 16);
+    lbl_80281E90 = UMemPool_Create(nCount, 0x20, 2, 16);
+    lbl_80281E8C = UMemPool_Create(nCount, sizeof(SkelPose), 2, 16);
+    lbl_80281E88 = UMemPool_Create(nCount, 0x114C, 2, 16);
 }
 
 // Destroy the pools fn_80071AD0 made.
 void fn_80071B94(void) {
     if (lbl_80281E98 != NULL) {
-        fn_8000B058(lbl_80281E98);
+        UMemPool_Destroy(lbl_80281E98);
         lbl_80281E98 = NULL;
     }
     if (lbl_80281E94 != NULL) {
-        fn_8000B058(lbl_80281E94);
+        UMemPool_Destroy(lbl_80281E94);
         lbl_80281E94 = NULL;
     }
     if (lbl_80281E90 != NULL) {
-        fn_8000B058(lbl_80281E90);
+        UMemPool_Destroy(lbl_80281E90);
         lbl_80281E90 = NULL;
     }
     if (lbl_80281E8C != NULL) {
-        fn_8000B058(lbl_80281E8C);
+        UMemPool_Destroy(lbl_80281E8C);
         lbl_80281E8C = NULL;
     }
     if (lbl_80281E88 != NULL) {
-        fn_8000B058(lbl_80281E88);
+        UMemPool_Destroy(lbl_80281E88);
         lbl_80281E88 = NULL;
     }
 }
@@ -72,13 +72,13 @@ void fn_80071C28(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBl
     if (*ppNode == NULL) {
         switch (nType) {
         case 0:
-            *ppNode = fn_8000B078(lbl_80281E98);
+            *ppNode = UMemPool_Alloc(lbl_80281E98);
             break;
         case 1:
-            *ppNode = fn_8000B078(lbl_80281E94);
+            *ppNode = UMemPool_Alloc(lbl_80281E94);
             break;
         default:
-            *ppNode = fn_8000B078(lbl_80281E90);
+            *ppNode = UMemPool_Alloc(lbl_80281E90);
             break;
         }
         if (*ppNode == NULL) return;
@@ -92,14 +92,14 @@ void fn_80071C28(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBl
     (*ppNode)->fStart = (*ppNode)->fEnd = 0.0f;
     (*ppNode)->fWeight = 0.5f;
     if ((*ppNode)->nFormat == 0) {
-        (*ppNode)->pPose = fn_8000B078(lbl_80281E8C);
+        (*ppNode)->pPose = UMemPool_Alloc(lbl_80281E8C);
         if ((*ppNode)->pPose == NULL) return;
         fn_8001E938((*ppNode)->pPose->a0, 128);
         fn_8001E938((*ppNode)->pPose->a10, 128);
         fn_8001E8A4((*ppNode)->pPose->a20, 128);
         fn_8001E8A4((*ppNode)->pPose->a30, 128);
     } else if ((*ppNode)->nFormat == 1) {
-        (*ppNode)->pPose = fn_8000B078(lbl_80281E88);
+        (*ppNode)->pPose = UMemPool_Alloc(lbl_80281E88);
         if ((*ppNode)->pPose == NULL) return;
         fn_8001E938(((SkelPose1*)(*ppNode)->pPose)->pose.a0, 128);
         fn_8001E938(((SkelPose1*)(*ppNode)->pPose)->pose.a10, 128);
@@ -134,11 +134,11 @@ void fn_80071F58(SKABlendNode** ppNode, u8 bFreeSources) {
     if (*ppNode == NULL) return;
     if ((*ppNode)->nFormat == 0) {
         if ((*ppNode)->pPose != NULL) {
-            fn_8000B0D4(lbl_80281E8C, (*ppNode)->pPose);
+            UMemPool_Free(lbl_80281E8C, (*ppNode)->pPose);
         }
     } else if ((*ppNode)->nFormat == 1) {
         if ((*ppNode)->pPose != NULL) {
-            fn_8000B0D4(lbl_80281E88, (*ppNode)->pPose);
+            UMemPool_Free(lbl_80281E88, (*ppNode)->pPose);
         }
     }
     (*ppNode)->pPose = NULL;
@@ -160,13 +160,13 @@ void fn_80071F58(SKABlendNode** ppNode, u8 bFreeSources) {
     if ((*ppNode)->bPooled == 1) {
         switch ((*ppNode)->nType) {
         case 0:
-            fn_8000B0D4(lbl_80281E98, *ppNode);
+            UMemPool_Free(lbl_80281E98, *ppNode);
             break;
         case 1:
-            fn_8000B0D4(lbl_80281E94, *ppNode);
+            UMemPool_Free(lbl_80281E94, *ppNode);
             break;
         default:
-            fn_8000B0D4(lbl_80281E90, *ppNode);
+            UMemPool_Free(lbl_80281E90, *ppNode);
             break;
         }
         *ppNode = NULL;

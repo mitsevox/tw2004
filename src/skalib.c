@@ -135,7 +135,7 @@ void ClipBank_Free(ClipBank* pBank) {
     for (i = 0; i < pBank->nClips; i++) {
         pClip = pBank->ppClips[i];
         if (pClip != NULL && (pClip->uFlags & 4)) {
-            fn_800B6594(pClip->uAram);
+            GoARAM_Free(pClip->uAram);
         }
     }
     if (pBank->pFile != NULL) {
@@ -1227,18 +1227,18 @@ u8* Skalib_ScratchToAram(int n) {
     }
     lbl_80281D0C[n] = uSize;
     if (lbl_80281D04[n] == 0) {
-        lbl_80281D04[n] = fn_800B6564(lbl_80281D0C[n]);
+        lbl_80281D04[n] = GoARAM_Alloc(lbl_80281D0C[n]);
     }
-    fn_800B67EC(fn_800B6844(p, lbl_80281D04[n], lbl_80281D0C[n]));
+    GoARAM_WaitTransfer(GoARAM_CopyToAram(p, lbl_80281D04[n], lbl_80281D0C[n]));
     return p;
 }
 
 // Brings slot n's scratch area back from ARAM and frees the ARAM.
 void Skalib_ScratchFromAram(int n) {
     u32 uSize = fn_8009EF90();
-    fn_800B67EC(fn_800B68B4(Skalib_Scratch(n, uSize), lbl_80281D04[n], lbl_80281D0C[n]));
+    GoARAM_WaitTransfer(GoARAM_CopyFromAram(Skalib_Scratch(n, uSize), lbl_80281D04[n], lbl_80281D0C[n]));
     if (lbl_80281D04[n] != 0) {
-        fn_800B6594(lbl_80281D04[n]);
+        GoARAM_Free(lbl_80281D04[n]);
         lbl_80281D04[n] = 0;
     }
 }
@@ -1385,12 +1385,12 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             if (n50 & 31) {
                 n50Al = ((n50 >> 5) + 1) << 5;
             }
-            uAram      = fn_800B6564(pHdr->n38 + pHdr->n04 + n50Al + n4CAl);
+            uAram      = GoARAM_Alloc(pHdr->n38 + pHdr->n04 + n50Al + n4CAl);
             uAramStart = uAram;
             if (pHdr->n38 != 0) {
                 for (f = 0; f < pHdr->nFrames; f++) {
                     Mem_cpy(lbl_80281CC8, pSrc1, pHdr->n8C * 2);
-                    fn_800B67EC(fn_800B6844(lbl_80281CC8, uAram, nStride1));
+                    GoARAM_WaitTransfer(GoARAM_CopyToAram(lbl_80281CC8, uAram, nStride1));
                     uAram += nStride1;
                     pSrc1 += pHdr->n8C * 2;
                 }
@@ -1398,7 +1398,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             if (pHdr->n04 != 0) {
                 for (f = 0; f < pHdr->nFrames; f++) {
                     Mem_cpy(lbl_80281CC4, pSrc2, pHdr->n8E);
-                    fn_800B67EC(fn_800B6844(lbl_80281CC4, uAram, nStride2));
+                    GoARAM_WaitTransfer(GoARAM_CopyToAram(lbl_80281CC4, uAram, nStride2));
                     uAram += nStride2;
                     pSrc2 += pHdr->n8E;
                 }
@@ -1407,13 +1407,13 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             pHdr->n8E = nStride2;
             if (n50 != 0) {
                 Mem_cpy(lbl_80281CCC, ((Clip*)pClipSrc)->pEC, pHdr->n50);
-                fn_800B67EC(fn_800B6844(lbl_80281CCC, uAram, n50Al));
+                GoARAM_WaitTransfer(GoARAM_CopyToAram(lbl_80281CCC, uAram, n50Al));
                 uAram += n50Al;
             }
             pHdr->n50 = n50Al;
             if (n4C != 0) {
                 Mem_cpy(lbl_80281CD0, ((Clip*)pClipSrc)->pF0, pHdr->n4C);
-                fn_800B67EC(fn_800B6844(lbl_80281CD0, uAram, n4CAl));
+                GoARAM_WaitTransfer(GoARAM_CopyToAram(lbl_80281CD0, uAram, n4CAl));
             }
             pHdr->n4C = n4CAl;
             fn_80020F60(pHdr, uAramStart);
@@ -1566,7 +1566,7 @@ void AnimLib_ReloadSlot(void) {
     for (i = 0; i < lbl_801C6050[nSlot]->nClips; i++) {
         pClip = lbl_801C6050[nSlot]->ppClips[i];
         if (pClip != NULL && (pClip->uFlags & 4)) {
-            fn_800B6594(pClip->uAram);
+            GoARAM_Free(pClip->uAram);
         }
     }
     pSlot = &lbl_801C6068[nSlot];
@@ -2037,9 +2037,9 @@ void ClipBank_Stash(int nSlot) {
     if (lbl_801C6488[nSlot] != NULL) {
         lbl_801C647C[nSlot] = ((lbl_801C6488[nSlot]->uSize + 0x80) / 32 + 1) * 32;
         if (lbl_801C6470[nSlot] == 0) {
-            lbl_801C6470[nSlot] = fn_800B6564(lbl_801C647C[nSlot]);
+            lbl_801C6470[nSlot] = GoARAM_Alloc(lbl_801C647C[nSlot]);
         }
-        fn_800B67EC(fn_800B6844(lbl_801C6488[nSlot], lbl_801C6470[nSlot], lbl_801C647C[nSlot]));
+        GoARAM_WaitTransfer(GoARAM_CopyToAram(lbl_801C6488[nSlot], lbl_801C6470[nSlot], lbl_801C647C[nSlot]));
         if (lbl_801C6488[nSlot] != lbl_80281CE0) {
             fn_80009E70(lbl_801C6488[nSlot]);
         }
@@ -2054,7 +2054,7 @@ void ClipBank_Stash(int nSlot) {
 void ClipBank_Restore(int nSlot) {
     if (lbl_801C6488[nSlot] == NULL) {
         lbl_801C6488[nSlot] = lbl_80281CE0;
-        fn_800B67EC(fn_800B68B4(lbl_801C6488[nSlot], lbl_801C6470[nSlot], lbl_801C647C[nSlot]));
+        GoARAM_WaitTransfer(GoARAM_CopyFromAram(lbl_801C6488[nSlot], lbl_801C6470[nSlot], lbl_801C647C[nSlot]));
         lbl_801C6488[nSlot]->pData = (u8*)lbl_801C6488[nSlot] + 0x80;
         ClipBank_Install(lbl_801C6488[nSlot]);
     }
@@ -2065,7 +2065,7 @@ void ClipBank_FreeAram(void) {
     int i;
     for (i = 0; i < 3; i++) {
         if (lbl_801C6470[i] != 0) {
-            fn_800B6594(lbl_801C6470[i]);
+            GoARAM_Free(lbl_801C6470[i]);
             lbl_801C6470[i] = 0;
         }
     }

@@ -121,7 +121,7 @@ int fn_80049820(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
     case 9:
         return fn_800497BC(pObj, (uptr)pArg);
     case 11:
-        return fn_8000AD78(pObj->aRot[2], pObj->aRot[0]);
+        return atan2f(pObj->aRot[2], pObj->aRot[0]);
     case 12:
         return 0;
     default:

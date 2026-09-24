@@ -119,7 +119,7 @@ void fn_800A30E4(int nKind, Ball* pBall, int nPlayer, u8 bFlight, f32 fValue) {
             pDef = &lbl_8018CA98[lbl_8018C868[nKind][i].nDef];
             Vec3Copy(pBall->vPos, pDef->v80);
             if (bFlight) {
-                pDef->f40 = -fn_8000AD78(-gPlayers[nPlayer].ball.vVel[0], gPlayers[nPlayer].ball.vVel[2]);
+                pDef->f40 = -atan2f(-gPlayers[nPlayer].ball.vVel[0], gPlayers[nPlayer].ball.vVel[2]);
             } else {
                 pDef->f40 = -gPlayers[nPlayer].fAim;
             }

@@ -67,7 +67,7 @@ typedef struct ARAMTransfer {
     int        nType;                   // 0x2C   as request.type
     u32        uMain;                   // 0x30   the main-memory address
     u32        uLength;                 // 0x34
-    u8         uFlags;                  // 0x38   1: give it back once done; 2: fn_800B6728 cancels it
+    u8         uFlags;                  // 0x38   1: give it back once done; 2: GoARAM_CancelTransfers cancels it
     struct ARAMTransfer* pNext;         // 0x3C
     struct ARAMTransfer* pPrev;         // 0x40
 } ARAMTransfer;
@@ -91,18 +91,18 @@ LAYOUT_ASSERT(ARAMState, 0x28);
 extern ARAMState* lbl_802814C8;
 
 // The heap (startUp.c keeps a second heap inside one block of this one).
-ARAMHeap*     fn_800B5C40(u32 uSize, u32 uBase, u32 nBlocks, ARAMHeap* pHeap);
-u32           fn_800B5D34(ARAMHeap* pHeap, u32 uSize, u32 uAlign);     // returns the ARAM address
-void          fn_800B5E88(ARAMHeap* pHeap, u32 uAram);
+ARAMHeap*     GoARAM_HeapInit(u32 uSize, u32 uBase, u32 nBlocks, ARAMHeap* pHeap);
+u32           GoARAM_HeapAlloc(ARAMHeap* pHeap, u32 uSize, u32 uAlign);     // returns the ARAM address
+void          GoARAM_HeapFree(ARAMHeap* pHeap, u32 uAram);
 
 // GoARAM.c's own heap and transfers.
-u32           fn_800B6564(u32 uSize);                  // take ARAM, returns its address
-void          fn_800B6594(u32 uAram);                  // give it back
-ARAMTransfer* fn_800B65C0(u32 uSource, u32 uDest, u32 uLength, int nType, u32 uPriority,
+u32           GoARAM_Alloc(u32 uSize);                  // take ARAM, returns its address
+void          GoARAM_Free(u32 uAram);                  // give it back
+ARAMTransfer* GoARAM_QueueTransfer(u32 uSource, u32 uDest, u32 uLength, int nType, u32 uPriority,
                           void (*pfnDone)(u32 uOwner), u32 uOwner, u8 uFlags);
-int           fn_800B6728(u32 uOwner);                 // cancel uOwner's transfers
-void          fn_800B67EC(ARAMTransfer* pTransfer);    // wait for a transfer, then free it
-ARAMTransfer* fn_800B6844(void* pSrc, u32 uAram, u32 uSize);   // copy to ARAM
-ARAMTransfer* fn_800B68B4(void* pDst, u32 uAram, u32 uSize);   // copy from ARAM
+int           GoARAM_CancelTransfers(u32 uOwner);                 // cancel uOwner's transfers
+void          GoARAM_WaitTransfer(ARAMTransfer* pTransfer);    // wait for a transfer, then free it
+ARAMTransfer* GoARAM_CopyToAram(void* pSrc, u32 uAram, u32 uSize);   // copy to ARAM
+ARAMTransfer* GoARAM_CopyFromAram(void* pDst, u32 uAram, u32 uSize);   // copy from ARAM
 
 #endif
