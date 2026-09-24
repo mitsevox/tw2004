@@ -1,7 +1,7 @@
 // FE_Manager.c (EA's name, from its asserts; also in EA's 2002 source tree): the front end's
-// manager, which runs the menu screens: the movies played from the menus (the intro, the credits,
-// the golfers' bios), the profile being worked on, the created golfer and its Create-A-Player
-// picks and unlocks.
+// manager: its set-up and shut-down, the movies (the intro, and the credits and the golfers' bios
+// the menus queue), the profile being worked on and its backups (moved out to ARAM and back), the
+// created golfer and its Create-A-Player picks and unlocks.
 
 #include "engine.h"
 #include "ustream.h"
@@ -42,7 +42,7 @@ void fn_80076F58(void);
 void fn_80076F80(UStreamObject* pObject);
 void fn_8007706C(char* pName, char* pDir, char* pPath);
 void fn_800770D4(char* pName, char* pPath);
-void FE_GetBIOMovieName(void);
+void FE_UpdateMovieQueue(void);
 void fn_800772E0(void);
 void fn_8007731C(void);
 void fn_80077340(void);
@@ -53,7 +53,7 @@ void fn_8007739C(Replay* pReplay);
 void fn_800773F8(void);
 void fn_80077428(void);
 void fn_8007744C(void);
-void Golfer_LoadCreatedFromSave(void);
+void fn_800775BC_LoadCreatedFromSave(void);
 void fn_80077C1C(int a, int b);
 u8   FE_CrAP_IsAssetUndesirable(s16 nPart, CrAPAsset* pAsset);
 u8   fn_80078B84(CrAPAsset* pAsset);
@@ -72,7 +72,7 @@ u32 lbl_80281ECC;
 FEBio* lbl_80281EC8;
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
-// 1.0f (0x80283AC0), before the 0.0f and 0.05f FE_GetBIOMovieName uses first; its body is unknown.
+// 1.0f (0x80283AC0), before the 0.0f and 0.05f FE_UpdateMovieQueue uses first; its body is unknown.
 static f32 FE_Manager_StrippedFn(f32 x) {
     return x + 1.0f;
 }
@@ -176,7 +176,7 @@ u8 fn_80077148(void) {
 
 // Once a frame: while a movie is queued, fade the screen to black; once it is black, play the
 // movie and take it off the queue.
-void FE_GetBIOMovieName(void) {
+void FE_UpdateMovieQueue(void) {
     char szPath[256];
     char szName[32];
     f32 vColor[4];
@@ -267,7 +267,7 @@ void fn_800773F8(void) {
 }
 
 void fn_80077428(void) {
-    Golfer_LoadCreatedFromSave();
+    fn_800775BC_LoadCreatedFromSave();
     fn_80079D30();
 }
 
@@ -296,7 +296,7 @@ void fn_8007744C(void) {
 
 // Every player on a created golfer gets its slot's saved record in the golfer table, but keeps
 // the table's hidden attributes (fn_80079E44). Then the front end's data is freed.
-void Golfer_LoadCreatedFromSave(void) {
+void fn_800775BC_LoadCreatedFromSave(void) {
     int i;
     int j;
     int nGolfer;
@@ -334,8 +334,8 @@ void fn_80077780(void) {
     }
 }
 
-// Back up one slot's profile. A slot without a backup row takes its own row, first swapping in
-// the backup that sits in the first free row.
+// Back up one slot's profile. A slot without a backup row takes its own row, first moving the
+// backup that sat there into the first free row (a swap).
 void fn_80077808(int nSlot) {
     int nFree = -1;
     int i;
@@ -752,8 +752,9 @@ void fn_80078680(SaveProfile* pProfile) {
 
 // ---- the created golfer's parts -----------------------------------------------------------------
 
-// The created golfer's equipment tiers, from the equipment it wears: each of the 53 equipment
-// slots can raise up to two attributes' tiers.
+// pProfile's created golfer's equipment tiers, from the equipment in the 53 slots of the profile
+// being worked on (fn_80103D14 reads that profile, not pProfile; every caller passes it): each slot
+// can raise up to two attributes' tiers.
 void fn_8007873C(SaveProfile* pProfile) {
     s32 i;
     int nAsset;
@@ -859,7 +860,8 @@ void fn_80078A2C(s16 nPart, int nChance) {
     }
 }
 
-// The asset is one of the eight plain colours.
+// The asset is named one of eight bright colours (White, Bright Red, Orange, Pink, Yellow, Green,
+// Purple, Blue).
 u8 fn_80078B84(CrAPAsset* pAsset) {
     if (pAsset == NULL) {
         return 0;
@@ -939,7 +941,7 @@ u8 fn_80078D24(CrAPAsset* pAsset) {
 }
 
 // A random created golfer: random parts 10, 9 and 16; hair (part 3) with a 10% chance of corn
-// rows, an afro or a mohawk; parts 4 to 6 on a random choice now and then; part 14 a plain colour
+// rows, an afro or a mohawk; parts 4 to 6 on a random choice now and then; part 14 a bright colour
 // one time in five, and part 15 usually the same choice; a hat (part 0) 40% of the time, a crazy
 // one one time in five; and a few more parts by chance.
 void fn_80078E34(SaveProfile* pProfile) {
@@ -1129,9 +1131,10 @@ int fn_8007975C(SaveProfile* pProfile, s16 nPart, int nChance) {
     return fn_800797E0(pProfile, nPart, nPick, nChance);
 }
 
-// Part nPart, b at a random choice, which is returned; with a chance of nChance percent, its first
-// choice instead. Outside the session's 0x4000 mode (which also skips the intro movie) only
-// choices fn_80104020 allows are drawn. -1: nothing was picked.
+// Part nPart, b at a random choice, which is returned (-1: nothing was picked). With a chance of
+// nChance percent the part is left alone, except in the session's 0x4000 mode (which also skips
+// the intro movie), where it gets its first choice. Outside that mode only choices fn_80104020
+// allows are drawn (none: the first choice).
 int fn_800797E0(SaveProfile* pProfile, s16 nPart, int b, int nChance) {
     int aChoices[250];
     int nFound = 0;
@@ -1201,10 +1204,11 @@ void fn_80079974(void) {
     }
 }
 
-// Set up the session for the menus. In game modes 5 and 11 player 1 plays the created golfer when
-// slot 1 holds a profile, else golfer 0. Each player slot is a CPU player, a loaded profile (a
-// created golfer brings its own bag) or a table golfer with its bag; slots past the players have
-// no profile. Then the mode the menus start in.
+// Set up the session's players for a game started from the menus. In game modes 5 and 11 player 1
+// plays the created golfer when slot 1 holds a profile (unless b11703), else golfer 0. Each player
+// slot is a CPU player, a loaded profile (a created golfer brings its own bag), a CPU controller or
+// a table golfer with its bag (its save slot still marked active); slots past the players have no
+// profile. Then it records nMode (the menus read it back): the game mode, or 4, 23, 27 or 28.
 void fn_80079AD4(void) {
     int i;
     if (Game_GetMode() == 5 || Game_GetMode() == 11) {

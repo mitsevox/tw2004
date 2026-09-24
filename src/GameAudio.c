@@ -273,7 +273,7 @@ void fn_800A4044(u8 nIndex, u8 nValue) {
 void fn_800A4080(void) {
 }
 
-// Starts the course's sounds (not in modes 0, 1 and 3): the wind and the pin's emitter.
+// Starts the course's sounds (not in game types 0, 1 and 3): the wind and the pin's emitter.
 void fn_800A4084(void) {
     u8 nWind;
 
@@ -355,8 +355,8 @@ void fn_800A43DC(void) {
 }
 
 // Applies the sound options: the volumes, then the music. Game types 3 and 10 play music 2 on
-// row 0; otherwise music 6 plays (two players at most, not in a replay) on the row the game mode
-// picks, if that row is switched on. Without music the ambience (sound 8) plays instead.
+// row 0, others music 6 (two players at most, no replay) on the game mode's row, if the row is on
+// (skipped: a8[0] without flag 0x4000). Music 6 allowed but off: ambience (sound 8) if b288, SFX>0.
 void fn_800A44A0(void) {
     int nMode;
     f32 fVolume;
@@ -719,7 +719,7 @@ void fn_800A4FD8(void) {
     lbl_80282029 = 0;
 }
 
-// Sets up the round's sounds: each view's emitters (0 the swing, 1 the ball, 2 and 3 the crowd
+// Sets up the round's sounds: each view's emitters (0 the swing, 1 the ball, 2 and 3 a pair
 // either side), the music and the ambience.
 void fn_800A500C(void) {
     GameAudioView* pView;
@@ -894,8 +894,8 @@ void fn_800A562C(u8 nPlayer) {
     pView->n18 = 0;
 }
 
-// The swish of the club while the swing meter runs (swing states 1 and 3): its pitch and volume
-// follow how fast the club head (bone 0x53) moves.
+// The swish of the club in the backswing and downswing (swing states 1 and 3): its pitch and
+// volume follow how fast the club head (bone 0x53) moves.
 void fn_800A573C(u8 nPlayer) {
     Player* pPlayer;
     GameAudioView* pView;
@@ -951,8 +951,8 @@ void fn_800A573C(u8 nPlayer) {
     }
 }
 
-// The swing: its sound by club and lie on the view's emitter 0, the crowd's reaction for a few
-// calls after fn_800A68C0 set lbl_80282034.
+// The swing: its sound by club and lie on the view's emitter 0. For a few calls after fn_800A68C0
+// set lbl_80282034 it plays track 4 of the view's emitters 2 and 3 instead.
 void fn_800A5980(u8 nPlayer) {
     Player* pPlayer;
     GameAudioView* pView;
@@ -1147,7 +1147,7 @@ void fn_800A5FE8(u8 nPlayer) {
     fn_800ADA28(nId, 0, 0x17, 0);
 }
 
-// Plays sound 3 on the view's emitters' track 1, at most once every 300 frames when bLimit is set.
+// Plays variant 3 on track 1 of the view's emitters 2 and 3, at most every 300 frames with bLimit.
 void fn_800A6070(u8 nPlayer, u8 bLimit) {
     Player* pPlayer;
     u8 nIdA;
@@ -1247,7 +1247,6 @@ void fn_800A6450(u8 nPlayer) {
     }
 }
 
-// The calls below only sound when gpGame->b288 is set.
 void fn_800A64A8(u8 nPlayer, u8 b) {
     GameAudioView* pView;
 
@@ -1575,7 +1574,7 @@ void fn_800A7294(void) {
     }
 }
 
-// Switches the game's sounds off (bOff) or back on; bMusic restarts the music too.
+// Switches the game's sounds off (bOff); switching back on restarts only the music, if bMusic.
 void fn_800A72EC(u8 bOff, u8 bMusic) {
     if (lbl_8028202E ^ bOff) {
         lbl_8028202E = bOff;
