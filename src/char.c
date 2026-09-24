@@ -3430,6 +3430,7 @@ MtaLib* fn_8001F110(MtaLib* pLib, s32* pnSize) {
     int j;
     MtaEntry* pEntry;
     int nPad;
+    MtaRecord* pRecord2;
 
     pSrc = pDst = pLib;
     fn_8001F08C(&pSrc, &pDst, aHeader, 10, 1);
@@ -3446,9 +3447,9 @@ MtaLib* fn_8001F110(MtaLib* pLib, s32* pnSize) {
         nOffset += pRecord->nEntries * sizeof(MtaEntry);
     }
     for (i = 0; i < pLib->nRecords; i++) {
-        pRecord = &pLib->pRecords[i];
-        for (j = 0; j < pRecord->nEntries; j++) {
-            pEntry = &pRecord->pEntries[j];
+        pRecord2 = &pLib->pRecords[i];
+        for (j = 0; j < pRecord2->nEntries; j++) {
+            pEntry = &pRecord2->pEntries[j];
             pEntry->pData = (u8*)pLib + nOffset;
             nOffset += pEntry->nBytes;
             nPad = nOffset % 4;
