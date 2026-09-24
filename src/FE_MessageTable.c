@@ -33,6 +33,10 @@ s32  fn_800A1164(s32 nPort, s32 nSlot, char* pName, s32 n);     // MC.c
 s32  fn_800A1590(s32 nPort, s32 nSlot, s32 n, char* szOut);     // MC.c: clears szOut first
 void fn_8007739C(Replay* pReplay);      // FE_Manager.c
 f32  GM_GetBonusProgress(SaveProfile* pProfile);    // GameManager.c
+int  fn_80102134(void);                 // GameMode4.c: the current ladder event's holes
+int  fn_801021FC(void);                 // GameMode4.c: the current ladder event
+s32  fn_800ED688(int i);                // GameMode5.c: challenge i's opponent count
+s32  fn_800ED69C(int i, int k);         // GameMode5.c: its opponent k
 u8   fn_800E22E4(int nSlot, int a, int b);      // GameRound.c
 int  fn_800E234C(int nSlot, int a, int b);      // GameRound.c
 int  fn_800D3D10(int nGolfer);          // Earnings.c: the golfer's rating
@@ -4479,6 +4483,65 @@ void fn_80083068(MsgArg* pArgs, MsgArg* pResult) {
         }
     }
     pResult->i = b;
+}
+
+// For the current ladder event's challenge: the most a single opponent's skins are worth over the
+// holes played (the front nine, the back nine or both; each hole's skin at the opponent's rating),
+// and each opponent playing the player's own golfer gets the next of its four looks.
+void fn_8008311C(MsgArg* pArgs, MsgArg* pResult) {
+    int  nChallenge = fn_801021FC() - 1;
+    int  nOpponents = fn_800ED688(nChallenge);
+    int  nMax = 0;
+    int  nHoles = fn_80102134();
+    int  nGolfer;
+    int  nSum;
+    int  nLook;
+    int  i;
+    int  h;
+    GolferRecord* pRecord;
+
+    for (i = 0; i < nOpponents; i++) {
+        nGolfer = fn_800ED69C(nChallenge, i);
+        nSum = 0;
+        for (h = 0; h < 6; h++) {
+            if (nHoles == 2 || nHoles == 1) {
+                nSum += lbl_80200538.aSkins[fn_800D3D10(nGolfer)].aValue[0];
+            }
+        }
+        for (h = 6; h < 9; h++) {
+            if (nHoles == 2 || nHoles == 1) {
+                nSum += lbl_80200538.aSkins[fn_800D3D10(nGolfer)].aValue[1];
+            }
+        }
+        for (h = 9; h < 12; h++) {
+            if (nHoles == 3 || nHoles == 1) {
+                nSum += lbl_80200538.aSkins[fn_800D3D10(nGolfer)].aValue[1];
+            }
+        }
+        for (h = 12; h < 17; h++) {
+            if (nHoles == 3 || nHoles == 1) {
+                nSum += lbl_80200538.aSkins[fn_800D3D10(nGolfer)].aValue[2];
+            }
+        }
+        for (h = 17; h < 18; h++) {
+            if (nHoles == 3 || nHoles == 1) {
+                nSum += lbl_80200538.aSkins[fn_800D3D10(nGolfer)].aValue[3];
+            }
+        }
+        nMax = (nSum > nMax) ? nSum : nMax;
+    }
+    pResult->i = nMax;
+
+    pRecord = fn_80077A80(gSession.nGolfer[lbl_80281ED4->nSlot]);
+    for (i = 0; i < nOpponents; i++) {
+        if (pRecord->nModelID == fn_80077A80(fn_800ED69C(nChallenge, i))->nModelID) {
+            nLook = gSession.aProfile[lbl_80281ED4->nSlot].n0 + 1;
+            if (nLook == 4) {
+                nLook = 0;
+            }
+            gSession.aProfile[i + 1].n0 = nLook;
+        }
+    }
 }
 
 void fn_80083354(MsgArg* pArgs, MsgArg* pResult) {
