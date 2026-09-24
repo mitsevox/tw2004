@@ -8,21 +8,20 @@
 #include "game_types.h"
 #include "platform.h"
 
-// An entry of the front end's colour table: p8 points at four bytes, alpha first (uiText.c).
-// Every table in the UI file's second list holds entries of this shape; u0 is the entry's kind,
-// 0x10 in the colour table (fn_8008FDDC).
-// Movie entries (fe_movies.c) use the same shape: flags 1 a texture (p4 its data), 2 a movie
-// (p8 its LLPict).
-typedef struct UIColorEntry {
+// An entry of a table in the UI file's second list; u0 is the entry's kind. In the colour table
+// (kind 0x10, fn_8008FDDC) p8 points at four bytes, alpha first (uiText.c). fn_8008FE88 resolves
+// kind 1 to a texture and kind 2 to a named record (p4). Movie entries (fe_movies.c) use the same
+// shape: flags 1 a texture (p4 its data), 2 a movie (p8 its LLPict).
+typedef struct UIFileEntry {
     u32  u0;                    // 0x0
     void* p4;                   // 0x4
     u8*  p8;                    // 0x8
     char szC[4];                // 0xC  its name (fn_8008FFF0 reads it); the length is not known
-} UIColorEntry;
+} UIFileEntry;
 
 typedef struct UIColorTable {
     s32  nCount;                // 0x0  read as an s16
-    UIColorEntry* apEntries[1]; // 0x4  nCount of them
+    UIFileEntry* apEntries[1];  // 0x4  nCount of them
 } UIColorTable;
 
 // A pair in the UI file's first list. fn_8008F610 hands p4 to the studio as a screen's data.

@@ -329,7 +329,7 @@ void fn_8008FDDC(FrontEnd* pFE) {
 // table noted in lbl_801D87C0.n3C).
 void fn_8008FE88(FrontEnd* pFE) {
     UIColorTable* pTable;
-    UIColorEntry* pEntry;
+    UIFileEntry* pEntry;
     u64 uHash;
     char* szName;
     int nBank;
