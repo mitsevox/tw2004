@@ -677,6 +677,8 @@ void   fn_800C7480(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3, f32* pLook0, 
                    f32* pLook3, f32* pCam, f32* pSub, f32* pFov, f32 fFov1, f32 fFov2, f32 fT);
 // Not decompiled yet: a share of a fly-by path's spline (fn_8003EA50).
 f32    fn_800C7A9C(FlyByPath* pPath, f32 fT);
+// CamSpline.c: the Catmull-Rom basis matrix.
+extern f32 lbl_80191440[4][4];
 
 // ---- the static and fly-by cameras (GoStaticCam.c, 0x8006449C..) ----------------------------
 
