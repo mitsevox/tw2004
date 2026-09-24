@@ -12,6 +12,7 @@
 #include "core/memcard.h"
 #include "charstate.h"
 #include "trax.h"
+#include "core/gameaudio.h"
 #include "core/easb.h"
 #include "game/earnings.h"
 #include "game/modes/ladder.h"
@@ -19,7 +20,6 @@
 // Outside this file.
 void fn_800142A4(s8 n);                 // sets lbl_80281C98
 void fn_80057438(SaveProfile* pProfile);
-void fn_800A44A0(void);
 void fn_8008E354(void);                 // FEgolferanim.c
 void fn_8008F80C(s32 p0, s32 p1);       // uiProcessInterface.c
 void fn_8008E358(s32 p0);               // FEgolferanim.c
@@ -4640,6 +4640,39 @@ void fn_80083F54(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
+// The Game Boy Advance link's state (fn_80124094) as the menus number it; other states leave
+// the result as it was.
+void fn_80083F60(MsgArg* pArgs, MsgArg* pResult) {
+    switch (fn_80124094()) {
+    case 1:
+        pResult->i = 0;
+        break;
+    case 5:
+        pResult->i = 1;
+        break;
+    case 6:
+    case 8:
+        pResult->i = 3;
+        break;
+    case 7:
+    case 9:
+        pResult->i = 4;
+        break;
+    case 3:
+        pResult->i = 6;
+        break;
+    case 16:
+        pResult->i = 7;
+        break;
+    case 17:
+        pResult->i = 8;
+        break;
+    case 18:
+        pResult->i = 9;
+        break;
+    }
+}
+
 // Read five values over the Game Boy Advance link (gbacable.c) into the words pArgs[0..4] point
 // at: fn_80124174's after request 0x70, then fn_80124190's after requests 0xB0 with 0 to 3. It
 // stops once the link's state (fn_80124094) is 18 or -1. Then, if fn_80124224 says so, a state
@@ -4987,6 +5020,28 @@ void fn_80084B88(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80084BE4(MsgArg* pArgs, MsgArg* pResult) {
+}
+
+// Music commands: 0 turns music row 0 and its track pArgs[1] on and plays the track, 1 calls
+// fn_800A75B4, 2 calls fn_800A7944 unless fn_800A75F4 says not to.
+void fn_80084BE8(MsgArg* pArgs, MsgArg* pResult) {
+    switch (pArgs[0].i) {
+    case 0:
+        gSession.options.abRowOn[0] = 1;
+        gSession.options.rows[0][pArgs[1].i] = 1;
+        fn_800A75B4();
+        fn_800A44A0();
+        fn_800A754C(13, pArgs[1].i);
+        break;
+    case 1:
+        fn_800A75B4();
+        break;
+    case 2:
+        if (!fn_800A75F4()) {
+            fn_800A7944();
+        }
+        break;
+    }
 }
 
 // A name typed as nothing but spaces becomes "User <n>" for the working slot.
