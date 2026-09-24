@@ -130,7 +130,6 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
     Clip* pClip;
     char* pName;
     CourseInfo* pCourse;
-    AnimPlayer* pAnim;
     f32 fDelay;
 
     if (pChar->nStyle == -1) return;
@@ -183,9 +182,8 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
     if (fn_8001EC48(pChar)) {
         fn_8001BD18(pChar, pClip);
     }
-    pAnim = (AnimPlayer*)pChar->anim;
     if (bReset) {
-        pAnim->fTime = 0.0f;
+        pChar->fAnimTime = 0.0f;
         fn_80071F58(&pNode, 0);
         fn_80071C28(&pNode, 1, pNode->nFormat, pfnBlend, nC);
         fn_801141F8(pChar->pModel->pF0, pChar->pModel);
@@ -193,21 +191,21 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
         fn_801141F8(pChar->pModel->pF8, pChar->pModel);
     }
     if (-20000.0f == fStart) {
-        fStart = pAnim->fTime;
+        fStart = pChar->fAnimTime;
     }
     fn_800958F8(pChar, NULL, pClip, aBlend, fFrom, fTo, fStart, fOffset);
-    fDelay = fOffset + (pAnim->fEnd - pAnim->fTime);
+    fDelay = fOffset + (pChar->fAnimEnd - pChar->fAnimTime);
     fn_800175B0(pChar, pClip, aBlend[3] - aBlend[0]);
     pNew = NULL;
     fn_80071C28(&pNew, 0, pNode->nFormat, pfnBlend, nC);
     fn_800724C0(&pChar->blend, pNew, pClip, 1.0f);
     fn_800720C8(pChar, pNew, &pNode, aBlend, pfnBlend, nC);
-    pAnim->n00 = 0;
-    pAnim->n08 = 1;
-    pAnim->fStart = pNode->fStart;
-    pAnim->fEnd = pNode->fEnd;
+    ((AnimPlayer*)pChar->anim)->n00 = 0;
+    pChar->n16C = 1;
+    pChar->f180 = pNode->fStart;
+    pChar->fAnimEnd = pNode->fEnd;
     if (-20000.0f == fTime) {
-        fTime = pAnim->fTime;
+        fTime = pChar->fAnimTime;
     } else if (-10000.0f == fTime) {
         fTime = pNode->fEnd;
     } else if (-30000.0f == fTime) {
@@ -216,7 +214,7 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
     if (fOffset < 0.0f) {
         fTime += fOffset;
     }
-    fn_800958EC(pAnim, nAnim, fTime);
+    fn_800958EC((AnimPlayer*)pChar->anim, nAnim, fTime);
     pChar->p178C = NULL;
     if (pClip != NULL && pClip->pF4 != NULL) {
         fn_8009622C(pChar, pClip->pF4, bReset, fDelay);
