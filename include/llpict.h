@@ -36,7 +36,25 @@ typedef struct PictFrame {
     s32  nWidth;                // 0x00
     s32  nHeight;               // 0x04
     u8*  pPixels;               // 0x08
+    u32  nRefs;                 // 0x0C  1 or 2 when handed out; back to the free list at 0
 } PictFrame;
+
+// The MAD movie decoder (rcmp_mad_codec.c; 0x50 bytes, our name): six frames, each either in use
+// or free.
+typedef struct MadDecoder {
+    u8   bFirst;                // 0x00  the frames are not allocated yet
+    f32  fFrameTime;            // 0x04  milliseconds per frame
+    s32  nRate;                 // 0x08  frames per second, 16.16
+    s16  nWidth;                // 0x0C
+    s16  nHeight;               // 0x0E
+    PictFrame* pLast;           // 0x10  the last key or 'MADm' frame, the next one's reference
+    u8   nEnd;                  // 0x14  fn_800B9930 tests it for 2
+    s32  nFiles;                // 0x18  files read
+    PictFrame* pFrames;         // 0x1C  the six frames' memory
+    PictFrame* apUsed[6];       // 0x20
+    PictFrame* apFree[6];       // 0x38
+} MadDecoder;
+LAYOUT_ASSERT(MadDecoder, 0x50);
 
 // What LLVideo.c hands LLPict_Gc.c for a movie: the decoder (fn_8002FEB0 makes it, 0x50 bytes)
 // and its current frame.
