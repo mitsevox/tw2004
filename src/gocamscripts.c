@@ -359,7 +359,7 @@ void CamScript_RunFEScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript
 }
 
 // The script frame of a fly-by path (GoStaticCam.c). When the path has a spline, the camera flies
-// along it (fn_80065488) by the share of the spline's length the time has reached, and at the end
+// along it (StaticCam_GetFlybyInformation) by the share of the spline's length the time has reached, and at the end
 // goes on to the next path's shots; without one, the camera moves between the shots on the
 // spline only (CamScript_SplineCameras).
 void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b, f32 fTime) {
@@ -387,7 +387,7 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScr
         if (fShare > 1.0f) {
             fShare = 1.0f;
         }
-        fn_80065488(pScript, pScript->pShot->nA4, pCam, pSub, &fFov, nPlayer, fn_800C7A9C(pPath, fShare));
+        StaticCam_GetFlybyInformation(pScript, pScript->pShot->nA4, pCam, pSub, &fFov, nPlayer, fn_800C7A9C(pPath, fShare));
         fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), fFov);
         if (pScript->nCamera != 0) {
             fn_8003F2E0(pScript, fTime);
@@ -1732,7 +1732,7 @@ void CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer) {
                 fDist = fn_80009680(fn_80009744(vLand));
                 fReach = AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
                 fReach *= Physics_GetLiePowerPercentage(&gPlayers[nPlayer].ball);
-                fReach *= fn_8005B64C(nPlayer);
+                fReach *= SW_vGetShotPower(nPlayer);
                 if (fReach < fDist - 50.0f) {
                     fn_800BAF04(vLand, vLand);
                     fn_8001EF34(vLand, fReach, vLand);

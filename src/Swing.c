@@ -1,6 +1,8 @@
-// Swing.c: the human swing - the meter's error and power, and what the golfer's attributes do
-// to them. Named by its assert string at 0x8028118C. CodeWarrior GC/2.5, -O4,p. The formulas
-// and tables are written up in docs/gameplay.md.
+// Swing.c (named by its file string at 0x8028118C, in SW_vInitModule's allocations): the stick
+// swing - its phases, the miss and the power, and what the golfer's attributes do to them; the
+// club trail and the boost display; the golfer state engine (GOLFERSTATE_*) and its states'
+// callbacks (STATEFUNC_*). CodeWarrior GC/2.5, -O4,p. The formulas and tables are written up in
+// docs/gameplay.md.
 
 #include "golfer.h"
 #include "ball.h"
@@ -8,7 +10,8 @@
 #include "engine.h"
 #include "dynobj.h"
 
-// The swing module's state; only the tuning values read here. Set up in Swing_Init.
+// The swing module's data (gpSwing): the trail textures, meshes and buffers and the tuning
+// values. Set up in SW_vInitModule and SW_vUIInit.
 typedef struct SwingState {
     TexBank*  pBank;            // 0x000  the bank of the three textures below
     TexEntry* pClubBack;        // 0x004  texture "clubback": the backswing trail's
@@ -113,7 +116,7 @@ extern f32           gPuttXScale[8];             // 0x801882AC  per shot kind: 0
 extern f32           gSwingXScale[8];            // 0x801882CC  the same values again
 extern s32           gClubCurve[CLUB_MAX_e];      // 0x80183578  per club, 0..26: how much it can shape
 extern SwingStack    gSwingStacks[];             // 0x801D5A90
-extern u8            gInSwingExit;               // 0x80281E00  set while a state's exit callback runs
+extern u8            gInSwingExit;               // 0x80281E00  set while a state's enter or exit callback runs
 extern s8            lbl_80281E09;
 extern u8            lbl_80281E08;
 extern ModeStateDef  lbl_801883C0[];
@@ -129,28 +132,28 @@ extern Vec4          lbl_80183690;          // 0, 0, 0, 0.5 (assigned, not an in
 extern Vec4          lbl_80183620;          // 0, 0, 0, 0.5 (assigned)
 
 void  Swing_FaceVector(int nPlayer, f32* pOut);
-f32   Swing_MeterError(int nPlayer);
-void  Swing_ShapeVector(int nPlayer, f32* pOut);
+f32   fn_8005BA94_MishitAngle(int nPlayer);
+void  fn_8005B8C8_ShapeVector(int nPlayer, f32* pOut);
 f32   fn_8005CC84(f32 fTan);                     // atanf
 void  fn_8005CCA8(int nPlayer);
 void  Vec_Sub(f32* pA, f32* pB, f32* pOut);      // 0x8005CBF4  a - b
 void  Vec_Add(f32* pA, f32* pB, f32* pOut);      // 0x8005CBD0  a + b
-void  Swing_ClearFrameFlag(int nPlayer);
+void  SW_vUIBlurReset(int nPlayer);
 void  fn_800360A0(void* p);
-void  Swing_LoadTuning(int nPlayer);
+void  SW_vUIInit(int nPlayer);
 void  fn_80036054(void* p, int a, s32* pDesc);
 void  fn_8005A788(int nPlayer, int a);
 void  fn_800AE3C4(int nPlayer);
 u8*   Pad_State(int nPlayer, int nController);   // the pad's state: [1] main stick y, [3] C-stick y
-int   Swing_StickX(int nPlayer, u8* pPad);       // 0x80058F04  main or C-stick by bUsingCStick
+int   Swing_StickX(int nPlayer, u8* pPad);       // 0x80058F04  main or C-stick by nStickUsed
 int   Swing_StickY(int nPlayer, u8* pPad);       // 0x80058F30
 f32   Swing_TopTime(SwingData* pSw);             // 0x80058E98  fTimeSwingTop - 0.0076
 f32   Swing_StartTime(SwingData* pSw);           // 0x80058EA8  fTimeSwingStart + 0.0076
 int   fn_800204A0(Clip* pBlend, f32* pOut, f32 fTime);   // samples pBlend->pD8 at fTime
 void  Character_UpdateAnimation(Character* pObj, int a, f32 f);
-void  Swing_UpdatePower(int nPlayer);
-void  Swing_BoostInput(int nPlayer);
-void  fn_8005AD20(Character* pObj, SwingData* pSw, int nStickX);
+void  SW_vSetSwingStrength(int nPlayer);
+void  SW_vCheckForSwingBoost(int nPlayer);
+void  SW_vUIAdjustClub(Character* pObj, SwingData* pSw, int nStickX);
 int   fn_8005CC5C(void);
 void  fn_800AE3F8(int nView);
 void  fn_800360D4(u8* pMesh);
@@ -262,7 +265,8 @@ void Swing_ApplySpin(int nPlayer) {
     pSw->fForwardSpin *= -1.0f;
 }
 
-// Driver from the tee: up to +10% power when the tempo lands in the sweet-spot window.
+// Lie 0 with club 0 (a driver off the tee): up to +0.1 power when the backswing's sideways angle
+// is negative and its size falls between the curve's two knots, most at their midpoint.
 f32 Swing_TeeSweetSpot(int nPlayer, f32 fPower) {
     Player* p = &gPlayers[nPlayer];
     f32     fT, fHalf;
@@ -506,10 +510,11 @@ f32 fn_8005CC84(f32 fTan) {
     return atan(fTan);
 }
 
-// The final power for the shot. A CPU just scales what it planned (putts +5%). A human gets
-// the boost, then loses distance to the swing error: a scaled part of it under the threshold,
-// all of it above. Putts over 75% on the meter count as full power.
-f32 Swing_ComputePower(int nPlayer) {
+// The final power for the shot. A CPU just scales what it planned (putts +5%). A human's full
+// shot gets the boost, then loses distance to the swing error: a scaled part of it under the
+// threshold, all of it above. Putts, chips and pitches skip the error; a putt over 75% on the
+// meter counts as full power.
+f32 SW_vCalculateShotPower(int nPlayer) {
     Player* p;
     f32*    pPower;
     f32     fPower, fError;
@@ -600,17 +605,17 @@ clamp:
     return fPower;
 }
 
-f32 fn_8005B64C(int nPlayer) {
+f32 SW_vGetShotPower(int nPlayer) {
     return gPlayers[nPlayer].swing.fShotPower;
 }
 
 // ---- the hit -----------------------------------------------------------------------------------
 
-// The ball is struck. A replay (mode 10) reseeds the RNG and restores player 0's swing state;
-// otherwise the lucky-shot swap runs first. Then the meter's miss (zero for a CPU or a perfect
-// shot), the power, forgiveness, the launch blocks, and the aim - the player's aim plus the
-// face vector's angle plus the miss - go to Physics_ShotImpact.
-void Swing_Launch(int nPlayer) {
+// The ball is struck. In game mode 10 the recorded seed and player 0's recorded swing data are
+// restored; otherwise a live shot runs Luck_TakePerfectShot and REPLAY_Save, a replay REPLAY_Play.
+// Then the miss (zero for a CPU or a perfect shot), the power, forgiveness, the launch blocks, and
+// the aim - the player's aim plus the face vector's angle plus the miss - go to Physics_ShotImpact.
+void SW_vImpact(int nPlayer) {
     f32*    pLaunchB;
     f32*    pLaunchA;
     Player* p;
@@ -638,9 +643,9 @@ void Swing_Launch(int nPlayer) {
     if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
         gPlayers[nPlayer].swing.fMishitAngle = 0.0f;
     } else {
-        gPlayers[nPlayer].swing.fMishitAngle = Swing_MeterError(nPlayer);
+        gPlayers[nPlayer].swing.fMishitAngle = fn_8005BA94_MishitAngle(nPlayer);
     }
-    gPlayers[nPlayer].swing.fShotPower = Swing_ComputePower(nPlayer);
+    gPlayers[nPlayer].swing.fShotPower = SW_vCalculateShotPower(nPlayer);
     Swing_ApplyForgiveness(nPlayer);
     if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e && gPlayers[nPlayer].fDistance < 2.0f) {
         gPlayers[nPlayer].vLaunchA[0] = 0.0f;
@@ -649,7 +654,7 @@ void Swing_Launch(int nPlayer) {
         gPlayers[nPlayer].vLaunchA[3] = 0.0f;
     }
     pLaunchB = p->vLaunchB;
-    Swing_ShapeVector(nPlayer, pLaunchB);
+    fn_8005B8C8_ShapeVector(nPlayer, pLaunchB);
     gPlayers[nPlayer].swing.fHookSlice = gPlayers[nPlayer].vLaunchA[0];
     if (Player_IsController8(nPlayer)) {
         fn_8005CCA8(nPlayer);
@@ -675,12 +680,11 @@ void Swing_Launch(int nPlayer) {
 
 // ---- the meter's miss ----------------------------------------------------------------------------
 
-// The analog swing's error: the angle between the stick's path back (centre to the top of the
-// backswing) and its path through (top to impact). Both x samples get a random +-15 (of a
-// +-128 stick) before the x axis is scaled by 0.2 - 0.03 on a putt - so the wobble is worth up
-// to about 1.7 degrees on a full shot; then atan of the deviation, clamped to the meter's
-// maximum (gpSwing->fMaxError).
-f32 Swing_MeterError(int nPlayer) {
+// The swing's miss: the back vector (x centre - top, z top - centre) and the through vector (x
+// impact - centre, z centre - impact), both normalised; the angle of (0, 0, 1) plus through - back,
+// clamped to gpSwing->fMaxError. Both x samples first get a random +-15 (of a +-128 stick), and the
+// x differences are scaled by gSwingXScale (0.2; 0.03 on a putt).
+f32 fn_8005BA94_MishitAngle(int nPlayer) {
     f32 fTopX;
     f32 fTopY;
     f32 fImpactX;
@@ -822,7 +826,7 @@ void Swing_FaceVector(int nPlayer, f32* pOut) {
 }
 
 // The second launch block: a CPU's (or a perfect shot's) shape vector; square for a human.
-void Swing_ShapeVector(int nPlayer, f32* pOut) {
+void fn_8005B8C8_ShapeVector(int nPlayer, f32* pOut) {
     if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
         fn_8002D560_ShapeDir(nPlayer, pOut);
     } else {
@@ -833,11 +837,11 @@ void Swing_ShapeVector(int nPlayer, f32* pOut) {
     }
 }
 
-// ---- the swing state stack ----------------------------------------------------------------------
-// Each player has a small stack of swing states (ids into sGolferStateEngineTable, whose entries carry the
-// state's callbacks). The top is the current state; -1 is empty.
+// ---- the golfer state stack ---------------------------------------------------------------------
+// Each player has a small stack of golfer states (GS_*, rows of sGolferStateEngineTable, whose
+// entries carry the state's callbacks). The top is the current state; -1 is empty.
 
-// The current swing state, or -1.
+// The current golfer state (the top of the stack), or -1.
 int GOLFERSTATE_GetCurrentState(int nPlayer) {
     SwingStack* pStack = &gSwingStacks[nPlayer];
     if (pStack->nTop == -1) return -1;
@@ -971,7 +975,7 @@ void GOLFERSTATE_Switch(int nState, int nPlayer) {
     }
 }
 
-// Empty in release.
+// Empty.
 void fn_8005CCA8(int nPlayer) {
 }
 
@@ -984,7 +988,7 @@ void GOLFERSTATE_OpenONCE(void) {
     gInSwingExit = 0;
 }
 
-// Run the current state's update for every player (not while the game is held).
+// Run the current state's update for every player (none while fn_800E415C() is true).
 void GOLFERSTATE_Update(void) {
     int i;
     if (fn_800E415C()) return;
@@ -1005,7 +1009,7 @@ void GOLFERSTATE_Update(void) {
 }
 
 // Pop every player's states.
-void fn_8005CD94(void) {
+void GOLFERSTATE_CloseONCE(void) {
     s8*         pTop;
     SwingStack* pStack;
     int         i;
@@ -1028,11 +1032,11 @@ void fn_8005CD94(void) {
 
 #define CPU_TOLERANCE (0.05f * 0.05f)       // 0.05 yd squared: land within 1.8 in of the target
 
-// A human goes straight on to state 10 (setting up). A CPU rehearses its shot here, one frame
-// at a time, and moves on once the rehearsal has settled, at least a second has passed and the
-// camera has settled - or when its time is up: 4 s, 1.5 s for a tee shot and 3.5 s after in
-// modes 6 and 7, 3..4 s in mode 11. Out of time, the rehearsal is told to stop (best aim found,
-// or +25 and a fresh target), then the skill error goes on and it is state 10.
+// A human goes straight on to state 10 (the swing). A CPU rehearses its shot here, one frame at a
+// time, and moves on once the rehearsal is done, more than a second has passed (3 s in mode 11) and
+// fn_800C7100(view) agrees - or when its time is up: 4 s; in modes 6 and 7 (which wait while
+// fn_800FA118) 1.5 s on the hole's first stroke and 3.5 s after. Out of time, an unfinished
+// rehearsal is finished (nRehearseState 3); then AI_ApplyError and state 10.
 void STATEFUNC_ShotSetupUpdate(int nPlayer) {
     View*   pView;
     u8      bDone;
@@ -1084,11 +1088,12 @@ void STATEFUNC_ShotSetupUpdate(int nPlayer) {
 // stick history filled with the centre, the spin stick centred.
 // The backswing's top mark, a hair early.
 
-// Release the swing's loaded resources: two blocks in the tuning data and three pairs of handles.
+// Free what SW_vInitModule set up: the two trail meshes and the three buffers per view.
 
-// Set the swing module up: player 1's ratings and the fixed tuning into gpSwing, the two resource
-// blocks, each player's tuning and swing state, and three pairs of buffers.
-void Swing_Init(void) {
+// Set the swing module up: player 1's ratings and the fixed tuning into gpSwing, the two trail
+// meshes, each player's trail textures (SW_vUIInit), cleared boosts and trail colour, and three
+// buffers per view.
+void SW_vInitModule(void) {
     s32 desc[2];
     int i;
     gpSwing->fCC = 40.0f;
@@ -1122,8 +1127,8 @@ void Swing_Init(void) {
     fn_80036054(gpSwing->mesh[0], 0, desc);
     fn_80036054(gpSwing->mesh[1], 0, desc);
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        Swing_LoadTuning(i);
-        Swing_ResetBoostAndSpin(i);
+        SW_vUIInit(i);
+        SW_vClearBoosts(i);
         gPlayers[i].swing.fBlueColor = 0.5f;
         gPlayers[i].swing.fRedColor = 0.5f;
         gPlayers[i].swing.fGreenColor = 0.5f;
@@ -1164,7 +1169,7 @@ f32 Swing_StartTime(SwingData* pSw) {
     return 0.0076f + pSw->fTimeSwingStart;
 }
 
-// A controller's pad state; the neutral pad when there is none or input is locked.
+// A controller's pad state; the neutral pad when there is none or fn_80100C00() is true.
 u8* Pad_State(int nPlayer, int nController) {
     u8* pPad = fn_800136C4(nController);
     if (pPad == NULL || fn_80100C00()) {
@@ -1194,13 +1199,13 @@ u8 fn_80058F5C(int nPlayer) {
 }
 
 // Reset a player's swing: phase 0, sticks and spin stick centred, animation 5, no rumble.
-void fn_80058FA4(int nPlayer) {
+void SW_vInitSwing(int nPlayer) {
     gPlayers[nPlayer].swing.nState = 0;
     gPlayers[nPlayer].swing.nRestCX = gPlayers[nPlayer].swing.nRestCY = 0x80;
     gPlayers[nPlayer].swing.nRestX = gPlayers[nPlayer].swing.nRestY = 0x80;
     fn_80095744(gPlayers[nPlayer].pChar, 5);
-    Swing_RumbleOff(nPlayer);
-    Swing_ResetBoostAndSpin(nPlayer);
+    SW_KillVibration(nPlayer);
+    SW_vClearBoosts(nPlayer);
     gPlayers[nPlayer].swing.nSpinCtrlX = 0x80;
     gPlayers[nPlayer].swing.nSpinCtrlY = 0x80;
     gPlayers[nPlayer].swing.fTargetTurnAngle = 0.0f;
@@ -1210,7 +1215,7 @@ void fn_80058FA4(int nPlayer) {
     fn_800AE3C4(nPlayer);
 }
 
-void Swing_Begin(int nPlayer) {
+void SW_vStateInitBackSwing(int nPlayer) {
     Player*    p      = &gPlayers[nPlayer];
     Character* pChar  = p->pChar;
     SwingData* pSw    = &p->swing;
@@ -1232,16 +1237,16 @@ void Swing_Begin(int nPlayer) {
     pSw->fTimeSinceContact       = 0.0f;
     pSw->bSpun       = 0;
     pSw->bSpinning       = 0;
-    Swing_ResetBoostAndSpin(nPlayer);
+    SW_vClearBoosts(nPlayer);
     pSw->nSpinCtrlX = 128;
     pSw->nSpinCtrlY = 128;
     pSw->fTargetTurnAngle        = 0.0f;
     pSw->fCurrentTurnAngle        = 0.0f;
 }
 
-// Waiting for the backswing. A CPU (or a replay) starts at once. A human starts the frame
+// Waiting for the backswing. A CPU (or game mode 10) starts at once. A human starts the frame
 // either stick is pulled past 160 of 255 - more than a quarter of its travel - and that stick's
-// rest position becomes the centre sample; the C-stick can swing too (bUsingCStick). While
+// rest position becomes the centre sample; the C-stick can swing too (nStickUsed). While
 // nothing is pulled the rest positions are held at 128.
 int Swing_WaitForBackswing(int nPlayer) {
     Player* p          = &gPlayers[nPlayer];
@@ -1252,9 +1257,9 @@ int Swing_WaitForBackswing(int nPlayer) {
 
     if (Controller_IsCPU(nController) || Game_GetMode() == 10) {
         gPlayers[nPlayer].swing.nState = 1;
-        Swing_Begin(nPlayer);
+        SW_vStateInitBackSwing(nPlayer);
         pChar->uFlags &= ~1;
-        Swing_ClearFrameFlag(nPlayer);
+        SW_vUIBlurReset(nPlayer);
         return 0;
     }
     pPad    = Pad_State(nPlayer, nController);
@@ -1271,8 +1276,8 @@ int Swing_WaitForBackswing(int nPlayer) {
             gPlayers[nPlayer].swing.nStickUsed  = 0;
         }
         EVENT_Trigger(nPlayer, 0x2C, 0, 0);
-        Swing_Begin(nPlayer);
-        Swing_ClearFrameFlag(nPlayer);
+        SW_vStateInitBackSwing(nPlayer);
+        SW_vUIBlurReset(nPlayer);
         REPLAY_RecordStart();
     } else {
         gPlayers[nPlayer].swing.nRestCY = 128;
@@ -1285,8 +1290,9 @@ int Swing_WaitForBackswing(int nPlayer) {
 
 // ---- the backswing --------------------------------------------------------------------------------
 
-// Freeze the backswing at the top: the animation stops (rate 0.008) where it is.
-void Swing_HoldAtTop(int nPlayer) {
+// Enter the hold at the top: the animation goes to the pause time and slows to rate 0.008 (flag
+// 0x40), and the hold timers are cleared.
+void SW_vStateInitBackSwingFigit(int nPlayer) {
     Player*    p    = &gPlayers[nPlayer];
     Character* pObj = p->pChar;
     SwingData* pSw  = &p->swing;
@@ -1307,8 +1313,8 @@ static inline int Swing_DeadZone(int v) {
     return 128;
 }
 
-// Phase 1, the backswing. A CPU (or a replay) plays the backswing animation to 98% of the way
-// to the top (65% in lesson 5) and then swings down. A human's backswing follows the stick:
+// Phase 1, the backswing. A CPU (or game mode 10) plays the backswing animation to 98% of the way
+// to the top (65% when fn_80100AF8()) and then swings down. A human's backswing follows the stick:
 // the further back it is pulled (dead-zoned magnitude, capped at 100), the further along the
 // backswing the animation is asked to be; the animation chases that at a rate that grows with
 // the gap. While the stick is still back, every frame's sample goes into the 25-sample ring
@@ -1402,7 +1408,7 @@ int Swing_UpdateBackswing(int nPlayer) {
         if (fDelta > -0.05f && fDelta < 0.05f) {
             pSw->fFidgetPauseTime = pObj->fAnimTime;
             pSw->nFidgetPauseStickY = nY;
-            Swing_HoldAtTop(nPlayer);
+            SW_vStateInitBackSwingFigit(nPlayer);
             pSw->nState = 2;
         } else if ((pObj->uFlags & 0x40) && fDelta > 0.0f) {
             pObj->uFlags &= ~0x40;
@@ -1414,10 +1420,10 @@ int Swing_UpdateBackswing(int nPlayer) {
         pSw->nCtrlListY[pSw->nCtrlListIndex] = nY;
         pSw->nCtrlListIndex++;
         pSw->nCtrlListIndex %= 25;
-        Swing_UpdatePower(nPlayer);
+        SW_vSetSwingStrength(nPlayer);
         pSw->nBackSwingX = nX;
         pSw->nBackSwingY = nY;
-        Swing_BoostInput(nPlayer);
+        SW_vCheckForSwingBoost(nPlayer);
     } else if (nY <= 96) {
         // The stick has come forward: the top of the backswing is the furthest-back sample.
         int i;
@@ -1428,7 +1434,7 @@ int Swing_UpdateBackswing(int nPlayer) {
                 pSw->nBackSwingY = pSw->nCtrlListY[i];
             }
         }
-        Swing_UpdatePower(nPlayer);
+        SW_vSetSwingStrength(nPlayer);
         Anim_SetRate(pObj->anim, 1.0f);
         fn_80095744(pObj, 7);
         if (fn_800204A0(pObj->pBlend, pObj->v1638,
@@ -1448,18 +1454,18 @@ int Swing_UpdateBackswing(int nPlayer) {
         pSw->nFollowThroughY = nY;
         pSw->nMishitX = nX;
         pSw->nMishitY = nY;
-        Swing_ClearFrameFlag(nPlayer);
+        SW_vUIBlurReset(nPlayer);
     }
     return 0;
 }
 
 // ---- at the top, and the downswing ----------------------------------------------------------------
 
-// Phase 2, holding at the top. Any stick movement drops back to phase 1 (backing down if it
+// Phase 2, holding at the top. Any change in the stick's y drops back to phase 1 (backing down if it
 // came forward). While it is steady the animation waggles +-0.0076 around the top. If the
 // stick sits near centre (y at or below 160, x within 64..192) for over 0.1 s the swing is
-// abandoned: phase 0, the address animation, sound 9.
-int Swing_UpdateAtTop(int nPlayer) {
+// abandoned: phase 0, the address animation, event 9.
+int SW_vStateBackSwingFigit(int nPlayer) {
     Player*    p;
     Character*   pObj;
     SwingData* pSw;
@@ -1505,15 +1511,15 @@ int Swing_UpdateAtTop(int nPlayer) {
             EVENT_Trigger(nPlayer, 9, 0, 0);
         }
     }
-    Swing_UpdatePower(nPlayer);
+    SW_vSetSwingStrength(nPlayer);
     return 0;
 }
 
-// Phase 3, the downswing. Every frame the stick is forward of 96 and more than ~17 units from
-// the centre sample, that reading becomes the impact sample - so what counts is where the
-// stick was pointing on the way through, not when. The ball goes when the animation reports
-// impact (n5CC < 0): phase 5, Swing_Launch, the mis-hit rumble, the putt sound.
-int Swing_UpdateDownswing(int nPlayer) {
+// Phase 3, the downswing. For a human, every frame the stick is forward of 96 and more than ~17
+// units from the centre sample, that reading becomes the impact sample - so what counts is where
+// the stick was pointing on the way through, not when. The ball goes when the animation reports
+// impact (n5CC < 0): phase 5, SW_vImpact, the mis-hit rumble, event 0x2B on a putt.
+int SW_vStateDownSwing(int nPlayer) {
     Player*    p;
     int        nController;
     Character* pObj;
@@ -1547,7 +1553,7 @@ int Swing_UpdateDownswing(int nPlayer) {
     if (pObj->n5CC < 0) {
         SKEL_RelaxIK(pObj->pModel->pSkel);
         gPlayers[nPlayer].swing.nState = 5;
-        Swing_Launch(nPlayer);
+        SW_vImpact(nPlayer);
         if (!Controller_IsCPU(nController) && gSession.bReplay == 0) {
             gPlayers[nPlayer].swing.bCanSpin = 1;
         }
@@ -1573,7 +1579,7 @@ int Swing_PhaseIdle6(int nPlayer) {
 }
 
 // Stop the pad rumble.
-void Swing_RumbleOff(int nPlayer) {
+void SW_KillVibration(int nPlayer) {
     s32*    pFrames;
     s32*    pController;
     Player* p;
@@ -1589,11 +1595,11 @@ void Swing_RumbleOff(int nPlayer) {
 }
 
 // Count the mis-hit rumble down and stop it when it runs out.
-void Swing_RumbleTick(int nPlayer) {
+void SW_UpdateVibration(int nPlayer) {
     if (fn_8002E868_HasPad(nPlayer)) {
         if (gPlayers[nPlayer].swing.bVibrating) {
             if (gPlayers[nPlayer].swing.nVibrateCount <= 0) {
-                Swing_RumbleOff(nPlayer);
+                SW_KillVibration(nPlayer);
             } else {
                 gPlayers[nPlayer].swing.nVibrateCount--;
             }
@@ -1639,13 +1645,13 @@ int Swing_UpdateAfterImpact(int nPlayer) {
     pPad = Pad_State(nPlayer, nController);
     Swing_StickX(nPlayer, pPad);
     Swing_StickY(nPlayer, pPad);
-    Swing_RumbleTick(nPlayer);
+    SW_UpdateVibration(nPlayer);
     Swing_SpinInput(nPlayer);
     Swing_ApplySpin(nPlayer);
     return 0;
 }
 
-void Swing_ClearFrameFlag(int nPlayer) {
+void SW_vUIBlurReset(int nPlayer) {
     gPlayers[nPlayer].swing.nNumInBlurQueue = 0;
 }
 
@@ -1726,9 +1732,11 @@ void fn_8005A0FC(int nPlayer) {
     }
 }
 
-// Pose the golfer from the stick each frame of the backswing (animation 6) and downswing (7): the
-// blend weights at 0x484..0x490 and the twist. A human's stick is read; a CPU only does this in
-// mode 11 (when fn_8005CC5C() is 8 or 9), with the stick hard to one side.
+// Each frame of the backswing (animation 6) and downswing (7): the club trail's colour and alpha
+// (blue with the stick left of centre, yellow right, on the backswing; gpSwing's colours fading
+// after the ball-hit mark on the downswing) and the club twist (SW_vUIAdjustClub). A human's stick
+// is read; a CPU only does this in mode 11 (when fn_8005CC5C() is 8 or 9), with the stick hard to
+// one side.
 void fn_8005A478(int nPlayer) {
     Character*   pObj  = gPlayers[nPlayer].pChar;
     int        nBone = fn_8001EED8(pObj->pModel, 0x53);
@@ -1780,7 +1788,7 @@ void fn_8005A478(int nPlayer) {
                 pSw->fAlpha = gpSwing->fFC * (f32)(nStickX - pSw->nCalibrateX) /
                               (f32)(0xFF - pSw->nCalibrateX);
             }
-            fn_8005AD20(pObj, pSw, nStickX);
+            SW_vUIAdjustClub(pObj, pSw, nStickX);
         } else if (pObj->nAnim == 7) {
             pSw->fBlueColor = gpSwing->fF4;
             pSw->fGreenColor = gpSwing->fF0;
@@ -1793,7 +1801,7 @@ void fn_8005A478(int nPlayer) {
             } else {
                 pSw->fAlpha = 0.0f;
             }
-            fn_8005AD20(pObj, pSw, pSw->nBackSwingX);
+            SW_vUIAdjustClub(pObj, pSw, pSw->nBackSwingX);
         }
     }
 }
@@ -1811,8 +1819,8 @@ void fn_8005A7A0(int nPlayer) {
     }
 }
 
-// Draw the club's trail (the swing-trail option): a ribbon from the grip through the recorded
-// club-head positions, coloured by the swing's blend weights and fading along its length,
+// Draw the club's trail (session option a24[7]): a ribbon from the grip through the recorded
+// club-head positions, coloured by the trail colour and fading along its length,
 // textured "clubback" on the backswing and "clubdown" on the downswing.
 void fn_8005A850(int nPlayer) {
     s16           idx[26];
@@ -1906,10 +1914,10 @@ void fn_8005A850(int nPlayer) {
     }
 }
 
-// Twist the golfer with the stick: how far through the backswing (animation 6, eased in) or the
-// downswing (7, eased out) the animation is, times a smoothed copy of the stick's X, becomes a
-// rotation on the skeleton (mirrored for a left-hander).
-void fn_8005AD20(Character* pObj, SwingData* pSw, int nStickX) {
+// Twist the club with the stick: how far through the backswing (animation 6, eased in) or the
+// downswing (7, eased out) the animation is, times 0.75 and a smoothed copy of the stick's X,
+// becomes a Z rotation on the model (fn_80027808), negated when fn_8001EDF4().
+void SW_vUIAdjustClub(Character* pObj, SwingData* pSw, int nStickX) {
     f32 fAmount = 0.0f;
     f32 fDelta;
     f32 fRate;
@@ -1945,7 +1953,7 @@ void fn_8005AD20(Character* pObj, SwingData* pSw, int nStickX) {
 }
 
 // Find the swing's textures by name (all three are in one bank).
-void Swing_LoadTuning(int nPlayer) {
+void SW_vUIInit(int nPlayer) {
     u64 uHash;
     uHash = fn_8000BEE4("clubback");
     fn_800102DC(uHash, &gpSwing->pBank, &gpSwing->pClubBack);
@@ -1960,7 +1968,7 @@ void Swing_LoadTuning(int nPlayer) {
 // Every frame of the backswing: power is the square root of how far along the backswing is
 // (a CPU takes it straight), snapping to 1 within 3% of the top. Holding at the top of a full
 // backswing on anything but a putt costs (hold - 0.05)^2, at most 0.3.
-void Swing_UpdatePower(int nPlayer) {
+void SW_vSetSwingStrength(int nPlayer) {
     f32  fPower = gPlayers[nPlayer].pChar->fBackswing;
     f32  fPenalty;
     if (!Player_IsCPU(nPlayer)) {
@@ -1988,10 +1996,10 @@ void Swing_UpdatePower(int nPlayer) {
 // ---- the power boost input --------------------------------------------------------------------
 
 // Every backswing frame for a human with the boost option on: while a boost button (mask 0x1F)
-// is held with the stick pulled past 93 of its range, the boost level rises one a frame to 8.
-// Once the stick has backed down for 1/12 s (fPowerBoostDieTime, set by the backswing) the level and the
-// spin offsets are cleared.
-void Swing_BoostInput(int nPlayer) {
+// is held with the stick more than 93 from centre, the boost level rises one a frame to 8 (event
+// 0x2D). fPowerBoostDieTime (1/12 s, set when the backswing changes direction) counts down; when
+// it runs out the level and the turn angles are cleared.
+void SW_vCheckForSwingBoost(int nPlayer) {
     u32  uButtons;
     int  nX, nY;
     f32  fMag;
@@ -2019,8 +2027,8 @@ void Swing_BoostInput(int nPlayer) {
     }
 }
 
-// At the start of a swing: no boost, no spin, no back-down timer.
-void Swing_ResetBoostAndSpin(int nPlayer) {
+// No power boost, no spin boost, no back-down timer; the boost display flag back on (fn_8005A788).
+void SW_vClearBoosts(int nPlayer) {
     gPlayers[nPlayer].swing.nPowerBoost = 0;
     gPlayers[nPlayer].swing.nSpinBoost = 0;
     gPlayers[nPlayer].swing.fPowerBoostDieTime   = 0.0f;
@@ -2028,9 +2036,9 @@ void Swing_ResetBoostAndSpin(int nPlayer) {
     fn_800AE3C4(nPlayer);
 }
 
-// ---- swing states: the small ones -----------------------------------------------------------------
-// sGolferStateEngineTable is a table of 27 (enter, update, exit) callbacks; the current state is the top of
-// the player's SwingStack. Most of these drive the camera, HUD and sounds around the swing.
+// ---- golfer states: the small ones----------------------------------------------------------------
+// sGolferStateEngineTable is a table of 27 (enter, update, exit) callbacks; the current state is the
+// top of the player's SwingStack. Most of these drive the camera, HUD and events around the swing.
 
 void STATEFUNC_FadeToTapInExit(int nPlayer) {
 }
@@ -2088,7 +2096,7 @@ u8 fn_80062B90(void) {
     return 0;
 }
 
-// Clear an animation event's "reached" flag.
+// Clear an animation event's bSet flag.
 int fn_80062B98(Character* pChar, u64 uEvent) {
     pChar->events[(int)uEvent].bSet = 0;
     return 0;
@@ -2277,7 +2285,8 @@ void STATEFUNC_GreenReversePuttUpdate(int nPlayer) {
     }
 }
 
-// Keep a copy of the ball as it lies before the shot.
+// Show-yardage enter: keep a copy of the ball where it came to rest, update the emotion and raise
+// the first-frame flag (lbl_80281E13).
 void STATEFUNC_ShowYardageInit(int nPlayer) {
     fn_80017028(gPlayers[nPlayer].nView[0]);
     Mem_cpy(&gPlayers[nPlayer].ballBefore, &gPlayers[nPlayer].ball, sizeof(Ball));
@@ -2297,7 +2306,7 @@ void STATEFUNC_ReplaySwingExit(int nPlayer) {
     }
 }
 
-// Neither button 2 nor button 3 held: keep polling.
+// Pop the state once neither button 2 nor button 3 is held.
 void STATEFUNC_GreenUpdate(int nPlayer) {
     if (!(fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(2, 1))) {
         if (!(fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(3, 1))) {
@@ -2331,7 +2340,7 @@ void STATEFUNC_SimulateExit(int nPlayer) {
     fn_80045494(0, nPlayer);
     REPLAY_RecordStop();
     fn_80062CE0(0);
-    Swing_RumbleOff(nPlayer);
+    SW_KillVibration(nPlayer);
     fn_800C1790(fn_80017028(gPlayers[nPlayer].nView[0]), nPlayer);
     fn_80062DB8(pViewObj, 0);
 }
@@ -2397,8 +2406,8 @@ void STATEFUNC_InTheHoleInit(int nPlayer) {
     }
 }
 
-// Leaving the swing: the ball goes back to where it lay; on cameras 1, 3 and 4 a quarter-second
-// camera move.
+// Leaving pre-shot: the ball is put back from ballBefore; on script cameras 1, 3 and 4 a
+// quarter-second fade in.
 void STATEFUNC_PreShotExit(int nPlayer) {
     Vec4  vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
     View* pView   = fn_80017028(gPlayers[nPlayer].nView[0]);
@@ -2609,7 +2618,7 @@ void STATEFUNC_TapInInit(int nPlayer) {
 }
 
 // State 6: the putt preview. The caddie's solved shot is taken, the player is made a CPU for
-// one call so Swing_Launch fires it clean (no error, no luck swap), and the launched ball is
+// one call so SW_vImpact fires it clean (no error), and the launched ball is
 // kept in ballBefore as nobody's ball - the ghost that draws the preview. Everything the
 // player had (shot block, ball, controller) is put back afterwards.
 void STATEFUNC_GreenWatchRollInit(int nPlayer) {
@@ -2627,7 +2636,7 @@ void STATEFUNC_GreenWatchRollInit(int nPlayer) {
     Mem_cpy(&ballSaved, pBall, sizeof(Ball));
     nController  = gPlayers[nPlayer].nController;
     gPlayers[nPlayer].nController = CONTROLLER_CPU;
-    Swing_Launch(nPlayer);
+    SW_vImpact(nPlayer);
     gPlayers[nPlayer].nController = nController;
     Mem_cpy(&gPlayers[nPlayer].ballBefore, pBall, sizeof(Ball));
     gPlayers[nPlayer].ballBefore.nPlayer = -1;
@@ -2638,7 +2647,8 @@ void STATEFUNC_GreenWatchRollInit(int nPlayer) {
 }
 
 // State 21 (a camera flyover): over when the option skips cameras, the camera finishes, or a
-// button is pressed (any pad for a CPU's shot). Lessons wait for the camera.
+// button is pressed (any pad for a CPU's shot). While fn_80100294() it waits
+// for the camera unless cameras are skipped.
 void STATEFUNC_MidHoleFlyByUpdate(int nPlayer) {
     u8  bDone = 0;
     u32 uMask;
@@ -2665,7 +2675,8 @@ void STATEFUNC_MidHoleFlyByUpdate(int nPlayer) {
     }
 }
 
-// State 20 (another camera state), the same idea with a confirm step.
+// State 20 (the hole flyover): pops when the option skips cameras, the camera finishes, or button 0
+// is pressed on any pad (fn_80014300); the confirm hooks (fn_80062B88, fn_80062B7C) return 1.
 void STATEFUNC_InitialFlyByUpdate(int nPlayer) {
     u8 bDone = 0;
     if (gSession.a8[0] == 0 || !fn_80014300(0)) {
@@ -2712,13 +2723,13 @@ void STATEFUNC_SimulateInit(int nPlayer) {
     fn_8006ACF8(nPlayer, 0);
     fn_800DB714(nPlayer);
     gPlayers[nPlayer].bRehearsalDone = 0;
-    Swing_RumbleTick(nPlayer);
+    SW_UpdateVibration(nPlayer);
     fn_80062DC0(pV);
     fn_80062DB8(pV, 0);
 }
 
 // State 15 (fade to tap-in): while the camera moves, the CPU's rehearsal runs on the player -
-// human or not, made a CPU for the call, in fast mode - until it solves the tap-in. When the
+// human or not, made a CPU for the call, with fn_80050D2C on - until it solves the tap-in. When the
 // camera finishes: solved -> camera move and state 16 (the tap-in is played for the player);
 // not yet -> the turn ends (GM_EndOfGolferTurn) unless it had been solved before.
 void STATEFUNC_FadeToTapInUpdate(int nPlayer) {
@@ -2750,9 +2761,9 @@ void STATEFUNC_FadeToTapInUpdate(int nPlayer) {
     fn_80050D2C(0);
 }
 
-// State 16: a shot the game plays for the player. With animation 11 running and camera 12
-// set, the launch is made with the controller set to the CPU for the call (so no meter, no
-// error, no luck swap), then it is state 12 with the ball away.
+// State 16: a shot the game plays for the player. With animation 11 running and camera 12 set
+// (not on script cameras 1, 3, 4), at the ball-hit event (2; at once if there is none) the launch
+// is made with the controller set to the CPU for the call (so no error), then it is state 12.
 void STATEFUNC_TapInUpdate(int nPlayer) {
     int        nController;
     Vec4       vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
@@ -2772,7 +2783,7 @@ void STATEFUNC_TapInUpdate(int nPlayer) {
         fn_80062B98(pChar, 2);
         nController  = gPlayers[nPlayer].nController;
         gPlayers[nPlayer].nController = CONTROLLER_CPU;
-        Swing_Launch(nPlayer);
+        SW_vImpact(nPlayer);
         gPlayers[nPlayer].nController = nController;
         fn_800A5980((u8)nPlayer);
         REPLAY_ResetController(nPlayer, nController);
@@ -2780,7 +2791,7 @@ void STATEFUNC_TapInUpdate(int nPlayer) {
     } else {
         nController  = gPlayers[nPlayer].nController;
         gPlayers[nPlayer].nController = CONTROLLER_CPU;
-        Swing_Launch(nPlayer);
+        SW_vImpact(nPlayer);
         gPlayers[nPlayer].nController = nController;
         fn_800A5980((u8)nPlayer);
         REPLAY_ResetController(nPlayer, nController);
@@ -2788,8 +2799,8 @@ void STATEFUNC_TapInUpdate(int nPlayer) {
     }
 }
 
-// State 8: a free camera while button 19 is held (release pops the state). Buttons 11/12 and
-// 13/14 play the four pan sounds; button 4 switches between two camera modes.
+// State 8 (camera 7): pops once button 19 is released; while it is held, buttons 11/12 and 13/14
+// fire events 0x12..0x15. Button 4 held calls fn_800C6010, else fn_800C60E8.
 void STATEFUNC_KneeCamUpdate(int nPlayer) {
     if (!(fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x13, 1))) {
         GOLFERSTATE_Pop(nPlayer);
@@ -2817,8 +2828,8 @@ void STATEFUNC_KneeCamUpdate(int nPlayer) {
     TARGET_UpdateMomentums(nPlayer);
 }
 
-// State 4: an aiming camera held while button 7 is down (the caddie keeps updating). Buttons
-// 9/10 and 11..14 play the pan sounds.
+// State 4: held while button 7 is down (the caddie keeps updating). Buttons 9/10 and 11..14 fire
+// events 0xD/0xE and 0x12..0x15.
 void STATEFUNC_ElevatorUpdate(int nPlayer) {
     Caddie_Update(nPlayer);
     if (!(fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(7, 1))) {
@@ -2849,9 +2860,9 @@ void STATEFUNC_ElevatorUpdate(int nPlayer) {
     TARGET_UpdateMomentums(nPlayer);
 }
 
-// State 2, a shot begins. A CPU takes camera 0 (with gpGame+0x290) or 12 and, with that flag,
-// animation 2. The ball is kept as it lies and marked stopped, the live ball's state cleared,
-// the player's distance to the pin stored, and the "shot begins" sound played.
+// State 2, a shot begins. A CPU takes camera 0 (with gpGame+0x290) or 12; with that flag the
+// golfer plays animation 2. The ball is kept as it lies and marked stopped, the live ball's state
+// cleared, the swing reset (SW_vInitSwing), the target set up, fA64 stored and event 6 fired.
 void STATEFUNC_ShotSetupInit(int nPlayer) {
     s32   nView;
     Ball* pBall;
@@ -2872,7 +2883,7 @@ void STATEFUNC_ShotSetupInit(int nPlayer) {
     gPlayers[nPlayer].ballBefore.nState = 1;
     gPlayers[nPlayer].ball.nState       = 0;
     GameEffects_ResetGameEffectSettings();
-    fn_80058FA4(nPlayer);
+    SW_vInitSwing(nPlayer);
     gPlayers[nPlayer].swing.unk630 = 1;
     TARGET_ResetMomentums(nPlayer);
     if (gpGame->b276 != 0) {
@@ -2888,8 +2899,9 @@ void STATEFUNC_ShotSetupInit(int nPlayer) {
     EVENT_Trigger(nPlayer, 6, 0, -1);
 }
 
-// State 20: the walk to the tee. Camera 10 on this player's view, every other player's views
-// detached, this player attached to both of its views, Shot_Plan with the HUD told, animation 1.
+// State 20: the hole flyover. Event 0x4A, camera 10 full screen with a fade in on this player's
+// view, every other player's views detached, this player attached to both of its views, moved to
+// the ball, Shot_Plan with the HUD told, animation 1.
 void STATEFUNC_InitialFlyByInit(int nPlayer) {
     Vec4  vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
     int   i, k;
@@ -2925,7 +2937,7 @@ void STATEFUNC_InitialFlyByInit(int nPlayer) {
     }
 }
 
-// State 22: arriving at the ball for a new shot. The ball is put on the ground: the upper of the
+// State 22: placing the ball (a drop). vBall is put on the ground: the upper of the
 // two ground heights under it, unless there is none or it is more than 0.25 above the ball; then
 // the lower one (or the ball's own height if that is missing too). Then Shot_Plan with the HUD
 // told, the think timer cleared, camera 8, boost and spin reset.
@@ -2971,11 +2983,11 @@ void STATEFUNC_PlaceBallInit(int nPlayer) {
     Vec_Copy(gPlayers[nPlayer].vBall, fTmp);
     PlaceBall_Set(nPlayer, fTmp);
     PlaceBall_SetupTarget(nPlayer);
-    Swing_ResetBoostAndSpin(nPlayer);
+    SW_vClearBoosts(nPlayer);
 }
 
-// State 9: the putt-line view. Pops when neither button 46 nor 48 is held and the view's fade
-// is complete. For a human outside a replay, before the swing starts, the caddie updates and
+// State 9: the putt-line view. Pops when neither button 46 nor 48 is held and the view's f54
+// is 1.0. For a human outside a replay, before the swing starts, the caddie updates and
 // button 6 re-plans: the game's 0x264 callback (with gpGame+0x284) or a putt aims at the pin,
 // anything else re-chooses a target; then Shot_Prepare, the break line, animation 5.
 void STATEFUNC_GreenMorphUpdate(int nPlayer) {
@@ -3016,10 +3028,10 @@ void STATEFUNC_GreenMorphUpdate(int nPlayer) {
     }
 }
 
-// State 22: waiting at the ball. Button 35 with the "ball can be placed" flag: the ball is put
-// at the placement point (a class-1 surface gets the extra placement call), the player's
-// position follows it, and the swing (state 1) begins. Otherwise the cursor moves, buttons
-// 26..29 play the pan sounds, and button 25 off the tee (if allowed) re-does the setup.
+// State 22 every frame. Button 35 with the "ball can be placed" flag: the ball is dropped at the
+// placement point (a class-1 surface gets Physics_InitBall too), vBall follows it, and it is state
+// 1 (pre-shot). Otherwise the cursor moves, buttons 26..29 fire events 0x16..0x19, and button 25
+// off the tee takes a mulligan (if allowed).
 void STATEFUNC_PlaceBallUpdate(int nPlayer) {
     if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x23, 0)) {
         Ball*   pBall;
@@ -3059,9 +3071,9 @@ void STATEFUNC_PlaceBallUpdate(int nPlayer) {
     PlaceBall_UpdateMomentums(nPlayer, 1.0f);
 }
 
-// State 3: the aiming camera, held while button 8 is down (the caddie keeps updating). Pan
-// sounds on buttons 9/10, 30 and 11..14; once the camera has arrived (flag from the enter) a
-// one-off 0x67 event.
+// State 3: held while button 8 is down (the caddie keeps updating). Buttons 9/10, 30 and 11..14
+// fire events 0xD/0xE, 0xF and 0x12..0x15; once fn_800C7340 reports (flag from the enter) message
+// 0x67 is posted, once.
 void STATEFUNC_ZoomUpdate(int nPlayer) {
     Caddie_Update(nPlayer);
     if (!(fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(8, 1))) {
@@ -3101,11 +3113,11 @@ void STATEFUNC_ZoomUpdate(int nPlayer) {
     }
 }
 
-// State 6, the putt preview playing. Any button ends it (any pad for a CPU). Otherwise the
-// ghost ball (in ballBefore) is stepped preview-speed times a frame, 20 ticks each, with the
-// simulating flag up; the camera follows with quarter-second moves once the ghost has stopped,
-// come within 0.5 of the pin or started running away from it (0.1 past its closest), and the
-// state pops once the ghost has stopped and the camera settled.
+// State 6, the putt preview playing. Button 0 ends it (any pad for a CPU). Otherwise the ghost
+// ball (in ballBefore) is stepped GameEffects_BallUpdatesThisFrame times, 20 ticks each, with the
+// simulating flag up; a quarter-second fade-out starts once the ghost has stopped, come within 0.5
+// of the pin or started running away from it (0.1 past its closest), and the state pops when the
+// fade completes.
 void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
     Vec4        vOffset = {0.45f, 0.45f, 0.45f, 0.5f};
     CourseInfo* pCourse = fn_8000C594();
@@ -3154,11 +3166,12 @@ void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
     }
 }
 
-// State 13: the ball has come to rest and the golfer reacts. On the first frame the result is
-// handed to the view; a good result (gpGame+0x294, not on cameras 1/4) plays the reaction
-// animation 9 or cuts to camera 16. When the view is done and the camera is not 16, flag bit 2
-// is set and it is state 17 (the hole-out sequence). While animation 9 plays, camera 16 is
-// taken once the animation allows, and the reaction shot lines up.
+// State 13: holed out, the golfer reacts. On the first frame the view gets the remove-ball choice
+// (GM_ChooseRemoveBallState) and the post-shot animation choice; with gpGame+0x294 (not on script
+// cameras 1/4) the reaction animation 9 plays or camera 16 is cut to. When the remove-ball choice
+// is set and the camera is not 16, flag bit 2 is set and it is state 17 (fade to remove ball).
+// While animation 9 plays, camera 16 is taken once the animation allows, and the reaction shot
+// lines up.
 void STATEFUNC_InTheHoleUpdate(int nPlayer) {
     View* pV    = fn_80017028(gPlayers[nPlayer].nView[0]);
 
@@ -3200,9 +3213,10 @@ void STATEFUNC_InTheHoleUpdate(int nPlayer) {
 }
 
 // State 11 begins: the swing animation. The camera is 12 in a replay, else one of the three
-// special swing cameras (20..22) the view offers, else 13. The animation's event hooks are
-// registered (a wider window on the special cameras), the ball is teed up on the tee, and the
-// live ball's state is cleared for the launch.
+// special swing cameras (20..22) the view offers, else 13. A tap-in (player flag 8) takes the
+// tap-in state, anything else a swing blend (CharacterState_AddSKABlendData, two variants by
+// camera) with full IK weight; the ball is teed up on the tee, super slow-mo goes on and the live
+// ball's state is cleared for the launch.
 void STATEFUNC_ReplaySwingInit(int nPlayer) {
     View* pV    = fn_80017028(gPlayers[nPlayer].nView[0]);
     Ball* pBall;
@@ -3238,7 +3252,7 @@ void STATEFUNC_ReplaySwingInit(int nPlayer) {
         }
         SKEL_SetIKSolutionWeight(gPlayers[nPlayer].pChar->pModel->pSkel, 1.0f);
     }
-    Swing_ClearFrameFlag(nPlayer);
+    SW_vUIBlurReset(nPlayer);
     if (gPlayers[nPlayer].ball.nLie == 0) {
         DynObj_TeeAdd(&gPlayers[nPlayer].ball, nPlayer, 1);
     }
@@ -3257,10 +3271,10 @@ void STATEFUNC_ReplaySwingInit(int nPlayer) {
     }
 }
 
-// State 11: the swing animation. Nothing more until it passes its impact event (2). Then in a
-// replay the ball launches and it is state 12; otherwise once the camera has reached its mark the
-// impact sound plays, the special swing camera is chosen, the ball launches and it is state 12;
-// before that the camera keeps moving and one of two follow-through blends plays.
+// State 11: the swing animation in slow motion. Nothing more until it passes its ball-hit event
+// (2). Then in a replay the ball launches and it is state 12; otherwise once fn_800C4518(view)
+// reaches fn_800C6B38(view) event 0xA fires, the ball launches and it is state 12; before that the
+// slow-mo camera advances (fn_800C5CEC) and one of two swing blends restarts.
 void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
     View* pV    = fn_80017028(gPlayers[nPlayer].nView[0]);
     u8    bSpecial = 0;
@@ -3269,13 +3283,13 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
         fn_8005CB78(gPlayers[nPlayer].pChar, 2) < gPlayers[nPlayer].pChar->fAnimTime) {
         if (gSession.bReplay) {
             SKEL_RelaxIK(gPlayers[nPlayer].pChar->pModel->pSkel);
-            Swing_Launch(nPlayer);
+            SW_vImpact(nPlayer);
             GOLFERSTATE_Switch(GS_SIMULATE, nPlayer);
         } else if (fn_800C4518(pV) >= fn_800C6B38(pV)) {
             EVENT_Trigger(nPlayer, 0xA, &gPlayers[nPlayer].ball, 1);
             GolfCamera_Choose3ScreenCam(pV, nPlayer);
             SKEL_RelaxIK(gPlayers[nPlayer].pChar->pModel->pSkel);
-            Swing_Launch(nPlayer);
+            SW_vImpact(nPlayer);
             GOLFERSTATE_Switch(GS_SIMULATE, nPlayer);
         } else {
             fn_800C5CEC(pV, nPlayer);
@@ -3291,7 +3305,7 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
                                                -20000.0f, -90000.0f, -10000.0f, 0.0f, -10000.0f);
             }
             fn_800957D8(gPlayers[nPlayer].pChar);
-            Swing_ClearFrameFlag(nPlayer);
+            SW_vUIBlurReset(nPlayer);
             fn_80062D98();
         }
         fn_800A5980(nPlayer);
@@ -3303,10 +3317,10 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
 
 // State 1 begins: addressing the ball. Camera 25 and the game's 0x20C hook; a fresh Shot_Plan
 // when the game asks (gpGame+0x276, and it ends any replay); the glove comes off for a putt;
-// both views attached; the ball teed up on the tee and kept as it lies; the distance to the
-// pin stored; a CPU (outside game type 8) told to hide its HUD; and if the swing is to be
-// shown, the address animation - 10 for a low-IQ golfer off the tee outside a lesson, else 1 -
-// and camera 11.
+// both views attached; the ball teed up on the tee and kept as it lies; fA64 stored; events 0x2A
+// and 3; fn_800E3D38(n, 1) for a CPU outside game type 8; and if GM_DoPreshotAnimation says so,
+// the pre-shot animation - 10 with a low-IQ penalty away from the tee (unless fn_80100294()),
+// else 1 - and camera 11.
 void STATEFUNC_PreShotInit(int nPlayer) {
     Ball* pBall;
     int   nView, k;
@@ -3346,7 +3360,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
         fn_800957B0(gPlayers[nPlayer].pChar, 1);
     }
     fn_80045824(nPlayer);
-    Swing_ResetBoostAndSpin(nPlayer);
+    SW_vClearBoosts(nPlayer);
     BreakLine_Start(gPlayers[nPlayer].nView[0]);
     fn_8009B970(gPlayers[nPlayer].nView[0]);
     if (gPlayers[nPlayer].ball.nLie == 0) {
@@ -3378,12 +3392,13 @@ void STATEFUNC_PreShotInit(int nPlayer) {
     }
 }
 
-// State 1 update: addressing the ball. The game's 0x238 hook can skip it (unless the camera is
-// 0 or 11). The golfer's animation places the ball: while its "ball" event (3; 0x10 and 0x11 for
-// two other props) is pending the ball rides in the hand, and once it fires the ball is set down
-// - on the tee, 2 in up and teed. A ball still moving is stepped. Button 0 hurries the camera
-// (a CPU also rehearses here once its ball is still). When the camera is done the ball is put
-// in place and it is state 2; after 10 s on a camera it is state 2 anyway.
+// State 1 update: addressing the ball. The game's 0x238 hook can skip to state 2 (unless the
+// camera is 0 or 11). The golfer's animation places the ball: while its event 3 is pending the ball
+// rides in the hand, and once it fires the ball is set down (on the tee: 2 units up and teed);
+// events 0x10 and 0x11 drive fn_800A3CB0/fn_800A3D6C/fn_800A3DF4. A ball still moving is stepped.
+// Button 0 (any pad for a CPU) starts a fade out; a CPU also rehearses here once its ball is still.
+// Once fn_80063C7C(view) holds (and the camera allows) the ball is put in place and it is state 2;
+// after 10 s on a camera it is state 2 anyway.
 void STATEFUNC_PreShotUpdate(int nPlayer) {
     Vec4    vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
     u8      bInHand = 0;
@@ -3501,10 +3516,11 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
 
 // State 18, holed out: animation 12, the golfer picks the ball out of the cup and tosses it.
 // While the ball is in the hand it follows the hand bone (kept at least a real ball's radius,
-// 0.84 in, above the ground). At the animation's event 4 the ball is thrown: a real launch of
-// the kept ball along the hand's motion, at 0.5 x 60 x 60 x FRAME_RATE x (yards moved / 1760) - the
-// hand's speed in miles per hour, halved. Then, until event 3, the thrown ball is stepped 20
-// ticks a frame and the live ball follows it. Camera 16 over the whole thing.
+// 0.84 in, above the ground). From the animation's event 4 it follows the hand, and at event 3
+// (after 4) it is thrown: a real launch of the kept ball along the hand's motion, at 0.5 x 60 x 60
+// x FRAME_RATE x (yards moved / 1760) - the hand's speed in miles per hour, halved. Then the thrown
+// ball is stepped 20 ticks a frame and the live ball follows it. Camera 16 (with a fade in) once
+// animation 12 runs.
 void STATEFUNC_RemoveBallUpdate(int nPlayer) {
     View* pV      = fn_80017028(gPlayers[nPlayer].nView[0]);
     Vec4  vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
@@ -3574,12 +3590,13 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
     GM_DoPostShotInHoleUI(nPlayer);
 }
 
-// State 12: the ball is in the air. Once the view has faded past half way: holed -> state 13,
-// else state 14. Before the fade, a ball that has come to rest is marked (lie 12 with flag 8)
-// and the fade starts. While flying, buttons 22/23 (any pad for a CPU) drive the two flight
-// camera toggles. A human outside split screen and lessons: button 24 with a replay recorded
-// (and the game allowing it) replays the shot (state 11 via the replay launch); button 25 with
-// the mulligan allowed takes the shot back.
+// State 12: the ball is in flight. Once the view's latch (fn_80062DD4) is set and its value
+// (fn_80062DCC) passes 0.5: GM_PlayerTookShot, the replay stops, holed -> state 13, else state 14.
+// Before that a ball that has come to rest sets the latch (a tap-in, flag 8, becomes LIE_INCUP_e).
+// The swing phase keeps running (the spin window); buttons 22/23 (any pad for a CPU) drive
+// fn_80045558/fn_80045494. A live human outside split screen (and not while fn_800E430C or
+// fn_80100294): button 24 with a replay recorded (and the game allowing it) replays the shot
+// (REPLAY_Play, state 11); button 25 with the mulligan allowed takes the shot back.
 void STATEFUNC_SimulateUpdate(int nPlayer) {
     u8    bA = 0;
     u8    bB = 0;
@@ -3588,7 +3605,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
     pV = fn_80017028(gPlayers[nPlayer].nView[0]);
     if (GolfCamera_IsFreezeTimeActive()) return;
     GM_SimulateBallMovement(nPlayer);
-    Swing_RumbleTick(nPlayer);
+    SW_UpdateVibration(nPlayer);
     if (fn_80062DD4(pV) && fn_80062DCC(pV) > 0.5f) {
         GM_PlayerTookShot(nPlayer);
         REPLAY_Stop();
@@ -3672,10 +3689,10 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
     }
 }
 
-// State 10 begins: setting up the shot. The address animation and the HUD's club and shot
-// kind; camera 12; the tutorial tips (first tee, first approach, first putt) for a human when
-// tips are on; the caddie starts; on the tee every player's ball is set up; the shot flags
-// are cleared; sound 7.
+// State 10 begins: the swing. The address animation (5) with the club and shot kind set on the
+// character; the swing reset unless the shot setup did it (unk630); camera 12; first-time tips for
+// a human (fn_800E505C 0/1/2 or fn_800D1DAC, with gpGame+0x281); the caddie starts; on the tee the
+// tee goes in and every player's ball markers are set; the shot flags are cleared; event 7.
 void STATEFUNC_SwingInit(int nPlayer) {
     View* pV    = fn_80017028(gPlayers[nPlayer].nView[0]);
     int   nView;
@@ -3693,7 +3710,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
     fn_80062BE8(gPlayers[nPlayer].pChar);
     SKATime_UnPause(gPlayers[nPlayer].pChar->anim);
     if (gPlayers[nPlayer].swing.unk630 == 0) {
-        fn_80058FA4(nPlayer);
+        SW_vInitSwing(nPlayer);
         gPlayers[nPlayer].swing.unk630 = 1;
     }
     nView = gPlayers[nPlayer].nView[0];
@@ -3755,13 +3772,13 @@ void STATEFUNC_SwingInit(int nPlayer) {
     fn_80062B68(nPlayer);
 }
 
-// State 10 every frame: the shot setup. An idle timer (any button or the swing resets it, 10 s
-// wraps). When the swing has been made (the per-frame swing poll says so): the RNG stream 1 is
+// State 10 every frame: the swing. The swing phase runs; an idle timer (reset by fn_80014300 or a
+// swing phase past 0, wraps at 10 s). When the ball is hit: GM_BallHit, the RNG stream 1 is
 // reseeded from the session seed, the view told, and it is state 11 (the swing animation) on a
-// special camera - or state 12 straight away. Otherwise, for a human outside a replay before
-// the swing starts: the caddie updates; button 6 re-plans the shot (the 0x264 hook or a putt
-// aims at the pin, else a fresh target) with the break line and HUD redone; button 5 on a
-// putt goes to the putt-line camera (state 7).
+// special camera (with gpGame+0x283) - or state 12 straight away. Otherwise, for a human outside a
+// replay before the swing starts: the caddie updates; button 6 re-plans the shot (the 0x264 hook
+// or a putt uses AI_DefaultTarget, else AI_ChooseTarget) with the break line and HUD redone;
+// button 5 on a putt pushes the reverse-putt camera (state 7); else GM_CheckForShotChanges.
 void STATEFUNC_SwingUpdate(int nPlayer) {
     int   nClub = gPlayers[nPlayer].nClub;
     u8    bSwung;
@@ -3851,13 +3868,14 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
     }
 }
 
-// State 14: the ball has come to rest, not holed. First frame: the result to the view and the
-// reaction (animation 9 or camera 15). Camera 15 once the animation allows; the reaction shot
-// lines up. Then, unless the score display is up: with no menu, once the camera has settled
-// (and the reaction animation is far enough along) the hole state is updated and it is either
-// state 15 (the next shot) or a camera move. With the menu: a human outside split screen can
-// take a mulligan (button 25, if allowed), watch the replay (button 24, if recorded and
-// allowed) or continue (button 0); a CPU continues on any pad's button 0.
+// State 14: the ball has come to rest, not holed. First frame: the post-shot animation choice to
+// the view, the reaction (animation 9 or camera 15) and a rumble tick. Camera 15 once the animation
+// allows; the reaction shot lines up. Then, unless fn_800E46B4: without fn_800E4254, once the fade
+// has completed an OOB ball is replaced (low-IQ penalty) and the golfer's turn ends; before that,
+// when the reaction animation is far enough along, it is state 15 (fade to tap-in) if a gimme is
+// allowed, else a fade out starts. With fn_800E4254: a human outside split screen can take a
+// mulligan (button 25, if allowed), watch the replay (button 24, if recorded and allowed) or
+// continue (button 0, fn_800E41D4); a CPU continues on any pad's button 0.
 void STATEFUNC_ShowYardageUpdate(int nPlayer) {
     View* pV    = fn_80017028(gPlayers[nPlayer].nView[0]);
     Vec4  vOffset;
@@ -3870,7 +3888,7 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
         } else {
             CameraController_SetCameraMode(pV, 0xF, nPlayer, gPlayers[nPlayer].nView[0]);
         }
-        Swing_RumbleTick(nPlayer);
+        SW_UpdateVibration(nPlayer);
         lbl_80281E13 = 0;
     }
     vOffset = lbl_80183620;

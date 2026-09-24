@@ -372,12 +372,12 @@ void fn_8006B57C(int nPlayer) {
     f32 fWanted = AI_PowerForTarget(nPlayer);
     f32 fMiss;
 
-    if (fWanted > 0.95f && fn_8005B64C(nPlayer) > 1.0f && fn_8005B64C(nPlayer) > 1.0f) {
+    if (fWanted > 0.95f && SW_vGetShotPower(nPlayer) > 1.0f && SW_vGetShotPower(nPlayer) > 1.0f) {
         lbl_801D5F78[nPlayer].n0 = 0;
         lbl_801D5F78[nPlayer].n4 = 2;
         return;
     }
-    fMiss = fabsf(fWanted - fn_8005B64C(nPlayer));
+    fMiss = fabsf(fWanted - SW_vGetShotPower(nPlayer));
     if (fMiss < 0.2f) {
         lbl_801D5F78[nPlayer].n0 = 0;
         lbl_801D5F78[nPlayer].n4 = 1;

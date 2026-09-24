@@ -169,7 +169,7 @@ typedef struct SwingData {
     s32  nMishitY;              // 0x02C  (0x400)
     u8   unk30[0x3C - 0x30];    // 0x030  TW06: ballFlightX, ballFlightY, fForwardSwingMagnitude
     f32  fMishitAngle;          // 0x03C  (0x410) the stick's miss after forgiveness, added to the aim
-    f32  fShotPower;            // 0x040  (0x414) Swing_ComputePower's result
+    f32  fShotPower;            // 0x040  (0x414) SW_vCalculateShotPower's result
     f32  fHookSlice;            // 0x044  (0x418) copy of the face vector's x (vLaunchA[0])
     f32  fNonPowerShotPower;    // 0x048  (0x41C) boosted power minus the error. TW06: fNonPowerAttribAffectedShotPower
     f32  fControllerSliceAngle; // 0x04C  (0x420) the backswing's sideways angle, radians (0 on a putt)
@@ -726,8 +726,8 @@ int  fn_80015464(void);
 u8   fn_80101DF4(void);
 f32  Swing_SpinScale(int nSpin);         // how much spin SPIN allows: 0.15 at 0 .. 1.0 at 110 (Swing.c)
 f32  fn_8005C280(int nPlayer);          // the swing's fNonPowerShotPower (Swing.c)
-void Swing_RumbleOff(int nPlayer);      // stops the pad rumble (Swing.c)
-void Swing_ResetBoostAndSpin(int nPlayer);  // Swing.c
+void SW_KillVibration(int nPlayer);      // stops the pad rumble (Swing.c)
+void SW_vClearBoosts(int nPlayer);  // Swing.c
 
 u8   Club_UsableForKind(int nPlayer, int nClub, int nKind);
 int  AI_FirstUsableClub(int nPlayer, int nKind);

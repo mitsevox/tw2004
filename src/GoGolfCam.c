@@ -1860,7 +1860,7 @@ void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
     } else {
         fDist = AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
         fDist *= Physics_GetLiePowerPercentage(&gPlayers[nPlayer].ball);
-        fDist *= fn_8005B64C(nPlayer);
+        fDist *= SW_vGetShotPower(nPlayer);
         nClass = 2;
         fn_800C73DC(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vBall, vAim);
         fn_800BAF04(vAim, vAim);
@@ -3538,13 +3538,13 @@ void GolfCamera_ChooseSpecialSwing(View* pView, int nPlayer) {
     if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
         if (nPlayer == 0 && gPlayers[nPlayer].ball.nLie == 0) {
             pView->n260 = 2;
-            Swing_RumbleOff(nPlayer);
+            SW_KillVibration(nPlayer);
             fn_800A68C0(nPlayer);
             return;
         }
         if (nPlayer == 1 && gPlayers[nPlayer].ball.nLie == 0) {
             pView->n260 = 11;
-            Swing_RumbleOff(nPlayer);
+            SW_KillVibration(nPlayer);
             fn_800A68C0(nPlayer);
             return;
         }
@@ -3613,7 +3613,7 @@ void GolfCamera_ChooseSpecialSwing(View* pView, int nPlayer) {
             }
         }
         if (pView->n260 != 0) {
-            Swing_RumbleOff(nPlayer);
+            SW_KillVibration(nPlayer);
             fn_800A68C0(nPlayer);
         }
     } else {

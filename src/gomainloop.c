@@ -127,13 +127,13 @@ void fn_80055F18(void);
 void fn_800563C4(void);
 void fn_80056454(void);
 void GOLFERSTATE_OpenONCE(void);
-void Swing_Init(void);
+void SW_vInitModule(void);
 void fn_80058DB4(void);
 void fn_8005A0FC(int nPlayer);
 void fn_8005A478(int nPlayer);
 void fn_8005A7A0(int nPlayer);
 void fn_8005A850(int nPlayer);
-void fn_8005CD94(void);
+void GOLFERSTATE_CloseONCE(void);
 void fn_8005D2E4(void);
 void fn_8005D2F8(void);
 void fn_8005D348(void);
@@ -413,7 +413,7 @@ void fn_8006C720(void) {
 void fn_8006C770(void) {
     fn_800DCBB8();
     fn_8005D348();
-    fn_8005CD94();
+    GOLFERSTATE_CloseONCE();
     fn_800763B8();
     fn_80056454();
     fn_8002E25C();
@@ -657,7 +657,7 @@ void GO_vInitIG(void) {
     fn_8006F4B4();
     fn_8009005C("ingame");
     fn_8006DC20(1.0f);
-    Swing_Init();
+    SW_vInitModule();
     REPLAY_InitModule();
     fn_800DAE44();
     PsBallFx_InitModule();

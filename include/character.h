@@ -1037,8 +1037,8 @@ int   fn_80062B98(Character* pChar, u64 uEvent);
 int   fn_80062BB0(Character* pChar, u64 uEvent);   // event uEvent is set and its time has come
 void  fn_80062BE8(Character* pChar);
 void  fn_80062BFC(Character* pChar);
-int   fn_80062C10(Character* pChar);    // uFlags bit 4
-int   fn_80062C1C(Character* pChar);    // uFlags bit 1
+int   fn_80062C10(Character* pChar);    // uFlags & 4
+int   fn_80062C1C(Character* pChar);    // uFlags & 1
 f32   fn_80062C28(Character* pChar);    // how far the animation still has to run
 
 // ---- mtalib.c --------------------------------------------------------------------------------

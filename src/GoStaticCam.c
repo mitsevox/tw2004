@@ -2,7 +2,7 @@
 // cameras and fly-by camera paths. The course data brings them as 'Cact' objects (UKernel.c hands
 // type 201 to fn_80064A0C, type 200 to fn_800646D0) and the paths' timing curves
 // as a 'CAMC' stream object (fn_800644F4). The golf cameras (GoGolfCam.c) pick a static camera
-// whose area holds the ball (StaticCam_ChooseScript) and fly along a path (StaticCam_GetFlyByCam, fn_80065488).
+// whose area holds the ball (StaticCam_ChooseScript) and fly along a path (StaticCam_GetFlyByCam, StaticCam_GetFlybyInformation).
 
 #include "game_types.h"
 #include "engine.h"
@@ -354,7 +354,7 @@ FlyByPath* fn_80065424(u32 uPath) {
 // 0.005 steps until the camera has gone far enough, then home in on the exact distance. The script
 // keeps the shot it is on (pShot), the share of that shot's segment (fA0) and the distance so far
 // (fA4).
-void fn_80065488(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov, int nPlayer,
+void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov, int nPlayer,
                  f32 fShare) {
     f32 vLast[4];
     f32 vDiff[4];

@@ -89,7 +89,7 @@ void fn_80065C30(int nPlayer, int nEvent, void* pData, int nArg) {
     int i = 0;
 
     do {
-        Swing_ResetBoostAndSpin(i);
+        SW_vClearBoosts(i);
         i++;
     } while (i < 5);
 }

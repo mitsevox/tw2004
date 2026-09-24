@@ -431,7 +431,7 @@ void fn_801008F8(void) {
         fn_8009B970(gPlayers[0].nView[0]);
         fn_8001C804(0, 1, 1);
         fn_800957D8(gPlayers[0].pChar);
-        fn_80058FA4(0);
+        SW_vInitSwing(0);
         if (lbl_80282428 != 8 && lbl_80282428 != 9 && lbl_80282428 != 10 && lbl_80282428 != 11) {
             fn_80095744(gPlayers[0].pChar, 1);
         }

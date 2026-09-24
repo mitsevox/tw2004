@@ -723,7 +723,7 @@ void     fn_80064F54(CamShot* pShot, int nPlayer, f32* pOut);   // the shot's po
 CamShot* StaticCam_ChooseScript(int nPlayer, int nKind, u8 bNotKind5, CamShot* pNot);
 CamShot* StaticCam_GetFlyByCam(int nPath);        // a fly-by path's first shot (NULL past the 10th)
 FlyByPath* fn_80065424(u32 uPath);      // a fly-by path's timing curve (NULL: none)
-void     fn_80065488(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov, int nPlayer,
+void     StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov, int nPlayer,
                      f32 fShare);
 
 // ---- the camera modes' setups (GoGolfCam.c), one per CameraController_SetCameraMode mode --------------------
