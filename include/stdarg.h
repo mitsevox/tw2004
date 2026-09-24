@@ -3,9 +3,11 @@
 // __builtin_va_info; va_arg goes through MSL's __va_arg. SN ProDG (GCC 2.95, the shared file
 // library) predates __builtin_va_list, so it gets the same record and no macros: none of its code
 // takes variable arguments. Any other compiler gets its builtins.
+// The guard is the SDK C library's (extern/sdk/libc/stdarg.h): MSL sources reach both copies, and
+// whichever comes first must stand for the other.
 
-#ifndef STDARG_H
-#define STDARG_H
+#ifndef _STDARG_H_
+#define _STDARG_H_
 
 #if defined(__MWERKS__) || (defined(__GNUC__) && __GNUC__ < 3)
 typedef struct {
