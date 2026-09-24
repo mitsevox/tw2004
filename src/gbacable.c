@@ -87,20 +87,19 @@ void fn_801229F8(void) {
 s32 fn_80122AF0(s32 nChan) {
     u32 uWord;
     u32 uStart = OSGetTick();
-    u8* pStatus = &lbl_80260E18[nChan].uStatus;
 
     for (;;) {
-        if (GBAGetStatus(nChan, pStatus) != 0) {
+        if (GBAGetStatus(nChan, &lbl_80260E18[nChan].uStatus) != 0) {
             return 0;
         }
         if (OSGetTick() - uStart > GBA_TIMEOUT_TICKS) {
             return 0;
         }
-        if (*pStatus == 0x28) {
+        if (lbl_80260E18[nChan].uStatus == 0x28) {
             break;
         }
     }
-    if (GBARead(nChan, (u8*)&uWord, pStatus) != 0) {
+    if (GBARead(nChan, (u8*)&uWord, &lbl_80260E18[nChan].uStatus) != 0) {
         return 0;
     }
     lbl_80260E18[nChan].n4C = uWord;
