@@ -20,6 +20,7 @@ s32  fn_8009E280(s32 nPort, s32 nSlot, s32 nFile, CARDStat* pStat);
 s32  fn_8009ED34(s32 nPort, s32 nSlot, const char* pName, const char* pBackupName);
 s32  fn_8009EECC(s32 nPort, s32 nSlot, const char* pName);
 s32  fn_8009EF68(s32 nPort, s32 nSlot);
+s32  fn_8009F4D8(const void* pA, const void* pB);
 s32  fn_80125194(s32 a, s32 b);         // EA Sports Bio (0x80125194)
 s32  fn_801255C4(s32* pPos);            // EASportsBio.c
 s32  fn_801255F8(void);                 // EASportsBio.c: the EA Sports Bio file's size
@@ -910,6 +911,32 @@ void fn_8009F02C(void) {
     }
 }
 
+// List the files on the card whose names hold pPattern, sorted by fn_8009F4D8: copy up to nMax
+// names into apName and the number found into pnFound. The last one found is noted as the file to
+// open (lbl_802813D8, lbl_80281FCC). nSlot is not used.
+s32 fn_8009F0F0(s32 nPort, s32 nSlot, const char* pPattern, char** apName, s32 nMax, s32* pnFound) {
+    CARDStat stat;
+    int nChan = nPort;
+    int i;
+    lbl_80281FB0 = 0;
+    for (i = 0; i < 127; i++) {
+        if (CARDGetStatus(nChan, i, &stat) == CARD_RESULT_READY &&
+            strstr(stat.fileName, pPattern) != NULL) {
+            memcpy(&lbl_801E3B6C[lbl_80281FB0], &stat, sizeof(CARDStat));
+            lbl_802813D8 = i;
+            lbl_80281FB0++;
+            lbl_80281FCC = i;
+        }
+    }
+    qsort(lbl_801E3B6C, lbl_80281FB0, sizeof(CARDStat), fn_8009F4D8);
+    for (i = 0; i < lbl_80281FB0 && i < nMax; i++) {
+        strcpy(apName[i], lbl_801E3B6C[i].fileName);
+    }
+    *pnFound = lbl_80281FB0;
+    lbl_80281FB0 = 0;
+    return 0;
+}
+
 // Read nLen bytes of open file nFile into pBuf, from where the last read stopped. arg3 is not
 // used (TibExt's fn_80122744 passes 0).
 s32 fn_8009F208(s32 nFile, void* pBuf, s32 nLen, s32 arg3) {
@@ -999,6 +1026,17 @@ s32 fn_8009F488(s32 nFile) {
     return 0;
 }
 
+// fn_8009F0F0's qsort order: newest first, by the entries' time stamps.
+s32 fn_8009F4D8(const void* pA, const void* pB) {
+    // EA bug: the time stamps are read through the addresses of the two parameters, not through
+    // the entries they point to, so this compares whatever is on the stack there and the order is
+    // arbitrary. A port should read ((const CARDStat*)pA)->time.
+    u32 uTimeA = ((const CARDStat*)&pA)->time;
+    u32 uTimeB = ((const CARDStat*)&pB)->time;
+    if (uTimeA > uTimeB) return -1;
+    return uTimeA < uTimeB;
+}
+
 // Create pName with nLen bytes (only the EA Sports Bio's "EASB"), set its attribute bit 0x40 and
 // note it as the file to open (lbl_802813D8). An I/O error marks the card damaged.
 s32 fn_8009F514(s32 nPort, s32 nSlot, const char* pName, s32 nLen) {
@@ -1032,9 +1070,10 @@ s32 fn_8009F5E4(s32 nPort, s32 nSlot, const char* pName) {
 
 s32 fn_8009F6A0(s32 nPort, s32 nSlot) {
     CARDStat stat;
+    int nChan = nPort;
     int i;
     for (i = 0; i < 127; i++) {
-        if (CARDGetStatus(nPort, i, &stat) == CARD_RESULT_READY &&
+        if (CARDGetStatus(nChan, i, &stat) == CARD_RESULT_READY &&
             strstr(stat.fileName, "BASLUS-20572") != NULL) {
             return 0;
         }

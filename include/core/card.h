@@ -41,7 +41,8 @@ LAYOUT_ASSERT(CARDFileInfo, 0x14);
 // A file's directory entry (0x6C bytes); only the fields EA's code uses.
 typedef struct CARDStat {
     char fileName[32];          // 0x00
-    u8   unk20[0x28 - 0x20];
+    u8   unk20[0x24 - 0x20];
+    u32  time;                  // 0x24  when the file was last written
     char gameName[4];           // 0x28  the game code of the file's owner (not 0-terminated)
     u8   unk2C[0x2E - 0x2C];
     u8   bannerFormat;          // 0x2E  bits 0-1 the banner's format, bit 2 set: the icon ping-pongs
