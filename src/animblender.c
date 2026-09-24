@@ -322,6 +322,29 @@ f32 fn_80072CB8(SKABlendNode* pNode, u64 uEvent) {
     return fTime;
 }
 
+// Resets a player: stopped at time 0, f14 1, and its ten entries chained in order from p44.
+void fn_80072D90(AnimPlayer* pPlayer) {
+    int i;
+    AnimPlayerEntry* pPrev;
+
+    pPlayer->fTime = 0.0f;
+    pPlayer->n08 = 0;
+    pPlayer->uFlags = 0;
+    pPlayer->n00 = 0;
+    pPlayer->f14 = 1.0f;
+    pPlayer->nC = 0;
+    pPlayer->f10 = 0.0f;
+    pPlayer->n3C = 0;
+    pPlayer->n40 = 0;
+    pPlayer->p44 = &pPlayer->a48[0];
+    pPrev = NULL;
+    for (i = 0; i < 10; i++) {
+        pPlayer->a48[i].pNext = (i < 9) ? &pPlayer->a48[i + 1] : NULL;
+        pPlayer->a48[i].pPrev = pPrev;
+        pPrev = &pPlayer->a48[i];
+    }
+}
+
 // Character.anim is still declared as bytes, so these three take its address as a u8*.
 void fn_8007325C(u8* pAnim) {
     ((AnimPlayer*)pAnim)->uFlags |= 2;

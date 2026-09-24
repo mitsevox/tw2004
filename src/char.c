@@ -26,7 +26,6 @@ void  fn_8001A7C8(void);
 Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, SkinChoices* pChoices);
 CharSkinSet* fn_8001B208(u8* pData);
 Character* fn_8001942C(void);
-void  fn_80072D90(void* pAnim);                                 // animblender.c: reset a player
 s32   fn_800962F8(Character* pChar);                            // CharAnim.c
 void  fn_800184E4(Character* pChar, Skin* pSkin);
 void  fn_80018710(Character* pChar);
@@ -1012,7 +1011,7 @@ Character* fn_8001942C(void) {
         pChar->buffers[i].pBuf = fn_80009B34(0x890, 2, 0x40, "char.c", 0x8AF);
     }
     pNode = &pChar->blend;
-    fn_80072D90(pChar->anim);
+    fn_80072D90((AnimPlayer*)pChar->anim);
     fn_80071C28(&pNode, 1, 0, fn_80072ACC, 1);
     pNode = (SKABlendNode*)pChar->node3E0;
     fn_80072D90(&pChar->anim29C);

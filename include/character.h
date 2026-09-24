@@ -408,8 +408,16 @@ typedef struct CharBuffer {
 } CharBuffer;
 LAYOUT_ASSERT(CharBuffer, 0x1C);
 
-// An animation player; only what is read. Character has two: the one at 0x164, whose fields are
-// named in Character directly, and anim29C.
+// One of an animation player's ten entries (our name; 0x18 bytes).
+typedef struct AnimPlayerEntry {
+    struct AnimPlayerEntry* pNext;  // 0x00  } fn_80072D90 chains the ten in order
+    struct AnimPlayerEntry* pPrev;  // 0x04  }
+    u8    unk8[0x18 - 0x8];
+} AnimPlayerEntry;
+LAYOUT_ASSERT(AnimPlayerEntry, 0x18);
+
+// An animation player (0x138 bytes); only what is read. Character has two: the one at 0x164, whose
+// fields are named in Character directly, and anim29C.
 typedef struct AnimPlayer {
     s32   n00;                  // 0x00  } reset to 0 and -1 by fn_8001BE88
     s32   uFlags;               // 0x04  fn_8007325C sets bit 2, fn_8007326C clears bits 1 and 2
@@ -423,7 +431,15 @@ typedef struct AnimPlayer {
     f32   f24;                  // 0x24  } fn_800737B4: with uFlags bit 3, f28 climbs to f24; with
     f32   f28;                  // 0x28  } bit 4, it falls to f2C (at 0 bit 4 gives way to bit 0),
     f32   f2C;                  // 0x2C  } and the step is scaled by f28 / f24 on the way
+    u8    unk30[0x3C - 0x30];
+    s32   n3C;                  // 0x3C  } cleared by fn_80072D90
+    s32   n40;                  // 0x40  }
+    struct AnimPlayerEntry* p44;    // 0x44  a48[0] after fn_80072D90
+    AnimPlayerEntry a48[10];    // 0x48  chained both ways by fn_80072D90
 } AnimPlayer;
+LAYOUT_ASSERT(AnimPlayer, 0x138);
+
+void fn_80072D90(AnimPlayer* pPlayer);  // animblender.c: reset a player
 
 // An entry of Character.p44 (0x30 bytes), read from the CHR object by fn_8001A9F4.
 typedef struct CharEntry44 {
@@ -515,7 +531,6 @@ typedef struct Character {
     f32   fAnimEnd;             // 0x184  the animation's end time
     u8    unk188[0x29C - 0x188];
     AnimPlayer anim29C;         // 0x29C  a second animation player
-    u8    unk2CC[0x3D4 - 0x2CC];
     s32   n3D4;                 // 0x3D4  the bytes of its CHR object before the animation library
     AnimLib* pLib;              // 0x3D8  its animation library
     struct ClipRecord* pRecords;    // 0x3DC  records for its merged library (skalib)
