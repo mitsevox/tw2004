@@ -124,14 +124,14 @@ void fn_80112DA0(void) {
 // with the next one (TexEntry.b47 bit 0) or kind 9, blended over the first and with its material's
 // texture scale and offset. A mesh the override table replaces is drawn from the table's data.
 void fn_80112DD8(s32 nEntry) {
+    int nDraw;
     SkinDesc* pDesc;
     SkinDesc44* pEntry;
-    SkinDesc28* pPasses;
     s32* pMaterials;
-    s32* pMaterial;
+    SkinDesc28* pPasses;
     s16* pFirst;
-    s16* pCount;
     s32* pMesh;
+    s16* pCount;
     TexEntry* pTex;
     f32* pUV;
     SkinMeshRefs* pRefs;
@@ -139,9 +139,9 @@ void fn_80112DD8(s32 nEntry) {
     void** apOverride;
     int nPasses;
     int nMeshes;
+    s32* pMaterial;
     int nDraws;
     int nPass;
-    int nDraw;
     int nMesh;
     int i;
     s16 anFirst[16];            // the size is not known
@@ -154,15 +154,15 @@ void fn_80112DD8(s32 nEntry) {
     }
     pDesc = pState->pDesc;
     pEntry = &pDesc->p44[nEntry];
-    pPasses = &pDesc->p28[pEntry->nC];
     pMaterials = &pDesc->p20[pEntry->n4];
+    pPasses = &pDesc->p28[pEntry->nC];
     pFirst = &pDesc->pA4[pEntry->n28];
     nDraws = pEntry->n8;
     nPasses = pPasses->n0;
     nOverrides = (pState->pOverride != NULL) ? pState->pOverride->nMeshes : 0;
     apOverride = (pState->pOverride != NULL) ? pState->pOverride->apMesh : NULL;
 
-    for (nPass = 0, pMaterial = pMaterials; nPass < nPasses; nPass++, pMaterial++) {
+    for (nPass = 0, pMaterial = pMaterials; nPass < nPasses; pMaterial++, nPass++) {
         nMeshes = pPasses->a8[0].n1;
         for (i = 0; i < nMeshes; i++) {
             anFirst[i] = pFirst[i];
@@ -223,7 +223,8 @@ void fn_80112DD8(s32 nEntry) {
                         fn_8011368C(&pDesc->p34[nMesh], pRefs, anFirst[i], *pCount);
                     }
                 }
-                anFirst[i] += *pCount++;
+                anFirst[i] += *pCount;
+                pCount++;
             }
             fn_801132C4(pRefs);
         }
@@ -265,9 +266,9 @@ void fn_801132C4(SkinMeshRefs* pRefs) {
     f32* pPosBuf;
     s8* pNormalBuf;
     int n;
-    void* pBuf;
     s32 n10;
     s16* pVerts;
+    void* pBuf;
     void* pTexCoords;
     u16* pIndices;
     u16 nIndex;

@@ -223,11 +223,12 @@ s32 fn_8010C9D4(int nLie) {
 void fn_8010CA2C(int nPlayer) {
     Player* pPlayer = &gPlayers[nPlayer];
     s32 nKind;
-    u8 bCounts = 0;
     s32 nLead;
+    u8 bCounts = 0;
     s32 nMsgs = 0;
     s32 nLength;
     s32 nPoints;
+    s32 nTotal;
     u32 nPick;
     u16 aMsgs[20];
 
@@ -325,7 +326,7 @@ void fn_8010CA2C(int nPlayer) {
     if (nPoints > 0) {
         if (nLength > lbl_80282494) {
             if (lbl_80282494 != 0.0f) {
-                if (lbl_80281768 != nPlayer && lbl_80281768 != 5) {
+                if (nPlayer != lbl_80281768 && lbl_80281768 != 5) {
                     ADD_MSG(0xB);
                     if (nPlayer == 0) {
                         ADD_MSG(5);
@@ -358,7 +359,8 @@ void fn_8010CA2C(int nPlayer) {
     }
 
     pPlayer->nEBC += nPoints;
-    pPlayer->nEBC = (pPlayer->nEBC > 0) ? pPlayer->nEBC : 0;
+    nTotal = pPlayer->nEBC;
+    pPlayer->nEBC = (nTotal <= 0) ? 0 : nTotal;     // never below zero
     fn_800E5CA4(nPlayer, gPlayers[nPlayer].nEBC, nLength, nKind, 0, 0, nPoints, 0.0f);
 
     // A track the first time the score reaches 1200, 800 and 400 (EA also passes the player's
