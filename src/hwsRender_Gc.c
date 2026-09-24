@@ -468,7 +468,7 @@ SkinIter* fn_80113910(u8* pBuf, SkinIterArgs* pArgs) {
     SkinMeshIter* pIter = (SkinMeshIter*)pBuf;
     SkinDesc28* p28;
     s32 nCount;
-    int i;
+    s32 i;
 
     fn_80113E54(&pIter->iter, lbl_802817E8);
     pIter->pDesc = pArgs->pDesc;
