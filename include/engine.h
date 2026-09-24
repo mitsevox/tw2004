@@ -318,6 +318,8 @@ int  fn_800107C0(struct UStreamObject* pObject, TexBank* pBank, int n);   // loa
 
 // ---- the renderer ----------------------------------------------------------------------------
 
+void fn_800066E4(u8 bOnRelease, s32 nReset, s32 nCode, u8 bMenu);  // LLDisp_Gc.c: reset the console
+                                        //       (OSResetSystem's arguments) unless a memory card is busy
 void fn_80006EDC(void);                 // LLDisp_Gc.c: set the viewport (DiscCheck.c, ScreenClear.c)
 void fn_80006FE8(void);                 // LLDisp_Gc.c: end the frame (returns nothing)
 extern struct GXFifoObj* lbl_80281BA0; // LLDisp_Gc.c: the command FIFO (GXInit's)

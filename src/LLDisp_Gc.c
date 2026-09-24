@@ -3,6 +3,8 @@
 // and copies each finished frame out.
 
 #include "engine.h"
+#include "game.h"
+#include "core/card.h"
 
 volatile DispSync lbl_801A2350;       // volatile: the GX and VI callbacks change it
 GXRenderModeObj lbl_801A2464;          // the video mode
@@ -10,19 +12,66 @@ u8  lbl_80281B8C;                      // cleared when a frame ends, set when th
 u8  lbl_80281B8D;                      // copy the frame's colour, not only its alpha
 u32 lbl_80281B90;                      // one image buffer's size in bytes
 
+void VIInit(void);                      // SDK
+void VIConfigure(GXRenderModeObj* pMode);
+void VISetNextFrameBuffer(void* pBuf);
+void VISetPostRetraceCallback(void (*pCallback)(u32 nRetrace));
 u32  VIGetNextField(void);
+void VISetBlack(int bBlack);
+void VIFlush(void);
+void VIWaitForRetrace(void);
+void GXSetBreakPtCallback(void (*pCallback)(void));
+void GXSetDispCopyGamma(int eGamma);
+int  PADRecalibrate(u32 uMask);
+s32  OSResetSystem(s32, s32, s32);
+int  OSGetResetButtonState(void);
+void fn_80006A98(void);
+void fn_80006B4C(void);
 void fn_80007328(void);
 void fn_80007368(void);
+void fn_800073A8(void);
 void fn_800392D0(void);
 
+void fn_800067E4(GXRenderModeObj* pMode);
 void fn_80006DD0(void);
 void fn_80006DF4(void);
+void fn_80006E78(u32 nRetrace);
 void fn_80006EC8(void);
+void fn_80007160(void);
 void fn_800070DC(void);
 s32  fn_8000724C(void);
 void fn_80007254(void);
 u8   fn_80007258(void);
 void fn_80007260(void);
+
+// Resets the console with OSResetSystem's arguments, unless a memory card is busy. With
+// bOnRelease, only once the reset button has been pressed and let go again.
+void fn_800066E4(u8 bOnRelease, s32 nReset, s32 nCode, u8 bMenu) {
+    if (CARDGetResultCode(0) == -1) return;
+    if (CARDGetResultCode(1) == -1) return;
+    if (bOnRelease) {
+        if (lbl_80281B8E) {
+            if (OSGetResetButtonState()) return;
+        } else {
+            lbl_80281B8E = OSGetResetButtonState();
+            return;
+        }
+    }
+    fn_800070DC();
+    GXDrawDone();
+    VISetPostRetraceCallback(NULL);
+    VISetBlack(1);
+    VIFlush();
+    VIWaitForRetrace();
+    VISetBlack(1);
+    VIFlush();
+    VIWaitForRetrace();
+    PADRecalibrate(0x80000000);
+    PADRecalibrate(0x40000000);
+    PADRecalibrate(0x20000000);
+    PADRecalibrate(0x10000000);
+    OSResetSystem(nReset, nCode, bMenu);
+}
 
 // Clears the frame sync: no break points queued, the GPU not waited on.
 void fn_80006DD0(void) {
@@ -51,7 +100,7 @@ void fn_80006DF4(void) {
 }
 
 // VI's post-retrace callback: after a break point was hit, move on to the next one.
-void fn_80006E78(void) {
+void fn_80006E78(u32 nRetrace) {        // nRetrace: VI's retrace count, unused
     if (lbl_801A2350.bBreak) {
         lbl_801A2350.n11++;
         fn_80006DF4();
@@ -136,6 +185,29 @@ void fn_80007160(void) {
     GXCopyDisp(lbl_80281BA4[1], 1);
 }
 
+// Starts the display: the video mode, the image buffers, the frame sync and its callbacks; then
+// two black frames on screen.
+s32 fn_800071BC(void) {
+    VIInit();
+    fn_800067E4(NULL);
+    fn_80006A98();
+    VIConfigure(&lbl_801A2464);
+    fn_80006B4C();
+    fn_80006DD0();
+    VISetPostRetraceCallback(fn_80006E78);
+    GXSetBreakPtCallback(fn_80006EC8);
+    VISetNextFrameBuffer(lbl_80281BA4[0]);
+    VIWaitForRetrace();
+    if (lbl_801A2464.viTVmode & 1) {
+        VIWaitForRetrace();
+    }
+    fn_80007160();
+    VISetBlack(0);
+    VIFlush();
+    fn_800073A8();
+    return 0;
+}
+
 s32 fn_8000724C(void) {
     return 0;
 }
@@ -148,4 +220,20 @@ u8 fn_80007258(void) {
 }
 
 void fn_80007260(void) {
+}
+
+// Picks the frame copy's gamma from the average of three values: 1.0 below 1.7, 1.7 up to 2.2,
+// else 2.2 (GX's gamma 0, 1, 2).
+void fn_80007264(f32* pGamma) {
+    int eGamma;
+    f32 fAvg;
+
+    eGamma = 0;
+    fAvg = (pGamma[2] + (pGamma[0] + pGamma[1])) / 3.0f;
+    if (fAvg >= 1.7f && fAvg < 2.2f) {
+        eGamma = 1;
+    } else if (fAvg >= 2.2f) {
+        eGamma = 2;
+    }
+    GXSetDispCopyGamma(eGamma);
 }
