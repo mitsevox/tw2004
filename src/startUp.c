@@ -6,8 +6,12 @@
 #include "core/startup.h"
 #include "core/goaram.h"
 #include "core/memcard.h"
+#include "core/gameaudio.h"
 #include "game/frontend.h"
 #include "frontend/uistudio.h"
+#include "frontend/fe.h"
+#include "ball.h"
+#include "dynobj.h"
 
 void   fn_800AF324(void);
 void   fn_800AF93C(void* pVpb);
@@ -38,6 +42,30 @@ u8     fn_800B1180(void);
 s32    fn_800B12FC(s32* pnPort, s32* pnSlot);
 int    fn_800B13FC(s32* pnPort, s32* pnSlot);
 void   fn_800B166C(UStreamObject* pObject);
+void   fn_800B1CF4(f32* pA, f32* pB, f32* pOut);
+void   fn_800B1D18(f32* pA, f32* pB, f32* pOut);
+void   fn_800B1F20(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B1F9C(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B1FBC(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B1FFC(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B203C(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B204C(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B206C(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B208C(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B20B8(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B2104(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B2150(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B218C(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B21D0(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B21DC(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B21E0(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B21E4(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B21F0(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B223C(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B2250(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B227C(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B22D4(MsgArg* pArgs, MsgArg* pResult);
+void   fn_800B22F4(MsgArg* pArgs, MsgArg* pResult);
 
 // port: the GameCube's audio and ARAM libraries and their set-up.
 void   AIInit(u8* pStack);
@@ -64,7 +92,6 @@ void   fn_800B1A88(f32* pA, f32* pB);   // swap two floats
 void   fn_800B1A9C(f32* v, f32 x, f32 y);
 
 // The save kinds (a table of functions at lbl_8018C7D8).
-void   fn_80084FF0(s32 nKind);          // pick a save kind
 s32    fn_80084FB4(CardPos* pPos);      // the picked save kind's size on that card
 
 // The two built-in sounds: where their data is, its size, its playback rate (16.16 fixed point:
@@ -1306,94 +1333,231 @@ void fn_800B1A9C(f32* v, f32 x, f32 y) {
     v[1] = y;
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
-s32 fn_800B1AA8(void);
-s32 fn_800B1CF4();
-void fn_800B1AB0(u8* arg0, u32 arg1, f32* arg2);
-void fn_800B0B1C();
-void fn_800B1F9C(void);
-int fn_800B14E4(s32* pnPort, s32* pnSlot);
-void fn_800B1FBC(MsgArg* pArgs, MsgArg* pResult);
-void fn_800B1FFC(MsgArg* pArgs, MsgArg* pResult);
-void fn_800B0954();
-void fn_800B0960();
-void fn_800B204C(void);
-void fn_800B206C(void);
-void fn_800B1510(s32 a, s32 b);
-void fn_800B208C(MsgArg* pArgs);
-s32 fn_800B120C(s32* pnPort, s32* pnSlot);
-void fn_800B20B8(MsgArg* pArgs, MsgArg* pResult);
-void fn_800B2104(MsgArg* pArgs, MsgArg* pResult);
-s32 fn_800A7A14(s32);
-void fn_800B2150(MsgArg* pArgs);
-void fn_800B21D0(MsgArg* pArgs, MsgArg* pResult);
-void fn_800B21DC(void);
-void fn_800B21E0(void);
-void fn_800B21E4(MsgArg* pArgs, MsgArg* pResult);
-void fn_800B21F0(MsgArg* pArgs, MsgArg* pResult);
-Session* fn_800B223C(void);
-void fn_800B158C(s32 a, s32 b);
-void fn_800B2250(MsgArg* pArgs);
-void fn_80083D88(MsgArg* pArgs, MsgArg* pResult);
-void fn_800B22D4(void);
-void fn_800B22F4(MsgArg* pArgs, MsgArg* pResult);
-
-s32 fn_800B1AA8(void) {
+// Whether the ball can hit the object; every object can.
+u32 fn_800B1AA8(UObject* pObj, f32* pPos) {
     return 1;
 }
 
-void fn_800B1AB0(u8* arg0, u32 arg1, f32* arg2) {
-    u8* temp_r6;
-    u8** temp_r31;
-
-    temp_r31 = (*(u8***)((u8*)((*(u8**)((u8*)(arg0) + 0x100))) + 0x14));
-    if (arg1 != 0U) {
-        temp_r6 = *temp_r31;
-        fn_800B1CF4(arg0 + 0xC0, temp_r6 + 0x58, arg1, temp_r6);
+// Where an object's bounding sphere is (its position plus its mesh's sphere centre) and its radius.
+void fn_800B1AB0(DynObj* pObj, f32* pCenter, f32* pRadius) {
+    UObjMesh* pMesh = pObj->obj.pModel->apLod[0];
+    if (pCenter != NULL) {
+        fn_800B1CF4(pObj->obj.m80[3], pMesh->pInfo->v58, pCenter);
     }
-    if (arg2 != NULL) {
-        *arg2 = (*(f32*)((u8*)(*temp_r31) + 0x64));
+    if (pRadius != NULL) {
+        *pRadius = pMesh->pInfo->f64;
     }
 }
 
-void fn_800B1F9C(void) {
+// Did the ball, moving from pFrom to pTo, hit an object? Of the objects whose sphere (grown by the
+// ball's radius, in yards) holds pTo, take the one nearest pFrom: tell it (message 12), and give
+// the hit point on its sphere, the sphere's normal there and the object. Returns whether there was
+// one.
+u8 fn_800B1B18(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, HitObject** ppWhat) {
+    f32 vNormal[3];
+    f32 vCenter[4];     // fake match: three floats are used; the frame has room for four
+    f32 fRadius;
+    f32 fBest;
+    f32 fDX;
+    f32 fDY;
+    f32 fDZ;
+    f32 fFlat;
+    f32 fReach;
+    f32 fDist;
+    DynObj* pObj;
+    DynObj* pBest = NULL;
+
+    for (pObj = fn_80048E44(); pObj != NULL; pObj = pObj->pNext) {
+        if (pObj->uFlags & 8) {
+            fn_800B1AB0(pObj, vCenter, &fRadius);
+            fDZ = pTo[2] - vCenter[2];
+            fDX = pTo[0] - vCenter[0];
+            fFlat = fDX * fDX + fDZ * fDZ;
+            fDist = fn_80009680(fFlat);
+            fReach = gRealBallRadiusIn / 36.0f + fRadius;
+            if (fDist < fReach) {
+                fDY = pTo[1] - vCenter[1];
+                if ((f32)fn_80009680(fDY * fDY + fFlat) < fReach && fn_800B1AA8(&pObj->obj, pTo)) {
+                    fDist = Vec_Distance(pFrom, vCenter);
+                    if (pBest == NULL || fDist < fBest) {
+                        fBest = fDist;
+                        pBest = pObj;
+                    }
+                }
+            }
+        }
+    }
+    if (pBest != NULL) {
+        // port: the player number goes through the handler's pointer argument
+        pBest->pfnHandler(12, pBest, (void*)nPlayer, NULL);
+        fn_800B1AB0(pBest, vCenter, &fRadius);
+        fn_800B1D18(pTo, vCenter, vNormal);
+        fn_800BAF04(vNormal, vNormal);
+        if (pHit != NULL) {
+            fn_8000C5D4(vCenter, vNormal, fRadius, pHit);
+        }
+        if (pNormal != NULL) {
+            Vec3Copy(vNormal, pNormal);
+        }
+        if (ppWhat != NULL) {
+            *ppWhat = (HitObject*)pBest;    // HitObject is Ball.c's view of a DynObj
+        }
+        return 1;
+    }
+    return 0;
+}
+
+// a + b into out (three floats)
+#ifdef __MWERKS__
+asm void fn_800B1CF4(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_add f2, f2, f0
+    ps_add f3, f3, f1
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_800B1CF4(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pB[0] + pA[0];
+    pOut[1] = pB[1] + pA[1];
+    pOut[2] = pB[2] + pA[2];
+}
+#endif
+
+// a - b into out (three floats)
+#ifdef __MWERKS__
+asm void fn_800B1D18(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_800B1D18(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+}
+#endif
+
+// The UI commands while the session's game type is 1 (start-up): run command nCmd's handler.
+void fn_800B1D3C(int nCmd, MsgArg* pArgs, MsgArg* pResult) {
+    lbl_801F5DA8[nCmd](pArgs, pResult);
+}
+
+// Fill in the start-up UI command table.
+void fn_800B1D78(void) {
+    int i;
+    for (i = 0; i < 23; i++) {
+        lbl_801F5DA8[i] = NULL;
+    }
+    lbl_801F5DA8[0] = fn_800B1F20;
+    lbl_801F5DA8[1] = fn_800B1F9C;
+    lbl_801F5DA8[2] = fn_800B1FBC;
+    lbl_801F5DA8[3] = fn_800B1FFC;
+    lbl_801F5DA8[5] = fn_800B203C;
+    lbl_801F5DA8[6] = fn_800B204C;
+    lbl_801F5DA8[7] = fn_800B208C;
+    lbl_801F5DA8[8] = fn_800B20B8;
+    lbl_801F5DA8[9] = fn_800B2104;
+    lbl_801F5DA8[10] = fn_800B2150;
+    lbl_801F5DA8[11] = fn_800B21D0;
+    lbl_801F5DA8[12] = fn_800B21DC;
+    lbl_801F5DA8[13] = fn_800B21E0;
+    lbl_801F5DA8[14] = fn_800B21E4;
+    lbl_801F5DA8[15] = fn_800B21F0;
+    lbl_801F5DA8[16] = fn_800B223C;
+    lbl_801F5DA8[17] = fn_800B2250;
+    lbl_801F5DA8[18] = fn_800B218C;
+    lbl_801F5DA8[19] = fn_800B206C;
+    lbl_801F5DA8[20] = fn_800B227C;
+    lbl_801F5DA8[21] = fn_800B22D4;
+    lbl_801F5DA8[22] = fn_800B22F4;
+}
+
+// Command 0: the card status at a port and slot (values 0 and 1; the slot counts from 1, and both
+// are kept at 0 or above).
+void fn_800B1F20(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nPort = pArgs[0].i;
+    s32 nSlot = pArgs[1].i;
+    if (nSlot > 0) {
+        nSlot--;
+    }
+    if (nPort < 0) {
+        nPort = 0;
+    }
+    if (nSlot < 0) {
+        nSlot = 0;
+    }
+    fn_8009CD10();
+    pResult->i = fn_8009D390(nPort, nSlot);
+    fn_8009CD7C();
+}
+
+// Command 1.
+void fn_800B1F9C(MsgArg* pArgs, MsgArg* pResult) {
     fn_800B0B1C();
 }
 
+// Command 2: start a search for a card (the port and slot found go to the values' addresses).
 void fn_800B1FBC(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = (u8)fn_800B14E4(pArgs[0].p, pArgs[1].p);
 }
 
+// Command 3: continue the search.
 void fn_800B1FFC(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = (u8)fn_800B13FC(pArgs[0].p, pArgs[1].p);
 }
 
-void fn_800B204C(void) {
+// Command 5.
+void fn_800B203C(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_801D87C0.b0 = 1;
+}
+
+// Command 6.
+void fn_800B204C(MsgArg* pArgs, MsgArg* pResult) {
     fn_800B0960();
 }
 
-void fn_800B206C(void) {
+// Command 19.
+void fn_800B206C(MsgArg* pArgs, MsgArg* pResult) {
     fn_800B0954();
 }
 
-void fn_800B208C(MsgArg* pArgs) {
+// Command 7.
+void fn_800B208C(MsgArg* pArgs, MsgArg* pResult) {
     fn_800B1510(pArgs[0].i, pArgs[1].i);
 }
 
+// Command 8: report the next card status not yet reported.
 void fn_800B20B8(MsgArg* pArgs, MsgArg* pResult) {
     fn_8009CD10();
     pResult->i = fn_800B12FC(pArgs[0].p, pArgs[1].p);
     fn_8009CD7C();
 }
 
+// Command 9: report the card the reports reached again.
 void fn_800B2104(MsgArg* pArgs, MsgArg* pResult) {
     fn_8009CD10();
     pResult->i = fn_800B120C(pArgs[0].p, pArgs[1].p);
     fn_8009CD7C();
 }
 
-void fn_800B2150(MsgArg* pArgs) {
+// Command 10.
+void fn_800B2150(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 2) {
         fn_800A7A14(0);
         return;
@@ -1401,41 +1565,65 @@ void fn_800B2150(MsgArg* pArgs) {
     fn_800A7A14(1);
 }
 
+// Command 18: the state of the card at a port and slot.
+void fn_800B218C(MsgArg* pArgs, MsgArg* pResult) {
+    MCCardState state;
+    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    pResult->i = state.b94;
+}
+
+// Command 11.
 void fn_800B21D0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_800B21DC(void) {
+// Command 12.
+void fn_800B21DC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800B21E0(void) {
+// Command 13.
+void fn_800B21E0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
+// Command 14.
 void fn_800B21E4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 1;
 }
 
+// Command 15.
 void fn_800B21F0(MsgArg* pArgs, MsgArg* pResult) {
     fn_8009CD10();
     pResult->i = fn_8009D3DC(pArgs[0].i, pArgs[1].i);
     fn_8009CD7C();
 }
 
-Session* fn_800B223C(void) {
+// Command 16.
+void fn_800B223C(MsgArg* pArgs, MsgArg* pResult) {
     gSession.nC = 2;
-    return &gSession;
 }
 
-void fn_800B2250(MsgArg* pArgs) {
+// Command 17.
+void fn_800B2250(MsgArg* pArgs, MsgArg* pResult) {
     fn_800B158C(pArgs[0].i, pArgs[1].i);
 }
 
-void fn_800B22D4(void) {
+// Command 20: rebuild the card statuses; answers 1 when the disc in the drive is not disc 1 and
+// fn_80110460 answers 0.
+void fn_800B227C(MsgArg* pArgs, MsgArg* pResult) {
+    fn_800B1748();
+    if (fn_8011027C() && !fn_80110460()) {
+        pResult->i = 1;
+    } else {
+        pResult->i = 0;
+    }
+}
+
+// Command 21: ask for the other disc and wait for it.
+void fn_800B22D4(MsgArg* pArgs, MsgArg* pResult) {
     fn_801102AC();
 }
 
+// Command 22.
 void fn_800B22F4(MsgArg* pArgs, MsgArg* pResult) {
     fn_80083D88(pArgs, pResult);
 }
-
-// ---- end of sweep code ----

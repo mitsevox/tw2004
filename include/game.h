@@ -757,7 +757,7 @@ s32  fn_8011027C(void);                 // the disc in the drive is not disc 1 (
 void fn_801102AC(void);                 // ask for the other disc and wait for it
 int  fn_80110450(void);                 // the disc change has finished (lbl_802824D0)
 void fn_80110458(u8 b);
-u8   fn_80110460(void);
+int  fn_80110460(void);                 // lbl_802824D1 (its one caller, startUp.c, tests a whole word)
 int  fn_80110468(void);                 // the disc in the drive (its disk number; 0: disc 1)
 DVDCommandBlock* fn_801104A0(void);     // the disc change's command block
 extern DVDDiskID lbl_80213B60;          // the disc asked for by fn_80110390
