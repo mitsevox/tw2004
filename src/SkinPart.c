@@ -562,8 +562,9 @@ s32 fn_800CD5D0(SkinDesc* pDesc, int n) {
 
     args.pDesc = pDesc;
     args.n = n;
+    pIter = fn_80113B34(aBuf, &args);
     nBytes = 0;
-    for (pIter = fn_80113B34(aBuf, &args); fn_800CEEC0(pIter); fn_800CEEC8(pIter)) {
+    for (; fn_800CEEC0(pIter); fn_800CEEC8(pIter)) {
         pMesh = fn_800CEEF4(pIter);
         if ((pMesh->uFlags & 0x300000) == 0x300000) {
             nBytes += pMesh->nSize;
