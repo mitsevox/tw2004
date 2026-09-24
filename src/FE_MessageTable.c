@@ -33,6 +33,7 @@ s32  fn_800A1164(s32 nPort, s32 nSlot, char* pName, s32 n);     // MC.c
 s32  fn_800A1590(s32 nPort, s32 nSlot, s32 n, char* szOut);     // MC.c: clears szOut first
 void fn_8007739C(Replay* pReplay);      // FE_Manager.c
 f32  GM_GetBonusProgress(SaveProfile* pProfile);    // GameManager.c
+void fn_801176C0(TourSeason* pTour);    // PGATourSimulation.c
 int  fn_80102134(void);                 // GameMode4.c: the current ladder event's holes
 int  fn_801021FC(void);                 // GameMode4.c: the current ladder event
 s32  fn_800ED688(int i);                // GameMode5.c: challenge i's opponent count
@@ -3118,6 +3119,60 @@ void fn_8007F8A0(MsgArg* pArgs, MsgArg* pResult) {
         fn_8007739C(&replay13);
         break;
     }
+}
+
+// Saves the working profile (lbl_80281ED4) into slot pArgs[0]: its name, created golfer and the
+// rest from 0x54C0 on. A new slot keeps its money and gets n1C and 25,000 more. The records held
+// under the slot's old name, and its saved replays, take the new name.
+void fn_8007FA60(MsgArg* pArgs, MsgArg* pResult) {
+    char szOld[0x20];           // the size is unknown (0x20 gives the original's frame)
+    int  nSlot;
+    int  nMoney;
+    int  i;
+    int  j;
+    int  k;
+
+    nMoney = 0;
+    nSlot = pArgs[0].i;
+    if (!lbl_801D7148.aLoaded[nSlot]) {
+        nMoney = gpSaveData[nSlot].n6C;
+    }
+    strcpy(szOld, gpSaveData[nSlot].szName);
+    strcpy(gpSaveData[nSlot].szName, lbl_80281ED4->profile.szName);
+    memcpy(&gpSaveData[nSlot].createdGolfer, &lbl_80281ED4->profile.createdGolfer, sizeof(GolferRecord));
+    memcpy(gpSaveData[nSlot].unk54C0, lbl_80281ED4->profile.unk54C0, 0x5500 - 0x54C0);
+    memcpy(&gpSaveData[nSlot].choices, &lbl_80281ED4->profile.choices, 0xB634 - 0x5500);
+    if (!lbl_801D7148.aLoaded[nSlot]) {
+        nMoney = lbl_801D7148.n1C + nMoney;
+        gpSaveData[nSlot].n6C = nMoney + 25000;
+    }
+    gpSaveData[nSlot].bActive = 1;
+    if (gpSaveData[nSlot].nTourCardLevel == 0) {
+        gpSaveData[nSlot].nTourCardLevel = 1;
+    }
+    lbl_801D7148.aLoaded[nSlot] = 1;
+    fn_80077808(nSlot);
+
+    for (k = 0; k < 5; k++) {
+        strcpy(((Replay*)gpSaveData[pArgs[0].i].aReplay[k])->player.golfer.szLast, gpSaveData[nSlot].szName);
+    }
+    for (j = 0; j < 8; j++) {
+        for (k = 0; k < 5; k++) {
+            if (strcmp(gSession.recA[j][k].szName, szOld) == 0) {
+                strcpy(gSession.recA[j][k].szName, gpSaveData[nSlot].szName);
+            }
+        }
+    }
+    // EA bug: k is still 5 here, so each check reads the entry after [j][4] (the next kind's
+    // first; past the course's records for the last kind)
+    for (i = 0; i < NUM_COURSE_RECORDS; i++) {
+        for (j = 0; j < 8; j++) {
+            if (strcmp(gSession.aCourseRecord[i].aRecord[j][k].szName, szOld) == 0) {
+                strcpy(gSession.aCourseRecord[i].aRecord[j][k].szName, gpSaveData[nSlot].szName);
+            }
+        }
+    }
+    fn_801176C0(&gpSaveData[nSlot].tour);
 }
 
 void fn_8007FCC0(MsgArg* pArgs, MsgArg* pResult) {
