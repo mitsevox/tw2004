@@ -232,18 +232,17 @@ void fn_800ABA28(AudTrack* pTrack) {
 
     pList = pTrack->pTmpl->data.pPlayList;
     hFile = fn_800AC328();
-    if (pList == NULL) return;
-    if (pTrack->nState == 5) return;
+    if (pList == NULL || pTrack->nState == 5) return;
     if (pTrack->u.stm.pStream == NULL) return;
     request.flags.n = 0;
-    request.flags.b.b14 = 1;
     request.nPriority = 0x3FFF;
-    i = 0;
     request.n4 = 2;
     request.pfnCallback = fn_800AA400;
+    request.flags.b.b14 = 1;
+    i = 0;
     request.pUser = pTrack;
     request.flags.b.b12 = 1;
-    request.flags.b.b11 = pList->nId >> 2;
+    request.flags.b.b11 = (pList->nId >> 2) & 1;
     for (; i < pList->nChannels; i++) {
         request.nIndex = i;
         pVoice = fn_800AC4A0(&request);
