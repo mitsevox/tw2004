@@ -5,6 +5,24 @@
 
 #include "frontend/uistudio.h"
 
+// Runs fn_8016ABBC on p in pScreen, unless fn_8016AD54 finds p's switch already set as bOn
+// asks (or not at all).
+void fn_80168644(UIStudio* pStudio, UISScreen* pScreen, s32 nKind, void* p, s32 bOn) {
+    s32 nFound;
+    s32 nOn;
+
+    if (pScreen == NULL || pScreen->pData == NULL || p == NULL) {
+        return;
+    }
+    // EA passes the address of p itself as the info to look for; fn_8016AD54 writes the owner it
+    // finds into it.
+    nFound = fn_8016AD54(pScreen, (UISNodeInfo*)&p, 8, pScreen->pData->pNodes);
+    nOn = bOn != 0;
+    if (nFound != -1 && nFound != nOn) {
+        fn_8016ABBC(pStudio, pScreen, nOn, nKind, p, 1);
+    }
+}
+
 // Activates (bOn) a screen. With no p60 record open the current screen first gets event -5;
 // then, unless every screen is being unloaded, the screen becomes current, its first node is
 // switched on, the game hears of it (pfnScreen24) and it gets event -4. A screen waiting to be
