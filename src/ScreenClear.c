@@ -16,6 +16,16 @@ void fn_80007260(void);
 // Only read here (0x802821F0, 8 bytes in .sbss); nothing in the game writes it, so it stays 0.
 s32 lbl_802821F0;
 
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f, 0.0f and 0.5f (0x80284238), before the 0.0f fn_800BA74C uses first; its body is unknown.
+static f32 ScreenClear_StrippedFn(f32 x) {
+    x += 1.0f;
+    if (x < 0.0f) {
+        return 0.0f;
+    }
+    return x * 0.5f;
+}
+
 // Draws a black full-screen quad for a number of frames: with bFade 30 frames at alpha 0.1, the
 // last two at 0.5; otherwise one frame at alpha 0.5 (two while lbl_802821F0 is not 1).
 void fn_800BA74C(u8 bFade) {
