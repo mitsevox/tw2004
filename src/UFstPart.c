@@ -314,7 +314,105 @@ void fn_80099344(f32 fTime) {
     }
 }
 
-// Start an emitter from pParams: a new one when pParams->n54 is below 0, else the next of the six
+// Start the emitter a stream record (uSize bytes: 0xFC, or 0xF0 without fF0..fF8) places, unless
+// its flags keep it out of this view mode.
+void fn_8009943C(PsEmitterRecord* pRecord, u32 uSize) {
+    ParticleParams params;
+    PsEmitter* pEmitter;
+
+    if (gSession.nSplitScreen != 0 && (pRecord->uE8 & 0x44000)) {
+        return;
+    }
+    if (gSession.nSplitScreen == 0 && (pRecord->uE8 & 0x4000)) {
+        return;
+    }
+    if (uSize != 0xFC && uSize != 0xF0) {
+        return;
+    }
+    params.n0 = pRecord->n1C;
+    params.f4 = pRecord->fA8;
+    params.fC = pRecord->fA4;
+    params.f10 = pRecord->f54;
+    params.f14 = pRecord->f58;
+    params.f18 = pRecord->fD4;
+    params.f1C = pRecord->fD8;
+    params.f20 = pRecord->fDC;
+    params.f24 = 0.0f;
+    params.f28 = pRecord->f4C;
+    params.f2C = pRecord->f50;
+    params.f30 = pRecord->f44;
+    params.f34 = pRecord->f48;
+    params.f38 = pRecord->f34;
+    params.f3C = pRecord->f38;
+    params.f40 = pRecord->f2C;
+    params.f44 = pRecord->f28;
+    params.f48 = pRecord->f30;
+    params.f4C = pRecord->f3C;
+    params.f50 = pRecord->f40;
+    params.n54 = -1;
+    params.u58 = pRecord->uE8;
+    params.u5C = pRecord->nE0;
+    params.nCount = pRecord->n24;
+    params.v60[0] = pRecord->vC8[0];
+    params.v60[1] = pRecord->vC8[1];
+    params.v60[2] = pRecord->vC8[2];
+    params.nTexture = pRecord->n20;
+    params.n6E = pRecord->nE4;
+    params.v70[0] = 0.0f;
+    params.v70[1] = 0.0f;
+    params.v70[2] = 0.0f;
+    params.v70[3] = 1.0f;
+    params.v80[0] = pRecord->v10[0];
+    params.v80[1] = pRecord->v10[1];
+    params.v80[2] = pRecord->v10[2];
+    params.v80[3] = 1.0f;
+    params.n90 = pRecord->n8;
+    params.f94 = pRecord->fEC;
+    params.vA0[0] = pRecord->vB8[0];
+    params.vA0[1] = pRecord->vB8[1];
+    params.vA0[2] = pRecord->vB8[2];
+    params.vA0[3] = 1.0f;
+    params.vB0[0] = pRecord->vAC[0];
+    params.vB0[1] = pRecord->vAC[1];
+    params.vB0[2] = pRecord->vAC[2];
+    params.vB0[3] = 1.0f;
+    params.vC0[0] = pRecord->v74[0];
+    params.vC0[1] = pRecord->v74[1];
+    params.vC0[2] = pRecord->v74[2];
+    params.vC0[3] = pRecord->v74[3];
+    params.vD0[0] = pRecord->v84[0];
+    params.vD0[1] = pRecord->v84[1];
+    params.vD0[2] = pRecord->v84[2];
+    params.vD0[3] = pRecord->v84[3];
+    params.vE0[0] = pRecord->v94[0];
+    params.vE0[1] = pRecord->v94[1];
+    params.vE0[2] = pRecord->v94[2];
+    params.vE0[3] = pRecord->v94[3];
+    params.vF0[0] = pRecord->v64[0];
+    params.vF0[1] = pRecord->v64[1];
+    params.vF0[2] = pRecord->v64[2];
+    params.vF0[3] = pRecord->v64[3];
+    params.f110 = pRecord->fC4 ? pRecord->fC4 : 0.001f;
+    params.f114 = pRecord->f60;
+    params.f118 = pRecord->f5C;
+    params.f11C = pRecord->fC4 ? 1.0f / pRecord->fC4 : 1.0f / 0.001f;
+    if (uSize == 0xFC) {
+        params.f104 = pRecord->fF0;
+        params.f108 = pRecord->fF4;
+        params.f100 = pRecord->fF8 ? pRecord->fF8 : 0.001f;
+    } else {
+        params.f104 = 0.0f;
+        params.f108 = 512.0f;
+        params.f100 = 0.001f;
+    }
+    params.f10C = params.f100 ? 1.0f / params.f100 : 1.0f / 0.001f;
+    pEmitter = fn_80099758(&params);
+    if (pEmitter != NULL) {
+        fn_80099EA4(pEmitter);
+    }
+}
+
+// Start an emitter from pParams:a new one when pParams->n54 is below 0, else the next of the six
 // fixed ones (NULL when that one is still in use). Its particle count is capped to what its
 // settings can have alive at once, but kept at 16 or more (a fixed one's is always 128).
 PsEmitter* fn_80099758(ParticleParams* pParams) {

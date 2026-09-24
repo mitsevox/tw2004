@@ -53,6 +53,56 @@ typedef struct PsEmitter {
 } PsEmitter;
 LAYOUT_ASSERT(PsEmitter, 0x1A8);
 
+// A type 7 actor's stream record (our name; UKernel.c's fn_80048BDC hands it to fn_8009943C): a
+// particle emitter placed in the course. 0xF0 bytes, or 0xFC with the last three fields. Each
+// field goes to the ParticleParams field named after it.
+typedef struct PsEmitterRecord {
+    u8   unk0[8];
+    s32  n8;                    // 0x08  -> n90
+    u8   unkC[4];
+    f32  v10[3];                // 0x10  -> v80: where it is
+    s32  n1C;                   // 0x1C  -> n0
+    s32  n20;                   // 0x20  -> nTexture
+    s32  n24;                   // 0x24  -> nCount
+    f32  f28;                   // 0x28  -> f44
+    f32  f2C;                   // 0x2C  -> f40
+    f32  f30;                   // 0x30  -> f48
+    f32  f34;                   // 0x34  -> f38
+    f32  f38;                   // 0x38  -> f3C
+    f32  f3C;                   // 0x3C  -> f4C
+    f32  f40;                   // 0x40  -> f50
+    f32  f44;                   // 0x44  -> f30
+    f32  f48;                   // 0x48  -> f34
+    f32  f4C;                   // 0x4C  -> f28
+    f32  f50;                   // 0x50  -> f2C
+    f32  f54;                   // 0x54  -> f10
+    f32  f58;                   // 0x58  -> f14
+    f32  f5C;                   // 0x5C  -> f118
+    f32  f60;                   // 0x60  -> f114
+    f32  v64[4];                // 0x64  -> vF0
+    f32  v74[4];                // 0x74  -> vC0
+    f32  v84[4];                // 0x84  -> vD0
+    f32  v94[4];                // 0x94  -> vE0
+    f32  fA4;                   // 0xA4  -> fC
+    f32  fA8;                   // 0xA8  -> f4
+    f32  vAC[3];                // 0xAC  -> vB0
+    f32  vB8[3];                // 0xB8  -> vA0
+    f32  fC4;                   // 0xC4  -> f110
+    f32  vC8[3];                // 0xC8  -> v60
+    f32  fD4;                   // 0xD4  -> f18
+    f32  fD8;                   // 0xD8  -> f1C
+    f32  fDC;                   // 0xDC  -> f20
+    s32  nE0;                   // 0xE0  -> u5C
+    s32  nE4;                   // 0xE4  -> n6E
+    u32  uE8;                   // 0xE8  -> u58; with 0x4000, or 0x40000 in split screen, fn_8009943C
+                                //       starts nothing
+    f32  fEC;                   // 0xEC  -> f94
+    f32  fF0;                   // 0xF0  -> f104 (0 in a 0xF0-byte record)
+    f32  fF4;                   // 0xF4  -> f108 (512)
+    f32  fF8;                   // 0xF8  -> f100 (0.001)
+} PsEmitterRecord;
+LAYOUT_ASSERT(PsEmitterRecord, 0xFC);
+
 // UFstPart.c's six fixed emitters.
 extern PsEmitter* lbl_801DB888[6];
 extern s32 lbl_80281F8C;        // UFstPart.c: the fixed emitter fn_80099758 hands out next
@@ -97,6 +147,7 @@ extern PsEmitter* lbl_80281F88;             // UFstPart.c's list head (fn_80099E
 // UFstPart.c
 PsEmitter* fn_80099758(ParticleParams* pParams);  // start an emitter from pParams (may return NULL)
 void fn_80099EA4(PsEmitter* pEmitter);       // push pEmitter onto the list at lbl_80281F88
+void fn_8009943C(PsEmitterRecord* pRecord, u32 uSize);  // start the emitter a stream record places
 
 void fn_800A3D6C(f32* pPos, int nPlayer);
 void fn_800A3DF4(int nPlayer);
