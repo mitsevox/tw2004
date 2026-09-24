@@ -192,7 +192,8 @@ typedef struct Clip {
     s32    n04;                 // 0x04  bytes of the second frame stream
     u8     unk08[4];
     s16    nFrames;             // 0x0C
-    u8     unk0E[0xE];
+    u8     unk0E[0xA];
+    f32    f18;                 // 0x18  fn_8001BE88 blends up to it
     s32    n1C;                 // 0x1C
     u8     unk20[0xC];
     s32    n2C;                 // 0x2C
@@ -331,9 +332,9 @@ LAYOUT_ASSERT(CharBuffer, 0x1C);
 // An animation player; only what is read. Character has two: the one at 0x164, whose fields are
 // named in Character directly, and anim29C.
 typedef struct AnimPlayer {
-    u8    unk0[4];
+    s32   n00;                  // 0x00  } reset to 0 and -1 by fn_8001BE88
     s32   uFlags;               // 0x04  fn_8007325C sets bit 2, fn_8007326C clears bits 1 and 2
-    u8    unk8[4];
+    s32   n08;                  // 0x08  }
     s32   nC;                   // 0x0C  } set together by fn_800958EC
     f32   f10;                  // 0x10  }
     u8    unk14[4];
@@ -468,7 +469,8 @@ typedef struct Character {
     s32   nClubHeadBone;        // 0x16A0  bone 0x53's index: the club head (the swing trail's end)
     s32   nGripBone;            // 0x16A4  bone 0x52's index: the grip (the trail's other end)
     s32   n16A8;                // 0x16A8  fn_8001EEE4's answer for bone 0x15
-    u8    unk16AC[0x16CC - 0x16AC];
+    f32   q16AC[4];             // 0x16AC  } the grip bone's rotation and offset from the root while
+    f32   v16BC[4];             // 0x16BC  } flag 0x4000 holds it (fn_8001BD18)
     s32   nClub;                // 0x16CC  the club (fn_8001C774)
     s32   nShotKind;            // 0x16D0  the player's shot kind (fn_8001C724)
     s32   n16D4;              // 0x16D4  the key for clip lookups (Char_SetClip)
@@ -483,7 +485,7 @@ typedef struct Character {
     f32   afGroundHeight[4];    // 0x1774  }
     s32   n1784;                // 0x1784  set to -1 by Character_SetPosition
     Clip* pCurClip;             // 0x1788  the clip Char_SetClip picked
-    u8    unk178C[0x1790 - 0x178C];
+    s32   n178C;                // 0x178C  cleared by fn_8001BE88
     Clip* p1790;                // 0x1790  cleared by fn_80062BFC; CharacterState_AddSKABlendData plays it for
                                 //         groups 5, 6 and 10
     void* p1794;                // 0x1794  cleared by fn_80062BE8; the same for group 9
@@ -619,6 +621,8 @@ int   fn_8001EED8(CharModel* pModel, int nBone);    // a bone's index
 int   fn_8001EEE4(CharModel* pModel, int nBone);
 f32   fn_8001F02C(struct ClipBlend* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
 void  Anim_SetRate(u8* pAnim, f32 fRate);           // 0x8001F084
+// Plays a clip on the character: blended in from the current one, or (bNoBlend) from scratch.
+void  fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime);
 void  fn_8001E85C(f32* pSrc, f32* pDst);            // copy a quaternion
 void  SKEL_SetIKSolutionWeight(Skeleton* pSkel, f32 f);
 void  fn_80027108(Skeleton* pSkel);                                         // Skeleton.c

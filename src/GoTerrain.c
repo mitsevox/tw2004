@@ -16,7 +16,6 @@
 void* fn_800073B4(u8* pData, int n);
 void  fn_800075CC(void* p);         // frees what fn_800073B4 made
 void  fn_80019358(Character* pChar, f32* pDir, f32 f);
-void  fn_8001BE88(Character* pChar, void* pClip, int n, f32 f);
 void  fn_800F199C(f32 x, f32 y, f32 z);
 void  fn_80030894(void);
 void  fn_80030A40(void* p, int n);

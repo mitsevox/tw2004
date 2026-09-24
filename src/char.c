@@ -77,7 +77,11 @@ void  fn_80073108(Character* pChar, int nPlayer, void* pAnim, SKABlendNode* pNod
 void  fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);                  // CharAnim.c
 void  fn_80096F0C(Character* pChar);                            // CharAnim.c
 void  fn_8000914C(f32* pQ, f32 (*m)[4]);                        // Quaternion.c: a rotation matrix
-void  fn_8001BD18(Character* pChar, Clip* pClip);
+int   fn_8001BD18(Character* pChar, Clip* pClip);
+void  fn_80008F20(f32* pQ, f32* pOut);                          // Quaternion.c
+void  fn_80008FCC(f32* pA, f32* pB, f32* pOut);                 // Quaternion.c: a product
+void  fn_800090E4(f32* pQ, f32* pIn, f32* pOut);                // Quaternion.c: a vector turned by pQ
+void  fn_80009410(f32 fAngle, f32* pOut);                       // Quaternion.c
 void  fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, int n, f32 fTime);
 void  fn_800280E8(Character* pChar, f32* pPos, int bPlace);     // Skeleton.c
 void  fn_8001EFB4(f32* pA, f32* pB, f32* pOut);
@@ -143,7 +147,11 @@ void  fn_800106B8(u8 b);                // LLTexGrp.c
 void  fn_8008F310(void);                // uiLoadFile.c: park the UI file's data in ARAM
 void* fn_8008F354(void);                // uiLoadFile.c: the UI file's buffer
 void  fn_8008F35C(void);                // uiLoadFile.c: bring the UI file's data back
-void  fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 f);
+void  fn_800720C8(Character* pChar, SKABlendNode* pNew, SKABlendNode** ppNode, f32* pBlend,
+                  SKABlendFn pfnBlend, int b);                                         // animblender.c
+void  fn_800724C0(SKABlendNode* pNode, SKABlendNode* pNew, Clip* pClip, f32 fWeight);  // animblender.c
+void  fn_800732F4(void* pNode, void* pAnim, f32 fTime);                                // CharAnim.c
+void  fn_801141F8(struct DynChain* pChain, CharModel* pModel);                         // DynChain.c
 void  fn_80035600(void);                // GoTerrain.c
 void  fn_80035604(void);                // GoTerrain.c
 void  fn_800358E0(Character* pChar, u32 uFlags);
@@ -1483,6 +1491,106 @@ void fn_8001BC8C(f32 fTime) {
             Character_UpdateAnimation(lbl_801B9624[i], 0, fTime);
         }
     }
+}
+
+// With a clip of flag 0x10 the grip bone goes back to its parent; otherwise it is cut loose
+// (parent 0) and its rotation and offset from the root are kept in q16AC and v16BC (mirrored
+// while bEE is set). 1 when the state changed, 0 when it already was that way.
+int fn_8001BD18(Character* pChar, Clip* pClip) {
+    CharModel* pModel;
+    f32 qRoot[4];
+    f32 vOffset[4];
+    f32 qGrip[4];
+    f32 qTurn[4];
+
+    if (pClip->uFlags & 0x10) {
+        if (pChar->u10 & 0x4000) {
+            pChar->u10 &= ~0x4000;
+            pChar->pModel->pBones[pChar->nGripBone].nParent = pChar->n16A8;
+            return 1;
+        }
+    } else if (!(pChar->u10 & 0x4000)) {
+        pModel = pChar->pModel;
+        pChar->u10 |= 0x4000;
+        pChar->pModel->pBones[pChar->nGripBone].nParent = 0;
+        fn_80008F20(pModel->pPoses[0].q0, qRoot);
+        fn_80008FCC(pModel->pPoses[pChar->nGripBone].q0, qRoot, pChar->q16AC);
+        if (fn_8001EDF4(pChar)) {
+            fn_80009410(PI, qTurn);
+            fn_80008FCC(pChar->q16AC, qTurn, qGrip);
+            fn_8001E85C(qGrip, pChar->q16AC);
+        }
+        fn_8001EFB4(pModel->pPoses[pChar->nGripBone].v10, pModel->pPoses[0].v10, vOffset);
+        vOffset[3] = 0.0f;
+        fn_800090E4(qRoot, vOffset, pChar->v16BC);
+        pChar->v16BC[3] = 0.0f;
+        if (fn_8001EDF4(pChar)) {
+            pChar->v16BC[2] = -pChar->v16BC[2];
+        }
+        return 1;
+    }
+    return 0;
+}
+
+// Plays pClip on the character. With bNoBlend the blend tree and the animation player start
+// over; otherwise the clip is blended in over its first f18 seconds from the current time.
+void fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) {
+    f32 aBlend[6];
+    SKABlendNode* pNode;
+    SKABlendNode* pNew;
+    AnimPlayer* pAnim;
+    f32 fLen;
+
+    pNode = &pChar->blend;
+    pNew = NULL;
+    pAnim = (AnimPlayer*)pChar->anim;
+    if (pClip == NULL) {
+        return;
+    }
+    if (fn_8001EC48(pChar)) {
+        fn_8001BD18(pChar, pClip);
+    }
+    pChar->n178C = 0;
+    if (bNoBlend) {
+        fn_80071F58(&pNode, 0);
+        fn_80071C28(&pNode, 1, 0, fn_80072ACC, 0);
+        fn_800725BC(pNode, fn_80072ACC, 0.5f);
+        Anim_SetRate((u8*)pAnim, 1.0f);
+        pAnim->n00 = 0;
+        pAnim->uFlags = 0;
+        pAnim->n08 = -1;
+        pAnim->fTime = 0.0f;
+    }
+    fn_80071C28(&pNew, 0, 0, fn_80072ACC, 1);
+    fn_800724C0(&pChar->blend, pNew, pClip, 1.0f);
+    if (!bNoBlend) {
+        fn_800732F4(&pChar->blend, pChar->anim, pChar->fAnimTime + fTime);
+        aBlend[5] = 0.0f;
+        aBlend[0] = 0.0f;
+        fLen = pClip->f18;
+        aBlend[1] = fLen;
+        aBlend[2] = -1.0f;
+        if (fLen > aBlend[1]) {
+            aBlend[1] = fLen;
+        }
+        aBlend[3] = pAnim->fTime + aBlend[5];
+        aBlend[4] = aBlend[3] + (aBlend[1] - aBlend[0]);
+        fn_800720C8(pChar, pNew, &pNode, aBlend, fn_80072ACC, 1);
+    } else {
+        fn_800720C8(pChar, pNew, &pNode, NULL, fn_80072ACC, 0);
+        aBlend[3] = 0.0f;
+    }
+    pAnim->fStart = pNode->fStart;
+    pAnim->fEnd = pNode->fEnd;
+    // Clip and ClipBlend are two views of the same clip header (0xD4: pD4 / pEvents)
+    fn_800175B0(pChar, (ClipBlend*)pClip, aBlend[3]);
+    if (pClip != NULL && pClip->pF4 != NULL) {
+        fn_8009622C(pChar, pClip->pF4, bNoBlend, fTime);
+    }
+    pChar->pCurClip = pClip;
+    fn_801141F8(pChar->pModel->pF0, pChar->pModel);
+    fn_801141F8(pChar->pModel->pF4, pChar->pModel);
+    fn_801141F8(pChar->pModel->pF8, pChar->pModel);
 }
 
 // Frees a character: its texture bank slot, both blend trees, its skin, library, model, buffers
