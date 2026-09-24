@@ -3,11 +3,11 @@
 
 #include "game_types.h"
 #include "platform.h"
+#include "grassshader.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_8011E3B0(void);
-s32 UStream_UnregisterHandler(s32);
 u8 fn_80112B80();
 void fn_8011E4A4(void);
 s32 fn_800C6CB0();
@@ -15,15 +15,13 @@ void fn_8011EE4C(void);
 void fn_8011EF88(void);
 void fn_8011F374(void);
 s32 fn_8011F3AC();
-extern s32 lbl_80281900;
 void fn_8011E974(void);
 void fn_800137B0();
 void fn_8006E214();
 void fn_8007644C();
 void fn_80076B18();
 void fn_8011EAB8(void);
-s32 fn_80009E70();
-extern u32 lbl_80282510;
+extern void* lbl_80282510;
 void fn_8011EBF8(void);
 void GXCopyTex();
 void GXInvalidateTexAll();
@@ -57,9 +55,23 @@ void fn_80016B9C();
 void fn_80035138();
 void fn_800352BC();
 void GrassRender_vBuildAndUploadOneTimeData();
-void fn_8011FDC4(s32 p0);
+void fn_8011FDC4(void* pObject);
+void fn_8011E468(void);
+void fn_8011E584(UStreamObject* pObject);
+int  fn_8011E6B0(f32** ppA, f32** ppB);
+void fn_8011FD74(void* pObject);
+void fn_8011FF58(void);
+void fn_80120194(void);
+void fn_80008248(void* p);
 
 void fn_8011E3B0(void) {
+}
+
+// The grass's stream handler ('gras') is registered when fn_80112B80 allows it.
+void fn_8011E468(void) {
+    if (fn_80112B80() != 0) {
+        UStream_RegisterHandler('gras', fn_8011E584);
+    }
 }
 
 void fn_8011E4A4(void) {
@@ -68,29 +80,43 @@ void fn_8011E4A4(void) {
     }
 }
 
+// A sort order: by the float at +8 of the objects the two entries point to, the larger first
+// (equal gives -1).
+int fn_8011E6B0(f32** ppA, f32** ppB) {
+    f32 fA = (*ppA)[2];
+    f32 fB = (*ppB)[2];
+    if (fA < fB) {
+        return 1;
+    }
+    if (fA >= fB) {
+        return -1;
+    }
+    return 0;
+}
+
 void fn_8011E974(void) {
-    if (((u32) (*(u32*)((u8*)(lbl_80281900) + 0x370)) != 0U) && ((s32) (*(s32*)((u8*)(lbl_80281900) + 0x3E0)) != 0) && (fn_800C6CB0() == 0)) {
+    if (lbl_80281900->u370 != 0 && lbl_80281900->n3E0 != 0 && fn_800C6CB0() == 0) {
         fn_8011EF88();
         fn_8011F3AC();
         fn_8011F374();
-        if ((s32) (*(s32*)((u8*)(lbl_80281900) + 0x3CC)) != 0) {
+        if (lbl_80281900->n3CC != 0) {
             fn_8011EE4C();
         }
     }
 }
 
 void fn_8011EAB8(void) {
-    fn_8006E214(*(s32*)(((u8*)lbl_80281900) + 0x78));
-    fn_8007644C(*(s32*)(((u8*)lbl_80281900) + 0x74));
-    fn_80076B18(*(s32*)(((u8*)lbl_80281900) + 0x7C));
-    fn_800137B0(*(s32*)(((u8*)lbl_80281900) + 0x70));
+    fn_8006E214(lbl_80281900->p78);
+    fn_8007644C(lbl_80281900->p74);
+    fn_80076B18(lbl_80281900->p7C);
+    fn_800137B0(lbl_80281900->p70);
 }
 
 void fn_8011EBF8(void) {
-    if ((u32) lbl_80282510 != 0U) {
+    if (lbl_80282510 != NULL) {
         fn_80009E70(lbl_80282510);
     }
-    lbl_80282510 = 0U;
+    lbl_80282510 = NULL;
 }
 
 void fn_8011EC2C(void) {
@@ -143,21 +169,56 @@ void fn_8011F374(void) {
     fn_80012EF8();
 }
 
-void fn_8011FDC4(s32 p0) {
-    *(s32*)(((u8*)*(s32*)(((u8*)lbl_80281900) + 0xD8)) + (*(s32*)(((u8*)lbl_80281900) + 0xE4) << 2)) = p0;
-    *(s32*)(((u8*)lbl_80281900) + 0xE4) = (*(s32*)(((u8*)lbl_80281900) + 0xE4) + 1);
+// Puts pObject in the first free one of the 16 apDC slots.
+void fn_8011FD74(void* pObject) {
+    int i;
+    for (i = 0; i < 16; i++) {
+        if (lbl_80281900->apDC[i] == NULL) {
+            lbl_80281900->apDC[i] = pObject;
+            lbl_80281900->nE8 = lbl_80281900->nE8 + 1;
+            return;
+        }
+    }
+}
+
+// Pushes pObject on the apD8 stack.
+void fn_8011FDC4(void* pObject) {
+    lbl_80281900->apD8[lbl_80281900->nE4] = pObject;
+    lbl_80281900->nE4 = lbl_80281900->nE4 + 1;
+}
+
+// Empties the apD8 stack: each object gets fn_80008248 on its +0x14 and goes to a free apDC slot.
+void fn_8011FF58(void) {
+    while (lbl_80281900->nE4 != 0) {
+        fn_80008248((u8*)lbl_80281900->apD8[lbl_80281900->nE4 - 1] + 0x14);
+        fn_8011FD74(lbl_80281900->apD8[lbl_80281900->nE4 - 1]);
+        lbl_80281900->nE4 = lbl_80281900->nE4 - 1;
+    }
 }
 
 // ---- end of sweep code ----
 
 // ---- sweep code (not yet cleaned up) ----
 
+// Frees the grass's allocations: each record's p40, then the tables.
+void fn_80120194(void) {
+    int i;
+    for (i = 0; i < lbl_80281900->nE0; i++) {
+        fn_80009E70(lbl_80281900->pEC[i].p40);
+    }
+    fn_80009E70(lbl_80281900->pF0);
+    fn_80009E70(lbl_80281900->pF4);
+    fn_80009E70(lbl_80281900->pEC);
+    fn_80009E70(lbl_80281900->apDC);
+    fn_80009E70(lbl_80281900->apD8);
+}
+
 s32 fn_8012022C(void);
 f32 fn_80120244(f32 fX, f32 fM);
 s32 fn_8012028C(u8* p0);
 
 s32 fn_8012022C(void) {
-    return ((u32)((-*(s32*)(((u8*)lbl_80281900) + 0x370)) | *(s32*)(((u8*)lbl_80281900) + 0x370)) >> 31);
+    return lbl_80281900->u370 != 0;
 }
 
 // fmod for floats: the remainder of fX / fM (both callers pass the modulus in the second argument).

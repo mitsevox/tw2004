@@ -59,6 +59,39 @@ LAYOUT_ASSERT(SD_SShaderTypeData_Grass_Static, 0x378);
 
 extern SD_SShaderTypeData_Grass_Static* SD_gpGrassTypeData;
 
+// One of GoGrass.c's 0x4C-byte records (GrassManager.pEC).
+typedef struct GrassRecord {
+    u8    unk0[0x40];
+    void* p40;                  // 0x40  freed with the records (fn_80120194)
+    u8    unk44[0x4C - 0x44];
+} GrassRecord;
+
+// GoGrass.c's state (*lbl_80281900). Only the fields the decompiled code uses; its size is not known.
+typedef struct GrassManager {
+    u8           unk0[0x70];
+    void*        p70;           // 0x70
+    void*        p74;           // 0x74
+    void*        p78;           // 0x78
+    void*        p7C;           // 0x7C
+    u8           unk80[0xD8 - 0x80];
+    void**       apD8;          // 0xD8  a stack of objects (fn_8011FDC4 pushes, fn_8011FF58 empties)
+    void**       apDC;          // 0xDC  16 slots (fn_8011FD74 fills the first free one)
+    s32          nE0;           // 0xE0  the records at pEC
+    u32          nE4;           // 0xE4  apD8's depth
+    s32          nE8;           // 0xE8  apDC's used slots
+    GrassRecord* pEC;           // 0xEC
+    void*        pF0;           // 0xF0
+    void*        pF4;           // 0xF4
+    u8           unkF8[0x370 - 0xF8];
+    u32          u370;          // 0x370  the grass is on (fn_8012022C)
+    u8           unk374[0x3CC - 0x374];
+    s32          n3CC;          // 0x3CC
+    u8           unk3D0[0x3E0 - 0x3D0];
+    s32          n3E0;          // 0x3E0
+} GrassManager;
+
+extern GrassManager* lbl_80281900;
+
 // The grass parameters GoGrass.c hands over once per hole (SD_vSetGrassParamsOnce).
 extern f32 lbl_802607D0[16][4];
 extern f32 lbl_802608D0[4];
