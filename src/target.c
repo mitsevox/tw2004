@@ -991,11 +991,10 @@ void fn_80069CDC(int nPlayer) {
     fDotX = vDir[0] * vRel[0];
     fDotZ = vDir[2] * vRel[2];
     fCos2 = fn_80009638(fHalfFov / 2.0f - PI / 180.0f);
-    fCos2 *= fCos2;
-    fA = fCos2 - vDir[1] * vDir[1];
+    fA = fCos2 * fCos2 - vDir[1] * vDir[1];
     fB = -(2.0f * fDotX * vDir[1]) - 2.0f * fDotZ * vDir[1];
-    fC = vRel[0] * (vRel[0] * fCos2) + vRel[2] * (vRel[2] * fCos2) - fDotX * fDotX - fDotZ * fDotZ
-       - 2.0f * fDotX * fDotZ;
+    fC = vRel[0] * (vRel[0] * (fCos2 * fCos2)) + vRel[2] * (vRel[2] * (fCos2 * fCos2))
+       - fDotX * fDotX - fDotZ * fDotZ - 2.0f * fDotX * fDotZ;
     fDisc = fB * fB - 4.0f * fA * fC;
     if (fDisc < 0.0f) {
         fDenom = 0.0f;
