@@ -33,6 +33,7 @@ AnimStreamGroup lbl_80191490[2] = {
 // and in the end it is turned off in every case.
 void fn_800C937C(void) {
     int i;
+    int nPlayer;
     int j;
     int k;
     int m;
@@ -53,14 +54,14 @@ void fn_800C937C(void) {
             }
         }
     }
-    for (i = 0; i < 5; i++) {
-        lbl_80282230->players[i].nId = -1;
+    for (nPlayer = 0; nPlayer < 5; nPlayer++) {
+        lbl_80282230->players[nPlayer].nId = -1;
         for (j = 0; j < 2; j++) {
             for (k = 0; k < 8; k++) {
                 for (m = 0; m < 6; m++) {
-                    lbl_80282230->players[i].clips[j][k][m].nNext = -1;
-                    lbl_80282230->players[i].clips[j][k][m].nMaxSize = -1;
-                    lbl_80282230->players[i].clips[j][k][m].b8 = 0;
+                    lbl_80282230->players[nPlayer].clips[j][k][m].nNext = -1;
+                    lbl_80282230->players[nPlayer].clips[j][k][m].nMaxSize = -1;
+                    lbl_80282230->players[nPlayer].clips[j][k][m].b8 = 0;
                 }
             }
         }
