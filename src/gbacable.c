@@ -533,8 +533,7 @@ void fn_80123ABC(s32 nChan) {
         }
         pWord++;
     }
-    pWord = (u32*)&pCh->got;
-    for (i = 0; i < sizeof(GbaContext); i += 4) {
+    for (i = 0, pWord = (u32*)&pCh->got; i < sizeof(GbaContext); i += 4) {
         if (fn_80122E68(nChan, pWord) == 0) {
             OSReport("GbaSetport: An error occurred in reading (chan=%d).\n", nChan);
             pCh->n0 = 0;
