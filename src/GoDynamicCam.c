@@ -56,6 +56,10 @@ u8   fn_8003D054(CamSequence* pSequence);
 u8   fn_8003D0A0(int nMask, int nBit);
 u8   fn_8003D140(CamSequence* pSequence);
 u8   fn_8003D0BC(CamSequence* pSequence, f32 f);
+u8   fn_8003AB94(CamChoice* pChoice);
+u8   fn_8003ABEC(CamChoice* pChoice, int nPlayer);
+void fn_8003DAC8(CamShot* pShot, int nPlayer, f32* pA, f32* pB);
+f32  fn_80044F58(int nPlayer, CamScript* pScript);     // gocamscripts.c
 
 // Registers the handlers of the camera files ('CAMS', 'CAMV', 'CAMA').
 void fn_80039454(void) {
@@ -599,6 +603,55 @@ CamShot* fn_8003A8C4(char* szName) {
     return NULL;
 }
 
+// A shot of kind nKind from the sequence's choices (a choice for kind 9 fits any kind but 23),
+// picked at random from the first 50 that may be used on this hole by this golfer; failing that,
+// from the first 50 of the kind at all. Its blend kinds and times go to the out pointers that are
+// not NULL. NULL when the sequence has none.
+CamShot* fn_8003A950(CamSequence* pSequence, int nKind, int* pA, f32* pF1, f32* pF2, int* pB, f32* pF3,
+                     int nPlayer) {
+    int aPick[50];
+    int i;
+    int nCount = 0;
+    u32 nPick;
+
+    if (pSequence == NULL) return NULL;
+    for (i = 0; i < pSequence->nChoices; i++) {
+        if (nCount >= 50) break;
+        if ((nKind == pSequence->p4C[i].b14 || (nKind != 23 && pSequence->p4C[i].b14 == 9))
+            && fn_8003AB94(&pSequence->p4C[i]) && fn_8003ABEC(&pSequence->p4C[i], nPlayer)) {
+            aPick[nCount] = i;
+            nCount++;
+        }
+    }
+    if (nCount == 0) {
+        for (i = 0; i < pSequence->nChoices; i++) {
+            if (nCount >= 50) break;
+            if (nKind == pSequence->p4C[i].b14 || (nKind != 23 && pSequence->p4C[i].b14 == 9)) {
+                aPick[nCount] = i;
+                nCount++;
+            }
+        }
+    }
+    if (nCount == 0) return NULL;
+    nPick = Rand_Next(1) % nCount;
+    if (pA != NULL) {
+        *pA = pSequence->p4C[aPick[nPick]].b15;
+    }
+    if (pF1 != NULL) {
+        *pF1 = pSequence->p4C[aPick[nPick]].f0;
+    }
+    if (pF2 != NULL) {
+        *pF2 = pSequence->p4C[aPick[nPick]].f4;
+    }
+    if (pB != NULL) {
+        *pB = pSequence->p4C[aPick[nPick]].b16;
+    }
+    if (pF3 != NULL) {
+        *pF3 = pSequence->p4C[aPick[nPick]].f8;
+    }
+    return pSequence->p4C[aPick[nPick]].p10;
+}
+
 // The choice may be used on the current hole.
 u8 fn_8003AB94(CamChoice* pChoice) {
     if (fn_8001E9CC(pChoice->aNoHoles, Game_GetCourse() * 18 + fn_80015464())) return 0;
@@ -645,6 +698,59 @@ void fn_8003AC50(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
         fn_800C7D14(vFrom, vTo, 1, 1, pOut, pShot->f60, -pShot->f64);
     } else {
         fn_800C7D14(vFrom, vTo, 1, 1, pOut, pShot->f60, pShot->f64);
+    }
+    fn_8003D414(pOut, pScript, pShot, nPlayer, fY);
+}
+
+// As fn_8003AC50, with the distance and side from fn_8003DAC8 (level for bB1 2 and 3). For bB1 8,
+// the camera's offset from pSub is shortened as fn_80044F58's distance (never less than the most
+// seen, pScript->f100) goes from CamTuning.f23C to f244, unless fn_80043388 holds.
+void fn_8003ADF8(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub) {
+    f32 vFrom[4];
+    f32 vTo[4];
+    f32 vOff[4];
+    f32 fSide;
+    f32 fDist;
+    f32 fY = pOut[1];
+    f32 fFar;
+    f32 fScale;
+
+    if ((pShot->bAF == 0 || pShot->bB0 == 0 || pShot->bAF == 23 || pShot->bB0 == 23)
+        && GameEffects_BallUpdatesThisFrame(nPlayer) < 1) {
+        return;
+    }
+    DynamicCam_GetLocation(pShot->bAF, nPlayer, vFrom, pScript, pShot, pCam, pSub);
+    DynamicCam_GetLocation(pShot->bB0, nPlayer, vTo, pScript, pShot, pCam, pSub);
+    if (pShot->bB1 == 2 || pShot->bB1 == 3) {
+        fn_8003DAC8(pShot, nPlayer, &fSide, &fDist);
+        fn_800C7D14(vFrom, vTo, 0, 0, pOut, fDist, fSide);
+    } else {
+        fn_8003DAC8(pShot, nPlayer, &fSide, &fDist);
+        fn_800C7D14(vFrom, vTo, 1, 0, pOut, fDist, fSide);
+    }
+    if (pShot->bB1 == 8) {
+        fFar = fn_80044F58(nPlayer, pScript);
+        if (!fn_80043388(pScript, pShot)) {
+            if (fFar > pScript->f100) {
+                pScript->f100 = fFar;
+            }
+            fFar = pScript->f100;
+            fn_8003DC54(pOut, pSub, vOff);
+            vOff[1] = 0.0f;
+            if (fFar > lbl_80281F78->f23C) {
+                if (fFar > lbl_80281F78->f244) {
+                    fScale = lbl_80281F78->f248;
+                } else {
+                    fScale = lbl_80281F78->f240 -
+                             (fFar - lbl_80281F78->f23C) / (lbl_80281F78->f244 - lbl_80281F78->f23C) *
+                                 (lbl_80281F78->f240 - lbl_80281F78->f248);
+                }
+                fn_8001EF34(vOff, fScale, vOff);
+                fn_8003DC30(vOff, pSub, pOut);
+            }
+        } else {
+            pScript->f100 = fFar;
+        }
     }
     fn_8003D414(pOut, pScript, pShot, nPlayer, fY);
 }

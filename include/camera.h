@@ -452,6 +452,12 @@ typedef struct CamTuning {
     f32  f220;                  // 0x220  camera 4: its ground clearance, and its least height over the ball
     f32  f224;                  // 0x224  camera 4: (f20C - 1) times this raises the aim each frame ...
     s32  n228;                  // 0x228  ... unless this is set: then the aim is at the camera's height
+    u8   unk22C[0x23C - 0x22C];
+    f32  f23C;                  // 0x23C  placement kind 8 (GoDynamicCam.c fn_8003ADF8): past this
+                                //        distance the camera's offset is scaled from f240 ...
+    f32  f240;                  // 0x240
+    f32  f244;                  // 0x244  ... down to f248 at this distance and beyond
+    f32  f248;                  // 0x248
 } CamTuning;
 
 extern CamTuning* lbl_80281F78;         // EA's file list has GoCamTuningVars
