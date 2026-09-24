@@ -58,6 +58,8 @@ Quaternion.c:
 
 StaticMemory.c:
 	.text       start:0x8000977C end:0x8000A0E8
+	.data       start:0x80186810 end:0x80186828
+	.sbss       start:0x80281BB0 end:0x80281BD8
 
 UMemPool.c:
 	.text       start:0x8000A0E8 end:0x8000B130
