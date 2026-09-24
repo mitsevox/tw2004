@@ -691,9 +691,9 @@ void fn_8010BFA0(int nBytes, int nError) {
 // nA98 bytes, fn_80006444 reading in the background and fn_8010BFA0 counting what arrived, and
 // copies them into the character's DynTex. Returns whether it is still busy.
 u8 fn_8010BFE0(void) {
-    DynTex* pTex;
     TexEntry* pEntry;
     TexPalette* pPal;
+    DynTex* pTex;
     u32 bReady;
     s32 nLen;
 
