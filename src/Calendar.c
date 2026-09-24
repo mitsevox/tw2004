@@ -38,7 +38,7 @@ s32 fn_800D2608(u16 nDate) {
 }
 
 // A date's month.
-s32 fn_800D2640(u16 nDate) {
+u32 fn_800D2640(u16 nDate) {
     s32 nOther;
     s32 nMonth;
 

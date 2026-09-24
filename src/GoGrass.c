@@ -552,9 +552,9 @@ void fn_8011F544(int nX, int nZ, f32 f) {
     s32 nCur;
     int nTile;
 
+    nTile = lbl_80281900->p8[nX + nZ * lbl_80281900->n18];
     fX = 2.5f * (f32)nX + (f32)lbl_80281900->n14;
     fZ = 2.5f * (f32)nZ + (f32)lbl_80281900->n16;
-    nTile = lbl_80281900->p8[nX + nZ * lbl_80281900->n18];
     nCur = lbl_80281900->n100;
     bFound = 0;
     for (i = 0; i < lbl_80281900->anF8[1 - nCur] && !bFound; i++) {

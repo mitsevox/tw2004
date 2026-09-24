@@ -12,8 +12,8 @@
 #include "unsorted/cull.h"
 
 void fn_80045FC8(UStreamObject* pObject);   // the 'BALL' stream handler
-void fn_80046FDC(int nView);
-void fn_800470B0(int nView);
+void fn_80046FDC(s32 nView);
+void fn_800470B0(s32 nView);
 void fn_80047208(u8* aState);
 int  fn_800F1960(void);                 // GameModeReplay.c: how many targets the target games have
 void fn_800F196C(int i, f32* pOut);     // GameModeReplay.c: target i's position
@@ -454,7 +454,7 @@ void fn_80046E1C(f32* pPos, int nPlayer) {
 }
 
 // Draws a 'TEO ' model (10006 + the target's kind) at each target of the target games.
-void fn_80046FDC(int nView) {
+void fn_80046FDC(s32 nView) {
     f32 vPos[4];
     int i;
     int nKind;
@@ -472,7 +472,7 @@ void fn_80046FDC(int nView) {
 }
 
 // The same with the 'TEO ' 10020..10022 models, for the target kinds 0, 2 and 3.
-void fn_800470B0(int nView) {
+void fn_800470B0(s32 nView) {
     f32 vPos[4];
     int i;
     int nModel;

@@ -530,7 +530,8 @@ void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
         fAbove = pOut[1] - fFollow;
         fTop = fHi - fEase;
         if (fAbove > fTop) {
-            fOver = fEase * (1.0f - fEase / (fAbove - fTop + fEase));
+            fOver = fAbove - fTop;
+            fOver = fEase * (1.0f - fEase / (fOver + fEase));
             pOut[1] = fOver + (fFollow + fTop);
             if (pOut[1] - fGround < fLo) {
                 pOut[1] = fGround + fLo;
