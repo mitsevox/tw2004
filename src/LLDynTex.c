@@ -238,23 +238,23 @@ void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
                     uIndex = (*pIndices & (0xFF << nShift)) >> nShift;
                     if (bThree) {
                         if (uIndex == 0) {
-                            uIndices |= 1 << nShift;
+                            uIndices = uIndices | 1 << nShift;
                         } else if (uIndex == 1) {
-                            uIndices |= 0 << nShift;
+                            uIndices = uIndices | 0 << nShift;
                         } else if (uIndex == 0x10) {
-                            uIndices |= 0x10 << nShift;
+                            uIndices = uIndices | 0x10 << nShift;
                         } else if (uIndex == 0x11) {
-                            uIndices |= 0x11 << nShift;
+                            uIndices = uIndices | 0x11 << nShift;
                         }
                     } else {
                         if (uIndex == 0) {
-                            uIndices |= 1 << nShift;
+                            uIndices = uIndices | 1 << nShift;
                         } else if (uIndex == 1) {
-                            uIndices |= 0 << nShift;
+                            uIndices = uIndices | 0 << nShift;
                         } else if (uIndex == 0x10) {
-                            uIndices |= 0x11 << nShift;
+                            uIndices = uIndices | 0x11 << nShift;
                         } else if (uIndex == 0x11) {
-                            uIndices |= 0x10 << nShift;
+                            uIndices = uIndices | 0x10 << nShift;
                         }
                     }
                 }

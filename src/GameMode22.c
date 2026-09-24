@@ -388,7 +388,10 @@ void fn_801264B8(void) {
     s32* pScore;
 
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        if (PLAYER(i)->nEA0 < lbl_80195498.n4 || gPlayers[0].nEA0 != PLAYER(i)->nEA0) {
+        if (PLAYER(i)->nEA0 < lbl_80195498.n4) {
+            return;
+        }
+        if (gPlayers[0].nEA0 != PLAYER(i)->nEA0) {
             return;
         }
         pScore = &gPlayers[i].nEBC;

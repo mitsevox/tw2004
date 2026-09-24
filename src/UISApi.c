@@ -32,8 +32,8 @@ void fn_80168CD8(UIStudio* pStudio, UISWordStack* pStack, u32 uEvent, s32 n, s32
 // already; with n < 0 it is sent again.
 void fn_80168DB0(UIStudio* pStudio, u32 uEvent, s32 n, s32 b, void* p, u8 bAll) {
     s32 nLast;
-    u32 nEnd;
     u32 i;
+    u32 nEnd;
     UISScreen* pScreen;
     s32 nTaken;
     u8 bOut;
@@ -58,7 +58,8 @@ void fn_80168DB0(UIStudio* pStudio, u32 uEvent, s32 n, s32 b, void* p, u8 bAll) 
         if ((nTaken == 1 && n < 0) || nTaken == 0) {
             bOut = 0;
             pStudio->uFlags |= 2;
-            fn_8016A2D4(pStudio, pScreen, &pStudio->stack64, 0, uEvent, n, b, p, &bOut);
+            // fake match: the (int) cast sets uEvent's register (an int uEvent parameter does the same)
+            fn_8016A2D4(pStudio, pScreen, &pStudio->stack64, 0, (int)uEvent, n, b, p, &bOut);
             pStudio->uFlags &= ~2;
         }
     }
