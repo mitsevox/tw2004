@@ -210,7 +210,7 @@ void fn_80017508(Character* pChar) {
 
 // Sets the character's animation events from the blend's, fStart later. Events 5..14 are only
 // taken when their time is past 0.
-void fn_800175B0(Character* pChar, ClipBlend* pBlend, f32 fStart) {
+void fn_800175B0(Character* pChar, Clip* pBlend, f32 fStart) {
     u32 uId;
     int i;
 
@@ -2133,8 +2133,7 @@ void fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) {
     }
     pAnim->fStart = pNode->fStart;
     pAnim->fEnd = pNode->fEnd;
-    // Clip and ClipBlend are two views of the same clip header (0xD4: pD4 / pEvents)
-    fn_800175B0(pChar, (ClipBlend*)pClip, aBlend[3]);
+    fn_800175B0(pChar, pClip, aBlend[3]);
     if (pClip != NULL && pClip->pF4 != NULL) {
         fn_8009622C(pChar, pClip->pF4, bNoBlend, fTime);
     }
@@ -2436,7 +2435,7 @@ void fn_8001C860(Character* pChar) {
         fn_8001EED8(pChar->pModel, 1);      // the results are not used
         fn_8001EED8(pChar->pModel, 0x52);
         pClip = Char_SetClip(pChar, 0, pChar->nStyle, NULL);
-        if (pClip->uD8 == 0) {
+        if (pClip->pD8 == NULL) {
             fn_80027108(pSkel);
             SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 0.0f);
             pChar->pModel->pSkel->f1074 = 0.0f;
@@ -2446,7 +2445,7 @@ void fn_8001C860(Character* pChar) {
             pSkel->pClip = pClip;
             fn_80021978(pChar->pModel->bEE);
             if (bClipTime) {
-                fn_8001FCF4(pChar, pClip, &pSkel->pose, 0, pClip->pD4->f24);
+                fn_8001FCF4(pChar, pClip, &pSkel->pose, 0, pClip->pEvents[2].fTime);
             } else {
                 fn_8001FCF4(pChar, pClip, &pSkel->pose, 0, 0.0f);
             }
@@ -3388,7 +3387,7 @@ CamLens* fn_8001F004(void) {
 }
 
 // The time of the blend's event uEvent, 0 when it has none.
-f32 fn_8001F02C(ClipBlend* pBlend, u64 uEvent) {
+f32 fn_8001F02C(Clip* pBlend, u64 uEvent) {
     int i;
 
     for (i = 0; i < pBlend->nEvents; i++) {

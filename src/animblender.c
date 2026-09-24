@@ -8,7 +8,7 @@
 #include "charstate.h"
 #include "golfer.h"
 
-f32  fn_8001F02C(ClipBlend* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
+f32  fn_8001F02C(Clip* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
 void fn_8001F558(void* pItem);          // mtalib.c
 void fn_800977CC(void* p);
 void fn_800293CC(int a, int b, SkelPose* pA, SkelPose* pB, SkelPose* pOut);   // blends two poses
