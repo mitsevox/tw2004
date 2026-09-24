@@ -850,7 +850,7 @@ config.libs = [
             Object(NonMatching, "LLTexGrp.c"),
             Object(NonMatching, "LLFont.c"),
             Object(NonMatching, "UFont.c"),
-            Object(NonMatching, "GoRenderCtx_Gc.c"),
+            Object(Matching, "GoRenderCtx_Gc.c"),
             Object(NonMatching, "streammanagerhole.c"),
             Object(Matching, "ViewController.c"),
             Object(Matching, "char_tex_manager.c"),
