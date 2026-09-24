@@ -36,7 +36,7 @@ u8   fn_8006BAD8(int nPlayer, s32* pOut);
 f32  fn_8006C630(void);
 // hlaudemitter.c: makes an emitter for sound nSound; the callback is told when a track stops
 // (fn_800ADDC8). The other types are unproven.
-u8   fn_800AD280(s16 nSound, s16 nKind, u8 a, int b, void (*pfnCallback)(u8 nId, u8 nTrack, s32 n));
+u8   fn_800AD280(s16 nSound, s16 nKind, int a, int b, void (*pfnCallback)(u8 nId, u8 nTrack, s32 n));
 void fn_800ADA08(s16 nSound, u8 nTrack, u8 n);
 void fn_800AD734(u8 nId, int n);
 void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);

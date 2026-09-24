@@ -35,9 +35,9 @@ void fn_800A27FC(f32 fDir, f32 fPoint) {
     if (fn_8000C594()->p44 != NULL) {
         fn_80035338(2);
         fn_80093900(fn_8000C594()->p44);
+        fn_80035308();
+        fn_800352E4();
     }
-    fn_80035308();
-    fn_800352E4();
 }
 
 void fn_800A2934(void) {
@@ -103,14 +103,14 @@ s32 fn_800A2A80(s32 nKind, f32* pArg, s32 n3) {
 
 void fn_800A2B34(s32 nKind) {
     switch (nKind) {
+    case 1:
+        return;
     case 0:
         if (lbl_801F16F4[nKind] != NULL) {
             fn_800B4F24(lbl_801F16F4[nKind]);
             fn_80009E70(lbl_801F16F4[nKind]);
             lbl_801F16F4[nKind] = NULL;
         }
-        break;
-    case 1:
         break;
     }
 }

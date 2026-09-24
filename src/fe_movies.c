@@ -543,6 +543,31 @@ void fn_80091DB8(int nFrames) {
     fn_8002FEAC();
 }
 
+// Show the picture of the first movie entry (fading in over 30 frames), free it, then wait 600
+// frames.
+void fn_80091E1C(void) {
+    int i = 0;
+    LLPict* pPict;
+    UIFileEntry* pEntry;
+    UIMovieData* pData;
+
+    pEntry = lbl_80281F1C->pFile->p8->apTables[lbl_801D87C0.n3C]->apEntries[0];
+    pData = pEntry->p4;
+    pEntry->p8 = (u8*)fn_8002FD00(pData->aData, pData->uSize);
+    pPict = (LLPict*)pEntry->p8;
+    fn_800760D8(pPict);
+    fn_80091FC0(pPict, 30, 1.0f / 30.0f);
+    fn_80008380();
+    fn_8002FE70((LLPict*)pEntry->p8);
+    pEntry->p8 = NULL;
+    fn_8002FEAC();
+    for (; i < 600; i++) {
+        fn_80007254();
+    }
+    fn_8005CC64(0, 0);
+    fn_80012EF8();
+}
+
 // The movies after a round in game type 1 (uiProcessInterface.c fn_80090400): "eas", then, unless
 // the session has flag 0x4000, one of the two cameo movies "tigcam01"/"tigcam02" at random
 // (skippable with any button); then the first 'LEGL' picture startUp.c kept, shown for 180

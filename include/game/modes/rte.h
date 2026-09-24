@@ -32,8 +32,8 @@ extern RTEData gRTEs;
 // GameModeDriverRTE.c, as the career calendar (GameModeDriver.c) uses it
 u8   GameModeDriverRTE_GetEventByDate(u16 nDate, s32* pId, s32* pRound);
 s32  fn_800F0E3C(void);
-RTEvent* fn_800F0EB4(u16 nDate);        // the event on a day (NULL: none)
 RTEvent* GameModeDriverRTE_GetCalData(s32 i);
+RTEvent* fn_800F0EB4(u16 nDate);
 char* GameModeDriverRTE_GetName(s32 i);
 char* GameModeDriverRTE_GetDescription(s32 i);
 s32  fn_800F1008(s32 i);

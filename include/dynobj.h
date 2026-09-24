@@ -437,6 +437,10 @@ s32  fn_800490B8(DynObjSetup* pSetup);                      // a new object's id
 void fn_800490EC(void);                                     // sweeps out the objects given up
 void fn_800491C4(DynObj* pObj);
 void fn_80049514(DynObj* pObj, DynObjSetup* pSetup);    // type 0's message 2
+void fn_80049304(int nKey, int a, int b);   // records (a, b) on every object whose n140 is nKey
+void fn_8004939C(int nKey, int a, int b);   // ... whose n147 is nKey
+void fn_80049424(int nKey, int a, int b);   // ... whose n148 is nKey
+int  fn_800494AC(int nKey, uptr nWhat);     // asks the first object whose n140 is nKey (message 9)
 void fn_800486F4(UObject* pObj, UObjModel* pModel, u32 uFlags);
 UObject* fn_80048808(UObjModel* pModel);
 void fn_80048860(UObject* pObj);

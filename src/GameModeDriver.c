@@ -26,69 +26,6 @@ void fn_80117264(u16 nDate, char* sz);
 u8   fn_801174B8(u32 nMonth, u32 nOther);
 u8   fn_801174E4(u32 nMonth, u32 nOther);
 
-// The three drivers, in table order: no career, PGA TOUR, real-time events.
-void* fn_80116540(u16 nDate);
-void  fn_80116548(void);
-u8    fn_8011654C(void);
-u8    fn_80116554(void);
-s32   fn_8011655C(char* sz, u16 nDate, s32* pLook, s32* pButton);
-void  fn_80116564(int nLine, char* sz);
-void  fn_80116568(u16 nDate, int n, char* sz);
-s32   fn_8011656C(u16 nDate);
-void  fn_80116574(int nKind, char* szTitle, char* szText);
-u16   fn_80116578(void);
-char* fn_80116598(u16 nDate);
-void  fn_801165A0(void);
-u8    fn_801165A4(void);
-
-void  fn_801165AC(void);
-u8    fn_801165B0(void);
-u8    fn_80116614(void);
-void  fn_80116678(int nLine, char* sz);
-void  fn_801166E8(u16 nDate, int n, char* sz);
-s32   fn_80116858(char* sz, u16 nDate, s32* pLook, s32* pButton);
-s32   fn_80116AA0(u16 nDate);
-void  fn_80116B60(int nKind, char* szTitle, char* szText);
-u16   fn_80116CAC(void);
-char* fn_80116CE8(u16 nDate);
-void  fn_80116D28(void);
-u8    fn_80116D78(void);
-
-void  fn_80116DD4(void);
-u8    fn_80116DD8(void);
-u8    fn_80116E3C(void);
-s32   fn_80116EA4(char* sz, u16 nDate, s32* pLook, s32* pButton);
-void  fn_80116F0C(int nLine, char* sz);
-void  fn_80116F80(u16 nDate, int n, char* sz);
-s32   fn_80116FA4(u16 nDate);
-void  fn_80117004(int nKind, char* szTitle, char* szText);
-u16   fn_801170EC(void);
-char* fn_8011710C(u16 nDate);
-void  fn_8011714C(void);
-u8    fn_80117180(void);
-
-// The calendar screen's tables (CalendarScreen.c), indexed by CareerCalendar.nDriver.
-u8 (*lbl_80193E70[3])(void) = { fn_8011654C, fn_801165B0, fn_80116DD8 };
-u8 (*lbl_80193E7C[3])(void) = { fn_80116554, fn_80116614, fn_80116E3C };
-s32 (*lbl_80193E88[3])(char* sz, u16 nDate, s32* pLook, s32* pButton) = {
-    fn_8011655C, fn_80116858, fn_80116EA4
-};
-void (*lbl_80193E94[3])(int nLine, char* sz) = { fn_80116564, fn_80116678, fn_80116F0C };
-void (*lbl_80193EA0[3])(u16 nDate, int n, char* sz) = { fn_80116568, fn_801166E8, fn_80116F80 };
-s32 (*lbl_80193EAC[3])(u16 nDate) = { fn_8011656C, fn_80116AA0, fn_80116FA4 };
-void (*lbl_80193EB8[3])(int nKind, char* szTitle, char* szText) = {
-    fn_80116574, fn_80116B60, fn_80117004
-};
-u16 (*lbl_80193EC4[3])(void) = { fn_80116578, fn_80116CAC, fn_801170EC };
-void (*lbl_80193ED0[3])(void) = { fn_80116548, fn_801165AC, fn_80116DD4 };
-char* (*lbl_80193EDC[3])(u16 nDate) = { fn_80116598, fn_80116CE8, fn_8011710C };
-// port: the PGA TOUR and real-time entries return their own event types; callers only test for NULL.
-void* (*lbl_80193EE8[3])(u16 nDate) = {
-    fn_80116540, (void* (*)(u16))fn_800EFC80, (void* (*)(u16))fn_800F0EB4
-};
-void (*lbl_80193EF4[3])(void) = { fn_801165A0, fn_80116D28, fn_8011714C };
-u8 (*lbl_80193F00[3])(void) = { fn_801165A4, fn_80116D78, fn_80117180 };
-
 // ---- no career: nothing to show -------------------------------------------------------------
 
 void* fn_80116540(u16 nDate) {
@@ -172,6 +109,54 @@ u8 fn_80116614(void) {
     }
     return b;
 }
+
+void  fn_80116678(int nLine, char* sz);
+void  fn_801166E8(u16 nDate, int n, char* sz);
+s32   fn_80116858(char* sz, u16 nDate, s32* pLook, s32* pButton);
+s32   fn_80116AA0(u16 nDate);
+void  fn_80116B60(int nKind, char* szTitle, char* szText);
+u16   fn_80116CAC(void);
+char* fn_80116CE8(u16 nDate);
+void  fn_80116D28(void);
+u8    fn_80116D78(void);
+void  fn_80116DD4(void);
+u8    fn_80116DD8(void);
+u8    fn_80116E3C(void);
+s32   fn_80116EA4(char* sz, u16 nDate, s32* pLook, s32* pButton);
+void  fn_80116F0C(int nLine, char* sz);
+void  fn_80116F80(u16 nDate, int n, char* sz);
+s32   fn_80116FA4(u16 nDate);
+void  fn_80117004(int nKind, char* szTitle, char* szText);
+u16   fn_801170EC(void);
+char* fn_8011710C(u16 nDate);
+void  fn_8011714C(void);
+u8    fn_80117180(void);
+
+// The calendar screen's tables, indexed by CareerCalendar.nDriver: no career, the PGA TOUR season,
+// the real-time events. (Defined here, before the strings below, to keep EA's data order.)
+u8 (*lbl_80193E70[3])(void) = { fn_8011654C, fn_801165B0, fn_80116DD8 };
+u8 (*lbl_80193E7C[3])(void) = { fn_80116554, fn_80116614, fn_80116E3C };
+s32 (*lbl_80193E88[3])(char* sz, u16 nDate, s32* pLook, s32* pButton) = {
+    fn_8011655C, fn_80116858, fn_80116EA4
+};
+void (*lbl_80193E94[3])(int nLine, char* sz) = { fn_80116564, fn_80116678, fn_80116F0C };
+void (*lbl_80193EA0[3])(u16 nDate, int n, char* sz) = { fn_80116568, fn_801166E8, fn_80116F80 };
+s32 (*lbl_80193EAC[3])(u16 nDate) = { fn_8011656C, fn_80116AA0, fn_80116FA4 };
+void (*lbl_80193EB8[3])(int nKind, char* szTitle, char* szText) = {
+    fn_80116574, fn_80116B60, fn_80117004
+};
+u16 (*lbl_80193EC4[3])(void) = { fn_80116578, fn_80116CAC, fn_801170EC };
+void (*lbl_80193ED0[3])(void) = { fn_80116548, fn_801165AC, fn_80116DD4 };
+char* (*lbl_80193EDC[3])(u16 nDate) = { fn_80116598, fn_80116CE8, fn_8011710C };
+// port: the PGA TOUR and real-time drivers return their own event types through this void* entry
+void* (*lbl_80193EE8[3])(u16 nDate) = {
+    fn_80116540, (void* (*)(u16))fn_800EFC80, (void* (*)(u16))fn_800F0EB4
+};
+void (*lbl_80193EF4[3])(void) = { fn_801165A0, fn_80116D28, fn_8011714C };
+u8 (*lbl_80193F00[3])(void) = { fn_801165A4, fn_80116D78, fn_80117180 };
+
+// The calendar grid.
+CareerCalendar lbl_80223C48;
 
 // The calendar's header lines: 1 the current event (or "Season Complete"), 2 nothing.
 void fn_80116678(int nLine, char* sz) {
@@ -606,9 +591,7 @@ u16 fn_801173F0(u32 nCell) {
     nMonth = 0;
     nYear = 0;
     if (nCell < lbl_80223C48.nFirstCell) {
-        // fake match: two statements keep the original's add order.
-        nDay = nCell;
-        nDay += (lbl_80223C48.nPrevMonthDays - lbl_80223C48.nFirstCell) + 1;
+        nDay = 1 + (lbl_80223C48.nPrevMonthDays - lbl_80223C48.nFirstCell) + nCell;
         fn_800D2884(lbl_80223C48.nMonth, lbl_80223C48.nYear, &nMonth, &nYear);
     } else if (nCell >= lbl_80223C48.nEndCell) {
         nDay = nCell - (lbl_80223C48.nEndCell - 1);
@@ -653,10 +636,10 @@ s32 fn_80117510(u16 nDate) {
     fn_800D2714(&nCopy, &nMonth, &nDay, &nYear);
     // fake match: the original compares the months unsigned (cmplw); both are 1..12.
     if ((u32)lbl_80223C48.nMonth == nMonth) {
-        return nDay + lbl_80223C48.nFirstCell - 1;
+        return nDay + (s32)lbl_80223C48.nFirstCell - 1;
     }
     if (fn_801174B8(lbl_80223C48.nMonth, nMonth) && nDay < 35 - lbl_80223C48.nEndCell) {
-        return nDay + lbl_80223C48.nEndCell - 1;
+        return nDay + (s32)lbl_80223C48.nEndCell - 1;
     }
     if (fn_801174E4(lbl_80223C48.nMonth, nMonth) && nDay > nPrevShown) {
         return (nDay - nPrevShown) - 1;

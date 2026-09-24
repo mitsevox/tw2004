@@ -72,7 +72,7 @@ s32  GameModeDriverPGATour_GetSelectedEvent(s32* pRound);
 s32  GameModeDriverPGATour_GetFinalEventOfSeason(void);
 void fn_800EF9D0(s32 nEvent);
 Tournament* fn_800EFA70(s32 i);
-Tournament* fn_800EFC80(u16 nDate);     // the tournament on a day (NULL: none)
+Tournament* fn_800EFC80(u16 nDate);
 s32  GameModeDriverPGATour_GetRounds(s32 i);
 u16  fn_800EFD38(s32 i);                // the tournament's start date
 u16  GameModeDriverPGATour_GetEndDate(s32 i);

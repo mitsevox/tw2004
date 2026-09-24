@@ -1,6 +1,6 @@
 // LLTex.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): texture banks, made
-// from the 'txf ' objects of the stream files. Not yet decompiled; the code below is the matched
-// small functions.
+// from the 'txf ' objects of the stream files, and the byte-code scripts that drive the texture
+// items (fn_8000EA1C).
 
 #include "engine.h"
 #include "gx.h"
@@ -10,8 +10,8 @@ u8   fn_8002A3A4(void);                 // GxUtil.c
 void fn_8002A3AC(u8 b);                 // GxUtil.c
 void fn_80010114(int nDst, int nFunc, int nSrc, int nMtx);
 
-// Builds a bank from a 'txf ' object's data, into pBank or, when it is NULL, a new allocation.
-TexBank* TX_spParseTextureGroupFromStream(u8* pData, TexBank* pBank, int n);
+// Builds a bank from a 'txf ' object's data, into pInto or, when it is NULL, a new allocation.
+TexBank* TX_spParseTextureGroupFromStream(u8* pData, TexBank* pInto, int n);
 
 // A DynObj is going: every item whose def has its id counts one fewer (n1A).
 void fn_8000E830(DynObj* pObj) {
@@ -92,6 +92,255 @@ void fn_8000E9A8(int nId, int nMsg, int bOn) {
             fn_8000E884(pItem, nMsg, bOn);
         }
     }
+}
+
+// Runs a byte-code script on a value stack and returns what is left on top (1 for an empty
+// script, 0 while lbl_80281C68 stops scripts). nPush, when not negative, starts on the stack
+// above a 1. An opcode with bit 7 set pushes its low 7 bits; opcodes 9 and up pop one operand (a,
+// the top), 0x1D and up a second (b), 0x38 and up a third (c). Every opcode that makes a value
+// pushes it.
+int fn_8000EA1C(u8* pCode, int nArg, int nPush, DynObj* pObj) {
+    int a;
+    int b;
+    int nSp;
+    int c;
+    int nOp;
+
+    a = 0;
+    b = a;
+    c = 0;
+    if ((s8)*pCode == 0) {
+        return 1;
+    }
+    if (lbl_80281C68) {
+        return 0;
+    }
+    lbl_801A3438[0] = 1;
+    nSp = 1;
+    if (nPush >= 0) {
+        lbl_801A3438[1] = nPush;
+        nSp = 2;
+    }
+    do {
+        nOp = (s8)*pCode++;
+        if (nOp & 0x80) {
+            a = nOp & 0x7F;
+        } else {
+            if (nOp >= 9) {
+                a = lbl_801A3438[--nSp];
+                if (nOp >= 0x1D) {
+                    b = lbl_801A3438[--nSp];
+                    if (nOp >= 0x38) {
+                        c = lbl_801A3438[--nSp];
+                    }
+                }
+            }
+            switch (nOp) {
+            case 1:
+                a = -(*pCode++ + 1);
+                break;
+            case 2:
+                a = *pCode++ + 0x80;
+                break;
+            case 3:
+                a = pCode[1] | ((s8)pCode[0] << 8);
+                pCode += 2;
+                break;
+            case 4:
+                a = pCode[3] | ((pCode[2] | ((pCode[1] | ((s8)pCode[0] << 8)) << 8)) << 8);
+                pCode += 4;
+                break;
+            case 5:
+                a = nArg;
+                break;
+            case 8:
+                pCode += *pCode;
+                continue;
+            case 16:
+                a = lbl_80281C6C[a];
+                break;
+            case 17:
+                // port: entries from 7 on hold 32-bit addresses (also in case 30)
+                a = *(int*)lbl_80281C6C[a + 7];
+                break;
+            case 18:
+                a = lbl_80281C74[a] / 5;
+                break;
+            case 19:
+                a = lbl_80281C78[a];
+                break;
+            case 29:
+                lbl_80281C6C[a] = b;
+                continue;
+            case 30:
+                *(int*)lbl_80281C6C[a + 7] = b;
+                continue;
+            case 31:
+                lbl_80281C74[a] = b * 5;
+                continue;
+            case 32:
+                lbl_80281C78[a] = b;
+                continue;
+            // The steps below change the entry itself, also for the entries from 7 on that hold
+            // addresses, and leave the index on the stack.
+            case 21:
+                lbl_80281C6C[a]++;
+                break;
+            case 22:
+                lbl_80281C6C[a + 7]++;
+                break;
+            case 23:
+                lbl_80281C74[a] += 5;
+                break;
+            case 24:
+                lbl_80281C78[a]++;
+                break;
+            case 25:
+                lbl_80281C6C[a]--;
+                break;
+            case 26:
+                lbl_80281C6C[a + 7]--;
+                break;
+            case 27:
+                lbl_80281C74[a] -= 5;
+                break;
+            case 28:
+                lbl_80281C78[a]--;
+                break;
+            case 48:
+                lbl_80281C6C[a] += b;
+                break;
+            case 49:
+                lbl_80281C6C[a + 7] += b;
+                break;
+            case 50:
+                lbl_80281C74[a] += b * 5;
+                break;
+            case 51:
+                lbl_80281C78[a] += b;
+                break;
+            case 52:
+                lbl_80281C6C[a] -= b;
+                break;
+            case 53:
+                lbl_80281C6C[a + 7] -= b;
+                break;
+            case 54:
+                lbl_80281C74[a] -= b * 5;
+                break;
+            case 55:
+                lbl_80281C78[a] -= b;
+                break;
+            case 9:
+                a = a == 0;
+                break;
+            case 11:
+                // a random number below -a, or entry a of the 32 in lbl_80281C70
+                if (a >= 0) {
+                    a %= 32;
+                    a = lbl_80281C70[a];
+                } else {
+                    b = (int)Rand_Next(0);
+                    if (b < 0) {
+                        b = -b;
+                    }
+                    a = b % -a;
+                }
+                break;
+            case 20:
+                // a jump taken when a is 0
+                if (a == 0) {
+                    pCode += *pCode;
+                } else {
+                    pCode++;
+                }
+                continue;
+            case 33:
+                a = b == a;
+                break;
+            case 34:
+                a = b != a;
+                break;
+            case 35:
+                a = b > a;
+                break;
+            case 36:
+                a = b >= a;
+                break;
+            case 37:
+                a = b < a;
+                break;
+            case 38:
+                a = b <= a;
+                break;
+            case 39:
+                a += b;
+                break;
+            case 40:
+                a = b - a;
+                break;
+            case 41:
+                a *= b;
+                break;
+            case 42:
+                a = b / a;
+                break;
+            case 43:
+                if (a <= 0) {
+                    a = b & -a;
+                } else {
+                    a = b % a;
+                }
+                break;
+            case 44:
+                a = b != 0 && a != 0;
+                break;
+            case 45:
+                a = b != 0 || a != 0;
+                break;
+            case 46:
+                if (b == 0) {
+                    return a;
+                }
+                continue;
+            case 47:
+                // b 0: ask this object for its value a; b above 0: the first object with id b
+                if (b == 0) {
+                    a = pObj->pfnHandler(9, pObj, (void*)a, NULL);
+                } else if (b >= 0) {
+                    a = fn_800494AC(b, a);
+                }
+                break;
+            case 56:
+                if (c == 0) {
+                    fn_80049304(pObj->n140, b, a);
+                } else {
+                    fn_80049304(c, b, a);
+                }
+                continue;
+            case 58:
+                fn_80049424(c, b, a);
+                continue;
+            case 57:
+                fn_8004939C(c, b, a);
+                continue;
+            case 60:
+                fn_8000E948(c, b, a);
+                continue;
+            case 61:
+                fn_8000E9A8(c, b, a);
+                continue;
+            case 10:
+            case 14:
+            case 15:
+                break;
+            default:
+                continue;
+            }
+        }
+        lbl_801A3438[nSp++] = a;
+    } while ((s8)*pCode != 0);
+    return lbl_801A3438[--nSp];
 }
 
 // Resets the constant-alpha flag and texture coordinates 0-2 for a frame: each stage's constant
@@ -289,6 +538,126 @@ TexBank* fn_8000FB88(UStreamObject* pObject, TexBank* pBank, int n) {
 }
 
 void fn_8000FBAC(void) {
+}
+
+// The data (after a 0x10-byte header) is the bank's first 8 bytes, then four sections: the
+// textures, the palette rows, the pixels and the palette colours. With n -2 the bank keeps
+// pointing into the data; otherwise it copies the pixels and colours and sets up the GX objects.
+// n is added to every level's n8 and every palette's n6.
+TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
+    TexBank* pBank;
+    TexBank* pHead;
+    TexSection* pSection;
+    TexSection* pPixels;
+    u8* pTables;
+    u8* pColors;
+    TexEntry* pTex;
+    TexPalette* pPalette;
+    int nSize;
+    int i;
+    int j;
+    int nOffset;
+
+    p += 0x10;
+    pHead = (TexBank*)p;
+    p += 8;
+    nSize = sizeof(TexBank) + pHead->n2 * sizeof(TexEntry) + pHead->n4 * sizeof(TexPalette) +
+            pHead->n4 * sizeof(TexGXTlut) + pHead->n2 * sizeof(TexGXObj);
+    if (pInto != NULL) {
+        pBank = pInto;
+    } else {
+        pBank = fn_80009B34(nSize, 2, 0x10, "LLTex.c", 0x717);
+        pInto = pBank;
+    }
+    // the bank's first 8 bytes (its counts n2 and n4) as the data has them
+    ((u32*)pBank)[0] = ((u32*)pHead)[0];
+    ((u32*)pBank)[1] = ((u32*)pHead)[1];
+    pTables = (u8*)(pInto + 1);
+    pBank->p8 = (TexEntry*)pTables;
+    pTables += pBank->n2 * sizeof(TexEntry);
+    pBank->pC = (TexPalette*)pTables;
+    pTables += pBank->n4 * sizeof(TexPalette);
+    pBank->p10 = (TexGXObj*)pTables;
+    pTables += pBank->n2 * sizeof(TexGXObj);
+    pBank->p14 = (TexGXTlut*)pTables;
+
+    pSection = (TexSection*)p;
+    p += 8;
+    Mem_cpy(pBank->p8, p, pBank->n2 * sizeof(TexEntry));
+    p += pSection->nSize;
+    pSection = (TexSection*)p;
+    p += 8;
+    Mem_cpy(pBank->pC, p, pBank->n4 * sizeof(TexPalette));
+    p += pSection->nSize;
+    pPixels = (TexSection*)p;
+    p += 8;
+    if (n != -2) {
+        pBank->p18 = fn_80009B34(pPixels->nSize, 2, 0x20, "LLTex.c", 0x77A);
+        pBank->n1C = pPixels->nSize;
+        Mem_cpy(pBank->p18, p, pPixels->nSize);
+    } else {
+        pBank->p18 = p;
+    }
+    pBank->n28 = n;
+    pBank->b2C = 0;
+    if (n == -1) {
+        pBank->b2D = 1;
+    } else {
+        pBank->b2D = 0;
+    }
+
+    for (i = 0, nOffset = 0; i < pBank->n2; nOffset += sizeof(TexEntry), i++) {
+        pTex = (TexEntry*)((u8*)pBank->p8 + nOffset);
+        for (j = 0; j < pTex->n41; j++) {
+            pTex->aMips[j].n8 += (s16)pBank->n28;
+        }
+        if (n != -2) {
+            if (pTex->nPalette == -1) {
+                GXInitTexObj((GXTexObj*)&pBank->p10[pTex->n3E], pBank->p18 + pTex->aMips[0].uPixels,
+                             pTex->nWidth, pTex->nHeight, pTex->b40, (pTex->b46 & 1) == 0,
+                             (pTex->b46 & 2) == 0, pTex->n41 > 1);
+            } else {
+                GXInitTexObjCI((GXTexObj*)&pBank->p10[pTex->n3E], pBank->p18 + pTex->aMips[0].uPixels,
+                               pTex->nWidth, pTex->nHeight, pTex->b40, (pTex->b46 & 1) == 0,
+                               (pTex->b46 & 2) == 0, 0, 0);
+            }
+            if (pTex->n41 > 1) {
+                GXInitTexObjLOD((GXTexObj*)&pBank->p10[pTex->n3E], 5, 1, 0.0f, pTex->n41 - 1.0f, -2.0f,
+                                0, 0, 0);
+            }
+        }
+    }
+
+    p += pPixels->nSize;
+    pSection = (TexSection*)p;
+    p += 8;
+    if (pSection->nSize > 0) {
+        if (n != -2) {
+            pBank->p20 = fn_80009B34(pSection->nSize, 2, 0x20, "LLTex.c", 0x7FB);
+            pBank->n24 = pSection->nSize;
+            Mem_cpy(pBank->p20, p, pSection->nSize);
+        } else {
+            pBank->p20 = p;
+        }
+    } else {
+        pBank->p20 = NULL;
+    }
+    if (pBank->n24 == 0x200) {
+        pColors = pBank->p20;
+    } else {
+        pColors = p;
+    }
+
+    for (i = 0, nOffset = 0; i < pBank->n4; nOffset += sizeof(TexPalette), i++) {
+        pPalette = (TexPalette*)((u8*)pBank->pC + nOffset);
+        pPalette->n6 += (s16)pBank->n28;
+        if (n != -2) {
+            // every row is set up into the bank's first GX palette object
+            GXInitTlutObj((GXTlutObj*)pBank->p14, pColors + pPalette->uColors, pPalette->nFormat,
+                          pPalette->nEntries);
+        }
+    }
+    return pBank;
 }
 
 // Frees a bank's pixel and palette data, unless they are not its own.

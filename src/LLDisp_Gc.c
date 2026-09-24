@@ -53,8 +53,7 @@ void fn_80007260(void);
 // Resets the console with OSResetSystem's arguments, unless a memory card is busy. With
 // bOnRelease, only once the reset button has been pressed and let go again.
 void fn_800066E4(u8 bOnRelease, s32 nReset, s32 nCode, u8 bMenu) {
-    if (CARDGetResultCode(0) == -1) return;
-    if (CARDGetResultCode(1) == -1) return;
+    if (CARDGetResultCode(0) == -1 || CARDGetResultCode(1) == -1) return;
     if (bOnRelease) {
         if (lbl_80281B8E) {
             if (OSGetResetButtonState()) return;

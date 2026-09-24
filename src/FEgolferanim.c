@@ -291,7 +291,8 @@ void fn_8008B20C(void) {
         fn_8008B850();
         return;
     }
-    if (lbl_80281EE0->b8A == 1 || lbl_80281EE0->aGolfer[0].b19 == 1) return;
+    if (lbl_80281EE0->b8A == 1) return;
+    if (lbl_80281EE0->aGolfer[0].b19 == 1) return;
     pGolfer = lbl_80281EE0->pB4;
     if (pGolfer->b18 == 0 && pGolfer->nC != -1) {
         if (fn_8008DCF0(pGolfer->nC, pGolfer)) {
@@ -1283,8 +1284,7 @@ void fn_8008DD50(u8 bNoBlend) {
     Clip* pClip;
 
     pView = fn_80017028(fn_80016D10());
-    if (lbl_80281EE0->pB4 == NULL) return;
-    if (lbl_80281EE0->pB4->pChar == NULL) return;
+    if (lbl_80281EE0->pB4 == NULL || lbl_80281EE0->pB4->pChar == NULL) return;
     if (lbl_80281EE0->n8 != 0) {
         if (lbl_80281EE0->n8 == 1) {
             fn_8001C5B4(lbl_80281EE0->pB4->pChar, 0);
@@ -1628,7 +1628,15 @@ void fn_8008EA38(u8 b) {
 // Golfers 7 and 29 only: pass b on to the character and rebuild its model.
 void fn_8008EA44(u8 b) {
     if (lbl_80281EE0->pB4 != NULL && lbl_80281EE0->pB4->pChar != NULL) {
-        if (lbl_80281EE0->pB4->pChar->nC != 7 && lbl_80281EE0->pB4->pChar->nC != 29) return;
+        if (lbl_80281EE0->pB4->pChar->nC != 7) {
+            // fake match: a one-case switch keeps the original's branch over a branch
+            switch (lbl_80281EE0->pB4->pChar->nC) {
+            case 29:
+                break;
+            default:
+                return;
+            }
+        }
         fn_8001EE98(lbl_80281EE0->pB4->pChar, b);
         fn_80018484(lbl_80281EE0->pB4->pChar, lbl_80281EE0->pB4->pChar->pModel);
     }

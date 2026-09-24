@@ -144,7 +144,7 @@ void fn_800A7F2C(AudSource* pSource) {
     if ((uFlags & 2) || !(uFlags & 1)) {
         fPitch = 1.0f;
     } else {
-        if (lbl_80282068 >= 2 && pSource->afDist[1] < fDist) {
+        if (lbl_80282068 >= 2 && pSource->afDist[1] < pSource->afDist[0]) {
             fDist = pSource->afDist[1];
         }
         fSpeed = 32.0f * (pSource->fDist - fDist);
@@ -165,10 +165,7 @@ void fn_800A7FA8(AudSource* pSource) {
     f32 f68;
 
     if (lbl_80282068 < 2 && (pSource->pSound->n3 & 1)) {
-        fInv = 0.0f;
-        if (pSource->afDist[0] > fInv) {
-            fInv = 1.0f / pSource->afDist[0];
-        }
+        fInv = pSource->afDist[0] > 0.0f ? 1.0f / pSource->afDist[0] : 0.0f;
         fPan = fn_800A85FC(-pSource->aPos[0][0], fInv);
         f68 = fn_800A85FC(pSource->aPos[0][2], fInv);
         fPan = fPan < -1.0f ? -1.0f : fPan > 1.0f ? 1.0f : fPan;
@@ -202,12 +199,12 @@ f32 fn_800A809C(AudSource* pSource, f32 (*aPos)[3]) {
 // Sets the play list and stream of each streamed track in uMask: auStreams[i] holds the stream in
 // its low 16 bits, the play list above it and the mode in the top byte.
 void fn_800A8134(AudSource* pSource, u32* auStreams, u16 uMask) {
-    u8 i;
-    u16 uBit;
     AudTrack* pTrack;
     u32 uStream;
+    u8 i;
+    u16 uBit;
 
-    for (i = 0, uBit = 1; i < 8; i++, uBit <<= 1) {
+    for (uBit = 1, i = 0; i < 8; i++, uBit <<= 1) {
         if (uMask & uBit) {
             pTrack = pSource->apTracks[i];
             if (pTrack == NULL) {
@@ -217,7 +214,7 @@ void fn_800A8134(AudSource* pSource, u32* auStreams, u16 uMask) {
             if (pTrack->pTmpl->n0 & 8) {
                 uStream = auStreams[i];
                 Stm_SetPlayList(pTrack, uStream >> 16);
-                Stm_SetStream(pTrack, uStream, (s32)uStream >> 24);
+                Stm_SetStream(pTrack, uStream & 0xFFFF, (s32)uStream >> 24);
             }
         }
     }
