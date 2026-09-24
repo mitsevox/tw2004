@@ -48,14 +48,14 @@ u8   fn_8003CAFC(CamSequence* pSequence, int nKind);
 s32  fn_8003CB80(u32 n, int nPlayer);
 s32  fn_8003CBD4(int n, int nPlayer);
 u8   fn_8003CBE8(CamSequence* pSequence, int nPlayer);
-u8   fn_8003CD6C(CamSequence* pSequence, f32 f);
+u8   fn_8003CD6C(CamSequence* pSequence, int nPlayer, f32 f);
 u8   fn_8003CD9C(CamSequence* pSequence, int nPlayer, u8 b);
 u8   fn_8003CEEC(CamSequence* pSequence, int nPlayer);
 u8   fn_8003D00C(CamSequence* pSequence);
 u8   fn_8003D054(CamSequence* pSequence);
 u8   fn_8003D0A0(int nMask, int nBit);
 u8   fn_8003D140(CamSequence* pSequence);
-u8   fn_8003D0BC(CamSequence* pSequence, f32 f);
+u8   fn_8003D0BC(CamSequence* pSequence, int nPlayer, f32 f);
 u8   fn_8003AB94(CamChoice* pChoice);
 u8   fn_8003ABEC(CamChoice* pChoice, int nPlayer);
 void fn_8003DAC8(CamShot* pShot, int nPlayer, f32* pA, f32* pB);
@@ -1159,7 +1159,7 @@ CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, u8 a, f32
                        fn_8003D054(&lbl_80281D88->pSequences[i]) &&
                        fn_8003D0A0(lbl_80281D88->pSequences[i].b49, nTee) &&
                        fn_8003D0A0(lbl_80281D88->pSequences[i].b4A, nClassBit) &&
-                       fn_8003CD6C(&lbl_80281D88->pSequences[i], fHeight) &&
+                       fn_8003CD6C(&lbl_80281D88->pSequences[i], nPlayer, fHeight) &&
                        fn_8003D140(&lbl_80281D88->pSequences[i])) {
                 pSeq = &lbl_80281D88->pSequences[i];
                 if (fDist >= pSeq->f24 && fDist <= pSeq->f28 && pSeq->nChoices > 0) {
@@ -1245,10 +1245,10 @@ CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind
                        fn_8003CBE8(&lbl_80281D88->pSequences[i], nPlayer) &&
                        fn_8003CD9C(&lbl_80281D88->pSequences[i], nPlayer, 1) &&
                        fn_8003CEEC(&lbl_80281D88->pSequences[i], nPlayer) &&
-                       fn_8003D0BC(&lbl_80281D88->pSequences[i], fPinDist) &&
+                       fn_8003D0BC(&lbl_80281D88->pSequences[i], nPlayer, fPinDist) &&
                        fn_8003D00C(&lbl_80281D88->pSequences[i]) &&
                        fn_8003D054(&lbl_80281D88->pSequences[i]) &&
-                       fn_8003CD6C(&lbl_80281D88->pSequences[i], fHeight) &&
+                       fn_8003CD6C(&lbl_80281D88->pSequences[i], nPlayer, fHeight) &&
                        fn_8003D140(&lbl_80281D88->pSequences[i]) &&
                        fn_8003D0A0(lbl_80281D88->pSequences[i].b49, nTee)) {
                 anPicked[nPicked] = i;
@@ -1430,8 +1430,8 @@ u8 fn_8003CBE8(CamSequence* pSequence, int nPlayer) {
     }
 }
 
-// The value is within the sequence's f2C..f30.
-u8 fn_8003CD6C(CamSequence* pSequence, f32 f) {
+// The value is within the sequence's f2C..f30. nPlayer is not used (every caller passes it).
+u8 fn_8003CD6C(CamSequence* pSequence, int nPlayer, f32 f) {
     if (f <= pSequence->f30 && f >= pSequence->f2C) {
         return 1;
     }
@@ -1517,8 +1517,8 @@ u8 fn_8003D0A0(int nMask, int nBit) {
     return (nMask & (1 << nBit)) != 0;
 }
 
-// The value is within the sequence's f24..f28.
-u8 fn_8003D0BC(CamSequence* pSequence, f32 f) {
+// The value is within the sequence's f24..f28. nPlayer is not used (every caller passes it).
+u8 fn_8003D0BC(CamSequence* pSequence, int nPlayer, f32 f) {
     if (f >= pSequence->f24 && f <= pSequence->f28) {
         return 1;
     }
