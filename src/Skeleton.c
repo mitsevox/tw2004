@@ -6,6 +6,9 @@
 #include "charstate.h"
 
 void fn_80029BC8(f32* pVec);                            // sets a vector to lbl_80186838
+void fn_80026BF4(Skeleton* pSkel, IKChain* pChain);
+f32  fn_80026D18(Skeleton* pSkel, IKChain* pChain, f32* pTarget, int nLink, int n);   // an IK step's
+                                                                                     // remaining error
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // pDst = pSrc's rows
                                                                                 // through pMtx
 void fn_80113E60(void);                                 // DynChain.c
@@ -63,6 +66,25 @@ void fn_80027108(Skeleton* pSkel) {
     pSkel->f10C4 = 1.0f;
     for (i = 0; i < pSkel->nChains; i++) {
         fn_80026F90(pSkel, &pSkel->pChains[i], 1);
+    }
+}
+
+// Solves the chain toward pTarget: up to nIterations steps, each followed by pfnError (when given)
+// in place of the step's own error; stops once the error is below fTolerance.
+void fn_800273BC(Skeleton* pSkel, IKChain* pChain, f32* pTarget, s32 nIterations,
+                 f32 (*pfnError)(Skeleton* pSkel, IKChain* pChain, f32* pTarget), f32 fTolerance) {
+    s32 i;
+    f32 fError;
+
+    for (i = 0; i < nIterations; i++) {
+        fError = fn_80026D18(pSkel, pChain, pTarget, pChain->nLinks - 2, 0);
+        if (pfnError != NULL) {
+            fError = pfnError(pSkel, pChain, pTarget);
+        }
+        fn_80026BF4(pSkel, pChain);
+        if (fError < fTolerance) {
+            break;
+        }
     }
 }
 
@@ -252,6 +274,20 @@ int fn_800298F4(CharModel* pModel, u64 uId) {
 // Steps one of the model's dynamic chains.
 void fn_80029948(CharModel* pModel, struct DynChain* pChain, f32 f) {
     fn_8011443C(pModel, pChain, f);
+}
+
+// Copies bone 0x22's rotation in pPose into q740 and q750, when the model has that bone. EA looks
+// the same bone up for both.
+void fn_80029968(CharModel* pModel, SkelPose* pPose) {
+    int nFirst = fn_8001EED8(pModel, 0x22);
+    int nSecond = fn_8001EED8(pModel, 0x22);
+
+    if (nFirst != 0xFF) {
+        fn_8001E85C(pPose->aBones[nFirst].q0, pModel->q740);
+    }
+    if (nSecond != 0xFF) {
+        fn_8001E85C(pPose->aBones[nSecond].q0, pModel->q750);
+    }
 }
 
 // Gives bone nA the rotation pRot, then sets it halfway between that and bone nB's.
