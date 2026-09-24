@@ -980,7 +980,7 @@ config.libs = [
             Object(NonMatching, "GameModeBestBall.c"),
             Object(Matching, "GameModeFourBall.c"),
             Object(Matching, "GameModeMatch.c"),
-            Object(NonMatching, "GameMode5.c"),
+            Object(Matching, "GameMode5.c"),
             Object(Matching, "GameMode9.c"),
             Object(Matching, "GameModeDriverPGATour.c"),
             Object(Matching, "GameModeDriverRTE.c"),
