@@ -44,14 +44,14 @@ extern Replay gReplayData;              // 0x801D6030
 #define NUM_COURSES 30
 extern char* lbl_80191990[NUM_COURSES]; // each course's name ("Pebble Beach", ...)
 
-// The replay recorder's buffer (our name; 0x15260 bytes, made by fn_8006BED4 at the start of a
-// round): what fn_8006BF60 saves before a shot besides gReplayData, put back when it replays.
+// The replay recorder's buffer (our name; 0x15260 bytes, made by REPLAY_InitModule at the start of a
+// round): what REPLAY_Save saves before a shot besides gReplayData, put back when it replays.
 typedef struct ReplayBuffer {
     SaveProfile profile;        // 0x00000  the player's save profile
     SaveRecords records;        // 0x10600  the session's record tables
     s32  aQueueCount[12];       // 0x1522C  the UI queues' counts, lbl_802822B8 down to lbl_80282288
                                 //          (GameUI.c; lbl_802822A4 is not kept)
-    u8   b1525C;                // 0x1525C  set by fn_8006C5E0, cleared by fn_8006C608 (not in a replay)
+    u8   b1525C;                // 0x1525C  set by REPLAY_RecordStart, cleared by REPLAY_RecordStop (not in a replay)
     u8   unk1525D[3];
 } ReplayBuffer;
 LAYOUT_ASSERT(ReplayBuffer, 0x15260);
@@ -68,14 +68,14 @@ extern void*       lbl_80281E60;        // }   and CA_spCreateCamera when a game
 extern u8*   lbl_802811E8;              // [1]: a hole load is asked for (fn_8006F4B4)
 
 // Replay.c
-void fn_8006BED4(void);                 // make the replay buffer
-void fn_8006BF20(void);                 // free it
-void fn_8006BF4C(void);                 // in-flight replays off (gReplayData.bF10)
-void fn_8006C28C(int nPlayer, int nController);
-void fn_8006C2A8(int nPlayer, f32 fForwardSpin, f32 fSideSpin);
-void fn_8006C2C8(int nPlayer, f32* pForwardSpin, f32* pSideSpin);
-void fn_8006C5E0(void);
-void fn_8006C608(void);
+void REPLAY_InitModule(void);                 // make the replay buffer
+void REPLAY_CloseModule(void);                 // free it
+void REPLAY_Init(void);                 // in-flight replays off (gReplayData.bF10)
+void REPLAY_ResetController(int nPlayer, int nController);
+void REPLAY_SaveSpin(int nPlayer, f32 fForwardSpin, f32 fSideSpin);
+void REPLAY_GetSpin(int nPlayer, f32* pForwardSpin, f32* pSideSpin);
+void REPLAY_RecordStart(void);
+void REPLAY_RecordStop(void);
 
 int  Game_GetCourse(void);              // 0x80008830
 int  Game_CurHoleIndex(void);           // 0..17 in the round (Golfer.c)
@@ -239,7 +239,7 @@ s32  fn_8008AB4C(void);                 // GameUICommands.c
 int  fn_800E184C(int nPlayer, u8 bCurrent);        // GameRound.c
 s32  fn_800E81A0(int nPlayer);          // GameModeBattle.c
 s32  fn_800BCCCC(int nPlayer);          // SitDevFile.c: gpGame->pfn208
-s32  fn_800BCCF8(int nPlayer);          // SitDevFile.c: strokes behind the leader (gpGame->pfn200)
+s32  fn_800BCCF8(int nPlayer);          // SitDevFile.c: gpGame->pfn200's answer (TW06: GetCurrentLead)
 u8   fn_800BCD50(void);                 // SitDevFile.c: gpGame->bD4
 void CalDate_GetMDY(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
 void CalDate_SetMDY(u16* pDate, s32 nMonth, s32 nDay, u32 nYear);    // make a date
@@ -571,7 +571,7 @@ void fn_800F39F4(void);                 // mode 15
 void fn_800F4B40(void);                 // mode 16
 void fn_800F5AAC(void);                 // mode 17
 void fn_800F6A60(void);                 // mode 13
-void fn_800F80FC(void);                 // mode 2
+void GameModeSkins_Init(void);                 // mode 2
 void fn_800F944C(void);                 // mode 6
 void fn_800F9610(void);                 // mode 7
 void fn_800F986C(void);                 // mode 8

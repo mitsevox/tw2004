@@ -199,7 +199,7 @@ void fn_800E0B38(int nMode) {
         GameModeMatch_Init();
         break;
     case 2:
-        fn_800F80FC();
+        GameModeSkins_Init();
         break;
     case 4:
         GameMode4_Init();
@@ -940,7 +940,7 @@ void fn_800E299C(void) {
     int         i;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         gPlayers[i].ball.nLie = 0;
-        fn_80055AA8(&gPlayers[i].ball, &pCourse->tee[gSession.nTeeSet[i]].x, i);
+        Physics_InitBall(&gPlayers[i].ball, &pCourse->tee[gSession.nTeeSet[i]].x, i);
         Mem_cpy(&gPlayers[i].ballBefore, &gPlayers[i].ball, sizeof(Ball));
         Vec_Copy(&pCourse->tee[gSession.nTeeSet[i]].x, gPlayers[i].vBall);
         Vec_Copy(&pCourse->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);

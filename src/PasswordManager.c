@@ -19,7 +19,7 @@ char* lbl_80188024[16] = {
 };
 
 // Bit n of lbl_801D5948: the cheat that sets it has been entered.
-u8 fn_80056480(int n) {
+u8 PasswordManager_IsPasswordEntered(int n) {
     return fn_8001E9CC(lbl_801D5948, n);
 }
 
@@ -295,7 +295,7 @@ void fn_80057438(SaveProfile* pProfile) {
 
     pProfile->n64 = 0;
     pProfile->n68 = 0;
-    if (fn_80056480(0)) {
+    if (PasswordManager_IsPasswordEntered(0)) {
         pProfile->n6C = 1000000000;
     } else {
         pProfile->n6C = lbl_801D7148.n1C + 25000;

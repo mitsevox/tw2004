@@ -16,10 +16,10 @@ void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen);    // returns pDst
 void* fn_80005884(void* pDst, const void* pSrc, u32 uLen); // a copy the ranges may overlap in
 void* fn_80005AE8(void* pDst, int nValue, u32 uLen);      // memset; returns pDst
 int   fn_80005BC8(const void* pA, const void* pB, u32 uLen);   // memcmp
-// Allocates from the static heap (StaticMemory.c); nMode picks where (see there).
+// Allocates (StaticMemory.c): nMode picks the system heap or a part of the static heap (see there).
 void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine);
 void  fn_80009E70(void* p);             // free
-void  fn_8000A0AC(s32 v);               // } a value callers pass on as fn_80009B34's uFlags
+void  fn_8000A0AC(s32 v);               // } a value TibExtMemAlloc passes on as fn_80009B34's nMode
 s32   fn_8000A0B4(void);                // } (EASportsBio.c sets 0 while the Bio starts, then 2)
 void  fn_8000A0BC(void);                // start a new count of the bytes taken
 void  fn_8000A0C8(void);                // } counting on / off
@@ -55,7 +55,7 @@ typedef struct ProfWatch {
 LAYOUT_ASSERT(ProfWatch, 0x18);
 
 typedef struct ProfClock {
-    ProfTime tStart;            // 0x00  when fn_800952D8 set it up
+    ProfTime tStart;            // 0x00  when TI_vInitModule set it up
     ProfTime tNow;              // 0x08  the last reading
     ProfWatch aWatches[5];      // 0x10
 } ProfClock;
@@ -72,14 +72,14 @@ typedef struct ParticleBuffers {
 extern ParticleBuffers* lbl_802813A8;
 
 u32  fn_8000B3E8(void);                 // the tick (urandom.c)
-void fn_800952D8(void);                 // set up, every watch reset and stopped
-u64  fn_80095368(void);                 // the clock, since the set-up
-void fn_800953C8(int nWatch);           // start
-u8   fn_80095430(int nWatch);           // running?
-u64  fn_80095444(int nWatch);           // stop; returns the reading
-u64  fn_800954A4(int nWatch);           // the reading
+void TI_vInitModule(void);                 // set up, every watch reset and stopped
+u64  TI_sRead(void);                 // the clock, since the set-up
+void TI_vStartCounter(int nWatch);           // start
+u8   TI_bCounterIsRunning(int nWatch);           // running?
+u64  TI_sStopCounter(int nWatch);           // stop; returns the reading
+u64  TI_sReadCounter(int nWatch);           // the reading
 f32  fn_8006E118(u64 uNow, u64 uLast);  // seconds between two readings (gomainloop.c)
-void fn_80095504(int nWatch);           // reset to 0
+void TI_vResetCounter(int nWatch);           // reset to 0
 // Pack up to 12 characters of pName into a 64-bit code (base 40, table lbl_80191520).
 int   fn_800CB700(u64* pId, const char* pName);
 // And back: the 12 characters a code was made from (table lbl_80191720); szName takes 13 bytes.
@@ -104,9 +104,9 @@ typedef struct UMemPool {
 LAYOUT_ASSERT(UMemPool, 0x10);
 
 UMemPool* UMemPool_Create(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign);   // create
-void  UMemPool_Destroy(UMemPool* pPool);                     // destroy
-void* UMemPool_Alloc(UMemPool* pPool);                     // take a node (NULL when none is free)
-void  UMemPool_Free(UMemPool* pPool, void* pNode);        // give a node back
+void  DeleteMemPool(UMemPool* pPool);                     // destroy
+void* AllocPoolMem(UMemPool* pPool);                     // take a node (NULL when none is free)
+void  ReturnPoolMem(UMemPool* pPool, void* pNode);        // give a node back
 // Sorts nCount items of nSize bytes with pfnCompare (MSL, 0x8015929C).
 void  qsort(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const void* pA, const void* pB));
 
@@ -332,7 +332,7 @@ extern LoadObjInfo lbl_801A25F0;
 extern u8* lbl_80281C04;                // the 'load' object's data (147700 bytes)
 extern struct UStreamObject* lbl_80281C0C;   // LoadData.c: a copy of the 'txf2' object with id 10000
 
-void fn_80014544(int n);                // load the numbered stream file (sprintf'd name)
+void fn_80014544(int n);                // add loading file n to stream list 2 (sprintf'd name)
 void fn_800147A4(void);                 // streammanagerhole.c
 void fn_80014DFC(s32 nChar, s32 nUnused);   // streammanagerhole.c: stream list 3 = one FEChars file
 // streammanagerhole.c: a flag byte fn_8001618C sets; while it is set, the shader objects' untextured
@@ -734,7 +734,7 @@ struct ShaderObject {
 };
 LAYOUT_ASSERT(ShaderObject, 0x28);
 
-void fn_80036100(ShaderObject* pObj, const void* pData, int n);    // Skin.c: hands it a frame's data
+void fn_80036100(ShaderObject* pObj, const void* pData, int n);    // Skin.c: hands it data through its fill hook
 
 struct UObjMeshPart;
 struct UObjArraySet;
@@ -1070,8 +1070,8 @@ void fn_8000B830(UStreamObject* pObject);   // free an object
 // Files on disc: a handle from open, -1 for none.
 int  fn_800060E0(const char* pName);    // file open
 int  fn_8000633C(int hFile);            // file close
-// Reads uLen bytes at uOffset into pDst without waiting; pfnDone is called when it is done. Below
-// 0: the read could not be queued.
+// Reads uLen bytes at uOffset into pDst without waiting; pfnDone is called when it is done.
+// Returns 0, even when no request was free and the read was dropped.
 int  fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError));
 u32  fn_800065B0(int hFile);            // file size
 // LLFileIO_Gc.c: read a whole file into a new block aligned to nAlign; its size goes to *puSize.
@@ -1128,7 +1128,7 @@ typedef struct UFontContext {
     char* szText;                 // 0xD4  a queued string's copy of its text
 } UFontContext;                   // 0xD8
 
-UFontContext* UFont_GetContext(void);        // UFont.c: the current text settings
+UFontContext* FO_spGetCurrentPacket(void);        // UFont.c: the current text settings
 void UFont_DrawString(char* sz, f32 x, f32 y);       // UFont.c: draw a string
 void UFont_PackColor(const f32* pColor, u8* pOut);       // UFont.c: pack an RGBA colour into pOut
 void fn_8006A9AC(f32* pColor);                  // target.c: draw text in this colour
@@ -1395,11 +1395,11 @@ u8   fn_8004560C(void);
 typedef void (*EventHandler)(int nPlayer, int nEvent, void* pData, int nArg);   // event.c's table
 void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int b);   // through the event table at
                                         // lbl_80188628; pData: the ball, a position, or NULL
-void fn_800689D4(int nPlayer);
+void TARGET_SetupTarget(int nPlayer);
 u8   fn_80068AC8(int nPlayer);
-void fn_80069330(int nPlayer, f32* pPos);
+void PlaceBall_Set(int nPlayer, f32* pPos);
 u8   PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed);   // 0 when the cursor was stopped
-void fn_8006A6C4(int nPlayer);
+void PlaceBall_SetupTarget(int nPlayer);
 int  fn_8006AA9C(int nPlayer);          // how the shot turned out (5: nothing to react to)
 void fn_8006AAB4(int nPlayer, int a);
 void fn_8006ACE0(int nPlayer, int nResult);
@@ -1407,9 +1407,9 @@ void fn_8006ACF8(int nPlayer, int a);
 void Emotion_UpdatePlayerEmotion(int nPlayer);
 void fn_8006B2C4(int nPlayer, u8 bBefore);   // the shot's outcome from the ball (bBefore: ballBefore)
 void fn_8006BAA8(int nPlayer);
-void fn_8006BF60(int nPlayer);          // the replay recorder
+void REPLAY_Save(int nPlayer);          // the replay recorder
 void REPLAY_Play(int nPlayer);
-void fn_8006C4A0(void);                 // clears gSession.bReplay: a saved replay's playback ends
+void REPLAY_Stop(void);                 // clears gSession.bReplay: a saved replay's playback ends
 void fn_8006F4B4(void);
 void fn_8009B970(int nView);
 void fn_8009EF98(void);

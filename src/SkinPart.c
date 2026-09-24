@@ -499,8 +499,8 @@ u64 fn_800CD388(Skin* pSkin, int nSet, int nVariant) {
     return pDesc->p7C[nVariant + pSet->n10].uId;
 }
 
-// Allocates the four copies of the skin's choices: parts with nothing picked, sets on their
-// "Defaults" variant (or the first) and their first option (-1 when a variant has none).
+// Allocates the four copies of the skin's choices: parts zeroed (variant 0, option 0), sets on
+// their "Defaults" variant (or the first) and option 0 (-1 when the set's first variant has none).
 void fn_800CD404(Skin* pSkin) {
     int j;
     int i;
@@ -794,7 +794,8 @@ s32 fn_800CDD5C(Skin* pSkin, int nSet, const char* pName) {
     return fn_800CDCE0(pSkin, nSet, uId);
 }
 
-// The set variant's option with this name code, or -1.
+// The set variant's option with this name code, or -1 (0 when the set or the variant is out of
+// range).
 s32 fn_800CDDB0(Skin* pSkin, int nSet, int nVariant, u64 uId) {
     SkinDesc* pDesc;
     SkinDesc74* pSet;

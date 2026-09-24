@@ -18,7 +18,7 @@ void  fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);
 s8    fn_80096338(void);
 s32   fn_800962F8(Character* pChar);
 s32   fn_80096508(void);
-int   fn_80096530(Character* pChar);
+int   CharacterState_UpdateGameEmotionState(Character* pChar);
 f32   fn_800971B8(Character* pChar);
 u8    fn_8001EC48(Character* pChar);                        // char.c
 void  Character_PlaceFeetOnGround(Character* pChar);        // char.c
@@ -52,7 +52,7 @@ void fn_800957FC(Character* pChar, u8 bReset) {
         fn_800725BC(pNode, fn_80072ACC, 0.5f);
     }
     if (gSession.nGameType == 3 && pChar->p17AC != NULL) {
-        fn_8010E4DC(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, fn_80077ACC()->choices.a9B4,
+        CharSlider_UpdateCharacterBasedOnSliderValues(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, fn_80077ACC()->choices.a9B4,
                     &pChar->node3E0);
     }
 }
@@ -279,7 +279,7 @@ void fn_80095FD0(Character* pChar, MtaLib* pLib, u8 bReset, int nGroup, SKABlend
     fn_800958EC(&pChar->anim29C, nAnim, fTime);
     pChar->p178C = pLib;
     if (gSession.nGameType == 3 && pChar->p17AC != NULL) {
-        fn_8010E4DC(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, fn_80077ACC()->choices.a9B4,
+        CharSlider_UpdateCharacterBasedOnSliderValues(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, fn_80077ACC()->choices.a9B4,
                     &pChar->node3E0);
     }
 }
@@ -320,7 +320,7 @@ u8 fn_8009637C(Character* pChar) {
 // The idle update, in game type 6 with n20 at 5: count n24 down, then n25; when n25 runs out, play
 // an animation group 4 clip (state 4, n26 set) if the library has one that is not flagged, else
 // start the wait over. The result is the state to go to.
-s32 fn_80096398(Character* pChar) {
+s32 CharacterState_UpdateFidgetState(Character* pChar) {
     s32 nState;
     u32 uFlags;
     s32 nCount;
@@ -380,7 +380,7 @@ s32 fn_80096508(void) {
 }
 
 // TW06: CharacterState_UpdateGameEmotionState. The animation style from how the shot turned out.
-int fn_80096530(Character* pChar) {
+int CharacterState_UpdateGameEmotionState(Character* pChar) {
     int aStyle[10] = {5, 6, 7, 2, 1, 0, 3, 4, 5, 2};
     int nResult    = fn_8006AA9C(pChar->nPlayer);
     fn_8001C7FC(pChar, aStyle[nResult]);
@@ -515,7 +515,7 @@ void CharacterState_UpdateSKAState(Character* pChar) {
                 bReset = 1;
                 break;
             }
-            nGroup = fn_80096398(pChar);
+            nGroup = CharacterState_UpdateFidgetState(pChar);
         }
         CharacterState_AddSKABlendData(pChar, bReset, nGroup, fn_80072ACC, 1, 5, -20000.0f, -30000.0f,
                                        -10000.0f, fOffset, -10000.0f);
@@ -601,7 +601,7 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         break;
     case 9:
         bOther = 0;
-        nResult = fn_80096530(pChar);
+        nResult = CharacterState_UpdateGameEmotionState(pChar);
         switch (nResult) {
         case 8:
         case 9:
@@ -638,7 +638,7 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         bTransition = 1;
         break;
     case 12:
-        fn_80096530(pChar);
+        CharacterState_UpdateGameEmotionState(pChar);
         CharacterState_AddSKABlendData(pChar, 1, 6, fn_80072ACC, 1, 0, -10000.0f, -30000.0f, -10000.0f, 0.0f,
                                        -10000.0f);
         break;

@@ -14,8 +14,8 @@ void fn_800A874C(s32 n);
 void fn_800A87B4(u8 a, u8 n);
 void fn_800A8F68(u8 b);
 void fn_800A8700(u8 n);
-void fn_800A8708(u8 nCurve, f32 fVolume);
-void fn_800A871C(u8 nCurves, f32* pVolumes);
+void Mas_SetSubmixChan(u8 nCurve, f32 fVolume);
+void Mas_SetSubmixAll(u8 nCurves, f32* pVolumes);
 
 // hlaudemitter.c
 void fn_800AD698(u8 nId, u8 nTrack, u8 bOn);
@@ -172,7 +172,7 @@ u8   fn_800A8754(void);
 u8   fn_800A8824(void);
 u8   fn_800A8D2C(void);
 void fn_800A8D88(void);
-u8   fn_800A8DC8(u8 a, u8 b, u8 nListeners);
+u8   Ses_Init(u8 a, u8 b, u8 nListeners);
 void Mov_Init(void);
 void Mov_Exit(void);
 void Mov_Start(void);
@@ -241,11 +241,11 @@ void fn_800A3F94(u8 n) {
 }
 
 void fn_800A3FB4(u8 nCurve, f32 fVolume) {
-    fn_800A8708(nCurve, fVolume);
+    Mas_SetSubmixChan(nCurve, fVolume);
 }
 
 void fn_800A3FD4(u8 nCurves, f32* pVolumes) {
-    fn_800A871C(nCurves, pVolumes);
+    Mas_SetSubmixAll(nCurves, pVolumes);
 }
 
 u8 fn_800A3FF4(void) {
@@ -1047,7 +1047,7 @@ void fn_800A5980(u8 nPlayer) {
         lbl_8028202F = 0;
     }
     lbl_80282033 = 1;
-    pView->tLast = fn_800954A4(1);
+    pView->tLast = TI_sReadCounter(1);
 }
 
 // The ball's impact sound, by the surface it hit (its nSoundId) and scaled by its speed; on
@@ -1065,7 +1065,7 @@ void fn_800A5CA4(u8 nPlayer) {
     pPlayer = &gPlayers[nPlayer];
     pSurface = pPlayer->ball.pHitSurface;
     pView = &lbl_801F1790[pPlayer->nView[0]];
-    tNow = fn_800954A4(1);
+    tNow = TI_sReadCounter(1);
     fElapsed = fn_8006E118(tNow, pView->tLast);
     pView->tLast = tNow;
     if ((pPlayer->ball.nCollideCount == 0
@@ -1785,8 +1785,8 @@ void fn_800A7A14(u8 nSound) {
 s32 fn_800A7A34(u8 a, u8 b, u8 nListeners, int nUnused) {
     fn_800AD0C4();
     fn_800A402C(nListeners);
-    // port: EA passes an argument fn_800A8DC8 ignores
-    ((u8 (*)(u8, u8, u8, int))fn_800A8DC8)(a, b, nListeners, 0);
+    // port: EA passes an argument Ses_Init ignores
+    ((u8 (*)(u8, u8, u8, int))Ses_Init)(a, b, nListeners, 0);
     return 1;
 }
 

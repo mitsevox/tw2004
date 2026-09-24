@@ -149,8 +149,8 @@ void fn_800A79F4(void);
 // the renderer
 void fn_80008380(void);
 void fn_800083A0(void);
-void UFont_SetMode(s32 v);
-s32  UFont_GetMode(void);
+void FO_vSetCurrentAddMode(s32 v);
+s32  FO_eGetCurrentAddMode(void);
 void fn_80012B2C(f32 x0, f32 x1);
 void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
@@ -332,7 +332,7 @@ void fn_80075A14_Start(Video* pVideo) {
 
 // The next frame is timed from now.
 void fn_80075A98_SetLastFrameTime(Video* pVideo) {
-    pVideo->tLast = fn_800954A4(0);
+    pVideo->tLast = TI_sReadCounter(0);
 }
 
 // Runs every movie once: each one whose next frame is due decodes it into its picture; one whose
@@ -364,7 +364,7 @@ void fn_80075AD0_UpdateAll(void) {
 
 // The movie's next frame is due.
 u8 fn_80075BF4_IsFrameDue(Video* pVideo) {
-    if (fn_8006E118(fn_800954A4(0), pVideo->tLast) < pVideo->fFrameTime) {
+    if (fn_8006E118(TI_sReadCounter(0), pVideo->tLast) < pVideo->fFrameTime) {
         return 0;
     }
     return 1;
@@ -390,8 +390,8 @@ void fn_80075C88(void) {
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
     fn_80014194(NULL);
-    lbl_80281200->n20 = UFont_GetMode();
-    UFont_SetMode(1);
+    lbl_80281200->n20 = FO_eGetCurrentAddMode();
+    FO_vSetCurrentAddMode(1);
     fn_80012B2C(1.0f, 1.0f);
     fn_80076128(10);
 }
@@ -401,7 +401,7 @@ void fn_80075D58(void) {
     fn_80008380();
     fn_80006EDC();
     fn_80012B2C(1.0f, 1.0f);
-    UFont_SetMode(lbl_80281200->n20);
+    FO_vSetCurrentAddMode(lbl_80281200->n20);
     fn_80012F34(1);
     fn_80012F50(0, 6, 0x80);
     fn_80012F18(3);
@@ -426,7 +426,7 @@ void fn_80075DEC_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nAr
     fn_80075C48();
     fn_80075C88();
     fn_80075A14_Start(pVideo);
-    tFrame = fn_800954A4(0);
+    tFrame = TI_sReadCounter(0);
     nLastFrame = -1;
     bFirst = 1;
     bDone = 0;
@@ -460,11 +460,11 @@ void fn_80075DEC_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nAr
         fn_800760D8(&pVideo->pict);
         fn_80012EF8();
         fn_8001644C(0xA1, xy, 0, uv, 2);
-        while (fn_8006E118(fn_800954A4(0), tFrame) < 1.0f / 33.0f) {
+        while (fn_8006E118(TI_sReadCounter(0), tFrame) < 1.0f / 33.0f) {
         }
         fn_80006FE8();
         VIWaitForRetrace();
-        tFrame = fn_800954A4(0);
+        tFrame = TI_sReadCounter(0);
         fn_800083A0();
         fn_80008380();
     } while (!bDone);
@@ -549,7 +549,7 @@ void fn_800760F4(f32* pUV, LLPict* pPict) {
 
 void fn_80076128(s32 p0) {
     UFontContext* pCtx;
-    pCtx = UFont_GetContext();
+    pCtx = FO_spGetCurrentPacket();
     pCtx->nA4 = p0;
 }
 

@@ -125,8 +125,8 @@ void fn_800E5240(int i) {
         }
         fn_800E3B04();
         if (gSession.nPaused == 2) {
-            if (!fn_80095430(1)) {
-                fn_800953C8(1);
+            if (!TI_bCounterIsRunning(1)) {
+                TI_vStartCounter(1);
             }
             lbl_802822DF = 0;
             fn_800DC9D4(0);

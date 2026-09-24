@@ -1,5 +1,5 @@
 // GoShaderObjectContainer_OBFData_Gc.c (EA's name, from its asserts; also in EA's 2002 source
-// tree): partly decompiled; the sweep code below is the matched small functions.
+// tree): the sweep code below is the matched small functions.
 
 #include "game.h"
 #include "ball.h"
@@ -149,7 +149,9 @@ void fn_8006FB10(void) {
     }
 }
 
-// Undoes fn_8006FB10: keeps the flags in u04, stops the effects and clears bits 0, 1, 2 and 4.
+// Ends fn_8006FB10's flags: keeps them in u04; bit 1 stops effects 0, 2 and 1 and calls
+// fn_80055C24 with 2, bit 4 stops effect 3; clears bits 0, 1, 2 and 4 (bit 0's fn_800B24E0 call
+// is not undone).
 void fn_8006FBF8(void) {
     lbl_802811F0->b1C = 0;
     lbl_802811F0->u04 = lbl_802811F0->uFlags;

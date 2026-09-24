@@ -136,7 +136,7 @@ void fn_80046264(void) {
 
 // Makes the models of the 'TEO ' objects that are loaded, puts the flag (character 100) at the
 // pin, and resets the tuning values and the per-player objects.
-void fn_80046288(void) {
+void DynObj_InitForHole(void) {
     int i;
     int nId;
     Character* pFlag;
@@ -280,7 +280,7 @@ void fn_80046828(int nView) {
 }
 
 // 0 in game mode 21 while the player is in state 19 and the partner is not.
-u8 fn_800468B4(int nPlayer) {
+u8 DynObj_bAltShotDrawBall(int nPlayer) {
     if (Game_GetMode() == 21 && (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 19 &&
         (s8)GOLFERSTATE_GetCurrentState(lbl_80187D38[nPlayer]) != 19) {
         return 0;
@@ -307,7 +307,7 @@ u8 fn_80046928(int nPlayer) {
     if ((nLie == 0 || nLie == 12 || nLie == 9) && (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 19) {
         return 0;
     }
-    if (!fn_800468B4(nPlayer)) {
+    if (!DynObj_bAltShotDrawBall(nPlayer)) {
         return 0;
     }
     if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 18 && nPlayer == fn_800636EC()) {
@@ -323,7 +323,7 @@ u8 fn_80046A54(int nPlayer) {
     if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 18 && fn_80048574(gPlayers[nPlayer].pChar, 4)) {
         return 0;
     }
-    if (!fn_800468B4(nPlayer)) {
+    if (!DynObj_bAltShotDrawBall(nPlayer)) {
         return 0;
     }
     return 1;
@@ -331,7 +331,7 @@ u8 fn_80046A54(int nPlayer) {
 
 u8 fn_80046B1C(int nPlayer) {
     if (gPlayers[nPlayer].ball.nLie == 9 &&(s8)GOLFERSTATE_GetCurrentState(nPlayer) == 19 &&
-        fn_800468B4(nPlayer)) {
+        DynObj_bAltShotDrawBall(nPlayer)) {
         return 1;
     }
     return 0;
@@ -862,7 +862,7 @@ void fn_80047C24(int nPlayer) {
 
 // Puts the player's 'TEO ' 10004 object at pPos (raised by fAAC), the first time making it (a type
 // 0 object with no flags); after that its turn angles wind back to 0 (at once with bReset).
-void fn_80047EF0(f32* pPos, int nPlayer, u8 bReset) {
+void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
     DynObjDef def;
     DynObjSetup setup;
     DynObjModel model;
@@ -938,7 +938,7 @@ void fn_8004816C(int nPlayer) {
     lbl_80281DA0->aA[nPlayer].b70 = 1;
 }
 
-// Flies the player's 'TEO ' 10004 object (fn_80047EF0) once fn_8004816C launched it: a random
+// Flies the player's 'TEO ' 10004 object (DynObj_TeeAdd) once fn_8004816C launched it: a random
 // heading, speed and spin, then its velocity, the wind and gravity until it lands. Until then it
 // stays where it was put.
 void fn_80048184(int nPlayer) {

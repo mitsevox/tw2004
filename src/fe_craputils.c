@@ -37,7 +37,7 @@ void fn_80057FBC(SaveProfile* pProfile) {
     s32 nAssets;
     s32 i;
 
-    if (fn_80105C30()) {
+    if (FE_CrAP_IsCrAPDBLoaded()) {
         nOffered = fn_80103BB4();
         nAssets = fn_80105C00();
         for (i = 0; i < nAssets; i++) {

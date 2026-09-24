@@ -140,7 +140,7 @@ int fn_800CB950(CourseInfo* pCourse, f32* pA, f32* pB, f32* pC, f32* pD, TerPoly
 // The supporting ground triangle under a point: the highest one at or below it. Its height
 // there, the grid cell, the strip, the triangle's vertices and its number in the strip;
 // TER_NO_GROUND when there is none. The strips that count are those of fn_8004C8E0.
-f32 fn_800CBEE0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
+f32 Ter_GetSupportingGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
                 s32* pTri) {
     u32 uPinSet = 1 << Game_CurrentPinSet();
     f32 fBest = TER_NO_GROUND;
@@ -200,13 +200,13 @@ f32 fn_800CBEE0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** p
 }
 
 // The surface type under a point (its supporting triangle's), NULL when there is no ground.
-SurfaceType* fn_800CC190(CourseInfo* pCourse, f32* pPos) {
+SurfaceType* Ter_GetSupportingGroundMaterial(CourseInfo* pCourse, f32* pPos) {
     TerCell* pCell;
     TerPolyRef* pRef;
     f32 (*pTri)[3];
     s32 nTri;
 
-    if (fn_800CBEE0(pCourse, pPos, &pCell, &pRef, &pTri, &nTri) != TER_NO_GROUND) {
+    if (Ter_GetSupportingGroundTriangle(pCourse, pPos, &pCell, &pRef, &pTri, &nTri) != TER_NO_GROUND) {
         return &gSurfaceTypes[pRef->nSurface];
     }
     return NULL;

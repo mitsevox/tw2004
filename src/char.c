@@ -91,7 +91,7 @@ void  fn_8001EDA8(Character* pChar, int nBone, f32* pPos);
 void  fn_8001EF54(f32* pA, f32* pB, f32* pOut);
 void  fn_8001EF10(f32* pA, f32* pB, f32* pOut);
 void  fn_80095558(void);
-void  AnimLib_ApplyOverlays(int nSlot);                         // skalib.c
+void  fn_800253E0_ApplySavedChoices(int nSlot);                         // skalib.c
 void  fn_80025478(void);                                        // skalib.c
 void  fn_800CA7E0(void);                                        // AnimStream.c
 void  fn_800CABA0(void);                                        // AnimStream.c
@@ -100,13 +100,13 @@ void  fn_8001DD18(u8* pData, int nBytes);
 void  fn_8001DEC8(u8* pData, int nBytes);
 s32   fn_800CE8C0(Skin** apSkins, int nSkins, SkinListEntry** ppList);   // SkinPart.c
 void  fn_800CEEBC(void);                                        // SkinPart.c: empty
-void  fn_800100B0(TexBank* pBank, TexEntry* p8, TexPalette* pC, void* p10, void* p14, s16 nNumTex,
-                  s16 nNumPalettes);                            // LLTex.c
+void  fn_800100B0(TexBank* pBank, TexEntry* p8, TexPalette* pC, void* p10, void* p14, int nNumTex,
+                  int nNumPalettes);                            // LLTex.c
 void  fn_8001EFD8(f32* pA, f32* pB, f32* pOut);
 f32 (*fn_8001EC6C(Character* pChar, int nBone))[4];
 f32 (*fn_8001ECA8(Character* pChar, int nBone))[4];
 f32   fn_8001EFFC(CamLens* pLens);
-void  fn_80027738(u8 bOn);
+void  SKEL_EnableIK(u8 bOn);
 void  fn_80035C58(void);
 void  fn_80035CC0(void);
 void  fn_80036460(int n);
@@ -431,7 +431,7 @@ void fn_80017DDC(Character* pChar) {
                 fLength = (fHead - fUnder * vNormal[1] / fDot) / fHead;
                 if (fLength > 0.75f) {
                     fn_8001EF34(pMtx[1], fLength, pMtx[1]);
-                    fn_80029A90(pChar->pModel, pMtx, 0x52);
+                    SKEL_UpdateSkinningMatrix(pChar->pModel, pMtx, 0x52);
                 }
             }
         }
@@ -655,7 +655,7 @@ void fn_80018710(Character* pChar) {
         if (pChar->pSkin->pModel != NULL) {
             fn_80037AB8(pChar->pSkin, pChar->pModel, 0, 0);
             fn_80029A74(pChar->pModel, pChar->pSkin->pModel->p34);
-            fn_80029A88(pChar->pModel, pChar->pSkin->p1088);
+            SKEL_SetDefaultWorld2BoneMatrices(pChar->pModel, pChar->pSkin->p1088);
             fn_80029A7C(pChar->pModel, pChar->pSkin->p108C, pChar->pSkin->pModel->n14);
         }
     }
@@ -799,15 +799,16 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     f32 fThigh;
     f32 fShin;
     f32 fDrop;
-    f32 fDen;
     f32 fSq;
     f32 fCos;
     f32 fAngleA;
     f32 fAngleB;
     f32 fTurn;
+    f32 fTurn2;
+    f32 fTurn3;
+    f32 fDen;
     f32 fDropA;
     f32 fLen;
-    f32 fScale;
     Skeleton* pSkel;
     Bone* pBone;
 
@@ -885,10 +886,10 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     }
 
     // the hip: turned by the change in the angle between the thigh and the hip-to-foot line
-    fTurn = fn_8000965C(fShin * fn_800095F0(fAngleA) / fReach) -
-            fn_8000965C(fShin * fn_800095F0(fAngleB) / fLeg);
-    if (fabsf(fTurn) > 0.0001f) {
-        fn_8001EF34(vNormal, fTurn, vAxis);
+    fTurn2 = fn_8000965C(fShin * fn_800095F0(fAngleA) / fReach);
+    fTurn2 -= fn_8000965C(fShin * fn_800095F0(fAngleB) / fLeg);
+    if (fabsf(fTurn2) > 0.0001f) {
+        fn_8001EF34(vNormal, fTurn2, vAxis);
         vAxis[3] = 0.0f;
         Quat_BuildFromVector(vAxis, qTurn);
         Quat_Invert(pChar->pModel->pPoses[nBoneA].q0, qA8);
@@ -912,13 +913,13 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     if (fLen < 0.01f) {
         return;
     }
-    fScale = 1.0f / fLen;
-    vAxis[0] *= fScale;
-    vAxis[2] *= fScale;
+    vAxis[0] *= 1.0f / fLen;
+    vAxis[2] *= 1.0f / fLen;
     fCos = vSlope[1];
-    fTurn = fn_80009614((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos)) * fDrop;
-    if (fabsf(fTurn) > 0.0001f) {
-        fn_8001EF34(vAxis, fTurn, vAxis);
+    fTurn3 = fn_80009614((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
+    fTurn3 *= fDrop;
+    if (fabsf(fTurn3) > 0.0001f) {
+        fn_8001EF34(vAxis, fTurn3, vAxis);
         Quat_Multiply(q48, q68, q38);
         Quat_Invert(q38, q28);
         vAxis[3] = 0.0f;
@@ -1123,10 +1124,10 @@ void fn_80019798(Character* pChar, Skin** apSkins, int nSkins) {
     nExtra = 0;
     pList = NULL;
     pData = pChar->p4C;
-    fn_80076158(&pData, (u8*)&nTexBytes, 4, 4);
-    fn_80076158(&pData, (u8*)&nPalBytes, 4, 4);
-    fn_80076158(&pData, (u8*)&pChar->n58, 4, 4);
-    fn_80076158(&pData, (u8*)&pChar->n5C, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&nTexBytes, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&nPalBytes, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&pChar->n58, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&pChar->n5C, 4, 4);
     if (nTexBytes != 0) {
         pTexData = (TexEntry*)pData;
         fn_8001DD18(pData, nTexBytes);
@@ -1518,7 +1519,7 @@ void fn_8001A73C(void) {
 
 // The 'SAC ' handler: an animation library merged over the one of the slot the object's id names.
 // port: the overlay library is little-endian on disc and AnimLib_MergeOverlay swaps it
-//       (fn_80020BC8 > fn_80076158): a little-endian port does not swap there.
+//       (fn_80020BC8 > BYTESWAP_SWAPDATA): a little-endian port does not swap there.
 void fn_8001A75C(UStreamObject* pObject) {
     AnimLib_MergeOverlay(pObject->pData, pObject->uId);
     fn_80009E70(pObject);
@@ -1590,8 +1591,8 @@ void fn_8001A920(void) {
             }
         }
     }
-    AnimLib_ApplyOverlays(0);
-    AnimLib_ApplyOverlays(1);
+    fn_800253E0_ApplySavedChoices(0);
+    fn_800253E0_ApplySavedChoices(1);
     fn_800CA9DC(-1);
     fn_800CA7E0();
     fn_80025478();
@@ -1605,7 +1606,7 @@ void fn_8001A920(void) {
 // skin, the p44 entries, its model (SKEL_LoadFromMem), its own animation library, and its slider
 // definitions; then a golfer's club skins and, with bLook, its look from pChoices. Every value read
 // is followed by 12 bytes it skips.
-// port: the object is little-endian on disc and fn_80076158 swaps each value as it reads it: a
+// port: the object is little-endian on disc and BYTESWAP_SWAPDATA swaps each value as it reads it: a
 //       little-endian port does not swap there.
 Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, SkinChoices* pChoices) {
     int nSize;
@@ -1637,15 +1638,15 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
     }
     pChar->nC = nId;
     pStart = pData;
-    fn_80076158(&pData, (u8*)&pChar->nSlot, 4, 4);
-    fn_80076158(&pData, (u8*)&fSkin, 4, 4);
-    fn_80076158(&pData, (u8*)&nFlag400, 4, 4);
-    fn_80076158(&pData, (u8*)&nModel, 4, 4);
-    fn_80076158(&pData, (u8*)&f134, 4, 4);
-    fn_80076158(&pData, (u8*)&f138, 4, 4);
-    fn_80076158(&pData, (u8*)&f13C, 4, 4);
-    fn_80076158(&pData, (u8*)&f12C, 4, 4);
-    fn_80076158(&pData, (u8*)&f130, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&pChar->nSlot, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&fSkin, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&nFlag400, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&nModel, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&f134, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&f138, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&f13C, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&f12C, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&f130, 4, 4);
     if (gSession.nGameType == 3) {
         ClipBank_Restore(pChar->nSlot);
     }
@@ -1656,7 +1657,7 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
     bGolfer = fn_8001EC48(pChar);
 
     // its skin
-    fn_80076158(&pData, (u8*)&nSize, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&nSize, 4, 4);
     pData += 0xC;
     if (nSize == 0) {
         pChar->pSkin = NULL;
@@ -1671,23 +1672,23 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
     pData += nSize;
 
     // the p44 entries
-    fn_80076158(&pData, (u8*)&pChar->n40, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&pChar->n40, 4, 4);
     pData += 0xC;
     pChar->p44 = fn_80009B34(pChar->n40 * sizeof(CharEntry44), 2, 0x40, "char.c", 0xE04);
     for (i = 0; i < pChar->n40; i++) {
-        fn_80076158(&pData, (u8*)pChar->p44[i].v0, 0xC, 4);
+        BYTESWAP_SWAPDATA(&pData, (u8*)pChar->p44[i].v0, 0xC, 4);
         pChar->p44[i].fC = 1.0f;
-        fn_80076158(&pData, (u8*)&pChar->p44[i].a10[0], 4, 4);
-        fn_80076158(&pData, (u8*)&pChar->p44[i].a10[1], 4, 4);
-        fn_80076158(&pData, (u8*)&pChar->p44[i].a10[2], 4, 4);
-        fn_80076158(&pData, (u8*)&pChar->p44[i].a10[3], 4, 4);
-        fn_80076158(&pData, (u8*)&pChar->p44[i].a10[4], 4, 4);
-        fn_80076158(&pData, (u8*)&pChar->p44[i].a10[5], 4, 4);
+        BYTESWAP_SWAPDATA(&pData, (u8*)&pChar->p44[i].a10[0], 4, 4);
+        BYTESWAP_SWAPDATA(&pData, (u8*)&pChar->p44[i].a10[1], 4, 4);
+        BYTESWAP_SWAPDATA(&pData, (u8*)&pChar->p44[i].a10[2], 4, 4);
+        BYTESWAP_SWAPDATA(&pData, (u8*)&pChar->p44[i].a10[3], 4, 4);
+        BYTESWAP_SWAPDATA(&pData, (u8*)&pChar->p44[i].a10[4], 4, 4);
+        BYTESWAP_SWAPDATA(&pData, (u8*)&pChar->p44[i].a10[5], 4, 4);
         pData += 0xC;
     }
 
     // its model
-    fn_80076158(&pData, (u8*)&nSize, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&nSize, 4, 4);
     pData += 0xC;
     if (bGolfer && gSession.nGameType != 10 && gSession.nGameType != 3) {
         if (gSession.nSplitScreen) {
@@ -1714,15 +1715,15 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
 
     // its own animation library: kept when its clips are its own or in a bank, otherwise merged over
     // its slot's library as an overlay
-    fn_80076158(&pData, (u8*)&bLib, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&bLib, 4, 4);
     pData += 0xC;
     if (bLib != 0) {
-        fn_80076158(&pData, (u8*)&nSize, 4, 4);
+        BYTESWAP_SWAPDATA(&pData, (u8*)&nSize, 4, 4);
         pData += 0xC;
         pPeek = pData + 0x138;
-        fn_80076158(&pPeek, (u8*)&nBank, 4, 4);
+        BYTESWAP_SWAPDATA(&pPeek, (u8*)&nBank, 4, 4);
         pPeek = pData + 0x13C;
-        fn_80076158(&pPeek, (u8*)&uLibFlags, 4, 4);
+        BYTESWAP_SWAPDATA(&pPeek, (u8*)&uLibFlags, 4, 4);
         if (pChar->nSlot == 2 || nBank != 0 || (uLibFlags & 1)) {
             pCopy = fn_80009B34(nSize, 2, 0x40, "char.c", 0xE54);
         } else {
@@ -1801,12 +1802,12 @@ CharSkinSet* fn_8001B208(u8* pData) {
     pSet->apSkins[3] = NULL;
     pSet->apSkins[4] = NULL;
     pSet->apSkins[5] = NULL;
-    fn_80076158(&pData, (u8*)&pSet->nCount, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&pSet->nCount, 4, 4);
     pData += 0xC;
     for (i = 0; i < pSet->nCount; i++) {
-        fn_80076158(&pData, (u8*)&nClass, 4, 4);
-        fn_80076158(&pData, (u8*)&pSet->afC[nClass], 4, 4);
-        fn_80076158(&pData, (u8*)&nSize, 4, 4);
+        BYTESWAP_SWAPDATA(&pData, (u8*)&nClass, 4, 4);
+        BYTESWAP_SWAPDATA(&pData, (u8*)&pSet->afC[nClass], 4, 4);
+        BYTESWAP_SWAPDATA(&pData, (u8*)&nSize, 4, 4);
         pData += 4;
         pSet->apSkins[nClass] = fn_800377FC(pData, 0);
         pSet->a9C[nClass] = fn_80009B34(sizeof(CharSkinRef), 2, 0x40, "char.c", 0xF25);
@@ -2157,7 +2158,7 @@ void fn_8001C0E0(Character* pChar) {
             fn_8001971C(pChar);
         }
         if (pChar->p17AC != NULL) {
-            fn_8010D454(pChar->p17AC);
+            CharSlider_Free(pChar->p17AC);
         }
         fn_80009E70(pChar);
         if (gSession.nGameType == 3) {
@@ -2181,7 +2182,7 @@ void fn_8001C254(void) {
     int n;
     fn_8009555C();
     fn_8001A288();
-    fn_80027738(1);
+    SKEL_EnableIK(1);
     n = 6;
     if (gSession.nSplitScreen) {
         n = 4;
@@ -2207,7 +2208,7 @@ void fn_8001C2E4(void) {
 
 void fn_8001C304(void) {
     fn_8001A288();
-    fn_80027738(0);
+    SKEL_EnableIK(0);
     lbl_80280E20 = 3;
     fn_800CCA1C();
     fn_800CEE88(0);
@@ -2232,7 +2233,7 @@ void fn_8001C37C(void) {
 
     Skalib_Init();
     fn_8001F64C();
-    fn_80029530();
+    SKEL_InitModule();
     fn_80071AD0();
     for (i = 0; i < 2; i++) {
         lbl_80280E24[i] = NULL;
@@ -2268,7 +2269,7 @@ void fn_8001C468(void) {
     lbl_80281CA8 = 0;
     Skalib_Shutdown();
     fn_8001F66C();
-    fn_8002955C();
+    SKEL_CloseModule();
     fn_80071B94();
 }
 
@@ -2647,7 +2648,7 @@ void fn_8001D384(void) {
 
 // The 'SKLO' handler: a character built from the object with no player (1000), keyed by the
 // object's id.
-// port: the skeleton is little-endian on disc and fn_8001A9F4 swaps it (fn_80076158): a
+// port: the skeleton is little-endian on disc and fn_8001A9F4 swaps it (BYTESWAP_SWAPDATA): a
 //       little-endian port does not swap there.
 void fn_8001D3EC(UStreamObject* pObject) {
     Character* pChar = fn_8001C21C(fn_8001A9F4(pObject->pData, 0, 0, pObject->uId, 0, NULL));
@@ -2863,7 +2864,7 @@ u8 fn_8001DBF4(Character* pChar) {
 // model's bEE.
 void fn_8001DC64(Character* pChar, SkinChoices* pChoices) {
     fn_800CC1EC(pChar, pChoices);
-    fn_8010E4DC(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, pChoices->a9B4,
+    CharSlider_UpdateCharacterBasedOnSliderValues(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, pChoices->a9B4,
                 &pChar->node3E0);
     if (gSession.nGameType != 3 || lbl_80281EE0->n0 == 1 || lbl_80281EE0->n0 == 4) {
         if (pChoices->n113 == 0) {
@@ -3396,8 +3397,8 @@ void fn_8001F08C(void** ppSrc, void** ppDst, SwapField* pFormat, int nFields, in
         do {
             pField = pFormat;
             for (i = 0; i < nFields; i++) {
-                // port: *ppSrc is read and advanced as a u8* (fn_80076158's parameter)
-                fn_80076158((u8**)ppSrc, *ppDst, pField->nBytes, pField->nSize);
+                // port: *ppSrc is read and advanced as a u8* (BYTESWAP_SWAPDATA's parameter)
+                BYTESWAP_SWAPDATA((u8**)ppSrc, *ppDst, pField->nBytes, pField->nSize);
                 *ppDst = (u8*)*ppDst + pField->nBytes;
                 pField++;
             }

@@ -54,7 +54,7 @@ void fn_800AA5A0(AudVoice* pVoice, int nReason) {
 
     pTrack = pVoice->pUser;
     nChannel = pVoice->nIndex;
-    fn_800AA400(pVoice, nReason);
+    Trk_VoiceEndCB(pVoice, nReason);
     if (nReason != 1 || !pVoice->flags.b.bA_1) {
         pTrack->u.seq.apEvents[nChannel] = NULL;
     }
@@ -121,7 +121,7 @@ void fn_800AA744(AudSeqEvent* pEvent, AudTrack* pTrack) {
     f32 f;
 
     pTone = fn_800AB384(pTmpl->data.pBank, pEvent->n3);
-    fAttn = fn_800A85FC(pTrack->f48, fn_800AA44C(pTmpl->data.pBank->n3));
+    fAttn = fn_800A85FC(pTrack->f48, Mas_GetSubmix(pTmpl->data.pBank->n3));
     nVolume = fn_800A85FC((f32)(pEvent->n4 << 7), fAttn);
     bLoops = pTone->n10 & 1;
     if (nVolume == 0) return;
@@ -220,7 +220,7 @@ void fn_800AAAA4(AudSeqEvent* pEvent, AudTrack* pTrack) {
         pSource = pTrack->pSource;
         pTarget = pSource->apTracks[n];
         if (pTarget == NULL) {
-            pTarget = fn_800A9BC8(pSource, &pSource->pSound->aTracks[n], n, pTrack->f48);
+            pTarget = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[n], n, pTrack->f48);
         }
     }
     if (pTarget != NULL) {
@@ -254,7 +254,7 @@ void fn_800AAB8C(AudSeqEvent* pEvent, AudTrack* pTrack) {
     nPlayList = pEvent->n4;
     pTarget = pSource->apTracks[n];
     if (pTarget == NULL) {
-        pTarget = fn_800A9BC8(pSource, &pSource->pSound->aTracks[n], n, pTrack->f48);
+        pTarget = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[n], n, pTrack->f48);
     }
     if (pTarget != NULL) {
         Stm_SetPlayList(pTarget, nPlayList);
@@ -273,7 +273,7 @@ void fn_800AAC00(AudSeqEvent* pEvent, AudTrack* pTrack) {
     nStream = pEvent->n4;
     pTarget = pSource->apTracks[n];
     if (pTarget == NULL) {
-        pTarget = fn_800A9BC8(pSource, &pSource->pSound->aTracks[n], n, pTrack->f48);
+        pTarget = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[n], n, pTrack->f48);
     }
     if (pTarget != NULL) {
         Stm_SetStream(pTarget, nStream, 0);

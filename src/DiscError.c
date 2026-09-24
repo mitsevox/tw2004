@@ -333,8 +333,9 @@ void fn_800B7210(s32 nStatus) {
     fn_800B6924();
 }
 
-// Check the drive (and the controllers, for a reset); while it reports a problem, stop the audio
-// and redraw the message every frame. Returns 1 when the screen was shown.
+// Check the drive (and the controllers, for a reset); while it reports a problem, redraw the
+// message every frame, with the audio paused unless the drive reports no disc, the wrong disc or
+// a retry. Returns 1 when the screen was shown.
 u8 fn_800B7490(void) {
     u8 bShown;
     s32 nStatus;

@@ -288,7 +288,7 @@ typedef struct Player {
     f32  fPower;                // 0x37C  0..1 (up to 1.5). TW06: strength
     s32  nShotKind;             // 0x380  0 putt, 2/3 approach, 5..7 recovery. TW06: type (ShotType_t)
     s32  nTrajectory;           // 0x384  from Shot_Trajectory: 0 low, 1 normal, 2 high. TW06 has a float stance here
-    f32  vLaunchA[4];           // 0x388  launch parameter blocks handed to Ball_Launch. TW06: clubDirection (the face)
+    f32  vLaunchA[4];           // 0x388  launch parameter blocks handed to Physics_ShotImpact. TW06: clubDirection (the face)
     f32  vLaunchB[4];           // 0x398  TW06: strokeDirection (the swing path, which carries the shape)
     s32  nShotShape;            // 0x3A8  SHAPE_*: what the aim point (or a lesson) asks the CPU to play. TW06: shape
     u8   bPerfect;              // 0x3AC  no error / no forgiveness when set. TW06: perfect
@@ -395,7 +395,7 @@ typedef struct Player {
     s32  nEE4;                  // 0xEE4  2 or 3 picks a message after a shot (GM_PlayerTookShot)
     u32  uFlags;                // 0xEE8  bit 0: scripted reaction, bit 2: the early reaction has played, bit 3: score display
     f32  fEEC;                  // 0xEEC  distance to the pin when the early reaction started (GM_SimulateBallMovement)
-    u32  uFlagsEF0;             // 0xEF0  0x1: the ball can be placed at vPlacement (fn_800693A4);
+    u32  uFlagsEF0;             // 0xEF0  0x1: the ball can be placed at vPlacement (PlaceBall_ResetMomentums);
                                 //        0x2: target is over water
     u8   unkEF4[0xEF8 - 0xEF4];
 } Player;
@@ -650,7 +650,7 @@ typedef struct AITarget {
 } AITarget;
 
 // How a player's aim marker is drawn (our name; 0x2C bytes, one per player at lbl_801D5BF0,
-// target.c): the "tball" texture drawn at the target. Putts get a different set (fn_800689D4).
+// target.c): the "tball" texture drawn at the target. Putts get a different set (TARGET_SetupTarget).
 typedef struct TargetMarker {
     f32  f0;                    // 0x00
     f32  f4;                    // 0x04
@@ -740,44 +740,44 @@ void AI_DefaultTarget(int nPlayer);
 s8   Caddie_GetTip(int nPlayer, f32* pOut);     // 0 no tip, 1 the aim point in pOut, 2 gave up
 u8   Player_IsCPU(int nPlayer);
 u8   Controller_IsCPU(int nController);
-u8   Player_HasPad(int nPlayer);
-u8   Controller_IsPad(int nController);
+u8   fn_8002E868_HasPad(int nPlayer);
+u8   fn_8002E898_IsPad(int nController);
 u8   Player_IsController8(int nPlayer);
 u8   Player_OnTee(int nPlayer);
 u8   Player_IsHoled(int nPlayer);
 u8   Team_IsAllHuman(int nTeam);        // team 0 is players 0 and 1, team 1 players 2 and 3
-void AI_PlanShot(int nPlayer, f32* pTarget);
+void fn_8002BDEC_SetTarget(int nPlayer, f32* pTarget);
 u8   AI_GreenTowardPin(int nPlayer, f32 fDist);
 u8   AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance);
 void AI_ApplyError(int nPlayer);
-u8   Lie_AllowsFullSwing(int nPlayer);
+u8   Player_NotInSand(int nPlayer);
 void Shot_FitTargetToClub(int nPlayer);
 void Shot_Plan(int nPlayer, u8 bNotify);
 void Shot_Prepare(int nPlayer, u8 bNotify);
 int  Shot_Trajectory(int nPlayer);
-void Shot_DefaultSpin(int nPlayer, f32* pOut);
-void Shot_FaceVector(int nPlayer, f32* pOut);
+void fn_8002D544_StraightDir(int nPlayer, f32* pOut);
+void fn_8002D680_CpuShapeDir(int nPlayer, f32* pOut);
 f32  Shot_AimAngle(int nPlayer);
 void AI_ClubLonger(int nPlayer, s32* pClub, int nStep);
 void AI_ClubShorter(int nPlayer, s32* pClub, int nStep);
 void AI_ChooseTarget(int nPlayer);
 void GOLFERSTATE_Kill(int nPlayer);      // Swing.c: pop every state
 f32  AI_PowerScale(int nPlayer);
-void AI_FaceVector(int nPlayer, f32* pOut);
+void fn_8002D560_ShapeDir(int nPlayer, f32* pOut);
 void Caddie_Start(int nPlayer);
 void Caddie_Stop(void);
 void Caddie_Update(int nPlayer);
 void Luck_TakePerfectShot(int nPlayer);
 void Caddie_ApplyTip(int nPlayer);
 int  Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode);
-u8   Controller_IsNotCPU(int nController);  // Golfer.c
+u8   fn_8002E8E4(int nController);  // Golfer.c
 f32  fn_8005C1EC(int nPlayer);          // Swing.c
 f32  fn_8005C268(int nPlayer);          // Swing.c
 int  fn_8005CB48(int nPlayer);          // Swing.c
 int  fn_8005CB60(int nPlayer);          // Swing.c
 u8   Player_IsHoledNotState23(int nPlayer);
 u8   Team_IsAllCPU(int nTeam);
-u8   Player_IsNotCPU(int nPlayer);
+u8   fn_8002E8B4(int nPlayer);
 u8   Bag_AddClub(int nPlayer, int nBit);
 u8   Bag_RemoveClub(int nPlayer, int nBit);
 u8   Bag_HasClub(int nPlayer, int nBit);

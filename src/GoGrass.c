@@ -167,7 +167,7 @@ void fn_8011E4D8(GrassChunk* pChunk) {
     lbl_80281900->a48[lbl_80281900->n1C] = pChunk;
     lbl_80281900->a20[lbl_80281900->n1C] = (GrassChunkData*)((u8*)(pChunk + 1) + pChunk->n2 * 0x30);
     pData = (u8*)lbl_80281900->a20[lbl_80281900->n1C];
-    fn_80076158(&pData, pData, 8, 4);
+    BYTESWAP_SWAPDATA(&pData, pData, 8, 4);
     lbl_80281900->f3B8 = lbl_80281900->a20[0]->f4;
     lbl_80281900->n3A4 = lbl_80281900->a20[0]->n0;
     lbl_80281900->n1C = lbl_80281900->n1C + 1;
@@ -311,7 +311,7 @@ void fn_8011E9D8(void) {
 
 void fn_8011EAB8(void) {
     FB_vReleaseFrameBuffer(lbl_80281900->pFrameBuf);
-    CA_vDestroyCamera(lbl_80281900->pLens);
+    CA_vReleaseCamera(lbl_80281900->pLens);
     VM_vReleaseViewport(lbl_80281900->pRect);
     fn_800137B0(lbl_80281900->pCamera);
 }

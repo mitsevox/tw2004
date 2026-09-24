@@ -1,7 +1,8 @@
 // rcmp_mad_codec.c (EA's name, from its asserts; also in EA's 2002 source tree): the decoder for
 // the 'MAD' movie format (TW06's rcmp folder splits it into maddec.c and madidct.c): the block
-// decoder and inverse DCT, the movie decoder that hands out frames (MadDecoder, llpict.h), and
-// the 'TEO '/'BALF' stream handlers after it.
+// decoder and inverse DCT, the movie decoder that hands out frames (MadDecoder, llpict.h). After
+// it comes front-end code: the 'TEO '/'BALF' stream handlers and the ball models and logo drawn
+// on the create-a-player golfer (FEgolferanim.c).
 //
 // A MAD file is a picture: 'MADk' a key frame, 'MADm' and 'MADe' frames coded against the last
 // key or 'MADm' frame. The coded data is read 16 bits at a time, little-endian, into a 32-bit
@@ -668,8 +669,8 @@ void fn_800B920C(MadDecoder* p) {
     }
 }
 
-// Decode pFile into a new frame. A 'MADm' frame becomes the next reference; the frame is NULL
-// when there is no free one, no reference or an unknown kind.
+// Decode pFile into a new frame. A 'MADk' or 'MADm' frame becomes the next reference; the frame is
+// NULL when there is no free one, no reference or an unknown kind.
 PictFrame* fn_800B928C(MadDecoder* p, PictFile* pFile) {
     PictFrame* pFrame;
     u8* pRefY;

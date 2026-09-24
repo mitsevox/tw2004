@@ -49,7 +49,7 @@ typedef struct Video {
     u8         bEnded;                  // 0x1022 the decoder ran out (fn_800760A8_HasEnded)
     u8         bStarved;                // 0x1023 the queue ran dry while reading
     LLPict     pict;                    // 0x1024 the picture the frames are copied into
-    u64        tLast;                   // 0x1098 when the last frame was due (fn_800954A4(0))
+    u64        tLast;                   // 0x1098 when the last frame was due (TI_sReadCounter(0))
     f32        fFrameTime;              // 0x10A0 seconds per frame: 1.0f / the frame rate
     int        nFrame;                  // 0x10A4 frames decoded; -1 before the first
     u8         bFirstFrame;             // 0x10A8 set once the first frame has been decoded
@@ -61,7 +61,7 @@ LAYOUT_ASSERT(Video, 0x10B0);
 #define NUM_VIDEO_SLOTS 8
 typedef struct VideoSlots {
     Video* apVideo[NUM_VIDEO_SLOTS];    // 0x00  fn_80075904 puts a movie in a slot
-    int    n20;                         // 0x20  UFont_GetMode()'s value while a movie shows
+    int    n20;                         // 0x20  FO_eGetCurrentAddMode()'s value while a movie shows
                                         //       (fn_80075C88 saves it, fn_80075D58 puts it back)
     u8     pad24[4];
 } VideoSlots;

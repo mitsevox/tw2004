@@ -15,7 +15,7 @@ void  fn_80038010(u8 a, int n, f32* pVec);
 void  fn_80038054(u8 a, int n, f32 f1, f32 f2);
 void  CameraController_Idle(View* pView, int nPlayer);
 void  CA_vSetLookAtSide(CamLens* pLens, f32* pPos, f32* pAt, f32* pUp);
-void  fn_80076664_SetScaledLookAt(CamLens* pLens, f32* pPos, f32* pAt, f32* pF5C, f32* pF50);
+void  Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* pPos, f32* pAt, f32* pF5C, f32* pF50);
 void  fn_80017208(CamLens* pLens, f32* pPos, f32* pAngles);
 void  fn_80013D68(void* pCamera);
 void  VM_vUpdateInternalViewportRectData(f32* pRect);
@@ -81,7 +81,7 @@ void fn_80016E3C(int nView) {
     ViewController* pCtrl;
 
     pCtrl = fn_80016E28(nView);
-    CA_vDestroyCamera(fn_80008370(pCtrl->pCamera));
+    CA_vReleaseCamera(fn_80008370(pCtrl->pCamera));
     VM_vReleaseViewport(fn_80012EF0(pCtrl->pCamera));
     fn_800137B0(pCtrl->pCamera);
     pCtrl->b274 = 0;
@@ -99,7 +99,7 @@ void fn_80016E90(int nView) {
         CA_vSetLookAtSide(fn_80008370(pCamera), fn_8001731C(pView), fn_80017314(pView), pView->v20);
     } else if (fn_800172C4(pView)) {
         if (pView->nCurCamera == 4) {
-            fn_80076664_SetScaledLookAt(fn_80008370(pCamera), fn_8001731C(pView), fn_80017314(pView),
+            Camera_SetCameraPositionAndTargetWithOffsetAndScale(fn_80008370(pCamera), fn_8001731C(pView), fn_80017314(pView),
                         fn_800172BC(pView), fn_800172B4(pView));
         } else {
             CA_vSetLookAtSide(fn_80008370(pCamera), fn_8001731C(pView), fn_80017314(pView), pView->v20);

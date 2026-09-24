@@ -1,6 +1,7 @@
 // LLDynTex.c (EA's name, from its asserts): textures whose pixels the game rewrites while they are
-// shown; the menu golfer (FEgolferanim.c) drives them, and char_tex_manager.c puts the user logos
-// in them. Partly decompiled.
+// shown: char.c makes them for the golfer models and queues their loads, the loader streams their
+// pixels in from the character's file (run by char.c and the menu golfer, FEgolferanim.c), and
+// char_tex_manager.c puts the user logos in them.
 
 #include "engine.h"
 #include "gx.h"
@@ -519,7 +520,8 @@ DynTexJob* fn_8010B960(void) {
     return pJob;
 }
 
-// Free every job: the one in pA88 and all queued ones.
+// Free every job: the one in pA88 and all queued ones; a load in progress (n980 not 0) is told to
+// stop (3).
 void fn_8010B9BC(void) {
     if (lbl_80282488->pA88 != NULL) {
         lbl_80282488->pA88->bUsed = 0;
@@ -655,7 +657,8 @@ void fn_8010BEC4(void) {
     lbl_80282488->n96C = 0;
 }
 
-// Start over: sort the textures in use by where their pixels start (fn_8010BC94).
+// Start loading the textures in use (n980 = 1, the read state reset), sorted by where their pixels
+// start (fn_8010BC94).
 void fn_8010BED4(void) {
     lbl_80282488->b975 = 1;
     lbl_80282488->b974 = 1;
@@ -690,10 +693,11 @@ void fn_8010BFA0(int nBytes, int nError) {
 // port: EA likely had these five fields in a struct of their own inside Character
 #define DYNTEX_CHAR(ppBank) ((Character*)((u8*)(ppBank) - 0x50))
 
-// The loader, run each frame by fn_8010BF68: takes the next queued job, then streams the pixels
-// and palette of each texture in use (aUses) from the job's character file in reads of at most
-// nA98 bytes, fn_80006444 reading in the background and fn_8010BFA0 counting what arrived, and
-// copies them into the character's DynTex. Returns whether it is still busy.
+// The loader, one step per call (each frame from char.c and FEgolferanim.c; fn_8010BF68 runs it
+// until done): takes the next queued job, then streams the pixels and palette of each texture in
+// use (aUses) from the file of p8's character (fn_8010BC88) in reads of at most nA98 bytes,
+// fn_80006444 reading in the background and fn_8010BFA0 counting what arrived, and copies them
+// into the job's character's DynTex. Returns whether it is still busy.
 u8 fn_8010BFE0(void) {
     TexEntry* pEntry;
     DynTexObj* pObj;
@@ -899,7 +903,7 @@ int fn_8010C458(int nFormat) {
     return nBits;
 }
 
-// Run the jobs until the queue is empty and nothing is left to do, a frame at a time.
+// Run the loader (fn_8010BFE0) until the queue is empty and nothing is left to do.
 void fn_8010BF68(void) {
     while (!fn_8010BF3C()) {
         fn_800B7490();

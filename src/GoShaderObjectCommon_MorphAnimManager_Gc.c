@@ -1,6 +1,6 @@
 // GoShaderObjectCommon_MorphAnimManager_Gc.c (EA's name, from its asserts): the list of morph
-// animations the shader objects play (include/morphanim.h): a count, the total of their frames and
-// a slot per animation.
+// animations the shader objects play (include/morphanim.h): a count, the total of their recorded
+// vertices and a slot per animation.
 
 #include "morphanim.h"
 #include "charstate.h"
@@ -91,7 +91,7 @@ void fn_800975B0(MorphAnim* pAnim) {
     lbl_80281F70->nCount++;
 }
 
-// Take an animation's frames off the totals.
+// Take an animation off the manager: one less, and its vertices off the total.
 void fn_800975FC(MorphAnim* pAnim) {
     lbl_80281F70->nCount--;
     lbl_80281F70->nFrames -= pAnim->nFrames;

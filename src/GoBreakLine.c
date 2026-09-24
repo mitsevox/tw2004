@@ -1,5 +1,5 @@
 // GoBreakLine.c (EA's name, from its asserts): the putt's break line, a line on the green from the
-// ball that shows how the putt will break (BreakLine, breakline.h). Partly decompiled.
+// ball that shows how the putt will break (BreakLine, breakline.h).
 
 #include "golfer.h"
 #include "game.h"
@@ -17,7 +17,7 @@ void fn_800C9334(f32* pA, f32* pB, f32* pOut);
 void fn_800C9358(f32* pA, f32* pB, f32* pOut);
 void fn_8003519C(int nRow, void* pData);   // GoTerrain.c: calls row nRow's function with pData
 
-void fn_800C808C(void) {
+void BreakLine_InitModule(void) {
     lbl_80282228 = fn_80009B34(sizeof(BreakLine), 2, 16, "GoBreakLine.c", 93);
     lbl_80282228->fAB30 = 27.0f;
     lbl_80282228->fAB34 = 0.0f;
@@ -75,8 +75,10 @@ void fn_800C830C(void) {
     lbl_8028222C = 0;
 }
 
-// Steps view nView's line while its player, a human, stands over a putt within 75 of the hole
-// and the ball is within an inch of the pin (EA's test; distances in yards).
+// Steps view nView's line (BreakLine_Step) while the line is on (lbl_8028222C) and its player, a
+// human, stands over a putt within 75 of the hole with the target (vTarget) within an inch of the
+// pin (EA's test; distances in yards). A view's first call after the line is set up only clears
+// its abSkip.
 void BreakLine_Update(int nView) {
     int nPlayer = fn_8001707C(nView);
     f32 fDist;
@@ -128,9 +130,9 @@ void BreakLine_Step(int nView) {
         if (lbl_80282228->abA91C[nView]) {
             if ((lbl_80282228->aBall[nView].nState == 2 || lbl_80282228->aBall[nView].nState == 3 ||
                  lbl_80282228->aBall[nView].nState == 4) && fDist > 0.001f) {
-                Ball_SetSimulating(1);
-                Ball_SimStep(&lbl_80282228->aBall[nView], lbl_80282228->fAAE0, lbl_80282228->fAAE4);
-                Ball_SetSimulating(0);
+                fn_80050D24_SetSimulating(1);
+                fn_8005585C_SimForTime(&lbl_80282228->aBall[nView], lbl_80282228->fAAE0, lbl_80282228->fAAE4);
+                fn_80050D24_SetSimulating(0);
                 fDist = fn_800BB028(lbl_80282228->aBall[nView].vPos,
                                     &lbl_80282228->aBall[nView].pCourse->pin[Game_CurrentPinSet()].x);
                 if (fDist < lbl_80282228->afAAD4[nView]) {
@@ -275,11 +277,11 @@ void BreakLine_Start(int nView) {
                 nTex = 0;
             }
         }
-        Ball_SetSimulating(1);
+        fn_80050D24_SetSimulating(1);
         lbl_80282228->aBall[nView].nState = 0;
-        Ball_Launch(&lbl_80282228->aBall[nView], pPlayer->nClub, pPlayer->nShotKind, fPower,
+        Physics_ShotImpact(&lbl_80282228->aBall[nView], pPlayer->nClub, pPlayer->nShotKind, fPower,
                     pPlayer->fAim, 1, pPlayer->vLaunchA, pPlayer->vLaunchB);
-        Ball_SetSimulating(0);
+        fn_80050D24_SetSimulating(0);
     }
 }
 

@@ -130,7 +130,7 @@ void fn_800F5E9C(int nPlayer) {
     if (gReplayData.bF10) {
         Mem_cpy(&gPlayers[nPlayer].ball, &gReplayData.player.ball, sizeof(Ball));
     } else {
-        fn_80055AA8(&gPlayers[nPlayer].ball,
+        Physics_InitBall(&gPlayers[nPlayer].ball,
                     &gPlayers[nPlayer].ball.pCourse->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
     }
     gPlayers[nPlayer].nDC0--;

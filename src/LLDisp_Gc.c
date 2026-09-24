@@ -1,6 +1,6 @@
-// LLDisp_Gc.c (EA's name, from its asserts): the display. Sets up the video mode and the two
-// image buffers, keeps the CPU in step with the GPU through FIFO break points, sets the viewport
-// and copies each finished frame out.
+// LLDisp_Gc.c (EA's name, from its asserts): the display. Sets up the video mode and the image
+// buffer (both buffer slots share one), keeps the CPU in step with the GPU through FIFO break
+// points, sets the viewport and copies each finished frame out.
 
 #include "engine.h"
 #include "game.h"
@@ -212,7 +212,8 @@ void fn_80006EC8(void) {
     lbl_801A2350.bBreak = 1;
 }
 
-// Sets the viewport to the whole frame; in field rendering it jitters by a line each field.
+// Starts a frame (the flag fn_80006FE8 checks) and sets the viewport to the whole frame, jittered
+// for the field in field rendering.
 void fn_80006EDC(void) {
     lbl_80281B8C = 1;
     if (lbl_801A2464.field_rendering) {
@@ -274,7 +275,7 @@ void fn_800070F4(void* pBuf) {
     }
 }
 
-// Clears both image buffers and puts them on screen.
+// Clears both image buffers to black, then copies the frame (EFB) into each.
 void fn_80007160(void) {
     fn_800070F4(lbl_80281BA4[0]);
     if (lbl_80281BA4[0] != lbl_80281BA4[1]) {
@@ -284,8 +285,8 @@ void fn_80007160(void) {
     GXCopyDisp(lbl_80281BA4[1], 1);
 }
 
-// Starts the display: the video mode, the image buffers, the frame sync and its callbacks; then
-// two black frames on screen.
+// Starts the display: the video mode, the image buffer, GX, the frame sync and its callbacks;
+// then, a retrace later (two for some TV modes), clears the image buffers and turns the picture on.
 s32 fn_800071BC(void) {
     VIInit();
     fn_800067E4(NULL);

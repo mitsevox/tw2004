@@ -1,6 +1,6 @@
-// target.c (TW06's target.c, golf/ai/target.c): where the CPU aims, the aim marker drawn at the
-// target, and where a ball may be placed or dropped (TW06's PlaceBall_* functions). Partly
-// decompiled; the machine-style code at the end is the sweep's.
+// target.c (TW06's target.c, golf/ai/target.c): the aim marker drawn at the target, a human's
+// aim-point and ball-placement controls, and where a ball may be placed or dropped (TW06's
+// PlaceBall_* functions). The machine-style code near the end is the sweep's.
 
 #include "game.h"
 #include "camera.h"
@@ -9,12 +9,12 @@
 void fn_80067B80(void);
 void fn_80067CD4(int nPlayer);
 void fn_80067DAC(int nPlayer);
-void fn_80068AA8(int nPlayer);
+void TARGET_ResetMomentums(int nPlayer);
 void fn_800690C0(int nPlayer);
 void fn_80069104(int nPlayer);
 void fn_80069148(int nPlayer);
 void fn_800691B0(int nPlayer);
-void fn_800693A4(int nPlayer);
+void PlaceBall_ResetMomentums(int nPlayer);
 void fn_80069A84(int nPlayer);
 void fn_80069AFC(int nPlayer);
 void fn_80069B74(int nPlayer);
@@ -251,27 +251,24 @@ void fn_80067DAC(int nPlayer) {
         }
         nFrame = lbl_801D5BF0[nPlayer].n10;
         if (nFrame == 0) {
-            fBob = 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
             for (i = 0; i < 4; i++) {
                 aY2[i] = aMarker[i][1];
-                aY1[i] = aMarker[i][1] - fBob;
-                aY0[i] = aY1[i] - fBob;
+                aY1[i] = aY2[i] - 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
+                aY0[i] = aY1[i] - 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
             }
         }
         if (nFrame == 1) {
-            fBob = 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
             for (i = 0; i < 4; i++) {
                 aY1[i] = aMarker[i][1];
-                aY2[i] = aMarker[i][1] - fBob;
-                aY0[i] = aY2[i] - fBob;
+                aY2[i] = aY1[i] - 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
+                aY0[i] = aY2[i] - 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
             }
         }
         if (nFrame == 2) {
-            fBob = 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
             for (i = 0; i < 4; i++) {
                 aY1[i] = aMarker[i][1];
-                aY0[i] = aMarker[i][1] - fBob;
-                aY2[i] = aY0[i] - fBob;
+                aY0[i] = aY1[i] - 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
+                aY2[i] = aY0[i] - 0.5f * (fScale * lbl_801D5BF0[nPlayer].f18);
             }
         }
         for (i = 0; i < 4; i++) {
@@ -326,7 +323,7 @@ void fn_80067DAC(int nPlayer) {
 
 // The marker's settings for the coming shot: one set for putts and shot kind 2, another for
 // everything else.
-void fn_800689D4(int nPlayer) {
+void TARGET_SetupTarget(int nPlayer) {
     if (gPlayers[nPlayer].nShotKind == 0 || gPlayers[nPlayer].nShotKind == 2) {
         lbl_801D5BF0[nPlayer].f0 = 0.0f;
         lbl_801D5BF0[nPlayer].f4 = 0.0f;
@@ -352,8 +349,8 @@ void fn_800689D4(int nPlayer) {
     lbl_801D5BF0[nPlayer].f24 = 0.2f;
 }
 
-// The ball-placement cursor stops.
-void fn_80068AA8(int nPlayer) {
+// Stops the aim point: its turn and move inputs (fA5C, fA60) back to 0.
+void TARGET_ResetMomentums(int nPlayer) {
     gPlayers[nPlayer].fA5C = 0.0f;
     gPlayers[nPlayer].fA60 = 0.0f;
 }
@@ -425,7 +422,7 @@ u8 fn_80068AC8(int nPlayer) {
         fDZ = fCos * gPlayers[nPlayer].fDistance;
         gPlayers[nPlayer].vTarget[0] = fDX + gPlayers[nPlayer].vBall[0];
         gPlayers[nPlayer].vTarget[2] = fDZ + gPlayers[nPlayer].vBall[2];
-        AI_PlanShot(nPlayer, pTarget);
+        fn_8002BDEC_SetTarget(nPlayer, pTarget);
         Vec_Copy(pTarget, gPlayers[nPlayer].vTarget2);
         fn_8001C804(nPlayer, 0, 1);
         fn_80062C38();
@@ -478,14 +475,14 @@ u8 fn_80068AC8(int nPlayer) {
             bInRange = 1;
         }
         if (bInRange) {
-            AI_PlanShot(nPlayer, pTarget);
+            fn_8002BDEC_SetTarget(nPlayer, pTarget);
             fSin = fn_800095F0(gPlayers[nPlayer].fAim);
             fCos = fn_80009638(gPlayers[nPlayer].fAim);
             fDX = -fSin * gPlayers[nPlayer].fDistance;
             fDZ = fCos * gPlayers[nPlayer].fDistance;
             gPlayers[nPlayer].vTarget[0] = fDX + gPlayers[nPlayer].vBall[0];
             gPlayers[nPlayer].vTarget[2] = fDZ + gPlayers[nPlayer].vBall[2];
-            AI_PlanShot(nPlayer, pTarget);
+            fn_8002BDEC_SetTarget(nPlayer, pTarget);
             Vec_Copy(pTarget, gPlayers[nPlayer].vTarget2);
             if (gPlayers[nPlayer].nShotKind != 2) {
                 nClub = gPlayers[nPlayer].nClub;
@@ -513,7 +510,7 @@ u8 fn_80068AC8(int nPlayer) {
     return bMoved;
 }
 
-// The placement cursor speeds up towards -x, at most -1.
+// The aim point's turn input (fA5C) ramps towards -1 (4.5 x the frame time a call).
 void fn_800690C0(int nPlayer) {
     gPlayers[nPlayer].fA5C -= 4.5f * gSession.fFrameTime;
     if (gPlayers[nPlayer].fA5C < -1.0f) {
@@ -521,7 +518,7 @@ void fn_800690C0(int nPlayer) {
     }
 }
 
-// The placement cursor speeds up towards +x, at most 1.
+// The aim point's turn input (fA5C) ramps towards 1 (4.5 x the frame time a call).
 void fn_80069104(int nPlayer) {
     gPlayers[nPlayer].fA5C += 4.5f * gSession.fFrameTime;
     if (gPlayers[nPlayer].fA5C > 1.0f) {
@@ -529,7 +526,8 @@ void fn_80069104(int nPlayer) {
     }
 }
 
-// The placement cursor speeds up towards +z, at most 1. 1000 holds it; -1000 is reset to 0 first.
+// The aim point's move input (fA60) ramps towards 1 (4.5 x the frame time a call). 1000 holds
+// it; -1000 is reset to 0 first.
 void fn_80069148(int nPlayer) {
     if (1000.0f == gPlayers[nPlayer].fA60) return;
     if (-1000.0f == gPlayers[nPlayer].fA60) {
@@ -541,7 +539,8 @@ void fn_80069148(int nPlayer) {
     }
 }
 
-// The placement cursor speeds up towards -z, at most -1. -1000 holds it; 1000 is reset to 0 first.
+// The aim point's move input (fA60) ramps towards -1 (4.5 x the frame time a call). -1000 holds
+// it; 1000 is reset to 0 first.
 void fn_800691B0(int nPlayer) {
     if (-1000.0f == gPlayers[nPlayer].fA60) return;
     if (1000.0f == gPlayers[nPlayer].fA60) {
@@ -556,7 +555,7 @@ void fn_800691B0(int nPlayer) {
 // Whether a ball may be placed at pPos: in bounds, not in a free-drop area, on ground that takes
 // a ball (not water, 7 and 16, or the cup, 12) and flat enough (the normal's y above cos 30);
 // then class 1 always, else a valid drop surface or a spot with no object or hazard near it.
-u8 fn_80069218(f32* pPos) {
+u8 PlaceBall_IsValidDropLocation(f32* pPos) {
     SurfaceType* pSurface;
     f32          vNormal[4];
 
@@ -573,22 +572,22 @@ u8 fn_80069218(f32* pPos) {
 }
 
 // Puts the placement point over pPos, on the ground if there is any there.
-void fn_80069330(int nPlayer, f32* pPos) {
+void PlaceBall_Set(int nPlayer, f32* pPos) {
     f32 fHeight;
 
     gPlayers[nPlayer].vPlacement[0] = pPos[0];
     gPlayers[nPlayer].vPlacement[2] = pPos[2];
-    fHeight = Terrain_HeightAt(gPlayers[nPlayer].vPlacement, NULL);
+    fHeight = CamScript_GuessBestPlayableHeight(gPlayers[nPlayer].vPlacement, NULL);
     if (TER_NO_GROUND != fHeight) {
         gPlayers[nPlayer].vPlacement[1] = 0.001f + fHeight;
     }
 }
 
-// Stops the placement cursor and flags whether the ball can be placed where it is.
-void fn_800693A4(int nPlayer) {
+// Zeroes the aim inputs (fA5C, fA60) and flags whether the ball can be placed at vPlacement.
+void PlaceBall_ResetMomentums(int nPlayer) {
     gPlayers[nPlayer].fA5C = 0.0f;
     gPlayers[nPlayer].fA60 = 0.0f;
-    if (fn_80069218(gPlayers[nPlayer].vPlacement)) {
+    if (PlaceBall_IsValidDropLocation(gPlayers[nPlayer].vPlacement)) {
         gPlayers[nPlayer].uFlagsEF0 |= 1;
     } else {
         gPlayers[nPlayer].uFlagsEF0 &= ~1;
@@ -597,7 +596,7 @@ void fn_800693A4(int nPlayer) {
 
 // Inside the hole's placement outline, or, with none loaded, the in-bounds outlines; with an
 // outline, a point outside it still counts when some in-bounds outline holds it.
-u8 fn_80069428(f32* pPos) {
+u8 PlaceBall_CheckInBounds(f32* pPos) {
     if (lbl_80281E30 != NULL) {
         if (fn_8000C140(pPos, lbl_80281E30, lbl_80281E30->nNumNodes)) {
             return 1;
@@ -610,7 +609,7 @@ u8 fn_80069428(f32* pPos) {
     return Ter_PointInOOBNetwork(pPos);
 }
 
-TNetwork* fn_80069498(void) {
+TNetwork* PlaceBall_GetPlaceBallNetwork(void) {
     return lbl_80281E30;
 }
 
@@ -745,11 +744,11 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
         fBaseZ = gPlayers[nPlayer].vPlacement[2];
         vPos[0] = fZ * -fSin + fBaseX + fX * fCos;
         vPos[2] = fZ * fCos + fBaseZ + fX * fSin;
-        if (fn_80069428(vPos)) {
+        if (PlaceBall_CheckInBounds(vPos)) {
         place:
             gPlayers[nPlayer].vPlacement[0] = vPos[0];
             gPlayers[nPlayer].vPlacement[2] = vPos[2];
-            fn_80069330(nPlayer, gPlayers[nPlayer].vPlacement);
+            PlaceBall_Set(nPlayer, gPlayers[nPlayer].vPlacement);
         } else {
             // outside: try the step turned further and further either way
             for (fAngle = 15.0f; fAngle <= 90.0f; fAngle += 15.0f) {
@@ -762,7 +761,7 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
                 fCos = fn_80009638(fHeading);
                 vPos[0] = fZ * -fSin + fBaseX + fX * fCos;
                 vPos[2] = fZ * fCos + fBaseZ + fX * fSin;
-                if (fn_80069428(vPos)) {
+                if (PlaceBall_CheckInBounds(vPos)) {
                     gPlayers[nPlayer].fA84 = 0.0f;
                     goto place;  // fake match: the original has one copy of the placing code
                 }
@@ -774,7 +773,7 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
                 fCos = fn_80009638(fHeading);
                 vPos[0] = fZ * -fSin + fBaseX + fX * fCos;
                 vPos[2] = fZ * fCos + fBaseZ + fX * fSin;
-                if (fn_80069428(vPos)) {
+                if (PlaceBall_CheckInBounds(vPos)) {
                     gPlayers[nPlayer].fA84 = 0.0f;
                     goto place;  // fake match: as above
                 }
@@ -785,7 +784,7 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
             gPlayers[nPlayer].fA7C = 0.0f;
         }
     }
-    if (fn_80069218(gPlayers[nPlayer].vPlacement)) {
+    if (PlaceBall_IsValidDropLocation(gPlayers[nPlayer].vPlacement)) {
         gPlayers[nPlayer].uFlagsEF0 |= 1;
     } else {
         gPlayers[nPlayer].uFlagsEF0 &= ~1;
@@ -876,25 +875,25 @@ void fn_80069CDC(int nPlayer) {
     f32   vBallDir[4];
     f32   fX;
     f32   fY;
-    f32   fCos;
-    f32   fDot;
-    f32   fSin;
-    f32   fTeeDist;
-    f32   fHoleDist;
-    f32   fBallDist;
+    f32   fHeight;
     f32   fHalfFov;
-    f32   fCos2;
+    f32   fLow;
+    f32   fHigh;
     f32   fDotX;
     f32   fDotZ;
+    f32   fCos2;
     f32   fA;
     f32   fB;
     f32   fC;
-    f32   fDisc;
     f32   fDenom;
-    f32   fLow;
-    f32   fHigh;
-    f32   fHeight;
     f32   fOld;
+    f32   fDisc;
+    f32   fSin;
+    f32   fCos;
+    f32   fTeeDist;
+    f32   fHoleDist;
+    f32   fBallDist;
+    f32   fDot;
     View* pView;
     f32*  pCamPos;
     f32*  pLook;
@@ -994,11 +993,10 @@ void fn_80069CDC(int nPlayer) {
     fDotX = vDir[0] * vRel[0];
     fDotZ = vDir[2] * vRel[2];
     fCos2 = fn_80009638(fHalfFov / 2.0f - PI / 180.0f);
-    fCos2 *= fCos2;
-    fA = fCos2 - vDir[1] * vDir[1];
+    fA = fCos2 * fCos2 - vDir[1] * vDir[1];
     fB = -(2.0f * fDotX * vDir[1]) - 2.0f * fDotZ * vDir[1];
-    fC = vRel[0] * (vRel[0] * fCos2) + vRel[2] * (vRel[2] * fCos2) - fDotX * fDotX - fDotZ * fDotZ
-       - 2.0f * fDotX * fDotZ;
+    fC = vRel[0] * (vRel[0] * (fCos2 * fCos2)) + vRel[2] * (vRel[2] * (fCos2 * fCos2))
+       - fDotX * fDotX - fDotZ * fDotZ - 2.0f * fDotX * fDotZ;
     fDisc = fB * fB - 4.0f * fA * fC;
     if (fDisc < 0.0f) {
         fDenom = 0.0f;
@@ -1041,12 +1039,10 @@ void fn_80069CDC(int nPlayer) {
 
     // the bob: f4 runs between 0 and f18 at f0 a frame, and the shadow shrinks as it rises
     if (0.0f != lbl_801D5BF0[nPlayer].f0) {
-        fOld = lbl_801D5BF0[nPlayer].f4;
-        lbl_801D5BF0[nPlayer].f4 = fOld + lbl_801D5BF0[nPlayer].f0;
-        aMarker[0][1] -= fOld;
-        aMarker[1][1] -= fOld;
-        aMarker[2][1] -= fOld;
-        aMarker[3][1] -= fOld;
+        for (i = 0; i < 4; i++) {
+            aMarker[i][1] -= lbl_801D5BF0[nPlayer].f4;
+        }
+        lbl_801D5BF0[nPlayer].f4 += lbl_801D5BF0[nPlayer].f0;
         if (lbl_801D5BF0[nPlayer].f4 > lbl_801D5BF0[nPlayer].f18 || lbl_801D5BF0[nPlayer].f4 < 0.0f) {
             lbl_801D5BF0[nPlayer].f0 = -lbl_801D5BF0[nPlayer].f0;
         }
@@ -1093,7 +1089,7 @@ void fn_80069CDC(int nPlayer) {
 
 // fA88: the heading from the game's point (gpGame->p130) to the placement point, less a quarter
 // turn; and the aim marker's usual settings.
-void fn_8006A6C4(int nPlayer) {
+void PlaceBall_SetupTarget(int nPlayer) {
     f32 vDir[4];
 
     fn_8006A988(gPlayers[nPlayer].vPlacement, gpGame->p130, vDir);
@@ -1210,16 +1206,16 @@ void fn_8006A8D4(void* pCamera, f32* pX, f32* pY) {
 
 // Draw text in one colour (pColor: RGBA).
 void fn_8006A9AC(f32* pColor) {
-    UFont_GetContext()->nA4 = 0x12;
-    UFont_PackColor(pColor, (u8*)&UFont_GetContext()->u5C);
+    FO_spGetCurrentPacket()->nA4 = 0x12;
+    UFont_PackColor(pColor, (u8*)&FO_spGetCurrentPacket()->u5C);
 }
 
 // The current font's line height, scaled as the text is drawn.
 f32 fn_8006A9FC(void) {
-    return fn_8006A8A8((u8*)fn_8006AA3C()) * UFont_GetContext()->f80;
+    return fn_8006A8A8((u8*)fn_8006AA3C()) * FO_spGetCurrentPacket()->f80;
 }
 
 // The font the current text settings draw with.
 LLFont* fn_8006AA3C(void) {
-    return lbl_80280DE0->apFonts[UFont_GetContext()->nFont];
+    return lbl_80280DE0->apFonts[FO_spGetCurrentPacket()->nFont];
 }

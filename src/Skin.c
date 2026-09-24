@@ -1,5 +1,6 @@
-// Skin.c (EA's name, from its asserts; also in EA's 2002 source tree): not yet decompiled; the
-// sweep code below is the matched small functions.
+// Skin.c (EA's name, from its asserts; also in EA's 2002 source tree): a character's skinned
+// model: making a skin from its file (byte-swapped, offsets to pointers), its bone matrices and
+// morph weights, and drawing it (all its parts but "shadow", or only those).
 
 #include "game_types.h"
 #include "engine.h"
@@ -409,7 +410,7 @@ void fn_800360D4(ShaderObject* pObj) {
     pObj->pHooks->pfnDraw(pObj);
 }
 
-// Hands it a frame's data.
+// Hands it pData and n through its row's fill hook.
 void fn_80036100(ShaderObject* pObj, const void* pData, int n) {
     pObj->pHooks->pfnFill(pObj, pData, n);
 }
@@ -425,8 +426,9 @@ void fn_8003614C(Character* pChar, f32* pOut) {
     }
 }
 
-// Blends the morph weights of two format 1 poses into pOut, fWeight of the way from pA to pB, for
-// each morph either sets; the morphs pOut gets are those of both, and pA's and pB's are cleared.
+// Blends two format 1 poses into pOut, fWeight of the way from pA to pB: in each of the three
+// blocks, each of the 20 channels either sets; pOut's bits become the union of both, and pA's and
+// pB's bits are cleared.
 void fn_80036180(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fWeight) {
     u32 aBits[4];   // only 20 bits are used; the size is not known
     int i;
@@ -475,7 +477,7 @@ void fn_80036344(SkinModel44* pEntries, s32 nEntries) {
     for (i = 0; i < nEntries; i++) {
         pData = (u8*)pEntries->p4;
         pSrc = pData;
-        fn_80076158(&pSrc, pData, pEntries->n8 * 4, 4);
+        BYTESWAP_SWAPDATA(&pSrc, pData, pEntries->n8 * 4, 4);
         pEntries++;
     }
 }
@@ -678,7 +680,7 @@ void fn_800368FC(SkinDesc* pDesc) {
     u8* pData;
     int i;
     u8* p;
-    void* pSrc;                 // port: fn_80076158 takes it as a u8** too (one stack slot in EA's code)
+    void* pSrc;                 // port: BYTESWAP_SWAPDATA takes it as a u8** too (one stack slot in EA's code)
     void* pDst;
     s32 n;
 
@@ -726,7 +728,7 @@ void fn_800368FC(SkinDesc* pDesc) {
     p = (u8*)pDesc->p20;
     if (p != NULL && pDesc->n1C != 0) {
         pSrc = pDst = p;
-        fn_80076158((u8**)&pSrc, p, pDesc->n1C * 4, 4);
+        BYTESWAP_SWAPDATA((u8**)&pSrc, p, pDesc->n1C * 4, 4);
     }
 
     p = (u8*)pDesc->p28;
@@ -764,37 +766,37 @@ void fn_800368FC(SkinDesc* pDesc) {
             pMesh->pBits = NULL;
         } else if (pMesh->uFlags & 0x30) {
             pSrc = pDst = pData;
-            fn_80076158((u8**)&pSrc, pData, n * 8, 2);
+            BYTESWAP_SWAPDATA((u8**)&pSrc, pData, n * 8, 2);
             pData += n * 8;
             pSrc = pData;
-            fn_80076158((u8**)&pSrc, pData, n * 4, 1);
+            BYTESWAP_SWAPDATA((u8**)&pSrc, pData, n * 4, 1);
             pData += n * 4;
             if (pMesh->uFlags & 0x1000) {
                 pSrc = pData;
-                fn_80076158((u8**)&pSrc, pData, n * 2, 2);
+                BYTESWAP_SWAPDATA((u8**)&pSrc, pData, n * 2, 2);
             } else if (pMesh->uFlags & 0x40) {
                 pSrc = pData;
-                fn_80076158((u8**)&pSrc, pData, n * 4, 2);
+                BYTESWAP_SWAPDATA((u8**)&pSrc, pData, n * 4, 2);
             }
         } else if (pMesh->uFlags & 0x40) {
             pSrc = pDst = pData;
-            fn_80076158((u8**)&pSrc, pData, n * 4, 2);
+            BYTESWAP_SWAPDATA((u8**)&pSrc, pData, n * 4, 2);
         } else if (pMesh->uFlags & 0x1808) {
             pSrc = pData;
-            fn_80076158((u8**)&pSrc, pData, n * 2, 2);
+            BYTESWAP_SWAPDATA((u8**)&pSrc, pData, n * 2, 2);
         } else if (pMesh->uFlags & 0x300004) {
             pSrc = pData;
-            fn_80076158((u8**)&pSrc, pData, n * 64, 4);
+            BYTESWAP_SWAPDATA((u8**)&pSrc, pData, n * 64, 4);
         } else if (pMesh->uFlags & 2) {
             pSrc = pData;
-            fn_80076158((u8**)&pSrc, pData, n * 2, 2);
+            BYTESWAP_SWAPDATA((u8**)&pSrc, pData, n * 2, 2);
         }
     }
 
     p = (u8*)pDesc->p3C;
     if (p != NULL && pDesc->n38 != 0) {
         pSrc = pDst = p;
-        fn_80076158((u8**)&pSrc, p, pDesc->n38 * 4, 4);
+        BYTESWAP_SWAPDATA((u8**)&pSrc, p, pDesc->n38 * 4, 4);
     }
 
     p = (u8*)pDesc->p44;
@@ -826,7 +828,7 @@ void fn_800368FC(SkinDesc* pDesc) {
     if (p != NULL) {
         if (pDesc->n58 != 0 && p != NULL && pDesc->n58 != 0) {
             pSrc = pDst = p;
-            fn_80076158((u8**)&pSrc, p, pDesc->n58 * 8, 4);
+            BYTESWAP_SWAPDATA((u8**)&pSrc, p, pDesc->n58 * 8, 4);
         }
     }
 
@@ -842,7 +844,7 @@ void fn_800368FC(SkinDesc* pDesc) {
     p = (u8*)pDesc->p6C;
     if (p != NULL && pDesc->n68 != 0) {
         pSrc = pDst = p;
-        fn_80076158((u8**)&pSrc, p, pDesc->n68 * 4, 4);
+        BYTESWAP_SWAPDATA((u8**)&pSrc, p, pDesc->n68 * 4, 4);
     }
 
     p = (u8*)pDesc->p74;
@@ -884,13 +886,13 @@ void fn_800368FC(SkinDesc* pDesc) {
     p = (u8*)pDesc->pA4;
     if (p != NULL && pDesc->nA0 != 0) {
         pSrc = pDst = p;
-        fn_80076158((u8**)&pSrc, p, pDesc->nA0 * 2, 2);
+        BYTESWAP_SWAPDATA((u8**)&pSrc, p, pDesc->nA0 * 2, 2);
     }
 
     p = (u8*)pDesc->pAC;
     if (p != NULL && pDesc->nA8 != 0) {
         pSrc = pDst = p;
-        fn_80076158((u8**)&pSrc, p, pDesc->nA8 * 2, 2);
+        BYTESWAP_SWAPDATA((u8**)&pSrc, p, pDesc->nA8 * 2, 2);
     }
 
     p = (u8*)pDesc->pB8;
@@ -945,7 +947,7 @@ void fn_80037574(BonePose* pBones, s32 nBones) {
     u8* pSrc;
 
     pSrc = (u8*)pBones;
-    fn_80076158(&pSrc, (u8*)pBones, nBones * sizeof(BonePose), 4);
+    BYTESWAP_SWAPDATA(&pSrc, (u8*)pBones, nBones * sizeof(BonePose), 4);
 }
 
 // Allocates what a skin needs once loaded (bit 2 of u10D4; 0 if it already was): the matrices,

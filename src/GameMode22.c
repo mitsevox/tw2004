@@ -1,7 +1,7 @@
-// GameMode22.c (our name): game mode 22 (GameRound.c starts it with fn_80125E68), and before it the
-// trophy case's text (Rookie of the Year, Player of the Year, the money and scoring leaders; "Earned
-// on %s"). One file: both halves share its .data, .sdata and .sbss blocks. Partly decompiled; the
-// trophy case's handlers and the mode's small hooks are in C.
+// GameMode22.c (our name): game mode 22, a long-drive contest (GameRound.c starts it with
+// fn_80125E68), and before it the trophy case's text (Rookie of the Year, Player of the Year, the
+// money and scoring leaders; "Earned on %s"). One file: both halves share its .data, .sdata and
+// .sbss blocks.
 
 #include "golfer.h"
 #include "ball.h"
@@ -119,8 +119,8 @@ void fn_80125BB8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = pArgs[0].i % 4;
 }
 
-// Message handler (FE_MessageTable.c): the day the medal of challenge group n (1-based) was
-// earned, as text; empty for group 0 or no medal.
+// Message handler (FE_MessageTable.c): the day the medal of group n (1-based) was earned, as
+// text; empty for group 0 or no medal (aMedal 3).
 void fn_80125BD8(MsgArg* pArgs, MsgArg* pResult) {
     s32 nGroup = pArgs[0].i;
     char* szOut = ((MsgString*)pArgs[1].p)->pStr;
@@ -373,7 +373,7 @@ void fn_8012643C(int nPlayer) {
 
 // The ball back on the player's tee.
 void fn_8012645C(int nPlayer) {
-    fn_80055AA8(&gPlayers[nPlayer].ball,
+    Physics_InitBall(&gPlayers[nPlayer].ball,
                 &gPlayers[nPlayer].ball.pCourse->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
 }
 

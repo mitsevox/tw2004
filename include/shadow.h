@@ -26,7 +26,7 @@ typedef struct Shadow {
     GxTexture   tex;            // 0x45C
     u8          aMesh[2][0x28]; // 0x48C  a mesh object per view (Skin.c's fn_80036054 sets it up,
                                 //        fn_800360A0 frees it)
-    f32         f4DC;           // 0x4DC  } set up by SH_vSetShadowIntensity
+    f32         f4DC;           // 0x4DC  } set up by fn_800B251C_ShadowInit
     f32         f4E0;           // 0x4E0  }
     s32         n4E4;           // 0x4E4  }
     f32         f4E8;           // 0x4E8  }
@@ -41,7 +41,7 @@ extern f32   lbl_802814AC;      // how far the shadow's ground mesh is lifted (f
 extern f32   lbl_802814B0;      // how far the flat shadow is lifted (fn_800B2DB0)
 extern s32   lbl_80282158;      // the most strips and vertices a shadow mesh has used
 extern s32   lbl_8028215C;      //   (fn_800B2FB0)
-// The shadow's ground mesh, made by SH_vSetShadowIntensity (0x200 strips, 0x800 vertices):
+// The shadow's ground mesh, made by fn_800B251C_ShadowInit (0x200 strips, 0x800 vertices):
 extern TrailDraw* lbl_80282160; // the strips
 extern s16*  lbl_80282164;      // the vertex indices
 extern f32*  lbl_80282168;      // the texture coordinates, two a vertex

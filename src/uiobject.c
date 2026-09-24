@@ -80,17 +80,17 @@ void UI_Obj_InitModule(void) {
     lbl_801F5B40.apLight[0]->u.dir.fC = 1.0f;
 }
 
-// Free the object, the lens and the lights.
+// Free the object, the camera and the lights.
 void fn_800AE338(void) {
     if (lbl_802820D0 != NULL) {
         fn_80048860(lbl_802820D0);
     }
     lbl_802820D0 = NULL;
-    CA_vDestroyCamera(lbl_802820CC);
+    CA_vReleaseCamera(lbl_802820CC);
     fn_8006E62C(&lbl_801F5B40);
 }
 
-// Make the object from its 'TEO ' model once that has streamed in.
+// Make the object from its 'TEO ' model (id 10003), unless it is made already.
 // port: a 'TEO ' object's UStreamObject.uUnk4 holds its model (see rcmp_mad_codec.c fn_800B9B48).
 void fn_800AE380(void) {
     if (lbl_802820D0 == NULL) {
