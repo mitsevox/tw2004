@@ -50,6 +50,42 @@ void fn_80045F74(UStreamObject* arg0) {
     }
 }
 
+// ---- end of sweep code ----
+
+// The 'BALL' stream handler: a bank of ball logos. Each player's chosen logo (its profile's byte
+// 0x38, from lbl_80187B98's names) is copied over the pixels of that player's logo texture
+// ("logoea", "logonike", ...), then the bank is freed.
+void fn_80045FC8(UStreamObject* pObject) {
+    u64 uLogo;
+    u64 uSlot;
+    TexBank* pSlotBank;
+    TexEntry* pSlot;
+    TexBank* pBank;
+    TexEntry* pLogo;
+    int i;
+    int nLogo;
+
+    pBank = fn_8000FB88(pObject, NULL, -2);
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        if ((s8)gSession.aProfile[i].nOutfit >= 0) {
+            fn_800CB700(&uLogo, lbl_80187B98[(s8)gSession.aProfile[i].nOutfit]);
+            fn_800CB700(&uSlot, lbl_80187CF8[i]);
+            fn_800102DC(uSlot, &pSlotBank, &pSlot);
+            nLogo = fn_8001005C(pBank, uLogo);
+            pLogo = &pBank->p8[nLogo];
+            // EA bug: this loop counts with the player loop's i
+            while (i < pLogo->n41) {
+                Mem_cpy(pSlotBank->p18 + pSlot->uPixels, pBank->p18 + pLogo->uPixels, pLogo->nC * 16);
+                i++;
+            }
+        }
+    }
+    fn_80009E70(pBank);
+    fn_80009E70(pObject);
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_800460F8(UStreamObject* arg0) {
     void* temp_r31;
 

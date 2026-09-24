@@ -168,9 +168,12 @@ void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
 typedef struct TexEntry {
     u64  u0;                    // 0x00  its name's hash (fn_8000BEE4; fn_8001005C finds a texture by it)
     u32  uPixels;               // 0x08  where its pixels start in the bank's p18
-    u8   unkC[0x3C - 0xC];
+    s16  nC;                    // 0x0C  GoDynObj.c's fn_80045FC8 copies nC * 16 bytes of its pixels
+    u8   unkE[0x3C - 0xE];
     s16  nPalette;              // 0x3C  its row in the bank's pC
-    u8   unk3E[0x47 - 0x3E];
+    u8   unk3E[0x41 - 0x3E];
+    s8   n41;                   // 0x41  (fn_80045FC8)
+    u8   unk42[0x47 - 0x42];
     u8   b47;                   // 0x47  bit 0: the next texture goes with it (char.c fn_80019798)
     u8   unk48[0x50 - 0x48];
 } TexEntry;
