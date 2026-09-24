@@ -1,4 +1,5 @@
-// Small functions found by the sweep (sweep.py). Original file: UObject3D.c (fn_80045D80 calls them).
+// Small functions found by the sweep (sweep.py). Original file unknown; UObject3D.c's fn_80045D80
+// calls them.
 
 #include "dynobj.h"
 
