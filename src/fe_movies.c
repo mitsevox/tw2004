@@ -128,6 +128,26 @@ void fn_80091870(void) {
     fn_80010544(lbl_80281378);
 }
 
+// Set lbl_801D8858 up once, unless the session has flag 4: the clock, the number of players in
+// game type 4 (else 0) and values from it, then the 'load' object's picture (fn_800917C8).
+void fn_800918A4(void) {
+    if (!(gSession.uFlags & 4) && !lbl_801D8858.b18) {
+        lbl_801D8858.b18 = 1;
+        lbl_801D8858.n1C = -1;
+        lbl_801D8858.f10 = 0.0f;
+        lbl_801D8858.u20 = fn_80095368();
+        lbl_801D8858.n0 = 0;
+        if (gSession.nGameType == 4) {
+            lbl_801D8858.n14 = gSession.nNumPlayers;
+        } else {
+            lbl_801D8858.n14 = 0;
+        }
+        lbl_801D8858.fC = lbl_801D8858.f4 = (4.83f * lbl_801D8858.n14 + 3.1f) / 8.0f;
+        lbl_801D8858.f8 = 0.0f;
+        fn_800917C8();
+    }
+}
+
 // Decode the picture in the 'load' object, show it for nFrames frames (fading in over 30), then
 // free it.
 void fn_80091DB8(int nFrames) {
