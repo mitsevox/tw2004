@@ -118,7 +118,7 @@ extern f32 lbl_801DB878[4];     // UFstPart.c: the point fn_80099E34 orders emit
 // PsBallFx.c's state (lbl_801F1708, 0x88 bytes), reached through lbl_80281408. The sand trail's
 // fields (0x28-0x74) are arrays of one, indexed by the trail number (fn_800A34C0).
 typedef struct PsBallFxState {
-    ShaderObject mesh;          // 0x00  a row 0 shader object (Skin.c's fn_80036054; fn_800A2E14 frees it)
+    ShaderObject mesh[1];       // 0x00  a row 0 shader object (Skin.c's fn_80036054; fn_800A2E14 frees it)
     f32* ap28[1];               // 0x28  } freed by fn_800A2E14; PsBallFx_InitModule allocates 0x960,
     f32* ap2C[1];               // 0x2C  } 0x640 and 0x320 bytes: 200 vertices' positions (x, y, z),
     u8*  ap30[1];               // 0x30  } texture corners (0,0) (1,0) (0,1) (1,1) of 50 quads, colours

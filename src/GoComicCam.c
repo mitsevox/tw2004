@@ -20,6 +20,8 @@ u8   fn_800B4818(f32* pRect, int nPlayer);
 u8   fn_800B4908(void);
 void fn_800B4914(View* pView, int nPlayer);
 
+ComicCam* lbl_80282178;
+
 void fn_800B34F0(void) {
     lbl_80282178 = fn_80009B34(sizeof(ComicCam), 2, 0, "GoComicCam.c", 91);
 }
@@ -232,7 +234,7 @@ void fn_800B3D68(ComicPanel* pPanel, f32* pRect, f32 fFrameTime) {
     fHeight = pRect[3];
     fWidth = pRect[2];
     for (i = 0; i < 10; i++) {
-        if (0.0f < lbl_80282178->a24[i]) {
+        if (lbl_80282178->a24[i] > 0.0f) {
             fn_800B3F4C(pRect, lbl_80282178->aPanel[i].fTop, lbl_80282178->aPanel[i].fLeft,
                         lbl_80282178->aPanel[i].fWidth, lbl_80282178->aPanel[i].fHeight);
             aColour[3] = 0.5f * (1.0f - lbl_80282178->a24[i] / lbl_80282178->a4C[i]);
@@ -240,7 +242,7 @@ void fn_800B3D68(ComicPanel* pPanel, f32* pRect, f32 fFrameTime) {
             lbl_80282178->a24[i] = lbl_80282178->a24[i] - fFrameTime;
             fn_80038624(aColour);
             if (lbl_80282178->bNext && lbl_80282178->a24[i] <= 0.0f) {
-                lbl_80282178->a24[i] = lbl_80282178->a24[i] + fFrameTime;
+                lbl_80282178->a24[i] += fFrameTime;
             }
         }
     }

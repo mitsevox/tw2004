@@ -605,6 +605,10 @@ shadow.c:
 
 GoComicCam.c:
 	.text       start:0x800B34F0 end:0x800B4B5C
+	.rodata     start:0x80183BC8 end:0x80183C78
+	.data       start:0x8018FF78 end:0x8018FF88
+	.sbss       start:0x80282178 end:0x80282180
+	.sdata2     start:0x802840F8 end:0x80284148
 
 GoShaderObject_Rain_Gc.c:
 	.text       start:0x800B4B5C end:0x800B5934
