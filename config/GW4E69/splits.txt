@@ -587,11 +587,8 @@ GoComicCam.c:
 GoShaderObject_Rain_Gc.c:
 	.text       start:0x800B4B5C end:0x800B5918
 
-unsorted/sweep_800B5934.c:
-	.text       start:0x800B5934 end:0x800B59BC
-
-unsorted/sweep_800B59EC.c:
-	.text       start:0x800B59EC end:0x800B5A14
+AudLock.c:
+	.text       start:0x800B5934 end:0x800B5A14
 
 UAudMemStack.c:
 	.text       start:0x800B5A14 end:0x800B5C40
