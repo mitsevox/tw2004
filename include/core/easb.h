@@ -6,7 +6,7 @@
 // Error codes and the image layout are TW06's (its PDB keeps the EASB types).
 
 #include "game_types.h"
-#include "Common/SharedFileIO.h"
+#include "Common/TagFile.h"
 
 // Every library call returns one of these (TW06's EASBErrorE).
 typedef enum EASBErrorE {
@@ -182,6 +182,69 @@ LAYOUT_ASSERT(TibExtCard, 0x90);
 extern TibExtCard* lbl_80281970;
 extern s32 lbl_80194758[46];        // the file library's code for each card error (by -error)
 
+// A storage operation's arguments, kept in EASBStorage.args while its steps run (fn_8012BF18).
+typedef struct EASBStorageArgs {
+    char* szName;                   // 0x00: the product name the game's record must have (fn_8012AA7C)
+    EASBTotals* pTotals;            // 0x04
+    EASBProduct* pProduct;          // 0x08: one record, or fn_8012C774's EASB_MAX_PRODUCTS
+    EASBImageSlot* pImageSlots;     // 0x0C: EASB_MAX_PRODUCTS pictures (fn_8012AE40)
+    EASBImage* pImage;              // 0x10
+    void* pHeader;                  // 0x14: the save's banner and icon block (SFIOCreate)
+    int eDevice;                    // 0x18: where to create the file (TagFile_BeginSave)
+} EASBStorageArgs;                  // size 0x1C
+
+// One of the storage operations (lbl_80195520, by operation number): whether it starts the
+// tag-file library first and shuts it down after, and its steps in order.
+typedef struct EASBStorageOp {
+    s32 nOperation;                 // 0x00: its own number
+    u8 bStartTagFile;               // 0x04: fn_8012BF18 starts the library (fn_8012CAA8)
+    u8 bStopTagFile;                // 0x05: fn_8012C03C shuts it down (fn_8012CC48)
+    u8 unk6[2];
+    s32 anSteps[8];                 // 0x08: EASB_STEP_END ends the list
+} EASBStorageOp;                    // size 0x28
+
+#define EASB_OPERATION_ERROR 10     // clean-up after a failed operation (fn_8012C1AC)
+#define EASB_OPERATION_NONE 11      // EASBStorage.nOperation when nothing runs
+#define EASB_STEP_END 0x14
+
+extern EASBStorageOp lbl_80195520[EASB_OPERATION_NONE + 1];
+
+// The storage code's state (lbl_802825B0, 0x1A8 bytes from fn_8012BD0C).
+typedef struct EASBStorage {
+    SFIOFuncTable callbacks;        // 0x000: a copy of EASBInitParams.pCallbacks
+    TagSession savedSession;        // 0x044: the open file's session, kept between operations
+    u32 uHeapID;                    // 0x08C
+    u8 b90;                         // 0x090
+    u8 bFileOpen;                   // 0x091
+    u8 b92;                         // 0x092
+    u8 unk93;
+    s32 n94;                        // 0x094: how the game's slot was picked (fn_8012A4C4): 3 its own
+                                    //        record, 2 an empty one, 1 the oldest; fn_80129F98's mode
+    u8 nSlot;                       // 0x098: this game's record, or EASB_PRODUCT_NONE
+    u8 unk99[3];
+    u8* pBuffer;                    // 0x09C: one record's packed bytes (fn_8012CAA8)
+    u32 uBufferSize;                // 0x0A0: the biggest record: an image (0x4301)
+    s32 nHeadState;                 // 0x0A4: 1 when the HEAD record is read or written, 2 when missing
+    s32 anProductState[EASB_MAX_PRODUCTS];  // 0x0A8: the same for each PROD record
+    EASBTotals totals;              // 0x10C: the totals in the file's HEAD record
+    TagSession session;             // 0x120: the tag-file session of the running operation
+    u8 nRecord;                     // 0x168: the record a step is on (EASB_PRODUCT_NONE: HEAD)
+    u8 nFoundSlot;                  // 0x169: the slot fn_8012A4C4 picks for the game
+    u8 unk16A[2];
+    u32 uOldestTime;                // 0x16C: the oldest record seen by fn_8012A4C4
+    s32 nFoundKind;                 // 0x170: how nFoundSlot was picked (becomes n94)
+    s32 nLastError;                 // 0x174: the tag-file library's last error (fn_8012C98C)
+    s32 nResult;                    // 0x178: the error that stopped nLastOperation (fn_8012C1AC)
+    s32 nLastOperation;             // 0x17C: the operation that failed
+    EASBStorageArgs args;           // 0x180: the running operation's arguments
+    s32 nOperation;                 // 0x19C: EASB_OPERATION_NONE when idle
+    s32* pnSteps;                   // 0x1A0: the running operation's steps (EASBStorageOp.anSteps)
+    EASBProcessE eStepProcess;      // 0x1A4: where the running step has got to (fn_8012C388)
+} EASBStorage;
+LAYOUT_ASSERT(EASBStorage, 0x1A8);
+
+extern EASBStorage* lbl_802825B0;
+
 // EASBStorage.c: the code before EASB.c.
 EASBErrorE fn_80127F88(EASBProduct* pProduct);  // EASB_ERROR_INVALID_PRODUCT if the record is bad
 EASBErrorE fn_80128054(EASBAccomplishment* pAccomplishment);
@@ -206,11 +269,11 @@ u32 fn_80128BC4(u32 uTime);         // clamps a time to 2003-01-01..2023-01-01
 EASBErrorE fn_8012881C(u32 uTime, u16* pnDays, u8* pnHours, u8* pnMinutes, u8* pnSeconds);
 EASBErrorE fn_801288DC(u32 uTime, u16* pnYear, u8* pnMonth, u8* pnDay, u8* pnHours, u8* pnMinutes,
                        u8* pnSeconds);
-EASBErrorE fn_8012C5F8(EASBTotals* pTotals, EASBProduct* pProduct, u8* p2);
+EASBErrorE fn_8012C5F8(EASBTotals* pTotals, EASBProduct* pProduct, char* szName);
 EASBErrorE fn_8012C69C(void);
 EASBErrorE fn_8012C73C(void);
 EASBErrorE fn_8012C774(EASBProduct* pProducts);
-EASBErrorE fn_8012C7BC(EASBTotals* pTotals, EASBProduct* pProduct, void* pImage);
+EASBErrorE fn_8012C7BC(EASBTotals* pTotals, EASBProduct* pProduct, EASBImage* pImage);
 u8 fn_8012C83C(void);
 u8 fn_8012C848(void);
 EASBErrorE fn_8012C854(u8* pnSlot);  // the storage code's slot number (EASB_PRODUCT_NONE: none)

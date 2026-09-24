@@ -14,7 +14,7 @@ void fn_800ACCF4(void);
 u8   fn_800AF264(u8 a, u8 b);
 void fn_800AF2D8(void);
 void fn_800AF2DC(u8 b);
-void fn_800AF31C(s32 n);
+void fn_800AF31C(u8 n);
 
 void fn_800A8D54(void);
 
@@ -116,7 +116,7 @@ u8 fn_800A87A4(u8 a, u8 b, u8 nListeners) {
 void fn_800A87B0(void) {
 }
 
-void fn_800A87B4(s32 a, s32 n) {
+void fn_800A87B4(u8 a, u8 n) {
     fn_800AF31C(n);
 }
 

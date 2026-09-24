@@ -107,6 +107,10 @@ int  SFIOUpdate(int* pProcess, int* pResult);
 int  SFIOSetDescriptor(SFIODescriptor* pDescriptor);
 void SFIOPlatformCall80172F48(void* const** ppInterface);
 
+// SharedFileIO.c: what EASBStorage.c calls.
+int  SFIOCreate(void* pHeader);
+void fn_8017124C(SFIODescriptor* pDescriptor, u32* pSize, u32* pEntries);
+
 // SharedFileIO.c: shared with the platform layer.
 BOOL SFIOIsInitialized(void);
 int  SFIOGetLastError(void);
