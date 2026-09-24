@@ -180,17 +180,10 @@ void fn_80114398(DynChain* pChain) {
 }
 
 // pIn (x, y, z, w) through pMtx's rotation into pOut; w is copied.
-void fn_801143D0(f32 (*pMtx)[4], f32* pIn, f32* pOut) {
-    f32 fY = pIn[1];
-    f32 fX = pIn[0];
-    f32 fZ = pIn[2];
-    f32 fOutX = fZ * pMtx[2][0] + (fX * pMtx[0][0] + fY * pMtx[1][0]);
-    f32 fOutY = fZ * pMtx[2][1] + (fX * pMtx[0][1] + fY * pMtx[1][1]);
-    f32 fOutZ = fZ * pMtx[2][2] + (fX * pMtx[0][2] + fY * pMtx[1][2]);
-
-    pOut[0] = fOutX;
-    pOut[1] = fOutY;
-    pOut[2] = fOutZ;
+void fn_801143D0(const f32 (*pMtx)[4], const f32* pIn, f32* pOut) {
+    pOut[0] = pIn[2] * pMtx[2][0] + (pIn[0] * pMtx[0][0] + pIn[1] * pMtx[1][0]);
+    pOut[1] = pIn[2] * pMtx[2][1] + (pIn[0] * pMtx[0][1] + pIn[1] * pMtx[1][1]);
+    pOut[2] = pIn[2] * pMtx[2][2] + (pIn[0] * pMtx[0][2] + pIn[1] * pMtx[1][2]);
     pOut[3] = pIn[3];
 }
 
