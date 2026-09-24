@@ -10,6 +10,13 @@ void fn_80036460(int n);                // Skin.c
 void PostFx_CopyScreenToBuffer(void);   // gomainloop.c
 void fn_8011EB80(void);
 void fn_80112B34(void);                 // hwsOverride_Gc.c
+void fn_800CEEC8(SkinIter* pIter);      // SkinPart.c: the iterator's next step
+void fn_80113C70(SkinIter* pIter);
+void fn_80113D28(SkinIter* pIter);
+
+// The step functions of the two iterators (fn_80113A9C, fn_80113B34).
+void (*lbl_802817EC[1])(SkinIter* pIter) = { fn_80113C70 };
+void (*lbl_802817F0[2])(SkinIter* pIter) = { fn_80113D28, NULL };
 
 void* lbl_802824E0;                     // the screen buffer (fn_80112C64)
 u32 lbl_802824EC;                       // and its size
@@ -112,7 +119,7 @@ void fn_80113904(s32 p0);
 void fn_80113A7C(void);
 void fn_80113B14(void);
 void fn_80113BAC(void);
-void fn_80113E54(u8* p, s32 v);
+void fn_80113E54(SkinIter* pIter, void (**ppfnNext)(SkinIter* pIter));
 void fn_80113E5C(void);
 
 void fn_8011368C(u8* p0, s32 p1, s32 p2, s32 p3) {
@@ -180,16 +187,50 @@ void fn_80113A7C(void) {
     fn_80113E5C();
 }
 
+// ---- end of sweep code ----
+
+// An iterator in pBuf over the meshes of pArgs's SkinDesc.p5C entry (first step taken).
+SkinIter* fn_80113A9C(u8* pBuf, SkinIterArgs* pArgs) {
+    SkinDescIter* pIter = (SkinDescIter*)pBuf;
+
+    fn_80113E54(&pIter->iter, lbl_802817EC);
+    pIter->pDesc = pArgs->pDesc;
+    pIter->pEntry = &pArgs->pDesc->p5C[pArgs->n];
+    pIter->n1C = 0;
+    pIter->n18 = -1;
+    fn_800CEEC8(&pIter->iter);
+    return &pIter->iter;
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_80113B14(void) {
     fn_80113E5C();
 }
+
+// ---- end of sweep code ----
+
+// The same with the other step function.
+SkinIter* fn_80113B34(u8* pBuf, SkinIterArgs* pArgs) {
+    SkinDescIter* pIter = (SkinDescIter*)pBuf;
+
+    fn_80113E54(&pIter->iter, lbl_802817F0);
+    pIter->pDesc = pArgs->pDesc;
+    pIter->pEntry = &pArgs->pDesc->p5C[pArgs->n];
+    pIter->n1C = 0;
+    pIter->n18 = -1;
+    fn_800CEEC8(&pIter->iter);
+    return &pIter->iter;
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_80113BAC(void) {
     fn_80113E5C();
 }
 
-void fn_80113E54(u8* p, s32 v) {
-    *(s32*)(p + 0x0) = v;
+void fn_80113E54(SkinIter* pIter, void (**ppfnNext)(SkinIter* pIter)) {
+    pIter->ppfnNext = ppfnNext;
 }
 
 void fn_80113E5C(void) {

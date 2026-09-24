@@ -318,6 +318,16 @@ typedef struct SkinIter {
     s32  nCur;                  // 0xC
 } SkinIter;
 
+// The whole iterator fn_80113A9C and fn_80113B34 build (our name): the meshes of one SkinDesc.p5C
+// entry.
+typedef struct SkinDescIter {
+    SkinIter iter;              // 0x00
+    SkinDesc* pDesc;            // 0x10
+    SkinDesc5C* pEntry;         // 0x14
+    s32  n18;                   // 0x18  -1 before the first step
+    s32  n1C;                   // 0x1C
+} SkinDescIter;
+
 // What fn_80113B34 walks: a description and a SkinDesc.p5C entry (or, from fn_800CD5D0, a
 // SkinVariant.nC index).
 typedef struct SkinIterArgs {
