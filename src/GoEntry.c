@@ -8,7 +8,6 @@
 #include "game/frontend.h"
 
 int  printf(const char* pFmt, ...);         // MSL
-void GXDrawDone(void);                      // SDK
 void VISetPostRetraceCallback(void* pCallback);
 void VISetBlack(int bBlack);
 void VIFlush(void);

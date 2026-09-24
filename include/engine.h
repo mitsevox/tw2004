@@ -325,6 +325,20 @@ extern u32 lbl_80281B9C;                // LLDisp_Gc.c: the most the FIFO has he
 extern void* lbl_80281BA4[2];           // LLDisp_Gc.c: two image buffers (DepthField.c and
                                         //       FEgolferanim.c make textures of them)
 
+// LLDisp_Gc.c's frame sync (lbl_801A2350, our name): the FIFO break points the GPU is stopped at,
+// so the CPU knows when a frame's commands have been drawn.
+typedef struct DispSync {
+    void* aBreakPt[3];          // 0x00  a ring of FIFO write pointers
+    s8   nNext;                 // 0x0C  the next one to enable (0..2)
+    s8   b0D;                   // 0x0D
+    s8   nPending;              // 0x0E  how many are queued
+    s8   bBusy;                 // 0x0F  set while the GPU runs to a break point; fn_800070DC waits on it
+    u8   nBuf;                  // 0x10  the lbl_80281BA4 buffer the frame is copied to
+    s8   n11;                   // 0x11  counted up at each retrace with a break point hit
+    s8   n12;                   // 0x12  counted up at each jittered viewport
+    s8   bBreak;                // 0x13  the GPU reached a break point (fn_80006EC8, GX's callback)
+} DispSync;
+
 // The renderer's state (lbl_801B8980, 0x118 bytes); only what the game code writes.
 // GoTerrain.c's setters write one group of fields each and set that group's bit in u110.
 typedef struct RenderState {
