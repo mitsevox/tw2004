@@ -843,20 +843,20 @@ void fn_8011443C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
 // scaled by the settings' f90. 1 is no sway.
 f32 fn_80116304(u32 nFrame, f32 fPhase, f32 fStrength) {
     f32 fPeriod = 600.0f;
+    f32 fOne = 1.0f;            // the wave's scale and the most sway (EA kept the multiply)
     f32 fAngle;
     f32 fWave;
-    f32 fBase;
     f32 fSway;
 
     fAngle = PI * (2.0f * ((f32)(nFrame % (u32)fPeriod) / fPeriod));
-    fWave = fn_800095F0(3.0f * fAngle + 2.0f + fPhase);
-    fWave = fn_800095F0(fAngle + fPhase) + fWave;
-    fWave = fn_800095F0(5.0f * fAngle + 4.0f + fPhase) + fWave;
-    fWave = fn_800095F0(7.0f * fAngle + 6.0f + fPhase) + fWave;
-    fBase = lbl_802824F8->f94 + fStrength * (lbl_802824F8->f98 - lbl_802824F8->f94) / 35.0f;
-    fSway = 1.0f * fWave + fBase;
-    fSway = (fSway < 0.0f) ? 0.0f : ((fSway > 1.0f) ? 1.0f : fSway);
-    return 1.0f - lbl_802824F8->f90 * (1.0f - fSway);
+    // Four waves; CodeWarrior calls the right operand first, so the 3x wave is made first.
+    fWave = fn_800095F0(7.0f * fAngle + 6.0f + fPhase) +
+            (fn_800095F0(5.0f * fAngle + 4.0f + fPhase) +
+             (fn_800095F0(fAngle + fPhase) + fn_800095F0(3.0f * fAngle + 2.0f + fPhase)));
+    fSway = fOne * fWave;
+    fSway += lbl_802824F8->f94 + fStrength * (lbl_802824F8->f98 - lbl_802824F8->f94) / 35.0f;
+    fSway = (fSway < 0.0f) ? 0.0f : ((fSway > fOne) ? fOne : fSway);
+    return 1.0f - lbl_802824F8->f90 * (fOne - fSway);
 }
 
 // The strength the chains sway with: the settings' nB8, or fn_80055F80's when it is -1; at least 5.
