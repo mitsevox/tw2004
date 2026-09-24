@@ -5,6 +5,8 @@
 #include "core/easb.h"
 #include "platform.h"
 
+EASBState* lbl_802825B8;
+
 // Checks that the library is running with a valid product, and that the Bio file is open or
 // closed as the call needs (EASB_NEED_*).
 EASBErrorE fn_8012CCD8(s32 nNeed) {

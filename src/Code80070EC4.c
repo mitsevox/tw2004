@@ -8,6 +8,8 @@
 #include "shaderdata.h"
 #include "terrain.h"
 
+f32 lbl_80281E78;
+
 void fn_80070EC4(TerWaveData* pWave);
 void fn_80070F00(StaticShaderObject* pObj, ShaderCmds* pCmds);
 void fn_80070F34(StaticShaderObject* pObj);

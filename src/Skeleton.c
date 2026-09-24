@@ -7,7 +7,9 @@
 #include "golfer.h"
 #include "unsorted/cull.h"
 
-void fn_80029BC8(f32* pVec);                            // sets a vector to lbl_80186838
+f32 lbl_801C6498[4];
+
+void fn_80029BC8(f32* pVec);                           // sets a vector to lbl_80186838
 void fn_80026BF4(CharModel* pModel, IKChain* pChain);
 f32  fn_80026D18(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLink, int n);   // an IK step's
                                                                                        // remaining error

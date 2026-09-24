@@ -10,6 +10,8 @@
 #include "core/startup.h"
 #include "shaderdata.h"
 
+f32 lbl_80281E70;
+
 // The header's __FILE__, which the allocations name.
 #define DRB_FILE "GoShaderObjectCommon_DynamicRenderingBuffer_Gc.h"
 

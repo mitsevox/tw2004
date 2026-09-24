@@ -21,6 +21,8 @@ EASBStorageOp lbl_80195520[EASB_OPERATION_NONE + 1] = {
     { EASB_OPERATION_NONE, 0, 0, {0, 0}, {EASB_STEP_END, 0, 0, 0, 0, 0, 0, 0} },
 };
 
+EASBStorage* lbl_802825B0;
+
 // The two-letter language codes the library knows (EASBInitParams.uGamesPlayedTypeLanguage).
 #define EASB_LANGUAGE(a, b) (((a) << 8) | (b))
 

@@ -153,6 +153,7 @@ skalib.c:
 Skeleton.c:
 	.text       start:0x80026B4C end:0x80029FC8
 	.data       start:0x80187400 end:0x80187490
+	.bss        start:0x801C6498 end:0x801C64A8
 	.sdata      start:0x80281080 end:0x802810A8
 	.sdata2     start:0x80282D10 end:0x80282D60
 
@@ -196,6 +197,7 @@ GoDynamicCam.c:
 	.rodata     start:0x8017E690 end:0x8017E938
 	.data       start:0x80187910 end:0x80187AA0
 	.sdata      start:0x80281108 end:0x80281110
+	.sbss       start:0x80281D88 end:0x80281D90
 	.sdata2     start:0x80283068 end:0x802830A8
 
 gocamscripts.c:
@@ -350,10 +352,12 @@ unsorted/sweep_80070168.c:
 DynamicRenderingBuffer.c:
 	.text       start:0x8007018C end:0x80070EC4
 	.data       start:0x80188E18 end:0x80188E50
+	.sbss       start:0x80281E70 end:0x80281E78
 	.sdata2     start:0x802839B8 end:0x802839C8
 
 Code80070EC4.c:
 	.text       start:0x80070EC4 end:0x8007110C
+	.sbss       start:0x80281E78 end:0x80281E80
 	.sdata2     start:0x802839C8 end:0x802839D0
 
 GoShaderObject_PrelitUVAnimation_Gc.c:
@@ -711,6 +715,7 @@ SkinPart.c:
 
 HoleScore.c:
 	.text       start:0x800CF158 end:0x800D1698
+	.sbss       start:0x80282240 end:0x80282248
 	.sdata2     start:0x80284478 end:0x802844C8
 
 SwingTips.c:
@@ -795,6 +800,7 @@ GameModeFourBall.c:
 
 GameModeMatch.c:
 	.text       start:0x800E9E40 end:0x800EACD8
+	.sdata      start:0x80281658 end:0x80281660
 	.sdata2     start:0x80284660 end:0x80284668
 
 GameMode5.c:
@@ -808,6 +814,7 @@ GameMode5.c:
 GameMode9.c:
 	.text       start:0x800ED738 end:0x800EDD18
 	.rodata     start:0x80184DD0 end:0x80184DE0
+	.sbss       start:0x80282330 end:0x80282338
 	.sdata2     start:0x80284670 end:0x80284688
 
 GameModeDriverPGATour.c:
@@ -885,6 +892,7 @@ GameMode8.c:
 GameModeStableford.c:
 	.text       start:0x800FE1B4 end:0x800FEAFC
 	.rodata     start:0x80184DE0 end:0x80184DF0
+	.sdata      start:0x802816D0 end:0x802816D8
 	.sdata2     start:0x802847A0 end:0x802847A8
 
 GameMode12.c:
@@ -1014,6 +1022,7 @@ fe_stats.c:
 	.text       start:0x8011CEB0 end:0x8011D280
 	.data       start:0x80194180 end:0x801944F8
 	.sdata      start:0x80281888 end:0x802818A8
+	.sbss       start:0x80282508 end:0x80282510
 
 EventInfo.c:
 	.text       start:0x8011D280 end:0x8011E020
@@ -1069,6 +1078,7 @@ SkinBurn.c:
 	.text       start:0x801270F0 end:0x80127D84
 	.data       start:0x80195500 end:0x80195520
 	.sdata      start:0x802819A8 end:0x802819B0
+	.sbss       start:0x802825A8 end:0x802825B0
 	.sdata2     start:0x80284B38 end:0x80284B40
 
 EASBStorage.c:
@@ -1076,10 +1086,12 @@ EASBStorage.c:
 	.rodata     start:0x80184E40 end:0x80184FC0
 	.data       start:0x80195520 end:0x80195750
 	.sdata      start:0x802819B0 end:0x802819B8
+	.sbss       start:0x802825B0 end:0x802825B8
 	.sdata2     start:0x80284B40 end:0x80284B58
 
 EASB.c:
 	.text       start:0x8012CCD8 end:0x8012E950
+	.sbss       start:0x802825B8 end:0x802825C0
 	.sdata2     start:0x80284B58 end:0x80284B60
 
 src/vi/vi.c:

@@ -27,6 +27,8 @@ StatsUnits lbl_80194484[FE_STATS_NUM_CATEGORIES] = {
     UNITS_NONE,
 };
 
+s32 lbl_80282508;
+
 // Prints a statistic's value text with its units: "$1,234,567", "301.2 yds", "65.2%".
 void PrintStatsWithUnits(const char* szValue, StatsUnits eUnits, char* szOut) {
     char szMoney[128];

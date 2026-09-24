@@ -9,7 +9,7 @@
 #include "game/earnings.h"
 
 // The points for 3 under par .. 2 or more over. TW06: GameModeStableford::stablefordPointTable.
-extern s8  lbl_802816D0[6];
+s8  lbl_802816D0[6] = {8, 5, 2, 0, -1, -3};
 
 u8   GameModeStableford_PlayerDoneHole(int nPlayer);
 void GameModeStableford_SetupNextGolfer(void);
