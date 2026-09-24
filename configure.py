@@ -999,7 +999,7 @@ config.libs = [
             Object(Matching, "GameMode12.c"),
             Object(Matching, "GameModeStroke.c"),
             Object(Matching, "GameMode11.c"),
-            Object(NonMatching, "GameMode4.c"),
+            Object(Matching, "GameMode4.c"),
             Object(NonMatching, "uiArc.c"),
             Object(NonMatching, "FE_CrAPDB.c"),
             Object(Matching, "FE_CrAPMessages.c"),
