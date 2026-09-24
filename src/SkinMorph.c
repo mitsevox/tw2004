@@ -6,10 +6,72 @@
 #include "engine.h"
 #include "charstate.h"
 
-void fn_8011C068(SkinMorphWork* pWork, SkinMeshBit* aVerts, u8* pExtra, u32 nVerts);
-void fn_8011C1FC(SkinMorphWork* pWork, u8* pVerts, u8* pExtra, u32 nVerts);
+// Unpacks nVerts vertices into the work area: positions (four s16 each) and normals (four s8
+// each) to 16.16 fixed point.
+void fn_8011C068(SkinMorphWork* pWork, s16* pPos, s8* pNrm, u32 nVerts) {
+    SkinMorphVert* pVert = pWork->aVerts;
+    u32 i;
+
+    for (i = 0; i < nVerts; i++) {
+        pVert->aPos[0] = pPos[0] << 16;
+        pVert->aPos[1] = pPos[1] << 16;
+        pVert->aPos[2] = pPos[2] << 16;
+        pVert->aPos[3] = pPos[3] << 16;
+        pPos += 4;
+        pVert->aNrm[0] = pNrm[0] << 16;
+        pVert->aNrm[1] = pNrm[1] << 16;
+        pVert->aNrm[2] = pNrm[2] << 16;
+        pVert->aNrm[3] = pNrm[3] << 16;
+        pNrm += 4;
+        pVert++;
+    }
+}
+
 void fn_8011C68C(SkinMorphWork* pWork, int n);
 s32  fn_8011CDE8(Skin* pSkin);
+
+// Packs the work area's nVerts vertices back: positions as four s16 each, normals as four s8.
+void fn_8011C1FC(SkinMorphWork* pWork, s16* pPos, s8* pNrm, u32 nVerts) {
+    SkinMorphVert* pVert = pWork->aVerts;
+    u32 i;
+
+    for (i = 0; i < nVerts; i++) {
+        pPos[0] = pVert->aPos[0] >> 16;
+        pPos[1] = pVert->aPos[1] >> 16;
+        pPos[2] = pVert->aPos[2] >> 16;
+        pPos[3] = pVert->aPos[3] >> 16;
+        pPos += 4;
+        pNrm[0] = pVert->aNrm[0] >> 16;
+        pNrm[1] = pVert->aNrm[1] >> 16;
+        pNrm[2] = pVert->aNrm[2] >> 16;
+        pNrm[3] = pVert->aNrm[3] >> 16;
+        pVert++;
+        pNrm += 4;
+    }
+}
+
+// Adds a morph target to the vertices it moves: nVerts position offsets (four s16 each), normal
+// offsets (four s8 each) and vertex numbers (s16), each offset times fScale.
+void fn_8011C27C(SkinMorphWork* pWork, void* pTarget, u32 nVerts, f32 fScale) {
+    s16* pPos = pTarget;
+    s8* pNrm = (s8*)(pPos + nVerts * 4);
+    s16* pIndex = (s16*)(pNrm + nVerts * 4);
+    SkinMorphVert* pVert;
+    u32 i;
+
+    for (i = 0; i < nVerts; i++) {
+        pVert = &pWork->aVerts[*pIndex];
+        pVert->aPos[0] = pPos[0] * fScale + pVert->aPos[0];
+        pVert->aPos[1] = pPos[1] * fScale + pVert->aPos[1];
+        pVert->aPos[2] = pPos[2] * fScale + pVert->aPos[2];
+        pVert->aNrm[0] = pNrm[0] * fScale + pVert->aNrm[0];
+        pVert->aNrm[1] = pNrm[1] * fScale + pVert->aNrm[1];
+        pVert->aNrm[2] = pNrm[2] * fScale + pVert->aNrm[2];
+        pIndex++;
+        pPos += 4;
+        pNrm += 4;
+    }
+}
 
 // Swaps the work area's two buffers.
 void fn_8011C46C(SkinMorphWork* pWork) {
@@ -33,14 +95,20 @@ void fn_8011C49C(SkinMorphWork* pWork, SkinMesh* pMesh) {
     SkinMeshBit* aVerts = pMesh->pBits;
 
     pWork->n10018 = nVerts;
-    fn_8011C068(pWork, aVerts, (u8*)(aVerts + nVerts), nVerts);
+    fn_8011C068(pWork, (s16*)aVerts, (s8*)(aVerts + nVerts), nVerts);
 }
 
 // Packs the work area's vertices back into pDst.
 void fn_8011C4D4(SkinMorphWork* pWork, u8* pDst) {
     u32 nVerts = pWork->n10018;
 
-    fn_8011C1FC(pWork, pDst, pDst + (nVerts << 3), nVerts);    // 8 bytes a vertex
+    fn_8011C1FC(pWork, (s16*)pDst, (s8*)(pDst + (nVerts << 3)), nVerts);  // 8 bytes a vertex
+}
+
+// Adds nVerts vertices of the target in the first buffer, scaled by fWeight, to the work area
+// (in 16.16 fixed point: the scale is fWeight * 65536, rounded).
+void fn_8011C504(SkinMorphWork* pWork, s32 nVerts, f32 fWeight) {
+    fn_8011C27C(pWork, pWork->p10020, nVerts, (s32)(65536.0f * fWeight + 0.5f));
 }
 
 // Clears the work area's skin and gives it.

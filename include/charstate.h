@@ -221,9 +221,16 @@ typedef struct SkinMorphState {
 
 // SkinMorph.c's work area (lbl_80281880; our name): blends a mesh's morph targets into one of two
 // vertex buffers. Only what the code reads.
+typedef struct SkinMorphVert {
+    s32  aPos[4];               // 0x00  16.16 fixed point
+    s32  aNrm[4];               // 0x10  the same
+} SkinMorphVert;
+LAYOUT_ASSERT(SkinMorphVert, 0x20);
+
 typedef struct SkinMorphWork {
-    u8   unk0[0x10018];
-    u16  n10018;                // 0x10018  vertices in the mesh being blended (fn_8011C49C)
+    SkinMorphVert aVerts[0x800];    // 0x00000  the mesh being blended (fn_8011C068 unpacks it)
+    u8   unk10000[0x18];
+    u16  n10018;               // 0x10018  vertices in the mesh being blended (fn_8011C49C)
     u8   pad1001A[0x10020 - 0x1001A];
     void* p10020;               // 0x10020  } the two buffers; fn_8011C46C swaps them
     void* p10024;               // 0x10024  }
