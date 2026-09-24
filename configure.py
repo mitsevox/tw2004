@@ -882,6 +882,8 @@ config.libs = [
             Object(NonMatching, "ska_shared.c"),
             Object(Matching, "Skeleton.c"),
             Object(NonMatching, "Golfer.c"),
+            Object(Matching, "Code8002DB80.c"),
+            Object(NonMatching, "Code8002EE1C.c"),
             Object(Matching, "GoRenderSurface.c"),
             Object(Matching, "LLPict_Gc.c"),
             Object(NonMatching, "GoTerrain.c"),
