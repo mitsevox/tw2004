@@ -196,12 +196,13 @@ void fn_800BB4E8(void) {
 
 // Byte-swap the tables in place, then put the bit-fields of the p14 and p1C entries in order.
 void fn_800BB52C(void) {
-    u32 i;
     void* pSrc;
     void* pDst;
     SitDevEntry* pEntry;
+    u32 i;
     SitDevEntry8* pEntry8;
     u16 uRaw;
+    u32 j;
     if (lbl_80282208->nEntries != 0) {
         pSrc = lbl_80282208->p14;
         pDst = lbl_80282208->p14;
@@ -227,14 +228,14 @@ void fn_800BB52C(void) {
     for (i = 0; i < lbl_80282208->nEntries; i++) {
         pEntry = &lbl_80282208->p14[i];
         uRaw = pEntry->b2.uRaw;
-        pEntry->b2.s.n11 = uRaw;
-        lbl_80282208->p14[i].b2.s.n5 = uRaw >> 11;
+        pEntry->b2.s.n11 = uRaw & 0x7FF;
+        lbl_80282208->p14[i].b2.s.n5 = (uRaw >> 11) & 0x1F;
     }
-    for (i = 0; i < lbl_80282208->n08; i++) {
-        pEntry8 = &lbl_80282208->p1C[i];
+    for (j = 0; j < lbl_80282208->n08; j++) {
+        pEntry8 = &lbl_80282208->p1C[j];
         uRaw = pEntry8->b2.uRaw;
-        pEntry8->b2.s.n11 = uRaw;
-        lbl_80282208->p1C[i].b2.s.n5 = uRaw >> 11;
+        pEntry8->b2.s.n11 = uRaw & 0x7FF;
+        lbl_80282208->p1C[j].b2.s.n5 = (uRaw >> 11) & 0x1F;
     }
 }
 
