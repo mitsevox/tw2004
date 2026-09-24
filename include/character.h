@@ -431,7 +431,10 @@ typedef struct AnimPlayer {
     f32   f24;                  // 0x24  } fn_800737B4: with uFlags bit 3, f28 climbs to f24; with
     f32   f28;                  // 0x28  } bit 4, it falls to f2C (at 0 bit 4 gives way to bit 0),
     f32   f2C;                  // 0x2C  } and the step is scaled by f28 / f24 on the way
-    u8    unk30[0x3C - 0x30];
+    f32   f30;                  // 0x30  with uFlags bit 7, fn_80072ED8 counts it down to 0, then
+                                //       clears bits 0 and 7
+    f32   f34;                  // 0x34  fn_80073108: a clock that drives a sway of three cosines
+    f32   f38;                  // 0x38  fn_80073108: the time the sway is centred on
     s32   n3C;                  // 0x3C  } cleared by fn_80072D90
     s32   n40;                  // 0x40  }
     struct AnimPlayerEntry* p44;    // 0x44  a48[0] after fn_80072D90
@@ -747,6 +750,8 @@ int   fn_80048574(Character* pChar, u64 uEvent);    // the character's animation
 u8    fn_8009637C(Character* pChar);    // CharAnim.c: n26 is not 1 (both callers mask the result)
 void  fn_80072ACC(SKABlendNode* pNode, int* pn, f32 fTime);
 f32   fn_80072CB8(SKABlendNode* pNode, u64 uEvent); // an event's time in a blend tree
+void  fn_80072ED8(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT);    // advance a player
+void  fn_80073108(Character* pChar, int nPlayer, AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT);
 void  fn_8007326C(u8* pAnim);
 void  Anim_SetTime(u8* pAnim, f32 fTime);           // 0x8007327C
 u8    fn_800734A0(SKABlendNode* pNode);

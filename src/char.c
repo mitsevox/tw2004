@@ -73,8 +73,6 @@ void  fn_800279C0(Character* pChar);                            // Skeleton.c
 void  SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform);   // Skeleton.c
 void  fn_80037C48(Skin* pSkin, SkelPose* pPose);                // Skin.c
 void  fn_8007260C(Character* pChar, SKABlendNode* pNode, CharModel* pModel, f32 fTime);  // animblender.c
-void  fn_80072ED8(void* pAnim, SKABlendNode* pNode, f32 fTime);                          // animblender.c
-void  fn_80073108(Character* pChar, int nPlayer, void* pAnim, SKABlendNode* pNode, f32 fTime);
 void  fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);                  // CharAnim.c
 void  fn_80096F0C(Character* pChar);                            // CharAnim.c
 void  fn_8000914C(f32* pQ, f32 (*m)[4]);                        // Quaternion.c: a rotation matrix
@@ -488,11 +486,11 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
         bC860 = 1;
     }
     if (pChar->n20 == 8 && pChar->nAnim == 8) {
-        fn_80073108(pChar, pChar->nPlayer, pChar->anim, &pChar->blend, fTime);
+        fn_80073108(pChar, pChar->nPlayer, (AnimPlayer*)pChar->anim, &pChar->blend, fTime);
     } else if (pChar->u10 & 0x100) {
-        fn_80072ED8(pChar->anim, &pChar->blend, 5.0f * fTime);
+        fn_80072ED8((AnimPlayer*)pChar->anim, &pChar->blend, 5.0f * fTime);
     } else {
-        fn_80072ED8(pChar->anim, &pChar->blend, fTime);
+        fn_80072ED8((AnimPlayer*)pChar->anim, &pChar->blend, fTime);
         if (pChar->uFlags & 0x1000) {
             pChar->uFlags &= ~0x1000;
             if (pChar->pCurClip != NULL && pChar->pCurClip->pF4 != NULL) {

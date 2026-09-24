@@ -22,6 +22,7 @@ f32  fn_80072938(SKABlendNode* pNode);
 void fn_8007325C(u8* pAnim);
 f32  fn_800732B8(f32 fTime, f32 fNow, f32 fStart, f32 fEnd);
 int  fn_800734D0(SKABlendNode* pNode);
+f32  fn_800737B4(AnimPlayer* pPlayer, f32 fT);
 
 // Create the blend tree pools: 10 of each in game types 3 and 10, else 50.
 void fn_80071AD0(void) {
@@ -343,6 +344,110 @@ void fn_80072D90(AnimPlayer* pPlayer) {
         pPlayer->a48[i].pPrev = pPrev;
         pPrev = &pPlayer->a48[i];
     }
+}
+
+// Advances a player by fT across the times of the tree under pNode: forward, or backward with
+// uFlags bit 6. At an end n08 counts the plays down (at 0 the player stops there, bit 2; with bit 8
+// it rewinds and clears itself instead); with bit 5 it turns round (bit 6 flips), else it wraps to
+// the other end and sets bit 12.
+void fn_80072ED8(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT) {
+    f32 fStep;
+    f32 fEnd;
+    f32 fStart;
+
+    pPlayer->uFlags &= ~0x1000;
+    pPlayer->fStart = fn_800728D8(pNode);
+    pPlayer->fEnd = fn_80072938(pNode);
+    if (pPlayer->uFlags & 0x80) {
+        pPlayer->f30 -= fT;
+        if (pPlayer->f30 <= 0.0f) {
+            pPlayer->f30 = 0.0f;
+            pPlayer->uFlags &= ~0x81;
+        }
+    }
+    pPlayer->uFlags &= ~4;
+    fStep = fn_800737B4(pPlayer, fT);
+    fStart = pPlayer->fStart;
+    fEnd = pPlayer->fEnd;
+    if (pPlayer->uFlags & 1) return;
+    if (pPlayer->uFlags & 0x40) {
+        pPlayer->fTime -= fStep;
+        if (pPlayer->fTime < fStart) {
+            if (pPlayer->n08 != 0 && pPlayer->n08 > 0) {
+                pPlayer->n08--;
+            }
+            if (pPlayer->n08 == 0) {
+                pPlayer->uFlags |= 4;
+                pPlayer->fTime = fStart;
+                return;
+            }
+            if (pPlayer->uFlags & 0x20) {
+                pPlayer->fTime = fStart;
+                pPlayer->uFlags ^= 0x40;
+                pPlayer->uFlags |= 4;
+                return;
+            }
+            pPlayer->fTime = fEnd;
+            pPlayer->uFlags |= 0x1000;
+        }
+    } else {
+        pPlayer->fTime += fStep;
+        if (pPlayer->fTime > fEnd) {
+            if (pPlayer->n08 != 0 && pPlayer->n08 > 0) {
+                pPlayer->n08--;
+            }
+            if (pPlayer->n08 == 0) {
+                if (pPlayer->uFlags & 0x100) {
+                    pPlayer->fTime = 0.0f;
+                    pPlayer->uFlags &= ~0x105;
+                    pPlayer->n00 = 0;
+                    pPlayer->n08 = 1;
+                    return;
+                }
+                pPlayer->uFlags |= 4;
+                pPlayer->fTime = fEnd;
+                return;
+            }
+            if (pPlayer->uFlags & 0x20) {
+                pPlayer->fTime = fEnd;
+                pPlayer->uFlags ^= 0x40;
+                pPlayer->uFlags |= 4;
+                return;
+            }
+            pPlayer->fTime = fStart;
+            pPlayer->uFlags |= 0x1000;
+        }
+    }
+}
+
+// Sways pPlayer's time around f38: three cosines of the f34 clock (advanced by fT) make a wave
+// from 0 to 1, scaled by 0.033 or 0.3 (club 25, by the clip group) or 0.05; the player then runs
+// forward or backward (uFlags bit 6) towards that time.
+void fn_80073108(Character* pChar, int nPlayer, AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT) {
+    f32 fWave;
+    f32 fDelta;
+
+    pPlayer->f34 += fT;
+    fWave = 1.0f - (3.0f + (fn_80009638(pPlayer->f34 / 5.0f) +
+                            (fn_80009638(5.0f * pPlayer->f34) + fn_80009638(7.0f * pPlayer->f34 / 3.0f)))) /
+                       6.0f;
+    if (gPlayers[nPlayer].nClub == 25) {
+        if (pChar->blend.nGroup == 9) {
+            fWave *= 0.033f;
+        } else {
+            fWave *= 0.3f;
+        }
+    } else {
+        fWave *= 0.05f;
+    }
+    fDelta = (pPlayer->f38 - fWave) - pPlayer->fTime;
+    if (fDelta < 0.0f) {
+        fDelta = -fDelta;
+        pPlayer->uFlags |= 0x40;
+    } else {
+        pPlayer->uFlags &= ~0x40;
+    }
+    fn_80072ED8(pPlayer, pNode, fDelta);
 }
 
 // Character.anim is still declared as bytes, so these three take its address as a u8*.
