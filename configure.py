@@ -1052,7 +1052,7 @@ config.libs = [
             Object(Matching, "unsorted/sweep_800072E8.c"),
             Object(Matching, "unsorted/sweep_80045D18.c"),
             Object(Matching, "unsorted/sweep_80045EC0.c"),
-            Object(NonMatching, "fe_craputils.c"),
+            Object(Matching, "fe_craputils.c"),
             Object(Matching, "unsorted/sweep_8006F4B4.c"),
             Object(Matching, "unsorted/sweep_8006F518.c"),
             Object(NonMatching, "DynamicRenderingBuffer.c"),

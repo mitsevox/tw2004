@@ -372,6 +372,7 @@ int  fn_8010553C(int nAsset);           // }
 s8   fn_801055DC(int nAsset);           // } an asset's lock kind and number (-1: no such
 s16  fn_80105610(int nAsset);           // } asset)
 s32  fn_80105C00(void);                 // how many assets there are
+s32  fn_80105C0C(int nAsset);           // an asset's n38 (-1: no such asset)
 u8   fn_80105C30(void);                 // the Create-A-Player database is allocated
 char* fn_801064EC(int nCategory);       // a category's name
 int  fn_80104AF4(s16 nPart, int n);     // the category of a part's entry n (-1 or 0x40: none)
