@@ -692,7 +692,7 @@ void fn_800368FC(SkinDesc* pDesc) {
 
     if (pDesc->nVersion > 8 || (pDesc->nVersion == 8 && pDesc->n04 == 1)) {
         // fake match: this walk alone uses p and j, every other one pData and i. With pData and i here
-        // too CW swaps this loop's registers; with j for the mesh bits it starts that loop's offset at li 0
+        // its registers swap; the mesh-bits loop needs a counter set before it (i) for EA's `mr` start
         p = (u8*)pDesc->p14;
         for (j = 0; j < pDesc->n10; j++) {
             pSrc = pDst = p;
