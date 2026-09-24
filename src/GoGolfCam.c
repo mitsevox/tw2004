@@ -233,11 +233,11 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
     f32* pSub;
     CourseInfo* pCourse;
     u8 bMirror;
-    f32 fDist;
     f32 fTotal;
-    f32 fBase;
-    f32 fSlow;
     f32 fSpeed;
+    f32 fSlow;
+    f32 fDist;
+    f32 fBase;
     f32 f;
     f32 fAimY;
     f32 fCamY;
