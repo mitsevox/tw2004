@@ -698,6 +698,24 @@ LAYOUT_ASSERT(ShaderObject, 0x28);
 
 void fn_80036100(ShaderObject* pObj, const void* pData, int n);    // Skin.c: hands it a frame's data
 
+struct UObjMeshPart;
+struct UObjArraySet;
+
+// A shader type's model-part functions (ModuleHooks.part; code_800080D0.c calls them for a
+// dynobj.h UObjMeshPart of that type).
+typedef struct UObjPartFuncs {
+    void (*p0)(struct UObjMeshPart* pPart, void* pArg);    // 0x0  sets the part up (fn_8000827C)
+    void (*p4)(struct UObjMeshPart* pPart);                // 0x4  fn_80008248, when not NULL
+    void (*p8)(struct UObjMeshPart* pPart);                // 0x8  fn_800082CC
+} UObjPartFuncs;
+
+// A mode's array-set functions (HookRow.set; code_800080D0.c calls them for a dynobj.h
+// UObjArraySet in that mode).
+typedef struct UObjSetFuncs {
+    void (*p0)(struct UObjArraySet* pSet, void* pArg);     // 0x0  sets the set up (fn_800081C8)
+    void (*p4)(struct UObjArraySet* pSet);                 // 0x4  fn_80008214, when not NULL
+} UObjSetFuncs;
+
 // One row of lbl_80188E88 (our name; 20 rows of 0x44 bytes): a module's hooks. The main loop
 // (gomainloop.c) calls each row's pfnC..pfn20 at six points of a frame (fn_8006DDA8 and its
 // neighbours), skipping NULL ones; fn_8003519C calls a row's pfn8 with data. Rows 0 and 1 hold
@@ -713,7 +731,8 @@ typedef struct ModuleHooks {
     void  (*pfn18)(void);         // 0x18  fn_8006DE68
     void  (*pfn1C)(void);         // 0x1C  fn_8006DF68
     void  (*pfn20)(void);         // 0x20  fn_8006DEE8
-    u8    unk24[0x34 - 0x24];
+    UObjPartFuncs part;           // 0x24  its model parts' functions (code_800080D0.c)
+    u8    unk30[0x34 - 0x30];
     ShaderObjectHooks shader;     // 0x34  its shader objects' hooks
 } ModuleHooks;
 LAYOUT_ASSERT(ModuleHooks, 0x44);
@@ -726,8 +745,7 @@ extern u8 lbl_801893D8[20];         // per row: its pfn0/pfn4 run outside game t
 typedef struct HookRow {
     void  (*pfn0)(void);          // 0x00
     void  (*pfn4)(void);          // 0x04
-    void  (*pfn8)(void);          // 0x08
-    void  (*pfnC)(void);          // 0x0C
+    UObjSetFuncs set;             // 0x08  mode 0's array-set functions (code_800080D0.c fn_800081C8)
 } HookRow;
 
 extern HookRow lbl_80188E78[1];

@@ -66,6 +66,8 @@ typedef struct Camera {
 } Camera;
 LAYOUT_ASSERT(Camera, 0x234);       // GoRenderCtx_Gc.c fn_8001371C allocates 0x234 bytes
 
+GoFrameBuf* fn_80013E40(Camera* pCamera);   // GoRenderCtx_Gc.c: the camera's frame buffer
+
 Sphere* fn_800082F8(RenderObj* obj);
 void fn_800BAD60(float mtx[4][4], Vec4* src, Vec4* dst);
 int fn_80007D74(Sphere* sphere, Camera* cam, int mode);

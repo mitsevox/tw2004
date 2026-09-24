@@ -358,13 +358,13 @@ void fn_8011CB5C(Skin* pSkin, int nView) {
 // Makes a mesh table and a memory block for the skin's morphed meshes and blends every morph
 // target into them; gives both (NULL without a morph state or such meshes).
 void fn_8011CC40(Skin* pSkin, HwsMemBlock** ppBlock, HwsOverrideTable** ppTable) {
-    s32 nSize;
-    SkinDesc* pDesc;
-    SkinMorphWork* pWork;
-    HwsOverrideTable* pTable;
     HwsMemBlock* pBlock;
+    HwsOverrideTable* pTable;
+    SkinMorphWork* pWork;
+    SkinDesc* pDesc;
     s32 i;
     s32 nEntries;
+    s32 nSize;
 
     nSize = fn_8011CDE8(pSkin);
     *ppBlock = NULL;
