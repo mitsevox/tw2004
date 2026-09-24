@@ -575,12 +575,12 @@ void fn_800A96DC(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
 
     nChannels = pTrack->pTmpl->n2;
     params.flags.n = 0;
-    params.flags.b.bVolume = 1;
-    params.flags.b.bPitch = 1;
     ppVoice = pTrack->apVoices;
     ppEnd = &pTrack->apVoices[nChannels];
+    params.flags.b.bVolume = 1;
     bRight = 0;
     bMono = nChannels == 1;
+    params.flags.b.bPitch = 1;
     params.fPitch = pTrack->f4C;
     for (; ppVoice < ppEnd; ppVoice++) {
         pVoice = *ppVoice;
