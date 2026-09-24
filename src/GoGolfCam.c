@@ -17,7 +17,6 @@ u8       fn_800B36F4(View* pView, int nPlayer, f32 fFrameTime);
 void     fn_800C73B8(f32* pA, f32* pB, f32* pOut);
 void     fn_800C73DC(f32* pA, f32* pB, f32* pOut);
 void     fn_800C7400(f32* pA, f32* pOut);
-void     GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer);
 f32      fn_800C741C(Character* pChar, u64 uEvent);
 void     fn_800C6110(View* pView, int nPlayer, int a);
 void     fn_8006351C(View* pView, int nPlayer, int nCamera);
