@@ -93,11 +93,12 @@ void fn_8008F568(s32 nCmd, s32 unused1, s32 unused2, s32 unused3, s32 a, s32 b) 
 // The studio's UISLoadFn: screen uScreen's data from the UI file's pairs (0 past the end). The
 // group is ignored.
 void* fn_8008F610(u16 uGroup, u16 uScreen) {
-    UIFilePairs* pPairs = lbl_80281F1C->pFile->p4;
     UIFilePair* pPair;
 
-    if (pPairs->nCount <= uScreen) return NULL;
-    pPair = &pPairs->aPairs[uScreen];
+    if (uScreen >= lbl_80281F1C->pFile->p4->nCount) {
+        return NULL;
+    }
+    pPair = &lbl_80281F1C->pFile->p4->aPairs[uScreen];
     return pPair->p4;
 }
 
