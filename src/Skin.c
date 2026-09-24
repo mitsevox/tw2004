@@ -567,14 +567,14 @@ void fn_800364AC(SkinModel* pModel) {
 void fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int nView) {
     int j;
     SkinModel54* pEntry;
-    f32 (*aMtx)[4][4];
+    s32 nMatrices;
     f32 (*pDst)[4];
     f32 (*pSrc)[4];
     f32 fWeight;
     int nBones;
     int i;
     int k;
-    s32 nMatrices;
+    f32 (*aMtx)[4][4];
 
     if (pSkin->pModel == NULL) {
         return;
