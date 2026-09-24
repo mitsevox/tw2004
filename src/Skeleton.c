@@ -31,6 +31,7 @@ void fn_8000ADC0(f32 (*pMtx)[4]);                        // identity
 void fn_80021980(u32* aA, u32* aB, u32* aOut, u32 nBits);   // aOut = aA | aB, bit arrays
 void fn_80029A00(CharModel* pModel, int nA, int nB, f32* pRot);
 void fn_80029BF4(f32* pA, f32* pB, f32* pOut);
+void fn_80029C3C(f32* pA, f32* pB, f32* pOut);
 void fn_80029C60(u32* aSrc, u32* aDst, u32 nBits, u32 nShift);
 void fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits);
 void fn_80029664(CharModel* pModel);
@@ -117,6 +118,63 @@ void fn_80027108(Skeleton* pSkel) {
     for (i = 0; i < pSkel->nChains; i++) {
         fn_80026F90(pSkel, &pSkel->pChains[i], 1);
     }
+}
+
+// Sets the chain's links up from the model's pose: each link's rotation and offset from the link
+// before it (kept in q38/v48 too when its bone's parent comes before the chain), a zero rotation
+// vector, and the bone's skeleton bit when the link is posed; v8 takes the last link's position.
+void fn_800271A0(CharModel* pModel, IKChain* pChain) {
+    f32 qInv[4];
+    f32 vDelta[4];
+    int nPrevBone;
+    int nBone;
+    IKLink* pLink;
+    Bone* pBone;
+    Skeleton* pSkel = pModel->pSkel;
+    int i;
+    IKLink* pPrevLink;
+    int nPrev;
+
+    for (i = 0; i < pChain->nLinks; i++) {
+        pLink = &pChain->pLinks[i];
+        nBone = pLink->nBone;
+        nPrev = pLink->nPrev;
+        nPrevBone = pChain->pLinks[nPrev].nBone;
+        pBone = &pModel->pBones[nBone];
+        pLink->b0 = 0;
+        fn_80029BC8(pLink->v58);
+        if (pLink->f4 > 0.0f) {
+            fn_8001EA34(pSkel->a10, pLink->nBone);
+        }
+        if (i > 0) {
+            pPrevLink = &pChain->pLinks[nPrev];
+        } else {
+            pPrevLink = NULL;
+        }
+        if (i == 0) {
+            fn_8001E85C(pModel->pPoses[nBone].q0, pLink->q18);
+        } else {
+            fn_8001E85C(pBone->q0C, pLink->q18);
+        }
+        if (pPrevLink != NULL && pPrevLink->nBone != pBone->nParent) {
+            fn_80008F20(pModel->pPoses[nPrevBone].q0, qInv);
+            fn_80008FCC(pModel->pPoses[nBone].q0, qInv, pLink->q18);
+            fn_80029C3C(pModel->pPoses[nBone].v10, pModel->pPoses[nPrevBone].v10, vDelta);
+            vDelta[3] = 0.0f;
+            fn_800090E4(qInv, vDelta, pLink->v28);
+            pLink->v28[3] = 0.0f;
+            if (pBone->nParent < pChain->pLinks[0].nBone) {
+                fn_8001E85C(pLink->q18, pLink->q38);
+                fn_8001E85C(pLink->v28, pLink->v48);
+                pLink->b0 |= 1;
+            }
+        } else if (i == 0) {
+            Vec_Copy(pModel->pPoses[nBone].v10, pLink->v28);
+        } else {
+            Vec_Copy(pBone->v1C, pLink->v28);
+        }
+    }
+    fn_8001E880(pModel->pPoses[pChain->pLinks[pChain->nLinks - 1].nBone].v10, pChain->v8);
 }
 
 // Solves the chain toward pTarget: up to nIterations steps, each followed by pfnError (when given)

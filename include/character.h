@@ -38,7 +38,7 @@ typedef struct IKChain {
     s8   nLinks;                // 0x00
     u8   unk1[3];
     IKLink* pLinks;             // 0x04
-    u8   unk8[0x18 - 0x8];
+    f32  v8[4];                 // 0x08  its last link's position (fn_800271A0)
     s32  n18;                   // 0x18
     f32  f1C;                   // 0x1C
 } IKChain;
