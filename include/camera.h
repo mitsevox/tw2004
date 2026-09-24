@@ -18,9 +18,13 @@ typedef struct CamLens {
                                 //       zoom-to-aim camera copies m4[0] to View.v20
     f32  m44[4][4];             // 0x44  world to camera space (hlaudemitter.c fn_800AD800 moves a
                                 //       sound's position with it)
-    u8   unk84[0xA4 - 0x84];
+    f32  v84[3];                // 0x84  1 / v94 (fn_80076664)
+    u8   unk90[0x94 - 0x90];
+    f32  v94[3];                // 0x94  fn_80076664 scales the world by it around a point
+    u8   unkA0[0xA4 - 0xA0];
     f32  fFov;                  // 0xA4  the field of view (GoGolfCam.c sets DEG(60.0f) or DEG(30.0f))
-    u8   unkA8[0xB0 - 0xA8];
+    f32  fA8;                   // 0xA8  fn_800768E0 starts it at 0.1
+    f32  fAC;                   // 0xAC  fn_800768E0 starts it at 4096 (GoTerrain.c fn_800354B4 sets it)
     f32  fB0;                   // 0xB0  fn_8001EFFC; the zoom-to-aim camera divides its distance by it
     f32  fB4;                  // 0xB4  a flat camera's view width (guess)
     f32  fB8;                   // 0xB8  its view height (guess)
@@ -789,7 +793,7 @@ void        fn_8006E26C(GoFrameBuf* pBuf, f32 f0, f32 f4, f32 fWidth, f32 fHeigh
 
 CamLens* fn_80076400(void);                     // a new lens
 void     fn_8007644C(CamLens* pLens);           // free it
-void     fn_8007646C(CamLens* pLens, f32* pA, f32* pB);   // not decompiled yet: two 4-float points
+void     fn_8007646C(CamLens* pLens, f32* pPos, f32* pTarget);   // aims the lens from pPos at pTarget
 void     fn_800768E0(CamLens* pLens);
 void     fn_80076948(CamLens* pLens, f32 fB4, f32 fB8);   // sets fB4 and fB8
 void     fn_80076A0C(CamLens* pLens, s32 nType);          // sets nType
