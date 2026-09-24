@@ -382,3 +382,11 @@ void fn_800B58FC(f32* pA, f32* pOut) {
     pOut[3] = -pA[3];
 }
 #endif
+
+// Copy three floats. Like the GX writes above, it sits at the end of this file's code and every
+// other caller (GoGolfCam.c, GoShaderObject_Grass_Gc.c) comes later in the link order.
+void fn_800B5918(const f32* pSrc, f32* pDst) {
+    pDst[0] = pSrc[0];
+    pDst[1] = pSrc[1];
+    pDst[2] = pSrc[2];
+}
