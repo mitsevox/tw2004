@@ -694,8 +694,7 @@ u8 fn_8010BFE0(void) {
     DynTex* pTex;
     TexEntry* pEntry;
     TexPalette* pPal;
-    DynTexUse* pUse;
-    int bReady;
+    u32 bReady;
     s32 nLen;
 
     if (lbl_80282488->n980 == 3) {
@@ -740,11 +739,12 @@ u8 fn_8010BFE0(void) {
                 fn_8010B1D4(pTex, lbl_80282488->aUses[lbl_80282488->n970 - 1].nC, NULL,
                             lbl_80282488->aUses[lbl_80282488->n970 - 1].p4,
                             lbl_80282488->aUses[lbl_80282488->n970 - 1].n8);
-                pUse = &lbl_80282488->aUses[lbl_80282488->n970 - 1];
-                if (pTex->p0[pUse->nC].n1C != 0) {
+                if (pTex->p0[lbl_80282488->aUses[lbl_80282488->n970 - 1].nC].n1C != 0) {
                     // port: EA passes two arguments fn_8010B2A8 ignores
-                    ((void (*)(DynTex*, int, s16*, void*, s32))fn_8010B2A8)(pTex, pUse->nC, NULL,
-                                                                            pUse->p4, pUse->n8);
+                    ((void (*)(DynTex*, int, s16*, void*, s32))fn_8010B2A8)(
+                        pTex, lbl_80282488->aUses[lbl_80282488->n970 - 1].nC, NULL,
+                        lbl_80282488->aUses[lbl_80282488->n970 - 1].p4,
+                        lbl_80282488->aUses[lbl_80282488->n970 - 1].n8);
                 }
             }
             if (lbl_80282488->n970 == lbl_80282488->n96C) {
