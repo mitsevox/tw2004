@@ -46,5 +46,6 @@ void fn_800A44A0(void);                 // start what lbl_8028203C says to play
 void fn_800A754C(u8 a, u16 b);
 u8   fn_800A75F4(void);
 void fn_800A7944(void);
+void fn_800A7A14(u8 nSound);
 
 #endif

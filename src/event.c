@@ -17,7 +17,6 @@ void fn_80051C84(Ball* pBall, f32 fX, f32 fY);
 void fn_8005A788(int nPlayer, int a);
 void fn_8005C15C(int nPlayer, f32* pSpinY, f32* pSpinX);
 void fn_8005C298(int nPlayer);
-int  fn_8005CB48(int nPlayer);
 void fn_800690C0(int nPlayer);
 void fn_80069104(int nPlayer);
 void fn_80069148(int nPlayer);

@@ -156,6 +156,9 @@ void fn_8000883C(f32* pA, f32* pB, f32 fT);   // quaternion slerp from a to b by
 void fn_80008FCC(f32* pA, f32* pB, f32* pOut); // quaternion product a x b (Quaternion.c)
 void fn_80008BB8(f32* pOut, f32 fA, f32 fB, f32 fC);   // the quaternion of three (negated) angles
 void fn_8000923C(f32* pRot, f32* pOut); // a rotation vector (axis * angle) as a quaternion
+void fn_800093AC(f32 fAngle, f32* pOut); // the quaternion of a rotation by -fAngle about z
+void fn_80009410(f32 fAngle, f32* pOut); // the quaternion of a rotation by -fAngle about y
+void fn_80009474(f32 fAngle, f32* pOut); // the quaternion of a rotation by -fAngle about x
 void fn_80009710(f32* pQ);              // the identity quaternion (0, 0, 0, 1)
 f32  fn_80029B64(f32 x);                // square root (Skeleton.c); x itself when x <= 0
 void fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b
@@ -499,31 +502,63 @@ typedef struct SD_SShaderObject_Static {
 } SD_SShaderObject_Static;
 
 // A particle system's settings, as the particle shader's create callback (fn_8009428C) reads
-// them. Only the fields read there are named.
+// them. Only the fields read there are named. 0x120 bytes: UFstPart.c's emitters (PsEmitter.params,
+// psmgr.h) are started from these, and PsBallFx.c's 25 at lbl_8018CA98 are its settings.
 typedef struct ParticleParams {
-    u8   unk0[4];
-    f32  f4;                    // 0x04  the particles' lifetime: older ones are dropped (fn_80094B84)
-    u8   unk8[0x58 - 0x8];
-    u32  u58;                   // 0x58  flags; 0x80 and 0x100 pick the blend (fn_800949D0)
-    u8   unk5C[2];
+    s32  n0;                    // 0x00
+    f32  f4;                   // 0x04  the particles' lifetime: older ones are dropped (fn_80094B84)
+    u8   unk8[4];
+    f32  fC;                    // 0x0C  } a new particle's two values after its velocity:
+    f32  f10;                   // 0x10  } fC (with flag 2 times a random -1..1), f10 (with flag 4
+    f32  f14;                   // 0x14  } plus up to f14; fn_80098CDC)
+    f32  f18;                   // 0x18  } at least 1/60 (fn_80099758); an emitter's f48 counts down
+    f32  f1C;                   // 0x1C  } from f18 plus up to f1C, then its f44 restarts at f20
+    f32  f20;                   // 0x20  } (fn_8009912C)
+    f32  f24;                   // 0x24  the radius fn_80099AE4 tests an emitter with (over 1000: always);
+                                //       fn_80099758 works it out when f4 is not 0
+    f32  f28;                   // 0x28  a new particle's speed (flag 8: plus up to f2C; fn_80098CDC)
+    f32  f2C;                   // 0x2C
+    f32  f30;                   // 0x30  its distance from the emitter (flag 0x20: plus up to f34)
+    f32  f34;                   // 0x34
+    f32  f38;                   // 0x38  the angle it leaves at (flag 0x40: plus up to f3C);
+                                //       fn_80099758 replaces it with pi/2 minus it
+    f32  f3C;                   // 0x3C
+    f32  f40;                   // 0x40  } three angles fn_80099758 makes the emitter's matrix from;
+    f32  f44;                   // 0x44  } f40 is written by fn_800A30E4
+    f32  f48;                   // 0x48  }
+    f32  f4C;                   // 0x4C  added to f40 per unit of time (fn_8009912C)
+    f32  f50;                   // 0x50
+    s32  n54;                   // 0x54  below 0 in an emitter: fn_80098BDC frees it
+    u32  u58;                   // 0x58  flags; 0x80 and 0x100 pick the blend (fn_800949D0); in an
+                                //       emitter 0x80000000 marks it done (fn_80098C70, fn_80099344)
+    u16  u5C;                   // 0x5C  a factor in fn_80099758's particle count
     s16  nCount;                // 0x5E  how many particles
-    u8   unk60[0x6C - 0x60];
+    f32  v60[3];                // 0x60
     s16  nTexture;              // 0x6C  the texture: its name in lbl_801F1640
-    u8   unk6E[0xA0 - 0x6E];
-    f32  vA0[4];                // 0xA0  } ParticleShape.v60 = vB0 + vA0 x f110
+    s16  n6E;                   // 0x6E
+    f32  v70[4];                // 0x70  a point fn_80099AE4 puts through the camera's view matrix
+    f32  v80[4];                // 0x80  a position (the ball's, fn_800A2FFC; fn_800A3D6C)
+    s32  n90;                   // 0x90
+    f32  f94;                  // 0x94  not 0: fn_80099758 starts the emitter's f48 from it
+    u8   unk98[0xA0 - 0x98];
+    f32  vA0[4];               // 0xA0  } ParticleShape.v60 = vB0 + vA0 x f110; fn_800A3CB0
+                                //       puts the wind vector x 0.1 here
     f32  vB0[4];                // 0xB0  }
     f32  vC0[4];                // 0xC0  -> ParticleShape.v10 (each of these / 256)
     f32  vD0[4];                // 0xD0  -> ParticleShape.v20
     f32  vE0[4];                // 0xE0  -> ParticleShape.v30
     f32  vF0[4];                // 0xF0  -> ParticleShape.v0
-    u8   unk100[4];
+    f32  f100;                  // 0x100  never 0 (fn_8009943C)
     f32  f104;                  // 0x104
     f32  f108;                  // 0x108
-    u8   unk10C[4];
-    f32  f110;                  // 0x110  a time: ParticleShape.f50 is a quarter of it, f54 its inverse
+    f32  f10C;                  // 0x10C  1 / f100
+    f32  f110;                  // 0x110  a time: ParticleShape.f50 is a quarter of it, f54 its inverse;
+                                //        never 0 (fn_8009943C)
     f32  f114;                  // 0x114
     f32  f118;                  // 0x118
+    f32  f11C;                  // 0x11C  1 / f110
 } ParticleParams;
+LAYOUT_ASSERT(ParticleParams, 0x120);
 
 // What the particle shader's create callback is handed. It is called twice: with bAlloc set to
 // allocate the system, then clear to fill it in.
@@ -571,12 +606,12 @@ typedef struct ParticleMsg {
         struct {
             f32  fCarried;      // 0x08  added to the age of each particle carried over
             f32  fStep;         // 0x0C  added to the age of each live one
-            s32* pnLive;        // 0x10  gets how many are live after
+            u32* pnLive;        // 0x10  gets how many are live after
         } age;
         struct {
             f32 (*pMtx)[4];     // 0x08  the new particles' positions and velocities go through it
             u32  nCount;        // 0x0C  how many to emit; counted down to 0
-            u8   unk10[4];
+            f32  f10;           // 0x10  UFstPart.c's fn_800990BC passes a float here
             f32  fAgeSpread;    // 0x14  the new particles' ages run from this down to 0
         } emit;
     } u;
