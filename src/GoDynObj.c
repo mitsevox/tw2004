@@ -27,7 +27,6 @@ void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix fro
 void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_8000A144(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies three rows
-f32  fn_8004D5F0(CourseInfo* pCourse, f32* pPos);          // GoTerrainCollision.c: the ground height
 void fn_80048680(f32* pA, f32* pB, f32* pOut);
 void fn_800486A4(f32* pA, f32* pB, f32* pOut);
 void fn_800486C8(f32* pA, f32* pB, f32* pOut);
@@ -35,7 +34,6 @@ void fn_80047290(void);
 void fn_8004731C(u8* pState);
 void fn_80047C24(int nPlayer);
 void fn_80048184(int nPlayer);
-void fn_80035240(int n);
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -311,7 +309,7 @@ void fn_80046B8C(int nView) {
     fn_800352E4();
     fn_80012EF8();
     fn_8004731C(aState);
-    fn_80035240(0);
+    fn_80035240(NULL);
     if (gSession.nSplitScreen == 0) {
         fn_80047290();
         if ((s8)GOLFERSTATE_GetCurrentState(fn_8001707C(nView)) != 9) {
