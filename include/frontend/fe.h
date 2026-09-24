@@ -75,9 +75,17 @@ extern FEScreen lbl_801D87C0;
 
 // lbl_801D8858 (0x38 bytes), also used by the code at 0x8009170C. Only what the cleaned code reads.
 typedef struct FE801D8858 {
-    u8  unk0[0x18];
-    u8  b18;                    // 0x18
-    u8  unk19[0x30 - 0x19];
+    s32 n0;                     // 0x00  } fn_800918A4 sets them up
+    f32 f4;                     // 0x04  }
+    f32 f8;                     // 0x08  }
+    f32 fC;                     // 0x0C  }
+    f32 f10;                    // 0x10  }
+    s32 n14;                    // 0x14  the number of players in game type 4, else 0
+    u8  b18;                    // 0x18  set once fn_800918A4 has set it up
+    u8  unk19[0x1C - 0x19];
+    s32 n1C;                    // 0x1C
+    u64 u20;                    // 0x20  fn_80095368's clock when it was set up
+    u8  unk28[0x30 - 0x28];
     struct LLPict* p30;         // 0x30  a picture decoded from the 'load' object (fn_800917C8)
     u8  unk34[0x38 - 0x34];
 } FE801D8858;
@@ -106,6 +114,9 @@ LAYOUT_ASSERT(FE801D8890, 0x8);
 
 #define FE_NUM_801D8890 200
 extern FE801D8890 lbl_801D8890[FE_NUM_801D8890];
+// One word per lbl_801D8890 entry: nonzero sets that entry's b0 (and clears its b1) when the front
+// end is shut down in game type 3 (uiProcessInterface.c fn_80090400).
+extern u32 lbl_801D8ED0[FE_NUM_801D8890];
 
 // The profile being worked on in the menus (lbl_80281ED4 points to it; 0x11708 bytes, allocated
 // and cleared by fn_8007744C).
@@ -351,6 +362,8 @@ int  fn_801062C8(s16 nPart, int n);     // the asset in the first slot of aAF80 
 
 void FE_MakeMoviePath(char* pName, char* pPath);        // "data/movies/<name>.NGC"
 void FE_MakeCameoMoviePath(char* pName, char* pPath);   // "data/movies/cameos/<name>.NGC"
+// A movie's skip test for LLVideo.c's fn_80075FB8 (whose arguments it ignores): any button.
+u8   fn_80076FDC(struct Video* pVideo, int nArg);
 
 // fe_movies.c: the texture bank loaded from LoadData.c's 'txf2' copy (fn_80091778), its slot and its
 // first texture.
@@ -401,6 +414,7 @@ extern s32 lbl_80281FFC;                // set by fn_80084FF0: the lbl_8018C7D8 
 
 // ---- the golfers animated on menu screens (FEgolferanim.c) ------------------------------------
 
+void fn_8008B044(int nGolfer, int a, int b);    // show golfer nGolfer
 void fn_8008B760(void);
 u8   fn_8008B978(u8 bPaused);           // pause the menus' state machine (or not); the old setting
 int  fn_8008B990(void);
@@ -468,5 +482,13 @@ u8*  fn_8010FF5C(u8* pLogo, int nWidth, int nHeight);   // the logo's pixels as 
 
 extern u8 lbl_80212B60[64 * 64];        // a logo's pixels laid out as a texture (fn_8010FF5C);
                                         // 64 x 64 or 128 x 32
+
+// ---- the front end's movies (fe_movies.c) -------------------------------------------------------
+
+extern u8 lbl_80281370;         // fn_80091454 clears it; the front end's shutdown in game type 3
+                                // sets it (uiProcessInterface.c fn_80090400)
+void fn_80090B10(void);
+void fn_80091454(void);
+void fn_80091EE8(void);
 
 #endif

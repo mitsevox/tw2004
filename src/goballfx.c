@@ -8,7 +8,6 @@
 #include "ball.h"
 
 void fn_80035FFC(void);
-CamLens* fn_8001F004(void);
 void fn_80093990(LightSet* pSet);
 void fn_800939CC(LightSet* pSet);
 f32  fn_80093A04(s32 nLight, CamLens* pLens);

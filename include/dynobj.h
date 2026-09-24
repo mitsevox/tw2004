@@ -86,7 +86,9 @@ typedef struct UObjMeshInfo {
     f32  v58[3];                // 0x58  copied to UObjModel.v2C by type 0's setup; with f64 the
                                 //       bounding sphere GoTerrain.c's fn_800354C4 returns
     f32  f64;                   // 0x64  copied to UObjModel.f5C by type 0's setup
-    u8   unk68[0x8B - 0x68];
+    f32  a68[8];                // 0x68  a terrain object's bounds (GoTerrain.c fn_80035508, fn_80031154):
+                                //       its centre [0..2], a radius [3] and a height [7]
+    u8   unk88[0x8B - 0x88];
     u8   b8B;                   // 0x8B  bit 1: a terrain object drawn without z writes (GoTerrain.c
                                 //       fn_80035554, fn_80033308)
 } UObjMeshInfo;
@@ -110,7 +112,10 @@ typedef struct UObjMesh {
     struct UObjMesh* p14;       // 0x14  the next terrain mesh of a list (fn_800354BC); a patch's
                                 //       ground's is its objects (Ter_PatchReference.pObjects)
     struct UObjMeshPart* p18;   // 0x18  fn_80048A84 passes entry n28 to fn_800082CC
-    u8   a1C[0x28 - 0x1C];      // 0x1C  nonzero: entry i of p18 is used
+    u8   a1C[0x20 - 0x1C];      // 0x1C  nonzero: entry i of p18 is used
+    u32  n20;                   // 0x20  a word: GoTerrain.c fn_80032B7C draws a ground's extra meshes
+                                //       only when it is not 0
+    u8   unk24[0x28 - 0x24];
     s32  n28;                   // 0x28
 } UObjMesh;
 

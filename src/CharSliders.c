@@ -10,7 +10,6 @@
 #include "golfer.h"
 
 void fn_8011CADC(Skin* pSkin, int nMorph, f32 fWeight);    // SkinMorph.c
-void fn_800736D8(u8* pNode, int n);     // animblender.c
 
 // Free slider definitions made by CharSlider_CreateDefinitionsFromMem.
 void fn_8010D454(CharSliderDefs* pDefs) {
@@ -382,7 +381,7 @@ void fn_8010E224(CharSliderDefs* pDefs, CharModel* pModel) {
 }
 
 // Weight the skin's morph targets by the sliders (and mark the first 20 in the blend node).
-void fn_8010E35C(CharSliderDefs* pDefs, Skin* pSkin, u8* pNode) {
+void fn_8010E35C(CharSliderDefs* pDefs, Skin* pSkin, SKABlendNode* pNode) {
     CharSliderDef* pDef;
     CharSliderValue* pValue;
     CharSliderRange* pRange;
@@ -422,7 +421,7 @@ void fn_8010E35C(CharSliderDefs* pDefs, Skin* pSkin, u8* pNode) {
 
 // Apply nSliders slider values (percentages) to a character's model and skin.
 void fn_8010E4DC(CharSliderDefs* pDefs, CharModel* pModel, Skin* pSkin, int nSliders, u8* aValues,
-                 u8* pNode) {
+                 SKABlendNode* pNode) {
     if (pModel == NULL || pSkin == NULL || aValues == NULL || pDefs == NULL) {
         return;
     }
