@@ -12,8 +12,6 @@
 // The other systems' start-up, shut-down and per-frame calls, from their files (most are not
 // decompiled yet; the types are from the calls here).
 u8   OSGetResetButtonState(void);
-void fn_80006EDC(void);
-void fn_80006FE8(void);
 void fn_80007254(void);
 void fn_80007260(void);
 void fn_800080D0(void);
@@ -227,7 +225,6 @@ void fn_800A4C54(void);
 void fn_800A4E34(void);
 void fn_800A4FD8(void);
 void fn_800A7A34(int a, int b, u8 c, int d);
-void fn_800A7A98(int n);
 void fn_800AE338(void);
 void fn_800B1608(void);
 void fn_800B1D78(void);
@@ -241,7 +238,6 @@ void fn_800B5C38(void);
 void fn_800B5C3C(void);
 void fn_800B655C(void);
 void fn_800B6560(void);
-void fn_800B7490(void);
 void fn_800B9A88(void);
 void fn_800B9AAC(void);
 void fn_800B9B48(void);
@@ -332,7 +328,6 @@ void fn_8006D27C(void);
 void fn_8006D7E8(void);
 void fn_8006D838(void);
 void fn_8006D8E8(void);
-void fn_8006DBD4(void);
 void fn_8006DC20(f32 f);
 u8   fn_8006DC34(void);
 void fn_8006DC40(int nField);

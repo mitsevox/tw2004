@@ -4,13 +4,10 @@
 // the disc in the drive.
 
 #include "game_types.h"
+#include "engine.h"
 #include "game.h"
-
-// ---- sweep code (not yet cleaned up) ----
-
-extern u8 lbl_80213B80[];
-
-// ---- end of sweep code ----
+#include "game/frontend.h"
+#include "frontend/fe.h"
 
 // Note which disc is in the drive and read the list of each disc's files from
 // "data/fend/d_layout.bin": the two counts (the first byte of each of two words), then disc 1's
@@ -86,8 +83,86 @@ int fn_80110180(void) {
     return 0;
 }
 
+// DVDChangeDiskAsync's callback: the disc change has finished (in game type 3 the menus are told
+// through fn_8007BCA4). EA wrote it returning 0 (li r3, 0 before the blr) although the library's
+// callback type returns nothing; the callers cast it.
+int fn_80110234(s32 nResult, DVDCommandBlock* pBlock) {
+    if (gSession.nGameType == 3) {
+        fn_8007BCA4(NULL, NULL);
+    }
+    lbl_802824D0 = 1;
+    return 0;
+}
+
 s32 fn_8011027C(void) {
     return DVDGetCurrentDiskID()->nDiskNumber != 0;
+}
+
+// Ask for the other disc and wait for it, keeping the screen and the game going. In game type 3
+// the menus' state machine is paused instead and fn_80110390 asks later.
+void fn_801102AC(void) {
+    DVDDiskID id;
+    DVDCommandBlock block;
+    u8 nDisc;
+    s32 nStatus;
+
+    if (gSession.nGameType == 3) {
+        fn_8008B760();
+        fn_8008B978(1);
+        lbl_802824D8 = 1;
+        return;
+    }
+    lbl_802824D8 = 0;
+    lbl_802824D0 = 0;
+    if (lbl_802824D4 == 0) {
+        nDisc = 1;
+    } else {
+        nDisc = 0;
+    }
+    memcpy(&id, DVDGetCurrentDiskID(), sizeof(DVDDiskID));
+    id.nDiskNumber = nDisc;
+    lbl_802824D4 = nDisc;
+    DVDChangeDiskAsync(&block, &id, (DVDCBCallback)fn_80110234);
+    fn_80006FE8();
+    fn_800A7A98(1);
+    do {
+        nStatus = DVDGetDriveStatus();
+        fn_80006EDC();
+        if (gSession.nGameType == 6) {
+            fn_800E3C0C(0);
+        }
+        fn_8006DBD4();
+        fn_80006FE8();
+        fn_800B7490();
+    } while (nStatus != 0);
+}
+
+// The disc change fn_801102AC left for later: ask for the other disc once the drive is idle
+// (not busy, waiting or with its cover open).
+void fn_80110390(void) {
+    u8 nDisc;
+    s32 nStatus;
+
+    if (lbl_802824D8 == 0) {
+        return;
+    }
+    nStatus = DVDGetDriveStatus();
+    if (nStatus == 6 || nStatus == 4 || nStatus == 1) {
+        return;
+    }
+    lbl_802824D0 = 0;
+    if (lbl_802824D4 == 0) {
+        nDisc = 1;
+    } else {
+        nDisc = 0;
+    }
+    memcpy(&lbl_80213B60, DVDGetCurrentDiskID(), sizeof(DVDDiskID));
+    lbl_802824D4 = nDisc;
+    lbl_80213B60.nDiskNumber = nDisc;
+    fn_800A7A98(1);
+    DVDChangeDiskAsync(&lbl_80213B80, &lbl_80213B60, (DVDCBCallback)fn_80110234);
+    DVDGetDriveStatus();
+    lbl_802824D8 = 0;
 }
 
 // Callers compare the answer as an int (no clrlwi after the call).
@@ -113,8 +188,8 @@ int fn_80110468(void) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-u8* fn_801104A0(void) {
-    return lbl_80213B80;
+DVDCommandBlock* fn_801104A0(void) {
+    return &lbl_80213B80;
 }
 
 // ---- end of sweep code ----

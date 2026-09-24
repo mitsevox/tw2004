@@ -33,7 +33,6 @@ int  fn_800D3D10(int nGolfer);          // Earnings.c: the golfer's rating
 int  fn_800E2520(int nMode);            // GameRound.c
 void fn_800E25E0(void);                 // GameRound.c
 void fn_800E30D4(void);                 // GameRound.c: builds the mixed rounds
-s32  DVDGetCommandBlockStatus(u8* pBlock);
 void fn_80101EE8(void);                 // GameMode11.c
 void fn_800EE2C8(void);                 // GameModeDriverPGATour.c
 u8*  fn_8010C718(void);                 // CharSliders.c
@@ -246,7 +245,6 @@ void fn_8007BC10(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007BC48(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007BC74(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007BCA0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007BCA4(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007BCC4(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007BD18(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007BD1C(MsgArg* pArgs, MsgArg* pResult);

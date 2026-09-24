@@ -376,7 +376,6 @@ void fn_800A75B4(void);                 // (0x800A75B4) FE_Manager.c calls it af
 
 void fn_80079EA8(void);                 // fill the table
 void fn_80084FF0(int n);                // sets lbl_80281FFC
-
 extern char* lbl_80191990[30];          // per course: a string the menus show (a replay's course
                                         // picks it)
 extern s32 lbl_80281FFC;                // set by fn_80084FF0: the lbl_8018C7D8 set (memcard.h) the
@@ -384,6 +383,8 @@ extern s32 lbl_80281FFC;                // set by fn_80084FF0: the lbl_8018C7D8 
 
 // ---- the golfers animated on menu screens (FEgolferanim.c) ------------------------------------
 
+void fn_8008B760(void);
+u8   fn_8008B978(u8 bPaused);           // pause the menus' state machine (or not); the old setting
 int  fn_8008B990(void);
 void fn_8008DAEC(void);
 void fn_8008E244(void);

@@ -274,6 +274,9 @@ LAYOUT_ASSERT(TexGrpList, 0x20);
 
 // ---- the renderer ----------------------------------------------------------------------------
 
+void fn_80006EDC(void);                 // LLDisp_Gc.c: set the viewport (DiscCheck.c, ScreenClear.c)
+void fn_80006FE8(void);                 // LLDisp_Gc.c: end the frame (returns nothing)
+
 // The renderer's state (lbl_801B8980, 0x118 bytes); only what the game code writes.
 // GoTerrain.c's setters write one group of fields each and set that group's bit in u110.
 typedef struct RenderState {
@@ -556,6 +559,9 @@ u32  fn_800142AC(int nButton, int a);   // a button's mask
 u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 
 // ---- events, sound, effects ------------------------------------------------------------------
+
+void fn_800A7A98(s32 n);                // GameAudio.c
+void fn_800B7490(void);                 // DiscError.c: yield / pump (UStream.c, DiscCheck.c)
 
 // A node of Code8009B340.c's list (lbl_80281FA0): glows queued by fn_8009B260 that fade out
 // (fAlpha falls by fAlphaSpeed a second) and is freed once it has faded.
