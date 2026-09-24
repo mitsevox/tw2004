@@ -6,9 +6,14 @@
 #include "game.h"
 #include "golfer.h"
 #include "dynobj.h"
+#include "camera.h"
+#include "terrain.h"
 
 void fn_80036054(ShaderObject* pObj, int nRow, const void* pDesc);  // Skin.c
 void fn_800360A0(ShaderObject* pObj);                               // Skin.c
+void fn_800360D4(ShaderObject* pObj);                               // Skin.c
+void fn_80036100(ShaderObject* pObj, const void* pData, int n);     // Skin.c
+void fn_800352BC(void);
 void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer);   // below; Ball.c declares it too
 void fn_800A34C0(int n, Ball* pBall, f32* pDir);          // not yet decompiled
 
@@ -222,6 +227,69 @@ void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer) {
         fn_800BAF04(vDir, vDir);
         fn_800A34C0(0, pBall, vDir);
     }
+}
+
+// Keep each view's emitter from fn_800A2FFC at the ball of the player that view follows, then
+// draw the sand trail: the indices from n40 up to n38 in the ring of 600 (two draws when they
+// wrap), once it has more than two vertices.
+void fn_800A3A84(void) {
+    DynRenderDrawIn aDraws[2];
+    DynRenderFill fill;
+    PsEmitter* pEmitter;
+    s32 nFirst;
+    s32 nEnd;
+
+    pEmitter = lbl_80281408->ap74[0];
+    if (pEmitter != NULL && (pEmitter->params.u58 & 0x20000)) {
+        Vec_Copy(gPlayers[fn_8001707C(0)].ball.vPos, pEmitter->params.v80);
+        Vec_Copy(gPlayers[fn_8001707C(0)].ball.vPos, lbl_80281408->ap74[0]->mtx[3]);
+    }
+    pEmitter = lbl_80281408->ap74[1];
+    if (pEmitter != NULL && (pEmitter->params.u58 & 0x20000)) {
+        Vec_Copy(gPlayers[fn_8001707C(1)].ball.vPos, pEmitter->params.v80);
+        Vec_Copy(gPlayers[fn_8001707C(1)].ball.vPos, lbl_80281408->ap74[1]->mtx[3]);
+    }
+    fn_80014118(0x70);
+    fn_800352BC();
+    fn_80013CCC(fn_8001614C());
+    fn_80013EEC(fn_8001614C());
+    fn_80035240(0);
+    fn_80016B9C();
+    fn_80035138(0);
+    fn_80012F50(0, 6, 0x80);
+    fn_80012F18(3);
+    fn_80035118(1, 1);
+    fn_80012EF8();
+    if (lbl_80281408->n44 > 2) {
+        fn_8005CC64(lbl_80281408->pBank, lbl_80281408->pTex);
+        fn_80012EF8();
+        nFirst = lbl_80281408->n40;
+        nEnd = lbl_80281408->n38;
+        if (nFirst < nEnd) {
+            fill.nCount = 1;
+            aDraws[0].nPrim = 0;
+            aDraws[0].nStart = nFirst;
+            aDraws[0].nCount = nEnd - nFirst;
+        } else {
+            aDraws[0].nPrim = 0;
+            fill.nCount = 2;
+            aDraws[0].nStart = nFirst;
+            aDraws[0].nCount = 600 - nFirst;
+            aDraws[1].nPrim = 0;
+            aDraws[1].nStart = 0;
+            aDraws[1].nCount = nEnd;
+        }
+        fill.pDraws = aDraws;
+        fill.nVerts = lbl_80281408->n44;
+        fill.pIndices = lbl_80281408->p50;
+        fill.pPos = lbl_80281408->p28;
+        fill.pColour = lbl_80281408->p30;
+        fill.pTexCoord = lbl_80281408->p2C;
+        fn_80036100(&lbl_80281408->mesh, &fill, 1);
+        fn_800360D4(&lbl_80281408->mesh);
+    }
+    fn_80012F50(1, 6, 0x80);
+    fn_80012EF8();
 }
 
 // Start emitter 15 at pPos for nPlayer's view, drifting with a tenth of the wind.
