@@ -57,7 +57,7 @@ void  fn_8001CD80(UStreamObject* pObject);
 void  fn_8001CE5C(UStreamObject* pObject);
 void  fn_8001D020(UStreamObject* pObject);
 void  fn_8001D3EC(UStreamObject* pObject);
-void  fn_8001D7EC(void);
+void  fn_8001D7EC(Character* pChar);
 void  fn_8001C5B4(Character* pChar, int n);
 void  fn_800BBADC(int nValue);         // SitDevFile.c
 void  fn_8001EBD8(Character* pChar, int nBone, f32* pPos);
@@ -86,6 +86,9 @@ void  fn_8001EFB4(f32* pA, f32* pB, f32* pOut);
 void  fn_8001A14C(Character* pChar);
 void  fn_8001D6D8(int n);
 void  fn_8010B098(void* pModel);                                // LLDynTex.c
+void  fn_80071C28(SKABlendNode** ppNode, int a, int b, SKABlendFn pfnBlend, int c);   // animblender.c
+void  fn_800725BC(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 f);                  // animblender.c
+void  fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f);            // CharAnim.c
 void  fn_80095558(void);
 void  AnimLib_ApplyOverlays(int nSlot);                         // skalib.c
 void  fn_80025478(void);                                        // skalib.c
@@ -1669,9 +1672,33 @@ void fn_8001D6F0(void) {
 }
 
 void fn_8001D7A4(Character* pChar) {
-    fn_8001D7EC();
+    fn_8001D7EC(pChar);
     pChar->u10 = pChar->u10 & ~0x20C;
     pChar->u10 = pChar->u10 | 0x40;
+}
+
+// Resets the character's animation: both blend trees are given back and rebuilt as one node
+// blending with fn_80072ACC (fn_800725BC, 0.5), both animation players are reset and the state
+// cleared.
+void fn_8001D7EC(Character* pChar) {
+    SKABlendNode* pNode;
+
+    pNode = &pChar->blend;
+    fn_80071F58(&pNode, 0);
+    fn_80071C28(&pNode, 1, 0, fn_80072ACC, 0);
+    fn_800725BC(pNode, fn_80072ACC, 0.5f);
+    pNode = (SKABlendNode*)pChar->node3E0;
+    fn_80071F58(&pNode, 0);
+    fn_80071C28(&pNode, 1, 1, fn_80072ACC, 1);
+    fn_800725BC(pNode, fn_80072ACC, 0.5f);
+    fn_800958EC(&pChar->anim29C, 0, 0.0f);
+    pChar->n2C = 0;
+    pChar->n30 = 0;
+    fn_800958EC((AnimPlayer*)pChar->anim, 0, 0.0f);
+    pChar->nAnim = 0;
+    pChar->n20 = 0;
+    pChar->n18 = 0;
+    pChar->u28 = 0;
 }
 
 void fn_8001D8DC(int nPlayer) {

@@ -324,8 +324,8 @@ typedef struct Character {
     f32   f14;                  // 0x014  set to 2^30 (never) by Character_UpdateAnimation; for a
                                 //        character that is not a golfer it is tested against
                                 //        fn_8001ED44 first
-    u8    unk18[0x1C - 0x18];
-    s32   nAnim;              // 0x01C  the playing animation (6 backswing, 7 downswing)
+    s32   n18;                  // 0x018  cleared with the animation state (fn_8001D7EC)
+    s32   nAnim;            // 0x01C  the playing animation (6 backswing, 7 downswing)
     s32   n20;                  // 0x020
     s8    n24;                  // 0x024  } counters CharacterState's idle update (fn_80096398) runs down
     s8    n25;                  // 0x025  }
