@@ -290,19 +290,6 @@ void fn_8016B0F8(UIStudio* pStudio, u32 uEvent, s32 nArgs, const s32* pArgs) {
     }
 }
 
-// A node's script for an event (its 0x4000 handler), or NULL.
-// fake match: fn_8016C5C4's body, kept here so fn_8016B188 can inline it (as UIS_FindScreen below).
-static inline u8* UIS_FindScript(UISNode* pNode, u32 uEvent) {
-    u32 i;
-    for (i = 0; i < pNode->nHandlers; i++) {
-        UISHandler* pHandler = &pNode->pHandlers[i];
-        if ((pHandler->uFlags & 0x4000) && pHandler->uEvent == (u16)uEvent) {
-            return pHandler->u4.pScript;
-        }
-    }
-    return NULL;
-}
-
 // Runs the 0x4000 handlers for an event of node nNode and of every node it links to, the linked
 // nodes first.
 void fn_8016B188(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent,
@@ -318,7 +305,17 @@ void fn_8016B188(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u3
             fn_8016B188(pStudio, pScreen, pStack, pHandler->u4.nNode, uEvent, nArgs, pArgs);
         }
     }
-    pScript = UIS_FindScript(pNode, uEvent);
+    // The node's script for the event (fn_8016C5C4's search). The original has fn_8016C5C4
+    // inlined here and called only at the deepest inlined level; a static inline copy of it matches
+    // better (93%) but adds a function the original does not have, so the unit could not link.
+    pScript = NULL;
+    for (i = 0; i < pNode->nHandlers; i++) {
+        UISHandler* pHandler = &pNode->pHandlers[i];
+        if ((pHandler->uFlags & 0x4000) && pHandler->uEvent == (u16)uEvent) {
+            pScript = pHandler->u4.pScript;
+            break;
+        }
+    }
     if (pScript != NULL) {
         fn_8016C270(pStudio, pScreen, pNode->pInfo, pStack, pScript, nArgs, pArgs, 0, NULL, 0, 0, NULL);
     }

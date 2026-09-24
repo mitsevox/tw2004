@@ -99,7 +99,7 @@ EASBErrorE fn_80127F88(EASBProduct* pProduct) {
 }
 
 // Checks an accomplishment: in use, set within 2003-2023, u86 in 1-250 and a usable name.
-EASBErrorE fn_80128054(EASBAccomplishment* pAccomplishment) {
+EASBErrorE fn_80128054(const EASBAccomplishment* pAccomplishment) {
     u32 uLength;
 
     if (pAccomplishment == NULL) return EASB_ERROR_NULL_PARAMETERS;
@@ -209,7 +209,7 @@ EASBErrorE fn_8012830C(char* sz, u32 uSize, u32* puLength) {
 }
 
 // The same for wide text, uSize in characters.
-EASBErrorE fn_8012835C(u16* sz, u32 uSize, u32* puLength) {
+EASBErrorE fn_8012835C(const u16* sz, u32 uSize, u32* puLength) {
     *puLength = 0;
     while (sz[*puLength] != 0 && *puLength < uSize) {
         *puLength = *puLength + 1;
@@ -237,6 +237,17 @@ EASBErrorE fn_801283B0(EASBInitParams* pParams) {
     return EASB_ERROR_NONE;
 }
 
+// Adds x and y, saturating at 0xFFFFFFFF.
+u32 fn_80128468(u32 x, u32 y) {
+    u32 uSum;
+
+    uSum = x + y;
+    if (uSum < x || uSum < y) {
+        uSum = 0xFFFFFFFF;
+    }
+    return uSum;
+}
+
 // Starts a product record: the game's names, level 1, nothing played, updated now.
 void fn_80128488(EASBProduct* pProduct, u8 bValid, char* szName, u16* szGamesPlayedType, u16 uLanguage) {
     fn_80128C4C(pProduct->szGamesPlayedType, szGamesPlayedType, EASB_GAMES_PLAYED_TYPE_SIZE - 1);
@@ -250,17 +261,6 @@ void fn_80128488(EASBProduct* pProduct, u8 bValid, char* szName, u16* szGamesPla
     pProduct->u50 = 0;
     pProduct->u54 = 0;
     pProduct->uTime = fn_80128BC4(TibExtCurrentTimeGet());
-}
-
-// Adds x and y, saturating at 0xFFFFFFFF.
-u32 fn_80128468(u32 x, u32 y) {
-    u32 uSum;
-
-    uSum = x + y;
-    if (uSum < x || uSum < y) {
-        uSum = 0xFFFFFFFF;
-    }
-    return uSum;
 }
 
 // Starts the totals from one product record (all zero when it is not in use).
@@ -281,8 +281,8 @@ void fn_80128528(EASBTotals* pTotals, EASBProduct* pProduct) {
     pTotals->nProducts = 0;
 }
 
-// Adds one product record into the totals (fn_8012B4C0 passes 1 as n2, which is not used).
-void fn_80128580(EASBTotals* pTotals, EASBProduct* pProduct, s32 n2) {
+// Adds one product record into the totals.
+void fn_80128580(EASBTotals* pTotals, const EASBProduct* pProduct) {
     if (pProduct->bValid) {
         pTotals->u0 = fn_80128468(pTotals->u0, pProduct->u50);
         pTotals->u4 = fn_80128468(pTotals->u4, pProduct->u54);
@@ -442,7 +442,7 @@ char* fn_80128BF8(char* szDest, char* szSrc, u32 uSize) {
 }
 
 // The same for wide text.
-u16* fn_80128C4C(u16* szDest, u16* szSrc, u32 uLength) {
+u16* fn_80128C4C(u16* szDest, const u16* szSrc, u32 uLength) {
     u16* pDest;
     u16 c;
 
@@ -577,7 +577,7 @@ u32 fn_80128F58(u32 uValue, u32 uScaleB, u32 uDivisor, u32 uScaleA) {
 // The Bio's level from its totals: points for the games in it, the hours played and the two
 // counters, then level n needs 20 * n + 1000 points more than level n - 1. *pfProgress is how
 // far into the next level the points go (0 to 1).
-EASBErrorE fn_80128FD4(EASBTotals* pTotals, u16* puLevel, f32* pfProgress) {
+EASBErrorE fn_80128FD4(const EASBTotals* pTotals, u16* puLevel, f32* pfProgress) {
     u32 nHours0;
     u32 nHours4;
     u32 uProducts;
@@ -591,10 +591,10 @@ EASBErrorE fn_80128FD4(EASBTotals* pTotals, u16* puLevel, f32* pfProgress) {
     u16 nLevel;
 
     if (puLevel == NULL || pfProgress == NULL) return EASB_ERROR_NULL_PARAMETERS;
-    nHours0 = pTotals->u0 / 3600;
-    nHours4 = pTotals->u4 / 3600;
     *puLevel = 0;
     *pfProgress = 0.0f;
+    nHours0 = pTotals->u0 / 3600;
+    nHours4 = pTotals->u4 / 3600;
     uProducts = fn_80128F58(pTotals->nProducts, 600, 5, 1500);
     uHours0 = fn_80128F58(nHours0, 50, 50, 150);
     uHours4 = fn_80128F58(nHours4, 5, 1, 0);
@@ -604,8 +604,8 @@ EASBErrorE fn_80128FD4(EASBTotals* pTotals, u16* puLevel, f32* pfProgress) {
     uPoints = fn_80128468(uPoints, uHours4);
     uPoints = fn_80128468(uPoints, u8Points);
     uPoints = fn_80128468(uPoints, uCPoints);
-    uLevelEnd = 0;
     uLevelStart = 0;
+    uLevelEnd = 0;
     for (nLevel = 1; nLevel <= EASB_MAX_LEVEL; nLevel++) {
         if (uPoints < uLevelEnd) break;
         uLevelStart = uLevelEnd;
@@ -907,7 +907,7 @@ void fn_80129E88(EASBImageSlot* pSlot, u8* pBuffer, u32 uSize) {
 
 // Adds pAdd into pTotals, keeping u8 at least uC; the record count comes from pAdd, one more
 // (up to 250) unless nMode is 3.
-void fn_80129F98(EASBTotals* pTotals, EASBTotals* pAdd, s32 nMode) {
+void fn_80129F98(EASBTotals* pTotals, const EASBTotals* pAdd, s32 nMode) {
     pTotals->u0 = fn_80128468(pTotals->u0, pAdd->u0);
     pTotals->u4 = fn_80128468(pTotals->u4, pAdd->u4);
     pTotals->u8 = fn_80128468(pTotals->u8, pAdd->u8);
@@ -923,7 +923,7 @@ void fn_80129F98(EASBTotals* pTotals, EASBTotals* pAdd, s32 nMode) {
 
 // Adds pFrom's record into pInto when both are in use: the counters, every valid
 // accomplishment (through fn_8012DB30), b1167, u1160 and the higher level.
-void fn_8012A050(EASBProduct* pInto, EASBProduct* pFrom) {
+void fn_8012A050(EASBProduct* pInto, const EASBProduct* pFrom) {
     u32 i;
 
     if (!pInto->bValid || !pFrom->bValid) return;
@@ -1541,7 +1541,7 @@ EASBErrorE fn_8012B4C0(EASBProcessE* peProcess) {
         if (eError == EASB_ERROR_NONE) {
             fn_80129B30(&product, lbl_802825B0->pBuffer, lbl_802825B0->uBufferSize);
             lbl_802825B0->anProductState[lbl_802825B0->nRecord] = 1;
-            fn_80128580(&lbl_802825B0->totals, &product, 1);
+            fn_80128580(&lbl_802825B0->totals, &product);
         } else if (eError == EASB_ERROR_SECTION_CORRUPT) {
             eError = EASB_ERROR_NONE;
             lbl_802825B0->anProductState[lbl_802825B0->nRecord] = 2;

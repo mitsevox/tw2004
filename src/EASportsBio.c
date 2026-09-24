@@ -17,6 +17,16 @@ s32 fn_801258E8(void);
 u8 fn_801257A0(void);
 void fn_80124B10(UStreamObject* pObject);
 
+// This game's name and its "games played" label (16-bit characters) for the Bio library.
+char lbl_80195308[28] = "Tiger Woods PGA TOUR\xAE 2004";
+u16 lbl_80195324[14] = {'R', 'o', 'u', 'n', 'd', 's', ' ', 'P', 'l', 'a', 'y', 'e', 'd', 0};
+
+// The memory-card screens' error code for each EASBErrorE.
+s32 EASB_gErrorMap[35] = {
+    0,   -12, -3,  -18, -18, -18, -18, -18, -18, -5,  -18, -18, -18, -18, -18, -18, -18, -44,
+    -43, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18,
+};
+
 // Starts the Bio library once, under this game's name, with the memory-card glue from TibExt.c.
 void EASBio_InitOnce(void) {
     lbl_80261040.szProductName = lbl_80195308;
@@ -148,7 +158,7 @@ void fn_80124C10(void) {
     }
     if (lbl_8028257C) {
         nCount = 0;
-        bByTime = !lbl_80282568;
+        bByTime = lbl_80282568 == 0;
         fn_8012E670(lbl_80282570, bByTime, &nCount);
         fn_80107554(0xAF, nCount);
         for (i = lbl_80282574, n = 0; i < nCount; i++) {
