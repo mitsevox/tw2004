@@ -71,7 +71,7 @@ void fn_801229F8(void) {
     for (i = 0; i < GBA_NUM_CHANNELS; i++) {
         lbl_80260E18[i].n0 = 0;
         fn_8012408C(0x12);
-        lbl_80260E18[i].n5C = 0x40;
+        lbl_80260E18[i].u5C = 0x40;
         lbl_80260E18[i].n64 = 0;
         lbl_80260E18[i].n4C = 0;
         lbl_80260E18[i].n50 = 0;
@@ -87,20 +87,19 @@ void fn_801229F8(void) {
 s32 fn_80122AF0(s32 nChan) {
     u32 uWord;
     u32 uStart = OSGetTick();
-    u8* pStatus = &lbl_80260E18[nChan].uStatus;
 
     for (;;) {
-        if (GBAGetStatus(nChan, pStatus) != 0) {
+        if (GBAGetStatus(nChan, &lbl_80260E18[nChan].uStatus) != 0) {
             return 0;
         }
         if (OSGetTick() - uStart > GBA_TIMEOUT_TICKS) {
             return 0;
         }
-        if (*pStatus == 0x28) {
+        if (lbl_80260E18[nChan].uStatus == 0x28) {
             break;
         }
     }
-    if (GBARead(nChan, (u8*)&uWord, pStatus) != 0) {
+    if (GBARead(nChan, (u8*)&uWord, &lbl_80260E18[nChan].uStatus) != 0) {
         return 0;
     }
     lbl_80260E18[nChan].n4C = uWord;
@@ -111,31 +110,30 @@ s32 fn_80122AF0(s32 nChan) {
 // status (0x30).
 s32 fn_80122BCC(s32 nChan) {
     u32 uStart = OSGetTick();
-    u8* pStatus = &lbl_80260E18[nChan].uStatus;
 
     for (;;) {
-        if (GBAGetStatus(nChan, pStatus) != 0) {
+        if (GBAGetStatus(nChan, &lbl_80260E18[nChan].uStatus) != 0) {
             return 0;
         }
         if (OSGetTick() - uStart > GBA_TIMEOUT_TICKS) {
             return 0;
         }
-        if (*pStatus == 0x20) {
+        if (lbl_80260E18[nChan].uStatus == 0x20) {
             break;
         }
     }
-    if (GBAWrite(nChan, (u8*)lbl_8028255C, pStatus) != 0) {
+    if (GBAWrite(nChan, (u8*)lbl_8028255C, &lbl_80260E18[nChan].uStatus) != 0) {
         return 0;
     }
     uStart = OSGetTick();
     for (;;) {
-        if (GBAGetStatus(nChan, pStatus) != 0) {
+        if (GBAGetStatus(nChan, &lbl_80260E18[nChan].uStatus) != 0) {
             return 0;
         }
         if (OSGetTick() - uStart > GBA_TIMEOUT_TICKS) {
             return 0;
         }
-        if (*pStatus == 0x30) {
+        if (lbl_80260E18[nChan].uStatus == 0x30) {
             return 1;
         }
     }
@@ -144,14 +142,13 @@ s32 fn_80122BCC(s32 nChan) {
 // Sends the GBA one word once it can take one ("GbaWriteOnline").
 s32 fn_80122CFC(s32 nChan, u32* pCmd) {
     u32 uStart = OSGetTick();
-    u8* pStatus = &lbl_80260E18[nChan].uStatus;
 
     for (;;) {
-        if (GBAGetStatus(nChan, pStatus) != 0) {
+        if (GBAGetStatus(nChan, &lbl_80260E18[nChan].uStatus) != 0) {
             OSReport("GbaWriteOnline: Failed to get status from GBA (chan=%d).\n", nChan);
             return 0;
         }
-        if ((*pStatus & 0x30) != 0x30) {
+        if ((lbl_80260E18[nChan].uStatus & 0x30) != 0x30) {
             OSReport("GbaWriteOnline: Lost connection with GBA while waiting to write (chan=%d).\n", nChan);
             return 0;
         }
@@ -159,11 +156,11 @@ s32 fn_80122CFC(s32 nChan, u32* pCmd) {
             OSReport("GbaWriteOnline: Timeout to wait to change GBA status (chan=%d).\n", nChan);
             return 0;
         }
-        if (!(*pStatus & 2)) {
+        if (!(lbl_80260E18[nChan].uStatus & 2)) {
             break;
         }
     }
-    if (GBAWrite(nChan, (u8*)pCmd, pStatus) != 0) {
+    if (GBAWrite(nChan, (u8*)pCmd, &lbl_80260E18[nChan].uStatus) != 0) {
         OSReport("GbaWriteOnline: Failed to write data to GBA (chan=%d).\n", nChan);
         return 0;
     }
@@ -177,14 +174,13 @@ s32 fn_80122CFC(s32 nChan, u32* pCmd) {
 // Reads one word from the GBA once it has one ("GbaReadOnline").
 s32 fn_80122E68(s32 nChan, u32* pWord) {
     u32 uStart = OSGetTick();
-    u8* pStatus = &lbl_80260E18[nChan].uStatus;
 
     for (;;) {
-        if (GBAGetStatus(nChan, pStatus) != 0) {
+        if (GBAGetStatus(nChan, &lbl_80260E18[nChan].uStatus) != 0) {
             OSReport("GbaReadOnline: Failed to get status from GBA (chan=%d).\n", nChan);
             return 0;
         }
-        if ((*pStatus & 0x30) != 0x30) {
+        if ((lbl_80260E18[nChan].uStatus & 0x30) != 0x30) {
             OSReport("GbaReadOnline: Lost connection with GBA while waiting to read (chan=%d).\n", nChan);
             return 0;
         }
@@ -192,11 +188,11 @@ s32 fn_80122E68(s32 nChan, u32* pWord) {
             OSReport("GbaReadOnline: Timeout to wait to change GBA status (chan=%d).\n", nChan);
             return 0;
         }
-        if ((*pStatus & 8) == 8) {
+        if ((lbl_80260E18[nChan].uStatus & 8) == 8) {
             break;
         }
     }
-    if (GBARead(nChan, (u8*)pWord, pStatus) != 0) {
+    if (GBARead(nChan, (u8*)pWord, &lbl_80260E18[nChan].uStatus) != 0) {
         OSReport("GbaReadOnline: Failed to read data to GBA (chan=%d).\n", nChan);
         return 0;
     }
@@ -321,8 +317,8 @@ void fn_8012332C(s32 nChan) {
 void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
     u32 uCmd = 0x10000000;
     u32 uWord;
-    s32 nValue;
     s32 i;
+    s32 nWhich;
 
     if (fn_80122CFC(nChan, &uCmd) == 0) {
         OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_PADDATA' (chan=%d).\n",
@@ -371,7 +367,7 @@ void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
             return;
         }
         lbl_80260E18[nChan].u68 = uWord & 0xFFFFFF;
-        if (nCmd == 0x70) {
+        if (nCmd == 0x70U) {    // EA compared unsigned here (cmplwi), unlike the switch
             break;
         }
         if (lbl_80260E18[nChan].u68 == 0) {
@@ -414,24 +410,26 @@ void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
         lbl_80260E18[nChan].n6C = uWord & 0xFFFFFF;
         break;
     case 0xB0:
+        // EA keeps the stat number in nWhich and reuses nStat for the stat's value.
+        nWhich = nStat;
         switch (nStat) {
         case 0:
-            nValue = fn_80077ACC()->nA8;
+            nStat = fn_80077ACC()->nA8;
             break;
         case 1:
-            nValue = fn_80077ACC()->nAC;
+            nStat = fn_80077ACC()->nAC;
             break;
         case 2:
-            nValue = fn_80077ACC()->nA0;
+            nStat = fn_80077ACC()->nA0;
             break;
         case 3:
-            nValue = fn_80077ACC()->nA4;
+            nStat = fn_80077ACC()->nA4;
             break;
         default:
-            nValue = 0;
+            nStat = 0;
             break;
         }
-        uCmd = ((nStat + 0xB0) << 24) | nValue;
+        uCmd = ((nWhich + 0xB0) << 24) | nStat;
         if (fn_80122CFC(nChan, &uCmd) == 0) {
             OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_STATS' (chan=%d).\n",
                      nChan);
@@ -439,7 +437,7 @@ void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
             fn_8012408C(0x12);
             return;
         }
-        if (fn_80122E68(nChan, &uWord) == 0 || uWord >> 24 != nStat + 0xC0) {
+        if (fn_80122E68(nChan, &uWord) == 0 || uWord >> 24 != nWhich + 0xC0) {
             OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_STAT_TRANSFER' (chan=%d).\n",
                      nChan);
             lbl_80260E18[nChan].n0 = 0;
@@ -567,19 +565,21 @@ void fn_80123CBC(s32 a, s32 b) {
     s32 nChan = 0;
     u32 uStart;
     s32 nErr;
+    u8* pStatus;
 
     do {
-        if (pCh->n5C != 0x40000 || (lbl_80281984 != -1 && lbl_80281984 != nChan)) {
+        if (pCh->u5C != 0x40000 || (lbl_80281984 != -1 && lbl_80281984 != nChan)) {
             pCh->n4C = 0;
             pCh->n0 = 0;
         } else {
             switch (pCh->n0) {
             case 0:
                 uStart = OSGetTick();
+                pStatus = &pCh->uStatus;
                 do {
                     fn_800A4BDC();
                     fn_800B7490();
-                    nErr = GBAGetStatus(nChan, &pCh->uStatus);
+                    nErr = GBAGetStatus(nChan, pStatus);
                 } while (nErr != 0 && OSGetTick() - uStart < GBA_TICKS_PER_MS * 800);
                 if (nErr == 0) {
                     pCh->n0 = 1;
@@ -614,22 +614,25 @@ void fn_80123CBC(s32 a, s32 b) {
 // no port is being worked on); ports with a pad (types 8 and 0x40) are reset.
 void fn_80123E34(void) {
     u32 uReset = 0;
-    s32 nChan = 0;
-    GbaChannel* pCh = lbl_80260E18;
+    s32 nChan;
+    GbaChannel* pCh;
     PadStatus* pPad;
     const u32* pMask;
     u32 uKey;
     u32 uStart;
     u8 uProc;
+    u32* pType;
 
     PADRead(lbl_80260FF8);
     PADClamp(lbl_80260FF8);
+    nChan = 0;
+    pCh = lbl_80260E18;
     pPad = lbl_80260FF8;
     pMask = lbl_80184E30;
     do {
         if (pCh->n0 == 2) {
             if (pCh->n64 != 0) {
-                if ((u8)pCh->u58 == fn_801228E0((pCh->u58 & 0xFF00) | ((pCh->u58 >> 16) & 0xFF))) {
+                if ((u8)pCh->u58 == fn_801228E0(((pCh->u58 >> 16) & 0xFF) | (pCh->u58 & 0xFF00))) {
                     uKey = pCh->u58;
                     pPad->uButtons = (((uKey >> 23) & 1) ? 4 : 0) |
                                      ((((uKey >> 22) & 1) ? 8 : 0) |
@@ -641,16 +644,17 @@ void fn_80123E34(void) {
             if (pCh->n0 == 0 && GBAGetProcessStatus(nChan, &uProc) != 2) {
                 if (lbl_80281984 == -1) {
                     uStart = OSGetTick();
+                    pType = &pCh->u5C;
                     do {
                         fn_800A4BDC();
                         fn_800B7490();
-                        pCh->n5C = SIProbe(nChan);
-                    } while (pCh->n5C != 0x40000 && OSGetTick() - uStart < GBA_TICKS_PER_MS * 800);
+                        *pType = SIProbe(nChan);
+                    } while (*pType != 0x40000 && OSGetTick() - uStart < GBA_TICKS_PER_MS * 800);
                 } else if (nChan != lbl_80281984) {
-                    pCh->n5C = SIProbe(nChan);
+                    pCh->u5C = SIProbe(nChan);
                 }
             }
-            if (pCh->n5C == 8 || pCh->n5C == 0x40) {
+            if (pCh->u5C == 8 || pCh->u5C == 0x40) {
                 uReset |= *pMask;
             }
         }
