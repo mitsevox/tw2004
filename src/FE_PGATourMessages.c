@@ -719,7 +719,7 @@ void fn_8010F3A4(MsgArg* pArgs, MsgArg* pResult) {
 
     strcpy(((MsgString*)pArgs[4].p)->pStr, "Player of the Month");
     *pOut = 0;
-    bWon = gpSaveData[nPlayer].a1C0[n].b;
+    bWon = gpSaveData[nPlayer].a1C0[n].bWon;
     if (bWon) {
         fn_800D28DC(gpSaveData[nPlayer].a1C0[n].nDate, szDate);
     } else {

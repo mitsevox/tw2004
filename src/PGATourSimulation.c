@@ -39,6 +39,8 @@ void CalcTotalDriving(int nGolfer, f32* pfValue);
 void CalcBallStriking(int nGolfer, f32* pfValue);
 void fn_8011B978(int nPlayer, s32 nTotal, s32 nFirstRow, s32 nCount);
 void fn_8011BAD4(int nPlayer, int nTotal, int n);
+void fn_801180C4(int nPlayer, u8 bUser, u8 bFirst);
+void fn_8011C054(int nA, int nB);
 void fn_80117694(UStreamObject* pObject);
 
 char* GameModeDriverPGATour_GetInitialChampName(s32 i);               // a tournament's first champion
@@ -231,6 +233,144 @@ void fn_80117DF0(int nPlayer) {
         }
     }
     gbScoresDirty = 1;
+}
+
+// The tournament is over. The winner is the entrant in first place: the player if the player is
+// in the playoff, else one of the playoff entrants at random. The winner's wins and Player of the
+// Year points are counted, the prize money paid out, and the player's awards given (fn_801180C4).
+void fn_80117E98(int nPlayer) {
+    s32 nEntrants = fn_80118664(nPlayer);
+    u8 bUser;
+    u8 bFirst;
+    s32 nPlayoff;
+    s32 nPick;
+    s32 nWinner;
+    s32 i;
+    PgaEntrantMC* pWinner;
+    s32 nFirstPrize;
+    s32 nPurse;
+
+    CalcScoreRankingsIfDirty(nPlayer);
+    bUser = fn_8011908C(nPlayer, 0);
+    bFirst = lbl_80223C70.aRank[0] == 1;
+    nPlayoff = fn_8011A684(nPlayer);
+    if (fn_8011A6F4(nPlayer, 0)) {
+        nWinner = 0;
+    } else {
+        nPick = Rand_Next(0) % nPlayoff;
+        for (i = 0; i < nEntrants; i++) {
+            if (fn_8011A6F4(nPlayer, i)) {
+                nWinner = i;
+                if (nPick-- == 0) {
+                    break;
+                }
+            }
+        }
+    }
+    pWinner = GetEntrantMCPtr(nPlayer, nWinner);
+    gpSaveData[nPlayer].tour.field.nWinner = nWinner;
+    gbScoresDirty = 1;
+    gpSaveData[nPlayer].tour.aStats[pWinner->nGolfer].nSeasonWins++;
+    gpSaveData[nPlayer].tour.aStats[pWinner->nGolfer].nCareerWins++;
+    gpSaveData[nPlayer].tour.aStats[pWinner->nGolfer].nPlayerOfYearPoints++;
+    if (fn_800EFA70(gpSaveData[nPlayer].tour.nEvent)->nC != 0) {
+        gpSaveData[nPlayer].tour.aStats[pWinner->nGolfer].nPlayerOfYearPoints += 3;
+    }
+    nFirstPrize = GameModeDriverPGATour_ComputeFirstPrizeForBracket(gpSaveData[nPlayer].tour.nEvent,
+                                                                    fn_800EF0E0(nPlayer));
+    nPurse = GameModeDriverPGATour_ComputePurseForBracket(gpSaveData[nPlayer].tour.nEvent,
+                                                          fn_800EF0E0(nPlayer));
+    fn_8011BAD4(nPlayer, nFirstPrize, nPurse);
+    fn_801180C4(nPlayer, bUser, bFirst);
+}
+
+// The player's awards after a tournament. bUser: the player played it; bFirst: the player's
+// entrant finished first. Career winnings first on the tour, in the top 5 or in the top 25 win
+// a200's awards. After the last tournament of the season: the four trophies (a1C0[12..15]: a
+// first season with two wins or more, and leading the Player of the Year points, the season's
+// winnings or, with 15 tournaments, the scoring average). When a month ends, leading every pro's
+// winnings for the month wins that month's award, and the month's winnings start again.
+void fn_801180C4(int nPlayer, u8 bUser, u8 bFirst) {
+    SaveProfile* pProfile = &gpSaveData[nPlayer];
+    s32 nAhead;
+    s32 i;
+    s32 nNext;
+
+    if (bFirst && fn_800EFA70(gpSaveData[nPlayer].tour.nEvent)->nC != 0) {
+        pProfile->tour.n4E9A++;
+    }
+    if (bUser && bFirst) {
+        pProfile->tour.n4E96++;
+    } else if (bUser && !bFirst) {
+        pProfile->tour.n4E96 = 0;
+    }
+
+    nAhead = 0;
+    for (i = 0; i < PGA_NUM_PROS; i++) {
+        if (gpSaveData[nPlayer].tour.aStats[i].nCareerWinnings >
+            pProfile->tour.aStats[PGA_USER_GOLFER].nCareerWinnings) {
+            nAhead++;
+        }
+    }
+    if (nAhead == 0) {
+        if (fn_800D7770(nPlayer, &gpSaveData[nPlayer].a200[0])) {
+            fn_8011C054(1, 1);
+        }
+        fn_800D7770(nPlayer, &gpSaveData[nPlayer].a200[1]);
+        fn_800D7770(nPlayer, &gpSaveData[nPlayer].a200[2]);
+    } else if (nAhead <= 4) {
+        if (fn_800D7770(nPlayer, &gpSaveData[nPlayer].a200[1])) {
+            fn_8011C054(3, 1);
+        }
+        fn_800D7770(nPlayer, &gpSaveData[nPlayer].a200[2]);
+    } else if (nAhead <= 24) {
+        if (fn_800D7770(nPlayer, &gpSaveData[nPlayer].a200[2])) {
+            fn_8011C054(4, 1);
+        }
+    }
+
+    nNext = GameModeDriverPGATour_GetNextEvent();
+    if (nNext == -1) {
+        if (gpSaveData[nPlayer].tour.nSeason == 0 && pProfile->tour.aStats[PGA_USER_GOLFER].nSeasonWins > 1
+            && fn_800D7770(nPlayer, &gpSaveData[nPlayer].a1C0[12])) {
+            fn_8011C054(12, 2);
+        }
+        if (fn_80118F60(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_PLAYER_OF_YEAR_POINTS)
+            && fn_800D7770(nPlayer, &gpSaveData[nPlayer].a1C0[13])) {
+            fn_8011C054(11, 1);
+        }
+        if (fn_80118F60(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_SEASON_WINNINGS)
+            && fn_800D7770(nPlayer, &gpSaveData[nPlayer].a1C0[14])) {
+            if ((Rand_Next(0) & 1) == 0) {
+                fn_8011C054(5, 1);
+            } else {
+                fn_8011C054(2, 1);
+            }
+        }
+        if (pProfile->tour.aStats[PGA_USER_GOLFER].nEvents >= 15
+            && fn_80118F60(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_SCORING)
+            && fn_800D7770(nPlayer, &gpSaveData[nPlayer].a1C0[15])) {
+            fn_8011C054(6, 2);
+        }
+    }
+
+    if (nNext == -1
+        || fn_800D2640(GameModeDriverPGATour_GetEndDate(nNext))
+               != fn_800D2640(GameModeDriverPGATour_GetEndDate(gpSaveData[nPlayer].tour.nEvent))) {
+        for (i = 0; i < PGA_NUM_PROS; i++) {
+            if (pProfile->tour.aStats[PGA_USER_GOLFER].n44 < gpSaveData[nPlayer].tour.aStats[i].n44) {
+                break;
+            }
+        }
+        if (i == PGA_NUM_PROS
+            && fn_800D7770(nPlayer, &gpSaveData[nPlayer].a1C0[fn_800D2640(GameModeDriverPGATour_GetEndDate(
+                                        gpSaveData[nPlayer].tour.nEvent)) - 1])) {
+            fn_8011C054(14, 6);
+        }
+        for (i = 0; i < PGA_NUM_GOLFERS; i++) {
+            gpSaveData[nPlayer].tour.aStats[i].n44 = 0;
+        }
+    }
 }
 
 // The size of the field. TW06: GM_PgaTourSim_GetNumEntrants.
@@ -827,6 +967,142 @@ void fn_80119E28(int nPlayer, int nEntrant, int nRound) {
                 nHole = 0;
             }
         }
+    }
+}
+
+// One hole of a simulated round counted in the entrant's season statistics: the score against
+// par, and a green in regulation, a drive, the putts, a fairway and a bunker save made up from
+// the pro's season form (the player's entrant uses the first pro's).
+void fn_8011A074(int nPlayer, int nRound, int nEntrant, int nHole) {
+    PgaEntrantMC* pEntrantMC = GetEntrantMCPtr(nPlayer, nEntrant);
+    PgaEntrant* pEntrant = GetEntrantNonMCPtr(nEntrant);
+    PgaPro* pPro;
+    PgaStatCounts* pStats = &gpSaveData[nPlayer].tour.aStats[pEntrantMC->nGolfer];
+    s32 nPar;
+    s32 nStrokes;
+    u16 bGIR;
+    s32 bHit;
+    f32 fDrive;
+    f32 fRandom;
+    s32 nDrive;
+    s32 nPutts;
+
+    gbStatsDirty = 1;
+    gbScoresDirty = 1;
+    if (pEntrantMC->nGolfer != PGA_USER_GOLFER) {
+        pPro = &lbl_8024B9CC[pEntrantMC->nGolfer];
+    } else {
+        pPro = &lbl_8024B9CC[0];
+    }
+    nPar = fn_800D2AD8(nHole);
+    nStrokes = pEntrant->aHoleStrokes[nHole];
+
+    pStats->nHoles++;
+    if (nHole == 0) {
+        pStats->nRounds++;
+        if (nRound == 0) {
+            pStats->nEvents++;
+        }
+    }
+    pStats->nStrokes += (u16)nStrokes;
+    if (nStrokes < nPar) {
+        if (nStrokes < nPar - 1) {
+            pStats->nEagles++;
+        }
+        pStats->nBirdies++;
+    } else if (nStrokes > nPar) {
+        pStats->nBogeys++;
+    }
+    if (nHole > 0 && nStrokes < nPar && pEntrant->aHoleStrokes[nHole - 1] > fn_800D2AD8(nHole - 1)) {
+        pStats->nBirdiesAfterBogey++;
+    }
+    switch (nPar) {
+    case 3:
+        pStats->nPar3Holes++;
+        pStats->nPar3Strokes += (u16)nStrokes;
+        if (nStrokes < nPar) {
+            pStats->nPar3Birdies++;
+        }
+        break;
+    case 4:
+        pStats->nPar4Holes++;
+        pStats->nPar4Strokes += (u16)nStrokes;
+        if (nStrokes < nPar) {
+            pStats->nPar4Birdies++;
+        }
+        break;
+    case 5:
+        pStats->nPar5Holes++;
+        pStats->nPar5Strokes += (u16)nStrokes;
+        if (nStrokes < nPar) {
+            pStats->nPar5Birdies++;
+        }
+        break;
+    }
+
+    // A green in regulation: fGIRPct percent of holes.
+    bGIR = 0;
+    if (Rand_Float(0) * 100.0f < pPro->fGIRPct) {
+        bGIR = 1;
+    }
+    pStats->nGreensHit += bGIR;
+    if (nStrokes < nPar && bGIR) {
+        pStats->nGIRBirdies++;
+    }
+    if (nStrokes <= nPar && !bGIR) {
+        pStats->nNonGIRPars++;
+    }
+
+    // The drive: the pro's average plus 30 x a normal random number, no longer than the hole;
+    // one over 520 loses up to 50.
+    fRandom = 30.0f * fn_8000B318(0) + pPro->fDriveAvg;
+    fDrive = (fRandom > 0.0f) ? fRandom : 0.0f;
+    if (fDrive > fn_800D2C30(nHole, 0)) {
+        fDrive = fn_800D2C30(nHole, 0);
+    }
+    if (fDrive > 520.0f) {
+        fDrive -= 50.0f * Rand_Float(0);
+    }
+    nDrive = fDrive;
+    pStats->nLongestDrive = ((u16)nDrive <= pStats->nLongestDrive) ? pStats->nLongestDrive : nDrive;
+    if (fn_800D3080(nHole)) {
+        pStats->nDrives++;
+        pStats->nDriveDistance += (u16)nDrive;
+    }
+
+    // The putts: the pro's average per hole, never more than the strokes less one.
+    nPutts = 0.5f + (0.3f * fn_8000B318(0) + pPro->fPuttAvg / 18.0f);
+    if (nPutts <= 0) {
+        if (Rand_Float(0) < 0.05f) {
+            nPutts = 0;
+        } else {
+            nPutts = 1;
+        }
+    }
+    nPutts = (nPutts <= nStrokes - 1) ? nPutts : nStrokes - 1;
+    if (bGIR) {
+        pStats->nGIRPutts += (u16)nPutts;
+    }
+    pStats->nPutts += (u16)nPutts;
+
+    // A fairway on a par 4 or 5: fFairwayPct percent of them.
+    if (nPar >= 4) {
+        bHit = 0;
+        if (Rand_Float(0) * 100.0f < pPro->fFairwayPct) {
+            bHit = 1;
+        }
+        pStats->nFairwaysHit += bHit;
+        pStats->nFairways++;
+    }
+
+    // A bunker on one hole in ten not under par, saved fSandSavePct percent of the time.
+    if (nStrokes >= nPar && Rand_Float(0) < 0.1f) {
+        bHit = 0;
+        if (Rand_Float(0) * 100.0f < pPro->fSandSavePct) {
+            bHit = 1;
+        }
+        pStats->nBunkerSaves += bHit;
+        pStats->nBunkers++;
     }
 }
 
@@ -1469,8 +1745,8 @@ s32 fn_8011BF74(const void* pA, const void* pB) {
     return strcmp(fn_80118E30(nPlayer, pEntrantA->nGolfer), fn_80118E30(nPlayer, pEntrantB->nGolfer));
 }
 
-// Called from fn_801180C4; empty in this build.
-void fn_8011C054(void) {
+// Called from fn_801180C4 with two numbers as each award is won; empty in this build.
+void fn_8011C054(int nA, int nB) {
 }
 
 void fn_8011C058(u8 bDirty) {

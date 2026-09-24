@@ -35,7 +35,6 @@ void fn_8010D334(s32 v);
 s32 fn_8010D364(void);
 extern s32 lbl_8028176C;
 s32 fn_8010D390(void);
-void fn_8010D428(s32 p0, s32 p1);
 
 void fn_8010C714(void) {
 }

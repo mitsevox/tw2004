@@ -71,7 +71,8 @@ typedef struct PgaStatCounts {
     u16  nPar5Strokes;          // 0x3C  TW06: nPar5Strokes
     u8   unk3E[2];
     u32  nSeasonWinnings;       // 0x40  TW06: seasonWinnings
-    s32  n44;                   // 0x44
+    u32  n44;                   // 0x44  winnings this month: the leader at a month's end gets that
+                                //       month's award, then every golfer's is cleared (fn_801180C4)
     u16  nSeasonWins;           // 0x48  (0x80117E98; a new season clears 0x00-0x4A, 0x80117860)
     u8   nPlayerOfYearPoints;   // 0x4A  1 a win, 3 more where fn_800EFA70's nC is set. TW06: playerOfYearPoints
     u8   unk4B;
@@ -113,10 +114,12 @@ typedef struct TourSeason {
     PgaStatCounts aStats[PGA_NUM_GOLFERS];      // 0x0468  per golfer id
     PgaField field;             // 0x4090
     u16  n4E94;                 // 0x4E94  counts the tournaments started
-    u8   unk4E96[2];
+    u16  n4E96;                 // 0x4E96  a run of the player's tournament wins (fn_801180C4);
+                                //         reset to 0 when the player finishes elsewhere
     u16  n4E98;                 // 0x4E98  a run of tour rounds, counted on each 18th hole
                                 //         (GameModeDriverPGATour_EndHole); reset to 0 when the run breaks
-    u8   unk4E9A[2];
+    u16  n4E9A;                 // 0x4E9A  wins of the tournaments whose Tournament.nC is set
+                                //         (fn_801180C4)
 } TourSeason;
 LAYOUT_ASSERT(TourSeason, 0x4E9C);
 
@@ -234,12 +237,13 @@ typedef struct SaveProfile {
     s32  nC0;                   // 0x000C0  }
     s32  nC4;                   // 0x000C4  }
     TourWin aC8[31];           // 0x000C8  one per PGA TOUR tournament
-    struct {
-        u8 b;
-        u8 unk1;
-        u16 nDate;              // 0x2  the day it was set (FE_PGATourMessages.c fn_8010F3A4 shows it)
-    } a1C0[16];                 // 0x001C0  flags GM_GetBonusProgress counts
-    u8   unk200[0x20C - 0x200];
+    Award a1C0[16];            // 0x001C0  the won ones count for GM_GetBonusProgress. 0..11: Player
+                                //          of the Month, per month (the tour's month money leader,
+                                //          n44; FE_PGATourMessages.c fn_8010F3A4); 12..15: the
+                                //          four trophies (both awarded by PGATourSimulation
+                                //          fn_801180C4; GameMode22 fn_8012597C reads their days)
+    Award a200[3];              // 0x00200  the player's career winnings first, in the top 5 and in the
+                                //          top 25 of the tour (PGATourSimulation fn_801180C4)
     Award aRTEAward[75];        // 0x0020C  per real-time event id. TW06: rteEventAwardInfo
     Award aLadderAward[25];     // 0x00338  per ladder event (GameMode4.c); fn_800584DC's earnings
                                 //          rating counts the won ones

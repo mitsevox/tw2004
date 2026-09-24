@@ -581,12 +581,13 @@ s32 fn_80117510(u16 nDate) {
     s32 nMonth;
     s32 nDay;
     s32 nYear;
-    s32 nPrevShown;
+    u32 nPrevShown;
 
     nCopy = nDate;
     nPrevShown = lbl_80223C48.nPrevMonthDays - lbl_80223C48.nFirstCell;
     fn_800D2714(&nCopy, &nMonth, &nDay, &nYear);
-    if (lbl_80223C48.nMonth == nMonth) {
+    // fake match: the original compares the months unsigned (cmplw); both are 1..12.
+    if ((u32)lbl_80223C48.nMonth == nMonth) {
         return nDay + (lbl_80223C48.nFirstCell - 1);
     }
     if (fn_801174B8(lbl_80223C48.nMonth, nMonth) && nDay < 35 - lbl_80223C48.nEndCell) {

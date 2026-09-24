@@ -7,6 +7,7 @@
 #include "game.h"
 #include "engine.h"
 #include "game/save.h"
+#include "game/modes/pgatoursim.h"
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState and the (u8) on GOLFERSTATE_Set's player (see game.h).
 

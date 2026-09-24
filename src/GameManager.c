@@ -1357,7 +1357,7 @@ f32 GM_GetGameProgress(SaveProfile* pProfile) {
 }
 
 // TW06: GM_GetBonusProgress (by position). A point for each real-time event won; half a point for
-// awards 23..38, each of the 16 a1C0 flags and each all-time record held.
+// awards 23..38, each of the 16 a1C0 awards won and each all-time record held.
 f32 GM_GetBonusProgress(SaveProfile* pProfile) {
     f32 f = 0.0f;
     int i;
@@ -1372,12 +1372,12 @@ f32 GM_GetBonusProgress(SaveProfile* pProfile) {
         }
     }
     for (i = 0; i < 12; i++) {
-        if (pProfile->a1C0[i].b) {
+        if (pProfile->a1C0[i].bWon) {
             f += 0.5f;
         }
     }
     for (i = 12; i < 16; i++) {
-        if (pProfile->a1C0[i].b) {
+        if (pProfile->a1C0[i].bWon) {
             f += 0.5f;
         }
     }

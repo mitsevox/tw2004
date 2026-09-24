@@ -225,6 +225,7 @@ s32  fn_800D2640(u16 nDate);            // Calendar.c
 u16  fn_800D2994(void);                 // today's date
 int  fn_800D2ABC(int nCourse, int nHole);   // a hole's par on a course
 int  fn_800D2AD8(int nHole);            // a hole's par
+s32  fn_800D2C30(int nHole, int nTee);  // CourseData.c: a round hole's length from tee set nTee
 s32  fn_800D3478(int nTotal, int n, int nRow);  // Earnings.c: the prize for a finishing row
 void fn_800D3548(int nPlayer, int nMoney, CourseMoneyTracking* pMoney);   // pMoney may be NULL
 int  fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize);

@@ -687,12 +687,12 @@ u8 fn_80078008(s32 nAsset, SaveProfile* pProfile) {
         }
         break;
     case 25:
-        bLocked = !pProfile->a1C0[n + 12].b;
+        bLocked = !pProfile->a1C0[n + 12].bWon;
         break;
     case 26:
         bLocked = 1;
         for (i = 12; i < 16; i++) {
-            if (pProfile->a1C0[i].b) {
+            if (pProfile->a1C0[i].bWon) {
                 nCount++;
             }
         }

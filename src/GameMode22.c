@@ -22,10 +22,10 @@ void fn_80126184(void);
 void fn_801262C4(int nPlayer);
 s32 fn_8012632C(void);
 u8   fn_801263C4(int nPlayer, int n);
-void fn_80126698();
+void fn_80126698(int nPlayer);
 u8   fn_80126FB0(s32* pn8);
 u8   fn_80126418(int n);
-void fn_8012643C(void);
+void fn_8012643C(int nPlayer);
 void fn_8012645C(int nPlayer);
 void fn_801264B8(void);
 s32  fn_80126640(int n);
@@ -43,6 +43,22 @@ s32 fn_80126FD8(void);
 u8   fn_80127004(void);
 void fn_80127034(int nPlayer);
 s32 fn_80127098(s32 arg0);
+
+// Message handler (FE_MessageTable.c): one of the four trophies: whether it is won, its title,
+// and the day it was won (empty while not).
+void fn_8012597C(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nTrophy = pArgs[0].i;
+    char* szName = ((MsgString*)pArgs[1].p)->pStr;
+    char* szDate = ((MsgString*)pArgs[2].p)->pStr;
+
+    pResult->i = fn_80077ACC()->a1C0[nTrophy + 12].bWon;
+    strcpy(szName, lbl_8019543C[nTrophy]);
+    if (pResult->i) {
+        fn_800D28DC(fn_80077ACC()->a1C0[nTrophy + 12].nDate, szDate);
+        return;
+    }
+    szDate[0] = '\0';
+}
 
 // Message handler (FE_MessageTable.c): a trophy's text, by column: 0 its title, 1 and 2
 // placeholders.
@@ -172,6 +188,59 @@ void fn_80125DE0(MsgArg* pArgs, MsgArg* pResult) {
     szOut[0] = '\0';
 }
 
+// The mode's setup: its callbacks and options, split screen as chosen, the per-player values
+// cleared, and its messages to show.
+void fn_80125E68(void) {
+    s32 i;
+
+    gpGame->pfnInit = fn_80125E68;
+    gpGame->pfnShutdown = fn_801260B8;
+    gpGame->pfn1F0 = fn_801260BC;
+    gpGame->pfnSetupNextGolfer = fn_80126130;
+    gpGame->pfnGetHonors = fn_80126334;
+    gpGame->pfn250 = fn_8012643C;
+    gpGame->pfnHoleFinished = (u8 (*)(int, u8))fn_801263C4;
+    gpGame->pfnGameFinished = (u8 (*)(u8))fn_80126418;
+    gpGame->pfnGoToPlayoff = (u8 (*)(u8))fn_8012632C;  // port: EA passes an argument fn_8012632C ignores
+    gpGame->pfnEndGolferTurn = fn_8012645C;
+    gpGame->pfnEndGame = fn_80126150;
+    gpGame->pfn220 = fn_80126184;
+    gpGame->pfn20C = fn_801262C4;
+    gpGame->pfn244 = fn_80126698;
+    gpGame->pfn1E4 = fn_80126E68;
+    gpGame->pfn224 = fn_80126E88;
+    gpGame->bGimmesAllowed = 0;
+    gpGame->b279 = 1;
+    gpGame->b27F = 0;
+    gpGame->b280 = 0;
+    gpGame->b271 = 0;
+    gpGame->b281 = 0;
+    gpGame->bStrokeLimit = 0;
+    gpGame->b285 = 0;
+    gpGame->b274 = 0;
+    gpGame->b286 = 1;
+    gpGame->b287 = 1;
+    gpGame->b288 = 0;
+    gpGame->b289 = 0;
+    gpGame->b28A = 0;
+    gpGame->bBumpObstructions = 0;
+    gpGame->bShowYardage = 0;
+    gpGame->n290 = 0;
+    gpGame->n294 = 0;
+    gpGame->nMulligans = 0;
+    gpGame->n10 = 2;
+    gpGame->nC = 4;
+    gpGame->nDC = 0;
+    gpGame->n4 = 0;
+    gSession.nSplitScreen = lbl_8028227C;
+    for (i = 0; i < 5; i++) {
+        lbl_8028259C[i] = 0;
+        lbl_80282594[i] = 0;
+        lbl_8028258C[i] = 0;
+    }
+    lbl_80282580 = 1;
+}
+
 void fn_801260B8(void) {
 }
 
@@ -296,8 +365,9 @@ u8 fn_80126418(int n) {
     return fn_80126FB0(NULL);
 }
 
-void fn_8012643C(void) {
-    fn_80126698();
+// The ball went out of bounds: scored as a shot.
+void fn_8012643C(int nPlayer) {
+    fn_80126698(nPlayer);
 }
 
 // The ball back on the player's tee.
@@ -366,6 +436,209 @@ s32 fn_80126640(int n) {
         return 5;
     default:
         return 1;
+    }
+}
+
+// Adds message n to the list the shot's comment is picked from (20 at most). Our name.
+#define ADD_MSG(n)                          \
+    if (nMsgs < 20) {                       \
+        aMsgs[nMsgs++] = (n);               \
+    }
+
+// A shot is over (gpGame->pfn244): the player's points for it from where the ball ended up (and
+// how far it went), the longest shot kept, the score's tracks, the winner's message, or else a
+// comment picked at random from the ones the shot earned.
+void fn_80126698(int nPlayer) {
+    Player* pPlayer = &gPlayers[nPlayer];
+    u8 bCounts = 0;
+    s32 nMsgs;
+    s32 nKind;
+    s32 nLength;
+    s32 nPoints;
+    u16 aMsgs[20];
+
+    nMsgs = 0;
+    pPlayer->nEA0++;
+    switch (pPlayer->ball.nSurface) {
+    case 0x9B:
+        nKind = 1;
+        bCounts = 1;
+        break;
+    case 0x2F:
+    case 0x68:
+        nKind = 4;
+        break;
+    default:
+        if (pPlayer->bLowIQPenalty) {
+            nKind = 5;
+            break;
+        }
+        switch (fn_80126640(pPlayer->ball.nLie)) {
+        case 0:
+        case 2:
+            nKind = 2;
+            break;
+        case 1:
+        case 4:
+        case 5:
+            nKind = 0;
+            bCounts = 1;
+            break;
+        case 3:
+            nKind = 3;
+            break;
+        default:
+            nKind = 0;
+            break;
+        }
+        break;
+    }
+
+    nLength = fn_800D0550(nPlayer);
+    if (bCounts) {
+        gPlayers[nPlayer].nEA4++;
+        gPlayers[nPlayer].nEC4 += nLength;
+        gPlayers[nPlayer].nEC0 = (f32)gPlayers[nPlayer].nEC4 / (f32)gPlayers[nPlayer].nEA4;
+    }
+
+    nPoints = 0;
+    switch (nKind) {
+    case 1:
+        ADD_MSG(0x17);
+        gPlayers[nPlayer].nECC++;
+        nPoints = nLength + (s32)(0.2f * nLength);
+        break;
+    case 0:
+        nPoints = nLength;
+        gPlayers[nPlayer].nEC8++;
+        break;
+    case 2:
+        ADD_MSG(0x1C);
+        nPoints = 0;
+        gPlayers[nPlayer].nED0++;
+        break;
+    case 3:
+        ADD_MSG(0x1D);
+        nPoints = -50;
+        gPlayers[nPlayer].nED4++;
+        break;
+    case 4:
+        if (fn_80015464() == 4) {
+            // port: EA passes two arguments fn_800A746C ignores
+            ((void (*)(s32, int, int, int, int))fn_800A746C)(1, 0, 2, 0, 0);
+        } else {
+            // port: EA passes two arguments fn_800A746C ignores
+            ((void (*)(s32, int, int, int, int))fn_800A746C)(1, 0, 1, 0, 0);
+        }
+        ADD_MSG(0x1E);
+        nPoints = -100;
+        gPlayers[nPlayer].nED8++;
+        break;
+    case 5:
+        ADD_MSG(0x1B);
+        nPoints = -100;
+        gPlayers[nPlayer].nEDC++;
+        break;
+    }
+    if (nLength >= 400 && (nKind == 1 || nKind == 0)) {
+        nPoints += 100;
+    }
+
+    // A scoring shot longer than the longest so far (f10, by n14) is the new longest.
+    if (nPoints > 0) {
+        if (nLength > lbl_80195498.f10) {
+            if (lbl_80195498.f10 != 0.0f) {
+                if (lbl_80195498.n14 != nPlayer && lbl_80195498.n14 != 5) {
+                    fn_80062D38(0x4C, nLength, nPlayer);
+                    ADD_MSG(0xB);
+                    if (nPlayer == 0) {
+                        ADD_MSG(5);
+                        ADD_MSG(9);
+                    }
+                    if (nPlayer == 1) {
+                        ADD_MSG(6);
+                        ADD_MSG(0xA);
+                    }
+                }
+                if (nPlayer == 0) {
+                    ADD_MSG(7);
+                }
+                if (nPlayer == 1) {
+                    ADD_MSG(8);
+                }
+                ADD_MSG(0xC);
+            }
+            lbl_80195498.n14 = nPlayer;
+            lbl_80195498.f10 = nLength;
+        } else if (nLength > 400) {
+            ADD_MSG(0x22);
+        }
+    }
+    if (nPoints < 0) {
+        ADD_MSG(0x1A);
+    }
+    if (nPoints == 0) {
+        ADD_MSG(0x19);
+    }
+
+    // With n0 1 a shot only scores what it adds to the player's best.
+    if (lbl_80195498.n0 == 1) {
+        nPoints = 0;
+        if (bCounts && pPlayer->nEBC < nLength) {
+            nPoints = nLength - pPlayer->nEBC;
+        }
+    }
+    pPlayer->nEBC += nPoints;
+    pPlayer->nEBC = (pPlayer->nEBC > 0) ? pPlayer->nEBC : 0;
+    fn_800E5CA4(0, gPlayers[nPlayer].nEBC, nLength, nKind, 0, 0, nPoints, 0.0f);
+
+    // A track the first time the score reaches 1200, 800 and 400.
+    if (!lbl_8028259C[nPlayer] && gPlayers[nPlayer].nEBC >= 1200) {
+        // port: EA passes two arguments fn_800A746C ignores
+        ((void (*)(s32, int, int, int, int))fn_800A746C)(0, 0, 2, 0, 0);
+        lbl_8028259C[nPlayer] = 1;
+    }
+    if (!lbl_80282594[nPlayer] && gPlayers[nPlayer].nEBC >= 800) {
+        // port: EA passes two arguments fn_800A746C ignores
+        ((void (*)(s32, int, int, int, int))fn_800A746C)(0, 0, 3, 0, 0);
+        lbl_80282594[nPlayer] = 1;
+    }
+    if (!lbl_8028258C[nPlayer] && gPlayers[nPlayer].nEBC >= 400) {
+        // port: EA passes two arguments fn_800A746C ignores
+        ((void (*)(s32, int, int, int, int))fn_800A746C)(0, 0, 4, 0, 0);
+        lbl_8028258C[nPlayer] = 1;
+    }
+
+    // The player's longest counted shot, and where the ball lay.
+    if (bCounts && nLength > pPlayer->nEA8) {
+        pPlayer->nEA8 = nLength;
+        Vec_Copy(pPlayer->ball.vPos, pPlayer->vEAC);
+        if (gPlayers[nPlayer].nEA8 > gPlayers[1 - nPlayer].nEA8) {
+            fn_80062D38(0x4C, nLength, nPlayer);
+            // port: EA passes two arguments fn_800A746C ignores
+            ((void (*)(s32, int, int, int, int))fn_800A746C)(0, 0, 0, 0, 0);
+        }
+    }
+
+    fn_801264B8();
+    if (lbl_80195498.n8 != 5) {
+        nMsgs = 0;
+        if (nPlayer > 1) {
+            if (nPlayer == lbl_80195498.n8) {
+                fn_8010D428(2, 0);
+            } else {
+                fn_8010D428(1, 0);
+            }
+        } else if (lbl_80195498.n8 == 0) {
+            fn_8010D428(3, 0);
+        } else if (lbl_80195498.n8 == 1) {
+            fn_8010D428(4, 0);
+        } else {
+            fn_8010D428(1, 0);
+        }
+    }
+    if (nMsgs > 0 && lbl_80195498.n8 == 5) {
+        fn_8010D428(aMsgs[Rand_Next(1) % nMsgs], 0);
     }
 }
 
