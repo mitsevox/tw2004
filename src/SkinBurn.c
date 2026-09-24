@@ -195,6 +195,7 @@ void fn_801276E4(Skin* pSkin) {
     SkinModel44* pEntry;
     s32 j;
     s32 n;
+    s32 nEntries;
 
     pOld = pSkin->pModel;
     // EA passes &pOld where an array is expected: never NULL, so the model always counts
@@ -222,11 +223,12 @@ void fn_801276E4(Skin* pSkin) {
     aIndexes = fn_801276A8(pBase, &nOffset, nIndexes * sizeof(s32), 16);
 
     nFirst = 0;
-    for (i = 0; i < pNew->n40; i++) {
+    nEntries = pNew->n40;
+    for (i = 0; i < nEntries; i++) {
         pEntry = &pNew->p44[i];
         n = pEntry->n8;
         for (j = 0; j < n; j++) {
-            aIndexes[nFirst + j] = pEntry->p4[j];
+            aIndexes[j + nFirst] = pEntry->p4[j];
         }
         pEntry->p4 = &aIndexes[nFirst];
         nFirst += pEntry->n8;
