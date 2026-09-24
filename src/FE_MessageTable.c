@@ -4272,6 +4272,20 @@ void fn_80083A44(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80083A48(MsgArg* pArgs, MsgArg* pResult) {
 }
 
+// Fill string pArgs[0] with pArgs[1] asterisks (a hidden entry).
+void fn_80083A4C(MsgArg* pArgs, MsgArg* pResult) {
+    char szStars[64] = "";
+    int i;
+    int nLen;
+
+    nLen = pArgs[1].i;
+    for (i = 0; i < nLen; i++) {
+        szStars[i] = '*';
+    }
+    szStars[i + 1] = '\0';      // EA bug: one past the stars; the buffer is zeroed anyway
+    strcpy(((MsgString*)pArgs[0].p)->pStr, szStars);
+}
+
 void fn_80083BA4(MsgArg* pArgs, MsgArg* pResult) {
     fn_8010D334(pArgs[0].i);
 }
