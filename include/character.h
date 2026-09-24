@@ -227,6 +227,12 @@ extern DynChainSettings* lbl_802824F8;
 extern f32 lbl_80193DE8[6][4];  // DynChain.c: a direction per chain kind, in the model's root space
 extern f32 lbl_80193E48[6];     // DynChain.c: an angle per chain kind, in degrees (fn_80115B2C)
 
+// Skeleton.c: a short string per bone id (the first is empty); the model loader (fn_80028564)
+// copies bone 0x54's first 8 bytes into each bone it adds as the bone's uId.
+extern char* lbl_80187278[90];
+extern u8 lbl_80281098[6];      // Skeleton.c: the bone ids of the model's kind 2 dynamic chains
+extern u8 lbl_802810A0[6];      // Skeleton.c: the bone ids of its kind 3 dynamic chains
+
 // A clip's header (the fields used here). In a file, pD0 marks the end of the header and
 // uAram points at the end of the key data; once a clip's frames are streamed out, uAram is
 // their ARAM address and flag 4 is set.

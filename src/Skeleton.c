@@ -25,6 +25,11 @@ void fn_80029A00(CharModel* pModel, int nA, int nB, f32* pRot);
 void fn_80029BF4(f32* pA, f32* pB, f32* pOut);
 void fn_80029C60(u32* aSrc, u32* aDst, u32 n, u32 nShift);
 void fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits);
+void fn_80029664(CharModel* pModel);
+void fn_80029804(CharModel* pModel);
+void SKEL_TransformBones(CharModel* pModel, u32* aBits);
+Skeleton* fn_80028314(CharModel* pModel, CharModelDefs* pDefs);
+struct DynChain* fn_80114270(CharModel* pModel, int nBone, s32 nType, s32 n10);   // DynChain.c
 
 // Poses the chain's links (those with f4 above 0) from their rotation vectors.
 void fn_80026B4C(Skeleton* pSkel, IKChain* pChain) {
@@ -198,6 +203,78 @@ void fn_800284DC(Skeleton* pSkel) {
     fn_80009E70(pSkel->p24);
     fn_80009E70(pSkel->p20);
     fn_80009E70(pSkel);
+}
+
+// Loads a model from pData: its bone count, two floats, then per bone its id, parent and position.
+// A negative nExtra asks for that many bones in all: the missing ones are added at the root, with
+// bone 0x54's id. Then builds its matrices, skeleton (with pDefs) and dynamic chains.
+CharModel* fn_80028564(u8* pData, s8 nExtra, CharModelDefs* pDefs, u8 b) {
+    u32 aAll[4];
+    s8 nTotal;
+    CharModel* pModel;
+    int i;
+
+    pModel = fn_80009B34(sizeof(CharModel), 2, 64, "Skeleton.c", 1228);
+    memset(pModel, 0, sizeof(CharModel));
+    fn_80076158(&pData, (u8*)&pModel->nBones, 4, 4);
+    if (nExtra < 0) {
+        nExtra = -nExtra - pModel->nBones;
+        if (nExtra < 0) {
+            nExtra = 0;
+        }
+    }
+    nTotal = pModel->nBones + nExtra;
+    pModel->pBones = fn_80009B34(nTotal * sizeof(Bone), 2, 64, "Skeleton.c", 1242);
+    fn_80076158(&pData, (u8*)&pModel->f10, 4, 4);
+    fn_80076158(&pData, (u8*)&pModel->fC, 4, 4);
+    for (i = 0; i < pModel->nBones; i++) {
+        fn_80076158(&pData, (u8*)&pModel->pBones[i].uId, 8, -8);
+        fn_80076158(&pData, (u8*)&pModel->pBones[i].nParent, 1, 1);
+        fn_80076158(&pData, (u8*)pModel->pBones[i].v1C, 0x10, 4);
+    }
+    for (; i < nTotal; i++) {
+        pModel->pBones[i].nParent = 0;
+        pModel->pBones[i].v1C[0] = 0.0f;
+        pModel->pBones[i].v1C[1] = 0.0f;
+        pModel->pBones[i].v1C[2] = 0.0f;
+        pModel->pBones[i].v1C[3] = 1.0f;
+        pModel->pBones[i].uId = *(u64*)lbl_80187278[0x54];  // port: reads 8 bytes of the name
+    }
+    pModel->nBones = nTotal;
+    pModel->pMatrices = fn_80009B34(pModel->nBones * sizeof(f32[4][4]), 2, 64, "Skeleton.c", 1265);
+    pModel->pPoses = fn_80009B34(pModel->nBones * sizeof(BonePose), 2, 64, "Skeleton.c", 1266);
+    for (i = 0; i < pModel->nBones; i++) {
+        fn_80009710(pModel->pBones[i].q0C);
+    }
+    fn_8001E8A4(pModel->a14, 0x80);
+    fn_8001E8A4(pModel->a24, 0x80);
+    pModel->bEE = b;
+    fn_80029664(pModel);
+    fn_80029804(pModel);
+    if (pDefs != NULL) {
+        pModel->pSkel = fn_80028314(pModel, pDefs);
+    } else {
+        pModel->pSkel = NULL;
+    }
+    fn_8001E8A4(aAll, 0x80);
+    SKEL_TransformBones(pModel, aAll);
+    pModel->pF0 = fn_80114270(pModel, fn_8001EED8(pModel, 0xB), 0, 0);
+    pModel->pF4 = fn_80114270(pModel, fn_8001EED8(pModel, 0x57), 1, 0);
+    pModel->pF8 = fn_80114270(pModel, fn_8001EED8(pModel, 0x58), 1, 1);
+    for (i = 0; i < 6; i++) {
+        pModel->apFC[i] = fn_80114270(pModel, fn_8001EED8(pModel, lbl_80281098[i]), 2, i);
+    }
+    for (i = 0; i < 6; i++) {
+        pModel->ap114[i] = fn_80114270(pModel, fn_8001EED8(pModel, lbl_802810A0[i]), 3, i);
+    }
+    for (i = 0; i < pModel->nBones; i++) {
+        pModel->a140[i][0] = 1.0f;
+        pModel->a140[i][1] = 1.0f;
+        pModel->a140[i][2] = 1.0f;
+    }
+    pModel->p760 = NULL;
+    pModel->p768 = NULL;
+    return pModel;
 }
 
 // Resets every bone's factors to 1.
