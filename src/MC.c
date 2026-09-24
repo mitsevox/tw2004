@@ -980,7 +980,6 @@ void fn_800A1C58(char* szText) {
     s32 nLen;
     char* pStart;
     char* pEnd;
-    char* pDst;
     s32 n;
 
     nLen = strlen(szText);
@@ -988,20 +987,17 @@ void fn_800A1C58(char* szText) {
     while (isspace(*pStart)) {
         pStart++;
     }
-    pEnd = &szText[nLen];
-    if (*--pEnd == -1) {
+    pEnd = &szText[nLen - 1];
+    if (*pEnd == -1) {
         pEnd--;
     }
     while (isspace(*pEnd)) {
         pEnd--;
     }
-    pDst = aBuf;
     n = 0;
     for (; *pStart != 0 && pStart != pEnd + 1 && *pStart != -1; pStart++) {
         if (*pStart != '"') {
-            *pDst = *pStart;
-            n++;
-            pDst++;
+            aBuf[n++] = *pStart;
         }
     }
     aBuf[n] = 0;
