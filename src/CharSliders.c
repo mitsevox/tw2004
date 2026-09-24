@@ -229,19 +229,19 @@ void fn_8010DE04(CharSliderDefs* pDefs) {
 
 // Cut each pair of sliders that share a length back to it.
 void fn_8010DE60(CharSliderDefs* pDefs) {
-    CharSliderValue* pValue;
-    CharSliderDef* pDef;
-    CharSliderLimit* pLimit;
-    CharSliderValue* pOther;
-    f32 fLength;
     int i;
     int j;
+    CharSliderDef* pDef;
+    CharSliderValue* pValue;
+    CharSliderValue* pOther;
+    CharSliderLimit* pLimit;
+    f32 fLength;
     int n;
 
     if (pDefs != NULL) {
         for (i = 0; i < pDefs->nSliders; i++) {
-            pValue = &pDefs->pValues[i];
             pDef = &pDefs->pDefs[i];
+            pValue = &pDefs->pValues[i];
             if (pValue->bFixed != 1 && pDef->nLimits > 0) {
                 for (j = 0; j < pDef->nLimits; j++) {
                     pLimit = &pDef->pLimits[j];
@@ -251,7 +251,7 @@ void fn_8010DE60(CharSliderDefs* pDefs) {
                         if (pOther->bFixed == 0) {
                             fLength = fn_80009680(pValue->fValue * pValue->fValue
                                                   + pOther->fValue * pOther->fValue);
-                            if (fLength > pLimit->fLength && fLength != 0.0f) {
+                            if (!(fLength <= pLimit->fLength) && fLength != 0.0f) {
                                 pValue->fValue = pLimit->fLength * (pValue->fValue / fLength);
                                 pOther->fValue = pLimit->fLength * (pOther->fValue / fLength);
                             }
