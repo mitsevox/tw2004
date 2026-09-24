@@ -6,6 +6,7 @@
 #define CHARSTATE_H
 
 #include "character.h"
+#include "game/save.h"              // SkinChoice, SkinChoices
 
 // ---- a skin's parts (SkinPart.c) ----------------------------------------------------------------
 // Parts, variants and the other entries are found by a 64-bit name code: fn_800CB700 packs a name
@@ -177,14 +178,6 @@ typedef struct SkinModel {
     s32  n50;                   // 0x50  bits in Skin.p10CC
 } SkinModel;
 
-// A part's (or a set's) choice: its variant and that variant's option. For a set, the variant is
-// an entry of its p7C run and the option one of that entry's p8C run.
-typedef struct SkinChoice {
-    s32  nVariant;              // 0x0  -1 none
-    s32  nOption;               // 0x4  -1 none
-} SkinChoice;
-LAYOUT_ASSERT(SkinChoice, 8);
-
 // A skin (Skin.c): a character's body or one of its attachments; only what the code reads.
 typedef struct Skin {
     SkinModel* pModel;          // 0x0000
@@ -215,16 +208,6 @@ typedef struct SkinIterArgs {
     SkinDesc* pDesc;            // 0x0
     s32  n;                     // 0x4
 } SkinIterArgs;
-
-// A golfer's skin choices as kept outside the skins (fn_800CC1EC fills it from the body's skin or
-// the skin from it; fn_800CC408 gives the other six skins theirs).
-typedef struct SkinChoices {
-    u8   unk0[0x114];
-    SkinChoice aParts[40];      // 0x114  the body's, per part (-1 -1 throughout: not set yet)
-    SkinChoice aSets[116];      // 0x254  the body's, per set
-    SkinChoice aSkinParts[6][10];   // 0x5F4  the six skins' of CharSkinSet
-    SkinChoice aSkinSets[6][10];    // 0x7D4
-} SkinChoices;
 
 // An entry of the lists fn_800CE660 and fn_800CE8C0 build: each name code once.
 typedef struct SkinListEntry {

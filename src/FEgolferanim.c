@@ -614,7 +614,7 @@ u8 fn_8008DCF0(int nGolfer, CrAPGolfer* pGolfer) {
 }
 
 void fn_8008DD34(int nProfile, s8 n) {
-    gpSaveData[nProfile].n5613 = n;
+    gpSaveData[nProfile].choices.n113 = n;
 }
 
 // Start the golfer's idle animation (or the one n8 asks for) and point the camera at him.
@@ -661,10 +661,10 @@ void fn_8008DD50(u8 bNoBlend) {
         pClip = fn_8008E02C();
     }
     if (pClip->uD8 != 0) {
-        if (!fn_8001EDF4(lbl_80281EE0->pB4->pChar) && fn_80077ACC()->n5613 != 0) {
+        if (!fn_8001EDF4(lbl_80281EE0->pB4->pChar) && fn_80077ACC()->choices.n113 != 0) {
             fn_8008E2F8(0, PI);
         }
-        fn_8008EA44(fn_80077ACC()->n5613);
+        fn_8008EA44(fn_80077ACC()->choices.n113);
     } else {
         if (fn_8001EDF4(lbl_80281EE0->pB4->pChar)) {
             fn_8008E2F8(0, 0.0f);
@@ -827,10 +827,10 @@ u8 fn_8008E468(char* szAnim, char* szShot, u8 bNoBlend) {
             return 0;
         }
         if (pClip->uD8 != 0) {
-            if (!fn_8001EDF4(lbl_80281EE0->pB4->pChar) && fn_80077ACC()->n5613 != 0) {
+            if (!fn_8001EDF4(lbl_80281EE0->pB4->pChar) && fn_80077ACC()->choices.n113 != 0) {
                 fn_8008E2F8(0, PI);
             }
-            fn_8008EA44(fn_80077ACC()->n5613);
+            fn_8008EA44(fn_80077ACC()->choices.n113);
         } else {
             if (fn_8001EDF4(lbl_80281EE0->pB4->pChar)) {
                 fn_8008E2F8(0, 0.0f);

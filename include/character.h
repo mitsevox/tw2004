@@ -360,7 +360,8 @@ typedef struct Character {
                                 //         groups 5, 6 and 10
     void* p1794;                // 0x1794  cleared by fn_80062BE8; the same for group 9
     u8    unk1798[0x17B8 - 0x1798];
-    struct ProfileLogos* pLogos;    // 0x17B8  the logos fn_8001A20C puts on its model (fn_8001744C)
+    struct SkinChoices* pChoices;   // 0x17B8  its look (fn_8001D4A4 dresses it from this); fn_8001A20C
+                                    //         puts its logos on the model (fn_8001744C)
 } Character;
 
 // The players' characters (gViewSlots, 0x80187124): Player_SetGolfer takes the player's from here.

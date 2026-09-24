@@ -62,7 +62,7 @@ void  fn_8009555C(void);
 void  fn_80095560(void);
 void  fn_80095564(void);
 void  fn_800955F0(int nPlayer);
-void  fn_8001744C(void* pChar, void* pModel, struct ProfileLogos* pLogos);   // char_tex_manager.c
+void  fn_8001744C(void* pChar, void* pModel, SkinChoices* pChoices);   // char_tex_manager.c
 void  fn_8010BA2C(void* p);
 void  fn_8008B704(void);               // FEgolferanim.c
 void  fn_8008B754(int nNext);           // FEgolferanim.c
@@ -275,6 +275,15 @@ void fn_80019DE8(Character* pChar) {
     fn_8010BED4();
 }
 
+// Puts the profile's created golfer's logos on the character's model in use.
+void fn_80019E80(Character* pChar) {
+    fn_80019C84(pChar);
+    fn_80019CEC(pChar);
+    fn_8001744C(pChar, pChar->a64[pChar->n74], &fn_80077ACC()->choices);
+    fn_8010BA2C(pChar->a64[pChar->n74]);
+    fn_8008EA38(1);
+}
+
 void fn_8001A0FC(Character* pChar) {
     fn_80019C84(pChar);
     fn_8008E918(2);
@@ -287,7 +296,7 @@ void fn_8001A0FC(Character* pChar) {
 void fn_8001A20C(Character* pChar) {
     fn_80019C84(pChar);
     fn_80019CEC(pChar);
-    fn_8001744C(pChar, pChar->a64[pChar->n74], pChar->pLogos);
+    fn_8001744C(pChar, pChar->a64[pChar->n74], pChar->pChoices);
     fn_8010BA2C(pChar->a64[pChar->n74]);
     pChar->bE0 = 1;
     lbl_801B95E8.a[6].p = NULL;
