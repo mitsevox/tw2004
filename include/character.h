@@ -680,6 +680,7 @@ void  fn_8001C0E0(Character* pChar);    // frees the character
 void  fn_8001C5B4(Character* pChar, int n);
 void  fn_8001D238(void);
 void  fn_8001D4A4(Character* pChar, int nSlot);   // dresses the character (its skins and clubs)
+void  fn_8001DC64(Character* pChar, struct SkinChoices* pChoices);  // applies a look (char.c)
 void  fn_8001EE98(Character* pChar, u8 b);    // sets the model's bEE
 void  Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace);
 int   fn_8001C558(int nPlayer);          // the model id of the player's golfer

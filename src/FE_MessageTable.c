@@ -2221,6 +2221,16 @@ void fn_8007D938(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007D964(MsgArg* pArgs, MsgArg* pResult) {
 }
 
+// Work on slot pArgs[0]'s profile; the golfer shown, if it is golfer 7 or 29, takes that
+// profile's look.
+void fn_8007D968(MsgArg* pArgs, MsgArg* pResult) {
+    lbl_80281ED4->nSlot = pArgs[0].i;
+    if (lbl_80281EE0->pB4->pChar != NULL &&
+        (lbl_80281EE0->pB4->pChar->nC == 7 || lbl_80281EE0->pB4->pChar->nC == 29)) {
+        fn_8001DC64(lbl_80281EE0->pB4->pChar, &fn_80077ACC()->choices);
+    }
+}
+
 void fn_8007D9D0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80281ED4->nSlot;
 }
