@@ -19,12 +19,19 @@ void fn_800AF2DC(u8 bMute);
 void fn_800AF31C(void);
 void fn_800AF320(void);
 
-UAudMemStackBlock lbl_801F5C08[32];     // the effect memory's blocks
+// The effects' settings: a 2.5 second reverb for mode 0, a 4 second one for mode 2, and for mode
+// 1 a delay of about half a second (499 and 501 ms left and right) with a little feedback.
+AXFX_REVERBHI lbl_8018EC20 = { {0}, 0, 0.5f, 1.0f, 2.5f, 0.6f, 0.0f, 0.5f };
+AXFX_DELAY lbl_8018EE00 = { {0}, {499, 501, 10}, {15, 15, 0}, {100, 100, 0} };
+AXFX_REVERBHI lbl_8018EE60 = { {0}, 0, 0.9f, 1.0f, 4.0f, 0.2f, 0.0f, 0.5f };
+
+// Uninitialised data, defined last-first (CodeWarrior lays it out in reverse).
 UAudMemStack lbl_801F5D88;              // the effect memory
+UAudMemStackBlock lbl_801F5C08[32];     // the effect memory's blocks
 s8 lbl_80281490 = -1;                   // the mode set up (-1: none yet)
-u8* lbl_802820D8;                       // the effect memory's buffer
+void* lbl_802820E0;                     // the effect's state
 AXAuxCallback lbl_802820DC;             // the effect running
-void* lbl_802820E0;                     // its state
+u8* lbl_802820D8;                       // the effect memory's buffer
 
 // The effects library's allocator hooks: the effect memory, never freed piecemeal.
 void* fn_800AF114(u32 uSize) {

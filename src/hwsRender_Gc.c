@@ -189,7 +189,7 @@ void fn_80112DD8(s32 nEntry) {
                 GXSetAlphaCompare(7, 0, 0, 7, 0x7F);
                 GXSetZCompLoc(1);
             }
-            pUV = pDesc->p18[*pMaterial].afC;
+            pUV = pDesc->p18[*pMaterial].uvC.a;
             PSMTXIdentity(lbl_80223C14);
             if (nPass > 0) {
                 PSMTXScale(mScale, pUV[0], pUV[1], 1.0f);

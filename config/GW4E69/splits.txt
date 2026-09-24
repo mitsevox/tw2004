@@ -522,6 +522,10 @@ uiobject.c:
 
 AudReverb.c:
 	.text       start:0x800AF114 end:0x800AF324
+	.data       start:0x8018EC20 end:0x8018F040
+	.bss        start:0x801F5C08 end:0x801F5DA8
+	.sdata      start:0x80281490 end:0x80281498
+	.sbss       start:0x802820D8 end:0x802820E8
 
 startUp.c:
 	.text       start:0x800AF324 end:0x800B1AA8
@@ -858,6 +862,7 @@ CalendarScreen.c:
 
 hwsMaterial_Gc.c:
 	.text       start:0x80112614 end:0x80112804
+	.data       start:0x80193DA8 end:0x80193DC0
 
 hwsOverride_Gc.c:
 	.text       start:0x80112804 end:0x80112B80
