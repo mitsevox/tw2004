@@ -19,8 +19,10 @@ void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 f32  fn_8006E118(u64 tEnd, u64 tStart);    // GameManager.c: seconds between two time stamps
 void fn_8000AE48(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
 void fn_80090D28(FEQuad* pQuad);
-void fn_800913EC(s16 n0, s16 n1);
-void fn_80091460(s16 n0, s16 n1);
+void fn_800913EC(s16 nTable, s16 nEntry);
+void fn_80091460(s16 nTable, s16 nEntry);
+void fn_80090940(int nEntry);       // makes the picture of entry nEntry (lbl_801D87C0's table)
+void fn_800909B4(int nEntry);       // sets flag 0x10 on entry nEntry (lbl_801D87C0's table)
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -269,6 +271,29 @@ void fn_800912F4(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale,
     pColour[3] = pVtx->au14[3];
     fn_8000AE48(pColour, pScale, pColour);
     fn_80092250(pColour, pAdd, pColour);
+}
+
+// Make the picture of UI file entry (nTable, nEntry) when its flags have 2 set and 1 clear.
+void fn_800913EC(s16 nTable, s16 nEntry) {
+    u32 uFlags;
+
+    if (nTable == -1) return;
+    uFlags = lbl_80281F1C->pFile->p8->apTables[nTable]->apEntries[nEntry]->u0;
+    if (!(uFlags & 1) && (uFlags & 2)) {
+        fn_80090940(nEntry);
+    }
+}
+
+// For UI file entry (nTable, nEntry) with flags 2 set and 1 clear: fn_80008380, then flag 0x10.
+void fn_80091460(s16 nTable, s16 nEntry) {
+    u32 uFlags;
+
+    if (nTable == -1) return;
+    uFlags = lbl_80281F1C->pFile->p8->apTables[nTable]->apEntries[nEntry]->u0;
+    if (!(uFlags & 1) && (uFlags & 2)) {
+        fn_80008380();
+        fn_800909B4(nEntry);
+    }
 }
 
 // Update the loading screen set up by fn_800918A4, unless the session has flag 4: add the time since
