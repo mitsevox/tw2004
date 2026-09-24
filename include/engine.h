@@ -316,14 +316,79 @@ void fn_80010544(int nSlot);            // frees the bank in slot nSlot and empt
 TexBank* fn_800106C4(int nSlot);        // the bank in slot nSlot
 int  fn_800107C0(struct UStreamObject* pObject, TexBank* pBank, int n);   // loads a bank: its slot
 
+// ---- disc reads (LLFileIO_Gc.c) ------------------------------------------------------------------
+
+// The SDK's open disc file (0x3C bytes); only what the game reads.
+typedef struct DVDFileInfo {
+    u8    unk0[0x18];
+    void* pAddr;                // 0x18  the running read's buffer
+    u8    unk1C[0x34 - 0x1C];
+    u32   uLength;              // 0x34  the file's size in bytes
+    void* pCallback;            // 0x38
+} DVDFileInfo;
+typedef void (*DVDCallback)(s32 nResult, DVDFileInfo* pInfo);
+s32 DVDReadAsyncPrio(DVDFileInfo* pInfo, void* pBuf, s32 nLen, s32 nOffset, DVDCallback pCallback,
+                     s32 nPrio);
+
+// An open file (lbl_8019EAD0, 32 of them, 0xC4 bytes each).
+typedef struct DiscFile {
+    DVDFileInfo info;           // 0x00
+    u8   unk3C[0xC4 - 0x3C];
+} DiscFile;
+
+// A queued read (0x24 bytes: lbl_8019E880 holds eight free ones per priority).
+typedef struct FileReq {
+    struct FileReq* pNext;      // 0x00
+    struct FileReq* pPrev;      // 0x04
+    s32   nFile;                // 0x08  the DiscFile to read from
+    void* pBuf;                 // 0x0C
+    s32   nLen;                 // 0x10
+    s32   nOffset;              // 0x14
+    void (*pfnDone)(int nBytes, int nError);    // 0x18
+    s32   n1C;                  // 0x1C
+    u8    b20;                  // 0x20
+    u8    b21;                  // 0x21
+    u8    unk22[2];
+} FileReq;
+
+// A priority's reads: a ring through the FileReqs, the list itself as its end (lbl_8019E868[2]).
+typedef struct FileQueue {
+    FileReq* pNext;             // 0x00
+    FileReq* pPrev;             // 0x04
+    s32   nCount;               // 0x08
+} FileQueue;
+
+// A priority's free FileReqs (lbl_8019E880[2]): a ring like FileQueue's, and the eight requests.
+typedef struct FileReqPool {
+    FileReq* pNext;             // 0x00
+    FileReq* pPrev;             // 0x04
+    FileReq  aReq[8];           // 0x08
+} FileReqPool;
+
 // ---- the renderer ----------------------------------------------------------------------------
 
+void fn_800066E4(u8 bOnRelease, s32 nReset, s32 nCode, u8 bMenu);  // LLDisp_Gc.c: reset the console
+                                        //       (OSResetSystem's arguments) unless a memory card is busy
 void fn_80006EDC(void);                 // LLDisp_Gc.c: set the viewport (DiscCheck.c, ScreenClear.c)
 void fn_80006FE8(void);                 // LLDisp_Gc.c: end the frame (returns nothing)
 extern struct GXFifoObj* lbl_80281BA0; // LLDisp_Gc.c: the command FIFO (GXInit's)
 extern u32 lbl_80281B9C;                // LLDisp_Gc.c: the most the FIFO has held (fn_800124CC)
 extern void* lbl_80281BA4[2];           // LLDisp_Gc.c: two image buffers (DepthField.c and
                                         //       FEgolferanim.c make textures of them)
+
+// LLDisp_Gc.c's frame sync (lbl_801A2350, our name): the FIFO break points the GPU is stopped at,
+// so the CPU knows when a frame's commands have been drawn.
+typedef struct DispSync {
+    void* aBreakPt[3];          // 0x00  a ring of FIFO write pointers
+    s8   nNext;                 // 0x0C  the next one to enable (0..2)
+    s8   b0D;                   // 0x0D
+    s8   nPending;              // 0x0E  how many are queued
+    s8   bBusy;                 // 0x0F  set while the GPU runs to a break point; fn_800070DC waits on it
+    u8   nBuf;                  // 0x10  the lbl_80281BA4 buffer the frame is copied to
+    s8   n11;                   // 0x11  counted up at each retrace with a break point hit
+    s8   n12;                   // 0x12  counted up at each jittered viewport
+    s8   bBreak;                // 0x13  the GPU reached a break point (fn_80006EC8, GX's callback)
+} DispSync;
 
 // The renderer's state (lbl_801B8980, 0x118 bytes); only what the game code writes.
 // GoTerrain.c's setters write one group of fields each and set that group's bit in u110.

@@ -130,6 +130,9 @@ streammanagerhole.c:
 
 ViewController.c:
 	.text       start:0x80016CB8 end:0x80017320
+	.bss        start:0x801B8BA8 end:0x801B95C8
+	.sbss       start:0x80281CA0 end:0x80281CA8
+	.sdata2     start:0x80282BB8 end:0x80282BC0
 
 char_tex_manager.c:
 	.text       start:0x80017320 end:0x80017508
