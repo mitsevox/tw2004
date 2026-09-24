@@ -1,7 +1,8 @@
 // Code80090940.c (our name): the pictures of the movie entries in the UI file table the front end
 // shows movies from (lbl_801D87C0.n3C): make an entry's picture, mark it, free it, and free the
 // marked ones or all of them. Between uiProcessInterface.c and fe_movies.c; which file it belongs to
-// is not known yet.
+// is not known yet (it has no data of its own; lbl_801D87C0 lies in uiProcessInterface.c's .bss
+// range, but other files use it too).
 
 #include "game_types.h"
 #include "llpict.h"
