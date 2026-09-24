@@ -7,7 +7,9 @@
 
 #include "engine.h"
 
-// One word of the grass vertex buffer. A vertex is four words: x, y, z, then four bytes.
+// One word of the grass vertex buffer. A vertex is four words: x, y, z, then four bytes: n374 at
+// the time, 1, the row's vertex count (on a row's first vertex) and 1 on a row's first vertex.
+// The buffer is walked in words (GrassPacket_iEndPacket divides the word count by 4).
 typedef union GrassWord {
     f32 f;
     u8  b[4];
@@ -39,5 +41,12 @@ typedef struct SD_SShaderTypeData_Grass_Static {
 LAYOUT_ASSERT(SD_SShaderTypeData_Grass_Static, 0x378);
 
 extern SD_SShaderTypeData_Grass_Static* SD_gpGrassTypeData;
+
+// The grass parameters GoGrass.c hands over once per hole (SD_vSetGrassParamsOnce).
+extern f32 lbl_802607D0[16][4];
+extern f32 lbl_802608D0[4];
+extern f32 lbl_802608E0[8];
+extern f32 lbl_80260900[2][4];
+extern f32 lbl_80260920[2][4];
 
 #endif
