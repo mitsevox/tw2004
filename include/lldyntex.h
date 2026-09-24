@@ -77,9 +77,14 @@ LAYOUT_ASSERT(DynTexBlock, 0xC);
 // Per texture (0x50 bytes, DynTexHeader.p8): its blocks, then more not read yet.
 typedef struct DynTexObj {
     DynTexBlock aBlocks[4];     // 0x00  DynTexEntry.n8 of them
-    u8    unk30[0x3C - 0x30];
+    u8    unk30[8];
+    u16   n38;                  // 0x38  } its size in pixels, halved per level (fn_8010B6AC)
+    u16   n3A;                  // 0x3A  }
     s16   n3C;                  // 0x3C  set by fn_8010ADA4
-    u8    unk3E[0x50 - 0x3E];
+    u8    unk3E[2];
+    s8    n40;                  // 0x40  its pixel format (fn_8010C458)
+    s8    n41;                  // 0x41  its levels (fn_8010B754)
+    u8    unk42[0x50 - 0x42];
 } DynTexObj;
 LAYOUT_ASSERT(DynTexObj, 0x50);
 

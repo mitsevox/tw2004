@@ -13,7 +13,7 @@ void fn_8001052C(s16 n);
 void fn_8010A668(DynTex* pTex);
 void* fn_8010A780(DynTex* pTex);
 void fn_8010B098(void* arg0);
-s32 fn_8010C458(s16);
+int fn_8010C458(int nFormat);
 s32 fn_8010B664(void* arg0);
 void fn_8000FBAC();
 
@@ -232,6 +232,57 @@ void fn_8010B7C0(void) {
         lbl_80282488->aJobs[i].pfnB = NULL;
         lbl_80282488->apQueue[i] = NULL;
     }
+}
+
+// The bytes of level nLevel of a texture: its size halved nLevel times, at its format's bits per
+// pixel, rounded up to whole bytes.
+u32 fn_8010B6AC(DynTexObj* pObj, int nLevel) {
+    u32 nA = pObj->n3A;
+    u32 nB = pObj->n38;
+    int i;
+
+    for (i = 0; i < nLevel; i++) {
+        nA >>= 1;
+        nB >>= 1;
+    }
+    return (nA * nB * fn_8010C458(pObj->n40) + 7) >> 3;
+}
+
+// The bytes of all of a texture's levels.
+s32 fn_8010B754(DynTexObj* pObj) {
+    int i;
+    s32 nBytes = 0;
+
+    for (i = 0; i < pObj->n41; i++) {
+        nBytes += fn_8010B6AC(pObj, i);
+    }
+    return nBytes;
+}
+
+// Bits per pixel of texture format nFormat (0 for the formats it does not list).
+int fn_8010C458(int nFormat) {
+    int nBits = 0;
+
+    switch (nFormat) {
+    case 0:
+    case 8:
+    case 14:
+        nBits = 4;
+        break;
+    case 1:
+    case 9:
+        nBits = 8;
+        break;
+    case 2:
+    case 4:
+    case 5:
+        nBits = 16;
+        break;
+    case 6:
+        nBits = 32;
+        break;
+    }
+    return nBits;
 }
 
 // Run the jobs until the queue is empty and nothing is left to do, a frame at a time.
