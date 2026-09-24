@@ -10,6 +10,7 @@ void fn_80036460(int n);                // Skin.c
 void PostFx_CopyScreenToBuffer(void);   // gomainloop.c
 void fn_8011EB80(void);
 void fn_80112B34(void);                 // hwsOverride_Gc.c
+void fn_80112DD8(s32 nEntry);
 void fn_80113BCC(SkinIter* pIter);
 void fn_80113C70(SkinIter* pIter);
 void fn_80113D28(SkinIter* pIter);
@@ -129,6 +130,35 @@ u32* fn_80113764(void) {
     return lbl_80223BB0.s10.p48;
 }
 
+// ---- end of sweep code ----
+
+// fn_80112DD8 on each SkinDesc.p6C entry of option nOption of variant nVariant of part nPart of
+// the description being drawn (nothing when the part or variant does not exist).
+void fn_80113774(int nPart, int nVariant, int nOption) {
+    SkinDesc* pDesc = lbl_80223BB0.pDesc;
+    SkinPartDef* pPart;
+    SkinDesc5C* pOption;
+    s32 nCount;
+    s32 nFirst;
+    int i;
+
+    if (nPart >= pDesc->nParts) {
+        return;
+    }
+    pPart = &pDesc->pParts[nPart];
+    if (nVariant >= pPart->nVariants) {
+        return;
+    }
+    pOption = &pDesc->p5C[nOption + pDesc->pVariants[nVariant + pPart->nFirst].nFirstOption];
+    nCount = pOption->n0;
+    nFirst = pOption->n4;
+    for (i = 0; i < nCount; i++) {
+        fn_80112DD8(lbl_80223BB0.pDesc->p6C[nFirst + i]);
+    }
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_80113840(void) {
 }
 
@@ -136,7 +166,7 @@ void fn_80113840(void) {
 
 // Clear the renderer's state.
 void fn_80113844(void) {
-    lbl_80223BB0.p0 = NULL;
+    lbl_80223BB0.pDesc = NULL;
     lbl_80223BB0.n4 = 0;
     lbl_80223BB0.pOverride = NULL;
     lbl_80223BB0.n8 = 0;
@@ -156,8 +186,8 @@ void fn_8011389C(void) {
 
 // ---- end of sweep code ----
 
-void fn_801138CC(void* p) {
-    lbl_80223BB0.p0 = p;
+void fn_801138CC(SkinDesc* pDesc) {
+    lbl_80223BB0.pDesc = pDesc;
 }
 
 // ---- sweep code (not yet cleaned up) ----
