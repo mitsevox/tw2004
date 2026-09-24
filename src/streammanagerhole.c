@@ -1,6 +1,7 @@
 // streammanagerhole.c (our name, after TW06's golf/streaming/streammanagerhole.cpp; the 2003 game
-// is C): loads a hole's stream files, registering and unregistering every system's stream handlers
-// around each load. Not yet decompiled; the code below is the matched small functions.
+// is C): the stream file lists (front end, startup, in game, characters, loading screens, the
+// hole) and their loads, the lists of stream handlers each part registers and unregisters, and
+// (from 0x80015470) the renderer's state cache, the 2D view and the vertex output.
 
 #include "ustream.h"
 #include "camera.h"
@@ -722,7 +723,7 @@ void fn_80015624(void) {
                 fn_80016158(0xFF);
             }
         }
-        // alpha test: off, or pass above the reference with the depth test after texturing
+        // alpha test: off, or compare n8 against the reference bC with the depth test after texturing
         if (lbl_801B8980.u110 & 0x4) {
             if (lbl_801B8980.bD == 0) {
                 GXSetZCompLoc(1);
@@ -1011,8 +1012,8 @@ void fn_80016C44(const f32* pViewport) {
 }
 
 // Draw primitive 0xA1: each pair of vertices gives the opposite corners of a rectangle (x from
-// one, y from the other), drawn as a 4-vertex strip (0x98). Colours and texture coordinates are
-// spread over the corners the same way.
+// one, y from the other), drawn as a 4-vertex strip (0x98). Texture coordinates are spread over
+// the corners the same way; colours by row (the first vertex's on the first two corners).
 void fn_800162AC(f32* pPos, f32* pColour, f32* pUV, int nVerts) {
     f32 aPos[4][4];
     f32 aColour[4][4];
@@ -1185,8 +1186,8 @@ void fn_80014A64(void) {
     }
 }
 
-// Refill stream list 0 with the swing-animation files: the male and/or female sac file for each
-// animation slot that has overlays, and every player's golfer's CharSac file.
+// Refill stream list 0 with the sac files: malesac for animation slot 0 and femsac for slot 1
+// when that slot has overlays, and every player's golfer's CharSac file.
 void fn_80014BB4(void) {
     char szName[0x80];  // size unknown: the frame allows up to 0x88 bytes
     int nPlayer;

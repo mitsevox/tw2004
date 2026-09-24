@@ -245,8 +245,8 @@ s32 fn_801694A0(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 nArgs, s32* pArgs
     return 1;
 }
 
-// Makes pFile the studio's UI file, fixing up its offsets the first time it is seen. Returns
-// whether the file can be used; a file that cannot is dropped.
+// Makes pFile the studio's UI file (pCurrent->p10), fixing up its offsets unless it already is
+// that file. Returns whether the file can be used; a file that cannot is dropped.
 u8 fn_80169520(UIStudio* pStudio, UISScreenFile* pFile) {
     u8 bOk;
 

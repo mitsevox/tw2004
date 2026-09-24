@@ -39,6 +39,7 @@ void fn_800922A8(UIText* pText) {
     Vec4 vEndOut;
     char* szText;
     s32 uFlags;
+    f32 fInvH;
     f32 fX;
     f32 fY;
     f32 fW;
@@ -84,7 +85,8 @@ void fn_800922A8(UIText* pText) {
     vEnd.y = 0.0f;
     vEnd.z = 0.0f;
     vEnd.w = fW;
-    fY = vOut.y * (1.0f / 448.0f);
+    fInvH = 1.0f / 448.0f; // fake match: the factor through a local puts vOut.y first in fmuls
+    fY = vOut.y * fInvH;
     if (pText->nFlags & 0x100) {
         vEnd.x = 512.0f * (pText->v18[0] / 512.0f) + 512.0f * (pText->f30 / 512.0f);
     }
@@ -109,7 +111,7 @@ void fn_800922A8(UIText* pText) {
         fH = vEndOut.y - fY;
     }
     if ((pText->nFlags & 1) && (pText->nFlags & 0x100)) {
-        fX += (vEndOut.x - fX) * 0.5f;
+        fX += (vEndOut.x - fX) / 2.0f;
     }
     if (pText->nFlags & 0x10) {
         aColor[0] = (u8)(lbl_80281F30->a[0] * (pText->aShadowColor[0] + lbl_80281F34->a[0])) / 255.0f;
@@ -243,44 +245,44 @@ void fn_800929E4(UIText* pText, int nMsg, s32 n, MsgArg* pArgs, MsgArg* pResult)
 
 // ---- sweep code (not yet cleaned up) ----
 
-void UFont_SetMode();
+void FO_vSetCurrentAddMode();
 void fn_80092BA0(void);
 void fn_80092BC4(void);
 void fn_80092BA0(void) {
-    UFont_SetMode(1);
+    FO_vSetCurrentAddMode(1);
 }
 
 void fn_80092BC4(void) {
-    UFont_SetMode(0);
+    FO_vSetCurrentAddMode(0);
 }
 
 // ---- end of sweep code ----
 
 // Sets up the text shadow: nC4 0x12, and uC8 packed from the colour pColor.
 void fn_80092BE8(f32* pColor) {
-    UFont_GetContext()->nC4 = 0x12;
-    UFont_PackColor(pColor, (u8*)&UFont_GetContext()->uC8);
+    FO_spGetCurrentPacket()->nC4 = 0x12;
+    UFont_PackColor(pColor, (u8*)&FO_spGetCurrentPacket()->uC8);
 }
 
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80092C38(f32 x0, f32 x1) {
     UFontContext* pCtx;
-    pCtx = UFont_GetContext();
+    pCtx = FO_spGetCurrentPacket();
     pCtx->fCC = x0;
     pCtx->fD0 = x1;
 }
 
 void fn_80092C78(f32 x0, f32 x1) {
     UFontContext* pCtx;
-    pCtx = UFont_GetContext();
+    pCtx = FO_spGetCurrentPacket();
     pCtx->fBC = x0;
     pCtx->fC0 = x1;
 }
 
 void fn_80092CB8(f32 x0) {
     UFontContext* pCtx;
-    pCtx = UFont_GetContext();
+    pCtx = FO_spGetCurrentPacket();
     pCtx->fB8 = x0;
 }
 

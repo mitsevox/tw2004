@@ -1,9 +1,9 @@
-// GameHoleContests.c (our name): the hole contests of a multiplayer stroke round. At the start of the
-// round up to three holes are drawn: a par 4 or 5 for the longest drive (lbl_80281568), a par 3 for
-// closest to the pin (lbl_8028156C) and, one round in five, another par 3 with a $100,000 prize for
-// a hole in one (lbl_80281570). Each player's result on the contest hole is kept by player
-// (lbl_80202884 distances), ranked into a result table (lbl_80202828 names, lbl_80202870
-// distances), and the winner (lbl_80282264) is paid $2,500.
+// GameHoleContests.c (our name): the hole contests of a multiplayer round in game mode 0 (stroke
+// play), 1 or 2. At the start of the round up to three holes are drawn: a par 4 or 5 for the
+// longest drive (lbl_80281568), a par 3 for closest to the pin (lbl_8028156C) and, one round in
+// five, another par 3 with a $100,000 prize for a hole in one (lbl_80281570). Each player's result
+// on the contest hole is kept by player (lbl_80202884 distances), ranked into a result table
+// (lbl_80202828 names, lbl_80202870 distances), and the winner (lbl_80282264) is paid $2,500.
 
 #include "golfer.h"
 #include "game.h"
@@ -40,8 +40,8 @@ void fn_800D9E14(void) {
     }
 }
 
-// Whether this round has hole contests: several players in a plain stroke round of every hole,
-// without mulligans.
+// Whether this round has hole contests: several players, a round of every hole, no mulligans,
+// gSession.a8[0] clear, neither GameMode5 test (fn_800EC550, fn_800ED6F0) and game mode 0, 1 or 2.
 u8 fn_800D9E5C(void) {
     if (gpGame->nMulligans != 0) return 0;
     if (gSession.nNumPlayers == 1) return 0;
@@ -151,7 +151,8 @@ u8 fn_800DA2AC(void) {
     return bDone;
 }
 
-// Clears every player's contest result.
+// Clears every player's contest result and the result table (winner: nobody); on the round's first
+// hole (fn_800E1734) also draws the contest holes again (fn_800D9E14).
 void fn_800DA36C(void) {
     int i;
     int n;

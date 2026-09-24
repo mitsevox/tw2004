@@ -47,10 +47,10 @@ void fn_8006F4E0(void);
 void fn_800676AC();
 void fn_8006A89C();
 void fn_8006F600(void);
-void AI_TargetsHook();
+void fn_8002BC6C();
 void fn_80019648();
 void fn_80037E50();
-void fn_80046288();
+void DynObj_InitForHole();
 void fn_8006F604(void);
 void fn_8006F650();
 void fn_80091708();
@@ -65,7 +65,7 @@ s32 fn_8003467C();
 s32 fn_80046664();
 s32 fn_80048EF4();
 s32 fn_80058E40();
-s32 fn_80064EA4();
+s32 StaticCam_Reset();
 s32 fn_8006FBF8();
 s32 fn_80098C28();
 s32 fn_800A2B34(s32);
@@ -92,9 +92,9 @@ void fn_8006F4F0(void) {
 void fn_8006F518(void) {
     fn_8009B894();
     fn_800C8134();
-    AI_TargetsHook();
+    fn_8002BC6C();
     fn_80019648();
-    fn_80046288();
+    DynObj_InitForHole();
     fn_8006F650();
     GM_InitForHole();
     fn_800A2E68();
@@ -116,7 +116,7 @@ void fn_8006F568(void) {
         fn_8011E3B4();
         fn_8003467C();
         fn_80046664();
-        fn_80064EA4();
+        StaticCam_Reset();
         fn_80098C28();
         var_r31 = 0;
         do {

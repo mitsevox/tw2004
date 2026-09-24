@@ -2,7 +2,7 @@
 // twin: each scoring shot earns its length in points, the first player to the target score
 // (fn_8010D334) wins. GameRound.c starts it with fn_8010C4A0 (its case 26), which fills gpGame's
 // callbacks with this file's hooks the way GameMode22.c's fn_80125E68 does; fn_8010D364 tests
-// Game_GetMode() == 26. The file ends where CharSliders.c begins (fn_8010D454, the slider code
+// Game_GetMode() == 26. The file ends where CharSliders.c begins (CharSlider_Free, the slider code
 // char.c calls).
 
 #include "engine.h"
@@ -151,7 +151,7 @@ u8 fn_8010C8D8(u8 bCheck) {
     return 0;
 }
 
-// Nobody plays after the current player: the mode switches players itself.
+// Always 5: no player has the honor.
 s32 fn_8010C8E0(int nPlayer) {
     return 5;
 }
@@ -178,7 +178,7 @@ void fn_8010C958(int nPlayer) {
 
 // A fresh ball for the player on the tee set the session gives it.
 void fn_8010C978(int nPlayer) {
-    fn_80055AA8(&gPlayers[nPlayer].ball,
+    Physics_InitBall(&gPlayers[nPlayer].ball,
                 &gPlayers[nPlayer].ball.pCourse->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
 }
 
@@ -484,7 +484,8 @@ void fn_8010D3B8(void) {
     }
 }
 
-// The ball came to rest on surface 155.
+// A track (fn_800A746C kind 1, track 0) when the player's ball is on surface 155 (GameAudio.c
+// calls it when the ball hits a surface).
 void fn_8010D3D8(int nPlayer) {
     Player* pPlayer = &gPlayers[nPlayer];
 

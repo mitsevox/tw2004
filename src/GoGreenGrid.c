@@ -424,7 +424,8 @@ void fn_8009C914(int nView) {
 }
 
 // Whether the grid shows for the player: never with fn_800E39F0; with the putter when
-// options.b84 is set; otherwise when the target is on the kinds of ground fn_8009BD94 lists.
+// options.b84 is set; otherwise when the player's ground (nSurface) is of a class that
+// fn_8009BD94 lists.
 u8 fn_8009BD24(int nPlayer) {
     if (fn_800E39F0()) {
         return 0;

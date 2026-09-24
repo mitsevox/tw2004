@@ -49,8 +49,8 @@ void fn_80093580(void) {
 }
 
 // Fill the current set from the hole's lights: the directional light from the first directional
-// record (the fifth record if none of the first four is one), the point lights from the records
-// around it.
+// record (with none among the first five it reads one record past them), the point lights from
+// the records around it.
 void fn_800935CC(CourseLights* pLights) {
     LightSet* pSet;
     GoLight* pLight;

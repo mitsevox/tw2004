@@ -208,7 +208,7 @@ void fn_800A8134(AudSource* pSource, u32* auStreams, u16 uMask) {
         if (uMask & uBit) {
             pTrack = pSource->apTracks[i];
             if (pTrack == NULL) {
-                pTrack = fn_800A9BC8(pSource, &pSource->pSound->aTracks[i], i, 1.0f);
+                pTrack = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[i], i, 1.0f);
                 if (pTrack == NULL) return;
             }
             if (pTrack->pTmpl->n0 & 8) {
@@ -239,10 +239,10 @@ void fn_800A8248(u8 nEntry, u8 nTrack, u8 n) {
     pTmpl = &pSource->pSound->aTracks[nTrack];
     pTrack = pSource->apTracks[nTrack];
     if (pTrack == NULL) {
-        pTrack = fn_800A9BC8(pSource, pTmpl, nTrack, 1.0f);
+        pTrack = Trk_AllocPerf(pSource, pTmpl, nTrack, 1.0f);
         if (pTrack == NULL) return;
     }
-    fn_800AA30C(pTrack, n);
+    Trk_SelectVariation(pTrack, n);
 }
 
 void fn_800A82CC(u8 nEntry, u8 nTrack, u8 n) {
@@ -252,10 +252,10 @@ void fn_800A82CC(u8 nEntry, u8 nTrack, u8 n) {
     pSource = &lbl_80282058[nEntry];
     pTrack = pSource->apTracks[nTrack];
     if (pTrack == NULL) {
-        pTrack = fn_800A9BC8(pSource, &pSource->pSound->aTracks[nTrack], nTrack, 1.0f);
+        pTrack = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[nTrack], nTrack, 1.0f);
         if (pTrack == NULL) return;
     }
-    fn_800AA32C(pTrack, n);
+    Trk_SetVariationRange(pTrack, n);
 }
 
 void fn_800A834C(s16 nSound, u8 nTrack, u8 n) {
@@ -269,10 +269,10 @@ void fn_800A8394(u8 nEntry, u8 nTrack, u8 n, int bCheck) {
     pSource = &lbl_80282058[nEntry];
     pTrack = pSource->apTracks[nTrack];
     if (pTrack == NULL) {
-        pTrack = fn_800A9BC8(pSource, &pSource->pSound->aTracks[nTrack], nTrack, 1.0f);
+        pTrack = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[nTrack], nTrack, 1.0f);
         if (pTrack == NULL) return;
     }
-    fn_800AA2EC(pTrack, n, bCheck);
+    Trk_Step(pTrack, n, bCheck);
 }
 
 // Sets a track's volume.
@@ -283,7 +283,7 @@ void fn_800A8424(u8 nEntry, u8 nTrack, f32 fVolume) {
     pSource = &lbl_80282058[nEntry];
     pTrack = pSource->apTracks[nTrack];
     if (pTrack == NULL) {
-        pTrack = fn_800A9BC8(pSource, &pSource->pSound->aTracks[nTrack], nTrack, 1.0f);
+        pTrack = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[nTrack], nTrack, 1.0f);
         if (pTrack == NULL) return;
     }
     pTrack->f44 = fVolume;
@@ -297,7 +297,7 @@ void fn_800A84A4(u8 nEntry, u8 nTrack, f32 fPitch) {
     pSource = &lbl_80282058[nEntry];
     pTrack = pSource->apTracks[nTrack];
     if (pTrack == NULL) {
-        pTrack = fn_800A9BC8(pSource, &pSource->pSound->aTracks[nTrack], nTrack, 1.0f);
+        pTrack = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[nTrack], nTrack, 1.0f);
         if (pTrack == NULL) return;
     }
     pTrack->f4C = fPitch;

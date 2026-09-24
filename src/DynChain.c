@@ -349,7 +349,7 @@ void fn_80114540(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         Vec_Copy(pModel->pMatrices[pChain->nBone][3], vPos);
         fn_800BAE5C(mRot, mScale, pModel->pMatrices[pChain->nBone], 3);
         Vec_Copy(vPos, pModel->pMatrices[pChain->nBone][3]);
-        fn_80029A90(pModel, pModel->pMatrices[pChain->nBone], pChain->nBone);
+        SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[pChain->nBone], pChain->nBone);
     }
     Vec3Copy(pChain->pLinks->v04, pChain->pLinks->v14);
 }
@@ -458,7 +458,7 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         fn_8001E85C(vPos, pChain->pLinks[i].v64);
         fn_8001E85C(vPos, pModel->pPoses[pChain->nBone + i].v10);
         fn_8001E880(vPos, pModel->pMatrices[pChain->nBone + i][3]);
-        fn_80029A90(pModel, pModel->pMatrices[pChain->nBone + i], pChain->nBone + i);
+        SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[pChain->nBone + i], pChain->nBone + i);
     }
 
     // Turn each bone toward the next one, and rebuild its matrix.
@@ -503,7 +503,7 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             Vec_Copy(pModel->pMatrices[pChain->nBone + i][3], vSave);
             fn_800BAE5C(mRot, mScale, pModel->pMatrices[pChain->nBone + i], 3);
             Vec_Copy(vSave, pModel->pMatrices[pChain->nBone + i][3]);
-            fn_80029A90(pModel, pModel->pMatrices[pChain->nBone + i], pChain->nBone + i);
+            SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[pChain->nBone + i], pChain->nBone + i);
         } else {
             // The last bone takes the rotation of the one above it (not in 4-link chains).
             if (pChain->nLinks != 4) {
@@ -517,7 +517,7 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             Vec_Copy(pModel->pMatrices[pChain->nBone + i][3], vSave);
             fn_800BAE5C(mRot, mScale, pModel->pMatrices[pChain->nBone + i], 3);
             Vec_Copy(vSave, pModel->pMatrices[pChain->nBone + i][3]);
-            fn_80029A90(pModel, pModel->pMatrices[pChain->nBone + i], pChain->nBone + i);
+            SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[pChain->nBone + i], pChain->nBone + i);
         }
         fn_8001E85C(pChain->pLinks[i].q44, pChain->pLinks[i].q54);
         fn_8001E85C(pChain->pLinks[i].v64, pChain->pLinks[i].v74);
@@ -856,7 +856,7 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
                                 Quat_RotateVector(qTurn, vDir, vSwung);
                                 fn_801164F8(vSwung, pModel->pMatrices[pChain->pLinks->nParent][3],
                                             pModel->pMatrices[pChain->pLinks->nBone][3]);
-                                fn_80029A90(pModel, pModel->pMatrices[pChain->pLinks->nBone],
+                                SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[pChain->pLinks->nBone],
                                             pChain->pLinks->nBone);
                                 for (i = 0; i < pChain->nLinks; i++) {
                                     fn_8001E85C(pChain->pLinks[i].q44,

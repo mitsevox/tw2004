@@ -1,9 +1,9 @@
 // StaticMemory.c (our name, from the "StaticMemory: %d" message its set-up prints): the game's own
 // heap. At start-up it takes one big block (about 20 MB, less while the system heap cannot give that
 // much) and keeps a sorted table of its free spans. Blocks come from the low end of a span (first
-// fit, from a moving cursor) or from the high end (last fit or best fit); each block starts with
-// its span address and size. Anything outside the block came from the system heap and goes back
-// there.
+// fit, from a moving cursor) or from the high end (first fit searching down from the cursor, or
+// best fit); the 8 bytes before a block hold the start and size of the piece it was cut from. A
+// block outside the big one came from the system heap and goes back there.
 //
 // port: the span table holds addresses as signed 32-bit integers, and the code compares and
 // aligns them as integers; a 64-bit port needs a wider table.
@@ -164,7 +164,7 @@ int fn_80009A60(int nSize) {
 
 // Allocates nSize bytes aligned to nAlign (16 when less than 2). nMode 0 asks the system heap; 2
 // takes the low end of the first fitting span from the cursor (and moves the cursor there); 1 the
-// high end of the last fitting span, 4 of the best fitting one. When one way fails the other is
+// high end of the first fitting span searching down from the cursor, 4 of the best fitting one. When one way fails the other is
 // tried once: the static heap for mode 0, the system heap for the others. New memory is filled
 // with 0x33 (low end) or 0x55 (high end).
 void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine) {

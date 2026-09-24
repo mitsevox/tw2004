@@ -11,8 +11,8 @@ u8 lbl_80281648[2] = {0, 0};                // per team: 1 when the second partn
 
 u8  GameModeAlternateShot_TeamDone(int nTeam);
 int GameModeAlternateShot_GetPartner(int nPlayer);
-u8  fn_800E6A98(int nPlayer);
-int fn_800E6AF8(int nPlayer);
+u8  GameModeAlternateShot_PlayerHasTeamHonors(int nPlayer);
+int GetGamePlayerTeam(int nPlayer);
 int GameModeAlternateShot_TeamBestPossibleScore(int nTeam);
 int GameModeAlternateShot_TeamMatchWins(int nTeam);
 void GameModeAlternateShot_SetupNextGolfer(void);
@@ -81,13 +81,13 @@ int GameModeAlternateShot_GetPartner(int nPlayer) {
 }
 
 // Whether it is this player's turn to hit the team's ball.
-u8 fn_800E6A98(int nPlayer) {
+u8 GameModeAlternateShot_PlayerHasTeamHonors(int nPlayer) {
     int bSecond = (nPlayer == 1 || nPlayer == 3) ? 1 : 0;
-    return bSecond == lbl_80281648[fn_800E6AF8(nPlayer)];
+    return bSecond == lbl_80281648[GetGamePlayerTeam(nPlayer)];
 }
 
 // A player's team.
-int fn_800E6AF8(int nPlayer) {
+int GetGamePlayerTeam(int nPlayer) {
     return nPlayer / 2;
 }
 
@@ -183,8 +183,8 @@ s32 GameModeAlternateShot_GetHonors(int nPlayer) {
     // fake match: the tee-order loop reuses the hole counter h; a counter of its own gets another
     // register (h, t or w all match)
     for (h = 0; h < gNumPlayersSetUp; h++) {
-        if (nPlayer != aOrder[h] && Player_OnTee(aOrder[h]) && fn_800E6A98(aOrder[h]) &&
-            !GameModeAlternateShot_TeamDone(fn_800E6AF8(aOrder[h]))) {
+        if (nPlayer != aOrder[h] && Player_OnTee(aOrder[h]) && GameModeAlternateShot_PlayerHasTeamHonors(aOrder[h]) &&
+            !GameModeAlternateShot_TeamDone(GetGamePlayerTeam(aOrder[h]))) {
             return aOrder[h];
         }
     }
@@ -193,8 +193,8 @@ s32 GameModeAlternateShot_GetHonors(int nPlayer) {
     fBest = 0.0f;
     nBest = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (i != nPlayer && !Player_IsHoled(i) && fn_800E6A98(i) &&
-            !GameModeAlternateShot_TeamDone(fn_800E6AF8(i)) && PLAYER(i)->ball.nLie != LIE_GREEN_e) {
+        if (i != nPlayer && !Player_IsHoled(i) && GameModeAlternateShot_PlayerHasTeamHonors(i) &&
+            !GameModeAlternateShot_TeamDone(GetGamePlayerTeam(i)) && PLAYER(i)->ball.nLie != LIE_GREEN_e) {
             dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
             dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
             d = fn_80009680(dx * dx + dz * dz);
@@ -208,8 +208,8 @@ s32 GameModeAlternateShot_GetHonors(int nPlayer) {
         fBest = 0.0f;
         nBest = 5;
         for (i = 0; i < gNumPlayersSetUp; i++) {
-            if (i != nPlayer && !Player_IsHoled(i) && fn_800E6A98(i) &&
-                !GameModeAlternateShot_TeamDone(fn_800E6AF8(i))) {
+            if (i != nPlayer && !Player_IsHoled(i) && GameModeAlternateShot_PlayerHasTeamHonors(i) &&
+                !GameModeAlternateShot_TeamDone(GetGamePlayerTeam(i))) {
                 dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
                 dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
                 d = fn_80009680(dx * dx + dz * dz);
@@ -235,7 +235,7 @@ void GameModeAlternateShot_EndGolferTurn(int nPlayer) {
     gPlayers[nPartner].bLowIQPenalty = gPlayers[nPlayer].bLowIQPenalty;
     gPlayers[nPartner].ball.nPlayer = nPartner;
     gPlayers[nPartner].nStrokes[Game_CurHoleIndex()] = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
-    nTeam = fn_800E6AF8(nPlayer);
+    nTeam = GetGamePlayerTeam(nPlayer);
     lbl_80281648[nTeam] = 1 - lbl_80281648[nTeam];
 }
 

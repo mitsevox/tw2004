@@ -1,6 +1,7 @@
 // SitDevFile.c (EA's name, from its asserts; TW06): a watcher that follows the ball after a shot
 // (an event 48 frames in, a call when it reaches surface 105), the loading of the situation
-// scripts into the block lbl_802811B8 points at (sitdev.h), and the values the scripts test.
+// scripts (lbl_80282208; their state is in the block lbl_802811B8 points at, sitdev.h), the values
+// the scripts test, and running the scripts' actions (commentary lines, sounds, music).
 
 #include "game_types.h"
 #include "engine.h"
@@ -221,7 +222,7 @@ void fn_800BB52C(void) {
         pDst = lbl_80282208->p20;
         // EA bug: the byte count and the value width are swapped, and the address of pDst is
         // passed for pDst (the call is shaped like fn_8001F08C's)
-        fn_80076158((u8**)&pSrc, (u8*)&pDst, 4, lbl_80282208->n0C * 4);
+        BYTESWAP_SWAPDATA((u8**)&pSrc, (u8*)&pDst, 4, lbl_80282208->n0C * 4);
     }
     for (i = 0; i < lbl_80282208->nEntries; i++) {
         pEntry = &lbl_80282208->p14[i];
@@ -244,7 +245,7 @@ void fn_800BB6DC(u8* pChunk) {
 }
 
 // The bits of every zone the point is in (0 when the hole has none).
-u32 fn_800BB6FC(f32* pPos) {
+u32 SitDev_GetCommentaryZones(f32* pPos) {
     int i;
     u32 uBits = 0;
     if (lbl_80282210 == 0) return 0;
@@ -325,7 +326,7 @@ void fn_800BBADC(int nValue) {
 
 // ---- the values the scripts test -----------------------------------------------------------
 
-void fn_800BCA60(s32* pClass, int nSurface, Ball* pBall, Player* pPlayer);
+void modifyFinalLie(s32* pClass, int nSurface, Ball* pBall, Player* pPlayer);
 void fn_800BCB74(s32* pClass, int nSurface);
 int  fn_800BCB88(void);
 u8   fn_800BCBE0(void);
@@ -427,7 +428,7 @@ void FE_GolferAttributes(int nPlayer, u8 nKind) {
         fn_80067B1C(pValues, 41, fn_800D0FBC(nPlayer), pSetBits);
         fn_80067B1C(pValues, 42, fn_800D1170(nPlayer, 0), pSetBits);
         fn_80067B1C(pValues, 6, pPlayer->pChar->nSlot, pSetBits);
-        fn_80067B1C(pValues, 13, Controller_IsNotCPU(pPlayer->nController), pSetBits);
+        fn_80067B1C(pValues, 13, fn_8002E8E4(pPlayer->nController), pSetBits);
         fn_80067B1C(pValues, 84, gSession.nGolfer[nPlayer] >= 30, pSetBits);
         fn_80067B1C(pValues, 61, gSession.nGolfer[nPlayer], pSetBits);
         if (gSession.nNumPlayers == 2) {
@@ -528,15 +529,15 @@ void FE_GolferAttributes(int nPlayer, u8 nKind) {
         fn_80067B1C(pValues, 21, nValue, pSetBits);
         // the class of where the ball lies
         nValue = SurfaceType_IsValid(nSurface) ? gSurfaceTypes[pBall->nSurface].nClass : -1;
-        fn_800BCA60(&nValue, pBall->nSurface, pBall, pPlayer);
+        modifyFinalLie(&nValue, pBall->nSurface, pBall, pPlayer);
         fn_80067B1C(pValues, 22, nValue, pSetBits);
         fn_80067B1C(pValues, 87, lbl_80281E28 && lbl_80282218 != nValue, pSetBits);
         fn_80067B1C(pValues, 25, (s32)(36.0f * pBall->fClosest), pSetBits);
         fn_80067B1C(pValues, 26, (s32)(36.0f * fn_800D04E0(nPlayer)), pSetBits);
         nValue = fn_800D0514(nPlayer);
-        fn_800BCA60(&nValue, nBeforeSurface, pBefore, pPlayer);
+        modifyFinalLie(&nValue, nBeforeSurface, pBefore, pPlayer);
         fn_80067B1C(pValues, 27, nValue, pSetBits);
-        // the lie, in percent (fn_800510EC inlined)
+        // the lie, in percent (Physics_GetLiePowerPercentage inlined)
         nValue = SurfaceType_IsValid(pBall->nStartSurface) ?
                  (u32)(100.0f * (pBall->f70 + gSurfaceTypes[pBall->nStartSurface].f00)) : 100;
         fn_80067B1C(pValues, 58, nValue, pSetBits);
@@ -548,7 +549,7 @@ void FE_GolferAttributes(int nPlayer, u8 nKind) {
         if (nKind == 29) {
             lbl_80282218 = nValue;
         }
-        fn_80067B1C(pValues, 79, fn_800BB6FC(pBefore->vPos), pSetBits);
+        fn_80067B1C(pValues, 79, SitDev_GetCommentaryZones(pBefore->vPos), pSetBits);
         fn_80067B1C(pValues, 75, fn_8005CB48(nPlayer), pSetBits);
         fn_80067B1C(pValues, 76, fn_8005CB60(nPlayer), pSetBits);
         fn_80067B1C(pValues, 23, (s32)(100.0f * fn_8005C1EC(nPlayer)), pSetBits);
@@ -561,7 +562,7 @@ void FE_GolferAttributes(int nPlayer, u8 nKind) {
 // Correct the surface class of where a ball lies (SurfaceType.nClass) for the scripts: outside the
 // course outline, or on ground a ball may not stay on, is 19 (not playable) unless it is water; a
 // ball that must be dropped counts as water (7); surface 151 is 21; class 18 (green) reads as 12.
-void fn_800BCA60(s32* pClass, int nSurface, Ball* pBall, Player* pPlayer) {
+void modifyFinalLie(s32* pClass, int nSurface, Ball* pBall, Player* pPlayer) {
     u8 bWater;
     u8 bNoLie;
     bWater = nSurface >= 0 && nSurface < NUM_SURFACE_TYPES &&
@@ -582,7 +583,7 @@ void fn_800BCA60(s32* pClass, int nSurface, Ball* pBall, Player* pPlayer) {
     }
 }
 
-// Surface 151 is class 21 (the same test as in fn_800BCA60).
+// Surface 151 is class 21 (the same test as in modifyFinalLie).
 void fn_800BCB74(s32* pClass, int nSurface) {
     if (nSurface == 151) {
         *pClass = 21;
@@ -787,9 +788,10 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
     return bPlayed;
 }
 
-// Whether an action is held back: in modes with odd holes, or for a ball in the cup, at situations
-// 21 and 22; for events 20 and 31 while the GameBreaker is up; and commentary (kinds 1 and 2)
-// during a replay, in modes 6..8 and where fn_800E39F0 says so, and everywhere but mode 11.
+// Whether an action is held back: at situations 21 and 22 in modes with odd holes (gpGame's
+// b136..b139), or while fn_800EC550 is set (at 22 only for a ball off the tee); for events 20 and
+// 31 while the GameBreaker is up (not at situation 2); and commentary (kinds 1 and 2) during a
+// replay, in modes 6..8, where fn_800E39F0 says so, and in mode 11.
 u8 fn_800BD3F8(SitDevAction* pAction, int nSit, int nPlayer, u8 nEvent) {
     int nMode = Game_GetMode();
     if (nSit == 22 || nSit == 21) {
@@ -844,7 +846,7 @@ void fn_800BD580(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
         }
         break;
     case 4:
-        if (Player_IsNotCPU(nPlayer)) {
+        if (fn_8002E8B4(nPlayer)) {
             if (pDo->n4 == 0) {
                 fn_800DBA50(nPlayer);
             } else {
@@ -873,7 +875,8 @@ void fn_800BD74C(void) {
 
 // ---- sounds and music ----------------------------------------------------------------------
 
-// Hand GameEffects a sound to stop later (u48), unless one is waiting already; not in mode 11.
+// Hand GameEffects a commentary line to play later (u48; fn_800DBDA8 plays it as the GameBreaker
+// ends), unless one is waiting already; not in mode 11.
 void fn_800BD77C(int nSound) {
     if (Game_GetMode() != 11 && !lbl_80202898.b47) {
         lbl_80202898.u48 = nSound;
@@ -881,7 +884,7 @@ void fn_800BD77C(int nSound) {
     }
 }
 
-// Tell GameEffects which music to go back to.
+// Hand GameEffects a music to play later (n4F; fn_800DBDA8 plays it as the GameBreaker ends).
 void fn_800BD7D0(u8 nMusic) {
     lbl_80202898.b4E = 1;
     lbl_80202898.n4F = nMusic;

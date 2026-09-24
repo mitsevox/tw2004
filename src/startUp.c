@@ -1,7 +1,10 @@
 // startUp.c (EA's name, from its asserts; also in EA's 2002 source tree): the boot-time systems.
 // The sound voices (lbl_802820E8: 50 wrappers around the hardware's voices, run from the mixer
-// callback fn_800AF324), the audio-RAM heap and its DMA, and the 'LEGL' stream (the legal screens).
-// Most of it talks to the GameCube's audio libraries; see core/startup.h.
+// callback fn_800AF324), the audio-RAM heap and its DMA, the two built-in sounds, the boot-time
+// memory-card checks and the start-up UI commands (lbl_801F5DA8), and the 'LEGL' stream (two
+// pictures; fe_movies.c shows the first at boot). It also holds a length estimate without a
+// square root (for AudTable.c) and the ball-against-object test (for Ball.c). The sound code
+// talks to the GameCube's audio libraries; see core/startup.h.
 
 #include "core/startup.h"
 #include "core/goaram.h"
@@ -869,9 +872,9 @@ s32 fn_800B09C8(int nPort, int nSlot) {
     return nStatus;
 }
 
-// Build the memory-card status table from scratch, every status reported, and send the message
-// for the first status that has one; message 0x80 when a status is 3 or out of range first, 0x81
-// when no status sends one.
+// Build the memory-card status table from scratch (every card marked not yet reported) and send
+// the message for the first status that has one (0x8C for both 10 and 11); message 0x80 when a
+// status is 3 or out of range first, 0x81 when no status sends one.
 void fn_800B0B1C(void) {
     int i;
     int j;
@@ -1498,8 +1501,8 @@ void fn_800B1D78(void) {
     lbl_801F5DA8[22] = fn_800B22F4;
 }
 
-// Command 0: the card status at a port and slot (values 0 and 1; the slot counts from 1, and both
-// are kept at 0 or above).
+// Command 0: fn_8009D390's count for the game's save and the EA Sports Bio on the card at a port
+// and slot (values 0 and 1; the slot counts from 1, and both are kept at 0 or above).
 void fn_800B1F20(MsgArg* pArgs, MsgArg* pResult) {
     s32 nPort = pArgs[0].i;
     s32 nSlot = pArgs[1].i;
@@ -1575,7 +1578,7 @@ void fn_800B2150(MsgArg* pArgs, MsgArg* pResult) {
     fn_800A7A14(1);
 }
 
-// Command 18: the state of the card at a port and slot.
+// Command 18: byte b94 of the state of the card at a port and slot.
 void fn_800B218C(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
     fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);

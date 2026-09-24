@@ -12,24 +12,24 @@ int  fn_80055F78(void);                 // Ball.c: the wind's direction
 f32  fn_80055F80(void);                 // Ball.c: the wind's speed
 f32  fn_8006C630(void);                 // gomainloop.c
 
-void fn_8006BED4(void) {
+void REPLAY_InitModule(void) {
     lbl_80281E48 = fn_80009B34(sizeof(ReplayBuffer), 2, 0, "Replay.c", 77);
     lbl_80281E48->b1525C = 0;
 }
 
-void fn_8006BF20(void) {
+void REPLAY_CloseModule(void) {
     fn_80009E70(lbl_80281E48);
     lbl_80281E48 = NULL;
 }
 
-void fn_8006BF4C(void) {
+void REPLAY_Init(void) {
     gReplayData.bF10 = 0;
 }
 
 // Before nPlayer's shot: save everything a replay of it needs (a new random seed, the player, his
 // save profile, the record tables, the UI queues and the conditions), unless a saved replay is
 // playing. A CPU's shot, or one with uFlags bit 3 set, turns in-flight replays off.
-void fn_8006BF60(int nPlayer) {
+void REPLAY_Save(int nPlayer) {
     s32 nMode;
 
     if (gSession.bReplay) return;
@@ -86,14 +86,14 @@ void fn_8006BF60(int nPlayer) {
 }
 
 // While in-flight replays are on, the saved player uses this controller.
-void fn_8006C28C(int nPlayer, int nController) {
+void REPLAY_ResetController(int nPlayer, int nController) {
     if (gReplayData.bF10) {
         gReplayData.player.nController = nController;
     }
 }
 
 // While in-flight replays are on, keep the spin put on the ball.
-void fn_8006C2A8(int nPlayer, f32 fForwardSpin, f32 fSideSpin) {
+void REPLAY_SaveSpin(int nPlayer, f32 fForwardSpin, f32 fSideSpin) {
     if (gReplayData.bF10) {
         gReplayData.fF08 = fForwardSpin;
         gReplayData.fF0C = fSideSpin;
@@ -101,7 +101,7 @@ void fn_8006C2A8(int nPlayer, f32 fForwardSpin, f32 fSideSpin) {
 }
 
 // The saved spin, or none when in-flight replays are off.
-void fn_8006C2C8(int nPlayer, f32* pForwardSpin, f32* pSideSpin) {
+void REPLAY_GetSpin(int nPlayer, f32* pForwardSpin, f32* pSideSpin) {
     if (gReplayData.bF10) {
         *pForwardSpin = gReplayData.fF08;
         *pSideSpin = gReplayData.fF0C;
@@ -148,13 +148,13 @@ void REPLAY_Play(int nPlayer) {
 }
 
 // Ends a saved replay's playback.
-void fn_8006C4A0(void) {
+void REPLAY_Stop(void) {
     if (gSession.bReplay) {
         gSession.bReplay = 0;
     }
 }
 
-// Puts back what fn_8006BF60 saved before nPlayer's shot (the player whole, his save profile, the
+// Puts back what REPLAY_Save saved before nPlayer's shot (the player whole, his save profile, the
 // record tables and the UI queues), then fn_800335F8(1).
 void REPLAY_Restore(int nPlayer) {
     if (gReplayData.bF10) {
@@ -178,13 +178,13 @@ void REPLAY_Restore(int nPlayer) {
     }
 }
 
-void fn_8006C5E0(void) {
+void REPLAY_RecordStart(void) {
     if (!gSession.bReplay) {
         lbl_80281E48->b1525C = 1;
     }
 }
 
-void fn_8006C608(void) {
+void REPLAY_RecordStop(void) {
     if (!gSession.bReplay) {
         lbl_80281E48->b1525C = 0;
     }

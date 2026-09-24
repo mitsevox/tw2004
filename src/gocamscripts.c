@@ -10,14 +10,14 @@
 
 void fn_80045428(f32* pA, f32* pB, f32* pOut);  // pOut = pA - pB (paired singles)
 void fn_8004544C(f32* pA, f32* pB, f32* pOut);  // pOut = pA + pB (paired singles)
-void fn_800418B0(CamShot* pShot, f32* pOut, f32 f1, f32 f2);
-void fn_80041EA8(int nPlayer, f32* pOut, f32* pCam, CamShot* pShot, CamScript* pScript, f32* pVec,
+void CameraScript_CalculateShoulderShake(CamShot* pShot, f32* pOut, f32 f1, f32 f2);
+void CameraScript_LagBallFlight(int nPlayer, f32* pOut, f32* pCam, CamShot* pShot, CamScript* pScript, f32* pVec,
                  f32 fTime);
-void fn_800422C4(int nPlayer, f32* pOut, f32* pCam, f32* pTarget, CamShot* pShot, CamScript* pScript,
+void CameraScript_LagTargetPoint(int nPlayer, f32* pOut, f32* pCam, f32* pTarget, CamShot* pShot, CamScript* pScript,
                  f32 fTime, f32 fLag);
-f32  fn_80043420(int nPlayer, CamScript* pScript, f32* pPos, f32* pCam, CamShot* pShot);
-void fn_8004349C(int nPlayer, f32* pCam, f32* pOut, f32* pTarget, CamScript* pScript, f32 fLag);
-void fn_8004255C(f32* pPos, f32* pTarget, f32 fUp, f32 fSide);
+f32  CameraScript_GetBallHeightWithMaxHeight(int nPlayer, CamScript* pScript, f32* pPos, f32* pCam, CamShot* pShot);
+void CameraScript_KeepPointInView(int nPlayer, f32* pCam, f32* pOut, f32* pTarget, CamScript* pScript, f32 fLag);
+void CameraScript_OffsetLookVector(f32* pPos, f32* pTarget, f32 fUp, f32 fSide);
 void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
 void fn_80038054(u8 a, int n, f32 f1, f32 f2);
 void fn_800457B8(int nPlayer, f32 f);
@@ -25,16 +25,16 @@ f32  fn_800DC45C(f32 f);
 u8   fn_80044E74(CamShot* pShot);
 void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pSub, f32* pPrev,
                  f32 fTime);
-void fn_8003EE68(CamScript* pScript, f32* pCam, u8 b, int nPlayer, f32 fMaxStep);
-f32  fn_8003F064(CamScript* pScript, f32 fTime);
+void CamScript_SmoothTerrainHeight(CamScript* pScript, f32* pCam, u8 b, int nPlayer, f32 fMaxStep);
+f32  CamScript_AccelerateTime(CamScript* pScript, f32 fTime);
 void fn_8003F518(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
 void fn_8003F7EC(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
 void fn_8003FAA0(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
 void fn_8003FD54(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
-void fn_8004017C(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
+void CamScript_LerpSwingToBallFlightCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
 void CamScript_SplineCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
-void fn_800407D4(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
-void fn_80040A58(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
+void CamScript_ArcCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
+void CamScript_CircleCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
 void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam, CamScript* pScript,
                               f32* pVec, f32 fTime);
 void CameraScript_GoToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pCam, f32* pSub,
@@ -42,9 +42,9 @@ void CameraScript_GoToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer,
 void CamScript_CheckOutOfBounds(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pSaved,
                                 f32* pPrev, u8 b);
 void CamScript_UpdateFairwayCam(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer);
-void fn_800441E4(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pSaved, f32* pPrev);
-u8   fn_800439E4(f32* pCam, int nPlayer);
-u8   fn_80043920(CamScript* pScript, int nPlayer);
+void CamScript_CheckFlagCollision(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pSaved, f32* pPrev);
+u8   CamScript_CheckObstructedCamera(f32* pCam, int nPlayer);
+u8   CameraScript_DontUpdateCameraDuringSlowMo(CamScript* pScript, int nPlayer);
 void fn_80044768(f32* pPos, f32* pOut);
 f32  fn_8003F790(CamScript* pScript);   // the blend's share (0..1) so far
 f32  fn_80044F58(int nPlayer, CamScript* pScript);
@@ -60,7 +60,7 @@ void fn_800386F0(int n, f32* pVec);
 f32  fn_8003F194(CamShot* pShot, f32 fA, f32 fB, f32 fTime);
 u8   Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bHazards, f32 fStep,
                                          u8 bSlope, f32 fMaxSlope);   // GoTerrainCollision.c
-void fn_80040CF0(CamScript* pScript, f32* pSub, int nPlayer, f32* pPrev, f32 fTime);
+void CamScript_PickArcDirection(CamScript* pScript, f32* pSub, int nPlayer, f32* pPrev, f32 fTime);
 void Quat_RotateVector(f32* pTurn, f32* pVec, f32* pOut);     // the vector turned by it
 u8   fn_800DC464(int nPlayer);          // GameEffects.c: the ball is simulated from its position
 u8   Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
@@ -69,11 +69,12 @@ u8   Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32*
 // The camera script's frame (a view's &View.script; pShot is the view's hand-built shot19C). Unless
 // paused (or b), it eases the ball-update rate fEC, places the camera for the current and next
 // shots (fn_8003A148 for script shots, bA8 1), then either takes the current shot outright (its look-at
-// point, field of view, slow motion) or blends by the next shot's kind nBC (0, 1, 2/11/12, 3, 7,
+// point, field of view, fn_800457B8's value, fn_80038054's screen effect) or blends by the next
+// shot's kind nBC (0, 1, 2/11/12, 3, 7,
 // 13, 14, 15); keeps the camera above the ground and on the fairway, steps the script's clocks, and
 // moves on to the next shot when the current one has run its f8C (kinds 13 and 15: when fF8
 // reaches 1).
-void fn_8003DCE8(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b, f32 fTime) {
+void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b, f32 fTime) {
     f32 vPrev[4];
     f32 vMove[4];
     f32 vBall[4];
@@ -86,18 +87,18 @@ void fn_8003DCE8(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
     u8 bFirstFrame;
 
     if (pScript->pShot == NULL) return;
-    if (fn_800C714C()) {
+    if (GolfCamera_IsScriptMatrixModeOn()) {
         fTime = FRAME_TIME;
     }
     fn_8000C594();  // the result is not used
-    if (!b && !fn_80043388(pScript, pScript->pShot)
+    if (!b && !CameraScript_SnapToScript(pScript, pScript->pShot)
         && (gSession.nPaused != 0 || (0.0f == gSession.fFrameTime && 0.0f == fTime))) {
         if (pScript->nCamera != 0) {
             fn_8003F2E0(pScript, fTime);
         }
         return;
     }
-    if (fn_80043920(pScript, nPlayer)) {
+    if (CameraScript_DontUpdateCameraDuringSlowMo(pScript, nPlayer)) {
         if (pScript->nCamera != 0) {
             fn_8003F2E0(pScript, fTime);
         }
@@ -177,15 +178,15 @@ void fn_8003DCE8(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
             fn_8003FD54(nPlayer, pCam, pSub, pScript, vPrev, fTime);
             break;
         case 14:
-            fn_8004017C(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            CamScript_LerpSwingToBallFlightCameras(nPlayer, pCam, pSub, pScript, vPrev, fTime);
             break;
         case 2:
         case 11:
         case 12:
-            fn_800407D4(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            CamScript_ArcCameras(nPlayer, pCam, pSub, pScript, vPrev, fTime);
             break;
         case 7:
-            fn_80040A58(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            CamScript_CircleCameras(nPlayer, pCam, pSub, pScript, vPrev, fTime);
             break;
         case 3:
             CamScript_SplineCameras(nPlayer, pCam, pSub, pScript, vPrev, fTime);
@@ -194,7 +195,7 @@ void fn_8003DCE8(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
     }
     if (pScript->pShot->bA8 == 1 || (pScript->pNextShot != NULL && pScript->pNextShot->bA8 == 1)) {
         if (pScript->pShot->bAD != 0
-            && CamScript_KeepAboveGround(nPlayer, pCam, vPrev, fn_80043388(pScript, pScript->pShot) == 0,
+            && CamScript_KeepAboveGround(nPlayer, pCam, vPrev, CameraScript_SnapToScript(pScript, pScript->pShot) == 0,
                                          NULL, NULL, NULL, lbl_80281F78->f168)
             && (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 12 && pScript->pShot->bAD != 3) {
             CamScript_PutBackOnFairway(pScript, pCam, pSub, nPlayer, pShot, vPrev);
@@ -204,27 +205,27 @@ void fn_8003DCE8(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
                 CamScript_UpdateFairwayCam(pScript, pCam, pSub, nPlayer);
             }
         }
-        if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 12 && fn_80043388(pScript, pScript->pShot)
-            && pScript->pShot->bAD != 3 && !pScript->bCF && fn_800439E4(pCam, nPlayer) && !fn_800E39F0()) {
+        if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 12 && CameraScript_SnapToScript(pScript, pScript->pShot)
+            && pScript->pShot->bAD != 3 && !pScript->bCF && CamScript_CheckObstructedCamera(pCam, nPlayer) && !fn_800E39F0()) {
             CamScript_PutBackOnFairway(pScript, pCam, pSub, nPlayer, pShot, vPrev);
         }
         if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 12 && !fn_8003A76C(pScript->pShot)) {
-            fn_800441E4(pScript, pCam, pSub, nPlayer, pShot, vPrev);
+            CamScript_CheckFlagCollision(pScript, pCam, pSub, nPlayer, pShot, vPrev);
         }
     }
-    fn_8003EE68(pScript, pCam, 1, nPlayer, -1.0f);
+    CamScript_SmoothTerrainHeight(pScript, pCam, 1, nPlayer, -1.0f);
     if (pScript->nCamera != 0) {
         fn_8003F2E0(pScript, fTime);
     }
-    if (fn_80043388(pScript, pScript->pShot)) {
+    if (CameraScript_SnapToScript(pScript, pScript->pShot)) {
         pScript->v60[0] = 0.0f;
         pScript->v60[1] = 0.0f;
         pScript->v60[2] = 0.0f;
     } else {
         fn_80045428(pCam, vPrev, pScript->v60);
     }
-    bFirstFrame = fn_80043388(pScript, pScript->pShot);
-    fStep = fn_8003F064(pScript, fTime);
+    bFirstFrame = CameraScript_SnapToScript(pScript, pScript->pShot);
+    fStep = CamScript_AccelerateTime(pScript, fTime);
     pScript->f84 = pScript->fCamTime;
     pScript->fCamTime += fStep;
     pScript->f90 += fStep;
@@ -246,7 +247,7 @@ void fn_8003DCE8(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
                 pScript->nBC = 5;
             } else {
                 CameraScript_GoToNewScript(pScript, pScript->pNextShot, nPlayer, pCam, pSub, pShot);
-                bFirstFrame = fn_80043388(pScript, pScript->pShot);
+                bFirstFrame = CameraScript_SnapToScript(pScript, pScript->pShot);
             }
             if (fStep > 0.0f) {
                 fn_80045428(vPrev, pCam, vMove);
@@ -259,9 +260,9 @@ void fn_8003DCE8(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
     }
 }
 
-// A plainer script frame than fn_8003DCE8 (a is not read): no pause test, no ball-rate easing, no
+// A plainer script frame than CamScript_RunScript (a is not read): no pause test, no ball-rate easing, no
 // ground or fairway checks; the look-at point goes straight to pSub and fD8 is cleared.
-void fn_8003E624(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, int a, f32 fTime) {
+void CamScript_RunFEScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, int a, f32 fTime) {
     f32 vPrev[4];
     f32 vMove[4];
     f32 fFov;
@@ -314,22 +315,22 @@ void fn_8003E624(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
             fn_8003FD54(nPlayer, pCam, pSub, pScript, vPrev, fTime);
             break;
         case 14:
-            fn_8004017C(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            CamScript_LerpSwingToBallFlightCameras(nPlayer, pCam, pSub, pScript, vPrev, fTime);
             break;
         case 2:
         case 11:
         case 12:
-            fn_800407D4(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            CamScript_ArcCameras(nPlayer, pCam, pSub, pScript, vPrev, fTime);
             break;
         case 7:
-            fn_80040A58(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            CamScript_CircleCameras(nPlayer, pCam, pSub, pScript, vPrev, fTime);
             break;
         case 3:
             CamScript_SplineCameras(nPlayer, pCam, pSub, pScript, vPrev, fTime);
             break;
         }
     }
-    fn_80043388(pScript, pScript->pShot);   // its answer is not used
+    CameraScript_SnapToScript(pScript, pScript->pShot);   // its answer is not used
     pScript->f84 = pScript->fCamTime;
     pScript->fCamTime += fTime;
     pScript->f90 += fTime;
@@ -348,7 +349,7 @@ void fn_8003E624(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
             pScript->nBC = 5;
         } else {
             CameraScript_GoToNewScript(pScript, pScript->pNextShot, nPlayer, pCam, pSub, pShot);
-            fn_80043388(pScript, pScript->pShot);   // its answer is not used
+            CameraScript_SnapToScript(pScript, pScript->pShot);   // its answer is not used
         }
         if (fTime > 0.0f) {
             fn_80045428(vPrev, pCam, vMove);
@@ -359,9 +360,9 @@ void fn_8003E624(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
 
 // The script frame of a fly-by path (GoStaticCam.c). When the path has a spline, the camera flies
 // along it (fn_80065488) by the share of the spline's length the time has reached, and at the end
-// goes on to the next path's shots; without one, the camera moves between the shots like
-// fn_8003E624 does.
-void fn_8003EA50(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b, f32 fTime) {
+// goes on to the next path's shots; without one, the camera moves between the shots on the
+// spline only (CamScript_SplineCameras).
+void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b, f32 fTime) {
     f32 vPrev[4];
     f32 vMove[4];
     f32 vMoveTo[4];
@@ -373,7 +374,7 @@ void fn_8003EA50(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
 
     if (pScript->pShot == NULL) return;
     Vec_Copy(lbl_80281F78->v17C, vMoveTo);
-    if (!b && !fn_80043388(pScript, pScript->pShot)
+    if (!b && !CameraScript_SnapToScript(pScript, pScript->pShot)
         && (gSession.nPaused != 0 || (0.0f == gSession.fFrameTime && 0.0f == fTime))) {
         if (pScript->nCamera != 0) {
             fn_8003F2E0(pScript, fTime);
@@ -430,15 +431,15 @@ void fn_8003EA50(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
     if (pScript->nCamera != 0) {
         fn_8003F2E0(pScript, fTime);
     }
-    if (fn_80043388(pScript, pScript->pShot)) {
+    if (CameraScript_SnapToScript(pScript, pScript->pShot)) {
         pScript->v60[0] = 0.0f;
         pScript->v60[1] = 0.0f;
         pScript->v60[2] = 0.0f;
     } else {
         fn_80045428(pCam, vPrev, pScript->v60);
     }
-    fn_80043388(pScript, pScript->pShot);   // its answer is not used
-    fStep = fn_8003F064(pScript, fTime);
+    CameraScript_SnapToScript(pScript, pScript->pShot);   // its answer is not used
+    fStep = CamScript_AccelerateTime(pScript, fTime);
     pScript->f84 = pScript->fCamTime;
     pScript->fCamTime += fStep;
     pScript->f90 += fStep;
@@ -447,7 +448,7 @@ void fn_8003EA50(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
     }
     if (pScript->pNextShot != NULL && pScript->fCamTime > pScript->f8C) {
         CameraScript_GoToNewScript(pScript, pScript->pNextShot, nPlayer, pCam, pSub, pShot);
-        fn_80043388(pScript, pScript->pShot);   // its answer is not used
+        CameraScript_SnapToScript(pScript, pScript->pShot);   // its answer is not used
         if (fStep > 0.0f) {
             fn_80045428(vPrev, pCam, vMove);
             pScript->fD4 = (f32)fn_80009680(fn_80009744(vMove)) / fStep;
@@ -457,18 +458,18 @@ void fn_8003EA50(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
 
 // Eases the script's ground height fD8 towards the ground under pCam (by CamTuning.fE0 a frame; with
 // no ground found, fD8 stays and bE8 asks for the fairway fix). With fMaxStep 0 or more, fD8 is
-// kept within it of the ground; never below the course's floor. Not while a held shot of bA8 1
-// plays.
-void fn_8003EE68(CamScript* pScript, f32* pCam, u8 b, int nPlayer, f32 fMaxStep) {
+// kept within it of the ground; never below the course's floor. Not on the first frame
+// (CameraScript_SnapToScript) of a shot of bA8 1.
+void CamScript_SmoothTerrainHeight(CamScript* pScript, f32* pCam, u8 b, int nPlayer, f32 fMaxStep) {
     CourseInfo* pCourse = fn_8000C594();
     f32 fGround;
     f32 fRate;
     f32 fStep;
 
     pScript->bE8 = 0;
-    if (!fn_80043388(pScript, pScript->pShot) || pScript->pShot->bA8 != 1) {
+    if (!CameraScript_SnapToScript(pScript, pScript->pShot) || pScript->pShot->bA8 != 1) {
         if (pCourse != NULL) {
-            fGround = fn_8004D620(pCourse, pCam);
+            fGround = Ter_GetSupportingGroundHeight(pCourse, pCam);
         } else {
             fGround = pScript->fD8;
         }
@@ -511,7 +512,7 @@ void fn_8003EE68(CamScript* pScript, f32* pCam, u8 b, int nPlayer, f32 fMaxStep)
 // The script's time step for a kind-0 (bAD) shot on a chain: fTime, unless the camera's speed fD4
 // lies outside the spline speeds at the blend's start and now; then fn_800C7970 works out a step
 // that eases between them.
-f32 fn_8003F064(CamScript* pScript, f32 fTime) {
+f32 CamScript_AccelerateTime(CamScript* pScript, f32 fTime) {
     f32 fSpeed;
     f32 fNow;
     f32 fStart;
@@ -610,8 +611,8 @@ void fn_8003F2E0(CamScript* pScript, f32 fTime) {
 }
 
 // Blend kind 0: the camera and the point it looks at both move on straight lines from the current
-// shot's to the next one's (by fn_8003F790's share); field of view, fn_800457B8's value, slow
-// motion and fA8 blend the same.
+// shot's to the next one's (by fn_8003F790's share); field of view, fn_800457B8's value,
+// fn_80038054's screen effect (the shots' f8C, f90) and fA8 blend the same.
 void fn_8003F518(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
     f32 vMove[4];
     f32 vPos[4];
@@ -769,7 +770,8 @@ void fn_8003FAA0(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
 
 // Blend kind 1: the camera moves on the straight line from the current shot's position to the next
 // one's (by fn_8003F790's share), and its view direction turns from the one shot's to the other's
-// about their common axis; field of view, fn_800457B8's value, slow motion and fA8 blend the same.
+// about their common axis; field of view, fn_800457B8's value, fn_80038054's screen effect and
+// fA8 blend the same.
 void fn_8003FD54(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
     f32 vDir0[4];
     f32 vDir1[4];
@@ -847,8 +849,9 @@ void fn_8003FD54(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
 
 // Blend kind 3: the camera and the point it looks at follow splines (fn_800C7480) through the
 // current and next shots, with the shot before the current one (p44) and the one after the next
-// (p40) as the outer points (or the shots' own when there are none); field of view, fn_800457B8's
-// value, slow motion and fA8 are blended by the camera's time over the blend's length f8C.
+// (p40) as the outer points (or the shots' own when there are none), the field of view with them;
+// fn_800457B8's value, fn_80038054's screen effect and fA8 are blended by the camera's time over
+// the blend's length f8C.
 void CamScript_SplineCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
     f32 vPrevPos[4];
     f32 vPos0[4];
@@ -918,8 +921,8 @@ void CamScript_SplineCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScri
 
 // Blend kinds 2, 11 and 12: the point looked at moves on the straight line between the two shots'
 // look-at points; the camera follows the curve fn_800C7E50 makes through the two positions (kind
-// nD0), set up by fn_80040CF0 on the blend's first frame.
-void fn_800407D4(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
+// nD0), set up by CamScript_PickArcDirection on the blend's first frame.
+void CamScript_ArcCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
     f32 vMove[4];
     f32 vPos[4];
     CamShot* pShot = pScript->pShot;
@@ -935,7 +938,7 @@ void fn_800407D4(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     fn_8004544C(vPos, pScript->a20, vPos);
     Vec3Copy(vPos, pSub);
     if (0.0f == pScript->fCamTime) {
-        fn_80040CF0(pScript, pSub, nPlayer, pPrev, fTime);
+        CamScript_PickArcDirection(pScript, pSub, nPlayer, pPrev, fTime);
     }
     fn_800C7E50(pScript->v0, pScript->v10, pSub, pScript->nD0, pCam, fT);
     f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
@@ -963,7 +966,7 @@ void fn_800407D4(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
 // Blend kind 7: there and back. The share runs to 1 at the blend's middle and back to 0; the
 // point looked at and the camera's curve (fn_800C7E50, kind nD0: 1 going, 2 coming back) follow
 // it. fA8 blends by the doubled share itself.
-void fn_80040A58(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
+void CamScript_CircleCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
     f32 vMove[4];
     f32 vPos[4];
     CamShot* pShot = pScript->pShot;
@@ -1017,7 +1020,7 @@ void fn_80040A58(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
 // it looks at is the current shot's look-at point plus the share of the way from a point along the
 // current view direction (at the ball's level distance from the camera) to the next shot's look-at
 // point.
-void fn_8004017C(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
+void CamScript_LerpSwingToBallFlightCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
     f32 vDir[4];
     f32 vFromAim[4];
     f32 vMove[4];
@@ -1074,7 +1077,7 @@ void fn_8004017C(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
 // kinds 12 and 11 the side follows fn_800453C8; otherwise each side's curve midpoint (fn_800C7E50,
 // through the halfway point of the two look-at points) is tested against the in-bounds outlines,
 // and the side whose point alone is inside is taken.
-void fn_80040CF0(CamScript* pScript, f32* pSub, int nPlayer, f32* pPrev, f32 fTime) {
+void CamScript_PickArcDirection(CamScript* pScript, f32* pSub, int nPlayer, f32* pPrev, f32 fTime) {
     f32 vSide1[4];
     f32 vSide2[4];
     f32 vLook[4];
@@ -1128,8 +1131,8 @@ void fn_80040CF0(CamScript* pScript, f32* pSub, int nPlayer, f32* pPrev, f32 fTi
 
 // Where the camera looks for the shot's bAC, into pOut: the pin (kind 0 in golfer state 18), the
 // ball, Player.vBall, bones of the golfer, the tee, the aim; the look-at point is moved by the
-// shot's f74 up and f70 sideways (fn_8004255C), and by fn_800418B0's offset before and after.
-// fn_80043388 decides between setting the point outright and easing it there.
+// shot's f74 up and f70 sideways (CameraScript_OffsetLookVector), and by CameraScript_CalculateShoulderShake's offset before and after.
+// CameraScript_SnapToScript decides between setting the point outright and easing it there.
 void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam, CamScript* pScript,
                               f32* pVec, f32 fTime) {
     f32 vPos[4];
@@ -1149,8 +1152,8 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
     int nPin;
     int nTee;
 
-    if (!fn_80043388(pScript, pShot)) {
-        fn_800418B0(pShot, vOffset, pScript->f9C, pShot->f98);
+    if (!CameraScript_SnapToScript(pScript, pShot)) {
+        CameraScript_CalculateShoulderShake(pShot, vOffset, pScript->f9C, pShot->f98);
         fn_80045428(pOut, vOffset, pOut);
     }
     switch (pShot->bAC) {
@@ -1159,7 +1162,7 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
             pCourse = fn_8000C594();
             nPin = Game_CurrentPinSet();
             Vec3Copy(&pCourse->pin[nPin].x, pOut);
-        } else if (fn_80043388(pScript, pShot)) {
+        } else if (CameraScript_SnapToScript(pScript, pShot)) {
             fn_8003D9AC(pScript, pShot, nPlayer, vPos, 0);
             if (pScript->bCF) {
                 // not steeper than 1 in 5 down to the camera, once it is far enough out
@@ -1172,11 +1175,11 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
                 }
             }
             Vec3Copy(vPos, pOut);
-            pOut[1] = fn_80043420(nPlayer, pScript, vPos, pCam, pShot);
-            fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+            pOut[1] = CameraScript_GetBallHeightWithMaxHeight(nPlayer, pScript, vPos, pCam, pShot);
+            CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
             pScript->fDC = lbl_80281F78->fE4;
         } else {
-            fn_80041EA8(nPlayer, pOut, pCam, pShot, pScript, pVec, fTime);
+            CameraScript_LagBallFlight(nPlayer, pOut, pCam, pShot, pScript, pVec, fTime);
         }
         break;
     case 23:
@@ -1185,39 +1188,39 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
         fn_8001EF34(vVel, pShot->f70, vVel);
         vVel[1] = pShot->f74 * gPlayers[nPlayer].ball.vVel[1];
         fn_8004544C(gPlayers[nPlayer].ball.vPos, vVel, vAim);
-        if (fn_80043388(pScript, pShot)) {
+        if (CameraScript_SnapToScript(pScript, pShot)) {
             Vec3Copy(vAim, pOut);
         } else {
-            fn_800422C4(nPlayer, pOut, pCam, vAim, pShot, pScript, fTime, lbl_80281F78->fE4);
+            CameraScript_LagTargetPoint(nPlayer, pOut, pCam, vAim, pShot, pScript, fTime, lbl_80281F78->fE4);
         }
-        fn_8004349C(nPlayer, pCam, pOut, gPlayers[nPlayer].ball.vPos, pScript, lbl_80281F78->fE4);
+        CameraScript_KeepPointInView(nPlayer, pCam, pOut, gPlayers[nPlayer].ball.vPos, pScript, lbl_80281F78->fE4);
         break;
     case 15:
         Vec3Copy(gPlayers[nPlayer].ball.vPos, pOut);
         break;
     case 13:
-        if (fn_80043388(pScript, pShot)) {
+        if (CameraScript_SnapToScript(pScript, pShot)) {
             Vec3Copy(gPlayers[nPlayer].ball.vPos, pOut);
             pOut[1] -= gPlayers[nPlayer].ball.fHeight;
-            fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+            CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
         } else if (GameEffects_BallUpdatesThisFrame(nPlayer) != 0) {
             Vec3Copy(gPlayers[nPlayer].ball.vPos, vPos);
             vPos[1] -= gPlayers[nPlayer].ball.fHeight;
-            fn_8004255C(vPos, pCam, pShot->f74, pShot->f70);
+            CameraScript_OffsetLookVector(vPos, pCam, pShot->f74, pShot->f70);
             fStep = vPos[1] - pOut[1];
             fStep *= lbl_80281F78->f164;
             pOut[0] = vPos[0];
             pOut[1] += fStep;
             pOut[2] = vPos[2];
-            fn_8004349C(nPlayer, pCam, pOut, pOut, pScript, lbl_80281F78->fE4);
+            CameraScript_KeepPointInView(nPlayer, pCam, pOut, pOut, pScript, lbl_80281F78->fE4);
         }
         break;
     case 1:
         Vec3Copy(gPlayers[nPlayer].vBall, pOut);
         if (fn_800453C8(nPlayer, pShot)) {
-            fn_8004255C(pOut, pCam, pShot->f74, -pShot->f70);
+            CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, -pShot->f70);
         } else {
-            fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+            CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
         }
         break;
     case 2:
@@ -1227,9 +1230,9 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
         fn_8001EF34(vMid, 0.5f, vMid);
         Vec3Copy(vMid, pOut);
         if (fn_800453C8(nPlayer, pShot)) {
-            fn_8004255C(pOut, pCam, pShot->f74, -pShot->f70);
+            CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, -pShot->f70);
         } else {
-            fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+            CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
         }
         break;
     case 3:
@@ -1237,77 +1240,77 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
         fn_8001EB8C(gPlayers[nPlayer].pChar, 0x47, vBone47);
         fn_8004544C(vBone39, vBone47, vMid);
         fn_8001EF34(vMid, 0.5f, vMid);
-        if (fn_80043388(pScript, pShot)) {
+        if (CameraScript_SnapToScript(pScript, pShot)) {
             Vec3Copy(vMid, pOut);
             if (fn_800453C8(nPlayer, pShot)) {
-                fn_8004255C(pOut, pCam, pShot->f74, -pShot->f70);
+                CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, -pShot->f70);
             } else {
-                fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+                CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
             }
         } else {
-            fn_800422C4(nPlayer, pOut, pCam, vMid, pShot, pScript, fTime, lbl_80281F78->fE8);
+            CameraScript_LagTargetPoint(nPlayer, pOut, pCam, vMid, pShot, pScript, fTime, lbl_80281F78->fE8);
         }
         break;
     case 4:
         fn_8001EB8C(gPlayers[nPlayer].pChar, 1, vBone1);
         Vec3Copy(vBone1, pOut);
         if (fn_800453C8(nPlayer, pShot)) {
-            fn_8004255C(pOut, pCam, pShot->f74, -pShot->f70);
+            CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, -pShot->f70);
         } else {
-            fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+            CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
         }
         break;
     case 5:
         fn_8001EB8C(gPlayers[nPlayer].pChar, 1, vBone1);
-        if (fn_80043388(pScript, pShot)) {
+        if (CameraScript_SnapToScript(pScript, pShot)) {
             Vec3Copy(vBone1, pOut);
             if (fn_800453C8(nPlayer, pShot)) {
-                fn_8004255C(pOut, pCam, pShot->f74, -pShot->f70);
+                CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, -pShot->f70);
             } else {
-                fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+                CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
             }
         } else {
-            fn_800422C4(nPlayer, pOut, pCam, vBone1, pShot, pScript, fTime, lbl_80281F78->fE8);
+            CameraScript_LagTargetPoint(nPlayer, pOut, pCam, vBone1, pShot, pScript, fTime, lbl_80281F78->fE8);
         }
         break;
     case 6:
         fn_8001EB8C(gPlayers[nPlayer].pChar, 10, vBone10);
         Vec3Copy(vBone10, pOut);
         if (fn_800453C8(nPlayer, pShot)) {
-            fn_8004255C(pOut, pCam, pShot->f74, -pShot->f70);
+            CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, -pShot->f70);
         } else {
-            fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+            CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
         }
         break;
     case 7:
         fn_8001EB8C(gPlayers[nPlayer].pChar, 10, vBone10);
-        if (fn_80043388(pScript, pShot)) {
+        if (CameraScript_SnapToScript(pScript, pShot)) {
             Vec3Copy(vBone10, pOut);
             if (fn_800453C8(nPlayer, pShot)) {
-                fn_8004255C(pOut, pCam, pShot->f74, -pShot->f70);
+                CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, -pShot->f70);
             } else {
-                fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+                CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
             }
         } else {
-            fn_800422C4(nPlayer, pOut, pCam, vBone10, pShot, pScript, fTime, lbl_80281F78->fE8);
+            CameraScript_LagTargetPoint(nPlayer, pOut, pCam, vBone10, pShot, pScript, fTime, lbl_80281F78->fE8);
         }
         break;
     case 10:
         nPin = Game_CurrentPinSet();
         pCourse = fn_8000C594();
         Vec3Copy(&pCourse->pin[nPin].x, pOut);
-        fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+        CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
         break;
     case 11:
         nTee = gSession.nTeeSet[nPlayer];
         pCourse = fn_8000C594();
         Vec3Copy(&pCourse->tee[nTee].x, pOut);
-        fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+        CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
         break;
     case 9:
-        if (fn_80043388(pScript, pShot) || pScript->pNextShot != NULL) {
+        if (CameraScript_SnapToScript(pScript, pShot) || pScript->pNextShot != NULL) {
             Vec3Copy(gPlayers[nPlayer].vTargetCopy, pOut);
-            fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+            CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
         } else {
             CameraScript_LagAimMarker(nPlayer, pOut, pCam, pShot, 1, 0, lbl_80281F78->fD8, 0.0f,
                                       lbl_80281F78->fDC);
@@ -1316,22 +1319,22 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
     case 14:
         fn_8003D9AC(pScript, pShot, nPlayer, pOut, 0);
         pOut[1] = pCam[1];
-        fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+        CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
         break;
     case 22:
     case 24:
         Vec3Copy(pShot->v30, pOut);
-        fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+        CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
         break;
     }
-    fn_80043388(pScript, pShot);    // its answer is not used
-    fn_800418B0(pShot, vOffset, pScript->f98, pShot->f98);
+    CameraScript_SnapToScript(pScript, pShot);    // its answer is not used
+    CameraScript_CalculateShoulderShake(pShot, vOffset, pScript->f98, pShot->f98);
     fn_8004544C(pOut, vOffset, pOut);
 }
 
 // The shot's wobble at time fTime (at speed fSpeed, 0.1 at least): three sums of cosines at unrelated
 // rates, each 0..1 less a half, scaled by the shot's f94 over the tuning's f11C. Nothing without f94.
-void fn_800418B0(CamShot* pShot, f32* pOut, f32 fTime, f32 fSpeed) {
+void CameraScript_CalculateShoulderShake(CamShot* pShot, f32* pOut, f32 fTime, f32 fSpeed) {
     f32 fX;
     f32 fY;
     f32 fT;
@@ -1397,7 +1400,7 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
         fOldY = pSub[1];
         Vec3Copy(vAim, vGoal);
         if (pShot != NULL) {
-            fn_8004255C(vGoal, pCam, pShot->f74, pShot->f70);
+            CameraScript_OffsetLookVector(vGoal, pCam, pShot->f74, pShot->f70);
         }
         fn_80045428(vGoal, pCam, vDir);
         fMin = lbl_80281F78->fF0;
@@ -1455,13 +1458,13 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
 }
 
 // The look-at point following the ball, one step per ball update this frame: the aim moves from
-// the script's v70 towards the ball (fn_8003D9AC) at its fn_80043420 height, moved by the shot's
+// the script's v70 towards the ball (fn_8003D9AC) at its CameraScript_GetBallHeightWithMaxHeight height, moved by the shot's
 // f74 and f70; during a fairway fix (bCF) a steep look down is limited (as in
 // CamScript_GetLookAtPoint). pOut eases towards it by a share that grows with the distance
 // (CamTuning.f138, f13C) and eases in over the move (fD4, f158); its height eases in by f15C/f160
-// and slows near the ground once the ball comes down. Then the aim lags by fE4 (fn_8004349C). pVec
+// and slows near the ground once the ball comes down. Then the aim lags by fE4 (CameraScript_KeepPointInView). pVec
 // is not read.
-void fn_80041EA8(int nPlayer, f32* pOut, f32* pCam, CamShot* pShot, CamScript* pScript, f32* pVec,
+void CameraScript_LagBallFlight(int nPlayer, f32* pOut, f32* pCam, CamShot* pShot, CamScript* pScript, f32* pVec,
                  f32 fTime) {
     f32 vMove[4];
     f32 vAim[4];
@@ -1486,8 +1489,8 @@ void fn_80041EA8(int nPlayer, f32* pOut, f32* pCam, CamShot* pShot, CamScript* p
         fn_80045428(vBall, pScript->v70, vStep);
         fn_8001EF34(vStep, (f32)(i + 1) / (f32)nUpdates, vStep);
         fn_8004544C(pScript->v70, vStep, vAim);
-        vAim[1] = fn_80043420(nPlayer, pScript, vAim, pCam, pShot);
-        fn_8004255C(vAim, pCam, pShot->f74, pShot->f70);
+        vAim[1] = CameraScript_GetBallHeightWithMaxHeight(nPlayer, pScript, vAim, pCam, pShot);
+        CameraScript_OffsetLookVector(vAim, pCam, pShot->f74, pShot->f70);
         if (pScript->bCF) {
             fn_80045428(vAim, pCam, vDir);
             fBase = pCam[1];
@@ -1539,18 +1542,18 @@ void fn_80041EA8(int nPlayer, f32* pOut, f32* pCam, CamShot* pShot, CamScript* p
         Vec3Copy(pOut, vLast);
     }
     if (pScript->bCF) {
-        fn_8004349C(nPlayer, pCam, pOut, vAim, pScript, lbl_80281F78->fE4);
+        CameraScript_KeepPointInView(nPlayer, pCam, pOut, vAim, pScript, lbl_80281F78->fE4);
     } else {
-        fn_8004349C(nPlayer, pCam, pOut, gPlayers[nPlayer].ball.vPos, pScript, lbl_80281F78->fE4);
+        CameraScript_KeepPointInView(nPlayer, pCam, pOut, gPlayers[nPlayer].ball.vPos, pScript, lbl_80281F78->fE4);
     }
 }
 
 // Eases the look-at point pOut towards pTarget (moved by the shot's f74 up and f70 sideways, the
 // other way round for fn_800453C8), level and in height separately, by CamTuning.f144 and f148 a
 // frame; slower when it is close. Right after a cut to the next shot it jumps there. Without a
-// next shot (or with blend 5) the aim lags by fLag (fn_8004349C). Only on frames with ball updates
-// or with fn_800C714C.
-void fn_800422C4(int nPlayer, f32* pOut, f32* pCam, f32* pTarget, CamShot* pShot, CamScript* pScript,
+// next shot (or with blend 5) the aim lags by fLag (CameraScript_KeepPointInView). Only on frames with ball updates
+// or with GolfCamera_IsScriptMatrixModeOn.
+void CameraScript_LagTargetPoint(int nPlayer, f32* pOut, f32* pCam, f32* pTarget, CamShot* pShot, CamScript* pScript,
                  f32 fTime, f32 fLag) {
     f32 vMove[4];
     f32 vAim[4];
@@ -1562,12 +1565,12 @@ void fn_800422C4(int nPlayer, f32* pOut, f32* pCam, f32* pTarget, CamShot* pShot
     f32 fRate;
     f32 fNear;
 
-    if (GameEffects_BallUpdatesThisFrame(nPlayer) != 0 || fn_800C714C()) {
+    if (GameEffects_BallUpdatesThisFrame(nPlayer) != 0 || GolfCamera_IsScriptMatrixModeOn()) {
         Vec3Copy(pTarget, vAim);
         if (fn_800453C8(nPlayer, pShot)) {
-            fn_8004255C(vAim, pCam, pShot->f74, -pShot->f70);
+            CameraScript_OffsetLookVector(vAim, pCam, pShot->f74, -pShot->f70);
         } else {
-            fn_8004255C(vAim, pCam, pShot->f74, pShot->f70);
+            CameraScript_OffsetLookVector(vAim, pCam, pShot->f74, pShot->f70);
         }
         fn_80045428(vAim, pOut, vMove);
         vMove[1] = 0.0f;
@@ -1600,13 +1603,13 @@ void fn_800422C4(int nPlayer, f32* pOut, f32* pCam, f32* pTarget, CamShot* pShot
         fDy *= fRate;
         pOut[1] += fDy;
         if (pScript->pNextShot == NULL || pScript->nBC == 5) {
-            fn_8004349C(nPlayer, pCam, pOut, vAim, pScript, fLag);
+            CameraScript_KeepPointInView(nPlayer, pCam, pOut, vAim, pScript, fLag);
         }
     }
 }
 
 // Raises pPos by fUp and moves it fSide sideways, square to the line from pTarget to it.
-void fn_8004255C(f32* pPos, f32* pTarget, f32 fUp, f32 fSide) {
+void CameraScript_OffsetLookVector(f32* pPos, f32* pTarget, f32 fUp, f32 fSide) {
     f32 vDir[4];
 
     pPos[1] += fUp;
@@ -1619,9 +1622,9 @@ void fn_8004255C(f32* pPos, f32* pTarget, f32 fUp, f32 fSide) {
 }
 
 // Records the camera as it is now into pShot ("ON THE FLY CAM"): positioned at pCam, looking at
-// pSub (bAC 24), with the lens's field of view (less the letterbox's change, except with bView1:
-// the player's second view) and the current shot's timing and slow motion. The script is left with
-// no next shot.
+// pSub (bAC 24), with the lens's field of view (less GameEffects_FieldOfViewChange, except with
+// bView1: the player's second view) and the current shot's bAD, nA0, f88 and fn_80038054 values
+// (f8C, f90). The script is left with no next shot.
 void CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPlayer, CamScript* pScript,
                                    u8 bView1) {
     char szName[] = "ON THE FLY CAM";
@@ -1671,7 +1674,7 @@ void CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPl
 // Where the ball-flight camera expects the ball to land, into the script's v50: the ball as it lay
 // before the shot while it has not been hit (single view), the target without a club (25); in
 // flight, where the line of its velocity (lifted while rising, bent down by its height) meets the
-// ground, pulled back to the club's reach; at rest, 5 x fn_800510EC along its velocity, on the ground.
+// ground, pulled back to the club's reach; at rest, 5 x Physics_GetLiePowerPercentage along its velocity, on the ground.
 void CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer) {
     f32 vHit[4];
     f32 vNormal[4];
@@ -1728,13 +1731,13 @@ void CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer) {
                 fn_80045428(vHit, pBall->vStart, vLand);
                 fDist = fn_80009680(fn_80009744(vLand));
                 fReach = AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
-                fReach *= fn_800510EC(&gPlayers[nPlayer].ball);
+                fReach *= Physics_GetLiePowerPercentage(&gPlayers[nPlayer].ball);
                 fReach *= fn_8005B64C(nPlayer);
                 if (fReach < fDist - 50.0f) {
                     fn_800BAF04(vLand, vLand);
                     fn_8001EF34(vLand, fReach, vLand);
                     fn_8004544C(pBall->vStart, vLand, vLand);
-                    fHeight = Terrain_HeightAt(vLand, NULL);
+                    fHeight = CamScript_GuessBestPlayableHeight(vLand, NULL);
                     if (!(fHeight < -60000.0f)) {
                         vLand[1] = fHeight;
                         Vec3Copy(vLand, pScript->v50);
@@ -1748,9 +1751,9 @@ void CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer) {
         }
     } else {
         Vec3Copy(pBall->vVel, vStep);
-        fn_8001EF34(vStep, 5.0f * fn_800510EC(&gPlayers[nPlayer].ball), vStep);
+        fn_8001EF34(vStep, 5.0f * Physics_GetLiePowerPercentage(&gPlayers[nPlayer].ball), vStep);
         fn_8004544C(vPos, vStep, vStep);
-        fHeight = Terrain_HeightAt(vStep, NULL);
+        fHeight = CamScript_GuessBestPlayableHeight(vStep, NULL);
         if (!(fHeight < -60000.0f)) {
             vStep[1] = fHeight;
             Vec3Copy(vStep, pScript->v50);
@@ -1809,7 +1812,7 @@ void CameraScript_GoToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer,
     }
     if (pScript->bCC == 0) {
         CameraScript_UpdateLandingEstimate(pScript, nPlayer);
-        fn_8003DCE8(nPlayer, pCam, pSub, pScript, pSaved, 0, 0.0f);
+        CamScript_RunScript(nPlayer, pCam, pSub, pScript, pSaved, 0, 0.0f);
         pScript->fCamTime += 0.001f;
         pScript->f88 += 0.001f;
         pScript->f98 = 0.0f;
@@ -1833,9 +1836,9 @@ void CameraScript_GoToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer,
             fn_80045494(0, nPlayer);
         }
         if (pScript->pShot->nA0 == 3) {
-            fn_800C7140(1);
+            GolfCamera_SetCameraMatrixMode(1);
         } else {
-            fn_800C7140(0);
+            GolfCamera_SetCameraMatrixMode(0);
         }
     }
     if (pScript->bCC == 0) {
@@ -1848,7 +1851,7 @@ void CameraScript_GoToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer,
 // makes pShot the next shot (first recording the current camera into pB4 when both shots are
 // script shots), its length f1 at least the move's distance over speed f2; otherwise pShot and
 // its follow-on start at once. nB and f3 go to nE0/fE4; single-view play sets fn_80045494,
-// fn_80045558 and fn_800C7140 from the shot's nA0.
+// fn_80045558 and GolfCamera_SetCameraMatrixMode from the shot's nA0.
 void CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pCam, f32* pSub,
                                     int nA, f32 f1, f32 f2, int nB, f32 f3) {
     f32 vDiff[4];
@@ -1967,9 +1970,9 @@ void CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPla
             fn_80045494(0, nPlayer);
         }
         if (pScript->pShot->nA0 == 3) {
-            fn_800C7140(1);
+            GolfCamera_SetCameraMatrixMode(1);
         } else {
-            fn_800C7140(0);
+            GolfCamera_SetCameraMatrixMode(0);
         }
     }
     pScript->fF8 = 0.0f;
@@ -1978,7 +1981,7 @@ void CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPla
 // The script is on its first frame (fCamTime 0, no blend running) for pShot: not for the current
 // shot while a next shot waits that is not its follow-on, nor for that next shot when it shares
 // the current shot's bB1.
-u8 fn_80043388(CamScript* pScript, CamShot* pShot) {
+u8 CameraScript_SnapToScript(CamScript* pScript, CamShot* pShot) {
     if (0.0f != pScript->fCamTime) return 0;
     if (pScript->bCC) return 0;
     if (pScript->pNextShot != NULL && pScript->pShot->p40 != pScript->pNextShot && pScript->pShot == pShot) {
@@ -1993,7 +1996,7 @@ u8 fn_80043388(CamScript* pScript, CamShot* pShot) {
 
 // pPos's height, brought down by CamTuning.fD0 times how far it is above the shot's f6C over the
 // script's ground height fD8 (times the lens's fB0).
-f32 fn_80043420(int nPlayer, CamScript* pScript, f32* pPos, f32* pCam, CamShot* pShot) {
+f32 CameraScript_GetBallHeightWithMaxHeight(int nPlayer, CamScript* pScript, f32* pPos, f32* pCam, CamShot* pShot) {
     f32 fY = pPos[1];
     f32 fAbove = pPos[1] - pScript->fD8;
     f32 fDrop;
@@ -2010,7 +2013,7 @@ f32 fn_80043420(int nPlayer, CamScript* pScript, f32* pPos, f32* pCam, CamShot* 
 // directions is more than the script's lag angle fDC, pOut is turned towards pTarget (about their
 // common perpendicular) until it is fDC away; otherwise fDC takes the angle once it passes fLag
 // (scaled by the lens's fB0). nPlayer is not read.
-void fn_8004349C(int nPlayer, f32* pCam, f32* pOut, f32* pTarget, CamScript* pScript, f32 fLag) {
+void CameraScript_KeepPointInView(int nPlayer, f32* pCam, f32* pOut, f32* pTarget, CamScript* pScript, f32 fLag) {
     f32 vToTarget[4];
     f32 vTargetDir[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     f32 vToOut[4];
@@ -2124,7 +2127,7 @@ u8 CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam) {
 
 // The script's shot, or else its next one (unless the next kind is 5), has bAC 0 or 13 while the
 // ball makes no update this frame.
-u8 fn_80043920(CamScript* pScript, int nPlayer) {
+u8 CameraScript_DontUpdateCameraDuringSlowMo(CamScript* pScript, int nPlayer) {
     if (pScript->pShot == NULL) {
         return 0;
     }
@@ -2144,7 +2147,7 @@ u8 fn_80043920(CamScript* pScript, int nPlayer) {
 
 // The camera at pCam is in the way: inside an object, or (with the flagstick in) close to the pin
 // and not far above it (CamTuning.f120, f124).
-u8 fn_800439E4(f32* pCam, int nPlayer) {
+u8 CamScript_CheckObstructedCamera(f32* pCam, int nPlayer) {
     f32 vDiff[4];
     int nPin = Game_CurrentPinSet();
     CourseInfo* pCourse = fn_8000C594();
@@ -2168,8 +2171,8 @@ u8 fn_800439E4(f32* pCam, int nPlayer) {
 
 // Puts the camera back on the fairway (CamScript_PutBackOnFairway) when the script asks for it
 // (bE8), or, once the camera has run CamTuning.fEC (or b) and the move is past half way (f98), when
-// the camera has left the hole's outline (fn_80069498) while the ball's next step stays inside it.
-// Only for a next shot (or, without one, a current shot) of bAD 4, and not while fn_800C6D9C holds.
+// the camera has left the hole's outline (PlaceBall_GetPlaceBallNetwork) while the ball's next step stays inside it.
+// Only for a next shot (or, without one, a current shot) of bAD 4, and not while GolfCamera_IsFreezeTimeActive holds.
 void CamScript_CheckOutOfBounds(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pSaved,
                                 f32* pPrev, u8 b) {
     f32 vNext[4];
@@ -2180,7 +2183,7 @@ void CamScript_CheckOutOfBounds(CamScript* pScript, f32* pCam, f32* pSub, int nP
     if (!b && pScript->fCamTime < lbl_80281F78->fEC) {
         bEarly = 1;
     }
-    if (fn_800C6D9C()) return;
+    if (GolfCamera_IsFreezeTimeActive()) return;
     if (pScript->pShot != NULL) {
         if (pScript->pNextShot != NULL) {
             if (pScript->pNextShot->bAD != 4) return;
@@ -2189,7 +2192,7 @@ void CamScript_CheckOutOfBounds(CamScript* pScript, f32* pCam, f32* pSub, int nP
         }
     }
     if (!bEarly && (b || pScript->f98 > 0.5f)) {
-        pNet = fn_80069498();
+        pNet = PlaceBall_GetPlaceBallNetwork();
         if (pNet != NULL && fn_8000C140(pCam, pNet, pNet->nNumNodes) == 0) {
             fn_8004544C(gPlayers[nPlayer].ball.vVel, gPlayers[nPlayer].ball.vPos, vNext);
             if (!fn_8000C4E0(gPlayers[nPlayer].ball.vPos, vNext, pNet, pNet->nNumNodes)) {
@@ -2205,7 +2208,7 @@ void CamScript_CheckOutOfBounds(CamScript* pScript, f32* pCam, f32* pSub, int nP
 // With the flagstick in and no fairway fix running (bCF), a camera close to the pin (level
 // distance times the lens's fB0 under CamTuning.f120) is raised towards f124 above it, more the
 // closer it is.
-void fn_800441E4(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pSaved, f32* pPrev) {
+void CamScript_CheckFlagCollision(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pSaved, f32* pPrev) {
     f32 vDiff[4];
     int nPin = Game_CurrentPinSet();
     CourseInfo* pCourse = fn_8000C594();
@@ -2227,13 +2230,13 @@ void fn_800441E4(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot*
     }
 }
 
-// A spot for the camera by the green: of the AI targets nearest the ball, nearest the player's
+// A spot for the camera on the fairway: of the AI targets nearest the ball, nearest the player's
 // target and 3 past the pin (as seen from Player.vBall), taken nearest the ball first, the first
 // whose level direction to the ball is far enough from the camera's (pSub to the ball); else the
 // target nearest the point halfway from tee 0 to the pin. Kept at least 2 from the pin, raised
 // CamTuning.f10C over the ground there into pOut (not when there is no ground); the ground height
 // goes to *pHeight when it is not NULL.
-void fn_80043C74(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot* pShot, f32* pSub,
+void CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot* pShot, f32* pSub,
                  f32* pHeight) {
     f32 vNearBall[4];
     f32 vNearTarget[4];
@@ -2360,7 +2363,7 @@ void fn_80043C74(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot*
         fn_8001EF34(vNearBall, 2.0f, vNearBall);
         fn_8004544C(pPin, vNearBall, vSpot);
     }
-    fHeight = Terrain_HeightAt(vSpot, NULL);
+    fHeight = CamScript_GuessBestPlayableHeight(vSpot, NULL);
     if (pHeight != NULL) {
         *pHeight = fHeight;
     }
@@ -2370,16 +2373,16 @@ void fn_80043C74(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot*
     }
 }
 
-// Moves the camera to a spot on the fairway (fn_80043C74) and makes pShot a still shot there: it
-// looks straight at its target (bAC 0) for 1000 seconds at the tuning's field of view (f114), with no
-// wobble or slow motion. The script cuts to it (blend 5) with the ground height fD8 at the spot (the
+// Moves the camera to a spot on the fairway (CamScript_GetCameraOnFairwayPos) and makes pShot a still shot there: it
+// looks at the ball (bAC 0) at the tuning's field of view (f114), f68 CamTuning.f10C and f6C 1000,
+// with no wobble (f94), fn_800457B8 value (f88) or fn_80038054 effect (f8C, f90). The script cuts to it (blend 5) with the ground height fD8 at the spot (the
 // course's floor at least), and the lens takes the new field of view at once.
 void CamScript_PutBackOnFairway(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pShot,
                                 f32* pPrev) {
     f32 fHeight;
     f32 fFov;
 
-    fn_80043C74(pScript, pCam, pSub, nPlayer, pShot, pPrev, &fHeight);
+    CamScript_GetCameraOnFairwayPos(pScript, pCam, pSub, nPlayer, pShot, pPrev, &fHeight);
     CameraScript_RecordCurrentCam(pShot, pCam, pSub, nPlayer, pScript, 0);
     pScript->pShot = pShot;
     pScript->pNextShot = NULL;
@@ -2451,7 +2454,7 @@ void CamScript_UpdateFairwayCam(CamScript* pScript, f32* pCam, f32* pSub, int nP
         fDot = fn_8000C5FC(vDir, vVel);
         if (fDist < lbl_80281F78->f100) return;
         if (fDot > lbl_80281F78->f108) return;
-        fHeight = Terrain_HeightAt(vSpot, NULL);
+        fHeight = CamScript_GuessBestPlayableHeight(vSpot, NULL);
         if (!(fHeight < -60000.0f) && pScript->pShot != NULL) {
             Vec3Copy(vSpot, pScript->pShot->v20);
             pScript->pShot->v20[1] = fHeight + lbl_80281F78->f10C;
@@ -2483,7 +2486,7 @@ void fn_80044768(f32* pPos, f32* pOut) {
 // CamTuning.f130 above it; a layer under another kind of surface (water, say) starts a region
 // whose top counts unless a standing surface is found below it. Surface 149 and, on course 7's
 // hole 2, anything above 10 are passed over; there a region's lower standing surface wins.
-f32 Terrain_HeightAt(f32* pPos, SurfaceType** ppSurface) {
+f32 CamScript_GuessBestPlayableHeight(f32* pPos, SurfaceType** ppSurface) {
     f32 vPos[4];
     SurfaceType* aSurfaces[20];
     f32 aHeights[20];
@@ -2784,7 +2787,7 @@ u8 CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, CamS
     Mem_cpy(&shot, pShot, sizeof(CamShot));
     Mem_cpy(&script, pScript, sizeof(CamScript));
     CameraScript_InterpToNewScript(&script, &shot, nPlayer, vCam, vSub, 5, 0.0f, 100.0f, 25, 0.0f);
-    fn_8003DCE8(nPlayer, vCam, vSub, &script, &shotSaved, 0, 0.0f);
+    CamScript_RunScript(nPlayer, vCam, vSub, &script, &shotSaved, 0, 0.0f);
     Vec_Copy(gPlayers[nPlayer].vBall, vGolfer);
     vGolfer[1] += 1.0f;
     return Ter_CheckForGroundCollision(pCourse, vCam, vGolfer, vHit, vNormal, &pSurface, &pObj) != 0;

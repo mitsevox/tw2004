@@ -1,5 +1,5 @@
 // LLFileIO_Gc.c (EA's name, from its asserts): the disc file reads, run from a queue by a reader
-// thread. Only part of it is decompiled so far.
+// thread.
 #include "engine.h"
 #include "platform.h"
 #include "core/startup.h"
@@ -58,7 +58,8 @@ void fn_80005C90(FileReq* pReq) {
 
 // The reader thread (EA's name, from its lock: file_RequestDaemon). Each time the semaphore wakes it,
 // it finishes the read it started (the callback, then the request back to its priority's free
-// list), and starts the first queued read of the most urgent priority.
+// list) and starts the first queued read of the most urgent priority; a read that failed goes
+// through the disc-error check and is started again.
 void* fn_80005D10(void* pArg) {
     int nPrio;                  // set whenever pReq is
     FileReq* pReq;

@@ -1,6 +1,6 @@
 // Code80067710.c (our name; a file of its own by its constants, name unknown): the queue of events
 // the situation scripts (SitDevFile.c) react to. event.c's handlers queue each moment of a shot
-// (fn_80067710); fn_8006795C runs every script whose event came up, then empties the queue.
+// (fn_80067710); SitDev_ProcessEventQueue runs every script whose event came up, then empties the queue.
 
 #include "game_types.h"
 #include "engine.h"
@@ -89,7 +89,7 @@ void fn_80067710(int nPlayer, int a, u8 nEvent) {
 }
 
 // Run the scripts for this frame's events, then empty the queue.
-void fn_8006795C(void) {
+void SitDev_ProcessEventQueue(void) {
     int i;
     int j;
     SitDevEntry* pEntry;

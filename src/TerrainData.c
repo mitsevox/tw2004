@@ -34,7 +34,7 @@ f32 fn_8000BF20(const f32* pPos) {
     v[3] = 1.0f;
     pCourse = fn_8000C594();
     if (pCourse != NULL) {
-        fHeight = fn_8004D620(pCourse, v);
+        fHeight = Ter_GetSupportingGroundHeight(pCourse, v);
         if (fHeight != -65536.125f) {
             return fHeight;
         }

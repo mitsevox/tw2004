@@ -1,6 +1,7 @@
 // PsMgr.c (EA's name, from its asserts; also in EA's 2002 source tree): the manager of the weather
 // particle effects (include/psmgr.h). Only kind 0, the rain, is made on the GameCube: fn_800A2A80
-// creates it and dims the hole's lights to match, fn_800A2BBC and fn_800A2C08 run and draw it.
+// creates it and rescales the hole's light colours to match (directional x 1 + 0.55 s, point
+// x 0.45 + 0.55 s: brighter at the default 0.9), fn_800A2BBC and fn_800A2C08 run and draw it.
 
 #include "psmgr.h"
 #include "golfer.h"
@@ -59,7 +60,7 @@ void fn_800A298C(void) {
     UStream_UnregisterHandler('sfxd');
 }
 
-// The 'sfxd' stream handler: its data is a list like "{a=name,b=name}"; each name after an '='
+// The 'sfxd' stream handler: each word (sscanf %s) after an '=' before the first '}' of its text
 // goes into lbl_801F1640 in turn.
 void fn_800A29B4(UStreamObject* pObject) {
     char* pEnd;

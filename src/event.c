@@ -343,7 +343,7 @@ void fn_80066664(int nPlayer, int nEvent, void* pData, int nArg) {
         }
         fn_8005C15C(nPlayer, &fSpinY, &fSpinX);
         if (!gSession.bReplay) {
-            fn_8006C2A8(nPlayer, fSpinX, fSpinY);
+            REPLAY_SaveSpin(nPlayer, fSpinX, fSpinY);
         }
         fn_80051C84(&gPlayers[nPlayer].ball, fSpinY, fSpinX);
     }
@@ -706,7 +706,7 @@ void fn_80067220(int nPlayer) {
             pPlayer->nShotKind = 0;
             pPlayer->nClub = CLUB_PUTTER_e;
             Shot_FitTargetToClub(nPlayer);
-        } else if (Lie_AllowsFullSwing(nPlayer)) {
+        } else if (Player_NotInSand(nPlayer)) {
             AI_AimAtPin(nPlayer);
             pPlayer->fAim = Shot_AimAngle(nPlayer);
             pPlayer->nShotKind = 2;
@@ -740,7 +740,7 @@ void fn_80067220(int nPlayer) {
         pPlayer->nShotKind2 = pPlayer->nShotKind;
         break;
     }
-    fn_800689D4(nPlayer);
+    TARGET_SetupTarget(nPlayer);
     pPlayer->fA60 = 0.0f;
     Shot_FitTargetToClub(nPlayer);
     Vec_Copy(pPlayer->vTarget, pPlayer->vTarget2);

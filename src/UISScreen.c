@@ -267,8 +267,8 @@ void fn_8016AEEC(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
     }
 }
 
-// Send an event to every screen. While the studio is already sending one (flag 2 or 4), it is
-// queued on the event stack instead.
+// Send an event to every screen. While the studio is busy (flag 2: sending an event; 4: running
+// its rate functions), it is queued on the event stack instead.
 void fn_8016B09C(UIStudio* pStudio, u32 uEvent, s32 nArgs, const s32* pArgs) {
     UISEventData data;
     if ((pStudio->uFlags & 2) || (pStudio->uFlags & 4)) {

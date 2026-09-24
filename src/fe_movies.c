@@ -392,7 +392,7 @@ void fn_800918A4(void) {
         lbl_801D8858.b18 = 1;
         lbl_801D8858.n1C = -1;
         lbl_801D8858.f10 = 0.0f;
-        lbl_801D8858.u20 = fn_80095368();
+        lbl_801D8858.u20 = TI_sRead();
         lbl_801D8858.n0 = 0;
         if (gSession.nGameType == 4) {
             lbl_801D8858.n14 = gSession.nNumPlayers;
@@ -417,7 +417,7 @@ void fn_8009198C(int nMode) {
     if (nMode == 1) {
         lbl_801D8858.b18 = 0;
     }
-    lbl_801D8858.u28 = fn_80095368();
+    lbl_801D8858.u28 = TI_sRead();
     fSecs = fn_8006E118(lbl_801D8858.u28, lbl_801D8858.u20);
     lbl_801D8858.u20 = lbl_801D8858.u28;
     lbl_801D8858.f10 += fabsf(fSecs);

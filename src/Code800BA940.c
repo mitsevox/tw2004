@@ -16,7 +16,7 @@ void fn_800BAA50(int nPlayer);
 void fn_800BAB80(int nPlayer);
 void ColGlow_ResetCurrentList(void);                 // Code8009A928.c: empty the glow queue
 void fn_8006DEA8(void);                 // gomainloop.c
-void fn_80098938(void);                 // GoShaderObject_Glows_Gc.c: draw the queued glows
+void ColGlow_RenderAllGlowInCurrentList(void);                 // GoShaderObject_Glows_Gc.c: draw the queued glows
 void fn_8006DF28(void);                 // gomainloop.c
 
 // The size fT of the way from the start size to the largest.
@@ -73,7 +73,7 @@ void fn_800BAA50(int nPlayer) {
                         0.1f * fScale + fSize, fSize, 0.0f);
         }
         fn_8006DEA8();
-        fn_80098938();
+        ColGlow_RenderAllGlowInCurrentList();
         fn_8006DF28();
     }
 }

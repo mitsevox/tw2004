@@ -4,7 +4,7 @@
 // the sound engine's setup around it: the sound banks and the stream file (loaded through
 // UStream.c), the volume curves and the stream buffer. Its extent is proven by its data:
 // fn_800A85CC is the first function to use its .sbss (0x80282060-0x80282098; the file before it
-// ends at 0x80282058), and fn_800A9808 after it is the first to use the next file's .bss
+// ends at 0x80282058), and InsertSortWorldPerf after it is the first to use the next file's .bss
 // (0x801F1868).
 
 #include "core/audtrack.h"
@@ -84,11 +84,11 @@ void fn_800A8700(u8 n) {
     lbl_80282064 = n;
 }
 
-void fn_800A8708(u8 nCurve, f32 fVolume) {
+void Mas_SetSubmixChan(u8 nCurve, f32 fVolume) {
     lbl_801F17D0[nCurve] = fVolume;
 }
 
-void fn_800A871C(u8 nCurves, f32* pVolumes) {
+void Mas_SetSubmixAll(u8 nCurves, f32* pVolumes) {
     Mem_cpy(lbl_801F17D0, pVolumes, nCurves * sizeof(f32));
 }
 
@@ -299,7 +299,7 @@ void fn_800A8D88(void) {
 }
 
 // Sets the sound engine up; b == 0 also drops bank 0. Each step must succeed for the next to run.
-u8 fn_800A8DC8(u8 a, u8 b, u8 nListeners) {
+u8 Ses_Init(u8 a, u8 b, u8 nListeners) {
     u8 bOk;
 
     lbl_80282080 = a;

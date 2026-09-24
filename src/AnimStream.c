@@ -946,6 +946,6 @@ void fn_800CB8F0(u64* pId, char* szName) {
     u64 uId = *pId;
     u8* p = (u8*)&uId;
 
-    fn_80076158(&p, (u8*)&uId, sizeof(u64), sizeof(u64));
+    BYTESWAP_SWAPDATA(&p, (u8*)&uId, sizeof(u64), sizeof(u64));
     fn_800CB868(&uId, szName);
 }

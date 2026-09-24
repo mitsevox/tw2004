@@ -1,8 +1,8 @@
 // BootCourse.c (our name): sets up a round on the next of four fixed course/hole/golfer set-ups
-// (fn_80099ED8, called from GoEntry.c and uiProcessInterface.c; fn_8009A1F4 puts the session
+// (DEMO_Start, called from GoEntry.c and uiProcessInterface.c; DEMO_Restore puts the session
 // back), and a 120-second timer that runs while fn_8008AC40 is false and raises a flag when it runs
 // out (fn_8009A180; GoEntry.c tests the flag with fn_8009A1EC). Its .bss starts on its own 8-byte
-// boundary (0x801DB8A0, shared by fn_80099ED8 and fn_8009A1F4).
+// boundary (0x801DB8A0, shared by DEMO_Start and DEMO_Restore).
 
 #include "golfer.h"
 #include "game.h"
@@ -17,7 +17,7 @@ const s32 lbl_80183AB8[4] = {0, 12, 9, 1};
 const s32 lbl_80183AC8[4] = {4, 15, 27, 7};
 
 // Uninitialised data, defined last-first (CodeWarrior lays it out in reverse).
-Session lbl_801DB8A0;           // the session as it was before fn_80099ED8 changed it
+Session lbl_801DB8A0;           // the session as it was before DEMO_Start changed it
 f32 lbl_80281F98;               // seconds counted
 u8  lbl_80281F94;               // the timer ran out
 s32 lbl_80281F90;               // which of the four set-ups the next start uses
@@ -25,7 +25,7 @@ s32 lbl_80281F90;               // which of the four set-ups the next start uses
 // Saves the session and sets up a two-player game on the next of four course/hole/golfer set-ups,
 // moving on through the courses until one is on the disc. With uFlags bit 14 it is a one-player
 // game on a fixed course and hole per set-up instead, with a random pin.
-void fn_80099ED8(void) {
+void DEMO_Start(void) {
     int n;
     Mem_cpy(&lbl_801DB8A0, &gSession, sizeof(Session));
     gSession.a8[0] = 1;
@@ -121,8 +121,8 @@ u8 fn_8009A1EC(void) {
     return lbl_80281F94;
 }
 
-// Put the session back as fn_80099ED8 found it, all but n28.
-void fn_8009A1F4(void) {
+// Put the session back as DEMO_Start found it, all but n28.
+void DEMO_Restore(void) {
     s32 n28;
     if (gSession.a8[0] != 0) {
         n28 = gSession.n28;

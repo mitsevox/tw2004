@@ -1,6 +1,6 @@
 // mtalib.c (EA's name, from its asserts; also in EA's 2002 source tree): animation helpers, and
 // the 'MAL ' banks loaded from the stream files (two slots, lbl_80281CB4): groups of items that the
-// animation code picks from at random. Only part of it is decompiled.
+// animation code picks from at random.
 
 #include "charstate.h"
 
@@ -88,11 +88,12 @@ void fn_8001F558(void* pItem) {
 // records after the header, each record's entries after those, then each entry's data.
 void fn_8001F578(MtaLib* pLib) {
     int i;
-    int j;
     int nPad;
     MtaRecord* pRecord;
     MtaEntry* pEntry;
     int nOffset;
+    int j;
+    MtaRecord* pRecord2;
 
     pLib->pRecords = (MtaRecord*)(pLib + 1);
     nOffset = sizeof(MtaLib) + pLib->nRecords * sizeof(MtaRecord);
@@ -102,9 +103,9 @@ void fn_8001F578(MtaLib* pLib) {
         nOffset += pRecord->nEntries * sizeof(MtaEntry);
     }
     for (i = 0; i < pLib->nRecords; i++) {
-        pRecord = &pLib->pRecords[i];
-        for (j = 0; j < pRecord->nEntries; j++) {
-            pEntry = &pRecord->pEntries[j];
+        pRecord2 = &pLib->pRecords[i];
+        for (j = 0; j < pRecord2->nEntries; j++) {
+            pEntry = &pRecord2->pEntries[j];
             pEntry->pData = (u8*)pLib + nOffset;
             nOffset += pEntry->nBytes;
             nPad = nOffset % 4;
@@ -196,14 +197,14 @@ MalBank* fn_8001F804(u8* pData) {
 
     pBank = fn_80009B34(sizeof(MalBank), 2, 0x40, "mtalib.c", 474);
     lbl_80281CB0 += sizeof(MalBank);
-    fn_80076158(&pData, (u8*)&pBank->nNumGroups, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&pBank->nNumGroups, 4, 4);
     if ((uptr)pData & 0xF) {
         pData = (u8*)(((uptr)pData & ~0xF) + 0x10);
     }
     for (i = 0; i < pBank->nNumGroups; i++) {
-        fn_80076158(&pData, (u8*)&nGroup, 4, 4);
+        BYTESWAP_SWAPDATA(&pData, (u8*)&nGroup, 4, 4);
         pGroup = &pBank->aGroup[nGroup];
-        fn_80076158(&pData, (u8*)&pGroup->nNum, 4, 4);
+        BYTESWAP_SWAPDATA(&pData, (u8*)&pGroup->nNum, 4, 4);
         if (pGroup->nNum != 0) {
             pGroup->apItem = fn_80009B34(pGroup->nNum * 4, 2, 0x40, "mtalib.c", 490);
             for (j = 0; j < pGroup->nNum; j++) {

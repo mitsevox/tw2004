@@ -8,10 +8,10 @@
 
 #define NUM_GLOWS 13
 
-// A glow's display list (our name): fn_80097F44 starts one, fn_80098004 ends it.
+// A glow's display list (our name): _StartGlowStrip starts one, _EndGlowStrip ends it.
 typedef struct GlowList {
     s32   n0;                   // 0x0  the list's size
-    void* p4;                   // 0x4  the list; freed by fn_800987D4
+    void* p4;                   // 0x4  the list; freed by GlowsRenderData_CloseModule
 } GlowList;
 
 // The glows' table (lbl_801D99D0, 0x70 bytes).
@@ -24,7 +24,7 @@ LAYOUT_ASSERT(GlowTable, 0x70);
 
 extern GlowTable lbl_801D99D0;
 
-// The glows queued for drawing (lbl_80281F80): fn_8009B260 adds one, fn_80098938 draws them all.
+// The glows queued for drawing (lbl_80281F80): fn_8009B260 adds one, ColGlow_RenderAllGlowInCurrentList draws them all.
 #define NUM_GLOW_QUEUE 160
 
 typedef struct GlowQueued {
@@ -54,7 +54,7 @@ LAYOUT_ASSERT(GlowQueue, 0x1E10);
 extern GlowQueue lbl_801D9A68[1];
 extern GlowQueue* lbl_80281F80;
 
-// What fn_80098938 hands the glow mesh (our name): Skin.c's fn_80036100 passes it on, fn_80098884
+// What ColGlow_RenderAllGlowInCurrentList hands the glow mesh (our name): Skin.c's fn_80036100 passes it on, fn_80098884
 // copies it and fn_8009884C draws the queue with it.
 typedef struct GlowDrawDesc {
     GlowQueue* pQueue;          // 0x0
@@ -95,13 +95,17 @@ LAYOUT_ASSERT(SunFlrView, 0xA8);
 // SunFlr_Gc.c's weights for fn_8009A754 (6 rows of 8).
 extern f32 lbl_80189DA8[6][8];
 
+// An element of a SunFlrSet (0x40 bytes; our name).
+typedef struct SunFlrDesc {
+    u8   unk0[0x24];
+    f32  f24;                   // 0x24
+    u8   unk28[0x40 - 0x28];
+} SunFlrDesc;
+LAYOUT_ASSERT(SunFlrDesc, 0x40);
+
 // An entry of Code8009AA28.c's table lbl_80189E78 (0x90 bytes; our name): up to two elements.
 typedef struct SunFlrSet {
-    struct {
-        u8   unk0[0x24];
-        f32  f24;               // +0x24
-        u8   unk28[0x40 - 0x28];
-    } a[2];                     // 0x00
+    SunFlrDesc a[2];            // 0x00
     s32  nCount;                // 0x80  how many of a[] are used
     u8   unk84[0x90 - 0x84];
 } SunFlrSet;

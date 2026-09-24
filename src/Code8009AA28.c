@@ -1,8 +1,8 @@
-// Code8009AA28.c (our name; what it does is not known yet): code that drives SunFlr_Gc.c's
-// functions (fn_8009A250-fn_8009A754) from its own state (lbl_802813B8) and tables, and queues
-// glows (fn_8009B260). Its extent so far is the functions that use its data: the .sdata
+// Code8009AA28.c (our name): the sun flare's set-up, per-view update and shutdown, which drive
+// SunFlr_Gc.c's functions (fn_8009A250-fn_8009A754) from its own state (lbl_802813B8) and tables,
+// and the glow queue's add (fn_8009B260). Its extent so far is the functions that use its data: the .sdata
 // 0x802813B8-0x802813C0, the .sdata2 0x80283E90-0x80283EC0 and the .data 0x80189E78-0x8018C6C8
-// (fn_8009AA28-fn_8009B18C, and fn_8009B260 between them and fn_8009B314). Where it starts after
+// (fn_8009AA28-SF_vUpdateSunFlare, and fn_8009B260 between them and fn_8009B314). Where it starts after
 // SunFlr_Gc.c (0x8009A844 at the earliest) is not proven, and fn_8009B314 is still in a sweep file
 // with the next file's first function.
 
@@ -85,9 +85,10 @@ void fn_8009AA28(void) {
 // GoTerrain.c's values (v4 = (0, 150, -400), v14 = (0.8, 0.8, 0.4)).
 void fn_8009AF30(s32 nViews) {
     s32 i;
+    s32 j;
     s32 k;
     SunFlrSet* pSet;
-    s32 j;
+    SunFlrDesc* pDesc;
     SunFlrView* pView;
     f32 v14[4];
     f32 v4[4];
@@ -101,9 +102,10 @@ void fn_8009AF30(s32 nViews) {
     for (i = 0; i < 3; i++) {
         lbl_802813B8->af193C[i] = 0.0f;
         pSet = &lbl_802813B8->p1924[i];
-        for (j = 0; j < pSet->nCount; j++) {
-            if (lbl_802813B8->af193C[i] < pSet->a[j].f24) {
-                lbl_802813B8->af193C[i] = pSet->a[j].f24;
+        pDesc = pSet->a;
+        for (j = 0; j < pSet->nCount; j++, pDesc++) {
+            if (lbl_802813B8->af193C[i] < pDesc->f24) {
+                lbl_802813B8->af193C[i] = pDesc->f24;
             }
         }
     }
@@ -131,7 +133,7 @@ void fn_8009AF30(s32 nViews) {
 }
 
 // Frees each view's part.
-void fn_8009B0D0(void) {
+void SF_vCloseModule(void) {
     s32 i;
 
     fn_8009A340();
@@ -150,9 +152,10 @@ void fn_8009B134(void) {
     }
 }
 
-// Per view, each frame: where v4 falls on the view's screen, and fn_8009A754's result for the
-// field being drawn. The getters called first have their results thrown away.
-void fn_8009B18C(s32 nView) {
+// Per view, each frame: the frame buffer and viewport from the current rect; with the flare on,
+// where v4 falls on the view's screen, fn_8009A754's result for the field being drawn, and the
+// next depth copy (fn_8009A3F4). fn_8001F004's result is thrown away.
+void SF_vUpdateSunFlare(s32 nView) {
     f32* pRect;
     s32 nCtx;
     SunFlrState* pState;

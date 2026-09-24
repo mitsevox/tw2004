@@ -1,5 +1,6 @@
-// hwsRender_Gc.c (EA's name, from its asserts): the GameCube renderer's setup: a screen buffer
-// sized for one or two views, and the state (lbl_80223BB0) the skin drawing reads.
+// hwsRender_Gc.c (EA's name, from its asserts): the GameCube skin renderer: a buffer for skinned
+// vertices sized for one or two views, the state (lbl_80223BB0) the skin drawing reads, the
+// drawing of a skin description's entries and iterators over their meshes.
 
 #include "engine.h"
 #include "charstate.h"
@@ -29,13 +30,14 @@ void (*lbl_802817E8[1])(SkinIter* pIter) = { fn_80113BCC };
 void (*lbl_802817EC[1])(SkinIter* pIter) = { fn_80113C70 };
 void (*lbl_802817F0[2])(SkinIter* pIter) = { fn_80113D28, NULL };
 
-void* lbl_802824E0;                     // the screen buffer (fn_80112C64)
+void* lbl_802824E0;                     // the skinned-vertex buffer (fn_80112C64)
 u32 lbl_802824E4;                       // the next free offset in it (fn_801132C4)
 int lbl_802824E8;                       // set: fn_801132C4 skins the next mesh's vertices again
 u32 lbl_802824EC;                       // the buffer's size
 void* lbl_802824F0;                     // the vertices fn_801132C4 last wrote
 
-// Whether the extra pass runs: one view, at most three players (two on course 14's hole 11).
+// Whether the grass is on (GoGrass.c; fn_80112D20 makes its texture only then): one view, at most
+// three players (two on course 14's hole 11).
 u8 fn_80112B80(void) {
     int nHole = fn_80015464();
 
@@ -61,7 +63,7 @@ u8 fn_80112C04(void) {
     return 1;
 }
 
-// Allocate the screen buffer: bigger for split screen.
+// Allocate the skinned-vertex buffer: bigger for split screen.
 void fn_80112C64(int bSplit) {
     if (bSplit == 0) {
         lbl_802824E0 = fn_80009B34(0x30C00, 2, 32, "hwsRender_Gc.c", 266);
@@ -119,10 +121,12 @@ void fn_80112DA0(void) {
 
 // ---- end of sweep code ----
 
-// Draw SkinDesc.p44 entry nEntry: a pass per material of its SkinDesc28, each drawing its meshes
-// n8 times. The first pass may be untextured; a later pass is drawn only for a texture that goes
-// with the next one (TexEntry.b47 bit 0) or kind 9, blended over the first and with its material's
-// texture scale and offset. A mesh the override table replaces is drawn from the table's data.
+// Draw SkinDesc.p44 entry nEntry: a pass per material of its SkinDesc28, each in n8 draws of its
+// meshes (each draw's index ranges follow the last's). A pass without a texture uses the vertex
+// colour alone; a textured pass after the first is drawn only for a texture that goes with the
+// next one (TexEntry.b47 bit 0) or kind 9 (else the drawing stops), blended over the first and
+// with its material's texture scale and offset. A mesh the override table replaces is drawn from
+// the table's data.
 void fn_80112DD8(s32 nEntry) {
     int j;
     SkinDesc* pDesc;
@@ -358,7 +362,8 @@ void fn_801136C4(SkinMesh* pMesh, void* pData, SkinMeshRefs* pOut, u16 n0, u16 n
             pOut->n10 = pMesh->n8;
             pOut->p14 = pData;
             if (pMesh->uFlags & 0x40) {
-                // The third part follows n10 bits (8 bytes each) and n10 words.
+                // The texture coordinates follow the n10 positions (8 bytes each) and
+                // n10 normals (4 bytes each), in the mesh's own data.
                 pOut->p1C = (u8*)pMesh->pBits + (pOut->n10 * 4 + pOut->n10 * 8);
                 pOut->n18 = pMesh->n8;
             }
@@ -495,7 +500,8 @@ void fn_80113A7C(SkinIter* pIter) {
 
 // ---- end of sweep code ----
 
-// An iterator in pBuf over the meshes of pArgs's SkinDesc.p5C entry (first step taken).
+// An iterator in pBuf over the SkinDesc.p44 entries (by SkinDesc.p6C) of pArgs's SkinDesc.p5C
+// entry (first step taken).
 SkinIter* fn_80113A9C(u8* pBuf, SkinIterArgs* pArgs) {
     SkinDescIter* pIter;
 
@@ -517,7 +523,7 @@ void fn_80113B14(SkinIter* pIter) {
 
 // ---- end of sweep code ----
 
-// The same with the other step function.
+// The same with fn_80113D28 as its step: it goes over every mesh of those entries.
 SkinIter* fn_80113B34(u8* pBuf, SkinIterArgs* pArgs) {
     SkinDescIter* pIter;
 
