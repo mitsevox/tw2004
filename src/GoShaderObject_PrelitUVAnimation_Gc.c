@@ -25,6 +25,9 @@ void fn_80071A90(int nRow);
 void fn_80070168(void);     // sweep_80070168.c: calls a display list
 void fn_8007524C(void);     // GoShaderObjectCommon_ShaderObjectsData_Gc.c: empty
 
+s32 lbl_80281E80;
+s32* lbl_802811F8 = &lbl_80281E80;
+
 // Row 5's data hook: set the texture animation clock from the frame count.
 void fn_8007110C(u32* pnFrame) {
     fn_80076C20(*pnFrame);

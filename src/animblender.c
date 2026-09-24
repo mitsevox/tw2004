@@ -21,6 +21,13 @@ f32  fn_800732B8(f32 fTime, f32 fNow, f32 fStart, f32 fEnd);
 int  fn_800734D0(SKABlendNode* pNode);
 f32  fn_800737B4(AnimPlayer* pPlayer, f32 fT);
 
+// Defined here, last address first (CodeWarrior lays out .sbss in reverse).
+UMemPool* lbl_80281E98;
+UMemPool* lbl_80281E94;
+UMemPool* lbl_80281E90;
+UMemPool* lbl_80281E8C;
+UMemPool* lbl_80281E88;
+
 // Create the blend tree pools: 10 of each in game types 3 and 10, else 50.
 void fn_80071AD0(void) {
     int nCount;
