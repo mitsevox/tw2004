@@ -992,6 +992,58 @@ void fn_8001A4BC(void) {
     }
 }
 
+// With more than two players, the pool entries go to player nPlayer and the next player
+// (fn_800E295C): every other character holding entries (except the one queued last) gives them
+// back and gets bit 0x40 of u10; nPlayer's character loses that bit, and unless it has its entries
+// already it takes them (the queued character giving its back first) and queues its dynamic
+// textures. The next player's character is then queued the same way.
+void fn_8001A58C(int nPlayer) {
+    int i;
+    Character* pChar;
+    Character* pQueued;
+
+    if (gSession.nNumPlayers > 2) {
+        gPlayers[nPlayer].pChar->u10 &= ~0x40;
+        fn_80008380();
+        pChar = gPlayers[nPlayer].pChar;
+        for (i = 0; i < gSession.nNumPlayers; i++) {
+            if (i != nPlayer && gPlayers[i].pChar->a64[gPlayers[i].pChar->n74] != NULL &&
+                gPlayers[i].pChar != lbl_801B95E8.a[6].p) {
+                fn_8001A484(gPlayers[i].pChar);
+                fn_8001A3B0(gPlayers[i].pChar);
+                gPlayers[i].pChar->bE0 = 0;
+                gPlayers[i].pChar->u10 |= 0x40;
+            }
+        }
+        if (!pChar->bE0) {
+            pQueued = lbl_801B95E8.a[6].p;
+            if (pChar != pQueued) {
+                fn_8010BF68();
+                if (pQueued != NULL) {
+                    fn_8001A484(pQueued);
+                    fn_8001A3B0(pQueued);
+                    pQueued->bE0 = 0;
+                    pQueued->u10 |= 0x40;
+                }
+                fn_8001A418(pChar);
+                fn_80019D64(pChar, fn_8001A14C, fn_8001A20C);
+                fn_8010BF68();
+            } else {
+                fn_8010BF68();
+            }
+        }
+        i = fn_800E295C();
+        if (i < gSession.nNumPlayers) {
+            pChar = gPlayers[i].pChar;
+            if (!pChar->bE0 && pChar != lbl_801B95E8.a[6].p) {
+                fn_8010BF68();
+                fn_8001A418(pChar);
+                fn_80019D64(pChar, fn_8001A14C, fn_8001A20C);
+            }
+        }
+    }
+}
+
 void fn_8001A73C(void) {
     fn_8010BF68();
 }
