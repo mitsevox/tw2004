@@ -294,23 +294,8 @@ Code8006F154.c:
 	.sdata      start:0x802811E0 end:0x802811E8
 	.sdata2     start:0x80283958 end:0x80283988
 
-unsorted/sweep_8006F4B4.c:
-	.text       start:0x8006F4B4 end:0x8006F4E0
-
-unsorted/sweep_8006F4E0.c:
-	.text       start:0x8006F4E0 end:0x8006F4F0
-
-unsorted/sweep_8006F4F0.c:
-	.text       start:0x8006F4F0 end:0x8006F518
-
-unsorted/sweep_8006F518.c:
-	.text       start:0x8006F518 end:0x8006F568
-
-unsorted/sweep_8006F568.c:
-	.text       start:0x8006F568 end:0x8006F5F8
-
-unsorted/sweep_8006F5F8.c:
-	.text       start:0x8006F5F8 end:0x8006F608
+Code8006F438.c:
+	.text       start:0x8006F438 end:0x8006F608
 
 unsorted/sweep_8006F608.c:
 	.text       start:0x8006F608 end:0x8006F64C
