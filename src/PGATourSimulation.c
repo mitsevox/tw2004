@@ -44,7 +44,7 @@ void fn_80117694(UStreamObject* pObject);
 
 char* GameModeDriverPGATour_GetInitialChampName(s32 i);               // a tournament's first champion
 s32  GameModeDriverPGATour_GetInitialChampScore(s32 i);                // and the champion's score
-s32  fn_800EF0E0(s32 nPlayer);          // GameModeDriverPGATour.c: the player's bracket
+s32  fn_800EF0E0(int nPlayer);          // GameModeDriverPGATour.c: the player's bracket
 
 PgaEntrantMC* GetEntrantMCPtr(int nPlayer, int nEntrant) {
     return &gpSaveData[nPlayer].tour.field.aEntrant[nEntrant];
@@ -95,13 +95,12 @@ void fn_80117860(TourSeason* pTour) {
 // A round of a tournament for the field (TW06: GM_PgaTourSim_SimRound). The first round also
 // picks the field. uFlags: 1 the player is in the field, 2 the player's round is simulated too,
 // 4 the round only starts: no scores or statistics are kept and the other entrants are put on
-// random holes. 97.9%: with nPlayer an int it is exact, but GameModeDriverPGATour fn_800EF130 (linked)
-// needs this prototype's s32 to match; only saved registers differ here.
-void fn_801178C8(s32 nPlayer, SeasonEvent* pEvent, int nRound, int n, int uFlags) {
+// random holes.
+void fn_801178C8(int nPlayer, SeasonEvent* pEvent, int nRound, int n, int uFlags) {
     s32 nEntrants;
-    int i;
     PgaEntrant* pEntrant;
-    s32 nHole;
+    int nHole;
+    int i;
 
     fn_80005AE8(&lbl_80223C70, 0, sizeof(lbl_80223C70));
     gbScoresDirty = 1;
@@ -238,12 +237,12 @@ void fn_80117DF0(int nPlayer) {
 // in the playoff, else one of the playoff entrants at random. The winner's wins and Player of the
 // Year points are counted, the prize money paid out, and the player's awards given (fn_801180C4).
 void fn_80117E98(int nPlayer) {
+    s32 nWinner;
     s32 nEntrants = fn_80118664(nPlayer);
     u8 bUser;
     u8 bFirst;
     s32 nPlayoff;
     s32 nPick;
-    s32 nWinner;
     s32 i;
     PgaEntrantMC* pWinner;
     s32 nFirstPrize;
