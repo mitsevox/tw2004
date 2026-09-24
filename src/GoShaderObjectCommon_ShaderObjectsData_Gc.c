@@ -23,9 +23,13 @@ u8 lbl_80281EB3;
 u8 lbl_80281EB4;
 u8 lbl_80281EB5;
 
-// An int's absolute value as EA wrote it here: (v + sign) ^ sign (srawi, add, xor). The
-// compiler's own abs() and IABS give xor, subf.
-#define ABS_ADDXOR(v) (((v) + ((v) >> 31)) ^ ((v) >> 31))
+// An int's absolute value as EA wrote it here: (sign + v) ^ sign (srawi, add, xor). The
+// compiler's own abs() and IABS give xor, subf; the sign in a local puts it first in the add.
+static inline int AbsAddXor(int v) {
+    int nSign = v >> 31;
+
+    return (nSign + v) ^ nSign;
+}
 
 int fn_80073878(TexBank* pBank, TexEntry* pTex);
 void fn_800738DC(TexBank* pBank, TexEntry* pTex, u8 bFirst);
@@ -382,8 +386,8 @@ u16* fn_80074628(u16* p, u16* pEnd) {
             if (lbl_80281EB3) {
                 fn_80075250(0);
             }
-            if (ABS_ADDXOR(((s8*)auDelta)[0]) > 2 || ABS_ADDXOR(((s8*)auDelta)[1]) > 2 ||
-                ABS_ADDXOR(((s8*)auDelta)[2]) > 2) {
+            if (AbsAddXor(((s8*)auDelta)[0]) > 2 || AbsAddXor(((s8*)auDelta)[1]) > 2 ||
+                AbsAddXor(((s8*)auDelta)[2]) > 2) {
                 fn_80097330(lbl_80281EA0, nPos, (s8*)auDelta);
             }
             nVerts--;
