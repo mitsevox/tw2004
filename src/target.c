@@ -6,6 +6,16 @@
 #include "camera.h"
 #include "unsorted/cull.h"
 
+// .bss / .sbss: defined in reverse address order
+TPlaceNode lbl_801D5CCC[85];
+TargetMarker lbl_801D5BF0[5];
+s32 lbl_80281E44;
+TexEntry* lbl_80281E40;
+TexBank* lbl_80281E3C;
+TexEntry* lbl_80281E38;
+TexBank* lbl_80281E34;
+TNetwork* lbl_80281E30;
+
 void TARGET_Init(void);
 void fn_80067CD4(int nPlayer);
 void TARGET_RenderBallTarget(int nPlayer);
