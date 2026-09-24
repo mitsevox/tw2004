@@ -193,6 +193,43 @@ typedef struct Skin {
                                 //         tested by fn_80037708
 } Skin;
 
+// hwsOverride_Gc.c (our names): a block of memory handed out in pieces (fn_80112938), sized for
+// a SkinDesc's meshes of flag 0x100000 (fn_80112848).
+typedef struct HwsMemBlock {
+    s32  nSize;                 // 0x0
+    s32  nUsed;                 // 0x4
+    u8*  pData;                 // 0x8  the memory, right after this header
+    u8   unkC[4];
+} HwsMemBlock;
+
+// A pointer per mesh of a SkinDesc (fn_8011296C), filled from an HwsMemBlock (fn_80112A80).
+// Skin.a10A0 holds them; fn_801138D8 makes one the renderer's current table.
+typedef struct HwsOverrideTable {
+    SkinDesc* pDesc;            // 0x0
+    s32  nMeshes;               // 0x4
+    void** apMesh;              // 0x8  nMeshes of them, right after this header
+} HwsOverrideTable;
+
+// Part of the renderer's state that fn_80112B34 sets up.
+typedef struct HwsRender10 {
+    u32  u0;                    // 0x00  cleared by fn_80112B34
+    u8   unk4[0x24 - 0x4];
+    u8   a24[0x48 - 0x24];      // 0x24
+    u32* p48;                   // 0x48  fn_80112B34 points it at u0 (fn_80113764 gives it)
+    u8*  p4C;                   // 0x4C  and this at a24
+    s32  n50;                   // 0x50  cleared by fn_8011389C
+} HwsRender10;
+
+// The GameCube renderer's state (lbl_80223BB0; hwsRender_Gc.c, hwsOverride_Gc.c).
+typedef struct HwsRenderState {
+    u8   unk0[0xC];
+    HwsOverrideTable* pOverride;    // 0x0C  fn_801138D8
+    HwsRender10 s10;            // 0x10
+} HwsRenderState;
+LAYOUT_ASSERT(HwsRenderState, 0x64);
+
+extern HwsRenderState lbl_80223BB0;
+
 // A character's body sliders (Character.p17AC, made by CharSlider_CreateDefinitionsFromMem; our
 // names). fn_8010E4DC sets each slider's value, lets the sliders push on each other, then moves
 // the model's bones and the skin's morph targets by them.
