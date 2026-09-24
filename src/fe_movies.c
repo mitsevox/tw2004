@@ -4,9 +4,11 @@
 #include "game_types.h"
 #include "llpict.h"
 #include "frontend/fe.h"
+#include "game/frontend.h"
 
 void fn_80008380(void);
 void fn_80092250(f32* pA, f32* pB, f32* pOut);
+void fn_80092080(LLPict* pPict, f32 fAlpha);    // draws the picture at that alpha
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -26,8 +28,6 @@ void fn_80091DB8();
 void fn_80091D84(void);
 void fn_80091EE4(void);
 void fn_8009220C(void);
-extern void* lbl_80281F1C;
-extern f32 lbl_80283BA4;
 f32 fn_80092210(void);
 void fn_80013E30();
 void fn_80092274(s32 p0);
@@ -61,10 +61,10 @@ void fn_8009220C(void) {
 }
 
 f32 fn_80092210(void) {
-    if ((void* ) lbl_80281F1C != NULL) {
-        return (*(f32*)((u8*)(lbl_80281F1C) + 0x18));
+    if (lbl_80281F1C != NULL) {
+        return lbl_80281F1C->f18;
     }
-    return lbl_80283BA4;
+    return 0.0f;
 }
 
 void fn_80092274(s32 p0) {
@@ -116,6 +116,26 @@ void fn_800917C8(void) {
 void fn_80091870(void) {
     if (gSession.uFlags & 4) return;
     fn_80010544(lbl_80281378);
+}
+
+// Show pPict for nFrames frames, fading it in by fStep a frame (up to 1).
+void fn_80091FC0(LLPict* pPict, int nFrames, f32 fStep) {
+    f32 fAlpha = 0.0f;
+    int i;
+
+    for (i = 0; i < nFrames; i++) {
+        fn_80006EDC();
+        fAlpha += fStep;
+        if (fAlpha > 1.0f) {
+            fAlpha = 1.0f;
+        }
+        fn_80092080(pPict, fAlpha);
+        fn_80006FE8();
+        fn_80007254();
+        fn_800083A0();
+        fn_800A4BDC();
+        fn_800B7490();
+    }
 }
 
 // Free the pixel data of every bank whose entry in lbl_801D8890 has a positive n4.
