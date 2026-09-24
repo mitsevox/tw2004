@@ -100,6 +100,93 @@ void fn_800380A8(u8 b, f32* pV, u8 b1, int nView, f32 f14, f32 f18) {
     lbl_801D5020[nView].f18 = f18;
 }
 
+// Draws a thin vertical strip down the middle of the screen (x 0.495 to 0.505), clear at its edges
+// and coloured (0.1, 0.2, 0.5, alpha 0.4) along its centre.
+void fn_80038128(void) {
+    f32 aXY[8][4];
+    f32 aColour[8][4];
+
+    fn_8001425C(0);
+    fn_80012F34(0);
+    fn_80012F18(7);
+    fn_80014118(0x40);
+    fn_80035118(4, 5);
+    fn_80012F50(0, 6, 0x80);
+    fn_80012EF8();
+
+    aXY[0][0] = 0.495f;
+    aXY[0][1] = 0.0f;
+    aXY[0][2] = 1.0f;
+    aXY[0][3] = 1.0f;
+    aXY[1][0] = 0.495f;
+    aXY[1][1] = 1.0f;
+    aXY[1][2] = 1.0f;
+    aXY[1][3] = 1.0f;
+    aXY[2][0] = 0.5f;
+    aXY[2][1] = 0.0f;
+    aXY[2][2] = 1.0f;
+    aXY[2][3] = 1.0f;
+    aXY[3][0] = 0.5f;
+    aXY[3][1] = 1.0f;
+    aXY[3][2] = 1.0f;
+    aXY[3][3] = 1.0f;
+    aXY[4][0] = 0.5f;
+    aXY[4][1] = 0.0f;
+    aXY[4][2] = 1.0f;
+    aXY[4][3] = 1.0f;
+    aXY[5][0] = 0.5f;
+    aXY[5][1] = 1.0f;
+    aXY[5][2] = 1.0f;
+    aXY[5][3] = 1.0f;
+    aXY[6][0] = 0.505f;
+    aXY[6][1] = 0.0f;
+    aXY[6][2] = 1.0f;
+    aXY[6][3] = 1.0f;
+    aXY[7][0] = 0.505f;
+    aXY[7][1] = 1.0f;
+    aXY[7][2] = 1.0f;
+    aXY[7][3] = 1.0f;
+
+    aColour[0][0] = 0.0f;
+    aColour[0][1] = 0.0f;
+    aColour[0][2] = 0.0f;
+    aColour[0][3] = 0.0f;
+    aColour[1][0] = 0.0f;
+    aColour[1][1] = 0.0f;
+    aColour[1][2] = 0.0f;
+    aColour[1][3] = 0.0f;
+    aColour[2][0] = 0.1f;
+    aColour[2][1] = 0.2f;
+    aColour[2][2] = 0.5f;
+    aColour[2][3] = 0.4f;
+    aColour[3][0] = 0.1f;
+    aColour[3][1] = 0.2f;
+    aColour[3][2] = 0.5f;
+    aColour[3][3] = 0.4f;
+    aColour[4][0] = 0.1f;
+    aColour[4][1] = 0.2f;
+    aColour[4][2] = 0.5f;
+    aColour[4][3] = 0.4f;
+    aColour[5][0] = 0.1f;
+    aColour[5][1] = 0.2f;
+    aColour[5][2] = 0.5f;
+    aColour[5][3] = 0.4f;
+    aColour[6][0] = 0.0f;
+    aColour[6][1] = 0.0f;
+    aColour[6][2] = 0.0f;
+    aColour[6][3] = 0.0f;
+    aColour[7][0] = 0.0f;
+    aColour[7][1] = 0.0f;
+    aColour[7][2] = 0.0f;
+    aColour[7][3] = 0.0f;
+
+    fn_8001644C(0x98, aXY[0], aColour[0], NULL, 8);
+    fn_80012F34(1);
+    fn_80012F18(3);
+    fn_80012F50(1, 6, 0x80);
+    fn_80012EF8();
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_800382E0(void) {
