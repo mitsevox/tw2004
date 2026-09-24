@@ -367,6 +367,18 @@ typedef struct ViewSlot {
 
 extern ViewSlot gViewSlots[5];          // 0x80187124  per player
 
+// char.c: the club skins' part and set names, one per club kind (0 drivers, 1 fairway woods,
+// 2 putters, 3 and 4 the 3 and 7 irons, 5 wedges), for Character_SetClubStatesForCharacter
+extern char lbl_80186EC0[6][13];        // the parts: "Drivers" ...
+extern char lbl_80186F10[6][13];        // "fwd_shaft", "pwi_shaft" sets
+extern char lbl_80186F60[6][13];        // "Defaults", their variants
+extern char lbl_80186FB0[6][13];        // "EA_Driver" ... sets
+extern char lbl_80187000[6][13];        // "Defaults"
+extern char lbl_80187050[6][13];        // "fwd_grip", "pwi_grip" sets
+extern char lbl_801870A0[6][13];        // "Defaults"
+
+void  Character_SetClubStatesForCharacter(Character* pChar, int nSlot, struct SkinChoices* pChoices);
+
 // Skeleton.c
 extern f32 lbl_801C6498[4];             // the identity rotation (quaternion), set by fn_80029530
 extern u8  lbl_802810A6;                // IK on (fn_80027738); off, the IK functions do nothing

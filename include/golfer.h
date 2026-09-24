@@ -64,6 +64,15 @@ typedef enum PlayerNumber_t {
 
 #define IABS(v) (((v) ^ ((v) >> 31)) - ((v) >> 31))   // what the compiler emits for abs()
 
+// One club skin's look in a GolferRecord: the variant of its part ("Drivers", "Putters", ...) and
+// the options of its three sets ("EA_Driver", "fwd_shaft", "fwd_grip", ...), as name codes.
+typedef struct ClubLook {
+    u64  uPart;                 // 0x00
+    u64  uModel;                // 0x08
+    u64  uShaft;                // 0x10
+    u64  uGrip;                 // 0x18
+} ClubLook;
+
 // One 320-byte row of STATS_GC.BIN as it sits in gGolferTable. The file has a 2-byte header,
 // so every field is 2 bytes later than in the file; the game reuses the first byte as the
 // golfer index once a row is copied into a player. TW06: GolferData_t (0x1F0), the same up to
@@ -84,7 +93,15 @@ typedef struct GolferRecord {
     u8   bAvailable;            // 0x08E  non-zero in gCurGolferRecord when there is one. TW06: available
     u8   unk8F;                 // 0x08F
     u32  uBagMask;              // 0x090  bit n set = club n is in the bag. TW06: clubAvailable
-    u8   unk94[0x140 - 0x94];
+    u8   unk94[4];
+    // The golfer's club models as name codes (fn_800CB700) for the character's club skins
+    // (Character_SetClubStatesForCharacter). The irons' two skins share one set of options.
+    ClubLook aClubs[3];         // 0x098  drivers, fairway woods, putters
+    u64  aIronPart[2];          // 0x0F8  the "3Irons" and "7Irons" parts' variants
+    u64  uIronModel;            // 0x108  } the irons' "EA_3Iron"/"EA_7Iron", "pwi_shaft" and
+    u64  uIronShaft;            // 0x110  } "pwi_grip" options
+    u64  uIronGrip;             // 0x118  }
+    ClubLook wedges;            // 0x120
 } GolferRecord;
 LAYOUT_ASSERT(GolferRecord, 0x140);
 
@@ -692,6 +709,7 @@ extern f32          gClubDistAtPower0[CLUB_MAX_e];   // 0x80187580  reach at POW
 extern f32          gClubPowerStep[CLUB_MAX_e];      // 0x801875E8  reach gained per POWER point over 100
 
 int  Game_GetMode(void);                // 0x8000BED8
+int  Golfer_FindById(int nId);          // the gGolferTable row with that nModelID, -1 none
 void fn_8002EBA4(u8* pObj, u8 nValue);  // set byte 7 of the options (a7[0]) and apply it (Golfer.c)
 int  fn_800D2B08(void);
 s32  fn_800D2C68(int nTee);             // CourseData.c: the current hole's value for tee set nTee

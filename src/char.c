@@ -6,6 +6,7 @@
 #include "game.h"
 #include "charstate.h"
 #include "lldyntex.h"
+#include "frontend/fe.h"
 #include "unsorted/cull.h"
 #include "game_types.h"
 #include "endian.h"
@@ -734,6 +735,103 @@ u8 fn_8001DBF4(Character* pChar) {
         return 1;
     }
     return 0;
+}
+
+// Dresses the character's six club skins: from pChoices when it is given, else from the golfer's
+// gGolferTable row (golfer 7's own row in the 0x4000 session mode). The front end's golfer is
+// left until fn_8008EAB0 allows it.
+void Character_SetClubStatesForCharacter(Character* pChar, int nSlot, SkinChoices* pChoices) {
+    int nGolfer;
+    u64 uName;
+    u64 uVariant;
+
+    if (pChar == NULL || pChar->p16D8 == NULL) return;
+    if (gSession.nGameType == 3 && !fn_8008EAB0()) {
+        fn_8008EABC(1);
+        return;
+    }
+    if (pChoices == NULL) {
+        nGolfer = Golfer_FindById(pChar->nC);
+        if ((gSession.uFlags & 0x4000) && pChar->nC == 7) {
+            nGolfer = 7;
+        }
+        if (nGolfer >= 0) {
+            fn_800CB700(&uName, lbl_80186EC0[0]);
+            fn_800CC710(pChar, 0, uName, gGolferTable[nGolfer].aClubs[0].uPart);
+            fn_800CB700(&uName, lbl_80186FB0[0]);
+            fn_800CB700(&uVariant, lbl_80187000[0]);
+            fn_800CC7DC(pChar, 0, uName, uVariant, gGolferTable[nGolfer].aClubs[0].uModel);
+            fn_800CB700(&uName, lbl_80186F10[0]);
+            fn_800CB700(&uVariant, lbl_80186F60[0]);
+            fn_800CC7DC(pChar, 0, uName, uVariant, gGolferTable[nGolfer].aClubs[0].uShaft);
+            fn_800CB700(&uName, lbl_80187050[0]);
+            fn_800CB700(&uVariant, lbl_801870A0[0]);
+            fn_800CC7DC(pChar, 0, uName, uVariant, gGolferTable[nGolfer].aClubs[0].uGrip);
+
+            fn_800CB700(&uName, lbl_80186EC0[1]);
+            fn_800CC710(pChar, 1, uName, gGolferTable[nGolfer].aClubs[1].uPart);
+            fn_800CB700(&uName, lbl_80186FB0[1]);
+            fn_800CB700(&uVariant, lbl_80187000[1]);
+            fn_800CC7DC(pChar, 1, uName, uVariant, gGolferTable[nGolfer].aClubs[1].uModel);
+            fn_800CB700(&uName, lbl_80186F10[1]);
+            fn_800CB700(&uVariant, lbl_80186F60[1]);
+            fn_800CC7DC(pChar, 1, uName, uVariant, gGolferTable[nGolfer].aClubs[1].uShaft);
+            fn_800CB700(&uName, lbl_80187050[1]);
+            fn_800CB700(&uVariant, lbl_801870A0[1]);
+            fn_800CC7DC(pChar, 1, uName, uVariant, gGolferTable[nGolfer].aClubs[1].uGrip);
+
+            fn_800CB700(&uName, lbl_80186EC0[3]);
+            fn_800CC710(pChar, 3, uName, gGolferTable[nGolfer].aIronPart[0]);
+            fn_800CB700(&uName, lbl_80186FB0[3]);
+            fn_800CB700(&uVariant, lbl_80187000[3]);
+            fn_800CC7DC(pChar, 3, uName, uVariant, gGolferTable[nGolfer].uIronModel);
+            fn_800CB700(&uName, lbl_80186F10[3]);
+            fn_800CB700(&uVariant, lbl_80186F60[3]);
+            fn_800CC7DC(pChar, 3, uName, uVariant, gGolferTable[nGolfer].uIronShaft);
+            fn_800CB700(&uName, lbl_80187050[3]);
+            fn_800CB700(&uVariant, lbl_801870A0[3]);
+            fn_800CC7DC(pChar, 3, uName, uVariant, gGolferTable[nGolfer].uIronGrip);
+
+            fn_800CB700(&uName, lbl_80186EC0[4]);
+            fn_800CC710(pChar, 4, uName, gGolferTable[nGolfer].aIronPart[1]);
+            fn_800CB700(&uName, lbl_80186FB0[4]);
+            fn_800CB700(&uVariant, lbl_80187000[4]);
+            fn_800CC7DC(pChar, 4, uName, uVariant, gGolferTable[nGolfer].uIronModel);
+            fn_800CB700(&uName, lbl_80186F10[4]);
+            fn_800CB700(&uVariant, lbl_80186F60[4]);
+            fn_800CC7DC(pChar, 4, uName, uVariant, gGolferTable[nGolfer].uIronShaft);
+            fn_800CB700(&uName, lbl_80187050[4]);
+            fn_800CB700(&uVariant, lbl_801870A0[4]);
+            fn_800CC7DC(pChar, 4, uName, uVariant, gGolferTable[nGolfer].uIronGrip);
+
+            fn_800CB700(&uName, lbl_80186EC0[5]);
+            fn_800CC710(pChar, 5, uName, gGolferTable[nGolfer].wedges.uPart);
+            fn_800CB700(&uName, lbl_80186FB0[5]);
+            fn_800CB700(&uVariant, lbl_80187000[5]);
+            fn_800CC7DC(pChar, 5, uName, uVariant, gGolferTable[nGolfer].wedges.uModel);
+            fn_800CB700(&uName, lbl_80186F10[5]);
+            fn_800CB700(&uVariant, lbl_80186F60[5]);
+            fn_800CC7DC(pChar, 5, uName, uVariant, gGolferTable[nGolfer].wedges.uShaft);
+            fn_800CB700(&uName, lbl_80187050[5]);
+            fn_800CB700(&uVariant, lbl_801870A0[5]);
+            fn_800CC7DC(pChar, 5, uName, uVariant, gGolferTable[nGolfer].wedges.uGrip);
+
+            fn_800CB700(&uName, lbl_80186EC0[2]);
+            fn_800CC710(pChar, 2, uName, gGolferTable[nGolfer].aClubs[2].uPart);
+            fn_800CB700(&uName, lbl_80186FB0[2]);
+            fn_800CB700(&uVariant, lbl_80187000[2]);
+            fn_800CC7DC(pChar, 2, uName, uVariant, gGolferTable[nGolfer].aClubs[2].uModel);
+            fn_800CB700(&uName, lbl_80186F10[2]);
+            fn_800CB700(&uVariant, lbl_80186F60[2]);
+            fn_800CC7DC(pChar, 2, uName, uVariant, gGolferTable[nGolfer].aClubs[2].uShaft);
+            fn_800CB700(&uName, lbl_80187050[2]);
+            fn_800CB700(&uVariant, lbl_801870A0[2]);
+            fn_800CC7DC(pChar, 2, uName, uVariant, gGolferTable[nGolfer].aClubs[2].uGrip);
+        }
+    } else {
+        fn_800CC408(pChar, pChoices);
+    }
+    fn_800CC8BC(pChar, fn_8001EDF4(pChar));
 }
 
 // Every player for whom fn_800FCC38 says so has its animation played at normal speed.
