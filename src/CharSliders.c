@@ -51,6 +51,125 @@ void fn_8010D454(CharSliderDefs* pDefs) {
     }
 }
 
+// Reads the slider definitions at *ppData (a count of sliders and of morph targets, then each
+// table in turn, byte-swapped by its layout); NULL when there are no sliders.
+CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
+    void* pDst;
+    s32 nSliders;
+    s32 nMorphs;
+    CharSliderDefs* pDefs;
+    int i;
+    int j;
+    int k;
+
+    fn_80076158(ppData, (u8*)&nSliders, 4, 4);
+    fn_80076158(ppData, (u8*)&nMorphs, 4, 4);
+    *ppData += 8;
+    if (nSliders <= 0) {
+        return NULL;
+    }
+
+    pDefs = fn_80009B34(sizeof(CharSliderDefs), 2, 0, "CharSliders.c", 1010);
+    fn_80005AE8(pDefs, 0, sizeof(CharSliderDefs));
+    pDefs->nSliders = nSliders;
+    pDefs->pDefs = fn_80009B34(pDefs->nSliders * sizeof(CharSliderDef), 2, 0, "CharSliders.c", 1014);
+    fn_80005AE8(pDefs->pDefs, 0, pDefs->nSliders * sizeof(CharSliderDef));
+    pDefs->pValues = fn_80009B34(pDefs->nSliders * sizeof(CharSliderValue), 2, 0, "CharSliders.c", 1016);
+    fn_80005AE8(pDefs->pValues, 0, pDefs->nSliders * sizeof(CharSliderValue));
+    pDefs->nMorphs = nMorphs;
+    pDefs->aMorphIds = fn_80009B34(pDefs->nMorphs * sizeof(u64), 2, 0, "CharSliders.c", 1020);
+    fn_80005AE8(pDefs->aMorphIds, 0, pDefs->nMorphs * sizeof(u64));
+
+    // The sliders; the pointers read with them are not valid yet.
+    for (i = 0; i < pDefs->nSliders; i++) {
+        pDst = &pDefs->pDefs[i];
+        fn_8001F08C((void**)ppData, &pDst, lbl_80193C30, 10, 1);
+        pDefs->pDefs[i].pBoneRanges = NULL;
+        pDefs->pDefs[i].pMorphRanges = NULL;
+        pDefs->pDefs[i].pLinks = NULL;
+        pDefs->pDefs[i].pLimits = NULL;
+    }
+    for (i = 0; i < pDefs->nSliders; i++) {
+        if (pDefs->pDefs[i].nLinks > 0) {
+            pDefs->pDefs[i].pLinks = fn_80009B34(pDefs->pDefs[i].nLinks * sizeof(CharSliderLink), 2, 0,
+                                                 "CharSliders.c", 1039);
+            for (j = 0; j < pDefs->pDefs[i].nLinks; j++) {
+                pDst = &pDefs->pDefs[i].pLinks[j];
+                fn_8001F08C((void**)ppData, &pDst, lbl_80193BF0, 6, 1);
+            }
+        }
+    }
+    for (i = 0; i < pDefs->nSliders; i++) {
+        if (pDefs->pDefs[i].nLimits > 0) {
+            pDefs->pDefs[i].pLimits = fn_80009B34(pDefs->pDefs[i].nLimits * sizeof(CharSliderLimit), 2, 0,
+                                                  "CharSliders.c", 1053);
+            for (j = 0; j < pDefs->pDefs[i].nLimits; j++) {
+                pDst = &pDefs->pDefs[i].pLimits[j];
+                fn_8001F08C((void**)ppData, &pDst, lbl_80193C20, 2, 1);
+            }
+        }
+    }
+
+    // The bone ranges, then the bones of each.
+    for (i = 0; i < pDefs->nSliders; i++) {
+        if (pDefs->pDefs[i].nBoneRanges > 0) {
+            pDefs->pDefs[i].pBoneRanges = fn_80009B34(pDefs->pDefs[i].nBoneRanges * sizeof(CharSliderRange),
+                                                      2, 0, "CharSliders.c", 1067);
+            for (j = 0; j < pDefs->pDefs[i].nBoneRanges; j++) {
+                pDst = &pDefs->pDefs[i].pBoneRanges[j];
+                fn_8001F08C((void**)ppData, &pDst, lbl_80193B98, 4, 1);
+                pDefs->pDefs[i].pBoneRanges[j].items.pBones = NULL;
+            }
+        }
+    }
+    for (i = 0; i < pDefs->nSliders; i++) {
+        for (j = 0; j < pDefs->pDefs[i].nBoneRanges; j++) {
+            if (pDefs->pDefs[i].pBoneRanges[j].nItems > 0) {
+                pDefs->pDefs[i].pBoneRanges[j].items.pBones =
+                    fn_80009B34(pDefs->pDefs[i].pBoneRanges[j].nItems * sizeof(CharSliderBone), 2, 0,
+                                "CharSliders.c", 1084);
+                for (k = 0; k < pDefs->pDefs[i].pBoneRanges[j].nItems; k++) {
+                    pDst = &pDefs->pDefs[i].pBoneRanges[j].items.pBones[k];
+                    fn_8001F08C((void**)ppData, &pDst, lbl_80193B70, 5, 1);
+                }
+            }
+        }
+    }
+
+    // The morph target ranges, then the morph targets of each.
+    for (i = 0; i < pDefs->nSliders; i++) {
+        if (pDefs->pDefs[i].nMorphRanges > 0) {
+            pDefs->pDefs[i].pMorphRanges = fn_80009B34(pDefs->pDefs[i].nMorphRanges * sizeof(CharSliderRange),
+                                                       2, 0, "CharSliders.c", 1100);
+            for (j = 0; j < pDefs->pDefs[i].nMorphRanges; j++) {
+                pDst = &pDefs->pDefs[i].pMorphRanges[j];
+                fn_8001F08C((void**)ppData, &pDst, lbl_80193BD0, 4, 1);
+                pDefs->pDefs[i].pMorphRanges[j].items.pMorphs = NULL;
+            }
+        }
+    }
+    for (i = 0; i < pDefs->nSliders; i++) {
+        for (j = 0; j < pDefs->pDefs[i].nMorphRanges; j++) {
+            if (pDefs->pDefs[i].pMorphRanges[j].nItems > 0) {
+                pDefs->pDefs[i].pMorphRanges[j].items.pMorphs =
+                    fn_80009B34(pDefs->pDefs[i].pMorphRanges[j].nItems * sizeof(CharSliderMorph), 2, 0,
+                                "CharSliders.c", 1117);
+                for (k = 0; k < pDefs->pDefs[i].pMorphRanges[j].nItems; k++) {
+                    pDst = &pDefs->pDefs[i].pMorphRanges[j].items.pMorphs[k];
+                    fn_8001F08C((void**)ppData, &pDst, lbl_80193BB8, 3, 1);
+                }
+            }
+        }
+    }
+
+    // The morph targets' ids.
+    for (i = 0; i < pDefs->nMorphs; i++) {
+        pDst = &pDefs->aMorphIds[i];
+        fn_8001F08C((void**)ppData, &pDst, lbl_80281788, 1, 1);
+    }
+    return pDefs;
+}
+
 // The index of the slider whose id is nId, or -1.
 int fn_8010DC94(CharSliderDefs* pDefs, s32 nId) {
     int i;

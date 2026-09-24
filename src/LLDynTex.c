@@ -12,15 +12,17 @@
 void fn_8001052C(s16 n);
 void fn_8010A668(DynTex* pTex);
 void* fn_8010A780(DynTex* pTex);
-void fn_8010B098(void* arg0);
+void fn_8010B098(void* p);
 int fn_8010C458(int nFormat);
-s32 fn_8010B664(void* arg0);
+s32 fn_8010B664(DynTexPalette* pPal);
 void fn_8000FBAC();
 
 // ---- end of sweep code ----
 
 void fn_8010B7C0(void);
 void fn_8010A930(DynTexObj* pObj, u8* pBuf, void* p, s32 n);
+s32  fn_8010B338(DynTex* pTex, DynTexObj* pObj, DynTexPalette* pPal, u8* pPixels, u8* pPalette,
+                 void* p, s32 n);   // adds a texture; gives its index
 DynTexJob* fn_8010B960(void);
 u8   fn_8010BF3C(void);
 u8   fn_8010BFE0(void);
@@ -54,6 +56,36 @@ void fn_8010A668(DynTex* pTex) {
     fn_80009E70(pTex);
 }
 
+// ---- end of sweep code ----
+
+// pDst emptied, then every texture of pSrc added to it (with its palette when it has one).
+void fn_8010A6A8(DynTex* pSrc, DynTex* pDst) {
+    int i;
+    u8* pPixels;
+    u8* pPalettes;
+    DynTexObj* pObj;
+    DynTexPalette* pPal;
+
+    fn_8010B098(pDst);
+    pPixels = pSrc->p4->p18;
+    pPalettes = pSrc->p4->p20;
+    for (i = 0; i < pSrc->n8; i++) {
+        pObj = &pSrc->p4->p8[i];
+        pPal = NULL;
+        if (pObj->n3C != -1) {
+            pPal = &pSrc->p4->pC[i];
+        }
+        if (pPal != NULL) {
+            fn_8010B338(pDst, pObj, pPal, pPixels + pObj->aBlocks[0].nOffset, pPalettes + pPal->nOffset,
+                        NULL, 0);
+        } else {
+            fn_8010B338(pDst, pObj, NULL, pPixels + pObj->aBlocks[0].nOffset, NULL, NULL, 0);
+        }
+    }
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void* fn_8010A780(DynTex* pTex) {
     return pTex->p4;
 }
@@ -79,6 +111,103 @@ void fn_8010AD50(DynTex* pTex, u64 uId) {
             pTex->p0[i].uId = 0;
         }
     }
+}
+
+// Drops the textures whose id was cleared (fn_8010AD50): the others' pixels and palettes move
+// down in p18 over the gaps, and from the first dropped one on their entries and descriptions
+// are packed to the front.
+void fn_8010ADA4(DynTex* pTex) {
+    DynTexHeader* pHdr = pTex->p4;
+    DynTexEntry* pOutEntry = pTex->p0;
+    DynTexObj* pOutObj = pHdr->p8;
+    DynTexPalette* pOutPal = pHdr->pC;
+    DynTex40* pOut10 = pHdr->p10;
+    DynTex18* pOut14 = pHdr->p14;
+    DynTexEntry* pEntry;
+    u32 nSrc = 0;
+    u32 nDst = 0;
+    s32 nKept = 0;
+    s32 nObjs = 0;
+    u8 bMoved = 0;
+    int i;
+    int j;
+
+    for (i = 0; i < pTex->n8; i++) {
+        pEntry = &pTex->p0[i];
+        if (pEntry->uId == 0) {
+            bMoved = 1;
+            for (j = 0; j < pEntry->n8; j++) {
+                nSrc += pEntry->aC[j];
+            }
+            nSrc += pEntry->n1C;
+            continue;
+        }
+        for (j = 0; j < pEntry->n8; j++) {
+            if (pEntry->aC[j] != 0 && nDst != nSrc) {
+                memmove(pTex->p18 + nDst, pTex->p18 + nSrc, pEntry->aC[j]);
+                pHdr->p8[i].aBlocks[j].nOffset = nDst;
+            }
+            nDst += pEntry->aC[j];
+            nSrc += pEntry->aC[j];
+        }
+        if (pEntry->n1C != 0 && nDst != nSrc) {
+            memmove(pTex->p18 + nDst, pTex->p18 + nSrc, pEntry->n1C);
+            pHdr->pC[i].nOffset = nDst;
+        }
+        nDst += pEntry->n1C;
+        nSrc += pEntry->n1C;
+        if (bMoved) {
+            memcpy(pOutObj, &pHdr->p8[i], sizeof(DynTexObj));
+            memcpy(pOutPal, &pHdr->pC[i], sizeof(DynTexPalette));
+            memcpy(pOut10, &pHdr->p10[i], sizeof(DynTex40));
+            memcpy(pOut14, &pHdr->p14[i], sizeof(DynTex18));
+            memcpy(pOutEntry, pEntry, sizeof(DynTexEntry));
+            if (pEntry->n1C != 0) {
+                pOutObj->n3C = (s8)nKept;
+            }
+        }
+        pOutEntry++;
+        pOutObj++;
+        pOutPal++;
+        pOut10++;
+        pOut14++;
+        nObjs++;
+        nKept++;
+    }
+    pTex->n8 = nKept;
+    pHdr->n2 = nKept;
+    pHdr->n4 = nObjs;
+    pTex->n14 = nDst;
+}
+
+// Fills pEntry for pObj and its palette pPal (if any): the id, each level's bytes and the
+// palette's, each rounded up to 16. Returns them all added up.
+s32 fn_8010B0C0(DynTexObj* pObj, DynTexPalette* pPal, DynTexEntry* pEntry) {
+    u32 nA = pObj->n38;
+    u32 nB = pObj->n3A;
+    s32 nTotal = 0;
+    int nBits;
+    int i;
+
+    memset(pEntry, 0, sizeof(DynTexEntry));
+    pEntry->uId = pObj->uId;
+    pEntry->n8 = pObj->n41;
+    nBits = fn_8010C458(pObj->n40);
+    for (i = 0; i < pEntry->n8; i++) {
+        pEntry->aC[i] = (nB * (nBits * nA) + 7) >> 3;
+        nA >>= 1;
+        nB >>= 1;
+        pEntry->aC[i] = (pEntry->aC[i] + 15) & ~15;
+        nTotal += pEntry->aC[i];
+    }
+    if (pPal != NULL) {
+        pEntry->n1C = (pPal->nEntries * (u32)fn_8010C458(pPal->nFormat) + 7) >> 3;
+    } else {
+        pEntry->n1C = 0;
+    }
+    pEntry->n1C = (pEntry->n1C + 15) & ~15;
+    nTotal += pEntry->n1C;
+    return nTotal;
 }
 
 // New pixels for texture nTex (pPixels holds its blocks back to back), each block flushed to the
@@ -164,28 +293,26 @@ void fn_8010B9BC(void) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8010B098(void* arg0) {
-    if (arg0 != NULL) {
-        (*(s32*)((u8*)(arg0) + 8)) = 0;
-        (*(s16*)((u8*)((*(void**)((u8*)(arg0) + 4))) + 2)) = 0;
-        (*(s16*)((u8*)((*(void**)((u8*)(arg0) + 4))) + 4)) = 0;
-        (*(s32*)((u8*)(arg0) + 0x14)) = 0;
+// Empties pTex: no textures, nothing of p18 used (char.c and FEgolferanim.c pass it as a void*).
+void fn_8010B098(void* p) {
+    DynTex* pTex = p;
+
+    if (pTex != NULL) {
+        pTex->n8 = 0;
+        pTex->p4->n2 = 0;
+        pTex->p4->n4 = 0;
+        pTex->n14 = 0;
     }
 }
 
-s32 fn_8010B664(void* arg0) {
-    s32 var_r3;
-
-    if ((s16) (*(s16*)((u8*)(arg0) + 8)) > 0x10) {
-        var_r3 = 0x40;
-        if (fn_8010C458((*(s16*)((u8*)(arg0) + 0xA))) == 0x10) {
+s32 fn_8010B664(DynTexPalette* pPal) {
+    if (pPal->nEntries > 16) {
+        if (fn_8010C458(pPal->nFormat) == 16) {
             return 0x20;
         }
-        /* Duplicate return node #4. Try simplifying control flow for better match */
-        return var_r3;
+        return 0x40;
     }
-    var_r3 = 4;
-    return var_r3;
+    return 4;
 }
 
 void fn_8010BC64(u8* p) {
