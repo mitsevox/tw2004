@@ -1,20 +1,56 @@
-// GoBreakLine.c (EA's name, from its asserts): not yet decompiled; the sweep code below is the
-// matched small functions.
+// GoBreakLine.c (EA's name, from its asserts): the putt's break line, a line on the green from the
+// ball that shows how the putt will break (BreakLine, breakline.h). Partly decompiled.
 
-#include "game_types.h"
+#include "golfer.h"
+#include "camera.h"
+#include "breakline.h"
 
-// ---- sweep code (not yet cleaned up) ----
+BreakLine* lbl_80282228;
+u8 lbl_8028222C;
 
-extern s32 lbl_80282228;
-void fn_80009E70();
-void fn_800C8108(void);
+void fn_800360A0(void* pMesh);         // Skin.c: frees a mesh object
+
+void fn_800C808C(void) {
+    lbl_80282228 = fn_80009B34(sizeof(BreakLine), 2, 16, "GoBreakLine.c", 93);
+    lbl_80282228->fAB30 = 27.0f;
+    lbl_80282228->fAB34 = 0.0f;
+    lbl_80282228->fAB38 = 20.0f;
+    lbl_80282228->fAB3C = 0.009f;
+}
 
 void fn_800C8108(void) {
     fn_80009E70(lbl_80282228);
-    lbl_80282228 = 0;
+    lbl_80282228 = NULL;
 }
 
-// ---- end of sweep code ----
+void fn_800C830C(void) {
+    fn_800360A0(lbl_80282228->aMesh[0]);
+    if (gSession.nSplitScreen) {
+        fn_800360A0(lbl_80282228->aMesh[1]);
+    }
+    lbl_8028222C = 0;
+}
+
+// Steps view nView's line while its player, a human, stands over a putt within 75 of the hole
+// and the ball is within an inch of the pin (EA's test; distances in yards).
+void BreakLine_Update(int nView) {
+    int nPlayer = fn_8001707C(nView);
+
+    if (36.0f * Vec_Distance(lbl_80282228->vPin, gPlayers[nPlayer].vTarget) <= 1.0f &&
+        gPlayers[nPlayer].nShotKind == 0 && gPlayers[nPlayer].swing.nState == 0 &&
+        gPlayers[nPlayer].fDistance < 75.0f && !Player_IsCPU(nPlayer) && lbl_8028222C) {
+        if (!lbl_80282228->abSkip[nView]) {
+            BreakLine_Step(nView);
+            return;
+        }
+        lbl_80282228->abSkip[nView] = 0;
+    }
+}
+
+// View nView's point.
+void fn_800C8C3C(int nView, f32* pOut) {
+    Vec_Copy(lbl_80282228->aViewPoint[nView], pOut);
+}
 
 // a + b into out (three floats)
 #ifdef __MWERKS__

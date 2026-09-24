@@ -1,9 +1,10 @@
 // SwingTips.c (our name): the tips shown as a swing starts (fn_800D1DAC, from
 // STATEFUNC_SwingInit). Each test (wind, lie, slope, the golfer's attributes, par and score) picks
 // a tip; the first time a save profile meets one it gets the full tip (and a flag in the save),
-// later a short random one. Not yet decompiled beyond the two tests below.
+// later a short random one (the flags are SaveProfile.aTipSeen).
 
 #include "game.h"
+#include "game/save.h"
 
 u8 fn_800D1698(int nPlayer);
 u8 fn_800D16F0(int nPlayer);
@@ -20,6 +21,7 @@ u8 fn_800D1C38(int nPlayer);
 u8 fn_800D1C9C(int nPlayer);
 u8 fn_800D1D30(void);
 u8 fn_800D1D38(int nPlayer);
+void fn_800E4FB0(u8 nKind, int nTip);   // GameUI.c: show a tip (1 full, 2 short)
 
 // A tip test: a shot other than a putt, with the wind's speed over 6.
 u8 fn_800D1698(int nPlayer) {
@@ -180,4 +182,180 @@ u8 fn_800D1D38(int nPlayer) {
         return 1;
     }
     return 0;
+}
+
+// The tips as a swing starts, when the tips option is on and the player has a save profile (and
+// no controller in use is unplugged). Each test that passes shows its tip: the full one the
+// first time for this profile (unless b522F is set), else a random short one.
+void fn_800D1DAC(int nPlayer) {
+    u8 bFull;
+    u8 bUnplugged;
+    int nChan;
+    int i;
+    int nProfile;
+
+    bUnplugged = 0;
+    if (gSession.uFlags & 0x4000) {
+        return;
+    }
+    if (!gSession.options.a24[0]) {
+        return;
+    }
+    if (gPlayers[nPlayer].nShotKind == 0) {
+        return;
+    }
+    nProfile = gPlayers[nPlayer].nIndex;
+    bFull = 0;
+    if (gpSaveData[nProfile].bActive != 1) {
+        return;
+    }
+    for (nChan = 0; nChan < 4; nChan++) {
+        for (i = 0; i < gSession.nNumPlayers; i++) {
+            if (!fn_80013070(nChan) && nChan == gSession.nController[i]) {
+                bUnplugged = 1;
+            }
+        }
+    }
+    if (bUnplugged) {
+        return;
+    }
+    if (fn_800D1698(nPlayer)) {
+        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[0]) {
+            fn_800E4FB0(1, 0);
+            bFull = 1;
+            gpSaveData[nProfile].aTipSeen[0] = 1;
+        } else {
+            fn_800E4FB0(2, (Rand_Next(0) & 1) + 0);
+        }
+    }
+    if (fn_800D16F0(nPlayer)) {
+        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[1]) {
+            fn_800E4FB0(1, 2);
+            bFull = 1;
+            gpSaveData[nProfile].aTipSeen[1] = 1;
+        } else {
+            fn_800E4FB0(2, (Rand_Next(0) & 3) + 2);
+        }
+    }
+    if (fn_800D17E4(nPlayer)) {
+        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[2]) {
+            fn_800E4FB0(1, 6);
+            bFull = 1;
+            gpSaveData[nProfile].aTipSeen[2] = 1;
+        } else {
+            fn_800E4FB0(2, (Rand_Next(0) & 1) + 6);
+        }
+    }
+    if (fn_800D18D8(nPlayer)) {
+        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[3]) {
+            fn_800E4FB0(1, 8);
+            bFull = 1;
+            gpSaveData[nProfile].aTipSeen[3] = 1;
+        } else {
+            fn_800E4FB0(2, Rand_Next(0) % 3 + 8);
+        }
+    }
+    if (fn_800D19F8(nPlayer)) {
+        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[4]) {
+            fn_800E4FB0(1, 11);
+            bFull = 1;
+            gpSaveData[nProfile].aTipSeen[4] = 1;
+        } else {
+            fn_800E4FB0(2, (Rand_Next(0) & 1) + 11);
+        }
+    }
+    if (fn_800D1A34(nPlayer)) {
+        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[5]) {
+            fn_800E4FB0(1, 13);
+            bFull = 1;
+            gpSaveData[nProfile].aTipSeen[5] = 1;
+        } else {
+            fn_800E4FB0(2, (Rand_Next(0) & 1) + 13);
+        }
+    }
+    if (fn_800D1A70(nPlayer)) {
+        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[6]) {
+            fn_800E4FB0(1, 15);
+            bFull = 1;
+            gpSaveData[nProfile].aTipSeen[6] = 1;
+        } else {
+            fn_800E4FB0(2, (Rand_Next(0) & 1) + 15);
+        }
+    }
+    if (fn_800D1AA8(nPlayer)) {
+        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[7]) {
+            fn_800E4FB0(1, 17);
+            bFull = 1;
+            gpSaveData[nProfile].aTipSeen[7] = 1;
+        } else {
+            fn_800E4FB0(2, (Rand_Next(0) & 1) + 17);
+        }
+    }
+    if (((u8 (*)(int))fn_800D1AE0)(nPlayer)) {   // port: EA passes an argument fn_800D1AE0 ignores
+        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[8]) {
+            fn_800E4FB0(1, 19);
+            bFull = 1;
+            gpSaveData[nProfile].aTipSeen[8] = 1;
+        } else {
+            fn_800E4FB0(2, Rand_Next(0) % 3 + 19);
+        }
+    }
+    if (fn_800D1B10(nPlayer)) {
+        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[9]) {
+            fn_800E4FB0(1, 22);
+            bFull = 1;
+            gpSaveData[nProfile].aTipSeen[9] = 1;
+        } else {
+            fn_800E4FB0(2, Rand_Next(0) % 3 + 22);
+        }
+    }
+    if (fn_800D1BA4(nPlayer)) {
+        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[10]) {
+            fn_800E4FB0(1, 25);
+            bFull = 1;
+            gpSaveData[nProfile].aTipSeen[10] = 1;
+        } else {
+            fn_800E4FB0(2, Rand_Next(0) % 1 + 25);
+        }
+    }
+    if (fn_800D1C38(nPlayer)) {
+        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[11]) {
+            fn_800E4FB0(1, 26);
+            bFull = 1;
+            gpSaveData[nProfile].aTipSeen[11] = 1;
+        } else {
+            fn_800E4FB0(2, (Rand_Next(0) & 1) + 26);
+        }
+    }
+    if (fn_800D1C9C(nPlayer)) {
+        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[12]) {
+            fn_800E4FB0(1, 28);
+            bFull = 1;
+            gpSaveData[nProfile].aTipSeen[12] = 1;
+        } else {
+            fn_800E4FB0(2, Rand_Next(0) % 1 + 28);
+        }
+    }
+    if (((u8 (*)(int))fn_800D1D30)(nPlayer)) {   // port: EA passes an argument fn_800D1D30 ignores
+        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[13]) {
+            fn_800E4FB0(1, 29);
+            bFull = 1;
+            gpSaveData[nProfile].aTipSeen[13] = 1;
+        } else {
+            fn_800E4FB0(2, Rand_Next(0) % 1 + 29);
+        }
+    }
+    if (fn_800D1D38(nPlayer)) {
+        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[14]) {
+            fn_800E4FB0(1, 30);
+            bFull = 1;
+            gpSaveData[nProfile].aTipSeen[14] = 1;
+        } else {
+            fn_800E4FB0(2, (Rand_Next(0) & 1) + 30);
+        }
+    }
+    if (bFull) {
+        fn_800E3D38(nPlayer, 0);
+        fn_80062C80(gPlayers[nPlayer].nC58, 0);
+    }
 }

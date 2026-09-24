@@ -16,7 +16,10 @@ typedef struct CamLens {
     f32  v24[3];                // 0x24  a direction: goballfx.c's fn_80093A50 takes its angle to a light
     u8   unk30[0x34 - 0x30];
     f32  v34[3];                // 0x34  a position: GameMode8 measures the ball's distance to it
-    u8   unk40[0xA4 - 0x40];
+    u8   unk40[0x44 - 0x40];
+    f32  m44[4][4];             // 0x44  world to camera space (hlaudemitter.c fn_800AD800 moves a
+                                //       sound's position with it)
+    u8   unk84[0xA4 - 0x84];
     f32  fFov;                  // 0xA4  the field of view (GoGolfCam.c sets DEG(60.0f) or DEG(30.0f))
     u8   unkA8[0xB0 - 0xA8];
     f32  fB0;                   // 0xB0  fn_8001EFFC; the zoom-to-aim camera divides its distance by it
