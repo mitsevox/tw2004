@@ -77,7 +77,12 @@ typedef struct SkinDesc44 {
     s32  n4;                    // 0x04  the first entry in SkinDesc.p20
     s32  n8;                    // 0x08  0: skipped
     s32  nC;                    // 0x0C  its SkinDesc.p28 entry
-    u8   unk10[0x30 - 0x10];
+    u8   unk10[4];
+    s32  n14;                   // 0x14  } n14 + n18: the morph targets it needs (fn_8011C850)
+    s32  n18;                   // 0x18  }
+    u8   unk1C[0x24 - 0x1C];
+    u32  u24;                   // 0x24  bit 1: has morph targets
+    u8   unk28[0x30 - 0x28];
 } SkinDesc44;
 LAYOUT_ASSERT(SkinDesc44, 0x30);
 
@@ -136,7 +141,7 @@ typedef struct SkinDesc {
     SkinMesh* p34;              // 0x034
     u8   unk38[4];
     u8*  p3C;                   // 0x03C
-    u8   unk40[4];
+    s32  n40;                   // 0x040  entries in p44
     SkinDesc44* p44;            // 0x044
     s32  nParts;                // 0x048
     SkinPartDef* pParts;        // 0x04C
@@ -205,6 +210,14 @@ typedef struct SkinModel {
 } SkinModel;
 LAYOUT_ASSERT(SkinModel, 0x140);  // fn_801276E4 copies it whole
 
+// What Skin.pMorph points at (SkinMorph.c; our name): the weights of the skin's morph targets.
+typedef struct SkinMorphState {
+    s32  nMorphs;               // 0x0
+    f32* afWeights;             // 0x4  one per morph target (fn_8011CADC)
+    u32* p8;                    // 0x8  } bit arrays of nMorphs bits: fn_8011CADC sets a changed
+    u32* pC;                    // 0xC  } target's bit in both, fn_8011CE58 sets every bit
+} SkinMorphState;
+
 // A skin (Skin.c): a character's body or one of its attachments; only what the code reads.
 typedef struct Skin {
     SkinModel* pModel;          // 0x0000
@@ -220,7 +233,7 @@ typedef struct Skin {
     SkinChoice* aParts[4];      // 0x10A8  a choice per part, four copies (fn_800CEE04 copies one
                                 //         over another); [3] is set while lbl_80282238 is clear
     SkinChoice* aSets[4];       // 0x10B8  the same per SkinDesc.p74 set
-    u8   unk10C8[4];
+    SkinMorphState* pMorph;     // 0x10C8
     u32* p10CC;                 // 0x10CC  } bit arrays
     u32* p10D0;                 // 0x10D0  }
     u32  u10D4;                 // 0x10D4  bit 1 set by fn_80019CEC and when the choices change; bit 2
@@ -470,6 +483,7 @@ void  fn_80127B98(Skin* pSkin, s32* aParts, s32* aList);
 extern s32* lbl_802825A8;               // the new number of each mesh bit (fn_801271E0)
 
 // Bit n of a bit array of 32-bit words: test, set, clear.
+void  fn_8001E8A4(u32* aBits, u32 nBits);  // sets every bit of a bit array
 void  fn_8001E938(u32* aBits, u32 nBits);  // clears a bit array
 u8    fn_8001E9CC(u32* aBits, u32 n);
 void  fn_8001EA34(u32* aBits, u32 n);

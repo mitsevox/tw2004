@@ -2,6 +2,7 @@
 // matched small functions.
 
 #include "game_types.h"
+#include "charstate.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -49,22 +50,73 @@ void fn_8011C84C(void) {
 
 // ---- end of sweep code ----
 
-// ---- sweep code (not yet cleaned up) ----
+// The morph targets a skin description needs: the highest n14 + n18 of its p44 entries that have
+// morph targets.
+s32 fn_8011C850(SkinDesc* pDesc) {
+    SkinDesc44* pEntry;
+    s32 nMax;
+    s32 i;
 
-s32 fn_80009E70(void*);
-void fn_8011CD84(void* arg0);
+    nMax = 0;
+    for (i = 0; i < pDesc->n40; i++) {
+        pEntry = &pDesc->p44[i];
+        if ((pEntry->u24 & 2) && pEntry->n8 > 0 && pEntry->n18 + pEntry->n14 > nMax) {
+            nMax = pEntry->n18 + pEntry->n14;
+        }
+    }
+    return nMax;
+}
 
-void fn_8011CD84(void* arg0) {
-    void* temp_r3;
+// Sets the weight of morph target nMorph and marks it changed.
+void fn_8011CADC(Skin* pSkin, int nMorph, f32 fWeight) {
+    SkinMorphState* pMorph = pSkin->pMorph;
 
-    temp_r3 = (*(void**)((u8*)(arg0) + 0x10C8));
-    if (temp_r3 != NULL) {
-        fn_80009E70((*(void**)((u8*)(temp_r3) + 4)));
-        fn_80009E70((*(void**)((u8*)((*(void**)((u8*)(arg0) + 0x10C8))) + 8)));
-        fn_80009E70((*(void**)((u8*)((*(void**)((u8*)(arg0) + 0x10C8))) + 0xC)));
-        fn_80009E70((*(void**)((u8*)(arg0) + 0x10C8)));
-        (*(void**)((u8*)(arg0) + 0x10C8)) = NULL;
+    if (pMorph == NULL || nMorph < 0 || nMorph >= pMorph->nMorphs) {
+        return;
+    }
+    if (fWeight != pMorph->afWeights[nMorph]) {
+        pMorph->afWeights[nMorph] = fWeight;
+        fn_8001EA34(pMorph->p8, nMorph);
+        fn_8001EA34(pMorph->pC, nMorph);
     }
 }
 
-// ---- end of sweep code ----
+// Frees the skin's morph state (Skin.c calls it).
+void fn_8011CD84(Skin* pSkin) {
+    if (pSkin->pMorph != NULL) {
+        fn_80009E70(pSkin->pMorph->afWeights);
+        fn_80009E70(pSkin->pMorph->p8);
+        fn_80009E70(pSkin->pMorph->pC);
+        fn_80009E70(pSkin->pMorph);
+        pSkin->pMorph = NULL;
+    }
+}
+
+// The bytes of the skin's meshes that have both flags 0x100000 and 0x10.
+s32 fn_8011CDE8(Skin* pSkin) {
+    SkinDesc* pDesc;
+    SkinMesh* pMesh;
+    s32 nSize;
+    s32 i;
+
+    if (pSkin == NULL || (pDesc = pSkin->pModel->pDesc) == NULL) {
+        return 0;
+    }
+    nSize = 0;
+    for (i = 0; i < pDesc->n30; i++) {
+        pMesh = &pDesc->p34[i];
+        if ((pMesh->uFlags & 0x100010) == 0x100010) {
+            nSize += pMesh->nSize;
+        }
+    }
+    return nSize;
+}
+
+// Marks every morph target changed.
+void fn_8011CE58(Skin* pSkin) {
+    if (pSkin == NULL || pSkin->pMorph == NULL) {
+        return;
+    }
+    fn_8001E8A4(pSkin->pMorph->p8, pSkin->pMorph->nMorphs);
+    fn_8001E8A4(pSkin->pMorph->pC, pSkin->pMorph->nMorphs);
+}
