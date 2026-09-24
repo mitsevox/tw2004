@@ -139,8 +139,8 @@ void Mov_Init(void) {
     AudVoiceRequest request;
 
     request.nPriority = 0x3FFF;
-    request.n4 = 2;
     request.flags.n = 0;
+    request.n4 = 2;
     request.flags.b.b14 = 1;
     request.flags.b.b10 = 1;
     request.flags.b.b9 = 1;
