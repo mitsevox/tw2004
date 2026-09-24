@@ -6,7 +6,7 @@
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80009E70();
-void fn_800137B0(void);
+void fn_800137B0(void* pCamera);    // camera.h
 void fn_80012EF8();
 void fn_80013EA0();
 void fn_80013EEC();
@@ -40,8 +40,8 @@ f32 fn_8001417C(u8* p);
 f32 fn_80014184(u8* p);
 f32 fn_8001418C(u8* p);
 
-void fn_800137B0(void) {
-    fn_80009E70();
+void fn_800137B0(void* pCamera) {
+    fn_80009E70(pCamera);
 }
 
 void fn_800137D0(s32 p0) {

@@ -85,7 +85,6 @@ void  fn_80096F0C(Character* pChar);                            // CharAnim.c
 void  fn_8000914C(f32* pQ, f32 (*m)[4]);                        // Quaternion.c: a rotation matrix
 int   fn_8001BD18(Character* pChar, Clip* pClip);
 void  fn_80008F20(f32* pQ, f32* pOut);                          // Quaternion.c
-void  fn_80008FCC(f32* pA, f32* pB, f32* pOut);                 // Quaternion.c: a product
 void  fn_800090E4(f32* pQ, f32* pIn, f32* pOut);                // Quaternion.c: a vector turned by pQ
 void  fn_80009410(f32 fAngle, f32* pOut);                       // Quaternion.c
 void  fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, int n, f32 fTime);
@@ -119,7 +118,6 @@ void  fn_8001EFD8(f32* pA, f32* pB, f32* pOut);
 f32 (*fn_8001EC6C(Character* pChar, int nBone))[4];
 f32 (*fn_8001ECA8(Character* pChar, int nBone))[4];
 f32   fn_8001EFFC(CamLens* pLens);
-CamLens* fn_8001F004(void);
 void  fn_80027738(u8 bOn);
 void  fn_80035C58(void);
 void  fn_80035CC0(void);
@@ -210,7 +208,7 @@ void fn_80017508(Character* pChar) {
 
 // Sets the character's animation events from the blend's, fStart later. Events 5..14 are only
 // taken when their time is past 0.
-void fn_800175B0(Character* pChar, ClipBlend* pBlend, f32 fStart) {
+void fn_800175B0(Character* pChar, Clip* pBlend, f32 fStart) {
     u32 uId;
     int i;
 
@@ -777,6 +775,176 @@ void fn_8001899C(Character* pChar, u8 bLegA, u8 bLegB) {
     }
     if (fn_8001E9F4(auBits, auBits, 0x80)) {
         SKEL_TransformBones(pChar->pModel, auBits);
+    }
+}
+
+// Bends leg nLeg (bones A, B, C and D down the leg, test points nPoint and nOther under it) so its
+// foot stands on the ground: the knee (B) and hip (A) are turned so bone C reaches the ground height
+// under nPoint, then C is tilted towards the ground's slope, more the deeper the foot sat.
+void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, int nBoneA, int nBoneB,
+                             int nBoneC, int nBoneD, int nPoint, int nOther) {
+    f32 vOld[4];
+    f32 vC[4];
+    f32 vPoint[4];
+    f32 vD[4];
+    f32 vA[4];
+    f32 vB[4];
+    f32 vReach[4];
+    f32 vLeg[4];
+    f32 vThigh[4];
+    f32 vShin[4];
+    f32 vFoot[4];
+    f32 vAxis[4];
+    f32 vSlope[4];
+    f32 qTurn[4];
+    f32 qB8[4];
+    f32 qA8[4];
+    f32 q98[4];
+    f32 q88[4];
+    f32 q78[4];
+    f32 q68[4];
+    f32 q58[4];
+    f32 q48[4];
+    f32 q38[4];
+    f32 q28[4];
+    f32 q18[4];
+    f32 vNormal[4];
+    f32 fDropA;
+    f32 fDropB;
+    f32 fDrop;
+    f32 fReach;
+    f32 fLeg;
+    f32 fThigh;
+    f32 fShin;
+    f32 fDen;
+    f32 fSq;
+    f32 fCos;
+    f32 fAngleA;
+    f32 fAngleB;
+    f32 fTurn;
+    f32 fLen;
+    f32 fScale;
+    Skeleton* pSkel;
+    Bone* pBone;
+
+    fn_8001EBD8(pChar, nBoneC, vC);
+    fn_8001EBD8(pChar, nBoneA, vA);
+    fn_8001EBD8(pChar, nBoneB, vB);
+    fn_8001EBD8(pChar, nBoneD, vD);
+    Vec_Copy(pChar->aPoints[nPoint], vPoint);
+    // how far each test point sits below the ground (0.165 in, in feet)
+    fDropA = 0.165f / 12.0f + (pChar->afGroundHeight[nPoint] - vPoint[1]);
+    fDropB = 0.165f / 12.0f + (pChar->afGroundHeight[nOther] - pChar->aPoints[nOther][1]);
+    if (fDropA < 0.0f && fDropB < 0.0f) {
+        return;
+    }
+    if (fDropA > 1.0f) {
+        return;
+    }
+    fDrop = (fDropA <= fDropB) ? fDropB : fDropA;
+    if (fDrop < 0.0f) {
+        return;
+    }
+    fn_8001EF54(pChar->aGroundNormal[nPoint], pChar->aGroundNormal[nOther], vSlope);
+    fn_800BAF04(vSlope, vSlope);
+    if (fDrop > 0.33f / 12.0f) {
+        fDrop = 1.0f;
+    } else {
+        fDrop = fDrop / (0.33f / 12.0f);
+    }
+    fDropA -= 0.165f / 12.0f;
+    if (fDropA < 0.0f) {
+        fDropA = 0.0f;
+    }
+
+    // the knee: the angle the thigh and shin must make for the hip to reach bone C raised by fDropA
+    Vec3Copy(vC, vOld);
+    vC[1] += fDropA;
+    fn_8001EF10(vA, vOld, vReach);
+    fn_8001EF10(vA, vC, vLeg);
+    fn_8001EF10(vB, vA, vThigh);
+    fn_8001EF10(vB, vOld, vShin);
+    fn_8001EF10(vOld, vD, vFoot);
+    fReach = (f32)fn_80009680(fn_80009744(vReach));
+    fLeg = (f32)fn_80009680(fn_80009744(vLeg));
+    fThigh = (f32)fn_80009680(fn_80009744(vThigh));
+    fShin = (f32)fn_80009680(fn_80009744(vShin));
+    if (fLeg > fThigh + fShin) {
+        fLeg = fThigh + fShin;
+    }
+    fDen = 2.0f * fThigh * fShin;
+    if (0.0f == fDen) {
+        fDen = 1.0f;
+    }
+    fSq = fThigh * fThigh + fShin * fShin;
+    fCos = (fSq - fReach * fReach) / fDen;
+    fAngleA = fn_80009614((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
+    fCos = (fSq - fLeg * fLeg) / fDen;
+    fAngleB = fn_80009614((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
+    fTurn = fAngleA - fAngleB;
+    vec4flt_CrossProduct(vShin, vThigh, vNormal);
+    fLen = fn_800BAFC0(vNormal, vNormal);
+    vNormal[3] = 0.0f;
+    pSkel = pChar->pModel->pSkel;
+    if (pSkel != NULL) {
+        // a degenerate bend axis falls back on the last good one
+        if (fLen > 0.0001f) {
+            Vec_Copy(vNormal, pSkel->a10E8[nLeg]);
+        } else {
+            Vec_Copy(pSkel->a10E8[nLeg], vNormal);
+        }
+    }
+    if (fabsf(fTurn) > 0.0001f) {
+        fn_8001EF34(vNormal, fTurn, vAxis);
+        fn_8000923C(vAxis, qTurn);
+        fn_80008F20(pChar->pModel->pPoses[nBoneB].q0, qA8);
+        fn_800090E4(qA8, qTurn, q98);
+        fn_80008FCC(q98, pChar->pModel->pBones[nBoneB].q0C, qB8);
+        fn_8001E85C(qB8, pChar->pModel->pBones[nBoneB].q0C);
+    }
+
+    // the hip: turned by the change in the angle between the thigh and the hip-to-foot line
+    fTurn = fn_8000965C(fShin * fn_800095F0(fAngleA) / fReach) -
+            fn_8000965C(fShin * fn_800095F0(fAngleB) / fLeg);
+    if (fabsf(fTurn) > 0.0001f) {
+        fn_8001EF34(vNormal, fTurn, vAxis);
+        vAxis[3] = 0.0f;
+        fn_8000923C(vAxis, qTurn);
+        fn_80008F20(pChar->pModel->pPoses[nBoneA].q0, qA8);
+        fn_800090E4(qA8, qTurn, q98);
+        fn_80008FCC(q98, pChar->pModel->pBones[nBoneA].q0C, qB8);
+        fn_8001E85C(qB8, pChar->pModel->pBones[nBoneA].q0C);
+    }
+
+    // the ankle: tilted about the horizontal axis across the slope, by the slope's angle
+    pBone = &pChar->pModel->pBones[nBoneA];
+    fn_80008FCC(pBone->q0C, pChar->pModel->pPoses[pBone->nParent].q0, q88);
+    fn_80008FCC(pChar->pModel->pBones[nBoneB - 1].q0C, q88, q58);
+    fn_80008FCC(pChar->pModel->pBones[nBoneB].q0C, q58, q68);
+    fn_80008F20(q68, q78);
+    fn_80008FCC(pChar->pModel->pPoses[nBoneC].q0, q78, q48);
+    vAxis[0] = vSlope[2];
+    vAxis[1] = 0.0f;
+    vAxis[2] = -vSlope[0];
+    vAxis[3] = 0.0f;
+    fLen = (f32)fn_80009680(vAxis[0] * vAxis[0] + vAxis[2] * vAxis[2]);
+    if (fLen < 0.01f) {
+        return;
+    }
+    fScale = 1.0f / fLen;
+    vAxis[0] *= fScale;
+    vAxis[2] *= fScale;
+    fCos = vSlope[1];
+    fTurn = fn_80009614((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos)) * fDrop;
+    if (fabsf(fTurn) > 0.0001f) {
+        fn_8001EF34(vAxis, fTurn, vAxis);
+        fn_80008FCC(q48, q68, q38);
+        fn_80008F20(q38, q28);
+        vAxis[3] = 0.0f;
+        fn_8000923C(vAxis, qTurn);
+        fn_800090E4(q28, qTurn, qB8);
+        fn_80008FCC(qB8, q48, q18);
+        fn_8001E85C(q18, pChar->pModel->pBones[nBoneC].q0C);
     }
 }
 
@@ -1963,8 +2131,7 @@ void fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) {
     }
     pAnim->fStart = pNode->fStart;
     pAnim->fEnd = pNode->fEnd;
-    // Clip and ClipBlend are two views of the same clip header (0xD4: pD4 / pEvents)
-    fn_800175B0(pChar, (ClipBlend*)pClip, aBlend[3]);
+    fn_800175B0(pChar, pClip, aBlend[3]);
     if (pClip != NULL && pClip->pF4 != NULL) {
         fn_8009622C(pChar, pClip->pF4, bNoBlend, fTime);
     }
@@ -2266,7 +2433,7 @@ void fn_8001C860(Character* pChar) {
         fn_8001EED8(pChar->pModel, 1);      // the results are not used
         fn_8001EED8(pChar->pModel, 0x52);
         pClip = Char_SetClip(pChar, 0, pChar->nStyle, NULL);
-        if (pClip->uD8 == 0) {
+        if (pClip->pD8 == NULL) {
             fn_80027108(pSkel);
             SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 0.0f);
             pChar->pModel->pSkel->f1074 = 0.0f;
@@ -2276,7 +2443,7 @@ void fn_8001C860(Character* pChar) {
             pSkel->pClip = pClip;
             fn_80021978(pChar->pModel->bEE);
             if (bClipTime) {
-                fn_8001FCF4(pChar, pClip, &pSkel->pose, 0, pClip->pD4->f24);
+                fn_8001FCF4(pChar, pClip, &pSkel->pose, 0, pClip->pEvents[2].fTime);
             } else {
                 fn_8001FCF4(pChar, pClip, &pSkel->pose, 0, 0.0f);
             }
@@ -3219,7 +3386,7 @@ CamLens* fn_8001F004(void) {
 }
 
 // The time of the blend's event uEvent, 0 when it has none.
-f32 fn_8001F02C(ClipBlend* pBlend, u64 uEvent) {
+f32 fn_8001F02C(Clip* pBlend, u64 uEvent) {
     int i;
 
     for (i = 0; i < pBlend->nEvents; i++) {

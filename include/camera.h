@@ -782,4 +782,21 @@ void        fn_8006E214(GoFrameBuf* pBuf);   // free it
 void        fn_8006E234(GoFrameBuf* pBuf);   // the default size: 512 x 448, scale 1
 void        fn_8006E26C(GoFrameBuf* pBuf, f32 f0, f32 f4, f32 fWidth, f32 fHeight, f32 f10, f32 f14);
 
+// ---- the parts of a render camera: lens (GoCamera.c), screen rectangle (GoViewport.c) ---------
+
+CamLens* fn_80076400(void);                     // a new lens
+void     fn_8007644C(CamLens* pLens);           // free it
+void     fn_8007646C(CamLens* pLens, f32* pA, f32* pB);   // not decompiled yet: two 4-float points
+void     fn_800768E0(CamLens* pLens);
+void     fn_80076948(CamLens* pLens, f32 fB4, f32 fB8);   // sets fB4 and fB8
+void     fn_80076A0C(CamLens* pLens, s32 nType);          // sets nType
+f32*     fn_80076ACC(void);                     // a new screen rectangle
+void     fn_80076B18(f32* pRect);               // free it
+void     fn_800B3438(f32* pRect, f32 x, f32 y); // shadow.c
+CamLens* fn_8001F004(void);                     // char.c
+
+// GoRenderCtx_Gc.c: a render camera made from a lens, a frame buffer and a screen rectangle.
+void*    fn_8001371C(CamLens* pLens, GoFrameBuf* pBuf, f32* pRect);
+void     fn_800137B0(void* pCamera);            // free it
+
 #endif

@@ -8,6 +8,7 @@
 
 #include "game_types.h"
 #include "platform.h"
+#include "gx.h"
 
 // ---- memory and strings ----------------------------------------------------------------------
 
@@ -152,6 +153,7 @@ void fn_8000B2B8(u32 uSeed);            // seed all three random streams
 void fn_8000B30C(void);                 // drop the kept normal value (fn_8000B318)
 f32  Rand_Float(int nStream);           // 0x8000B428  [0, 1)
 void fn_8000883C(f32* pA, f32* pB, f32 fT);   // quaternion slerp from a to b by fT, into b
+void fn_80008FCC(f32* pA, f32* pB, f32* pOut); // quaternion product a x b (Quaternion.c)
 void fn_80008BB8(f32* pOut, f32 fA, f32 fB, f32 fC);   // the quaternion of three (negated) angles
 void fn_8000923C(f32* pRot, f32* pOut); // a rotation vector (axis * angle) as a quaternion
 void fn_80009710(f32* pQ);              // the identity quaternion (0, 0, 0, 1)
@@ -311,6 +313,8 @@ int  fn_800107C0(struct UStreamObject* pObject, TexBank* pBank, int n);   // loa
 
 void fn_80006EDC(void);                 // LLDisp_Gc.c: set the viewport (DiscCheck.c, ScreenClear.c)
 void fn_80006FE8(void);                 // LLDisp_Gc.c: end the frame (returns nothing)
+extern struct GXFifoObj* lbl_80281BA0; // LLDisp_Gc.c: the command FIFO (GXInit's)
+extern u32 lbl_80281B9C;                // LLDisp_Gc.c: the most the FIFO has held (fn_800124CC)
 extern void* lbl_80281BA4[2];           // LLDisp_Gc.c: two image buffers (DepthField.c and
                                         //       FEgolferanim.c make textures of them)
 
@@ -702,16 +706,32 @@ typedef struct UFontContext {
 
 UFontContext* fn_80012EC4(void);        // UFont.c: the current text settings
 
+// A glyph of a loaded font (0x28 bytes each, LLFont.p410; LLGlyph is our name).
+typedef struct LLGlyph {
+    u8    pad00[0x18];            // 0x00
+    f32   f18;                    // 0x18  its advance (fn_80011C90 adds them up for a string's width)
+    u8    pad1C[0x28 - 0x1C];     // 0x1C
+} LLGlyph;
+
 // A loaded font, from an 'sfn ' stream object (FO_spLoadFontFromStream). LLFont is our name.
 typedef struct LLFont {
-    u8    pad00[0x470];           // 0x00
+    u8    pad00[0xC];             // 0x00
+    LLGlyph* apGlyphs[256];       // 0x0C  by character code; NULL: the font has no such glyph
+    u8    pad40C[0x440 - 0x40C];  // 0x40C
+    GXTexObj tex;                 // 0x440
+    s32   nPalette;               // 0x460  its palette in UFontState.aTluts (0..2)
+    u8    pad464[0x46C - 0x464];  // 0x464
+    s32   n46C;                   // 0x46C
     void* p470;                   // 0x470  freed with the font
     s32   n474;                   // 0x474
 } LLFont;
 
 // UFont.c's state (lbl_80280DE0 points at the 0x1E0-byte block lbl_801A34C0).
 typedef struct UFontState {
-    u8    a00[0xA0];              // 0x00  LLFont.c's state (fn_80011034 sets it up)
+    u8    pad00[0xC];             // 0x00  LLFont.c's state from here to 0xA0 (fn_80011034 sets it up)
+    GXTlutObj aTluts[3];          // 0x0C  the three glyph palettes
+    u8    pad30[0x40 - 0x30];     // 0x30
+    u16   aaPalettes[3][16];      // 0x40  IA8 (alpha << 8 | intensity), what aTluts point at
     LLFont* apFonts[6];           // 0xA0  loaded fonts; NULL: a free slot
     UFontContext* apQueue[6];     // 0xB8  each font's queued strings, newest first
     UFontContext* pQueuePool;     // 0xD0  room for 50 queued strings
@@ -730,6 +750,8 @@ LLFont* FO_spLoadFontFromStream(void* pData, UFontState* pState);
 void fn_80011034(UFontState* pState);
 void fn_80011160(UFontState* pState);
 void fn_800111A4(LLFont* pFont);        // free a font
+void fn_800111D8(void);                 // set GX up for text (saves the viewport and projection)
+void fn_800112DC(void);                 // put the saved viewport and projection back
 void fn_80011310(LLFont* pFont, UFontState* pState);
 void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz);
 void fn_80011C8C(LLFont* pFont);
@@ -812,6 +834,7 @@ u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 // ---- events, sound, effects ------------------------------------------------------------------
 
 void fn_800A7A98(s32 n);                // GameAudio.c
+void fn_800A4BDC(void);                 // GameAudio.c: once a frame, the emitters and the queued sound
 u8   fn_800B7490(void);                 // DiscError.c: show the disc-error screen while the drive
                                         // reports a problem; 1: it was shown (UStream.c, DiscCheck.c)
 
@@ -885,6 +908,8 @@ void fn_800A78F0(f32 f);                // } and a0[1] (FE_MessageTable.c, GameU
 void fn_800A7924(f32 f);                // }
 void Vec_Normalize(f32* pSrc, f32* pDst);
 void fn_800BAF04(f32* pSrc, f32* pDst);   // normalise
+void fn_800B5918(f32* pSrc, f32* pDst);   // copy three floats (not decompiled yet)
+f32  fn_800BAFC0(f32* pSrc, f32* pDst);   // VecMath.c: normalises pSrc into pDst, gives its length
 f32  Vec_Distance(f32* pA, f32* pB);
 void fn_800BD83C(int nSound, int a);      // SitDevFile.c: fn_800A7664(0, nSound, a)
 void BreakLine_Start(int nView);

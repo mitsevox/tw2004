@@ -101,7 +101,8 @@ typedef struct Skeleton {
     u8   unk10C8[0x10D4 - 0x10C8];
     f32  q10D4[4];              // 0x10D4  a rotation (quaternion) given by fn_80027808
     s32  n10E4;                 // 0x10E4  set to 4 as a swing starts
-    u8   unk10E8[0x112C - 0x10E8];
+    f32  a10E8[4][4];           // 0x10E8  per leg, the last good bend axis (Character_IKLegToGround)
+    u8   unk1128[0x112C - 0x1128];
     s32  n112C;                 // 0x112C  } the character's club class and n16D4 (fn_8001C860)
     s32  n1130;                 // 0x1130  }
 } Skeleton;
@@ -242,7 +243,9 @@ typedef struct Clip {
     s32    n38;                 // 0x38  bytes of the first frame stream
     s32    n3C;                 // 0x3C
     s32    n40;                 // 0x40
-    u8     unk44[8];
+    u8     unk44[4];
+    s16    nEvents;             // 0x48  how many pEvents holds
+    u8     unk4A[2];
     s32    n4C;                 // 0x4C
     s32    n50;                 // 0x50
     u8     unk54[0x10];
@@ -253,10 +256,12 @@ typedef struct Clip {
     s16    n8E;                 // 0x8E  bytes per frame, second stream
     u64    u90;                 // 0x90  looked up in lbl_801B9638 (FEgolferanim.c fn_8008D058)
     u8     unk98[8];
-    char   name[0x30];          // 0xA0
+    char   name[0x2C];          // 0xA0
+    f32    fCC;                 // 0xCC  how far along the swing is, 0..1 (Character.fBackswing copies it)
     u8*    pD0;                 // 0xD0
-    struct ClipD4* pD4;         // 0xD4
-    u32    uD8;                 // 0xD8  nonzero: FEgolferanim.c turns the golfer round for it
+    struct ClipEvent* pEvents;  // 0xD4  its timed events (fn_8001F02C finds one by its id)
+    struct BlendClip* pD8;      // 0xD8  fn_800204A0 samples it; set: FEgolferanim.c turns the
+                                //       golfer round for the clip
     u32    uAram;               // 0xDC
     u8     unkE0[4];
     u8*    pE4;                 // 0xE4
@@ -321,7 +326,7 @@ struct SKABlendNode {
             SKABlendNode* apChild[2];       // 0x24
         } blend;                            // nType 1
         struct {
-            void* pSrc;                     // 0x20  a ClipBlend for nFormat 0 (fn_8001F02C)
+            void* pSrc;                     // 0x20  a Clip for nFormat 0 (fn_8001F02C)
             f32   fFrom;                    // 0x24
             f32   fTo;                      // 0x28
         } src;                              // nType 0
@@ -331,33 +336,21 @@ struct SKABlendNode {
 };
 LAYOUT_ASSERT(SKABlendNode, 0x30);
 
-// A clip as the swing reads it through a ClipBlend; only what the swing reads.
+// What Clip.pD8 points at; only what the swing reads.
 typedef struct BlendClip {
     u8   unk0[8];
     f32  f08;                   // 0x08  added to the time fn_800204A0 samples the clip at
     f32  f0C;                   // 0x0C
 } BlendClip;
 
-// One of a ClipBlend's timed events (fn_8001F02C finds one by its id). Event 2's time is the
-// ball-hit time the swing measures.
+// One of a clip's timed events (Clip.pEvents; fn_8001F02C finds one by its id). Event 2's time is
+// the ball-hit time the swing measures (fn_8001C860 starts the skeleton's clip at it).
 typedef struct ClipEvent {
     u32  uId;                   // 0x0
     f32  fTime;                 // 0x4
     u8   unk8[8];
 } ClipEvent;
 LAYOUT_ASSERT(ClipEvent, 0x10);
-
-// What Character.pBlend points at: two clips and how far along the blend is; only what the swing
-// reads.
-typedef struct ClipBlend {
-    u8   unk0[0x48];
-    s16  nEvents;               // 0x48  how many pEvents holds
-    u8   unk4A[0xCC - 0x4A];
-    f32  fCC;                   // 0xCC  how far along it is, 0..1 (Character.fBackswing copies it)
-    u8   unkD0[4];
-    ClipEvent* pEvents;         // 0xD4
-    BlendClip* pD8;             // 0xD8  fn_800204A0 samples it
-} ClipBlend;
 
 // One of a character's four data buffers (Character.buffers): pBuf holds three runs of 16-byte
 // entries, p0C..p18 mark where they start and end, their counts read from p04's +0x60, +0x58 and
@@ -409,12 +402,6 @@ extern CharModelDefs lbl_80280E18;
 // Per club class, an offset (x, y, z) fn_8001C860 places the golfer by (0x4C bytes: one more
 // float follows the six).
 extern f32 lbl_80187184[6][3];
-
-// What Clip.pD4 points at; only what the code reads.
-typedef struct ClipD4 {
-    u8    unk0[0x24];
-    f32   f24;                  // 0x24  fn_8001C860 starts the skeleton's clip at it
-} ClipD4;
 
 // The golfer's character object (0x1798 bytes or more); only the fields read so far. Anim_SetRate,
 // Anim_SetTime and fn_8007326C take the address of its animation player at 0x164, whose fields
@@ -494,7 +481,7 @@ typedef struct Character {
     s32   n5CC;                 // 0x5CC
     u8    unk5D0[0x1614 - 0x5D0];
     char  sz1614[16];           // 0x1614  a name the situation scripts test (fn_800BB7AC)
-    ClipBlend* pBlend;          // 0x1624
+    Clip* pBlend;               // 0x1624
     f32   fBackswing;           // 0x1628  how far along the backswing is, 0..1 (pBlend's fCC, copied every
                                 //         frame of the backswing; the swing's power is its square root)
     f32   f162C;                // 0x162C
@@ -583,6 +570,7 @@ void  Character_SetClubStatesForCharacter(Character* pChar, int nSlot, struct Sk
 extern f32 lbl_801C6498[4];             // the identity rotation (quaternion), set by fn_80029530
 extern u8  lbl_802810A6;                // IK on (fn_80027738); off, the IK functions do nothing
 extern u8  lbl_8018742C[42][2];         // pairs of standard bones (fn_80029804 reads the first 41)
+extern f32 lbl_80186838[4];             // a zero vector (fn_80029BC8 copies it)
 
 // AnimStream.c: the animation groups it streams clips for (groups 1 and 5, the reactions), and the
 // index each has in its tables.
@@ -670,7 +658,7 @@ int   fn_8001EE88(Character* pChar);    // n1658
 int   fn_8001EE90(Character* pChar);
 int   fn_8001EED8(CharModel* pModel, int nBone);    // a bone's index
 int   fn_8001EEE4(CharModel* pModel, int nBone);
-f32   fn_8001F02C(struct ClipBlend* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
+f32   fn_8001F02C(struct Clip* pClip, u64 uEvent);   // an event's time (by its 64-bit id)
 void  Anim_SetRate(u8* pAnim, f32 fRate);           // 0x8001F084
 // Plays a clip on the character: blended in from the current one, or (bNoBlend) from scratch.
 void  fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime);
@@ -932,25 +920,34 @@ LAYOUT_ASSERT(MalBank, 0x1C);
 
 // An animation library as fn_8001F110 byte-swaps and links it in place (MtaLib, MtaRecord and
 // MtaEntry are our names): a 0x34-byte header, its records, each record's entries, then each
-// entry's data (4-byte aligned).
+// entry's data (4-byte aligned). An entry is a track of one value per frame, a byte each: frame
+// byte b gives fLo + (fHi - fLo) * b / 256 (fn_8001F32C).
 typedef struct MtaEntry {
-    u8     unk00[0x24];
+    u8     unk00[0x20];
+    s32    nMorph;              // 0x20  the morph whose weight it drives (SkelPoseBlock.af8); < 0: none
     s32    nBytes;              // 0x24  the bytes of its data
-    u8     unk28[0x3C - 0x28];
-    u8*    pData;               // 0x3C
+    s32    nLastFrame;          // 0x28
+    f32    fFrameTime;          // 0x2C  the time per frame
+    u8     unk30[4];
+    f32    fLo;                 // 0x34
+    f32    fHi;                 // 0x38
+    u8*    pData;               // 0x3C  a byte per frame
     u8     unk40[0x48 - 0x40];
 } MtaEntry;
 LAYOUT_ASSERT(MtaEntry, 0x48);
 
 typedef struct MtaRecord {
-    u8     unk00[0x24];
+    u8     unk00[0x20];
+    s32    nBlock;              // 0x20  its block of the pose buffer (SkelPose1.aBlocks)
     s32    nEntries;            // 0x24
     MtaEntry* pEntries;         // 0x28
 } MtaRecord;
 LAYOUT_ASSERT(MtaRecord, 0x2C);
 
 typedef struct MtaLib {
-    u8     unk00[0x20];
+    u8     unk00[0x14];
+    s32    nBytes;              // 0x14  the library's size (fn_8001F804 allocates it)
+    u8     unk18[0x20 - 0x18];
     s32    nRecords;            // 0x20
     u8     unk24[0x30 - 0x24];
     MtaRecord* pRecords;        // 0x30

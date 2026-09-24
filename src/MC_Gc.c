@@ -14,7 +14,6 @@
 #include "core/goaram.h"
 
 void fn_8006C63C(void);         // } called around every CARD library call (not yet known)
-void fn_800A4BDC(void);         // }
 void fn_8009DC80(s32 nPort, s32 nSlot, s32 nResult);
 void fn_8009DCE8(void);
 void fn_8009EB30(UStreamObject* pObject);
@@ -29,7 +28,6 @@ s32  fn_80125194(s32 a, s32 b);         // EA Sports Bio (0x80125194)
 s32  fn_801255C4(s32* pPos);            // EASportsBio.c
 s32  fn_801255F8(void);                 // EASportsBio.c: the EA Sports Bio file's size
 void fn_8012CCCC(int uHandle);          // EASBStorage.c
-void GXSetVtxAttrFmt(int nFmt, int nAttr, int nCnt, int nType, u8 uFrac);   // port: GameCube only
 u8*  Skalib_ScratchToAram(int n);       // skalib.c
 void Skalib_ScratchFromAram(int n);     // skalib.c
 

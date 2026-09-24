@@ -21,7 +21,6 @@ void fn_80006FE8();
 void fn_80007254();
 void fn_800083A0();
 void fn_80091BDC();
-void fn_800A4BDC();
 void fn_80091B98(s32 p0);
 void fn_80012EF8();
 void fn_8005CC64();

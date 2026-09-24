@@ -30,10 +30,8 @@ void fn_8001058C(void);
 void fn_8001260C(void);
 void fn_800126C0(void);
 void fn_80012A78(void);
-void* fn_8001371C(void* pA, GoFrameBuf* pBuf, void* pC);   // a render camera from three parts
 void fn_800136F4(void);
 void fn_80013718(void);
-void fn_800137B0(void* p);              // frees it
 void fn_800137D0(void* pCamera);
 void fn_80013808(void* pCamera, int n, void** ppSlot);
 void fn_80013D5C(void* pCamera);        // the current render camera (lbl_80280DF0)
@@ -163,14 +161,10 @@ void fn_8007185C(void);
 void fn_80071890(void);
 void fn_800718C4(void);
 void fn_800757B8(void);
-void* fn_80076400(void);
 void fn_800763B4(void);
 void fn_800763B8(void);
-void fn_8007644C(void* p);
 void fn_80076AC4(void);
 void fn_80076AC8(void);
-void* fn_80076ACC(void);
-void fn_80076B18(void* p);
 void fn_80076E48(void);
 void fn_800773F8(void);
 void fn_80077428(void);
@@ -219,7 +213,6 @@ void fn_8009C914(int nView);
 void fn_800A2064(void);
 void fn_800A2E14(void);
 void fn_800A3A84(void);
-void fn_800A4BDC(void);
 void fn_800A4C54(void);
 void fn_800A4E34(void);
 void fn_800A4FD8(void);

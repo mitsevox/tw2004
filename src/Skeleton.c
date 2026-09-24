@@ -6,6 +6,9 @@
 #include "charstate.h"
 
 void fn_80029BC8(f32* pVec);                            // sets a vector to lbl_80186838
+void fn_80026BF4(Skeleton* pSkel, IKChain* pChain);
+f32  fn_80026D18(Skeleton* pSkel, IKChain* pChain, f32* pTarget, int nLink, int n);   // an IK step's
+                                                                                     // remaining error
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // pDst = pSrc's rows
                                                                                 // through pMtx
 void fn_80113E60(void);                                 // DynChain.c
@@ -66,6 +69,25 @@ void fn_80027108(Skeleton* pSkel) {
     }
 }
 
+// Solves the chain toward pTarget: up to nIterations steps, each followed by pfnError (when given)
+// in place of the step's own error; stops once the error is below fTolerance.
+void fn_800273BC(Skeleton* pSkel, IKChain* pChain, f32* pTarget, s32 nIterations,
+                 f32 (*pfnError)(Skeleton* pSkel, IKChain* pChain, f32* pTarget), f32 fTolerance) {
+    s32 i;
+    f32 fError;
+
+    for (i = 0; i < nIterations; i++) {
+        fError = fn_80026D18(pSkel, pChain, pTarget, pChain->nLinks - 2, 0);
+        if (pfnError != NULL) {
+            fError = pfnError(pSkel, pChain, pTarget);
+        }
+        fn_80026BF4(pSkel, pChain);
+        if (fError < fTolerance) {
+            break;
+        }
+    }
+}
+
 // Turns the IK on or off.
 void fn_80027738(u8 bOn) {
     lbl_802810A6 = bOn;
@@ -101,6 +123,23 @@ void fn_80027808(CharModel* pModel, f32* pRot) {
         if (pModel->pSkel->fIKWeight < 1.0f) {
             fn_8000883C(lbl_801C6498, pModel->pSkel->q10D4, pModel->pSkel->fIKWeight);
             Vec_Normalize(pModel->pSkel->q10D4, pModel->pSkel->q10D4);
+        }
+    }
+}
+
+// Turns bone 0x11's rotation by the skeleton's q10D4 while n10E4 is set, unless the IK is off or at
+// no weight.
+void fn_8002787C(CharModel* pModel) {
+    Skeleton* pSkel = pModel->pSkel;
+    f32 qRot[4];
+
+    if (pSkel != NULL && lbl_802810A6 != 0) {
+        if (pSkel->fIKWeight <= 0.0f) {
+            return;
+        }
+        if (pSkel->n10E4 != 0) {
+            fn_80008FCC(pSkel->q10D4, pSkel->p20[fn_8001EEE4(pModel, 0x11)], qRot);
+            fn_8001E85C(qRot, pModel->pSkel->p20[fn_8001EEE4(pModel, 0x11)]);
         }
     }
 }
@@ -254,6 +293,20 @@ void fn_80029948(CharModel* pModel, struct DynChain* pChain, f32 f) {
     fn_8011443C(pModel, pChain, f);
 }
 
+// Copies bone 0x22's rotation in pPose into q740 and q750, when the model has that bone. EA looks
+// the same bone up for both.
+void fn_80029968(CharModel* pModel, SkelPose* pPose) {
+    int nFirst = fn_8001EED8(pModel, 0x22);
+    int nSecond = fn_8001EED8(pModel, 0x22);
+
+    if (nFirst != 0xFF) {
+        fn_8001E85C(pPose->aBones[nFirst].q0, pModel->q740);
+    }
+    if (nSecond != 0xFF) {
+        fn_8001E85C(pPose->aBones[nSecond].q0, pModel->q750);
+    }
+}
+
 // Gives bone nA the rotation pRot, then sets it halfway between that and bone nB's.
 void fn_80029A00(CharModel* pModel, int nA, int nB, f32* pRot) {
     fn_8001E85C(pRot, pModel->pBones[nA].q0C);
@@ -303,4 +356,95 @@ f32 fn_80029B64(f32 x) {
         return y;
     }
     return x;
+}
+
+// Sets a vector to zero.
+void fn_80029BC8(f32* pVec) {
+    Vec_Copy(lbl_80186838, pVec);
+}
+
+// pA + pB into out, three floats (paired singles).
+#ifdef __MWERKS__
+asm void fn_80029BF4(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_add f2, f2, f0
+    ps_add f3, f3, f1
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_80029BF4(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pB[0] + pA[0];
+    pOut[1] = pB[1] + pA[1];
+    pOut[2] = pB[2] + pA[2];
+}
+#endif
+
+// pA - pB into out, three floats (paired singles).
+#ifdef __MWERKS__
+asm void fn_80029C18(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 1, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 1, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 1, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_80029C18(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+}
+#endif
+
+// pA - pB into out, four floats (paired singles).
+#ifdef __MWERKS__
+asm void fn_80029C3C(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 0, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 0, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 0, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_80029C3C(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+    pOut[3] = pA[3] - pB[3];
+}
+#endif
+
+// Copies a bit array of nBits bits (whole words) from pSrc to pDst, when both are given.
+void fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits) {
+    u32 nWords;
+    u32 i;
+
+    if (pDst != NULL) {
+        if (pSrc == NULL) {
+            return;
+        }
+        nWords = (nBits + 31) >> 5;
+        for (i = 0; i < nWords; i++) {
+            pDst[i] = pSrc[i];
+        }
+    }
 }
