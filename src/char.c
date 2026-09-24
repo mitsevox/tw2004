@@ -804,6 +804,8 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     f32 fAngleA;
     f32 fAngleB;
     f32 fTurn;
+    f32 fTurn2;
+    f32 fTurn3;
     f32 fDen;
     f32 fDropA;
     f32 fLen;
@@ -884,10 +886,10 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     }
 
     // the hip: turned by the change in the angle between the thigh and the hip-to-foot line
-    fTurn = fn_8000965C(fShin * fn_800095F0(fAngleA) / fReach);
-    fTurn -= fn_8000965C(fShin * fn_800095F0(fAngleB) / fLeg);
-    if (fabsf(fTurn) > 0.0001f) {
-        fn_8001EF34(vNormal, fTurn, vAxis);
+    fTurn2 = fn_8000965C(fShin * fn_800095F0(fAngleA) / fReach);
+    fTurn2 -= fn_8000965C(fShin * fn_800095F0(fAngleB) / fLeg);
+    if (fabsf(fTurn2) > 0.0001f) {
+        fn_8001EF34(vNormal, fTurn2, vAxis);
         vAxis[3] = 0.0f;
         fn_8000923C(vAxis, qTurn);
         fn_80008F20(pChar->pModel->pPoses[nBoneA].q0, qA8);
@@ -914,10 +916,10 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     vAxis[0] *= 1.0f / fLen;
     vAxis[2] *= 1.0f / fLen;
     fCos = vSlope[1];
-    fTurn = fn_80009614((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
-    fTurn *= fDrop;
-    if (fabsf(fTurn) > 0.0001f) {
-        fn_8001EF34(vAxis, fTurn, vAxis);
+    fTurn3 = fn_80009614((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
+    fTurn3 *= fDrop;
+    if (fabsf(fTurn3) > 0.0001f) {
+        fn_8001EF34(vAxis, fTurn3, vAxis);
         fn_80008FCC(q48, q68, q38);
         fn_80008F20(q38, q28);
         vAxis[3] = 0.0f;
