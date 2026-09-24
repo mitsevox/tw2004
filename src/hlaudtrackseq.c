@@ -63,16 +63,16 @@ void fn_800AA5A0(AudVoice* pVoice, int nReason) {
 // Plays again every note whose voice was taken from it.
 void fn_800AA618(AudTrack* pTrack) {
     AudVoice** ppVoice;
-    AudSeqEvent** ppEvent;
     AudVoice** ppEnd;
+    AudSeqEvent** ppEvent;
+    AudSeqEvent* pEvent;
 
     ppVoice = pTrack->apVoices;
     ppEvent = pTrack->u.seq.apEvents;
     ppEnd = ppVoice + pTrack->pTmpl->n2;
     for (; ppVoice < ppEnd; ppVoice++, ppEvent++) {
-        if (*ppVoice == NULL && *ppEvent != NULL) {
-            AudSeqEvent* pEvent = *ppEvent;
-
+        pEvent = *ppEvent;
+        if (*ppVoice == NULL && pEvent != NULL) {
             *ppEvent = NULL;
             fn_800AA744(pEvent, pTrack);
         }
