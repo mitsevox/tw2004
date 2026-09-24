@@ -229,14 +229,6 @@ extern GXTexObj lbl_8026038C;   // its texture
 extern UObjMesh     lbl_80260360;
 extern UObjMeshInfo lbl_802602C0;
 
-// GoGrass.c's draw data (not in C yet).
-extern char lbl_80194598[4][8]; // the grass textures' names, "akgrass1".."akgrass4" (by n3A4)
-extern f32 lbl_801945B8[4];     // a colour: 0.21, 0.31, 0.1, 1 (fn_8011EC84)
-extern f32 lbl_801945C8[8];     // the unit square's corners (fn_8011EC84)
-extern f32 lbl_801945E8[4];     // a colour: 0.5 each (fn_8011EE4C)
-extern f32 lbl_801945F8[8];     // (fn_8011EE4C)
-extern f32 lbl_80194618[8];     // (fn_8011EE4C)
-
 void SD_vSetGrassParamsOnce(f32* pUnused0, f32* pUnused1, f32 (*a2)[4], f32* p8, f32 (*b2)[4],
                             f32 (*a16)[4], f32 fA, f32 fB);
 

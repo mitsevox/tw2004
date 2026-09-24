@@ -1021,7 +1021,7 @@ config.libs = [
             Object(Matching, "fe_stats.c"),
             Object(Matching, "EventInfo.c"),
             Object(Matching, "llrtclock.c"),
-            Object(NonMatching, "GoGrass.c"),
+            Object(Matching, "GoGrass.c"),
             Object(NonMatching, "GoShaderObject_Grass_Gc.c"),
             Object(NonMatching, "GameMode4Menu.c"),
             Object(NonMatching, "TibExt.c"),

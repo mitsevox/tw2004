@@ -59,6 +59,20 @@ GrassBuffer* fn_8011FDEC(s32 nSize);
 void fn_8011FF58(void);
 void fn_80120194(void);
 
+// The grass's draw data.
+char lbl_80194598[4][8] = {"akgras1", "akgras2", "akgras3", "akgras4"}; // textures, by n3A4
+f32 lbl_801945B8[4] = {0.21f, 0.31f, 0.1f, 1.0f};                          // a colour (fn_8011EC84)
+f32 lbl_801945C8[8] = {0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};  // the unit square's corners
+f32 lbl_801945E8[4] = {0.5f, 0.5f, 0.5f, 0.5f};                            // a colour (fn_8011EE4C)
+f32 lbl_801945F8[8] = {0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 0.5f, 1.0f, 1.0f};  // (fn_8011EE4C)
+f32 lbl_80194618[8] = {0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};  // (fn_8011EE4C)
+
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80284A30), before the 4.9f fn_8011E170 uses first; its body is unknown.
+static f32 GoGrass_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 // The grass's start: its chunk loader (chunk 6) is registered and its settings get their defaults.
 void fn_8011E170(void) {
     lbl_80281900->p370 = NULL;
