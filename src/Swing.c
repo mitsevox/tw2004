@@ -623,8 +623,8 @@ f32 SW_vGetShotPower(int nPlayer) {
 // Then the miss (zero for a CPU or a perfect shot), the power, forgiveness, the launch blocks, and
 // the aim - the player's aim plus the face vector's angle plus the miss - go to Physics_ShotImpact.
 void SW_vImpact(int nPlayer) {
-    f32*    pLaunchB;
     f32*    pLaunchA;
+    f32*    pLaunchB;
     Player* p;
     Ball*   pBall;
     int     nClub, nTrajectory, nKind;
@@ -641,7 +641,7 @@ void SW_vImpact(int nPlayer) {
     } else {
         REPLAY_Play(nPlayer);
     }
-    pLaunchA    = p->vLaunchA;
+    pLaunchA    = gPlayers[nPlayer].vLaunchA;
     nClub       = p->nClub;
     nTrajectory = p->nTrajectory;
     nKind       = p->nShotKind;
