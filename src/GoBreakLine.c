@@ -87,6 +87,59 @@ void BreakLine_Update(int nView) {
     }
 }
 
+// Starts view nView's line when its player stands over a putt within 75 of the hole: lays out the
+// line's vertices, colours and texture coordinates, and launches a copy of the ball with the
+// putt's power for the distance, with sounds and effects off.
+void BreakLine_Start(int nView) {
+    Player* pPlayer;
+    f32 fPower;
+    int i;
+    int nTex = 0;
+
+    pPlayer = &gPlayers[fn_8001707C(nView)];
+    if (pPlayer->nShotKind == 0 && pPlayer->fDistance < 75.0f && pPlayer->fDistance > 0.0f) {
+        lbl_80282228->abA91C[nView] = 1;
+        lbl_80282228->abSkip[nView] = 1;
+        lbl_80282228->anA928[nView] = 0;
+        lbl_8028222C = 1;
+        Mem_cpy(&lbl_80282228->aBall[nView], &pPlayer->ball, sizeof(Ball));
+        Vec_Copy(lbl_80282228->aBall[nView].vPos, lbl_80282228->aViewPoint[nView]);
+        lbl_80282228->afAAD4[nView] = 1000000.0f;
+        lbl_80282228->abAADC[nView] = 0;
+        fPower = fn_80050D34(pPlayer->fDistance);
+        lbl_80282228->anAAF0[nView] = 0;
+        for (i = 0; i < BREAKLINE_POINTS; i++) {
+            lbl_80282228->aVert[nView][i][0][0] = 0.0f;
+            lbl_80282228->aVert[nView][i][0][1] = 0.0f;
+            lbl_80282228->aVert[nView][i][0][2] = lbl_80282228->fAB1C;
+            lbl_80282228->aVert[nView][i][1][0] = 0.0f;
+            lbl_80282228->aVert[nView][i][1][1] = 0.0f;
+            lbl_80282228->aVert[nView][i][1][2] = -lbl_80282228->fAB1C;
+            lbl_80282228->aColor[nView][i][0][0] = lbl_80282228->anColor[0];
+            lbl_80282228->aColor[nView][i][0][1] = lbl_80282228->anColor[1];
+            lbl_80282228->aColor[nView][i][0][2] = lbl_80282228->anColor[2];
+            lbl_80282228->aColor[nView][i][0][3] = lbl_80282228->anColor[3];
+            lbl_80282228->aColor[nView][i][1][0] = lbl_80282228->anColor[0];
+            lbl_80282228->aColor[nView][i][1][1] = lbl_80282228->anColor[1];
+            lbl_80282228->aColor[nView][i][1][2] = lbl_80282228->anColor[2];
+            lbl_80282228->aColor[nView][i][1][3] = lbl_80282228->anColor[3];
+            lbl_80282228->aUV[nView][i][0][0] = (f32)nTex / (f32)lbl_80282228->nAAEC;
+            lbl_80282228->aUV[nView][i][0][1] = 0.0f;
+            lbl_80282228->aUV[nView][i][1][0] = (f32)nTex / (f32)lbl_80282228->nAAEC;
+            lbl_80282228->aUV[nView][i][1][1] = 1.0f;
+            nTex++;
+            if (nTex > lbl_80282228->nAAEC) {
+                nTex = 0;
+            }
+        }
+        Ball_SetSimulating(1);
+        lbl_80282228->aBall[nView].nState = 0;
+        Ball_Launch(&lbl_80282228->aBall[nView], pPlayer->nClub, pPlayer->nShotKind, fPower,
+                    pPlayer->fAim, 1, pPlayer->vLaunchA, pPlayer->vLaunchB);
+        Ball_SetSimulating(0);
+    }
+}
+
 // View nView's point.
 void fn_800C8C3C(int nView, f32* pOut) {
     Vec_Copy(lbl_80282228->aViewPoint[nView], pOut);
