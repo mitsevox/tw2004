@@ -721,6 +721,7 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
     int nStart;
     int nEntry;
     int i;
+    s32 j;
     u8 bPlayed = 0;
 
     if (pAction->aList[1] == 0xFFF0) {
@@ -763,8 +764,8 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
                 nEntry = aaIndex[nKind][nPick];
                 if (nPick == nStart) {
                     // Every entry has been drawn: start the deck over.
-                    for (i = 0; i < anCount[nKind]; i++) {
-                        pAction->aList[aaIndex[nKind][i]] &= 0x7FFF;
+                    for (j = 0; j < anCount[nKind]; j++) {
+                        pAction->aList[aaIndex[nKind][j]] &= 0x7FFF;
                     }
                     nPick = nStart;
                     break;
@@ -826,11 +827,12 @@ void fn_800BD580(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
         break;
     case 11:
         if (gSession.options.a0[4] && !fn_800DC784()) {
+            u16 uSound = pDo->n4;
             nArg = 2;
             if (nPlayer == 0) {
                 nArg = 0;
             }
-            fn_800BD868((u16)pDo->n4, nArg);
+            fn_800BD868(uSound, nArg);
         }
         break;
     case 10:
