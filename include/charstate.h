@@ -230,13 +230,15 @@ LAYOUT_ASSERT(SkinModel54, 0x14);
 
 // What Skin.pModel points at; only what SkinPart.c and SkinBurn.c read.
 typedef struct SkinModel {
-    u8   unk0[8];
+    s32  n00;                   // 0x00  4: the file carries a SkinDesc at pDesc (fn_800377FC)
+    u8   unk4[4];
     s32  n08;                   // 0x08  its size with all its arrays once burnt (fn_801276E4)
     s32  n0C;                   // 0x0C  entries in p3C
     u8   unk10[4];
     s32  n14;                   // 0x14  how many matrices Skin.p108C holds (fn_80018710); also
                                 //       the 0x20-byte entries in p34
-    u8   unk18[0x34 - 0x18];
+    u8   unk18[0x30 - 0x18];
+    u32  u30;                   // 0x30  0x40000002 both set: already byte-swapped (fn_800377FC)
     void* p34;                  // 0x34  handed to the character's model (fn_80029A74)
     void* p38;                  // 0x38  one 0x50-byte block
     void* p3C;                  // 0x3C  n0C 0x50-byte blocks
@@ -309,7 +311,9 @@ typedef struct Skin {
                                 //         tested by fn_80037708
     f32  f10D8;                 // 0x10D8  from the CHR object's header (fn_8001A9F4)
     f32  f10DC;                 // 0x10DC  1 when loaded
+    u8   unk10E0[4];
 } Skin;
+LAYOUT_ASSERT(Skin, 0x10E4);    // fn_800377FC allocates and clears one
 
 // hwsOverride_Gc.c (our names): a block of memory handed out in pieces (fn_80112938), sized for
 // a SkinDesc's meshes of flag 0x100000 (fn_80112848).
@@ -589,6 +593,8 @@ extern CharSkinSet* lbl_80280E24[2];   // what fn_8001B208 makes of the 'CLB ' o
 
 void  fn_80037CD8(Skin* pSkin);         // Skin.c: frees a skin
 s32   fn_80037708(Skin* pSkin);         // Skin.c: frees what loading it allocated
+s32   fn_800375AC(Skin* pSkin, u8 b);   // Skin.c: allocates it
+Skin* fn_800377FC(u8* pData, u8 b);     // Skin.c: makes a skin from its file
 extern void* lbl_80281D70;              // } Skin.c; fn_80036464 frees lbl_80281D70 and clears all
 extern s32   lbl_80281D74;              // } three
 extern s32   lbl_80281D78;              // }

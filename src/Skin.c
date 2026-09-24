@@ -15,10 +15,26 @@ void  fn_80016978(f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight);
 void  fn_8006E7A4(LightGroup* pGroup);         // GoLighting.c: load the group's lights
 void  fn_8006EADC(UObject* pObj);              // GoLighting.c: light the object
 void  fn_8006ED70(void);                       // GoLighting.c
+void  fn_801127A0(void* pDesc);                // hwsMaterial_Gc.c
 void  fn_801127C4(void* pDesc);                // hwsMaterial_Gc.c
+void  fn_800CEE88(u8 b);                       // SkinPart.c
+void  fn_800CEF04(SkinDesc* pDesc);            // SkinPart.c: offsets to pointers
+void  fn_800CD404(Skin* pSkin);                // SkinPart.c
+s32   fn_800CD700(Skin* pSkin);                // SkinPart.c
+void  fn_800CE164(void);                       // SkinPart.c
+void  fn_8011C9B0(Skin* pSkin);                // SkinMorph.c
+s32   fn_8011CDE8(Skin* pSkin);                // SkinMorph.c
+void  fn_8011CE58(Skin* pSkin);                // SkinMorph.c
+HwsMemBlock* fn_801128C8(SkinDesc* pDesc, s32 nSize);         // hwsOverride_Gc.c
+HwsOverrideTable* fn_80112A10(SkinDesc* pDesc, s32 nMeshes);  // hwsOverride_Gc.c
 
 void  fn_80035F40(void* pCamera);
 void  fn_8003612C(LightGroup* pGroup);
+void  fn_800364AC(SkinModel* pModel);
+void  fn_8003682C(SkinModel* pModel);
+void  fn_80036894(SkinDesc* pDesc);
+void  fn_800368FC(SkinDesc* pDesc);
+void  fn_80037574(BonePose* pBones, s32 nBones);
 void  fn_80037D5C(SkinDesc* pDesc);
 
 // ---- sweep code (tidied) ----
@@ -379,6 +395,132 @@ s32 fn_80037708(Skin* pSkin) {
 }
 
 // ---- end of sweep code ----
+
+// Byte-swaps the model's bone poses.
+void fn_80037574(BonePose* pBones, s32 nBones) {
+    u8* pSrc;
+
+    pSrc = (u8*)pBones;
+    fn_80076158(&pSrc, (u8*)pBones, nBones * sizeof(BonePose), 4);
+}
+
+// Allocates what a skin needs once loaded (bit 2 of u10D4; 0 if it already was): the matrices,
+// the two bit arrays and, with a description, its morph memory. b: also calls fn_800CE164.
+s32 fn_800375AC(Skin* pSkin, u8 b) {
+    SkinModel* pModel;
+    SkinDesc* pDesc;
+    s32 nSize;
+
+    if (pSkin->u10D4 & 2) {
+        return 0;
+    }
+    pModel = pSkin->pModel;
+    pDesc = pModel->pDesc;
+    pSkin->p108C = fn_80009B34(pModel->n50 * sizeof(*pSkin->p108C), 2, 0x80, "Skin.c", 0x500);
+    pSkin->p10CC = fn_80009B34((pModel->n50 + 31) / 32 * 4, 2, 0, "Skin.c", 0x50C);
+    pSkin->p10D0 = fn_80009B34((pModel->n40 + 31) / 32 * 4, 2, 0, "Skin.c", 0x50D);
+    fn_8001E938(pSkin->p10CC, pModel->n50);
+    fn_8001E938(pSkin->p10D0, pModel->n40);
+    if (pDesc != NULL) {
+        fn_800CD700(pSkin);
+        nSize = fn_8011CDE8(pSkin);
+        if (nSize != 0) {
+            pSkin->a1098[0] = fn_801128C8(pModel->pDesc, nSize);
+        }
+        pSkin->a10A0[0] = fn_80112A10(pModel->pDesc, 0);
+        pSkin->u10D4 = 1;
+        if (b) {
+            ((void (*)(Skin*))fn_800CE164)(pSkin);  // port: EA passes an argument fn_800CE164 ignores
+        }
+    }
+    fn_8011CE58(pSkin);
+    pSkin->u10D4 = pSkin->u10D4 | 2;
+    return 1;
+}
+
+// Makes a skin from its file: copies the model (and its description) into memory of its own,
+// byte-swapping the file first if that has not been done, and starts the pose at the model's.
+// b picks the allocation mode (1 instead of 2).
+Skin* fn_800377FC(u8* pData, u8 b) {
+    SkinModel* pModel;
+    Skin* pSkin;
+    SkinDesc* pDesc;
+    BonePose* pBones;
+    s32 nDescSize;
+    s32 nSize;
+    u8 bSwap;
+    int i;
+    u8 bOld;
+
+    bOld = fn_800CEE90();
+    fn_800CEE88(1);
+    pSkin = fn_80009B34(sizeof(Skin), 2, 0x80, "Skin.c", 0x5C4);
+    memset(pSkin, 0, sizeof(Skin));
+    pModel = (SkinModel*)pData;     // the file's model, then the copy
+    if ((((SkinModel*)pData)->u30 & 0x40000002) != 0x40000002) {
+        fn_8003682C((SkinModel*)pData);
+        bSwap = 1;
+        ((SkinModel*)pData)->u30 = ((SkinModel*)pData)->u30 | 0x40000000 | 2;
+    } else {
+        bSwap = 0;
+    }
+    if (pModel->n00 == 4) {
+        pDesc = pModel->pDesc;
+        if (pDesc != NULL) {
+            pDesc = (SkinDesc*)((u8*)pModel + (uptr)pDesc);
+        }
+        if (bSwap) {
+            fn_80036894(pDesc);
+        }
+        nDescSize = (pDesc != NULL) ? pDesc->n08 : 0;
+        nSize = pModel->n08 - nDescSize;
+    } else {
+        nSize = sizeof(SkinModel);
+        nDescSize = 0;
+    }
+    if (b) {
+        pSkin->pModel = fn_80009B34(nSize, 1, 0x80, "Skin.c", 0x5EF);
+    } else {
+        pSkin->pModel = fn_80009B34(nSize, 2, 0x80, "Skin.c", 0x5F3);
+    }
+    memcpy(pSkin->pModel, pModel, nSize);
+    pModel = pSkin->pModel;
+    fn_800364AC(pModel);
+    pModel->n08 = nSize;
+    if (nDescSize != 0) {
+        if (b) {
+            pModel->pDesc = fn_80009B34(nDescSize, 1, 0x80, "Skin.c", 0x604);
+        } else {
+            pModel->pDesc = fn_80009B34(nDescSize, 2, 0x80, "Skin.c", 0x608);
+        }
+        memcpy(pModel->pDesc, pDesc, nDescSize);
+        fn_800CEF04(pModel->pDesc);
+        fn_800368FC(pModel->pDesc);
+    } else {
+        pModel->pDesc = NULL;
+    }
+    pDesc = pModel->pDesc;
+    pSkin->b1044 = 0;
+    pBones = pModel->p34;
+    fn_80037574(pBones, pModel->n14);
+    fn_8001E8A4(pSkin->pose.a0, 0x80);
+    fn_8001E8A4(pSkin->pose.a10, 0x80);
+    fn_8001E8A4(pSkin->pose.a20, 0x80);
+    fn_8001E8A4(pSkin->pose.a30, 0x80);
+    for (i = 0; i < pModel->n14; i++) {
+        fn_8001E85C(pBones[i].q0, pSkin->pose.aBones[i].q0);
+        fn_8001E85C(pBones[i].v10, pSkin->pose.aBones[i].v10);
+    }
+    pSkin->p1088 = fn_80009B34(pModel->n14 * sizeof(*pSkin->p1088), 2, 0x80, "Skin.c", 0x62A);
+    if (pDesc != NULL) {
+        fn_801127A0(pDesc);
+    }
+    fn_800CD404(pSkin);
+    fn_8011C9B0(pSkin);
+    fn_800CEE88(bOld);
+    fn_800375AC(pSkin, 0);
+    return pSkin;
+}
 
 // ---- sweep code (tidied) ----
 
