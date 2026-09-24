@@ -277,6 +277,47 @@ void fn_80017864(Character* pChar, SkelPose* pPose) {
     }
 }
 
+// The ground height at pPos (looked for from 0.055 above it), with *ppNormal pointed at that
+// ground's normal; -65536.125 for none, and for surface classes 0xC and 0x12. Of the two heights
+// around the point the high one is taken when it is the only one, or the low one is on class 7 or
+// 0x13, or the two are less than 0.05 apart, or it is below 1 over the point.
+f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNormal) {
+    f32 vPos[4];
+    f32 fLow;
+    f32 fHigh;
+    SurfaceType* pLowSurface;
+    SurfaceType* pHighSurface;
+    CourseInfo* pCourse;
+
+    if (pChar != NULL) {
+        if ((pCourse = fn_8000C594()) != NULL) {
+            Vec_Copy(pPos, vPos);
+            vPos[1] += 0.055f;
+            Ter_GetEnclosingGroundData(pCourse, vPos, &fLow, &pLowSurface, lbl_801B95D8, &fHigh,
+                                       &pHighSurface, lbl_801B95C8);
+            if (fHigh >= -60000.0f) {
+                if (fLow < -60000.0f || pLowSurface->nClass == 7 || pLowSurface->nClass == 0x13 ||
+                    fHigh - fLow < 0.05f || fHigh < 1.0f + pPos[1]) {
+                    if (pHighSurface->nClass == 0xC || pHighSurface->nClass == 0x12) {
+                        return -65536.125f;
+                    }
+                    *ppNormal = lbl_801B95C8;
+                    return fHigh;
+                }
+            } else if (fLow < -60000.0f) {
+                return -65536.125f;
+            }
+            if (pLowSurface->nClass == 0xC || pLowSurface->nClass == 0x12) {
+                return -65536.125f;
+            }
+            *ppNormal = lbl_801B95D8;
+            return fLow;
+        }
+        return -65536.125f;
+    }
+    return -65536.125f;
+}
+
 // Keeps the club out of the ground: when point 4 is below the terrain and bone 0x52's y axis
 // points into the slope, that axis is shortened by how far the point is under, measured against
 // the club class's head height (not below 3/4 of it).

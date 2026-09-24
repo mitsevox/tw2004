@@ -384,6 +384,8 @@ typedef struct CharPool {
 } CharPool;
 LAYOUT_ASSERT(CharPool, 0x3C);
 
+extern f32        lbl_801B95C8[4];      // } the two ground normals Character_GetTerrainHeightAndNormal
+extern f32        lbl_801B95D8[4];      // } reads (the pNormalHigh / pNormalLow of Ter_GetEnclosingGroundData)
 extern CharPool   lbl_801B95E8;
 extern Character* lbl_801B9624[5];     // the characters made so far (fn_8001C21C)
 extern s32        lbl_80281CA8;         // how many
