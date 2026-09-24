@@ -19,7 +19,7 @@ s32  OSResetSystem(s32, s32, s32);
 void fn_8006C6F0(void);
 void fn_8006C720(void);
 void fn_8006C770(void);
-void fn_8006C9EC(void);
+void GO_vInitFE(void);
 void fn_8006CB2C(void);
 void fn_8006CDC4(void);
 void fn_8006CEFC(void);
@@ -99,7 +99,7 @@ void fn_800083A4(void) {
             }
             break;
         case 10:
-            fn_8006C9EC();
+            GO_vInitFE();
             gSession.nGameType = 3;
             break;
         case 3:

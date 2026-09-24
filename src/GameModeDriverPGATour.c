@@ -635,7 +635,7 @@ u8 GameModeDriverPGATour_GoToPlayoff(u8 bCheck) {
         fn_800E1260(0);
         fn_800E1404(lbl_80282340);
         gpGame->bD4 = 1;
-        fn_800E45C0();
+        GUI_GolfersTiedUIMessage();
     }
     return bPlayoff;
 }

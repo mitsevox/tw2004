@@ -260,7 +260,7 @@ void GM_EndOfGolferTurn_GameFinished(int nPlayer) {
         }
         GOLFERSTATE_Set(GS_WAIT, nPlayer);
         nView = gPlayers[nPlayer].nView[0];
-        View_SetCamera(fn_80017028(nView), 0x11, nPlayer, nView);
+        CameraController_SetCameraMode(fn_80017028(nView), 0x11, nPlayer, nView);
         return;
     }
     gSession.b12 = 1;
@@ -279,7 +279,7 @@ void GM_HoleFinished_GameNotFinished(int nPlayer) {
     }
     GOLFERSTATE_Set(GS_WAIT, nPlayer);
     nView = gPlayers[nPlayer].nView[0];
-    View_SetCamera(fn_80017028(nView), 0x11, nPlayer, nView);
+    CameraController_SetCameraMode(fn_80017028(nView), 0x11, nPlayer, nView);
     fn_800E3D90();
 }
 
@@ -569,11 +569,11 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     return 1;
 }
 
-// Whether to play the pre-shot routine (our reading; TW06's name for this one is not certain).
+// Whether to play the pre-shot animation.
 // The mode's setting 0x290: 0 never, 1 always; otherwise always off the tee, never with clubs 0-8
 // (the drivers and woods) from elsewhere, never with an obstruction nearby, else 85% of the time.
 // On course 18, hole 10, not within 40 yards of the tee.
-int fn_800DDFB4(int nPlayer) {
+int GM_DoPreshotAnimation(int nPlayer) {
     f32 v[4];
     if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
         return gPlayers[nPlayer].ball.nLie == 0;
@@ -982,7 +982,7 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
         fn_80062B78(nPlayer);
         fn_80062B74(nPlayer);
         fn_80062B70();
-        fn_80063BF4(pView, lbl_80281F78->f170, vOffset);
+        CameraController_FadeOut(pView, lbl_80281F78->f170, vOffset);
         return;
     }
     if (Player_IsNotCPU(nPlayer) && gSession.nSplitScreen == 0) {
@@ -1161,7 +1161,7 @@ void GM_SimulateBallMovement(int nPlayer) {
 }
 
 // TW06: GM_CheckControllerPulled (by position). When the mode's pfn234 says yes and player
-// 0's view is not on camera 1, 2 or 4, calls fn_800E5228 (an empty function).
+// 0's view is not in colour fade state 1, 2 or 4, calls fn_800E5228 (an empty function).
 void fn_800DFC18(void) {
     if (gpGame->pfn234()) {
         if (!fn_80063C90(fn_80017028(gPlayers[0].nView[0]))) {

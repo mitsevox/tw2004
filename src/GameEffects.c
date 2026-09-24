@@ -547,9 +547,9 @@ void fn_800DC290(f32 fHeight) {
     fn_80012EF8();
 }
 
-// TW06: GameEffects_FieldOfViewChange (by position). The letterbox's field-of-view change: up to
-// 0.349 (20 degrees) over the first 0.8 seconds.
-f32 fn_800DC3A4(void) {
+// TW06: GameEffects_FieldOfViewChange (by position). The GameBreaker's field-of-view change: up to
+// 0.349 (20 degrees) over the first 0.8 seconds; 0 when none runs or it is paused.
+f32 GameEffects_FieldOfViewChange(void) {
     if (!lbl_80202898.bGameBreaker) {
         return 0.0f;
     }

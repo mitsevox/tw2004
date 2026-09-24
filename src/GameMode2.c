@@ -223,7 +223,7 @@ u8 GameModeSkins_GameFinished(u8 bCheck) {
             gPlayers[i].n2E0 = 0;
             gPlayers[i].n308 = 0;
         }
-        fn_800E45C0();
+        GUI_GolfersTiedUIMessage();
     } else {
         nLeft = 0;
         for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
@@ -289,7 +289,7 @@ u8 GameModeSkins_GoToPlayoff(u8 bCheck) {
     }
     gpGame->bD4 = 1;
     gpGame->nD8++;
-    fn_800E45C0();
+    GUI_GolfersTiedUIMessage();
     return 1;
 }
 

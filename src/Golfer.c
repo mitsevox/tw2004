@@ -1747,7 +1747,7 @@ void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int b
             p->nView[1] = 2;
             fn_8001704C(p->nView[1], nPlayer);
             nView = p->nView[1];
-            View_SetCamera(fn_80017028(nView), 0x19, nPlayer, nView);
+            CameraController_SetCameraMode(fn_80017028(nView), 0x19, nPlayer, nView);
         } else {
             p->nView[1] = 0;
             fn_8001704C(p->nView[1], nPlayer);

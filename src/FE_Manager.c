@@ -56,9 +56,9 @@ void fn_8007744C(void);
 void fn_800775BC_LoadCreatedFromSave(void);
 void fn_80077C1C(int a, int b);
 u8   FE_CrAP_IsAssetUndesirable(s16 nPart, CrAPAsset* pAsset);
-u8   fn_80078B84(CrAPAsset* pAsset);
+u8   FE_CrAP_IsCrazyHairColor(CrAPAsset* pAsset);
 u8   FE_CrAP_IsCrazyHat(CrAPAsset* pAsset);
-u8   fn_80078D24(CrAPAsset* pAsset);
+u8   FE_CrAP_IsCrazyFaceHairColor(CrAPAsset* pAsset);
 void fn_80079974(void);
 void fn_80079D30(void);
 void fn_80079DAC(void);
@@ -862,7 +862,7 @@ void fn_80078A2C(s16 nPart, int nChance) {
 
 // The asset is named one of eight bright colours (White, Bright Red, Orange, Pink, Yellow, Green,
 // Purple, Blue).
-u8 fn_80078B84(CrAPAsset* pAsset) {
+u8 FE_CrAP_IsCrazyHairColor(CrAPAsset* pAsset) {
     if (pAsset == NULL) {
         return 0;
     }
@@ -908,8 +908,8 @@ u8 FE_CrAP_IsCrazyHat(CrAPAsset* pAsset) {
     return 1;
 }
 
-// The same test as fn_80078B84.
-u8 fn_80078D24(CrAPAsset* pAsset) {
+// The same test as FE_CrAP_IsCrazyHairColor.
+u8 FE_CrAP_IsCrazyFaceHairColor(CrAPAsset* pAsset) {
     if (pAsset == NULL) {
         return 0;
     }
@@ -1018,11 +1018,11 @@ void fn_80078E34(SaveProfile* pProfile) {
     while (bPicking) {
         nPick = Misc_RandFunc(0) % nCount;
         pAsset = fn_80104E84(14, 0, nPick);
-        if (bChance && !fn_80078B84(pAsset)) {
+        if (bChance && !FE_CrAP_IsCrazyHairColor(pAsset)) {
             FE_CrAP_TurnOnPart(14, 0, nPick);
             bPicking = 0;
         }
-        if (!bChance && fn_80078B84(pAsset)) {
+        if (!bChance && FE_CrAP_IsCrazyHairColor(pAsset)) {
             FE_CrAP_TurnOnPart(14, 0, nPick);
             bPicking = 0;
         }
@@ -1038,11 +1038,11 @@ void fn_80078E34(SaveProfile* pProfile) {
         while (bPicking) {
             nPick = Misc_RandFunc(0) % nCount;
             pAsset = fn_80104E84(15, 0, nPick);
-            if (bChance && !fn_80078D24(pAsset)) {
+            if (bChance && !FE_CrAP_IsCrazyFaceHairColor(pAsset)) {
                 FE_CrAP_TurnOnPart(15, 0, nPick);
                 bPicking = 0;
             }
-            if (!bChance && fn_80078D24(pAsset)) {
+            if (!bChance && FE_CrAP_IsCrazyFaceHairColor(pAsset)) {
                 FE_CrAP_TurnOnPart(15, 0, nPick);
                 bPicking = 0;
             }

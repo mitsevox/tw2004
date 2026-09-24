@@ -306,7 +306,7 @@ void fn_8006C7A8(void);
 void fn_8006C854(void);
 void fn_8006C8EC(int nView);
 void fn_8006C968(void);
-void fn_8006C9EC(void);
+void GO_vInitFE(void);
 void fn_8006CB2C(void);
 void GO_vInitIG(void);
 void fn_8006CDC4(void);
@@ -523,7 +523,7 @@ void fn_8006C968(void) {
 }
 
 // Starts the front end (game type 3).
-void fn_8006C9EC(void) {
+void GO_vInitFE(void) {
     int nView;
 
     fn_8006C7A8();
@@ -554,7 +554,7 @@ void fn_8006C9EC(void) {
     fn_800146C4();
     Player_SetGolfer(0, 0, 0, 0, 0);
     nView = gPlayers[0].nView[0];
-    View_SetCamera(fn_80017028(nView), 0x17, 0, nView);
+    CameraController_SetCameraMode(fn_80017028(nView), 0x17, 0, nView);
     fn_8005D3A8(0);
     GOLFERSTATE_Set(0, 0);
     fn_800A4E34();
@@ -753,7 +753,7 @@ void fn_8006CEFC(void) {
     fn_8006DCA8(0, 0, 0, 4);
     fn_80037DD8();
     nView = gPlayers[0].nView[0];
-    View_SetCamera(fn_80017028(nView), 0x19, 0, nView);
+    CameraController_SetCameraMode(fn_80017028(nView), 0x19, 0, nView);
     fn_8010F748();
     fn_8010FF9C();
 }
