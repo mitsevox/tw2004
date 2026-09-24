@@ -1093,7 +1093,7 @@ config.libs = [
             Object(NonMatching, "uiText.c"),
             Object(NonMatching, "hlaudtrack.c"),
             Object(NonMatching, "hlaudtrackseq.c"),
-            Object(NonMatching, "hlaudemitter.c"),
+            Object(Matching, "hlaudemitter.c"),
             Object(Matching, "AudReverb.c"),
             Object(Matching, "unsorted/sweep_8013B3C4.c"),
             Object(Matching, "unsorted/sweep_8014CA80.c"),

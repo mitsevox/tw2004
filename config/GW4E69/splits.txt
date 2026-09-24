@@ -538,6 +538,7 @@ hlaudvoice.c:
 
 hlaudemitter.c:
 	.text       start:0x800ACECC end:0x800ADE70
+	.sdata2     start:0x80284008 end:0x80284018
 
 UAudContainers.c:
 	.text       start:0x800ADE70 end:0x800AE1F8
