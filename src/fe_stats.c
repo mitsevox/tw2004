@@ -6,6 +6,27 @@
 #include "frontend/fe.h"
 #include "game/modes/pgatoursim.h"
 
+char* lbl_8019439C[FE_STATS_NUM_CATEGORIES] = {
+    "Season Money Leaders", "Career Money Leaders", "All-Around Ranking", "Total Rounds",
+    "Scoring Average", "Total Driving", "Longest Drive", "Driving Distance", "Driving Accuracy",
+    "Ball Striking", "Greens In Regulation (GIR)", "Putts Per Round", "Putting Average",
+    "Sand Save %", "Scrambling", "Bounce Back", "Consecutive Cuts Made", "Total Eagles",
+    "Holes Per Eagle", "Total Birdies", "Birdie Average", "Par 3 Birdie Leaders",
+    "Par 4 Birdie Leaders", "Par 5 Birdie Leaders", "Birdie Conversion", "Par Breakers",
+    "Par 3 Performance", "Par 4 Performance", "Par 5 Performance",
+};
+s32 lbl_80194410[FE_STATS_NUM_CATEGORIES] = {
+    24, 25, 28, 26, 14, 29, 19, 0, 1, 30, 2, 3, 4, 5, 6, 7, 23, 21, 8, 22, 9, 10, 11, 12, 13, 15,
+    16, 17, 18,
+};
+StatsUnits lbl_80194484[FE_STATS_NUM_CATEGORIES] = {
+    UNITS_MONEY, UNITS_MONEY, UNITS_NONE, UNITS_NONE, UNITS_NONE, UNITS_NONE, UNITS_YARDS,
+    UNITS_YARDS, UNITS_PERCENT, UNITS_NONE, UNITS_PERCENT, UNITS_NONE, UNITS_NONE, UNITS_PERCENT,
+    UNITS_PERCENT, UNITS_PERCENT, UNITS_NONE, UNITS_NONE, UNITS_NONE, UNITS_NONE, UNITS_NONE,
+    UNITS_NONE, UNITS_NONE, UNITS_NONE, UNITS_PERCENT, UNITS_PERCENT, UNITS_NONE, UNITS_NONE,
+    UNITS_NONE,
+};
+
 // Prints a statistic's value text with its units: "$1,234,567", "301.2 yds", "65.2%".
 void PrintStatsWithUnits(const char* szValue, StatsUnits eUnits, char* szOut) {
     char szMoney[128];

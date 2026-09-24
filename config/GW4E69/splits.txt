@@ -1001,6 +1001,7 @@ SkinMorph.c:
 
 fe_stats.c:
 	.text       start:0x8011CEB0 end:0x8011D280
+	.data       start:0x80194180 end:0x801944F8
 	.sdata      start:0x80281888 end:0x802818A8
 
 EventInfo.c:
