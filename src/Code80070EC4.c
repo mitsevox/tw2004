@@ -71,7 +71,7 @@ void fn_80071028(StaticShaderObject* pObj) {
     MorphAnim* pAnim = &pObj->anim;
     int nEvery = (gSession.nSplitScreen != 0) + 2;
 
-    if (pObj->anim.b8 != 0) {
+    if (pAnim->b8 != 0) {
         GXSetArray(9, pObj->pArrays->apPos[0], 12);
     }
     if (fn_80097688() != 0 && (u32)gSession.nFrameCount % nEvery == pAnim->nIndex % nEvery &&

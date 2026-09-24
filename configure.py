@@ -1053,7 +1053,7 @@ config.libs = [
             Object(Matching, "unsorted/sweep_80045EC0.c"),
             Object(Matching, "fe_craputils.c"),
             Object(NonMatching, "DynamicRenderingBuffer.c"),
-            Object(NonMatching, "Code80070EC4.c"),
+            Object(Matching, "Code80070EC4.c"),
             Object(Matching, "unsorted/sweep_80097E98.c"),
             Object(Matching, "Code8009A928.c"),
             Object(NonMatching, "hlaudvoice.c"),
