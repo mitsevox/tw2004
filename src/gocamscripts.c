@@ -546,6 +546,91 @@ void fn_8004255C(f32* pPos, f32* pTarget, f32 fUp, f32 fSide) {
     pPos[2] += fSide * vDir[0];
 }
 
+// Moves the script on to pShot (its next shot): the next shot's positions become the current
+// ones, pShot's follow-on (p40) the next shot, with its length and kind (the new shot's own when
+// its bAD is 0). Unless the move is a blend (bCC), the landing estimate is refreshed and the script
+// runs one frame at once. Kinds 6, 8, 9 and 10 are dropped outside golfer states 10 and 11.
+void CameraScript_GoToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pCam, f32* pSub,
+                                CamShot* pSaved) {
+    s32 nOldA0 = pScript->pShot->nA0;
+
+    if (pScript->pShot->bAD == 0) {
+        pScript->fCamTime -= pScript->f8C;
+    } else {
+        pScript->f88 = lbl_80281F78->f15C;
+        pScript->fCamTime = 0.0f;
+    }
+    if (pScript->pNextShot->bAC == 0) {
+        if (pScript->nBC != 5) {
+            pScript->bCD = 0;
+        } else {
+            pScript->bCD = 1;
+        }
+    } else {
+        pScript->bCD = 0;
+    }
+    if (pScript->nBC != 5 && (pScript->nBC != 4 || pShot->bAB == 4)) {
+        pScript->bCC = 1;
+    } else {
+        pScript->fDC = PI;
+    }
+    pScript->pShot = pShot;
+    pScript->pNextShot = pScript->pShot->p40;
+    if (pScript->pNextShot != NULL) {
+        if (pScript->pShot->bAD == 0) {
+            pScript->f8C = pScript->pShot->f48;
+            pScript->nBC = pScript->pShot->bAB;
+        } else {
+            pScript->f8C = pScript->pNextShot->f48;
+            pScript->nBC = pScript->pNextShot->bAB;
+        }
+    } else {
+        pScript->nBC = 5;
+    }
+    Vec3Copy(pScript->v10, pScript->v0);
+    Vec3Copy(&pScript->a20[4], pScript->a20);
+    if (pScript->pShot->bAF == 16 && pScript->bCC == 0) {
+        Vec3Copy(gPlayers[nPlayer].ball.vPos, pScript->v0);
+    }
+    if (pScript->pNextShot != NULL && pScript->pShot->bB0 == 16) {
+        Vec3Copy(gPlayers[nPlayer].ball.vPos, pScript->v10);
+    }
+    if (pScript->bCC == 0) {
+        CameraScript_UpdateLandingEstimate(pScript, nPlayer);
+        fn_8003DCE8(nPlayer, pCam, pSub, pScript, pSaved, 0, 0.0f);
+        pScript->fCamTime += 0.001f;
+        pScript->f88 += 0.001f;
+        pScript->f98 = 0.0f;
+    }
+    pScript->bCE = 1;
+    if ((pScript->nBC == 6 || pScript->nBC == 8 || pScript->nBC == 9 || pScript->nBC == 10)
+        && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 10
+        && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 11) {   // fake match: see game.h
+        pScript->nBC = 5;
+        pScript->pNextShot = NULL;
+    }
+    if (gSession.nSplitScreen == 0 && pScript->pShot != NULL && nOldA0 != pScript->pShot->nA0) {
+        if (pScript->pShot->nA0 == 0) {
+            fn_80045558(0, nPlayer);
+            fn_80045494(1, nPlayer);
+        } else if (pScript->pShot->nA0 == 2) {
+            fn_80045558(1, nPlayer);
+            fn_80045494(0, nPlayer);
+        } else {
+            fn_80045558(0, nPlayer);
+            fn_80045494(0, nPlayer);
+        }
+        if (pScript->pShot->nA0 == 3) {
+            fn_800C7140(1);
+        } else {
+            fn_800C7140(0);
+        }
+    }
+    if (pScript->bCC == 0) {
+        pScript->fEC = GameEffects_BallUpdatesThisFrame(nPlayer);
+    }
+}
+
 // Starts pShot on the script. Blend kind nA 4 (the swing camera's cut) takes it outright unless
 // the current shot is a kind-3 shot that is not the default swing camera; a blend with time f1
 // makes pShot the next shot (first recording the current camera into pB4 when both shots are
