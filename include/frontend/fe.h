@@ -414,6 +414,7 @@ extern s32 lbl_80281FFC;                // set by fn_80084FF0: the lbl_8018C7D8 
 
 // ---- the golfers animated on menu screens (FEgolferanim.c) ------------------------------------
 
+void fn_8008B044(int nGolfer, int a, int b);    // show golfer nGolfer
 void fn_8008B760(void);
 u8   fn_8008B978(u8 bPaused);           // pause the menus' state machine (or not); the old setting
 int  fn_8008B990(void);

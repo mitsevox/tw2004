@@ -2180,6 +2180,33 @@ void fn_8007D7E4(MsgArg* pArgs, MsgArg* pResult) {
     fn_800A75B4();
 }
 
+// Show golfer pArgs[0] (fn_8008B044), then give the profile's player (unless it is player 0) the
+// first n0 (0..3) that no player up to and including it with the same golfer model has.
+void fn_8007D810(MsgArg* pArgs, MsgArg* pResult) {
+    u8 abFree[4] = {1, 1, 1, 1};
+    int i;
+    u32 n;
+    GolferRecord* pMine;
+    GolferRecord* pOther;
+
+    fn_80077ACC();
+    fn_8008B044(pArgs[0].i, pArgs[1].i, pArgs[2].i);
+    for (i = 0; i <= lbl_80281ED4->nSlot; i++) {
+        pMine = fn_80077A80(gSession.nGolfer[lbl_80281ED4->nSlot]);
+        pOther = fn_80077A80(gSession.nGolfer[i]);
+        if (pMine->nModelID == pOther->nModelID) {
+            abFree[gSession.aProfile[i].n0] = 0;
+        }
+    }
+    for (n = 0; n < 4; n++) {
+        if (abFree[n] && lbl_80281ED4->nSlot > 0) {
+            gSession.aProfile[lbl_80281ED4->nSlot].n0 = n;
+            break;
+        }
+    }
+    Session_SetupProfiles();
+}
+
 void fn_8007D924(MsgArg* pArgs, MsgArg* pResult) {
     gSession.nSplitScreen = pArgs[0].i;
 }
