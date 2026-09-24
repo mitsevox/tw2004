@@ -1201,8 +1201,8 @@ void fn_80014BB4(void) {
 void fn_80014C9C(void) {
     char szName[0x80];  // size unknown: the frame allows up to 0x8C bytes
     u32 nSlot;
-    LibSlot* pSlot;
     int nPlayer;
+    LibSlot* pSlot;
     int nModel;
     int i;
 
