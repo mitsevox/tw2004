@@ -50,15 +50,8 @@ extern f32 lbl_80191AA4[70];
 
 
 void  fn_800D344C(UStreamObject* pObject);
-int   fn_800584DC(int nProfile);
 int   fn_801020C0(void);
 int   fn_801021FC(void);                                // GameMode4: the current ladder event
-void  fn_800583B0(int nProfile, int nCourse);           // unlock a course (aCourseUnlocked)
-u8    fn_800583FC(int nProfile, int nCourse);           // whether a course is unlocked
-void  fn_8005844C(int nProfile);                        // the same for aCourseUnlocked[21]
-u8    fn_8005846C(int nProfile);
-void  fn_80058494(int nProfile);                        // and for aCourseUnlocked[22]
-u8    fn_800584B4(int nProfile);
 f32   fn_800D04AC(int nPlayer);                         // HoleScore.c
 u32   fn_800D0BAC(int nPlayer);                         // the class of the ground the shot left
 u8    fn_800D0BF8(int nPlayer, u8 bUnder, u8 bAnyLie);

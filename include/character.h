@@ -972,6 +972,7 @@ s32  AnimLib_MergeOverlay(u8* pData, int nSlot);   // skalib.c; char.c's 'SAC ' 
 void  AnimLib_FreeWorkCopies(void);
 void  AnimLib_ReloadSlot(void);
 void* AnimLib_FindByName(AnimLib* pLib, const char* pName);   // a clip by name (NULL: none)
+AnimLib* fn_80026AC0(Character* pChar);  // skalib.c: the overlay library loaded for the character (slots 0 and 1)
 
 // Swing.c
 f32   fn_8005CB78(Character* pChar, u64 uEvent);    // the time of an animation event
