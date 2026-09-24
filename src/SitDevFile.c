@@ -202,7 +202,6 @@ void fn_800BB52C(void) {
     u32 i;
     SitDevEntry8* pEntry8;
     u16 uRaw;
-    u32 j;
     if (lbl_80282208->nEntries != 0) {
         pSrc = lbl_80282208->p14;
         pDst = lbl_80282208->p14;
@@ -214,7 +213,10 @@ void fn_800BB52C(void) {
         fn_8001F08C(&pSrc, &pDst, lbl_801911E8, 5, lbl_80282208->n04);
     }
     if (lbl_80282208->n08 != 0) {
-        pSrc = lbl_80282208->p1C;
+        // fake match: pEntry8 carries the source pointer here (permuter find): it gives the i / pEntry8
+        // registers of the second loop below
+        pEntry8 = lbl_80282208->p1C;
+        pSrc = pEntry8;
         pDst = lbl_80282208->p1C;
         fn_8001F08C(&pSrc, &pDst, lbl_80191210, 4, lbl_80282208->n08);
     }
@@ -231,11 +233,11 @@ void fn_800BB52C(void) {
         pEntry->b2.s.n11 = uRaw & 0x7FF;
         lbl_80282208->p14[i].b2.s.n5 = (uRaw >> 11) & 0x1F;
     }
-    for (j = 0; j < lbl_80282208->n08; j++) {
-        pEntry8 = &lbl_80282208->p1C[j];
+    for (i = 0; i < lbl_80282208->n08; i++) {
+        pEntry8 = &lbl_80282208->p1C[i];
         uRaw = pEntry8->b2.uRaw;
         pEntry8->b2.s.n11 = uRaw & 0x7FF;
-        lbl_80282208->p1C[j].b2.s.n5 = (uRaw >> 11) & 0x1F;
+        lbl_80282208->p1C[i].b2.s.n5 = (uRaw >> 11) & 0x1F;
     }
 }
 
