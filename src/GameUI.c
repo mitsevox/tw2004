@@ -68,7 +68,7 @@ u8  lbl_80282282;
 u8  lbl_80282281;
 u8  lbl_80282280;
 
-// Clears every display flag and timer at the start of a round.
+// Clears every display flag and queue at the start of a hole (and when it restarts).
 void fn_800E3B28(void) {
     lbl_802822DF = 0;
     lbl_802822DC[0] = 0;
@@ -209,7 +209,8 @@ void fn_800E3E0C(void) {
     fn_8006A8B0();
 }
 
-// Pauses the game (gSession.nPaused): the pause menu, sounds held, the HUD's pause flag.
+// Pauses the game once (gSession.nPaused and the flag fn_800E415C returns): rumble off, message
+// 0x23 with 0, watch 1 stopped, a GameBreaker paused, EASBio play state 0.
 void fn_800E3E3C(void) {
     if (gSession.nPaused == 0) {
         fn_800E5714(4);
@@ -233,9 +234,10 @@ void fn_800E3ECC(void) {
     lbl_80282281 = 0;
 }
 
-// Unpauses, and finishes whatever the pause was covering: the end-of-hole screen (the hole is
-// marked done) or the end-of-round screen (the mode is told; mode 12 replays the same hole,
-// otherwise the next selected hole, and every ball goes back on the tee lie).
+// Unpauses, and finishes whatever the pause was covering: the end-of-round screen (gSession.b12
+// ends the round) or the end-of-hole screen (the mode is told; mode 12 clears the hole's scores,
+// then it or bD4/b134 ask for a hole load (fn_8006F4B4), otherwise the next selected hole; every
+// ball goes back on the tee lie).
 void fn_800E3EE0(void) {
     int i;
     int j;
@@ -329,8 +331,8 @@ void fn_800E4238(int i) {
     lbl_802822DB = 0;
 }
 
-// Whether a message or screen still holds a player: the message flag, two other screens, or the
-// player's own screen slot (slot 0 outside split screen).
+// Whether a message or screen still holds a player: the message flag, mode 26 or 22 while its
+// state is not 5 with a count left, or the player's own slot (slot 0 outside split screen).
 u8 fn_800E4254(int nPlayer) {
     if (lbl_802822DB) {
         return 1;
@@ -416,7 +418,7 @@ void fn_800E45C0(void) {
     lbl_802822A4 = 14;
 }
 
-// Whether any of the display timers or flags is still running.
+// Whether anything waits: a queued item (not queue 5), the pending message or a deferred screen.
 u8 fn_800E45CC(void) {
     if (lbl_802822B8 != 0 || lbl_802822B4 != 0 || lbl_802822B0 != 0 || lbl_802822AC != 0 ||
         lbl_802822A8 != 0 || lbl_802822A4 != 0 || lbl_802822C3 != 0 || lbl_802822C4 != 0 ||
@@ -428,9 +430,10 @@ u8 fn_800E45CC(void) {
     return 0;
 }
 
-// The display pump, every frame: while a screen slot is up nothing else runs; otherwise pending
-// screens and messages go first, then the newest item of the first non-empty queue goes to that
-// queue's handler. Returns nonzero while anything is still showing.
+// The display pump, every frame. With no screen slot up, queued items only raise message 16 and
+// the pending message and deferred screens go up one at a time; with a slot up, the newest item
+// of the first non-empty queue goes to that queue's handler (queue 5 is never taken). Returns
+// nonzero while anything is still showing.
 //
 // Two copy-and-paste slips in the original are kept: queue 4 reads its item's second and third
 // values with queue 3's count (always 0 here, so from the entry before the queue), and queue 8
@@ -556,8 +559,9 @@ u8 fn_800E4BF8(void) {
     return b;
 }
 
-// The end-of-round screen: if something is still on screen it is queued (for the human or the
-// CPU side); otherwise it opens, with effects reset and event 0x41 for a human.
+// The end-of-hole screen (message 14, kind 1): while a screen slot is up or anything is queued it
+// waits for fn_800E46B4; otherwise sound off (not in mode 7), next hole pending, effects reset,
+// and event 0x41 when bHuman.
 void fn_800E4C20(u8 bHuman) {
     if (lbl_802822DC[0] || lbl_802822DC[1] || lbl_802822DC[2] || lbl_802822B8 != 0 || lbl_802822B4 != 0 ||
         lbl_802822B0 != 0 || lbl_802822AC != 0 || lbl_802822A8 != 0 || lbl_802822A4 != 0 ||
@@ -588,8 +592,8 @@ void fn_800E4D88(void) {
     lbl_80282281 = 1;
 }
 
-// The end-of-hole screen, as fn_800E4C20 does the end-of-round one; in the side-by-side modes
-// 22 and 26 both players' cameras are moved first.
+// The end-of-round screen (message 14, kind 2), as fn_800E4C20 does the end-of-hole one; in
+// modes 22 and 26 in split screen both players' cameras are moved first.
 void fn_800E4D94(u8 bHuman) {
     if (lbl_802822DC[0] || lbl_802822DC[1] || lbl_802822DC[2] || lbl_802822B8 != 0 || lbl_802822B4 != 0 ||
         lbl_802822B0 != 0 || lbl_802822AC != 0 || lbl_802822A8 != 0 || lbl_802822A4 != 0 ||

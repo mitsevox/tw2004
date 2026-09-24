@@ -161,9 +161,9 @@ typedef struct HoleData {
     s32  n0C;                   // 0x0C  tee 2
     s32  n10;                   // 0x10  tee 1
     s32  n14;                   // 0x14  tee 0
-    s32  nWindDir;              // 0x18  (Hole_WindDir)
+    s32  nWindDir;              // 0x18  (fn_800D2CB0_HoleWindDir)
     u8   unk1C[0x2C - 0x1C];
-    f32  fWindSpeed;            // 0x2C  (Hole_WindSpeed)
+    f32  fWindSpeed;            // 0x2C  (fn_800D2CF8_HoleWindSpeed)
     u8   unk30[4];
     u8   b34;                   // 0x34
     u8   b35;                   // 0x35
@@ -197,10 +197,10 @@ extern BuiltRound lbl_801FA1F8[NUM_BUILT_ROUNDS];    // 0x801FA1F8
 extern CourseData lbl_801FA2F4[NUM_COURSE_DATA];     // 0x801FA2F4
 
 void fn_800D29E8(void);
-int  Hole_WindDir(void);
-f32  Hole_WindSpeed(void);
+int  fn_800D2CB0_HoleWindDir(void);
+f32  fn_800D2CF8_HoleWindSpeed(void);
 s32  fn_800D2F00(int nCourse, int nTeeSet);    // a course's par from a tee set
-s32  fn_800D2FB4(s32 nTeeSet);          // the course's par (the tee set is not used)
+s32  fn_800D2FB4(s32 nTeeSet);          // the par of the round's 18 holes (the tee set is not used)
 u8   fn_800D3080(int nHole);
 int  fn_800D3118(int nRound, int nHole);    // a built round's course for a hole
 int  fn_800D315C(int nRound, int nHole);    // and its hole number (1-based)
@@ -441,12 +441,12 @@ u8   fn_800E4254(int nPlayer);          // whether a message or screen still hol
 u8   fn_800E430C(int nPlayer);
 void fn_800E4364(u32 nQueue, int a, int b, int c);    // add an item to a display queue
 void fn_800E45C0(void);
-u8   fn_800E45CC(void);                 // whether any display timer or flag is still running
+u8   fn_800E45CC(void);                 // whether a queued item, message or deferred screen waits
 u8   fn_800E46B4(void);                 // the display pump; nonzero while anything is showing
 u8   fn_800E4BF8(void);
-void fn_800E4C20(u8 bHuman);            // the end-of-round screen
+void fn_800E4C20(u8 bHuman);            // opens the end-of-hole screen, or defers it
 void fn_800E4D88(void);
-void fn_800E4D94(u8 bHuman);            // the end-of-hole screen
+void fn_800E4D94(u8 bHuman);            // opens the end-of-round screen, or defers it
 void fn_800E4F88(int nPlayer);
 void fn_800E5240(int i);                // GameMessages.c: clears slot i of lbl_80202B88
 
@@ -477,8 +477,8 @@ extern u8          lbl_80202B88[9];             // the menu screens still open (
 extern u8          lbl_80203138[14];            // the tips already shown (GameMessages.c, GameAnalysis.c)
 
 extern u8  lbl_80282280;
-extern u8  lbl_80282281;                    // the end-of-round screen is up
-extern u8  lbl_80282282;                    // the end-of-hole screen is up
+extern u8  lbl_80282281;                    // a next hole is pending (end-of-hole screen)
+extern u8  lbl_80282282;                    // the round's end is pending (end-of-round screen)
 extern s32 lbl_80282284;
 extern s32 lbl_80282288;
 extern s32 lbl_8028228C;
