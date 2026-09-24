@@ -1478,8 +1478,8 @@ void fn_80041EA8(int nPlayer, f32* pOut, f32* pCam, CamShot* pShot, CamScript* p
             fn_80045428(vAim, pCam, vDir);
             fBase = pCam[1];
             if (pScript->pShot != NULL) {
-                fBase = pCam[1] - pScript->pShot->f68;
                 fDrop = vDir[1] + pScript->pShot->f68;
+                fBase = pCam[1] - pScript->pShot->f68;
             }
             vDir[1] = 0.0f;
             fLen = fn_80009680(fn_80009744(vDir));
@@ -1498,7 +1498,8 @@ void fn_80041EA8(int nPlayer, f32* pOut, f32* pCam, CamShot* pShot, CamScript* p
         fRate = lbl_80281F78->f138 * (fRate / lbl_80281F78->f13C);
         fShare = fRate < 0.0f ? 0.0f : (fRate > 1.0f ? 1.0f : fRate);
         if (pScript->f98 < lbl_80281F78->fD4) {
-            fRate = 1.0f - (f32)fn_80009680(pScript->f98 / lbl_80281F78->fD4) * (1.0f - fShare);
+            fRate = (f32)fn_80009680(pScript->f98 / lbl_80281F78->fD4);
+            fRate = 1.0f - fRate * (1.0f - fShare);
         } else {
             fRate = fShare < 0.0f ? 0.0f : (fShare > lbl_80281F78->f138 ? lbl_80281F78->f138 : fShare);
         }
@@ -1506,8 +1507,10 @@ void fn_80041EA8(int nPlayer, f32* pOut, f32* pCam, CamShot* pShot, CamScript* p
             fRate *= pScript->f88 / lbl_80281F78->f158;
         }
         if (pScript->f88 < lbl_80281F78->f15C) {
-            vMove[1] *= powf(pScript->f88 / lbl_80281F78->f15C, lbl_80281F78->f160)
-                        * (fTime / (1.0f / FRAME_RATE));
+            f32 fScale = powf(pScript->f88 / lbl_80281F78->f15C, lbl_80281F78->f160);
+
+            fScale *= fTime / (1.0f / FRAME_RATE);
+            vMove[1] = fScale * vMove[1];
         }
         if (gPlayers[nPlayer].ball.bHitTopArc) {
             if (gPlayers[nPlayer].ball.fHeight <= 0.15f) {
