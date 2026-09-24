@@ -122,9 +122,23 @@ def size_findings(syms):
         for (k, n, d), fs in sorted(hits.items())]
 
 
+def built_objects():
+    """The objects the current build.ninja makes, so that objects left over from units since removed
+    or renamed are not audited."""
+    ninja = ROOT / 'build.ninja'
+    if not ninja.exists():
+        return None
+    pat = re.compile(r'^build (build[\\/]GW4E69[\\/]src[\\/]\S+?\.o):')
+    return {pathlib.Path(ROOT, m.group(1).replace('\\', '/')).resolve()
+            for m in map(pat.match, ninja.read_text(encoding='utf-8', errors='replace').splitlines()) if m}
+
+
 def scope_findings(syms):
     hits = []
+    current = built_objects()
     for o in sorted((ROOT / 'build/GW4E69/src').rglob('*.o')):
+        if current is not None and o.resolve() not in current:
+            continue                        # left over from a unit no longer in configure.py
         if 'unsorted' in o.parts:
             continue                        # sweeps are placeholders, not our declarations
         out = subprocess.run([str(NM), str(o)], capture_output=True, text=True).stdout

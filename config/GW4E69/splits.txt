@@ -331,11 +331,8 @@ GoShaderObjectContainer_OBFData_Gc.c:
 unsorted/sweep_8006FF2C.c:
 	.text       start:0x8006FF2C end:0x8006FF80
 
-unsorted/sweep_8006FF80.c:
-	.text       start:0x8006FF80 end:0x8006FFD4
-
-unsorted/sweep_8006FFD4.c:
-	.text       start:0x8006FFD4 end:0x8006FFF8
+ShaderRow0.c:
+	.text       start:0x8006FF80 end:0x80070168
 
 unsorted/sweep_80070168.c:
 	.text       start:0x80070168 end:0x8007018C
@@ -345,6 +342,7 @@ DynamicRenderingBuffer.c:
 
 Code80070EC4.c:
 	.text       start:0x80070EC4 end:0x8007110C
+	.sdata2     start:0x802839C8 end:0x802839D0
 
 GoShaderObject_PrelitUVAnimation_Gc.c:
 	.text       start:0x8007110C end:0x80071AD0
@@ -400,6 +398,9 @@ uiLoadFile.c:
 
 uiProcessInterface.c:
 	.text       start:0x8008F39C end:0x80090940
+
+Code80090940.c:
+	.text       start:0x80090940 end:0x80090B80
 
 fe_movies.c:
 	.text       start:0x80090B80 end:0x800922A8
@@ -1264,7 +1265,11 @@ dolphin/os/OSTime.c:
 	.text       start:0x8014E48C end:0x8014E8B0
 	.data       start:0x8019C2E0 end:0x8019C340
 
-src/os/__ppc_eabi_init.c:
+dolphin/os/__start.c:
+	.init       start:0x80003100 end:0x80003354
+
+dolphin/os/__ppc_eabi_init.cpp:
+	.init       start:0x80003354 end:0x800033A8
 	.text       start:0x8014E8B0 end:0x8014E944
 
 dolphin/pad/PadClamp.c:
@@ -1553,9 +1558,6 @@ MetroTRK/notify.c:
 MetroTRK/flush_cache.c:
 	.text       start:0x80162278 end:0x801622B0
 
-dolphin/os/__start.c:
-	.init       start:0x80003100 end:0x80003354
-
 runtime/__mem.c:
 	.init       start:0x800033A8 end:0x800034E0
 
@@ -1673,9 +1675,25 @@ Common/TagFile/TagFile.c:
 	.rodata     start:0x8018655C end:0x801866D4
 	.sbss       start:0x80282A30 end:0x80282A38
 
-src/gba/GBA.c:
-	.text       start:0x80176270 end:0x80176280
+dolphin/gba/GBA.c:
+	.text       start:0x80175F54 end:0x80176280
+	.data       start:0x8019D2C0 end:0x8019D300
+	.bss        start:0x80280660 end:0x80280B60
+	.sdata      start:0x80281B60 end:0x80281B68
 	.sbss       start:0x80282A38 end:0x80282A40
+
+dolphin/gba/GBAGetProcessStatus.c:
+	.text       start:0x80176280 end:0x8017641C
+
+dolphin/gba/GBARead.c:
+	.text       start:0x8017641C end:0x8017658C
+
+dolphin/gba/GBAWrite.c:
+	.text       start:0x8017658C end:0x801766E0
+
+dolphin/gba/GBAXfer.c:
+	.text       start:0x801766E0 end:0x80176A38
+	.data       start:0x8019D300 end:0x8019D338
 
 src/card/CARDBios.c:
 	.text       start:0x80176A38 end:0x80177DA4
