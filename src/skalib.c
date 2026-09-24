@@ -14,7 +14,8 @@ ClipBank* ClipBank_Get(u32 nSlot);
 void  fn_80020BC8(void* pClip);                        // swaps a clip in place
 void  fn_80020F60(struct Clip* pClip, u32 uAram);
 void  fn_800269E4(struct LibOverlay* pOv, int nSlot, s32 n);
-void  fn_80026844(LibOverlay* pOv, int nSlot, int n2, int n3, int n4, int n5, char* pNames, int nNames);
+void  fn_80026844(LibOverlay* pOv, int nSlot, int nGroup, int nClub, int nStyle, int nKey, char* pNames,
+                  int nNames);
 u32   Skalib_NextSlot(void);
 void  Skalib_SetBudgets(void);
 u32   AnimLib_PlanBank(u32 nSlot);
@@ -550,15 +551,15 @@ int AnimLib_KeepRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* p
 // Merge walk, keep pass: marks nCount - nKeep more clips of each leaf to keep, highest n18 first.
 int AnimLib_KeepBestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx,
                        int nLevel, int nIndex) {
+    int         i;
+    int         nMarked;
     AnimLeaf*   pLeaf;
     AnimLib*    pLib;
+    s16*        pIdx;
+    ClipRecord* pBest;
     int         nExtra;
-    int         nMarked;
-    int         i;
     int         j;
     ClipRecord* pRec;
-    ClipRecord* pBest;
-    s16*        pIdx;
 
     if (pLeafA != NULL) {
         pLeaf = pLeafA;
@@ -2086,6 +2087,67 @@ void Skalib_Unregister(void) {
     UStream_UnregisterHandler('BNK ');
 }
 
+// Points each clip of one leaf of the overlay's tree (group nGroup, style nStyle, club nClub, key
+// nKey, or the club's default leaf when nKey < 0) at the clip of group 20's first default leaf
+// (style 0, club 0) named in pNames (16 characters each, taken in turn), and counts the use. nSlot
+// is not used.
+void fn_80026844(LibOverlay* pOv, int nSlot, int nGroup, int nClub, int nStyle, int nKey, char* pNames,
+                 int nNames) {
+    int i;
+    int j;
+    s16* pToIdx;
+    s16* pFromIdx;
+    AnimLeaf* pTo;
+    AnimLeaf* pFrom;
+    ClipRecord* pRec;
+    AnimClubNode* pNode;
+    s16 nOff;
+    int nGroupOff;
+    u8* pTree;
+
+    if (nNames == 0) return;
+    nGroupOff = pOv->pWork->groups[20];
+    if (nGroupOff < 0) return;
+    pTree = pOv->pWork->pTree;
+    nOff = *(s16*)(pTree + (nGroupOff + 2));
+    if (nOff < 0) return;
+    nOff = *(s16*)(pTree + nOff);
+    if (nOff < 0) return;
+    nOff = *(s16*)(pTree + nOff + 2);
+    if (nOff < 0) return;
+    pFrom = (AnimLeaf*)(pTree + nOff);
+
+    nGroupOff = pOv->pWork->groups[nGroup];
+    if (nGroupOff < 0) return;
+    nOff = ((s16*)(pTree + nGroupOff + 2))[nStyle];
+    if (nOff < 0) return;
+    nOff = *(s16*)(pTree + nOff + nClub * 2);
+    if (nOff < 0) return;
+    pNode = (AnimClubNode*)(pTree + nOff);
+    if (nKey < 0) {
+        nOff = pNode->nDefault;
+        if (nOff < 0) return;
+        pTo = (AnimLeaf*)(pTree + nOff);
+    } else {
+        nOff = pNode->aKeys[nKey];
+        if (nOff < 0) return;
+        pTo = (AnimLeaf*)(pTree + nOff);
+    }
+
+    for (i = 0; i < pTo->nCount; i++) {
+        pToIdx = pOv->pWork->pIndex + pTo->nFirst;
+        pFromIdx = pOv->pWork->pIndex + pFrom->nFirst;
+        for (j = 0; j < pFrom->nCount; j++) {
+            pRec = &pOv->pWork->pRecords[pFromIdx[j]];
+            if (strcmp(pRec->name, &pNames[(i % nNames) * 16]) == 0) {
+                pToIdx[i] = pFromIdx[j];
+                pRec->n10++;
+                break;
+            }
+        }
+    }
+}
+
 // Applies the created golfer's three name lists (SkinChoices.a1, a82 and sz103) of player n to
 // the overlay.
 void fn_800269E4(LibOverlay* pOv, int nSlot, s32 n) {
@@ -2107,4 +2169,9 @@ AnimLib* fn_80026AC0(Character* pChar) {
         }
     }
     return NULL;
+}
+
+// The library of the character's animation slot.
+AnimLib* fn_80026B34(Character* pChar) {
+    return lbl_801C6068[pChar->nSlot].pLib;
 }

@@ -1062,7 +1062,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_80005580.c"),
             Object(Matching, "unsorted/sweep_8006F608.c"),
 
-            Object(Matching, "unsorted/sweep_80026B34.c"),
             Object(Matching, "unsorted/sweep_80045F50.c"),
             Object(Matching, "unsorted/sweep_800055D4.c"),
             Object(Matching, "unsorted/sweep_800072E0.c"),

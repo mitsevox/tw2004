@@ -17,8 +17,6 @@ void fn_800CA610(int nPlayer, AnimLib* pLib, int nFirst, int nLast, int nStyleFi
 void fn_800CACD4(int nPlayer);
 void fn_800CB2B0(int nSlot);
 void fn_800CB4E0(int hFile, u32 uFileSize, void* pDst, u32 uLen, u32 uOffset);
-AnimLib* fn_80026AC0(Character* pChar);  // the overlay library loaded for the character (slots 0 and 1)
-AnimLib* fn_80026B34(Character* pChar);  // the library of the character's animation slot
 void fn_800CB668(u8 bGlobal, int bFemale, int nPlayer, char* szPath);
 int fn_800CB568(int nId);
 u8 fn_800CB5B0(int nPlayer, Clip* pClip);

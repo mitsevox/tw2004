@@ -346,7 +346,18 @@ u8   fn_800D7770(int nPlayer, Award* pAward);   // mark an award won today; 1 if
 // fe_craputils.c (TW06's FE_CrAP_ utilities)
 extern char lbl_80188138[];     // "NoLogoName": a user logo's name until one is given
 void FE_CrAP_InitCrAPInfo(SaveProfile* pProfile);
+void fn_80058278(int nProfile, int nGolfer);        // unlock a golfer for the profile
+void fn_800582C4(SaveProfile* pProfile, int nBit, u8 bSet);    // set or clear bit nBit of a10548
 u8   fn_80058304(SaveProfile* pProfile, int nBit);  // bit nBit of pProfile->u10548
+u8   fn_8005832C(int nProfile, int nGolfer);        // the golfer is unlocked for the profile
+void fn_800583B0(int nProfile, int nCourse);        // unlock a course (aCourseUnlocked)
+u8   fn_800583FC(int nProfile, int nCourse);        // whether a course is unlocked
+void fn_80058428(int nProfile, int nReward);        // unlock a reward
+void fn_8005844C(int nProfile);                     // the same for aCourseUnlocked[21]
+u8   fn_8005846C(int nProfile);
+void fn_80058494(int nProfile);                     // and for aCourseUnlocked[22]
+u8   fn_800584B4(int nProfile);
+int  fn_800584DC(int nProfile);                     // the profile's earnings rating
 void fn_80058560(SaveProfile* pProfile, int nKind, char* pName);  // add pName to list nKind
 void fn_80058624(SaveProfile* pProfile, int nKind, char* pName);  // take pName out of list nKind
 u8   fn_800587A8(SaveProfile* pProfile, int nKind, char* pName);  // pName is in list nKind (0..2)
