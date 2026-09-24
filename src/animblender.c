@@ -316,12 +316,6 @@ void fn_800725BC(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 fWeight) {
     }
 }
 
-// fTime's point between fStart and fEnd, carried over to fFrom..fTo (our name). fake match: EA's
-// fn_8007260C fuses this multiply-add, which CW does here only for an inline function's result.
-static inline f32 RemapTime(f32 fFrom, f32 fTo, f32 fTime, f32 fStart, f32 fEnd) {
-    return (fTime - fStart) * ((fTo - fFrom) / (fEnd - fStart)) + fFrom;
-}
-
 // Pose the tree at pNode at fTime: take its times from its children, free a flagged child that has
 // ended, pose each source at its clip time (fFrom to fTo in proportion, kept in f2C) and each blend
 // node the same way, then blend with pfnBlend. Between two format 0 sources, when only the earlier
@@ -378,8 +372,11 @@ void fn_8007260C(Character* pChar, SKABlendNode* pNode, CharModel* pModel, f32 f
                 fn_8007260C(pChar, pChild, pModel, fTime);
             } else {
                 bInside = 1;
-                fClip = RemapTime(pChild->u.src.fFrom, pChild->u.src.fTo, fTime, pChild->fStart,
-                                  pChild->fEnd);
+                // the clip time: fTime's point between fStart and fEnd, carried over to fFrom..fTo
+                fClip = fTime - pChild->fStart;
+                fClip = fClip * ((pChild->u.src.fTo - pChild->u.src.fFrom) /
+                                 (pChild->fEnd - pChild->fStart)) +
+                        pChild->u.src.fFrom;
                 if (fClip >= pChild->u.src.fTo) {
                     fClip = pChild->u.src.fTo;
                     bInside = 0;

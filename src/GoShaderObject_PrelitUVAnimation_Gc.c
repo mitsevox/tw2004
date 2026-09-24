@@ -148,10 +148,10 @@ void fn_80071624(void);
 void fn_80071628(StaticShaderObject* pObj, ShaderCmds* pCmds);
 void fn_8007165C(StaticShaderObject* pObj);
 void fn_80071680(StaticShaderObject* pObj);
-void fn_80097208();
-void fn_80097250();
-void fn_8009F780();
-void fn_8009F7E4();
+void fn_80097208(void);     // GoShaderObjectCommon_MorphAnimManager_Gc.c: allocate the manager
+void fn_80097250(void);     // GoShaderObjectCommon_MorphAnimManager_Gc.c: free the manager
+void fn_8009F780(void);     // MC_Gc.c: set vertex format 2
+void fn_8009F7E4(void);     // MC_Gc.c: empty
 void fn_800716D4(void);
 void fn_800716FC(void);
 void fn_80071724(void);
@@ -159,15 +159,13 @@ void fn_80071748(void);
 void fn_8007176C(void);
 void fn_8007178C(void);
 void fn_80071828(void);
-extern s32 lbl_802811F8;
 void fn_80071850(void);
-s32 fn_80071854(void);
-void fn_8006FCD4();
-void fn_8006FCD8();
+s32* fn_80071854(void);
+void fn_8006FCD4(void);     // GoShaderObjectContainer_OBFData_Gc.c: empty
+void fn_8006FCD8(void);     // GoShaderObjectContainer_OBFData_Gc.c: empty
 void fn_8007185C(void);
 void fn_80071890(void);
 void fn_800718C4(void);
-extern s32 lbl_80281B88;
 void fn_800718E4(void);
 void fn_8007190C(void);
 void fn_80071910(void);
@@ -270,16 +268,18 @@ void fn_800717E8(int nRow) {
 
 // ---- sweep code (not yet cleaned up) ----
 
+// Clear the video field copy.
 void fn_80071828(void) {
-    s32 t0;
-    t0 = fn_80071854();
-    *(s32*)((u8*)t0) = 0;
+    s32* pnField = fn_80071854();
+
+    *pnField = 0;
 }
 
 void fn_80071850(void) {
 }
 
-s32 fn_80071854(void) {
+// Where the video field copy is kept.
+s32* fn_80071854(void) {
     return lbl_802811F8;
 }
 
@@ -305,10 +305,11 @@ void fn_800718C4(void) {
     fn_800718E4();
 }
 
+// Copy the video field being drawn.
 void fn_800718E4(void) {
-    s32 t0;
-    t0 = fn_80071854();
-    *(s32*)((u8*)t0) = lbl_80281B88;
+    s32* pnField = fn_80071854();
+
+    *pnField = lbl_80281B88;
 }
 
 void fn_8007190C(void) {

@@ -935,6 +935,7 @@ typedef struct ScreenCopy {
 
 extern ScreenCopy* lbl_80281100;
 extern s32 lbl_80281B88;        // bit 0: the video field being drawn
+extern s32* lbl_802811F8;       // points at lbl_80281E80, a copy of lbl_80281B88 (fn_800718E4)
 
 // ---- the depth-of-field blur (DepthField.c) -------------------------------------------------
 
