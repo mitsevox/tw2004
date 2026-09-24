@@ -327,8 +327,11 @@ void fn_8016B188(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u3
 // pastes functions defined earlier, and -inline deferred pastes too much (see configure.py).
 static inline u16 UIS_FindScreen(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
     u16 i;
+    UISScreen* pScreen;
+
     for (i = 0; i < pStudio->nScreens; i++) {
-        if (pStudio->pScreens[i].uGroup == uGroup && pStudio->pScreens[i].uScreen == uScreen) break;
+        pScreen = &pStudio->pScreens[i];
+        if (pScreen->uGroup == uGroup && pScreen->uScreen == uScreen) break;
     }
     return i;
 }
