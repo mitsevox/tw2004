@@ -471,6 +471,54 @@ f32 fn_800732B8(f32 fTime, f32 fNow, f32 fStart, f32 fEnd) {
     return fTime;
 }
 
+// Cuts the tree at pNode off at fTime: when pPlayer's time is inside it, its end (the player's
+// too) and its children's ends come down to fTime (a source's fTo in proportion) and all are
+// flagged in bC; otherwise the player goes back to 0 and pNode is freed and taken again as an
+// empty blend node of the same format and callback.
+void fn_800732F4(SKABlendNode* pNode, AnimPlayer* pPlayer, f32 fTime) {
+    s32 nFormat;
+    SKABlendFn pfnBlend;
+    SKABlendNode* pChild;
+
+    if (pPlayer->fTime < pNode->fStart || fn_8007286C(pNode, pPlayer->fTime) == -1) {
+        nFormat = pNode->nFormat;
+        pfnBlend = pNode->u.blend.pfnBlend;
+        pPlayer->fTime = 0.0f;
+        pPlayer->fEnd = 0.0f;
+        pPlayer->fStart = 0.0f;
+        fn_80071F58(&pNode, 0);
+        fn_80071C28(&pNode, 1, nFormat, pfnBlend, 1);
+        return;
+    }
+    if (pNode->fEnd > fTime) {
+        pNode->fEnd = fTime;
+        pPlayer->fEnd = fTime;
+        pChild = pNode->u.blend.apChild[0];
+        if (pChild != NULL) {
+            if (pChild->fEnd > fTime) {
+                if (pChild->nType == 0) {
+                    pChild->u.src.fTo = pChild->u.src.fFrom + (fTime - pChild->fStart) *
+                        ((pChild->u.src.fTo - pChild->u.src.fFrom) / (pChild->fEnd - pChild->fStart));
+                }
+                pNode->u.blend.apChild[0]->fEnd = fTime;
+            }
+            pNode->u.blend.apChild[0]->bC = 1;
+        }
+        pChild = pNode->u.blend.apChild[1];
+        if (pChild != NULL) {
+            if (pChild->fEnd > fTime) {
+                if (pChild->nType == 0) {
+                    pChild->u.src.fTo = pChild->u.src.fFrom + (fTime - pChild->fStart) *
+                        ((pChild->u.src.fTo - pChild->u.src.fFrom) / (pChild->fEnd - pChild->fStart));
+                }
+                pNode->u.blend.apChild[1]->fEnd = fTime;
+            }
+            pNode->u.blend.apChild[1]->bC = 1;
+        }
+    }
+    pNode->bC = 1;
+}
+
 // The tree under pNode plays other than exactly one source.
 u8 fn_800734A0(SKABlendNode* pNode) {
     return fn_800734D0(pNode) != 1;
