@@ -788,9 +788,10 @@ s32 fn_8011FFCC(void) {
     lbl_80281900->apDC = fn_80009B34(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3716);
     nBytes = 16 * sizeof(GrassBuffer) + 4 * (16 * sizeof(GrassBuffer*));
     for (i = 0; i < lbl_80281900->nE0; i++) {
-        nVerts = 450;
         if (i < 4) {
             nVerts = 600;
+        } else {
+            nVerts = 450;
         }
         nSize = nVerts * 16;
         lbl_80281900->pEC[i].p40 = fn_80009B34(nSize, 2, 16, "GoGrass.c", 3729);
