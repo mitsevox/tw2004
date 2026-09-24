@@ -591,10 +591,10 @@ EASBErrorE fn_80128FD4(const EASBTotals* pTotals, u16* puLevel, f32* pfProgress)
     u16 nLevel;
 
     if (puLevel == NULL || pfProgress == NULL) return EASB_ERROR_NULL_PARAMETERS;
-    nHours0 = pTotals->u0 / 3600;
-    nHours4 = pTotals->u4 / 3600;
     *puLevel = 0;
     *pfProgress = 0.0f;
+    nHours0 = pTotals->u0 / 3600;
+    nHours4 = pTotals->u4 / 3600;
     uProducts = fn_80128F58(pTotals->nProducts, 600, 5, 1500);
     uHours0 = fn_80128F58(nHours0, 50, 50, 150);
     uHours4 = fn_80128F58(nHours4, 5, 1, 0);
