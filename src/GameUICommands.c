@@ -251,7 +251,7 @@ void  GM_RestartHole(void);                                   // GameManager.c
 void  GameModeBattle_AddClub(int nPlayer, int nClub);         // GameModeBattle.c
 int   GameModeBattle_CanAddClub(int nPlayer, int nClub);
 s32   GameModeBattle_GetWinner(void);
-u8    fn_800E81B4(void);
+u8    GameModeBattle_ShowEndOfHole_ClubAddRemove_UI(void);
 int   GameModeBattle_NumRemovableClubsLeft(int nPlayer);
 u8    GameModeBattle_RemoveClub(int nPlayer, int nClub);
 void  fn_8001A870(void);
@@ -2704,7 +2704,7 @@ void fn_8008A86C(MsgArg* pArgs, MsgArg* pResult) {
 
 // Battle mode: whether a club is to be taken: the last hole had a winner and the game goes on.
 void fn_8008A870(MsgArg* pArgs, MsgArg* pResult) {
-    if (fn_800E81B4() != 0) {
+    if (GameModeBattle_ShowEndOfHole_ClubAddRemove_UI() != 0) {
         pResult->i = 1;
         return;
     }

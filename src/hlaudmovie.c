@@ -4,7 +4,7 @@
 // the sound engine's setup around it: the sound banks and the stream file (loaded through
 // UStream.c), the volume curves and the stream buffer. Its extent is proven by its data:
 // fn_800A85CC is the first function to use its .sbss (0x80282060-0x80282098; the file before it
-// ends at 0x80282058), and fn_800A9808 after it is the first to use the next file's .bss
+// ends at 0x80282058), and InsertSortWorldPerf after it is the first to use the next file's .bss
 // (0x801F1868).
 
 #include "core/audtrack.h"

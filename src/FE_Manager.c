@@ -27,7 +27,7 @@ void fn_800A4FD8(void);
 void fn_80102AC4(void);
 void fn_80103B74(int a);
 void fn_801073DC(int nPart);            // FE_CrAPDB.c
-u8   fn_80056480(int a);
+u8   PasswordManager_IsPasswordEntered(int a);
 u8   fn_800564AC(int n);
 s32  fn_801258E8(void);                 // EASportsBio.c
 void fn_8009170C(void);
@@ -42,7 +42,7 @@ void fn_80076F58(void);
 void fn_80076F80(UStreamObject* pObject);
 void fn_8007706C(char* pName, char* pDir, char* pPath);
 void fn_800770D4(char* pName, char* pPath);
-void FE_UpdateMovieQueue(void);
+void FE_movieFade(void);
 void fn_800772E0(void);
 void fn_8007731C(void);
 void fn_80077340(void);
@@ -72,7 +72,7 @@ u32 lbl_80281ECC;
 FEBio* lbl_80281EC8;
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
-// 1.0f (0x80283AC0), before the 0.0f and 0.05f FE_UpdateMovieQueue uses first; its body is unknown.
+// 1.0f (0x80283AC0), before the 0.0f and 0.05f FE_movieFade uses first; its body is unknown.
 static f32 FE_Manager_StrippedFn(f32 x) {
     return x + 1.0f;
 }
@@ -176,7 +176,7 @@ u8 fn_80077148(void) {
 
 // Once a frame: while a movie is queued, fade the screen to black; once it is black, play the
 // movie and take it off the queue.
-void FE_UpdateMovieQueue(void) {
+void FE_movieFade(void) {
     char szPath[256];
     char szName[32];
     f32 vColor[4];
@@ -525,7 +525,7 @@ void fn_80077C1C(int a, int b) {
 }
 
 // Whether a Create-A-Player asset is still locked for the profile (never in the session's 0x4000
-// mode, nor while fn_80056480(0) holds). The asset names a lock kind (fn_801055DC) and a number
+// mode, nor while PasswordManager_IsPasswordEntered(0) holds). The asset names a lock kind (fn_801055DC) and a number
 // for it (fn_80105610): a bit, an award, a tournament won, a count of them to reach, a season...
 u8 fn_80078008(s32 nAsset, SaveProfile* pProfile) {
     int aBits[5] = {1, 2, 3, 4, 5};
@@ -539,7 +539,7 @@ u8 fn_80078008(s32 nAsset, SaveProfile* pProfile) {
     }
     nKind = fn_801055DC(nAsset);
     n = fn_80105610(nAsset);
-    if (fn_80056480(0)) {
+    if (PasswordManager_IsPasswordEntered(0)) {
         return 0;
     }
     switch (nKind) {

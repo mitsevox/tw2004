@@ -170,7 +170,7 @@ void fn_800B2734(void) {
         p->pRect = NULL;
     }
     if (p->pLens != NULL) {
-        CA_vDestroyCamera(p->pLens);
+        CA_vReleaseCamera(p->pLens);
         p->pLens = NULL;
     }
     fn_800B246C();

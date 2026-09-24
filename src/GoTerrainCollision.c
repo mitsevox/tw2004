@@ -275,7 +275,7 @@ f32 fn_8004B78C(CourseInfo* pCourse, f32* pPos) {
 
     fHeight = fn_8004D01C(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
     if (fHeight == TER_NO_GROUND || fHeight > pPos[1] + 0.25f) {
-        fHeight = fn_800CBEE0(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
+        fHeight = Ter_GetSupportingGroundTriangle(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
         if (fHeight == TER_NO_GROUND) {
             fHeight = fn_8004CB30(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
         }
@@ -516,7 +516,7 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
     vPos[1] = 1000000.0f;
     vPos[2] = pOut[2];
     vPos[3] = 1.0f;
-    pGround = fn_800CC190(pCourse, vPos);
+    pGround = Ter_GetSupportingGroundMaterial(pCourse, vPos);
     fDist = fn_800BB028(pOut, p->ball.vPos);
     if (fDist > 9.0f
         || (!bPreferred && pGround->nClass != gSurfaceTypes[p->ball.nSurface].nClass)) {
@@ -982,7 +982,7 @@ f32 Ter_GetSupportingGroundHeight(CourseInfo* pCourse, f32* pPos) {
     f32 (*pTri)[3];
     s32 nTri;
 
-    return fn_800CBEE0(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
+    return Ter_GetSupportingGroundTriangle(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
 }
 
 // The height of the ground covering a point, with that triangle's upward normal. Probably TW06's
@@ -1029,7 +1029,7 @@ u8 Ter_GetSupportingGroundNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal) {
     f32 (*pTri)[3];
     s32 nTri;
 
-    if (fn_800CBEE0(pCourse, pPos, &pCell, &pRef, &pTri, &nTri) != TER_NO_GROUND) {
+    if (Ter_GetSupportingGroundTriangle(pCourse, pPos, &pCell, &pRef, &pTri, &nTri) != TER_NO_GROUND) {
         Vec3Copy(pTri[0], vA);
         Vec3Copy(pTri[1], vB);
         Vec3Copy(pTri[2], vC);
@@ -1083,7 +1083,7 @@ f32 Ter_GetSupportingGroundData(CourseInfo* pCourse, f32* pPos, SurfaceType** pp
     s32 nTri;
     f32 fHeight;
 
-    fHeight = fn_800CBEE0(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
+    fHeight = Ter_GetSupportingGroundTriangle(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
     if (fHeight != TER_NO_GROUND) {
         Vec3Copy(pTri[0], vA);
         Vec3Copy(pTri[1], vB);

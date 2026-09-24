@@ -7,7 +7,7 @@
 #include "game/frontend.h"
 #include "game/modes/rte.h"
 
-u8 fn_80056480(int n);                  // PasswordManager.c
+u8 PasswordManager_IsPasswordEntered(int n);                  // PasswordManager.c
 
 // Grid cell pArgs[0]: its day number, the driver's text, look and button for it, and whether it
 // lies outside the month shown.
@@ -167,7 +167,7 @@ void fn_80112548(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80112580(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_80056480(6);
+    pResult->i = PasswordManager_IsPasswordEntered(6);
 }
 
 void fn_801125B8(MsgArg* pArgs, MsgArg* pResult) {

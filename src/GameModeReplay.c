@@ -133,7 +133,7 @@ void GameModeReplay_SetupNextGolfer(void) {
     nWindSpeed = gReplayData.nWindSpeed;
     nF12 = gReplayData.nF12;
     nF14 = gReplayData.nF14;
-    fn_8006BF60(0);
+    REPLAY_Save(0);
     gSession.bReplay = 1;
     gReplayData.fF08 = fF08;
     gReplayData.fF0C = fF0C;

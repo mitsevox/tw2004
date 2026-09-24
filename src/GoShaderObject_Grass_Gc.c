@@ -38,7 +38,7 @@ void SD_vShaderObject_Grass_Type_Init(void) {
 }
 
 void SD_vShaderObject_Grass_Type_Close(void) {
-    UMemPool_Destroy(SD_gpGrassTypeData->pPool);
+    DeleteMemPool(SD_gpGrassTypeData->pPool);
 }
 
 void SD_vShaderObject_Grass_Type_SetParameters(void* pParams) {
@@ -52,7 +52,7 @@ void SD_vShaderObject_Grass_Type_SetParameters(void* pParams) {
 void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassBufferDesc* pDesc) {
     f32 (*pVerts)[3] = fn_8000C594()->pVerts;
     u8* pTriFlags = fn_8000C594()->pTriFlags;
-    GrassRenderData* pRender = UMemPool_Alloc(SD_gpGrassTypeData->pPool);
+    GrassRenderData* pRender = AllocPoolMem(SD_gpGrassTypeData->pPool);
     s32 nSet;
     s32 nRow;
     s32 i;
@@ -392,7 +392,7 @@ void GrassPacket_vSetBuffer(GrassWord* pBuffer, int nVerts) {
 
 // A grass object goes: its render record back to the pool.
 void SD_vShaderObject_Grass_Static_Close(SD_SShaderObject_Static* pObject) {
-    UMemPool_Free(SD_gpGrassTypeData->pPool, pObject->pData);
+    ReturnPoolMem(SD_gpGrassTypeData->pPool, pObject->pData);
 }
 
 // GoGrass.c hands over the hole's grass parameters: copies of its vectors and eight floats, and

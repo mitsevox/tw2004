@@ -2,7 +2,7 @@
 // twin: each scoring shot earns its length in points, the first player to the target score
 // (fn_8010D334) wins. GameRound.c starts it with fn_8010C4A0 (its case 26), which fills gpGame's
 // callbacks with this file's hooks the way GameMode22.c's fn_80125E68 does; fn_8010D364 tests
-// Game_GetMode() == 26. The file ends where CharSliders.c begins (fn_8010D454, the slider code
+// Game_GetMode() == 26. The file ends where CharSliders.c begins (CharSlider_Free, the slider code
 // char.c calls).
 
 #include "engine.h"

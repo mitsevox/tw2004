@@ -170,12 +170,12 @@ extern EASBState* lbl_802825B8;
 void* TibExtMemAlloc(u32 uHeapID, u32 uSize, u32 uAlign);
 void TibExtMemFree(u32 uHeapID, void* p, u32 uSize, u32 uAlign);
 u32 TibExtCurrentTimeGet(void);     // the real-time clock, in seconds since 1970
-SFIOFuncTable* fn_801221F0(void);   // fills in and returns the memory-card callbacks
+SFIOFuncTable* SFIO_spGetCallbacks(void);   // fills in and returns the memory-card callbacks
 
 // TibExt.c's memory-card glue (lbl_80260D88): the callbacks it hands the shared file library,
 // then the result of the last card call.
 typedef struct TibExtCard {
-    SFIOFuncTable fn;               // 0x00: fn_801221F0 fills these in
+    SFIOFuncTable fn;               // 0x00: SFIO_spGetCallbacks fills these in
     s32 nError;                     // 0x44: the last card call's error, as the file library's code
     s32 n48;                        // 0x48: the last call's result (a size, a count, a file)
     char szFileName[0x44];          // 0x4C: the save file the probe found

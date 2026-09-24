@@ -301,9 +301,9 @@ int  fn_800CB950(CourseInfo* pCourse, f32* pA, f32* pB, f32* pC, f32* pD, TerPol
                  u32 uSkip);   // the ground strips under a quad, as runs of triangles
 // The ground triangle under a point: its height there, the grid cell, the strip, the triangle's
 // first vertex and its number in the strip. Probably TW06's Ter_GetSupportingGroundTriangle.
-f32  fn_800CBEE0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
+f32  Ter_GetSupportingGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
                  s32* pTri);
-SurfaceType* fn_800CC190(CourseInfo* pCourse, f32* pPos);   // surface type under a point
+SurfaceType* Ter_GetSupportingGroundMaterial(CourseInfo* pCourse, f32* pPos);   // surface type under a point
 
 // GoTerrainCollision (TW06's goterraincollision.c; types from its definitions)
 void fn_8004B1EC(CourseInfo* pCourse);          // TW06: Ter_InitTGD, readies a loaded course's data

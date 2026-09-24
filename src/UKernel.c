@@ -23,10 +23,10 @@ void fn_80048BDC(UStreamObject* pObject);
 // else from the heap.
 void* fn_80048AF4_DynObjAlloc(int nSize) {
     if (nSize < 400 && lbl_80281DAC->nFree != 0) {
-        return UMemPool_Alloc(lbl_80281DAC);
+        return AllocPoolMem(lbl_80281DAC);
     }
     if (nSize < 528 && lbl_80281DA8->nFree != 0) {
-        return UMemPool_Alloc(lbl_80281DA8);
+        return AllocPoolMem(lbl_80281DA8);
     }
     return fn_80009B34(nSize, 1, 16, "UKernel.c", 201);
 }
@@ -34,9 +34,9 @@ void* fn_80048AF4_DynObjAlloc(int nSize) {
 // Gives an object's memory back to the pool it came from, or to the heap.
 void fn_80048B70(void* p) {
     if ((u8*)p > (u8*)lbl_80281DAC && (u8*)p < lbl_80281DAC->pEnd) {
-        UMemPool_Free(lbl_80281DAC, p);
+        ReturnPoolMem(lbl_80281DAC, p);
     } else if ((u8*)p > (u8*)lbl_80281DA8 && (u8*)p < lbl_80281DA8->pEnd) {
-        UMemPool_Free(lbl_80281DA8, p);
+        ReturnPoolMem(lbl_80281DA8, p);
     } else {
         fn_80009E70(p);
     }
@@ -141,8 +141,8 @@ void fn_80048E7C(void) {
     fn_800490EC();
     fn_800490EC();
     lbl_80281DB4 = 0;
-    UMemPool_Destroy(lbl_80281DAC);
-    UMemPool_Destroy(lbl_80281DA8);
+    DeleteMemPool(lbl_80281DAC);
+    DeleteMemPool(lbl_80281DA8);
 }
 
 // The same, keeping the pools, and the list starts over empty.

@@ -245,44 +245,44 @@ void fn_800929E4(UIText* pText, int nMsg, s32 n, MsgArg* pArgs, MsgArg* pResult)
 
 // ---- sweep code (not yet cleaned up) ----
 
-void UFont_SetMode();
+void FO_vSetCurrentAddMode();
 void fn_80092BA0(void);
 void fn_80092BC4(void);
 void fn_80092BA0(void) {
-    UFont_SetMode(1);
+    FO_vSetCurrentAddMode(1);
 }
 
 void fn_80092BC4(void) {
-    UFont_SetMode(0);
+    FO_vSetCurrentAddMode(0);
 }
 
 // ---- end of sweep code ----
 
 // Sets up the text shadow: nC4 0x12, and uC8 packed from the colour pColor.
 void fn_80092BE8(f32* pColor) {
-    UFont_GetContext()->nC4 = 0x12;
-    UFont_PackColor(pColor, (u8*)&UFont_GetContext()->uC8);
+    FO_spGetCurrentPacket()->nC4 = 0x12;
+    UFont_PackColor(pColor, (u8*)&FO_spGetCurrentPacket()->uC8);
 }
 
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80092C38(f32 x0, f32 x1) {
     UFontContext* pCtx;
-    pCtx = UFont_GetContext();
+    pCtx = FO_spGetCurrentPacket();
     pCtx->fCC = x0;
     pCtx->fD0 = x1;
 }
 
 void fn_80092C78(f32 x0, f32 x1) {
     UFontContext* pCtx;
-    pCtx = UFont_GetContext();
+    pCtx = FO_spGetCurrentPacket();
     pCtx->fBC = x0;
     pCtx->fC0 = x1;
 }
 
 void fn_80092CB8(f32 x0) {
     UFontContext* pCtx;
-    pCtx = UFont_GetContext();
+    pCtx = FO_spGetCurrentPacket();
     pCtx->fB8 = x0;
 }
 

@@ -104,9 +104,9 @@ typedef struct UMemPool {
 LAYOUT_ASSERT(UMemPool, 0x10);
 
 UMemPool* UMemPool_Create(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign);   // create
-void  UMemPool_Destroy(UMemPool* pPool);                     // destroy
-void* UMemPool_Alloc(UMemPool* pPool);                     // take a node (NULL when none is free)
-void  UMemPool_Free(UMemPool* pPool, void* pNode);        // give a node back
+void  DeleteMemPool(UMemPool* pPool);                     // destroy
+void* AllocPoolMem(UMemPool* pPool);                     // take a node (NULL when none is free)
+void  ReturnPoolMem(UMemPool* pPool, void* pNode);        // give a node back
 // Sorts nCount items of nSize bytes with pfnCompare (MSL, 0x8015929C).
 void  qsort(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const void* pA, const void* pB));
 
@@ -1128,7 +1128,7 @@ typedef struct UFontContext {
     char* szText;                 // 0xD4  a queued string's copy of its text
 } UFontContext;                   // 0xD8
 
-UFontContext* UFont_GetContext(void);        // UFont.c: the current text settings
+UFontContext* FO_spGetCurrentPacket(void);        // UFont.c: the current text settings
 void UFont_DrawString(char* sz, f32 x, f32 y);       // UFont.c: draw a string
 void UFont_PackColor(const f32* pColor, u8* pOut);       // UFont.c: pack an RGBA colour into pOut
 void fn_8006A9AC(f32* pColor);                  // target.c: draw text in this colour
@@ -1407,9 +1407,9 @@ void fn_8006ACF8(int nPlayer, int a);
 void Emotion_UpdatePlayerEmotion(int nPlayer);
 void fn_8006B2C4(int nPlayer, u8 bBefore);   // the shot's outcome from the ball (bBefore: ballBefore)
 void fn_8006BAA8(int nPlayer);
-void fn_8006BF60(int nPlayer);          // the replay recorder
+void REPLAY_Save(int nPlayer);          // the replay recorder
 void REPLAY_Play(int nPlayer);
-void fn_8006C4A0(void);                 // clears gSession.bReplay: a saved replay's playback ends
+void REPLAY_Stop(void);                 // clears gSession.bReplay: a saved replay's playback ends
 void fn_8006F4B4(void);
 void fn_8009B970(int nView);
 void fn_8009EF98(void);

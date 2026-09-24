@@ -27,8 +27,8 @@ void fn_8000F0E8(void);
 void fn_800103C0(void);
 void fn_8001049C(void);
 void fn_8001058C(void);
-void UFont_Init(void);
-void UFont_Shutdown(void);
+void FO_vInitModule(void);
+void FO_vCloseModule(void);
 void UFont_DrawQueue(void);
 void fn_800136F4(void);
 void fn_80013718(void);
@@ -148,7 +148,7 @@ void fn_80067608(void);
 void fn_8006765C(void);
 void fn_80067B80(void);
 void fn_80067CD4(int nPlayer);
-void fn_8006795C(void);
+void SitDev_ProcessEventQueue(void);
 void FB_vInitModule(void);
 void FB_vCloseModule(void);
 void fn_8006E2A4(void);
@@ -188,8 +188,8 @@ void fn_80091778(void);
 void fn_80091870(void);
 void fn_80093AD4(void);
 void fn_80093D14(void);
-void fn_80093D3C(void);
-void fn_800940FC(void);
+void BS_vInit(void);
+void BS_vClose(void);
 void fn_80095364(void);
 void fn_80095550(void);
 void CameraTuning_Init(void);
@@ -200,7 +200,7 @@ void fn_80099344(f32 fFrameTime);
 void fn_80099BA0(void);
 void fn_8009A16C(void);
 u8   fn_8009A180(void);
-void fn_8009A1F4(void);
+void DEMO_Restore(void);
 void GLW_vInitModule(int n);
 void GLW_vCloseModule(void);
 void GLW_vUpdateGlows(int nView);
@@ -280,7 +280,7 @@ void fn_801250C0(void);
 void fn_80124C10(void);
 void AI_TargetsInit(void);
 void BreakLine_Update(int nView);
-void FE_UpdateMovieQueue(void);
+void FE_movieFade(void);
 void fn_800DFC18(void);
 void GM_Update(void);
 void GR_vInit(void);
@@ -424,7 +424,7 @@ void fn_8006C770(void) {
 void fn_8006C7A8(void) {
     u32 uSeed;
 
-    fn_8006BF4C();
+    REPLAY_Init();
     fn_8000989C();
     fn_800B5C38();
     fn_800080D4();
@@ -434,7 +434,7 @@ void fn_8006C7A8(void) {
     fn_8000F060();
     fn_8006DC44();
     fn_80016198();
-    UFont_Init();
+    FO_vInitModule();
     fn_80015540();
     FB_vInitModule();
     fn_8007185C();
@@ -480,7 +480,7 @@ void fn_8006C854(void) {
     VM_vCloseModule();
     FB_vCloseModule();
     fn_80015620();
-    UFont_Shutdown();
+    FO_vCloseModule();
     fn_800162A0();
     fn_8006DC48();
     fn_8000F0E8();
@@ -573,7 +573,7 @@ void fn_8006CB2C(void) {
     fn_80077428();
     VM_vReleaseViewport(lbl_80281E58);
     FB_vReleaseFrameBuffer(lbl_80281E5C);
-    CA_vDestroyCamera(lbl_80281E60);
+    CA_vReleaseCamera(lbl_80281E60);
     fn_80062E20();
     fn_8003A074();
     fn_80097E98();
@@ -652,13 +652,13 @@ void GO_vInitIG(void) {
     fn_800A2934();
     fn_80098A98();
     fn_8009CC00();
-    fn_80093D3C();
+    BS_vInit();
     GR_vInit();
     fn_8006F4B4();
     fn_8009005C("ingame");
     fn_8006DC20(1.0f);
     Swing_Init();
-    fn_8006BED4();
+    REPLAY_InitModule();
     fn_800DAE44();
     PsBallFx_InitModule();
     fn_8011E170();
@@ -681,7 +681,7 @@ void fn_8006CDC4(void) {
     fn_800137B0(lbl_80281E54);
     VM_vReleaseViewport(lbl_80281E58);
     FB_vReleaseFrameBuffer(lbl_80281E5C);
-    CA_vDestroyCamera(lbl_80281E60);
+    CA_vReleaseCamera(lbl_80281E60);
     fn_80091870();
     fn_8011E3B0();
     fn_800A2E14();
@@ -694,7 +694,7 @@ void fn_8006CDC4(void) {
     fn_8006DCA4(0);
     Players_Reset();
     fn_8009B898();
-    fn_800940FC();
+    BS_vClose();
     fn_8009CC88();
     if (gSession.nSplitScreen) {
         fn_80016E3C(0);
@@ -711,7 +711,7 @@ void fn_8006CDC4(void) {
     GLW_vCloseModule();
     fn_8006DD84();
     fn_800B2734();
-    fn_8006BF20();
+    REPLAY_CloseModule();
     fn_80058DB4();
     fn_80090664();
     fn_8001C2B4();
@@ -730,7 +730,7 @@ void fn_8006CDC4(void) {
     fn_8002A020();
     fn_8006DD44();
     fn_8006C854();
-    fn_8009A1F4();
+    DEMO_Restore();
 }
 
 // Starts the start-up screens (game type 1).
@@ -1023,7 +1023,7 @@ void fn_8006D838(void) {
     fn_8009069C();
     fn_8008FD60(1);
     fn_800382E0();
-    FE_UpdateMovieQueue();
+    FE_movieFade();
     fn_8006DE28();
     fn_8006DDA8();
     fn_801242D0();
@@ -1108,7 +1108,7 @@ void fn_8006D8E8(void) {
         case 6:
             fn_8006D27C();
             fn_800BB0E8();
-            fn_8006795C();
+            SitDev_ProcessEventQueue();
             break;
         case 1:
             fn_8006D7E8();

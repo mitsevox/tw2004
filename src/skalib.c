@@ -1884,7 +1884,7 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
         pDst = pSrc = pLib->ppClips;
         // port: the library's clip numbers into its bank, little-endian on disc; a little-endian port does
         //       not swap here
-        fn_80076158((u8**)&pSrc, pDst, pLib->nClips * 4, 4);   // port: pSrc is a void* (fn_8001F08C's)
+        BYTESWAP_SWAPDATA((u8**)&pSrc, pDst, pLib->nClips * 4, 4);   // port: pSrc is a void* (fn_8001F08C's)
         if (pLib->uId != pBank->uId) {
             for (i = 0; i < pLib->nClips; i++) {
                 pLib->ppClips[i] = pBank->ppClips[0];
@@ -1908,7 +1908,7 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
         pData += pLib->nTreeSize;
         pDst = pSrc = pLib->pIndex;
         // port: the library's clip index, little-endian on disc; a little-endian port does not swap here
-        fn_80076158((u8**)&pSrc, pDst, pLib->nClips * 2, 2);   // port: as above
+        BYTESWAP_SWAPDATA((u8**)&pSrc, pDst, pLib->nClips * 2, 2);   // port: as above
         pDst = pSrc = pLib->pRecords;
         // port: the library's clip records (ClipRecord, laid over the bytes), little-endian on disc; a
         //       little-endian port does not swap here
@@ -1963,7 +1963,7 @@ ClipBank* ClipBank_Load(u8* pFile, u32 uAlign) {
     pBank->ppClips = (void**)pData;
     pSrc = (u8*)pBank->ppClips;
     // port: the bank's clip offsets, little-endian on disc; a little-endian port does not swap here
-    fn_80076158(&pSrc, (u8*)pBank->ppClips, pBank->nClips * 4, 4);
+    BYTESWAP_SWAPDATA(&pSrc, (u8*)pBank->ppClips, pBank->nClips * 4, 4);
     pData += pBank->nClips * 4;
     uPad = 16 - ((uptr)pData & 15);
     if (uPad == 16) {

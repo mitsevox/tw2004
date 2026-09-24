@@ -197,14 +197,14 @@ MalBank* fn_8001F804(u8* pData) {
 
     pBank = fn_80009B34(sizeof(MalBank), 2, 0x40, "mtalib.c", 474);
     lbl_80281CB0 += sizeof(MalBank);
-    fn_80076158(&pData, (u8*)&pBank->nNumGroups, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&pBank->nNumGroups, 4, 4);
     if ((uptr)pData & 0xF) {
         pData = (u8*)(((uptr)pData & ~0xF) + 0x10);
     }
     for (i = 0; i < pBank->nNumGroups; i++) {
-        fn_80076158(&pData, (u8*)&nGroup, 4, 4);
+        BYTESWAP_SWAPDATA(&pData, (u8*)&nGroup, 4, 4);
         pGroup = &pBank->aGroup[nGroup];
-        fn_80076158(&pData, (u8*)&pGroup->nNum, 4, 4);
+        BYTESWAP_SWAPDATA(&pData, (u8*)&pGroup->nNum, 4, 4);
         if (pGroup->nNum != 0) {
             pGroup->apItem = fn_80009B34(pGroup->nNum * 4, 2, 0x40, "mtalib.c", 490);
             for (j = 0; j < pGroup->nNum; j++) {

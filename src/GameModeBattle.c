@@ -217,7 +217,7 @@ s32 fn_800E81A0(int nPlayer) {
 }
 
 // Nonzero while a club is to be taken.
-u8 fn_800E81B4(void) {
+u8 GameModeBattle_ShowEndOfHole_ClubAddRemove_UI(void) {
     return lbl_802822E8;
 }
 

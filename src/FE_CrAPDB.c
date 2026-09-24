@@ -1024,11 +1024,11 @@ void fn_80105B80(CrAPAsset* pAsset, char* pName) {
     u8* pSrc;
 
     pSrc = (u8*)pAsset->aVariant;
-    fn_80076158(&pSrc, (u8*)pAsset->aVariant, sizeof(pAsset->aVariant), sizeof(u64));
+    BYTESWAP_SWAPDATA(&pSrc, (u8*)pAsset->aVariant, sizeof(pAsset->aVariant), sizeof(u64));
     nId = pAsset->aVariant[0];
     fn_800CB868(&nId, pName);
     pSrc = (u8*)pAsset->aVariant;
-    fn_80076158(&pSrc, (u8*)pAsset->aVariant, sizeof(pAsset->aVariant), sizeof(u64));
+    BYTESWAP_SWAPDATA(&pSrc, (u8*)pAsset->aVariant, sizeof(pAsset->aVariant), sizeof(u64));
 }
 
 s32 fn_80105C00(void) {
@@ -1092,16 +1092,16 @@ void fn_80105DAC(void) {
         fn_8001F08C((void**)&pSrc, (void**)&pDst, lbl_80193228, 20, 1);
         pSrc = (u8*)&lbl_80282460->pAssets[i].n110;
         pDst = (u8*)&lbl_80282460->pAssets[i].n110;
-        fn_80076158(&pSrc, pDst, sizeof(s16), sizeof(s16));
+        BYTESWAP_SWAPDATA(&pSrc, pDst, sizeof(s16), sizeof(s16));
         pSrc = (u8*)&lbl_80282460->pAssets[i].n112;
         pDst = (u8*)&lbl_80282460->pAssets[i].n112;
-        fn_80076158(&pSrc, pDst, sizeof(s16), sizeof(s16));
+        BYTESWAP_SWAPDATA(&pSrc, pDst, sizeof(s16), sizeof(s16));
         pSrc = (u8*)&lbl_80282460->pAssets[i].n114;
         pDst = (u8*)&lbl_80282460->pAssets[i].n114;
-        fn_80076158(&pSrc, pDst, sizeof(s16), sizeof(s16));
+        BYTESWAP_SWAPDATA(&pSrc, pDst, sizeof(s16), sizeof(s16));
         pSrc = (u8*)&lbl_80282460->pAssets[i].n116;
         pDst = (u8*)&lbl_80282460->pAssets[i].n116;
-        fn_80076158(&pSrc, pDst, sizeof(s16), sizeof(s16));
+        BYTESWAP_SWAPDATA(&pSrc, pDst, sizeof(s16), sizeof(s16));
     }
 }
 

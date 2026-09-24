@@ -10,7 +10,7 @@
 
 #define SITDEV_NUM_VALUES 96
 
-// An event queued for the scripts (fn_80067710 adds them, fn_8006795C runs and clears them).
+// An event queued for the scripts (fn_80067710 adds them, SitDev_ProcessEventQueue runs and clears them).
 typedef struct SitDevEvent {
     s32   nPlayer;              // 0x00
     u8    nEvent;               // 0x04  event.c's event number

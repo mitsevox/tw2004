@@ -293,7 +293,7 @@ int fn_800DB86C(int nPlayer) {
     }
     nPar = fn_800D2B08();
     nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1;
-    pSurface = fn_800CC190(pCourse, gPlayers[nPlayer].vTarget2);
+    pSurface = Ter_GetSupportingGroundMaterial(pCourse, gPlayers[nPlayer].vTarget2);
     fDist = fn_800D0478(nPlayer);
     if (!pSurface) {
         return 0;

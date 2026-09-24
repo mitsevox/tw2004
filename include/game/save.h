@@ -197,7 +197,7 @@ typedef struct SkinChoices {
     SkinChoice aSets[116];      // 0x254  the body's, per set
     SkinChoice aSkinParts[6][10];   // 0x5F4  the six skins' of CharSkinSet
     SkinChoice aSkinSets[6][10];    // 0x7D4
-    u8   a9B4[26];              // 0x9B4  the 26 sliders (fn_8010E4DC; a menu message reads slider n
+    u8   a9B4[26];              // 0x9B4  the 26 sliders (CharSlider_UpdateCharacterBasedOnSliderValues; a menu message reads slider n
                                 //        signed); set to 50 each when FE_CrAP_InitCrAPInfo clears
                                 //        the profile's 0x5500..0xB634 (fn_80058208)
     u8   unk9CE[2];

@@ -261,7 +261,7 @@ static void UStream_FinishObject(UStreamObject* pObject) {
     UStreamNode* pNode;
     UStreamNode* p;
     if (gnCurStream == -1) return;
-    pNode = UMemPool_Alloc(gpNodePool);
+    pNode = AllocPoolMem(gpNodePool);
     if (pNode == NULL) return;
     pNode->pNext = NULL;
     pNode->pObject = pObject;
@@ -677,7 +677,7 @@ static UStreamObject* UStream_NextObject(u8 bParse) {
     if (pNode == NULL) return NULL;
     pObject = pNode->pObject;
     gpDoneList = pNode->pNext;
-    UMemPool_Free(gpNodePool, pNode);
+    ReturnPoolMem(gpNodePool, pNode);
     return pObject;
 }
 
@@ -826,7 +826,7 @@ void UStream_CloseAll(void) {
         pStream->hFile = -1;
     }
     if (gpNodePool != NULL) {
-        UMemPool_Destroy(gpNodePool);
+        DeleteMemPool(gpNodePool);
         gpNodePool = NULL;
     }
 }

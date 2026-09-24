@@ -401,7 +401,7 @@ void fn_8006B6D0(int nPlayer) {
 
 // Reaction 2: from the surface class under the ball.
 void fn_8006B6F0(int nPlayer) {
-    SurfaceType* pSurface = fn_800CC190(fn_8000C594(), gPlayers[nPlayer].ball.vPos);
+    SurfaceType* pSurface = Ter_GetSupportingGroundMaterial(fn_8000C594(), gPlayers[nPlayer].ball.vPos);
 
     if (pSurface == NULL) {
         lbl_801D5F78[nPlayer].n0 = 4;

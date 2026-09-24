@@ -40,23 +40,23 @@ void fn_80071AD0(void) {
 // Destroy the pools fn_80071AD0 made.
 void fn_80071B94(void) {
     if (lbl_80281E98 != NULL) {
-        UMemPool_Destroy(lbl_80281E98);
+        DeleteMemPool(lbl_80281E98);
         lbl_80281E98 = NULL;
     }
     if (lbl_80281E94 != NULL) {
-        UMemPool_Destroy(lbl_80281E94);
+        DeleteMemPool(lbl_80281E94);
         lbl_80281E94 = NULL;
     }
     if (lbl_80281E90 != NULL) {
-        UMemPool_Destroy(lbl_80281E90);
+        DeleteMemPool(lbl_80281E90);
         lbl_80281E90 = NULL;
     }
     if (lbl_80281E8C != NULL) {
-        UMemPool_Destroy(lbl_80281E8C);
+        DeleteMemPool(lbl_80281E8C);
         lbl_80281E8C = NULL;
     }
     if (lbl_80281E88 != NULL) {
-        UMemPool_Destroy(lbl_80281E88);
+        DeleteMemPool(lbl_80281E88);
         lbl_80281E88 = NULL;
     }
 }
@@ -72,13 +72,13 @@ void fn_80071C28(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBl
     if (*ppNode == NULL) {
         switch (nType) {
         case 0:
-            *ppNode = UMemPool_Alloc(lbl_80281E98);
+            *ppNode = AllocPoolMem(lbl_80281E98);
             break;
         case 1:
-            *ppNode = UMemPool_Alloc(lbl_80281E94);
+            *ppNode = AllocPoolMem(lbl_80281E94);
             break;
         default:
-            *ppNode = UMemPool_Alloc(lbl_80281E90);
+            *ppNode = AllocPoolMem(lbl_80281E90);
             break;
         }
         if (*ppNode == NULL) return;
@@ -92,14 +92,14 @@ void fn_80071C28(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBl
     (*ppNode)->fStart = (*ppNode)->fEnd = 0.0f;
     (*ppNode)->fWeight = 0.5f;
     if ((*ppNode)->nFormat == 0) {
-        (*ppNode)->pPose = UMemPool_Alloc(lbl_80281E8C);
+        (*ppNode)->pPose = AllocPoolMem(lbl_80281E8C);
         if ((*ppNode)->pPose == NULL) return;
         fn_8001E938((*ppNode)->pPose->a0, 128);
         fn_8001E938((*ppNode)->pPose->a10, 128);
         fn_8001E8A4((*ppNode)->pPose->a20, 128);
         fn_8001E8A4((*ppNode)->pPose->a30, 128);
     } else if ((*ppNode)->nFormat == 1) {
-        (*ppNode)->pPose = UMemPool_Alloc(lbl_80281E88);
+        (*ppNode)->pPose = AllocPoolMem(lbl_80281E88);
         if ((*ppNode)->pPose == NULL) return;
         fn_8001E938(((SkelPose1*)(*ppNode)->pPose)->pose.a0, 128);
         fn_8001E938(((SkelPose1*)(*ppNode)->pPose)->pose.a10, 128);
@@ -134,11 +134,11 @@ void fn_80071F58(SKABlendNode** ppNode, u8 bFreeSources) {
     if (*ppNode == NULL) return;
     if ((*ppNode)->nFormat == 0) {
         if ((*ppNode)->pPose != NULL) {
-            UMemPool_Free(lbl_80281E8C, (*ppNode)->pPose);
+            ReturnPoolMem(lbl_80281E8C, (*ppNode)->pPose);
         }
     } else if ((*ppNode)->nFormat == 1) {
         if ((*ppNode)->pPose != NULL) {
-            UMemPool_Free(lbl_80281E88, (*ppNode)->pPose);
+            ReturnPoolMem(lbl_80281E88, (*ppNode)->pPose);
         }
     }
     (*ppNode)->pPose = NULL;
@@ -160,13 +160,13 @@ void fn_80071F58(SKABlendNode** ppNode, u8 bFreeSources) {
     if ((*ppNode)->bPooled == 1) {
         switch ((*ppNode)->nType) {
         case 0:
-            UMemPool_Free(lbl_80281E98, *ppNode);
+            ReturnPoolMem(lbl_80281E98, *ppNode);
             break;
         case 1:
-            UMemPool_Free(lbl_80281E94, *ppNode);
+            ReturnPoolMem(lbl_80281E94, *ppNode);
             break;
         default:
-            UMemPool_Free(lbl_80281E90, *ppNode);
+            ReturnPoolMem(lbl_80281E90, *ppNode);
             break;
         }
         *ppNode = NULL;

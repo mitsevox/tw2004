@@ -221,7 +221,7 @@ void fn_800BB52C(void) {
         pDst = lbl_80282208->p20;
         // EA bug: the byte count and the value width are swapped, and the address of pDst is
         // passed for pDst (the call is shaped like fn_8001F08C's)
-        fn_80076158((u8**)&pSrc, (u8*)&pDst, 4, lbl_80282208->n0C * 4);
+        BYTESWAP_SWAPDATA((u8**)&pSrc, (u8*)&pDst, 4, lbl_80282208->n0C * 4);
     }
     for (i = 0; i < lbl_80282208->nEntries; i++) {
         pEntry = &lbl_80282208->p14[i];

@@ -199,7 +199,7 @@ void fn_800E0B38(int nMode) {
         GameModeMatch_Init();
         break;
     case 2:
-        fn_800F80FC();
+        GameModeSkins_Init();
         break;
     case 4:
         GameMode4_Init();

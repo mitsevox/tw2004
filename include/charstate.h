@@ -308,7 +308,7 @@ typedef struct Skin {
     u8   pad1045[3];
     f32  a1048[4][4];           // 0x1048  four leg points, each through fn_8000AB40 of its bone's
                                 //         matrix (fn_800184E4: bones 0x3A, 0x48, 0x39, 0x47)
-    f32  (*p1088)[4][4];        // 0x1088  } matrices fn_80018710 hands the model (fn_80029A88,
+    f32  (*p1088)[4][4];        // 0x1088  } matrices fn_80018710 hands the model (SKEL_SetDefaultWorld2BoneMatrices,
     f32  (*p108C)[4][4];        // 0x108C  } fn_80029A7C)
     struct HwsMemBlock* p1090;  // 0x1090  freed by fn_80037708
     u8   unk1094[0x1098 - 0x1094];
@@ -384,10 +384,10 @@ extern HwsRenderState lbl_80223BB0;
 extern f32 lbl_80223C14[3][4];      // the texture matrix fn_80112DD8 loads for a textured pass
 
 // A character's body sliders (Character.p17AC, made by CharSlider_CreateDefinitionsFromMem; our
-// names). fn_8010E4DC sets each slider's value, lets the sliders push on each other, then moves
+// names). CharSlider_UpdateCharacterBasedOnSliderValues sets each slider's value, lets the sliders push on each other, then moves
 // the model's bones and the skin's morph targets by them.
 
-// A slider that moves another's range when this one is between fFrom and fTo (fn_8010DF8C).
+// A slider that moves another's range when this one is between fFrom and fTo (CharSlider_PropogateEffects).
 typedef struct CharSliderLink {
     s32  nSlider;               // 0x00  the slider it moves
     u32  uFlags;                // 0x04  1: moves the other's low end, 2: its high end
@@ -397,13 +397,13 @@ typedef struct CharSliderLink {
 } CharSliderLink;
 
 // A slider this one shares a length with: the two values, as a vector, are cut to fLength
-// (fn_8010DE60).
+// (CharSlider_NormalizePairs).
 typedef struct CharSliderLimit {
     s32  nSlider;               // 0x0
     f32  fLength;               // 0x4
 } CharSliderLimit;
 
-// A bone a slider scales (fn_800298F4 finds it by uId; fn_80028A70 scales it on uAxes).
+// A bone a slider scales (SKEL_GetBoneIDFromNameID finds it by uId; fn_80028A70 scales it on uAxes).
 typedef struct CharSliderBone {
     u64  uId;                   // 0x00
     f32  fFrom;                 // 0x08  the scale at the range's start
@@ -638,10 +638,10 @@ s32   fn_800CDCA0(Skin* pSkin, const char* pName);
 s32   fn_800CDCE0(Skin* pSkin, int nSet, u64 uId);
 s32   fn_800CDD5C(Skin* pSkin, int nSet, const char* pName);
 s32   fn_800CDDB0(Skin* pSkin, int nSet, int nVariant, u64 uId);
-void  fn_8010E4DC(CharSliderDefs* pDefs, CharModel* pModel, Skin* pSkin, int nSliders, u8* aValues,
+void  CharSlider_UpdateCharacterBasedOnSliderValues(CharSliderDefs* pDefs, CharModel* pModel, Skin* pSkin, int nSliders, u8* aValues,
                   struct SKABlendNode* pNode);
                                         // applies slider values (Character.p17AC's definitions)
-void  fn_8010D454(CharSliderDefs* pDefs);   // CharSliders.c: frees slider definitions
+void  CharSlider_Free(CharSliderDefs* pDefs);   // CharSliders.c: frees slider definitions
 void  fn_800CE170(Skin* pSkin, SkinTarget* pTarget);
 void  fn_800CC1EC(Character* pChar, SkinChoices* pChoices);
 void  fn_800CC658(Character* pChar, char* pSet, char* pVariant, char* pOption);

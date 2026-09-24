@@ -18,7 +18,7 @@ typedef struct CamLens {
                                 //       zoom-to-aim camera copies m4[0] to View.v20
     f32  m44[4][4];             // 0x44  world to camera space (hlaudemitter.c fn_800AD800 moves a
                                 //       sound's position with it)
-    f32  m84[2][4];             // 0x84  [1] the scale fn_80076664_SetScaledLookAt puts on the world around a point,
+    f32  m84[2][4];             // 0x84  [1] the scale Camera_SetCameraPositionAndTargetWithOffsetAndScale puts on the world around a point,
                                 //       [0] its inverse; ViewController.c fn_8001728C sets all to 1.0
     f32  fFov;                  // 0xA4  the field of view (GoGolfCam.c sets DEG(60.0f) or DEG(30.0f))
     f32  fA8;                   // 0xA8  CA_vInitCamera starts it at 0.1
@@ -881,7 +881,7 @@ f32         fn_80014174(GoFrameBuf* pBuf);   // f0
 // ---- the parts of a render camera: lens (GoCamera.c), screen rectangle (GoViewport.c) ---------
 
 CamLens* CA_spCreateCamera(void);                     // a new lens
-void     CA_vDestroyCamera(CamLens* pLens);           // free it
+void     CA_vReleaseCamera(CamLens* pLens);           // free it
 void     CA_vSetLookAt(CamLens* pLens, f32* pPos, f32* pTarget);   // aims the lens from pPos at pTarget
 void     CA_vInitCamera(CamLens* pLens);
 void     fn_80076948(CamLens* pLens, f32 fB4, f32 fB8);   // sets fB4 and fB8

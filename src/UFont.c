@@ -5,16 +5,16 @@
 
 #include "engine.h"
 
-void UFont_ResetQueues(void);
+void FO_vClearPacketLists(void);
 void UFont_LoadFontFromStream(UStreamObject* pObject);
 void UFont_ResetContext(void);
 void UFont_LoadFont(u32 uSlot, void* pData, s32 bFlag);
 void UFont_SetFont(s32 nFont);
-void UFont_SetMode(s32 nMode);
-char* UFont_CopyString(char* sz);
+void FO_vSetCurrentAddMode(s32 nMode);
+char* FO_chpCopyString(char* sz);
 f32  UFont_GetStringWidth(char* sz, int nFont);
-void UFont_BeginDraw(void);
-void UFont_EndDraw(void);
+void FO_vSetFontContext(void);
+void FO_vRestoreFontContext(void);
 void fn_80012E00_CalcGradientScale(UFontContext* pCtx);
 void fn_80012E1C(LLFont* pFont, s32 v);
 void fn_80012E24(LLFont* pFont, UFontContext* pCtx);
@@ -24,7 +24,7 @@ UFontState lbl_801A34C0;
 UFontState* lbl_80280DE0 = &lbl_801A34C0;
 
 // Empties every font's queue and both pools.
-void UFont_ResetQueues(void) {
+void FO_vClearPacketLists(void) {
     lbl_80280DE0->apQueue[0] = NULL;
     lbl_80280DE0->apQueue[1] = NULL;
     lbl_80280DE0->apQueue[2] = NULL;
@@ -49,12 +49,12 @@ void UFont_LoadFontFromStream(UStreamObject* pObject) {
     fn_80009E70(pObject);
 }
 
-void UFont_Init(void) {
+void FO_vInitModule(void) {
     UStream_RegisterHandler('sfn ', UFont_LoadFontFromStream);
     fn_80011034(lbl_80280DE0);
     lbl_80280DE0->pQueuePool = fn_80009B34(50 * sizeof(UFontContext), 2, 0x10, "UFont.c", 0x125);
     lbl_80280DE0->pStrings = fn_80009B34(0x1F4, 2, 0x10, "UFont.c", 0x12F);
-    UFont_ResetQueues();
+    FO_vClearPacketLists();
     UFont_ResetContext();
     lbl_80280DE0->apFonts[0] = NULL;
     lbl_80280DE0->apFonts[1] = NULL;
@@ -64,7 +64,7 @@ void UFont_Init(void) {
     lbl_80280DE0->apFonts[5] = NULL;
 }
 
-void UFont_Shutdown(void) {
+void FO_vCloseModule(void) {
     int i;
 
     for (i = 0; i < 6; i++) {
@@ -82,8 +82,8 @@ void UFont_Shutdown(void) {
 void UFont_ResetContext(void) {
     UFontContext* pCtx;
 
-    UFont_SetMode(0);
-    pCtx = UFont_GetContext();
+    FO_vSetCurrentAddMode(0);
+    pCtx = FO_spGetCurrentPacket();
     pCtx->f78 = 1.0f;
     pCtx->f7C = 1.0f;
     pCtx->f80 = 1.0f;
@@ -122,20 +122,20 @@ void UFont_FreeFont(int nSlot) {
 void UFont_SetFont(s32 nFont) {
     UFontContext* pCtx;
 
-    pCtx = UFont_GetContext();
+    pCtx = FO_spGetCurrentPacket();
     pCtx->nFont = nFont;
 }
 
-void UFont_SetMode(s32 nMode) {
+void FO_vSetCurrentAddMode(s32 nMode) {
     lbl_80280DE0->n1B8 = nMode;
 }
 
-s32 UFont_GetMode(void) {
+s32 FO_eGetCurrentAddMode(void) {
     return lbl_80280DE0->n1B8;
 }
 
 // Copies a string into the text pool and returns the copy.
-char* UFont_CopyString(char* sz) {
+char* FO_chpCopyString(char* sz) {
     char* szCopy;
     char* pDst;
 
@@ -158,26 +158,26 @@ void UFont_DrawString(char* sz, f32 fX, f32 fY) {
 
     switch (lbl_80280DE0->n1B8) {
     case 1:
-        pCtx = UFont_GetContext();
+        pCtx = FO_spGetCurrentPacket();
         pFont = lbl_80280DE0->apFonts[pCtx->nFont];
         pCtx->f70 = fX;
         pCtx->f74 = fY;
         nOld = fn_80012E4C(pFont);
         fn_80012E24(pFont, pCtx);
-        UFont_BeginDraw();
+        FO_vSetFontContext();
         fn_80011310(pFont, lbl_80280DE0);
         fn_8001144C(pFont, pCtx, sz);
         fn_80011C8C(pFont);
         fn_80012E1C(pFont, nOld);
-        UFont_EndDraw();
+        FO_vRestoreFontContext();
         break;
     case 0:
-        pCtx = UFont_GetContext();
+        pCtx = FO_spGetCurrentPacket();
         pRec = lbl_80280DE0->pQueueNext++;
         Mem_cpy(pRec, pCtx, sizeof(UFontContext));
         pRec->pNext = lbl_80280DE0->apQueue[pCtx->nFont];
         lbl_80280DE0->apQueue[pCtx->nFont] = pRec;
-        pRec->szText = UFont_CopyString(sz);
+        pRec->szText = FO_chpCopyString(sz);
         pRec->f70 = fX;
         pRec->f74 = fY;
         fn_80012E00_CalcGradientScale(pRec);
@@ -192,7 +192,7 @@ void UFont_DrawQueue(void) {
     UFontContext* pRec;
     LLFont* pFont;
 
-    UFont_BeginDraw();
+    FO_vSetFontContext();
     for (i = 0; i < 6; i++) {
         pFont = lbl_80280DE0->apFonts[i];
         if (pFont != NULL) {
@@ -208,14 +208,14 @@ void UFont_DrawQueue(void) {
             fn_80012438(pFont);
         }
     }
-    UFont_ResetQueues();
-    UFont_EndDraw();
+    FO_vClearPacketLists();
+    FO_vRestoreFontContext();
 }
 
 void fn_80012B2C(f32 x0, f32 x1) {
     UFontContext* pCtx;
 
-    pCtx = UFont_GetContext();
+    pCtx = FO_spGetCurrentPacket();
     pCtx->f84 = x0;
     pCtx->f88 = x1;
 }
@@ -223,14 +223,14 @@ void fn_80012B2C(f32 x0, f32 x1) {
 void fn_80012B6C(f32 x0) {
     UFontContext* pCtx;
 
-    pCtx = UFont_GetContext();
+    pCtx = FO_spGetCurrentPacket();
     pCtx->f78 = x0;
 }
 
 void fn_80012B9C(f32 x0, f32 x1) {
     UFontContext* pCtx;
 
-    pCtx = UFont_GetContext();
+    pCtx = FO_spGetCurrentPacket();
     pCtx->f7C = x0;
     pCtx->f80 = x1;
 }
@@ -240,7 +240,7 @@ f32 UFont_GetStringWidth(char* sz, int nFont) {
     UFontContext* pCtx;
 
     UFont_SetFont(nFont);
-    pCtx = UFont_GetContext();
+    pCtx = FO_spGetCurrentPacket();
     return fn_80011C90(lbl_80280DE0->apFonts[pCtx->nFont], pCtx, sz);
 }
 
@@ -251,21 +251,21 @@ f32 fn_80012C30(char* sz) {
 void fn_80012C54_SetWordWrap(s32 v) {
     UFontContext* pCtx;
 
-    pCtx = UFont_GetContext();
+    pCtx = FO_spGetCurrentPacket();
     pCtx->uA8 = v;
 }
 
 void fn_80012C84_SetFlags(s32 v) {
     UFontContext* pCtx;
 
-    pCtx = UFont_GetContext();
+    pCtx = FO_spGetCurrentPacket();
     pCtx->n9C = v;
 }
 
 void fn_80012CB4_SetWordWrapBox(f32 f0, f32 f1, f32 f2, f32 f3, s32 n) {
     UFontContext* pCtx;
 
-    pCtx = UFont_GetContext();
+    pCtx = FO_spGetCurrentPacket();
     pCtx->a8C[0] = f0;
     pCtx->a8C[1] = f1;
     pCtx->a8C[2] = f2;
@@ -284,7 +284,7 @@ s32 UFont_FindFreeSlot(void) {
     return -1;
 }
 
-void UFont_BeginDraw(void) {
+void FO_vSetFontContext(void) {
     fn_800111D8();
     fn_80012F50(1, 6, 1);
     fn_80012F34(0);
@@ -292,7 +292,7 @@ void UFont_BeginDraw(void) {
     fn_80012EF8();
 }
 
-void UFont_EndDraw(void) {
+void FO_vRestoreFontContext(void) {
     fn_800112DC();
     fn_80012F34(1);
     fn_80012F18(3);
@@ -325,6 +325,6 @@ void UFont_PackColor(const f32* pColor, u8* pOut) {
     pOut[3] = (int)(255.0f * pColor[3]);
 }
 
-UFontContext* UFont_GetContext(void) {
+UFontContext* FO_spGetCurrentPacket(void) {
     return &lbl_80280DE0->ctx;
 }

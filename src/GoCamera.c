@@ -29,7 +29,7 @@ CamLens* CA_spCreateCamera(void) {
     return pLens;
 }
 
-void CA_vDestroyCamera(CamLens* pLens) {
+void CA_vReleaseCamera(CamLens* pLens) {
     fn_80009E70(pLens);
 }
 
@@ -93,7 +93,7 @@ void CA_vSetLookAtSide(CamLens* pLens, f32* pPos, f32* pTarget, f32* pSide) {
 
 // Aims the lens like CA_vSetLookAt, then scales the world by pScale around pCenter: m44 gets the
 // scale, m4 its inverse (1 / pScale, kept in m84[0]).
-void fn_80076664_SetScaledLookAt(CamLens* pLens, f32* pPos, f32* pTarget, f32* pCenter, f32* pScale) {
+void Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* pPos, f32* pTarget, f32* pCenter, f32* pScale) {
     f32 vDir[4];
     f32 mB[4][4];
     f32 mA[4][4];

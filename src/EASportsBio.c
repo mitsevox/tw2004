@@ -31,7 +31,7 @@ s32 EASB_gErrorMap[35] = {
 void EASBio_InitOnce(void) {
     lbl_80261040.szProductName = lbl_80195308;
     lbl_80261040.szGamesPlayedType = lbl_80195324;
-    lbl_80261040.pCallbacks = fn_801221F0();
+    lbl_80261040.pCallbacks = SFIO_spGetCallbacks();
     lbl_80261040.uHeapID = 0;
     lbl_80261040.uGamesPlayedTypeLanguage = 'en';
     fn_8000A0AC(0);

@@ -1418,7 +1418,7 @@ u8 AI_GreenTowardPin(int nPlayer, f32 fDist) {
     fHeight = Ter_GetHighestGroundHeight(pCourse, vDir);
     if (fHeight != TER_NO_GROUND) {
         vDir[1]  = 10.0f + fHeight;
-        pSurface = fn_800CC190(pCourse, vDir);
+        pSurface = Ter_GetSupportingGroundMaterial(pCourse, vDir);
         if (pSurface->nClass == 3) {
             bGreen = 1;
         }
@@ -1445,7 +1445,7 @@ void Golfer_TableByteSwap(void) {
         // port: 'stat' is little-endian on disc; a little-endian port does not swap here. Only
         // 0x98..0x140 of each record is swapped, in 8-byte units (the u32 at 0x90 is not); the
         // records are then read in place as GolferRecord.
-        fn_80076158(&pSrc, (u8*)&gGolferTable[i] + 0x98, 0xA8, 8);
+        BYTESWAP_SWAPDATA(&pSrc, (u8*)&gGolferTable[i] + 0x98, 0xA8, 8);
     }
 }
 

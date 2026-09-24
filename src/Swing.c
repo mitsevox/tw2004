@@ -210,7 +210,7 @@ f32 Swing_ApplyPowerBoost(int nPlayer, f32 fPower) {
 // The spin stick's result (a replay reads it back from the recording first).
 void fn_8005C15C(int nPlayer, f32* pSpinY, f32* pSpinX) {
     if (gSession.bReplay) {
-        fn_8006C2C8(nPlayer, &gPlayers[nPlayer].swing.fForwardSpin, &gPlayers[nPlayer].swing.fSideSpin);
+        REPLAY_GetSpin(nPlayer, &gPlayers[nPlayer].swing.fForwardSpin, &gPlayers[nPlayer].swing.fSideSpin);
     }
     *pSpinX = gPlayers[nPlayer].swing.fForwardSpin;
     *pSpinY = gPlayers[nPlayer].swing.fSideSpin;
@@ -619,7 +619,7 @@ void Swing_Launch(int nPlayer) {
         Mem_cpy(&gPlayers[0].swing, &gReplayData.player.swing, 0x630);
     } else if (gSession.bReplay == 0) {
         Luck_TakePerfectShot(nPlayer);
-        fn_8006BF60(nPlayer);
+        REPLAY_Save(nPlayer);
     } else {
         REPLAY_Play(nPlayer);
     }
@@ -1267,7 +1267,7 @@ int Swing_WaitForBackswing(int nPlayer) {
         EVENT_Trigger(nPlayer, 0x2C, 0, 0);
         Swing_Begin(nPlayer);
         Swing_ClearFrameFlag(nPlayer);
-        fn_8006C5E0();
+        REPLAY_RecordStart();
     } else {
         gPlayers[nPlayer].swing.nRestCY = 128;
         gPlayers[nPlayer].swing.nRestCX = 128;
@@ -1539,7 +1539,7 @@ int Swing_UpdateDownswing(int nPlayer) {
         }
     }
     if (pObj->n5CC < 0) {
-        fn_8002792C(pObj->pModel->pSkel);
+        SKEL_RelaxIK(pObj->pModel->pSkel);
         gPlayers[nPlayer].swing.nState = 5;
         Swing_Launch(nPlayer);
         if (!Controller_IsCPU(nController) && gSession.bReplay == 0) {
@@ -2323,7 +2323,7 @@ void STATEFUNC_SimulateExit(int nPlayer) {
     View* pViewObj = fn_80017028(gPlayers[nPlayer].nView[0]);
     fn_80045558(0, nPlayer);
     fn_80045494(0, nPlayer);
-    fn_8006C608();
+    REPLAY_RecordStop();
     fn_80062CE0(0);
     Swing_RumbleOff(nPlayer);
     fn_800C1790(fn_80017028(gPlayers[nPlayer].nView[0]), nPlayer);
@@ -2627,7 +2627,7 @@ void STATEFUNC_GreenWatchRollInit(int nPlayer) {
     gPlayers[nPlayer].ballBefore.nPlayer = -1;
     Mem_cpy(pBall, &ballSaved, sizeof(Ball));
     Mem_cpy(pShot, shotSaved, 0x5C);   // port: as above
-    fn_8006BF60(nPlayer);
+    REPLAY_Save(nPlayer);
     fn_800E3D38(nPlayer, 0);
 }
 
@@ -2769,7 +2769,7 @@ void STATEFUNC_TapInUpdate(int nPlayer) {
         Swing_Launch(nPlayer);
         gPlayers[nPlayer].nController = nController;
         fn_800A5980((u8)nPlayer);
-        fn_8006C28C(nPlayer, nController);
+        REPLAY_ResetController(nPlayer, nController);
         GOLFERSTATE_Switch(GS_SIMULATE, nPlayer);
     } else {
         nController  = gPlayers[nPlayer].nController;
@@ -2777,7 +2777,7 @@ void STATEFUNC_TapInUpdate(int nPlayer) {
         Swing_Launch(nPlayer);
         gPlayers[nPlayer].nController = nController;
         fn_800A5980((u8)nPlayer);
-        fn_8006C28C(nPlayer, nController);
+        REPLAY_ResetController(nPlayer, nController);
         GOLFERSTATE_Switch(GS_SIMULATE, nPlayer);
     }
 }
@@ -3262,13 +3262,13 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
     if (!fn_80048574(gPlayers[nPlayer].pChar, 2) ||
         fn_8005CB78(gPlayers[nPlayer].pChar, 2) < gPlayers[nPlayer].pChar->fAnimTime) {
         if (gSession.bReplay) {
-            fn_8002792C(gPlayers[nPlayer].pChar->pModel->pSkel);
+            SKEL_RelaxIK(gPlayers[nPlayer].pChar->pModel->pSkel);
             Swing_Launch(nPlayer);
             GOLFERSTATE_Switch(GS_SIMULATE, nPlayer);
         } else if (fn_800C4518(pV) >= fn_800C6B38(pV)) {
             EVENT_Trigger(nPlayer, 0xA, &gPlayers[nPlayer].ball, 1);
             fn_800C44A8(pV, nPlayer);
-            fn_8002792C(gPlayers[nPlayer].pChar->pModel->pSkel);
+            SKEL_RelaxIK(gPlayers[nPlayer].pChar->pModel->pSkel);
             Swing_Launch(nPlayer);
             GOLFERSTATE_Switch(GS_SIMULATE, nPlayer);
         } else {
@@ -3585,7 +3585,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
     Swing_RumbleTick(nPlayer);
     if (fn_80062DD4(pV) && fn_80062DCC(pV) > 0.5f) {
         GM_PlayerTookShot(nPlayer);
-        fn_8006C4A0();
+        REPLAY_Stop();
         fn_800DBDA8(nPlayer);
         if (gPlayers[nPlayer].ball.nLie == LIE_INCUP_e) {
             GOLFERSTATE_Switch(GS_IN_THE_HOLE, nPlayer);
@@ -3656,7 +3656,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
     }
     if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x19, 0)) &&
         !(gPlayers[nPlayer].uFlags & 8) && GM_PlayerTakeMulligan(nPlayer)) {
-        fn_8006C4A0();
+        REPLAY_Stop();
         if (fn_800C6D28()) {
             fn_800C6DE4();
         }

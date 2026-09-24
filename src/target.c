@@ -1206,16 +1206,16 @@ void fn_8006A8D4(void* pCamera, f32* pX, f32* pY) {
 
 // Draw text in one colour (pColor: RGBA).
 void fn_8006A9AC(f32* pColor) {
-    UFont_GetContext()->nA4 = 0x12;
-    UFont_PackColor(pColor, (u8*)&UFont_GetContext()->u5C);
+    FO_spGetCurrentPacket()->nA4 = 0x12;
+    UFont_PackColor(pColor, (u8*)&FO_spGetCurrentPacket()->u5C);
 }
 
 // The current font's line height, scaled as the text is drawn.
 f32 fn_8006A9FC(void) {
-    return fn_8006A8A8((u8*)fn_8006AA3C()) * UFont_GetContext()->f80;
+    return fn_8006A8A8((u8*)fn_8006AA3C()) * FO_spGetCurrentPacket()->f80;
 }
 
 // The font the current text settings draw with.
 LLFont* fn_8006AA3C(void) {
-    return lbl_80280DE0->apFonts[UFont_GetContext()->nFont];
+    return lbl_80280DE0->apFonts[FO_spGetCurrentPacket()->nFont];
 }

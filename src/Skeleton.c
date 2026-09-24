@@ -40,8 +40,8 @@ void fn_80029C3C(f32* pA, f32* pB, f32* pOut);
 void fn_80029C18(f32* pA, f32* pB, f32* pOut);
 void fn_80029C60(u32* aSrc, u32* aDst, u32 nBits, u32 nShift);
 void fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits);
-void fn_80029664(CharModel* pModel);
-void fn_80029804(CharModel* pModel);
+void SKEL_GenerateBoneLookupTable(CharModel* pModel);
+void SKEL_GenerateLeftHandedTable(CharModel* pModel);
 void SKEL_TransformBones(CharModel* pModel, u32* aBits);
 Skeleton* SKEL_CreateIKSkeleton(CharModel* pModel, CharModelDefs* pDefs);
 struct DynChain* fn_80114270(CharModel* pModel, int nBone, s32 nType, s32 n10);   // DynChain.c
@@ -186,7 +186,7 @@ void fn_80026F90(Skeleton* pSkel, IKChain* pChain, u8 bAll) {
 
 // Copies the chain's rotations from p20 to p24; below full weight, blends them toward the
 // identity by the weight.
-void fn_8002703C(Skeleton* pSkel, IKChain* pChain, f32 fWeight) {
+void SKEL_WeightIKChain(Skeleton* pSkel, IKChain* pChain, f32 fWeight) {
     int i;
     for (i = 0; i < pChain->nLinks; i++) {
         int nBone = pChain->pLinks[i].nBone;
@@ -360,13 +360,13 @@ f32 fn_800275F4(CharModel* pModel, IKChain* pChain, f32* pTarget) {
 }
 
 // Turns the IK on or off.
-void fn_80027738(u8 bOn) {
+void SKEL_EnableIK(u8 bOn) {
     lbl_802810A6 = bOn;
 }
 
 // Applies the IK weight to the first IK chain.
 void fn_80027740(Skeleton* pSkel, f32 fWeight) {
-    fn_8002703C(pSkel, pSkel->pChains, fWeight);
+    SKEL_WeightIKChain(pSkel, pSkel->pChains, fWeight);
 }
 
 // Sets how strongly the IK solution is applied. At 0 or 1 the bones use p20 as they are; in
@@ -413,7 +413,7 @@ void fn_8002787C(CharModel* pModel) {
 }
 
 // With any IK weight, sets f1074 and f1078 to 0.25.
-void fn_8002792C(Skeleton* pSkel) {
+void SKEL_RelaxIK(Skeleton* pSkel) {
     if (pSkel == NULL || lbl_802810A6 == 0) return;
     if (pSkel->fIKWeight > 0.0f) {
         pSkel->f1074 = 0.25f;
@@ -502,7 +502,7 @@ void fn_800279C0(Character* pChar) {
     vTarget[3] = 0.0f;
     fn_800273BC(pModel, pChain, vTarget, pChain->n18, NULL, pChain->f1C);
     if (pSkel->fIKWeight < 1.0f) {
-        fn_8002703C(pSkel, pChain, pSkel->fIKWeight);
+        SKEL_WeightIKChain(pSkel, pChain, pSkel->fIKWeight);
     }
     Quat_Multiply(pSkel->q107C, pGrip->q0, pPose28->q0);
     fn_8001EB6C(pModel->a14, n28);
@@ -699,7 +699,7 @@ Skeleton* SKEL_CreateIKSkeleton(CharModel* pModel, CharModelDefs* pDefs) {
 }
 
 // Frees a skeleton: its chains' links, the chains, and both rotation sets.
-void fn_800284DC(Skeleton* pSkel) {
+void SKEL_FreeIKSkeleton(Skeleton* pSkel) {
     int i;
     for (i = 0; i < pSkel->nChains; i++) {
         fn_80009E70(pSkel->pChains[i].pLinks);
@@ -721,7 +721,7 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int b) {
 
     pModel = fn_80009B34(sizeof(CharModel), 2, 64, "Skeleton.c", 1228);
     memset(pModel, 0, sizeof(CharModel));
-    fn_80076158(&pData, (u8*)&pModel->nBones, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&pModel->nBones, 4, 4);
     if (nExtra < 0) {
         nExtra = -nExtra - pModel->nBones;
         if (nExtra < 0) {
@@ -730,12 +730,12 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int b) {
     }
     nTotal = pModel->nBones + nExtra;
     pModel->pBones = fn_80009B34(nTotal * sizeof(Bone), 2, 64, "Skeleton.c", 1242);
-    fn_80076158(&pData, (u8*)&pModel->f10, 4, 4);
-    fn_80076158(&pData, (u8*)&pModel->fC, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&pModel->f10, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&pModel->fC, 4, 4);
     for (i = 0; i < pModel->nBones; i++) {
-        fn_80076158(&pData, (u8*)&pModel->pBones[i].uId, 8, -8);
-        fn_80076158(&pData, (u8*)&pModel->pBones[i].nParent, 1, 1);
-        fn_80076158(&pData, (u8*)pModel->pBones[i].v1C, 0x10, 4);
+        BYTESWAP_SWAPDATA(&pData, (u8*)&pModel->pBones[i].uId, 8, -8);
+        BYTESWAP_SWAPDATA(&pData, (u8*)&pModel->pBones[i].nParent, 1, 1);
+        BYTESWAP_SWAPDATA(&pData, (u8*)pModel->pBones[i].v1C, 0x10, 4);
     }
     for (; i < nTotal; i++) {
         pModel->pBones[i].nParent = 0;
@@ -754,8 +754,8 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int b) {
     fn_8001E8A4(pModel->a14, 0x80);
     fn_8001E8A4(pModel->a24, 0x80);
     pModel->bEE = b;
-    fn_80029664(pModel);
-    fn_80029804(pModel);
+    SKEL_GenerateBoneLookupTable(pModel);
+    SKEL_GenerateLeftHandedTable(pModel);
     if (pDefs != NULL) {
         pModel->pSkel = SKEL_CreateIKSkeleton(pModel, pDefs);
     } else {
@@ -850,7 +850,7 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
         fn_800BADF8(pModel->pMatrices[0], mScale, mOut, 4);
         fn_8000A0E8(mOut, pModel->pMatrices[0]);
         fn_8001E880(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
-        fn_80029A90(pModel, pModel->pMatrices[0], 0);
+        SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[0], 0);
     }
     fn_80029C60(aCur, aCur, 4, 1);
 
@@ -918,7 +918,7 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
             fn_800BADF8(pModel->pMatrices[i], mScale, mOut, 4);
             fn_8000A0E8(mOut, pModel->pMatrices[i]);
             fn_8001E880(pPose->v10, pModel->pMatrices[i][3]);
-            fn_80029A90(pModel, pModel->pMatrices[i], i);
+            SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[i], i);
             fn_80021980(aBits, aCur, aBits, 0x80);
         }
         fn_80029C60(aCur, aCur, 0x80, 1);
@@ -1016,13 +1016,13 @@ void fn_800293CC(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pO
 }
 
 // Sets up: the identity rotation, then the dynamic chains.
-void fn_80029530(void) {
+void SKEL_InitModule(void) {
     fn_80009710(lbl_801C6498);
     fn_80113E60();
 }
 
 // Shuts down the dynamic chains.
-void fn_8002955C(void) {
+void SKEL_CloseModule(void) {
     fn_80114080();
 }
 
@@ -1053,14 +1053,14 @@ void SKEL_Free(CharModel* pModel) {
         }
     }
     if (pModel->pSkel != NULL) {
-        fn_800284DC(pModel->pSkel);
+        SKEL_FreeIKSkeleton(pModel->pSkel);
     }
     fn_80009E70(pModel);
 }
 
 // Fills in aBone: finds each model bone's id by its name (the first 8 bytes of its uId). Of the
 // bones with no known name (up to 30), the first named after a club becomes bone 0x52, the club.
-void fn_80029664(CharModel* pModel) {
+void SKEL_GenerateBoneLookupTable(CharModel* pModel) {
     char szName[9];
     u8 aUnknown[30];
     int nUnknown = 0;
@@ -1102,7 +1102,7 @@ void fn_80029664(CharModel* pModel) {
 
 // Fills in aBone2: each bone maps to itself, except the pairs in lbl_8018742C, where the model's
 // first bone maps to its second.
-void fn_80029804(CharModel* pModel) {
+void SKEL_GenerateLeftHandedTable(CharModel* pModel) {
     int i;
     int nA;
     int nB;
@@ -1121,7 +1121,7 @@ void fn_80029804(CharModel* pModel) {
 }
 
 // The index of the bone with this id, -1 for none.
-int fn_800298F4(CharModel* pModel, u64 uId) {
+int SKEL_GetBoneIDFromNameID(CharModel* pModel, u64 uId) {
     int i;
     for (i = 0; i < pModel->nBones; i++) {
         if (pModel->pBones[i].uId == uId) {
@@ -1165,12 +1165,12 @@ void fn_80029A7C(CharModel* pModel, f32 (*pMatrices)[4][4], s32 nMatrices) {
     pModel->n76C = nMatrices;
 }
 
-void fn_80029A88(CharModel* pModel, f32 (*pMatrices)[4][4]) {
+void SKEL_SetDefaultWorld2BoneMatrices(CharModel* pModel, f32 (*pMatrices)[4][4]) {
     pModel->p764 = pMatrices;
 }
 
 // Transforms a bone's p764 matrix through pMtx into its p768 matrix, when the model has them.
-void fn_80029A90(CharModel* pModel, f32 (*pMtx)[4], int nBone) {
+void SKEL_UpdateSkinningMatrix(CharModel* pModel, f32 (*pMtx)[4], int nBone) {
     if (nBone >= pModel->n76C || pModel->p760 == NULL || pModel->p768 == NULL || pModel->p764 == NULL) {
         return;
     }
@@ -1181,7 +1181,7 @@ void fn_80029A90(CharModel* pModel, f32 (*pMtx)[4], int nBone) {
 void fn_80029AF8(CharModel* pModel) {
     int i;
     for (i = 0; i < pModel->nBones; i++) {
-        fn_80029A90(pModel, pModel->pMatrices[i], i);
+        SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[i], i);
     }
 }
 

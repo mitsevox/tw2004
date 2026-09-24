@@ -442,20 +442,20 @@ void fn_80020858(Clip* pClip) {
     u8* pSrc;
 
     pSrc = (u8*)pClip->uAram;
-    fn_80076158(&pSrc, pSrc, pClip->n38, 2);
+    BYTESWAP_SWAPDATA(&pSrc, pSrc, pClip->n38, 2);
     if (pClip->n04 != 0) {  // tests n04 but swaps the n3C bytes at pE0
         pSrc = pClip->pE0;
-        fn_80076158(&pSrc, pSrc, pClip->n3C, 2);
+        BYTESWAP_SWAPDATA(&pSrc, pSrc, pClip->n3C, 2);
     }
     if (pClip->n40 != 0) {
         pSrc = pClip->pE8;
-        fn_80076158(&pSrc, pSrc, pClip->n40, 2);
+        BYTESWAP_SWAPDATA(&pSrc, pSrc, pClip->n40, 2);
     }
     if (pClip->n4C != 0) {
         pSrc = pClip->pEC;
-        fn_80076158(&pSrc, pSrc, pClip->n50, 4);
+        BYTESWAP_SWAPDATA(&pSrc, pSrc, pClip->n50, 4);
         pSrc = pClip->pF0;
-        fn_80076158(&pSrc, pSrc, pClip->n4C, 2);
+        BYTESWAP_SWAPDATA(&pSrc, pSrc, pClip->n4C, 2);
     }
 }
 
@@ -541,17 +541,17 @@ void fn_80020BC8(u8* p) {
     if (pClip->n40 != 0) {
         pSrc = p;
         p += pClip->n40;
-        fn_80076158(&pSrc, pSrc, pClip->n40, 2);
+        BYTESWAP_SWAPDATA(&pSrc, pSrc, pClip->n40, 2);
     }
     if (pClip->n3C != 0) {
         pSrc = p;
         p += pClip->n3C;
-        fn_80076158(&pSrc, pSrc, pClip->n3C, 2);
+        BYTESWAP_SWAPDATA(&pSrc, pSrc, pClip->n3C, 2);
     }
     pSrc = p;
     pClip->uAram = (uptr)p;
     p += pClip->n38;
-    fn_80076158(&pSrc, pSrc, pClip->n38, 2);
+    BYTESWAP_SWAPDATA(&pSrc, pSrc, pClip->n38, 2);
     if (pClip->n04 != 0) {
         pClip->pE4 = p;
         p += pClip->n04;
@@ -559,11 +559,11 @@ void fn_80020BC8(u8* p) {
     if (pClip->n4C != 0) {
         pSrc = p;
         pClip->pEC = p;
-        fn_80076158(&pSrc, pSrc, pClip->n50, 4);
+        BYTESWAP_SWAPDATA(&pSrc, pSrc, pClip->n50, 4);
         p += pClip->n50;
         pClip->pF0 = p;
         pSrc = p;
-        fn_80076158(&pSrc, p, pClip->n4C, 2);
+        BYTESWAP_SWAPDATA(&pSrc, p, pClip->n4C, 2);
         p += pClip->n4C;
     }
     if (pClip->n64 != 0) {
@@ -576,11 +576,11 @@ void fn_80020BC8(u8* p) {
     nBytes = (pClip->n1C * 2 + 31) / 32 * 4;
     pClip->pF8 = p;
     pSrc = p;
-    fn_80076158(&pSrc, p, nBytes, 4);
+    BYTESWAP_SWAPDATA(&pSrc, p, nBytes, 4);
     p += nBytes;
     pClip->pFC = p;
     pSrc = p;
-    fn_80076158(&pSrc, p, nBytes, 4);
+    BYTESWAP_SWAPDATA(&pSrc, p, nBytes, 4);
 }
 
 // Takes the clip at pData rounded up to nAlign bytes, byte-swaps it in place and lays it out with
@@ -627,11 +627,11 @@ Clip* fn_80020DD4(u8* p, u32* pu30, u32 nAlign) {
     nBytes = (pClip->n1C * 2 + 31) / 32 * 4;
     pClip->pF8 = p;
     pSrc = p;
-    fn_80076158(&pSrc, p, nBytes, 4);
+    BYTESWAP_SWAPDATA(&pSrc, p, nBytes, 4);
     p += nBytes;
     pClip->pFC = p;
     pSrc = p;
-    fn_80076158(&pSrc, p, nBytes, 4);
+    BYTESWAP_SWAPDATA(&pSrc, p, nBytes, 4);
     if (pu30 != NULL) {
         *pu30 = pClip->u30;
     }

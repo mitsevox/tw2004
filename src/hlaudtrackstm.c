@@ -45,7 +45,7 @@ void fn_800AB428(AudTrack* pTrack) {
     u8 i;
 
     pList = pTrack->pTmpl->data.pPlayList;
-    fn_800A85FC(pTrack->f44, fn_800AA44C(pList->n3));
+    fn_800A85FC(pTrack->f44, Mas_GetSubmix(pList->n3));
     bLoud = pList->n3 == 15;
     for (i = 0; i < pList->nChannels; i++) {
         fn_800AC7DC(pTrack->apVoices[i], 0xFE00, pList->n4, bLoud);
@@ -237,7 +237,7 @@ void fn_800ABA28(AudTrack* pTrack) {
     request.flags.n = 0;
     request.nPriority = 0x3FFF;
     request.n4 = 2;
-    request.pfnCallback = fn_800AA400;
+    request.pfnCallback = Trk_VoiceEndCB;
     request.flags.b.b14 = 1;
     i = 0;
     request.pUser = pTrack;

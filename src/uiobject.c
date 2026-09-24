@@ -76,7 +76,7 @@ void fn_800AE338(void) {
         fn_80048860(lbl_802820D0);
     }
     lbl_802820D0 = NULL;
-    CA_vDestroyCamera(lbl_802820CC);
+    CA_vReleaseCamera(lbl_802820CC);
     fn_8006E62C(&lbl_801F5B40);
 }
 

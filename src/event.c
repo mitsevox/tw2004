@@ -343,7 +343,7 @@ void fn_80066664(int nPlayer, int nEvent, void* pData, int nArg) {
         }
         fn_8005C15C(nPlayer, &fSpinY, &fSpinX);
         if (!gSession.bReplay) {
-            fn_8006C2A8(nPlayer, fSpinX, fSpinY);
+            REPLAY_SaveSpin(nPlayer, fSpinX, fSpinY);
         }
         fn_80051C84(&gPlayers[nPlayer].ball, fSpinY, fSpinX);
     }

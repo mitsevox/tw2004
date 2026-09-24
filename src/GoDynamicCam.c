@@ -107,9 +107,9 @@ void fn_80039554(UStreamObject* pObject) {
         return;
     }
     pSrc = pObject->pData;
-    fn_80076158(&pSrc, (u8*)&nSequences, sizeof(nSequences), 4);
+    BYTESWAP_SWAPDATA(&pSrc, (u8*)&nSequences, sizeof(nSequences), 4);
     pSrc = pObject->pData + 4;
-    fn_80076158(&pSrc, (u8*)&nChoices, sizeof(nChoices), 4);
+    BYTESWAP_SWAPDATA(&pSrc, (u8*)&nChoices, sizeof(nChoices), 4);
     lbl_80281D88->pSequences = fn_80009B34(nSequences * sizeof(CamSequence), 2, 0, "GoDynamicCam.c", 403);
     lbl_80281D88->pChoices = fn_80009B34(nChoices * sizeof(CamChoice), 2, 0, "GoDynamicCam.c", 404);
     lbl_80281D88->nSequences = 0;

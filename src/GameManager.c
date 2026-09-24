@@ -551,7 +551,7 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     gPlayers[nPlayer].bC2F = 1;
     gpGame->pfn254(nPlayer);
     if (gSession.bReplay) {
-        fn_8006C4A0();
+        REPLAY_Stop();
     }
     fn_800C70F8(fn_80017028(gPlayers[nPlayer].nView[0]), 1);
     fn_800957D8(gPlayers[nPlayer].pChar);
