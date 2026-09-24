@@ -721,81 +721,81 @@ u8 fn_8010BFE0(void) {
     fn_80007368();
     bReady = lbl_80282488->b974 != 0;
     fn_80007328();
-    if (!bReady) {
-        return 1;
-    }
-    pTex = DYNTEX_CHAR(lbl_80282488->pA88->p0)->p60;
-    // Copy what the last read brought.
-    if (lbl_80282488->n978 != 0) {
-        Mem_cpy(lbl_80282488->p4, lbl_80282488->p0 + lbl_80282488->nA94, lbl_80282488->nA90);
-        lbl_80282488->p4 += lbl_80282488->nA90;
-        lbl_80282488->nA8C += lbl_80282488->nA90;
-        lbl_80282488->nA94 = 0;
-    }
-    if (lbl_80282488->b975) {
-        if (lbl_80282488->n980 == 1) {
-            // The last texture is all in: flush it (and its palette) to the GPU.
-            if (lbl_80282488->n978 != 0 && lbl_80282488->n970 > 0) {
-                fn_8010B1D4(pTex, lbl_80282488->aUses[lbl_80282488->n970 - 1].nC, NULL,
+    if (bReady) {
+        pTex = DYNTEX_CHAR(lbl_80282488->pA88->p0)->p60;
+        // Copy what the last read brought.
+        if (lbl_80282488->n978 != 0) {
+            Mem_cpy(lbl_80282488->p4, lbl_80282488->p0 + lbl_80282488->nA94, lbl_80282488->nA90);
+            lbl_80282488->p4 += lbl_80282488->nA90;
+            lbl_80282488->nA8C += lbl_80282488->nA90;
+            lbl_80282488->nA94 = 0;
+        }
+        if (lbl_80282488->b975) {
+            if (lbl_80282488->n980 == 1) {
+                // The last texture is all in: flush it (and its palette) to the GPU.
+                if (lbl_80282488->n978 != 0 && lbl_80282488->n970 > 0) {
+                    fn_8010B1D4(pTex, lbl_80282488->aUses[lbl_80282488->n970 - 1].nC, NULL,
+                                lbl_80282488->aUses[lbl_80282488->n970 - 1].p4,
+                                lbl_80282488->aUses[lbl_80282488->n970 - 1].n8);
+                    if (pTex->p0[lbl_80282488->aUses[lbl_80282488->n970 - 1].nC].n1C != 0) {
+                        // port: EA passes two arguments fn_8010B2A8 ignores
+                        ((void (*)(DynTex*, int, s16*, void*, s32))fn_8010B2A8)(
+                            pTex, lbl_80282488->aUses[lbl_80282488->n970 - 1].nC, NULL,
                             lbl_80282488->aUses[lbl_80282488->n970 - 1].p4,
                             lbl_80282488->aUses[lbl_80282488->n970 - 1].n8);
-                if (pTex->p0[lbl_80282488->aUses[lbl_80282488->n970 - 1].nC].n1C != 0) {
-                    // port: EA passes two arguments fn_8010B2A8 ignores
-                    ((void (*)(DynTex*, int, s16*, void*, s32))fn_8010B2A8)(
-                        pTex, lbl_80282488->aUses[lbl_80282488->n970 - 1].nC, NULL,
-                        lbl_80282488->aUses[lbl_80282488->n970 - 1].p4,
-                        lbl_80282488->aUses[lbl_80282488->n970 - 1].n8);
+                    }
                 }
+                if (lbl_80282488->n970 == lbl_80282488->n96C) {
+                    // All done.
+                    lbl_80282488->pA88->pfnB(lbl_80282488->pA88->pChar);
+                    lbl_80282488->pA88->bUsed = 0;
+                    lbl_80282488->n980 = 0;
+                    return 0;
+                }
+                // The next texture: add it to the DynTex and work out the 2 KB-aligned read.
+                pEntry = lbl_80282488->aUses[lbl_80282488->n970].pTex;
+                lbl_80282488->n984 = 0;
+                pPal = NULL;
+                if (pEntry->nPalette != -1) {
+                    pPal = &(*lbl_80282488->p8)->pC[pEntry->nPalette];
+                }
+                lbl_80282488->aUses[lbl_80282488->n970].nC =
+                    fn_8010B338(DYNTEX_CHAR(lbl_80282488->pA88->p0)->p60, (DynTexObj*)pEntry,
+                                (DynTexPalette*)pPal, NULL, NULL,
+                                lbl_80282488->aUses[lbl_80282488->n970].p4,
+                                lbl_80282488->aUses[lbl_80282488->n970].n8);
+                lbl_80282488->p4 = pTex->p18 +
+                    pTex->p4->p8[lbl_80282488->aUses[lbl_80282488->n970].nC].aBlocks[0].nOffset;
+                lbl_80282488->u98C = DYNTEX_CHAR(lbl_80282488->p8)->n58 + pEntry->uPixels;
+                lbl_80282488->u98C &= ~0x7FF;
+                lbl_80282488->nA94 =
+                    DYNTEX_CHAR(lbl_80282488->p8)->n58 + pEntry->uPixels - lbl_80282488->u98C;
+                lbl_80282488->n988 = fn_8010B5F8((DynTexObj*)pEntry) << 4;
+                if (pPal != NULL) {
+                    lbl_80282488->n988 += fn_8010B664((DynTexPalette*)pPal) << 4;
+                }
+                lbl_80282488->n984 = lbl_80282488->n988 + lbl_80282488->nA94;
+                lbl_80282488->n984 = (lbl_80282488->n984 + 0x7FF) & ~0x7FF;
+                lbl_80282488->n970++;
             }
-            if (lbl_80282488->n970 == lbl_80282488->n96C) {
-                // All done.
-                lbl_80282488->pA88->pfnB(lbl_80282488->pA88->pChar);
-                lbl_80282488->pA88->bUsed = 0;
-                lbl_80282488->n980 = 0;
-                return 0;
-            }
-            // The next texture: add it to the DynTex and work out the 2 KB-aligned read.
-            pEntry = lbl_80282488->aUses[lbl_80282488->n970].pTex;
-            lbl_80282488->n984 = 0;
-            pPal = NULL;
-            if (pEntry->nPalette != -1) {
-                pPal = &(*lbl_80282488->p8)->pC[pEntry->nPalette];
-            }
-            lbl_80282488->aUses[lbl_80282488->n970].nC =
-                fn_8010B338(DYNTEX_CHAR(lbl_80282488->pA88->p0)->p60, (DynTexObj*)pEntry,
-                            (DynTexPalette*)pPal, NULL, NULL,
-                            lbl_80282488->aUses[lbl_80282488->n970].p4,
-                            lbl_80282488->aUses[lbl_80282488->n970].n8);
-            lbl_80282488->p4 = pTex->p18 +
-                pTex->p4->p8[lbl_80282488->aUses[lbl_80282488->n970].nC].aBlocks[0].nOffset;
-            lbl_80282488->u98C = DYNTEX_CHAR(lbl_80282488->p8)->n58 + pEntry->uPixels;
-            lbl_80282488->u98C &= ~0x7FF;
-            lbl_80282488->nA94 =
-                DYNTEX_CHAR(lbl_80282488->p8)->n58 + pEntry->uPixels - lbl_80282488->u98C;
-            lbl_80282488->n988 = fn_8010B5F8((DynTexObj*)pEntry) << 4;
-            if (pPal != NULL) {
-                lbl_80282488->n988 += fn_8010B664((DynTexPalette*)pPal) << 4;
-            }
-            lbl_80282488->n984 = lbl_80282488->n988 + lbl_80282488->nA94;
-            lbl_80282488->n984 = (lbl_80282488->n984 + 0x7FF) & ~0x7FF;
-            lbl_80282488->n970++;
+            lbl_80282488->n978 = 0;
+            lbl_80282488->nA8C = 0;
+            lbl_80282488->b975 = 0;
         }
-        lbl_80282488->n978 = 0;
-        lbl_80282488->nA8C = 0;
-        lbl_80282488->b975 = 0;
+        // Start the next read.
+        nLen = lbl_80282488->n984 - lbl_80282488->n978;
+        if (nLen > lbl_80282488->nA98) {
+            nLen = lbl_80282488->nA98;
+        }
+        lbl_80282488->nA90 = nLen - lbl_80282488->nA94;
+        if (lbl_80282488->nA8C + lbl_80282488->nA90 > lbl_80282488->n988) {
+            lbl_80282488->nA90 = lbl_80282488->n988 - lbl_80282488->nA8C;
+        }
+        lbl_80282488->b974 = 0;
+        fn_80006444(DYNTEX_CHAR(lbl_80282488->p8)->hFile, lbl_80282488->p0, nLen,
+                    lbl_80282488->u98C + lbl_80282488->n978, fn_8010BFA0);
+        return 1;
     }
-    // Start the next read.
-    nLen = lbl_80282488->n984 - lbl_80282488->n978;
-    if (nLen > lbl_80282488->nA98) {
-        nLen = lbl_80282488->nA98;
-    }
-    lbl_80282488->nA90 = nLen - lbl_80282488->nA94;
-    if (lbl_80282488->nA8C + lbl_80282488->nA90 > lbl_80282488->n988) {
-        lbl_80282488->nA90 = lbl_80282488->n988 - lbl_80282488->nA8C;
-    }
-    lbl_80282488->b974 = 0;
-    fn_80006444(DYNTEX_CHAR(lbl_80282488->p8)->hFile, lbl_80282488->p0, nLen,
-                lbl_80282488->u98C + lbl_80282488->n978, fn_8010BFA0);
     return 1;
 }
 
