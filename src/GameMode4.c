@@ -266,10 +266,13 @@ void fn_801025FC(void) {
 void fn_80102704(void) {
     s32 nPrize;
     int nMoney = fn_800D38F0(0, 1, 0, &nPrize);
-    if (nMoney != 0 && gpSaveData[gPlayers[0].nIndex].bActive) {
-        fn_800E4364(0, 0x6E, nPrize, gPlayers[0].nIndex);
-        fn_800D3548(0, nMoney, NULL);
-        gPlayers[0].money.nC += nMoney;
+    if (nMoney != 0) {
+        int nIndex = gPlayers[0].nIndex;
+        if (gpSaveData[nIndex].bActive) {
+            fn_800E4364(0, 0x6E, nPrize, nIndex);
+            fn_800D3548(0, nMoney, NULL);
+            gPlayers[0].money.nC += nMoney;
+        }
     }
     fn_80102874();
 }
