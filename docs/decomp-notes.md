@@ -320,6 +320,36 @@ They will be sorted into the sections below.
 - **[verified] A caller's `extsb` on a result means the callee returns `s8`** (Caddie_GetTip); a `u16`
   parameter fed `(s16)(s8)f()` gives `extsb; clrlwi 16`.
 - **[verified] `UISEvent.c` was built with `-pragma "pool_data on"`** (strings through one base register).
+- **[verified] Zeroing: a variable that already held a value gets its zero by `mr` from another zeroed
+  register; a variable set for the first time gets its own `li r,0`.** So when the original has two `li`s
+  and ours `li; mr`, give the second zero a fresh variable (a new loop counter), and the reverse for one
+  `li; mr` (Earnings fn_800D7DA0, hwsBurn fn_80111850, GameMode5 fn_800EAF7C, GameHoleContests
+  fn_800D9F34; `a = b = 0`, types and statement order make no difference). A search written as an
+  inline helper hands its index back by `mr`; the same loop written in the caller gets `li` (UISEvent
+  fn_80165D2C, fn_80165D90).
+- **[verified] `int` and `s32` allocate differently, in both directions**: an `s32` parameter where `int`
+  fails (GoDynObj fn_80046FDC 94 -> 100), `int` locals where `s32` fails (fn_8008052C 92 -> 100).
+- **[verified] Block-scoped locals per switch case** allocate differently from one function-level local
+  (EventInfo fn_8011D280); case labels merged into `default` (`case 3: default:`) reshape the compare
+  tree or jump table (event fn_80066A9C, fn_80067220), and extra empty cases make the tree test a value
+  first (Controller_Gc fn_80013400: `case -2: case -3: break;`).
+- **[verified] Return a local instead of an expression** so the register restores come before the last
+  arithmetic (LLDynTex fn_8010B6AC 90 -> 100); round up through a local written back
+  (`n = a + *p; n = (n - 1) & ~(a - 1); *p = n;`, hwsBurn fn_80110E98); a round-up division only matches
+  as `(size - 1 + n) / size` (MC_Gc fn_8009D74C).
+- **[verified] `static const` locals for constant struct arguments** load just before each call where
+  initialised locals load at entry; pass a global struct field by value directly, not through a local
+  (streammanagerhole fn_80015624).
+- **[verified] A local pointer to the array element flips `cmpw` operands** where swapping the `==`
+  operands doesn't (GoTerrain fn_80034DE4); `if (x) return 0; return 1;` in a `u8` function gives
+  `cntlzw; srwi` where `return x == 0;` adds a mask (hwsRender_Gc fn_80112B80).
+- **[verified] EA's abs is `(v + (v >> 31)) ^ (v >> 31)`** (`srawi; add; xor`); MWCC's `__abs` gives
+  `xor; subf` (ShaderObjectsData fn_80074628).
+- **[verified] A caller's `cmpwi` on a returned pointer means EA tested it as a signed number**:
+  `(s32)f() != 0`, marked fake match with a port note (GoPostFx fn_80037E50).
+- **[verified] A near-100 function whose only difference is a branch target can be a real behaviour bug**
+  in our C (PsMgr fn_800A27FC: two calls outside their block; SitDevFile fn_800BD3F8: wrong `&&`/`||`
+  grouping). Check branch-only mismatches before calling them register noise.
 - **Linking (tools):**
   - A unit's `.data` range ends at its own 8-byte alignment, not the next object's 32-byte alignment
     (GoARAM). The last object in `.sdata`/`.sbss` ends at the true section end, not rounded to 8 (CARD).

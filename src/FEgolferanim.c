@@ -177,7 +177,7 @@ void fn_8008AD80(void) {
             nPrev = CRAP_NUM_GOLFERS - 1;
         }
         nNext = i + 1;
-        if (nNext >= CRAP_NUM_GOLFERS) {
+        if (nNext > CRAP_NUM_GOLFERS - 1) {
             nNext = 0;
         }
         lbl_80281EE8[i] = NULL;
@@ -219,8 +219,6 @@ void fn_8008B00C(void) {
 // Show golfer nGolfer: the one shown, the next or the previous one if one of them is him, else
 // load him into the shown slot. Golfers 7 and 29 (with a or b) set b90.
 void fn_8008B044(int nGolfer, int a, int b) {
-    CrAPGolfer* pGolfer;
-
     fn_8008B704();
     fn_8008B754(1);
     if (nGolfer == 7 || nGolfer == 29) {
@@ -234,16 +232,15 @@ void fn_8008B044(int nGolfer, int a, int b) {
     if (a == 7 || a == 29) {
         lbl_80281EE0->b90 = 1;
     }
-    pGolfer = lbl_80281EE0->pB4;
-    if (pGolfer->nC != nGolfer) {
-        if (pGolfer->pNext->nC == nGolfer) {
-            lbl_80281EE0->pB4 = pGolfer->pNext;
+    if (lbl_80281EE0->pB4->nC != nGolfer) {
+        if (lbl_80281EE0->pB4->pNext->nC == nGolfer) {
+            lbl_80281EE0->pB4 = lbl_80281EE0->pB4->pNext;
             gPlayers[0].pChar = lbl_80281EE0->pB4->pChar;
-        } else if (pGolfer->pPrev->nC == nGolfer) {
-            lbl_80281EE0->pB4 = pGolfer->pPrev;
+        } else if (lbl_80281EE0->pB4->pPrev->nC == nGolfer) {
+            lbl_80281EE0->pB4 = lbl_80281EE0->pB4->pPrev;
             gPlayers[0].pChar = lbl_80281EE0->pB4->pChar;
         } else {
-            pGolfer->nC = nGolfer;
+            lbl_80281EE0->pB4->nC = nGolfer;
             lbl_80281EE0->pB4->b18 = 0;
             lbl_80281EE0->pB4->n1C = -1;
         }
@@ -552,8 +549,10 @@ void sFE_AdjustAndSetGolferPosition(void) {
     pView = fn_80017028(fn_80016D10());
     fn_8008F24C();
     fn_800364A0();
-    if (lbl_80281EE0->aGolfer[0].b19 || lbl_80281EE0->b8A) {
-        lbl_80281EE0->aGolfer[0].b18 = 0;
+    for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
+        if (lbl_80281EE0->aGolfer[i].b19 || lbl_80281EE0->b8A) {
+            lbl_80281EE0->aGolfer[i].b18 = 0;
+        }
     }
     if (lbl_80281EE0->b8A || (lbl_80281EE0->pB4 != NULL && lbl_80281EE0->pB4->b19)) {
         lbl_80281EE0->pB4->b18 = 0;
@@ -1235,10 +1234,15 @@ void fn_8008DAEC(void) {
     }
 }
 
+// Flag every golfer slot's character to be freed (b19) and clear the shown golfer's b18.
 void fn_8008DBE8(void) {
-    lbl_80281EE0->aGolfer[0].b19 = 1;
-    if (lbl_80281EE0->pB4 != NULL) {
-        lbl_80281EE0->pB4->b18 = 0;
+    int i;
+
+    for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
+        lbl_80281EE0->aGolfer[i].b19 = 1;
+        if (lbl_80281EE0->pB4 != NULL) {
+            lbl_80281EE0->pB4->b18 = 0;
+        }
     }
 }
 
@@ -1368,9 +1372,9 @@ void fn_8008E0B0(f32 fTurn) {
     fDiff = fabsf(lbl_80281EE0->f1A0 - lbl_80281EE0->f19C);
     if (fDiff < 2.0f * PI - fDiff) {
         if (lbl_80281EE0->f19C < lbl_80281EE0->f1A0 - 0.05f) {
-            lbl_80281EE0->f19C = lbl_80281EE0->f19C + 0.05f;
+            lbl_80281EE0->f19C += 0.05f;
         } else if (lbl_80281EE0->f19C > 0.05f + lbl_80281EE0->f1A0) {
-            lbl_80281EE0->f19C = lbl_80281EE0->f19C - 0.05f;
+            lbl_80281EE0->f19C -= 0.05f;
         }
     } else if (lbl_80281EE0->f19C < lbl_80281EE0->f1A0) {
         lbl_80281EE0->f19C = lbl_80281EE0->f19C - 0.05f;
@@ -1378,7 +1382,7 @@ void fn_8008E0B0(f32 fTurn) {
             lbl_80281EE0->f19C = 2.0f * PI + lbl_80281EE0->f19C;
         }
     } else if (lbl_80281EE0->f19C > lbl_80281EE0->f1A0) {
-        lbl_80281EE0->f19C = lbl_80281EE0->f19C + 0.05f;
+        lbl_80281EE0->f19C += 0.05f;
         if (lbl_80281EE0->f19C > 2.0f * PI) {
             lbl_80281EE0->f19C = lbl_80281EE0->f19C - 2.0f * PI;
         }

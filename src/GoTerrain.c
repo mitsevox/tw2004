@@ -2032,12 +2032,14 @@ void fn_80034AE4(void) {
 
 // Draws the grass patches of render pass nRenderPass that take part in the first pass (bit 0 of
 // n1C), farthest first, one clip method at a time.
-// Not exact (97.1%): the original tests bit 0 with `and.` against a register holding 1 (one more
-// saved register); every spelling tried folds the 1 into `clrlwi.` (a local, s32/int counters).
+// Not exact (97.2%): the original tests bit 0 with `and.` against a register holding 1 (one more
+// saved register); every spelling tried folds the 1 into `clrlwi.` (a local mask of int, s32, u32 or
+// u8, s32/int counters).
 void fn_80034CAC(int nRenderPass) {
     u8 bFirst = 1;
     int i;
     s32 nClip;
+    Ter_PatchReference* pPatch;
 
     fn_80012EF8();
     fn_80014118(0x70);
@@ -2055,15 +2057,10 @@ void fn_80034CAC(int nRenderPass) {
         }
         fn_80012EF8();
         for (i = lbl_801D3CB0.iNumGrassPatches - 1; i >= 0; i--) {
-            if (lbl_801D3CB0.xpGrassPatchList[i].eClipMethod == nClip
-                && lbl_801D3CB0.xpGrassPatchList[i].iRenderPass == nRenderPass
-                && (lbl_801D3CB0.xpGrassPatchList[i].n1C & 1)) {
-                fn_80032B7C(lbl_801D3CB0.xpGrassPatchList[i].pGround, nClip, 0,
-                            lbl_801D3CB0.xpGrassPatchList[i].n1C, lbl_801D3CB0.xpGrassPatchList[i].n18,
-                            lbl_801D3CB0.xpGrassPatchList[i].n20, &bFirst, 0, 1,
-                            lbl_801D3CB0.xpGrassPatchList[i].fDistance,
-                            lbl_801D3CB0.xpGrassPatchList[i].fDistance
-                                + 2.0f * lbl_801D3CB0.xpGrassPatchList[i].fBoundingRadius);
+            pPatch = &lbl_801D3CB0.xpGrassPatchList[i];
+            if (pPatch->eClipMethod == nClip && pPatch->iRenderPass == nRenderPass && (pPatch->n1C & 1)) {
+                fn_80032B7C(pPatch->pGround, nClip, 0, pPatch->n1C, pPatch->n18, pPatch->n20, &bFirst, 0, 1,
+                            pPatch->fDistance, pPatch->fDistance + 2.0f * pPatch->fBoundingRadius);
             }
         }
     }

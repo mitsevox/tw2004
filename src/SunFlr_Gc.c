@@ -204,9 +204,11 @@ void fn_8009A704(s32 nView) {
 // the alpha and red pairs first, then the green and blue pairs.
 u32 fn_8009A708(u8* pImage, int x, int y) {
     u8* p;
+    u32 uColour;
 
     p = &pImage[(x / 4 + y / 4 * 3) * 64 + (y & 3) * 8 + (x & 3) * 2];
-    return (p[1] << 16) | (p[0x20] << 8) | p[0x21];
+    uColour = (p[1] << 16) | (p[0x20] << 8);
+    return uColour | p[0x21];
 }
 
 // View nView's part for the field being drawn: the weights of the pixels read whose colour is
