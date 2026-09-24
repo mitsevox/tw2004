@@ -28,6 +28,8 @@ u8   fn_8010BF3C(void);
 u8   fn_8010BFE0(void);
 void fn_80007254(void);                 // LLDisp_Gc.c
 int  fn_800106F0(TexBank* pBank);       // LLTexGrp.c
+int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
+TexEntry* fn_800107E4(TexBank* pBank, int nTex);  // LLTexGrp.c
 
 // Set up: the state and its nSize-byte block (gomainloop.c: 0x18000, later 0x6000).
 void fn_8010A448(int nSize) {
@@ -442,6 +444,36 @@ void fn_8010BC64(u8* p) {
 
 void fn_8010BC88(void* p) {
     lbl_80282488->p8 = p;
+}
+
+// Note that a skin uses the bank's texture uId (and the one paired with it), with p and n; an
+// unknown name is only turned into text.
+void fn_8010BCFC(u64 uId, void* p, s32 n) {
+    char szName[16];            // the size is not known (fn_800CB868 writes the name)
+    int nTex = fn_8001005C(*lbl_80282488->p8, uId);
+
+    if (nTex != (int)0x80000000) {
+        lbl_80282488->aUses[lbl_80282488->n96C].pTex = fn_800107E4(*lbl_80282488->p8, nTex);
+    } else {
+        fn_800CB868(&uId, szName);
+        return;
+    }
+    lbl_80282488->aUses[lbl_80282488->n96C].p4 = p;
+    lbl_80282488->aUses[lbl_80282488->n96C].n8 = n;
+    lbl_80282488->aUses[lbl_80282488->n96C].nC = -1;
+    lbl_80282488->n96C++;
+    if (lbl_80282488->aUses[lbl_80282488->n96C - 1].pTex->b47 & 1) {
+        lbl_80282488->aUses[lbl_80282488->n96C].pTex = fn_800107E4(*lbl_80282488->p8, nTex + 1);
+        lbl_80282488->aUses[lbl_80282488->n96C].p4 = p;
+        lbl_80282488->aUses[lbl_80282488->n96C].n8 = n;
+        lbl_80282488->aUses[lbl_80282488->n96C].nC = -1;
+        // The pair is kept only when it has the same name.
+        if ((lbl_80282488->aUses[lbl_80282488->n96C - 1].pTex->b47 & 1) &&
+            lbl_80282488->aUses[lbl_80282488->n96C - 1].pTex->u0 ==
+                lbl_80282488->aUses[lbl_80282488->n96C].pTex->u0) {
+            lbl_80282488->n96C++;
+        }
+    }
 }
 
 void fn_8010BEC4(void) {

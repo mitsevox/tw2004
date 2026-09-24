@@ -22,12 +22,22 @@ typedef struct DynTexJob {
 } DynTexJob;
 LAYOUT_ASSERT(DynTexJob, 0x14);
 
+// A texture of *DynTexState.p8's bank that a skin uses (0x10 bytes; our name): fn_8010BCFC adds
+// them, two for a texture paired with the next one (TexEntry.b47 bit 0).
+typedef struct DynTexUse {
+    struct TexEntry* pTex;      // 0x0
+    void* p4;                   // 0x4  } fn_8010BCFC's p and n
+    s32   n8;                   // 0x8  }
+    s32   nC;                   // 0xC  -1 when added
+} DynTexUse;
+LAYOUT_ASSERT(DynTexUse, 0x10);
+
 // Its state (0xA9C bytes, allocated by fn_8010A448); only what the code reads so far.
 typedef struct DynTexState {
     void* p0;                   // 0x000  a 0x40-byte block allocated with it
     u8    unk4[4];
-    void* p8;                   // 0x008  set by fn_8010BC88 (char.c gives it &Character.p50)
-    u8    unkC[0x96C - 0xC];
+    struct TexBank** p8;        // 0x008  set by fn_8010BC88 (char.c gives it &Character.p50)
+    DynTexUse aUses[150];       // 0x00C  n96C of them (fn_8010BCFC)
     s32   n96C;                 // 0x96C
     u8    unk970[4];
     u8    b974;                 // 0x974  set by fn_8010BFA0
