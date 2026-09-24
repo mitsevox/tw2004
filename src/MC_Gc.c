@@ -4,6 +4,10 @@
 // what it learns about each card in lbl_801F1510 (include/core/memcard.h).
 //
 // port: a PC build replaces this file with file I/O.
+//
+// The CARD library calls take the port through an int copy, nChan (and fn_8009E280 its file
+// number, nFileNo). The copies do nothing, but EA's code evidently had them: the int-to-long copy
+// is what the original's register use shows (fake match: nothing else reproduces it).
 
 #include "core/memcard.h"
 #include "frontend/fe.h"
@@ -345,11 +349,13 @@ void fn_8009D728(s32 nPort, s32 nResult) {
 // Unmount the card if it is mounted, then park the save file images in ARAM (fn_8009EF98).
 s32 fn_8009DBAC(s32 nPort, s32 nSlot) {
     s32 nResult;
+    int nChan;
     if (lbl_801F1510[nPort][nSlot].uFlags & MC_CARD_MOUNTED) {
         lbl_801F1510[nPort][nSlot].uFlags &= ~MC_CARD_MOUNTED;
+        nChan = nPort;
         do {
             fn_800A4BDC();
-            nResult = CARDUnmount(nPort);
+            nResult = CARDUnmount(nChan);
             fn_8006C63C();
         } while (nResult == CARD_RESULT_BUSY);
         switch (nResult) {
