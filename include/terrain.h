@@ -213,7 +213,19 @@ LAYOUT_ASSERT(TerSettings, 0x54);
 extern Ter_TerrainRendererMgr lbl_801D3CB0;
 extern TerSettings* lbl_802811E0;    // Code8006F154.c: points at lbl_801D70A8
 extern TerSettings lbl_801D70A8;
-extern f32 lbl_80281D60;            // fn_80030254's random number, 0..1, stepped once per object
+// A step of a crowd member's move from one pose state to another (0x14 bytes; fn_80033744): when its
+// states are n0 and n4, f4 is eased toward fC, and once there it goes to state n8 with f4 = f10.
+typedef struct TerPoseStep {
+    s32  n0;                    // 0x00
+    s32  n4;                    // 0x04
+    s32  n8;                    // 0x08
+    f32  fC;                    // 0x0C
+    f32  f10;                   // 0x10
+} TerPoseStep;
+
+extern TerPoseStep lbl_801877E0[6]; // fn_80033744: for objects without bit 0x40 of word 3
+extern TerPoseStep lbl_80187858[2]; // fn_80033744: for objects with it
+extern f32 lbl_80281D60;           // fn_80030254's random number, 0..1, stepped once per object
 extern s32 lbl_801D3A30[5][32];     // [n][k]: how many of k's lowest n bits are set (fn_80030254);
                                     // fn_80032B7C picks a ground's mesh by it
 

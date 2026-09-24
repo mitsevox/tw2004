@@ -1471,6 +1471,216 @@ void fn_80033704(u16 nPatch, u16 nObject) {
     }
 }
 
+// Animates the course objects once a frame (the frame time capped at 1/30 s): runs the crowd
+// countdowns, fades each object's views in (state 2) or out (state 0), and moves each object with
+// bit 0x1 of word 0: crowd members (bit 0x2) held in iCrowdPose, swaying in their pose or easing to
+// the next one through lbl_801877E0 (lbl_80187858 with bit 0x40 of word 3); bit 0x1 of word 3 rises
+// to 1 once n1C is 1; the trees sway by their period with noise.
+void fn_80033744(void) {
+    f32 fDrop;
+    f32 fTime;
+    f32 fUpFast;
+    f32 fDownFast;
+    f32 fUp;
+    f32 fDown;
+    u32 nFrames;
+    s32 i;
+    s32 v;
+    s32 k;
+    u32 uFlags0;
+    u32 uFlags3;
+    f32 fPeriod;
+    f32 fStep;
+    f32 fNoise;
+    f32 fSum;
+    f32 fScale;
+    f32 fWave;
+    Ter_ObjectState* pState;
+
+    fTime = gSession.fFrameTime;
+    if (fTime > 1.0f / 30.0f) {
+        fTime = 1.0f / 30.0f;
+    }
+    if (fTime < 0.0f) {
+        fTime = 0.0f;
+    }
+    if (lbl_801D3CB0.fCrowdAnimationDelayedStartTimer > 0.0f) {
+        lbl_801D3CB0.fCrowdAnimationDelayedStartTimer -= fTime;
+        if (lbl_801D3CB0.fCrowdAnimationDelayedStartTimer <= 0.0f) {
+            fn_8003349C(lbl_801D3CB0.fCrowdAnimationDelayedStartPercentage,
+                        lbl_801D3CB0.fCrowdAnimationDelayedStartDuration, 0.0f);
+        }
+    }
+    if (lbl_801D3CB0.fCrowdAnimationCountdown > 0.0f) {
+        lbl_801D3CB0.fCrowdAnimationCountdown -= fTime;
+        if (lbl_801D3CB0.fCrowdAnimationCountdown <= 0.0f) {
+            fn_800335F8(0);
+        }
+    }
+    nFrames = FRAME_RATE * fTime;
+    fUpFast = 6.0f * fTime;
+    fDownFast = -6.0f * fTime;
+    fUp = 4.0f * fTime;
+    fDown = -4.0f * fTime;
+    fDrop = 5.0f * fTime;
+    for (i = 0; i < TER_NUM_OBJECTS; i++) {
+        for (v = 0; v < 2; v++) {
+            if (lbl_801D3CB0.pObjectStateList[i].aView[v].n4 == 2) {
+                lbl_801D3CB0.pObjectStateList[i].aView[v].f0 += 4.0f * gSession.fFrameTime;
+                if (lbl_801D3CB0.pObjectStateList[i].aView[v].f0 >= 1.0f) {
+                    lbl_801D3CB0.pObjectStateList[i].aView[v].f0 = 1.0f;
+                    lbl_801D3CB0.pObjectStateList[i].aView[v].n4 = 3;
+                }
+            }
+            if (lbl_801D3CB0.pObjectStateList[i].aView[v].n4 == 0) {
+                lbl_801D3CB0.pObjectStateList[i].aView[v].f0 -= 4.0f * gSession.fFrameTime;
+                if (lbl_801D3CB0.pObjectStateList[i].aView[v].f0 <= 0.0f) {
+                    lbl_801D3CB0.pObjectStateList[i].aView[v].f0 = 0.0f;
+                    lbl_801D3CB0.pObjectStateList[i].aView[v].n4 = 1;
+                }
+            }
+        }
+        pState = &lbl_801D3CB0.pObjectStateList[i];
+        uFlags0 = pState->a20[0];
+        uFlags3 = pState->a20[3];
+        if (!(uFlags0 & 1)) {
+            continue;
+        }
+        if ((uFlags0 & 2) && lbl_801D3CB0.iCrowdPose != 0) {
+            if (lbl_801D3CB0.iCrowdPose == 1) {
+                pState->n18 = 0;
+                pState->n1C = 0;
+            } else {
+                pState->n18 = 3;
+                pState->n1C = 3;
+            }
+            pState->f4 = lbl_801D3CB0.fCrowdInterpValue;
+        } else if ((uFlags0 & 2) && !(uFlags3 & 0x40)) {
+            pState->nC += nFrames;
+            if (pState->n18 == pState->n1C || pState->f14 > 0.0f) {
+                fPeriod = 4.0f * (pState->f0 - lbl_801D3CB0.fTreeMinPeriod) + 1.5f;
+                if (pState->n18 == 3) {
+                    pState->f4 =
+                        0.5f * fn_800095F0(10.0f * (6.2831855f * fn_800351D8(pState->nC, fPeriod / 10.0f))
+                                           / fPeriod)
+                        + 0.5f;
+                } else {
+                    pState->f4 =
+                        0.5f * fn_800095F0(0.5f * (6.2831855f * fn_800351D8(pState->nC, fPeriod / 0.5f))
+                                           / fPeriod)
+                        + 0.5f;
+                }
+                pState->f14 -= fTime;
+            } else {
+                for (k = 0; k < 6; k++) {
+                    if (pState->n18 == lbl_801877E0[k].n0 && pState->n1C == lbl_801877E0[k].n4) {
+                        fStep = lbl_801877E0[k].fC - pState->f4;
+                        if (pState->n18 == 2 || pState->n18 == 3) {
+                            if (fStep > fUpFast) {
+                                fStep = fUpFast;
+                            }
+                            if (fStep < fDownFast) {
+                                fStep = fDownFast;
+                            }
+                        } else {
+                            if (fStep > fUp) {
+                                fStep = fUp;
+                            }
+                            if (fStep < fDown) {
+                                fStep = fDown;
+                            }
+                        }
+                        pState->f4 += fStep;
+                        if (fabsf(pState->f4 - lbl_801877E0[k].fC) < 0.01f) {
+                            pState->n18 = lbl_801877E0[k].n8;
+                            pState->f4 = lbl_801877E0[k].f10;
+                            pState->nC = 0;
+                            break;
+                        }
+                    }
+                }
+            }
+        } else if ((uFlags0 & 2) && (uFlags3 & 0x40)) {
+            pState->nC += nFrames;
+            if (pState->n18 == pState->n1C || pState->f14 > 0.0f) {
+                if (pState->n18 == 0) {
+                    pState->f4 -= fDrop;
+                    if (pState->f4 < 0.0f) {
+                        pState->f4 = 0.0f;
+                    }
+                    pState->f14 -= fTime;
+                } else {
+                    fPeriod = 4.0f * (pState->f0 - lbl_801D3CB0.fTreeMinPeriod) + 1.5f;
+                    if (pState->n18 == 1) {
+                        pState->f4 =
+                            0.5f * fn_800095F0(10.0f * (6.2831855f * fn_800351D8(pState->nC, fPeriod / 10.0f))
+                                               / fPeriod)
+                            + 0.5f;
+                    } else {
+                        pState->f4 =
+                            0.5f * fn_800095F0(0.5f * (6.2831855f * fn_800351D8(pState->nC, fPeriod / 0.5f))
+                                               / fPeriod)
+                            + 0.5f;
+                    }
+                    pState->f14 -= fTime;
+                }
+            } else {
+                for (k = 0; k < 2; k++) {
+                    if (pState->n18 == lbl_80187858[k].n0 && pState->n1C == lbl_80187858[k].n4) {
+                        fStep = lbl_80187858[k].fC - pState->f4;
+                        if (pState->n18 == 2 || pState->n18 == 3) {
+                            if (fStep > fUpFast) {
+                                fStep = fUpFast;
+                            }
+                            if (fStep < fDownFast) {
+                                fStep = fDownFast;
+                            }
+                        } else {
+                            if (fStep > fUp) {
+                                fStep = fUp;
+                            }
+                            if (fStep < fDown) {
+                                fStep = fDown;
+                            }
+                        }
+                        pState->f4 += fStep;
+                        if (fabsf(pState->f4 - lbl_80187858[k].fC) < 0.01f) {
+                            pState->n18 = lbl_80187858[k].n8;
+                            pState->f4 = lbl_80187858[k].f10;
+                            pState->nC = 0;
+                            break;
+                        }
+                    }
+                }
+            }
+        } else if (uFlags3 & 1) {
+            if (pState->n1C == 1) {
+                pState->f4 += fTime;
+                if (pState->f4 > 1.0f) {
+                    pState->f4 = 1.0f;
+                }
+            } else {
+                pState->f4 = 0.0f;
+            }
+        } else {
+            fNoise = lbl_801D3CB0.fTreeNoiseAmplitudeScale;
+            fSum = 1.0f + fNoise;
+            fScale = 1.0f / fSum;
+            fWave = 0.5f * (fScale * fNoise)
+                    * fn_800095F0(6.2831855f
+                                  * fn_800351D8(gSession.nFrameCount,
+                                                lbl_801D3CB0.fTreeNoisePeriodScale * pState->f0)
+                                  / (lbl_801D3CB0.fTreeNoisePeriodScale * pState->f0));
+            pState->f4 = 0.5f * fScale
+                             * fn_800095F0(6.2831855f * fn_800351D8(gSession.nFrameCount, pState->f0)
+                                           / pState->f0)
+                       + fWave;
+            pState->f4 = pState->f4 * lbl_801D3CB0.fTreeOverdrive;
+            pState->f4 = pState->f4 + 0.5f;
+        }
+    }
+}
+
 // Draws object list nList of the hole data (0 before the patches, 2 after them) when its switch is
 // on, as panorama items: each object that is not off screen, except (list 0) objects 0-1 or 2-3 by
 // lbl_802811F0's flag 0x2, (list 2) the last lbl_80281D64, and in split screen those with flag 8.
