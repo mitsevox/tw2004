@@ -11,7 +11,7 @@
 f32  fn_8001F02C(Clip* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
 void fn_8001F558(void* pItem);          // mtalib.c
 void fn_800977CC(void* p);
-void fn_800293CC(int a, int b, SkelPose* pA, SkelPose* pB, SkelPose* pOut);   // blends two poses
+void fn_800293CC(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pOut, f32 fT);   // Skeleton.c
 void fn_80036180(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut);             // the same, format 1
 
 int  fn_800723E8(SKABlendNode* pNode, SKABlendNode*** pppOldest);
@@ -284,7 +284,7 @@ void fn_80072ACC(SKABlendNode* pNode, int* pn, f32 fTime) {
         pNode->u.blend.apChild[1]->fWeight = 1.0f - fWeight;
         if (pNode->nFormat == 0) {
             fn_800293CC(1, *pn - 1, pNode->u.blend.apChild[0]->pPose, pNode->u.blend.apChild[1]->pPose,
-                        pNode->pPose);
+                        pNode->pPose, fWeight);
         } else if (pNode->nFormat == 1) {
             fn_80036180((SkelPose1*)pNode->u.blend.apChild[0]->pPose,
                         (SkelPose1*)pNode->u.blend.apChild[1]->pPose, (SkelPose1*)pNode->pPose);

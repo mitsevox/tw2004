@@ -22,8 +22,12 @@ typedef struct IKLink {
     s32  n8;                    // 0x08
     f32  fC;                    // 0x0C
     f32  f10;                   // 0x10
-    s32  nPrev;                 // 0x14  the link before it in the chain, -1 for the first
-    u8   unk18[0x58 - 0x18];
+    s8   nPrev;                 // 0x14  the link before it in the chain, -1 for the first (every
+    u8   pad15[3];              //       access is a byte: fn_80026BF4, fn_80028208)
+    f32  q18[4];                // 0x18  its rotation (quaternion) from the link before it
+    f32  v28[4];                // 0x28  its offset from the link before it
+    f32  q38[4];                // 0x38  } q18 and v28 kept for a link whose b0 bit 1 is set:
+    f32  v48[4];                // 0x48  }   fn_80027478 poses it from these
     f32  v58[3];                // 0x58  its rotation as a vector (axis * angle)
     u8   unk64[0x78 - 0x64];
 } IKLink;
@@ -34,11 +38,30 @@ typedef struct IKChain {
     s8   nLinks;                // 0x00
     u8   unk1[3];
     IKLink* pLinks;             // 0x04
-    u8   unk8[0x18 - 0x8];
+    f32  v8[4];                 // 0x08  its last link's position (fn_800271A0)
     s32  n18;                   // 0x18
     f32  f1C;                   // 0x1C
 } IKChain;
 LAYOUT_ASSERT(IKChain, 0x20);
+
+// An IK link's setup (our name): what fn_80028208 copies into an IKLink.
+typedef struct IKLinkDef {
+    s32  nBone;                 // 0x00  a bone id (fn_8001EEE4 gives its index)
+    f32  f4;                    // 0x04  } IKLink's f4, n8, fC and f10
+    s32  n8;                    // 0x08  }
+    f32  fC;                    // 0x0C  }
+    f32  f10;                   // 0x10  }
+} IKLinkDef;
+LAYOUT_ASSERT(IKLinkDef, 0x14);
+
+// An IK chain's setup (our name): what fn_80028208 builds an IKChain from.
+typedef struct IKChainDef {
+    IKLinkDef* pLinks;          // 0x00
+    s32  nLinks;                // 0x04
+    s32  n8;                    // 0x08  IKChain's n18
+    f32  fC;                    // 0x0C  IKChain's f1C
+} IKChainDef;
+LAYOUT_ASSERT(IKChainDef, 0x10);
 
 // A bone's pose in a model (CharModel.p34).
 typedef struct BonePose {
@@ -94,11 +117,17 @@ typedef struct Skeleton {
     f32  fIKWeight;             // 0x1070  SKEL_SetIKSolutionWeight
     f32  f1074;                 // 0x1074  } set by fn_8002792C and SKEL_TransitionIK
     f32  f1078;                 // 0x1078  }
-    u8   unk107C[0x10A4 - 0x107C];
+    f32  q107C[4];              // 0x107C  a rotation (quaternion) fn_800279C0 turns the grip's by
+    f32  v108C[4];              // 0x108C  an offset from the grip, turned by its rotation: the IK
+                                //         target of the second chain (fn_800279C0)
+    f32  f109C;                 // 0x109C  } 0.025 and 0.15 from fn_800280E8
+    f32  f10A0;                 // 0x10A0  }
     f32  v10A4[4];              // 0x10A4
     f32  v10B4[4];              // 0x10B4  v10A4 scaled by the IK weight
     f32  f10C4;                 // 0x10C4  the IK weight
-    u8   unk10C8[0x10D4 - 0x10C8];
+    f32  f10C8;                 // 0x10C8  } set up by fn_800280E8: the first link's offset height,
+    f32  f10CC;                 // 0x10CC  }   0.025 and 0.05
+    f32  f10D0;                 // 0x10D0  }
     f32  q10D4[4];              // 0x10D4  a rotation (quaternion) given by fn_80027808
     s32  n10E4;                 // 0x10E4  set to 4 as a swing starts
     f32  a10E8[4][4];           // 0x10E8  per leg, the last good bend axis (Character_IKLegToGround)
@@ -127,7 +156,8 @@ typedef struct CharModel {
                                 //        position
     f32       fC;               // 0x00C  } lengths Character_UpdateTestPoints sets points 0-3 out by
     f32       f10;              // 0x010  } along the leg bones' axes when the skin has no a1048
-    u8        unk14[0x34 - 0x14];
+    u32       a14[4];           // 0x014  } bits per bone: SKEL_TransformBones turns a bone set in a14
+    u32       a24[4];           // 0x024  }   and moves one set in a24, then sets them all again
     BonePose* pPoses;           // 0x034  one per bone; freed with the model
     Skeleton* pSkel;            // 0x038
     u8        aBone[0x59];      // 0x03C  each bone id's index (fn_8001EED8), 0xFF none; fn_80029664
@@ -225,6 +255,13 @@ LAYOUT_ASSERT(DynChainSettings, 0xC0);
 extern DynChainSettings* lbl_802824F8;
 extern f32 lbl_80193DE8[6][4];  // DynChain.c: a direction per chain kind, in the model's root space
 extern f32 lbl_80193E48[6];     // DynChain.c: an angle per chain kind, in degrees (fn_80115B2C)
+
+// Skeleton.c: a short string per bone id (the first is empty); the model loader (fn_80028564)
+// copies bone 0x54's first 8 bytes into each bone it adds as the bone's uId.
+extern char* lbl_80187278[90];
+extern struct Character* lbl_80281D20;   // Skeleton.c: the character fn_80027E8C moves with its root
+extern u8 lbl_80281098[6];      // Skeleton.c: the bone ids of the model's kind 2 dynamic chains
+extern u8 lbl_802810A0[6];      // Skeleton.c: the bone ids of its kind 3 dynamic chains
 
 // A clip's header (the fields used here). In a file, pD0 marks the end of the header and
 // uAram points at the end of the key data; once a clip's frames are streamed out, uAram is
