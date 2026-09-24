@@ -505,7 +505,9 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     if (pChar->blend.pPose != NULL) {
         fn_8007260C(pChar, &pChar->blend, pChar->pModel, pChar->fAnimTime);
         if (fn_8001EC48(pChar) && pChar->p16D8 != NULL) {
-            pChar->blend.pPose->aBones[pChar->nClubHeadBone].v10[1] = pChar->p16D8->afC[pChar->nClubClass];
+            // fake match: aBones[nClubHeadBone].v10[1] written as a flat float index (0x40 / 4 + 8 per
+            // bone + 5), which gives the original's indexed store; the pose is all 4-byte words
+            ((f32*)pChar->blend.pPose)[pChar->nClubHeadBone * 8 + 21] = pChar->p16D8->afC[pChar->nClubClass];
         }
         SKEL_UpdateState(pChar->pModel, pChar->blend.pPose, 0);
         if (fn_8001EC48(pChar)) {
