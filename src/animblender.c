@@ -532,7 +532,9 @@ void fn_80072ACC(SKABlendNode* pNode, CharModel* pModel, f32 fTime) {
         }
         fWeight = fn_80072980(pNode->u.blend.apChild[0], pNode->u.blend.apChild[1], bBetween, fTime);
         pNode->u.blend.apChild[0]->fWeight = fWeight;
-        pNode->u.blend.apChild[1]->fWeight = 1.0f - fWeight;
+        // the pose blend below takes the second child's weight
+        fWeight = 1.0f - fWeight;
+        pNode->u.blend.apChild[1]->fWeight = fWeight;
         if (pNode->nFormat == 0) {
             fn_800293CC(1, pModel->nBones - 1, pNode->u.blend.apChild[0]->pPose,
                         pNode->u.blend.apChild[1]->pPose, pNode->pPose, fWeight);
