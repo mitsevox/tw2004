@@ -421,7 +421,8 @@ void fn_800B4914(View* pView, int nPlayer) {
     f32* pCam = fn_8001731C(pView);
     f32* pSub = fn_80017314(pView);
     int nPanel = lbl_80282178->nPanel;
-    u8 nColumn = (int)(lbl_80282178->aPanel[nPanel].fLeft * 3.0f);
+    ComicPanel* pPanel = &lbl_80282178->aPanel[nPanel];
+    u8 nColumn = (int)(pPanel->fLeft * 3.0f);
     CamShot* pShot;
     int nShot;
 
