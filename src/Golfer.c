@@ -125,9 +125,9 @@ void AI_ChooseTarget(int nPlayer) {
     int         nPower;
     int         nAggr;
     int         nPinSet;
+    s8          nCand;
     s8          k;
     s8          nBest;
-    s8          nCand;
     int         nSkill;
     int         nIQ;
     f32         fDumb;         // (100 - IQ): the overconfidence term
