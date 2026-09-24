@@ -1,42 +1,38 @@
 // Small functions found by the sweep (sweep.py). Original file and meanings unknown.
 
 #include "game_types.h"
+#include "unsorted/cull.h"
 
-f32 fn_80012ED0();
-f32 fn_80012ED8();
-f32 fn_80012EE0();
-f32 fn_80012EE8();
-s32 fn_80012EF0();
-s32 fn_80013E40();
-f32 fn_8001415C();
-f32 fn_80014164();
-f32 fn_8001416C();
-f32 fn_80014174();
+void fn_8009A844(void* pCamera, u8* pIn, u8* pOut);
 
-void fn_8009A844(void* p0, u8* p1, u8* p2);
-void fn_8009A844(void* p0, u8* p1, u8* p2) {
-    s32 t0;
-    f32 t1;
-    f32 t2;
-    f32 t3;
-    f32 t4;
-    s32 t5;
-    f32 t6;
-    f32 t7;
-    f32 t8;
-    f32 t9;
-    t0 = fn_80012EF0();
-    t1 = fn_80012EE8();
-    t2 = fn_80012ED8(t0);
-    *(f32*)p2 = (*(f32*)p1 * t2 + t1);
-    t3 = fn_80012EE0(t0);
-    t4 = fn_80012ED0(t0);
-    *(f32*)(p2 + 0x4) = (*(f32*)(p1 + 0x4) * t4 + t3);
-    t5 = fn_80013E40(p0);
-    t6 = fn_80014174();
-    t7 = fn_8001416C(t5);
-    *(f32*)p2 = (*(f32*)p2 * t7 + t6);
-    t8 = fn_80014164(t5);
-    t9 = fn_8001415C(t5);
-    *(f32*)(p2 + 0x4) = (*(f32*)(p2 + 0x4) * t9 + t8);
+// Moves a point from the camera's 0..1 screen rectangle units (pIn: x, y) into frame buffer units
+// (pOut), as fn_80013EEC does for the rectangle itself.
+void fn_8009A844(void* pCamera, u8* pIn, u8* pOut) {
+    f32* pRect;
+    f32* pSrc = (f32*)pIn;
+    f32* pDst = (f32*)pOut;
+    f32 fLeft;
+    f32 fWidth;
+    f32 fTop;
+    f32 fHeight;
+    GoFrameBuf* pBuf;
+    f32 f0;
+    f32 fBufWidth;
+    f32 f4;
+    f32 fBufHeight;
+
+    pRect = fn_80012EF0(pCamera);
+    fLeft = fn_80012EE8(pRect);
+    fWidth = fn_80012ED8(pRect);
+    pDst[0] = pSrc[0] * fWidth + fLeft;
+    fTop = fn_80012EE0(pRect);
+    fHeight = fn_80012ED0(pRect);
+    pDst[1] = pSrc[1] * fHeight + fTop;
+    pBuf = fn_80013E40(pCamera);
+    f0 = fn_80014174(pBuf);
+    fBufWidth = fn_8001416C(pBuf);
+    pDst[0] = pDst[0] * fBufWidth + f0;
+    f4 = fn_80014164(pBuf);
+    fBufHeight = fn_8001415C(pBuf);
+    pDst[1] = pDst[1] * fBufHeight + f4;
 }

@@ -1,5 +1,6 @@
-// GoRenderCtx_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): not yet
-// decompiled; the sweep code below is the matched small functions.
+// GoRenderCtx_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): the render
+// camera (lens, frame buffer, screen rectangle and the matrices made from them), the renderer's
+// screen state, and the pads' button masks.
 
 #include "game_types.h"
 #include "engine.h"
@@ -10,7 +11,6 @@ void fn_80013D68(Camera* pCamera);
 void fn_80013E28(Camera* pCamera, f32* pRect);
 void fn_80013E30(Camera* pCamera, GoFrameBuf* pBuf);
 void fn_80013E38(Camera* pCamera, CamLens* pLens);
-GoFrameBuf* fn_80013E40(Camera* pCamera);
 void fn_80013E48(Camera* pCamera);
 void fn_80013EA0(Camera* pCamera);
 void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
@@ -32,6 +32,23 @@ void* fn_8001371C(CamLens* pLens, GoFrameBuf* pBuf, f32* pRect) {
     fn_80013E48(pCamera);
     fn_80013D68(pCamera);
     return pCamera;
+}
+
+// fake match: stands in for a function the original linker stripped. The file's pool has 0.0,
+// 0.5, 1.0, 16773216, 512, 448 in that order, before the functions below use them (they would
+// put 1.0 before 0.5, and 1.442695 first of the rest); its body is unknown, this one only
+// reproduces the order.
+static f32 GoRenderCtx_Gc_StrippedFn(f32 x) {
+    if (x < 0.5f) {
+        x = 0.0f;
+    }
+    if (x < 16773216.0f) {
+        x = 1.0f;
+    }
+    if (x < 448.0f) {
+        x = 512.0f;
+    }
+    return x;
 }
 
 // ---- sweep code (not yet cleaned up) ----
