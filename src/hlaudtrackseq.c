@@ -63,16 +63,16 @@ void fn_800AA5A0(AudVoice* pVoice, int nReason) {
 // Plays again every note whose voice was taken from it.
 void fn_800AA618(AudTrack* pTrack) {
     AudVoice** ppVoice;
-    AudSeqEvent** ppEvent;
     AudVoice** ppEnd;
+    AudSeqEvent** ppEvent;
+    AudSeqEvent* pEvent;
 
     ppVoice = pTrack->apVoices;
     ppEvent = pTrack->u.seq.apEvents;
     ppEnd = ppVoice + pTrack->pTmpl->n2;
     for (; ppVoice < ppEnd; ppVoice++, ppEvent++) {
-        if (*ppVoice == NULL && *ppEvent != NULL) {
-            AudSeqEvent* pEvent = *ppEvent;
-
+        pEvent = *ppEvent;
+        if (*ppVoice == NULL && pEvent != NULL) {
             *ppEvent = NULL;
             fn_800AA744(pEvent, pTrack);
         }
@@ -178,10 +178,10 @@ void fn_800AA744(AudSeqEvent* pEvent, AudTrack* pTrack) {
 
 // Event: lets the voices playing tone n3 end, starting from the channel of the last note.
 void fn_800AA9EC(AudSeqEvent* pEvent, AudTrack* pTrack) {
-    AudTrackTmpl* pTmpl;
     AudSeqTone* pTone;
-    s8 nChannel;
     u8 i;
+    AudTrackTmpl* pTmpl;
+    s8 nChannel;
     AudVoice* pVoice;
 
     pTmpl = pTrack->pTmpl;
@@ -193,7 +193,7 @@ void fn_800AA9EC(AudSeqEvent* pEvent, AudTrack* pTrack) {
     }
     for (i = 0; i < pTmpl->n2; i++, nChannel++) {
         if (nChannel >= pTmpl->n2) {
-            nChannel -= pTmpl->n2;
+            nChannel -= (s8)pTmpl->n2;     // EA sign-extends the count here (extsb)
         }
         pVoice = pTrack->apVoices[nChannel];
         if (pVoice != NULL && pVoice->pTone == pTone) {

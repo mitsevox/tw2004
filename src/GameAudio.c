@@ -925,8 +925,8 @@ void fn_800A5428(void) {
     int nViews;
     int i;
 
+    nViews = gSession.nSplitScreen ? 2 : 1;
     lbl_80282042 = 0;
-    nViews = (gSession.nSplitScreen != 0) + 1;
     if (lbl_8028203C == 2) {
         fn_800AD450(lbl_8028141A);
         lbl_8028141A = 0xFF;
@@ -1306,12 +1306,14 @@ void fn_800A5CA4(u8 nPlayer) {
 void fn_800A5EC0(u8 nPlayer) {
     Player* pPlayer;
     u8 nId;
+    u8 nRand;
 
     pPlayer = &gPlayers[nPlayer];
     nId = lbl_801F1790[pPlayer->nView[0]].n1;
     fn_800AD800(nId, pPlayer->ball.vPos, NULL, 0);
     fn_800ADA94(nId, 0, 2.0f);
-    fn_800ADA28(nId, 0, !(Rand_Next(2) & 1) ? 0x1A : 0x1C, 0);
+    nRand = Rand_Next(2) & 1;   // one of two sounds at random
+    fn_800ADA28(nId, 0, nRand == 0 ? 0x1A : 0x1C, 0);
 }
 
 void fn_800A5F60(u8 nPlayer) {
@@ -1338,13 +1340,13 @@ void fn_800A5FE8(u8 nPlayer) {
 
 // Plays sound 3 on the view's emitters' track 1, at most once every 300 frames when bLimit is set.
 void fn_800A6070(u8 nPlayer, u8 bLimit) {
-    GameAudioView* pView;
+    Player* pPlayer;
     u8 nIdA;
     u8 nIdB;
 
-    pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
-    nIdA = pView->n2;
-    nIdB = pView->n3;
+    pPlayer = &gPlayers[nPlayer];
+    nIdA = lbl_801F1790[pPlayer->nView[0]].n2;
+    nIdB = lbl_801F1790[pPlayer->nView[0]].n3;
     if (!bLimit || lbl_80282048 == 0 || lbl_80282048 + 300 < gSession.nFrameCount) {
         lbl_80282048 = gSession.nFrameCount;
         fn_800AD9AC(nIdA, 1, 3);
@@ -1738,7 +1740,8 @@ void fn_800A7664(int nKind, int nMsg, int a) {
             lbl_8028204C = a;
             return;
         }
-        fn_800A7968(lbl_80281419, 0, nKind, nMsg, a);
+        // port: EA passes nKind and nMsg as ints, unmasked, to fn_800A7968's u8 and u16 parameters
+        ((void (*)(u8, u8, int, int, s32))fn_800A7968)(lbl_80281419, 0, nKind, nMsg, a);
         fn_800AD698(lbl_80281419, 0, 1);
     }
 }
