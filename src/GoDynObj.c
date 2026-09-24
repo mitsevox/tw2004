@@ -77,7 +77,8 @@ void fn_80045FC8(UStreamObject* pObject) {
             pLogo = &pBank->p8[nLogo];
             // EA bug: this loop counts with the player loop's i
             while (i < pLogo->n41) {
-                Mem_cpy(pSlotBank->p18 + pSlot->uPixels, pBank->p18 + pLogo->uPixels, pLogo->nC * 16);
+                Mem_cpy(pSlotBank->p18 + pSlot->aMips[0].uPixels, pBank->p18 + pLogo->aMips[0].uPixels,
+                        pLogo->aMips[0].nC * 16);
                 i++;
             }
         }

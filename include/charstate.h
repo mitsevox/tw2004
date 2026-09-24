@@ -604,10 +604,13 @@ void  fn_80113A7C(SkinIter* pIter);     // and its end
 
 // SkinMorph.c: the morph targets a skin description needs.
 s32   fn_8011C850(SkinDesc* pDesc);
+void  fn_8011CD3C(Skin* pSkin, HwsMemBlock* pBlock, HwsOverrideTable* pTable);
 
 // hwsOverride_Gc.c: a mesh table and a memory block for a skin description's morphed meshes.
 HwsMemBlock* fn_801128EC(SkinDesc* pDesc, s32 nSize);
+void  fn_80112910(HwsMemBlock* pBlock);
 HwsOverrideTable* fn_80112A34(SkinDesc* pDesc, s32 nMeshes);
+void  fn_80112A58(HwsOverrideTable* pTable);
 void* fn_80112A80(HwsMemBlock* pBlock, HwsOverrideTable* pTable, int i, u8 bKeep);
 
 // hwsBurn.c: pfn is called with pSkin on each SkinDesc.p14 entry the burn copies; fn_80111EB0

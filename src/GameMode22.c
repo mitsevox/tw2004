@@ -331,7 +331,7 @@ s32 fn_80126334(int nPlayer) {
     s32 i;
 
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        if (gPlayers[i].nEA0 != 0) {
+        if (PLAYER(i)->nEA0 != 0) {
             bNone = 0;
         }
     }
@@ -386,16 +386,16 @@ void fn_801264B8(void) {
     s32 i;
 
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        if (gPlayers[i].nEA0 < lbl_80195498.n4 || gPlayers[0].nEA0 != gPlayers[i].nEA0) {
+        if (PLAYER(i)->nEA0 < lbl_80195498.n4 || gPlayers[0].nEA0 != PLAYER(i)->nEA0) {
             return;
         }
-        if (gPlayers[i].nEBC >= nBest) {
+        if (PLAYER(i)->nEBC >= nBest) {
             bTie = 0;
-            if (nBest == gPlayers[i].nEBC && nWinner != 5) {
+            if (nBest == PLAYER(i)->nEBC && nWinner != 5) {
                 bTie = 1;
             }
             nWinner = i;
-            nBest = gPlayers[i].nEBC;
+            nBest = PLAYER(i)->nEBC;
         }
     }
     lbl_80195498.n8 = nWinner;
@@ -405,7 +405,7 @@ void fn_801264B8(void) {
         lbl_80195498.bC = 0;
         if (lbl_80195498.n0 == 1) {
             for (i = 0; i < gSession.nNumPlayers; i++) {
-                gPlayers[i].nEBC = 0;
+                PLAYER(i)->nEBC = 0;
             }
         }
     }

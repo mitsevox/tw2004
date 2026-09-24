@@ -29,8 +29,8 @@ void fn_80036464(void);
 void fn_800364A0(void);
 s32 fn_80008380();
 s32 fn_800CE168();
-s32 fn_80112910();
-s32 fn_80112A58();
+void fn_80112910(struct HwsMemBlock* pBlock);
+void fn_80112A58(struct HwsOverrideTable* pTable);
 s32 fn_80037D5C();
 s32 fn_80037708(void* arg0);
 
@@ -103,11 +103,11 @@ s32 fn_80037708(void* arg0) {
     fn_80008380();
     temp_r3 = (*(void**)((u8*)(arg0) + 0));
     if ((temp_r3 != NULL) && ((u32) (*(u32*)((u8*)(temp_r3) + 0x48)) != 0U)) {
-        fn_80112910((*(s32*)((u8*)(arg0) + 0x1090)));
+        fn_80112910((*(struct HwsMemBlock**)((u8*)(arg0) + 0x1090)));
         (*(s32*)((u8*)(arg0) + 0x1090)) = 0;
-        fn_80112910((*(s32*)((u8*)(arg0) + 0x1098)));
+        fn_80112910((*(struct HwsMemBlock**)((u8*)(arg0) + 0x1098)));
         (*(s32*)((u8*)(arg0) + 0x1098)) = 0;
-        fn_80112A58((*(s32*)((u8*)(arg0) + 0x10A0)));
+        fn_80112A58((*(struct HwsOverrideTable**)((u8*)(arg0) + 0x10A0)));
         (*(s32*)((u8*)(arg0) + 0x10A0)) = 0;
         fn_80037D5C((*(u32*)((u8*)((*(void**)((u8*)(arg0) + 0))) + 0x48)));
     }

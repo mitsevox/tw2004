@@ -82,8 +82,8 @@ void fn_800B9864(MadDecoder* p, PictFrame* pFrame);
 
 // Drop nBits bits from the buffer, refilling 16 at a time.
 void fn_800B7D80(int nBits) {
-    lbl_802821B0 -= nBits;
     lbl_802821B4 <<= nBits;
+    lbl_802821B0 -= nBits;
     if (lbl_802821B0 < 16) {
         lbl_802821B4 |= fn_800B8984(lbl_802821B8, 2) << (16 - lbl_802821B0);
         lbl_802821B0 += 16;
@@ -310,13 +310,13 @@ u32 fn_800B8984(u8* pData, int nBytes) {
         return pData[0];
     }
     if (nBytes == 2) {
-        return pData[0] | (pData[1] << 8);
+        return (pData[1] << 8) | pData[0];
     }
     if (nBytes == 3) {
-        return pData[0] | ((pData[1] << 8) | (pData[2] << 16));
+        return pData[0] | ((pData[2] << 16) | (pData[1] << 8));
     }
     if (nBytes == 4) {
-        return pData[0] | ((pData[1] << 8) | ((pData[2] << 16) | (pData[3] << 24)));
+        return pData[0] | ((pData[1] << 8) | ((pData[3] << 24) | (pData[2] << 16)));
     }
     return 0;
 }
@@ -328,8 +328,8 @@ s32 fn_800B8A04(s32 a, s32 b) {
 
 // The same as fn_800B7D80.
 void fn_800B8A2C(int nBits) {
-    lbl_802821B0 -= nBits;
     lbl_802821B4 <<= nBits;
+    lbl_802821B0 -= nBits;
     if (lbl_802821B0 < 16) {
         lbl_802821B4 |= fn_800B8984(lbl_802821B8, 2) << (16 - lbl_802821B0);
         lbl_802821B0 += 16;
@@ -811,6 +811,7 @@ void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);
 void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
+int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
 
 void fn_800B9944(void) {
     UStream_RegisterHandler('TEO ', fn_800B99FC);
@@ -976,5 +977,41 @@ void fn_800B9CF0(u8 bTarget) {
         fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
         fn_80013EEC(fn_8001614C());
         fn_80012EF8();
+    }
+}
+
+// Put the logo szBall on the held ball: its texture's levels are copied over the "logoea"
+// texture. NULL hides the logo layers instead.
+void fn_800B9EB8(char* szBall) {
+    u64       uLogo;
+    u64       uSlot;
+    TexBank*  pSlotBank;
+    TexEntry* pSlot;
+    TexEntry* pLogo;
+    int       nLogo;
+    int       i;
+
+    if (lbl_802821D4 == NULL) {
+        return;
+    }
+    if (szBall == NULL) {
+        lbl_802814E8 = 0;
+        return;
+    }
+    fn_800CB700(&uLogo, szBall);
+    fn_800CB700(&uSlot, lbl_802814FC);
+    fn_800102DC(uSlot, &pSlotBank, &pSlot);
+    if (pSlotBank == NULL || pSlot == NULL) {
+        return;
+    }
+    nLogo = fn_8001005C(lbl_802821D4, uLogo);
+    if (nLogo == (int)0x80000000) {
+        return;
+    }
+    lbl_802814E8 = 1;
+    pLogo = &lbl_802821D4->p8[nLogo];
+    for (i = 0; i < pLogo->n41; i++) {
+        Mem_cpy(pSlotBank->p18 + pSlot->aMips[i].uPixels, lbl_802821D4->p18 + pLogo->aMips[i].uPixels,
+                pLogo->aMips[i].nC * 16);
     }
 }
