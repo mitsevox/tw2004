@@ -179,7 +179,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->pC--;
             pArgs = pFrame->pC - n;
             data.au[0] = pArgs[0];
-            fn_80165B90(pScreen->uGroup, pScreen->uScreen, pStudio, 9, &data, (u8)n, pArgs + 1);
+            fn_80165B90(pScreen->uGroup, pScreen->uScreen, pStudio, 9, &data, n, pArgs + 1);
             break;
         case 0x0B:  // a command to the game (pfnCommand)
             n = *--pFrame->pC;
@@ -193,11 +193,23 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             n = *--pFrame->pC;
             data.au[0] = *--pFrame->pC;
             data.au[1] = *--pFrame->pC;
-            fn_80165B90(pScreen->uGroup, pScreen->uScreen, pStudio, 7, &data, (u8)n, pFrame->pC - n);
+            fn_80165B90(pScreen->uGroup, pScreen->uScreen, pStudio, 7, &data, n, pFrame->pC - n);
             break;
         case 0x0D:  // push the screen file
             *pTop = (s32)pScreen->pData;
             pFrame->pC++;
+            break;
+        case 0x0E:  // copy a text
+            pText = (UISText*)*--pFrame->pC;
+            pFind = (UISText*)*--pFrame->pC;
+            if (pText != NULL && pFind != NULL) {
+                n = pFind->nSize;
+                if (pText->nSize < n) {
+                    n = pText->nSize;
+                }
+                strncpy(pText->szText, pFind->szText, n);
+                pText->szText[n] = 0;
+            }
             break;
         case 0x0F:  // push a word
         case 0x10:
@@ -1015,18 +1027,6 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             if (pText != NULL && pStudio->pfnScreen28 != NULL && pScreen != NULL) {
                 // port: the text's address passed as the callback's word
                 pStudio->pfnScreen28(pScreen->uGroup, pScreen->uScreen, (s32)pText->szText);
-            }
-            break;
-        case 0x0E:  // copy a text
-            pText = (UISText*)*--pFrame->pC;
-            pFind = (UISText*)*--pFrame->pC;
-            if (pText != NULL && pFind != NULL) {
-                n = pFind->nSize;
-                if (pText->nSize < n) {
-                    n = pText->nSize;
-                }
-                strncpy(pText->szText, pFind->szText, n);
-                pText->szText[n] = 0;
             }
             break;
         }
