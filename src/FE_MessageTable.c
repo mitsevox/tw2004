@@ -1,8 +1,8 @@
 // FE_MessageTable.c (our name): the menus' message table. The menu UI (uiProcessInterface.c) sends
-// its messages here while the front end runs (game type 3): fn_80079EA8 fills a table of 770
-// handlers and fn_80079E6C calls the one for a message's number with its arguments and results.
-// The handlers read and set what the menus show: golfer names, the session's setup, the save
-// profile's stats and records, the Create-A-Player choices. TW06 has GetGolferName in
+// its messages here while the front end runs (game type 3): fn_80079EA8 fills 612 of a table of
+// 770 slots with handlers and fn_80079E6C calls the one for a message's number with its arguments
+// and results. The handlers read and set what the menus show: golfer names, the session's setup,
+// the save profile's stats and records, the Create-A-Player choices. TW06 has GetGolferName in
 // apt_fe_gamemessages.c. Rounds have their own table (fn_800850E4).
 
 #include "game.h"
@@ -66,7 +66,7 @@ void fn_80102308(s32 n);                // GameMode4.c
 void fn_8010D334(s32 v);                // CharSliders.c
 void fn_8008DD34(int nSlot, int n);
 s32  fn_8009FCFC(MCCardPos* pPos);      // MC.c: load the save from the card
-s32  fn_8009FE90(MCCardPos* pPos);      // } MC.c, in lbl_8018C7D8's set 0
+s32  fn_8009FE90(MCCardPos* pPos);      // } MC.c, in lbl_8018C7D8 (sets 0, 2, 1, 1)
 s32  fn_800A09EC(MCCardPos* pPos);      // }
 s32  fn_800A0E6C(MCCardPos* pPos);      // }
 s32  fn_800A1964(MCCardPos* pPos);      // }
@@ -709,8 +709,8 @@ void fn_80084F84(MsgArg* pArgs, MsgArg* pResult);
 #define FE_NUM_MESSAGES 770
 MsgHandler lbl_801D77A8[FE_NUM_MESSAGES];
 
-// fn_8007D428 and fn_80080388 set it to 0 for a golfer that can be picked and 0.2 for a locked
-// one.
+// fn_8007D428 and fn_80080388 set it to 0.2 for a locked golfer, else 0 (also for one that is not
+// available).
 f32 lbl_80281374 = 0.25f;
 
 // Run message nMsg's handler.
@@ -1500,8 +1500,8 @@ void fn_8007C254(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// The CrAP screen's state: leaving state 0, or entering state 3, calls fn_8008DAEC; fn_8008E358
-// is told whether it is now 0.
+// The CrAP screen's state: changing it to 0 or to 3 calls fn_8008DAEC; fn_8008E358 is told
+// whether it is now 0.
 void fn_8007C2A0(MsgArg* pArgs, MsgArg* pResult) {
     s32 nOld;
 
@@ -1642,7 +1642,6 @@ void fn_8007C698(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = n;
 }
 
-// The slot's profile has a created golfer.
 // Every player's tee set: 1, 2 or 3 picks tee set 2, 1 or 0.
 void fn_8007C6E4(MsgArg* pArgs, MsgArg* pResult) {
     int i;
@@ -2088,7 +2087,8 @@ void fn_8007D424(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Whether golfer pArgs[1] can be picked: 1 when it is unlocked (by any profile or a cheat code, or
-// it is a created golfer), 0 when it is locked, -1 when it is not available at all.
+// it is a created golfer), 0 when it is locked, -1 when it is not available at all; always 1
+// while lbl_80281ED4->b11702 is set.
 void fn_8007D428(MsgArg* pArgs, MsgArg* pResult) {
     int i;
 
@@ -2573,8 +2573,9 @@ void fn_8007E650(MsgArg* pArgs, MsgArg* pResult) {
     fn_8007E458(7, pArgs, pResult);
 }
 
-// Load the replay at card position pArgs[0..2]: 1 when it loaded. Its golfer (a created golfer is
-// replaced by golfer 0) and course are set up for the session.
+// Load the replay at card position pArgs[0..2]: 1 when it loaded. Player 0 gets slot 0's created
+// golfer when that slot's profile is loaded, else the replay's golfer (golfer 0 for a created
+// one); the replay's course is set up for the session.
 void fn_8007E67C(MsgArg* pArgs, MsgArg* pResult) {
     MCCardPos pos;
 
@@ -2873,7 +2874,8 @@ void fn_8007EE80(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Save the profile being worked on into slot pArgs[0] and mark the slot loaded (with session flag
-// 0x4000, only into a slot that has none). A profile without a TOUR card level gets level 1.
+// 0x4000, only into a slot that has none). A profile without a TOUR card level gets level 1,
+// unless lbl_801D7148.b18 is set.
 void fn_8007EE90(MsgArg* pArgs, MsgArg* pResult) {
     s32 nSlot = pArgs[0].i;
 
@@ -3158,9 +3160,10 @@ void fn_8007F8A0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Saves the working profile (lbl_80281ED4) into slot pArgs[0]: its name, created golfer and the
-// rest from 0x54C0 on. A new slot keeps its money and gets n1C and 25,000 more. The records held
-// under the slot's old name, and its saved replays, take the new name.
+// Saves the working profile (lbl_80281ED4) into slot pArgs[0]: its name, created golfer and its
+// bytes from 0x54C0 up to 0xB634. A new slot keeps its money and gets n1C and 25,000 more. The
+// all-time records held under the slot's old name, and its saved replays, take the new name (the
+// course records were meant to: see the EA bug below).
 void fn_8007FA60(MsgArg* pArgs, MsgArg* pResult) {
     char szOld[0x20];           // the size is unknown (0x20 gives the original's frame)
     int  nSlot;
@@ -3389,7 +3392,8 @@ void fn_80080358(MsgArg* pArgs, MsgArg* pResult) {
     fn_8009CD7C();
 }
 
-// Like fn_8007D428, with the golfers of lbl_801894E8 unlocked instead of the profiles' unlocks.
+// Like fn_8007D428 (without its b11702 override), with the golfers of lbl_801894E8 unlocked
+// instead of the profiles' unlocks.
 void fn_80080388(MsgArg* pArgs, MsgArg* pResult) {
     int i;
 
