@@ -876,7 +876,7 @@ config.libs = [
             Object(NonMatching, "Ball.c"),
             Object(NonMatching, "LLPictInt.c"),
             Object(NonMatching, "user.c"),
-            Object(NonMatching, "PasswordManager.c"),
+            Object(Matching, "PasswordManager.c"),
             Object(NonMatching, "Swing.c"),
             Object(NonMatching, "GoCamCont.c"),
             Object(NonMatching, "skalib.c"),
