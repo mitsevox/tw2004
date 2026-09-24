@@ -219,15 +219,16 @@ void fn_80110C88(HwsBurn* pBurn, int n) {
 // What variant nVariant of part nPart uses: its chosen options (all without one), and the
 // options its links pick on other parts' chosen variants.
 void fn_80110D10(HwsBurn* pBurn, int nPart, int nVariant) {
+    int i;
     SkinLink* pLink;
     SkinVariant* pOther;
     s32 nOption;
     s32 nFirst;
     s32 nChosen;
-    s32 nFirstLink;
     int nLinked;
-    int i;
     int j;
+    s32 nFirstLink;
+    s32 nFirstVariant;
 
     nOption = pBurn->aOption[nPart];
     nFirst = pBurn->pDesc->pVariants[nVariant].nFirstOption;
@@ -243,10 +244,10 @@ void fn_80110D10(HwsBurn* pBurn, int nPart, int nVariant) {
         if (nLinked != -1) {
             nOption = pLink->nOption;
             nChosen = pBurn->aVariant[nLinked];
-            nFirst = pBurn->pDesc->pParts[nLinked].nFirst;
+            nFirstVariant = pBurn->pDesc->pParts[nLinked].nFirst;
             for (j = 0; j < pBurn->pDesc->pParts[nLinked].nVariants; j++) {
                 if ((nChosen == -1 || nChosen == j) && nOption >= 0) {
-                    pOther = &pBurn->pDesc->pVariants[nFirst + j];
+                    pOther = &pBurn->pDesc->pVariants[nFirstVariant + j];
                     if (nOption < pOther->nOptions) {
                         fn_80110C88(pBurn, pOther->nFirstOption + nOption);
                     }
