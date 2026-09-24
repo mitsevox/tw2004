@@ -3595,6 +3595,7 @@ void fn_80080CA8(MsgArg* pArgs, MsgArg* pResult) {
 // that this profile or the cheat codes have unlocked, and a random hole number 0..17, drawn again
 // while the round already holds that course and hole.
 void fn_80080CC8(MsgArg* pArgs, MsgArg* pResult) {
+    int i;
     int nSlot = pArgs[0].i;
     int nRound = pArgs[1].i;
     int nEntry = pArgs[2].i;
@@ -3604,7 +3605,6 @@ void fn_80080CC8(MsgArg* pArgs, MsgArg* pResult) {
     u32 nPick;
     u32 nFound;
     s8 nHoleNum;
-    int i;
 
     for (i = 0; i < 20; i++) {
         if (gpSaveData[nSlot].aCourseUnlocked[aCourses[i]] ||
