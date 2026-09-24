@@ -417,7 +417,9 @@ typedef struct Character {
                                 //         (Player_SetGolfer)
     s32   nStyle;               // 0x16E0  the animation style (fn_8001C7FC); at -1
                                 //         CharacterState_AddSKABlendData does nothing
-    u8    unk16E4[0x1784 - 0x16E4];
+    f32   aPoints[5][4];        // 0x16E4  points Character_PlaceFeetOnGround sets the heights of; the
+                                //         skeleton code (0x80027FF8) moves them in x and z
+    u8    unk1734[0x1784 - 0x1734];
     s32   n1784;                // 0x1784  set to -1 by Character_SetPosition
     Clip* pCurClip;             // 0x1788  the clip Char_SetClip picked
     u8    unk178C[0x1790 - 0x178C];
@@ -426,7 +428,8 @@ typedef struct Character {
     void* p1794;                // 0x1794  cleared by fn_80062BE8; the same for group 9
     Clip* p1798;                // 0x1798  cleared by fn_8001942C; with n2C 6, fn_8001C650 and
                                 //         fn_8001C860 set n16D4 to 4 when it is 0
-    u8    unk179C[0x17AC - 0x179C];
+    f32   a179C[4];             // 0x179C  cleared by Character_PlaceFeetOnGround; fn_80017DDC acts only
+                                //         while a179C[1] is above 0.9
     void* p17AC;                // 0x17AC  its slider definitions (CharSlider_CreateDefinitionsFromMem,
                                 //         fn_8001A9F4); fn_8001DC64 applies them
     void (*pfn17B0)(void);      // 0x17B0  called by Character_UpdateAnimation before the bones are

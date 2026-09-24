@@ -268,6 +268,43 @@ void fn_80017864(Character* pChar, SkelPose* pPose) {
     }
 }
 
+// Keeps the club out of the ground: when point 4 is below the terrain and bone 0x52's y axis
+// points into the slope, that axis is shortened by how far the point is under, measured against
+// the club class's head height (not below 3/4 of it).
+void fn_80017DDC(Character* pChar) {
+    f32 vNormal[4];
+    f32 (*pMtx)[4];
+    CourseInfo* pCourse;
+    f32 fHeight;
+    f32 fUnder;
+    f32 fDot;
+    f32 fLength;
+    f32 fHead;
+
+    if (pChar->p16D8 != NULL && pChar->a179C[1] > 0.9f) {
+        pMtx = fn_8001ED08(pChar, 0x52);
+        if (pMtx != NULL && (pCourse = fn_8000C594()) != NULL) {
+            fHeight = fn_8004D650(pCourse, pChar->aPoints[4], vNormal);
+            if (fHeight < -60000.0f) {
+                return;
+            }
+            fUnder = fHeight - pChar->aPoints[4][1];
+            if (fUnder < 0.0f) {
+                return;
+            }
+            fDot = -fn_8001EEA4(pMtx[1], vNormal);
+            if (fDot > 0.707f) {
+                fHead = pChar->p16D8->afC[pChar->nClubClass];
+                fLength = (fHead - fUnder * vNormal[1] / fDot) / fHead;
+                if (fLength > 0.75f) {
+                    fn_8001EF34(pMtx[1], fLength, pMtx[1]);
+                    fn_80029A90(pChar->pModel, pMtx, 0x52);
+                }
+            }
+        }
+    }
+}
+
 // Advances the character's animation by fTime: both animation players and their blend trees, the
 // pose (the club head at the club class's height), the bones, the feet on the ground and the
 // model's dynamic chains. Unless bForce, it waits while a golfer's state is 0x13 and while f14 of
