@@ -15,7 +15,6 @@ void fn_800293CC(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pO
 void fn_80036180(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut);             // the same, format 1
 
 int  fn_800723E8(SKABlendNode* pNode, SKABlendNode*** pppOldest);
-void fn_800725BC(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 fWeight);
 int  fn_8007286C(SKABlendNode* pNode, f32 fTime);
 f32  fn_800728D8(SKABlendNode* pNode);
 f32  fn_80072938(SKABlendNode* pNode);

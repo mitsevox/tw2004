@@ -666,6 +666,7 @@ SkinIter* fn_80113B34(u8* pBuf, SkinIterArgs* pArgs);
 void  fn_80113BAC(SkinIter* pIter);
 SkinIter* fn_80113910(u8* pBuf, SkinIterArgs* pArgs);   // hwsRender_Gc.c: another mesh iterator
 void  fn_80113A7C(SkinIter* pIter);     // and its end
+u8    fn_80112C04(void);                // hwsRender_Gc.c: 0 on course 14's hole 11 with four players
 
 // SkinPart.c, as Skin.c uses it.
 u64   fn_800CCDDC(Skin* pSkin, int nPart);

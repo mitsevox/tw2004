@@ -348,6 +348,12 @@ u8 fn_80073610(SKABlendNode* pNode, void* pSrc);
 // The blend callback CharacterState_AddSKABlendData attaches (fn_80072ACC is one).
 typedef void (*SKABlendFn)(SKABlendNode* pNode, int* pn, f32 fTime);
 
+// animblender.c: set up *ppNode (taken from nType's pool when NULL) as a node of nType with pose
+// format nFormat, bC set from nC.
+void fn_80071C28(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBlend, int nC);
+// animblender.c: make pNode a blend node that mixes its children with pfnBlend at fWeight.
+void fn_800725BC(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 fWeight);
+
 // A node of a character's SKA blend tree (animblender.c; the root is at Character + 0x40C). A node
 // of type 1 blends its two children into its pose with pfnBlend; a node of type 0 plays one source
 // from fFrom to fTo. fn_80071C28 takes nodes from three pools by type (0x34, 0x2C and 0x20 bytes),

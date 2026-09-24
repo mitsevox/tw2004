@@ -89,8 +89,6 @@ void  fn_8001EFB4(f32* pA, f32* pB, f32* pOut);
 void  fn_8001A14C(Character* pChar);
 void  fn_8001D6D8(int n);
 void  fn_8010B098(void* pModel);                                // LLDynTex.c
-void  fn_80071C28(SKABlendNode** ppNode, int a, int b, SKABlendFn pfnBlend, int c);   // animblender.c
-void  fn_800725BC(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 f);                  // animblender.c
 void  fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f);            // CharAnim.c
 void  fn_800094D8(f32* pQ, f32* pA, f32* pB, f32* pC);          // Quaternion.c: a rotation as angles
 void  fn_80029968(CharModel* pModel, SkelPose* pPose);          // Skeleton.c
