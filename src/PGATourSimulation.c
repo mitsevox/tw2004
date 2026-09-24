@@ -1694,17 +1694,21 @@ s32 fn_8011BCFC(const void* pA, const void* pB) {
 
 // The score sort comparisons (lbl_80281848 is the player). Lower scores first, then by name.
 
-// All entrants: a cut entrant sorts last, the winner first. 97.4%: only nPlayer and nEntrantA/nScoreB
-// swap saved registers (declaration orders, int/s32, an inline score helper and the permuter tried).
+// All entrants: a cut entrant sorts last, the winner first.
 s32 fn_8011BDF8(const void* pA, const void* pB) {
+    PgaEntrantMC* pEntrantA;
+    PgaEntrantMC* pEntrantB;
+    int nEntrantA;
+    int nEntrantB;
     s32 nScoreA;
-    s32 nEntrantB = *(const s32*)pB;
-    s32 nPlayer = lbl_80281848;
-    s32 nEntrantA = *(const s32*)pA;
-    PgaEntrantMC* pEntrantA = GetEntrantMCPtr(nPlayer, nEntrantA);
-    PgaEntrantMC* pEntrantB = GetEntrantMCPtr(nPlayer, nEntrantB);
     s32 nScoreB;
+    int nPlayer;
 
+    nEntrantA = *(const s32*)pA;
+    nEntrantB = *(const s32*)pB;
+    nPlayer = lbl_80281848;
+    pEntrantA = GetEntrantMCPtr(nPlayer, nEntrantA);
+    pEntrantB = GetEntrantMCPtr(nPlayer, nEntrantB);
     nScoreA = fn_8011937C(nPlayer, nEntrantA, !fn_8011908C(nPlayer, nEntrantA));
     if (fn_801197A4(nPlayer, nEntrantA)) {
         nScoreA = PGA_SCORE_CUT;
@@ -1728,9 +1732,9 @@ s32 fn_8011BDF8(const void* pA, const void* pB) {
 
 // The cut entrants among themselves.
 s32 fn_8011BF74(const void* pA, const void* pB) {
-    s32 nEntrantA = *(const s32*)pA;
-    s32 nEntrantB = *(const s32*)pB;
-    s32 nPlayer = lbl_80281848;
+    int nEntrantA = *(const s32*)pA;
+    int nEntrantB = *(const s32*)pB;
+    int nPlayer = lbl_80281848;
     PgaEntrantMC* pEntrantA = GetEntrantMCPtr(nPlayer, nEntrantA);
     PgaEntrantMC* pEntrantB = GetEntrantMCPtr(nPlayer, nEntrantB);
     s32 nScoreA = fn_8011937C(nPlayer, nEntrantA, !fn_8011908C(nPlayer, nEntrantA));
