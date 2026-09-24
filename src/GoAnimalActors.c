@@ -9,6 +9,7 @@ void fn_8000ADC0(f32 (*pMtx)[4]);                       // identity
 void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void fn_8000C5A4(f32 (*pMtx)[4]);
 void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 f);
+f32  fn_800351D8(u32 n, f32 fPeriod);                   // GoTerrain.c
 int  fn_8004AB90(UObjMesh* pMesh, int i);
 UObjMesh* fn_8004ABA4(UObjMesh* pMesh, int i);
 UObjMesh* fn_8004ABB4(UObjModelRoot* pRoot);
@@ -147,6 +148,160 @@ void fn_8004A24C(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
         pAnimal->base.obj.m80[3][2] = pDef->base.aPos[2];
     }
     fn_8004A14C(pAnimal);
+}
+
+// A wave from 0 to 1 and back, fRate times a second, at frame nFrame (our macro: EA's code reads
+// fRate twice at each use, which an inline function would not).
+#define ANIMAL_WAVE(nFrame, fRate) \
+    (0.5f * fn_800095F0(6.2831855f * (fRate) * fn_800351D8((nFrame), 1.0f / (fRate))) + 0.5f)
+
+// Message 6, the per-frame update: moves the animal along its route, speeds it up or slows it
+// down (b1BC: moving), counts down its moving (f190) and resting (f18C) times, and animates its
+// pose (n1AC, blended by f1B4) by its kind n1A4.
+void fn_8004A578(DynObjAnimal* pAnimal, void* pArg) {
+    f32 fDt;
+    f32 fDiff;
+    f32 fMaxA;
+    f32 fMinA;
+    f32 fMaxB;
+    f32 fMinB;
+    u32 i;
+
+    fDt = *(f32*)&pArg;  // port: the frame time's float bits arrive as the message argument
+    if (fDt > 0.50050056f) {
+        fDt = 0.50050056f;
+    }
+    if (fDt < 0.0f) {
+        fDt = 0.0f;
+    }
+    if (0.0f == fDt) {
+        return;
+    }
+    if (pAnimal->pRoute != NULL && pAnimal->f170 != 0.0f) {
+        pAnimal->f194 = pAnimal->f170 * fDt + pAnimal->f194;
+        ActAnimal_SetWorldMatrix(pAnimal, fDt);
+    }
+    if (pAnimal->b1BC && pAnimal->f170 < pAnimal->f16C) {
+        pAnimal->f170 = pAnimal->f174 * fDt + pAnimal->f170;
+        if (pAnimal->f170 > pAnimal->f16C) {
+            pAnimal->f170 = pAnimal->f16C;
+        }
+    }
+    if (!pAnimal->b1BC && pAnimal->f170 > 0.0f) {
+        pAnimal->f170 = pAnimal->f170 - pAnimal->f174 * fDt;
+        if (pAnimal->f170 < 0.0f) {
+            pAnimal->f170 = 0.0f;
+        }
+    }
+    pAnimal->f190 -= fDt;
+    if (pAnimal->f190 <= 0.0f) {
+        pAnimal->b1BC = 0;
+        switch (pAnimal->n1A4) {
+        case 2:
+            pAnimal->n1B0 = 0;
+            break;
+        case 1:
+            pAnimal->n1B0 = 0;
+            break;
+        case 0:
+        case 3:
+            break;
+        }
+    }
+    pAnimal->f18C -= fDt;
+    if (pAnimal->f18C <= 0.0f) {
+        pAnimal->b1BC = 1;
+        pAnimal->f190 = pAnimal->a178[4];
+        switch (pAnimal->n1A4) {
+        case 2:
+            pAnimal->n1B0 = 3;
+            break;
+        case 1:
+            pAnimal->n1B0 = 3;
+            break;
+        case 0:
+        case 3:
+            break;
+        }
+        pAnimal->f18C = pAnimal->a178[3] * Rand_Float(1) + pAnimal->a178[2];
+    }
+    pAnimal->n1B8 += (u32)(59.94f * fDt);  // port: frames at the NTSC rate
+
+    switch (pAnimal->n1A4) {
+    case 3:
+        pAnimal->f1B4 = ANIMAL_WAVE(pAnimal->n1B8, pAnimal->a178[0]);
+        break;
+    case 1:
+        if ((pAnimal->n1AC == 0 && pAnimal->n1B0 == 0) || (pAnimal->n1AC >= 3 && pAnimal->n1B0 == 3) ||
+            pAnimal->n1AC > 3) {
+            if (pAnimal->n1AC >= 3) {
+                pAnimal->f1B4 = 5.0f * pAnimal->a178[1] * fDt + pAnimal->f1B4;
+                while (pAnimal->f1B4 > 1.0f) {
+                    pAnimal->n1AC++;
+                    if (pAnimal->n1AC > 7) {
+                        pAnimal->n1AC = 3;
+                    }
+                    pAnimal->f1B4 -= 1.0f;
+                }
+            } else {
+                pAnimal->f1B4 = ANIMAL_WAVE(pAnimal->n1B8, pAnimal->a178[0]);
+            }
+            break;
+        }
+        // fall through
+    case 2:
+        if (pAnimal->n1AC == pAnimal->n1B0) {
+            if (pAnimal->n1AC == 0) {
+                pAnimal->f1B4 = ANIMAL_WAVE(pAnimal->n1B8, pAnimal->a178[0]);
+            } else {
+                pAnimal->f1B4 = ANIMAL_WAVE(pAnimal->n1B8, pAnimal->a178[1]);
+            }
+        } else {
+            fMaxA = 6.0f * fDt;
+            fMinA = -6.0f * fDt;
+            fMaxB = 4.0f * fDt;
+            fMinB = -4.0f * fDt;
+            for (i = 0; i < 6; i++) {
+                if (pAnimal->n1AC == lbl_80187DF0[i].nFrom && pAnimal->n1B0 == lbl_80187DF0[i].nTo) {
+                    fDiff = lbl_80187DF0[i].fTarget - pAnimal->f1B4;
+                    if (pAnimal->n1AC == 2 || pAnimal->n1AC == 3) {
+                        if (fDiff > fMaxA) {
+                            fDiff = fMaxA;
+                        }
+                        if (fDiff < fMinA) {
+                            fDiff = fMinA;
+                        }
+                    } else {
+                        if (fDiff > fMaxB) {
+                            fDiff = fMaxB;
+                        }
+                        if (fDiff < fMinB) {
+                            fDiff = fMinB;
+                        }
+                    }
+                    pAnimal->f1B4 += fDiff;
+                    if (fabsf(pAnimal->f1B4 - lbl_80187DF0[i].fTarget) < 0.01f) {
+                        pAnimal->n1AC = lbl_80187DF0[i].nNext;
+                        pAnimal->f1B4 = lbl_80187DF0[i].fStart;
+                        pAnimal->n1B8 = 0;
+                        return;
+                    }
+                }
+            }
+        }
+        break;
+    case 0:
+        pAnimal->f1B4 = ANIMAL_WAVE(pAnimal->n1B8, pAnimal->a178[0]);
+        if (pAnimal->f1B4 < 0.5f) {
+            pAnimal->f1B4 *= 2.0f;
+            pAnimal->n1AC = 0;
+        } else {
+            pAnimal->f1B4 -= 0.5f;
+            pAnimal->f1B4 *= 2.0f;
+            pAnimal->n1AC = 1;
+        }
+        break;
+    }
 }
 
 // Type 11's message handler; other messages go to type 0's.

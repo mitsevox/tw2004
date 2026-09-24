@@ -239,16 +239,27 @@ typedef struct DynObjAnimal {
     f32  f1A0;                  // 0x1A0
     s32  n1A4;                  // 0x1A4  0..4, from its model's mesh bits (4: no model)
     AnimalRoute* pRoute;        // 0x1A8  NULL: it stands at its definition's position
-    s32  n1AC;                  // 0x1AC  } copied to its UObject's n108 and f10C before it is drawn
-    s32  n1B0;                  // 0x1B0  }
+    u32  n1AC;                  // 0x1AC  } its pose, copied to its UObject's n108 and f10C before it
+    u32  n1B0;                  // 0x1B0  }   is drawn; n1B0 the pose it is heading for (fn_8004A578)
     f32  f1B4;                  // 0x1B4  }
-    s32  n1B8;                  // 0x1B8
+    u32  n1B8;                  // 0x1B8  frames counted (fn_8004A578)
     u8   b1BC;                  // 0x1BC
     u8   b1BD;                  // 0x1BD  set when its route's first point with ground under it is
                                 //        less than 0.5 above the ground (and f198 was given)
     u8   unk1BE[2];
 } DynObjAnimal;
 LAYOUT_ASSERT(DynObjAnimal, 0x1C0);
+
+// A change of an animal's pose (our name; GoAnimalActors.c's lbl_80187DF0, 6 of them): in pose
+// nFrom heading for nTo, f1B4 moves to fTarget, then the animal takes pose nNext at fStart.
+typedef struct AnimalStep {
+    u32  nFrom;                 // 0x00
+    u32  nTo;                   // 0x04
+    u32  nNext;                 // 0x08
+    f32  fTarget;               // 0x0C
+    f32  fStart;                // 0x10
+} AnimalStep;
+extern AnimalStep lbl_80187DF0[6];
 
 // One entry of UKernel.c's lbl_801D5228 (12 bytes), taken by fn_80049230.
 typedef struct DynObjSlot {
