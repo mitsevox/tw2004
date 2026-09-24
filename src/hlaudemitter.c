@@ -9,7 +9,77 @@
 
 AudInstance* fn_800AD674(u8 nId);
 
+// Runs fn_800AD450 on every instance in use, then empties every emitter. Always 1.
+int fn_800AD0C4(void) {
+    AudInstance* pInst;
+    AudInstance* pNext;
+    s32 i;
+
+    for (pInst = lbl_801F2668.pActive; pInst != NULL; pInst = pNext) {
+        pNext = pInst->pNextActive;
+        fn_800AD450(pInst->nId);
+    }
+    for (i = 0; i < 32; i++) {
+        lbl_801F2668.apFirst[i] = NULL;
+        lbl_801F2668.anSound[i] = 0;
+    }
+    return 1;
+}
+
 void fn_800AD1C4(void) {
+}
+
+// Whether bit nTrack of an instance's u22 is set; 0 for no instance.
+u8 fn_800AD618(u8 nId, u8 nTrack) {
+    AudInstance* pInst = fn_800AD674(nId);
+    if (pInst == NULL) {
+        return 0;
+    }
+    return (pInst->u22 & (1 << nTrack)) != 0;
+}
+
+// The instance with an id; id 0xFF is none.
+AudInstance* fn_800AD674(u8 nId) {
+    AudInstance* pInst = &lbl_801F2740[nId];
+    if (nId == 0xFF) {
+        return NULL;
+    }
+    return pInst;
+}
+
+// Switches an instance's track on (bOn 1: also marked in u22) or off.
+void fn_800AD698(u8 nId, u8 nTrack, u8 bOn) {
+    AudInstance* pInst = fn_800AD674(nId);
+    u8 uBit = 1 << nTrack;
+    if (pInst != NULL) {
+        if (bOn == 1) {
+            pInst->pCmd->uOn |= uBit;
+            pInst->u22 |= uBit;
+        } else {
+            pInst->pCmd->uOff |= uBit;
+        }
+        pInst->pCmd->uChanged |= 0x200;
+    }
+}
+
+// Sets which of an instance's tracks are on (the rest off), in u22 too.
+void fn_800AD734(u8 nId, int n) {
+    AudInstance* pInst = fn_800AD674(nId);
+    if (pInst != NULL) {
+        pInst->pCmd->uOn = n;
+        pInst->pCmd->uOff = ~n;
+        pInst->pCmd->uChanged |= 0x200;
+        pInst->u22 = n;
+    }
+}
+
+// Sets the parameters of one of an instance's tracks.
+void fn_800AD790(u8 nId, u8 nTrack, u32 uParams) {
+    AudInstance* pInst = fn_800AD674(nId);
+    if (pInst != NULL) {
+        pInst->pCmd->auParams[nTrack] = uParams;
+        pInst->pCmd->uChanged |= (u8)(1 << nTrack);
+    }
 }
 
 // The calls below pass on to AudTable.c's entry nId (the same number as the instance).
@@ -47,6 +117,39 @@ void fn_800ADAF0(u8 nId, u8 nTrack, f32 fPitch) {
     }
 }
 
+// The calls below do the same for every instance of an emitter.
+void fn_800ADB4C(s16 nEmitter, u8 nTrack, u8 bOn) {
+    AudInstance* pInst;
+    for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
+        fn_800AD698(pInst->nId, nTrack, bOn);
+    }
+}
+
+// The emitter's own sound first (fn_800ADA08), when it has instances.
+void fn_800ADC44(s16 nEmitter, u8 nTrack, u8 n) {
+    AudInstance* pInst = lbl_801F2668.apFirst[nEmitter];
+    if (pInst != NULL) {
+        fn_800ADA08(lbl_801F2668.anSound[nEmitter], nTrack, n);
+    }
+    for (; pInst != NULL; pInst = pInst->pNext) {
+        fn_800AD9AC(pInst->nId, nTrack, n);
+    }
+}
+
+void fn_800ADCD0(s16 nEmitter, u8 nTrack, u8 n, int bCheck) {
+    AudInstance* pInst;
+    for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
+        fn_800ADA28(pInst->nId, nTrack, n, bCheck);
+    }
+}
+
+void fn_800ADD54(s16 nEmitter, u8 nTrack, f32 fVolume) {
+    AudInstance* pInst;
+    for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
+        fn_800ADA94(pInst->nId, nTrack, fVolume);
+    }
+}
+
 // Clears bit nBit of an instance's u22 and tells its callback.
 void fn_800ADDC8(u8 nId, u8 nBit, s32 n) {
     AudInstance* pInst;
@@ -60,4 +163,12 @@ void fn_800ADDC8(u8 nId, u8 nBit, s32 n) {
             pfnCallback(nId, nBit, n);
         }
     }
+}
+
+// Sets a four-float vector to (0, 0, 0, 1).
+void fn_800ADE54(f32* pVec) {
+    pVec[2] = 0.0f;
+    pVec[1] = 0.0f;
+    pVec[0] = 0.0f;
+    pVec[3] = 1.0f;
 }

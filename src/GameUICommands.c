@@ -231,9 +231,7 @@ void fn_8008AB04(MsgArg* pArgs, MsgArg* pResult);
 
 // This file's helpers.
 u8   fn_80085BC0(int nController);
-s32  fn_8008AB40(void);
 s32  fn_8008AB4C(void);
-s32  fn_8008AC00(void);
 void fn_8008AC3C(int a, int b);
 u8   fn_8008AC40(void);
 void fn_8008AC48(int nPlayer, char* sz);
@@ -331,7 +329,6 @@ s32   fn_800F3668(int n);
 s8    fn_800F4878(void);
 s32   fn_800F4B00(void);
 void  fn_800F7DA4(void);
-s32   fn_800F9254(void);
 s32   fn_800F9308(void);
 s32   fn_800FA4B8(int nPlayer);
 s32   fn_800FD704(int nPlayer, int nHole, s32* pWon);

@@ -373,7 +373,6 @@ void   fn_800348DC(void);
 f32    fn_80055E10(f32 a, f32 b, f32 fSin, f32 fCos);
 f32    fn_80055E1C(f32 a, f32 b, f32 fSin, f32 fCos);
 void   fn_80055E28(f32 fAngle, f32* pSin, f32* pCos);
-void   fn_80055D70(f32* pA, f32* pB, f32 fSin, f32 fCos);
 void   Physics_OutOfBounds(Ball* pBall, u8 bSound);
 f32    Ball_DistanceToPin(f32* pPos);
 void   Ball_Holed(Ball* pBall);
