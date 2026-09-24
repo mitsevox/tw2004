@@ -564,30 +564,6 @@ void fn_80063CF0(View* pView, int nKind, int nPlayer) {
     }
 }
 
-// Shakes the camera: moves its position by up to half of the script's fF4 each way.
-void fn_8006421C(View* pView) {
-    pView->v0[0] += pView->script.fF4 * (Rand_Float(0) - 0.5f);
-    pView->v0[1] += pView->script.fF4 * (Rand_Float(0) - 0.5f);
-    pView->v0[2] += pView->script.fF4 * (Rand_Float(0) - 0.5f);
-}
-
-void fn_800642A4(View* pView, f32 fF0, f32 fF4) {
-    pView->script.fF0 = fF0;
-    pView->script.fF4 = fF4;
-}
-
-u8 fn_800642B0(void) {
-    return fn_800C6CB0();
-}
-
-// Blends the view's script into its current shot.
-void fn_800642D0(View* pView, int nPlayer) {
-    f32* pPos = fn_8001731C(pView);
-
-    CameraScript_InterpToNewScript(&pView->script, pView->script.pShot, nPlayer, pPos, fn_80017314(pView), 5,
-                                   0.0f, 100.0f, 25, 0.0f);
-}
-
 // Turns pA a fifth of the way towards pB (both taken as directions) into pOut; while the game is
 // paused pA is copied unchanged.
 void fn_80063F08(f32* pA, f32* pB, f32* pOut) {
@@ -653,6 +629,30 @@ void fn_80064108(View* pView) {
     fn_8000923C(vDir, qTurn);
     vSide[3] = 0.0f;
     fn_800090E4(qTurn, vSide, pView->v20);
+}
+
+// Shakes the camera: moves its position by up to half of the script's fF4 each way.
+void fn_8006421C(View* pView) {
+    pView->v0[0] += pView->script.fF4 * (Rand_Float(0) - 0.5f);
+    pView->v0[1] += pView->script.fF4 * (Rand_Float(0) - 0.5f);
+    pView->v0[2] += pView->script.fF4 * (Rand_Float(0) - 0.5f);
+}
+
+void fn_800642A4(View* pView, f32 fF0, f32 fF4) {
+    pView->script.fF0 = fF0;
+    pView->script.fF4 = fF4;
+}
+
+u8 fn_800642B0(void) {
+    return fn_800C6CB0();
+}
+
+// Blends the view's script into its current shot.
+void fn_800642D0(View* pView, int nPlayer) {
+    f32* pPos = fn_8001731C(pView);
+
+    CameraScript_InterpToNewScript(&pView->script, pView->script.pShot, nPlayer, pPos, fn_80017314(pView), 5,
+                                   0.0f, 100.0f, 25, 0.0f);
 }
 
 // Puts the point pPos through the camera onto the screen: pX and pY from 0 to 1 across it, pZ its
