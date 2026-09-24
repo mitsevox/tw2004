@@ -2468,8 +2468,10 @@ void fn_8007E200(MsgArg* pArgs, MsgArg* pResult) {
 // golfer's.
 void fn_8007E204(MsgArg* pArgs, MsgArg* pResult) {
     GolferRecord* pRecord = fn_80077A80(gSession.nGolfer[pArgs[0].i]);
+    s32 n = pArgs[1].i;
 
-    pResult->i = pRecord->uBagMask & (1 << pArgs[1].i);
+    n = pRecord->uBagMask & (1 << n);   // fake match: one local for the club and the result (register order)
+    pResult->i = n;
     gSession.uBag[pArgs[0].i] = pRecord->uBagMask;
 }
 
