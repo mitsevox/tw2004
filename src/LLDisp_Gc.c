@@ -8,7 +8,10 @@
 #include "discerror.h"
 
 volatile DispSync lbl_801A2350;       // volatile: the GX and VI callbacks change it
+GXTexRegion lbl_801A2364[16];          // the texture cache, in 32 KB regions
 GXRenderModeObj lbl_801A2464;          // the video mode
+void* lbl_80281B94;                    // GX's command FIFO memory
+u32 lbl_80281B98;                      // bits per pixel of the frame: 16 or 24
 u8  lbl_80281B8C;                      // cleared when a frame ends, set when the viewport is set
 u8  lbl_80281B8D;                      // copy the frame's colour, not only its alpha
 u32 lbl_80281B90;                      // one image buffer's size in bytes
@@ -40,6 +43,7 @@ void fn_80006DF4(void);
 void fn_80006E78(u32 nRetrace);
 void fn_80006EC8(void);
 void fn_80007160(void);
+void fn_80007264(f32* pGamma);
 void fn_800070DC(void);
 s32  fn_8000724C(void);
 void fn_80007254(void);
@@ -121,6 +125,46 @@ void fn_80006A98(void) {
     OSSetArenaLo((void*)(((uptr)pBuf + uSize + 31) & ~31));
     fn_800B694C(lbl_801A2464.fbWidth, lbl_801A2464.xfbHeight, uSize);
     fn_800B6C0C(lbl_80281BA4[0]);
+}
+
+// Starts GX: its FIFO from the arena, sixteen 32 KB texture cache regions, the viewport, the frame
+// copy for the video mode, and the pixel format (16 bits with anti-aliasing, else 24).
+void fn_80006B4C(void) {
+    GXColor cClear = {0, 0, 0, 0};
+    f32 aGamma[4] = {1.0f, 1.0f, 1.0f, 0.0f};
+    void* pLo;
+    u32 i;
+
+    pLo = OSGetArenaLo();
+    OSGetArenaHi();
+    lbl_80281B94 = (void*)(((uptr)pLo + 31) & ~31);
+    OSSetArenaLo((void*)(((uptr)lbl_80281B94 + 0x64000 + 31) & ~31));
+    lbl_80281BA0 = GXInit(lbl_80281B94, 0x64000);
+    for (i = 0; i < 16; i++) {
+        GXInitTexCacheRegion(&lbl_801A2364[i], 0, i * 0x8000, 0, 0x80000 + i * 0x8000, 0);
+    }
+    GXSetViewport(0.0f, 0.0f, lbl_801A2464.fbWidth, lbl_801A2464.efbHeight, 0.0f, 1.0f);
+    GXSetScissor(0, 0, lbl_801A2464.fbWidth, lbl_801A2464.efbHeight);
+    GXSetDispCopySrc(0, 0, lbl_801A2464.fbWidth, lbl_801A2464.efbHeight);
+    GXSetDispCopyDst(lbl_801A2464.fbWidth, lbl_801A2464.xfbHeight);
+    GXSetDispCopyYScale((f32)lbl_801A2464.xfbHeight / (f32)lbl_801A2464.efbHeight);
+    GXSetCopyFilter(lbl_801A2464.aa, lbl_801A2464.sample_pattern, 1, lbl_801A2464.vfilter);
+    GXSetZMode(1, 3, 1);
+    GXSetColorUpdate(1);
+    GXSetCopyClear(cClear, 0xFFFFFF);
+    GXSetNumChans(1);
+    GXSetCullMode(0);
+    if (lbl_801A2464.aa) {
+        GXSetDither(1);
+        GXSetPixelFmt(2, 0);
+        lbl_80281B98 = 16;
+    } else {
+        GXSetDither(1);
+        GXSetPixelFmt(1, 1);
+        lbl_80281B98 = 24;
+    }
+    GXCopyDisp(lbl_80281BA4[lbl_801A2350.nBuf], 1);
+    fn_80007264(aGamma);
 }
 
 // Clears the frame sync: no break points queued, the GPU not waited on.

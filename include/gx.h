@@ -45,6 +45,23 @@ extern GXRenderModeObj GXNtsc480IntDf;  // the SDK's video modes
 extern GXRenderModeObj GXPal528IntDf;
 extern GXRenderModeObj GXMpal480IntDf;
 void GXAdjustForOverscan(GXRenderModeObj* pIn, GXRenderModeObj* pOut, u16 nHor, u16 nVer);
+typedef struct GXTexRegion {
+    u32 unk0[4];
+} GXTexRegion;                  // a texture cache region (0x10 bytes)
+
+// ---- setting GX up and copying the frame out ------------------------------------------------------
+
+GXFifoObj* GXInit(void* pBase, u32 uSize);
+void GXInitTexCacheRegion(GXTexRegion* pRegion, u8 b32Bit, u32 uEvenAddr, int eEvenSize, u32 uOddAddr,
+                          int eOddSize);
+void GXSetScissor(u32 nLeft, u32 nTop, u32 nWidth, u32 nHeight);
+void GXSetDispCopySrc(u16 nLeft, u16 nTop, u16 nWidth, u16 nHeight);
+void GXSetDispCopyDst(u16 nWidth, u16 nHeight);
+u32  GXSetDispCopyYScale(f32 fScale);
+void GXSetCopyFilter(u8 bAA, u8 aSamples[12][2], u8 bVFilter, u8 aVFilter[7]);
+void GXSetCopyClear(GXColor cClear, u32 uZ);
+void GXSetDither(u8 bDither);
+void GXSetPixelFmt(int ePixelFmt, int eZFmt);
 
 // ---- the matrix library (MTX), for the matrices GX takes -------------------------------------
 
