@@ -23,7 +23,6 @@ void fn_80038054(u8 a, int n, f32 f1, f32 f2);
 void fn_800457B8(int nPlayer, f32 f);
 f32  fn_800DC45C(f32 f);
 u8   fn_80044E74(CamShot* pShot);
-void fn_80064F54(CamShot* pShot, int nPlayer, f32* pOut);
 void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pSub, f32* pPrev,
                  f32 fTime);
 void fn_8003EE68(CamScript* pScript, f32* pCam, u8 b, int nPlayer, f32 fMaxStep);

@@ -20,7 +20,6 @@ void     fn_800C7400(f32* pA, f32* pOut);
 void     GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer);
 f32      fn_800C741C(Character* pChar, u64 uEvent);
 void     fn_800C6110(View* pView, int nPlayer, int a);
-CamShot* fn_8006509C(s32 n);
 void     fn_8006351C(View* pView, int nPlayer, int nCamera);
 void     fn_800B3550(int a, View* pView, int nPlayer);
 u8       fn_800B4908(void);
@@ -41,7 +40,6 @@ int      fn_800C4D2C(f32* pFrom, f32* pTo, f32* pOut, f32 fMax);
 u8       fn_8004B6F8(f32* pFrom, f32* pTo, f32* pHit);
 f32      fn_8001EFFC(u8* pLens);                        // the lens's fB0 (char.c: its parameter is u8*)
 void     fn_80038054(u8 a, int n, f32 f1, f32 f2);
-CamShot* fn_80064F7C(int nPlayer, int nKind, int a, CamShot* pShot);
 CamShot* fn_800C4DF8(int nFirst, int nPlayer);
 void     fn_800C5EC0(View* pView, f32* pCam, f32* pSub, int nPlayer);
 f32      fn_800C7394(View* pView);
