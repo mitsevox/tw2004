@@ -74,7 +74,7 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
     int i;
     int* pSlot;
     int* pFrame;
-    u32 aTmp[4];
+    u32 aTmp[8];                // fake match: size unknown; EA's frame has room for 8 (0x80 bits are used)
     f32 aA[4];
     f32 aB[4];
     int aSlot[2];
