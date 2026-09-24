@@ -304,6 +304,8 @@ GoFrameBuf.c:
 
 GoLighting.c:
 	.text       start:0x8006E2A4 end:0x8006F154
+	.data       start:0x801888F0 end:0x80188900
+	.sdata2     start:0x80283900 end:0x80283958
 
 Code8006F154.c:
 	.text       start:0x8006F154 end:0x8006F438
@@ -359,6 +361,8 @@ ByteSwap.c:
 
 GoCamera.c:
 	.text       start:0x800763BC end:0x80076A54
+	.data       start:0x80189480 end:0x80189490
+	.sdata2     start:0x80283A70 end:0x80283A98
 
 GoViewport.c:
 	.text       start:0x80076A54 end:0x80076B7C

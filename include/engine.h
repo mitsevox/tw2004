@@ -1332,7 +1332,7 @@ void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int b);   // through th
 void fn_800689D4(int nPlayer);
 u8   fn_80068AC8(int nPlayer);
 void fn_80069330(int nPlayer, f32* pPos);
-void PlaceBall_UpdateMomentums(int nPlayer, f32 f);
+u8   PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed);   // 0 when the cursor was stopped
 void fn_8006A6C4(int nPlayer);
 int  fn_8006AA9C(int nPlayer);          // how the shot turned out (0..4, 8+)
 void fn_8006AAB4(int nPlayer, int a);

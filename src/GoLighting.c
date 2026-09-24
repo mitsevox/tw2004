@@ -24,6 +24,13 @@ void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   /
 void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: inverts a rotation+translation
 
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80283900), before the white below and the 128.0f and 0.0f fn_8006E2A4 uses first; its
+// body is unknown, this one only reproduces the order.
+static f32 GoLighting_StrippedFn(void) {
+    return 1.0f;
+}
+
 const GXColor lbl_80283904 = {0xFF, 0xFF, 0xFF, 0xFF};    // white
 
 // Makes the pool (every light free), loads no lights, and sets channel 4's ambient and material
