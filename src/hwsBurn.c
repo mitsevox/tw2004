@@ -504,9 +504,10 @@ SkinMesh* fn_801111E8(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
 // Mark the SkinDesc.p8C entries the a64 entries use (p78) and list them (a7C, a80). nAlign is
 // unused (see fn_80110F2C).
 s32 fn_80111658(HwsBurn* pBurn, s32 nAlign) {
-    int i;
     int nEntries = pBurn->n60;
     int nBits = pBurn->n70;
+    int i;
+    int j;
     int n;
 
     fn_8001E938(pBurn->p78, nBits);
@@ -516,10 +517,10 @@ s32 fn_80111658(HwsBurn* pBurn, s32 nAlign) {
         }
     }
     n = 0;
-    for (i = 0; i < nBits; i++) {
-        if (fn_8001E9CC(pBurn->p78, i)) {
-            pBurn->a7C[n] = i;
-            pBurn->a80[i] = n;
+    for (j = 0; j < nBits; j++) {
+        if (fn_8001E9CC(pBurn->p78, j)) {
+            pBurn->a7C[n] = j;
+            pBurn->a80[j] = n;
             n++;
         }
     }
