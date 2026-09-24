@@ -206,6 +206,54 @@ f32 fn_80072938(SKABlendNode* pNode) {
     return fEnd;
 }
 
+// The blend weight at fTime across the overlap of two nodes, from the later start to the earlier
+// end: it runs from nLater (0 when pA starts later, else 1) to the other end, or back with bOut.
+// When one node lies inside the other, it is folded to |2w - 1|.
+f32 fn_80072980(SKABlendNode* pA, SKABlendNode* pB, u8 bOut, f32 fTime) {
+    f32 fStart;
+    f32 fEnd;
+    int nLater;
+    u8 bInside;
+    f32 fDir;
+    f32 fLen;
+    f32 fWeight;
+
+    if (pA->fStart > pB->fStart) {
+        fStart = pA->fStart;
+        nLater = 0;
+    } else {
+        nLater = 1;
+        fStart = pB->fStart;
+    }
+    if (pA->fEnd >= pB->fEnd) {
+        fEnd = pB->fEnd;
+        bInside = nLater == 1;
+    } else {
+        fEnd = pA->fEnd;
+        bInside = nLater == 0;
+    }
+    fDir = 2.0f * ((f32)nLater - 0.5f);
+    if (!bOut) {
+        fLen = fEnd - fStart;
+        if (fLen < 0.00001f) {
+            fWeight = nLater;
+        } else {
+            fWeight = nLater - fDir * (fTime - fStart) / fLen;
+        }
+    } else {
+        fLen = fStart - fEnd;
+        if (fLen < 0.00001f) {
+            fWeight = nLater;
+        } else {
+            fWeight = nLater - fDir * (fTime - fEnd) / fLen;
+        }
+    }
+    if (bInside) {
+        return fabsf(2.0f * fWeight - 1.0f);
+    }
+    return fWeight;
+}
+
 // The time of event uEvent in the first source under pNode that has it (0 when none has).
 f32 fn_80072CB8(SKABlendNode* pNode, u64 uEvent) {
     f32 fTime = 0.0f;
