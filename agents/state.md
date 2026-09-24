@@ -19,6 +19,10 @@ Strong split leads from the survey, all free now: Swing (3 state files, ~23 KB e
 hlaudmovie. RUNNING (cloud, to 19:15 CDT, no permuter): split-01 (worktree cam-01) on Swing, Ball/Wind,
 goballfx/GoLightFogEnv, Golfer; uis-01 (worktree swing-01) reworking UISApi, UISEvent, UIStudio for
 the deferred build. Fake-match helpers now named fn_<caller>_Read (brief).
+Held by the owner's PC to ~19:15 CDT (wins come as local/<name> branches): map-02 GoGolfCam,
+Earnings, gocamscripts; map-03 Skin, UStream, GoBreakLine, GoStaticCam, UObject, uiText,
+TerrainData, GoShaderObject_Rain_Gc, hlaudmovie, LLFileIO_Gc; map-04 ska_shared, AnimStream, skalib;
+map-07 (data) PsBallFx, the SitDev tables, the streammanagerhole strings, then orphan-data leads.
 local/target-link and local/streaming-link (streammanagerhole split in 3, all linked, +8 % data)
 are merged; the owner deletes those branches (the session cannot). The PC's split finder
 (agent/map-05, to ~18:00) surveys unlinked units for EA file boundaries: no cloud splits until it
