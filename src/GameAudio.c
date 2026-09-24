@@ -3,7 +3,7 @@
 // the sound emitters (hlaudemitter.c's fn_800AD*) from the game: the course, the game mode and the
 // pin set. Its extent is proven by its data: every section starts and ends on 8-byte boundaries
 // shared with no other file (.rodata 0x80183AD8-0x80183B08, .data 0x8018E988-0x8018EB30,
-// .bss 0x801F1708-0x801F17D0, .sdata 0x80281418-0x80281460, .sbss 0x80282010-0x80282058,
+// .bss 0x801F1790-0x801F17D0, .sdata 0x80281418-0x80281460, .sbss 0x80282020-0x80282058,
 // .sdata2 0x80283F48-0x80283F88), and all its functions share those globals.
 
 #include "core/gameaudio.h"
@@ -154,7 +154,7 @@ u8 lbl_8028202B;
 u8 lbl_8028202A;
 u8 lbl_80282029;
 u8 lbl_80282028;
-u8 lbl_80282024[2];
+u8 lbl_80282024[4];                     // 4 bytes in the original; fn_800A3FF4 clears only two
 u8 lbl_80282020;
 
 // startUp.c: the sound engine's start-up steps, each nonzero when it worked
@@ -188,6 +188,16 @@ void fn_800ADA28(u8 nId, u8 nTrack, u8 n, int bCheck);
 
 u8   fn_800A3FF4(void);
 void fn_800A75B4(void);
+void fn_800A68C0(u8 nPlayer);
+void fn_800A6EC8(void);
+void fn_800A73C0(u8 a, int n);
+
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80283F48), before the 0.2f and the int-to-float double fn_800A41A4 uses first; its
+// body is unknown.
+static f32 GameAudio_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
 
 // Starts the sound engine one step after another; stops at the first step that fails and
 // returns 0, else 1.
@@ -207,290 +217,6 @@ u8 fn_800A3E3C(u8 nRate) {
     }
     return bOk;
 }
-
-s32 fn_800A402C(u8 n) {
-    lbl_80282020 = n;
-    return 1;
-}
-
-void fn_800A4038(void) {
-    lbl_80282020 = 0;
-}
-
-void fn_800A4080(void) {
-}
-
-void fn_800A4374(void) {
-    if (lbl_80282040) {
-        fn_800AD698(lbl_8028141C, 2, 0);
-        fn_800AD698(lbl_8028141D, 2, 0);
-        fn_800AD698(lbl_8028141C, 3, 0);
-        fn_800AD698(lbl_8028141D, 3, 0);
-    }
-}
-
-// Stops the ambience's tracks; track 0 too unless bKeepFirst.
-void fn_800A49A4(u8 bKeepFirst) {
-    if (lbl_8028203C == 2) {
-        if (!bKeepFirst) {
-            fn_800AD698(lbl_8028141A, 0, 0);
-        }
-        fn_800AD698(lbl_8028141A, 1, 0);
-        fn_800AD698(lbl_8028141A, 2, 0);
-        fn_800AD698(lbl_8028141A, 3, 0);
-        fn_800AD698(lbl_8028141A, 4, 0);
-    }
-}
-
-int fn_800A4BAC(void) {
-    return fn_800A4A88() != 0;
-}
-
-// Once a frame: the emitters, then the queued sound once its wait runs out.
-void fn_800A4BDC(void) {
-    fn_800AD1C8();
-    fn_800A4080();
-    if (lbl_80282054 != 0) {
-        if (--lbl_80282054 == 0 && lbl_80282038) {
-            fn_800A7968(lbl_80281419, 0, lbl_80282052, lbl_80282050, lbl_8028204C);
-            fn_800AD698(lbl_80281419, 0, 1);
-            lbl_80282038 = 0;
-        }
-    }
-}
-
-void fn_800A4C54(void) {
-    if (lbl_8028202A) {
-        lbl_8028202A = 0;
-        fn_800A4084();
-    }
-    if (lbl_80282029) {
-        if (lbl_8028202C) {
-            fn_800A44A0();
-            lbl_8028202C = 0;
-        }
-        fn_800A43DC();
-        fn_800A41A4();
-        fn_800A4928();
-    }
-}
-
-void fn_800A4FD8(void) {
-    fn_800A75B4();
-    lbl_8028141B = 0xFF;
-    lbl_80281418 = 0xFF;
-    lbl_80282029 = 0;
-}
-
-void fn_800A5620(void) {
-    lbl_8028202D = 1;
-}
-
-void fn_800A5E94(u8 nPlayer) {
-    fn_8006BAA8(nPlayer);
-    fn_800A4374();
-    fn_800A707C();
-}
-
-void fn_800A624C(void) {
-    fn_800ADB4C(3, 1, 1);
-}
-
-void fn_800A6278(void) {
-    fn_800ADB4C(3, 1, 0);
-}
-
-void fn_800A62A4(void) {
-    fn_800ADC44(3, 0, 0);
-    fn_800ADB4C(3, 0, 1);
-}
-
-void fn_800A62E0(void) {
-    fn_800ADC44(3, 0, 1);
-    fn_800ADB4C(3, 0, 1);
-}
-
-void fn_800A631C(void) {
-    fn_800ADC44(3, 0, 2);
-    fn_800ADB4C(3, 0, 1);
-}
-
-void fn_800A6358(void) {
-    fn_800ADC44(3, 0, 3);
-    fn_800ADB4C(3, 0, 1);
-}
-
-void fn_800A6394(void) {
-    fn_800ADC44(3, 0, 4);
-    fn_800ADB4C(3, 0, 1);
-}
-
-void fn_800A63D0(void) {
-    fn_800ADC44(3, 0, 6);
-    fn_800ADB4C(3, 0, 1);
-}
-
-void fn_800A640C(void) {
-    fn_800ADC44(3, 0, 7);
-    fn_800ADB4C(3, 0, 1);
-}
-
-void fn_800A6448(void) {
-}
-
-void fn_800A644C(void) {
-}
-
-void fn_800A6EC8(void) {
-    if (lbl_80282040) {
-        fn_800A4374();
-        fn_800A707C();
-        fn_800AD698(lbl_8028141C, 0, 0);
-        fn_800AD698(lbl_8028141C, 1, 0);
-        fn_800AD698(lbl_8028141D, 0, 0);
-        fn_800AD698(lbl_8028141D, 1, 0);
-    }
-}
-
-void fn_800A6F38(void) {
-    if (lbl_80282040) {
-        fn_800AD9AC(lbl_8028141C, 0, 2);
-        fn_800AD9AC(lbl_8028141C, 1, 2);
-        fn_800AD9AC(lbl_8028141D, 0, 2);
-        fn_800AD9AC(lbl_8028141D, 1, 2);
-        fn_800AD698(lbl_8028141C, 0, 1);
-        fn_800AD698(lbl_8028141C, 1, 1);
-        fn_800AD698(lbl_8028141D, 0, 1);
-        fn_800AD698(lbl_8028141D, 1, 1);
-    }
-}
-
-void fn_800A707C(void) {
-    if (lbl_80282040) {
-        fn_800AD698(lbl_8028141C, 4, 0);
-        fn_800AD698(lbl_8028141D, 4, 0);
-        fn_800AD698(lbl_8028141C, 5, 0);
-        fn_800AD698(lbl_8028141D, 5, 0);
-    }
-}
-
-// Switches the game's sounds off (bOff) or back on; bMusic restarts the music too.
-void fn_800A72EC(u8 bOff, u8 bMusic) {
-    if (lbl_8028202E ^ bOff) {
-        lbl_8028202E = bOff;
-        if (bOff) {
-            fn_800A49A4(0);
-            fn_800A75B4();
-            fn_800A6EC8();
-            fn_800A6660(0);
-            return;
-        }
-        if (bMusic) {
-            fn_800A44A0();
-            fn_800A47A0();
-        }
-    }
-}
-
-// a is unused.
-void fn_800A73C0(u8 a, int n) {
-    fn_800ADA28(lbl_8028141B, 0, n, 0);
-}
-
-void fn_800A73F0(s32 n) {
-    switch (n) {
-    case 1:
-        fn_800ADA28(lbl_8028141B, 1, 0, 0);
-        break;
-    case 6:
-        fn_800ADA28(lbl_8028141B, 1, 1, 0);
-        break;
-    default:
-        fn_800ADA28(lbl_8028141B, 0, n, 0);
-        break;
-    }
-}
-
-s32 fn_800A7528(void) {
-    return fn_800A7720();
-}
-
-void fn_800A75B4(void) {
-    if (lbl_8028203C == 1) {
-        fn_800AD698(lbl_80281418, 0, 0);
-        lbl_8028203C = 0;
-    }
-}
-
-u8 fn_800A75F4(void) {
-    int bResult;
-
-    bResult = 0;
-    if (lbl_8028203C == 1 && fn_800AD618(lbl_80281418, 0)) {
-        bResult = 1;
-    }
-    return bResult;
-}
-
-void fn_800A7644(void) {
-    fn_800A44A0();
-}
-
-void fn_800A76E4(void) {
-    fn_800AD698(lbl_80281419, 0, 0);
-    lbl_80282054 = 15;
-    lbl_80282038 = 0;
-}
-
-u8 fn_800A7720(void) {
-    return fn_800AD618(lbl_80281419, 0);
-}
-
-void fn_800A7924(f32 f) {
-    fn_800A44A0();
-}
-
-void fn_800A7944(void) {
-    fn_800A44A0();
-    fn_800A47A0();
-}
-
-void fn_800A7994(void) {
-    Mov_Init();
-}
-
-void fn_800A79B4(void) {
-    Mov_Exit();
-}
-
-void fn_800A79D4(void) {
-    Mov_Start();
-}
-
-void fn_800A79F4(void) {
-    Mov_Tick();
-}
-
-void fn_800A7A14(u8 nSound) {
-    fn_800B0858(nSound);
-}
-
-// Every caller passes a fourth argument; nothing here reads it.
-s32 fn_800A7A34(u8 a, u8 b, u8 nListeners, int nUnused) {
-    fn_800AD0C4();
-    fn_800A402C(nListeners);
-    // port: EA passes an argument fn_800A8DC8 ignores
-    ((u8 (*)(u8, u8, u8, int))fn_800A8DC8)(a, b, nListeners, 0);
-    return 1;
-}
-
-void fn_800A7A98(s32 n) {
-    fn_800AD1C4();
-    fn_800A4038();
-    // port: EA passes an argument fn_800A8D88 ignores
-    ((void (*)(s32))fn_800A8D88)(n);
-}
-
 
 // Every caller passes a second flag (DiscError.c 1, this file 0); nothing here reads it.
 void fn_800A3F38(u8 b, u8 b2) {
@@ -523,9 +249,18 @@ void fn_800A3FD4(u8 nCurves, f32* pVolumes) {
 }
 
 u8 fn_800A3FF4(void) {
-    fn_80005AE8(lbl_80282024, 0, sizeof(lbl_80282024));
+    fn_80005AE8(lbl_80282024, 0, 2);
     lbl_80282020 = 0;
     return 1;
+}
+
+s32 fn_800A402C(u8 n) {
+    lbl_80282020 = n;
+    return 1;
+}
+
+void fn_800A4038(void) {
+    lbl_80282020 = 0;
 }
 
 void fn_800A4044(u8 nIndex, u8 nValue) {
@@ -535,54 +270,7 @@ void fn_800A4044(u8 nIndex, u8 nValue) {
     }
 }
 
-// An emitter callback (hlaudemitter.c's pfnCallback shape): when track 2 stops, tells GameEffects.c.
-void fn_800A4170(u8 nId, u8 nTrack, s32 n) {
-    if (nTrack == 2) {
-        fn_800DC6E8(fn_8001707C(0));
-    }
-}
-
-void fn_800A42B0(u8 n) {
-    if (lbl_8028202F || !lbl_80282040) return;
-    fn_800AD9AC(lbl_8028141C, 2, n);
-    fn_800AD9AC(lbl_8028141D, 2, n);
-    fn_800AD9AC(lbl_8028141C, 3, n);
-    fn_800AD9AC(lbl_8028141D, 3, n);
-    fn_800AD698(lbl_8028141C, 2, 1);
-    fn_800AD698(lbl_8028141D, 2, 1);
-    fn_800AD698(lbl_8028141C, 3, 1);
-    fn_800AD698(lbl_8028141D, 3, 1);
-}
-
-void fn_800A4928(void) {
-    switch (lbl_8028203C) {
-    case 2:
-        if (lbl_80282041 != 0 && lbl_8028202D == 0 && !fn_800A7748()) {
-            lbl_80282041 = 0;
-            fn_800A484C();
-        }
-        break;
-    case 1:
-        if (!fn_800A75F4()) {
-            fn_800A47A0();
-        }
-        break;
-    }
-}
-
-// The sound for a course and n (fn_800A484C passes fn_80015464()), or 0xFF when it has none.
-u8 fn_800A4A24(s32 nCourse, int n) {
-    u8 nSound;
-    int i;
-
-    nSound = 0xFF;
-    for (i = 0; i < 9; i++) {
-        if (nCourse == lbl_8018EA08[i].nCourse && (u8)(n + 1) == lbl_8018EA08[i].n4) {
-            nSound = lbl_8018EA08[i].nSound;
-            break;
-        }
-    }
-    return nSound;
+void fn_800A4080(void) {
 }
 
 // Starts the course's sounds (not in modes 0, 1 and 3): the wind and the pin's emitter.
@@ -605,6 +293,13 @@ void fn_800A4084(void) {
     lbl_80282029 = 1;
 }
 
+// An emitter callback (hlaudemitter.c's pfnCallback shape): when track 2 stops, tells GameEffects.c.
+void fn_800A4170(u8 nId, u8 nTrack, s32 n) {
+    if (nTrack == 2) {
+        fn_800DC6E8(fn_8001707C(0));
+    }
+}
+
 void fn_800A41A4(void) {
     if (fn_800A7720()) {
         if (lbl_80282031 == 0) {
@@ -618,6 +313,27 @@ void fn_800A41A4(void) {
             fn_800A3FB4(15, 0.2f * (s8)gSession.options.a0[1] * lbl_8018E988[15]);
         }
         lbl_80282031 = 0;
+    }
+}
+
+void fn_800A42B0(u8 n) {
+    if (lbl_8028202F || !lbl_80282040) return;
+    fn_800AD9AC(lbl_8028141C, 2, n);
+    fn_800AD9AC(lbl_8028141D, 2, n);
+    fn_800AD9AC(lbl_8028141C, 3, n);
+    fn_800AD9AC(lbl_8028141D, 3, n);
+    fn_800AD698(lbl_8028141C, 2, 1);
+    fn_800AD698(lbl_8028141D, 2, 1);
+    fn_800AD698(lbl_8028141C, 3, 1);
+    fn_800AD698(lbl_8028141D, 3, 1);
+}
+
+void fn_800A4374(void) {
+    if (lbl_80282040) {
+        fn_800AD698(lbl_8028141C, 2, 0);
+        fn_800AD698(lbl_8028141D, 2, 0);
+        fn_800AD698(lbl_8028141C, 3, 0);
+        fn_800AD698(lbl_8028141D, 3, 0);
     }
 }
 
@@ -736,29 +452,6 @@ void fn_800A44A0(void) {
     lbl_8028203C = nState;
 }
 
-void fn_800A484C(void) {
-    int nCourse;
-    u8 n;
-    u8 nSound;
-
-    if (lbl_8028203C == 2) {
-        nCourse = Game_GetCourse();
-        n = fn_80015464();
-        fn_800ADA94(lbl_8028141A, 0, 1.0f);
-        fn_800AD698(lbl_8028141A, 1, 1);
-        if (fn_80035574()) {
-            fn_800AD698(lbl_8028141A, 2, 1);
-        }
-        fn_800AD9AC(lbl_8028141A, 3, nCourse);
-        fn_800AD698(lbl_8028141A, 3, 1);
-        nSound = fn_800A4A24(nCourse, n);
-        if (nSound != 0xFF) {
-            fn_800AD9AC(lbl_8028141A, 4, nSound);
-            fn_800AD698(lbl_8028141A, 4, 1);
-        }
-    }
-}
-
 // Steps to the next track switched on in the options' row lbl_8028142C (19 tracks) and plays it.
 void fn_800A47A0(void) {
     u8 i;
@@ -782,6 +475,73 @@ void fn_800A47A0(void) {
             }
         }
     }
+}
+
+void fn_800A484C(void) {
+    int nCourse;
+    u8 n;
+    u8 nSound;
+
+    if (lbl_8028203C == 2) {
+        nCourse = Game_GetCourse();
+        n = fn_80015464();
+        fn_800ADA94(lbl_8028141A, 0, 1.0f);
+        fn_800AD698(lbl_8028141A, 1, 1);
+        if (fn_80035574()) {
+            fn_800AD698(lbl_8028141A, 2, 1);
+        }
+        fn_800AD9AC(lbl_8028141A, 3, nCourse);
+        fn_800AD698(lbl_8028141A, 3, 1);
+        nSound = fn_800A4A24(nCourse, n);
+        if (nSound != 0xFF) {
+            fn_800AD9AC(lbl_8028141A, 4, nSound);
+            fn_800AD698(lbl_8028141A, 4, 1);
+        }
+    }
+}
+
+void fn_800A4928(void) {
+    switch (lbl_8028203C) {
+    case 2:
+        if (lbl_80282041 != 0 && lbl_8028202D == 0 && !fn_800A7748()) {
+            lbl_80282041 = 0;
+            fn_800A484C();
+        }
+        break;
+    case 1:
+        if (!fn_800A75F4()) {
+            fn_800A47A0();
+        }
+        break;
+    }
+}
+
+// Stops the ambience's tracks; track 0 too unless bKeepFirst.
+void fn_800A49A4(u8 bKeepFirst) {
+    if (lbl_8028203C == 2) {
+        if (!bKeepFirst) {
+            fn_800AD698(lbl_8028141A, 0, 0);
+        }
+        fn_800AD698(lbl_8028141A, 1, 0);
+        fn_800AD698(lbl_8028141A, 2, 0);
+        fn_800AD698(lbl_8028141A, 3, 0);
+        fn_800AD698(lbl_8028141A, 4, 0);
+    }
+}
+
+// The sound for a course and n (fn_800A484C passes fn_80015464()), or 0xFF when it has none.
+u8 fn_800A4A24(s32 nCourse, int n) {
+    u8 nSound;
+    int i;
+
+    nSound = 0xFF;
+    for (i = 0; i < 9; i++) {
+        if (nCourse == lbl_8018EA08[i].nCourse && (u8)(n + 1) == lbl_8018EA08[i].n4) {
+            nSound = lbl_8018EA08[i].nSound;
+            break;
+        }
+    }
+    return nSound;
 }
 
 u8 fn_800A4A88(void) {
@@ -830,6 +590,39 @@ u8 fn_800A4A88(void) {
     fn_800A3E3C(60);
     fn_800A3FD4(32, lbl_8018E988);
     return 1;
+}
+
+int fn_800A4BAC(void) {
+    return fn_800A4A88() != 0;
+}
+
+// Once a frame: the emitters, then the queued sound once its wait runs out.
+void fn_800A4BDC(void) {
+    fn_800AD1C8();
+    fn_800A4080();
+    if (lbl_80282054 != 0) {
+        if (--lbl_80282054 == 0 && lbl_80282038) {
+            fn_800A7968(lbl_80281419, 0, lbl_80282052, lbl_80282050, lbl_8028204C);
+            fn_800AD698(lbl_80281419, 0, 1);
+            lbl_80282038 = 0;
+        }
+    }
+}
+
+void fn_800A4C54(void) {
+    if (lbl_8028202A) {
+        lbl_8028202A = 0;
+        fn_800A4084();
+    }
+    if (lbl_80282029) {
+        if (lbl_8028202C) {
+            fn_800A44A0();
+            lbl_8028202C = 0;
+        }
+        fn_800A43DC();
+        fn_800A41A4();
+        fn_800A4928();
+    }
 }
 
 // Starts a world object's sound. Kinds 0, 3 and 5 play as a pair of emitters lbl_80281450 either
@@ -919,52 +712,11 @@ void fn_800A4E34(void) {
     lbl_80282040 = 0;
 }
 
-// Stops the game's sounds and clears every view's emitters.
-void fn_800A5428(void) {
-    int nViews;
-    int i;
-
-    nViews = gSession.nSplitScreen ? 2 : 1;
-    lbl_80282042 = 0;
-    if (lbl_8028203C == 2) {
-        fn_800AD450(lbl_8028141A);
-        lbl_8028141A = 0xFF;
-    } else {
-        fn_800A75B4();
-    }
-    fn_800AD450(lbl_80281419);
-    lbl_80281419 = 0xFF;
-    fn_800A6EC8();
-    fn_800A6854(0);
-    fn_800A6660(0);
-    fn_800A6D48(0);
-    fn_800A6BA8(0);
-    fn_800A707C();
-    fn_800A714C();
-    fn_800A7294();
-    fn_800A71E4();
-    for (i = 0; i < nViews; i++) {
-        lbl_801F1790[i].n0 = 0xFF;
-        lbl_801F1790[i].n1 = 0xFF;
-        lbl_801F1790[i].n2 = 0xFF;
-        lbl_801F1790[i].n3 = 0xFF;
-        lbl_801F1790[i].n4 = 0;
-        lbl_801F1790[i].n5 = 0;
-        lbl_801F1790[i].f8 = 0.0f;
-        lbl_801F1790[i].fC = 0.0f;
-        lbl_801F1790[i].tLast = 0;
-    }
-    lbl_80281419 = 0xFF;
-    lbl_80281418 = 0xFF;
-    lbl_8028141C = 0xFF;
-    lbl_8028141D = 0xFF;
-    lbl_8028141E = 0xFF;
-    lbl_8028141F = 0xFF;
-    lbl_8028141A = 0xFF;
+void fn_800A4FD8(void) {
+    fn_800A75B4();
     lbl_8028141B = 0xFF;
-    lbl_80281420 = 0xFF;
+    lbl_80281418 = 0xFF;
     lbl_80282029 = 0;
-    fn_800A3F58(0, 0);
 }
 
 // Sets up the round's sounds: each view's emitters (0 the swing, 1 the ball, 2 and 3 the crowd
@@ -1058,17 +810,69 @@ void fn_800A500C(void) {
     lbl_80282040 = ((1 << nMode) & 0x03BC0437) != 0;
 }
 
+// Stops the game's sounds and clears every view's emitters.
+void fn_800A5428(void) {
+    int nViews;
+    int i;
+
+    nViews = gSession.nSplitScreen ? 2 : 1;
+    lbl_80282042 = 0;
+    if (lbl_8028203C == 2) {
+        fn_800AD450(lbl_8028141A);
+        lbl_8028141A = 0xFF;
+    } else {
+        fn_800A75B4();
+    }
+    fn_800AD450(lbl_80281419);
+    lbl_80281419 = 0xFF;
+    fn_800A6EC8();
+    fn_800A6854(0);
+    fn_800A6660(0);
+    fn_800A6D48(0);
+    fn_800A6BA8(0);
+    fn_800A707C();
+    fn_800A714C();
+    fn_800A7294();
+    fn_800A71E4();
+    for (i = 0; i < nViews; i++) {
+        lbl_801F1790[i].n0 = 0xFF;
+        lbl_801F1790[i].n1 = 0xFF;
+        lbl_801F1790[i].n2 = 0xFF;
+        lbl_801F1790[i].n3 = 0xFF;
+        lbl_801F1790[i].n4 = 0;
+        lbl_801F1790[i].n5 = 0;
+        lbl_801F1790[i].f8 = 0.0f;
+        lbl_801F1790[i].fC = 0.0f;
+        lbl_801F1790[i].tLast = 0;
+    }
+    lbl_80281419 = 0xFF;
+    lbl_80281418 = 0xFF;
+    lbl_8028141C = 0xFF;
+    lbl_8028141D = 0xFF;
+    lbl_8028141E = 0xFF;
+    lbl_8028141F = 0xFF;
+    lbl_8028141A = 0xFF;
+    lbl_8028141B = 0xFF;
+    lbl_80281420 = 0xFF;
+    lbl_80282029 = 0;
+    fn_800A3F58(0, 0);
+}
+
+void fn_800A5620(void) {
+    lbl_8028202D = 1;
+}
+
+// Resets the swing sound state and parks the view's swish emitter (emitter 0) at the club head
+// (bone 0x53), silent, before the swing meter starts.
 void fn_800A562C(u8 nPlayer) {
-    s32* pnView;
     GameAudioView* pView;
     Player* pPlayer;
     u8 nId;
     f32 vPos[3];
 
+    pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
     pPlayer = &gPlayers[nPlayer];
-    pnView = pPlayer->nView;
     lbl_80282030 = 0;
-    pView = &lbl_801F1790[*pnView];
     lbl_80282032 = 0;
     nId = pView->n0;
     lbl_80282034 = 0;
@@ -1078,7 +882,7 @@ void fn_800A562C(u8 nPlayer) {
     fn_800A6BA8(nPlayer);
     fn_800AD734(pView->n2, 0);
     fn_800AD734(pView->n3, 0);
-    if (fn_80016CFC(*pnView)->bFlagOut) {
+    if (fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut) {
         fn_800AD450(lbl_80281420);
         lbl_80281420 = 0xFF;
     }
@@ -1302,6 +1106,12 @@ void fn_800A5CA4(u8 nPlayer) {
     fn_800A707C();
 }
 
+void fn_800A5E94(u8 nPlayer) {
+    fn_8006BAA8(nPlayer);
+    fn_800A4374();
+    fn_800A707C();
+}
+
 void fn_800A5EC0(u8 nPlayer) {
     Player* pPlayer;
     u8 nId;
@@ -1377,6 +1187,55 @@ void fn_800A61C4(int n) {
     fn_800AD9AC(nIdB, 7, n);
     fn_800AD698(nIdA, 7, 1);
     fn_800AD698(nIdB, 7, 1);
+}
+
+void fn_800A624C(void) {
+    fn_800ADB4C(3, 1, 1);
+}
+
+void fn_800A6278(void) {
+    fn_800ADB4C(3, 1, 0);
+}
+
+void fn_800A62A4(void) {
+    fn_800ADC44(3, 0, 0);
+    fn_800ADB4C(3, 0, 1);
+}
+
+void fn_800A62E0(void) {
+    fn_800ADC44(3, 0, 1);
+    fn_800ADB4C(3, 0, 1);
+}
+
+void fn_800A631C(void) {
+    fn_800ADC44(3, 0, 2);
+    fn_800ADB4C(3, 0, 1);
+}
+
+void fn_800A6358(void) {
+    fn_800ADC44(3, 0, 3);
+    fn_800ADB4C(3, 0, 1);
+}
+
+void fn_800A6394(void) {
+    fn_800ADC44(3, 0, 4);
+    fn_800ADB4C(3, 0, 1);
+}
+
+void fn_800A63D0(void) {
+    fn_800ADC44(3, 0, 6);
+    fn_800ADB4C(3, 0, 1);
+}
+
+void fn_800A640C(void) {
+    fn_800ADC44(3, 0, 7);
+    fn_800ADB4C(3, 0, 1);
+}
+
+void fn_800A6448(void) {
+}
+
+void fn_800A644C(void) {
 }
 
 void fn_800A6450(u8 nPlayer) {
@@ -1592,6 +1451,16 @@ void fn_800A6C98(u8 nPlayer, u8 n) {
     }
 }
 
+void fn_800A6D48(u8 nPlayer) {
+    GameAudioView* pView;
+
+    pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
+    if (Game_GetMode() < 6 || Game_GetMode() > 8) {
+        fn_800AD698(pView->n2, 3, 0);
+        fn_800AD698(pView->n3, 3, 0);
+    }
+}
+
 void fn_800A6DCC(int nMusic, int a) {
     u8 n = nMusic;
 
@@ -1615,13 +1484,27 @@ void fn_800A6DCC(int nMusic, int a) {
     lbl_80281424 = nMusic;
 }
 
-void fn_800A6D48(u8 nPlayer) {
-    GameAudioView* pView;
+void fn_800A6EC8(void) {
+    if (lbl_80282040) {
+        fn_800A4374();
+        fn_800A707C();
+        fn_800AD698(lbl_8028141C, 0, 0);
+        fn_800AD698(lbl_8028141C, 1, 0);
+        fn_800AD698(lbl_8028141D, 0, 0);
+        fn_800AD698(lbl_8028141D, 1, 0);
+    }
+}
 
-    pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
-    if (Game_GetMode() < 6 || Game_GetMode() > 8) {
-        fn_800AD698(pView->n2, 3, 0);
-        fn_800AD698(pView->n3, 3, 0);
+void fn_800A6F38(void) {
+    if (lbl_80282040) {
+        fn_800AD9AC(lbl_8028141C, 0, 2);
+        fn_800AD9AC(lbl_8028141C, 1, 2);
+        fn_800AD9AC(lbl_8028141D, 0, 2);
+        fn_800AD9AC(lbl_8028141D, 1, 2);
+        fn_800AD698(lbl_8028141C, 0, 1);
+        fn_800AD698(lbl_8028141C, 1, 1);
+        fn_800AD698(lbl_8028141D, 0, 1);
+        fn_800AD698(lbl_8028141D, 1, 1);
     }
 }
 
@@ -1634,6 +1517,15 @@ void fn_800A6FE0(void) {
     fn_800AD698(lbl_8028141D, 4, 1);
     fn_800AD698(lbl_8028141C, 5, 1);
     fn_800AD698(lbl_8028141D, 5, 1);
+}
+
+void fn_800A707C(void) {
+    if (lbl_80282040) {
+        fn_800AD698(lbl_8028141C, 4, 0);
+        fn_800AD698(lbl_8028141D, 4, 0);
+        fn_800AD698(lbl_8028141C, 5, 0);
+        fn_800AD698(lbl_8028141D, 5, 0);
+    }
 }
 
 void fn_800A70E4(int n) {
@@ -1683,6 +1575,24 @@ void fn_800A7294(void) {
     }
 }
 
+// Switches the game's sounds off (bOff) or back on; bMusic restarts the music too.
+void fn_800A72EC(u8 bOff, u8 bMusic) {
+    if (lbl_8028202E ^ bOff) {
+        lbl_8028202E = bOff;
+        if (bOff) {
+            fn_800A49A4(0);
+            fn_800A75B4();
+            fn_800A6EC8();
+            fn_800A6660(0);
+            return;
+        }
+        if (bMusic) {
+            fn_800A44A0();
+            fn_800A47A0();
+        }
+    }
+}
+
 void fn_800A7350(u8 bOn) {
     if ((lbl_8028202B ^ bOn) != 0) {
         lbl_8028202B = bOn;
@@ -1694,6 +1604,25 @@ void fn_800A7350(u8 bOn) {
                 lbl_8028202C = 1;
             }
         }
+    }
+}
+
+// a is unused.
+void fn_800A73C0(u8 a, int n) {
+    fn_800ADA28(lbl_8028141B, 0, n, 0);
+}
+
+void fn_800A73F0(s32 n) {
+    switch (n) {
+    case 1:
+        fn_800ADA28(lbl_8028141B, 1, 0, 0);
+        break;
+    case 6:
+        fn_800ADA28(lbl_8028141B, 1, 1, 0);
+        break;
+    default:
+        fn_800ADA28(lbl_8028141B, 0, n, 0);
+        break;
     }
 }
 
@@ -1719,12 +1648,37 @@ void fn_800A74E4(s32 nKind, int nTrack) {
     }
 }
 
+s32 fn_800A7528(void) {
+    return fn_800A7720();
+}
+
 void fn_800A754C(u8 a, u16 b) {
     if (lbl_8028203C == 1) {
         fn_800A7968(lbl_80281418, 0, a, b, 2);
         fn_800AD698(lbl_80281418, 0, 1);
         fn_800BA734(1, b);
     }
+}
+
+void fn_800A75B4(void) {
+    if (lbl_8028203C == 1) {
+        fn_800AD698(lbl_80281418, 0, 0);
+        lbl_8028203C = 0;
+    }
+}
+
+u8 fn_800A75F4(void) {
+    int bResult;
+
+    bResult = 0;
+    if (lbl_8028203C == 1 && fn_800AD618(lbl_80281418, 0)) {
+        bResult = 1;
+    }
+    return bResult;
+}
+
+void fn_800A7644(void) {
+    fn_800A44A0();
 }
 
 // port: the callers pass nKind and nMsg as full ints (their prototype takes int), but this body
@@ -1743,6 +1697,16 @@ void fn_800A7664(int nKind, int nMsg, int a) {
         ((void (*)(u8, u8, int, int, s32))fn_800A7968)(lbl_80281419, 0, nKind, nMsg, a);
         fn_800AD698(lbl_80281419, 0, 1);
     }
+}
+
+void fn_800A76E4(void) {
+    fn_800AD698(lbl_80281419, 0, 0);
+    lbl_80282054 = 15;
+    lbl_80282038 = 0;
+}
+
+u8 fn_800A7720(void) {
+    return fn_800AD618(lbl_80281419, 0);
 }
 
 u8 fn_800A7748(void) {
@@ -1785,10 +1749,55 @@ void fn_800A78F0(f32 fVolume) {
     fn_800A3FB4(14, fVolume);
 }
 
-void fn_800A7AD0(s16 nSound, u8 nTrack, u8 bOn) {
-    fn_800A94F4(nSound, nTrack, bOn);
+void fn_800A7924(f32 f) {
+    fn_800A44A0();
+}
+
+void fn_800A7944(void) {
+    fn_800A44A0();
+    fn_800A47A0();
 }
 
 void fn_800A7968(u8 nId, u8 nTrack, u8 a, u16 b, s32 c) {
     fn_800AD790(nId, nTrack, (c << 24) | (a << 16) | b);
+}
+
+void fn_800A7994(void) {
+    Mov_Init();
+}
+
+void fn_800A79B4(void) {
+    Mov_Exit();
+}
+
+void fn_800A79D4(void) {
+    Mov_Start();
+}
+
+void fn_800A79F4(void) {
+    Mov_Tick();
+}
+
+void fn_800A7A14(u8 nSound) {
+    fn_800B0858(nSound);
+}
+
+// Every caller passes a fourth argument; nothing here reads it.
+s32 fn_800A7A34(u8 a, u8 b, u8 nListeners, int nUnused) {
+    fn_800AD0C4();
+    fn_800A402C(nListeners);
+    // port: EA passes an argument fn_800A8DC8 ignores
+    ((u8 (*)(u8, u8, u8, int))fn_800A8DC8)(a, b, nListeners, 0);
+    return 1;
+}
+
+void fn_800A7A98(s32 n) {
+    fn_800AD1C4();
+    fn_800A4038();
+    // port: EA passes an argument fn_800A8D88 ignores
+    ((void (*)(s32))fn_800A8D88)(n);
+}
+
+void fn_800A7AD0(s16 nSound, u8 nTrack, u8 bOn) {
+    fn_800A94F4(nSound, nTrack, bOn);
 }

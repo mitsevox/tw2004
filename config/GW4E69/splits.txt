@@ -525,6 +525,12 @@ PsBallFx.c:
 
 GameAudio.c:
 	.text       start:0x800A3E3C end:0x800A7AF0
+	.rodata     start:0x80183AD8 end:0x80183B08
+	.data       start:0x8018E988 end:0x8018EB30
+	.bss        start:0x801F1790 end:0x801F17D0
+	.sdata      start:0x80281418 end:0x80281460
+	.sbss       start:0x80282020 end:0x80282058
+	.sdata2     start:0x80283F48 end:0x80283F88
 
 AudTable.c:
 	.text       start:0x800A7AF0 end:0x800A85CC

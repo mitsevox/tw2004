@@ -326,10 +326,12 @@ void GrassPacket_vAddVert(f32* pPos, int nInRow) {
 // or along x, and that point's flag: bit 2 for a step of 0, bit 4 otherwise.
 void fn_80120C2C(f32 (*aPoints)[3], u8* aFlags, f32* pOut, u16 nIndex, u8 nStep, u8* pFlag, int bAlongX,
                  f32 fAt) {
-    u16 nOther = nIndex + nStep + 1;
+    u16 nOther = 1 + nIndex + nStep;
     f32 fT;
+    f32 fLen;
+
     if (!bAlongX) {
-        f32 fLen = aPoints[nOther][2] - aPoints[nIndex][2];
+        fLen = aPoints[nOther][2] - aPoints[nIndex][2];
         if (0.0f == fLen) {
             fT = 0.0f;
         } else {
@@ -338,22 +340,26 @@ void fn_80120C2C(f32 (*aPoints)[3], u8* aFlags, f32* pOut, u16 nIndex, u8 nStep,
         pOut[0] = fT * (aPoints[nOther][0] - aPoints[nIndex][0]) + aPoints[nIndex][0];
         pOut[1] = fT * (aPoints[nOther][1] - aPoints[nIndex][1]) + aPoints[nIndex][1];
         pOut[2] = fAt;
+        if (nStep == 0) {
+            *pFlag = aFlags[nIndex] & 2;
+        } else {
+            *pFlag = aFlags[nIndex] & 4;
+        }
     } else {
-        f32 fLen;
-        fT = 0.0f;
         fLen = aPoints[nOther][0] - aPoints[nIndex][0];
-        if (fT == fLen) {
+        if (0.0f == fLen) {
+            fT = 0.0f;
         } else {
             fT = (fAt - aPoints[nIndex][0]) / fLen;
         }
         pOut[0] = fAt;
         pOut[2] = fT * (aPoints[nOther][2] - aPoints[nIndex][2]) + aPoints[nIndex][2];
         pOut[1] = fT * (aPoints[nOther][1] - aPoints[nIndex][1]) + aPoints[nIndex][1];
-    }
-    if (nStep == 0) {
-        *pFlag = aFlags[nIndex] & 2;
-    } else {
-        *pFlag = aFlags[nIndex] & 4;
+        if (nStep == 0) {
+            *pFlag = aFlags[nIndex] & 2;
+        } else {
+            *pFlag = aFlags[nIndex] & 4;
+        }
     }
 }
 
