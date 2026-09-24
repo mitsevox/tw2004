@@ -11,15 +11,21 @@
 typedef struct AudVoice {
     UListNode link;             // 0x0    in one of its pool's lists (AudVoicePool.aLists)
     u16  nHwVoice;              // 0x8    the startUp.c voice it plays on
-    u8   bHalf : 1;             // 0xA    which half of its ARAM buffer the next stream block fills
-    u8   unkA_6 : 2;
-    u8   bA_4 : 1;              //        it owns uAram, given back when it stops (fn_800ACB28)
-    u8   unkA_3 : 2;
-    u8   bA_1 : 1;              //        fn_800AA5A0 keeps the channel's event when it is set
-    u8   unkA_0 : 1;
-    u8   bStopped : 1;          // 0xB    fn_800ACA94 has stopped it and taken it off its list
-    u8   bB_6 : 1;              //        paused; Stm_Tick resumes it once the drive is fine
-    u8   unkB : 6;
+    union {
+        struct {
+            u8 bHalf : 1;       // 0xA    which half of its ARAM buffer the next stream block fills
+            u8 bA_6 : 1;        //        no reverb: fn_800AC91C starts it with aux A off
+            u8 bA_5 : 1;        //        fn_800AC91C skips its next settings (and clears it)
+            u8 bA_4 : 1;        //        it owns uAram, given back when it stops (fn_800ACB28)
+            u8 unkA_3 : 2;
+            u8 bA_1 : 1;        //        fn_800AA5A0 keeps the channel's event when it is set
+            u8 bA_0 : 1;        //        set up (fn_800AC6D0, fn_800AC7DC), started by fn_800AC91C
+            u8 bStopped : 1;    // 0xB    fn_800ACA94 has stopped it and taken it off its list
+            u8 bB_6 : 1;        //        paused; Stm_Tick resumes it once the drive is fine
+            u8 unkB : 6;
+        } b;
+        u16 n;                  //        cleared as a whole when the voice is freed (fn_800ACB98)
+    } flags;                    // 0xA
     u32  uC;                    // 0xC
     s32  n10;                   // 0x10   the request's n4, and the pool list it is on: a voice with
                                 //        a lower one can be stolen
@@ -33,7 +39,8 @@ typedef struct AudVoice {
     u32  uAram;                 // 0x28   its ARAM buffer (two halves of 0x7F00 bytes)
     u32  uPlayPos;              // 0x2C   where it is playing in that buffer, in bytes
     u8   unk30[0x3E - 0x30];
-    u16  n3E;                   // 0x3E   cleared when the voice is taken (fn_800AC4A0)
+    u8   n3E;                   // 0x3E   cleared when the voice is taken (fn_800AC4A0, a byte store)
+    u8   unk3F;
 } AudVoice;
 LAYOUT_ASSERT(AudVoice, 0x40);
 
@@ -48,6 +55,7 @@ typedef struct AudVoicePool {
 LAYOUT_ASSERT(AudVoicePool, 0xCAC);
 
 extern AudVoicePool lbl_801F19B8[1];
+extern u8  lbl_802820B0;                // the voices in use, counted by fn_800ACB98
 extern s32 lbl_802820B4;                // flipped by each pause: the order fn_800ACCF4 goes through
 
 // Settings for a voice; the flags say which fields are set. fn_800AC91C sets them on a voice;
@@ -140,7 +148,10 @@ typedef union AudTrackStmFlags {
 
 // A tone of a sequencer bank (0x14 bytes).
 typedef struct AudSeqTone {
-    u8   unk0[0x10];
+    struct SoundHeader* pHeader;    // 0x0    the sound it plays (startup.h)
+    u32  u4;                    // 0x4    fn_800AC6D0 picks the voice's uC at random from u4 up to u8
+    u32  u8;                    // 0x8
+    struct VoiceEnvelope* pEnv; // 0xC    its volume envelope (startup.h)
     s32  n10;                   // 0x10   bit 0: it loops
 } AudSeqTone;
 LAYOUT_ASSERT(AudSeqTone, 0x14);
@@ -539,8 +550,8 @@ void Stm_SetStream(AudTrack* pTrack, u16 nStream, int nMode);
 s32  fn_800AC494(void);
 void fn_800AC49C(void);
 AudVoice* fn_800AC4A0(AudVoiceRequest* pRequest);
-void fn_800AC6D0(AudVoice* pVoice, AudVoiceParams* pParams, u8 n, f32 f);
-void fn_800AC7DC(AudVoice* pVoice, u32 uLen, u16 n4, int bLoud);
+void fn_800AC6D0(AudVoice* pVoice, AudVoiceParams* pParams, u8 nVolume, f32 fPitch);
+void fn_800AC7DC(AudVoice* pVoice, u32 uLen, u32 nRate, u8 bLoud);
 void fn_800AC91C(AudVoice* pVoice, AudVoiceParams* pParams);
 void fn_800ACA5C(AudVoice* pVoice, u8 bPause);
 void fn_800ACA94(AudVoice* pVoice);     // let it end
