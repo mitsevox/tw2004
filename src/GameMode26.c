@@ -11,7 +11,21 @@
 #include "game.h"
 #include "game/modes/mode26.h"
 
+s32 lbl_80281760 = 10000;
+s32 lbl_80281764 = 5;
+s32 lbl_80281768 = 5;
+s32 lbl_8028176C = 120;
+s32 lbl_80281770 = 15;
+s32 lbl_80281774[2] = {0, 0};
+s32 lbl_8028177C[2] = {0, 0};
+
+// .sbss in reverse address order (CodeWarrior lays it out backwards)
+u8  lbl_802824A8[5];
+u8  lbl_802824A0[5];
+u8  lbl_80282498[5];
+f32 lbl_80282494;
 u8 lbl_80282491;                        // set when the session is split screen (fn_8010D3B8)
+u8  lbl_80282490;
 
 void fn_8010C714(void);
 void fn_8010C73C(void);
@@ -25,7 +39,7 @@ u8   fn_8010C934(u8 bCheck);
 void fn_8010C958(int nPlayer);
 void fn_8010C978(int nPlayer);
 s32  fn_8010C9D4(int nLie);
-void fn_8010CA2C(int nPlayer);
+void fn_8010CA2C(PlayerNumber_t nPlayer);
 void fn_8010D230(void);
 void fn_8010D250(void);
 void fn_8010D278(void);
@@ -50,7 +64,7 @@ void fn_8010C4A0(void) {
     gpGame->pfnEndGame = fn_8010C740;
     gpGame->pfn220 = fn_8010C764;
     gpGame->pfn20C = fn_8010C8B8;
-    gpGame->pfn244 = fn_8010CA2C;
+    gpGame->pfn244 = (void (*)(int))fn_8010CA2C;    // port: its parameter is PlayerNumber_t, pfn244's int
     gpGame->pfn1E4 = fn_8010D230;
     gpGame->pfn224 = fn_8010D250;
     gpGame->bGimmesAllowed = 0;
@@ -220,13 +234,13 @@ s32 fn_8010C9D4(int nLie) {
 // A shot is over: score it by where the ball ended up, keep the players' shot statistics, play
 // the tracks for new records and point totals, and say one of the collected messages. The first
 // player to lbl_80281760 points wins.
-void fn_8010CA2C(int nPlayer) {
-    s32 nLead;
+void fn_8010CA2C(PlayerNumber_t nPlayer) {
     s32 nKind;
     Player* pPlayer = &gPlayers[nPlayer];
     u8 bCounts = 0;
     s32 nMsgs = 0;
     s32 nLength;
+    s32 nLead;
     s32 nPoints;
     s32 nTotal;
     s32 nPick;

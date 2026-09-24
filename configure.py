@@ -149,9 +149,15 @@ if Path(".git").is_file():
         capture_output=True, text=True,
     ).stdout.strip()
     _main_build = Path(_common).parent / "build"
-    for _attr, _rel in (("dtk", "tools/dtk.exe"), ("objdiff", "tools/objdiff-cli.exe"),
-                        ("sjiswrap", "tools/sjiswrap.exe"), ("compilers", "compilers"),
-                        ("binutils", "binutils")):
+    if is_windows():
+        _tools = (("dtk", "tools/dtk.exe"), ("objdiff", "tools/objdiff-cli.exe"))
+    else:
+        # Linux/macOS: native dtk and objdiff-cli, and wibo to run the Windows compiler (without
+        # it the worktree downloads wibo into the shared folder while other builds run it)
+        _tools = (("dtk", "tools/dtk"), ("objdiff", "tools/objdiff-cli"), ("wrapper", "tools/wibo"))
+    _tools += (("sjiswrap", "tools/sjiswrap.exe"), ("compilers", "compilers"),
+               ("binutils", "binutils"))
+    for _attr, _rel in _tools:
         if getattr(args, _attr) is None and (_main_build / _rel).exists():
             setattr(args, _attr, _main_build / _rel)
 
@@ -866,7 +872,9 @@ config.libs = [
             Object(NonMatching, "LLFont.c"),
             Object(Matching, "UFont.c"),
             Object(Matching, "GoRenderCtx_Gc.c"),
-            Object(NonMatching, "streammanagerhole.c"),
+            Object(Matching, "streammanagerhole.c"),
+            Object(Matching, "Code80015470.c"),
+            Object(Matching, "Code80016198.c"),
             Object(Matching, "ViewController.c"),
             Object(Matching, "char_tex_manager.c"),
             Object(NonMatching, "char.c"),
@@ -883,7 +891,7 @@ config.libs = [
             Object(NonMatching, "gocamscripts.c"),
             Object(NonMatching, "DepthField.c"),
             Object(Matching, "UObject3D.c"),
-            Object(NonMatching, "GoDynObj.c"),
+            Object(Matching, "GoDynObj.c"),
             Object(NonMatching, "UObject.c"),
             Object(Matching, "UKernel.c"),
             Object(Matching, "GoAnimalActors.c"),
@@ -896,7 +904,7 @@ config.libs = [
             Object(Matching, "GoCamCont.c"),
             Object(NonMatching, "skalib.c"),
             Object(NonMatching, "GoStaticCam.c"),
-            Object(NonMatching, "target.c"),
+            Object(Matching, "target.c"),
             Object(Matching, "emotion.c"),
             Object(Matching, "Replay.c"),
             Object(Matching, "gomainloop.c"),
@@ -907,7 +915,7 @@ config.libs = [
             Object(NonMatching, "GoShaderObjectContainer_OBFData_Gc.c"),
             Object(Matching, "GoShaderObject_PrelitUVAnimation_Gc.c"),
             Object(Matching, "animblender.c"),
-            Object(NonMatching, "GoShaderObjectCommon_ShaderObjectsData_Gc.c"),
+            Object(Matching, "GoShaderObjectCommon_ShaderObjectsData_Gc.c"),
             Object(Matching, "LLVideo.c"),
             Object(Matching, "ByteSwap.c"),
             Object(Matching, "GoCamera.c"),
@@ -917,7 +925,7 @@ config.libs = [
             Object(Matching, "FE_MessageTable.c"),
             Object(Matching, "GameUICommands.c"),
             Object(Matching, "FEgolferanim.c"),
-            Object(NonMatching, "uiLoadFile.c"),
+            Object(Matching, "uiLoadFile.c"),
             Object(NonMatching, "uiProcessInterface.c"),
             Object(Matching, "Code80090940.c"),
             Object(Matching, "fe_movies.c"),
@@ -925,6 +933,7 @@ config.libs = [
             Object(NonMatching, "goballfx.c"),
             Object(Matching, "GoObjShadow.c"),
             Object(NonMatching, "GoShaderObject_Particle_Gc.c"),
+            Object(Matching, "LLTime.c"),
             Object(Matching, "CharAnim.c"),
             Object(NonMatching, "GoShaderObjectCommon_MorphAnimManager_Gc.c"),
             Object(Matching, "GoCamTuningVars.c"),
@@ -952,6 +961,7 @@ config.libs = [
             Object(Matching, "GoARAM.c"),
             Object(NonMatching, "DiscError.c"),
             Object(NonMatching, "rcmp_mad_codec.c"),
+            Object(Matching, "Code800B90F4.c"),
             Object(Matching, "Trax.c"),
             Object(Matching, "ScreenClear.c"),
             Object(Matching, "Code800BA940.c"),
@@ -972,7 +982,7 @@ config.libs = [
             Object(Matching, "Calendar.c"),
             Object(Matching, "CourseData.c"),
             Object(NonMatching, "Earnings.c"),
-            Object(NonMatching, "GameHoleContests.c"),
+            Object(Matching, "GameHoleContests.c"),
             Object(Matching, "GameManager.c"),
             Object(Matching, "GameEffects.c"),
             Object(Matching, "GameRound.c"),
@@ -1008,7 +1018,7 @@ config.libs = [
             Object(Matching, "FE_CrAPDB.c"),
             Object(Matching, "FE_CrAPMessages.c"),
             Object(NonMatching, "LLDynTex.c"),
-            Object(NonMatching, "GameMode26.c"),
+            Object(Matching, "GameMode26.c"),
             Object(Matching, "CharSliders.c"),
             Object(Matching, "FE_PGATourMessages.c"),
             Object(Matching, "FE_LogoDesign.c"),
@@ -1031,7 +1041,7 @@ config.libs = [
             Object(Matching, "GameMode4Menu.c"),
             Object(Matching, "LadderMap.c"),
             Object(Matching, "TibExt.c"),
-            Object(NonMatching, "gbacable.c"),
+            Object(Matching, "gbacable.c"),
             Object(Matching, "ShaderRow19.c"),
             Object(Matching, "EASportsBio.c"),
             Object(NonMatching, "GameMode22.c"),
@@ -1045,11 +1055,13 @@ config.libs = [
             # function worse.
             Object(NonMatching, "UISApi.c", extra_cflags=["-inline auto"]),
             # Built with automatic inlining: fn_8016A830 and fn_8016B188 have their own recursion
-            # inlined three deep (-inline smart 55.8%, -inline auto 64.7%, nothing worse). Not
-            # deferred: -inline auto,deferred emits the functions in reverse order and pastes
-            # fn_8016C614/fn_8016C674 and the fn_8016C15C accessors into fn_8016A2D4/fn_8016A510,
-            # which the original calls (87 -> 62%, 93 -> 69%).
-            Object(NonMatching, "UISScreen.c", extra_cflags=["-inline auto"]),
+            # inlined three deep (-inline smart 55.8%, -inline auto 64.7%, nothing worse). Deferred:
+            # -inline auto,deferred emits the functions in reverse order (so the source is written
+            # last address first) and would paste fn_8016C614/fn_8016C674 and the fn_8016C15C
+            # accessors into their callers, which the original calls: those six sit in
+            # `#pragma auto_inline off`. fn_8016B188 77.50 -> 93.27, nothing worse. The flag alone
+            # on UISApi/UISEvent/UIStudio changes no score (their sources are still in address order).
+            Object(NonMatching, "UISScreen.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "GoDynObjTypes.c"),
             Object(Matching, "unsorted/sweep_800977CC.c"),
             Object(Matching, "GoDynObjBase.c"),

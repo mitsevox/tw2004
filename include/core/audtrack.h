@@ -472,7 +472,7 @@ void           fn_800A834C(s16 nSound, u8 nTrack, u8 n);       // the track's nA
 void           fn_800A8394(u8 nEntry, u8 nTrack, u8 n, int bCheck);
 void           fn_800A8424(u8 nEntry, u8 nTrack, f32 fVolume);
 void           fn_800A84A4(u8 nEntry, u8 nTrack, f32 fPitch);
-void           fn_800A8524(AudSound* pSound, int n);
+void           fn_800A8524(AudSound* pSound, u16 n);
 void           fn_800A8584(AudSource* pSource, u8 nTrack, s32 n);
 
 // hlaudmovie.c

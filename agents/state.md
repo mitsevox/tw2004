@@ -1,12 +1,27 @@
 # State (keep this short: current facts only; history goes to docs/journal.md)
 
-Updated 2026-09-24 ~16:00 CDT. RUNNING (cloud, checkpoint 17:00 CDT), quickest wins first:
-- cam-01: GoGolfCam, GoBreakLine, UStream, Skin, gbacable
-- money-01: Earnings, SunFlr_Gc, uiLoadFile, Ball, DepthField, PsMgr
+Updated 2026-09-24 ~17:10 CDT. RUNNING (cloud, to 18:00 CDT, no permuter):
+- swing-01 round 2: GoStaticCam, UObject, uiText, TerrainData, GoShaderObject_Rain_Gc
+- cam-01 round 2: GameMode26, LLFileIO_Gc, startUp, GoDynObj
+Round 1 merged (notes: agents/notes/cloud-2026-09-24-round1.txt, money-01-notes_cloud1.txt): linked
+uiLoadFile, gbacable, target (the owner's PC), ShaderObjectsData; exact BreakLine_Reset,
+Stream_ParseBufs, Glows fn_800981D0; closer Skin (1 instruction), hwsRender, AI_ChooseTarget, PictInt.
 
-Held by the owner's PC until ~16:45 CDT (permuters + a closer lane on agent/map-09; hands wins to the
-cloud to apply, never pushes): GoStaticCam, GoShaderObjectCommon_ShaderObjectsData_Gc, UObject,
-TerrainData, GoShaderObject_Rain_Gc, startUp, LLFileIO_Gc, GameMode26, GoDynObj, uiText.
+~17:40 CDT: no cloud lanes running. The owner's PC lanes are done and every unit is released,
+except UISScreen until local/uisscreen-deferred is merged (the whole UIS library looks built with
+`-inline auto,deferred`: the flag alone changes no score; the gain needs reversed source order +
+auto_inline pragmas; next a lane for UISApi/UISEvent/UIStudio). Merged from the PC: target,
+streaming (3 files), goterrain (+4 exact; inline renamed fn_80031E58_Read, no name evidence).
+Also merged: holecontests-link (GameHoleContests linked), hlaudmovie (+1), uisscreen-deferred,
+split-finder (LLTime.c, Code800B90F4.c linked; survey in agents/findings/split-survey.tsv).
+Strong split leads from the survey, all free now: Swing (3 state files, ~23 KB exact), Golfer
+(Caddie part ~4.8 KB), Ball (Wind.c), goballfx (GoLightFogEnv); medium: Golfer club part, Glows,
+hlaudmovie. Next round proposed: a split lane on those + a lane reworking UISApi/UISEvent/UIStudio
+for the deferred build.
+local/target-link and local/streaming-link (streammanagerhole split in 3, all linked, +8 % data)
+are merged; the owner deletes those branches (the session cannot). The PC's split finder
+(agent/map-05, to ~18:00) surveys unlinked units for EA file boundaries: no cloud splits until it
+reports. Plan: keep 2 cloud lanes (~$35-40/h); size the next round from the survey.
 
 ## Numbers (report.json)
 

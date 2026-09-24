@@ -124,7 +124,21 @@ GoRenderCtx_Gc.c:
 	.sdata2     start:0x80282B58 end:0x80282B80
 
 streammanagerhole.c:
-	.text       start:0x800143B8 end:0x80016CB8
+	.text       start:0x800143B8 end:0x80015470
+	.bss        start:0x801A3728 end:0x801A4900
+	.sdata      start:0x80280DF8 end:0x80280E00
+
+Code80015470.c:
+	.text       start:0x80015470 end:0x80016198
+	.bss        start:0x801A4900 end:0x801B8A98
+	.sdata      start:0x80280E00 end:0x80280E08
+	.sdata2     start:0x80282B80 end:0x80282BA0
+
+Code80016198.c:
+	.text       start:0x80016198 end:0x80016CB8
+	.bss        start:0x801B8A98 end:0x801B8BA8
+	.sdata      start:0x80280E08 end:0x80280E10
+	.sdata2     start:0x80282BA0 end:0x80282BB8
 
 ViewController.c:
 	.text       start:0x80016CB8 end:0x80017320
@@ -216,6 +230,9 @@ UObject3D.c:
 
 GoDynObj.c:
 	.text       start:0x80045F74 end:0x800486F4
+	.data       start:0x80187B98 end:0x80187D48
+	.sbss       start:0x80281DA0 end:0x80281DA8
+	.sdata2     start:0x80283168 end:0x802831E0
 
 UObject.c:
 	.text       start:0x800486F4 end:0x80048AF4
@@ -290,6 +307,12 @@ Code80067710.c:
 
 target.c:
 	.text       start:0x80067B80 end:0x8006AA70
+	.rodata     start:0x80183768 end:0x80183848
+	.data       start:0x80188778 end:0x80188830
+	.bss        start:0x801D5BF0 end:0x801D5F78
+	.sdata      start:0x802811C0 end:0x802811D0
+	.sbss       start:0x80281E30 end:0x80281E48
+	.sdata2     start:0x80283778 end:0x80283868
 
 emotion.c:
 	.text       start:0x8006AA70 end:0x8006BED4
@@ -375,6 +398,9 @@ animblender.c:
 
 GoShaderObjectCommon_ShaderObjectsData_Gc.c:
 	.text       start:0x80073878 end:0x80075280
+	.data       start:0x801893F0 end:0x8018946C
+	.sbss       start:0x80281EA0 end:0x80281EB8
+	.sdata2     start:0x80283A30 end:0x80283A50
 
 LLVideo.c:
 	.text       start:0x80075280 end:0x80076158
@@ -440,6 +466,10 @@ FEgolferanim.c:
 
 uiLoadFile.c:
 	.text       start:0x8008EC30 end:0x8008F39C
+	.data       start:0x80189B18 end:0x80189B38
+	.bss        start:0x801D87A8 end:0x801D87C0
+	.sdata      start:0x80281350 end:0x80281368
+	.sbss       start:0x80281EF0 end:0x80281F18
 
 uiProcessInterface.c:
 	.text       start:0x8008F39C end:0x80090940
@@ -476,7 +506,10 @@ GoObjShadow.c:
 	.sdata2     start:0x80283C68 end:0x80283C80
 
 GoShaderObject_Particle_Gc.c:
-	.text       start:0x8009414C end:0x8009554C
+	.text       start:0x8009414C end:0x800952D8
+
+LLTime.c:
+	.text       start:0x800952D8 end:0x8009554C
 
 unsorted/sweep_8009554C.c:
 	.text       start:0x8009554C end:0x80095564
@@ -685,7 +718,14 @@ DiscError.c:
 	.text       start:0x800B6924 end:0x800B769C
 
 rcmp_mad_codec.c:
-	.text       start:0x800B769C end:0x800B9FF0
+	.text       start:0x800B769C end:0x800B90F4
+
+Code800B90F4.c:
+	.text       start:0x800B90F4 end:0x800B9FF0
+	.data       start:0x801910E0 end:0x801910F8
+	.sdata      start:0x802814E8 end:0x80281508
+	.sbss       start:0x802821C0 end:0x802821E8
+	.sdata2     start:0x802841C8 end:0x802841E0
 
 Trax.c:
 	.text       start:0x800B9FF0 end:0x800BA74C
@@ -784,6 +824,10 @@ Earnings.c:
 
 GameHoleContests.c:
 	.text       start:0x800D9E14 end:0x800DAE44
+	.bss        start:0x80202828 end:0x80202898
+	.sdata      start:0x80281568 end:0x80281588
+	.sbss       start:0x80282260 end:0x80282270
+	.sdata2     start:0x80284560 end:0x80284578
 
 GameEffects.c:
 	.text       start:0x800DAE44 end:0x800DCAD8
@@ -993,6 +1037,10 @@ LLDynTex.c:
 
 GameMode26.c:
 	.text       start:0x8010C4A0 end:0x8010D454
+	.data       start:0x80193B28 end:0x80193B70
+	.sdata      start:0x80281760 end:0x80281788
+	.sbss       start:0x80282490 end:0x802824B0
+	.sdata2     start:0x80284890 end:0x802848A0
 
 CharSliders.c:
 	.text       start:0x8010D454 end:0x8010E58C
@@ -1115,6 +1163,11 @@ TibExt.c:
 
 gbacable.c:
 	.text       start:0x801228E0 end:0x801247C0
+	.rodata     start:0x80184E30 end:0x80184E40
+	.data       start:0x80194810 end:0x80195308
+	.bss        start:0x80260E18 end:0x80261028
+	.sdata      start:0x80281980 end:0x80281988
+	.sbss       start:0x80282518 end:0x80282568
 
 ShaderRow19.c:
 	.text       start:0x801247C0 end:0x801249A8

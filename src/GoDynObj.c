@@ -11,6 +11,39 @@
 #include "game.h"
 #include "unsorted/cull.h"
 
+char lbl_80187B98[27][13] = {
+    "LogoBENHapex",
+    "LogoCALLhxb",
+    "LogoCALLhxr",
+    "LogoCALLctr",
+    "LogoEApiece",
+    "LogoEAspiner",
+    "LogoEApboo",
+    "LogoEAspow",
+    "LogoEAwtc",
+    "LogoMAXFnod",
+    "LogoMAXFa3r",
+    "LogoMAXFm3r",
+    "LogoMAXFm3b",
+    "LogoNIKEsoft",
+    "LogoNIKEfar",
+    "LogoNIKEfly",
+    "LogoNIKEspn",
+    "LogoNIKElng",
+    "LogoNIKEtw",
+    "LogoPRECed",
+    "LogoPRECtp",
+    "LogoTITLprov",
+    "LogoSTRAace",
+    "LogoWILSwils",
+    "LogoNIKEone",
+    "LogoNIKEoneT",
+    "LogoCYBM",
+};
+char lbl_80187CF8[4][13] = {"logoea", "logonike", "logotitl", "logostrt"};
+
+GoDynObjMgr* lbl_80281DA0;
+
 void fn_80045FC8(UStreamObject* pObject);   // the 'BALL' stream handler
 void fn_80046FDC(s32 nView);
 void fn_800470B0(s32 nView);
@@ -129,6 +162,9 @@ void fn_800461A8(void) {
     lbl_80281DA0->apTeo10006[2] = NULL;
     lbl_80281DA0->apTeo10006[3] = NULL;
 }
+
+// Defined after fn_800461A8 so that its "GoDynObj.c" comes first in .data, as in the original.
+s32 lbl_80187D38[4] = {1, 0, 3, 2};
 
 void fn_80046264(void) {
     fn_80009E70(lbl_80281DA0);
@@ -286,6 +322,18 @@ u8 DynObj_bAltShotDrawBall(int nPlayer) {
         return 0;
     }
     return 1;
+}
+
+// fake match: stands in for a function the original linker stripped. Its constants (10.0, 0.5,
+// 1.0, 0.0) are still in this file's pool ahead of fn_80046928's; its body is unknown.
+static f32 GoDynObj_StrippedFn(f32 x) {
+    x += 10.0f;
+    x += 0.5f;
+    x += 1.0f;
+    if (x > 0.0f) {
+        return 0.0f;
+    }
+    return x;
 }
 
 u8 fn_80046928(int nPlayer) {
@@ -537,10 +585,10 @@ void fn_8004731C(u8* pState) {
     f32 aSpin[4];
     f32 aTurn[4];
     f32 aRot[4];
-    int i;
+    s32 i;
     UObject* pBall;
-    UObject* pLogoB;
     UObject* pLogoA;
+    UObject* pLogoB;
     f32 fDist;
     f32 fSink;
     f32 fSize;

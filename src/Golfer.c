@@ -138,7 +138,6 @@ void AI_ChooseTarget(int nPlayer) {
     s8          nZone;
     int         nClub;
     f32         fDX, fDZ;
-    AITarget*   pBest;
 
     nPinSet = Game_CurrentPinSet();
     pCourse = fn_8000C594();
@@ -206,31 +205,30 @@ void AI_ChooseTarget(int nPlayer) {
                 nBest      = nCand;
                 continue;
             }
-            pBest = &gAITargets[nBest];
-            if (pBest->bPriority) {
+            if (gAITargets[nBest].bPriority) {
                 fBestDist2 = fDist2;
                 nBest      = nCand;
                 continue;
             }
             // Prefer the more demanding point: power, then aggression, then skill, then closer.
-            if (t->nPowerReq > pBest->nPowerReq) {
+            if (t->nPowerReq > gAITargets[nBest].nPowerReq) {
                 fBestDist2 = fDist2;
                 nBest      = nCand;
                 continue;
             }
-            if (pBest->nPowerReq != __abs(t->nPowerReq)) continue;
-            if (t->nAggrReq > pBest->nAggrReq) {
+            if (gAITargets[nBest].nPowerReq != __abs(t->nPowerReq)) continue;
+            if (t->nAggrReq > gAITargets[nBest].nAggrReq) {
                 fBestDist2 = fDist2;
                 nBest      = nCand;
                 continue;
             }
-            if (pBest->nAggrReq != __abs(t->nAggrReq)) continue;
-            if (t->nSkillReq > pBest->nSkillReq) {
+            if (gAITargets[nBest].nAggrReq != __abs(t->nAggrReq)) continue;
+            if (t->nSkillReq > gAITargets[nBest].nSkillReq) {
                 fBestDist2 = fDist2;
                 nBest      = nCand;
                 continue;
             }
-            if (pBest->nSkillReq != __abs(t->nSkillReq)) continue;
+            if (gAITargets[nBest].nSkillReq != __abs(t->nSkillReq)) continue;
             if (fDist2 < fBestDist2) {
                 nBest      = nCand;
                 fBestDist2 = fDist2;
