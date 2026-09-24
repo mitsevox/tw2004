@@ -138,7 +138,9 @@ int fn_8000EA1C(u8* pCode, int nArg, int nPush, DynObj* pObj) {
                 a = -(*pCode++ + 1);
                 break;
             case 2:
-                a = *pCode++ + 0x80;
+                a = *pCode;
+                pCode++;
+                a += 0x80;
                 break;
             case 3:
                 a = pCode[1] | ((s8)pCode[0] << 8);
@@ -239,7 +241,8 @@ int fn_8000EA1C(u8* pCode, int nArg, int nPush, DynObj* pObj) {
                     a = lbl_80281C70[a];
                 } else {
                     int nRand = (int)Misc_RandFunc(0);
-                    b = (nRand + (nRand >> 31)) ^ (nRand >> 31);   // EA's abs
+                    int nSign = nRand >> 31;
+                    b = (nSign + nRand) ^ nSign;   // EA's abs
                     a = b % -a;
                 }
                 break;

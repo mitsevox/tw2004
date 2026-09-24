@@ -687,9 +687,9 @@ static UStreamObject* UStream_NextObject(u8 bParse) {
 // handler registered for its type. Returns 0 when the stream has nothing left to do.
 u8 UStream_Update(void) {
     UStreamObject* pObject;
+    int i;
     UStreamObject* pNext;
     UStream* pStream;
-    int i;
     fn_800B7490();
     for (pObject = UStream_NextObject(1); pObject != NULL; pObject = UStream_NextObject(0)) {
         pObject->pPrev = NULL;
@@ -706,9 +706,10 @@ u8 UStream_Update(void) {
     pObject = gpQueueHead;
     if (pObject == NULL) {
         if (gnCurStream == -1) return 0;
-        pStream = &gStreams[gnCurStream];
+        pStream = gStreams;
+        pStream += gnCurStream;
         fn_800A4BDC();
-        if (pStream->bEOF && !gbReadPending && gReadyRing[gReadyRingTail] == NULL && gpCurList == NULL
+        if (pStream->bEOF &&!gbReadPending && gReadyRing[gReadyRingTail] == NULL && gpCurList == NULL
             && gpUsedList == NULL) {
             return 0;
         }

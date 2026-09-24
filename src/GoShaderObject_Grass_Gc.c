@@ -430,7 +430,7 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
     s32 nVerts = pData->anVerts[nSet][nRun];
     GrassWord* pVert = pData->apVerts[nSet][nRun];
     f32 vEye[3];
-    f32 vAt[3];
+    f32 vAt[4];     // fake match: three floats are used; the frame has room for four
     f32 fDist;
     f32 fPerX;
     f32 fPerZ;

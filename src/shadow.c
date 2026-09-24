@@ -433,8 +433,6 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     f32           fHalfX = p->f424;
     f32           fHalfZ = p->f428;
     CourseInfo*   pCourse;
-    TerPolyRef*   pRef;
-    f32*          pVert;
     f32           fScaleX;
     f32           fScaleZ;
     f32           fRight;
@@ -442,12 +440,14 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     f32           fU;
     f32           fV;
     int           nList;
-    int           nCount;
-    int           nVerts;
-    int           nStrips;
     int           n;
     int           i;
+    int           nCount;
+    TerPolyRef*   pRef;
     int           j;
+    int           nVerts;
+    int           nStrips;
+    f32*          pVert;
 
     if (fHalfX > 10.0f || fHalfZ > 10.0f) {
         return;

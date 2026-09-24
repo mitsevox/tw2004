@@ -16,33 +16,33 @@ void fn_80007824(UObjModelRoot* pRoot, int nSet);
 // 0's setup, and the meshes, built from the chunks after it, follow the model in one block.
 UObjModelRoot* fn_800073B4(u8* pData, int n) {
     u8* pNext;
-    u8* pCur;
+    u8* pStart;
     UObjArrayList list;
     u32* pChunk;
     UObjModelHead* pHead;
     UObjModelRoot* pRoot;
 
     // The original stores pData, then pData + 8, and keeps pData in r30 (ours: r29): 95%.
-    pCur = pData;
-    pCur += 8;
+    pStart = pData;
+    pData = pStart + 8;
     list.n = 0;
     for (;;) {
-        pChunk = (u32*)pCur;
-        pCur += 8;
+        pChunk = (u32*)pData;
+        pData += 8;
         if (pChunk[0] == 0x41525241) {  // 'ARRA'
-            list.ap[list.n++] = pCur;
-            pCur += pChunk[1];
+            list.ap[list.n++] = pData;
+            pData += pChunk[1];
         } else if (pChunk[0] == 0x48454144) {   // 'HEAD'
             break;
         }
     }
-    pHead = (UObjModelHead*)pCur;
-    pCur += sizeof(UObjModelHead);
+    pHead = (UObjModelHead*)pData;
+    pData += sizeof(UObjModelHead);
     pRoot = fn_80009B34(sizeof(UObjModelRoot) + pHead->nMeshes * sizeof(UObjMesh) +
                         (pHead->nMeshes - 1) * sizeof(UObjMesh*), 2, 16, "LLObj_Gc.c", 198);
     pNext = (u8*)pRoot;
     pRoot->pE4 = NULL;
-    pRoot->pE0 = pData;
+    pRoot->pE0 = pStart;
     pRoot->pE8 = pHead;
     fn_80005AE8(pRoot, 0, sizeof(pRoot->aSets));
     pRoot->aSets[0].n30 = -1;
@@ -53,7 +53,7 @@ UObjModelRoot* fn_800073B4(u8* pData, int n) {
     pNext += sizeof(UObjModelRoot);
     pRoot->pMesh = (UObjMesh*)pNext;
     pNext += pRoot->pE8->nMeshes * sizeof(UObjMesh);
-    fn_8000799C(pRoot, pRoot->pMesh, n, &pCur, &pNext);
+    fn_8000799C(pRoot, pRoot->pMesh, n, &pData, &pNext);
     return pRoot;
 }
 

@@ -272,6 +272,7 @@ int File_ReadAsyncEx(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDon
                 u8 nPrio, s32 n1C, u8 b20, u8 b21) {
     FileReqPool* pPool;
     FileReq* pReq;
+    FileQueue* pQueue;
 
     fn_800B7490();
     fn_800B596C("File_ReadAsyncEx");
@@ -291,7 +292,9 @@ int File_ReadAsyncEx(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDon
             }
             lbl_8019E868[nPrio].pPrev = pReq;
         }
-        lbl_8019E868[nPrio].nCount++;
+        pQueue = lbl_8019E868;
+        pQueue += nPrio;
+        pQueue->nCount++;
         pReq->nFile = hFile;
         pReq->pBuf = pDst;
         pReq->nOffset = uOffset;
@@ -312,9 +315,9 @@ int File_ReadAsyncEx(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDon
 // to *puSize when that is not NULL. NULL when no memory is free.
 void* fn_800065C8(const char* szPath, u32* puSize, int nAlign) {
     DVDFileInfo info;
-    s32 nEntry;
     u32 uSize;
     s32 nLen;
+    s32 nEntry;
     void* pData;
     s32 nStatus;
     u8 bRetry;
@@ -336,7 +339,7 @@ void* fn_800065C8(const char* szPath, u32* puSize, int nAlign) {
     }
     nLen = info.uLength;
     uSize = nLen;
-    pData = fn_80009B34(uSize, 1, nAlign, "LLFileIO_Gc.c", 750);
+    pData = fn_80009B34(nLen, 1, nAlign, "LLFileIO_Gc.c", 750);
     if (pData == NULL) {
         return NULL;
     }
@@ -346,9 +349,10 @@ void* fn_800065C8(const char* szPath, u32* puSize, int nAlign) {
         do {
             // a DVDFileInfo begins with its command block
             nStatus = DVDGetCommandBlockStatus((DVDCommandBlock*)&info);
-            if (nStatus != 0) {
-                bRetry = fn_800B7490();
+            if (nStatus == 0) {     // fake match: a break before the loop's own (same) test
+                break;
             }
+            bRetry = fn_800B7490();
         } while (nStatus != 0);
     } while (bRetry);
     do {
