@@ -3,7 +3,7 @@
 Creates build/perm/<fn>/ in this checkout with base.c, target.o, compile.sh, settings.toml.
 Run:  timeout 2700 python C:/dev/tools/decomp-permuter/permuter.py build/perm/<fn> -j6 --best-only
 """
-import os, pathlib, re, subprocess, sys
+import os, pathlib, re, shlex, subprocess, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2].as_posix()   # the checkout this script lives in
 HERE = pathlib.Path(__file__).resolve().parent.as_posix()
@@ -11,12 +11,25 @@ unit, fn = sys.argv[1], sys.argv[2]
 out = f'{ROOT}/build/perm/{fn}' + (sys.argv[3] if len(sys.argv) > 3 else '')
 os.makedirs(out, exist_ok=True)
 
-CC = ROOT + '/build/compilers/GC/2.5/mwcceppc.exe'
-CFLAGS = ['-nodefaults', '-proc', 'gekko', '-align', 'powerpc', '-enum', 'int', '-fp', 'hardware',
-          '-Cpp_exceptions', 'off', '-O4,p', '-inline', 'smart', '-pragma', 'cats off', '-pragma',
-          'warn_notinlined off', '-maxerrors', '1', '-nosyspath', '-RTTI', 'off', '-fp_contract', 'on',
-          '-str', 'reuse', '-common', 'on', '-use_lmw_stmw', 'on', '-multibyte', '-lang=c']
-DEFS = ['-DBUILD_VERSION=0', '-DVERSION_GW4E69', '-DVERSION=0', '-DNDEBUG=1']
+def unit_flags(unit):
+    """The compiler and cflags build.ninja uses for this unit's object (per-object extra_cflags included)."""
+    nj = re.sub(r'\$\n\s*', '', open(ROOT + '/build.ninja', encoding='utf-8').read())
+    obj = 'build\\GW4E69\\src\\%s.o:' % unit.replace('/', '\\')
+    i = nj.index('build ' + obj)
+    block = nj[i:nj.find('\nbuild ', i + 1)]
+    ver = re.search(r'^\s*mw_version = (\S+)', block, re.M).group(1).replace('\\', '/')
+    flags = shlex.split(re.sub(r'\s+', ' ', re.search(r'^\s*cflags = (.*)$', block, re.M).group(1)))
+    return ROOT + '/build/compilers/%s/mwcceppc.exe' % ver, flags
+
+
+CC, ALL = unit_flags(unit)
+CFLAGS, DEFS, k = [], [], 0             # compile.sh gets no -i/-D: base.c is already preprocessed
+while k < len(ALL):
+    if ALL[k] in ('-i', '-I', '-ir'):
+        k += 2
+        continue
+    (DEFS if ALL[k].startswith('-D') else CFLAGS).append(ALL[k])
+    k += 1
 
 
 def bracket_end(s, i):
