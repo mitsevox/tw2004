@@ -274,7 +274,9 @@ typedef struct CamTuning {
     f32  fE4;                   // 0x0E4  CamScript_GetLookAtPoint: the aim's lag on the ball (fn_800422C4,
                                 //        fn_8004349C); also put in CamScript.fDC
     f32  fE8;                   // 0x0E8  ... its lag on a bone of the golfer (fn_800422C4)
-    u8   unkEC[0xF4 - 0xEC];
+    f32  fEC;                   // 0x0EC  CamScript_CheckOutOfBounds: the camera time before it checks
+                                //        the hole's outline
+    u8   unkF0[0xF4 - 0xF0];
     f32  fF4;                   // 0x0F4  fn_80043C74: a spot is taken when the dot product of its level
                                 //        direction to the ball with the camera's is below this
     u8   unkF8[0xFC - 0xF8];
@@ -282,7 +284,8 @@ typedef struct CamTuning {
                                 //        camera's and the aim's level directions from the ball
     u8   unk100[0x10C - 0x100];
     f32  f10C;                  // 0x10C  fn_80043C74: the camera's height over the ground at the spot
-    u8   unk110[0x120 - 0x110];
+    u8   unk110[0x11C - 0x110];
+    f32  f11C;                  // 0x11C  fn_800418B0: a shot's f94 over this is its wobble's size
     f32  f120;                  // 0x120  fn_800439E4: a camera closer to the pin than this (level, times
                                 //        the lens's fB0) ...
     f32  f124;                  // 0x124  ... and less than this above it counts as in the way

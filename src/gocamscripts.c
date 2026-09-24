@@ -1033,6 +1033,38 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
     fn_8004544C(pOut, vOffset, pOut);
 }
 
+// The shot's wobble at time fTime (at speed fSpeed, 0.1 at least): three sums of cosines at unrelated
+// rates, each 0..1 less a half, scaled by the shot's f94 over the tuning's f11C. Nothing without f94.
+void fn_800418B0(CamShot* pShot, f32* pOut, f32 fTime, f32 fSpeed) {
+    f32 fX;
+    f32 fY;
+    f32 fT;
+    f32 fZ;
+
+    if (pShot->f94 > 0.0f) {
+        if (fSpeed < 0.1f) {
+            fT = 0.1f * fTime;
+        } else {
+            fT = fTime * fSpeed;
+        }
+        fX = (fn_80009638(5.0f * fT) + fn_80009638(7.0f * fT / 3.0f) + fn_80009638(fT / 5.0f) + 3.0f) / 6.0f;
+        fY = (fX + fn_80009638(9.0f * fT)) / 2.0f;
+        fZ = (fY + fn_80009638(11.0f * fT)) / 2.0f;
+        fX -= 0.5f;
+        fY -= 0.5f;
+        fZ -= 0.5f;
+        pOut[0] = fX * (pShot->f94 / lbl_80281F78->f11C);
+        pOut[1] = fY * (pShot->f94 / lbl_80281F78->f11C);
+        pOut[2] = fZ * (pShot->f94 / lbl_80281F78->f11C);
+        pOut[3] = 0.0f;
+    } else {
+        pOut[0] = 0.0f;
+        pOut[1] = 0.0f;
+        pOut[2] = 0.0f;
+        pOut[3] = 0.0f;
+    }
+}
+
 // Raises pPos by fUp and moves it fSide sideways, square to the line from pTarget to it.
 void fn_8004255C(f32* pPos, f32* pTarget, f32 fUp, f32 fSide) {
     f32 vDir[4];
@@ -1451,6 +1483,42 @@ u8 fn_800439E4(f32* pCam, int nPlayer) {
         }
     }
     return bBlocked;
+}
+
+// Puts the camera back on the fairway (CamScript_PutBackOnFairway) when the script asks for it
+// (bE8), or, once the camera has run CamTuning.fEC (or b) and the move is past half way (f98), when
+// the camera has left the hole's outline (fn_80069498) while the ball's next step stays inside it.
+// Only for a next shot (or, without one, a current shot) of bAD 4, and not while fn_800C6D9C holds.
+void CamScript_CheckOutOfBounds(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pSaved,
+                                f32* pPrev, u8 b) {
+    f32 vNext[4];
+    TNetwork* pNet;
+    u8 bEarly = 0;
+
+    if (fn_8000C594() == NULL) return;
+    if (!b && pScript->fCamTime < lbl_80281F78->fEC) {
+        bEarly = 1;
+    }
+    if (fn_800C6D9C()) return;
+    if (pScript->pShot != NULL) {
+        if (pScript->pNextShot != NULL) {
+            if (pScript->pNextShot->bAD != 4) return;
+        } else if (pScript->pShot->bAD != 4) {
+            return;
+        }
+    }
+    if (!bEarly && (b || pScript->f98 > 0.5f)) {
+        pNet = fn_80069498();
+        if (pNet != NULL && fn_8000C140(pCam, pNet, pNet->nNumNodes) == 0) {
+            fn_8004544C(gPlayers[nPlayer].ball.vVel, gPlayers[nPlayer].ball.vPos, vNext);
+            if (!fn_8000C4E0(gPlayers[nPlayer].ball.vPos, vNext, pNet, pNet->nNumNodes)) {
+                CamScript_PutBackOnFairway(pScript, pCam, pSub, nPlayer, pSaved, pPrev);
+            }
+        }
+    }
+    if (pScript->bE8) {
+        CamScript_PutBackOnFairway(pScript, pCam, pSub, nPlayer, pSaved, pPrev);
+    }
 }
 
 // With the flagstick in and no fairway fix running (bCF), a camera close to the pin (level
