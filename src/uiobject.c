@@ -13,6 +13,7 @@ void fn_80013E38(u8* p, s32 v);  // GoRenderCtx_Gc.c
 void fn_8007644C(CamLens* pLens);    // GoCamera.c: free a lens
 void fn_800AE338(void);
 void fn_800AE380(void);
+void fn_800AE3C4(void);
 void fn_800AF0A8(s32 v);
 
 // Free the object, the lens and the lights.
@@ -31,6 +32,17 @@ void fn_800AE380(void) {
     if (lbl_802820D0 == NULL) {
         lbl_802820D0 = fn_80048808((UObjModel*)fn_8000B70C('TEO ', 10003)->uUnk4);
     }
+}
+
+void fn_800AE3C4(void) {
+    lbl_801F5B78[0] = lbl_801F5B98.a28[3];
+    lbl_801F5B78[1] = lbl_801F5B98.a28[3];
+    lbl_801F5B78[2] = lbl_801F5B98.a28[3];
+    lbl_801F5B78[3] = lbl_801F5B98.a28[3];
+    lbl_801F5B78[4] = lbl_801F5B98.a28[3];
+    lbl_801F5B78[5] = lbl_801F5B98.a28[3];
+    lbl_801F5B78[6] = lbl_801F5B98.a28[3];
+    lbl_801F5B78[7] = lbl_801F5B98.a28[3];
 }
 
 void fn_800AF0A8(s32 v) {
