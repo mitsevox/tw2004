@@ -36,6 +36,13 @@ void fn_80077348(void);                 // FE_Manager.c
 // game/frontend.h; it takes a UIStudio*).
 void fn_80168B80(void* pHandler, u32 uEvent);
 void fn_80169B4C(void* pHandler);      // UISApi.c: unload every screen
+void fn_80168C24(void* pHandler, s32 nTicks);     // UIStudio.c: run the UI
+void fn_8016B09C(void* pHandler, u32 uEvent, s32 nArgs, const s32* pArgs);
+void fn_80016B6C(f32 x, f32 y);
+void fn_80012898(s32 nMode);
+void fn_80012C54(s32 v);
+void fn_8001273C(void);
+void fn_800908D4(f32 x0);
 
 u8 fn_8008F39C(void) {
     return lbl_80281F1B;
@@ -91,6 +98,52 @@ u32 fn_8008F610(u16 uGroup, u16 uScreen) {
 }
 
 void fn_8008F644(void) {
+}
+
+// Run and draw the UI for nTicks (while lbl_80281F1A is set), then step lbl_801D880C: counting
+// 0..2 up, and past 2 it is reset and its n4 sent to the menus (0x23) or the round (0x24).
+void fn_8008F648(s32 nTicks) {
+    s32 aArgs[1];
+
+    if (lbl_80281F1A) {
+        fn_8001425C(0);
+        fn_80035118(4, 5);
+        fn_80012F34(0);
+        fn_80012F50(1, 6, 1);
+        fn_80012EF8();
+        if (lbl_80281370 && gSession.nGameType == 3) {
+            fn_80091454();
+        }
+        fn_80014194(NULL);
+        fn_80016B6C(1.0f / 512.0f, 1.0f / 448.0f);
+        fn_80012898(1);
+        fn_80012C54(1);
+        fn_800908D4(0.85f);
+        if (lbl_80281F1C != NULL) {
+            fn_80168C24(lbl_80281F1C->pHandler, nTicks);
+        }
+        fn_800908D4(1.0f);
+        fn_80012C54(0);
+        fn_80016B6C(1.0f, 1.0f);
+        fn_80012F34(1);
+        fn_80012F50(1, 6, 0x80);
+        fn_80012F18(3);
+        fn_80012EF8();
+        if (lbl_801D880C.n0 <= 2 && lbl_801D880C.n0 >= 0) {
+            lbl_801D880C.n0++;
+        } else if (lbl_801D880C.n0 > 2) {
+            lbl_801D880C.n0 = -1;
+            fn_80005AE8(aArgs, 0, sizeof(aArgs));
+            aArgs[0] = lbl_801D880C.n4;
+            if (gSession.nGameType == 3) {
+                fn_8016B09C(lbl_80281F1C->pHandler, 0x23, 1, aArgs);
+            }
+            if (gSession.nGameType >= 4 && gSession.nGameType <= 8) {
+                fn_8016B09C(lbl_80281F1C->pHandler, 0x24, 1, aArgs);
+            }
+        }
+        fn_8001273C();
+    }
 }
 
 void fn_8008F80C(s32 n, s32 b) {
