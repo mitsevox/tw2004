@@ -93,11 +93,11 @@ void fn_8016A510(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
             fn_8016C15C(add.a[0] + pInfo->afAdd[0], add.a[1] + pInfo->afAdd[1], add.a[2] + pInfo->afAdd[2],
                         add.a[3] + pInfo->afAdd[3]);
             pStudio->pfnTransform(1, pNode->pInfo->af8);
-            for (i = 0; i < pNode->nGroups; i++) {
-                UISGroup* pGroup = pNode->ppGroups[i];
+            for (j = 0; j < pNode->nGroups; j++) {
+                UISGroup* pGroup = pNode->ppGroups[j];
                 if (pGroup->pInfo->p0 != NULL) {
-                    for (j = 0; j < pGroup->nEntries; j++) {
-                        UISEntry* pEntry = &pGroup->pEntries[j];
+                    for (i = 0; i < pGroup->nEntries; i++) {
+                        UISEntry* pEntry = &pGroup->pEntries[i];
                         if (pEntry->uHandler == 0xFFFF) {
                             fn_8016A510(pStudio, pScreen, pEntry->u4.nNode, nMsg);
                         } else if (pEntry->n2 != 0 && pEntry->uHandler < pStudio->nHandlers) {
