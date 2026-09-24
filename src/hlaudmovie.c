@@ -569,8 +569,8 @@ void fn_800A96DC(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
     AudVoice** ppVoice;
     AudVoice** ppEnd;
     AudVoice* pVoice;
-    s8 bRight;
     u8 bMono;
+    s8 bRight;
     u8 nChannels;
 
     nChannels = pTrack->pTmpl->n2;
