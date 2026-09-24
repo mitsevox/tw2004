@@ -301,13 +301,13 @@ void fn_8008FD60(u32 uEvent) {
 // Find the colour table among the UI file's tables (the one whose first entry is of kind 0x10)
 // and turn its entries' colour offsets into pointers; with none, p14 is NULL.
 void fn_8008FDDC(FrontEnd* pFE) {
-    UIFile* pFile = pFE->pFile;
+    uptr uBase = (uptr)pFE->pFile;
     UIColorTable* pTable;
     u8 bFound = 0;
     int nTables;
     int i;
 
-    nTables = pFile->p8->nCount;
+    nTables = pFE->pFile->p8->nCount;
     for (i = 0; i < nTables; i++) {
         pTable = pFE->pFile->p8->apTables[i];
 
@@ -319,7 +319,7 @@ void fn_8008FDDC(FrontEnd* pFE) {
     }
     if (bFound) {
         for (i = 0; i < pFE->p14->nCount; i++) {
-            pFE->p14->apEntries[i]->p8 = (u8*)((uptr)pFE->p14->apEntries[i]->p8 + (uptr)pFile);
+            pFE->p14->apEntries[i]->p8 = (u8*)((uptr)pFE->p14->apEntries[i]->p8 + uBase);
         }
     } else {
         pFE->p14 = NULL;
