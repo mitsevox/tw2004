@@ -64,20 +64,20 @@ void fn_800A298C(void) {
 void fn_800A29B4(UStreamObject* pObject) {
     char* pEnd;
     char* p;
-    char* pName;
+    int i;
     char szName[16];
 
     p = (char*)pObject->pData;
     pEnd = strchr(p, '}');
     p = strchr(p + 1, '=');
-    pName = lbl_801F1640[0];
+    i = 0;
     while (p != NULL && p < pEnd) {
         p++;
         sscanf(p, "%s", szName);
         p += strlen(szName);
         p = strchr(p, '=');
-        strcpy(pName, szName);
-        pName += sizeof(lbl_801F1640[0]);
+        strcpy(lbl_801F1640[i], szName);
+        i++;
     }
     fn_80009E70(pObject);
 }
