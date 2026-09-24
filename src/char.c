@@ -339,7 +339,7 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
             vPos[1] += 0.055f;
             Ter_GetEnclosingGroundData(pCourse, vPos, &fLow, &pLowSurface, lbl_801B95D8, &fHigh,
                                        &pHighSurface, lbl_801B95C8);
-            if (fHigh >= -60000.0f) {
+            if (!(fHigh < -60000.0f)) {
                 if (fLow < -60000.0f || pLowSurface->nClass == 7 || pLowSurface->nClass == 0x13 ||
                     fHigh - fLow < 0.05f || fHigh < 1.0f + pPos[1]) {
                     if (pHighSurface->nClass == 0xC || pHighSurface->nClass == 0x12) {
