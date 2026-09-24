@@ -22,11 +22,67 @@ CamLens* fn_8001F004(void);
 f32  fn_8001415C(u8* p);                // GoRenderCtx_Gc.c
 f32  fn_8001416C(u8* p);
 void fn_8009A250(void);                 // SunFlr_Gc.c
-void fn_8009AA28(void);
 void fn_8009B314(u8 v);
 void fn_80035584(s32 v);                // GoTerrain.c
 void fn_80035590(f32* p0);
 void fn_800355B8(f32* p0);
+
+// Fills a24 from [1] with four sweeps of ten steps of 0.1: red up, then green down, then red down,
+// then green up (blue and alpha 1), aCA4 with zeros alongside, and closes the ramp with a copy of
+// entry 1.
+void fn_8009AA28(void) {
+    int n;
+    int i;
+
+    n = 1;
+    for (i = 0; i < 10; i++) {
+        lbl_802813B8->a24[n][0] = 0.1f * i;
+        lbl_802813B8->a24[n][1] = 1.0f;
+        lbl_802813B8->a24[n][2] = 1.0f;
+        lbl_802813B8->a24[n][3] = 1.0f;
+        lbl_802813B8->aCA4[n][0] = 0.0f;
+        lbl_802813B8->aCA4[n][1] = 0.0f;
+        lbl_802813B8->aCA4[n][2] = 0.0f;
+        lbl_802813B8->aCA4[n][3] = 0.0f;
+        n++;
+    }
+    for (i = 0; i < 10; i++) {
+        lbl_802813B8->a24[n][0] = 1.0f;
+        lbl_802813B8->a24[n][1] = 1.0f - 0.1f * i;
+        lbl_802813B8->a24[n][2] = 1.0f;
+        lbl_802813B8->a24[n][3] = 1.0f;
+        lbl_802813B8->aCA4[n][0] = 0.0f;
+        lbl_802813B8->aCA4[n][1] = 0.0f;
+        lbl_802813B8->aCA4[n][2] = 0.0f;
+        lbl_802813B8->aCA4[n][3] = 0.0f;
+        n++;
+    }
+    for (i = 0; i < 10; i++) {
+        lbl_802813B8->a24[n][0] = 1.0f - 0.1f * i;
+        lbl_802813B8->a24[n][1] = 0.0f;
+        lbl_802813B8->a24[n][2] = 1.0f;
+        lbl_802813B8->a24[n][3] = 1.0f;
+        lbl_802813B8->aCA4[n][0] = 0.0f;
+        lbl_802813B8->aCA4[n][1] = 0.0f;
+        lbl_802813B8->aCA4[n][2] = 0.0f;
+        lbl_802813B8->aCA4[n][3] = 0.0f;
+        n++;
+    }
+    for (i = 0; i < 10; i++) {
+        lbl_802813B8->a24[n][0] = 0.0f;
+        lbl_802813B8->a24[n][1] = 0.1f * i;
+        lbl_802813B8->a24[n][2] = 1.0f;
+        lbl_802813B8->a24[n][3] = 1.0f;
+        lbl_802813B8->aCA4[n][0] = 0.0f;
+        lbl_802813B8->aCA4[n][1] = 0.0f;
+        lbl_802813B8->aCA4[n][2] = 0.0f;
+        lbl_802813B8->aCA4[n][3] = 0.0f;
+        n++;
+    }
+    Vec_Copy(lbl_802813B8->a24[1], lbl_802813B8->a24[n]);
+    Vec_Copy(lbl_802813B8->aCA4[1], lbl_802813B8->aCA4[n]);
+    lbl_802813B8->n1948 = n + 1;
+}
 
 // Sets up for nViews views: the tables, each table entry's largest f24, each view's part, and
 // GoTerrain.c's values (v4 = (0, 150, -400), v14 = (0.8, 0.8, 0.4)).

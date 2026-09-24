@@ -104,7 +104,9 @@ typedef struct SunFlrState {
     f32  v4[3];                 // 0x0004  set by GoTerrain.c's fn_80035590
     u8   unk10[4];
     f32  v14[3];                // 0x0014  set by GoTerrain.c's fn_800355B8
-    u8   unk20[0x1924 - 0x20];
+    u8   unk20[4];
+    f32  a24[200][4];           // 0x0024  } colour ramps filled by fn_8009AA28 from [1] on (four
+    f32  aCA4[200][4];          // 0x0CA4  } sweeps of ten, closed with a copy of [1])
     SunFlrSet* p1924;           // 0x1924  lbl_80189E78
     u8*  p1928;                 // 0x1928  lbl_8018A028
     u8*  p192C;                 // 0x192C  lbl_8018A4D8
@@ -112,7 +114,7 @@ typedef struct SunFlrState {
     f32  f1934;                 // 0x1934  0 at set-up
     f32  f1938;                 // 0x1938  1 at set-up
     f32  af193C[3];             // 0x193C  per entry of p1924, its elements' largest f24
-    u8   unk1948[4];
+    s32  n1948;                 // 0x1948  how many of a24/aCA4 fn_8009AA28 filled, plus one
     s32  nViews;                // 0x194C  how many of aView are in use
     SunFlrView aView[4];        // 0x1950
     u8   b1BF0;                 // 0x1BF0  set by fn_8009B314; fn_8009B134 does nothing without it
