@@ -16,6 +16,7 @@ void fn_80027478(CharModel* pModel, IKChain* pChain);
 f32  fn_800275F4(CharModel* pModel, IKChain* pChain, f32* pTarget);   // an IK error (fn_800273BC)
 void fn_80008F20(f32* pQ, f32* pOut);                   // Quaternion.c
 void fn_8001FBA4(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two points by fT
+void fn_8001FB00(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two rotations by fT
 void fn_800BAD60(f32 mtx[4][4], Vec4* src, Vec4* dst);  // VecMath.c: a point through a matrix
 void fn_80009410(f32 fAngle, f32* pOut);                // Quaternion.c
 void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);       // UMemPool.c: inverts a rotation+translation
@@ -858,6 +859,34 @@ void SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform) {
     if (bTransform) {
         fn_80021980(pPose->a10, pPose->a0, aAll, 0x80);
         SKEL_TransformBones(pModel, aAll);
+    }
+}
+
+// Blends poses pA and pB by fT into pOut for nCount bones from nBone: rotations where both have
+// the a30 bit, positions where both have the a20 bit; pOut's a0 and a10 say which it got.
+void fn_800293CC(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pOut, f32 fT) {
+    u32 aCur[4];
+    u32 aPos[4];
+    u32 aRot[4];
+    int nLast;
+
+    fn_8001EA54(pA->a20, pB->a20, aPos, 0x80);
+    fn_8001EA54(pA->a30, pB->a30, aRot, 0x80);
+    fn_8001E938(aCur, 0x80);
+    fn_8001EA34(aCur, nBone);
+    nLast = nBone + nCount - 1;
+    fn_8001E938(pOut->a0, 0x80);
+    fn_8001E938(pOut->a10, 0x80);
+    for (; nBone <= nLast; nBone++) {
+        if (fn_8001E9F4(aRot, aCur, 0x80)) {
+            fn_8001FB00(pA->aBones[nBone].q0, pB->aBones[nBone].q0, pOut->aBones[nBone].q0, fT);
+            fn_80021980(pOut->a0, aCur, pOut->a0, 0x80);
+        }
+        if (fn_8001E9F4(aPos, aCur, 0x80)) {
+            fn_8001FBA4(pA->aBones[nBone].v10, pB->aBones[nBone].v10, pOut->aBones[nBone].v10, fT);
+            fn_80021980(pOut->a10, aCur, pOut->a10, 0x80);
+        }
+        fn_80029C60(aCur, aCur, 0x80, 1);
     }
 }
 
