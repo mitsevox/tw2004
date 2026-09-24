@@ -9,17 +9,18 @@ void fn_800988B8();
 void fn_800988CC();
 
 void fn_80097E98(void);
-void fn_80097EC4(u8* p0);
+void fn_80097EC4(f32* pPos);
 void fn_80097E98(void) {
     fn_80009E70(lbl_80281F78);
     lbl_80281F78 = 0;
 }
 
-void fn_80097EC4(u8* p0) {
+// Two vertices at pPos: through matrix 3 in white, through matrix 0 transparent black.
+void fn_80097EC4(f32* pPos) {
     fn_800988CC(3);
-    fn_800988B8(*(f32*)p0, *(f32*)(p0 + 0x4), *(f32*)(p0 + 0x8));
+    fn_800988B8(pPos[0], pPos[1], pPos[2]);
     fn_800988A0(255, 255, 255, 255);
     fn_800988CC(0);
-    fn_800988B8(*(f32*)p0, *(f32*)(p0 + 0x4), *(f32*)(p0 + 0x8));
+    fn_800988B8(pPos[0], pPos[1], pPos[2]);
     fn_800988A0(0, 0, 0, 0);
 }

@@ -15,7 +15,6 @@ UObjMesh* fn_80048AC4(UObjMesh* pMesh, int i);
 int  fn_80048AD4(UObjMesh* pMesh, int i);
 int  fn_80048AE8(UObject* pObj);
 CamLens* fn_8001F004(void);                 // the current camera's lens (its fFov is read)
-void fn_8003526C(void);
 f32  fn_8001414C(void);
 f32  fn_80014280(f32 f);
 int  fn_80007B2C(UObjMesh* pMesh, void* pCamera, f32 a, f32 fSize, f32 c);   // 3: not drawn
