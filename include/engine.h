@@ -156,6 +156,9 @@ void fn_8000883C(f32* pA, f32* pB, f32 fT);   // quaternion slerp from a to b by
 void fn_80008FCC(f32* pA, f32* pB, f32* pOut); // quaternion product a x b (Quaternion.c)
 void fn_80008BB8(f32* pOut, f32 fA, f32 fB, f32 fC);   // the quaternion of three (negated) angles
 void fn_8000923C(f32* pRot, f32* pOut); // a rotation vector (axis * angle) as a quaternion
+void fn_800093AC(f32 fAngle, f32* pOut); // the quaternion of a rotation by -fAngle about z
+void fn_80009410(f32 fAngle, f32* pOut); // the quaternion of a rotation by -fAngle about y
+void fn_80009474(f32 fAngle, f32* pOut); // the quaternion of a rotation by -fAngle about x
 void fn_80009710(f32* pQ);              // the identity quaternion (0, 0, 0, 1)
 f32  fn_80029B64(f32 x);                // square root (Skeleton.c); x itself when x <= 0
 void fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b

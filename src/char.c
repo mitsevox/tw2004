@@ -79,7 +79,6 @@ void  fn_8000914C(f32* pQ, f32 (*m)[4]);                        // Quaternion.c:
 int   fn_8001BD18(Character* pChar, Clip* pClip);
 void  fn_80008F20(f32* pQ, f32* pOut);                          // Quaternion.c
 void  fn_800090E4(f32* pQ, f32* pIn, f32* pOut);                // Quaternion.c: a vector turned by pQ
-void  fn_80009410(f32 fAngle, f32* pOut);                       // Quaternion.c
 void  fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, int n, f32 fTime);
 void  fn_800280E8(Character* pChar, f32* pPos, int bPlace);     // Skeleton.c
 void  fn_8001EFB4(f32* pA, f32* pB, f32* pOut);
