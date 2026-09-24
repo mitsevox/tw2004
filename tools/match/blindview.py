@@ -149,8 +149,10 @@ def main():
         print('// %s (blind view)' % p.relative_to(ROOT).as_posix())
         print(re.sub(r'\n\s*\n+', '\n', b(body)))
         return
-    if re.fullmatch(r'(0x)?[0-9A-Fa-f]{8}', arg):
-        a = int(arg.removeprefix('0x'), 16)
+    m = re.fullmatch(r'(?:0x|fn_)?([0-9A-Fa-f]{8})', arg)
+    if m:
+        # an address, in any form a blind reader sees it (80102468, 0x80102468, fn_80102468)
+        a = int(m.group(1), 16)
         arg = next((n for n, x in b.game.items() if x == a), 'fn_%08X' % a)
     p, line, body = find_definition(arg)
     if body is None:
