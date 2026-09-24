@@ -551,15 +551,15 @@ int AnimLib_KeepRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* p
 // Merge walk, keep pass: marks nCount - nKeep more clips of each leaf to keep, highest n18 first.
 int AnimLib_KeepBestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx,
                        int nLevel, int nIndex) {
+    int         i;
+    int         nMarked;
     AnimLeaf*   pLeaf;
     AnimLib*    pLib;
+    s16*        pIdx;
+    ClipRecord* pBest;
     int         nExtra;
-    int         nMarked;
-    int         i;
     int         j;
     ClipRecord* pRec;
-    ClipRecord* pBest;
-    s16*        pIdx;
 
     if (pLeafA != NULL) {
         pLeaf = pLeafA;
