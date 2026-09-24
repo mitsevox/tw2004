@@ -1,7 +1,8 @@
 // EventInfo.c (our name): the front end's panel of details about a calendar day's event: for a
 // PGA TOUR event the purse, round, course, leader, score and the defending champion, for a
-// real-time event its rewards, status and dates. Each function fills one line's label and value
-// (lines 3 to 8 of the panel).
+// real-time event its rewards, status and dates. The panel functions fill one line's label and
+// value each (lines 3 to 8 of the panel); three front-end messages give the next real-time event,
+// the clock's date and an award.
 // TW06 keeps the like in fe_calendarpopups.c, but nothing here proves the pairing.
 
 #include "golfer.h"
@@ -89,7 +90,7 @@ void fn_8011D280(int nLine, char* szLabel, char* szValue) {
     }
 }
 
-// A PGA TOUR event played: the winner, the winning score, the player's earnings and finish.
+// A PGA TOUR event played: the winner, the winning score, the winner's earnings, your finish.
 void fn_8011D4DC(int nLine, char* szLabel, char* szValue) {
     char sz[128];
     s32 nId;
@@ -184,7 +185,7 @@ void fn_8011D858(int nLine, char* szLabel, char* szValue) {
     fn_8011D658(nLine, szLabel, szValue);
 }
 
-// A real-time event to come: the purse and up to three rewards.
+// A real-time event (day panel 4: today's): the purse and up to three rewards.
 void fn_8011D878(int nLine, char* szLabel, char* szValue) {
     char szReward1[36];
     char szReward2[36];
@@ -239,7 +240,8 @@ void fn_8011D878(int nLine, char* szLabel, char* szValue) {
     }
 }
 
-// A real-time event played: whether the player completed it, then the purse and rewards.
+// A real-time event (day panel 5: an earlier day's, or today's when fn_800F102C): whether the
+// player completed it, then the purse and rewards.
 void fn_8011DA44(int nLine, char* szLabel, char* szValue) {
     char szReward1[36];
     char szReward2[36];
@@ -300,7 +302,8 @@ void fn_8011DA44(int nLine, char* szLabel, char* szValue) {
     }
 }
 
-// The same for a real-time event on another day.
+// As fn_8011D878 (the purse and up to three rewards), for a real-time event on a later day (day
+// panel 6).
 void fn_8011DC30(int nLine, char* szLabel, char* szValue) {
     char szReward1[36];
     char szReward2[36];
@@ -355,8 +358,8 @@ void fn_8011DC30(int nLine, char* szLabel, char* szValue) {
     }
 }
 
-// The next real-time event: name, "Status (?)", its start date; flashes (sound 0x19) when it is
-// a day or less away and a profile is loaded. Gives whether it flashed.
+// The next real-time event: name, "Status (?)", its start date; when it is a day or less away and
+// a profile is loaded, calls GameAudio's fn_800A73F0(0x19). Gives whether it did.
 void fn_8011DDFC(MsgArg* pArgs, MsgArg* pResult) {
     char* szName = ((MsgString*)pArgs[0].p)->pStr;
     char* szStatus = ((MsgString*)pArgs[1].p)->pStr;
@@ -375,9 +378,9 @@ void fn_8011DDFC(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(szName, GameModeDriverRTE_GetName(nEvent));
     strcpy(szStatus, "Status (?)");
     strcpy(szDate, "Start Date");
-    fn_800D28DC(nDate, szDate);
+    CalDate_ToString(nDate, szDate);
     bNear = 0;
-    if (nDate - fn_800D2994() < 2 && lbl_801D7148.aLoaded[0]) {
+    if (nDate - CalDate_GetToday() < 2 && lbl_801D7148.aLoaded[0]) {
         bNear = 1;
     }
     // fake match: worked out as an int and kept as a u8 (one clrlwi for the test and the result);
@@ -389,7 +392,8 @@ void fn_8011DDFC(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = bSoon;
 }
 
-// The clock's date and time as text, while the clock reads before October 2003 (not set yet).
+// The clock's date and time as text while the clock's year is before 2003 and its month before
+// October; else an empty string. Gives which.
 void fn_8011DEF0(MsgArg* pArgs, MsgArg* pResult) {
     s32 nMonth;
     s32 nYear;
@@ -424,7 +428,7 @@ void fn_8011DF90(MsgArg* pArgs, MsgArg* pResult) {
     *pPrize = fn_800F1154(nId);
     bWon = pProfile->aRTEAward[nId].bWon;
     if (bWon) {
-        fn_800D28DC(pProfile->aRTEAward[nId].nDate, szDate);
+        CalDate_ToString(pProfile->aRTEAward[nId].nDate, szDate);
     } else {
         szDate[0] = '\0';
     }

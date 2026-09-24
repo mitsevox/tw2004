@@ -302,7 +302,7 @@ typedef struct ViewController {
 } ViewController;
 LAYOUT_ASSERT(ViewController, 0x288);
 
-// The camera tuning values (GoGolfCam.c), allocated and set by GoCamTuningVars.c's fn_800977F8.
+// The camera tuning values (GoGolfCam.c), allocated and set by GoCamTuningVars.c's CameraTuning_Init.
 typedef struct CamTuning {
     f32  f0;                    // 0x000  the zoom-to-aim camera's base speed
     f32  f4;                    // 0x004  the zoom-to-aim camera's distance back from the target
@@ -849,8 +849,8 @@ u8     fn_800C7340(View* pView, int nPlayer);
 
 // ---- frame buffers (GoFrameBuf.c) -----------------------------------------------------------
 
-// A frame buffer's size and scale (0x34 bytes; fn_8006E1C8 makes one). The last seven fields are
-// worked out from the first six by fn_8006E150.
+// A frame buffer's size and scale (0x34 bytes; FB_spCreateFrameBuffer makes one). The last seven fields are
+// worked out from the first six by FB_vUpdateInternalFrameBufferData.
 typedef struct GoFrameBuf {
     f32  f0;                    // 0x00  0 by default
     f32  f4;                    // 0x04  0 by default
@@ -868,11 +868,11 @@ typedef struct GoFrameBuf {
 } GoFrameBuf;
 LAYOUT_ASSERT(GoFrameBuf, 0x34);
 
-void        fn_8006E150(GoFrameBuf* pBuf);   // work out the derived fields
-GoFrameBuf* fn_8006E1C8(void);               // a new frame buffer with the default size
-void        fn_8006E214(GoFrameBuf* pBuf);   // free it
-void        fn_8006E234(GoFrameBuf* pBuf);   // the default size: 512 x 448, scale 1
-void        fn_8006E26C(GoFrameBuf* pBuf, f32 f0, f32 f4, f32 fWidth, f32 fHeight, f32 f10, f32 f14);
+void        FB_vUpdateInternalFrameBufferData(GoFrameBuf* pBuf);   // work out the derived fields
+GoFrameBuf* FB_spCreateFrameBuffer(void);               // a new frame buffer with the default size
+void        FB_vReleaseFrameBuffer(GoFrameBuf* pBuf);   // free it
+void        FB_vSetDefaultFrameBuffer(GoFrameBuf* pBuf);   // the default size: 512 x 448, scale 1
+void        FB_vSetFrameBuffer(GoFrameBuf* pBuf, f32 f0, f32 f4, f32 fWidth, f32 fHeight, f32 f10, f32 f14);
 f32         fn_8001415C(GoFrameBuf* pBuf);   // GoRenderCtx_Gc.c: fHeight
 f32         fn_80014164(GoFrameBuf* pBuf);   // f4
 f32         fn_8001416C(GoFrameBuf* pBuf);   // fWidth
@@ -886,8 +886,8 @@ void     CA_vSetLookAt(CamLens* pLens, f32* pPos, f32* pTarget);   // aims the l
 void     CA_vInitCamera(CamLens* pLens);
 void     fn_80076948(CamLens* pLens, f32 fB4, f32 fB8);   // sets fB4 and fB8
 void     fn_80076A0C_SetType(CamLens* pLens, s32 nType);          // sets nType
-f32*     fn_80076ACC(void);                     // a new screen rectangle
-void     fn_80076B18(f32* pRect);               // free it
+f32*     VM_spCreateViewport(void);                     // a new screen rectangle
+void     VM_vReleaseViewport(f32* pRect);               // free it
 void     fn_800B3438(f32* pRect, f32 x, f32 y); // shadow.c
 CamLens* fn_8001F004(void);                     // char.c
 

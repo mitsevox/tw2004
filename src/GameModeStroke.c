@@ -1,6 +1,6 @@
 // GameModeStroke.c (TW06's GameModeStroke, matched by method order): game mode 0, stroke play for
 // up to four players. The lowest score on the last hole played has the honor, the farthest from the
-// pin plays next, and a human who beats CPU golfers wins the best one's prize. Modes 9, 12, 13..17
+// pin plays next, and a human who beats CPU golfers wins the best one's prize. Modes 9, 12..17, 22
 // and 23 reuse some of these callbacks.
 
 #include "golfer.h"
@@ -10,7 +10,7 @@
 
 void GameModeStroke_EndGame(void);
 
-// Up to four players, one mulligan each.
+// One mulligan per player per round (nMulligans 2), one view.
 void GameModeStroke_Init(void) {
     gpGame->pfnInit = GameModeStroke_Init;
     gpGame->pfnSetupNextGolfer = GameModeStroke_SetupNextGolfer;
@@ -28,8 +28,8 @@ void GameModeStroke_Init(void) {
     gSession.nSplitScreen = 0;
 }
 
-// The hole starts: in split screen everyone
-// plays at once; otherwise the first golfer gets ready and the others wait.
+// In split screen everyone plays at once; otherwise whoever plays next (the mode's honors) gets
+// ready and the others wait.
 void GameModeStroke_SetupNextGolfer(void) {
     int i;
     if (gSession.nSplitScreen == 1) {

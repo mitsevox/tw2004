@@ -54,7 +54,7 @@ void fn_8012597C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_80077ACC()->a1C0[nTrophy + 12].bWon;
     strcpy(szName, lbl_8019543C[nTrophy]);
     if (pResult->i) {
-        fn_800D28DC(fn_80077ACC()->a1C0[nTrophy + 12].nDate, szDate);
+        CalDate_ToString(fn_80077ACC()->a1C0[nTrophy + 12].nDate, szDate);
         return;
     }
     szDate[0] = '\0';
@@ -96,7 +96,7 @@ void fn_80125AA4(MsgArg* pArgs, MsgArg* pResult) {
     pProfile = fn_80077ACC();
     for (i = 0; i < 118; i++) {
         nDate = fn_800F0FBC(i);
-        fn_800D2714(&nDate, &nEventMonth, &nDay, &nDay);
+        CalDate_GetMDY(&nDate, &nEventMonth, &nDay, &nDay);
         if (nEventMonth == nMonth && pProfile->a104D0[i]) {
             nCount++;
         }
@@ -131,7 +131,7 @@ void fn_80125BD8(MsgArg* pArgs, MsgArg* pResult) {
         return;
     }
     if (pProfile->aMedal[nGroup - 1] != 3) {
-        fn_800D28DC(pProfile->aMedalDate[nGroup - 1], szOut);
+        CalDate_ToString(pProfile->aMedalDate[nGroup - 1], szOut);
         return;
     }
     szOut[0] = '\0';
@@ -147,7 +147,7 @@ void fn_80125C5C(MsgArg* pArgs, MsgArg* pResult) {
 
     strcpy(szCourse, lbl_80191990[GameMode4_GetEventCourse(nEvent)]);
     if (pProfile->aLadderAward[nEvent].bWon) {
-        fn_800D28DC(fn_80077ACC()->aLadderAward[nEvent].nDate, szDate);
+        CalDate_ToString(fn_80077ACC()->aLadderAward[nEvent].nDate, szDate);
         return;
     }
     szDate[0] = '\0';
@@ -181,7 +181,7 @@ void fn_80125DE0(MsgArg* pArgs, MsgArg* pResult) {
     char szDate[12];    // the size is not known (the frame leaves room for 12 bytes)
 
     if (fn_80077ACC()->aAward[nAward].bWon == 1) {
-        fn_800D28DC(fn_80077ACC()->aAward[nAward].nDate, szDate);
+        CalDate_ToString(fn_80077ACC()->aAward[nAward].nDate, szDate);
         sprintf(szOut, "Earned on %s", szDate);
         return;
     }

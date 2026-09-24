@@ -1408,7 +1408,7 @@ void Emotion_UpdatePlayerEmotion(int nPlayer);
 void fn_8006B2C4(int nPlayer, u8 bBefore);   // the shot's outcome from the ball (bBefore: ballBefore)
 void fn_8006BAA8(int nPlayer);
 void fn_8006BF60(int nPlayer);          // the replay recorder
-void fn_8006C300(int nPlayer);
+void REPLAY_Play(int nPlayer);
 void fn_8006C4A0(void);                 // clears gSession.bReplay: a saved replay's playback ends
 void fn_8006F4B4(void);
 void fn_8009B970(int nView);

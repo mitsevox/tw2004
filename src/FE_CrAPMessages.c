@@ -13,7 +13,7 @@
 void fn_80103B74(u8 b);                 // FE_CrAPDB.c: set the database's b14
 void fn_801073DC(s16 nSlot);            // FE_CrAPDB.c
 void fn_800A73F0(s32 n);
-u8   fn_800D256C(u32 nYear);            // Calendar.c: a leap year (1900 counts as one)
+u8   IsLeapYear(u32 nYear);            // Calendar.c: a leap year (1900 counts as one)
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -1246,7 +1246,7 @@ void fn_8010A3C4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8010A3C8(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800D256C(pArgs[0].i);
+    pResult->i = IsLeapYear(pArgs[0].i);
 }
 
 // ---- end of sweep code ----

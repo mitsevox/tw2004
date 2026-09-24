@@ -2518,7 +2518,7 @@ void fn_8008A2E0(MsgArg* pArgs, MsgArg* pResult) {
     ((MsgString*)pArgs[1].p)->pStr[0] = '$';
     fn_800907AC(pTour->n8, ((MsgString*)pArgs[1].p)->pStr + 1);
     strcpy(((MsgString*)pArgs[2].p)->pStr, GameModeDriverPGATour_GetName(gpSaveData->tour.nEvent));
-    fn_800D28DC(GameModeDriverPGATour_GetEndDate(gpSaveData->tour.nEvent), ((MsgString*)pArgs[3].p)->pStr);
+    CalDate_ToString(GameModeDriverPGATour_GetEndDate(gpSaveData->tour.nEvent), ((MsgString*)pArgs[3].p)->pStr);
     nPlace = pTour->n4;
     if (nPlace > 100) {
         nPlace = pTour->n4 % 100;
