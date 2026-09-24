@@ -75,7 +75,7 @@ void  fn_8001C860(Character* pChar);
 void  fn_80021978(u8 v);                                        // ska_shared.c
 void  fn_8002787C(CharModel* pModel);                           // Skeleton.c
 void  fn_800279C0(Character* pChar);                            // Skeleton.c
-void  SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, int n);   // Skeleton.c
+void  SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform);   // Skeleton.c
 void  fn_80037C48(Skin* pSkin, SkelPose* pPose);                // Skin.c
 void  fn_8007260C(Character* pChar, SKABlendNode* pNode, CharModel* pModel, f32 fTime);  // animblender.c
 void  fn_80072ED8(void* pAnim, SKABlendNode* pNode, f32 fTime);                          // animblender.c

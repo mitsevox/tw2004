@@ -16,6 +16,7 @@ void fn_80027478(CharModel* pModel, IKChain* pChain);
 void fn_80008F20(f32* pQ, f32* pOut);                   // Quaternion.c
 void fn_8001FBA4(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two points by fT
 void fn_800BAD60(f32 mtx[4][4], Vec4* src, Vec4* dst);  // VecMath.c: a point through a matrix
+void fn_80009410(f32 fAngle, f32* pOut);                // Quaternion.c
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // pDst = pSrc's rows
                                                                                 // through pMtx
 void fn_80113E60(void);                                 // DynChain.c
@@ -504,6 +505,65 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
     }
     fn_8001E8A4(pModel->a14, 0x80);
     fn_8001E8A4(pModel->a24, 0x80);
+}
+
+// Copies a pose's bone rotations (bits a0) and positions (bits a10) into the model's bones; with
+// bTransform, then rebuilds those bones. With bEE set, each rotation goes to the bone's aBone2 pair,
+// bone 1 (and 0x52 at the root) turned half a turn, and bone 1, 0x54 and 0x52 get a flipped position.
+void SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform) {
+    u32 aRot[4];
+    u32 aPos[4];
+    u32 aAll[4];
+    f32 qTurn[4];
+    int i;
+
+    fn_80029EF4(pPose->a0, aRot, 0x80);
+    fn_80029EF4(pPose->a10, aPos, 0x80);
+    for (i = 0; i < pModel->nBones; i++) {
+        if (fn_8001E9CC(aRot, i)) {
+            if (pModel->bEE) {
+                if (i == fn_8001EED8(pModel, 1)) {
+                    fn_80009410(PI, qTurn);
+                    fn_80008FCC(pPose->aBones[i].q0, qTurn, pModel->pBones[pModel->aBone2[i]].q0C);
+                    fn_8001EA34(pPose->a0, pModel->aBone2[i]);
+                } else if (i == fn_8001EED8(pModel, 0x52)) {
+                    if (pModel->pBones[i].nParent == 0) {
+                        fn_80009410(PI, qTurn);
+                        fn_80008FCC(pPose->aBones[i].q0, qTurn, pModel->pBones[pModel->aBone2[i]].q0C);
+                        fn_8001EA34(pPose->a0, pModel->aBone2[i]);
+                    } else {
+                        fn_8001E85C(pPose->aBones[i].q0, pModel->pBones[pModel->aBone2[i]].q0C);
+                        fn_8001EA34(pPose->a0, pModel->aBone2[i]);
+                    }
+                } else {
+                    fn_8001E85C(pPose->aBones[i].q0, pModel->pBones[pModel->aBone2[i]].q0C);
+                    fn_8001EA34(pPose->a0, pModel->aBone2[i]);
+                }
+            } else {
+                fn_8001E85C(pPose->aBones[i].q0, pModel->pBones[i].q0C);
+            }
+        }
+        if (fn_8001E9CC(aPos, i)) {
+            if (pModel->bEE && (i == fn_8001EED8(pModel, 1) || i == fn_8001EED8(pModel, 0x54))) {
+                fn_8001E85C(pPose->aBones[i].v10, pModel->pBones[i].v1C);
+                pModel->pBones[i].v1C[2] = -pModel->pBones[i].v1C[2];
+            } else if (pModel->bEE && i == fn_8001EED8(pModel, 0x52)) {
+                if (pModel->pBones[i].nParent == 0) {
+                    fn_8001E85C(pPose->aBones[i].v10, pModel->pBones[i].v1C);
+                    pModel->pBones[i].v1C[2] = -pModel->pBones[i].v1C[2];
+                } else {
+                    fn_8001E85C(pPose->aBones[i].v10, pModel->pBones[i].v1C);
+                    pModel->pBones[i].v1C[0] = -pModel->pBones[i].v1C[0];
+                }
+            } else {
+                fn_8001E85C(pPose->aBones[i].v10, pModel->pBones[i].v1C);
+            }
+        }
+    }
+    if (bTransform) {
+        fn_80021980(pPose->a10, pPose->a0, aAll, 0x80);
+        SKEL_TransformBones(pModel, aAll);
+    }
 }
 
 // Sets up: the identity rotation, then the dynamic chains.
