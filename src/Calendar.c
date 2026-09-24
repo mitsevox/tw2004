@@ -12,15 +12,24 @@ u8 lbl_80191798[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};    // da
 // Whether a year is a leap year. EA bug: 1900 counts as one (it was not), which the day numbers
 // rely on (36525 days from 1900 to 2000).
 u8 fn_800D256C(u32 nYear) {
+    u8 bLeap;
+
     if ((nYear & 3) == 0) {
         if (nYear % 100 == 0) {
-            if (nYear == 1900) return 1;
-            if (nYear % 400 == 0) return 1;
+            if (nYear == 1900) {
+                bLeap = 1;
+            } else if (nYear % 400 == 0) {
+                bLeap = 1;
+            } else {
+                bLeap = 0;
+            }
         } else {
-            return 1;
+            bLeap = 1;
         }
+    } else {
+        bLeap = 0;
     }
-    return 0;
+    return bLeap;
 }
 
 // The days in a year.
