@@ -39,6 +39,7 @@ void fn_800922A8(UIText* pText) {
     Vec4 vEndOut;
     char* szText;
     s32 uFlags;
+    f32 fInvH;
     f32 fX;
     f32 fY;
     f32 fW;
@@ -84,7 +85,8 @@ void fn_800922A8(UIText* pText) {
     vEnd.y = 0.0f;
     vEnd.z = 0.0f;
     vEnd.w = fW;
-    fY = vOut.y * (1.0f / 448.0f);
+    fInvH = 1.0f / 448.0f; // fake match: the factor through a local puts vOut.y first in fmuls
+    fY = vOut.y * fInvH;
     if (pText->nFlags & 0x100) {
         vEnd.x = 512.0f * (pText->v18[0] / 512.0f) + 512.0f * (pText->f30 / 512.0f);
     }
@@ -109,7 +111,7 @@ void fn_800922A8(UIText* pText) {
         fH = vEndOut.y - fY;
     }
     if ((pText->nFlags & 1) && (pText->nFlags & 0x100)) {
-        fX += (vEndOut.x - fX) * 0.5f;
+        fX += (vEndOut.x - fX) / 2.0f;
     }
     if (pText->nFlags & 0x10) {
         aColor[0] = (u8)(lbl_80281F30->a[0] * (pText->aShadowColor[0] + lbl_80281F34->a[0])) / 255.0f;

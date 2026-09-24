@@ -108,21 +108,21 @@ void fn_800AA698(AudSeqEvent* pEvent, AudTrack* pTrack) {
 // Event: a note. Its tone is the event's n3, its loudness the event's n4 through the track's
 // volume; it takes the next free channel, stealing a voice that is easier to steal if none is.
 void fn_800AA744(AudSeqEvent* pEvent, AudTrack* pTrack) {
-    AudVoiceRequest request;
-    AudTrackTmpl* pTmpl;
-    AudSeqTone* pTone;
+    AudTrackTmpl* pTmpl = pTrack->pTmpl;
+    f32 fAttn;
     s16 nVolume;
+    AudSeqTone* pTone;
     u8 bLoops;
+    AudVoiceRequest request;
     u8 nChannel;
     u8 i;
     AudVoice* pVoice;
     AudVoiceParams* pParams;
     f32 f;
 
-    pTmpl = pTrack->pTmpl;
     pTone = fn_800AB384(pTmpl->data.pBank, pEvent->n3);
-    nVolume = fn_800A85FC((f32)(pEvent->n4 << 7),
-                          fn_800A85FC(pTrack->f48, fn_800AA44C(pTmpl->data.pBank->n3)));
+    fAttn = fn_800A85FC(pTrack->f48, fn_800AA44C(pTmpl->data.pBank->n3));
+    nVolume = fn_800A85FC((f32)(pEvent->n4 << 7), fAttn);
     bLoops = pTone->n10 & 1;
     if (nVolume == 0) return;
     if (pTone == NULL) return;
@@ -156,8 +156,8 @@ void fn_800AA744(AudSeqEvent* pEvent, AudTrack* pTrack) {
     request.nIndex = nChannel;
     request.flags.n = 0;
     request.flags.b.b14 = (pTrack->pSource->pSound->n3 & 4) || (pTrack->pTmpl->n0 & 0x20);
-    request.nPriority = nVolume;
     request.flags.b.b9 = bLoops;
+    request.nPriority = nVolume;
     request.n2 = 0x40;
     request.n3 = 0x7F;
     pVoice = Voc_Alloc(&request);
