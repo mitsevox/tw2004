@@ -349,7 +349,7 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
     if (pChar != NULL) {
         if ((pCourse = fn_8000C594()) != NULL) {
             Vec_Copy(pPos, vPos);
-            vPos[1] += 0.055f;
+            vPos[1] += 0.66f / 12.0f;
             Ter_GetEnclosingGroundData(pCourse, vPos, &fLow, &pLowSurface, lbl_801B95D8, &fHigh,
                                        &pHighSurface, lbl_801B95C8);
             if (!(fHigh < -60000.0f)) {
