@@ -57,6 +57,7 @@ f32 fn_80021A98(Clip* pClip, f32 fTime);
 // buffers (kept while they still hold them) and blended by where fTime falls between them. A time
 // at or past the pending event n5CC is held there once.
 void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32 fTime) {
+    int j;
     f32* pRot;
     ClipTrack* pTrack;
     f32* pA10;
@@ -186,8 +187,8 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
         pRange = lbl_80281CCC;
         fn_8001FCD4(fn_8001FCA8((uptr)pClip->pF0, lbl_80281CD0, pClip->n4C));
         pKeys = lbl_80281CD0;
-        for (i = 0; i < pClip->n1C; i++) {
-            pTrack = &((ClipTrack*)pClip->pD0)[i];
+        for (j = 0; j < pClip->n1C; j++) {
+            pTrack = &((ClipTrack*)pClip->pD0)[j];
             if (pTrack->uFlags & 0x10) {
                 pTrack->pKeys = (u16*)pKeys;
                 pKeys += pClip->nFrames * 6;
