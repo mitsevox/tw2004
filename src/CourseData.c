@@ -11,7 +11,6 @@ void fn_800D2A64(UStreamObject* pObject);
 void fn_800D2A90(UStreamObject* pObject);
 s32  fn_800D2B4C(int nHole);
 s32  fn_800D2B80(int nCourse, int nHole, int nTee);
-s32  fn_800D2C30(int nHole, int nTee);
 s32  fn_800D2D40(int nTee);
 s32  fn_800D2DA0(int nTee);
 s32  fn_800D2E00(int nTee);

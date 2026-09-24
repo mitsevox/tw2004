@@ -242,20 +242,22 @@ void fn_80117E98(int nPlayer) {
     s32 nEntrants = fn_80118664(nPlayer);
     u8 bUser;
     u8 bFirst;
+    s32 nPlayoff;
     s32 nPick;
     s32 nWinner;
     s32 i;
     PgaEntrantMC* pWinner;
     s32 nFirstPrize;
+    s32 nPurse;
 
     CalcScoreRankingsIfDirty(nPlayer);
     bUser = fn_8011908C(nPlayer, 0);
     bFirst = lbl_80223C70.aRank[0] == 1;
-    nPick = fn_8011A684(nPlayer);
+    nPlayoff = fn_8011A684(nPlayer);
     if (fn_8011A6F4(nPlayer, 0)) {
         nWinner = 0;
     } else {
-        nPick = Rand_Next(0) % nPick;
+        nPick = Rand_Next(0) % nPlayoff;
         for (i = 0; i < nEntrants; i++) {
             if (fn_8011A6F4(nPlayer, i)) {
                 nWinner = i;
@@ -276,9 +278,9 @@ void fn_80117E98(int nPlayer) {
     }
     nFirstPrize = GameModeDriverPGATour_ComputeFirstPrizeForBracket(gpSaveData[nPlayer].tour.nEvent,
                                                                     fn_800EF0E0(nPlayer));
-    fn_8011BAD4(nPlayer, nFirstPrize,
-                GameModeDriverPGATour_ComputePurseForBracket(gpSaveData[nPlayer].tour.nEvent,
-                                                             fn_800EF0E0(nPlayer)));
+    nPurse = GameModeDriverPGATour_ComputePurseForBracket(gpSaveData[nPlayer].tour.nEvent,
+                                                          fn_800EF0E0(nPlayer));
+    fn_8011BAD4(nPlayer, nFirstPrize, nPurse);
     fn_801180C4(nPlayer, bUser, bFirst);
 }
 
@@ -965,6 +967,142 @@ void fn_80119E28(int nPlayer, int nEntrant, int nRound) {
                 nHole = 0;
             }
         }
+    }
+}
+
+// One hole of a simulated round counted in the entrant's season statistics: the score against
+// par, and a green in regulation, a drive, the putts, a fairway and a bunker save made up from
+// the pro's season form (the player's entrant uses the first pro's).
+void fn_8011A074(int nPlayer, int nRound, int nEntrant, int nHole) {
+    PgaEntrantMC* pEntrantMC = GetEntrantMCPtr(nPlayer, nEntrant);
+    PgaEntrant* pEntrant = GetEntrantNonMCPtr(nEntrant);
+    PgaPro* pPro;
+    PgaStatCounts* pStats = &gpSaveData[nPlayer].tour.aStats[pEntrantMC->nGolfer];
+    s32 nPar;
+    s32 nStrokes;
+    u16 bGIR;
+    s32 bHit;
+    f32 fDrive;
+    f32 fRandom;
+    s32 nDrive;
+    s32 nPutts;
+
+    gbStatsDirty = 1;
+    gbScoresDirty = 1;
+    if (pEntrantMC->nGolfer != PGA_USER_GOLFER) {
+        pPro = &lbl_8024B9CC[pEntrantMC->nGolfer];
+    } else {
+        pPro = &lbl_8024B9CC[0];
+    }
+    nPar = fn_800D2AD8(nHole);
+    nStrokes = pEntrant->aHoleStrokes[nHole];
+
+    pStats->nHoles++;
+    if (nHole == 0) {
+        pStats->nRounds++;
+        if (nRound == 0) {
+            pStats->nEvents++;
+        }
+    }
+    pStats->nStrokes += (u16)nStrokes;
+    if (nStrokes < nPar) {
+        if (nStrokes < nPar - 1) {
+            pStats->nEagles++;
+        }
+        pStats->nBirdies++;
+    } else if (nStrokes > nPar) {
+        pStats->nBogeys++;
+    }
+    if (nHole > 0 && nStrokes < nPar && pEntrant->aHoleStrokes[nHole - 1] > fn_800D2AD8(nHole - 1)) {
+        pStats->nBirdiesAfterBogey++;
+    }
+    switch (nPar) {
+    case 3:
+        pStats->nPar3Holes++;
+        pStats->nPar3Strokes += (u16)nStrokes;
+        if (nStrokes < nPar) {
+            pStats->nPar3Birdies++;
+        }
+        break;
+    case 4:
+        pStats->nPar4Holes++;
+        pStats->nPar4Strokes += (u16)nStrokes;
+        if (nStrokes < nPar) {
+            pStats->nPar4Birdies++;
+        }
+        break;
+    case 5:
+        pStats->nPar5Holes++;
+        pStats->nPar5Strokes += (u16)nStrokes;
+        if (nStrokes < nPar) {
+            pStats->nPar5Birdies++;
+        }
+        break;
+    }
+
+    // A green in regulation: fGIRPct percent of holes.
+    bGIR = 0;
+    if (Rand_Float(0) * 100.0f < pPro->fGIRPct) {
+        bGIR = 1;
+    }
+    pStats->nGreensHit += bGIR;
+    if (nStrokes < nPar && bGIR) {
+        pStats->nGIRBirdies++;
+    }
+    if (nStrokes <= nPar && !bGIR) {
+        pStats->nNonGIRPars++;
+    }
+
+    // The drive: the pro's average plus 30 x a normal random number, no longer than the hole;
+    // one over 520 loses up to 50.
+    fRandom = 30.0f * fn_8000B318(0) + pPro->fDriveAvg;
+    fDrive = (fRandom > 0.0f) ? fRandom : 0.0f;
+    if (fDrive > fn_800D2C30(nHole, 0)) {
+        fDrive = fn_800D2C30(nHole, 0);
+    }
+    if (fDrive > 520.0f) {
+        fDrive -= 50.0f * Rand_Float(0);
+    }
+    nDrive = fDrive;
+    pStats->nLongestDrive = ((u16)nDrive <= pStats->nLongestDrive) ? pStats->nLongestDrive : nDrive;
+    if (fn_800D3080(nHole)) {
+        pStats->nDrives++;
+        pStats->nDriveDistance += (u16)nDrive;
+    }
+
+    // The putts: the pro's average per hole, never more than the strokes less one.
+    nPutts = 0.5f + (0.3f * fn_8000B318(0) + pPro->fPuttAvg / 18.0f);
+    if (nPutts <= 0) {
+        if (Rand_Float(0) < 0.05f) {
+            nPutts = 0;
+        } else {
+            nPutts = 1;
+        }
+    }
+    nPutts = (nPutts <= nStrokes - 1) ? nPutts : nStrokes - 1;
+    if (bGIR) {
+        pStats->nGIRPutts += (u16)nPutts;
+    }
+    pStats->nPutts += (u16)nPutts;
+
+    // A fairway on a par 4 or 5: fFairwayPct percent of them.
+    if (nPar >= 4) {
+        bHit = 0;
+        if (Rand_Float(0) * 100.0f < pPro->fFairwayPct) {
+            bHit = 1;
+        }
+        pStats->nFairwaysHit += bHit;
+        pStats->nFairways++;
+    }
+
+    // A bunker on one hole in ten not under par, saved fSandSavePct percent of the time.
+    if (nStrokes >= nPar && Rand_Float(0) < 0.1f) {
+        bHit = 0;
+        if (Rand_Float(0) * 100.0f < pPro->fSandSavePct) {
+            bHit = 1;
+        }
+        pStats->nBunkerSaves += bHit;
+        pStats->nBunkers++;
     }
 }
 
