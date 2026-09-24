@@ -78,6 +78,7 @@ void GXInitTexObjCI(GXTexObj* pObj, void* pImage, u16 nWidth, u16 nHeight, int e
                     int eWrapT, u8 bMipmap, u32 nTlut);
 void GXInitTlutObj(GXTlutObj* pObj, void* pLut, int eFormat, u16 nEntries);
 void GXLoadTexObj(GXTexObj* pObj, int eMap);
+void GXLoadTlut(GXTlutObj* pObj, u32 nTlut);
 void GXSetNumTexGens(u8 nGens);
 void GXLoadTexMtxIndx(u16 nIndex, u32 nId, int eType);
 
@@ -97,6 +98,7 @@ typedef struct GXLightObj {
     u32 unk0[16];
 } GXLightObj;                   // a light (0x40 bytes)
 
+void GXSetNumChans(u8 nChans);
 void GXSetChanAmbColor(int eChan, GXColor colour);
 void GXSetChanMatColor(int eChan, GXColor colour);
 void GXSetChanCtrl(int eChan, u8 bEnable, int eAmbSrc, int eMatSrc, u32 uLightMask, int eDiffFn,

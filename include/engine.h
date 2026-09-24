@@ -8,6 +8,7 @@
 
 #include "game_types.h"
 #include "platform.h"
+#include "gx.h"
 
 // ---- memory and strings ----------------------------------------------------------------------
 
@@ -698,14 +699,21 @@ typedef struct LLGlyph {
 typedef struct LLFont {
     u8    pad00[0xC];             // 0x00
     LLGlyph* apGlyphs[256];       // 0x0C  by character code; NULL: the font has no such glyph
-    u8    pad40C[0x470 - 0x40C];  // 0x40C
+    u8    pad40C[0x440 - 0x40C];  // 0x40C
+    GXTexObj tex;                 // 0x440
+    s32   nPalette;               // 0x460  its palette in UFontState.aTluts (0..2)
+    u8    pad464[0x46C - 0x464];  // 0x464
+    s32   n46C;                   // 0x46C
     void* p470;                   // 0x470  freed with the font
     s32   n474;                   // 0x474
 } LLFont;
 
 // UFont.c's state (lbl_80280DE0 points at the 0x1E0-byte block lbl_801A34C0).
 typedef struct UFontState {
-    u8    a00[0xA0];              // 0x00  LLFont.c's state (fn_80011034 sets it up)
+    u8    pad00[0xC];             // 0x00  LLFont.c's state from here to 0xA0 (fn_80011034 sets it up)
+    GXTlutObj aTluts[3];          // 0x0C  the three glyph palettes
+    u8    pad30[0x40 - 0x30];     // 0x30
+    u16   aaPalettes[3][16];      // 0x40  IA8 (alpha << 8 | intensity), what aTluts point at
     LLFont* apFonts[6];           // 0xA0  loaded fonts; NULL: a free slot
     UFontContext* apQueue[6];     // 0xB8  each font's queued strings, newest first
     UFontContext* pQueuePool;     // 0xD0  room for 50 queued strings

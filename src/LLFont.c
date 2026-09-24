@@ -1,5 +1,6 @@
-// LLFont.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): not yet decompiled;
-// the sweep code below is the matched small functions.
+// LLFont.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): the font renderer
+// under UFont.c: loads 'sfn ' fonts, sets GX up for text and draws glyphs. The loader
+// (FO_spLoadFontFromStream) and the glyph drawing are not decompiled yet.
 
 #include "engine.h"
 #include "gx.h"
@@ -7,7 +8,55 @@
 static f32 lbl_801A3478[7];             // the projection saved while fonts draw
 static f32 lbl_801A3494[6];             // the viewport saved while fonts draw
 
+// The three glyph palettes: a grey level and an alpha (0x80 = opaque) per glyph pixel value.
+static GXColor lbl_801869C0[3][16] = {
+    {
+        { 0xFF, 0xFF, 0xFF, 0x00 }, { 0xFF, 0xFF, 0xFF, 0x08 }, { 0xFF, 0xFF, 0xFF, 0x11 },
+        { 0xFF, 0xFF, 0xFF, 0x19 }, { 0xFF, 0xFF, 0xFF, 0x22 }, { 0xFF, 0xFF, 0xFF, 0x2A },
+        { 0xFF, 0xFF, 0xFF, 0x33 }, { 0xFF, 0xFF, 0xFF, 0x3B }, { 0xFF, 0xFF, 0xFF, 0x44 },
+        { 0xFF, 0xFF, 0xFF, 0x4C }, { 0xFF, 0xFF, 0xFF, 0x55 }, { 0xFF, 0xFF, 0xFF, 0x5D },
+        { 0xFF, 0xFF, 0xFF, 0x66 }, { 0xFF, 0xFF, 0xFF, 0x6E }, { 0xFF, 0xFF, 0xFF, 0x77 },
+        { 0xFF, 0xFF, 0xFF, 0x80 },
+    },
+    {
+        { 0x80, 0x80, 0x80, 0x00 }, { 0x6F, 0x6F, 0x6F, 0x07 }, { 0x5F, 0x5F, 0x5F, 0x0F },
+        { 0x50, 0x50, 0x50, 0x17 }, { 0x3F, 0x3F, 0x3F, 0x20 }, { 0x2F, 0x2F, 0x2F, 0x4F },
+        { 0x20, 0x20, 0x20, 0x5F }, { 0x0F, 0x0F, 0x0F, 0x6F }, { 0x00, 0x00, 0x00, 0x80 },
+        { 0x12, 0x12, 0x12, 0x80 }, { 0x24, 0x24, 0x24, 0x80 }, { 0x36, 0x36, 0x36, 0x80 },
+        { 0x48, 0x48, 0x48, 0x80 }, { 0x5B, 0x5B, 0x5B, 0x80 }, { 0x6D, 0x6D, 0x6D, 0x80 },
+        { 0x80, 0x80, 0x80, 0x80 },
+    },
+    {
+        { 0xFF, 0xFF, 0xFF, 0x00 }, { 0x00, 0x00, 0x00, 0x80 }, { 0x3F, 0x3F, 0x3F, 0x5F },
+        { 0x7F, 0x7F, 0x7F, 0x3F }, { 0xBF, 0xBF, 0xBF, 0x1F }, { 0xFF, 0xFF, 0xFF, 0x19 },
+        { 0xFF, 0xFF, 0xFF, 0x33 }, { 0xFF, 0xFF, 0xFF, 0x4C }, { 0xFF, 0xFF, 0xFF, 0x66 },
+        { 0xFF, 0xFF, 0xFF, 0x80 }, { 0xCB, 0xCB, 0xCB, 0x80 }, { 0x98, 0x98, 0x98, 0x80 },
+        { 0x65, 0x65, 0x65, 0x80 }, { 0x32, 0x32, 0x32, 0x80 }, { 0x00, 0x00, 0x00, 0x80 },
+        { 0x00, 0x00, 0x00, 0x80 },
+    },
+};
+
 void fn_80012444(f32* pViewport);
+void fn_8001247C(s32 eDst, s32 eFunc, s32 eSrc, s32 nMtx);
+
+// Builds the three glyph palettes as IA8 (alpha doubled from the table's 0x80 scale, the grey level
+// from its red) and their TLUT objects.
+void fn_80011034(UFontState* pState) {
+    int i;
+    int j;
+    int nAlpha;
+
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 16; j++) {
+            nAlpha = lbl_801869C0[i][j].a * 2;
+            if (nAlpha > 255) {
+                nAlpha = 255;
+            }
+            pState->aaPalettes[i][j] = lbl_801869C0[i][j].r | (nAlpha << 8);
+        }
+        GXInitTlutObj(&pState->aTluts[i], pState->aaPalettes[i], 0, 16);
+    }
+}
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -60,6 +109,25 @@ void fn_800112DC(void) {
     GXSetProjectionv(lbl_801A3478);
 }
 
+// Sets the TEV up to draw pFont's glyphs: one stage, the glyph texture's colour times the vertex
+// colour, through the font's palette, alpha blended.
+void fn_80011310(LLFont* pFont, UFontState* pState) {
+    pFont->n46C = 0;
+    fn_8001247C(0, 1, 4, 60);
+    GXSetTevOrder(0, 0, 0, 4);
+    GXSetNumTevStages(1);
+    GXSetNumChans(1);
+    GXSetNumTexGens(1);
+    GXSetChanCtrl(4, 0, 0, 1, 0, 0, 2);
+    GXSetTevColorIn(0, 15, 8, 10, 15);
+    GXSetTevColorOp(0, 0, 0, 0, 1, 0);
+    GXSetTevAlphaIn(0, 7, 4, 5, 7);
+    GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
+    GXLoadTlut(&pState->aTluts[pFont->nPalette], 0);
+    GXLoadTexObj(&pFont->tex, 0);
+    GXSetBlendMode(1, 4, 5, 15);
+}
+
 // UFont.c passes the font; this build does nothing with it.
 void fn_80011C8C(LLFont* pFont) {
 }
@@ -101,7 +169,6 @@ f32 fn_80011C90(LLFont* pFont, UFontContext* pCtx, char* sz) {
 // ---- sweep code (not yet cleaned up) ----
 
 void GXSetTexCoordGen2();
-void fn_8001247C(s32 p0, s32 p1, s32 p2, s32 p3);
 void fn_800124CC(void);
 void fn_800124A4(void);
 void fn_800124A8(void);
@@ -118,8 +185,9 @@ void fn_80012444(f32* pViewport) {
     GXSetViewport(pViewport[0], pViewport[1], pViewport[2], pViewport[3], pViewport[4], pViewport[5]);
 }
 
-void fn_8001247C(s32 p0, s32 p1, s32 p2, s32 p3) {
-    GXSetTexCoordGen2(p0, p1, p2, p3, 0, 125);
+// A texture coordinate generator with no post-transform (matrix 125: GX's identity).
+void fn_8001247C(s32 eDst, s32 eFunc, s32 eSrc, s32 nMtx) {
+    GXSetTexCoordGen2(eDst, eFunc, eSrc, nMtx, 0, 125);
 }
 
 void fn_800124A4(void) {
