@@ -9,8 +9,6 @@
 
 void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
-void fn_80035098(u8 b);                 // GoTerrain.c: renderer state
-void fn_80035154(u8 b);                 // GoTerrain.c: renderer state
 void fn_80035F1C(void);
 
 void DF_vDrawBufferToScreen(int n);
