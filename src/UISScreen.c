@@ -405,29 +405,35 @@ static inline u8 UIS_NodeLinks(UISScreenFile* pData, UISNode* pNode, UISNodeInfo
     return 0;
 }
 
+// The info of the first node pNode links to whose u4 is set, or NULL.
+static inline UISNodeInfo* UIS_LinkedOn(UISScreenFile* pData, UISNode* pNode) {
+    u32 i;
+    u32 j;
+
+    for (i = 0; i < pNode->nGroups; i++) {
+        UISGroup* pGroup = pNode->ppGroups[i];
+        for (j = 0; j < pGroup->nEntries; j++) {
+            UISEntry* pEntry = &pGroup->pEntries[j];
+            if (pEntry->uHandler == 0xFFFF) {
+                UISNodeInfo* pLinked = pData->pNodes[pEntry->u4.nNode].pInfo;
+                if (pLinked->u4 != 0) return pLinked;
+            }
+        }
+    }
+    return NULL;
+}
+
 // Finds the node that links to pInfo's node and returns the info of the first node it links to
 // whose u4 is set.
 UISNodeInfo* fn_8016B6BC(UISScreen* pScreen, UISNodeInfo* pInfo) {
     UISScreenFile* pData;
     u32 i;
-    u32 j;
-    u32 k;
 
     pData = pScreen->pData;
     for (i = 0; i < pData->nNodes; i++) {
         UISNode* pNode = &pData->pNodes[i];
         if (UIS_NodeLinks(pData, pNode, pInfo)) {
-            for (j = 0; j < pNode->nGroups; j++) {
-                UISGroup* pGroup = pNode->ppGroups[j];
-                for (k = 0; k < pGroup->nEntries; k++) {
-                    UISEntry* pEntry = &pGroup->pEntries[k];
-                    if (pEntry->uHandler == 0xFFFF) {
-                        UISNodeInfo* pLinked = pData->pNodes[pEntry->u4.nNode].pInfo;
-                        if (pLinked->u4 != 0) return pLinked;
-                    }
-                }
-            }
-            return NULL;
+            return UIS_LinkedOn(pData, pNode);
         }
     }
     return NULL;
