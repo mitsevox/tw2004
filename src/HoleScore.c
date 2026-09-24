@@ -21,6 +21,7 @@ int  fn_800D1170(int nPlayer, u8 bOnlyFlagged);
 int  fn_800D1250(int nPlayer);
 int  fn_800D1330(int nPlayer);
 void fn_800D1674(f32* pA, f32* pB, f32* pOut);
+void fn_800C8C3C(int nView, f32* pOut);   // GoBreakLine: a point kept per view
 
 // The ball's distance from the pin: where it lies, where the shot started, and where it lay before
 // the shot.
@@ -143,6 +144,40 @@ int fn_800D089C(int nPlayer, u8 bCurrent) {
     return nRun;
 }
 
+// The angle (radians) at the start of the shot, along the ground, from the direction of the pin
+// to that of the player's view's point (fn_800C8C3C); negative on one side.
+f32 fn_800D0960(int nPlayer) {
+    f32 vView[4];
+    f32 vToPin[4];
+    f32 vToView[4];
+    f32 fCos;
+    f32 fAngle;
+
+    fn_800C8C3C(gPlayers[nPlayer].nView[0], vView);
+    fn_800D1674(&gPlayers[nPlayer].ball.pCourse->pin[Game_CurrentPinSet()].x, gPlayers[nPlayer].ball.vStart,
+                vToPin);
+    vToPin[1] = 0.0f;
+    fn_800D1674(vView, gPlayers[nPlayer].ball.vStart, vToView);
+    vToView[1] = 0.0f;
+    if ((f32)fn_80009680(fn_80009744(vToPin)) > 0.0f) {
+        fn_800BAF04(vToPin, vToPin);
+    }
+    if ((f32)fn_80009680(fn_80009744(vToView)) > 0.0f) {
+        fn_800BAF04(vToView, vToView);
+    }
+    fCos = fn_8000C5FC(vToView, vToPin);
+    if (fCos < -1.0f) {
+        fCos = -1.0f;
+    } else if (fCos > 1.0f) {
+        fCos = 1.0f;
+    }
+    fAngle = fn_80009614(fCos);
+    if (vToView[2] * vToPin[0] - vToView[0] * vToPin[2] < 0.0f) {
+        fAngle *= -1.0f;
+    }
+    return fAngle;
+}
+
 // The score the hole will finish on once the tap-in drops: strokes so far plus one, minus par.
 int Hole_ScoreAfterTapIn(int nPlayer) {
     return gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 - fn_800D2B08();
@@ -176,6 +211,43 @@ u32 fn_800D0BAC(int nPlayer) {
         return 0;
     }
     return gSurfaceTypes[gPlayers[nPlayer].ball.nStartSurface].nClass;
+}
+
+// The ground under Player.vBall is not green (class 3) and the hole's strokes so far are three
+// under par or better (bUnder: more than three); without bAnyLie, the ball must also be on the
+// green or in the cup and two under par (bUnder: more).
+u8 fn_800D0BF8(int nPlayer, u8 bUnder, u8 bAnyLie) {
+    SurfaceType* pSurface;
+    int nPar;
+    int nStrokes;
+    int nLie;
+
+    pSurface = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].ball.pCourse, gPlayers[nPlayer].vBall);
+    if (pSurface != NULL) {
+        nPar = fn_800D2B08();
+        if (bAnyLie) {
+            nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
+            if (bUnder) {
+                if (pSurface->nClass != 3 && nStrokes < nPar - 3) {
+                    return 1;
+                }
+            } else if (pSurface->nClass != 3 && nStrokes <= nPar - 3) {
+                return 1;
+            }
+        } else {
+            nLie = gPlayers[nPlayer].ball.nLie;
+            nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
+            if (bUnder) {
+                if (pSurface->nClass != 3 && (nLie == LIE_GREEN_e || nLie == LIE_INCUP_e) && nStrokes < nPar - 2) {
+                    return 1;
+                }
+            } else if (pSurface->nClass != 3 && (nLie == LIE_GREEN_e || nLie == LIE_INCUP_e) &&
+                       nStrokes <= nPar - 2) {
+                return 1;
+            }
+        }
+    }
+    return 0;
 }
 
 // The shot started from class 1 ground (fairway) and the ball now lies 1, 9 or 12 (12: in the cup).
