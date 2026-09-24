@@ -49,13 +49,13 @@ void fn_8001FCD4(ARAMTransfer* pTransfer) {
 }
 
 void fn_80021134(u16* pFrame, f32* pOut, s32 nBones, u32* pBits);
-void fn_8002148C(u8* pFrame, void* pPose, s32 n, u8* pBits, u8* pData);
+void fn_8002148C(u8* pFrame, f32* pOut, s32 nBones, u32* pBits, u16* aBase);
 
 // Decodes frame nFrame of pClip: its second-stream frame into pPose2 (fn_8002148C) and its
 // first-stream frame into pPose1 (fn_80021134), fetching them from ARAM first when the clip's
 // frames live there (then n28 bytes of the first-stream frame are also copied to pExtra).
 // Always returns 1.
-u8 fn_80020328(Clip* pClip, int nFrame, void* pPose2, f32* pPose1, u8* pExtra) {
+u8 fn_80020328(Clip* pClip, int nFrame, f32* pPose2, f32* pPose1, u8* pExtra) {
     ARAMTransfer* pTransfer = NULL;
     u8* pFrame;
 
@@ -71,7 +71,7 @@ u8 fn_80020328(Clip* pClip, int nFrame, void* pPose2, f32* pPose1, u8* pExtra) {
         } else {
             pFrame = pClip->pE4 + pClip->n8E * nFrame;
         }
-        fn_8002148C(pFrame, pPose2, pClip->n58, pClip->pF8, pClip->pE0);
+        fn_8002148C(pFrame, pPose2, pClip->n58, (u32*)pClip->pF8, (u16*)pClip->pE0);
     }
     if (pClip->n0A != 0) {
         if (pClip->uFlags & 4) {
@@ -501,15 +501,16 @@ void fn_80020FF8(f32* pOut, f32 fX, f32 fY, f32 fZ) {
 // x (2) or about y (3), or three angles (0). While lbl_80281CC0 is clear the z and y angles and the
 // last two of three angles are negated (fn_80021978 sets it).
 void fn_80021134(u16* p, f32* pOut, s32 nBones, u32* pBits) {
-    u64 uKind;  // fake match: a 64-bit switch value (the asm compares register pairs)
+    int nBit;   // fake match: 2 * i kept in its own counter for the second bit (i + i gives the first)
     int i;
+    u64 uKind;  // fake match: a 64-bit switch value (the asm compares register pairs)
 
-    for (i = 0; i < nBones; pOut += 4, i++) {
+    for (i = 0, nBit = 0; i < nBones; pOut += 4, nBit += 2, i++) {
         uKind = 0;
-        if (fn_8001E9CC(pBits, i * 2)) {
+        if (fn_8001E9CC(pBits, i + i)) {
             uKind = 1;
         }
-        if (fn_8001E9CC(pBits, i * 2 + 1)) {
+        if (fn_8001E9CC(pBits, nBit + 1)) {
             uKind |= 2;
         }
         switch (uKind) {
@@ -540,6 +541,59 @@ void fn_80021134(u16* p, f32* pOut, s32 nBones, u32* pBits) {
                             -(TWOPI * p[0]) / 65536.0f);
             } else {
                 fn_80020FF8(pOut, TWOPI * p[2] / 65536.0f, TWOPI * p[1] / 65536.0f, TWOPI * p[0] / 65536.0f);
+            }
+            p += 3;
+            break;
+        }
+    }
+}
+
+// Like fn_80021134, for frames stored as one byte per angle: each angle is the bone's base angle
+// in aBase (three u16 angles per bone) minus the byte times 16 (same units).
+void fn_8002148C(u8* p, f32* pOut, s32 nBones, u32* pBits, u16* aBase) {
+    int nBit;   // fake match: as in fn_80021134
+    int i;
+    u64 uKind;  // fake match: a 64-bit switch value (the asm compares register pairs)
+
+    for (i = 0, nBit = 0; i < nBones; aBase += 3, pOut += 4, nBit += 2, i++) {
+        uKind = 0;
+        if (fn_8001E9CC(pBits, i + i)) {
+            uKind = 1;
+        }
+        if (fn_8001E9CC(pBits, nBit + 1)) {
+            uKind |= 2;
+        }
+        switch (uKind) {
+        case 1:
+            if (lbl_80281CC0) {
+                fn_800093AC(TWOPI * aBase[0] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f, pOut);
+            } else {
+                fn_800093AC(-(TWOPI * aBase[0] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f), pOut);
+            }
+            p += 1;
+            break;
+        case 3:
+            if (lbl_80281CC0) {
+                fn_80009410(TWOPI * aBase[1] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f, pOut);
+            } else {
+                fn_80009410(-(TWOPI * aBase[1] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f), pOut);
+            }
+            p += 1;
+            break;
+        case 2:
+            fn_80009474(-(TWOPI * aBase[2] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f), pOut);
+            p += 1;
+            break;
+        case 0:
+        default:
+            if (lbl_80281CC0) {
+                fn_80020FF8(pOut, TWOPI * aBase[2] / 65536.0f - TWOPI * ((u32)(u16)p[2] << 4) / 65536.0f,
+                            -(TWOPI * aBase[1] / 65536.0f - TWOPI * ((u32)(u16)p[1] << 4) / 65536.0f),
+                            -(TWOPI * aBase[0] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f));
+            } else {
+                fn_80020FF8(pOut, TWOPI * aBase[2] / 65536.0f - TWOPI * ((u32)(u16)p[2] << 4) / 65536.0f,
+                            TWOPI * aBase[1] / 65536.0f - TWOPI * ((u32)(u16)p[1] << 4) / 65536.0f,
+                            TWOPI * aBase[0] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f);
             }
             p += 3;
             break;
