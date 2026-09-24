@@ -18,6 +18,7 @@ void fn_801260B8(void);
 void fn_801260BC(void);
 void fn_80126130(void);
 void fn_80126150(void);
+void fn_80126184(void);
 void fn_801262C4(int nPlayer);
 s32 fn_8012632C(void);
 u8   fn_801263C4(int nPlayer, int n);
@@ -201,6 +202,45 @@ void fn_80126150(void) {
 
     fn_80126FB0(&nPlayer);
     fn_800D3548(nPlayer, 5000, NULL);
+}
+
+// The mode's frame: its message once when asked, every 16 frames the current shot's length sent
+// as message 0x4D (a track plays while it is a new nonzero length), and the n18 countdown.
+void fn_80126184(void) {
+    s32 nLength;
+
+    if (lbl_80282580 != 0) {
+        switch (lbl_80195498.n0) {
+        case 0:
+            fn_800E5D40(1);
+            break;
+        case 1:
+            fn_800E5D40(2);
+            break;
+        }
+        fn_80127034(lbl_80282278);
+        lbl_80282580 = 0;
+    }
+    if (lbl_802819A0-- <= 0) {
+        nLength = fn_800D0550(lbl_80282278);
+        fn_80062D38(0x4D, 0, nLength);
+        if (nLength != 0 && nLength != lbl_80282584) {
+            if (lbl_80282588 == 0) {
+                // port: EA passes two arguments fn_800A746C ignores
+                ((void (*)(s32, int, int, int, int))fn_800A746C)(0, 1, 0, 1, 0);
+                lbl_80282588 = 1;
+            }
+        } else if (lbl_80282588 != 0) {
+            // port: EA passes an argument fn_800A74E4 ignores
+            ((void (*)(s32, int, int))fn_800A74E4)(0, 1, 0);
+            lbl_80282588 = 0;
+        }
+        lbl_80282584 = nLength;
+        lbl_802819A0 = 15;
+    }
+    if (lbl_80195498.n8 != 5) {
+        lbl_80195498.n18--;
+    }
 }
 
 void fn_801262C4(int nPlayer) {

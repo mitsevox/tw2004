@@ -650,6 +650,8 @@ void fn_800A6358(void);
 void fn_800A63D0(void);
 void fn_800A6DCC(int nMusic, int a);
 void fn_800A72EC(u8 a, u8 b);
+void fn_800A746C(s32 nKind, int nTrack, int n);     // GameAudio.c: start a track
+void fn_800A74E4(s32 nKind, int nTrack);            // GameAudio.c: stop it
 void fn_800A7664(int nKind, int nMsg, int a);
 void fn_800A76E4(void);
 void fn_800A77E0(f32 f);                // } the options menu passes them 0.2 x options.a0[0], a0[4]

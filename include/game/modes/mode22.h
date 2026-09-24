@@ -20,6 +20,10 @@ typedef struct GameMode22State {
 LAYOUT_ASSERT(GameMode22State, 0x1C);
 
 extern GameMode22State lbl_80195498;
+extern s32 lbl_802819A0;        // frames to the next shot-length check (fn_80126184), from 15
+extern s32 lbl_80282580;        // set: fn_80126184 shows the mode's messages once
+extern s32 lbl_80282584;        // the shot length at the last check
+extern s32 lbl_80282588;        // the track fn_80126184 starts is playing
 extern char* lbl_8019543C[4];   // the trophies' titles ("Rookie of the Year", "Player of the Year", ...)
 // The text fn_80127034 prints (starts as "D"; 0xE zero bytes follow it, so likely 16 bytes).
 extern char lbl_80195488[];
