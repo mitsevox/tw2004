@@ -23,7 +23,7 @@ int SFIOLastDeviceFromMask(u16 uDeviceMask);
 extern void* TibExtMemAlloc(void* pAllocator, u32 uSize, u32 uAlign, const char* pFile, int uLine);
 extern void  TibExtMemFree(void* pAllocator, void* p, u32 uSize, u32 uAlign);
 
-// Default descriptor handed to callers. Starts with 'BM6D'; meaning not yet known.
+// Returned by fn_8016D0A8: a BMP file header ("BM"), 128 x 128 pixels, 8-bit, 256 colours.
 static const u32 gSFIODefaultDescriptor[14] = {
     0x424D3644, 0x00000000, 0x00003604, 0x00002800, 0x00008000, 0x00008000, 0x00000100,
     0x08000000, 0x00000040, 0x0000220B, 0x0000220B, 0x00000001, 0x00000001, 0x00000000,
@@ -31,7 +31,7 @@ static const u32 gSFIODefaultDescriptor[14] = {
 
 // Describe the save to the library: a header block image of exactly one card block, and the data
 // size the host fills in.
-int SFIOCreate(void* pHeader) {
+int fn_8016CFF8_SetSaveDescriptor(void* pHeader) {
     SFIODescriptor desc;
     int eTagError = 0;   // same type as the callee's return: the result goes through r0
     int eError = 0;
@@ -45,7 +45,7 @@ int SFIOCreate(void* pHeader) {
     return eError;
 }
 
-const u32* SFIOGetDefaultDescriptor(void) {
+const u32* fn_8016D0A8(void) {
     return gSFIODefaultDescriptor;
 }
 
@@ -153,7 +153,7 @@ int SFIOStartOp19(int* pDescriptor, int* pProcess) {
 }
 
 #line 629
-int SFIOStartSelectDevice(int eDevice, int* pProcess) {
+int fn_8016DA84_StartUnmount(int eDevice, int* pProcess) {
     SFIO_ASSERT(SFIO_DEVICE_INVALID != eDevice);
     SFIO_ASSERT(NULL != pProcess);
     *pProcess = 1;
@@ -353,13 +353,13 @@ int SFIOValidateErrorOp17(int eError, void* pArg1, void* pArg2) {
     return eError;
 }
 
-int SFIOValidateErrorPassThrough(int eError, void* pArg1, void* pArg2) {
+int fn_8016EA60_ContinueIdle(int eError, void* pArg1, void* pArg2) {
     return eError;
 }
 
-// Asynchronous probe / mount / select sequence. Called with the result of the previous step.
-// *pProcess: 1 = keep calling, 2 = finished.
-int SFIOContinueSelect(int eError, int* pProcess, int* pResult) {
+// Continuation for an open (states 3, 6): find the file on the mounted device, then open it.
+// A failed step unmounts; state 3 then tries the next device. *pProcess: 1 = again, 2 = done.
+int fn_8016EA94_ContinueOpen(int eError, int* pProcess, int* pResult) {
     char szSearchName[0x20];
     if (pProcess == NULL) return 0x12;
     if (pResult == NULL) return 0x12;
@@ -405,7 +405,7 @@ int SFIOContinueSelect(int eError, int* pProcess, int* pResult) {
             }
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
+            return fn_8016DA84_StartUnmount(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 0x16:
@@ -421,7 +421,7 @@ int SFIOContinueSelect(int eError, int* pProcess, int* pResult) {
             }
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
+            return fn_8016DA84_StartUnmount(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 0x1A:
@@ -456,8 +456,8 @@ int SFIOContinueSelect(int eError, int* pProcess, int* pResult) {
     return 0;
 }
 
-// Continuation for the close / verify operations (states 8, 9, 0xA).
-int SFIOContinueClose(int eError, int* pProcess, int* pResult) {
+// Continuation for a seek, write or read (states 8, 9, 0xA); a failure closes and unmounts.
+int fn_8016EF90_ContinueSeekReadWrite(int eError, int* pProcess, int* pResult) {
     if (pProcess == NULL) return 0x12;
     if (pResult == NULL) return 0x12;
     if (!(_SFIO_pData->eState == 8 || _SFIO_pData->eState == 0xA || _SFIO_pData->eState == 9)) return 0x12;
@@ -495,8 +495,8 @@ int SFIOContinueClose(int eError, int* pProcess, int* pResult) {
     return 0;
 }
 
-// Continuation for the unmount sequence (state 7): op 0x18 -> 0x19 -> 0x1A.
-int SFIOContinueUnmount(int eError, int* pProcess, int* pResult) {
+// Continuation for a close (state 7): op 0x18 -> 0x19 (close the file) -> 0x1A (unmount).
+int fn_8016F148_ContinueClose(int eError, int* pProcess, int* pResult) {
     if (pProcess == NULL) return 0x12;
     if (pResult == NULL) return 0x12;
     if (!(_SFIO_pData->eState == 7)) return 0x12;
@@ -517,7 +517,7 @@ int SFIOContinueUnmount(int eError, int* pProcess, int* pResult) {
             _SFIO_pDevice->fn.pfnSelectDevice(_SFIO_pData->Session.eDevice);
         } else {
             SFIOSetLastError(eError);
-            return SFIOStartSelectDevice(_SFIO_pData->Session.eDevice, pProcess);
+            return fn_8016DA84_StartUnmount(_SFIO_pData->Session.eDevice, pProcess);
         }
         break;
     case 0x1A:
@@ -665,8 +665,8 @@ int SFIOGetSessionInfo(SFIOSession* pOut) {
     return 0;
 }
 
-// Begin a save session: pick the device (or start searching for one) and probe it.
-int SFIOBeginLoad(const char* pName, int eDevice, int uSearchDirection) {
+// Start a delete: pick the device (or start searching for one) and mount it.
+int fn_8016FBB8_DeleteStart(const char* pName, int eDevice, int uSearchDirection) {
     if (!SFIOIsInitialized()) return 2;
     if (pName == NULL) return 0xC;
     if (!(eDevice == SFIO_DEVICE_INVALID || (eDevice <= SFIO_DEVICE_LAST && eDevice >= SFIO_DEVICE_FIRST))) return 9;
@@ -702,8 +702,8 @@ int SFIOBeginLoad(const char* pName, int eDevice, int uSearchDirection) {
 }
 
 // Three entry points share one body; they differ only in the state they leave behind
-// (single device / searching): Load 5/2, Save 4/1, Delete 6/3. Save also limits the name length.
-int SFIOBeginSave(const char* pName, int eDevice, int uSearchDirection) {
+// (single device / searching): delete 5/2, create 4/1, open 6/3. Create caps the name at 25 chars.
+int SFIOCreateStart(const char* pName, int eDevice, int uSearchDirection) {
     if (!SFIOIsInitialized()) return 2;
     if (pName == NULL) return 0xC;
     if (strlen(pName) > 25) return 0xC;
@@ -739,7 +739,7 @@ int SFIOBeginSave(const char* pName, int eDevice, int uSearchDirection) {
     return 0;
 }
 
-int SFIOBeginDelete(const char* pName, int eDevice, int uSearchDirection) {
+int fn_8017009C_OpenStart(const char* pName, int eDevice, int uSearchDirection) {
     if (!SFIOIsInitialized()) return 2;
     if (pName == NULL) return 0xC;
 
@@ -775,7 +775,7 @@ int SFIOBeginDelete(const char* pName, int eDevice, int uSearchDirection) {
     return 0;
 }
 
-// Close the session: copy the caller's session info back and start the unmount (op 0x18).
+// Close the session: copy the caller's session info back and start the close sequence (op 0x18).
 int SFIOEnd(SFIOSession* pSession) {
     if (!SFIOIsInitialized()) return 2;
     if (pSession == NULL) return 0xC;
@@ -787,7 +787,7 @@ int SFIOEnd(SFIOSession* pSession) {
     return 0;
 }
 
-// Seek within the open save. uWhence 0 = relative to the header, otherwise absolute.
+// Seek within the open save. uWhence 0 adds the header size, so uOffset counts from the data.
 int SFIOSeek(SFIOSession* pSession, u32 uOffset, u32 uWhence) {
     if (!SFIOIsInitialized()) return 2;
     if (pSession == NULL) return 0xC;
@@ -886,7 +886,7 @@ BOOL SFIOValidateFilename(const char* pFilename) {
     return fn_80172D54(pFilename);
 }
 
-// Convert an ASCII save name to full-width Shift-JIS (what the memory card directory stores).
+// Convert an ASCII string to full-width Shift-JIS; the output gets no terminating 0.
 // Letters and digits map arithmetically; punctuation goes through the table. Output is byte-swapped.
 void SFIOAsciiToShiftJIS(const char* pSrc, u16* pDst) {
     u8 i = 0;
@@ -921,7 +921,7 @@ void SFIOAsciiToShiftJIS(const char* pSrc, u16* pDst) {
     }
 }
 
-// Convert a full-width Shift-JIS name back to ASCII. Inverse of SFIOAsciiToShiftJIS.
+// Shift-JIS back to ASCII, undoing SFIOAsciiToShiftJIS; punctuation after '/' comes back wrong.
 void SFIOShiftJISToAscii(const u16* pSrc, char* pDst) {
     u16 c;
     u8 i = 0;
@@ -976,7 +976,7 @@ void fn_8017124C(SFIODescriptor* pDescriptor, u32* pSize, u32* pEntries) {
     fn_80172D7C(pDescriptor, pSize, pEntries);
 }
 
-void SFIOPlatformCall80172F48(void* const** ppInterface) {
+void fn_80171294_GetChecksumInterface(void* const** ppInterface) {
     fn_80172F48(ppInterface);
 }
 
@@ -989,17 +989,17 @@ extern int fn_80171E94(int eError, int* pProcess, int* pResult);
 extern int fn_801727C8(int eError, int* pProcess, int* pResult);
 
 int (*gSFIOContinueTable[14])(int eError, int* pProcess, int* pResult) = {
-    SFIOValidateErrorPassThrough,   // 0  idle
+    fn_8016EA60_ContinueIdle,   // 0  idle
     fn_80171E94,                    // 1
     fn_801727C8,                    // 2
-    SFIOContinueSelect,             // 3
+    fn_8016EA94_ContinueOpen,             // 3
     fn_80171E94,                    // 4
     fn_801727C8,                    // 5
-    SFIOContinueSelect,             // 6
-    SFIOContinueUnmount,            // 7
-    SFIOContinueClose,              // 8
-    SFIOContinueClose,              // 9
-    SFIOContinueClose,              // 10
+    fn_8016EA94_ContinueOpen,             // 6
+    fn_8016F148_ContinueClose,            // 7
+    fn_8016EF90_ContinueSeekReadWrite,              // 8
+    fn_8016EF90_ContinueSeekReadWrite,              // 9
+    fn_8016EF90_ContinueSeekReadWrite,              // 10
     SFIOContinueAbort,              // 11
     SFIOContinueAbort,              // 12
     SFIOContinueAbort,              // 13

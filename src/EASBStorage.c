@@ -1450,7 +1450,7 @@ EASBErrorE fn_8012B27C(EASBProcessE* peProcess) {
         return EASB_ERROR_INTERNAL;
     }
     if (*peProcess == EASB_PROCESS_NONE) {
-        eError = SFIOCreate(lbl_802825B0->args.pHeader);
+        eError = fn_8016CFF8_SetSaveDescriptor(lbl_802825B0->args.pHeader);
         if (eError == EASB_ERROR_NONE) {
             eError = fn_8012C98C(TagFile_BeginSave("EASB", lbl_802825B0->args.eDevice, 0));
         }

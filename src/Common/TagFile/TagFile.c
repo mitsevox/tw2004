@@ -365,7 +365,7 @@ static int TagFile_Decode(void* pData, u32 uSize) {
 
 static int TagFile_StartDelete(const char* pName, int eDevice, int uSearchDirection, int eOperation) {
     int eError = 0;
-    eError = SFIOBeginDelete(pName, eDevice, uSearchDirection);
+    eError = fn_8017009C_OpenStart(pName, eDevice, uSearchDirection);
     _TagFile_pData->eOperation = eOperation;
     _TagFile_pData->eStep = 4;
     _TagFile_pData->Map.uNumEntries = 0;
@@ -504,7 +504,7 @@ int TagFile_Init(const TagFileInitParams* pParams) {
     }
     // The checksum module hands out its interface as a table of function addresses; this file
     // reads the same table as a ChecksumInterface.
-    SFIOPlatformCall80172F48((void* const**)&_TagFile_pData->pChecksum);
+    fn_80171294_GetChecksumInterface((void* const**)&_TagFile_pData->pChecksum);
     eChecksumError = _TagFile_pData->pChecksum->pfnInit(pParams->pAllocator);
     if (eChecksumError != 0) {
         return TagFile_ChecksumError(eChecksumError);
@@ -585,7 +585,7 @@ int TagFile_BeginSave(const char* pName, int eDevice, int uSearchDirection) {
     int eError = 0;
     _TagFile_pData->eOperation = 1;
     _TagFile_pData->eStep = 1;
-    eError = SFIOBeginSave(pName, eDevice, uSearchDirection);
+    eError = SFIOCreateStart(pName, eDevice, uSearchDirection);
     return TagFile_SFIOError(eError);
 }
 
@@ -593,7 +593,7 @@ int TagFile_BeginLoad(const char* pName, int eDevice, int uSearchDirection) {
     int eError = 0;
     _TagFile_pData->eOperation = 2;
     _TagFile_pData->eStep = 2;
-    eError = SFIOBeginLoad(pName, eDevice, uSearchDirection);
+    eError = fn_8016FBB8_DeleteStart(pName, eDevice, uSearchDirection);
     return TagFile_SFIOError(eError);
 }
 

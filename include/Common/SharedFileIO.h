@@ -96,19 +96,19 @@ void* const* CRC32_GetInterface(void);
 int  SFIOInit(int* pDevices, const SFIOFuncTable* pFuncs, void* pAllocator);
 int  SFIOShutdown(void);
 int  SFIOGetSessionInfo(SFIOSession* pOut);
-int  SFIOBeginLoad(const char* pName, int eDevice, int uSearchDirection);
-int  SFIOBeginSave(const char* pName, int eDevice, int uSearchDirection);
-int  SFIOBeginDelete(const char* pName, int eDevice, int uSearchDirection);
+int  fn_8016FBB8_DeleteStart(const char* pName, int eDevice, int uSearchDirection);
+int  SFIOCreateStart(const char* pName, int eDevice, int uSearchDirection);
+int  fn_8017009C_OpenStart(const char* pName, int eDevice, int uSearchDirection);
 int  SFIOEnd(SFIOSession* pSession);
 int  SFIOSeek(SFIOSession* pSession, u32 uOffset, u32 uWhence);
 int  SFIORead(SFIOSession* pSession, void* pBuffer, u32 uSize);
 int  SFIOWrite(SFIOSession* pSession, void* pBuffer, u32 uSize);
 int  SFIOUpdate(int* pProcess, int* pResult);
 int  SFIOSetDescriptor(SFIODescriptor* pDescriptor);
-void SFIOPlatformCall80172F48(void* const** ppInterface);
+void fn_80171294_GetChecksumInterface(void* const** ppInterface);
 
 // SharedFileIO.c: what EASBStorage.c calls.
-int  SFIOCreate(void* pHeader);
+int  fn_8016CFF8_SetSaveDescriptor(void* pHeader);
 void fn_8017124C(SFIODescriptor* pDescriptor, u32* pSize, u32* pEntries);
 
 // SharedFileIO.c: shared with the platform layer.
@@ -117,7 +117,7 @@ int  SFIOGetLastError(void);
 void SFIOSetLastError(int eError);
 BOOL SFIOValidateFilename(const char* pFilename);
 int  SFIONextDeviceFromMask(u16 uDeviceMask, int uDirection);
-int  SFIOStartSelectDevice(int eDevice, int* pProcess);
+int  fn_8016DA84_StartUnmount(int eDevice, int* pProcess);
 int  SFIOStartOp18(int* pHandle, int* pProcess);
 int  SFIOStartOp19(int* pHandle, int* pProcess);
 
