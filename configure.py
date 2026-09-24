@@ -480,7 +480,6 @@ config.libs = [
             Object(Matching, "src/os/OSFont.c"),
             Object(Matching, "src/os/OSLink.c"),
             Object(Matching, "src/os/OSSemaphore.c"),
-            Object(Matching, "src/os/__ppc_eabi_init.c"),
             Object(Matching, "src/card/CARDBios.c"),
             Object(Matching, "src/card/CARDRdwr.c"),
         ],
@@ -780,6 +779,7 @@ config.libs = [
             Object(Matching, "dolphin/os/OSMutex.c"),
             Object(Matching, "dolphin/os/OSSync.c"),
             Object(Matching, "dolphin/os/__start.c"),
+            Object(Matching, "dolphin/os/__ppc_eabi_init.cpp"),
         ],
     },
     {

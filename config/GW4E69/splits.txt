@@ -1248,7 +1248,11 @@ dolphin/os/OSTime.c:
 	.text       start:0x8014E48C end:0x8014E8B0
 	.data       start:0x8019C2E0 end:0x8019C340
 
-src/os/__ppc_eabi_init.c:
+dolphin/os/__start.c:
+	.init       start:0x80003100 end:0x80003354
+
+dolphin/os/__ppc_eabi_init.cpp:
+	.init       start:0x80003354 end:0x800033A8
 	.text       start:0x8014E8B0 end:0x8014E944
 
 dolphin/pad/PadClamp.c:
@@ -1536,9 +1540,6 @@ MetroTRK/notify.c:
 
 MetroTRK/flush_cache.c:
 	.text       start:0x80162278 end:0x801622B0
-
-dolphin/os/__start.c:
-	.init       start:0x80003100 end:0x80003354
 
 runtime/__mem.c:
 	.init       start:0x800033A8 end:0x800034E0
