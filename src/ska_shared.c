@@ -423,6 +423,35 @@ Clip* fn_80020F60(Clip* pClip, u32 uAram) {
     return pClip;
 }
 
+// The rotation quaternion (x, y, z, w) of the angles fX, fY and fZ (radians).
+void fn_80020FF8(f32* pOut, f32 fX, f32 fY, f32 fZ) {
+    f32 fHalfX;
+    f32 fHalfZ;
+    f32 fHalfY;
+    f32 fSinX;
+    f32 fCosX;
+    f32 fSinY;
+    f32 fCosY;
+    f32 fSinZ;
+    f32 fCosZ;
+    f32 fCosXY;
+
+    fHalfX = 0.5f * fX;
+    fSinX = fn_800095F0(fHalfX);
+    fCosX = fn_80009638(fHalfX);
+    fHalfZ = 0.5f * fZ;
+    fSinZ = fn_800095F0(fHalfZ);
+    fCosZ = fn_80009638(fHalfZ);
+    fHalfY = 0.5f * fY;
+    fSinY = fn_800095F0(fHalfY);
+    fCosY = fn_80009638(fHalfY);
+    fCosXY = fCosX * fCosY;
+    pOut[3] = fCosZ * fCosXY - fSinZ * (fSinX * fSinY);
+    pOut[0] = fSinZ * (fCosX * fSinY) + fSinX * (fCosZ * fCosY);
+    pOut[1] = fSinZ * (-fCosY * fSinX) + fSinY * (fCosZ * fCosX);
+    pOut[2] = fSinZ * fCosXY + fSinY * (fCosZ * fSinX);
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
 extern u8 lbl_80281CC0;
