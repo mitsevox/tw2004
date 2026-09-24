@@ -79,8 +79,11 @@ void fn_800C830C(void) {
 // and the ball is within an inch of the pin (EA's test; distances in yards).
 void BreakLine_Update(int nView) {
     int nPlayer = fn_8001707C(nView);
+    f32 fDist;
 
-    if (36.0f * Vec_Distance(lbl_80282228->vPin, gPlayers[nPlayer].vTarget) <= 1.0f &&
+    fDist = Vec_Distance(lbl_80282228->vPin, gPlayers[nPlayer].vTarget);
+    fDist *= 36.0f;                     // yards to inches
+    if (fDist <= 1.0f &&
         gPlayers[nPlayer].nShotKind == 0 && gPlayers[nPlayer].swing.nState == 0 &&
         gPlayers[nPlayer].fDistance < 75.0f && !Player_IsCPU(nPlayer) && lbl_8028222C) {
         if (!lbl_80282228->abSkip[nView]) {
