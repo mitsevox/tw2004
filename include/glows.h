@@ -135,6 +135,32 @@ typedef struct SunFlrState {
 
 extern SunFlrState* lbl_802813B8;
 
+// Code800BA940.c's glows: two at each view's ball (our names). Each grows from fStartSize to
+// fMaxSize, fading out past fFadeSize, and is drawn larger the further the camera is.
+typedef struct BallGlow {
+    f32  vPos[3];               // 0x00  the ball's position
+    f32  fScale;                // 0x0C  fDistScale times the camera's distance to the ball
+} BallGlow;
+
+typedef struct BallGlowState {
+    f32  aColour[2][4];         // 0x00  per view: red, green, blue (0..1); [3] not read here
+    f32  aSize[2][2];           // 0x20  per view, per glow
+    u8   unk30[0x38 - 0x30];
+    BallGlow aGlow[2][2];       // 0x38
+    u8   aRGBA[2][2][4];        // 0x78  aColour and the fade, as bytes
+    f32  f88;                   // 0x88
+    f32  f8C;                   // 0x8C
+    f32  f90;                   // 0x90
+    f32  fMaxSize;              // 0x94
+    f32  fFadeSize;             // 0x98
+    f32  fGrowth;               // 0x9C  per frame
+    f32  fStartSize;            // 0xA0
+    f32  fDistScale;            // 0xA4
+} BallGlowState;
+LAYOUT_ASSERT(BallGlowState, 0xA8);
+
+extern BallGlowState* lbl_80281518;
+
 // Queues a glow at pPos (Code8009AA28.c); nothing when the queue is full.
 void fn_8009B260(f32* pPos, u32 uColorA, u32 uColorB, u8 n25, u8 n24, u8 n26, f32 f18, f32 f1C,
                  f32 f20);
