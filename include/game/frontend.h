@@ -81,8 +81,8 @@ typedef void (*MsgHandler)(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007BCA4(MsgArg* pArgs, MsgArg* pResult);  // FE_MessageTable.c: fn_80079AD4 (DiscCheck.c
                                         // calls it directly, with no values)
 
-// Send message nMsg with nArgs values to a front-end handler (fn_8016B09C also sends through it).
-void fn_8016B0F8(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
+// Messages to a front-end handler (FrontEnd.pHandler) go through fn_8016B0F8 (UISScreen.c; its
+// prototype is in frontend/uistudio.h). The values are passed as an s32 array.
 
 // A menu UI arc (uiArc.c): nSegments pieces from fStart to fEnd degrees, shaded from colour
 // aColorA to aColorB. Only what the code reads so far.

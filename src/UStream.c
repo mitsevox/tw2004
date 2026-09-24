@@ -675,7 +675,7 @@ static UStreamObject* UStream_NextObject(u8 bParse) {
 
 // The per-frame call: pull finished objects, rebase their references, and deliver each to the
 // handler registered for its type. Returns 0 when the stream has nothing left to do.
-int UStream_Update(void) {
+u8 UStream_Update(void) {
     UStreamObject* pObject;
     UStreamObject* pNext;
     UStream* pStream;

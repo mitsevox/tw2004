@@ -52,8 +52,18 @@ u8*  fn_8003020C(LLPict* pPict);    // Y
 u8*  fn_80030214(PictFrame* pFrame);    // V
 u8*  fn_80030234(PictFrame* pFrame);    // U
 u8*  fn_8003024C(PictFrame* pFrame);    // Y
+// A movie's picture and decoder (LLVideo.c): pfnRead(pArg) hands the decoder its next data.
+void fn_8002FEB0(LLPict* pPict, PictStream* pStream, void* (*pfnRead)(void* pArg), void* pArg);
+void fn_8002FF38(LLPict* pPict, PictStream* pStream);
+void fn_8002FF94(LLPict* pPict, PictStream* pStream);                     // empty
+void fn_8002FF98(LLPict* pPict, PictStream* pStream);
+u8   fn_8003001C(LLPict* pPict, PictStream* pStream);
 u8   fn_80030040(LLPict* pPict, PictStream* pStream);
+void fn_8003009C(LLPict* pPict, PictStream* pStream, int n2);             // empty
 void fn_800300A0(LLPict* pPict, PictStream* pStream);
+
+// A picture from a "MADk" file in memory (LLPict_Gc.c).
+LLPict* fn_8002FD00(u8* pData, u32 uSize);
 
 // LLPictInt.c
 LLPict* PictInt_Decode(PictFile* pFile);

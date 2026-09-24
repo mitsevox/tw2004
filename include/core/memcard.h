@@ -40,6 +40,8 @@ LAYOUT_ASSERT(MCCardState, 0x98);
 // MCCardState.uFlags. Each bit is set or cleared where the CARD library returns the result named.
 #define MC_CARD_PRESENT     0x02    // cleared on CARD_RESULT_NOCARD
 #define MC_CARD_MOUNTED     0x04    // set by a mount (fn_8009D74C), cleared by an unmount (fn_8009DBAC)
+#define MC_CARD_FORMATTED   0x08    // cleared before a format and set when it succeeds (fn_8009E918);
+                                    // without it fn_8009F734 answers -1
 #define MC_CARD_WRONGDEVICE 0x10    // CARD_RESULT_WRONGDEVICE: not a memory card
 #define MC_CARD_IOERROR     0x20    // CARD_RESULT_IOERROR
 #define MC_CARD_BROKEN      0x40    // CARD_RESULT_BROKEN
@@ -195,8 +197,9 @@ void fn_8009CC00(void);
 void fn_8009CC88(void);
 void fn_8009CD10(void);
 void fn_8009CD7C(void);
-// The space a save needs: compared with MCCardState.nFreeBlocks (EASportsBio.c passes 0, 3).
-s32  fn_8009D1D8(s32 nPort, s32 nSlot, s32 arg2, s32 arg3);
+// The space a save of kind nKind needs (0-2 the game's save, 3 the EA Sports Bio): compared with
+// MCCardState.nFreeBlocks. arg2 is not used.
+s32  fn_8009D1D8(s32 nPort, s32 nSlot, s32 arg2, s32 nKind);
 s32  fn_8009D3DC(s32 nPort, s32 nSlot);
 s32  fn_8009D50C(s32 nPort, s32 nSlot);     // new files an EA Sports Bio save needs (0 or 1)
 s32  fn_8009D614(s32 nPort, s32 nSlot, const char* pName);
@@ -254,6 +257,8 @@ s32  fn_8009FAD0(void);
 s32  fn_800A0A7C(s32 nPort, s32 nSlot);
 void fn_800A1BE0(void);
 void fn_800A1D4C(UStreamObject* pObject);  // the 'eagm' handler
+void fn_800A1F6C(const char* szGameCode);   // mark the 'eagm' entries whose names match
+s32  fn_800A2030(void);                     // how many 'eagm' entries are marked
 s32  fn_800A2100(s32 nPort, s32 nSlot);
 s32  fn_800A218C(s32 nPort, s32 nSlot);    // always MC_ERR_NOFILE
 s32  fn_800A2194(s32 nPort, s32 nSlot);
@@ -280,8 +285,13 @@ void  fn_800A27BC(const char* szSrc, u16* szDst, s32 nMax);
 // ---- MC_Gc.c's CARD state (the CARD library itself is in core/card.h) ----------------------------
 
 extern CARDFileInfo lbl_801E3180[127];  // the open files, by file number
+extern void* lbl_802813D0;      // the CARD library's work area, given to CARDMountAsync
+extern CARDStat lbl_801E3B6C[127];      // the directory entries fn_8009F0F0 found
+extern s32   lbl_80281FB0;      // how many fn_8009F0F0 found
+extern u8    lbl_802813D4;      // the last position move (fn_8009F2D8) was from the start
 extern s32   lbl_802813D8;      // the file open through fn_8009F3D4 (-1: none)
 extern s32   lbl_80281FC8;      // where the next fn_8009F208 read starts
+extern s32   lbl_80281FCC;      // the file number of the EA Sports Bio file, when fn_8009F3D4 opens it
 extern s32   lbl_80281FB4;      // the size of the operation in progress (fn_8009CB9C)
 
 #endif

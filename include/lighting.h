@@ -11,10 +11,13 @@
 #define NUM_LIGHT_SETS      4
 #define NUM_SET_LIGHTS      5   // four point lights, then one directional light
 
-// A light (GoLighting.c's object); only what goballfx.c writes. What follows nType depends on it.
+// A light (GoLighting.c's object, 0x3C bytes; a pool of 25 in GoLighting). What follows nType
+// depends on it.
 typedef struct GoLight {
-    u8   unk0[8];
-    s32  nType;                 // 0x08  1: directional (no position), 2: a point light
+    struct GoLight* pNext;      // 0x00  } a ring: the pool's free or used lights
+    struct GoLight* pPrev;      // 0x04  }
+    s32  nType;                 // 0x08  1: directional (no position), 2: a point light; 0 when
+                                //       just taken from the pool
     union {
         struct {
             f32  fC;            // 0x0C
@@ -32,14 +35,21 @@ typedef struct GoLight {
     } u;
 } GoLight;
 
+// A group of lights lit together (GoLighting.c, 0x38 bytes): fn_8006E5A8 takes its lights from
+// the pool, fn_8006E7A4 loads them.
+typedef struct LightGroup {
+    GoLight* apLight[NUM_SET_LIGHTS];   // 0x00  goballfx.c: [4] is the directional light
+    s32  nLights;               // 0x14
+    f32  v18[4];                // 0x18  given to fn_8001EF34 with the lights' colours (fn_8006E460)
+    f32  v28[4];                // 0x28  goballfx.c: LightParams.v0
+} LightGroup;
+LAYOUT_ASSERT(LightGroup, 0x38);
+
 // One set of lights (0x8C bytes).
 typedef struct LightSet {
     TerSettings settings;       // 0x00  the terrain colours: fn_80035308 copies them to the renderer's
                                 //       (fn_80035440), fn_8003534C resets them (fn_8006F334)
-    GoLight* apLight[NUM_SET_LIGHTS];   // 0x54  [4] is the directional light
-    u8   unk68[0x7C - 0x68];
-    f32  v7C[3];                // 0x7C
-    u8   unk88[0x8C - 0x88];
+    LightGroup group;           // 0x54
 } LightSet;
 LAYOUT_ASSERT(LightSet, 0x8C);
 
@@ -66,6 +76,40 @@ typedef struct LightParams {
 LAYOUT_ASSERT(LightParams, 0x30);
 
 extern LightSets* lbl_80281380;
+
+// GoLighting.c's state (lbl_801D6F58, 0x150 bytes, reached through lbl_802811D8): the pool of
+// lights, and the colours and positions of the group last loaded (fn_8006E7A4), up to four point
+// lights and an ambient colour.
+#define NUM_POOL_LIGHTS  25
+#define NUM_POINT_LIGHTS 4
+typedef struct GoLighting {
+    GoLight* p0;                // 0x000  the pool's first light
+    GoLight* pUsed;             // 0x004  } the rings of taken and free lights
+    GoLight* pFree;             // 0x008  }
+    GoLight* pPool;             // 0x00C  the pool (NUM_POOL_LIGHTS lights)
+    s32  nPool;                 // 0x010
+    s32  nUsed;                 // 0x014
+    s32  nFree;                 // 0x018
+    f32  v1C[3];                // 0x01C
+    u8   unk28[4];
+    f32  aPointColour[NUM_POINT_LIGHTS][4]; // 0x02C  0..255
+    f32  vAmbient[4];           // 0x06C  0..255 (from a directional light)
+    f32  aPointColour2[NUM_POINT_LIGHTS][4]; // 0x07C  aPointColour through fn_8000AE48
+    f32  vAmbient2[4];          // 0x0BC  vAmbient through fn_8000AE48
+    f32  afPointX[NUM_POINT_LIGHTS];    // 0x0CC  } the point lights' positions
+    f32  afPointY[NUM_POINT_LIGHTS];    // 0x0DC  }
+    f32  afPointZ[NUM_POINT_LIGHTS];    // 0x0EC  }
+    f32  vFC[4];                // 0x0FC  set by fn_80029BC8
+    f32  aPointPos[NUM_POINT_LIGHTS][4];    // 0x10C
+    s32  nPoints;               // 0x14C  point lights loaded
+} GoLighting;
+LAYOUT_ASSERT(GoLighting, 0x150);
+extern GoLighting* lbl_802811D8;
+
+// GoLighting.c
+void fn_8006E5A8(LightGroup* pGroup, s32 nLights);  // take the group's lights from the pool
+void fn_8006E62C(LightGroup* pGroup);               // and give them back
+void fn_8006EDC0(LightGroup* pGroup);               // the default lights
 
 LightSet* fn_8003532C(void);    // lbl_80281380->pCur
 void fn_80035338(s32 nSet);     // make aSet[nSet] the current set
