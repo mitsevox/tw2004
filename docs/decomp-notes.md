@@ -397,6 +397,33 @@ They will be sorted into the sections below.
 - **Shell:** the Bash tool strips backslashes even inside quoted heredocs (`<<'EOF'`). Write scripts with
   the Write tool.
 
+### New from the link waves (2026-09-24 afternoon)
+
+- **[verified] A global read twice with no store in between** (once for a test, again for a call): write
+  the second read as `*(volatile T*)&gGlobal` at that one use (GameHoleContests fn_800DADC0 95.3 -> 100).
+- **[verified] Constants and a string address loaded into saved registers at entry, before any call:**
+  EA's body sits in a loop, even `for (j = 0; j < 1; j++)` over one-entry arrays (PsBallFx_InitModule
+  43 -> 100).
+- **[verified] `p = arr; p += n;` instead of `&arr[n]`** keeps the element address, not the index
+  (UStream_Update 98.8 -> 99.8, File_ReadAsyncEx 93.8 -> 99.6).
+- **[verified] An expression passed to an inline is substituted at each use of the parameter**, so the
+  original can build the same value twice and take its bits apart again. Routing it through a static
+  inline reproduces that (GoTerrain fn_80032F88 89.2 -> 99.45).
+- **[verified] Runs of written-out zero stores were loops in EA's source:** the compiler unrolls a small
+  constant loop fully, with other registers than hand-written stores (SitDev_SetupStateVector 23 diffs ->
+  exact with two `for` loops).
+- **[verified] Copy a real struct member, not a cast byte array:** the struct copy keeps the original's
+  load/store order (FE_MessageTable fn_8007F8A0 86 -> 100 with `SaveProfile.aReplay` as `Replay[5]`).
+- **[verified] EA's vector-scale helpers take the scale first** (TW07 `LLMath_Scale3(float, const float*,
+  float*)`): fn_8001EF34 / fn_8000AE28 fixed in 149 calls; Ball_FlightStep became exact.
+- **Permuter traps:** it ignores branch targets, so a "score 0" result can move a statement out of its `if`
+  and change the behaviour (uiText fn_800922A8); check the diff's meaning. A float operand swap can
+  score higher but fuse the other multiply into `fmadds` and round differently (AI_ChooseTarget): check
+  which product is fused. perm_setup's base.c breaks on `__declspec(export)` and on a char literal
+  inside a comment: edit base.c by hand.
+- **Orphan data:** after linking a unit, attach its orphan `.bss` too (define its globals in the unit in
+  reverse address order, add the `.bss` range to splits.txt): 45 units, data linked 30.8% -> 65.0%.
+
 ### Loops and unrolling
 
 - **[verified] Two tests on players n and n + 1 can be a two-pass loop.** When the second
