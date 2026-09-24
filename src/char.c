@@ -89,6 +89,7 @@ void  fn_8010B098(void* pModel);                                // LLDynTex.c
 void  fn_80071C28(SKABlendNode** ppNode, int a, int b, SKABlendFn pfnBlend, int c);   // animblender.c
 void  fn_800725BC(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 f);                  // animblender.c
 void  fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f);            // CharAnim.c
+void  fn_800094D8(f32* pQ, f32* pA, f32* pB, f32* pC);          // Quaternion.c: a rotation as angles
 void  fn_80095558(void);
 void  AnimLib_ApplyOverlays(int nSlot);                         // skalib.c
 void  fn_80025478(void);                                        // skalib.c
@@ -1724,6 +1725,29 @@ void Character_GetBallOnFingerPosition(Character* pChar, f32* pPos) {
         fn_8000C5D4(pPos, vAxis, 0.05f, pPos);
     } else {
         fn_8000C5D4(pPos, vAxis, -0.05f, pPos);
+    }
+}
+
+// Where the hand holds the ball, for the swing: bone 0x1A's position moved 0.000625 along the
+// bone's x axis (the other way while the model's bEE is set), and bone 0x15's pose as three angles
+// (fn_800094D8), the second 30 degrees more.
+void fn_8001DA04(Character* pChar, f32* pPos, f32* pAngles) {
+    f32 (*pMtx)[4];
+    f32 vAxis[3];
+
+    if (pChar != NULL && pChar->pModel != NULL) {
+        pMtx = fn_8001EC6C(pChar, 0x1A);
+        Vec_Copy(pMtx[3], pPos);
+        Vec3Copy(pMtx[0], vAxis);
+        fn_800BAF04(vAxis, vAxis);
+        if (fn_8001EDF4(pChar)) {
+            fn_8000C5D4(pPos, vAxis, -0.000625f, pPos);
+        } else {
+            fn_8000C5D4(pPos, vAxis, 0.000625f, pPos);
+        }
+        fn_800094D8(pChar->pModel->pPoses[fn_8001EEE4(pChar->pModel, 0x15)].q0, &pAngles[0], &pAngles[1],
+                    &pAngles[2]);
+        pAngles[1] += 30.0f / 180.0f * PI;
     }
 }
 
