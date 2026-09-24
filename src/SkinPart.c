@@ -7,7 +7,7 @@
 #include "terrain.h"
 #include "camera.h"
 
-void  fn_80112614(SkinDesc14* pEntry, u8* p, s32 n);
+void  fn_80112614(SkinDesc14* pEntry, SkinDesc18* pMaterial, s32 n);
 void  fn_80113774(int nPart, int nVariant, int nOption);
 void  fn_8011387C(int n);
 void  fn_8011389C(void);
@@ -902,7 +902,7 @@ void fn_800CE170(Skin* pSkin, SkinTarget* pTarget) {
         for (i = 0; i < pDesc->n10; i++) {
             Mem_cpy(&entry, &pDesc->p14[i], sizeof(SkinDesc14));
             fn_800CE224(pSkin, &entry, NULL, NULL, 0);
-            fn_80112614(&entry, pDesc->p18 + i * 0x1C, pTarget->n4);
+            fn_80112614(&entry, &pDesc->p18[i], pTarget->n4);
         }
     }
 }
@@ -1271,7 +1271,7 @@ void fn_800CEF04(SkinDesc* pDesc) {
         pDesc->p14 = (SkinDesc14*)((u8*)pDesc + (uptr)pDesc->p14);
     }
     if (pDesc->p18 != NULL) {
-        pDesc->p18 = (u8*)pDesc + (uptr)pDesc->p18;
+        pDesc->p18 = (SkinDesc18*)((u8*)pDesc + (uptr)pDesc->p18);
     }
     if (pDesc->p20 != NULL) {
         pDesc->p20 = (s32*)((u8*)pDesc + (uptr)pDesc->p20);
@@ -1319,10 +1319,10 @@ void fn_800CEF04(SkinDesc* pDesc) {
         pDesc->p8C = (SkinDesc8C*)((u8*)pDesc + (uptr)pDesc->p8C);
     }
     if (pDesc->pA4 != NULL) {
-        pDesc->pA4 = (u8*)pDesc + (uptr)pDesc->pA4;
+        pDesc->pA4 = (s16*)((u8*)pDesc + (uptr)pDesc->pA4);
     }
     if (pDesc->pAC != NULL) {
-        pDesc->pAC = (u8*)pDesc + (uptr)pDesc->pAC;
+        pDesc->pAC = (s16*)((u8*)pDesc + (uptr)pDesc->pAC);
     }
     if (pDesc->pB8 != NULL) {
         pDesc->pB8 = (SkinDescB8*)((u8*)pDesc + (uptr)pDesc->pB8);
