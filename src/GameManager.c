@@ -638,7 +638,7 @@ int GM_ShowPostShotAnimation(int nPlayer) {
             return 0;
         }
     }
-    if (gPlayers[nPlayer].pChar->blend.nGroup == 11 &&
+    if (gPlayers[nPlayer].pChar->nGroup == 11 &&
         gPlayers[nPlayer].ball.nStartSurface == 0x2D) {
         return 0;
     }

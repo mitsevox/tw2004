@@ -235,6 +235,35 @@ typedef struct TexBank {
 } TexBank;
 LAYOUT_ASSERT(TexBank, 0x30);
 
+// LLTex.c: the items lbl_80281C60 lists (a count, then that many item pointers), which
+// fn_8000E884 steps by message. The type names are ours.
+typedef struct LLTexItemDef {
+    s32  n0;                    // 0x00  its id: a DynObj's n140 (fn_8000E830), fn_8000E948's id
+    u8   unk4[0x18 - 0x4];
+    u8   n18;                   // 0x18  fn_8000E9A8's id
+} LLTexItemDef;
+
+typedef struct LLTexItemState {
+    u8   unk0[0x10];
+    u32  u10;                   // 0x10  cleared when message 0x46 clears n16 bit 0
+    s16  n14;                   // 0x14  message 0x47 steps only while n1A is below it
+    s16  n16;                   // 0x16  bit 0 and two 4-bit counters (bits 8-11, 12-15)
+    s16  n18;                   // 0x18  message 0x47 steps only while it is not 0
+    s16  n1A;                   // 0x1A  one less when a DynObj with the def's id goes (fn_8000E830)
+    u8   unk1C[0x2C - 0x1C];
+    LLTexItemDef* p2C;          // 0x2C
+} LLTexItemState;
+
+typedef struct LLTexItem {
+    u8   unk0[4];
+    LLTexItemState* p4;         // 0x04
+} LLTexItem;
+
+typedef struct LLTexItemList {
+    s32  nItems;                // 0x00  followed by nItems LLTexItem pointers
+} LLTexItemList;
+extern LLTexItemList* lbl_80281C60;
+
 u64  fn_8000BEE4(char* pName);          // a name's 64-bit hash
 // Find a loaded texture by its name's hash: its bank and entry (both NULL if none).
 int  fn_800102DC(u64 uHash, TexBank** ppBank, TexEntry** ppTex);
@@ -332,11 +361,17 @@ typedef struct DVDFileInfo {
 typedef void (*DVDCallback)(s32 nResult, DVDFileInfo* pInfo);
 s32 DVDReadAsyncPrio(DVDFileInfo* pInfo, void* pBuf, s32 nLen, s32 nOffset, DVDCallback pCallback,
                      s32 nPrio);
+void DVDInit(void);
+s32 DVDConvertPathToEntrynum(const char* pPath);
+int DVDFastOpen(s32 nEntry, DVDFileInfo* pInfo);
+int DVDClose(DVDFileInfo* pInfo);
 
 // An open file (lbl_8019EAD0, 32 of them, 0xC4 bytes each).
 typedef struct DiscFile {
     DVDFileInfo info;           // 0x00
-    u8   unk3C[0xC4 - 0x3C];
+    s32  nEntry;                // 0x3C  its disc entry number; -1: a free slot
+    s32  nOpens;                // 0x40  how many opens it has (File_Close closes it at 0)
+    char szPath[0x80];          // 0x44  its path in the disc's form (fn_80005BE8)
 } DiscFile;
 
 // A queued read (0x24 bytes: lbl_8019E880 holds eight free ones per priority).
@@ -662,7 +697,9 @@ void fn_80036100(ShaderObject* pObj, const void* pData, int n);    // Skin.c: ha
 // neighbours), skipping NULL ones; fn_8003519C calls a row's pfn8 with data. Rows 0 and 1 hold
 // functions of 0x8006FED4-0x80070FB0 from +0x24 on.
 typedef struct ModuleHooks {
-    u8    unk0[8];
+    void  (*pfn0)(void);          // 0x00  the type's init (row 17: SD_vShaderObject_Grass_Type_Init),
+                                  //       run by fn_80071A54 for rows in use (lbl_801893D8)
+    void  (*pfn4)(void);          // 0x04  its close (..._Grass_Type_Close), fn_80071A90
     void  (*pfn8)(void* pData);   // 0x08
     void  (*pfnC)(void);          // 0x0C  fn_8006E068
     void  (*pfn10)(void);         // 0x10  fn_8006DDE8
@@ -676,6 +713,18 @@ typedef struct ModuleHooks {
 LAYOUT_ASSERT(ModuleHooks, 0x44);
 
 extern ModuleHooks lbl_80188E88[20];
+extern u8 lbl_801893D8[20];         // per row: its pfn0/pfn4 run outside game types 4..8 too
+
+// lbl_80188E78 (our name): one more set of four hooks, run before the rows' (fn_800717AC,
+// fn_800717E8).
+typedef struct HookRow {
+    void  (*pfn0)(void);          // 0x00
+    void  (*pfn4)(void);          // 0x04
+    void  (*pfn8)(void);          // 0x08
+    void  (*pfnC)(void);          // 0x0C
+} HookRow;
+
+extern HookRow lbl_80188E78[1];
 
 // A dynamic rendering buffer (DynamicRenderingBuffer.c; our name, after the header its allocations
 // name, "GoShaderObjectCommon_DynamicRenderingBuffer_Gc.h"): vertices a shader object rewrites every
@@ -747,6 +796,47 @@ typedef struct DynRenderFill {
     const void* pColour;            // 0x10
     const void* pTexCoord;          // 0x14
 } DynRenderFill;
+
+// A scrolling texture animation (GoShaderObjectCommon_TexAnimManager_Gc.c; our names, after
+// fn_80074BE0's). Each frame its texture matrix is moved by the fraction of fU and fV times the
+// clock, snapped to fScale steps of fInv.
+typedef struct TexAnim {
+    f32   fU;                       // 0x00  scroll rate across
+    f32   fV;                       // 0x04  scroll rate down
+    f32   fScale;                   // 0x08  steps per repeat
+    f32   fInv;                     // 0x0C  1 / fScale
+} TexAnim;
+
+// The texture animation manager (lbl_80281EC0; 0x610 bytes, one allocation): up to 32 animations
+// and their 2x4 texture matrices, which GX reads as array 23 (the texture matrix array).
+typedef struct TexAnimManager {
+    TexAnim aAnims[32];             // 0x000
+    f32   aMtx[32][2][4];           // 0x200  the matrix of each animation
+    s32   nAnims;                   // 0x600
+    f32   fTime;                    // 0x604  the clock the matrices were made for
+    u8    unk608[8];
+} TexAnimManager;
+LAYOUT_ASSERT(TexAnimManager, 0x610);
+
+void fn_80076B7C(void);             // make the manager
+void fn_80076BC4(void);             // free it
+void fn_80076C20(f32 fFrame);       // set the clock and move every matrix
+f32  fn_80076E18(void);             // the clock
+void fn_80076E24(void);             // forget every animation
+
+// A shader object that scrolls its texture (GoShaderObject_PrelitUVAnimation_Gc.c, row 5 of
+// lbl_80188E88): a DynRenderObject with its own texture matrix, loaded as matrix 0x39.
+typedef struct PrelitUVObject {
+    u8    unk0[4];
+    DynRenderBuffer* pBuf;          // 0x04
+    f32   (*pMtx)[4];               // 0x08  2x4
+} PrelitUVObject;
+
+// One frame's geometry for a PrelitUVObject, with its scroll.
+typedef struct PrelitUVFill {
+    DynRenderFill fill;             // 0x00
+    TexAnim anim;                   // 0x18
+} PrelitUVFill;
 
 // A render surface (GoRenderSurface.c; our name, after the file): one of five 0x2C-byte slots at
 // lbl_801D3950. A slot whose n0 is not 1 owns a buffer of nSize bytes. Only what the code reads.

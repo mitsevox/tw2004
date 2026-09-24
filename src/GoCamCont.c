@@ -20,6 +20,12 @@ f32  fn_8005CC18(f32* pV);                              // Swing.c
 void fn_8006421C(View* pView);
 void fn_80064108(View* pView);
 
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x802836E8), before the 0.0f fn_80062E40 uses first; its body is unknown.
+static f32 GoCamCont_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 // Sets a view up: no camera (25), no shots, the script cleared.
 void fn_80062E40(View* pView) {
     int i;
@@ -316,6 +322,19 @@ void fn_8006351C(View* pView, int nPlayer, int nKind) {
 // The player's target is on screen, 0.1 in from the edges.
 u8 fn_800635D0(int nPlayer) {
     return fn_80063608(nPlayer, gPlayers[nPlayer].vTarget, 0.1f);
+}
+
+// fake match: stands in for code the original compiled here and the linker stripped: the pool has
+// fn_8006434C's constants (-0.0001f, 0.0001f, -10000.0f, 10000.0f, 0x802836F8) at this point, not
+// after fn_800642D0's; the body is unknown.
+static f32 GoCamCont_StrippedFn2(f32 x) {
+    if (x < -0.0001f || x > 0.0001f) {
+        return 1.0f / x;
+    }
+    if (x < 0.0f) {
+        return -10000.0f;
+    }
+    return 10000.0f;
 }
 
 // pPos is on the player's screen, at least fMargin in from every edge.
