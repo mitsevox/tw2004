@@ -3,6 +3,7 @@
 // around each load. Not yet decompiled; the code below is the matched small functions.
 
 #include "ustream.h"
+#include "camera.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -98,14 +99,16 @@ void fn_80014DC0(void);
 void fn_80014DF8(void);
 void fn_80014E68(void);
 void fn_80014E6C(void);
-void fn_80014E70(void);
-void fn_80014E74(void);
+void fn_80014E70(void* pArg);
+void fn_80014E74(void* pArg);
 void fn_80014E78(void);
 void fn_80014E7C(void);
 void fn_80014E80(void);
 void fn_80014E84(void);
-void fn_80014E88(void);
-void fn_80014E8C(void);
+void fn_80014E88(void* pArg);
+void fn_80014E8C(void* pArg);
+void fn_800153CC(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
+void fn_80015030(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
 void fn_80014E90(void);
 void fn_80014E94(void);
 void UStream_Close();
@@ -128,8 +131,6 @@ extern u8* gpGame;
 s32 fn_80015464(void);
 void fn_80015620(void);
 void fn_80016124(s32 p0, s32 p1, s32 p2, s32 p3);
-extern u8* lbl_80280DF0;
-s32 fn_8001614C(void);
 void fn_800162A0(void);
 void fn_800162A4(void);
 void fn_800162A8(void);
@@ -321,10 +322,11 @@ void fn_80014E68(void) {
 void fn_80014E6C(void) {
 }
 
-void fn_80014E70(void) {
+// Stream file callbacks that do nothing (opened/closed of the Load%d and FEChars files).
+void fn_80014E70(void* pArg) {
 }
 
-void fn_80014E74(void) {
+void fn_80014E74(void* pArg) {
 }
 
 void fn_80014E78(void) {
@@ -339,10 +341,10 @@ void fn_80014E80(void) {
 void fn_80014E84(void) {
 }
 
-void fn_80014E88(void) {
+void fn_80014E88(void* pArg) {
 }
 
-void fn_80014E8C(void) {
+void fn_80014E8C(void* pArg) {
 }
 
 void fn_80014E90(void) {
@@ -430,8 +432,8 @@ void fn_80016124(s32 p0, s32 p1, s32 p2, s32 p3) {
     GXSetTexCoordGen2(p0, p1, p2, p3, 0, 125);
 }
 
-s32 fn_8001614C(void) {
-    return *(s32*)(lbl_80280DF0 + 0x0);
+void* fn_8001614C(void) {
+    return *lbl_80280DF0;
 }
 
 void fn_8001618C(u8 v) {
@@ -466,3 +468,78 @@ void fn_80016CA8(f32 farg0, f32 farg1) {
 }
 
 // ---- end of sweep code ----
+
+// Add a file to stream list 5, with the calls made when it is opened and closed.
+void fn_80014E98(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
+    strcpy(lbl_80280DF8->aParams[5].aszName[lbl_80280DF8->aParams[5].nNumFiles], szName);
+    lbl_80280DF8->aParams[5].apfnOpened[lbl_80280DF8->aParams[5].nNumFiles] = pfnOpened;
+    lbl_80280DF8->aParams[5].apfnClosed[lbl_80280DF8->aParams[5].nNumFiles] = pfnClosed;
+    lbl_80280DF8->aParams[5].nNumFiles++;
+}
+
+// The same for list 4.
+void fn_80014F20(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
+    strcpy(lbl_80280DF8->aParams[4].aszName[lbl_80280DF8->aParams[4].nNumFiles], szName);
+    lbl_80280DF8->aParams[4].apfnOpened[lbl_80280DF8->aParams[4].nNumFiles] = pfnOpened;
+    lbl_80280DF8->aParams[4].apfnClosed[lbl_80280DF8->aParams[4].nNumFiles] = pfnClosed;
+    lbl_80280DF8->aParams[4].nNumFiles++;
+}
+
+// The same for list 1.
+void fn_80014FA8(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
+    strcpy(lbl_80280DF8->aParams[1].aszName[lbl_80280DF8->aParams[1].nNumFiles], szName);
+    lbl_80280DF8->aParams[1].apfnOpened[lbl_80280DF8->aParams[1].nNumFiles] = pfnOpened;
+    lbl_80280DF8->aParams[1].apfnClosed[lbl_80280DF8->aParams[1].nNumFiles] = pfnClosed;
+    lbl_80280DF8->aParams[1].nNumFiles++;
+}
+
+// The same for list 2.
+void fn_80015030(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
+    strcpy(lbl_80280DF8->aParams[2].aszName[lbl_80280DF8->aParams[2].nNumFiles], szName);
+    lbl_80280DF8->aParams[2].apfnOpened[lbl_80280DF8->aParams[2].nNumFiles] = pfnOpened;
+    lbl_80280DF8->aParams[2].apfnClosed[lbl_80280DF8->aParams[2].nNumFiles] = pfnClosed;
+    lbl_80280DF8->aParams[2].nNumFiles++;
+}
+
+// The same for list 6.
+void fn_8001529C(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
+    strcpy(lbl_80280DF8->aParams[6].aszName[lbl_80280DF8->aParams[6].nNumFiles], szName);
+    lbl_80280DF8->aParams[6].apfnOpened[lbl_80280DF8->aParams[6].nNumFiles] = pfnOpened;
+    lbl_80280DF8->aParams[6].apfnClosed[lbl_80280DF8->aParams[6].nNumFiles] = pfnClosed;
+    lbl_80280DF8->aParams[6].nNumFiles++;
+}
+
+// The same for list 0.
+void fn_80015334(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
+    strcpy(lbl_80280DF8->aParams[0].aszName[lbl_80280DF8->aParams[0].nNumFiles], szName);
+    lbl_80280DF8->aParams[0].apfnOpened[lbl_80280DF8->aParams[0].nNumFiles] = pfnOpened;
+    lbl_80280DF8->aParams[0].apfnClosed[lbl_80280DF8->aParams[0].nNumFiles] = pfnClosed;
+    lbl_80280DF8->aParams[0].nNumFiles++;
+}
+
+// The same for list 3.
+void fn_800153CC(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
+    strcpy(lbl_80280DF8->aParams[3].aszName[lbl_80280DF8->aParams[3].nNumFiles], szName);
+    lbl_80280DF8->aParams[3].apfnOpened[lbl_80280DF8->aParams[3].nNumFiles] = pfnOpened;
+    lbl_80280DF8->aParams[3].apfnClosed[lbl_80280DF8->aParams[3].nNumFiles] = pfnClosed;
+    lbl_80280DF8->aParams[3].nNumFiles++;
+}
+
+// Add loading file nFile (data/Load/Load<n>.gcb) to stream list 2.
+void fn_80014544(int nFile) {
+    char szName[0x40];   // size unknown: the frame allows 0x40..0x48 bytes
+
+    sprintf(szName, lbl_80186C14, nFile);
+    fn_80015030(szName, fn_80014E70, fn_80014E88);
+}
+
+// Make stream list 3 hold only the front-end character file for character nChar
+// (data/FEChars/<nChar + 1>charfe.gcb), for the golfer the front end is loading.
+void fn_80014DFC(s32 nChar, s32 nUnused) {   // port: FEgolferanim.c passes a second argument this ignores
+    char szName[0x100];  // size unknown: the frame allows up to 0x100 bytes
+
+    fn_80015454();
+    sprintf(szName, lbl_80186CA8, nChar + 1);
+    lbl_80281EE0->pB8->n14 = -1;
+    fn_800153CC(szName, fn_80014E74, fn_80014E8C);
+}

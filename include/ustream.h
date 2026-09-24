@@ -72,6 +72,8 @@ typedef struct StreamLists {
     int  nStream;               // 0x119C  the open stream (UStream_Open)
 } StreamLists;
 extern StreamLists* lbl_80280DF8;
+extern char lbl_80186C14[];   // "data/Load/Load%d.gcb" (streammanagerhole.c fn_80014544)
+extern char lbl_80186CA8[];   // "data/FEChars/%02dcharfe.gcb" (streammanagerhole.c fn_80014DFC)
 
 // A stream (0x2E0 bytes).
 typedef struct {
