@@ -144,9 +144,9 @@ void fn_800B4FA4(RainObject* pRain) {
     int j;
     int k;
     int nHalf;
-    RainPoint* pPoint;
     RainSplash* pSplash;
     int nAlpha;
+    RainPoint* pPoint;
 
     pCamera = fn_8001614C();
     pData = &pRain->data;
@@ -199,8 +199,8 @@ void fn_800B4FA4(RainObject* pRain) {
     GXInvalidateVtxCache();
     fn_80012520(0x90, 4, RAIN_NUM_SPLASHES * 3);    // triangles
     for (i = 0; i < RAIN_NUM_SPLASHES; i++) {
+        nAlpha = 128.0f * pData->apB[nBuf][i].fAlpha;
         pSplash = &pData->apB[nBuf][i];
-        nAlpha = 128.0f * pSplash->fAlpha;
         fn_800B58C0(pSplash->av[0][0], pSplash->av[0][1], pSplash->av[0][2]);
         fn_800B58E4(0x80, 0x80, 0x80, (u8)nAlpha);
         fn_800B58D4(0.0f, 0.0f);
@@ -223,14 +223,14 @@ void fn_800B52D4(RainObject* pRain, f32* pTime) {
     Sphere sphere;
     f32 mView[4][4];
     Camera* pCamera;
-    CamLens* pLens;
-    RainData* pData;
-    RainPoint* pPoint;
-    RainSplash* pSplash;
-    int nBuf;
-    int nHalf;
     int i;
+    CamLens* pLens;
+    RainSplash* pSplash;
+    int nHalf;
     int j;
+    RainData* pData;
+    int nBuf;
+    RainPoint* pPoint;
     int k;
     f32 fOff;
     f32 fY;

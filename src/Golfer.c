@@ -1922,39 +1922,31 @@ void Session_SetupProfiles(void) {
     s8       nSpin;
 
     for (i = 0; i < pSession->nNumPlayers; i++) {
-        PlayerProfile* pProf = &gSession.aProfile[i];
         int            nGolfer;
-        pProf->n1 = 0;
         nSpin = gGolferTable[pSession->nGolfer[i]].attr[ATTR_SPIN];
+        gSession.aProfile[i].n1 = 0;
         for (j = 0; j < 6; j++) {
-            fn_800CB700(&pProf->aNames[j], gszEmpty);
+            fn_800CB700(&gSession.aProfile[i].aNames[j], gszEmpty);
         }
-        pProf->nOutfit = gGolferTable[pSession->nGolfer[i]].nOutfit;
+        gSession.aProfile[i].nOutfit = gGolferTable[pSession->nGolfer[i]].nOutfit;
         nGolfer = pSession->nGolfer[i];
         if (nGolfer >= FIRST_CREATED_GOLFER) {
-            SaveProfile* pSave = &gpSaveData[nGolfer - FIRST_CREATED_GOLFER];
             for (j = 0; j < 6; j++) {
-                pProf->aNames[j] = pSave->aGolferNames[j];
+                gSession.aProfile[i].aNames[j] = gpSaveData[nGolfer - FIRST_CREATED_GOLFER].aGolferNames[j];
             }
-            pProf->n2        = pSave->n54C2;
-            pProf->nBallType = pSave->nGolferBallType;
-            pProf->nOutfit   = pSave->nGolferOutfit;
+            gSession.aProfile[i].n2        = gpSaveData[nGolfer - FIRST_CREATED_GOLFER].n54C2;
+            gSession.aProfile[i].nBallType = gpSaveData[nGolfer - FIRST_CREATED_GOLFER].nGolferBallType;
+            gSession.aProfile[i].nOutfit   = gpSaveData[nGolfer - FIRST_CREATED_GOLFER].nGolferOutfit;
         } else if (nGolfer == 0 || nGolfer == 1) {
-            fn_800CB700(&pProf->aNames[0], lbl_80187650 + 0x1A);
-            pProf->n2        = 0;
-            pProf->nBallType = 0;
+            fn_800CB700(&gSession.aProfile[i].aNames[0], lbl_80187650 + 0x1A);
+            gSession.aProfile[i].n2        = 0;
+            gSession.aProfile[i].nBallType = 0;
         } else if (fn_80077B18(nGolfer)) {
-            pProf->n2        = 0;
-            pProf->nBallType = 0;
+            gSession.aProfile[i].n2        = 0;
+            gSession.aProfile[i].nBallType = 0;
         } else {
-            pProf->n2 = 0;
-            if (nSpin >= 100) {
-                pProf->nBallType = 3;
-            } else if (nSpin >= 75) {
-                pProf->nBallType = 2;
-            } else {
-                pProf->nBallType = nSpin >= 50;
-            }
+            gSession.aProfile[i].n2 = 0;
+            gSession.aProfile[i].nBallType = (nSpin >= 100) ? 3 : ((nSpin >= 75) ? 2 : (nSpin >= 50));
         }
     }
 }
