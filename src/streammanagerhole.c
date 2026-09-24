@@ -1009,7 +1009,7 @@ void fn_80016C28(f32* pSrc, f32* pDst) {
 #endif
 
 // Set the GX viewport from six values (GXGetViewportv's layout).
-void fn_80016C44(f32* pViewport) {
+void fn_80016C44(const f32* pViewport) {
     GXSetViewport(pViewport[0], pViewport[1], pViewport[2], pViewport[3], pViewport[4], pViewport[5]);
 }
 
