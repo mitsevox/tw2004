@@ -54,7 +54,8 @@ void fn_80005C90(FileReq* pReq) {
 void fn_800060DC(void) {
 }
 
-int fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError)) {
+int fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset,
+                void (*pfnDone)(int nBytes, int nError)) {
     return fn_80006478(hFile, pDst, uLen, uOffset, pfnDone, 1, 0, 0, 1);
 }
 
