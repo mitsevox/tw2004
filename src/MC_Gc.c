@@ -21,6 +21,7 @@ s32  fn_8009EECC(s32 nPort, s32 nSlot, const char* pName);
 s32  fn_8009EF68(s32 nPort, s32 nSlot);
 s32  fn_80125194(s32 a, s32 b);         // EA Sports Bio (0x80125194)
 s32  fn_801255C4(s32* pPos);            // EASportsBio.c
+void fn_8012CCCC(int uHandle);          // EASBStorage.c
 void GXSetVtxAttrFmt(int nFmt, int nAttr, int nCnt, int nType, u8 uFrac);   // port: GameCube only
 u8*  Skalib_ScratchToAram(int n);       // skalib.c
 void Skalib_ScratchFromAram(int n);     // skalib.c
@@ -481,6 +482,21 @@ s32 fn_8009E47C(s32 nPort, s32 nSlot, CARDFileInfo* pFile) {
     return 0;
 }
 
+// Fill in the save file's comment strings (the game's name and "Users and Options") and copy the
+// icon ('MCI ') and banner ('MCB ') images when asked for.
+void fn_8009E544(char* pGameName, char* pComment, u8* pIcon, u8* pBanner) {
+    memset(pGameName, 0, 32);
+    memset(pComment, 0, 32);
+    strcpy(pGameName, "Tiger Woods PGA Tour 2004");
+    strcpy(pComment, "Users and Options");
+    if (pIcon != NULL) {
+        memcpy(pIcon, lbl_80281FB8->pData, lbl_80281FB8->uSize);
+    }
+    if (pBanner != NULL) {
+        memcpy(pBanner, lbl_80281FBC->pData, lbl_80281FBC->uSize);
+    }
+}
+
 // Take the stream objects: the save file's icon ('MCI ') and banner ('MCB '), and MC.c's 'eagm'.
 void fn_8009EA98(void) {
     UStream_RegisterHandler('MCI ', fn_8009EB30);
@@ -691,11 +707,60 @@ s32 fn_8009F3A0(s32 nPort, s32 nSlot, const char* pName, s32* pnFreeFiles) {
     return 0;
 }
 
+// Open the file fn_8009F514 created (lbl_802813D8) and start at its beginning. pName "EASB" also
+// hands it to the EA Sports Bio's code (fn_8012CCCC). uFlags is not used.
+s32 fn_8009F3D4(s32 nPort, s32 nSlot, const char* pName, u32 uFlags, s32* pnFile) {
+    CARDFileInfo file;
+    s32 nResult;
+    lbl_80281FC8 = 0;
+    if (lbl_802813D8 == -1) return MC_ERR_NOFILE;
+    nResult = CARDFastOpen(nPort, lbl_802813D8, &file);
+    if (nResult != 0) return nResult;
+    memcpy(&lbl_801E3180[file.fileNo], &file, sizeof(CARDFileInfo));
+    *pnFile = file.fileNo;
+    if (strcmp("EASB", pName) == 0) {
+        fn_8012CCCC(file.fileNo);
+        lbl_80281FCC = file.fileNo;
+    }
+    return 0;
+}
+
 // Close open file nFile.
 s32 fn_8009F488(s32 nFile) {
     if (lbl_802813D8 == -1) return MC_ERR_NOFILE;
     CARDClose(&lbl_801E3180[nFile]);
     lbl_802813D8 = -1;
+    return 0;
+}
+
+// Create pName with nLen bytes (only the EA Sports Bio's "EASB"), set its attribute bit 0x40 and
+// note it as the file to open (lbl_802813D8). An I/O error marks the card damaged.
+s32 fn_8009F514(s32 nPort, s32 nSlot, const char* pName, s32 nLen) {
+    CARDFileInfo file;
+    u8 uAttr;
+    s32 nResult;
+    if (strcmp("EASB", pName) == 0) {
+        nResult = fn_8009DFD8(nPort, nSlot, pName, nLen, &file);
+        CARDGetAttributes(nPort, file.fileNo, &uAttr);
+        uAttr |= 0x40;
+        CARDSetAttributes(nPort, file.fileNo, uAttr);
+        lbl_802813D8 = file.fileNo;
+        if (nResult == MC_ERR_IOERROR) {
+            lbl_80281FD0[nPort] = 1;
+        }
+        return nResult;
+    }
+    return 0;
+}
+
+// Delete the save file, when pName is its name or the save directory's. No file is not an error.
+s32 fn_8009F5E4(s32 nPort, s32 nSlot, const char* pName) {
+    s32 nResult = fn_8009F734(nPort, nSlot);
+    if (nResult != 0) return nResult;
+    if (strcmp(MC_FILE_NAME, pName) == 0 || strcmp(MC_DIR_NAME, pName) == 0) {
+        nResult = fn_8009E758(nPort, nSlot, MC_FILE_NAME);
+    }
+    if (nResult != 0 && nResult != MC_ERR_NOFILE) return nResult;
     return 0;
 }
 
