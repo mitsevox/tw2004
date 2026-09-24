@@ -2057,35 +2057,39 @@ void fn_80034AE4(void) {
 
 // Draws the grass patches of render pass nRenderPass that take part in the first pass (bit 0 of
 // n1C), from the end of the list, one clip method at a time.
-// Not exact (97.2%): the original tests bit 0 with `and.` against a register holding 1 (one more
-// saved register); every spelling tried folds the 1 into `clrlwi.` (a local mask of int, s32, u32 or
-// u8, s32/int counters).
+// fake match: the one-pass loop over the passes (as in fn_800329CC) keeps the pass bit in a register
+// for the `and.` test of bit 0.
 void fn_80034CAC(int nRenderPass) {
     u8 bFirst = 1;
     int i;
-    s32 nClip;
     Ter_PatchReference* pPatch;
+    int nPass;
+    int nPassBit;
+    s32 nClip;
 
     fn_80012EF8();
     fn_80014118(0x70);
-    for (nClip = 0; nClip <= 2; nClip++) {
-        switch (nClip) {
-        case 2:
-            fn_80035138(1);
-            break;
-        case 1:
-            fn_80035138(1);
-            break;
-        default:
-            fn_80035138(0);
-            break;
-        }
-        fn_80012EF8();
-        for (i = lbl_801D3CB0.iNumGrassPatches - 1; i >= 0; i--) {
-            pPatch = &lbl_801D3CB0.xpGrassPatchList[i];
-            if (pPatch->eClipMethod == nClip && pPatch->iRenderPass == nRenderPass && (pPatch->n1C & 1)) {
-                fn_80032B7C(pPatch->pGround, nClip, 0, pPatch->n1C, pPatch->n18, pPatch->n20, &bFirst, 0, 1,
-                            pPatch->fDistance, pPatch->fDistance + 2.0f * pPatch->fBoundingRadius);
+    for (nPass = 0, nPassBit = 1; nPass < 1; nPass++, nPassBit <<= 1) {
+        for (nClip = 0; nClip <= 2; nClip++) {
+            switch (nClip) {
+            case 2:
+                fn_80035138(1);
+                break;
+            case 1:
+                fn_80035138(1);
+                break;
+            default:
+                fn_80035138(0);
+                break;
+            }
+            fn_80012EF8();
+            for (i = lbl_801D3CB0.iNumGrassPatches - 1; i >= 0; i--) {
+                pPatch = &lbl_801D3CB0.xpGrassPatchList[i];
+                if (pPatch->eClipMethod == nClip && pPatch->iRenderPass == nRenderPass
+                    && (pPatch->n1C & nPassBit)) {
+                    fn_80032B7C(pPatch->pGround, nClip, nPass, pPatch->n1C, pPatch->n18, pPatch->n20, &bFirst,
+                                0, 1, pPatch->fDistance, pPatch->fDistance + 2.0f * pPatch->fBoundingRadius);
+                }
             }
         }
     }
