@@ -23,17 +23,14 @@ u8   fn_8000C278(f32* pA, f32* pB, f32* pC, f32* pD, f32* pOut);
 u8   fn_8000C328(f32* pA, f32* pB, f32* pC, f32* pD);
 
 // The ground height under a node, from a point a third of a unit above it; 0 if there is none.
-f32 fn_8000BF20(f32* pPos) {
+f32 fn_8000BF20(const f32* pPos) {
     f32 v[4];
     CourseInfo* pCourse;
     f32 fHeight;
-    f32 fX = pPos[0];
-    f32 fY = 1.0f / 3.0f + pPos[1];
-    f32 fZ = pPos[2];
 
-    v[0] = fX;
-    v[1] = fY;
-    v[2] = fZ;
+    v[0] = pPos[0];
+    v[1] = 1.0f / 3.0f + pPos[1];
+    v[2] = pPos[2];
     v[3] = 1.0f;
     pCourse = fn_8000C594();
     if (pCourse != NULL) {
