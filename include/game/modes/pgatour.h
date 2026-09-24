@@ -93,4 +93,13 @@ s32  fn_800F0428(s32 nPlayer);
 // GameModeDriverPGATour.c, as FE_CrAPDB.c uses it
 s32  fn_800F0304(s32 i);                // aTriple[i].n8
 
+// GameModeDriverPGATour.c, as the PGA TOUR menus (FE_PGATourMessages.c) use it
+void fn_800EEF88(s32 nPlayer);
+s32  fn_800EF834(void);                 // the number of tournaments (31)
+s32  fn_800EFAD0(void);                 // the next season: 0 after the tenth
+s32  fn_800EFBAC(void);                 // the current season's year
+s32  GameModeDriverPGATour_GetCurrentEventID(void);
+s32  fn_800F02D4(s32 i);                // aTriple[i].n0
+s32  fn_800F02EC(s32 i);                // aTriple[i].n4
+
 #endif

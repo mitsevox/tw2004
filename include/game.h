@@ -218,6 +218,7 @@ s32  fn_800D2814(u32 nMonth, u32 nYear);        // the days in a month (compared
 void fn_800D2884(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month before
 void fn_800D28B0(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month after
 void fn_800D28DC(u16 nDate, char* szOut);       // a date as text
+void fn_800D293C(u16 nDate, char* szOut);       // a date as month/day
 u16  fn_800D2994(void);                 // today's date
 int  fn_800D2ABC(int nCourse, int nHole);   // a hole's par on a course
 int  fn_800D2AD8(int nHole);            // a hole's par

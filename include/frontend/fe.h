@@ -347,10 +347,15 @@ int  fn_801062C8(s16 nPart, int n);     // the asset in the first slot of aAF80 
 void FE_MakeMoviePath(char* pName, char* pPath);        // "data/movies/<name>.NGC"
 void FE_MakeCameoMoviePath(char* pName, char* pPath);   // "data/movies/cameos/<name>.NGC"
 void FE_CrAP_TurnOnPart(s16 nPart, int b, int c);      // FE_CrAPDB.c
+int  fn_80106E48(s16 n);                // FE_CrAPDB.c: the profile's assets whose n2C is n
+s32  fn_801070F4(void);                 // FE_CrAPDB.c: fill lbl_80282470; how many records
+void fn_80107244(int n, s16* pN0, s32* pN4, char* pDst);   // FE_CrAPDB.c: copy record n out
+void fn_80107294(s16 n, char* pDst);    // FE_CrAPDB.c: name n of lbl_801935C8
 SaveProfile* fn_80077ACC(void);         // the profile being worked on
 u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);  // the asset is locked (FE_Manager.c)
 int  fn_80078604(int a, int b, int c);  // a date (month, day, year from fn_8011E020) packed
 int  fn_80077B08(void);                 // its player slot
+u8   fn_80077148(void);
 int  fn_80077BDC(int n);                // -1, -2, -3 to 0, 1, 2; anything else to 0
 void fn_80078680(SaveProfile* pProfile);    // note which assets are locked (aAssetLocked)
 void fn_8007873C(SaveProfile* pProfile);

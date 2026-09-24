@@ -132,6 +132,7 @@ u8    fn_80117DE0(void);
 void  fn_80117DE8(int nPlayer, u8 b);
 void  fn_80117DF0(int nPlayer);
 void  fn_80117E98(int nPlayer);
+s32   fn_80118664(int nPlayer);
 s32   fn_80118684(int nPlayer);
 char* fn_80118E30(int nPlayer, int nGolfer);    // TW06: GM_PgaTourSim_GetNameFromGolferID
 u8    fn_8011908C(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_IsEntrantUser
@@ -142,6 +143,7 @@ s32   fn_80119588(int nPlayer, u8 b);
 s32   fn_80119638(int nPlayer, int nEntrant, int nRound);
 u8    fn_801197A4(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_GetWasCutFromEntrantID
 s32   fn_801197CC(int nPlayer, int nRow);       // TW06: GM_PgaTourSim_GetEntrantIDFromScoreRow
+u8    fn_80119808(int nPlayer, int nEntrant);
 void  fn_8011989C(int nPlayer, int nStrokes);   // TW06: GM_PgaTourSim_SetUserEntrantHoleStrokes
 void  fn_801198F8(int nPlayer, int nHole);
 void  fn_80119934(int nPlayer);
