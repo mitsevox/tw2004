@@ -16,6 +16,7 @@ s32  fn_800171B0(void);                 // ViewController.c
 void fn_800760D8(LLPict* pPict);        // LLVideo.c
 void fn_800760F4(f32* pUV, LLPict* pPict);  // LLVideo.c
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
+f32  fn_8006E118(u64 tEnd, u64 tStart);    // GameManager.c: seconds between two time stamps
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -148,6 +149,63 @@ void fn_800918A4(void) {
         lbl_801D8858.fC = lbl_801D8858.f4 = (4.83f * lbl_801D8858.n14 + 3.1f) / 8.0f;
         lbl_801D8858.f8 = 0.0f;
         fn_800917C8();
+    }
+}
+
+// Update the loading screen set up by fn_800918A4, unless the session has flag 4: add the time since
+// the last update to f10, and once it passes f4 (or f8, which steps by 2) redraw the picture and the
+// tiles shown so far, showing one more each time f10 passes f4. nMode 1 draws every tile left and
+// ends it (b18 cleared).
+void fn_8009198C(int nMode) {
+    f32 fSecs;
+    int i;
+
+    if (gSession.uFlags & 4) return;
+    if (nMode == 1) {
+        lbl_801D8858.b18 = 0;
+    }
+    lbl_801D8858.u28 = fn_80095368();
+    fSecs = fn_8006E118(lbl_801D8858.u28, lbl_801D8858.u20);
+    lbl_801D8858.u20 = lbl_801D8858.u28;
+    lbl_801D8858.f10 += fabsf(fSecs);
+    if (nMode != 1 && lbl_801D8858.f10 <= lbl_801D8858.f4) {
+        if (lbl_801D8858.f10 > lbl_801D8858.f8) {
+            lbl_801D8858.f8 += 2.0f;
+        } else {
+            return;
+        }
+    }
+    fn_80006EDC();
+    fn_80092080(lbl_801D8858.p30, 1.0f);
+    if (lbl_801D8858.n1C >= 0) {
+        for (i = 0; i <= lbl_801D8858.n1C; i++) {
+            if (i >= 8) break;
+            fn_80091BDC(i);
+        }
+    }
+    fn_80006FE8();
+    fn_800083A0();
+    fn_80007254();
+    fn_800A4BDC();
+    fn_80008380();
+    if (lbl_801D8858.f10 > lbl_801D8858.f4 || lbl_801D8858.n1C == -1) {
+        if (lbl_801D8858.f10 > lbl_801D8858.f4) {
+            lbl_801D8858.f4 += lbl_801D8858.fC;
+        }
+        if (++lbl_801D8858.n1C >= 8) return;
+        fn_80091B98(lbl_801D8858.n1C);
+    }
+    if (nMode == 1) {
+        if (lbl_801D8858.n1C < 0) {
+            lbl_801D8858.n1C = 0;
+        }
+        if (lbl_801D8858.n1C > 7) {
+            lbl_801D8858.n1C = 7;
+        }
+        for (i = lbl_801D8858.n1C + 1; i < 8; i++) {
+            fn_80091B98(i);
+        }
+        lbl_801D8858.b18 = 0;
     }
 }
 
