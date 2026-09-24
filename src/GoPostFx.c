@@ -605,10 +605,11 @@ void fn_80039344(int nView, f32 f) {
 // Covers the screen in black at view nView's share (lbl_801D5010) of CamTuning.f208's alpha.
 void fn_80039358(int nView) {
     f32 aColour[4];
-    f32 aXY[8];
-    f32 f = lbl_801D5010[nView];
+    f32 aXY[16];    // only 8 are filled; the frame has room for 16
+    f32 f;
 
-    if (f != 0.0f) {
+    f = lbl_801D5010[nView];
+    if (f) {
         aColour[0] = 0.0f;
         aColour[1] = 0.0f;
         aColour[2] = 0.0f;
