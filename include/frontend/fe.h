@@ -351,6 +351,13 @@ int  fn_80078604(int a, int b, int c);  // a date (month, day, year from fn_8011
 int  fn_80077B08(void);                 // its player slot
 int  fn_80077BDC(int n);                // -1, -2, -3 to 0, 1, 2; anything else to 0
 void fn_80078680(SaveProfile* pProfile);    // note which assets are locked (aAssetLocked)
+void fn_8007873C(SaveProfile* pProfile);
+void fn_80078A2C(s16 nPart, int nChance);
+void fn_80078E34(SaveProfile* pProfile);
+void fn_80079664(SaveProfile* pProfile);
+int  fn_8007975C(SaveProfile* pProfile, s16 nPart, int nChance);    // a random b and choice of
+                                        // part nPart; returns the choice (fn_800797E0)
+int  fn_800797E0(SaveProfile* pProfile, s16 nPart, int b, int nChance);
 u8   fn_80077B18(int nGolfer);          // a yes/no list over golfers 0..28 (Golfer.c asks it)
 void fn_80077B78(void);                 // pick the day's random assets (fn_80077C1C)
 FEMovie* fn_800770FC(void);             // the next free place in the movie queue
