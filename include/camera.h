@@ -284,7 +284,9 @@ typedef struct CamTuning {
                                 //        camera's and the aim's level directions from the ball
     u8   unk100[0x10C - 0x100];
     f32  f10C;                  // 0x10C  fn_80043C74: the camera's height over the ground at the spot
-    u8   unk110[0x11C - 0x110];
+    u8   unk110[0x114 - 0x110];
+    f32  f114;                  // 0x114  CamScript_PutBackOnFairway: its shot's field of view
+    u8   unk118[0x11C - 0x118];
     f32  f11C;                  // 0x11C  fn_800418B0: a shot's f94 over this is its wobble's size
     f32  f120;                  // 0x120  fn_800439E4: a camera closer to the pin than this (level, times
                                 //        the lens's fB0) ...
@@ -531,8 +533,8 @@ void     CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* p
                                    f32 f2, f32 f3);
 void     fn_80043C74(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot* pShot, f32* pSub,
                      f32* pHeight);
-void     CamScript_PutBackOnFairway(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot* pShot,
-                                    f32* pSub);
+void     CamScript_PutBackOnFairway(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pShot,
+                                    f32* pPrev);
 f32      fn_80044EA8(int nPlayer, CamScript* pScript);   // how far the ball's flight has run
 u8       fn_800451A8(CamScript* pScript, CamShot* pShot, int nPlayer);
 void     CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer);

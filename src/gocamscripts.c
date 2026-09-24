@@ -838,6 +838,62 @@ void fn_8004017C(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     pScript->fA8 = fT * (pNext->f9C - pShot->f9C) + pShot->f9C;
 }
 
+// Picks the side (nD0: 1 or 2, 0 for neither) of a curved move between the two shots. For next-shot
+// kinds 12 and 11 the side follows fn_800453C8; otherwise each side's curve midpoint (fn_800C7E50,
+// through the halfway point of the two look-at points) is tested against the in-bounds outlines,
+// and the side whose point alone is inside is taken.
+void fn_80040CF0(CamScript* pScript, f32* pSub, int nPlayer, f32* pPrev, f32 fTime) {
+    f32 vSide1[4];
+    f32 vSide2[4];
+    f32 vLook[4];
+    f32 vNextLook[4];
+    f32 vMid[4];
+    f32 vHalf[4];
+    f32 vPoint[4];
+    u8 bIn1;
+    u8 bIn2;
+
+    if (pScript->nBC == 12) {
+        if (fn_800453C8(nPlayer, NULL)) {
+            pScript->nD0 = 2;
+        } else {
+            pScript->nD0 = 1;
+        }
+    } else if (pScript->nBC == 11) {
+        if (fn_800453C8(nPlayer, NULL)) {
+            pScript->nD0 = 1;
+        } else {
+            pScript->nD0 = 2;
+        }
+    } else {
+        Vec3Copy(pSub, vLook);
+        CamScript_GetLookAtPoint(pScript->pShot, nPlayer, vLook, pScript->v0, pScript, pPrev, fTime);
+        Vec3Copy(pSub, vNextLook);
+        CamScript_GetLookAtPoint(pScript->pNextShot, nPlayer, vNextLook, pScript->v10, pScript, pPrev, fTime);
+        fn_80045428(vNextLook, vLook, vHalf);
+        fn_8001EF34(vHalf, 0.5f, vPoint);
+        fn_8004544C(vPoint, vLook, vPoint);
+        Vec3Copy(vPoint, vMid);
+        pScript->nD0 = 1;
+        fn_800C7E50(pScript->v0, pScript->v10, vMid, 1, vSide1, 0.5f);
+        pScript->nD0 = 2;
+        fn_800C7E50(pScript->v0, pScript->v10, vMid, 2, vSide2, 0.5f);
+        bIn1 = Ter_PointInOOBNetwork(vSide1);
+        bIn2 = Ter_PointInOOBNetwork(vSide2);
+        if (!bIn1) {
+            if (!bIn2) {
+                pScript->nD0 = 0;
+            } else {
+                pScript->nD0 = 2;
+            }
+        } else if (!bIn2) {
+            pScript->nD0 = 1;
+        } else {
+            pScript->nD0 = 0;
+        }
+    }
+}
+
 // Where the camera looks for the shot's bAC, into pOut: the pin (kind 0 in golfer state 18), the
 // ball, Player.vBall, bones of the golfer, the tee, the aim; the look-at point is moved by the
 // shot's f74 up and f70 sideways (fn_8004255C), and by fn_800418B0's offset before and after.
@@ -1689,6 +1745,45 @@ void fn_80043C74(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot*
         vSpot[1] = fHeight + lbl_80281F78->f10C;
         Vec_Copy(vSpot, pOut);
     }
+}
+
+// Moves the camera to a spot on the fairway (fn_80043C74) and makes pShot a still shot there: it
+// looks straight at its target (bAC 0) for 1000 seconds at the tuning's field of view (f114), with no
+// wobble or slow motion. The script cuts to it (blend 5) with the ground height fD8 at the spot (the
+// course's floor at least), and the lens takes the new field of view at once.
+void CamScript_PutBackOnFairway(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pShot,
+                                f32* pPrev) {
+    f32 fHeight;
+    f32 fFov;
+
+    fn_80043C74(pScript, pCam, pSub, nPlayer, pShot, pPrev, &fHeight);
+    CameraScript_RecordCurrentCam(pShot, pCam, pSub, nPlayer, pScript, 0);
+    pScript->pShot = pShot;
+    pScript->pNextShot = NULL;
+    pScript->fCamTime = 0.0f;
+    pScript->pShot->bAC = 0;
+    pScript->pShot->f68 = lbl_80281F78->f10C;
+    pScript->pShot->f6C = 1000.0f;
+    pScript->pShot->f4C = 2.0f;
+    pScript->pShot->f8C = 0.0f;
+    pScript->pShot->f90 = 0.0f;
+    pScript->pShot->f88 = 0.0f;
+    pScript->pShot->nA0 = 1;
+    pScript->pShot->bB2 = 0;
+    pScript->pShot->f94 = 0.0f;
+    pScript->pShot->f78 = lbl_80281F78->f114;
+    pScript->pShot->f7C = pScript->pShot->f78;
+    pScript->nE0 = 25;
+    pScript->fD8 = fHeight;
+    if (pScript->fD8 < -60000.0f || pScript->fD8 < fn_8000C594()->fFloor) {
+        pScript->fD8 = fn_8000C594()->fFloor;
+    }
+    CameraScript_InterpToNewScript(pScript, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 25, 0.0f);
+    CamScript_GetLookAtPoint(pScript->pShot, nPlayer, pSub, pCam, pScript, pPrev, 0.0f);
+    fFov = pScript->pShot->f78 + fn_800DC3A4();
+    fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), fFov);
+    pScript->bCF = 1;
+    pScript->fCamTime = 0.001f;
 }
 
 // The pin, when pPos is near no AI target: pOut gets the nearest target, or the current pin
