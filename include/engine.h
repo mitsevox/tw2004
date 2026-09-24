@@ -655,6 +655,8 @@ struct ShaderObject {
 };
 LAYOUT_ASSERT(ShaderObject, 0x28);
 
+void fn_80036100(ShaderObject* pObj, const void* pData, int n);    // Skin.c: hands it a frame's data
+
 // One row of lbl_80188E88 (our name; 20 rows of 0x44 bytes): a module's hooks. The main loop
 // (gomainloop.c) calls each row's pfnC..pfn20 at six points of a frame (fn_8006DDA8 and its
 // neighbours), skipping NULL ones; fn_8003519C calls a row's pfn8 with data. Rows 0 and 1 hold
