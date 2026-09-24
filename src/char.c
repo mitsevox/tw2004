@@ -438,11 +438,7 @@ void fn_80017DDC(Character* pChar) {
         pMtx = fn_8001ED08(pChar, 0x52);
         if (pMtx != NULL && (pCourse = fn_8000C594()) != NULL) {
             fHeight = fn_8004D650(pCourse, pChar->aPoints[4], vNormal);
-            if (fHeight < -60000.0f) {
-                return;
-            }
-            fUnder = fHeight - pChar->aPoints[4][1];
-            if (fUnder < 0.0f) {
+            if (fHeight < -60000.0f || (fUnder = fHeight - pChar->aPoints[4][1]) < 0.0f) {
                 return;
             }
             fDot = -fn_8001EEA4(pMtx[1], vNormal);
@@ -837,10 +833,7 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     // how far each test point sits below the ground (0.165 in, in feet)
     fDropA = 0.165f / 12.0f + (pChar->afGroundHeight[nPoint] - vPoint[1]);
     fDropB = 0.165f / 12.0f + (pChar->afGroundHeight[nOther] - pChar->aPoints[nOther][1]);
-    if (fDropA < 0.0f && fDropB < 0.0f) {
-        return;
-    }
-    if (fDropA > 1.0f) {
+    if ((fDropA < 0.0f && fDropB < 0.0f) || fDropA > 1.0f) {
         return;
     }
     fDrop = (fDropA <= fDropB) ? fDropB : fDropA;
