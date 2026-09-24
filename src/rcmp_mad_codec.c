@@ -811,6 +811,7 @@ void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);
 void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
+int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
 
 void fn_800B9944(void) {
     UStream_RegisterHandler('TEO ', fn_800B99FC);
@@ -976,5 +977,41 @@ void fn_800B9CF0(u8 bTarget) {
         fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
         fn_80013EEC(fn_8001614C());
         fn_80012EF8();
+    }
+}
+
+// Put the logo szBall on the held ball: its texture's levels are copied over the "logoea"
+// texture. NULL hides the logo layers instead.
+void fn_800B9EB8(char* szBall) {
+    u64       uLogo;
+    u64       uSlot;
+    TexBank*  pSlotBank;
+    TexEntry* pSlot;
+    TexEntry* pLogo;
+    int       nLogo;
+    int       i;
+
+    if (lbl_802821D4 == NULL) {
+        return;
+    }
+    if (szBall == NULL) {
+        lbl_802814E8 = 0;
+        return;
+    }
+    fn_800CB700(&uLogo, szBall);
+    fn_800CB700(&uSlot, lbl_802814FC);
+    fn_800102DC(uSlot, &pSlotBank, &pSlot);
+    if (pSlotBank == NULL || pSlot == NULL) {
+        return;
+    }
+    nLogo = fn_8001005C(lbl_802821D4, uLogo);
+    if (nLogo == (int)0x80000000) {
+        return;
+    }
+    lbl_802814E8 = 1;
+    pLogo = &lbl_802821D4->p8[nLogo];
+    for (i = 0; i < pLogo->n41; i++) {
+        Mem_cpy(pSlotBank->p18 + pSlot->aMips[i].uPixels, lbl_802821D4->p18 + pLogo->aMips[i].uPixels,
+                pLogo->aMips[i].nC * 16);
     }
 }

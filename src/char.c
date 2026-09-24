@@ -2918,7 +2918,7 @@ void fn_8001DD18(u8* pData, int nBytes) {
         for (i = 0; i < nEntries; i++) {
             pDst = pEntry;
             pSrc = pEntry;
-            pData = (u8*)&pEntry->uPixels;
+            pData = (u8*)pEntry->aMips;
             for (j = 0; j < 4; j++) {
                 pDst = pData;
                 pSrc = pData;
