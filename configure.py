@@ -1054,7 +1054,7 @@ config.libs = [
             Object(NonMatching, "DynamicRenderingBuffer.c"),
             Object(NonMatching, "Code80070EC4.c"),
             Object(Matching, "unsorted/sweep_80097E98.c"),
-            Object(NonMatching, "Code8009A928.c"),
+            Object(Matching, "Code8009A928.c"),
             Object(NonMatching, "hlaudvoice.c"),
             Object(Matching, "AudLock.c"),
             Object(Matching, "unsorted/sweep_8010FF5C.c"),

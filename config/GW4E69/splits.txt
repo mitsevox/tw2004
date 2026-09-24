@@ -473,6 +473,7 @@ unsorted/sweep_8009A844.c:
 
 Code8009A928.c:
 	.text       start:0x8009A928 end:0x8009AA28
+	.sdata2     start:0x80283E90 end:0x80283E98
 
 Code8009AA28.c:
 	.text       start:0x8009AA28 end:0x8009B314

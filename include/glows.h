@@ -51,6 +51,7 @@ typedef struct GlowQueue {
 // bytes; lbl_801DB878 follows it).
 LAYOUT_ASSERT(GlowQueue, 0x1E10);
 
+extern GlowQueue lbl_801D9A68[1];
 extern GlowQueue* lbl_80281F80;
 
 // What fn_80098938 hands the glow mesh (our name): Skin.c's fn_80036100 passes it on, fn_80098884
