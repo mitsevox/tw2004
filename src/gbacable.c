@@ -894,3 +894,154 @@ s32 fn_80124280(s32 arg0) {
 }
 
 // ---- end of sweep code ----
+
+// Runs the link for the front end once a frame, by the state fn_8012408C sets. 0 starts it (15
+// frames' grace, the port free); 1 polls until a GBA links, giving up (0x11) after 4 seconds; 4 and
+// 5 poll the linked GBA, and in 5 a pending request is sent (cash to the GBA, the stats copied into
+// the profile, the save-cash and save-stats requests); 0x12 (a failed command) undoes what the
+// pending request did to the profile; 6 takes cash from the GBA; 8 swaps stats with it, keeping the
+// best of each, and asks it to save them. 0xC to 0xF raise a request and go back to 5.
+void fn_801242D0(void) {
+    SaveProfile* pProfile;
+    s32 bFailed;
+    s32 nOld;
+    s32 nGot;
+
+    if (fn_80124094() == 0) {
+        lbl_80282548 = OSGetTick();
+        fn_8012422C();
+        lbl_80282544 = 15;
+        fn_8012408C(1);
+    } else if (fn_80124094() == 1) {
+        if (lbl_80282544 == 0) {
+            fn_8012402C();
+        } else {
+            lbl_80282544--;
+        }
+        if (OSGetTick() - lbl_80282548 > GBA_TICKS_PER_MS * 4000) {
+            fn_8012408C(0x11);
+        }
+    } else if (fn_80124094() == 2) {
+        fn_8012402C();
+    } else if (fn_80124094() == 4) {
+        fn_8012402C();
+        fn_80124138(0);
+        fn_8012408C(5);
+    } else if (fn_80124094() == 5) {
+        fn_8012402C();
+        if (fn_801241B4()) {
+            fn_80123CBC(0xD0, 0);
+            pProfile = fn_80077ACC();
+            pProfile->n6C -= fn_8012411C();
+            fn_80124154();
+            fn_801241AC(0);
+        } else if (fn_801241C4()) {
+            pProfile = fn_80077ACC();
+            pProfile->nA8 = fn_80124280(0);
+            pProfile->nAC = fn_80124280(1);
+            pProfile->nA0 = fn_80124280(2);
+            pProfile->nA4 = fn_80124280(3);
+            fn_801241BC(0);
+        } else if (fn_801241E4()) {
+            fn_80123CBC(0x71, 0);
+            fn_801241FC(0);
+            fn_801241DC(0);
+        } else if (fn_801241F4()) {
+            fn_80123CBC(0xD3, 0);
+            fn_8012420C(0);
+            fn_801241EC(0);
+        }
+    } else if (fn_80124094() == 0x12) {
+        if (fn_80124204()) {
+            pProfile = fn_80077ACC();
+            pProfile->n6C -= fn_8012411C();
+            fn_80124154();
+            fn_801241FC(0);
+        }
+        if (fn_80124214()) {
+            pProfile = fn_80077ACC();
+            pProfile->nA8 = fn_80124280(0);
+            pProfile->nAC = fn_80124280(1);
+            pProfile->nA0 = fn_80124280(2);
+            pProfile->nA4 = fn_80124280(3);
+            fn_8012420C(0);
+        }
+    } else if (fn_80124094() == 6) {
+        fn_80123CBC(0x90, 0);
+        if (fn_80124094() != 0x12) {
+            pProfile = fn_80077ACC();
+            pProfile->n6C += fn_8012411C();
+            fn_80123CBC(0x71, 0);
+            fn_80124138(0);
+            fn_8012408C(7);
+        }
+    } else if (fn_80124094() == 8) {
+        bFailed = 0;
+        pProfile = fn_80077ACC();
+        fn_80124238(0, pProfile->nA8);
+        fn_80124238(1, pProfile->nAC);
+        fn_80124238(2, pProfile->nA0);
+        fn_80124238(3, pProfile->nA4);
+
+        // the best round: the lower, where the GBA's is set (0 and 0xFF: none)
+        fn_80123CBC(0xB0, 0);
+        if (fn_80124094() == 0x12) {
+            bFailed = 1;
+        }
+        nOld = fn_80124280(0);
+        nGot = fn_80124190();
+        if (nOld <= 0) {
+            if (nGot != 0 && nGot != 0xFF) {
+                pProfile->nA8 = nGot;
+            }
+        } else if (nOld > nGot) {
+            pProfile->nA8 = nGot;
+        }
+
+        // the GBA's count is added
+        fn_80123CBC(0xB0, 1);
+        if (fn_80124094() == 0x12) {
+            bFailed = 1;
+        }
+        pProfile->nAC += fn_80124190();
+
+        // the longest drive and the longest putt: the higher
+        fn_80123CBC(0xB0, 2);
+        if (fn_80124094() == 0x12) {
+            bFailed = 1;
+        }
+        if (fn_80124280(2) < fn_80124190()) {
+            pProfile->nA0 = fn_80124190();
+        }
+        fn_80123CBC(0xB0, 3);
+        if (fn_80124094() == 0x12) {
+            bFailed = 1;
+        }
+        if (fn_80124280(3) < fn_80124190()) {
+            pProfile->nA4 = fn_80124190();
+        }
+        if (bFailed == 0) {
+            fn_80123CBC(0xD3, 0);
+            fn_8012408C(9);
+        }
+    } else if (fn_80124094() == 7) {
+        fn_8012402C();
+    } else if (fn_80124094() == 9) {
+        fn_8012402C();
+    } else if (fn_80124094() == 0xC) {
+        fn_801241AC(1);
+        fn_8012408C(5);
+    } else if (fn_80124094() == 0xD) {
+        fn_801241BC(1);
+        fn_8012408C(5);
+    } else if (fn_80124094() == 0xE) {
+        fn_801241DC(1);
+        fn_8012408C(5);
+    } else if (fn_80124094() == 0xF) {
+        fn_801241EC(1);
+        fn_8012408C(5);
+    } else {
+        // the state is read once more with nothing done (an empty test in the original)
+        fn_80124094();
+    }
+}

@@ -55,5 +55,7 @@ extern const u32 lbl_80184E30[GBA_NUM_CHANNELS];   // each port's PADReset bit (
 #define GBA_TICKS_PER_MS  (*(u32*)0x800000F8 / 4 / 1000)
 #define GBA_TIMEOUT_TICKS (GBA_TICKS_PER_MS * 100)
 extern s32 lbl_80281984;        // the port being worked on (-1: none, fn_8012422C)
+extern u32 lbl_80282544;        // frames left before the link is first polled (fn_801242D0)
+extern u32 lbl_80282548;        // the tick the link was started at (fn_801242D0)
 
 #endif
