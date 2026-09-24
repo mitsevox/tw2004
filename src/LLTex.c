@@ -238,10 +238,8 @@ int fn_8000EA1C(u8* pCode, int nArg, int nPush, DynObj* pObj) {
                     a %= 32;
                     a = lbl_80281C70[a];
                 } else {
-                    b = (int)Rand_Next(0);
-                    if (b < 0) {
-                        b = -b;
-                    }
+                    int nRand = (int)Rand_Next(0);
+                    b = (nRand + (nRand >> 31)) ^ (nRand >> 31);   // EA's abs
                     a = b % -a;
                 }
                 break;
