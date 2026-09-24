@@ -634,7 +634,7 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
         if (!bNoBall && !fn_800D4EF8(lbl_80200538.aShotGoal[i].uBallLies,
                                      fn_800D46E8(gPlayers[nPlayer].ball.nLie))) continue;
         if (!bNoBall && lbl_80200538.aShotGoal[i].f14 > fn_800D0550(nPlayer)) continue;
-        if (!bNoBall && lbl_80200538.aShotGoal[i].f18 != 0.0f &&
+        if (!bNoBall && lbl_80200538.aShotGoal[i].f18 &&
             lbl_80200538.aShotGoal[i].f18 < fn_800D0478(nPlayer)) continue;
         if (!fn_800D4EF8(lbl_80200538.aShotGoal[i].uShotKinds, gPlayers[nPlayer].nShotKind)) continue;
         if (!fn_800D4EF8(lbl_80200538.aShotGoal[i].uClubs, gPlayers[nPlayer].nClub)) continue;
@@ -1895,20 +1895,24 @@ s32 fn_800D8720(s32 n) {
 int fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlayer) {
     int nResult;
     int nPos;
-    int j;
     int n;
     RecordEntry* pFrom;
     RecordEntry* pTo;
+    RecordEntry* pLast;
+    RecordEntry* pRec;
+    int j;
+    PlayerNumber_t nProfile;
 
     nResult = 0;
     if (gpGame->b136) return 0;
     if (nKind < 8) {
-        if (fn_800D867C(nKind, nValue, gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][4].nValue)) {
+        pLast = &gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][4];
+        if (fn_800D867C(nKind, nValue, pLast->nValue)) {
             nResult = 1;
             nPos = 4;
             for (j = 3; j >= 0; j--) {
-                if (fn_800D867C(nKind, nValue,
-                                gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][j].nValue)) {
+                pRec = &gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][j];
+                if (fn_800D867C(nKind, nValue, pRec->nValue)) {
                     nPos = j;
                 }
             }
@@ -1927,11 +1931,13 @@ int fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlaye
                 sprintf(pTo->szName, szName);
             }
         }
-        if (fn_800D867C(nKind, nValue, gSession.recA[nKind][4].nValue)) {
+        pLast = &gSession.recA[nKind][4];
+        if (fn_800D867C(nKind, nValue, pLast->nValue)) {
             nResult = 3;
             nPos = 4;
             for (j = 3; j >= 0; j--) {
-                if (fn_800D867C(nKind, nValue, gSession.recA[nKind][j].nValue)) {
+                pRec = &gSession.recA[nKind][j];
+                if (fn_800D867C(nKind, nValue, pRec->nValue)) {
                     nPos = j;
                 }
             }
@@ -1953,11 +1959,13 @@ int fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlaye
     } else if (nKind == 8) {
         n = fn_800D86DC(Game_GetMode());
         if (n != 3) {
-            if (fn_800D867C(nKind, nValue, gSession.recB[fn_80015464()][n][4].nValue)) {
+            pLast = &gSession.recB[fn_80015464()][n][4];
+            if (fn_800D867C(nKind, nValue, pLast->nValue)) {
                 nResult = 1;
                 nPos = 4;
                 for (j = 3; j >= 0; j--) {
-                    if (fn_800D867C(nKind, nValue, gSession.recB[fn_80015464()][n][j].nValue)) {
+                    pRec = &gSession.recB[fn_80015464()][n][j];
+                    if (fn_800D867C(nKind, nValue, pRec->nValue)) {
                         nPos = j;
                     }
                 }
@@ -1980,11 +1988,13 @@ int fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlaye
     } else {
         n = fn_800D8720(fn_80126FA0());
         if (n != 2) {
-            if (fn_800D867C(nKind, nValue, gSession.recC[fn_80127098(fn_80015464())][n][4].nValue)) {
+            pLast = &gSession.recC[fn_80127098(fn_80015464())][n][4];
+            if (fn_800D867C(nKind, nValue, pLast->nValue)) {
                 nResult = 1;
                 nPos = 4;
                 for (j = 3; j >= 0; j--) {
-                    if (fn_800D867C(nKind, nValue, gSession.recC[fn_80127098(fn_80015464())][n][j].nValue)) {
+                    pRec = &gSession.recC[fn_80127098(fn_80015464())][n][j];
+                    if (fn_800D867C(nKind, nValue, pRec->nValue)) {
                         nPos = j;
                     }
                 }
@@ -2005,9 +2015,12 @@ int fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlaye
             }
         }
     }
-    if (nPlayer != 5 && nResult != 0 && (u8)bSave) {
-        if (gpSaveData[gPlayers[nPlayer].nIndex].bActive) {
-            gpSaveData[gPlayers[nPlayer].nIndex].b70 = 1;
+    if (nPlayer != 5) {
+        nProfile = gPlayers[nPlayer].nIndex;
+        if (nResult != 0 && (u8)bSave) {
+            if (gpSaveData[nProfile].bActive) {
+                gpSaveData[nProfile].b70 = 1;
+            }
         }
     }
     return nResult;
