@@ -58,7 +58,8 @@ typedef struct Skeleton {
     f32  (*p20)[4];             // 0x0020  a quaternion per bone
     f32  (*p24)[4];             // 0x0024  a quaternion per bone
     f32  (*p28)[4];             // 0x0028  p20 at an IK weight of 0 or 1, otherwise p24
-    u8   unk2C[0x1070 - 0x2C];
+    s32  n2C;                   // 0x002C  cleared before and after fn_8001966C's animation update
+    u8   unk30[0x1070 - 0x30];
     f32  fIKWeight;             // 0x1070  SKEL_SetIKSolutionWeight
     f32  f1074;                 // 0x1074  } set by fn_8002792C and SKEL_TransitionIK
     f32  f1078;                 // 0x1078  }
@@ -294,7 +295,7 @@ typedef struct Character {
                                 //        it with cmpwi
     u8    unk16C[0x17C - 0x16C];
     f32   fAnimTime;            // 0x17C
-    u8    unk180[0x184 - 0x180];
+    f32   f180;                 // 0x180  fn_8001966C: fAnimTime = f180 + the blend's time - v1638[1]
     f32   fAnimEnd;             // 0x184  the animation's end time
     u8    unk188[0x29C - 0x188];
     AnimPlayer anim29C;         // 0x29C  a second animation player
@@ -327,7 +328,8 @@ typedef struct Character {
     s32   nClubHeadBone;        // 0x16A0  bone 0x53's index: the club head (the swing trail's end)
     s32   nGripBone;            // 0x16A4  bone 0x52's index: the grip (the trail's other end)
     s32   n16A8;                // 0x16A8  fn_8001EEE4's answer for bone 0x15
-    u8    unk16AC[0x16D0 - 0x16AC];
+    u8    unk16AC[0x16CC - 0x16AC];
+    s32   nClub;                // 0x16CC  the club (fn_8001C774)
     s32   nShotKind;            // 0x16D0  the player's shot kind (fn_8001C724)
     s32   n16D4;              // 0x16D4  the key for clip lookups (Char_SetClip)
     struct CharSkinSet* p16D8;  // 0x16D8  six more skins (SkinPart.c)
@@ -342,6 +344,8 @@ typedef struct Character {
     Clip* p1790;                // 0x1790  cleared by fn_80062BFC; CharacterState_AddSKABlendData plays it for
                                 //         groups 5, 6 and 10
     void* p1794;                // 0x1794  cleared by fn_80062BE8; the same for group 9
+    u8    unk1798[0x17B8 - 0x1798];
+    struct ProfileLogos* pLogos;    // 0x17B8  the logos fn_8001A20C puts on its model (fn_8001744C)
 } Character;
 
 // The players' characters (gViewSlots, 0x80187124): Player_SetGolfer takes the player's from here.
@@ -424,7 +428,7 @@ void  fn_8001C7FC(Character* pChar, int nStyle);   // the animation style (nStyl
 Character* fn_8001D324(int nId);        // the character with this id (100: the flag, by its clips), or NULL
 void  fn_8001D624(int n);               // set gSession.aD2D[n]
 void  fn_8001D7A4(Character* pChar);
-void  fn_8001DA04(Character* pChar, u8* pA, u8* pB);
+void  fn_8001DA04(Character* pChar, f32* pA, f32* pB);   // pA gets a bone's position
 void  fn_8001DB04(Character* pChar, f32* pOut);    // the golfer's position
 void  fn_8001DB98(Character* pChar);    // empty the character's four data buffers
 u8    fn_8001DBF4(Character* pChar);    // the ball is in the golfer's hand
@@ -434,6 +438,7 @@ u8    fn_8001EDF4(Character* pChar);    // the model's bEE
 int   fn_8001EE90(Character* pChar);
 int   fn_8001EED8(CharModel* pModel, int nBone);    // a bone's index
 int   fn_8001EEE4(CharModel* pModel, int nBone);
+f32   fn_8001F02C(struct ClipBlend* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
 void  Anim_SetRate(u8* pAnim, f32 fRate);           // 0x8001F084
 void  fn_8001E85C(f32* pSrc, f32* pDst);            // copy a quaternion
 void  SKEL_SetIKSolutionWeight(Skeleton* pSkel, f32 f);

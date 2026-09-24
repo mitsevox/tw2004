@@ -6,6 +6,7 @@
 #include "ball.h"
 #include "game.h"
 #include "engine.h"
+#include "dynobj.h"
 
 // The swing module's state; only the tuning values read here. Set up in Swing_Init.
 typedef struct SwingState {
@@ -141,7 +142,6 @@ extern u8            lbl_80281E11;
 extern u8            lbl_80281E12;
 extern Vec4          lbl_80183690;          // 0, 0, 0, 0.5 (assigned, not an initialiser: as one,
                                                 //   STATEFUNC_RemoveBallExit drops to 42.5%)
-extern u8*           lbl_80281DA0;               // per player, 0x104 bytes each
 extern f32           gRealBallRadiusIn;          // 0x80283300  0.84: a real golf ball, in inches
 extern Vec4          lbl_80183620;          // 0, 0, 0, 0.5 (assigned)
 
@@ -174,7 +174,7 @@ void  fn_80036100(u8* pMesh, void* pDesc, int n);
 void  fn_800360D4(u8* pMesh);
 void  fn_80098C70(void);
 void  GOLFERSTATE_Pop(int nPlayer);
-void  fn_80067710(int nPlayer, int a, int b);
+void  fn_80067710(int nPlayer, int a, u8 nEvent);
 s8    GOLFERSTATE_GetPreviousState(int nPlayer);  // the state below the top of the stack
 void  fn_80017158(int nView);
 void  fn_80039344(int nView, f32 f);             // a per-view float (0x801D5010[nView])
@@ -2411,7 +2411,7 @@ void STATEFUNC_PreShotExit(int nPlayer) {
     View* pView   = fn_80017028(gPlayers[nPlayer].nView[0]);
     int   nCamera;
     Mem_cpy(&gPlayers[nPlayer].ball, &gPlayers[nPlayer].ballBefore, sizeof(Ball));
-    nCamera = pView->nCamera;
+    nCamera = pView->script.nCamera;
     if (nCamera == 1 || nCamera == 3 || nCamera == 4) {
         fn_80063B98(pView, 0.25f, (f32*)&vOffset);
     }
@@ -2423,7 +2423,7 @@ void STATEFUNC_RemoveBallExit(int nPlayer) {
     pV      = fn_80017028(gPlayers[nPlayer].nView[0]);
     vOffset = lbl_80183690;
     Mem_cpy(&gPlayers[nPlayer].ballBefore, &gPlayers[nPlayer].ball, sizeof(Ball));
-    if (pV->nCamera == 3) {
+    if (pV->script.nCamera == 3) {
         fn_80063B98(fn_80017028(gPlayers[nPlayer].nView[0]), 0.75f, (f32*)&vOffset);
     }
 }
@@ -2465,10 +2465,10 @@ void STATEFUNC_InitialFlyByExit(int nPlayer) {
     for (i = 0; i < gNumPlayersSetUp; i++) {
         pDst = fn_80017028(gPlayers[i].nView[0]);
         fn_800170C4(gPlayers[i].nView[0], 1);
-        pDst->nCamera = pSrc->nCamera;
-        pDst->f118    = pSrc->f118;
-        Vec_Copy(pSrc->vC4, pDst->vC4);
-        pDst->f114    = pSrc->f114;
+        pDst->script.nCamera = pSrc->script.nCamera;
+        pDst->script.f94     = pSrc->script.f94;
+        Vec_Copy(pSrc->script.v40, pDst->script.v40);
+        pDst->script.f90     = pSrc->script.f90;
     }
     gpGame->pfn24C(nPlayer);
 }
@@ -2478,7 +2478,7 @@ void STATEFUNC_ConcededInit(int nPlayer) {
     View* pV      = fn_80017028(gPlayers[nPlayer].nView[0]);
     fn_800C7178(pV, nPlayer);
     View_SetCamera(pV, 0x19, nPlayer, gPlayers[nPlayer].nView[0]);
-    if (pV->nCamera == 1 || pV->nCamera == 3 || pV->nCamera == 4) {
+    if (pV->script.nCamera == 1 || pV->script.nCamera == 3 || pV->script.nCamera == 4) {
         fn_80063B98(pV, 0.25f, (f32*)&vOffset);
     }
 }
@@ -2767,9 +2767,9 @@ void STATEFUNC_TapInUpdate(int nPlayer) {
         View_SetCamera(pV, 0xC, nPlayer, gPlayers[nPlayer].nView[0]);
         fn_80063B98(pV, 0.75f, (f32*)&vOffset);
     }
-    if (pV->nCamera == 1) return;
-    if (pV->nCamera == 4) return;
-    if (pV->nCamera == 3) return;
+    if (pV->script.nCamera == 1) return;
+    if (pV->script.nCamera == 4) return;
+    if (pV->script.nCamera == 3) return;
     if (fn_80048574(pChar, 2)) {
         if (!fn_80062BB0(pChar, 2)) return;
         fn_80062B98(pChar, 2);
@@ -3180,7 +3180,7 @@ void STATEFUNC_InTheHoleUpdate(int nPlayer) {
             return;
         }
         fn_800C7158(pV, GM_ShowPostShotAnimation(nPlayer));
-        if (gpGame->n294 != 0 && pV->nCamera != 1 && pV->nCamera != 4) {
+        if (gpGame->n294 != 0 && pV->script.nCamera != 1 && pV->script.nCamera != 4) {
             if (!(gPlayers[nPlayer].uFlags & 8) || fn_8006AA9C(nPlayer) == 2) {
                 if (fn_80095780(gPlayers[nPlayer].pChar) != 9 && fn_80095798(gPlayers[nPlayer].pChar) != 9 &&
                     fn_800C7160(pV)) {
@@ -3191,7 +3191,7 @@ void STATEFUNC_InTheHoleUpdate(int nPlayer) {
             }
         }
     }
-    if (fn_800C7170(pV) && pV->nCurCamera != 0x10 && pV->nCamera != 1 && pV->nCamera != 4) {
+    if (fn_800C7170(pV) && pV->nCurCamera != 0x10 && pV->script.nCamera != 1 && pV->script.nCamera != 4) {
         gPlayers[nPlayer].uFlags |= 2;
         GOLFERSTATE_Switch(GS_FADE_TO_REMOVE_BALL, nPlayer);
         return;
@@ -3398,13 +3398,13 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
     Vec4    vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
     u8      bInHand = 0;
     View*   pV;
-    u8*     pSlot;
+    GoDynObjPlayerA* pSlot;
     int     nSteps, i;
     s32*    pState;
     f32     vHand[4];
 
     pV    = fn_80017028(gPlayers[nPlayer].nView[0]);
-    pSlot = lbl_80281DA0 + nPlayer * 0x104;
+    pSlot = &lbl_80281DA0->aA[nPlayer];
     if (pV->nCurCamera != 11 && pV->nCurCamera != 0 && gpGame->pfn238(nPlayer)) {
         GOLFERSTATE_Switch(GS_SHOT_SETUP, nPlayer);
         return;
@@ -3444,7 +3444,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
             fn_80047EF0(&gPlayers[nPlayer].ball, nPlayer, 0);
         } else {
             Character_GetBallOnFingerPosition(gPlayers[nPlayer].pChar, gPlayers[nPlayer].ball.vPos);
-            fn_8001DA04(gPlayers[nPlayer].pChar, pSlot + 0x30, pSlot + 0x50);
+            fn_8001DA04(gPlayers[nPlayer].pChar, pSlot->v30, pSlot->v50);
             bInHand = 1;
         }
     } else if (gPlayers[nPlayer].ball.nLie == 0) {
@@ -3498,7 +3498,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
         GOLFERSTATE_Switch(GS_SHOT_SETUP, nPlayer);
         return;
     }
-    if (pV->fCamTime > 10.0f) {
+    if (pV->script.fCamTime > 10.0f) {
         GOLFERSTATE_Switch(GS_SHOT_SETUP, nPlayer);
     }
     if (fn_80095780(gPlayers[nPlayer].pChar) != 10 && fn_80095780(gPlayers[nPlayer].pChar) != 1 &&
@@ -3905,7 +3905,7 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
         if (fn_80063C90(pV)) return;
         if (!fn_800C6604(pV) && fn_80095780(gPlayers[nPlayer].pChar) == 9) {
             if (!(fn_80062C28(gPlayers[nPlayer].pChar) >= lbl_80281F78->f170 / 2.0f ||
-                  pV->f11C > 1.0f)) {
+                  pV->script.f98 > 1.0f)) {
                 return;
             }
         }

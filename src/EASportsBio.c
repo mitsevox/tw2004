@@ -105,11 +105,11 @@ void fn_801250C0(void) {
 }
 
 // TRUE when the card could be opened (or reported -18).
-u8 fn_80125118(s32* pArgs) {
+int fn_80125118(s32* pArgs) {
     s32 nPort;
     s32 nSlot;
     s32 nError;
-    s32 bOk;
+    u8 bOk;
 
     nSlot = pArgs[1];
     nPort = pArgs[0];

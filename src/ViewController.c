@@ -178,9 +178,9 @@ f32* fn_800172BC(View* pView) {
 }
 
 u8 fn_800172C4(View* pView) {
-    if (pView->p130 == NULL) return 1;
-    if (pView->p130->bAD) return 1;
-    if (pView->p130->p40 == NULL && pView->nCamera != 1) return 1;
+    if (pView->script.pShot == NULL) return 1;
+    if (pView->script.pShot->bAD) return 1;
+    if (pView->script.pShot->p40 == NULL && pView->script.nCamera != 1) return 1;
     return 0;
 }
 

@@ -16,7 +16,6 @@
 // loading turns it into the pointer in place; with 64-bit pointers the file needs its own layout.
 #define TER_RELOCATE(pCourse, field) ((pCourse)->field = (void*)((u8*)(pCourse) + BE32(&(pCourse)->field)))
 
-u8    fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit);   // segment crosses outline
 void  fn_8004B588(TNetwork* pNet);
 u8    Ter_LieIsPreferred(u32 nClass);
 void  fn_8004B63C(TNetwork* pNet);

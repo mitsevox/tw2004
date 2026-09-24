@@ -24,16 +24,16 @@ void fn_80062E40(View* pView) {
     pView->f54 = 1.0f;
     pView->f58 = 1.0f;
     pView->nCurCamera = 25;
-    pView->fCamTime = 0.0f;
-    pView->f11C = 0.0f;
-    pView->f114 = 0.0f;
-    pView->p130 = NULL;
-    pView->p134 = NULL;
-    pView->nCamera = 0;
-    pView->b150 = 0;
-    pView->b153 = 0;
+    pView->script.fCamTime = 0.0f;
+    pView->script.f98 = 0.0f;
+    pView->script.f90 = 0.0f;
+    pView->script.pShot = NULL;
+    pView->script.pNextShot = NULL;
+    pView->script.nCamera = 0;
+    pView->script.bCC = 0;
+    pView->script.bCF = 0;
     pView->b16C = 0;
-    pView->p138 = &pView->shot19C;
+    pView->script.pB4 = &pView->shot19C;
     pView->f174 = 0.0f;
     pView->p78 = NULL;
     pView->p7C = NULL;
@@ -50,10 +50,10 @@ void fn_80062E40(View* pView) {
     for (i = 0; i < 8; i++) {
         pView->script.a20[i] = 0.0f;
     }
-    pView->vF4[0] = 0.0f;
-    pView->vF4[1] = 0.0f;
-    pView->vF4[2] = 0.0f;
-    pView->vF4[3] = 1.0f;
+    pView->script.v70[0] = 0.0f;
+    pView->script.v70[1] = 0.0f;
+    pView->script.v70[2] = 0.0f;
+    pView->script.v70[3] = 1.0f;
 }
 
 // Forgets the view's camera sequences and shot.
@@ -72,14 +72,14 @@ void fn_8006351C(View* pView, int nPlayer, int nKind) {
     CamShot* pShot = fn_8003A7C8(nPlayer, nKind, NULL);
 
     if (pShot != NULL) {
-        pView->p134 = pShot->p40;
+        pView->script.pNextShot = pShot->p40;
         if (pShot->p40 != NULL) {
-            pView->n140 = pShot->p40->bAB;
-            pView->f110 = pShot->p40->f48;
+            pView->script.nBC = pShot->p40->bAB;
+            pView->script.f8C = pShot->p40->f48;
         }
     }
-    pView->fCamTime = 0.0f;
-    pView->p130 = pShot;
+    pView->script.fCamTime = 0.0f;
+    pView->script.pShot = pShot;
     fn_8003DCE8(nPlayer, pPos, pAt, &pView->script, &pView->shot19C, 0, 0.0f);
 }
 
@@ -142,12 +142,13 @@ u8 fn_800637C4(int nPlayer, int nView) {
 
     if (gPlayers[nPlayer].nView[0] == nView && fn_8001707C(nView) == nPlayer) {
         pView = fn_80017028(gPlayers[nPlayer].nView[0]);
-        if (pView->p130 != NULL) {
+        if (pView->script.pShot != NULL) {
             if ((pView->nCurCamera == 15 || pView->nCurCamera == 16) && fn_800C72DC(pView)) {
                 return 1;
             }
-            if (pView->p130->bAA == 0) {
-                if (pView->p134 == NULL || pView->p134->bAA == 0 || pView->n140 == 5) {
+            if (pView->script.pShot->bAA == 0) {
+                if (pView->script.pNextShot == NULL || pView->script.pNextShot->bAA == 0
+                    || pView->script.nBC == 5) {
                     return 1;
                 }
             }
@@ -169,41 +170,41 @@ void fn_800638B8(View* pView, int nPlayer) {
 
 // Camera 2 on the point pVec, over fTime.
 void fn_80063B98(View* pView, f32 fTime, f32* pVec) {
-    pView->nCamera = 2;
-    Vec_Copy(pVec, pView->vC4);
-    pView->f114 = 0.0f;
-    pView->f118 = fTime;
+    pView->script.nCamera = 2;
+    Vec_Copy(pVec, pView->script.v40);
+    pView->script.f90 = 0.0f;
+    pView->script.f94 = fTime;
 }
 
 // Camera 1 on the point pVec, over fTime.
 void fn_80063BF4(View* pView, f32 fTime, f32* pVec) {
-    pView->nCamera = 1;
-    Vec_Copy(pVec, pView->vC4);
-    pView->f114 = 0.0f;
-    pView->f118 = fTime;
+    pView->script.nCamera = 1;
+    Vec_Copy(pVec, pView->script.v40);
+    pView->script.f90 = 0.0f;
+    pView->script.f94 = fTime;
 }
 
 u8 fn_80063C50(View* pView) {
-    if (pView->nCamera == 5 || pView->nCamera == 4 || pView->nCamera == 3) {
+    if (pView->script.nCamera == 5 || pView->script.nCamera == 4 || pView->script.nCamera == 3) {
         return 1;
     }
     return 0;
 }
 
 u8 fn_80063C7C(View* pView) {
-    return pView->nCamera == 4;
+    return pView->script.nCamera == 4;
 }
 
 u8 fn_80063C90(View* pView) {
-    if (pView->nCamera == 2 || pView->nCamera == 1 || pView->nCamera == 4) {
+    if (pView->script.nCamera == 2 || pView->script.nCamera == 1 || pView->script.nCamera == 4) {
         return 1;
     }
     return 0;
 }
 
 void fn_80063CBC(View* pView, f32* pVec) {
-    pView->nCamera = 3;
-    Vec_Copy(pVec, pView->vC4);
+    pView->script.nCamera = 3;
+    Vec_Copy(pVec, pView->script.v40);
 }
 
 // Shakes the camera: moves its position by up to half of f178 each way.
@@ -226,8 +227,8 @@ u8 fn_800642B0(void) {
 void fn_800642D0(View* pView, int nPlayer) {
     f32* pPos = fn_8001731C(pView);
 
-    CameraScript_InterpToNewScript(&pView->script, pView->p130, nPlayer, pPos, fn_80017314(pView), 5, 0.0f,
-                                   100.0f, 25, 0.0f);
+    CameraScript_InterpToNewScript(&pView->script, pView->script.pShot, nPlayer, pPos, fn_80017314(pView), 5,
+                                   0.0f, 100.0f, 25, 0.0f);
 }
 
 // a - b into out, three floats; the same helper as Ball.c's fn_80055EA0.

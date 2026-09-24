@@ -502,7 +502,7 @@ void fn_80034720(UStreamObject* pObject) {
 // A pin position arrived (UKernel.c hands it on). With fn_800E39F0 set it goes to fn_800F199C;
 // otherwise a pin the course already has (w not 0) is copied into the chunk, and a missing one is
 // taken from it.
-int fn_800347B4(UStreamObject* pObject) {
+u8 fn_800347B4(UStreamObject* pObject) {
     TerPosData* pPin = (TerPosData*)pObject->pData;
 
     if (lbl_801D3CB0.pCourse != NULL) {
