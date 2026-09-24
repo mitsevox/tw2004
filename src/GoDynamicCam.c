@@ -36,6 +36,13 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
 void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
 void fn_8003D324(f32* pPos, f32* pDir, CamScript* pScript, CamShot* pShot, int nPlayer, f32 fSide, f32 fY);
 void fn_8003D414(f32* pPos, CamScript* pScript, CamShot* pShot, int nPlayer, f32 fY);
+void fn_8003AC50(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub);
+void fn_8003ADF8(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub);
+void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub,
+                 f32 f);
+void fn_8003B534(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub);
+void fn_8003B6D0(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub);
+f32  fn_8003DBA8(f32 f);
 
 // Registers the handlers of the camera files ('CAMS', 'CAMV', 'CAMA').
 void fn_80039454(void) {
@@ -374,6 +381,165 @@ void fn_8003A074(void) {
     }
     lbl_80281D88->n1C = 0;
     fn_80009E70(lbl_80281D88);
+}
+
+// Places a shot's camera at pOut by its placement kind (bB1), then keeps it above the ground under
+// it (on course 12 when fn_80015464 is 10, within 40 of the tee, fn_8004D5F0's height): at least
+// f68 above it, eased in under f6C. A kind 3 camera then moves a limited step from where it was.
+void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub,
+                 f32 f) {
+    f32 aOld[4];
+    f32 aStep[4];
+    f32 aOff[4];
+    f32 aDir[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    CourseInfo* pCourse;
+    int nPinSet;
+    f32 fGround;
+    f32 fLow;
+    f32 fLo;
+    f32 fHi;
+    f32 fDiff;
+    f32 fTop;
+    f32 fEase;
+    f32 fAbove;
+    f32 fFollow;
+    f32 fDist;
+    f32 fLimit;
+    f32 fStep;
+
+    nPinSet = Game_CurrentPinSet();
+    Vec3Copy(pOut, aOld);
+    switch (pShot->bB1) {
+    case 0:
+    case 1:
+        fn_8003AC50(pShot, nPlayer, pScript, pOut, pCam, pSub);
+        break;
+    case 2:
+    case 3:
+    case 4:
+    case 8:
+        fn_8003ADF8(pShot, nPlayer, pScript, pOut, pCam, pSub);
+        break;
+    case 5:
+    case 6:
+        fn_8003B028(pShot, nPlayer, pScript, pOut, pCam, pSub, f);
+        break;
+    case 7:
+        fn_8003B534(pShot, nPlayer, pScript, pOut, pCam, pSub);
+        break;
+    case 9:
+        fn_8003B6D0(pShot, nPlayer, pScript, pOut, pCam, pSub);
+        break;
+    }
+    pCourse = fn_8000C594();
+    if (pCourse != NULL) {
+        if (fn_80043388(pScript, pShot) && pShot != pScript->pNextShot) {
+            if (Game_GetCourse() == 12 && fn_80015464() == 10) {
+                fn_8003DC54(&pCourse->tee[gSession.nTeeSet[nPlayer]].x, pOut, aOff);
+                aOff[1] = 0.0f;
+                if ((f32)fn_80009680(fn_80009744(aOff)) < 40.0f) {
+                    fGround = fn_8004D5F0(pCourse, pOut);
+                } else {
+                    fGround = Terrain_HeightAt(pOut, NULL);
+                    if (pShot->bAD == 4 && !fn_8003A76C(pShot) && !fn_8003DC78(pShot)) {
+                        fLow = (pCourse->pin[nPinSet].y <= pCourse->tee[gSession.nTeeSet[nPlayer]].y)
+                                   ? pCourse->pin[nPinSet].y
+                                   : pCourse->tee[gSession.nTeeSet[nPlayer]].y;
+                        fGround = (fLow <= fGround) ? fGround : fLow;
+                    }
+                }
+                pScript->fD8 = fGround;
+                if (pScript->fD8 < -60000.0f) {
+                    pScript->fD8 = fn_8000C594()->fFloor;
+                }
+            } else {
+                fGround = Terrain_HeightAt(pOut, NULL);
+                if (pShot->bAD == 4 && !fn_8003A76C(pShot) && !fn_8003DC78(pShot)) {
+                    fLow = (pCourse->pin[nPinSet].y <= pCourse->tee[gSession.nTeeSet[nPlayer]].y)
+                               ? pCourse->pin[nPinSet].y
+                               : pCourse->tee[gSession.nTeeSet[nPlayer]].y;
+                    fGround = (fLow <= fGround) ? fGround : fLow;
+                }
+                pScript->fD8 = fGround;
+                if (pScript->fD8 < -60000.0f) {
+                    pScript->fD8 = fn_8000C594()->fFloor;
+                }
+            }
+        } else {
+            fGround = pScript->fD8;
+        }
+    } else if (gSession.nGameType == 3) {
+        fGround = pShot->f68;
+        pOut[1] = fGround;
+    } else {
+        fGround = 0.0f;
+    }
+    if (fGround < -60000.0f) {
+        fGround = fn_8004D5F0(pCourse, pOut);
+    }
+    if (fn_8003A76C(pShot) || fn_8003DC78(pShot)) {
+        fDiff = gPlayers[nPlayer].vBall[1] - fGround;
+        fLo = pShot->f68 + fDiff;
+        fHi = pShot->f6C + fDiff;
+        if (fLo < lbl_80281F78->f168) {
+            fLo = lbl_80281F78->f168;
+        }
+        if (fHi < lbl_80281F78->f168) {
+            fHi = lbl_80281F78->f168;
+        }
+    } else {
+        fLo = pShot->f68;
+        fHi = fn_8003DBA8(pShot->f6C);
+    }
+    if (pOut[1] - fGround < fLo) {
+        if (pShot->bB1 == 5 || pShot->bB1 == 6 || pShot->bB1 == 7) {
+            // fake match: a negated >=, where < gives a plain bge
+            if (!(aOld[1] - fGround >= fLo)) {
+                pOut[1] += lbl_80281F78->f194;
+                if (pOut[1] - fGround > fLo) {
+                    pOut[1] = fGround + fLo;
+                }
+            }
+            if (pOut[1] - fGround < lbl_80281F78->f168) {
+                pOut[1] = fGround + lbl_80281F78->f168;
+            }
+        } else {
+            pOut[1] = fGround + fLo;
+        }
+    } else {
+        fFollow = pScript->fD8;
+        fEase = lbl_80281F78->f174;
+        fAbove = pOut[1] - fFollow;
+        fTop = fHi - fEase;
+        if (fAbove > fTop) {
+            fEase = fEase * (1.0f - fEase / (fAbove - fTop + fEase));
+            pOut[1] = fEase + (fFollow + fTop);
+            if (pOut[1] - fGround < fLo) {
+                pOut[1] = fGround + fLo;
+            }
+        }
+    }
+    if (pShot->bB1 == 3 && !fn_80043388(pScript, pShot) &&
+        (pScript->pNextShot != pShot || pScript->fCamTime > 0.0f)) {
+        fn_8003DC54(pOut, aOld, aStep);
+        fDist = (f32)fn_80009680(fn_80009744(aStep));
+        if (aStep[0] != 0.0f || aStep[1] != 0.0f || aStep[2] != 0.0f) {
+            fn_800BAF04(aStep, aDir);
+        } else {
+            aDir[0] = 0.0f;
+            aDir[1] = 0.0f;
+            aDir[2] = 0.0f;
+        }
+        fLimit = 0.5f * fabsf(pShot->f60);
+        if (fDist > fLimit) {
+            fStep = fDist - fLimit;
+        } else {
+            fStep = fDist * (1.0f - (fLimit - fDist) / fLimit);
+            fStep = fStep * fStep;
+        }
+        fn_8001EF34(aDir, fStep, aStep);
+        fn_8003DC30(aOld, aStep, pOut);
+    }
 }
 
 // The shot is one of kinds 1, 3, 13, 28..34 or 40..45.

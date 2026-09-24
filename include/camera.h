@@ -408,13 +408,13 @@ typedef struct CamTuning {
     f32  f168;                  // 0x168  the ground clearance for CamScript_KeepAboveGround
     f32  f16C;                  // 0x16C  the obstruction radius around the ball for the pre-shot routine
     f32  f170;                  // 0x170  a blend for fn_80063B98 / fn_80063BF4
-    u8   unk174[0x178 - 0x174];
+    f32  f174;                  // 0x174  fn_8003A148: how softly a camera eases in under its height limit
     f32  f178;                  // 0x178
     f32  v17C[4];               // 0x17C
     f32  f18C;                  // 0x18C  fn_8003B534: the ball-flight camera closes in by this share of
                                 //        the height above the shot's f6C ...
     f32  f190;                  // 0x190  ... and backs off by this share of the height below its f68
-    u8   unk194[0x198 - 0x194];
+    f32  f194;                  // 0x194  fn_8003A148: how far a camera below its least height rises a frame
     f32  f198;                  // 0x198  fn_8003B534: the least ball speed it follows the flight at
     f32  f19C;                  // 0x19C  the steepest a camera direction may tilt (fn_8003D810, radians)
     u8   unk1A0[0x1A8 - 0x1A0];
