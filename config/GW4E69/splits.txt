@@ -348,6 +348,8 @@ ByteSwap.c:
 
 GoCamera.c:
 	.text       start:0x800763BC end:0x80076A54
+	.data       start:0x80189480 end:0x80189490
+	.sdata2     start:0x80283A70 end:0x80283A98
 
 GoViewport.c:
 	.text       start:0x80076A54 end:0x80076B7C
