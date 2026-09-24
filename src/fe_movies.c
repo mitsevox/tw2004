@@ -10,6 +10,14 @@
 #include "frontend/uisvec.h"
 #include "unsorted/cull.h"
 
+FE801D8858 lbl_801D8858;
+f32 lbl_801D8818[8][2];
+
+f32* lbl_80281F2C;
+f32* lbl_80281F28;
+struct TexEntry* lbl_80281F24;
+struct TexBank*  lbl_80281F20;
+
 void fn_80008380(void);
 void fn_80092250(f32* pA, f32* pB, f32* pOut);
 void fn_80092080(LLPict* pPict, f32 fAlpha);    // draws the picture at that alpha

@@ -252,6 +252,7 @@ PasswordManager.c:
 	.text       start:0x80056480 end:0x80057F18
 	.rodata     start:0x801834C0 end:0x80183578
 	.data       start:0x80187F88 end:0x80188138
+	.bss        start:0x801D5908 end:0x801D5968
 	.sdata      start:0x80281140 end:0x80281188
 
 fe_craputils.c:
@@ -317,6 +318,7 @@ GoLighting.c:
 
 Code8006F154.c:
 	.text       start:0x8006F154 end:0x8006F438
+	.bss        start:0x801D70A8 end:0x801D7100
 	.sdata      start:0x802811E0 end:0x802811E8
 	.sdata2     start:0x80283958 end:0x80283988
 
@@ -366,6 +368,9 @@ GoShaderObjectCommon_ShaderObjectsData_Gc.c:
 LLVideo.c:
 	.text       start:0x80075280 end:0x80076158
 	.data       start:0x80189470 end:0x80189480
+	.bss        start:0x801D7120 end:0x801D7148
+	.sdata      start:0x80281200 end:0x80281208
+	.sbss       start:0x80281EB8 end:0x80281EC0
 	.sdata2     start:0x80283A50 end:0x80283A70
 
 ByteSwap.c:
@@ -429,7 +434,9 @@ Code80090940.c:
 fe_movies.c:
 	.text       start:0x80090B80 end:0x800922A8
 	.data       start:0x80189C00 end:0x80189C38
+	.bss        start:0x801D8818 end:0x801D8890
 	.sdata      start:0x80281378 end:0x80281380
+	.sbss       start:0x80281F20 end:0x80281F30
 	.sdata2     start:0x80283B90 end:0x80283BF0
 
 uiText.c:
@@ -503,6 +510,8 @@ GoShaderObject_Glows_Gc.c:
 UFstPart.c:
 	.text       start:0x80098A98 end:0x80099ED8
 	.data       start:0x80189D98 end:0x80189DA8
+	.bss        start:0x801DB878 end:0x801DB8A0
+	.sbss       start:0x80281F88 end:0x80281F90
 	.sdata2     start:0x80283E20 end:0x80283E70
 
 BootCourse.c:
@@ -571,6 +580,8 @@ hlaudmovie.c:
 
 hlaudtrack.c:
 	.text       start:0x800A9808 end:0x800AA4BC
+	.bss        start:0x801F1868 end:0x801F1880
+	.sbss       start:0x80282098 end:0x802820A8
 	.sdata2     start:0x80283FD0 end:0x80283FD8
 
 hlaudtrackseq.c:

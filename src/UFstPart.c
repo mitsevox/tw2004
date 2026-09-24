@@ -7,6 +7,12 @@
 #include "golfer.h"
 #include "unsorted/cull.h"
 
+PsEmitter* lbl_801DB888[6];
+f32 lbl_801DB878[4];
+
+s32 lbl_80281F8C;
+PsEmitter* lbl_80281F88;
+
 // Skin.c
 void fn_80036054(ShaderObject* pObj, int nRow, const void* pDesc);
 void fn_800360A0(ShaderObject* pObj);

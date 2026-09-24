@@ -8,6 +8,11 @@
 #include "camera.h"
 #include "terrain.h"
 
+VideoSlots lbl_801D7120;
+VideoSlots* lbl_80281200 = &lbl_801D7120;
+
+u8 lbl_80281EB8;
+
 u8   LLVideo_UpdateStream(Video* pVideo, int* pnQueued);
 void fn_800752DC_PreloadQueue(Video* pVideo);
 void LLVideo_ChunkAddBufferRef(VideoChunk* pChunk);
