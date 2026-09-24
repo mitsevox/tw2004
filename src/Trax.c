@@ -9,8 +9,9 @@
 #include "frontend/fe.h"
 #include "trax.h"
 
-TraxState lbl_801F8458;
+// Defined in reverse address order: CodeWarrior lays out .bss last-defined first.
 TraxTrack lbl_801F846C[TRAX_NUM_TRACKS];
+TraxState lbl_801F8458;
 
 u8 fn_800BA080(void);
 void fn_800BA118(UStreamObject* pObject);

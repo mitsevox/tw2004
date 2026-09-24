@@ -935,7 +935,7 @@ config.libs = [
             Object(Matching, "GoARAM.c"),
             Object(NonMatching, "DiscError.c"),
             Object(NonMatching, "rcmp_mad_codec.c"),
-            Object(NonMatching, "Trax.c"),
+            Object(Matching, "Trax.c"),
             Object(NonMatching, "ScreenClear.c"),
             Object(NonMatching, "Code800BA940.c"),
             Object(NonMatching, "VecMath.c"),
