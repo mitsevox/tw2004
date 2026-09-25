@@ -7,6 +7,10 @@
 #include "golfer.h"
 #include "gx.h"
 #include "shaderdata.h"
+#include "obfdata.h"
+#include "terrain.h"
+#include "rain.h"
+#include "grassshader.h"
 
 void fn_8007110C(u32* pnFrame);
 void fn_80071148(StaticShaderObject* pObj, ShaderCmds* pCmds);
@@ -24,6 +28,83 @@ void fn_80071A54(int nRow);
 void fn_80071A90(int nRow);
 void fn_80070168(void);     // sweep_80070168.c: calls a display list
 void fn_8007524C(void);     // GoShaderObjectCommon_ShaderObjectsData_Gc.c: empty
+
+// The hooks of lbl_80188E78 and lbl_80188E88 defined in other units, by unit.
+// GoShaderObjectContainer_OBFData_Gc.c
+void fn_8006FDCC(void);
+void fn_8006FDD0(void);
+void fn_8006FED4(u8* p0, s32 p1);
+void fn_8006FF08(u8* p0);
+// sweep_8006FF2C.c
+void fn_8006FF2C(void* arg0);
+// ShaderRow0.c
+void fn_8006FF80(DynRenderObject* pObj, const DynRenderSize* pSize);
+void fn_8006FFD4(DynRenderObject* pObj);
+void fn_8006FFF8(DynRenderObject* pObj);
+void fn_80070078(DynRenderObject* pObj, DynRenderFill* pFill, u8 bRestart);
+// DynamicRenderingBuffer.c
+void fn_80070B74(void);
+void fn_80070B78(StaticShaderObject* pObj, ShaderCmds* pCmds);
+void fn_80070BAC(StaticShaderObject* pObj);
+void fn_80070BD0(StaticShaderObject* pObj);
+void fn_80070C24(StaticShaderObject* pObj, ShaderCmds* pCmds);
+void fn_80070C58(StaticShaderObject* pObj);
+void fn_80070C7C(StaticShaderObject* pObj);
+void fn_80070CD0(StaticShaderObject* pObj, ShaderCmds* pCmds);
+void fn_80070D04(StaticShaderObject* pObj);
+void fn_80070D28(StaticShaderObject* pObj);
+void fn_80070D7C(f32* pfWeight);
+void fn_80070D88(StaticShaderObject* pObj, ShaderCmds* pCmds);
+void fn_80070DBC(StaticShaderObject* pObj);
+void fn_80070DF4(StaticShaderObject* pObj);
+// Code80070EC4.c
+void fn_80070EC4(TerWaveData* pWave);
+void fn_80070F00(StaticShaderObject* pObj, ShaderCmds* pCmds);
+void fn_80070F34(StaticShaderObject* pObj);
+void fn_80070F5C(StaticShaderObject* pObj);
+void fn_80070FB0(f32* pfWeight);
+void fn_80070FBC(StaticShaderObject* pObj, ShaderCmds* pCmds);
+void fn_80070FF0(StaticShaderObject* pObj);
+void fn_80071028(StaticShaderObject* pObj);
+// GoShaderObject_Particle_Gc.c
+void fn_8009414C(void);
+void fn_80094214(void);
+void fn_80094274(void);
+void fn_80094278(void);
+void fn_8009428C(SD_SShaderObject_Static* pObject, ParticleCreate* pCreate);
+void fn_800944F8(SD_SShaderObject_Static* pObject);
+void fn_800949D0(SD_SShaderObject_Static* pObject);
+void fn_80095088(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg);
+// GoShaderObject_Glows_Gc.c
+void GlowsRenderData_InitModule(void);
+void GlowsRenderData_CloseModule(void);
+void fn_80098844(void);
+void fn_80098848(void);
+void fn_8009884C(u8* p0);
+void fn_80098884(u8* p0, u8* p1);
+// GoShaderObject_Rain_Gc.c
+void fn_800B4B5C(void);
+void fn_800B4BB0(void);
+void fn_800B4BB4(void);
+void fn_800B4BB8(void);
+void fn_800B4BD8(void);
+void fn_800B4BFC(void);
+void SD_vShaderObject_Rain_Dynamic_Init(RainObject* pRain, f32* pStrength);
+void fn_800B4F24(RainObject* pRain);
+void fn_800B4FA4(RainObject* pRain);
+void fn_800B52D4(RainObject* pRain, f32* pTime);
+// GoShaderObject_Grass_Gc.c
+void SD_vShaderObject_Grass_Type_Init(void);
+void SD_vShaderObject_Grass_Type_Close(void);
+void SD_vShaderObject_Grass_Type_SetParameters(void* pParams);
+void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassBufferDesc* pDesc);
+void SD_vShaderObject_Grass_Static_Close(SD_SShaderObject_Static* pObject);
+void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject);
+// ShaderRow19.c
+void fn_801247C0(DynRenderObject* pObj, const DynRenderSize* pSize);
+void fn_80124814(DynRenderObject* pObj);
+void fn_80124838(DynRenderObject* pObj);
+void fn_801248B8(DynRenderObject* pObj, DynRenderFill* pFill, u8 bRestart);
 
 s32 lbl_80281E80;
 s32* lbl_802811F8 = &lbl_80281E80;
@@ -375,3 +456,192 @@ void fn_80071A90(int nRow) {
         lbl_80188E88[nRow].pfn4();
     }
 }
+
+// port: most hooks in these two tables are defined with their own object and data types, not their
+// field's (the pfn8 hooks of rows 6, 7 and 10 take nothing); each is cast to its field's type here,
+// and a port must call each through its real type.
+HookRow lbl_80188E78[1] = {
+    {
+        fn_8006FDCC, fn_8006FDD0,
+        {
+            (void (*)(struct UObjArraySet*, void*))fn_8006FDD4,
+            (void (*)(struct UObjArraySet*))fn_8006FE44,
+        },
+    },
+};
+
+ModuleHooks lbl_80188E88[20] = {
+    {   // 0
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+        {
+            (void (*)(struct UObjMeshPart*, void*))fn_8006FED4,
+            (void (*)(struct UObjMeshPart*))fn_8006FF08,
+            (void (*)(struct UObjMeshPart*))fn_8006FF2C,
+        },
+        { 0 },
+        {
+            (void (*)(ShaderObject*, const void*))fn_8006FF80,
+            (void (*)(ShaderObject*))fn_8006FFD4,
+            (void (*)(ShaderObject*))fn_8006FFF8,
+            (void (*)(ShaderObject*, const void*, int))fn_80070078,
+        },
+    },
+    {   // 1
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+        {
+            (void (*)(struct UObjMeshPart*, void*))fn_80070CD0,
+            (void (*)(struct UObjMeshPart*))fn_80070D04,
+            (void (*)(struct UObjMeshPart*))fn_80070D28,
+        },
+    },
+    {   // 2
+        NULL, NULL,
+        (void (*)(void*))fn_80070FB0,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+        {
+            (void (*)(struct UObjMeshPart*, void*))fn_80070FBC,
+            (void (*)(struct UObjMeshPart*))fn_80070FF0,
+            (void (*)(struct UObjMeshPart*))fn_80071028,
+        },
+    },
+    {   // 3
+        NULL, NULL,
+        (void (*)(void*))fn_80070D7C,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+        {
+            (void (*)(struct UObjMeshPart*, void*))fn_80070D88,
+            (void (*)(struct UObjMeshPart*))fn_80070DBC,
+            (void (*)(struct UObjMeshPart*))fn_80070DF4,
+        },
+    },
+    {   // 4
+        NULL, NULL,
+        (void (*)(void*))fn_80070EC4,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+        {
+            (void (*)(struct UObjMeshPart*, void*))fn_80070F00,
+            (void (*)(struct UObjMeshPart*))fn_80070F34,
+            (void (*)(struct UObjMeshPart*))fn_80070F5C,
+        },
+    },
+    {   // 5
+        NULL, NULL,
+        (void (*)(void*))fn_8007110C,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+        {
+            (void (*)(struct UObjMeshPart*, void*))fn_80071148,
+            (void (*)(struct UObjMeshPart*))fn_8007117C,
+            (void (*)(struct UObjMeshPart*))fn_800711A4,
+        },
+        { 0 },
+        {
+            (void (*)(ShaderObject*, const void*))fn_800711F8,
+            (void (*)(ShaderObject*))fn_800712B4,
+            (void (*)(ShaderObject*))fn_800712EC,
+            (void (*)(ShaderObject*, const void*, int))fn_800713B4,
+        },
+    },
+    {   // 6
+        NULL, NULL,
+        (void (*)(void*))fn_80071624,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+        {
+            (void (*)(struct UObjMeshPart*, void*))fn_80071628,
+            (void (*)(struct UObjMeshPart*))fn_8007165C,
+            (void (*)(struct UObjMeshPart*))fn_80071680,
+        },
+    },
+    {   // 7
+        NULL, NULL,
+        (void (*)(void*))fn_80070B74,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+        {
+            (void (*)(struct UObjMeshPart*, void*))fn_80070B78,
+            (void (*)(struct UObjMeshPart*))fn_80070BAC,
+            (void (*)(struct UObjMeshPart*))fn_80070BD0,
+        },
+    },
+    {   // 8
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+        {
+            (void (*)(struct UObjMeshPart*, void*))fn_80070C24,
+            (void (*)(struct UObjMeshPart*))fn_80070C58,
+            (void (*)(struct UObjMeshPart*))fn_80070C7C,
+        },
+    },
+    {   // 9
+        fn_8009414C, fn_80094214, NULL, fn_80094274, fn_80094278, NULL, NULL, NULL, NULL,
+        { NULL },
+        { 0 },
+        {
+            (void (*)(ShaderObject*, const void*))fn_8009428C,
+            (void (*)(ShaderObject*))fn_800944F8,
+            (void (*)(ShaderObject*))fn_800949D0,
+            (void (*)(ShaderObject*, const void*, int))fn_80095088,
+        },
+    },
+    {   // 10
+        NULL, NULL,
+        (void (*)(void*))fn_80071574,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+        {
+            (void (*)(struct UObjMeshPart*, void*))fn_80071578,
+            (void (*)(struct UObjMeshPart*))fn_800715AC,
+            (void (*)(struct UObjMeshPart*))fn_800715D0,
+        },
+    },
+    {   // 11
+        GlowsRenderData_InitModule, GlowsRenderData_CloseModule, NULL, NULL, NULL, NULL, NULL, NULL,
+        NULL,
+        { NULL },
+        { 0 },
+        {
+            (void (*)(ShaderObject*, const void*))fn_80098844,
+            (void (*)(ShaderObject*))fn_80098848,
+            (void (*)(ShaderObject*))fn_8009884C,
+            (void (*)(ShaderObject*, const void*, int))fn_80098884,
+        },
+    },
+    {   // 12
+        fn_800B4B5C, fn_800B4BB0, NULL, fn_800B4BB4, fn_800B4BB8, fn_800B4BD8, fn_800B4BFC, NULL,
+        NULL,
+        { NULL },
+        { 0 },
+        {
+            (void (*)(ShaderObject*, const void*))SD_vShaderObject_Rain_Dynamic_Init,
+            (void (*)(ShaderObject*))fn_800B4F24,
+            (void (*)(ShaderObject*))fn_800B4FA4,
+            (void (*)(ShaderObject*, const void*, int))fn_800B52D4,
+        },
+    },
+    { NULL },          // 13
+    { NULL },          // 14
+    { NULL },          // 15
+    { NULL },          // 16
+    {   // 17
+        SD_vShaderObject_Grass_Type_Init, SD_vShaderObject_Grass_Type_Close,
+        SD_vShaderObject_Grass_Type_SetParameters, NULL, NULL, NULL, NULL, NULL, NULL,
+        {
+            (void (*)(struct UObjMeshPart*, void*))SD_vShaderObject_Grass_Static_Init,
+            (void (*)(struct UObjMeshPart*))SD_vShaderObject_Grass_Static_Close,
+            (void (*)(struct UObjMeshPart*))SD_vShaderObject_Grass_Static_Render,
+        },
+    },
+    { NULL },          // 18
+    {   // 19
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+        { NULL },
+        { 0 },
+        {
+            (void (*)(ShaderObject*, const void*))fn_801247C0,
+            (void (*)(ShaderObject*))fn_80124814,
+            (void (*)(ShaderObject*))fn_80124838,
+            (void (*)(ShaderObject*, const void*, int))fn_801248B8,
+        },
+    },
+};
+
+u8 lbl_801893D8[20] = {
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+    1, 0, 0, 1, 1, 1, 1, 0, 1, 1,
+};
