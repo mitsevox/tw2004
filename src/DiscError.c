@@ -185,8 +185,8 @@ void fn_800B6E1C(int nX, int nY, int nRow, DiscGlyph* pGlyph) {
     if (pGlyph != NULL) {
         nY += pGlyph->nDrop;
     }
-    uBackCb = (lbl_80190D40[7].uY << 8) + lbl_80190D40[7].uCb;
     uForeCb = (lbl_80190D40[lbl_80282190].uY << 8) + lbl_80190D40[lbl_80282190].uCb;
+    uBackCb = (lbl_80190D40[7].uY << 8) + lbl_80190D40[7].uCb;
     uForeCr = (lbl_80190D40[lbl_80282190].uY << 8) + lbl_80190D40[lbl_80282190].uCr;
     uBackCr = (lbl_80190D40[7].uY << 8) + lbl_80190D40[7].uCr;
     uFore = uForeCb;
@@ -222,8 +222,8 @@ void fn_800B6E1C(int nX, int nY, int nRow, DiscGlyph* pGlyph) {
                 uFore = uForeCr;
             }
         }
-        pBits++;
         nY2 += 2;
+        pBits++;
     }
 }
 
