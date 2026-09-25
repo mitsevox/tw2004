@@ -10,6 +10,15 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 (add yours here: date, lane, what, score)
 
+- 2026-09-25 n-modes (quicktrial aligned, base 79): observation: only the FIRST clamp differs; ours
+  compares with f30 (the loop's hoisted 1.0 of `1.0f - ...`, same basic block, so CSE'd), EA loads
+  1.0 again into the result register and compares with it (as ours already does in the second clamp,
+  which sits in a later block). Clamp bodies with a result local `r = fHi; if (!(x > r)) r = x;` (and
+  if/else, ternary-into-r, early-return variants) 62-83: best 62 aligned but objdiff 97.88 -> 97.67
+  (reverted); x f32/f64 on fLo/fHi: no effect (constants propagate). Clamp on fZ instead of aXY[] 92-93;
+  fZ computed at the loop top / before the call 115-136; `fOne` local for the 1.0 of fZ: no effect
+  (copy-propagated).
+
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
 ```
