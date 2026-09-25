@@ -197,7 +197,17 @@ GoTerrain.c:
 	.text       start:0x80030254 end:0x80035640
 
 Skin.c:
-	.text       start:0x80035640 end:0x80037DD8
+	.text       start:0x80035640 end:0x80037AB8
+	.rodata     start:0x8017E1C0 end:0x8017E690
+	.data       start:0x801878A8 end:0x80187900
+	.bss        start:0x801D4E78 end:0x801D4F68
+	.sdata      start:0x802810F0 end:0x80281100
+	.sbss       start:0x80281D70 end:0x80281D80
+	.sdata2     start:0x80283018 end:0x80283020
+
+Code80037AB8.c:
+	.text       start:0x80037AB8 end:0x80037DD8
+	.sdata2     start:0x80283020 end:0x80283028
 
 GoPostFx.c:
 	.text       start:0x80037DD8 end:0x8003944C

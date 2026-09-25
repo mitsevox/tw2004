@@ -20,7 +20,6 @@ void  fn_8006E7A4(LightGroup* pGroup);         // GoLighting.c: load the group's
 void  fn_8006EADC(UObject* pObj);              // GoLighting.c: light the object
 void  fn_8006ED70(void);                       // GoLighting.c
 void  fn_801127A0(void* pDesc);                // hwsMaterial_Gc.c
-void  fn_801127C4(void* pDesc);                // hwsMaterial_Gc.c
 void  fn_800CEE88(u8 b);                       // SkinPart.c
 void  fn_800CEF04(SkinDesc* pDesc);            // SkinPart.c: offsets to pointers
 void  fn_800CD404(Skin* pSkin);                // SkinPart.c
@@ -55,11 +54,6 @@ void  fn_8011CB5C(Skin* pSkin, int nView);                   // SkinMorph.c
 void  fn_800CE16C(void);                                     // SkinPart.c
 void  fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int nView);
 void  fn_80036790(Skin* pSkin, int n);
-void  fn_80037AB8(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst);
-void  Quat_Add(f32* pA, f32* pB, f32* pOut);                // Quaternion.c
-void  Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);            // Quaternion.c: pIn turned by pQuat
-void  Quat_QuatToMatrix(f32* pQ, f32 (*pMtx)[4]);                   // Quaternion.c: to a matrix
-void  fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);            // UMemPool.c: inverts a matrix
 void  fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits);          // Skeleton.c
 void  fn_80036278(SkinModel44* pEntries, s32 nEntries);
 void  fn_80036344(SkinModel44* pEntries, s32 nEntries);
@@ -70,6 +64,12 @@ void  fn_80036894(SkinDesc* pDesc);
 void  fn_800368FC(SkinDesc* pDesc);
 void  fn_80037574(BonePose* pBones, s32 nBones);
 void  fn_80037D5C(SkinDesc* pDesc);
+
+// .bss and .sbss, each in reverse address order (CodeWarrior lays them out last-defined-first)
+SkinTris lbl_801D4E78;
+s32 lbl_80281D78;
+s32 lbl_80281D74;
+void* lbl_80281D70;
 
 // Picks the "shadow" part of the character's skin and of its club's skin, for n17B4.
 void fn_80035640(Character* pChar) {
@@ -141,6 +141,12 @@ void fn_80035810(Character* pChar) {
             fn_800CE128(pSkin);
         }
     }
+}
+
+// fake match: stands in for a function the original linker stripped. The file's pool has 0.0f
+// (0x80283018) before the 0.5f fn_800358E0 uses first; its body is unknown.
+static f32 Skin_StrippedFn(f32 x) {
+    return (x < 0.0f) ? -x : x;
 }
 
 // Draws the character's skin: without flag 2, lit by the current course's light set (flag 4: set 3
@@ -1076,89 +1082,4 @@ Skin* fn_800377FC(u8* pData, u8 b) {
     fn_800CEE88(bOld);
     fn_800375AC(pSkin, 0);
     return pSkin;
-}
-
-// Once per skin model (flag 0x8000): turns its bone poses from relative to their parent (the
-// character model's bone parents, from bone nFirst on nSkip further along) into model space, then
-// stores each bone's inverse matrix in p1088.
-void fn_80037AB8(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst) {
-    f32 aQuat[4];
-    f32 aTurned[4];
-    f32 aMtx[4][4];
-    BonePose* pParent;
-    int nBone;
-    int i;
-
-    if (pSkin->pModel != NULL && !(pSkin->pModel->u30 & 0x8000)) {
-        pSkin->pModel->u30 |= 0x8000;
-        for (i = 1; i < pSkin->pModel->n14; i++) {
-            nBone = i;
-            if (i >= nFirst) {
-                nBone = i + nSkip;
-            }
-            pParent = &pSkin->pModel->p34[pCharModel->pBones[nBone].nParent];
-            Quat_RotateVector(pParent->q0, pSkin->pModel->p34[i].v10, aTurned);
-            Quat_Add(pParent->v10, aTurned, pSkin->pModel->p34[i].v10);
-            pSkin->pModel->p34[i].v10[3] = 0.0f;
-            Quat_Multiply(pSkin->pModel->p34[i].q0, pParent->q0, aQuat);
-            fn_8001E85C(aQuat, pSkin->pModel->p34[i].q0);
-        }
-        for (i = 0; i < pSkin->pModel->n14; i++) {
-            Quat_QuatToMatrix(pSkin->pModel->p34[i].q0, aMtx);
-            fn_8001E880(pSkin->pModel->p34[i].v10, aMtx[3]);
-            fn_8000A798(aMtx, pSkin->p1088[i]);
-        }
-    }
-}
-
-// Hands the skin the morph weights a format 1 pose buffer changed (bits 5..19 of its first block),
-// then clears the block's bits.
-void fn_80037C48(Skin* pSkin, SkelPose* pPose) {
-    SkelPoseBlock* pBlock;
-    int i;
-
-    if (pSkin != NULL) {
-        pBlock = &((SkelPose1*)pPose)->aBlocks[0];
-        for (i = 5; i < 20; i++) {
-            if (fn_8001E9CC(pBlock->aBits, i)) {
-                fn_8011CADC(pSkin, i - 5, pBlock->af8[i]);
-            }
-        }
-        fn_8001E938(pBlock->aBits, 20);
-    }
-}
-
-// ---- sweep code (tidied) ----
-
-void fn_80037CD8(Skin* pSkin) {
-    SkinModel* pModel;
-
-    fn_80037708(pSkin);
-    fn_8011CD84(pSkin);
-    fn_800CD56C(pSkin);
-    pModel = pSkin->pModel;
-    if (pModel != NULL) {
-        if (pModel->pDesc != NULL) {
-            fn_801127C4(pModel->pDesc);
-            fn_80009E70(pSkin->pModel->pDesc);
-        }
-        fn_80009E70(pSkin->pModel);
-    }
-    if (pSkin->p1088 != NULL) {
-        fn_80009E70(pSkin->p1088);
-    }
-    fn_80009E70(pSkin);
-}
-
-// ---- end of sweep code ----
-
-// Frees the mesh bit data a description allocated for itself (flag 0x400000).
-void fn_80037D5C(SkinDesc* pDesc) {
-    int i;
-
-    for (i = 0; i < pDesc->n2C; i++) {
-        if (pDesc->p34[i].pBits != NULL && (pDesc->p34[i].uFlags & 0x400000)) {
-            fn_80009E70(pDesc->p34[i].pBits);
-        }
-    }
 }
