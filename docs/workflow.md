@@ -149,7 +149,8 @@ python tools/match/permute.py <Unit> <fn> --minutes 20 -j 4
 
 It sets up `build/perm/<fn>`, runs the permuter and stops it at the time limit, killing the whole
 process tree (Git Bash's `timeout` does not stop it on Windows; a run once went 51 minutes). The
-machine is shared, so keep `-j 4` or less. Output lands in `build/perm/<fn>/output-*`. Read the diff it found and apply the idea by hand;
+machine is shared, so keep `-j 4` or less (the script caps it; on an idle many-core machine
+`--max-jobs 18 -j 18` lifts the cap, e.g. an overnight `--minutes 480` run). Output lands in `build/perm/<fn>/output-*`. Read the diff it found and apply the idea by hand;
 its code is often ugly but it points at the real change (a type, an order, a temporary).
 
 **The lever sweeper** tries the changes that have actually fixed near-misses (declaration moves,
