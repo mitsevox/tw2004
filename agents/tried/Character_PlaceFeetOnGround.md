@@ -1,6 +1,9 @@
 # Character_PlaceFeetOnGround (char.c, 0x800187CC)
 
-Status: OPEN, 99.05% on 2026-09-25.
+Status: SOLVED 2026-09-25 (n-charskin): the non-golfer height goes through its own local
+(TW07 has a local `h` here): `fH = fHigh; if (..) { fH = fLow; if (fH < -60000.0f) fH = pPos[1]; }
+fY = fH;`. The identity read on pPos is still needed. Commit: "SkinPart.c fn_800CE660, char.c
+Character_PlaceFeetOnGround exact".
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -9,6 +12,12 @@ unless you combine it with something new. Before you stop, add every attempt und
 ## Attempts
 
 (add yours here: date, lane, what, score)
+
+- 2026-09-25 n-charskin (from 3 diffs, with the pPos identity read): `fY = fLow; if (fLow|fY < ..)
+  fY = pPos[1];`, `!(<) ?:`, if/else forms, whole block as if/else-if/else, full ternary, a copy
+  through fDelta or fLowest: 3-8. A new local fH for the copy of fLow only (4 forms x 13
+  positions): 3. fH carrying the whole choice and `fY = fH` after: 0 at every position; without
+  the identity read: 4.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 

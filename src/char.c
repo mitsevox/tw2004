@@ -675,6 +675,7 @@ void Character_PlaceFeetOnGround(Character* pChar) {
     f32 fDelta;
     f32* pPos;
     int i;
+    f32 fH;
     f32 fLow;
     f32 fHigh;
     SurfaceType* pSurfLow;
@@ -718,10 +719,14 @@ void Character_PlaceFeetOnGround(Character* pChar) {
     pPos = fn_800187CC_Read(pChar->pModel->pBones[0].v1C);
     Ter_GetEnclosingGroundData(pCourse, pPos, &fLow, &pSurfLow, vNormalLow, &fHigh, &pSurfHigh,
                                vNormalHigh);
-    fY = fHigh;
+    fH = fHigh;
     if (fHigh < -60000.0f || fHigh > 1.0f + pPos[1]) {
-        fY = (fLow < -60000.0f) ? pPos[1] : fLow;
+        fH = fLow;
+        if (fH < -60000.0f) {
+            fH = pPos[1];
+        }
     }
+    fY = fH;
     if (fY > 131072.25f || fY < -131072.25f) {
         return;
     }
@@ -1134,12 +1139,14 @@ void fn_80019798(Character* pChar, Skin** apSkins, int nSkins) {
     BYTESWAP_SWAPDATA(&pData, (u8*)&pChar->n5C, 4, 4);
     if (nTexBytes != 0) {
         pTexData = (TexEntry*)pData;
-        fn_8001DD18(pData, nTexBytes);
+        // fake match: pTexData and pPalData (the same pointers as pData) go to the swaps: EA's
+        // registers
+        fn_8001DD18((u8*)pTexData, nTexBytes);
         pData += nTexBytes;
     }
     if (nPalBytes != 0) {
         pPalData = (TexPalette*)pData;
-        fn_8001DEC8(pData, nPalBytes);
+        fn_8001DEC8((u8*)pPalData, nPalBytes);
     } else {
         pChar->n5C = 0;
     }
@@ -1184,9 +1191,8 @@ void fn_80019798(Character* pChar, Skin** apSkins, int nSkins) {
             Mem_cpy(pChar->pB0, pPalData, nPalBytes);
         }
     } else {
-        nOut = 0;
         nNames = pChar->nAC - nExtra;
-        for (i = 0; i < nNames; i++) {
+        for (i = nOut = 0; i < nNames; i++) {
             bFound = 0;
             for (j = 0; j < nTex; j++) {
                 if (pList[i].uId == pTexData[j].u0) {
