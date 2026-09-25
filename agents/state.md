@@ -22,14 +22,20 @@ moved to Code80037AB8.c. The bone-name strings 0x801871D0-0x801873F0 (.sdata 0x8
 belong to skalib or char, not Skeleton: attach them when that unit links. UISApi/UIStudio under
 `-inline auto,deferred` give byte-identical code (kept as they are; reversed versions on
 agent/swing-01 db03b3f). Split leads not taken (no boundary evidence): Golfer's club part, Glows;
-DiscError needs fn_800B6FCC. Remote branches local/* and reference-build-debug-inventories are
+DiscError needs fn_800B6FCC. Orphan data still parked: Code8009AA28's raw blobs lbl_8018A028
+(0x4B0) / lbl_8018A4D8 (0x21F0), probably textures: the owner decides (no art in git; options:
+leave unlinked, or link them from main.dol at build time); GoRenderCtx_Gc lbl_80186AF0 (232 B of
+button masks, 8-aligned in the original: no type found that aligns it without a fake); .sdata
+lbl_80281100 -> .bss lbl_801D4F68 (the screen-copy record) sit between Skin/Code80037AB8 and
+GoDynamicCam/GoPostFx in link order, used only by GxUtil and gomainloop: owner unsettled.
+Remote branches local/* and reference-build-debug-inventories are
 merged: the owner deletes them (the session cannot).
 
 ## Numbers (report.json)
 
 | exact functions | matched code | code linked | data linked | game units linked |
 |---|---|---|---|---|
-| 7,508 / 7,647 | 92.67% | 72.72% | 76.03% | 205 / 259 |
+| 7,508 / 7,647 | 92.67% | 72.72% | 76.16% | 205 / 259 |
 
 2026-09-24 (the first cloud day, with the owner's PC): from 7,484 / 91.20% / 62.84% / 65.70%.
 Left: 139 non-exact functions (110 KB) in 54 game units; 29 units are 1 function from linking, 9
