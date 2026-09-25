@@ -445,6 +445,14 @@ They will be sorted into the sections below.
 - **[verified] Link: `.sbss` defined last-first also flips chained assignments.** With the globals in
   reverse address order, `a = b = c = 0` stores in the opposite order; write the chain low address first
   to keep EA's store order (ShaderObjectsData: the only DOL differences were two chains).
+  The reverse also happens: two separate `x = 0; y = 0;` stores can come out swapped (the source order
+  does not change it), and only a chain restores EA's order (UStream_Init: `gReadyRingHead =
+  gReadyRingTail = 0;`). objdiff scored the function exact before: it compares the relocation names,
+  and two stores of the same register to two small-data globals swapped only show in the DOL.
+- **[verified] Link: a global the code never references is dead-stripped**, so the unit's `.bss` comes
+  out short. Declare the used object at the symbol's full size instead (LLFileIO_Gc lbl_801A0350: 0x2000
+  symbol, code uses 0x1000). An opaque SDK stand-in type needs the real type's alignment or the
+  padding before it goes missing (OSThread: f64 array for 8-byte alignment).
 - **[verified] Some register rotations need a type change AND a declaration move together;** each alone
   scores no better, so one-change sweeps miss them. Sweep the pair (type x declaration order): GameMode26
   fn_8010CA2C 39 diffs -> 0 (parameter as `PlayerNumber_t`, nLead after nLength), GoDynObj fn_8004731C

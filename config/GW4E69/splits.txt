@@ -94,6 +94,10 @@ TerrainData.c:
 
 UStream.c:
 	.text       start:0x8000C624 end:0x8000E830
+	.data       start:0x801868A0 end:0x801868B0
+	.bss        start:0x801A2AC0 end:0x801A3438
+	.sdata      start:0x80280DB8 end:0x80280DC8
+	.sbss       start:0x80281C18 end:0x80281C60
 
 LLTex.c:
 	.text       start:0x8000E830 end:0x8001013C

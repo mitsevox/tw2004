@@ -67,7 +67,6 @@ void  fn_800A929C(u32 uType);
 void* fn_800A9374(u32 uSize);
 void  fn_800A93AC(void);
 void  fn_8000E708(UStreamParams* p);
-void  fn_8015A7FC(char* pDst, const char* pSrc);             // strcpy
 
 static void UStream_ReadDone(int nBytes, int nError);
 static void UStream_StartRead(void);
@@ -347,61 +346,6 @@ static void UStream_StripStreamExt(char* pName) {
     }
 }
 
-u8* UStream_Fill(u8* pDst, u32 value, u32 uCount) {
-    u8 v = (u8)value;
-    u8* p = pDst;
-    while (uCount--) {
-        *p++ = v;
-    }
-    return pDst;
-}
-
-// Forward copy that may overlap (source before destination); copies halfwords when both
-// pointers have the same alignment. Used by the decompressor for back-references.
-// The eight-at-a-time blocks read into temporaries first: that is what lets the compiler
-// hoist the loads above the stores.
-u8* UStream_Copy(u8* pDst, const u8* pSrc, u32 uCount) {
-    if (((uptr)pDst & (uptr)pSrc) & 1) {
-        *pDst++ = *pSrc++;
-        uCount--;
-    }
-    if ((((uptr)pDst | (uptr)pSrc) & 1) == 0) {
-        s16* d = (s16*)pDst;
-        const s16* s = (const s16*)pSrc;
-        u32 uOdd = uCount & 1;
-        uCount >>= 1;
-        while (uCount > 7) {
-            {
-                s16 t0 = s[0], t1 = s[1], t2 = s[2], t3 = s[3], t4 = s[4], t5 = s[5], t6 = s[6], t7 = s[7];
-                d[0] = t0; d[1] = t1; d[2] = t2; d[3] = t3; d[4] = t4; d[5] = t5; d[6] = t6; d[7] = t7;
-                d += 8; s += 8;
-            }
-            uCount -= 8;
-        }
-        while (uCount--) {
-            *d++ = *s++;
-        }
-        if (uOdd) {
-            *(u8*)d = *(const u8*)s;
-        }
-    } else {
-        u8* d = pDst;
-        while (uCount > 7) {
-            {
-                u8 t0 = pSrc[0], t1 = pSrc[1], t2 = pSrc[2], t3 = pSrc[3];
-                u8 t4 = pSrc[4], t5 = pSrc[5], t6 = pSrc[6], t7 = pSrc[7];
-                d[0] = t0; d[1] = t1; d[2] = t2; d[3] = t3; d[4] = t4; d[5] = t5; d[6] = t6; d[7] = t7;
-                d += 8; pSrc += 8;
-            }
-            uCount -= 8;
-        }
-        while (uCount--) {
-            *d++ = *pSrc++;
-        }
-    }
-    return pDst;
-}
-
 // Decompress an 'Rdat' payload. Two-byte command words, big-endian:
 //   1nnn1ooo cccccccc  nnn != 0: fill (c + 3) bytes with the byte at dst - (ooo<<3 | nnn)
 //   10001lll llllllll  literal run of l bytes (l = low 11 bits)
@@ -465,6 +409,61 @@ void UStream_Decompress(const void* pSrc, void* pDst, u32 uSize) {
             }
         }
     } while (d < pEnd);
+}
+
+u8* UStream_Fill(u8* pDst, u32 value, u32 uCount) {
+    u8 v = (u8)value;
+    u8* p = pDst;
+    while (uCount--) {
+        *p++ = v;
+    }
+    return pDst;
+}
+
+// Forward copy that may overlap (source before destination); copies halfwords when both
+// pointers have the same alignment. Used by the decompressor for back-references.
+// The eight-at-a-time blocks read into temporaries first: that is what lets the compiler
+// hoist the loads above the stores.
+u8* UStream_Copy(u8* pDst, const u8* pSrc, u32 uCount) {
+    if (((uptr)pDst & (uptr)pSrc) & 1) {
+        *pDst++ = *pSrc++;
+        uCount--;
+    }
+    if ((((uptr)pDst | (uptr)pSrc) & 1) == 0) {
+        s16* d = (s16*)pDst;
+        const s16* s = (const s16*)pSrc;
+        u32 uOdd = uCount & 1;
+        uCount >>= 1;
+        while (uCount > 7) {
+            {
+                s16 t0 = s[0], t1 = s[1], t2 = s[2], t3 = s[3], t4 = s[4], t5 = s[5], t6 = s[6], t7 = s[7];
+                d[0] = t0; d[1] = t1; d[2] = t2; d[3] = t3; d[4] = t4; d[5] = t5; d[6] = t6; d[7] = t7;
+                d += 8; s += 8;
+            }
+            uCount -= 8;
+        }
+        while (uCount--) {
+            *d++ = *s++;
+        }
+        if (uOdd) {
+            *(u8*)d = *(const u8*)s;
+        }
+    } else {
+        u8* d = pDst;
+        while (uCount > 7) {
+            {
+                u8 t0 = pSrc[0], t1 = pSrc[1], t2 = pSrc[2], t3 = pSrc[3];
+                u8 t4 = pSrc[4], t5 = pSrc[5], t6 = pSrc[6], t7 = pSrc[7];
+                d[0] = t0; d[1] = t1; d[2] = t2; d[3] = t3; d[4] = t4; d[5] = t5; d[6] = t6; d[7] = t7;
+                d += 8; pSrc += 8;
+            }
+            uCount -= 8;
+        }
+        while (uCount--) {
+            *d++ = *pSrc++;
+        }
+    }
+    return pDst;
 }
 
 // A buffer's data was handed to an object: count the reference.
@@ -898,7 +897,7 @@ int Stream_OpenStreamFile(const char* pName) {
     memset(&params, 0, sizeof(params));
     fn_8000E708(&params);
     params.nNumFiles = 1;
-    fn_8015A7FC(params.aszName[0], pName);
+    strcpy(params.aszName[0], pName);
     return Stream_OpenStreamFiles(&params);
 }
 
@@ -961,8 +960,9 @@ void UStream_Init(void) {
     s32 n;
     gbReadPending = 0;
     gpReadBuffer = NULL;
-    gReadyRingTail = 0;
-    gReadyRingHead = 0;
+    // section note: a chain, as .sbss is laid out last-defined-first; two statements store in the
+    // other order
+    gReadyRingHead = gReadyRingTail = 0;
     gRPNSBase = 0;
     gpQueueHead = NULL;
     gpQueueTail = NULL;

@@ -866,7 +866,7 @@ config.libs = [
             Object(Matching, "ObjList.c"),
             Object(Matching, "LoadData.c"),
             Object(NonMatching, "TerrainData.c"),
-            Object(NonMatching, "UStream.c"),
+            Object(Matching, "UStream.c"),
             Object(NonMatching, "LLTex.c"),
             Object(Matching, "LLTexGrp.c"),
             Object(NonMatching, "LLFont.c"),

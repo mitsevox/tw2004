@@ -1,6 +1,6 @@
 # State (keep this short: current facts only; history goes to docs/journal.md)
 
-Updated 2026-09-25 ~00:30 CDT. QUIET: no lanes running (cloud or PC), everything merged to main,
+Updated 2026-09-25 ~07:40 CDT. QUIET: no cloud lanes running, everything merged to main,
 `main.dol: OK`. Every unit is free.
 
 **Tonight (owner's PC): the lever sweeper.** `ninja build/GW4E69/report.json`, then
@@ -12,15 +12,14 @@ BreakLine_Render, StaticCam_GetFlybyInformation, UObject fn_800488B4, uiText fn_
 TerrainData fn_8000C278, Rain fn_800B52D4, hlaudmovie fn_800A8AD4, File_ReadAsyncEx, Earnings
 fn_800D477C/fn_800D4F14, gocamscripts CameraScript_LagAimMarker/fn_8003F2E0.
 
-**Plan agreed 2026-09-25 ~02:00 CDT (cloud credit ~$65 left; the owner wants the highest success
-rate):** 1) the sure links first: LLFileIO_Gc and UStream (all exact, not linked; see below), ~11 KB
-code + ~20 KB data; 2) then a research crack at Golfer AI_ChooseTarget (the biggest blocker: 13 KB
-code + 31 KB data, 98.20%, only register numbers differ): learn CodeWarrior's callee-saved numbering
-by controlled experiments, see agents/tried/AI_ChooseTarget.md (NEXT). Biggest blockers by link gain
-per function: Golfer AI_ChooseTarget, Ball Physics_HandleCollision, Earnings x2, startUp fn_800B0748,
-gocamscripts x2, skalib (52 KB data, 5 left). Lane nm-c (rcmp_mad_codec, SkinPart fn_800CE660,
-UISScreen fn_8016AEEC; worktree golfer-01) runs to 02:30 CDT: review + merge its branch. hwsBurn is
-26/27 (fn_8011172C 1 instruction off). The tried-ledger agents/tried/<fn>.md is the record of all
+**2026-09-25 day (cloud):** LLFileIO_Gc and UStream LINKED (45d089d + next). nm-c merged (f55c2a4:
+rcmp_mad_codec 15/17). Golfer AI_ChooseTarget research done, not solved (agents/tried/AI_ChooseTarget.md:
+declaration orders exhausted, 2 h permuter float-only, compilers ruled out). NEXT for it: a long
+permuter run on the owner's PC: `python tools/match/permute.py Golfer AI_ChooseTarget --minutes 480
+-j 18 --max-jobs 18` (after the sweep; not while it reads src/). Biggest blockers by link gain per
+function: Golfer AI_ChooseTarget, Ball Physics_HandleCollision, Earnings x2, startUp fn_800B0748,
+gocamscripts x2, skalib (52 KB data, 5 left), rcmp fn_800B769C/fn_800B8618. hwsBurn is 26/27
+(fn_8011172C 1 instruction off). The tried-ledger agents/tried/<fn>.md is the record of all
 attempts (brief + roles/matching.md point there). merge.py has an asm gate (asmgate.py).
 
 gemini/hand-matches (2026-09-25): only its two C fixes are merged (c576b92: File_ReadAsyncEx,
@@ -28,10 +27,7 @@ UStream_Update exact). The other 13 "matches" (Earnings x2, Golfer AI_ChooseTarg
 hlaudmovie, ska_shared, PsMgr, GoStaticCam, BreakLine_Render, Rain, uiText, MC, GameModeBestBall,
 startUp) paste the original assembly under #ifdef __MWERKS__ with the old C in #else: the match
 proves nothing about the C, so they are NOT merged (also: extern in .c, data redefined, trial.py's
-newline='\n' removed). LLFileIO_Gc and UStream are now all exact but NOT linked: LLFileIO's
-lbl_8019D54C is declared 0x1000 (original 0x1004) and lbl_801A0350 0x1000 (original 0x2000), and its
-.bss needs reverse order (ranges: .data 0x801866E0-0x80186730, .bss 0x8019D540-0x801A2350, .sbss
-0x80281B80-0x80281B88); UStream's links not tried yet. A data-lane job (+~22 KB).
+newline='\n' removed).
 
 What was tried per function: agents/notes/ (cloud-2026-09-24-round1.txt, money-01-notes_cloud1.txt,
 the PC's map-*-notes_w9/w10 files). New rules: docs/decomp-notes.md "New from the first cloud lanes".
@@ -56,7 +52,7 @@ merged: the owner deletes them (the session cannot).
 
 | exact functions | matched code | code linked | data linked | game units linked |
 |---|---|---|---|---|
-| 7,520 / 7,647 | 92.96% | 73.04% | 76.17% | 207 / 259 |
+| 7,523 / 7,647 | 93.04% | 73.78% | 78.27% | 209 / 259 |
 
 2026-09-24 (the first cloud day, with the owner's PC): from 7,484 / 91.20% / 62.84% / 65.70%.
 Left: 139 non-exact functions (110 KB) in 54 game units; 29 units are 1 function from linking, 9
