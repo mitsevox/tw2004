@@ -17,7 +17,7 @@ void VIWaitForRetrace(void);
 void fn_800B6924(void);
 void fn_800B6C14(s16 nX, s16 nY, const char* pFmt, ...);
 void fn_800B6CD0(u16 nColor);
-void fn_800B6CD8(int nX, int nY, const char* szText);
+void fn_800B6CD8(int nX, int nY, u8* szText);
 int  fn_800B6DA4(const char* szText);
 void fn_800B6E1C(int nX, int nY, int nRow, DiscGlyph* pGlyph);
 void fn_800B6FCC(int nLines);
@@ -26,6 +26,9 @@ void fn_800B7210(s32 nStatus);
 void fn_800B7684(u8 b);
 void fn_800B768C(u8 b);
 void fn_800B7694(u8 b);
+
+// .bss (discerror.h)
+DiscGlyph lbl_801F66A8[107];
 
 // Write the drawn screen back from the CPU cache.
 void fn_800B6924(void) {
@@ -100,7 +103,7 @@ void fn_800B6C14(s16 nX, s16 nY, const char* pFmt, ...) {
     va_start(args, pFmt);
     vsprintf(szText, pFmt, args);
     va_end(args);
-    fn_800B6CD8(nX, nY, szText);
+    fn_800B6CD8(nX, nY, (u8*)szText);
 }
 
 void fn_800B6CD0(u16 nColor) {
@@ -108,15 +111,15 @@ void fn_800B6CD0(u16 nColor) {
 }
 
 // Draw a string, characters outside 0x20..0x8A as spaces.
-void fn_800B6CD8(int nX, int nY, const char* szText) {
+void fn_800B6CD8(int nX, int nY, u8* szText) {
     DiscGlyph* pGlyph;
     int n;
     u8 c;
 
+    c = *szText;
     if (lbl_802814D2) {
         nX *= 8;
     }
-    c = *szText;
     while (c != 0) {
         if (c < 0x20) {
             c = 0x20;
@@ -200,11 +203,11 @@ void fn_800B6E1C(int nX, int nY, int nRow, DiscGlyph* pGlyph) {
         for (nCol = 0; nCol < 8; nCol++) {
             if (pGlyph == NULL || (nCol >= pGlyph->nLeft && nCol <= pGlyph->nRight)) {
                 if (uBits & 0xF0000000) {
-                    pPixel = (u16*)lbl_80282194 + nX2 + lbl_8028218C * nY2;
+                    pPixel = lbl_80282194 + nX2 + lbl_8028218C * nY2;
                     pPixel[0] = uFore;
                     pPixel[lbl_8028218C] = uFore;
                 } else if (lbl_802814D0) {
-                    pPixel = (u16*)lbl_80282194 + nX2 + lbl_8028218C * nY2;
+                    pPixel = lbl_80282194 + nX2 + lbl_8028218C * nY2;
                     pPixel[0] = uBack;
                     pPixel[lbl_8028218C] = uBack;
                 }
