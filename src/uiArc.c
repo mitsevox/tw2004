@@ -126,10 +126,11 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     fV0 = fV + !nLo;
     fU1 = fU + nLo;
     fV1 = nHi + fV;
-    fU2 = !nHi + fU;
-    fV2 = fV + nLo;
+    // fake match: EA computes corner 3 before corner 2.
     fU3 = fU + !nLo;
     fV3 = !nHi + fV;
+    fU2 = !nHi + fU;
+    fV2 = fV + nLo;
 
     fStart = PI * ((pArc->uFlags & 0x10) ? 0.0f : pArc->fStart) / 180.0f;
     fEnd = PI * ((pArc->uFlags & 0x10) ? 360.0f : pArc->fEnd) / 180.0f;
@@ -150,11 +151,16 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
             if (pArc->uFlags & 0x20) {
                 fS = (f32)(pArc->nSegments - i) / pArc->nSegments;
                 fT = (f32)i / pArc->nSegments;
-                fA = colorB.a * fT + colorA.a * fS;
+                // fake match: keep EA's multiply-then-add colour interpolation.
+                fA = colorA.a * fS;
+                fA += colorB.a * fT;
                 if (!(pArc->uFlags & 4) || (pArc->uFlags & 2)) {
-                    fR = colorB.r * fT + colorA.r * fS;
-                    fG = colorB.g * fT + colorA.g * fS;
-                    fB = colorB.b * fT + colorA.b * fS;
+                    fR = colorA.r * fS;
+                    fR += colorB.r * fT;
+                    fG = colorA.g * fS;
+                    fG += colorB.g * fT;
+                    fB = colorA.b * fS;
+                    fB += colorB.b * fT;
                 } else {
                     fR = fG = fB = 255.0f;
                 }
@@ -197,11 +203,16 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
         if (pArc->uFlags & 0x20) {
             fS = (f32)(pArc->nSegments - i) / pArc->nSegments;
             fT = (f32)i / pArc->nSegments;
-            fA = colorB.a * fT + colorA.a * fS;
+            // fake match: keep EA's multiply-then-add colour interpolation.
+            fA = colorA.a * fS;
+            fA += colorB.a * fT;
             if (!(pArc->uFlags & 4) || (pArc->uFlags & 2)) {
-                fR = colorB.r * fT + colorA.r * fS;
-                fG = colorB.g * fT + colorA.g * fS;
-                fB = colorB.b * fT + colorA.b * fS;
+                fR = colorA.r * fS;
+                fR += colorB.r * fT;
+                fG = colorA.g * fS;
+                fG += colorB.g * fT;
+                fB = colorA.b * fS;
+                fB += colorB.b * fT;
             } else {
                 fR = fG = fB = 255.0f;
             }
