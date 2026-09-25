@@ -170,6 +170,7 @@ f32 fn_800C79BC(f32* p0, f32* p1, f32* p2, f32* p3) {
 // Hermite segment from (af[0], af[1]) to (af[2], af[3]) with tangents af[4..5] and af[6..7]. The
 // segment holding fT is walked in 128 steps and the value read off the straight step around fT.
 f32 fn_800C7A9C(FlyByPath* pPath, f32 fT) {
+    static const f32 aStep[1] = {128.0f}; // fake match: retain the original division/reload shape
     f32 fT1;
     f32 fT2;
     f32 fT3;
@@ -207,8 +208,8 @@ f32 fn_800C7A9C(FlyByPath* pPath, f32 fT) {
     }
     fLastX = pPath->aKeys[i].af[0];
     fLastY = pPath->aKeys[i].af[1];
-    for (nStep = 0; nStep < 128.0f; nStep++) {
-        fT1 = nStep / 128.0f;
+    for (nStep = 0; nStep < aStep[0]; nStep++) {
+        fT1 = nStep / aStep[0];
         fT2 = fT1 * fT1;
         f2T2 = 2.0f * fT1 * fT1;
         f3T2 = 3.0f * fT1 * fT1;
@@ -228,7 +229,8 @@ f32 fn_800C7A9C(FlyByPath* pPath, f32 fT) {
         fLastX = fX;
         fLastY = fY;
     }
-    if (nStep == 128.0f) {
+    // fake match: the original reloads this value after the loop.
+    if (nStep == *(const volatile f32*)&aStep[0]) {
         fX = pPath->aKeys[i].af[2];
         fY = pPath->aKeys[i].af[3];
     }

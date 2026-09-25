@@ -6,6 +6,8 @@
 #include "charstate.h"
 #include "golfer.h"
 
+MorphAnimMgr* lbl_80281F70;
+
 void fn_800975B0(MorphAnim* pAnim);
 void fn_800975FC(MorphAnim* pAnim);
 
@@ -122,18 +124,26 @@ u32 fn_80097694(u8 nIndex) {
 // Move each recorded vertex to its position plus its morph offset scaled by fC * fWeight (the
 // offsets are s8s in 127ths), and stamp the animation's slot with this frame.
 void fn_800976A8(MorphAnim* pAnim, f32 fWeight) {
-    int i;
+    int i = pAnim->nFrames - 1;
     f32 fScale = (1.0f / 127.0f) * (pAnim->fC * fWeight);
-    u16* pVerts = pAnim->p10;
-    f32* pPos = pAnim->p1C;
-    f32* pBase = pAnim->p14;
-    s8* pDelta = pAnim->p18;
+    // EA bug: zero frames and the final decrements form out-of-range pointers; neither is dereferenced.
+    // port: form these pointers only inside a nonempty loop and skip the final decrements.
+    u16* pVert = pAnim->p10 + i;
+    f32* pX = pAnim->p1C;
+    f32* pBase = pAnim->p14 + i * 3 + 2;
+    s8* pDelta = pAnim->p18 + i * 3 + 2;
+    f32* pY = pX + 1;
+    f32* pZ = pX + 2;
 
-    for (i = pAnim->nFrames - 1; i >= 0; i--) {
-        u16 nVert = pVerts[i];
-        pPos[nVert * 3 + 2] = pDelta[i * 3 + 2] * fScale + pBase[i * 3 + 2];
-        pPos[nVert * 3 + 1] = pDelta[i * 3 + 1] * fScale + pBase[i * 3 + 1];
-        pPos[nVert * 3] = pDelta[i * 3] * fScale + pBase[i * 3];
+    for (; i >= 0; i--) {
+        u16 nVert = *pVert;
+        int n = nVert * 3;
+        pZ[n] = pDelta[0] * fScale + pBase[0];
+        pY[n] = pDelta[-1] * fScale + pBase[-1];
+        pX[n] = pDelta[-2] * fScale + pBase[-2];
+        pVert--;
+        pDelta -= 3;
+        pBase -= 3;
     }
     lbl_80281F70->au8[pAnim->nIndex] = gSession.nFrameCount;
 }
