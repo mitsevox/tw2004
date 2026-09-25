@@ -176,6 +176,29 @@ match (look for EA's helper in TW07 first, else `fn_<caller>_Read` with `// fake
 fn_80032518 and Glows fn_800981D0; the swap lever finds AI_ChooseTarget's fDX/fDZ order (112 -> 90
 with other levers in 4 min; the PC permuter found it first).
 
+**Sending a job to the PC.** The owner's PC is a self-hosted GitHub runner (LUCASPC, label
+`tw-pc`, 20 cores), online only while the owner runs it. `.github/workflows/pc-job.yml` runs the
+permuter or the lever sweeper there on manual dispatch only (never on push); one job at a time
+(concurrency group `pc-runner`), queued while the PC is off.
+
+```
+gh workflow run pc-job.yml -f tool=permute -f unit=hwsBurn -f fn=fn_8011172C -f minutes=360 -f jobs=18
+gh workflow run pc-job.yml -f tool=leversweep -f unit=hwsBurn -f fn=fn_8011172C -f minutes=6
+gh workflow run pc-job.yml -f tool=leversweep                  # --from-report: every near-miss
+gh workflow run pc-job.yml ... -f ref=my-branch                # build from a pushed branch
+```
+
+(Or Actions > PC job > Run workflow on github.com.) It checks out `ref` (default main), copies the
+game files from `C:/dev/tw2004/orig` (they never leave the PC), builds and stops unless
+`main.dol: OK`, then runs the tool with `-j jobs` (default 18) for `minutes` (default 360; the job
+times out an hour later). The results land on a new branch `pc-results/<fn>-<run id>`: the
+permuter's best 5 outputs (`diff.txt`, `score.txt`; no `source.c`) and its last progress line, or the
+sweeper's `build/leversweep/` files from that run, plus the log and `run.txt` (the inputs).
+`git fetch origin 'pc-results/*'` and read them; apply a hit by hand as with any permuter result.
+The workspace keeps `build/` between jobs (checkout `clean: false`), so compilers are not
+downloaded again. Do not dispatch while the owner runs a local permuter on all cores (use `-f jobs=2`
+then).
+
 Before you commit
 -----------------
 
