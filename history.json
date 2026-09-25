@@ -39841,5 +39841,21 @@
 "matched_functions": 7528,
 "total_functions": 7647,
 "exact": 7528
+},
+{
+"commit": "3eabc86",
+"sha": "3eabc86e932650397027c1a62a4c5b58751c7d5f",
+"time": 1790354653,
+"subject": "tools/sweep: the small-function sweep tools from the PC (sweep, sweep_m2c, smallsurvey, retry, retry_hits.json), paths made repo-relative (paths.py: hosttools compiler, m2c beside the checkout, state in build/sweep)",
+"report": true,
+"matched_code": 1445112,
+"complete_code": 1150048,
+"matched_data": 701147,
+"complete_data": 844511,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7528,
+"total_functions": 7647,
+"exact": 7528
 }
 ]
