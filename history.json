@@ -1814,5 +1814,21 @@
 "matched_functions": 7528,
 "total_functions": 7647,
 "exact": 7528
+},
+{
+"commit": "cbfdca9",
+"sha": "cbfdca9ddca66d274f019a45fcb63f80da60f4d9",
+"time": 1790353690,
+"subject": "docs: infrastructure.md (machines, git flow, CI, Pages, decomp.dev, PC jobs, branch cleanup) replaces scattered sections",
+"report": true,
+"matched_code": 1445112,
+"complete_code": 1150048,
+"matched_data": 701147,
+"complete_data": 844511,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7528,
+"total_functions": 7647,
+"exact": 7528
 }
 ]
