@@ -86,6 +86,11 @@ void fn_800A29B4(UStreamObject* pObject) {
 s32 fn_800A2A80(s32 nKind, f32* pArg, s32 n3) {
     f32 fStrength;
     switch (nKind) {
+    case 1:
+        if (n3) {                       // fake match: prevents MWCC from collapsing case 1 into default
+            break;
+        }
+        break;
     case 0:
         lbl_801F16F4[0] = fn_80009B34(0x28, 2, 32, "PsMgr.c", 530);    // the rain object
         if (pArg != NULL) {
@@ -95,8 +100,6 @@ s32 fn_800A2A80(s32 nKind, f32* pArg, s32 n3) {
         }
         SD_vShaderObject_Rain_Dynamic_Init(lbl_801F16F4[0], &fStrength);
         fn_800A27FC(1.0f + 0.55f * fStrength, 0.45f + 0.55f * fStrength);
-        break;
-    case 1:
         break;
     }
     return 0;
