@@ -146,7 +146,7 @@ u8* fn_8016C5C4(UISNode* pNode, u32 uEvent) {
 // info and a 0) and runs pScript on it. The frame stays on the stack only when the script
 // returns 3 (it paused).
 s8 fn_8016C270(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UISWordStack* pStack, u8* pScript,
-               u32 nArgs, const s32* pArgs, u32 nArgs2, const s32* pArgs2, u8 bExtra, s32 nExtra,
+               s32 nArgs, const s32* pArgs, u32 nArgs2, const s32* pArgs2, u8 bExtra, s32 nExtra,
                s32* pnSaved) {
     s32* pFrame;
     u32 i;

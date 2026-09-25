@@ -333,7 +333,7 @@ void fn_8016C174(f32 f1, f32 f2, f32 f3, f32 f4);
 f32* fn_8016C1A4(s32 n20, UISNodeInfo* pInfo);
 // Runs pScript for node info pInfo with a call frame pushed on pStack.
 s8 fn_8016C270(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UISWordStack* pStack, u8* pScript,
-               u32 nArgs, const s32* pArgs, u32 nArgs2, const s32* pArgs2, u8 bExtra, s32 nExtra, s32* pnSaved);
+               s32 nArgs, const s32* pArgs, u32 nArgs2, const s32* pArgs2, u8 bExtra, s32 nExtra, s32* pnSaved);
 // A node's handler scripts for an event, by kind (0x4000, plain with an ID, 0x8000); NULL for none.
 // The event is a u32 (callers pass it unmasked; each function masks it to 16 bits).
 u8* fn_8016C5C4(UISNode* pNode, u32 uEvent);
