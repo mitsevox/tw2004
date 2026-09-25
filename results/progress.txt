@@ -1,0 +1,1 @@
+iteration 1575, 39 errors, score = 650
