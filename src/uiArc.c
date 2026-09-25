@@ -38,10 +38,11 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     f32 vPictUV[4];     // fn_8009222C fills two
     GXColor colorA;
     GXColor colorB;
-    f32 fDist;
+    // fake match: scalar declaration order controls CodeWarrior's saved-FPR allocation.
+    f32 fInnerY;
     f32 fZ;
-    f32 fProj;
-    f32 fU;
+    f32 fStart;
+    f32 fEnd;
     f32 fV;
     f64 fU0;            // f64: the original keeps these in 8-byte stack slots
     f64 fV0;
@@ -51,18 +52,18 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     f64 fV2;
     f64 fU3;
     f64 fV3;
-    f32 fStart;
-    f32 fEnd;
+    f32 fProj;
+    f32 fU;
     f32 fAngle;
     f32 fStep;
-    f32 fInnerX;
-    f32 fInnerY;
-    f32 fOuterX;
     f32 fOuterY;
+    f32 fDist;
+    f32 fOuterX;
+    f32 fInnerX;
     f32 fSin;
     f32 fCos;
-    f32 fT;
     f32 fS;
+    f32 fT;
     f32 fR;
     f32 fG;
     f32 fB;
@@ -146,6 +147,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
         fInnerY = pArc->v20[1] * fOuterY;
     }
     fStep = (fEnd - fStart) / pArc->nSegments;
+    // fake match: white-colour branches assign B, G, R in EA's FPR order.
     for (i = 0; i < pArc->nSegments;) {
         if (i == 0) {
             if (pArc->uFlags & 0x20) {
@@ -162,7 +164,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
                     fB = colorA.b * fS;
                     fB += colorB.b * fT;
                 } else {
-                    fR = fG = fB = 255.0f;
+                    fB = fG = fR = 255.0f;
                 }
             } else {
                 fA = colorA.a;
@@ -171,7 +173,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
                     fG = colorA.g;
                     fB = colorA.b;
                 } else {
-                    fR = fG = fB = 255.0f;
+                    fB = fG = fR = 255.0f;
                 }
             }
         }
@@ -214,7 +216,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
                 fB = colorA.b * fS;
                 fB += colorB.b * fT;
             } else {
-                fR = fG = fB = 255.0f;
+                fB = fG = fR = 255.0f;
             }
         } else {
             fA = colorA.a;
@@ -223,7 +225,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
                 fG = colorA.g;
                 fB = colorA.b;
             } else {
-                fR = fG = fB = 255.0f;
+                fB = fG = fR = 255.0f;
             }
         }
         if (i == pArc->nSegments) {
