@@ -34,6 +34,7 @@ unless you combine it with something new. Before you stop, add every attempt und
   `goto` active label all stayed at 4; a `switch` guard worsened to 6. Static inline blocks
   for the two rumble calls, the two final clears, or the whole active tail, with either
   original guard or early return, all stayed at 4. No source change.
+- 2026-09-25, n-const: SwingData* through `static inline KV_Swing(Player*)` with `pSwing->nVibrateCount = 0` 4; int temp = p->nController first 19; pointers set then first call on `p->nController` 19; `p = q = &gPlayers[n]` with pController from q 19; `gPlayers + nPlayer` with pFrames after the first call 4; inline `KV_Off(Player*, nPlayer)` holding the whole tail 8; inline taking the two pointers (from p or gPlayers[]) 19/20; `&KV_P(nPlayer)->field` for both pointers 7; inline for the two calls with `q->nController` first 19. Compilers 1.3.2 / 2.0 / 2.0p1 / 2.6 / 2.7: all 4.
 
 ## Structural constraint from the third pass
 

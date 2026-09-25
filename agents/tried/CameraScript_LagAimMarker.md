@@ -8,7 +8,7 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
-(add yours here: date, lane, what, score)
+- 2026-09-25, n-const: merged every pair of locals/params with disjoint lives (fFrames, fRate, fMin, fAimY, fMinDist into fMin/fAimY/fDist/fAngle/fFrames; 15 single merges and all 4-distinct pairs of them): none below 11 (base 11).
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
