@@ -1,0 +1,71 @@
+char Character_PlaceFeetOnGround
+base 7, 146 levers, 19362 variants (146 singles) in 170 s; best 3
+
+3 [safe]
+  - identity inline on `pPos = pChar->pModel->pBones[0].v1C;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+3 [safe]
+  - identity inline on `pPos = pChar->pModel->pBones[0].v1C;`
+  - move `CourseInfo* pCourse;` to line 6 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+3 [safe]
+  - identity inline on `pPos = pChar->pModel->pBones[0].v1C;`
+  - move `f32 fLowest;` to line 1 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+3 [safe]
+  - identity inline on `pPos = pChar->pModel->pBones[0].v1C;`
+  - move `f32 fY;` to line 3 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+3 [safe]
+  - identity inline on `pPos = pChar->pModel->pBones[0].v1C;`
+  - move `f32 fY;` to line 6 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+3 [safe]
+  - identity inline on `pPos = pChar->pModel->pBones[0].v1C;`
+  - move `f32 fY;` to line 10 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+3 [safe]
+  - identity inline on `pPos = pChar->pModel->pBones[0].v1C;`
+  - move `f32 fY;` to line 11 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+3 [safe]
+  - identity inline on `pPos = pChar->pModel->pBones[0].v1C;`
+  - move `f32 fY;` to line 12 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+3 [safe]
+  - identity inline on `pPos = pChar->pModel->pBones[0].v1C;`
+  - move `f32* pPos;` to line 1 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+3 [safe]
+  - identity inline on `pPos = pChar->pModel->pBones[0].v1C;`
+  - move `f32 fY;` to line 7 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+3 [safe]
+  - identity inline on `pPos = pChar->pModel->pBones[0].v1C;`
+  - move `f32 fY;` to line 8 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+3 [safe]
+  - identity inline on `pPos = pChar->pModel->pBones[0].v1C;`
+  - move `CourseInfo* pCourse;` to line 7 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+changed lines of the best variant (base.c):
+@@ -1 +1,2 @@
++static inline f32 * __lv_pPos_0(f32 * v) { return v; }
+ void Character_PlaceFeetOnGround(Character* pChar) {
+@@ -46,3 +47,3 @@
+ }
+-pPos = pChar->pModel->pBones[0].v1C;
++pPos = __lv_pPos_0(pChar->pModel->pBones[0].v1C);
+ Ter_GetEnclosingGroundData(pCourse, pPos, &fLow, &pSurfLow, vNormalLow, &fHigh, &pSurfHigh,

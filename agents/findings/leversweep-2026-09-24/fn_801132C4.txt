@@ -1,0 +1,42 @@
+hwsRender_Gc fn_801132C4
+base 3, 63 levers, 5951 variants (63 singles) in 57 s; best 3
+
+3 [safe]
+  - identity inline on `pNormalOut = pNormalBuf;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+3 [safe]
+  - for loop #1 (`for (i = 0; i < pRefs->n10; pPos += 4, pNormal += `) as a while loop
+
+3 [safe]
+  - for loop #2 (`for (n = 0; n < pRefs->n2; n++) {`) as a while loop
+
+3 [safe]
+  - move `Vec4 vNormalIn;` to line 1 of the declarations
+
+3 [safe]
+  - move `Vec4 vNormalOut;` to line 7 of the declarations
+
+3 [safe]
+  - move `Vec4 vNormalOut;` to line 8 of the declarations
+
+3 [safe]
+  - move `Vec4 vNormalOut;` to line 9 of the declarations
+
+3 [safe]
+  - identity inline on `pPos = pVerts;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+3 [safe]
+  - identity inline on `pNormal = (s8*)(pVerts + n10 * 4);`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+3 [safe]
+  - identity inline on `pPosOut = pBuf;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+3 [safe]
+  - move `s16* pPos;` to line 5 of the declarations
+
+3 [safe]
+  - move `s16* pPos;` to line 1 of the declarations

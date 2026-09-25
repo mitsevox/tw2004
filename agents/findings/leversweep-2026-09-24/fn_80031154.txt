@@ -1,0 +1,66 @@
+GoTerrain fn_80031154
+base 59, 761 levers, 32145 variants (761 singles) in 362 s; best 31
+
+31 [safe]
+  - type of nLast: s32 -> int
+  - move `s32 nObjects;` to line 28 of the declarations
+
+31 [safe]
+  - type of nLast: s32 -> int
+  - move `s32 nObjects;` to line 26 of the declarations
+
+31 [safe]
+  - type of nLast: s32 -> int
+  - move `s32 nObjects;` to line 27 of the declarations
+
+34 [safe]
+  - identity inline on `nLast = nObjects + nFirstObject - 1;`
+  - move `s32 nObjects;` to line 26 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+34 [safe]
+  - identity inline on `nLast = nObjects + nFirstObject - 1;`
+  - move `s32 nObjects;` to line 27 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+34 [safe]
+  - identity inline on `nLast = nObjects + nFirstObject - 1;`
+  - move `s32 nObjects;` to line 28 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+37 [review]
+  - type of i: s32 -> u32
+  - move `s32 nObjects;` to line 26 of the declarations
+
+37 [review]
+  - type of i: s32 -> u32
+  - move `s32 nObjects;` to line 27 of the declarations
+
+37 [review]
+  - type of i: s32 -> u32
+  - move `s32 nObjects;` to line 28 of the declarations
+
+41 [safe]
+  - type of nLast: s32 -> int
+
+41 [safe]
+  - type of nLast: s32 -> int
+  - move `f32 v48[4];` to line 1 of the declarations
+
+41 [safe]
+  - type of nLast: s32 -> int
+  - move `f32 v48[4];` to line 2 of the declarations
+
+changed lines of the best variant (base.c):
+@@ -7,6 +7,5 @@
+ f32 v8[4];
+-s32 nObjects;
+ s32 nLists;
+ s32 i;
+-s32 nLast;
++int nLast;
+ UObjMesh* pLOD0;
+@@ -27,2 +26,3 @@
+ View* pView;
++s32 nObjects;
+ Ter_ObjectReference* pRef;

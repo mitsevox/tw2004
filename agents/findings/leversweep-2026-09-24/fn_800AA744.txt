@@ -1,0 +1,38 @@
+hlaudtrackseq fn_800AA744
+base 2, 122 levers, 13677 variants (122 singles) in 120 s; best 2
+
+2 [safe]
+  - move `u8 i;` to line 11 of the declarations
+
+2 [safe]
+  - move `u8 i;` to line 12 of the declarations
+
+2 [safe]
+  - move `f32 fAttn;` to line 9 of the declarations
+
+2 [safe]
+  - move `f32 fAttn;` to line 10 of the declarations
+
+2 [safe]
+  - move `f32 fAttn;` to line 11 of the declarations
+
+2 [safe]
+  - move `f32 fAttn;` to line 12 of the declarations
+
+2 [safe]
+  - move `s16 nVolume;` to line 7 of the declarations
+
+2 [safe]
+  - move `s16 nVolume;` to line 8 of the declarations
+
+2 [safe]
+  - move `AudSeqTone* pTone;` to line 1 of the declarations
+
+2 [safe]
+  - move `AudSeqTone* pTone;` to line 2 of the declarations
+
+2 [safe]
+  - move `f32 fAttn;` to line 1 of the declarations
+
+2 [safe]
+  - move `f32 fAttn;` to line 2 of the declarations

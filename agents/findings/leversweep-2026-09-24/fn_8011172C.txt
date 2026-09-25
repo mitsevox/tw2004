@@ -1,0 +1,87 @@
+hwsBurn fn_8011172C
+base 10, 33 levers, 2371 variants (33 singles) in 22 s; best 2
+
+2 [safe]
+  - identity inline on `nEnd = nAlign + *pOffset;`
+  - move `SkinDesc* pDesc = pBurn->pDesc;` to line 1 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+2 [safe]
+  - identity inline on `nEnd = nAlign + *pOffset;`
+  - move `SkinDesc* pDesc = pBurn->pDesc;` to line 2 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+2 [safe]
+  - identity inline on `nEnd = (nEnd - 1) & ~(nAlign - 1);`
+  - move `SkinDesc* pDesc = pBurn->pDesc;` to line 1 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+2 [safe]
+  - identity inline on `nEnd = (nEnd - 1) & ~(nAlign - 1);`
+  - move `SkinDesc* pDesc = pBurn->pDesc;` to line 2 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+2 [safe]
+  - identity inline on `nEnd = nAlign + *pOffset;`
+  - move `SkinDesc* pDesc = pBurn->pDesc;` to line 1 of the declarations
+  - move `s32 nEnd;` to line 1 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+2 [safe]
+  - identity inline on `nEnd = nAlign + *pOffset;`
+  - move `SkinDesc* pDesc = pBurn->pDesc;` to line 1 of the declarations
+  - move `s32 nEnd;` to line 2 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+2 [safe]
+  - identity inline on `nEnd = nAlign + *pOffset;`
+  - move `SkinDesc* pDesc = pBurn->pDesc;` to line 1 of the declarations
+  - move `s32 nEnd;` to line 4 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+2 [safe]
+  - identity inline on `nEnd = nAlign + *pOffset;`
+  - move `SkinDesc* pDesc = pBurn->pDesc;` to line 1 of the declarations
+  - for loop #1 (`for (i = 0; i < n; i++) {`) as a while loop
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+2 [safe]
+  - identity inline on `nEnd = nAlign + *pOffset;`
+  - move `SkinDesc* pDesc = pBurn->pDesc;` to line 1 of the declarations
+  - type of i: int -> s32
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+2 [safe]
+  - identity inline on `nEnd = nAlign + *pOffset;`
+  - move `SkinDesc* pDesc = pBurn->pDesc;` to line 1 of the declarations
+  - split `nEnd = nAlign + *pOffset` into += steps
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+2 [safe]
+  - identity inline on `nEnd = nAlign + *pOffset;`
+  - move `SkinDesc* pDesc = pBurn->pDesc;` to line 2 of the declarations
+  - move `s32 nEnd;` to line 5 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+2 [safe]
+  - identity inline on `nEnd = nAlign + *pOffset;`
+  - move `SkinDesc* pDesc = pBurn->pDesc;` to line 2 of the declarations
+  - type of n: int -> s32
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+changed lines of the best variant (base.c):
+@@ -1,2 +1,4 @@
+-SkinDesc8C* fn_8011172C(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
++static inline s32 __lv_nEnd_0(s32 v) { return v; }
++SkinDesc8C* fn_8011172C(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {SkinDesc* pDesc = pBurn->pDesc;
++
+ SkinDesc8C* aOut;
+@@ -4,3 +6,2 @@
+ int n = pBurn->n74;
+-SkinDesc* pDesc = pBurn->pDesc;
+ s32 nEnd;
+@@ -8,3 +9,3 @@
+ *pOffset += n * sizeof(SkinDesc8C);
+-nEnd = nAlign + *pOffset;
++nEnd = __lv_nEnd_0(nAlign + *pOffset);
+ nEnd = (nEnd - 1) & ~(nAlign - 1);

@@ -1,0 +1,15 @@
+char fn_8001F110
+base 25, 3 levers, 4 variants (3 singles) in 1 s; best 25
+
+25 [safe]
+  - for loop #1 (`for (i = 0; i < pLib->nRecords; i++) {`) as a while loop
+
+25 [safe]
+  - for loop #2 (`for (i = 0; i < pLib->nRecords; i++) {`) as a while loop
+
+25 [safe]
+  - for loop #3 (`for (j = 0; j < pRecord2->nEntries; j++) {`) as a while loop
+
+25 [safe]
+  - for loop #1 (`for (i = 0; i < pLib->nRecords; i++) {`) as a while loop
+  - for loop #2 (`for (i = 0; i < pLib->nRecords; i++) {`) as a while loop

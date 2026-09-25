@@ -1,0 +1,56 @@
+UISScreen fn_8016B4D4
+base 46, 103 levers, 10636 variants (103 singles) in 101 s; best 26
+
+26 [safe]
+  - move `s32 nStep;` to line 8 of the declarations
+
+26 [safe]
+  - move `s32 nStep;` to line 9 of the declarations
+
+26 [safe]
+  - move `s32 nStep;` to line 10 of the declarations
+
+26 [safe]
+  - move `s32 nTo;` to line 5 of the declarations
+
+26 [safe]
+  - move `s32 nStep;` to line 8 of the declarations
+  - move `s32 nScreens;` to line 4 of the declarations
+
+26 [safe]
+  - move `s32 nStep;` to line 8 of the declarations
+  - move `s32 nIndex;` to line 1 of the declarations
+
+26 [safe]
+  - move `s32 nStep;` to line 8 of the declarations
+  - move `s32 nIndex;` to line 2 of the declarations
+
+26 [safe]
+  - move `s32 nStep;` to line 8 of the declarations
+  - move `s32 nIndex;` to line 5 of the declarations
+
+26 [review]
+  - move `s32 nStep;` to line 8 of the declarations
+  - type of nIndex: s32 -> u32
+
+26 [safe]
+  - move `s32 nStep;` to line 8 of the declarations
+  - identity inline on `nIndex = fn_8016C6C4(pStudio, uGroup, uScreen);`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+26 [safe]
+  - move `s32 nStep;` to line 8 of the declarations
+  - type of nCount: s32 -> int
+
+26 [safe]
+  - move `s32 nStep;` to line 8 of the declarations
+  - move `s32 nScreens;` to line 1 of the declarations
+
+changed lines of the best variant (base.c):
+@@ -4,5 +4,5 @@
+ s32 nCount;
+-s32 nStep;
+ s32 nFrom;
+ s32 nTo;
++s32 nStep;
+ u32 i;

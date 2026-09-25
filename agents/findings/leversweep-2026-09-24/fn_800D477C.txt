@@ -1,0 +1,38 @@
+Earnings fn_800D477C
+base 19, 140 levers, 17316 variants (139 singles) in 207 s; best 19
+
+19 [safe]
+  - move `s32 nValue;` to line 7 of the declarations
+
+19 [safe]
+  - move `s32 nValue;` to line 8 of the declarations
+
+19 [safe]
+  - move `s32 nValue;` to line 11 of the declarations
+
+19 [safe]
+  - move `s32 nValue;` to line 12 of the declarations
+
+19 [safe]
+  - move `Ball saved;` to line 7 of the declarations
+
+19 [safe]
+  - move `Ball saved;` to line 8 of the declarations
+
+19 [safe]
+  - move `Ball saved;` to line 9 of the declarations
+
+19 [safe]
+  - move `Ball saved;` to line 10 of the declarations
+
+19 [safe]
+  - move `Ball saved;` to line 11 of the declarations
+
+19 [safe]
+  - move `Ball saved;` to line 12 of the declarations
+
+19 [safe]
+  - move `int i;` to line 1 of the declarations
+
+19 [safe]
+  - move `int i;` to line 2 of the declarations

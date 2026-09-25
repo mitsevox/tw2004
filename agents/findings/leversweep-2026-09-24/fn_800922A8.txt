@@ -1,0 +1,38 @@
+uiText fn_800922A8
+base 2, 454 levers, 33813 variants (454 singles) in 361 s; best 2
+
+2 [safe]
+  - move `UITransform t;` to line 7 of the declarations
+
+2 [safe]
+  - move `UITransform t;` to line 8 of the declarations
+
+2 [safe]
+  - move `UITransform t;` to line 9 of the declarations
+
+2 [safe]
+  - move `UITransform t;` to line 10 of the declarations
+
+2 [safe]
+  - move `UITransform t;` to line 11 of the declarations
+
+2 [safe]
+  - move `UITransform t;` to line 12 of the declarations
+
+2 [safe]
+  - move `UITransform t;` to line 13 of the declarations
+
+2 [safe]
+  - move `UITransform t;` to line 14 of the declarations
+
+2 [safe]
+  - move `f32 m[4][4];` to line 1 of the declarations
+
+2 [safe]
+  - move `f32 m[4][4];` to line 2 of the declarations
+
+2 [safe]
+  - move `f32 m[4][4];` to line 5 of the declarations
+
+2 [safe]
+  - move `f32 m[4][4];` to line 6 of the declarations

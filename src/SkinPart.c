@@ -1146,10 +1146,10 @@ s32 fn_800CEAE4(int i, SkinListEntry* aList, int nList) {
 // Hands fn_8010AD50 each of pTex's name codes the skins' chosen options do not use, then calls
 // fn_8010ADA4.
 void fn_800CEB1C(Skin** apSkins, int nSkins, DynTex* pTex) {
-    SkinListEntry* pList;
-    s32 nList;
-    s32 n;
     int i;
+    SkinListEntry* pList;
+    int nList;
+    s32 n;
     u64 uId;
 
     if (pTex == NULL) return;

@@ -1,0 +1,26 @@
+startUp fn_800B0748
+base 2, 4 levers, 7 variants (4 singles) in 1 s; best 2
+
+2 [safe]
+  - move `u32 uBit = 1;` to line 1 of the declarations
+
+13 [safe]
+  - type of uBit: u32 -> unsigned int
+
+13 [review]
+  - type of uBit: u32 -> int
+
+13 [review]
+  - type of uBit: u32 -> s32
+
+13 [safe]
+  - move `u32 uBit = 1;` to line 1 of the declarations
+  - type of uBit: u32 -> unsigned int
+
+13 [review]
+  - move `u32 uBit = 1;` to line 1 of the declarations
+  - type of uBit: u32 -> int
+
+13 [review]
+  - move `u32 uBit = 1;` to line 1 of the declarations
+  - type of uBit: u32 -> s32

@@ -1,0 +1,38 @@
+GoTerrain fn_80032B7C
+base 4, 113 levers, 12167 variants (113 singles) in 120 s; best 4
+
+4 [safe]
+  - move `f32 mRaise[4][4];` to line 7 of the declarations
+
+4 [safe]
+  - move `f32 mRaise[4][4];` to line 8 of the declarations
+
+4 [safe]
+  - move `f32 mRaise[4][4];` to line 9 of the declarations
+
+4 [safe]
+  - move `f32 mRaise[4][4];` to line 10 of the declarations
+
+4 [safe]
+  - move `u8 bFirst;` to line 6 of the declarations
+
+4 [safe]
+  - move `u8 bFirst;` to line 7 of the declarations
+
+4 [safe]
+  - move `u8 bFirst;` to line 8 of the declarations
+
+4 [safe]
+  - move `u8 bFirst;` to line 9 of the declarations
+
+4 [safe]
+  - move `f32 mRaise[4][4];` to line 1 of the declarations
+
+4 [safe]
+  - move `f32 mRaise[4][4];` to line 4 of the declarations
+
+4 [safe]
+  - move `f32 mRaise[4][4];` to line 5 of the declarations
+
+4 [safe]
+  - move `f32 mRaise[4][4];` to line 6 of the declarations

@@ -1,0 +1,38 @@
+uiProcessInterface fn_8008F820
+base 22, 110 levers, 11651 variants (110 singles) in 112 s; best 22
+
+22 [safe]
+  - move `int k;` to line 5 of the declarations
+
+22 [safe]
+  - move `int k;` to line 6 of the declarations
+
+22 [safe]
+  - move `int k;` to line 7 of the declarations
+
+22 [safe]
+  - move `int k;` to line 8 of the declarations
+
+22 [safe]
+  - move `s32 aArgs[1];` to line 5 of the declarations
+
+22 [safe]
+  - move `f32 fOne;` to line 1 of the declarations
+
+22 [safe]
+  - move `s32 aArgs[1];` to line 6 of the declarations
+
+22 [safe]
+  - move `s32 aArgs[1];` to line 7 of the declarations
+
+22 [safe]
+  - move `s32 aArgs[1];` to line 8 of the declarations
+
+22 [safe]
+  - move `s32 aArgs[1];` to line 9 of the declarations
+
+22 [safe]
+  - move `u32 aPressed[8];` to line 9 of the declarations
+
+22 [safe]
+  - move `u32 aPressed[8];` to line 10 of the declarations

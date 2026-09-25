@@ -1,0 +1,49 @@
+GoGreenGrid fn_8009BE08
+base 43, 102 levers, 10207 variants (102 singles) in 106 s; best 40
+
+40 [safe]
+  - move `int nSteps = 0;` to line 8 of the declarations
+
+40 [safe]
+  - move `int nSteps = 0;` to line 9 of the declarations
+
+40 [safe]
+  - move `int nSteps = 0;` to line 10 of the declarations
+
+40 [review]
+  - move `CourseInfo* pCourse = fn_8000C594();` to line 8 of the declarations
+
+40 [review]
+  - move `CourseInfo* pCourse = fn_8000C594();` to line 9 of the declarations
+
+40 [review]
+  - move `CourseInfo* pCourse = fn_8000C594();` to line 10 of the declarations
+
+40 [review]
+  - move `CourseInfo* pCourse = fn_8000C594();` to line 11 of the declarations
+
+40 [safe]
+  - move `int n;` to line 6 of the declarations
+
+40 [safe]
+  - move `int nSteps = 0;` to line 11 of the declarations
+
+40 [safe]
+  - move `int nSteps = 0;` to line 8 of the declarations
+  - move `f32 fDirX;` to line 2 of the declarations
+
+40 [safe]
+  - move `int nSteps = 0;` to line 8 of the declarations
+  - move `f32 fDirX;` to line 3 of the declarations
+
+40 [safe]
+  - move `int nSteps = 0;` to line 8 of the declarations
+  - move `f32 fDirX;` to line 4 of the declarations
+
+changed lines of the best variant (base.c):
+@@ -5,4 +5,4 @@
+ CourseInfo* pCourse = fn_8000C594();
++int n;
+ int nSteps = 0;
+-int n;
+ f32 fAcross;

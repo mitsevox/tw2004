@@ -1,0 +1,42 @@
+DiscError fn_800B6FCC
+base 7, 13 levers, 518 variants (13 singles) in 6 s; best 7
+
+7 [safe]
+  - for loop #1 (`for (i = 0; i < nLines; i++) {`) as a while loop
+
+7 [safe]
+  - type of nY: int -> s32
+
+7 [review]
+  - type of nY: int -> u32
+
+7 [safe]
+  - identity inline on `nY = (28 - nLines) / 2;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - type of i: int -> s32
+
+7 [safe]
+  - move `char szLine[0x29];` to line 1 of the declarations
+
+7 [safe]
+  - move `char szLine[0x29];` to line 4 of the declarations
+
+7 [safe]
+  - move `int nY;` to line 1 of the declarations
+
+7 [safe]
+  - move `int nY;` to line 2 of the declarations
+
+7 [safe]
+  - for loop #1 (`for (i = 0; i < nLines; i++) {`) as a while loop
+  - move `char szLine[0x29];` to line 1 of the declarations
+
+7 [safe]
+  - for loop #1 (`for (i = 0; i < nLines; i++) {`) as a while loop
+  - move `char szLine[0x29];` to line 4 of the declarations
+
+7 [safe]
+  - for loop #1 (`for (i = 0; i < nLines; i++) {`) as a while loop
+  - move `int nY;` to line 1 of the declarations

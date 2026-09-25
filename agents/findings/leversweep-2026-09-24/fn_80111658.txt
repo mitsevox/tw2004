@@ -1,0 +1,39 @@
+hwsBurn fn_80111658
+base 6, 37 levers, 2434 variants (37 singles) in 23 s; best 6
+
+6 [safe]
+  - for loop #2 (`for (j = 0; j < nBits; j++) {`) as a while loop
+
+6 [safe]
+  - move `int j;` to line 4 of the declarations
+
+6 [safe]
+  - type of n: int -> s32
+
+6 [review]
+  - type of n: int -> u32
+
+6 [safe]
+  - identity inline on `n = 0;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+6 [safe]
+  - type of i: int -> s32
+
+6 [safe]
+  - type of j: int -> s32
+
+6 [safe]
+  - move `int nBits = pBurn->n70;` to line 1 of the declarations
+
+6 [safe]
+  - move `int nBits = pBurn->n70;` to line 2 of the declarations
+
+6 [safe]
+  - move `int i;` to line 6 of the declarations
+
+6 [safe]
+  - type of nEntries: int -> s32
+
+6 [safe]
+  - type of nBits: int -> s32
