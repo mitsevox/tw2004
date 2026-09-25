@@ -126,5 +126,21 @@
 "matched_functions": 7528,
 "total_functions": 7647,
 "exact": 7528
+},
+{
+"commit": "3cebbf8",
+"sha": "3cebbf8f3366f3629d85fc7e676045bfd7ba7f29",
+"time": 1790353093,
+"subject": "branch-cleanup.yml: delete remote branches fully merged into main (dry run by default; main, pages-history, unmerged work never touched; old pc-results on request); docs",
+"report": true,
+"matched_code": 1445112,
+"complete_code": 1150048,
+"matched_data": 701147,
+"complete_data": 844511,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7528,
+"total_functions": 7647,
+"exact": 7528
 }
 ]
