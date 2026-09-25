@@ -43,9 +43,8 @@ headers 69 (phase 3, not started).
 
 ## Parked (need the owner or a later phase)
 
-- Housekeeping: remove tools/dashboard/install_hook.py and the PC's post-commit refresh_history
-  hook (the local dashboard is retired; refresh_history.py stays, backfill and pages.py use it). Owner:
-  ~30 old agent worktrees in C:/dev/tw2004-agents (delete each once verified merged); C:/dev/scratch
+- Housekeeping: the PC's post-commit refresh_history hook can go (the local dashboard is retired;
+  refresh_history.py stays, backfill and pages.py use it). Owner: ~30 old agent worktrees in C:/dev/tw2004-agents (delete each once verified merged); C:/dev/scratch
   is archive-only. The public page's history before 2026-09-24 11:49 (the repository's rewrite) is
   only in the PC's build/dashboard_history.json: `pages.py merge` adds it (docs/infrastructure.md).
 - Docs staleness audit (owner-approved plan): a verdict per doc section (current / fix / remove /

@@ -18,7 +18,9 @@ decomp.dev and PC jobs: `docs/infrastructure.md`.
   files at all (no `rm`, not even scratch temp files); the orchestrator uses non-shell deletes.
 - **No game files in git**: no `main.dol`, disc images, ELF/PDB/SELF, archives, art or other game
   data. The build gets `main.dol` from a private container (`tools/cloud/`, CI).
-- **No third-party SDK material in the repo**, and it is not discussed publicly.
+- **No official SDK files in the repo** (Nintendo or Metrowerks headers, libraries, documentation),
+  and leaked SDK material is never discussed publicly. Decompiled SDK and runtime code taken from
+  public decomps (`extern/`, each with its CREDITS/README) is fine.
 - **Never edit C or headers through the shell** (sed, heredocs, echo, `python -c`): it strips
   backslashes. Use the editor tools; a repeated edit is a saved Python script, and its diff is read.
 - **Names and comments need evidence** (docs/style.md "Where names and comments come from"): EA's

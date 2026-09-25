@@ -36,7 +36,7 @@ and Linux.
   and unmerged work are never touched; `pc-results/*` go only with `pc_results_days`, after
   their results were read.
 - **Never in git:** `main.dol`, disc images, ELF/PDB/SELF, archives, art or other game data
-  (`orig/*/*` is ignored), third-party SDK material. Commit messages: no Co-Authored-By, no AI
+  (`orig/*/*` is ignored), official SDK files (CLAUDE.md). Commit messages: no Co-Authored-By, no AI
   footer.
 
 ## CI: the build (`.github/workflows/build.yml`)
