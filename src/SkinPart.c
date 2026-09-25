@@ -1037,9 +1037,6 @@ void fn_800CE52C(Skin* pSkin, int n, SkinListEntry* aList, s32* pnList, int nCop
     }
 }
 
-// fake match: an identity read; it gives EA's register order.
-static inline Skin* fn_800CE660_Read(Skin* p) { return p; }
-
 // Lists (in a new *ppList) the name codes the skins' chosen options use; for the parts named in
 // aIds, those of every option. Returns the list's length.
 s32 fn_800CE660(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, int nIds, int nCopy) {
@@ -1048,8 +1045,10 @@ s32 fn_800CE660(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, i
     Skin* pSkin;
     SkinDesc* pDesc;
     u8 bAll;
+    int m;
     int i;
     int k;
+    int v;
     s32 n;
     s32 nVariant;
     s32 nOption;
@@ -1063,8 +1062,9 @@ s32 fn_800CE660(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, i
     nList = 0;
     *ppList = fn_80009B34(n * sizeof(SkinListEntry), 1, 0, "SkinPart.c", 1980);
     for (i = 0; i < nSkins; i++) {
-        pSkin = fn_800CE660_Read(apSkins[i]);
-        if (pSkin != NULL && pSkin->pModel != NULL && (pDesc = pSkin->pModel->pDesc) != NULL) {
+        if (apSkins[i] != NULL && apSkins[i]->pModel != NULL && apSkins[i]->pModel->pDesc != NULL) {
+            pSkin = apSkins[i];
+            pDesc = pSkin->pModel->pDesc;
             for (j = 0; j < fn_800CCA40(pSkin); j++) {
                 bAll = 0;
                 nVariant = fn_800CCD30(pSkin, j, nCopy);
@@ -1078,9 +1078,9 @@ s32 fn_800CE660(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, i
                     }
                 }
                 if (bAll == 1) {
-                    for (k = 0; k < fn_800CCA70(pSkin, j); k++) {
-                        for (n = 0; n < fn_800CCAC0(pSkin, j, k); n++) {
-                            fn_800CE52C(pSkin, n + pDesc->pVariants[k + pDesc->pParts[j].nFirst].nFirstOption,
+                    for (v = 0; v < fn_800CCA70(pSkin, j); v++) {
+                        for (m = 0; m < fn_800CCAC0(pSkin, j, v); m++) {
+                            fn_800CE52C(pSkin, m + pDesc->pVariants[v + pDesc->pParts[j].nFirst].nFirstOption,
                                         *ppList, &nList, nCopy);
                         }
                     }

@@ -675,6 +675,7 @@ void Character_PlaceFeetOnGround(Character* pChar) {
     f32 fDelta;
     f32* pPos;
     int i;
+    f32 fH;
     f32 fLow;
     f32 fHigh;
     SurfaceType* pSurfLow;
@@ -718,10 +719,14 @@ void Character_PlaceFeetOnGround(Character* pChar) {
     pPos = fn_800187CC_Read(pChar->pModel->pBones[0].v1C);
     Ter_GetEnclosingGroundData(pCourse, pPos, &fLow, &pSurfLow, vNormalLow, &fHigh, &pSurfHigh,
                                vNormalHigh);
-    fY = fHigh;
+    fH = fHigh;
     if (fHigh < -60000.0f || fHigh > 1.0f + pPos[1]) {
-        fY = (fLow < -60000.0f) ? pPos[1] : fLow;
+        fH = fLow;
+        if (fH < -60000.0f) {
+            fH = pPos[1];
+        }
     }
+    fY = fH;
     if (fY > 131072.25f || fY < -131072.25f) {
         return;
     }
