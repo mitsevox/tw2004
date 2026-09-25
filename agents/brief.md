@@ -73,6 +73,12 @@ if things are going well.
 - Anything unnatural that exists for the match gets `// fake match: <why>`. Normal EA style needs no
   comment. Undefined behaviour is a bug even in an exact function; if the original really does it,
   keep it and mark it `// EA bug: <what>` (and `// port:` how a port should write it).
+- **Fake matches are allowed (owner, 2026-09-25)** when they are labelled `// fake match: <why>`,
+  keep the logic exactly (same behaviour for every input), and do not hurt a port to new hardware:
+  no UB, no reliance on registers or stack layout, no asm, no type puns that break on 64-bit. An
+  unused local, a copy through a temp, a declaration order, an identity inline, a cast that changes
+  nothing: fine. A 100% decomp can be cleaned up later; an unlinked unit cannot be ported at all.
+  Permuter results rejected earlier as "fake" qualify under this rule if they keep the logic.
 - If a function will not match after a real effort (~20 minutes: the decomp-notes "Try these first"
   list, `trial.py`, TW07's locals), leave it at its best score, clean and readable, note what you
   tried, and move on.
