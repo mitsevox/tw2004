@@ -22,6 +22,11 @@ unless you combine it with something new. Before you stop, add every attempt und
   p[nPart]`, `SkinChoice** pp` walk: 12; `p = &aParts[k][nPart]; p->nOption`: 9 (idx+4 CSE'd); an
   `n = nPart*8` local with `&->nOption + n`: 12; inline helpers (set(a,n,v), set(p,k,n,v),
   get(a,n) 9, get(p,k,n) 10, field pointer 10); GC/2.0: 12 (same code). PC permuter candidate.
+  Also: the pointer cast through a struct with an embedded array (`((T*)p)->a[nPart]`, a[1] or
+  a[40]): 10, same code as the plain cast; `((SkinChoice*)&p->nOption)[nPart].nVariant`,
+  `((SkinChoice*)((s32*)p + 1))[..]`, `((SkinChoice*)((u8*)p + 4))[..]`, `(*(SkinChoice**)&..)`:
+  12. Note: the exact fn_800CC8BC has the same `addi r0,base,off; lwzx` shape from an embedded
+  array field (`p16D8->apSkins[i]`), so EA's shape here looks like an array starting at +4.
 
 ## Collected from the notes and docs (2026-09-25)
 
