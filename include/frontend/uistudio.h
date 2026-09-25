@@ -316,7 +316,7 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs);
 s32 fn_8016A2D4(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent, u32 n5,
                 s32 nArgs, const s32* pArgs, u8* pbOut);
 void fn_8016A510(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg);
-void fn_8016A830(UIStudio* pStudio, s32 nOp, UISScreen* pScreen, u32 nNode);
+void fn_8016A830(UIStudio* pStudio, int nOp, UISScreen* pScreen, u32 nNode);
 void fn_8016ABBC(UIStudio* pStudio, UISScreen* pScreen, s32 n, s32 nKind, void* p, u8 bAll);
 s32 fn_8016AD54(UISScreen* pScreen, UISNodeInfo* pInfo, s32 nKind, void* p);
 void fn_8016AEEC(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg);

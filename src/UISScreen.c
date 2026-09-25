@@ -721,10 +721,9 @@ void fn_8016ABBC(UIStudio* pStudio, UISScreen* pScreen, s32 n, s32 nKind, void* 
 
 // Hands node nNode and every node it links to to the transform callback with operation nOp.
 // Operations 0 and 3 also reach groups whose info has no owner.
-void fn_8016A830(UIStudio* pStudio, s32 nOp, UISScreen* pScreen, u32 nNode) {
+void fn_8016A830(UIStudio* pStudio, int nOp, UISScreen* pScreen, u32 nNode) {
     UISNode* pNode;
     u32 i;
-    u32 j;
 
     if (pScreen->pData != NULL) {
         pNode = &pScreen->pData->pNodes[nNode];
@@ -732,6 +731,7 @@ void fn_8016A830(UIStudio* pStudio, s32 nOp, UISScreen* pScreen, u32 nNode) {
         for (i = 0; i < pNode->nGroups; i++) {
             UISGroup* pGroup = pNode->ppGroups[i];
             if (pGroup->pInfo->p0 != NULL || nOp == 0 || nOp == 3) {
+                u32 j;
                 for (j = 0; j < pGroup->nEntries; j++) {
                     UISEntry* pEntry = &pGroup->pEntries[j];
                     if (pEntry->uHandler == 0xFFFF) {
