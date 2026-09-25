@@ -219,6 +219,9 @@ void GR_BuildGridRenderData(int nView) {
     int bInGap;
     int k;
     int i;
+    // fake match: an s32 (long) copy of nView, kept in its own register, for the fn_8001707C call
+    s32 nViewCopy;
+    nViewCopy = nView;
     lbl_802813C0->nVerts = 0;
     fPrev = 0.0f;
     lbl_802813C0->nIndices = 0;
@@ -232,9 +235,9 @@ void GR_BuildGridRenderData(int nView) {
     for (n = 0; n < lbl_802813C0->nCols * lbl_802813C0->anRows[nView]; n++) {
         nRow = n / lbl_802813C0->nCols;
         nCol = n % lbl_802813C0->nCols;
+        fAcross = nCol * lbl_802813C0->fCellW;
         fAlong = nRow * lbl_802813C0->fCellD;
         fHeight = lbl_802813C0->apHeight[nView][nCol + nRow * lbl_802813C0->nCols];
-        fAcross = nCol * lbl_802813C0->fCellW;
         if (nCol == 0) {
             nEdge = 0;
         } else if (nCol == lbl_802813C0->nCols - 1) {
@@ -322,7 +325,7 @@ void GR_BuildGridRenderData(int nView) {
                     (k == nEdge) ? 0 : (u8)lbl_802813C0->anColor[3];
                 if (k == 0 && lbl_802813C0->nVerts > 0) {
                     fU = (u32)gSession.nFrameCount * lbl_802813C0->f100 * (fPrev - fHeight);
-                    if ((s8)GOLFERSTATE_GetCurrentState(fn_8001707C(nView)) == GS_ZOOM) {
+                    if ((s8)GOLFERSTATE_GetCurrentState(fn_8001707C(nViewCopy)) == GS_ZOOM) {
                         fV = 0.75f;
                         fGap = 0.0625f;
                     } else {
