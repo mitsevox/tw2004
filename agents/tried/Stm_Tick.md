@@ -1,6 +1,6 @@
 # Stm_Tick (hlaudtrackstm.c, 0x800ABDB0)
 
-Status: OPEN, 99.06% on 2026-09-25.
+Status: OPEN, 99.10% on 2026-09-25.
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -17,6 +17,22 @@ unless you combine it with something new. Before you stop, add every attempt und
   threshold temporaries, `int` quotient, identity inline, and register/type variants on the
   remaining spots, plus a 6-minute combination lever sweep: 99.06% -> 99.06%. The new C remains
   a portable partial match.
+- 2026-09-25, ChatGPT follow-up: varied quotient helper bodies and the declaration/assignment
+  orders of the quotient, channel count, buffer, stream offset, and read position; also tried
+  unsigned-equivalent subtraction forms and GC/2.0 with unchanged source. Fast-snapshot diff
+  stayed at 4 instructions (the same two spots); real-unit score remains 99.06%. No source edit.
+- 2026-09-25, ChatGPT follow-up: split the unsigned threshold calculation into a shift and
+  `/= pList->nChannels`. The real-unit score rose 99.06% -> 99.10% and the `divwu` destination
+  now matches. One ordering swap remains: original loads `uReadPos` before shifting the channel
+  count; our compiler schedules those two independent instructions in the opposite order.
+  Reordered declarations, read-size/buffer/offset calculations, compound arithmetic, cap
+  expressions, and GC/2.0 on the new source: 2 differing instructions -> 2.
+- 2026-09-25, ChatGPT follow-up: ran a six-minute combination lever sweep from the new
+  99.10% snapshot. Its best candidate merely moved `bFed` in the declarations and still
+  differed by the same two instructions, so no sweep candidate was applied.
+- 2026-09-25, ChatGPT follow-up: repeated a focused four-minute sweep after main added
+  the adjacent-assignment-swap lever. Best result remained two differing instructions;
+  no candidate improved the real source.
 
 ## Collected from the notes and docs (2026-09-25)
 
