@@ -1,0 +1,38 @@
+GoShaderObject_Rain_Gc fn_800B52D4
+base 14, 375 levers, 37768 variants (374 singles) in 360 s; best 14
+
+14 [safe]
+  - move `Camera* pCamera;` to line 5 of the declarations
+
+14 [safe]
+  - move `Vec4 vCenter;` to line 1 of the declarations
+
+14 [safe]
+  - move `Sphere sphere;` to line 15 of the declarations
+
+14 [safe]
+  - move `Sphere sphere;` to line 16 of the declarations
+
+14 [safe]
+  - move `Sphere sphere;` to line 17 of the declarations
+
+14 [safe]
+  - move `Sphere sphere;` to line 18 of the declarations
+
+14 [safe]
+  - move `Sphere sphere;` to line 11 of the declarations
+
+14 [safe]
+  - move `Sphere sphere;` to line 12 of the declarations
+
+14 [safe]
+  - move `Sphere sphere;` to line 13 of the declarations
+
+14 [safe]
+  - move `Sphere sphere;` to line 14 of the declarations
+
+14 [safe]
+  - move `Camera* pCamera;` to line 1 of the declarations
+
+14 [safe]
+  - move `Camera* pCamera;` to line 2 of the declarations

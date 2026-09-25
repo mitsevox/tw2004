@@ -1,0 +1,80 @@
+GoTerrainCollision Ter_CheckObjectAndHazardObstruction
+base 41, 1393 levers, 31235 variants (1393 singles) in 360 s; best 31
+
+31 [safe]
+  - move `TerCell* pCell;` to line 1 of the declarations
+  - identity inline on `fWide = 0.5f + fRadius;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - identity inline on `pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];`
+  - identity inline on `fWide = 0.5f + fRadius;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - move `TerCell* pCell;` to line 5 of the declarations
+  - identity inline on `fWide = 0.5f + fRadius;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - move `TerCell* pCell;` to line 6 of the declarations
+  - identity inline on `fWide = 0.5f + fRadius;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - move `TerCell* pCell;` to line 7 of the declarations
+  - identity inline on `fWide = 0.5f + fRadius;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - move `TerCell* pCell;` to line 8 of the declarations
+  - identity inline on `fWide = 0.5f + fRadius;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - move `TerCell* pCell;` to line 9 of the declarations
+  - identity inline on `fWide = 0.5f + fRadius;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - move `TerCell* pCell;` to line 10 of the declarations
+  - identity inline on `fWide = 0.5f + fRadius;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - move `TerCell* pCell;` to line 11 of the declarations
+  - identity inline on `fWide = 0.5f + fRadius;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - move `TerCell* pCell;` to line 12 of the declarations
+  - identity inline on `fWide = 0.5f + fRadius;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - move `TerCell* pCell;` to line 2 of the declarations
+  - identity inline on `fWide = 0.5f + fRadius;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - move `TerCell* pCell;` to line 3 of the declarations
+  - identity inline on `fWide = 0.5f + fRadius;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+changed lines of the best variant (base.c):
+@@ -1,3 +1,5 @@
++static inline f32 __lv_fWide_0(f32 v) { return v; }
+ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bHazards, f32 fStep, u8 bSlope,
+-f32 fMaxSlope) {
++f32 fMaxSlope) {TerCell* pCell;
++
+ f32 aHeight[5];
+@@ -38,3 +40,2 @@
+ u16* pObjRef;
+-TerCell* pCell;
+ f32 (*pVert)[3];
+@@ -61,3 +62,3 @@
+ nMaxZ = (int)Ter_Floor((fMaxZ - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+-fWide = 0.5f + fRadius;
++fWide = __lv_fWide_0(0.5f + fRadius);
+ for (; nX <= nMaxX; nX++) {

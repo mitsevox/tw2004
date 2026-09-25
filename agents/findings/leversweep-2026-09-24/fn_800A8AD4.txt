@@ -1,0 +1,41 @@
+hlaudmovie fn_800A8AD4
+base 8, 47 levers, 3386 variants (47 singles) in 34 s; best 8
+
+8 [review]
+  - type of uRight: u32 -> int
+
+8 [review]
+  - type of uRight: u32 -> s32
+
+8 [safe]
+  - move `MovieSoundBlock* pBlock = pChunk;` to line 1 of the declarations
+
+8 [review]
+  - type of uLeft: u32 -> int
+
+8 [review]
+  - type of uLeft: u32 -> s32
+
+8 [safe]
+  - type of uRight: u32 -> unsigned int
+
+8 [safe]
+  - type of nMode: int -> s32
+
+8 [safe]
+  - type of uLeft: u32 -> unsigned int
+
+8 [review]
+  - type of nMode: int -> u32
+
+8 [safe]
+  - identity inline on `nMode = 0;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+8 [safe]
+  - identity inline on `nMode = 2;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+8 [safe]
+  - identity inline on `nMode = 1;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.

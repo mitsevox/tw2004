@@ -1,0 +1,52 @@
+LLTex fn_8000E884
+base 4, 5 levers, 23 variants (5 singles) in 2 s; best 4
+
+4 [safe]
+  - identity inline on `n = pState->n16;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+4 [safe]
+  - move `LLTexItemState* pState = pItem->p4;` to line 1 of the declarations
+
+4 [safe]
+  - move `s16 n;` to line 1 of the declarations
+
+4 [safe]
+  - move `s16 n;` to line 2 of the declarations
+
+4 [safe]
+  - identity inline on `n = pState->n16;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+4 [safe]
+  - move `s16 n;` to line 2 of the declarations
+  - identity inline on `n = pState->n16;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+4 [safe]
+  - move `LLTexItemState* pState = pItem->p4;` to line 1 of the declarations
+  - move `s16 n;` to line 1 of the declarations
+
+4 [safe]
+  - move `LLTexItemState* pState = pItem->p4;` to line 1 of the declarations
+  - move `s16 n;` to line 2 of the declarations
+
+4 [safe]
+  - move `LLTexItemState* pState = pItem->p4;` to line 1 of the declarations
+  - identity inline on `n = pState->n16;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+4 [safe]
+  - move `s16 n;` to line 1 of the declarations
+  - identity inline on `n = pState->n16;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+4 [safe]
+  - identity inline on `n = pState->n16;`
+  - move `LLTexItemState* pState = pItem->p4;` to line 1 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+4 [safe]
+  - identity inline on `n = pState->n16;`
+  - move `s16 n;` to line 1 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.

@@ -1,0 +1,48 @@
+SkinPart fn_800CDF80
+base 1, 12 levers, 425 variants (12 singles) in 5 s; best 1
+
+1 [safe]
+  - identity inline on `pDesc = pSkin->pModel->pDesc;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+1 [safe]
+  - move `SkinDesc* pDesc;` to line 1 of the declarations
+
+1 [safe]
+  - move `SkinDesc* pDesc;` to line 4 of the declarations
+
+1 [safe]
+  - move `SkinLink* pLink;` to line 1 of the declarations
+
+1 [safe]
+  - move `SkinLink* pLink;` to line 2 of the declarations
+
+1 [safe]
+  - identity inline on `pLink = &pDesc->pLinks[((SkinVariant*)pDesc->pVariants)[nVar`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+1 [safe]
+  - type of nOther: s32 -> int
+
+1 [safe]
+  - move `SkinDesc* pDesc;` to line 1 of the declarations
+  - move `SkinLink* pLink;` to line 2 of the declarations
+
+1 [safe]
+  - move `SkinDesc* pDesc;` to line 1 of the declarations
+  - identity inline on `pLink = &pDesc->pLinks[((SkinVariant*)pDesc->pVariants)[nVar`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+1 [safe]
+  - move `SkinDesc* pDesc;` to line 1 of the declarations
+  - type of nOther: s32 -> int
+
+1 [safe]
+  - identity inline on `pLink = &pDesc->pLinks[((SkinVariant*)pDesc->pVariants)[nVar`
+  - move `s32 nOther;` to line 1 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+1 [safe]
+  - identity inline on `pLink = &pDesc->pLinks[((SkinVariant*)pDesc->pVariants)[nVar`
+  - move `s32 nOther;` to line 2 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.

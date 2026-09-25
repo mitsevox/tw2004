@@ -1,0 +1,5 @@
+char fn_80017DDC
+base 1, 1 levers, 1 variants (1 singles) in 1 s; best 1
+
+1 [safe]
+  - move `f32 vNormal[4];` to line 1 of the declarations

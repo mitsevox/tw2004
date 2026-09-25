@@ -1,0 +1,38 @@
+skalib fn_80026844
+base 13, 143 levers, 18247 variants (143 singles) in 177 s; best 13
+
+13 [safe]
+  - move `AnimClubNode* pNode;` to line 7 of the declarations
+
+13 [safe]
+  - move `AnimClubNode* pNode;` to line 8 of the declarations
+
+13 [safe]
+  - move `AnimClubNode* pNode;` to line 11 of the declarations
+
+13 [safe]
+  - move `AnimClubNode* pNode;` to line 12 of the declarations
+
+13 [safe]
+  - move `int i;` to line 1 of the declarations
+
+13 [safe]
+  - move `ClipRecord* pRec;` to line 5 of the declarations
+
+13 [safe]
+  - move `ClipRecord* pRec;` to line 6 of the declarations
+
+13 [safe]
+  - move `ClipRecord* pRec;` to line 7 of the declarations
+
+13 [safe]
+  - move `ClipRecord* pRec;` to line 10 of the declarations
+
+13 [safe]
+  - move `AnimLeaf* pFrom;` to line 9 of the declarations
+
+13 [safe]
+  - move `AnimLeaf* pFrom;` to line 10 of the declarations
+
+13 [safe]
+  - move `AnimLeaf* pFrom;` to line 11 of the declarations

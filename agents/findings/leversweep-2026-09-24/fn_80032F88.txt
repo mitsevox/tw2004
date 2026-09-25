@@ -1,0 +1,38 @@
+GoTerrain fn_80032F88
+base 21, 244 levers, 39668 variants (244 singles) in 361 s; best 21
+
+21 [safe]
+  - move `f32 fWave3;` to line 5 of the declarations
+
+21 [safe]
+  - move `f32 fWave3;` to line 6 of the declarations
+
+21 [safe]
+  - move `f32 fWave3;` to line 7 of the declarations
+
+21 [safe]
+  - move `f32 fWave3;` to line 8 of the declarations
+
+21 [safe]
+  - move `f32 fWave3;` to line 9 of the declarations
+
+21 [safe]
+  - move `f32 fWave3;` to line 10 of the declarations
+
+21 [safe]
+  - move `f32 fWave3;` to line 11 of the declarations
+
+21 [safe]
+  - move `f32 fWave3;` to line 12 of the declarations
+
+21 [safe]
+  - move `f32 fWave2;` to line 1 of the declarations
+
+21 [safe]
+  - move `f32 fBias = 100.0f;` to line 11 of the declarations
+
+21 [safe]
+  - move `f32 fBias = 100.0f;` to line 12 of the declarations
+
+21 [safe]
+  - move `f32 fBias = 100.0f;` to line 13 of the declarations

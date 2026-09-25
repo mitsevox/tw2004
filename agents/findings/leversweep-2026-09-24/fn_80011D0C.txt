@@ -1,0 +1,71 @@
+LLFont fn_80011D0C
+base 9, 101 levers, 11275 variants (101 singles) in 101 s; best 7
+
+7 [safe]
+  - identity inline on `cSaved = *pCut;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - identity inline on `cSaved = *pCut;`
+  - identity inline on `pLine = sz;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - identity inline on `cSaved = *pCut;`
+  - identity inline on `pLine = p;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - identity inline on `cSaved = *pCut;`
+  - identity inline on `pLine = pBreak;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - identity inline on `cSaved = *pCut;`
+  - identity inline on `p = pLine;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - identity inline on `cSaved = *pCut;`
+  - move `f32 fLine;` to line 9 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - identity inline on `cSaved = *pCut;`
+  - move `f32 fLine;` to line 10 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - identity inline on `cSaved = *pCut;`
+  - move `char c;` to line 1 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - identity inline on `cSaved = *pCut;`
+  - move `char c;` to line 2 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - identity inline on `cSaved = *pCut;`
+  - move `int nLines;` to line 9 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - identity inline on `cSaved = *pCut;`
+  - move `int nLines;` to line 10 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - identity inline on `cSaved = *pCut;`
+  - move `f32 fLine;` to line 7 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+changed lines of the best variant (base.c):
+@@ -1 +1,2 @@
++static inline char __lv_cSaved_2(char v) { return v; }
+ int fn_80011D0C(LLFont* pFont, UFontContext* pCtx, u8 bDraw, char* sz) {
+@@ -72,3 +73,3 @@
+ for (; n > 0; n--, pCut--) {
+-cSaved = *pCut;
++cSaved = __lv_cSaved_2(*pCut);
+ *pCut = '\0';

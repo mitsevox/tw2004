@@ -1,0 +1,5 @@
+gocamscripts fn_8003F2E0
+base 8, 1 levers, 1 variants (1 singles) in 1 s; best 8
+
+8 [safe]
+  - move `f32 v[4];` to line 1 of the declarations

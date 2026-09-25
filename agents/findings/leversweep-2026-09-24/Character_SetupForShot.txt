@@ -1,0 +1,38 @@
+char Character_SetupForShot
+base 6, 199 levers, 31039 variants (199 singles) in 318 s; best 6
+
+6 [safe]
+  - move `f32 vDir[4];` to line 1 of the declarations
+
+6 [safe]
+  - move `f32 vPos[4];` to line 8 of the declarations
+
+6 [safe]
+  - move `f32 vPos[4];` to line 9 of the declarations
+
+6 [safe]
+  - move `f32 vPos[4];` to line 10 of the declarations
+
+6 [safe]
+  - move `f32 vPos[4];` to line 11 of the declarations
+
+6 [safe]
+  - move `int bStance;` to line 5 of the declarations
+
+6 [safe]
+  - move `f32 vPos[4];` to line 7 of the declarations
+
+6 [safe]
+  - move `int bStance;` to line 1 of the declarations
+
+6 [safe]
+  - move `int bStance;` to line 2 of the declarations
+
+6 [safe]
+  - move `int bStance;` to line 3 of the declarations
+
+6 [safe]
+  - move `int bStance;` to line 4 of the declarations
+
+6 [safe]
+  - move `f32 vPos[4];` to line 12 of the declarations

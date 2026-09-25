@@ -1,0 +1,91 @@
+SkinPart fn_800CE52C
+base 14, 134 levers, 16939 variants (134 singles) in 147 s; best 5
+
+5 [safe]
+  - move `SkinDesc* pDesc;` to line 12 of the declarations
+  - identity inline on `nIndices = pDesc->p28[p44->nC].n0;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+5 [safe]
+  - move `SkinDesc* pDesc;` to line 12 of the declarations
+  - identity inline on `nIndices = pDesc->p28[p44->nC].n0;`
+  - move `s32 n44;` to line 2 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+5 [safe]
+  - move `SkinDesc* pDesc;` to line 12 of the declarations
+  - identity inline on `nIndices = pDesc->p28[p44->nC].n0;`
+  - move `s32 n44;` to line 3 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+5 [safe]
+  - move `SkinDesc* pDesc;` to line 12 of the declarations
+  - identity inline on `nIndices = pDesc->p28[p44->nC].n0;`
+  - move `s32 n44;` to line 4 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+5 [safe]
+  - move `SkinDesc* pDesc;` to line 12 of the declarations
+  - identity inline on `nIndices = pDesc->p28[p44->nC].n0;`
+  - move `s32 n44;` to line 5 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+5 [safe]
+  - move `SkinDesc* pDesc;` to line 12 of the declarations
+  - identity inline on `nIndices = pDesc->p28[p44->nC].n0;`
+  - move `SkinDesc44* p44;` to line 10 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+5 [safe]
+  - move `SkinDesc* pDesc;` to line 12 of the declarations
+  - identity inline on `nIndices = pDesc->p28[p44->nC].n0;`
+  - move `s32 nFirst;` to line 6 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+5 [safe]
+  - move `SkinDesc* pDesc;` to line 12 of the declarations
+  - identity inline on `nIndices = pDesc->p28[p44->nC].n0;`
+  - move `SkinDesc44* p44;` to line 11 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+5 [safe]
+  - move `SkinDesc* pDesc;` to line 12 of the declarations
+  - identity inline on `nIndices = pDesc->p28[p44->nC].n0;`
+  - move `SkinDesc44* p44;` to line 12 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+5 [safe]
+  - move `SkinDesc* pDesc;` to line 12 of the declarations
+  - identity inline on `nIndices = pDesc->p28[p44->nC].n0;`
+  - move `s32 nOut;` to line 9 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+5 [safe]
+  - move `SkinDesc* pDesc;` to line 12 of the declarations
+  - identity inline on `nIndices = pDesc->p28[p44->nC].n0;`
+  - move `s32 nOut;` to line 10 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+5 [safe]
+  - move `SkinDesc* pDesc;` to line 12 of the declarations
+  - identity inline on `nIndices = pDesc->p28[p44->nC].n0;`
+  - move `SkinDesc14 entry;` to line 7 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+changed lines of the best variant (base.c):
+@@ -1 +1,2 @@
++static inline s32 __lv_nIndices_0(s32 v) { return v; }
+ void fn_800CE52C(Skin* pSkin, int n, SkinListEntry* aList, s32* pnList, int nCopy) {
+@@ -4,3 +5,2 @@
+ s32 nOut;
+-SkinDesc* pDesc;
+ SkinDesc44* p44;
+@@ -11,2 +11,3 @@
+ s32* pIndex;
++SkinDesc* pDesc;
+ s32 n44;
+@@ -19,3 +20,3 @@
+ if (p44->n8 != 0) {
+-nIndices = pDesc->p28[p44->nC].n0;
++nIndices = __lv_nIndices_0(pDesc->p28[p44->nC].n0);
+ pIndex = &pDesc->p20[p44->n4];

@@ -1,0 +1,53 @@
+GoStaticCam	StaticCam_GetFlybyInformation	2	2		safe	move `CamShot* pAfter;` to line 8 of the declarations
+ska_shared	fn_8001FCF4	3	3		safe	move `u8* pKeys;` to line 1 of the declarations
+UObject	fn_800488B4	1	1		safe	type of nFlags0: int -> s32
+char	Character_SetupForShot	6	6		safe	move `f32 vDir[4];` to line 1 of the declarations
+GoTerrainCollision	Ter_SearchForDropLocation	6	6		safe	move `u8 bPreferredLie;` to line 11 of the declarations
+GoBreakLine	BreakLine_Render	7	7		review	move `int nPlayer = fn_8001707C(nView);` to line 13 of the declarations
+UStream	UStream_Update	27	27		safe	for loop #1 (`for (i = 0; i < gnNumHandlers; i++) {`) as a while loop
+Swing	SW_vImpact	6	6		safe	move `f32 fAim;` to line 1 of the declarations
+Earnings	fn_800D477C	19	19		safe	move `s32 nValue;` to line 7 of the declarations
+uiText	fn_800922A8	2	2		safe	move `UITransform t;` to line 7 of the declarations
+Earnings	fn_800D4F14	14	14		safe	for loop #2 (`for (j = 0; j < lbl_80282250; j++) {`) as a while loop
+gocamscripts	CameraScript_LagAimMarker	11	11		safe	move `f32 vGoal[4];` to line 1 of the declarations
+TerrainData	fn_8000C278	1	1		safe	move `f32 fBz;` to line 1 of the declarations
+SkinPart	fn_800CDF80	1	1		safe	identity inline on `pDesc = pSkin->pModel->pDesc;`
+GoShaderObject_Rain_Gc	fn_800B52D4	14	14		safe	move `Camera* pCamera;` to line 5 of the declarations
+LLFont	fn_80011D0C	9	7		safe	identity inline on `cSaved = *pCut;`
+UISApi	fn_80168FC8	15	7		safe	move `u32 nIndex;` to line 5 of the declarations + identity inline on `pSrc = &pStudio->pScreens[i];`
+SkinPart	fn_800CCB08	5	5		safe	identity inline on `nLinks = fn_800CDEF4(pSkin, nPart, nVariant);`
+UISEvent	fn_80165B90	2	-			
+hwsBurn	fn_80110FB4	6	5		safe	identity inline on `pDesc = pBurn->pDesc;`
+uiProcessInterface	fn_8008F820	22	22		safe	move `int k;` to line 5 of the declarations
+LLTex	fn_8000E884	4	4		safe	identity inline on `n = pState->n16;`
+UISEvent	fn_80165528	6	6		safe	identity inline on `nType = p[0];`
+hlaudmovie	fn_800A8AD4	8	8		review	type of uRight: u32 -> int
+LLFileIO_Gc	File_ReadAsyncEx	6	6		safe	identity inline on `pQueue = lbl_8019E868;`
+GoTerrain	fn_80032F88	21	21		safe	move `f32 fWave3;` to line 5 of the declarations
+startUp	fn_800B0748	2	2		safe	move `u32 uBit = 1;` to line 1 of the declarations
+DiscError	fn_800B6FCC	7	7		safe	for loop #1 (`for (i = 0; i < nLines; i++) {`) as a while loop
+SkinPart	fn_800CE224	19	19		safe	move `SkinDescB8* pB8;` to line 7 of the declarations
+GoTerrainCollision	Ter_CheckObjectAndHazardObstruction	41	31		safe	move `TerCell* pCell;` to line 1 of the declarations + identity inline on `fWide = 0.5f + fRadius;`
+SkinPart	fn_800CEB1C	6	0	EXACT	safe	move `int i;` to line 1 of the declarations + type of nList: s32 -> int
+skalib	fn_80026844	13	13		safe	move `AnimClubNode* pNode;` to line 7 of the declarations
+SkinPart	fn_800CE52C	14	5		safe	move `SkinDesc* pDesc;` to line 12 of the declarations + identity inline on `nIndices = pDesc->p28[p44->nC].n0;`
+hlaudtrackseq	fn_800AA9EC	8	2		safe	identity inline on `nChannel = pTrack->u.seq.n65 - 1;` + move `u8 i;` to line 6 of the declarations
+LLTex	fn_8000EA1C	10	10		safe	identity inline on `a = nOp & 0x7F;`
+char	Character_PlaceFeetOnGround	7	3		safe	identity inline on `pPos = pChar->pModel->pBones[0].v1C;`
+SunFlr_Gc	fn_8009A3F4	33	33		safe	move `void* pCamera;` to line 1 of the declarations
+char	fn_8001F110	25	25		safe	for loop #1 (`for (i = 0; i < pLib->nRecords; i++) {`) as a while loop
+hlaudtrackseq	fn_800AA744	2	2		safe	move `u8 i;` to line 11 of the declarations
+Ball	Physics_HandleCollision	92	82		safe	move `f32 fD;` to line 1 of the declarations + identity inline on `fCo = fn_80009638(fA);` + move `f32 fB;` to line 13 of the declarations
+hwsRender_Gc	fn_801132C4	3	3		safe	identity inline on `pNormalOut = pNormalBuf;`
+DiscError	fn_800B694C	4	4		safe	identity inline on `u = uBits;`
+SunFlr_Gc	fn_8009A708	3	3		safe	type of uColour: u32 -> unsigned int
+hwsBurn	fn_80111658	6	6		safe	for loop #2 (`for (j = 0; j < nBits; j++) {`) as a while loop
+char	fn_80017DDC	1	1		safe	move `f32 vNormal[4];` to line 1 of the declarations
+GoGreenGrid	fn_8009BE08	43	40		safe	move `int nSteps = 0;` to line 8 of the declarations
+hwsBurn	fn_8011172C	10	2		safe	identity inline on `nEnd = nAlign + *pOffset;` + move `SkinDesc* pDesc = pBurn->pDesc;` to line 1 of the declarations
+GoGreenGrid	fn_8009B970	43	37		safe	identity inline on `fAlong = (f32)fn_80009680(fn_80009744(lbl_802813C0->aDir[nVi` + move `f32 fNegZ;` to line 2 of the declarations
+GoTerrain	fn_80032B7C	4	4		safe	move `f32 mRaise[4][4];` to line 7 of the declarations
+SkinPart	fn_800CE8C0	26	10		safe	move `SkinDesc* pDesc;` to line 9 of the declarations + move `Skin* pSkin;` to line 8 of the declarations
+gocamscripts	fn_8003F2E0	8	8		safe	move `f32 v[4];` to line 1 of the declarations
+UISScreen	fn_8016B4D4	46	26		safe	move `s32 nStep;` to line 8 of the declarations
+GoTerrain	fn_80031154	59	31		safe	type of nLast: s32 -> int + move `s32 nObjects;` to line 28 of the declarations

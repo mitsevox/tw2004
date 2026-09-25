@@ -1,0 +1,88 @@
+UISApi fn_80168FC8
+base 15, 96 levers, 10031 variants (96 singles) in 93 s; best 7
+
+7 [safe]
+  - move `u32 nIndex;` to line 5 of the declarations
+  - identity inline on `pSrc = &pStudio->pScreens[i];`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - move `u32 nIndex;` to line 5 of the declarations
+  - identity inline on `pSrc = &pStudio->pScreens[i];`
+  - identity inline on `nIndex = fn_8016C6C4(pStudio, uGroup, uScreen);`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - move `u32 nIndex;` to line 5 of the declarations
+  - identity inline on `pSrc = &pStudio->pScreens[i];`
+  - identity inline on `pScreen = &pStudio->pScreens[pStudio->nCurScreen];`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - move `u32 nIndex;` to line 5 of the declarations
+  - identity inline on `pSrc = &pStudio->pScreens[i];`
+  - move `u16 uPrevGroup;` to line 8 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - move `u32 nIndex;` to line 5 of the declarations
+  - identity inline on `pSrc = &pStudio->pScreens[i];`
+  - move `u16 uPrevGroup;` to line 9 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - move `u32 nIndex;` to line 5 of the declarations
+  - identity inline on `pSrc = &pStudio->pScreens[i];`
+  - move `u16 uPrevGroup;` to line 10 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - move `u32 nIndex;` to line 5 of the declarations
+  - identity inline on `pSrc = &pStudio->pScreens[i];`
+  - move `UISEventData data;` to line 5 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - move `u32 nIndex;` to line 5 of the declarations
+  - identity inline on `pSrc = &pStudio->pScreens[i];`
+  - move `UISEventData data;` to line 6 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - move `u32 nIndex;` to line 5 of the declarations
+  - identity inline on `pSrc = &pStudio->pScreens[i];`
+  - move `UISEventData data;` to line 7 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - move `u32 nIndex;` to line 5 of the declarations
+  - identity inline on `pSrc = &pStudio->pScreens[i];`
+  - move `UISEventData data;` to line 10 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - move `u32 nIndex;` to line 5 of the declarations
+  - identity inline on `pSrc = &pStudio->pScreens[i];`
+  - move `UISScreen* pScreen;` to line 1 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+7 [safe]
+  - move `u32 nIndex;` to line 5 of the declarations
+  - identity inline on `pSrc = &pStudio->pScreens[i];`
+  - move `UISScreen* pScreen;` to line 2 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+changed lines of the best variant (base.c):
+@@ -1,5 +1,6 @@
++static inline UISScreen * __lv_pSrc_0(UISScreen * v) { return v; }
+ u8 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
+-u32 nIndex;
+ UISScreen* pScreen;
+ UISScreen* pSrc;
++u32 nIndex;
+ u16 uPrevScreen;
+@@ -20,3 +21,3 @@
+ for (i = 0; i < pStudio->nScreens; i++) {
+-pSrc = &pStudio->pScreens[i];
++pSrc = __lv_pSrc_0(&pStudio->pScreens[i]);
+ if (pSrc->uPrevGroup == uGroup && pSrc->uPrevScreen == uScreen) {

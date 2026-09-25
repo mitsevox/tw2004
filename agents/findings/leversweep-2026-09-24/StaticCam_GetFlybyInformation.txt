@@ -1,0 +1,38 @@
+GoStaticCam StaticCam_GetFlybyInformation
+base 2, 385 levers, 36390 variants (385 singles) in 360 s; best 2
+
+2 [safe]
+  - move `CamShot* pAfter;` to line 8 of the declarations
+
+2 [safe]
+  - move `CamShot* pAfter;` to line 9 of the declarations
+
+2 [safe]
+  - move `CamShot* pAfter;` to line 10 of the declarations
+
+2 [safe]
+  - move `f32 vLast[4];` to line 1 of the declarations
+
+2 [safe]
+  - move `f32 vDiff[4];` to line 17 of the declarations
+
+2 [safe]
+  - move `f32 vDiff[4];` to line 18 of the declarations
+
+2 [safe]
+  - move `f32 vDiff[4];` to line 19 of the declarations
+
+2 [safe]
+  - move `f32 vDiff[4];` to line 20 of the declarations
+
+2 [safe]
+  - move `f32 vDiff[4];` to line 5 of the declarations
+
+2 [safe]
+  - move `f32 vDiff[4];` to line 6 of the declarations
+
+2 [safe]
+  - move `f32 vDiff[4];` to line 7 of the declarations
+
+2 [safe]
+  - move `f32 vDiff[4];` to line 8 of the declarations
