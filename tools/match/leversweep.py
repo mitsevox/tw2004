@@ -343,6 +343,47 @@ def levers(f):
             out.append((('addr', acc), 'take &%s into a pointer after `%s`, later reads through it'
                         % (acc, lines[k].strip()[:40]), 'review', ad))
 
+    # two adjacent independent assignments swapped (AI_ChooseTarget: fDX before fDZ, found by the
+    # permuter). Only one-line `x = e;` / `x op= e;` pairs with no call, no ++/--, and neither
+    # statement naming the other's target. safe: both targets plain locals whose address is never
+    # taken; review: a store through memory or to a global (a pointer could alias it).
+    asg = re.compile(r'^(\s*)([A-Za-z_*(][^=;]*?)\s*([-+*/%&|^]|<<|>>)?=(?!=)\s*([^;]*);\s*$')
+    ident = re.compile(r'(?<![\w.>])([A-Za-z_]\w*)')
+    addr_taken = set(re.findall(r'&\s*([A-Za-z_]\w*)', f.rest))
+    declared = set(loc)
+    for l in f.decls:                      # `f32 fDX, fDZ;`: every name of a multi-declarator line
+        if f._multi(l) and not re.search(r'[(=]', l):
+            declared.update(re.findall(r'([A-Za-z_]\w*)\s*(?:\[[^\]]*\]\s*)?(?=[,;])', l))
+    rl = f.rest.split('\n')
+    seen = {}
+    for k in range(len(rl) - 1):
+        a, b = asg.match(rl[k]), asg.match(rl[k + 1])
+        if not a or not b or a.group(1) != b.group(1):
+            continue
+        if any(re.search(r'\b\w+\s*\(|\+\+|--', l) for l in (a.group(2) + a.group(4), b.group(2) + b.group(4))):
+            continue
+        ta, tb = ident.findall(a.group(2))[:1], ident.findall(b.group(2))[:1]
+        if not ta or not tb or ta[0] in KEYWORDS or tb[0] in KEYWORDS:
+            continue
+        if ta[0] in ident.findall(rl[k + 1]) or tb[0] in ident.findall(rl[k]):
+            continue
+        plain = all(re.fullmatch(r'\s*[A-Za-z_]\w*\s*', m.group(2)) and m.group(2).strip() in declared
+                    and m.group(2).strip() not in addr_taken for m in (a, b))
+        pair = rl[k] + '\n' + rl[k + 1]
+        n = seen.get(pair, 0)
+        seen[pair] = n + 1
+        def sw(g, pair=pair, n=n):
+            i = -1
+            for _ in range(n + 1):
+                i = g.rest.find(pair, i + 1)
+                if i < 0:
+                    return False
+            x, y = pair.split('\n')
+            g.rest = g.rest[:i] + y + '\n' + x + g.rest[i + len(pair):]
+            return True
+        out.append((('swap', k), 'swap `%s` and `%s`' % (rl[k].strip()[:40], rl[k + 1].strip()[:40]),
+                    'safe' if plain else 'review', sw))
+
     # a do/while loop as a while loop (review: a do runs its body once before the first test)
     for n, m in enumerate(re.finditer(r'\bdo \{', f.rest)):
         def dw(g, n=n):
