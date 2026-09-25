@@ -85,8 +85,11 @@ if things are going well.
 
 ## Read first
 
+0. **Before touching any function: `agents/tried/<fn>.md`** (the tried-ledger, one file per function
+   not yet exact). Everything anyone tried on it is there. Never repeat a listed attempt unless you
+   combine it with something new; add your own attempts to it before you stop (roles/matching.md).
 1. `docs/workflow.md` (commands), `docs/style.md`, `docs/decomp-notes.md` ("Try these first" fully,
-   then each section as needed; newest rules: "New from the link waves").
+   then each section as needed; newest rules: "New from the first cloud lanes").
 2. `include/golfer.h`, `include/game.h`, `include/engine.h`.
 3. As needed: `docs/tw06-names.md`, `docs/reference-builds/tw07-ps3/` (EA's later source layout:
    parameter order, types, locals and their order often fix the last 1-5%).

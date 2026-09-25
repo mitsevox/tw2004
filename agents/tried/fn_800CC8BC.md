@@ -1,0 +1,15 @@
+# fn_800CC8BC (SkinPart.c, 0x800CC8BC)
+
+Status: OPEN, 93.49% on 2026-09-25.
+
+Read all of this before working on the function. Do not repeat an attempt listed here
+unless you combine it with something new. Before you stop, add every attempt under
+"Attempts" (what, score before -> after). When it is exact: Status SOLVED, the fix, the commit.
+
+## Attempts
+
+(add yours here: date, lane, what, score)
+
+## Collected from the notes and docs (2026-09-25)
+
+Nothing recorded.
