@@ -511,7 +511,7 @@ u32 fn_80169D90(u32 nScreens, u32 nHandlers, u32 nRateFns, u32 n60, u32 nEventWo
 // Turns a file offset stored in a pointer field into the pointer.
 // port: the UI file keeps 32-bit offsets in its pointer fields.
 static inline void* UISFile_Fix(UISScreenFile* pFile, void* p) {
-    return (u8*)pFile + (uptr)p;
+    return (void*)((uptr)pFile + (uptr)p);
 }
 
 // Fixes up a UI file the first time it is seen: every offset in it becomes a pointer, and each
