@@ -895,7 +895,7 @@ config.libs = [
             Object(NonMatching, "DepthField.c"),
             Object(Matching, "UObject3D.c"),
             Object(Matching, "GoDynObj.c"),
-            Object(NonMatching, "UObject.c"),
+            Object(Matching, "UObject.c"),
             Object(Matching, "UKernel.c"),
             Object(Matching, "GoAnimalActors.c"),
             Object(NonMatching, "GoTerrainCollision.c"),
