@@ -97,24 +97,28 @@ void fn_8009B898(void) {
 // Lays the view's grid out for its player's target: with the putter it runs from beyond the pin
 // back past the ball (at most 8 or 16 rows), otherwise it is a square of nCols x nCols points.
 void fn_8009B970(int nView) {
+    // fake match: an s32 (long) copy of nView, kept in its own register, for the fn_8001707C calls
+    s32 nViewCopy;
     f32 vPin[4];
-    f32 fDirX;
     f32 fNegZ;
+    f32 fDirX;
     f32 fAcross;
     f32 fAlong;
+    f32 fDist;
     f32 fLen;
-    if (!fn_8009BD24(fn_8001707C(nView))) {
+    nViewCopy = nView;
+    if (!fn_8009BD24(fn_8001707C(nViewCopy))) {
         return;
     }
-    Vec_Copy(PLAYER(fn_8001707C(nView))->vTarget, lbl_802813C0->aTarget[nView]);
+    Vec_Copy(PLAYER(fn_8001707C(nViewCopy))->vTarget, lbl_802813C0->aTarget[nView]);
     lbl_802813C0->anDone[nView] = 0;
-    fn_8009CB78(PLAYER(fn_8001707C(nView))->vTarget, PLAYER(fn_8001707C(nView))->ball.vPos,
+    fn_8009CB78(PLAYER(fn_8001707C(nViewCopy))->vTarget, PLAYER(fn_8001707C(nViewCopy))->ball.vPos,
                 lbl_802813C0->aDir[nView]);
     lbl_802813C0->aDir[nView][1] = 0.0f;
-    fAlong = (f32)fn_80009680(fn_80009744(lbl_802813C0->aDir[nView]));
+    fDist = (f32)fn_80009680(fn_80009744(lbl_802813C0->aDir[nView]));
     fn_800BAF04(lbl_802813C0->aDir[nView], lbl_802813C0->aDir[nView]);
-    if (PLAYER(fn_8001707C(nView))->nClub == CLUB_PUTTER_e) {
-        fn_8009CB78(&fn_8000C594()->pin[Game_CurrentPinSet()].x, PLAYER(fn_8001707C(nView))->ball.vPos,
+    if (PLAYER(fn_8001707C(nViewCopy))->nClub == CLUB_PUTTER_e) {
+        fn_8009CB78(&fn_8000C594()->pin[Game_CurrentPinSet()].x, PLAYER(fn_8001707C(nViewCopy))->ball.vPos,
                     vPin);
         vPin[1] = 0.0f;
         fLen = 2.0f + (f32)fn_80009680(fn_80009744(vPin));
@@ -125,7 +129,7 @@ void fn_8009B970(int nView) {
             lbl_802813C0->anRows[nView] = 16;
         }
         lbl_802813C0->fCellD = fLen / (lbl_802813C0->anRows[nView] - 1);
-        fAlong = lbl_802813C0->fCellD / 2.0f + fAlong;
+        fAlong = lbl_802813C0->fCellD / 2.0f + fDist;
         fAcross = (lbl_802813C0->nCols / 2) * lbl_802813C0->fCellW - lbl_802813C0->fCellW / 2.0f;
     } else {
         lbl_802813C0->anRows[nView] = lbl_802813C0->nCols;
@@ -135,16 +139,18 @@ void fn_8009B970(int nView) {
     }
     fDirX = lbl_802813C0->aDir[nView][0];
     fNegZ = -lbl_802813C0->aDir[nView][2];
-    lbl_802813C0->aCorner[nView][0] =
-        fAcross * fNegZ + (PLAYER(fn_8001707C(nView))->vTarget[0] - fAlong * lbl_802813C0->aDir[nView][0]);
-    lbl_802813C0->aCorner[nView][2] =
-        fAcross * fDirX + (PLAYER(fn_8001707C(nView))->vTarget[2] - fAlong * lbl_802813C0->aDir[nView][2]);
+    lbl_802813C0->aCorner[nView][0] = fAcross * fNegZ
+        + (PLAYER(fn_8001707C(nViewCopy))->vTarget[0] - fAlong * lbl_802813C0->aDir[nView][0]);
+    lbl_802813C0->aCorner[nView][2] = fAcross * fDirX
+        + (PLAYER(fn_8001707C(nViewCopy))->vTarget[2] - fAlong * lbl_802813C0->aDir[nView][2]);
 }
 
 // Samples the ground height under up to four more of the view's grid points (a frame's share),
 // first laying the grid out again if the player's target has moved. Points on ground of class 12
 // are lifted by a ninth.
 void fn_8009BE08(int nView) {
+    // fake match: an s32 (long) copy of nView, kept in its own register, for the fn_8001707C calls
+    s32 nViewCopy;
     f32 vPoint[4];
     f32 vNormal[4];
     SurfaceType* pSurface;
@@ -155,12 +161,13 @@ void fn_8009BE08(int nView) {
     f32 fAlong;
     f32 fDirX;
     f32 fDirZ;
-    if (!fn_8009BD24(fn_8001707C(nView))) {
+    nViewCopy = nView;
+    if (!fn_8009BD24(fn_8001707C(nViewCopy))) {
         return;
     }
-    if (lbl_802813C0->aTarget[nView][0] != PLAYER(fn_8001707C(nView))->vTarget[0]
-        || lbl_802813C0->aTarget[nView][1] != PLAYER(fn_8001707C(nView))->vTarget[1]
-        || lbl_802813C0->aTarget[nView][2] != PLAYER(fn_8001707C(nView))->vTarget[2]) {
+    if (lbl_802813C0->aTarget[nView][0] != PLAYER(fn_8001707C(nViewCopy))->vTarget[0]
+        || lbl_802813C0->aTarget[nView][1] != PLAYER(fn_8001707C(nViewCopy))->vTarget[1]
+        || lbl_802813C0->aTarget[nView][2] != PLAYER(fn_8001707C(nViewCopy))->vTarget[2]) {
         fn_8009B970(nView);
     }
     fDirX = lbl_802813C0->aDir[nView][0];
@@ -170,7 +177,7 @@ void fn_8009BE08(int nView) {
         fAlong = (n / lbl_802813C0->nCols) * lbl_802813C0->fCellD;
         fAcross = (n % lbl_802813C0->nCols) * lbl_802813C0->fCellW;
         vPoint[0] = fAcross * fDirZ + (fAlong * fDirX + lbl_802813C0->aCorner[nView][0]);
-        vPoint[1] = 2.0f + PLAYER(fn_8001707C(nView))->vTarget[1];
+        vPoint[1] = 2.0f + PLAYER(fn_8001707C(nViewCopy))->vTarget[1];
         vPoint[2] = (fAlong * fDirZ + lbl_802813C0->aCorner[nView][2]) - fAcross * fDirX;
         vPoint[3] = 1.0f;
         lbl_802813C0->apHeight[nView][n] =
@@ -360,16 +367,19 @@ void GR_BuildGridRenderData(int nView) {
 // Draws the view's grid once every point has been sampled: only for a human player standing over
 // the ball (set-up, aiming and green cameras, or the swing before it starts).
 void fn_8009C914(int nView) {
+    // fake match: an s32 (long) copy of nView, kept in its own register, for the fn_8001707C calls
+    s32 nViewCopy;
     TrailDraw draw;
     TrailMeshDesc desc;
     CamLens* pLens;
     f32 fAC;
     int nPlayer;
     int nState;
+    nViewCopy = nView;
     if (!fn_8009BD24(fn_8001707C(nView))) {
         return;
     }
-    nPlayer = fn_8001707C(nView);
+    nPlayer = fn_8001707C(nViewCopy);
     nState = GOLFERSTATE_GetCurrentState(nPlayer);
     if ((s8)nState == GS_WAIT) {
         return;
