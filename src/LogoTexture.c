@@ -24,8 +24,7 @@ void fn_8010FC3C(u8* pDst, u8* pSrc, int bToTexture, int nWidth, int nHeight) {
     int nPos;
 
     nTileRow = (nWidth == 64) ? 64 * 4 : 128 * 4;
-    nRow = 0;
-    for (y = 0; y < nHeight; y++) {
+    for (y = 0, nRow = 0; y < nHeight; y++, nRow += nWidth) {
         nBase = (y % 4) * 8 + (y / 4) * nTileRow;
         i = nRow;
         x = 0;
@@ -48,7 +47,6 @@ void fn_8010FC3C(u8* pDst, u8* pSrc, int bToTexture, int nWidth, int nHeight) {
                 x++;
             }
         }
-        nRow += nWidth;
     }
     DCFlushRange(pDst, 64 * 64);
     GXInvalidateTexAll();

@@ -586,6 +586,7 @@ void* fn_800CAA7C(int nPlayer, int nGroup, int nStyle, int nClub) {
     int nOther;
     void* pData;
     int i;
+    int nUseStyle = nStyle;
 
     nIndex = fn_800C98DC(nGroup);
     if (lbl_80282230->players[nPlayer].nId == -1) {
@@ -606,9 +607,9 @@ void* fn_800CAA7C(int nPlayer, int nGroup, int nStyle, int nClub) {
     pData = lbl_80282230->bufs[lbl_80282230->players[nPlayer].nId][nIndex][nStyle][nClub].pData;
     if (pData == NULL) {
         pData = lbl_80282230->bufs[lbl_80282230->players[nPlayer].nId][nIndex][0][nClub].pData;
-        nStyle = 0;
+        nUseStyle = 0;
     }
-    fn_800CA268(nPlayer, lbl_80282230->players[nPlayer].nId, nGroup, nClub, nStyle);
+    fn_800CA268(nPlayer, lbl_80282230->players[nPlayer].nId, nGroup, nClub, nUseStyle);
     fn_8001DB98(gPlayers[nPlayer].pChar);
     return pData;
 }
@@ -669,7 +670,7 @@ void fn_800CACD4(int nPlayer) {
     pRecords = pChar->pRecords;
     nSlot = lbl_80282230->players[nPlayer].nId;
     pLib = pChar->pLib;
-    fn_800CB668(0, nAnimSlot, nPlayer, szPath);
+    fn_800CB668(0, pChar->nSlot, nPlayer, szPath);
     lbl_80282230->hFile = fn_800060E0(szPath);
     uFileSize = fn_800065B0(lbl_80282230->hFile);
     for (i = 0; i < 2; i++) {
@@ -789,6 +790,7 @@ void fn_800CB2B0(int nSlot) {
     int nPlayer;
     AnimLib* pLib;
     ClipRecord* pRecords;
+    ClipRecord* pRec;
     int i;
     int nStyle;
     int nClub;
@@ -815,11 +817,12 @@ void fn_800CB2B0(int nSlot) {
                         AnimLib_Find(pLib, fn_800C9928(i), nStyle, nClub, 0, &nCount, &uFlags, NULL, &nFirst);
                         if (nCount > 0) {
                             nFirst += lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nNext;
-                            if (pRecords[nFirst].n12 & 2) {
+                            pRec = &pRecords[nFirst];
+                            if (pRec->n12 & 2) {
                                 fn_800CB4E0(lbl_80282230->hFile, uFileSize,
                                             lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData,
                                             lbl_80282230->bufs[nPlayer][i][nStyle][nClub].nSize,
-                                            pRecords[nFirst].n20);
+                                            pRec->n20);
                                 lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData =
                                     fn_80020DD4(lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData,
                                                 NULL, 16);

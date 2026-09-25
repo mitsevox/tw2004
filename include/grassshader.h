@@ -219,6 +219,7 @@ typedef struct GrassManager {
     f32          f41C;          // 0x41C  0.025
 } GrassManager;
 
+extern GrassManager lbl_802603B0;
 extern GrassManager* lbl_80281900;
 extern s32 lbl_80282514;        // cleared when the grass is freed (fn_8011E3B4)
 extern void* lbl_80282510;      // the grass's 256x256 texture buffer (fn_8011EB80)

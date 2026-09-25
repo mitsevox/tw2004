@@ -16,8 +16,21 @@ Also merged: holecontests-link (GameHoleContests linked), hlaudmovie (+1), uissc
 split-finder (LLTime.c, Code800B90F4.c linked; survey in agents/findings/split-survey.tsv).
 Strong split leads from the survey, all free now: Swing (3 state files, ~23 KB exact), Golfer
 (Caddie part ~4.8 KB), Ball (Wind.c), goballfx (GoLightFogEnv); medium: Golfer club part, Glows,
-hlaudmovie. Next round proposed: a split lane on those + a lane reworking UISApi/UISEvent/UIStudio
-for the deferred build.
+hlaudmovie. split-01 merged (31f5af8): StateGolfer.c, stateFunc.c, Code8005D2E4.c (from Swing), Wind.c
+(Ball), GoLightFogEnv.c (goballfx), Code8002DB80.c (Golfer; the session tail is a new NonMatching
+Code8002EE1C.c) split off and linked. Not split (no boundary evidence): Golfer's club part, Glows.
+Follow-ups for the audit (comments, not matching): Swing.c's and goballfx.c's file headers still
+describe the moved code; DynChain.c/Replay.c prototype comments still say "Ball.c" for the Wind
+functions. The bone-name strings 0x801871D0-0x801873F0 (.sdata 0x80280E78-0x80281070) are not
+Skeleton's: they sit before skalib's data (skalib or char); attach them when that unit links.
+leversweep.py (the lever-combination sweeper) is being self-tested in worktree probe-01. uis-01 done: UISApi/UISEvent/UIStudio reversed + deferred give
+byte-identical code and data (no evidence either way; no score moved). Merged only UISEvent, where
+it lets FindRateFn's fake copy go (callers call fn_8016604C); UISApi/UIStudio left as they were
+(branch agent/swing-01 commit db03b3f has the reversed versions). Fake-match helpers now named fn_<caller>_Read (brief).
+Held by the owner's PC to ~19:15 CDT (wins come as local/<name> branches): map-02 GoGolfCam,
+Earnings, gocamscripts; map-03 Skin, UStream, GoBreakLine, GoStaticCam, UObject, uiText,
+TerrainData, GoShaderObject_Rain_Gc, hlaudmovie, LLFileIO_Gc; map-04 ska_shared, AnimStream, skalib;
+map-07 (data) PsBallFx, the SitDev tables, the streammanagerhole strings, then orphan-data leads.
 local/target-link and local/streaming-link (streammanagerhole split in 3, all linked, +8 % data)
 are merged; the owner deletes those branches (the session cannot). The PC's split finder
 (agent/map-05, to ~18:00) surveys unlinked units for EA file boundaries: no cloud splits until it

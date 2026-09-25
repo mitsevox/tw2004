@@ -1,0 +1,61 @@
+map-03 w10 (closer lane, 2026-09-24 18:12-19:15 CDT)
+
+Compiler sweep (quicktrial base.c, GC 1.2.5n/1.3/1.3.2/1.3.2r/2.0/2.0p1/2.5/2.6/2.7/3.0a3/3.0a5.2):
+  Skin fn_800368FC, UObject fn_800488B4, TerrainData fn_8000C278, GoBreakLine BreakLine_Render,
+  GoStaticCam StaticCam_GetFlybyInformation, LLFileIO_Gc File_ReadAsyncEx, hlaudmovie fn_800A8AD4:
+  1.3 through 2.7 all identical to 2.5 (2.0p1 worse on BreakLine/StaticCam); no version helps.
+
+Skin fn_800368FC 99.9 -> 100 (APPLIED, 496fddd7): the first p14 walk (version > 8) on p and j, every
+  other walk on pData and i (the mesh-bits loop included, the old separate j gone). How: the `mr` needs
+  the counter variable to have a definition before its loop (j used in any earlier loop, or shared i);
+  that alone swaps counter/pData (26), and merging p into pData everywhere fixes that except the first
+  loop (7); that loop on its own p/j: 0. Old fake matches (Skin_DescMesh, (n*4)<<1, n*sizeof(u32)) are
+  still needed (13/9/2 without). Decl order i/j either way exact (kept i, j).
+Skin link: fn_80035F1C/fn_80035F40 and fn_80037708 were defined out of address order (moved, in the
+  commit). graduate with .rodata 0x8017E1C0-0x8017E690, .data 0x801878A8-0x80187900, .sdata
+  0x802810F0-0x80281100, .sdata2 0x80283020-0x80283028 then fails only on .sdata2: EA's pool is
+  0x80283018 0.0f (fn_80035D10), 0x8028301C 0.5f (fn_800358E0), then a new 8-aligned block at 0x80283020
+  with 0.0f again (fn_80037AB8 only). One TU pools equal literals once, so 0x80037AB8-0x80037DD8
+  (fn_80037AB8, fn_80037C48, fn_80037CD8, fn_80037D5C) looks like a second EA file (the file map had
+  Skin.c end at 0x80037AB8 before commit 49a5cead widened it). Not split (needs the orchestrator's go).
+  After a split, the first part still emits its pool as [0.5f, 0.0f] where EA has [0.0f, 0.5f]: a
+  Skin_StrippedFn stand-in using 0.0f first (decomp-notes) would be needed. The text/.data/.rodata/.sdata
+  ranges above all matched in the trial link (the only DOL differences were the three sda offsets).
+SPLIT DONE (80feef29, orchestrator's go): Skin.c 0x80035640-0x80037AB8 + Code80037AB8.c 0x80037AB8-0x80037DD8,
+  both Matching. Skin_StrippedFn `return (x < 0.0f) ? -x : x;` fixes the pool order (`x + 0.0f` did not:
+  it emits no constant). Header comments still say "Skin.c" for fn_80037CD8 (charstate.h) and
+  fn_80037AB8/fn_80037C48 (char.c prototypes): left unchanged (comment rule).
+Skin fn_800368FC before the fix (1: EA `li r16,0; mr r14,r16`): (u32)j index 360; while-loop j; Skin_DescMesh for the
+  pBits test/fix (all/if only); `j = 0, i = j`; `j = n = 0`; `pData = 0, j = 0`; `j = 0;` before a
+  `for (;` ; `j = 0 * i`; pMesh taken first and pBits fixed through it: all 1. Previous mesh loop
+  counting with j: 26; shared i: 26; every single decl move (10x10) on both: none <= 2. Explicit byte
+  offset IV (`uOff += sizeof(SkinMesh)`, u32/int/s32, 4 init forms): 39+.
+
+hlaudmovie fn_800A8AD4 (8 instrs: pBlock r29 vs EA r30, 2nd &lbl_801F1850 base r30 vs EA r29):
+  typed MovieSoundBlock* parameter 24; pBlock declared last 88; pBlock assigned after the state test,
+  pChunk passed to fn_800B0338, pDataL from pChunk: 8; the 12 legal orders of the 4 pData/uLeft/uRight
+  statements: 8-12; offset local 13; offset first 8; AudVoice* pL/pR locals 8; MovieSound* pointer 82;
+  uLeft/uRight as `x = a; x += b` 14.
+
+GoStaticCam StaticCam_GetFlybyInformation (2): block 2 through a static inline lerp (return / r = a; r +=)
+  into fT or fEnd: 6; `fEnd = fHiT - fT; fEnd *= ratio; fT += fEnd` 49; ratio local first 6-11;
+  `fEnd = fT; fT = fEnd + ...` 7; `fEnd = fT; fEnd += ...; fT = fEnd` 2; product first 7; 12 block-2
+  forms x 3 block-1 forms (fEnd / direct fT / fT = fEnd =): best stays 2 (base). The `fT +=` form's diff
+  is only the scheduler placing fmadds after `stw r30,0x10(r1)` and the two lfs f78 swapped.
+
+GoBreakLine BreakLine_Render: permuter 20 min -j 4 (16.5k iterations, base 55): no improvement.
+GoBreakLine BreakLine_Render (fZ f0, EA f2): fX/fZ replaced by every ordered pair of the function's
+  float locals (fX, fZ, fDist, fAngle, fAlpha; 19 pairs): all 7 (quicktrial), no change. Block-scoped
+  fresh fX2/fZ2 (either order) 7; a local f32 v[4] 9; new x into a temp stored after z 8; `t = fZ*fCos;
+  t += fX*-fSin` 8.
+GoShaderObject_Rain_Gc fn_800B52D4: permuter 20 min -j 4 (13.4k iterations, base 90): no improvement.
+GoShaderObject_Rain_Gc fn_800B52D4 (14 quicktrial): the 6 role orders of the i/j/k loops x splash loop on
+  i/j/k: 14-23. EA's splash loop starts `li r22,0; mr r17,r22` (ours r20: the IV copy is already there).
+UStream UStream_Update (3; quicktrial base shows 27 because of symbol names, 24 of them): `i =
+  gnCurStream` before or after the check, (u32)i, gStreams + i, byte-offset product first (30), `&pStream[n]`
+  from a cast base, `+= 0`, nested `!= -1` block (47), `return !(...)` (43), inverted test (34),
+  `pStream = pStream + n`, -1 in a local: 27 (no change).
+hlaudmovie fn_800A8AD4: no pBlock at all, pChunk cast at each use (typed param or void*, aDataL as a
+  byte offset): 24. `register` on pBlock or on the parameter: 8 (no change).
+UObject fn_800488B4: min via if-assign into fFov/fMax/fLod with `0.5f *` or `/ 2.0f`, `fLod *= 0.5f`,
+  `fLod = 0.5f * fLod`: 7-98 (fLod reuse wrecks the later registers), none 0.

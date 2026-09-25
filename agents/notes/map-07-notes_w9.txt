@@ -1,0 +1,31 @@
+map-07 closer wave 9 (2026-09-24, 16:40-17:15 CDT). Units: LLDisp_Gc, LogoTexture. Neither linked.
+
+LLDisp_Gc fn_80006A98: 77.67 -> 78.0 (objdiff; quicktrial positional 31 -> 20, best order 16).
+- KEY: the orig's late `mr r30,r6` (size computed in r6, copied to the saved reg) comes from reading
+  the size back out of the global: `uSize = lbl_80281B90 = SZ;` (or `lbl_80281B90 = SZ; ... uSize =
+  lbl_80281B90;`). Every plain-local form gives slwi r30 directly (no mr).
+- Applied: source order [0], n11, n12, [1], nBuf, `uSize = lbl_80281B90 = SZ;` : the store order
+  and the mr-before-stw now match the orig exactly (20 positional, 78.0). A different order
+  (g first ... [0] late) scores 16 / 78.22 but its store order is wrong.
+- Left: orig schedules `li r7,&lbl_80281BA4` + the [0] store first and `lis &lbl_801A2350` + `li 0`
+  after the mullw; ours computes the DispSync base first. Register numbers follow from that.
+- Tried, no gain (on the new form): 210-420 statement permutations x modes (volatile DispSync*
+  local, void** local, non-volatile cast, [1] = [0], size via separate local, chain both directions,
+  pBuf/pLo as [0] reads), size via static inline (3 shapes: 27-43), u32 pBuf / u32 pLo / pHi local /
+  pLo reused / u8 zero local / n11 = n12 = 0 / chained buffer stores: all 20; int uSize 33.
+  Non-volatile lbl_801A2350 definition: identical (volatility is not the cause).
+  A DispSync* local initialised BEFORE the calls gives the orig's exact store order but costs a
+  saved register (46).
+
+LogoTexture fn_8010FC3C: 78.20 -> 78.25 (positional 143 -> 141).
+- Applied: `for (y = 0, nRow = 0; y < nHeight; y++, nRow += nWidth)`: fixes the li r10/li r9 order.
+- Left: register allocation only (orig: nBase in r22, loaded byte and ctr count in r12; ours nBase
+  in r12). Also orig takes the ctr count from the n copy (srwi. r12,r31) where ours uses r6.
+- Tried, no gain: nPos forms x8 (nBase+x%8 then (x/8)*32 as first operand, x%8+nBase, one
+  expression, 3-step) x 4 loop forms (while n-- > 0, while n--, for n, for x): best is the current
+  one; nBase folded into nPos (5 forms: 176-213); static inline tile helper (4 shapes: 142-158);
+  nRow as y*nWidth (151); statement order of i/x/nBase; nBase operand order; 400 random decl
+  orders (best 141).
+
+Process note: one scratch-script edit was made with sed (t_logo.py, left t_logo.py.bak); against
+the brief, not repeated.

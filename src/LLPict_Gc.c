@@ -10,9 +10,11 @@ void fn_8002F56C(u8* pPlane, void* pWork, int nWidth, int nHeight);  // reorders
 PictFrame* fn_800B94CC(void* pDecoder, int n);                  // the decoder's next frame, or NULL
 void fn_800B9808(void* pDecoder, PictFrame* pFrame);            // gives a frame back
 
+void* lbl_80281D58;
+void** lbl_802810C0 = &lbl_80281D58;
+
 // ---- sweep code (not yet cleaned up) ----
 
-extern u8 lbl_801876C8[];
 void fn_80056204();
 void fn_80056208();
 void fn_8002F4FC(void);
@@ -24,7 +26,7 @@ s32 fn_800B920C();
 void fn_8002F4FC(void) {
     void* t1;
     fn_80056204();
-    t1 = fn_80009B34(2048, 2, 32, (const char*)lbl_801876C8, 68);
+    t1 = fn_80009B34(2048, 2, 32, "LLPict_Gc.c", 68);
     *lbl_802810C0 = t1;
 }
 
@@ -117,7 +119,7 @@ void fn_8002FEAC(void) {
 
 void fn_8002FEB0(LLPict* pPict, PictStream* pStream, void* (*pfnRead)(void* pArg), void* pArg) {
     pPict->pPixels = NULL;
-    pStream->pDecoder = fn_80009B34(80, 1, 32, (const char*)lbl_801876C8, 278);
+    pStream->pDecoder = fn_80009B34(80, 1, 32, "LLPict_Gc.c", 278);
     pStream->pFrame = NULL;
     fn_800B90F4(pfnRead, pArg);
     fn_800B91B8(pStream->pDecoder);
@@ -149,7 +151,7 @@ void fn_8002FF98(LLPict* pPict, PictStream* pStream) {
     pPict->nWidth = pStream->pFrame->nWidth;
     pPict->nHeight = pStream->pFrame->nHeight;
     pPict->pPixels =
-        fn_80009B34(pPict->nWidth * pPict->nHeight * 3 / 2, 1, 32, (const char*)lbl_801876C8, 346);
+        fn_80009B34(pPict->nWidth * pPict->nHeight * 3 / 2, 1, 32, "LLPict_Gc.c", 346);
     pPict->f6C = 1.0f;
     pPict->f70 = 1.0f;
 }

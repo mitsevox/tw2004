@@ -13,6 +13,21 @@
 #include "llpict.h"
 #include "unsorted/cull.h"
 
+char lbl_80186BD8[] = "data/FEnd/FEnd.gcb";
+char lbl_80186BEC[] = "FEChar.gcb";
+char lbl_80186BF8[] = "LoadOnce.gcb";
+char lbl_80186C08[] = "startup.gcb";
+char lbl_80186C14[] = "data/Load/Load%d.gcb";
+char lbl_80186C2C[] = "data/%s/";
+char lbl_80186C38[] = "/hole.hog";
+char lbl_80186C44[] = "GlbData.gcb";
+char lbl_80186C50[] = "GlbChar.gcb";
+char lbl_80186C5C[] = "data/Chars/%02dchar.gcb";
+char lbl_80186C74[] = "malesac.gcb";
+char lbl_80186C80[] = "femsac.gcb";
+char lbl_80186C8C[] = "data/CharSac/%02dchrsac.gcb";
+char lbl_80186CA8[] = "data/FEChars/%02dcharfe.gcb";
+
 // Defined here, last address first (CodeWarrior lays out .bss in reverse).
 u8          lbl_801A48C8[0x38];
 StreamLists lbl_801A3728;

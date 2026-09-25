@@ -8,6 +8,11 @@
 #include "game/modes/pgatoursim.h"
 #include "game/modes/pgatour.h"
 
+s32 lbl_801910F8[28] = {
+    0, 1, 2, 3, 4, 5, -1, -1, -1, -1, -1, 6, -1, -1, -1, -1, -1, -1, 7, 8, 9, 10, 11, 12, 13, 14,
+    -1, 0,
+};
+
 // Defined here, last address first (CodeWarrior lays out .sbss in reverse).
 u8    lbl_80282200;     // 0x80282200  the watched ball has reached surface 105
 Ball* lbl_802821FC;     // 0x802821FC  the watched ball, NULL for none

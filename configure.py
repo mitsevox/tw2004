@@ -882,6 +882,8 @@ config.libs = [
             Object(NonMatching, "ska_shared.c"),
             Object(Matching, "Skeleton.c"),
             Object(NonMatching, "Golfer.c"),
+            Object(Matching, "Code8002DB80.c"),
+            Object(NonMatching, "Code8002EE1C.c"),
             Object(Matching, "GoRenderSurface.c"),
             Object(Matching, "LLPict_Gc.c"),
             Object(NonMatching, "GoTerrain.c"),
@@ -898,10 +900,14 @@ config.libs = [
             Object(Matching, "GoAnimalActors.c"),
             Object(NonMatching, "GoTerrainCollision.c"),
             Object(NonMatching, "Ball.c"),
+            Object(Matching, "Wind.c"),
             Object(NonMatching, "LLPictInt.c"),
             Object(Matching, "user.c"),
             Object(Matching, "PasswordManager.c"),
             Object(NonMatching, "Swing.c"),
+            Object(Matching, "StateGolfer.c"),
+            Object(Matching, "Code8005D2E4.c"),
+            Object(Matching, "stateFunc.c"),
             Object(Matching, "GoCamCont.c"),
             Object(NonMatching, "skalib.c"),
             Object(NonMatching, "GoStaticCam.c"),
@@ -931,6 +937,7 @@ config.libs = [
             Object(Matching, "Code80090940.c"),
             Object(Matching, "fe_movies.c"),
             Object(Matching, "uiTransform.c"),
+            Object(Matching, "GoLightFogEnv.c"),
             Object(NonMatching, "goballfx.c"),
             Object(Matching, "GoObjShadow.c"),
             Object(NonMatching, "GoShaderObject_Particle_Gc.c"),
@@ -972,10 +979,10 @@ config.libs = [
             Object(Matching, "SitDevCommentaryZones.c"),
             Object(Matching, "SitDevStateVector.c"),
             Object(Matching, "SitDevTrigger.c"),
-            Object(NonMatching, "GoGolfCam.c"),
+            Object(Matching, "GoGolfCam.c"),
             Object(NonMatching, "CamSpline.c"),
             Object(NonMatching, "GoBreakLine.c"),
-            Object(NonMatching, "AnimStream.c"),
+            Object(Matching, "AnimStream.c"),
             Object(Matching, "TerrainGround.c"),
             Object(NonMatching, "SkinPart.c"),
             Object(Matching, "HoleScore.c"),
@@ -1049,8 +1056,11 @@ config.libs = [
             Object(Matching, "SkinBurn.c"),
             Object(Matching, "EASBStorage.c"),
             Object(Matching, "EASB.c"),
-            # Built with pool_data on: fn_80165E9C 82.1 -> 94.2%, no function worse.
-            Object(NonMatching, "UISEvent.c", extra_cflags=['-pragma "pool_data on"']),
+            # Built with pool_data on: fn_80165E9C 82.1 -> 94.2%, no function worse. Deferred like
+            # UISScreen.c (source last address first): .text and data byte-identical to the old
+            # build, and fn_8016604C's callers call it (inlined) instead of a written-out copy.
+            # UISApi.c and UIStudio.c give byte-identical code under deferred too; left as they are.
+            Object(NonMatching, "UISEvent.c", extra_cflags=['-pragma "pool_data on"', "-inline auto,deferred"]),
             Object(NonMatching, "UIStudio.c"),
             # Built with automatic inlining like UISScreen.c below: fn_80168DB0 88.9 -> 98.7%, no
             # function worse.

@@ -8,6 +8,7 @@
 #include "unsorted/cull.h"
 
 f32 lbl_801C6498[4];
+struct Character* lbl_80281D20;
 
 void fn_80029BC8(f32* pVec);                           // sets a vector to lbl_80186838
 void fn_80026BF4(CharModel* pModel, IKChain* pChain);

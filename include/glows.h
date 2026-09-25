@@ -97,9 +97,17 @@ extern f32 lbl_80189DA8[6][8];
 
 // An element of a SunFlrSet (0x40 bytes; our name).
 typedef struct SunFlrDesc {
-    u8   unk0[0x24];
+    u8   unk0[0x10];
+    f32  f10;                   // 0x10
+    f32  f14;                   // 0x14
+    f32  f18;                   // 0x18
+    f32  f1C;                   // 0x1C
+    f32  f20;                   // 0x20
     f32  f24;                   // 0x24
-    u8   unk28[0x40 - 0x28];
+    u8   unk28[0x34 - 0x28];
+    u8   b34;                   // 0x34
+    u8   b35;                   // 0x35
+    u8   unk36[0x40 - 0x36];
 } SunFlrDesc;
 LAYOUT_ASSERT(SunFlrDesc, 0x40);
 

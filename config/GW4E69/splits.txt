@@ -42,6 +42,8 @@ LLObj_Gc.c:
 
 unsorted/code_800080D0.c:
 	.text       start:0x800080D0 end:0x800082F8
+	.bss        start:0x801A24A0 end:0x801A24B8
+	.sdata      start:0x80280DA0 end:0x80280DA8
 
 unsorted/code_800082F8.c:
 	.text       start:0x800082F8 end:0x800083A4
@@ -125,6 +127,7 @@ GoRenderCtx_Gc.c:
 
 streammanagerhole.c:
 	.text       start:0x800143B8 end:0x80015470
+	.data       start:0x80186BD8 end:0x80186CC8
 	.bss        start:0x801A3728 end:0x801A4900
 	.sdata      start:0x80280DF8 end:0x80280E00
 
@@ -172,6 +175,7 @@ Skeleton.c:
 	.data       start:0x80187400 end:0x80187490
 	.bss        start:0x801C6498 end:0x801C64A8
 	.sdata      start:0x80281080 end:0x802810A8
+	.sbss       start:0x80281D20 end:0x80281D28
 	.sdata2     start:0x80282D10 end:0x80282D60
 
 GxUtil.c:
@@ -181,7 +185,15 @@ GxUtil.c:
 	.sdata2     start:0x80282D60 end:0x80282D68
 
 Golfer.c:
-	.text       start:0x8002A630 end:0x8002F1D4
+	.text       start:0x8002A630 end:0x8002DB80
+
+Code8002DB80.c:
+	.text       start:0x8002DB80 end:0x8002EE1C
+	.sbss       start:0x80281D48 end:0x80281D50
+	.sdata2     start:0x80282EF0 end:0x80282F20
+
+Code8002EE1C.c:
+	.text       start:0x8002EE1C end:0x8002F1D4
 
 GoRenderSurface.c:
 	.text       start:0x8002F1D4 end:0x8002F4FC
@@ -191,6 +203,9 @@ GoRenderSurface.c:
 
 LLPict_Gc.c:
 	.text       start:0x8002F4FC end:0x80030254
+	.data       start:0x801876C8 end:0x801876D8
+	.sdata      start:0x802810C0 end:0x802810C8
+	.sbss       start:0x80281D58 end:0x80281D60
 	.sdata2     start:0x80282F30 end:0x80282F48
 
 GoTerrain.c:
@@ -241,6 +256,7 @@ UObject3D.c:
 GoDynObj.c:
 	.text       start:0x80045F74 end:0x800486F4
 	.data       start:0x80187B98 end:0x80187D48
+	.sdata      start:0x80281128 end:0x80281130
 	.sbss       start:0x80281DA0 end:0x80281DA8
 	.sdata2     start:0x80283168 end:0x802831E0
 
@@ -272,10 +288,16 @@ GoTerrainCollision.c:
 	.text       start:0x8004AFA0 end:0x80050C2C
 
 Ball.c:
-	.text       start:0x80050C2C end:0x8005620C
+	.text       start:0x80050C2C end:0x80055F14
+
+Wind.c:
+	.text       start:0x80055F14 end:0x80056204
+	.data       start:0x80187EF8 end:0x80187F78
+	.sbss       start:0x80281DE8 end:0x80281DF0
+	.sdata2     start:0x80283588 end:0x802835A8
 
 LLPictInt.c:
-	.text       start:0x8005620C end:0x800563C4
+	.text       start:0x80056204 end:0x800563C4
 
 user.c:
 	.text       start:0x800563C4 end:0x80056480
@@ -293,7 +315,24 @@ fe_craputils.c:
 	.data       start:0x80188138 end:0x80188148
 
 Swing.c:
-	.text       start:0x800589F8 end:0x80062E40
+	.text       start:0x800589F8 end:0x8005CCAC
+
+StateGolfer.c:
+	.text       start:0x8005CCAC end:0x8005D2E4
+	.bss        start:0x801D5A90 end:0x801D5AB0
+	.sbss       start:0x80281E00 end:0x80281E08
+
+Code8005D2E4.c:
+	.text       start:0x8005D2E4 end:0x8005D44C
+	.sbss       start:0x80281E08 end:0x80281E10
+
+stateFunc.c:
+	.text       start:0x8005D44C end:0x80062E40
+	.rodata     start:0x801835E0 end:0x801836B0
+	.data       start:0x801883C0 end:0x80188528
+	.sdata      start:0x802811A8 end:0x802811B8
+	.sbss       start:0x80281E10 end:0x80281E18
+	.sdata2     start:0x80283680 end:0x802836E8
 
 GoCamCont.c:
 	.text       start:0x80062E40 end:0x8006449C
@@ -400,10 +439,13 @@ Code80070EC4.c:
 GoShaderObject_PrelitUVAnimation_Gc.c:
 	.text       start:0x8007110C end:0x80071AD0
 	.data       start:0x80188E50 end:0x80188E78
+	.sdata      start:0x802811F8 end:0x80281200
+	.sbss       start:0x80281E80 end:0x80281E88
 	.sdata2     start:0x802839D0 end:0x802839E8
 
 animblender.c:
 	.text       start:0x80071AD0 end:0x80073878
+	.sbss       start:0x80281E88 end:0x80281EA0
 	.sdata2     start:0x802839E8 end:0x80283A30
 
 GoShaderObjectCommon_ShaderObjectsData_Gc.c:
@@ -505,8 +547,14 @@ uiTransform.c:
 	.sbss       start:0x80281F38 end:0x80281F40
 	.sdata2     start:0x80283C20 end:0x80283C40
 
+GoLightFogEnv.c:
+	.text       start:0x80093524 end:0x80093A80
+	.bss        start:0x801D9278 end:0x801D94B0
+	.sdata      start:0x80281380 end:0x80281388
+	.sdata2     start:0x80283C40 end:0x80283C48
+
 goballfx.c:
-	.text       start:0x80093524 end:0x80093D3C
+	.text       start:0x80093A80 end:0x80093D3C
 
 GoObjShadow.c:
 	.text       start:0x80093D3C end:0x8009414C
@@ -592,6 +640,7 @@ Code8009A928.c:
 
 Code8009AA28.c:
 	.text       start:0x8009AA28 end:0x8009B314
+	.data       start:0x80189E78 end:0x8018A028
 	.sdata2     start:0x80283E98 end:0x80283EC0
 
 unsorted/sweep_8009B314.c:
@@ -619,7 +668,7 @@ PsMgr.c:
 
 PsBallFx.c:
 	.text       start:0x800A2C3C end:0x800A3E3C
-	.data       start:0x8018E978 end:0x8018E988
+	.data       start:0x8018C868 end:0x8018E988
 	.bss        start:0x801F1708 end:0x801F1790
 	.sdata      start:0x80281408 end:0x80281418
 	.sdata2     start:0x80283F28 end:0x80283F48
@@ -761,13 +810,14 @@ VecMath.c:
 
 SitDevMisc.c:
 	.text       start:0x800BB0A8 end:0x800BB42C
+	.data       start:0x801910F8 end:0x80191168
 	.bss        start:0x801FA198 end:0x801FA1C0
 	.sbss       start:0x802821F8 end:0x80282208
 	.sdata2     start:0x80284290 end:0x802842A0
 
 SitDevFile.c:
 	.text       start:0x800BB42C end:0x800BB6DC
-	.data       start:0x80191230 end:0x80191240
+	.data       start:0x80191168 end:0x80191240
 	.sbss       start:0x80282208 end:0x80282210
 
 SitDevCommentaryZones.c:
@@ -802,6 +852,8 @@ GoBreakLine.c:
 
 AnimStream.c:
 	.text       start:0x800C937C end:0x800CB950
+	.data       start:0x80191490 end:0x80191520
+	.sdata      start:0x80281530 end:0x80281538
 
 TerrainGround.c:
 	.text       start:0x800CB950 end:0x800CC1EC
@@ -1075,6 +1127,7 @@ LogoTexture.c:
 
 unsorted/sweep_8010FF5C.c:
 	.text       start:0x8010FF5C end:0x8010FF9C
+	.bss        start:0x80212B60 end:0x80213B60
 
 DiscCheck.c:
 	.text       start:0x8010FF9C end:0x801104AC
@@ -1148,6 +1201,7 @@ llrtclock.c:
 GoGrass.c:
 	.text       start:0x8011E170 end:0x80120298
 	.data       start:0x80194598 end:0x80194648
+	.sdata      start:0x80281900 end:0x80281908
 	.sdata2     start:0x80284A30 end:0x80284AD0
 
 GoShaderObject_Grass_Gc.c:
@@ -1185,6 +1239,9 @@ ShaderRow19.c:
 EASportsBio.c:
 	.text       start:0x801249A8 end:0x8012597C
 	.data       start:0x80195308 end:0x801953E0
+	.bss        start:0x80261028 end:0x80261058
+	.sdata      start:0x80281988 end:0x80281998
+	.sbss       start:0x80282568 end:0x80282580
 	.sdata2     start:0x80284B10 end:0x80284B28
 
 GameMode22.c:

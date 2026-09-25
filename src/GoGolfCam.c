@@ -234,6 +234,7 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
     f32* pSub;
     CourseInfo* pCourse;
     u8 bMirror;
+    s8 bKeepFlat; // fake match: s8 (TW07's bool keepFlat); as u8 or int the srwi is scheduled early
     f32 fSpeed;
     f32 fDist;
     f32 fTotal;
@@ -376,7 +377,8 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
     }
     f = lbl_80281F78->f18 + fDist / fTotal * (lbl_80281F78->f28 - lbl_80281F78->f18);
     if (pView->script.f108 >= 0.0f) {
-        CameraScript_LagAimMarker(nPlayer, pSub, pCam, &pView->shot19C, 1, bMirror != 0, f, fFlatDist,
+        bKeepFlat = bMirror != 0;
+        CameraScript_LagAimMarker(nPlayer, pSub, pCam, &pView->shot19C, 1, bKeepFlat, f, fFlatDist,
                                   lbl_80281F78->fDC);
     }
 }

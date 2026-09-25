@@ -34,7 +34,7 @@ static inline int AbsAddXor(int v) {
 
 // fake match: fn_80074628 reads the command's layout through this, which moves it to r31 as in
 // the original (read straight from p[1] it lands in r27). No evidence EA had such an accessor.
-static inline u16 ReadU16(u16* p, int i) {
+static inline u16 fn_80074628_Read(u16* p, int i) {
     return p[i];
 }
 
@@ -311,7 +311,7 @@ u16* fn_80074628(u16* p, u16* pEnd) {
     u16 nTex2;
 
     ePrim = p[0];
-    eLayout = ReadU16(p, 1);    // fake match: see ReadU16
+    eLayout = fn_80074628_Read(p, 1);    // fake match: see fn_80074628_Read
     nVerts = p[2];
     p += 3;
     switch (ePrim) {

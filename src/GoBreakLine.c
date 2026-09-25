@@ -233,7 +233,7 @@ void BreakLine_Render(int nView) {
 }
 
 // fake match: EA reads the player through an inline; written in place, pPlayer is allocated r29, not r31
-static inline Player* BreakLine_ViewPlayer(int nView) {
+static inline Player* fn_800C8C70_Read(int nView) {
     return &gPlayers[fn_8001707C(nView)];
 }
 
@@ -246,7 +246,7 @@ void BreakLine_Reset(int nView) {
     int i;
     int nTex = 0;
 
-    pPlayer = BreakLine_ViewPlayer(nView);
+    pPlayer = fn_800C8C70_Read(nView);
     if (pPlayer->nShotKind == 0 && pPlayer->fDistance < 75.0f && pPlayer->fDistance > 0.0f) {
         lbl_80282228->abA91C[nView] = 1;
         lbl_80282228->abSkip[nView] = 1;

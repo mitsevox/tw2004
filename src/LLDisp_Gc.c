@@ -123,10 +123,9 @@ void fn_80006A98(void) {
     lbl_80281BA4[0] = pBuf;
     lbl_801A2350.n11 = 0;
     lbl_801A2350.n12 = 0;
-    uSize = ((lbl_801A2464.fbWidth + 15) & 0xFFF0) * lbl_801A2464.xfbHeight * 2;
     lbl_80281BA4[1] = pBuf;
     lbl_801A2350.nBuf = 0;
-    lbl_80281B90 = uSize;
+    uSize = lbl_80281B90 = ((lbl_801A2464.fbWidth + 15) & 0xFFF0) * lbl_801A2464.xfbHeight * 2;
     OSSetArenaLo((void*)(((uptr)pBuf + uSize + 31) & ~31));
     fn_800B694C(lbl_801A2464.fbWidth, lbl_801A2464.xfbHeight, uSize);
     fn_800B6C0C(lbl_80281BA4[0]);

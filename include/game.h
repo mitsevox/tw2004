@@ -70,6 +70,16 @@ typedef struct SwingStateDef {
 
 extern SwingStateDef sGolferStateEngineTable[GS_NUM];   // 0x801883D8  one row per GS_* state
 
+// A second, single-slot state machine (no player argument): current index lbl_80281E09.
+typedef struct ModeStateDef {
+    void (*pfnEnter)(void);
+    void (*pfnUpdate)(void);
+    void (*pfnExit)(void);
+} ModeStateDef;
+
+extern ModeStateDef  lbl_801883C0[2];   // stateFunc.c
+void GOLFERSTATE_Update(void);          // StateGolfer.c
+
 u8   fn_80058F5C(int nPlayer);          // the per-frame swing poll: the ball was struck
 void SW_vInitSwing(int nPlayer);          // reset the player's swing
 f32  SW_vGetShotPower(int nPlayer);          // the swing's shot power

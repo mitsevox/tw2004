@@ -660,7 +660,7 @@ void fn_80036894(SkinDesc* pDesc) {
 }
 
 // fake match: EA takes the mesh through an inline; &pDesc->p34[j] in place allocates pMesh r19, not r18
-static inline SkinMesh* Skin_DescMesh(SkinDesc* pDesc, int j) {
+static inline SkinMesh* fn_800368FC_Read(SkinDesc* pDesc, int j) {
     return &pDesc->p34[j];
 }
 
@@ -773,7 +773,7 @@ void fn_800368FC(SkinDesc* pDesc) {
         if (pDesc->p34[i].pBits != NULL) {
             pDesc->p34[i].pBits = (SkinMeshBit*)((u8*)pDesc + (uptr)pDesc->p34[i].pBits);
         }
-        pMesh = Skin_DescMesh(pDesc, i);
+        pMesh = fn_800368FC_Read(pDesc, i);
         pData = (u8*)pMesh->pBits;
         n = pMesh->n8;
         if (pData == NULL) {
