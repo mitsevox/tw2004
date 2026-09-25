@@ -14,7 +14,8 @@ its own context small. Start of a session (or after a compaction): read `../CLAU
 | `agents/roles/matching.md` | a matching / link lane |
 | `agents/roles/audit.md` | the blind name-and-comment audit (lane 1, lane 2, reconciler) |
 | `agents/roles/data.md` | attaching orphan data to its owning unit |
-| `agents/notes/` | lane notes: what was tried per function (read before retrying a function) |
+| `agents/tried/` | **the tried-ledger: one file per function not yet exact** (every attempt, scores, sweep results); lanes read it first and add to it before stopping (`tools/agents/triedledger.py` starts files for new functions, never overwrites) |
+| `agents/notes/` | older per-lane notes (history; their content is collected into `agents/tried/`) |
 | `agents/findings/` | audit reports (EA bugs, misfiled units), the orphan-data map, older findings |
 | `tools/agents/` | `new_agent.py`, `merge.py`, `audit_apply.py`, `review.py`, `status.py`, `remain.py`, `phase2b.py` |
 | `docs/reference-builds/` | TW06 (PS2/Xbox) and TW07 (PS3 debug build) inventories; `tw07-ps3/cu/` = EA's functions per source file with parameters and locals; `tw07-ps3/pairs.tsv` = our address -> TW07 function |
@@ -35,7 +36,8 @@ with `TW_MAIN`, `TW_WORKTREES`, `TW_SCRATCH`, `TW_PERMUTER`.
 Give each lane its own files (units). Shared headers: add, never change what others use; a change
 that touches many lanes' files (a prototype's parameter order, a struct layout) is scheduled for one
 lane while the others avoid those call sites. Rotate unit lists between rounds (fresh eyes), and
-tell lanes to read `agents/notes/` for what was already tried.
+tell lanes to read `agents/tried/<fn>.md` for what was already tried. When merging, check the lane
+added its attempts to the ledger files of the functions it worked on, and that solved ones say SOLVED.
 
 ## Per report
 

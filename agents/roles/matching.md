@@ -12,8 +12,9 @@ functions left), `python tools/agents/remain.py` lists what is left per unit.
 
 ## Per function
 
-1. Grep `agents/notes/` and `docs/decomp-notes.md` for the function's address: skip what was already
-   tried unless a new rule applies.
+1. **Read `agents/tried/<fn>.md` first, all of it** (one file per function not yet exact: every
+   attempt from every lane, the PC's sweeps and the notes, with scores). Do not repeat an attempt
+   listed there unless you combine it with something new. Then `docs/decomp-notes.md` for the rules.
 2. TW07 (EA's PS3 debug build, 2006, same engine): look the function up in
    `docs/reference-builds/tw07-ps3/pairs.tsv`, then `docs/reference-builds/tw07-ps3/cu/<File>.txt`
    for EA's parameter order and types, locals and their order, and what it inlines
@@ -21,8 +22,10 @@ functions left), `python tools/agents/remain.py` lists what is left per unit.
 3. About 10-20 minutes per function: declaration order, statement order, types (u8/s8/int/s32,
    const), the decomp-notes rules. A near-100 function whose only difference is a branch target or a
    compare's signedness may be a real bug in our C: fix the meaning.
-4. Permuter only as the brief says. Write every attempt in your scratch notes (tried / result), so
-   the next lane can skip it; the orchestrator copies them into `agents/notes/`.
+4. Permuter only as the brief says. **Before you stop, add every attempt to `agents/tried/<fn>.md`**
+   under "Attempts" (date, lane, what, score before -> after) and commit it with your work, whether
+   the function matched or not. When it is exact: set its Status line to SOLVED with the fix and
+   the commit. (Old per-lane notes stay in `agents/notes/` as history; the ledger is the record.)
 
 ## Linking
 
