@@ -59,6 +59,12 @@ unless you combine it with something new. Before you stop, add every attempt und
   assembly evidence supports changing their types. In particular, this project's
   `ShotType_t` enum stops at 5 while live shot-kind fields also use 6 and 7, so forcing an
   enum local would not be a safe general correction. No source change.
+- 2026-09-25, ChatGPT subagent (fifth pass): final shot-power read in a new inner block with
+  `f32` or `const f32` local: 6 -> 6; assignment expression into a local in the power argument:
+  6 -> 6; `static inline` memory-read accessor (`const f32*` or `const Player*`): 6 -> 6.
+  Five sequenced comma-expression forms around the final power read worsened 6 -> 44. All
+  retain a separate memory read after the intervening calls; none changed the r27/r29 choice.
+  No source change.
 
 ## Safe-match constraints from the third pass
 
@@ -88,6 +94,21 @@ unless you combine it with something new. Before you stop, add every attempt und
   (`r26`, `r25`, `r23`, `r24`, `r28`) already match the target. Ball's
   `Physics_ShotImpact` and Swing's `fn_8005B8C8_ShapeVector` are exact functions in the
   current real-unit report. No field offset, argument order or width mismatch was found.
+
+## Next PC-only experiment
+
+When the owner's PC is idle and its decomp-permuter checkout is available, run from a current
+branch containing this source:
+
+```
+python tools/match/permute.py Swing SW_vImpact --minutes 120 -j 18 --max-jobs 18
+```
+
+The previous PC run was 14 minutes at two workers and found no improvement; a two-hour run at
+18 workers explores a much larger set. Inspect any candidate for unchanged behavior and verify
+it in the real unit; a score-0 permuter result alone is not acceptance. This Mac checkout has
+no `TW_PERMUTER` setting or `tools/decomp-permuter/permuter.py` at either path `permute.py`
+checks, so its local `quicktrial.py`/`leversweep.py` cannot perform that search.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
