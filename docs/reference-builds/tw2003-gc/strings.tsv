@@ -1,0 +1,108 @@
+kind	string	address	disc	in_tw04
+name	B0ffBr	8014F3B0	Tiger Woods PGA Tour 2003 (USA)	no
+message	File Position Error	801528B8	Tiger Woods PGA Tour 2003 (USA)	yes
+message	Input/output error	80152913	Tiger Woods PGA Tour 2003 (USA)	yes
+message	Cannot allocate memory	801529FC	Tiger Woods PGA Tour 2003 (USA)	yes
+message	Unknown Error (%d)	80152B32	Tiger Woods PGA Tour 2003 (USA)	yes
+name	file_RequestDaemon	80152FA0	Tiger Woods PGA Tour 2003 (USA)	yes
+name	File_Open	80152FB4	Tiger Woods PGA Tour 2003 (USA)	yes
+name	File_Close	80152FC0	Tiger Woods PGA Tour 2003 (USA)	yes
+name	File_ReadAsyncEx	80152FCC	Tiger Woods PGA Tour 2003 (USA)	yes
+path	LLDisp_Gc.c	80152FE0	Tiger Woods PGA Tour 2003 (USA)	yes
+path	LLObj_Gc.c	80153018	Tiger Woods PGA Tour 2003 (USA)	yes
+path	GoEntry.c	8015305C	Tiger Woods PGA Tour 2003 (USA)	yes
+path	UMemPool.c	801530C0	Tiger Woods PGA Tour 2003 (USA)	yes
+path	FETextureMgr.c	801530E0	Tiger Woods PGA Tour 2003 (USA)	no
+path	UStream.c	801530F0	Tiger Woods PGA Tour 2003 (USA)	yes
+path	pLLTexGrp.c	801531F7	Tiger Woods PGA Tour 2003 (USA)	no
+path	LLFont.c	8015331C	Tiger Woods PGA Tour 2003 (USA)	yes
+path	GoRenderCtx_Gc.c	80153328	Tiger Woods PGA Tour 2003 (USA)	yes
+message	data/%s/	8015344C	Tiger Woods PGA Tour 2003 (USA)	yes
+name	shadowSh	801537B0	Tiger Woods PGA Tour 2003 (USA)	no
+name	capShape	801537BC	Tiger Woods PGA Tour 2003 (USA)	no
+name	shirtSha	801537D4	Tiger Woods PGA Tour 2003 (USA)	no
+name	pantsSha	801537E0	Tiger Woods PGA Tour 2003 (USA)	no
+path	mtalib.c	80153B00	Tiger Woods PGA Tour 2003 (USA)	yes
+path	skalib.c	80153B10	Tiger Woods PGA Tour 2003 (USA)	yes
+path	Skeleton.c	80153B4C	Tiger Woods PGA Tour 2003 (USA)	yes
+path	GoRenderSurface.c	80153DB8	Tiger Woods PGA Tour 2003 (USA)	yes
+path	LLPict_Gc.c	80153DD0	Tiger Woods PGA Tour 2003 (USA)	yes
+path	GoTerrain.c	80153DE0	Tiger Woods PGA Tour 2003 (USA)	yes
+path	GoPostFx.c	80153E78	Tiger Woods PGA Tour 2003 (USA)	no
+path	GoDynamicCam.c	80153E88	Tiger Woods PGA Tour 2003 (USA)	yes
+path	UObject3D.c	80154100	Tiger Woods PGA Tour 2003 (USA)	yes
+path	GoDynObj.c	80154110	Tiger Woods PGA Tour 2003 (USA)	yes
+path	UObject.c	80154120	Tiger Woods PGA Tour 2003 (USA)	yes
+path	UKernel.c	80154130	Tiger Woods PGA Tour 2003 (USA)	yes
+path	LLPictInt.c	80154338	Tiger Woods PGA Tour 2003 (USA)	yes
+path	CareerMode.c	80154348	Tiger Woods PGA Tour 2003 (USA)	no
+path	CourseInfo.c	80154358	Tiger Woods PGA Tour 2003 (USA)	no
+path	Earnings.c	80154368	Tiger Woods PGA Tour 2003 (USA)	no
+path	tTournamentMode.c	80155707	Tiger Woods PGA Tour 2003 (USA)	no
+path	GoStaticCam.c	801560D0	Tiger Woods PGA Tour 2003 (USA)	yes
+message	FlyBy Cam: %d	801560E0	Tiger Woods PGA Tour 2003 (USA)	yes
+message	Static Cam: %d	801560F0	Tiger Woods PGA Tour 2003 (USA)	yes
+path	SitDev.c	801562E0	Tiger Woods PGA Tour 2003 (USA)	no
+path	GoFrameBuf.c	801564E0	Tiger Woods PGA Tour 2003 (USA)	yes
+path	GoLighting.c	801564F0	Tiger Woods PGA Tour 2003 (USA)	yes
+path	GoShaderObjectContainer_OBFData_Gc.c	801568C0	Tiger Woods PGA Tour 2003 (USA)	yes
+path	GoShaderObjectCommon_DynamicRenderingBuffer_Gc.h	801568E8	Tiger Woods PGA Tour 2003 (USA)	yes
+path	GoShaderObjectCommon_DynamicRenderingBuffer_Gc.h	80156920	Tiger Woods PGA Tour 2003 (USA)	yes
+path	GoShaderObject_PrelitUVAnimation_Gc.c	80156954	Tiger Woods PGA Tour 2003 (USA)	yes
+path	GoShaderObjectCommon_ShaderObjectsData_Gc.c	80156E58	Tiger Woods PGA Tour 2003 (USA)	yes
+path	LLVideo.c	80156EA8	Tiger Woods PGA Tour 2003 (USA)	yes
+path	GoCamera.c	80156FB8	Tiger Woods PGA Tour 2003 (USA)	yes
+path	GoViewport.c	80156FC8	Tiger Woods PGA Tour 2003 (USA)	yes
+path	GoShaderObjectCommon_TexAnimManager_Gc.c	80156FD8	Tiger Woods PGA Tour 2003 (USA)	yes
+path	FE_Manager.c	801572D4	Tiger Woods PGA Tour 2003 (USA)	yes
+message	data/movies/%s.%s	801572E4	Tiger Woods PGA Tour 2003 (USA)	yes
+message	data/movies/%s/%s.%s	801572F8	Tiger Woods PGA Tour 2003 (USA)	yes
+message	O$PLAYER%d	801574E6	Tiger Woods PGA Tour 2003 (USA)	no
+name	CoureName	80157618	Tiger Woods PGA Tour 2003 (USA)	no
+path	FEgolferanim.c	80157A70	Tiger Woods PGA Tour 2003 (USA)	yes
+path	uiLoadFile.c	80157A8C	Tiger Woods PGA Tour 2003 (USA)	yes
+path	uiProcessInterface.c	80157B30	Tiger Woods PGA Tour 2003 (USA)	yes
+name	GlobalScript	80157B48	Tiger Woods PGA Tour 2003 (USA)	yes
+path	uiTransform.c	80157BF0	Tiger Woods PGA Tour 2003 (USA)	yes
+path	GoShaderObject_Particle_Gc.c	80157C18	Tiger Woods PGA Tour 2003 (USA)	yes
+path	char_skin.c	80157C38	Tiger Woods PGA Tour 2003 (USA)	no
+path	GoShaderObjectCommon_MorphAnimManager_Gc.c	80157CA8	Tiger Woods PGA Tour 2003 (USA)	yes
+path	GoShaderObject_Glows_Gc.c	80157CD8	Tiger Woods PGA Tour 2003 (USA)	yes
+path	UFstPart.c	80157CF8	Tiger Woods PGA Tour 2003 (USA)	yes
+path	SunFlr_Gc.c	80157DE0	Tiger Woods PGA Tour 2003 (USA)	yes
+name	END_OF_FILE	8015A728	Tiger Woods PGA Tour 2003 (USA)	yes
+path	PsBallFx.c	8015C588	Tiger Woods PGA Tour 2003 (USA)	yes
+name	Mov_Init	8015C6C0	Tiger Woods PGA Tour 2003 (USA)	no
+name	Mov_Exit	8015C6CC	Tiger Woods PGA Tour 2003 (USA)	yes
+name	Mov_Start	8015C6D8	Tiger Woods PGA Tour 2003 (USA)	yes
+name	Mov_Tick	8015C6E4	Tiger Woods PGA Tour 2003 (USA)	yes
+name	Stm_Exit	8015C720	Tiger Woods PGA Tour 2003 (USA)	yes
+name	Stm_Start	8015C72C	Tiger Woods PGA Tour 2003 (USA)	yes
+name	Stm_Tick	8015C738	Tiger Woods PGA Tour 2003 (USA)	yes
+name	Stm_SetPlayList	8015C744	Tiger Woods PGA Tour 2003 (USA)	yes
+name	Stm_SetStream	8015C754	Tiger Woods PGA Tour 2003 (USA)	yes
+path	startUp.c	8015DAB8	Tiger Woods PGA Tour 2003 (USA)	no
+path	shadow_gc.c	8015DAC8	Tiger Woods PGA Tour 2003 (USA)	no
+path	shadow.c	8015DAD8	Tiger Woods PGA Tour 2003 (USA)	yes
+path	GoComicCam.c	8015DAE8	Tiger Woods PGA Tour 2003 (USA)	yes
+path	GoShaderObject_Rain_Gc.c	8015DAF8	Tiger Woods PGA Tour 2003 (USA)	yes
+path	UAudMemStack.c	8015DB18	Tiger Woods PGA Tour 2003 (USA)	yes
+path	GoARAM.c	8015DB28	Tiger Woods PGA Tour 2003 (USA)	yes
+message	An error has occurred.	8015EA20	Tiger Woods PGA Tour 2003 (USA)	yes
+path	crcmp_mad_codec.c	8015EC0F	Tiger Woods PGA Tour 2003 (USA)	yes
+path	uiEATrax.c	8015EC60	Tiger Woods PGA Tour 2003 (USA)	no
+message	Non-recoverable Exception %d	80164914	Tiger Woods PGA Tour 2003 (USA)	yes
+message	Unhandled Exception %d	80164934	Tiger Woods PGA Tour 2003 (USA)	yes
+path	UFont.c	8022F6A4	Tiger Woods PGA Tour 2003 (USA)	yes
+path	char.c	8022F6EC	Tiger Woods PGA Tour 2003 (USA)	yes
+path	Skin.c	8022FAA8	Tiger Woods PGA Tour 2003 (USA)	yes
+message	User %d	8022FAD0	Tiger Woods PGA Tour 2003 (USA)	yes
+name	h01_Peb	8022FADB	Tiger Woods PGA Tour 2003 (USA)	no
+message	User %d	8022FB88	Tiger Woods PGA Tour 2003 (USA)	yes
+message	USER%d	8022FFFC	Tiger Woods PGA Tour 2003 (USA)	yes
+path	Swing.c	8023000C	Tiger Woods PGA Tour 2003 (USA)	no
+message	USER%d	802300D0	Tiger Woods PGA Tour 2003 (USA)	yes
+message	User %d	802300E4	Tiger Woods PGA Tour 2003 (USA)	yes
+path	MC_Gc.c	802301C4	Tiger Woods PGA Tour 2003 (USA)	yes
+path	PsMgr.c	802301E8	Tiger Woods PGA Tour 2003 (USA)	yes
+message	User %d	80230298	Tiger Woods PGA Tour 2003 (USA)	yes
