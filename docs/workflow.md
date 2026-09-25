@@ -199,6 +199,16 @@ The workspace keeps `build/` between jobs (checkout `clean: false`), so compiler
 downloaded again. Do not dispatch while the owner runs a local permuter on all cores (use `-f jobs=2`
 then).
 
+**Cleaning up branches.** `.github/workflows/branch-cleanup.yml` deletes remote branches whose tip
+is already in main (so nothing is lost); a dry run unless `dry_run=false`. main, pages-history and
+unmerged branches are never touched; `pc-results/*` go only with `-f pc_results_days=N` (older
+than N days, after their results were read).
+
+```
+gh workflow run branch-cleanup.yml                                   # dry run: see the job summary
+gh workflow run branch-cleanup.yml -f dry_run=false [-f pattern='agent/*'] [-f pc_results_days=7]
+```
+
 Before you commit
 -----------------
 
