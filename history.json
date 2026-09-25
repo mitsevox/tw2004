@@ -40005,5 +40005,21 @@
 "matched_functions": 7528,
 "total_functions": 7647,
 "exact": 7528
+},
+{
+"commit": "83d03c0",
+"sha": "83d03c0def76a384e8f3236db6891f39ef9d791c",
+"time": 1790360013,
+"subject": "Record pc/sweep-tools as merged (its files are in tools/sweep since 3eabc86, with repo-relative paths); no file changes",
+"report": true,
+"matched_code": 1445112,
+"complete_code": 1150048,
+"matched_data": 701147,
+"complete_data": 844511,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7528,
+"total_functions": 7647,
+"exact": 7528
 }
 ]
