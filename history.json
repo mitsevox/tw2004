@@ -46,5 +46,21 @@
 "matched_functions": 7527,
 "total_functions": 7647,
 "exact": 7527
+},
+{
+"commit": "884a84e",
+"sha": "884a84ebbec04db02493264459a478885a1baec5",
+"time": 1790352427,
+"subject": "pc-job.yml: the PATH step in cmd (PowerShell scripts are blocked by the PC's execution policy)",
+"report": true,
+"matched_code": 1444328,
+"complete_code": 1150048,
+"matched_data": 701147,
+"complete_data": 844511,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7527,
+"total_functions": 7647,
+"exact": 7527
 }
 ]
