@@ -176,10 +176,11 @@ void fn_8008F80C(s32 n, s32 b) {
 void fn_8008F820(void) {
     f32 fOne;
     s32 aArgs[1];
-    u32 aPressed[8];            // fake match: 4 are used; the stack frame holds 8
-    u32 aButtons[8];            // fake match: likewise
+    u32 aButtons[8];            // fake match: 4 are used; the stack frame holds 8
+    u32 aPressed[8];            // fake match: likewise
     View* pView;
     u32 uMask;
+    u32 uButtons; // fake match: preserves the original mask-test operand order
     int i;
     int j;
     int k;
@@ -263,16 +264,18 @@ void fn_8008F820(void) {
     aArgs[0] = 0;
     if (lbl_801D87C0.b0 == 0 && fn_80077148() && lbl_801D87C0.b40 == 0) {
         for (k = 0; k < 4; k++) {
+            u32* pButtons = &aButtons[k]; // fake match: keeps the button-array pointer live
+            u32* pPressed = &aPressed[k]; // fake match: keeps the pressed-array pointer live
             if (lbl_801D87C0.a1[k] && lbl_801D87C0.a30[k]) {
                 if (gSession.nGameType != 6 || (gSession.nPaused != 2 && gSession.nPaused != 3)) {
                     pEvent = lbl_80189B58;
                     for (j = 0; j < UI_NUM_BUTTON_EVENTS; j++) {
-                        if (pEvent->uMask & aPressed[k]) {
+                        if (pEvent->uMask & *pPressed) {
                             fn_80168DB0(lbl_80281F1C->pHandler, k, pEvent->nEvent, 1, &fOne, 0);
                         }
                         pEvent++;
                     }
-                    if (aButtons[k] != 0 && gSession.nGameType == 3) {
+                    if (*pButtons != 0 && gSession.nGameType == 3) {
                         fn_8016B09C(lbl_80281F1C->pHandler, 0x22, 1, aArgs);
                     }
                 }
@@ -281,7 +284,8 @@ void fn_8008F820(void) {
                 }
                 if (gSession.nGameType == 6) {
                     uMask = fn_800142AC(0x20, 1);
-                    if (fn_800136DC(k) & uMask) {
+                    uButtons = fn_800136DC(k);
+                    if (uButtons & uMask) {
                         lbl_80189B38[k]++;
                     } else {
                         lbl_80189B38[k] = 0;
