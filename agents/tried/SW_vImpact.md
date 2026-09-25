@@ -12,6 +12,15 @@ unless you combine it with something new. Before you stop, add every attempt und
   `&p->vLaunchB[0]`: 6 differing instructions -> 6 (identity helpers worsened to 27).
 - 2026-09-25, ChatGPT: all 720 permutations of the six declaration lines and a 6-minute
   combination lever sweep: 6 -> 6. No source change.
+- 2026-09-25, ChatGPT subagent: fast-snapshot `nClub`/`nTrajectory`/`nKind` declaration permutations
+  (combined and split lines, `int`/`s32`/`long`), and shot-power store expression variants
+  (`p->swing`, redundant float cast): 6 -> 6. Local pointers to shot power at five declaration
+  positions, accessed through either `gPlayers` or `p`, including use in the final physics call:
+  6 -> 6.
+- 2026-09-25, ChatGPT subagent: combined six integer declaration orders with six earlier
+  `pLaunchB` assignment locations (before face-vector, mishit, power, forgiveness, putt reset,
+  or its final store): 6 -> 6. Identity inline reads at the final shot-power/launch-vector
+  arguments, singly and together: 6 -> 6. No source change.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
