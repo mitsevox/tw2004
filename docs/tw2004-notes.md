@@ -646,8 +646,8 @@ See [`infrastructure.md`](infrastructure.md) (the build container, CI, the publi
 The small-function sweep
 ------------------------
 
-Scripted matching of functions that need no judgement. Tools in `C:\dev\scratch\tw\` (outside
-the repo): `sweep.py`, `sweep_m2c.py`, `smallsurvey.py`.
+Scripted matching of functions that need no judgement. Tools in `tools/sweep/` (`sweep.py`,
+`sweep_m2c.py`, `smallsurvey.py`, `retry.py`; paths in `paths.py`, state and caches in `build/sweep/`).
 
 - `python sweep.py gen <maxbytes> 1 [--m2c]` finds functions not yet in any unit, writes C for
   each one a translator can handle, and adds them as `src/unsorted/sweep_<address>.c` units
