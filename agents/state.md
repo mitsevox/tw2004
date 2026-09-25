@@ -56,7 +56,7 @@ merged: the owner deletes them (the session cannot).
 
 | exact functions | matched code | code linked | data linked | game units linked |
 |---|---|---|---|---|
-| 7,523 / 7,647 | 93.04% | 73.78% | 78.27% | 209 / 259 |
+| 7,527 / 7,647 | 93.14% | 74.16% | 78.28% | 211 / 259 |
 
 2026-09-24 (the first cloud day, with the owner's PC): from 7,484 / 91.20% / 62.84% / 65.70%.
 Left: 139 non-exact functions (110 KB) in 54 game units; 29 units are 1 function from linking, 9
