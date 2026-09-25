@@ -40165,5 +40165,21 @@
 "matched_functions": 7532,
 "total_functions": 7647,
 "exact": 7532
+},
+{
+"commit": "36ee884",
+"sha": "36ee88447c48fb7ac2f49c3e32812b2b5f4b5295",
+"time": 1790378593,
+"subject": "agents/findings: EA builds and decomps research (NFSMW decomp names the MAD decoder)",
+"report": true,
+"matched_code": 1446676,
+"complete_code": 1151524,
+"matched_data": 701211,
+"complete_data": 844583,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7532,
+"total_functions": 7647,
+"exact": 7532
 }
 ]
