@@ -17,6 +17,7 @@ DONE
 
 TRIED, NO GAIN
 - UObject fn_800488B4 (0.5 operand order): *(1.0f/2.0f), 0.5 double, f64 temp, per-arm products, if/else,
+  SOLVED 2026-09-25 (UObject linked): see docs/decomp-notes.md "Late constant load in c * x" (decomp.me scratch SOh7Q).
   `>` ternary, fMin local with *,/: literal 0.5 always loads before the ternary; /2.0f gives (x,c).
 - GoStaticCam fn_80065488: fEnd in the ternary arms + both interpolation blocks -> 2 left (block 2 computes
   into f3 not f31); fEnd only in T+B1 -> 12 (block 2 scheduling); fCur for the whole homing block, B1/B2

@@ -17,6 +17,7 @@ w4_types.py <fn> (int/s32/u32 flips), w4_inline.py <fn> (inline once-assigned lo
 
 TRIED, NO GAIN
 - UObject fn_800488B4 (1 instr, fmuls operand order of the 0.5 in fn_80014280(min(fFov,fMax)/2)):
+  SOLVED 2026-09-25 (UObject linked): see docs/decomp-notes.md "Late constant load in c * x" (decomp.me scratch SOh7Q).
   *0.5f / 0.5f* hoist the lfs (5-7); /2.0f, *=0.5f give (x,c); helpers, if/else temp, extern/defined const,
   GC/2.0/2.0p1/2.6 all same.
 - GoStaticCam fn_80065488: `if (fT >= fLastT) {fFrom=fLastT; fEnd=fT;} else {fFrom=0; fEnd=fT;} fT=fEnd;`

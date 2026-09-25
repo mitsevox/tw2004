@@ -31,6 +31,7 @@ TerrainData fn_8000C278 (fmuls operand order): no locals at all (pointers in the
   statements (`fDen = a*b; fDen -= c*d;` both orders) 94; `-(c*d) + a*b` 96; (fBx-fAx) first: 99.3-99.5;
   commuted second product + fDx/fBz decl swap + 3 load orders: all 99.55. None.
 UObject fn_800488B4: not retried (map-10 w4/w6 list is long). The 0.5f is lbl_802831E0 (0.5, confirmed).
+  SOLVED 2026-09-25 (UObject linked): see docs/decomp-notes.md "Late constant load in c * x" (decomp.me scratch SOh7Q).
 ShaderObjectsData fn_80074628 (eLayout r31 vs r27): first switch in a static inline BeginPrim(ePrim, nVerts),
   and BeginPrim(p[-3], ...) with no ePrim local: 99.94, no change.
 GoStaticCam StaticCam_GetFlybyInformation (block 2 fmadds into f3, EA f31 = fT): writing fT directly

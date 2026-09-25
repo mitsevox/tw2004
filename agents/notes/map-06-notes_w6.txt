@@ -28,6 +28,7 @@ TRIED, NO GAIN
 - OBFData fn_8006FDD4: pList/pData copies, pointer to the chunk array, *(p+i), while, volatile count: 7 = base.
 - GoDynObj fn_8004731C: walking pState (for-increment pState++), *(pState+i), scale-first prototype: no change.
 - UObject fn_800488B4: permuter 14 min -j2, no improvement. Inline MinF helper with 0.5f* / *0.5f (5-6), /2.0f (1).
+  SOLVED 2026-09-25 (UObject linked): see docs/decomp-notes.md "Late constant load in c * x" (decomp.me scratch SOh7Q).
 - uiText fn_800922A8 (two separate `ori 4`, `ori 0x400` in EA; ours folds to 0x404): |= 1<<n, x = x|c, U
   suffixes, (u16) casts, int/u32/long/unsigned types, reversed order, do{}while(0), blocks, if(1), local holding
   0x400, b<<10 with b = 1, two ifs on the same test (3), nested repeat test (1, adds a ble): none.

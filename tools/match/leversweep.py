@@ -15,11 +15,18 @@ The levers (docs/decomp-notes.md, "New from the first cloud lanes"), each tried 
   safe    move a declaration; int/s32/long or u32/unsigned int respelled (the same type on the
           GameCube); an identity inline on an assignment's value (`p = __lv(&x[i])`: moved a pointer
           to EA's register in three functions); `x = a * b * c` split into `x = a; x *= b; ...`
-          (also +); a `for` loop written as `init; while (cond) { ...; step; }`.
+          (also +); a `for` loop written as `init; while (cond) { ...; step; }`; a parenthesised
+          ternary moved into its own temp; `x / 2.0f` as `0.5f * x` or `x * 0.5f` (powers of two:
+          exact).
   review  a local's signedness changed (int <-> u32); a (u32) cast on an array index (both change
           the meaning for negative values: a person checks the value range before using one); a
           do/while written as a while (changes it when the loop can run zero times); moving a
-          declaration whose initialiser calls a function (reorders the calls).
+          declaration whose initialiser calls a function (reorders the calls); a field's address
+          taken into a pointer between two statements and the later reads made through it (holds
+          a constant load back: UObject fn_800488B4, decomp.me SOh7Q; a fake match).
+Search: singles; then three searches taking turns: deeper along the best branches (live levers,
+ones that changed the code, before inert ones), every pair, and every triple of the levers other
+than declaration moves.
 An identity inline is a fake match by nature: EA had a real helper or macro there, or none. A hit
 that uses one says so in its report; look for EA's helper in TW07 first.
 First every lever alone, then pairs (the fixes that need two changes at once: GameMode26, GoDynObj),
@@ -265,6 +272,77 @@ def levers(f):
         out.append((('for', n), 'for loop #%d (`%s`) as a while loop' % (n + 1, m.group(0)[:50]),
                     'safe', fw))
 
+    # a parenthesised ternary moved into its own temp before its statement: UObject fn_800488B4
+    tern = r'\(([^()?:;]+?) \? ([^():;]+?) : ([^():;]+?)\)'
+    for n, m in enumerate(re.finditer(tern, f.rest)):
+        first = re.search(r'[A-Za-z_]\w*', m.group(2))
+        T = first and loc.get(first.group(0))
+        if not T or T[2] or T[3]:
+            continue
+        line_start = f.rest.rfind('\n', 0, m.start()) + 1
+        stmt = f.rest[line_start:f.rest.find(';', m.end()) + 1]
+        kind = 'safe' if len(re.findall(r'\b\w+\s*\(', stmt)) <= 1 else 'review'
+        def tt(g, n=n, typ=T[1]):
+            mm = _nth(tern, g.rest, n)
+            if not mm:
+                return False
+            ls = g.rest.rfind('\n', 0, mm.start()) + 1
+            ind = re.match(r'\s*', g.rest[ls:]).group(0)
+            tmp = '__lv_tern_%d' % n
+            g.decls.append('%s %s;' % (typ, tmp))
+            g.rest = (g.rest[:ls] + '%s%s = %s ? %s : %s;\n' % (ind, tmp, mm.group(1), mm.group(2), mm.group(3))
+                      + g.rest[ls:mm.start()] + tmp + g.rest[mm.end():])
+            return True
+        out.append((('tern', n), 'ternary `%s` into its own temp' % m.group(0)[:50], kind, tt))
+
+    # `x / 2.0f` as `0.5f * x` or `x * 0.5f` (exact for a power of two): UObject fn_800488B4
+    div = r'(\([^()]*\)|[A-Za-z_]\w*(?:->\w+|\.\w+|\[[^\]]*\])*) / (2|4|8|16)\.0f\b'
+    for n, m in enumerate(re.finditer(div, f.rest)):
+        for form in ('c*x', 'x*c'):
+            def dv(g, n=n, form=form):
+                mm = _nth(div, g.rest, n)
+                if not mm:
+                    return False
+                c = {'2': '0.5f', '4': '0.25f', '8': '0.125f', '16': '0.0625f'}[mm.group(2)]
+                x = mm.group(1)
+                g.rest = g.rest[:mm.start()] + ('%s * %s' % (c, x) if form == 'c*x' else '%s * %s' % (x, c)) \
+                    + g.rest[mm.end():]
+                return True
+            out.append((('div', n), '`%s` as a multiply (%s)' % (m.group(0)[:40], form), 'safe', dv))
+
+    # a field's address taken into a pointer between two statements, the later reads through it:
+    # holds a constant load back (UObject fn_800488B4, decomp.me SOh7Q). review: a fake match.
+    lines = f.rest.split('\n')
+    fields = {}
+    for k, l in enumerate(lines):
+        for mm in re.finditer(r'\b([A-Za-z_]\w*)->([A-Za-z_]\w*)\b(?!\s*\()', l):
+            fields.setdefault(mm.group(0), k)
+    for acc, first in fields.items():
+        if re.search(re.escape(acc) + r'\s*(?:[-+*/|&^]?=(?!=)|\+\+|--)|&\s*' + re.escape(acc) + r'\b|'
+                     r'(?:\+\+|--)\s*' + re.escape(acc), f.rest):
+            continue                       # written or its address taken already: not a plain read
+        depth, spots = 0, []
+        for k in range(first):
+            depth += lines[k].count('{') - lines[k].count('}')
+            if depth == 0 and lines[k].rstrip().endswith(';'):
+                spots.append(k)
+        for k in spots[-8:]:               # the nearest statements before the first read
+            name = '__lv_a_%s' % acc.replace('->', '_')
+            def ad(g, acc=acc, k=k, name=name):
+                ls = g.rest.split('\n')
+                if k >= len(ls) or not ls[k].rstrip().endswith(';'):
+                    return False
+                ind = re.match(r'\s*', ls[k]).group(0)
+                tail = '\n'.join(ls[k + 1:])
+                new = re.sub(re.escape(acc) + r'\b(?!\s*\()', '(*%s)' % name, tail)
+                if new == tail:
+                    return False
+                g.decls.append('__typeof__(%s)* %s;' % (acc, name))
+                g.rest = '\n'.join(ls[:k + 1] + ['%s%s = &%s;' % (ind, name, acc)]) + '\n' + new
+                return True
+            out.append((('addr', acc), 'take &%s into a pointer after `%s`, later reads through it'
+                        % (acc, lines[k].strip()[:40]), 'review', ad))
+
     # a do/while loop as a while loop (review: a do runs its body once before the first test)
     for n, m in enumerate(re.finditer(r'\bdo \{', f.rest)):
         def dw(g, n=n):
@@ -339,7 +417,7 @@ def _score(job):
         o.write_bytes(b'')               # a failed compile must not score the previous object
     subprocess.run(qt._compiler(fn) + ['-c', str(c), '-o', str(o)], capture_output=True, text=True)
     if not o.exists() or o.stat().st_size == 0:
-        return idx, 9999, None
+        return idx, 9999, None, None
     a, b = qt._target[fn], qt._dis(fn, str(o))
     ab, bb = qt._branchless(a), qt._branchless(b)
     ops = difflib.SequenceMatcher(None, ab, bb, autojunk=False).get_opcodes()
@@ -347,7 +425,7 @@ def _score(job):
     pos = None
     if s == 0:
         pos = sum(1 for x, y in zip(a, b) if x != y) + abs(len(a) - len(b))
-    return idx, s, pos
+    return idx, s, pos, hash(tuple(b))   # the code itself: tells a lever that changed nothing
 
 
 # ---- one function ---------------------------------------------------------------------------------
@@ -388,8 +466,8 @@ def sweep(unit, fn, minutes, jobs, setup=True):
         if not batch:
             return False
         order = {b[0]: b[2] for b in batch}
-        for idx, sc, pos in pool.imap_unordered(_score, [(b[0], b[1]) for b in batch], chunksize=4):
-            results.append((sc, pos, order[idx]))
+        for idx, sc, pos, h in pool.imap_unordered(_score, [(b[0], b[1]) for b in batch], chunksize=4):
+            results.append((sc, pos, order[idx], h))
             if sc == 0 and pos == 0:
                 return True
             if time.time() > deadline:
@@ -398,31 +476,39 @@ def sweep(unit, fn, minutes, jobs, setup=True):
         return False
 
     with multiprocessing.Pool(jobs, _init, (fn,)) as pool:
-        base_score = pool.apply(_score, ((0, src),))[1]
+        _, base_score, _, base_hash = pool.apply(_score, ((0, src),))
         if base_score == 0:
             return _write(unit, fn, 0, [], 0, time.time() - t0, 'already exact in the snapshot')
         done = run([[k] for k in range(len(L))], pool)
         single = {r[2][0]: r[0] for r in results}
+        # A lever that leaves the code exactly as it was is inert; one that changes the code without
+        # changing the score is live, and goes first among equal scores: UObject's fix was three
+        # levers that each left the score at 1 but each changed the code.
+        inert = {r[2][0] for r in results if r[3] == base_hash}
         n1 = len(results)
-        ks = sorted(single, key=lambda k: single[k])
+        ks = sorted(single, key=lambda k: (single[k], k in inert))
 
         def beam(size, beam_width=40):
-            """The best combinations of size-1 levers, each extended by every lever."""
+            """The best combinations of size-1 levers, each extended by every live lever first."""
             top = sorted((r for r in results if len(r[2]) == size - 1 and r[0] < 9999),
-                         key=lambda r: r[0])[:beam_width]
+                         key=lambda r: (r[0], r[3] == base_hash))[:beam_width]
             return [[*r[2], k] for r in top for k in ks if k not in r[2]]
 
-        # Two searches take turns, one batch each, so neither starves the other: deeper along the
-        # best branches (fixes of three changes: PlaceBall) and every pair (two changes that each
-        # do nothing alone: GoDynObj).
+        # Three searches take turns, one batch each, so none starves the others: deeper along the
+        # best branches (fixes of three changes: PlaceBall), every pair (two changes that each do
+        # nothing alone: GoDynObj), and every triple of the levers other than declaration moves
+        # (UObject: two levers that changed nothing alone and one that made it worse).
         pairs = sorted(([a, b] for i, a in enumerate(ks) for b in ks[i + 1:] if L[a][0] != L[b][0]),
-                       key=lambda p: single[p[0]] + single[p[1]])
+                       key=lambda p: (single[p[0]] + single[p[1]], (p[0] in inert) + (p[1] in inert)))
+        other = [k for k in ks if L[k][0][0] != 'move']
+        triples = [[a, b, c] for i, a in enumerate(other) for j, b in enumerate(other[i + 1:], i + 1)
+                   for c in other[j + 1:] if len({L[a][0], L[b][0], L[c][0]}) == 3]
         deep, level = [], 1
-        while not done and time.time() < deadline and (pairs or level < 5):
+        while not done and time.time() < deadline and (pairs or triples or level < 5):
             if not deep and level < 5:
                 level += 1
                 deep = beam(level)
-            for queue in (deep, pairs):
+            for queue in (deep, pairs, triples):
                 if queue and not done and time.time() < deadline:
                     batch = queue[:400]
                     del queue[:400]
@@ -440,12 +526,12 @@ def _write(unit, fn, base_score, results, nlev, secs, note, f=None, L=None, n1=0
         lines.append('base %s, %d levers, %d variants (%d singles) in %.0f s; best %s%s'
                      % (base_score, nlev, len(results), n1, secs, best[0][0] if best else '-',
                         ' EXACT' if exact else ''))
-        for sc, pos, combo in best[:12]:
+        for sc, pos, combo, _ in best[:12]:
             kinds = {L[k][2] for k in combo}
             lines.append('\n%s%s [%s]' % (sc, ' (exact)' if sc == 0 and pos == 0 else '',
                                          'review' if 'review' in kinds else 'safe'))
             lines += ['  - ' + L[k][1] for k in combo]
-            if any(L[k][0][0] == 'id' for k in combo):
+            if any(L[k][0][0] in ('id', 'addr') for k in combo):
                 lines.append('  fake match: EA did not write an identity wrapper. Look in TW07 '
                              '(docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this '
                              'spot and use it; otherwise name it fn_<caller address>_Read with a '

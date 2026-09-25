@@ -453,6 +453,12 @@ They will be sorted into the sections below.
   list start and a byte offset apart.** The cast in the index, `list[(u32)i]`, brings EA's form back;
   declaring the variable `u32` does not (GoTerrain fn_80032518 96.27 -> 100, fn_80032770 89.62 -> 100;
   also GameHoleContests).
+- **[verified] Late constant load in `c * x` (fmuls const,x):** write the min or ternary into its own
+  temp; `0.5f * fTemp` alone still hoists the lfs above it. An unrelated statement between the temp
+  and the multiply holds the load back. Here that was taking the address of a field used later
+  (`p = &pObj->n108`, read as `*p` below): UObject fn_800488B4 exact, found by an anonymous
+  decomp.me user (https://decomp.me/scratch/SOh7Q). The three changes each do nothing or worse
+  alone; leversweep.py has them as levers and finds the combination.
 - Other compiler versions (GC 2.0, 2.0p1, 2.6, 2.7, 1.3.2) gave output identical to 2.5 on 18 near-miss
   functions tried today: not a lever for these.
 

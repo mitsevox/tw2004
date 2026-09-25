@@ -134,6 +134,7 @@ TRIED, NO GAIN
   percentDiff/distDiff/testPercent as locals (every subset/order x 9 final forms): 2. `fHiT -= fT` first
   4/13; ratio in fEnd first 6/16.
 - UObject fn_800488B4 (1: EA's `fmuls f1,f0,f1` = 0.5 * min(fFov,fMax), 0.5 loaded after the ternary):
+  SOLVED 2026-09-25 (UObject linked): see docs/decomp-notes.md "Late constant load in c * x" (decomp.me scratch SOh7Q).
   a literal as either operand (c*x, x*c, 1.0f/2.0f, (f32)0.5, 0.25f+0.25f) loads it before the ternary 5;
   `x / 2.0f` late load but x first 1; `if (fFov <= fMax) fMax = fFov; 0.5f * fMax` right order, x in f30
   4; inline Half/HalfTan/MinHalf/TanHalf/MinF/Scale, fresh fX (if/else, ternary), fHalf/fTwo locals, *=,
