@@ -1,5 +1,7 @@
 """Merge one reviewed agent branch into main, verify, and push.
-    python tools/agents/merge.py <agent-name> ["merge message"]
+    python tools/agents/merge.py <agent-name> ["merge message"] [--allow-asm]
+--allow-asm: the merge may add asm that has its plain-C fallback, after the orchestrator checked by
+hand that it is EA's own asm (asmgate.py; without it any added asm is refused).
 Steps: refresh main's report and save its exact-function set; merge agent/<name> with --no-ff (on a
 conflict: abort the merge and list the files, so the owning agent can merge main and resolve); run
 configure + a full build (DOL must be OK); rebuild the report and compare exact sets (no function may
@@ -9,10 +11,13 @@ failed merge never stays on main for the next merge to stack on. Exit code 1 on 
 Run merges one at a time and stop at the first failure (chain with &&)."""
 import json, pathlib, re, subprocess, sys
 import paths
+import asmgate
 
 MAIN = paths.MAIN_S
-name = sys.argv[1]
-msg = sys.argv[2] if len(sys.argv) > 2 else f'Merge agent/{name}'
+ALLOW_ASM = '--allow-asm' in sys.argv
+args = [a for a in sys.argv[1:] if a != '--allow-asm']
+name = args[0]
+msg = args[1] if len(args) > 1 else f'Merge agent/{name}'
 NL = '\n'
 
 
@@ -174,7 +179,14 @@ if consts_before is not None and consts_after is not None and consts_after > con
 # Shell edits (sed, heredocs, echo) strip backslashes. A removed line with a backslash that comes back
 # identical except for its backslashes is that damage.
 d = run(f'git diff -U0 {base} -- "*.c" "*.h"').stdout.splitlines()
-removed = [l[1:] for l in d if l.startswith('-') and not l.startswith('---') and '\\' in l]
+# The asm gate (owner's rule, 2026-09-25): no added asm without its plain-C fallback, and none at all
+# without --allow-asm (pasted target instructions "match" anything and prove nothing about the C).
+asm_ok, asm_report = asmgate.check(d, MAIN, ALLOW_ASM)
+if asm_report:
+    print(NL.join(asm_report))
+if not asm_ok:
+    undo('asm gate (not pushed): the merge adds asm (lines above). -> the lane writes the function in C')
+removed =[l[1:] for l in d if l.startswith('-') and not l.startswith('---') and '\\' in l]
 added = {l[1:] for l in d if l.startswith('+') and not l.startswith('+++')}
 stripped = [l for l in removed if l.replace('\\', '') in added]
 if stripped:

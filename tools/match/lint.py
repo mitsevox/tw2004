@@ -56,12 +56,13 @@ def intrinsic_fallbacks():
     return out
 
 
-def asm_fallback_hits(lines):
-    """Lines of asm functions and intrinsics with no plain-C version (port-asm-no-fallback)."""
+def asm_fallback_hits(lines, honor_exempt=True):
+    """Lines of asm functions and intrinsics with no plain-C version (port-asm-no-fallback).
+    honor_exempt=False ignores `port:` exemptions (merge.py's asm gate, for newly added asm)."""
     hits, stack, have = [], [], intrinsic_fallbacks()
     for i, l in enumerate(lines, 1):
         s = l.strip()
-        exempt = 'port:' in l or (i > 1 and 'port:' in lines[i - 2])
+        exempt = honor_exempt and ('port:' in l or (i > 1 and 'port:' in lines[i - 2]))
         if re.match(r'#\s*if', s):
             stack.append({'mw': re.match(r'#\s*(ifdef\s+__MWERKS__|if\s+defined\s*\(?\s*__MWERKS__)', s)
                           is not None, 'else': False, 'asm': []})
