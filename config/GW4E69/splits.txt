@@ -438,7 +438,7 @@ Code80070EC4.c:
 
 GoShaderObject_PrelitUVAnimation_Gc.c:
 	.text       start:0x8007110C end:0x80071AD0
-	.data       start:0x80188E50 end:0x80188E78
+	.data       start:0x80188E50 end:0x801893F0
 	.sdata      start:0x802811F8 end:0x80281200
 	.sbss       start:0x80281E80 end:0x80281E88
 	.sdata2     start:0x802839D0 end:0x802839E8
