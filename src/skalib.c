@@ -156,8 +156,16 @@ ClipBank* ClipBank_Get(u32 nSlot) {
 #define SKA_NODE(pLib, nOff) \
     (((pLib) != NULL && (nOff) >= 0) ? (s16*)((pLib)->pTree + (nOff)) : NULL)
 // The child nIdx of a node, or NULL.
-#define SKA_CHILD(pLib, pNode, nIdx) \
-    (((pNode) != NULL && (pNode)[nIdx] >= 0) ? (s16*)((pLib)->pTree + (pNode)[nIdx]) : NULL)
+// fake match: an inline, not a macro, so each result is worked out before the call's arguments
+// are loaded (as a macro, pA and pB go into r3/r4 before the last child is found).
+static inline s16* fn_80021F50_Read(AnimLib* pLib, s16* pNode, int nIdx) {
+    return (pNode != NULL && pNode[nIdx] >= 0) ? (s16*)(pLib->pTree + pNode[nIdx]) : NULL;
+}
+
+// fake match: SKA_NODE(pLib, pLib->nDefault) as an inline, for the same reason.
+static inline s16* fn_80021F50_Get(AnimLib* pLib) {
+    return (pLib != NULL && pLib->nDefault >= 0) ? (s16*)(pLib->pTree + pLib->nDefault) : NULL;
+}
 
 // Walks the clip trees of two libraries together (either may be NULL), telling pfn about every
 // group, style, club and key either one has. lbl_80281CE8..CF4 hold where the walk is.
@@ -180,7 +188,9 @@ int AnimLib_WalkPair(AnimLib* pA, AnimLib* pB, AnimLibWalkFn pfn, void* pCtx) {
     lbl_80281CEC = -1;
     lbl_80281CF0 = -1;
     lbl_80281CF4 = -1;
-    nRet = pfn(pA, pB, SKA_NODE(pA, pA->nDefault), SKA_NODE(pB, pB->nDefault), pCtx, 0, 0);
+    pLeafB = fn_80021F50_Get(pB);
+    pLeafA = fn_80021F50_Get(pA);
+    nRet = pfn(pA, pB, pLeafA, pLeafB, pCtx, 0, 0);
     if (nRet > 0) return nRet;
     for (nGroup = 0; nGroup < 21; nGroup++) {
         lbl_80281CE8 = nGroup;
@@ -190,32 +200,32 @@ int AnimLib_WalkPair(AnimLib* pA, AnimLib* pB, AnimLibWalkFn pfn, void* pCtx) {
         pGroupA = SKA_NODE(pA, pA->groups[nGroup]);
         pGroupB = SKA_NODE(pB, pB->groups[nGroup]);
         if (pGroupA == NULL && pGroupB == NULL) continue;
-        pLeafA = SKA_CHILD(pA, pGroupA, 0);
-        pLeafB = SKA_CHILD(pB, pGroupB, 0);
+        pLeafA = fn_80021F50_Read(pA, pGroupA, 0);
+        pLeafB = fn_80021F50_Read(pB, pGroupB, 0);
         nRet = pfn(pA, pB, pLeafA, pLeafB, pCtx, 1, nGroup);
         if (nRet > 0) return nRet;
         for (nStyle = 0; nStyle < 8; nStyle++) {
             lbl_80281CEC = nStyle;
             lbl_80281CF0 = -1;
-            pStyleA = SKA_CHILD(pA, pGroupA, 1 + nStyle);
-            pStyleB = SKA_CHILD(pB, pGroupB, 1 + nStyle);
+            pStyleA = fn_80021F50_Read(pA, pGroupA, 1 + nStyle);
+            pStyleB = fn_80021F50_Read(pB, pGroupB, 1 + nStyle);
             if (pStyleA == NULL && pStyleB == NULL) continue;
             nRet = pfn(pA, pB, NULL, NULL, pCtx, 2, nStyle);
             if (nRet > 0) return nRet;
             for (nClub = 0; nClub < 6; nClub++) {
                 lbl_80281CF0 = nClub;
                 lbl_80281CF4 = -1;
-                pClubA = SKA_CHILD(pA, pStyleA, nClub);
-                pClubB = SKA_CHILD(pB, pStyleB, nClub);
+                pClubA = fn_80021F50_Read(pA, pStyleA, nClub);
+                pClubB = fn_80021F50_Read(pB, pStyleB, nClub);
                 if (pClubA == NULL && pClubB == NULL) continue;
-                pLeafA = SKA_CHILD(pA, pClubA, 1);
-                pLeafB = SKA_CHILD(pB, pClubB, 1);
+                pLeafA = fn_80021F50_Read(pA, pClubA, 1);
+                pLeafB = fn_80021F50_Read(pB, pClubB, 1);
                 nRet = pfn(pA, pB, pLeafA, pLeafB, pCtx, 3, nClub);
                 if (nRet > 0) return nRet;
                 for (nKey = 0; nKey < 11; nKey++) {
                     lbl_80281CF4 = nKey;
-                    pLeafA = SKA_CHILD(pA, pClubA, 2 + nKey);
-                    pLeafB = SKA_CHILD(pB, pClubB, 2 + nKey);
+                    pLeafA = fn_80021F50_Read(pA, pClubA, 2 + nKey);
+                    pLeafB = fn_80021F50_Read(pB, pClubB, 2 + nKey);
                     nRet = pfn(pA, pB, pLeafA, pLeafB, pCtx, 4, nKey);
                     if (nRet > 0) return nRet;
                 }

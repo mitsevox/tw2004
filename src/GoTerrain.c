@@ -456,7 +456,7 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
     s32 nObjects;
     s32 nLists;
     s32 i;
-    s32 nLast;
+    int nLast;
     UObjMesh* pLOD0;
     UObjMesh* pLOD1;
     UObjMesh* pLOD2;
@@ -470,10 +470,10 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
     f32 fBallToObject;
     f32 fPinToBall;
     f32 fObjectToPin;
-    u8 bHide;
     s32 eClipMethod;
     View* pView;
     Ter_ObjectReference* pRef;
+    u8 bHide;
 
     nObjects = fn_800354F4(fn_800354E4(pPatch->pObjects, 0));
     if (nObjects == 0) {
@@ -484,7 +484,11 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
         nLists = fn_800354F4(fn_800354E4(pPatch->pObjects, 0));
         pLOD0 = fn_800354E4(fn_800354E4(pPatch->pObjects, 0), 0);
         pLOD1 = nLists > 1 ? fn_800354E4(fn_800354E4(pPatch->pObjects, 0), 1) : pLOD0;
-        pLOD2 = nLists > 2 ? fn_800354E4(fn_800354E4(pPatch->pObjects, 0), 2) : pLOD1;
+        if (nLists > 2) {
+            pLOD2 = fn_800354E4(fn_800354E4(pPatch->pObjects, 0), 2);
+        } else {
+            pLOD2 = pLOD1;
+        }
     } else {
         if (lbl_801D3CB0.iLowLODListOffset == -1) {
             if (fn_800354F4(pPatch->pObjects) == 5) {
@@ -497,7 +501,7 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
         pLOD1 = fn_800354E4(fn_800354E4(pPatch->pObjects, lbl_801D3CB0.iLowLODListOffset + 1), 0);
         pLOD2 = fn_800354E4(fn_800354E4(pPatch->pObjects, lbl_801D3CB0.iLowLODListOffset + 2), 0);
     }
-    nLast = nObjects + nFirstObject - 1;
+    nLast = nObjects - 1 + nFirstObject;
     for (i = nObjects - 1; i >= 0; i--) {
         uFlags2 = fn_800354D0(pLOD0, 2);
         if (gSession.nSplitScreen == 0 || !(uFlags2 & 8)) {
