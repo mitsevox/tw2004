@@ -1,13 +1,18 @@
 # State (keep this short: current facts only; history goes to docs/journal.md)
 
-Updated 2026-09-25 ~11:30 CDT. How the machines, CI, the page and PC jobs fit together:
+Updated 2026-09-25 ~18:10 CDT. How the machines, CI, the page and PC jobs fit together:
 docs/infrastructure.md. History: docs/journal.md.
 
-**Running:** ChatGPT (`codex/round3`, owner's Mac) per agents/assign/2026-09-25-chatgpt-round3.md:
-structural (LOGIC) misses that link their unit (MorphAn, LLPictInt, goballfx, CamSpline, LogoTexture,
-hlaudtrackstm, OBFD, uiArc; those units held). Gemini is out of usage. Pick work with
-`tools/agents/diffkinds.py`: of 119 left, 90 LOGIC, 14 CONST, 15 REG (register roulette). Local Claude on the PC: permuter on Golfer AI_ChooseTarget (Golfer
-held). The orchestrator merges, cleans branches, sends PC jobs.
+**Running (evening push, checkpoint 19:35 CDT):** 10 cloud lanes, whole units each (worktrees
+`n-*`): n-uisscreen (UISScreen), n-uisapi (UISApi), n-uistudio (UISEvent, UIStudio), n-ll (LLPictInt,
+LLDisp_Gc, LLDynTex, LLTex, LLFont), n-shaders (Glows, OBFD, GoGreenGrid, Particle, Grass),
+n-charskin (SkinPart, char), n-terrain (GoTerrainCollision, GoTerrain, skalib), n-modes (DiscError,
+MC, GameModeBestBall, Code8002EE1C, DepthField, GameMode22, Ball), n-misc (hlaudtrackstm,
+uiProcessInterface, uiText, rcmp, CamSpline, goballfx, LogoTexture, uiArc), n-const (Earnings,
+BreakLine, Rain, StaticCam, TerrainData, Swing, gocamscripts, ska_shared). A research agent looks for
+EA builds/decomps (agents/findings/2026-09-25-ea-research.md). PC: permuter on SunFlr fn_8009A708;
+next hlaudmovie fn_800A8AD4, startUp fn_800B0748. Golfer held (PC). ChatGPT and Gemini done for
+the night. The cloud box has 4 cores: lanes run no permuter.
 
 **Biggest blockers** by link gain per function: Golfer AI_ChooseTarget (98.53%, registers only:
 agents/tried/AI_ChooseTarget.md), Ball Physics_HandleCollision, Earnings x2, startUp fn_800B0748,
