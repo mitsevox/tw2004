@@ -21,6 +21,7 @@ CASES = [
     ('GoShaderObject_Glows_Gc', 'fn_800981D0', '1745a20^1', 'do/while as a loop'),
     ('UObject', 'fn_800488B4', '653997b^1', 'ternary temp + a field address taken early (decomp.me SOh7Q)'),
     ('GameHoleContests', 'fn_800DA6D0', '854e8e9^1', '(u32) index cast + a new loop variable (partly out of reach)'),
+    ('Golfer', 'AI_ChooseTarget', '2afeac0^1', 'three adjacent assignments swapped (partial: registers stay)'),
     ('target', 'TARGET_Init', '9a375fa^1', 'a u64 local for a call result (out of reach)'),
     ('GameMode26', 'fn_8010CA2C', 'a2d0373^1', 'parameter type + declaration move (out of reach)'),
     ('uiLoadFile', 'fn_8008EFC0', 'a9e160c^1', 'add through a new local (out of reach)'),

@@ -1,6 +1,6 @@
 # AI_ChooseTarget (Golfer.c, 0x8002C2DC)
 
-Status: OPEN, 98.20% on 2026-09-25.
+Status: OPEN, 98.53% on 2026-09-25.
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -53,6 +53,10 @@ unless you combine it with something new. Before you stop, add every attempt und
   Conclusion: EA's C differs in some expression shape we have not found, under full register
   pressure (chaotic: small graph changes reorder everything). Best next step is a long permuter run
   on a many-core machine (free), not hand work.
+- 2026-09-25 PC permuter (18 cores): in all three distance blocks compute fDX before fDZ (EA's order
+  is X then Z; no logic change): permuter 675 -> 550 (block 3 alone 620); objdiff 98.20 -> 98.53%,
+  merged. The sweep's `(u32)k` + nKind-first scores 1940 in the permuter: left out. The PC permuter
+  continues from this version.
 - DONE (was NEXT, 2026-09-25): learn CodeWarrior's callee-saved numbering rule by controlled one-change
   experiments on this function, recording the full register map each time (first definition, use
   count, loop vs straight code, parameter vs local, how the (s8) casts are written, extra uses).

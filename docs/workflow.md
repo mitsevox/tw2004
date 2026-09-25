@@ -155,7 +155,8 @@ its code is often ugly but it points at the real change (a type, an order, a tem
 
 **The lever sweeper** tries the changes that have actually fixed near-misses (declaration moves,
 int/s32 spellings, an identity inline on an assignment, `*=` splits, loop forms, `(u32)` index
-casts), singly, in pairs and deeper, instead of random rewrites. CPU only, src/ untouched; meant
+casts, two adjacent independent assignments swapped), singly, in pairs and deeper, instead of
+random rewrites. CPU only, src/ untouched; meant
 for a whole night on every core:
 
 ```
@@ -167,11 +168,13 @@ python tools/match/leversweep.py <Unit> <fn>                        # one functi
 Results: `build/leversweep/summary.tsv` (one row per function: base, best, EXACT, safe/review, the
 levers) and `build/leversweep/<fn>.txt` (the best variants and the changed lines). A hit is a
 candidate: apply it to the unit, confirm it in the real build, and check the meaning. "review" levers
-change behaviour for some values (a signedness, a do/while as while); an identity inline is a fake
+change behaviour for some values (a signedness, a do/while as while) or may (a swap that stores
+through memory or to a global, which a pointer could alias); an identity inline is a fake
 match (look for EA's helper in TW07 first, else `fn_<caller>_Read` with `// fake match:`).
 `leversweep_selftest.py` sweeps functions already solved, from their source before the fix: on
 2026-09-25 it rediscovered BreakLine_Reset, GoDynObj fn_8004731C (a two-change pair), GoTerrain
-fn_80032518 and Glows fn_800981D0.
+fn_80032518 and Glows fn_800981D0; the swap lever finds AI_ChooseTarget's fDX/fDZ order (112 -> 90
+with other levers in 4 min; the PC permuter found it first).
 
 Before you commit
 -----------------

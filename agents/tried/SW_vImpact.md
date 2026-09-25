@@ -8,7 +8,10 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
-(add yours here: date, lane, what, score)
+- 2026-09-25, ChatGPT: fast-snapshot identity helpers and `register` pointer declarations, plus
+  `&p->vLaunchB[0]`: 6 differing instructions -> 6 (identity helpers worsened to 27).
+- 2026-09-25, ChatGPT: all 720 permutations of the six declaration lines and a 6-minute
+  combination lever sweep: 6 -> 6. No source change.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
