@@ -12,6 +12,16 @@ BreakLine_Render, StaticCam_GetFlybyInformation, UObject fn_800488B4, uiText fn_
 TerrainData fn_8000C278, Rain fn_800B52D4, hlaudmovie fn_800A8AD4, File_ReadAsyncEx, Earnings
 fn_800D477C/fn_800D4F14, gocamscripts CameraScript_LagAimMarker/fn_8003F2E0.
 
+gemini/hand-matches (2026-09-25): only its two C fixes are merged (c576b92: File_ReadAsyncEx,
+UStream_Update exact). The other 13 "matches" (Earnings x2, Golfer AI_ChooseTarget, TerrainData,
+hlaudmovie, ska_shared, PsMgr, GoStaticCam, BreakLine_Render, Rain, uiText, MC, GameModeBestBall,
+startUp) paste the original assembly under #ifdef __MWERKS__ with the old C in #else: the match
+proves nothing about the C, so they are NOT merged (also: extern in .c, data redefined, trial.py's
+newline='\n' removed). LLFileIO_Gc and UStream are now all exact but NOT linked: LLFileIO's
+lbl_8019D54C is declared 0x1000 (original 0x1004) and lbl_801A0350 0x1000 (original 0x2000), and its
+.bss needs reverse order (ranges: .data 0x801866E0-0x80186730, .bss 0x8019D540-0x801A2350, .sbss
+0x80281B80-0x80281B88); UStream's links not tried yet. A data-lane job (+~22 KB).
+
 What was tried per function: agents/notes/ (cloud-2026-09-24-round1.txt, money-01-notes_cloud1.txt,
 the PC's map-*-notes_w9/w10 files). New rules: docs/decomp-notes.md "New from the first cloud lanes".
 
