@@ -459,6 +459,9 @@ They will be sorted into the sections below.
   (`p = &pObj->n108`, read as `*p` below): UObject fn_800488B4 exact, found by an anonymous
   decomp.me user (https://decomp.me/scratch/SOh7Q). The three changes each do nothing or worse
   alone; leversweep.py has them as levers and finds the combination.
+- **[verified] A cast that changes nothing still changes the code:** `(u8)` on a u8 field read reorders
+  CodeWarrior's instructions and registers (hlaudtrackseq fn_800AA744, fn_800AAAA4: 2 diffs -> 0
+  each; the permuter found `& 0xFFu` and `(unsigned int)`, which also work). Label it `// fake match:`.
 - Other compiler versions (GC 2.0, 2.0p1, 2.6, 2.7, 1.3.2) gave output identical to 2.5 on 18 near-miss
   functions tried today: not a lever for these.
 
