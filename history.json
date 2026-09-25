@@ -62,5 +62,21 @@
 "matched_functions": 7527,
 "total_functions": 7647,
 "exact": 7527
+},
+{
+"commit": "9bdfc41",
+"sha": "9bdfc41b5e5c058fba589b563ddddbf30d8d2db4",
+"time": 1790352577,
+"subject": "pc-job.yml: strip dtk's colour codes before matching main.dol: OK",
+"report": true,
+"matched_code": 1444328,
+"complete_code": 1150048,
+"matched_data": 701147,
+"complete_data": 844511,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7527,
+"total_functions": 7647,
+"exact": 7527
 }
 ]
