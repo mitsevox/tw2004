@@ -1,0 +1,23 @@
+map-05 split finder, 2026-09-24 16:52-17:10 CDT
+
+Method: survey5.py flags a data symbol whose natural size is padded up to 8 (4byte/float/byte with
+size 8, or a real gap) followed by an 8-aligned symbol that does not itself need 8-alignment; then
+compares which of the unit's functions use the nearby symbols before / after. It re-finds both known
+streammanagerhole cuts (0x80015470, 0x80016198), so the method is sound. String-only markers are noise.
+
+Linked (branch agent/map-05):
+- fa1d3469 LLTime.c 800952D8-8009554C (TI_* x8), text only. Its .sdata lbl_802813B0 (= &lbl_801D97F8,
+  a 0x110-byte .bss, larger than ProfClock's 0x88) is left orphan: the type needs proof first.
+- 7ab250de Code800B90F4.c 800B90F4-800B9FF0 + .data/.sdata/.sbss/.sdata2. The "rcmp_mad_codec.c"
+  assert string is used only by this part, so EA's rcmp_mad_codec.c is really the new unit and the
+  codec head (800B769C-800B90F4) is TW06's maddec.c/madidct.c: a rename for the orchestrator.
+Stale comments (not changed, per the rules): GoShaderObject_Particle_Gc.c header still says the
+stopwatches are in this file; rcmp_mad_codec.c header still describes the front-end code after it.
+
+Not linked:
+- DiscError: strong .sbss cut at 0x802821A0 (font part 82188-8219F vs disc-error UI 821A0-821A7),
+  but fn_800B6FCC (99.4%, r30/r31 swap of &szLine[1] and nY) sits on the cut. Tried: decl swap i/nY
+  (worse). map-10 notes list many earlier tries. trial_6fcc*.py: nY in the for-init (99.4), >> 1
+  (93.7), sizeof index (99.4), nY = 28 first (99.4), i = 0 before (99.4), nY++ in the call (96.8),
+  nY += 1 (99.4), szLine declared after nY/i in 3 orders (99.4 / 98.9 / 99.4): no.
+Survey table: split_survey.tsv

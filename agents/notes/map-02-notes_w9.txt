@@ -24,3 +24,19 @@ LEFT
   bNoBall types/forms (ternary, &&, set0), nHoles block/types. 13 aligned only with a shadowing award nSlot.
 - GameModeBestBall fn_800E8A68: nBase/nMoney order swap, separate inner loop counter (int/s32/PlayerNumber_t): no.
 - FE_CrAPDB fn_801070F4 (pProfile r29 vs p r26): climb, pProfile as statement, p = aAssets, s32 types: no.
+
+w10 (hlaudmovie)
+- fn_800A8FFC EXACT: (1) fn_800A8524's unused 2nd param is u16, not int (header + AudTable.c; the call
+  zero-extends u8 i with clrlwi after `mr r3`), (2) `pData = pSounds + pBank->n2C + pBank->nGroups * 4;`
+  (no parentheses) and pSampleData before the ppGroups fix-up, (3) `u32 j;` declared before pGroup.
+- fn_800A8AD4 (11, pBlock orig r30 / &lbl_801F1850 temp r29; ours r24 / r30). Locals take registers in
+  declaration order after the address temps, the parameter last. Tried: all 5-decl perms x local copy
+  `MovieSoundBlock* pBlock = p;` (void* p) at 6 positions (best 7-8: only pBlock/temp swap left);
+  late `pBlock = p;` (11); pMov = &lbl_801F1850 local any position (no effect); nMode types, u32/int
+  uLeft/uRight, ternary/else-if nMode, pDataL/R as expressions (74+), inline helpers for the ARAM
+  address or the fn_800B0338 call (24/11), GC 2.0-2.7 (same), 3.0 (62). Permuter 20 min: nothing valid.
+  Committed: `void fn_800A8AD4(void* pChunk) { MovieSoundBlock* pBlock = pChunk;` (UStream.c's own
+  prototype is `void fn_800A8AD4(void* pChunk)`), natural decl order: 99.40 -> 99.57 (8 diffs, only
+  pBlock r29/temp r30 swapped). On that form: calls with pChunk (24), pDataL from pChunk (9), register (8),
+  inner block (24), all 24 statement orders x 120 decl orders (best 7). Permuter 18 min on this form:
+  best 5 only with pBlock left uninitialised (UB, not usable).

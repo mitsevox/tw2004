@@ -1,0 +1,35 @@
+map-02 notes w10 (2026-09-24, closer lane)
+
+- GoGolfCam GolfCamera_ProcessZoomToAimCamera 99.53 -> 100, unit linked (graduate.py, ranges were already in
+  splits.txt). Fix: the bMirror != 0 argument goes through `s8 bKeepFlat` (TW07 local `bool keepFlat`) set
+  inside the `if (f108 >= 0)` right before the call. Quicktrial: s8/char/s16/short local inside the if 0;
+  the same local assigned before the if 12; u8/int local 2; `(s8)(bMirror != 0)` / `(s16)` cast in the call
+  0; (u8)/(u16)/(u32)/(int) cast 2; prototype param int (u8 bLimit -> int) 0 but the callee's clrlwi. needs
+  u8 (prototype mismatch, not used). Marked `// fake match:` (type is a guess; a u8 local schedules the
+  srwi early).
+- Compiler sweep (GC 1.3.2, 1.3.2r, 2.0, 2.0p1, 2.5, 2.6, 2.7, 3.0a3) on fn_800D477C (19), fn_800D4F14 (14),
+  fn_8003F2E0 (8), CameraScript_LagAimMarker (11): no version changes anything (3.0a3 far worse).
+- Earnings fn_800D477C: bNoBall s8/char/int/s16/u16/u32/s32/BOOL 19; bLost s8/int 21; bReplace s8/int 59;
+  nHoles s32/s16/u8/s8 19, u32 20; every order of {bNoBall, nAdj, nHoles} at every decl position: 19 best;
+  nHoles reusing nValue 19, reusing j 33.
+- gocamscripts fn_8003F2E0 case 2 (8): f64 d block (v[3] = d; f = d) 6; `f = v[3] = (f64)(?:)` 6;
+  ratio local 25; v40[3] local 7-10; if/else into v[3] 11; accumulate f 10; `(f64)v40 - ...` arm 6;
+  both arms (f64) with (f64)(f94*0) else 5; (f32)((f64)a - (f64)(a*r)) 5; a float zero variable
+  (`f32 z = 0.0f`) as the compare and the else arm, d/f=v3 forms 6, plain 8. EA's else arm is an
+  explicit fmr of the compare's 0.0f into the then-arm's register (f2 = v40[3]'s load); ours folds the
+  join into f0. Also: compare/else constants as 0.0 / 0.0f / 0 in all 9 pairs (5-8; `> 0.0` loads lfd);
+  f32/f64 f with `v[3] = f = ?:`, `f = ?:; v[3] = f` (f32 5, f64 17), if/else f / v[3]=f / f=v[3] arms
+  (8-13); pointer to v[3] 8; `!(cond) ? 0 : E` 9; case-1 style (clamp on v[3]) ?: 11, if/else 5 (else
+  stores to v[3] and reloads); f64 d if/else with a float zero variable 6; d then f = v[3] 5-6.
+- fn_800D4F14: fn-level bLost as in fn_800D477C (whose award branch matches that way) 21; j per block in
+  4 orders 27-35.
+- LagAimMarker: (f32) casts dropped on each sqrt compare 12-20; fDist (f32) cast 11; s8 bLimit/bClose 12;
+  fMin one expression 22, `fMin = -vDir[1] * fMin` 16, `*= -1.0f * vDir[1]` 15, `fMin = fMin * -vDir[1]`
+  11; f64 fAimY / fMin 13; bClose first in the && 16. Permuter 20 min -j4: base 65, no improvement
+  (13250 iterations).
+- fn_8003F2E0 permuter 20 min -j4: base 235 -> 195 only by moving case 4's fn_80038010 call into case 5
+  (changes behaviour; unusable).
+- fn_800D477C: the prize branch's nSlot as a function-level variable (as nSlot or its own name) at every
+  declaration position: 19 always.
+- CameraScript_LagAimMarker (11): EA's colour webs {fMinDist, fDist} f30, {fAimY, fAngle} f27, fMin f26;
+  ours {fMin, fDist} f30, {fMinDist, fAngle} f27, fAimY f26.

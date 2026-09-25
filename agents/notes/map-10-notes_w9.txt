@@ -1,0 +1,25 @@
+map-10 wave 9 (closer): uiProcessInterface
+
+fn_8008F820 (99.61 -> better, 20 diffs raw):
+- APPLIED: `uMask = fn_800142AC(0x20, 1); if (fn_800136DC(k) & uMask)` -> `if (fn_800136DC(k) & fn_800142AC(0x20, 1))`
+  (uMask local removed). MWCC calls the right operand first; fixes `and. r0, r3, r27` operand order. 22 -> 21 aligned.
+- APPLIED: aButtons declared before aPressed (EA's stack: aButtons 0x30, aPressed 0x10). Same score; makes
+  the rest a pure register rotation: EA aButtons ptr r22 / aPressed ptr r23 / i,k counter r24; ours r23/r24/r22.
+- Tried, no gain (quicktrial): full permutation of the 7 movable declarations (2520 orders, aButtons before aPressed): all 20.
+  Every assignment of i/j/k to the four loops (players, pads, k, events): best 20. Block-scoped uMask/k/j/pEvent/pView: same.
+  s32/int arrays, u32/s32 counters (worse), arrays [4] (worse), 4x[4] arrays, 2-D array, struct of arrays (66).
+  continue form, nested ifs, `aButtons[k]` truthiness, operand swaps, for(;;pEvent++), indexed events (worse).
+  counter init moved earlier, while / do-while loop 1. Compilers 2.0/2.0p1/2.6/2.7/1.3.2: 20 or worse.
+- Permuter 20 min on the old base: found only the and-operand fix (score 130 -> 120).
+- Permuter 20 min on the new base (120): best 105 = `u32* pButtons = &aButtons[k];` at the top of the k-loop
+  body, `*pButtons != 0` in the 0x22 test. quicktrial: 21 -> 18 aligned; fixes aPressed's register (r23), leaves
+  aButtons ptr r24 vs EA r22 and the counter r22 vs EA r24 (a swap). pButtons at any of 10 decl positions: same;
+  plus pPressed (either order), pointer in loop 1 too, u32 uButtons copy (32): no gain. NOT applied (partial, odd).
+
+fn_8008F488 (96.25, 3 diffs): EA evaluates the 2nd call's arg1 (p8 + 4) before arg4 (p8->nCount), p8 in r6.
+- Tried, all 3: (void*)/(uptr)/+0/&nCount+1 arg spellings, (u32)/<<0/*1U count, uBase/stride casts, (*p).x forms,
+  static inline wrappers (FixTables(p8), generic Wrap(p,b,s,n) on 2nd / all calls), unused/used locals
+  (ap, p8, u32* p, n count), labels/goto/do-while(0), void-expression, i as int (4), compilers 2.0..2.7.
+- Exact (0) only with a dead `if (!pFE->pFile->p8->apTables && X) {}` before the call, X any non-constant
+  (uBase, p4, nCount, `nCount >= 0`); `if (!apTables) {}` alone, `||` of consts, `0 && x`: 3. Block-structure
+  effect of `&&`, not a label. Not natural code.

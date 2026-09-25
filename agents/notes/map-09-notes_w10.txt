@@ -1,0 +1,53 @@
+map-09 closer wave 10 (2026-09-24 16:40-17:45). Unit GoTerrain (course terrain / object drawing).
+Scripts: w10_*.py (quicktrial variants), w10_744_apply.py / w10_744_apply2.py / w10_744_wrap.py (edits inside
+fn_80033744 only; diff read).
+
+DONE
+- fn_80031E58 78.95 -> 83.62: the default mipmap bias read through `static inline f32 Ter_MipmapBias(s32 iLOD)`
+  (fake match comment). quicktrial 151 -> 128. Left: argument scheduling of the five fn_8003241C calls
+  (EA builds lis/addi of lbl_801D3CB0 for the bias first, `mr r4`/`li r5` last) and the register numbers
+  that follow from it.
+- fn_80033744 81.10 -> 100:
+  * no pState alias: every field read as lbl_801D3CB0.pObjectStateList[i].x (EA reloads the list pointer
+    and indexes with the byte offset every time); uFlags0/uFlags3 s32 (cmpwi on the & 2 test). 204 -> 146.
+  * wave argument `X * (2pi * fn_800351D8(nC, fPeriod / X) / fPeriod)` (divide before the X multiply). 142.
+  * the frame-time products (nFrames, +-6*fTime, +-4*fTime, 5*fTime) written in place inside the loop, not
+    as locals before it: the compiler hoists them into the loop preheader AFTER `i = 0` and the list base,
+    which is where EA's `bl __cvt_fp2unsigned` sits. 142 -> 35.
+  * pose-table loops `k < sizeof(tbl) / sizeof(tbl[0])` (cmplwi; same as u32 k). 33.
+  * tree sway in one expression (no fWave local), fSum/fScale from the global then fNoise read after,
+    `f4 *= fTreeOverdrive; f4 += 0.5f;`. 18 in quicktrial, 99.81 built.
+  * EXACT: `3 == n18` in the two pose-step tests `n18 == 2 || 3 == n18` (permuter, 20 min run stopped
+    after the hit; fake match comment). Before that, compare operand orders of the table tests: worse.
+- fn_80032518 96.27 -> 100: `pSortedPatchList[nRenderPass][nList][(u32)nClip]` (all three reads).
+- fn_80032770 89.62 -> 100: `[(u32)nClip]` in the list read (26 from 38), the first-list check as
+  `for (nClip = 0; nClip < 3; nClip++) if (list[(u32)nClip]) { bAny = 1; break; }` (17), and no ppHead
+  local: the list read in place in the `if` and the `for` init (permuter pointed at it; 0). A quicktrial decl
+  order (bAny, ppHead, nClip, pLens, pPatch, fAC) built WORSE (98.21) before that, reverted.
+- fn_80034CAC 97.21 -> 100: a one-pass pass loop `for (nPass = 0, nPassBit = 1; nPass < 1; nPass++,
+  nPassBit <<= 1)` around the clip loop, `n1C & nPassBit`, nPass as fn_80032B7C's pass argument (the
+  unrolled loop keeps the 1 in r28: `and.`), decls bFirst, i, pPatch, nPass, nPassBit, nClip (quicktrial
+  permutation, 9 -> 0). Replaced the old "Not exact (97.2%)" note on it (now false).
+
+FINDING (verified): with a signed loop index, CodeWarrior folds the array base into one walking pointer;
+EA's code keeps the base and a separate byte offset (base + off, off += 4). An unsigned index (`(u32)i`)
+reproduces EA's form: fn_80032518 96.27 -> 100, fn_80032770 89.62 -> 98.80. (u32 as the variable type does
+not; only the cast in the subscript.) Same idea, fn_80033744: loop invariants written inside the loop get
+hoisted after the loop's own init, which is how EA's code orders them.
+
+TRIED, NO GAIN
+- fn_80031E58 (after the bias inline, 128): no pRef local at all / only the first: 128; inlines for the model
+  pick, the next draw slot, the fog flag (and all three): 128.
+- fn_80031154 (59 quicktrial): pLOD1/pLOD2 as if/else 57 (not applied), default-then-if 61, nested ?: 69;
+  nLast association forms 57, `nLast = a + b; nLast--` 63. EA adds nObjects + nFirstObject first, then
+  i = nObjects - 1, then nLast - 1.
+- fn_80032F88 (99.45): permuter ~20 min -j4: nothing below base (120).
+- fn_80032B7C: inline helper for the two deferred adds (3 signatures): 4 / 4 / 30 vs base 4. Otherwise not retried (1.0f alpha load scheduled late; see map-10 w5).
+- fn_80031E58: wrapper inline for the whole fn_8003241C call (list/count/max/pRef/LOD/alpha, 4 forms, pRef or
+  the list expression as argument): 151 (worse than the bias inline alone); bias via (int)/(s8) cast, pointer
+  arith, (&lbl)->: none; bias/model as block locals, `0.0f < d`, (u8) fog: none; all pRef-> as the list
+  expression, pRef assignments dropped: 151.
+- fn_80032770: pT = &lbl_801D3CB0 local, nList = 3 local, outer 1-pass nList loop, row pointer locals,
+  byte-offset address, flat [0][0][9 + n], u32 loop variable (+ (s32) switch): 36-40.
+- fn_80033744: fold fSum, drop fNoise local (22-35 vs 18); computing the products as locals at the top of the
+  loop body: worse (156-159).

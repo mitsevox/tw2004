@@ -1,0 +1,48 @@
+startUp fn_800B0748 (99.44, slw result r4 vs r0): GC/2.0 compile of startUp: same 99.44 (not the compiler).
+  `lbl_802820F0 &= ~(uBit << (uAddr / 0xFE00))` (uBit=1 unmodified) fixes the slw register but swaps
+  the flags load / mulhwu result (r5/r3 vs r3/r5): 98.6. On that form tried: `x = x & ~..`, `~.. & x`,
+  count-- first, uIndex local, `uAddr -= ` inside, `uAddr = (..)/0xFE00`, `uAddr /= 0xFE00`, uBit
+  assigned late, int uBit (61.9), (int) shift count, uFlags local first/second/late, `-= 1`, `--x`:
+  all 95-98.6. Not solved.
+LLFileIO_Gc File_ReadAsyncEx (99.55, base/element r5/r4 swapped): `1 == sum`, [1]+[0] (99.53), a 2-pass sum
+  loop into nTotal, pQueue kept as the base (pQueue[nPrio].nCount++, (pQueue+n)->, sum through pQueue: 93.8),
+  lbl_8019E868->nCount in the sum: none better. Also `pQueue = lbl_8019E868;` (or &[0]) again right before
+  the sum and the sum through pQueue[0]/pQueue[1] or pQueue->: 99.55 (no change).
+startUp fn_800B0748 more: whenever the shift result is a variable it is coalesced into that variable's
+  register (uBit r4, `uAddr = uBit << ..` r6: 99.44); as a temp (inside the &=) it goes to r0 like EA but
+  the flags load / mulhwu swap r3/r5 (98.6): const uBit, a u32* pFlags, `& ~0`, (u32) casts, `x - 1` for the
+  count, uFlags local round trip (98.1), int n index, uBit = ~uBit (61.9), ^ 0xFFFFFFFF (80.8), (u8) count
+  (73.1): none.
+GameMode26 fn_8010CA2C: nLength first + nLead last / nLead after nMsgs: 98.61 (worse); PlayerNumber_t
+  param breaks the build (gpGame->pfn244 type). Otherwise not retried (3 lanes + 2 permuter runs). Register map for the next lane: EA has
+  nPlayer r28, nLength r27, nLead r22; ours nPlayer r22, nLength r28, nLead r27 (nKind r26, pPlayer r25,
+  bCounts r24, nMsgs r23 agree and follow declaration order).
+GoDynObj fn_8004731C (pState r23 / pLogoB r24 swapped): pState is walked by the compiler (addi r23,r23,1).
+  TW07 DynObj_DrawGolfBalls(bool* boBallShadowDraw) locals: pBallBaseModel, i, PlayerID, ...,
+  pBallLogoModel, pBallLogoModelSide. Tried TW07 decl order pBall,i,pLogoA,pLogoB (arrays first or last),
+  + PlayerNumber_t nPlayer local (98.56), pLogoA/pLogoB block-scoped in the loop (either order: 99.43 / 98.94),
+  a u8* pDraw copy walked in the for (99.43): no.
+uiText fn_800922A8 (ori 4 / ori 0x400 folded): GC/2.0, 2.0p1, 1.3.2, 2.6, 2.7 all 99.78 (not the compiler);
+  a dead store between the two |= (fR = 0, nColor = 0, pRGBA = NULL, `;`), a third |= 0x400: all fold;
+  static inline Or(a, b) returning a | b: 99.18 (constant-propagates to li 0x404); Or(&uFlags, b): folds;
+  `if (uFlags) uFlags |= 0x400` 99.57; `uFlags |= (uFlags & 4) << 8` 99.65. None.
+TerrainData fn_8000C278 (fmuls operand order): no locals at all (pointers in the formula, with/without fNum):
+  83; difference locals (fDCx/fBAz/fBAx/fDCz, 3 orders x 2 product orders): 86-88; fDen built in two
+  statements (`fDen = a*b; fDen -= c*d;` both orders) 94; `-(c*d) + a*b` 96; (fBx-fAx) first: 99.3-99.5;
+  commuted second product + fDx/fBz decl swap + 3 load orders: all 99.55. None.
+UObject fn_800488B4: not retried (map-10 w4/w6 list is long). The 0.5f is lbl_802831E0 (0.5, confirmed).
+ShaderObjectsData fn_80074628 (eLayout r31 vs r27): first switch in a static inline BeginPrim(ePrim, nVerts),
+  and BeginPrim(p[-3], ...) with no ePrim local: 99.94, no change.
+GoStaticCam StaticCam_GetFlybyInformation (block 2 fmadds into f3, EA f31 = fT): writing fT directly
+  (`fT = fT + ..`, `fT += ..`, `(..) + fT`, ratio in fStep, `fEnd = fHiT - fT; fT += fEnd * ..`) puts the
+  fmadds in f31 as EA does but reschedules the call's arguments (EA sets r6 before r4 and f2 before f1): 99.20.
+  With fEnd = fT after it and the call passing fEnd, or `fEnd = fT` inside the call: 99.20. `fEnd = fT;
+  fEnd += ..`: 99.95. So EA's fmadds target is fT, but something else keeps the fEnd-form scheduling.
+  Also: `fT = fEnd = ..` 99.20; fHiT/fStep/fFrom/fLoT/fHiDist as the temp then fT = it: 99.95 (same as fEnd);
+  call(fEnd) with `fT = fEnd` after the call / after fn_80065B20 / after fDist: 98.85 (fEnd goes to f24).
+uiText fn_800922A8 more: `uFlags = uFlags | 4 | 0x400`, `0x400 | (4 | uFlags)`: fold (99.78); `(x|4) + 0x400`
+  99.18; `|= 4; += 0x400` 99.52; inline Flag(n) returning n or 1 << n: fold; empty inline Nop() between,
+  (void)pText, fW = 1.0f, szText = szText, inner block: all fold. Two ifs on the same test: 99.34 (keeps a
+  second fcmpo/ble).
+GoShaderObject_Rain_Gc fn_800B52D4: EA has pData (pRain+4) in r19 and k + the splash-loop counter both in
+  r22; ours pData r22, k r19, splash counter r20. Splash loop run on k or j instead of i: 99.76 (no change).
