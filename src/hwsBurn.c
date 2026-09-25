@@ -517,23 +517,22 @@ SkinMesh* fn_801111E8(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
 // Mark the SkinDesc.p8C entries the a64 entries use (p78) and list them (a7C, a80). nAlign is
 // unused (see fn_80110F2C).
 s32 fn_80111658(HwsBurn* pBurn, s32 nAlign) {
+    int i;
     int nEntries = pBurn->n60;
     int nBits = pBurn->n70;
-    int i;
-    int j;
     int n;
 
-    fn_8001E938(pBurn->p78, nBits);
+    fn_8001E938(pBurn->p78, pBurn->n70);
     for (i = 0; i < nEntries; i++) {
         if (pBurn->a64[i].n18 >= 0 && pBurn->a64[i].n18 < nBits) {
             fn_8001EA34(pBurn->p78, pBurn->a64[i].n18);
         }
     }
     n = 0;
-    for (j = 0; j < nBits; j++) {
-        if (fn_8001E9CC(pBurn->p78, j)) {
-            pBurn->a7C[n] = j;
-            pBurn->a80[j] = n;
+    for (i = 0; i < nBits; i++) {
+        if (fn_8001E9CC(pBurn->p78, i)) {
+            pBurn->a7C[n] = i;
+            pBurn->a80[i] = n;
             n++;
         }
     }
@@ -543,7 +542,7 @@ s32 fn_80111658(HwsBurn* pBurn, s32 nAlign) {
 
 // Copy the listed SkinDesc.p8C entries to pBase + *pOffset.
 SkinDesc8C* fn_8011172C(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
-    SkinDesc* pDesc = pBurn->pDesc;     // fake match: declared first for the register order
+    SkinDesc* pDesc = pBurn->pDesc;
     SkinDesc8C* aOut;
     int i;
     int n = pBurn->n74;
