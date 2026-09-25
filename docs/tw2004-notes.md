@@ -415,31 +415,6 @@ Project conventions
 - Compiler: GC/2.5, flags in `configure.py` (`cflags_base`). Confirmed and unconfirmed flags are
   listed in `compiler.md`.
 
-Progress dashboard
-------------------
-
-`tools/dashboard/server.py` serves a read-only progress page on the LAN (port 8420). It reads
-`build/GW4E69/report.json`, `symbols.txt` and `build/dashboard_history.json`; refreshes every
-20 s. It shows code and data as linked (files marked `Matching`) inside matched, per-file status
-(linked, ready to link = 100% matched but not linked, in progress), matched and linked code per
-commit, and an "in flight" panel: for each worktree in `C:\dev\tw2004-agents` (`--agents` to
-change), the code its last `ninja` report matches or links that main's report does not, compared
-function by function. It runs as the
-Windows scheduled task `tw2004-dashboard` (created with `schtasks`, no admin needed) so it outlives
-the Claude session. It does not survive a reboot; restart it with:
-
-    schtasks /run /tn tw2004-dashboard
-
-Inbound port 8420 needs a Windows firewall allow rule (the PC's network is on the Public profile).
-The server launches no programs (see decomp-notes.md); commit history comes from
-`build/dashboard_history.json`, written by the post-commit hook (`refresh_history.py`). Linked
-bytes per commit are summed from `configure.py` and `splits.txt` at that commit, so they are exact
-for every commit; matched bytes need a build report of that commit (cached in
-`build/dashboard_reports.json`), otherwise the previous value is repeated. The hook caches each
-commit's git reads in the history file, so after the first run it takes well under a second.
-After cloning, run `python tools/dashboard/install_hook.py` once. To stop or restart: kill
-`pythonw3.13.exe` (not `pythonw`), then `schtasks /run /tn tw2004-dashboard`.
-
 Starting a new area: check the references first
 -----------------------------------------------
 
@@ -666,28 +641,7 @@ files are identified.
 CI and decomp.dev
 -----------------
 
-Set up 2026-09-23 following `docs/github_actions.md`.
-
-- `mitsevox/tw2004-build` (**private**) holds only `orig/GW4E69/sys/main.dol` and builds the
-  container `ghcr.io/mitsevox/tw2004-build:main`; `tw2004` has Read access to it (package
-  settings, "Manage Actions access").
-- `.github/workflows/build.yml` builds on every push and uploads `GW4E69_report` (the progress
-  report decomp.dev reads) and `GW4E69_maps`. Unlike the template, it does not pass
-  `--compilers /compilers --binutils /binutils`: the container's packages are older than the
-  versions pinned in `configure.py`, so the build downloads its own, as a local build does.
-- The ProDG step runs the Windows compiler through the build's wrapper (wibo) off Windows
-  (`tools/prodg/prodgcc.py --wrapper`); CI rebuilds `main.dol` byte-identical on Linux.
-- Pitfall: when the build repo is created from its template, the template's initial-commit
-  container build can finish *after* the commit that adds `main.dol` and overwrite the `:main`
-  tag with an empty image ("orig/GW4E69/sys/main.dol not found"). Re-run the latest container
-  build.
-- Pushing workflow files needs the `workflow` scope on the GitHub CLI token
-  (`gh auth refresh -h github.com -s workflow`).
-- decomp.dev only updates instantly if its GitHub App (https://github.com/apps/decomp-dev) is
-  installed on the repo. Without it, the site checks for new reports every 30 minutes, and the
-  "Force refresh" button on https://decomp.dev/manage/mitsevox/tw2004 fetches them right away
-  (from decomp.dev's source, `crates/web/src/cron.rs`). If the site lags, first check that the
-  latest CI run's `GW4E69_report` artifact has the new numbers.
+See [`infrastructure.md`](infrastructure.md) (the build container, CI, the public page, decomp.dev).
 
 The small-function sweep
 ------------------------

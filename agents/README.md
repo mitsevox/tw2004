@@ -52,6 +52,20 @@ added its attempts to the ledger files of the functions it worked on, and that s
 3. Verified findings go into `docs/decomp-notes.md` (a docs commit), and into the next prompts.
 4. Tell the owner what landed, in game terms, with the numbers side by side.
 
+## Outside agents and PC jobs
+
+- **Outside agents** (Gemini, ChatGPT/Codex on the owner's Mac) get a written assignment in
+  `agents/assign/<date>-<who>.md`: disjoint unit lists (two agents on one unit tangle), their own
+  worktree and branch (`gemini/...`, `codex/...`), the merge rules, what to report. The owner hands
+  it over; update the file (a dated UPDATE section on top) when plans change.
+- **Merging their branches**: read the diff, then `git branch -f agent/<name> origin/<branch>` and
+  `python tools/agents/merge.py <name>`. Check what the gates cannot: fake-match labels, logic kept,
+  portability (a pointer in an `int`/`u32` breaks the 64-bit port: `uptr`), no pasted asm (the asm
+  gate refuses it). If two branches solved the same function, keep the cleaner C.
+- **Heavy jobs** (long permuter or sweeper runs) go to the owner's PC runner:
+  `docs/infrastructure.md` "Heavy jobs". Read the `pc-results/` branch, apply a hit by hand.
+- After merging, clean up with the branch-cleanup workflow (`docs/infrastructure.md`).
+
 ## Gates and invariants
 
 - `main.dol: OK` after every merge; only exact 100% counts; no function loses its exact match.

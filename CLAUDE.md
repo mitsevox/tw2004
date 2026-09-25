@@ -6,7 +6,8 @@ C is right, not the goal. Fidelity and parity outrank speed.
 
 Read next, in this order: `agents/state.md` (where things stand, what is running, what is parked),
 `agents/README.md` (how the orchestrator runs agent lanes), then the playbook for your role in
-`agents/roles/`. Agents read `agents/brief.md` first.
+`agents/roles/`. Agents read `agents/brief.md` first. Machines, git flow, CI, the public page,
+decomp.dev and PC jobs: `docs/infrastructure.md`.
 
 ## Hard rules (the owner's; never relax them)
 
