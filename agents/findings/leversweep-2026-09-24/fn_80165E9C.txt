@@ -1,0 +1,40 @@
+UISEvent fn_80165E9C
+base 82, 12 levers, 342 variants (12 singles) in 5 s; best 82
+
+82 [review]
+  - type of i: u32 -> int
+
+82 [review]
+  - type of i: u32 -> s32
+
+82 [safe]
+  - identity inline on `i = fn_8016604C(pStudio, pNodeInfo, uId);`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+82 [safe]
+  - identity inline on `pRateFn = &pStudio->pRateFns[i];`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+82 [safe]
+  - move `char szMsg[256];` to line 1 of the declarations
+
+82 [safe]
+  - move `char szMsg[256];` to line 4 of the declarations
+
+82 [safe]
+  - move `u32 i;` to line 1 of the declarations
+
+82 [safe]
+  - move `u32 i;` to line 2 of the declarations
+
+82 [safe]
+  - move `UISRateFn* pRateFn;` to line 1 of the declarations
+
+82 [safe]
+  - move `UISRateFn* pRateFn;` to line 2 of the declarations
+
+82 [safe]
+  - move `UISRateFn* pRateFn;` to line 3 of the declarations
+
+82 [safe]
+  - type of i: u32 -> unsigned int

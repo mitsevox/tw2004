@@ -1,0 +1,28 @@
+PsMgr fn_800A2A80
+base 9999, 3 levers, 6 variants (3 singles) in 1 s; best 9999
+
+9999 [safe]
+  - move `f32 fStrength;` to line 1 of the declarations
+
+9999 [safe]
+  - identity inline on `fStrength = *pArg;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+9999 [safe]
+  - identity inline on `fStrength = 0.9f;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+9999 [safe]
+  - move `f32 fStrength;` to line 1 of the declarations
+  - identity inline on `fStrength = *pArg;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+9999 [safe]
+  - move `f32 fStrength;` to line 1 of the declarations
+  - identity inline on `fStrength = 0.9f;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+9999 [safe]
+  - identity inline on `fStrength = *pArg;`
+  - identity inline on `fStrength = 0.9f;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.

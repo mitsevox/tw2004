@@ -96,15 +96,17 @@ void fn_800CC1EC(Character* pChar, SkinChoices* pChoices) {
 
 // Gives the six skins of p16D8 their choices from pChoices, in all four copies.
 void fn_800CC408(Character* pChar, SkinChoices* pChoices) {
-    int j;
     int i;
+    int j;
 
     if (pChar == NULL || pChoices == NULL || pChar->p16D8 == NULL) return;
     for (i = 0; i < 6; i++) {
         for (j = 0; j < 4; j++) {
-            Mem_cpy(pChar->p16D8->apSkins[i]->aParts[j], pChoices->aSkinParts[i],
+            // fake match: the (u32) on j (0-3, so the same index) keeps the array start and the offset
+            // apart, as EA's code does (docs/decomp-notes.md, the (u32) index cast)
+            Mem_cpy(pChar->p16D8->apSkins[i]->aParts[(u32)j], pChoices->aSkinParts[i],
                     fn_800CCA40(pChar->p16D8->apSkins[i]) * sizeof(SkinChoice));
-            Mem_cpy(pChar->p16D8->apSkins[i]->aSets[j], pChoices->aSkinSets[i],
+            Mem_cpy(pChar->p16D8->apSkins[i]->aSets[(u32)j], pChoices->aSkinSets[i],
                     fn_800CCEA0(pChar->p16D8->apSkins[i]) * sizeof(SkinChoice));
         }
     }

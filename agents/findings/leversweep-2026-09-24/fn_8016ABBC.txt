@@ -1,0 +1,44 @@
+UISScreen fn_8016ABBC
+base 16, 6 levers, 23 variants (6 singles) in 2 s; best 16
+
+16 [safe]
+  - for loop #1 (`for (i = 0; i < nGroups; i++) {`) as a while loop
+
+16 [safe]
+  - for loop #2 (`for (i = 0; i < nEntries; i++) {`) as a while loop
+
+16 [safe]
+  - move `u32 i;` to line 1 of the declarations
+
+16 [safe]
+  - type of i: u32 -> unsigned int
+
+16 [review]
+  - type of i: u32 -> int
+
+16 [review]
+  - type of i: u32 -> s32
+
+16 [safe]
+  - move `u32 i;` to line 1 of the declarations
+  - type of i: u32 -> unsigned int
+
+16 [review]
+  - move `u32 i;` to line 1 of the declarations
+  - type of i: u32 -> int
+
+16 [review]
+  - move `u32 i;` to line 1 of the declarations
+  - type of i: u32 -> s32
+
+16 [safe]
+  - for loop #1 (`for (i = 0; i < nGroups; i++) {`) as a while loop
+  - move `u32 i;` to line 1 of the declarations
+
+16 [safe]
+  - for loop #1 (`for (i = 0; i < nGroups; i++) {`) as a while loop
+  - type of i: u32 -> unsigned int
+
+16 [review]
+  - for loop #1 (`for (i = 0; i < nGroups; i++) {`) as a while loop
+  - type of i: u32 -> int

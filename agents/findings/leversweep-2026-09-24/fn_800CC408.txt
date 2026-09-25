@@ -1,0 +1,62 @@
+SkinPart fn_800CC408
+base 25, 11 levers, 39 variants (11 singles) in 2 s; best 0 EXACT
+
+0 (exact) [review]
+  - (u32) cast on every [j] index
+  - move `int i;` to line 1 of the declarations
+
+11 [review]
+  - (u32) cast on every [j] index
+
+11 [review]
+  - (u32) cast on every [j] index
+  - for loop #1 (`for (i = 0; i < 6; i++) {`) as a while loop
+
+11 [review]
+  - (u32) cast on every [j] index
+  - for loop #2 (`for (j = 0; j < 4; j++) {`) as a while loop
+
+11 [review]
+  - (u32) cast on every [j] index
+  - type of i: int -> s32
+
+11 [review]
+  - (u32) cast on every [j] index
+  - type of i: int -> u32
+
+11 [review]
+  - (u32) cast on every [j] index
+  - move `int j;` to line 1 of the declarations
+
+11 [review]
+  - (u32) cast on every [j] index
+  - type of j: int -> s32
+
+25 [safe]
+  - for loop #1 (`for (i = 0; i < 6; i++) {`) as a while loop
+
+25 [safe]
+  - for loop #2 (`for (j = 0; j < 4; j++) {`) as a while loop
+
+25 [safe]
+  - type of i: int -> s32
+
+25 [review]
+  - type of i: int -> u32
+
+changed lines of the best variant (base.c):
+@@ -1,4 +1,4 @@
+-void fn_800CC408(Character* pChar, SkinChoices* pChoices) {
++void fn_800CC408(Character* pChar, SkinChoices* pChoices) {int i;
++
+ int j;
+-int i;
+ if (pChar == 0 || pChoices == 0 || pChar->p16D8 == 0 ) return;
+@@ -6,5 +6,5 @@
+ for (j = 0; j < 4; j++) {
+-Mem_cpy(pChar->p16D8->apSkins[i]->aParts[j], pChoices->aSkinParts[i],
++Mem_cpy(pChar->p16D8->apSkins[i]->aParts[(u32)j], pChoices->aSkinParts[i],
+ fn_800CCA40(pChar->p16D8->apSkins[i]) * sizeof(SkinChoice));
+-Mem_cpy(pChar->p16D8->apSkins[i]->aSets[j], pChoices->aSkinSets[i],
++Mem_cpy(pChar->p16D8->apSkins[i]->aSets[(u32)j], pChoices->aSkinSets[i],
+ fn_800CCEA0(pChar->p16D8->apSkins[i]) * sizeof(SkinChoice));

@@ -1,0 +1,82 @@
+GoShaderObject_Grass_Gc SD_vShaderObject_Grass_Static_Render
+base 74, 699 levers, 42608 variants (699 singles) in 360 s; best 55
+
+55 [safe]
+  - move `GrassWord* pVert = pData->apVerts[nSet][nRun];` to line 26 of the declarations
+  - move `int nPass;` to line 7 of the declarations
+  - move `f32 fPerX;` to line 17 of the declarations
+
+55 [safe]
+  - move `GrassWord* pVert = pData->apVerts[nSet][nRun];` to line 26 of the declarations
+  - move `int nPass;` to line 7 of the declarations
+  - move `f32 fPerX;` to line 18 of the declarations
+
+55 [safe]
+  - move `GrassWord* pVert = pData->apVerts[nSet][nRun];` to line 26 of the declarations
+  - move `int nPass;` to line 7 of the declarations
+  - move `f32 fPerX;` to line 19 of the declarations
+
+55 [safe]
+  - move `GrassWord* pVert = pData->apVerts[nSet][nRun];` to line 26 of the declarations
+  - move `int nPass;` to line 7 of the declarations
+  - move `f32 fPerX;` to line 20 of the declarations
+
+55 [safe]
+  - move `GrassWord* pVert = pData->apVerts[nSet][nRun];` to line 26 of the declarations
+  - move `int nPass;` to line 7 of the declarations
+  - move `f32 fPerX;` to line 23 of the declarations
+
+55 [safe]
+  - move `GrassWord* pVert = pData->apVerts[nSet][nRun];` to line 26 of the declarations
+  - move `int nPass;` to line 7 of the declarations
+  - move `f32 fPerX;` to line 24 of the declarations
+
+55 [safe]
+  - move `GrassWord* pVert = pData->apVerts[nSet][nRun];` to line 26 of the declarations
+  - move `int nPass;` to line 7 of the declarations
+  - move `f32 fPerX;` to line 25 of the declarations
+
+55 [safe]
+  - move `GrassWord* pVert = pData->apVerts[nSet][nRun];` to line 26 of the declarations
+  - move `int nPass;` to line 7 of the declarations
+  - move `f32 fPerX;` to line 16 of the declarations
+
+55 [safe]
+  - move `GrassWord* pVert = pData->apVerts[nSet][nRun];` to line 26 of the declarations
+  - move `int nPass;` to line 7 of the declarations
+  - move `f32 fPerX;` to line 22 of the declarations
+
+55 [safe]
+  - move `GrassWord* pVert = pData->apVerts[nSet][nRun];` to line 26 of the declarations
+  - move `int nPass;` to line 7 of the declarations
+  - move `f32 fPerX;` to line 21 of the declarations
+
+55 [safe]
+  - move `GrassWord* pVert = pData->apVerts[nSet][nRun];` to line 26 of the declarations
+  - move `int nPass;` to line 7 of the declarations
+  - move `f32 fPerX;` to line 26 of the declarations
+
+55 [safe]
+  - move `GrassWord* pVert = pData->apVerts[nSet][nRun];` to line 26 of the declarations
+  - move `int nPass;` to line 7 of the declarations
+  - move `f32 fPerX;` to line 27 of the declarations
+
+changed lines of the best variant (base.c):
+@@ -6,3 +6,3 @@
+ s32 nVerts = pData->anVerts[nSet][nRun];
+-GrassWord* pVert = pData->apVerts[nSet][nRun];
++int nPass;
+ f32 vEye[3];
+@@ -10,3 +10,2 @@
+ f32 fDist;
+-f32 fPerX;
+ f32 fPerZ;
+@@ -16,2 +15,3 @@
+ f32 fTexT;
++f32 fPerX;
+ f32 fShade;
+@@ -24,3 +24,3 @@
+ int nInRow;
+-int nPass;
++GrassWord* pVert = pData->apVerts[nSet][nRun];
+ int nRow;

@@ -1,0 +1,41 @@
+UISApi fn_80169858
+base 57, 32 levers, 1799 variants (32 singles) in 17 s; best 57
+
+57 [safe]
+  - move `UISScreen* pScreen;` to line 1 of the declarations
+
+57 [safe]
+  - move `UISScreen* pScreen;` to line 2 of the declarations
+
+57 [safe]
+  - move `UISScreen* pScreen;` to line 3 of the declarations
+
+57 [safe]
+  - move `UISScreen* pScreen;` to line 6 of the declarations
+
+57 [safe]
+  - move `u8 bOut;` to line 5 of the declarations
+
+57 [safe]
+  - type of nIndex: u32 -> unsigned int
+
+57 [review]
+  - type of nIndex: u32 -> int
+
+57 [review]
+  - type of nIndex: u32 -> s32
+
+57 [review]
+  - type of bFixed: s32 -> u32
+
+57 [safe]
+  - identity inline on `bFixed = fn_80169DC4(pScreen->pData);`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+57 [safe]
+  - identity inline on `bOut = 0;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+57 [safe]
+  - identity inline on `bOut = 0;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
