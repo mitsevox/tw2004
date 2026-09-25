@@ -268,9 +268,9 @@ void fn_800949D0(SD_SShaderObject_Static* pObject) {
         fn_80094534(pCamera->viewMtx, &pSys->shape, pVerts, pAges, n);
         n = pSys->nCount - nStart;
         if (nLive > n) {
-            fn_80094534(pCamera->viewMtx, &pSys->shape,
-                        (ParticleVertex*)lbl_802813A8->apBuffers[nBuf] + pSys->nFirst,
-                        (f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst, nLive - n);
+            pVerts = (ParticleVertex*)lbl_802813A8->apBuffers[nBuf] + pSys->nFirst;
+            pAges = (f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst;
+            fn_80094534(pCamera->viewMtx, &pSys->shape, pVerts, pAges, nLive - n);
         }
         fn_80012F34(1);
         fn_80012F50(1, 6, 0x80);
@@ -284,6 +284,7 @@ void fn_800949D0(SD_SShaderObject_Static* pObject) {
 void fn_80094B84(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {
     ParticleSystem* pSys;
     int nBuf;
+    int nOther;
     u32 nDead;
     u32 nStart;
     u32 nLive;
@@ -318,15 +319,16 @@ void fn_80094B84(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {
         }
         nLive -= nDead;
     }
-    nEnd = pSys->anStart[1 - nBuf] + pSys->anLive[1 - nBuf];
+    nOther = 1 - nBuf;
+    nEnd = pSys->anStart[nOther] + pSys->anLive[nOther];
     if (nEnd >= pSys->nCount) {
         nEnd -= pSys->nCount;
     }
     while (i != nEnd) {
         *((f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst + i) =
-            *((f32*)lbl_802813A8->apBuffers[1 - nBuf + 2] + pSys->nFirst + i) + pMsg->u.age.fCarried;
+            *((f32*)lbl_802813A8->apBuffers[nOther + 2] + pSys->nFirst + i) + pMsg->u.age.fCarried;
         // EA copies four slots from each particle's on; the next three are other particles'
-        pSrc = (ParticleVertex*)lbl_802813A8->apBuffers[1 - nBuf] + pSys->nFirst + i;
+        pSrc = (ParticleVertex*)lbl_802813A8->apBuffers[nOther] + pSys->nFirst + i;
         pDst = (ParticleVertex*)lbl_802813A8->apBuffers[nBuf] + pSys->nFirst + i;
         pDst[0] = pSrc[0];
         pDst[1] = pSrc[1];
