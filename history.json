@@ -78,5 +78,21 @@
 "matched_functions": 7527,
 "total_functions": 7647,
 "exact": 7527
+},
+{
+"commit": "01fd1a7",
+"sha": "01fd1a75dcefc236bb72582cdc12d43ba2d792fb",
+"time": 1790352680,
+"subject": "perm_objdump.py: a failed stdout write (OSError, or no stdout at all) no longer ends a long permuter run",
+"report": true,
+"matched_code": 1444328,
+"complete_code": 1150048,
+"matched_data": 701147,
+"complete_data": 844511,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7527,
+"total_functions": 7647,
+"exact": 7527
 }
 ]
