@@ -39825,5 +39825,21 @@
 "matched_functions": 7528,
 "total_functions": 7647,
 "exact": 7528
+},
+{
+"commit": "fcb1181",
+"sha": "fcb118118f55752dd0b68dc6b1796030236e3799",
+"time": 1790354506,
+"subject": "Cleanup (owner-approved): remove agents/notes (collected into agents/tried), install_hook.py (local dashboard retired), phase2b.py (audit done), backslash_scan.py (merge.py guards it); SDK rule: no official SDK files, decompiled code from public decomps is fine",
+"report": true,
+"matched_code": 1445112,
+"complete_code": 1150048,
+"matched_data": 701147,
+"complete_data": 844511,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7528,
+"total_functions": 7647,
+"exact": 7528
 }
 ]
