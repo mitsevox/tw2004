@@ -293,8 +293,7 @@ int File_ReadAsyncEx(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDon
             lbl_8019E868[nPrio].pPrev = pReq;
         }
         pQueue = lbl_8019E868;
-        pQueue += nPrio;
-        pQueue->nCount++;
+        (pQueue += nPrio)->nCount++;   // fake match: compound expression for register order (r4/r5)
         pReq->nFile = hFile;
         pReq->pBuf = pDst;
         pReq->nOffset = uOffset;
