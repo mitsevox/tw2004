@@ -8,6 +8,10 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-25, n-ll: the whole header swap (32-bit, width and height, sibling fn_800B965C's
+  spellings) as one static inline on the PictFile, used at both swaps / the first only / returning
+  the pointer / with its own parameter name: 14 -> 19 aligned (same as the sibling width expression
+  at the first swap: correct mask, too-early scheduling). No change kept.
 - 2026-09-25, ChatGPT round 3: baseline real unit 93.08182% (LLPictInt 2/3 exact), quicktrial 15
   differing instructions. Target's 32-bit header store loads `uC` into r4 and delays `stwbrx`
   until after allocator-argument setup; ours uses r3 and stores earlier. Both width swaps differ

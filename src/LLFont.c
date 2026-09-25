@@ -713,8 +713,8 @@ int fn_80011D0C(LLFont* pFont, UFontContext* pCtx, u8 bDraw, char* sz) {
 u32 fn_8001208C(UFontContext* pCtx, u8 r, u8 g, u8 b, u8 a, f32 fXScale, f32 fYScale, f32 fX,
                 f32 fY) {
     GXColor color;
-    UFontStop* pStop;
     UFontStop* pNext;
+    UFontStop* pStop;
     f32 fU;
     f32 fV;
     f32 fT;
@@ -722,8 +722,8 @@ u32 fn_8001208C(UFontContext* pCtx, u8 r, u8 g, u8 b, u8 a, f32 fXScale, f32 fYS
 
     fU = fX * fXScale;
     fV = fY * fYScale;
-    pStop = pCtx->a14;
-    pNext = pStop + 1;
+    pStop = &pCtx->a14[0];
+    pNext = &pCtx->a14[1];
     fU -= pCtx->f04;
     fU *= pCtx->f0C;
     fU -= (s32)fU;
