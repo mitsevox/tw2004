@@ -8,6 +8,8 @@
 
 #include "core/audtrack.h"
 
+AudSeqHandler lbl_801F1880[13];
+
 // Picks a track's next variation, the way its template's n1 says: 4 and up in order, 2 at random
 // but not the same twice, 3 at random but not the one the template played last, others at random.
 void fn_800AA4BC(AudTrack* pTrack) {
@@ -120,7 +122,8 @@ void fn_800AA744(AudSeqEvent* pEvent, AudTrack* pTrack) {
     AudVoiceParams* pParams;
     f32 f;
 
-    pTone = fn_800AB384(pTmpl->data.pBank, pEvent->n3);
+    // fake match: the (u8) changes nothing; it gives EA's instruction order.
+    pTone = fn_800AB384(pTmpl->data.pBank, (u8)pEvent->n3);
     fAttn = fn_800A85FC(pTrack->f48, Mas_GetSubmix(pTmpl->data.pBank->n3));
     nVolume = fn_800A85FC((f32)(pEvent->n4 << 7), fAttn);
     bLoops = pTone->n10 & 1;
@@ -177,18 +180,22 @@ void fn_800AA744(AudSeqEvent* pEvent, AudTrack* pTrack) {
     pParams->flags.n = 0;
 }
 
+// fake match: an identity read (u8 -> s8 -> u8 gives back the same byte); it gives EA's register
+// order.
+static inline u8 fn_800AA9EC_Read(s8 n) { return n; }
+
 // Event: lets the voices playing tone n3 end, starting from the channel of the last note.
 void fn_800AA9EC(AudSeqEvent* pEvent, AudTrack* pTrack) {
     AudSeqTone* pTone;
-    u8 i;
     AudTrackTmpl* pTmpl;
     s8 nChannel;
+    u8 i;           // fake match: declared after nChannel for EA's register order
     AudVoice* pVoice;
 
     pTmpl = pTrack->pTmpl;
     pTone = fn_800AB384(pTmpl->data.pBank, pEvent->n3);
     if (pTone == NULL) return;
-    nChannel = pTrack->u.seq.n65 - 1;
+    nChannel = fn_800AA9EC_Read(pTrack->u.seq.n65) - 1;
     if (nChannel < 0) {
         nChannel = 0;
     }
@@ -213,7 +220,7 @@ void fn_800AAAA4(AudSeqEvent* pEvent, AudTrack* pTrack) {
     AudSource* pSource;
     u8 n;
 
-    n = pEvent->n3;
+    n = (u8)pEvent->n3;     // fake match: the (u8) changes nothing; it gives EA's instructions
     if (n == 0xFF) {
         pTarget = pTrack;
     } else {

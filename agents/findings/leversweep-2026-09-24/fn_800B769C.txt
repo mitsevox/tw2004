@@ -1,0 +1,107 @@
+rcmp_mad_codec fn_800B769C
+base 78, 150 levers, 21119 variants (150 singles) in 224 s; best 15
+
+15 [safe]
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+15 [safe]
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - move `int nLen;` to line 5 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+15 [safe]
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - move `int nLen;` to line 6 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+15 [safe]
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - move `int nLen;` to line 9 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+15 [safe]
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - for loop #11 (`for (i = 0; i < 32; i++) {`) as a while loop
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+15 [safe]
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - move `int i;` to line 5 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+15 [safe]
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - move `int nCount;` to line 8 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+15 [safe]
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - move `int nCount;` to line 9 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+15 [safe]
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - move `int nCount;` to line 10 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+15 [safe]
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - move `s32 nCode;` to line 6 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+15 [safe]
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - move `int nLen;` to line 10 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+15 [safe]
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+  - move `int nLen;` to line 11 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+changed lines of the best variant (base.c):
+@@ -1 +1,4 @@
++static inline u32 __lv_uEntry_1(u32 v) { return v; }
++static inline u32 __lv_uEntry_2(u32 v) { return v; }
++static inline u32 __lv_uEntry_3(u32 v) { return v; }
+ void fn_800B769C(void) {
+@@ -45,3 +48,3 @@
+ nCount = 1 << (8 - nBits);
+-uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6) & 0x3F0000))) ;
++uEntry = __lv_uEntry_1(((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6) & 0x3F0000))));
+ for (j = 0; j < nCount; j++) {
+@@ -59,3 +62,3 @@
+ nCount = 1 << (8 - nBits);
+-uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6) & 0x3F0000))) ;
++uEntry = __lv_uEntry_2(((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6) & 0x3F0000))));
+ for (j = 0; j < nCount; j++) {
+@@ -67,3 +70,3 @@
+ nCount = 1 << (8 - nBits);
+-uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6) & 0x3F0000))) ;
++uEntry = __lv_uEntry_3(((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6) & 0x3F0000))));
+ for (j = 0; j < nCount; j++) {

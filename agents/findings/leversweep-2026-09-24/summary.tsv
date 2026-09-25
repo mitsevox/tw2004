@@ -51,3 +51,30 @@ SkinPart	fn_800CE8C0	26	10		safe	move `SkinDesc* pDesc;` to line 9 of the declar
 gocamscripts	fn_8003F2E0	8	8		safe	move `f32 v[4];` to line 1 of the declarations
 UISScreen	fn_8016B4D4	46	26		safe	move `s32 nStep;` to line 8 of the declarations
 GoTerrain	fn_80031154	59	31		safe	type of nLast: s32 -> int + move `s32 nObjects;` to line 28 of the declarations
+Golfer	AI_ChooseTarget	112	97		review	(u32) cast on every [k] index + move `int nKind;` to line 1 of the declarations
+DepthField	DF_vDrawBufferToScreen	79	79		safe	move `int bOdd;` to line 8 of the declarations
+PsMgr	fn_800A2A80	9999	9999		safe	move `f32 fStrength;` to line 1 of the declarations
+rcmp_mad_codec	fn_800B769C	78	15		safe	identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6` + identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6` + identity inline on `uEntry = ((nBits) | (((u32)(nValue) << 22) | (((nValue) << 6`
+UISApi	fn_80169858	57	57		safe	move `UISScreen* pScreen;` to line 1 of the declarations
+hlaudtrackseq	fn_800AAAA4	2	2		safe	identity inline on `pTarget = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[n`
+GoGreenGrid	GR_BuildGridRenderData	156	135		review	identity inline on `nCol = n / lbl_802813C0->anRows[nView];` + move `int n;` to line 24 of the declarations + do/while loop #1 as a while loop
+SkinPart	fn_800CC408	25	0	EXACT	review	(u32) cast on every [j] index + move `int i;` to line 1 of the declarations
+UISScreen	fn_8016AEEC	40	25		safe	identity inline on `bLast = (nMsg == -1);` + move `u32 j;` to line 1 of the declarations
+SkinPart	fn_800CE660	58	31		safe	identity inline on `pSkin = apSkins[i];` + move `int j;` to line 1 of the declarations + move `u8 bAll;` to line 6 of the declarations
+hwsBurn	fn_80110A38	21	11		safe	identity inline on `pIter = fn_80113910((u8*)&iterBuf, &args);`
+char	fn_80019798	32	32		safe	move `SkinListEntry* pList;` to line 9 of the declarations
+UISApi	fn_80169308	23	13		safe	identity inline on `i = pStudio->n5C;` + move `UISFrame* pFrame;` to line 1 of the declarations
+GoShaderObject_Grass_Gc	SD_vShaderObject_Grass_Static_Render	74	55		safe	move `GrassWord* pVert = pData->apVerts[nSet][nRun];` to line 26 of the declarations + move `int nPass;` to line 7 of the declarations + move `f32 fPerX;` to line 17 of the declarations
+UIStudio	fn_80168918	27	22		safe	move `UISNode* pNode;` to line 13 of the declarations + move `UISNode* pLinkNode;` to line 10 of the declarations
+UISApi	fn_80169590	88	83		safe	move `s16 nPrevScreen;` to line 1 of the declarations
+rcmp_mad_codec	fn_800B8C54	24	9		safe	move `s32 z10;` to line 13 of the declarations + move `s32 e2;` to line 17 of the declarations + move `s32 z12;` to line 15 of the declarations
+UISEvent	fn_80165670	34	34		safe	identity inline on `nIndex = fn_8016C6C4(pStudio, pData->aw[0], pData->aw[1]);`
+UISApi	fn_80168CD8	29	-			
+GoShaderObjectContainer_OBFData_Gc	fn_8006F650	25	25		safe	for loop #1 (`for (i = 0; fRoll > fSum; i++) {`) as a while loop
+GoShaderObject_Particle_Gc	fn_80094534	121	119		safe	identity inline on `fDiff = pVerts->vC[0] * pShape->f54;` + identity inline on `fDiff = fDiff - pShape->v60[0] * pShape->f54;` + identity inline on `fEase = fEase * fEase;`
+uiProcessInterface	fn_8008F488	3	3		safe	for loop #1 (`for (i = 0; i < pFE->pFile->p8->nCount; i++) {`) as a while loop
+UISScreen	fn_8016ABBC	16	16		safe	for loop #1 (`for (i = 0; i < nGroups; i++) {`) as a while loop
+SkinPart	fn_800CEBE8	9	9		safe	move `int i;` to line 3 of the declarations
+MC	fn_8009F8C8	20	20		safe	for loop #8 (`for (j = 0; j < 2; j++) {`) as a while loop
+Code8002EE1C	Session_SetupProfiles	14	14		safe	for loop #1 (`for (i = 0; i < pSession->nNumPlayers; i++) {`) as a while loop
+UISEvent	fn_80165E9C	82	82		review	type of i: u32 -> int

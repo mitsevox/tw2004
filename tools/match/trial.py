@@ -24,7 +24,7 @@ class Trial:
         self.base = self.path.read_text(encoding='utf-8')
 
     def _write(self, s):
-        self.path.write_text(s, encoding='utf-8', newline='\n')
+        self.path.write_text(s, encoding='utf-8')
 
     def score(self, fn):
         r = subprocess.run('ninja build/GW4E69/report.json', shell=True, cwd=ROOT,

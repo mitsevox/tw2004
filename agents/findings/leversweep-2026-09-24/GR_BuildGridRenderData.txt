@@ -1,0 +1,102 @@
+GoGreenGrid GR_BuildGridRenderData
+base 156, 638 levers, 30493 variants (638 singles) in 361 s; best 135
+
+135 [review]
+  - identity inline on `nCol = n / lbl_802813C0->anRows[nView];`
+  - move `int n;` to line 24 of the declarations
+  - do/while loop #1 as a while loop
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+135 [review]
+  - identity inline on `nCol = n / lbl_802813C0->anRows[nView];`
+  - move `int n;` to line 24 of the declarations
+  - do/while loop #2 as a while loop
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+135 [review]
+  - identity inline on `nCol = n / lbl_802813C0->anRows[nView];`
+  - move `int n;` to line 25 of the declarations
+  - do/while loop #1 as a while loop
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+135 [review]
+  - identity inline on `nCol = n / lbl_802813C0->anRows[nView];`
+  - move `int n;` to line 25 of the declarations
+  - do/while loop #2 as a while loop
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+140 [safe]
+  - identity inline on `nCol = n / lbl_802813C0->anRows[nView];`
+  - move `int n;` to line 24 of the declarations
+  - move `int k;` to line 21 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+141 [safe]
+  - identity inline on `nCol = n / lbl_802813C0->anRows[nView];`
+  - move `int n;` to line 24 of the declarations
+  - move `f32 fDirX;` to line 18 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+141 [safe]
+  - identity inline on `nCol = n / lbl_802813C0->anRows[nView];`
+  - move `int n;` to line 24 of the declarations
+  - move `f32 fDirX;` to line 19 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+141 [safe]
+  - identity inline on `nCol = n / lbl_802813C0->anRows[nView];`
+  - move `int n;` to line 24 of the declarations
+  - move `f32 fDirX;` to line 20 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+141 [safe]
+  - identity inline on `nCol = n / lbl_802813C0->anRows[nView];`
+  - move `int n;` to line 24 of the declarations
+  - move `f32 fDirX;` to line 13 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+141 [safe]
+  - identity inline on `nCol = n / lbl_802813C0->anRows[nView];`
+  - move `int n;` to line 24 of the declarations
+  - move `f32 fDirX;` to line 25 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+141 [safe]
+  - identity inline on `nCol = n / lbl_802813C0->anRows[nView];`
+  - move `int n;` to line 24 of the declarations
+  - move `f32 fDirX;` to line 21 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+141 [safe]
+  - identity inline on `nCol = n / lbl_802813C0->anRows[nView];`
+  - move `int n;` to line 24 of the declarations
+  - move `f32 fDirX;` to line 22 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+changed lines of the best variant (base.c):
+@@ -1 +1,2 @@
++static inline int __lv_nCol_1(int v) { return v; }
+ void GR_BuildGridRenderData(int nView) {
+@@ -17,3 +18,2 @@
+ f32 fPeriod;
+-int n;
+ int nRow;
+@@ -23,2 +23,3 @@
+ int bInGap;
++int n;
+ int k;
+@@ -62,3 +63,3 @@
+ k = 0;
+-do {
++while (k < 2) {
+ lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 0] = fX;
+@@ -83,3 +84,3 @@
+ lbl_802813C0->nVerts++;
+-} while (k < 2);
++}
+ fPrev = fHeight;
+@@ -91,3 +92,3 @@
+ for (n = 0; n < lbl_802813C0->nCols * lbl_802813C0->anRows[nView]; n++) {
+-nCol = n / lbl_802813C0->anRows[nView];
++nCol = __lv_nCol_1(n / lbl_802813C0->anRows[nView]);
+ nRow = n % lbl_802813C0->anRows[nView];

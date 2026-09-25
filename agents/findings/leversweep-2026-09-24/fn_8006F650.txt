@@ -1,0 +1,44 @@
+GoShaderObjectContainer_OBFData_Gc fn_8006F650
+base 25, 7 levers, 53 variants (7 singles) in 2 s; best 25
+
+25 [safe]
+  - for loop #1 (`for (i = 0; fRoll > fSum; i++) {`) as a while loop
+
+25 [safe]
+  - for loop #2 (`for (i = 0; fRoll > fSum; i++) {`) as a while loop
+
+25 [safe]
+  - move `u32 uSeed;` to line 1 of the declarations
+
+25 [safe]
+  - type of uSeed: u32 -> unsigned int
+
+25 [review]
+  - type of uSeed: u32 -> int
+
+25 [review]
+  - type of uSeed: u32 -> s32
+
+25 [safe]
+  - for loop #1 (`for (i = 0; fRoll > fSum; i++) {`) as a while loop
+  - move `u32 uSeed;` to line 1 of the declarations
+
+25 [safe]
+  - for loop #1 (`for (i = 0; fRoll > fSum; i++) {`) as a while loop
+  - type of uSeed: u32 -> unsigned int
+
+25 [review]
+  - for loop #1 (`for (i = 0; fRoll > fSum; i++) {`) as a while loop
+  - type of uSeed: u32 -> int
+
+25 [review]
+  - for loop #1 (`for (i = 0; fRoll > fSum; i++) {`) as a while loop
+  - type of uSeed: u32 -> s32
+
+25 [review]
+  - for loop #2 (`for (i = 0; fRoll > fSum; i++) {`) as a while loop
+  - type of uSeed: u32 -> s32
+
+25 [safe]
+  - move `u32 uSeed;` to line 1 of the declarations
+  - type of uSeed: u32 -> unsigned int

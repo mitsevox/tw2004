@@ -1,0 +1,100 @@
+SkinPart fn_800CE660
+base 58, 121 levers, 14886 variants (121 singles) in 143 s; best 31
+
+31 [safe]
+  - identity inline on `pSkin = apSkins[i];`
+  - move `int j;` to line 1 of the declarations
+  - move `u8 bAll;` to line 6 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - identity inline on `pSkin = apSkins[i];`
+  - move `int j;` to line 1 of the declarations
+  - move `u8 bAll;` to line 7 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - identity inline on `pSkin = apSkins[i];`
+  - move `int j;` to line 2 of the declarations
+  - move `u8 bAll;` to line 7 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - identity inline on `pSkin = apSkins[i];`
+  - move `int j;` to line 2 of the declarations
+  - move `u8 bAll;` to line 6 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - identity inline on `pSkin = apSkins[i];`
+  - move `int j;` to line 3 of the declarations
+  - move `u8 bAll;` to line 7 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - identity inline on `pSkin = apSkins[i];`
+  - move `int j;` to line 3 of the declarations
+  - move `u8 bAll;` to line 6 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - identity inline on `pSkin = apSkins[i];`
+  - move `SkinDesc* pDesc;` to line 7 of the declarations
+  - move `u8 bAll;` to line 7 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - identity inline on `pSkin = apSkins[i];`
+  - move `int j;` to line 4 of the declarations
+  - move `u8 bAll;` to line 7 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - identity inline on `pSkin = apSkins[i];`
+  - move `int j;` to line 4 of the declarations
+  - move `u8 bAll;` to line 6 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - identity inline on `pSkin = apSkins[i];`
+  - move `int j;` to line 1 of the declarations
+  - move `u8 bAll;` to line 6 of the declarations
+  - move `Skin* pSkin;` to line 11 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - identity inline on `pSkin = apSkins[i];`
+  - move `int j;` to line 1 of the declarations
+  - move `u8 bAll;` to line 6 of the declarations
+  - move `Skin* pSkin;` to line 8 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+31 [safe]
+  - identity inline on `pSkin = apSkins[i];`
+  - move `int j;` to line 1 of the declarations
+  - move `u8 bAll;` to line 6 of the declarations
+  - move `Skin* pSkin;` to line 9 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+changed lines of the best variant (base.c):
+@@ -1,2 +1,4 @@
+-s32 fn_800CE660(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, int nIds, int nCopy) {
++static inline Skin * __lv_pSkin_0(Skin * v) { return v; }
++s32 fn_800CE660(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, int nIds, int nCopy) {int j;
++
+ s32 nList;
+@@ -4,4 +6,4 @@
+ SkinDesc* pDesc;
++u8 bAll;
+ int i;
+-int j;
+ int k;
+@@ -10,3 +12,2 @@
+ s32 nOption;
+-u8 bAll;
+ n = 0;
+@@ -20,3 +21,3 @@
+ for (i = 0; i < nSkins; i++) {
+-pSkin = apSkins[i];
++pSkin = __lv_pSkin_0(apSkins[i]);
+ if (pSkin != 0 && pSkin->pModel != 0 && (pDesc = pSkin->pModel->pDesc) != 0 ) {
