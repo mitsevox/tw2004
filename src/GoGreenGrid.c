@@ -365,20 +365,31 @@ void fn_8009C914(int nView) {
     CamLens* pLens;
     f32 fAC;
     int nPlayer;
-    s8 nState;
+    int nState;
     if (!fn_8009BD24(fn_8001707C(nView))) {
         return;
     }
     nPlayer = fn_8001707C(nView);
     nState = GOLFERSTATE_GetCurrentState(nPlayer);
-    if (nState == GS_WAIT || Player_IsCPU(nPlayer) || fn_800E415C() || fn_800E5098()) {
+    if ((s8)nState == GS_WAIT) {
         return;
     }
-    if (!(nState == GS_SHOT_SETUP || nState == GS_ZOOM || nState == GS_ELEVATOR || nState == GS_SWING
-          || nState == GS_GREEN_REVERSE_PUTT || nState == GS_KNEE_CAM || nState == GS_GREEN_MORPH)) {
+    if (Player_IsCPU(nPlayer)) {
         return;
     }
-    if (gPlayers[nPlayer].swing.nState != 0) {
+    if (fn_800E415C()) {
+        return;
+    }
+    if (fn_800E5098()) {
+        return;
+    }
+    if (!((u8)(nState - 2) <= 2 || (s8)nState == GS_SWING || (u8)(nState - 7) <= 1 || (s8)nState == GS_GREEN_MORPH)) {
+        return;
+    }
+    switch (gPlayers[nPlayer].swing.nState) {
+    case 0:
+        break;
+    default:
         return;
     }
     if (lbl_802813C0->anDone[nView] != lbl_802813C0->nCols * lbl_802813C0->anRows[nView]) {
