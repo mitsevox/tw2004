@@ -1139,12 +1139,14 @@ void fn_80019798(Character* pChar, Skin** apSkins, int nSkins) {
     BYTESWAP_SWAPDATA(&pData, (u8*)&pChar->n5C, 4, 4);
     if (nTexBytes != 0) {
         pTexData = (TexEntry*)pData;
-        fn_8001DD18(pData, nTexBytes);
+        // fake match: pTexData and pPalData (the same pointers as pData) go to the swaps: EA's
+        // registers
+        fn_8001DD18((u8*)pTexData, nTexBytes);
         pData += nTexBytes;
     }
     if (nPalBytes != 0) {
         pPalData = (TexPalette*)pData;
-        fn_8001DEC8(pData, nPalBytes);
+        fn_8001DEC8((u8*)pPalData, nPalBytes);
     } else {
         pChar->n5C = 0;
     }
@@ -1189,9 +1191,8 @@ void fn_80019798(Character* pChar, Skin** apSkins, int nSkins) {
             Mem_cpy(pChar->pB0, pPalData, nPalBytes);
         }
     } else {
-        nOut = 0;
         nNames = pChar->nAC - nExtra;
-        for (i = 0; i < nNames; i++) {
+        for (i = nOut = 0; i < nNames; i++) {
             bFound = 0;
             for (j = 0; j < nTex; j++) {
                 if (pList[i].uId == pTexData[j].u0) {

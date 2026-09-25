@@ -1188,7 +1188,7 @@ void fn_800CEB1C(Skin** apSkins, int nSkins, DynTex* pTex) {
 // and nIds go on to fn_800CE660.
 void fn_800CEBE8(Skin** apSkins, int nSkins, DynTex* pTex, u64* aIds, int nIds) {
     SkinListEntry* pList;
-    s32 nList;
+    int nList;
     int i;
     s32 nC;
     u64 uId;
@@ -1197,10 +1197,9 @@ void fn_800CEBE8(Skin** apSkins, int nSkins, DynTex* pTex, u64* aIds, int nIds) 
     pList = NULL;
     if (pTex == NULL) return;
     nList = fn_800CE660(apSkins, nSkins, &pList, aIds, nIds, 2);
-    i = 0;
     // port: a DynTexHeader has TexBank's layout (lldyntex.h); the two are not merged yet.
     pBank = (TexBank*)fn_8010A780(pTex);
-    for (; i < nList; i++) {
+    for (i = 0; i < nList; i++) {
         uId = fn_800CEA6C(i, pList, nList);
         if (uId != 0 && fn_8001005C(pBank, uId) == -0x80000000) {
             nC = fn_800CEAE4(i, pList, nList);

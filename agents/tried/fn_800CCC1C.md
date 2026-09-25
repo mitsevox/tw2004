@@ -10,6 +10,19 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 (add yours here: date, lane, what, score)
 
+- 2026-09-25 n-charskin (12 diffs: the four copies in the fn_800CEE90 branch store with
+  `addi r0,ptr,4; stwx v,idx,r0`; ours `add r3,ptr,idx; stw v,4(r3)`; the single store after
+  the branch is the normal form in both; fn_800CCF90 has the same pattern, fn_800CCB08 its
+  offset-0 form): cast `((SkinChoice*)pSkin->aParts[k])[nPart]`: 10 (the +4 goes onto the index
+  instead); + (u32)/`& 0xFFFFFFFFu` on nPart: 10; `(&p->nOption)[nPart*2]`, `(p + nPart)->`,
+  `nPart[p]`, `(&p[nPart])->`, `(u32)`, `(u16)`, `&0xFFFFFFFFu` on nPart, `(u32)`/`u` on k,
+  `*(s32*)((u8*)p + nPart*8 + 4)` and `+ 4 + nPart*8`: 10-14; `s32 (*)[2]`, `s32*` with
+  `[nPart*2+1]` (four spellings), a struct `{ s32 a[2]; }`: 10-14; the aParts field retyped
+  `s32 (*aParts[4])[2]` in the scratch copy: 12; a k loop (int/u32, before or after i), `p = aParts[k];
+  p[nPart]`, `SkinChoice** pp` walk: 12; `p = &aParts[k][nPart]; p->nOption`: 9 (idx+4 CSE'd); an
+  `n = nPart*8` local with `&->nOption + n`: 12; inline helpers (set(a,n,v), set(p,k,n,v),
+  get(a,n) 9, get(p,k,n) 10, field pointer 10); GC/2.0: 12 (same code). PC permuter candidate.
+
 ## Collected from the notes and docs (2026-09-25)
 
 Nothing recorded.

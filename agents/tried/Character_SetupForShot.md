@@ -10,6 +10,9 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 (add yours here: date, lane, what, score)
 
+- 2026-09-25 n-charskin: bStance/bPlace/bClipTime as u32: 9, s32: 6, u16: 37; the three
+  flags read before pPlayer/pModel: 6; pBallPos from gPlayers directly: 11; nPlayer in a local: 6.
+
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
 ```
