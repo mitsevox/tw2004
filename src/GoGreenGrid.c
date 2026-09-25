@@ -383,7 +383,10 @@ void fn_8009C914(int nView) {
     if (fn_800E5098()) {
         return;
     }
-    if (!((u8)(nState - 2) <= 2 || (s8)nState == GS_SWING || (u8)(nState - 7) <= 1 || (s8)nState == GS_GREEN_MORPH)) {
+    // fake match: the state ranges written as EA's compiled range checks.
+    if (!((u8)(nState - GS_SHOT_SETUP) <= GS_ELEVATOR - GS_SHOT_SETUP || (s8)nState == GS_SWING
+          || (u8)(nState - GS_GREEN_REVERSE_PUTT) <= GS_KNEE_CAM - GS_GREEN_REVERSE_PUTT
+          || (s8)nState == GS_GREEN_MORPH)) {
         return;
     }
     switch (gPlayers[nPlayer].swing.nState) {
