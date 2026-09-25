@@ -82,11 +82,8 @@ void fn_800B694C(s32 nWidth, s32 nHeight, u32 uSize) {
         lbl_801F66A8[n].nLeft = nLeft;
         lbl_801F66A8[n].nRight = nRight;
         lbl_801F66A8[n].nWidth = nRight + 1 - nLeft;
-        bDrop = 0;
-        if (n == 'g' - 0x20 || n == ',' - 0x20 || n == ';' - 0x20 || n == 'j' - 0x20 ||
-            n == 'p' - 0x20 || n == 'q' - 0x20 || n == 'y' - 0x20) {
-            bDrop = 1;
-        }
+        bDrop = (n == 'g' - 0x20 || n == ',' - 0x20 || n == ';' - 0x20 || n == 'j' - 0x20 ||
+                 n == 'p' - 0x20 || n == 'q' - 0x20 || n == 'y' - 0x20);
         lbl_801F66A8[n].nDrop = bDrop ? 2 : 0;
     }
 }
@@ -235,25 +232,27 @@ void fn_800B6E1C(int nX, int nY, int nRow, DiscGlyph* pGlyph) {
 void fn_800B6FCC(int nLines) {
     char szLine[0x29];
     int nY;
+    char* p;
     int i;
 
     fn_800B7684(1);
     szLine[0x28] = 0;
     fn_800B6CD0(2);
+    p = &szLine[1];
     nY = (28 - nLines) / 2;
     for (i = 0; i < nLines; i++) {
         if (i == 0 || i == nLines - 1) {
             if (i == 0) {
                 szLine[0] = 0x82;
                 szLine[0x27] = 0x83;
-                fn_80005AE8(&szLine[1], 0x86, sizeof(szLine) - 3);
+                fn_80005AE8(p, 0x86, sizeof(szLine) - 3);
             } else {
                 szLine[0] = 0x84;
                 szLine[0x27] = 0x85;
-                fn_80005AE8(&szLine[1], 0x88, sizeof(szLine) - 3);
+                fn_80005AE8(p, 0x88, sizeof(szLine) - 3);
             }
         } else {
-            fn_80005AE8(&szLine[1], ' ', sizeof(szLine) - 3);
+            fn_80005AE8(p, ' ', sizeof(szLine) - 3);
             szLine[0] = 0x89;
             szLine[0x27] = 0x87;
         }

@@ -210,12 +210,13 @@ void fn_800CC7DC(Character* pChar, int nSkin, u64 uSet, u64 uVariant, u64 uOptio
 // Sets every set of the six skins that has a "DefaultL" variant to it (bOn) or to its first
 // variant, keeping the option.
 void fn_800CC8BC(Character* pChar, u8 bOn) {
-    int j;
     int i;
+    int j;
     int nSets;
     int nVariant;
     int nOption;
     int nCopy;
+    u8 b;
 
     if (pChar == NULL || pChar->p16D8 == NULL || pChar->p16D8->apSkins == NULL) return;
     for (i = 0; i < 6; i++) {
@@ -223,8 +224,9 @@ void fn_800CC8BC(Character* pChar, u8 bOn) {
         for (j = 0; j < nSets; j++) {
             nVariant = fn_800CDD5C(pChar->p16D8->apSkins[i], j, "DefaultL");
             if (nVariant >= 0) {
+                b = fn_800CEE90();
                 nCopy = 3;
-                if (fn_800CEE90()) {
+                if (b) {
                     nCopy = 0;
                 }
                 nOption = fn_800CD1D8(pChar->p16D8->apSkins[i], j, nCopy);
