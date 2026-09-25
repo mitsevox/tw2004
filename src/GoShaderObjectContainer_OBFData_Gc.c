@@ -248,10 +248,11 @@ void fn_8006FDD0(void) {
 
 // Loads each chunk of pList into pData.
 void fn_8006FDD4(OBFData* pData, OBFChunkList* pList) {
+    OBFChunkList* const pListCopy = pList;      // fake match: a const copy gets its own register
     s32 i;
 
-    for (i = 0; i < pList->nChunks; i++) {
-        fn_8006FCDC(pData, pList->apChunks[i]);
+    for (i = 0; i < pListCopy->nChunks; i++) {
+        fn_8006FCDC(pData, pListCopy->apChunks[i]);
     }
 }
 
