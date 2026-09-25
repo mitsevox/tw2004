@@ -8,7 +8,10 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
-(add yours here: date, lane, what, score)
+- 2026-09-25, ChatGPT: initialized `Player*` earlier, reordered pointer declarations and
+  assignments, used direct frame-field store, and applied `register` to each pointer: 4 differing
+  instructions -> 4 (early Player initialization worsened to 12, moving its declaration to 7).
+  No source change.
 
 ## Collected from the notes and docs (2026-09-25)
 
