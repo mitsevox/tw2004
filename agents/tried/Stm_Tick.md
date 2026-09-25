@@ -33,6 +33,11 @@ unless you combine it with something new. Before you stop, add every attempt und
 - 2026-09-25, ChatGPT follow-up: repeated a focused four-minute sweep after main added
   the adjacent-assignment-swap lever. Best result remained two differing instructions;
   no candidate improved the real source.
+- 2026-09-25 n-misc (quicktrial aligned, base 2): cap in a `uMax = nChannels << 15` temp
+  (before or after uRemaining, or before uOffset), uReadPos in a local used by offset and remaining,
+  `nChannels * sizeof(StreamChunk)`, `sizeof(StreamChunk) * nChannels`, `(u32)nChannels << 15`,
+  `* 0x8000`: all 2; `uLen >= cap` 4; the read length as a ternary argument of fn_800AB4C0 81, with
+  offset/buffer as call arguments 19. Permuter candidate (pure scheduling of two loads/shift).
 
 ## Collected from the notes and docs (2026-09-25)
 
