@@ -21,6 +21,94 @@ unless you combine it with something new. Before you stop, add every attempt und
   `pLaunchB` assignment locations (before face-vector, mishit, power, forgiveness, putt reset,
   or its final store): 6 -> 6. Identity inline reads at the final shot-power/launch-vector
   arguments, singly and together: 6 -> 6. No source change.
+- 2026-09-25, ChatGPT subagent (second pass): exact diff is only the `r27`/`r29` allocation swap:
+  target uses `r27` for the saved shot-power address (`stfsu` then final `lfs`), `r29` for
+  `pLaunchB` (`addi`, shape-vector arg, final physics arg); ours reverses them. New tests:
+  pointer-to-array launch-B local with three equivalent call-site forms, redundant launch-B
+  self-assignment/comma forms at six live-range points, late scalar shot-power read, nested
+  block scope for launch-B at eight starts, explicit shot-power result temporary at seven
+  declaration positions, and inline field/value helpers: best still 6. Nested scope worsened
+  to 17; assigning launch-B again at final call worsened to 41. No source change.
+- 2026-09-25, ChatGPT subagent (second pass continued): 128 combinations of seven individually
+  neutral levers (shot-power result/final-read temps, launch-B self-assignment/comma argument,
+  split integer declarations, player-identity helper, redundant float cast) all remained at 6.
+  Crossing the launch-B declaration position with either shot-power temp (84 variants), then
+  testing 168 explicit shot-power pointer variants (normal/`register`/`__restrict`, `p` or
+  `gPlayers` address, store/final read through pointer, assignment timing) also remained at 6.
+- 2026-09-25, ChatGPT subagent (second pass continued): `nPlayer` copy (`int` or `s32`) at
+  three liveness points substituted into seven call/index sites; `Player* pCopy` at six points
+  substituted into launch-B address or shot-power store: all 6 -> 6. No source change.
+- 2026-09-25, ChatGPT subagent (third pass): TW07's `SW_vImpact` debug locals describe a
+  substantially expanded shot path (974 PS3 bytes, `pCoreShotInfo`, `pSwingInfo`, trajectory/
+  stance and network/estimated-ball locals), not a clear declaration-for-declaration analogue
+  of this GameCube tail. Target GameCube bytes load shot power *after* the intervening calls;
+  caching the value across them would change semantics, so that is not a valid lever. Safe
+  two-stage launch-B aliases (flat or pointer-to-array, five capture points and three later
+  uses) stayed at 6. Static inline structural splits of the putt launch reset, hook store,
+  shot-power store, power-plus-forgiveness, and shape-plus-hook regions all stayed at 6.
+  No source change.
+- 2026-09-25, ChatGPT subagent (third pass continued): member-derived byte-pointer arithmetic
+  rooted in the full `Player` object for launch-B and shot-power (nine combinations) stayed at
+  6. Tiny pointer-to-pointer launch-B assignment helpers and shot-power store helpers, with
+  void/value returns, also stayed at 6. The optimizer emits the same bytes for these safe
+  structural forms; no source change.
+- 2026-09-25, ChatGPT subagent (fourth pass, semantic audit): the real-unit diff is 157 vs 157
+  instructions and exactly the same five mismatch sites as the fast snapshot, all the
+  `r27`/`r29` swap. Type hypotheses in a fresh snapshot: `PlayerNumber_t` for the parameter
+  worsened 6 -> 42; `Club_t` for `nClub` and/or `ShotType_t` for `nKind` stayed at 6. No
+  assembly evidence supports changing their types. In particular, this project's
+  `ShotType_t` enum stops at 5 while live shot-kind fields also use 6 and 7, so forcing an
+  enum local would not be a safe general correction. No source change.
+- 2026-09-25, ChatGPT subagent (fifth pass): final shot-power read in a new inner block with
+  `f32` or `const f32` local: 6 -> 6; assignment expression into a local in the power argument:
+  6 -> 6; `static inline` memory-read accessor (`const f32*` or `const Player*`): 6 -> 6.
+  Five sequenced comma-expression forms around the final power read worsened 6 -> 44. All
+  retain a separate memory read after the intervening calls; none changed the r27/r29 choice.
+  No source change.
+
+## Safe-match constraints from the third pass
+
+- The only mismatches are register numbers for two simultaneously live pointers, not a wrong
+  vector coordinate or value. Swapping x/z writes would change the currently matching putt
+  reset and the game's launch vector semantics.
+- The target stores shot power, calls forgiveness/shape/controller/aim helpers, then reloads
+  shot power from memory at the final physics call. Caching the float across those calls may
+  change observable game behavior if a callee mutates player state, so a match that relies on
+  that cached value is not acceptable even if its register allocation improves.
+- Deriving launch-B with `pLaunchA + 4` crosses from one array member into another and is not
+  portable C pointer arithmetic. The tested full-`Player` byte-pointer derivation is safe but
+  left the same six differences.
+
+## Semantic audit of the mismatch region
+
+- The target's `stfsu f1, 0x414(r27)` stores the `SW_vCalculateShotPower` float at
+  `Player.swing.fShotPower` (Player 0x3D4 + SwingData 0x40). Its final `lfs f1, 0(r27)` reloads
+  that same field. The header's `f32` agrees with the load/store width and TW06's
+  `SW_sSwingData::fShotPower` (`float` at its shifted offset 0x50).
+- The target's `addi r29, r31, 0x398` is `Player.vLaunchB`, a four-float array. `r29` is passed
+  to `fn_8005B8C8_ShapeVector(int, f32*)` for modification and later as `r8` to
+  `Physics_ShotImpact`; both call sites and the array type agree. TW06's analogous
+  `AIshot_t::strokeDirection[4]` is also float data, but its later layout was not copied here.
+- The final call's registers match the current prototype: `r3` ball, `r4` club, `r5` kind,
+  `f1` power, `f2` aim, `r6` trajectory, `r7` launch-A, `r8` launch-B. The other saved values
+  (`r26`, `r25`, `r23`, `r24`, `r28`) already match the target. Ball's
+  `Physics_ShotImpact` and Swing's `fn_8005B8C8_ShapeVector` are exact functions in the
+  current real-unit report. No field offset, argument order or width mismatch was found.
+
+## Next PC-only experiment
+
+When the owner's PC is idle and its decomp-permuter checkout is available, run from a current
+branch containing this source:
+
+```
+python tools/match/permute.py Swing SW_vImpact --minutes 120 -j 18 --max-jobs 18
+```
+
+The previous PC run was 14 minutes at two workers and found no improvement; a two-hour run at
+18 workers explores a much larger set. Inspect any candidate for unchanged behavior and verify
+it in the real unit; a score-0 permuter result alone is not acceptance. This Mac checkout has
+no `TW_PERMUTER` setting or `tools/decomp-permuter/permuter.py` at either path `permute.py`
+checks, so its local `quicktrial.py`/`leversweep.py` cannot perform that search.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
