@@ -61,6 +61,14 @@ void fn_8008F3A4(u32* p, uptr uBase, int nStride, u32 n) {
     }
 }
 
+// fake match: MWCC evaluates p8->nCount before p8->apTables unless apTables is evaluated in a
+// boolean condition first
+static inline void* fn_8008F488_Read(void* p) {
+    if (!p && !p) {
+    }
+    return p;
+}
+
 // Turn the UI file's offsets into pointers.
 // port: the file stores 32-bit offsets in its pointer fields, as the GameCube's pointers are.
 void fn_8008F488(FrontEnd* pFE) {
@@ -70,7 +78,7 @@ void fn_8008F488(FrontEnd* pFE) {
     pFE->pFile->p4 = (UIFilePairs*)((uptr)pFE->pFile->p4 + uBase);
     pFE->pFile->p8 = (UIFileTables*)((uptr)pFE->pFile->p8 + uBase);
     fn_8008F3A4((u32*)pFE->pFile->p4->aPairs, uBase, 1, pFE->pFile->p4->nCount * 2);
-    fn_8008F3A4((u32*)pFE->pFile->p8->apTables, uBase, 1, pFE->pFile->p8->nCount);
+    fn_8008F3A4((u32*)fn_8008F488_Read(pFE->pFile->p8->apTables), uBase, 1, pFE->pFile->p8->nCount);
     for (i = 0; i < pFE->pFile->p8->nCount; i++) {
         fn_8008F3A4((u32*)pFE->pFile->p8->apTables[i]->apEntries, uBase, 1,
                     pFE->pFile->p8->apTables[i]->nCount);
