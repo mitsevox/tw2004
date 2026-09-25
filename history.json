@@ -110,5 +110,21 @@
 "matched_functions": 7528,
 "total_functions": 7647,
 "exact": 7528
+},
+{
+"commit": "eee22cd",
+"sha": "eee22cdee73ab978146528fde3a020c41df70a0b",
+"time": 1790352817,
+"subject": "state: housekeeping list (dashboard retired, hook/worktree/branch cleanup), numbers; AI_ChooseTarget ledger: PC permuter from 520",
+"report": true,
+"matched_code": 1445112,
+"complete_code": 1150048,
+"matched_data": 701147,
+"complete_data": 844511,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7528,
+"total_functions": 7647,
+"exact": 7528
 }
 ]
