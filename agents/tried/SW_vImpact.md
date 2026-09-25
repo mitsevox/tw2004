@@ -65,6 +65,7 @@ unless you combine it with something new. Before you stop, add every attempt und
   Five sequenced comma-expression forms around the final power read worsened 6 -> 44. All
   retain a separate memory read after the intervening calls; none changed the r27/r29 choice.
   No source change.
+- 2026-09-25, n-const: registers only (r27/r29 swap, as the ledger says). Compilers 1.3.2 / 2.0 / 2.0p1 / 2.6 / 2.7: all 6.
 
 ## Safe-match constraints from the third pass
 

@@ -8,7 +8,7 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
-(add yours here: date, lane, what, score)
+- 2026-09-25, n-const: registers only (fZ f0 vs EA f2; the first product f2 vs EA f0). `-fSin` into fAlpha before/after the fCos call: 10/9; loads z first with commuted sums 8; while loop 7; `-fSin * fX + fCos * fZ` operand order 7; fCos call before fSin 10; products / new x / new z / loads through the dead locals fDist, fAngle, fAlpha (each singly, both products through a pair in both orders, and an exhaustive sweep of X/Z/P1/P2 over {fX, fZ, fDist, fAngle, fAlpha}): none below 7. Compilers 1.3.2 / 2.0 / 2.6 / 2.7: 7, 2.0p1: 28.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 

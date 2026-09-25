@@ -22,6 +22,15 @@ f32  fn_8000C244(f32* pA, f32* pB, f32* pP);
 u8   fn_8000C278(f32* pA, f32* pB, f32* pC, f32* pD, f32* pOut);
 u8   fn_8000C328(f32* pA, f32* pB, f32* pC, f32* pD);
 
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 0.0f (0x80282AF0), before the 1.0f / 3.0f fn_8000BF20 uses first; its body is unknown.
+static f32 TerrainData_StrippedFn(f32 x) {
+    if (x < 0.0f) {
+        return 0.0f;
+    }
+    return x;
+}
+
 // The ground height under a node, from a point a third of a unit above it; 0 if there is none.
 f32 fn_8000BF20(const f32* pPos) {
     f32 v[4];
@@ -162,7 +171,11 @@ u8 fn_8000C278(f32* pA, f32* pB, f32* pC, f32* pD, f32* pOut) {
     fCz = pC[2];
     fDx = pD[0];
     fDz = pD[2];
-    fDen = (fDz - fCz) * (fBx - fAx) - (fBz - fAz) * (fDx - fCx);
+    // fake match: the two differences go through fT1 and fT2 (both set again below before any
+    // read); written inline, the product's operands or the loads' registers come out swapped
+    fT1 = fBz - fAz;
+    fT2 = fDx - fCx;
+    fDen = (fDz - fCz) * (fBx - fAx) - fT2 * fT1;
     if (0.0f == fDen) {
         return 0;
     }
