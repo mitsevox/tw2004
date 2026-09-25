@@ -662,6 +662,9 @@ void fn_80018710(Character* pChar) {
     }
 }
 
+// fake match: an identity read; it gives EA's register order.
+static inline f32* fn_800187CC_Read(f32* p) { return p; }
+
 // A golfer is dropped to 0.01 below the lowest of its four ground heights (the test points move
 // with it) and a179C set to the average ground normal; any other character stands on the ground
 // under its root bone (the ground below it, if the one found is more than 1 above).
@@ -712,7 +715,7 @@ void Character_PlaceFeetOnGround(Character* pChar) {
         pChar->aPoints[4][1] += fDelta;
         return;
     }
-    pPos = pChar->pModel->pBones[0].v1C;
+    pPos = fn_800187CC_Read(pChar->pModel->pBones[0].v1C);
     Ter_GetEnclosingGroundData(pCourse, pPos, &fLow, &pSurfLow, vNormalLow, &fHigh, &pSurfHigh,
                                vNormalHigh);
     fY = fHigh;

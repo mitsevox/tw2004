@@ -990,12 +990,14 @@ void fn_800CE4B8(u64 uId, SkinListEntry* aList, s32* pnList, u8* p, s32 n) {
     (*pnList)++;
 }
 
+// fake match: an identity read; it gives EA's register order.
+static inline s32 fn_800CE52C_Read(s32 n) { return n; }
+
 // Lists the name codes of option n's p14 entries (as the chosen sets patch them).
 void fn_800CE52C(Skin* pSkin, int n, SkinListEntry* aList, s32* pnList, int nCopy) {
     SkinDesc14 entry;
     u8* p;
     s32 nOut;
-    SkinDesc* pDesc;
     SkinDesc44* p44;
     s32 nFirst;
     int i;
@@ -1003,6 +1005,7 @@ void fn_800CE52C(Skin* pSkin, int n, SkinListEntry* aList, s32* pnList, int nCop
     s32 nIndices;
     s32* pIndex;
     s32 n44;
+    SkinDesc* pDesc;
 
     pDesc = pSkin->pModel->pDesc;
     nFirst = pDesc->p5C[n].n4;
@@ -1011,7 +1014,7 @@ void fn_800CE52C(Skin* pSkin, int n, SkinListEntry* aList, s32* pnList, int nCop
         if (n44 >= 0) {
             p44 = &pDesc->p44[n44];
             if (p44->n8 != 0) {
-                nIndices = pDesc->p28[p44->nC].n0;
+                nIndices = fn_800CE52C_Read(pDesc->p28[p44->nC].n0);
                 pIndex = &pDesc->p20[p44->n4];
                 for (j = 0; j < nIndices; j++) {
                     if (!(pDesc->p14[*pIndex].u08 & 1)) {
@@ -1082,16 +1085,19 @@ s32 fn_800CE660(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, i
     return nList;
 }
 
+// fake match: an identity read; it gives EA's register order.
+static inline SkinDesc* fn_800CE8C0_Read(SkinDesc* p) { return p; }
+
 // Lists (in a new *ppList) the name codes every option of the skins uses. Returns the list's
 // length.
 s32 fn_800CE8C0(Skin** apSkins, int nSkins, SkinListEntry** ppList) {
     s32 nList;
-    Skin* pSkin;
-    SkinDesc* pDesc;
     int i;
     int j;
     int k;
     int m;
+    Skin* pSkin;
+    SkinDesc* pDesc;
     s32 n;
 
     n = 0;
@@ -1103,7 +1109,8 @@ s32 fn_800CE8C0(Skin** apSkins, int nSkins, SkinListEntry** ppList) {
     *ppList = fn_80009B34(n * sizeof(SkinListEntry), 1, 0, "SkinPart.c", 2068);
     nList = 0;
     for (i = 0; i < nSkins; i++) {
-        if (apSkins[i] != NULL && apSkins[i]->pModel != NULL && (pDesc = apSkins[i]->pModel->pDesc) != NULL) {
+        if (apSkins[i] != NULL && apSkins[i]->pModel != NULL &&
+            (pDesc = fn_800CE8C0_Read(apSkins[i]->pModel->pDesc)) != NULL) {
             pSkin = apSkins[i];
             for (j = 0; j < fn_800CCA40(pSkin); j++) {
                 for (k = 0; k < fn_800CCA70(pSkin, j); k++) {
