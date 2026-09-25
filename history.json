@@ -1,0 +1,18 @@
+[
+{
+"commit": "bad1c4c",
+"sha": "bad1c4c5aee5793d2d4537c3cc620b731bfd2859",
+"time": 1790351552,
+"subject": "Progress page on GitHub Pages, fed by CI: server.py --export (static, no in-flight panel), pages.py (history.json on pages-history), build.yml deploys on main pushes; backfill --first-parent/--pages-history seed",
+"report": true,
+"matched_code": 1444328,
+"complete_code": 1150048,
+"matched_data": 701147,
+"complete_data": 844511,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7527,
+"total_functions": 7647,
+"exact": 7527
+}
+]
