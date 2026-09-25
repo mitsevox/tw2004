@@ -86,6 +86,9 @@ instructions; `-O3` regressed 31 -> 179 aligned diffs, also 135 instructions.
 Changing `-inline smart` to `-inline off` on either 2.0 or 2.5 left the
 instruction stream and 31-diff score unchanged. No compiler/flag variant
 tested improves the color/UV cluster; retain the configured GC/2.5 `-O4,p`.
+- 2026-09-25 n-misc (quicktrial aligned, base 31): EA reads r with lbzx (table base + n*4)
+  and g/b/a through the row pointer. All 24 orders of {pColour, r (direct), pSrc + g/b/a via pSrc,
+  pUV}: best 32. No change.
 
 ## Collected from the notes and docs (2026-09-25)
 
