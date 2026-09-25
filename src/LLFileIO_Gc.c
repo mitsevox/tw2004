@@ -5,15 +5,19 @@
 #include "core/startup.h"
 #include "core/audtrack.h"
 
-DiscFile lbl_8019EAD0[32];              // the open files
-FileQueue lbl_8019E868[2];              // the queued reads, per priority
-FileReqPool lbl_8019E880[2];            // the free requests, per priority
-OSSemaphore lbl_8019D540;               // signalled when a read ends, or the queue gets its first read
-u8 lbl_8019D54C[0x1000];                // the reader thread's stack
-OSThread lbl_8019E550;                  // the reader thread (fn_80005D10)
-s32 lbl_80281B84;                       // the last read's result: bytes read, or below 0 an error
+// section note: .bss and .sbss are laid out last-defined-first, so these are defined from the
+// highest address down.
 // The open files' paths, by slot. The symbol is 0x2000 bytes; the code only reaches the first 0x1000.
-char lbl_801A0350[32][0x80];
+// section note: declared at the symbol's full size, 64 slots; an unreferenced array for the rest is
+// dead-stripped by the linker.
+char lbl_801A0350[64][0x80];
+DiscFile lbl_8019EAD0[32];              // the open files
+FileReqPool lbl_8019E880[2];            // the free requests, per priority
+FileQueue lbl_8019E868[2];              // the queued reads, per priority
+OSThread lbl_8019E550;                  // the reader thread (fn_80005D10)
+u8 lbl_8019D54C[0x1000];                // the reader thread's stack
+OSSemaphore lbl_8019D540;               // signalled when a read ends, or the queue gets its first read
+s32 lbl_80281B84;                       // the last read's result: bytes read, or below 0 an error
 s32 lbl_80281B80;                       // how many files are open
 
 void fn_80005BE8(const char* szSrc, char* szDst);
@@ -310,6 +314,11 @@ int File_ReadAsyncEx(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDon
     return 0;
 }
 
+// A file's size in bytes.
+u32 fn_800065B0(int hFile) {
+    return lbl_8019EAD0[hFile].info.uLength;
+}
+
 // Reads a whole file, waiting for the drive, into a new allocation aligned to nAlign; its size goes
 // to *puSize when that is not NULL. NULL when no memory is free.
 void* fn_800065C8(const char* szPath, u32* puSize, int nAlign) {
@@ -364,9 +373,4 @@ void* fn_800065C8(const char* szPath, u32* puSize, int nAlign) {
         *puSize = nLen;
     }
     return pData;
-}
-
-// A file's size in bytes.
-u32 fn_800065B0(int hFile) {
-    return lbl_8019EAD0[hFile].info.uLength;
 }

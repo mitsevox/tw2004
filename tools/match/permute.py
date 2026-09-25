@@ -1,5 +1,7 @@
 """Run decomp-permuter on one function with a hard time limit.
-    python tools/match/permute.py <Unit> <fn> [--minutes 20] [-j 4]
+    python tools/match/permute.py <Unit> <fn> [--minutes 20] [-j 4] [--max-jobs N]
+-j is capped at 4 because the machine is usually shared; --max-jobs N raises the cap (an idle
+many-core machine: --max-jobs 18 -j 18).
 Sets up build/perm/<fn> (perm_setup.py), runs the permuter, and stops it after the time limit,
 killing its whole process tree (Git Bash's `timeout` does not stop it on Windows). Then lists the
 best outputs found. Read the diff in the best output and apply the idea by hand."""
@@ -15,13 +17,15 @@ PERMUTER = os.environ.get('TW_PERMUTER') or next(
                       ROOT.parent.parent / 'tools/decomp-permuter/permuter.py') if p.exists()),
     str(ROOT.parent / 'tools/decomp-permuter/permuter.py'))
 args = sys.argv[1:]
-minutes, jobs = 20, 4
+minutes, jobs, max_jobs = 20, 4, 4
 if '--minutes' in args:
     k = args.index('--minutes'); minutes = float(args[k + 1]); del args[k:k + 2]
+if '--max-jobs' in args:
+    k = args.index('--max-jobs'); max_jobs = int(args[k + 1]); del args[k:k + 2]
 if '-j' in args:
     k = args.index('-j'); jobs = int(args[k + 1]); del args[k:k + 2]
 unit, fn = args[0], args[1]
-jobs = min(jobs, 4)                  # the machine is shared (docs/workflow.md)
+jobs = min(jobs, max_jobs)           # the machine is shared (docs/workflow.md)
 
 kill_orphan_workers()                # leftovers of earlier runs
 subprocess.run([sys.executable, str(ROOT / 'tools/match/perm_setup.py'), unit, fn], check=True)

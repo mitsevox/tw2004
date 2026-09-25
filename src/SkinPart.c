@@ -1035,19 +1035,22 @@ void fn_800CE52C(Skin* pSkin, int n, SkinListEntry* aList, s32* pnList, int nCop
     }
 }
 
+// fake match: an identity read; it gives EA's register order.
+static inline Skin* fn_800CE660_Read(Skin* p) { return p; }
+
 // Lists (in a new *ppList) the name codes the skins' chosen options use; for the parts named in
 // aIds, those of every option. Returns the list's length.
 s32 fn_800CE660(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, int nIds, int nCopy) {
+    int j;
     s32 nList;
     Skin* pSkin;
     SkinDesc* pDesc;
+    u8 bAll;
     int i;
-    int j;
     int k;
     s32 n;
     s32 nVariant;
     s32 nOption;
-    u8 bAll;
 
     n = 0;
     for (i = 0; i < nSkins; i++) {
@@ -1058,7 +1061,7 @@ s32 fn_800CE660(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, i
     nList = 0;
     *ppList = fn_80009B34(n * sizeof(SkinListEntry), 1, 0, "SkinPart.c", 1980);
     for (i = 0; i < nSkins; i++) {
-        pSkin = apSkins[i];
+        pSkin = fn_800CE660_Read(apSkins[i]);
         if (pSkin != NULL && pSkin->pModel != NULL && (pDesc = pSkin->pModel->pDesc) != NULL) {
             for (j = 0; j < fn_800CCA40(pSkin); j++) {
                 bAll = 0;

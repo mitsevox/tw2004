@@ -104,8 +104,8 @@ void OSPanic(const char* pFile, int nLine, const char* pFmt, ...);   // print an
 
 // Threads wait on a queue; a mutex is owned by one thread, a semaphore counts.
 typedef struct OSThread {
-    u8   unk0[0x318];
-} OSThread;                     // a thread (0x318 bytes; LLFileIO_Gc.c's reader is one)
+    f64  unk0[0x318 / 8];       // opaque; f64 only for its 8-byte alignment (LLFileIO_Gc.c's .bss pads to it)
+} OSThread;                   // a thread (0x318 bytes; LLFileIO_Gc.c's reader is one)
 int  OSCreateThread(OSThread* pThread, void* (*pfnMain)(void* pArg), void* pArg, void* pStackTop,
                     u32 uStackSize, s32 nPriority, u16 uAttr);
 s32  OSResumeThread(OSThread* pThread);
