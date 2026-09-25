@@ -1,0 +1,87 @@
+UISScreen fn_8016AEEC
+base 40, 24 levers, 1323 variants (24 singles) in 13 s; best 25
+
+25 [safe]
+  - identity inline on `bLast = (nMsg == -1);`
+  - move `u32 j;` to line 1 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+25 [safe]
+  - identity inline on `bLast = (nMsg == -1);`
+  - move `u32 j;` to line 2 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+25 [safe]
+  - identity inline on `bLast = (nMsg == -1);`
+  - move `UISNode* pNode;` to line 5 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+25 [safe]
+  - identity inline on `bLast = (nMsg == -1);`
+  - move `u32 j;` to line 1 of the declarations
+  - for loop #1 (`for (i = 0; i < pScreen->pData->nStart; i++) {`) as a while loop
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+25 [safe]
+  - identity inline on `bLast = (nMsg == -1);`
+  - move `u32 j;` to line 1 of the declarations
+  - for loop #2 (`for (j = 0; j < pNode->nGroups; j++) {`) as a while loop
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+25 [safe]
+  - identity inline on `bLast = (nMsg == -1);`
+  - move `u32 j;` to line 1 of the declarations
+  - for loop #3 (`for (i = 0; i < pGroup->nEntries; i++) {`) as a while loop
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+25 [review]
+  - identity inline on `bLast = (nMsg == -1);`
+  - move `u32 j;` to line 2 of the declarations
+  - type of i: u32 -> int
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+25 [review]
+  - identity inline on `bLast = (nMsg == -1);`
+  - move `u32 j;` to line 2 of the declarations
+  - type of i: u32 -> s32
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+25 [safe]
+  - identity inline on `bLast = (nMsg == -1);`
+  - move `u32 j;` to line 2 of the declarations
+  - type of j: u32 -> unsigned int
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+25 [review]
+  - identity inline on `bLast = (nMsg == -1);`
+  - move `u32 j;` to line 2 of the declarations
+  - type of j: u32 -> int
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+25 [safe]
+  - identity inline on `bLast = (nMsg == -1);`
+  - move `u32 j;` to line 2 of the declarations
+  - move `u8 bLast;` to line 1 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+25 [safe]
+  - identity inline on `bLast = (nMsg == -1);`
+  - move `u32 j;` to line 2 of the declarations
+  - move `u8 bLast;` to line 2 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+changed lines of the best variant (base.c):
+@@ -1,5 +1,6 @@
+-void fn_8016AEEC(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
++static inline u8 __lv_bLast_0(u8 v) { return v; }
++void fn_8016AEEC(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {u32 j;
++
+ UISNode* pNode;
+ u32 i;
+-u32 j;
+ u8 bLast;
+@@ -7,3 +8,3 @@
+ pNode = &pScreen->pData->pNodes[nNode];
+-bLast = (nMsg == -1);
++bLast = __lv_bLast_0((nMsg == -1));
+ for (i = 0; i < pScreen->pData->nStart; i++) {

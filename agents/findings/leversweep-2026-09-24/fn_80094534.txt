@@ -1,0 +1,78 @@
+GoShaderObject_Particle_Gc fn_80094534
+base 121, 394 levers, 38263 variants (394 singles) in 360 s; best 119
+
+119 [safe]
+  - identity inline on `fDiff = pVerts->vC[0] * pShape->f54;`
+  - identity inline on `fDiff = fDiff - pShape->v60[0] * pShape->f54;`
+  - identity inline on `fEase = fEase * fEase;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+120 [safe]
+  - identity inline on `fDiff = pVerts->vC[0] * pShape->f54;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+120 [safe]
+  - identity inline on `fDiff = fDiff - pShape->v60[0] * pShape->f54;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+120 [safe]
+  - identity inline on `fDiff = pVerts->vC[0] * pShape->f54;`
+  - move `u32 i;` to line 11 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+120 [safe]
+  - identity inline on `fDiff = pVerts->vC[0] * pShape->f54;`
+  - move `u32 i;` to line 12 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+120 [safe]
+  - identity inline on `fDiff = pVerts->vC[0] * pShape->f54;`
+  - move `u32 i;` to line 13 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+120 [safe]
+  - identity inline on `fDiff = pVerts->vC[0] * pShape->f54;`
+  - move `u32 i;` to line 14 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+120 [safe]
+  - identity inline on `fDiff = pVerts->vC[0] * pShape->f54;`
+  - identity inline on `fDiff = fDiff - pShape->v60[0] * pShape->f54;`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+120 [safe]
+  - identity inline on `fDiff = pVerts->vC[0] * pShape->f54;`
+  - move `f32 fSize;` to line 5 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+120 [safe]
+  - identity inline on `fDiff = pVerts->vC[0] * pShape->f54;`
+  - move `f32 fSize;` to line 8 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+120 [safe]
+  - identity inline on `fDiff = pVerts->vC[0] * pShape->f54;`
+  - move `f32 fSize;` to line 9 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+120 [safe]
+  - identity inline on `fDiff = pVerts->vC[0] * pShape->f54;`
+  - move `f32 fDiff;` to line 13 of the declarations
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+changed lines of the best variant (base.c):
+@@ -1 +1,4 @@
++static inline f32 __lv_fDiff_0(f32 v) { return v; }
++static inline f32 __lv_fDiff_1(f32 v) { return v; }
++static inline f32 __lv_fEase_1(f32 v) { return v; }
+ void fn_80094534(f32 (*pMtx)[4], ParticleShape* pShape, ParticleVertex* pVerts, f32* pTimes, u32 n) {
+@@ -29,6 +32,6 @@
+ fEase = pShape->f50 * t + 1.0f;
+-fEase = fEase * fEase;
++fEase = __lv_fEase_1(fEase * fEase);
+ fEase = 1.0f / (fEase * fEase);
+-fDiff = pVerts->vC[0] * pShape->f54;
+-fDiff = fDiff - pShape->v60[0] * pShape->f54;
++fDiff = __lv_fDiff_0(pVerts->vC[0] * pShape->f54);
++fDiff = __lv_fDiff_1(fDiff - pShape->v60[0] * pShape->f54);
+ v.x = pShape->v60[0] * t + pVerts->v0[0] + fDiff - fEase * fDiff;

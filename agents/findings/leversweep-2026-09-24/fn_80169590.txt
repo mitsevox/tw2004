@@ -1,0 +1,55 @@
+UISApi fn_80169590
+base 88, 60 levers, 4960 variants (60 singles) in 45 s; best 83
+
+83 [safe]
+  - move `s16 nPrevScreen;` to line 1 of the declarations
+
+83 [safe]
+  - move `s16 nPrevScreen;` to line 2 of the declarations
+
+83 [safe]
+  - move `s16 nPrevScreen;` to line 3 of the declarations
+
+83 [safe]
+  - move `s16 nPrevGroup;` to line 5 of the declarations
+
+83 [safe]
+  - move `s16 nPrevGroup;` to line 6 of the declarations
+
+83 [safe]
+  - move `s16 nPrevGroup;` to line 7 of the declarations
+
+83 [safe]
+  - move `s16 nPrevGroup;` to line 8 of the declarations
+
+83 [safe]
+  - move `s32 nResult;` to line 3 of the declarations
+
+83 [safe]
+  - move `s16 nPrevScreen;` to line 1 of the declarations
+  - identity inline on `pRec = &pStudio->p60[nRecord];`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+83 [safe]
+  - move `s16 nPrevScreen;` to line 1 of the declarations
+  - identity inline on `uIndex = fn_8016C6C4(pStudio, uGroup, uScreen);`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+83 [safe]
+  - move `s16 nPrevScreen;` to line 1 of the declarations
+  - identity inline on `uIndex = fn_8016C6C4(pStudio, nPrevGroup, nPrevScreen);`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+83 [safe]
+  - move `s16 nPrevScreen;` to line 1 of the declarations
+  - move `UISRecord60* pRec;` to line 3 of the declarations
+
+changed lines of the best variant (base.c):
+@@ -1,5 +1,5 @@
+-s32 fn_80169590(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 bPush, u8 nArgs, s32* pArgs) {
++s32 fn_80169590(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 bPush, u8 nArgs, s32* pArgs) {s16 nPrevScreen;
++
+ u32 nRecord;
+ s16 nPrevGroup;
+-s16 nPrevScreen;
+ u8 bLoaded;

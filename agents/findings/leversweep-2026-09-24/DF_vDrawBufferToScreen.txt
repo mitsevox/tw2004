@@ -1,0 +1,38 @@
+DepthField DF_vDrawBufferToScreen
+base 79, 151 levers, 19655 variants (151 singles) in 176 s; best 79
+
+79 [safe]
+  - move `int bOdd;` to line 8 of the declarations
+
+79 [safe]
+  - move `int bOdd;` to line 9 of the declarations
+
+79 [safe]
+  - move `int bOdd;` to line 10 of the declarations
+
+79 [safe]
+  - move `int bOdd;` to line 11 of the declarations
+
+79 [safe]
+  - move `f32 aUV[8];` to line 7 of the declarations
+
+79 [safe]
+  - move `f32 aUV[8];` to line 8 of the declarations
+
+79 [safe]
+  - move `f32 aUV[8];` to line 9 of the declarations
+
+79 [safe]
+  - move `int i;` to line 1 of the declarations
+
+79 [safe]
+  - move `f32 aUV[8];` to line 10 of the declarations
+
+79 [safe]
+  - move `f32 aUV[8];` to line 11 of the declarations
+
+79 [safe]
+  - move `f32 aUV[8];` to line 12 of the declarations
+
+79 [safe]
+  - move `f32 aUV[8];` to line 13 of the declarations

@@ -1,0 +1,43 @@
+Code8002EE1C Session_SetupProfiles
+base 14, 11 levers, 371 variants (11 singles) in 4 s; best 14
+
+14 [safe]
+  - for loop #1 (`for (i = 0; i < pSession->nNumPlayers; i++) {`) as a while loop
+
+14 [safe]
+  - for loop #2 (`for (j = 0; j < 6; j++) {`) as a while loop
+
+14 [safe]
+  - for loop #3 (`for (j = 0; j < 6; j++) {`) as a while loop
+
+14 [safe]
+  - move `Session* pSession = &gSession;` to line 1 of the declarations
+
+14 [safe]
+  - move `Session* pSession = &gSession;` to line 4 of the declarations
+
+14 [safe]
+  - move `int i, j;` to line 1 of the declarations
+
+14 [safe]
+  - move `int i, j;` to line 2 of the declarations
+
+14 [safe]
+  - for loop #3 (`for (j = 0; j < 6; j++) {`) as a while loop
+  - move `Session* pSession = &gSession;` to line 1 of the declarations
+
+14 [safe]
+  - for loop #3 (`for (j = 0; j < 6; j++) {`) as a while loop
+  - move `Session* pSession = &gSession;` to line 4 of the declarations
+
+14 [safe]
+  - for loop #3 (`for (j = 0; j < 6; j++) {`) as a while loop
+  - move `int i, j;` to line 1 of the declarations
+
+14 [safe]
+  - for loop #3 (`for (j = 0; j < 6; j++) {`) as a while loop
+  - move `int i, j;` to line 2 of the declarations
+
+14 [safe]
+  - for loop #1 (`for (i = 0; i < pSession->nNumPlayers; i++) {`) as a while loop
+  - for loop #2 (`for (j = 0; j < 6; j++) {`) as a while loop

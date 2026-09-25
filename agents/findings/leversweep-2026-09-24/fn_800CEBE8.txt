@@ -1,0 +1,39 @@
+SkinPart fn_800CEBE8
+base 9, 43 levers, 3023 variants (43 singles) in 27 s; best 9
+
+9 [safe]
+  - move `int i;` to line 3 of the declarations
+
+9 [safe]
+  - type of nList: s32 -> int
+
+9 [review]
+  - type of nList: s32 -> u32
+
+9 [safe]
+  - identity inline on `nList = fn_800CE660(apSkins, nSkins, &pList, aIds, nIds, 2);`
+  fake match: EA did not write an identity wrapper. Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this spot and use it; otherwise name it fn_<caller address>_Read with a `// fake match:` comment.
+
+9 [safe]
+  - type of i: int -> s32
+
+9 [safe]
+  - move `SkinListEntry* pList;` to line 7 of the declarations
+
+9 [safe]
+  - move `s32 nList;` to line 1 of the declarations
+
+9 [safe]
+  - move `s32 nList;` to line 2 of the declarations
+
+9 [safe]
+  - move `s32 nList;` to line 5 of the declarations
+
+9 [safe]
+  - move `SkinListEntry* pList;` to line 1 of the declarations
+
+9 [safe]
+  - move `SkinListEntry* pList;` to line 4 of the declarations
+
+9 [safe]
+  - move `SkinListEntry* pList;` to line 5 of the declarations
