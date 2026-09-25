@@ -125,7 +125,8 @@ jobs:
         # ninja prints "main.dol: OK" only when the check reruns: run it again to be sure.
         DTK=build/tools/dtk; [ -f "$DTK.exe" ] && DTK="$DTK.exe"
         "$DTK" shasum -c config/GW4E69/build.sha1 | tee "$RUNNER_TEMP/sha.log"
-        grep -q "main.dol: OK" "$RUNNER_TEMP/sha.log"
+        # dtk colours the OK on Windows: strip the colour codes before matching
+        sed 's/\x1b\[[0-9;]*m//g' "$RUNNER_TEMP/sha.log" | grep -q "main.dol: OK"
 
     - name: Run ${{ inputs.tool }}
       id: tool
