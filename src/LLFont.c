@@ -572,6 +572,11 @@ f32 fn_80011C90(LLFont* pFont, UFontContext* pCtx, char* sz) {
 
 // ---- end of sweep code ----
 
+// fake match: an identity read, for the register order of fn_80011D0C.
+static inline char fn_80011D0C_Read(char c) {
+    return c;
+}
+
 // Word-wraps sz (NULL: pCtx->szText) into the box pCtx->a8C (x, y, width, height), drawing each line
 // when bDraw is set. f70/f74 come in as 0..1 within the box and are turned into screen positions;
 // f74 then steps down a line at a time. Lines break at spaces and '\n' ('\r' counts as a space);
@@ -652,7 +657,7 @@ int fn_80011D0C(LLFont* pFont, UFontContext* pCtx, u8 bDraw, char* sz) {
                 n = p - pLine - 1;
                 pCut = pLine + n;
                 for (; n > 0; n--, pCut--) {
-                    cSaved = *pCut;
+                    cSaved = fn_80011D0C_Read(*pCut);  // fake match: through fn_80011D0C_Read
                     *pCut = '\0';
                     if (fn_80011C90(pFont, pCtx, pLine) <= pCtx->a8C[2]) {
                         if (bDraw) {

@@ -12,6 +12,17 @@ BreakLine_Render, StaticCam_GetFlybyInformation, UObject fn_800488B4, uiText fn_
 TerrainData fn_8000C278, Rain fn_800B52D4, hlaudmovie fn_800A8AD4, File_ReadAsyncEx, Earnings
 fn_800D477C/fn_800D4F14, gocamscripts CameraScript_LagAimMarker/fn_8003F2E0.
 
+**Plan agreed 2026-09-25 ~02:00 CDT (cloud credit ~$65 left; the owner wants the highest success
+rate):** 1) the sure links first: LLFileIO_Gc and UStream (all exact, not linked; see below), ~11 KB
+code + ~20 KB data; 2) then a research crack at Golfer AI_ChooseTarget (the biggest blocker: 13 KB
+code + 31 KB data, 98.20%, only register numbers differ): learn CodeWarrior's callee-saved numbering
+by controlled experiments, see agents/tried/AI_ChooseTarget.md (NEXT). Biggest blockers by link gain
+per function: Golfer AI_ChooseTarget, Ball Physics_HandleCollision, Earnings x2, startUp fn_800B0748,
+gocamscripts x2, skalib (52 KB data, 5 left). Lane nm-c (rcmp_mad_codec, SkinPart fn_800CE660,
+UISScreen fn_8016AEEC; worktree golfer-01) runs to 02:30 CDT: review + merge its branch. hwsBurn is
+26/27 (fn_8011172C 1 instruction off). The tried-ledger agents/tried/<fn>.md is the record of all
+attempts (brief + roles/matching.md point there). merge.py has an asm gate (asmgate.py).
+
 gemini/hand-matches (2026-09-25): only its two C fixes are merged (c576b92: File_ReadAsyncEx,
 UStream_Update exact). The other 13 "matches" (Earnings x2, Golfer AI_ChooseTarget, TerrainData,
 hlaudmovie, ska_shared, PsMgr, GoStaticCam, BreakLine_Render, Rain, uiText, MC, GameModeBestBall,
@@ -45,7 +56,7 @@ merged: the owner deletes them (the session cannot).
 
 | exact functions | matched code | code linked | data linked | game units linked |
 |---|---|---|---|---|
-| 7,508 / 7,647 | 92.67% | 72.72% | 76.16% | 205 / 259 |
+| 7,520 / 7,647 | 92.96% | 73.04% | 76.17% | 207 / 259 |
 
 2026-09-24 (the first cloud day, with the owner's PC): from 7,484 / 91.20% / 62.84% / 65.70%.
 Left: 139 non-exact functions (110 KB) in 54 game units; 29 units are 1 function from linking, 9

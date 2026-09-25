@@ -462,6 +462,9 @@ They will be sorted into the sections below.
 - **[verified] A cast that changes nothing still changes the code:** `(u8)` on a u8 field read reorders
   CodeWarrior's instructions and registers (hlaudtrackseq fn_800AA744, fn_800AAAA4: 2 diffs -> 0
   each; the permuter found `& 0xFFu` and `(unsigned int)`, which also work). Label it `// fake match:`.
+- **[verified] An identity read inside a declaration's initializer** (`int n = fn_X_Read(p->n38);`)
+  fixes a register order that the same read as a statement does not (hwsBurn fn_80110FB4: 5 diffs ->
+  0; leversweep's statement-level levers stopped at 5). Label it `// fake match:`.
 - Other compiler versions (GC 2.0, 2.0p1, 2.6, 2.7, 1.3.2) gave output identical to 2.5 on 18 near-miss
   functions tried today: not a lever for these.
 
