@@ -1165,6 +1165,10 @@ hwsOverride_Gc.c:
 
 hwsRender_Gc.c:
 	.text       start:0x80112B80 end:0x80113E60
+	.data       start:0x80193DD8 end:0x80193DE8
+	.sdata      start:0x802817E8 end:0x802817F8
+	.sbss       start:0x802824E0 end:0x802824F8
+	.sdata2     start:0x802848C8 end:0x802848E8
 
 DynChain.c:
 	.text       start:0x80113E60 end:0x80116540

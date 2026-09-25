@@ -30,11 +30,11 @@ void (*lbl_802817E8[1])(SkinIter* pIter) = { fn_80113BCC };
 void (*lbl_802817EC[1])(SkinIter* pIter) = { fn_80113C70 };
 void (*lbl_802817F0[2])(SkinIter* pIter) = { fn_80113D28, NULL };
 
-void* lbl_802824E0;                     // the skinned-vertex buffer (fn_80112C64)
-u32 lbl_802824E4;                       // the next free offset in it (fn_801132C4)
-int lbl_802824E8;                       // set: fn_801132C4 skins the next mesh's vertices again
-u32 lbl_802824EC;                       // the buffer's size
 void* lbl_802824F0;                     // the vertices fn_801132C4 last wrote
+u32 lbl_802824EC;                       // the buffer's size
+int lbl_802824E8;                       // set: fn_801132C4 skins the next mesh's vertices again
+u32 lbl_802824E4;                       // the next free offset in it (fn_801132C4)
+void* lbl_802824E0;                     // the skinned-vertex buffer (fn_80112C64)
 
 // Whether the grass is on (GoGrass.c; fn_80112D20 makes its texture only then): one view, at most
 // three players (two on course 14's hole 11).
@@ -272,6 +272,7 @@ void fn_801132C4(SkinMeshRefs* pRefs) {
     f32* pPosBuf;
     s8* pNormalBuf;
     int n;
+    uptr uNormal;
     s32 n10;
     s16* pVerts;
     void* pBuf;
@@ -296,7 +297,11 @@ void fn_801132C4(SkinMeshRefs* pRefs) {
         pVerts = pRefs->p14;
         pMatrices = pRefs->pC;
         pPos = pVerts;
-        pNormal = (s8*)(pVerts + n10 * 4);
+        // fake match: the normals' address (pVerts + n10 * 4 s16s) built as an integer gives EA's
+        // code; uptr keeps it pointer-sized for the port
+        uNormal = (uptr)pVerts;
+        uNormal += n10 * 8;
+        pNormal = (s8*)uNormal;
         pNormalBuf = (s8*)pBuf + n10 * 12;
         pNormalOut = pNormalBuf;
         for (i = 0; i < pRefs->n10; pPos += 4, pNormal += 4, i++) {

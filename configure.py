@@ -1036,7 +1036,7 @@ config.libs = [
             Object(Matching, "CalendarScreen.c"),
             Object(Matching, "hwsMaterial_Gc.c"),
             Object(Matching, "hwsOverride_Gc.c"),
-            Object(NonMatching, "hwsRender_Gc.c"),
+            Object(Matching, "hwsRender_Gc.c"),
             Object(Matching, "DynChain.c"),
             Object(Matching, "GameModeDriver.c"),
             Object(Matching, "PGATourSimulation.c"),
