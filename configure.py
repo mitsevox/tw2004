@@ -853,7 +853,7 @@ config.libs = [
         "cflags": cflags_base,
         "progress_category": "game",
         "objects": [
-            Object(NonMatching, "LLFileIO_Gc.c"),
+            Object(Matching, "LLFileIO_Gc.c"),
             Object(NonMatching, "LLDisp_Gc.c"),
             Object(Matching, "LLObj_Gc.c"),
             Object(Matching, "unsorted/code_800080D0.c"),
