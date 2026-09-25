@@ -37,6 +37,12 @@ LLFileIO_Gc.c:
 
 LLDisp_Gc.c:
 	.text       start:0x800066E4 end:0x800073B4
+	.rodata     start:0x8017DB60 end:0x8017DB70
+	.data       start:0x80186730 end:0x80186768
+	.bss        start:0x801A2350 end:0x801A24A0
+	.sbss       start:0x80281B88 end:0x80281BB0
+	.sdata2     start:0x80282A60 end:0x80282A80
+	.sbss2      start:0x80285200 end:0x80285204
 
 LLObj_Gc.c:
 	.text       start:0x800073B4 end:0x800080D0
