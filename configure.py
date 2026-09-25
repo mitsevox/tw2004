@@ -945,7 +945,7 @@ config.libs = [
             Object(Matching, "CharAnim.c"),
             Object(Matching, "GoShaderObjectCommon_MorphAnimManager_Gc.c"),
             Object(Matching, "GoCamTuningVars.c"),
-            Object(NonMatching, "GoShaderObject_Glows_Gc.c"),
+            Object(Matching, "GoShaderObject_Glows_Gc.c"),
             Object(Matching, "UFstPart.c"),
             Object(Matching, "BootCourse.c"),
             Object(NonMatching, "SunFlr_Gc.c"),

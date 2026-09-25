@@ -133,7 +133,7 @@ void fn_80098350(void) {
 // Draws a queued glow at pPos (in view space) unless its n25 has bit 0x80: glow n25's display list
 // through two matrices, the ring's inner edge scaled by f18 and its outer by f1C, both turned by
 // f20, in the colours uColorA and uColorB; n24 draws it over everything.
-void fn_80098408(GlowQueued* pGlow, f32* pPos) {
+void fn_80098408(GlowQueued* pGlow, const f32* pPos) {
     f32 fSin;
     f32 fCos;
     f32 fOuter;
@@ -264,7 +264,9 @@ void fn_80098884(u8* p0, u8* p1);
 void fn_800988A0(s32 p0, s32 p1, s32 p2, s32 p3);
 void fn_800988B8(f32 farg0, f32 farg1, f32 farg2);
 void fn_800988CC(s32 p0);
-extern u8 lbl_801D9A40[];
+// .bss in reverse address order (CodeWarrior lays it out last-defined-first)
+u8 lbl_801D9A40[0x28];
+GlowTable lbl_801D99D0;
 void fn_80036054();
 void fn_800360A0();
 void ColGlow_InitModule(void);
