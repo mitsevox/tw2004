@@ -674,6 +674,8 @@ MC.c:
 
 PsMgr.c:
 	.text       start:0x800A27FC end:0x800A2C3C
+	.sdata      start:0x802813F8 end:0x80281408
+	.sdata2     start:0x80283F18 end:0x80283F28
 
 PsBallFx.c:
 	.text       start:0x800A2C3C end:0x800A3E3C

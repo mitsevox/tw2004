@@ -16,6 +16,7 @@ typedef struct PsMgrState {
 } PsMgrState;
 LAYOUT_ASSERT(PsMgrState, 0x8);
 
+extern PsMgrState lbl_80282010;
 extern PsMgrState* lbl_802813F8;
 extern void* lbl_801F16F4[PS_NUM_KINDS];    // each kind's effect object (NULL: none)
 extern char lbl_801F1640[20][9];            // the names listed by the 'sfxd' object (fn_800A29B4)

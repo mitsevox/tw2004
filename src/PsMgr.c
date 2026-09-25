@@ -16,6 +16,8 @@ void fn_800B4F24(void* pRain);
 void fn_800B4FA4(void* pRain);
 void fn_800B52D4(void* pRain, f32* pFrameTime, s32 n);
 
+PsMgrState* lbl_802813F8 = &lbl_80282010;
+
 // Scales the colour of the hole's directional lights by fDir and of its point lights by fPoint,
 // then hands the lights to the light sets again.
 void fn_800A27FC(f32 fDir, f32 fPoint) {
@@ -81,6 +83,12 @@ void fn_800A29B4(UStreamObject* pObject) {
         i++;
     }
     fn_80009E70(pObject);
+}
+
+// fake match: stands in for a function the original linker stripped. The file's pool has 1.0 before
+// fn_800A2A80's 0.9 (0x80283F18, 0x80283F1C); its body is unknown, this one only reproduces the order.
+static f32 PsMgr_StrippedFn(f32 x) {
+    return x + 1.0f;
 }
 
 s32 fn_800A2A80(s32 nKind, f32* pArg, s32 n3) {

@@ -953,7 +953,7 @@ config.libs = [
             Object(NonMatching, "GoGreenGrid.c"),
             Object(Matching, "MC_Gc.c"),
             Object(NonMatching, "MC.c"),
-            Object(NonMatching, "PsMgr.c"),
+            Object(Matching, "PsMgr.c"),
             Object(Matching, "PsBallFx.c"),
             Object(Matching, "GameAudio.c"),
             Object(Matching, "AudTable.c"),
