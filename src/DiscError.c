@@ -164,20 +164,20 @@ int fn_800B6DA4(const char* szText) {
 // Draw one glyph (its bitmap rows from lbl_8018FFE0[nRow]) at twice the height; without a
 // DiscGlyph every column is drawn (fixed width).
 void fn_800B6E1C(int nX, int nY, int nRow, DiscGlyph* pGlyph) {
-    u32* pBits;
     u16* pPixel;
-    u32 uBits;
+    u16 uForeCb;
+    u32* pBits;
+    int nY2;
+    u16 uForeCr;
+    u16 uBackCb;
+    u16 uBackCr;
     u16 uFore;
     u16 uBack;
-    u16 uForeCb;
-    u16 uBackCb;
-    u16 uForeCr;
-    u16 uBackCr;
     int nX2;
-    int nY2;
-    int nCol;
-    int nLine;
+    u32 uBits;
     int bOdd;
+    int nLine;
+    int nCol;
 
     if (lbl_802814D2) {
         nY *= 8;
@@ -195,22 +195,22 @@ void fn_800B6E1C(int nX, int nY, int nRow, DiscGlyph* pGlyph) {
     nY2 = nY * 2;
     bOdd = 0;
     for (nLine = 0; nLine < 8; nLine++) {
-        nX2 = nX * 2;
+        nX2 = nX;
         uBits = *pBits;
         for (nCol = 0; nCol < 8; nCol++) {
             if (pGlyph == NULL || (nCol >= pGlyph->nLeft && nCol <= pGlyph->nRight)) {
                 if (uBits & 0xF0000000) {
-                    pPixel = (u16*)((u8*)lbl_80282194 + nX2 + lbl_8028218C * nY2 * 2);
+                    pPixel = (u16*)lbl_80282194 + nX2 + lbl_8028218C * nY2;
                     pPixel[0] = uFore;
                     pPixel[lbl_8028218C] = uFore;
                 } else if (lbl_802814D0) {
-                    pPixel = (u16*)((u8*)lbl_80282194 + nX2 + lbl_8028218C * nY2 * 2);
+                    pPixel = (u16*)lbl_80282194 + nX2 + lbl_8028218C * nY2;
                     pPixel[0] = uBack;
                     pPixel[lbl_8028218C] = uBack;
                 }
             }
             if (pGlyph == NULL || (nCol >= pGlyph->nLeft && nCol <= pGlyph->nRight)) {
-                nX2 += 2;
+                nX2++;
             }
             bOdd = 1 - bOdd;
             uBits <<= 4;
