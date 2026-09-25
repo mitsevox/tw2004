@@ -93,15 +93,20 @@ void fn_80168F5C(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
     }
 }
 
+// fake match: an identity read, for the register order of fn_80168FC8.
+static inline UISScreen* fn_80168FC8_Read(UISScreen* pScreen) {
+    return pScreen;
+}
+
 // Unloads a screen. Screens that named it as their previous screen take its previous screen
 // instead; it gets event -1 and the type 9 events queued for it (fn_80165ACC), its nodes and rate
 // functions are dropped, the unload callback frees its data and the table closes up. With no
 // current screen left, its previous screen (or the last one) becomes current through event 3.
 // Returns 0 when fn_80169308 says the screen cannot go yet.
 u8 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
-    u32 nIndex;
     UISScreen* pScreen;
     UISScreen* pSrc;
+    u32 nIndex;
     u16 uPrevScreen;
     u16 uPrevGroup;
     u32 i;
@@ -119,7 +124,7 @@ u8 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
             pStudio->nCurScreen = -1;
         }
         for (i = 0; i < pStudio->nScreens; i++) {
-            pSrc = &pStudio->pScreens[i];
+            pSrc = fn_80168FC8_Read(&pStudio->pScreens[i]);  // fake match: through fn_80168FC8_Read
             if (pSrc->uPrevGroup == uGroup && pSrc->uPrevScreen == uScreen) {
                 pSrc->uPrevGroup = uPrevGroup;
                 pSrc->uPrevScreen = uPrevScreen;
@@ -189,7 +194,6 @@ u8 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
 // stack. Returns 0 when an older record names the screen, or holds it: it cannot go yet.
 u8 fn_80169308(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
     s32 i;
-    UISRecord60* pRecords;
     UISRecord60* pRec;
     UISScreen* pScreen;
     s32* p1C;
@@ -197,8 +201,7 @@ u8 fn_80169308(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
 
     i = pStudio->n5C;
     if (i > 0) {
-        pRecords = pStudio->p60;
-        pRec = &pRecords[i - 1];
+        pRec = &pStudio->p60[i - 1];
         if (pRec->u24 == uScreen && pRec->u26 == uGroup) {
             pStudio->n5C = i - 1;
             if (pRec->pScreen != NULL) {
@@ -220,7 +223,7 @@ u8 fn_80169308(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
             }
         } else {
             while (i-- != 0) {
-                pRec = &pRecords[i];
+                pRec = &pStudio->p60[i];
                 if (pRec->u24 == uScreen && pRec->u26 == uGroup) return 0;
                 pScreen = pRec->pScreen;
                 if (pScreen != NULL && pScreen->uScreen == uScreen && pScreen->uGroup == uGroup) return 0;

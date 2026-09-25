@@ -150,6 +150,11 @@ void fn_80110A24(HwsBurn* pBurn, int n) {
     pBurn->a1C[n] = 1;
 }
 
+// fake match: an identity read, for the register order of fn_80110A38.
+static inline SkinIter* fn_80110A38_Read(SkinIter* pIter) {
+    return pIter;
+}
+
 // Marks SkinDesc.p44 entry n used: its bits, its meshes' bits, the morph-target entries after it
 // (those whose a1C flag is clear, each marked the same way) and its SkinDesc.p3C entries.
 void fn_80110A38(HwsBurn* pBurn, int n) {
@@ -161,12 +166,13 @@ void fn_80110A38(HwsBurn* pBurn, int n) {
     s32 nCount;
     int nLast;
     int i;
+    int j;
 
     fn_8001EA34(pBurn->p3C, n);
     fn_8001EA34(pBurn->p40, n);
     args.pDesc = pBurn->pDesc;
     args.n = n;
-    pIter = fn_80113910((u8*)&iterBuf, &args);
+    pIter = fn_80110A38_Read(fn_80113910((u8*)&iterBuf, &args));  // fake match: through fn_80110A38_Read
     while (fn_800CEEC0(pIter)) {
         fn_8001EA34(pBurn->p28, fn_800CEEFC(pIter));
         fn_800CEEC8(pIter);
@@ -176,14 +182,14 @@ void fn_80110A38(HwsBurn* pBurn, int n) {
     pEntry = &pBurn->pDesc->p44[n];
     if (pEntry->u24 & 2) {
         nLast = 0;
-        for (i = 0; i < pEntry->n14; i++) {
-            if (pBurn->a1C[pEntry->n18 + i] == 0) {
-                fn_80110A38(pBurn, pEntry->n10 + i);
-                nLast = i + 1;
+        for (j = 0; j < pEntry->n14; j++) {
+            if (pBurn->a1C[pEntry->n18 + j] == 0) {
+                fn_80110A38(pBurn, pEntry->n10 + j);
+                nLast = j + 1;
             }
         }
-        for (i = 0; i < nLast; i++) {
-            fn_8001EA34(pBurn->p40, pEntry->n10 + i);
+        for (j = 0; j < nLast; j++) {
+            fn_8001EA34(pBurn->p40, pEntry->n10 + j);
         }
     }
 
@@ -305,11 +311,16 @@ s32 fn_80110F2C(HwsBurn* pBurn, s32 nAlign) {
     return 0;
 }
 
+// fake match: an identity read, for the register order of fn_80110FB4.
+static inline int fn_80110FB4_Read(int n) {
+    return n;
+}
+
 // Copies of the SkinDesc.p44 entries fn_80110F2C listed (a44) at pBase + *pOffset, renumbered
 // for the burn: an entry whose p3C bit is clear loses its meshes, and the morph targets stop at
 // the first one not kept. NULL when none are listed.
 SkinDesc44* fn_80110FB4(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
-    int n = pBurn->n38;
+    int n = fn_80110FB4_Read(pBurn->n38);  // fake match: through fn_80110FB4_Read
     SkinDesc* pDesc;
     SkinDesc44* aOut;
     SkinDesc44* pOut;
@@ -506,23 +517,22 @@ SkinMesh* fn_801111E8(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
 // Mark the SkinDesc.p8C entries the a64 entries use (p78) and list them (a7C, a80). nAlign is
 // unused (see fn_80110F2C).
 s32 fn_80111658(HwsBurn* pBurn, s32 nAlign) {
+    int i;
     int nEntries = pBurn->n60;
     int nBits = pBurn->n70;
-    int i;
-    int j;
     int n;
 
-    fn_8001E938(pBurn->p78, nBits);
+    fn_8001E938(pBurn->p78, pBurn->n70);
     for (i = 0; i < nEntries; i++) {
         if (pBurn->a64[i].n18 >= 0 && pBurn->a64[i].n18 < nBits) {
             fn_8001EA34(pBurn->p78, pBurn->a64[i].n18);
         }
     }
     n = 0;
-    for (j = 0; j < nBits; j++) {
-        if (fn_8001E9CC(pBurn->p78, j)) {
-            pBurn->a7C[n] = j;
-            pBurn->a80[j] = n;
+    for (i = 0; i < nBits; i++) {
+        if (fn_8001E9CC(pBurn->p78, i)) {
+            pBurn->a7C[n] = i;
+            pBurn->a80[i] = n;
             n++;
         }
     }
@@ -532,15 +542,16 @@ s32 fn_80111658(HwsBurn* pBurn, s32 nAlign) {
 
 // Copy the listed SkinDesc.p8C entries to pBase + *pOffset.
 SkinDesc8C* fn_8011172C(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
+    SkinDesc* pDesc = pBurn->pDesc;
     SkinDesc8C* aOut;
     int i;
     int n = pBurn->n74;
-    SkinDesc* pDesc = pBurn->pDesc;
     s32 nEnd;
 
     aOut = (SkinDesc8C*)(pBase + *pOffset);
     *pOffset += n * sizeof(SkinDesc8C);
-    nEnd = nAlign + *pOffset;
+    nEnd = *pOffset;
+    nEnd += nAlign;
     nEnd = (nEnd - 1) & ~(nAlign - 1);
     *pOffset = nEnd;
     for (i = 0; i < n; i++) {
