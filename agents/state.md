@@ -1,48 +1,38 @@
 # State (keep this short: current facts only; history goes to docs/journal.md)
 
-Updated 2026-09-24 ~17:10 CDT. RUNNING (cloud, to 18:00 CDT, no permuter):
-- swing-01 round 2: GoStaticCam, UObject, uiText, TerrainData, GoShaderObject_Rain_Gc
-- cam-01 round 2: GameMode26, LLFileIO_Gc, startUp, GoDynObj
-Round 1 merged (notes: agents/notes/cloud-2026-09-24-round1.txt, money-01-notes_cloud1.txt): linked
-uiLoadFile, gbacable, target (the owner's PC), ShaderObjectsData; exact BreakLine_Reset,
-Stream_ParseBufs, Glows fn_800981D0; closer Skin (1 instruction), hwsRender, AI_ChooseTarget, PictInt.
+Updated 2026-09-25 ~00:30 CDT. QUIET: no lanes running (cloud or PC), everything merged to main,
+`main.dol: OK`. Every unit is free.
 
-~17:40 CDT: no cloud lanes running. The owner's PC lanes are done and every unit is released,
-except UISScreen until local/uisscreen-deferred is merged (the whole UIS library looks built with
-`-inline auto,deferred`: the flag alone changes no score; the gain needs reversed source order +
-auto_inline pragmas; next a lane for UISApi/UISEvent/UIStudio). Merged from the PC: target,
-streaming (3 files), goterrain (+4 exact; inline renamed fn_80031E58_Read, no name evidence).
-Also merged: holecontests-link (GameHoleContests linked), hlaudmovie (+1), uisscreen-deferred,
-split-finder (LLTime.c, Code800B90F4.c linked; survey in agents/findings/split-survey.tsv).
-Strong split leads from the survey, all free now: Swing (3 state files, ~23 KB exact), Golfer
-(Caddie part ~4.8 KB), Ball (Wind.c), goballfx (GoLightFogEnv); medium: Golfer club part, Glows,
-hlaudmovie. split-01 merged (31f5af8): StateGolfer.c, stateFunc.c, Code8005D2E4.c (from Swing), Wind.c
-(Ball), GoLightFogEnv.c (goballfx), Code8002DB80.c (Golfer; the session tail is a new NonMatching
-Code8002EE1C.c) split off and linked. Not split (no boundary evidence): Golfer's club part, Glows.
-Follow-ups for the audit (comments, not matching): Swing.c's and goballfx.c's file headers still
-describe the moved code; DynChain.c/Replay.c prototype comments still say "Ball.c" for the Wind
-functions. The bone-name strings 0x801871D0-0x801873F0 (.sdata 0x80280E78-0x80281070) are not
-Skeleton's: they sit before skalib's data (skalib or char); attach them when that unit links.
-leversweep.py (the lever-combination sweeper) is being self-tested in worktree probe-01. uis-01 done: UISApi/UISEvent/UIStudio reversed + deferred give
-byte-identical code and data (no evidence either way; no score moved). Merged only UISEvent, where
-it lets FindRateFn's fake copy go (callers call fn_8016604C); UISApi/UIStudio left as they were
-(branch agent/swing-01 commit db03b3f has the reversed versions). Fake-match helpers now named fn_<caller>_Read (brief).
-Held by the owner's PC to ~19:15 CDT (wins come as local/<name> branches): map-02 GoGolfCam,
-Earnings, gocamscripts; map-03 Skin, UStream, GoBreakLine, GoStaticCam, UObject, uiText,
-TerrainData, GoShaderObject_Rain_Gc, hlaudmovie, LLFileIO_Gc; map-04 ska_shared, AnimStream, skalib;
-map-07 (data) PsBallFx, the SitDev tables, the streammanagerhole strings, then orphan-data leads.
-local/target-link and local/streaming-link (streammanagerhole split in 3, all linked, +8 % data)
-are merged; the owner deletes those branches (the session cannot). The PC's split finder
-(agent/map-05, to ~18:00) surveys unlinked units for EA file boundaries: no cloud splits until it
-reports. Plan: keep 2 cloud lanes (~$35-40/h); size the next round from the survey.
+**Tonight (owner's PC): the lever sweeper.** `ninja build/GW4E69/report.json`, then
+`python tools/match/leversweep.py --from-report --min 95 -j 20` (80 functions, ~8 h; docs/workflow.md
+"The lever sweeper"). Results in build/leversweep/summary.tsv + <fn>.txt: candidates only; a lane
+applies each hit, confirms it in the real build and checks review levers and fake-match labels.
+Priority targets (hand + permuter exhausted, ~99.5%+): ska_shared fn_8001FCF4, UStream_Update,
+BreakLine_Render, StaticCam_GetFlybyInformation, UObject fn_800488B4, uiText fn_800922A8,
+TerrainData fn_8000C278, Rain fn_800B52D4, hlaudmovie fn_800A8AD4, File_ReadAsyncEx, Earnings
+fn_800D477C/fn_800D4F14, gocamscripts CameraScript_LagAimMarker/fn_8003F2E0.
+
+What was tried per function: agents/notes/ (cloud-2026-09-24-round1.txt, money-01-notes_cloud1.txt,
+the PC's map-*-notes_w9/w10 files). New rules: docs/decomp-notes.md "New from the first cloud lanes".
+
+Follow-ups (audit, not matching lanes): Swing.c's and goballfx.c's file headers still describe code
+moved to StateGolfer.c/stateFunc.c/Code8005D2E4.c and GoLightFogEnv.c; DynChain.c/Replay.c prototype
+comments say "Ball.c" for the Wind functions; charstate.h/char.c say "Skin.c" for the three functions
+moved to Code80037AB8.c. The bone-name strings 0x801871D0-0x801873F0 (.sdata 0x80280E78-0x80281070)
+belong to skalib or char, not Skeleton: attach them when that unit links. UISApi/UIStudio under
+`-inline auto,deferred` give byte-identical code (kept as they are; reversed versions on
+agent/swing-01 db03b3f). Split leads not taken (no boundary evidence): Golfer's club part, Glows;
+DiscError needs fn_800B6FCC. Remote branches local/* and reference-build-debug-inventories are
+merged: the owner deletes them (the session cannot).
 
 ## Numbers (report.json)
 
 | exact functions | matched code | code linked | data linked | game units linked |
 |---|---|---|---|---|
-| 7,484 / 7,647 | 91.20% | 62.84% | 65.70% | 183 / 247 |
+| 7,508 / 7,647 | 92.67% | 72.72% | 76.03% | 205 / 259 |
 
-Left: 163 non-exact functions (133 KB) in 64 game units; 30 units are 1 function from linking, 17
+2026-09-24 (the first cloud day, with the owner's PC): from 7,484 / 91.20% / 62.84% / 65.70%.
+Left: 139 non-exact functions (110 KB) in 54 game units; 29 units are 1 function from linking, 9
 are 2. `python tools/agents/remain.py` lists them; rank by code-bar gain per function.
 
 Audit: function names and comments 100% (tag `audit-baseline-1`). `auditbaseline.py` now: audited
