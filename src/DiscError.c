@@ -82,11 +82,8 @@ void fn_800B694C(s32 nWidth, s32 nHeight, u32 uSize) {
         lbl_801F66A8[n].nLeft = nLeft;
         lbl_801F66A8[n].nRight = nRight;
         lbl_801F66A8[n].nWidth = nRight + 1 - nLeft;
-        bDrop = 0;
-        if (n == 'g' - 0x20 || n == ',' - 0x20 || n == ';' - 0x20 || n == 'j' - 0x20 ||
-            n == 'p' - 0x20 || n == 'q' - 0x20 || n == 'y' - 0x20) {
-            bDrop = 1;
-        }
+        bDrop = (n == 'g' - 0x20 || n == ',' - 0x20 || n == ';' - 0x20 || n == 'j' - 0x20 ||
+                 n == 'p' - 0x20 || n == 'q' - 0x20 || n == 'y' - 0x20);
         lbl_801F66A8[n].nDrop = bDrop ? 2 : 0;
     }
 }
