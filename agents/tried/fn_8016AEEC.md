@@ -10,6 +10,8 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 (add yours here: date, lane, what, score)
 
+- 2026-09-25 n-uisscreen: (scores are aligned diff counts from the WHOLE unit compiled: base.c from perm_setup drops the auto-inlined callees, e.g. fn_8016C6C4 inside fn_8016B4D4). u8 copy of bLast before loop 2, int/s16 bLast, init at the declaration, bLast before pNode, the start loop or loop 2 or one group as a static inline helper (with -inline auto,deferred the recursion inlines into the helper: 107-144), a block-scoped or separate counter for the start loop (35), nMsg int (51): none below 25. The first loop's counter shares r24 with loop 2's pGroup in EA: the start loop's i is not loop 2's i, but a separate variable made it worse.
+
 - 2026-09-25 nm-c: the sweep's best applied (fn_8016AEEC_Read identity inline on `nMsg == -1`,
   `u32 j` first): 97.27% -> 97.64% (40 -> 25 diffs). New leversweep 7 min: 25. bLast assigned just
   before the second loop: 31; through a second u8 (bMsg early, `bLast = bMsg` before the loop, EA

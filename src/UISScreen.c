@@ -311,18 +311,20 @@ char* fn_8016BEDC(char* pOut, char* pEnd, s32 nWidth, s32 nPrec, f32 f) {
         aDigits[nDigits++] = '-';
     }
     if (nWidth != 0) {
-        for (nPad = nWidth - (nPrec + (nDigits + (nPrec != 0))); nPad > 0; nPad--) {
+        for (nPad = nWidth - (nPrec + nDigits + (nPrec != 0)); nPad > 0; nPad--) {
             aDigits[nDigits++] = ' ';
         }
     }
-    while (nDigits-- > 0 && pOut < pEnd) {
+    while (--nDigits >= 0 && pOut < pEnd) {
         *pOut++ = aDigits[nDigits];
     }
     if (nPrec != 0 && pOut < pEnd) {
         *pOut++ = '.';
         do {
             fFrac *= 10.0f;
-            *pOut++ = (s32)fFrac + '0';
+            // (int) and (s32) (a long) are separate conversions to the compiler: EA stores the
+            // digit and the whole part as two words.
+            *pOut++ = (int)fFrac + '0';
             fFrac -= (s32)fFrac;
         } while (--nPrec != 0 && pOut < pEnd);
     }
@@ -492,11 +494,11 @@ void fn_8016B4D4(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 nMove) {
     s32 nScreens;
     s32 nIndex;
     s32 nCount;
-    s32 nStep;
     s32 nFrom;
     s32 nTo;
     u32 i;
     u32 j;
+    s32 nStep;
     UISScreen tmp;
 
     nScreens = pStudio->nScreens;
@@ -811,8 +813,8 @@ s32 fn_8016A2D4(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32
     nResult = 0;
     if (pScreen->pData == NULL || nNode >= pScreen->pData->nNodes) return 0;
     pNode = &pScreen->pData->pNodes[nNode];
-    if ((pNode->pInfo->u4 != 0 && pNode->pInfo->u60 != 0) || (n5 >= (u32)-10 && n5 <= (u32)-8) ||
-        (n5 >= (u32)-5 && n5 <= (u32)-2) || n5 == (u32)-11) {
+    if ((pNode->pInfo->u4 != 0 && pNode->pInfo->u60 != 0) || n5 - (u32)-10 <= 2 ||
+        n5 - (u32)-5 <= 3 || n5 == (u32)-11) {
         for (i = 0; i < pNode->nHandlers; i++) {
             UISHandler* pHandler = &pNode->pHandlers[i];
             if (pHandler->uEvent == 0xFFFF) {
