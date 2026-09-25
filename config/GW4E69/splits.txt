@@ -91,6 +91,10 @@ LoadData.c:
 
 TerrainData.c:
 	.text       start:0x8000BF20 end:0x8000C624
+	.bss        start:0x801A2A00 end:0x801A2AC0
+	.sdata      start:0x80280DB0 end:0x80280DB8
+	.sbss       start:0x80281C10 end:0x80281C18
+	.sdata2     start:0x80282AF0 end:0x80282B08
 
 UStream.c:
 	.text       start:0x8000C624 end:0x8000E830
