@@ -152,6 +152,26 @@ process tree (Git Bash's `timeout` does not stop it on Windows; a run once went 
 machine is shared, so keep `-j 4` or less. Output lands in `build/perm/<fn>/output-*`. Read the diff it found and apply the idea by hand;
 its code is often ugly but it points at the real change (a type, an order, a temporary).
 
+**The lever sweeper** tries the changes that have actually fixed near-misses (declaration moves,
+int/s32 spellings, an identity inline on an assignment, `*=` splits, loop forms, `(u32)` index
+casts), singly, in pairs and deeper, instead of random rewrites. CPU only, src/ untouched; meant
+for a whole night on every core:
+
+```
+ninja build/GW4E69/report.json
+python tools/match/leversweep.py --from-report --min 95 -j 20      # ~6 min per function
+python tools/match/leversweep.py <Unit> <fn>                        # one function
+```
+
+Results: `build/leversweep/summary.tsv` (one row per function: base, best, EXACT, safe/review, the
+levers) and `build/leversweep/<fn>.txt` (the best variants and the changed lines). A hit is a
+candidate: apply it to the unit, confirm it in the real build, and check the meaning. "review" levers
+change behaviour for some values (a signedness, a do/while as while); an identity inline is a fake
+match (look for EA's helper in TW07 first, else `fn_<caller>_Read` with `// fake match:`).
+`leversweep_selftest.py` sweeps functions already solved, from their source before the fix: on
+2026-09-25 it rediscovered BreakLine_Reset, GoDynObj fn_8004731C (a two-change pair), GoTerrain
+fn_80032518 and Glows fn_800981D0.
+
 Before you commit
 -----------------
 
