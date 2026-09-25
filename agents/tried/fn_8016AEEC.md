@@ -10,6 +10,11 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 (add yours here: date, lane, what, score)
 
+- 2026-09-25 nm-c: the sweep's best applied (fn_8016AEEC_Read identity inline on `nMsg == -1`,
+  `u32 j` first): 97.27% -> 97.64% (40 -> 25 diffs). New leversweep 7 min: 25. bLast assigned just
+  before the second loop: 31; through a second u8 (bMsg early, `bLast = bMsg` before the loop, EA
+  has a `mr r30,r27` there): 44.
+
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
 ```
