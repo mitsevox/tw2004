@@ -12,6 +12,10 @@ BreakLine_Render, StaticCam_GetFlybyInformation, UObject fn_800488B4, uiText fn_
 TerrainData fn_8000C278, Rain fn_800B52D4, hlaudmovie fn_800A8AD4, File_ReadAsyncEx, Earnings
 fn_800D477C/fn_800D4F14, gocamscripts CameraScript_LagAimMarker/fn_8003F2E0.
 
+**Running (2026-09-25 afternoon):** local Claude on the PC: permuter on Golfer AI_ChooseTarget
+(Golfer held). Gemini (`gemini/round2`) and ChatGPT (`codex/round2`) on the owner's Mac, disjoint unit
+lists in agents/assign/2026-09-25-gemini-chatgpt.md (those units held). The orchestrator merges.
+
 **2026-09-25 day (cloud):** LLFileIO_Gc and UStream LINKED (45d089d + next). nm-c merged (f55c2a4:
 rcmp_mad_codec 15/17). Golfer AI_ChooseTarget research done, not solved (agents/tried/AI_ChooseTarget.md:
 declaration orders exhausted, 2 h permuter float-only, compilers ruled out). NEXT for it: a long
