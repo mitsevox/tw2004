@@ -79,6 +79,17 @@ jobs:
       JOBS: ${{ inputs.jobs }}
       TW_PERMUTER: C:/dev/tools/decomp-permuter/permuter.py
     steps:
+    # The runner service's PATH has Git's cmd\ (git.exe) but not its bin\ (bash.exe): add it for
+    # the steps below, which all run in bash.
+    - name: Git Bash on PATH
+      shell: powershell
+      run: |
+        $git = (Get-Command git -ErrorAction SilentlyContinue).Source
+        $root = if ($git) { Split-Path (Split-Path $git) } else { 'C:\Program Files\Git' }
+        if (-not (Test-Path "$root\bin\bash.exe")) { throw "no bash.exe under $root\bin" }
+        Add-Content -Path $env:GITHUB_PATH -Value "$root\bin"
+        Write-Output "bash: $root\bin\bash.exe"
+
     - name: Check inputs
       run: |
         for v in "$UNIT" "$FN"; do
