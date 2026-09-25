@@ -4,6 +4,7 @@ The public progress page's history (GitHub Pages, fed by CI): one record per bui
 
     python tools/dashboard/pages.py append <history.json> <report.json> <sha> <time> <subject>
     python tools/dashboard/pages.py seed <history.json> [<dashboard_history.json>]
+    python tools/dashboard/pages.py merge <history.json> <older dashboard_history.json>
 
 append: adds (or replaces, for the same sha) the record of one CI build: sha, date, exact
 functions, matched / linked code and data, all from objdiff's report.json. seed: writes a first
@@ -70,8 +71,25 @@ def seed(out_path, src_path):
     print('pages.py seed: wrote %s, %d commits' % (out_path, len(out)))
 
 
+def merge_older(history_path, src_path):
+    """Adds the records of an older history file (e.g. the PC's build/dashboard_history.json,
+    which covers commits from before a history rewrite) that are older than everything in
+    history_path. Records from the same time on are left as they are."""
+    h, src = load(history_path), load(src_path)
+    first = min((r.get('time', 0) for r in h), default=float('inf'))
+    older = [{k: r[k] for k in ('commit', 'time', 'subject', 'report', 'matched_code', 'complete_code',
+                                'matched_data', 'complete_data', 'linked_code', 'linked_data') if k in r}
+             for r in src if r.get('time', 0) < first]
+    h = sorted(older + h, key=lambda r: r.get('time', 0))
+    json.dump(h, open(history_path, 'w'), indent=0)
+    print('pages.py merge: %d older records added, %s now %d records' % (len(older), history_path, len(h)))
+
+
 if __name__ == '__main__':
     a = sys.argv[1:]
+    if len(a) == 3 and a[0] == 'merge':
+        merge_older(a[1], a[2])
+        raise SystemExit(0)
     if len(a) == 6 and a[0] == 'append':
         h = append(a[1], record(a[2], a[3], a[4], a[5]))
         print('pages.py append: %s now %d records, latest %s' % (a[1], len(h), a[3][:7]))
