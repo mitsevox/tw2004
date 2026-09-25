@@ -1,6 +1,6 @@
 # SD_vShaderObject_Grass_Static_Render (GoShaderObject_Grass_Gc.c, 0x80120F74)
 
-Status: OPEN, 96.78% on 2026-09-25.
+Status: OPEN, 97.21% on 2026-09-25 (n-shaders).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -9,6 +9,11 @@ unless you combine it with something new. Before you stop, add every attempt und
 ## Attempts
 
 (add yours here: date, lane, what, score)
+- 2026-09-25, n-shaders: the PC sweep's three moves searched over nearby positions (pVert 20-27,
+  nPass 5-9, fPerX 15-19): best pVert 22nd, nPass 6th, fPerX 15th, aligned 74 -> 55, real
+  96.78 -> 97.21 (kept). Decl climb after it: none. const on pObject / the pointer locals: 74.
+  Left: register allocation (nSteps-like counters r18/r22, f22/f27) and two address adds
+  scheduled differently. Permuter candidate.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
