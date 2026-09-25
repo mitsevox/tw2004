@@ -1782,5 +1782,21 @@
 "matched_functions": 7528,
 "total_functions": 7647,
 "exact": 7528
+},
+{
+"commit": "1ba3895",
+"sha": "1ba3895ed919bb245d36eb24a0847909db24318f",
+"time": 1790353496,
+"subject": "pages.py merge: add an older history file's records (the PC's pre-rewrite dashboard history) before the page's first record",
+"report": true,
+"matched_code": 1445112,
+"complete_code": 1150048,
+"matched_data": 701147,
+"complete_data": 844511,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7528,
+"total_functions": 7647,
+"exact": 7528
 }
 ]
