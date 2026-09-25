@@ -73,6 +73,12 @@ void fn_800B8F28(s32* pOut, int nStride);
 // A code's table entry: its length in the low byte, the run in bits 16-21, the level on top.
 #define MAD_ENTRY(nLen, nValue) ((nLen) | (((u32)(nValue) << 22) | (((nValue) << 6) & 0x3F0000)))
 
+// fake match: an identity inline around each MAD_ENTRY in fn_800B769C moves the entry's
+// computation after the loop setup, as in EA's code
+static inline u32 fn_800B769C_Read(u32 uEntry) {
+    return uEntry;
+}
+
 // Build the decoder's tables: the pixel clamp, the coefficient code lookups and the DC codes.
 void fn_800B769C(void) {
     s32 nCode;
@@ -116,7 +122,7 @@ void fn_800B769C(void) {
             // up to 9 bits: every 9-bit index that starts with the code
             nIndex = nCode >> 7;
             nCount = 1 << (9 - nLen);
-            uEntry = MAD_ENTRY(nLen, nValue);
+            uEntry = fn_800B769C_Read(MAD_ENTRY(nLen, nValue));
             for (j = 0; j < nCount; j++) {
                 lbl_801F7A58[nIndex + j] = uEntry;
             }
@@ -125,7 +131,7 @@ void fn_800B769C(void) {
             nIndex = nCode >> 2;
             nBits = nLen - 6;
             nCount = 1 << (8 - nBits);
-            uEntry = MAD_ENTRY(nBits, nValue);
+            uEntry = fn_800B769C_Read(MAD_ENTRY(nBits, nValue));
             for (j = 0; j < nCount; j++) {
                 lbl_801F7258[nIndex + j] = uEntry;
             }
@@ -140,7 +146,7 @@ void fn_800B769C(void) {
             nBits = nLen - 1;
             nIndex = nCode >> 7;
             nCount = 1 << (8 - nBits);
-            uEntry = MAD_ENTRY(nBits, nValue);
+            uEntry = fn_800B769C_Read(MAD_ENTRY(nBits, nValue));
             for (j = 0; j < nCount; j++) {
                 lbl_801F7658[nIndex + j] = uEntry;
             }
@@ -148,7 +154,7 @@ void fn_800B769C(void) {
             nBits = nLen + 2;
             nIndex = nCode >> 10;
             nCount = 1 << (8 - nBits);
-            uEntry = MAD_ENTRY(nBits, nValue);
+            uEntry = fn_800B769C_Read(MAD_ENTRY(nBits, nValue));
             for (j = 0; j < nCount; j++) {
                 lbl_801F7258[nIndex + j] = uEntry;
             }
@@ -436,9 +442,14 @@ int fn_800B8AA0(void) {
     nDC = (s32)lbl_802821B4 >> 24;
     lbl_801F8358[0] = nDC * lbl_801F7058[0];
     fn_800B8A2C(8);
+    // fake match: the 63 words cleared three per pass; a loop of single stores unrolls 9-way, not
+    // EA's 21 stores x 3
     p = &lbl_801F8358[1];
-    for (i = 63; i != 0; i--) {
-        *p++ = 0;
+    for (i = 0; i < 21; i++) {
+        p[0] = 0;
+        p[1] = 0;
+        p[2] = 0;
+        p += 3;
     }
     n = 1;
     while (1) {
@@ -475,21 +486,18 @@ int fn_800B8AA0(void) {
 
 // The inverse DCT's first pass: eight coefficients in, a column of pOut (8 apart) out.
 void fn_800B8C54(s32* pIn, s32* pOut) {
-    s32 z10;
+    s32 t10;
     s32 z11;
-    s32 z12;
     s32 z13;
     s32 z5;
-    s32 t10;
     s32 t11;
-    s32 t12;
-    s32 o0;
-    s32 o1;
     s32 o2;
+    s32 z10;
     s32 e0;
     s32 e1;
-    s32 e2;
+    s32 z12;
     s32 e3;
+    s32 e2;
     s32 t;
     s32 s;
 
@@ -510,13 +518,15 @@ void fn_800B8C54(s32* pIn, s32* pOut) {
     z11 = pIn[1] + pIn[7];
     z13 = pIn[5] + pIn[3];
     t11 = z11 - z13;
-    s = z13 + z11;
+    // register note: z13 and z5 are reused for the later sums (z13: the odd sum, then o0; z5: t12,
+    // then o1), which gives EA's register allocation
+    z13 = z13 + z11;
     z5 = fn_800B8A04(z10 + z12, 0x61F8);
     t10 = z5 + fn_800B8A04(z10, 0x8A8C);
     t11 = fn_800B8A04(t11, 0xB505);
-    t12 = fn_800B8A04(z12, 0x14E7B) - z5;
-    o0 = s + t12;
-    o1 = t12 + t11;
+    z5 = fn_800B8A04(z12, 0x14E7B) - z5;
+    z13 = z13 + z5;
+    z5 = z5 + t11;
     o2 = t11 + t10;
     e0 = pIn[0] + pIn[4];
     e1 = pIn[0] - pIn[4];
@@ -526,65 +536,63 @@ void fn_800B8C54(s32* pIn, s32* pOut) {
     s = pIn[2] + pIn[6] + t;
     e3 = e0 - s;
     e0 = e0 + s;
-    pOut[0] = e0 + o0;
-    pOut[8] = e1 + o1;
+    pOut[0] = e0 + z13;
+    pOut[8] = e1 + z5;
     pOut[16] = e2 + o2;
     pOut[24] = e3 + t10;
     pOut[32] = e3 - t10;
     pOut[40] = e2 - o2;
-    pOut[48] = e1 - o1;
-    pOut[56] = e0 - o0;
+    pOut[48] = e1 - z5;
+    pOut[56] = e0 - z13;
 }
 
 // The second pass: a row of the first pass's output into eight 16.16 values.
 void fn_800B8DF4(s32* pIn, s32* pOut) {
-    s32 z10;
+    s32 t10;
     s32 z11;
-    s32 z12;
     s32 z13;
     s32 z5;
-    s32 t10;
     s32 t11;
-    s32 t12;
-    s32 o0;
-    s32 o1;
     s32 o2;
+    s32 z10;
     s32 e0;
     s32 e1;
-    s32 e2;
+    s32 z12;
     s32 e3;
+    s32 e2;
     s32 t;
     s32 s;
 
     z10 = pIn[5] - pIn[3];
-    z13 = pIn[5] + pIn[3];
     z11 = pIn[1] + pIn[7];
     z12 = pIn[1] - pIn[7];
+    z13 = pIn[5] + pIn[3];
     t11 = z11 - z13;
-    s = z13 + z11;
+    // register note: z13 and z5 reused as in fn_800B8C54
+    z13 = z13 + z11;
     z5 = fn_800B8A04(z10 + z12, 0x61F8);
     t10 = z5 + fn_800B8A04(z10, 0x8A8C);
     t11 = fn_800B8A04(t11, 0xB505);
-    t12 = fn_800B8A04(z12, 0x14E7B) - z5;
-    o0 = s + t12;
-    o1 = t12 + t11;
+    z5 = fn_800B8A04(z12, 0x14E7B) - z5;
+    z13 = z13 + z5;
+    z5 = z5 + t11;
     o2 = t11 + t10;
     e0 = pIn[0] + pIn[4];
     e1 = pIn[0] - pIn[4];
     t = fn_800B8A04(pIn[2] - pIn[6], 0xB505);
     e2 = e1 - t;
     e1 = e1 + t;
-    s = pIn[2] + (pIn[6] + t);
+    s = pIn[2] + pIn[6] + t;
     e3 = e0 - s;
     e0 = e0 + s;
-    pOut[0] = e0 + o0;
-    pOut[1] = e1 + o1;
+    pOut[0] = e0 + z13;
+    pOut[1] = e1 + z5;
     pOut[2] = e2 + o2;
     pOut[3] = e3 + t10;
     pOut[4] = e3 - t10;
     pOut[5] = e2 - o2;
-    pOut[6] = e1 - o1;
-    pOut[7] = e0 - o0;
+    pOut[6] = e1 - z5;
+    pOut[7] = e0 - z13;
 }
 
 // The inverse DCT of lbl_801F8358 into an 8x8 block (rows nStride words apart).

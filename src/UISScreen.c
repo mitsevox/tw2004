@@ -587,17 +587,20 @@ void fn_8016B09C(UIStudio* pStudio, u32 uEvent, s32 nArgs, const s32* pArgs) {
     }
 }
 
+// fake match: an identity read; it gives EA's register order.
+static inline u8 fn_8016AEEC_Read(u8 b) { return b; }
+
 // Runs the screen file's start entries that have not run yet, then every handler under node
 // nNode; a handler run with message -1 is marked as run.
 void fn_8016AEEC(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
+    u32 j;
     UISNode* pNode;
     u32 i;
-    u32 j;
     u8 bLast;
 
     if (pScreen->pData != NULL) {
         pNode = &pScreen->pData->pNodes[nNode];
-        bLast = (nMsg == -1);
+        bLast = fn_8016AEEC_Read(nMsg == -1);
         for (i = 0; i < pScreen->pData->nStart; i++) {
             UISEntry* pEntry = &pScreen->pData->pStart[i];
             if (pEntry->n2 == 0) {
