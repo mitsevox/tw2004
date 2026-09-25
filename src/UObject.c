@@ -78,6 +78,12 @@ void fn_80048894(UObject* pObj) {
     fn_800488B4(pObj);
 }
 
+// fake match: stands in for a function the original linker stripped. The file's pool has 1.0 before
+// fn_800488B4's 0.75 (0x802831F0, 0x802831F4); its body is unknown, this one only reproduces the order.
+static f32 UObject_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 // Draws the object: its level of detail's mesh, unless fn_80007B2C finds it off screen (3); lit by
 // the ground under it (outside game type 3) when its mesh asks for it.
 void fn_800488B4(UObject* pObj) {
@@ -86,17 +92,24 @@ void fn_800488B4(UObject* pObj) {
     int nClip;
     int nLod;
     UObjMesh* pMesh;
+    s32* pN108;
     f32 fFov;
     f32 fMax;
     int nFlags2;
     f32 fLod;
+    f32 fTemp;
 
     nLod = fn_80048AE8(pObj);
     pMesh = pObj->pModel->apLod[nLod];
     fFov = fn_8001F004()->fFov;
     fMax = 0.75f * fFov * fn_8001414C((u8*)fn_8003526C());
     fn_80035240(pObj->m80);
-    fFov = fn_80014280((fFov <= fMax ? fFov : fMax) / 2.0f);
+    fTemp = fFov <= fMax ? fFov : fMax;
+    // fake match: n108's address is taken here only so the 0.5 is loaded after the min, as in the
+    // original; nothing in TW07 shows EA wrote it so. A port reads pObj->n108 directly below.
+    // Found by an anonymous decomp.me user: https://decomp.me/scratch/SOh7Q
+    pN108 = &pObj->n108;
+    fFov = fn_80014280(0.5f * fTemp);
     nClip = fn_80007B2C(pMesh, fn_8001614C(), 0.0f, fFov, 1.0f);
     if (nClip == 3) return;
     nFlags0 = fn_80048AD4(pMesh, 0);
@@ -111,7 +124,7 @@ void fn_800488B4(UObject* pObj) {
         fn_80035FDC(pObj);
     } else if (nFlags0 & 1) {
         if ((nFlags0 & 2) || (nFlags2 & 1) || (nFlags2 & 2)) {
-            pMesh = fn_80048AC4(pMesh, pObj->n108);
+            pMesh = fn_80048AC4(pMesh, *pN108);
         }
         fn_80012EF8();
         fLod = pObj->f10C;
