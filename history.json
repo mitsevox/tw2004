@@ -30,5 +30,21 @@
 "matched_functions": 7527,
 "total_functions": 7647,
 "exact": 7527
+},
+{
+"commit": "10716cf",
+"sha": "10716cf6bbdcbc6ea5dc2c9a00cca6f7832e75b7",
+"time": 1790352303,
+"subject": "pc-job.yml: put Git Bash's bin on PATH first (the runner service only has Git's cmd)",
+"report": true,
+"matched_code": 1444328,
+"complete_code": 1150048,
+"matched_data": 701147,
+"complete_data": 844511,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7527,
+"total_functions": 7647,
+"exact": 7527
 }
 ]
