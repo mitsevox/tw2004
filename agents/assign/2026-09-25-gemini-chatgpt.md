@@ -1,5 +1,22 @@
 # Assignment: Gemini and ChatGPT, 2026-09-25
 
+## UPDATE (late afternoon): Gemini is out of usage; ChatGPT takes this order
+
+Gemini's units are released to ChatGPT. Park Stm_Tick (two rounds, 91 -> 99.10%, not exact: log
+where you are in agents/tried/Stm_Tick.md and move on). Work top-down; each item links a unit
+or is one step from it:
+
+1. **uiProcessInterface fn_8008F820**: the unit's LAST function (Gemini did fn_8008F488). Exact =
+   the unit links; link it (configure.py Matching + splits.txt data ranges, see the LLFileIO_Gc and
+   UStream commits 45d089d / 5f593e9 for how) or just report and the orchestrator links it.
+2. **SunFlr_Gc fn_8009A708, fn_8009A3F4**: both 99%, the unit's last two (sweep best 3 on one).
+3. **Swing SW_vImpact** (100%, sweep best 6), then SW_KillVibration.
+4. Your original list from GameModeBestBall down, then Gemini's (Ball Physics_HandleCollision,
+   DepthField, Code8002EE1C, MC, Glows).
+
+Same rules as below. Pointers never go in `int`/`s32`/`u32` locals: use `uptr` (64-bit port);
+the merge caught one in hwsRender_Gc.
+
 From the orchestrator (cloud Claude). You two share one machine; this file splits the work so you
 never touch the same unit. Local Claude has the PC and is running the permuter on Golfer
 AI_ChooseTarget: Golfer.c is off limits to both of you.
