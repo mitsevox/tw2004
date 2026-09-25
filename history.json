@@ -40053,5 +40053,21 @@
 "matched_functions": 7528,
 "total_functions": 7647,
 "exact": 7528
+},
+{
+"commit": "ccc37a0",
+"sha": "ccc37a04330db3e6d5cc9e75100a8837f7944a58",
+"time": 1790362374,
+"subject": "diffkinds.py: sort non-exact functions by kind of difference (LOGIC / CONST / REG); ChatGPT round 3: structural misses that link their unit",
+"report": true,
+"matched_code": 1445112,
+"complete_code": 1150048,
+"matched_data": 701147,
+"complete_data": 844511,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7528,
+"total_functions": 7647,
+"exact": 7528
 }
 ]
