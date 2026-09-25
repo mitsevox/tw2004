@@ -700,6 +700,8 @@ hlaudtrack.c:
 
 hlaudtrackseq.c:
 	.text       start:0x800AA4BC end:0x800AB3A4
+	.bss        start:0x801F1880 end:0x801F18B8
+	.sdata2     start:0x80283FD8 end:0x80283FF8
 
 hlaudtrackstm.c:
 	.text       start:0x800AB3A4 end:0x800AC330
