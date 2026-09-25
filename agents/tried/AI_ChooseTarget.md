@@ -19,6 +19,25 @@ unless you combine it with something new. Before you stop, add every attempt und
 - Register map, EA vs ours: nPlayer r28/r15, nPinSet r23/r26, p r31/r22, nAggr r24/r27, nIQ r25/r28,
   zone offset r26/r29, gAITargets base r27/r30, pin row r19/r23, pin+0x58 r14/r24, (s8) temps
   r21,r20/r31,r14, k r22/r25, nCand r16/r19, t r30/r21.
+- 2026-09-25 orchestrator, register-order research (regmap: full EA->ours map per variant).
+  Corrected roles: r25 is nPower (nIQ is dead after fDumb), r22 = k*2 (the nLinks offset), r18 = k,
+  r14 = &gSession.nTeeSet[nPlayer] (hoisted), r19 = the pin row. Colouring order (first = r31):
+  EA   p t nKind nPlayer | AIbase zoneoff nPower nAggr nPinSet k*2 s8Aggr s8Pow pinrow | k nBest nCand nSkill | tee58
+  ours s8Aggr AIbase zoneoff nPower nAggr nPinSet k*2 tee58 pinrow | p t nKind nCand k nBest nSkill nPlayer | s8Pow
+  Rules seen: (1) the user locals keep declaration order among themselves, block scope included
+  (declaring k/nCand/nSkill inside the if or the for is the same as declaring them last), then the
+  parameter; reversing the declarations reverses that group only. (2) nPower/nAggr/nPinSet (one
+  call-result assignment each) and the hoisted temps are a separate group in code order (swapping
+  the nPower/nAggr calls swaps them). (3) EA spills pCourse to 0x10(r1): all 18 callee-saved
+  registers are in use, so this is Chaitin under pressure; which locals come before the temp group
+  depends on degrees, not a simple rule. Dropping one `(s8)` on an `__abs` compare (code changes)
+  rotates the order to nCand k nBest nPlayer | temps | p t nKind ...: the casts steer it.
+  `(u32)k` + nKind declared first gives EA's top (p r31, t r30, 97) but changes the loop (no k*2
+  strength reduction, pCourse no longer spilled): not the answer. Moving p's statement first (118),
+  fDumb into the loop (107), parameter copies (coalesced away: no change), EA-like declaration
+  order p t nKind nPower nAggr nPinSet k nBest nCand nSkill (120): no.
+  Running: permuter (base 675; only float-register wins so far, e.g. the final fDZ inlined: 107
+  quicktrial) and a random-restart declaration-order search (swaps + moves over all 20 lines).
 - NEXT (plan, 2026-09-25): learn CodeWarrior's callee-saved numbering rule by controlled one-change
   experiments on this function, recording the full register map each time (first definition, use
   count, loop vs straight code, parameter vs local, how the (s8) casts are written, extra uses).
