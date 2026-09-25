@@ -171,7 +171,6 @@ f32 fn_800C79BC(f32* p0, f32* p1, f32* p2, f32* p3) {
 // segment holding fT is walked in 128 steps and the value read off the straight step around fT.
 f32 fn_800C7A9C(FlyByPath* pPath, f32 fT) {
     static const f32 aStep[1] = {128.0f}; // fake match: retain the original division/reload shape
-    f32 fT1;
     f32 fT2;
     f32 fT3;
     f32 f2T2;
@@ -183,6 +182,7 @@ f32 fn_800C7A9C(FlyByPath* pPath, f32 fT) {
     f32 fH11;
     f32 fX;
     f32 fY;
+    f32 fT1;
     f32 fLastX;
     f32 fLastY;
     f32 fStep;
@@ -209,15 +209,17 @@ f32 fn_800C7A9C(FlyByPath* pPath, f32 fT) {
     fLastX = pPath->aKeys[i].af[0];
     fLastY = pPath->aKeys[i].af[1];
     for (nStep = 0; nStep < aStep[0]; nStep++) {
-        fT1 = nStep / aStep[0];
+        // fake match: reuse the later cubic temporary for the step quotient.
+        f3T2 = nStep / aStep[0];
+        fT1 = f3T2;
         fT2 = fT1 * fT1;
         f2T2 = 2.0f * fT1 * fT1;
         f3T2 = 3.0f * fT1 * fT1;
         fT3 = fT1 * fT2;
         f2T3 = fT1 * f2T2;
-        fH10 = fT1 + (fT3 - f2T2);
-        fH01 = -f2T3 + f3T2;
         fH00 = 1.0f + (f2T3 - f3T2);
+        fH01 = -f2T3 + f3T2;
+        fH10 = fT1 + (fT3 - f2T2);
         fH11 = fT3 - fT2;
         fX = fH11 * pPath->aKeys[i].af[6] +
              (fH10 * pPath->aKeys[i].af[4] + (fH00 * pPath->aKeys[i].af[0] + fH01 * pPath->aKeys[i].af[2]));

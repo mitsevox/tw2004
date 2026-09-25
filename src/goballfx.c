@@ -34,6 +34,7 @@ void BFX_vRender(Ball* pBall, int nPlayer) {
     TrailMeshDesc desc;
     f32* pPos;
     u8* pColour;
+    u8* pSrc;
     f32* pUV;
     f32 fGround;
     f32 fSize;
@@ -63,8 +64,10 @@ void BFX_vRender(Ball* pBall, int nPlayer) {
         pColour = lbl_801D9578[nPlayer];
         r = lbl_80189CB0[nPlayer][0];
         g = lbl_80189CB0[nPlayer][1];
-        b = lbl_80189CB0[nPlayer][2];
-        a = lbl_80189CB0[nPlayer][3];
+        // fake match: materialize the row for the last two colour bytes.
+        pSrc = lbl_80189CB0[nPlayer];
+        b = pSrc[2];
+        a = pSrc[3];
         pUV = lbl_801D94D8[nPlayer];
         pColour[0] = r;
         pColour[1] = g;

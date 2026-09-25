@@ -53,7 +53,7 @@ LLPict* PictInt_Decode(PictFile* pFile) {
         }
     }
     __stwbrx(pFile->uC, &pFile->uC, 0);
-    pFile->nWidth = (pFile->nWidth << 8) | ((pFile->nWidth >> 8) & 0xFF);
+    pFile->nWidth = ((u16)pFile->nWidth >> 8) | (((u16)pFile->nWidth & 0xFF) << 8);
     pFile->nHeight = (((u16)pFile->nHeight >> 8) & 0xFF) | (((u16)pFile->nHeight & 0xFF) << 8);
     return pPict;
 }
