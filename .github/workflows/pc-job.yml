@@ -80,15 +80,17 @@ jobs:
       TW_PERMUTER: C:/dev/tools/decomp-permuter/permuter.py
     steps:
     # The runner service's PATH has Git's cmd\ (git.exe) but not its bin\ (bash.exe): add it for
-    # the steps below, which all run in bash.
+    # the steps below, which all run in bash. cmd, not PowerShell: the PC's execution policy blocks
+    # the runner's .ps1 scripts.
     - name: Git Bash on PATH
-      shell: powershell
+      shell: cmd
       run: |
-        $git = (Get-Command git -ErrorAction SilentlyContinue).Source
-        $root = if ($git) { Split-Path (Split-Path $git) } else { 'C:\Program Files\Git' }
-        if (-not (Test-Path "$root\bin\bash.exe")) { throw "no bash.exe under $root\bin" }
-        Add-Content -Path $env:GITHUB_PATH -Value "$root\bin"
-        Write-Output "bash: $root\bin\bash.exe"
+        set "ROOT=C:\Program Files\Git"
+        for /f "delims=" %%i in ('where git 2^>nul') do if not defined GITEXE set "GITEXE=%%i"
+        if defined GITEXE for %%a in ("%GITEXE%\..\..") do set "ROOT=%%~fa"
+        if not exist "%ROOT%\bin\bash.exe" (echo no bash.exe under %ROOT%\bin & exit /b 1)
+        echo %ROOT%\bin>>"%GITHUB_PATH%"
+        echo bash: %ROOT%\bin\bash.exe
 
     - name: Check inputs
       run: |
