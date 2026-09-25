@@ -1,5 +1,7 @@
 # Assignment: Gemini and ChatGPT, 2026-09-25
 
+**SUPERSEDED for ChatGPT by `2026-09-25-chatgpt-round3.md`** (its rules section below still applies).
+
 ## UPDATE (late afternoon): Gemini is out of usage; ChatGPT takes this order
 
 Gemini's units are released to ChatGPT. Park Stm_Tick (two rounds, 91 -> 99.10%, not exact: log

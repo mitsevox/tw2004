@@ -53,6 +53,9 @@ added its attempts to the ledger files of the functions it worked on, and that s
 
 ## Outside agents and PC jobs
 
+- **Picking work**: `python tools/agents/diffkinds.py` sorts every non-exact function into LOGIC
+  (instructions missing/extra/different: fixable by reading the asm), CONST (a constant or offset) and
+  REG (register numbers only: roulette). Hand out LOGIC first, weighted by link gain.
 - **Outside agents** (Gemini, ChatGPT/Codex on the owner's Mac) get a written assignment in
   `agents/assign/<date>-<who>.md`: disjoint unit lists (two agents on one unit tangle), their own
   worktree and branch (`gemini/...`, `codex/...`), the merge rules, what to report. The owner hands

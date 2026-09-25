@@ -3,9 +3,10 @@
 Updated 2026-09-25 ~11:30 CDT. How the machines, CI, the page and PC jobs fit together:
 docs/infrastructure.md. History: docs/journal.md.
 
-**Running:** ChatGPT (`codex/round2`, owner's Mac) per agents/assign/2026-09-25-gemini-chatgpt.md
-(UPDATE section: uiProcessInterface fn_8008F820, SunFlr fn_8009A708, Swing, then the rest; those units
-held); Gemini is out of usage. Local Claude on the PC: permuter on Golfer AI_ChooseTarget (Golfer
+**Running:** ChatGPT (`codex/round3`, owner's Mac) per agents/assign/2026-09-25-chatgpt-round3.md:
+structural (LOGIC) misses that link their unit (MorphAn, LLPictInt, goballfx, CamSpline, LogoTexture,
+hlaudtrackstm, OBFD, uiArc; those units held). Gemini is out of usage. Pick work with
+`tools/agents/diffkinds.py`: of 119 left, 90 LOGIC, 14 CONST, 15 REG (register roulette). Local Claude on the PC: permuter on Golfer AI_ChooseTarget (Golfer
 held). The orchestrator merges, cleans branches, sends PC jobs.
 
 **Biggest blockers** by link gain per function: Golfer AI_ChooseTarget (98.53%, registers only:
