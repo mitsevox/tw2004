@@ -50,3 +50,7 @@ compile_commands.json
 # Miscellaneous
 /*.txt
 *.exe
+
+# CI: the Pages export and the pages-history worktree (.github/workflows/build.yml)
+/site/
+/pages-history/

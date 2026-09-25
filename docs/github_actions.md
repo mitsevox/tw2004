@@ -44,3 +44,25 @@ Once the build workflow is running on the main branch, you can add your game to 
 Visit <https://decomp.dev/manage/new>, select your GitHub repository and fill out the required fields.
 
 If you have questions or issues, try asking in the [GC/Wii Decompilation Discord](https://discord.gg/hKx3FJJgrV) #decomp.dev channel.
+
+## Progress page (GitHub Pages)
+
+Every push to `main` also publishes the progress dashboard (`tools/dashboard/server.py`, the same
+page as the local one minus the "in flight" panel) to GitHub Pages:
+
+1. `tools/dashboard/pages.py append` adds the run's numbers (sha, date, exact functions, matched and
+   linked code and data, all from `report.json`) to `history.json` on the data-only branch
+   `pages-history` (created by the first run if it does not exist).
+2. `server.py --export site --history ...` writes `index.html`, `progress.json` and `history.json`.
+3. The `pages` job deploys `site/` with `actions/deploy-pages`.
+
+Only `report.json`-derived numbers, file (unit) names and commit subjects are published: no game
+data, nothing from `/orig`.
+
+One-time setup: Settings > Pages > Build and deployment > Source: **GitHub Actions**. To give the
+chart real matched numbers for past commits, seed the history once on a machine with `orig/`:
+
+    python tools/dashboard/backfill_history.py 2bf605c --pages-history history.json
+
+then commit that `history.json` as the only file of the `pages-history` branch (it builds main's
+149 first-parent commits, about 30 s each). Without the seed, the chart starts at the first CI run.
