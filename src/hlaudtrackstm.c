@@ -350,9 +350,7 @@ u8 Stm_Tick(AudTrack* pTrack) {
     switch (pTrack->nState) {
     case 4:
         uFull = pList->nChannels * 0x7F00;
-        if (pTrack->u.stm.uLength <= uFull) {
-            uFull = pTrack->u.stm.uLength;
-        }
+        uFull = pTrack->u.stm.uLength <= uFull ? pTrack->u.stm.uLength : uFull;
         if (pTrack->u.stm.uFilled != 0 && pTrack->u.stm.uFilled >= uFull) {
             if (pTrack->u.stm.flags.b.b6) {
                 bFed = 1;
@@ -385,13 +383,13 @@ u8 Stm_Tick(AudTrack* pTrack) {
             if (!pTrack->u.stm.flags.b.bStarved) {
                 pTrack->u.stm.flags.b.bStarved = 1;
                 for (i = 0; i < pList->nChannels; i++) {
-                    Voc_Pause(pTrack->apVoices[i], 1);
+                    Voc_Pause(ppVoice[i], 1);
                 }
             }
         } else if (pTrack->u.stm.flags.b.bStarved) {
             pTrack->u.stm.flags.b.bStarved = 0;
             for (i = 0; i < pList->nChannels; i++) {
-                Voc_Pause(pTrack->apVoices[i], 0);
+                Voc_Pause(ppVoice[i], 0);
             }
         }
         break;
@@ -410,13 +408,16 @@ u8 Stm_Tick(AudTrack* pTrack) {
                 pTrack->u.stm.uFilled = 0;
             }
         } else if (pTrack->nState != 3) {
-            uLen = pTrack->u.stm.uLength - pTrack->u.stm.uReadPos;
+            u32 uRemaining; // fake match: separate read length keeps the original register allocation
+            s32 hFile = fn_800AC328();
+            u32 uOffset = pTrack->u.stm.pStream->uOffset + pTrack->u.stm.uReadPos;
+            u8* pBuffer = pTrack->u.stm.pBuffer;
+            uRemaining = pTrack->u.stm.uLength - pTrack->u.stm.uReadPos;
+            uLen = uRemaining;
             if (pList->nChannels << 15 <= uLen) {
                 uLen = pList->nChannels << 15;
             }
-            fn_800AB4C0(fn_800AC328(), pTrack->u.stm.pBuffer, uLen,
-                        pTrack->u.stm.pStream->uOffset + pTrack->u.stm.uReadPos, fn_800AB99C, pTrack,
-                        pTrack->u.stm.nReadId, 0);
+            fn_800AB4C0(hFile, pBuffer, uLen, uOffset, fn_800AB99C, pTrack, pTrack->u.stm.nReadId, 0);
         }
     }
     ProcessAudStreamReadQueue();
