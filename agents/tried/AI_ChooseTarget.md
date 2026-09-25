@@ -38,7 +38,22 @@ unless you combine it with something new. Before you stop, add every attempt und
   order p t nKind nPower nAggr nPinSet k nBest nCand nSkill (120): no.
   Running: permuter (base 675; only float-register wins so far, e.g. the final fDZ inlined: 107
   quicktrial) and a random-restart declaration-order search (swaps + moves over all 20 lines).
-- NEXT (plan, 2026-09-25): learn CodeWarrior's callee-saved numbering rule by controlled one-change
+- 2026-09-25 orchestrator, results: (a) random-restart search over all 20 declaration lines
+  (swaps + moves, 74,479 orders, 90 min): floor 102 (t p nSkill nKind k nBest nCand after the temp
+  group); the temp group comes first in EVERY order, so declarations alone cannot give EA's shape.
+  (b) decomp-permuter, 2 h, -j3, ~95k iterations: base 675 -> 610, float registers only (final
+  fDZ inlined, `fDX = t->pDef->x; fDX = pin.x - fDX;`); no integer register moved. (c) same-code
+  rewrites, no effect on the integer order: pDef truthy test, nCand without cast / (int)k / (s32)k /
+  pointer form, t = gAITargets + nCand, (signed char)/(char) casts, split if, ++k / k += 1,
+  k initialised earlier, (int) on the tee compare, operand swaps; worse: -x for __abs, t after the
+  -1 test, fDumb via int. (d) only changes that remove the k*2 strength reduction flip the groups
+  (`(u32)k`, `k = k + 1`, a while with k++): the locals then go first (nCand k nBest nPlayer | temps
+  | p t nKind ...), but the loop code changes and pCourse is no longer spilled. (e) compilers GC
+  1.3.2, 2.0, 2.0p1, 2.6, 2.7 give 2.5's exact order; 1.2.5n and 3.0 change the code. Not the build.
+  Conclusion: EA's C differs in some expression shape we have not found, under full register
+  pressure (chaotic: small graph changes reorder everything). Best next step is a long permuter run
+  on a many-core machine (free), not hand work.
+- DONE (was NEXT, 2026-09-25): learn CodeWarrior's callee-saved numbering rule by controlled one-change
   experiments on this function, recording the full register map each time (first definition, use
   count, loop vs straight code, parameter vs local, how the (s8) casts are written, extra uses).
 
