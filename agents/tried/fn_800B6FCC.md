@@ -1,6 +1,6 @@
 # fn_800B6FCC (DiscError.c, 0x800B6FCC)
 
-Status: OPEN, 99.44% on 2026-09-25.
+Status: SOLVED (100.0% exact match).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -8,7 +8,7 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
-(add yours here: date, lane, what, score)
+- 2026-09-25 (Gemini): Declared local pointer `char* p = &szLine[1];` before `nY = (28 - nLines) / 2;`, passing `p` to `fn_80005AE8`. Resolved r30/r31 swap. Score 7 -> 0 (100.0% exact match).
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
