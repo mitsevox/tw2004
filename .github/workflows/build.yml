@@ -4,6 +4,11 @@ on:
   push:
   pull_request:
 
+# Builds of main queue up instead of racing: each one appends to the Pages history in turn.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   build:
     # A *private* build container holding only the game's main.dol (mitsevox/tw2004-build).
@@ -11,6 +16,9 @@ jobs:
     container: ghcr.io/mitsevox/tw2004-build:main
 
     runs-on: ubuntu-latest
+    permissions:
+      contents: write     # the Pages history commit on pages-history (main pushes only)
+      packages: read      # the private build container
     strategy:
       fail-fast: false
       matrix:
@@ -71,3 +79,52 @@ jobs:
       with:
         name: ${{ matrix.version }}_report
         path: build/${{ matrix.version }}/report.json
+
+    # ---- The public progress page (GitHub Pages), main pushes only ----------------------------
+    # Only report.json-derived numbers are published (tools/dashboard/pages.py, server.py
+    # --export): no game data, nothing from /orig. history.json lives on the data-only branch
+    # pages-history (seeded once with tools/dashboard/backfill_history.py --pages-history).
+    - name: Pages history
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.version == 'GW4E69'
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        if git fetch origin pages-history; then
+          git worktree add --detach pages-history FETCH_HEAD
+        else
+          git worktree add --detach pages-history HEAD
+          git -C pages-history checkout --orphan pages-history-new
+          git -C pages-history rm -rfq .
+          echo '[]' > pages-history/history.json
+        fi
+        python tools/dashboard/pages.py append pages-history/history.json \
+            build/${{ matrix.version }}/report.json "$GITHUB_SHA" \
+            "$(git log -1 --format=%ct "$GITHUB_SHA")" "$(git log -1 --format=%s "$GITHUB_SHA")"
+        git -C pages-history add history.json
+        git -C pages-history commit -q -m "history: ${GITHUB_SHA::7}"
+        git -C pages-history push origin HEAD:refs/heads/pages-history
+
+    - name: Export site
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.version == 'GW4E69'
+      run: python tools/dashboard/server.py --export site --history pages-history/history.json --sha "$GITHUB_SHA"
+
+    - name: Upload site
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.version == 'GW4E69'
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: site
+
+  pages:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+    - name: Deploy
+      id: deploy
+      uses: actions/deploy-pages@v4

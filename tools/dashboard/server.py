@@ -3,6 +3,10 @@
 Local progress dashboard for the tw2004 decompilation.
 
     python tools/dashboard/server.py [--port 8420] [--host 0.0.0.0] [--agents DIR]
+    python tools/dashboard/server.py --export site/ [--history history.json] [--sha SHA]
+
+--export writes the static copy CI publishes on GitHub Pages (index.html reading progress.json,
+no "in flight" panel; report.json numbers only) and exits.
 
 Serves one page and /api/progress. Reads build/GW4E69/report.json (written by every `ninja`
 run), config/GW4E69/symbols.txt, build/dashboard_history.json (written by the post-commit hook,
@@ -342,6 +346,7 @@ footer code{font-family:ui-monospace,Consolas,monospace}
 <footer>Reads <code>build/GW4E69/report.json</code> (written by every <code>ninja</code> run), <code>symbols.txt</code> and <code>build/dashboard_history.json</code> (written by the post-commit hook). Refreshes every 20&nbsp;s. Read-only.</footer>
 </div>
 <script>
+const API='/api/progress',REFRESH=20000,AGENTS_PANEL=true;
 const $=s=>document.querySelector(s);
 const fmt=n=>Math.round(n).toLocaleString('en-US');
 const pct=(a,b)=>b?100*a/b:0;
@@ -405,7 +410,7 @@ function render(d){
    stat('Fuzzy code match',pf(m.fuzzy_match_percent||0,1),'partial functions count in part')+
   `</div>`+
   `<section class="card"><h2>History</h2><div class="chartlegend"><span><i class="sw matched"></i>Matched code</span><span><i class="sw linked"></i>Linked code</span><span style="color:var(--text-3)">% of all code, per commit</span></div><div id="chartbox"><svg id="chart" aria-label="Matched and linked code over time"></svg><div class="tip" id="tip"></div></div><p class="note" id="chartnote"></p></section>`+
-  (d.agents.length?`<section class="card"><h2>In flight &middot; agent worktrees ahead of main</h2><div class="agents" id="agents"></div><p class="note">From each worktree's last <code>ninja</code> report: code in functions that match there but not in main's build, compared function by function. Linked counts functions in files that worktree links and main does not.</p></section>`:'')+
+  (AGENTS_PANEL&&d.agents&&d.agents.length?`<section class="card"><h2>In flight &middot; agent worktrees ahead of main</h2><div class="agents" id="agents"></div><p class="note">From each worktree's last <code>ninja</code> report: code in functions that match there but not in main's build, compared function by function. Linked counts functions in files that worktree links and main does not.</p></section>`:'')+
   `<section class="card"><h2>Source files</h2>
    ${counts.ready?`<div class="callout"><span class="badge ready">&#8594; ${counts.ready}</span><span>${counts.ready===1?'file is':'files are'} 100% matched but not linked yet (${fmt(readyBytes)} B of code). <button class="link" data-f="ready">Show them</button></span></div>`:''}
    <div class="toolbar"><div class="seg" id="seg"></div><input type="search" id="q" placeholder="Filter by name" value="${esc(state.q)}"><select id="sortsel" aria-label="Sort by">${[['status','Sort: status'],['pct','Sort: matched %'],['code','Sort: size'],['fns','Sort: functions'],['name','Sort: name']].map(([k,l])=>`<option value="${k}"${state.sort===k?' selected':''}>${l}</option>`).join('')}</select></div>
@@ -502,15 +507,51 @@ function drawChart(){
 }
 
 async function load(){
- let d;try{d=await (await fetch('/api/progress',{cache:'no-store'})).json()}catch(e){$('#meta').textContent='Server not reachable; retrying every 20 s.';return}
+ let d;try{d=await (await fetch(API,{cache:'no-store'})).json()}catch(e){$('#meta').textContent='Progress data not reachable; retrying.';return}
  if(d.error){$('#meta').textContent='Error: '+d.error;return}
  if(!d.report){$('#meta').textContent='No report.json yet: run ninja once.';return}
  $('#meta').innerHTML=`branch <b>${esc(d.branch)}</b> &middot; last build <b title="${esc(new Date(d.report.mtime*1000).toLocaleString())}">${ago(d.report.mtime)}</b>`;
  const y=window.scrollY;state.data=d;render(d);window.scrollTo(0,y);
 }
 let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>state.data&&drawChart(),150)});
-load();setInterval(()=>{if(!document.activeElement||document.activeElement.id!=='q')load()},20000);
+load();setInterval(()=>{if(!document.activeElement||document.activeElement.id!=='q')load()},REFRESH);
 </script></body></html>'''
+
+
+STATIC_FOOTER = ('<footer>Built by CI from <code>build/GW4E69/report.json</code> (objdiff) on every push to main. '
+                 'Only progress numbers are published. <a href="history.json">history.json</a></footer>')
+
+
+def export(out_dir, history_path, sha):
+    """The static site for GitHub Pages: index.html (reads progress.json, no "in flight" panel)
+    and progress.json + history.json, all from report.json, symbols.txt and the history file."""
+    rep = parse_report(REPORT) if os.path.exists(REPORT) else None
+    if not rep:
+        raise SystemExit('export: no %s; run ninja first' % REPORT)
+    try:
+        history = json.load(open(history_path)) if history_path else parse_history(HISTORY)
+    except (OSError, ValueError):
+        history = []
+    data = {
+        'now': time.time(),
+        'branch': 'main' + (' @ ' + sha[:7] if sha else ''),
+        'report': {k: v for k, v in rep.items() if not k.startswith('_')},
+        'symbols': parse_symbols(SYMBOLS),
+        'history': history,
+        'agents': [],
+    }
+    page = PAGE
+    for old, new in (("const API='/api/progress',REFRESH=20000,AGENTS_PANEL=true;",
+                      "const API='progress.json',REFRESH=300000,AGENTS_PANEL=false;"),
+                     (re.search(r'<footer>.*?</footer>', PAGE, re.S).group(0), STATIC_FOOTER)):
+        assert old in page, old
+        page = page.replace(old, new)
+    os.makedirs(out_dir, exist_ok=True)
+    open(os.path.join(out_dir, 'index.html'), 'w', encoding='utf-8').write(page)
+    json.dump(data, open(os.path.join(out_dir, 'progress.json'), 'w'), separators=(',', ':'))
+    json.dump(history, open(os.path.join(out_dir, 'history.json'), 'w'), indent=0)
+    open(os.path.join(out_dir, '.nojekyll'), 'w').close()
+    print('exported %s: index.html, progress.json, history.json (%d records)' % (out_dir, len(history)))
 
 
 class H(BaseHTTPRequestHandler):
@@ -545,7 +586,14 @@ if __name__ == '__main__':
     ap.add_argument('--host', default='0.0.0.0')
     ap.add_argument('--port', type=int, default=8420)
     ap.add_argument('--agents', default=AGENTS, help='folder of agent worktrees for the "in flight" panel')
+    ap.add_argument('--export', metavar='DIR', help='write the static site (GitHub Pages) to DIR and exit')
+    ap.add_argument('--history', metavar='FILE', help='with --export: the history to publish '
+                    '(default build/dashboard_history.json)')
+    ap.add_argument('--sha', default='', help='with --export: the commit the report is for')
     a = ap.parse_args()
+    if a.export:
+        export(a.export, a.history, a.sha)
+        raise SystemExit(0)
     H.agents_dir = a.agents
     srv = ThreadingHTTPServer((a.host, a.port), H)
     print(f'tw2004 dashboard on http://{a.host}:{a.port}/  (root {ROOT}, agents {a.agents})', flush=True)

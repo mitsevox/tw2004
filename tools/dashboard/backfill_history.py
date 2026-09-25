@@ -3,7 +3,14 @@
 Backfill build/dashboard_reports.json (objdiff's matched and linked bytes per commit) by rebuilding old commits
 in a throwaway worktree, then refresh the dashboard history.
 
-    python tools/dashboard/backfill_history.py <oldest-commit> [<newest-commit>]
+    python tools/dashboard/backfill_history.py <oldest-commit> [<newest-commit>] [--first-parent]
+                                               [--pages-history OUT]
+
+--first-parent: build main's own commits only (what the public page shows); implied by
+--pages-history.
+
+--pages-history OUT: afterwards, also write the public page's history (tools/dashboard/pages.py
+seed) to OUT; commit it once to the pages-history branch as history.json, and CI appends from then.
 
 Builds every commit in oldest..newest (inclusive) that has no cached report yet, oldest first.
 The worktree lives in ../tw2004_backfill next to the repo and reuses this checkout's
@@ -24,8 +31,15 @@ def log(msg):
 def git(*a, cwd=ROOT):
     return subprocess.run(['git', '--no-pager', *a], cwd=cwd, capture_output=True, text=True, stdin=subprocess.DEVNULL)
 
-oldest = sys.argv[1]; newest = sys.argv[2] if len(sys.argv) > 2 else 'HEAD'
-commits = git('rev-list', '--reverse', f'{oldest}^..{newest}').stdout.split()
+args = sys.argv[1:]
+pages_out = None
+if '--pages-history' in args:
+    k = args.index('--pages-history'); pages_out = args[k + 1]; del args[k:k + 2]
+first_parent = '--first-parent' in args or pages_out is not None   # main's own commits only
+args = [x for x in args if x != '--first-parent']
+oldest = args[0]; newest = args[1] if len(args) > 1 else 'HEAD'
+commits = git('rev-list', '--reverse', *(['--first-parent'] if first_parent else []),
+              f'{oldest}^..{newest}').stdout.split()
 reports = json.load(open(REPORTS)) if os.path.exists(REPORTS) else {}
 todo = [c for c in commits if c not in reports]
 log(f'backfill {len(todo)} of {len(commits)} commits')
@@ -67,3 +81,8 @@ for i, c in enumerate(todo):
                    cwd=ROOT, capture_output=True, text=True, stdin=subprocess.DEVNULL,
                    env={**os.environ, 'DASHBOARD_NO_HEAD_REPORT': '1'})
 log('done')
+if pages_out:
+    subprocess.run([sys.executable, os.path.join(ROOT, 'tools', 'dashboard', 'refresh_history.py')],
+                   cwd=ROOT, stdin=subprocess.DEVNULL, env={**os.environ, 'DASHBOARD_NO_HEAD_REPORT': '1'})
+    subprocess.run([sys.executable, os.path.join(ROOT, 'tools', 'dashboard', 'pages.py'), 'seed', pages_out],
+                   cwd=ROOT, check=True, stdin=subprocess.DEVNULL)
