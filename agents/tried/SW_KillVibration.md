@@ -18,6 +18,31 @@ unless you combine it with something new. Before you stop, add every attempt und
   assignments before, between and after the first call; pointer initializers inside the pad branch:
   all 4 -> 4. A short `leversweep.py` combination run (two workers, completed in ~17 seconds)
   also found no improvement (best 4). No source change.
+- 2026-09-25, ChatGPT subagent (second pass): inspected exact liveness: target copies the player
+  address `r29` to `r30`, loads the first controller value from `r29+0xA08`, then advances `r29`
+  to the frame field and `r30` to the controller field before the first rumble call; ours folds
+  the frame offset into the final store and advances the controller address before the load.
+  New tests: inline value-read helpers (`s32*`, `Player*`, index), C89 block-initialized pointers
+  with qualifiers, `__restrict` pointer locals, chained final stores, and explicitly staged
+  member-derived byte pointers: best still 4 (staged byte pointers were 13). No source change.
+- 2026-09-25, ChatGPT subagent (second pass continued): varied the player-base local between
+  `void*`, `const void*`, and `const Player*`, then recovered real fields through typed pointer
+  casts at each address-taking site. All compiling variants stayed at 4. This did not recover
+  the target's delayed pair of pointer additions. No source change.
+- 2026-09-25, ChatGPT subagent (third pass): whole-block control-flow rewrites with a guard
+  and early return (`!HasPad`, `HasPad == 0`, braced form), a scoped active block, and a
+  `goto` active label all stayed at 4; a `switch` guard worsened to 6. Static inline blocks
+  for the two rumble calls, the two final clears, or the whole active tail, with either
+  original guard or early return, all stayed at 4. No source change.
+
+## Structural constraint from the third pass
+
+The target keeps a frame pointer live before the first rumble call and writes through it at the
+end. Our C exposes only one use of that pointer, the final store, so CodeWarrior safely folds the
+frame offset into that store. Rewriting the guard or moving these effects into inlined blocks did
+not prevent the fold. An added observable read/write or non-inlined call would change behavior or
+the instruction stream; only a semantics-preserving source shape that makes the compiler keep
+the early pointer is acceptable.
 
 ## Collected from the notes and docs (2026-09-25)
 
