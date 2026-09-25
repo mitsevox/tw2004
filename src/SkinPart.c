@@ -838,8 +838,8 @@ s32 fn_800CDEF4(Skin* pSkin, int nPart, int nVariant) {
     return pDesc->pVariants[nVariant + pDesc->pParts[nPart].nFirst].nLinks;
 }
 
-// fake match: an inline addition keeps the original operand order without changing the value.
-static inline int fn_800CDF80_Add(int a, int b) { return a + b; }
+// fake match: an identity read; gives EA's operand order for add r0, r0, r6.
+static inline int fn_800CDF80_Read(int n) { return n; }
 
 // Applies a link of a part's variant: sets the option of the part it names.
 void fn_800CDF80(Skin* pSkin, int nPart, int nVariant, int nLink) {
@@ -850,8 +850,8 @@ void fn_800CDF80(Skin* pSkin, int nPart, int nVariant, int nLink) {
     if (pSkin == NULL) return;
     pDesc = pSkin->pModel->pDesc;
     // fake match: the cast, as in fn_800CCAC0
-    pLink = &pDesc->pLinks[fn_800CDF80_Add(
-        ((SkinVariant*)pDesc->pVariants)[nVariant + pDesc->pParts[nPart].nFirst].nFirstLink, nLink)];
+    pLink = &pDesc->pLinks[((SkinVariant*)pDesc->pVariants)[nVariant + pDesc->pParts[nPart].nFirst].nFirstLink
+                           + fn_800CDF80_Read(nLink)];
     nOther = fn_800CDAFC(pSkin, pLink->uPart);
     if (nOther >= 0 && nOther < fn_800CCA40(pSkin)) {
         fn_800CCC1C(pSkin, nOther, pLink->nOption);
