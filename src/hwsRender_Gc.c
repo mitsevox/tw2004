@@ -272,6 +272,7 @@ void fn_801132C4(SkinMeshRefs* pRefs) {
     f32* pPosBuf;
     s8* pNormalBuf;
     int n;
+    uptr uNormal;
     s32 n10;
     s16* pVerts;
     void* pBuf;
@@ -296,9 +297,11 @@ void fn_801132C4(SkinMeshRefs* pRefs) {
         pVerts = pRefs->p14;
         pMatrices = pRefs->pC;
         pPos = pVerts;
-        n = (uptr)pVerts;
-        n += n10 * 8;
-        pNormal = (s8*)n;
+        // fake match: the normals' address (pVerts + n10 * 4 s16s) built as an integer gives EA's
+        // code; uptr keeps it pointer-sized for the port
+        uNormal = (uptr)pVerts;
+        uNormal += n10 * 8;
+        pNormal = (s8*)uNormal;
         pNormalBuf = (s8*)pBuf + n10 * 12;
         pNormalOut = pNormalBuf;
         for (i = 0; i < pRefs->n10; pPos += 4, pNormal += 4, i++) {
