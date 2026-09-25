@@ -1,0 +1,194 @@
+# Heavy jobs on the owner's PC (self-hosted runner LUCASPC, labels tw-pc; online only while the
+# owner runs it). Manual dispatch only: never on push or pull_request.
+#
+#   gh workflow run pc-job.yml -f tool=permute -f unit=hwsBurn -f fn=fn_8011172C -f minutes=360
+#   gh workflow run pc-job.yml -f tool=leversweep                    # --from-report, every near-miss
+#
+# Results go to a new branch pc-results/<fn>-<run_id>: the permuter's best 5 outputs (diff.txt +
+# score.txt, no source.c), or the sweeper's build/leversweep/ files from this run, plus the log.
+# The game files are copied from C:/dev/tw2004/orig on the PC and are never committed or uploaded.
+# See docs/workflow.md "Sending a job to the PC".
+name: PC job
+
+on:
+  workflow_dispatch:
+    inputs:
+      tool:
+        description: permute or leversweep
+        type: choice
+        options: [permute, leversweep]
+        default: permute
+      unit:
+        description: unit (e.g. hwsBurn); blank with leversweep and fn blank = --from-report
+        type: string
+        default: ''
+      fn:
+        description: function (e.g. fn_8011172C); blank with leversweep = --from-report
+        type: string
+        default: ''
+      minutes:
+        description: time budget in minutes (the job times out 60 later)
+        type: number
+        default: 360
+      jobs:
+        description: parallel jobs (the PC has 20 cores)
+        type: number
+        default: 18
+      ref:
+        description: branch to build from (push a branch with base changes and name it here)
+        type: string
+        default: main
+
+concurrency:
+  group: pc-runner
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  # Expressions cannot add, so the time limits are computed here.
+  plan:
+    runs-on: ubuntu-latest
+    permissions: {}
+    outputs:
+      step: ${{ steps.t.outputs.step }}
+      job: ${{ steps.t.outputs.job }}
+    steps:
+    - id: t
+      env:
+        MINUTES: ${{ inputs.minutes }}
+      run: |
+        case "$MINUTES" in ''|*[!0-9]*) echo "minutes must be a whole number"; exit 1;; esac
+        echo "step=$((MINUTES + 15))" >> "$GITHUB_OUTPUT"
+        echo "job=$((MINUTES + 60))" >> "$GITHUB_OUTPUT"
+
+  run:
+    needs: plan
+    runs-on: [self-hosted, tw-pc]
+    timeout-minutes: ${{ fromJSON(needs.plan.outputs.job) }}
+    env:
+      TOOL: ${{ inputs.tool }}
+      UNIT: ${{ inputs.unit }}
+      FN: ${{ inputs.fn }}
+      MINUTES: ${{ inputs.minutes }}
+      JOBS: ${{ inputs.jobs }}
+      TW_PERMUTER: C:/dev/tools/decomp-permuter/permuter.py
+    steps:
+    # The runner service's PATH has Git's cmd\ (git.exe) but not its bin\ (bash.exe): add it for
+    # the steps below, which all run in bash. cmd, not PowerShell: the PC's execution policy blocks
+    # the runner's .ps1 scripts.
+    - name: Git Bash on PATH
+      shell: cmd
+      run: |
+        set "ROOT=C:\Program Files\Git"
+        for /f "delims=" %%i in ('where git 2^>nul') do if not defined GITEXE set "GITEXE=%%i"
+        if defined GITEXE for %%a in ("%GITEXE%\..\..") do set "ROOT=%%~fa"
+        if not exist "%ROOT%\bin\bash.exe" (echo no bash.exe under %ROOT%\bin & exit /b 1)
+        echo %ROOT%\bin>>"%GITHUB_PATH%"
+        echo bash: %ROOT%\bin\bash.exe
+
+    - name: Check inputs
+      run: |
+        for v in "$UNIT" "$FN"; do
+          case "$v" in *[!A-Za-z0-9_]*) echo "unit/fn: letters, digits and _ only"; exit 1;; esac
+        done
+        case "$JOBS" in ''|*[!0-9]*) echo "jobs must be a whole number"; exit 1;; esac
+        if [ "$TOOL" = permute ] && { [ -z "$UNIT" ] || [ -z "$FN" ]; }; then
+          echo "permute needs unit and fn"; exit 1
+        fi
+        if [ "$TOOL" = leversweep ] && [ -n "$FN" ] && [ -z "$UNIT" ]; then
+          echo "leversweep with fn needs unit"; exit 1
+        fi
+
+    # clean: false keeps build/ (the downloaded compilers and tools) between jobs; tracked files
+    # are still reset to the ref.
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.ref }}
+        clean: false
+
+    # The game files live only on the PC; orig/ is git-ignored and nothing below uploads it.
+    - name: Game files
+      run: cp -a C:/dev/tw2004/orig .
+
+    - name: Build
+      run: |
+        python configure.py
+        ninja
+        ninja build/GW4E69/report.json
+        # ninja prints "main.dol: OK" only when the check reruns: run it again to be sure.
+        DTK=build/tools/dtk; [ -f "$DTK.exe" ] && DTK="$DTK.exe"
+        "$DTK" shasum -c config/GW4E69/build.sha1 | tee "$RUNNER_TEMP/sha.log"
+        # dtk colours the OK on Windows: strip the colour codes before matching
+        sed 's/\x1b\[[0-9;]*m//g' "$RUNNER_TEMP/sha.log" | grep -q "main.dol: OK"
+
+    - name: Run ${{ inputs.tool }}
+      id: tool
+      continue-on-error: true
+      timeout-minutes: ${{ fromJSON(needs.plan.outputs.step) }}
+      run: |
+        touch "$RUNNER_TEMP/start"
+        if [ "$TOOL" = permute ]; then
+          python tools/match/permute.py "$UNIT" "$FN" --minutes "$MINUTES" -j "$JOBS" --max-jobs "$JOBS" \
+              2>&1 | tee "$RUNNER_TEMP/tool.log"
+        elif [ -n "$FN" ]; then
+          python tools/match/leversweep.py "$UNIT" "$FN" --minutes "$MINUTES" -j "$JOBS" \
+              2>&1 | tee "$RUNNER_TEMP/tool.log"
+        else
+          python tools/match/leversweep.py --from-report -j "$JOBS" 2>&1 | tee "$RUNNER_TEMP/tool.log"
+        fi
+
+    # Only files this run wrote (newer than the start marker): build/perm and build/leversweep keep
+    # earlier runs' output because of clean: false.
+    - name: Commit results
+      if: always() && steps.tool.outcome != 'skipped'
+      env:
+        RUN_ID: ${{ github.run_id }}
+        REF: ${{ inputs.ref }}
+      run: |
+        NAME="${FN:-from-report}"
+        BRANCH="pc-results/$NAME-$RUN_ID"
+        RES="$RUNNER_TEMP/res"
+        git worktree prune
+        git worktree add --detach "$RES" HEAD
+        git -C "$RES" checkout -q --orphan "$BRANCH"
+        git -C "$RES" rm -rfq .
+        mkdir -p "$RES/results"
+        if [ "$TOOL" = permute ]; then
+          n=0
+          for d in $(find "build/perm/$FN" -maxdepth 1 -type d -name 'output-*' -newer "$RUNNER_TEMP/start" \
+                     | awk -F'output-' '{split($2, a, "-"); print a[1] "\t" $0}' | sort -n | cut -f2 | head -5); do
+            mkdir -p "$RES/results/$(basename "$d")"
+            cp "$d/diff.txt" "$d/score.txt" "$RES/results/$(basename "$d")/" 2>/dev/null || true
+            n=$((n + 1))
+          done
+          tr '\r' '\n' < "build/perm/$FN/permuter.log" 2>/dev/null | grep '^iteration ' | tail -1 \
+              > "$RES/results/progress.txt" || true
+          echo "$n outputs"
+        else
+          find build/leversweep -type f -newer "$RUNNER_TEMP/start" -exec cp {} "$RES/results/" \;
+        fi
+        cp "$RUNNER_TEMP/tool.log" "$RES/results/" 2>/dev/null || true
+        printf 'tool=%s unit=%s fn=%s minutes=%s jobs=%s ref=%s (%s) outcome=%s\n' \
+            "$TOOL" "$UNIT" "$FN" "$MINUTES" "$JOBS" "$REF" "$(git rev-parse --short HEAD)" \
+            "${{ steps.tool.outcome }}" > "$RES/results/run.txt"
+        git -C "$RES" add results
+        git -C "$RES" -c user.name="github-actions[bot]" \
+            -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "PC $TOOL results: $NAME (run $RUN_ID)"
+        git -C "$RES" push -q origin "HEAD:refs/heads/$BRANCH"
+        echo "pushed $BRANCH"
+        git worktree remove --force "$RES"
+
+    # The results are pushed even when the tool failed or hit its time limit; the job still says so.
+    - name: Tool outcome
+      if: steps.tool.outcome == 'failure'
+      run: |
+        echo "the ${{ inputs.tool }} step failed or timed out (results, if any, were pushed)"
+        exit 1

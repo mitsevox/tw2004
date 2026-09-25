@@ -15,9 +15,8 @@ its own context small. Start of a session (or after a compaction): read `../CLAU
 | `agents/roles/audit.md` | the blind name-and-comment audit (lane 1, lane 2, reconciler) |
 | `agents/roles/data.md` | attaching orphan data to its owning unit |
 | `agents/tried/` | **the tried-ledger: one file per function not yet exact** (every attempt, scores, sweep results); lanes read it first and add to it before stopping (`tools/agents/triedledger.py` starts files for new functions, never overwrites) |
-| `agents/notes/` | older per-lane notes (history; their content is collected into `agents/tried/`) |
 | `agents/findings/` | audit reports (EA bugs, misfiled units), the orphan-data map, older findings |
-| `tools/agents/` | `new_agent.py`, `merge.py`, `audit_apply.py`, `review.py`, `status.py`, `remain.py`, `phase2b.py` |
+| `tools/agents/` | `new_agent.py`, `merge.py`, `audit_apply.py`, `review.py`, `status.py`, `remain.py` |
 | `docs/reference-builds/` | TW06 (PS2/Xbox) and TW07 (PS3 debug build) inventories; `tw07-ps3/cu/` = EA's functions per source file with parameters and locals; `tw07-ps3/pairs.tsv` = our address -> TW07 function |
 
 Paths (`tools/agents/paths.py`): the main checkout, worktrees in `<parent>/tw2004-agents/<lane>`
@@ -51,6 +50,20 @@ added its attempts to the ledger files of the functions it worked on, and that s
    only if all pass, else undoes the merge. A conflict goes back to the lane (`git merge main`).
 3. Verified findings go into `docs/decomp-notes.md` (a docs commit), and into the next prompts.
 4. Tell the owner what landed, in game terms, with the numbers side by side.
+
+## Outside agents and PC jobs
+
+- **Outside agents** (Gemini, ChatGPT/Codex on the owner's Mac) get a written assignment in
+  `agents/assign/<date>-<who>.md`: disjoint unit lists (two agents on one unit tangle), their own
+  worktree and branch (`gemini/...`, `codex/...`), the merge rules, what to report. The owner hands
+  it over; update the file (a dated UPDATE section on top) when plans change.
+- **Merging their branches**: read the diff, then `git branch -f agent/<name> origin/<branch>` and
+  `python tools/agents/merge.py <name>`. Check what the gates cannot: fake-match labels, logic kept,
+  portability (a pointer in an `int`/`u32` breaks the 64-bit port: `uptr`), no pasted asm (the asm
+  gate refuses it). If two branches solved the same function, keep the cleaner C.
+- **Heavy jobs** (long permuter or sweeper runs) go to the owner's PC runner:
+  `docs/infrastructure.md` "Heavy jobs". Read the `pc-results/` branch, apply a hit by hand.
+- After merging, clean up with the branch-cleanup workflow (`docs/infrastructure.md`).
 
 ## Gates and invariants
 

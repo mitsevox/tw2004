@@ -3,7 +3,7 @@
 Disassembles <fn> with objdiff-cli and prints it in objdump -d layout. Data symbol names are
 blanked so the game's lbl_XXXXXXXX and the compiler's @NNN literals compare equal; branch
 targets are function-relative offsets on both sides."""
-import json, pathlib, re, subprocess, sys
+import json, os, pathlib, re, subprocess, sys
 ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script lives in
 
 fn, obj = sys.argv[1], sys.argv[2]
@@ -22,4 +22,14 @@ for s in d['left']['symbols']:
         mn, _, args = f.partition(' ')
         args = args.replace(' ', '')
         lines.append('%8x:\t00 00 00 00\t%s\t%s' % (i * 4, mn, args))
-print('\n'.join(lines))
+# A long permuter run once died here (Windows, ~258k iterations): OSError [Errno 22], stdout closed
+# under the write. One lost disassembly only costs that variant, so never let it end the run; the
+# exit flush would raise again, so stdout goes to the null device after a failed write.
+try:
+    sys.stdout.buffer.write(('\n'.join(lines) + '\n').encode())
+    sys.stdout.flush()
+except (OSError, AttributeError, ValueError):     # AttributeError: no stdout at all (None)
+    try:
+        os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())
+    except (OSError, AttributeError, ValueError):
+        pass

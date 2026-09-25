@@ -38,8 +38,10 @@ if '--pages-history' in args:
 first_parent = '--first-parent' in args or pages_out is not None   # main's own commits only
 args = [x for x in args if x != '--first-parent']
 oldest = args[0]; newest = args[1] if len(args) > 1 else 'HEAD'
+# oldest^ does not exist when oldest is a root commit: then everything up to newest
+has_parent = git('rev-parse', '-q', '--verify', f'{oldest}^').returncode == 0
 commits = git('rev-list', '--reverse', *(['--first-parent'] if first_parent else []),
-              f'{oldest}^..{newest}').stdout.split()
+              f'{oldest}^..{newest}' if has_parent else newest).stdout.split()
 reports = json.load(open(REPORTS)) if os.path.exists(REPORTS) else {}
 todo = [c for c in commits if c not in reports]
 log(f'backfill {len(todo)} of {len(commits)} commits')

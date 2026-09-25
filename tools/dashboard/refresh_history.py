@@ -18,9 +18,8 @@ linked_* sums above.
 
     python tools/dashboard/refresh_history.py
 
-Installed as .git/hooks/post-commit by tools/dashboard/install_hook.py, so the dashboard's history
-updates itself. Runs git here (from a shell that has a console) so the dashboard server never has to.
-Commits are immutable, so the per-commit git reads are cached in the history file itself and only
+Used by backfill_history.py and pages.py seed (the public page's history; docs/infrastructure.md)
+and by the local server. Commits are immutable, so the per-commit git reads are cached in the history file itself and only
 new commits are read.
 """
 import json, os, re, subprocess

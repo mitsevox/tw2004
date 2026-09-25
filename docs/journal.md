@@ -439,3 +439,24 @@ Dated log of what was done and decided, newest last. Facts and lessons belong in
 - **The suggested shot is the rehearsal.** Swing state 15 runs `AI_RehearseShot` on every player,
   humans made CPUs for the call, while the camera flies in; the club and aim you are handed are
   its solution. Also: state 12 keeps the ball as it lies; `bRehearsalDone`/`bPlanReady` named.
+
+2026-09-24/25 - Cloud sessions, outside agents, infrastructure
+--------------------------------------------------------------
+
+- **Cloud orchestrator.** First cloud box (4 cores): setup OK, clean build 27 s, `trial.py` 0.4 s
+  per variant, permuter `-j 2` ~3,400 iterations in 5 min. `tools/match` made Linux-clean (all
+  platform differences in `hosttools.py`). Lanes and the PC's lever sweeper overnight; the
+  tried-ledger `agents/tried/` replaced per-lane notes; `merge.py` got the asm gate.
+- **From 7,484 / 91.20% / 62.84% / 65.70%** (exact / matched / code linked / data linked, start of
+  09-24) to 7,528 / 93.19% / 74.16% / 78.28% (09-25 afternoon), 211 of 259 game units linked
+  (among them LLFileIO_Gc, UStream, hwsRender_Gc, PsMgr on 09-25).
+- **Outside agents.** gemini/hand-matches: 13 of 15 "matches" pasted the original assembly under
+  `#ifdef __MWERKS__` (proves nothing about the C): refused, and the asm gate added; its two C
+  fixes merged. Afterwards Gemini and ChatGPT worked from written assignments (`agents/assign/`)
+  on disjoint units; both once solved the same function (SkinPart fn_800CDF80) before that.
+- **AI_ChooseTarget** (Golfer, the largest blocker): all instructions equal, only callee-saved
+  register numbers differ (the original runs out of registers and spills pCourse). Declaration
+  orders exhausted (74k), compilers ruled out; the PC permuter found fDX-before-fDZ (98.20 -> 98.53%).
+- **Infrastructure.** The PC became a self-hosted runner (`pc-job.yml`); the progress page moved to
+  GitHub Pages (the local dashboard retired); branch cleanup became a workflow; the orchestrator
+  commits to main only. All in `infrastructure.md`.
