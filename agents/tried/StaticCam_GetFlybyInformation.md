@@ -8,7 +8,7 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
-(add yours here: date, lane, what, score)
+- 2026-09-25, gemini: Analyzed block 2 coalescing (`fmadds f31` vs `f3`, `fmr f3, f31` vs `fmr f31, f3`). With `fEnd` as temporary, MWCC coalesces `fEnd` with call argument register `f3`, copying `f3` to `f31` (`fmr f31, f3`). Writing `fT += ...` or `fT = ... + fT` eliminates the coalescing and emits `fmadds f31` and `fmr f3, f31`, but causes MWCC's latency scheduler to delay `addi r6, r10, 0x20` after `addi r4, r31, 0x20` and reorder `lfs f1/f2` (~7 diffs). Tested TW07 DWARF locals `percentDiff`, `distDiff`, `testPercent`, chained assignments `fT = fEnd = ...`, `fEnd = fT += ...`, `register f32 fEnd`, and inline identity reads; all either preserve score 2 or trigger the 7-diff argument reschedule.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
