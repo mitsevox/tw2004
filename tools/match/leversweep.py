@@ -532,10 +532,11 @@ def _write(unit, fn, base_score, results, nlev, secs, note, f=None, L=None, n1=0
                                          'review' if 'review' in kinds else 'safe'))
             lines += ['  - ' + L[k][1] for k in combo]
             if any(L[k][0][0] in ('id', 'addr') for k in combo):
-                lines.append('  fake match: EA did not write an identity wrapper. Look in TW07 '
-                             '(docs/reference-builds/tw07-ps3/cu/) for a real helper or macro at this '
-                             'spot and use it; otherwise name it fn_<caller address>_Read with a '
-                             '`// fake match:` comment.')
+                lines.append('  fake match: EA did not write this (an identity inline, or an address '
+                             'taken only to steer the compiler). Look in TW07 (docs/reference-builds/'
+                             'tw07-ps3/cu/) for EA\'s real helper or macro at this spot and use it; '
+                             'otherwise keep it with a `// fake match:` comment (an inline named '
+                             'fn_<caller address>_Read).')
         if best and best[0][0] < base_score:
             g = f.copy()
             for k in best[0][2]:
