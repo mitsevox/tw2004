@@ -16,6 +16,7 @@ unless you combine it with something new. Before you stop, add every attempt und
   `u32 j` first): 97.27% -> 97.64% (40 -> 25 diffs). New leversweep 7 min: 25. bLast assigned just
   before the second loop: 31; through a second u8 (bMsg early, `bLast = bMsg` before the loop, EA
   has a `mr r30,r27` there): 44.
+- 2026-09-25 n-uisscreen, more: `pEntry->n2 = <expr>` in the loop with no bLast (plain/ternary/s16 70, (u8)/(int)/read 31), int/s16/s32 bLast without the read 44-49, loop 2's inner counter as a new `u32 k` in the group block 39, j in its own block 32.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
