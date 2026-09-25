@@ -57,6 +57,10 @@ unless you combine it with something new. Before you stop, add every attempt und
   is X then Z; no logic change): permuter 675 -> 550 (block 3 alone 620); objdiff 98.20 -> 98.53%,
   merged. The sweep's `(u32)k` + nKind-first scores 1940 in the permuter: left out. The PC permuter
   continues from this version.
+- 2026-09-25 PC permuter from the 520 version (until ~15:35 CDT): best raw 415 needs a
+  half-initialised nPlayer copy (reads it before the copy: not usable); a clean
+  `int nPlayer = nPlayerArg;` copy scores 520, no gain. (That run died once after ~258k iterations
+  on a stdout OSError in perm_objdump.py: fixed in 01fd1a7.)
 - DONE (was NEXT, 2026-09-25): learn CodeWarrior's callee-saved numbering rule by controlled one-change
   experiments on this function, recording the full register map each time (first definition, use
   count, loop vs straight code, parameter vs local, how the (s8) casts are written, extra uses).

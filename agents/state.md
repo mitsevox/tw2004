@@ -56,7 +56,7 @@ merged: the owner deletes them (the session cannot).
 
 | exact functions | matched code | code linked | data linked | game units linked |
 |---|---|---|---|---|
-| 7,527 / 7,647 | 93.14% | 74.16% | 78.28% | 211 / 259 |
+| 7,528 / 7,647 | 93.19% | 74.16% | 78.28% | 211 / 259 |
 
 2026-09-24 (the first cloud day, with the owner's PC): from 7,484 / 91.20% / 62.84% / 65.70%.
 Left: 139 non-exact functions (110 KB) in 54 game units; 29 units are 1 function from linking, 9
@@ -90,6 +90,14 @@ headers 69 (phase 3, not started).
    Golfer (2), GoTerrainCollision (3), then the 1-function units.
 
 ## Parked (need the owner or a later phase)
+
+- Housekeeping (2026-09-25, the PC is going away): the local dashboard is retired (GitHub Pages
+  replaces it, its scheduled task disabled); remove tools/dashboard/install_hook.py and the PC's
+  post-commit refresh_history hook in a cleanup (refresh_history.py itself stays: backfill and
+  pages.py seed use it). Owner: delete the merged remote branch gemini/round2 (and future merged
+  agent/codex/gemini branches); clean ~30 old agent worktrees in C:/dev/tw2004-agents once each is
+  verified merged; C:/dev/scratch is archive-only. Heavy jobs now go to the PC runner via
+  .github/workflows/pc-job.yml (docs/workflow.md "Sending a job to the PC").
 
 - Orphan data left for linked owners (~14 KB): GoGrass (0xA0 slot vs 0x90 type), MC_Gc small
   globals (padding), GoRenderCtx_Gc table (8-align), Skeleton strings, Code8009AA28 10 KB raw blobs
