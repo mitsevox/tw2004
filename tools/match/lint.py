@@ -15,7 +15,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script 
 sys.path.insert(0, str(ROOT / 'tools/match'))
 import sweepblock                                    # noqa: E402
 import includes                                      # noqa: E402
-from hosttools import mwcc, reported_name            # noqa: E402
+from hosttools import NINJA_SEP, mwcc, reported_name  # noqa: E402
 
 SWEEP_DEBT = {}                                      # file name -> lines of uncleaned sweep code
 COMPILE_ERRORS = set()                               # (file name, line) the style pass reported
@@ -298,7 +298,7 @@ def compile_units(units):
     ninja = (ROOT / 'build.ninja').read_text(encoding='utf-8', errors='replace')
     targets, missing = [], []
     for u in units:
-        t = 'build\\GW4E69\\src\\%s.o' % u.replace('/', '\\')
+        t = NINJA_SEP.join(['build', 'GW4E69', 'src', '%s.o' % u.replace('/', NINJA_SEP)])
         (targets if ('build %s:' % t) in ninja else missing).append((u, t))
     out = []
     for u, _ in missing:
@@ -314,7 +314,7 @@ def compile_units(units):
         if m or re.match(r'^\[\d+/\d+\]|^\[end\]|^ninja:', l):
             if cur:
                 failed[cur] = msg
-            cur, msg = (m.group(1).replace('/', '\\') if m else None), []
+            cur, msg = (m.group(1).replace('/', NINJA_SEP) if m else None), []
         elif cur:
             msg.append(l)
     for u, t in targets:
@@ -326,7 +326,7 @@ def compile_units(units):
             msg = ' / '.join(err[:3]) or 'the unit does not compile'
             where = re.search(r'^#\s+File: (\S+)', text, re.M)
             at = int(ln.group(1)) if ln else 1
-            if where and pathlib.Path(where.group(1)).name != pathlib.Path(u).name + '.c':
+            if where and reported_name(where.group(1)) != pathlib.Path(u).name + '.c':
                 msg = 'in %s:%d: %s' % (where.group(1).replace('\\', '/'), at, msg)
                 at = 1                              # the error is in a header it includes
             out.append((u + '.c', at, 'compile-error', msg))
