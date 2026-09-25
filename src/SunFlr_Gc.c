@@ -54,31 +54,30 @@ void fn_8009A3D0(s32 nView, SunFlrView* pView) {
 // sun's own depth, so fn_8009A754 later counts the pixels nothing is drawn in front of.
 void fn_8009A3F4(s32 nView) {
     void* pCamera;
-    int iPart;
+    int nSunX;
     f32 v[4];
     int nSunY;
-    int nSunX;
+    int iPart = (lbl_80281B88 + 3) % 4; // fake match: early initializer fixes the register order
     int nLeft;
     int nTop;
     SunFlrPart* pPart;
     int nX;
     int nY;
-    int nBottom;
+    int nEndY;
     int nEndX;
     int nRight;
-    int nEndY;
-    int nCopyY;
+    SunFlrView* pView;
+    int nBottom;
     int nCopyX;
     int nReadX;
     int nReadY;
     int nWeightX;
     int nWeightY;
     int nWidth;
-    SunFlrView* pView;
+    int nCopyY;
     int nHeight;
 
     pView = &lbl_802813B8->aView[nView];
-    iPart = (lbl_80281B88 + 3) % 4;
     pCamera = fn_80017004(nView);
 
     // The sun on the screen, kept within +-500000.

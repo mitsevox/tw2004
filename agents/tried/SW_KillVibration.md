@@ -12,6 +12,12 @@ unless you combine it with something new. Before you stop, add every attempt und
   assignments, used direct frame-field store, and applied `register` to each pointer: 4 differing
   instructions -> 4 (early Player initialization worsened to 12, moving its declaration to 7).
   No source change.
+- 2026-09-25, ChatGPT subagent: `Player*` identity inlines at seven combinations of the player,
+  frame and controller address reads; `pFrames[0]`/`*(pFrames + 0)` final stores; byte-pointer
+  derivations through real struct members; explicit controller-value temporary with pointer
+  assignments before, between and after the first call; pointer initializers inside the pad branch:
+  all 4 -> 4. A short `leversweep.py` combination run (two workers, completed in ~17 seconds)
+  also found no improvement (best 4). No source change.
 
 ## Collected from the notes and docs (2026-09-25)
 
