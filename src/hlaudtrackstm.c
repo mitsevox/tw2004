@@ -335,6 +335,7 @@ u8 Stm_Tick(AudTrack* pTrack) {
     u32 uLen;
     u8 bBehind;
     u32 uPos;
+    u32 uThreshold;
 
     bFed = 0;
     fn_800B596C("Stm_Tick");
@@ -375,8 +376,10 @@ u8 Stm_Tick(AudTrack* pTrack) {
             }
         }
         if (bFed) break;
+        uThreshold = pTrack->u.stm.uFilled >> 15;
+        uThreshold /= pList->nChannels;
         bBehind = 0;
-        if (pTrack->u.stm.uPlayed > (pTrack->u.stm.uFilled >> 15) / pList->nChannels * 0x7F00 - 0xCB3) {
+        if (pTrack->u.stm.uPlayed > uThreshold * 0x7F00 - 0xCB3) {
             bBehind = 1;
         }
         if (bBehind) {
