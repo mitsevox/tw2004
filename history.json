@@ -1798,5 +1798,21 @@
 "matched_functions": 7528,
 "total_functions": 7647,
 "exact": 7528
+},
+{
+"commit": "cc88fd9",
+"sha": "cc88fd98b1b6150078600961f779fcbdf95b27a0",
+"time": 1790353561,
+"subject": "backfill_history.py: a root commit as the oldest (no parent) means everything up to newest",
+"report": true,
+"matched_code": 1445112,
+"complete_code": 1150048,
+"matched_data": 701147,
+"complete_data": 844511,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7528,
+"total_functions": 7647,
+"exact": 7528
 }
 ]
