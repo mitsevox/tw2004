@@ -967,7 +967,7 @@ config.libs = [
             Object(NonMatching, "GoShaderObject_Rain_Gc.c"),
             Object(Matching, "UAudMemStack.c"),
             Object(Matching, "GoARAM.c"),
-            Object(NonMatching, "DiscError.c"),
+            Object(Matching, "DiscError.c"),
             Object(NonMatching, "rcmp_mad_codec.c"),
             Object(Matching, "Code800B90F4.c"),
             Object(Matching, "Trax.c"),

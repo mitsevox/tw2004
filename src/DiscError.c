@@ -17,7 +17,7 @@ void VIWaitForRetrace(void);
 void fn_800B6924(void);
 void fn_800B6C14(s16 nX, s16 nY, const char* pFmt, ...);
 void fn_800B6CD0(u16 nColor);
-void fn_800B6CD8(int nX, int nY, const char* szText);
+void fn_800B6CD8(int nX, int nY, u8* szText);
 int  fn_800B6DA4(const char* szText);
 void fn_800B6E1C(int nX, int nY, int nRow, DiscGlyph* pGlyph);
 void fn_800B6FCC(int nLines);
@@ -26,6 +26,9 @@ void fn_800B7210(s32 nStatus);
 void fn_800B7684(u8 b);
 void fn_800B768C(u8 b);
 void fn_800B7694(u8 b);
+
+// .bss (discerror.h)
+DiscGlyph lbl_801F66A8[107];
 
 // Write the drawn screen back from the CPU cache.
 void fn_800B6924(void) {
@@ -100,7 +103,7 @@ void fn_800B6C14(s16 nX, s16 nY, const char* pFmt, ...) {
     va_start(args, pFmt);
     vsprintf(szText, pFmt, args);
     va_end(args);
-    fn_800B6CD8(nX, nY, szText);
+    fn_800B6CD8(nX, nY, (u8*)szText);
 }
 
 void fn_800B6CD0(u16 nColor) {
@@ -108,15 +111,15 @@ void fn_800B6CD0(u16 nColor) {
 }
 
 // Draw a string, characters outside 0x20..0x8A as spaces.
-void fn_800B6CD8(int nX, int nY, const char* szText) {
+void fn_800B6CD8(int nX, int nY, u8* szText) {
     DiscGlyph* pGlyph;
     int n;
     u8 c;
 
+    c = *szText;
     if (lbl_802814D2) {
         nX *= 8;
     }
-    c = *szText;
     while (c != 0) {
         if (c < 0x20) {
             c = 0x20;
@@ -164,20 +167,20 @@ int fn_800B6DA4(const char* szText) {
 // Draw one glyph (its bitmap rows from lbl_8018FFE0[nRow]) at twice the height; without a
 // DiscGlyph every column is drawn (fixed width).
 void fn_800B6E1C(int nX, int nY, int nRow, DiscGlyph* pGlyph) {
-    u32* pBits;
     u16* pPixel;
-    u32 uBits;
+    u16 uForeCb;
+    u32* pBits;
+    int nY2;
+    u16 uForeCr;
+    u16 uBackCb;
+    u16 uBackCr;
     u16 uFore;
     u16 uBack;
-    u16 uForeCb;
-    u16 uBackCb;
-    u16 uForeCr;
-    u16 uBackCr;
     int nX2;
-    int nY2;
-    int nCol;
-    int nLine;
+    u32 uBits;
     int bOdd;
+    int nLine;
+    int nCol;
 
     if (lbl_802814D2) {
         nY *= 8;
@@ -185,8 +188,8 @@ void fn_800B6E1C(int nX, int nY, int nRow, DiscGlyph* pGlyph) {
     if (pGlyph != NULL) {
         nY += pGlyph->nDrop;
     }
-    uBackCb = (lbl_80190D40[7].uY << 8) + lbl_80190D40[7].uCb;
     uForeCb = (lbl_80190D40[lbl_80282190].uY << 8) + lbl_80190D40[lbl_80282190].uCb;
+    uBackCb = (lbl_80190D40[7].uY << 8) + lbl_80190D40[7].uCb;
     uForeCr = (lbl_80190D40[lbl_80282190].uY << 8) + lbl_80190D40[lbl_80282190].uCr;
     uBackCr = (lbl_80190D40[7].uY << 8) + lbl_80190D40[7].uCr;
     uFore = uForeCb;
@@ -195,22 +198,22 @@ void fn_800B6E1C(int nX, int nY, int nRow, DiscGlyph* pGlyph) {
     nY2 = nY * 2;
     bOdd = 0;
     for (nLine = 0; nLine < 8; nLine++) {
-        nX2 = nX * 2;
+        nX2 = nX;
         uBits = *pBits;
         for (nCol = 0; nCol < 8; nCol++) {
             if (pGlyph == NULL || (nCol >= pGlyph->nLeft && nCol <= pGlyph->nRight)) {
                 if (uBits & 0xF0000000) {
-                    pPixel = (u16*)((u8*)lbl_80282194 + nX2 + lbl_8028218C * nY2 * 2);
+                    pPixel = lbl_80282194 + nX2 + lbl_8028218C * nY2;
                     pPixel[0] = uFore;
                     pPixel[lbl_8028218C] = uFore;
                 } else if (lbl_802814D0) {
-                    pPixel = (u16*)((u8*)lbl_80282194 + nX2 + lbl_8028218C * nY2 * 2);
+                    pPixel = lbl_80282194 + nX2 + lbl_8028218C * nY2;
                     pPixel[0] = uBack;
                     pPixel[lbl_8028218C] = uBack;
                 }
             }
             if (pGlyph == NULL || (nCol >= pGlyph->nLeft && nCol <= pGlyph->nRight)) {
-                nX2 += 2;
+                nX2++;
             }
             bOdd = 1 - bOdd;
             uBits <<= 4;
@@ -222,8 +225,8 @@ void fn_800B6E1C(int nX, int nY, int nRow, DiscGlyph* pGlyph) {
                 uFore = uForeCr;
             }
         }
-        pBits++;
         nY2 += 2;
+        pBits++;
     }
 }
 
