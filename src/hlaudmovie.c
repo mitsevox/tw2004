@@ -204,8 +204,7 @@ void Mov_Start(void) {
 }
 
 // A chunk of the movie's sound came in: each channel goes into the next block of its voice's ring.
-void fn_800A8AD4(void* pChunk) {
-    MovieSoundBlock* pBlock = pChunk;
+void fn_800A8AD4(MovieSoundBlock* pBlock) {
     int nMode;
     u8* pDataL;
     u8* pDataR;
@@ -231,7 +230,9 @@ void fn_800A8AD4(void* pChunk) {
         fn_800B044C(uLeft, pDataL, MOVIE_BLOCK_SIZE, NULL, 0);
         fn_800B044C(uRight, pDataR, MOVIE_BLOCK_SIZE, NULL, 1);
     } else {
-        fn_800B044C(uLeft, pDataL, MOVIE_BLOCK_SIZE, fn_800A87D8, 0);
+        // fake match: pBlock->aDataL instead of pDataL (same address) keeps pBlock live into this
+        // branch: its 29th allocator neighbour puts it in r30 ahead of the &lbl_801F1850 temp.
+        fn_800B044C(uLeft, pBlock->aDataL, MOVIE_BLOCK_SIZE, fn_800A87D8, 0);
         fn_800B044C(uRight, pDataR, MOVIE_BLOCK_SIZE, fn_800A87D8, 1);
     }
     // Before the start nothing plays, so the blocks advance here instead of in fn_800A87D8.
