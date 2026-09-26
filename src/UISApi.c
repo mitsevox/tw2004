@@ -547,8 +547,8 @@ static inline void* UISFile_Fix(UISScreenFile* pFile, void* p) {
 // link word names its pEntriesC entry by pointer (0 when out of range). Returns 1, or -1 when the
 // file was already fixed up (its node table then lies after its start).
 // fake match: the file's address is taken into an integer local before each loop (int, and
-// unsigned int for the node loop's entry and handler fixes) and the last three loops have
-// their own counters, for EA's hoisted copies.
+// unsigned int for the node loop's entry and handler fixes) and the pEntriesC and link loops
+// have their own counters, for EA's hoisted copies.
 // port: the fixes add 32-bit offsets to the file's address held in an int.
 s32 fn_80169DC4(UISScreenFile* pFile) {
     u32 i;
@@ -566,7 +566,6 @@ s32 fn_80169DC4(UISScreenFile* pFile) {
     int nBase6;
     u32 i1;
     u32 i2;
-    u32 i3;
 
     if ((u8*)pFile->pNodes < (u8*)pFile) {
         pFile->pNodes = (UISNode*)UISFile_Fix(pFile, pFile->pNodes);
@@ -619,10 +618,10 @@ s32 fn_80169DC4(UISScreenFile* pFile) {
         }
         pFile->pStart = (UISEntry*)UISFile_Fix(pFile, pFile->pStart);
         nBase6 = (int)pFile;
-        i3 = pFile->nStart;
-        while (i3-- != 0) {
-            if (pFile->pStart[i3].u4.pnOffset != NULL) {
-                pFile->pStart[i3].u4.pnOffset = (u32*)(nBase6 + (u32)pFile->pStart[i3].u4.pnOffset);
+        i = pFile->nStart;
+        while (i-- != 0) {
+            if (pFile->pStart[i].u4.pnOffset != NULL) {
+                pFile->pStart[i].u4.pnOffset = (u32*)(nBase6 + (u32)pFile->pStart[i].u4.pnOffset);
             }
         }
         return 1;
