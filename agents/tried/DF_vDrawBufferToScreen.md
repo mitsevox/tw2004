@@ -8,6 +8,10 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26, r6-args: permuter 15 min -j2 (13.5k iterations, base 550): best 330 and 395, both change behaviour (fOffset stored into fX0 / fY0, which the next pass reads for aUV); not usable.
+
+- 2026-09-26, r6-args: an empty `if (n) { } else { }` (block boundary) after `aXY[2] = fZ` or before the first clamp: 79 (the CSE is not stopped).
+
 - 2026-09-26, r6-args (aligned, base 79): the EA clamps' 1.0 is the same pooled symbol as fZ's hoisted 1.0
   (lbl_80283148 in both), so EA's first clamp simply was not CSE'd with fZ's load. fZ as f64 (79), f64 fZ with
   an f32-parameter clamp (79), clamping fZ instead of aXY[] (f32 or f64 fZ) 94.

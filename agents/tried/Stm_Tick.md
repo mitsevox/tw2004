@@ -8,6 +8,8 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26, r6-args (aligned, base 2): an empty `if (pTrack) { } else { }` before uRemaining or before the offset/buffer statements: 2. A block-local copy of pTrack (plain 2, through void* 5) or of pList through void* (2) for the read block; the whole function's pTrack parameter through a void* copy 5.
+
 - 2026-09-26, r6-args (aligned, base 2): an unreferenced label before the offset/buffer statements or before
   uRemaining (testing whether EA's post-RA block split there): 2 (labels dropped). fn_800AB4C0 takes only
   int arguments, so the parameter-order lever cannot apply without changing registers.

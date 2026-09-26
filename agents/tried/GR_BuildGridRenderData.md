@@ -8,6 +8,8 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26, r6-args: permuter 15 min -j2 (base 400): best 280 was only `aDir[(long long)nView][2]` in the fDirZ read; aligned it is 30 vs base 28 ((s64)/(unsigned long long) 30, (u32)/(long) 28, on the other three dir/corner reads 30-31). Not kept.
+
 (add yours here: date, lane, what, score)
 - 2026-09-26, r4-render (aligned): the parameter as `s32 nView` (fn_8001707C takes int) with the
   nViewCopy dropped: 44 -> 40 (`mr r29,r3` first and every nView use from r29, as EA's), real

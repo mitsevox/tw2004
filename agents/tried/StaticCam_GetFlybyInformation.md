@@ -8,6 +8,8 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26, r6-args (quicktrial): the late parameter copy through void* (`T p = (T)(void*)pArg;`, the fn_800AB860 fix) on each pointer parameter, declared first or last: pScript/pSub/pFov 2, pCam 31-52. An empty `if (pCam) { } else { }` (a frontend block boundary, agents/findings/2026-09-26-dead-asserts.md) between `fT = fEnd` and the call: 2.
+
 - 2026-09-26, r6-args: parameter-order lever on fn_800C7480: all 364 placements of the three float
   parameters among the eleven pointers (float order and int order kept, so registers unchanged), every call
   site reordered with the prototype, in both the base (fEnd) form and the `fT +=` form: base 2 / 32 (float

@@ -8,6 +8,8 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26, r6-args: the late parameter copy through void* (`T p = (T)(void*)pArg;`, the fn_800AB860 fix) on each pointer parameter, declared first or last: pShot 11, pSub 23, pCam 32. Permuter 15 min -j2 (12.9k iterations, base 65): nothing better.
+
 - 2026-09-26, r6-args: fMin's 33 neighbours = 14 volatile + fMinDist/fYShare/fAimY/fOldY/fDiv + 14 temps
   (f55-f59 the `*=` chain and vDir[1] = 0, f62 the first length's frsp, f63-f68 the zero tests, f71/f73/f74/f76
   the vDir[1] expression). One length local for both length reads (new fLen: fMin still 33 nb, 17; into fDist

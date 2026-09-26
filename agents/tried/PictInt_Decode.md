@@ -8,6 +8,10 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26, r6-args: permuter 15 min -j2 (base 415): best 350, the height's high byte read into a new local before the width swap; by hand (quicktrial aligned) 11 -> 23. Not kept.
+
+- 2026-09-26, r6-args: the late parameter copy through void* (`T p = (T)(void*)pArg;`, the fn_800AB860 fix) on each pointer parameter, declared first or last: 11 (aligned, base 11).
+
 - 2026-09-26, r2-ll: MAD_decodemacroblock takes 7 arguments (TW06 PDB: src_y, src_cb, src_cr,
   dest_y, dest_cb, dest_cr, width, flags; our exact rcmp_mad_codec.c uses the first 7). The
   target's loop width in r9 is the 7th argument: passing `pFile->nWidth` (and NULL refs) fixed
