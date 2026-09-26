@@ -8,6 +8,21 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26 r5-render (aligned, base 79): the hi bound as a different constant object so CSE
+  cannot merge it: DF_Clamp fLo/fHi f32/f64 x literals `0.0f`/`0.0`, `1.0f`/`1.0`: f32 lo + f64
+  hi 58 (the hi loads become fresh `lfd`, but the ternary turns double: an frsp at the end), f64
+  both 51, f64 lo only 82; with f64 hi, bodies casting fHi (`(f32)fHi` in the result and/or the
+  compare) 79 (folded back to the float constant, CSE'd again), `(f32)(inner ternary)` 50, if/return
+  and `f32 x = f` bodies 79-81.
+
+- 2026-09-26 r5-render: mwccdbg (batch dump). backend-00: fZ's `1.0f -` loads @6 (1.0) in
+  B12; the first clamp's hi compare is B14, whose only predecessor is B12, so pass 02 (CSE)
+  merges its `lfs @6` into fZ's register (then hoisted to f30); the second clamp's hi load sits
+  in B22 after the bOdd join (B20), so it stays a load, as in EA. EA has a fresh `lfs` at BOTH
+  clamps, so in EA the first clamp's hi compare is not in the same extended block as fZ's 1.0
+  (or its 1.0 is not the same load). The FPR list shows the rest (f105.. f0/f1 swaps) follows
+  from that. No C found for it this round (no attempts beyond the reading).
+
 (add yours here: date, lane, what, score)
 
 - 2026-09-26 r2-modes (quicktrial aligned, base 79): fZ's 1.0 as `1`, `(f32)1.0`, `-(...) + 1.0f` x

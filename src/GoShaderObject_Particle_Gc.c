@@ -488,7 +488,7 @@ void fn_80095108(void) {
 void* fn_800951A0(u32 uSize, u16 nAlign, int n) {
     u32 uPad;
     u32 uTotal;
-    u8* pBlock;
+    void* pBlock;
     u32 uOff;
     u8* pData;
     u32 uPeak;
@@ -499,18 +499,18 @@ void* fn_800951A0(u32 uSize, u16 nAlign, int n) {
     }
     uPad = nAlign - 1;
     uTotal = sizeof(HeapBlockHead) + 1 + uPad + uSize;
-    pBlock = OSAllocFromHeap(__OSCurrHeap, uTotal);
-    if (pBlock == NULL) return NULL;
-    pData = pBlock;
+    pData = OSAllocFromHeap(__OSCurrHeap, uTotal);
+    if (pData == NULL) return NULL;
+    pBlock = pData;
     // port: aligned by the address
-    uOff = (uptr)(pBlock + sizeof(HeapBlockHead)) % nAlign;
+    uOff = ((uptr)pBlock + sizeof(HeapBlockHead)) % nAlign;
     if (uOff != 0) {
-        pData += nAlign - uOff;
+        uOff = nAlign - uOff;
     }
+    pData += uOff;
     ((HeapBlockHead*)pData)->pBlock = pBlock;
     ((HeapBlockHead*)pData)->uSize = uSize;
-    pData = (u8*)((HeapBlockHead*)pData + 1);
-    *(pData + uSize) = uPad;
+    (pData += sizeof(HeapBlockHead))[uSize] = uPad;
     uPeak = lbl_80281F5C;
     lbl_80281F58 += uTotal;
     if (lbl_80281F58 > uPeak) {
