@@ -57,6 +57,7 @@ static inline char* UIS_PutString(char* pOut, char* pEnd, const char* sz, s32 nW
     s32 nAbs;
     s32 nCount;
     s32 nPad;
+    s32 nLen;
     s32 i;
 
     nAbs = nWidth;
@@ -64,19 +65,22 @@ static inline char* UIS_PutString(char* pOut, char* pEnd, const char* sz, s32 nW
     if (nWidth < 0) {
         nAbs = -nWidth;
     }
-    nPad = nAbs - strlen(sz);
-    if (!bLeft && nPad > 0) {
-        for (i = nPad; i > 0; i--) {
-            *pOut++ = ' ';
+    nLen = strlen(sz);
+    if (!bLeft) {
+        nPad = nAbs - nLen;
+        if (nPad > 0) {
+            for (i = nPad; i > 0; i--) {
+                *pOut++ = ' ';
+            }
+            nCount = nPad;
         }
-        nCount = nPad;
     }
     while (*sz != 0) {
         *pOut++ = *sz++;
         nCount++;
         if (pOut == pEnd) break;
     }
-    if (bLeft == 1 && nCount < nAbs) {
+    if (bLeft == 1) {
         for (i = nCount; i < nAbs; i++) {
             *pOut++ = ' ';
         }
