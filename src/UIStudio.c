@@ -46,6 +46,16 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
     u32 k;
     s32 bMatch;
     f32 f;
+    // The script's big-endian immediates are read a byte at a time into these, then combined
+    // (the three four-byte reads into n go through the u8 ones: the code masks those bytes).
+    u32 uByte0;
+    u32 uByte1;
+    u32 uByte2;
+    u32 uByte3;
+    u8 nByte0;
+    u8 nByte1;
+    u8 nByte2;
+    u8 nByte3;
 
     while (pFrame->p10 != NULL) {
         uOp = *pFrame->p10;
@@ -212,26 +222,28 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             break;
         case 0x0F:  // push a word
         case 0x10:
-            u = *pFrame->p10 << 24;
+            uByte0 = *pFrame->p10;
             pFrame->p10++;
-            u |= *pFrame->p10 << 16;
+            uByte1 = *pFrame->p10;
             pFrame->p10++;
-            u |= *pFrame->p10 << 8;
+            uByte2 = *pFrame->p10;
             pFrame->p10++;
-            u |= *pFrame->p10;
+            uByte3 = *pFrame->p10;
             pFrame->p10++;
+            u = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
             *pFrame->pC = u;
             pFrame->pC++;
             break;
         case 0x11:  // push a float
-            word.u = *pFrame->p10 << 24;
+            uByte0 = *pFrame->p10;
             pFrame->p10++;
-            word.u |= *pFrame->p10 << 16;
+            uByte1 = *pFrame->p10;
             pFrame->p10++;
-            word.u |= *pFrame->p10 << 8;
+            uByte2 = *pFrame->p10;
             pFrame->p10++;
-            word.u |= *pFrame->p10;
+            uByte3 = *pFrame->p10;
             pFrame->p10++;
+            word.u = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
             *(f32*)pFrame->pC = word.f;
             pFrame->pC++;
             break;
@@ -439,14 +451,15 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->pC--;
             break;
         case 0x43:  // call a script address, pushing the return address
-            u = *pFrame->p10 << 24;
+            uByte0 = *pFrame->p10;
             pFrame->p10++;
-            u |= *pFrame->p10 << 16;
+            uByte1 = *pFrame->p10;
             pFrame->p10++;
-            u |= *pFrame->p10 << 8;
+            uByte2 = *pFrame->p10;
             pFrame->p10++;
-            u |= *pFrame->p10;
+            uByte3 = *pFrame->p10;
             pFrame->p10++;
+            u = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
             *pFrame->pC = (s32)pFrame->p10;
             pFrame->pC++;
             if ((u & 0x80000000) == 0x80000000) {
@@ -648,18 +661,20 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             break;
         case 0x55:  // push a word at a local's pointer plus an offset (0x6B: its address)
         case 0x6B:
-            u = *pFrame->p10 << 24;
+            uByte0 = *pFrame->p10;
             pFrame->p10++;
-            u |= *pFrame->p10 << 16;
+            uByte1 = *pFrame->p10;
             pFrame->p10++;
-            u |= *pFrame->p10 << 8;
+            uByte2 = *pFrame->p10;
             pFrame->p10++;
-            u |= *pFrame->p10;
+            uByte3 = *pFrame->p10;
             pFrame->p10++;
-            n = *pFrame->p10 << 8;
+            u = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
+            uByte0 = *pFrame->p10;
             pFrame->p10++;
-            n |= *pFrame->p10;
+            uByte1 = *pFrame->p10;
             pFrame->p10++;
+            n = (uByte0 << 8) | uByte1;
             pArgs = (s32*)(u + pTop[(s16)n]);
             if (uOp == 0x6B) {
                 *pTop = (s32)pArgs;  // port: a stack word holds the pointer
@@ -670,34 +685,38 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             }
             break;
         case 0x56:  // store the top at a local's pointer plus an offset
-            u = *pFrame->p10 << 24;
+            uByte0 = *pFrame->p10;
             pFrame->p10++;
-            u |= *pFrame->p10 << 16;
+            uByte1 = *pFrame->p10;
             pFrame->p10++;
-            u |= *pFrame->p10 << 8;
+            uByte2 = *pFrame->p10;
             pFrame->p10++;
-            u |= *pFrame->p10;
+            uByte3 = *pFrame->p10;
             pFrame->p10++;
-            n = *pFrame->p10 << 8;
+            u = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
+            uByte0 = *pFrame->p10;
             pFrame->p10++;
-            n |= *pFrame->p10;
+            uByte1 = *pFrame->p10;
             pFrame->p10++;
+            n = (uByte0 << 8) | uByte1;
             *(s32*)(u + pFrame->pC[(s16)n]) = pTop[-1];
             pFrame->pC--;
             break;
         case 0x57:  // push a local's pointer plus an offset
-            u = *pFrame->p10 << 24;
+            uByte0 = *pFrame->p10;
             pFrame->p10++;
-            u |= *pFrame->p10 << 16;
+            uByte1 = *pFrame->p10;
             pFrame->p10++;
-            u |= *pFrame->p10 << 8;
+            uByte2 = *pFrame->p10;
             pFrame->p10++;
-            u |= *pFrame->p10;
+            uByte3 = *pFrame->p10;
             pFrame->p10++;
-            n = *pFrame->p10 << 8;
+            u = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
+            uByte0 = *pFrame->p10;
             pFrame->p10++;
-            n |= *pFrame->p10;
+            uByte1 = *pFrame->p10;
             pFrame->p10++;
+            n = (uByte0 << 8) | uByte1;
             pTop = pFrame->pC;
             *pTop = u + pTop[(s16)n];
             pFrame->pC++;
@@ -743,10 +762,11 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 pFrame->p10++;
                 u |= *pFrame->p10;
                 pFrame->p10++;
-                n = *pFrame->p10 << 8;
+                uByte0 = *pFrame->p10;
                 pFrame->p10++;
-                n |= *pFrame->p10;
+                uByte1 = *pFrame->p10;
                 pFrame->p10++;
+                n = (uByte0 << 8) | uByte1;
                 pArr = (s32*)(u + pFrame->pC[(s16)n]);
                 break;
             }
@@ -798,10 +818,11 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 pFrame->p10++;
                 u |= *pFrame->p10;
                 pFrame->p10++;
-                n = *pFrame->p10 << 8;
+                uByte0 = *pFrame->p10;
                 pFrame->p10++;
-                n |= *pFrame->p10;
+                uByte1 = *pFrame->p10;
                 pFrame->p10++;
+                n = (uByte0 << 8) | uByte1;
                 pArr = (s32*)(u + pFrame->pC[(s16)n]);
                 break;
             }
@@ -818,39 +839,42 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->pC -= nDims + bOnStack + 1;
             break;
         case 0x63:  // push n copies of the top
-            n = *pFrame->p10 << 24;
+            nByte0 = *pFrame->p10;
             pFrame->p10++;
-            n |= *pFrame->p10 << 16;
+            nByte1 = *pFrame->p10;
             pFrame->p10++;
-            n |= *pFrame->p10 << 8;
+            nByte2 = *pFrame->p10;
             pFrame->p10++;
-            n |= *pFrame->p10;
+            nByte3 = *pFrame->p10;
             pFrame->p10++;
+            n = ((u32)nByte0 << 24) | (nByte1 << 16) | (nByte2 << 8) | nByte3;
             for (i = 0; i < n; i++) {
                 pTop[i] = pTop[-1];
             }
             pFrame->pC += n;
             break;
         case 0x64:  // drop n words
-            n = *pFrame->p10 << 24;
+            nByte0 = *pFrame->p10;
             pFrame->p10++;
-            n |= *pFrame->p10 << 16;
+            nByte1 = *pFrame->p10;
             pFrame->p10++;
-            n |= *pFrame->p10 << 8;
+            nByte2 = *pFrame->p10;
             pFrame->p10++;
-            n |= *pFrame->p10;
+            nByte3 = *pFrame->p10;
             pFrame->p10++;
+            n = ((u32)nByte0 << 24) | (nByte1 << 16) | (nByte2 << 8) | nByte3;
             pFrame->pC -= n;
             break;
         case 0x65:  // push a copy of the top n words
-            n = *pFrame->p10 << 24;
+            nByte0 = *pFrame->p10;
             pFrame->p10++;
-            n |= *pFrame->p10 << 16;
+            nByte1 = *pFrame->p10;
             pFrame->p10++;
-            n |= *pFrame->p10 << 8;
+            nByte2 = *pFrame->p10;
             pFrame->p10++;
-            n |= *pFrame->p10;
+            nByte3 = *pFrame->p10;
             pFrame->p10++;
+            n = ((u32)nByte0 << 24) | (nByte1 << 16) | (nByte2 << 8) | nByte3;
             for (i = 0; i < n; i++) {
                 pTop[i] = pTop[i - n];
             }
@@ -881,10 +905,11 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 pFrame->p10++;
                 u |= *pFrame->p10;
                 pFrame->p10++;
-                n = *pFrame->p10 << 8;
+                uByte0 = *pFrame->p10;
                 pFrame->p10++;
-                n |= *pFrame->p10;
+                uByte1 = *pFrame->p10;
                 pFrame->p10++;
+                n = (uByte0 << 8) | uByte1;
                 pArr = (s32*)(u + pFrame->pC[(s16)n]);
                 break;
             }
@@ -906,18 +931,20 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             }
             break;
         case 0x59:  // switch a node on or off (fn_80168644)
-            u = *pFrame->p10 << 24;
+            uByte0 = *pFrame->p10;
             pFrame->p10++;
-            u |= *pFrame->p10 << 16;
+            uByte1 = *pFrame->p10;
             pFrame->p10++;
-            u |= *pFrame->p10 << 8;
+            uByte2 = *pFrame->p10;
             pFrame->p10++;
-            u |= *pFrame->p10;
+            uByte3 = *pFrame->p10;
             pFrame->p10++;
-            k = *pFrame->p10 << 8;
+            u = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
+            uByte0 = *pFrame->p10;
             pFrame->p10++;
-            k |= *pFrame->p10;
+            uByte1 = *pFrame->p10;
             pFrame->p10++;
+            k = (uByte0 << 8) | uByte1;
             pCode = pFrame->p10++;
             fn_80168644(pStudio, pScreen, *pCode, (void*)(u + pFrame->pC[k]), pTop[-1]);
             pFrame->pC--;
