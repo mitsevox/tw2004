@@ -41061,5 +41061,21 @@
 "matched_functions": 7567,
 "total_functions": 7647,
 "exact": 7567
+},
+{
+"commit": "eac4923",
+"sha": "eac49237f17f0bc3378c4f1d443973bd882afd11",
+"time": 1790433225,
+"subject": "mwccdbg: EA register column, --all batch, lock for parallel lanes, worktree lookup; matching.md step 3: read the compiler's view first",
+"report": true,
+"matched_code": 1472624,
+"complete_code": 1218288,
+"matched_data": 714119,
+"complete_data": 858875,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7567,
+"total_functions": 7647,
+"exact": 7567
 }
 ]
