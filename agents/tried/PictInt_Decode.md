@@ -8,6 +8,12 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26, r2-ll: MAD_decodemacroblock takes 7 arguments (TW06 PDB: src_y, src_cb, src_cr,
+  dest_y, dest_cb, dest_cr, width, flags; our exact rcmp_mad_codec.c uses the first 7). The
+  target's loop width in r9 is the 7th argument: passing `pFile->nWidth` (and NULL refs) fixed
+  the whole loop. 93.12727 -> 93.26363% real, quicktrial 14 -> 11 aligned. Kept.
+  After it: sibling width at the first swap 16, stwbrx moved after the height swap 28,
+  `__stwbrx(pFile->uC, pFile, 0xC)` 13.
 - 2026-09-25, n-ll: the whole header swap (32-bit, width and height, sibling fn_800B965C's
   spellings) as one static inline on the PictFile, used at both swaps / the first only / returning
   the pointer / with its own parameter name: 14 -> 19 aligned (same as the sibling width expression
