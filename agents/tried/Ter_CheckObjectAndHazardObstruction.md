@@ -28,6 +28,9 @@ unless you combine it with something new. Before you stop, add every attempt und
   nCorner / j registers r19-r21 rotated, and the pFlags / pVert address adds. The same inline for
   nMinZ / nMaxX / nMaxZ too: 51.
 
+- 2026-09-26 r2-terrain (from the 28 lead): `bObstructed = 0` after `bFirst = 1`: 28; after the
+  pCourse test: 42; just before the loops: 38.
+
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
 ```
