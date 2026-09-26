@@ -815,9 +815,9 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             }
             if (uOp == 0x6C || uOp == 0x6D || uOp == 0x6E) {
                 // port: a stack word holds the pointer
-                pTop[-(nDims + bOnStack)] = (s32)&pArr[nDims + nIndex + 1];
+                pTop[-(nDims + bOnStack)] = (s32)&pArr[nDims + 1 + nIndex];
             } else {
-                pTop[-(nDims + bOnStack)] = pArr[nDims + nIndex + 1];
+                pTop[-(nDims + bOnStack)] = pArr[nDims + 1 + nIndex];
             }
             pFrame->pC -= nDims - (1 - bOnStack);
             break;
@@ -870,7 +870,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 nIndex += nMul * n;
                 nMul *= pArr[i];
             }
-            pArr[nDims + nIndex + 1] = pTop[-1 - bOnStack];
+            pArr[nDims + 1 + nIndex] = pTop[-1 - bOnStack];
             pFrame->pC -= nDims + bOnStack + 1;
             break;
         case 0x63:  // push n copies of the top
