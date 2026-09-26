@@ -23,7 +23,6 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
     s32* pTop;
     s32* pArgs;
     s32* pArr;
-    u8* pCode;
     u8 uOp;
     u8 nArgs;
     u32 u;
@@ -753,15 +752,16 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 break;
             case 0x5F:
             case 0x6E:
-                pCode = pFrame->p10++;
                 bOnStack = 0;
-                u = *pCode << 24;
-                u |= *pFrame->p10 << 16;
+                uByte0 = *pFrame->p10;
                 pFrame->p10++;
-                u |= *pFrame->p10 << 8;
+                uByte1 = *pFrame->p10;
                 pFrame->p10++;
-                u |= *pFrame->p10;
+                uByte2 = *pFrame->p10;
                 pFrame->p10++;
+                uByte3 = *pFrame->p10;
+                pFrame->p10++;
+                u = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
                 uByte0 = *pFrame->p10;
                 pFrame->p10++;
                 uByte1 = *pFrame->p10;
@@ -809,15 +809,16 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 bOnStack = 1;
                 break;
             case 0x60:
-                pCode = pFrame->p10++;
                 bOnStack = 0;
-                u = *pCode << 24;
-                u |= *pFrame->p10 << 16;
+                uByte0 = *pFrame->p10;
                 pFrame->p10++;
-                u |= *pFrame->p10 << 8;
+                uByte1 = *pFrame->p10;
                 pFrame->p10++;
-                u |= *pFrame->p10;
+                uByte2 = *pFrame->p10;
                 pFrame->p10++;
+                uByte3 = *pFrame->p10;
+                pFrame->p10++;
+                u = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
                 uByte0 = *pFrame->p10;
                 pFrame->p10++;
                 uByte1 = *pFrame->p10;
@@ -896,15 +897,16 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 bOnStack = 1;
                 break;
             case 0x68:
-                pCode = pFrame->p10++;
                 bOnStack = 0;
-                u = *pCode << 24;
-                u |= *pFrame->p10 << 16;
+                uByte0 = *pFrame->p10;
                 pFrame->p10++;
-                u |= *pFrame->p10 << 8;
+                uByte1 = *pFrame->p10;
                 pFrame->p10++;
-                u |= *pFrame->p10;
+                uByte2 = *pFrame->p10;
                 pFrame->p10++;
+                uByte3 = *pFrame->p10;
+                pFrame->p10++;
+                u = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
                 uByte0 = *pFrame->p10;
                 pFrame->p10++;
                 uByte1 = *pFrame->p10;
@@ -945,8 +947,9 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             uByte1 = *pFrame->p10;
             pFrame->p10++;
             k = (uByte0 << 8) | uByte1;
-            pCode = pFrame->p10++;
-            fn_80168644(pStudio, pScreen, *pCode, (void*)(u + pFrame->pC[k]), pTop[-1]);
+            uByte0 = *pFrame->p10;
+            pFrame->p10++;
+            fn_80168644(pStudio, pScreen, uByte0, (void*)(u + pFrame->pC[(s16)k]), pTop[-1]);
             pFrame->pC--;
             break;
         case 0x73: {  // whether a rate function runs
