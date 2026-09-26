@@ -1,12 +1,26 @@
 # GR_BuildGridRenderData (GoGreenGrid.c, 0x8009C0BC)
 
-Status: OPEN, 98.99% on 2026-09-26 (r4-render).
+Status: OPEN, 99.22% on 2026-09-26 (r7-cam; only the preamble's GPRs left).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
 "Attempts" (what, score before -> after). When it is exact: Status SOLVED, the fix, the commit.
 
 ## Attempts
+
+- 2026-09-26, r7-cam: mwccdbg + rasim --fpr search over the 15 float locals: no declaration order
+  fixes the floats (7 of 21 targets wrong at best). Reading: EA colours loop 1's x/y/z BEFORE the
+  hoisted temp @205 (fPrev - fHeight), i.e. they are backend temps numbered above it, not locals.
+  Writing the three vertex values straight into the apVert stores (no fX/fY/fZ; loop code motion
+  hoists them) in both loops: every float register right, 98.99 -> 99.22 (kept). Left: preamble
+  `slwi r5`/second `lwz lbl_802813C0` r4 (ours r4/r3). rasim what-if: EA's colouring follows if
+  the second lbl_802813C0 load (r107) is live when the fDirX address add (r108) is defined, or if
+  the gSession lis/addi is numbered above r107 and live across it. Tried: pSession assigned after
+  `nIndices = 0` / at the end of the preamble (same), `nIndices = 0` after fDirX (registers right
+  but fDirX's load is CSE'd into it: worse), no pSession (`gSession.nFrameCount`: slwi r5 right,
+  but &gSession.nFrameCount hoisted, many diffs).
+
+- 2026-09-26, r6-args: permuter 15 min -j2 (base 400): best 280 was only `aDir[(long long)nView][2]` in the fDirZ read; aligned it is 30 vs base 28 ((s64)/(unsigned long long) 30, (u32)/(long) 28, on the other three dir/corner reads 30-31). Not kept.
 
 (add yours here: date, lane, what, score)
 - 2026-09-26, r4-render (aligned): the parameter as `s32 nView` (fn_8001707C takes int) with the

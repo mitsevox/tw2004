@@ -20,3 +20,4 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 Nothing recorded.
 - 2026-09-26 round 3 (r3-render; written by the orchestrator from the lane report, the disk was full): nBits as s32/int 284, s16 285, u32 292 (base 288). Orig divides by 32 signed; its frame is 0x100 vs our 0x110.
+- 2026-09-26, r6-assert: dead asserts (agents/findings/2026-09-26-dead-asserts.md): not swept. Frame: on GC/2.5 a dead or unused buffer takes no stack (unused, write-only, used only under if (0) / static const 0 / goto, empty inline: all frames unchanged), so dead debug code cannot explain a frame difference either way.

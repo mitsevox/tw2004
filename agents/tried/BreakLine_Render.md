@@ -1,12 +1,19 @@
 # BreakLine_Render (GoBreakLine.c, 0x800C844C)
 
-Status: OPEN, 99.89% on 2026-09-25.
+Status: SOLVED 2026-09-26 (r6-args): fZ holds the NEW z, computed before the x store, and both
+expressions read the old z from aVert[..][2] (`fZ = fX * fCos + v[2] * fSin; v[0] = fX * -fSin + v[2] * fCos;
+v[2] = fZ;`). GoBreakLine linked in the same commit.
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
 "Attempts" (what, score before -> after). When it is exact: Status SOLVED, the fix, the commit.
 
 ## Attempts
+
+- 2026-09-26, r6-args: mwcc-debugger: the rotate temps are colored in reverse creation order (new z f61 -> f0 first,
+  then the x chain f59/f58 -> f2); EA's x chain gets f0, so its temps had to be created after z's. Computing new z
+  into a local before the x statement: fDist/fAngle/fAlpha 7, fX 5, into fZ itself (old z re-read from the array) 0.
+  Kept `fZ = fX * fCos + v[2] * fSin` (both reads from the array also 0). 99.89 -> 100.
 
 - 2026-09-25, n-const: registers only (fZ f0 vs EA f2; the first product f2 vs EA f0). `-fSin` into fAlpha before/after the fCos call: 10/9; loads z first with commuted sums 8; while loop 7; `-fSin * fX + fCos * fZ` operand order 7; fCos call before fSin 10; products / new x / new z / loads through the dead locals fDist, fAngle, fAlpha (each singly, both products through a pair in both orders, and an exhaustive sweep of X/Z/P1/P2 over {fX, fZ, fDist, fAngle, fAlpha}): none below 7. Compilers 1.3.2 / 2.0 / 2.6 / 2.7: 7, 2.0p1: 28.
 

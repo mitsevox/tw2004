@@ -25,6 +25,12 @@ unless you combine it with something new. Before you stop, add every attempt und
   inline's value, skipped to level 2 by its 49 neighbours). EA computes nMsg == -1 into r27 before loop 1
   and copies it (`mr r30,r27`) at loop 2's start, stores r30: the same kept-copy shape as fn_8016B4D4 /
   fn_8016AD54 (see there); our build folds the copy.
+- 2026-09-26 r7-uis, mwcc-debugger (mechanism in agents/findings/2026-09-26-r7-uis-copy-chains.md): the hoisted (short) conversion of
+  bLast in loop 2's preheader is `rlwinm r50,r56,0,24,31` until constant propagation (pass 06)
+  proves the mask redundant and rewrites it to `mr r50,r56`; the copy propagation after load
+  deletion (08) deletes it. EA's `mr r30,r27` is that copy kept: in EA's IR r50 still fed a copy
+  (or had a second definition) at pass 08 and 12. The inner preheader copy `mr r52,r50` is gone
+  already at pass 03 in ours. No source change tried beyond reading the dumps.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 

@@ -6,8 +6,8 @@
 #include "camera.h"
 #include "breakline.h"
 
-BreakLine* lbl_80282228;
 u8 lbl_8028222C;
+BreakLine* lbl_80282228;
 
 void fn_80036054(void* pMesh, int n, s32* pDesc);    // Skin.c: sets up a mesh object
 void fn_800360A0(void* pMesh);         // Skin.c: frees a mesh object
@@ -16,6 +16,12 @@ void fn_800C9310(f32* pA, f32* pB, f32* pOut);
 void fn_800C9334(f32* pA, f32* pB, f32* pOut);
 void fn_800C9358(f32* pA, f32* pB, f32* pOut);
 void fn_8003519C(int nRow, void* pData);   // GoTerrain.c: calls row nRow's function with pData
+
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x802843F8), before the 27.0f BreakLine_InitModule uses first; its body is unknown.
+static f32 GoBreakLine_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
 
 void BreakLine_InitModule(void) {
     lbl_80282228 = fn_80009B34(sizeof(BreakLine), 2, 16, "GoBreakLine.c", 93);
@@ -157,9 +163,9 @@ void BreakLine_Render(int nView) {
                 // Turn the new pair of vertices to the heading and move them to the ball.
                 for (i = lbl_80282228->anVerts[nView]; i <= lbl_80282228->anVerts[nView] + 1; i++) {
                     fX = lbl_80282228->aVert[nView][i][0];
-                    fZ = lbl_80282228->aVert[nView][i][2];
-                    lbl_80282228->aVert[nView][i][0] = fX * -fSin + fZ * fCos;
-                    lbl_80282228->aVert[nView][i][2] = fX * fCos + fZ * fSin;
+                    fZ = fX * fCos + lbl_80282228->aVert[nView][i][2] * fSin;
+                    lbl_80282228->aVert[nView][i][0] = fX * -fSin + lbl_80282228->aVert[nView][i][2] * fCos;
+                    lbl_80282228->aVert[nView][i][2] = fZ;
                 }
                 fn_800C9310(lbl_80282228->aVert[nView][lbl_80282228->anVerts[nView]],
                             lbl_80282228->aBall[nView].vPos,
@@ -232,6 +238,11 @@ void BreakLine_Render(int nView) {
     }
 }
 
+// View nView's point.
+void fn_800C8C3C(int nView, f32* pOut) {
+    Vec_Copy(lbl_80282228->aViewPoint[nView], pOut);
+}
+
 // fake match: EA reads the player through an inline; written in place, pPlayer is allocated r29, not r31
 static inline Player* fn_800C8C70_Read(int nView) {
     return &gPlayers[fn_8001707C(nView)];
@@ -288,11 +299,6 @@ void BreakLine_Reset(int nView) {
                     pPlayer->fAim, 1, pPlayer->vLaunchA, pPlayer->vLaunchB);
         fn_80050D24_SetSimulating(0);
     }
-}
-
-// View nView's point.
-void fn_800C8C3C(int nView, f32* pOut) {
-    Vec_Copy(lbl_80282228->aViewPoint[nView], pOut);
 }
 
 // The caddie's putt read for view nView, in feet: how far past (+) or short of the hole the aim

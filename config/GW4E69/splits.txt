@@ -351,6 +351,10 @@ fe_craputils.c:
 
 Swing.c:
 	.text       start:0x800589F8 end:0x8005CCAC
+	.data       start:0x80188148 end:0x801883C0
+	.bss        start:0x801D5968 end:0x801D5A90
+	.sdata      start:0x80281188 end:0x802811A8
+	.sdata2     start:0x802835B0 end:0x80283680
 
 StateGolfer.c:
 	.text       start:0x8005CCAC end:0x8005D2E4
@@ -914,6 +918,11 @@ CamSpline.c:
 
 GoBreakLine.c:
 	.text       start:0x800C808C end:0x800C937C
+	.rodata     start:0x80184D20 end:0x80184D30
+	.data       start:0x80191480 end:0x80191490
+	.sdata      start:0x80281528 end:0x80281530
+	.sbss       start:0x80282228 end:0x80282230
+	.sdata2     start:0x802843F8 end:0x80284460
 
 AnimStream.c:
 	.text       start:0x800C937C end:0x800CB950
@@ -948,6 +957,9 @@ CourseData.c:
 
 Earnings.c:
 	.text       start:0x800D3244 end:0x800D9E14
+	.data       start:0x80191A08 end:0x80192010
+	.sdata      start:0x80281560 end:0x80281568
+	.sdata2     start:0x80284510 end:0x80284560
 
 GameHoleContests.c:
 	.text       start:0x800D9E14 end:0x800DAE44
@@ -1161,6 +1173,9 @@ FE_CrAPMessages.c:
 
 LLDynTex.c:
 	.text       start:0x8010A448 end:0x8010C4A0
+	.data       start:0x80193AE0 end:0x80193B28
+	.sbss       start:0x80282488 end:0x80282490
+	.sdata2     start:0x80284868 end:0x80284890
 
 GameMode26.c:
 	.text       start:0x8010C4A0 end:0x8010D454
@@ -1203,6 +1218,7 @@ DiscCheck.c:
 
 hwsBurn.c:
 	.text       start:0x801104AC end:0x80111F58
+	.data       start:0x80193D80 end:0x80193D90
 
 CalendarScreen.c:
 	.text       start:0x80111F58 end:0x80112614

@@ -1,12 +1,27 @@
 # FO_spLoadFontFromStream (LLFont.c, 0x800107F4)
 
-Status: OPEN, 84.75% on 2026-09-25.
+Status: OPEN, 87.02% on 2026-09-26 (r6-misc).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
 "Attempts" (what, score before -> after). When it is exact: Status SOLVED, the fix, the commit.
 
 ## Attempts
+
+- 2026-09-26 r6-misc: WHY the srawi forms: mwccdbg shows each peephole-forward pass folds only
+  ONE `rlwinm; srawi` pair per basic block, the last one in the block (backend-01/-09/-13 fold
+  n0C, nGlyphs, uVersion in turn; n00 is never reached). EA's header swaps all keep srawi, so
+  EA's block had three more signed candidates after n0C: uGlyphs, u18 and uBitmap were signed.
+  KEPT: those three fields s32 in engine.h (84.75 -> 86.57; the whole swap block now has EA's
+  instruction forms), and the size `sizeof(LLFont) + n * sizeof(LLGlyphRec) + n *
+  sizeof(LLGlyph)` (86.57 -> 87.02; quicktrial 363 -> 359, 8 other term orders 359-363).
+  No gain: `if (((LLFontFile*)pData)->n0C > 100)`, pBytes through void*, pBytes/pFile copies
+  swapped or chained (363-364); `s32 i` 360 (EA's first 256-loop keeps the `li r0,0; cmpwi
+  r0,0x100` guard, i.e. a long counter, but not kept alone); pGlyphs from `pFont->pRecs +
+  n` / `&pFont->pRecs[n]` (same). Left: pFile/pBytes kept apart in EA (r30/r28, ours both
+  coalesced into r31: the backend copy-propagation pattern of UISScreen), the texel loop's
+  shape (EA: `li r26,2; mtctr` inner k loop with rlwimi byte merges) and `aCode[1] << 8`
+  (EA keeps a clrlslwi).
 
 - 2026-09-26 r5-render: reading only (no variant): EA's n00 and n0C swaps both use the signed
   `rlwinm 0,8,15` + `srawi 8` form and the n0C one reloads `lwz r5,0xc(r30)` after the compare's

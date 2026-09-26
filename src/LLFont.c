@@ -88,8 +88,8 @@ LLFont* FO_spLoadFontFromStream(void* pData, UFontState* pState) {
         pFile->u18 = LLFONT_SWAP32(pFile->u18);
         pFile->uBitmap = LLFONT_SWAP32(pFile->uBitmap);
     }
-    pFont = fn_80009B34(pFile->nGlyphs * sizeof(LLGlyphRec) + pFile->nGlyphs * sizeof(LLGlyph) +
-                            sizeof(LLFont),
+    pFont = fn_80009B34(sizeof(LLFont) + pFile->nGlyphs * sizeof(LLGlyphRec) +
+                            pFile->nGlyphs * sizeof(LLGlyph),
                         2, 16, "LLFont.c", 630);
     pFont->pRecs = (LLGlyphRec*)(pFont + 1);
     pFont->pGlyphs = (LLGlyph*)((LLGlyphRec*)(pFont + 1) + pFile->nGlyphs);

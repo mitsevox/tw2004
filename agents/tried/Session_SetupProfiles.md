@@ -65,3 +65,4 @@ Session_SetupProfiles: per-site gSession./pSession-> sweep: no.
   lbl_80281B40 (Swing.c:403) unsized is DELIBERATE: original uses lis/@ha (fn_8005CC18 100%) -> label it fake
   match. (So symaudit's sda finding for lbl_80281B40 is a correct flag of a deliberate trick: needs a label.)
 ```
+- 2026-09-26, r6-assert: dead asserts (agents/findings/2026-09-26-dead-asserts.md): an empty `if (x) { } else { }` (the only assert form that leaves any trace on GC/2.5) after every statement of the function, quicktrial aligned: gPlayers[0].nController as the condition: 14. No source change.

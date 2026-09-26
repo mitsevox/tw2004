@@ -3,12 +3,19 @@
 Updated 2026-09-25 ~21:30 CDT. How the machines, CI, the page and PC jobs fit together:
 docs/infrastructure.md. History: docs/journal.md.
 
-**Running (round 6, launched 2026-09-26 11:40 CDT, checkpoint 14:00 CDT):** r6-uis (UISScreen's
-shared copy pattern, UIS parameter order, UIStudio/UISEvent/UISApi, uiProcessInterface, uiArc), r6-args
-(scheduling misses + the parameter-order lever: StaticCam, BreakLine, Rain, hlaudtrackstm, startUp,
-SunFlr, rcmp, CamSpline, gocamscripts, GoGreenGrid, DepthField, PictInt, MC), r6-assert (the dead-assert
-lane: Grass Static_Init, hwsBurn, Golfer, char, SkinPart, Earnings, Swing, skalib, Session, BestBall,
-GameMode22), r6-misc (Particle, LLFont, LLTex, goballfx, LLDynTex, LogoTexture). Weekly usage 19% at launch.
+**Running:** nothing. Round 7 (4 lanes, 16:25-17:30 CDT) merged: Swing linked (SW_KillVibration),
+exact also Character_SetupForShot, CameraScript_LagAimMarker; AI_ChooseTarget 98.66 -> 99.56 (last miss:
+the kept-copy class); GR_BuildGridRenderData 99.22. rasim.py now models spills / later passes. UIS
+kept-copy source form not found (3 rounds): parked until the endgame unless new evidence. Levers:
+decomp-notes "New from round 7".
+Round 6 (5 lanes, 11:40-13:25 CDT) merged: Earnings, LLDynTex, hwsBurn, GoBreakLine
+linked; exact also hlaudtrackstm fn_800AB860, UISEvent fn_80165B90 (labelled s64 fake). Dead asserts: no
+effect (findings). UIS = Tiburon's IStudio: one library flag set ties the per-file flags (not applied yet:
+owner's call); NASCAR 2005 GC DWARF fetched (docs/reference-builds/nascar2005-gc): no IStudio. r6-big broke
+/dev/null (rm, against the brief); restored by the orchestrator. Levers: decomp-notes "New from round 6".
+Follow-ups: move r6-misc's allocator replay (rasim.py, rasearch.py) into tools/match; include/engine.h
+LLFontFile uGlyphs/u18/uBitmap are now s32 (their u prefix: audit rename); Earnings' award-branch nSlot
+shadow awaits its own name (audit).
 Round 5 (5 lanes, mwcc-debugger on all 80 non-exact functions, 09:35-11:00
 CDT) merged 2026-09-26 ~11:10 CDT: uiText, GoTerrain, HLAudMaster + hlaudmovie (split) linked; exact
 Particle fn_800951A0, Grass Static_Render, LLTex fn_8000EA1C, SW_vImpact, hlaudmovie fn_800A8AD4
@@ -81,7 +88,7 @@ GoDynamicCam/GoPostFx in link order, used only by GxUtil and gomainloop: owner u
 
 | exact functions | matched code | code linked | data linked | game units linked |
 |---|---|---|---|---|
-| 7,575 / 7,647 | 95.49% | 80.42% | 80.21% | 223 / 259 |
+| 7,585 / 7,647 | 96.15% | 84.59% | 80.49% | 228 / 259 |
 
 `python tools/agents/remain.py` lists what is left by unit; rank by code-bar gain per function.
 
