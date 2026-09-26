@@ -221,6 +221,8 @@ void GR_BuildGridRenderData(int nView) {
     int i;
     // fake match: an s32 (long) copy of nView, kept in its own register, for the fn_8001707C call
     s32 nViewCopy;
+    // fake match: &gSession through a local, so its base (not &gSession.nFrameCount) is kept
+    Session* pSession = &gSession;
     nViewCopy = nView;
     lbl_802813C0->nVerts = 0;
     fPrev = 0.0f;
@@ -269,7 +271,7 @@ void GR_BuildGridRenderData(int nView) {
                 lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 3] =
                     (k == nEdge) ? 0 : (u8)lbl_802813C0->anColor[3];
                 if (k == 0 && lbl_802813C0->nVerts > 0) {
-                    fU = (u32)gSession.nFrameCount * lbl_802813C0->f100 * (fPrev - fHeight);
+                    fU = (u32)pSession->nFrameCount * lbl_802813C0->f100 * (fPrev - fHeight);
                     fU = fU - fn_80035074(fU);
                     lbl_802813C0->apUV[nView][lbl_802813C0->nVerts * 2 + 0] = fU;
                     lbl_802813C0->apUV[nView][lbl_802813C0->nVerts * 2 + 1] = 0.75f;
@@ -324,7 +326,7 @@ void GR_BuildGridRenderData(int nView) {
                 lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 3] =
                     (k == nEdge) ? 0 : (u8)lbl_802813C0->anColor[3];
                 if (k == 0 && lbl_802813C0->nVerts > 0) {
-                    fU = (u32)gSession.nFrameCount * lbl_802813C0->f100 * (fPrev - fHeight);
+                    fU = (u32)pSession->nFrameCount * lbl_802813C0->f100 * (fPrev - fHeight);
                     if ((s8)GOLFERSTATE_GetCurrentState(fn_8001707C(nViewCopy)) == GS_ZOOM) {
                         fV = 0.75f;
                         fGap = 0.0625f;

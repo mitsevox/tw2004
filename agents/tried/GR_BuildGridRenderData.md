@@ -1,6 +1,6 @@
 # GR_BuildGridRenderData (GoGreenGrid.c, 0x8009C0BC)
 
-Status: OPEN, 97.67% on 2026-09-25 (n-shaders).
+Status: OPEN, 98.27% on 2026-09-26 (r2-render).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -15,6 +15,14 @@ unless you combine it with something new. Before you stop, add every attempt und
   last 140 -> 117, declared first 131. Real 97.42 -> 97.67 (kept). fDirX..fCornerZ declared
   before fPrev/fHole: no change; decl climb: none. Left: the four dir/corner floats get
   f20-f23 (orig f28-f31), nView is kept in r29 in orig, gSession base vs gSession+0x24 hoisted.
+- 2026-09-26, r2-render: `Session* pSession = &gSession;` for both nFrameCount reads (fake
+  match): aligned 117 -> 80, real 97.67 -> 98.27 (kept; fixes the hoisted base). Without the
+  nView copy then: 140. No gain: fHole as a literal in the compares / set once (117); plain
+  s32 nFrameCount (121); fresh locals for the second loop's fX/fY/fZ (116), + fAcross/fAlong/
+  fHeight (117-120), fU/fV (122), the ints (120). Left: dir/corner floats f20-f23 vs orig
+  f28-f31 (orig gives the two hoisted constants f27/f26), and the int registers that follow.
+  TW07 (GR_BuildGridRenderData, drifted a lot: bool showDots, unsigned row/col) declares
+  playerNum, nx, ny, cx, cy first as consts.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
