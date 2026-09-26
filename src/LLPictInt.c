@@ -3,13 +3,8 @@
 
 #include "llpict.h"
 
-<<<<<<< HEAD
-void MAD_initdecode(u8* pData, int a, int n);
-void MAD_decodemacroblock(u8* pRefY, u8* pRefU, u8* pRefV, u8* pY, u8* pU, u8* pV, int nStride);
-=======
 void fn_800B8528(u8* pData, int a, int n);
-void fn_800B8618(int a, int b, int c, u8* pY, u8* pU, u8* pV);
->>>>>>> main
+void fn_800B8618(u8* pRefY, u8* pRefU, u8* pRefV, u8* pY, u8* pU, u8* pV, int nStride);
 
 void fn_80056204(void) {
 }
@@ -53,14 +48,9 @@ LLPict* PictInt_Decode(PictFile* pFile) {
     for (y = 0; y < pFile->nHeight; y += 16) {
         // a block is 16x16 Y pixels and 8x8 U and V ones
         for (x = 0, xc = 0; x < pFile->nWidth; xc += 8, x += 16) {
-<<<<<<< HEAD
-            MAD_decodemacroblock(NULL, NULL, NULL, &pY[x + y * pFile->nWidth],
+            fn_800B8618(NULL, NULL, NULL, &pY[x + y * pFile->nWidth],
                         &pU[xc + y * pFile->nWidth / 4], &pV[xc + y * pFile->nWidth / 4],
                         pFile->nWidth);
-=======
-            fn_800B8618(0, 0, 0, &pY[x + y * pFile->nWidth], &pU[xc + y * pFile->nWidth / 4],
-                        &pV[xc + y * pFile->nWidth / 4]);
->>>>>>> main
         }
     }
     __stwbrx(pFile->uC, &pFile->uC, 0);
