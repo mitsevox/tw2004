@@ -196,13 +196,8 @@ if stripped:
 # The audit baseline (tag audit-baseline-1, user's hard rule): matching never renames a function or
 # changes an audited comment; it may only ADD matching notes. Print what changed for review.
 ab = run('python tools/match/auditbaseline.py --list changed').stdout.splitlines()
-# Owner-approved (2026-09-25): renames the orchestrator applied with evidence are logged in
-# name_sources.tsv and pass. The log is read from main before this merge (HEAD), so a branch cannot
-# log its own rename; any other name change still fails.
-logged = {tuple(l.split('\t')[:2]) for l in run('git show HEAD:config/GW4E69/name_sources.tsv').stdout.splitlines()}
-renamed = [l for l in ab if 'name' in l.split('\t')[-1] and tuple(l.split('\t')[:2]) not in logged]
-if renamed:
-    print(NL.join(renamed)[:2000])
+if any('name' in l.split('\t')[-1] for l in ab):
+    print(NL.join(l for l in ab if 'name' in l.split('\t')[-1])[:2000])
     undo('a function name changed since the audit baseline (not pushed): matching never renames')
 cm = [l for l in d if l[:1] in '+-' and l[:3] not in ('+++', '---') and re.search(r'//|/\*', l)]
 print('audit baseline: %d changed rows; comment lines in this merge: %d added, %d removed' % (
