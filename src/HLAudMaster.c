@@ -2,7 +2,8 @@
 // Mas_SetSubmixAll and Mas_SetSubmixMuteAll): the sound engine's master settings, the volume of
 // each of the 32 curves (submix channels) and their mute bits. Split from hlaudmovie.c by its
 // data: its .sdata (0x80281460) and .sbss (0x80282060-0x80282065) each end in padding to the next
-// file's 8-aligned start, which one file's packed globals cannot leave, and fn_800A8754 after it is the first to use the next file's .sbss.
+// file's 8-aligned start, which one file's packed globals cannot leave, and fn_800A8754 after it
+// is the first to use the next file's .sbss.
 // fn_800A85CC and fn_800A85FC come before the Mas_ functions and have no data of their own:
 // kept here, as nothing places them elsewhere.
 
