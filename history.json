@@ -40789,5 +40789,21 @@
 "matched_functions": 7557,
 "total_functions": 7647,
 "exact": 7557
+},
+{
+"commit": "6fcd30a",
+"sha": "6fcd30a4f366938f1a43907954f11ae7811566ed",
+"time": 1790399225,
+"subject": "brief: file-wide compiler flags are EA's settings; a per-function pragma is an endgame fake match",
+"report": true,
+"matched_code": 1460468,
+"complete_code": 1165216,
+"matched_data": 703495,
+"complete_data": 847427,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7557,
+"total_functions": 7647,
+"exact": 7557
 }
 ]
