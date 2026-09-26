@@ -108,10 +108,10 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             // set, otherwise into the screen's own file.
             UISNodeInfo* pNodeInfo;
             s32 n30;
-            s32* pTime;
-            s32* pTarget;
-            s32* pU20;
-            s32* pId;
+            s32 nTime;
+            f32 fTarget;
+            s32 nU20;
+            s32 nId;
             u8* pDoneScript = NULL;
             u8* pStepScript = NULL;
 
@@ -149,19 +149,19 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                     pDoneScript = pRet;
                 }
             }
-            pTime = --pFrame->pC;
-            pTarget = --pFrame->pC;
-            pU20 = --pFrame->pC;
-            pId = --pFrame->pC;
-            fn_80165E9C(pStudio, pScreen, pNodeInfo, n30, *pId, pDoneScript, pStepScript, *pTime,
-                        *(f32*)pTarget, *pU20);
+            nTime = *--pFrame->pC;
+            fTarget = *(f32*)--pFrame->pC;
+            nU20 = *--pFrame->pC;
+            nId = *--pFrame->pC;
+            fn_80165E9C(pStudio, pScreen, pNodeInfo, n30, nId, pDoneScript, pStepScript, nTime, fTarget,
+                        nU20);
             break;
         }
         case 0x06: {  // start a stepped rate function
-            s32* pNodeInfo = --pFrame->pC;
-            s32* pU10 = --pFrame->pC;
+            UISNodeInfo* pNodeInfo = (UISNodeInfo*)*--pFrame->pC;
+            s32 nU10 = *--pFrame->pC;
             u8* pStepScript;
-            s32* pId;
+            s32 nId;
 
             u = *--pFrame->pC;
             {
@@ -175,8 +175,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 }
                 pStepScript = pRet;
             }
-            pId = --pFrame->pC;
-            fn_80165D90(pStudio, pScreen, (UISNodeInfo*)*pNodeInfo, *pId, pStepScript, *pU10);
+            nId = *--pFrame->pC;
+            fn_80165D90(pStudio, pScreen, pNodeInfo, nId, pStepScript, nU10);
             break;
         }
         case 0x07: {  // stop a rate function
