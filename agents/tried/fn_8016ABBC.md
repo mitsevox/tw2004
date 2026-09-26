@@ -41,3 +41,4 @@ base 16, 6 levers, 23 variants (6 singles) in 2 s; best 16
 - UISScreen fn_8016ABBC (orig keeps p in r7 and copies it per case: mr r29/r28,r7): pNode/pGroup at
   function top (4 orders), casts, split null tests: no.
 ```
+- 2026-09-26 round 3 (r3-uisscreen; written by the orchestrator from the lane report, the disk was full): void* copies in the case ((UISNode*)(void*)p, also via u8*/char*/const void*), with the first pInfo read through p, copies at the function top, the parameter typed UISNode* in the header plus void* copies; per-function pragmas opt_lifetimes/opt_dead_assignments/opt_loop_invariants/peephole/opt_findoptimalunrollfactor off and optimization_level 3: all 16 (base). A case-helper inline 26. Observed in standalone tests: a copy q = p keeps its own register when q is passed to a call or the copy is long/unsigned; int->int and pointer->pointer copies merge; a copy only dereferenced in a loop merges.

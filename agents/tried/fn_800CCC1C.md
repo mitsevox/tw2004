@@ -31,3 +31,4 @@ unless you combine it with something new. Before you stop, add every attempt und
 ## Collected from the notes and docs (2026-09-25)
 
 Nothing recorded.
+- 2026-09-26 round 3 (r3-charskin; written by the orchestrator from the lane report, the disk was full): same forms as fn_800CCB08: best 10; EA's addi r0,ptr,4; stwx never came out.

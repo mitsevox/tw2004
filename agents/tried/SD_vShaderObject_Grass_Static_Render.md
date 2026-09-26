@@ -40,3 +40,4 @@ base 74, 699 levers, 42608 variants (699 singles) in 360 s; best 55
 ## Collected from the notes and docs (2026-09-25)
 
 Nothing recorded.
+- 2026-09-26 round 3 (r3-render; written by the orchestrator from the lane report, the disk was full): 1500 random declaration orders + climb: no gain (41).

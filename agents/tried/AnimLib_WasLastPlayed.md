@@ -32,3 +32,4 @@ unless you combine it with something new. Before you stop, add every attempt und
 - skalib AnimLib_WasLastPlayed (nKind in r10, orig; ours r0): types, !strcmp, *ppSlot reuse, &[0], if-return.
   AnimLib_WasLastPlayed. GoDynObj fn_8004731C: decl climb and the spin-constant expression forms, no gain.
 ```
+- 2026-09-26 round 3 (r3-terrain; written by the orchestrator from the lane report, the disk was full): nKind initialised at its declaration (0 or -1), an extra slot local, u32 nKind, a (u8) cast on the return, an if-return form: all stay at 11.

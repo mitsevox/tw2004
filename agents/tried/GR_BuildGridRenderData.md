@@ -59,3 +59,4 @@ base 156, 638 levers, 30493 variants (638 singles) in 361 s; best 135
 GoGreenGrid GR_BuildGridRenderData 97.4: aligned climb 24 went 156 -> 138 with a scrambled order; stopped at
   the checkpoint, not applied (log w6_gr_climb.log).
 ```
+- 2026-09-26 round 3 (r3-render; written by the orchestrator from the lane report, the disk was full): nViewCopy in the dir/corner loads or every [nView] index, or assigned elsewhere: 43-44 (base 44; copy propagation undoes them; orig still mr r29,r3 first). Fresh second-loop locals: fZ / fX,fY,fZ / fU 44, fHeight 81, fAcross/fAlong 271. Dropping the copy + 600 random declaration orders + climb: 96 (worse).

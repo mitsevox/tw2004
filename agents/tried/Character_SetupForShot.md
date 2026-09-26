@@ -58,3 +58,4 @@ base 6, 199 levers, 31039 variants (199 singles) in 318 s; best 6
 - char Character_SetupForShot (6: nPlayer/u10 load regs swapped): gPlayers + n, (u32) index, pModel
   first, u10 through a u32 local: all 6.
 ```
+- 2026-09-26 round 3 (r3-charskin; written by the orchestrator from the lane report, the disk was full): nPlayer/u10 locals in 80 type and order combinations, inline getters, the void* copy: best 6.
