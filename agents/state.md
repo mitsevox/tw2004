@@ -3,17 +3,14 @@
 Updated 2026-09-25 ~21:30 CDT. How the machines, CI, the page and PC jobs fit together:
 docs/infrastructure.md. History: docs/journal.md.
 
-**Running (round 6, launched 2026-09-26 11:40 CDT, checkpoint 14:00 CDT):** r6-uis (UISScreen's
-shared copy pattern, UIS parameter order, UIStudio/UISEvent/UISApi, uiProcessInterface, uiArc), r6-args
-(scheduling misses + the parameter-order lever: StaticCam, BreakLine, Rain, hlaudtrackstm, startUp,
-SunFlr, rcmp, CamSpline, gocamscripts, GoGreenGrid, DepthField, PictInt, MC), r6-assert (the dead-assert
-lane: Grass Static_Init, hwsBurn, Golfer, char, SkinPart, Earnings, Swing, skalib, Session, BestBall,
-GameMode22; finished 12:04, merged: hwsBurn linked, dead asserts no effect), r6-misc (Particle, LLFont, LLTex,
-goballfx, LLDynTex, LogoTexture), r6-big (Earnings, char, Swing). Weekly usage 19% at launch.
-UIS = EA Tiburon's IStudio library (TW2005 paths: Code/Tiburon/IStudio/): r6-uis redirected to a
-library-wide flag set + macro-style temporaries; PC job libflags (tools/match/libflags.py) on the four
-UIS units, 240 min; a research agent looks for Tiburon builds with DWARF/STABS/maps. First cloud run:
-one set for all four (-O4,p -inline auto,deferred -pragma "pool_data on" -str readonly) keeps all 33 exact.
+**Running:** nothing. Round 6 (5 lanes, 11:40-13:25 CDT) merged: Earnings, LLDynTex, hwsBurn, GoBreakLine
+linked; exact also hlaudtrackstm fn_800AB860, UISEvent fn_80165B90 (labelled s64 fake). Dead asserts: no
+effect (findings). UIS = Tiburon's IStudio: one library flag set ties the per-file flags (not applied yet:
+owner's call); NASCAR 2005 GC DWARF fetched (docs/reference-builds/nascar2005-gc): no IStudio. r6-big broke
+/dev/null (rm, against the brief); restored by the orchestrator. Levers: decomp-notes "New from round 6".
+Follow-ups: move r6-misc's allocator replay (rasim.py, rasearch.py) into tools/match; include/engine.h
+LLFontFile uGlyphs/u18/uBitmap are now s32 (their u prefix: audit rename); Earnings' award-branch nSlot
+shadow awaits its own name (audit).
 Round 5 (5 lanes, mwcc-debugger on all 80 non-exact functions, 09:35-11:00
 CDT) merged 2026-09-26 ~11:10 CDT: uiText, GoTerrain, HLAudMaster + hlaudmovie (split) linked; exact
 Particle fn_800951A0, Grass Static_Render, LLTex fn_8000EA1C, SW_vImpact, hlaudmovie fn_800A8AD4
@@ -86,7 +83,7 @@ GoDynamicCam/GoPostFx in link order, used only by GxUtil and gomainloop: owner u
 
 | exact functions | matched code | code linked | data linked | game units linked |
 |---|---|---|---|---|
-| 7,575 / 7,647 | 95.49% | 80.42% | 80.21% | 223 / 259 |
+| 7,582 / 7,647 | 95.99% | 83.48% | 80.38% | 227 / 259 |
 
 `python tools/agents/remain.py` lists what is left by unit; rank by code-bar gain per function.
 

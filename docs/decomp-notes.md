@@ -476,6 +476,38 @@ They will be sorted into the sections below.
 - Other compiler versions (GC 2.0, 2.0p1, 2.6, 2.7, 1.3.2) gave output identical to 2.5 on 18 near-miss
   functions tried today: not a lever for these.
 
+### New from round 6 (2026-09-26 afternoon)
+
+- **[verified] Replay the allocator offline**: mwccdbg's `regalloc-*-pass-1-all/assigned.txt` are
+  enough to rebuild the priority list and colouring exactly (all 122 GPRs of LLDynTex fn_8010A930,
+  all 98 FPRs of Particle fn_80094534); a search over declaration orders against the replay found
+  EA's registers where objdiff-score climbs stalled (fn_8010A930 aligned 30 -> 4, then exact).
+  Scripts: r6-misc's rasim.py / rasearch.py (lane scratch; to be moved into tools/match).
+- **[verified] One `rlwinm; srawi` fold per basic block per peephole-forward pass, the last one**:
+  where EA keeps a srawi, EA's block had later signed candidates (the RGB565 decode written
+  mask-first, `(u & 0xF800) >> 8`: fn_8010A930 93.5 -> 99.05; FO_spLoadFontFromStream +1.8).
+- **[verified] The backend's second CSE turns `li rX,0` into `mr rX,<zero reg>` only for frontend
+  temps**: a function-level variable the frontend splits gets EA's `mr`, a block-level one keeps
+  `li` (Earnings fn_800D4F14, with the field store `a[nSlot] = s.aPuttGoal[i].nValue`: exact).
+- **[verified] Temp creation order**: temps of one expression are coloured in reverse creation
+  order; writing one result into an existing local first and re-reading the array reorders them
+  (BreakLine_Render's rotation: `fZ = fX*c + v[2]*s; v[0] = fX*-s + v[2]*c; v[2] = fZ;`, exact).
+- **[verified] The late `void*` parameter copy also fixes argument-setup order** (hlaudtrackstm
+  fn_800AB860 84.5 -> 100: memset's `li r4,0` ahead of its size).
+- **[verified, fake-match class] A dead value that survives to register allocation changes
+  register choice and the final schedule**: `(s64)x` leaves a dead `srawi` until the post-RA
+  peephole (UISEvent fn_80165B90 exact; swept on 10 other near-misses: nothing).
+- **[verified, negative] Dead asserts do nothing on GC/2.5 -O4,p** (agents/findings/
+  2026-09-26-dead-asserts.md): every macro form compiles away without a trace except an empty
+  two-armed `if {} else {}`, and dead buffers take no stack.
+- **[verified, negative] Parameter order does not move StaticCam_GetFlybyInformation** (all 364
+  float placements).
+- **UIS = EA Tiburon's IStudio library** (TW2005 paths `Code/Tiburon/IStudio/`): one flag set for
+  all four units (`-pragma "pool_data on" -inline auto,deferred -str reuse,readonly`) ties the
+  per-file flags exactly; no flag/pragma/compiler moves the kept-copy pattern, which is a copy
+  whose destination has a second definition in EA's source (agents/findings/
+  2026-09-26-uis-library-flags.md).
+
 ### New from round 5, the mwcc-debugger round (2026-09-26)
 
 Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "mwcc-debugger");
