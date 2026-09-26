@@ -8,15 +8,21 @@
 #include "discerror.h"
 #include "core/startup.h"
 
-volatile DispSync lbl_801A2350;       // volatile: the GX and VI callbacks change it
-GXTexRegion lbl_801A2364[16];          // the texture cache, in 32 KB regions
+// .bss and .sbss are defined in reverse address order (CodeWarrior lays them out last-defined-first).
 GXRenderModeObj lbl_801A2464;          // the video mode
-void* lbl_80281B94;                    // GX's command FIFO memory
-u32 lbl_80281B98;                      // bits per pixel of the frame: 16 or 24
-u8  lbl_80281B8C;                      // cleared when a frame ends, set when the viewport is set
-u8  lbl_80281B8D;                      // copy the frame's colour, not only its alpha
-u32 lbl_80281B90;                      // one image buffer's size in bytes
+GXTexRegion lbl_801A2364[16];          // the texture cache, in 32 KB regions
+volatile DispSync lbl_801A2350;       // volatile: the GX and VI callbacks change it
 u8  lbl_80281BAC;                      // set once fn_800072E8 has stopped the disc and the audio
+void* lbl_80281BA4[2];
+struct GXFifoObj* lbl_80281BA0;
+u32 lbl_80281B9C;
+u32 lbl_80281B98;                      // bits per pixel of the frame: 16 or 24
+void* lbl_80281B94;                    // GX's command FIFO memory
+u32 lbl_80281B90;                      // one image buffer's size in bytes
+u8  lbl_80281B8E;
+u8  lbl_80281B8D;                      // copy the frame's colour, not only its alpha
+u8  lbl_80281B8C;                      // cleared when a frame ends, set when the viewport is set
+s32 lbl_80281B88;
 
 void VIInit(void);                      // SDK
 void VIConfigure(GXRenderModeObj* pMode);
@@ -114,20 +120,21 @@ void fn_800067E4(GXRenderModeObj* pMode) {
 // pixel, rows rounded up to 16 pixels) and gives it to the disc-error screens.
 void fn_80006A98(void) {
     void* pLo;
-    void* pBuf;
     u32 uSize;
+    u32 uArg;
 
     pLo = OSGetArenaLo();
     OSGetArenaHi();
-    pBuf = (void*)(((uptr)pLo + 31) & ~31);
-    lbl_80281BA4[0] = pBuf;
+    uSize = (u16)((lbl_801A2464.fbWidth + 15) & ~15) * lbl_801A2464.xfbHeight * 2;
+    lbl_80281BA4[0] = (void*)(((uptr)pLo + 31) & ~31);
+    lbl_80281BA4[1] = lbl_80281BA4[0];
     lbl_801A2350.n11 = 0;
     lbl_801A2350.n12 = 0;
-    lbl_80281BA4[1] = pBuf;
     lbl_801A2350.nBuf = 0;
-    uSize = lbl_80281B90 = ((lbl_801A2464.fbWidth + 15) & 0xFFF0) * lbl_801A2464.xfbHeight * 2;
-    OSSetArenaLo((void*)(((uptr)pBuf + uSize + 31) & ~31));
-    fn_800B694C(lbl_801A2464.fbWidth, lbl_801A2464.xfbHeight, uSize);
+    // fake match: uArg, a copy of uSize for the call, gives EA's mr r30 after the size's store
+    uArg = lbl_80281B90 = uSize;
+    OSSetArenaLo((void*)(((uptr)lbl_80281BA4[1] + uSize + 31) & ~31));
+    fn_800B694C(lbl_801A2464.fbWidth, lbl_801A2464.xfbHeight, uArg);
     fn_800B6C0C(lbl_80281BA4[0]);
 }
 

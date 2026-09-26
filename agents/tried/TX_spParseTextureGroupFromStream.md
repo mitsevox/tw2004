@@ -8,7 +8,11 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
-(add yours here: date, lane, what, score)
+- 2026-09-25, n-ll (quicktrial aligned, base 111). Reading: the target keeps the stream cursor as a
+  moving register (`addi r25,r3,0x10; mr r28,r25` for the header; `mr r29,r25; addi r25,r25,8` for
+  each section) while ours folds every field into offsets from the parameter. `pHead = p + 0x10;
+  p += 0x18`, `p = (u8*)pHead + 8`, `&p[0x10]`, header copy through `((u32*)p)[-2]`: all 111 (CW
+  canonicalises); through `(u32)p + n` integer arithmetic: 171. No change kept.
 
 ## Collected from the notes and docs (2026-09-25)
 
