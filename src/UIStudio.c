@@ -43,7 +43,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
     s32 nGrow;
     u32 j;
     u32 k;
-    s32 bMatch;
+    u8 bMatch;
     f32 f;
     // The script's big-endian immediates are read a byte at a time into these, then combined
     // (the three four-byte reads into n go through the u8 ones: the code masks those bytes).
