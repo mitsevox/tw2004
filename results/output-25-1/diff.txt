@@ -1,0 +1,17 @@
+--- before
++++ after
+@@ -2539,9 +2539,11 @@
+ {
+   u8 *p;
+   u32 uColour;
+-  p = &pImage[(((x & 3) * 2) + ((y & 3) * 8)) + (((x / 4) + ((y / 4) * 3)) * 64)];
+-  uColour = (p[1] << 16) | (p[0x20] << 8);
+-  return uColour | p[0x21];
++  int new_var;
++  new_var = (((x & 3) * 2) + ((y & 3) * 8)) + (((x / 4) + ((y / 4) * 3)) * 64);
++  p = &pImage[new_var];
++  uColour = (p[1] << 16) | (p[(unsigned int) 0x20] << 8);
++  return uColour | (&pImage[new_var])[0x21];
+ }
+ 
+ f32 fn_8009A754(s32 nView, SunFlrView *pView);
