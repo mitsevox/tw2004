@@ -41045,5 +41045,21 @@
 "matched_functions": 7567,
 "total_functions": 7647,
 "exact": 7567
+},
+{
+"commit": "842d890",
+"sha": "842d89066e2c5d6f3b4c1be380c03fa28f510391",
+"time": 1790432421,
+"subject": "mwcc-debugger: mwccdbg.py wrapper (GC/2.6 = 2.5 on all 262 units), setup + how to read it in workflow.md",
+"report": true,
+"matched_code": 1472624,
+"complete_code": 1218288,
+"matched_data": 714119,
+"complete_data": 858875,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7567,
+"total_functions": 7647,
+"exact": 7567
 }
 ]
