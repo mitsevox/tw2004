@@ -61,10 +61,13 @@ def main():
     out.mkdir(parents=True)
     # The emulator's gdb port (9001) is fixed: one run at a time per machine, others wait here.
     import fcntl, tempfile
+    env = os.environ.copy()
+    if '/opt/homebrew/bin' not in env.get('PATH', ''):     # macOS: gdb from Homebrew (Gemini, round 4)
+        env['PATH'] = '/opt/homebrew/bin:' + env.get('PATH', '')
     with open(os.path.join(tempfile.gettempdir(), 'mwccdbg.lock'), 'w') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         r = subprocess.run([sys.executable, str(script), '-e', str(emu), '-a', shlex.join(args + ['-sym', 'on']),
-                            fn, str(out)], cwd=ROOT, capture_output=True, text=True)
+                            fn, str(out)], cwd=ROOT, capture_output=True, text=True, env=env)
     if not list(out.glob('*before-regalloc*')):
         sys.exit((r.stdout + r.stderr)[-1500:])
     # The emulated run writes no object: compile ours with the build's own command (GC/2.5, wibo).
