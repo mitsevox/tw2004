@@ -387,6 +387,9 @@ cflags_gcc = [
     "-I include",
 ]
 
+# EA Tiburon's IStudio library (the UIS units): its own library setting, see the units' comment.
+UIS_CFLAGS = ['-pragma "pool_data on"', "-inline auto,deferred", "-str reuse,readonly"]
+
 config.libs = [
     {
         "lib": "sonicheroes_sdk_0",
@@ -1058,26 +1061,23 @@ config.libs = [
             Object(Matching, "SkinBurn.c"),
             Object(Matching, "EASBStorage.c"),
             Object(Matching, "EASB.c"),
-            # Built with pool_data on: fn_80165E9C 82.1 -> 94.2%, no function worse. Deferred like
-            # UISScreen.c (source last address first): .text and data byte-identical to the old
-            # build, and fn_8016604C's callers call it (inlined) instead of a written-out copy.
-            # UISApi.c and UIStudio.c give byte-identical code under deferred too; left as they are.
-            # Read-only strings: the original's string pool is in .rodata (lbl_801860D8), apart
-            # from the switch tables in .data. The string offsets in fn_80165E9C now match.
-            Object(NonMatching, "UISEvent.c",
-                   extra_cflags=['-pragma "pool_data on"', "-inline auto,deferred", "-str reuse,readonly"]),
-            Object(NonMatching, "UIStudio.c"),
-            # Built with automatic inlining like UISScreen.c below: fn_80168DB0 88.9 -> 98.7%, no
-            # function worse.
-            Object(NonMatching, "UISApi.c", extra_cflags=["-inline auto"]),
-            # Built with automatic inlining: fn_8016A830 and fn_8016B188 have their own recursion
-            # inlined three deep (-inline smart 55.8%, -inline auto 64.7%, nothing worse). Deferred:
-            # -inline auto,deferred emits the functions in reverse order (so the source is written
-            # last address first) and would paste fn_8016C614/fn_8016C674 and the fn_8016C15C
-            # accessors into their callers, which the original calls: those six sit in
-            # `#pragma auto_inline off`. fn_8016B188 77.50 -> 93.27, nothing worse. The flag alone
-            # on UISApi/UISEvent/UIStudio changes no score (their sources are still in address order).
-            Object(NonMatching, "UISScreen.c", extra_cflags=["-inline auto,deferred"]),
+            # The UIS units are EA Tiburon's IStudio library (TW2005's paths: Code/Tiburon/IStudio/),
+            # built with one library setting (#match-help: real teams set flags per library). This
+            # one set scores exactly as the four per-file sets did (agents/findings/
+            # 2026-09-26-uis-library-flags.md):
+            # - pool_data on: fn_80165E9C 82.1 -> 94.2%.
+            # - -inline auto,deferred: fn_80168DB0 88.9 -> 98.7%; fn_8016A830 and fn_8016B188 have
+            #   their own recursion inlined three deep. Deferred emits the functions in reverse order,
+            #   so UISScreen.c is written last address first, and it would paste fn_8016C614/
+            #   fn_8016C674 and the fn_8016C15C accessors into their callers, which the original
+            #   calls: those six sit in `#pragma auto_inline off`. UISApi/UISEvent/UIStudio are in
+            #   address order and give the same code either way.
+            # - Read-only strings: the original's string pool is in .rodata (lbl_801860D8), apart
+            #   from the switch tables in .data; the string offsets in fn_80165E9C match.
+            Object(NonMatching, "UISEvent.c", extra_cflags=UIS_CFLAGS),
+            Object(NonMatching, "UIStudio.c", extra_cflags=UIS_CFLAGS),
+            Object(NonMatching, "UISApi.c", extra_cflags=UIS_CFLAGS),
+            Object(NonMatching, "UISScreen.c", extra_cflags=UIS_CFLAGS),
             Object(Matching, "GoDynObjTypes.c"),
             Object(Matching, "unsorted/sweep_800977CC.c"),
             Object(Matching, "GoDynObjBase.c"),
