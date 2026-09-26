@@ -1,0 +1,8 @@
+ready: C:/dev/actions-runner/_work/tw2004/tw2004/build/perm/madinit
+permuter stopped after the time limit (150.0 min)
+  iteration 129030, 4868 errors, score = 635
+  build\perm\madinit\output-225-1 (score 225, 0 = exact)
+  build\perm\madinit\output-225-10 (score 225, 0 = exact)
+  build\perm\madinit\output-225-11 (score 225, 0 = exact)
+  build\perm\madinit\output-225-2 (score 225, 0 = exact)
+  build\perm\madinit\output-225-3 (score 225, 0 = exact)

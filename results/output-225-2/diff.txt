@@ -1,0 +1,12 @@
+--- before
++++ after
+@@ -3895,7 +3895,8 @@
+       nIndex = nCode >> 2;
+       nBits = nLen - 6;
+       nCount = 1 << (8 - nBits);
+-      uEntry = fn_800B769C_Read(nBits | ((((u32) nValue) << 22) | ((nValue << 6) & 0x3F0000)));
++      nBits = nValue;
++      uEntry = fn_800B769C_Read(nBits | ((((u32) nBits) << 22) | ((nValue << 6) & 0x3F0000)));
+       for (j = 0; j < nCount; j++)
+       {
+         lbl_801F7258[nIndex + j] = uEntry;
