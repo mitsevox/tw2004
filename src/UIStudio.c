@@ -272,7 +272,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pTop[-1] = pTop[pTop[-1] - 1];
             break;
         case 0x1B:  // store a local
-            pTop[pTop[-1] - 1] = pTop[-2];
+            n = pTop[-1] - 1;
+            pTop[n] = pTop[-2];
             pFrame->pC -= 2;
             break;
         case 0x1C:  // bitwise and
@@ -356,9 +357,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->pC--;
             break;
         case 0x2D:  // float divide (0 by zero)
-            f = *(f32*)&pTop[-1];
-            if (f != 0.0f) {
-                *(f32*)&pTop[-2] = *(f32*)&pTop[-2] / f;
+            if (*(f32*)&pTop[-1] != 0.0f) {
+                *(f32*)&pTop[-2] = *(f32*)&pTop[-2] / *(f32*)&pTop[-1];
             } else {
                 *(f32*)&pTop[-2] = 0.0f;
             }
@@ -371,10 +371,10 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pTop[-1] = pTop[-1] - 1;
             break;
         case 0x30:  // float increment
-            *(f32*)&pTop[-1] = *(f32*)&pTop[-1] + 1.0f;
+            *(f32*)&pTop[-1] += 1.0f;
             break;
         case 0x31:  // float decrement
-            *(f32*)&pTop[-1] = *(f32*)&pTop[-1] - 1.0f;
+            *(f32*)&pTop[-1] -= 1.0f;
             break;
         case 0x32:  // int >=
             pTop[-2] = pTop[-1] <= pTop[-2];
