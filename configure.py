@@ -983,7 +983,7 @@ config.libs = [
             Object(Matching, "SitDevTrigger.c"),
             Object(Matching, "GoGolfCam.c"),
             Object(NonMatching, "CamSpline.c"),
-            Object(NonMatching, "GoBreakLine.c"),
+            Object(Matching, "GoBreakLine.c"),
             Object(Matching, "AnimStream.c"),
             Object(Matching, "TerrainGround.c"),
             Object(NonMatching, "SkinPart.c"),

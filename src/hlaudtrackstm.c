@@ -172,8 +172,12 @@ void fn_800AB818(u32 bLast) {
 // Queued by fn_800AB570 once a stream that does not loop has ended: clears the chunk and DMAs it
 // (silence) into each voice's free half, with no step (fn_800AB72C).
 void fn_800AB860(AudTrack* pTrack) {
-    fn_80005AE8(pTrack->u.stm.pBuffer, 0, sizeof(StreamChunk));
-    fn_800AB72C(pTrack, fn_800AB818, 0, 0);
+    // fake match: the parameter copied through void* (decomp-notes "EA's late parameter copy") puts
+    // the memset's 0 before its size, as in EA's schedule
+    AudTrack* pCopy = (AudTrack*)(void*)pTrack;
+
+    fn_80005AE8(pCopy->u.stm.pBuffer, 0, sizeof(StreamChunk));
+    fn_800AB72C(pCopy, fn_800AB818, 0, 0);
 }
 
 // At the stream's end: loop back, or mark it ended when it does not loop.
