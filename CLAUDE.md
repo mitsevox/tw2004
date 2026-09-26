@@ -66,3 +66,8 @@ first"), `docs/style.md` (how the C must read).
   never audited (1 in 5 code comments from that era were wrong).
 - Port-hazards doc (EA bugs sorted by effect; raw material in agents/findings/).
 - Misfiled units and `src/unsorted/` placement (agents/state.md follow-ups).
+- **Apply the EA names found after the baseline** (the audit gate blocks renames until then): the
+  MAD video decoder in rcmp_mad_codec.c (14 functions, 5 globals, TW06 PDB + NFSMW decomp agree:
+  `agents/findings/2026-09-25-mad-names.tsv`) and ska_shared's SKAUtil_EulerAnglesToQTs8 /
+  SKA_LoadFromMem (TW07 + 007 EoN: `docs/reference-builds/007eon-ps2`). Log them in
+  `config/GW4E69/name_sources.tsv` with `tools/match/rename.py`.
