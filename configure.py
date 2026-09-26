@@ -919,6 +919,7 @@ config.libs = [
             Object(Matching, "GoLighting.c"),
             Object(Matching, "Code8006F154.c"),
             Object(Matching, "Code8006F438.c"),
+            Object(Matching, "Code8006F608.c"),
             Object(Matching, "GoShaderObjectContainer_OBFData_Gc.c"),
             Object(Matching, "GoShaderObject_PrelitUVAnimation_Gc.c"),
             Object(Matching, "animblender.c"),
@@ -1102,12 +1103,10 @@ config.libs = [
             Object(Matching, "unsorted/sweep_8010FF5C.c"),
             Object(Matching, "unsorted/sweep_801654F4.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
             Object(Matching, "unsorted/sweep_80005580.c"),
-            Object(Matching, "unsorted/sweep_8006F608.c"),
 
             Object(Matching, "unsorted/sweep_800055D4.c"),
             Object(Matching, "GxUtil.c"),
             Object(Matching, "unsorted/sweep_8003944C.c"),
-            Object(Matching, "unsorted/sweep_8006F64C.c"),
             Object(Matching, "unsorted/sweep_80070168.c"),
             Object(NonMatching, "uiText.c"),
             Object(Matching, "hlaudtrack.c"),
