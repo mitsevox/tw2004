@@ -505,7 +505,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             nArgs = *pFrame->p10;
             pFrame->p10++;
             n = *--pFrame->pC;
-            u = *(u32*)((u8*)pScreen->pData + *(u32*)n);
+            u = *(u32*)(*(u32*)n + (u32)pScreen->pData);  // port: EA sums the pointer as a u32
             if (u != 0xFFFFFFFF) {
                 data.aw[0] = u;
                 data.aw[1] = u >> 16;
@@ -546,7 +546,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             s32 nEntry;
 
             nEntry = *--pFrame->pC;
-            pnList = (s32*)((u8*)pScreen->pData + *pList);
+            pnList = (s32*)(*pList + (u32)pScreen->pData);  // port: EA sums the pointer as a u32
             if (nEntry < pnList[0]) {
                 pEntry = (UISNodeInfo*)((u8*)pScreen->pData + pnList[nEntry + 2]);
                 if (pInfo != pEntry || pEntry->u4 == 0) {
