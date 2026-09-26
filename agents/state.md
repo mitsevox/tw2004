@@ -3,7 +3,14 @@
 Updated 2026-09-25 ~21:30 CDT. How the machines, CI, the page and PC jobs fit together:
 docs/infrastructure.md. History: docs/journal.md.
 
-**Running:** no cloud lanes (round 4, worktrees `r4-*`, all merged 2026-09-26 ~01:00 CDT).
+**Running (round 5, launched 2026-09-26 09:35 CDT, checkpoint 12:00 CDT):** 5 lanes on all 80
+non-exact functions, each armed with mwcc-debugger (matching.md step 3): r5-uiapi (uiProcessInterface,
+uiText, uiArc, UISEvent, UISApi), r5-uisscreen (hlaudmovie, MC, hlaudtrackstm, UIStudio, UISScreen),
+r5-game (hwsBurn, Golfer, char, SkinPart, Earnings, Swing, Code8002EE1C, GameModeBestBall, GameMode22,
+skalib), r5-world (GoStaticCam, GoBreakLine, Rain, startUp, rcmp_mad_codec, CamSpline, gocamscripts,
+GoGreenGrid, GoTerrain), r5-render (SunFlr, DepthField, Grass, Particle, LLTex, LLFont, LLDynTex,
+LLPictInt, goballfx, LogoTexture). Batch dumps: `mwccdbg.py --all` -> build/mwccdbg/<fn>/summary.txt.
+Round 4 (worktrees `r4-*`) all merged 2026-09-26 ~01:00 CDT.
 PC: `declsearch` (tools/match/declsearch.py, every declaration order / kick-and-climb over 18
 cores) on the 41 functions at 97%+, 240 min, results on a `pc-results/declsearch-*` branch: apply
 an exact order by hand. Golfer held (PC). Gemini round 4 merged (GameModeBestBall closer; its
