@@ -33,3 +33,5 @@ unless you combine it with something new. Before you stop, add every attempt und
   AnimLib_WasLastPlayed. GoDynObj fn_8004731C: decl climb and the spin-constant expression forms, no gain.
 ```
 - 2026-09-26 round 3 (r3-terrain; written by the orchestrator from the lane report, the disk was full): nKind initialised at its declaration (0 or -1), an extra slot local, u32 nKind, a (u8) cast on the return, an if-return form: all stay at 11.
+
+- 2026-09-26 r4-terrain (12 aligned): `[nClub]` spelled apart, `&..[nClub][0]`, `!strcmp`, if-return 1 / return 0, a pName copy: 12; the switch as an if / else-if chain: 18; `default: nKind = -1` then `if (nKind < 0) return 0`: 15.
