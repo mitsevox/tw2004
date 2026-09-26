@@ -8,6 +8,19 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26 r6-misc (quicktrial aligned, base 111): `#pragma opt_propagation off` around the
+  function gives EA's whole head (`addi r25,r3,0x10; mr r28,r25; ...; addi r25,r25,8`, the
+  frontend keeps every `p +=`): 109, but it breaks the texture loop (`j * 12` no longer folds to
+  0) and, file-wide, 3 other LLTex functions (fn_8000EA1C, fn_8000F0EC, fn_8001005C): not EA's
+  file setting. opt_lifetimes off 108, opt_common_subs off 135, others 111. Other pragma-free
+  forms, all still folded (111-171): void* parameter with `(u8*)p + n` / `(char*)` /
+  `(u32)`/`(int)` steps (153), `pHead = (TexBank*)(void*)p`, `p = &p[0x10]`, comma statement,
+  `p -= -0x10`, an inline step helper (116), `(u32*)` cursor (113), `register` parameter,
+  `p = p + 0x10`. Small-file probes (scratch r6-misc/m1-m6.c): the fold survives 600 extra
+  statements, 300 block locals, a later loop or conditional redefinition of p, a local whose
+  address is taken, a switch. nSize term orders under the pragma: best 107. Still open: what
+  EA wrote that stops the frontend's propagation of the first two constant steps.
+
 - 2026-09-26 r5-render (aligned, base 111): `pHead = (TexBank*)(p += 0x10); p += 8;` 111,
   with `p = (u8*)(pHead + 0) + 8` 111, `p = p + 8` 111, `p = (u8*)((u32*)pHead + 2)` 111,
   `(u32*)` steps 171: the frontend folds them all.
