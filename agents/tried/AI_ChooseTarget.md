@@ -136,3 +136,4 @@ UStream_Update exact). The other 13 "matches" (Earnings x2, Golfer AI_ChooseTarg
   comes from the spill-cost choice; first '!' from the top: `r41 -> r31 !EA r21 137 nb p`. EA's
   column puts nKind r31, @170 r30, @178 r29, nSkill r28 first and p at r21. No attempt beyond the
   dump (time went to the lane's other functions).
+- 2026-09-26, r6-assert: dead asserts (agents/findings/2026-09-26-dead-asserts.md): an empty `if (x) { } else { }` (the only assert form that leaves any trace on GC/2.5) after every statement of the function, quicktrial aligned: nPlayer as the condition: 91 (a dead assert extends no live range and adds no neighbour, measured). No source change.
