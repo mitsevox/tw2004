@@ -64,3 +64,12 @@ base 6, 199 levers, 31039 variants (199 singles) in 318 s; best 6
 - 2026-09-26 r4-charskin: pPlayer as integer address math (u32 / int / u8* spellings): 6.
 - 2026-09-26 r4-charskin: every order (5040) of bStance, bPlace, bClipTime, pModel, pBallPos, pPlayer, pSkel: 6.
 - 2026-09-26 PC declsearch (run 36221888505, iterated local search over the declaration order): best 6 (no better order than the current one), 11346 trials.
+- 2026-09-26, r5-game (mwcc-debugger): the only '!' is `r51 -> r7 !EA r6 11 nb @1457`: @1457 is
+  the frontend's CSE temp for pChar->u10 (shared by the three flag reads); nPlayer's load is the
+  backend temp r52. All small temps are added in vreg order, so r52 is assigned before r51 and
+  takes r6. EA needs the u10 load numbered above the nPlayer load: the u10 reads not
+  frontend-CSEd (a backend temp made after the nPlayer load), or the nPlayer read made a frontend
+  temp. Tried (quicktrial): `(*pChar).u10` on one read, (int)/(s32) casts on two reads,
+  parenthesised reads, `&pPlayer->ball.vPos[0]`, pPlayer after the flags: 6; `x = u10; x &= mask`
+  per flag 287; pBallPos from `gPlayers[pChar->nPlayer]` 11 (still swapped, plus pPlayer /
+  pBallPos); an `int nPlayer` local (copy-propagated away, same dump): 6. No source change.
