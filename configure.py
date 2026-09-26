@@ -1108,7 +1108,9 @@ config.libs = [
             Object(Matching, "GxUtil.c"),
             Object(Matching, "unsorted/sweep_8003944C.c"),
             Object(Matching, "unsorted/sweep_80070168.c"),
-            Object(NonMatching, "uiText.c"),
+            # Built with opt_propagation off: fn_800922A8's two flag ORs stay separate (ori 4, ori
+            # 0x400; with propagation the front end merges them into ori 0x404), no function worse.
+            Object(Matching, "uiText.c", extra_cflags=['-pragma "opt_propagation off"']),
             Object(Matching, "hlaudtrack.c"),
             Object(Matching, "hlaudtrackseq.c"),
             Object(Matching, "hlaudemitter.c"),
