@@ -41029,5 +41029,21 @@
 "matched_functions": 7567,
 "total_functions": 7647,
 "exact": 7567
+},
+{
+"commit": "f08e2a5",
+"sha": "f08e2a51a99a6e8dc6710a22e9a6bf9ea0569cdb",
+"time": 1790431355,
+"subject": "state + CLAUDE.md: #match-help advice; next: mwcc-debugger, dead-assert lane; flag audit and fake inventory after 100%",
+"report": true,
+"matched_code": 1472624,
+"complete_code": 1218288,
+"matched_data": 714119,
+"complete_data": 858875,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7567,
+"total_functions": 7647,
+"exact": 7567
 }
 ]
