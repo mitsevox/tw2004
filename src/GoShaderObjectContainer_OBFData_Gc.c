@@ -46,9 +46,6 @@ void fn_8006F650(void) {
             case 2: {
                 f32 fSum;
                 f32 fRoll;
-                f32 fMin;
-                f32 fRange;
-                s32 nMax;
                 int i;
 
                 if (lbl_802811F0->n10 >= lbl_802811F0->n0C || lbl_802811F0->b14) {
@@ -63,10 +60,9 @@ void fn_8006F650(void) {
                             break;
                         }
                     }
-                    fMin = lbl_80188900[Game_GetCourse()][i].nMin;
-                    nMax = lbl_80188900[Game_GetCourse()][i].nMax;
-                    fRange = nMax - lbl_80188900[Game_GetCourse()][i].nMin;
-                    lbl_802811F0->n0C = Misc_RandFuncf(1) * fRange + fMin;
+                    lbl_802811F0->n0C = Misc_RandFuncf(1) * (f32)(lbl_80188900[Game_GetCourse()][i].nMax -
+                                                                  lbl_80188900[Game_GetCourse()][i].nMin) +
+                                        (f32)lbl_80188900[Game_GetCourse()][i].nMin;
                     lbl_802811F0->b14 = 0;
                     lbl_802811F0->n10 = 1;
                     lbl_802811F0->f18 = 0.3f;
