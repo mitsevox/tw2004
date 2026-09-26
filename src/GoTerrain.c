@@ -447,33 +447,33 @@ void fn_8003185C(void) {
 // (word 1 bits 0x1, 0x2, 0x4: tee sets 0-2) not of the player's tee set, and all of them once the
 // ball is off the tee (Ball.nLie).
 void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
-    s32 iObject;
     f32 v48[4];
+    s32 iObject;
+    UObjMesh* pLOD1;
+    s32 uFlags2;
+    f32 fHeight;
     f32 v38[4];
     f32 v28[4];
-    f32 v18[4];
-    f32 v8[4];
-    s32 nObjects;
-    s32 nLists;
-    s32 i;
-    int nLast;
-    UObjMesh* pLOD0;
-    UObjMesh* pLOD1;
-    UObjMesh* pLOD2;
-    s32 uFlags2;
-    f32* pBounds;
-    f32* pBall;
-    f32* pPin;
-    f32 fHeight;
-    f32 fXZ;
     f32 fDistanceSquared;
+    f32 v18[4];
     f32 fBallToObject;
+    int nLast;
+    f32* pBall;
     f32 fPinToBall;
-    f32 fObjectToPin;
-    s32 eClipMethod;
     View* pView;
+    f32 v8[4];
+    f32 fXZ;
+    UObjMesh* pLOD2;
+    f32* pBounds;
+    s32 eClipMethod;
+    UObjMesh* pLOD0;
+    f32 fObjectToPin;
+    f32* pPin;
     Ter_ObjectReference* pRef;
+    s32 i;
+    s32 nLists;
     u8 bHide;
+    s32 nObjects;
 
     nObjects = fn_800354F4(fn_800354E4(pPatch->pObjects, 0));
     if (nObjects == 0) {
