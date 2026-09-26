@@ -1,6 +1,6 @@
 # Physics_HandleCollision (Ball.c, 0x80052598)
 
-Status: OPEN, 98.74% on 2026-09-25.
+Status: OPEN, 99.28% on 2026-09-26 (r2-modes, commit "Ball.c: Physics_HandleCollision 98.74 -> 99.28").
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -9,6 +9,28 @@ unless you combine it with something new. Before you stop, add every attempt und
 ## Attempts
 
 (add yours here: date, lane, what, score)
+
+- 2026-09-26 r2-modes (quicktrial aligned, base 92): greedy "reuse an existing local that is dead over
+  this live range" search (scratch hc4.py: every web x every other float local, only non-overlapping
+  ranges): 92 -> 39, kept 9 renames (spin clamp fT -> fD; vDir[2] fRest -> fS; second turn's sin fCo
+  -> fRest; third turn's sin/cos fSi/fCo -> fBounce/fGrip; rough scale fSi -> fBite; random pass fD ->
+  fBounce; soil fLen -> fRest; end fC -> fRest), then declaration moves: fSpeed after fImpact 39 -> 31.
+  Objdiff 98.74 -> 99.28 (committed, labelled fake match). Adding 4 fresh locals to the same greedy: 31.
+  Identity inline wrappers on each sin/cos/atan2 call (15 sites, greedy): none better. GC/2.0 92,
+  2.0p1 94, 2.6/2.7 92.
+- 2026-09-26 r2-modes, finding: EA's float registers are ONE register per ORIGINAL variable: fA f31 (soil
+  factor and bank angle), fSpeed f30, fImpact f29, fRest f28 (vDir[2] and the restitution), fB f27,
+  fC f26 (all three webs), fD f25, fCo f24 (first cos, second sin, third cos), fSi f23 (spin clamp,
+  second cos, third sin). That is what `#pragma opt_lifetimes off` produces (no live-range splitting):
+  on the original C (before the renames) it gives 171; with declarations fA, fSpeed, fImpact, fRest, fB,
+  fC, fD, fCo, fSi: 78; plus spin-clamp fSi -> fScale, second turn's fT -> fS, spin-clamp fS -> fresh
+  local: 22 aligned, every register right. What is left under the pragma: EA moves the call results of
+  fC/fD/fT (both turns' fn_80055E1C/E10, the atan2 of the heading, the three end-of-function sin/cos)
+  straight into their register, ours goes through f0 (`fmr f0,f1 ... fmr f26,f0`); sin/cos into
+  fB/fCo/fSi go through f0 in both. `register` on any subset: no change. Objdiff of the 25 version
+  98.60 (worse than 99.28 because of the f0 copies), not kept. Without the pragma the end block's
+  direct moves match, so EA is probably not simply "lifetimes off"; but whatever EA wrote colours
+  every variable into one register.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 

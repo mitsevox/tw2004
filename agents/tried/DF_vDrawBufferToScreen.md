@@ -10,6 +10,12 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 (add yours here: date, lane, what, score)
 
+- 2026-09-26 r2-modes (quicktrial aligned, base 79): fZ's 1.0 as `1`, `(f32)1.0`, `-(...) + 1.0f` x
+  first clamp's bounds as `1`, `1.0`, `(f32)1.0`, `0`, `0.0`: all 79. Optimizer pragmas on the function
+  (opt_lifetimes, propagation, dead_assignments, strength_reduction, unroll_loops off: 79; common_subs
+  off 87; loop_invariants off 143). Observation: f30 (1.0) and f31 (0.0) are hoisted from fZ's `1.0f -`
+  and the clamps' low bound, not from fn_800141F8's arguments (those are reloaded each pass).
+
 - 2026-09-25 n-modes (quicktrial aligned, base 79): observation: only the FIRST clamp differs; ours
   compares with f30 (the loop's hoisted 1.0 of `1.0f - ...`, same basic block, so CSE'd), EA loads
   1.0 again into the result register and compares with it (as ours already does in the second clamp,
