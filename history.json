@@ -40549,5 +40549,21 @@
 "matched_functions": 7555,
 "total_functions": 7647,
 "exact": 7555
+},
+{
+"commit": "e3eaf2b",
+"sha": "e3eaf2b49d924799620eae53145865648a1a4765",
+"time": 1790392317,
+"subject": "CLAUDE.md: after 100%, apply the EA names found after the baseline (MAD decoder, SKA)",
+"report": true,
+"matched_code": 1459892,
+"complete_code": 1165216,
+"matched_data": 702231,
+"complete_data": 846163,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7555,
+"total_functions": 7647,
+"exact": 7555
 }
 ]
