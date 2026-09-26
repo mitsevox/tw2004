@@ -41605,5 +41605,21 @@
 "matched_functions": 7585,
 "total_functions": 7647,
 "exact": 7585
+},
+{
+"commit": "849bbd6",
+"sha": "849bbd6802670f73b5852bba67cb97818abc04e9",
+"time": 1790466938,
+"subject": "assign: Codex continues AI_ChooseTarget (debugger reading of the last four registers)",
+"report": true,
+"matched_code": 1491024,
+"complete_code": 1311696,
+"matched_data": 723063,
+"complete_data": 868387,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7585,
+"total_functions": 7647,
+"exact": 7585
 }
 ]
