@@ -57,29 +57,30 @@ f32 fn_80021A98(Clip* pClip, f32 fTime);
 // buffers (kept while they still hold them) and blended by where fTime falls between them. A time
 // at or past the pending event n5CC is held there once.
 void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32 fTime) {
+    // fake match: the declaration order (found by tools/match/declsearch.py) sets the registers
     u8* pKeys;
     f32* pRot;
     ClipTrack* pTrack;
+    int* pFree;
     f32* pA10;
+    int nNext;
     f32* pA14;
     f32* pB10;
-    f32* pB14;
-    BonePose* pBone;
-    int j;
-    u32 uFlags;
-    f32 fPos;
-    f32 fFrac;
-    u8* pRange;
-    int nNext;
-    int nKey;
-    int i;
-    u32 aTmp[8];               // fake match: size unknown; EA's frame has room for 8 (0x80 bits are used)
-    f32 aA[4];
-    f32 aB[4];
     int aSlot[2];
+    f32* pB14;
+    int j;
+    int i;
     int aFree[2];
+    f32 aA[4];
+    u8* pRange;
+    int nKey;
+    f32 fPos;
+    BonePose* pBone;
+    f32 aB[4];
+    u32 aTmp[8];               // fake match: size unknown; EA's frame has room for 8 (0x80 bits are used)
+    u32 uFlags;
+    f32 fFrac;
     int aFrame[2];
-    int* pFree;
 
     if (pChar != NULL && pClip->pEvents != NULL && pChar->n5CC >= 0) {
         if (fTime >= pClip->pEvents[pChar->n5CC].fTime) {
