@@ -476,6 +476,30 @@ They will be sorted into the sections below.
 - Other compiler versions (GC 2.0, 2.0p1, 2.6, 2.7, 1.3.2) gave output identical to 2.5 on 18 near-miss
   functions tried today: not a lever for these.
 
+### New from round 7 (2026-09-26 evening)
+
+- **[verified] A spilling function's final registers come from the LAST regalloc pass**: pass 1
+  spills, pass 2 recolours. Read the last pass (mwccdbg's summary now marks superseded passes);
+  `rasim.py --pass` replays it, including the spill-cost choice (lowest cost / remaining
+  neighbours, ties to the last in vreg order) and coalesced (phantom) neighbours.
+- **[verified] After a spill, a copy blocked from coalescing in pass 1 can coalesce in pass 2 and
+  become a permanent extra neighbour**: Golfer AI_ChooseTarget, a separate local for the governing
+  attribute (`nA = Shot_GoverningAttribute(..); nSkill = Golfer_GetAttribute(p, nA, ..)`), 18 wrong
+  registers -> 9, 98.66 -> 99.56.
+- **[verified] Locals declared after a crowded variable leave the graph first and lower its
+  remaining-neighbour count**: CameraScript_LagAimMarker's fMin had 33 (limit 31 for FPRs); the
+  reciprocal and a length pulled into locals declared after it: exact.
+- **[verified] An empty `if (field) {} else {}` whose condition reads a struct field makes the
+  frontend share that field's address** (EA's kept `mr`+`addi` address copies): Swing
+  SW_KillVibration exact (labelled fake; possibly a compiled-away assert).
+- **[verified] An inline getter's parameter is a frontend variable numbered below the frontend's
+  shared temps**: Character_SetupForShot exact (labelled).
+- **UIS kept copies (mechanism, agents/findings/2026-09-26-r7-uis-copy-chains.md)**: each copy-
+  propagation pass removes only the last link of a copy chain; a surviving copy is still coalesced
+  unless both sides interfere; `void** q = &p;` gives EA's copy but adds a store. EA's source form
+  is not found; AI_ChooseTarget's last miss (an extsb writing the frontend temp directly) is the
+  same class.
+
 ### New from round 6 (2026-09-26 afternoon)
 
 - **[verified] Replay the allocator offline**: mwccdbg's `regalloc-*-pass-1-all/assigned.txt` are

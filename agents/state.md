@@ -3,10 +3,11 @@
 Updated 2026-09-25 ~21:30 CDT. How the machines, CI, the page and PC jobs fit together:
 docs/infrastructure.md. History: docs/journal.md.
 
-**Running (round 7, launched 2026-09-26 16:25 CDT, checkpoint 18:30 CDT, weekly usage 23%):** r7-golfer
-(AI_ChooseTarget, extend rasim.py to spill-cost ordering), r7-charswing (char x4, Swing KillVibration, SkinPart),
-r7-cam (gocamscripts x2, startUp, StaticCam, Rain, GoGreenGrid, CamSpline, Stm_Tick), r7-uis (the kept-copy
-source form, UISApi/UIStudio near-misses). UIS units now share UIS_CFLAGS (owner OK). rasim.py in tools/match.
+**Running:** nothing. Round 7 (4 lanes, 16:25-17:30 CDT) merged: Swing linked (SW_KillVibration),
+exact also Character_SetupForShot, CameraScript_LagAimMarker; AI_ChooseTarget 98.66 -> 99.56 (last miss:
+the kept-copy class); GR_BuildGridRenderData 99.22. rasim.py now models spills / later passes. UIS
+kept-copy source form not found (3 rounds): parked until the endgame unless new evidence. Levers:
+decomp-notes "New from round 7".
 Round 6 (5 lanes, 11:40-13:25 CDT) merged: Earnings, LLDynTex, hwsBurn, GoBreakLine
 linked; exact also hlaudtrackstm fn_800AB860, UISEvent fn_80165B90 (labelled s64 fake). Dead asserts: no
 effect (findings). UIS = Tiburon's IStudio: one library flag set ties the per-file flags (not applied yet:
@@ -87,7 +88,7 @@ GoDynamicCam/GoPostFx in link order, used only by GxUtil and gomainloop: owner u
 
 | exact functions | matched code | code linked | data linked | game units linked |
 |---|---|---|---|---|
-| 7,582 / 7,647 | 95.99% | 83.48% | 80.38% | 227 / 259 |
+| 7,585 / 7,647 | 96.15% | 84.59% | 80.49% | 228 / 259 |
 
 `python tools/agents/remain.py` lists what is left by unit; rank by code-bar gain per function.
 
