@@ -75,4 +75,5 @@ base 6, 199 levers, 31039 variants (199 singles) in 318 s; best 6
   pBallPos); an `int nPlayer` local (copy-propagated away, same dump): 6. pBallPos from
   `gPlayers[pChar->nPlayer]` with both gPlayers statements after the flag reads, in 4 orders: 11
   (the dump: the frontend now CSEs the whole &gPlayers[n] into @1458, but the nPlayer load itself
-  stays a backend temp above @1457). No source change.
+  stays a backend temp above @1457). Permuter 15 min -j2 (base 30, 5514 iterations): no
+  improvement. No source change.
