@@ -10,6 +10,13 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 (add yours here: date, lane, what, score)
 
+- 2026-09-26 r2-terrain (41; EA holds the first cell x in r14 and stores it to nX's slot 0x90 only
+  at the loop, after fWide): a separate start variable (int nMinX, or reusing i/j/k/n/nCorner/nZ)
+  copied in the for-init or before/after fWide: 100-136 (CodeWarrior sinks the (int) conversion to
+  the copy, keeping the floor result in an extra float register); `nX = nMinX = ..`: 41; u32/s32
+  start: 136; the floor kept as f32 and cast at the loop: 41-136; Ter_GridCell for any of the four
+  cells (16 combos): 41-66; nMinX through Ter_GridCell: 134-136; parameter copies (pcopy): 63+.
+
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
 ```
