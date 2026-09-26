@@ -292,6 +292,9 @@ s32* fn_80165670(UIStudio* pStudio, s32* pTop, s32** ppKeep) {
 // Runs the event stack from the bottom up. With bScreenOnly only the type 5 and 6 events run
 // (each once), and they stay queued; otherwise every event runs and those that must wait are
 // queued again, in order, from the bottom.
+// fake match: dead-assignment removal off for this function only: with it on, nType and the
+// argument count read below trade r0 and r3 (no source spelling found that does the same)
+#pragma opt_dead_assignments off
 void fn_80165528(UIStudio* pStudio, u8 bScreenOnly) {
     s32* p;
     s32* pKeep;
@@ -337,3 +340,4 @@ void fn_80165528(UIStudio* pStudio, u8 bScreenOnly) {
     }
     pStudio->uFlags &= ~1;
 }
+#pragma opt_dead_assignments reset

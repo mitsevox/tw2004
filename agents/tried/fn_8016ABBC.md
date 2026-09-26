@@ -32,6 +32,9 @@ base 16, 6 levers, 23 variants (6 singles) in 2 s; best 16
 16 [safe]
   - type of i: u32 -> unsigned int
 ```
+- 2026-09-26 r4-uisscreen: the round 3 copy rules tested on fn_8016AD54 (same shape, see there):
+  integer-typed copies of p, every p type x cast chain, p reassigned as the call argument, all
+  merge; not repeated here.
 
 ## Collected from the notes and docs (2026-09-25)
 
