@@ -82,7 +82,12 @@ if things are going well.
   own form can't be found, labelled `// fake match: <why>`, logic exactly unchanged (same behaviour
   for every input), no reliance on registers or stack layout, no asm. An unused local, a copy
   through a temp, a declaration order, an identity inline, a cast that changes nothing: fine.
-  Portability is NOT a reason to reject an EA-style form (see the goal above). A 100% decomp can be cleaned up later; an unlinked unit cannot be ported at all.
+  Portability is NOT a reason to reject an EA-style form (see the goal above).
+- **Compiler settings (owner, 2026-09-26):** a flag that makes a WHOLE file match (configure.py
+  `extra_cflags`) is EA's build setting: use it. A `#pragma` wrapped around ONE function (e.g.
+  `opt_dead_assignments off` ... `reset`) is a fake match: endgame only, labelled `// fake match:`,
+  and it may stand in for a truer EA form. If one pragma fixes several functions of a file, try it
+  file-wide. A 100% decomp can be cleaned up later; an unlinked unit cannot be ported at all.
   Permuter results rejected earlier as "fake" qualify under this rule if they keep the logic.
 - If a function will not match after a real effort (~20 minutes: the decomp-notes "Try these first"
   list, `trial.py`, TW07's locals), leave it at its best score, clean and readable, note what you
