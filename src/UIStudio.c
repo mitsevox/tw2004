@@ -863,7 +863,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             }
             nDims = pArr[0];
             for (i = 1; i <= nDims; i++) {
-                n = pTop[-(i + bOnStack + 1)];
+                n = pTop[-(i + bOnStack) - 1];
                 if (n >= pArr[i] || n < 0) {
                     n = pArr[i] - 1;
                 }
