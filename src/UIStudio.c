@@ -18,7 +18,6 @@ void fn_80168644(UIStudio* pStudio, UISScreen* pScreen, s32 nKind, void* p, s32 
 s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, UISNodeInfo* pInfo) {
     UISEventData data;
     UISWord word;
-    s32 nArg;
     u16 uGroup;
     u16 uScreen;
     s32* pTop;
@@ -579,11 +578,14 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->pC[-1] = uCurGroup | (uCurScreen << 16);
             break;
         }
-        case 0x4D:  // send event 2 with a word
+        case 0x4D: {  // send event 2 with a word
+            s32 nArg;
+
             nArg = *--pFrame->pC;
             data.au[0] = *--pFrame->pC;
             fn_80165B90(pScreen->uGroup, pScreen->uScreen, pStudio, 2, &data, 1, &nArg);
             break;
+        }
         case 0x4E:  // skip a word
             pFrame->p10 += 4;
             break;
