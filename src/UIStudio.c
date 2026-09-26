@@ -954,7 +954,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 nMul *= pArr[i2];
             }
             for (i2 = 0; i2 < nMul; i2++) {
-                pArr[nDims + i2 + 1] = pTop[-1 - bOnStack];
+                pArr[nDims + 1 + i2] = pTop[-1 - bOnStack];
             }
             pFrame->pC -= bOnStack + 1;
             break;
