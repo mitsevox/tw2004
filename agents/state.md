@@ -13,7 +13,7 @@ that say "argument order"); UISScreen's copy-propagation pattern (unsolved); src
 comment still says uistudio.h has `const s32*` (now non-const): audit fix.
 Rule change (owner, 2026-09-26): EA's code exactly as EA wrote it; portability is not a constraint
 (CLAUDE.md, agents/brief.md). Leads to revisit with it: file-loading / fixup / address-math code.
-Unit count: the weather split (Code8006F608.c) replaced two unsorted sweep units (259 -> 258).
+Unit count: 259 (the weather split replaced two sweep units: 258; the HLAudMaster split added one).
 
 **Next (owner-approved 2026-09-26, after a context compaction):**
 1. **mwcc-debugger** (recommended by #match-help's Mrkol: "regswaps are solvable, use
