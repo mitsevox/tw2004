@@ -75,24 +75,24 @@ f32 powf(f32 x, f32 y) {
 // Pick where the CPU aims: the most demanding authored aim point it qualifies for. A human
 // only ever gets a priority point from here (the default aim on walking up to the ball).
 void AI_ChooseTarget(int nPlayer) {
-    Player*     p;
     AITarget*   t;
+    int         nClub;
+    f32         fDumb;         // (100 - IQ): the overconfidence term
     int         nKind;
-    int         nPower;
-    int         nAggr;
-    int         nPinSet;
-    s8          nCand;
+    int         nIQ;
+    f32         fDist2;
+    int         nSkill;
+    f32         fDist;
+    f32         fBestDist2;
+    Player*     p;
+    CourseInfo* pCourse;
     s8          k;
     s8          nBest;
-    int         nSkill;
-    int         nIQ;
-    f32         fDumb;         // (100 - IQ): the overconfidence term
-    f32         fDist2;
-    f32         fBestDist2;
-    f32         fDist;
-    CourseInfo* pCourse;
     s8          nZone;
-    int         nClub;
+    s8          nCand;
+    int         nPower;
+    int         nPinSet;
+    int         nAggr;
     f32         fDX, fDZ;
 
     nPinSet = Game_CurrentPinSet();

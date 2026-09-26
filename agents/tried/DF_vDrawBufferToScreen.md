@@ -90,3 +90,4 @@ base 79, 151 levers, 19655 variants (151 singles) in 176 s; best 79
   body forms x f32/f64 on every parameter, int/s32/u8/s16 fHi, nested Min(Max()) (143): none < 27.
 ```
 - 2026-09-26 PC declsearch (run 36221888505, iterated local search over the declaration order): queued but given no time (a scheduling bug, fixed); not searched.
+- 2026-09-26 PC declsearch run 2 (36235241920, fair time slices): best 79 aligned (base), 7198 trials.

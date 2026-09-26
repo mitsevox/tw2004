@@ -1219,20 +1219,20 @@ void fn_801686F8(UIStudio* pStudio, u8 bOn, u16 uGroup, u16 uScreen) {
 // switches off the one fn_8016B6BC finds set. The scripts get nId and pInfo's place in the
 // list p (a count, a word, then file offsets; -1 when not there).
 void fn_80168918(UIStudio* pStudio, u8 bOn, s32 nId, UISNodeInfo* pInfo, s32* p, u16 uScreen, u16 uGroup) {
-    s32 aArgs[2];
-    UISScreenFile* pFile;
-    UISNode* pNode;
+    UISScreen* pScreen;
     UISNode* pLinkNode;
-    UISNode* pCheck;
-    UISNodeInfo* pOther;
-    u8* pScript;
+    s32 nEvent;
+    UISScreenFile* pFile;
     u16 nIndex;
+    UISNodeInfo* pOther;
+    UISNode* pCheck;
+    UISNode* pNode;
+    s32 i;
+    u8* pScript;
+    s32 nSlot;
     u32 nNode;
     u32 n;
-    s32 i;
-    s32 nSlot;
-    UISScreen* pScreen;
-    s32 nEvent;
+    s32 aArgs[2];
 
     nSlot = -1;
     nIndex = fn_8016C6C4(pStudio, uGroup, uScreen);
