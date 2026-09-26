@@ -13,6 +13,10 @@ unless you combine it with something new. Before you stop, add every attempt und
 - 2026-09-25 n-uisscreen: (scores are aligned diff counts from the WHOLE unit compiled: base.c from perm_setup drops the auto-inlined callees, e.g. fn_8016C6C4 inside fn_8016B4D4). EA keeps p in r7 and copies it per case (not coalesced, same as fn_8016AD54, fn_8016AEEC's bLast, fn_8016B4D4's nScreens, fn_8016A2D4's uEvent: one cause suspected). Tried: explicit casts, `void* const p`, split declaration/assignment, case 8 body as a static inline helper (118: the recursion inlines), if/else chain (22), nKind int: all 16 or worse. GC 1.3.2-2.7: identical; 1.2.5n/3.0: worse; -O4/-O3/-O2/-O4,s: worse; -opt nocse/nopeephole/nopropagation: worse.
 - 2026-09-25 n-uisscreen, more: p typed u32/s32/int/unsigned int/char*/u8*/UISNode* (header, casts at the calls and in the cases): all 16.
 - 2026-09-26 r2-uisscreen (whole-unit aligned, base 16): identity inline on the p copies (node, group, both) 16; the first pInfo read through p (EA's `lwz r3,0(r7)` after `mr r29,r7`), once or in both reads, 16; function-level pNode/pGroup assigned in both cases (pGroup = ppGroups[i] in case 8, pNode = &pNodes[..] in case 7), all 6 declaration orders, 16; `register` / `const` pNode and pGroup, `register void* p` 16; each kind as a static inline helper with fn_8016ABBC under `#pragma auto_inline off` 31 (135 without the pragma). See fn_8016AD54 for the shared copy problem.
+- 2026-09-26 r5-uisscreen, mwcc-debugger: `r35 -> r28 !EA r7 41 nb p`: EA never moves p out of r7 (its
+  NULL test reads r7) and copies it per case (`mr r29,r7` / `mr r28,r7`) with the case's first load on
+  r7; ours keeps p in r28 from the entry and folds the case copies. Same kept-copy shape as
+  fn_8016AD54 (see there); no new C tried.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
