@@ -169,6 +169,14 @@ In a cloud container without IPv6, change `target remote localhost:9001` to `127
 `mwcc_debugger.py` (gdb otherwise times out). The debugger supports GC/2.6, not our GC/2.5;
 `mwccdbg.py` swaps in 2.6, which compiles every unit of ours byte-identically (all 262 checked).
 
+**Replay the allocator offline** (`tools/match/rasim.py`, from lane r6-misc): with a mwccdbg dump,
+`rasim.py build/mwccdbg/<fn> replay [--fpr]` rebuilds the compiler's priority list and colouring
+(checked against the dump: 0 differences on every function tried), and
+`rasim.py build/mwccdbg/<fn> search <lo> <hi> --summary` (or `name=r29 ...` targets) searches the
+order of the locals' vregs lo..hi (their declaration order) for EA's registers, thousands of orders
+a second without compiling. Write the winning order and confirm with a build (LLDynTex fn_8010A930:
+30 -> 4 aligned where climbs stalled, then exact).
+
 **The permuter** searches random rewrites for you. It is slow (minutes to hours) but has solved
 functions nothing else did (`fn_800F6ED4`: the loop counter had to be `long`).
 
