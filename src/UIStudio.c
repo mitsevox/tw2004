@@ -584,11 +584,11 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             break;
         }
         case 0x4B:  // set a text's character n
-            pArgs = --pFrame->pC;
+            n = *--pFrame->pC;
             u = *--pFrame->pC;
             pText = (UISText*)*--pFrame->pC;
             if (pText != NULL && u < pText->nSize) {
-                pText->szText[u] = *pArgs;
+                pText->szText[u] = n;
             }
             break;
         case 0x4C:  // format a text (at most 20 arguments)
@@ -601,8 +601,9 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                     pFrame->pC--;
                 }
             }
-            pArgs = --pFrame->pC;
-            fn_8016B808((u32)pScreen->pData, (UISText*)*--pFrame->pC, (UISText*)*pArgs, n, lbl_802805D8);
+            pFind = (UISText*)*--pFrame->pC;
+            pText = (UISText*)*--pFrame->pC;
+            fn_8016B808((u32)pScreen->pData, pText, pFind, n, lbl_802805D8);
             break;
         case 0x77:  // whether a group is this screen's
             u = *--pFrame->pC;
