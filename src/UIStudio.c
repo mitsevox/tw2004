@@ -122,17 +122,31 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             if (nArgs >= 5) {
                 if (nArgs >= 6) {
                     u = *--pFrame->pC;
-                    if ((u & 0x80000000) == 0x80000000) {
-                        pStepScript = (u8*)pStudio->pCurrent->p10 + (u & 0x7FFFFFFF);
-                    } else {
-                        pStepScript = (u8*)pScreen->pData + u;
+                    // fake match: each script address is resolved through these temporaries, the
+                    // file base read first and the result copied, as from an inline helper.
+                    {
+                        u8* pBase = (u8*)pScreen->pData;
+                        u8* pRet;
+
+                        if ((u & 0x80000000) == 0x80000000) {
+                            pRet = (u8*)pStudio->pCurrent->p10 + (u & 0x7FFFFFFF);
+                        } else {
+                            pRet = pBase + u;
+                        }
+                        pStepScript = pRet;
                     }
                 }
                 u = *--pFrame->pC;
-                if ((u & 0x80000000) == 0x80000000) {
-                    pDoneScript = (u8*)pStudio->pCurrent->p10 + (u & 0x7FFFFFFF);
-                } else {
-                    pDoneScript = (u8*)pScreen->pData + u;
+                {
+                    u8* pBase = (u8*)pScreen->pData;
+                    u8* pRet;
+
+                    if ((u & 0x80000000) == 0x80000000) {
+                        pRet = (u8*)pStudio->pCurrent->p10 + (u & 0x7FFFFFFF);
+                    } else {
+                        pRet = pBase + u;
+                    }
+                    pDoneScript = pRet;
                 }
             }
             pTime = --pFrame->pC;
@@ -150,10 +164,16 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             s32* pId;
 
             u = *--pFrame->pC;
-            if ((u & 0x80000000) == 0x80000000) {
-                pStepScript = (u8*)pStudio->pCurrent->p10 + (u & 0x7FFFFFFF);
-            } else {
-                pStepScript = (u8*)pScreen->pData + u;
+            {
+                u8* pBase = (u8*)pScreen->pData;
+                u8* pRet;
+
+                if ((u & 0x80000000) == 0x80000000) {
+                    pRet = (u8*)pStudio->pCurrent->p10 + (u & 0x7FFFFFFF);
+                } else {
+                    pRet = pBase + u;
+                }
+                pStepScript = pRet;
             }
             pId = --pFrame->pC;
             fn_80165D90(pStudio, pScreen, (UISNodeInfo*)*pNodeInfo, *pId, pStepScript, *pU10);
@@ -463,10 +483,16 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             u = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
             *pFrame->pC = (s32)pFrame->p10;
             pFrame->pC++;
-            if ((u & 0x80000000) == 0x80000000) {
-                pFrame->p10 = (u8*)pStudio->pCurrent->p10 + (u & 0x7FFFFFFF);
-            } else {
-                pFrame->p10 = (u8*)pScreen->pData + u;
+            {
+                u8* pBase = (u8*)pScreen->pData;
+                u8* pRet;
+
+                if ((u & 0x80000000) == 0x80000000) {
+                    pRet = (u8*)pStudio->pCurrent->p10 + (u & 0x7FFFFFFF);
+                } else {
+                    pRet = pBase + u;
+                }
+                pFrame->p10 = pRet;
             }
             break;
         case 0x44:  // return to the popped address
