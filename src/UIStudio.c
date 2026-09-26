@@ -703,7 +703,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             uByte1 = *pFrame->p10;
             pFrame->p10++;
             n = (uByte0 << 8) | uByte1;
-            pArgs = (s32*)(uOffset + pFrame->pC[(s16)n]);
+            uOffset += pFrame->pC[(s16)n];
+            pArgs = (s32*)uOffset;
             if (uOp == 0x6B) {
                 *pFrame->pC = (s32)pArgs;  // port: a stack word holds the pointer
                 pFrame->pC++;
@@ -730,7 +731,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             uByte1 = *pFrame->p10;
             pFrame->p10++;
             n = (uByte0 << 8) | uByte1;
-            *(s32*)(uOffset + pFrame->pC[(s16)n]) = pTop[-1];
+            uOffset += pFrame->pC[(s16)n];
+            *(s32*)uOffset = pTop[-1];
             pFrame->pC--;
             break;
         }
@@ -752,7 +754,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->p10++;
             n = (uByte0 << 8) | uByte1;
             pTop = pFrame->pC;
-            *pTop = uOffset + pTop[(s16)n];
+            uOffset += pTop[(s16)n];
+            *pTop = uOffset;
             pFrame->pC++;
             break;
         }
