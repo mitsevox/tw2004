@@ -17,9 +17,9 @@ on:
   workflow_dispatch:
     inputs:
       tool:
-        description: permute, leversweep, declsearch (declaration-order search, many functions) or libflags (one flag set for a group of units)
+        description: permute, leversweep, declsearch (declaration-order search, many functions) libflags (one flag set for a group of units) or refdwarf (fetch an allowlisted reference build's debug archive to C:/dev/refs, commit only derived evidence)
         type: choice
-        options: [permute, leversweep, declsearch, libflags]
+        options: [permute, leversweep, declsearch, libflags, refdwarf]
         default: permute
       unit:
         description: unit (e.g. hwsBurn); blank with leversweep and fn blank = --from-report
@@ -30,7 +30,7 @@ on:
         type: string
         default: ''
       targets:
-        description: declsearch, Unit:fn pairs, comma-separated (GoTerrain:fn_80032B7C,UISApi:fn_80169308); libflags, units (UISEvent,UIStudio,UISApi,UISScreen)
+        description: declsearch, Unit:fn pairs, comma-separated (GoTerrain:fn_80032B7C,UISApi:fn_80169308); libflags, units (UISEvent,UIStudio,UISApi,UISScreen); refdwarf, a tools/ref/fetchdwarf.py REFS key (nascar2005gc)
         type: string
         default: ''
       minutes:
@@ -107,7 +107,7 @@ jobs:
         done
         case "$JOBS" in ''|*[!0-9]*) echo "jobs must be a whole number"; exit 1;; esac
         case "$TARGETS" in *[!A-Za-z0-9_:,]*) echo "targets: Unit:fn pairs, commas only"; exit 1;; esac
-        if { [ "$TOOL" = declsearch ] || [ "$TOOL" = libflags ]; } && [ -z "$TARGETS" ]; then
+        if { [ "$TOOL" = declsearch ] || [ "$TOOL" = libflags ] || [ "$TOOL" = refdwarf ]; } && [ -z "$TARGETS" ]; then
           echo "$TOOL needs targets"; exit 1
         fi
         if [ "$TOOL" = permute ] && { [ -z "$UNIT" ] || [ -z "$FN" ]; }; then
@@ -149,6 +149,10 @@ jobs:
         if [ "$TOOL" = declsearch ]; then
           python tools/match/declsearch.py "$TARGETS" --minutes "$MINUTES" -j "$JOBS" \
               2>&1 | tee "$RUNNER_TEMP/tool.log"
+        elif [ "$TOOL" = refdwarf ]; then
+          # The archive and its files stay in C:/dev/refs (outside the repo, never committed).
+          python -m pip install --quiet py7zr
+          python tools/ref/fetchdwarf.py "$TARGETS" --store C:/dev/refs 2>&1 | tee "$RUNNER_TEMP/tool.log"
         elif [ "$TOOL" = libflags ]; then
           python tools/match/libflags.py "$TARGETS" --minutes "$MINUTES" -j "$JOBS" \
               2>&1 | tee "$RUNNER_TEMP/tool.log"
@@ -173,6 +177,7 @@ jobs:
         NAME="${FN:-from-report}"
         [ "$TOOL" = declsearch ] && NAME=declsearch
         [ "$TOOL" = libflags ] && NAME=libflags
+        [ "$TOOL" = refdwarf ] && NAME="refdwarf-$TARGETS"
         BRANCH="pc-results/$NAME-$RUN_ID"
         RES="$RUNNER_TEMP/res"
         git worktree prune
@@ -195,6 +200,8 @@ jobs:
           for f in $(find build/declsearch -type f -newer "$RUNNER_TEMP/start"); do
             d="$RES/results/$(basename "$(dirname "$f")")"; mkdir -p "$d"; cp "$f" "$d/"
           done
+        elif [ "$TOOL" = refdwarf ]; then
+          cp -r "build/refdwarf/$TARGETS/." "$RES/results/" 2>/dev/null || true
         elif [ "$TOOL" = libflags ]; then
           cp build/libflags/best.txt build/libflags/results.tsv "$RES/results/" 2>/dev/null || true
         else
