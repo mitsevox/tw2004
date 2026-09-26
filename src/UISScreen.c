@@ -57,6 +57,7 @@ static inline char* UIS_PutString(char* pOut, char* pEnd, const char* sz, s32 nW
     s32 nAbs;
     s32 nCount;
     s32 nPad;
+    s32 nLen;
     s32 i;
 
     nAbs = nWidth;
@@ -64,19 +65,22 @@ static inline char* UIS_PutString(char* pOut, char* pEnd, const char* sz, s32 nW
     if (nWidth < 0) {
         nAbs = -nWidth;
     }
-    nPad = nAbs - strlen(sz);
-    if (!bLeft && nPad > 0) {
+    nLen = strlen(sz);
+    if (!bLeft) {
+        nPad = nAbs - nLen;
         for (i = nPad; i > 0; i--) {
             *pOut++ = ' ';
         }
-        nCount = nPad;
+        if (nPad > 0) {
+            nCount = nPad;
+        }
     }
     while (*sz != 0) {
         *pOut++ = *sz++;
         nCount++;
         if (pOut == pEnd) break;
     }
-    if (bLeft == 1 && nCount < nAbs) {
+    if (bLeft == 1) {
         for (i = nCount; i < nAbs; i++) {
             *pOut++ = ' ';
         }
@@ -119,10 +123,11 @@ u8* fn_8016C674(UISNode* pNode, u32 uEvent) {
 // A node's plain handler (neither kind bit) with the given ID for an event.
 u8* fn_8016C614(UISNode* pNode, u16 uId, u32 uEvent) {
     u32 i;
+    int nId = uId;
     for (i = 0; i < pNode->nHandlers; i++) {
         UISHandler* pHandler = &pNode->pHandlers[i];
         if (!(pHandler->uFlags & 0xC000) && pHandler->uEvent == (u16)uEvent &&
-            (pHandler->uFlags & 0x2FFF) == uId) {
+            (pHandler->uFlags & 0x2FFF) == nId) {
             return pHandler->u4.pScript;
         }
     }
@@ -145,12 +150,12 @@ u8* fn_8016C5C4(UISNode* pNode, u32 uEvent) {
 // Pushes a call frame on pStack (the saved word, the extra word, both argument lists, the node's
 // info and a 0) and runs pScript on it. The frame stays on the stack only when the script
 // returns 3 (it paused).
-s8 fn_8016C270(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UISWordStack* pStack, u8* pScript,
+s32 fn_8016C270(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UISWordStack* pStack, u8* pScript,
                s32 nArgs, const s32* pArgs, u32 nArgs2, const s32* pArgs2, u8 bExtra, s32 nExtra,
                s32* pnSaved) {
     s32* pFrame;
     u32 i;
-    s8 nResult;
+    s32 nResult;
 
     pFrame = pStack->pC;
     if (pnSaved == NULL) {
@@ -339,16 +344,17 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
     char* pStart;
     s32 nArg;
     char c;
-    u8 bUnsigned;
+    s32 bUnsigned;
     s32 nWidth;
     s32 nPrec;
     char cPad;
-    u8 bUpper;
+    s32 bUpper;
     s32 nDigits;
     s32 nPad;
     u32 u;
-    u8 bNeg;
+    s32 bNeg;
     char* p;
+    s32 nUpper;
     char aDec[20];
     char aHex[12];
 
@@ -391,6 +397,7 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
             if (c >= 'A' && c <= 'Z') {
                 bUpper = 1;
             }
+            nUpper = bUpper ? 'A' - 'a' : 0;
             switch (c) {
             case 'c':
                 *pOut++ = pArgs[nArg++].n;
@@ -410,12 +417,12 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
             case 'i':
                 nDigits = 0;
                 u = pArgs[nArg++].u;
-                bNeg = !bUnsigned && (s32)u < 0;
-                if (bNeg) {
-                    u = -u;
-                }
+                // fake match: `bUnsigned ^ 1` for !bUnsigned (it is 0 or 1) gives EA's xori, and
+                // `u >> 31` for (s32)u < 0 its srwi.
+                bNeg = (bUnsigned ^ 1) && (u >> 31);
+                u = bNeg ? -u : u;
                 do {
-                    aDec[nDigits++] = u % 10 + '0';
+                    aDec[nDigits++] = u + '0' - u / 10 * 10;
                     u /= 10;
                 } while (u != 0);
                 if (nWidth != 0) {
@@ -441,7 +448,7 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
                 do {
                     c = (u & 0xF) + '0';
                     if (c > '9') {
-                        c += (bUpper ? 'A' - 'a' : 0) + 'a' - '9' - 1;
+                        c += nUpper + 'a' - '9' - 1;
                     }
                     u >>= 4;
                     aHex[nDigits++] = c;
@@ -462,7 +469,7 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
         }
     }
     *pOut++ = '\0';
-    return pOut - pStart - 1;
+    return pOut - (pStart + 1);
 }
 
 // Formats pFormat's text with pArgs into pOut's buffer.
@@ -821,7 +828,8 @@ s32 fn_8016A2D4(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32
                 bOut = 0;
                 nResult = fn_8016A2D4(pStudio, pScreen, pStack, pHandler->u4.nNode, uEvent, n5, nArgs, pArgs,
                                       &bOut);
-                if (bOut == 1) {
+                // fake match: the (s32) gives EA's signed cmpwi
+                if ((s32)bOut == 1) {
                     u8* pLinked = fn_8016C614(pNode, (u16)pHandler->u4.nNode, n5);
                     if (pLinked != NULL) {
                         s32 nRet = fn_8016C270(pStudio, pScreen, pNode->pInfo, pStack, pLinked, nArgs, pArgs,
