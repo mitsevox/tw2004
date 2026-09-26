@@ -3,18 +3,14 @@
 Updated 2026-09-25 ~21:30 CDT. How the machines, CI, the page and PC jobs fit together:
 docs/infrastructure.md. History: docs/journal.md.
 
-**Running (round 5, launched 2026-09-26 09:35 CDT, checkpoint 12:00 CDT):** 5 lanes on all 80
-non-exact functions, each armed with mwcc-debugger (matching.md step 3): r5-uiapi (uiProcessInterface,
-uiText, uiArc, UISEvent, UISApi), r5-uisscreen (hlaudmovie, MC, hlaudtrackstm, UIStudio, UISScreen),
-r5-game (hwsBurn, Golfer, char, SkinPart, Earnings, Swing, Code8002EE1C, GameModeBestBall, GameMode22,
-skalib), r5-world (GoStaticCam, GoBreakLine, Rain, startUp, rcmp_mad_codec, CamSpline, gocamscripts,
-GoGreenGrid, GoTerrain), r5-render (SunFlr, DepthField, Grass, Particle, LLTex, LLFont, LLDynTex,
-LLPictInt, goballfx, LogoTexture). Batch dumps: `mwccdbg.py --all` -> build/mwccdbg/<fn>/summary.txt.
-Round 4 (worktrees `r4-*`) all merged 2026-09-26 ~01:00 CDT.
-PC: `declsearch` (tools/match/declsearch.py, every declaration order / kick-and-climb over 18
-cores) on the 41 functions at 97%+, 240 min, results on a `pc-results/declsearch-*` branch: apply
-an exact order by hand. Golfer held (PC). Gemini round 4 merged (GameModeBestBall closer; its
-`nOurs` reuse there needs a `fake match:` label at the next pass over that file).
+**Running:** nothing. Round 5 (5 lanes, mwcc-debugger on all 80 non-exact functions, 09:35-11:00
+CDT) merged 2026-09-26 ~11:10 CDT: uiText, GoTerrain, HLAudMaster + hlaudmovie (split) linked; exact
+Particle fn_800951A0, Grass Static_Render, LLTex fn_8000EA1C, SW_vImpact, hlaudmovie fn_800A8AD4
+(labelled fake), uiText fn_800922A8, GoTerrain x2. Every lane wrote its debugger readings into the
+ledgers; the levers are in docs/decomp-notes.md "New from round 5". Gemini round 4 (findings only)
+merged. Worktrees r5-* can be reused. Follow-up leads: parameter order vs argument schedule (ledgers
+that say "argument order"); UISScreen's copy-propagation pattern (unsolved); src/FE_CrAPDB.c:139's
+comment still says uistudio.h has `const s32*` (now non-const): audit fix.
 Rule change (owner, 2026-09-26): EA's code exactly as EA wrote it; portability is not a constraint
 (CLAUDE.md, agents/brief.md). Leads to revisit with it: file-loading / fixup / address-math code.
 Unit count: the weather split (Code8006F608.c) replaced two unsorted sweep units (259 -> 258).
@@ -79,7 +75,7 @@ GoDynamicCam/GoPostFx in link order, used only by GxUtil and gomainloop: owner u
 
 | exact functions | matched code | code linked | data linked | game units linked |
 |---|---|---|---|---|
-| 7,566 / 7,647 | 94.86% | 78.04% | 79.55% | 218 / 258 |
+| 7,575 / 7,647 | 95.49% | 80.42% | 80.21% | 223 / 259 |
 
 `python tools/agents/remain.py` lists what is left by unit; rank by code-bar gain per function.
 

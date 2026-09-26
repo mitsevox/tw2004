@@ -476,6 +476,38 @@ They will be sorted into the sections below.
 - Other compiler versions (GC 2.0, 2.0p1, 2.6, 2.7, 1.3.2) gave output identical to 2.5 on 18 near-miss
   functions tried today: not a lever for these.
 
+### New from round 5, the mwcc-debugger round (2026-09-26)
+
+Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "mwcc-debugger");
+per-function readings are in each `agents/tried/<fn>.md`, the batch in
+`agents/findings/2026-09-26-mwccdbg-batch.md`.
+
+- **[verified] The allocator's levels**: a variable with more than 28 remaining neighbours cannot be
+  placed on the first level and jumps to the top (takes r31). One temp more or fewer is the lever.
+  hwsBurn fn_8011172C (`nAlign + *pOffset` makes a temp: pBurn 29 neighbours, r31 not r25);
+  hlaudmovie fn_800A8AD4 (a use of pBlock in one more branch gave it the 29th: exact).
+- **[verified] The frontend numbers its temps above every declared local**, so a local EA orders
+  above a frontend temp cannot get there by declaration order; writing the expression at each use
+  (the frontend makes the temp) can. Swing SW_vImpact: pLaunchA/B locals -> `gPlayers[nPlayer].vLaunchA/B`
+  at each call, 6 -> 0.
+- **[verified] A callee's parameter order sets its callers' argument schedule**, even when every
+  register stays the same. GoTerrain fn_80032B7C 98.46 -> 100 and fn_80031E58 83.6 -> 100 from
+  fn_8003241C's parameters in Ter_ObjectDrawData's field order. Worth a look wherever a ledger says
+  "argument order" (PictInt_Decode, Stm_Tick, fn_80006A98, fn_8009A708, UISApi/UISEvent).
+- **[verified] File-wide `opt_propagation off` keeps consecutive `x |= c` statements separate**
+  (the frontend otherwise merges them into one `ori`): uiText fn_800922A8 2 -> 0, no function worse.
+  A one-file flag: on the after-100% flag audit list.
+- **[observed] A `const` pointer lets loads move past stores through another pointer**; EA's code
+  kept each load after the previous store, so EA's parameters were not const. UISScreen fn_8016C270
+  aligned 191 -> 153 (non-const pArgs through the whole script-call chain).
+- **[verified] Reassigning a variable elsewhere can bring back a copy the frontend folds to a
+  constant**: LLTex fn_8000EA1C, case 11 reading its random number into b turned `li r30,0` into
+  EA's `mr r30,r31`, 98.99 -> 100.
+- **[verified] A `void*` copy stops the AST optimizer's copy propagation** (it rewrote pBlock to
+  pData): Particle fn_800951A0 92.0 -> 100 (`void* pBlock = pData`, the header field's own type).
+- **[observed] Unsolved pattern: EA keeps a copy our backend's first copy-propagation pass folds**
+  (UISScreen fn_8016AD54, fn_8016ABBC, fn_8016B4D4, fn_8016AEEC, fn_8016A2D4): no flag or form found.
+
 ### New from the evening push (2026-09-25)
 
 - **[verified] EA's late parameter copy (`mr r0,r3 ... mr rN,r0`): copy the parameter into a local
