@@ -63,7 +63,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
         switch (uOp) {
         case 0x02:  // send event 0 (a call to screen group|screen<<16 below the arguments)
         case 0x71:
-            nArgs = *pFrame->p10++;
+            nArgs = *pFrame->p10;
+            pFrame->p10++;
             pArgs = pFrame->pC - nArgs;
             u = pArgs[-1];
             data.aw[0] = u;
@@ -77,7 +78,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->pC--;
             break;
         case 0x03:  // send event 1 to a screen (0xFFFF: this one) with a word
-            pArgs = --pFrame->pC;
+            n = *--pFrame->pC;
             u = *--pFrame->pC;
             uGroup = u;
             uScreen = u >> 16;
@@ -87,7 +88,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             }
             data.aw[0] = uGroup;
             data.aw[1] = uScreen;
-            data.au[2] = *pArgs;
+            data.au[2] = n;
             fn_80165B90(pScreen->uGroup, pScreen->uScreen, pStudio, 1, &data, 0, NULL);
             break;
         case 0x08:  // send event 3 to a screen (0xFFFF: this one)
@@ -114,7 +115,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             u8* pDoneScript = NULL;
             u8* pStepScript = NULL;
 
-            nArgs = *pFrame->p10++;
+            nArgs = *pFrame->p10;
+            pFrame->p10++;
             pNodeInfo = (UISNodeInfo*)*--pFrame->pC;
             n30 = *--pFrame->pC;
             if (nArgs >= 5) {
@@ -471,7 +473,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->p10 = (u8*)*--pFrame->pC;
             break;
         case 0x45:  // send events 0 and 3 to the screen a file word names, with n words
-            nArgs = *pFrame->p10++;
+            nArgs = *pFrame->p10;
+            pFrame->p10++;
             n = *--pFrame->pC;
             u = *(u32*)((u8*)pScreen->pData + *(u32*)n);
             if (u != 0xFFFFFFFF) {
@@ -614,7 +617,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             break;
         case 0x51:  // call a screen and wait for it: the script pauses in a p60 record
         case 0x70:
-            nArgs = *pFrame->p10++;
+            nArgs = *pFrame->p10;
+            pFrame->p10++;
             n = pStudio->n5C;
             if (n < pStudio->nMax60) {
                 pArgs = pFrame->pC - nArgs;
