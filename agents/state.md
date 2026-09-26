@@ -3,7 +3,11 @@
 Updated 2026-09-25 ~21:30 CDT. How the machines, CI, the page and PC jobs fit together:
 docs/infrastructure.md. History: docs/journal.md.
 
-**Running:** nothing. Round 6 (5 lanes, 11:40-13:25 CDT) merged: Earnings, LLDynTex, hwsBurn, GoBreakLine
+**Running (round 7, launched 2026-09-26 16:25 CDT, checkpoint 18:30 CDT, weekly usage 23%):** r7-golfer
+(AI_ChooseTarget, extend rasim.py to spill-cost ordering), r7-charswing (char x4, Swing KillVibration, SkinPart),
+r7-cam (gocamscripts x2, startUp, StaticCam, Rain, GoGreenGrid, CamSpline, Stm_Tick), r7-uis (the kept-copy
+source form, UISApi/UIStudio near-misses). UIS units now share UIS_CFLAGS (owner OK). rasim.py in tools/match.
+Round 6 (5 lanes, 11:40-13:25 CDT) merged: Earnings, LLDynTex, hwsBurn, GoBreakLine
 linked; exact also hlaudtrackstm fn_800AB860, UISEvent fn_80165B90 (labelled s64 fake). Dead asserts: no
 effect (findings). UIS = Tiburon's IStudio: one library flag set ties the per-file flags (not applied yet:
 owner's call); NASCAR 2005 GC DWARF fetched (docs/reference-builds/nascar2005-gc): no IStudio. r6-big broke
