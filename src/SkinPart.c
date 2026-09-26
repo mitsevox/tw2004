@@ -1188,9 +1188,9 @@ void fn_800CEB1C(Skin** apSkins, int nSkins, DynTex* pTex) {
 // and nIds go on to fn_800CE660.
 void fn_800CEBE8(Skin** apSkins, int nSkins, DynTex* pTex, u64* aIds, int nIds) {
     SkinListEntry* pList;
-    int nList;
-    int i;
     s32 nC;
+    int i;
+    int nList;
     u64 uId;
     TexBank* pBank;
 

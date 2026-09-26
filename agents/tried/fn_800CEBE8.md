@@ -1,6 +1,7 @@
 # fn_800CEBE8 (SkinPart.c, 0x800CEBE8)
 
-Status: OPEN, 96.21% on 2026-09-25.
+Status: SOLVED 2026-09-26 (r3-charskin): declarations in the order pList, nC, i, nList, uId,
+pBank (found by trying all 720 orders; the greedy climb stops at 7).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -16,6 +17,9 @@ unless you combine it with something new. Before you stop, add every attempt und
   nC through nSkins/nIds, nC int/u32, nList s32 again with nC int, pList init moved, while loop,
   `nList > i`, pBank call first (24), a copy nC2 at each position, `(s32)0x80000000`: 7-24.
   PC permuter candidate (registers only).
+- 2026-09-26 r3-charskin: each parameter copied into a local (void* for pointers, plain / long
+  for ints) at every declaration position: 7-9; nList / nC routed through nSkins / nIds: 12-24;
+  all 720 orders of the six declarations: 0 with pList, nC, i, nList, uId, pBank (applied).
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
