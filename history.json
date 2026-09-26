@@ -40613,5 +40613,21 @@
 "matched_functions": 7555,
 "total_functions": 7647,
 "exact": 7555
+},
+{
+"commit": "176f77a",
+"sha": "176f77a833b3325f86de90610a4a7d9bd68833c9",
+"time": 1790394816,
+"subject": "quicktrial.py: remove each trial's temporary folder (leaked folders filled the disk)",
+"report": true,
+"matched_code": 1459892,
+"complete_code": 1165216,
+"matched_data": 703495,
+"complete_data": 847427,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7555,
+"total_functions": 7647,
+"exact": 7555
 }
 ]
