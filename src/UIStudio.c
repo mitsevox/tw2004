@@ -212,12 +212,13 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             fn_80165B90(pScreen->uGroup, pScreen->uScreen, pStudio, 9, &data, n, pArgs + 1);
             break;
         case 0x0B:  // a command to the game (pfnCommand)
+            uGroup = pScreen->uGroup;
+            uScreen = pScreen->uScreen;
             n = *--pFrame->pC;
             pFrame->pC--;
             pArgs = pFrame->pC - n;
             // port: pointers passed as the callback's words
-            pStudio->pfnCommand(pArgs[0], pScreen->uGroup, pScreen->uScreen, n, (s32)(pArgs + 1),
-                                (s32)(pArgs - 1));
+            pStudio->pfnCommand(pArgs[0], uGroup, uScreen, n, (s32)(pArgs + 1), (s32)(pArgs - 1));
             break;
         case 0x0C:  // send event 7 with two words and n more
             n = *--pFrame->pC;
