@@ -1,0 +1,17 @@
+--- before
++++ after
+@@ -2289,11 +2289,11 @@
+   pDataR = pDataL + 0x2FC0;
+   uLeft = lbl_801F1850.pLeft->uAram + (lbl_801F1850.nSendBlock * 0x2FC0);
+   uRight = lbl_801F1850.pRight->uAram + (lbl_801F1850.nSendBlock * 0x2FC0);
+-  fn_800B0338(lbl_801F1850.pLeft->nHwVoice, pBlock, 0, nMode);
+-  fn_800B0338(lbl_801F1850.pRight->nHwVoice, pBlock, 1, nMode);
++  fn_800B0338(lbl_801F1850.pLeft->nHwVoice, pChunk, 0, nMode);
++  fn_800B0338(lbl_801F1850.pRight->nHwVoice, pChunk, 1, nMode);
+   if (lbl_801F1850.nState == 1)
+   {
+-    fn_800B044C(uLeft, pDataL, 0x2FC0, 0, 0);
++    fn_800B044C(uLeft, pBlock->aDataL, 0x2FC0, 0, 0);
+     fn_800B044C(uRight, pDataR, 0x2FC0, 0, 1);
+   }
+   else
