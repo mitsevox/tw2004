@@ -31,6 +31,9 @@ unless you combine it with something new. Before you stop, add every attempt und
   98.60 (worse than 99.28 because of the f0 copies), not kept. Without the pragma the end block's
   direct moves match, so EA is probably not simply "lifetimes off"; but whatever EA wrote colours
   every variable into one register.
+- 2026-09-26 r2-modes: randomised restarts of the rename + declaration-move search from the original C
+  (22 min, 13 restarts, no pragma): basins 29-71, best 29 aligned with 13 renames (not kept: 2 fewer than
+  the committed 31, much less readable). The rename space alone does not reach 0.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
