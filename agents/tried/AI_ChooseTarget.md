@@ -1,6 +1,6 @@
 # AI_ChooseTarget (Golfer.c, 0x8002C2DC)
 
-Status: OPEN, 99.56% on 2026-09-26 (r7-golfer): only the two hoisted `(s8)` temps' register
+Status: OPEN, 99.74599% on 2026-09-26 (codex/round3 form merged over r7-golfer's 99.56: same nAttr split and declaration idea, plus a labelled pTargets base alias).
 numbers are left (see the last attempts).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
@@ -180,3 +180,48 @@ UStream_Update exact). The other 13 "matches" (Earnings x2, Golfer AI_ChooseTarg
 - 2026-09-26 r7-golfer permuter (15 min, -j 2, from the 99.56 version, base 165): 95 with a
   `new_var = gAITargets` base pointer (moves zoneoff into a frontend-temp slot, quicktrial 17),
   50 with `long long nPower` plus `if (x = (s8)nAggr < ...)`: not EA forms, not applied.
+- 2026-09-26 codex/round3 AI_ChooseTarget focused pass: refreshed scratch baseline is
+  91 aligned/positional diffs, 374 instructions; real report baseline 98.66310%. A late recomputed
+  `Player* q = &gPlayers[nPlayer]` for the tail scored 85 in scratch but regressed real report to
+  98.15508%, so it was reverted. Splitting either nested `Shot_GoverningAttribute` into `int nAttr`
+  or nested `AI_FirstUsableClub` into `int nFirstClub` preserves 374 instructions and improves real
+  report to 98.70321%; together they regress to 98.46257%. Kept `nAttr` only. `register` on p, t,
+  nKind, nSkill, k, nBest, nCand, nPower, nPinSet, nAggr, and nPlayer had no effect (91 scratch).
+  `gAITargets` zone and request aliases were neutral (91); a best-pointer alias worsened to 94.
+  Single `opt_lifetimes`, `opt_propagation`, and `opt_strength_reduction` off each worsened to 97;
+  `opt_dead_assignments` and `opt_common_subexpressions` off were neutral (91).
+  Exact `AI_ApplyError` in this same file already uses an `int nAttr` assignment from
+  `Shot_GoverningAttribute(...)` before an attribute lookup, supporting the kept source form.
+  nAttr placement/scope (function-local or tiny block) and int/s32/long/u32 all compile to the
+  same 82-diff scratch map; short/s8/u8 worsen. An `ATTR_TOTAL` mode local is optimized away
+  (82 unchanged). A loop-local recomputed Player pointer with nAttr scored 79 in scratch but
+  regressed the real report to 98.28877%, so it was reverted. Cross-job local reuse,
+  `gAITargets` aliases, and hoisted s8 copies did not preserve a better same-shape match.
+- 2026-09-26 codex/round3 continuation: after the `nAttr` split, moving the existing `s8 nBest`
+  declaration immediately after `AITarget* t` preserved all 374 instructions and improved scratch
+  positional/aligned diffs 82 -> 61; the real report improved 98.70321 -> 99.09091%. This is an
+  interaction: prior 74k baseline declaration-order trials did not have `nAttr`. The working
+  debugger's nAttr-only dump shows p r31 (EA r31), then k r30, nBest r29, nCand r28, nPlayer r27;
+  EA wants t r30, nKind r29, nPlayer r28.
+- 2026-09-26 codex/round3: from the nAttr+nBest baseline, moving `s8 k` immediately after
+  `AITarget* t` (so t/k/nBest lead declarations) preserved 374 instructions and improved scratch
+  61 -> 59; real report 99.09091 -> 99.19786%. Kept.
+- 2026-09-26 codex/round3: moving `AITarget* t` down to immediately after `Player* p` (top
+  declarations now k/nBest) preserved 374 instructions and improved scratch 59 -> 43; real report
+  99.19786 -> 99.35829%. Kept.
+- 2026-09-26 codex/round3: moving `s8 nCand` up after `s8 nBest` and `int nKind` down after
+  `AITarget* t` preserved 374 instructions and improved scratch 43 -> 28; real report
+  99.35829 -> 99.55882%. Kept. Current scratch register map has p/t/nKind/nPlayer/k/nBest/nCand/
+  nSkill exact; mismatches are the hoisted s8 aggression and power temps plus AIbase/zone/power/
+  pin/tee offset register cascade. Moving nCand or t to loop scope worsens 28 -> 62 or 48;
+  nKind loop scope is neutral; nSkill loop scope worsens to 100.
+- 2026-09-26 codex/round3: added a `gAITargets` base-pointer local used only for the two
+  `[nZone]` lookups (all other table uses remain direct). Same 374 instructions; scratch
+  28 -> 17; real report 99.55882 -> 99.74599%. Kept. Using that pointer for all table uses
+  changes instruction shape, while a request-only alias is neutral and a best-only alias worse.
+  A loop-local pointer to `gSession.nTeeSet[nPlayer]` alone scored 28 -> 25 scratch, but on top of
+  this 99.74599 version it gave no real-report gain and was reverted.
+  The current MWCC debugger dump has the named locals in EA's registers; the first wrong virtual
+  is the hoisted `(s8)nAggr` temp (ours r27, EA r21). The selective table-base alias is labelled
+  `fake match:` pending stronger evidence that EA wrote that exact source form. The more natural
+  zone-pointer alias returned scratch 17 -> 28; no source replacement found before this handoff.
