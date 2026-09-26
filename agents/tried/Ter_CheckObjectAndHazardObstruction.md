@@ -31,6 +31,15 @@ unless you combine it with something new. Before you stop, add every attempt und
 - 2026-09-26 r2-terrain (from the 28 lead): `bObstructed = 0` after `bFirst = 1`: 28; after the
   pCourse test: 42; just before the loops: 38.
 
+- 2026-09-26 r3-terrain: applied the 28 lead (the inline must call fn_80035074 itself; through
+  Ter_Floor: 109). Then a separate counter for the inner corner loop (`int nInner;` declared right
+  after nCorner, instead of reusing i): 28 -> 13 (declared anywhere else: 25-57); pVert assigned
+  before pFlags: 13 -> 9 (99.98%, b4d5b7c). Left: only the spill slots of bObstructed (EA 0x88)
+  and n (EA 0xa0) swapped. Tried from 9, none better: a full declaration climb; n reusing
+  i/j/k/nZ/nCorner/nInner (28-85); bObstructed int/s32 (10); bFirst int (29); n s32 (9);
+  bObstructed = 0 after bFirst (13), before/after fWide (23), after the init loop (27);
+  swapping which of nCorner/nInner is outer (13); pFlags/pVert spelled with & or + (13).
+
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
 ```
