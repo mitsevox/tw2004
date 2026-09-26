@@ -65,3 +65,4 @@ base 40, 24 levers, 1323 variants (24 singles) in 13 s; best 25
 - UISScreen fn_8016AEEC (orig: bLast computed early, `mr r30,r27` copy before the 2nd loop): u16 bLast
   with `(u8)(nMsg == -1)` 40 -> 28 raw; not applied (register web left).
 ```
+- 2026-09-26 PC declsearch (run 36221888505, iterated local search over the declaration order): best 25 (no better order than the current one), 24 trials.

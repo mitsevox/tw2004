@@ -156,3 +156,4 @@ Swing SW_vImpact: all-gPlayers / all-p / PLAYER() / p = gPlayers; p += n / p set
 - SW_vImpact (23, EA p = r31 and the gPlayers offset r30): decl climb, p initialiser in 3 places,
   gPlayers + nPlayer: none.
 ```
+- 2026-09-26 PC declsearch (run 36221888505, iterated local search over the declaration order): best 6 (no better order than the current one), 4792663213 trials.

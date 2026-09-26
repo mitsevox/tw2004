@@ -63,3 +63,4 @@ GoBreakLine BreakLine_Render (fZ f0, EA f2): fX/fZ replaced by every ordered pai
 BreakLine_Render, StaticCam_GetFlybyInformation, UObject fn_800488B4, uiText fn_800922A8,
 hlaudmovie, ska_shared, PsMgr, GoStaticCam, BreakLine_Render, Rain, uiText, MC, GameModeBestBall,
 ```
+- 2026-09-26 PC declsearch (run 36221888505, iterated local search over the declaration order): best 7 (no better order than the current one), 4827098366 trials.

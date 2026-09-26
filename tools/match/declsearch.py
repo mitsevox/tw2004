@@ -59,7 +59,10 @@ def scorer(fn, head, rest):
 
 def job(args):
     """One worker: (fn, mode, seed, deadline, stop) -> (fn, mode, seed, best score, best order, trials)."""
-    fn, mode, seed, deadline, stop = args
+    fn, mode, seed, (slice_s, end), stop = args
+    # Each job gets its own slice from when it starts (a queue of more jobs than workers would
+    # otherwise leave the later jobs no time: 17 of 41 got none on 2026-09-26), never past the end.
+    deadline = min(time.time() + slice_s, end)
     head, decl, rest = split(fn, quicktrial.base(fn))
     sc = scorer(fn, head, rest)
     best_d, best = list(decl), sc(decl)
@@ -122,15 +125,19 @@ def main():
         print('%s: %d declarations' % (fn, len(parts[1])), flush=True)
     if not fns:
         sys.exit('nothing to search')
-    deadline = time.time() + minutes * 60
+    end = time.time() + minutes * 60
     mgr = mp.Manager()
     stops = {fn: mgr.Event() for fn, _ in fns}
-    jobs = [(fn, 'all', 0, deadline, stops[fn]) for fn, n in fns if n <= 7]
+    jobs = [(fn, 'all', 0) for fn, n in fns if n <= 7]
     seed = 1
     while len(jobs) < max(workers, len(fns)):
         for fn, _ in fns:
-            jobs.append((fn, 'ils', seed, deadline, stops[fn]))
+            jobs.append((fn, 'ils', seed))
         seed += 1
+    # Every job gets an equal share of the workers' time.
+    slice_s = minutes * 60 * workers / len(jobs)
+    jobs = [(fn, mode, sd, (slice_s, end), stops[fn]) for fn, mode, sd in jobs]
+    print('%d jobs on %d workers, %.0f minutes each' % (len(jobs), workers, slice_s / 60), flush=True)
     best = {}
     with mp.Pool(workers) as pool:
         for fn, mode, sd, s, d, decl, n in pool.imap_unordered(job, jobs):

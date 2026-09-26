@@ -63,3 +63,4 @@ base 6, 199 levers, 31039 variants (199 singles) in 318 s; best 6
 - 2026-09-26 r4-charskin: the three flags in one comma statement 6; inline getters for &gPlayers[nPlayer] (11) and for u10 (6), both 11.
 - 2026-09-26 r4-charskin: pPlayer as integer address math (u32 / int / u8* spellings): 6.
 - 2026-09-26 r4-charskin: every order (5040) of bStance, bPlace, bClipTime, pModel, pBallPos, pPlayer, pSkel: 6.
+- 2026-09-26 PC declsearch (run 36221888505, iterated local search over the declaration order): best 6 (no better order than the current one), 11346 trials.

@@ -105,3 +105,4 @@ GoStaticCam StaticCam_GetFlybyInformation (block 2 fmadds into f3, EA f31 = fT):
 ```
 BreakLine_Render, StaticCam_GetFlybyInformation, UObject fn_800488B4, uiText fn_800922A8,
 ```
+- 2026-09-26 PC declsearch (run 36221888505, iterated local search over the declaration order): best 2 (no better order than the current one), 11102 trials.

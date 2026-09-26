@@ -129,3 +129,4 @@ Golfer AI_ChooseTarget 92.8 -> 97.0 (committed):
 ```
 UStream_Update exact). The other 13 "matches" (Earnings x2, Golfer AI_ChooseTarget, TerrainData,
 ```
+- 2026-09-26 PC declsearch (run 36221888505, iterated local search over the declaration order): queued but given no time (a scheduling bug, fixed); not searched.

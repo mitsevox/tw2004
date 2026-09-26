@@ -95,7 +95,18 @@ gh workflow run pc-job.yml -f tool=permute -f unit=hwsBurn -f fn=fn_8011172C -f 
 gh workflow run pc-job.yml -f tool=leversweep -f unit=hwsBurn -f fn=fn_8011172C -f minutes=6
 gh workflow run pc-job.yml -f tool=leversweep                  # --from-report: every near-miss
 gh workflow run pc-job.yml ... -f ref=my-branch                # build from a pushed branch
+gh workflow run pc-job.yml -f tool=declsearch -f targets=Unit:fn,Unit:fn -f minutes=240
 ```
+
+`declsearch` (tools/match/declsearch.py) searches declaration orders over many functions at once,
+each job with an equal time slice; results go to `pc-results/declsearch-<run id>` (per function
+`score.txt` and the declaration diff). It beat the permuter on register-only near misses (first
+run: ska_shared fn_8001FCF4 exact, unit linked). **Speed, measured 2026-09-26:** about 46 trials a
+minute per worker on the PC (11,000 per worker in 4 hours on 18 workers), against about 550 a
+minute per worker in the cloud: every trial writes a fresh temp `.c`/`.o` and runs the compiler and
+objdump, and Windows (Defender scanning each new file is the likely cost) makes that slow.
+Excluding the runner's work folder and `%TEMP%` from Defender's real-time scan should help; to be
+measured.
 
 It checks out `ref` (default main; the workspace keeps `build/` between jobs), copies
 `C:/dev/tw2004/orig`, builds and stops unless `main.dol: OK`, then runs the tool with `-j jobs`

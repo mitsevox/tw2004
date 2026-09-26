@@ -89,3 +89,4 @@ base 79, 151 levers, 19655 variants (151 singles) in 176 s; best 79
   original (0.0 kept in f31, 1.0 reloaded with lfs into the result register). Operand orders x 3
   body forms x f32/f64 on every parameter, int/s32/u8/s16 fHi, nested Min(Max()) (143): none < 27.
 ```
+- 2026-09-26 PC declsearch (run 36221888505, iterated local search over the declaration order): queued but given no time (a scheduling bug, fixed); not searched.

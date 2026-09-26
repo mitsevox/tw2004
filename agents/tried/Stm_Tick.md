@@ -46,3 +46,4 @@ unless you combine it with something new. Before you stop, add every attempt und
 ```
   Stm_Tick: decl climb 94 -> 88 only.
 ```
+- 2026-09-26 PC declsearch (run 36221888505, iterated local search over the declaration order): queued but given no time (a scheduling bug, fixed); not searched.

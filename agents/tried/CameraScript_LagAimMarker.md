@@ -77,3 +77,4 @@ base 11, 223 levers, 37830 variants (223 singles) in 352 s; best 11
 ```
 fn_800D477C/fn_800D4F14, gocamscripts CameraScript_LagAimMarker/fn_8003F2E0.
 ```
+- 2026-09-26 PC declsearch (run 36221888505, iterated local search over the declaration order): best 11 (no better order than the current one), 11468 trials.
