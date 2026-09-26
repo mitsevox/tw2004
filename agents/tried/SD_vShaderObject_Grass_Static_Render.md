@@ -17,6 +17,13 @@ unless you combine it with something new. Before you stop, add every attempt und
   96.78 -> 97.21 (kept). Decl climb after it: none. const on pObject / the pointer locals: 74.
   Left: register allocation (nSteps-like counters r18/r22, f22/f27) and two address adds
   scheduled differently. Permuter candidate.
+- 2026-09-26 r4-render (aligned, base 41; left: nVerts r22 / nDone r20 swapped vs EA, the
+  `pVert + nAxis` add's operand order, fFade's temp registers): `nAxis + pVert`, `&pVert[nAxis]`,
+  an f32* or u8* pAxis: 41. nDone's declaration at every position: 41. nVerts declared plain and
+  assigned before the `nVerts <= 0` test, every declaration position: 41-45. `nVerts > nDone`,
+  a for loop: 41. int/s32 on nVerts/nDone/nSet/nRun/nRow/nInRow/nAxis/nWind: 41. 32 fFade
+  expression orders: 41. The skip loop on nRow itself 91, counting up 55, statements swapped 43;
+  the draw in an else 41, `nRow >= 2` first 116-117.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
