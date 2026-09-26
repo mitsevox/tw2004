@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "C:\dev\actions-runner\_work\tw2004\tw2004\tools\match\perm_setup.py", line 78, in <module>
+    '.include "macros.inc"\n.text\n.balign 4\n' + m.group(0) + '\n')
+                                                  ^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'group'
+Traceback (most recent call last):
+  File "C:\dev\actions-runner\_work\tw2004\tw2004\tools\match\permute.py", line 31, in <module>
+    subprocess.run([sys.executable, str(ROOT / 'tools/match/perm_setup.py'), unit, fn], check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3824.0_x64__qbz5n2kfra8p0\Lib\subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['C:\\Users\\lucas\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe', 'C:\\dev\\actions-runner\\_work\\tw2004\\tw2004\\tools\\match\\perm_setup.py', 'rcmp_mad_codec', 'fn_800B769C']' returned non-zero exit status 1.
