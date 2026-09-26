@@ -72,4 +72,7 @@ base 6, 199 levers, 31039 variants (199 singles) in 318 s; best 6
   temp. Tried (quicktrial): `(*pChar).u10` on one read, (int)/(s32) casts on two reads,
   parenthesised reads, `&pPlayer->ball.vPos[0]`, pPlayer after the flags: 6; `x = u10; x &= mask`
   per flag 287; pBallPos from `gPlayers[pChar->nPlayer]` 11 (still swapped, plus pPlayer /
-  pBallPos); an `int nPlayer` local (copy-propagated away, same dump): 6. No source change.
+  pBallPos); an `int nPlayer` local (copy-propagated away, same dump): 6. pBallPos from
+  `gPlayers[pChar->nPlayer]` with both gPlayers statements after the flag reads, in 4 orders: 11
+  (the dump: the frontend now CSEs the whole &gPlayers[n] into @1458, but the nPlayer load itself
+  stays a backend temp above @1457). No source change.
