@@ -81,13 +81,15 @@ def score(fn, src, show=False, aligned=False):
     0 still means exact."""
     if fn not in _target:
         _target[fn] = _dis(fn, os.path.join(_perm(fn), 'target.o'))
-    d = tempfile.mkdtemp()
-    c, o = os.path.join(d, 'v.c'), os.path.join(d, 'v.o')
-    open(c, 'w', encoding='utf-8').write(src)
-    r = subprocess.run(_compiler(fn) + ['-c', c, '-o', o], capture_output=True, text=True)
-    if not os.path.exists(o):
-        return ('ERR', r.stdout[-800:])
-    a, b = _target[fn], _dis(fn, o)
+    # One temporary folder per trial, removed when the trial ends (leaked folders once filled the
+    # cloud box's disk mid-run: 2026-09-25).
+    with tempfile.TemporaryDirectory() as d:
+        c, o = os.path.join(d, 'v.c'), os.path.join(d, 'v.o')
+        open(c, 'w', encoding='utf-8').write(src)
+        r = subprocess.run(_compiler(fn) + ['-c', c, '-o', o], capture_output=True, text=True)
+        if not os.path.exists(o):
+            return ('ERR', r.stdout[-800:])
+        a, b = _target[fn], _dis(fn, o)
     if aligned:
         a, b = _branchless(a), _branchless(b)
         ops = difflib.SequenceMatcher(None, a, b, autojunk=False).get_opcodes()
