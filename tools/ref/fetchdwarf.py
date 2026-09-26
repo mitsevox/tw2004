@@ -6,7 +6,7 @@
 everything extracted from it stay in --store (game data never enters git or the results). What is
 written to --out, for committing: cus.txt (every compilation unit's source path and code range),
 hits.txt (the units and lines naming the KEYWORDS), and cu/<file>.txt: dtk's DWARF dump of each unit
-whose path names a keyword (function signatures, locals, types: the same kind of evidence as
+whose path names a keyword or whose file name is one of our src/ units' (function signatures, locals, types: the same kind of evidence as
 docs/reference-builds/tw07-ps3/cu/). Needs py7zr (pip) for .7z archives."""
 import pathlib, re, subprocess, sys, urllib.parse, urllib.request
 
@@ -18,6 +18,10 @@ REFS = {
                     '[GC] NASCAR 2005 - Chase for the Cup (USA) [GN4E69] (DWARF).7z',
 }
 KEYWORDS = ['IStudio', 'iStudio', 'UIS', 'UIStudio', 'Tiburon', 'TibExt', 'Eassdk']
+# Also kept: every unit whose file name (without extension, any case) is one of our src/ units, and
+# these (the font code around our LLFont.c's FO_ functions).
+EXTRA_STEMS = {'font'}
+OUR_STEMS = {p.stem.lower() for p in (ROOT / 'src').rglob('*.c')}
 
 
 def main():
@@ -70,7 +74,8 @@ def main():
             path = re.search(r'Compile unit: (.+)', unit).group(1).strip()
             rng = re.search(r'Code range: (.+)', unit)
             cus.append('%s\t%s\t%s' % (elf.name, rng.group(1).strip() if rng else '', path))
-            if any(k in path for k in KEYWORDS):
+            stem = re.split(r'[/\\]', path)[-1].rsplit('.', 1)[0].lower()
+            if any(k in path for k in KEYWORDS) or stem in OUR_STEMS | EXTRA_STEMS:
                 fn = re.sub(r'[^A-Za-z0-9_.-]', '_', path.replace('\\', '/').rsplit('/', 1)[-1])
                 (out / 'cu' / (fn + '.txt')).write_text(unit, encoding='utf-8')
                 hits.append('unit %s' % path)
