@@ -12,6 +12,22 @@ Rule change (owner, 2026-09-26): EA's code exactly as EA wrote it; portability i
 (CLAUDE.md, agents/brief.md). Leads to revisit with it: file-loading / fixup / address-math code.
 Unit count: the weather split (Code8006F608.c) replaced two unsorted sweep units (259 -> 258).
 
+**Next (owner-approved 2026-09-26, after a context compaction):**
+1. **mwcc-debugger** (recommended by #match-help's Mrkol: "regswaps are solvable, use
+   mwcc-debugger"): the owner approved getting it. Find it (web), download/build it, learn it, and
+   point it at the register-only near misses (24 functions at 99%+).
+2. **Dead-assert lane** (1-2 lanes to start): EA's compiled-away asserts/debug code still change
+   register choice (a variable used in a dead `if (!p) { if (DEBUG) {...} }` counts as used more)
+   and stack size (dead buffers). TW07's PS3 debug build keeps EA's asserts: map where EA asserted
+   in our stuck functions and try the dead-macro form there. First: register-order functions, and
+   the two stack-size misses (UIStudio fn_80166098 frame 0x70 vs our 0x60; Grass Static_Init 0x100
+   vs our 0x110). A dead assert is EA's form (rule 1), not a fake.
+3. Flag audit and fake-match inventory: after 100% (CLAUDE.md), mark only.
+#match-help notes (2026-09-26): per-file flags are unrealistic (per-library is); a per-function
+pragma is a fake match; "fake" = anything a SWE would be unlikely to write; dead-stripped
+functions shift helper order (our StrippedFn stand-ins); `static const` debug flags / dead asserts
+affect codegen (NFSMW, Mario Party, Prime).
+
 **Parked for the owner:**
 - EA names for rcmp_mad_codec (14 functions, 5 globals) and ska_shared (SKAUtil_EulerAnglesToQTs8,
   SKA_LoadFromMem) have two sources each (agents/findings/2026-09-25-mad-names.tsv,

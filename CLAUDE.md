@@ -74,6 +74,12 @@ first"), `docs/style.md` (how the C must read).
   `agents/findings/2026-09-25-mad-names.tsv`) and ska_shared's SKAUtil_EulerAnglesToQTs8 /
   SKA_LoadFromMem (TW07 + 007 EoN: `docs/reference-builds/007eon-ps2`). Log them in
   `config/GW4E69/name_sources.tsv` with `tools/match/rename.py`.
+- **Compiler-flag audit (owner, 2026-09-26; #match-help: real devs set flags per LIBRARY, not per
+  file):** group every per-unit `extra_cflags` in configure.py by library (UIS, LL, hlaud, rcmp,
+  SDK...); flags consistent across a library are EA's; one-file outliers are marked as probable
+  fake matches. Mark only: no match progress is thrown away.
+- **Fake-match inventory:** list every `// fake match:` and every per-function `#pragma` (grep) with
+  its function, for later cleanup/labelling. They stay until a truer EA form is found.
 - **Give matched functions' placeholder locals their real names**: matching lanes may not name
   things, so some exact functions carry letter locals. First: Ball.c Physics_HandleCollision (26
   float locals fE, fF, fG...; TW07's names such as bankAngle, sinPitch, headingAngle are in
