@@ -907,7 +907,7 @@ config.libs = [
             Object(NonMatching, "LLPictInt.c"),
             Object(Matching, "user.c"),
             Object(Matching, "PasswordManager.c"),
-            Object(NonMatching, "Swing.c"),
+            Object(Matching, "Swing.c"),
             Object(Matching, "StateGolfer.c"),
             Object(Matching, "Code8005D2E4.c"),
             Object(Matching, "stateFunc.c"),
