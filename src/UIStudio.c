@@ -633,8 +633,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->p10 += 4;
             break;
         case 0x52:  // swap the top two
-            n = pTop[-1];
-            pTop[-1] = pTop[-2];
+            n = pFrame->pC[-1];
+            pFrame->pC[-1] = pFrame->pC[-2];
             pFrame->pC[-2] = n;
             break;
         case 0x4F:  // clear the screen's event mask
@@ -706,12 +706,12 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             uByte1 = *pFrame->p10;
             pFrame->p10++;
             n = (uByte0 << 8) | uByte1;
-            pArgs = (s32*)(u + pTop[(s16)n]);
+            pArgs = (s32*)(u + pFrame->pC[(s16)n]);
             if (uOp == 0x6B) {
-                *pTop = (s32)pArgs;  // port: a stack word holds the pointer
+                *pFrame->pC = (s32)pArgs;  // port: a stack word holds the pointer
                 pFrame->pC++;
             } else {
-                *pTop = *pArgs;
+                *pFrame->pC = *pArgs;
                 pFrame->pC++;
             }
             break;
