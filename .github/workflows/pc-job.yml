@@ -3,9 +3,11 @@
 #
 #   gh workflow run pc-job.yml -f tool=permute -f unit=hwsBurn -f fn=fn_8011172C -f minutes=360
 #   gh workflow run pc-job.yml -f tool=leversweep                    # --from-report, every near-miss
+#   gh workflow run pc-job.yml -f tool=declsearch -f targets=GoTerrain:fn_80032B7C,UISApi:fn_80169308
 #
 # Results go to a new branch pc-results/<fn>-<run_id>: the permuter's best 5 outputs (diff.txt +
-# score.txt, no source.c), or the sweeper's build/leversweep/ files from this run, plus the log.
+# score.txt, no source.c), the sweeper's build/leversweep/ files from this run, or declsearch's
+# per-function score.txt + diff.txt (declaration lines only), plus the log.
 # The game files are copied from C:/dev/tw2004/orig on the PC and are never committed or uploaded.
 # See docs/workflow.md "Sending a job to the PC".
 name: PC job
@@ -14,9 +16,9 @@ on:
   workflow_dispatch:
     inputs:
       tool:
-        description: permute or leversweep
+        description: permute, leversweep or declsearch (declaration-order search, many functions)
         type: choice
-        options: [permute, leversweep]
+        options: [permute, leversweep, declsearch]
         default: permute
       unit:
         description: unit (e.g. hwsBurn); blank with leversweep and fn blank = --from-report
@@ -24,6 +26,10 @@ on:
         default: ''
       fn:
         description: function (e.g. fn_8011172C); blank with leversweep = --from-report
+        type: string
+        default: ''
+      targets:
+        description: declsearch only, Unit:fn pairs, comma-separated (GoTerrain:fn_80032B7C,UISApi:fn_80169308)
         type: string
         default: ''
       minutes:
@@ -75,6 +81,7 @@ jobs:
       TOOL: ${{ inputs.tool }}
       UNIT: ${{ inputs.unit }}
       FN: ${{ inputs.fn }}
+      TARGETS: ${{ inputs.targets }}
       MINUTES: ${{ inputs.minutes }}
       JOBS: ${{ inputs.jobs }}
       TW_PERMUTER: C:/dev/tools/decomp-permuter/permuter.py
@@ -98,6 +105,10 @@ jobs:
           case "$v" in *[!A-Za-z0-9_]*) echo "unit/fn: letters, digits and _ only"; exit 1;; esac
         done
         case "$JOBS" in ''|*[!0-9]*) echo "jobs must be a whole number"; exit 1;; esac
+        case "$TARGETS" in *[!A-Za-z0-9_:,]*) echo "targets: Unit:fn pairs, commas only"; exit 1;; esac
+        if [ "$TOOL" = declsearch ] && [ -z "$TARGETS" ]; then
+          echo "declsearch needs targets"; exit 1
+        fi
         if [ "$TOOL" = permute ] && { [ -z "$UNIT" ] || [ -z "$FN" ]; }; then
           echo "permute needs unit and fn"; exit 1
         fi
@@ -134,7 +145,10 @@ jobs:
       timeout-minutes: ${{ fromJSON(needs.plan.outputs.step) }}
       run: |
         touch "$RUNNER_TEMP/start"
-        if [ "$TOOL" = permute ]; then
+        if [ "$TOOL" = declsearch ]; then
+          python tools/match/declsearch.py "$TARGETS" --minutes "$MINUTES" -j "$JOBS" \
+              2>&1 | tee "$RUNNER_TEMP/tool.log"
+        elif [ "$TOOL" = permute ]; then
           python tools/match/permute.py "$UNIT" "$FN" --minutes "$MINUTES" -j "$JOBS" --max-jobs "$JOBS" \
               2>&1 | tee "$RUNNER_TEMP/tool.log"
         elif [ -n "$FN" ]; then
@@ -153,6 +167,7 @@ jobs:
         REF: ${{ inputs.ref }}
       run: |
         NAME="${FN:-from-report}"
+        [ "$TOOL" = declsearch ] && NAME=declsearch
         BRANCH="pc-results/$NAME-$RUN_ID"
         RES="$RUNNER_TEMP/res"
         git worktree prune
@@ -171,12 +186,16 @@ jobs:
           tr '\r' '\n' < "build/perm/$FN/permuter.log" 2>/dev/null | grep '^iteration ' | tail -1 \
               > "$RES/results/progress.txt" || true
           echo "$n outputs"
+        elif [ "$TOOL" = declsearch ]; then
+          for f in $(find build/declsearch -type f -newer "$RUNNER_TEMP/start"); do
+            d="$RES/results/$(basename "$(dirname "$f")")"; mkdir -p "$d"; cp "$f" "$d/"
+          done
         else
           find build/leversweep -type f -newer "$RUNNER_TEMP/start" -exec cp {} "$RES/results/" \;
         fi
         cp "$RUNNER_TEMP/tool.log" "$RES/results/" 2>/dev/null || true
-        printf 'tool=%s unit=%s fn=%s minutes=%s jobs=%s ref=%s (%s) outcome=%s\n' \
-            "$TOOL" "$UNIT" "$FN" "$MINUTES" "$JOBS" "$REF" "$(git rev-parse --short HEAD)" \
+        printf 'tool=%s unit=%s fn=%s targets=%s minutes=%s jobs=%s ref=%s (%s) outcome=%s\n' \
+            "$TOOL" "$UNIT" "$FN" "$TARGETS" "$MINUTES" "$JOBS" "$REF" "$(git rev-parse --short HEAD)" \
             "${{ steps.tool.outcome }}" > "$RES/results/run.txt"
         git -C "$RES" add results
         git -C "$RES" -c user.name="github-actions[bot]" \
