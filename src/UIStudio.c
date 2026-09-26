@@ -195,7 +195,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             n2 = *--pFrame->pC;
             pnOffset = (u32*)*--pFrame->pC;
             if (pnOffset != NULL) {
-                pVar = (u8*)pScreen->pData + *pnOffset;
+                // fake match: an integer sum, offset first (EA's add order)
+                pVar = (void*)(*pnOffset + (uptr)pScreen->pData);
             } else {
                 pVar = NULL;
             }
