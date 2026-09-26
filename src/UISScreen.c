@@ -417,7 +417,9 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
             case 'i':
                 nDigits = 0;
                 u = pArgs[nArg++].u;
-                bNeg = !bUnsigned && (s32)u < 0;
+                // fake match: `bUnsigned ^ 1` for !bUnsigned (it is 0 or 1) gives EA's xori, and
+                // `u >> 31` for (s32)u < 0 its srwi.
+                bNeg = (bUnsigned ^ 1) && (u >> 31);
                 u = bNeg ? -u : u;
                 do {
                     aDec[nDigits++] = u + '0' - u / 10 * 10;
