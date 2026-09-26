@@ -30,6 +30,16 @@ unless you combine it with something new. Before you stop, add every attempt und
   optimization_level 3 16, 2 38, optimize_for_size 29; every GC compiler x {-O4,p; -O3,p;
   -O4,s}: 16 at best. The same kept-copy family appears across UIS (see fn_80165670: some of it
   is O3-shaped).
+- 2026-09-26 r6-uis, later (verified mechanism, not a fix): a SECOND definition of pNode/pGroup
+  reaching their uses reproduces EA's whole register picture: `UISNode* pNode = (nKind == 8) ? p :
+  p;` and `UISGroup* pGroup = (nKind == 7) ? p : p;` give p no entry copy at all (the NULL test
+  and the case copies read r7, as EA) and pNode/pGroup their own saved registers; 21 aligned
+  only because the ?: leaves its branch (`bne; mr r30,r7; b; mr r30,r7`) and the loop registers
+  rotate. One side only: 19-20. So EA's pNode/pGroup had a second definition that costs no code;
+  its source form is not found. Also no change (16): the case bodies in `do { } while (0)` /
+  `if (1) { }` / a declare-then-assign block, a local union {void*, UISNode*, UISGroup*}, K&R
+  definition, the body as a static inline worker behind a wrapper (45-53: the recursion inlines).
+  Library-wide flag sweep: agents/findings/2026-09-26-uis-library-flags.md.
 
 - 2026-09-25 n-uisscreen: (scores are aligned diff counts from the WHOLE unit compiled: base.c from perm_setup drops the auto-inlined callees, e.g. fn_8016C6C4 inside fn_8016B4D4). EA keeps p in r7 and copies it per case (not coalesced, same as fn_8016AD54, fn_8016AEEC's bLast, fn_8016B4D4's nScreens, fn_8016A2D4's uEvent: one cause suspected). Tried: explicit casts, `void* const p`, split declaration/assignment, case 8 body as a static inline helper (118: the recursion inlines), if/else chain (22), nKind int: all 16 or worse. GC 1.3.2-2.7: identical; 1.2.5n/3.0: worse; -O4/-O3/-O2/-O4,s: worse; -opt nocse/nopeephole/nopropagation: worse.
 - 2026-09-25 n-uisscreen, more: p typed u32/s32/int/unsigned int/char*/u8*/UISNode* (header, casts at the calls and in the cases): all 16.

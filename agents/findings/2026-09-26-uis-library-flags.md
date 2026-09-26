@@ -56,6 +56,8 @@ Each set below is the library set plus one change (exact / weighted, functions l
 | GC 1.3.2 / 2.0 / 2.6 / 2.7 | 33 | 96.8146 | identical |
 | GC 2.0p1 | 30 | 96.20 | |
 | GC 3.0a3 | 10 | 71.57 | |
+| GC 1.3 | 26 | 92.60 | |
+| GC 1.0 / 1.1 / 1.2.5 | 11 | 70.10-70.13 | |
 
 ## What the kept copies are (mwcc-debugger)
 
