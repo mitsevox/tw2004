@@ -164,17 +164,17 @@ void fn_8010A788(f32* pIn, f32* pOut, f32 (*pMtx)[3], s32 nMode) {
 // round and the block's 2-bit indices are remapped to match.
 void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
     u8* pPixels = pBuf + pObj->aBlocks[0].nOffset;
-    u16* pBlock = (u16*)pPixels;
     int y;
     int x;
+    u8 bThree;
     f32 aIn[3];
     f32 aOut[3];
     u16 uOld0;
     u16 uOld1;
+    u16* pBlock = (u16*)pPixels;
     u16 uNew0;
     u16 uNew1;
     u8 bSwap;
-    u8 bThree;
     int nShift;
     u8 uIndices;
     int i;
