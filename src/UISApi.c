@@ -637,11 +637,11 @@ s32 fn_80169DC4(UISScreenFile* pFile) {
 // handler) runs.
 void fn_8016A030(UIStudio* pStudio, u32 uMs) {
     u32 i;
-    u32 n;
-    UISRateFn* pRate;
     UISScreen* pScreen;
     UISWordStack* pStack;
     s32 nLeft;
+    u32 n;
+    UISRateFn* pRate;
     s32 nArgs;
     u8* pScript;
     f32 fScale;
