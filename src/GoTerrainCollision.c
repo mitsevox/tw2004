@@ -286,6 +286,19 @@ f32 fn_8004B78C(CourseInfo* pCourse, f32* pPos) {
     return 1.0f;
 }
 
+// fake match: the first grid column goes through an inline with a local; written out, the compiler
+// moves the conversion into the column loop instead of storing the start before it as EA does.
+// It calls fn_80035074 itself: through Ter_Floor the registers drift further.
+static inline int fn_8004B89C_Calc(f32 fCells) {
+    int n = (int)fn_80035074(fCells);
+    return n;
+}
+
+// fake match: an identity read; gives EA's register choices around fWide.
+static inline f32 fn_8004B89C_Read(f32 f) {
+    return f;
+}
+
 // TW06: bool Ter_CheckObjectAndHazardObstruction(f32*, f32, bool, bool, f32, bool, f32). Whether
 // something spoils a spot for a ball. Checked at the spot and at four corners fStep away in x and
 // z, against the highest ground at most 2 x fStep above the spot: an object (with bModels, only
@@ -296,6 +309,8 @@ f32 fn_8004B78C(CourseInfo* pCourse, f32* pPos) {
 // than fStep x fMaxSlope above or below the spot.
 u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bHazards, f32 fStep, u8 bSlope,
                                        f32 fMaxSlope) {
+    int j;
+    TerCell* pCell;
     f32 aHeight[5];
     TerPolyRef* apRef[5];
     f32 vPos[4];
@@ -324,15 +339,15 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
     int nMaxX;
     int nMaxZ;
     int nX;
+    int nMinX;
     int nZ;
     int i;
-    int j;
     int k;
     int n;
     int nCorner;
+    int nInner;
     TerPolyRef* pRef;
     u16* pObjRef;
-    TerCell* pCell;
     f32 (*pVert)[3];
     u8* pFlags;
     u8 uFlags;
@@ -352,12 +367,12 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
     fMinZ = pPos[2] - (fRadius <= fStep ? fStep : fRadius);
     fMaxZ = pPos[2] + (fRadius <= fStep ? fStep : fRadius);
     fTop = pPos[1] + 2.0f * fStep;
-    nX = (int)Ter_Floor((fMinX - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nMinX = fn_8004B89C_Calc((fMinX - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
     nMinZ = (int)Ter_Floor((fMinZ - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
     nMaxX = (int)Ter_Floor((fMaxX - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
     nMaxZ = (int)Ter_Floor((fMaxZ - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
-    fWide = 0.5f + fRadius;
-    for (; nX <= nMaxX; nX++) {
+    fWide = fn_8004B89C_Read(0.5f + fRadius);
+    for (nX = nMinX; nX <= nMaxX; nX++) {
         for (nZ = nMinZ; nZ <= nMaxZ; nZ++) {
             if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
                 pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
@@ -385,8 +400,8 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
                     if (pRef->n2 != 0) {
                         pRef++;
                     } else {
-                        pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
                         pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
+                        pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
                         for (j = pRef->nTris - 1; j >= 0; j--) {
                             uFlags = pFlags[2];
                             if (bFirst) {
@@ -407,7 +422,7 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
                             vPos[0] = pPos[0] - fStep;
                             for (nCorner = 0; nCorner < 2; nCorner++) {
                                 vPos[2] = pPos[2] - fStep;
-                                for (i = 0; i < 2; i++) {
+                                for (nInner = 0; nInner < 2; nInner++) {
                                     if (bFirst) {
                                         abFreeDrop[k] = Ter_PointInFreeDropNetwork(vPos);
                                     }
