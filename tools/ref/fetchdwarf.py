@@ -6,7 +6,7 @@
 everything extracted from it stay in --store (game data never enters git or the results). What is
 written to --out, for committing: cus.txt (every compilation unit's source path and code range),
 hits.txt (the units and lines naming the KEYWORDS), and cu/<file>.txt: dtk's DWARF dump of each unit
-whose path names a keyword or whose file name is one of our src/ units' (function signatures, locals, types: the same kind of evidence as
+whose path names a keyword or whose file name is one of our src/ units (function signatures, locals, types: the same kind of evidence as
 docs/reference-builds/tw07-ps3/cu/). Needs py7zr (pip) for .7z archives."""
 import pathlib, re, subprocess, sys, urllib.parse, urllib.request
 
