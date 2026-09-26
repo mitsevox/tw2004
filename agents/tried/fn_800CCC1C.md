@@ -1,6 +1,6 @@
 # fn_800CCC1C (SkinPart.c, 0x800CCC1C)
 
-Status: OPEN, 92.75% on 2026-09-25.
+Status: SOLVED 2026-09-26 (r4-charskin, d1336d3): the four copies stored in a loop `for (i = 0; i != 4; i++)` (the unrolled loop gives EA's addi r0,ptr,off; stwx; `i < 4`, `i <= 3` and `4U` unroll to the add + stw form: 12).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -32,3 +32,5 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 Nothing recorded.
 - 2026-09-26 round 3 (r3-charskin; written by the orchestrator from the lane report, the disk was full): same forms as fn_800CCB08: best 10; EA's addi r0,ptr,4; stwx never came out.
+- 2026-09-26 r4-charskin: the copies as a loop: `i < 4` 12, `i <= 3` 12, `i < 4U` 12, counting down `i = 3; i >= 0` 8 (EA's form, stores reversed), `aParts[3 - i]` 25, `i = 4; i > 0; aParts[i - 1]` 8, do/while 17, `i != 4`: 0 (exact).
+- 2026-09-26 r4-charskin (after the owner's EA-form rule): integer address math for the four stores (`*(s32*)((u32)p + 4 + nPart * 8)`, `+ nPart * 8 + 4` 10, the nOption field address in u32/int, `sizeof` spellings, `((s32*)((u32)p + 4))[nPart * 2]`): 10-12; only the loop gives EA's code.
