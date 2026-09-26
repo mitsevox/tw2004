@@ -476,6 +476,29 @@ They will be sorted into the sections below.
 - Other compiler versions (GC 2.0, 2.0p1, 2.6, 2.7, 1.3.2) gave output identical to 2.5 on 18 near-miss
   functions tried today: not a lever for these.
 
+### New from the evening push (2026-09-25)
+
+- **[verified] EA's late parameter copy (`mr r0,r3 ... mr rN,r0`): copy the parameter into a local
+  through `void*`**: `Character* pChar = (Character*)(void*)pArg;`. A plain copy or a same-type cast
+  is coalesced back into the parameter; the `void*` detour survives. Where the copy is declared
+  matters. char fn_80019DE8 22 -> 0, fn_80019EF4 23 -> 0, fn_8001A14C 21 -> 0 diffs.
+- **[verified] Write index loops, not pointer walks**: EA's pointer registers come from CodeWarrior
+  strength-reducing `p[i]`. LLFont fn_80011D0C 7 -> 0 (`pLine[n]` instead of a `pCut` walk),
+  LLDynTex fn_8010A930 123 -> 105 (`pIndices[i]`).
+- **[verified] One local per job**: reusing a counter or pointer for a second job merges registers
+  EA kept apart. SkinPart fn_800CE660 9 -> 0 (new `v`/`m` loop counters), char
+  Character_PlaceFeetOnGround 3 -> 0 (an `fH` local), UISApi fn_80168FC8 7 -> 0.
+- **[verified] The opposite also happens: route subexpressions through EXISTING multiply-assigned
+  locals**; fresh single-assignment locals are copied back into the expression and change nothing.
+  TerrainData fn_8000C278 4 -> 0; Ball Physics_HandleCollision 92 -> 31 aligned diffs.
+- **[verified] Random declaration orders followed by a move/swap climb** find gains that greedy climbs
+  record as "none": GoShaderObject_Particle fn_80094B84 130 -> 10 (then 0 with a `pAge` local).
+- **[verified] A string pool in `.rodata`** needs `-str reuse,readonly` on the unit (UISEvent: its
+  strings sat 0x28 off, behind the switch tables in `.data`).
+- **[observed] Ball Physics_HandleCollision keeps one register per float variable for the whole
+  function**, which `#pragma opt_lifetimes off` reproduces (171 -> 22 aligned); not kept (objdiff
+  lower), a lead for the plain-C shape.
+
 ### Loops and unrolling
 
 - **[verified] Two tests on players n and n + 1 can be a two-pass loop.** When the second
