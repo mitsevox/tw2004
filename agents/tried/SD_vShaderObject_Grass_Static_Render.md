@@ -68,3 +68,4 @@ base 74, 699 levers, 42608 variants (699 singles) in 360 s; best 55
 Nothing recorded.
 - 2026-09-26 round 3 (r3-render; written by the orchestrator from the lane report, the disk was full): 1500 random declaration orders + climb: no gain (41).
 - 2026-09-26 PC declsearch (run 36221888505, iterated local search over the declaration order): queued but given no time (a scheduling bug, fixed); not searched.
+- 2026-09-26 PC declsearch run 2 (36235241920, fair time slices): best 2 aligned (base), 9455 trials.

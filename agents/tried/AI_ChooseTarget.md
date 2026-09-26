@@ -130,3 +130,4 @@ Golfer AI_ChooseTarget 92.8 -> 97.0 (committed):
 UStream_Update exact). The other 13 "matches" (Earnings x2, Golfer AI_ChooseTarget, TerrainData,
 ```
 - 2026-09-26 PC declsearch (run 36221888505, iterated local search over the declaration order): queued but given no time (a scheduling bug, fixed); not searched.
+- 2026-09-26 PC declsearch run 2 (36235241920, fair time slices): best 91 aligned (new order), 6588 trials. Applied: real 98.53 -> 98.66%.
