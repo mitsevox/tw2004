@@ -292,8 +292,8 @@ void GR_BuildGridRenderData(s32 nView) {
     fHole = -65536.125f;
     nGapEdge = -1;
     for (n = 0; n < lbl_802813C0->nCols * lbl_802813C0->anRows[nView]; n++) {
-        nCol = n / lbl_802813C0->anRows[nView];
         nRow = n % lbl_802813C0->anRows[nView];
+        nCol = n / lbl_802813C0->anRows[nView];
         fAcross = nCol * lbl_802813C0->fCellW;
         fAlong = nRow * lbl_802813C0->fCellD;
         fHeight = lbl_802813C0->apHeight[nView][nCol + nRow * lbl_802813C0->nCols];
