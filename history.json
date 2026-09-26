@@ -40597,5 +40597,21 @@
 "matched_functions": 7555,
 "total_functions": 7647,
 "exact": 7555
+},
+{
+"commit": "6aad156",
+"sha": "6aad156561ff497e6a562e5c72b5c9408b6b65d8",
+"time": 1790393391,
+"subject": "Remove unsorted/sweep_8006F608.c and sweep_8006F64C.c (now in Code8006F608.c)",
+"report": true,
+"matched_code": 1459892,
+"complete_code": 1165216,
+"matched_data": 703495,
+"complete_data": 847427,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7555,
+"total_functions": 7647,
+"exact": 7555
 }
 ]
