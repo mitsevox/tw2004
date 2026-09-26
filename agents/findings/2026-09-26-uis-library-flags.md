@@ -77,6 +77,19 @@ Each set below is the library set plus one change (exact / weighted, functions l
   r72,uA; mr r74,uB` into the preheader and only O4 has a copy-prop pass after load-deletion to
   fold them; at O3 the whole UISEvent_NoneWaiting loop matches EA.
 
+- A second definition is enough to rebuild EA's picture in fn_8016ABBC: `UISNode* pNode = (nKind ==
+  8) ? p : p;` and the same for pGroup leave p in r7 with no entry copy (as EA) and pNode/pGroup in
+  their own saved registers; only the ?:'s own branch and a loop-register rotation remain (21).
+  EA's asm has no such branch, so its second definition (if that is what it is) costs no code.
+- Near-misses that read as the same family (a parameter or call-result copy EA keeps and we
+  propagate): fn_80165B90 (EA extends nB before nA: nA's entry copy kept would delay its extsh),
+  fn_80168F5C / fn_801694A0 (uScreen's `mr r0,r5` / `mr r8,r5`), fn_8016C6C4 / fn_8016C614 (the
+  last parameter's mask after `li i`), fn_80165670 (`mr r25,r4`), fn_80169858 (`mr r0,r3; mr
+  r25,r0`), fn_8016AD54 (`mr r0,r3; cmpwi r0,-1`), fn_8016ABBC / fn_8016AD54 / fn_8016B4D4 /
+  fn_8016AEEC / fn_8016A2D4 (the per-case copies). `-pragma "register_coloring off"` and unknown
+  `-opt` keywords are accepted and change nothing; `-opt [no]prop` is the only switch and it
+  covers constant AND copy propagation (EA's code clearly has constant propagation).
+
 ## Source forms tried for the copy (all no change, quicktrial aligned)
 
 fn_8016ABBC (16): case body in `do { ... } while (0)`, in `if (1) { }`, a block with the copy
@@ -85,6 +98,16 @@ struct; a 1-element array; `void** ppv = &p`; `(u8*)p + 0`; `&((UISNode*)p)[0]`;
 `register` p; the body in a static inline worker called by a thin wrapper (the recursion inlines
 into it: 45-53). fn_8016AD54 (38): the result compare through `if ((n = f()) != -1)`, a
 block-local, a second local, reversed compare, casts.
+
+## New lever (verified): a dead value that lives until register allocation
+
+UISEvent fn_80165B90 99.64 -> 100 (commit "fn_80165B90 exact"): passing `(s64)nArgs` to the
+inline's s32 parameter leaves the high word's `srawi rX,rN,31` in the code; no pass before
+register allocation deletes it (the post-regalloc peephole does), so it occupies a register during
+allocation, the nA/nB extsh temps get different registers and the final scheduler emits them in
+EA's order. Found by the permuter (15 variants, all a 64-bit round trip on nType or nArgs).
+Logic unchanged (s32 -> s64 -> s32), labelled fake match. A sweep wrapping every rvalue
+identifier in `(s64)` found nothing in ten other UIS/uiProcessInterface near-misses.
 
 ## Not found
 
