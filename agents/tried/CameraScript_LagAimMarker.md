@@ -78,3 +78,9 @@ base 11, 223 levers, 37830 variants (223 singles) in 352 s; best 11
 fn_800D477C/fn_800D4F14, gocamscripts CameraScript_LagAimMarker/fn_8003F2E0.
 ```
 - 2026-09-26 PC declsearch (run 36221888505, iterated local search over the declaration order): best 11 (no better order than the current one), 11468 trials.
+- 2026-09-26 r5-world (mwcc-debugger): the float variables are all above 28 neighbours; priority
+  fDiv, fMin (33 nb), fOldY, fDist, fYShare, fMinDist. fMin goes second and takes f30, so
+  fMinDist falls to f27 and fAimY to f26. EA's colouring (fMin f26 after fAimY f27, fMinDist f30)
+  needs fMin at a low priority: 28 or fewer neighbours (5 fewer: 14 volatile regs + fMinDist,
+  fYShare, fAimY, fOldY, fDiv + 14 temps f55-f76 of its `*=` chain, the three zero tests and
+  the vDir[1] expression). Not tried further this round.

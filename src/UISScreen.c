@@ -10,7 +10,7 @@
 #include "frontend/uistudio.h"
 
 void fn_8016B188(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent,
-                 s32 nArgs, const s32* pArgs);
+                 s32 nArgs, s32* pArgs);
 char* fn_8016BEDC(char* pOut, char* pEnd, s32 nWidth, s32 nPrec, f32 f);
 
 // Whether one of pNode's groups links to the node pInfo belongs to.
@@ -151,7 +151,7 @@ u8* fn_8016C5C4(UISNode* pNode, u32 uEvent) {
 // info and a 0) and runs pScript on it. The frame stays on the stack only when the script
 // returns 3 (it paused).
 s32 fn_8016C270(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UISWordStack* pStack, u8* pScript,
-               s32 nArgs, const s32* pArgs, u32 nArgs2, const s32* pArgs2, u8 bExtra, s32 nExtra,
+               s32 nArgs, s32* pArgs, u32 nArgs2, const s32* pArgs2, u8 bExtra, s32 nExtra,
                s32* pnSaved) {
     s32* pFrame;
     u32 i;
@@ -552,7 +552,7 @@ void fn_8016B4D4(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 nMove) {
 // Runs the 0x4000 handlers for an event of node nNode and of every node it links to, the linked
 // nodes first.
 void fn_8016B188(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent,
-                 s32 nArgs, const s32* pArgs) {
+                 s32 nArgs, s32* pArgs) {
     UISNode* pNode;
     u32 i;
     u8* pScript;
@@ -573,7 +573,7 @@ void fn_8016B188(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u3
     }
 }
 
-void fn_8016B0F8(UIStudio* pStudio, u32 uEvent, s32 nArgs, const s32* pArgs) {
+void fn_8016B0F8(UIStudio* pStudio, u32 uEvent, s32 nArgs, s32* pArgs) {
     u32 i;
     u32 nScreens = pStudio->nScreens;
     for (i = 0; i < nScreens; i++) {
@@ -586,7 +586,7 @@ void fn_8016B0F8(UIStudio* pStudio, u32 uEvent, s32 nArgs, const s32* pArgs) {
 
 // Send an event to every screen. While the studio is busy (flag 2: sending an event; 4: running
 // its rate functions), it is queued on the event stack instead.
-void fn_8016B09C(UIStudio* pStudio, u32 uEvent, s32 nArgs, const s32* pArgs) {
+void fn_8016B09C(UIStudio* pStudio, u32 uEvent, s32 nArgs, s32* pArgs) {
     UISEventData data;
     if ((pStudio->uFlags & 2) || (pStudio->uFlags & 4)) {
         data.au[0] = uEvent;
@@ -810,7 +810,7 @@ void fn_8016A510(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
 // A linked node that answers with 1 gets the handler this node has for it. Returns 2 as soon as a
 // handler returns 2.
 s32 fn_8016A2D4(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent, u32 n5,
-                s32 nArgs, const s32* pArgs, u8* pbOut) {
+                s32 nArgs, s32* pArgs, u8* pbOut) {
     s32 nResult;
     u32 i;
     UISNode* pNode;

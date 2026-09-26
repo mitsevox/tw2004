@@ -327,6 +327,8 @@ void fn_800E8A68(void) {
                         nSum += lbl_80200538.aStrokePrize[nRating2].nBase;
                         nMoney = nSum + lbl_80200538.aStrokePrize[nRating1].nPerStroke * nMargin;
                         nMoney += lbl_80200538.aStrokePrize[nRating2].nPerStroke * nMargin;
+                        // fake match: nOurs (dead here) holds the base prize; TW07 has its own
+                        // baseearned local, but a separate local puts it in another register
                         nOurs = nSum / 2;
                         nMoney /= 2;
                         for (i = 0; i < 2; i++) {

@@ -1,6 +1,8 @@
 # SW_vImpact (Swing.c, 0x8005AEE0)
 
-Status: OPEN, 99.81% on 2026-09-25.
+Status: SOLVED 2026-09-26 (r5-game): no pLaunchA/pLaunchB locals; both calls and
+Physics_ShotImpact take `gPlayers[nPlayer].vLaunchA` / `.vLaunchB` directly (the frontend CSEs
+them into its own temps, numbered above the shot-power temp @374). No fake match.
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -157,3 +159,11 @@ Swing SW_vImpact: all-gPlayers / all-p / PLAYER() / p = gPlayers; p += n / p set
   gPlayers + nPlayer: none.
 ```
 - 2026-09-26 PC declsearch (run 36221888505, iterated local search over the declaration order): best 6 (no better order than the current one), 4792663213 trials.
+- 2026-09-26, r5-game (mwcc-debugger): the dump showed every pointer added in one sweep in vreg
+  order: `@370 r43, @371 r42, @374 r40 (shot-power address, frontend CSE temp), pLaunchA r39,
+  pLaunchB r38` -> r31..r27, while EA needs pLaunchB r29, pLaunchA r28, @374 r27. Frontend temps
+  are numbered above all locals, so no declaration order can put the locals above @374. A local
+  `f32* pPower` declared after pLaunchB/pLaunchA gives EA's registers (r27/r29) but changes the
+  address code (88). Dropping the pLaunchA and pLaunchB locals and writing
+  `gPlayers[nPlayer].vLaunchA/B` at each use: 6 -> 0 (only B dropped 6, only A 9; `p->vLaunchA/B`
+  spellings 84-128). EXACT.

@@ -21,6 +21,10 @@ unless you combine it with something new. Before you stop, add every attempt und
   parameter, for EA's `mr r30,r27`), or both as static inline helpers with fn_8016AEEC itself under
   `#pragma auto_inline off` so the recursion cannot inline into them: 41 / 52 / 52 (110 / 144 / 144
   without the pragma). `register u8 bLast` 25. See fn_8016AD54 for the shared copy problem.
+- 2026-09-26 r5-uisscreen, mwcc-debugger: `r56 -> r31 !EA r27 49 nb @853` = bLast (the identity
+  inline's value, skipped to level 2 by its 49 neighbours). EA computes nMsg == -1 into r27 before loop 1
+  and copies it (`mr r30,r27`) at loop 2's start, stores r30: the same kept-copy shape as fn_8016B4D4 /
+  fn_8016AD54 (see there); our build folds the copy.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 

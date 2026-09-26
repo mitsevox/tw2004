@@ -38,6 +38,13 @@ unless you combine it with something new. Before you stop, add every attempt und
   `nChannels * sizeof(StreamChunk)`, `sizeof(StreamChunk) * nChannels`, `(u32)nChannels << 15`,
   `* 0x8000`: all 2; `uLen >= cap` 4; the read length as a ternary argument of fn_800AB4C0 81, with
   offset/buffer as call arguments 19. Permuter candidate (pure scheduling of two loads/shift).
+- 2026-09-26 r5-uisscreen, mwcc-debugger: the pre-final-schedule order of the read-length block
+  (backend-19) is EA's final order exactly (lbz nChannels, lwz 0x64, lwz 0x70, rlwinm, lwz 0x80, ...);
+  our post-RA scheduler then moves the rlwinm above lwz 0x70 (it carries the WAR on r0 into lwz r0,0x80 ->
+  subf -> cmpl), EA's did not. Same registers on both sides, so the DAG we give the last scheduler matches
+  EA's except for something invisible here. Unit flags (-proc 750/603e/generic, -O2/-O3/-O4,s,
+  -opt noschedule/nopeephole, -inline auto, -fp_contract off): 2 or much worse.
+- 2026-09-26 r5-uisscreen: permuter 15 min -j2 (8991 iterations): nothing below the base.
 
 ## Collected from the notes and docs (2026-09-25)
 
