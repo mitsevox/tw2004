@@ -546,9 +546,10 @@ static inline void* UISFile_Fix(UISScreenFile* pFile, void* p) {
 // Fixes up a UI file the first time it is seen: every offset in it becomes a pointer, and each
 // link word names its pEntriesC entry by pointer (0 when out of range). Returns 1, or -1 when the
 // file was already fixed up (its node table then lies after its start).
-// fake match: the file's address is taken into an integer local before each loop (int or long,
-// one per kind of fix) and the last three loops have their own counters, for EA's hoisted copies.
-// port: the fixes add 32-bit offsets to the file's address held in an int or long.
+// fake match: the file's address is taken into an integer local before each loop (int, and
+// unsigned int for the node loop's entry and handler fixes) and the last three loops have
+// their own counters, for EA's hoisted copies.
+// port: the fixes add 32-bit offsets to the file's address held in an int.
 s32 fn_80169DC4(UISScreenFile* pFile) {
     u32 i;
     u32 j;
@@ -558,11 +559,11 @@ s32 fn_80169DC4(UISScreenFile* pFile) {
     UISEntry* pEntry;
     u32* pLink;
     int nBase1;
-    long nBase2;
-    int nBase3;
+    unsigned int nBase2;
+    unsigned int nBase3;
     int nBase4;
-    long nBase5;
-    long nBase6;
+    int nBase5;
+    int nBase6;
     u32 i1;
     u32 i2;
     u32 i3;
@@ -570,8 +571,8 @@ s32 fn_80169DC4(UISScreenFile* pFile) {
     if ((u8*)pFile->pNodes < (u8*)pFile) {
         pFile->pNodes = (UISNode*)UISFile_Fix(pFile, pFile->pNodes);
         nBase1 = (int)pFile;
-        nBase2 = (long)pFile;
-        nBase3 = (int)pFile;
+        nBase2 = (unsigned int)pFile;
+        nBase3 = (unsigned int)pFile;
         for (i = 0; i < pFile->nNodes; i++) {
             pNode = &pFile->pNodes[i];
             pNode->pInfo = (UISNodeInfo*)(nBase1 + (u32)pNode->pInfo);
@@ -606,7 +607,7 @@ s32 fn_80169DC4(UISScreenFile* pFile) {
             pFile->pEntriesC[i1].p8 = (void*)(nBase4 + (u32)pFile->pEntriesC[i1].p8);
         }
         pFile->pLinks = (u32*)UISFile_Fix(pFile, pFile->pLinks);
-        nBase5 = (long)pFile;
+        nBase5 = (int)pFile;
         i2 = pFile->nLinks;
         while (i2-- != 0) {
             pLink = (u32*)(nBase5 + pFile->pLinks[i2]);
@@ -617,7 +618,7 @@ s32 fn_80169DC4(UISScreenFile* pFile) {
             }
         }
         pFile->pStart = (UISEntry*)UISFile_Fix(pFile, pFile->pStart);
-        nBase6 = (long)pFile;
+        nBase6 = (int)pFile;
         i3 = pFile->nStart;
         while (i3-- != 0) {
             if (pFile->pStart[i3].u4.pnOffset != NULL) {
