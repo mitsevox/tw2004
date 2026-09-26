@@ -5,11 +5,12 @@ How the C in `src/` is written. Matching decides *what* the compiler must produc
 decides how the source reads, so every unit looks like one author wrote it. Model files:
 `src/GameTargets.c` and `src/GameModeReplay.c`.
 
-The goal is source that can be ported to PC and modded. The byte match proves the C is right; it
-is not the goal. So the C must mean what the original did, on any compiler: prototypes that match
-their definitions, no undefined behaviour, real fields and types instead of offsets, pointers kept
-as pointers, sizes written as `sizeof`, and one shared definition of shared data (see
-"Portability").
+The goal is EA's code exactly as EA wrote it (owner, 2026-09-26); a PC port starts from that code
+later. EA's form comes first, including its 32-bit habits (pointers in `int`, literal sizes, type
+puns): those get a `// port:` note, never a rewrite. A fake match is only the fallback when EA's
+form can't be found, and it never changes the logic. The C must mean what the original did:
+prototypes that match their definitions, real fields where EA had fields, and one shared
+definition of shared data (see "Port hazards").
 
 `python tools/match/lint.py <files>` checks the mechanical rules below, and compiles each file
 with the game's compiler to catch two kinds of undefined behaviour (see "Odd code vs wrong
@@ -172,18 +173,19 @@ problem; the current compiler producing the right bytes does not make the C righ
 When the original itself has the bug (the bytes prove EA wrote it), keep it, since the match
 requires it, and say so: `// EA bug: reads nC38 of player 5, one past the last player`.
 
-Portability
------------
+Port hazards
+------------
 
-A port rebuilds this C with another compiler, likely 64-bit and little-endian. `lint.py` flags
-the patterns that break there:
+A port will rebuild this C with another compiler, likely 64-bit and little-endian. The decomp does
+NOT write around that: EA's form wins (owner, 2026-09-26). `lint.py` prints these as notes for the
+port (they never block a merge); `// port: <what>` on the line or the line before records a known
+one:
 
-- `port-ptr-int`: a pointer cast to an integer (`(int)pBall`). Keep pointers as pointer types;
-  a handle that is really a pointer gets the pointer's type.
-- `port-literal-size`: a copy or clear whose size is a number (`Mem_cpy(a, b, 0xBC)`). Write
-  `sizeof(Ball)`: the size of a struct holding pointers changes on a 64-bit machine.
-- `port-frame-rate`: the frame rate as a bare number (`59.94f`). Use `FRAME_RATE` or `FRAME_TIME`
-  (engine.h); CodeWarrior folds `1.0f / FRAME_RATE` to the same constant as `0.016683351f`.
+- `port-ptr-int`: a pointer cast to an integer (`(int)pFile + offset`). Keep it when EA did it.
+- `port-literal-size`: a copy or clear whose size is a number (`Mem_cpy(a, b, 0xBC)`). `sizeof` is
+  fine when it gives the same code; a literal is fine when that's what matches.
+- `port-frame-rate`: the frame rate as a bare number (`59.94f`). `FRAME_RATE` / `FRAME_TIME`
+  (engine.h) fold to the same constant.
 - `port-asm-no-fallback`: CodeWarrior-only code with no plain-C version. An `asm` function sits
   under `#ifdef __MWERKS__` with an `#else` that computes the same result in C (marked untested
   until a port runs it; the asm body stays as it is). A compiler intrinsic (`__cntlzw`) needs a C
@@ -193,8 +195,8 @@ The base types and the platform layer:
 
 - `game_types.h`: for the GameCube build `s32`/`u32` stay `long` (CodeWarrior treats `int` and
   `long` differently, and some functions only match with `long`); a port defines `TW_PORT` and gets
-  `<stdint.h>` types. `uptr` is an integer as wide as a pointer: use it, not `u32`, for address
-  arithmetic (alignment, an offset stored in a pointer field), e.g. `(uptr)p & 15`.
+  `<stdint.h>` types. `uptr` is an integer as wide as a pointer, available for address arithmetic,
+  but EA's own integer type (`int`, `long`, `u32`) comes first when it is what EA wrote.
 - `platform.h` (included by engine.h): the C library prototypes, declared once (a port gets the
   standard headers instead), and `LAYOUT_ASSERT(Type, size)`, a zero-code size check. Every shared
   struct with a proven size gets one after its definition. The sizes are the GameCube's 32-bit
