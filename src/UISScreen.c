@@ -151,7 +151,7 @@ s8 fn_8016C270(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UISWor
                s32* pnSaved) {
     s32* pFrame;
     u32 i;
-    s8 nResult;
+    s32 nResult;
 
     pFrame = pStack->pC;
     if (pnSaved == NULL) {
