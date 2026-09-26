@@ -1381,11 +1381,13 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
     f32 vAim[4];
     f32 fFrames;
     f32 fDiv;
-    f32 fMin;
-    f32 fOldY;
     f32 fDist;
-    f32 fAngle;
+    f32 fOldY;
     f32 fAimY;
+    f32 fAngle;
+    f32 fMin;
+    f32 fA;
+    f32 fB;
 
     fFrames = 0.0f;
     if (0.0f != gSession.fFrameTime) {
@@ -1404,10 +1406,12 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
         }
         fn_80045428(vGoal, pCam, vDir);
         fMin = lbl_80281F78->fF0;
-        fMin *= 1.0f / fn_8001EFFC((u8*)fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])));
+        fB = 1.0f / fn_8001EFFC((u8*)fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])));
+        fMin *= fB;
         fMin *= -vDir[1];
         vDir[1] = 0.0f;
-        if ((f32)fn_80009680(fn_80009744(vDir)) < fMin && bClose) {
+        fA = fn_80009680(fn_80009744(vDir));
+        if (fA < fMin && bClose) {
             if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
                 fn_800BAF04(vDir, vDir);
             }
