@@ -23,8 +23,36 @@ void fn_80168C24(UIStudio* pStudio, s32 nTicks) {
 
 // Sends event uEvent to the current screen, or to every screen when bAll is set. Event -8 skips
 // a screen that is being unloaded.
+// fake match: UIStudio_Send's body written out, with cast copies of n, b and p (EA copies those
+// three at the top and uEvent late; the inline copies uEvent at the top).
 void fn_80168CD8(UIStudio* pStudio, UISWordStack* pStack, u32 uEvent, s32 n, s32 b, void* p, u8 bAll) {
-    UIStudio_Send(pStudio, pStack, uEvent, n, b, p, bAll);
+    u32 i;
+    u32 nEnd;
+    UISScreen* pScreen;
+    u8 bOut;
+    void* pCopy;
+    s32 bCopy;
+    u32 nCopy;
+
+    pCopy = (void*)p;
+    bCopy = (s32)b;
+    nCopy = (u32)n;
+    if (bAll) {
+        nEnd = pStudio->nScreens;
+        i = 0;
+    } else {
+        i = pStudio->nCurScreen;
+        nEnd = i + 1;
+        if (i == -1) return;
+    }
+    for (; i < nEnd; i++) {
+        pScreen = &pStudio->pScreens[i];
+        if (nCopy != -8 || pScreen->bUnloading != 1) {
+            bOut = 0;
+            // fake match: the (int) cast gives uEvent its late copy
+            fn_8016A2D4(pStudio, pScreen, pStack, 0, (int)uEvent, nCopy, bCopy, pCopy, &bOut);
+        }
+    }
 }
 
 // Runs the queued events, makes the screen named by the last p60 record current, then sends
@@ -188,13 +216,17 @@ u8 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
 // Called before a screen is unloaded. If the last p60 record names the screen, it is dropped:
 // the screen it holds becomes current, and its paused script runs on with n on the top of its
 // stack. Returns 0 when an older record names the screen, or holds it: it cannot go yet.
-u8 fn_80169308(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
+// fake match: pStudio is a cast copy of the parameter, declared before pFrame and p1C (the register
+// order: EA keeps pStudio above them)
+u8 fn_80169308(UIStudio* pStudioArg, u16 uGroup, u16 uScreen, s32 n) {
     s32 i;
     UISRecord60* pRec;
     UISScreen* pScreen;
-    s32* p1C;
+    UIStudio* pStudio;
     UISFrame* pFrame;
+    s32* p1C;
 
+    pStudio = (UIStudio*)pStudioArg;
     i = pStudio->n5C;
     if (i > 0) {
         pRec = &pStudio->p60[i - 1];

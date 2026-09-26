@@ -62,8 +62,9 @@ added its attempts to the ledger files of the functions it worked on, and that s
   it over; update the file (a dated UPDATE section on top) when plans change.
 - **Merging their branches**: read the diff, then `git branch -f agent/<name> origin/<branch>` and
   `python tools/agents/merge.py <name>`. Check what the gates cannot: fake-match labels, logic kept,
-  portability (a pointer in an `int`/`u32` breaks the 64-bit port: `uptr`), no pasted asm (the asm
-  gate refuses it). If two branches solved the same function, keep the cleaner C.
+  EA's form preferred over a fake (portability is not a reason to change EA-style C: a `// port:`
+  note instead), no pasted asm (the asm gate refuses it). If two branches solved the same function,
+  keep the one closer to how EA wrote it.
 - **Heavy jobs** (long permuter or sweeper runs) go to the owner's PC runner:
   `docs/infrastructure.md` "Heavy jobs". Read the `pc-results/` branch, apply a hit by hand.
 - After merging, clean up with the branch-cleanup workflow (`docs/infrastructure.md`).
