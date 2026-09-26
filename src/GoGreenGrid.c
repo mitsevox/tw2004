@@ -258,9 +258,11 @@ void GR_BuildGridRenderData(s32 nView) {
             }
             k = 0;
             do {
-                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 0] = fAcross * fDirZ + (fAlong * fDirX + fCornerX);
+                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 0] =
+                    fAcross * fDirZ + (fAlong * fDirX + fCornerX);
                 lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 1] = 0.01f + fHeight;
-                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 2] = (fAlong * fDirZ + fCornerZ) - fAcross * fDirX;
+                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 2] =
+                    (fAlong * fDirZ + fCornerZ) - fAcross * fDirX;
                 lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 0] = lbl_802813C0->anColor[0];
                 lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 1] = lbl_802813C0->anColor[1];
                 lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 2] = lbl_802813C0->anColor[2];
@@ -310,9 +312,11 @@ void GR_BuildGridRenderData(s32 nView) {
             }
             k = 0;
             do {
-                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 0] = fAcross * fDirZ + (fAlong * fDirX + fCornerX);
+                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 0] =
+                    fAcross * fDirZ + (fAlong * fDirX + fCornerX);
                 lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 1] = 0.01f + fHeight;
-                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 2] = (fAlong * fDirZ + fCornerZ) - fAcross * fDirX;
+                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 2] =
+                    (fAlong * fDirZ + fCornerZ) - fAcross * fDirX;
                 lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 0] = lbl_802813C0->anColor[0];
                 lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 1] = lbl_802813C0->anColor[1];
                 lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 2] = lbl_802813C0->anColor[2];
