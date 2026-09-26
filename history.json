@@ -41301,5 +41301,21 @@
 "matched_functions": 7576,
 "total_functions": 7647,
 "exact": 7576
+},
+{
+"commit": "d9387fa",
+"sha": "d9387fa2c4f4f7ab9c2da53a9a33158736dbf53a",
+"time": 1790444008,
+"subject": "findings: Tiburon builds with debug info (NASCAR 2005 GC DWARF is the lead for UIS/IStudio)",
+"report": true,
+"matched_code": 1480880,
+"complete_code": 1253892,
+"matched_data": 720303,
+"complete_data": 865315,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7576,
+"total_functions": 7647,
+"exact": 7576
 }
 ]
