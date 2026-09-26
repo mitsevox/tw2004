@@ -216,13 +216,17 @@ u8 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
 // Called before a screen is unloaded. If the last p60 record names the screen, it is dropped:
 // the screen it holds becomes current, and its paused script runs on with n on the top of its
 // stack. Returns 0 when an older record names the screen, or holds it: it cannot go yet.
-u8 fn_80169308(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
+// fake match: pStudio is a cast copy of the parameter, declared before pFrame and p1C (the register
+// order: EA keeps pStudio above them)
+u8 fn_80169308(UIStudio* pStudioArg, u16 uGroup, u16 uScreen, s32 n) {
     s32 i;
     UISRecord60* pRec;
     UISScreen* pScreen;
-    s32* p1C;
+    UIStudio* pStudio;
     UISFrame* pFrame;
+    s32* p1C;
 
+    pStudio = (UIStudio*)pStudioArg;
     i = pStudio->n5C;
     if (i > 0) {
         pRec = &pStudio->p60[i - 1];
