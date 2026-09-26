@@ -106,3 +106,11 @@ GoStaticCam StaticCam_GetFlybyInformation (block 2 fmadds into f3, EA f31 = fT):
 BreakLine_Render, StaticCam_GetFlybyInformation, UObject fn_800488B4, uiText fn_800922A8,
 ```
 - 2026-09-26 PC declsearch (run 36221888505, iterated local search over the declaration order): best 2 (no better order than the current one), 11102 trials.
+- 2026-09-26 r5-world (mwcc-debugger): summary has no '!' (fT f31, fEnd f3 as EA's). The
+  block-2 value is a frontend temp (@368, f46; block 1's is @369, f45), not fEnd: before regalloc
+  `fmadds f46; fmr f44(fT),f46; fmr f3,f46`, and f46 is coalesced into f3 (flags fCoalesced),
+  the same as block 1. For EA's `fmadds f31; fmr f3,f31` the temp must go to fT instead, i.e.
+  the copy into f3 must not be coalescable (f46 live past the f3 copy, e.g. the arg copy ahead of
+  the fT copy in the pre-regalloc order). Tried: a fresh-local form `X = E; call(.., X); fT = X`
+  with X in fStep/fFrom/fLastT/fLoDist/fHiDist and `fT = X` after the call, after fn_80065B20 or
+  after the fDist line: all 98.85 (X is live across the call and goes to a saved register).
