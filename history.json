@@ -40773,5 +40773,21 @@
 "matched_functions": 7556,
 "total_functions": 7647,
 "exact": 7556
+},
+{
+"commit": "482b4e3",
+"sha": "482b4e3627214043a7383f0217173a3d6a6fe6b9",
+"time": 1790398868,
+"subject": "Merge r4-uisevent: UISEvent fn_80165528 exact (opt_dead_assignments off around it)",
+"report": true,
+"matched_code": 1460468,
+"complete_code": 1165216,
+"matched_data": 703495,
+"complete_data": 847427,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7557,
+"total_functions": 7647,
+"exact": 7557
 }
 ]
