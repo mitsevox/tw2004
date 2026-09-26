@@ -29,14 +29,17 @@ CHECKS = [
     ('no-braces', re.compile(r'^\s*(if|for|while)\s*\(.*\)\s*[^{\s;][^{]*;\s*(//.*)?$')),
     ('commented-code', re.compile(r'^\s*//\s*([\w\[\]\.>-]+\s*[-+*/|&]?=[^=][^;]*|\w+\([^)]*\)|return\b[^;]*|(if|for|while)\s*\(.*\)\s*\{?)\s*;?\s*$')),
 ]
-# Portability (the goal is source a PC port can build, 64-bit and little-endian): a pointer squeezed
-# into an integer, a copy whose size is a literal instead of sizeof, the frame rate as a bare number.
-# A line that must stay this way says why with `port: <why>` on the line or the line before.
+# Port hazards (a 64-bit, little-endian port will need to look at these): a pointer in an integer, a
+# copy whose size is a literal instead of sizeof, the frame rate as a bare number. The owner's rule
+# (2026-09-26): the C is written the way EA wrote it, hazards included, so these are NOTES for the
+# port, printed but never counted as findings (they do not block a merge). Mark a known one with
+# `port: <why>` on the line or the line before to silence the note.
 PORT = [
     ('port-ptr-int', re.compile(r'\(\s*(int|s32|u32|long)\s*\)\s*(&\s*\w|p[A-Z]\w*\b(?!\s*(\[|->|\.)))')),
     ('port-literal-size', re.compile(r'\b(Mem_cpy|memcpy|memset|fn_80005AE8)\s*\([^;]*,\s*(0x[0-9A-Fa-f]{2,}|\d{3,})\s*\)')),
     ('port-frame-rate', re.compile(r'\b59\.94|\b0\.01668')),
 ]
+PORT_NOTES = {name for name, _ in PORT}
 # port-asm-no-fallback: CodeWarrior-only code with no plain-C version for a port. An `asm` function
 # must sit under `#ifdef __MWERKS__` with an `#else` holding a C version; a compiler intrinsic
 # (__cntlzw, ...) needs a C fallback in game_types.h or platform.h. Exempt with `port: <why>`.
@@ -354,6 +357,10 @@ def main():
         hits = lint(f, protos)
         if changed is not None:     # file-level checks (line 1) count only if line 1 changed too
             hits = [h for h in hits if h[0] in changed[f.name] or h[1] == 'compile-error']
+        notes = [h for h in hits if h[1] in PORT_NOTES]
+        hits = [h for h in hits if h[1] not in PORT_NOTES]
+        for ln, n, msg in notes:
+            print('%s:%d: note %s: %s' % (f.name, ln, n, msg[:100]))
         total += len(hits)
         COMPILE_ERRORS.update((f.name, h[0]) for h in hits if h[1] == 'compile-error')
         if '--summary' in sys.argv:
