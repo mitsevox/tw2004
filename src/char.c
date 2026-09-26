@@ -3424,7 +3424,9 @@ void fn_8001F08C(void** ppSrc, void** ppDst, SwapField* pFormat, int nFields, in
 // Byte-swaps an animation library in place and links it: the header, the records after it, each
 // record's entries after those, then each entry's data (each start rounded up to 4 bytes).
 // *pnSize gets the library's size.
-MtaLib* fn_8001F110(MtaLib* pLib, s32* pnSize) {
+MtaLib* fn_8001F110(MtaLib* pArg, s32* pnSize) {
+    // fake match: a copy of the parameter through void* (a plain copy is merged into it)
+    MtaLib* pLib = (MtaLib*)(void*)pArg;
     SwapField aHeader[10] = {
         { 16, 1 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 2, 2 }, { 6, 1 },
         { 4, 4 },
