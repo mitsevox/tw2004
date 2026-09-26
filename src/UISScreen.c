@@ -828,7 +828,8 @@ s32 fn_8016A2D4(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32
                 bOut = 0;
                 nResult = fn_8016A2D4(pStudio, pScreen, pStack, pHandler->u4.nNode, uEvent, n5, nArgs, pArgs,
                                       &bOut);
-                if (bOut == 1) {
+                // fake match: the (s32) gives EA's signed cmpwi
+                if ((s32)bOut == 1) {
                     u8* pLinked = fn_8016C614(pNode, (u16)pHandler->u4.nNode, n5);
                     if (pLinked != NULL) {
                         s32 nRet = fn_8016C270(pStudio, pScreen, pNode->pInfo, pStack, pLinked, nArgs, pArgs,
