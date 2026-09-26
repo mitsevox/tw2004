@@ -1265,8 +1265,8 @@ void fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFil
     f32 fDamp;
 
     fn_800332F4();
-    pDraw = pList;
     for (i = 0; i < nCount; i++) {
+        pDraw = &pList[i];
         iObject = pDraw->iGlobalObjectIndex;
         if (eClipMethod != pDraw->eClipMethod) {
             eClipMethod = pDraw->eClipMethod;
@@ -1344,7 +1344,6 @@ void fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFil
         if (pDraw->bSetsPrimField) {
             bForce = 1;
         }
-        pDraw++;
     }
 }
 
