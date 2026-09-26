@@ -8,6 +8,13 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26, r7-cam (reading only, nothing new built): with the call reading the temp, the
+  temp has two copies (`fmr fT,tmp`, `fmr f3,tmp`) and is coalesced into the argument register
+  f3, so fT keeps the copy; if the call read fT, fT (live across the call, so never coalescable
+  with f3) would absorb the temp and f3 would keep the copy, EA's result. So the whole match is
+  "stop the AST optimizer rewriting call(fT) to call(@368)" without a WAR on fT (the `fT +=`
+  forms reschedule because the fmadds then overwrites fT, which the fsubs still reads).
+
 - 2026-09-26, r6-args (quicktrial): the late parameter copy through void* (`T p = (T)(void*)pArg;`, the fn_800AB860 fix) on each pointer parameter, declared first or last: pScript/pSub/pFov 2, pCam 31-52. An empty `if (pCam) { } else { }` (a frontend block boundary, agents/findings/2026-09-26-dead-asserts.md) between `fT = fEnd` and the call: 2.
 
 - 2026-09-26, r6-args: parameter-order lever on fn_800C7480: all 364 placements of the three float
