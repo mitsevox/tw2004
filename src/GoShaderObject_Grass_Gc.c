@@ -427,8 +427,8 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
     GrassParams* pParams = SD_gpGrassTypeData->pParams;
     s32 nSet = pParams->n24;
     s32 nRun = pParams->a18[nSet];
-    s32 nVerts = pData->anVerts[nSet][nRun];
     // fake match: this declaration order (found by search) sets the register allocation
+    int nDone;
     int nPass;
     f32 vEye[3];
     f32 vAt[4];     // fake match: three floats are used; the frame has room for four
@@ -443,7 +443,7 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
     f32 fBladeT;
     f32 fFade;
     int nAxis;
-    int nDone;
+    s32 nVerts = pData->anVerts[nSet][nRun];
     int nWind;
     int nRow;
     GrassWord* pVert = pData->apVerts[nSet][nRun];
@@ -494,23 +494,22 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
             }
             continue;
         }
-        GXBegin(0x98, 3, nRow * 2);
         pAxis = pVert + nAxis;
-        for (nInRow = 0; nInRow < nRow; nInRow++) {
-            fFade = (fDist + (fPerX * (pVert[0].f - pParams->a04[0]) +
-                              fPerZ * (pVert[2].f - pParams->a04[1]))) *
-                        lbl_80260900[1][3] +
-                    lbl_80260900[0][3];
+        GXBegin(0x98, 3, nRow * 2);
+        for (nInRow = 0; nInRow < nRow; nInRow++, nDone++) {
+            fFade = fDist + (fPerX * (pVert[0].f - pParams->a04[0]) +
+                             fPerZ * (pVert[2].f - pParams->a04[1]));
+            fFade = fFade * lbl_80260900[1][3] + lbl_80260900[0][3];
             if (fFade < 0.0f) {
                 fFade = 0.0f;
             }
             if (fFade > 1.0f) {
                 fFade = 1.0f;
             }
-            fTexS = pVert[0].f * lbl_80260920[1][0] + lbl_80260920[0][0];
-            fTexT = pVert[2].f * lbl_80260920[1][1] + lbl_80260920[0][1];
             fShade = fInvScale * ((pAxis->f - fBase) + lbl_802608E0[pVert[3].b[0]]);
             nAlpha = 255.0f * pParams->a10[nSet] * fFade;
+            fTexS = pVert[0].f * lbl_80260920[1][0] + lbl_80260920[0][0];
+            fTexT = pVert[2].f * lbl_80260920[1][1] + lbl_80260920[0][1];
             for (nPass = 0; nPass < 2; nPass++) {
                 if (nPass == 1) {
                     fn_8012141C(pVert[0].f + lbl_802607D0[nWind][0], pVert[1].f + pParams->f20,
@@ -527,7 +526,6 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
             }
             pVert += 4;
             pAxis += 4;
-            nDone++;
         }
         fn_801213F0();
     }

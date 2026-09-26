@@ -22,7 +22,7 @@ void fn_800354B4(u8* p, f32 v);         // sets the lens's f32 at 0xAC (fn_80014
 f32  fn_80014268(u8* p);
 
 void fn_8009CB78(f32* pA, f32* pB, f32* pOut);
-void GR_BuildGridRenderData(int nView);
+void GR_BuildGridRenderData(s32 nView);
 u8   fn_8009BD24(int nPlayer);
 u8   fn_8009BD94(int nPlayer);
 
@@ -198,7 +198,7 @@ void fn_8009BE08(int nView) {
 // along. Each point gives two vertices (a line strip drawn doubled back); a point with no ground
 // (the -65536.125 marker) breaks the line, and the end of each line fades out. The texture scrolls
 // with the frame count.
-void GR_BuildGridRenderData(int nView) {
+void GR_BuildGridRenderData(s32 nView) {
     // fake match: this declaration order (found by search) sets the register allocation
     f32 fAlong;
     int n;
@@ -223,12 +223,9 @@ void GR_BuildGridRenderData(int nView) {
     f32 fCornerX;
     f32 fCornerZ;
     f32 fPeriod;
-    // fake match: an s32 (long) copy of nView, kept in its own register, for the fn_8001707C call
-    s32 nViewCopy;
     f32 fPrev;
     // fake match: &gSession through a local, so its base (not &gSession.nFrameCount) is kept
     Session* pSession = &gSession;
-    nViewCopy = nView;
     lbl_802813C0->nVerts = 0;
     fPrev = 0.0f;
     lbl_802813C0->nIndices = 0;
@@ -295,8 +292,8 @@ void GR_BuildGridRenderData(int nView) {
     fHole = -65536.125f;
     nGapEdge = -1;
     for (n = 0; n < lbl_802813C0->nCols * lbl_802813C0->anRows[nView]; n++) {
-        nCol = n / lbl_802813C0->anRows[nView];
         nRow = n % lbl_802813C0->anRows[nView];
+        nCol = n / lbl_802813C0->anRows[nView];
         fAcross = nCol * lbl_802813C0->fCellW;
         fAlong = nRow * lbl_802813C0->fCellD;
         fHeight = lbl_802813C0->apHeight[nView][nCol + nRow * lbl_802813C0->nCols];
@@ -318,8 +315,8 @@ void GR_BuildGridRenderData(int nView) {
                 bInGap = 0;
             }
             k = 0;
-            fY = 0.01f + fHeight;
             fX = fAcross * fDirZ + (fAlong * fDirX + fCornerX);
+            fY = 0.01f + fHeight;
             fZ = (fAlong * fDirZ + fCornerZ) - fAcross * fDirX;
             do {
                 lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 0] = fX;
@@ -332,7 +329,7 @@ void GR_BuildGridRenderData(int nView) {
                     (k == nEdge) ? 0 : (u8)lbl_802813C0->anColor[3];
                 if (k == 0 && lbl_802813C0->nVerts > 0) {
                     fU = (u32)pSession->nFrameCount * lbl_802813C0->f100 * (fPrev - fHeight);
-                    if ((s8)GOLFERSTATE_GetCurrentState(fn_8001707C(nViewCopy)) == GS_ZOOM) {
+                    if ((s8)GOLFERSTATE_GetCurrentState(fn_8001707C(nView)) == GS_ZOOM) {
                         fV = 0.75f;
                         fGap = 0.0625f;
                     } else {
