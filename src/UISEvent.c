@@ -174,7 +174,9 @@ void fn_80165C6C(UISReportFn pfnReport) {
 // then its arguments below it, the last one first.
 void fn_80165B90(s16 nA, s16 nB, UIStudio* pStudio, s32 nType, UISEventData* pData, s32 nArgs,
                  const s32* pArgs) {
-    UISEvent_Push(&pStudio->pEventTop, nA, nB, nType, pData, nArgs, pArgs);
+    // fake match: nArgs goes through s64 and back (the value is unchanged); the dead high word
+    // lives until register allocation and gives the original's order of the nA/nB sign extensions
+    UISEvent_Push(&pStudio->pEventTop, nA, nB, nType, pData, (s64)nArgs, pArgs);
 }
 
 // Walks the event stack from the bottom up and, for each type 9 event queued for the given

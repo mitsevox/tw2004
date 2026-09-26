@@ -1143,9 +1143,9 @@ typedef struct LLFontFile {
     s32   n0C;                    // 0x0C  flags; bits 1-2 pick the palette
     u8    pad10[3];               // 0x10
     s8    n13;                    // 0x13  the line height in 1/448ths
-    u32   uGlyphs;                // 0x14  offset of the glyph records
-    u32   u18;                    // 0x18
-    u32   uBitmap;                // 0x1C  offset of the bitmap (an LLFontBitmap, then 4-bit texels)
+    s32   uGlyphs;                // 0x14  offset of the glyph records
+    s32   u18;                    // 0x18
+    s32   uBitmap;                // 0x1C  offset of the bitmap (an LLFontBitmap, then 4-bit texels)
 } LLFontFile;
 
 // A glyph record as the stream stores it, copied 0x10 bytes at a time (LLGlyphRec is our name).
