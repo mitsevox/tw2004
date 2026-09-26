@@ -1,6 +1,9 @@
 # SD_vShaderObject_Grass_Static_Render (GoShaderObject_Grass_Gc.c, 0x80120F74)
 
-Status: OPEN, 99.30% on 2026-09-26 (r4-render); aligned 2 (one add's operand order and slot).
+Status: SOLVED 2026-09-26 (r5-render): no pAxis local at all; the loop reads `pVert[nAxis].f`
+and the compiler's own strength reduction makes the `nAxis*4 + pVert` induction pointer in the
+inner loop's preheader (after GXBegin), which is EA's `add r16,r25,r17`. Commit: "GoShaderObject_Grass_Gc.c:
+SD_vShaderObject_Grass_Static_Render exact" on agent/r5-render.
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -9,6 +12,11 @@ unless you combine it with something new. Before you stop, add every attempt und
 ## Attempts
 
 (add yours here: date, lane, what, score)
+- 2026-09-26 r5-render: the diff (EA's pAxis add sits in the inner for loop's preheader, after
+  the loop-invariant constant loads, and steps by 0x10 with pVert) read as a compiler-made
+  induction variable, not a source local. Removed pAxis (declaration, assignment, `pAxis += 4`)
+  and wrote `pVert[nAxis].f` in fShade: aligned 2 -> 0, real 99.30 -> 100 (also 0 with
+  `(pVert + nAxis)->f`). mwccdbg not needed (no dump in the batch yet).
 - 2026-09-26, r2-render: random orders of the 21 declarations after nVerts (up to 300 in ~4
   minutes), then a move/swap climb: aligned 55 -> 41, real 97.21 -> 97.63 (kept; order in the
   source). Not exhausted: a longer random search may go further.
