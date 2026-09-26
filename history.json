@@ -40997,5 +40997,21 @@
 "matched_functions": 7567,
 "total_functions": 7647,
 "exact": 7567
+},
+{
+"commit": "821cc23",
+"sha": "821cc23a72496d78a1e9e30a83699b3cb5bb0091",
+"time": 1790417710,
+"subject": "declsearch.py: an equal time slice per job; ledgers: the PC declsearch run; infrastructure: its speed",
+"report": true,
+"matched_code": 1472624,
+"complete_code": 1218288,
+"matched_data": 714119,
+"complete_data": 858875,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7567,
+"total_functions": 7647,
+"exact": 7567
 }
 ]
