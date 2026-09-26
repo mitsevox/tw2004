@@ -187,17 +187,17 @@ void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
     for (y = 0; y < pObj->n3A / 4; y++) {
         for (x = 0; x < pObj->n38 / 4; pBlock += 4, x++) {
             uOld0 = pBlock[0];
-            aIn[0] = (f32)(u32)((uOld0 >> 8) & 0xF8) / 255.0f;
-            aIn[1] = (f32)(u32)((uOld0 >> 3) & 0xFC) / 255.0f;
-            aIn[2] = (f32)(u32)((uOld0 << 3) & 0xF8) / 255.0f;
+            aIn[0] = (f32)(u32)((uOld0 & 0xF800) >> 8) / 255.0f;
+            aIn[1] = (f32)(u32)((uOld0 & 0x7E0) >> 3) / 255.0f;
+            aIn[2] = (f32)(u32)((uOld0 & 0x1F) << 3) / 255.0f;
             fn_8010A788(aIn, aOut, pMtx, nMode);
             uNew0 = (u16)((((u8)(int)(aOut[0] * 255.0f + 0.5f) >> 3) << 11) |
                           (((u8)(int)(aOut[1] * 255.0f + 0.5f) >> 2) << 5) |
                           ((u8)(int)(aOut[2] * 255.0f + 0.5f) >> 3));
             uOld1 = pBlock[1];
-            aIn[0] = (f32)(u32)((uOld1 >> 8) & 0xF8) / 255.0f;
-            aIn[1] = (f32)(u32)((uOld1 >> 3) & 0xFC) / 255.0f;
-            aIn[2] = (f32)(u32)((uOld1 << 3) & 0xF8) / 255.0f;
+            aIn[0] = (f32)(u32)((uOld1 & 0xF800) >> 8) / 255.0f;
+            aIn[1] = (f32)(u32)((uOld1 & 0x7E0) >> 3) / 255.0f;
+            aIn[2] = (f32)(u32)((uOld1 & 0x1F) << 3) / 255.0f;
             fn_8010A788(aIn, aOut, pMtx, nMode);
             uNew1 = (u16)((((u8)(int)(aOut[0] * 255.0f + 0.5f) >> 3) << 11) |
                           (((u8)(int)(aOut[1] * 255.0f + 0.5f) >> 2) << 5) |
