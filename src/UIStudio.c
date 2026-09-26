@@ -881,7 +881,9 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->pC -= nDims + 1 + bOnStack;
             break;
         }
-        case 0x63:  // push n copies of the top
+        case 0x63: {  // push n copies of the top
+            s32 nCount;
+
             nByte0 = *pFrame->p10;
             pFrame->p10++;
             nByte1 = *pFrame->p10;
@@ -890,13 +892,16 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->p10++;
             nByte3 = *pFrame->p10;
             pFrame->p10++;
-            n = ((u32)nByte0 << 24) | (nByte1 << 16) | (nByte2 << 8) | nByte3;
-            for (i = 0; i < n; i++) {
+            nCount = ((u32)nByte0 << 24) | (nByte1 << 16) | (nByte2 << 8) | nByte3;
+            for (i = 0; i < nCount; i++) {
                 pTop[i] = pTop[-1];
             }
-            pFrame->pC += n;
+            pFrame->pC += nCount;
             break;
-        case 0x64:  // drop n words
+        }
+        case 0x64: {  // drop n words
+            s32 nCount;
+
             nByte0 = *pFrame->p10;
             pFrame->p10++;
             nByte1 = *pFrame->p10;
@@ -905,10 +910,13 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->p10++;
             nByte3 = *pFrame->p10;
             pFrame->p10++;
-            n = ((u32)nByte0 << 24) | (nByte1 << 16) | (nByte2 << 8) | nByte3;
-            pFrame->pC -= n;
+            nCount = ((u32)nByte0 << 24) | (nByte1 << 16) | (nByte2 << 8) | nByte3;
+            pFrame->pC -= nCount;
             break;
-        case 0x65:  // push a copy of the top n words
+        }
+        case 0x65: {  // push a copy of the top n words
+            s32 nCount;
+
             nByte0 = *pFrame->p10;
             pFrame->p10++;
             nByte1 = *pFrame->p10;
@@ -917,12 +925,13 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->p10++;
             nByte3 = *pFrame->p10;
             pFrame->p10++;
-            n = ((u32)nByte0 << 24) | (nByte1 << 16) | (nByte2 << 8) | nByte3;
-            for (i = 0; i < n; i++) {
-                pTop[i] = pTop[i - n];
+            nCount = ((u32)nByte0 << 24) | (nByte1 << 16) | (nByte2 << 8) | nByte3;
+            for (i = 0; i < nCount; i++) {
+                pTop[i] = pTop[i - nCount];
             }
-            pFrame->pC += n;
+            pFrame->pC += nCount;
             break;
+        }
         case 0x66:  // fill an array with a value
         case 0x67:
         case 0x68: {
