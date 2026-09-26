@@ -24,6 +24,10 @@ unless you combine it with something new. Before you stop, add every attempt und
   The other nView functions of the unit (fn_8009B970, fn_8009BE08, fn_8009C914) carry the same
   s32 nViewCopy trick; an s32 parameter there probably replaces it, but their prototypes are in
   engine.h / gomainloop.c (not tried).
+- 2026-09-26, r4-render, later (aligned 28): fX/fZ/fY split into two statements each (3x2x2
+  forms, either loop), fU split three ways (either loop), `k++` at the do-body end or
+  `while (++k < 2)`, pSession split into declaration + assignment and an 8-min random/climb over
+  the 25 declarations: no gain (28-30).
 - 2026-09-25, n-shaders: first loop's fAlong/fHeight/fAcross orders (6) x nRow/nCol order:
   fAcross, fAlong, fHeight (as the second loop has it) 156 -> 140 (nRow/nCol order: no effect).
   Then the fn_8009C914 fix (an s32 nViewCopy for the GOLFERSTATE call's fn_8001707C): declared
