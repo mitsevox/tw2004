@@ -22,6 +22,8 @@ f32   fn_80014280(f32 x);           // tan
 void  fn_80030894(void);
 void  fn_80030A40(void* pHoleData, int nView);
 void  fn_80030CC8(void* pHoleData);
+void  fn_80031084(UObjMesh* pNode, s32 eClipMethod, s32 iRenderPass, Ter_PatchReference* pPatch,
+                  f32 fDistance);
 void  fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject);
 void  fn_8003185C(void);
 void  fn_800318D8(void);
@@ -80,25 +82,34 @@ UObjMesh* fn_80035500(u8* pHoleData);
 UObjMesh* fn_8003556C(UObjMesh* pGround);
 s32       fn_80035554(UObjMesh* pMesh);
 
-// Fills pPatch from a patch's node: its ground is node 0, its objects come with a second node.
-void fn_80031084(UObjMesh* pNode, s32 eClipMethod, s32 iRenderPass, Ter_PatchReference* pPatch,
-                 f32 fDistance) {
-    s32 nNodes;
+f32 lbl_801876D8[21][3] = {
+    { -5.0f, -8.0f, -8.0f },
+    { -5.0f, -8.0f, -8.0f },
+    { -5.0f, -8.0f, -8.0f },
+    { -5.0f, -8.0f, -8.0f },
+    { -5.0f, -8.0f, -8.0f },
+    { -5.0f, -5.0f, -5.0f },
+    { -5.0f, -8.0f, -8.0f },
+    { -5.0f, -8.0f, -8.0f },
+    { -5.0f, -5.0f, -5.0f },
+    { -5.0f, -8.0f, -8.0f },
+    { -5.0f, -8.0f, -8.0f },
+    { -5.0f, -8.0f, -8.0f },
+    { -5.0f, -8.0f, -8.0f },
+    { -5.0f, -8.0f, -8.0f },
+    { -5.0f, -8.0f, -8.0f },
+    { -5.0f, -8.0f, -8.0f },
+    { -5.0f, -5.0f, -5.0f },
+    { -5.0f, -8.0f, -8.0f },
+    { -5.0f, -5.0f, -5.0f },
+    { -5.0f, -5.0f, -5.0f },
+    { -5.0f, -5.0f, -5.0f },
+};
 
-    pPatch->fDistance = fDistance;
-    pPatch->fBoundingRadius = fn_800354C4(pNode)[3];
-    pPatch->eClipMethod = eClipMethod;
-    pPatch->iRenderPass = iRenderPass;
-    nNodes = fn_800354F4(pNode);
-    pPatch->pGround = fn_800354E4(pNode, 0);
-    pPatch->n18 = fn_800354D0(pPatch->pGround, 3);
-    pPatch->n1C = fn_800354D0(pPatch->pGround, 2);
-    pPatch->n20 = fn_800354D0(pNode, 1);
-    if (nNodes >= 2) {
-        pPatch->pObjects = fn_800354BC(pPatch->pGround);
-        return;
-    }
-    pPatch->pObjects = NULL;
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0 before fn_80030254's 3.7 and 1.6; its body is unknown, this one only reproduces the order.
+static f32 GoTerrain_StrippedFn(f32 x) {
+    return x + 1.0f;
 }
 
 // Sets up the terrain renderer: allocates its lists, gives every object state its starting values
@@ -262,6 +273,18 @@ void fn_80030894(void) {
     fn_8003519C(4, &wave);
     nFrame = gSession.nFrameCount;
     fn_8003519C(5, &nFrame);
+}
+
+// fake match: these two stand in for code the original linker stripped. The file's pool has
+// fn_800351D8's constants (1/59.94, 59.94, 0.5/59.94, the u32 conversion's) and then 0.375, 4.15
+// and 10 (as fn_80035398 uses them) right after fn_80030894's; their bodies are unknown, these
+// only reproduce the order.
+static f32 GoTerrain_StrippedFn2(u32 n, f32 x) {
+    return FRAME_TIME * (f32)(n % (u32)(FRAME_RATE * (0.5f / FRAME_RATE + x)));
+}
+
+static f32 GoTerrain_StrippedFn3(f32 x) {
+    return 0.375f * x + 4.15f * (10.0f + x);
 }
 
 // Draws the terrain in view nView: takes the camera's position and look direction, the flat
@@ -429,12 +452,25 @@ void fn_80030CC8(void* pHoleData) {
     }
 }
 
-// Sorts pObjectSortList by distance, except when gSession.b11 is set.
-void fn_8003185C(void) {
-    if (gSession.b11 == 0) {
-        qsort(lbl_801D3CB0.pObjectSortList, lbl_801D3CB0.iTotalSortObjects, sizeof(Ter_ObjectReference),
-              fn_800318AC);
+// Fills pPatch from a patch's node: its ground is node 0, its objects come with a second node.
+void fn_80031084(UObjMesh* pNode, s32 eClipMethod, s32 iRenderPass, Ter_PatchReference* pPatch,
+                 f32 fDistance) {
+    s32 nNodes;
+
+    pPatch->fDistance = fDistance;
+    pPatch->fBoundingRadius = fn_800354C4(pNode)[3];
+    pPatch->eClipMethod = eClipMethod;
+    pPatch->iRenderPass = iRenderPass;
+    nNodes = fn_800354F4(pNode);
+    pPatch->pGround = fn_800354E4(pNode, 0);
+    pPatch->n18 = fn_800354D0(pPatch->pGround, 3);
+    pPatch->n1C = fn_800354D0(pPatch->pGround, 2);
+    pPatch->n20 = fn_800354D0(pNode, 1);
+    if (nNodes >= 2) {
+        pPatch->pObjects = fn_800354BC(pPatch->pGround);
+        return;
     }
+    pPatch->pObjects = NULL;
 }
 
 // Adds a patch's objects to pObjectSortList, numbering them from nFirstObject: each gets its three
@@ -609,6 +645,14 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
     }
 }
 
+// Sorts pObjectSortList by distance, except when gSession.b11 is set.
+void fn_8003185C(void) {
+    if (gSession.b11 == 0) {
+        qsort(lbl_801D3CB0.pObjectSortList, lbl_801D3CB0.iTotalSortObjects, sizeof(Ter_ObjectReference),
+              fn_800318AC);
+    }
+}
+
 // fn_8003185C's comparison: nearest first.
 s32 fn_800318AC(const void* pA, const void* pB) {
     f32 fA = ((const Ter_ObjectReference*)pA)->fDistanceSquared;
@@ -648,6 +692,16 @@ void fn_80031A08(s32* pA, s32* pB, s32 a, s32 b) {
 
     *pA = (f32)(n / (int)lbl_802810D8 - 1) / lbl_801D3CB0.fFOVScale;
     *pB = lbl_802810DC + (b + lbl_802810E0 * (s32)lbl_802810D8 - n) / (int)lbl_802810D8;
+}
+
+// fake match: stands in for a function the original linker stripped. The file's pool has 0.4,
+// 0.2, 0.1 and 2.0 in that order right after fn_80030A40's; its body is unknown, this one only
+// reproduces the order.
+static f32 GoTerrain_StrippedFn4(f32 x) {
+    x += 0.4f;
+    x += 0.2f;
+    x += 0.1f;
+    return x + 2.0f;
 }
 
 // Picks each sorted object's level of detail by its distance: the first LOD plane whose end it is
@@ -1476,6 +1530,20 @@ void fn_80033704(u16 nPatch, u16 nObject) {
         pState->n1C = 1;
     }
 }
+
+TerPoseStep lbl_801877E0[6] = {
+    { 0, 3, 1, 0.5f, 0.0f },
+    { 1, 3, 2, 1.0f, 0.0f },
+    { 2, 3, 3, 1.0f, 0.5f },
+    { 3, 0, 2, 0.5f, 1.0f },
+    { 2, 0, 1, 0.0f, 1.0f },
+    { 1, 0, 0, 0.0f, 0.5f },
+};
+
+TerPoseStep lbl_80187858[2] = {
+    { 0, 1, 1, 1.0f, 0.5f },
+    { 1, 0, 0, 0.5f, 1.0f },
+};
 
 // Animates the course objects once a frame (the frame time capped at 1/30 s): runs the crowd
 // countdowns, fades each object's views in (state 2) or out (state 0), and moves each object with
