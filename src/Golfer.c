@@ -75,24 +75,25 @@ f32 powf(f32 x, f32 y) {
 // Pick where the CPU aims: the most demanding authored aim point it qualifies for. A human
 // only ever gets a priority point from here (the default aim on walking up to the ball).
 void AI_ChooseTarget(int nPlayer) {
-    AITarget*   t;
-    int         nClub;
-    f32         fDumb;         // (100 - IQ): the overconfidence term
-    int         nKind;
-    int         nIQ;
-    f32         fDist2;
-    int         nSkill;
-    f32         fDist;
-    f32         fBestDist2;
-    Player*     p;
-    CourseInfo* pCourse;
+    int         nA;
     s8          k;
     s8          nBest;
-    s8          nZone;
     s8          nCand;
+    int         nSkill;
+    Player*     p;
+    AITarget*   t;
+    int         nKind;
+    int         nClub;
+    int         nIQ;
+    CourseInfo* pCourse;
+    s8          nZone;
     int         nPower;
     int         nPinSet;
     int         nAggr;
+    f32         fDumb;         // (100 - IQ): the overconfidence term
+    f32         fDist2;
+    f32         fDist;
+    f32         fBestDist2;
     f32         fDX, fDZ;
 
     nPinSet = Game_CurrentPinSet();
@@ -132,8 +133,8 @@ void AI_ChooseTarget(int nPlayer) {
             fDist  = fn_80009680(fDX * fDX + fDZ * fDZ);
             nKind  = AI_ShotKindForDistance(nPlayer, fDist);
             nClub  = AI_ClubForShot(nPlayer, nKind, 0, fDist);
-            nSkill = Golfer_GetAttribute(p, Shot_GoverningAttribute(nPlayer, nClub, p->ball.nLie, nKind),
-                                         ATTR_TOTAL);
+            nA     = Shot_GoverningAttribute(nPlayer, nClub, p->ball.nLie, nKind);
+            nSkill = Golfer_GetAttribute(p, nA, ATTR_TOTAL);
             if (Player_IsCPU(nPlayer)) {
                 // Low IQ makes the golfer think it is better than it is.
                 if (p->bLowIQPenalty) {

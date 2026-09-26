@@ -1,6 +1,7 @@
 # AI_ChooseTarget (Golfer.c, 0x8002C2DC)
 
-Status: OPEN, 98.53% on 2026-09-25.
+Status: OPEN, 99.56% on 2026-09-26 (r7-golfer): only the two hoisted `(s8)` temps' register
+numbers are left (see the last attempts).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -137,3 +138,45 @@ UStream_Update exact). The other 13 "matches" (Earnings x2, Golfer AI_ChooseTarg
   column puts nKind r31, @170 r30, @178 r29, nSkill r28 first and p at r21. No attempt beyond the
   dump (time went to the lane's other functions).
 - 2026-09-26, r6-assert: dead asserts (agents/findings/2026-09-26-dead-asserts.md): an empty `if (x) { } else { }` (the only assert form that leaves any trace on GC/2.5) after every statement of the function, quicktrial aligned: nPlayer as the condition: 91 (a dead assert extends no live range and adds no neighbour, measured). No source change.
+- 2026-09-26 r7-golfer, allocator replay (tools/match/rasim.py now models the spill-cost choice:
+  lowest cost / remaining neighbours, a tie goes to the LAST in vreg order; both GPR passes of
+  this function replay with 0 differences). Corrections to the earlier readings: (1) the final
+  registers come from PASS 2 (pass 1 spills pCourse, exactly as EA: `stw r3,0x10(r1)`), so the
+  pass-1 section of summary.txt and its "EA" column (r5-game's `p r31 !EA r21`) are misleading;
+  (2) in pass 2 the 18 long-lived values (p t nKind nPlayer, AIbase zoneoff nPower nAggr nPinSet,
+  k*2 @170, (s8)nAggr, (s8)nPower, pin row @178, tee58 @174, k nBest nCand nSkill) are a complete
+  clique: one spill-cost choice, then ONE sweep in vreg order, so our order is plain vreg order
+  and nPlayer (r32, lowest) could never reach EA's r28. EA's order needs a two-sweep shape:
+  p/t/nKind/nPlayer must carry one extra permanent (coalesced) neighbour that nSkill lacks.
+  What-if search on the replay (rasim `--phantoms/--key`): exact with (a) one coalesced copy in
+  the final pass live with nKind but not nSkill, (b) the two hoisted `(s8)` temps keeping their
+  frontend numbers (@175/@176 = r67/r66 in the old numbering: then tee58 wins the cost tie as in
+  EA), (c) declarations k nBest nCand nSkill before p t nKind.
+- (a) found: `nA = Shot_GoverningAttribute(...); nSkill = Golfer_GetAttribute(p, nA, ATTR_TOTAL);`
+  (a separate int local; the Shot_GoverningAttribute result copy is blocked in pass 1 and coalesced
+  in pass 2: the extra neighbour, measured). With (c), `nA k nBest nCand nSkill p t nKind ...`:
+  quicktrial aligned 91 -> 28, objdiff 98.66 -> 99.56%, committed. Tried for (a) without effect:
+  nClub inlined into the call, nClub reused for the attribute or the first usable club, nSkill
+  reused for the attribute (makes the phantom but range-splits nSkill into a frontend temp: 13
+  wrong), gPlayers[nPlayer].ball.nLie, nKind assigned inside the call's arguments.
+- Left: (b). Pass 2 now differs from EA only there: our `(s8)nAggr`/`(s8)nPower` hoisted by the
+  frontend as int temps `@175 = (int)(s8)nAggr`; the backend writes `extsb rNew; mr r@175,rNew`
+  and copy propagation keeps rNew (top vreg), so s8Aggr takes r27-area and s8Pow wins the tie over
+  tee58. An s8-typed hoisted temp (`EASS s8 @ = (s8)x`, like nCand's) would be written directly.
+  Tried without effect on the numbering: s32 nAggr/nPower, operands swapped, `(s8)x > (s32)__abs`,
+  an inline `static` requirement check (130), s8 nAggr/nPower (changes the code: extsb after the
+  call, no spill), `(s8)__abs` (extra extsb, no hoist); on the 99.56 version: `#pragma
+  opt_propagation off` around the function (no change: the copy propagation is the backend's),
+  `opt_common_subs off` (47, code changes), `(s8)(u8)x` / `(s8)(s16)x` (the frontend stops
+  hoisting: extsb in the loop), identity inlines returning or taking s8 (folded away: no change),
+  `t->nXReq > (s8)x` at the second test, the `&&` split into nested ifs, `(int)(s8)x` at both tests
+  (CSE: code changes, 122). A scan of every sweep position for the two temps
+  (scratch scan.py over rasim) finds EA's registers ONLY between the pin row @178 and tee58 @174,
+  i.e. exactly the slots of the frontend temps @175/@176: EA's extsb wrote the frontend temp
+  itself. Same class as decomp-notes round 5 "EA keeps a copy our backend's first copy-propagation
+  pass folds" (UISScreen); unsolved. Read agents/findings/2026-09-26-r7-uis-copy-chains.md next:
+  a copy survives copy propagation only as part of a chain longer than the CP passes (3 here) or
+  with a second definition; if `mr r@175,rNew` reached the allocator, coalescing would keep r@175.
+- 2026-09-26 r7-golfer permuter (15 min, -j 2, from the 99.56 version, base 165): 95 with a
+  `new_var = gAITargets` base pointer (moves zoneoff into a frontend-temp slot, quicktrial 17),
+  50 with `long long nPower` plus `if (x = (s8)nAggr < ...)`: not EA forms, not applied.
