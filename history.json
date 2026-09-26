@@ -40933,5 +40933,21 @@
 "matched_functions": 7566,
 "total_functions": 7647,
 "exact": 7566
+},
+{
+"commit": "bca732f",
+"sha": "bca732fb2ccf7466839c1ae9d9378d6c0684c631",
+"time": 1790401690,
+"subject": "declsearch.py: declaration-order search over many functions on many cores; pc-job tool=declsearch",
+"report": true,
+"matched_code": 1471036,
+"complete_code": 1210132,
+"matched_data": 713519,
+"complete_data": 858227,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7566,
+"total_functions": 7647,
+"exact": 7566
 }
 ]
