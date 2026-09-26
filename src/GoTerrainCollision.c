@@ -17,6 +17,15 @@
 // loading turns it into the pointer in place; with 64-bit pointers the file needs its own layout.
 #define TER_RELOCATE(pCourse, field) ((pCourse)->field = (void*)((u8*)(pCourse) + BE32(&(pCourse)->field)))
 
+// .bss and .sbss in reverse address order (CodeWarrior lays them out backwards).
+u8        lbl_801D54A0[MAX_OBJECTS];
+TNetwork* lbl_801D548C[MAX_OOB_NETWORKS];
+TNetwork* lbl_801D5428[MAX_FREE_DROP_NETWORKS];
+TerBox    lbl_801D53A8[NUM_CUP_POSITIONS];
+s32       lbl_80281DC8;
+s32       lbl_80281DC4;
+u8        lbl_80281DC0;
+
 void  fn_8004B588(TNetwork* pNet);
 u8    Ter_LieIsPreferred(u32 nClass);
 void  fn_8004B63C(TNetwork* pNet);
