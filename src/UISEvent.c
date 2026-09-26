@@ -219,6 +219,7 @@ s32* fn_80165670(UIStudio* pStudio, s32* pTop, s32** ppKeep) {
     u16 uA;
     u16 uB;
     u32 nIndex;
+    UISScreen* pScreen;
 
     nType = pTop[0];
     nArgs = pTop[-8];
@@ -235,7 +236,8 @@ s32* fn_80165670(UIStudio* pStudio, s32* pTop, s32** ppKeep) {
     case 1:
         nIndex = fn_8016C6C4(pStudio, pData->aw[0], pData->aw[1]);
         if (nIndex < pStudio->nScreens) {
-            pStudio->pScreens[nIndex].bUnloading = 1;
+            pScreen = &pStudio->pScreens[nIndex];
+            pScreen->bUnloading = 1;
         }
         if (!UISEvent_NoneWaiting(pStudio, pArgs - 1, uA, uB)) {
             UISEvent_Push(ppKeep, uA, uB, nType, pData, nArgs, pArgs);
