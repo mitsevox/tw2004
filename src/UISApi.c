@@ -559,6 +559,7 @@ s32 fn_80169DC4(UISScreenFile* pFile) {
     u32* pLink;
     u32 kEntry;
     UISEntry* pEntry;
+    UISHandler* pHandler;
     int nBase1;
     unsigned int nBase2;
     unsigned int nBase3;
@@ -592,8 +593,9 @@ s32 fn_80169DC4(UISScreenFile* pFile) {
             pNode->pHandlers = (UISHandler*)(nBase1 + (u32)pNode->pHandlers);
             k = pNode->nHandlers;
             while (k-- != 0) {
-                if (pNode->pHandlers[k].uEvent != 0xFFFF) {
-                    pNode->pHandlers[k].u4.pScript = (u8*)(nBase3 + (u32)pNode->pHandlers[k].u4.pScript);
+                pHandler = &pNode->pHandlers[k];
+                if (pHandler->uEvent != 0xFFFF) {
+                    pHandler->u4.pScript = (u8*)(nBase3 + (u32)pHandler->u4.pScript);
                 }
             }
         }
