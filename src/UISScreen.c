@@ -344,12 +344,13 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
     s32 nWidth;
     s32 nPrec;
     char cPad;
-    u8 bUpper;
+    s32 bUpper;
     s32 nDigits;
     s32 nPad;
     u32 u;
     u8 bNeg;
     char* p;
+    s32 nUpper;
     char aDec[20];
     char aHex[12];
 
@@ -392,6 +393,7 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
             if (c >= 'A' && c <= 'Z') {
                 bUpper = 1;
             }
+            nUpper = bUpper ? 'A' - 'a' : 0;
             switch (c) {
             case 'c':
                 *pOut++ = pArgs[nArg++].n;
@@ -442,7 +444,7 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
                 do {
                     c = (u & 0xF) + '0';
                     if (c > '9') {
-                        c += (bUpper ? 'A' - 'a' : 0) + 'a' - '9' - 1;
+                        c += nUpper + 'a' - '9' - 1;
                     }
                     u >>= 4;
                     aHex[nDigits++] = c;
