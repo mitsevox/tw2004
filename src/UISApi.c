@@ -332,15 +332,18 @@ static inline s32 Screen_BringBack(UIStudio* pStudio, u16 uGroup, u16 uScreen, u
 // Goes to a screen. A loaded one is brought back; otherwise it is loaded, and with bPush (forced
 // while p60 holds records) a p60 record is pushed for it that remembers the screen that was
 // current and the new screen's first node. Returns what fn_80169858 returned.
-s32 fn_80169590(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 bPush, u8 nArgs, s32* pArgs) {
-    u32 nRecord;
+// fake match: pStudio is a cast copy of the parameter, declared last (the register order)
+s32 fn_80169590(UIStudio* pStudioArg, u16 uGroup, u16 uScreen, u8 bPush, u8 nArgs, s32* pArgs) {
     s16 nPrevGroup;
     s16 nPrevScreen;
+    u32 nRecord;
     u8 bLoaded;
     s32 nResult;
     UISRecord60* pRec;
     u16 uIndex;
+    UIStudio* pStudio;
 
+    pStudio = (UIStudio*)pStudioArg;
     nRecord = 0;
     if (pStudio->nScreens == 0 || pStudio->nCurScreen == -1) {
         nPrevGroup = -1;
@@ -369,7 +372,9 @@ s32 fn_80169590(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 bPush, u8 nArgs, 
         uIndex = fn_8016C6C4(pStudio, uGroup, uScreen);
         if (uIndex < (s32)pStudio->nScreens) {  // fake match: this compare is signed
             pRec = &pStudio->p60[nRecord];
-            pRec->pInfo = pStudio->pScreens[uIndex].pData->pNodes[0].pInfo;
+            // fake match: the screen addressed by byte offset (EA's addi r0,r5,0x10; lwzx)
+            pRec->pInfo =
+                ((UISScreen*)((u8*)pStudio->pScreens + uIndex * sizeof(UISScreen)))->pData->pNodes[0].pInfo;
             uIndex = fn_8016C6C4(pStudio, nPrevGroup, nPrevScreen);
             if (uIndex < (s32)pStudio->nScreens) {  // fake match: this compare is signed
                 pRec->pScreen = &pStudio->pScreens[uIndex];
