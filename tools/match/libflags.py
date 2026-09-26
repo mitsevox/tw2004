@@ -40,12 +40,15 @@ def base_command(units):
     """(the plain unit's compile command, {unit: source}) from ninja's compile commands."""
     cmds = subprocess.run(['ninja', '-t', 'commands', 'build/GW4E69/report.json'], capture_output=True,
                           text=True, cwd=ROOT).stdout.splitlines()
-    cc = [c.split(' && ')[0] for c in cmds if 'mwcceppc' in c and ' -c src/' in c]
+    # Windows' ninja writes src\\X.c: match on a /-normalised copy, keep the original for running.
+    cc = [c.split(' && ')[0] for c in cmds if 'mwcceppc' in c and re.search(r' -c src[/\\]', c)]
+    norm = lambda c: c.replace('\\', '/')
     # The base: a plain game unit's flags (no extra_cflags): EASB.c.
-    plain = next(c for c in cc if ' -c src/EASB.c ' in c)
+    plain = next(c for c in cc if ' -c src/EASB.c ' in norm(c))
     out = {}
     for u in units:
-        src = next((re.search(r' -c (\S+) ', c).group(1) for c in cc if re.search(r' -c src/(\S*/)?%s\.c ' % re.escape(u), c)), None)
+        src = next((re.search(r' -c (\S+) ', c).group(1) for c in cc
+                    if re.search(r' -c src/(\S*/)?%s\.c ' % re.escape(u), norm(c))), None)
         if not src:
             sys.exit('no compile command for ' + u)
         out[u] = src
