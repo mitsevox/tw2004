@@ -140,6 +140,35 @@ are shuffled. When full permutations only find scrambled orders, try orders a fe
 from the natural one first (GameMode0 `fn_800FFDB8`: 137 of 633 such orders were exact, one a
 single swap from natural).
 
+**mwcc-debugger: see why a register differs** instead of guessing. It runs the compiler under an
+emulator and dumps the PCode between backend passes and the register allocator's priority list
+(each variable, its register, its neighbour count). About 7 s per function:
+
+```
+python tools/match/mwccdbg.py src/<Unit>.c <fn> [--src scratch/copy.c]   # dumps in build/mwccdbg/<fn>
+```
+
+How to read it (the tool's README, https://github.com/cadmic/mwcc-debugger, explains the
+allocator): variables are listed highest priority first and each takes the lowest free register;
+a variable with more than 28 neighbours cannot be placed on the first "level" and jumps to the top
+of the list (it takes r31). Compare EA's registers with the list, find the first variable that
+differs, then change what gives it or its neighbours one temp more or fewer (`backend-00-initial-code`
+shows every temp). Example, hwsBurn fn_8011172C: with `nAlign + *pOffset` the frontend loads
+`*pOffset` into its own temp, pBurn gets 29 neighbours and takes r31 instead of EA's r25.
+
+Setup, once per machine (Linux or macOS; needs gdb, cmake, Rust), both clones next to the repo
+(or set `MWCCDBG_HOME`):
+
+```
+git clone https://github.com/cadmic/mwcc-debugger
+git clone https://github.com/encounter/retrowin32 && cd retrowin32 && git checkout gdb-stub
+cargo build -p retrowin32 -F x86-unicorn --profile lto          # about 3 minutes
+```
+
+In a cloud container without IPv6, change `target remote localhost:9001` to `127.0.0.1:9001` in
+`mwcc_debugger.py` (gdb otherwise times out). The debugger supports GC/2.6, not our GC/2.5;
+`mwccdbg.py` swaps in 2.6, which compiles every unit of ours byte-identically (all 262 checked).
+
 **The permuter** searches random rewrites for you. It is slow (minutes to hours) but has solved
 functions nothing else did (`fn_800F6ED4`: the loop counter had to be `long`).
 

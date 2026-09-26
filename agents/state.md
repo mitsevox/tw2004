@@ -14,8 +14,9 @@ Unit count: the weather split (Code8006F608.c) replaced two unsorted sweep units
 
 **Next (owner-approved 2026-09-26, after a context compaction):**
 1. **mwcc-debugger** (recommended by #match-help's Mrkol: "regswaps are solvable, use
-   mwcc-debugger"): the owner approved getting it. Find it (web), download/build it, learn it, and
-   point it at the register-only near misses (24 functions at 99%+).
+   mwcc-debugger"): installed 2026-09-26 in the cloud (`tools/match/mwccdbg.py`, docs/workflow.md).
+   Next: point it at the register-only near misses (24 functions at 99%+). First read: hwsBurn
+   fn_8011172C (EA's `add r3,r6,r3` form gives pBurn 29 neighbours: find the form with one temp fewer).
 2. **Dead-assert lane** (1-2 lanes to start): EA's compiled-away asserts/debug code still change
    register choice (a variable used in a dead `if (!p) { if (DEBUG) {...} }` counts as used more)
    and stack size (dead buffers). TW07's PS3 debug build keeps EA's asserts: map where EA asserted
