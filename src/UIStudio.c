@@ -180,10 +180,10 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             break;
         }
         case 0x07: {  // stop a rate function
-            s32* pNodeInfo = --pFrame->pC;
-            s32* pId = --pFrame->pC;
+            UISNodeInfo* pNodeInfo = (UISNodeInfo*)*--pFrame->pC;
+            s32 nId = *--pFrame->pC;
 
-            fn_80165D2C(pStudio, (UISNodeInfo*)*pNodeInfo, *pId);
+            fn_80165D2C(pStudio, pNodeInfo, nId);
             break;
         }
         case 0x0A: {  // call one of the game's handlers with a variable of the screen file
