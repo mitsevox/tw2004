@@ -500,11 +500,12 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             s32* pList = --pFrame->pC;
             s32* pnList;
             UISNodeInfo* pEntry;
+            s32 nEntry;
 
-            nArg = *--pFrame->pC;
+            nEntry = *--pFrame->pC;
             pnList = (s32*)((u8*)pScreen->pData + *(s32*)*pList);
-            if (nArg < pnList[0]) {
-                pEntry = (UISNodeInfo*)((u8*)pScreen->pData + pnList[nArg + 2]);
+            if (nEntry < pnList[0]) {
+                pEntry = (UISNodeInfo*)((u8*)pScreen->pData + pnList[nEntry + 2]);
                 if (pInfo != pEntry || pEntry->u4 == 0) {
                     data.aw[0] = *pId;
                     data.aw[1] = 0;
@@ -512,7 +513,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                     data.ap[1] = pnList;
                     data.aw[7] = pScreen->uGroup;
                     data.aw[6] = pScreen->uScreen;
-                    fn_80165B90(data.aw[7], data.aw[6], pStudio, 5, &data, 1, &nArg);
+                    fn_80165B90(data.aw[7], data.aw[6], pStudio, 5, &data, 1, &nEntry);
                 }
             }
             break;
