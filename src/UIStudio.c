@@ -767,6 +767,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
         case 0x6C:
         case 0x6D:
         case 0x6E: {
+            u32 uOffset;
             s32* pArr;
             s32 nIndex;
             s32 nMul;
@@ -803,13 +804,13 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 pFrame->p10++;
                 uByte3 = *pFrame->p10;
                 pFrame->p10++;
-                u = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
+                uOffset = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
                 uByte0 = *pFrame->p10;
                 pFrame->p10++;
                 uByte1 = *pFrame->p10;
                 pFrame->p10++;
                 n = (uByte0 << 8) | uByte1;
-                pArr = (s32*)(u + pFrame->pC[(s16)n]);
+                pArr = (s32*)(uOffset + pFrame->pC[(s16)n]);
                 break;
             }
             nDims = pArr[0];
@@ -834,6 +835,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
         case 0x5E:
         case 0x60:
         case 0x62: {
+            u32 uOffset;
             s32* pArr;
             s32 nIndex;
             s32 nMul;
@@ -867,13 +869,13 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 pFrame->p10++;
                 uByte3 = *pFrame->p10;
                 pFrame->p10++;
-                u = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
+                uOffset = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
                 uByte0 = *pFrame->p10;
                 pFrame->p10++;
                 uByte1 = *pFrame->p10;
                 pFrame->p10++;
                 n = (uByte0 << 8) | uByte1;
-                pArr = (s32*)(u + pFrame->pC[(s16)n]);
+                pArr = (s32*)(uOffset + pFrame->pC[(s16)n]);
                 break;
             }
             nDims = pArr[0];
@@ -943,6 +945,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
         case 0x66:  // fill an array with a value
         case 0x67:
         case 0x68: {
+            u32 uOffset;
             s32* pArr;
             s32 nMul;
             s32 nDims;
@@ -971,13 +974,13 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 pFrame->p10++;
                 uByte3 = *pFrame->p10;
                 pFrame->p10++;
-                u = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
+                uOffset = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
                 uByte0 = *pFrame->p10;
                 pFrame->p10++;
                 uByte1 = *pFrame->p10;
                 pFrame->p10++;
                 n = (uByte0 << 8) | uByte1;
-                pArr = (s32*)(u + pFrame->pC[(s16)n]);
+                pArr = (s32*)(uOffset + pFrame->pC[(s16)n]);
                 break;
             }
             nDims = pArr[0];
