@@ -886,7 +886,7 @@ config.libs = [
             Object(NonMatching, "Code8002EE1C.c"),
             Object(Matching, "GoRenderSurface.c"),
             Object(Matching, "LLPict_Gc.c"),
-            Object(NonMatching, "GoTerrain.c"),
+            Object(Matching, "GoTerrain.c"),
             Object(Matching, "Skin.c"),
             Object(Matching, "Code80037AB8.c"),
             Object(Matching, "GoPostFx.c"),
@@ -1108,7 +1108,9 @@ config.libs = [
             Object(Matching, "GxUtil.c"),
             Object(Matching, "unsorted/sweep_8003944C.c"),
             Object(Matching, "unsorted/sweep_80070168.c"),
-            Object(NonMatching, "uiText.c"),
+            # Built with opt_propagation off: fn_800922A8's two flag ORs stay separate (ori 4, ori
+            # 0x400; with propagation the front end merges them into ori 0x404), no function worse.
+            Object(Matching, "uiText.c", extra_cflags=['-pragma "opt_propagation off"']),
             Object(Matching, "hlaudtrack.c"),
             Object(Matching, "hlaudtrackseq.c"),
             Object(Matching, "hlaudemitter.c"),
