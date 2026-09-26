@@ -537,18 +537,18 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             fn_80165B90(data.aw[7], data.aw[6], pStudio, 5, &data, 0, NULL);
             break;
         case 0x47: {  // send event 5 for entry n of a list of node infos, unless it is this one and set
-            s32* pId = --pFrame->pC;
-            s32* pList = --pFrame->pC;
+            s32 nId = *--pFrame->pC;
+            s32* pList = (s32*)*--pFrame->pC;
             s32* pnList;
             UISNodeInfo* pEntry;
             s32 nEntry;
 
             nEntry = *--pFrame->pC;
-            pnList = (s32*)((u8*)pScreen->pData + *(s32*)*pList);
+            pnList = (s32*)((u8*)pScreen->pData + *pList);
             if (nEntry < pnList[0]) {
                 pEntry = (UISNodeInfo*)((u8*)pScreen->pData + pnList[nEntry + 2]);
                 if (pInfo != pEntry || pEntry->u4 == 0) {
-                    data.aw[0] = *pId;
+                    data.aw[0] = nId;
                     data.aw[1] = 0;
                     data.ap[2] = pEntry;
                     data.ap[1] = pnList;
