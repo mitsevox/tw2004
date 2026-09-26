@@ -340,7 +340,7 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
     char* pStart;
     s32 nArg;
     char c;
-    u8 bUnsigned;
+    s32 bUnsigned;
     s32 nWidth;
     s32 nPrec;
     char cPad;
@@ -348,7 +348,7 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
     s32 nDigits;
     s32 nPad;
     u32 u;
-    u8 bNeg;
+    s32 bNeg;
     char* p;
     s32 nUpper;
     char aDec[20];
