@@ -114,3 +114,11 @@ BreakLine_Render, StaticCam_GetFlybyInformation, UObject fn_800488B4, uiText fn_
   the fT copy in the pre-regalloc order). Tried: a fresh-local form `X = E; call(.., X); fT = X`
   with X in fStep/fFrom/fLastT/fLoDist/fHiDist and `fT = X` after the call, after fn_80065B20 or
   after the fDist line: all 98.85 (X is live across the call and goes to a saved register).
+- 2026-09-26 r5-world (later): `fEnd = E; call(.., fEnd); fT = fEnd;` dumped: the temp (@368)
+  has only f0-f13 and fLastDist as neighbours (not fT), and `fmr f44,f46` sits right after the
+  call, yet it is not coalesced into fT (it takes f24): the coalescer does not merge it there.
+  fn_800C7480's parameters in TW07's CamScript_SplineCamerasByPositionAndLook order (pos0-3,
+  look0-3, fov0, fov1, param, finalPos, finalLook, finalFOV; the three outputs are stack
+  arguments either way, so no callee change): every fn_800C7480 caller unchanged, this function
+  99.95; with it, `fT +=` 99.20 (same schedule difference: EA sets r6 before r4 and f2 before
+  f1), fEnd passed and `fT = fEnd` as a comma inside the pCam/pSub/pFov argument 99.95. Reverted.
