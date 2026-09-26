@@ -40373,5 +40373,21 @@
 "matched_functions": 7545,
 "total_functions": 7647,
 "exact": 7545
+},
+{
+"commit": "159cacd",
+"sha": "159cacdaa7dc7ab3db22cdbd87375b33dea4cbde",
+"time": 1790388307,
+"subject": "name_sources.tsv: log tonight's 22 evidence-backed renames; merge.py passes logged renames (owner-approved)",
+"report": true,
+"matched_code": 1453776,
+"complete_code": 1162948,
+"matched_data": 702159,
+"complete_data": 846035,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7545,
+"total_functions": 7647,
+"exact": 7545
 }
 ]
