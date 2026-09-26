@@ -40741,5 +40741,21 @@
 "matched_functions": 7556,
 "total_functions": 7647,
 "exact": 7556
+},
+{
+"commit": "4daece6",
+"sha": "4daece607ae509c6e085d9d0b16c3ee8f2be50f6",
+"time": 1790398395,
+"subject": "Goal: EA's code exactly as EA wrote it; portability is not a constraint (owner, 2026-09-26)",
+"report": true,
+"matched_code": 1460140,
+"complete_code": 1165216,
+"matched_data": 703495,
+"complete_data": 847427,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7556,
+"total_functions": 7647,
+"exact": 7556
 }
 ]
