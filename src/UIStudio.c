@@ -22,18 +22,12 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
     u16 uScreen;
     s32* pTop;
     s32* pArgs;
-    s32* pArr;
     u8 uOp;
     u8 nArgs;
     u32 u;
     s32 n;
     s32 n2;
     s32 i;
-    int i2;  // cases 0x66-0x68 count in an int: EA's loop guards compare it with the s32 bound
-    s32 nDims;
-    s32 nIndex;
-    s32 nMul;
-    s32 bOnStack;
     UISText* pText;
     UISText* pFind;
     UISText* pRep;
@@ -764,7 +758,13 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
         case 0x61:
         case 0x6C:
         case 0x6D:
-        case 0x6E:
+        case 0x6E: {
+            s32* pArr;
+            s32 nIndex;
+            s32 nMul;
+            s32 nDims;
+            s32 bOnStack;
+
             pArr = NULL;
             nIndex = 0;
             nMul = 1;
@@ -821,10 +821,17 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             }
             pFrame->pC -= nDims - (1 - bOnStack);
             break;
+        }
         case 0x5C:  // write an array element
         case 0x5E:
         case 0x60:
-        case 0x62:
+        case 0x62: {
+            s32* pArr;
+            s32 nIndex;
+            s32 nMul;
+            s32 nDims;
+            s32 bOnStack;
+
             pArr = NULL;
             nIndex = 0;
             nMul = 1;
@@ -873,6 +880,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pArr[nDims + 1 + nIndex] = pTop[-1 - bOnStack];
             pFrame->pC -= nDims + 1 + bOnStack;
             break;
+        }
         case 0x63:  // push n copies of the top
             nByte0 = *pFrame->p10;
             pFrame->p10++;
@@ -917,7 +925,13 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             break;
         case 0x66:  // fill an array with a value
         case 0x67:
-        case 0x68:
+        case 0x68: {
+            s32* pArr;
+            s32 nMul;
+            s32 nDims;
+            s32 bOnStack;
+            int i2;  // an int: EA's loop guards compare it with the s32 bound
+
             pArr = NULL;
             nMul = 1;
             bOnStack = 0;
@@ -958,6 +972,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             }
             pFrame->pC -= bOnStack + 1;
             break;
+        }
         case 0x6F:  // entry n of the screen file's third table (0 past its end)
             u = pTop[-1];
             if (u < pScreen->pData->nEntriesC) {
