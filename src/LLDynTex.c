@@ -185,7 +185,7 @@ void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
         return;
     }
     for (y = 0; y < pObj->n3A / 4; y++) {
-        for (x = 0; x < pObj->n38 / 4; x++, pBlock += 4) {
+        for (x = 0; x < pObj->n38 / 4; pBlock += 4, x++) {
             uOld0 = pBlock[0];
             aIn[0] = (f32)(u32)((uOld0 >> 8) & 0xF8) / 255.0f;
             aIn[1] = (f32)(u32)((uOld0 >> 3) & 0xFC) / 255.0f;
