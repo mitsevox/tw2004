@@ -595,9 +595,10 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
     u8 bReplace;
     u8 bLost;
     int j;
+    int nSlot;
     s32 nValue;
-    u8 bNoBall;
     s32 nAdj;
+    u8 bNoBall;
     int nHoles;
 
     lbl_80282254 = 0;
@@ -660,7 +661,8 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
             GM_GetGameProgress(&gpSaveData[nPlayer]) < 100.0f) continue;
 
         if (lbl_80200538.aShotGoal[i].nAward != 39) {
-            int nSlot;
+            int nSlot;  // fake match: shadows the function-level nSlot (register order; TW07 keeps
+                        // one function-level index per table, this one awaits its own name)
 
             if (!fn_800D76AC(nPlayer, lbl_80200538.aShotGoal[i].nAward)) continue;
             bReplace = 0;
@@ -690,8 +692,6 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
                                          lbl_80200538.aBio[lbl_80200538.aShotGoal[i].nBio].nValue);
             }
         } else {
-            int nSlot;
-
             nValue = lbl_80200538.aShotGoal[i].nValue;
             if (nValue == 0) continue;
             bReplace = 0;
