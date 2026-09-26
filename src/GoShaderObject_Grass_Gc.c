@@ -496,7 +496,7 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
         }
         pAxis = pVert + nAxis;
         GXBegin(0x98, 3, nRow * 2);
-        for (nInRow = 0; nInRow < nRow; nInRow++) {
+        for (nInRow = 0; nInRow < nRow; nInRow++, nDone++) {
             fFade = (fDist + (fPerX * (pVert[0].f - pParams->a04[0]) +
                               fPerZ * (pVert[2].f - pParams->a04[1]))) *
                         lbl_80260900[1][3] +
@@ -527,7 +527,6 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
             }
             pVert += 4;
             pAxis += 4;
-            nDone++;
         }
         fn_801213F0();
     }
