@@ -1,6 +1,6 @@
 # GR_BuildGridRenderData (GoGreenGrid.c, 0x8009C0BC)
 
-Status: OPEN, 98.27% on 2026-09-26 (r2-render).
+Status: OPEN, 98.81% on 2026-09-26 (r2-render).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -23,6 +23,14 @@ unless you combine it with something new. Before you stop, add every attempt und
   f28-f31 (orig gives the two hoisted constants f27/f26), and the int registers that follow.
   TW07 (GR_BuildGridRenderData, drifted a lot: bool showDots, unsigned row/col) declares
   playerNum, nx, ny, cx, cy first as consts.
+- 2026-09-26, r2-render: const-initialised dir/corner locals (at the top or in place): 88;
+  the dir/corner loads moved among the opening statements (7 positions + 150 random orders):
+  80 at best; fX/fZ statements swapped: 80. A move climb of the 25 declarations: 80 -> 72;
+  random declaration orders (300) then a move/swap climb: 80 -> 44, real 98.27 -> 98.81 (kept;
+  the dir/corner floats now get f31-f28 as in the original). A second 400-order random run and
+  a further 8-minute climb from 44: no better. With that order, dropping the nView copy or
+  pSession: 116 / 84. Left: the preamble keeps nView in r3 (orig `mr r29,r3`), and the fX/fY/fZ
+  / fU float registers.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
