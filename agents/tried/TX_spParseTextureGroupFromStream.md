@@ -8,6 +8,10 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26 r5-render (aligned, base 111): `pHead = (TexBank*)(p += 0x10); p += 8;` 111,
+  with `p = (u8*)(pHead + 0) + 8` 111, `p = p + 8` 111, `p = (u8*)((u32*)pHead + 2)` 111,
+  `(u32*)` steps 171: the frontend folds them all.
+
 - 2026-09-26 r5-render: mwccdbg frontend-02 shows the AST optimizer drops `p += 0x10` and
   `p += 8` entirely (pHead becomes `p + 0x10`, the first pSection `p + 0x18`, then one
   `p = p + 0x20`), so the cursor starts life as the parameter itself; EA materialises

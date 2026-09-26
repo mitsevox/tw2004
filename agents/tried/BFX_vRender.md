@@ -8,6 +8,13 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26 r5-render: frontend-02 shows the frontend CSE temp @19 (`lbl_80189CB0 +
+  nPlayer*4`) formed at red's read and reused for b/a (and the backend CSE folds g's add into it),
+  so red's address has several uses and never becomes EA's `lbzx`. EA needs red's add to stay
+  single-use until peephole-forward (pass 01, before CSE). Red spelled `[0]`, `*row`, flat
+  `((u8*)tab)[n * 4]`, `pSrc[0]`, `*(u8*)&row` x g/b/a via pSrc or indexed x red first / after
+  `pSrc = row` / last: all 32 (best 32 of 30 variants).
+
 - 2026-09-26 r5-render (aligned, base 32): EA reads red with `lbzx r5,r6,r7` (table base +
   nPlayer*4, its own address) and g/b/a with lbz 1/2/3 off `add r4,r6,r7`, i.e. red's address is
   not CSE'd with the row. Tried: red direct + pSrc for g/b/a (both orders) 32, `r = *row` 32,
