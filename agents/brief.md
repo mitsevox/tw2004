@@ -6,12 +6,17 @@ quality matters as much as the match: experienced decomp people will review it, 
 write as if one author wrote everything. The hard rules in `../CLAUDE.md` apply to you; this file
 adds how lanes work. Then read your role file in `agents/roles/`.
 
-**The goal is source that can be ported to PC and modded.** The byte match only proves the C is
-right. Someone will recompile it with another compiler, possibly 64-bit, so write C that means what
-the original did: every prototype matches its definition; values go through arguments and returns,
-never by luck in r3; no undefined behaviour; real struct fields, not offsets; pointers typed as
-pointers; one shared definition of shared data. A function that matches only through something a
-porter can't trust is not done: report it.
+**The goal is EA's code, exactly as EA wrote it (owner, 2026-09-26).** A PC port comes later and
+starts from that code; the decomp does not bend the C to suit a port. In order:
+1. **EA's own form first, always.** EA's types, casts, pointers kept in `int`/`long`/`u32`, 32-bit
+   assumptions, type puns, magic sizes: if that is how EA wrote it, that is the right C. Where it
+   would bite a 64-bit port, add a `// port: <what>` note next to it; never rewrite it.
+2. **Only when EA's form is out of reach (the endgame of a function):** a labelled
+   `// fake match: <why>` that leaves the logic exactly unchanged (same behaviour for every input).
+3. **Never** change what the function does to satisfy the compiler.
+The C must still mean what the original did: every prototype matches its definition; values go
+through arguments and returns, never by luck in r3; real struct fields where EA had fields; one
+shared definition of shared data.
 
 **Checkpoints:** your prompt gives a stop time. Stop there (check `date`), commit, and report, even
 if things are going well.
@@ -73,11 +78,16 @@ if things are going well.
 - Anything unnatural that exists for the match gets `// fake match: <why>`. Normal EA style needs no
   comment. Undefined behaviour is a bug even in an exact function; if the original really does it,
   keep it and mark it `// EA bug: <what>` (and `// port:` how a port should write it).
-- **Fake matches are allowed (owner, 2026-09-25)** when they are labelled `// fake match: <why>`,
-  keep the logic exactly (same behaviour for every input), and do not hurt a port to new hardware:
-  no UB, no reliance on registers or stack layout, no asm, no type puns that break on 64-bit. An
-  unused local, a copy through a temp, a declaration order, an identity inline, a cast that changes
-  nothing: fine. A 100% decomp can be cleaned up later; an unlinked unit cannot be ported at all.
+- **Fake matches are the fallback, not the first try (owner, 2026-09-25/26)**: allowed when EA's
+  own form can't be found, labelled `// fake match: <why>`, logic exactly unchanged (same behaviour
+  for every input), no reliance on registers or stack layout, no asm. An unused local, a copy
+  through a temp, a declaration order, an identity inline, a cast that changes nothing: fine.
+  Portability is NOT a reason to reject an EA-style form (see the goal above).
+- **Compiler settings (owner, 2026-09-26):** a flag that makes a WHOLE file match (configure.py
+  `extra_cflags`) is EA's build setting: use it. A `#pragma` wrapped around ONE function (e.g.
+  `opt_dead_assignments off` ... `reset`) is a fake match: endgame only, labelled `// fake match:`,
+  and it may stand in for a truer EA form. If one pragma fixes several functions of a file, try it
+  file-wide. A 100% decomp can be cleaned up later; an unlinked unit cannot be ported at all.
   Permuter results rejected earlier as "fake" qualify under this rule if they keep the logic.
 - If a function will not match after a real effort (~20 minutes: the decomp-notes "Try these first"
   list, `trial.py`, TW07's locals), leave it at its best score, clean and readable, note what you

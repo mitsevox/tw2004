@@ -812,8 +812,8 @@ void fn_8016A510(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
 s32 fn_8016A2D4(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent, u32 n5,
                 s32 nArgs, const s32* pArgs, u8* pbOut) {
     s32 nResult;
-    UISNode* pNode;
     u32 i;
+    UISNode* pNode;
     u8* pScript;
     u8 bOut;
 
