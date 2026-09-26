@@ -418,9 +418,7 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
                 nDigits = 0;
                 u = pArgs[nArg++].u;
                 bNeg = !bUnsigned && (s32)u < 0;
-                if (bNeg) {
-                    u = -u;
-                }
+                u = bNeg ? -u : u;
                 do {
                     aDec[nDigits++] = u % 10 + '0';
                     u /= 10;
