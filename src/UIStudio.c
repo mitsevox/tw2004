@@ -29,15 +29,9 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
     s32 n2;
     s32 i;
     UISText* pText;
-    UISText* pRep;
     UISRecord60* pRec;
-    u32 nText;
-    u32 nFind;
-    u32 nRep;
-    s32 nGrow;
     u32 j;
     u32 k;
-    u8 bMatch;
     f32 f;
     // The script's big-endian immediates are read a byte at a time into these, then combined
     // (the three four-byte reads into n go through the u8 ones: the code masks those bytes).
@@ -1091,6 +1085,12 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             }
             break;
         case 0x7C: {  // replace every pFind in a text by pRep
+            u8 bMatch;
+            s32 nGrow;
+            u32 nRep;
+            u32 nFind;
+            u32 nText;
+            UISText* pRep;
             UISText* pFind;
             UISText* pText;
 
