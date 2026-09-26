@@ -10,6 +10,9 @@
 void fn_80055C24(int n);        // Ball.c
 void fn_800B24E0(f32 f);        // shadow.c
 
+Unk802811F0 lbl_801D7100;
+Unk802811F0* lbl_802811F0 = &lbl_801D7100;
+
 void fn_8006FB10(void);
 void fn_8006FCC4(u32 uSeed);
 void fn_8006FCC8(void);
