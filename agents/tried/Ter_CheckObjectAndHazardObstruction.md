@@ -17,6 +17,17 @@ unless you combine it with something new. Before you stop, add every attempt und
   start: 136; the floor kept as f32 and cast at the loop: 41-136; Ter_GridCell for any of the four
   cells (16 combos): 41-66; nMinX through Ter_GridCell: 134-136; parameter copies (pcopy): 63+.
 
+- 2026-09-26 r2-terrain, structural lead (41 -> 28 in quicktrial, not applied): EA's delayed nX
+  store is reproduced by a separate start variable fed through an inline with a local, which
+  stops CodeWarrior sinking the (int) conversion into the loop's copy: `static inline int
+  G(f32 x) { int n = (int)fn_80035074(x); return n; }`, `nMinX = G((fMinX - ..) / ..);`, `for (nX =
+  nMinX; ..)` (40, shape now EA's: `lwz rN,0x6c(r1)` early, `stw rN,0x90(r1)` at the loop). Then a
+  declaration climb (`int j;` then `TerCell* pCell;` first, `int nMinX;` after `int nX;`): 30;
+  plus the identity inline on fWide (`fWide = TW(0.5f + fRadius);`): 28. Climbing every
+  declaration again from there: 28. Left: bObstructed / n spill slots 0x88 / 0xa0 swapped, i /
+  nCorner / j registers r19-r21 rotated, and the pFlags / pVert address adds. The same inline for
+  nMinZ / nMaxX / nMaxZ too: 51.
+
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
 ```
