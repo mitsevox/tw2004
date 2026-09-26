@@ -199,32 +199,33 @@ void fn_8009BE08(int nView) {
 // (the -65536.125 marker) breaks the line, and the end of each line fades out. The texture scrolls
 // with the frame count.
 void GR_BuildGridRenderData(int nView) {
-    f32 fPrev;
-    f32 fHole;
-    f32 fDirX;
-    f32 fDirZ;
-    f32 fCornerX;
-    f32 fCornerZ;
+    // fake match: this declaration order (found by search) sets the register allocation
     f32 fAlong;
-    f32 fAcross;
-    f32 fHeight;
-    f32 fX;
+    int n;
+    int i;
     f32 fY;
+    f32 fX;
+    f32 fV;
+    f32 fHeight;
+    f32 fGap;
     f32 fZ;
     f32 fU;
-    f32 fV;
-    f32 fGap;
-    f32 fPeriod;
-    int n;
-    int nRow;
+    f32 fAcross;
     int nCol;
+    int nRow;
     int nEdge;
-    int nGapEdge;
-    int bInGap;
     int k;
-    int i;
+    f32 fDirX;
+    f32 fDirZ;
+    int bInGap;
+    int nGapEdge;
+    f32 fHole;
+    f32 fCornerX;
+    f32 fCornerZ;
+    f32 fPeriod;
     // fake match: an s32 (long) copy of nView, kept in its own register, for the fn_8001707C call
     s32 nViewCopy;
+    f32 fPrev;
     // fake match: &gSession through a local, so its base (not &gSession.nFrameCount) is kept
     Session* pSession = &gSession;
     nViewCopy = nView;
