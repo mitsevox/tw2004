@@ -863,7 +863,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             }
             nDims = pArr[0];
             for (i = 1; i <= nDims; i++) {
-                n = pTop[-(i + bOnStack) - 1];
+                n = pTop[-(i + 1 + bOnStack)];
                 if (n >= pArr[i] || n < 0) {
                     n = pArr[i] - 1;
                 }
@@ -871,7 +871,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 nMul *= pArr[i];
             }
             pArr[nDims + 1 + nIndex] = pTop[-1 - bOnStack];
-            pFrame->pC -= nDims + bOnStack + 1;
+            pFrame->pC -= nDims + 1 + bOnStack;
             break;
         case 0x63:  // push n copies of the top
             nByte0 = *pFrame->p10;
