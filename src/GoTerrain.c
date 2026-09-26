@@ -82,6 +82,25 @@ UObjMesh* fn_80035500(u8* pHoleData);
 UObjMesh* fn_8003556C(UObjMesh* pGround);
 s32       fn_80035554(UObjMesh* pMesh);
 
+// .bss and .sbss in reverse address order
+Ter_TerrainRendererMgr lbl_801D3CB0;
+s32 lbl_801D3A30[5][32];
+s32 lbl_80281D68;
+s32 lbl_80281D64;
+f32 lbl_80281D60;
+
+f32 lbl_802810C8 = -1.0f;
+s8  lbl_802810CC = -1;
+s32 lbl_802810D0 = 26;
+s32 lbl_802810D4 = 16;
+f32 lbl_802810D8 = 5.0f;
+s32 lbl_802810DC = 4;
+s32 lbl_802810E0 = 4;
+s32 lbl_802810E4 = -1;
+s32 lbl_802810E8 = -1;
+u8  lbl_802810EC = 1;
+u8  lbl_802810ED = 1;
+
 f32 lbl_801876D8[21][3] = {
     { -5.0f, -8.0f, -8.0f },
     { -5.0f, -8.0f, -8.0f },
@@ -2373,7 +2392,6 @@ void fn_80035398(void) {
 
 void fn_8006F154();
 extern s32 lbl_80281B88;
-extern s32 lbl_80281D68;
 void fn_800355E0(s32 arg0);
 void fn_80035600(void);
 
