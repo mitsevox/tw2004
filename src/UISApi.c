@@ -607,7 +607,7 @@ s32 fn_80169DC4(UISScreenFile* pFile) {
         pFile->pLinks = (u32*)UISFile_Fix(pFile, pFile->pLinks);
         i2 = pFile->nLinks;
         while (i2-- != 0) {
-            pLink = (u32*)(nBase1 + pFile->pLinks[i2]);
+            pLink = (u32*)((u8*)pFile + pFile->pLinks[i2]);
             if (*pLink < pFile->nEntriesC) {
                 *pLink = (uptr)&pFile->pEntriesC[*pLink];  // port: a pointer stored in a 32-bit word
             } else {
