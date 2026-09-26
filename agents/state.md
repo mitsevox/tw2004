@@ -8,7 +8,12 @@ shared copy pattern, UIS parameter order, UIStudio/UISEvent/UISApi, uiProcessInt
 (scheduling misses + the parameter-order lever: StaticCam, BreakLine, Rain, hlaudtrackstm, startUp,
 SunFlr, rcmp, CamSpline, gocamscripts, GoGreenGrid, DepthField, PictInt, MC), r6-assert (the dead-assert
 lane: Grass Static_Init, hwsBurn, Golfer, char, SkinPart, Earnings, Swing, skalib, Session, BestBall,
-GameMode22), r6-misc (Particle, LLFont, LLTex, goballfx, LLDynTex, LogoTexture). Weekly usage 19% at launch.
+GameMode22; finished 12:04, merged: hwsBurn linked, dead asserts no effect), r6-misc (Particle, LLFont, LLTex,
+goballfx, LLDynTex, LogoTexture), r6-big (Earnings, char, Swing). Weekly usage 19% at launch.
+UIS = EA Tiburon's IStudio library (TW2005 paths: Code/Tiburon/IStudio/): r6-uis redirected to a
+library-wide flag set + macro-style temporaries; PC job libflags (tools/match/libflags.py) on the four
+UIS units, 240 min; a research agent looks for Tiburon builds with DWARF/STABS/maps. First cloud run:
+one set for all four (-O4,p -inline auto,deferred -pragma "pool_data on" -str readonly) keeps all 33 exact.
 Round 5 (5 lanes, mwcc-debugger on all 80 non-exact functions, 09:35-11:00
 CDT) merged 2026-09-26 ~11:10 CDT: uiText, GoTerrain, HLAudMaster + hlaudmovie (split) linked; exact
 Particle fn_800951A0, Grass Static_Render, LLTex fn_8000EA1C, SW_vImpact, hlaudmovie fn_800A8AD4
