@@ -41173,5 +41173,21 @@
 "matched_functions": 7572,
 "total_functions": 7647,
 "exact": 7572
+},
+{
+"commit": "baf1a4d",
+"sha": "baf1a4d6dc58f90843f85fb11cd35e5ec5506dfe",
+"time": 1790438856,
+"subject": "Merge hlaud-split: HLAudMaster.c split from hlaudmovie.c, both units linked",
+"report": true,
+"matched_code": 1477744,
+"complete_code": 1247064,
+"matched_data": 720287,
+"complete_data": 865299,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7572,
+"total_functions": 7647,
+"exact": 7572
 }
 ]
