@@ -322,7 +322,7 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
     f32 fB2;
     f32 fC2;
     u8 bFirst;
-    u8 bObstructed;
+    int n;
     CourseInfo* pCourse;
     f32 fMinX;
     f32 fMaxX;
@@ -343,7 +343,7 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
     int nZ;
     int i;
     int k;
-    int n;
+    u8 bObstructed;
     int nCorner;
     int nInner;
     TerPolyRef* pRef;
