@@ -120,8 +120,8 @@ void fn_800124A8(void);                                 // LLFont.c: end the pri
 // and it spins by f18 + f1C t turns.
 void fn_80094534(f32 (*pMtxArg)[4], ParticleShape* pShapeArg, ParticleVertex* pVertsArg, f32* pTimesArg,
                  u32 nArg) {
-    // fake match: this declaration order (found by search) sets the register allocation
-    // fake match: every parameter copied (through void*) into a local declared first
+    // fake match: every parameter copied (through void*) into a local, and this declaration order
+    // (found by search), set the register allocation
     f32 fGreen;
     f32 fSin;
     f32* pTimes;
