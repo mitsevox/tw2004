@@ -96,6 +96,7 @@ gh workflow run pc-job.yml -f tool=leversweep -f unit=hwsBurn -f fn=fn_8011172C 
 gh workflow run pc-job.yml -f tool=leversweep                  # --from-report: every near-miss
 gh workflow run pc-job.yml ... -f ref=my-branch                # build from a pushed branch
 gh workflow run pc-job.yml -f tool=declsearch -f targets=Unit:fn,Unit:fn -f minutes=240
+gh workflow run pc-job.yml -f tool=libflags -f targets=UISEvent,UIStudio,UISApi,UISScreen -f minutes=240
 ```
 
 `declsearch` (tools/match/declsearch.py) searches declaration orders over many functions at once,
@@ -107,6 +108,11 @@ minute per worker in the cloud: every trial writes a fresh temp `.c`/`.o` and ru
 objdump, and Windows (Defender scanning each new file is the likely cost) makes that slow.
 Excluding the runner's work folder and `%TEMP%` from Defender's real-time scan should help; to be
 measured.
+
+`libflags` (tools/match/libflags.py) searches ONE compiler flag set for a group of units (a library:
+real teams set flags per library), scoring all of them together with objdiff; results
+`pc-results/libflags-<run id>` (best.txt, results.tsv). First use: the UIS units, EA Tiburon's IStudio
+library (TW2005's paths put it in Code/Tiburon/IStudio/, not the Tiger team's Code/Golf/).
 
 It checks out `ref` (default main; the workspace keeps `build/` between jobs), copies
 `C:/dev/tw2004/orig`, builds and stops unless `main.dol: OK`, then runs the tool with `-j jobs`

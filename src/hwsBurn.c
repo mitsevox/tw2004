@@ -365,6 +365,67 @@ SkinDesc44* fn_80110FB4(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
     return aOut;
 }
 
+// List the bits of p28 that are set (a2C, a30) and give the bytes the meshes they stand for take
+// (each rounded up to nAlign; meshes with flag 0x400000 left out).
+s32 fn_80111124(HwsBurn* pBurn, s32 nAlign) {
+    SkinDesc* pDesc = pBurn->pDesc;
+    int i;
+    int nBits = pDesc->n2C;
+    int n;
+    s32 nBytes;
+
+    nBytes = 0;
+    n = 0;
+
+    for (i = 0; i < nBits; i++) {
+        if (fn_8001E9CC(pBurn->p28, i)) {
+            pBurn->a2C[n] = i;
+            pBurn->a30[i] = n;
+            n++;
+            if (!(pDesc->p34[i].uFlags & 0x400000)) {
+                nBytes += fn_80110E74(pDesc->p34[i].pBits, pDesc->p34[i].nSize, 1, nAlign);
+            }
+        }
+    }
+    pBurn->n24 = n;
+    return nBytes;
+}
+
+// Copies of the meshes fn_80111124 listed at pBase + *pOffset, then each one's data after them
+// (from the override table when it has the mesh). NULL when none are listed.
+SkinMesh* fn_801111E8(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
+    SkinDesc* pDesc = pBurn->pDesc;
+    SkinMesh* aOut;
+    void* pSrc;
+    s32 nMesh;
+    int i;
+    int n = pBurn->n24;
+    s32 nEnd;
+
+    if (n == 0) {
+        return NULL;
+    }
+    aOut = (SkinMesh*)(pBase + *pOffset);
+    *pOffset += n * sizeof(SkinMesh);
+    nEnd = nAlign + *pOffset;
+    nEnd = (nEnd - 1) & ~(nAlign - 1);
+    *pOffset = nEnd;
+    for (i = 0; i < n; i++) {
+        nMesh = pBurn->a2C[i];
+        memcpy(&aOut[i], &pDesc->p34[nMesh], sizeof(SkinMesh));
+        if (aOut[i].pBits != NULL) {
+            if (pBurn->pOverride != NULL && nMesh < pBurn->pOverride->nMeshes &&
+                pBurn->pOverride->apMesh[nMesh] != NULL) {
+                pSrc = pBurn->pOverride->apMesh[nMesh];
+            } else {
+                pSrc = pDesc->p34[nMesh].pBits;
+            }
+            aOut[i].pBits = fn_80110E98(pBase, pOffset, pSrc, pDesc->p34[nMesh].nSize, nAlign);
+        }
+    }
+    return aOut;
+}
+
 // The bytes the SkinDesc.p28 blocks take, each rounded up to nAlign.
 s32 fn_80111310(HwsBurn* pBurn, s32 nAlign) {
     SkinDesc* pDesc = pBurn->pDesc;
@@ -453,65 +514,17 @@ s32* fn_80111540(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
     return aCopy;
 }
 
-// List the bits of p28 that are set (a2C, a30) and give the bytes the meshes they stand for take
-// (each rounded up to nAlign; meshes with flag 0x400000 left out).
-s32 fn_80111124(HwsBurn* pBurn, s32 nAlign) {
-    SkinDesc* pDesc = pBurn->pDesc;
+// Copy SkinDesc.p14 and hand each entry to the burn's callback.
+void fn_801115C4(HwsBurn* pBurn) {
     int i;
-    int nBits = pDesc->n2C;
-    int n;
-    s32 nBytes;
+    int n = pBurn->n60;
 
-    nBytes = 0;
-    n = 0;
-
-    for (i = 0; i < nBits; i++) {
-        if (fn_8001E9CC(pBurn->p28, i)) {
-            pBurn->a2C[n] = i;
-            pBurn->a30[i] = n;
-            n++;
-            if (!(pDesc->p34[i].uFlags & 0x400000)) {
-                nBytes += fn_80110E74(pDesc->p34[i].pBits, pDesc->p34[i].nSize, 1, nAlign);
-            }
-        }
-    }
-    pBurn->n24 = n;
-    return nBytes;
-}
-
-// Copies of the meshes fn_80111124 listed at pBase + *pOffset, then each one's data after them
-// (from the override table when it has the mesh). NULL when none are listed.
-SkinMesh* fn_801111E8(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
-    SkinDesc* pDesc = pBurn->pDesc;
-    SkinMesh* aOut;
-    void* pSrc;
-    s32 nMesh;
-    int i;
-    int n = pBurn->n24;
-    s32 nEnd;
-
-    if (n == 0) {
-        return NULL;
-    }
-    aOut = (SkinMesh*)(pBase + *pOffset);
-    *pOffset += n * sizeof(SkinMesh);
-    nEnd = nAlign + *pOffset;
-    nEnd = (nEnd - 1) & ~(nAlign - 1);
-    *pOffset = nEnd;
+    memcpy(pBurn->a64, pBurn->pDesc->p14, n * sizeof(SkinDesc14));
     for (i = 0; i < n; i++) {
-        nMesh = pBurn->a2C[i];
-        memcpy(&aOut[i], &pDesc->p34[nMesh], sizeof(SkinMesh));
-        if (aOut[i].pBits != NULL) {
-            if (pBurn->pOverride != NULL && nMesh < pBurn->pOverride->nMeshes &&
-                pBurn->pOverride->apMesh[nMesh] != NULL) {
-                pSrc = pBurn->pOverride->apMesh[nMesh];
-            } else {
-                pSrc = pDesc->p34[nMesh].pBits;
-            }
-            aOut[i].pBits = fn_80110E98(pBase, pOffset, pSrc, pDesc->p34[nMesh].nSize, nAlign);
+        if (pBurn->pfn68 != NULL) {
+            pBurn->pfn68(pBurn->pSkin, &pBurn->a64[i]);
         }
     }
-    return aOut;
 }
 
 // Mark the SkinDesc.p8C entries the a64 entries use (p78) and list them (a7C, a80). nAlign is
@@ -551,9 +564,8 @@ SkinDesc8C* fn_8011172C(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
     aOut = (SkinDesc8C*)(pBase + *pOffset);
     *pOffset += n * sizeof(SkinDesc8C);
     nEnd = *pOffset;
-    nEnd += nAlign;
-    nEnd = (nEnd - 1) & ~(nAlign - 1);
-    *pOffset = nEnd;
+    nEnd += nAlign - 1;
+    *pOffset = nEnd & ~(nAlign - 1);
     for (i = 0; i < n; i++) {
         memcpy(&aOut[i], &pDesc->p8C[pBurn->a7C[i]], sizeof(SkinDesc8C));
     }
@@ -571,19 +583,6 @@ SkinDesc14* fn_801117D0(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
         }
     }
     return fn_80110E98(pBase, pOffset, pBurn->a64, pBurn->n60 * sizeof(SkinDesc14), nAlign);
-}
-
-// Copy SkinDesc.p14 and hand each entry to the burn's callback.
-void fn_801115C4(HwsBurn* pBurn) {
-    int i;
-    int n = pBurn->n60;
-
-    memcpy(pBurn->a64, pBurn->pDesc->p14, n * sizeof(SkinDesc14));
-    for (i = 0; i < n; i++) {
-        if (pBurn->pfn68 != NULL) {
-            pBurn->pfn68(pBurn->pSkin, &pBurn->a64[i]);
-        }
-    }
 }
 
 // Burn the description: list what is used, then copy the description and each table it keeps into
