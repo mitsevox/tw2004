@@ -129,8 +129,8 @@ void fn_8009B970(int nView) {
             lbl_802813C0->anRows[nView] = 16;
         }
         lbl_802813C0->fCellD = fLen / (lbl_802813C0->anRows[nView] - 1);
-        fAlong = lbl_802813C0->fCellD / 2.0f + fDist;
         fAcross = (lbl_802813C0->nCols / 2) * lbl_802813C0->fCellW - lbl_802813C0->fCellW / 2.0f;
+        fAlong = lbl_802813C0->fCellD / 2.0f + fDist;
     } else {
         lbl_802813C0->anRows[nView] = lbl_802813C0->nCols;
         lbl_802813C0->fCellD = lbl_802813C0->fCellW;
