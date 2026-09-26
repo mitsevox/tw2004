@@ -87,3 +87,4 @@ Swing SW_KillVibration: inline helpers returning &p->nController / &p->swing.nVi
 - Swing_RumbleOff: pointer order/const/decl permutations, p-> forms; TW07 SW_KillVibration has int temp +
   pCoreShotInfo + pSwingInfo.
 ```
+- 2026-09-26, r6-assert: dead asserts (agents/findings/2026-09-26-dead-asserts.md): an empty `if (x) { } else { }` (the only assert form that leaves any trace on GC/2.5) after every statement of the function, quicktrial aligned: an empty if/else after the pointer setup keeps pFrames past the frontend (the `addi rX,base,0x834` before the first call, as EA) but with other registers: 4 -> 7 for every condition and position; with it, 4896 variants (pointer spellings from p or gPlayers[], first call through pController / p / gPlayers[], the flag store through p or gPlayers[], both assignment orders, all declaration orders, the assert on pFrames / pController / both / p at 4 positions): best 4. No source change.
