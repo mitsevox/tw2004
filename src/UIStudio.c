@@ -29,6 +29,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
     s32 n;
     s32 n2;
     s32 i;
+    int i2;  // cases 0x66-0x68 count in an int: EA's loop guards compare it with the s32 bound
     s32 nDims;
     s32 nIndex;
     s32 nMul;
@@ -949,11 +950,11 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 break;
             }
             nDims = pArr[0];
-            for (i = 1; i <= nDims; i++) {
-                nMul *= pArr[i];
+            for (i2 = 1; i2 <= nDims; i2++) {
+                nMul *= pArr[i2];
             }
-            for (i = 0; i < nMul; i++) {
-                pArr[nDims + i + 1] = pTop[-1 - bOnStack];
+            for (i2 = 0; i2 < nMul; i2++) {
+                pArr[nDims + i2 + 1] = pTop[-1 - bOnStack];
             }
             pFrame->pC -= bOnStack + 1;
             break;
