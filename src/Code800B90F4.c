@@ -19,8 +19,8 @@ f32 lbl_802821C8;               // } the held ball's offset in its bone (x, y); 
 PictFile* (*lbl_802821C4)(void* pArg);   // reads the next MAD file
 void* lbl_802821C0;             // what the read function is given
 
-void MAD_initdecode(u8* pData, int nMode, int nQuant);
-void MAD_decodemacroblock(u8* pRefY, u8* pRefU, u8* pRefV, u8* pY, u8* pU, u8* pV, int nStride);
+void fn_800B8528(u8* pData, int nMode, int nQuant);
+void fn_800B8618(u8* pRefY, u8* pRefU, u8* pRefV, u8* pY, u8* pU, u8* pV, int nStride);
 u32 fn_800B94B0(PictFile* pFile);
 void fn_800B95FC(PictFile* pFile);
 void fn_800B9624(PictFrame** apList, PictFrame* pFrame);
@@ -105,7 +105,7 @@ PictFrame* fn_800B928C(MadDecoder* p, PictFile* pFile) {
         if (pFrame == NULL) {
             return NULL;
         }
-        MAD_initdecode(pFile->aData, 0, pFile->n15);
+        fn_800B8528(pFile->aData, 0, pFile->n15);
         // a key frame has no reference: it gets its own Y plane for all three
         pRefY = pRefU = pRefV = fn_8003024C(pFrame);
     } else {
@@ -126,7 +126,7 @@ PictFrame* fn_800B928C(MadDecoder* p, PictFile* pFile) {
         if (pFrame == NULL) {
             return NULL;
         }
-        MAD_initdecode(pFile->aData, 1, pFile->n15);
+        fn_800B8528(pFile->aData, 1, pFile->n15);
     }
     pY = fn_8003024C(pFrame);
     pU = fn_80030234(pFrame);
@@ -134,7 +134,7 @@ PictFrame* fn_800B928C(MadDecoder* p, PictFile* pFile) {
     for (y = 0; y < p->nHeight; y += 16) {
         // a block is 16x16 Y pixels and 8x8 U and V ones
         for (x = 0, xc = 0; x < p->nWidth; xc += 8, x += 16) {
-            MAD_decodemacroblock(&pRefY[x + y * p->nWidth], &pRefU[xc + y * p->nWidth / 4],
+            fn_800B8618(&pRefY[x + y * p->nWidth], &pRefU[xc + y * p->nWidth / 4],
                         &pRefV[xc + y * p->nWidth / 4], &pY[x + y * p->nWidth],
                         &pU[xc + y * p->nWidth / 4], &pV[xc + y * p->nWidth / 4], p->nWidth);
         }

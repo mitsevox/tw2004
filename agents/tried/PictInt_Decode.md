@@ -1,6 +1,6 @@
 # PictInt_Decode (LLPictInt.c, 0x8005620C)
 
-Status: OPEN, 93.12727% on 2026-09-25.
+Status: OPEN, 93.26363% on 2026-09-26.
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -8,6 +8,24 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26, r2-ll: MAD_decodemacroblock takes 7 arguments (TW06 PDB: src_y, src_cb, src_cr,
+  dest_y, dest_cb, dest_cr, width, flags; our exact rcmp_mad_codec.c uses the first 7). The
+  target's loop width in r9 is the 7th argument: passing `pFile->nWidth` (and NULL refs) fixed
+  the whole loop. 93.12727 -> 93.26363% real, quicktrial 14 -> 11 aligned. Kept.
+  After it: sibling width at the first swap 16, stwbrx moved after the height swap 28,
+  `__stwbrx(pFile->uC, pFile, 0xC)` 13. uC field as s32/int/f32 (with a u32 read) 11; value
+  `(int)` cast, `(void*)` address 11; `(u32*)pFile + 3` / `(u8*)pFile + 0xC` / both through a
+  `(u8*)pFile + 0xC` pointer 68. 32-bit swap as a C shift expression 13 (not turned into stwbrx),
+  `pFile->uC = __lwbrx(&pFile->uC, 0)` 15, with the sibling width 14. The three swaps put in a
+  comma expression inside the allocator's first/last argument or before the call: 11 / 16 with
+  the sibling width (no change at all). Left: the 32-bit value takes r4 (not r3) at BOTH swaps,
+  as if r3 were live there (the allocator's r3 argument at the first, the returned pPict at the
+  last); the first width mask needs the sibling spelling but that schedules it too early.
+  Also from 11 (w1 = current first width, sib = sibling spelling): the 32-bit value through the
+  existing int locals x/y/xc at either or both swaps 11 (sib 16); a header-swap static inline
+  (void or returning the pointer, also `pFile = Swap(pFile)`) at both / first / last swap 11-12
+  (sib first 16, sib last 11), `return Swap(pFile) ? pPict : pPict` 29-34; `volatile` uC (with
+  a `(void*)` address) 11 / sib 16, volatile width/height 87-90.
 - 2026-09-25, n-ll: the whole header swap (32-bit, width and height, sibling fn_800B965C's
   spellings) as one static inline on the PictFile, used at both swaps / the first only / returning
   the pointer / with its own parameter name: 14 -> 19 aligned (same as the sibling width expression

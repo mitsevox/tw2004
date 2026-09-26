@@ -93,11 +93,6 @@ void fn_80168F5C(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
     }
 }
 
-// fake match: an identity read, for the register order of fn_80168FC8.
-static inline UISScreen* fn_80168FC8_Read(UISScreen* pScreen) {
-    return pScreen;
-}
-
 // Unloads a screen. Screens that named it as their previous screen take its previous screen
 // instead; it gets event -1 and the type 9 events queued for it (fn_80165ACC), its nodes and rate
 // functions are dropped, the unload callback frees its data and the table closes up. With no
@@ -106,6 +101,7 @@ static inline UISScreen* fn_80168FC8_Read(UISScreen* pScreen) {
 u8 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
     UISScreen* pScreen;
     UISScreen* pSrc;
+    UISScreen* pOther;
     u32 nIndex;
     u16 uPrevScreen;
     u16 uPrevGroup;
@@ -124,10 +120,10 @@ u8 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
             pStudio->nCurScreen = -1;
         }
         for (i = 0; i < pStudio->nScreens; i++) {
-            pSrc = fn_80168FC8_Read(&pStudio->pScreens[i]);  // fake match: through fn_80168FC8_Read
-            if (pSrc->uPrevGroup == uGroup && pSrc->uPrevScreen == uScreen) {
-                pSrc->uPrevGroup = uPrevGroup;
-                pSrc->uPrevScreen = uPrevScreen;
+            pOther = &pStudio->pScreens[i];
+            if (pOther->uPrevGroup == uGroup && pOther->uPrevScreen == uScreen) {
+                pOther->uPrevGroup = uPrevGroup;
+                pOther->uPrevScreen = uPrevScreen;
             }
         }
         bOut = 0;
@@ -278,7 +274,8 @@ static inline s32 Screen_BringBack(UIStudio* pStudio, u16 uGroup, u16 uScreen, u
     u32 n;
     u8 bOut;
 
-    pScreen = &pStudio->pScreens[fn_8016C6C4(pStudio, uGroup, uScreen)];
+    i = fn_8016C6C4(pStudio, uGroup, uScreen);
+    pScreen = &pStudio->pScreens[i];
     fn_80165C74(pStudio);
     pStudio->uFlags |= 4;
     n = pStudio->nRateFns;

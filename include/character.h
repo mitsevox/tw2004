@@ -285,7 +285,7 @@ typedef struct Clip {
     s16    n28;                 // 0x28  bytes fn_80020328 copies out of a frame of the first stream
     s16    n2A;                 // 0x2A  from this offset
     s32    n2C;                 // 0x2C
-    u32    u30;                 // 0x30  SKA_LoadFromMem hands it back
+    u32    u30;                 // 0x30  fn_80020DD4 hands it back
     u8     unk34[2];
     s16    n36;                 // 0x36  non-zero: it has a second frame stream (fn_80020328)
     s32    n38;                 // 0x38  bytes of the first frame stream
@@ -296,8 +296,8 @@ typedef struct Clip {
     u8     unk4A[2];
     s32    n4C;                 // 0x4C
     s32    n50;                 // 0x50
-    s32    n54;                 // 0x54  bytes from pC4 to the pF4 library (SKA_LoadFromMem)
-    s32    n58;                 // 0x58  passed to SKAUtil_EulerAnglesToQTs8 with a second-stream frame
+    s32    n54;                 // 0x54  bytes from pC4 to the pF4 library (fn_80020DD4)
+    s32    n58;                 // 0x58  passed to fn_8002148C with a second-stream frame
     s32    n5C;                 // 0x5C  passed to fn_80021134 with a first-stream frame
     s32    n60;                 // 0x60  passed to fn_80021134 with pE8
     s32    n64;                 // 0x64
@@ -309,7 +309,7 @@ typedef struct Clip {
     u8     unk98[8];
     char   name[0x20];          // 0xA0  (fn_8002091C swaps 0xA0 and 0xB0 as 16 bytes each, then words)
     void*  pC0;                 // 0xC0  where the clip was loaded: itself (fn_80020F60), or the start
-                                //       of the buffer it was aligned up in (SKA_LoadFromMem)
+                                //       of the buffer it was aligned up in (fn_80020DD4)
     u8*    pC4;                 // 0xC4  the end of pD0's tracks
     u8*    pC8;                 // 0xC8  the same; fn_800206C8 lays out the streams from here
     f32    fCC;                 // 0xCC  how far along the swing is, 0..1 (Character.fBackswing copies it)
@@ -341,7 +341,7 @@ typedef struct ClipTrack {
 
 // ska_shared.c: run on a clip just read from disc (skalib.c, AnimStream.c): moves nothing, but
 // takes the clip at pData rounded up to nAlign, byte-swaps it and lays it out in memory.
-Clip* SKA_LoadFromMem(u8* pData, u32* pu30, u32 nAlign);
+Clip* fn_80020DD4(u8* pData, u32* pu30, u32 nAlign);
 
 typedef struct SKABlendNode SKABlendNode;
 

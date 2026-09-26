@@ -1060,7 +1060,10 @@ config.libs = [
             # UISScreen.c (source last address first): .text and data byte-identical to the old
             # build, and fn_8016604C's callers call it (inlined) instead of a written-out copy.
             # UISApi.c and UIStudio.c give byte-identical code under deferred too; left as they are.
-            Object(NonMatching, "UISEvent.c", extra_cflags=['-pragma "pool_data on"', "-inline auto,deferred"]),
+            # Read-only strings: the original's string pool is in .rodata (lbl_801860D8), apart
+            # from the switch tables in .data. The string offsets in fn_80165E9C now match.
+            Object(NonMatching, "UISEvent.c",
+                   extra_cflags=['-pragma "pool_data on"', "-inline auto,deferred", "-str reuse,readonly"]),
             Object(NonMatching, "UIStudio.c"),
             # Built with automatic inlining like UISScreen.c below: fn_80168DB0 88.9 -> 98.7%, no
             # function worse.
