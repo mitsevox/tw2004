@@ -29,9 +29,9 @@ void  fn_80031AB4(void);
 u8    fn_80031E40(void);
 void  fn_80031E58(void);
 u8    fn_80032330(UObjMesh* pModel);
-void  fn_8003241C(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UObjMesh* pModel, s32 iObject,
-                  s32 eClipMethod, u8 bUseFog, u8 bSetsPrimField, f32 fAlpha, f32 fMipmapBias,
-                  f32 fDistanceSquared);
+void  fn_8003241C(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UObjMesh* pModel, f32 fAlpha,
+                  f32 fMipmapBias, f32 fDistanceSquared, s32 iObject, s32 eClipMethod, u8 bUseFog,
+                  u8 bSetsPrimField);
 void  fn_80032518(int nRenderPass);
 void  fn_80032770(void);
 void  fn_80032954(void);
@@ -816,9 +816,9 @@ void fn_80031E58(void) {
         if (uFlags2 & 0x80) {
             pRef = &lbl_801D3CB0.pObjectSortList[i];
             fn_8003241C(&lbl_801D3CB0.pPostDrawItemsList[lbl_801D3CB0.iPostDrawItems],
-                        &lbl_801D3CB0.iPostDrawItems, 400, pRef->apObject[pRef->iOpaqueLOD],
-                        pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0, 1.0f,
-                        fn_80031E58_Read(pRef->iOpaqueLOD), pRef->fDistanceSquared);
+                        &lbl_801D3CB0.iPostDrawItems, 400, pRef->apObject[pRef->iOpaqueLOD], 1.0f,
+                        fn_80031E58_Read(pRef->iOpaqueLOD), pRef->fDistanceSquared, pRef->iGlobalObjectIndex,
+                        pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0);
         } else if (lbl_801D3CB0.pObjectSortList[i].fDistanceSquared < fFarSquared) {
             fDistance = fn_80009680(lbl_801D3CB0.pObjectSortList[i].fDistanceSquared);
             if (fDistance > fFar || (uFlags0 & 0x40)
@@ -831,10 +831,9 @@ void fn_80031E58(void) {
                 lbl_801D3CB0.pObjectStateList[iObject].aView[lbl_801D3CB0.iCurrentViewContext].f0 = 1.0f;
                 pRef = &lbl_801D3CB0.pObjectSortList[i];
                 fn_8003241C(&lbl_801D3CB0.pOpaqueObjectList[lbl_801D3CB0.iOpaqueObjects],
-                            &lbl_801D3CB0.iOpaqueObjects, 650, pRef->apObject[pRef->iOpaqueLOD],
-                            pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0,
-                            1.0f, fn_80031E58_Read(pRef->iOpaqueLOD),
-                            pRef->fDistanceSquared);
+                            &lbl_801D3CB0.iOpaqueObjects, 650, pRef->apObject[pRef->iOpaqueLOD], 1.0f,
+                            fn_80031E58_Read(pRef->iOpaqueLOD), pRef->fDistanceSquared,
+                            pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0);
             } else {
                 fT = (fDistance - fNear) / fRange;
                 if (fT < 0.0f) {
@@ -843,10 +842,10 @@ void fn_80031E58(void) {
                 if (fT != 0.0f) {
                     pRef = &lbl_801D3CB0.pObjectSortList[i];
                     fn_8003241C(&lbl_801D3CB0.pNearbyObjectList[lbl_801D3CB0.iNearbyObjects],
-                                &lbl_801D3CB0.iNearbyObjects, 70, pRef->apObject[pRef->iOpaqueLOD],
+                                &lbl_801D3CB0.iNearbyObjects, 70, pRef->apObject[pRef->iOpaqueLOD], fT,
+                                fn_80031E58_Read(pRef->iOpaqueLOD), pRef->fDistanceSquared,
                                 pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f,
-                                0, fT, fn_80031E58_Read(pRef->iOpaqueLOD),
-                                pRef->fDistanceSquared);
+                                0);
                 }
             }
         } else {
@@ -855,18 +854,17 @@ void fn_80031E58(void) {
                 .aView[lbl_801D3CB0.iCurrentViewContext].n4 = 3;
             pRef = &lbl_801D3CB0.pObjectSortList[i];
             fn_8003241C(&lbl_801D3CB0.pOpaqueObjectList[lbl_801D3CB0.iOpaqueObjects],
-                        &lbl_801D3CB0.iOpaqueObjects, 650, pRef->apObject[pRef->iOpaqueLOD],
-                        pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0, 1.0f,
-                        fn_80031E58_Read(pRef->iOpaqueLOD), pRef->fDistanceSquared);
+                        &lbl_801D3CB0.iOpaqueObjects, 650, pRef->apObject[pRef->iOpaqueLOD], 1.0f,
+                        fn_80031E58_Read(pRef->iOpaqueLOD), pRef->fDistanceSquared, pRef->iGlobalObjectIndex,
+                        pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0);
         }
         if (gSession.b11 == 0) {
             pRef = &lbl_801D3CB0.pObjectSortList[i];
             if (pRef->fAlpha != 0.0f && !(uFlags0 & 0x40)) {
                 fn_8003241C(&lbl_801D3CB0.pTranslucentObjectList[lbl_801D3CB0.iTranslucentObjects],
                             &lbl_801D3CB0.iTranslucentObjects, 200, pRef->apObject[pRef->iTranslucentLOD],
-                            pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0,
-                            pRef->fAlpha, fn_80031E58_Read(pRef->iTranslucentLOD),
-                            pRef->fDistanceSquared);
+                            pRef->fAlpha, fn_80031E58_Read(pRef->iTranslucentLOD), pRef->fDistanceSquared,
+                            pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0);
             }
         }
     }
@@ -892,9 +890,9 @@ u8 fn_80032330(UObjMesh* pModel) {
 // Adds a draw of pModel to a draw list: fills pDraw and counts it in *pCount. A model whose flags
 // (bytes 0 and 3) ask for it is skipped in modes 6-8 (fn_800E3A54); one with bits 0 and 1 of byte 0
 // is otherwise drawn as its node chosen by the object's state (n18).
-void fn_8003241C(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UObjMesh* pModel, s32 iObject,
-                 s32 eClipMethod, u8 bUseFog, u8 bSetsPrimField, f32 fAlpha, f32 fMipmapBias,
-                 f32 fDistanceSquared) {
+void fn_8003241C(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UObjMesh* pModel, f32 fAlpha,
+                 f32 fMipmapBias, f32 fDistanceSquared, s32 iObject, s32 eClipMethod, u8 bUseFog,
+                 u8 bSetsPrimField) {
     s32 uFlags0;
     s32 uFlags3;
 
@@ -1200,16 +1198,16 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
     if ((uFlags2 & 0x10) && b2 == 0) {
         if (pMesh->n20 != 0) {
             fn_8003241C(&lbl_801D3CB0.pDeferredItemsList[lbl_801D3CB0.iDeferredItems],
-                        &lbl_801D3CB0.iDeferredItems, 50, pMesh, 0x289, eClipMethod, fFar > 0.0f, 0, 1.0f,
-                        bLake ? fBias : 0.0f, 0.0f);
+                        &lbl_801D3CB0.iDeferredItems, 50, pMesh, 1.0f, bLake ? fBias : 0.0f, 0.0f, 0x289,
+                        eClipMethod, fFar > 0.0f, 0);
         }
         pMesh = fn_800354BC(pMesh);
     }
     if (uFlags2 & 0x20) {
         if (pMesh->n20 != 0) {
             fn_8003241C(&lbl_801D3CB0.pDeferredItemsList[lbl_801D3CB0.iDeferredItems],
-                        &lbl_801D3CB0.iDeferredItems, 50, pMesh, 0x289, eClipMethod, fFar > 0.0f, 0, 1.0f,
-                        bLake ? fBias : 0.0f, 0.0f);
+                        &lbl_801D3CB0.iDeferredItems, 50, pMesh, 1.0f, bLake ? fBias : 0.0f, 0.0f, 0x289,
+                        eClipMethod, fFar > 0.0f, 0);
         }
         pMesh = fn_800354BC(pMesh);
     }
@@ -1748,9 +1746,9 @@ void fn_80033F94(void* pHoleData, u32 nList) {
                         // fake match: uFlags is reused for bUseFog (fog unless flag 0x20); a new local
                         // is computed after the call to fn_80035560, the original before it
                         uFlags = ((uFlags & 0x20) >> 5) ^ 1;
-                        fn_8003241C(&lbl_801D3CB0.pPanoramaItemsList[nItems], &nItems, 300, pMesh, 0x289 - i,
-                                    nClip, uFlags, 0, 1.0f,
-                                    lbl_801D3CB0.fDefaultObjectMipmapBias[0] * fn_80035560(pMesh), 0.0f);
+                        fn_8003241C(&lbl_801D3CB0.pPanoramaItemsList[nItems], &nItems, 300, pMesh, 1.0f,
+                                    lbl_801D3CB0.fDefaultObjectMipmapBias[0] * fn_80035560(pMesh), 0.0f,
+                                    0x289 - i, nClip, uFlags, 0);
                     }
                 }
                 pMesh = fn_800354BC(pMesh);
