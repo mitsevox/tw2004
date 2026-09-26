@@ -351,6 +351,10 @@ fe_craputils.c:
 
 Swing.c:
 	.text       start:0x800589F8 end:0x8005CCAC
+	.data       start:0x80188148 end:0x801883C0
+	.bss        start:0x801D5968 end:0x801D5A90
+	.sdata      start:0x80281188 end:0x802811A8
+	.sdata2     start:0x802835B0 end:0x80283680
 
 StateGolfer.c:
 	.text       start:0x8005CCAC end:0x8005D2E4
