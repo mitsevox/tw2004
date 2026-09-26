@@ -810,7 +810,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 uByte1 = *pFrame->p10;
                 pFrame->p10++;
                 n = (uByte0 << 8) | uByte1;
-                pArr = (s32*)(uOffset + pFrame->pC[(s16)n]);
+                uOffset += pFrame->pC[(s16)n];
+                pArr = (s32*)uOffset;
                 break;
             }
             nDims = pArr[0];
@@ -875,7 +876,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 uByte1 = *pFrame->p10;
                 pFrame->p10++;
                 n = (uByte0 << 8) | uByte1;
-                pArr = (s32*)(uOffset + pFrame->pC[(s16)n]);
+                uOffset += pFrame->pC[(s16)n];
+                pArr = (s32*)uOffset;
                 break;
             }
             nDims = pArr[0];
@@ -980,7 +982,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 uByte1 = *pFrame->p10;
                 pFrame->p10++;
                 n = (uByte0 << 8) | uByte1;
-                pArr = (s32*)(uOffset + pFrame->pC[(s16)n]);
+                uOffset += pFrame->pC[(s16)n];
+                pArr = (s32*)uOffset;
                 break;
             }
             nDims = pArr[0];
