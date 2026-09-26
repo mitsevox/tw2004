@@ -146,7 +146,7 @@ u8* fn_8016C5C4(UISNode* pNode, u32 uEvent) {
 // info and a 0) and runs pScript on it. The frame stays on the stack only when the script
 // returns 3 (it paused).
 s8 fn_8016C270(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UISWordStack* pStack, u8* pScript,
-               u32 nArgs, const s32* pArgs, u32 nArgs2, const s32* pArgs2, u8 bExtra, s32 nExtra,
+               s32 nArgs, const s32* pArgs, u32 nArgs2, const s32* pArgs2, u8 bExtra, s32 nExtra,
                s32* pnSaved) {
     s32* pFrame;
     u32 i;
@@ -311,18 +311,20 @@ char* fn_8016BEDC(char* pOut, char* pEnd, s32 nWidth, s32 nPrec, f32 f) {
         aDigits[nDigits++] = '-';
     }
     if (nWidth != 0) {
-        for (nPad = nWidth - (nPrec + (nDigits + (nPrec != 0))); nPad > 0; nPad--) {
+        for (nPad = nWidth - (nPrec + nDigits + (nPrec != 0)); nPad > 0; nPad--) {
             aDigits[nDigits++] = ' ';
         }
     }
-    while (nDigits-- > 0 && pOut < pEnd) {
+    while (--nDigits >= 0 && pOut < pEnd) {
         *pOut++ = aDigits[nDigits];
     }
     if (nPrec != 0 && pOut < pEnd) {
         *pOut++ = '.';
         do {
             fFrac *= 10.0f;
-            *pOut++ = (s32)fFrac + '0';
+            // (int) and (s32) (a long) are separate conversions to the compiler: EA stores the
+            // digit and the whole part as two words.
+            *pOut++ = (int)fFrac + '0';
             fFrac -= (s32)fFrac;
         } while (--nPrec != 0 && pOut < pEnd);
     }
@@ -492,11 +494,11 @@ void fn_8016B4D4(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 nMove) {
     s32 nScreens;
     s32 nIndex;
     s32 nCount;
-    s32 nStep;
     s32 nFrom;
     s32 nTo;
     u32 i;
     u32 j;
+    s32 nStep;
     UISScreen tmp;
 
     nScreens = pStudio->nScreens;
@@ -719,10 +721,9 @@ void fn_8016ABBC(UIStudio* pStudio, UISScreen* pScreen, s32 n, s32 nKind, void* 
 
 // Hands node nNode and every node it links to to the transform callback with operation nOp.
 // Operations 0 and 3 also reach groups whose info has no owner.
-void fn_8016A830(UIStudio* pStudio, s32 nOp, UISScreen* pScreen, u32 nNode) {
+void fn_8016A830(UIStudio* pStudio, int nOp, UISScreen* pScreen, u32 nNode) {
     UISNode* pNode;
     u32 i;
-    u32 j;
 
     if (pScreen->pData != NULL) {
         pNode = &pScreen->pData->pNodes[nNode];
@@ -730,6 +731,7 @@ void fn_8016A830(UIStudio* pStudio, s32 nOp, UISScreen* pScreen, u32 nNode) {
         for (i = 0; i < pNode->nGroups; i++) {
             UISGroup* pGroup = pNode->ppGroups[i];
             if (pGroup->pInfo->p0 != NULL || nOp == 0 || nOp == 3) {
+                u32 j;
                 for (j = 0; j < pGroup->nEntries; j++) {
                     UISEntry* pEntry = &pGroup->pEntries[j];
                     if (pEntry->uHandler == 0xFFFF) {
@@ -811,8 +813,8 @@ s32 fn_8016A2D4(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32
     nResult = 0;
     if (pScreen->pData == NULL || nNode >= pScreen->pData->nNodes) return 0;
     pNode = &pScreen->pData->pNodes[nNode];
-    if ((pNode->pInfo->u4 != 0 && pNode->pInfo->u60 != 0) || (n5 >= (u32)-10 && n5 <= (u32)-8) ||
-        (n5 >= (u32)-5 && n5 <= (u32)-2) || n5 == (u32)-11) {
+    if ((pNode->pInfo->u4 != 0 && pNode->pInfo->u60 != 0) || n5 - (u32)-10 <= 2 ||
+        n5 - (u32)-5 <= 3 || n5 == (u32)-11) {
         for (i = 0; i < pNode->nHandlers; i++) {
             UISHandler* pHandler = &pNode->pHandlers[i];
             if (pHandler->uEvent == 0xFFFF) {
