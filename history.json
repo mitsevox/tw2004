@@ -41557,5 +41557,21 @@
 "matched_functions": 7585,
 "total_functions": 7647,
 "exact": 7585
+},
+{
+"commit": "0c6f6c8",
+"sha": "0c6f6c805ddbe41e9d26eb849b8882b0f1550b1f",
+"time": 1790461892,
+"subject": "Merge r7-golfer: AI_ChooseTarget 98.66 -> 99.56 (nA local); rasim.py models spill choice + later passes; mwccdbg marks superseded passes",
+"report": true,
+"matched_code": 1491024,
+"complete_code": 1311696,
+"matched_data": 723063,
+"complete_data": 868387,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7585,
+"total_functions": 7647,
+"exact": 7585
 }
 ]
