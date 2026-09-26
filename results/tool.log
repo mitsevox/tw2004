@@ -1,0 +1,5 @@
+singles done: 33 trials, best (33, 385.12465594413135)
+descent end: (33, 387.3609936490494)  opt=-O4,p | inline=-inline auto,deferred | pool=-pragma "pool_data on" | str=-str reuse,readonly | fpc=-fp_contract on | lang=-lang=c | cc=GC/2.5 | misc=
+descent end: (33, 387.35553020642647)  opt=-O4,p | inline=-inline auto | pool=-pragma "pool_data on" | str=-str reuse | fpc=-fp_contract on | lang=-lang=c | cc=GC/2.5 | misc=
+descent end: (33, 387.35553020642647)  opt=-O4,p | inline=-inline all | pool=-pragma "pool_data on" | str=-str reuse | fpc=-fp_contract on | lang=-lang=c | cc=GC/2.5 | misc=
+descent end: (33, 387.35553020642647)  opt=-O4,p | inline=-inline auto | pool=-pragma "pool_data on" | str=-str reuse | fpc=-fp_contract on | lang=-lang=c | cc=GC/2.5 | misc=
