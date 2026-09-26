@@ -315,8 +315,8 @@ void GR_BuildGridRenderData(s32 nView) {
                 bInGap = 0;
             }
             k = 0;
-            fY = 0.01f + fHeight;
             fX = fAcross * fDirZ + (fAlong * fDirX + fCornerX);
+            fY = 0.01f + fHeight;
             fZ = (fAlong * fDirZ + fCornerZ) - fAcross * fDirX;
             do {
                 lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 0] = fX;
