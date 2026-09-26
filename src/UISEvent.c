@@ -180,14 +180,18 @@ void fn_80165B90(s16 nA, s16 nB, UIStudio* pStudio, s32 nType, UISEventData* pDa
 // Walks the event stack from the bottom up and, for each type 9 event queued for the given
 // screen, while that screen is still loaded, calls fn_8016B0F8 with the event's first data word
 // and its arguments.
-s32 fn_80165ACC(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
+s32 fn_80165ACC(UIStudio* pArg, u16 uGroup, u16 uScreen) {
+    // fake match: the declaration order, the uGroup copy and the copy of the parameter through
+    // void* (a plain copy is merged into it) set the saved registers
     s32* p;
-    s32* pData;
-    s32* pArgs;
-    s32 nArgs;
-    s32 nType;
-    u16 uA;
     u16 uB;
+    s32 nType;
+    const u16 uG = uGroup;
+    UIStudio* pStudio = (UIStudio*)(void*)pArg;
+    u16 uA;
+    s32* pArgs;
+    s32* pData;
+    s32 nArgs;
 
     p = pStudio->pEventBase;
     while (p > pStudio->pEventTop) {
@@ -200,7 +204,7 @@ s32 fn_80165ACC(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
         p -= nArgs;
         pArgs = p;
         p -= 1;
-        if (uA == uGroup && uB == uScreen && nType == 9
+        if (uA == uG && uB == uScreen && nType == 9
             && fn_8016C6C4(pStudio, uA, uB) < pStudio->nScreens) {
             fn_8016B0F8(pStudio, *pData, nArgs, pArgs);
         }
