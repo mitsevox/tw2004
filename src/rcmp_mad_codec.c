@@ -17,9 +17,9 @@
 
 s32 lbl_802821A8;               // the decoder's tables are built
 s32 lbl_802821AC;               // 0: a key frame, 1: coded against a reference
-s32 lbl_802821B0;               // bits left in lbl_802821B4
-u32 lbl_802821B4;               // the bit buffer, next bit at the top
-u8* lbl_802821B8;               // the next coded byte
+s32 madbitcount;               // bits left in madshiftreg
+u32 madshiftreg;               // the bit buffer, next bit at the top
+u8* maddataptr;               // the next coded byte
 
 // MPEG-1's default intra quantizer matrix
 const s32 lbl_80184A68[64] = {
@@ -55,32 +55,32 @@ const s32 lbl_80184B68[64] = {
 u8 lbl_801F6858[512];           // a pixel value's clamp to 0..255, by its low 9 bits
 s32 lbl_801F6A58[2][64];        // a macroblock's U and V blocks
 s32 lbl_801F6C58[256];          // a macroblock's 16x16 Y block
-s32 lbl_801F7058[64];           // the quantizer for this picture
-u32 lbl_801F7158[64];           // looked up by the buffer's top 6 bits
+s32 madquant[64];           // the quantizer for this picture
+u32 madvlctbl4[64];           // looked up by the buffer's top 6 bits
 u32 lbl_801F7258[256];          // } the coefficient codes: the first 9 bits index
-u32 lbl_801F7658[256];          // } lbl_801F7A58; longer codes continue in these two
-u32 lbl_801F7A58[512];          // }
+u32 lbl_801F7658[256];          // } madvlctbl1; longer codes continue in these two
+u32 madvlctbl1[512];          // }
 s32 lbl_801F8258[64];           // the inverse DCT's first pass
 s32 lbl_801F8358[64];           // a block's coefficients
 
-void fn_800B769C(void);
+void madinit(void);
 u32 fn_800B8984(u8* pData, int nBytes);
 s32 fn_800B8A04(s32 a, s32 b);
-void fn_800B8618(u8* pRefY, u8* pRefU, u8* pRefV, u8* pY, u8* pU, u8* pV, int nStride);
-int fn_800B8AA0(void);
-void fn_800B8F28(s32* pOut, int nStride);
+void MAD_decodemacroblock(u8* pRefY, u8* pRefU, u8* pRefV, u8* pY, u8* pU, u8* pV, int nStride);
+int madvlcdecode(void);
+void idctcompute(s32* pOut, int nStride);
 
 // A code's table entry: its length in the low byte, the run in bits 16-21, the level on top.
 #define MAD_ENTRY(nLen, nValue) ((nLen) | (((u32)(nValue) << 22) | (((nValue) << 6) & 0x3F0000)))
 
-// fake match: an identity inline around each MAD_ENTRY in fn_800B769C moves the entry's
+// fake match: an identity inline around each MAD_ENTRY in madinit moves the entry's
 // computation after the loop setup, as in EA's code
 static inline u32 fn_800B769C_Read(u32 uEntry) {
     return uEntry;
 }
 
 // Build the decoder's tables: the pixel clamp, the coefficient code lookups and the DC codes.
-void fn_800B769C(void) {
+void madinit(void) {
     s32 nCode;
     s32 nValue;
     u32 uEntry;
@@ -103,15 +103,15 @@ void fn_800B769C(void) {
     }
 
     // the first 9 bits: the escape and end-of-block prefixes, and where longer codes continue
-    lbl_801F7A58[0] = 0xF;
+    madvlctbl1[0] = 0xF;
     for (i = 1; i < 8; i++) {
-        lbl_801F7A58[i] = 0x1F;
+        madvlctbl1[i] = 0x1F;
     }
     for (i = 8; i < 16; i++) {
-        lbl_801F7A58[i] = 0x2F;
+        madvlctbl1[i] = 0x2F;
     }
     for (i = 0; i < 128; i++) {
-        lbl_801F7A58[256 + i] = 0x3F;
+        madvlctbl1[256 + i] = 0x3F;
     }
 
     for (i = 1; i < 95; i++) {
@@ -124,7 +124,7 @@ void fn_800B769C(void) {
             nCount = 1 << (9 - nLen);
             uEntry = fn_800B769C_Read(MAD_ENTRY(nLen, nValue));
             for (j = 0; j < nCount; j++) {
-                lbl_801F7A58[nIndex + j] = uEntry;
+                madvlctbl1[nIndex + j] = uEntry;
             }
         } else {
             // six zero bits first: the next 8 bits index lbl_801F7258
@@ -163,35 +163,35 @@ void fn_800B769C(void) {
 
     // the DC codes, by the top 6 bits: a 0 bit is 0; 1 and five bits are 1..16 or -16..-1
     for (i = 0; i < 32; i++) {
-        lbl_801F7158[i] = 1;
+        madvlctbl4[i] = 1;
     }
     for (i = 0; i < 16; i++) {
-        lbl_801F7158[32 + i] = ((u32)(i + 1) << 22) | 6;
-        lbl_801F7158[48 + i] = ((u32)(i - 16) << 22) | 6;
+        madvlctbl4[32 + i] = ((u32)(i + 1) << 22) | 6;
+        madvlctbl4[48 + i] = ((u32)(i - 16) << 22) | 6;
     }
     lbl_802821A8 = 1;
 }
 
 // Drop nBits bits from the buffer, refilling 16 at a time.
-void fn_800B7D80(int nBits) {
-    lbl_802821B4 <<= nBits;
-    lbl_802821B0 -= nBits;
-    if (lbl_802821B0 < 16) {
-        lbl_802821B4 |= fn_800B8984(lbl_802821B8, 2) << (16 - lbl_802821B0);
-        lbl_802821B0 += 16;
-        lbl_802821B8 += 2;
+void discardbits(int nBits) {
+    madshiftreg <<= nBits;
+    madbitcount -= nBits;
+    if (madbitcount < 16) {
+        madshiftreg |= fn_800B8984(maddataptr, 2) << (16 - madbitcount);
+        madbitcount += 16;
+        maddataptr += 2;
     }
 }
 
 // The code at the top of the buffer: its entry's low byte is its length in bits.
-s32 fn_800B7DF4(void) {
-    s32 nCode = lbl_801F7158[lbl_802821B4 >> 26];
-    fn_800B7D80(nCode & 0xFF);
+s32 getdelta(void) {
+    s32 nCode = madvlctbl4[madshiftreg >> 26];
+    discardbits(nCode & 0xFF);
     return nCode >> 22;
 }
 
 // Fill an 8x8 block (rows nStride words apart) with lbl_801F8358[0].
-void fn_800B7E38(s32* pOut, int nStride) {
+void dcblock(s32* pOut, int nStride) {
     int i;
 
     for (i = 0; i < 8; i++) {
@@ -208,7 +208,7 @@ void fn_800B7E38(s32* pOut, int nStride) {
 }
 
 // An 8x8 block of pixels into a 16-wide block of 16.16 values, nAdd added to each.
-void fn_800B8064(const u8* pSrc, int nStride, s32* pOut, int nAdd) {
+void getluma(const u8* pSrc, int nStride, s32* pOut, int nAdd) {
     int i;
 
     for (i = 0; i < 8; i++) {
@@ -226,7 +226,7 @@ void fn_800B8064(const u8* pSrc, int nStride, s32* pOut, int nAdd) {
 }
 
 // The same into an 8-wide block.
-void fn_800B8180(const u8* pSrc, int nStride, s32* pOut, int nAdd) {
+void getchroma(const u8* pSrc, int nStride, s32* pOut, int nAdd) {
     int i;
 
     for (i = 0; i < 8; i++) {
@@ -244,7 +244,7 @@ void fn_800B8180(const u8* pSrc, int nStride, s32* pOut, int nAdd) {
 }
 
 // A 16x16 block of 16.16 values back to pixels, clamped through lbl_801F6858.
-void fn_800B829C(const s32* pIn, u8* pOut, int nStride) {
+void setluma(const s32* pIn, u8* pOut, int nStride) {
     int i;
 
     for (i = 0; i < 16; i++) {
@@ -270,7 +270,7 @@ void fn_800B829C(const s32* pIn, u8* pOut, int nStride) {
 }
 
 // An 8x8 block of 16.16 values back to pixels.
-void fn_800B83DC(const s32* pIn, u8* pOut, int nStride) {
+void setchroma(const s32* pIn, u8* pOut, int nStride) {
     int i;
 
     for (i = 0; i < 8; i++) {
@@ -289,19 +289,19 @@ void fn_800B83DC(const s32* pIn, u8* pOut, int nStride) {
 
 // Start a picture: pData is its coded data, nMode 0 for a key frame and 1 for one coded against
 // a reference, nQuant its quality.
-void fn_800B8528(u8* pData, int nMode, int nQuant) {
+void MAD_initdecode(u8* pData, int nMode, int nQuant) {
     int i;
 
     if (lbl_802821A8 == 0) {
-        fn_800B769C();
+        madinit();
     }
-    lbl_802821B4 = (fn_800B8984(pData, 2) << 16) | fn_800B8984(pData + 2, 2);
-    lbl_802821B0 = 32;
-    lbl_802821B8 = pData + 4;
+    madshiftreg = (fn_800B8984(pData, 2) << 16) | fn_800B8984(pData + 2, 2);
+    madbitcount = 32;
+    maddataptr = pData + 4;
     lbl_802821AC = nMode;
-    lbl_801F7058[0] = fn_800B8A04(lbl_80184A68[0] << 16, lbl_80190FE0[0]);
+    madquant[0] = fn_800B8A04(lbl_80184A68[0] << 16, lbl_80190FE0[0]);
     for (i = 1; i < 64; i++) {
-        lbl_801F7058[i] = fn_800B8A04((nQuant * lbl_80184A68[i]) << 13, lbl_80190FE0[i]);
+        madquant[i] = fn_800B8A04((nQuant * lbl_80184A68[i]) << 13, lbl_80190FE0[i]);
     }
 }
 
@@ -309,7 +309,7 @@ void fn_800B8528(u8* pData, int nMode, int nQuant) {
 // (the U and V rows are half that). In a frame coded against a reference, a block with its bit
 // set in the block pattern is the reference block (moved by the macroblock's motion) plus a
 // level; the others are coded in full.
-void fn_800B8618(u8* pRefY, u8* pRefU, u8* pRefV, u8* pY, u8* pU, u8* pV, int nStride) {
+void MAD_decodemacroblock(u8* pRefY, u8* pRefU, u8* pRefV, u8* pY, u8* pU, u8* pV, int nStride) {
     int nHalf;
     u32 uPattern;
     int nAdd;
@@ -320,87 +320,87 @@ void fn_800B8618(u8* pRefY, u8* pRefU, u8* pRefV, u8* pY, u8* pU, u8* pV, int nS
     nHalf = nStride >> 1;
     if (lbl_802821AC == 0) {
         uPattern = 0;
-    } else if (!(lbl_802821B4 & 0xC0000000)) {
+    } else if (!(madshiftreg & 0xC0000000)) {
         uPattern = 0;
-        fn_800B7D80(2);
+        discardbits(2);
     } else {
-        if (lbl_802821B4 & 0x80000000) {
+        if (madshiftreg & 0x80000000) {
             uPattern = 0x3FF;
-            fn_800B7D80(1);
+            discardbits(1);
         } else {
-            uPattern = lbl_802821B4 >> 24;
-            fn_800B7D80(8);
+            uPattern = madshiftreg >> 24;
+            discardbits(8);
         }
-        dx = fn_800B7DF4();
-        dy = fn_800B7DF4();
+        dx = getdelta();
+        dy = getdelta();
         pRefY += dx + dy * nStride;
         nOffset = (dx >> 1) + (dy >> 1) * nHalf;
         pRefU += nOffset;
         pRefV += nOffset;
     }
     if (!(uPattern & 1)) {
-        if (fn_800B8AA0() == 1) {
-            fn_800B7E38(&lbl_801F6C58[0], 16);
+        if (madvlcdecode() == 1) {
+            dcblock(&lbl_801F6C58[0], 16);
         } else {
-            fn_800B8F28(&lbl_801F6C58[0], 16);
+            idctcompute(&lbl_801F6C58[0], 16);
         }
     } else {
-        nAdd = fn_800B7DF4() * 2 - 128;
-        fn_800B8064(pRefY, nStride, &lbl_801F6C58[0], nAdd);
+        nAdd = getdelta() * 2 - 128;
+        getluma(pRefY, nStride, &lbl_801F6C58[0], nAdd);
     }
     if (!(uPattern & 2)) {
-        if (fn_800B8AA0() == 1) {
-            fn_800B7E38(&lbl_801F6C58[8], 16);
+        if (madvlcdecode() == 1) {
+            dcblock(&lbl_801F6C58[8], 16);
         } else {
-            fn_800B8F28(&lbl_801F6C58[8], 16);
+            idctcompute(&lbl_801F6C58[8], 16);
         }
     } else {
-        nAdd = fn_800B7DF4() * 2 - 128;
-        fn_800B8064(pRefY + 8, nStride, &lbl_801F6C58[8], nAdd);
+        nAdd = getdelta() * 2 - 128;
+        getluma(pRefY + 8, nStride, &lbl_801F6C58[8], nAdd);
     }
     if (!(uPattern & 4)) {
-        if (fn_800B8AA0() == 1) {
-            fn_800B7E38(&lbl_801F6C58[128], 16);
+        if (madvlcdecode() == 1) {
+            dcblock(&lbl_801F6C58[128], 16);
         } else {
-            fn_800B8F28(&lbl_801F6C58[128], 16);
+            idctcompute(&lbl_801F6C58[128], 16);
         }
     } else {
-        nAdd = fn_800B7DF4() * 2 - 128;
-        fn_800B8064(pRefY + nStride * 8, nStride, &lbl_801F6C58[128], nAdd);
+        nAdd = getdelta() * 2 - 128;
+        getluma(pRefY + nStride * 8, nStride, &lbl_801F6C58[128], nAdd);
     }
     if (!(uPattern & 8)) {
-        if (fn_800B8AA0() == 1) {
-            fn_800B7E38(&lbl_801F6C58[136], 16);
+        if (madvlcdecode() == 1) {
+            dcblock(&lbl_801F6C58[136], 16);
         } else {
-            fn_800B8F28(&lbl_801F6C58[136], 16);
+            idctcompute(&lbl_801F6C58[136], 16);
         }
     } else {
-        nAdd = fn_800B7DF4() * 2 - 128;
-        fn_800B8064(pRefY + nStride * 8 + 8, nStride, &lbl_801F6C58[136], nAdd);
+        nAdd = getdelta() * 2 - 128;
+        getluma(pRefY + nStride * 8 + 8, nStride, &lbl_801F6C58[136], nAdd);
     }
     if (!(uPattern & 0x10)) {
-        if (fn_800B8AA0() == 1) {
-            fn_800B7E38(lbl_801F6A58[0], 8);
+        if (madvlcdecode() == 1) {
+            dcblock(lbl_801F6A58[0], 8);
         } else {
-            fn_800B8F28(lbl_801F6A58[0], 8);
+            idctcompute(lbl_801F6A58[0], 8);
         }
     } else {
-        nAdd = fn_800B7DF4() * 2 - 128;
-        fn_800B8180(pRefU, nHalf, lbl_801F6A58[0], nAdd);
+        nAdd = getdelta() * 2 - 128;
+        getchroma(pRefU, nHalf, lbl_801F6A58[0], nAdd);
     }
     if (!(uPattern & 0x20)) {
-        if (fn_800B8AA0() == 1) {
-            fn_800B7E38(lbl_801F6A58[1], 8);
+        if (madvlcdecode() == 1) {
+            dcblock(lbl_801F6A58[1], 8);
         } else {
-            fn_800B8F28(lbl_801F6A58[1], 8);
+            idctcompute(lbl_801F6A58[1], 8);
         }
     } else {
-        nAdd = fn_800B7DF4() * 2 - 128;
-        fn_800B8180(pRefV, nHalf, lbl_801F6A58[1], nAdd);
+        nAdd = getdelta() * 2 - 128;
+        getchroma(pRefV, nHalf, lbl_801F6A58[1], nAdd);
     }
-    fn_800B829C(lbl_801F6C58, pY, nStride);
-    fn_800B83DC(lbl_801F6A58[0], pU, nHalf);
-    fn_800B83DC(lbl_801F6A58[1], pV, nHalf);
+    setluma(lbl_801F6C58, pY, nStride);
+    setchroma(lbl_801F6A58[0], pU, nHalf);
+    setchroma(lbl_801F6A58[1], pV, nHalf);
 }
 
 // nBytes bytes at pData, little-endian.
@@ -425,20 +425,20 @@ s32 fn_800B8A04(s32 a, s32 b) {
     return ((s64)a * b + 0x8000) >> 16;
 }
 
-// The same as fn_800B7D80.
+// The same as discardbits.
 void fn_800B8A2C(int nBits) {
-    lbl_802821B4 <<= nBits;
-    lbl_802821B0 -= nBits;
-    if (lbl_802821B0 < 16) {
-        lbl_802821B4 |= fn_800B8984(lbl_802821B8, 2) << (16 - lbl_802821B0);
-        lbl_802821B0 += 16;
-        lbl_802821B8 += 2;
+    madshiftreg <<= nBits;
+    madbitcount -= nBits;
+    if (madbitcount < 16) {
+        madshiftreg |= fn_800B8984(maddataptr, 2) << (16 - madbitcount);
+        madbitcount += 16;
+        maddataptr += 2;
     }
 }
 
 // Decode one block's coefficients into lbl_801F8358, dequantized, in natural order. The result
 // is one past the last coefficient's scan position: 1 when there is only the DC one.
-int fn_800B8AA0(void) {
+int madvlcdecode(void) {
     u32 uCode;
     int nLen;
     int n;
@@ -446,8 +446,8 @@ int fn_800B8AA0(void) {
     int nDC;
     s32* p;
 
-    nDC = (s32)lbl_802821B4 >> 24;
-    lbl_801F8358[0] = nDC * lbl_801F7058[0];
+    nDC = (s32)madshiftreg >> 24;
+    lbl_801F8358[0] = nDC * madquant[0];
     fn_800B8A2C(8);
     // fake match: the 63 words cleared three per pass; a loop of single stores unrolls 9-way, not
     // EA's 21 stores x 3
@@ -460,23 +460,23 @@ int fn_800B8AA0(void) {
     }
     n = 1;
     while (1) {
-        uCode = lbl_801F7A58[lbl_802821B4 >> 23];
+        uCode = madvlctbl1[madshiftreg >> 23];
         nLen = uCode & 0xFF;
         if (nLen > 9) {
             if (!(nLen & 0x20)) {
                 if (!(nLen & 0x10)) {
                     fn_800B8A2C(9);
-                    uCode = lbl_801F7658[lbl_802821B4 >> 24];
+                    uCode = lbl_801F7658[madshiftreg >> 24];
                     nLen = uCode & 0xFF;
                 } else {
                     fn_800B8A2C(6);
-                    uCode = lbl_801F7258[lbl_802821B4 >> 24];
+                    uCode = lbl_801F7258[madshiftreg >> 24];
                     nLen = uCode & 0xFF;
                 }
             } else if (!(nLen & 0x10)) {
                 // escape: the run and level follow as they are
                 fn_800B8A2C(6);
-                uCode = lbl_802821B4;
+                uCode = madshiftreg;
                 nLen = 16;
             } else {
                 // end of block
@@ -487,12 +487,12 @@ int fn_800B8AA0(void) {
         fn_800B8A2C(nLen);
         n += (uCode >> 16) & 0x3F;
         i = lbl_80184B68[n++];
-        lbl_801F8358[i] = ((s32)uCode >> 22) * lbl_801F7058[i];
+        lbl_801F8358[i] = ((s32)uCode >> 22) * madquant[i];
     }
 }
 
 // The inverse DCT's first pass: eight coefficients in, a column of pOut (8 apart) out.
-void fn_800B8C54(s32* pIn, s32* pOut) {
+void IdctColumn(s32* pIn, s32* pOut) {
     s32 t10;
     s32 z11;
     s32 z13;
@@ -554,7 +554,7 @@ void fn_800B8C54(s32* pIn, s32* pOut) {
 }
 
 // The second pass: a row of the first pass's output into eight 16.16 values.
-void fn_800B8DF4(s32* pIn, s32* pOut) {
+void IdctRow(s32* pIn, s32* pOut) {
     s32 t10;
     s32 z11;
     s32 z13;
@@ -575,7 +575,7 @@ void fn_800B8DF4(s32* pIn, s32* pOut) {
     z12 = pIn[1] - pIn[7];
     z13 = pIn[5] + pIn[3];
     t11 = z11 - z13;
-    // register note: z13 and z5 reused as in fn_800B8C54
+    // register note: z13 and z5 reused as in IdctColumn
     z13 = z13 + z11;
     z5 = fn_800B8A04(z10 + z12, 0x61F8);
     t10 = z5 + fn_800B8A04(z10, 0x8A8C);
@@ -603,21 +603,21 @@ void fn_800B8DF4(s32* pIn, s32* pOut) {
 }
 
 // The inverse DCT of lbl_801F8358 into an 8x8 block (rows nStride words apart).
-void fn_800B8F28(s32* pOut, int nStride) {
-    fn_800B8C54(&lbl_801F8358[0], &lbl_801F8258[0]);
-    fn_800B8C54(&lbl_801F8358[8], &lbl_801F8258[1]);
-    fn_800B8C54(&lbl_801F8358[16], &lbl_801F8258[2]);
-    fn_800B8C54(&lbl_801F8358[24], &lbl_801F8258[3]);
-    fn_800B8C54(&lbl_801F8358[32], &lbl_801F8258[4]);
-    fn_800B8C54(&lbl_801F8358[40], &lbl_801F8258[5]);
-    fn_800B8C54(&lbl_801F8358[48], &lbl_801F8258[6]);
-    fn_800B8C54(&lbl_801F8358[56], &lbl_801F8258[7]);
-    fn_800B8DF4(&lbl_801F8258[0], pOut);
-    fn_800B8DF4(&lbl_801F8258[8], pOut + nStride);
-    fn_800B8DF4(&lbl_801F8258[16], pOut + nStride * 2);
-    fn_800B8DF4(&lbl_801F8258[24], pOut + nStride * 3);
-    fn_800B8DF4(&lbl_801F8258[32], pOut + nStride * 4);
-    fn_800B8DF4(&lbl_801F8258[40], pOut + nStride * 5);
-    fn_800B8DF4(&lbl_801F8258[48], pOut + nStride * 6);
-    fn_800B8DF4(&lbl_801F8258[56], pOut + nStride * 7);
+void idctcompute(s32* pOut, int nStride) {
+    IdctColumn(&lbl_801F8358[0], &lbl_801F8258[0]);
+    IdctColumn(&lbl_801F8358[8], &lbl_801F8258[1]);
+    IdctColumn(&lbl_801F8358[16], &lbl_801F8258[2]);
+    IdctColumn(&lbl_801F8358[24], &lbl_801F8258[3]);
+    IdctColumn(&lbl_801F8358[32], &lbl_801F8258[4]);
+    IdctColumn(&lbl_801F8358[40], &lbl_801F8258[5]);
+    IdctColumn(&lbl_801F8358[48], &lbl_801F8258[6]);
+    IdctColumn(&lbl_801F8358[56], &lbl_801F8258[7]);
+    IdctRow(&lbl_801F8258[0], pOut);
+    IdctRow(&lbl_801F8258[8], pOut + nStride);
+    IdctRow(&lbl_801F8258[16], pOut + nStride * 2);
+    IdctRow(&lbl_801F8258[24], pOut + nStride * 3);
+    IdctRow(&lbl_801F8258[32], pOut + nStride * 4);
+    IdctRow(&lbl_801F8258[40], pOut + nStride * 5);
+    IdctRow(&lbl_801F8258[48], pOut + nStride * 6);
+    IdctRow(&lbl_801F8258[56], pOut + nStride * 7);
 }
