@@ -8,6 +8,10 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26, r6-args (aligned, base 79): the EA clamps' 1.0 is the same pooled symbol as fZ's hoisted 1.0
+  (lbl_80283148 in both), so EA's first clamp simply was not CSE'd with fZ's load. fZ as f64 (79), f64 fZ with
+  an f32-parameter clamp (79), clamping fZ instead of aXY[] (f32 or f64 fZ) 94.
+
 - 2026-09-26 r5-render (aligned, base 79): the hi bound as a different constant object so CSE
   cannot merge it: DF_Clamp fLo/fHi f32/f64 x literals `0.0f`/`0.0`, `1.0f`/`1.0`: f32 lo + f64
   hi 58 (the hi loads become fresh `lfd`, but the ternary turns double: an frsp at the end), f64

@@ -8,6 +8,16 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26, r6-args: parameter-order lever on fn_800C7480: all 364 placements of the three float
+  parameters among the eleven pointers (float order and int order kept, so registers unchanged), every call
+  site reordered with the prototype, in both the base (fEnd) form and the `fT +=` form: base 2 / 32 (float
+  first), `fT +=` 7 / 28. The interleaving does not move this schedule. mwcc-debugger reading: EA's final code
+  equals our pre-RA shape `fmadds tmp; fmr fT,tmp; ...; fmr f3,<x>` with the call argument read from fT
+  (tmp then coalesces into fT, f3 stays a copy). frontend-00 has the call on fT; the AST optimizer (frontend-01)
+  rewrites it to the temp @368, so tmp is copied to f3 and coalesced there. Forms that did not stop that
+  rewrite: `fEnd = 0.0f` / `fHiT = fEnd` / `fEnd = fT` after `fT = fEnd` (2 each, the dead store goes first),
+  `fT = fEnd`, `fT = E`, `fT = fEnd = E`, `fEnd = fT = E`, `fT += ..` as the call's last argument (7 each).
+
 - 2026-09-25, gemini: Analyzed block 2 coalescing (`fmadds f31` vs `f3`, `fmr f3, f31` vs `fmr f31, f3`). With `fEnd` as temporary, MWCC coalesces `fEnd` with call argument register `f3`, copying `f3` to `f31` (`fmr f31, f3`). Writing `fT += ...` or `fT = ... + fT` eliminates the coalescing and emits `fmadds f31` and `fmr f3, f31`, but causes MWCC's latency scheduler to delay `addi r6, r10, 0x20` after `addi r4, r31, 0x20` and reorder `lfs f1/f2` (~7 diffs). Tested TW07 DWARF locals `percentDiff`, `distDiff`, `testPercent`, chained assignments `fT = fEnd = ...`, `fEnd = fT += ...`, `register f32 fEnd`, and inline identity reads; all either preserve score 2 or trigger the 7-diff argument reschedule.
 - 2026-09-25, n-const: block 2 with the ratio or the difference through each dead local (fEnd, fLoDist, fLoT, fStep, fFrom, fLastT, fHiDist, fHiT) and fT or fEnd as the result, `X = fT; fT = X + (fHiT - X) * ..`, and ratio+difference through all 56 ordered pairs with `fT = fT + d * r`: best 2 (base). The fT-form diff is scheduling only: EA sets r6 before r4 and loads pNext->f78 (f2) before pShot->f78 (f1) as our fEnd form does, but with fmadds into f31. Compilers 1.3.2 / 2.0 / 2.6 / 2.7: 2, 2.0p1: 12.
 - 2026-09-25, n-const (3): with `#pragma scheduling off` the base emits `fmadds f3; fmr f31,f3` then the arguments in order; the fT form emits `fmadds f31` and `fmr f3,f31` last, just before the call, so the scheduler orders r4/r5/r6 and the two f78 loads differently (EA: the base order with fmadds into f31). `fT = E; X = fT; call(.., X)`, `fT += ..; X = fT`, `X = fT = E` for X in fEnd, fFrom, fLoT, fStep, fLastT, fLoDist: all 12 (the copy is propagated into the call). Assignment inside the argument (`fT = fEnd`, `fT = E`, `fT = fEnd = E`, `fEnd = fT = E`): 12; call(fEnd) then `fT = fEnd`: 17.

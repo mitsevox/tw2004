@@ -8,6 +8,11 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26, r6-args: fMin's 33 neighbours = 14 volatile + fMinDist/fYShare/fAimY/fOldY/fDiv + 14 temps
+  (f55-f59 the `*=` chain and vDir[1] = 0, f62 the first length's frsp, f63-f68 the zero tests, f71/f73/f74/f76
+  the vDir[1] expression). One length local for both length reads (new fLen: fMin still 33 nb, 17; into fDist
+  or fAngle 19; fFrames 12), plus a heightDiff local `fH = vGoal[1] - fAimY`: same scores. Base 11.
+
 - 2026-09-25, n-const: merged every pair of locals/params with disjoint lives (fFrames, fRate, fMin, fAimY, fMinDist into fMin/fAimY/fDist/fAngle/fFrames; 15 single merges and all 4-distinct pairs of them): none below 11 (base 11).
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
