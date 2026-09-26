@@ -1,6 +1,6 @@
 # GR_BuildGridRenderData (GoGreenGrid.c, 0x8009C0BC)
 
-Status: OPEN, 97.42% on 2026-09-25.
+Status: OPEN, 97.67% on 2026-09-25 (n-shaders).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -9,6 +9,12 @@ unless you combine it with something new. Before you stop, add every attempt und
 ## Attempts
 
 (add yours here: date, lane, what, score)
+- 2026-09-25, n-shaders: first loop's fAlong/fHeight/fAcross orders (6) x nRow/nCol order:
+  fAcross, fAlong, fHeight (as the second loop has it) 156 -> 140 (nRow/nCol order: no effect).
+  Then the fn_8009C914 fix (an s32 nViewCopy for the GOLFERSTATE call's fn_8001707C): declared
+  last 140 -> 117, declared first 131. Real 97.42 -> 97.67 (kept). fDirX..fCornerZ declared
+  before fPrev/fHole: no change; decl climb: none. Left: the four dir/corner floats get
+  f20-f23 (orig f28-f31), nView is kept in r29 in orig, gSession base vs gSession+0x24 hoisted.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
