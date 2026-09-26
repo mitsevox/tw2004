@@ -281,17 +281,17 @@ void fn_800E8A68(void) {
     int i;
     int nFirst;
     int nSum;
-    int nOtherTeam;
     int nTheirs;
     int nMargin;
     int nRating1;
     int nRating2;
     int nOurs;
     int nOther2;
-    int nBase;
     int nMoney;
     int nOther;
+    int nPlayer;
     int nProfile;
+    int nOtherTeam;
     if (fn_800E1BBC()) {
         switch (fn_800EC550()) {
         case 0:
@@ -327,16 +327,17 @@ void fn_800E8A68(void) {
                         nSum += lbl_80200538.aStrokePrize[nRating2].nBase;
                         nMoney = nSum + lbl_80200538.aStrokePrize[nRating1].nPerStroke * nMargin;
                         nMoney += lbl_80200538.aStrokePrize[nRating2].nPerStroke * nMargin;
-                        nBase = nSum / 2;
+                        nOurs = nSum / 2;
                         nMoney /= 2;
                         for (i = 0; i < 2; i++) {
-                            nProfile = gPlayers[nFirst + i].nIndex;
+                            nPlayer = nFirst + i;
+                            nProfile = PLAYER(nPlayer)->nIndex;
                             if (gpSaveData[nProfile].bActive) {
                                 EASBio_SetCurrentGameWon(1);
-                                if (nBase) {
-                                    fn_800E4364(0, 0x76, nBase, nProfile);
+                                if (nOurs) {
+                                    fn_800E4364(0, 0x76, nOurs, nProfile);
                                 }
-                                fn_800D3548(nFirst + i, nMoney, 0);
+                                fn_800D3548(nPlayer, nMoney, 0);
                             }
                         }
                     }

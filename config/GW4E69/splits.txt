@@ -311,6 +311,11 @@ GoTerrainCollision.c:
 
 Ball.c:
 	.text       start:0x80050C2C end:0x80055F14
+	.rodata     start:0x80181328 end:0x801834C0
+	.data       start:0x80187E68 end:0x80187EF8
+	.sdata      start:0x80281130 end:0x80281138
+	.sbss       start:0x80281DD0 end:0x80281DE8
+	.sdata2     start:0x80283308 end:0x80283588
 
 Wind.c:
 	.text       start:0x80055F14 end:0x80056204

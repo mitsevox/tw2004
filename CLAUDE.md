@@ -1,8 +1,11 @@
 # TW2004 decomp: start here
 
-A matching decompilation of Tiger Woods PGA Tour 2004 (GameCube, GW4E69). The goal is C source
-that can be ported to PC and modded; the byte match (`build/GW4E69/main.dol: OK`) is the proof the
-C is right, not the goal. Fidelity and parity outrank speed.
+A matching decompilation of Tiger Woods PGA Tour 2004 (GameCube, GW4E69). The goal is EA's code
+exactly as EA wrote it; a PC port and mods start from that code later, and the decomp never bends
+the C to suit a port. The byte match (`build/GW4E69/main.dol: OK`) is the proof the C is right.
+Fidelity and parity outrank speed. Order (owner, 2026-09-26): (1) EA's own form, 32-bit habits and
+all (a `// port:` note marks a hazard); (2) only when that can't be found, a labelled fake match
+that leaves the logic exactly unchanged; (3) never change what the game does to satisfy the compiler.
 
 Read next, in this order: `agents/state.md` (where things stand, what is running, what is parked),
 `agents/README.md` (how the orchestrator runs agent lanes), then the playbook for your role in
@@ -71,3 +74,7 @@ first"), `docs/style.md` (how the C must read).
   `agents/findings/2026-09-25-mad-names.tsv`) and ska_shared's SKAUtil_EulerAnglesToQTs8 /
   SKA_LoadFromMem (TW07 + 007 EoN: `docs/reference-builds/007eon-ps2`). Log them in
   `config/GW4E69/name_sources.tsv` with `tools/match/rename.py`.
+- **Give matched functions' placeholder locals their real names**: matching lanes may not name
+  things, so some exact functions carry letter locals. First: Ball.c Physics_HandleCollision (26
+  float locals fE, fF, fG...; TW07's names such as bankAngle, sinPitch, headingAngle are in
+  `docs/reference-builds/tw07-ps3/cu/`). Renaming locals changes no code; the match proves it.

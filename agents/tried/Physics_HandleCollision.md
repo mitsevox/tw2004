@@ -1,6 +1,14 @@
 # Physics_HandleCollision (Ball.c, 0x80052598)
 
-Status: OPEN, 99.28% on 2026-09-26 (r2-modes, commit "Ball.c: Physics_HandleCollision 98.74 -> 99.28").
+Status: SOLVED 2026-09-26 (r4-ball, commit "Ball.c: Physics_HandleCollision exact (99.30 -> 100)";
+Ball.c linked in the next commit). Fix: start from round 3's "every web its own local" template at
+its 28 order, then (1) the end-of-function turns compute the cosine into the angle's own variable
+(`a = -head; s = sin(a); a = cos(a);`): 28 -> 22; (2) greedy merges of webs whose line spans do not
+overlap (logic unchanged), alternating with declaration climbs: 22 -> 6; (3) merges that do not
+raise the score (to shrink the local count) found the last ones: all three turns back share one
+angle/cosine local and one sine local, and that sine local is also the bounce factor: 6 -> 0.
+Rule seen: a call result assigned to a local with other assignments goes straight into its register;
+into a local assigned once it goes through f0 (`fmr f0,f1 ... fmr fN,f0`). 26 float locals (was 16).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -9,6 +17,14 @@ unless you combine it with something new. Before you stop, add every attempt und
 ## Attempts
 
 (add yours here: date, lane, what, score)
+
+- 2026-09-26 r4-ball (quicktrial aligned, base 29): round 3's dot copy through fT (32) with a
+  declaration climb + random restarts: no gain (32). Second turn's sine/cosine/vDir[2] in every
+  pairing of fS/fRest/fCo/fSi/fT/fLen, nested E1C in E10 or not: all 29 (or 32 with the dot copy).
+  Split template at the 28 order: end turns `a = cos(a)` 22; greedy safe web merges + climbs: 6
+  (w_t, w_y2 -> bent length; x -> dot; y -> surface +0x28 temp); merging the end sines with fC/head
+  or the angles with fD: 24-114, not kept; score-neutral merges: end angles into one local, end sines
+  into one, then into the bounce factor: 0 (exact, objdiff 100).
 
 - 2026-09-26 r2-modes (quicktrial aligned, base 92): greedy "reuse an existing local that is dead over
   this live range" search (scratch hc4.py: every web x every other float local, only non-overlapping
