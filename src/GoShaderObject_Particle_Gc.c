@@ -147,10 +147,10 @@ void fn_80094534(f32 (*pMtxArg)[4], ParticleShape* pShapeArg, ParticleVertex* pV
     int nBlue;
     f32 fRed;
 
-    pMtx = (f32 (*)[4])(void*)pMtxArg;
     pShape = (ParticleShape*)(void*)pShapeArg;
     pVerts = (ParticleVertex*)(void*)pVertsArg;
     pTimes = (f32*)(void*)pTimesArg;
+    pMtx = (f32 (*)[4])(void*)pMtxArg;
     n = nArg;
     v.w = 1.0f;
     m[0][2] = 0.0f;
