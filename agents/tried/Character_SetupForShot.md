@@ -61,3 +61,5 @@ base 6, 199 levers, 31039 variants (199 singles) in 318 s; best 6
 - 2026-09-26 round 3 (r3-charskin; written by the orchestrator from the lane report, the disk was full): nPlayer/u10 locals in 80 type and order combinations, inline getters, the void* copy: best 6.
 - 2026-09-26 r4-charskin: pBallPos from gPlayers again 11, a void* view of pChar for nPlayer 6, u10 read first / bClipTime first / pPlayer last / flags after pBallPos: 6 (identical code: the source order of the two loads does not reach the allocator), `? 1 : 0` 31, SetPosition on pPlayer->ball.vPos 14, pBallPos assigned in the call 6; GC/1.3.2-2.7: 6.
 - 2026-09-26 r4-charskin: the three flags in one comma statement 6; inline getters for &gPlayers[nPlayer] (11) and for u10 (6), both 11.
+- 2026-09-26 r4-charskin: pPlayer as integer address math (u32 / int / u8* spellings): 6.
+- 2026-09-26 r4-charskin: every order (5040) of bStance, bPlace, bClipTime, pModel, pBallPos, pPlayer, pSkel: 6.
