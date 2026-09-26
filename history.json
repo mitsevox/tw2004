@@ -41525,5 +41525,21 @@
 "matched_functions": 7582,
 "total_functions": 7647,
 "exact": 7582
+},
+{
+"commit": "8caa1b5",
+"sha": "8caa1b593171720e48a2df2ee869901f32fb1abb",
+"time": 1790460189,
+"subject": "Merge r7-charswing: Swing exact and linked (SW_KillVibration), char Character_SetupForShot exact (labelled fakes); Vec_Add/Vec_Sub asm only moved into address order",
+"report": true,
+"matched_code": 1489868,
+"complete_code": 1311696,
+"matched_data": 723063,
+"complete_data": 868387,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7584,
+"total_functions": 7647,
+"exact": 7584
 }
 ]
