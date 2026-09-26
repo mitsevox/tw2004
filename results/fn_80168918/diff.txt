@@ -1,0 +1,26 @@
+--- before
++++ after
+@@ -1,14 +1,14 @@
+-s32 aArgs[2];
++UISScreen* pScreen;
++UISNode* pLinkNode;
++s32 nEvent;
+ UISScreenFile* pFile;
++u16 nIndex;
++UISNodeInfo* pOther;
++UISNode* pCheck;
+ UISNode* pNode;
+-UISNode* pLinkNode;
+-UISNode* pCheck;
+-UISNodeInfo* pOther;
++s32 i;
+ u8* pScript;
+-u16 nIndex;
++s32 nSlot;
+ u32 nNode;
+ u32 n;
+-s32 i;
+-s32 nSlot;
+-UISScreen* pScreen;
+-s32 nEvent;
++s32 aArgs[2];

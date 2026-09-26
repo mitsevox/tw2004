@@ -1,0 +1,35 @@
+--- before
++++ after
+@@ -1,18 +1,18 @@
++AITarget* t;
++int nClub;
++f32 fDumb;
++int nKind;
++int nIQ;
++f32 fDist2;
++int nSkill;
++f32 fDist;
++f32 fBestDist2;
+ Player* p;
+-AITarget* t;
+-int nKind;
+-int nPower;
+-int nAggr;
+-int nPinSet;
+-s8 nCand;
++CourseInfo* pCourse;
+ s8 k;
+ s8 nBest;
+-int nSkill;
+-int nIQ;
+-f32 fDumb;
+-f32 fDist2;
+-f32 fBestDist2;
+-f32 fDist;
+-CourseInfo* pCourse;
+ s8 nZone;
+-int nClub;
++s8 nCand;
++int nPower;
++int nPinSet;
++int nAggr;

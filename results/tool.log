@@ -1,0 +1,54 @@
+Stm_Tick: 10 declarations
+fn_80032B7C: 10 declarations
+fn_800C7A9C: 18 declarations
+fn_80026844: 11 declarations
+fn_800B769C: 10 declarations
+fn_8016B4D4: 9 declarations
+fn_80168918: 14 declarations
+SD_vShaderObject_Grass_Static_Render: 26 declarations
+GR_BuildGridRenderData: 25 declarations
+fn_80169590: 8 declarations
+DF_vDrawBufferToScreen: 12 declarations
+AI_ChooseTarget: 18 declarations
+fn_80166098: 25 declarations
+26 jobs on 18 workers, 125 minutes each
+fn_800C7A9C ils seed 2: best (10, 10) after 3477 trials
+DF_vDrawBufferToScreen ils seed 1: best (79, 143) after 3538 trials
+Stm_Tick ils seed 1: best (2, 2) after 3660 trials
+fn_80032B7C ils seed 1: best (4, 10) after 3660 trials
+fn_800C7A9C ils seed 1: best (10, 10) after 3477 trials
+fn_80169590 ils seed 1: best (56, 56) after 4331 trials
+SD_vShaderObject_Grass_Static_Render ils seed 1: best (2, 12) after 5002 trials
+fn_8016B4D4 ils seed 1: best (26, 119) after 3965 trials
+fn_80026844 ils seed 1: best (13, 13) after 3721 trials
+fn_80032B7C ils seed 2: best (4, 10) after 3721 trials
+fn_800B769C ils seed 2: best (15, 18) after 3355 trials
+AI_ChooseTarget ils seed 1: best (91, 91) after 3294 trials
+fn_80168918 ils seed 1: best (17, 70) after 3599 trials
+GR_BuildGridRenderData ils seed 1: best (28, 27) after 2989 trials
+Stm_Tick ils seed 2: best (2, 2) after 3721 trials
+fn_800B769C ils seed 1: best (15, 18) after 3355 trials
+fn_80026844 ils seed 2: best (13, 13) after 3782 trials
+fn_80166098 ils seed 1: best (617, 2325) after 2196 trials
+fn_8016B4D4 ils seed 2: best (26, 119) after 4026 trials
+fn_80168918 ils seed 2: best (17, 70) after 3660 trials
+DF_vDrawBufferToScreen ils seed 2: best (79, 143) after 3660 trials
+fn_80169590 ils seed 2: best (56, 56) after 4331 trials
+SD_vShaderObject_Grass_Static_Render ils seed 2: best (2, 12) after 4453 trials
+AI_ChooseTarget ils seed 2: best (91, 91) after 3294 trials
+GR_BuildGridRenderData ils seed 2: best (28, 27) after 2867 trials
+fn_80166098 ils seed 2: best (617, 2325) after 1586 trials
+Stm_Tick                     base -> 2
+SD_vShaderObject_Grass_Static_Render base -> 2
+fn_80032B7C                  base -> 4
+fn_800C7A9C                  base -> 10
+fn_80026844                  base -> 13
+fn_800B769C                  base -> 15
+fn_80168918                  new order -> 17
+fn_8016B4D4                  base -> 26
+GR_BuildGridRenderData       base -> 28
+fn_80169590                  base -> 56
+DF_vDrawBufferToScreen       base -> 79
+AI_ChooseTarget              new order -> 91
+fn_80166098                  base -> 617
+0 of 13 exact
