@@ -41109,5 +41109,21 @@
 "matched_functions": 7567,
 "total_functions": 7647,
 "exact": 7567
+},
+{
+"commit": "5d18c73",
+"sha": "5d18c731a416dd76f62c2bdb3870db24700febf3",
+"time": 1790437226,
+"subject": "Merge r5-uiapi: uiText exact + linked (file-wide opt_propagation off); uiProcessInterface fn_8008F820 99.94; mwcc-debugger ledgers",
+"report": true,
+"matched_code": 1474472,
+"complete_code": 1220912,
+"matched_data": 714279,
+"complete_data": 859035,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7568,
+"total_functions": 7647,
+"exact": 7568
 }
 ]
