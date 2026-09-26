@@ -89,6 +89,9 @@ tested improves the color/UV cluster; retain the configured GC/2.5 `-O4,p`.
 - 2026-09-25 n-misc (quicktrial aligned, base 31): EA reads r with lbzx (table base + n*4)
   and g/b/a through the row pointer. All 24 orders of {pColour, r (direct), pSrc + g/b/a via pSrc,
   pUV}: best 32. No change.
+- 2026-09-26 r4-render (aligned, base 31): random dependency-keeping moves of the 45 statements
+  from `pPos = ..` to the last UV store (5 min climb): 28, but only as a scramble of the pPos /
+  colour / UV stores (not EA-like; not applied, real not measured).
 
 ## Collected from the notes and docs (2026-09-25)
 

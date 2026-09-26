@@ -1,6 +1,6 @@
 # SD_vShaderObject_Grass_Static_Render (GoShaderObject_Grass_Gc.c, 0x80120F74)
 
-Status: OPEN, 97.63% on 2026-09-26 (r2-render).
+Status: OPEN, 98.89% on 2026-09-26 (r4-render).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -24,6 +24,14 @@ unless you combine it with something new. Before you stop, add every attempt und
   a for loop: 41. int/s32 on nVerts/nDone/nSet/nRun/nRow/nInRow/nAxis/nWind: 41. 32 fFade
   expression orders: 41. The skip loop on nRow itself 91, counting up 55, statements swapped 43;
   the draw in an else 41, `nRow >= 2` first 116-117.
+- 2026-09-26 r4-render, statement orders: fShade and nAlpha before fTexS/fTexT 41 -> 20, real
+  97.63 -> 98.17; `pAxis = pVert + nAxis;` before GXBegin 17, real 98.89 (both kept). No gain on
+  that: the fFade block among the four (all orders), pAxis in the for-init / after GXBegin /
+  at the while head / `&pVert[nAxis]`, 32 fFade spellings, nDone's position, the setup
+  statements (vAt..nDone) in 200 s of random moves, the setup's nAxis..nDone orders, the three
+  per-point steps' orders, nWind/fBladeT swapped, a 10-min random/climb of the 21 declarations.
+  Left: nVerts r22 / nDone r20 (EA the other way), the pAxis add's operand order and slot, and
+  fFade's temp registers.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 

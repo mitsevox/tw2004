@@ -1,6 +1,6 @@
 # GR_BuildGridRenderData (GoGreenGrid.c, 0x8009C0BC)
 
-Status: OPEN, 98.81% on 2026-09-26 (r2-render).
+Status: OPEN, 98.99% on 2026-09-26 (r4-render).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -9,6 +9,21 @@ unless you combine it with something new. Before you stop, add every attempt und
 ## Attempts
 
 (add yours here: date, lane, what, score)
+- 2026-09-26, r4-render (aligned): the parameter as `s32 nView` (fn_8001707C takes int) with the
+  nViewCopy dropped: 44 -> 40 (`mr r29,r3` first and every nView use from r29, as EA's), real
+  98.81 -> 98.84 (kept; an int or s32 copy on top: 40/116). Second loop: fX before fY 37,
+  real 98.88; `nRow = n % ..` before `nCol = n / ..` 28, real 98.99 (both kept). No gain on
+  that: loop 1's head orders (nRow/nCol/fAcross/fAlong/fHeight) and k/fX/fY/fZ orders, loop 2's
+  k position, the gap statements swapped (16 combos), `fHeight == fHole`, the preamble in 200 s
+  of random moves, the pSession assignment at every preamble position, the three resets' orders,
+  16 fU expression spellings, a fresh loop-1 or loop-2 copy of fU/fX/fY/fZ/fHeight/fAcross/fAlong
+  at every declaration position, int -> s32/u32 on each int local, the per-point locals
+  block-scoped in each loop (TW07 style) with a 15-min random/climb search (74 -> 68), and a
+  12-min random/climb search of the 24 declarations (28). Left: the preamble's lwz/slwi
+  registers and loop 1's float registers (EA fX f25 fY f24 fZ f23, fPrev - fHeight f22, fU f20).
+  The other nView functions of the unit (fn_8009B970, fn_8009BE08, fn_8009C914) carry the same
+  s32 nViewCopy trick; an s32 parameter there probably replaces it, but their prototypes are in
+  engine.h / gomainloop.c (not tried).
 - 2026-09-25, n-shaders: first loop's fAlong/fHeight/fAcross orders (6) x nRow/nCol order:
   fAcross, fAlong, fHeight (as the second loop has it) 156 -> 140 (nRow/nCol order: no effect).
   Then the fn_8009C914 fix (an s32 nViewCopy for the GOLFERSTATE call's fn_8001707C): declared
