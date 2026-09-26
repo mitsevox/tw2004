@@ -1025,9 +1025,9 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
         case 0x79:  // a text's buffer size, as a float
             pText = (UISText*)*--pFrame->pC;
             if (pText != NULL) {
-                *(f32*)&pFrame->pC[-1] = pText->nSize;
+                pFrame->pC[-1] = pText->nSize;
             } else {
-                *(f32*)&pFrame->pC[-1] = 0.0f;
+                pFrame->pC[-1] = 0;
             }
             break;
         case 0x7A:  // a text to upper case
