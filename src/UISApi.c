@@ -556,9 +556,9 @@ s32 fn_80169DC4(UISScreenFile* pFile) {
     u32 k;
     UISNode* pNode;
     UISGroup* pGroup;
-    UISEntry* pEntry;
     u32* pLink;
     u32 kEntry;
+    UISEntry* pEntry;
     int nBase1;
     unsigned int nBase2;
     unsigned int nBase3;
