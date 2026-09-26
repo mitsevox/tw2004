@@ -404,7 +404,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->pC--;
             break;
         case 0x33:  // int <=
-            pTop[-2] = pTop[-2] <= pTop[-1];
+            pTop[-2] = pTop[-1] >= pTop[-2];
             pFrame->pC--;
             break;
         case 0x34:  // int >
@@ -412,7 +412,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->pC--;
             break;
         case 0x35:  // int <
-            pTop[-2] = pTop[-2] < pTop[-1];
+            pTop[-2] = pTop[-1] > pTop[-2];
             pFrame->pC--;
             break;
         case 0x36:  // int ==
