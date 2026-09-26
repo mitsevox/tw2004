@@ -436,9 +436,9 @@ typedef struct AudBlock48 {
 
 extern AudSource* lbl_80282058;         // AudTable.c's table
 extern u8 lbl_80282068;                 // the number of listeners (hlaudmovie.c)
-extern f32 lbl_801F17D0[32];            // the volume of each curve (Mas_GetSubmix; hlaudmovie.c)
-extern s32 lbl_80282060;                // one bit per curve: 1 = muted (Mas_IsChanMuted; hlaudmovie.c)
-extern f32 lbl_80281460;                // fn_800A86BC's rate, fn_800AB39C's result (hlaudmovie.c)
+extern f32 lbl_801F17D0[32];            // the volume of each curve (Mas_GetSubmix; HLAudMaster.c)
+extern s32 lbl_80282060;                // one bit per curve: 1 = muted (Mas_IsChanMuted; HLAudMaster.c)
+extern f32 lbl_80281460;                // fn_800A86BC's rate, fn_800AB39C's result (HLAudMaster.c)
 extern s32 lbl_80282080;                // fn_800AB374 says whether it is 0 (hlaudmovie.c)
 extern AudStreamFile* lbl_80282070;     // the stream file's header (hlaudmovie.c)
 extern AudBank* lbl_80282074;           // bank 1 (hlaudmovie.c)
@@ -475,9 +475,13 @@ void           fn_800A84A4(u8 nEntry, u8 nTrack, f32 fPitch);
 void           fn_800A8524(AudSound* pSound, u16 n);
 void           fn_800A8584(AudSource* pSource, u8 nTrack, s32 n);
 
-// hlaudmovie.c
+// HLAudMaster.c
 AudSound*    fn_800A85CC(s16 nSound);
 f32          fn_800A85FC(f32 fVolume, f32 fCurve);
+u8           fn_800A86B0(void);
+void         fn_800A86B8(void);
+
+// hlaudmovie.c
 u8*          fn_800A942C(u32 uSize, u8 nPlayList);                  // the stream buffer
 void         fn_800A9434(u8* pBuffer, u32 uSize, u8 nPlayList);     // give it back
 AudStream*   fn_800A9438(AudPlayList* pList, u16 nStream, u32* puLength);

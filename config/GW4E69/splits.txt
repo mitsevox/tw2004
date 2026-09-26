@@ -735,8 +735,20 @@ AudTable.c:
 	.sbss       start:0x80282058 end:0x80282060
 	.sdata2     start:0x80283F88 end:0x80283FB0
 
+HLAudMaster.c:
+	.text       start:0x800A85CC end:0x800A8754
+	.bss        start:0x801F17D0 end:0x801F1850
+	.sdata      start:0x80281460 end:0x80281468
+	.sbss       start:0x80282060 end:0x80282068
+	.sdata2     start:0x80283FB0 end:0x80283FC0
+
 hlaudmovie.c:
-	.text       start:0x800A85CC end:0x800A9808
+	.text       start:0x800A8754 end:0x800A9808
+	.data       start:0x8018EB30 end:0x8018EB78
+	.bss        start:0x801F1850 end:0x801F1868
+	.sdata      start:0x80281468 end:0x80281470
+	.sbss       start:0x80282068 end:0x80282098
+	.sdata2     start:0x80283FC0 end:0x80283FD0
 
 hlaudtrack.c:
 	.text       start:0x800A9808 end:0x800AA4BC
