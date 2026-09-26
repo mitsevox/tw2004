@@ -41477,5 +41477,21 @@
 "matched_functions": 7582,
 "total_functions": 7647,
 "exact": 7582
+},
+{
+"commit": "dbc1fdf",
+"sha": "dbc1fdff30667bcdd1f8a630c033b1239352c9f5",
+"time": 1790457653,
+"subject": "rasim.py: replay MWCC's register allocator from mwccdbg dumps and search declaration orders against it (from lane r6-misc)",
+"report": true,
+"matched_code": 1488548,
+"complete_code": 1294620,
+"matched_data": 722103,
+"complete_data": 867219,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7582,
+"total_functions": 7647,
+"exact": 7582
 }
 ]
