@@ -74,3 +74,7 @@ first"), `docs/style.md` (how the C must read).
   `agents/findings/2026-09-25-mad-names.tsv`) and ska_shared's SKAUtil_EulerAnglesToQTs8 /
   SKA_LoadFromMem (TW07 + 007 EoN: `docs/reference-builds/007eon-ps2`). Log them in
   `config/GW4E69/name_sources.tsv` with `tools/match/rename.py`.
+- **Give matched functions' placeholder locals their real names**: matching lanes may not name
+  things, so some exact functions carry letter locals. First: Ball.c Physics_HandleCollision (26
+  float locals fE, fF, fG...; TW07's names such as bankAngle, sinPitch, headingAngle are in
+  `docs/reference-builds/tw07-ps3/cu/`). Renaming locals changes no code; the match proves it.

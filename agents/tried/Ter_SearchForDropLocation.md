@@ -1,6 +1,10 @@
 # Ter_SearchForDropLocation (GoTerrainCollision.c, 0x8004C134)
 
-Status: OPEN, 99.89% on 2026-09-25.
+Status: SOLVED 2026-09-26 r4-terrain: no fLift variable (`vPos[1] = p->ball.vPos[1] + 2.0f *
+fRadius;` in the inner loop, CodeWarrior hoists the product into EA's f25), a separate ring
+distance fDist2 (TW07 has one: dropPositionDistance), and the declaration order fAngle, vPos,
+vDir, pSurface, bDrop, bPreferredLie, pCourse, fDist, fDropDist, fRadius, fDist2, fTurn, ...
+Commit: "GoTerrainCollision.c: Ter_SearchForDropLocation exact".
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -14,6 +18,14 @@ unless you combine it with something new. Before you stop, add every attempt und
   distance is f22, fLift f25): separate fPin/fPref locals (5x5 declaration positions): 12; the ring
   distance kept in fDropDist: 6, in fHeading/fAngle/fSin/fCos/fTurn: 59-75; fLift kept in
   fDropDist: 14, fDist/fHeading/fSin/fCos: 57-73; nPlayer int/s32 copies: 6.
+
+- 2026-09-26 r4-terrain (6): every pair of declarations swapped: >= 6; 300 random declaration
+  orders: >= 6; identity inlines on fLift / fDist / fRadius / fHeading / the compares (1-2 at a
+  time): >= 6; `fDist > fRadius`, `9.0f < fDist`: 7; the ring search as a static inline (TW07's
+  Ter_SearchAreaForDropLocation, fDist a parameter) + declaration climb: 26-34. fLift written
+  inline in the inner loop: 13 (fLift now EA's f25), + declaration climb: 7 (fDist / fAngle
+  swapped); + fAngle inlined into both calls: 10; + ring distance in fDropDist: 7; + a new ring
+  distance local, each position + climb: 0.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 

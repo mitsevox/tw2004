@@ -302,10 +302,10 @@ void fn_800CCB08(Skin* pSkin, int nPart, int nVariant) {
                 nVariant = -1;
             }
             if (fn_800CEE90()) {
-                pSkin->aParts[0][nPart].nVariant = nVariant;
-                pSkin->aParts[1][nPart].nVariant = nVariant;
-                pSkin->aParts[2][nPart].nVariant = nVariant;
-                pSkin->aParts[3][nPart].nVariant = nVariant;
+                // fake match: `!=` (`i < 4` unrolls to add + stw, EA's is stwx)
+                for (i = 0; i != 4; i++) {
+                    pSkin->aParts[i][nPart].nVariant = nVariant;
+                }
                 pSkin->u10D4 |= 1;
             } else {
                 pSkin->aParts[3][nPart].nVariant = nVariant;
@@ -334,10 +334,10 @@ void fn_800CCC1C(Skin* pSkin, int nPart, int nOption) {
             }
         }
         if (fn_800CEE90()) {
-            pSkin->aParts[0][nPart].nOption = nOption;
-            pSkin->aParts[1][nPart].nOption = nOption;
-            pSkin->aParts[2][nPart].nOption = nOption;
-            pSkin->aParts[3][nPart].nOption = nOption;
+            // fake match: `!=` (`i < 4` unrolls to add + stw 4(r3), EA's is addi + stwx)
+            for (i = 0; i != 4; i++) {
+                pSkin->aParts[i][nPart].nOption = nOption;
+            }
             pSkin->u10D4 |= 1;
             return;
         }
@@ -424,6 +424,8 @@ s32 fn_800CCF10(Skin* pSkin, int nSet, int nVariant) {
 
 // Picks a set's variant (0 when out of range) and option (-1 when out of range).
 void fn_800CCF90(Skin* pSkin, int nSet, int nVariant, int nOption) {
+    int i;
+
     if (pSkin == NULL || nSet < 0 || nSet >= fn_800CCEA0(pSkin)) return;
     if (nVariant < 0 || nVariant >= fn_800CCED0(pSkin, nSet)) {
         nVariant = 0;
@@ -432,14 +434,11 @@ void fn_800CCF90(Skin* pSkin, int nSet, int nVariant, int nOption) {
         nOption = -1;
     }
     if (fn_800CEE90()) {
-        pSkin->aSets[0][nSet].nVariant = nVariant;
-        pSkin->aSets[0][nSet].nOption = nOption;
-        pSkin->aSets[1][nSet].nVariant = nVariant;
-        pSkin->aSets[1][nSet].nOption = nOption;
-        pSkin->aSets[2][nSet].nVariant = nVariant;
-        pSkin->aSets[2][nSet].nOption = nOption;
-        pSkin->aSets[3][nSet].nVariant = nVariant;
-        pSkin->aSets[3][nSet].nOption = nOption;
+        // fake match: `!=` (`i < 4` unrolls to add + stw, EA's is addi + stwx)
+        for (i = 0; i != 4; i++) {
+            pSkin->aSets[i][nSet].nVariant = nVariant;
+            pSkin->aSets[i][nSet].nOption = nOption;
+        }
         return;
     }
     pSkin->aSets[3][nSet].nVariant = nVariant;
