@@ -1,0 +1,3582 @@
+/*
+    Compile unit: ../../../Source/NGC/Font/LLFont.c
+    Producer: GNU C 2.95.3 SN BUILD v1.76 for Nintendo Gamecube
+    Compile directory: F:\PROJ\LL_API\project\ngc\Font
+    Language: C89
+    Code range: 0x801C54C8 -> 0x801C5E64
+    GCC Source File Name Offset: 0x00002605
+    GCC Source Info Offset: 0x00001998
+*/
+static inline void OSSetGQR2(unsigned int type, unsigned int scale) {
+    // Local variables
+    unsigned int val;
+}
+
+static inline void OSSetGQR3(unsigned int type, unsigned int scale) {
+    // Local variables
+    unsigned int val;
+}
+
+static inline void OSSetGQR4(unsigned int type, unsigned int scale) {
+    // Local variables
+    unsigned int val;
+}
+
+static inline void OSSetGQR5(unsigned int type, unsigned int scale) {
+    // Local variables
+    unsigned int val;
+}
+
+static inline void OSSetGQR6(unsigned int type, unsigned int scale) {
+    // Local variables
+    unsigned int val;
+}
+
+static inline void OSSetGQR7(unsigned int type, unsigned int scale) {
+    // Local variables
+    unsigned int val;
+}
+
+static inline void OSInitFastCast(void) {}
+
+static inline void GXEnd(void) {}
+
+static inline void GXSetTexCoordGen(enum _GXTexCoordID dst_coord, enum _GXTexGenType func, enum _GXTexGenSrc src_param, unsigned int mtx) {}
+
+enum _GXTexCoordID {
+    GX_TEXCOORD0 = 0,
+    GX_TEXCOORD1 = 1,
+    GX_TEXCOORD2 = 2,
+    GX_TEXCOORD3 = 3,
+    GX_TEXCOORD4 = 4,
+    GX_TEXCOORD5 = 5,
+    GX_TEXCOORD6 = 6,
+    GX_TEXCOORD7 = 7,
+    GX_MAX_TEXCOORD = 8,
+    GX_TEXCOORD_NULL = 255,
+};
+enum _GXTexGenType {
+    GX_TG_MTX3x4 = 0,
+    GX_TG_MTX2x4 = 1,
+    GX_TG_BUMP0 = 2,
+    GX_TG_BUMP1 = 3,
+    GX_TG_BUMP2 = 4,
+    GX_TG_BUMP3 = 5,
+    GX_TG_BUMP4 = 6,
+    GX_TG_BUMP5 = 7,
+    GX_TG_BUMP6 = 8,
+    GX_TG_BUMP7 = 9,
+    GX_TG_SRTG = 10,
+};
+enum _GXTexGenSrc {
+    GX_TG_POS = 0,
+    GX_TG_NRM = 1,
+    GX_TG_BINRM = 2,
+    GX_TG_TANGENT = 3,
+    GX_TG_TEX0 = 4,
+    GX_TG_TEX1 = 5,
+    GX_TG_TEX2 = 6,
+    GX_TG_TEX3 = 7,
+    GX_TG_TEX4 = 8,
+    GX_TG_TEX5 = 9,
+    GX_TG_TEX6 = 10,
+    GX_TG_TEX7 = 11,
+    GX_TG_TEXCOORD0 = 12,
+    GX_TG_TEXCOORD1 = 13,
+    GX_TG_TEXCOORD2 = 14,
+    GX_TG_TEXCOORD3 = 15,
+    GX_TG_TEXCOORD4 = 16,
+    GX_TG_TEXCOORD5 = 17,
+    GX_TG_TEXCOORD6 = 18,
+    GX_TG_COLOR0 = 19,
+    GX_TG_COLOR1 = 20,
+};
+static inline void GXSetViewportv(const float * vp) {}
+
+static inline void GXCmd1u8(const unsigned char x) {}
+
+static inline void GXCmd1u16(const unsigned short x) {}
+
+static inline void GXCmd1u32(const unsigned long x) {}
+
+static inline void GXParam1u8(const unsigned char x) {}
+
+static inline void GXParam1u16(const unsigned short x) {}
+
+static inline void GXParam1u32(const unsigned long x) {}
+
+static inline void GXParam1s8(const signed char x) {}
+
+static inline void GXParam1s16(const short x) {}
+
+static inline void GXParam1s32(const long x) {}
+
+static inline void GXParam1f32(const float x) {}
+
+static inline void GXParam3f32(const float x, const float y, const float z) {}
+
+static inline void GXParam4f32(const float x, const float y, const float z, const float w) {}
+
+static inline void GXPosition3f32(const float x, const float y, const float z) {}
+
+static inline void GXPosition3u8(const unsigned char x, const unsigned char y, const unsigned char z) {}
+
+static inline void GXPosition3s8(const signed char x, const signed char y, const signed char z) {}
+
+static inline void GXPosition3u16(const unsigned short x, const unsigned short y, const unsigned short z) {}
+
+static inline void GXPosition3s16(const short x, const short y, const short z) {}
+
+static inline void GXPosition2f32(const float x, const float y) {}
+
+static inline void GXPosition2u8(const unsigned char x, const unsigned char y) {}
+
+static inline void GXPosition2s8(const signed char x, const signed char y) {}
+
+static inline void GXPosition2u16(const unsigned short x, const unsigned short y) {}
+
+static inline void GXPosition2s16(const short x, const short y) {}
+
+static inline void GXPosition1x16(const unsigned short x) {}
+
+static inline void GXPosition1x8(const unsigned char x) {}
+
+static inline void GXNormal3f32(const float x, const float y, const float z) {}
+
+static inline void GXNormal3s16(const short x, const short y, const short z) {}
+
+static inline void GXNormal3s8(const signed char x, const signed char y, const signed char z) {}
+
+static inline void GXNormal1x16(const unsigned short x) {}
+
+static inline void GXNormal1x8(const unsigned char x) {}
+
+static inline void GXColor4u8(const unsigned char x, const unsigned char y, const unsigned char z, const unsigned char w) {}
+
+static inline void GXColor1u32(const unsigned long x) {}
+
+static inline void GXColor3u8(const unsigned char x, const unsigned char y, const unsigned char z) {}
+
+static inline void GXColor1u16(const unsigned short x) {}
+
+static inline void GXColor1x16(const unsigned short x) {}
+
+static inline void GXColor1x8(const unsigned char x) {}
+
+static inline void GXTexCoord2f32(const float x, const float y) {}
+
+static inline void GXTexCoord2s16(const short x, const short y) {}
+
+static inline void GXTexCoord2u16(const unsigned short x, const unsigned short y) {}
+
+static inline void GXTexCoord2s8(const signed char x, const signed char y) {}
+
+static inline void GXTexCoord2u8(const unsigned char x, const unsigned char y) {}
+
+static inline void GXTexCoord1f32(const float x) {}
+
+static inline void GXTexCoord1s16(const short x) {}
+
+static inline void GXTexCoord1u16(const unsigned short x) {}
+
+static inline void GXTexCoord1s8(const signed char x) {}
+
+static inline void GXTexCoord1u8(const unsigned char x) {}
+
+static inline void GXTexCoord1x16(const unsigned short x) {}
+
+static inline void GXTexCoord1x8(const unsigned char x) {}
+
+static inline void GXMatrixIndex1u8(const unsigned char x) {}
+
+static inline void GXFastCallDisplayList(const void * list, unsigned int nbytes) {}
+
+// total size: 0x10
+struct DmaTag_T {
+    // Members
+    unsigned short nQwords; // offset 0x0, size 0x2
+    unsigned char mark; // offset 0x2, size 0x1
+    unsigned char type; // offset 0x3, size 0x1
+    void * addr; // offset 0x4, size 0x4
+    unsigned int pad[2]; // offset 0x8, size 0x8
+};
+static inline struct DmaTag_T * GlibBinBeginVif1(struct GlibRenderBin_T * pRenderBin) {}
+
+// total size: 0x7C
+struct GlibRenderBin_T {
+    // Members
+    char * pName; // offset 0x0, size 0x4
+    unsigned int pad; // offset 0x4, size 0x4
+    unsigned int Flags; // offset 0x8, size 0x4
+    struct DmaTag_T * pMicroCode; // offset 0xC, size 0x4
+    void (* pBeginFunc)(struct GlibRenderBin_T *); // offset 0x10, size 0x4
+    void (* pEndFunc)(struct GlibRenderBin_T *); // offset 0x14, size 0x4
+    unsigned char VramHeapList[8]; // offset 0x18, size 0x8
+    int uCodeAddr; // offset 0x20, size 0x4
+    unsigned char bVisible; // offset 0x24, size 0x1
+    unsigned int CycleTime; // offset 0x28, size 0x4
+    unsigned int CycleBegin; // offset 0x2C, size 0x4
+    unsigned int CycleEnd; // offset 0x30, size 0x4
+    struct GlibRenderBin_T * pNextBin; // offset 0x34, size 0x4
+    struct DmaTag_T * pVIF1Base; // offset 0x38, size 0x4
+    struct DmaTag_T * pGIF3Base; // offset 0x3C, size 0x4
+    struct DmaTag_T * pVIF1Tag; // offset 0x40, size 0x4
+    struct DmaTag_T * pGIF3Tag; // offset 0x44, size 0x4
+    struct DmaTag_T * pAsyncGIF3Tag; // offset 0x48, size 0x4
+    struct DmaList_T VIF1List; // offset 0x4C, size 0x18
+    struct DmaList_T GIF3List; // offset 0x64, size 0x18
+};
+// total size: 0x18
+struct DmaList_T {
+    // Members
+    unsigned int nQwords; // offset 0x0, size 0x4
+    struct DmaTag_T * pTag; // offset 0x4, size 0x4
+    struct DmaTag_T * pBase[2]; // offset 0x8, size 0x8
+    struct DmaMemPool_T * pMemPool[2]; // offset 0x10, size 0x8
+};
+// total size: 0x8
+struct DmaMemPool_T {
+    // Members
+    unsigned short nQwords; // offset 0x0, size 0x2
+    unsigned short nNodes; // offset 0x2, size 0x2
+    void * pNodeHandler; // offset 0x4, size 0x4
+};
+static inline void GlibBinEndVif1(struct GlibRenderBin_T * pRenderBin, struct DmaTag_T * pTag) {}
+
+static inline struct DmaTag_T * GlibBinBeginGif3(struct GlibRenderBin_T * pRenderBin) {}
+
+static inline void GlibBinEndGif3(struct GlibRenderBin_T * pRenderBin, struct DmaTag_T * pTag) {}
+
+static inline volatile int AngleMult(int Dst, int Src) {
+    // Local variables
+    long long Rslt;
+}
+
+static inline void _FontLLXformGlyph(struct GlibColor4b_t * pColor, struct FontLLGlyph_T * pGlyph) {}
+
+// total size: 0x4
+struct GlibColor4b_t {
+    // Members
+    unsigned char r; // offset 0x0, size 0x1
+    unsigned char g; // offset 0x1, size 0x1
+    unsigned char b; // offset 0x2, size 0x1
+    unsigned char a; // offset 0x3, size 0x1
+};
+// total size: 0x80
+struct FontLLGlyph_T {
+    // Members
+    struct Vec4_t Vertex[4]; // offset 0x0, size 0x40
+    struct Vec4_t TexCoord[4]; // offset 0x40, size 0x40
+};
+// total size: 0x10
+struct Vec4_t {
+    // Members
+    float vx; // offset 0x0, size 0x4
+    float vy; // offset 0x4, size 0x4
+    float vz; // offset 0x8, size 0x4
+    float vw; // offset 0xC, size 0x4
+};
+// Range: 0x801C54C8 -> 0x801C5690
+static void _FontLLSetupGlyph(struct PrFont_t * pFont /* r3 */, struct FontLLGlyph_T * pGlyph /* r4 */, struct FontRenderMap_t * pRenderMap /* r5 */) {
+    // Local variables
+    float TexLeft; // f11
+    float TexRight; // f13
+    float TexTop; // f12
+    float TexBottom; // f0
+}
+
+// total size: 0x28
+struct PrFont_t {
+    // Members
+    struct PrFontList_t * pFontList; // offset 0x0, size 0x4
+    // total size: 0x20
+    struct {
+        // Members
+        unsigned int signature; // offset 0x0, size 0x4
+        unsigned int size; // offset 0x4, size 0x4
+        unsigned short version; // offset 0x8, size 0x2
+        unsigned short num; // offset 0xA, size 0x2
+        unsigned int flags; // offset 0xC, size 0x4
+        unsigned char centerx; // offset 0x10, size 0x1
+        unsigned char centery; // offset 0x11, size 0x1
+        unsigned char ascent; // offset 0x12, size 0x1
+        unsigned char descent; // offset 0x13, size 0x1
+        unsigned int chartbl; // offset 0x14, size 0x4
+        unsigned int kerntbl; // offset 0x18, size 0x4
+        unsigned int shape; // offset 0x1C, size 0x4
+    } * header; // offset 0x4, size 0x4
+    // total size: 0xC
+    struct {
+        // Members
+        unsigned short index; // offset 0x0, size 0x2
+        unsigned char width; // offset 0x2, size 0x1
+        unsigned char height; // offset 0x3, size 0x1
+        unsigned short u; // offset 0x4, size 0x2
+        unsigned short v; // offset 0x6, size 0x2
+        char advance; // offset 0x8, size 0x1
+        char xoffset; // offset 0x9, size 0x1
+        char yoffset; // offset 0xA, size 0x1
+        unsigned char pad; // offset 0xB, size 0x1
+    } * chartbl; // offset 0x8, size 0x4
+    union {
+        // total size: 0x8
+        struct {
+            // Members
+            unsigned short previousCode; // offset 0x0, size 0x2
+            unsigned short nextCode; // offset 0x2, size 0x2
+            char kernValue; // offset 0x4, size 0x1
+            unsigned char pad[3]; // offset 0x5, size 0x3
+        } * pBig; // offset 0x0, size 0x4
+        // total size: 0x4
+        struct {
+            // Members
+            unsigned char previousCode; // offset 0x0, size 0x1
+            unsigned char nextCode; // offset 0x1, size 0x1
+            char kernValue; // offset 0x2, size 0x1
+            unsigned char pad; // offset 0x3, size 0x1
+        } * pSmall; // offset 0x0, size 0x4
+        void * pVoid; // offset 0x0, size 0x4
+    } kerntbl; // offset 0xC, size 0x4
+    // total size: 0x14
+    struct {
+        // Members
+        unsigned int type : 8; // offset 0x0, size 0x4
+        int next : 24; // offset 0x0, size 0x4
+        unsigned short width; // offset 0x4, size 0x2
+        unsigned short height; // offset 0x6, size 0x2
+        unsigned short centerx; // offset 0x8, size 0x2
+        unsigned short centery; // offset 0xA, size 0x2
+        int shapex : 12; // offset 0xC, size 0x4
+        unsigned int nodata : 1; // offset 0xC, size 0x4
+        unsigned int twiddles : 1; // offset 0xC, size 0x4
+        unsigned int transposed : 1; // offset 0xC, size 0x4
+        unsigned int reserved : 1; // offset 0xC, size 0x4
+        int shapey : 12; // offset 0xC, size 0x4
+        unsigned int mipmaps : 4; // offset 0xC, size 0x4
+        unsigned char data[1]; // offset 0x10, size 0x1
+    } * shape; // offset 0x10, size 0x4
+    unsigned int pad1; // offset 0x14, size 0x4
+    struct LLFont_t LLInfo; // offset 0x18, size 0x10
+};
+// total size: 0x14
+struct FontRenderMap_t {
+    // Members
+    int x; // offset 0x0, size 0x4
+    int y; // offset 0x4, size 0x4
+    int width; // offset 0x8, size 0x4
+    int height; // offset 0xC, size 0x4
+    unsigned short u; // offset 0x10, size 0x2
+    unsigned short v; // offset 0x12, size 0x2
+};
+// total size: 0x10
+struct PrFontList_t {
+    // Members
+    void * FontFile; // offset 0x0, size 0x4
+    int FontIndex; // offset 0x4, size 0x4
+    unsigned int FontNum; // offset 0x8, size 0x4
+    unsigned char * pFontFile; // offset 0xC, size 0x4
+};
+// total size: 0x10
+struct LLFont_t {
+    // Members
+    struct _GXTexObj * pTexObj; // offset 0x0, size 0x4
+    struct _GXTlutObj * pTlutObj; // offset 0x4, size 0x4
+    struct _GXTlutObj * pTlutObjOut; // offset 0x8, size 0x4
+    struct _GXTlutObj * pTlutObjIn; // offset 0xC, size 0x4
+};
+// total size: 0x20
+struct _GXTexObj {
+    // Members
+    unsigned int dummy[8]; // offset 0x0, size 0x20
+};
+// total size: 0xC
+struct _GXTlutObj {
+    // Members
+    unsigned int dummy[3]; // offset 0x0, size 0xC
+};
+// Range: 0x801C5690 -> 0x801C5888
+static // total size: 0x10
+struct {
+    // Members
+    unsigned long long hi; // offset 0x0, size 0x8
+    unsigned long long lo; // offset 0x8, size 0x8
+} * _FontLLRender(// total size: 0x10
+struct {
+    // Members
+    unsigned long long hi; // offset 0x0, size 0x8
+    unsigned long long lo; // offset 0x8, size 0x8
+} * pTag /* r24 */, struct PrFont_t * pFont /* r25 */, struct FontRenderMap_t * pRenderMapArray /* r5 */, unsigned int NumMaps /* r26 */, struct GlibColor4f_t * pColor /* r7 */, const unsigned long long * pTex0 /* r8 */) {
+    // Local variables
+    unsigned int idxMap; // r28
+    struct FontLLGlyph_T Glyph; // r1+0x8
+    struct GlibColor4b_t byteColor; // r1+0x88
+
+    // Range: 0x801C5750 -> 0x801C5750
+    inline void _FontLLXformGlyph(struct GlibColor4b_t * pColor, struct FontLLGlyph_T * pGlyph) {
+        // Range: 0x801C5750 -> 0x801C5750
+        inline void GXPosition3f32(const float x, const float y, const float z) {}
+
+        // Range: 0x801C5750 -> 0x801C5750
+        inline void GXColor4u8(const unsigned char x, const unsigned char y, const unsigned char z, const unsigned char w) {}
+
+        // Range: 0x801C5750 -> 0x801C5750
+        inline void GXTexCoord2f32(const float x, const float y) {}
+
+        // Range: 0x801C5750 -> 0x801C5750
+        inline void GXPosition3f32(const float x, const float y, const float z) {}
+
+        // Range: 0x801C5750 -> 0x801C5750
+        inline void GXColor4u8(const unsigned char x, const unsigned char y, const unsigned char z, const unsigned char w) {}
+
+        // Range: 0x801C5750 -> 0x801C5750
+        inline void GXTexCoord2f32(const float x, const float y) {}
+
+        // Range: 0x801C5750 -> 0x801C5750
+        inline void GXPosition3f32(const float x, const float y, const float z) {}
+
+        // Range: 0x801C5750 -> 0x801C5750
+        inline void GXColor4u8(const unsigned char x, const unsigned char y, const unsigned char z, const unsigned char w) {}
+
+        // Range: 0x801C5750 -> 0x801C5750
+        inline void GXTexCoord2f32(const float x, const float y) {}
+
+        // Range: 0x801C5750 -> 0x801C5750
+        inline void GXPosition3f32(const float x, const float y, const float z) {}
+
+        // Range: 0x801C5750 -> 0x801C5750
+        inline void GXColor4u8(const unsigned char x, const unsigned char y, const unsigned char z, const unsigned char w) {}
+
+        // Range: 0x801C5750 -> 0x801C5750
+        inline void GXTexCoord2f32(const float x, const float y) {}
+
+        // Range: 0x801C5750 -> 0x801C5750
+        inline void GXEnd(void) {}
+    }
+}
+
+// total size: 0x10
+struct GlibColor4f_t {
+    // Members
+    float r; // offset 0x0, size 0x4
+    float g; // offset 0x4, size 0x4
+    float b; // offset 0x8, size 0x4
+    float a; // offset 0xC, size 0x4
+};
+// Range: 0x801C5888 -> 0x801C5A44
+unsigned int FontLLRenderText(void * Font /* r31 */, char * text /* r4 */, int Flags /* r5 */, float Wrap /* f1 */, struct Vec3_t * pPos /* r30 */) {
+    // Local variables
+    unsigned int err;
+    struct PrFont_t * pFont;
+    struct FontRenderMap_t * pMapArray; // r28
+    unsigned int NumMaps; // r1+0x48
+    // total size: 0x10
+    struct {
+        // Members
+        unsigned long long hi; // offset 0x0, size 0x8
+        unsigned long long lo; // offset 0x8, size 0x8
+    } * pTag; // r29
+    struct Mat_t mt; // r1+0x8
+}
+
+// total size: 0xC
+struct Vec3_t {
+    // Members
+    float vx; // offset 0x0, size 0x4
+    float vy; // offset 0x4, size 0x4
+    float vz; // offset 0x8, size 0x4
+};
+// total size: 0x40
+struct Mat_t {
+    // Members
+    float m[16]; // offset 0x0, size 0x40
+};
+// Range: 0x801C5A44 -> 0x801C5BC4
+void FontLLRenderBegin(void) {
+    // Range: 0x801C5A50 -> 0x801C5A50
+    inline void GXSetTexCoordGen(enum _GXTexCoordID dst_coord, enum _GXTexGenType func, enum _GXTexGenSrc src_param, unsigned int mtx) {}
+}
+
+// Range: 0x801C5BC4 -> 0x801C5D10
+void FontLLUploadPalettes(unsigned int * mainID /* r3 */, unsigned int * outlineID /* r4 */, unsigned int * inlineID /* r5 */) {
+    // Local variables
+    unsigned int PalIndex; // r10
+    unsigned int nPalSize;
+    unsigned int nPalStart;
+}
+
+// Range: 0x801C5D10 -> 0x801C5D14
+void FontLLReleasePalettes(unsigned int mainID /* r3 */, unsigned int outlineID /* r4 */, unsigned int inlineID /* r5 */) {}
+
+// Range: 0x801C5D14 -> 0x801C5E34
+void FontLLUploadTextures(struct PrFont_t * pFont /* r31 */, unsigned int PalID /* r4 */, unsigned int PalIDOut /* r5 */, unsigned int PalIDIn /* r6 */, unsigned char bAsync /* r7 */) {
+    // Local variables
+    struct GlibTexture_t Texture; // r1+0x10
+}
+
+// total size: 0x20
+struct GlibTexture_t {
+    // Members
+    unsigned short Width; // offset 0x0, size 0x2
+    unsigned short Height; // offset 0x2, size 0x2
+    unsigned char ChannelOrder[4]; // offset 0x4, size 0x4
+    enum GlibTexStorageType_t TexStorageType; // offset 0x8, size 0x4
+    void * pTexData; // offset 0xC, size 0x4
+    enum GlibPalStorageType_t PalStorageType; // offset 0x10, size 0x4
+    void * pPaletteData; // offset 0x14, size 0x4
+    unsigned int TextureID; // offset 0x18, size 0x4
+    unsigned char Dirty; // offset 0x1C, size 0x1
+    unsigned char Pad1; // offset 0x1D, size 0x1
+    unsigned short Pad2; // offset 0x1E, size 0x2
+};
+enum GlibTexStorageType_t {
+    GLIB_TEXSTORAGETYPE_4BIT = 0,
+    GLIB_TEXSTORAGETYPE_8BIT = 1,
+    GLIB_TEXSTORAGETYPE_IA4BIT = 2,
+    GLIB_TEXSTORAGETYPE_IA8BIT = 3,
+    GLIB_TEXSTORAGETYPE_16BIT565 = 4,
+    GLIB_TEXSTORAGETYPE_16BIT5A3 = 5,
+    GLIB_TEXSTORAGETYPE_32BIT = 6,
+    GLIB_TEXSTORAGETYPE_NONE1 = 7,
+    GLIB_TEXSTORAGETYPE_C4 = 8,
+    GLIB_TEXSTORAGETYPE_C8 = 9,
+    GLIB_TEXSTORAGETYPE_C14X2 = 10,
+    GLIB_TEXSTORAGETYPE_RAW8 = 11,
+    GLIB_TEXSTORAGETYPE_NONE3 = 12,
+    GLIB_TEXSTORAGETYPE_NONE4 = 13,
+    GLIB_TEXSTORAGETYPE_S3TC = 14,
+    GLIB_TEXSTORAGETYPE_MAX = 15,
+};
+enum GlibPalStorageType_t {
+    GLIB_PALSTORAGETYPE_16BIT_IA8 = 0,
+    GLIB_PALSTORAGETYPE_16BIT_RGB565 = 1,
+    GLIB_PALSTORAGETYPE_16BIT_RGB5A3 = 2,
+    GLIB_PALSTORAGETYPE_NONE = 3,
+    GLIB_PALSTORAGETYPE_32BIT = 6,
+    GLIB_PALSTORAGETYPE_MAX = 7,
+};
+// Range: 0x801C5E34 -> 0x801C5E60
+void FontLLReleaseTextures(struct PrFont_t * pFont /* r3 */) {}
+
+// Range: 0x801C5E60 -> 0x801C5E64
+void FontLLCreateFont(struct PrFont_t * pFont /* r3 */) {}
+
+// Range: 0xFFFFFFFF -> 0x801C5E64
+void FontLLRegisterDrawDebugFnc(void (* pFontDrawDebugFnc)(unsigned int, void *) /* r3 */, unsigned int uUserParam /* r4 */) {}
+
+typedef int ptrdiff_t;
+typedef unsigned int size_t;
+typedef int wchar_t;
+typedef unsigned int wint_t;
+typedef char int8_t;
+typedef short int16_t;
+typedef int int32_t;
+typedef unsigned char uint8_t;
+typedef unsigned short uint16_t;
+typedef unsigned int uint32_t;
+typedef float float_t;
+typedef double double_t;
+typedef long long int64_t;
+typedef unsigned long long uint64_t;
+typedef unsigned long long intptr_t;
+typedef long long intmax_t;
+typedef unsigned long long uintmax_t;
+typedef char char8_t;
+typedef unsigned short char16_t;
+typedef int char32_t;
+typedef // total size: 0x10
+struct {
+    // Members
+    long long hi; // offset 0x0, size 0x8
+    long long lo; // offset 0x8, size 0x8
+} Int128;
+typedef // total size: 0x10
+struct {
+    // Members
+    unsigned long long hi; // offset 0x0, size 0x8
+    unsigned long long lo; // offset 0x8, size 0x8
+} Uint128;
+typedef unsigned char Bool;
+// total size: 0xC
+struct __va_list_tag {
+    // Members
+    char gpr; // offset 0x0, size 0x1
+    char fpr; // offset 0x1, size 0x1
+    char * overflow_arg_area; // offset 0x4, size 0x4
+    char * reg_save_area; // offset 0x8, size 0x4
+};
+typedef struct __va_list_tag __va_list[1];
+typedef __va_list __gnuc_va_list;
+typedef // total size: 0x60
+struct {
+    // Members
+    long __gp_save[8]; // offset 0x0, size 0x20
+    double __fp_save[8]; // offset 0x20, size 0x40
+} __va_regsave_t;
+typedef __va_list va_list;
+typedef char s8;
+typedef short s16;
+typedef int s32;
+typedef long long s64;
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned int u32;
+typedef unsigned long long u64;
+typedef volatile unsigned char vu8;
+typedef volatile unsigned short vu16;
+typedef volatile unsigned long vu32;
+typedef volatile unsigned long long vu64;
+typedef volatile signed char vs8;
+typedef volatile short vs16;
+typedef volatile long vs32;
+typedef volatile long long vs64;
+typedef float f32;
+typedef double f64;
+typedef volatile float vf32;
+typedef volatile double vf64;
+typedef char * Ptr;
+typedef int BOOL;
+typedef unsigned char GXBool;
+enum _GXAttr {
+    GX_VA_PNMTXIDX = 0,
+    GX_VA_TEX0MTXIDX = 1,
+    GX_VA_TEX1MTXIDX = 2,
+    GX_VA_TEX2MTXIDX = 3,
+    GX_VA_TEX3MTXIDX = 4,
+    GX_VA_TEX4MTXIDX = 5,
+    GX_VA_TEX5MTXIDX = 6,
+    GX_VA_TEX6MTXIDX = 7,
+    GX_VA_TEX7MTXIDX = 8,
+    GX_VA_POS = 9,
+    GX_VA_NRM = 10,
+    GX_VA_CLR0 = 11,
+    GX_VA_CLR1 = 12,
+    GX_VA_TEX0 = 13,
+    GX_VA_TEX1 = 14,
+    GX_VA_TEX2 = 15,
+    GX_VA_TEX3 = 16,
+    GX_VA_TEX4 = 17,
+    GX_VA_TEX5 = 18,
+    GX_VA_TEX6 = 19,
+    GX_VA_TEX7 = 20,
+    GX_POS_MTX_ARRAY = 21,
+    GX_NRM_MTX_ARRAY = 22,
+    GX_TEX_MTX_ARRAY = 23,
+    GX_LIGHT_ARRAY = 24,
+    GX_VA_NBT = 25,
+    GX_VA_MAX_ATTR = 26,
+    GX_VA_NULL = 255,
+};
+typedef enum _GXAttr GXAttr;
+enum _GXVtxFmt {
+    GX_VTXFMT0 = 0,
+    GX_VTXFMT1 = 1,
+    GX_VTXFMT2 = 2,
+    GX_VTXFMT3 = 3,
+    GX_VTXFMT4 = 4,
+    GX_VTXFMT5 = 5,
+    GX_VTXFMT6 = 6,
+    GX_VTXFMT7 = 7,
+    GX_MAX_VTXFMT = 8,
+};
+typedef enum _GXVtxFmt GXVtxFmt;
+enum _GXAttrType {
+    GX_NONE = 0,
+    GX_DIRECT = 1,
+    GX_INDEX8 = 2,
+    GX_INDEX16 = 3,
+};
+typedef enum _GXAttrType GXAttrType;
+typedef enum _GXTexCoordID GXTexCoordID;
+typedef enum _GXTexGenType GXTexGenType;
+typedef enum _GXTexGenSrc GXTexGenSrc;
+enum _GXCompCnt {
+    GX_POS_XY = 0,
+    GX_POS_XYZ = 1,
+    GX_NRM_XYZ = 0,
+    GX_NRM_NBT = 1,
+    GX_NRM_NBT3 = 2,
+    GX_CLR_RGB = 0,
+    GX_CLR_RGBA = 1,
+    GX_TEX_S = 0,
+    GX_TEX_ST = 1,
+};
+typedef enum _GXCompCnt GXCompCnt;
+enum _GXCompType {
+    GX_U8 = 0,
+    GX_S8 = 1,
+    GX_U16 = 2,
+    GX_S16 = 3,
+    GX_F32 = 4,
+    GX_RGB565 = 0,
+    GX_RGB8 = 1,
+    GX_RGBX8 = 2,
+    GX_RGBA4 = 3,
+    GX_RGBA6 = 4,
+    GX_RGBA8 = 5,
+};
+typedef enum _GXCompType GXCompType;
+enum _GXChannelID {
+    GX_COLOR0 = 0,
+    GX_COLOR1 = 1,
+    GX_ALPHA0 = 2,
+    GX_ALPHA1 = 3,
+    GX_COLOR0A0 = 4,
+    GX_COLOR1A1 = 5,
+    GX_COLOR_ZERO = 6,
+    GX_ALPHA_BUMP = 7,
+    GX_ALPHA_BUMPN = 8,
+    GX_COLOR_NULL = 255,
+};
+typedef enum _GXChannelID GXChannelID;
+enum _GXColorSrc {
+    GX_SRC_REG = 0,
+    GX_SRC_VTX = 1,
+};
+typedef enum _GXColorSrc GXColorSrc;
+enum _GXLightID {
+    GX_LIGHT0 = 1,
+    GX_LIGHT1 = 2,
+    GX_LIGHT2 = 4,
+    GX_LIGHT3 = 8,
+    GX_LIGHT4 = 16,
+    GX_LIGHT5 = 32,
+    GX_LIGHT6 = 64,
+    GX_LIGHT7 = 128,
+    GX_MAX_LIGHT = 256,
+    GX_LIGHT_NULL = 0,
+};
+typedef enum _GXLightID GXLightID;
+enum _GXDiffuseFn {
+    GX_DF_NONE = 0,
+    GX_DF_SIGN = 1,
+    GX_DF_CLAMP = 2,
+};
+typedef enum _GXDiffuseFn GXDiffuseFn;
+enum _GXAttnFn {
+    GX_AF_SPEC = 0,
+    GX_AF_SPOT = 1,
+    GX_AF_NONE = 2,
+};
+typedef enum _GXAttnFn GXAttnFn;
+enum _GXSpotFn {
+    GX_SP_OFF = 0,
+    GX_SP_FLAT = 1,
+    GX_SP_COS = 2,
+    GX_SP_COS2 = 3,
+    GX_SP_SHARP = 4,
+    GX_SP_RING1 = 5,
+    GX_SP_RING2 = 6,
+};
+typedef enum _GXSpotFn GXSpotFn;
+enum _GXDistAttnFn {
+    GX_DA_OFF = 0,
+    GX_DA_GENTLE = 1,
+    GX_DA_MEDIUM = 2,
+    GX_DA_STEEP = 3,
+};
+typedef enum _GXDistAttnFn GXDistAttnFn;
+enum _GXPosNrmMtx {
+    GX_PNMTX0 = 0,
+    GX_PNMTX1 = 3,
+    GX_PNMTX2 = 6,
+    GX_PNMTX3 = 9,
+    GX_PNMTX4 = 12,
+    GX_PNMTX5 = 15,
+    GX_PNMTX6 = 18,
+    GX_PNMTX7 = 21,
+    GX_PNMTX8 = 24,
+    GX_PNMTX9 = 27,
+};
+typedef enum _GXPosNrmMtx GXPosNrmMtx;
+enum _GXTexMtx {
+    GX_TEXMTX0 = 30,
+    GX_TEXMTX1 = 33,
+    GX_TEXMTX2 = 36,
+    GX_TEXMTX3 = 39,
+    GX_TEXMTX4 = 42,
+    GX_TEXMTX5 = 45,
+    GX_TEXMTX6 = 48,
+    GX_TEXMTX7 = 51,
+    GX_TEXMTX8 = 54,
+    GX_TEXMTX9 = 57,
+    GX_IDENTITY = 60,
+};
+typedef enum _GXTexMtx GXTexMtx;
+enum _GXPTTexMtx {
+    GX_PTTEXMTX0 = 64,
+    GX_PTTEXMTX1 = 67,
+    GX_PTTEXMTX2 = 70,
+    GX_PTTEXMTX3 = 73,
+    GX_PTTEXMTX4 = 76,
+    GX_PTTEXMTX5 = 79,
+    GX_PTTEXMTX6 = 82,
+    GX_PTTEXMTX7 = 85,
+    GX_PTTEXMTX8 = 88,
+    GX_PTTEXMTX9 = 91,
+    GX_PTTEXMTX10 = 94,
+    GX_PTTEXMTX11 = 97,
+    GX_PTTEXMTX12 = 100,
+    GX_PTTEXMTX13 = 103,
+    GX_PTTEXMTX14 = 106,
+    GX_PTTEXMTX15 = 109,
+    GX_PTTEXMTX16 = 112,
+    GX_PTTEXMTX17 = 115,
+    GX_PTTEXMTX18 = 118,
+    GX_PTTEXMTX19 = 121,
+    GX_PTIDENTITY = 125,
+};
+typedef enum _GXPTTexMtx GXPTTexMtx;
+enum _GXTexMtxType {
+    GX_MTX3x4 = 0,
+    GX_MTX2x4 = 1,
+};
+typedef enum _GXTexMtxType GXTexMtxType;
+enum _GXPrimitive {
+    GX_POINTS = 184,
+    GX_LINES = 168,
+    GX_LINESTRIP = 176,
+    GX_TRIANGLES = 144,
+    GX_TRIANGLESTRIP = 152,
+    GX_TRIANGLEFAN = 160,
+    GX_QUADS = 128,
+};
+typedef enum _GXPrimitive GXPrimitive;
+enum _GXTexOffset {
+    GX_TO_ZERO = 0,
+    GX_TO_SIXTEENTH = 1,
+    GX_TO_EIGHTH = 2,
+    GX_TO_FOURTH = 3,
+    GX_TO_HALF = 4,
+    GX_TO_ONE = 5,
+    GX_MAX_TEXOFFSET = 6,
+};
+typedef enum _GXTexOffset GXTexOffset;
+enum _GXCullMode {
+    GX_CULL_NONE = 0,
+    GX_CULL_FRONT = 1,
+    GX_CULL_BACK = 2,
+    GX_CULL_ALL = 3,
+};
+typedef enum _GXCullMode GXCullMode;
+enum _GXClipMode {
+    GX_CLIP_ENABLE = 0,
+    GX_CLIP_DISABLE = 1,
+};
+typedef enum _GXClipMode GXClipMode;
+enum _GXTexWrapMode {
+    GX_CLAMP = 0,
+    GX_REPEAT = 1,
+    GX_MIRROR = 2,
+    GX_MAX_TEXWRAPMODE = 3,
+};
+typedef enum _GXTexWrapMode GXTexWrapMode;
+enum _GXTexFilter {
+    GX_NEAR = 0,
+    GX_LINEAR = 1,
+    GX_NEAR_MIP_NEAR = 2,
+    GX_LIN_MIP_NEAR = 3,
+    GX_NEAR_MIP_LIN = 4,
+    GX_LIN_MIP_LIN = 5,
+};
+typedef enum _GXTexFilter GXTexFilter;
+enum _GXCITexFmt {
+    GX_TF_C4 = 8,
+    GX_TF_C8 = 9,
+    GX_TF_C14X2 = 10,
+};
+typedef enum _GXCITexFmt GXCITexFmt;
+enum _GXTexFmt {
+    GX_TF_I4 = 0,
+    GX_TF_I8 = 1,
+    GX_TF_IA4 = 2,
+    GX_TF_IA8 = 3,
+    GX_TF_RGB565 = 4,
+    GX_TF_RGB5A3 = 5,
+    GX_TF_RGBA8 = 6,
+    GX_TF_CMPR = 14,
+    GX_CTF_R4 = 32,
+    GX_CTF_RA4 = 34,
+    GX_CTF_RA8 = 35,
+    GX_CTF_YUVA8 = 38,
+    GX_CTF_A8 = 39,
+    GX_CTF_R8 = 40,
+    GX_CTF_G8 = 41,
+    GX_CTF_B8 = 42,
+    GX_CTF_RG8 = 43,
+    GX_CTF_GB8 = 44,
+    GX_TF_Z8 = 17,
+    GX_TF_Z16 = 19,
+    GX_TF_Z24X8 = 22,
+    GX_CTF_Z4 = 48,
+    GX_CTF_Z8M = 57,
+    GX_CTF_Z8L = 58,
+    GX_CTF_Z16L = 60,
+    GX_TF_A8 = 39,
+};
+typedef enum _GXTexFmt GXTexFmt;
+enum _GXTlutFmt {
+    GX_TL_IA8 = 0,
+    GX_TL_RGB565 = 1,
+    GX_TL_RGB5A3 = 2,
+    GX_MAX_TLUTFMT = 3,
+};
+typedef enum _GXTlutFmt GXTlutFmt;
+enum _GXTlutSize {
+    GX_TLUT_16 = 1,
+    GX_TLUT_32 = 2,
+    GX_TLUT_64 = 4,
+    GX_TLUT_128 = 8,
+    GX_TLUT_256 = 16,
+    GX_TLUT_512 = 32,
+    GX_TLUT_1K = 64,
+    GX_TLUT_2K = 128,
+    GX_TLUT_4K = 256,
+    GX_TLUT_8K = 512,
+    GX_TLUT_16K = 1024,
+};
+typedef enum _GXTlutSize GXTlutSize;
+enum _GXTlut {
+    GX_TLUT0 = 0,
+    GX_TLUT1 = 1,
+    GX_TLUT2 = 2,
+    GX_TLUT3 = 3,
+    GX_TLUT4 = 4,
+    GX_TLUT5 = 5,
+    GX_TLUT6 = 6,
+    GX_TLUT7 = 7,
+    GX_TLUT8 = 8,
+    GX_TLUT9 = 9,
+    GX_TLUT10 = 10,
+    GX_TLUT11 = 11,
+    GX_TLUT12 = 12,
+    GX_TLUT13 = 13,
+    GX_TLUT14 = 14,
+    GX_TLUT15 = 15,
+    GX_BIGTLUT0 = 16,
+    GX_BIGTLUT1 = 17,
+    GX_BIGTLUT2 = 18,
+    GX_BIGTLUT3 = 19,
+};
+typedef enum _GXTlut GXTlut;
+enum _GXTexMapID {
+    GX_TEXMAP0 = 0,
+    GX_TEXMAP1 = 1,
+    GX_TEXMAP2 = 2,
+    GX_TEXMAP3 = 3,
+    GX_TEXMAP4 = 4,
+    GX_TEXMAP5 = 5,
+    GX_TEXMAP6 = 6,
+    GX_TEXMAP7 = 7,
+    GX_MAX_TEXMAP = 8,
+    GX_TEXMAP_NULL = 255,
+    GX_TEX_DISABLE = 256,
+};
+typedef enum _GXTexMapID GXTexMapID;
+enum _GXTexCacheSize {
+    GX_TEXCACHE_32K = 0,
+    GX_TEXCACHE_128K = 1,
+    GX_TEXCACHE_512K = 2,
+    GX_TEXCACHE_NONE = 3,
+};
+typedef enum _GXTexCacheSize GXTexCacheSize;
+enum _GXIndTexFormat {
+    GX_ITF_8 = 0,
+    GX_ITF_5 = 1,
+    GX_ITF_4 = 2,
+    GX_ITF_3 = 3,
+    GX_MAX_ITFORMAT = 4,
+};
+typedef enum _GXIndTexFormat GXIndTexFormat;
+enum _GXIndTexBiasSel {
+    GX_ITB_NONE = 0,
+    GX_ITB_S = 1,
+    GX_ITB_T = 2,
+    GX_ITB_ST = 3,
+    GX_ITB_U = 4,
+    GX_ITB_SU = 5,
+    GX_ITB_TU = 6,
+    GX_ITB_STU = 7,
+    GX_MAX_ITBIAS = 8,
+};
+typedef enum _GXIndTexBiasSel GXIndTexBiasSel;
+enum _GXIndTexAlphaSel {
+    GX_ITBA_OFF = 0,
+    GX_ITBA_S = 1,
+    GX_ITBA_T = 2,
+    GX_ITBA_U = 3,
+    GX_MAX_ITBALPHA = 4,
+};
+typedef enum _GXIndTexAlphaSel GXIndTexAlphaSel;
+enum _GXIndTexMtxID {
+    GX_ITM_OFF = 0,
+    GX_ITM_0 = 1,
+    GX_ITM_1 = 2,
+    GX_ITM_2 = 3,
+    GX_ITM_S0 = 5,
+    GX_ITM_S1 = 6,
+    GX_ITM_S2 = 7,
+    GX_ITM_T0 = 9,
+    GX_ITM_T1 = 10,
+    GX_ITM_T2 = 11,
+};
+typedef enum _GXIndTexMtxID GXIndTexMtxID;
+enum _GXIndTexWrap {
+    GX_ITW_OFF = 0,
+    GX_ITW_256 = 1,
+    GX_ITW_128 = 2,
+    GX_ITW_64 = 3,
+    GX_ITW_32 = 4,
+    GX_ITW_16 = 5,
+    GX_ITW_0 = 6,
+    GX_MAX_ITWRAP = 7,
+};
+typedef enum _GXIndTexWrap GXIndTexWrap;
+enum _GXIndTexScale {
+    GX_ITS_1 = 0,
+    GX_ITS_2 = 1,
+    GX_ITS_4 = 2,
+    GX_ITS_8 = 3,
+    GX_ITS_16 = 4,
+    GX_ITS_32 = 5,
+    GX_ITS_64 = 6,
+    GX_ITS_128 = 7,
+    GX_ITS_256 = 8,
+    GX_MAX_ITSCALE = 9,
+};
+typedef enum _GXIndTexScale GXIndTexScale;
+enum _GXIndTexStageID {
+    GX_INDTEXSTAGE0 = 0,
+    GX_INDTEXSTAGE1 = 1,
+    GX_INDTEXSTAGE2 = 2,
+    GX_INDTEXSTAGE3 = 3,
+    GX_MAX_INDTEXSTAGE = 4,
+};
+typedef enum _GXIndTexStageID GXIndTexStageID;
+enum _GXTevStageID {
+    GX_TEVSTAGE0 = 0,
+    GX_TEVSTAGE1 = 1,
+    GX_TEVSTAGE2 = 2,
+    GX_TEVSTAGE3 = 3,
+    GX_TEVSTAGE4 = 4,
+    GX_TEVSTAGE5 = 5,
+    GX_TEVSTAGE6 = 6,
+    GX_TEVSTAGE7 = 7,
+    GX_TEVSTAGE8 = 8,
+    GX_TEVSTAGE9 = 9,
+    GX_TEVSTAGE10 = 10,
+    GX_TEVSTAGE11 = 11,
+    GX_TEVSTAGE12 = 12,
+    GX_TEVSTAGE13 = 13,
+    GX_TEVSTAGE14 = 14,
+    GX_TEVSTAGE15 = 15,
+    GX_MAX_TEVSTAGE = 16,
+};
+typedef enum _GXTevStageID GXTevStageID;
+enum _GXTevRegID {
+    GX_TEVPREV = 0,
+    GX_TEVREG0 = 1,
+    GX_TEVREG1 = 2,
+    GX_TEVREG2 = 3,
+    GX_MAX_TEVREG = 4,
+};
+typedef enum _GXTevRegID GXTevRegID;
+enum _GXTevOp {
+    GX_TEV_ADD = 0,
+    GX_TEV_SUB = 1,
+    GX_TEV_COMP_R8_GT = 8,
+    GX_TEV_COMP_R8_EQ = 9,
+    GX_TEV_COMP_GR16_GT = 10,
+    GX_TEV_COMP_GR16_EQ = 11,
+    GX_TEV_COMP_BGR24_GT = 12,
+    GX_TEV_COMP_BGR24_EQ = 13,
+    GX_TEV_COMP_RGB8_GT = 14,
+    GX_TEV_COMP_RGB8_EQ = 15,
+    GX_TEV_COMP_A8_GT = 14,
+    GX_TEV_COMP_A8_EQ = 15,
+};
+typedef enum _GXTevOp GXTevOp;
+enum _GXTevColorArg {
+    GX_CC_CPREV = 0,
+    GX_CC_APREV = 1,
+    GX_CC_C0 = 2,
+    GX_CC_A0 = 3,
+    GX_CC_C1 = 4,
+    GX_CC_A1 = 5,
+    GX_CC_C2 = 6,
+    GX_CC_A2 = 7,
+    GX_CC_TEXC = 8,
+    GX_CC_TEXA = 9,
+    GX_CC_RASC = 10,
+    GX_CC_RASA = 11,
+    GX_CC_ONE = 12,
+    GX_CC_HALF = 13,
+    GX_CC_KONST = 14,
+    GX_CC_ZERO = 15,
+    GX_CC_TEXRRR = 16,
+    GX_CC_TEXGGG = 17,
+    GX_CC_TEXBBB = 18,
+    GX_CC_QUARTER = 14,
+};
+typedef enum _GXTevColorArg GXTevColorArg;
+enum _GXTevAlphaArg {
+    GX_CA_APREV = 0,
+    GX_CA_A0 = 1,
+    GX_CA_A1 = 2,
+    GX_CA_A2 = 3,
+    GX_CA_TEXA = 4,
+    GX_CA_RASA = 5,
+    GX_CA_KONST = 6,
+    GX_CA_ZERO = 7,
+    GX_CA_ONE = 6,
+};
+typedef enum _GXTevAlphaArg GXTevAlphaArg;
+enum _GXTevBias {
+    GX_TB_ZERO = 0,
+    GX_TB_ADDHALF = 1,
+    GX_TB_SUBHALF = 2,
+    GX_MAX_TEVBIAS = 3,
+};
+typedef enum _GXTevBias GXTevBias;
+enum _GXTevClampMode {
+    GX_TC_LINEAR = 0,
+    GX_TC_GE = 1,
+    GX_TC_EQ = 2,
+    GX_TC_LE = 3,
+    GX_MAX_TEVCLAMPMODE = 4,
+};
+typedef enum _GXTevClampMode GXTevClampMode;
+enum _GXTevKColorID {
+    GX_KCOLOR0 = 0,
+    GX_KCOLOR1 = 1,
+    GX_KCOLOR2 = 2,
+    GX_KCOLOR3 = 3,
+    GX_MAX_KCOLOR = 4,
+};
+typedef enum _GXTevKColorID GXTevKColorID;
+enum _GXTevKColorSel {
+    GX_TEV_KCSEL_8_8 = 0,
+    GX_TEV_KCSEL_7_8 = 1,
+    GX_TEV_KCSEL_6_8 = 2,
+    GX_TEV_KCSEL_5_8 = 3,
+    GX_TEV_KCSEL_4_8 = 4,
+    GX_TEV_KCSEL_3_8 = 5,
+    GX_TEV_KCSEL_2_8 = 6,
+    GX_TEV_KCSEL_1_8 = 7,
+    GX_TEV_KCSEL_1 = 0,
+    GX_TEV_KCSEL_3_4 = 2,
+    GX_TEV_KCSEL_1_2 = 4,
+    GX_TEV_KCSEL_1_4 = 6,
+    GX_TEV_KCSEL_K0 = 12,
+    GX_TEV_KCSEL_K1 = 13,
+    GX_TEV_KCSEL_K2 = 14,
+    GX_TEV_KCSEL_K3 = 15,
+    GX_TEV_KCSEL_K0_R = 16,
+    GX_TEV_KCSEL_K1_R = 17,
+    GX_TEV_KCSEL_K2_R = 18,
+    GX_TEV_KCSEL_K3_R = 19,
+    GX_TEV_KCSEL_K0_G = 20,
+    GX_TEV_KCSEL_K1_G = 21,
+    GX_TEV_KCSEL_K2_G = 22,
+    GX_TEV_KCSEL_K3_G = 23,
+    GX_TEV_KCSEL_K0_B = 24,
+    GX_TEV_KCSEL_K1_B = 25,
+    GX_TEV_KCSEL_K2_B = 26,
+    GX_TEV_KCSEL_K3_B = 27,
+    GX_TEV_KCSEL_K0_A = 28,
+    GX_TEV_KCSEL_K1_A = 29,
+    GX_TEV_KCSEL_K2_A = 30,
+    GX_TEV_KCSEL_K3_A = 31,
+};
+typedef enum _GXTevKColorSel GXTevKColorSel;
+enum _GXTevKAlphaSel {
+    GX_TEV_KASEL_8_8 = 0,
+    GX_TEV_KASEL_7_8 = 1,
+    GX_TEV_KASEL_6_8 = 2,
+    GX_TEV_KASEL_5_8 = 3,
+    GX_TEV_KASEL_4_8 = 4,
+    GX_TEV_KASEL_3_8 = 5,
+    GX_TEV_KASEL_2_8 = 6,
+    GX_TEV_KASEL_1_8 = 7,
+    GX_TEV_KASEL_1 = 0,
+    GX_TEV_KASEL_3_4 = 2,
+    GX_TEV_KASEL_1_2 = 4,
+    GX_TEV_KASEL_1_4 = 6,
+    GX_TEV_KASEL_K0_R = 16,
+    GX_TEV_KASEL_K1_R = 17,
+    GX_TEV_KASEL_K2_R = 18,
+    GX_TEV_KASEL_K3_R = 19,
+    GX_TEV_KASEL_K0_G = 20,
+    GX_TEV_KASEL_K1_G = 21,
+    GX_TEV_KASEL_K2_G = 22,
+    GX_TEV_KASEL_K3_G = 23,
+    GX_TEV_KASEL_K0_B = 24,
+    GX_TEV_KASEL_K1_B = 25,
+    GX_TEV_KASEL_K2_B = 26,
+    GX_TEV_KASEL_K3_B = 27,
+    GX_TEV_KASEL_K0_A = 28,
+    GX_TEV_KASEL_K1_A = 29,
+    GX_TEV_KASEL_K2_A = 30,
+    GX_TEV_KASEL_K3_A = 31,
+};
+typedef enum _GXTevKAlphaSel GXTevKAlphaSel;
+enum _GXTevSwapSel {
+    GX_TEV_SWAP0 = 0,
+    GX_TEV_SWAP1 = 1,
+    GX_TEV_SWAP2 = 2,
+    GX_TEV_SWAP3 = 3,
+    GX_MAX_TEVSWAP = 4,
+};
+typedef enum _GXTevSwapSel GXTevSwapSel;
+enum _GXTevColorChan {
+    GX_CH_RED = 0,
+    GX_CH_GREEN = 1,
+    GX_CH_BLUE = 2,
+    GX_CH_ALPHA = 3,
+};
+typedef enum _GXTevColorChan GXTevColorChan;
+enum _GXAlphaOp {
+    GX_AOP_AND = 0,
+    GX_AOP_OR = 1,
+    GX_AOP_XOR = 2,
+    GX_AOP_XNOR = 3,
+    GX_MAX_ALPHAOP = 4,
+};
+typedef enum _GXAlphaOp GXAlphaOp;
+enum _GXTevScale {
+    GX_CS_SCALE_1 = 0,
+    GX_CS_SCALE_2 = 1,
+    GX_CS_SCALE_4 = 2,
+    GX_CS_DIVIDE_2 = 3,
+    GX_MAX_TEVSCALE = 4,
+};
+typedef enum _GXTevScale GXTevScale;
+enum _GXFogType {
+    GX_FOG_NONE = 0,
+    GX_FOG_PERSP_LIN = 2,
+    GX_FOG_PERSP_EXP = 4,
+    GX_FOG_PERSP_EXP2 = 5,
+    GX_FOG_PERSP_REVEXP = 6,
+    GX_FOG_PERSP_REVEXP2 = 7,
+    GX_FOG_ORTHO_LIN = 10,
+    GX_FOG_ORTHO_EXP = 12,
+    GX_FOG_ORTHO_EXP2 = 13,
+    GX_FOG_ORTHO_REVEXP = 14,
+    GX_FOG_ORTHO_REVEXP2 = 15,
+    GX_FOG_LIN = 2,
+    GX_FOG_EXP = 4,
+    GX_FOG_EXP2 = 5,
+    GX_FOG_REVEXP = 6,
+    GX_FOG_REVEXP2 = 7,
+};
+typedef enum _GXFogType GXFogType;
+enum _GXBlendMode {
+    GX_BM_NONE = 0,
+    GX_BM_BLEND = 1,
+    GX_BM_LOGIC = 2,
+    GX_BM_SUBTRACT = 3,
+    GX_MAX_BLENDMODE = 4,
+};
+typedef enum _GXBlendMode GXBlendMode;
+enum _GXBlendFactor {
+    GX_BL_ZERO = 0,
+    GX_BL_ONE = 1,
+    GX_BL_SRCCLR = 2,
+    GX_BL_INVSRCCLR = 3,
+    GX_BL_SRCALPHA = 4,
+    GX_BL_INVSRCALPHA = 5,
+    GX_BL_DSTALPHA = 6,
+    GX_BL_INVDSTALPHA = 7,
+    GX_BL_DSTCLR = 2,
+    GX_BL_INVDSTCLR = 3,
+};
+typedef enum _GXBlendFactor GXBlendFactor;
+enum _GXCompare {
+    GX_NEVER = 0,
+    GX_LESS = 1,
+    GX_EQUAL = 2,
+    GX_LEQUAL = 3,
+    GX_GREATER = 4,
+    GX_NEQUAL = 5,
+    GX_GEQUAL = 6,
+    GX_ALWAYS = 7,
+};
+typedef enum _GXCompare GXCompare;
+enum _GXLogicOp {
+    GX_LO_CLEAR = 0,
+    GX_LO_AND = 1,
+    GX_LO_REVAND = 2,
+    GX_LO_COPY = 3,
+    GX_LO_INVAND = 4,
+    GX_LO_NOOP = 5,
+    GX_LO_XOR = 6,
+    GX_LO_OR = 7,
+    GX_LO_NOR = 8,
+    GX_LO_EQUIV = 9,
+    GX_LO_INV = 10,
+    GX_LO_REVOR = 11,
+    GX_LO_INVCOPY = 12,
+    GX_LO_INVOR = 13,
+    GX_LO_NAND = 14,
+    GX_LO_SET = 15,
+};
+typedef enum _GXLogicOp GXLogicOp;
+enum _GXPixelFmt {
+    GX_PF_RGB8_Z24 = 0,
+    GX_PF_RGBA6_Z24 = 1,
+    GX_PF_RGB565_Z16 = 2,
+    GX_PF_Z24 = 3,
+    GX_PF_Y8 = 4,
+    GX_PF_U8 = 5,
+    GX_PF_V8 = 6,
+    GX_PF_YUV420 = 7,
+};
+typedef enum _GXPixelFmt GXPixelFmt;
+enum _GXZFmt16 {
+    GX_ZC_LINEAR = 0,
+    GX_ZC_NEAR = 1,
+    GX_ZC_MID = 2,
+    GX_ZC_FAR = 3,
+};
+typedef enum _GXZFmt16 GXZFmt16;
+enum _GXTevMode {
+    GX_MODULATE = 0,
+    GX_DECAL = 1,
+    GX_BLEND = 2,
+    GX_REPLACE = 3,
+    GX_PASSCLR = 4,
+};
+typedef enum _GXTevMode GXTevMode;
+enum _GXGamma {
+    GX_GM_1_0 = 0,
+    GX_GM_1_7 = 1,
+    GX_GM_2_2 = 2,
+};
+typedef enum _GXGamma GXGamma;
+enum _GXProjectionType {
+    GX_PERSPECTIVE = 0,
+    GX_ORTHOGRAPHIC = 1,
+};
+typedef enum _GXProjectionType GXProjectionType;
+enum _GXEvent {
+    GX_VCACHE_MISS_ALL = 0,
+    GX_VCACHE_MISS_POS = 1,
+    GX_VCACHE_MISS_NRM = 2,
+};
+typedef enum _GXEvent GXEvent;
+enum _GXFBClamp {
+    GX_CLAMP_NONE = 0,
+    GX_CLAMP_TOP = 1,
+    GX_CLAMP_BOTTOM = 2,
+};
+typedef enum _GXFBClamp GXFBClamp;
+enum _GXAnisotropy {
+    GX_ANISO_1 = 0,
+    GX_ANISO_2 = 1,
+    GX_ANISO_4 = 2,
+    GX_MAX_ANISOTROPY = 3,
+};
+typedef enum _GXAnisotropy GXAnisotropy;
+enum _GXZTexOp {
+    GX_ZT_DISABLE = 0,
+    GX_ZT_ADD = 1,
+    GX_ZT_REPLACE = 2,
+    GX_MAX_ZTEXOP = 3,
+};
+typedef enum _GXZTexOp GXZTexOp;
+enum _GXAlphaReadMode {
+    GX_READ_00 = 0,
+    GX_READ_FF = 1,
+    GX_READ_NONE = 2,
+};
+typedef enum _GXAlphaReadMode GXAlphaReadMode;
+enum _GXPerf0 {
+    GX_PERF0_VERTICES = 0,
+    GX_PERF0_CLIP_VTX = 1,
+    GX_PERF0_CLIP_CLKS = 2,
+    GX_PERF0_XF_WAIT_IN = 3,
+    GX_PERF0_XF_WAIT_OUT = 4,
+    GX_PERF0_XF_XFRM_CLKS = 5,
+    GX_PERF0_XF_LIT_CLKS = 6,
+    GX_PERF0_XF_BOT_CLKS = 7,
+    GX_PERF0_XF_REGLD_CLKS = 8,
+    GX_PERF0_XF_REGRD_CLKS = 9,
+    GX_PERF0_CLIP_RATIO = 10,
+    GX_PERF0_TRIANGLES = 11,
+    GX_PERF0_TRIANGLES_CULLED = 12,
+    GX_PERF0_TRIANGLES_PASSED = 13,
+    GX_PERF0_TRIANGLES_SCISSORED = 14,
+    GX_PERF0_TRIANGLES_0TEX = 15,
+    GX_PERF0_TRIANGLES_1TEX = 16,
+    GX_PERF0_TRIANGLES_2TEX = 17,
+    GX_PERF0_TRIANGLES_3TEX = 18,
+    GX_PERF0_TRIANGLES_4TEX = 19,
+    GX_PERF0_TRIANGLES_5TEX = 20,
+    GX_PERF0_TRIANGLES_6TEX = 21,
+    GX_PERF0_TRIANGLES_7TEX = 22,
+    GX_PERF0_TRIANGLES_8TEX = 23,
+    GX_PERF0_TRIANGLES_0CLR = 24,
+    GX_PERF0_TRIANGLES_1CLR = 25,
+    GX_PERF0_TRIANGLES_2CLR = 26,
+    GX_PERF0_QUAD_0CVG = 27,
+    GX_PERF0_QUAD_NON0CVG = 28,
+    GX_PERF0_QUAD_1CVG = 29,
+    GX_PERF0_QUAD_2CVG = 30,
+    GX_PERF0_QUAD_3CVG = 31,
+    GX_PERF0_QUAD_4CVG = 32,
+    GX_PERF0_AVG_QUAD_CNT = 33,
+    GX_PERF0_CLOCKS = 34,
+    GX_PERF0_NONE = 35,
+};
+typedef enum _GXPerf0 GXPerf0;
+enum _GXPerf1 {
+    GX_PERF1_TEXELS = 0,
+    GX_PERF1_TX_IDLE = 1,
+    GX_PERF1_TX_REGS = 2,
+    GX_PERF1_TX_MEMSTALL = 3,
+    GX_PERF1_TC_CHECK1_2 = 4,
+    GX_PERF1_TC_CHECK3_4 = 5,
+    GX_PERF1_TC_CHECK5_6 = 6,
+    GX_PERF1_TC_CHECK7_8 = 7,
+    GX_PERF1_TC_MISS = 8,
+    GX_PERF1_VC_ELEMQ_FULL = 9,
+    GX_PERF1_VC_MISSQ_FULL = 10,
+    GX_PERF1_VC_MEMREQ_FULL = 11,
+    GX_PERF1_VC_STATUS7 = 12,
+    GX_PERF1_VC_MISSREP_FULL = 13,
+    GX_PERF1_VC_STREAMBUF_LOW = 14,
+    GX_PERF1_VC_ALL_STALLS = 15,
+    GX_PERF1_VERTICES = 16,
+    GX_PERF1_FIFO_REQ = 17,
+    GX_PERF1_CALL_REQ = 18,
+    GX_PERF1_VC_MISS_REQ = 19,
+    GX_PERF1_CP_ALL_REQ = 20,
+    GX_PERF1_CLOCKS = 21,
+    GX_PERF1_NONE = 22,
+};
+typedef enum _GXPerf1 GXPerf1;
+enum _GXVCachePerf {
+    GX_VC_POS = 0,
+    GX_VC_NRM = 1,
+    GX_VC_CLR0 = 2,
+    GX_VC_CLR1 = 3,
+    GX_VC_TEX0 = 4,
+    GX_VC_TEX1 = 5,
+    GX_VC_TEX2 = 6,
+    GX_VC_TEX3 = 7,
+    GX_VC_TEX4 = 8,
+    GX_VC_TEX5 = 9,
+    GX_VC_TEX6 = 10,
+    GX_VC_TEX7 = 11,
+    GX_VC_ALL = 15,
+};
+typedef enum _GXVCachePerf GXVCachePerf;
+enum _GXCopyMode {
+    GX_COPY_PROGRESSIVE = 0,
+    GX_COPY_INTLC_EVEN = 2,
+    GX_COPY_INTLC_ODD = 3,
+};
+typedef enum _GXCopyMode GXCopyMode;
+enum _GXMiscToken {
+    GX_MT_XF_FLUSH = 1,
+    GX_MT_DL_SAVE_CONTEXT = 2,
+    GX_MT_ABORT_WAIT_COPYOUT = 3,
+    GX_MT_NULL = 0,
+};
+typedef enum _GXMiscToken GXMiscToken;
+enum _GXXFFlushVal {
+    GX_XF_FLUSH_NONE = 0,
+    GX_XF_FLUSH_SAFE = 8,
+};
+typedef enum _GXXFFlushVal GXXFFlushVal;
+typedef enum {
+    VI_TVMODE_NTSC_INT = 0,
+    VI_TVMODE_NTSC_DS = 1,
+    VI_TVMODE_NTSC_PROG = 2,
+    VI_TVMODE_PAL_INT = 4,
+    VI_TVMODE_PAL_DS = 5,
+    VI_TVMODE_EURGB60_INT = 20,
+    VI_TVMODE_EURGB60_DS = 21,
+    VI_TVMODE_MPAL_INT = 8,
+    VI_TVMODE_MPAL_DS = 9,
+    VI_TVMODE_DEBUG_INT = 12,
+    VI_TVMODE_DEBUG_PAL_INT = 16,
+    VI_TVMODE_DEBUG_PAL_DS = 17,
+} VITVMode;
+typedef enum {
+    VI_XFBMODE_SF = 0,
+    VI_XFBMODE_DF = 1,
+} VIXFBMode;
+typedef void (* VIRetraceCallback)(unsigned int);
+// total size: 0x4
+struct _GXColor {
+    // Members
+    unsigned char r; // offset 0x0, size 0x1
+    unsigned char g; // offset 0x1, size 0x1
+    unsigned char b; // offset 0x2, size 0x1
+    unsigned char a; // offset 0x3, size 0x1
+};
+typedef struct _GXColor GXColor;
+// total size: 0x8
+struct _GXColorS10 {
+    // Members
+    short r; // offset 0x0, size 0x2
+    short g; // offset 0x2, size 0x2
+    short b; // offset 0x4, size 0x2
+    short a; // offset 0x6, size 0x2
+};
+typedef struct _GXColorS10 GXColorS10;
+typedef struct _GXTexObj GXTexObj;
+typedef struct _GXTlutObj GXTlutObj;
+// total size: 0x40
+struct _GXLightObj {
+    // Members
+    unsigned int dummy[16]; // offset 0x0, size 0x40
+};
+typedef struct _GXLightObj GXLightObj;
+// total size: 0x10
+struct _GXVtxAttrFmtList {
+    // Members
+    GXAttr attr; // offset 0x0, size 0x4
+    GXCompCnt cnt; // offset 0x4, size 0x4
+    GXCompType type; // offset 0x8, size 0x4
+    unsigned char frac; // offset 0xC, size 0x1
+};
+typedef struct _GXVtxAttrFmtList GXVtxAttrFmtList;
+// total size: 0x10
+struct _GXTexRegion {
+    // Members
+    unsigned int dummy[4]; // offset 0x0, size 0x10
+};
+typedef struct _GXTexRegion GXTexRegion;
+// total size: 0x10
+struct _GXTlutRegion {
+    // Members
+    unsigned int dummy[4]; // offset 0x0, size 0x10
+};
+typedef struct _GXTlutRegion GXTlutRegion;
+// total size: 0x8
+struct _GXVtxDescList {
+    // Members
+    GXAttr attr; // offset 0x0, size 0x4
+    GXAttrType type; // offset 0x4, size 0x4
+};
+typedef struct _GXVtxDescList GXVtxDescList;
+// total size: 0x3C
+struct _GXRenderModeObj {
+    // Members
+    VITVMode viTVmode; // offset 0x0, size 0x4
+    unsigned short fbWidth; // offset 0x4, size 0x2
+    unsigned short efbHeight; // offset 0x6, size 0x2
+    unsigned short xfbHeight; // offset 0x8, size 0x2
+    unsigned short viXOrigin; // offset 0xA, size 0x2
+    unsigned short viYOrigin; // offset 0xC, size 0x2
+    unsigned short viWidth; // offset 0xE, size 0x2
+    unsigned short viHeight; // offset 0x10, size 0x2
+    VIXFBMode xFBmode; // offset 0x14, size 0x4
+    unsigned char field_rendering; // offset 0x18, size 0x1
+    unsigned char aa; // offset 0x19, size 0x1
+    unsigned char sample_pattern[2][12]; // offset 0x1A, size 0x18
+    unsigned char vfilter[7]; // offset 0x32, size 0x7
+};
+typedef struct _GXRenderModeObj GXRenderModeObj;
+// total size: 0x14
+struct _GXFogAdjTable {
+    // Members
+    unsigned short r[10]; // offset 0x0, size 0x14
+};
+typedef struct _GXFogAdjTable GXFogAdjTable;
+typedef long long OSTime;
+typedef unsigned int OSTick;
+unsigned int __OSBusClock; // size: 0x4, address: 0x800000F8
+unsigned int __OSCoreClock; // size: 0x4, address: 0x800000FC
+// total size: 0x28
+struct OSCalendarTime {
+    // Members
+    int sec; // offset 0x0, size 0x4
+    int min; // offset 0x4, size 0x4
+    int hour; // offset 0x8, size 0x4
+    int mday; // offset 0xC, size 0x4
+    int mon; // offset 0x10, size 0x4
+    int year; // offset 0x14, size 0x4
+    int wday; // offset 0x18, size 0x4
+    int yday; // offset 0x1C, size 0x4
+    int msec; // offset 0x20, size 0x4
+    int usec; // offset 0x24, size 0x4
+};
+typedef struct OSCalendarTime OSCalendarTime;
+// total size: 0x30
+struct OSStopwatch {
+    // Members
+    char * name; // offset 0x0, size 0x4
+    unsigned int hits; // offset 0x4, size 0x4
+    long long total; // offset 0x8, size 0x8
+    long long min; // offset 0x10, size 0x8
+    long long max; // offset 0x18, size 0x8
+    long long last; // offset 0x20, size 0x8
+    int running; // offset 0x28, size 0x4
+    unsigned int _padding; // offset 0x2C, size 0x4
+};
+typedef struct OSStopwatch OSStopwatch;
+typedef int OSHeapHandle;
+typedef void (* OSAllocVisitor)(void *, unsigned int);
+// total size: 0x2C8
+struct OSContext {
+    // Members
+    unsigned int gpr[32]; // offset 0x0, size 0x80
+    unsigned int cr; // offset 0x80, size 0x4
+    unsigned int lr; // offset 0x84, size 0x4
+    unsigned int ctr; // offset 0x88, size 0x4
+    unsigned int xer; // offset 0x8C, size 0x4
+    double fpr[32]; // offset 0x90, size 0x100
+    unsigned int fpscr_pad; // offset 0x190, size 0x4
+    unsigned int fpscr; // offset 0x194, size 0x4
+    unsigned int srr0; // offset 0x198, size 0x4
+    unsigned int srr1; // offset 0x19C, size 0x4
+    unsigned short mode; // offset 0x1A0, size 0x2
+    unsigned short state; // offset 0x1A2, size 0x2
+    unsigned int gqr[8]; // offset 0x1A4, size 0x20
+    unsigned int psf_pad; // offset 0x1C4, size 0x4
+    double psf[32]; // offset 0x1C8, size 0x100
+};
+typedef struct OSContext OSContext;
+// total size: 0x28
+struct OSAlarm {
+    // Members
+    void (* handler)(struct OSAlarm *, OSContext *); // offset 0x0, size 0x4
+    unsigned int tag; // offset 0x4, size 0x4
+    long long fire; // offset 0x8, size 0x8
+    struct OSAlarm * prev; // offset 0x10, size 0x4
+    struct OSAlarm * next; // offset 0x14, size 0x4
+    long long period; // offset 0x18, size 0x8
+    long long start; // offset 0x20, size 0x8
+};
+typedef struct OSAlarm OSAlarm;
+typedef void (* OSAlarmHandler)(OSAlarm *, OSContext *);
+typedef unsigned char __OSException;
+typedef void (* __OSExceptionHandler)(unsigned char, OSContext *);
+typedef unsigned short OSError;
+typedef void (* OSErrorHandler)(unsigned short, OSContext *, ...);
+// total size: 0x30
+struct OSFontHeader {
+    // Members
+    unsigned short fontType; // offset 0x0, size 0x2
+    unsigned short firstChar; // offset 0x2, size 0x2
+    unsigned short lastChar; // offset 0x4, size 0x2
+    unsigned short invalChar; // offset 0x6, size 0x2
+    unsigned short ascent; // offset 0x8, size 0x2
+    unsigned short descent; // offset 0xA, size 0x2
+    unsigned short width; // offset 0xC, size 0x2
+    unsigned short leading; // offset 0xE, size 0x2
+    unsigned short cellWidth; // offset 0x10, size 0x2
+    unsigned short cellHeight; // offset 0x12, size 0x2
+    unsigned int sheetSize; // offset 0x14, size 0x4
+    unsigned short sheetFormat; // offset 0x18, size 0x2
+    unsigned short sheetColumn; // offset 0x1A, size 0x2
+    unsigned short sheetRow; // offset 0x1C, size 0x2
+    unsigned short sheetWidth; // offset 0x1E, size 0x2
+    unsigned short sheetHeight; // offset 0x20, size 0x2
+    unsigned short widthTable; // offset 0x22, size 0x2
+    unsigned int sheetImage; // offset 0x24, size 0x4
+    unsigned int sheetFullSize; // offset 0x28, size 0x4
+    unsigned char c0; // offset 0x2C, size 0x1
+    unsigned char c1; // offset 0x2D, size 0x1
+    unsigned char c2; // offset 0x2E, size 0x1
+    unsigned char c3; // offset 0x2F, size 0x1
+};
+typedef struct OSFontHeader OSFontHeader;
+typedef short __OSInterrupt;
+typedef void (* __OSInterruptHandler)(short, OSContext *);
+typedef unsigned int OSInterruptMask;
+// total size: 0x318
+struct OSThread {
+    // Members
+    OSContext context; // offset 0x0, size 0x2C8
+    unsigned short state; // offset 0x2C8, size 0x2
+    unsigned short attr; // offset 0x2CA, size 0x2
+    int suspend; // offset 0x2CC, size 0x4
+    int priority; // offset 0x2D0, size 0x4
+    int base; // offset 0x2D4, size 0x4
+    void * val; // offset 0x2D8, size 0x4
+    struct OSThreadQueue * queue; // offset 0x2DC, size 0x4
+    struct OSThreadLink link; // offset 0x2E0, size 0x8
+    struct OSThreadQueue queueJoin; // offset 0x2E8, size 0x8
+    struct OSMutex * mutex; // offset 0x2F0, size 0x4
+    struct OSMutexQueue queueMutex; // offset 0x2F4, size 0x8
+    struct OSThreadLink linkActive; // offset 0x2FC, size 0x8
+    unsigned char * stackBase; // offset 0x304, size 0x4
+    unsigned long * stackEnd; // offset 0x308, size 0x4
+    int error; // offset 0x30C, size 0x4
+    void * specific[2]; // offset 0x310, size 0x8
+};
+// total size: 0x8
+struct OSThreadLink {
+    // Members
+    struct OSThread * next; // offset 0x0, size 0x4
+    struct OSThread * prev; // offset 0x4, size 0x4
+};
+// total size: 0x8
+struct OSThreadQueue {
+    // Members
+    struct OSThread * head; // offset 0x0, size 0x4
+    struct OSThread * tail; // offset 0x4, size 0x4
+};
+// total size: 0x18
+struct OSMutex {
+    // Members
+    struct OSThreadQueue queue; // offset 0x0, size 0x8
+    struct OSThread * thread; // offset 0x8, size 0x4
+    int count; // offset 0xC, size 0x4
+    struct OSMutexLink link; // offset 0x10, size 0x8
+};
+// total size: 0x8
+struct OSMutexQueue {
+    // Members
+    struct OSMutex * head; // offset 0x0, size 0x4
+    struct OSMutex * tail; // offset 0x4, size 0x4
+};
+// total size: 0x8
+struct OSMutexLink {
+    // Members
+    struct OSMutex * next; // offset 0x0, size 0x4
+    struct OSMutex * prev; // offset 0x4, size 0x4
+};
+typedef struct OSThread OSThread;
+typedef struct OSThreadQueue OSThreadQueue;
+typedef struct OSThreadLink OSThreadLink;
+typedef int OSPriority;
+typedef struct OSMutex OSMutex;
+typedef struct OSMutexQueue OSMutexQueue;
+typedef struct OSMutexLink OSMutexLink;
+// total size: 0x8
+struct OSCond {
+    // Members
+    OSThreadQueue queue; // offset 0x0, size 0x8
+};
+typedef struct OSCond OSCond;
+typedef void (* OSIdleFunction)(void *);
+typedef void (* OSSwitchThreadCallback)(OSThread *, OSThread *);
+enum OS_THREAD_STATE {
+    OS_THREAD_STATE_READY = 1,
+    OS_THREAD_STATE_RUNNING = 2,
+    OS_THREAD_STATE_WAITING = 4,
+    OS_THREAD_STATE_MORIBUND = 8,
+};
+// total size: 0x20
+struct OSMessageQueue {
+    // Members
+    OSThreadQueue queueSend; // offset 0x0, size 0x8
+    OSThreadQueue queueReceive; // offset 0x8, size 0x8
+    void * * msgArray; // offset 0x10, size 0x4
+    int msgCount; // offset 0x14, size 0x4
+    int firstIndex; // offset 0x18, size 0x4
+    int usedCount; // offset 0x1C, size 0x4
+};
+typedef struct OSMessageQueue OSMessageQueue;
+typedef void * OSMessage;
+// total size: 0x4C
+struct OSModuleHeader {
+    // Members
+    struct OSModuleInfo info; // offset 0x0, size 0x20
+    unsigned int bssSize; // offset 0x20, size 0x4
+    unsigned int relOffset; // offset 0x24, size 0x4
+    unsigned int impOffset; // offset 0x28, size 0x4
+    unsigned int impSize; // offset 0x2C, size 0x4
+    unsigned char prologSection; // offset 0x30, size 0x1
+    unsigned char epilogSection; // offset 0x31, size 0x1
+    unsigned char unresolvedSection; // offset 0x32, size 0x1
+    unsigned char bssSection; // offset 0x33, size 0x1
+    unsigned int prolog; // offset 0x34, size 0x4
+    unsigned int epilog; // offset 0x38, size 0x4
+    unsigned int unresolved; // offset 0x3C, size 0x4
+    unsigned int align; // offset 0x40, size 0x4
+    unsigned int bssAlign; // offset 0x44, size 0x4
+    unsigned int fixSize; // offset 0x48, size 0x4
+};
+// total size: 0x20
+struct OSModuleInfo {
+    // Members
+    unsigned int id; // offset 0x0, size 0x4
+    struct OSModuleLink link; // offset 0x4, size 0x8
+    unsigned int numSections; // offset 0xC, size 0x4
+    unsigned int sectionInfoOffset; // offset 0x10, size 0x4
+    unsigned int nameOffset; // offset 0x14, size 0x4
+    unsigned int nameSize; // offset 0x18, size 0x4
+    unsigned int version; // offset 0x1C, size 0x4
+};
+// total size: 0x8
+struct OSModuleLink {
+    // Members
+    struct OSModuleInfo * next; // offset 0x0, size 0x4
+    struct OSModuleInfo * prev; // offset 0x4, size 0x4
+};
+typedef struct OSModuleHeader OSModuleHeader;
+typedef unsigned int OSModuleID;
+// total size: 0x8
+struct OSModuleQueue {
+    // Members
+    struct OSModuleInfo * head; // offset 0x0, size 0x4
+    struct OSModuleInfo * tail; // offset 0x4, size 0x4
+};
+typedef struct OSModuleQueue OSModuleQueue;
+typedef struct OSModuleLink OSModuleLink;
+typedef struct OSModuleInfo OSModuleInfo;
+// total size: 0x8
+struct OSSectionInfo {
+    // Members
+    unsigned int offset; // offset 0x0, size 0x4
+    unsigned int size; // offset 0x4, size 0x4
+};
+typedef struct OSSectionInfo OSSectionInfo;
+// total size: 0x8
+struct OSImportInfo {
+    // Members
+    unsigned int id; // offset 0x0, size 0x4
+    unsigned int offset; // offset 0x4, size 0x4
+};
+typedef struct OSImportInfo OSImportInfo;
+// total size: 0x8
+struct OSRel {
+    // Members
+    unsigned short offset; // offset 0x0, size 0x2
+    unsigned char type; // offset 0x2, size 0x1
+    unsigned char section; // offset 0x3, size 0x1
+    unsigned int addend; // offset 0x4, size 0x4
+};
+typedef struct OSRel OSRel;
+typedef void (* OSResetCallback)(void);
+// total size: 0xC
+struct OSSemaphore {
+    // Members
+    int count; // offset 0x0, size 0x4
+    OSThreadQueue queue; // offset 0x4, size 0x8
+};
+typedef struct OSSemaphore OSSemaphore;
+typedef int (* OSResetFunction)(int);
+// total size: 0x10
+struct OSResetFunctionInfo {
+    // Members
+    int (* func)(int); // offset 0x0, size 0x4
+    unsigned int priority; // offset 0x4, size 0x4
+    struct OSResetFunctionInfo * next; // offset 0x8, size 0x4
+    struct OSResetFunctionInfo * prev; // offset 0xC, size 0x4
+};
+typedef struct OSResetFunctionInfo OSResetFunctionInfo;
+typedef enum {
+    SYS_CALLBACKTYPEDEP_TIMER0 = 0,
+    SYS_CALLBACKTYPEDEP_MAXTYPES = 1,
+} SysCallbackTypeDepT;
+typedef OSMutex * SysSemaphoreT;
+// total size: 0x20
+struct SysCriticalSection_t {
+    // Members
+    OSMutex Mutex; // offset 0x0, size 0x18
+    unsigned int ThreadId; // offset 0x18, size 0x4
+    unsigned int Count; // offset 0x1C, size 0x4
+};
+typedef struct SysCriticalSection_t SysCriticalT;
+// total size: 0x4
+struct SysLLInitParms_t {
+    // Members
+    unsigned int Pad1; // offset 0x0, size 0x4
+};
+typedef struct SysLLInitParms_t SysLLInitParmsT;
+// total size: 0x8
+struct SysLLTimer_t {
+    // Members
+    unsigned int TimerID; // offset 0x0, size 0x4
+    unsigned int SystemTime; // offset 0x4, size 0x4
+};
+typedef struct SysLLTimer_t SysLLTimerT;
+// total size: 0x14
+struct SysDebugOutputSetting_t {
+    // Members
+    unsigned int ThreadID; // offset 0x0, size 0x4
+    unsigned int TimeAdded; // offset 0x4, size 0x4
+    unsigned int FileHandle; // offset 0x8, size 0x4
+    unsigned char * MemBuffer; // offset 0xC, size 0x4
+    unsigned int BufferSize; // offset 0x10, size 0x4
+};
+typedef struct SysDebugOutputSetting_t SysDebugOutputSettingT;
+// total size: 0xC
+struct SysClock_t {
+    // Members
+    unsigned char Second; // offset 0x0, size 0x1
+    unsigned char Minute; // offset 0x1, size 0x1
+    unsigned char Hour; // offset 0x2, size 0x1
+    unsigned char Day; // offset 0x3, size 0x1
+    unsigned char Month; // offset 0x4, size 0x1
+    unsigned short Year; // offset 0x6, size 0x2
+    unsigned int Hundredths; // offset 0x8, size 0x4
+};
+typedef struct SysClock_t SysClockT;
+typedef enum {
+    SYS_TIMERMODES_COUNTER = 0,
+    SYS_TIMERMODES_TIMED = 1,
+    SYS_TIMERMODES_TIMEDREPEAT = 2,
+} SysTimerModeT;
+typedef enum {
+    SYS_TIMERLENGTH_NANOSECOND = 0,
+    SYS_TIMERLENGTH_MILLISECOND = 1,
+    SYS_TIMERLENGTH_MICROSECOND = 2,
+    SYS_TIMERLENGTH_SIXTIETHSOFASECOND = 3,
+} SysTimerLengthT;
+typedef enum {
+    SYS_CALLBACKTYPEINDEP_VBLANK = 1,
+    SYS_CALLBACKTYPEINDEP_MAXTYPES = 2,
+} SysCallbackTypeIndepT;
+typedef enum {
+    SYS_DEBUGFILEMODE_NEW = 0,
+    SYS_DEBUGFILEMODE_APPEND = 1,
+    SYS_DEBUGBUFFER = 2,
+} SysDebugFileModeT;
+// total size: 0x8
+struct SysInitParms_t {
+    // Members
+    unsigned char NumTimers; // offset 0x0, size 0x1
+    unsigned char NumCallbacks; // offset 0x1, size 0x1
+    unsigned char NumThreads; // offset 0x2, size 0x1
+    unsigned char Pad2; // offset 0x3, size 0x1
+    SysLLInitParmsT LLSystemInfo; // offset 0x4, size 0x4
+};
+typedef struct SysInitParms_t SysInitParmsT;
+typedef void * SysThreadInfoNode;
+enum MemHeapStat_t {
+    MEM_HEAP_STAT_FREEMEM = 0,
+    MEM_HEAP_STAT_USEDMEM = 1,
+    MEM_HEAP_STAT_USEDRELEASEMEM = 2,
+    MEM_HEAP_STAT_MAXBLOCK = 3,
+    MEM_HEAP_STAT_FREEBLOCKS = 4,
+    MEM_HEAP_STAT_USEDBLOCKS = 5,
+    MEM_HEAP_STAT_TOTALBLOCKS = 6,
+    MEM_HEAP_STAT_NUMALLOCS = 7,
+    MEM_HEAP_STAT_NUMFREES = 8,
+    MEM_HEAP_STAT_CURRENT_FREEMEM = 9,
+    MEM_HEAP_STAT_CURRENT_USEDMEM = 10,
+    MEM_HEAP_STAT_CURRENT_USEDRELEASEMEM = 11,
+    MEM_HEAP_STAT_CURRENT_USEDREQUESTEDMEM = 12,
+    MEM_HEAP_STAT_CURRENT_FREEBLOCKS = 13,
+    MEM_HEAP_STAT_CURRENT_USEDBLOCKS = 14,
+    MEM_HEAP_STAT_SIZE = 15,
+    MEM_HEAP_STAT_NUMSTATS = 16,
+};
+typedef enum MemHeapStat_t MemHeapStatT;
+typedef unsigned int MemHeapID;
+// total size: 0x18
+struct MemHeapDef_t {
+    // Members
+    char HeapName[8]; // offset 0x0, size 0x8
+    unsigned int HeapID; // offset 0x8, size 0x4
+    unsigned int HeapAddr; // offset 0xC, size 0x4
+    unsigned int HeapSize; // offset 0x10, size 0x4
+    unsigned short BlockAlign; // offset 0x14, size 0x2
+    unsigned char HeapPriority; // offset 0x16, size 0x1
+};
+typedef struct MemHeapDef_t MemHeapDefT;
+// total size: 0x44
+struct MemInitParms_t {
+    // Members
+    char LogFile[64]; // offset 0x0, size 0x40
+    MemHeapDefT * pMainHeapDef; // offset 0x40, size 0x4
+};
+typedef struct MemInitParms_t MemInitParmsT;
+typedef void (* MemCallbackT)(unsigned int, unsigned int);
+// total size: 0x24
+struct MemHookT {
+    // Members
+    void (* DestroyHeap)(void *); // offset 0x0, size 0x4
+    int (* DisplayHeap)(void *, unsigned int, void (*)(char *)); // offset 0x4, size 0x4
+    int (* VerifyHeap)(void *, void (*)(char *)); // offset 0x8, size 0x4
+    int (* VerifyAddr)(void *, void *, void (*)(char *)); // offset 0xC, size 0x4
+    int (* HeapInfo)(void *, unsigned int); // offset 0x10, size 0x4
+    void * (* Alloc)(void *, unsigned int, unsigned int, const char *, const char *, const char *, unsigned int); // offset 0x14, size 0x4
+    int (* Free)(void *, void *); // offset 0x18, size 0x4
+    void * (* Resize)(void *, void *, unsigned int, unsigned int); // offset 0x1C, size 0x4
+    int (* Sizeof)(void *, void *); // offset 0x20, size 0x4
+};
+typedef struct MemHookT MemHookT;
+typedef void (* MemLowPointCallbackT)(unsigned int);
+enum DSNodeStat_t {
+    DS_NODE_FREENODES = 0,
+    DS_NODE_USEDNODES = 1,
+    DS_NODE_TOTALNODES = 2,
+    DS_NODE_NUMSTATS = 3,
+};
+typedef enum DSNodeStat_t DSNodeStatT;
+// ERROR: Failed to process tag 507670 (Typedef)
+enum DSListNode_t {
+    DS_LIST_START = 0,
+    DS_LIST_END = 1,
+    DS_LIST_ROOT = 2,
+    DS_LIST_PREV = 3,
+    DS_LIST_NEXT = 4,
+    DS_LIST_NUMCODES = 5,
+};
+typedef enum DSListNode_t DSListNodeT;
+enum DSListType_t {
+    DS_LIST_LINKEDLIST = 0,
+    DS_LIST_BINARYTREE = 1,
+    DS_LIST_SPLAYTREE = 2,
+    DS_LIST_SYSTEM1 = 3,
+    DS_LIST_SYSTEM2 = 4,
+    DS_LIST_FIRSTUSERTYPE = 5,
+    DS_LIST_USER0 = 5,
+    DS_LIST_USER1 = 6,
+    DS_LIST_USER2 = 7,
+    DS_LIST_USER3 = 8,
+    DS_LIST_NUMTYPES = 9,
+};
+typedef enum DSListType_t DSListTypeT;
+enum DSListStat_t {
+    DS_LIST_FREENODES = 0,
+    DS_LIST_USEDNODES = 1,
+    DS_LIST_TOTALNODES = 2,
+    DS_LIST_LISTNODES = 3,
+    DS_LIST_NUMSTATS = 4,
+};
+typedef enum DSListStat_t DSListStatT;
+enum DSListReturnCode_t {
+    DS_LIST_SUCCESS = 0,
+    DS_LIST_EMPTY = 1,
+    DS_LIST_FOUND = 2,
+    DS_LIST_NOTFOUND = 3,
+    DS_LIST_ABORTED = 4,
+    DS_LIST_SKIPOPT = 5,
+    DS_LIST_NUMCONDITIONS = 6,
+};
+typedef enum DSListReturnCode_t DSListReturnCodeT;
+// ERROR: Failed to process tag 5079FF (Typedef)
+typedef int (* DSInsertFuncT)(const void *, const void *);
+typedef unsigned char (* DSTraverseFuncT)(void *, void *, void *);
+typedef int (* DSSearchFuncT)(const void *, void *, void *);
+// total size: 0x18
+struct DSListHdr_t {
+    // Members
+    DSListTypeT Type; // offset 0x0, size 0x4
+    unsigned int NumElements; // offset 0x4, size 0x4
+    unsigned int SizeElements; // offset 0x8, size 0x4
+    unsigned int HeapID; // offset 0xC, size 0x4
+    int (* pInsertFunc)(const void *, const void *); // offset 0x10, size 0x4
+    void * pNodeHandler; // offset 0x14, size 0x4
+};
+typedef struct DSListHdr_t DSListHdrT;
+// total size: 0x8
+struct DSGenericNode_t {
+    // Members
+    unsigned int Flags; // offset 0x0, size 0x4
+    unsigned int Pad; // offset 0x4, size 0x4
+};
+typedef struct DSGenericNode_t DSGenericNodeT;
+typedef void (* DSListInitListFuncT)(void *);
+typedef unsigned int (* DSListDelListFuncT)(void *);
+typedef void (* DSListInitNodeFuncT)(void *, unsigned int);
+typedef void * (* DSListAddNodeFuncT)(void *, void *, unsigned char);
+typedef const void * (* DSListGetNodeFuncT)(const void *, const void *, unsigned int);
+typedef void (* DSListRemoveNodeFuncT)(void *, void *);
+typedef unsigned int (* DSListTraverseListFuncT)(void *, void *, void *, void *, unsigned char (*)(void *, void *, void *), int);
+typedef unsigned int (* DSListSearchListFuncT)(void *, void *, void *, void *, int (*)(const void *, void *, void *));
+typedef unsigned int (* DSListOptimizeListFuncT)(void *, float, float, unsigned char, unsigned char);
+enum DSStackStat_t {
+    DS_STACK_FREENODES = 0,
+    DS_STACK_USEDNODES = 1,
+    DS_STACK_TOTALNODES = 2,
+    DS_STACK_NUMSTATS = 3,
+};
+typedef enum DSStackStat_t DSStackStatT;
+enum DSStackType_t {
+    DS_STACK = 0,
+    DS_QUEUE = 1,
+    DS_STACK_NUMTYPES = 2,
+};
+typedef enum DSStackType_t DSStackTypeT;
+// ERROR: Failed to process tag 5082A6 (Typedef)
+enum DSErrCode_t {
+    DS_ERROR_DSACTIVE = 196609,
+    DS_ERROR_DSINACTIVE = 196610,
+    DS_ERROR_OUTOFNODES = 196611,
+};
+typedef enum DSErrCode_t DSErrCodeT;
+typedef struct DmaMemPool_T DmaMemPoolT;
+enum DmaChannel_T {
+    DMA_CHANNEL_VIF0 = 0,
+    DMA_CHANNEL_VIF1 = 1,
+    DMA_CHANNEL_GIF = 2,
+    DMA_CHANNEL_fromIPU = 3,
+    DMA_CHANNEL_toIPU = 4,
+    DMA_CHANNEL_SIF0 = 5,
+    DMA_CHANNEL_SIF1 = 6,
+    DMA_CHANNEL_SIF2 = 7,
+    DMA_CHANNEL_fromSPR = 8,
+    DMA_CHANNEL_toSPR = 9,
+    DMA_CHANNEL_NUM = 10,
+};
+typedef enum DmaChannel_T DmaChannelT;
+typedef struct DmaTag_T DmaTagT;
+typedef struct DmaList_T DmaListT;
+typedef void (* DmaCallbackFuncT)(...);
+enum DmaErr_t {
+    DMADBG_ERROR_NONE = 0,
+    DMADBG_ERROR_CALLSTACK_UNDERFLOW = 1,
+    DMADBG_ERROR_CALLSTACK_OVERFLOW = 2,
+    DMADBG_ERROR_INVALID_TAG = 3,
+    DMADBG_ERROR_UNALIGNED_REFADDR = 4,
+    DMADBG_ERROR_UNALIGNED_CALLADDR = 5,
+    DMADBG_NUMERRORS = 6,
+};
+typedef enum DmaErr_t DmaErrT;
+enum DmaErrCode_t {
+    DMA_ERROR_DMAACTIVE = 393217,
+    DMA_ERROR_DMAINACTIVE = 393218,
+    DMA_NUMERRORS = 393219,
+};
+typedef enum DmaErrCode_t DmaErrCodeT;
+typedef enum {
+    FILEIO_TYPE_NONE = 0,
+    FILEIO_TYPE_FILE = 1,
+    FILEIO_TYPE_DIRECTORY = 2,
+    FILEIO_TYPE_MAX = 3,
+} FileTypeE;
+typedef int TFile;
+typedef void (* CallbackPtr)(int, int, void *);
+typedef unsigned char (* BlockCallbackPtr)(int, int, void *);
+typedef void (* UserBlockCallbackPtr)(int, char *, int, void *);
+typedef unsigned int FileFindHandleT;
+typedef void * FileAsyncRefT;
+typedef // total size: 0x9C
+struct {
+    // Members
+    char FileName[128]; // offset 0x0, size 0x80
+    FileTypeE FileType; // offset 0x80, size 0x4
+    char FileCreateDate[11]; // offset 0x84, size 0xB
+    char FileModifyDate[11]; // offset 0x8F, size 0xB
+} FileFindInfoT;
+typedef // total size: 0x40C
+struct {
+    // Members
+    char PCRootPath[128]; // offset 0x0, size 0x80
+    char CDRootPath[128]; // offset 0x80, size 0x80
+    char USBRootPath[128]; // offset 0x100, size 0x80
+    char iLinkRootPath[128]; // offset 0x180, size 0x80
+    char ConsoleHDCacheRootPath[128]; // offset 0x200, size 0x80
+    char UserRootPath[128]; // offset 0x280, size 0x80
+    char CDCachingPath[128]; // offset 0x300, size 0x80
+    char CDCachingExtraFilePath[128]; // offset 0x380, size 0x80
+    unsigned int uMaxFiles; // offset 0x400, size 0x4
+    unsigned int uMaxOpenFiles; // offset 0x404, size 0x4
+    unsigned char bAllowHostAccess; // offset 0x408, size 0x1
+} FileInitParmT;
+// total size: 0x44
+struct FilevDevice_t {
+    // Members
+    int hDeviceList[8]; // offset 0x0, size 0x20
+    char * PathList[8]; // offset 0x20, size 0x20
+    int NumDevices; // offset 0x40, size 0x4
+};
+typedef struct FilevDevice_t FilevDeviceT;
+// total size: 0x24
+struct FilevDeviceList_t {
+    // Members
+    FilevDeviceT * List[8]; // offset 0x0, size 0x20
+    int NumvDevices; // offset 0x20, size 0x4
+};
+typedef struct FilevDeviceList_t FilevDeviceListT;
+enum LLDevices {
+    FILE_DEVICE_NULL = 0,
+    FILE_DEVICE_CD = 1,
+    FILE_DEVICE_MEMORYCARD = 2,
+    FILE_DEVICE_HARDDRIVECACHE = 3,
+    FILE_DEVICE_MEMORYCARD_1A = 2,
+    FILE_DEVICE_MEMORYCARD_1B = 3,
+    FILE_DEVICE_PC = 4,
+    FILE_DEVICE_SERIAL = 5,
+    FILE_DEVICE_USB = 6,
+    FILE_DEVICE_ILINK = 7,
+    FILE_DEVICE_USER = 8,
+    FILE_DEVICE_MAX = 9,
+    FILE_DEVICE_MASK = 15,
+    FILE_DEVICE_ASYNC = 16,
+    FILE_DEVICE_CD_ASYNC = 17,
+    _FILE_DEVICE_MEMORYCARD_ASYNC = 18,
+    FILE_DEVICE_HARDDRIVECACHE_ASYNC = 19,
+    _FILE_DEVICE_MEMORYCARD_1A_ASYNC = 18,
+    _FILE_DEVICE_MEMORYCARD_1B_ASYNC = 19,
+    _FILE_DEVICE_MEMORYCARD_1C_ASYNC = 20,
+    _FILE_DEVICE_MEMORYCARD_1D_ASYNC = 21,
+    _FILE_DEVICE_MEMORYCARD_2A_ASYNC = 22,
+    _FILE_DEVICE_MEMORYCARD_2B_ASYNC = 23,
+    _FILE_DEVICE_MEMORYCARD_2C_ASYNC = 24,
+    _FILE_DEVICE_MEMORYCARD_2D_ASYNC = 25,
+    _FILE_DEVICE_PC_ASYNC = 26,
+    _FILE_DEVICE_SERIAL_ASYNC = 27,
+    FILE_DEVICE_WRITE_MASK = 31,
+    FILE_DEVICE_WRITE = 32,
+    _FILE_DEVICE_CD_WRITE = 33,
+    FILE_DEVICE_MEMORYCARD_WRITE = 34,
+    FILE_DEVICE_HARDDRIVECACHE_WRITE = 35,
+    FILE_DEVICE_MEMORYCARD_1A_WRITE = 34,
+    FILE_DEVICE_MEMORYCARD_1B_WRITE = 35,
+    FILE_DEVICE_MEMORYCARD_1C_WRITE = 36,
+    FILE_DEVICE_MEMORYCARD_1D_WRITE = 37,
+    FILE_DEVICE_MEMORYCARD_2A_WRITE = 38,
+    FILE_DEVICE_MEMORYCARD_2B_WRITE = 39,
+    FILE_DEVICE_MEMORYCARD_2C_WRITE = 40,
+    FILE_DEVICE_MEMORYCARD_2D_WRITE = 41,
+    FILE_DEVICE_PC_WRITE = 42,
+    _FILE_DEVICE_SERIAL_WRITE = 43,
+    FILE_DEVICE_DEFAULT = 44,
+    FILE_DEVICE_HARD_DISK = 45,
+};
+typedef enum LLDevices LLDevices;
+enum FileSeekParam_t {
+    FILE_SEEK_START = 0,
+    FILE_SEEK_CURRENT = 1,
+    FILE_SEEK_END = 2,
+};
+typedef enum FileSeekParam_t FileSeekParamT;
+typedef enum GlibTexStorageType_t GlibTexStorageTypeT;
+typedef enum GlibPalStorageType_t GlibPalStorageTypeT;
+enum GlibGenericChannelType_t {
+    GLIB_GENERICCHANNEL_RED = 0,
+    GLIB_GENERICCHANNEL_GREEN = 1,
+    GLIB_GENERICCHANNEL_BLUE = 2,
+    GLIB_GENERICCHANNEL_ALPHA = 3,
+    GLIB_GENERICCHANNEL_MAX = 4,
+};
+typedef enum GlibGenericChannelType_t GlibGenericChannelTypeT;
+typedef struct GlibTexture_t GlibTextureT;
+typedef GXTexRegion * (* GXTexRegionCallback)(const GXTexObj *, GXTexMapID);
+typedef GXTlutRegion * (* GXTlutRegionCallback)(unsigned int);
+typedef // total size: 0x80
+struct {
+    // Members
+    unsigned char pad[128]; // offset 0x0, size 0x80
+} GXFifoObj;
+typedef void (* GXBreakPtCallback)(void);
+typedef void (* GXDrawSyncCallback)(unsigned short);
+typedef void (* GXDrawDoneCallback)(void);
+union uPPCWGPipe {
+    unsigned char u8; // offset 0x0, size 0x1
+    unsigned short u16; // offset 0x0, size 0x2
+    unsigned int u32; // offset 0x0, size 0x4
+    unsigned long long u64; // offset 0x0, size 0x8
+    char s8; // offset 0x0, size 0x1
+    short s16; // offset 0x0, size 0x2
+    int s32; // offset 0x0, size 0x4
+    long long s64; // offset 0x0, size 0x8
+    float f32; // offset 0x0, size 0x4
+    double f64; // offset 0x0, size 0x8
+};
+typedef union uPPCWGPipe PPCWGPipe;
+volatile PPCWGPipe GXWGFifo; // size: 0x8, address: 0xCC008000
+typedef enum {
+    GX_WARN_NONE = 0,
+    GX_WARN_SEVERE = 1,
+    GX_WARN_MEDIUM = 2,
+    GX_WARN_ALL = 3,
+} GXWarningLevel;
+typedef void (* GXVerifyCallback)(GXWarningLevel, unsigned int, const char *);
+typedef struct GlibRenderBin_T GlibRenderBinT;
+typedef void (* GlibRenderFuncT)(GlibRenderBinT *);
+// total size: 0xC
+struct GlibLLFifoObj_t {
+    // Members
+    unsigned int GXFifoSize; // offset 0x0, size 0x4
+    GXFifoObj * pGXFifoObj; // offset 0x4, size 0x4
+    void * pGXFifoMem; // offset 0x8, size 0x4
+};
+typedef struct GlibLLFifoObj_t GlibLLFifoObjT;
+// total size: 0x64
+struct GlibLLRenderObj_t {
+    // Members
+    GXRenderModeObj RenderModeObj; // offset 0x0, size 0x3C
+    GlibLLFifoObjT FifoObj[2]; // offset 0x3C, size 0x18
+    void * pFrameBuffer[2]; // offset 0x54, size 0x8
+    short ScrnWidLog2; // offset 0x5C, size 0x2
+    short ScrnHgtLog2; // offset 0x5E, size 0x2
+    unsigned char iFrame; // offset 0x60, size 0x1
+    unsigned char bDbgStat; // offset 0x61, size 0x1
+    unsigned char pad[2]; // offset 0x62, size 0x2
+};
+typedef struct GlibLLRenderObj_t GlibLLRenderObjT;
+DmaTagT * Glib_pVIF1Tag; // size: 0x4
+typedef int AngleT;
+// total size: 0x8
+struct Orient2_t {
+    // Members
+    int vx; // offset 0x0, size 0x4
+    int vy; // offset 0x4, size 0x4
+};
+typedef struct Orient2_t Orient2T;
+// total size: 0xC
+struct Orient3_t {
+    // Members
+    int vx; // offset 0x0, size 0x4
+    int vy; // offset 0x4, size 0x4
+    int vz; // offset 0x8, size 0x4
+};
+typedef struct Orient3_t Orient3T;
+// total size: 0x10
+struct Orient4_t {
+    // Members
+    int vx; // offset 0x0, size 0x4
+    int vy; // offset 0x4, size 0x4
+    int vz; // offset 0x8, size 0x4
+    int vw; // offset 0xC, size 0x4
+};
+typedef struct Orient4_t Orient4T;
+// total size: 0x8
+struct Vec2_t {
+    // Members
+    float vx; // offset 0x0, size 0x4
+    float vy; // offset 0x4, size 0x4
+};
+typedef struct Vec2_t Vec2T;
+typedef struct Vec3_t Vec3T;
+typedef struct Vec4_t Vec4T;
+// total size: 0x18
+struct VecRotPos_t {
+    // Members
+    Orient3T Rot; // offset 0x0, size 0xC
+    Vec3T Pos; // offset 0xC, size 0xC
+};
+typedef struct VecRotPos_t VecRotPosT;
+struct Quat_t {};
+typedef struct Quat_t QuatT;
+enum MatIndex_t {
+    MAT_A = 0,
+    MAT_D = 1,
+    MAT_G = 2,
+    MAT_X = 3,
+    MAT_B = 4,
+    MAT_E = 5,
+    MAT_H = 6,
+    MAT_Y = 7,
+    MAT_C = 8,
+    MAT_F = 9,
+    MAT_I = 10,
+    MAT_Z = 11,
+    MAT_P = 12,
+    MAT_Q = 13,
+    MAT_R = 14,
+    MAT_W = 15,
+    MAT_NUMELEMENTS = 16,
+};
+typedef enum MatIndex_t MatIndexT;
+enum MatRotOrder_t {
+    MAT_ROTORDER_ZYX = 0,
+    MAT_ROTORDER_XYZ = 1,
+    MAT_ROTORDER_YZX = 2,
+    MAT_NUMROTORDERS = 3,
+};
+typedef enum MatRotOrder_t MatRotOrderT;
+typedef struct Mat_t MatT;
+// total size: 0x24
+struct Mat33_t {
+    // Members
+    float r[9]; // offset 0x0, size 0x24
+};
+typedef struct Mat33_t Mat33T;
+// total size: 0x30
+struct Mat34_t {
+    // Members
+    float m[12]; // offset 0x0, size 0x30
+};
+typedef struct Mat34_t Mat34T;
+enum MatErrCode_t {
+    MAT_ERROR_MATACTIVE = 327681,
+    MAT_ERROR_MATINACTIVE = 327682,
+    MAT_NUMERRORS = 327683,
+};
+typedef enum MatErrCode_t MatErrCodeT;
+// total size: 0xC
+struct MatStack_t {
+    // Members
+    unsigned int NumElements; // offset 0x0, size 0x4
+    unsigned int TopOfStack; // offset 0x4, size 0x4
+    MatT * pStack; // offset 0x8, size 0x4
+};
+typedef struct MatStack_t MatStackT;
+enum GlibRenderMode_t {
+    GLIB_RENDERMODE_240_DS = 0,
+    GLIB_RENDERMODE_240_DS_AA = 1,
+    GLIB_RENDERMODE_240_INT = 2,
+    GLIB_RENDERMODE_240_INT_AA = 3,
+    GLIB_RENDERMODE_480_INT_DF = 4,
+    GLIB_RENDERMODE_480_INT = 5,
+    GLIB_RENDERMODE_480_INT_AA = 6,
+    GLIB_RENDERMODE_480_PROG = 7,
+    GLIB_RENDERMODE_PAL = 8,
+    GLIB_RENDERMODE_MAX = 9,
+};
+typedef enum GlibRenderMode_t GlibRenderModeT;
+// total size: 0x10
+struct GlibGifTag_T {
+    // Members
+    unsigned int nLoop : 15; // offset 0x0, size 0x4
+    unsigned int Eop : 1; // offset 0x0, size 0x4
+    unsigned int pad16 : 16; // offset 0x0, size 0x4
+    unsigned int Id : 14; // offset 0x4, size 0x4
+    unsigned int PrimEnable : 1; // offset 0x4, size 0x4
+    unsigned int Prim : 11; // offset 0x4, size 0x4
+    unsigned int Format : 2; // offset 0x4, size 0x4
+    unsigned int nRegs : 4; // offset 0x4, size 0x4
+    unsigned int Reg0 : 4; // offset 0x8, size 0x4
+    unsigned int Reg1 : 4; // offset 0x8, size 0x4
+    unsigned int Reg2 : 4; // offset 0x8, size 0x4
+    unsigned int Reg3 : 4; // offset 0x8, size 0x4
+    unsigned int Reg4 : 4; // offset 0x8, size 0x4
+    unsigned int Reg5 : 4; // offset 0x8, size 0x4
+    unsigned int Reg6 : 4; // offset 0x8, size 0x4
+    unsigned int Reg7 : 4; // offset 0x8, size 0x4
+    unsigned int Reg8 : 4; // offset 0xC, size 0x4
+    unsigned int Reg9 : 4; // offset 0xC, size 0x4
+    unsigned int Reg10 : 4; // offset 0xC, size 0x4
+    unsigned int Reg11 : 4; // offset 0xC, size 0x4
+    unsigned int Reg12 : 4; // offset 0xC, size 0x4
+    unsigned int Reg13 : 4; // offset 0xC, size 0x4
+    unsigned int Reg14 : 4; // offset 0xC, size 0x4
+    unsigned int Reg15 : 4; // offset 0xC, size 0x4
+};
+typedef struct GlibGifTag_T GlibGifTagT;
+// total size: 0x10
+struct GlibGsRegAD_T {
+    // Members
+    unsigned long long data; // offset 0x0, size 0x8
+    unsigned long long addr; // offset 0x8, size 0x8
+};
+typedef struct GlibGsRegAD_T GlibGsRegADT;
+// total size: 0x40
+struct GlibDitherMatrix_T {
+    // Members
+    unsigned char m[16]; // offset 0x0, size 0x10
+    GlibGifTagT gifTag; // offset 0x10, size 0x10
+    GlibGsRegADT gsReg[2]; // offset 0x20, size 0x20
+};
+typedef struct GlibDitherMatrix_T GlibDitherMatrixT;
+union GlibGsRgbaq_t {
+    struct _GlibGsRgbaq_t Color; // offset 0x0, size 0x8
+    unsigned long long Data; // offset 0x0, size 0x8
+};
+// total size: 0x8
+struct _GlibGsRgbaq_t {
+    // Members
+    unsigned char R; // offset 0x0, size 0x1
+    unsigned char G; // offset 0x1, size 0x1
+    unsigned char B; // offset 0x2, size 0x1
+    unsigned char A; // offset 0x3, size 0x1
+    float Q; // offset 0x4, size 0x4
+};
+typedef union GlibGsRgbaq_t GlibGsRgbaqT;
+union GlibGsSt_t {
+    struct _GlibGsSt_t Coord; // offset 0x0, size 0x8
+    unsigned long long Data; // offset 0x0, size 0x8
+};
+// total size: 0x8
+struct _GlibGsSt_t {
+    // Members
+    float S; // offset 0x0, size 0x4
+    float T; // offset 0x4, size 0x4
+};
+typedef union GlibGsSt_t GlibGsStT;
+// total size: 0x24
+struct GlibLLInitBlock_t {
+    // Members
+    unsigned int ScreenWidth; // offset 0x0, size 0x4
+    unsigned int ScreenHeight; // offset 0x4, size 0x4
+    unsigned int PixelFormat; // offset 0x8, size 0x4
+    unsigned int ZFormat; // offset 0xC, size 0x4
+    unsigned int ZTest; // offset 0x10, size 0x4
+    unsigned int OutputMode; // offset 0x14, size 0x4
+    unsigned char Interlaced; // offset 0x18, size 0x1
+    unsigned char Field; // offset 0x19, size 0x1
+    GXColor EraseColor; // offset 0x1A, size 0x4
+    unsigned int FifoSize; // offset 0x20, size 0x4
+};
+typedef struct GlibLLInitBlock_t GlibLLInitBlockT;
+typedef void (* GlibCallbackFuncT)(void);
+typedef struct GlibColor4b_t GlibColor4bT;
+typedef struct GlibColor4f_t GlibColor4fT;
+// total size: 0x24
+struct GlibInitBlock_t {
+    // Members
+    GlibLLInitBlockT LLGlibInfo; // offset 0x0, size 0x24
+};
+typedef struct GlibInitBlock_t GlibInitBlockT;
+typedef enum {
+    GLIB_LETTERBOX_OFF = 0,
+    GLIB_LETTERBOX_ON = 1,
+    GLIB_LETTERBOX_NOTSUPPORTED = 65535,
+} Glib_LetterboxModeT;
+typedef enum {
+    GLIB_WIDESCREEN_OFF = 0,
+    GLIB_WIDESCREEN_ON = 1,
+    GLIB_WIDESCREEN_NOTSUPPORTED = 65535,
+} Glib_WidescreenModeT;
+typedef void * HANDLE;
+// total size: 0x2
+struct FileCDOptions_t {
+    // Members
+    unsigned char PrefetchEnable; // offset 0x0, size 0x1
+    unsigned char CacheEnable; // offset 0x1, size 0x1
+};
+typedef struct FileCDOptions_t FileCDOptionsT;
+// total size: 0x8
+struct FileTime_t {
+    // Members
+    unsigned short Year; // offset 0x0, size 0x2
+    char Month; // offset 0x2, size 0x1
+    char Day; // offset 0x3, size 0x1
+    char Hour; // offset 0x4, size 0x1
+    char Minute; // offset 0x5, size 0x1
+    char Second; // offset 0x6, size 0x1
+};
+typedef struct FileTime_t FileTimeT;
+typedef unsigned int IffChunkTypeT;
+// total size: 0x8
+struct IffChunk_t {
+    // Members
+    unsigned int ID; // offset 0x0, size 0x4
+    unsigned int Length; // offset 0x4, size 0x4
+};
+typedef struct IffChunk_t IffChunkT;
+enum GCmpDirection_t {
+    GCMP_COMPRESS = 0,
+    GCMP_DECOMPRESS = 1,
+};
+typedef enum GCmpDirection_t GCmpDirectionT;
+enum GCmpTypeID_t {
+    GCMP_NONE = 0,
+    GCMP_RLE = 1,
+    GCMP_HUFFMAN = 2,
+    GCMP_LZM = 3,
+    GCMP_IPU = 4,
+    GCMP_LZH = 5,
+    GCMP_USER_START = 6,
+};
+typedef enum GCmpTypeID_t GCmpTypeIDT;
+enum GCmpState_t {
+    GCMP_STATE_CONTINUE = 0,
+    GCMP_STATE_FINISHED = 1,
+    GCMP_STATE_NEEDINPUT = 2,
+    GCMP_STATE_FLUSHOUTPUT = 3,
+};
+typedef enum GCmpState_t GCmpStateT;
+// total size: 0x1C
+struct GCmpBlock_t {
+    // Members
+    unsigned char * pData; // offset 0x0, size 0x4
+    unsigned int Size; // offset 0x4, size 0x4
+    unsigned int Cursor; // offset 0x8, size 0x4
+    unsigned short Width; // offset 0xC, size 0x2
+    unsigned short Height; // offset 0xE, size 0x2
+    unsigned int Quantize; // offset 0x10, size 0x4
+    unsigned short Alpha; // offset 0x14, size 0x2
+    unsigned short BitDepth; // offset 0x16, size 0x2
+    unsigned char IsLast; // offset 0x18, size 0x1
+};
+typedef struct GCmpBlock_t GCmpBlockT;
+// total size: 0x1C
+struct GCmpInfo_t {
+    // Members
+    GCmpBlockT * pIn; // offset 0x0, size 0x4
+    GCmpBlockT * pOut; // offset 0x4, size 0x4
+    void * pUserInfo; // offset 0x8, size 0x4
+    GCmpDirectionT Direction; // offset 0xC, size 0x4
+    GCmpTypeIDT TypeID; // offset 0x10, size 0x4
+    GCmpStateT State; // offset 0x14, size 0x4
+    unsigned char ResizeBuffer; // offset 0x18, size 0x1
+};
+typedef struct GCmpInfo_t GCmpInfoT;
+// total size: 0x28
+struct GCmpType_t {
+    // Members
+    unsigned int ID; // offset 0x0, size 0x4
+    unsigned int Flags; // offset 0x4, size 0x4
+    void * (* CoStart)(GCmpBlockT *, GCmpBlockT *); // offset 0x8, size 0x4
+    GCmpStateT (* CoProcess)(GCmpBlockT *, GCmpBlockT *, void *); // offset 0xC, size 0x4
+    void (* CoStop)(GCmpBlockT *, GCmpBlockT *, void *); // offset 0x10, size 0x4
+    void * (* DecStart)(GCmpBlockT *, GCmpBlockT *); // offset 0x14, size 0x4
+    GCmpStateT (* DecProcess)(GCmpBlockT *, GCmpBlockT *, void *); // offset 0x18, size 0x4
+    void (* DecStop)(GCmpBlockT *, GCmpBlockT *, void *); // offset 0x1C, size 0x4
+    unsigned int (* CodecInit)(void); // offset 0x20, size 0x4
+    unsigned int (* CodecShutdown)(void); // offset 0x24, size 0x4
+};
+typedef struct GCmpType_t GCmpTypeT;
+// total size: 0x3C
+struct IPUBlock_t {
+    // Members
+    unsigned char * pSourceBuffer; // offset 0x0, size 0x4
+    unsigned char * pImageBuffer; // offset 0x4, size 0x4
+    int destAddress; // offset 0x8, size 0x4
+    int destWidth; // offset 0xC, size 0x4
+    int dxOffset; // offset 0x10, size 0x4
+    int dyOffset; // offset 0x14, size 0x4
+    char outBitDepth; // offset 0x18, size 0x1
+    long * pGifTags; // offset 0x1C, size 0x4
+    void * pUserData; // offset 0x20, size 0x4
+    char dither; // offset 0x24, size 0x1
+    int headerOffset; // offset 0x28, size 0x4
+    char alphaQuant; // offset 0x2C, size 0x1
+    char alphaType; // offset 0x2D, size 0x1
+    char headerFlags; // offset 0x2E, size 0x1
+    int sourceDataSize; // offset 0x30, size 0x4
+    int width; // offset 0x34, size 0x4
+    int height; // offset 0x38, size 0x4
+};
+typedef struct IPUBlock_t IPUBlockT;
+typedef void (* IPU_Finished_DMA)(IPUBlockT *);
+typedef // total size: 0x4
+struct {
+    // Members
+    unsigned char b; // offset 0x0, size 0x1
+    unsigned char g; // offset 0x1, size 0x1
+    unsigned char r; // offset 0x2, size 0x1
+    unsigned char a; // offset 0x3, size 0x1
+} ARGB;
+typedef void * ResFileT;
+typedef void * ResAsyncRefT;
+typedef void (* ResCallbackT)(void *, unsigned int, void *, unsigned int, void *);
+typedef void (* ResLoopCallbackT)(unsigned int);
+typedef void (* ResErrorCallbackT)(char *, unsigned int);
+typedef enum {
+    RES_DIRTYPE_AUTO = 0,
+    RES_DIRTYPE_DIR1 = 1,
+    RES_DIRTYPE_COUNT = 2,
+} ResDirTypeE;
+typedef enum {
+    RES_HASHTYPE_NONE = 0,
+    RES_HASHTYPE_HSH1 = 1,
+    RES_HASHTYPE_HSH2 = 2,
+    RES_HASHTYPE_COUNT = 3,
+} ResHashTypeE;
+typedef // total size: 0x14
+struct {
+    // Members
+    unsigned int MaxSize; // offset 0x0, size 0x4
+    unsigned short Align; // offset 0x4, size 0x2
+    unsigned short NumResources; // offset 0x6, size 0x2
+    unsigned char Endian; // offset 0x8, size 0x1
+    unsigned char Platform; // offset 0x9, size 0x1
+    unsigned char bAllowCompression; // offset 0xA, size 0x1
+    ResDirTypeE DirType; // offset 0xC, size 0x4
+    ResHashTypeE HashType; // offset 0x10, size 0x4
+} ResCreateParmsT;
+typedef // total size: 0x20
+struct {
+    // Members
+    int iKind; // offset 0x0, size 0x4
+    char * pFilename; // offset 0x4, size 0x4
+    unsigned int uFlags; // offset 0x8, size 0x4
+    char * pBuffer; // offset 0xC, size 0x4
+    int iOffset; // offset 0x10, size 0x4
+    int iLength; // offset 0x14, size 0x4
+    unsigned int uDeliver; // offset 0x18, size 0x4
+    unsigned int uTicker; // offset 0x1C, size 0x4
+} ResAsyncDebugT;
+enum VecErrCode_t {
+    VEC_ERROR_VECACTIVE = 393217,
+    VEC_ERROR_VECINACTIVE = 393218,
+    VEC_NUMERRORS = 393219,
+};
+typedef enum VecErrCode_t VecErrCodeT;
+typedef void * FontFileT;
+typedef void * FontT;
+typedef void * FontTextT;
+typedef enum {
+    FONT_COLORTYPE_BASE = 0,
+    FONT_COLORTYPE_SHADOW = 1,
+} FontColorTypeT;
+// total size: 0x10
+struct FontInitParms_t {
+    // Members
+    unsigned int MaxFonts; // offset 0x0, size 0x4
+    unsigned int Flags; // offset 0x4, size 0x4
+    unsigned int Heap; // offset 0x8, size 0x4
+    unsigned short DesignWidth; // offset 0xC, size 0x2
+    unsigned short DesignHeight; // offset 0xE, size 0x2
+};
+typedef struct FontInitParms_t FontInitParmsT;
+typedef void FontDrawDebugFncT(unsigned int, void *);
+typedef short FontPosT;
+typedef char FontKerningT;
+enum FontEncoding_t {
+    FONT_ENCODING_NONE = 0,
+    FONT_ENCODING_ASCII = 1,
+    FONT_ENCODING_LATIN1 = 2,
+    FONT_ENCODING_LATIN2 = 3,
+    FONT_ENCODING_UNICODE = 4,
+    FONT_ENCODING_MAX = 5,
+};
+typedef enum FontEncoding_t FontEncodingT;
+// total size: 0x10
+struct FontSizeMetrics_t {
+    // Members
+    short x_ppem; // offset 0x0, size 0x2
+    short y_ppem; // offset 0x2, size 0x2
+    short ascent; // offset 0x4, size 0x2
+    short descent; // offset 0x6, size 0x2
+    short linegap; // offset 0x8, size 0x2
+    short advance; // offset 0xA, size 0x2
+    short space; // offset 0xC, size 0x2
+    short pad1; // offset 0xE, size 0x2
+};
+typedef struct FontSizeMetrics_t FontSizeMetricsT;
+// total size: 0x10
+struct FontGlyphMetrics_t {
+    // Members
+    short width; // offset 0x0, size 0x2
+    short height; // offset 0x2, size 0x2
+    short horiBearingX; // offset 0x4, size 0x2
+    short horiBearingY; // offset 0x6, size 0x2
+    short horiAdvance; // offset 0x8, size 0x2
+    short vertBearingX; // offset 0xA, size 0x2
+    short vertBearingY; // offset 0xC, size 0x2
+    short vertAdvance; // offset 0xE, size 0x2
+};
+typedef struct FontGlyphMetrics_t FontGlyphMetricsT;
+// total size: 0x14
+struct FontGlyph_t {
+    // Members
+    FontGlyphMetricsT Metrics; // offset 0x0, size 0x10
+    int MapIndex; // offset 0x10, size 0x4
+};
+typedef struct FontGlyph_t FontGlyphT;
+// total size: 0x8
+struct FontTextureMap_t {
+    // Members
+    unsigned char width; // offset 0x0, size 0x1
+    unsigned char height; // offset 0x1, size 0x1
+    unsigned char u; // offset 0x2, size 0x1
+    unsigned char v; // offset 0x3, size 0x1
+    unsigned short page; // offset 0x4, size 0x2
+    unsigned short pad1; // offset 0x6, size 0x2
+};
+typedef struct FontTextureMap_t FontTextureMapT;
+// total size: 0x18
+struct FontTexturePage_t {
+    // Members
+    unsigned int ID; // offset 0x0, size 0x4
+    unsigned int clutID; // offset 0x4, size 0x4
+    unsigned int size; // offset 0x8, size 0x4
+    unsigned short width; // offset 0xC, size 0x2
+    unsigned short height; // offset 0xE, size 0x2
+    unsigned char bpp; // offset 0x10, size 0x1
+    unsigned char pad1; // offset 0x11, size 0x1
+    unsigned short pad2; // offset 0x12, size 0x2
+    void * buffer; // offset 0x14, size 0x4
+};
+typedef struct FontTexturePage_t FontTexturePageT;
+// total size: 0x24
+struct FontTypeface_t {
+    // Members
+    FontEncodingT encoding; // offset 0x0, size 0x4
+    FontSizeMetricsT size; // offset 0x4, size 0x10
+    unsigned int flags; // offset 0x14, size 0x4
+    unsigned int style; // offset 0x18, size 0x4
+    unsigned int numGlyphs; // offset 0x1C, size 0x4
+    unsigned int numFixedSizes; // offset 0x20, size 0x4
+};
+typedef struct FontTypeface_t FontTypefaceT;
+// total size: 0x4
+struct FontPalette_t {
+    // Members
+    unsigned char Red; // offset 0x0, size 0x1
+    unsigned char Green; // offset 0x1, size 0x1
+    unsigned char Blue; // offset 0x2, size 0x1
+    unsigned char Alpha; // offset 0x3, size 0x1
+};
+typedef struct FontPalette_t FontPaletteT;
+typedef // total size: 0x28
+struct {
+    // Members
+    FontTypefaceT * pTypeface; // offset 0x0, size 0x4
+    unsigned int numGlyphs; // offset 0x4, size 0x4
+    unsigned int numMaps; // offset 0x8, size 0x4
+    unsigned short numPages; // offset 0xC, size 0x2
+    unsigned short flags; // offset 0xE, size 0x2
+    unsigned int * pCharDecode; // offset 0x10, size 0x4
+    FontGlyphT * pGlyphTable; // offset 0x14, size 0x4
+    FontTextureMapT * pTextureTable; // offset 0x18, size 0x4
+    FontTexturePageT * pPageTable; // offset 0x1C, size 0x4
+    signed char * pKerningTable; // offset 0x20, size 0x4
+    FontPaletteT * pPalette; // offset 0x24, size 0x4
+} FontInstanceT;
+typedef // total size: 0x30
+struct {
+    // Members
+    unsigned char FFVersion[2]; // offset 0x0, size 0x2
+    unsigned char Endian; // offset 0x2, size 0x1
+    unsigned char Platform; // offset 0x3, size 0x1
+    unsigned short Align; // offset 0x4, size 0x2
+    unsigned short Pad1; // offset 0x6, size 0x2
+    unsigned int DirSize; // offset 0x8, size 0x4
+    FontTypefaceT Typeface; // offset 0xC, size 0x24
+} FontHeaderT;
+// total size: 0xC
+struct FontDirEntry_t {
+    // Members
+    unsigned short PointSize; // offset 0x0, size 0x2
+    unsigned short NumTextures; // offset 0x2, size 0x2
+    unsigned int Scale; // offset 0x4, size 0x4
+    unsigned int EntrySize; // offset 0x8, size 0x4
+};
+typedef struct FontDirEntry_t FontDirEntryT;
+// total size: 0x10
+struct FontDirTexEntry_t {
+    // Members
+    char Keyword[16]; // offset 0x0, size 0x10
+};
+typedef struct FontDirTexEntry_t FontDirTexEntryT;
+typedef // total size: 0x20
+struct {
+    // Members
+    unsigned int signature; // offset 0x0, size 0x4
+    unsigned int size; // offset 0x4, size 0x4
+    unsigned short version; // offset 0x8, size 0x2
+    unsigned short num; // offset 0xA, size 0x2
+    unsigned int flags; // offset 0xC, size 0x4
+    unsigned char centerx; // offset 0x10, size 0x1
+    unsigned char centery; // offset 0x11, size 0x1
+    unsigned char ascent; // offset 0x12, size 0x1
+    unsigned char descent; // offset 0x13, size 0x1
+    unsigned int chartbl; // offset 0x14, size 0x4
+    unsigned int kerntbl; // offset 0x18, size 0x4
+    unsigned int shape; // offset 0x1C, size 0x4
+} FontEACHeaderT;
+typedef // total size: 0x8
+struct {
+    // Members
+    unsigned short previousCode; // offset 0x0, size 0x2
+    unsigned short nextCode; // offset 0x2, size 0x2
+    char kernValue; // offset 0x4, size 0x1
+    unsigned char pad[3]; // offset 0x5, size 0x3
+} FontEACBigKernT;
+typedef // total size: 0x4
+struct {
+    // Members
+    unsigned char previousCode; // offset 0x0, size 0x1
+    unsigned char nextCode; // offset 0x1, size 0x1
+    char kernValue; // offset 0x2, size 0x1
+    unsigned char pad; // offset 0x3, size 0x1
+} FontEACSmallKernT;
+typedef union {
+    FontEACBigKernT * pBig; // offset 0x0, size 0x4
+    FontEACSmallKernT * pSmall; // offset 0x0, size 0x4
+    void * pVoid; // offset 0x0, size 0x4
+} FontEACKernPtrU;
+typedef // total size: 0xC
+struct {
+    // Members
+    unsigned short index; // offset 0x0, size 0x2
+    unsigned char width; // offset 0x2, size 0x1
+    unsigned char height; // offset 0x3, size 0x1
+    unsigned short u; // offset 0x4, size 0x2
+    unsigned short v; // offset 0x6, size 0x2
+    char advance; // offset 0x8, size 0x1
+    char xoffset; // offset 0x9, size 0x1
+    char yoffset; // offset 0xA, size 0x1
+    unsigned char pad; // offset 0xB, size 0x1
+} FontEACCharT;
+typedef // total size: 0x14
+struct {
+    // Members
+    unsigned int type : 8; // offset 0x0, size 0x4
+    int next : 24; // offset 0x0, size 0x4
+    unsigned short width; // offset 0x4, size 0x2
+    unsigned short height; // offset 0x6, size 0x2
+    unsigned short centerx; // offset 0x8, size 0x2
+    unsigned short centery; // offset 0xA, size 0x2
+    int shapex : 12; // offset 0xC, size 0x4
+    unsigned int nodata : 1; // offset 0xC, size 0x4
+    unsigned int twiddles : 1; // offset 0xC, size 0x4
+    unsigned int transposed : 1; // offset 0xC, size 0x4
+    unsigned int reserved : 1; // offset 0xC, size 0x4
+    int shapey : 12; // offset 0xC, size 0x4
+    unsigned int mipmaps : 4; // offset 0xC, size 0x4
+    unsigned char data[1]; // offset 0x10, size 0x1
+} FontEACShapeT;
+typedef struct LLFont_t LLFontT;
+typedef struct PrFontList_t PrFontListT;
+typedef struct PrFont_t PrFontT;
+typedef struct FontRenderMap_t FontRenderMapT;
+// total size: 0x1C
+struct PrFontText_t {
+    // Members
+    void * Font; // offset 0x0, size 0x4
+    unsigned int NumMaps; // offset 0x4, size 0x4
+    FontRenderMapT MapArray[1]; // offset 0x8, size 0x14
+};
+typedef struct PrFontText_t PrFontTextT;
+// total size: 0x3C
+struct FontRenderState_t {
+    // Members
+    int Flags; // offset 0x0, size 0x4
+    GlibColor4fT Color; // offset 0x4, size 0x10
+    GlibColor4fT ShadowColor; // offset 0x14, size 0x10
+    Vec3T ShadowOffset; // offset 0x24, size 0xC
+    float ShadowOffsetX; // offset 0x30, size 0x4
+    float ShadowOffsetY; // offset 0x34, size 0x4
+    float ShadowOffsetZ; // offset 0x38, size 0x4
+};
+typedef struct FontRenderState_t FontRenderStateT;
+FontRenderStateT Font_RenderState; // size: 0x3C
+enum TexMipMapFilter_t {
+    TEX_MIPMAP_FILTER_POINT = 0,
+    TEX_MIPMAP_FILTER_AVERAGE = 1,
+    TEX_MIPMAP_FILTER_MAX = 2,
+};
+typedef enum TexMipMapFilter_t TexMipMapFilterT;
+// total size: 0x28
+struct TexMatTypeHdr_t {
+    // Members
+    char FileType[4]; // offset 0x0, size 0x4
+    unsigned short TypeVersion; // offset 0x4, size 0x2
+    unsigned short Flags; // offset 0x6, size 0x2
+    unsigned char ChannelOrder[4]; // offset 0x8, size 0x4
+    unsigned short NumMaterials; // offset 0xC, size 0x2
+    unsigned short NumTextures; // offset 0xE, size 0x2
+    unsigned short NumPalettes; // offset 0x10, size 0x2
+    unsigned short Pad; // offset 0x12, size 0x2
+    struct TexMaterial_t * pMaterials; // offset 0x14, size 0x4
+    struct TexTextureChunk_t * pTextures; // offset 0x18, size 0x4
+    struct TexPaletteChunk_t * pPalettes; // offset 0x1C, size 0x4
+    struct TexMaterialName_t * pMaterialNames; // offset 0x20, size 0x4
+    struct TexBlindData_t * pBlindData; // offset 0x24, size 0x4
+};
+// total size: 0xC
+struct TexMaterial_t {
+    // Members
+    unsigned short NumPalettes; // offset 0x0, size 0x2
+    unsigned short NumMipmaps; // offset 0x2, size 0x2
+    unsigned short MipMapID; // offset 0x4, size 0x2
+    unsigned short NumPaletteMipmaps; // offset 0x6, size 0x2
+    unsigned short PaletteID; // offset 0x8, size 0x2
+    unsigned short Pad1; // offset 0xA, size 0x2
+};
+// total size: 0x10
+struct TexTextureChunk_t {
+    // Members
+    unsigned short Width; // offset 0x0, size 0x2
+    unsigned short Height; // offset 0x2, size 0x2
+    unsigned short TexStorageType; // offset 0x4, size 0x2
+    unsigned short CompressionType; // offset 0x6, size 0x2
+    unsigned int DataSize; // offset 0x8, size 0x4
+    unsigned char * pData; // offset 0xC, size 0x4
+};
+// total size: 0xC
+struct TexPaletteChunk_t {
+    // Members
+    unsigned short TexStorageType; // offset 0x0, size 0x2
+    unsigned short PalStorageType; // offset 0x2, size 0x2
+    unsigned int DataSize; // offset 0x4, size 0x4
+    unsigned char * pData; // offset 0x8, size 0x4
+};
+// total size: 0x10
+struct TexMaterialName_t {
+    // Members
+    char Name[16]; // offset 0x0, size 0x10
+};
+// total size: 0x8
+struct TexBlindData_t {
+    // Members
+    unsigned int Size; // offset 0x0, size 0x4
+    unsigned int * Data; // offset 0x4, size 0x4
+};
+typedef struct TexMatTypeHdr_t TexMatTypeHdrT;
+typedef unsigned int (* TexEffectFuncT)(GlibTextureT *, GlibTextureT *, void *);
+// total size: 0x1C
+struct TexTypeHdr_t {
+    // Members
+    char FileType[4]; // offset 0x0, size 0x4
+    unsigned short TypeVersion; // offset 0x4, size 0x2
+    unsigned short Frames; // offset 0x6, size 0x2
+    unsigned short Width; // offset 0x8, size 0x2
+    unsigned short Height; // offset 0xA, size 0x2
+    unsigned short TexStorageType; // offset 0xC, size 0x2
+    unsigned short PalStorageType; // offset 0xE, size 0x2
+    unsigned char ChannelOrder[4]; // offset 0x10, size 0x4
+    IffChunkT FirstChunk; // offset 0x14, size 0x8
+};
+typedef struct TexTypeHdr_t TexTypeHdrT;
+typedef struct TexMaterial_t TexMaterialT;
+// total size: 0x18
+struct TexTexChunkBlock_t {
+    // Members
+    unsigned int PosX; // offset 0x0, size 0x4
+    unsigned int PosY; // offset 0x4, size 0x4
+    unsigned int Width; // offset 0x8, size 0x4
+    unsigned int Height; // offset 0xC, size 0x4
+    unsigned int DataSize; // offset 0x10, size 0x4
+    unsigned char * pData; // offset 0x14, size 0x4
+};
+typedef struct TexTexChunkBlock_t TexTexChunkBlockT;
+typedef struct TexTextureChunk_t TexTextureChunkT;
+// total size: 0x20
+struct TexTextureChunkExt_t {
+    // Members
+    unsigned int NumBlocks; // offset 0x0, size 0x4
+    unsigned int Flags; // offset 0x4, size 0x4
+    TexTexChunkBlockT pBlocks[1]; // offset 0x8, size 0x18
+};
+typedef struct TexTextureChunkExt_t TexTextureChunkExtT;
+typedef struct TexPaletteChunk_t TexPaletteChunkT;
+typedef struct TexMaterialName_t TexMaterialNameT;
+typedef struct TexBlindData_t TexBlindDataT;
+typedef unsigned int (* TexCreateFuncT)(void *, GlibTextureT *);
+typedef unsigned int (* TexConvertFuncT)(GlibTextureT *, void *, unsigned int);
+// total size: 0x8
+struct TexEffect_t {
+    // Members
+    char EffectName[4]; // offset 0x0, size 0x4
+    unsigned int (* pEffectFunc)(GlibTextureT *, GlibTextureT *, void *); // offset 0x4, size 0x4
+};
+typedef struct TexEffect_t TexEffectT;
+// total size: 0xC
+struct TexConversionType_t {
+    // Members
+    char ConversionName[4]; // offset 0x0, size 0x4
+    unsigned int (* pCreateFunc)(void *, GlibTextureT *); // offset 0x4, size 0x4
+    unsigned int (* pConvertFunc)(GlibTextureT *, void *, unsigned int); // offset 0x8, size 0x4
+};
+typedef struct TexConversionType_t TexConversionTypeT;
+// total size: 0x10
+struct TexEffectEmbossInfo_t {
+    // Members
+    GlibTextureT * pBumpMapImage; // offset 0x0, size 0x4
+    int Azimuth; // offset 0x4, size 0x4
+    int Elevation; // offset 0x8, size 0x4
+    unsigned short Width45; // offset 0xC, size 0x2
+};
+typedef struct TexEffectEmbossInfo_t TexEffectEmbossInfoT;
+// total size: 0x28
+struct TexSplitInfo_t {
+    // Members
+    unsigned char Sections; // offset 0x0, size 0x1
+    unsigned char Horizontal; // offset 0x1, size 0x1
+    unsigned char Vertical; // offset 0x2, size 0x1
+    unsigned char Pad1; // offset 0x3, size 0x1
+    unsigned short OverflowH; // offset 0x4, size 0x2
+    unsigned short OverflowV; // offset 0x6, size 0x2
+    GlibTextureT Textures[1]; // offset 0x8, size 0x20
+};
+typedef struct TexSplitInfo_t TexSplitInfoT;
+enum TexMipMapType_t {
+    TEX_MIPMAP_TYPE_POINTSAMPLE = 0,
+    TEX_MIPMAP_TYPE_AVERAGESUM = 1,
+    TEX_MIPMAP_TYPE_MAX = 2,
+};
+typedef enum TexMipMapType_t TexMipMapTypeT;
+typedef void (* TexCreateMipMapFuncT)(GlibTextureT *, GlibTextureT *, unsigned int);
+typedef unsigned int VramHandleT;
+// total size: 0x6
+struct VramLLInitBlock_t {
+    // Members
+    unsigned short MaxNodes; // offset 0x0, size 0x2
+    unsigned short VramStartAddr; // offset 0x2, size 0x2
+    unsigned short VramEndAddr; // offset 0x4, size 0x2
+};
+typedef struct VramLLInitBlock_t VramLLInitBlockT;
+// total size: 0x4
+struct VramLLNode_t {
+    // Members
+    struct VramLLBlock_t * pBlock; // offset 0x0, size 0x4
+};
+// total size: 0x10
+struct VramLLBlock_t {
+    // Members
+    unsigned short Addr; // offset 0x0, size 0x2
+    unsigned short Size; // offset 0x2, size 0x2
+    unsigned int Status; // offset 0x4, size 0x4
+    struct VramLLNode_t * pAddrNode; // offset 0x8, size 0x4
+    struct VramLLNode_t * pFreeNode; // offset 0xC, size 0x4
+};
+typedef struct VramLLNode_t VramLLNodeT;
+typedef struct VramLLBlock_t VramLLBlockT;
+// total size: 0xC
+struct VramLLBlockInfo_t {
+    // Members
+    unsigned short VramAddr; // offset 0x0, size 0x2
+    unsigned short VramSize; // offset 0x2, size 0x2
+    unsigned char Pitch; // offset 0x4, size 0x1
+    unsigned char GsPixelFormat; // offset 0x5, size 0x1
+    unsigned char WidthLog2; // offset 0x6, size 0x1
+    unsigned char HeightLog2; // offset 0x7, size 0x1
+    VramLLBlockT * pVramBlock; // offset 0x8, size 0x4
+};
+typedef struct VramLLBlockInfo_t VramLLBlockInfoT;
+// total size: 0xC
+struct VramLLBuffer_t {
+    // Members
+    unsigned short NextAddr; // offset 0x0, size 0x2
+    unsigned short EndAddr; // offset 0x2, size 0x2
+    unsigned short heapID; // offset 0x4, size 0x2
+    unsigned short pad; // offset 0x6, size 0x2
+    VramLLBlockT * pVramBlock; // offset 0x8, size 0x4
+};
+typedef struct VramLLBuffer_t VramLLBufferT;
+enum VramErrorCode_t {
+    VRAM_ERROR_MODACTIVE = 524289,
+    VRAM_ERROR_MODINACTIVE = 524290,
+};
+typedef enum VramErrorCode_t VramErrorCodeT;
+enum VramBlockType_t {
+    VRAM_BLOCK_TEXTURE = 0,
+    VRAM_BLOCK_CLUT16 = 1,
+    VRAM_BLOCK_CLUT256 = 2,
+    VRAM_BLOCK_NUMTYPES = 3,
+    VRAM_BLOCK_UNUSED = 255,
+};
+typedef enum VramBlockType_t VramBlockTypeT;
+// total size: 0x1C
+struct VramBlockInfo_t {
+    // Members
+    void * pSource; // offset 0x0, size 0x4
+    unsigned short Height; // offset 0x4, size 0x2
+    unsigned short Width; // offset 0x6, size 0x2
+    unsigned char Type; // offset 0x8, size 0x1
+    unsigned char Priority; // offset 0x9, size 0x1
+    unsigned char BitDepth; // offset 0xA, size 0x1
+    unsigned char Flags; // offset 0xB, size 0x1
+    unsigned short heapID; // offset 0xC, size 0x2
+    unsigned char uAlignment; // offset 0xE, size 0x1
+    unsigned char pad; // offset 0xF, size 0x1
+    VramLLBlockInfoT LLInfo; // offset 0x10, size 0xC
+};
+typedef struct VramBlockInfo_t VramBlockInfoT;
+// total size: 0x20
+struct VramHeap_t {
+    // Members
+    unsigned short HeapID; // offset 0x0, size 0x2
+    VramLLInitBlockT LLInitBlock; // offset 0x2, size 0x6
+    VramBlockInfoT * pVramImageBlock; // offset 0x8, size 0x4
+    void * pVramImageMem; // offset 0xC, size 0x4
+    void * pBlocks; // offset 0x10, size 0x4
+    void * pNodes; // offset 0x14, size 0x4
+    void * pFreeNodes; // offset 0x18, size 0x4
+    unsigned char bUploadEnable; // offset 0x1C, size 0x1
+};
+typedef struct VramHeap_t VramHeapT;
+// total size: 0x204
+struct VramHeapInitBlock_t {
+    // Members
+    unsigned short numHeaps; // offset 0x0, size 0x2
+    VramHeapT Heaps[16]; // offset 0x4, size 0x200
+};
+typedef struct VramHeapInitBlock_t VramHeapInitBlockT;
+// total size: 0x2
+struct VramInitBlock_t {
+    // Members
+    unsigned short MaxBlocks; // offset 0x0, size 0x2
+};
+typedef struct VramInitBlock_t VramInitBlockT;
+enum ObjErrCode_t {
+    OBJ_ERROR_OBJACTIVE = 589825,
+    OBJ_ERROR_OBJINACTIVE = 589826,
+    OBJ_NUMERRORS = 589827,
+};
+typedef enum ObjErrCode_t ObjErrCodeT;
+enum ObjProcMode_t {
+    OBJ_PROCMODE_OBJSFIRST = 0,
+    OBJ_PROCMODE_FUNCSFIRST = 1,
+    OBJ_PROCMODE_SINGLEFUNC = 2,
+    OBJ_PROCMODE_NONE = 3,
+    OBJ_PROCMODE_NUMMODES = 4,
+};
+typedef enum ObjProcMode_t ObjProcModeT;
+// total size: 0x14
+struct ObjHdr_t {
+    // Members
+    unsigned char Type; // offset 0x0, size 0x1
+    unsigned char SubType; // offset 0x1, size 0x1
+    unsigned char NumLists; // offset 0x2, size 0x1
+    unsigned char Flags; // offset 0x3, size 0x1
+    Vec3T Pos; // offset 0x4, size 0xC
+    unsigned short SortPriority; // offset 0x10, size 0x2
+    unsigned short Pad; // offset 0x12, size 0x2
+};
+typedef struct ObjHdr_t ObjHdrT;
+typedef void (* ObjNewFuncT)(ObjHdrT *, void *);
+typedef void (* ObjDelFuncT)(ObjHdrT *);
+typedef int (* ObjProcFuncT)(ObjHdrT *, int);
+// ERROR: Failed to process tag 510124 (Typedef)
+// total size: 0x4
+struct VptLLInitBlock_t {
+    // Members
+    unsigned int Pad1; // offset 0x0, size 0x4
+};
+typedef struct VptLLInitBlock_t VptLLInitBlockT;
+// total size: 0x4
+struct VptLLViewportParms_t {
+    // Members
+    unsigned int Pad1; // offset 0x0, size 0x4
+};
+typedef struct VptLLViewportParms_t VptLLViewportParmsT;
+// total size: 0x4
+struct VptLLViewport_t {
+    // Members
+    unsigned int Pad1; // offset 0x0, size 0x4
+};
+typedef struct VptLLViewport_t VptLLViewportT;
+enum VptErrorCode_t {
+    VPT_ERROR_MODACTIVE = 524289,
+    VPT_ERROR_MODINACTIVE = 524290,
+};
+typedef enum VptErrorCode_t VptErrorCodeT;
+enum VptCallbackType_t {
+    VPT_CALLBACK_PREPROCESS = 0,
+    VPT_CALLBACK_AFTERRENDERSETUP = 1,
+    VPT_CALLBACK_POSTPROCESS = 2,
+    VPT_CALLBACK_TOTAL = 3,
+};
+typedef enum VptCallbackType_t VptCallbackTypeT;
+// total size: 0x10
+struct VptInitBlock_t {
+    // Members
+    unsigned int MaxViewports; // offset 0x0, size 0x4
+    unsigned int NumCallbacks; // offset 0x4, size 0x4
+    unsigned short MaxTrashItems; // offset 0x8, size 0x2
+    unsigned char MatrixStackIndex; // offset 0xA, size 0x1
+    unsigned char MatrixStackSize; // offset 0xB, size 0x1
+    VptLLInitBlockT LLInitBlock; // offset 0xC, size 0x4
+};
+typedef struct VptInitBlock_t VptInitBlockT;
+// total size: 0x18
+struct VptViewportParms_t {
+    // Members
+    unsigned short Priority; // offset 0x0, size 0x2
+    unsigned char DrawRoutineIndex; // offset 0x2, size 0x1
+    unsigned char RenderRegionsDefined; // offset 0x3, size 0x1
+    void * pRenderRegions[3]; // offset 0x4, size 0xC
+    unsigned short Height; // offset 0x10, size 0x2
+    unsigned short Width; // offset 0x12, size 0x2
+    VptLLViewportParmsT LLParmBlock; // offset 0x14, size 0x4
+};
+typedef struct VptViewportParms_t VptViewportParmsT;
+typedef void (* VptCameraFuncT)(void *, void *);
+typedef void (* VptCallbackFuncT)(void *);
+// ERROR: Failed to process tag 510754 (Typedef)
+// total size: 0xF8
+struct VptViewportHdr_t {
+    // Members
+    unsigned int Priority; // offset 0x0, size 0x4
+    float PosX; // offset 0x4, size 0x4
+    float PosY; // offset 0x8, size 0x4
+    float SizeX; // offset 0xC, size 0x4
+    float SizeY; // offset 0x10, size 0x4
+    float ScaleSizeX; // offset 0x14, size 0x4
+    float ScaleSizeY; // offset 0x18, size 0x4
+    unsigned int Flags; // offset 0x1C, size 0x4
+    float EraseR; // offset 0x20, size 0x4
+    float EraseG; // offset 0x24, size 0x4
+    float EraseB; // offset 0x28, size 0x4
+    unsigned short Pad1; // offset 0x2C, size 0x2
+    unsigned char RenderRegionsDefined; // offset 0x2E, size 0x1
+    unsigned char RenderRegionsCurrent; // offset 0x2F, size 0x1
+    void * pRenderRegions[3]; // offset 0x30, size 0xC
+    void (* pCameraFunction)(void *, void *); // offset 0x3C, size 0x4
+    void * pCameraData; // offset 0x40, size 0x4
+    unsigned char CameraUpdated; // offset 0x44, size 0x1
+    unsigned char DrawRoutineIndex; // offset 0x45, size 0x1
+    unsigned short Pad3; // offset 0x46, size 0x2
+    void * pObjectList; // offset 0x48, size 0x4
+    MatT CameraMatrix; // offset 0x4C, size 0x40
+    MatT ProjectionMatrix; // offset 0x8C, size 0x40
+    float Fovy; // offset 0xCC, size 0x4
+    float AspectRatio; // offset 0xD0, size 0x4
+    float OrthoScale; // offset 0xD4, size 0x4
+    float Left; // offset 0xD8, size 0x4
+    float Right; // offset 0xDC, size 0x4
+    float Top; // offset 0xE0, size 0x4
+    float Bottom; // offset 0xE4, size 0x4
+    float NearPlane; // offset 0xE8, size 0x4
+    float FarPlane; // offset 0xEC, size 0x4
+    float ZScale; // offset 0xF0, size 0x4
+    VptLLViewportT LLViewportInfo; // offset 0xF4, size 0x4
+};
+typedef struct VptViewportHdr_t VptViewportHdrT;
+// total size: 0x10
+struct VptCallback_t {
+    // Members
+    unsigned int Priority; // offset 0x0, size 0x4
+    VptCallbackTypeT CallbackType; // offset 0x4, size 0x4
+    void (* pCallbackFunction)(void *); // offset 0x8, size 0x4
+    void * pViewport; // offset 0xC, size 0x4
+};
+typedef struct VptCallback_t VptCallbackT;
+typedef int __int32_t;
+typedef unsigned int __uint32_t;
+typedef unsigned int clock_t;
+typedef int time_t;
+// total size: 0x24
+struct tm {
+    // Members
+    int tm_sec; // offset 0x0, size 0x4
+    int tm_min; // offset 0x4, size 0x4
+    int tm_hour; // offset 0x8, size 0x4
+    int tm_mday; // offset 0xC, size 0x4
+    int tm_mon; // offset 0x10, size 0x4
+    int tm_year; // offset 0x14, size 0x4
+    int tm_wday; // offset 0x18, size 0x4
+    int tm_yday; // offset 0x1C, size 0x4
+    int tm_isdst; // offset 0x20, size 0x4
+};
+typedef unsigned int ULong;
+// total size: 0xC
+struct _glue {
+    // Members
+    struct _glue * _next; // offset 0x0, size 0x4
+    int _niobs; // offset 0x4, size 0x4
+    struct __sFILE * _iobs; // offset 0x8, size 0x4
+};
+// total size: 0x60
+struct __sFILE {
+    // Members
+    unsigned char * _p; // offset 0x0, size 0x4
+    int _r; // offset 0x4, size 0x4
+    int _w; // offset 0x8, size 0x4
+    short _flags; // offset 0xC, size 0x2
+    short _file; // offset 0xE, size 0x2
+    struct __sbuf _bf; // offset 0x10, size 0x8
+    int _lbfsize; // offset 0x18, size 0x4
+    void * _cookie; // offset 0x1C, size 0x4
+    int (* _read)(void *, char *, int); // offset 0x20, size 0x4
+    int (* _write)(void *, const char *, int); // offset 0x24, size 0x4
+    int (* _seek)(void *, int, int); // offset 0x28, size 0x4
+    int (* _close)(void *); // offset 0x2C, size 0x4
+    struct __sbuf _ub; // offset 0x30, size 0x8
+    unsigned char * _up; // offset 0x38, size 0x4
+    int _ur; // offset 0x3C, size 0x4
+    unsigned char _ubuf[10]; // offset 0x40, size 0xA
+    unsigned char _nbuf[1]; // offset 0x4A, size 0x1
+    struct __sbuf _lb; // offset 0x4C, size 0x8
+    int _blksize; // offset 0x54, size 0x4
+    int _offset; // offset 0x58, size 0x4
+    struct _reent * _data; // offset 0x5C, size 0x4
+};
+// total size: 0x8
+struct __sbuf {
+    // Members
+    unsigned char * _base; // offset 0x0, size 0x4
+    int _size; // offset 0x4, size 0x4
+};
+// total size: 0x304
+struct _reent {
+    // Members
+    int _errno; // offset 0x0, size 0x4
+    struct __sFILE * _stdin; // offset 0x4, size 0x4
+    struct __sFILE * _stdout; // offset 0x8, size 0x4
+    struct __sFILE * _stderr; // offset 0xC, size 0x4
+    int _inc; // offset 0x10, size 0x4
+    char _emergency[25]; // offset 0x14, size 0x19
+    int _current_category; // offset 0x30, size 0x4
+    const char * _current_locale; // offset 0x34, size 0x4
+    int __sdidinit; // offset 0x38, size 0x4
+    void (* __cleanup)(struct _reent *); // offset 0x3C, size 0x4
+    struct _Bigint * _result; // offset 0x40, size 0x4
+    int _result_k; // offset 0x44, size 0x4
+    struct _Bigint * _p5s; // offset 0x48, size 0x4
+    struct _Bigint * * _freelist; // offset 0x4C, size 0x4
+    int _cvtlen; // offset 0x50, size 0x4
+    char * _cvtbuf; // offset 0x54, size 0x4
+    union {
+        // total size: 0x4C
+        struct {
+            // Members
+            unsigned int _rand_next; // offset 0x0, size 0x4
+            char * _strtok_last; // offset 0x4, size 0x4
+            char _asctime_buf[26]; // offset 0x8, size 0x1A
+            struct tm _localtime_buf; // offset 0x24, size 0x24
+            int _gamma_signgam; // offset 0x48, size 0x4
+        } _reent; // offset 0x0, size 0x4C
+        // total size: 0xF0
+        struct {
+            // Members
+            unsigned char * _nextf[30]; // offset 0x0, size 0x78
+            unsigned int _nmalloc[30]; // offset 0x78, size 0x78
+        } _unused; // offset 0x0, size 0xF0
+    } _new; // offset 0x58, size 0xF0
+    struct _atexit * _atexit; // offset 0x148, size 0x4
+    struct _atexit _atexit0; // offset 0x14C, size 0x88
+    void (* * _sig_func)(int); // offset 0x1D4, size 0x4
+    struct _glue __sglue; // offset 0x1D8, size 0xC
+    struct __sFILE __sf[3]; // offset 0x1E4, size 0x120
+};
+// total size: 0x18
+struct _Bigint {
+    // Members
+    struct _Bigint * _next; // offset 0x0, size 0x4
+    int _k; // offset 0x4, size 0x4
+    int _maxwds; // offset 0x8, size 0x4
+    int _sign; // offset 0xC, size 0x4
+    int _wds; // offset 0x10, size 0x4
+    unsigned int _x[1]; // offset 0x14, size 0x4
+};
+// total size: 0x88
+struct _atexit {
+    // Members
+    struct _atexit * _next; // offset 0x0, size 0x4
+    int _ind; // offset 0x4, size 0x4
+    void (* _fns[32])(void); // offset 0x8, size 0x80
+};
+typedef int _fpos_t;
+union __dmath {
+    unsigned int i[2]; // offset 0x0, size 0x8
+    double d; // offset 0x0, size 0x8
+};
+// total size: 0x28
+struct exception {
+    // Members
+    int type; // offset 0x0, size 0x4
+    char * name; // offset 0x4, size 0x4
+    double arg1; // offset 0x8, size 0x8
+    double arg2; // offset 0x10, size 0x8
+    double retval; // offset 0x18, size 0x8
+    int err; // offset 0x20, size 0x4
+};
+enum __fdlibm_version {
+    __fdlibm_ieee = -1,
+    __fdlibm_svid = 0,
+    __fdlibm_xopen = 1,
+    __fdlibm_posix = 2,
+};
+typedef enum {
+    PROF_COUNTER0_CURR_VALUE = 0,
+    PROF_COUNTER0_PROC_CYCLES = 1,
+    PROF_COUNTER0_COMPLETED_INST = 2,
+    PROF_COUNTER0_TB_BIT_TRANS = 3,
+    PROF_COUNTER0_INST_DISPATCHED = 4,
+    PROF_COUNTER0_EIEIO_INST = 5,
+    PROF_COUNTER0_ITLB_SEARCH_CYCLES = 6,
+    PROF_COUNTER0_L2_CACHE = 7,
+    PROF_COUNTER0_EA_INST = 8,
+    PROF_COUNTER0_IARB_MATCH = 9,
+    PROF_COUNTER0_L1_LOAD_MISS = 10,
+    PROF_COUNTER0_UNRESOLVED_BRANCH = 11,
+    PROF_COUNTER0_BRANCH_STALL_CYCLES = 12,
+    PROF_COUNTER0_L1_ICACHE_MISSES = 13,
+    PROF_COUNTER0_RESERVED = 14,
+    PROF_COUNTER0_UNUSED1 = 15,
+    PROF_COUNTER0_UNUSED2 = 16,
+    PROF_COUNTER0_UNUSED3 = 17,
+    PROF_COUNTER0_UNUSED4 = 18,
+} ProfCounter0T;
+typedef enum {
+    PROF_COUNTER1_CURR_VALUE = 0,
+    PROF_COUNTER1_PROC_CYCLES = 1,
+    PROF_COUNTER1_COMPLETED_INST = 2,
+    PROF_COUNTER1_TB_BIT_TRANS = 3,
+    PROF_COUNTER1_INST_DISPATCHED = 4,
+    PROF_COUNTER1_L1_ICACHE_MISS = 5,
+    PROF_COUNTER1_ITLB_MISS = 6,
+    PROF_COUNTER1_L1_IMISS = 7,
+    PROF_COUNTER1_FALLTHROUGH_BRANCH = 8,
+    PROF_COUNTER1_SWITCH_PRIV_USER = 9,
+    PROF_COUNTER1_RESERVED_LOAD = 10,
+    PROF_COUNTER1_LOAD_STORE = 11,
+    PROF_COUNTER1_SNOOPS = 12,
+    PROF_COUNTER1_L1_CASTOUT_TO_L2 = 13,
+    PROF_COUNTER1_SYSTEM_UNIT_INST = 14,
+    PROF_COUNTER1_INST_MISS_CYCLES = 15,
+    PROF_COUNTER1_1ST_SPEC_BRNCH_RSLV = 16,
+    PROF_COUNTER1_RESERVED = 17,
+    PROF_COUNTER1_UNUSED = 18,
+} ProfCounter1T;
+typedef enum {
+    PROF_COUNTER2_CURR_VALUE = 0,
+    PROF_COUNTER2_PROC_CYCLES = 1,
+    PROF_COUNTER2_COMPLETED_INST = 2,
+    PROF_COUNTER2_TB_BIT_TRANS = 3,
+    PROF_COUNTER2_INST_DISPATCHED = 4,
+    PROF_COUNTER2_L1_DCACHE_MISS = 5,
+    PROF_COUNTER2_DTLB_MISS = 6,
+    PROF_COUNTER2_L2_DATA_MISS = 7,
+    PROF_COUNTER2_PRED_BRANCH_TAKEN = 8,
+    PROF_COUNTER2_MARK_UNMARK_TRANS = 9,
+    PROF_COUNTER2_STORE_CONDTL_INST = 10,
+    PROF_COUNTER2_FPU_INST = 11,
+    PROF_COUNTER2_L2_CASTOUT = 12,
+    PROF_COUNTER2_RESERVED = 13,
+    PROF_COUNTER2_L1_LOAD_MISS_CYCLES = 14,
+    PROF_COUNTER2_BRNCH_SSS_CORRECT = 15,
+    PROF_COUNTER2_BPU_LRCR_STALL_CYCLES = 16,
+} ProfCounter2T;
+typedef enum {
+    PROF_COUNTER3_CURR_VALUE = 0,
+    PROF_COUNTER3_PROC_CYCLES = 1,
+    PROF_COUNTER3_COMPLETED_INST = 2,
+    PROF_COUNTER3_TB_BIT_TRANS = 3,
+    PROF_COUNTER3_INST_DISPATCHED = 4,
+    PROF_COUNTER3_L2_CASTOUT = 5,
+    PROF_COUNTER3_DTLB_SEARCH_CYCLES = 6,
+    PROF_COUNTER3_RESERVED1 = 7,
+    PROF_COUNTER3_MISPREDICTED_BRANCHES = 8,
+    PROF_COUNTER3_RESERVED2 = 9,
+    PROF_COUNTER3_STORE_CONDTL_INST = 10,
+    PROF_COUNTER3_COMPLETED_SYNC_INST = 11,
+    PROF_COUNTER3_SNOOP_REQUEST_RETRIES = 12,
+    PROF_COUNTER3_COMPLETED_INTEGER_OP = 13,
+    PROF_COUNTER3_BPU_2UNRESOLVED_STALL_CYCLES = 14,
+    PROF_COUNTER3_L1_DCACHE_MISSES = 15,
+    PROF_COUNTER3_RESERVED3 = 16,
+    PROF_COUNTER3_UNUSED = 17,
+} ProfCounter3T;
+// total size: 0x8
+struct ProfPollStat_T {
+    // Members
+    unsigned int cycle; // offset 0x0, size 0x4
+    unsigned short flags; // offset 0x4, size 0x2
+    unsigned short mark; // offset 0x6, size 0x2
+};
+typedef struct ProfPollStat_T ProfPollStatT;
+// total size: 0x14
+struct ProfRecord_T {
+    // Members
+    char * pSectionName; // offset 0x0, size 0x4
+    unsigned int flags; // offset 0x4, size 0x4
+    unsigned int count[3]; // offset 0x8, size 0xC
+};
+typedef struct ProfRecord_T ProfRecordT;
+// total size: 0x1C
+struct ProfSection_T {
+    // Members
+    char * pName; // offset 0x0, size 0x4
+    unsigned int nEntry; // offset 0x4, size 0x4
+    unsigned int count[3]; // offset 0x8, size 0xC
+    unsigned int refCount; // offset 0x14, size 0x4
+    ProfRecordT * pLastRecord; // offset 0x18, size 0x4
+};
+typedef struct ProfSection_T ProfSectionT;
+// total size: 0x10
+struct ProfInitBlock_T {
+    // Members
+    ProfRecordT * pProfLogBase; // offset 0x0, size 0x4
+    unsigned int numRecords; // offset 0x4, size 0x4
+    unsigned int Counter0Type; // offset 0x8, size 0x4
+    unsigned int Counter1Type; // offset 0xC, size 0x4
+};
+typedef struct ProfInitBlock_T ProfInitParmsT;
+typedef enum {
+    PROF_TYPE_DEFAULT = 0,
+    PROF_TYPE_CUMULATIVE = 0,
+    PROF_TYPE_SUMMARY = 1,
+    PROF_TYPE_VENDOR_INSTRUMENTED = 2,
+    PROF_TYPE_VENDOR_SAMPLING = 3,
+    PROF_TYPE_GPU = 4,
+    PROF_TYPE_MAX = 5,
+    PROF_TYPE_INVALID = -1,
+} ProfTypeE;
+// total size: 0x10
+struct FontRect_T {
+    // Members
+    float Left; // offset 0x0, size 0x4
+    float Right; // offset 0x4, size 0x4
+    float Top; // offset 0x8, size 0x4
+    float Bottom; // offset 0xC, size 0x4
+};
+typedef struct FontRect_T FontRectT;
+typedef struct FontLLGlyph_T FontLLGlyphT;
+static unsigned short _LLFontOutsideOutlinePal[16]; // size: 0x20, address: 0x8034F9A0
+static unsigned short _LLFontInsideOutlinePal[16]; // size: 0x20, address: 0x8034F9C0
+static GXTlutObj _LLFontOutsideOutlineObj; // size: 0xC, address: 0x8034F9E0
+static GXTlutObj _LLFontInsideOutlineObj; // size: 0xC, address: 0x8034FA00
+FontRenderMapT _FontLLRenderMapScratch[355]; // size: 0x1BBC, address: 0x803AEC7C
+

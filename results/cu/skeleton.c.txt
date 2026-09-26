@@ -1,0 +1,2205 @@
+/*
+    Compile unit: ../../../Source/Common/char/skeleton.c
+    Producer: GNU C 2.95.3 SN BUILD v1.76 for Nintendo Gamecube
+    Compile directory: F:\PROJ\LL_API\project\ngc\Char
+    Language: C89
+    Code range: 0x801BC3AC -> 0x801BC95C
+    GCC Source File Name Offset: 0x00001F40
+    GCC Source Info Offset: 0x0000161C
+*/
+static inline void OSSetGQR2(unsigned int type, unsigned int scale) {
+    // Local variables
+    unsigned int val;
+}
+
+static inline void OSSetGQR3(unsigned int type, unsigned int scale) {
+    // Local variables
+    unsigned int val;
+}
+
+static inline void OSSetGQR4(unsigned int type, unsigned int scale) {
+    // Local variables
+    unsigned int val;
+}
+
+static inline void OSSetGQR5(unsigned int type, unsigned int scale) {
+    // Local variables
+    unsigned int val;
+}
+
+static inline void OSSetGQR6(unsigned int type, unsigned int scale) {
+    // Local variables
+    unsigned int val;
+}
+
+static inline void OSSetGQR7(unsigned int type, unsigned int scale) {
+    // Local variables
+    unsigned int val;
+}
+
+static inline void OSInitFastCast(void) {}
+
+static inline volatile int AngleMult(int Dst, int Src) {
+    // Local variables
+    long long Rslt;
+}
+
+static inline int MathMapRange(int iVal, int iInLeft, int iInRight, int iOutLeft, int iOutRight) {}
+
+static inline float MathMapRangeF(float fVal, float fInLeft, float fInRight, float fOutLeft, float fOutRight) {}
+
+// Range: 0x801BC3AC -> 0x801BC3B0
+static void _SkelNullFunc(struct CharSkel_t * pSkel /* r3 */, struct CharJointHierarchy_t * pJointHierarchy /* r4 */, struct CharFrame_t * pFrame /* r5 */) {}
+
+// total size: 0x590
+struct CharSkel_t {
+    // Members
+    unsigned int FileID; // offset 0x0, size 0x4
+    unsigned short Flags; // offset 0x4, size 0x2
+    unsigned short NumJoints; // offset 0x6, size 0x2
+    struct CharJointHierarchy_t * pJointHierarchy; // offset 0x8, size 0x4
+    struct CharJoint_t * pJointList; // offset 0xC, size 0x4
+    struct CharBone_t Bones[64]; // offset 0x10, size 0x400
+    struct CharRefAngle_t RefAngles[64]; // offset 0x410, size 0x180
+};
+// total size: 0xC
+struct CharJointHierarchy_t {
+    // Members
+    unsigned char NumChildJoints; // offset 0x0, size 0x1
+    unsigned char Level; // offset 0x1, size 0x1
+    unsigned char JointIndex; // offset 0x2, size 0x1
+    unsigned char Pad; // offset 0x3, size 0x1
+    struct CharJointHierarchy_t * pParent; // offset 0x4, size 0x4
+    struct CharJointHierarchy_t * pChildren[1]; // offset 0x8, size 0x4
+};
+// total size: 0x38
+struct CharFrame_t {
+    // Members
+    unsigned short SrcType; // offset 0x0, size 0x2
+    unsigned short DstType; // offset 0x2, size 0x2
+    unsigned short NumJoints; // offset 0x4, size 0x2
+    short iBallWrist; // offset 0x6, size 0x2
+    struct Vec3_t RootTrans; // offset 0x8, size 0xC
+    struct Vec3_t BallTrans; // offset 0x14, size 0xC
+    int RootRot; // offset 0x20, size 0x4
+    struct Orient3_t BallRot; // offset 0x24, size 0xC
+    union CharJointData_t Src; // offset 0x30, size 0x4
+    union CharJointData_t Dst; // offset 0x34, size 0x4
+};
+// total size: 0x14
+struct CharJoint_t {
+    // Members
+    struct CharJointHierarchy_t * pJointHierarchy; // offset 0x0, size 0x4
+    char JointName[16]; // offset 0x4, size 0x10
+};
+// total size: 0x10
+struct CharBone_t {
+    // Members
+    struct Vec3_t Pos; // offset 0x0, size 0xC
+    short iParent; // offset 0xC, size 0x2
+    unsigned char bPush; // offset 0xE, size 0x1
+    unsigned char _pad; // offset 0xF, size 0x1
+};
+// total size: 0x6
+struct CharRefAngle_t {
+    // Members
+    short vx; // offset 0x0, size 0x2
+    short vy; // offset 0x2, size 0x2
+    short vz; // offset 0x4, size 0x2
+};
+// total size: 0xC
+struct Vec3_t {
+    // Members
+    float vx; // offset 0x0, size 0x4
+    float vy; // offset 0x4, size 0x4
+    float vz; // offset 0x8, size 0x4
+};
+// total size: 0xC
+struct Orient3_t {
+    // Members
+    int vx; // offset 0x0, size 0x4
+    int vy; // offset 0x4, size 0x4
+    int vz; // offset 0x8, size 0x4
+};
+union CharJointData_t {
+    struct CharOrient3_t * pEuler; // offset 0x0, size 0x4
+    struct Quat_t * pQuat; // offset 0x0, size 0x4
+    struct Mat_t * pMat; // offset 0x0, size 0x4
+    void * pBuf; // offset 0x0, size 0x4
+};
+// total size: 0x6
+struct CharOrient3_t {
+    // Members
+    short vx; // offset 0x0, size 0x2
+    short vy; // offset 0x2, size 0x2
+    short vz; // offset 0x4, size 0x2
+};
+// total size: 0x10
+struct Quat_t {
+    // Members
+    float vx; // offset 0x0, size 0x4
+    float vy; // offset 0x4, size 0x4
+    float vz; // offset 0x8, size 0x4
+    float vw; // offset 0xC, size 0x4
+};
+// total size: 0x40
+struct Mat_t {
+    // Members
+    float m[16]; // offset 0x0, size 0x40
+};
+// Range: 0x801BC3B0 -> 0x801BC424
+static void _SkelEulerLToQuatL(struct CharSkel_t * pSkel /* r28 */, struct CharJointHierarchy_t * pJointHierarchy /* r4 */, struct CharFrame_t * pFrame /* r5 */) {
+    // Local variables
+    struct CharOrient3_t * pEulerBuf; // r9
+    struct Quat_t * pQuatBuf; // r3
+    int Joint; // r29
+}
+
+// Range: 0x801BC424 -> 0x801BC50C
+static int _SkelEulerLToMatrixGHierarchy(struct CharSkel_t * pSkel /* r24 */, struct CharJointHierarchy_t * pJointHierarchy /* r31 */, struct CharOrient3_t * pEuler /* r27 */, struct Mat_t * pMat /* r25 */) {
+    // Local variables
+    int Chain; // r29
+    unsigned int JointIndex; // r29
+    int Level; // r26
+    struct CharOrient3_t * pVec; // r30
+}
+
+// Range: 0x801BC50C -> 0x801BC568
+static void _SkelEulerLToMatrixG(struct CharSkel_t * pSkel /* r28 */, struct CharJointHierarchy_t * pJointHierarchy /* r29 */, struct CharFrame_t * pFrame /* r30 */) {}
+
+// Range: 0x801BC568 -> 0x801BC5EC
+static void _SkelQuatLToEulerL(struct CharSkel_t * pSkel /* r28 */, struct CharJointHierarchy_t * pJointHierarchy /* r4 */, struct CharFrame_t * pFrame /* r5 */) {
+    // Local variables
+    struct CharOrient3_t * pEulerBuf; // r9
+    struct Quat_t * pQuatBuf; // r4
+    int Joint; // r29
+    struct Orient3_t Euler; // r1+0x8
+}
+
+// Range: 0x801BC5EC -> 0x801BC6EC
+static int _SkelQuatLToMatrixGHierarchy(struct CharSkel_t * pSkel /* r24 */, struct CharJointHierarchy_t * pJointHierarchy /* r28 */, struct QuatRotPos_t * pQuatStack /* r31 */, struct Quat_t * pQuat /* r25 */, struct Mat_t * pMat /* r26 */) {
+    // Local variables
+    int Chain; // r30
+    unsigned int JointIndex; // r30
+    struct Vec3_t * pVec;
+    int Level; // r27
+}
+
+// total size: 0x1C
+struct QuatRotPos_t {
+    // Members
+    struct Quat_t Rot; // offset 0x0, size 0x10
+    struct Vec3_t Pos; // offset 0x10, size 0xC
+};
+// Range: 0x801BC6EC -> 0x801BC744
+static void _SkelQuatLToMatrixG(struct CharSkel_t * pSkel /* r30 */, struct CharJointHierarchy_t * pJointHierarchy /* r28 */, struct CharFrame_t * pFrame /* r29 */) {
+    // Local variables
+    struct QuatRotPos_t QuatStack[16]; // r1+0x8
+}
+
+// Range: 0x801BC744 -> 0x801BC788
+static void _SkelRelocateHierarchyNode(struct CharJointHierarchy_t * pJointHierarchy /* r3 */, void * pUserData /* r4 */) {
+    // Local variables
+    int Child; // r11
+}
+
+// Range: 0xFFFFFFFF -> 0x801BC788
+void CharConvJointData(struct CharSkel_t * pSkel /* r3 */, struct CharFrame_t * pFrame /* r4 */) {
+    // Local variables
+    void (* * pFuncBlock)(struct CharSkel_t *, struct CharJointHierarchy_t *, struct CharFrame_t *); // r9
+    unsigned int SrcJointType; // r10
+    unsigned int DstJointType; // r11
+}
+
+// Range: 0x801BC788 -> 0x801BC838
+int CharTraverseSkeleton(struct CharJointHierarchy_t * pJointHierarchy /* r30 */, void (* pVisitFunc)(struct CharJointHierarchy_t *, void *) /* r26 */, void * pUserData /* r27 */) {
+    // Local variables
+    int Chain; // r29
+    int Level; // r28
+}
+
+// Range: 0xFFFFFFFF -> 0x801BC838
+void CharIterateSkeleton(struct CharSkel_t * pSkeleton /* r30 */, void (* pVisitFunc)(struct CharJointHierarchy_t *, void *) /* r27 */, void * pUserData /* r28 */) {
+    // Local variables
+    int JointIndex; // r31
+}
+
+// Range: 0x801BC838 -> 0x801BC8E4
+void CharRelocateSkeleton(struct CharSkel_t * pSkeleton /* r31 */) {
+    // Local variables
+    unsigned int JointIndex; // r10
+}
+
+// Range: 0x801BC8E4 -> 0x801BC95C
+int CharSkelGetJointByName(struct CharSkel_t * pSkel /* r29 */, char * pJointName /* r28 */) {
+    // Local variables
+    struct CharJoint_t * pJointList; // r9
+    int iJoint; // r30
+}
+
+// Range: 0xFFFFFFFF -> 0x801BC95C
+void CharSkelHFlipBindAngles(struct CharSkel_t * pDstSkeleton /* r3 */, struct CharSkel_t * pSrcSkeleton /* r4 */) {
+    // Local variables
+    int iJoint; // r10
+}
+
+// Range: 0xFFFFFFFF -> 0x801BC95C
+static void _SkelUpdateCollision(struct CharJointHierarchy_t * pJointHierarchy /* r3 */, void * pUserData /* r4 */) {
+    // Local variables
+    unsigned int CurrentPart; // r5
+    unsigned int ParentPart; // r10
+    struct Mat_t * pMatrices;
+    struct CldObjType3_t * pCldInfo; // r7
+    struct CldSkelInfo_t * pSkelInfo;
+}
+
+// total size: 0x2B4
+struct CldObjType3_t {
+    // Members
+    struct CldObjHeader_t header; // offset 0x0, size 0xC
+    struct Square2D_t square; // offset 0xC, size 0xC4
+    struct Box3D_t box; // offset 0xD0, size 0x1DC
+    unsigned int sausageCnt; // offset 0x2AC, size 0x4
+    struct Sausage3D_t * sausage; // offset 0x2B0, size 0x4
+};
+// total size: 0x8
+struct CldSkelInfo_t {
+    // Members
+    struct CldObjType3_t * pCldInfo; // offset 0x0, size 0x4
+    struct Mat_t * pRefMatrices; // offset 0x4, size 0x4
+};
+// total size: 0xC
+struct CldObjHeader_t {
+    // Members
+    struct _CldNodeT node; // offset 0x0, size 0x8
+    enum CldObjType_t objType; // offset 0x8, size 0x4
+};
+// total size: 0xC4
+struct Square2D_t {
+    // Members
+    unsigned int id; // offset 0x0, size 0x4
+    struct Vec2_t min; // offset 0x4, size 0x8
+    struct Vec2_t max; // offset 0xC, size 0x8
+    struct Vec2_t pnt[4]; // offset 0x14, size 0x20
+    struct Plane2D_t pln[4]; // offset 0x34, size 0x30
+    struct Vec2_t cen; // offset 0x64, size 0x8
+    struct Vec2_t dim; // offset 0x6C, size 0x8
+    struct Vec2_t wPnt[4]; // offset 0x74, size 0x20
+    struct Plane2D_t wPlane[4]; // offset 0x94, size 0x30
+};
+// total size: 0x1DC
+struct Box3D_t {
+    // Members
+    unsigned int id; // offset 0x0, size 0x4
+    struct Vec3_t pnt[8]; // offset 0x4, size 0x60
+    struct Plane3D_t pln[6]; // offset 0x64, size 0x60
+    struct Vec3_t dim; // offset 0xC4, size 0xC
+    struct Vec3_t cen; // offset 0xD0, size 0xC
+    struct Vec3_t wPnt[8]; // offset 0xDC, size 0x60
+    struct Plane3D_t wPlane[6]; // offset 0x13C, size 0x60
+    struct Mat_t matrix; // offset 0x19C, size 0x40
+};
+// total size: 0x24
+struct Sausage3D_t {
+    // Members
+    unsigned int id; // offset 0x0, size 0x4
+    struct Vec3_t pnt[2]; // offset 0x4, size 0x18
+    float rad; // offset 0x1C, size 0x4
+    float radius2; // offset 0x20, size 0x4
+};
+// total size: 0x8
+struct _CldNodeT {
+    // Members
+    struct _CldNodeT * ln_Succ; // offset 0x0, size 0x4
+    struct _CldNodeT * ln_Pred; // offset 0x4, size 0x4
+};
+enum CldObjType_t {
+    CLD_OBJ_TYPE_1 = 0,
+    CLD_OBJ_TYPE_2 = 1,
+    CLD_OBJ_TYPE_3 = 2,
+};
+// total size: 0x8
+struct Vec2_t {
+    // Members
+    float vx; // offset 0x0, size 0x4
+    float vy; // offset 0x4, size 0x4
+};
+// total size: 0xC
+struct Plane2D_t {
+    // Members
+    struct Vec2_t pnt; // offset 0x0, size 0x8
+    float dis; // offset 0x8, size 0x4
+};
+// total size: 0x10
+struct Plane3D_t {
+    // Members
+    struct Vec3_t pnt; // offset 0x0, size 0xC
+    float dis; // offset 0xC, size 0x4
+};
+// Range: 0xFFFFFFFF -> 0x801BC95C
+void CharUpdateSkeletonCollision(void * cldInfo /* r3 */, struct CharSkel_t * pSkel /* r4 */, struct Mat_t * pMatrices /* r5 */) {
+    // Local variables
+    struct CldSkelInfo_t CldSkelInfo; // r1+0x8
+}
+
+typedef int ptrdiff_t;
+typedef unsigned int size_t;
+typedef int wchar_t;
+typedef unsigned int wint_t;
+typedef char int8_t;
+typedef short int16_t;
+typedef int int32_t;
+typedef unsigned char uint8_t;
+typedef unsigned short uint16_t;
+typedef unsigned int uint32_t;
+typedef float float_t;
+typedef double double_t;
+typedef long long int64_t;
+typedef unsigned long long uint64_t;
+typedef unsigned long long intptr_t;
+typedef long long intmax_t;
+typedef unsigned long long uintmax_t;
+typedef char char8_t;
+typedef unsigned short char16_t;
+typedef int char32_t;
+typedef // total size: 0x10
+struct {
+    // Members
+    long long hi; // offset 0x0, size 0x8
+    long long lo; // offset 0x8, size 0x8
+} Int128;
+typedef // total size: 0x10
+struct {
+    // Members
+    unsigned long long hi; // offset 0x0, size 0x8
+    unsigned long long lo; // offset 0x8, size 0x8
+} Uint128;
+typedef unsigned char Bool;
+// total size: 0xC
+struct __va_list_tag {
+    // Members
+    char gpr; // offset 0x0, size 0x1
+    char fpr; // offset 0x1, size 0x1
+    char * overflow_arg_area; // offset 0x4, size 0x4
+    char * reg_save_area; // offset 0x8, size 0x4
+};
+typedef struct __va_list_tag __va_list[1];
+typedef __va_list __gnuc_va_list;
+typedef // total size: 0x60
+struct {
+    // Members
+    long __gp_save[8]; // offset 0x0, size 0x20
+    double __fp_save[8]; // offset 0x20, size 0x40
+} __va_regsave_t;
+typedef __va_list va_list;
+typedef char s8;
+typedef short s16;
+typedef int s32;
+typedef long long s64;
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned int u32;
+typedef unsigned long long u64;
+typedef volatile unsigned char vu8;
+typedef volatile unsigned short vu16;
+typedef volatile unsigned long vu32;
+typedef volatile unsigned long long vu64;
+typedef volatile signed char vs8;
+typedef volatile short vs16;
+typedef volatile long vs32;
+typedef volatile long long vs64;
+typedef float f32;
+typedef double f64;
+typedef volatile float vf32;
+typedef volatile double vf64;
+typedef char * Ptr;
+typedef int BOOL;
+typedef unsigned char GXBool;
+enum _GXAttr {
+    GX_VA_PNMTXIDX = 0,
+    GX_VA_TEX0MTXIDX = 1,
+    GX_VA_TEX1MTXIDX = 2,
+    GX_VA_TEX2MTXIDX = 3,
+    GX_VA_TEX3MTXIDX = 4,
+    GX_VA_TEX4MTXIDX = 5,
+    GX_VA_TEX5MTXIDX = 6,
+    GX_VA_TEX6MTXIDX = 7,
+    GX_VA_TEX7MTXIDX = 8,
+    GX_VA_POS = 9,
+    GX_VA_NRM = 10,
+    GX_VA_CLR0 = 11,
+    GX_VA_CLR1 = 12,
+    GX_VA_TEX0 = 13,
+    GX_VA_TEX1 = 14,
+    GX_VA_TEX2 = 15,
+    GX_VA_TEX3 = 16,
+    GX_VA_TEX4 = 17,
+    GX_VA_TEX5 = 18,
+    GX_VA_TEX6 = 19,
+    GX_VA_TEX7 = 20,
+    GX_POS_MTX_ARRAY = 21,
+    GX_NRM_MTX_ARRAY = 22,
+    GX_TEX_MTX_ARRAY = 23,
+    GX_LIGHT_ARRAY = 24,
+    GX_VA_NBT = 25,
+    GX_VA_MAX_ATTR = 26,
+    GX_VA_NULL = 255,
+};
+typedef enum _GXAttr GXAttr;
+enum _GXVtxFmt {
+    GX_VTXFMT0 = 0,
+    GX_VTXFMT1 = 1,
+    GX_VTXFMT2 = 2,
+    GX_VTXFMT3 = 3,
+    GX_VTXFMT4 = 4,
+    GX_VTXFMT5 = 5,
+    GX_VTXFMT6 = 6,
+    GX_VTXFMT7 = 7,
+    GX_MAX_VTXFMT = 8,
+};
+typedef enum _GXVtxFmt GXVtxFmt;
+enum _GXAttrType {
+    GX_NONE = 0,
+    GX_DIRECT = 1,
+    GX_INDEX8 = 2,
+    GX_INDEX16 = 3,
+};
+typedef enum _GXAttrType GXAttrType;
+enum _GXTexCoordID {
+    GX_TEXCOORD0 = 0,
+    GX_TEXCOORD1 = 1,
+    GX_TEXCOORD2 = 2,
+    GX_TEXCOORD3 = 3,
+    GX_TEXCOORD4 = 4,
+    GX_TEXCOORD5 = 5,
+    GX_TEXCOORD6 = 6,
+    GX_TEXCOORD7 = 7,
+    GX_MAX_TEXCOORD = 8,
+    GX_TEXCOORD_NULL = 255,
+};
+typedef enum _GXTexCoordID GXTexCoordID;
+enum _GXTexGenType {
+    GX_TG_MTX3x4 = 0,
+    GX_TG_MTX2x4 = 1,
+    GX_TG_BUMP0 = 2,
+    GX_TG_BUMP1 = 3,
+    GX_TG_BUMP2 = 4,
+    GX_TG_BUMP3 = 5,
+    GX_TG_BUMP4 = 6,
+    GX_TG_BUMP5 = 7,
+    GX_TG_BUMP6 = 8,
+    GX_TG_BUMP7 = 9,
+    GX_TG_SRTG = 10,
+};
+typedef enum _GXTexGenType GXTexGenType;
+enum _GXTexGenSrc {
+    GX_TG_POS = 0,
+    GX_TG_NRM = 1,
+    GX_TG_BINRM = 2,
+    GX_TG_TANGENT = 3,
+    GX_TG_TEX0 = 4,
+    GX_TG_TEX1 = 5,
+    GX_TG_TEX2 = 6,
+    GX_TG_TEX3 = 7,
+    GX_TG_TEX4 = 8,
+    GX_TG_TEX5 = 9,
+    GX_TG_TEX6 = 10,
+    GX_TG_TEX7 = 11,
+    GX_TG_TEXCOORD0 = 12,
+    GX_TG_TEXCOORD1 = 13,
+    GX_TG_TEXCOORD2 = 14,
+    GX_TG_TEXCOORD3 = 15,
+    GX_TG_TEXCOORD4 = 16,
+    GX_TG_TEXCOORD5 = 17,
+    GX_TG_TEXCOORD6 = 18,
+    GX_TG_COLOR0 = 19,
+    GX_TG_COLOR1 = 20,
+};
+typedef enum _GXTexGenSrc GXTexGenSrc;
+enum _GXCompCnt {
+    GX_POS_XY = 0,
+    GX_POS_XYZ = 1,
+    GX_NRM_XYZ = 0,
+    GX_NRM_NBT = 1,
+    GX_NRM_NBT3 = 2,
+    GX_CLR_RGB = 0,
+    GX_CLR_RGBA = 1,
+    GX_TEX_S = 0,
+    GX_TEX_ST = 1,
+};
+typedef enum _GXCompCnt GXCompCnt;
+enum _GXCompType {
+    GX_U8 = 0,
+    GX_S8 = 1,
+    GX_U16 = 2,
+    GX_S16 = 3,
+    GX_F32 = 4,
+    GX_RGB565 = 0,
+    GX_RGB8 = 1,
+    GX_RGBX8 = 2,
+    GX_RGBA4 = 3,
+    GX_RGBA6 = 4,
+    GX_RGBA8 = 5,
+};
+typedef enum _GXCompType GXCompType;
+enum _GXChannelID {
+    GX_COLOR0 = 0,
+    GX_COLOR1 = 1,
+    GX_ALPHA0 = 2,
+    GX_ALPHA1 = 3,
+    GX_COLOR0A0 = 4,
+    GX_COLOR1A1 = 5,
+    GX_COLOR_ZERO = 6,
+    GX_ALPHA_BUMP = 7,
+    GX_ALPHA_BUMPN = 8,
+    GX_COLOR_NULL = 255,
+};
+typedef enum _GXChannelID GXChannelID;
+enum _GXColorSrc {
+    GX_SRC_REG = 0,
+    GX_SRC_VTX = 1,
+};
+typedef enum _GXColorSrc GXColorSrc;
+enum _GXLightID {
+    GX_LIGHT0 = 1,
+    GX_LIGHT1 = 2,
+    GX_LIGHT2 = 4,
+    GX_LIGHT3 = 8,
+    GX_LIGHT4 = 16,
+    GX_LIGHT5 = 32,
+    GX_LIGHT6 = 64,
+    GX_LIGHT7 = 128,
+    GX_MAX_LIGHT = 256,
+    GX_LIGHT_NULL = 0,
+};
+typedef enum _GXLightID GXLightID;
+enum _GXDiffuseFn {
+    GX_DF_NONE = 0,
+    GX_DF_SIGN = 1,
+    GX_DF_CLAMP = 2,
+};
+typedef enum _GXDiffuseFn GXDiffuseFn;
+enum _GXAttnFn {
+    GX_AF_SPEC = 0,
+    GX_AF_SPOT = 1,
+    GX_AF_NONE = 2,
+};
+typedef enum _GXAttnFn GXAttnFn;
+enum _GXSpotFn {
+    GX_SP_OFF = 0,
+    GX_SP_FLAT = 1,
+    GX_SP_COS = 2,
+    GX_SP_COS2 = 3,
+    GX_SP_SHARP = 4,
+    GX_SP_RING1 = 5,
+    GX_SP_RING2 = 6,
+};
+typedef enum _GXSpotFn GXSpotFn;
+enum _GXDistAttnFn {
+    GX_DA_OFF = 0,
+    GX_DA_GENTLE = 1,
+    GX_DA_MEDIUM = 2,
+    GX_DA_STEEP = 3,
+};
+typedef enum _GXDistAttnFn GXDistAttnFn;
+enum _GXPosNrmMtx {
+    GX_PNMTX0 = 0,
+    GX_PNMTX1 = 3,
+    GX_PNMTX2 = 6,
+    GX_PNMTX3 = 9,
+    GX_PNMTX4 = 12,
+    GX_PNMTX5 = 15,
+    GX_PNMTX6 = 18,
+    GX_PNMTX7 = 21,
+    GX_PNMTX8 = 24,
+    GX_PNMTX9 = 27,
+};
+typedef enum _GXPosNrmMtx GXPosNrmMtx;
+enum _GXTexMtx {
+    GX_TEXMTX0 = 30,
+    GX_TEXMTX1 = 33,
+    GX_TEXMTX2 = 36,
+    GX_TEXMTX3 = 39,
+    GX_TEXMTX4 = 42,
+    GX_TEXMTX5 = 45,
+    GX_TEXMTX6 = 48,
+    GX_TEXMTX7 = 51,
+    GX_TEXMTX8 = 54,
+    GX_TEXMTX9 = 57,
+    GX_IDENTITY = 60,
+};
+typedef enum _GXTexMtx GXTexMtx;
+enum _GXPTTexMtx {
+    GX_PTTEXMTX0 = 64,
+    GX_PTTEXMTX1 = 67,
+    GX_PTTEXMTX2 = 70,
+    GX_PTTEXMTX3 = 73,
+    GX_PTTEXMTX4 = 76,
+    GX_PTTEXMTX5 = 79,
+    GX_PTTEXMTX6 = 82,
+    GX_PTTEXMTX7 = 85,
+    GX_PTTEXMTX8 = 88,
+    GX_PTTEXMTX9 = 91,
+    GX_PTTEXMTX10 = 94,
+    GX_PTTEXMTX11 = 97,
+    GX_PTTEXMTX12 = 100,
+    GX_PTTEXMTX13 = 103,
+    GX_PTTEXMTX14 = 106,
+    GX_PTTEXMTX15 = 109,
+    GX_PTTEXMTX16 = 112,
+    GX_PTTEXMTX17 = 115,
+    GX_PTTEXMTX18 = 118,
+    GX_PTTEXMTX19 = 121,
+    GX_PTIDENTITY = 125,
+};
+typedef enum _GXPTTexMtx GXPTTexMtx;
+enum _GXTexMtxType {
+    GX_MTX3x4 = 0,
+    GX_MTX2x4 = 1,
+};
+typedef enum _GXTexMtxType GXTexMtxType;
+enum _GXPrimitive {
+    GX_POINTS = 184,
+    GX_LINES = 168,
+    GX_LINESTRIP = 176,
+    GX_TRIANGLES = 144,
+    GX_TRIANGLESTRIP = 152,
+    GX_TRIANGLEFAN = 160,
+    GX_QUADS = 128,
+};
+typedef enum _GXPrimitive GXPrimitive;
+enum _GXTexOffset {
+    GX_TO_ZERO = 0,
+    GX_TO_SIXTEENTH = 1,
+    GX_TO_EIGHTH = 2,
+    GX_TO_FOURTH = 3,
+    GX_TO_HALF = 4,
+    GX_TO_ONE = 5,
+    GX_MAX_TEXOFFSET = 6,
+};
+typedef enum _GXTexOffset GXTexOffset;
+enum _GXCullMode {
+    GX_CULL_NONE = 0,
+    GX_CULL_FRONT = 1,
+    GX_CULL_BACK = 2,
+    GX_CULL_ALL = 3,
+};
+typedef enum _GXCullMode GXCullMode;
+enum _GXClipMode {
+    GX_CLIP_ENABLE = 0,
+    GX_CLIP_DISABLE = 1,
+};
+typedef enum _GXClipMode GXClipMode;
+enum _GXTexWrapMode {
+    GX_CLAMP = 0,
+    GX_REPEAT = 1,
+    GX_MIRROR = 2,
+    GX_MAX_TEXWRAPMODE = 3,
+};
+typedef enum _GXTexWrapMode GXTexWrapMode;
+enum _GXTexFilter {
+    GX_NEAR = 0,
+    GX_LINEAR = 1,
+    GX_NEAR_MIP_NEAR = 2,
+    GX_LIN_MIP_NEAR = 3,
+    GX_NEAR_MIP_LIN = 4,
+    GX_LIN_MIP_LIN = 5,
+};
+typedef enum _GXTexFilter GXTexFilter;
+enum _GXCITexFmt {
+    GX_TF_C4 = 8,
+    GX_TF_C8 = 9,
+    GX_TF_C14X2 = 10,
+};
+typedef enum _GXCITexFmt GXCITexFmt;
+enum _GXTexFmt {
+    GX_TF_I4 = 0,
+    GX_TF_I8 = 1,
+    GX_TF_IA4 = 2,
+    GX_TF_IA8 = 3,
+    GX_TF_RGB565 = 4,
+    GX_TF_RGB5A3 = 5,
+    GX_TF_RGBA8 = 6,
+    GX_TF_CMPR = 14,
+    GX_CTF_R4 = 32,
+    GX_CTF_RA4 = 34,
+    GX_CTF_RA8 = 35,
+    GX_CTF_YUVA8 = 38,
+    GX_CTF_A8 = 39,
+    GX_CTF_R8 = 40,
+    GX_CTF_G8 = 41,
+    GX_CTF_B8 = 42,
+    GX_CTF_RG8 = 43,
+    GX_CTF_GB8 = 44,
+    GX_TF_Z8 = 17,
+    GX_TF_Z16 = 19,
+    GX_TF_Z24X8 = 22,
+    GX_CTF_Z4 = 48,
+    GX_CTF_Z8M = 57,
+    GX_CTF_Z8L = 58,
+    GX_CTF_Z16L = 60,
+    GX_TF_A8 = 39,
+};
+typedef enum _GXTexFmt GXTexFmt;
+enum _GXTlutFmt {
+    GX_TL_IA8 = 0,
+    GX_TL_RGB565 = 1,
+    GX_TL_RGB5A3 = 2,
+    GX_MAX_TLUTFMT = 3,
+};
+typedef enum _GXTlutFmt GXTlutFmt;
+enum _GXTlutSize {
+    GX_TLUT_16 = 1,
+    GX_TLUT_32 = 2,
+    GX_TLUT_64 = 4,
+    GX_TLUT_128 = 8,
+    GX_TLUT_256 = 16,
+    GX_TLUT_512 = 32,
+    GX_TLUT_1K = 64,
+    GX_TLUT_2K = 128,
+    GX_TLUT_4K = 256,
+    GX_TLUT_8K = 512,
+    GX_TLUT_16K = 1024,
+};
+typedef enum _GXTlutSize GXTlutSize;
+enum _GXTlut {
+    GX_TLUT0 = 0,
+    GX_TLUT1 = 1,
+    GX_TLUT2 = 2,
+    GX_TLUT3 = 3,
+    GX_TLUT4 = 4,
+    GX_TLUT5 = 5,
+    GX_TLUT6 = 6,
+    GX_TLUT7 = 7,
+    GX_TLUT8 = 8,
+    GX_TLUT9 = 9,
+    GX_TLUT10 = 10,
+    GX_TLUT11 = 11,
+    GX_TLUT12 = 12,
+    GX_TLUT13 = 13,
+    GX_TLUT14 = 14,
+    GX_TLUT15 = 15,
+    GX_BIGTLUT0 = 16,
+    GX_BIGTLUT1 = 17,
+    GX_BIGTLUT2 = 18,
+    GX_BIGTLUT3 = 19,
+};
+typedef enum _GXTlut GXTlut;
+enum _GXTexMapID {
+    GX_TEXMAP0 = 0,
+    GX_TEXMAP1 = 1,
+    GX_TEXMAP2 = 2,
+    GX_TEXMAP3 = 3,
+    GX_TEXMAP4 = 4,
+    GX_TEXMAP5 = 5,
+    GX_TEXMAP6 = 6,
+    GX_TEXMAP7 = 7,
+    GX_MAX_TEXMAP = 8,
+    GX_TEXMAP_NULL = 255,
+    GX_TEX_DISABLE = 256,
+};
+typedef enum _GXTexMapID GXTexMapID;
+enum _GXTexCacheSize {
+    GX_TEXCACHE_32K = 0,
+    GX_TEXCACHE_128K = 1,
+    GX_TEXCACHE_512K = 2,
+    GX_TEXCACHE_NONE = 3,
+};
+typedef enum _GXTexCacheSize GXTexCacheSize;
+enum _GXIndTexFormat {
+    GX_ITF_8 = 0,
+    GX_ITF_5 = 1,
+    GX_ITF_4 = 2,
+    GX_ITF_3 = 3,
+    GX_MAX_ITFORMAT = 4,
+};
+typedef enum _GXIndTexFormat GXIndTexFormat;
+enum _GXIndTexBiasSel {
+    GX_ITB_NONE = 0,
+    GX_ITB_S = 1,
+    GX_ITB_T = 2,
+    GX_ITB_ST = 3,
+    GX_ITB_U = 4,
+    GX_ITB_SU = 5,
+    GX_ITB_TU = 6,
+    GX_ITB_STU = 7,
+    GX_MAX_ITBIAS = 8,
+};
+typedef enum _GXIndTexBiasSel GXIndTexBiasSel;
+enum _GXIndTexAlphaSel {
+    GX_ITBA_OFF = 0,
+    GX_ITBA_S = 1,
+    GX_ITBA_T = 2,
+    GX_ITBA_U = 3,
+    GX_MAX_ITBALPHA = 4,
+};
+typedef enum _GXIndTexAlphaSel GXIndTexAlphaSel;
+enum _GXIndTexMtxID {
+    GX_ITM_OFF = 0,
+    GX_ITM_0 = 1,
+    GX_ITM_1 = 2,
+    GX_ITM_2 = 3,
+    GX_ITM_S0 = 5,
+    GX_ITM_S1 = 6,
+    GX_ITM_S2 = 7,
+    GX_ITM_T0 = 9,
+    GX_ITM_T1 = 10,
+    GX_ITM_T2 = 11,
+};
+typedef enum _GXIndTexMtxID GXIndTexMtxID;
+enum _GXIndTexWrap {
+    GX_ITW_OFF = 0,
+    GX_ITW_256 = 1,
+    GX_ITW_128 = 2,
+    GX_ITW_64 = 3,
+    GX_ITW_32 = 4,
+    GX_ITW_16 = 5,
+    GX_ITW_0 = 6,
+    GX_MAX_ITWRAP = 7,
+};
+typedef enum _GXIndTexWrap GXIndTexWrap;
+enum _GXIndTexScale {
+    GX_ITS_1 = 0,
+    GX_ITS_2 = 1,
+    GX_ITS_4 = 2,
+    GX_ITS_8 = 3,
+    GX_ITS_16 = 4,
+    GX_ITS_32 = 5,
+    GX_ITS_64 = 6,
+    GX_ITS_128 = 7,
+    GX_ITS_256 = 8,
+    GX_MAX_ITSCALE = 9,
+};
+typedef enum _GXIndTexScale GXIndTexScale;
+enum _GXIndTexStageID {
+    GX_INDTEXSTAGE0 = 0,
+    GX_INDTEXSTAGE1 = 1,
+    GX_INDTEXSTAGE2 = 2,
+    GX_INDTEXSTAGE3 = 3,
+    GX_MAX_INDTEXSTAGE = 4,
+};
+typedef enum _GXIndTexStageID GXIndTexStageID;
+enum _GXTevStageID {
+    GX_TEVSTAGE0 = 0,
+    GX_TEVSTAGE1 = 1,
+    GX_TEVSTAGE2 = 2,
+    GX_TEVSTAGE3 = 3,
+    GX_TEVSTAGE4 = 4,
+    GX_TEVSTAGE5 = 5,
+    GX_TEVSTAGE6 = 6,
+    GX_TEVSTAGE7 = 7,
+    GX_TEVSTAGE8 = 8,
+    GX_TEVSTAGE9 = 9,
+    GX_TEVSTAGE10 = 10,
+    GX_TEVSTAGE11 = 11,
+    GX_TEVSTAGE12 = 12,
+    GX_TEVSTAGE13 = 13,
+    GX_TEVSTAGE14 = 14,
+    GX_TEVSTAGE15 = 15,
+    GX_MAX_TEVSTAGE = 16,
+};
+typedef enum _GXTevStageID GXTevStageID;
+enum _GXTevRegID {
+    GX_TEVPREV = 0,
+    GX_TEVREG0 = 1,
+    GX_TEVREG1 = 2,
+    GX_TEVREG2 = 3,
+    GX_MAX_TEVREG = 4,
+};
+typedef enum _GXTevRegID GXTevRegID;
+enum _GXTevOp {
+    GX_TEV_ADD = 0,
+    GX_TEV_SUB = 1,
+    GX_TEV_COMP_R8_GT = 8,
+    GX_TEV_COMP_R8_EQ = 9,
+    GX_TEV_COMP_GR16_GT = 10,
+    GX_TEV_COMP_GR16_EQ = 11,
+    GX_TEV_COMP_BGR24_GT = 12,
+    GX_TEV_COMP_BGR24_EQ = 13,
+    GX_TEV_COMP_RGB8_GT = 14,
+    GX_TEV_COMP_RGB8_EQ = 15,
+    GX_TEV_COMP_A8_GT = 14,
+    GX_TEV_COMP_A8_EQ = 15,
+};
+typedef enum _GXTevOp GXTevOp;
+enum _GXTevColorArg {
+    GX_CC_CPREV = 0,
+    GX_CC_APREV = 1,
+    GX_CC_C0 = 2,
+    GX_CC_A0 = 3,
+    GX_CC_C1 = 4,
+    GX_CC_A1 = 5,
+    GX_CC_C2 = 6,
+    GX_CC_A2 = 7,
+    GX_CC_TEXC = 8,
+    GX_CC_TEXA = 9,
+    GX_CC_RASC = 10,
+    GX_CC_RASA = 11,
+    GX_CC_ONE = 12,
+    GX_CC_HALF = 13,
+    GX_CC_KONST = 14,
+    GX_CC_ZERO = 15,
+    GX_CC_TEXRRR = 16,
+    GX_CC_TEXGGG = 17,
+    GX_CC_TEXBBB = 18,
+    GX_CC_QUARTER = 14,
+};
+typedef enum _GXTevColorArg GXTevColorArg;
+enum _GXTevAlphaArg {
+    GX_CA_APREV = 0,
+    GX_CA_A0 = 1,
+    GX_CA_A1 = 2,
+    GX_CA_A2 = 3,
+    GX_CA_TEXA = 4,
+    GX_CA_RASA = 5,
+    GX_CA_KONST = 6,
+    GX_CA_ZERO = 7,
+    GX_CA_ONE = 6,
+};
+typedef enum _GXTevAlphaArg GXTevAlphaArg;
+enum _GXTevBias {
+    GX_TB_ZERO = 0,
+    GX_TB_ADDHALF = 1,
+    GX_TB_SUBHALF = 2,
+    GX_MAX_TEVBIAS = 3,
+};
+typedef enum _GXTevBias GXTevBias;
+enum _GXTevClampMode {
+    GX_TC_LINEAR = 0,
+    GX_TC_GE = 1,
+    GX_TC_EQ = 2,
+    GX_TC_LE = 3,
+    GX_MAX_TEVCLAMPMODE = 4,
+};
+typedef enum _GXTevClampMode GXTevClampMode;
+enum _GXTevKColorID {
+    GX_KCOLOR0 = 0,
+    GX_KCOLOR1 = 1,
+    GX_KCOLOR2 = 2,
+    GX_KCOLOR3 = 3,
+    GX_MAX_KCOLOR = 4,
+};
+typedef enum _GXTevKColorID GXTevKColorID;
+enum _GXTevKColorSel {
+    GX_TEV_KCSEL_8_8 = 0,
+    GX_TEV_KCSEL_7_8 = 1,
+    GX_TEV_KCSEL_6_8 = 2,
+    GX_TEV_KCSEL_5_8 = 3,
+    GX_TEV_KCSEL_4_8 = 4,
+    GX_TEV_KCSEL_3_8 = 5,
+    GX_TEV_KCSEL_2_8 = 6,
+    GX_TEV_KCSEL_1_8 = 7,
+    GX_TEV_KCSEL_1 = 0,
+    GX_TEV_KCSEL_3_4 = 2,
+    GX_TEV_KCSEL_1_2 = 4,
+    GX_TEV_KCSEL_1_4 = 6,
+    GX_TEV_KCSEL_K0 = 12,
+    GX_TEV_KCSEL_K1 = 13,
+    GX_TEV_KCSEL_K2 = 14,
+    GX_TEV_KCSEL_K3 = 15,
+    GX_TEV_KCSEL_K0_R = 16,
+    GX_TEV_KCSEL_K1_R = 17,
+    GX_TEV_KCSEL_K2_R = 18,
+    GX_TEV_KCSEL_K3_R = 19,
+    GX_TEV_KCSEL_K0_G = 20,
+    GX_TEV_KCSEL_K1_G = 21,
+    GX_TEV_KCSEL_K2_G = 22,
+    GX_TEV_KCSEL_K3_G = 23,
+    GX_TEV_KCSEL_K0_B = 24,
+    GX_TEV_KCSEL_K1_B = 25,
+    GX_TEV_KCSEL_K2_B = 26,
+    GX_TEV_KCSEL_K3_B = 27,
+    GX_TEV_KCSEL_K0_A = 28,
+    GX_TEV_KCSEL_K1_A = 29,
+    GX_TEV_KCSEL_K2_A = 30,
+    GX_TEV_KCSEL_K3_A = 31,
+};
+typedef enum _GXTevKColorSel GXTevKColorSel;
+enum _GXTevKAlphaSel {
+    GX_TEV_KASEL_8_8 = 0,
+    GX_TEV_KASEL_7_8 = 1,
+    GX_TEV_KASEL_6_8 = 2,
+    GX_TEV_KASEL_5_8 = 3,
+    GX_TEV_KASEL_4_8 = 4,
+    GX_TEV_KASEL_3_8 = 5,
+    GX_TEV_KASEL_2_8 = 6,
+    GX_TEV_KASEL_1_8 = 7,
+    GX_TEV_KASEL_1 = 0,
+    GX_TEV_KASEL_3_4 = 2,
+    GX_TEV_KASEL_1_2 = 4,
+    GX_TEV_KASEL_1_4 = 6,
+    GX_TEV_KASEL_K0_R = 16,
+    GX_TEV_KASEL_K1_R = 17,
+    GX_TEV_KASEL_K2_R = 18,
+    GX_TEV_KASEL_K3_R = 19,
+    GX_TEV_KASEL_K0_G = 20,
+    GX_TEV_KASEL_K1_G = 21,
+    GX_TEV_KASEL_K2_G = 22,
+    GX_TEV_KASEL_K3_G = 23,
+    GX_TEV_KASEL_K0_B = 24,
+    GX_TEV_KASEL_K1_B = 25,
+    GX_TEV_KASEL_K2_B = 26,
+    GX_TEV_KASEL_K3_B = 27,
+    GX_TEV_KASEL_K0_A = 28,
+    GX_TEV_KASEL_K1_A = 29,
+    GX_TEV_KASEL_K2_A = 30,
+    GX_TEV_KASEL_K3_A = 31,
+};
+typedef enum _GXTevKAlphaSel GXTevKAlphaSel;
+enum _GXTevSwapSel {
+    GX_TEV_SWAP0 = 0,
+    GX_TEV_SWAP1 = 1,
+    GX_TEV_SWAP2 = 2,
+    GX_TEV_SWAP3 = 3,
+    GX_MAX_TEVSWAP = 4,
+};
+typedef enum _GXTevSwapSel GXTevSwapSel;
+enum _GXTevColorChan {
+    GX_CH_RED = 0,
+    GX_CH_GREEN = 1,
+    GX_CH_BLUE = 2,
+    GX_CH_ALPHA = 3,
+};
+typedef enum _GXTevColorChan GXTevColorChan;
+enum _GXAlphaOp {
+    GX_AOP_AND = 0,
+    GX_AOP_OR = 1,
+    GX_AOP_XOR = 2,
+    GX_AOP_XNOR = 3,
+    GX_MAX_ALPHAOP = 4,
+};
+typedef enum _GXAlphaOp GXAlphaOp;
+enum _GXTevScale {
+    GX_CS_SCALE_1 = 0,
+    GX_CS_SCALE_2 = 1,
+    GX_CS_SCALE_4 = 2,
+    GX_CS_DIVIDE_2 = 3,
+    GX_MAX_TEVSCALE = 4,
+};
+typedef enum _GXTevScale GXTevScale;
+enum _GXFogType {
+    GX_FOG_NONE = 0,
+    GX_FOG_PERSP_LIN = 2,
+    GX_FOG_PERSP_EXP = 4,
+    GX_FOG_PERSP_EXP2 = 5,
+    GX_FOG_PERSP_REVEXP = 6,
+    GX_FOG_PERSP_REVEXP2 = 7,
+    GX_FOG_ORTHO_LIN = 10,
+    GX_FOG_ORTHO_EXP = 12,
+    GX_FOG_ORTHO_EXP2 = 13,
+    GX_FOG_ORTHO_REVEXP = 14,
+    GX_FOG_ORTHO_REVEXP2 = 15,
+    GX_FOG_LIN = 2,
+    GX_FOG_EXP = 4,
+    GX_FOG_EXP2 = 5,
+    GX_FOG_REVEXP = 6,
+    GX_FOG_REVEXP2 = 7,
+};
+typedef enum _GXFogType GXFogType;
+enum _GXBlendMode {
+    GX_BM_NONE = 0,
+    GX_BM_BLEND = 1,
+    GX_BM_LOGIC = 2,
+    GX_BM_SUBTRACT = 3,
+    GX_MAX_BLENDMODE = 4,
+};
+typedef enum _GXBlendMode GXBlendMode;
+enum _GXBlendFactor {
+    GX_BL_ZERO = 0,
+    GX_BL_ONE = 1,
+    GX_BL_SRCCLR = 2,
+    GX_BL_INVSRCCLR = 3,
+    GX_BL_SRCALPHA = 4,
+    GX_BL_INVSRCALPHA = 5,
+    GX_BL_DSTALPHA = 6,
+    GX_BL_INVDSTALPHA = 7,
+    GX_BL_DSTCLR = 2,
+    GX_BL_INVDSTCLR = 3,
+};
+typedef enum _GXBlendFactor GXBlendFactor;
+enum _GXCompare {
+    GX_NEVER = 0,
+    GX_LESS = 1,
+    GX_EQUAL = 2,
+    GX_LEQUAL = 3,
+    GX_GREATER = 4,
+    GX_NEQUAL = 5,
+    GX_GEQUAL = 6,
+    GX_ALWAYS = 7,
+};
+typedef enum _GXCompare GXCompare;
+enum _GXLogicOp {
+    GX_LO_CLEAR = 0,
+    GX_LO_AND = 1,
+    GX_LO_REVAND = 2,
+    GX_LO_COPY = 3,
+    GX_LO_INVAND = 4,
+    GX_LO_NOOP = 5,
+    GX_LO_XOR = 6,
+    GX_LO_OR = 7,
+    GX_LO_NOR = 8,
+    GX_LO_EQUIV = 9,
+    GX_LO_INV = 10,
+    GX_LO_REVOR = 11,
+    GX_LO_INVCOPY = 12,
+    GX_LO_INVOR = 13,
+    GX_LO_NAND = 14,
+    GX_LO_SET = 15,
+};
+typedef enum _GXLogicOp GXLogicOp;
+enum _GXPixelFmt {
+    GX_PF_RGB8_Z24 = 0,
+    GX_PF_RGBA6_Z24 = 1,
+    GX_PF_RGB565_Z16 = 2,
+    GX_PF_Z24 = 3,
+    GX_PF_Y8 = 4,
+    GX_PF_U8 = 5,
+    GX_PF_V8 = 6,
+    GX_PF_YUV420 = 7,
+};
+typedef enum _GXPixelFmt GXPixelFmt;
+enum _GXZFmt16 {
+    GX_ZC_LINEAR = 0,
+    GX_ZC_NEAR = 1,
+    GX_ZC_MID = 2,
+    GX_ZC_FAR = 3,
+};
+typedef enum _GXZFmt16 GXZFmt16;
+enum _GXTevMode {
+    GX_MODULATE = 0,
+    GX_DECAL = 1,
+    GX_BLEND = 2,
+    GX_REPLACE = 3,
+    GX_PASSCLR = 4,
+};
+typedef enum _GXTevMode GXTevMode;
+enum _GXGamma {
+    GX_GM_1_0 = 0,
+    GX_GM_1_7 = 1,
+    GX_GM_2_2 = 2,
+};
+typedef enum _GXGamma GXGamma;
+enum _GXProjectionType {
+    GX_PERSPECTIVE = 0,
+    GX_ORTHOGRAPHIC = 1,
+};
+typedef enum _GXProjectionType GXProjectionType;
+enum _GXEvent {
+    GX_VCACHE_MISS_ALL = 0,
+    GX_VCACHE_MISS_POS = 1,
+    GX_VCACHE_MISS_NRM = 2,
+};
+typedef enum _GXEvent GXEvent;
+enum _GXFBClamp {
+    GX_CLAMP_NONE = 0,
+    GX_CLAMP_TOP = 1,
+    GX_CLAMP_BOTTOM = 2,
+};
+typedef enum _GXFBClamp GXFBClamp;
+enum _GXAnisotropy {
+    GX_ANISO_1 = 0,
+    GX_ANISO_2 = 1,
+    GX_ANISO_4 = 2,
+    GX_MAX_ANISOTROPY = 3,
+};
+typedef enum _GXAnisotropy GXAnisotropy;
+enum _GXZTexOp {
+    GX_ZT_DISABLE = 0,
+    GX_ZT_ADD = 1,
+    GX_ZT_REPLACE = 2,
+    GX_MAX_ZTEXOP = 3,
+};
+typedef enum _GXZTexOp GXZTexOp;
+enum _GXAlphaReadMode {
+    GX_READ_00 = 0,
+    GX_READ_FF = 1,
+    GX_READ_NONE = 2,
+};
+typedef enum _GXAlphaReadMode GXAlphaReadMode;
+enum _GXPerf0 {
+    GX_PERF0_VERTICES = 0,
+    GX_PERF0_CLIP_VTX = 1,
+    GX_PERF0_CLIP_CLKS = 2,
+    GX_PERF0_XF_WAIT_IN = 3,
+    GX_PERF0_XF_WAIT_OUT = 4,
+    GX_PERF0_XF_XFRM_CLKS = 5,
+    GX_PERF0_XF_LIT_CLKS = 6,
+    GX_PERF0_XF_BOT_CLKS = 7,
+    GX_PERF0_XF_REGLD_CLKS = 8,
+    GX_PERF0_XF_REGRD_CLKS = 9,
+    GX_PERF0_CLIP_RATIO = 10,
+    GX_PERF0_TRIANGLES = 11,
+    GX_PERF0_TRIANGLES_CULLED = 12,
+    GX_PERF0_TRIANGLES_PASSED = 13,
+    GX_PERF0_TRIANGLES_SCISSORED = 14,
+    GX_PERF0_TRIANGLES_0TEX = 15,
+    GX_PERF0_TRIANGLES_1TEX = 16,
+    GX_PERF0_TRIANGLES_2TEX = 17,
+    GX_PERF0_TRIANGLES_3TEX = 18,
+    GX_PERF0_TRIANGLES_4TEX = 19,
+    GX_PERF0_TRIANGLES_5TEX = 20,
+    GX_PERF0_TRIANGLES_6TEX = 21,
+    GX_PERF0_TRIANGLES_7TEX = 22,
+    GX_PERF0_TRIANGLES_8TEX = 23,
+    GX_PERF0_TRIANGLES_0CLR = 24,
+    GX_PERF0_TRIANGLES_1CLR = 25,
+    GX_PERF0_TRIANGLES_2CLR = 26,
+    GX_PERF0_QUAD_0CVG = 27,
+    GX_PERF0_QUAD_NON0CVG = 28,
+    GX_PERF0_QUAD_1CVG = 29,
+    GX_PERF0_QUAD_2CVG = 30,
+    GX_PERF0_QUAD_3CVG = 31,
+    GX_PERF0_QUAD_4CVG = 32,
+    GX_PERF0_AVG_QUAD_CNT = 33,
+    GX_PERF0_CLOCKS = 34,
+    GX_PERF0_NONE = 35,
+};
+typedef enum _GXPerf0 GXPerf0;
+enum _GXPerf1 {
+    GX_PERF1_TEXELS = 0,
+    GX_PERF1_TX_IDLE = 1,
+    GX_PERF1_TX_REGS = 2,
+    GX_PERF1_TX_MEMSTALL = 3,
+    GX_PERF1_TC_CHECK1_2 = 4,
+    GX_PERF1_TC_CHECK3_4 = 5,
+    GX_PERF1_TC_CHECK5_6 = 6,
+    GX_PERF1_TC_CHECK7_8 = 7,
+    GX_PERF1_TC_MISS = 8,
+    GX_PERF1_VC_ELEMQ_FULL = 9,
+    GX_PERF1_VC_MISSQ_FULL = 10,
+    GX_PERF1_VC_MEMREQ_FULL = 11,
+    GX_PERF1_VC_STATUS7 = 12,
+    GX_PERF1_VC_MISSREP_FULL = 13,
+    GX_PERF1_VC_STREAMBUF_LOW = 14,
+    GX_PERF1_VC_ALL_STALLS = 15,
+    GX_PERF1_VERTICES = 16,
+    GX_PERF1_FIFO_REQ = 17,
+    GX_PERF1_CALL_REQ = 18,
+    GX_PERF1_VC_MISS_REQ = 19,
+    GX_PERF1_CP_ALL_REQ = 20,
+    GX_PERF1_CLOCKS = 21,
+    GX_PERF1_NONE = 22,
+};
+typedef enum _GXPerf1 GXPerf1;
+enum _GXVCachePerf {
+    GX_VC_POS = 0,
+    GX_VC_NRM = 1,
+    GX_VC_CLR0 = 2,
+    GX_VC_CLR1 = 3,
+    GX_VC_TEX0 = 4,
+    GX_VC_TEX1 = 5,
+    GX_VC_TEX2 = 6,
+    GX_VC_TEX3 = 7,
+    GX_VC_TEX4 = 8,
+    GX_VC_TEX5 = 9,
+    GX_VC_TEX6 = 10,
+    GX_VC_TEX7 = 11,
+    GX_VC_ALL = 15,
+};
+typedef enum _GXVCachePerf GXVCachePerf;
+enum _GXCopyMode {
+    GX_COPY_PROGRESSIVE = 0,
+    GX_COPY_INTLC_EVEN = 2,
+    GX_COPY_INTLC_ODD = 3,
+};
+typedef enum _GXCopyMode GXCopyMode;
+enum _GXMiscToken {
+    GX_MT_XF_FLUSH = 1,
+    GX_MT_DL_SAVE_CONTEXT = 2,
+    GX_MT_ABORT_WAIT_COPYOUT = 3,
+    GX_MT_NULL = 0,
+};
+typedef enum _GXMiscToken GXMiscToken;
+enum _GXXFFlushVal {
+    GX_XF_FLUSH_NONE = 0,
+    GX_XF_FLUSH_SAFE = 8,
+};
+typedef enum _GXXFFlushVal GXXFFlushVal;
+typedef enum {
+    VI_TVMODE_NTSC_INT = 0,
+    VI_TVMODE_NTSC_DS = 1,
+    VI_TVMODE_NTSC_PROG = 2,
+    VI_TVMODE_PAL_INT = 4,
+    VI_TVMODE_PAL_DS = 5,
+    VI_TVMODE_EURGB60_INT = 20,
+    VI_TVMODE_EURGB60_DS = 21,
+    VI_TVMODE_MPAL_INT = 8,
+    VI_TVMODE_MPAL_DS = 9,
+    VI_TVMODE_DEBUG_INT = 12,
+    VI_TVMODE_DEBUG_PAL_INT = 16,
+    VI_TVMODE_DEBUG_PAL_DS = 17,
+} VITVMode;
+typedef enum {
+    VI_XFBMODE_SF = 0,
+    VI_XFBMODE_DF = 1,
+} VIXFBMode;
+typedef void (* VIRetraceCallback)(unsigned int);
+// total size: 0x4
+struct _GXColor {
+    // Members
+    unsigned char r; // offset 0x0, size 0x1
+    unsigned char g; // offset 0x1, size 0x1
+    unsigned char b; // offset 0x2, size 0x1
+    unsigned char a; // offset 0x3, size 0x1
+};
+typedef struct _GXColor GXColor;
+// total size: 0x8
+struct _GXColorS10 {
+    // Members
+    short r; // offset 0x0, size 0x2
+    short g; // offset 0x2, size 0x2
+    short b; // offset 0x4, size 0x2
+    short a; // offset 0x6, size 0x2
+};
+typedef struct _GXColorS10 GXColorS10;
+// total size: 0x20
+struct _GXTexObj {
+    // Members
+    unsigned int dummy[8]; // offset 0x0, size 0x20
+};
+typedef struct _GXTexObj GXTexObj;
+// total size: 0xC
+struct _GXTlutObj {
+    // Members
+    unsigned int dummy[3]; // offset 0x0, size 0xC
+};
+typedef struct _GXTlutObj GXTlutObj;
+// total size: 0x40
+struct _GXLightObj {
+    // Members
+    unsigned int dummy[16]; // offset 0x0, size 0x40
+};
+typedef struct _GXLightObj GXLightObj;
+// total size: 0x10
+struct _GXVtxAttrFmtList {
+    // Members
+    GXAttr attr; // offset 0x0, size 0x4
+    GXCompCnt cnt; // offset 0x4, size 0x4
+    GXCompType type; // offset 0x8, size 0x4
+    unsigned char frac; // offset 0xC, size 0x1
+};
+typedef struct _GXVtxAttrFmtList GXVtxAttrFmtList;
+// total size: 0x10
+struct _GXTexRegion {
+    // Members
+    unsigned int dummy[4]; // offset 0x0, size 0x10
+};
+typedef struct _GXTexRegion GXTexRegion;
+// total size: 0x10
+struct _GXTlutRegion {
+    // Members
+    unsigned int dummy[4]; // offset 0x0, size 0x10
+};
+typedef struct _GXTlutRegion GXTlutRegion;
+// total size: 0x8
+struct _GXVtxDescList {
+    // Members
+    GXAttr attr; // offset 0x0, size 0x4
+    GXAttrType type; // offset 0x4, size 0x4
+};
+typedef struct _GXVtxDescList GXVtxDescList;
+// total size: 0x3C
+struct _GXRenderModeObj {
+    // Members
+    VITVMode viTVmode; // offset 0x0, size 0x4
+    unsigned short fbWidth; // offset 0x4, size 0x2
+    unsigned short efbHeight; // offset 0x6, size 0x2
+    unsigned short xfbHeight; // offset 0x8, size 0x2
+    unsigned short viXOrigin; // offset 0xA, size 0x2
+    unsigned short viYOrigin; // offset 0xC, size 0x2
+    unsigned short viWidth; // offset 0xE, size 0x2
+    unsigned short viHeight; // offset 0x10, size 0x2
+    VIXFBMode xFBmode; // offset 0x14, size 0x4
+    unsigned char field_rendering; // offset 0x18, size 0x1
+    unsigned char aa; // offset 0x19, size 0x1
+    unsigned char sample_pattern[2][12]; // offset 0x1A, size 0x18
+    unsigned char vfilter[7]; // offset 0x32, size 0x7
+};
+typedef struct _GXRenderModeObj GXRenderModeObj;
+// total size: 0x14
+struct _GXFogAdjTable {
+    // Members
+    unsigned short r[10]; // offset 0x0, size 0x14
+};
+typedef struct _GXFogAdjTable GXFogAdjTable;
+typedef long long OSTime;
+typedef unsigned int OSTick;
+unsigned int __OSBusClock; // size: 0x4, address: 0x800000F8
+unsigned int __OSCoreClock; // size: 0x4, address: 0x800000FC
+// total size: 0x28
+struct OSCalendarTime {
+    // Members
+    int sec; // offset 0x0, size 0x4
+    int min; // offset 0x4, size 0x4
+    int hour; // offset 0x8, size 0x4
+    int mday; // offset 0xC, size 0x4
+    int mon; // offset 0x10, size 0x4
+    int year; // offset 0x14, size 0x4
+    int wday; // offset 0x18, size 0x4
+    int yday; // offset 0x1C, size 0x4
+    int msec; // offset 0x20, size 0x4
+    int usec; // offset 0x24, size 0x4
+};
+typedef struct OSCalendarTime OSCalendarTime;
+// total size: 0x30
+struct OSStopwatch {
+    // Members
+    char * name; // offset 0x0, size 0x4
+    unsigned int hits; // offset 0x4, size 0x4
+    long long total; // offset 0x8, size 0x8
+    long long min; // offset 0x10, size 0x8
+    long long max; // offset 0x18, size 0x8
+    long long last; // offset 0x20, size 0x8
+    int running; // offset 0x28, size 0x4
+    unsigned int _padding; // offset 0x2C, size 0x4
+};
+typedef struct OSStopwatch OSStopwatch;
+typedef int OSHeapHandle;
+typedef void (* OSAllocVisitor)(void *, unsigned int);
+// total size: 0x2C8
+struct OSContext {
+    // Members
+    unsigned int gpr[32]; // offset 0x0, size 0x80
+    unsigned int cr; // offset 0x80, size 0x4
+    unsigned int lr; // offset 0x84, size 0x4
+    unsigned int ctr; // offset 0x88, size 0x4
+    unsigned int xer; // offset 0x8C, size 0x4
+    double fpr[32]; // offset 0x90, size 0x100
+    unsigned int fpscr_pad; // offset 0x190, size 0x4
+    unsigned int fpscr; // offset 0x194, size 0x4
+    unsigned int srr0; // offset 0x198, size 0x4
+    unsigned int srr1; // offset 0x19C, size 0x4
+    unsigned short mode; // offset 0x1A0, size 0x2
+    unsigned short state; // offset 0x1A2, size 0x2
+    unsigned int gqr[8]; // offset 0x1A4, size 0x20
+    unsigned int psf_pad; // offset 0x1C4, size 0x4
+    double psf[32]; // offset 0x1C8, size 0x100
+};
+typedef struct OSContext OSContext;
+// total size: 0x28
+struct OSAlarm {
+    // Members
+    void (* handler)(struct OSAlarm *, OSContext *); // offset 0x0, size 0x4
+    unsigned int tag; // offset 0x4, size 0x4
+    long long fire; // offset 0x8, size 0x8
+    struct OSAlarm * prev; // offset 0x10, size 0x4
+    struct OSAlarm * next; // offset 0x14, size 0x4
+    long long period; // offset 0x18, size 0x8
+    long long start; // offset 0x20, size 0x8
+};
+typedef struct OSAlarm OSAlarm;
+typedef void (* OSAlarmHandler)(OSAlarm *, OSContext *);
+typedef unsigned char __OSException;
+typedef void (* __OSExceptionHandler)(unsigned char, OSContext *);
+typedef unsigned short OSError;
+typedef void (* OSErrorHandler)(unsigned short, OSContext *, ...);
+// total size: 0x30
+struct OSFontHeader {
+    // Members
+    unsigned short fontType; // offset 0x0, size 0x2
+    unsigned short firstChar; // offset 0x2, size 0x2
+    unsigned short lastChar; // offset 0x4, size 0x2
+    unsigned short invalChar; // offset 0x6, size 0x2
+    unsigned short ascent; // offset 0x8, size 0x2
+    unsigned short descent; // offset 0xA, size 0x2
+    unsigned short width; // offset 0xC, size 0x2
+    unsigned short leading; // offset 0xE, size 0x2
+    unsigned short cellWidth; // offset 0x10, size 0x2
+    unsigned short cellHeight; // offset 0x12, size 0x2
+    unsigned int sheetSize; // offset 0x14, size 0x4
+    unsigned short sheetFormat; // offset 0x18, size 0x2
+    unsigned short sheetColumn; // offset 0x1A, size 0x2
+    unsigned short sheetRow; // offset 0x1C, size 0x2
+    unsigned short sheetWidth; // offset 0x1E, size 0x2
+    unsigned short sheetHeight; // offset 0x20, size 0x2
+    unsigned short widthTable; // offset 0x22, size 0x2
+    unsigned int sheetImage; // offset 0x24, size 0x4
+    unsigned int sheetFullSize; // offset 0x28, size 0x4
+    unsigned char c0; // offset 0x2C, size 0x1
+    unsigned char c1; // offset 0x2D, size 0x1
+    unsigned char c2; // offset 0x2E, size 0x1
+    unsigned char c3; // offset 0x2F, size 0x1
+};
+typedef struct OSFontHeader OSFontHeader;
+typedef short __OSInterrupt;
+typedef void (* __OSInterruptHandler)(short, OSContext *);
+typedef unsigned int OSInterruptMask;
+// total size: 0x318
+struct OSThread {
+    // Members
+    OSContext context; // offset 0x0, size 0x2C8
+    unsigned short state; // offset 0x2C8, size 0x2
+    unsigned short attr; // offset 0x2CA, size 0x2
+    int suspend; // offset 0x2CC, size 0x4
+    int priority; // offset 0x2D0, size 0x4
+    int base; // offset 0x2D4, size 0x4
+    void * val; // offset 0x2D8, size 0x4
+    struct OSThreadQueue * queue; // offset 0x2DC, size 0x4
+    struct OSThreadLink link; // offset 0x2E0, size 0x8
+    struct OSThreadQueue queueJoin; // offset 0x2E8, size 0x8
+    struct OSMutex * mutex; // offset 0x2F0, size 0x4
+    struct OSMutexQueue queueMutex; // offset 0x2F4, size 0x8
+    struct OSThreadLink linkActive; // offset 0x2FC, size 0x8
+    unsigned char * stackBase; // offset 0x304, size 0x4
+    unsigned long * stackEnd; // offset 0x308, size 0x4
+    int error; // offset 0x30C, size 0x4
+    void * specific[2]; // offset 0x310, size 0x8
+};
+// total size: 0x8
+struct OSThreadLink {
+    // Members
+    struct OSThread * next; // offset 0x0, size 0x4
+    struct OSThread * prev; // offset 0x4, size 0x4
+};
+// total size: 0x8
+struct OSThreadQueue {
+    // Members
+    struct OSThread * head; // offset 0x0, size 0x4
+    struct OSThread * tail; // offset 0x4, size 0x4
+};
+// total size: 0x18
+struct OSMutex {
+    // Members
+    struct OSThreadQueue queue; // offset 0x0, size 0x8
+    struct OSThread * thread; // offset 0x8, size 0x4
+    int count; // offset 0xC, size 0x4
+    struct OSMutexLink link; // offset 0x10, size 0x8
+};
+// total size: 0x8
+struct OSMutexQueue {
+    // Members
+    struct OSMutex * head; // offset 0x0, size 0x4
+    struct OSMutex * tail; // offset 0x4, size 0x4
+};
+// total size: 0x8
+struct OSMutexLink {
+    // Members
+    struct OSMutex * next; // offset 0x0, size 0x4
+    struct OSMutex * prev; // offset 0x4, size 0x4
+};
+typedef struct OSThread OSThread;
+typedef struct OSThreadQueue OSThreadQueue;
+typedef struct OSThreadLink OSThreadLink;
+typedef int OSPriority;
+typedef struct OSMutex OSMutex;
+typedef struct OSMutexQueue OSMutexQueue;
+typedef struct OSMutexLink OSMutexLink;
+// total size: 0x8
+struct OSCond {
+    // Members
+    OSThreadQueue queue; // offset 0x0, size 0x8
+};
+typedef struct OSCond OSCond;
+typedef void (* OSIdleFunction)(void *);
+typedef void (* OSSwitchThreadCallback)(OSThread *, OSThread *);
+enum OS_THREAD_STATE {
+    OS_THREAD_STATE_READY = 1,
+    OS_THREAD_STATE_RUNNING = 2,
+    OS_THREAD_STATE_WAITING = 4,
+    OS_THREAD_STATE_MORIBUND = 8,
+};
+// total size: 0x20
+struct OSMessageQueue {
+    // Members
+    OSThreadQueue queueSend; // offset 0x0, size 0x8
+    OSThreadQueue queueReceive; // offset 0x8, size 0x8
+    void * * msgArray; // offset 0x10, size 0x4
+    int msgCount; // offset 0x14, size 0x4
+    int firstIndex; // offset 0x18, size 0x4
+    int usedCount; // offset 0x1C, size 0x4
+};
+typedef struct OSMessageQueue OSMessageQueue;
+typedef void * OSMessage;
+// total size: 0x4C
+struct OSModuleHeader {
+    // Members
+    struct OSModuleInfo info; // offset 0x0, size 0x20
+    unsigned int bssSize; // offset 0x20, size 0x4
+    unsigned int relOffset; // offset 0x24, size 0x4
+    unsigned int impOffset; // offset 0x28, size 0x4
+    unsigned int impSize; // offset 0x2C, size 0x4
+    unsigned char prologSection; // offset 0x30, size 0x1
+    unsigned char epilogSection; // offset 0x31, size 0x1
+    unsigned char unresolvedSection; // offset 0x32, size 0x1
+    unsigned char bssSection; // offset 0x33, size 0x1
+    unsigned int prolog; // offset 0x34, size 0x4
+    unsigned int epilog; // offset 0x38, size 0x4
+    unsigned int unresolved; // offset 0x3C, size 0x4
+    unsigned int align; // offset 0x40, size 0x4
+    unsigned int bssAlign; // offset 0x44, size 0x4
+    unsigned int fixSize; // offset 0x48, size 0x4
+};
+// total size: 0x20
+struct OSModuleInfo {
+    // Members
+    unsigned int id; // offset 0x0, size 0x4
+    struct OSModuleLink link; // offset 0x4, size 0x8
+    unsigned int numSections; // offset 0xC, size 0x4
+    unsigned int sectionInfoOffset; // offset 0x10, size 0x4
+    unsigned int nameOffset; // offset 0x14, size 0x4
+    unsigned int nameSize; // offset 0x18, size 0x4
+    unsigned int version; // offset 0x1C, size 0x4
+};
+// total size: 0x8
+struct OSModuleLink {
+    // Members
+    struct OSModuleInfo * next; // offset 0x0, size 0x4
+    struct OSModuleInfo * prev; // offset 0x4, size 0x4
+};
+typedef struct OSModuleHeader OSModuleHeader;
+typedef unsigned int OSModuleID;
+// total size: 0x8
+struct OSModuleQueue {
+    // Members
+    struct OSModuleInfo * head; // offset 0x0, size 0x4
+    struct OSModuleInfo * tail; // offset 0x4, size 0x4
+};
+typedef struct OSModuleQueue OSModuleQueue;
+typedef struct OSModuleLink OSModuleLink;
+typedef struct OSModuleInfo OSModuleInfo;
+// total size: 0x8
+struct OSSectionInfo {
+    // Members
+    unsigned int offset; // offset 0x0, size 0x4
+    unsigned int size; // offset 0x4, size 0x4
+};
+typedef struct OSSectionInfo OSSectionInfo;
+// total size: 0x8
+struct OSImportInfo {
+    // Members
+    unsigned int id; // offset 0x0, size 0x4
+    unsigned int offset; // offset 0x4, size 0x4
+};
+typedef struct OSImportInfo OSImportInfo;
+// total size: 0x8
+struct OSRel {
+    // Members
+    unsigned short offset; // offset 0x0, size 0x2
+    unsigned char type; // offset 0x2, size 0x1
+    unsigned char section; // offset 0x3, size 0x1
+    unsigned int addend; // offset 0x4, size 0x4
+};
+typedef struct OSRel OSRel;
+typedef void (* OSResetCallback)(void);
+// total size: 0xC
+struct OSSemaphore {
+    // Members
+    int count; // offset 0x0, size 0x4
+    OSThreadQueue queue; // offset 0x4, size 0x8
+};
+typedef struct OSSemaphore OSSemaphore;
+typedef int (* OSResetFunction)(int);
+// total size: 0x10
+struct OSResetFunctionInfo {
+    // Members
+    int (* func)(int); // offset 0x0, size 0x4
+    unsigned int priority; // offset 0x4, size 0x4
+    struct OSResetFunctionInfo * next; // offset 0x8, size 0x4
+    struct OSResetFunctionInfo * prev; // offset 0xC, size 0x4
+};
+typedef struct OSResetFunctionInfo OSResetFunctionInfo;
+typedef enum {
+    SYS_CALLBACKTYPEDEP_TIMER0 = 0,
+    SYS_CALLBACKTYPEDEP_MAXTYPES = 1,
+} SysCallbackTypeDepT;
+typedef OSMutex * SysSemaphoreT;
+// total size: 0x20
+struct SysCriticalSection_t {
+    // Members
+    OSMutex Mutex; // offset 0x0, size 0x18
+    unsigned int ThreadId; // offset 0x18, size 0x4
+    unsigned int Count; // offset 0x1C, size 0x4
+};
+typedef struct SysCriticalSection_t SysCriticalT;
+// total size: 0x4
+struct SysLLInitParms_t {
+    // Members
+    unsigned int Pad1; // offset 0x0, size 0x4
+};
+typedef struct SysLLInitParms_t SysLLInitParmsT;
+// total size: 0x8
+struct SysLLTimer_t {
+    // Members
+    unsigned int TimerID; // offset 0x0, size 0x4
+    unsigned int SystemTime; // offset 0x4, size 0x4
+};
+typedef struct SysLLTimer_t SysLLTimerT;
+// total size: 0x14
+struct SysDebugOutputSetting_t {
+    // Members
+    unsigned int ThreadID; // offset 0x0, size 0x4
+    unsigned int TimeAdded; // offset 0x4, size 0x4
+    unsigned int FileHandle; // offset 0x8, size 0x4
+    unsigned char * MemBuffer; // offset 0xC, size 0x4
+    unsigned int BufferSize; // offset 0x10, size 0x4
+};
+typedef struct SysDebugOutputSetting_t SysDebugOutputSettingT;
+// total size: 0xC
+struct SysClock_t {
+    // Members
+    unsigned char Second; // offset 0x0, size 0x1
+    unsigned char Minute; // offset 0x1, size 0x1
+    unsigned char Hour; // offset 0x2, size 0x1
+    unsigned char Day; // offset 0x3, size 0x1
+    unsigned char Month; // offset 0x4, size 0x1
+    unsigned short Year; // offset 0x6, size 0x2
+    unsigned int Hundredths; // offset 0x8, size 0x4
+};
+typedef struct SysClock_t SysClockT;
+typedef enum {
+    SYS_TIMERMODES_COUNTER = 0,
+    SYS_TIMERMODES_TIMED = 1,
+    SYS_TIMERMODES_TIMEDREPEAT = 2,
+} SysTimerModeT;
+typedef enum {
+    SYS_TIMERLENGTH_NANOSECOND = 0,
+    SYS_TIMERLENGTH_MILLISECOND = 1,
+    SYS_TIMERLENGTH_MICROSECOND = 2,
+    SYS_TIMERLENGTH_SIXTIETHSOFASECOND = 3,
+} SysTimerLengthT;
+typedef enum {
+    SYS_CALLBACKTYPEINDEP_VBLANK = 1,
+    SYS_CALLBACKTYPEINDEP_MAXTYPES = 2,
+} SysCallbackTypeIndepT;
+typedef enum {
+    SYS_DEBUGFILEMODE_NEW = 0,
+    SYS_DEBUGFILEMODE_APPEND = 1,
+    SYS_DEBUGBUFFER = 2,
+} SysDebugFileModeT;
+// total size: 0x8
+struct SysInitParms_t {
+    // Members
+    unsigned char NumTimers; // offset 0x0, size 0x1
+    unsigned char NumCallbacks; // offset 0x1, size 0x1
+    unsigned char NumThreads; // offset 0x2, size 0x1
+    unsigned char Pad2; // offset 0x3, size 0x1
+    SysLLInitParmsT LLSystemInfo; // offset 0x4, size 0x4
+};
+typedef struct SysInitParms_t SysInitParmsT;
+typedef void * SysThreadInfoNode;
+typedef int AngleT;
+typedef int __int32_t;
+typedef unsigned int __uint32_t;
+typedef unsigned int clock_t;
+typedef int time_t;
+// total size: 0x24
+struct tm {
+    // Members
+    int tm_sec; // offset 0x0, size 0x4
+    int tm_min; // offset 0x4, size 0x4
+    int tm_hour; // offset 0x8, size 0x4
+    int tm_mday; // offset 0xC, size 0x4
+    int tm_mon; // offset 0x10, size 0x4
+    int tm_year; // offset 0x14, size 0x4
+    int tm_wday; // offset 0x18, size 0x4
+    int tm_yday; // offset 0x1C, size 0x4
+    int tm_isdst; // offset 0x20, size 0x4
+};
+typedef unsigned int ULong;
+// total size: 0xC
+struct _glue {
+    // Members
+    struct _glue * _next; // offset 0x0, size 0x4
+    int _niobs; // offset 0x4, size 0x4
+    struct __sFILE * _iobs; // offset 0x8, size 0x4
+};
+// total size: 0x60
+struct __sFILE {
+    // Members
+    unsigned char * _p; // offset 0x0, size 0x4
+    int _r; // offset 0x4, size 0x4
+    int _w; // offset 0x8, size 0x4
+    short _flags; // offset 0xC, size 0x2
+    short _file; // offset 0xE, size 0x2
+    struct __sbuf _bf; // offset 0x10, size 0x8
+    int _lbfsize; // offset 0x18, size 0x4
+    void * _cookie; // offset 0x1C, size 0x4
+    int (* _read)(void *, char *, int); // offset 0x20, size 0x4
+    int (* _write)(void *, const char *, int); // offset 0x24, size 0x4
+    int (* _seek)(void *, int, int); // offset 0x28, size 0x4
+    int (* _close)(void *); // offset 0x2C, size 0x4
+    struct __sbuf _ub; // offset 0x30, size 0x8
+    unsigned char * _up; // offset 0x38, size 0x4
+    int _ur; // offset 0x3C, size 0x4
+    unsigned char _ubuf[10]; // offset 0x40, size 0xA
+    unsigned char _nbuf[1]; // offset 0x4A, size 0x1
+    struct __sbuf _lb; // offset 0x4C, size 0x8
+    int _blksize; // offset 0x54, size 0x4
+    int _offset; // offset 0x58, size 0x4
+    struct _reent * _data; // offset 0x5C, size 0x4
+};
+// total size: 0x8
+struct __sbuf {
+    // Members
+    unsigned char * _base; // offset 0x0, size 0x4
+    int _size; // offset 0x4, size 0x4
+};
+// total size: 0x304
+struct _reent {
+    // Members
+    int _errno; // offset 0x0, size 0x4
+    struct __sFILE * _stdin; // offset 0x4, size 0x4
+    struct __sFILE * _stdout; // offset 0x8, size 0x4
+    struct __sFILE * _stderr; // offset 0xC, size 0x4
+    int _inc; // offset 0x10, size 0x4
+    char _emergency[25]; // offset 0x14, size 0x19
+    int _current_category; // offset 0x30, size 0x4
+    const char * _current_locale; // offset 0x34, size 0x4
+    int __sdidinit; // offset 0x38, size 0x4
+    void (* __cleanup)(struct _reent *); // offset 0x3C, size 0x4
+    struct _Bigint * _result; // offset 0x40, size 0x4
+    int _result_k; // offset 0x44, size 0x4
+    struct _Bigint * _p5s; // offset 0x48, size 0x4
+    struct _Bigint * * _freelist; // offset 0x4C, size 0x4
+    int _cvtlen; // offset 0x50, size 0x4
+    char * _cvtbuf; // offset 0x54, size 0x4
+    union {
+        // total size: 0x4C
+        struct {
+            // Members
+            unsigned int _rand_next; // offset 0x0, size 0x4
+            char * _strtok_last; // offset 0x4, size 0x4
+            char _asctime_buf[26]; // offset 0x8, size 0x1A
+            struct tm _localtime_buf; // offset 0x24, size 0x24
+            int _gamma_signgam; // offset 0x48, size 0x4
+        } _reent; // offset 0x0, size 0x4C
+        // total size: 0xF0
+        struct {
+            // Members
+            unsigned char * _nextf[30]; // offset 0x0, size 0x78
+            unsigned int _nmalloc[30]; // offset 0x78, size 0x78
+        } _unused; // offset 0x0, size 0xF0
+    } _new; // offset 0x58, size 0xF0
+    struct _atexit * _atexit; // offset 0x148, size 0x4
+    struct _atexit _atexit0; // offset 0x14C, size 0x88
+    void (* * _sig_func)(int); // offset 0x1D4, size 0x4
+    struct _glue __sglue; // offset 0x1D8, size 0xC
+    struct __sFILE __sf[3]; // offset 0x1E4, size 0x120
+};
+// total size: 0x18
+struct _Bigint {
+    // Members
+    struct _Bigint * _next; // offset 0x0, size 0x4
+    int _k; // offset 0x4, size 0x4
+    int _maxwds; // offset 0x8, size 0x4
+    int _sign; // offset 0xC, size 0x4
+    int _wds; // offset 0x10, size 0x4
+    unsigned int _x[1]; // offset 0x14, size 0x4
+};
+// total size: 0x88
+struct _atexit {
+    // Members
+    struct _atexit * _next; // offset 0x0, size 0x4
+    int _ind; // offset 0x4, size 0x4
+    void (* _fns[32])(void); // offset 0x8, size 0x80
+};
+typedef int _fpos_t;
+union __dmath {
+    unsigned int i[2]; // offset 0x0, size 0x8
+    double d; // offset 0x0, size 0x8
+};
+// total size: 0x28
+struct exception {
+    // Members
+    int type; // offset 0x0, size 0x4
+    char * name; // offset 0x4, size 0x4
+    double arg1; // offset 0x8, size 0x8
+    double arg2; // offset 0x10, size 0x8
+    double retval; // offset 0x18, size 0x8
+    int err; // offset 0x20, size 0x4
+};
+enum __fdlibm_version {
+    __fdlibm_ieee = -1,
+    __fdlibm_svid = 0,
+    __fdlibm_xopen = 1,
+    __fdlibm_posix = 2,
+};
+enum MathRandType_t {
+    MATH_RAND_FASTLINEAR = 0,
+    MATH_RAND_SLOWLINEAR = 1,
+    MATH_RAND_SUBTRACTIVE = 2,
+    MATH_RAND_NUMFUNCS = 3,
+};
+typedef enum MathRandType_t MathRandTypeT;
+// ERROR: Failed to process tag 3D2530 (Typedef)
+// total size: 0x8
+struct Orient2_t {
+    // Members
+    int vx; // offset 0x0, size 0x4
+    int vy; // offset 0x4, size 0x4
+};
+typedef struct Orient2_t Orient2T;
+typedef struct Orient3_t Orient3T;
+// total size: 0x10
+struct Orient4_t {
+    // Members
+    int vx; // offset 0x0, size 0x4
+    int vy; // offset 0x4, size 0x4
+    int vz; // offset 0x8, size 0x4
+    int vw; // offset 0xC, size 0x4
+};
+typedef struct Orient4_t Orient4T;
+enum MathErrCode_t {
+    MATH_ERROR_MATHACTIVE = 262145,
+    MATH_ERROR_MATHINACTIVE = 262146,
+    MATH_ERROR_INPUTINVALID = 262147,
+    MATH_NUMERRORS = 262148,
+};
+typedef enum MathErrCode_t MathErrCodeT;
+typedef struct Vec2_t Vec2T;
+typedef struct Vec3_t Vec3T;
+// total size: 0x10
+struct Vec4_t {
+    // Members
+    float vx; // offset 0x0, size 0x4
+    float vy; // offset 0x4, size 0x4
+    float vz; // offset 0x8, size 0x4
+    float vw; // offset 0xC, size 0x4
+};
+typedef struct Vec4_t Vec4T;
+// total size: 0x18
+struct VecRotPos_t {
+    // Members
+    Orient3T Rot; // offset 0x0, size 0xC
+    Vec3T Pos; // offset 0xC, size 0xC
+};
+typedef struct VecRotPos_t VecRotPosT;
+enum VecErrCode_t {
+    VEC_ERROR_VECACTIVE = 393217,
+    VEC_ERROR_VECINACTIVE = 393218,
+    VEC_NUMERRORS = 393219,
+};
+typedef enum VecErrCode_t VecErrCodeT;
+typedef struct Quat_t QuatT;
+enum MatIndex_t {
+    MAT_A = 0,
+    MAT_D = 1,
+    MAT_G = 2,
+    MAT_X = 3,
+    MAT_B = 4,
+    MAT_E = 5,
+    MAT_H = 6,
+    MAT_Y = 7,
+    MAT_C = 8,
+    MAT_F = 9,
+    MAT_I = 10,
+    MAT_Z = 11,
+    MAT_P = 12,
+    MAT_Q = 13,
+    MAT_R = 14,
+    MAT_W = 15,
+    MAT_NUMELEMENTS = 16,
+};
+typedef enum MatIndex_t MatIndexT;
+enum MatRotOrder_t {
+    MAT_ROTORDER_ZYX = 0,
+    MAT_ROTORDER_XYZ = 1,
+    MAT_ROTORDER_YZX = 2,
+    MAT_NUMROTORDERS = 3,
+};
+typedef enum MatRotOrder_t MatRotOrderT;
+typedef struct Mat_t MatT;
+// total size: 0x24
+struct Mat33_t {
+    // Members
+    float r[9]; // offset 0x0, size 0x24
+};
+typedef struct Mat33_t Mat33T;
+// total size: 0x30
+struct Mat34_t {
+    // Members
+    float m[12]; // offset 0x0, size 0x30
+};
+typedef struct Mat34_t Mat34T;
+enum MatErrCode_t {
+    MAT_ERROR_MATACTIVE = 327681,
+    MAT_ERROR_MATINACTIVE = 327682,
+    MAT_NUMERRORS = 327683,
+};
+typedef enum MatErrCode_t MatErrCodeT;
+// total size: 0xC
+struct MatStack_t {
+    // Members
+    unsigned int NumElements; // offset 0x0, size 0x4
+    unsigned int TopOfStack; // offset 0x4, size 0x4
+    MatT * pStack; // offset 0x8, size 0x4
+};
+typedef struct MatStack_t MatStackT;
+typedef struct QuatRotPos_t QuatRotPosT;
+enum QuatErrCode_t {
+    QUAT_ERROR_QUATACTIVE = 458753,
+    QUAT_ERROR_QUATINACTIVE = 458754,
+    QUAT_NUMERRORS = 458755,
+};
+typedef enum QuatErrCode_t QuatErrCodeT;
+typedef struct CharJointHierarchy_t CharJointHierarchyT;
+typedef struct CharBone_t CharBoneT;
+typedef struct CharJoint_t CharJointT;
+typedef struct CharRefAngle_t CharRefAngleT;
+typedef struct CharSkel_t CharSkelT;
+typedef short CharAngleT;
+typedef struct CharOrient3_t CharOrient3T;
+typedef union CharJointData_t CharJointDataT;
+typedef struct CharFrame_t CharFrameT;
+// total size: 0x8
+struct CharAngleConstraint_t {
+    // Members
+    int Lo; // offset 0x0, size 0x4
+    int Hi; // offset 0x4, size 0x4
+};
+typedef struct CharAngleConstraint_t CharAngleConstraintT;
+// total size: 0x18
+struct CharJointConstraint_t {
+    // Members
+    CharAngleConstraintT ConstraintX; // offset 0x0, size 0x8
+    CharAngleConstraintT ConstraintY; // offset 0x8, size 0x8
+    CharAngleConstraintT ConstraintZ; // offset 0x10, size 0x8
+};
+typedef struct CharJointConstraint_t CharJointConstraintT;
+// total size: 0x4
+struct CharIkChainNode_t {
+    // Members
+    char Child; // offset 0x0, size 0x1
+    unsigned char JointIndex; // offset 0x1, size 0x1
+    unsigned char CanRotate; // offset 0x2, size 0x1
+    unsigned char Pad; // offset 0x3, size 0x1
+};
+typedef struct CharIkChainNode_t CharIkChainNodeT;
+// total size: 0x8
+struct CharIkEvalJoint_t {
+    // Members
+    CharOrient3T Angle; // offset 0x0, size 0x6
+    unsigned short JointIndex; // offset 0x6, size 0x2
+};
+typedef struct CharIkEvalJoint_t CharIkEvalJointT;
+// total size: 0x10
+struct CharIkChain_t {
+    // Members
+    CharSkelT * pSkeleton; // offset 0x0, size 0x4
+    unsigned char IkType; // offset 0x4, size 0x1
+    unsigned char NumNodes; // offset 0x5, size 0x1
+    unsigned char BaseNodeIndex; // offset 0x6, size 0x1
+    unsigned char EndNodeIndex; // offset 0x7, size 0x1
+    unsigned char NumModifiedJoints; // offset 0x8, size 0x1
+    unsigned char pad1; // offset 0x9, size 0x1
+    unsigned short pad2; // offset 0xA, size 0x2
+    CharIkChainNodeT * pNodes; // offset 0xC, size 0x4
+};
+typedef struct CharIkChain_t CharIkChainT;
+enum CharErrCode_t {
+    CHAR_ERROR_CHARACTIVE = 1179649,
+    CHAR_ERROR_CHARINACTIVE = 1179650,
+};
+typedef enum CharErrCode_t CharErrCodeT;
+// total size: 0x14
+struct CldInitParms_t {
+    // Members
+    unsigned int maxObjType1; // offset 0x0, size 0x4
+    unsigned int maxObjType2; // offset 0x4, size 0x4
+    unsigned int maxObjType3; // offset 0x8, size 0x4
+    unsigned int maxObjType3Links; // offset 0xC, size 0x4
+    unsigned int maxCldResults; // offset 0x10, size 0x4
+};
+typedef struct CldInitParms_t CldInitParmsT;
+typedef struct _CldNodeT CldNodeT;
+// total size: 0xC
+struct _CldListT {
+    // Members
+    CldNodeT * lh_Head; // offset 0x0, size 0x4
+    CldNodeT * lh_Tail; // offset 0x4, size 0x4
+    CldNodeT * lh_TailPred; // offset 0x8, size 0x4
+};
+typedef struct _CldListT CldListT;
+typedef struct Plane2D_t Plane2DT;
+// total size: 0x14
+struct Circle2D_t {
+    // Members
+    unsigned int id; // offset 0x0, size 0x4
+    Vec2T cen; // offset 0x4, size 0x8
+    float rad; // offset 0xC, size 0x4
+    float radius2; // offset 0x10, size 0x4
+};
+typedef struct Circle2D_t Circle2DT;
+typedef struct Square2D_t Square2DT;
+typedef struct Plane3D_t Plane3DT;
+// total size: 0x18
+struct Sphere3D_t {
+    // Members
+    unsigned int id; // offset 0x0, size 0x4
+    Vec3T cen; // offset 0x4, size 0xC
+    float rad; // offset 0x10, size 0x4
+    float radius2; // offset 0x14, size 0x4
+};
+typedef struct Sphere3D_t Sphere3DT;
+typedef struct Box3D_t Box3DT;
+typedef struct Sausage3D_t Sausage3DT;
+typedef enum CldObjType_t CldObjTypeT;
+typedef struct CldObjHeader_t CldObjHeaderT;
+// total size: 0x4
+struct CldObjType1Config_t {
+    // Members
+    float radius; // offset 0x0, size 0x4
+};
+typedef struct CldObjType1Config_t CldObjType1ConfigT;
+// total size: 0xC
+struct CldObjType2Config_t {
+    // Members
+    Vec3T dim3d; // offset 0x0, size 0xC
+};
+typedef struct CldObjType2Config_t CldObjType2ConfigT;
+// total size: 0x10
+struct CldObjType3Config_t {
+    // Members
+    Vec3T dim3d; // offset 0x0, size 0xC
+    float radius; // offset 0xC, size 0x4
+};
+typedef struct CldObjType3Config_t CldObjType3ConfigT;
+// total size: 0x3C
+struct CldResultInfo_t {
+    // Members
+    unsigned int id; // offset 0x0, size 0x4
+    void * refA; // offset 0x4, size 0x4
+    Vec3T pntA; // offset 0x8, size 0xC
+    Vec3T dirA; // offset 0x14, size 0xC
+    void * refB; // offset 0x20, size 0x4
+    Vec3T pntB; // offset 0x24, size 0xC
+    Vec3T dirB; // offset 0x30, size 0xC
+};
+typedef struct CldResultInfo_t CldResultInfoT;
+// total size: 0xC
+struct CldResults_t {
+    // Members
+    unsigned int cnt; // offset 0x0, size 0x4
+    unsigned int max; // offset 0x4, size 0x4
+    CldResultInfoT * result; // offset 0x8, size 0x4
+};
+typedef struct CldResults_t CldResultsT;
+// total size: 0x38
+struct CldObjType1_t {
+    // Members
+    CldObjHeaderT header; // offset 0x0, size 0xC
+    Circle2DT circle; // offset 0xC, size 0x14
+    Sphere3DT sphere; // offset 0x20, size 0x18
+};
+typedef struct CldObjType1_t CldObjType1T;
+// total size: 0x2AC
+struct CldObjType2_t {
+    // Members
+    CldObjHeaderT header; // offset 0x0, size 0xC
+    Square2DT square; // offset 0xC, size 0xC4
+    Box3DT box; // offset 0xD0, size 0x1DC
+};
+typedef struct CldObjType2_t CldObjType2T;
+typedef struct CldObjType3_t CldObjType3T;
+enum CldErrCode_t {
+    CLD_ERROR_ACTIVE = 1245185,
+    CLD_ERROR_INACTIVE = 1245186,
+};
+typedef enum CldErrCode_t CldErrCodeT;
+typedef void (* SkelXformFuncT)(CharSkelT *, CharJointHierarchyT *, CharFrameT *);
+static void (* _SkelLocalLocalFuncBlock[16])(CharSkelT *, CharJointHierarchyT *, CharFrameT *); // size: 0x40, address: 0x802AB498
+static void (* _SkelLocalGlobalFuncBlock[16])(CharSkelT *, CharJointHierarchyT *, CharFrameT *); // size: 0x40, address: 0x802AB4D8
+static void (* _SkelGlobalGlobalFuncBlock[16])(CharSkelT *, CharJointHierarchyT *, CharFrameT *); // size: 0x40, address: 0x802AB518
+static float _defaultCollisionPartSize[32]; // size: 0x80, address: 0x802AB558
+typedef struct CldSkelInfo_t CldSkelInfoT;
+

@@ -1,0 +1,178 @@
+/*
+    Compile unit: s:\dolphin\build\libraries\gba\src\GBAWrite.c
+    Producer: MW EABI PPC C-Compiler
+    Language: C89
+    Code range: 0x802536D0 -> 0x802536D0
+*/
+// total size: 0x2C8
+struct OSContext {
+    // Members
+    unsigned long gpr[32]; // offset 0x0, size 0x80
+    unsigned long cr; // offset 0x80, size 0x4
+    unsigned long lr; // offset 0x84, size 0x4
+    unsigned long ctr; // offset 0x88, size 0x4
+    unsigned long xer; // offset 0x8C, size 0x4
+    double fpr[32]; // offset 0x90, size 0x100
+    unsigned long fpscr_pad; // offset 0x190, size 0x4
+    unsigned long fpscr; // offset 0x194, size 0x4
+    unsigned long srr0; // offset 0x198, size 0x4
+    unsigned long srr1; // offset 0x19C, size 0x4
+    unsigned short mode; // offset 0x1A0, size 0x2
+    unsigned short state; // offset 0x1A2, size 0x2
+    unsigned long gqr[8]; // offset 0x1A4, size 0x20
+    double psf[32]; // offset 0x1C8, size 0x100
+};
+// total size: 0x8
+struct OSThreadLink {
+    // Members
+    struct OSThread * next; // offset 0x0, size 0x4
+    struct OSThread * prev; // offset 0x4, size 0x4
+};
+// total size: 0x8
+struct OSMutexLink {
+    // Members
+    struct OSMutex * next; // offset 0x0, size 0x4
+    struct OSMutex * prev; // offset 0x4, size 0x4
+};
+// total size: 0x18
+struct OSMutex {
+    // Members
+    struct OSThreadQueue queue; // offset 0x0, size 0x8
+    struct OSThread * thread; // offset 0x8, size 0x4
+    long count; // offset 0xC, size 0x4
+    struct OSMutexLink link; // offset 0x10, size 0x8
+};
+// total size: 0x8
+struct OSMutexQueue {
+    // Members
+    struct OSMutex * head; // offset 0x0, size 0x4
+    struct OSMutex * tail; // offset 0x4, size 0x4
+};
+// total size: 0x310
+struct OSThread {
+    // Members
+    struct OSContext context; // offset 0x0, size 0x2C8
+    unsigned short state; // offset 0x2C8, size 0x2
+    unsigned short attr; // offset 0x2CA, size 0x2
+    long suspend; // offset 0x2CC, size 0x4
+    long priority; // offset 0x2D0, size 0x4
+    long base; // offset 0x2D4, size 0x4
+    void * val; // offset 0x2D8, size 0x4
+    struct OSThreadQueue * queue; // offset 0x2DC, size 0x4
+    struct OSThreadLink link; // offset 0x2E0, size 0x8
+    struct OSThreadQueue queueJoin; // offset 0x2E8, size 0x8
+    struct OSMutex * mutex; // offset 0x2F0, size 0x4
+    struct OSMutexQueue queueMutex; // offset 0x2F4, size 0x8
+    struct OSThreadLink linkActive; // offset 0x2FC, size 0x8
+    unsigned char * stackBase; // offset 0x304, size 0x4
+    unsigned long * stackEnd; // offset 0x308, size 0x4
+};
+// total size: 0x8
+struct OSThreadQueue {
+    // Members
+    struct OSThread * head; // offset 0x0, size 0x4
+    struct OSThread * tail; // offset 0x4, size 0x4
+};
+// total size: 0x68
+struct GBABootInfo {
+    // Members
+    long paletteColor; // offset 0x0, size 0x4
+    long paletteSpeed; // offset 0x4, size 0x4
+    unsigned char * programp; // offset 0x8, size 0x4
+    long length; // offset 0xC, size 0x4
+    unsigned char * status; // offset 0x10, size 0x4
+    void (* callback)(long, long); // offset 0x14, size 0x4
+    unsigned char readbuf[4]; // offset 0x18, size 0x4
+    unsigned char writebuf[4]; // offset 0x1C, size 0x4
+    int i; // offset 0x20, size 0x4
+    unsigned long start; // offset 0x24, size 0x4
+    long long begin; // offset 0x28, size 0x8
+    int firstXfer; // offset 0x30, size 0x4
+    int curOffset; // offset 0x34, size 0x4
+    unsigned long crc; // offset 0x38, size 0x4
+    unsigned long dummyWord[7]; // offset 0x3C, size 0x1C
+    unsigned long keyA; // offset 0x58, size 0x4
+    long keyB; // offset 0x5C, size 0x4
+    unsigned long initialCode; // offset 0x60, size 0x4
+    int realLength; // offset 0x64, size 0x4
+};
+// total size: 0x50
+struct STRUCT_DSP_TASK {
+    // Members
+    unsigned long state; // offset 0x0, size 0x4
+    unsigned long priority; // offset 0x4, size 0x4
+    unsigned long flags; // offset 0x8, size 0x4
+    unsigned short * iram_mmem_addr; // offset 0xC, size 0x4
+    unsigned long iram_length; // offset 0x10, size 0x4
+    unsigned long iram_addr; // offset 0x14, size 0x4
+    unsigned short * dram_mmem_addr; // offset 0x18, size 0x4
+    unsigned long dram_length; // offset 0x1C, size 0x4
+    unsigned long dram_addr; // offset 0x20, size 0x4
+    unsigned short dsp_init_vector; // offset 0x24, size 0x2
+    unsigned short dsp_resume_vector; // offset 0x26, size 0x2
+    void (* init_cb)(void *); // offset 0x28, size 0x4
+    void (* res_cb)(void *); // offset 0x2C, size 0x4
+    void (* done_cb)(void *); // offset 0x30, size 0x4
+    void (* req_cb)(void *); // offset 0x34, size 0x4
+    struct STRUCT_DSP_TASK * next; // offset 0x38, size 0x4
+    struct STRUCT_DSP_TASK * prev; // offset 0x3C, size 0x4
+    long long t_context; // offset 0x40, size 0x8
+    long long t_task; // offset 0x48, size 0x8
+};
+// total size: 0x40
+struct GBASecParam {
+    // Members
+    unsigned char readbuf[4]; // offset 0x0, size 0x4
+    long paletteColor; // offset 0x4, size 0x4
+    long paletteSpeed; // offset 0x8, size 0x4
+    long length; // offset 0xC, size 0x4
+    unsigned long * out; // offset 0x10, size 0x4
+    unsigned char _padding0[12]; // offset 0x14, size 0xC
+    unsigned long keyA; // offset 0x20, size 0x4
+    long keyB; // offset 0x24, size 0x4
+    unsigned char _padding1[24]; // offset 0x28, size 0x18
+};
+// total size: 0x100
+struct GBAControl {
+    // Members
+    unsigned char output[5]; // offset 0x0, size 0x5
+    unsigned char input[5]; // offset 0x5, size 0x5
+    unsigned long outputBytes; // offset 0xC, size 0x4
+    unsigned long inputBytes; // offset 0x10, size 0x4
+    unsigned char * status; // offset 0x14, size 0x4
+    void * ptr; // offset 0x18, size 0x4
+    void (* callback)(long, long); // offset 0x1C, size 0x4
+    long ret; // offset 0x20, size 0x4
+    struct OSThreadQueue threadQueue; // offset 0x24, size 0x8
+    long long delay; // offset 0x30, size 0x8
+    void (* proc)(long); // offset 0x38, size 0x4
+    struct GBABootInfo bootInfo; // offset 0x40, size 0x68
+    struct STRUCT_DSP_TASK task; // offset 0xA8, size 0x50
+    struct GBASecParam * param; // offset 0xF8, size 0x4
+};
+struct GBAControl __GBA[4]; // size: 0x400, address: 0x80381FC0
+// Range: 0xFFFFFFFF -> 0x802536D0
+static void WriteProc(long chan /* r1+0x0 */) {
+    // Local variables
+    struct GBAControl * gba; // r1+0x0
+
+    // References
+    // -> struct GBAControl __GBA[4];
+}
+
+// Range: 0xFFFFFFFF -> 0x802536D0
+long GBAWriteAsync(long chan /* r27 */, unsigned char * src /* r28 */, unsigned char * status /* r29 */, void (* callback)(long, long) /* r30 */) {
+    // Local variables
+    struct GBAControl * gba; // r1+0x8
+
+    // References
+    // -> struct GBAControl __GBA[4];
+}
+
+// Range: 0xFFFFFFFF -> 0x802536D0
+long GBAWrite(long chan /* r28 */, unsigned char * src /* r29 */, unsigned char * status /* r30 */) {
+    // References
+    // -> struct GBAControl __GBA[4];
+}
+
+

@@ -1,0 +1,260 @@
+/*
+    Compile unit: ../../../Source/Common/Checksum/ChecksumCRC32.c
+    Producer: GNU C 2.95.3 SN BUILD v1.72 for Nintendo Gamecube
+    Compile directory: F:\USR\LOCAL\Tiburon\EASSDK\Project\NGC\Checksum
+    Language: C89
+    Code range: 0x801B3038 -> 0x801B32F0
+    GCC Source File Name Offset: 0x0000130A
+    GCC Source Info Offset: 0x00000F90
+*/
+// Range: 0x801B3038 -> 0x801B306C
+static unsigned int _ChecksumCRC32_Calculate(unsigned int uValue /* r3 */) {
+    // Local variables
+    unsigned char uLoop; // r9
+    unsigned int uCRC; // r3
+}
+
+// Range: 0x801B306C -> 0x801B30B4
+static void _ChecksumCRC32_CreateLookupTable(unsigned int * pTable /* r3 */) {
+    // Local variables
+    unsigned int uLoop; // r31
+}
+
+// Range: 0x801B30B4 -> 0x801B3138
+static enum {
+    CHECKSUM_ERROR_NONE = 0,
+    CHECKSUM_ERROR_OUTOFMEMORY = 1,
+    CHECKSUM_ERROR_INVALIDPARAMETERS = 2,
+    CHECKSUM_ERROR_STARTED = 3,
+    CHECKSUM_ERROR_NOTSTARTED = 4,
+    CHECKSUM_ERROR_INITIALIZED = 5,
+    CHECKSUM_ERROR_NOTINITIALIZED = 6,
+    CHECKSUM_ERROR_INTERNAL = 7,
+    CHECKSUM_ERROR_FORCE32BIT = 2147483647,
+} _ChecksumCRC32_Init(unsigned int uMemID /* r29 */) {}
+
+// Range: 0x801B3138 -> 0x801B3194
+static enum {
+    CHECKSUM_ERROR_NONE = 0,
+    CHECKSUM_ERROR_OUTOFMEMORY = 1,
+    CHECKSUM_ERROR_INVALIDPARAMETERS = 2,
+    CHECKSUM_ERROR_STARTED = 3,
+    CHECKSUM_ERROR_NOTSTARTED = 4,
+    CHECKSUM_ERROR_INITIALIZED = 5,
+    CHECKSUM_ERROR_NOTINITIALIZED = 6,
+    CHECKSUM_ERROR_INTERNAL = 7,
+    CHECKSUM_ERROR_FORCE32BIT = 2147483647,
+} _ChecksumCRC32_Shutdown(void) {}
+
+// Range: 0x801B3194 -> 0x801B31B0
+static unsigned char _ChecksumCRC32_IsInitialized(void) {}
+
+// Range: 0x801B31B0 -> 0x801B31DC
+static enum {
+    CHECKSUM_ERROR_NONE = 0,
+    CHECKSUM_ERROR_OUTOFMEMORY = 1,
+    CHECKSUM_ERROR_INVALIDPARAMETERS = 2,
+    CHECKSUM_ERROR_STARTED = 3,
+    CHECKSUM_ERROR_NOTSTARTED = 4,
+    CHECKSUM_ERROR_INITIALIZED = 5,
+    CHECKSUM_ERROR_NOTINITIALIZED = 6,
+    CHECKSUM_ERROR_INTERNAL = 7,
+    CHECKSUM_ERROR_FORCE32BIT = 2147483647,
+} _ChecksumCRC32_Start(void) {}
+
+// Range: 0x801B31DC -> 0x801B3250
+static enum {
+    CHECKSUM_ERROR_NONE = 0,
+    CHECKSUM_ERROR_OUTOFMEMORY = 1,
+    CHECKSUM_ERROR_INVALIDPARAMETERS = 2,
+    CHECKSUM_ERROR_STARTED = 3,
+    CHECKSUM_ERROR_NOTSTARTED = 4,
+    CHECKSUM_ERROR_INITIALIZED = 5,
+    CHECKSUM_ERROR_NOTINITIALIZED = 6,
+    CHECKSUM_ERROR_INTERNAL = 7,
+    CHECKSUM_ERROR_FORCE32BIT = 2147483647,
+} _ChecksumCRC32_CalculateBuffer(unsigned char * pBuffer /* r3 */, unsigned int uLength /* r4 */) {
+    // Local variables
+    unsigned int uIndex; // r10
+    unsigned int uGen;
+    unsigned int uCRC; // r0
+}
+
+// Range: 0x801B3250 -> 0x801B32A8
+static enum {
+    CHECKSUM_ERROR_NONE = 0,
+    CHECKSUM_ERROR_OUTOFMEMORY = 1,
+    CHECKSUM_ERROR_INVALIDPARAMETERS = 2,
+    CHECKSUM_ERROR_STARTED = 3,
+    CHECKSUM_ERROR_NOTSTARTED = 4,
+    CHECKSUM_ERROR_INITIALIZED = 5,
+    CHECKSUM_ERROR_NOTINITIALIZED = 6,
+    CHECKSUM_ERROR_INTERNAL = 7,
+    CHECKSUM_ERROR_FORCE32BIT = 2147483647,
+} _ChecksumCRC32_Stop(struct ChecksumResult_t * * ppResult /* r8 */) {
+    // Local variables
+    unsigned int uCRCResult; // @ 0x803B283C
+}
+
+// total size: 0x8
+struct ChecksumResult_t {
+    // Members
+    unsigned int uSize; // offset 0x0, size 0x4
+    unsigned char * pChecksum; // offset 0x4, size 0x4
+};
+// Range: 0x801B32A8 -> 0x801B32E4
+static enum {
+    CHECKSUM_ERROR_NONE = 0,
+    CHECKSUM_ERROR_OUTOFMEMORY = 1,
+    CHECKSUM_ERROR_INVALIDPARAMETERS = 2,
+    CHECKSUM_ERROR_STARTED = 3,
+    CHECKSUM_ERROR_NOTSTARTED = 4,
+    CHECKSUM_ERROR_INITIALIZED = 5,
+    CHECKSUM_ERROR_NOTINITIALIZED = 6,
+    CHECKSUM_ERROR_INTERNAL = 7,
+    CHECKSUM_ERROR_FORCE32BIT = 2147483647,
+} _ChecksumCRC32_GetSize(unsigned int * pSize /* r11 */) {}
+
+// total size: 0x1C
+struct ChecksumType_t {
+    // Members
+    enum {
+        CHECKSUM_ERROR_NONE = 0,
+        CHECKSUM_ERROR_OUTOFMEMORY = 1,
+        CHECKSUM_ERROR_INVALIDPARAMETERS = 2,
+        CHECKSUM_ERROR_STARTED = 3,
+        CHECKSUM_ERROR_NOTSTARTED = 4,
+        CHECKSUM_ERROR_INITIALIZED = 5,
+        CHECKSUM_ERROR_NOTINITIALIZED = 6,
+        CHECKSUM_ERROR_INTERNAL = 7,
+        CHECKSUM_ERROR_FORCE32BIT = 2147483647,
+    } (* const Init)(unsigned int); // offset 0x0, size 0x4
+    enum {
+        CHECKSUM_ERROR_NONE = 0,
+        CHECKSUM_ERROR_OUTOFMEMORY = 1,
+        CHECKSUM_ERROR_INVALIDPARAMETERS = 2,
+        CHECKSUM_ERROR_STARTED = 3,
+        CHECKSUM_ERROR_NOTSTARTED = 4,
+        CHECKSUM_ERROR_INITIALIZED = 5,
+        CHECKSUM_ERROR_NOTINITIALIZED = 6,
+        CHECKSUM_ERROR_INTERNAL = 7,
+        CHECKSUM_ERROR_FORCE32BIT = 2147483647,
+    } (* const Shutdown)(void); // offset 0x4, size 0x4
+    unsigned char (* const IsInitialized)(void); // offset 0x8, size 0x4
+    enum {
+        CHECKSUM_ERROR_NONE = 0,
+        CHECKSUM_ERROR_OUTOFMEMORY = 1,
+        CHECKSUM_ERROR_INVALIDPARAMETERS = 2,
+        CHECKSUM_ERROR_STARTED = 3,
+        CHECKSUM_ERROR_NOTSTARTED = 4,
+        CHECKSUM_ERROR_INITIALIZED = 5,
+        CHECKSUM_ERROR_NOTINITIALIZED = 6,
+        CHECKSUM_ERROR_INTERNAL = 7,
+        CHECKSUM_ERROR_FORCE32BIT = 2147483647,
+    } (* const Start)(void); // offset 0xC, size 0x4
+    enum {
+        CHECKSUM_ERROR_NONE = 0,
+        CHECKSUM_ERROR_OUTOFMEMORY = 1,
+        CHECKSUM_ERROR_INVALIDPARAMETERS = 2,
+        CHECKSUM_ERROR_STARTED = 3,
+        CHECKSUM_ERROR_NOTSTARTED = 4,
+        CHECKSUM_ERROR_INITIALIZED = 5,
+        CHECKSUM_ERROR_NOTINITIALIZED = 6,
+        CHECKSUM_ERROR_INTERNAL = 7,
+        CHECKSUM_ERROR_FORCE32BIT = 2147483647,
+    } (* const Calculate)(unsigned char *, unsigned int); // offset 0x10, size 0x4
+    enum {
+        CHECKSUM_ERROR_NONE = 0,
+        CHECKSUM_ERROR_OUTOFMEMORY = 1,
+        CHECKSUM_ERROR_INVALIDPARAMETERS = 2,
+        CHECKSUM_ERROR_STARTED = 3,
+        CHECKSUM_ERROR_NOTSTARTED = 4,
+        CHECKSUM_ERROR_INITIALIZED = 5,
+        CHECKSUM_ERROR_NOTINITIALIZED = 6,
+        CHECKSUM_ERROR_INTERNAL = 7,
+        CHECKSUM_ERROR_FORCE32BIT = 2147483647,
+    } (* const Stop)(struct ChecksumResult_t * *); // offset 0x14, size 0x4
+    enum {
+        CHECKSUM_ERROR_NONE = 0,
+        CHECKSUM_ERROR_OUTOFMEMORY = 1,
+        CHECKSUM_ERROR_INVALIDPARAMETERS = 2,
+        CHECKSUM_ERROR_STARTED = 3,
+        CHECKSUM_ERROR_NOTSTARTED = 4,
+        CHECKSUM_ERROR_INITIALIZED = 5,
+        CHECKSUM_ERROR_NOTINITIALIZED = 6,
+        CHECKSUM_ERROR_INTERNAL = 7,
+        CHECKSUM_ERROR_FORCE32BIT = 2147483647,
+    } (* const GetSize)(unsigned int *); // offset 0x18, size 0x4
+};
+// Range: 0x801B32E4 -> 0x801B32F0
+const struct ChecksumType_t * ChecksumCRC32QueryType(void) {}
+
+typedef int ptrdiff_t;
+typedef unsigned int size_t;
+typedef int wchar_t;
+typedef unsigned int wint_t;
+typedef char int8_t;
+typedef short int16_t;
+typedef int int32_t;
+typedef unsigned char uint8_t;
+typedef unsigned short uint16_t;
+typedef unsigned int uint32_t;
+typedef float float_t;
+typedef double double_t;
+typedef long long int64_t;
+typedef unsigned long long uint64_t;
+typedef unsigned long long intptr_t;
+typedef long long intmax_t;
+typedef unsigned long long uintmax_t;
+typedef char char8_t;
+typedef unsigned short char16_t;
+typedef int char32_t;
+typedef // total size: 0x10
+struct {
+    // Members
+    long long hi; // offset 0x0, size 0x8
+    long long lo; // offset 0x8, size 0x8
+} Int128;
+typedef // total size: 0x10
+struct {
+    // Members
+    unsigned long long hi; // offset 0x0, size 0x8
+    unsigned long long lo; // offset 0x8, size 0x8
+} Uint128;
+typedef unsigned char Bool;
+typedef struct ChecksumResult_t ChecksumResultT;
+typedef enum {
+    CHECKSUM_ERROR_NONE = 0,
+    CHECKSUM_ERROR_OUTOFMEMORY = 1,
+    CHECKSUM_ERROR_INVALIDPARAMETERS = 2,
+    CHECKSUM_ERROR_STARTED = 3,
+    CHECKSUM_ERROR_NOTSTARTED = 4,
+    CHECKSUM_ERROR_INITIALIZED = 5,
+    CHECKSUM_ERROR_NOTINITIALIZED = 6,
+    CHECKSUM_ERROR_INTERNAL = 7,
+    CHECKSUM_ERROR_FORCE32BIT = 2147483647,
+} ChecksumErrorE;
+typedef ChecksumErrorE (* ChecksumInitT)(unsigned int);
+typedef ChecksumErrorE (* ChecksumShutdownT)(void);
+typedef unsigned char (* ChecksumIsInitializedT)(void);
+typedef ChecksumErrorE (* ChecksumStartT)(void);
+typedef ChecksumErrorE (* ChecksumCalculateT)(unsigned char *, unsigned int);
+typedef ChecksumErrorE (* ChecksumStopT)(ChecksumResultT * *);
+typedef ChecksumErrorE (* ChecksumGetSizeT)(unsigned int *);
+typedef const struct ChecksumType_t ChecksumTypeT;
+typedef unsigned short EASLanguageT;
+typedef unsigned char Uchar;
+typedef unsigned short Wchar;
+typedef unsigned int EASTimeT;
+// total size: 0x14
+struct CheckSumCRC32Info_t {
+    // Members
+    unsigned int * pLookupTable; // offset 0x0, size 0x4
+    ChecksumResultT Result; // offset 0x4, size 0x8
+    unsigned int uCRC; // offset 0xC, size 0x4
+    unsigned int uMemID; // offset 0x10, size 0x4
+};
+typedef struct CheckSumCRC32Info_t CheckSumCRC32InfoT;
+static CheckSumCRC32InfoT _ChecksumCRC32_State; // size: 0x14, address: 0x802AB428
+static const struct ChecksumType_t _ChecksumCRC32_Type; // size: 0x1C, address: 0x802935A8
+

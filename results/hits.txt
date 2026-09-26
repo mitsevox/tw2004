@@ -1,0 +1,10 @@
+unit ../../../Source/Common/Checksum/ChecksumCRC32.c
+unit ../../../Source/Common/char/skeleton.c
+unit ../../../Source/Common/Font/Font.c
+unit ../../../Source/NGC/Font/LLFont.c
+unit ../../../Source/Common/MovieRcmp/rcmp_mad_codec.cpp
+unit s:\dolphin\build\libraries\gba\src\GBA.c
+unit s:\dolphin\build\libraries\gba\src\GBAGetProcessStatus.c
+unit s:\dolphin\build\libraries\gba\src\GBARead.c
+unit s:\dolphin\build\libraries\gba\src\GBAWrite.c
+unit s:\dolphin\build\libraries\gba\src\GBAXfer.c
