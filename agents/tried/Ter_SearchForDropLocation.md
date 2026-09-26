@@ -10,6 +10,11 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 (add yours here: date, lane, what, score)
 
+- 2026-09-26 r2-terrain (6; EA's pin/preferred distances share f26 with fHeading, the ring
+  distance is f22, fLift f25): separate fPin/fPref locals (5x5 declaration positions): 12; the ring
+  distance kept in fDropDist: 6, in fHeading/fAngle/fSin/fCos/fTurn: 59-75; fLift kept in
+  fDropDist: 14, fDist/fHeading/fSin/fCos: 57-73; nPlayer int/s32 copies: 6.
+
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
 ```

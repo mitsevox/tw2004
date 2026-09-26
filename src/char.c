@@ -1268,7 +1268,9 @@ void fn_80019D64(Character* pChar, void (*pfnA)(Character* pChar), void (*pfnB)(
 }
 
 // Sets up the dynamic textures (LLDynTex.c) for the character's model in use.
-void fn_80019DE8(Character* pChar) {
+void fn_80019DE8(Character* pArg) {
+    // fake match: a copy of the parameter through void* (a plain copy is merged into it)
+    Character* pChar = (Character*)(void*)pArg;
     void* pModel = pChar->a64[pChar->n74];
 
     fn_8008EAC8(0);
@@ -1294,10 +1296,12 @@ void fn_80019E80(Character* pChar) {
 
 // Sets up the dynamic textures on the character's other model: the model in use is copied to it
 // (fn_8010A6A8) and each skin choice that differs from the skin's current one is put on it.
-void fn_80019EF4(Character* pChar) {
+void fn_80019EF4(Character* pArg) {
     int i;
     int j;
     Skin* pSkin;
+    // fake match: a copy of the parameter through void* (a plain copy is merged into it)
+    Character* pChar = (Character*)(void*)pArg;
     void* pModel;
 
     fn_8008E918(1);
@@ -1357,7 +1361,9 @@ void fn_8001A0FC(Character* pChar) {
 // Sets up the dynamic textures for the character's model in use (fn_8010B098), dresses it
 // (fn_8001D4A4) and puts its skins on the model; the last marked player (lbl_80281CAC) is
 // dressed again.
-void fn_8001A14C(Character* pChar) {
+void fn_8001A14C(Character* pArg) {
+    // fake match: a copy of the parameter through void* (a plain copy is merged into it)
+    Character* pChar = (Character*)(void*)pArg;
     u64 uGlove;
     void* pModel;
 

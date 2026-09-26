@@ -1933,7 +1933,7 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
             pLib->ppClips   = fn_80009B34(pLib->nClips * 4, 2, 0x40, "skalib.c", 4164);
             for (i = 0; i < pLib->nRecords; i++) {
                 pLib->pRecords[i].pClip =
-                    SKA_LoadFromMem(pLib->pClipData + (uptr)pLib->pRecords[i].pClip, NULL, 16);
+                    fn_80020DD4(pLib->pClipData + (uptr)pLib->pRecords[i].pClip, NULL, 16);
             }
             for (i = 0; i < pLib->nClips; i++) {
                 pLib->ppClips[i] = pLib->pRecords[pLib->pIndex[i]].pClip;
@@ -1983,7 +1983,7 @@ ClipBank* ClipBank_Load(u8* pFile, u32 uAlign) {
     }
     pData += uPad;
     for (i = 0; i < pBank->nClips; i++) {
-        pBank->ppClips[i] = SKA_LoadFromMem(pData + (uptr)pBank->ppClips[i], &uUnused, 16);
+        pBank->ppClips[i] = fn_80020DD4(pData + (uptr)pBank->ppClips[i], &uUnused, 16);
     }
     return pBank;
 }
