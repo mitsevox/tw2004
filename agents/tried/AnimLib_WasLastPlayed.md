@@ -10,6 +10,12 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 (add yours here: date, lane, what, score)
 
+- 2026-09-26 r2-terrain (12 aligned): inline getter for the slot (whole index, player+kind
+  row): 12; s32 copy of nClub, kind kept in nGroup: 12; strcmp on *ppSlot: 11 (not EA's: it
+  re-reads the table); if/else chain: 18; case 1 first: 12; `register` nKind: 12; slot / row /
+  player pointer locals: 14; a second kind variable: 12; `if (strcmp..) return 1; return 0;`: 12;
+  `nPlayer > 3`: 14; unsigned player test: 15; parameter copies (pcopy): 12.
+
 ## Collected from the notes and docs (2026-09-25)
 
 ### agents/notes/map-03-notes_w7.txt
