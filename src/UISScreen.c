@@ -68,10 +68,10 @@ static inline char* UIS_PutString(char* pOut, char* pEnd, const char* sz, s32 nW
     nLen = strlen(sz);
     if (!bLeft) {
         nPad = nAbs - nLen;
+        for (i = nPad; i > 0; i--) {
+            *pOut++ = ' ';
+        }
         if (nPad > 0) {
-            for (i = nPad; i > 0; i--) {
-                *pOut++ = ' ';
-            }
             nCount = nPad;
         }
     }
@@ -420,7 +420,7 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
                 bNeg = !bUnsigned && (s32)u < 0;
                 u = bNeg ? -u : u;
                 do {
-                    aDec[nDigits++] = u % 10 + '0';
+                    aDec[nDigits++] = u + '0' - u / 10 * 10;
                     u /= 10;
                 } while (u != 0);
                 if (nWidth != 0) {
@@ -467,7 +467,7 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
         }
     }
     *pOut++ = '\0';
-    return pOut - pStart - 1;
+    return pOut - (pStart + 1);
 }
 
 // Formats pFormat's text with pArgs into pOut's buffer.
