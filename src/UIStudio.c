@@ -532,7 +532,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             }
             break;
         case 0x4A: {  // a text's character n
-            s8 c = 0;
+            s32 c = 0;
 
             u = *--pFrame->pC;
             pText = (UISText*)*--pFrame->pC;
@@ -565,11 +565,15 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             break;
         case 0x77:  // whether a group is this screen's
             n = *--pFrame->pC;
-            pFrame->pC[-1] = n == pScreen->uGroup;
+            if (n == pScreen->uGroup) {
+                pFrame->pC[-1] = 1;
+            } else {
+                pFrame->pC[-1] = 0;
+            }
             break;
         case 0x78: {  // the current screen, group|screen<<16
-            u16 uCurGroup;
             u16 uCurScreen;
+            u16 uCurGroup;
 
             fn_80168EE8(pStudio, &uCurGroup, &uCurScreen);
             pFrame->pC[-1] = uCurGroup | (uCurScreen << 16);
