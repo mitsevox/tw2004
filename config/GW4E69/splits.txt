@@ -948,6 +948,9 @@ CourseData.c:
 
 Earnings.c:
 	.text       start:0x800D3244 end:0x800D9E14
+	.data       start:0x80191A08 end:0x80192010
+	.sdata      start:0x80281560 end:0x80281568
+	.sdata2     start:0x80284510 end:0x80284560
 
 GameHoleContests.c:
 	.text       start:0x800D9E14 end:0x800DAE44
