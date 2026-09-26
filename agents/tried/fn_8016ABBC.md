@@ -48,6 +48,24 @@ unless you combine it with something new. Before you stop, add every attempt und
   NULL test reads r7) and copies it per case (`mr r29,r7` / `mr r28,r7`) with the case's first load on
   r7; ours keeps p in r28 from the entry and folds the case copies. Same kept-copy shape as
   fn_8016AD54 (see there); no new C tried.
+- 2026-09-26 r7-uis (quicktrial aligned, base 16; mechanism in agents/findings/2026-09-26-r7-uis-copy-chains.md): each backend
+  copy-propagation pass deletes only the last link of a copy chain, and the register allocator
+  then coalesces any surviving copy whose two sides do not interfere, so EA's case copies need a
+  second definition of pNode/pGroup (or a feed into a never-propagated copy) all the way to
+  register allocation. Tried, no gain: p reused as the loop's child pointer (`p = pNode->ppGroups[i];
+  fn(.., p, 0)` / `p = ...` inside the argument, case 8, case 7, both): 16, the frontend folds or
+  deletes the store; with `#pragma opt_dead_assignments off` 19 (pNode's copy kept in case 8, p
+  then saved); the pInfo test as an inline taking pNode/pGroup, pInfo or void*: 26 / 62 (case 8
+  only); an inline `ppGroups[i]` accessor 16; identity accessors `UISNode* q = p; return q;`
+  (one to four nested levels: the frontend leaves one extra link, gone by pass 05) 16; case
+  bodies as static helpers taking `s32* pn` (the recursion inlines) 134; `pNode = p` again in the
+  loop latch 17 (an mr in the loop); `for (pNode = p, i = 0; ...)` 16; no-op self assignments
+  (`|0`, `&0xFFFFFFFF`, `<<0`, `*1`, `-0`, `^0`) folded 16; function-level pNode/pGroup also used
+  for the other case's recursive argument 16 (frontend folds). Permuter 15 min -j 2 (base 390):
+  390 -> 185 with `void** q = &p;` read in case 7 (p goes to the stack: `stw r7,0xc(r1)` not in
+  EA; load deletion then gives EA's exact `mr r30,r7; lwz r3,0(r7)`: proof the copies come
+  straight from r7), 255 (10 aligned) only with `new_var = p;` placed inside the switch before the
+  first case label, i.e. unreachable, so pNode reads an uninitialised variable: rejected.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
