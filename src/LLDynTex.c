@@ -175,9 +175,9 @@ void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
     u16 uNew1;
     u8 bSwap;
     u8 bThree;
-    int i;
     int nShift;
     u8 uIndices;
+    int i;
     u8 uIndex;
     u8* pIndices;
 
@@ -229,13 +229,13 @@ void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
                 continue;
             }
             pIndices = (u8*)&pBlock[2];
-            for (i = 0; i < 4; i++, pIndices++) {
+            for (i = 0; i < 4; i++) {
                 uIndices = 0;
                 for (nShift = 0; nShift < 8; nShift += 2) {
                     // EA bug: the mask keeps every bit from nShift up, not just the index's two,
                     // and the indices are compared as if 0x10 and 0x11 were binary 10 and 11;
                     // only the top index of a row is read right.
-                    uIndex = (*pIndices & (0xFF << nShift)) >> nShift;
+                    uIndex = (pIndices[i] & (0xFF << nShift)) >> nShift;
                     if (bThree) {
                         if (uIndex == 0) {
                             uIndices = uIndices | 1 << nShift;
@@ -258,7 +258,7 @@ void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
                         }
                     }
                 }
-                *pIndices = uIndices;
+                pIndices[i] = uIndices;
             }
         }
     }
