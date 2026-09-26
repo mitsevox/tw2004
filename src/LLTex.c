@@ -34,7 +34,7 @@ void fn_8000E830(DynObj* pObj) {
 // two 4-bit counters up (bits 8-11 when bOn, else 12-15) while n1A is below n14 and n18 is set.
 void fn_8000E884(LLTexItem* pItem, int nMsg, int bOn) {
     LLTexItemState* pState = pItem->p4;
-    s16 n;
+    int n;
 
     switch (nMsg) {
     case 0x46:
@@ -50,13 +50,13 @@ void fn_8000E884(LLTexItem* pItem, int nMsg, int bOn) {
     case 0x47:
         if (pState->n1A < pState->n14 && pState->n18 != 0) {
             if (bOn) {
-                n = pState->n16;
-                pState->n16 = n & 0xF0FF;
-                pState->n16 |= (((n >> 8) & 0xF) + 1) << 8;
+                n = (pState->n16 >> 8) & 0xF;
+                pState->n16 &= 0xF0FF;
+                pState->n16 |= (n + 1) << 8;
             } else {
-                n = pState->n16;
-                pState->n16 = n & 0xFFF;
-                pState->n16 |= (((n >> 12) & 0xF) + 1) << 12;
+                n = (pState->n16 >> 12) & 0xF;
+                pState->n16 &= 0xFFF;
+                pState->n16 |= (n + 1) << 12;
             }
         }
         break;
