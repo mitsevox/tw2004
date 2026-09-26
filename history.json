@@ -40325,5 +40325,21 @@
 "matched_functions": 7545,
 "total_functions": 7647,
 "exact": 7545
+},
+{
+"commit": "22d6750",
+"sha": "22d67502fa9826ccbebf110fe606b28ed25904c4",
+"time": 1790384423,
+"subject": "Merge n-uisapi (evening push, round 1)",
+"report": true,
+"matched_code": 1453776,
+"complete_code": 1162948,
+"matched_data": 702159,
+"complete_data": 846035,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7545,
+"total_functions": 7647,
+"exact": 7545
 }
 ]
