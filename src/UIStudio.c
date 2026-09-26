@@ -985,10 +985,10 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->pC--;
             break;
         case 0x73: {  // whether a rate function runs
-            s32* pNodeInfo = --pFrame->pC;
-            s32* pId = --pFrame->pC;
+            UISNodeInfo* pNodeInfo = (UISNodeInfo*)*--pFrame->pC;
+            s32 nId = *--pFrame->pC;
 
-            *pFrame->pC = fn_8016604C(pStudio, (UISNodeInfo*)*pNodeInfo, *pId) < pStudio->nRateFns;
+            *pFrame->pC = fn_8016604C(pStudio, pNodeInfo, nId) < pStudio->nRateFns;
             pFrame->pC++;
             break;
         }
@@ -1003,14 +1003,14 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             fn_80165B90(data.aw[2], data.aw[3], pStudio, 8, &data, 0, NULL);
             break;
         case 0x74: {  // set or clear a bit of the screen's event mask (-1: all)
-            s32* pOn = --pFrame->pC;
+            s32 bOn = *--pFrame->pC;
             u32 uBits = -1;
 
             n = *--pFrame->pC;
             if (n >= 0) {
                 uBits = 1 << n;
             }
-            if (*pOn != 0) {
+            if (bOn != 0) {
                 pScreen->uMask |= uBits;
             } else {
                 pScreen->uMask &= ~uBits;
