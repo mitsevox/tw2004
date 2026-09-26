@@ -1,6 +1,6 @@
 # Ter_CheckObjectAndHazardObstruction (GoTerrainCollision.c, 0x8004B89C)
 
-Status: OPEN, 99.32% on 2026-09-25.
+Status: OPEN, 99.98% on 2026-09-26 (9 instructions, two spill slots swapped).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
