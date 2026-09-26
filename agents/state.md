@@ -3,10 +3,13 @@
 Updated 2026-09-25 ~21:30 CDT. How the machines, CI, the page and PC jobs fit together:
 docs/infrastructure.md. History: docs/journal.md.
 
-**Running:** no cloud lanes (the evening push's two rounds are merged; lane branches `n-*`, `r2-*`).
-PC: permuter on rcmp madinit (fn_800B769C), then startUp fn_800B0748. Golfer held (PC).
-Leftover: the round-1 worktrees n-uisapi/n-uistudio/n-ll/n-shaders/n-terrain hold uncommitted,
-unverified edits from the interrupted lanes (not merged; the owner decides before any delete).
+**Running:** no cloud lanes. Round 3 (worktrees `r3-*`, all merged) was cut short at ~22:35 CDT
+when the disk filled: quicktrial.py leaked a temp folder per trial (fixed in 176f77a; their unwritten
+attempts are in agents/tried). Gemini (owner's Mac) works `gemini/round4`: LLPictInt, LLDynTex,
+LLTex, LLFont, MC, GameModeBestBall, Code8002EE1C, DepthField, GameMode22, CamSpline, uiArc.
+PC: permuter on rcmp madinit, then startUp fn_800B0748. Golfer held (PC).
+Unit count: the weather split (Code8006F608.c) replaced two unsorted sweep units, so game units
+went 217/259 -> 216/258 with no unit lost.
 
 **Parked for the owner:**
 - EA names for rcmp_mad_codec (14 functions, 5 globals) and ska_shared (SKAUtil_EulerAnglesToQTs8,
@@ -51,7 +54,7 @@ GoDynamicCam/GoPostFx in link order, used only by GxUtil and gomainloop: owner u
 
 | exact functions | matched code | code linked | data linked | game units linked |
 |---|---|---|---|---|
-| 7,555 / 7,647 | 94.14% | 75.14% | 78.43% | 217 / 259 |
+| 7,556 / 7,647 | 94.16% | 75.14% | 78.55% | 216 / 258 |
 
 `python tools/agents/remain.py` lists what is left by unit; rank by code-bar gain per function.
 
