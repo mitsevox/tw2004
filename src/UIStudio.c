@@ -688,7 +688,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             break;
         case 0x55:  // push a word at a local's pointer plus an offset (0x6B: its address)
         case 0x6B: {
-            u32 u;
+            u32 uOffset;
 
             uByte0 = *pFrame->p10;
             pFrame->p10++;
@@ -698,13 +698,13 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->p10++;
             uByte3 = *pFrame->p10;
             pFrame->p10++;
-            u = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
+            uOffset = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
             uByte0 = *pFrame->p10;
             pFrame->p10++;
             uByte1 = *pFrame->p10;
             pFrame->p10++;
             n = (uByte0 << 8) | uByte1;
-            pArgs = (s32*)(u + pFrame->pC[(s16)n]);
+            pArgs = (s32*)(uOffset + pFrame->pC[(s16)n]);
             if (uOp == 0x6B) {
                 *pFrame->pC = (s32)pArgs;  // port: a stack word holds the pointer
                 pFrame->pC++;
@@ -715,7 +715,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             break;
         }
         case 0x56: {  // store the top at a local's pointer plus an offset
-            u32 u;
+            u32 uOffset;
 
             uByte0 = *pFrame->p10;
             pFrame->p10++;
@@ -725,18 +725,18 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->p10++;
             uByte3 = *pFrame->p10;
             pFrame->p10++;
-            u = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
+            uOffset = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
             uByte0 = *pFrame->p10;
             pFrame->p10++;
             uByte1 = *pFrame->p10;
             pFrame->p10++;
             n = (uByte0 << 8) | uByte1;
-            *(s32*)(u + pFrame->pC[(s16)n]) = pTop[-1];
+            *(s32*)(uOffset + pFrame->pC[(s16)n]) = pTop[-1];
             pFrame->pC--;
             break;
         }
         case 0x57: {  // push a local's pointer plus an offset
-            u32 u;
+            u32 uOffset;
 
             uByte0 = *pFrame->p10;
             pFrame->p10++;
@@ -746,14 +746,14 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->p10++;
             uByte3 = *pFrame->p10;
             pFrame->p10++;
-            u = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
+            uOffset = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
             uByte0 = *pFrame->p10;
             pFrame->p10++;
             uByte1 = *pFrame->p10;
             pFrame->p10++;
             n = (uByte0 << 8) | uByte1;
             pTop = pFrame->pC;
-            *pTop = u + pTop[(s16)n];
+            *pTop = uOffset + pTop[(s16)n];
             pFrame->pC++;
             break;
         }
