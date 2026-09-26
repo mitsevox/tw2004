@@ -185,6 +185,8 @@ void fn_8008F820(void) {
     int j;
     int k;
     UIButtonEvent* pEvent;
+    u32* pPressed;
+    u32* pButtons;
 
     fOne = 1.0f;
     if (gSession.nGameType == 3 || gSession.nGameType == 1 ||
@@ -203,6 +205,8 @@ void fn_8008F820(void) {
     }
     lbl_801D87C0.n38 = 0;
     fn_80005AE8(aArgs, 0, sizeof(aArgs));
+    pButtons = aButtons;
+    pPressed = aPressed;
     for (i = 0; i < 4; i++) {
         if (fn_80013070(i)) {
             lbl_801D87C0.a1[i] = 1;
@@ -212,28 +216,28 @@ void fn_8008F820(void) {
             lbl_801D87C0.a1[i] = 0;
         }
         if (lbl_801D87C0.a1[i]) {
-            aButtons[i] = fn_800136DC(i);
-            if (aButtons[i] & 0x40000) {
-                aButtons[i] |= 4;
+            pButtons[i] = fn_800136DC(i);
+            if (pButtons[i] & 0x40000) {
+                pButtons[i] |= 4;
             }
-            if (aButtons[i] & 0x80000) {
-                aButtons[i] |= 8;
+            if (pButtons[i] & 0x80000) {
+                pButtons[i] |= 8;
             }
-            if (aButtons[i] & 0x20000) {
-                aButtons[i] |= 2;
+            if (pButtons[i] & 0x20000) {
+                pButtons[i] |= 2;
             }
-            if (aButtons[i] & 0x10000) {
-                aButtons[i] |= 1;
+            if (pButtons[i] & 0x10000) {
+                pButtons[i] |= 1;
             }
-            if (lbl_801D87C0.a8[i] != aButtons[i]) {
+            if (lbl_801D87C0.a8[i] != pButtons[i]) {
                 lbl_801D87C0.a18[i] = 0;
             } else if (lbl_801D87C0.a18[i] > 8) {
                 lbl_801D87C0.a18[i] = 0;
                 lbl_801D87C0.a8[i] = 0;
             }
             lbl_801D87C0.a18[i]++;
-            aPressed[i] = aButtons[i] & ~lbl_801D87C0.a8[i];
-            lbl_801D87C0.a8[i] = aButtons[i];
+            pPressed[i] = pButtons[i] & ~lbl_801D87C0.a8[i];
+            lbl_801D87C0.a8[i] = pButtons[i];
         }
         lbl_801D87C0.a28[i] = lbl_801D87C0.a1[i];
     }
@@ -263,9 +267,7 @@ void fn_8008F820(void) {
     }
     aArgs[0] = 0;
     if (lbl_801D87C0.b0 == 0 && fn_80077148() && lbl_801D87C0.b40 == 0) {
-        for (k = 0; k < 4; k++) {
-            u32* pButtons = &aButtons[k]; // fake match: keeps the button-array pointer live
-            u32* pPressed = &aPressed[k]; // fake match: keeps the pressed-array pointer live
+        for (k = 0; k < 4; k++, pButtons++, pPressed++) {
             if (lbl_801D87C0.a1[k] && lbl_801D87C0.a30[k]) {
                 if (gSession.nGameType != 6 || (gSession.nPaused != 2 && gSession.nPaused != 3)) {
                     pEvent = lbl_80189B58;

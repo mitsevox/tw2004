@@ -64,3 +64,8 @@ BreakLine_Render, StaticCam_GetFlybyInformation, UObject fn_800488B4, uiText fn_
 hlaudmovie, ska_shared, PsMgr, GoStaticCam, BreakLine_Render, Rain, uiText, MC, GameModeBestBall,
 ```
 - 2026-09-26 PC declsearch (run 36221888505, iterated local search over the declaration order): best 7 (no better order than the current one), 4827098366 trials.
+- 2026-09-26 r5-world (mwcc-debugger): the rotate loop's temps are assigned in reverse creation
+  order: f61 (new z) f0, f60 (z product) f0, f59 (new x) f2, f58 (x product) f2, then fZ f0. EA's
+  registers (x temps f0, z temps and fZ f2) need the new-x temps assigned before the new-z ones,
+  i.e. the x expression's temps numbered after the z expression's, while the x store stays
+  first. Not tried further this round.

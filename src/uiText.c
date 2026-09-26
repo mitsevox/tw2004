@@ -27,6 +27,13 @@ void fn_80092C38(f32 x0, f32 x1);
 void fn_80092C78(f32 x0, f32 x1);
 void fn_80092CB8(f32 x0);
 
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0, before the 512 and 448 fn_800922A8 uses first; its body is unknown, this one only
+// reproduces the order.
+static f32 uiText_StrippedFn(f32 f) {
+    return f + 1.0f;
+}
+
 // Draws the element's string: its place and size through the UI transform (screen units of
 // 512 x 448), its colour through the UI Studio's multiply and add, then the string itself.
 void fn_800922A8(UIText* pText) {
@@ -85,8 +92,9 @@ void fn_800922A8(UIText* pText) {
     vEnd.y = 0.0f;
     vEnd.z = 0.0f;
     vEnd.w = fW;
-    fInvH = 1.0f / 448.0f; // fake match: the factor through a local puts vOut.y first in fmuls
-    fY = vOut.y * fInvH;
+    // fake match: the factor assigned to a local inside the product loads vOut.y first (a
+    // constant operand is put first in fmuls)
+    fY = vOut.y * (fInvH = 1.0f / 448.0f);
     if (pText->nFlags & 0x100) {
         vEnd.x = 512.0f * (pText->v18[0] / 512.0f) + 512.0f * (pText->f30 / 512.0f);
     }
