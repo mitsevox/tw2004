@@ -41077,5 +41077,21 @@
 "matched_functions": 7567,
 "total_functions": 7647,
 "exact": 7567
+},
+{
+"commit": "84f7d39",
+"sha": "84f7d39f18e81a24cb4c341bebb5b695a62dc319",
+"time": 1790433282,
+"subject": "state: round 5 (mwcc-debugger on all 80 functions, 5 lanes, checkpoint 12:00 CDT)",
+"report": true,
+"matched_code": 1472624,
+"complete_code": 1218288,
+"matched_data": 714119,
+"complete_data": 858875,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7567,
+"total_functions": 7647,
+"exact": 7567
 }
 ]
