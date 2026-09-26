@@ -1,0 +1,17 @@
+file	function	size	returns	parameters	locals	tw2004_candidate	confidence	why
+SKA.cpp	SKA_DistributePointers	0x224	void	TSkeletonAnimation* pSKA, char* pRotData	char* pData	fn_800206C8	medium	(animation*, data): lays the streams out from a base
+SKA.cpp	SKA_GetTotalRotationDataBytes		int32	TSkeletonAnimation* pSKA				
+SKA.cpp	SKA_LoadFromMem	0x80	TSkeletonAnimation*	char* pData, int32* iSize, uint32 align	TSkeletonAnimation* pSKA; uint32 iOffset	fn_80020DD4	strong	(data*, int* size, alignment) -> the animation; ours names its 3rd parameter nAlign
+SKA.cpp	SKA_PatchMemory		TSkeletonAnimation*	TSkeletonAnimation* pSKA, char* pRotData	char* pData	fn_80020F60	medium	(animation*, data) -> animation*; ours (Clip*, uAram) -> Clip*
+SKA.cpp	SKA_Free		void	TSkeletonAnimation* pSKA				
+SKA.cpp	AnimFrameCache_Init		void	TAnimFrameCache* pCache, int numBones	int32 i; char* expPtr			
+SKA_Util.cpp	SKAUtil_EulerAnglesToQTs16	0x520	void	uint16* spAniAngle16_p, Quat* xpQuats_p, int32 iNumberOfElements_p, uint64* uiAxisMask_p, uint16* spBaseAniAngle16_p	uint32 i; uint32 ii; uint64 aMask; uint64 axisMask; Quat* Q; float ss; float sc; float cs; float cc; float sh; float sj; float si; float ch; float cj; float ci; float th; float tj	fn_80021134	medium	u16*, out, count, mask*; TW2004 has no base-angle parameter
+SKA_Util.cpp	SKAUtil_EulerAnglesToQTs8	0x640	void	uint8* spAniAngle8_p, Quat* xpQuats_p, int32 iNumberOfElements_p, uint64* uiAxisMask_p, uint16* spBaseAniAngle16_p	uint32 i; uint32 ii; uint64 aMask; uint64 axisMask; Quat* Q; float ss; float sc; float cs; float cc; float sh; float sj; float si; float ch; float cj; float ci; float th; float tj	fn_8002148C	strong	same 5 parameter types (u8*, out, count, mask*, u16* base)
+SKA_Util.cpp	SKAUtil_Expand8BitTrans	0x148	void	uint8* p8BitTFrames, vec3flt* pDestTFrames, vec3flt* pBaseTFrames, int32 numBones, uint64* axisMask	int i; int ii; uint64 aMask; uint64 axis			
+SKA_Util.cpp	SKAUtil_Expand16BitTrans	0x148	void	uint16* p16BitTFrames, vec3flt* pDestTFrames, vec3flt* pBaseTFrames, int32 numBones, uint64* axisMask	int i; int ii; uint64 aMask; uint64 axis			
+SKA_Util.cpp	SKAUtil_ExpandStaticFrames	0x1C8	void	uint16* pYPR, Quat* pDest, int32 num	int32 i; Quat* Q; float ss; float sc; float cs; float cc; float sh; float sj; float si; float ch; float cj; float ci; float th; float tj			
+SKA_Util.cpp	SKAUtil_ExpandStaticFirstBone	0x170	void	uint16* pYPR, Quat* pDest	Quat* Q; float ss; float sc; float cs; float cc; float sh; float sj; float si; float ch; float cj; float ci; float th; float tj			
+SKA_Util.cpp	SKAUtil_EulerAnglesRPY		void	float ex, float ey, float ez, Quat* Q	float tj; float th; float ci; float cj; float ch; float si; float sj; float sh; float cc; float cs; float sc; float ss			
+SKA_Util.cpp	SKAUtil_CopyFloatTrans		void	vec3flt* pFloatTFrames, vec3flt* pDestTFrames, int32 numBones	int i			
+SKA_Util.cpp	SKAUtil_ExpandSingleFrameToDest	0x160	bool	TSkeletonAnimation* pSKA, int32 iFrame, Quat* dest8, Quat* dest16, vec3flt* dest8BitT, vec3flt* dest16BitT, vec3flt* destFloatT	vec3flt* pFloatTFrames; vec3flt* pDestTFrames; int i			
+SKA_Util.cpp	SKAUtil_ExpandFirstBoneToDest	0x168	bool	TSkeletonAnimation* pSKA, int32 iFrame, Quat* dest8, Quat* dest16, vec3flt* dest8BitT, vec3flt* dest16BitT, vec3flt* destFloatT	vec3flt* pDestTFrames			

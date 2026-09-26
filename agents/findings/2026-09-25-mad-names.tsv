@@ -1,0 +1,21 @@
+our_address	ea_name	source1_tw06_xbox_pdb	source2_nfsmw_gc_symbols
+800B769C	madinit	maddec.c: void madinit()	maddec.cpp madinit__Fv
+800B7D80	discardbits	maddec.c: void discardbits(s32 bits)	maddec.cpp discardbits__Fi
+800B7DF4	getdelta	maddec.c: s32 getdelta()	maddec.cpp getdelta__Fv
+800B7E38	dcblock	maddec.c: void dcblock(s32* dest, s32 stride)	maddec.cpp dcblock__FPii
+800B8064	getluma	maddec.c: void getluma(const u8* src, s32 stride, s32* dest, s32 correction)	maddec.cpp getluma__FPCUciPii
+800B8180	getchroma	maddec.c: void getchroma(const u8* src, s32 stride, s32* dest, s32 correction)	maddec.cpp getchroma__FPCUciPii
+800B829C	setluma	maddec.c: void setluma(const s32* src, u8* dest, s32 stride)	maddec.cpp setluma__FPCiPUci
+800B83DC	setchroma	maddec.c: void setchroma(const s32* src, u8* dest, s32 stride)	maddec.cpp setchroma__FPCiPUci
+800B8528	MAD_initdecode	maddec.c: void MAD_initdecode(const u16* src, s32 motion, s32 quality)	maddec.cpp MAD_initdecode__FPCUsii
+800B8618	MAD_decodemacroblock	maddec.c: void MAD_decodemacroblock(const u8* src_y, const u8* src_cb, const u8* src_cr, u8* dest_y, u8* dest_cb, u8* dest_cr, s32 width, s32 flags)	maddec.cpp MAD_decodemacroblock__FPCUcN20PUcN23i
+800B8AA0	madvlcdecode	maddeca.c: s32 madvlcdecode()	maddeca.cpp madvlcdecode
+800B8C54	IdctColumn	madidct.c: void IdctColumn(s32* src, s32* dest)	madidct.cpp IdctColumn
+800B8DF4	IdctRow	madidct.c: void IdctRow(s32* src, s32* dest)	madidct.cpp IdctRow
+800B8F28	idctcompute	madidct.c: void idctcompute(s32* dest, s32 stride)	madidct.cpp idctcompute
+802821B0	madbitcount	global s32 madbitcount	global madbitcount (.sbss 4)
+802821B4	madshiftreg	global u32 madshiftreg	global madshiftreg (.sbss)
+802821B8	maddataptr	global const u16* maddataptr	global maddataptr (.sbss 4)
+801F7A58	madvlctbl1	global s32[512] madvlctbl1	global madvlctbl1 (.bss 0x800)
+801F7158	madvlctbl4	global volatile s32[64] madvlctbl4	global madvlctbl4 (.bss 0x100)
+801F7058	madquant	global s32[64] madquant	global madquant (.bss 0x100)
