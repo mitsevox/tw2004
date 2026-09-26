@@ -1,0 +1,11 @@
+--- before
++++ after
+@@ -1,6 +1,6 @@
++int nMode;
+ MovieSoundBlock* pBlock = pChunk;
+-int nMode;
+-u8* pDataL;
+ u8* pDataR;
+ u32 uLeft;
+ u32 uRight;
++u8* pDataL;

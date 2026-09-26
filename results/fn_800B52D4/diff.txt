@@ -1,0 +1,37 @@
+--- before
++++ after
+@@ -1,19 +1,19 @@
+-Vec4 vCenter;
+-Vec4 vPos;
+-Sphere sphere;
+-f32 mView[4][4];
+ Camera* pCamera;
+ int i;
++RainData* pData;
++f32 mView[4][4];
++int nHalf;
++int k;
++Vec4 vCenter;
++int nBuf;
++f32 fFade;
++f32 fY;
++RainSplash* pSplash;
++f32 fOff;
+ CamLens* pLens;
+-RainSplash* pSplash;
+-int nHalf;
++f32 fX;
++Vec4 vPos;
++f32 fSize;
++RainPoint* pPoint;
+ int j;
+-RainData* pData;
+-int nBuf;
+-RainPoint* pPoint;
+-int k;
+-f32 fOff;
+-f32 fY;
+-f32 fX;
+-f32 fFade;
+-f32 fSize;
++Sphere sphere;

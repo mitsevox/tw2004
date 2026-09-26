@@ -1,0 +1,38 @@
+--- before
++++ after
+@@ -1,23 +1,23 @@
+ u8* pKeys;
+ f32* pRot;
+ ClipTrack* pTrack;
++int* pFree;
+ f32* pA10;
++int nNext;
+ f32* pA14;
+ f32* pB10;
++int aSlot[2];
+ f32* pB14;
++int j;
++int i;
++int aFree[2];
++f32 aA[4];
++u8* pRange;
++int nKey;
++f32 fPos;
+ BonePose* pBone;
+-int j;
++f32 aB[4];
++u32 aTmp[8];
+ u32 uFlags;
+-f32 fPos;
+ f32 fFrac;
+-u8* pRange;
+-int nNext;
+-int nKey;
+-int i;
+-u32 aTmp[8];
+-f32 aA[4];
+-f32 aB[4];
+-int aSlot[2];
+-int aFree[2];
+ int aFrame[2];
+-int* pFree;

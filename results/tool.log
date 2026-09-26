@@ -1,0 +1,126 @@
+StaticCam_GetFlybyInformation: 19 declarations
+fn_8001FCF4: 23 declarations
+Character_SetupForShot: 14 declarations
+BreakLine_Render: 3 declarations
+fn_8016B188: 3 declarations
+SW_vImpact: 4 declarations
+fn_80169308: 6 declarations
+fn_800D477C: 11 declarations
+fn_800922A8: 21 declarations
+fn_800D4F14: 6 declarations
+CameraScript_LagAimMarker: 15 declarations
+fn_800B52D4: 19 declarations
+fn_8011172C: 5 declarations
+fn_8008F820: 11 declarations
+fn_80165B90: fewer than 2 declarations found, skipped
+fn_80168CD8: 7 declarations
+fn_800CE52C: 11 declarations
+fn_800A8AD4: 6 declarations
+fn_80019798: 15 declarations
+fn_800B0748: fewer than 2 declarations found, skipped
+fn_800CE224: 11 declarations
+fn_80026844: 11 declarations
+fn_8001F110: fewer than 2 declarations found, skipped
+Stm_Tick: 10 declarations
+fn_8000EA1C: 5 declarations
+GR_BuildGridRenderData: 26 declarations
+fn_8016B4D4: 9 declarations
+fn_8009A708: 2 declarations
+fn_80017DDC: fewer than 2 declarations found, skipped
+fn_800B769C: 10 declarations
+AI_ChooseTarget: 18 declarations
+fn_800C7A9C: 18 declarations
+fn_80032B7C: 10 declarations
+fn_80169590: 8 declarations
+fn_8003F2E0: fewer than 2 declarations found, skipped
+fn_80169858: 5 declarations
+DF_vDrawBufferToScreen: 12 declarations
+fn_80166098: 25 declarations
+fn_8016AEEC: 4 declarations
+SD_vShaderObject_Grass_Static_Render: 26 declarations
+fn_80168918: 14 declarations
+fn_8009A708 all seed 0: best (3, 3) after 2 trials
+fn_8016B188 all seed 0: best (187, 212) after 6 trials
+BreakLine_Render all seed 0: best (7, 7) after 6 trials
+fn_8016AEEC all seed 0: best (25, 66) after 24 trials
+SW_vImpact all seed 0: best (6, 6) after 24 trials
+fn_80169858 all seed 0: best (49, 102) after 120 trials
+fn_8011172C all seed 0: best (1, 1) after 120 trials
+fn_8001FCF4 ils seed 1: best (0, 0) after 122 trials
+fn_8000EA1C all seed 0: best (5, 7) after 120 trials
+fn_80169308 all seed 0: best (2, 2) after 720 trials
+fn_800A8AD4 all seed 0: best (7, 7) after 720 trials
+fn_800D4F14 all seed 0: best (14, 14) after 720 trials
+fn_80168CD8 all seed 0: best (4, 2) after 5040 trials
+SW_vImpact ils seed 1: best (6, 6) after 4792663189 trials
+fn_800A8AD4 ils seed 1: best (7, 7) after 3585614587 trials
+BreakLine_Render ils seed 1: best (7, 7) after 4827098360 trials
+fn_800D4F14 ils seed 1: best (14, 14) after 3878940773 trials
+fn_8016B188 ils seed 1: best (187, 212) after 4900627821 trials
+fn_8011172C ils seed 1: best (1, 1) after 4455289330 trials
+fn_80169308 ils seed 1: best (2, 2) after 4003042833 trials
+fn_80168CD8 ils seed 1: best (4, 2) after 2030150028 trials
+fn_8016B4D4 ils seed 1: best (26, 119) after 0 trials
+fn_8009A708 ils seed 1: best (3, 3) after 0 trials
+Stm_Tick ils seed 1: best (2, 2) after 0 trials
+fn_8000EA1C ils seed 1: best (5, 7) after 0 trials
+AI_ChooseTarget ils seed 1: best (101, 101) after 0 trials
+fn_80026844 ils seed 1: best (13, 13) after 0 trials
+fn_800B769C ils seed 1: best (15, 18) after 0 trials
+GR_BuildGridRenderData ils seed 1: best (44, 41) after 0 trials
+fn_800C7A9C ils seed 1: best (10, 10) after 0 trials
+fn_80032B7C ils seed 1: best (4, 10) after 0 trials
+fn_80169858 ils seed 1: best (49, 102) after 0 trials
+DF_vDrawBufferToScreen ils seed 1: best (79, 143) after 0 trials
+fn_80169590 ils seed 1: best (56, 56) after 0 trials
+fn_8016AEEC ils seed 1: best (25, 66) after 0 trials
+SD_vShaderObject_Grass_Static_Render ils seed 1: best (41, 38) after 0 trials
+fn_80166098 ils seed 1: best (617, 2325) after 0 trials
+fn_80168918 ils seed 1: best (27, 77) after 0 trials
+fn_800D477C ils seed 1: best (19, 19) after 10553 trials
+StaticCam_GetFlybyInformation ils seed 1: best (2, 2) after 11102 trials
+fn_80019798 ils seed 1: best (28, 28) after 10126 trials
+fn_800CE52C ils seed 1: best (5, 5) after 11651 trials
+CameraScript_LagAimMarker ils seed 1: best (11, 11) after 11468 trials
+fn_800922A8 ils seed 1: best (2, 370) after 10797 trials
+fn_800CE224 ils seed 1: best (19, 19) after 6832 trials
+fn_8008F820 ils seed 1: best (17, 17) after 11102 trials
+Character_SetupForShot ils seed 1: best (6, 6) after 11346 trials
+fn_800B52D4 ils seed 1: best (13, 13) after 10614 trials
+fn_8001FCF4                  new order -> 0   EXACT
+fn_8011172C                  base -> 1
+fn_80169308                  base -> 2
+Stm_Tick                     base -> 2
+StaticCam_GetFlybyInformation base -> 2
+fn_800922A8                  base -> 2
+fn_8009A708                  base -> 3
+fn_80168CD8                  base -> 4
+fn_80032B7C                  base -> 4
+fn_800CE52C                  base -> 5
+fn_8000EA1C                  base -> 5
+SW_vImpact                   base -> 6
+Character_SetupForShot       base -> 6
+BreakLine_Render             base -> 7
+fn_800A8AD4                  new order -> 7
+fn_800C7A9C                  base -> 10
+CameraScript_LagAimMarker    base -> 11
+fn_80026844                  base -> 13
+fn_800B52D4                  new order -> 13
+fn_800D4F14                  base -> 14
+fn_800B769C                  base -> 15
+fn_8008F820                  base -> 17
+fn_800D477C                  base -> 19
+fn_800CE224                  base -> 19
+fn_8016AEEC                  base -> 25
+fn_8016B4D4                  base -> 26
+fn_80168918                  base -> 27
+fn_80019798                  base -> 28
+SD_vShaderObject_Grass_Static_Render base -> 41
+GR_BuildGridRenderData       base -> 44
+fn_80169858                  base -> 49
+fn_80169590                  base -> 56
+DF_vDrawBufferToScreen       base -> 79
+AI_ChooseTarget              base -> 101
+fn_8016B188                  base -> 187
+fn_80166098                  base -> 617
+1 of 36 exact
