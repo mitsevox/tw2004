@@ -3,13 +3,14 @@
 Updated 2026-09-25 ~21:30 CDT. How the machines, CI, the page and PC jobs fit together:
 docs/infrastructure.md. History: docs/journal.md.
 
-**Running:** no cloud lanes. Round 3 (worktrees `r3-*`, all merged) was cut short at ~22:35 CDT
-when the disk filled: quicktrial.py leaked a temp folder per trial (fixed in 176f77a; their unwritten
-attempts are in agents/tried). Gemini (owner's Mac) works `gemini/round4`: LLPictInt, LLDynTex,
-LLTex, LLFont, MC, GameModeBestBall, Code8002EE1C, DepthField, GameMode22, CamSpline, uiArc.
-PC: permuter on rcmp madinit, then startUp fn_800B0748. Golfer held (PC).
-Unit count: the weather split (Code8006F608.c) replaced two unsorted sweep units, so game units
-went 217/259 -> 216/258 with no unit lost.
+**Running:** no cloud lanes (round 4, worktrees `r4-*`, all merged 2026-09-26 ~01:00 CDT).
+PC: `declsearch` (tools/match/declsearch.py, every declaration order / kick-and-climb over 18
+cores) on the 41 functions at 97%+, 240 min, results on a `pc-results/declsearch-*` branch: apply
+an exact order by hand. Golfer held (PC). Gemini round 4 merged (GameModeBestBall closer; its
+`nOurs` reuse there needs a `fake match:` label at the next pass over that file).
+Rule change (owner, 2026-09-26): EA's code exactly as EA wrote it; portability is not a constraint
+(CLAUDE.md, agents/brief.md). Leads to revisit with it: file-loading / fixup / address-math code.
+Unit count: the weather split (Code8006F608.c) replaced two unsorted sweep units (259 -> 258).
 
 **Parked for the owner:**
 - EA names for rcmp_mad_codec (14 functions, 5 globals) and ska_shared (SKAUtil_EulerAnglesToQTs8,
@@ -54,7 +55,7 @@ GoDynamicCam/GoPostFx in link order, used only by GxUtil and gomainloop: owner u
 
 | exact functions | matched code | code linked | data linked | game units linked |
 |---|---|---|---|---|
-| 7,556 / 7,647 | 94.16% | 75.14% | 78.55% | 216 / 258 |
+| 7,566 / 7,647 | 94.86% | 78.04% | 79.55% | 218 / 258 |
 
 `python tools/agents/remain.py` lists what is left by unit; rank by code-bar gain per function.
 
