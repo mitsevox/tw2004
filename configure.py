@@ -886,7 +886,7 @@ config.libs = [
             Object(NonMatching, "Code8002EE1C.c"),
             Object(Matching, "GoRenderSurface.c"),
             Object(Matching, "LLPict_Gc.c"),
-            Object(NonMatching, "GoTerrain.c"),
+            Object(Matching, "GoTerrain.c"),
             Object(Matching, "Skin.c"),
             Object(Matching, "Code80037AB8.c"),
             Object(Matching, "GoPostFx.c"),
