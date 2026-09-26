@@ -282,18 +282,18 @@ void fn_800949D0(SD_SShaderObject_Static* pObject) {
 // fStep and those past the lifetime are dropped; then the particles the other buffer has beyond
 // them are carried over, aged by fCarried.
 void fn_80094B84(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {
-    ParticleSystem* pSys;
-    int nBuf;
-    int nOther;
-    u32 nDead;
     u32 nStart;
-    u32 nLive;
     u32 i;
-    u32 n;
     u32 nEnd;
-    f32 fAge;
+    ParticleSystem* pSys;
     ParticleVertex* pSrc;
+    int nOther;
+    f32 fAge;
+    u32 n;
     ParticleVertex* pDst;
+    u32 nLive;
+    int nBuf;
+    u32 nDead;
 
     nDead = 0;
     pSys = pObject->pData;
