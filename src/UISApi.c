@@ -334,9 +334,9 @@ static inline s32 Screen_BringBack(UIStudio* pStudio, u16 uGroup, u16 uScreen, u
 // current and the new screen's first node. Returns what fn_80169858 returned.
 // fake match: pStudio is a cast copy of the parameter, declared last (the register order)
 s32 fn_80169590(UIStudio* pStudioArg, u16 uGroup, u16 uScreen, u8 bPush, u8 nArgs, s32* pArgs) {
-    s16 nPrevGroup;
     s16 nPrevScreen;
     u32 nRecord;
+    s16 nPrevGroup;
     u8 bLoaded;
     s32 nResult;
     UISRecord60* pRec;
