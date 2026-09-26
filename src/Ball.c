@@ -391,20 +391,21 @@ void   Ball_FlightStep(Ball* pBall, f32 fTicks);
 f32    Physics_GetBallAltitude(Ball* pBall);
 u8     fn_80054040(Ball* pBall, f32 fTicks);
 
-extern u8  gSimulating;                          // 0x80281DD0  a rehearsal: no sounds or effects
-extern u8  gSimFullCup;                          // a sim that still gets the cup pull and near-cup gravity
-                                                 // (state 15, look-ahead)
-extern u8  lbl_80281DD2;
-// options +0x18 (GREEN SPEED?), 0..2: green friction x 1, 0.9, 0.8
-extern s32 gGreenSpeedSetting;
-extern s32 gFairwaySetting;                      // 0..2: class-2 friction x 1.0 / 0.9 / 0.8
 // 0..4, default 2; rain sets 1 (light) or 0 (heavy): the putt table and friction
-extern s32 gTurfSpeed;
+s32 gTurfSpeed = 2;
 // options +0x1C (ROUGH LENGTH?), 0..2: class-5 friction x 0.7, 1, 1.3
-extern s32 gRoughSetting;
-extern u8  lbl_80281DE4;                          // the two ground heights below are current
-extern f32 lbl_80281DE0;                         // ground height under the ball
-extern f32 lbl_80281DDC;                         // the other ground height (Ter_GetEnclosingGroundData)
+s32 gRoughSetting = 1;
+// .sbss: defined in reverse address order.
+u8  lbl_80281DE4;                          // the two ground heights below are current
+f32 lbl_80281DE0;                         // ground height under the ball
+f32 lbl_80281DDC;                         // the other ground height (Ter_GetEnclosingGroundData)
+s32 gFairwaySetting;                      // 0..2: class-2 friction x 1.0 / 0.9 / 0.8
+// options +0x18 (GREEN SPEED?), 0..2: green friction x 1, 0.9, 0.8
+s32 gGreenSpeedSetting;
+u8  lbl_80281DD2;
+u8  gSimFullCup;                          // a sim that still gets the cup pull and near-cup gravity
+                                          // (state 15, look-ahead)
+u8  gSimulating;                          // 0x80281DD0  a rehearsal: no sounds or effects
 
 static inline u8 Ball_NoGround(f32 fHeight) {
     return fHeight < -60000.0f;
@@ -938,6 +939,27 @@ void fn_80051C84(Ball* pBall, f32 fX, f32 fY) {
     if (pBall == NULL) return;
     pBall->fSpinX = 15.0f * fX;
     pBall->fSpinY = 15.0f * fY;
+}
+
+// fake match: stands in for a second function the original linker stripped. The file's pool has
+// Ball_FlightStep's drag and lift coefficients in this order (0.0169 and -0.000349 before
+// 0.000781, 0.0407 and -0.000628 before -0.000201), which Ball_FlightStep's own code does not
+// produce; its body is unknown, this one only reproduces the order.
+static f32 Ball_StrippedFn2(f32 x) {
+    x *= -15.0f;
+    x *= 0.25f;
+    x *= 0.75f;
+    x *= -0.190666676f;
+    x *= 0.000474568689f;
+    x *= 0.225790471f;
+    x *= 0.0168940704f;
+    x *= -0.000348685688f;
+    x *= 0.000780952396f;
+    x *= 0.0847342834f;
+    x *= 0.0407094695f;
+    x *= -0.000628289126f;
+    x *= -0.000201047602f;
+    return x;
 }
 
 // One tick in the air. The wind (a CPU's clamped to +-15 on each axis) is weaker near the
