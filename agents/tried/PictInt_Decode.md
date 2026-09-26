@@ -21,6 +21,11 @@ unless you combine it with something new. Before you stop, add every attempt und
   the sibling width (no change at all). Left: the 32-bit value takes r4 (not r3) at BOTH swaps,
   as if r3 were live there (the allocator's r3 argument at the first, the returned pPict at the
   last); the first width mask needs the sibling spelling but that schedules it too early.
+  Also from 11 (w1 = current first width, sib = sibling spelling): the 32-bit value through the
+  existing int locals x/y/xc at either or both swaps 11 (sib 16); a header-swap static inline
+  (void or returning the pointer, also `pFile = Swap(pFile)`) at both / first / last swap 11-12
+  (sib first 16, sib last 11), `return Swap(pFile) ? pPict : pPict` 29-34; `volatile` uC (with
+  a `(void*)` address) 11 / sib 16, volatile width/height 87-90.
 - 2026-09-25, n-ll: the whole header swap (32-bit, width and height, sibling fn_800B965C's
   spellings) as one static inline on the PictFile, used at both swaps / the first only / returning
   the pointer / with its own parameter name: 14 -> 19 aligned (same as the sibling width expression
