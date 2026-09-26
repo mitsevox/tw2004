@@ -1,18 +1,31 @@
 # State (keep this short: current facts only; history goes to docs/journal.md)
 
-Updated 2026-09-25 ~18:10 CDT. How the machines, CI, the page and PC jobs fit together:
+Updated 2026-09-25 ~21:30 CDT. How the machines, CI, the page and PC jobs fit together:
 docs/infrastructure.md. History: docs/journal.md.
 
-**Running (evening push, checkpoint 19:35 CDT):** 10 cloud lanes, whole units each (worktrees
-`n-*`): n-uisscreen (UISScreen), n-uisapi (UISApi), n-uistudio (UISEvent, UIStudio), n-ll (LLPictInt,
-LLDisp_Gc, LLDynTex, LLTex, LLFont), n-shaders (Glows, OBFD, GoGreenGrid, Particle, Grass),
-n-charskin (SkinPart, char), n-terrain (GoTerrainCollision, GoTerrain, skalib), n-modes (DiscError,
-MC, GameModeBestBall, Code8002EE1C, DepthField, GameMode22, Ball), n-misc (hlaudtrackstm,
-uiProcessInterface, uiText, rcmp, CamSpline, goballfx, LogoTexture, uiArc), n-const (Earnings,
-BreakLine, Rain, StaticCam, TerrainData, Swing, gocamscripts, ska_shared). A research agent looks for
-EA builds/decomps (agents/findings/2026-09-25-ea-research.md). PC: permuter on SunFlr fn_8009A708;
-next hlaudmovie fn_800A8AD4, startUp fn_800B0748. Golfer held (PC). ChatGPT and Gemini done for
-the night. The cloud box has 4 cores: lanes run no permuter.
+**Running:** no cloud lanes (the evening push's two rounds are merged; lane branches `n-*`, `r2-*`).
+PC: permuter on rcmp madinit (fn_800B769C), then startUp fn_800B0748. Golfer held (PC).
+Leftover: the round-1 worktrees n-uisapi/n-uistudio/n-ll/n-shaders/n-terrain hold uncommitted,
+unverified edits from the interrupted lanes (not merged; the owner decides before any delete).
+
+**Parked for the owner:**
+- EA names for rcmp_mad_codec (14 functions, 5 globals) and ska_shared (SKAUtil_EulerAnglesToQTs8,
+  SKA_LoadFromMem) have two sources each (agents/findings/2026-09-25-mad-names.tsv,
+  docs/reference-builds/007eon-ps2) but are NOT applied: the audit gate refuses any rename after
+  the baseline. Apply them after 100% (or when the owner approves a rename path for the gate).
+- OBFData split: GoShaderObjectContainer_OBFData_Gc.c looks like two EA files (a weather file
+  0x8006F608..0x8006FCDC with the course table lbl_80188900, then OBFData proper): the string sits
+  after 4 zero bytes at 0x80188DF0. The table's initialiser is in the r2-render lane's scratch.
+- Audit: UIStudio fn_80166098 case 0x79's comment ("a text's buffer size, as a float") is wrong
+  since the match: EA stores the int word.
+
+**New verified levers (2026-09-25 evening, for docs/decomp-notes.md):** a parameter copied into a
+local through `void*` (`T* p = (T*)(void*)pArg;`) reproduces EA's `mr r0,r3 ... mr rN,r0`
+(char x3); index loops (`p[i]`) instead of pointer walks give EA's strength-reduced registers
+(LLFont, LLDynTex); giving each job its own local (SkinPart, char, UISApi); reusing multiply-assigned
+locals (TerrainData, Ball); random declaration orders + a climb find gains greedy climbs miss
+(Particle fn_80094B84); `#pragma opt_lifetimes off` reproduces Ball Physics_HandleCollision's
+float registers (lead, not kept).
 
 **Biggest blockers** by link gain per function: Golfer AI_ChooseTarget (98.53%, registers only:
 agents/tried/AI_ChooseTarget.md), Ball Physics_HandleCollision, Earnings x2, startUp fn_800B0748,
@@ -38,7 +51,7 @@ GoDynamicCam/GoPostFx in link order, used only by GxUtil and gomainloop: owner u
 
 | exact functions | matched code | code linked | data linked | game units linked |
 |---|---|---|---|---|
-| 7,528 / 7,647 | 93.19% | 74.16% | 78.28% | 211 / 259 |
+| 7,555 / 7,647 | 94.14% | 75.14% | 78.43% | 217 / 259 |
 
 `python tools/agents/remain.py` lists what is left by unit; rank by code-bar gain per function.
 
