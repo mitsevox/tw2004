@@ -2144,9 +2144,6 @@ u8 fn_800504F4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* p
 // Mark the highest and lowest corner of every ground triangle whose flags are not 0 in those
 // flags (bits 4-5 and 6-7), using bit 3 to do each triangle once, then clear bit 3 again. TW06 has
 // the two halves as Ter_ComputeHighestPointInEveryTriangle and Ter_ClearVertexProcessedBit.
-// Not exact yet (94.5%): only the second pass's registers differ (it adds the strip's base to
-// the vertex index last; ours adds the low half first). Tried: its own block locals and
-// orders, a static inline helper, a named index (int, s32, u32), for/while forms.
 void fn_80050794(CourseInfo* pCourse) {
     u8 uFlags;
     f32 (*pVert)[3];
@@ -2200,12 +2197,16 @@ void fn_80050794(CourseInfo* pCourse) {
     pRef = pCourse->pPolyRefs;
     i = pCourse->nPolyRefs;
     while (i != 0) {
+        // fake match: pVert is set and stepped but not read in this pass (as in the first pass);
+        // without it CodeWarrior adds the flag array to the vertex index's low half first.
+        pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
         pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
         j = pRef->nTris;
         while (j != 0) {
             pFlags[2] &= 0xF7;
             j--;
             pFlags++;
+            pVert++;
         }
         i--;
         pRef++;
