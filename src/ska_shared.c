@@ -49,7 +49,7 @@ void fn_8001FCD4(ARAMTransfer* pTransfer) {
 }
 
 void fn_80021134(u16* pFrame, f32* pOut, s32 nBones, u32* pBits);
-void SKAUtil_EulerAnglesToQTs8(u8* pFrame, f32* pOut, s32 nBones, u32* pBits, u16* aBase);
+void fn_8002148C(u8* pFrame, f32* pOut, s32 nBones, u32* pBits, u16* aBase);
 u8 fn_80020328(Clip* pClip, int nFrame, f32* pPose2, f32* pPose1, u8* pExtra);
 f32 fn_80021A98(Clip* pClip, f32 fTime);
 
@@ -234,10 +234,10 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
     }
 }
 
-// Decodes frame nFrame of pClip: its second-stream frame into pPose2 (SKAUtil_EulerAnglesToQTs8,
-// when n36 is not 0) and its first-stream frame into pPose1 (fn_80021134, when n0A is not 0),
-// fetching them from ARAM first when the clip's frames live there (then, when pF0 is set, n28
-// bytes at n2A of the first-stream frame are also copied to pExtra). Always returns 1.
+// Decodes frame nFrame of pClip: its second-stream frame into pPose2 (fn_8002148C, when n36 is not
+// 0) and its first-stream frame into pPose1 (fn_80021134, when n0A is not 0), fetching them from
+// ARAM first when the clip's frames live there (then, when pF0 is set, n28 bytes at n2A of the
+// first-stream frame are also copied to pExtra). Always returns 1.
 u8 fn_80020328(Clip* pClip, int nFrame, f32* pPose2, f32* pPose1, u8* pExtra) {
     ARAMTransfer* pTransfer = NULL;
     u8* pFrame2;
@@ -256,7 +256,7 @@ u8 fn_80020328(Clip* pClip, int nFrame, f32* pPose2, f32* pPose1, u8* pExtra) {
         } else {
             pFrame2 = pClip->pE4 + pClip->n8E * nFrame;
         }
-        SKAUtil_EulerAnglesToQTs8(pFrame2, pPose2, pClip->n58, (u32*)pClip->pF8, (u16*)pClip->pE0);
+        fn_8002148C(pFrame2, pPose2, pClip->n58, (u32*)pClip->pF8, (u16*)pClip->pE0);
     }
     if (pClip->n0A != 0) {
         if (pClip->uFlags & 4) {
@@ -578,7 +578,7 @@ void fn_80020BC8(u8* p) {
 
 // Takes the clip at pData rounded up to nAlign bytes, byte-swaps it in place and lays it out with
 // its frames in memory; *pu30 gets its u30 when pu30 is not NULL.
-Clip* SKA_LoadFromMem(u8* p, u32* pu30, u32 nAlign) {
+Clip* fn_80020DD4(u8* p, u32* pu30, u32 nAlign) {
     Clip* pClip;
     u8* pSrc;
     u32 uPad;
@@ -740,7 +740,7 @@ void fn_80021134(u16* p, f32* pOut, s32 nBones, u32* pBits) {
 
 // Like fn_80021134, for frames stored as one byte per angle: each angle is the bone's base angle
 // in aBase (three u16 angles per bone) minus the byte times 16 (same units).
-void SKAUtil_EulerAnglesToQTs8(u8* p, f32* pOut, s32 nBones, u32* pBits, u16* aBase) {
+void fn_8002148C(u8* p, f32* pOut, s32 nBones, u32* pBits, u16* aBase) {
     int nBit;   // fake match: as in fn_80021134
     int i;
     u64 uKind;  // fake match: a 64-bit switch value (the asm compares register pairs)
