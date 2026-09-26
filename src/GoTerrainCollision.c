@@ -17,6 +17,15 @@
 // loading turns it into the pointer in place; with 64-bit pointers the file needs its own layout.
 #define TER_RELOCATE(pCourse, field) ((pCourse)->field = (void*)((u8*)(pCourse) + BE32(&(pCourse)->field)))
 
+// .bss and .sbss in reverse address order (CodeWarrior lays them out backwards).
+u8        lbl_801D54A0[MAX_OBJECTS];
+TNetwork* lbl_801D548C[MAX_OOB_NETWORKS];
+TNetwork* lbl_801D5428[MAX_FREE_DROP_NETWORKS];
+TerBox    lbl_801D53A8[NUM_CUP_POSITIONS];
+s32       lbl_80281DC8;
+s32       lbl_80281DC4;
+u8        lbl_80281DC0;
+
 void  fn_8004B588(TNetwork* pNet);
 u8    Ter_LieIsPreferred(u32 nClass);
 void  fn_8004B63C(TNetwork* pNet);
@@ -58,6 +67,12 @@ u8    fn_800504F4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32
                   f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj);
 u8    fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius);
 int   fn_80050BD8(UObjMesh* pModel, int n);
+
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80283288), before the constants fn_8004AFA0 uses first; its body is unknown.
+static f32 GoTerrainCollision_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
 
 // TW06: bool Ter_LineTriangleIntersection(f32*, f32*, f32, f32**, f32*, f32[4]*, f32[4]*). Where the
 // line from pFrom along pDir meets a triangle, as a fraction t of pDir (0 < t < fMax): t, the point
@@ -322,7 +337,7 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
     f32 fB2;
     f32 fC2;
     u8 bFirst;
-    u8 bObstructed;
+    int n;
     CourseInfo* pCourse;
     f32 fMinX;
     f32 fMaxX;
@@ -343,7 +358,7 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
     int nZ;
     int i;
     int k;
-    int n;
+    u8 bObstructed;
     int nCorner;
     int nInner;
     TerPolyRef* pRef;
@@ -485,10 +500,8 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
 // than the ball, search rings of 1 to 4 yards around the ball, every 45 degrees starting towards
 // the pin, for a drop on the same class, else the nearest. Returns 0 when the spot is where the
 // shot started, or (with bCheck, while vBall is still at vA44) within 50 yards of vA44.
-// Not exact yet (99.86%): only two float registers are swapped, the ring search's fDist (the
-// original's f22) and fLift (f25). Tried: every order of the float declarations, a separate
-// variable for the ring search's distance (declared anywhere), fLift written inline.
 u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
+    f32 fAngle;
     f32 vPos[4];
     f32 vDir[4];
     SurfaceType* pSurface;
@@ -497,9 +510,8 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
     CourseInfo* pCourse;
     f32 fDist;
     f32 fDropDist;
-    f32 fAngle;
     f32 fRadius;
-    f32 fLift;
+    f32 fDist2;
     f32 fTurn;
     f32 fSin;
     f32 fHeading;
@@ -532,15 +544,14 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
     vPos[2] = pOut[2];
     vPos[3] = 1.0f;
     pGround = Ter_GetSupportingGroundMaterial(pCourse, vPos);
-    fDist = fn_800BB028(pOut, p->ball.vPos);
-    if (fDist > 9.0f
+    fDist2 = fn_800BB028(pOut, p->ball.vPos);
+    if (fDist2 > 9.0f
         || (!bPreferred && pGround->nClass != gSurfaceTypes[p->ball.nSurface].nClass)) {
         fn_8005097C(&pCourse->pin[Game_CurrentPinSet()].x, p->ball.vPos, vDir);
         fn_800BAF04(vDir, vDir);
         fHeading = atan2f(vDir[0], vDir[2]);
         fRadius = 1.0f;
         for (nRing = 0; nRing < 4; nRing++) {
-            fLift = 2.0f * fRadius;
             for (fTurn = 0.0f; fTurn <= 6.265732f; fTurn += 0.7853982f) {
                 fAngle = fHeading + fTurn;
                 fSin = fn_800095F0(fAngle);
@@ -549,7 +560,7 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
                 vPos[2] = fSin * fRadius + p->ball.vPos[2];
                 // from water, only straight towards the pin
                 if (gSurfaceTypes[p->ball.nSurface].nClass == 7 && fTurn > 0.0f) continue;
-                vPos[1] = p->ball.vPos[1] + fLift;
+                vPos[1] = p->ball.vPos[1] + 2.0f * fRadius;
                 vPos[1] = Ter_CheckForDropLocation(pCourse, vPos, 0, &bDrop, &bPreferredLie, &pSurface);
                 if ((bPreferred && bPreferredLie) || (!bPreferred && bDrop)) {
                     if (pSurface->nClass == gSurfaceTypes[p->ball.nSurface].nClass) {
@@ -557,9 +568,9 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
                         goto done;  // fake match: the original branches straight to the end, past the
                                     // ring loop's compare, which a break (and a flag) would keep
                     }
-                    if (fRadius < fDist) {      // EA bug: a distance against a squared one
+                    if (fRadius < fDist2) {     // EA bug: a distance against a squared one
                         Vec_Copy(vPos, pOut);
-                        fDist = fRadius;
+                        fDist2 = fRadius;
                     }
                 }
             }
@@ -2144,9 +2155,6 @@ u8 fn_800504F4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* p
 // Mark the highest and lowest corner of every ground triangle whose flags are not 0 in those
 // flags (bits 4-5 and 6-7), using bit 3 to do each triangle once, then clear bit 3 again. TW06 has
 // the two halves as Ter_ComputeHighestPointInEveryTriangle and Ter_ClearVertexProcessedBit.
-// Not exact yet (94.5%): only the second pass's registers differ (it adds the strip's base to
-// the vertex index last; ours adds the low half first). Tried: its own block locals and
-// orders, a static inline helper, a named index (int, s32, u32), for/while forms.
 void fn_80050794(CourseInfo* pCourse) {
     u8 uFlags;
     f32 (*pVert)[3];
@@ -2200,12 +2208,16 @@ void fn_80050794(CourseInfo* pCourse) {
     pRef = pCourse->pPolyRefs;
     i = pCourse->nPolyRefs;
     while (i != 0) {
+        // fake match: pVert is set and stepped but not read in this pass (as in the first pass);
+        // without it CodeWarrior adds the flag array to the vertex index's low half first.
+        pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
         pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
         j = pRef->nTris;
         while (j != 0) {
             pFlags[2] &= 0xF7;
             j--;
             pFlags++;
+            pVert++;
         }
         i--;
         pRef++;

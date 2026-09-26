@@ -1,6 +1,9 @@
 # Ter_CheckObjectAndHazardObstruction (GoTerrainCollision.c, 0x8004B89C)
 
-Status: OPEN, 99.98% on 2026-09-26 (9 instructions, two spill slots swapped).
+Status: SOLVED 2026-09-26 r4-terrain: swap the declarations of `u8 bObstructed;` and `int n;`
+(n where bObstructed was, bObstructed where n was). Found by an exhaustive swap of every pair of
+declarations (903 pairs, only this one is 0). Commit: "GoTerrainCollision.c:
+Ter_CheckObjectAndHazardObstruction exact".
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -39,6 +42,11 @@ unless you combine it with something new. Before you stop, add every attempt und
   i/j/k/nZ/nCorner/nInner (28-85); bObstructed int/s32 (10); bFirst int (29); n s32 (9);
   bObstructed = 0 after bFirst (13), before/after fWide (23), after the init loop (27);
   swapping which of nCorner/nInner is outer (13); pFlags/pVert spelled with & or + (13).
+
+- 2026-09-26 r4-terrain (from 9): n block-scoped in the if / nZ / nX blocks (9); other loop
+  variables reused for the init and tail loops, 128 combos (all 9); `n > -1` (11); n counted with
+  `--n >= 0` (17); `if (!bModels)` first (15); every pair of declarations swapped: bObstructed <->
+  n gives 0 (exact).
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
