@@ -1179,7 +1179,7 @@ void fn_80168918(UIStudio* pStudio, u8 bOn, s32 nId, UISNodeInfo* pInfo, s32* p,
     s32 i;
     s32 nSlot;
     UISScreen* pScreen;
-    u16 nEvent;
+    s32 nEvent;
 
     nSlot = -1;
     nIndex = fn_8016C6C4(pStudio, uGroup, uScreen);
@@ -1188,7 +1188,7 @@ void fn_80168918(UIStudio* pStudio, u8 bOn, s32 nId, UISNodeInfo* pInfo, s32* p,
         return;
     }
     pScreen = &pStudio->pScreens[nIndex];
-    nEvent = (bOn == 1) - 7;
+    nEvent = bOn == 1 ? -6 : -7;
     pFile = pScreen->pData;
     nNode = pFile->nNodes;
     while (nNode-- != 0) {
