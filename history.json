@@ -41221,5 +41221,21 @@
 "matched_functions": 7575,
 "total_functions": 7647,
 "exact": 7575
+},
+{
+"commit": "a334c9c",
+"sha": "a334c9c53c855bf4dca00dbf8d4465c06e44cb41",
+"time": 1790439018,
+"subject": "state: unit count",
+"report": true,
+"matched_code": 1480716,
+"complete_code": 1247064,
+"matched_data": 720287,
+"complete_data": 865299,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7575,
+"total_functions": 7647,
+"exact": 7575
 }
 ]
