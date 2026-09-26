@@ -1,6 +1,6 @@
 # SD_vShaderObject_Grass_Static_Render (GoShaderObject_Grass_Gc.c, 0x80120F74)
 
-Status: OPEN, 98.89% on 2026-09-26 (r4-render).
+Status: OPEN, 99.30% on 2026-09-26 (r4-render); aligned 2 (one add's operand order and slot).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -32,6 +32,17 @@ unless you combine it with something new. Before you stop, add every attempt und
   per-point steps' orders, nWind/fBladeT swapped, a 10-min random/climb of the 21 declarations.
   Left: nVerts r22 / nDone r20 (EA the other way), the pAxis add's operand order and slot, and
   fFade's temp registers.
+- 2026-09-26 r4-render, later: all initialisers split off (plain declarations + assignments)
+  and a random/climb search over the 26 declarations: nDone declared first and nVerts after
+  nAxis (the others keep their initialisers) 17 -> 11, real 99.04 (kept); `nDone++` in the for
+  header (`nInRow++, nDone++`) 9, real 99.11 (kept); fFade as two statements (`fFade = fDist +
+  (..);` then `fFade = fFade * lbl_80260900[1][3] + lbl_80260900[0][3];`) 2, real 99.30 (kept).
+  Left only EA's `add r16,r25,r17` for pAxis (nAxis*4 + pVert) placed after GXBegin's constant
+  loads; ours `add r16,r17,r25` before GXBegin. No gain: 9 + 7 pAxis spellings (index-first,
+  &pVert[nAxis], u8*/uptr offsets, &pVert->f + nAxis, two statements), each before or after
+  GXBegin (after: 5, the f30/f31 constants swap), pAxis in the for init (5), pVert/pAxis steps
+  in the for header (4-13), the initial assignments' orders (17 at the time), an 8-min
+  declaration search on the after-GXBegin form (5).
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
