@@ -3,7 +3,13 @@
 Updated 2026-09-25 ~21:30 CDT. How the machines, CI, the page and PC jobs fit together:
 docs/infrastructure.md. History: docs/journal.md.
 
-**Running:** nothing. Round 5 (5 lanes, mwcc-debugger on all 80 non-exact functions, 09:35-11:00
+**Running (round 6, launched 2026-09-26 11:40 CDT, checkpoint 14:00 CDT):** r6-uis (UISScreen's
+shared copy pattern, UIS parameter order, UIStudio/UISEvent/UISApi, uiProcessInterface, uiArc), r6-args
+(scheduling misses + the parameter-order lever: StaticCam, BreakLine, Rain, hlaudtrackstm, startUp,
+SunFlr, rcmp, CamSpline, gocamscripts, GoGreenGrid, DepthField, PictInt, MC), r6-assert (the dead-assert
+lane: Grass Static_Init, hwsBurn, Golfer, char, SkinPart, Earnings, Swing, skalib, Session, BestBall,
+GameMode22), r6-misc (Particle, LLFont, LLTex, goballfx, LLDynTex, LogoTexture). Weekly usage 19% at launch.
+Round 5 (5 lanes, mwcc-debugger on all 80 non-exact functions, 09:35-11:00
 CDT) merged 2026-09-26 ~11:10 CDT: uiText, GoTerrain, HLAudMaster + hlaudmovie (split) linked; exact
 Particle fn_800951A0, Grass Static_Render, LLTex fn_8000EA1C, SW_vImpact, hlaudmovie fn_800A8AD4
 (labelled fake), uiText fn_800922A8, GoTerrain x2. Every lane wrote its debugger readings into the
