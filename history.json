@@ -41333,5 +41333,21 @@
 "matched_functions": 7576,
 "total_functions": 7647,
 "exact": 7576
+},
+{
+"commit": "7fdd8b8",
+"sha": "7fdd8b88df4b17428edcbda5825647d1e902cd9b",
+"time": 1790445348,
+"subject": "fetchdwarf: also keep units named like ours (NASCAR 2005 has LLFont.c, skeleton.c, ChecksumCRC32.c, rcmp_mad_codec)",
+"report": true,
+"matched_code": 1480880,
+"complete_code": 1253892,
+"matched_data": 720303,
+"complete_data": 865315,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7576,
+"total_functions": 7647,
+"exact": 7576
 }
 ]
