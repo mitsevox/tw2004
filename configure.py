@@ -898,7 +898,7 @@ config.libs = [
             Object(Matching, "UObject.c"),
             Object(Matching, "UKernel.c"),
             Object(Matching, "GoAnimalActors.c"),
-            Object(NonMatching, "GoTerrainCollision.c"),
+            Object(Matching, "GoTerrainCollision.c"),
             Object(NonMatching, "Ball.c"),
             Object(Matching, "Wind.c"),
             Object(NonMatching, "LLPictInt.c"),

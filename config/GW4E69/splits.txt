@@ -305,6 +305,7 @@ GoDynObjTypes.c:
 
 GoTerrainCollision.c:
 	.text       start:0x8004AFA0 end:0x80050C2C
+	.sdata2     start:0x80283288 end:0x80283300
 
 Ball.c:
 	.text       start:0x80050C2C end:0x80055F14

@@ -59,6 +59,12 @@ u8    fn_800504F4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32
 u8    fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius);
 int   fn_80050BD8(UObjMesh* pModel, int n);
 
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80283288), before the constants fn_8004AFA0 uses first; its body is unknown.
+static f32 GoTerrainCollision_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 // TW06: bool Ter_LineTriangleIntersection(f32*, f32*, f32, f32**, f32*, f32[4]*, f32[4]*). Where the
 // line from pFrom along pDir meets a triangle, as a fraction t of pDir (0 < t < fMax): t, the point
 // and the triangle's normal. A line along the triangle's plane never meets it.
