@@ -118,20 +118,16 @@ void fn_800124A8(void);                                 // LLFont.c: end the pri
 // plus its own velocity's difference from v60 eased out by 1 / (1 + f50 t)^4; it is skipped when
 // it ends up behind the camera. Its size, colour and alpha run linearly with time within limits,
 // and it spins by f18 + f1C t turns.
-void fn_80094534(f32 (*pMtxArg)[4], ParticleShape* pShapeArg, ParticleVertex* pVertsArg, f32* pTimesArg,
-                 u32 nArg) {
-    // fake match: every parameter copied (through void*) into a local, and this declaration order
-    // (found by search), set the register allocation
+void fn_80094534(f32 (*pMtx)[4], ParticleShape* pShape, ParticleVertex* pVerts, f32* pTimes,
+                 u32 n) {
+    // fake match: this declaration order (found by search) sets the float register allocation
     f32 fSin;
     f32 fDiff;
-    int nBlue;
+    u8 nBlue;
     f32 fBlue;
-    f32* pTimes;
     f32 fRed;
     f32 t;
-    ParticleVertex* pVerts;
     u32 i;
-    f32 (*pMtx)[4];
     f32 fSize;
     u8 uAlpha;
     f32 fEase;
@@ -139,19 +135,12 @@ void fn_80094534(f32 (*pMtxArg)[4], ParticleShape* pShapeArg, ParticleVertex* pV
     f32 fAlpha;
     f32 fGreen;
     f32 m[3][4];
-    ParticleShape* pShape;
     f32 fFade;
     Vec4 v;
-    int nRed;
-    u32 n;
-    int nGreen;
+    u8 nRed;
+    u8 nGreen;
     f32 fCos;
 
-    pShape = (ParticleShape*)(void*)pShapeArg;
-    pVerts = (ParticleVertex*)(void*)pVertsArg;
-    pTimes = (f32*)(void*)pTimesArg;
-    pMtx = (f32 (*)[4])(void*)pMtxArg;
-    n = nArg;
     v.w = 1.0f;
     m[0][2] = 0.0f;
     m[1][2] = 0.0f;
@@ -217,16 +206,16 @@ void fn_80094534(f32 (*pMtxArg)[4], ParticleShape* pShapeArg, ParticleVertex* pV
             GXLoadPosMtxImm(m, 0);
             GXBegin(0x80, 4, 4);                // quads, vertex format 4
             fn_800950F4(-fSize, -fSize, 0.0f);
-            fn_800950DC((u8)nRed, (u8)nGreen, (u8)nBlue, (u8)fFade);
+            fn_800950DC(nRed, nGreen, nBlue, (u8)fFade);
             fn_800950CC(1.0f, 1.0f);
             fn_800950F4(fSize, -fSize, 0.0f);
-            fn_800950DC((u8)nRed, (u8)nGreen, (u8)nBlue, (u8)fFade);
+            fn_800950DC(nRed, nGreen, nBlue, (u8)fFade);
             fn_800950CC(0.0f, 1.0f);
             fn_800950F4(fSize, fSize, 0.0f);
-            fn_800950DC((u8)nRed, (u8)nGreen, (u8)nBlue, (u8)fFade);
+            fn_800950DC(nRed, nGreen, nBlue, (u8)fFade);
             fn_800950CC(0.0f, 0.0f);
             fn_800950F4(-fSize, fSize, 0.0f);
-            fn_800950DC((u8)nRed, (u8)nGreen, (u8)nBlue, (u8)fFade);
+            fn_800950DC(nRed, nGreen, nBlue, (u8)fFade);
             fn_800950CC(1.0f, 0.0f);
             // fake match: the step written in both branches
             pVerts++;

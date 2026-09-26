@@ -1027,7 +1027,7 @@ config.libs = [
             Object(NonMatching, "uiArc.c"),
             Object(Matching, "FE_CrAPDB.c"),
             Object(Matching, "FE_CrAPMessages.c"),
-            Object(NonMatching, "LLDynTex.c"),
+            Object(Matching, "LLDynTex.c"),
             Object(Matching, "GameMode26.c"),
             Object(Matching, "CharSliders.c"),
             Object(Matching, "FE_PGATourMessages.c"),
