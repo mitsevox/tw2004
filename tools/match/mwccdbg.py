@@ -80,9 +80,15 @@ def main():
     ea = regmap(unit, fn, out / 'obj.o')
     # Summary: each variable's register in priority order (highest first), with its neighbour count
     # and the register EA has where ours has that one ('!' = differs).
+    # After a spill the allocator reruns (pass 2): only the LAST pass of a class gives the final
+    # registers, and EA's column maps those, so an earlier pass's "EA" column is meaningless.
     lines = []
-    for f in sorted(out.glob('regalloc-*-assigned.txt')):
-        lines.append('== ' + f.name)
+    files = sorted(out.glob('regalloc-*-assigned.txt'))
+    for f in files:
+        cls = f.name.split('-pass-')[0]
+        later = [g.name for g in files if g.name.split('-pass-')[0] == cls and g.name > f.name]
+        lines.append('== ' + f.name + ('   (superseded by %s: ignore the EA column here)' % later[-1]
+                                       if later else ''))
         txt = f.read_text()
         for m in re.finditer(r'^(r\d+|f\d+) -> (\S+)( [^\n]*)?\n(?:.*\n){4}\s*neighbors: (\d+)', txt, re.M):
             if m.group(2) not in ('r0', 'f0') or m.group(3):
