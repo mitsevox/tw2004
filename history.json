@@ -41365,5 +41365,21 @@
 "matched_functions": 7576,
 "total_functions": 7647,
 "exact": 7576
+},
+{
+"commit": "5e15dfb",
+"sha": "5e15dfb705d323c35979bee6384e3c04e8ecb4da",
+"time": 1790446084,
+"subject": "Merge r6-big: Earnings 64/64 exact and linked (fn_800D477C, fn_800D4F14)",
+"report": true,
+"matched_code": 1485220,
+"complete_code": 1281492,
+"matched_data": 721935,
+"complete_data": 866947,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7578,
+"total_functions": 7647,
+"exact": 7578
 }
 ]
