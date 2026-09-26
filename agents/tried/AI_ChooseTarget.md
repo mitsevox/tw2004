@@ -131,3 +131,8 @@ UStream_Update exact). The other 13 "matches" (Earnings x2, Golfer AI_ChooseTarg
 ```
 - 2026-09-26 PC declsearch (run 36221888505, iterated local search over the declaration order): queued but given no time (a scheduling bug, fixed); not searched.
 - 2026-09-26 PC declsearch run 2 (36235241920, fair time slices): best 91 aligned (new order), 6588 trials. Applied: real 98.53 -> 98.66%.
+- 2026-09-26 r5-game (mwcc-debugger, read only): every integer variable has 43-137 neighbours
+  (p 137, nPlayer 135), so the first phase never adds them by the 28-neighbour rule and the order
+  comes from the spill-cost choice; first '!' from the top: `r41 -> r31 !EA r21 137 nb p`. EA's
+  column puts nKind r31, @170 r30, @178 r29, nSkill r28 first and p at r21. No attempt beyond the
+  dump (time went to the lane's other functions).

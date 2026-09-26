@@ -571,8 +571,6 @@ f32 SW_vGetShotPower(int nPlayer) {
 // Then the miss (zero for a CPU or a perfect shot), the power, forgiveness, the launch blocks, and
 // the aim - the player's aim plus the face vector's angle plus the miss - go to Physics_ShotImpact.
 void SW_vImpact(int nPlayer) {
-    f32*    pLaunchA;
-    f32*    pLaunchB;
     Player* p;
     Ball*   pBall;
     int     nClub, nTrajectory, nKind;
@@ -589,12 +587,11 @@ void SW_vImpact(int nPlayer) {
     } else {
         REPLAY_Play(nPlayer);
     }
-    pLaunchA    = gPlayers[nPlayer].vLaunchA;
-    nClub       = p->nClub;
+    nClub      = p->nClub;
     nTrajectory = p->nTrajectory;
     nKind       = p->nShotKind;
     pBall       = &p->ball;
-    Swing_FaceVector(nPlayer, pLaunchA);
+    Swing_FaceVector(nPlayer, gPlayers[nPlayer].vLaunchA);
     if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
         gPlayers[nPlayer].swing.fMishitAngle = 0.0f;
     } else {
@@ -608,8 +605,7 @@ void SW_vImpact(int nPlayer) {
         gPlayers[nPlayer].vLaunchA[2] = 1.0f;
         gPlayers[nPlayer].vLaunchA[3] = 0.0f;
     }
-    pLaunchB = p->vLaunchB;
-    fn_8005B8C8_ShapeVector(nPlayer, pLaunchB);
+    fn_8005B8C8_ShapeVector(nPlayer, gPlayers[nPlayer].vLaunchB);
     gPlayers[nPlayer].swing.fHookSlice = gPlayers[nPlayer].vLaunchA[0];
     if (Player_IsController8(nPlayer)) {
         fn_8005CCA8(nPlayer);
@@ -629,8 +625,8 @@ void SW_vImpact(int nPlayer) {
     while (fAim > PI) {
         fAim -= 2 * PI;
     }
-    Physics_ShotImpact(pBall, nClub, nKind, gPlayers[nPlayer].swing.fShotPower, fAim, nTrajectory, pLaunchA,
-                pLaunchB);
+    Physics_ShotImpact(pBall, nClub, nKind, gPlayers[nPlayer].swing.fShotPower, fAim, nTrajectory,
+                gPlayers[nPlayer].vLaunchA, gPlayers[nPlayer].vLaunchB);
 }
 
 // ---- the meter's miss ----------------------------------------------------------------------------
