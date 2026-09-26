@@ -41317,5 +41317,21 @@
 "matched_functions": 7576,
 "total_functions": 7647,
 "exact": 7576
+},
+{
+"commit": "552f548",
+"sha": "552f5485aa37aeb183aff392ce8c284bf64b36cc",
+"time": 1790445258,
+"subject": "PC job refdwarf: fetch an allowlisted reference build's debug archive to C:/dev/refs, commit only derived DWARF evidence (first: NASCAR 2005 GC, Tiburon); libflags: Windows path fix",
+"report": true,
+"matched_code": 1480880,
+"complete_code": 1253892,
+"matched_data": 720303,
+"complete_data": 865315,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7576,
+"total_functions": 7647,
+"exact": 7576
 }
 ]
