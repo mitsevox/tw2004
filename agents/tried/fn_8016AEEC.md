@@ -41,7 +41,15 @@ base 40, 24 levers, 1323 variants (24 singles) in 13 s; best 25
 25 [safe]
 ```
 - 2026-09-26 r4-uisscreen (base.c aligned, base 25): every order of the 4 declarations (24):
-  25 (12 orders) or 32.
+  25 (12 orders) or 32. EA's `mr r30,r27` sits where a loop-invariant conversion of bLast is
+  hoisted to loop 2's preheader: `pEntry->n2 = (s8)bLast;` puts an `extsb r31,r24` exactly there,
+  and a j-block `u16 b = bLast;` stored as `pEntry->n2 = b;` gives `extsh r30,r24` there (EA's r30)
+  and fixes the inner loop's `mr r31,r28`: 25 -> 23 (any bLast type; logic unchanged, but an
+  extsh instead of EA's mr: not kept). No conversion found that gives a plain mr: bLast u8/int/s32/
+  u32/s16/u16/unsigned int x a j-block, i-block or store-scoped copy of 13 types (507 combos), store
+  casts and cast pairs over 10 types (777), `+bLast`, `bLast | 0`, `!!bLast`, `bLast != 0`, the
+  expression recomputed in the loop, etc.: 25 or worse. Standalone (store to a field / pass to a
+  call inside nested loops, 10 x 10 types): never a hoisted mr.
 
 ## Collected from the notes and docs (2026-09-25)
 
