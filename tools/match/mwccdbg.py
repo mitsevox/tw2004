@@ -39,9 +39,12 @@ def main():
     if out.exists():
         shutil.rmtree(out)
     out.mkdir(parents=True)
+    env = os.environ.copy()
+    if '/opt/homebrew/bin' not in env.get('PATH', ''):
+        env['PATH'] = '/opt/homebrew/bin:' + env.get('PATH', '')
     r = subprocess.run([sys.executable, str(script), '-e', str(emu), '-a', shlex.join(args + ['-sym', 'on']),
-                        fn, str(out)], cwd=ROOT, capture_output=True, text=True)
-    if not (out / 'backend-09-before-regalloc.txt').exists():
+                        fn, str(out)], cwd=ROOT, capture_output=True, text=True, env=env)
+    if not list(out.glob('*before-regalloc.txt')):
         sys.exit((r.stdout + r.stderr)[-1500:])
     # Summary: each variable's register in priority order (highest first), with its neighbour count.
     for f in sorted(out.glob('regalloc-*-assigned.txt')):
