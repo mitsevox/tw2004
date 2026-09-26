@@ -211,12 +211,12 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pText = (UISText*)*--pFrame->pC;
             pFind = (UISText*)*--pFrame->pC;
             if (pText != NULL && pFind != NULL) {
-                n = pFind->nSize;
-                if (pText->nSize < n) {
-                    n = pText->nSize;
+                u = pFind->nSize;
+                if (pText->nSize < u) {
+                    u = pText->nSize;
                 }
-                strncpy(pText->szText, pFind->szText, n);
-                pText->szText[n] = 0;
+                strncpy(pText->szText, pFind->szText, u);
+                pText->szText[u] = 0;
             }
             break;
         case 0x0F:  // push a word
@@ -426,15 +426,15 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             break;
         case 0x3E:  // jump by an offset if true
             n = *--pFrame->pC;
-            n2 = *--pFrame->pC;
-            if (n2 != 0) {
+            u = *--pFrame->pC;
+            if (u != 0) {
                 pFrame->p10 += n;
             }
             break;
         case 0x3F:  // jump by an offset if false
             n = *--pFrame->pC;
-            n2 = *--pFrame->pC;
-            if (n2 == 0) {
+            u = *--pFrame->pC;
+            if (u == 0) {
                 pFrame->p10 += n;
             }
             break;
@@ -575,8 +575,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             fn_8016B808((u32)pScreen->pData, (UISText*)*--pFrame->pC, (UISText*)*pArgs, n, lbl_802805D8);
             break;
         case 0x77:  // whether a group is this screen's
-            n = *--pFrame->pC;
-            if (n == pScreen->uGroup) {
+            u = *--pFrame->pC;
+            if (u == pScreen->uGroup) {
                 pFrame->pC[-1] = 1;
             } else {
                 pFrame->pC[-1] = 0;
