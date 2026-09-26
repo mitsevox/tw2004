@@ -1292,17 +1292,16 @@ int Swing_PhaseIdle6(int nPlayer) {
 
 // Stop the pad rumble.
 void SW_KillVibration(int nPlayer) {
-    s32*    pFrames;
-    s32*    pController;
-    Player* p;
     if (fn_8002E868_HasPad(nPlayer)) {
-        p           = &gPlayers[nPlayer];
-        pFrames     = &p->swing.nVibrateCount;
-        pController = &p->nController;
-        fn_800130F8(*pController, 0);
-        fn_80013130(*pController, 0);
+        // fake match: an empty test (a compiled-away assert?) makes the frontend share the
+        // nVibrateCount address, which EA computes before the calls
+        if (gPlayers[nPlayer].swing.nVibrateCount) {
+        } else {
+        }
+        fn_800130F8(gPlayers[nPlayer].nController, 0);
+        fn_80013130(gPlayers[nPlayer].nController, 0);
         gPlayers[nPlayer].swing.bVibrating = 0;
-        *pFrames = 0;
+        gPlayers[nPlayer].swing.nVibrateCount = 0;
     }
 }
 

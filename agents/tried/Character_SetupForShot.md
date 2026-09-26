@@ -1,6 +1,8 @@
 # Character_SetupForShot (char.c, 0x8001C860)
 
-Status: OPEN, 99.90% on 2026-09-25.
+Status: SOLVED 2026-09-26 (r7-charswing): pBallPos through `static inline f32*
+fn_8001C860_Get(int nPlayer) { return gPlayers[nPlayer].ball.vPos; }` called with
+pChar->nPlayer (labelled fake match), declarations unchanged.
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -79,3 +81,11 @@ base 6, 199 levers, 31039 variants (199 singles) in 318 s; best 6
   improvement. No source change.
 - 2026-09-26, r6-assert: dead asserts (agents/findings/2026-09-26-dead-asserts.md): an empty `if (x) { } else { }` (the only assert form that leaves any trace on GC/2.5) after every statement of the function, quicktrial aligned: pChar as the condition (splitting the three u10 reads too): 6. No source change.
 - 2026-09-26, r6-assert: every statement order of the six setup lines (pPlayer, pModel, the three u10 flags, pBallPos; pPlayer before pBallPos), 360 orders: 6. No source change.
+- 2026-09-26, r7-charswing: the u10 reads spelt `*(u32*)((u8*)pChar + 0x10)` / `((u32*)pChar)[4]`
+  on 1-3 of them: 6-8 (a raw read that escapes the frontend CSE takes r0). Inline getters:
+  `pPlayer = SFS(pChar->nPlayer)` (int param) 11, `SFS(pChar)` 11; pBallPos through an inline
+  taking `int n` (`return gPlayers[n].ball.vPos;`) called with pChar->nPlayer: 6 -> 5 with an
+  inline pPlayer too, 6 -> 0 with the plain `pPlayer = &gPlayers[pChar->nPlayer]` (every single
+  declaration move also 0). The inline's parameter is a frontend variable holding the nPlayer
+  load, numbered below @1457 (the u10 CSE temp), so u10 is coloured first and gets r6 as in EA.
+  SOLVED.

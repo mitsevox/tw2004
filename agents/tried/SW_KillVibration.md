@@ -1,6 +1,8 @@
 # SW_KillVibration (Swing.c, 0x80059EB4)
 
-Status: OPEN, 92.75% on 2026-09-25.
+Status: SOLVED 2026-09-26 (r7-charswing): no pointer locals, every access `gPlayers[nPlayer].x`,
+plus an empty `if (gPlayers[nPlayer].swing.nVibrateCount) { } else { }` before the calls
+(labelled fake match). Commit: see r7-charswing "Swing.c: SW_KillVibration exact".
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -88,3 +90,19 @@ Swing SW_KillVibration: inline helpers returning &p->nController / &p->swing.nVi
   pCoreShotInfo + pSwingInfo.
 ```
 - 2026-09-26, r6-assert: dead asserts (agents/findings/2026-09-26-dead-asserts.md): an empty `if (x) { } else { }` (the only assert form that leaves any trace on GC/2.5) after every statement of the function, quicktrial aligned: an empty if/else after the pointer setup keeps pFrames past the frontend (the `addi rX,base,0x834` before the first call, as EA) but with other registers: 4 -> 7 for every condition and position; with it, 4896 variants (pointer spellings from p or gPlayers[], first call through pController / p / gPlayers[], the flag store through p or gPlayers[], both assignment orders, all declaration orders, the assert on pFrames / pController / both / p at 4 positions): best 4. No source change.
+- 2026-09-26, r7-charswing (quicktrial aligned): void* copies of p into pController / pFrames
+  (`pController = (s32*)(void*)p; pController = &((Player*)(void*)pController)->nController`, u8*
+  and `+= 0xA08/4` in-place forms, both orders, first call via *pController / p->): 4-7 (the
+  backend copy-propagates the `mr`); inline getters (Player* / void* / int parameter, the argument
+  an expression, 7x7x2 mixes): 4-20; all accesses `gPlayers[nPlayer].x` with no locals (32
+  orders/spellings): 19-28 (gives `lwzu`: only the nController address is shared). Permuter 15
+  min -j2: 275 -> 140 with fake forms only ((long long) casts, `if (p && p)`).
+- 2026-09-26, r7-charswing: SOLVED. What the asm showed: EA's `mr r30,r29 ... addi r30,r30,0xa08`
+  and `addi r29,r29,0x834` are the shape the frontend's address CSE gives (the same pattern in
+  exact code: Golfer AI_GreenTowardPin, GameMode8 fn_800FD1C0, target PlaceBall_UpdateMomentums):
+  a CSE temp `@ = (gPlayers + off) + n*0xEF8` is built with an in-place addi, and the backend's
+  CSE turns the second one's add into `mr`. That needs both addresses used twice, the
+  nVibrateCount one before the calls, which only a dead read does: `if
+  (gPlayers[nPlayer].swing.nVibrateCount) { } else { }` (or `>= 0`) before the calls, every access
+  through gPlayers[nPlayer], no locals: 4 -> 0. Stores in either order of the chained `a = b = 0`
+  also exact; bVibrating after nVibrateCount 4; one-armed if / `(void)x;` / expression statement: 20.

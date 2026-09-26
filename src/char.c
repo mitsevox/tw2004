@@ -2382,6 +2382,10 @@ void fn_8001C804(int nPlayer, u8 a, u8 b) {
     }
 }
 
+// fake match: the index passed through an inline's parameter numbers the nPlayer read below the
+// shared u10 read, which gives EA's registers.
+static inline f32* fn_8001C860_Get(int nPlayer) { return gPlayers[nPlayer].ball.vPos; }
+
 // Puts the golfer at its player's ball, facing the target (level), and resets its root bone's pose
 // and matrix. With u10 bit 8 and a skeleton, it then takes the stance of its clip for the style:
 // the clip is started on the skeleton when it changed (at its event 2's time with bit 0x10000), the
@@ -2410,7 +2414,7 @@ void Character_SetupForShot(Character* pChar) {
     bPlace = pChar->u10 & 0x200;
     bStance = pChar->u10 & 8;
     bClipTime = pChar->u10 & 0x10000;
-    pBallPos = pPlayer->ball.vPos;
+    pBallPos = fn_8001C860_Get(pChar->nPlayer);
     Character_SetPosition(pChar, pBallPos, 0);
     pChar->u10 &= ~(0x10000 | 0x200 | 8 | 4);
     // fake match: n2C is compared unsigned here
