@@ -41237,5 +41237,21 @@
 "matched_functions": 7575,
 "total_functions": 7647,
 "exact": 7575
+},
+{
+"commit": "9577303",
+"sha": "957730384d8958e2bee192311937a2ab61b78d6e",
+"time": 1790440613,
+"subject": "state: round 6 launched (4 lanes incl. the dead-assert lane), checkpoint 14:00 CDT",
+"report": true,
+"matched_code": 1480716,
+"complete_code": 1247064,
+"matched_data": 720287,
+"complete_data": 865299,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7575,
+"total_functions": 7647,
+"exact": 7575
 }
 ]
