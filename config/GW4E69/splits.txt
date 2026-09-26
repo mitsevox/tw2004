@@ -426,18 +426,16 @@ Code8006F438.c:
 	.sdata      start:0x802811E8 end:0x802811F0
 	.sbss       start:0x80281E68 end:0x80281E70
 
-unsorted/sweep_8006F608.c:
-	.text       start:0x8006F608 end:0x8006F64C
-
-unsorted/sweep_8006F64C.c:
-	.text       start:0x8006F64C end:0x8006F650
-
-GoShaderObjectContainer_OBFData_Gc.c:
-	.text       start:0x8006F650 end:0x8006FF2C
-	.data       start:0x80188DF0 end:0x80188E18
+Code8006F608.c:
+	.text       start:0x8006F608 end:0x8006FCDC
+	.data       start:0x80188900 end:0x80188DF0
 	.bss        start:0x801D7100 end:0x801D7120
 	.sdata      start:0x802811F0 end:0x802811F8
 	.sdata2     start:0x80283988 end:0x802839B8
+
+GoShaderObjectContainer_OBFData_Gc.c:
+	.text       start:0x8006FCDC end:0x8006FF2C
+	.data       start:0x80188DF0 end:0x80188E18
 
 unsorted/sweep_8006FF2C.c:
 	.text       start:0x8006FF2C end:0x8006FF80
