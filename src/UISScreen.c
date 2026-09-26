@@ -119,10 +119,11 @@ u8* fn_8016C674(UISNode* pNode, u32 uEvent) {
 // A node's plain handler (neither kind bit) with the given ID for an event.
 u8* fn_8016C614(UISNode* pNode, u16 uId, u32 uEvent) {
     u32 i;
+    int nId = uId;
     for (i = 0; i < pNode->nHandlers; i++) {
         UISHandler* pHandler = &pNode->pHandlers[i];
         if (!(pHandler->uFlags & 0xC000) && pHandler->uEvent == (u16)uEvent &&
-            (pHandler->uFlags & 0x2FFF) == uId) {
+            (pHandler->uFlags & 0x2FFF) == nId) {
             return pHandler->u4.pScript;
         }
     }
