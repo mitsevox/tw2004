@@ -45,8 +45,23 @@ extern s32 lbl_80282248;
 extern s32 lbl_8028224C;
 extern s32 lbl_80282250;
 extern s32 lbl_80282254;
-extern s32 lbl_80191A08[39];
-extern f32 lbl_80191AA4[70];
+
+s32 lbl_80191A08[39] = {
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+    12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 0,
+    10, 3, 11, 12, 5, 13, 6, 14, 4, 15, 8, 16,
+    9, 17, 2,
+};
+
+f32 lbl_80191AA4[70] = {
+    0.18f, 0.108f, 0.068f, 0.048f, 0.04f, 0.036f, 0.0335f, 0.031f, 0.029f, 0.027f,
+    0.025f, 0.023f, 0.021f, 0.019f, 0.018f, 0.017f, 0.016f, 0.015f, 0.014f, 0.013f,
+    0.012f, 0.0112f, 0.0104f, 0.0096f, 0.0088f, 0.008f, 0.0077f, 0.0074f, 0.0071f, 0.0068f,
+    0.0065f, 0.0062f, 0.0059f, 0.00565f, 0.0054f, 0.00515f, 0.0049f, 0.0047f, 0.0045f, 0.0043f,
+    0.0041f, 0.0039f, 0.0037f, 0.0035f, 0.0033f, 0.0031f, 0.0029f, 0.00274f, 0.0026f, 0.00252f,
+    0.00246f, 0.0024f, 0.00236f, 0.00232f, 0.0023f, 0.00228f, 0.00226f, 0.00224f, 0.00222f, 0.0022f,
+    0.00218f, 0.00216f, 0.00214f, 0.00212f, 0.0021f, 0.00208f, 0.00206f, 0.00204f, 0.00202f, 0.002f,
+};
 
 
 void  fn_800D344C(UStreamObject* pObject);
@@ -79,8 +94,8 @@ s32   fn_800D9E00(s32 i);
 
 // Copy the working tables and their two counts into the second set, which the payouts then read.
 void fn_800D3244(void) {
-    lbl_80282248 = lbl_80282250;
     lbl_8028224C = lbl_80282254;
+    lbl_80282248 = lbl_80282250;
     memcpy(lbl_802001C8, lbl_80200420, sizeof(lbl_802001C8));
     memcpy(lbl_802001A0, lbl_802003F8, sizeof(lbl_802001A0));
     memcpy(lbl_80200178, lbl_802003D0, sizeof(lbl_80200178));
@@ -94,6 +109,11 @@ void fn_800D3244(void) {
     memcpy(lbl_80200038, lbl_80200218, sizeof(lbl_80200038));
     memcpy(lbl_80200010, lbl_802001F0, sizeof(lbl_80200010));
     memcpy(lbl_801FFD90, lbl_801FFAE8, sizeof(lbl_801FFD90));
+}
+
+// fake match: stands in for a function EA's linker stripped; it puts 1.0f first in .sdata2
+static f32 Earnings_StrippedFn(f32 x) {
+    return x + 1.0f;
 }
 
 // nMoney rounded to the nearest $25. TW06: roundToNearest25 (by position).
@@ -120,6 +140,11 @@ void fn_800D344C(UStreamObject* pObject) {
     // big-endian on disc, so a little-endian port converts it field by field here
     // (docs/format-byteorder.md)
     Stream_StreamLoadFixedSize(pObject, sizeof(lbl_80200538), &lbl_80200538);
+}
+
+// fake match: stands in for a function EA's linker stripped; it puts 0.5f before 0.1f in .sdata2
+static f32 Earnings_StrippedFn2(f32 x) {
+    return x + 0.5f;
 }
 
 // Row 0 gets n as it is; any other row gets nTotal * lbl_80191AA4[nRow] scaled by
@@ -751,6 +776,7 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
     s32 aAwardIds[10];
     int i;
     u8 bReplace;
+    u8 bLost;
     int j;
     s32 nValue;
 
@@ -821,7 +847,6 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
 
         if (lbl_80200538.aPuttGoal[i].nAward != 39) {
             int nSlot;
-            u8 bLost;
 
             if (!fn_800D76AC(nPlayer, lbl_80200538.aPuttGoal[i].nAward)) continue;
             bReplace = 0;
@@ -852,7 +877,6 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
             }
         } else {
             int nSlot;
-            u8 bLost;
 
             nValue = lbl_80200538.aPuttGoal[i].nValue;
             if (nValue == 0) continue;
@@ -872,7 +896,7 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
                 }
             }
             if (bLost) continue;
-            lbl_80200308[nSlot] = nValue;
+            lbl_80200308[nSlot] = lbl_80200538.aPuttGoal[i].nValue;
             aPrizeIds[nSlot] = lbl_80200538.aPuttGoal[i].nId;
             lbl_80200380[nSlot] = GM_Earnings_ComputeBonusModifiers(lbl_80200308[nSlot], nPlayer,
                                               fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 0),
