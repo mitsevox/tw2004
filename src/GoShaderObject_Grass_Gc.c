@@ -427,8 +427,8 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
     GrassParams* pParams = SD_gpGrassTypeData->pParams;
     s32 nSet = pParams->n24;
     s32 nRun = pParams->a18[nSet];
-    s32 nVerts = pData->anVerts[nSet][nRun];
     // fake match: this declaration order (found by search) sets the register allocation
+    int nDone;
     int nPass;
     f32 vEye[3];
     f32 vAt[4];     // fake match: three floats are used; the frame has room for four
@@ -443,7 +443,7 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
     f32 fBladeT;
     f32 fFade;
     int nAxis;
-    int nDone;
+    s32 nVerts = pData->anVerts[nSet][nRun];
     int nWind;
     int nRow;
     GrassWord* pVert = pData->apVerts[nSet][nRun];
