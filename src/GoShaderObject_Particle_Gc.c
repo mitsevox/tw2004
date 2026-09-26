@@ -282,18 +282,19 @@ void fn_800949D0(SD_SShaderObject_Static* pObject) {
 // fStep and those past the lifetime are dropped; then the particles the other buffer has beyond
 // them are carried over, aged by fCarried.
 void fn_80094B84(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {
-    ParticleSystem* pSys;
-    int nBuf;
-    int nOther;
-    u32 nDead;
+    f32* pAge;
     u32 nStart;
-    u32 nLive;
     u32 i;
-    u32 n;
     u32 nEnd;
-    f32 fAge;
+    ParticleSystem* pSys;
     ParticleVertex* pSrc;
+    int nOther;
+    f32 fAge;
+    u32 n;
     ParticleVertex* pDst;
+    u32 nLive;
+    int nBuf;
+    u32 nDead;
 
     nDead = 0;
     pSys = pObject->pData;
@@ -302,11 +303,12 @@ void fn_80094B84(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {
     nLive = pSys->anLive[nBuf];
     i = nStart;
     for (n = nLive; n != 0; n--) {
-        fAge = *((f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst + i) + pMsg->u.age.fStep;
+        pAge = (f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst + i;
+        fAge = *pAge + pMsg->u.age.fStep;
         if (fAge > pMsg->pParams->f4) {
             nDead++;
         } else {
-            *((f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst + i) = fAge;
+            *pAge = fAge;
         }
         if (++i == pSys->nCount) {
             i = 0;
@@ -325,8 +327,8 @@ void fn_80094B84(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {
         nEnd -= pSys->nCount;
     }
     while (i != nEnd) {
-        *((f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst + i) =
-            *((f32*)lbl_802813A8->apBuffers[nOther + 2] + pSys->nFirst + i) + pMsg->u.age.fCarried;
+        pAge = (f32*)lbl_802813A8->apBuffers[nOther + 2] + pSys->nFirst + i;
+        *((f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst + i) = *pAge + pMsg->u.age.fCarried;
         // EA copies four slots from each particle's on; the next three are other particles'
         pSrc = (ParticleVertex*)lbl_802813A8->apBuffers[nOther] + pSys->nFirst + i;
         pDst = (ParticleVertex*)lbl_802813A8->apBuffers[nBuf] + pSys->nFirst + i;

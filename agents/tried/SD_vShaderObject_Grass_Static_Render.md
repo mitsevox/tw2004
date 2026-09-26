@@ -1,6 +1,6 @@
 # SD_vShaderObject_Grass_Static_Render (GoShaderObject_Grass_Gc.c, 0x80120F74)
 
-Status: OPEN, 97.21% on 2026-09-25 (n-shaders).
+Status: OPEN, 97.63% on 2026-09-26 (r2-render).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -9,6 +9,9 @@ unless you combine it with something new. Before you stop, add every attempt und
 ## Attempts
 
 (add yours here: date, lane, what, score)
+- 2026-09-26, r2-render: random orders of the 21 declarations after nVerts (up to 300 in ~4
+  minutes), then a move/swap climb: aligned 55 -> 41, real 97.21 -> 97.63 (kept; order in the
+  source). Not exhausted: a longer random search may go further.
 - 2026-09-25, n-shaders: the PC sweep's three moves searched over nearby positions (pVert 20-27,
   nPass 5-9, fPerX 15-19): best pVert 22nd, nPass 6th, fPerX 15th, aligned 74 -> 55, real
   96.78 -> 97.21 (kept). Decl climb after it: none. const on pObject / the pointer locals: 74.

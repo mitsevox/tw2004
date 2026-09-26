@@ -129,8 +129,8 @@ void fn_8009B970(int nView) {
             lbl_802813C0->anRows[nView] = 16;
         }
         lbl_802813C0->fCellD = fLen / (lbl_802813C0->anRows[nView] - 1);
-        fAlong = lbl_802813C0->fCellD / 2.0f + fDist;
         fAcross = (lbl_802813C0->nCols / 2) * lbl_802813C0->fCellW - lbl_802813C0->fCellW / 2.0f;
+        fAlong = lbl_802813C0->fCellD / 2.0f + fDist;
     } else {
         lbl_802813C0->anRows[nView] = lbl_802813C0->nCols;
         lbl_802813C0->fCellD = lbl_802813C0->fCellW;
@@ -149,14 +149,16 @@ void fn_8009B970(int nView) {
 // first laying the grid out again if the player's target has moved. Points on ground of class 12
 // are lifted by a ninth.
 void fn_8009BE08(int nView) {
+    int n;
+    int nRow;
+    int nCol;
+    CourseInfo* pCourse = fn_8000C594();
     // fake match: an s32 (long) copy of nView, kept in its own register, for the fn_8001707C calls
     s32 nViewCopy;
     f32 vPoint[4];
     f32 vNormal[4];
     SurfaceType* pSurface;
-    CourseInfo* pCourse = fn_8000C594();
     int nSteps = 0;
-    int n;
     f32 fAcross;
     f32 fAlong;
     f32 fDirX;
@@ -174,8 +176,10 @@ void fn_8009BE08(int nView) {
     fDirZ = lbl_802813C0->aDir[nView][2];
     while ((n = lbl_802813C0->anDone[nView]) < lbl_802813C0->nCols * lbl_802813C0->anRows[nView]
            && nSteps < 4) {
-        fAlong = (n / lbl_802813C0->nCols) * lbl_802813C0->fCellD;
-        fAcross = (n % lbl_802813C0->nCols) * lbl_802813C0->fCellW;
+        nRow = n / lbl_802813C0->nCols;
+        nCol = n % lbl_802813C0->nCols;
+        fAcross = nCol * lbl_802813C0->fCellW;
+        fAlong = nRow * lbl_802813C0->fCellD;
         vPoint[0] = fAcross * fDirZ + (fAlong * fDirX + lbl_802813C0->aCorner[nView][0]);
         vPoint[1] = 2.0f + PLAYER(fn_8001707C(nViewCopy))->vTarget[1];
         vPoint[2] = (fAlong * fDirZ + lbl_802813C0->aCorner[nView][2]) - fAcross * fDirX;
@@ -195,32 +199,35 @@ void fn_8009BE08(int nView) {
 // (the -65536.125 marker) breaks the line, and the end of each line fades out. The texture scrolls
 // with the frame count.
 void GR_BuildGridRenderData(int nView) {
-    f32 fPrev;
-    f32 fHole;
-    f32 fDirX;
-    f32 fDirZ;
-    f32 fCornerX;
-    f32 fCornerZ;
+    // fake match: this declaration order (found by search) sets the register allocation
     f32 fAlong;
-    f32 fAcross;
-    f32 fHeight;
-    f32 fX;
+    int n;
+    int i;
     f32 fY;
+    f32 fX;
+    f32 fV;
+    f32 fHeight;
+    f32 fGap;
     f32 fZ;
     f32 fU;
-    f32 fV;
-    f32 fGap;
-    f32 fPeriod;
-    int n;
-    int nRow;
+    f32 fAcross;
     int nCol;
+    int nRow;
     int nEdge;
-    int nGapEdge;
-    int bInGap;
     int k;
-    int i;
+    f32 fDirX;
+    f32 fDirZ;
+    int bInGap;
+    int nGapEdge;
+    f32 fHole;
+    f32 fCornerX;
+    f32 fCornerZ;
+    f32 fPeriod;
     // fake match: an s32 (long) copy of nView, kept in its own register, for the fn_8001707C call
     s32 nViewCopy;
+    f32 fPrev;
+    // fake match: &gSession through a local, so its base (not &gSession.nFrameCount) is kept
+    Session* pSession = &gSession;
     nViewCopy = nView;
     lbl_802813C0->nVerts = 0;
     fPrev = 0.0f;
@@ -269,7 +276,7 @@ void GR_BuildGridRenderData(int nView) {
                 lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 3] =
                     (k == nEdge) ? 0 : (u8)lbl_802813C0->anColor[3];
                 if (k == 0 && lbl_802813C0->nVerts > 0) {
-                    fU = (u32)gSession.nFrameCount * lbl_802813C0->f100 * (fPrev - fHeight);
+                    fU = (u32)pSession->nFrameCount * lbl_802813C0->f100 * (fPrev - fHeight);
                     fU = fU - fn_80035074(fU);
                     lbl_802813C0->apUV[nView][lbl_802813C0->nVerts * 2 + 0] = fU;
                     lbl_802813C0->apUV[nView][lbl_802813C0->nVerts * 2 + 1] = 0.75f;
@@ -324,7 +331,7 @@ void GR_BuildGridRenderData(int nView) {
                 lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 3] =
                     (k == nEdge) ? 0 : (u8)lbl_802813C0->anColor[3];
                 if (k == 0 && lbl_802813C0->nVerts > 0) {
-                    fU = (u32)gSession.nFrameCount * lbl_802813C0->f100 * (fPrev - fHeight);
+                    fU = (u32)pSession->nFrameCount * lbl_802813C0->f100 * (fPrev - fHeight);
                     if ((s8)GOLFERSTATE_GetCurrentState(fn_8001707C(nViewCopy)) == GS_ZOOM) {
                         fV = 0.75f;
                         fGap = 0.0625f;

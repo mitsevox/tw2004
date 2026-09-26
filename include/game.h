@@ -121,6 +121,7 @@ typedef struct Unk802811F0 {
     f32 f18;                    // 0x18
     u8  b1C;                    // 0x1C
 } Unk802811F0;
+extern Unk802811F0 lbl_801D7100;        // 0x801D7100 (lbl_802811F0's initial value points here)
 extern Unk802811F0* lbl_802811F0;       // 0x802811F0
 
 // lbl_80188900: five choices per course (fn_8006F650). A roll picks choice n with chance fShare
