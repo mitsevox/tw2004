@@ -203,12 +203,9 @@ void GR_BuildGridRenderData(s32 nView) {
     f32 fAlong;
     int n;
     int i;
-    f32 fY;
-    f32 fX;
     f32 fV;
     f32 fHeight;
     f32 fGap;
-    f32 fZ;
     f32 fU;
     f32 fAcross;
     int nCol;
@@ -259,14 +256,13 @@ void GR_BuildGridRenderData(s32 nView) {
                 nEdge = nGapEdge;
                 bInGap = 0;
             }
-            fY = 0.01f + fHeight;
-            fX = fAcross * fDirZ + (fAlong * fDirX + fCornerX);
-            fZ = (fAlong * fDirZ + fCornerZ) - fAcross * fDirX;
             k = 0;
             do {
-                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 0] = fX;
-                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 1] = fY;
-                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 2] = fZ;
+                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 0] =
+                    fAcross * fDirZ + (fAlong * fDirX + fCornerX);
+                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 1] = 0.01f + fHeight;
+                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 2] =
+                    (fAlong * fDirZ + fCornerZ) - fAcross * fDirX;
                 lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 0] = lbl_802813C0->anColor[0];
                 lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 1] = lbl_802813C0->anColor[1];
                 lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 2] = lbl_802813C0->anColor[2];
@@ -315,13 +311,12 @@ void GR_BuildGridRenderData(s32 nView) {
                 bInGap = 0;
             }
             k = 0;
-            fX = fAcross * fDirZ + (fAlong * fDirX + fCornerX);
-            fY = 0.01f + fHeight;
-            fZ = (fAlong * fDirZ + fCornerZ) - fAcross * fDirX;
             do {
-                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 0] = fX;
-                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 1] = fY;
-                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 2] = fZ;
+                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 0] =
+                    fAcross * fDirZ + (fAlong * fDirX + fCornerX);
+                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 1] = 0.01f + fHeight;
+                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 2] =
+                    (fAlong * fDirZ + fCornerZ) - fAcross * fDirX;
                 lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 0] = lbl_802813C0->anColor[0];
                 lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 1] = lbl_802813C0->anColor[1];
                 lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 2] = lbl_802813C0->anColor[2];

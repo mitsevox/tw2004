@@ -50,6 +50,7 @@ typedef struct SwingState {
     f32  f110;                  // 0x110  0.01
     f32  fMaxError;             // 0x114  the meter's largest miss, radians
     f32  fPuttFullPower;        // 0x118  0.75: a putt meter over this counts as full
+    u8   unk11C[0x128 - 0x11C];
 } SwingState;
 
 // Rows of gForgivenessTable, in pairs (threshold, scale) unless noted.
@@ -100,16 +101,8 @@ enum {
 #define GOLFER_GET_ATTRIBUTE_S8(p, nAttr, nMode) \
     (((s8 (*)(Player*, int, int))Golfer_GetAttribute)(p, nAttr, nMode))
 
-extern SwingState*   gpSwing;                    // 0x80281188
-extern f32           gForgivenessTable[3][27];  // 0x80188168  rows: value at attribute 0 / 100 / 110
-extern s32           gBoostSteps[8];             // 0x80188148  power boost per level: 1 2 4 6 9 12 16 20
 extern f32           lbl_80281B40[];             // FLT_MAX
-extern f32           gPuttXScale[8];             // 0x801882AC  per shot kind: 0.03 for a putt, 0.2 otherwise
-extern f32           gSwingXScale[8];            // 0x801882CC  the same values again
 extern s32           gClubCurve[CLUB_MAX_e];      // 0x80183578  per club, 0..26: how much it can shape
-extern u8            lbl_80281194[4];            // a neutral pad: both sticks centred (0x80)
-extern u8 (*gSwingPhaseFns[])(int nPlayer);
-extern f32           gSwingRange[8];             // 0x801882EC  backswing rate by shot kind: -, 0.85, 0.5, 0.8
 
 void  Swing_FaceVector(int nPlayer, f32* pOut);
 f32   fn_8005BA94_MishitAngle(int nPlayer);
@@ -137,661 +130,73 @@ void  SW_vUIAdjustClub(Character* pObj, SwingData* pSw, int nStickX);
 int   fn_8005CC5C(void);
 void  UI_Obj_RenderBoostUI(int nView);
 void  fn_800360D4(u8* pMesh);
+void  SW_vStateInitBackSwingFigit(int nPlayer);
+void  SW_vImpact(int nPlayer);
+f32   SW_vCalculateShotPower(int nPlayer);
+f32   Swing_CurveAngle(s32* pClub, f32 fBackAngle);
+f32   Swing_TeeSweetSpot(int nPlayer, f32 fPower);
+f32   Swing_ApplyPowerBoost(int nPlayer, f32 fPower);
+void  Swing_SpinInput(int nPlayer);
+void  Swing_ApplySpin(int nPlayer);
+void  Swing_ApplyForgiveness(int nPlayer);
+void  Swing_MisHitRumble(int nPlayer);
+f32   fn_8005CC18(f32* pV);
+u8    Swing_WaitForBackswing(int nPlayer);
+u8    Swing_UpdateBackswing(int nPlayer);
+u8    SW_vStateBackSwingFigit(int nPlayer);
+u8    SW_vStateDownSwing(int nPlayer);
+u8    Swing_PhaseIdle4(int nPlayer);
+u8    Swing_UpdateAfterImpact(int nPlayer);
+u8    Swing_PhaseIdle6(int nPlayer);
 
-// How much spin the SPIN attribute allows: 0.15 at 0, 0.6 at 100, 1.0 at 110.
-f32 Swing_SpinScale(int nSpin) {
-    return TABLE_AT(ROW_SPIN, (s8)nSpin);
-}
+SwingState lbl_801D5968;
 
-// Add the power boost: the pressed level's step times a per-point scale from POWER BOOST
-// (0.005 at 0, 0.010 at 100). Base value only - equipment counts, modifiers do not.
-f32 Swing_ApplyPowerBoost(int nPlayer, f32 fPower) {
-    int nAttr  = Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_POWER_BOOST, ATTR_BASE);
-    int nLevel = gPlayers[nPlayer].swing.nPowerBoost;
-    s8  nBoost = nAttr;
-    if (nLevel > 0) {
-        f32 fScale = TABLE_AT(ROW_BOOST, nBoost);
-        f32 fAdd   = fScale * (f32)gBoostSteps[nLevel - 1];
-        fPower += fAdd;
-        return fPower;
-    }
-    return fPower;
-}
+SwingState* gpSwing = &lbl_801D5968;               // 0x80281188
 
-// The spin stick's result (a replay reads it back from the recording first).
-void fn_8005C15C(int nPlayer, f32* pSpinY, f32* pSpinX) {
-    if (gSession.bReplay) {
-        REPLAY_GetSpin(nPlayer, &gPlayers[nPlayer].swing.fForwardSpin, &gPlayers[nPlayer].swing.fSideSpin);
-    }
-    *pSpinX = gPlayers[nPlayer].swing.fForwardSpin;
-    *pSpinY = gPlayers[nPlayer].swing.fSideSpin;
-}
+s32 gBoostSteps[8] = {1, 2, 4, 6, 9, 12, 16, 20};  // 0x80188148  power boost per level: 1 2 4 6 9 12 16 20
 
-// The backswing's sideways angle as a fraction of a quarter turn, mirrored by fn_8001EDF4.
-f32 fn_8005C1EC(int nPlayer) {
-    if (fn_8001EDF4(gPlayers[nPlayer].pChar)) {
-        return gPlayers[nPlayer].swing.fControllerSliceAngle / 1.5707964f;
-    }
-    return -(gPlayers[nPlayer].swing.fControllerSliceAngle / 1.5707964f);
-}
+// 0x80188168  rows: value at attribute 0 / 100 / 110
+f32 gForgivenessTable[3][27] = {
+    {0.1f, 0.85f, 0.125f, 0.825f, 0.13f, 0.8f, 0.135f, 0.775f, 0.1f,
+     0.9f, 0.1f, 0.85f, 0.1f, 0.85f, 0.1f, 0.85f, 0.1f, 0.85f,
+     0.1f, 0.85f, 0.0f, 1.0f, 3.14f, 0.0f, 0.005f, 135.0f, 0.15f},
+    {0.415f, 0.18f, 0.42f, 0.175f, 0.425f, 0.17f, 0.43f, 0.165f, 0.435f,
+     0.125f, 0.415f, 0.2f, 0.415f, 0.125f, 0.415f, 0.18f, 0.415f, 0.18f,
+     0.415f, 0.125f, 0.436f, 0.125f, 3.14f, 0.0f, 0.01f, 35.0f, 0.6f},
+    {0.435f, 0.165f, 0.445f, 0.145f, 0.465f, 0.125f, 0.485f, 0.115f, 0.5235f,
+     0.1f, 0.5235f, 0.15f, 0.5235f, 0.1f, 0.5235f, 0.1f, 0.5235f, 0.1f,
+     0.5235f, 0.1f, 0.5235f, 0.1f, 3.14f, 0.0f, 0.011f, 30.0f, 1.0f},
+};
 
-f32 fn_8005C268(int nPlayer) {
-    return gPlayers[nPlayer].swing.fMishitAngle;
-}
+// 0x801882AC  per shot kind: 0.03 for a putt, 0.2 otherwise
+f32 gPuttXScale[8] = {0.03f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f};
 
-f32 fn_8005C280(int nPlayer) {
-    return gPlayers[nPlayer].swing.fNonPowerShotPower;
-}
+// 0x801882CC  the same values again
+f32 gSwingXScale[8] = {0.03f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f};
 
-void fn_8005C298(int nPlayer) {
-    gPlayers[nPlayer].swing.bCanSpin = 0;
-}
+// 0x801882EC  backswing rate by shot kind: -, 0.85, 0.5, 0.8
+f32 gSwingRange[8] = {0.0f, 0.85f, 0.5f, 0.8f, 0.0f, 0.0f, 0.0f, 0.0f};
 
-// Turn the spin input into the shot's spin: stick deflection (-1..1) times the amount asked
-// for (0..20, over 20) times the SPIN scale (0.15 at 0, 0.6 at 100, 1.0 at 110).
-void Swing_ApplySpin(int nPlayer) {
-    SwingData* pSw = &gPlayers[nPlayer].swing;
-    f32        fInv = 1.0f / 128.0f;
-    int        nSpin;
-    f32        fScale;
-    if (gSession.bReplay) return;
-    if (pSw->nSpinBoost == 0) {
-        pSw->fForwardSpin = 0.0f;
-        pSw->fSideSpin = 0.0f;
-        return;
-    }
-    nSpin       = Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_SPIN, ATTR_TOTAL);
-    {
-        f32 fX = (f32)(pSw->nSpinCtrlX - 128) * fInv;
-        f32 fY = (f32)(pSw->nSpinCtrlY - 128) * fInv;
-        pSw->fSideSpin = fX * (f32)pSw->nSpinBoost / 20.0f;
-        pSw->fForwardSpin = fY * (f32)pSw->nSpinBoost / 20.0f;
-    }
-    fScale = Swing_SpinScale(nSpin);
-    pSw->fSideSpin *= fScale;
-    pSw->fForwardSpin *= fScale;
-    pSw->fForwardSpin *= -1.0f;
-}
+f32 lbl_8018830C[8][4] = {
+    {0.5f, 0.5f, 0.5f, 0.5f},
+    {0.5f, 0.5f, 0.5f, 0.5f},
+    {0.5f, 0.5f, 0.5f, 0.5f},
+    {0.5f, 0.3f, 0.3f, 0.5f},
+    {0.5f, 0.15f, 0.15f, 0.5f},
+    {0.5f, 0.0f, 0.0f, 0.5f},
+    {0.5f, 0.0f, 0.0f, 0.5f},
+    {0.5f, 0.0f, 0.0f, 0.5f},
+};
 
-// Lie 0 with club 0 (a driver off the tee): up to +0.1 power when the backswing's sideways angle
-// is negative and its size falls between the curve's two knots, most at their midpoint.
-f32 Swing_TeeSweetSpot(int nPlayer, f32 fPower) {
-    Player* p = &gPlayers[nPlayer];
-    f32     fT, fHalf;
-    if (p->ball.nLie == 0 && p->nClub == 0 && p->swing.fControllerSliceAngle < 0.0f) {
-        fT = -p->swing.fControllerSliceAngle / 1.5707964f;
-        if (fT > gpSwing->fKnot1X && fT < gpSwing->fKnot2X) {
-            f32 fBonus;
-            fHalf  = (gpSwing->fKnot2X - gpSwing->fKnot1X) / 2.0f;
-            fBonus = 1.0f - (f32)fabs(fHalf - (fT - gpSwing->fKnot1X)) / fHalf;
-            fBonus *= gpSwing->fTeeBonus;
-            return fPower + fBonus;
-        }
-    }
-    return fPower;
-}
+u8 (*gSwingPhaseFns[7])(int nPlayer) = {
+    Swing_WaitForBackswing, Swing_UpdateBackswing, SW_vStateBackSwingFigit, SW_vStateDownSwing,
+    Swing_PhaseIdle4,       Swing_UpdateAfterImpact, Swing_PhaseIdle6,
+};
 
-// Shrink a human's swing error by the governing attribute: below a threshold the error is
-// multiplied by a scale (at 100, misses under ~0.42 become 82% smaller). CPU players skip this.
-// Putts under 2 units lose their error entirely.
-void Swing_ApplyForgiveness(int nPlayer) {
-    if (Player_IsCPU(nPlayer)) return;
-    if (gPlayers[nPlayer].bPerfect) return;
-    {
-    f32  fError = gPlayers[nPlayer].swing.fMishitAngle;
-    int  nRowScale, nRowThresh;
-    int  nAttr;
-    f32  fThresh, fScale;
-
-    if (gPlayers[nPlayer].ball.nLie == 6 || gPlayers[nPlayer].ball.nLie == 7 ||
-        gPlayers[nPlayer].ball.nLie == 8 || gPlayers[nPlayer].ball.nLie == 3 ||
-        gPlayers[nPlayer].ball.nLie == 4) {
-        nRowScale  = ROW_RECOVERY + 1;
-        nRowThresh = ROW_RECOVERY;
-        nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL);
-    } else {
-        switch (gPlayers[nPlayer].nShotKind) {
-        case SHOT_TYPE_PUTT_e:
-            nRowScale  = ROW_PUTTING + 1;
-            nRowThresh = ROW_PUTTING;
-            nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_PUTTING, ATTR_TOTAL);
-            if (gPlayers[nPlayer].fDistance < 2.0f) {
-                gPlayers[nPlayer].swing.fMishitAngle = 0.0f;
-                return;
-            }
-            break;
-        case SHOT_TYPE_CHIP_e:
-            nRowScale  = ROW_APPROACH_B + 1;
-            nRowThresh = ROW_APPROACH_B;
-            nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_APPROACH, ATTR_TOTAL);
-            break;
-        case SHOT_TYPE_PITCH_e:
-            nRowScale  = ROW_APPROACH_A + 1;
-            nRowThresh = ROW_APPROACH_A;
-            nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_APPROACH, ATTR_TOTAL);
-            break;
-        case 5:
-        case 6:
-        case 7:
-            nRowScale  = ROW_RECOVERY + 1;
-            nRowThresh = ROW_RECOVERY;
-            nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL);
-            break;
-        default:
-            switch (gPlayers[nPlayer].nClub) {
-            case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
-                nRowScale  = ROW_DRIVING + 1;
-                nRowThresh = ROW_DRIVING;
-                nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_DRIVING_ACCURACY, ATTR_TOTAL);
-                break;
-            case 9: case 10: case 11: case 12:
-                nRowScale  = ROW_STRIKING_A + 1;
-                nRowThresh = ROW_STRIKING_A;
-                nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL);
-                break;
-            case 13: case 14: case 15: case 16:
-                nRowScale  = ROW_STRIKING_B + 1;
-                nRowThresh = ROW_STRIKING_B;
-                nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL);
-                break;
-            case 17: case 18: case 19: case 20: case 21: case 22: case 23: case 24:
-                nRowScale  = ROW_STRIKING_C + 1;
-                nRowThresh = ROW_STRIKING_C;
-                nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL);
-                break;
-            default:
-                nRowScale  = ROW_STRIKING_C + 1;
-                nRowThresh = ROW_STRIKING_C;
-                nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL);
-                break;
-            }
-            break;
-        }
-    }
-    TABLE_PAIR(nRowThresh, nRowScale, nAttr, fThresh, fScale);
-    if (fabs(fError) < fThresh) {
-        fError *= fScale;
-    }
-    gPlayers[nPlayer].swing.fMishitAngle = fError;
-    }
-}
-
-// Rumble the pad on a mis-hit: frames = (135 at attribute 0 .. 35 at 100) x |error|, max 30.
-void Swing_MisHitRumble(int nPlayer) {
-    int nPad = gPlayers[nPlayer].nController;
-    int nAttr;
-    f32 fScale;
-    switch (gPlayers[nPlayer].nShotKind) {
-    case SHOT_TYPE_PUTT_e:
-        nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_PUTTING, ATTR_TOTAL);
-        break;
-    case SHOT_TYPE_CHIP_e:
-    case SHOT_TYPE_PITCH_e:
-        nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_APPROACH, ATTR_TOTAL);
-        break;
-    case 5:
-    case 6:
-    case 7:
-        nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL);
-        break;
-    default:
-        nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL);
-        break;
-    }
-    fScale = TABLE_AT(ROW_RUMBLE, nAttr);
-    gPlayers[nPlayer].swing.nVibrateCount = (int)(fScale * fabs(gPlayers[nPlayer].swing.fMishitAngle));
-    if (gPlayers[nPlayer].swing.nVibrateCount > 30) {
-        gPlayers[nPlayer].swing.nVibrateCount = 30;
-    }
-    if (gPlayers[nPlayer].swing.nVibrateCount > 0) {
-        gPlayers[nPlayer].swing.bVibrating = 1;
-        fn_800130F8(nPad, 1);
-        fn_80013130(nPad, 0xFF);
-    }
-}
-
-int fn_8005CB48(int nPlayer) {
-    return gPlayers[nPlayer].swing.nPowerBoost;
-}
-
-int fn_8005CB60(int nPlayer) {
-    return gPlayers[nPlayer].swing.nSpinBoost;
-}
-
-// An animation event's time.
-f32 fn_8005CB78(Character* pChar, u64 uEvent) {
-    return pChar->events[(int)uEvent].fTime;
-}
-
-void fn_8005CB88(Character* pObj, f32 f) {
-    if (pObj != NULL) {
-        pObj->f162C = f;
-    }
-}
-
-f32 Char_GetBackswing(Character* pObj) {
-    if (pObj == NULL) {
-        return 0.0f;
-    }
-    return pObj->fBackswing;
-}
-
-void fn_8005CBB0(Character* pObj, f32 f) {
-    if (pObj != NULL) {
-        pObj->f1630 = f;
-    }
-}
-
-void fn_8005CBC0(Character* pObj, f32 f) {
-    if (pObj != NULL) {
-        pObj->f1634 = f;
-    }
-}
-
-// Paired-single vector add over four floats (the fourth is carried along).
-#ifdef __MWERKS__
-asm void Vec_Add(register f32* pA, register f32* pB, register f32* pOut) {
-    nofralloc
-    psq_l  f0, 0(pA), 0, 0
-    psq_l  f1, 8(pA), 0, 0
-    psq_l  f2, 0(pB), 0, 0
-    psq_l  f3, 8(pB), 0, 0
-    ps_add f2, f2, f0
-    ps_add f3, f3, f1
-    psq_st f2, 0(pOut), 0, 0
-    psq_st f3, 8(pOut), 0, 0
-    blr
-}
-#else
-// port: untested, the plain-C version for compilers without paired singles.
-void Vec_Add(f32* pA, f32* pB, f32* pOut) {
-    pOut[0] = pB[0] + pA[0];
-    pOut[1] = pB[1] + pA[1];
-    pOut[2] = pB[2] + pA[2];
-    pOut[3] = pB[3] + pA[3];
-}
-#endif
-
-#ifdef __MWERKS__
-asm void Vec_Sub(register f32* pA, register f32* pB, register f32* pOut) {
-    nofralloc
-    psq_l  f0, 0(pA), 0, 0
-    psq_l  f1, 8(pA), 0, 0
-    psq_l  f2, 0(pB), 0, 0
-    psq_l  f3, 8(pB), 0, 0
-    ps_sub f2, f0, f2
-    ps_sub f3, f1, f3
-    psq_st f2, 0(pOut), 0, 0
-    psq_st f3, 8(pOut), 0, 0
-    blr
-}
-#else
-// port: untested, the plain-C version for compilers without paired singles.
-void Vec_Sub(f32* pA, f32* pB, f32* pOut) {
-    pOut[0] = pA[0] - pB[0];
-    pOut[1] = pA[1] - pB[1];
-    pOut[2] = pA[2] - pB[2];
-    pOut[3] = pA[3] - pB[3];
-}
-#endif
-
-// A 4-vector's squared length, capped.
-f32 fn_8005CC18(f32* pV) {
-    f32 f = pV[0] * pV[0] + pV[1] * pV[1] + pV[2] * pV[2] + pV[3] * pV[3];
-    if (f > lbl_80281B40[0]) {
-        f = lbl_80281B40[0];
-    }
-    return f;
-}
-
-int fn_8005CC5C(void) {
-    return lbl_802823FC;
-}
-
-void fn_8005CC64(TexBank* pBank, TexEntry* pTex) {
-    lbl_801B8980.p100 = pBank;
-    lbl_801B8980.p104 = pTex;
-    lbl_801B8980.uFlags |= 1;
-}
-
-f32 fn_8005CC84(f32 fTan) {
-    return atan(fTan);
-}
-
-// The final power for the shot. A CPU just scales what it planned (putts +5%). A human's full
-// shot gets the boost, then loses distance to the swing error: a scaled part of it under the
-// threshold, all of it above. Putts, chips and pitches skip the error; a putt over 75% on the
-// meter counts as full power.
-f32 SW_vCalculateShotPower(int nPlayer) {
-    f32     fPower, fError;
-    f32*    pPower;
-    int     nRowScale, nRowThresh;
-    int     nAttr;
-    int     nKind;
-    f32     fThresh, fScale;
-
-    if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
-        fPower = gPlayers[nPlayer].fPower;
-        fPower *= AI_PowerScale(nPlayer);
-        if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e && !(gPlayers[nPlayer].uFlags & 8)) {
-            fPower *= 1.05f;
-            if (fPower < 0.1f) {
-                fPower = 0.1f;
-            }
-        }
-        goto clamp;         // fake match: the shared clamp as a jump (without the gotos: 83.9%, not 84.9%)
-    }
-    fPower = gPlayers[nPlayer].fPower;
-    // fake match: pPower through PLAYER(), everything else through gPlayers[] (all gPlayers[]:
-    // 94.2%; one Player* local: 84.9%)
-    pPower = &PLAYER(nPlayer)->fPower;
-    fError = fabs(gPlayers[nPlayer].swing.fMishitAngle);
-    gPlayers[nPlayer].swing.fNonPowerShotPower = Swing_ApplyPowerBoost(nPlayer, fPower) - fError;
-    nKind = gPlayers[nPlayer].nShotKind;
-    switch (nKind) {
-    case SHOT_TYPE_PUTT_e: {
-        f32 fDist = gPlayers[nPlayer].fDistance < 1.0f ? 1.0f : gPlayers[nPlayer].fDistance;
-        if (*pPower > gpSwing->fPuttFullPower) {
-            *pPower = 1.0f;
-        }
-        fPower = *pPower * fn_80050D34(fDist);
-        Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_PUTTING, ATTR_TOTAL);
-        if (fPower < 0.1f) {
-            fPower = 0.1f;
-        }
-        goto clamp;         // fake match: the shared clamp as a jump (without the gotos: 83.9%, not 84.9%)
-    }
-    case SHOT_TYPE_CHIP_e:
-    case SHOT_TYPE_PITCH_e: {
-        f32 f;
-        if (nKind == SHOT_TYPE_CHIP_e) {
-            f = *pPower * Physics_EstimateShotPower(gPlayers[nPlayer].fDistance, &gPlayers[nPlayer].ball,
-                                                    SHOT_TYPE_CHIP_e, gPlayers[nPlayer].nClub);
-        } else {
-            f = *pPower;
-        }
-        fPower = Swing_ApplyPowerBoost(nPlayer, f);
-        Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_APPROACH, ATTR_TOTAL);
-        if (fPower < 0.1f) {
-            fPower = 0.1f;
-        }
-        goto clamp;         // fake match: the shared clamp as a jump (without the gotos: 83.9%, not 84.9%)
-    }
-    case 5:
-    case 6:
-    case 7:
-        fPower     = Swing_ApplyPowerBoost(nPlayer, *pPower);
-        nRowScale  = ROW_RECOVERY_PWR + 1;
-        nRowThresh = ROW_RECOVERY_PWR;
-        nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL);
-        break;
-    default:
-        if (gPlayers[nPlayer].ball.nLie == 6 || gPlayers[nPlayer].ball.nLie == 7 ||
-            gPlayers[nPlayer].ball.nLie == 8 || gPlayers[nPlayer].ball.nLie == 3 ||
-            gPlayers[nPlayer].ball.nLie == 4) {
-            nRowScale  = ROW_RECOVERY_PWR + 1;
-            nRowThresh = ROW_RECOVERY_PWR;
-            nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL);
-        } else {
-            nRowScale  = ROW_DRIVING_PWR + 1;
-            nRowThresh = ROW_DRIVING_PWR;
-            nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_DRIVING_ACCURACY, ATTR_TOTAL);
-        }
-        fPower = *pPower;
-        fPower *= AI_PowerScale(nPlayer);
-        fPower = Swing_ApplyPowerBoost(nPlayer, fPower);
-        fPower = Swing_TeeSweetSpot(nPlayer, fPower);
-        break;
-    }
-    TABLE_PAIR(nRowThresh, nRowScale, nAttr, fThresh, fScale);
-    if (fError < fThresh) {
-        fPower = fPower - fScale * fError;
-    } else {
-        fPower = fPower - fError;
-    }
-clamp:
-    if (!(gPlayers[nPlayer].uFlags & 8)) {
-        if (fPower > 1.5f) {
-            fPower = 1.5f;
-        } else if (fPower < 0.05f) {
-            fPower = 0.05f;
-        }
-    }
-    return fPower;
-}
-
-f32 SW_vGetShotPower(int nPlayer) {
-    return gPlayers[nPlayer].swing.fShotPower;
-}
-
-// ---- the hit -----------------------------------------------------------------------------------
-
-// The ball is struck. In game mode 10 the recorded seed and player 0's recorded swing data are
-// restored; otherwise a live shot runs Luck_TakePerfectShot and REPLAY_Save, a replay REPLAY_Play.
-// Then the miss (zero for a CPU or a perfect shot), the power, forgiveness, the launch blocks, and
-// the aim - the player's aim plus the face vector's angle plus the miss - go to Physics_ShotImpact.
-void SW_vImpact(int nPlayer) {
-    Player* p;
-    Ball*   pBall;
-    int     nClub, nTrajectory, nKind;
-    f32     fAim;
-
-    p = &gPlayers[nPlayer];
-    if (Game_GetMode() == 10) {
-        Misc_SetSeedFunc(0, gReplayData.nSeed);
-        // port: 0x630 of the swing data's 0x634 bytes (it holds no pointers)
-        Mem_cpy(&gPlayers[0].swing, &gReplayData.player.swing, 0x630);
-    } else if (gSession.bReplay == 0) {
-        Luck_TakePerfectShot(nPlayer);
-        REPLAY_Save(nPlayer);
-    } else {
-        REPLAY_Play(nPlayer);
-    }
-    nClub      = p->nClub;
-    nTrajectory = p->nTrajectory;
-    nKind       = p->nShotKind;
-    pBall       = &p->ball;
-    Swing_FaceVector(nPlayer, gPlayers[nPlayer].vLaunchA);
-    if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
-        gPlayers[nPlayer].swing.fMishitAngle = 0.0f;
-    } else {
-        gPlayers[nPlayer].swing.fMishitAngle = fn_8005BA94_MishitAngle(nPlayer);
-    }
-    gPlayers[nPlayer].swing.fShotPower = SW_vCalculateShotPower(nPlayer);
-    Swing_ApplyForgiveness(nPlayer);
-    if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e && gPlayers[nPlayer].fDistance < 2.0f) {
-        gPlayers[nPlayer].vLaunchA[0] = 0.0f;
-        gPlayers[nPlayer].vLaunchA[1] = 0.0f;
-        gPlayers[nPlayer].vLaunchA[2] = 1.0f;
-        gPlayers[nPlayer].vLaunchA[3] = 0.0f;
-    }
-    fn_8005B8C8_ShapeVector(nPlayer, gPlayers[nPlayer].vLaunchB);
-    gPlayers[nPlayer].swing.fHookSlice = gPlayers[nPlayer].vLaunchA[0];
-    if (Player_IsController8(nPlayer)) {
-        fn_8005CCA8(nPlayer);
-        nTrajectory = p->nTrajectory;
-        nClub       = p->nClub;
-        nKind       = p->nShotKind;
-    }
-    if (0.0f == gPlayers[nPlayer].vLaunchA[2]) {
-        fAim = p->fAim + gPlayers[nPlayer].swing.fMishitAngle;
-    } else {
-        fAim = p->fAim + fn_8005CC84(gPlayers[nPlayer].vLaunchA[0] / gPlayers[nPlayer].vLaunchA[2]) +
-               gPlayers[nPlayer].swing.fMishitAngle;
-    }
-    while (fAim < -PI) {
-        fAim += 2 * PI;
-    }
-    while (fAim > PI) {
-        fAim -= 2 * PI;
-    }
-    Physics_ShotImpact(pBall, nClub, nKind, gPlayers[nPlayer].swing.fShotPower, fAim, nTrajectory,
-                gPlayers[nPlayer].vLaunchA, gPlayers[nPlayer].vLaunchB);
-}
-
-// ---- the meter's miss ----------------------------------------------------------------------------
-
-// The swing's miss: the back vector (x centre - top, z top - centre) and the through vector (x
-// impact - centre, z centre - impact), both normalised; the angle of (0, 0, 1) plus through - back,
-// clamped to gpSwing->fMaxError. Both x samples first get a random +-15 (of a +-128 stick), and the
-// x differences are scaled by gSwingXScale (0.2; 0.03 on a putt).
-f32 fn_8005BA94_MishitAngle(int nPlayer) {
-    f32 fTopX;
-    f32 fTopY;
-    f32 fImpactX;
-    f32 fCentreX;
-    f32 fCentreY;
-    f32 fImpactY;
-    f32 vBack[4], vThrough[4], vDiff[4], vDir[4];
-    f32 fAngle, fMax;
-
-    fTopX    = gPlayers[nPlayer].swing.nBackSwingX;
-    fTopY    = gPlayers[nPlayer].swing.nBackSwingY;
-    fImpactX = gPlayers[nPlayer].swing.nFollowThroughX;
-    fImpactY = gPlayers[nPlayer].swing.nFollowThroughY;
-    fCentreX = gPlayers[nPlayer].swing.nCalibrateX;
-    fCentreY = gPlayers[nPlayer].swing.nCalibrateY;
-
-    fTopX    += Misc_RandFuncf(0) * 30.0f - 15.0f;
-    fImpactX += Misc_RandFuncf(0) * 30.0f - 15.0f;
-    vDir[0] = 0.0f;
-    vDir[1] = 0.0f;
-    vDir[2] = 1.0f;
-    vDir[3] = 0.0f;
-    vBack[0] = (fCentreX - fTopX) * gSwingXScale[gPlayers[nPlayer].nShotKind];
-    vBack[1] = 0.0f;
-    vBack[2] = fTopY - fCentreY;
-    vBack[3] = 0.0f;
-    vThrough[0] = (fImpactX - fCentreX) * gSwingXScale[gPlayers[nPlayer].nShotKind];
-    vThrough[1] = 0.0f;
-    vThrough[2] = fCentreY - fImpactY;
-    vThrough[3] = 0.0f;
-    if (0.0f != vThrough[0] || 0.0f != vThrough[2]) {
-        Vec_Normalize(vThrough, vThrough);
-    }
-    if (0.0f != vBack[0] || 0.0f != vBack[2]) {
-        Vec_Normalize(vBack, vBack);
-    }
-    Vec_Sub(vThrough, vBack, vDiff);
-    Vec_Add(vDir, vDiff, vDir);
-    if (vDir[2]) {
-        fAngle = fn_8005CC84(vDir[0] / vDir[2]);
-    } else {
-        fAngle = (PI / 2) * (vDir[0] >= 0.0f ? 1.0f : -1.0f);
-    }
-    fMax = gpSwing->fMaxError;
-    if (fAngle < -fMax) {
-        fAngle = -fMax;
-    } else if (fAngle > fMax) {
-        fAngle = fMax;
-    }
-    return fAngle;
-}
-
-// ---- the clubface -------------------------------------------------------------------------------
-
-// How far the face turns for a backswing angled fBackAngle off vertical: the angle as a fraction
-// of a quarter turn goes through a three-piece curve (knots at gpSwing 0xB8..0xC4), scaled by
-// the club's shaping range (fCurveMin..fCurveMax by gClubCurve/26) and a quarter turn.
-f32 Swing_CurveAngle(s32* pClub, f32 fBackAngle) {
-    f32 fOut;
-    f32 fT;
-    f32 fRange;
-
-    fOut   = 0.0f;
-    fRange = gpSwing->fCurveMin +
-             ((f32)gClubCurve[*pClub] / 26.0f) * (gpSwing->fCurveMax - gpSwing->fCurveMin);
-    fT     = (f32)fabs(fBackAngle / (PI / 2));
-    if (fT < gpSwing->fKnot1X) {
-        fOut = gpSwing->fKnot1Y * fT / gpSwing->fKnot1X;
-    } else {
-        fOut += gpSwing->fKnot1Y;
-        if (fT < gpSwing->fKnot2X) {
-            fOut += (gpSwing->fKnot2Y - gpSwing->fKnot1Y) *
-                    ((fT - gpSwing->fKnot1X) / (gpSwing->fKnot2X - gpSwing->fKnot1X));
-        } else {
-            fOut += gpSwing->fKnot2Y - gpSwing->fKnot1Y;
-            fOut += (1.0f - gpSwing->fKnot2Y) * ((fT - gpSwing->fKnot2X) / (1.0f - gpSwing->fKnot2X));
-        }
-    }
-    fOut *= (PI / 2) * fRange;
-    if (fBackAngle < 0.0f) {
-        return -fOut;
-    }
-    return fOut;
-}
-
-// The first launch block: the human's clubface from the stick. A CPU or a perfect shot gets a
-// square face. On a full shot the backswing's sideways angle (kept in fControllerSliceAngle for the tee
-// bonus) becomes a face angle through Swing_CurveAngle; on a putt the face is a plain
-// proportion of the stick's sideways offset. Session flags 0x4000 + 0x8000 force it square.
-void Swing_FaceVector(int nPlayer, f32* pOut) {
-    f32     fTopY, fTopX, fCentreX, fDY;
-    f32     fAngle, fSin, fCos, fK;
-
-    if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
-        pOut[0] = 0.0f;
-        pOut[1] = 0.0f;
-        pOut[2] = 1.0f;
-        pOut[3] = 0.0f;
-        return;
-    }
-    fTopX    = gPlayers[nPlayer].swing.nBackSwingX;
-    fTopY    = gPlayers[nPlayer].swing.nBackSwingY;
-    fCentreX = gPlayers[nPlayer].swing.nCalibrateX;
-    if (0.0f == fCentreX) {
-        fCentreX = 1.0f;
-    }
-    if (0.0f == (fDY = fTopY - (f32)gPlayers[nPlayer].swing.nCalibrateY)) {
-        pOut[0] = 0.0f;
-        pOut[1] = 0.0f;
-        pOut[2] = 1.0f;
-        pOut[3] = 0.0f;
-    } else if (gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e) {
-        fAngle = fn_8005CC84((fTopX - fCentreX) / fDY);
-        gPlayers[nPlayer].swing.fControllerSliceAngle = fAngle;
-        fAngle = Swing_CurveAngle(&gPlayers[nPlayer].nClub, fAngle);
-        fSin   = fn_800095F0(fAngle);
-        fCos   = fn_80009638(fAngle);
-        pOut[0] = -fSin;
-        pOut[1] = 0.0f;
-        pOut[2] = fCos;
-        pOut[3] = 0.0f;
-    } else {
-        gPlayers[nPlayer].swing.fControllerSliceAngle = 0.0f;
-        if (fTopX > fCentreX) {
-            fK = ((fTopX - fCentreX) / (255.0f - fCentreX)) * gPuttXScale[gPlayers[nPlayer].nShotKind];
-        } else {
-            fK = ((fCentreX - fTopX) / fCentreX) * gPuttXScale[gPlayers[nPlayer].nShotKind];
-        }
-        pOut[0] = fK * (fCentreX - fTopX);
-        pOut[1] = 0.0f;
-        pOut[2] = fDY;
-        pOut[3] = 0.0f;
-    }
-    if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
-        pOut[0] = 0.0f;
-        pOut[1] = 0.0f;
-        pOut[2] = 1.0f;
-        pOut[3] = 0.0f;
-    }
-    Vec_Normalize(pOut, pOut);
-}
-
-// The second launch block: a CPU's (or a perfect shot's) shape vector; square for a human.
-void fn_8005B8C8_ShapeVector(int nPlayer, f32* pOut) {
-    if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
-        fn_8002D560_ShapeDir(nPlayer, pOut);
-    } else {
-        pOut[0] = 0.0f;
-        pOut[1] = 0.0f;
-        pOut[2] = 1.0f;
-        pOut[3] = 0.0f;
-    }
-}
-
-// Empty.
-void fn_8005CCA8(int nPlayer) {
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x802835B0), before the 40.0f SW_vInitModule uses first; its body is unknown.
+static f32 Swing_StrippedFn(f32 x) {
+    return x + 1.0f;
 }
 
 // ---- starting the swing ---------------------------------------------------------------------------
@@ -881,6 +286,8 @@ f32 Swing_StartTime(SwingData* pSw) {
     return 0.0076f + pSw->fTimeSwingStart;
 }
 
+u8 lbl_80281194[8] = {0x80, 0x80, 0x80, 0x80};    // a neutral pad: both sticks centred (0x80)
+
 // A controller's pad state; the neutral pad when there is none or fn_80100C00() is true.
 u8* Pad_State(int nPlayer, int nController) {
     u8* pPad = fn_800136C4(nController);
@@ -960,7 +367,7 @@ void SW_vStateInitBackSwing(int nPlayer) {
 // either stick is pulled past 160 of 255 - more than a quarter of its travel - and that stick's
 // rest position becomes the centre sample; the C-stick can swing too (nStickUsed). While
 // nothing is pulled the rest positions are held at 128.
-int Swing_WaitForBackswing(int nPlayer) {
+u8 Swing_WaitForBackswing(int nPlayer) {
     Player* p          = &gPlayers[nPlayer];
     int     nController = p->nController;
     Character* pChar   = p->pChar;
@@ -1000,23 +407,6 @@ int Swing_WaitForBackswing(int nPlayer) {
     return 0;
 }
 
-// ---- the backswing --------------------------------------------------------------------------------
-
-// Enter the hold at the top: the animation goes to the pause time and slows to rate 0.008 (flag
-// 0x40), and the hold timers are cleared.
-void SW_vStateInitBackSwingFigit(int nPlayer) {
-    Player*    p    = &gPlayers[nPlayer];
-    Character* pObj = p->pChar;
-    SwingData* pSw  = &p->swing;
-    pSw->fFidgetTargetTime = pSw->fFidgetPauseTime;
-    Anim_SetTime(pObj->anim, pSw->fFidgetTargetTime);
-    Character_UpdateAnimation(pObj, 0, 0.0f);
-    Anim_SetRate(pObj->anim, 0.008f);
-    pObj->uFlags |= 0x40;
-    pSw->fFidgetTimeElapsed = 0.0f;
-    pSw->fFidgetWaitToIdle = 0.0f;
-}
-
 // One stick axis through the dead zone: 96..160 reads as centre (128); forward of it runs
 // smoothly down to 1, back of it jumps to ~179 and runs to 255.
 static inline int Swing_DeadZone(int v) {
@@ -1033,7 +423,7 @@ static inline int Swing_DeadZone(int v) {
 // and is provisionally the top. The moment the stick comes forward of 96 (once the backswing
 // is at least 0.1 along) the top is the furthest-back sample in the ring, the downswing
 // animation starts, and it is phase 3 with the impact sample seeded from this frame.
-int Swing_UpdateBackswing(int nPlayer) {
+u8 Swing_UpdateBackswing(int nPlayer) {
     Player*    p;
     Character*   pObj;
     SwingData* pSw;
@@ -1171,13 +561,30 @@ int Swing_UpdateBackswing(int nPlayer) {
     return 0;
 }
 
+// ---- the backswing --------------------------------------------------------------------------------
+
+// Enter the hold at the top: the animation goes to the pause time and slows to rate 0.008 (flag
+// 0x40), and the hold timers are cleared.
+void SW_vStateInitBackSwingFigit(int nPlayer) {
+    Player*    p    = &gPlayers[nPlayer];
+    Character* pObj = p->pChar;
+    SwingData* pSw  = &p->swing;
+    pSw->fFidgetTargetTime = pSw->fFidgetPauseTime;
+    Anim_SetTime(pObj->anim, pSw->fFidgetTargetTime);
+    Character_UpdateAnimation(pObj, 0, 0.0f);
+    Anim_SetRate(pObj->anim, 0.008f);
+    pObj->uFlags |= 0x40;
+    pSw->fFidgetTimeElapsed = 0.0f;
+    pSw->fFidgetWaitToIdle = 0.0f;
+}
+
 // ---- at the top, and the downswing ----------------------------------------------------------------
 
 // Phase 2, holding at the top. Any change in the stick's y drops back to phase 1 (backing down if it
 // came forward). While it is steady the animation waggles +-0.0076 around the top. If the
 // stick sits near centre (y at or below 160, x within 64..192) for over 0.1 s the swing is
 // abandoned: phase 0, the address animation, event 9.
-int SW_vStateBackSwingFigit(int nPlayer) {
+u8 SW_vStateBackSwingFigit(int nPlayer) {
     Player*    p;
     Character*   pObj;
     SwingData* pSw;
@@ -1231,7 +638,7 @@ int SW_vStateBackSwingFigit(int nPlayer) {
 // units from the centre sample, that reading becomes the impact sample - so what counts is where
 // the stick was pointing on the way through, not when. The ball goes when the animation reports
 // impact (n5CC < 0): phase 5, SW_vImpact, the mis-hit rumble, event 0x2B on a putt.
-int SW_vStateDownSwing(int nPlayer) {
+u8 SW_vStateDownSwing(int nPlayer) {
     Player*    p;
     int        nController;
     Character* pObj;
@@ -1280,29 +687,18 @@ int SW_vStateDownSwing(int nPlayer) {
     return 0;
 }
 
-// ---- after impact ---------------------------------------------------------------------------------
-
-int Swing_PhaseIdle4(int nPlayer) {
-    return 0;
-}
-
-int Swing_PhaseIdle6(int nPlayer) {
-    return 0;
-}
-
 // Stop the pad rumble.
 void SW_KillVibration(int nPlayer) {
-    s32*    pFrames;
-    s32*    pController;
-    Player* p;
     if (fn_8002E868_HasPad(nPlayer)) {
-        p           = &gPlayers[nPlayer];
-        pFrames     = &p->swing.nVibrateCount;
-        pController = &p->nController;
-        fn_800130F8(*pController, 0);
-        fn_80013130(*pController, 0);
+        // fake match: an empty test (a compiled-away assert?) makes the frontend share the
+        // nVibrateCount address, which EA computes before the calls
+        if (gPlayers[nPlayer].swing.nVibrateCount) {
+        } else {
+        }
+        fn_800130F8(gPlayers[nPlayer].nController, 0);
+        fn_80013130(gPlayers[nPlayer].nController, 0);
         gPlayers[nPlayer].swing.bVibrating = 0;
-        *pFrames = 0;
+        gPlayers[nPlayer].swing.nVibrateCount = 0;
     }
 }
 
@@ -1319,36 +715,14 @@ void SW_UpdateVibration(int nPlayer) {
     }
 }
 
-// Spin, added after the ball is away: with the spin option on and the spin button (mask
-// 0x20) held after a real shot, the amount grows by one a frame up to 20 - a third of a second
-// for full spin - and the direction is the stick, whenever it is outside the 96..160 dead zone
-// (the first press starts it at straight back, 255).
-void Swing_SpinInput(int nPlayer) {
-    u32     uButtons;
-    int     nX, nY;
-    if (Player_IsCPU(nPlayer)) return;
-    if (gSession.options.bSpinEnabled == 0) return;
-    uButtons    = fn_800136DC(gPlayers[nPlayer].nController);
-    if (!(uButtons & fn_800142AC(0x20, 0))) return;
-    if (gPlayers[nPlayer].swing.bCanSpin == 0) return;
-    EVENT_Trigger(nPlayer, 0x2E, 0, 0);
-    nX = Swing_StickX(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));
-    nY = Swing_StickY(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));
-    if (gPlayers[nPlayer].swing.nSpinBoost == 0) {
-        gPlayers[nPlayer].swing.nSpinCtrlX = 128;
-        gPlayers[nPlayer].swing.nSpinCtrlY = 255;
-    }
-    if (nX < 96 || nX > 160 || nY < 96 || nY > 160) {
-        gPlayers[nPlayer].swing.nSpinCtrlX = nX;
-        gPlayers[nPlayer].swing.nSpinCtrlY = nY;
-    }
-    if (gPlayers[nPlayer].swing.nSpinBoost < 20) {
-        (gPlayers[nPlayer].swing.nSpinBoost)++;
-    }
+// ---- after impact ---------------------------------------------------------------------------------
+
+u8 Swing_PhaseIdle4(int nPlayer) {
+    return 0;
 }
 
 // Phase 5, the ball is away: the rumble counts down and spin can be added.
-int Swing_UpdateAfterImpact(int nPlayer) {
+u8 Swing_UpdateAfterImpact(int nPlayer) {
     int nController = gPlayers[nPlayer].nController;
     u8* pPad;
     if (Player_IsCPU(nPlayer) || gSession.bReplay != 0) {
@@ -1361,6 +735,21 @@ int Swing_UpdateAfterImpact(int nPlayer) {
     Swing_SpinInput(nPlayer);
     Swing_ApplySpin(nPlayer);
     return 0;
+}
+
+u8 Swing_PhaseIdle6(int nPlayer) {
+    return 0;
+}
+
+// Find the swing's textures by name (all three are in one bank).
+void SW_vUIInit(int nPlayer) {
+    u64 uHash;
+    uHash = fn_8000BEE4("clubback");
+    fn_800102DC(uHash, &gpSwing->pBank, &gpSwing->pClubBack);
+    uHash = fn_8000BEE4("clubdown");
+    fn_800102DC(uHash, &gpSwing->pBank, &gpSwing->pClubDown);
+    uHash = fn_8000BEE4("tball");
+    fn_800102DC(uHash, &gpSwing->pBank, &gpSwing->pTBall);
 }
 
 void SW_vUIBlurReset(int nPlayer) {
@@ -1626,6 +1015,12 @@ void fn_8005A850(int nPlayer) {
     }
 }
 
+// fake match: stands in for a function the original linker stripped. The pool has 2.0f
+// (0x8028363C) here, before the 0.33333334f SW_vUIAdjustClub uses first; its body is unknown.
+static f32 Swing_StrippedFn2(f32 x) {
+    return x + 2.0f;
+}
+
 // Twist the club with the stick: how far through the backswing (animation 6, eased in) or the
 // downswing (7, eased out) the animation is, times 0.75 and a smoothed copy of the stick's X,
 // becomes a Z rotation on the model (fn_80027808), negated when fn_8001EDF4().
@@ -1664,15 +1059,69 @@ void SW_vUIAdjustClub(Character* pObj, SwingData* pSw, int nStickX) {
     fn_80027808(pObj->pModel, vRot);
 }
 
-// Find the swing's textures by name (all three are in one bank).
-void SW_vUIInit(int nPlayer) {
-    u64 uHash;
-    uHash = fn_8000BEE4("clubback");
-    fn_800102DC(uHash, &gpSwing->pBank, &gpSwing->pClubBack);
-    uHash = fn_8000BEE4("clubdown");
-    fn_800102DC(uHash, &gpSwing->pBank, &gpSwing->pClubDown);
-    uHash = fn_8000BEE4("tball");
-    fn_800102DC(uHash, &gpSwing->pBank, &gpSwing->pTBall);
+// ---- the hit -----------------------------------------------------------------------------------
+
+// The ball is struck. In game mode 10 the recorded seed and player 0's recorded swing data are
+// restored; otherwise a live shot runs Luck_TakePerfectShot and REPLAY_Save, a replay REPLAY_Play.
+// Then the miss (zero for a CPU or a perfect shot), the power, forgiveness, the launch blocks, and
+// the aim - the player's aim plus the face vector's angle plus the miss - go to Physics_ShotImpact.
+void SW_vImpact(int nPlayer) {
+    Player* p;
+    Ball*   pBall;
+    int     nClub, nTrajectory, nKind;
+    f32     fAim;
+
+    p = &gPlayers[nPlayer];
+    if (Game_GetMode() == 10) {
+        Misc_SetSeedFunc(0, gReplayData.nSeed);
+        // port: 0x630 of the swing data's 0x634 bytes (it holds no pointers)
+        Mem_cpy(&gPlayers[0].swing, &gReplayData.player.swing, 0x630);
+    } else if (gSession.bReplay == 0) {
+        Luck_TakePerfectShot(nPlayer);
+        REPLAY_Save(nPlayer);
+    } else {
+        REPLAY_Play(nPlayer);
+    }
+    nClub      = p->nClub;
+    nTrajectory = p->nTrajectory;
+    nKind       = p->nShotKind;
+    pBall       = &p->ball;
+    Swing_FaceVector(nPlayer, gPlayers[nPlayer].vLaunchA);
+    if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
+        gPlayers[nPlayer].swing.fMishitAngle = 0.0f;
+    } else {
+        gPlayers[nPlayer].swing.fMishitAngle = fn_8005BA94_MishitAngle(nPlayer);
+    }
+    gPlayers[nPlayer].swing.fShotPower = SW_vCalculateShotPower(nPlayer);
+    Swing_ApplyForgiveness(nPlayer);
+    if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e && gPlayers[nPlayer].fDistance < 2.0f) {
+        gPlayers[nPlayer].vLaunchA[0] = 0.0f;
+        gPlayers[nPlayer].vLaunchA[1] = 0.0f;
+        gPlayers[nPlayer].vLaunchA[2] = 1.0f;
+        gPlayers[nPlayer].vLaunchA[3] = 0.0f;
+    }
+    fn_8005B8C8_ShapeVector(nPlayer, gPlayers[nPlayer].vLaunchB);
+    gPlayers[nPlayer].swing.fHookSlice = gPlayers[nPlayer].vLaunchA[0];
+    if (Player_IsController8(nPlayer)) {
+        fn_8005CCA8(nPlayer);
+        nTrajectory = p->nTrajectory;
+        nClub       = p->nClub;
+        nKind       = p->nShotKind;
+    }
+    if (0.0f == gPlayers[nPlayer].vLaunchA[2]) {
+        fAim = p->fAim + gPlayers[nPlayer].swing.fMishitAngle;
+    } else {
+        fAim = p->fAim + fn_8005CC84(gPlayers[nPlayer].vLaunchA[0] / gPlayers[nPlayer].vLaunchA[2]) +
+               gPlayers[nPlayer].swing.fMishitAngle;
+    }
+    while (fAim < -PI) {
+        fAim += 2 * PI;
+    }
+    while (fAim > PI) {
+        fAim -= 2 * PI;
+    }
+    Physics_ShotImpact(pBall, nClub, nKind, gPlayers[nPlayer].swing.fShotPower, fAim, nTrajectory,
+                gPlayers[nPlayer].vLaunchA, gPlayers[nPlayer].vLaunchB);
 }
 
 // ---- the power meter -----------------------------------------------------------------------------
@@ -1703,6 +1152,291 @@ void SW_vSetSwingStrength(int nPlayer) {
     if (gPlayers[nPlayer].fPower < 0.0f) {
         gPlayers[nPlayer].fPower = 0.0f;
     }
+}
+
+// The final power for the shot. A CPU just scales what it planned (putts +5%). A human's full
+// shot gets the boost, then loses distance to the swing error: a scaled part of it under the
+// threshold, all of it above. Putts, chips and pitches skip the error; a putt over 75% on the
+// meter counts as full power.
+f32 SW_vCalculateShotPower(int nPlayer) {
+    f32     fPower, fError;
+    f32*    pPower;
+    int     nRowScale, nRowThresh;
+    int     nAttr;
+    int     nKind;
+    f32     fThresh, fScale;
+
+    if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
+        fPower = gPlayers[nPlayer].fPower;
+        fPower *= AI_PowerScale(nPlayer);
+        if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e && !(gPlayers[nPlayer].uFlags & 8)) {
+            fPower *= 1.05f;
+            if (fPower < 0.1f) {
+                fPower = 0.1f;
+            }
+        }
+        goto clamp;         // fake match: the shared clamp as a jump (without the gotos: 83.9%, not 84.9%)
+    }
+    fPower = gPlayers[nPlayer].fPower;
+    // fake match: pPower through PLAYER(), everything else through gPlayers[] (all gPlayers[]:
+    // 94.2%; one Player* local: 84.9%)
+    pPower = &PLAYER(nPlayer)->fPower;
+    fError = fabs(gPlayers[nPlayer].swing.fMishitAngle);
+    gPlayers[nPlayer].swing.fNonPowerShotPower = Swing_ApplyPowerBoost(nPlayer, fPower) - fError;
+    nKind = gPlayers[nPlayer].nShotKind;
+    switch (nKind) {
+    case SHOT_TYPE_PUTT_e: {
+        f32 fDist = gPlayers[nPlayer].fDistance < 1.0f ? 1.0f : gPlayers[nPlayer].fDistance;
+        if (*pPower > gpSwing->fPuttFullPower) {
+            *pPower = 1.0f;
+        }
+        fPower = *pPower * fn_80050D34(fDist);
+        Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_PUTTING, ATTR_TOTAL);
+        if (fPower < 0.1f) {
+            fPower = 0.1f;
+        }
+        goto clamp;         // fake match: the shared clamp as a jump (without the gotos: 83.9%, not 84.9%)
+    }
+    case SHOT_TYPE_CHIP_e:
+    case SHOT_TYPE_PITCH_e: {
+        f32 f;
+        if (nKind == SHOT_TYPE_CHIP_e) {
+            f = *pPower * Physics_EstimateShotPower(gPlayers[nPlayer].fDistance, &gPlayers[nPlayer].ball,
+                                                    SHOT_TYPE_CHIP_e, gPlayers[nPlayer].nClub);
+        } else {
+            f = *pPower;
+        }
+        fPower = Swing_ApplyPowerBoost(nPlayer, f);
+        Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_APPROACH, ATTR_TOTAL);
+        if (fPower < 0.1f) {
+            fPower = 0.1f;
+        }
+        goto clamp;         // fake match: the shared clamp as a jump (without the gotos: 83.9%, not 84.9%)
+    }
+    case 5:
+    case 6:
+    case 7:
+        fPower     = Swing_ApplyPowerBoost(nPlayer, *pPower);
+        nRowScale  = ROW_RECOVERY_PWR + 1;
+        nRowThresh = ROW_RECOVERY_PWR;
+        nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL);
+        break;
+    default:
+        if (gPlayers[nPlayer].ball.nLie == 6 || gPlayers[nPlayer].ball.nLie == 7 ||
+            gPlayers[nPlayer].ball.nLie == 8 || gPlayers[nPlayer].ball.nLie == 3 ||
+            gPlayers[nPlayer].ball.nLie == 4) {
+            nRowScale  = ROW_RECOVERY_PWR + 1;
+            nRowThresh = ROW_RECOVERY_PWR;
+            nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL);
+        } else {
+            nRowScale  = ROW_DRIVING_PWR + 1;
+            nRowThresh = ROW_DRIVING_PWR;
+            nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_DRIVING_ACCURACY, ATTR_TOTAL);
+        }
+        fPower = *pPower;
+        fPower *= AI_PowerScale(nPlayer);
+        fPower = Swing_ApplyPowerBoost(nPlayer, fPower);
+        fPower = Swing_TeeSweetSpot(nPlayer, fPower);
+        break;
+    }
+    TABLE_PAIR(nRowThresh, nRowScale, nAttr, fThresh, fScale);
+    if (fError < fThresh) {
+        fPower = fPower - fScale * fError;
+    } else {
+        fPower = fPower - fError;
+    }
+clamp:
+    if (!(gPlayers[nPlayer].uFlags & 8)) {
+        if (fPower > 1.5f) {
+            fPower = 1.5f;
+        } else if (fPower < 0.05f) {
+            fPower = 0.05f;
+        }
+    }
+    return fPower;
+}
+
+f32 SW_vGetShotPower(int nPlayer) {
+    return gPlayers[nPlayer].swing.fShotPower;
+}
+
+// The first launch block: the human's clubface from the stick. A CPU or a perfect shot gets a
+// square face. On a full shot the backswing's sideways angle (kept in fControllerSliceAngle for the tee
+// bonus) becomes a face angle through Swing_CurveAngle; on a putt the face is a plain
+// proportion of the stick's sideways offset. Session flags 0x4000 + 0x8000 force it square.
+void Swing_FaceVector(int nPlayer, f32* pOut) {
+    f32     fTopY, fTopX, fCentreX, fDY;
+    f32     fAngle, fSin, fCos, fK;
+
+    if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
+        pOut[0] = 0.0f;
+        pOut[1] = 0.0f;
+        pOut[2] = 1.0f;
+        pOut[3] = 0.0f;
+        return;
+    }
+    fTopX    = gPlayers[nPlayer].swing.nBackSwingX;
+    fTopY    = gPlayers[nPlayer].swing.nBackSwingY;
+    fCentreX = gPlayers[nPlayer].swing.nCalibrateX;
+    if (0.0f == fCentreX) {
+        fCentreX = 1.0f;
+    }
+    if (0.0f == (fDY = fTopY - (f32)gPlayers[nPlayer].swing.nCalibrateY)) {
+        pOut[0] = 0.0f;
+        pOut[1] = 0.0f;
+        pOut[2] = 1.0f;
+        pOut[3] = 0.0f;
+    } else if (gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e) {
+        fAngle = fn_8005CC84((fTopX - fCentreX) / fDY);
+        gPlayers[nPlayer].swing.fControllerSliceAngle = fAngle;
+        fAngle = Swing_CurveAngle(&gPlayers[nPlayer].nClub, fAngle);
+        fSin   = fn_800095F0(fAngle);
+        fCos   = fn_80009638(fAngle);
+        pOut[0] = -fSin;
+        pOut[1] = 0.0f;
+        pOut[2] = fCos;
+        pOut[3] = 0.0f;
+    } else {
+        gPlayers[nPlayer].swing.fControllerSliceAngle = 0.0f;
+        if (fTopX > fCentreX) {
+            fK = ((fTopX - fCentreX) / (255.0f - fCentreX)) * gPuttXScale[gPlayers[nPlayer].nShotKind];
+        } else {
+            fK = ((fCentreX - fTopX) / fCentreX) * gPuttXScale[gPlayers[nPlayer].nShotKind];
+        }
+        pOut[0] = fK * (fCentreX - fTopX);
+        pOut[1] = 0.0f;
+        pOut[2] = fDY;
+        pOut[3] = 0.0f;
+    }
+    if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
+        pOut[0] = 0.0f;
+        pOut[1] = 0.0f;
+        pOut[2] = 1.0f;
+        pOut[3] = 0.0f;
+    }
+    Vec_Normalize(pOut, pOut);
+}
+
+// The second launch block: a CPU's (or a perfect shot's) shape vector; square for a human.
+void fn_8005B8C8_ShapeVector(int nPlayer, f32* pOut) {
+    if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
+        fn_8002D560_ShapeDir(nPlayer, pOut);
+    } else {
+        pOut[0] = 0.0f;
+        pOut[1] = 0.0f;
+        pOut[2] = 1.0f;
+        pOut[3] = 0.0f;
+    }
+}
+
+// ---- the clubface -------------------------------------------------------------------------------
+
+// How far the face turns for a backswing angled fBackAngle off vertical: the angle as a fraction
+// of a quarter turn goes through a three-piece curve (knots at gpSwing 0xB8..0xC4), scaled by
+// the club's shaping range (fCurveMin..fCurveMax by gClubCurve/26) and a quarter turn.
+f32 Swing_CurveAngle(s32* pClub, f32 fBackAngle) {
+    f32 fOut;
+    f32 fT;
+    f32 fRange;
+
+    fOut   = 0.0f;
+    fRange = gpSwing->fCurveMin +
+             ((f32)gClubCurve[*pClub] / 26.0f) * (gpSwing->fCurveMax - gpSwing->fCurveMin);
+    fT     = (f32)fabs(fBackAngle / (PI / 2));
+    if (fT < gpSwing->fKnot1X) {
+        fOut = gpSwing->fKnot1Y * fT / gpSwing->fKnot1X;
+    } else {
+        fOut += gpSwing->fKnot1Y;
+        if (fT < gpSwing->fKnot2X) {
+            fOut += (gpSwing->fKnot2Y - gpSwing->fKnot1Y) *
+                    ((fT - gpSwing->fKnot1X) / (gpSwing->fKnot2X - gpSwing->fKnot1X));
+        } else {
+            fOut += gpSwing->fKnot2Y - gpSwing->fKnot1Y;
+            fOut += (1.0f - gpSwing->fKnot2Y) * ((fT - gpSwing->fKnot2X) / (1.0f - gpSwing->fKnot2X));
+        }
+    }
+    fOut *= (PI / 2) * fRange;
+    if (fBackAngle < 0.0f) {
+        return -fOut;
+    }
+    return fOut;
+}
+
+// ---- the meter's miss ----------------------------------------------------------------------------
+
+// The swing's miss: the back vector (x centre - top, z top - centre) and the through vector (x
+// impact - centre, z centre - impact), both normalised; the angle of (0, 0, 1) plus through - back,
+// clamped to gpSwing->fMaxError. Both x samples first get a random +-15 (of a +-128 stick), and the
+// x differences are scaled by gSwingXScale (0.2; 0.03 on a putt).
+f32 fn_8005BA94_MishitAngle(int nPlayer) {
+    f32 fTopX;
+    f32 fTopY;
+    f32 fImpactX;
+    f32 fCentreX;
+    f32 fCentreY;
+    f32 fImpactY;
+    f32 vBack[4], vThrough[4], vDiff[4], vDir[4];
+    f32 fAngle, fMax;
+
+    fTopX    = gPlayers[nPlayer].swing.nBackSwingX;
+    fTopY    = gPlayers[nPlayer].swing.nBackSwingY;
+    fImpactX = gPlayers[nPlayer].swing.nFollowThroughX;
+    fImpactY = gPlayers[nPlayer].swing.nFollowThroughY;
+    fCentreX = gPlayers[nPlayer].swing.nCalibrateX;
+    fCentreY = gPlayers[nPlayer].swing.nCalibrateY;
+
+    fTopX    += Misc_RandFuncf(0) * 30.0f - 15.0f;
+    fImpactX += Misc_RandFuncf(0) * 30.0f - 15.0f;
+    vDir[0] = 0.0f;
+    vDir[1] = 0.0f;
+    vDir[2] = 1.0f;
+    vDir[3] = 0.0f;
+    vBack[0] = (fCentreX - fTopX) * gSwingXScale[gPlayers[nPlayer].nShotKind];
+    vBack[1] = 0.0f;
+    vBack[2] = fTopY - fCentreY;
+    vBack[3] = 0.0f;
+    vThrough[0] = (fImpactX - fCentreX) * gSwingXScale[gPlayers[nPlayer].nShotKind];
+    vThrough[1] = 0.0f;
+    vThrough[2] = fCentreY - fImpactY;
+    vThrough[3] = 0.0f;
+    if (0.0f != vThrough[0] || 0.0f != vThrough[2]) {
+        Vec_Normalize(vThrough, vThrough);
+    }
+    if (0.0f != vBack[0] || 0.0f != vBack[2]) {
+        Vec_Normalize(vBack, vBack);
+    }
+    Vec_Sub(vThrough, vBack, vDiff);
+    Vec_Add(vDir, vDiff, vDir);
+    if (vDir[2]) {
+        fAngle = fn_8005CC84(vDir[0] / vDir[2]);
+    } else {
+        fAngle = (PI / 2) * (vDir[0] >= 0.0f ? 1.0f : -1.0f);
+    }
+    fMax = gpSwing->fMaxError;
+    if (fAngle < -fMax) {
+        fAngle = -fMax;
+    } else if (fAngle > fMax) {
+        fAngle = fMax;
+    }
+    return fAngle;
+}
+
+// Lie 0 with club 0 (a driver off the tee): up to +0.1 power when the backswing's sideways angle
+// is negative and its size falls between the curve's two knots, most at their midpoint.
+f32 Swing_TeeSweetSpot(int nPlayer, f32 fPower) {
+    Player* p = &gPlayers[nPlayer];
+    f32     fT, fHalf;
+    if (p->ball.nLie == 0 && p->nClub == 0 && p->swing.fControllerSliceAngle < 0.0f) {
+        fT = -p->swing.fControllerSliceAngle / 1.5707964f;
+        if (fT > gpSwing->fKnot1X && fT < gpSwing->fKnot2X) {
+            f32 fBonus;
+            fHalf  = (gpSwing->fKnot2X - gpSwing->fKnot1X) / 2.0f;
+            fBonus = 1.0f - (f32)fabs(fHalf - (fT - gpSwing->fKnot1X)) / fHalf;
+            fBonus *= gpSwing->fTeeBonus;
+            return fPower + fBonus;
+        }
+    }
+    return fPower;
 }
 
 // ---- the power boost input --------------------------------------------------------------------
@@ -1746,4 +1480,337 @@ void SW_vClearBoosts(int nPlayer) {
     gPlayers[nPlayer].swing.fPowerBoostDieTime   = 0.0f;
     fn_8005A788(nPlayer, 1);
     fn_800AE3C4(nPlayer);
+}
+
+// Add the power boost: the pressed level's step times a per-point scale from POWER BOOST
+// (0.005 at 0, 0.010 at 100). Base value only - equipment counts, modifiers do not.
+f32 Swing_ApplyPowerBoost(int nPlayer, f32 fPower) {
+    int nAttr  = Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_POWER_BOOST, ATTR_BASE);
+    int nLevel = gPlayers[nPlayer].swing.nPowerBoost;
+    s8  nBoost = nAttr;
+    if (nLevel > 0) {
+        f32 fScale = TABLE_AT(ROW_BOOST, nBoost);
+        f32 fAdd   = fScale * (f32)gBoostSteps[nLevel - 1];
+        fPower += fAdd;
+        return fPower;
+    }
+    return fPower;
+}
+
+// The spin stick's result (a replay reads it back from the recording first).
+void fn_8005C15C(int nPlayer, f32* pSpinY, f32* pSpinX) {
+    if (gSession.bReplay) {
+        REPLAY_GetSpin(nPlayer, &gPlayers[nPlayer].swing.fForwardSpin, &gPlayers[nPlayer].swing.fSideSpin);
+    }
+    *pSpinX = gPlayers[nPlayer].swing.fForwardSpin;
+    *pSpinY = gPlayers[nPlayer].swing.fSideSpin;
+}
+
+// The backswing's sideways angle as a fraction of a quarter turn, mirrored by fn_8001EDF4.
+f32 fn_8005C1EC(int nPlayer) {
+    if (fn_8001EDF4(gPlayers[nPlayer].pChar)) {
+        return gPlayers[nPlayer].swing.fControllerSliceAngle / 1.5707964f;
+    }
+    return -(gPlayers[nPlayer].swing.fControllerSliceAngle / 1.5707964f);
+}
+
+f32 fn_8005C268(int nPlayer) {
+    return gPlayers[nPlayer].swing.fMishitAngle;
+}
+
+f32 fn_8005C280(int nPlayer) {
+    return gPlayers[nPlayer].swing.fNonPowerShotPower;
+}
+
+void fn_8005C298(int nPlayer) {
+    gPlayers[nPlayer].swing.bCanSpin = 0;
+}
+
+// Spin, added after the ball is away: with the spin option on and the spin button (mask
+// 0x20) held after a real shot, the amount grows by one a frame up to 20 - a third of a second
+// for full spin - and the direction is the stick, whenever it is outside the 96..160 dead zone
+// (the first press starts it at straight back, 255).
+void Swing_SpinInput(int nPlayer) {
+    u32     uButtons;
+    int     nX, nY;
+    if (Player_IsCPU(nPlayer)) return;
+    if (gSession.options.bSpinEnabled == 0) return;
+    uButtons    = fn_800136DC(gPlayers[nPlayer].nController);
+    if (!(uButtons & fn_800142AC(0x20, 0))) return;
+    if (gPlayers[nPlayer].swing.bCanSpin == 0) return;
+    EVENT_Trigger(nPlayer, 0x2E, 0, 0);
+    nX = Swing_StickX(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));
+    nY = Swing_StickY(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));
+    if (gPlayers[nPlayer].swing.nSpinBoost == 0) {
+        gPlayers[nPlayer].swing.nSpinCtrlX = 128;
+        gPlayers[nPlayer].swing.nSpinCtrlY = 255;
+    }
+    if (nX < 96 || nX > 160 || nY < 96 || nY > 160) {
+        gPlayers[nPlayer].swing.nSpinCtrlX = nX;
+        gPlayers[nPlayer].swing.nSpinCtrlY = nY;
+    }
+    if (gPlayers[nPlayer].swing.nSpinBoost < 20) {
+        (gPlayers[nPlayer].swing.nSpinBoost)++;
+    }
+}
+// How much spin the SPIN attribute allows: 0.15 at 0, 0.6 at 100, 1.0 at 110.
+f32 Swing_SpinScale(int nSpin) {
+    return TABLE_AT(ROW_SPIN, (s8)nSpin);
+}
+
+// Turn the spin input into the shot's spin: stick deflection (-1..1) times the amount asked
+// for (0..20, over 20) times the SPIN scale (0.15 at 0, 0.6 at 100, 1.0 at 110).
+void Swing_ApplySpin(int nPlayer) {
+    SwingData* pSw = &gPlayers[nPlayer].swing;
+    f32        fInv = 1.0f / 128.0f;
+    int        nSpin;
+    f32        fScale;
+    if (gSession.bReplay) return;
+    if (pSw->nSpinBoost == 0) {
+        pSw->fForwardSpin = 0.0f;
+        pSw->fSideSpin = 0.0f;
+        return;
+    }
+    nSpin       = Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_SPIN, ATTR_TOTAL);
+    {
+        f32 fX = (f32)(pSw->nSpinCtrlX - 128) * fInv;
+        f32 fY = (f32)(pSw->nSpinCtrlY - 128) * fInv;
+        pSw->fSideSpin = fX * (f32)pSw->nSpinBoost / 20.0f;
+        pSw->fForwardSpin = fY * (f32)pSw->nSpinBoost / 20.0f;
+    }
+    fScale = Swing_SpinScale(nSpin);
+    pSw->fSideSpin *= fScale;
+    pSw->fForwardSpin *= fScale;
+    pSw->fForwardSpin *= -1.0f;
+}
+
+// Shrink a human's swing error by the governing attribute: below a threshold the error is
+// multiplied by a scale (at 100, misses under ~0.42 become 82% smaller). CPU players skip this.
+// Putts under 2 units lose their error entirely.
+void Swing_ApplyForgiveness(int nPlayer) {
+    if (Player_IsCPU(nPlayer)) return;
+    if (gPlayers[nPlayer].bPerfect) return;
+    {
+    f32  fError = gPlayers[nPlayer].swing.fMishitAngle;
+    int  nRowScale, nRowThresh;
+    int  nAttr;
+    f32  fThresh, fScale;
+
+    if (gPlayers[nPlayer].ball.nLie == 6 || gPlayers[nPlayer].ball.nLie == 7 ||
+        gPlayers[nPlayer].ball.nLie == 8 || gPlayers[nPlayer].ball.nLie == 3 ||
+        gPlayers[nPlayer].ball.nLie == 4) {
+        nRowScale  = ROW_RECOVERY + 1;
+        nRowThresh = ROW_RECOVERY;
+        nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL);
+    } else {
+        switch (gPlayers[nPlayer].nShotKind) {
+        case SHOT_TYPE_PUTT_e:
+            nRowScale  = ROW_PUTTING + 1;
+            nRowThresh = ROW_PUTTING;
+            nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_PUTTING, ATTR_TOTAL);
+            if (gPlayers[nPlayer].fDistance < 2.0f) {
+                gPlayers[nPlayer].swing.fMishitAngle = 0.0f;
+                return;
+            }
+            break;
+        case SHOT_TYPE_CHIP_e:
+            nRowScale  = ROW_APPROACH_B + 1;
+            nRowThresh = ROW_APPROACH_B;
+            nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_APPROACH, ATTR_TOTAL);
+            break;
+        case SHOT_TYPE_PITCH_e:
+            nRowScale  = ROW_APPROACH_A + 1;
+            nRowThresh = ROW_APPROACH_A;
+            nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_APPROACH, ATTR_TOTAL);
+            break;
+        case 5:
+        case 6:
+        case 7:
+            nRowScale  = ROW_RECOVERY + 1;
+            nRowThresh = ROW_RECOVERY;
+            nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL);
+            break;
+        default:
+            switch (gPlayers[nPlayer].nClub) {
+            case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
+                nRowScale  = ROW_DRIVING + 1;
+                nRowThresh = ROW_DRIVING;
+                nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_DRIVING_ACCURACY, ATTR_TOTAL);
+                break;
+            case 9: case 10: case 11: case 12:
+                nRowScale  = ROW_STRIKING_A + 1;
+                nRowThresh = ROW_STRIKING_A;
+                nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL);
+                break;
+            case 13: case 14: case 15: case 16:
+                nRowScale  = ROW_STRIKING_B + 1;
+                nRowThresh = ROW_STRIKING_B;
+                nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL);
+                break;
+            case 17: case 18: case 19: case 20: case 21: case 22: case 23: case 24:
+                nRowScale  = ROW_STRIKING_C + 1;
+                nRowThresh = ROW_STRIKING_C;
+                nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL);
+                break;
+            default:
+                nRowScale  = ROW_STRIKING_C + 1;
+                nRowThresh = ROW_STRIKING_C;
+                nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL);
+                break;
+            }
+            break;
+        }
+    }
+    TABLE_PAIR(nRowThresh, nRowScale, nAttr, fThresh, fScale);
+    if (fabs(fError) < fThresh) {
+        fError *= fScale;
+    }
+    gPlayers[nPlayer].swing.fMishitAngle = fError;
+    }
+}
+
+// Rumble the pad on a mis-hit: frames = (135 at attribute 0 .. 35 at 100) x |error|, max 30.
+void Swing_MisHitRumble(int nPlayer) {
+    int nPad = gPlayers[nPlayer].nController;
+    int nAttr;
+    f32 fScale;
+    switch (gPlayers[nPlayer].nShotKind) {
+    case SHOT_TYPE_PUTT_e:
+        nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_PUTTING, ATTR_TOTAL);
+        break;
+    case SHOT_TYPE_CHIP_e:
+    case SHOT_TYPE_PITCH_e:
+        nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_APPROACH, ATTR_TOTAL);
+        break;
+    case 5:
+    case 6:
+    case 7:
+        nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL);
+        break;
+    default:
+        nAttr = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL);
+        break;
+    }
+    fScale = TABLE_AT(ROW_RUMBLE, nAttr);
+    gPlayers[nPlayer].swing.nVibrateCount = (int)(fScale * fabs(gPlayers[nPlayer].swing.fMishitAngle));
+    if (gPlayers[nPlayer].swing.nVibrateCount > 30) {
+        gPlayers[nPlayer].swing.nVibrateCount = 30;
+    }
+    if (gPlayers[nPlayer].swing.nVibrateCount > 0) {
+        gPlayers[nPlayer].swing.bVibrating = 1;
+        fn_800130F8(nPad, 1);
+        fn_80013130(nPad, 0xFF);
+    }
+}
+
+int fn_8005CB48(int nPlayer) {
+    return gPlayers[nPlayer].swing.nPowerBoost;
+}
+
+int fn_8005CB60(int nPlayer) {
+    return gPlayers[nPlayer].swing.nSpinBoost;
+}
+
+// An animation event's time.
+f32 fn_8005CB78(Character* pChar, u64 uEvent) {
+    return pChar->events[(int)uEvent].fTime;
+}
+
+void fn_8005CB88(Character* pObj, f32 f) {
+    if (pObj != NULL) {
+        pObj->f162C = f;
+    }
+}
+
+f32 Char_GetBackswing(Character* pObj) {
+    if (pObj == NULL) {
+        return 0.0f;
+    }
+    return pObj->fBackswing;
+}
+
+void fn_8005CBB0(Character* pObj, f32 f) {
+    if (pObj != NULL) {
+        pObj->f1630 = f;
+    }
+}
+
+void fn_8005CBC0(Character* pObj, f32 f) {
+    if (pObj != NULL) {
+        pObj->f1634 = f;
+    }
+}
+
+// Paired-single vector add over four floats (the fourth is carried along).
+#ifdef __MWERKS__
+asm void Vec_Add(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 0, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 0, 0
+    ps_add f2, f2, f0
+    ps_add f3, f3, f1
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 0, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void Vec_Add(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pB[0] + pA[0];
+    pOut[1] = pB[1] + pA[1];
+    pOut[2] = pB[2] + pA[2];
+    pOut[3] = pB[3] + pA[3];
+}
+#endif
+
+#ifdef __MWERKS__
+asm void Vec_Sub(register f32* pA, register f32* pB, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 0, 0
+    psq_l  f2, 0(pB), 0, 0
+    psq_l  f3, 8(pB), 0, 0
+    ps_sub f2, f0, f2
+    ps_sub f3, f1, f3
+    psq_st f2, 0(pOut), 0, 0
+    psq_st f3, 8(pOut), 0, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void Vec_Sub(f32* pA, f32* pB, f32* pOut) {
+    pOut[0] = pA[0] - pB[0];
+    pOut[1] = pA[1] - pB[1];
+    pOut[2] = pA[2] - pB[2];
+    pOut[3] = pA[3] - pB[3];
+}
+#endif
+
+// A 4-vector's squared length, capped.
+f32 fn_8005CC18(f32* pV) {
+    f32 f = pV[0] * pV[0] + pV[1] * pV[1] + pV[2] * pV[2] + pV[3] * pV[3];
+    if (f > lbl_80281B40[0]) {
+        f = lbl_80281B40[0];
+    }
+    return f;
+}
+
+int fn_8005CC5C(void) {
+    return lbl_802823FC;
+}
+
+void fn_8005CC64(TexBank* pBank, TexEntry* pTex) {
+    lbl_801B8980.p100 = pBank;
+    lbl_801B8980.p104 = pTex;
+    lbl_801B8980.uFlags |= 1;
+}
+
+f32 fn_8005CC84(f32 fTan) {
+    return atan(fTan);
+}
+
+// Empty.
+void fn_8005CCA8(int nPlayer) {
 }
