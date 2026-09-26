@@ -19,10 +19,20 @@ functions left), `python tools/agents/remain.py` lists what is left per unit.
    `docs/reference-builds/tw07-ps3/pairs.tsv`, then `docs/reference-builds/tw07-ps3/cu/<File>.txt`
    for EA's parameter order and types, locals and their order, and what it inlines
    (decomp-notes "Read EA's later source first"). Engine drift is real: the code decides.
-3. About 10-20 minutes per function: declaration order, statement order, types (u8/s8/int/s32,
+3. **Read the compiler's own view before guessing**: `build/mwccdbg/<fn>/summary.txt` (the
+   orchestrator's batch; rerun it with `python tools/match/mwccdbg.py src/<Unit>.c <fn>`, and with
+   `--src <scratch copy>` for a variant, about 10 s; runs from all lanes queue on one lock, so a
+   run can wait a minute). Each variable in the allocator's priority
+   order: its register, EA's register ('!' = differs), its neighbour count. Find the first '!' from
+   the top and ask why the compiler ordered it there (docs/workflow.md "mwcc-debugger": more than 28
+   neighbours jumps a variable to the top; `backend-00-initial-code.txt` shows every temp the C
+   made). Then change the C so the compiler's view matches EA's, the EA way (a temp fewer or more,
+   a dead assert from TW07, a different statement form), and confirm with a rerun. Put the key
+   line of what the dump showed in the ledger (e.g. "pBurn 29 nb with nAlign+*pOffset: r31").
+4. About 10-20 minutes per function: declaration order, statement order, types (u8/s8/int/s32,
    const), the decomp-notes rules. A near-100 function whose only difference is a branch target or a
    compare's signedness may be a real bug in our C: fix the meaning.
-4. Permuter only as the brief says. **Before you stop, add every attempt to `agents/tried/<fn>.md`**
+5. Permuter only as the brief says. **Before you stop, add every attempt to `agents/tried/<fn>.md`**
    under "Attempts" (date, lane, what, score before -> after) and commit it with your work, whether
    the function matched or not. When it is exact: set its Status line to SOLVED with the fix and
    the commit. (Old per-lane notes stay in `agents/notes/` as history; the ledger is the record.)
