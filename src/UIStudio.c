@@ -687,7 +687,9 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             fn_80165B90(data.aw[7], data.aw[6], pStudio, 5, &data, 0, NULL);
             break;
         case 0x55:  // push a word at a local's pointer plus an offset (0x6B: its address)
-        case 0x6B:
+        case 0x6B: {
+            u32 u;
+
             uByte0 = *pFrame->p10;
             pFrame->p10++;
             uByte1 = *pFrame->p10;
@@ -711,7 +713,10 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 pFrame->pC++;
             }
             break;
-        case 0x56:  // store the top at a local's pointer plus an offset
+        }
+        case 0x56: {  // store the top at a local's pointer plus an offset
+            u32 u;
+
             uByte0 = *pFrame->p10;
             pFrame->p10++;
             uByte1 = *pFrame->p10;
@@ -729,7 +734,10 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             *(s32*)(u + pFrame->pC[(s16)n]) = pTop[-1];
             pFrame->pC--;
             break;
-        case 0x57:  // push a local's pointer plus an offset
+        }
+        case 0x57: {  // push a local's pointer plus an offset
+            u32 u;
+
             uByte0 = *pFrame->p10;
             pFrame->p10++;
             uByte1 = *pFrame->p10;
@@ -748,6 +756,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             *pTop = u + pTop[(s16)n];
             pFrame->pC++;
             break;
+        }
         case 0x5A:  // int remainder
             pTop[-2] = pTop[-2] % pTop[-1];
             pFrame->pC--;
@@ -1076,7 +1085,9 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 }
             }
             break;
-        case 0x7C:  // replace every pFind in a text by pRep
+        case 0x7C: {  // replace every pFind in a text by pRep
+            UISText* pText;
+
             pRep = (UISText*)*--pFrame->pC;
             pFind = (UISText*)*--pFrame->pC;
             pText = (UISText*)*--pFrame->pC;
@@ -1117,6 +1128,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 }
             }
             break;
+        }
         case 0x7D:  // hand a text to the game (pfnScreen28)
             pText = (UISText*)*--pFrame->pC;
             if (pText != NULL && pStudio->pfnScreen28 != NULL && pScreen != NULL) {
