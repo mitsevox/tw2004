@@ -150,6 +150,8 @@ void fn_8009B970(int nView) {
 // are lifted by a ninth.
 void fn_8009BE08(int nView) {
     int n;
+    int nRow;
+    int nCol;
     CourseInfo* pCourse = fn_8000C594();
     // fake match: an s32 (long) copy of nView, kept in its own register, for the fn_8001707C calls
     s32 nViewCopy;
@@ -174,8 +176,10 @@ void fn_8009BE08(int nView) {
     fDirZ = lbl_802813C0->aDir[nView][2];
     while ((n = lbl_802813C0->anDone[nView]) < lbl_802813C0->nCols * lbl_802813C0->anRows[nView]
            && nSteps < 4) {
-        fAcross = (n % lbl_802813C0->nCols) * lbl_802813C0->fCellW;
-        fAlong = (n / lbl_802813C0->nCols) * lbl_802813C0->fCellD;
+        nRow = n / lbl_802813C0->nCols;
+        nCol = n % lbl_802813C0->nCols;
+        fAcross = nCol * lbl_802813C0->fCellW;
+        fAlong = nRow * lbl_802813C0->fCellD;
         vPoint[0] = fAcross * fDirZ + (fAlong * fDirX + lbl_802813C0->aCorner[nView][0]);
         vPoint[1] = 2.0f + PLAYER(fn_8001707C(nViewCopy))->vTarget[1];
         vPoint[2] = (fAlong * fDirZ + lbl_802813C0->aCorner[nView][2]) - fAcross * fDirX;
