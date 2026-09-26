@@ -8,6 +8,12 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26 r6-misc (quicktrial aligned, base 31): void* casts on the row (`pSrc = (u8*)(void*)
+  lbl_80189CB0[nPlayer]` for all four 125, red direct + void* row for g/b/a 32, red through a
+  void* row and g/b/a direct 32, `*(u8*)(void*)row` for red 32/31); red read at every statement
+  position from before the first call to after pColour (direct g/b/a 34-79, pSrc b/a 37-80). The
+  frontend still CSEs red's address with the row.
+
 - 2026-09-26 r5-render: frontend-02 shows the frontend CSE temp @19 (`lbl_80189CB0 +
   nPlayer*4`) formed at red's read and reused for b/a (and the backend CSE folds g's add into it),
   so red's address has several uses and never becomes EA's `lbzx`. EA needs red's add to stay

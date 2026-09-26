@@ -20,6 +20,11 @@ unless you combine it with something new. Before you stop, add every attempt und
   statements, 300 block locals, a later loop or conditional redefinition of p, a local whose
   address is taken, a switch. nSize term orders under the pragma: best 107. Still open: what
   EA wrote that stops the frontend's propagation of the first two constant steps.
+- 2026-09-26 r6-misc: the bank's first 8 bytes copied as one 8-byte struct (`*(Head*)pBank =
+  *(Head*)pHead`, a scratch typedef of TexBank's first 8 bytes) gives EA's order (both lwz, then
+  both stw): 111 -> 109. Not applied (needs a new header type; the propagation diff dominates).
+  A void* cursor initialised in its declaration from the void* parameter (TW07's vpGenPtr):
+  the frontend then materialises p + 0x18, not EA's p + 0x10 / + 8 steps (small-file probe m7.c).
 
 - 2026-09-26 r5-render (aligned, base 111): `pHead = (TexBank*)(p += 0x10); p += 8;` 111,
   with `p = (u8*)(pHead + 0) + 8` 111, `p = p + 8` 111, `p = (u8*)((u32*)pHead + 2)` 111,
