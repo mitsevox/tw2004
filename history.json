@@ -40485,5 +40485,21 @@
 "matched_functions": 7549,
 "total_functions": 7647,
 "exact": 7549
+},
+{
+"commit": "edc3645",
+"sha": "edc3645c1cc09c5fa56b17af37a84d3d66c9b0d8",
+"time": 1790389024,
+"subject": "Merge r2-ll (evening push, round 2)",
+"report": true,
+"matched_code": 1456348,
+"complete_code": 1162948,
+"matched_data": 702159,
+"complete_data": 846035,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7551,
+"total_functions": 7647,
+"exact": 7551
 }
 ]
