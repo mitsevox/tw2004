@@ -149,14 +149,14 @@ void fn_8009B970(int nView) {
 // first laying the grid out again if the player's target has moved. Points on ground of class 12
 // are lifted by a ninth.
 void fn_8009BE08(int nView) {
+    int n;
+    CourseInfo* pCourse = fn_8000C594();
     // fake match: an s32 (long) copy of nView, kept in its own register, for the fn_8001707C calls
     s32 nViewCopy;
     f32 vPoint[4];
     f32 vNormal[4];
     SurfaceType* pSurface;
-    CourseInfo* pCourse = fn_8000C594();
     int nSteps = 0;
-    int n;
     f32 fAcross;
     f32 fAlong;
     f32 fDirX;
@@ -174,8 +174,8 @@ void fn_8009BE08(int nView) {
     fDirZ = lbl_802813C0->aDir[nView][2];
     while ((n = lbl_802813C0->anDone[nView]) < lbl_802813C0->nCols * lbl_802813C0->anRows[nView]
            && nSteps < 4) {
-        fAlong = (n / lbl_802813C0->nCols) * lbl_802813C0->fCellD;
         fAcross = (n % lbl_802813C0->nCols) * lbl_802813C0->fCellW;
+        fAlong = (n / lbl_802813C0->nCols) * lbl_802813C0->fCellD;
         vPoint[0] = fAcross * fDirZ + (fAlong * fDirX + lbl_802813C0->aCorner[nView][0]);
         vPoint[1] = 2.0f + PLAYER(fn_8001707C(nViewCopy))->vTarget[1];
         vPoint[2] = (fAlong * fDirZ + lbl_802813C0->aCorner[nView][2]) - fAcross * fDirX;
