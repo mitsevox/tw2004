@@ -314,14 +314,14 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs);
 // Sends event uEvent to node nNode of a screen and the nodes it links to; *pbOut gets the node's
 // UISNodeInfo.u4.
 s32 fn_8016A2D4(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent, u32 n5,
-                s32 nArgs, const s32* pArgs, u8* pbOut);
+                s32 nArgs, s32* pArgs, u8* pbOut);
 void fn_8016A510(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg);
 void fn_8016A830(UIStudio* pStudio, int nOp, UISScreen* pScreen, u32 nNode);
 void fn_8016ABBC(UIStudio* pStudio, UISScreen* pScreen, s32 n, s32 nKind, void* p, u8 bAll);
 s32 fn_8016AD54(UISScreen* pScreen, UISNodeInfo* pInfo, s32 nKind, void* p);
 void fn_8016AEEC(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg);
-void fn_8016B09C(UIStudio* pStudio, u32 uEvent, s32 nArgs, const s32* pArgs);
-void fn_8016B0F8(UIStudio* pStudio, u32 uEvent, s32 nArgs, const s32* pArgs);
+void fn_8016B09C(UIStudio* pStudio, u32 uEvent, s32 nArgs, s32* pArgs);
+void fn_8016B0F8(UIStudio* pStudio, u32 uEvent, s32 nArgs, s32* pArgs);
 void fn_8016B4D4(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 nMove);
 UISNodeInfo* fn_8016B6BC(UISScreen* pScreen, UISNodeInfo* pInfo);
 void fn_8016B808(u32 u0, UISText* pOut, UISText* pFormat, s32 nArgs, const UISWord* pArgs);
@@ -333,7 +333,7 @@ void fn_8016C174(f32 f1, f32 f2, f32 f3, f32 f4);
 f32* fn_8016C1A4(s32 n20, UISNodeInfo* pInfo);
 // Runs pScript for node info pInfo with a call frame pushed on pStack.
 s32 fn_8016C270(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UISWordStack* pStack, u8* pScript,
-               s32 nArgs, const s32* pArgs, u32 nArgs2, const s32* pArgs2, u8 bExtra, s32 nExtra, s32* pnSaved);
+               s32 nArgs, s32* pArgs, u32 nArgs2, const s32* pArgs2, u8 bExtra, s32 nExtra, s32* pnSaved);
 // A node's handler scripts for an event, by kind (0x4000, plain with an ID, 0x8000); NULL for none.
 // The event is a u32 (callers pass it unmasked; each function masks it to 16 bits).
 u8* fn_8016C5C4(UISNode* pNode, u32 uEvent);
