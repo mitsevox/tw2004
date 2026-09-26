@@ -274,7 +274,8 @@ static inline s32 Screen_BringBack(UIStudio* pStudio, u16 uGroup, u16 uScreen, u
     u32 n;
     u8 bOut;
 
-    pScreen = &pStudio->pScreens[fn_8016C6C4(pStudio, uGroup, uScreen)];
+    i = fn_8016C6C4(pStudio, uGroup, uScreen);
+    pScreen = &pStudio->pScreens[i];
     fn_80165C74(pStudio);
     pStudio->uFlags |= 4;
     n = pStudio->nRateFns;
