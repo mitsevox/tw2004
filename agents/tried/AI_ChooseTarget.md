@@ -174,4 +174,9 @@ UStream_Update exact). The other 13 "matches" (Earnings x2, Golfer AI_ChooseTarg
   (scratch scan.py over rasim) finds EA's registers ONLY between the pin row @178 and tee58 @174,
   i.e. exactly the slots of the frontend temps @175/@176: EA's extsb wrote the frontend temp
   itself. Same class as decomp-notes round 5 "EA keeps a copy our backend's first copy-propagation
-  pass folds" (UISScreen); unsolved.
+  pass folds" (UISScreen); unsolved. Read agents/findings/2026-09-26-r7-uis-copy-chains.md next:
+  a copy survives copy propagation only as part of a chain longer than the CP passes (3 here) or
+  with a second definition; if `mr r@175,rNew` reached the allocator, coalescing would keep r@175.
+- 2026-09-26 r7-golfer permuter (15 min, -j 2, from the 99.56 version, base 165): 95 with a
+  `new_var = gAITargets` base pointer (moves zoneoff into a frontend-temp slot, quicktrial 17),
+  50 with `long long nPower` plus `if (x = (s8)nAggr < ...)`: not EA forms, not applied.
