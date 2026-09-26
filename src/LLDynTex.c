@@ -164,20 +164,20 @@ void fn_8010A788(f32* pIn, f32* pOut, f32 (*pMtx)[3], s32 nMode) {
 // round and the block's 2-bit indices are remapped to match.
 void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
     u8* pPixels = pBuf + pObj->aBlocks[0].nOffset;
-    u16* pBlock = (u16*)pPixels;
     int y;
     int x;
+    u8 bThree;
     f32 aIn[3];
     f32 aOut[3];
     u16 uOld0;
     u16 uOld1;
+    u16* pBlock = (u16*)pPixels;
     u16 uNew0;
     u16 uNew1;
     u8 bSwap;
-    u8 bThree;
-    int i;
     int nShift;
     u8 uIndices;
+    int i;
     u8 uIndex;
     u8* pIndices;
 
@@ -185,7 +185,7 @@ void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
         return;
     }
     for (y = 0; y < pObj->n3A / 4; y++) {
-        for (x = 0; x < pObj->n38 / 4; x++, pBlock += 4) {
+        for (x = 0; x < pObj->n38 / 4; pBlock += 4, x++) {
             uOld0 = pBlock[0];
             aIn[0] = (f32)(u32)((uOld0 >> 8) & 0xF8) / 255.0f;
             aIn[1] = (f32)(u32)((uOld0 >> 3) & 0xFC) / 255.0f;
@@ -229,13 +229,13 @@ void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
                 continue;
             }
             pIndices = (u8*)&pBlock[2];
-            for (i = 0; i < 4; i++, pIndices++) {
+            for (i = 0; i < 4; i++) {
                 uIndices = 0;
                 for (nShift = 0; nShift < 8; nShift += 2) {
                     // EA bug: the mask keeps every bit from nShift up, not just the index's two,
                     // and the indices are compared as if 0x10 and 0x11 were binary 10 and 11;
                     // only the top index of a row is read right.
-                    uIndex = (*pIndices & (0xFF << nShift)) >> nShift;
+                    uIndex = (pIndices[i] & (0xFF << nShift)) >> nShift;
                     if (bThree) {
                         if (uIndex == 0) {
                             uIndices = uIndices | 1 << nShift;
@@ -258,7 +258,7 @@ void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
                         }
                     }
                 }
-                *pIndices = uIndices;
+                pIndices[i] = uIndices;
             }
         }
     }

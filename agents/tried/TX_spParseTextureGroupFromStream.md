@@ -8,6 +8,14 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26, r2-ll (quicktrial aligned, base 111). TW07's LLTex.c locals for this function
+  (docs/reference-builds/tw07-ps3/cu/LLTex.c.txt): `void* vpGenPtr` (the cursor), vpTexturesData,
+  spTexture, iTexture, spTextureGroup, spTextureGroupHeader, spChunkDesc, spTextureGroupFileDesc,
+  iTextureDescsSize, iTextureGroupSize. A separate cursor local (param renamed pData): u8* 171,
+  void* with `(u8*)p + n` steps 153 (CW still folds every step into offsets). nSize term orders
+  (sizeof(TexBank) third / last, grouped, split over `+=` statements, `x + nSize` form, `(int)`
+  casts on the sizeofs): 111-118; the target adds 0x30 after the first two products.
+
 - 2026-09-25, n-ll (quicktrial aligned, base 111). Reading: the target keeps the stream cursor as a
   moving register (`addi r25,r3,0x10; mr r28,r25` for the header; `mr r29,r25; addi r25,r25,8` for
   each section) while ours folds every field into offsets from the parameter. `pHead = p + 0x10;
