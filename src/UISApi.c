@@ -540,12 +540,15 @@ u32 fn_80169D90(u32 nScreens, u32 nHandlers, u32 nRateFns, u32 n60, u32 nEventWo
 // Turns a file offset stored in a pointer field into the pointer.
 // port: the UI file keeps 32-bit offsets in its pointer fields.
 static inline void* UISFile_Fix(UISScreenFile* pFile, void* p) {
-    return (void*)((uptr)pFile + (uptr)p);
+    return (void*)((int)pFile + (int)p);
 }
 
 // Fixes up a UI file the first time it is seen: every offset in it becomes a pointer, and each
 // link word names its pEntriesC entry by pointer (0 when out of range). Returns 1, or -1 when the
 // file was already fixed up (its node table then lies after its start).
+// fake match: the file's address is taken into an integer local before each loop (int or long,
+// one per kind of fix) and the last three loops have their own counters, for EA's hoisted copies.
+// port: the fixes add 32-bit offsets to the file's address held in an int or long.
 s32 fn_80169DC4(UISScreenFile* pFile) {
     u32 i;
     u32 j;
@@ -554,45 +557,59 @@ s32 fn_80169DC4(UISScreenFile* pFile) {
     UISGroup* pGroup;
     UISEntry* pEntry;
     u32* pLink;
+    int nBase1;
+    long nBase2;
+    int nBase3;
+    int nBase4;
+    long nBase5;
+    long nBase6;
+    u32 i1;
+    u32 i2;
+    u32 i3;
 
     if ((u8*)pFile->pNodes < (u8*)pFile) {
         pFile->pNodes = (UISNode*)UISFile_Fix(pFile, pFile->pNodes);
+        nBase1 = (int)pFile;
+        nBase2 = (long)pFile;
+        nBase3 = (int)pFile;
         for (i = 0; i < pFile->nNodes; i++) {
             pNode = &pFile->pNodes[i];
-            pNode->pInfo = (UISNodeInfo*)UISFile_Fix(pFile, pNode->pInfo);
-            pNode->ppGroups = (UISGroup**)UISFile_Fix(pFile, pNode->ppGroups);
+            pNode->pInfo = (UISNodeInfo*)(nBase1 + (u32)pNode->pInfo);
+            pNode->ppGroups = (UISGroup**)(nBase1 + (u32)pNode->ppGroups);
             j = pNode->nGroups;
             while (j-- != 0) {
-                pNode->ppGroups[j] = (UISGroup*)UISFile_Fix(pFile, pNode->ppGroups[j]);
+                pNode->ppGroups[j] = (UISGroup*)(nBase1 + (u32)pNode->ppGroups[j]);
                 pGroup = pNode->ppGroups[j];
-                pGroup->pInfo = (UISNodeInfo*)UISFile_Fix(pFile, pGroup->pInfo);
-                pGroup->pEntries = (UISEntry*)UISFile_Fix(pFile, pGroup->pEntries);
+                pGroup->pInfo = (UISNodeInfo*)(nBase1 + (u32)pGroup->pInfo);
+                pGroup->pEntries = (UISEntry*)(nBase1 + (u32)pGroup->pEntries);
                 k = pGroup->nEntries;
                 while (k-- != 0) {
                     pEntry = &pGroup->pEntries[k];
                     if (pEntry->uHandler != 0xFFFF) {
                         pEntry->n2 = 0;
-                        pEntry->u4.pnOffset = (u32*)UISFile_Fix(pFile, pEntry->u4.pnOffset);
+                        pEntry->u4.pnOffset = (u32*)(nBase2 + (u32)pEntry->u4.pnOffset);
                     }
                 }
             }
-            pNode->pHandlers = (UISHandler*)UISFile_Fix(pFile, pNode->pHandlers);
+            pNode->pHandlers = (UISHandler*)(nBase1 + (u32)pNode->pHandlers);
             k = pNode->nHandlers;
             while (k-- != 0) {
                 if (pNode->pHandlers[k].uEvent != 0xFFFF) {
-                    pNode->pHandlers[k].u4.pScript = (u8*)UISFile_Fix(pFile, pNode->pHandlers[k].u4.pScript);
+                    pNode->pHandlers[k].u4.pScript = (u8*)(nBase3 + (u32)pNode->pHandlers[k].u4.pScript);
                 }
             }
         }
         pFile->pEntriesC = (UISFileEntryC*)UISFile_Fix(pFile, pFile->pEntriesC);
-        i = pFile->nEntriesC;
-        while (i-- != 0) {
-            pFile->pEntriesC[i].p8 = UISFile_Fix(pFile, pFile->pEntriesC[i].p8);
+        nBase4 = (int)pFile;
+        i1 = pFile->nEntriesC;
+        while (i1-- != 0) {
+            pFile->pEntriesC[i1].p8 = (void*)(nBase4 + (u32)pFile->pEntriesC[i1].p8);
         }
         pFile->pLinks = (u32*)UISFile_Fix(pFile, pFile->pLinks);
-        i = pFile->nLinks;
-        while (i-- != 0) {
-            pLink = (u32*)((u8*)pFile + pFile->pLinks[i]);
+        nBase5 = (long)pFile;
+        i2 = pFile->nLinks;
+        while (i2-- != 0) {
+            pLink = (u32*)(nBase5 + pFile->pLinks[i2]);
             if (*pLink < pFile->nEntriesC) {
                 *pLink = (uptr)&pFile->pEntriesC[*pLink];  // port: a pointer stored in a 32-bit word
             } else {
@@ -600,10 +617,11 @@ s32 fn_80169DC4(UISScreenFile* pFile) {
             }
         }
         pFile->pStart = (UISEntry*)UISFile_Fix(pFile, pFile->pStart);
-        i = pFile->nStart;
-        while (i-- != 0) {
-            if (pFile->pStart[i].u4.pnOffset != NULL) {
-                pFile->pStart[i].u4.pnOffset = (u32*)UISFile_Fix(pFile, pFile->pStart[i].u4.pnOffset);
+        nBase6 = (long)pFile;
+        i3 = pFile->nStart;
+        while (i3-- != 0) {
+            if (pFile->pStart[i3].u4.pnOffset != NULL) {
+                pFile->pStart[i3].u4.pnOffset = (u32*)(nBase6 + (u32)pFile->pStart[i3].u4.pnOffset);
             }
         }
         return 1;
