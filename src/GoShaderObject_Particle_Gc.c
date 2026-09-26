@@ -122,30 +122,30 @@ void fn_80094534(f32 (*pMtxArg)[4], ParticleShape* pShapeArg, ParticleVertex* pV
                  u32 nArg) {
     // fake match: every parameter copied (through void*) into a local, and this declaration order
     // (found by search), set the register allocation
-    f32 fGreen;
     f32 fSin;
+    f32 fDiff;
+    int nBlue;
+    f32 fBlue;
     f32* pTimes;
-    u32 n;
-    f32 m[3][4];
+    f32 fRed;
     f32 t;
     ParticleVertex* pVerts;
-    f32 fDiff;
-    f32 (*pMtx)[4];
-    f32 fEase;
     u32 i;
-    f32 fFade;
-    int nRed;
+    f32 (*pMtx)[4];
     f32 fSize;
-    Vec4 v;
     u8 uAlpha;
+    f32 fEase;
     f32 fAngle;
     f32 fAlpha;
+    f32 fGreen;
+    f32 m[3][4];
+    ParticleShape* pShape;
+    f32 fFade;
+    Vec4 v;
+    int nRed;
+    u32 n;
     int nGreen;
     f32 fCos;
-    f32 fBlue;
-    ParticleShape* pShape;
-    int nBlue;
-    f32 fRed;
 
     pShape = (ParticleShape*)(void*)pShapeArg;
     pVerts = (ParticleVertex*)(void*)pVertsArg;
