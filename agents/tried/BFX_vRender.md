@@ -8,6 +8,13 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26 r5-render (aligned, base 32): EA reads red with `lbzx r5,r6,r7` (table base +
+  nPlayer*4, its own address) and g/b/a with lbz 1/2/3 off `add r4,r6,r7`, i.e. red's address is
+  not CSE'd with the row. Tried: red direct + pSrc for g/b/a (both orders) 32, `r = *row` 32,
+  `pSrc = &row[1]` for g/b/a 27 (real not checked: the colour loads' registers still differ),
+  `pSrc = &row[2]` after g 31, all four direct 32, pColour after the reads 38, `*pSrc++` 125.
+  (The aIndex `@4+0x4` vs lbl_80283C4C difference is only the target's label split.)
+
 ### 2026-09-25, ChatGPT round 3
 
 Baseline in the real `main/goballfx` unit: 89.67376% for `BFX_vRender` (unit 91.68%, 3/4 exact). The matching scratch `quicktrial.py --aligned` baseline is 32 differing instructions out of 141. No tracked source edit was made in this pass; all experiments below were compiled with the unit's CodeWarrior flags in ignored `build/perm/BFX_vRender` scratch.

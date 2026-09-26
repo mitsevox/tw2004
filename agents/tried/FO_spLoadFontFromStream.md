@@ -8,6 +8,12 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26 r5-render: reading only (no variant): EA's n00 and n0C swaps both use the signed
+  `rlwinm 0,8,15` + `srawi 8` form and the n0C one reloads `lwz r5,0xc(r30)` after the compare's
+  `lwz r0,0xc(r3)`; ours emits the unsigned form for n0C (and extrwi for the u16 fields), i.e.
+  our frontend knows those values are non-negative (n0C > 100 in the branch, u16 by type) and EA's
+  did not; EA also keeps the compare on the parameter r3 and pFile in r30, pBytes r28.
+
 - 2026-09-25, n-ll (quicktrial aligned, base 407). Reading: the target keeps pFile (r30) and pBytes
   (r28) apart (ours coalesces both into r31); its 16-bit swaps are `rlwinm 16,23` + `srawi 8` (ours
   folds to extrwi); its n0C swap is the signed form like n00 (ours gets the unsigned form, as if CW
