@@ -29,7 +29,6 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
     s32 n2;
     s32 i;
     UISText* pText;
-    UISText* pFind;
     UISText* pRep;
     UISRecord60* pRec;
     u32 nText;
@@ -226,7 +225,9 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             *pTop = (s32)pScreen->pData;
             pFrame->pC++;
             break;
-        case 0x0E:  // copy a text
+        case 0x0E: {  // copy a text
+            UISText* pFind;
+
             pText = (UISText*)*--pFrame->pC;
             pFind = (UISText*)*--pFrame->pC;
             if (pText != NULL && pFind != NULL) {
@@ -238,6 +239,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 pText->szText[u] = 0;
             }
             break;
+        }
         case 0x0F:  // push a word
         case 0x10:
             uByte0 = *pFrame->p10;
@@ -587,7 +589,9 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 pText->szText[u] = n;
             }
             break;
-        case 0x4C:  // format a text (at most 20 arguments)
+        case 0x4C: {  // format a text (at most 20 arguments)
+            UISText* pFind;
+
             pFrame->pC--;
             n = pTop[-1];
             for (k = 0; k < n; k++) {
@@ -601,6 +605,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pText = (UISText*)*--pFrame->pC;
             fn_8016B808((u32)pScreen->pData, pText, pFind, n, lbl_802805D8);
             break;
+        }
         case 0x77:  // whether a group is this screen's
             u = *--pFrame->pC;
             if (u == pScreen->uGroup) {
@@ -1086,6 +1091,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             }
             break;
         case 0x7C: {  // replace every pFind in a text by pRep
+            UISText* pFind;
             UISText* pText;
 
             pRep = (UISText*)*--pFrame->pC;
