@@ -44,6 +44,7 @@ unless you combine it with something new. Before you stop, add every attempt und
   subf -> cmpl), EA's did not. Same registers on both sides, so the DAG we give the last scheduler matches
   EA's except for something invisible here. Unit flags (-proc 750/603e/generic, -O2/-O3/-O4,s,
   -opt noschedule/nopeephole, -inline auto, -fp_contract off): 2 or much worse.
+- 2026-09-26 r5-uisscreen: permuter 15 min -j2 (8991 iterations): nothing below the base.
 
 ## Collected from the notes and docs (2026-09-25)
 
