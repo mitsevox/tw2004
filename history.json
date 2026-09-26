@@ -40453,5 +40453,21 @@
 "matched_functions": 7548,
 "total_functions": 7647,
 "exact": 7548
+},
+{
+"commit": "eb8ce72",
+"sha": "eb8ce725669b716469fbe71442688ea14e44f80e",
+"time": 1790388765,
+"subject": "Merge r2-uistudio (evening push, round 2)",
+"report": true,
+"matched_code": 1454424,
+"complete_code": 1162948,
+"matched_data": 702159,
+"complete_data": 846035,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7548,
+"total_functions": 7647,
+"exact": 7548
 }
 ]
