@@ -37,6 +37,8 @@ s32  fn_8010B5F8(DynTexObj* pObj);
 void fn_80007368(void);
 void fn_80007328(void);
 
+DynTexState* lbl_80282488;
+
 // Set up: the state and its nSize-byte block (gomainloop.c: 0x18000, later 0x6000).
 void fn_8010A448(int nSize) {
     lbl_80282488 = fn_80009B34(sizeof(DynTexState), 2, 16, "LLDynTex.c", 105);
@@ -163,21 +165,21 @@ void fn_8010A788(f32* pIn, f32* pOut, f32 (*pMtx)[3], s32 nMode) {
 // switches the block between its four- and three-colour modes, they are stored the other way
 // round and the block's 2-bit indices are remapped to match.
 void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
-    u16 uOld0;
     int nShift;
-    u8 uIndices;
+    u16 uNew1;
+    u16 uOld0;
     u16 uOld1;
     u16* pBlock;
-    u16 uNew1;
-    u16 uNew0;
-    u8* pIndices;
+    u8 uIndices;
     u8* pPixels;
-    u8 bSwap;
     u8 uIndex;
-    int i;
+    u8* pIndices;
+    u8 bSwap;
     int y;
+    int i;
     int x;
     u8 bThree;
+    u16 uNew0;
     f32 aIn[3];
     f32 aOut[3];
 
@@ -193,9 +195,11 @@ void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
             aIn[1] = (f32)(u32)((uOld0 & 0x7E0) >> 3) / 255.0f;
             aIn[2] = (f32)(u32)((uOld0 & 0x1F) << 3) / 255.0f;
             fn_8010A788(aIn, aOut, pMtx, nMode);
+            // fake match: the (u8) on the first colour's blue term changes no value; it makes the
+            // OR an rlwimi as in EA's code.
             uNew0 = (u16)((((u8)(int)(aOut[0] * 255.0f + 0.5f) >> 3) << 11) |
                           (((u8)(int)(aOut[1] * 255.0f + 0.5f) >> 2) << 5) |
-                          ((u8)(int)(aOut[2] * 255.0f + 0.5f) >> 3));
+                          (u8)((u8)(int)(aOut[2] * 255.0f + 0.5f) >> 3));
             uOld1 = pBlock[1];
             aIn[0] = (f32)(u32)((uOld1 & 0xF800) >> 8) / 255.0f;
             aIn[1] = (f32)(u32)((uOld1 & 0x7E0) >> 3) / 255.0f;
@@ -237,7 +241,8 @@ void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
                     // EA bug: the mask keeps every bit from nShift up, not just the index's two,
                     // and the indices are compared as if 0x10 and 0x11 were binary 10 and 11;
                     // only the top index of a row is read right.
-                    uIndex = (pIndices[i] & (0xFF << nShift)) >> nShift;
+                    uIndex = pIndices[i];
+                    uIndex = (uIndex & (0xFF << nShift)) >> nShift;
                     if (bThree) {
                         if (uIndex == 0) {
                             uIndices = uIndices | 1 << nShift;
@@ -365,6 +370,22 @@ void fn_8010ADA4(DynTex* pTex) {
     pTex->n14 = nDst;
 }
 
+// ---- sweep code (not yet cleaned up) ----
+
+// Empties pTex: no textures, nothing of p18 used (char.c and FEgolferanim.c pass it as a void*).
+void fn_8010B098(void* p) {
+    DynTex* pTex = p;
+
+    if (pTex != NULL) {
+        pTex->n8 = 0;
+        pTex->p4->n2 = 0;
+        pTex->p4->n4 = 0;
+        pTex->n14 = 0;
+    }
+}
+
+// ---- end of sweep code ----
+
 // Fills pEntry for pObj and its palette pPal (if any): the id, each level's bytes and the
 // palette's, each rounded up to 16. Returns them all added up.
 s32 fn_8010B0C0(DynTexObj* pObj, DynTexPalette* pPal, DynTexEntry* pEntry) {
@@ -487,6 +508,87 @@ s32 fn_8010B338(DynTex* pTex, DynTexObj* pObj, DynTexPalette* pPal, u8* pPixels,
     return pTex->n8 - 1;
 }
 
+// The same level's size in 16-byte units, rounded up.
+u32 fn_8010B548(DynTexObj* pObj, int nLevel) {
+    u32 nA = pObj->n3A;
+    u32 nB = pObj->n38;
+    int i;
+    u32 nSize;
+
+    for (i = 0; i < nLevel; i++) {
+        nA >>= 1;
+        nB >>= 1;
+    }
+    nSize = (nA * nB * fn_8010C458(pObj->n40) + 7) >> 3;
+    nSize = (nSize + 15) >> 4;
+    return nSize;
+}
+
+// The 16-byte units of all of a texture's levels.
+s32 fn_8010B5F8(DynTexObj* pObj) {
+    int i;
+    s32 nUnits = 0;
+
+    for (i = 0; i < pObj->n41; i++) {
+        nUnits += fn_8010B548(pObj, i);
+    }
+    return nUnits;
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
+s32 fn_8010B664(DynTexPalette* pPal) {
+    if (pPal->nEntries > 16) {
+        if (fn_8010C458(pPal->nFormat) == 16) {
+            return 0x20;
+        }
+        return 0x40;
+    }
+    return 4;
+}
+
+// ---- end of sweep code ----
+
+// The bytes of level nLevel of a texture: its size halved nLevel times, at its format's bits per
+// pixel, rounded up to whole bytes.
+u32 fn_8010B6AC(DynTexObj* pObj, int nLevel) {
+    u32 nA = pObj->n3A;
+    u32 nB = pObj->n38;
+    int i;
+    u32 nSize;
+
+    for (i = 0; i < nLevel; i++) {
+        nA >>= 1;
+        nB >>= 1;
+    }
+    nSize = (nA * nB * fn_8010C458(pObj->n40) + 7) >> 3;
+    return nSize;
+}
+
+// The bytes of all of a texture's levels.
+s32 fn_8010B754(DynTexObj* pObj) {
+    int i;
+    s32 nBytes = 0;
+
+    for (i = 0; i < pObj->n41; i++) {
+        nBytes += fn_8010B6AC(pObj, i);
+    }
+    return nBytes;
+}
+
+// Empty the job pool and the queue.
+void fn_8010B7C0(void) {
+    int i;
+
+    lbl_80282488->nA84 = 0;
+    for (i = 0; i < 10; i++) {
+        lbl_80282488->aJobs[i].bUsed = 0;
+        lbl_80282488->aJobs[i].pfnA = NULL;
+        lbl_80282488->aJobs[i].pfnB = NULL;
+        lbl_80282488->apQueue[i] = NULL;
+    }
+}
+
 // A free job, or NULL.
 DynTexJob* fn_8010B8EC(void) {
     int i;
@@ -537,28 +639,6 @@ void fn_8010B9BC(void) {
 }
 
 // ---- sweep code (not yet cleaned up) ----
-
-// Empties pTex: no textures, nothing of p18 used (char.c and FEgolferanim.c pass it as a void*).
-void fn_8010B098(void* p) {
-    DynTex* pTex = p;
-
-    if (pTex != NULL) {
-        pTex->n8 = 0;
-        pTex->p4->n2 = 0;
-        pTex->p4->n4 = 0;
-        pTex->n14 = 0;
-    }
-}
-
-s32 fn_8010B664(DynTexPalette* pPal) {
-    if (pPal->nEntries > 16) {
-        if (fn_8010C458(pPal->nFormat) == 16) {
-            return 0x20;
-        }
-        return 0x40;
-    }
-    return 4;
-}
 
 // Set up GX's texture (and palette) objects of each of pTex's textures in use, first moving
 // their blocks' n8 by the header's n28. Always 1.
@@ -679,6 +759,19 @@ u8 fn_8010BF3C(void) {
     }
     return bDone;
 }
+
+// ---- end of sweep code ----
+
+// Run the loader (fn_8010BFE0) until the queue is empty and nothing is left to do.
+void fn_8010BF68(void) {
+    while (!fn_8010BF3C()) {
+        fn_800B7490();
+        fn_8010BFE0();
+        fn_80007254();
+    }
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 // fn_80006444's callback: nBytes more arrived (nError is not read).
 void fn_8010BFA0(int nBytes, int nError) {
@@ -812,73 +905,6 @@ u8 fn_8010BFE0(void) {
 
 // ---- end of sweep code ----
 
-// Empty the job pool and the queue.
-void fn_8010B7C0(void) {
-    int i;
-
-    lbl_80282488->nA84 = 0;
-    for (i = 0; i < 10; i++) {
-        lbl_80282488->aJobs[i].bUsed = 0;
-        lbl_80282488->aJobs[i].pfnA = NULL;
-        lbl_80282488->aJobs[i].pfnB = NULL;
-        lbl_80282488->apQueue[i] = NULL;
-    }
-}
-
-// The bytes of level nLevel of a texture: its size halved nLevel times, at its format's bits per
-// pixel, rounded up to whole bytes.
-u32 fn_8010B6AC(DynTexObj* pObj, int nLevel) {
-    u32 nA = pObj->n3A;
-    u32 nB = pObj->n38;
-    int i;
-    u32 nSize;
-
-    for (i = 0; i < nLevel; i++) {
-        nA >>= 1;
-        nB >>= 1;
-    }
-    nSize = (nA * nB * fn_8010C458(pObj->n40) + 7) >> 3;
-    return nSize;
-}
-
-// The bytes of all of a texture's levels.
-s32 fn_8010B754(DynTexObj* pObj) {
-    int i;
-    s32 nBytes = 0;
-
-    for (i = 0; i < pObj->n41; i++) {
-        nBytes += fn_8010B6AC(pObj, i);
-    }
-    return nBytes;
-}
-
-// The same level's size in 16-byte units, rounded up.
-u32 fn_8010B548(DynTexObj* pObj, int nLevel) {
-    u32 nA = pObj->n3A;
-    u32 nB = pObj->n38;
-    int i;
-    u32 nSize;
-
-    for (i = 0; i < nLevel; i++) {
-        nA >>= 1;
-        nB >>= 1;
-    }
-    nSize = (nA * nB * fn_8010C458(pObj->n40) + 7) >> 3;
-    nSize = (nSize + 15) >> 4;
-    return nSize;
-}
-
-// The 16-byte units of all of a texture's levels.
-s32 fn_8010B5F8(DynTexObj* pObj) {
-    int i;
-    s32 nUnits = 0;
-
-    for (i = 0; i < pObj->n41; i++) {
-        nUnits += fn_8010B548(pObj, i);
-    }
-    return nUnits;
-}
-
 // Bits per pixel of texture format nFormat (0 for the formats it does not list).
 int fn_8010C458(int nFormat) {
     int nBits = 0;
@@ -903,13 +929,4 @@ int fn_8010C458(int nFormat) {
         break;
     }
     return nBits;
-}
-
-// Run the loader (fn_8010BFE0) until the queue is empty and nothing is left to do.
-void fn_8010BF68(void) {
-    while (!fn_8010BF3C()) {
-        fn_800B7490();
-        fn_8010BFE0();
-        fn_80007254();
-    }
 }
