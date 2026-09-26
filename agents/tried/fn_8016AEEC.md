@@ -40,6 +40,8 @@ base 40, 24 levers, 1323 variants (24 singles) in 13 s; best 25
 
 25 [safe]
 ```
+- 2026-09-26 r4-uisscreen (base.c aligned, base 25): every order of the 4 declarations (24):
+  25 (12 orders) or 32.
 
 ## Collected from the notes and docs (2026-09-25)
 
