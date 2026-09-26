@@ -879,7 +879,7 @@ config.libs = [
             Object(Matching, "char_tex_manager.c"),
             Object(NonMatching, "char.c"),
             Object(Matching, "mtalib.c"),
-            Object(NonMatching, "ska_shared.c"),
+            Object(Matching, "ska_shared.c"),
             Object(Matching, "Skeleton.c"),
             Object(NonMatching, "Golfer.c"),
             Object(Matching, "Code8002DB80.c"),
