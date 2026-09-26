@@ -77,3 +77,5 @@ base 6, 199 levers, 31039 variants (199 singles) in 318 s; best 6
   (the dump: the frontend now CSEs the whole &gPlayers[n] into @1458, but the nPlayer load itself
   stays a backend temp above @1457). Permuter 15 min -j2 (base 30, 5514 iterations): no
   improvement. No source change.
+- 2026-09-26, r6-assert: dead asserts (agents/findings/2026-09-26-dead-asserts.md): an empty `if (x) { } else { }` (the only assert form that leaves any trace on GC/2.5) after every statement of the function, quicktrial aligned: pChar as the condition (splitting the three u10 reads too): 6. No source change.
+- 2026-09-26, r6-assert: every statement order of the six setup lines (pPlayer, pModel, the three u10 flags, pBallPos; pPlayer before pBallPos), 360 orders: 6. No source change.
