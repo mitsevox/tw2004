@@ -59,6 +59,11 @@ Character_SetupForShot 6, fn_800CE52C 5, fn_800CE224 19, fn_80019798 28, fn_800D
 fn_800D477C 19, Session_SetupProfiles 14, fn_800E8A68 14, fn_801264B8 26, AI_ChooseTarget 91,
 SW_KillVibration 4: all unchanged at best, aligned diffs).
 
+Found on the way (not an assert): hwsBurn fn_8011172C is exact with EA's align idiom written as
+`nEnd = *pOffset; nEnd += nAlign - 1; *pOffset = nEnd & ~(nAlign - 1);` (the `+=` keeps the load
+and the add in one vreg, 28 neighbours; `nAlign - 1` makes nAlign the add's first operand), with
+or without any assert. hwsBurn is linked (its functions had to be put in address order).
+
 Verdict: on this compiler EA's retail asserts are invisible unless the macro left an empty
 if/else; the neighbour, frame and "used more" effects described in #match-help do not occur here.
 The register-order and frame misses in the ledgers need other causes.
