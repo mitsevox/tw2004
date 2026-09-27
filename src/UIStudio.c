@@ -133,7 +133,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                         if ((u & 0x80000000) == 0x80000000) {
                             pRet = (u8*)pStudio->pCurrent->p10 + (u & 0x7FFFFFFF);
                         } else {
-                            pRet = pBase + u;
+                            pRet = (u8*)(u + (uptr)pBase);  // fake match: EA's add order; port: pointer-sized
                         }
                         pStepScript = pRet;
                     }
@@ -146,7 +146,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                     if ((u & 0x80000000) == 0x80000000) {
                         pRet = (u8*)pStudio->pCurrent->p10 + (u & 0x7FFFFFFF);
                     } else {
-                        pRet = pBase + u;
+                        pRet = (u8*)(u + (uptr)pBase);  // fake match: EA's add order; port: pointer-sized
                     }
                     pDoneScript = pRet;
                 }
@@ -173,7 +173,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 if ((u & 0x80000000) == 0x80000000) {
                     pRet = (u8*)pStudio->pCurrent->p10 + (u & 0x7FFFFFFF);
                 } else {
-                    pRet = pBase + u;
+                    pRet = (u8*)(u + (uptr)pBase);  // fake match: EA's add order; port: pointer-sized
                 }
                 pStepScript = pRet;
             }
@@ -1067,12 +1067,10 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             break;
         case 0x74: {  // set or clear a bit of the screen's event mask (-1: all)
             s32 bOn = *--pFrame->pC;
-            u32 uBits = -1;
+            u32 uBits;
 
             n = *--pFrame->pC;
-            if (n >= 0) {
-                uBits = 1 << n;
-            }
+            uBits = n >= 0 ? 1 << n : -1;
             if (bOn != 0) {
                 pScreen->uMask |= uBits;
             } else {
@@ -1119,9 +1117,9 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             u32 nRep;
             u32 nFind;
             u32 nText;
-            UISText* pRep;
-            UISText* pFind;
             UISText* pText;
+            UISText* pFind;
+            UISText* pRep;
 
             pRep = (UISText*)*--pFrame->pC;
             pFind = (UISText*)*--pFrame->pC;
