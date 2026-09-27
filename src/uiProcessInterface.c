@@ -10,9 +10,21 @@
 #include "camera.h"
 #include "frontend/uistudio.h"
 
-u8 lbl_80281F19;
-u8 lbl_80281F1A;                // set: fn_8008FD60 passes events to the UI
+// Defined here (declared in game/frontend.h); .sbss in reverse address order.
+FrontEnd* lbl_80281F1C;
 u8 lbl_80281F1B;
+u8 lbl_80281F1A;                // set: fn_8008FD60 passes events to the UI
+u8 lbl_80281F19;
+u8 lbl_80281F18;
+
+s32 lbl_80189B38[8] = {0};
+UIButtonEvent lbl_80189B58[UI_NUM_BUTTON_EVENTS] = {
+    {0x1000, 0x0}, {0x800, 0x6}, {0x100, 0x7}, {0x8, 0x2},
+    {0x4, 0x3},    {0x1, 0x4},   {0x2, 0x5},   {0x200, 0x8},
+    {0x400, 0x9},  {0x40, 0xA},  {0x10, 0xC},  {0x0, 0xE},
+    {0x20, 0xB},   {0x10, 0xD},  {0x0, 0xF},   {0x0, 0x1},
+};
+s8 lbl_80281368 = -1;
 
 void fn_8008F80C(s32 p0, s32 p1);
 s32 fn_80092BC4();
@@ -115,6 +127,12 @@ void* fn_8008F610(u16 uGroup, u16 uScreen) {
 void fn_8008F644(u16 uGroup, u16 uScreen, void* pData) {
 }
 
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80283B78), before the 1.0f / 512.0f fn_8008F648 uses first; its body is unknown.
+static f32 uiProcessInterface_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 // Run and draw the UI for nTicks (while lbl_80281F1A is set), then step lbl_801D880C: counting
 // 0..2 up, and past 2 it is reset and its n4 sent to the menus (0x23) or the round (0x24).
 void fn_8008F648(s32 nTicks) {
@@ -203,7 +221,13 @@ void fn_8008F820(void) {
             }
         }
     }
-    lbl_801D87C0.n38 = 0;
+    // fake match: n38 is cleared through pPressed and pButtons (the same single store). This
+    // first use makes the frontend give their array uses below temps numbered after the input
+    // loop counter's (EA's r22/r23/r24), which the late loop's indexing then shares; the void*
+    // copy keeps pButtons's use from being propagated away.
+    pPressed = (u32*)&lbl_801D87C0.n38;
+    pButtons = (u32*)(void*)pPressed;
+    *pButtons = 0;
     fn_80005AE8(aArgs, 0, sizeof(aArgs));
     pButtons = aButtons;
     pPressed = aPressed;
@@ -267,17 +291,17 @@ void fn_8008F820(void) {
     }
     aArgs[0] = 0;
     if (lbl_801D87C0.b0 == 0 && fn_80077148() && lbl_801D87C0.b40 == 0) {
-        for (k = 0; k < 4; k++, pButtons++, pPressed++) {
+        for (k = 0; k < 4; k++) {
             if (lbl_801D87C0.a1[k] && lbl_801D87C0.a30[k]) {
                 if (gSession.nGameType != 6 || (gSession.nPaused != 2 && gSession.nPaused != 3)) {
                     pEvent = lbl_80189B58;
                     for (j = 0; j < UI_NUM_BUTTON_EVENTS; j++) {
-                        if (pEvent->uMask & *pPressed) {
+                        if (pEvent->uMask & pPressed[k]) {
                             fn_80168DB0(lbl_80281F1C->pHandler, k, pEvent->nEvent, 1, &fOne, 0);
                         }
                         pEvent++;
                     }
-                    if (*pButtons != 0 && gSession.nGameType == 3) {
+                    if (pButtons[k] != 0 && gSession.nGameType == 3) {
                         fn_8016B09C(lbl_80281F1C->pHandler, 0x22, 1, aArgs);
                     }
                 }
