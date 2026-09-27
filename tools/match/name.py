@@ -7,10 +7,12 @@ batch.tsv, tab-separated, one function per line (# lines skipped):
         T3 read from the code (docs/style.md "Names"); codes as in config/GW4E69/name_sources.tsv
         (E1 EA text, E2 TW06/TW07 name, E3 wrapper, E4 named data, E5 named neighbours, E6 the code);
   evidence: what in the code or the reference shows it; purpose: one line, what the function does;
-  comment (optional): the comment for a function that has none, written for a reader of the code
-        (what it does in the game, not how; read from the code, never contradicting it). It goes
-        above the definition, wrapped at 100 columns. A function that already has a comment keeps
-        it: a wrong one is reported, not overwritten here.
+  comment (optional): the function's whole comment, written for a reader of the code (what it
+        does in the game, units, what 0/NULL mean; read from the code, never contradicting it).
+        It goes above the definition, wrapped at 100 columns, REPLACING an existing // comment:
+        rewrite a comment that is wrong, stale or vague. Keep every `fake match:`, `port:` and
+        `EA bug:` label of the old comment (correct its text if stale): name.py refuses a row
+        that drops one.
 Steps, in order; the first failure stops it and puts every touched file back:
   1. every row checked: EA style name (System_Verb: `Mem_set`, `RenderState_SetDepthFunc`), tier,
      codes, evidence and purpose present; then rename.py --dry-run (current name at that address,
@@ -107,54 +109,75 @@ def update_markdown(rows):
 
 
 def wrap_comment(text, indent=''):
-    lines, cur = [], ''
-    for w in text.split():
-        if cur and len(indent) + 3 + len(cur) + 1 + len(w) > 100:
-            lines.append(cur)
-            cur = w
-        else:
-            cur = f'{cur} {w}' if cur else w
-    return [f'{indent}// {l}' for l in lines + [cur]]
+    """// lines of at most 100 columns; each fake match: / port: / EA bug: label starts a line."""
+    out = []
+    for part in re.split(r'\s+(?=(?:fake match:|port:|EA bug:))', text.strip()):
+        lines, cur = [], ''
+        for w in part.split():
+            if cur and len(indent) + 3 + len(cur) + 1 + len(w) > 100:
+                lines.append(cur)
+                cur = w
+            else:
+                cur = f'{cur} {w}' if cur else w
+        out += [f'{indent}// {l}' for l in lines + [cur]]
+    return out
+
+
+LABELS = ('fake match:', 'port:', 'EA bug:')
 
 
 def add_comments(rows):
-    """Insert column 8 above each definition that has no comment. Returns (added, skipped)."""
-    added, skipped = 0, []
+    """Column 8 becomes the comment above each definition: added where there is none, and REPLACING
+    the existing // block where there is one (owner, 2026-09-27: naming lanes own the comments of
+    the functions they touch). A replacement must keep every matching label of the old block
+    (fake match:, port:, EA bug:; the text after it may be corrected). Only the first definition in
+    a file is commented (an #else plain-C copy keeps its own note). Returns (added, replaced, errors)."""
+    added, replaced, errors = 0, 0, []
     want = {new: com for _, _, new, *rest in rows for com in [rest[-1]] if com}
     if not want:
-        return 0, []
-    files = [p for d in ('src',) for p in (ROOT / d).rglob('*.c')]
+        return 0, 0, []
     found = set()
-    for p in files:
+    for p in (ROOT / 'src').rglob('*.c'):
         raw = p.read_bytes().decode('utf-8', 'surrogateescape')
         eol = '\r\n' if '\r\n' in raw else '\n'
         lines = raw.split(eol)
-        changed = False
-        for i in range(len(lines) - 1, -1, -1):
-            l = lines[i]
+        defs = []
+        for i, l in enumerate(lines):
             m = re.match(r'^(?:asm |static |inline )*[A-Za-z_][^;=(]*?\b([A-Za-z_]\w*)\s*\([^;]*$', l)
-            if not m or m.group(1) not in want:
+            if not m or m.group(1) not in want or m.group(1) in found:
                 continue
             j = i + 1
             while j < len(lines) and '{' not in lines[j - 1] and not lines[j - 1].rstrip().endswith(';'):
                 j += 1
             if lines[j - 1].rstrip().endswith(';'):
                 continue                                    # a prototype, not the definition
-            name = m.group(1)
-            found.add(name)
+            found.add(m.group(1))
+            defs.append((i, m.group(1)))
+        for i, name in reversed(defs):
             top = i
             while top > 0 and lines[top - 1].startswith('#if'):
                 top -= 1
-            if top > 0 and lines[top - 1].lstrip().startswith(('//', '/*', '*')):
-                skipped.append(name)
+            first = top
+            while first > 0 and lines[first - 1].lstrip().startswith('//'):
+                first -= 1
+            if first > 0 and lines[first - 1].rstrip().endswith('*/'):
+                errors.append(f'{name}: has a /* */ comment; edit it by hand')
                 continue
-            lines[top:top] = wrap_comment(want[name])
-            added += 1
-            changed = True
-        if changed:
+            old = ' '.join(l.strip()[2:].strip() for l in lines[first:top])
+            lost = [lab for lab in LABELS if old.count(lab) > want[name].count(lab)]
+            if lost:
+                errors.append(f'{name}: the new comment drops {", ".join(lost)} from the old one: '
+                              f'keep the label (correct its text if it is stale). Old: {old[:200]}')
+                continue
+            lines[first:top] = wrap_comment(want[name])
+            if first < top:
+                replaced += 1
+            else:
+                added += 1
+        if defs:
             p.write_bytes(eol.join(lines).encode('utf-8', 'surrogateescape'))
-    skipped += [f'{n} (definition not found)' for n in want if n not in found]
-    return added, list(dict.fromkeys(skipped))
+    errors += [f'{n}: definition not found' for n in want if n not in found]
+    return added, replaced, errors
 
 
 def main():
@@ -191,7 +214,9 @@ def main():
     if r is not None and r.returncode:
         restore('rename.py failed:\n' + r.stdout + r.stderr)
     md = update_markdown(renames) if renames else 0
-    ncom, kept = add_comments(rows)
+    ncom, nrep, cerr = add_comments(rows)
+    if cerr:
+        restore('comment rows refused:\n  ' + '\n  '.join(cerr))
     for _ in range(10):         # a reflowed comment spills into its next line: repeat until stable
         before_wrap = run(['git', 'diff', '--stat']).stdout + run(['git', 'diff']).stdout[-4000:]
         run([PY, 'tools/match/wraplong.py', '--from-lint', '--diff', 'HEAD'])
@@ -214,7 +239,7 @@ def main():
     left = [l for l in lint.splitlines() if re.match(r'^\S+:\d+: ', l)]
     print(f'name.py: {len(renames)} name(s) applied' + (f' ({r.stdout.strip()})' if r else '')
           + f'; {md} Markdown mention(s) updated')
-    print(f'comments added: {ncom}' + (f'; kept the existing comment of: {", ".join(kept)}' if kept else ''))
+    print(f'comments added: {ncom}; replaced: {nrep}')
     print('main.dol: OK')
     print(f'call sites to named functions: {before:.2f}% -> {after:.2f}%')
     if left:
