@@ -1162,6 +1162,7 @@ GameModeDriverRTE.c:
 
 GameModeReplay.c:
 	.text       start:0x800F125C end:0x800F19D4
+	.bss        start:0x80211D38 end:0x80211FB8
 	.sdata2     start:0x80284688 end:0x802846A0
 
 GameTargets.c:
