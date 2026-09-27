@@ -167,6 +167,10 @@ void fn_8001C650(void* arg0, s32 arg1);
 
 // ---- end of sweep code ----
 
+// This file's .sbss (charstate.h), in reverse address order as the compiler lays it out.
+s32 lbl_80281CAC;
+s32 lbl_80281CA8;
+
 CharModelDefs lbl_80280E10 = { lbl_80186E80, 2 };
 CharModelDefs lbl_80280E18 = { lbl_80186EA0, 2 };
 s32 lbl_80280E20 = 3;
