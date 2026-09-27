@@ -82,7 +82,7 @@ extern FrontEnd* lbl_80281F1C;
 // uiProcessInterface.c's controller input (fn_8008F820): which UI event each button sends.
 typedef struct UIButtonEvent {
     u32 uMask;                  // 0x0  the button's bit in fn_800136DC's pressed-this-frame half
-    s32 nEvent;                 // 0x4  the event fn_80168DB0 sends the UI
+    s32 nEvent;                 // 0x4  the event UISProcessEvent sends the UI
 } UIButtonEvent;
 #define UI_NUM_BUTTON_EVENTS 16
 extern UIButtonEvent lbl_80189B58[UI_NUM_BUTTON_EVENTS];
@@ -147,7 +147,7 @@ typedef void (*MsgHandler)(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007BCA4(MsgArg* pArgs, MsgArg* pResult);  // FE_MessageTable.c: fn_80079AD4 (DiscCheck.c
                                         // calls it directly, with no values)
 
-// Messages to a front-end handler (FrontEnd.pHandler) go through fn_8016B0F8 (UISScreen.c; its
+// Messages to a front-end handler (FrontEnd.pHandler) go through UISDoHint (UISScreen.c; its
 // prototype is in frontend/uistudio.h). The values are passed as an s32 array.
 
 // A menu UI arc (uiArc.c): nSegments pieces from fStart to fEnd degrees, shaded from colour

@@ -102,8 +102,8 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     pMtx = fn_80093274();
     pColour = fn_80093274();
     pAdd = fn_80093274();
-    lbl_80282458 = fn_8016C198()->a;
-    lbl_8028245C = fn_8016C18C()->a;
+    lbl_80282458 = UISGetColorMultipler()->a;
+    lbl_8028245C = UISGetColorAdditive()->a;
     if (pArc->n2 != -1) {
         pEntry = lbl_80281F1C->pFile->p8->apTables[pArc->n2]->apEntries[pArc->n0];
         pName = pEntry->szC;    // fake match: EA takes the name's address before the flag tests

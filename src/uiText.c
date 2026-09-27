@@ -8,8 +8,8 @@
 #include "game/frontend.h"
 #include "frontend/uisvec.h"
 
-// The file's globals: the UI Studio's colour multiply and add (fn_8016C198, fn_8016C18C), read
-// again at each draw.
+// The file's globals: the UI Studio's colour multiply and add (UISGetColorMultipler,
+// UISGetColorAdditive), read again at each draw.
 UISVec4* lbl_80281F34;
 UISVec4* lbl_80281F30;
 
@@ -62,8 +62,8 @@ void fn_800922A8(UIText* pText) {
     uFlags = 0;
     szText = ((MsgString*)((u8*)pText + pText->nText))->pStr;
     t = *fn_80093274();
-    lbl_80281F30 = fn_8016C198();
-    lbl_80281F34 = fn_8016C18C();
+    lbl_80281F30 = UISGetColorMultipler();
+    lbl_80281F34 = UISGetColorAdditive();
     t.m[3][0] = 512.0f * (t.m[3][0] / 512.0f);
     t.m[3][1] = 448.0f * (t.m[3][1] / 448.0f);
     Vec_Copy(t.m[0], m[0]);

@@ -9,7 +9,7 @@
 // step script (if any) gives the step's scale, the variable moves by fStep times it, and once it
 // reaches fTarget the function finishes and its done script (or the first node's event -14
 // handler) runs.
-void fn_8016A030(UIStudio* pStudio, u32 uMs) {
+void _ParseRateFncs(UIStudio* pStudio, u32 uMs) {
     // fake match: this declaration order (with uMsCopy and the pfVar identity below) gives EA's
     // registers: n, pArg1, pArg2 and uMsCopy leave the allocator's graph before the others.
     u32 uMsCopy;
@@ -37,7 +37,7 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs) {
     uMsCopy = (u32)((u64)uMs | ((u64)uMs << 32));
     uMsCopy = (u32)((u64)uMsCopy | ((u64)uMsCopy << 32));
     uMsCopy = (u32)((u64)uMsCopy | ((u64)uMsCopy << 32));
-    fn_80165C74(pStudio);
+    UISRemoveUnNessaryRateFncs(pStudio);
     pStack = &pStudio->stack78;
     pStudio->uFlags |= 4;
     n = pStudio->nRateFns;
@@ -72,14 +72,14 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs) {
                 } else {
                     nArgs = 2;
                 }
-                fn_8016C270(pStudio, pScreen, pRate->pNodeInfo, pStack, pRate->pStepScript, nArgs, aArgs, 0,
-                            NULL, 0, -1, &wScale.n);
+                UISExecuteFnc(pStudio, pScreen, pRate->pNodeInfo, pStack, pRate->pStepScript, nArgs, aArgs, 0,
+                              NULL, 0, -1, &wScale.n);
                 fScale = wScale.f;
             } else {
                 fScale = 1.0f;
             }
             if (pRate->u20 != 0) {
-                pfVar = fn_8016C1A4(pRate->u20, pRate->pInfo);
+                pfVar = UISGetActionPtrValue(pRate->u20, pRate->pInfo);
                 // fake match: pfVar goes through a 64-bit shift up and back down (the value is
                 // unchanged). The copy of the call's result it leaves is merged at register
                 // allocation and stays a neighbour of every variable live here: one more for each
@@ -101,14 +101,14 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs) {
                     pRate->uState = 1;
                     if (pRate->pDoneScript != NULL) {
                         aArgs[0] = pRate->uId;
-                        fn_8016C270(pStudio, pScreen, pRate->pNodeInfo, pStack, pRate->pDoneScript, 1, aArgs,
-                                    0, NULL, 0, -1, NULL);
+                        UISExecuteFnc(pStudio, pScreen, pRate->pNodeInfo, pStack, pRate->pDoneScript, 1,
+                                      aArgs, 0, NULL, 0, -1, NULL);
                     } else {
-                        pScript = fn_8016C674(pScreen->pData->pNodes, -14);
+                        pScript = UISFindEventPC(pScreen->pData->pNodes, -14);
                         if (pScript != NULL) {
                             aArgs[0] = pRate->uId;
-                            fn_8016C270(pStudio, pScreen, pRate->pNodeInfo, pStack, pScript, 1, aArgs, 0,
-                                        NULL, 0, -1, NULL);
+                            UISExecuteFnc(pStudio, pScreen, pRate->pNodeInfo, pStack, pScript, 1, aArgs, 0,
+                                          NULL, 0, -1, NULL);
                         }
                     }
                 }
@@ -116,7 +116,7 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs) {
         }
     }
     pStudio->uFlags &= ~4;
-    fn_80165C74(pStudio);
+    UISRemoveUnNessaryRateFncs(pStudio);
 }
 
 // Turns a file offset stored in a pointer field into the pointer.
@@ -139,7 +139,7 @@ static inline void* UISFile_Fix(UISScreenFile* pFile, void* p) {
 // `mr rD,rS` (the same encoding); the three use different integer types so the frontend does not
 // share one OR between the loops.
 // port: the fixes add 32-bit offsets to the file's address held in an integer.
-s32 fn_80169DC4(UISScreenFile* pFile) {
+s32 PatchScrData(UISScreenFile* pFile) {
     u32 nOff;
     u32 nBase1;
     u32 i;
@@ -222,19 +222,19 @@ s32 fn_80169DC4(UISScreenFile* pFile) {
     return -1;
 }
 
-// The size of the block fn_80169C0C builds, for the given table sizes. The screen table has one
+// The size of the block UISInit builds, for the given table sizes. The screen table has one
 // more entry's worth of room: the current record (UISCurrent, the same size).
 // fake match: the screen table's size as a 64-bit product (low word = (nScreens + 1) * 20); its
 // dead high word (li 20; mulhw) moves the handlers shift to the second slot of the pre-allocation
 // schedule as in the original, and is deleted after register allocation.
 // port: the product is truncated to 32 bits.
-u32 fn_80169D90(u32 nScreens, u32 nHandlers, u32 nRateFns, u32 n60, u32 nEventWords, u32 nWords2) {
+u32 UISGetMemSize(u32 nScreens, u32 nHandlers, u32 nRateFns, u32 n60, u32 nEventWords, u32 nWords2) {
     return sizeof(UIStudio) + (u32)((s32)(nScreens + 1) * (s64)sizeof(UISScreen)) +
            nHandlers * sizeof(UISHandlerFn) + nRateFns * sizeof(UISRateFn) + n60 * sizeof(UISRecord60) +
            (nWords2 + nEventWords) * sizeof(s32);
 }
 
-// Sets the studio up in the block at pStudio (fn_80169D90 bytes): the header, then each table in
+// Sets the studio up in the block at pStudio (UISGetMemSize bytes): the header, then each table in
 // turn, the current record and the two word stacks.
 // fake match: optimization level 2 for this function only, the four table counts are copies of
 // the parameters, and the three non-power-of-two table sizes are 64-bit products (low word = the
@@ -243,8 +243,8 @@ u32 fn_80169D90(u32 nScreens, u32 nHandlers, u32 nRateFns, u32 n60, u32 nEventWo
 // in r12, the 0xFFFF in r31 and each table pointer computed after the one before it is stored.
 // port: the products are truncated to 32 bits.
 #pragma optimization_level 2
-void fn_80169C0C(UIStudio* pStudio, u32 nScreensArg, u32 nHandlersArg, u32 nRateFnsArg, u32 n60Arg,
-                 u32 nEventWords, u32 nWords2, u32 uMsPerTick) {
+void UISInit(UIStudio* pStudio, u32 nScreensArg, u32 nHandlersArg, u32 nRateFnsArg, u32 n60Arg,
+             u32 nEventWords, u32 nWords2, u32 uMsPerTick) {
     u32 uOffset;
     u32 nScreens = nScreensArg;
     u32 nHandlers = nHandlersArg;
@@ -297,13 +297,13 @@ void fn_80169C0C(UIStudio* pStudio, u32 nScreensArg, u32 nHandlersArg, u32 nRate
     pStudio->pfnUnload = NULL;
     pStudio->pfnScreen24 = NULL;
     pStudio->pfnScreen28 = NULL;
-    lbl_80282A28 = NULL;
+    RuntimeErrorFnc = NULL;
 }
 #pragma optimization_level reset
 
 // Unloads every screen, the last one first (event 1 with one argument, 0), then marks the
 // studio as no longer set up.
-void fn_80169B4C(UIStudio* pStudio) {
+void UISShutdown(UIStudio* pStudio) {
     s32 i;
     UISScreen* pScreen;
     s32 nArg;
@@ -319,14 +319,14 @@ void fn_80169B4C(UIStudio* pStudio) {
         nArg = 0;
         data.aw[0] = uGroup;
         data.aw[1] = uScreen;
-        fn_80165B90(uGroup, uScreen, pStudio, 1, &data, 1, &nArg);
-        fn_80165528(pStudio, 0);
+        UISAddThreadAction(uGroup, uScreen, pStudio, 1, &data, 1, &nArg);
+        UISProcessThreadAction(pStudio, 0);
     }
     pStudio->uMagic = 0;
     pStudio->bUnloadingAll = 0;
 }
 
-void fn_80169B44(UIStudio* pStudio, UISCommandFn pfnCommand) {
+void UISRegisterMessageFnc(UIStudio* pStudio, UISCommandFn pfnCommand) {
     pStudio->pfnCommand = pfnCommand;
 }
 
@@ -334,16 +334,16 @@ void fn_80169B3C(UIStudio* pStudio, UISScreenDataFn pfnScreen28) {
     pStudio->pfnScreen28 = pfnScreen28;
 }
 
-void fn_80169B30(UIStudio* pStudio, UISLoadFn pfnLoad, UISUnloadFn pfnUnload) {
+void UISRegisterResourceFncs(UIStudio* pStudio, UISLoadFn pfnLoad, UISUnloadFn pfnUnload) {
     pStudio->pfnLoad = pfnLoad;
     pStudio->pfnUnload = pfnUnload;
 }
 
-void fn_80169B28(UIStudio* pStudio, UISTransformFn pfnTransform) {
+void UISRegisterTransformFncs(UIStudio* pStudio, UISTransformFn pfnTransform) {
     pStudio->pfnTransform = pfnTransform;
 }
 
-void fn_80169B0C(UIStudio* pStudio, s32 nIndex, UISHandlerFn pfnHandler) {
+void UISRegisterPluginFnc(UIStudio* pStudio, s32 nIndex, UISHandlerFn pfnHandler) {
     pStudio->ppfnHandlers[nIndex] = pfnHandler;
     pStudio->nHandlers++;
 }
@@ -357,9 +357,9 @@ static inline s32 Screen_BringBack(UIStudio* pStudio, u16 uGroup, u16 uScreen, u
     u32 n;
     u8 bOut;
 
-    i = fn_8016C6C4(pStudio, uGroup, uScreen);
+    i = UISFindScreen(pStudio, uGroup, uScreen);
     pScreen = &pStudio->pScreens[i];
-    fn_80165C74(pStudio);
+    UISRemoveUnNessaryRateFncs(pStudio);
     pStudio->uFlags |= 4;
     n = pStudio->nRateFns;
     for (i = 0; i < n; i++) {
@@ -368,14 +368,14 @@ static inline s32 Screen_BringBack(UIStudio* pStudio, u16 uGroup, u16 uScreen, u
         }
     }
     pStudio->uFlags &= ~4;
-    fn_80165C74(pStudio);
+    UISRemoveUnNessaryRateFncs(pStudio);
     pScreen->pData->pNodes[0].pInfo->u4 = 1;
     bOut = 0;
     if (nArgs == 0xFF) {
         nArgs = pArgs[10];
     }
     pStudio->uFlags |= 2;
-    fn_8016A2D4(pStudio, pScreen, &pStudio->stack64, 0, -1, -2, nArgs, pArgs, &bOut);
+    _ParseMaps(pStudio, pScreen, &pStudio->stack64, 0, -1, -2, nArgs, pArgs, &bOut);
     pStudio->uFlags &= ~2;
     return 0;
 }
@@ -384,8 +384,8 @@ static inline s32 Screen_BringBack(UIStudio* pStudio, u16 uGroup, u16 uScreen, u
 // screen to go back to. Its UI file is fixed up (event -9 when that was its first time), its
 // nodes are set up and it gets event -2 with the arguments. A loaded screen is brought back
 // instead. Returns 0 when the load callback gave nothing or the screen was already loaded.
-s32 fn_80169858(UIStudio* pStudio, u16 uGroup, u16 uScreen, u16 uPrevGroup, u16 uPrevScreen, u8 nArgs,
-                s32* pArgs) {
+s32 UISInternalLoadScreen(UIStudio* pStudio, u16 uGroup, u16 uScreen, u16 uPrevGroup, u16 uPrevScreen,
+                          u8 nArgs, s32* pArgs) {
     u32 nIndex;
     void* pFile;
     UISScreen* pScreen;
@@ -395,7 +395,7 @@ s32 fn_80169858(UIStudio* pStudio, u16 uGroup, u16 uScreen, u16 uPrevGroup, u16 
     // fake match: nScreens and nIndex go through s32 -> s64 -> u32 (the values are unchanged);
     // the dead high words give uGroup, uScreen and uPrevGroup the neighbours that put them in
     // pStudio's allocation level, so they take EA's r25-r27 above pStudio's r24
-    nIndex = fn_8016C6C4(pStudio, uGroup, uScreen);
+    nIndex = UISFindScreen(pStudio, uGroup, uScreen);
     if (nIndex < (u32)(s64)(s32)pStudio->nScreens) {
         return Screen_BringBack(pStudio, uGroup, uScreen, nArgs, pArgs);
     }
@@ -410,36 +410,36 @@ s32 fn_80169858(UIStudio* pStudio, u16 uGroup, u16 uScreen, u16 uPrevGroup, u16 
     pScreen->uMask = 0;
     pScreen->bUnloading = 0;
     pScreen->pData = pFile;
-    bFixed = fn_80169DC4(pScreen->pData);
+    bFixed = PatchScrData(pScreen->pData);
     // fake match: bFixed goes through a 64-bit shift up and back down (the value is unchanged).
     // The shifts become a chain of word copies after bFixed; each copy-propagation pass removes
     // one link, so bFixed's copy from the call result survives them all (EA's mr r0,r3 ...
     // mr r25,r0).
     // port: relies on the conversion to s64 wrapping and on >> of a negative s64 being arithmetic.
     bFixed = (s32)((s64)((u64)bFixed << 32) >> 32);
-    fn_8016AEEC(pStudio, pScreen, 0, -1);
+    _ParseInitialize(pStudio, pScreen, 0, -1);
     pScreen->pData->pNodes[0].pInfo->u4 = 1;
     if (bFixed) {
         bOut = 0;
         pStudio->uFlags |= 2;
-        fn_8016A2D4(pStudio, pScreen, &pStudio->stack64, 0, -1, -9, 0, NULL, &bOut);
+        _ParseMaps(pStudio, pScreen, &pStudio->stack64, 0, -1, -9, 0, NULL, &bOut);
         pStudio->uFlags &= ~2;
     }
-    fn_8016A830(pStudio, 0, pScreen, 0);
+    _ParseTransforms(pStudio, 0, pScreen, 0);
     bOut = 0;
     if (nArgs == 0xFF) {
         nArgs = pArgs[10];
     }
     pStudio->uFlags |= 2;
-    fn_8016A2D4(pStudio, pScreen, &pStudio->stack64, 0, -1, -2, nArgs, pArgs, &bOut);
+    _ParseMaps(pStudio, pScreen, &pStudio->stack64, 0, -1, -2, nArgs, pArgs, &bOut);
     pStudio->uFlags &= ~2;
     return 1;
 }
 
 // Goes to a screen. A loaded one is brought back; otherwise it is loaded, and with bPush (forced
 // while p60 holds records) a p60 record is pushed for it that remembers the screen that was
-// current and the new screen's first node. Returns what fn_80169858 returned.
-s32 fn_80169590(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 bPush, u8 nArgs, s32* pArgsArg) {
+// current and the new screen's first node. Returns what UISInternalLoadScreen returned.
+s32 _UISInternalLoad(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 bPush, u8 nArgs, s32* pArgsArg) {
     s16 nPrevGroup;
     UISRecord60* pRec;
     s16 nPrevScreen;
@@ -463,7 +463,7 @@ s32 fn_80169590(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 bPush, u8 nArgs, 
         nPrevGroup = pStudio->pScreens[pStudio->nCurScreen].uGroup;
         nPrevScreen = pStudio->pScreens[pStudio->nCurScreen].uScreen;
     }
-    bLoaded = fn_8016C6C4(pStudio, uGroup, uScreen) < pStudio->nScreens;
+    bLoaded = UISFindScreen(pStudio, uGroup, uScreen) < pStudio->nScreens;
     if (bLoaded == 1) {
         return Screen_BringBack(pStudio, uGroup, uScreen, nArgs, pArgs);
     }
@@ -478,15 +478,15 @@ s32 fn_80169590(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 bPush, u8 nArgs, 
         pRec->u24 = uScreen;
         pStudio->n5C++;
     }
-    nResult = fn_80169858(pStudio, uGroup, uScreen, nPrevGroup, nPrevScreen, nArgs, pArgs);
+    nResult = UISInternalLoadScreen(pStudio, uGroup, uScreen, nPrevGroup, nPrevScreen, nArgs, pArgs);
     if (bPush) {
-        uIndex = fn_8016C6C4(pStudio, uGroup, uScreen);
+        uIndex = UISFindScreen(pStudio, uGroup, uScreen);
         if (uIndex < (s32)pStudio->nScreens) {  // fake match: this compare is signed
             pRec = &pStudio->p60[nRecord];
             // fake match: the screen addressed by byte offset (EA's addi r0,r5,0x10; lwzx)
             pRec->pInfo =
                 ((UISScreen*)((u8*)pStudio->pScreens + uIndex * sizeof(UISScreen)))->pData->pNodes[0].pInfo;
-            uIndex = fn_8016C6C4(pStudio, nPrevGroup, nPrevScreen);
+            uIndex = UISFindScreen(pStudio, nPrevGroup, nPrevScreen);
             if (uIndex < (s32)pStudio->nScreens) {  // fake match: this compare is signed
                 pRec->pScreen = &pStudio->pScreens[uIndex];
             }
@@ -499,13 +499,13 @@ s32 fn_80169590(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 bPush, u8 nArgs, 
 
 // Makes pFile the studio's UI file (pCurrent->p10), fixing up its offsets unless it already is
 // that file. Returns whether the file can be used; a file that cannot is dropped.
-u8 fn_80169520(UIStudio* pStudio, UISScreenFile* pFile) {
+u8 UISSetGlobalScript(UIStudio* pStudio, UISScreenFile* pFile) {
     u8 bOk;
 
     bOk = 0;
     if (pFile != NULL) {
         if (pFile != pStudio->pCurrent->p10) {
-            bOk = fn_80169DC4(pFile);
+            bOk = PatchScrData(pFile);
             if (!bOk) {
                 pFile = NULL;
             }
@@ -522,7 +522,7 @@ u8 fn_80169520(UIStudio* pStudio, UISScreenFile* pFile) {
 // parameters. At level 4 the extra copy-propagation passes fold uScreen into r5 before the
 // argument setup, so pStudio is copied out of r3 instead of EA's `mr r8,r5` copy of uScreen.
 #pragma optimization_level 2
-s32 fn_801694A0(UIStudio* pStudio, u16 uGroupArg, u16 uScreenArg, u8 nArgs, s32* pArgs) {
+s32 UISLoadScreen(UIStudio* pStudio, u16 uGroupArg, u16 uScreenArg, u8 nArgs, s32* pArgs) {
     UISEventData data;
     u16 uGroup;
     u16 uScreen;
@@ -534,9 +534,9 @@ s32 fn_801694A0(UIStudio* pStudio, u16 uGroupArg, u16 uScreenArg, u8 nArgs, s32*
         data.aw[1] = uScreen;
         data.aw[2] = 0xFFFF;
         data.aw[3] = 0xFFFF;
-        fn_80165B90(uGroup, uScreen, pStudio, 0, &data, nArgs, pArgs);
+        UISAddThreadAction(uGroup, uScreen, pStudio, 0, &data, nArgs, pArgs);
     } else {
-        return fn_80169590(pStudio, uGroup, uScreen, 0, nArgs, pArgs);
+        return _UISInternalLoad(pStudio, uGroup, uScreen, 0, nArgs, pArgs);
     }
     return 1;
 }
@@ -545,7 +545,7 @@ s32 fn_801694A0(UIStudio* pStudio, u16 uGroupArg, u16 uScreenArg, u8 nArgs, s32*
 // Called before a screen is unloaded. If the last p60 record names the screen, it is dropped:
 // the screen it holds becomes current, and its paused script runs on with n on the top of its
 // stack. Returns 0 when an older record names the screen, or holds it: it cannot go yet.
-u8 fn_80169308(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
+u8 UISInternalUnloadModal(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
     s32 i;
     UISRecord60* pRec;
     UISScreen* pScreen;
@@ -561,7 +561,7 @@ u8 fn_80169308(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
             // takes EA's r29 above pFrame and p1C
             pStudio->n5C = (s64)(i - 1);
             if (pRec->pScreen != NULL) {
-                pStudio->nCurScreen = fn_8016C6C4(pStudio, pRec->pScreen->uGroup, pRec->pScreen->uScreen);
+                pStudio->nCurScreen = UISFindScreen(pStudio, pRec->pScreen->uGroup, pRec->pScreen->uScreen);
             } else {
                 pStudio->nCurScreen = -1;
                 return 1;
@@ -572,7 +572,7 @@ u8 fn_80169308(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
                     pFrame = pRec->pFrame;
                     *pFrame = pRec->frame;
                     pFrame->pC[-1] = n;
-                    if (fn_80166098(pStudio, pRec->p1C, pFrame, pRec->pScreen, pRec->pInfo) != 3) {
+                    if (UISStackProcess(pStudio, pRec->p1C, pFrame, pRec->pScreen, pRec->pInfo) != 3) {
                         pFrame->pC = p1C;
                     }
                 }
@@ -590,11 +590,11 @@ u8 fn_80169308(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
 }
 
 // Unloads a screen. Screens that named it as their previous screen take its previous screen
-// instead; it gets event -1 and the type 9 events queued for it (fn_80165ACC), its nodes and rate
+// instead; it gets event -1 and the type 9 events queued for it (UISThreadProcessHints), its nodes and rate
 // functions are dropped, the unload callback frees its data and the table closes up. With no
 // current screen left, its previous screen (or the last one) becomes current through event 3.
-// Returns 0 when fn_80169308 says the screen cannot go yet.
-u8 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
+// Returns 0 when UISInternalUnloadModal says the screen cannot go yet.
+u8 UISInternalUnloadScreen(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
     UISScreen* pScreen;
     UISScreen* pSrc;
     UISScreen* pOther;
@@ -606,12 +606,12 @@ u8 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
     u8 bOut;
     u32 j;
 
-    nIndex = fn_8016C6C4(pStudio, uGroup, uScreen);
+    nIndex = UISFindScreen(pStudio, uGroup, uScreen);
     if (nIndex < pStudio->nScreens) {
         pScreen = &pStudio->pScreens[nIndex];
         uPrevGroup = pScreen->uPrevGroup;
         uPrevScreen = pScreen->uPrevScreen;
-        if (!fn_80169308(pStudio, uGroup, uScreen, n)) return 0;
+        if (!UISInternalUnloadModal(pStudio, uGroup, uScreen, n)) return 0;
         if (nIndex == pStudio->nCurScreen) {
             pStudio->nCurScreen = -1;
         }
@@ -624,18 +624,18 @@ u8 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
         }
         bOut = 0;
         pStudio->uFlags |= 2;
-        fn_8016A2D4(pStudio, pScreen, &pStudio->stack64, 0, -1, -3, 0, NULL, &bOut);
+        _ParseMaps(pStudio, pScreen, &pStudio->stack64, 0, -1, -3, 0, NULL, &bOut);
         pStudio->uFlags &= ~2;
-        fn_80165ACC(pStudio, uGroup, uScreen);
-        fn_8016AEEC(pStudio, pScreen, 0, -3);
-        fn_8016A830(pStudio, 3, pScreen, 0);
+        UISThreadProcessHints(pStudio, uGroup, uScreen);
+        _ParseInitialize(pStudio, pScreen, 0, -3);
+        _ParseTransforms(pStudio, 3, pScreen, 0);
         j = pStudio->nRateFns;
         while (j-- != 0) {
             if (pStudio->pRateFns[j].pScreen == pScreen) {
                 pStudio->pRateFns[j].uState = 1;
             }
         }
-        fn_80165C74(pStudio);
+        UISRemoveUnNessaryRateFncs(pStudio);
         pStudio->pfnUnload(pScreen->uGroup, pScreen->uScreen, pScreen->pData);
         pScreen->pData = NULL;
         pStudio->nScreens--;
@@ -661,7 +661,7 @@ u8 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
         }
         if (pStudio->nCurScreen == -1) {
             if (pStudio->nScreens != 0) {
-                pStudio->nCurScreen = fn_8016C6C4(pStudio, uPrevGroup, uPrevScreen);
+                pStudio->nCurScreen = UISFindScreen(pStudio, uPrevGroup, uPrevScreen);
                 if (pStudio->nCurScreen < pStudio->nScreens) {
                     pScreen = &pStudio->pScreens[pStudio->nCurScreen];
                 } else {
@@ -671,7 +671,7 @@ u8 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
                 if (pScreen != NULL) {
                     data.aw[0] = pScreen->uGroup;
                     data.aw[1] = pScreen->uScreen;
-                    fn_80165B90(data.aw[0], data.aw[1], pStudio, 3, &data, 0, NULL);
+                    UISAddThreadAction(data.aw[0], data.aw[1], pStudio, 3, &data, 0, NULL);
                 }
             } else {
                 pStudio->nCurScreen = -1;
@@ -684,22 +684,22 @@ u8 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
 // Queues event 3 for a screen and runs the queue, unless an event is being sent right now.
 // fake match: optimization level 1 for this function only. At level 4 the copy-propagation passes
 // fold uScreen into r5 before the argument setup, so pStudio is set after the extsh's instead of
-// EA's `mr r0,r5` copy of uScreen and `mr r5,r31` first (see fn_801694A0).
+// EA's `mr r0,r5` copy of uScreen and `mr r5,r31` first (see UISLoadScreen).
 #pragma optimization_level 1
-void fn_80168F5C(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
+void UISSetScreenActive(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
     UISEventData data;
 
     data.aw[0] = uGroup;
     data.aw[1] = uScreen;
-    fn_80165B90(uGroup, uScreen, pStudio, 3, &data, 0, NULL);
+    UISAddThreadAction(uGroup, uScreen, pStudio, 3, &data, 0, NULL);
     if (!(pStudio->uFlags & 2)) {
-        fn_80165528(pStudio, 0);
+        UISProcessThreadAction(pStudio, 0);
     }
 }
 #pragma optimization_level reset
 
 // Returns the current screen's group and screen IDs, 0xFFFF when there is no current screen.
-void fn_80168EE8(UIStudio* pStudio, u16* puGroup, u16* puScreen) {
+void UISGetActiveScreen(UIStudio* pStudio, u16* puGroup, u16* puScreen) {
     if (puGroup != NULL) {
         *puGroup = 0xFFFF;
         if (pStudio->nCurScreen != -1) {
@@ -717,7 +717,7 @@ void fn_80168EE8(UIStudio* pStudio, u16* puGroup, u16* puScreen) {
 // Runs the queued events, makes the screen named by the last p60 record current, then sends
 // event uEvent to it (or to every screen when bAll is set) unless the screen has taken it
 // already; with n < 0 it is sent again.
-void fn_80168DB0(UIStudio* pStudio, u32 uEvent, s32 n, s32 b, void* p, u8 bAll) {
+void UISProcessEvent(UIStudio* pStudio, u32 uEvent, s32 n, s32 b, void* p, u8 bAll) {
     s32 nLast;
     u32 i;
     u32 nEnd;
@@ -725,10 +725,10 @@ void fn_80168DB0(UIStudio* pStudio, u32 uEvent, s32 n, s32 b, void* p, u8 bAll) 
     s32 nTaken;
     u8 bOut;
 
-    fn_80165528(pStudio, 0);
+    UISProcessThreadAction(pStudio, 0);
     nLast = pStudio->n5C - 1;
     if (nLast >= 0) {
-        pStudio->nCurScreen = fn_8016C6C4(pStudio, pStudio->p60[nLast].u26, pStudio->p60[nLast].u24);
+        pStudio->nCurScreen = UISFindScreen(pStudio, pStudio->p60[nLast].u26, pStudio->p60[nLast].u24);
     }
     if (bAll) {
         nEnd = pStudio->nScreens;
@@ -746,7 +746,7 @@ void fn_80168DB0(UIStudio* pStudio, u32 uEvent, s32 n, s32 b, void* p, u8 bAll) 
             bOut = 0;
             pStudio->uFlags |= 2;
             // fake match: the (int) cast sets uEvent's register (an int uEvent parameter does the same)
-            fn_8016A2D4(pStudio, pScreen, &pStudio->stack64, 0, (int)uEvent, n, b, p, &bOut);
+            _ParseMaps(pStudio, pScreen, &pStudio->stack64, 0, (int)uEvent, n, b, p, &bOut);
             pStudio->uFlags &= ~2;
         }
     }
@@ -754,7 +754,8 @@ void fn_80168DB0(UIStudio* pStudio, u32 uEvent, s32 n, s32 b, void* p, u8 bAll) 
 
 // Sends event uEvent to the current screen, or to every screen when bAll is set. Event -8 skips
 // a screen that is being unloaded.
-void fn_80168CD8(UIStudio* pStudio, UISWordStack* pStack, int uEvent, u32 n, s32 b, void* p, u8 bAll) {
+void UISProcessInternalEvents(UIStudio* pStudio, UISWordStack* pStack, int uEvent, u32 n, s32 b, void* p,
+                              u8 bAll) {
     u32 i;
     u32 nEnd;
     UISScreen* pScreen;
@@ -775,23 +776,23 @@ void fn_80168CD8(UIStudio* pStudio, UISWordStack* pStack, int uEvent, u32 n, s32
         pScreen = &pStudio->pScreens[i];
         if (n != -8 || pScreen->bUnloading != 1) {
             bOut = 0;
-            fn_8016A2D4(pStudio, pScreen, pStack, 0, uEvent, n, b, p, &bOut);
+            _ParseMaps(pStudio, pScreen, pStack, 0, uEvent, n, b, p, &bOut);
         }
     }
 }
 
 // Runs the studio for nTicks ticks, then updates every screen.
-void fn_80168C24(UIStudio* pStudio, s32 nTicks) {
+void UISDrawObjects(UIStudio* pStudio, s32 nTicks) {
     u32 uMs;
     u32 i;
     u32 n;
 
     uMs = pStudio->uMsPerTick * nTicks;
-    fn_8016C174(1.0f, 1.0f, 1.0f, 1.0f);
-    fn_8016C15C(0.0f, 0.0f, 0.0f, 0.0f);
-    fn_8016A030(pStudio, uMs);
+    UISSetColorMultipler(1.0f, 1.0f, 1.0f, 1.0f);
+    UISSetColorAdditive(0.0f, 0.0f, 0.0f, 0.0f);
+    _ParseRateFncs(pStudio, uMs);
     n = pStudio->nScreens;
     for (i = 0; i < n; i++) {
-        fn_8016A510(pStudio, &pStudio->pScreens[i], NULL, -2);
+        _ParseObjects(pStudio, &pStudio->pScreens[i], NULL, -2);
     }
 }

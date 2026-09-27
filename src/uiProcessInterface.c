@@ -157,7 +157,7 @@ void fn_8008F648(s32 nTicks) {
         fn_80012C54_SetWordWrap(1);
         fn_800908D4(0.85f);
         if (lbl_80281F1C != NULL) {
-            fn_80168C24(lbl_80281F1C->pHandler, nTicks);
+            UISDrawObjects(lbl_80281F1C->pHandler, nTicks);
         }
         fn_800908D4(1.0f);
         fn_80012C54_SetWordWrap(0);
@@ -301,7 +301,7 @@ void fn_8008F820(void) {
                     pEvent = lbl_80189B58;
                     for (j = 0; j < UI_NUM_BUTTON_EVENTS; j++) {
                         if (pEvent->uMask & pPressed[k]) {
-                            fn_80168DB0(lbl_80281F1C->pHandler, k, pEvent->nEvent, 1, &fOne, 0);
+                            UISProcessEvent(lbl_80281F1C->pHandler, k, pEvent->nEvent, 1, &fOne, 0);
                         }
                         pEvent++;
                     }
@@ -335,7 +335,7 @@ void fn_8008F820(void) {
 void fn_8008FD60(u32 uEvent) {
     if (lbl_80281F1A) {
         if (lbl_80281F1C != NULL) {
-            fn_80168B80(lbl_80281F1C->pHandler, uEvent);
+            UISIdleProcess(lbl_80281F1C->pHandler, uEvent);
         }
         if (lbl_80281F19) {
             fn_80090400(lbl_80281F1C);
@@ -457,41 +457,41 @@ FrontEnd* fn_8009005C(char* szSet) {
     fn_8008F488(lbl_80281F1C);
     fn_8008FE88(lbl_80281F1C);
     fn_8008FDDC(lbl_80281F1C);
-    lbl_80281F1C->pHandler = fn_80009B34(fn_80169D90(10, 9, 256, 2, 2048, 128), 2, 16,
+    lbl_80281F1C->pHandler = fn_80009B34(UISGetMemSize(10, 9, 256, 2, 2048, 128), 2, 16,
                                          "uiProcessInterface.c", 943);
-    fn_80169C0C(lbl_80281F1C->pHandler, 10, 9, 256, 2, 2048, 128, 16);
-    fn_80169B0C(lbl_80281F1C->pHandler, 0, (UISHandlerFn)fn_800914DC);
-    fn_80169B0C(lbl_80281F1C->pHandler, 1, fn_800908BC);
-    fn_80169B0C(lbl_80281F1C->pHandler, 2, fn_800908C0);
-    fn_80169B0C(lbl_80281F1C->pHandler, 3, fn_800908C4);
-    fn_80169B0C(lbl_80281F1C->pHandler, 4, fn_800908C8);
-    fn_80169B0C(lbl_80281F1C->pHandler, 5, fn_800908CC);
-    fn_80169B0C(lbl_80281F1C->pHandler, 6, fn_800908D0);
-    fn_80169B0C(lbl_80281F1C->pHandler, 7, (UISHandlerFn)fn_800929E4);
-    fn_80169B0C(lbl_80281F1C->pHandler, 8, (UISHandlerFn)fn_80103684);
-    fn_80169B30(lbl_80281F1C->pHandler, fn_8008F610, fn_8008F644);
-    fn_80169B28(lbl_80281F1C->pHandler, (UISTransformFn)fn_80093280);
-    fn_80169B44(lbl_80281F1C->pHandler, fn_8008F568);
+    UISInit(lbl_80281F1C->pHandler, 10, 9, 256, 2, 2048, 128, 16);
+    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 0, (UISHandlerFn)fn_800914DC);
+    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 1, fn_800908BC);
+    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 2, fn_800908C0);
+    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 3, fn_800908C4);
+    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 4, fn_800908C8);
+    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 5, fn_800908CC);
+    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 6, fn_800908D0);
+    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 7, (UISHandlerFn)fn_800929E4);
+    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 8, (UISHandlerFn)fn_80103684);
+    UISRegisterResourceFncs(lbl_80281F1C->pHandler, fn_8008F610, fn_8008F644);
+    UISRegisterTransformFncs(lbl_80281F1C->pHandler, (UISTransformFn)fn_80093280);
+    UISRegisterMessageFnc(lbl_80281F1C->pHandler, fn_8008F568);
     // fake match: the original compares the count signed here (cmpw), unsigned in fn_8008F610
     for (i = 0; i < (s32)lbl_80281F1C->pFile->p4->nCount; i++) {
         if (strcmp(lbl_80281F1C->pFile->p4->aPairs[i].p0, "GlobalScript") == 0) {
-            fn_80169520(lbl_80281F1C->pHandler, lbl_80281F1C->pFile->p4->aPairs[i].p4);
+            UISSetGlobalScript(lbl_80281F1C->pHandler, lbl_80281F1C->pFile->p4->aPairs[i].p4);
             break;
         }
     }
     if (gSession.nGameType != 1) {
-        fn_801694A0(lbl_80281F1C->pHandler, 0, 0, 0, NULL);
+        UISLoadScreen(lbl_80281F1C->pHandler, 0, 0, 0, NULL);
     } else {
         aArgs[0] = 0;
         aArgs[1] = 0;
-        fn_801694A0(lbl_80281F1C->pHandler, 0, 0, 2, aArgs);
+        UISLoadScreen(lbl_80281F1C->pHandler, 0, 0, 2, aArgs);
     }
     if (gSession.nGameType == 3) {
         fn_8008D8F4();
     }
-    fn_80168F5C(lbl_80281F1C->pHandler, 0, 0);
+    UISSetScreenActive(lbl_80281F1C->pHandler, 0, 0);
     fn_80169B3C(lbl_80281F1C->pHandler, fn_80090894);
-    fn_80165C6C(fn_80090890);
+    UISRegisterRuntimeErrorFnc(fn_80090890);
     return lbl_80281F1C;
 }
 
@@ -517,7 +517,7 @@ void fn_80090400(FrontEnd* pFE) {
         fn_8008F294();
         fn_8008F24C();
     }
-    fn_80169B4C(lbl_80281F1C->pHandler);
+    UISShutdown(lbl_80281F1C->pHandler);
     fn_8008F194(pFE->p10);
     fn_8008F164(pFE->pC);
     fn_8008F0FC(pFE->p8);

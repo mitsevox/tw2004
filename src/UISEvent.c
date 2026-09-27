@@ -9,8 +9,8 @@
 // Pushes an event on the event stack whose top is pTop: the event record, with its type on
 // the top word, then its arguments below it, the last one first. Returns the new top.
 // Signature (top by value, new top returned; pStudio unused): Madden 2003 STABS
-static inline s32* UISEvent_Push(UIStudio* pStudio, s32* pTop, UISEventData* pData, s16 nA, s16 nB,
-                                 s32 nType, s32 nArgs, const s32* pArgs) {
+static inline s32* UISEvent_Push(UIStudio* pStudio, s32* pTop, UISEventData* pData, s16 nA, s16 nB, s32 nType,
+                                 s32 nArgs, const s32* pArgs) {
     UISEvent* pEvent;
     s32* pDst;
     s32 i;
@@ -54,7 +54,7 @@ static inline u8 UISEvent_NoneWaiting(u16 uA, u16 uB, UIStudio* pStudio, s32* p)
 
 // Returns the index of a rate function, or the count when there is none.
 // The functions above it in this file (compiled after it: deferred build) have it inlined.
-u32 fn_8016604C(UIStudio* pStudio, UISNodeInfo* pNodeInfo, u32 uId) {
+u32 UISFindRateFnc(UIStudio* pStudio, UISNodeInfo* pNodeInfo, u32 uId) {
     u32 i;
     UISRateFn* pFn;
 
@@ -74,8 +74,8 @@ static inline u32 fn_80165E9C_Read(u32 x) {
 
 // Loads a rate function that moves a variable to fTarget in uTime, replacing one with the same
 // ID. The step per tick is the distance left divided by the number of ticks.
-void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, s32 n30, u32 uId,
-                 u8* pDoneScript, u8* pStepScript, u32 uTime, f32 fTarget, u32 u20) {
+void UISLoadAdvRateFnc(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, s32 n30, u32 uId,
+                       u8* pDoneScript, u8* pStepScript, u32 uTime, f32 fTarget, u32 u20) {
     char szMsg[256];
     u32 i;
     UISRateFn* pRateFn;
@@ -92,7 +92,7 @@ void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, 
     pStudio = (UIStudio*)fn_80165E9C_Read((u32)pStudio);
     pStudio = (UIStudio*)fn_80165E9C_Read((u32)pStudio);
     if (uTime == 0) {
-        lbl_80282A28(1, "UISEvent.c", 97,
+        RuntimeErrorFnc(1, "UISEvent.c", 97,
                      "Attempting to load rate function with duration 0 ms.  Rate function not loaded");
         return;
     }
@@ -101,10 +101,10 @@ void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, 
                 "Attempt to load rate function (ID: %d) ignored.  "
                 "The screen (Group: %d, Screen: %d) is being unloaded.",
                 uId, pScreen->uGroup, pScreen->uScreen);
-        lbl_80282A28(0, "UISEvent.c", 107, szMsg);
+        RuntimeErrorFnc(0, "UISEvent.c", 107, szMsg);
         return;
     }
-    i = fn_8016604C(pStudio, pNodeInfo, uId);
+    i = UISFindRateFnc(pStudio, pNodeInfo, uId);
     if (i == pStudio->nRateFns) {
         pStudio->nRateFns++;
     }
@@ -121,7 +121,7 @@ void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, 
     pRateFn->u20 = u20;
     pRateFn->fTarget = fTarget;
     pRateFn->pDoneScript = pDoneScript;
-    p = fn_8016C1A4(pRateFn->u20, pRateFn->pInfo);
+    p = UISGetActionPtrValue(pRateFn->u20, pRateFn->pInfo);
     // fake match: p goes through s64 and back, then its word is swapped into the high half of a
     // u64 and back (the value is unchanged). The first leaves copies of the call's result that
     // reach the first scheduling pass (the original's lis r4 before lwz r0 and the load in f1);
@@ -135,8 +135,8 @@ void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, 
 
 // Loads a rate function with no duration, replacing one with the same ID. Refused while the
 // screen is being unloaded.
-void fn_80165D90(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, u32 uId, u8* pStepScript,
-                 u32 u10) {
+void UISLoadRateFnc(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, u32 uId, u8* pStepScript,
+                    u32 u10) {
     char szMsg[256];
     u32 i;
     UISRateFn* pRateFn;
@@ -146,10 +146,10 @@ void fn_80165D90(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, 
                 "Attempt to load rate function (ID: %d) ignored.  "
                 "The screen (Group: %d, Screen: %d) is being unloaded.",
                 uId, pScreen->uGroup, pScreen->uScreen);
-        lbl_80282A28(0, "UISEvent.c", 151, szMsg);
+        RuntimeErrorFnc(0, "UISEvent.c", 151, szMsg);
         return;
     }
-    i = fn_8016604C(pStudio, pNodeInfo, uId);
+    i = UISFindRateFnc(pStudio, pNodeInfo, uId);
     if (i == pStudio->nRateFns) {
         pStudio->nRateFns++;
     }
@@ -168,18 +168,18 @@ void fn_80165D90(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, 
 }
 
 // Marks a rate function as finished.
-void fn_80165D2C(UIStudio* pStudio, UISNodeInfo* pNodeInfo, u32 uId) {
+void UISUnloadRateFnc(UIStudio* pStudio, UISNodeInfo* pNodeInfo, u32 uId) {
     u32 i;
     u32 n = pStudio->nRateFns;
 
-    i = fn_8016604C(pStudio, pNodeInfo, uId);
+    i = UISFindRateFnc(pStudio, pNodeInfo, uId);
     if (i < n) {
         pStudio->pRateFns[i].uState = 1;
     }
 }
 
 // Drops the rate functions that have finished and marks the new ones as running.
-void fn_80165C74(UIStudio* pStudio) {
+void UISRemoveUnNessaryRateFncs(UIStudio* pStudio) {
     int i;
     int j;
 
@@ -196,25 +196,25 @@ void fn_80165C74(UIStudio* pStudio) {
     }
 }
 
-UISReportFn lbl_80282A28;
+UISReportFn RuntimeErrorFnc;
 
-void fn_80165C6C(UISReportFn pfnReport) {
-    lbl_80282A28 = pfnReport;
+void UISRegisterRuntimeErrorFnc(UISReportFn pfnReport) {
+    RuntimeErrorFnc = pfnReport;
 }
 
 // Pushes an event on the studio's event stack: the event record, with its type on the top word,
 // then its arguments below it, the last one first.
-void fn_80165B90(s16 nA, s16 nB, UIStudio* pStudio, s32 nType, UISEventData* pData, s32 nArgs,
-                 const s32* pArgs) {
+void UISAddThreadAction(s16 nA, s16 nB, UIStudio* pStudio, s32 nType, UISEventData* pData, s32 nArgs,
+                        const s32* pArgs) {
     // fake match: nArgs goes through s64 and back (the value is unchanged); the dead high word
     // lives until register allocation and gives the original's order of the nA/nB sign extensions
     pStudio->pEventTop = UISEvent_Push(pStudio, pStudio->pEventTop, pData, nA, nB, nType, (s64)nArgs, pArgs);
 }
 
 // Walks the event stack from the bottom up and, for each type 9 event queued for the given
-// screen, while that screen is still loaded, calls fn_8016B0F8 with the event's first data word
+// screen, while that screen is still loaded, calls UISDoHint with the event's first data word
 // and its arguments.
-s32 fn_80165ACC(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
+s32 UISThreadProcessHints(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
     s32* pData;
     s32 nArgs;
     s32* pArgs;
@@ -235,24 +235,24 @@ s32 fn_80165ACC(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
         pArgs = p;
         p -= 1;
         if (uA == uGroup && uB == uScreen && nType == 9
-            && fn_8016C6C4(pStudio, uA, uB) < pStudio->nScreens) {
+            && UISFindScreen(pStudio, uA, uB) < pStudio->nScreens) {
             // fake match: *pData and nArgs go through s64 and back (the values are unchanged);
             // the two dead high words live until register allocation and give p, pStudio and
             // uScreen the extra neighbours that put them in the original's saved registers
-            fn_8016B0F8(pStudio, (s64)*pData, (s64)nArgs, pArgs);
+            UISDoHint(pStudio, (s64)*pData, (s64)nArgs, pArgs);
         }
     }
     return 1;
 }
 
 // Runs the event whose type word is at pTop and returns the next one's. An event that cannot run
-// yet (unloading a screen that still has events queued, or that fn_80168FC8 refuses) is pushed
+// yet (unloading a screen that still has events queued, or that UISInternalUnloadScreen refuses) is pushed
 // again on the stack at *ppKeep.
 // fake match: optimization level 3 for this function only: at level 4 an extra copy-propagation
 // pass folds the copies of uA and uB that UISEvent_NoneWaiting's loop compares with (the original
 // keeps them: mr r4,r28; mr r3,r27)
 #pragma optimization_level 3
-s32* fn_80165670(UIStudio* pStudio, s32* pTop, s32** ppKeep) {
+s32* _UISDoThreadAction(UIStudio* pStudio, s32* pTop, s32** ppKeep) {
     s32 nType;
     UISEventData* pData;
     s32 nArgs;
@@ -277,55 +277,57 @@ s32* fn_80165670(UIStudio* pStudio, s32* pTop, s32** ppKeep) {
     pTop--;
     switch (nType) {
     case 0:
-        fn_80169858(pStudio, pData->aw[0], pData->aw[1], pData->aw[2], pData->aw[3], nArgs, pArgs);
+        UISInternalLoadScreen(pStudio, pData->aw[0], pData->aw[1], pData->aw[2], pData->aw[3], nArgs, pArgs);
         break;
     case 1:
-        nIndex = fn_8016C6C4(pStudio, pData->aw[0], pData->aw[1]);
+        nIndex = UISFindScreen(pStudio, pData->aw[0], pData->aw[1]);
         if (nIndex < pStudio->nScreens) {
             pScreen = &pStudio->pScreens[nIndex];
             pScreen->bUnloading = 1;
         }
         if (!UISEvent_NoneWaiting(uA, uB, pStudio, pTop)) {
             *ppKeep = UISEvent_Push(pStudio, *ppKeep, pData, uA, uB, nType, nArgs, pArgs);
-        } else if (!fn_80168FC8(pStudio, pData->aw[0], pData->aw[1], pData->au[2])) {
+        } else if (!UISInternalUnloadScreen(pStudio, pData->aw[0], pData->aw[1], pData->au[2])) {
             *ppKeep = UISEvent_Push(pStudio, *ppKeep, pData, uA, uB, nType, nArgs, pArgs);
         }
         break;
     case 9:
-        if (fn_8016C6C4(pStudio, uA, uB) < pStudio->nScreens) {
-            fn_8016B0F8(pStudio, pData->au[0], nArgs, pArgs);
+        if (UISFindScreen(pStudio, uA, uB) < pStudio->nScreens) {
+            UISDoHint(pStudio, pData->au[0], nArgs, pArgs);
         }
         break;
     case 2:
         pStudio->uFlags |= 2;
-        fn_80168CD8(pStudio, &pStudio->stack64, pData->au[0], -8, nArgs, pArgs, 1);
+        UISProcessInternalEvents(pStudio, &pStudio->stack64, pData->au[0], -8, nArgs, pArgs, 1);
         pStudio->uFlags &= ~2;
         break;
     case 3:
-        fn_801686F8(pStudio, 1, pData->aw[0], pData->aw[1]);
+        UISInternalActivateScreen(pStudio, 1, pData->aw[0], pData->aw[1]);
         break;
     case 4:
-        fn_801686F8(pStudio, 0, pData->aw[0], pData->aw[1]);
+        UISInternalActivateScreen(pStudio, 0, pData->aw[0], pData->aw[1]);
         break;
     case 5:
         if (pData->as[1] == 0) {
-            fn_80168918(pStudio, 1, pData->as[0], pData->ap[2], pData->ap[1], pData->aw[6], pData->aw[7]);
+            UISInternalActivateControl(pStudio, 1, pData->as[0], pData->ap[2], pData->ap[1], pData->aw[6],
+                                       pData->aw[7]);
             pData->as[1] = 1;
         }
         break;
     case 6:
         if (pData->as[1] == 0) {
-            fn_80168918(pStudio, 0, pData->as[0], pData->ap[2], pData->ap[1], pData->aw[6], pData->aw[7]);
+            UISInternalActivateControl(pStudio, 0, pData->as[0], pData->ap[2], pData->ap[1], pData->aw[6],
+                                       pData->aw[7]);
             pData->as[1] = 1;
         }
         break;
     case 7:
         pStudio->uFlags |= 2;
-        fn_80168CD8(pStudio, &pStudio->stack64, pData->au[1], pData->au[0], nArgs, pArgs, 0);
+        UISProcessInternalEvents(pStudio, &pStudio->stack64, pData->au[1], pData->au[0], nArgs, pArgs, 0);
         pStudio->uFlags &= ~2;
         break;
     case 8:
-        fn_8016B4D4(pStudio, pData->aw[0], pData->aw[1], pData->au[3]);
+        UISMoveScreenDrawPosition(pStudio, pData->aw[0], pData->aw[1], pData->au[3]);
         break;
     }
     return pTop;
@@ -338,7 +340,7 @@ s32* fn_80165670(UIStudio* pStudio, s32* pTop, s32** ppKeep) {
 // fake match: dead-assignment removal off for this function only: with it on, nType and the
 // argument count read below trade r0 and r3 (no source spelling found that does the same)
 #pragma opt_dead_assignments off
-void fn_80165528(UIStudio* pStudio, u8 bScreenOnly) {
+void UISProcessThreadAction(UIStudio* pStudio, u8 bScreenOnly) {
     s32* p;
     s32* pKeep;
     UISEventData* pData;
@@ -360,15 +362,15 @@ void fn_80165528(UIStudio* pStudio, u8 bScreenOnly) {
             switch (nType) {
             case 5:
                 if (pData->as[1] == 0) {
-                    fn_80168918(pStudio, 1, pData->as[0], pData->ap[2], pData->ap[1], pData->aw[6],
-                                pData->aw[7]);
+                    UISInternalActivateControl(pStudio, 1, pData->as[0], pData->ap[2], pData->ap[1],
+                                               pData->aw[6], pData->aw[7]);
                     pData->as[1] = 1;
                 }
                 break;
             case 6:
                 if (pData->as[1] == 0) {
-                    fn_80168918(pStudio, 0, pData->as[0], pData->ap[2], pData->ap[1], pData->aw[6],
-                                pData->aw[7]);
+                    UISInternalActivateControl(pStudio, 0, pData->as[0], pData->ap[2], pData->ap[1],
+                                               pData->aw[6], pData->aw[7]);
                     pData->as[1] = 1;
                 }
                 break;
@@ -377,7 +379,7 @@ void fn_80165528(UIStudio* pStudio, u8 bScreenOnly) {
         }
     } else {
         while (p > pStudio->pEventTop) {
-            p = fn_80165670(pStudio, p, &pKeep);
+            p = _UISDoThreadAction(pStudio, p, &pKeep);
         }
         pStudio->pEventTop = pKeep;
     }

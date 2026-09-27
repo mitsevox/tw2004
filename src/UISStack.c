@@ -3,11 +3,11 @@
 
 #include "frontend/uistudio.h"
 
-// The arguments a script's format opcode (0x4C) hands fn_8016B808: at most 20.
-UISWord lbl_802805D8[20];
+// The arguments a script's format opcode (0x4C) hands UISStringFormat: at most 20.
+UISWord uisFormatStringStack[20];
 
 // name: Madden 2003 STABS (UISStack.c)
-// fake match: EA's build inlines this into fn_80166098, whose source here is over CW's default
+// fake match: EA's build inlines this into UISStackProcess, whose source here is over CW's default
 // inline budget (7000), so the budget is raised (deferred inlining reads it at the end of the file).
 #pragma inline_max_total_size(12000)
 static inline u8* _UISPatchFncPC(UIStudio* pStudio, UISScreenFile* pData, u32 uOffset) {
@@ -23,10 +23,10 @@ static inline u8* _UISPatchFncPC(UIStudio* pStudio, UISScreenFile* pData, u32 uO
 
 // Runs a screen's script from pFrame->p10: a byte-code machine with a stack of 32-bit words
 // (ints, floats and pointers) that grows up from pFrame->pC. It stops at the script's end
-// (returns 0) or when the script waits for another screen (returns 3; fn_80169308 resumes it
+// (returns 0) or when the script waits for another screen (returns 3; UISInternalUnloadModal resumes it
 // from the p60 record it keeps). Immediates are big-endian; opcodes not listed do nothing.
 // port: the stack keeps pointers in 32-bit words, like the rest of the studio.
-s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, UISNodeInfo* pInfo) {
+s8 UISStackProcess(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, UISNodeInfo* pInfo) {
     s32* pTop;
     u8 uOp;
     UISEventData data;
@@ -53,7 +53,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             data.aw[1] = u >> 16;
             data.aw[2] = pScreen->uGroup;
             data.aw[3] = pScreen->uScreen;
-            fn_80165B90(data.aw[2], data.aw[3], pStudio, 0, &data, nArgs, pArgs);
+            UISAddThreadAction(data.aw[2], data.aw[3], pStudio, 0, &data, nArgs, pArgs);
             while (nArgs-- != 0) {
                 pFrame->pC--;
             }
@@ -78,7 +78,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             data.aw[0] = uGroup;
             *pA1 = uScreen;
             data.au[2] = n;
-            fn_80165B90(pScreen->uGroup, pScreen->uScreen, pStudio, 1, &data, 0, NULL);
+            UISAddThreadAction(pScreen->uGroup, pScreen->uScreen, pStudio, 1, &data, 0, NULL);
             break;
         }
         case 0x08: {  // send event 3 to a screen (0xFFFF: this one)
@@ -95,7 +95,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             }
             data.aw[0] = uGroup;
             data.aw[1] = uScreen;
-            fn_80165B90(pScreen->uGroup, pScreen->uScreen, pStudio, 3, &data, 0, NULL);
+            UISAddThreadAction(pScreen->uGroup, pScreen->uScreen, pStudio, 3, &data, 0, NULL);
             break;
         }
         case 0x58: {  // start a rate function (the byte: how many script addresses follow)
@@ -128,8 +128,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             fTarget = *(f32*)--pFrame->pC;
             nU20 = *--pFrame->pC;
             nId = *--pFrame->pC;
-            fn_80165E9C(pStudio, pScreen, pNodeInfo, n30, nId, pDoneScript, pStepScript, nTime, fTarget,
-                        nU20);
+            UISLoadAdvRateFnc(pStudio, pScreen, pNodeInfo, n30, nId, pDoneScript, pStepScript, nTime, fTarget,
+                              nU20);
             break;
         }
         case 0x06: {  // start a stepped rate function
@@ -142,14 +142,14 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             u = *--pFrame->pC;
             pStepScript = _UISPatchFncPC(pStudio, pScreen->pData, u);
             nId = *--pFrame->pC;
-            fn_80165D90(pStudio, pScreen, pNodeInfo, nId, pStepScript, nU10);
+            UISLoadRateFnc(pStudio, pScreen, pNodeInfo, nId, pStepScript, nU10);
             break;
         }
         case 0x07: {  // stop a rate function
             UISNodeInfo* pNodeInfo = (UISNodeInfo*)*--pFrame->pC;
             s32 nId = *--pFrame->pC;
 
-            fn_80165D2C(pStudio, pNodeInfo, nId);
+            UISUnloadRateFnc(pStudio, pNodeInfo, nId);
             break;
         }
         case 0x0A: {  // call one of the game's handlers with a variable of the screen file
@@ -183,7 +183,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->pC--;
             pArgs = pFrame->pC - n;
             data.au[0] = pArgs[0];
-            fn_80165B90(pScreen->uGroup, pScreen->uScreen, pStudio, 9, &data, n, pArgs + 1);
+            UISAddThreadAction(pScreen->uGroup, pScreen->uScreen, pStudio, 9, &data, n, pArgs + 1);
             break;
         }
         case 0x0B: {  // a command to the game (pfnCommand)
@@ -207,7 +207,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             n = *--pFrame->pC;
             data.au[0] = *--pFrame->pC;
             data.au[1] = *--pFrame->pC;
-            fn_80165B90(pScreen->uGroup, pScreen->uScreen, pStudio, 7, &data, n, pFrame->pC - n);
+            UISAddThreadAction(pScreen->uGroup, pScreen->uScreen, pStudio, 7, &data, n, pFrame->pC - n);
             break;
         }
         case 0x0D:  // push the screen file
@@ -569,8 +569,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 data.aw[1] = u >> 16;
                 data.aw[2] = pScreen->uGroup;
                 *pA3 = pScreen->uScreen;
-                fn_80165B90(data.aw[2], data.aw[3], pStudio, 0, &data, nArgs, pFrame->pC - nArgs);
-                fn_80165B90(pScreen->uGroup, pScreen->uScreen, pStudio, 3, &data, 0, NULL);
+                UISAddThreadAction(data.aw[2], data.aw[3], pStudio, 0, &data, nArgs, pFrame->pC - nArgs);
+                UISAddThreadAction(pScreen->uGroup, pScreen->uScreen, pStudio, 3, &data, 0, NULL);
                 while (nArgs-- != 0) {
                     pFrame->pC--;
                 }
@@ -587,7 +587,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             data.au[1] = 0;
             data.aw[7] = pScreen->uGroup;
             data.aw[6] = pScreen->uScreen;
-            fn_80165B90(data.aw[7], data.aw[6], pStudio, 6, &data, 0, NULL);
+            UISAddThreadAction(data.aw[7], data.aw[6], pStudio, 6, &data, 0, NULL);
             break;
         }
         case 0x7E: {  // send event 5 for a node info
@@ -600,7 +600,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             data.au[1] = 0;
             data.aw[7] = pScreen->uGroup;
             data.aw[6] = pScreen->uScreen;
-            fn_80165B90(data.aw[7], data.aw[6], pStudio, 5, &data, 0, NULL);
+            UISAddThreadAction(data.aw[7], data.aw[6], pStudio, 5, &data, 0, NULL);
             break;
         }
         case 0x47: {  // send event 5 for entry n of a list of node infos, unless it is this one and set
@@ -624,7 +624,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                     *pA2 = pnList;
                     data.aw[7] = pScreen->uGroup;
                     data.aw[6] = pScreen->uScreen;
-                    fn_80165B90(data.aw[7], data.aw[6], pStudio, 5, &data, 1, &nEntry);
+                    UISAddThreadAction(data.aw[7], data.aw[6], pStudio, 5, &data, 1, &nEntry);
                 }
             }
             break;
@@ -632,7 +632,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
         case 0x48:  // send event 3 to the screen that made this one current
             data.aw[0] = pScreen->uPrevGroup;
             data.aw[1] = pScreen->uPrevScreen;
-            fn_80165B90(pScreen->uGroup, pScreen->uScreen, pStudio, 3, &data, 0, NULL);
+            UISAddThreadAction(pScreen->uGroup, pScreen->uScreen, pStudio, 3, &data, 0, NULL);
             break;
         case 0x49: {  // a text's length
             UISText* pText;
@@ -680,14 +680,14 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             n = *--pFrame->pC;
             for (k = 0; k < n; k++) {
                 if (k < 20) {
-                    lbl_802805D8[n - k - 1].n = *--pFrame->pC;
+                    uisFormatStringStack[n - k - 1].n = *--pFrame->pC;
                 } else {
                     pFrame->pC--;
                 }
             }
             pFind = (UISText*)*--pFrame->pC;
             pText = (UISText*)*--pFrame->pC;
-            fn_8016B808((u32)pScreen->pData, pText, pFind, n, lbl_802805D8);
+            UISStringFormat((u32)pScreen->pData, pText, pFind, n, uisFormatStringStack);
             break;
         }
         case 0x77: {  // whether a group is this screen's
@@ -705,7 +705,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             u16 uCurScreen;
             u16 uCurGroup;
 
-            fn_80168EE8(pStudio, &uCurGroup, &uCurScreen);
+            UISGetActiveScreen(pStudio, &uCurGroup, &uCurScreen);
             pFrame->pC[-1] = ((u32)uCurScreen << 16) | uCurGroup;
             break;
         }
@@ -714,7 +714,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
 
             nArg = *--pFrame->pC;
             data.au[0] = *--pFrame->pC;
-            fn_80165B90(pScreen->uGroup, pScreen->uScreen, pStudio, 2, &data, 1, &nArg);
+            UISAddThreadAction(pScreen->uGroup, pScreen->uScreen, pStudio, 2, &data, 1, &nArg);
             break;
         }
         case 0x4E:  // skip a word
@@ -752,7 +752,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 data.aw[1] = u >> 16;
                 data.aw[2] = pScreen->uGroup;
                 data.aw[3] = pScreen->uScreen;
-                fn_80165B90(data.aw[2], data.aw[3], pStudio, 0, &data, nArgs, pArgs);
+                UISAddThreadAction(data.aw[2], data.aw[3], pStudio, 0, &data, nArgs, pArgs);
                 while (nArgs-- != 0) {
                     pFrame->pC--;
                 }
@@ -788,7 +788,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             data.au[1] = 0;
             data.aw[7] = pScreen->uGroup;
             data.aw[6] = pScreen->uScreen;
-            fn_80165B90(data.aw[7], data.aw[6], pStudio, 5, &data, 0, NULL);
+            UISAddThreadAction(data.aw[7], data.aw[6], pStudio, 5, &data, 0, NULL);
             break;
         }
         case 0x55:  // push a word at a local's pointer plus an offset (0x6B: its address)
@@ -1177,7 +1177,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             }
             break;
         }
-        case 0x59: {  // switch a node on or off (fn_80168644)
+        case 0x59: {  // switch a node on or off (UISUpdateVisibility)
             u32 u;
             u32 uByte0;
             u32 uByte1;
@@ -1202,7 +1202,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             uByte0 = *pFrame->p10;
             pFrame->p10++;
             u += pFrame->pC[nIndex];  // port: the sum is a 32-bit address
-            fn_80168644(pStudio, pScreen, uByte0, (void*)u, pTop[-1]);
+            UISUpdateVisibility(pStudio, pScreen, uByte0, (void*)u, pTop[-1]);
             pFrame->pC--;
             break;
         }
@@ -1210,7 +1210,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             UISNodeInfo* pNodeInfo = (UISNodeInfo*)*--pFrame->pC;
             s32 nId = *--pFrame->pC;
 
-            *pFrame->pC = fn_8016604C(pStudio, pNodeInfo, nId) < pStudio->nRateFns;
+            *pFrame->pC = UISFindRateFnc(pStudio, pNodeInfo, nId) < pStudio->nRateFns;
             pFrame->pC++;
             break;
         }
@@ -1225,7 +1225,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             data.aw[2] = pScreen->uGroup;
             data.aw[3] = pScreen->uScreen;
             data.au[3] = n;
-            fn_80165B90(data.aw[2], data.aw[3], pStudio, 8, &data, 0, NULL);
+            UISAddThreadAction(data.aw[2], data.aw[3], pStudio, 8, &data, 0, NULL);
             break;
         }
         case 0x74: {  // set or clear a bit of the screen's event mask (-1: all)
