@@ -12,10 +12,8 @@ void fn_80168644(UIStudio* pStudio, UISScreen* pScreen, s32 nKind, void* p, s32 
 
 // name: Madden 2003 STABS (UISStack.c)
 // fake match: EA's build inlines this into fn_80166098, whose source here is over CW's default
-// inline budget (7000); a larger budget, and a callee size limit that keeps fn_80168644 a call.
-// Deferred inlining reads both at the end of the file.
+// inline budget (7000), so the budget is raised (deferred inlining reads it at the end of the file).
 #pragma inline_max_total_size(12000)
-#pragma inline_max_size(64)
 static inline u8* _UISPatchFncPC(UIStudio* pStudio, UISScreenFile* pData, u32 uOffset) {
     u8* pRet;
 
@@ -1368,6 +1366,9 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
 
 // Runs fn_8016ABBC on p in pScreen, unless fn_8016AD54 finds p's switch already set as bOn
 // asks (or not at all).
+// fake match: fn_80166098 calls this across EA's files (UISStack.c -> UIStudio.c, Madden 2003
+// STABS); in this unit, under the raised inline budget, CW would inline it.
+#pragma dont_inline on
 void fn_80168644(UIStudio* pStudio, UISScreen* pScreen, s32 nKind, void* p, s32 bOn) {
     s32 nFound;
     s32 nOn;
@@ -1383,6 +1384,7 @@ void fn_80168644(UIStudio* pStudio, UISScreen* pScreen, s32 nKind, void* p, s32 
         fn_8016ABBC(pStudio, pScreen, nOn, nKind, p, 1);
     }
 }
+#pragma dont_inline reset
 
 // Activates (bOn) a screen. With no p60 record open the current screen first gets event -5;
 // then, unless every screen is being unloaded, the screen becomes current, its first node is
