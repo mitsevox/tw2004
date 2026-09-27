@@ -1026,7 +1026,9 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 pTop[-1] = 0;
             }
             break;
-        case 0x59:  // switch a node on or off (fn_80168644)
+        case 0x59: {  // switch a node on or off (fn_80168644)
+            s16 nIndex;
+
             uByte0 = *pFrame->p10;
             pFrame->p10++;
             uByte1 = *pFrame->p10;
@@ -1040,12 +1042,13 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             pFrame->p10++;
             uByte1 = *pFrame->p10;
             pFrame->p10++;
-            k = (uByte0 << 8) | uByte1;
+            nIndex = (uByte0 << 8) | uByte1;
             uByte0 = *pFrame->p10;
             pFrame->p10++;
-            fn_80168644(pStudio, pScreen, uByte0, (void*)(u + pFrame->pC[(s16)k]), pTop[-1]);
+            fn_80168644(pStudio, pScreen, uByte0, (void*)(u + pFrame->pC[nIndex]), pTop[-1]);
             pFrame->pC--;
             break;
+        }
         case 0x73: {  // whether a rate function runs
             UISNodeInfo* pNodeInfo = (UISNodeInfo*)*--pFrame->pC;
             s32 nId = *--pFrame->pC;
