@@ -35,7 +35,7 @@ still reads like a fresh machine pass.
   `fn_80009744` (126; dot with itself), `fn_8001EF34` (107; engine.h:1406 "scale a vector").
   Ball.c:1184 `Physics_HandleCollision` is unreadable largely because of these.
 - **EA names in hand, not applied:** LLFileIO_Gc.c:63 says "EA's name, from its lock:
-  file_RequestDaemon" above `fn_80005D10`; UISStack.c's interpreter `fn_80166098` is Madden 2003
+  file_RequestDaemon" above `fn_80005D10`; UISStack.c's interpreter `UISStackProcess` is Madden 2003
   STABS `UISStackProcess` (docs/reference-builds/madden2003-ps2/pairing.md pairs ~68 UIS
   functions plus every UIS struct and field); golfer.h:566 `pfn200 // TW06: GetCurrentLead`;
   TW07 `pairs.tsv` has 60 med/high-confidence pairs on `fn_` functions; the MAD decoder (14) and

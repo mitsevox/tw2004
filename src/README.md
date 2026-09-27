@@ -19,7 +19,7 @@ and MetroTRK are built from public decomps in `extern/` (the `progress_category=
 | One frame | `gomainloop.c`: `fn_8006D8E8` is the frame loop, `fn_8006DBD4` picks the game type's frame, `fn_8006D27C` draws a round's frame, `fn_8006DDA8` runs every module's hooks |
 | A shot, start to finish | `gomainloop.c` calls `fn_8005D2F8` (`Code8005D2E4.c`) each frame, which runs `GOLFERSTATE_Update` (`StateGolfer.c`): each player's golfer state (`stateFunc.c`, `STATEFUNC_*`). `STATEFUNC_Swing*` drives `Swing.c`, which launches the ball with `Physics_ShotImpact` (`Ball.c`); `GM_BallHit` and `GM_Update` (`GameManager.c`) keep the round's turns and strokes |
 | A round's rules | `GameRound.c` `fn_800E0B38` fills `gpGame`'s callbacks (`GameState`, `include/golfer.h`) with defaults, then calls the game mode's own setup (`GameMode*.c`) |
-| The menus | `uiProcessInterface.c` runs the UI; the screens run on EA's UI Studio library (`UISApi.c` is the game's side, `UISStack.c` `fn_80166098` the script interpreter); menu messages land in `FE_MessageTable.c`, a round's in `GameUICommands.c` |
+| The menus | `uiProcessInterface.c` runs the UI; the screens run on EA's UI Studio library (`UISApi.c` is the game's side, `UISStack.c` `UISStackProcess` the script interpreter); menu messages land in `FE_MessageTable.c`, a round's in `GameUICommands.c` |
 | Loading anything from disc | `UStream.c` (the chunked `.hog`/`.gcb` streamer; `docs/formats/ctrl-container.md`), handlers registered per chunk type, file lists in `streammanagerhole.c` |
 | Shared headers | `include/engine.h` (services), `include/game.h` (round, modes), `include/golfer.h` (players, golfers, `GameState`), `include/character.h`, `include/camera.h` |
 
@@ -442,7 +442,7 @@ with one library-wide flag set (`UIS_CFLAGS` in `configure.py`). Header: `includ
 | File | Name | What it is |
 |---|---|---|
 | UISEvent.c | EA | the event stack and the rate functions |
-| UISStack.c | M03 | the script interpreter (`fn_80166098`) |
+| UISStack.c | M03 | the script interpreter (`UISStackProcess`) |
 | UIStudio.c | EA | the core: loading, activating, unloading screens; sending events |
 | UISApi.c | ours | the game's calls into the studio: set-up, callbacks, per-frame run, screen changes |
 | UISScreen.c | ours | drawing a screen's nodes, event handlers, text formatting |
