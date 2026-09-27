@@ -41717,5 +41717,21 @@
 "matched_functions": 7589,
 "total_functions": 7647,
 "exact": 7589
+},
+{
+"commit": "e3eaa81",
+"sha": "e3eaa81fa83b4c17a6d8811dbab53ef516557fa5",
+"time": 1790471688,
+"subject": "Merge e-link1: GoStaticCam, Rain, SunFlr exact and linked (labelled empty-test fakes)",
+"report": true,
+"matched_code": 1496012,
+"complete_code": 1322564,
+"matched_data": 723415,
+"complete_data": 868795,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7592,
+"total_functions": 7647,
+"exact": 7592
 }
 ]
