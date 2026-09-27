@@ -1444,8 +1444,8 @@ void Gaud_StartComment(int nKind, int nMsg, int a);
 void fn_8010D428(s32 p0, s32 p1);   // GameMode26.c: Gaud_StartComment(8, p0, p1)
 void Gaud_StopComment(void);
 void fn_800A77E0(f32 f);                // } the options menu passes them 0.2 x options.a0[0], a0[4]
-void fn_800A78F0(f32 f);                // } and a0[1] (FE_MessageTable.c, GameUICommands.c)
-void fn_800A7924(f32 f);                // }
+void Gaud_SetCommentLevel(f32 f);                // } and a0[1] (FE_MessageTable.c, GameUICommands.c)
+void Gaud_SetMusicLevel(f32 f);                // }
 void Vec_Normalize(f32* pSrc, f32* pDst);
 void Vec_NormalizeTo(f32* pSrc, f32* pDst);   // normalise
 void fn_800B5918(const f32* pSrc, f32* pDst);   // GoShaderObject_Rain_Gc.c: copy three floats

@@ -12,7 +12,7 @@
 
 void FE_CrAP_SetTriggerAnims(u8 b);                 // FE_CrAPDB.c: set the database's b14
 void FE_CrAP_UnequipSlot(s16 nSlot);            // FE_CrAPDB.c
-void fn_800A73F0(s32 n);
+void Gaud_PlayUISound(s32 n);
 u8   IsLeapYear(u32 nYear);            // Calendar.c: a leap year (1900 counts as one)
 
 // ---- sweep code (not yet cleaned up) ----
@@ -1085,7 +1085,7 @@ void fn_80109BA4(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80109CBC(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     View* pView = ViewController_GetCameraController(fn_80016D10());
-    fn_800A73F0((Misc_RandFunc(0) & 7) + 11);
+    Gaud_PlayUISound((Misc_RandFunc(0) & 7) + 11);
     fn_8008E244();
     fn_8008E364(0);
     GolfCamera_SwitchCrAPCamera(pView, "Crap Idle", lbl_80281EE0->n4, 0, 0, 0);

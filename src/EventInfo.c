@@ -15,7 +15,7 @@
 
 // Up to three reward names for a real-time event (nKind 0x11); how many there are.
 int  FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(int nKind, s32 nId, char* szFirst, char* szSecond, char* szThird);
-void fn_800A73F0(s32 n);
+void Gaud_PlayUISound(s32 n);
 void fn_8011D658(int nLine, char* szLabel, char* szValue);
 
 // fake match: stands in for a function the original linker stripped. The file's strings start
@@ -359,7 +359,7 @@ void fn_8011DC30(int nLine, char* szLabel, char* szValue) {
 }
 
 // The next real-time event: name, "Status (?)", its start date; when it is a day or less away and
-// a profile is loaded, calls GameAudio's fn_800A73F0(0x19). Gives whether it did.
+// a profile is loaded, calls GameAudio's Gaud_PlayUISound(0x19). Gives whether it did.
 void fn_8011DDFC(MsgArg* pArgs, MsgArg* pResult) {
     char* szName = ((MsgString*)pArgs[0].p)->pStr;
     char* szStatus = ((MsgString*)pArgs[1].p)->pStr;
@@ -387,7 +387,7 @@ void fn_8011DDFC(MsgArg* pArgs, MsgArg* pResult) {
     // the original likely returns it from an inlined u8 helper
     bSoon = bNear;
     if (bSoon) {
-        fn_800A73F0(0x19);
+        Gaud_PlayUISound(0x19);
     }
     pResult->i = bSoon;
 }

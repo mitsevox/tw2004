@@ -71,7 +71,7 @@ u8   GetAmbientStreamRange(s32 nCourse, int n);
 u8   Gaud_ReInit(void);
 void Aud_EmiSetTrackStream(u8 nId, u8 nTrack, u8 a, u16 b, s32 c);
 u8   Gaud_GetCommentStatus(void);
-u8   fn_800A7748(void);
+u8   Gaud_GetAmbientStmStatus(void);
 void Gaud_InitWindSound(int n);
 void Gaud_InitTreeSound(int n);
 
@@ -190,7 +190,7 @@ u8   Aud_MicInitOnce(void);
 void Gaud_StopMusic(void);
 void Gaud_InitSpecialShot(u8 nPlayer);
 void Gaud_ExitCrowdReactionSound(void);
-void fn_800A73C0(u8 a, int n);
+void Gaud_PlayGameUISound(u8 a, int n);
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x80283F48), before the 0.2f and the int-to-float double UpdateCommentVolDucking uses first; its
@@ -537,13 +537,13 @@ void StartAmbientStreamer(void) {
 void UpdateStreaming(void) {
     switch (lbl_8028203C) {
     case 2:
-        if (lbl_80282041 != 0 && lbl_8028202D == 0 && !fn_800A7748()) {
+        if (lbl_80282041 != 0 && lbl_8028202D == 0 && !Gaud_GetAmbientStmStatus()) {
             lbl_80282041 = 0;
             StartAmbientStreamer();
         }
         break;
     case 1:
-        if (!fn_800A75F4()) {
+        if (!Gaud_GetMusicStatus()) {
             StartBackgroundMusic();
         }
         break;
@@ -735,7 +735,7 @@ void Gaud_InitFE(void) {
     if (lbl_80282028 == 0) {
         // the options' volumes, 0.2 per step
         fn_800A77E0(0.2f * (s8)gSession.options.a0[0]);
-        fn_800A78F0(0.2f * (s8)gSession.options.a0[4]);
+        Gaud_SetCommentLevel(0.2f * (s8)gSession.options.a0[4]);
         Aud_SetSubmixAttn(15, 0.2f * (s8)gSession.options.a0[1] * lbl_8018E988[15]);
         Aud_SetOutputmode(2);
         lbl_80282028 = 1;
@@ -796,7 +796,7 @@ void Gaud_InitHole(void) {
     pView = lbl_801F1790;
     pPlayer = gPlayers;
     if (lbl_80282028 == 0) {
-        fn_800A78F0(0.2f * (s8)gSession.options.a0[4]);
+        Gaud_SetCommentLevel(0.2f * (s8)gSession.options.a0[4]);
         Aud_SetOutputmode(2);
         lbl_80282028 = 1;
     }
@@ -1734,7 +1734,7 @@ void Gaud_OnScoreCard(u8 bOff, u8 bMusic) {
 }
 
 // Pauses (bOn 1) or resumes the game's sound for the pause menu; pausing plays the pause sound
-// (fn_800A73C0, step 1), resuming re-picks the stream at the next Gaud_Monitor (lbl_8028202C). The
+// (Gaud_PlayGameUISound, step 1), resuming re-picks the stream at the next Gaud_Monitor (lbl_8028202C). The
 // engine is left alone while Gaud_OnScoreCard has the sound off. Nothing when it is already in that
 // state.
 void Gaud_Pause(u8 bOn) {
@@ -1743,7 +1743,7 @@ void Gaud_Pause(u8 bOn) {
         if (lbl_8028202E == 0) {
             Aud_Pause(bOn, 0);
             if (bOn) {
-                fn_800A73C0(0, 1);
+                Gaud_PlayGameUISound(0, 1);
             } else {
                 lbl_8028202C = 1;
             }
@@ -1751,12 +1751,15 @@ void Gaud_Pause(u8 bOn) {
     }
 }
 
-// a is unused.
-void fn_800A73C0(u8 a, int n) {
+// Plays UI sound n: step n of the UI sound emitter's track 0 (lbl_8028141B). a is unused. A UI
+// script command (GameUICommands.c fn_800883FC) and Gaud_Pause (n 1, the pause sound) call it.
+void Gaud_PlayGameUISound(u8 a, int n) {
     Aud_EmiSetTrackStep(lbl_8028141B, 0, n, 0);
 }
 
-void fn_800A73F0(s32 n) {
+// Plays menu sound n on the UI sound emitter (lbl_8028141B): n 1 and 6 are steps 0 and 1 of its
+// track 1, the others steps of its track 0 (callers pick 11 to 18 at random for a random one).
+void Gaud_PlayUISound(s32 n) {
     switch (n) {
     case 1:
         Aud_EmiSetTrackStep(lbl_8028141B, 1, 0, 0);
@@ -1797,7 +1800,7 @@ void Gaud_LongDriveUi_Stop(s32 nKind, int nTrack) {
     }
 }
 
-s32 fn_800A7528(void) {
+s32 Gaud_RewardCommentaryIsPlaying(void) {
     return Gaud_GetCommentStatus();
 }
 
@@ -1819,7 +1822,9 @@ void Gaud_StopMusic(void) {
     }
 }
 
-u8 fn_800A75F4(void) {
+// Whether music plays: music is what streams (lbl_8028203C 1) and the music emitter's track 0 is
+// on.
+u8 Gaud_GetMusicStatus(void) {
     int bResult;
 
     bResult = 0;
@@ -1829,7 +1834,10 @@ u8 fn_800A75F4(void) {
     return bResult;
 }
 
-void fn_800A7644(void) {
+// Starts the front end's music again: re-picks the stream (Gaud_SetStreamingContext). Callers pass
+// a flag (TW07: bool firstTime; GoEntry.c the menus' b0F, FE_Manager.c 0 after a movie) that this
+// definition does not take.
+void Gaud_StartFEMusic(void) {
     Gaud_SetStreamingContext();
 }
 
@@ -1866,18 +1874,20 @@ u8 Gaud_GetCommentStatus(void) {
     return Aud_EmiGetTrackStatus(lbl_80281419, 0);
 }
 
-u8 fn_800A7748(void) {
+u8 Gaud_GetAmbientStmStatus(void) {
     return Aud_EmiGetTrackStatus(lbl_8028141A, 0);
 }
 
-u8 fn_800A7770(void) {
+// Whether anything streams: the music, and outside the front end (game type 3) also the commentary
+// or the ambience. LLVideo.c asks before it plays a movie.
+u8 Gaud_GetStreamingStatus(void) {
     int bResult;
 
     if (gSession.nGameType == 3) {
-        return fn_800A75F4();
+        return Gaud_GetMusicStatus();
     }
     bResult = 0;
-    if (Gaud_GetCommentStatus() || fn_800A7748() || fn_800A75F4()) {
+    if (Gaud_GetCommentStatus() || Gaud_GetAmbientStmStatus() || Gaud_GetMusicStatus()) {
         bResult = 1;
     }
     return bResult;
@@ -1901,16 +1911,21 @@ void fn_800A77E0(f32 fVolume) {
     }
 }
 
-void fn_800A78F0(f32 fVolume) {
+// The commentary volume: curve 14 at fVolume (the options pass 0.2 x options.a0[4]) times its
+// level.
+void Gaud_SetCommentLevel(f32 fVolume) {
     fVolume *= lbl_8018E988[14];
     Aud_SetSubmixAttn(14, fVolume);
 }
 
-void fn_800A7924(f32 f) {
+// The music volume. f (the options pass 0.2 x options.a0[1]) is not used: Gaud_SetStreamingContext
+// reads the option itself, and starts or stops the music by it.
+void Gaud_SetMusicLevel(f32 f) {
     Gaud_SetStreamingContext();
 }
 
-void fn_800A7944(void) {
+// Restarts the music: re-picks the stream and starts the next track that is switched on.
+void Gaud_RestartMusic(void) {
     Gaud_SetStreamingContext();
     StartBackgroundMusic();
 }
@@ -1938,11 +1953,15 @@ void Aud_CycleMovie(void) {
     Mov_Tick();
 }
 
-void fn_800A7A14(u8 nSound) {
+// Plays built-in sound nSound (startUp.c's fn_800B0858; its command 10 plays 0 or 1).
+void Aud_PlayBuiltInSound(u8 nSound) {
     fn_800B0858(nSound);
 }
 
-// Every caller passes a fourth argument; nothing here reads it.
+// Starts a sound session (the front end, or a hole: GoEntry.c passes the course + 1, 1 and one
+// listener per view): frees every emitter instance, sets the listener count and starts the session
+// in hlaudmovie.c (Ses_Init). a and b are TW07's sessionID and subsessID; nUnused (TW07: options)
+// is not read. Always 1.
 s32 Aud_InitSession(u8 a, u8 b, u8 nListeners, int nUnused) {
     Aud_EmiInitSession();
     Aud_MicInitSession(nListeners);
@@ -1951,6 +1970,8 @@ s32 Aud_InitSession(u8 a, u8 b, u8 nListeners, int nUnused) {
     return 1;
 }
 
+// Ends a sound session: the emitters' and listeners' session end, then hlaudmovie.c's
+// (fn_800A8D88). n is TW07's subsessID.
 void Aud_ExitSession(s32 n) {
     Aud_EmiExitSession();
     Aud_MicExitSession();

@@ -267,9 +267,9 @@ void  Gaud_TextFall(void);
 void  Gaud_PlayTextDitty(int n);
 void  Gaud_FireQuickCheer(void);
 void  Gaud_Pause(int a);
-void  fn_800A73C0(u8 a, int b);
-s32   fn_800A7528(void);
-void  fn_800A7944(void);
+void  Gaud_PlayGameUISound(u8 a, int b);
+s32   Gaud_RewardCommentaryIsPlaying(void);
+void  Gaud_RestartMusic(void);
 u8    fn_800C6E44(View* pView);
 u8    fn_800C708C(View* pView);
 void  fn_800C9038(int nView, f32* pLong, f32* pSide);    // GoBreakLine.c
@@ -852,7 +852,7 @@ void fn_8008666C(MsgArg* pArgs, MsgArg* pResult) {
         fn_800ED554();
     }
     if (Game_GetMode() == 26 || Game_GetMode() == 22) {
-        fn_800A7944();
+        Gaud_RestartMusic();
     }
 }
 
@@ -1398,7 +1398,7 @@ void fn_800879B4(MsgArg* pArgs, MsgArg* pResult) {
             gSession.options.a0[4] = 4;
             break;
         }
-        fn_800A78F0(0.2f * (s8)gSession.options.a0[4]);
+        Gaud_SetCommentLevel(0.2f * (s8)gSession.options.a0[4]);
         return;
     case 4:
         if (pArgs[1].i != 0) {
@@ -1638,7 +1638,7 @@ void fn_8008835C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_800883FC(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800A73C0(pArgs[0].i, pArgs[1].i);
+    Gaud_PlayGameUISound(pArgs[0].i, pArgs[1].i);
 }
 
 void fn_80088428(MsgArg* pArgs, MsgArg* pResult) {
@@ -2670,7 +2670,7 @@ void fn_8008A690(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8008A758(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800A7528();
+    pResult->i = Gaud_RewardCommentaryIsPlaying();
 }
 
 void fn_8008A788(MsgArg* pArgs, MsgArg* pResult) {

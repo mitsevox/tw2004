@@ -22,7 +22,7 @@ void fn_8008D8CC(void);
 void fn_8008DBE8(void);
 void fn_80092198(void);
 void fn_8009220C(void);
-void fn_800A7644(int a);
+void Gaud_StartFEMusic(int a);
 void Gaud_ExitFE(void);
 void fn_80102AC4(void);
 void FE_CrAP_SetTriggerAnims(u8 b);
@@ -210,7 +210,7 @@ void FE_movieFade(void) {
                 break;                  // case only makes the dispatch test 3 before 1
             }
             fn_8007731C();
-            fn_800A7644(0);
+            Gaud_StartFEMusic(0);
             lbl_801D87C0.fFade = 0.0f;
             lbl_801D7148.nMovieNext++;
             if (lbl_801D7148.nMovieNext % FE_NUM_MOVIES == 0) {

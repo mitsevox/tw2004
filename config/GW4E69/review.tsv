@@ -274,3 +274,16 @@ address	name	comment	by	date
 800A7294	Gaud_ExitRainSound	add	cr4 (replayed by orchestrator)	2026-09-27
 800A72EC	Gaud_OnScoreCard	rewrite	cr4 (replayed by orchestrator)	2026-09-27
 800A7350	Gaud_Pause	add	cr4 (replayed by orchestrator)	2026-09-27
+800A73C0	Gaud_PlayGameUISound	rewrite	cr4 (replayed by orchestrator)	2026-09-27
+800A73F0	Gaud_PlayUISound	add	cr4 (replayed by orchestrator)	2026-09-27
+800A7528	Gaud_RewardCommentaryIsPlaying	none	cr4 (replayed by orchestrator)	2026-09-27
+800A75F4	Gaud_GetMusicStatus	add	cr4 (replayed by orchestrator)	2026-09-27
+800A7644	Gaud_StartFEMusic	add	cr4 (replayed by orchestrator)	2026-09-27
+800A7748	Gaud_GetAmbientStmStatus	none	cr4 (replayed by orchestrator)	2026-09-27
+800A7770	Gaud_GetStreamingStatus	add	cr4 (replayed by orchestrator)	2026-09-27
+800A78F0	Gaud_SetCommentLevel	add	cr4 (replayed by orchestrator)	2026-09-27
+800A7924	Gaud_SetMusicLevel	add	cr4 (replayed by orchestrator)	2026-09-27
+800A7944	Gaud_RestartMusic	add	cr4 (replayed by orchestrator)	2026-09-27
+800A7A14	Aud_PlayBuiltInSound	add	cr4 (replayed by orchestrator)	2026-09-27
+800A7A34	Aud_InitSession	rewrite	cr4 (replayed by orchestrator)	2026-09-27
+800A7A98	Aud_ExitSession	add	cr4 (replayed by orchestrator)	2026-09-27

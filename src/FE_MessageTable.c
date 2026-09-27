@@ -71,7 +71,7 @@ s32  fn_800A09EC(MCCardPos* pPos);      // }
 s32  MC_SaveUser(MCCardPos* pPos);      // }
 s32  MC_GetNumUser(MCCardPos* pPos);      // }
 void Gaud_ExitFE(void);
-void fn_800A73F0(int n);
+void Gaud_PlayUISound(int n);
 void fn_8010F2FC(MsgArg* pArgs, MsgArg* pResult);
 void fn_8010F3A4(MsgArg* pArgs, MsgArg* pResult);
 void fn_8011DF90(MsgArg* pArgs, MsgArg* pResult);
@@ -1606,9 +1606,9 @@ void fn_8007C5F0(MsgArg* pArgs, MsgArg* pResult) {
 
     n = pArgs[0].i;
     if (n == 11) {
-        fn_800A73F0((Misc_RandFunc(0) & 7) + 11);
+        Gaud_PlayUISound((Misc_RandFunc(0) & 7) + 11);
     } else {
-        fn_800A73F0(n);
+        Gaud_PlayUISound(n);
     }
 }
 
@@ -1812,7 +1812,7 @@ void fn_8007CACC(MsgArg* pArgs, MsgArg* pResult) {
         gSession.options.a0[4] = 4;
         break;
     }
-    fn_800A78F0(0.2f * (s8)gSession.options.a0[4]);
+    Gaud_SetCommentLevel(0.2f * (s8)gSession.options.a0[4]);
 }
 
 void fn_8007CBCC(MsgArg* pArgs, MsgArg* pResult) {
@@ -2745,7 +2745,7 @@ void fn_8007EA70(MsgArg* pArgs, MsgArg* pResult) {
         gSession.options.a0[1] = 4;
         break;
     }
-    fn_800A7924(0.2f * (s8)gSession.options.a0[1]);
+    Gaud_SetMusicLevel(0.2f * (s8)gSession.options.a0[1]);
 }
 
 // Option a0[0], the same way.
@@ -5454,7 +5454,7 @@ void fn_80084BE4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Music commands: 0 turns music row 0 and its track pArgs[1] on and plays the track, 1 calls
-// Gaud_StopMusic, 2 calls fn_800A7944 unless fn_800A75F4 says not to.
+// Gaud_StopMusic, 2 calls Gaud_RestartMusic unless Gaud_GetMusicStatus says not to.
 void fn_80084BE8(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 0:
@@ -5468,8 +5468,8 @@ void fn_80084BE8(MsgArg* pArgs, MsgArg* pResult) {
         Gaud_StopMusic();
         break;
     case 2:
-        if (!fn_800A75F4()) {
-            fn_800A7944();
+        if (!Gaud_GetMusicStatus()) {
+            Gaud_RestartMusic();
         }
         break;
     }

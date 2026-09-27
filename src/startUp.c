@@ -1588,10 +1588,10 @@ void fn_800B2104(MsgArg* pArgs, MsgArg* pResult) {
 // Command 10.
 void fn_800B2150(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 2) {
-        fn_800A7A14(0);
+        Aud_PlayBuiltInSound(0);
         return;
     }
-    fn_800A7A14(1);
+    Aud_PlayBuiltInSound(1);
 }
 
 // Command 18: byte b94 of the state of the card at a port and slot.

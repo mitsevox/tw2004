@@ -31,7 +31,7 @@ void fn_801270F0(void);
 void fn_800573E4(void);
 void fn_80091EE4(void);
 void fn_8007734C(void);
-void fn_800A7644(int a);
+void Gaud_StartFEMusic(int a);
 u8*  fn_8010C718(void);                     // CharSliders.c
 void fn_80091D84(void);
 void fn_80091E1C(void);
@@ -107,7 +107,7 @@ void fn_800083A4(void) {
             if (lbl_801D7148.b0F) {
                 fn_8007734C();
             }
-            fn_800A7644(lbl_801D7148.b0F);
+            Gaud_StartFEMusic(lbl_801D7148.b0F);
             fn_8009005C("frontend");
             fn_8006D8E8();
             if (gSession.nC == 0 && gSession.nGameType != 13) {

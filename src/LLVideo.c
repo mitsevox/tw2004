@@ -146,7 +146,7 @@ void   fn_80075AD0_UpdateAll(void);
 u8     fn_80075BF4_IsFrameDue(Video* pVideo);
 
 // GameAudio.c
-u8   fn_800A7770(void);
+u8   Gaud_GetStreamingStatus(void);
 void Aud_InitMovie(void);
 void Aud_ExitMovie(void);
 void Aud_StartMovie(void);
@@ -321,7 +321,7 @@ void fn_8007599C_Stop(Video* pVideo) {
 void fn_80075A14_Start(Video* pVideo) {
     do {
         Gaud_Cycle();
-    } while (fn_800A7770());
+    } while (Gaud_GetStreamingStatus());
     Aud_InitMovie();
     LLVideo_QueueReset(&pVideo->queue);
     pVideo->p1018 = NULL;
