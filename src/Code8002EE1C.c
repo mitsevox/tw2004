@@ -16,6 +16,12 @@ extern char lbl_80187650[];         // "cl_bbsd" ... the default name at +0x1A
 
 void Options_SetDefaults(GameOptions* pOpt);
 
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80282F20), before the 0.0f Session_Init uses first; its body is unknown.
+static f32 Code8002EE1C_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 // A fresh session: one player, every slot a CPU on tee set 2 with an empty profile.
 void Session_Init(void) {
     Session* pSession = &gSession;

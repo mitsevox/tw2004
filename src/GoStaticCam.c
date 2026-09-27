@@ -23,6 +23,8 @@ u8   fn_800659F4(CamShot* pShot, int nPlayer);
 void fn_80065AFC(f32* pA, f32* pB, f32* pOut);
 void fn_80065B20(f32* pA, f32* pB, f32* pOut);
 
+StaticCams* lbl_80281E18;
+
 // Register the 'CAMC' stream handler.
 void fn_8006449C(void) {
     Stream_RegisterLoadChunkCallback('CAMC', fn_800644F4);
@@ -456,8 +458,18 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
             fn_80065B20(pCam, vLast, vDiff);
             fDist = fLastDist + (f32)fn_80009680(fn_80009744(vDiff));
         } else if (fDist < fTarget) {
-            fEnd = fT + (fHiT - fT) * ((fTarget - fDist) / (fHiDist - fDist));
-            fT = fEnd;
+            fT = fT + (fHiT - fT) * ((fTarget - fDist) / (fHiDist - fDist));
+            // fake match: empty tests (dead checks) on the shot pointers make the frontend load them
+            // ahead of the call, so the call's arguments are scheduled as in the original
+            if (pNext) {
+            } else {
+            }
+            if (pAfter) {
+            } else {
+            }
+            if (pPrev->v20) {
+            } else {
+            }
             fn_800C7480(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20, pPrev->v30, pShot->v30, pNext->v30,
                         pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
             fn_80065B20(pCam, vLast, vDiff);

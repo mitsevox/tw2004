@@ -33,12 +33,22 @@ void fn_800B4F24(RainObject* pRain);
 void fn_800B4FA4(RainObject* pRain);
 void fn_800B52D4(RainObject* pRain, f32* pTime);
 
+RainState lbl_801F6320;
+RainState* lbl_802814B8 = &lbl_801F6320;
+
 void fn_800B4B5C(void) {
     lbl_802814B8->n0 = 0;
     lbl_802814B8->n4 = 0;
     lbl_802814B8->f8 = fn_80029B64(3075.0f);
     lbl_802814B8->pBank = NULL;
     lbl_802814B8->pTex = NULL;
+}
+
+// fake match: stands in for a function the original linker stripped. The file's pool has 0.0
+// right after fn_800B4B5C's 3075.0, before fn_800B4C00's constants; its body is unknown, this
+// one only reproduces the order.
+static f32 GoShaderObject_Rain_Gc_StrippedFn(void) {
+    return 0.0f;
 }
 
 void fn_800B4BB0(void) {
@@ -228,10 +238,11 @@ void fn_800B52D4(RainObject* pRain, f32* pTime) {
     RainSplash* pSplash;
     int nHalf;
     int j;
-    RainData* pData;
+    int k;
     int nBuf;
     RainPoint* pPoint;
-    int k;
+    RainData* pData;
+    f32 fAlpha;
     f32 fOff;
     f32 fY;
     f32 fX;
@@ -300,11 +311,15 @@ void fn_800B52D4(RainObject* pRain, f32* pTime) {
 
     for (i = 0; i < RAIN_NUM_SPLASHES; i++) {
         pSplash = &pData->apB[nBuf][i];
-        if (pSplash->fAlpha >= 0.05f && pSplash->fAlpha < 0.7f) {
-            pSplash->fAlpha = 5.0f * *pTime + pSplash->fAlpha;
+        fAlpha = pSplash->fAlpha;
+        if (fAlpha >= 0.05f && fAlpha < 0.7f) {
+            pSplash->fAlpha = 5.0f * *pTime + fAlpha;
             continue;
         }
-        if (pSplash->fAlpha <= 0.0f) {
+        // fake match: pSplash taken again (the same splash) makes it a frontend temp, so it gets
+        // its register before the loop counter
+        pSplash = &pData->apB[nBuf][i];
+        if (fAlpha <= 0.0f) {
             // fake match: through the buffer again, not pSplash (the original reloads apB here)
             pData->apB[nBuf][i].fAlpha = 0.9f * (0.65f * Misc_RandFuncf(1)) + 0.05f;
         } else {

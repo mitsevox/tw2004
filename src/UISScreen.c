@@ -499,6 +499,7 @@ UISNodeInfo* fn_8016B6BC(UISScreen* pScreen, UISNodeInfo* pInfo) {
 // the current screen, the rate functions and the p60 records on the screens they named.
 void fn_8016B4D4(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 nMove) {
     s32 nScreens;
+    s32 nLimit;
     s32 nIndex;
     s32 nCount;
     s32 nFrom;
@@ -508,8 +509,8 @@ void fn_8016B4D4(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 nMove) {
     s32 nStep;
     UISScreen tmp;
 
-    nScreens = pStudio->nScreens;
     nIndex = fn_8016C6C4(pStudio, uGroup, uScreen);
+    nScreens = pStudio->nScreens;
     if (nIndex < nScreens) {
         if (nMove >= 0) {
             nCount = nMove;
@@ -519,10 +520,14 @@ void fn_8016B4D4(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 nMove) {
             nStep = -1;
         }
         nTo = nIndex;
+        // fake match: nLimit is always nScreens; its second assignment in the loop keeps EA's copy of
+        // the count (`mr r28,r8`) from being propagated away.
+        nLimit = nScreens;
         while (nCount-- != 0) {
             nFrom = nTo;
             nTo += nStep;
-            if (nTo >= nScreens || nTo < 0) break;
+            if (nTo >= nLimit || nTo < 0) break;
+            nLimit = nScreens;
             if (pStudio->nCurScreen == nTo) {
                 pStudio->nCurScreen = nFrom;
             } else if (pStudio->nCurScreen == nFrom) {

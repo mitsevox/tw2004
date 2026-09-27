@@ -31,6 +31,19 @@ unless you combine it with something new. Before you stop, add every attempt und
   deletion (08) deletes it. EA's `mr r30,r27` is that copy kept: in EA's IR r50 still fed a copy
   (or had a second definition) at pass 08 and 12. The inner preheader copy `mr r52,r50` is gone
   already at pass 03 in ours. No source change tried beyond reading the dumps.
+- 2026-09-26 e-uisscreen (endgame; aligned counts on the WHOLE preprocessed unit, a scratch perm dir, same as the build): base 25. do { } while (0) / for (;;) { break; } / while (1) { break; }
+  around the store (1-3 deep), around the inner loop (1-3 deep) or the outer loop: 25 (folded).
+  A second store local reassigned in the loop (the lever that closed fn_8016B4D4): one local
+  (u8/s32/int/u32, set before loop 2 or in a block, reassigned before/after the store or at the
+  group start) 25 or worse; two locals (bX = bLast, bY = bX, bY reassigned after the store) 25+
+  (u8 conversions appear). Per-function pragmas (19 sets) and scheduling models: 25.
+  mwcc-debugger: the frontend hoists the store's conversion to loop 2's preheader
+  (`rlwinm r50,r56,0,24,31`) and copies it into the inner preheader (`mr r52,r50`); pass 03 deletes
+  r52, pass 06 turns r50 into `mr r50,r56`, pass 08 deletes it. EA's kept `mr r30,r27` needs that
+  copy still feeding another copy (or a second definition) at pass 08 and 12. nNode (dead after
+  pNode) reused as the counter of the start loop and the inner entry loop: 22 (start only 28, inner
+  only 36, outer j 33); with every order of the declarations 22; plus the store-local lever 22.
+  Left at 22: EA's `mr r30,r27` and a register rotation of the loop pointers.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 

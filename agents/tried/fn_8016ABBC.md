@@ -66,6 +66,29 @@ unless you combine it with something new. Before you stop, add every attempt und
   EA; load deletion then gives EA's exact `mr r30,r7; lwz r3,0(r7)`: proof the copies come
   straight from r7), 255 (10 aligned) only with `new_var = p;` placed inside the switch before the
   first case label, i.e. unreachable, so pNode reads an uninitialised variable: rejected.
+- 2026-09-26 e-uisscreen (endgame; aligned counts on the WHOLE preprocessed unit, a scratch perm dir, same as the build): base 16. Second definitions that cost nothing, all folded (16): a
+  constant condition (`s32/u8/int k = 1` or 0; `k ? p : p`, if/else), tautologies (`nKind ==
+  nKind`, `p == p`, `n - n`, `bAll & 0`, `(u32)nKind < 0`, ...) ? p : p; `(p != 0) ? p : p` 23.
+  Address-taken locals (&pNode, 1-element array, void* q + &q) 16. Per-function pragmas and
+  scheduling models 16. NEW (the lever that closed fn_8016B4D4): a second local per case assigned
+  from the case pointer before the loop and again right after its use in the loop, e.g. case 8
+  `pLoop = pNode; for (...) { pG = pLoop->ppGroups[i]; pLoop = pNode; fn_8016ABBC(.., pG, 0); }`
+  and case 7 `pLoop = pGroup; ... pEntry = &pLoop->pEntries[i]; pLoop = pGroup;`: EA's case copies
+  from r7 come back (`mr r29,r7` / `mr r28,r7`, p stays in r7, no entry copy), aligned 10; with
+  function-level declarations in the order rasim.py suggests (nEntries, pLoop8, i, nGroups, pNode,
+  pEntry, pLoop7, pGroup) and a separate counter k for case 7 (declared second): 8. Left: case 8's
+  ppGroups base goes to r4 with `li r6,7` before the lwzx (EA r6, the lwzx before `li r6,7`: the pG
+  temp moves the load out of the argument list), and case 7's offset starts `li r31,0` (EA `mr
+  r31,r29`, the CSE of the shared i's `li 0`, lost with the separate k). The reassignment after the
+  call instead keeps EA's argument order but puts the second local in r3 (`mr r3,r31` twice): 11.
+  Comma forms inside the arguments, `(pLoop = pNode)->`, for-increment: 13-16. The separate
+  counter on case 8 instead (random order search, 150 orders) 8; pEntry loop-local with the shared i
+  (sampled permutations of 7 declarations) 10: `mr r31,r29` is back but case 7's i/nEntries swap
+  (r30/r29). The reassignment placed inside the call's argument list (comma in argument 1, 3, 5's
+  index or 6): EA's exact argument order and case-8 registers, but the case copy is propagated
+  again (14); through a UISGroup** temp (address or base, statement or comma) 8.
+  Permuter 20 min from the 8 base: nothing better in aligned terms. Scratch:
+  /home/user/scratch/tw/agents/e-uisscreen/t_abbc6..17.py, v_abbc_k.c (the 8 source).
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 

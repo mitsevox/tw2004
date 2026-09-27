@@ -222,7 +222,7 @@ void GR_BuildGridRenderData(s32 nView) {
     f32 fPeriod;
     f32 fPrev;
     // fake match: &gSession through a local, so its base (not &gSession.nFrameCount) is kept
-    Session* pSession = &gSession;
+    Session* pSession;
     lbl_802813C0->nVerts = 0;
     fPrev = 0.0f;
     lbl_802813C0->nIndices = 0;
@@ -233,7 +233,10 @@ void GR_BuildGridRenderData(s32 nView) {
     fDirZ = lbl_802813C0->aDir[nView][2];
     fCornerX = lbl_802813C0->aCorner[nView][0];
     fCornerZ = lbl_802813C0->aCorner[nView][2];
-    for (n = 0; n < lbl_802813C0->nCols * lbl_802813C0->anRows[nView]; n++) {
+    // fake match: pSession is set in the loop test (always run at least once, so the second loop
+    // sees it set too); the compiler then hoists &gSession to the end of the preamble, as EA's
+    // code schedules it
+    for (n = 0; pSession = &gSession, n < lbl_802813C0->nCols * lbl_802813C0->anRows[nView]; n++) {
         nRow = n / lbl_802813C0->nCols;
         nCol = n % lbl_802813C0->nCols;
         fAcross = nCol * lbl_802813C0->fCellW;
