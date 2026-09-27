@@ -98,6 +98,7 @@ void AI_ChooseTarget(int nPlayer) {
     // fake match: keep the narrow power value separate for register allocation.
     int         powerByte;
     int         nPinSet;
+    // fake match: like nPower, widen storage only to match the original cast scheduling.
     long long   nAggr;
     f32         fDX, fDZ;
 

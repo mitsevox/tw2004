@@ -1,6 +1,6 @@
 # AI_ChooseTarget (Golfer.c, 0x8002C2DC)
 
-Status: OPEN, 99.74599% on 2026-09-26 (codex/round3 form merged over r7-golfer's 99.56).
+Status: SOLVED, 100.0% on 2026-09-26 (1496 bytes / 374 instructions). Fix commit b9ef8665.
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -224,3 +224,63 @@ UStream_Update exact). The other 13 "matches" (Earnings x2, Golfer AI_ChooseTarg
   is the hoisted `(s8)nAggr` temp (ours r27, EA r21). The selective table-base alias is labelled
   `fake match:` pending stronger evidence that EA wrote that exact source form. The more natural
   zone-pointer alias returned scratch 17 -> 28; no source replacement found before this handoff.
+- 2026-09-26 codex/round3, resumed from merged main: verified 99.74599% and 374 instructions;
+  `ninja` still reports `main.dol: OK`. On the current 17/17 quicktrial baseline, moving the
+  `pTargets` declaration to every possible position among the 20 locals is neutral; moving its
+  assignment before `nBest`, `fBestDist2`, or the pre-loop condition is neutral, while earlier
+  placements are worse. Index spelling of the zone target (`&pTargets[nZone]`, pointer addition,
+  `int`/`s8`/`s32`/`long` casts, reversed pointer addition), applied at the pre-loop test, loop
+  link access, or both, is neutral or worsens to 27; using `gAITargets` directly in the pre-loop
+  test is neutral, but in the loop worsens to 28. Current-baseline declaration climb and all 190
+  pair swaps found no score under 17. Per-function single, double, and triple combinations of
+  `opt_lifetimes`, `opt_propagation`, `opt_dead_assignments`, `opt_common_subexpressions`, and
+  `opt_strength_reduction` off were neutral or worse (best 17). Syntax variants on each/all six
+  `__abs(t->n*Req)` calls (`int`/`s8`/`s32`/`long` casts, unary plus, `+0`, `-0`, `*1`) were neutral;
+  a ternary absolute value changed code shape badly (180-204 diffs). All were scratch-only; no
+  source change. These exclude local spelling/declaration/compiler-pragma fixes on this baseline.
+- 2026-09-26 codex/round3, microrepro lead: move the pure `fDumb = 100.0f - (f32)(s8)nIQ`
+  statement from before the loop to just after the tee-set and pin-set `continue` guards, before
+  the best-priority test. The compiler hoists it back to the same instruction sequence but changes
+  allocation: scratch positional/aligned 17 -> 11, real report 99.74599 -> 99.82620%, still
+  374 instructions / 1496 bytes. `ninja` and `git diff --check` pass. Kept in Golfer.c.
+- 2026-09-26 codex/round3, current 99.82620 baseline: the remaining 11 scratch differences are
+  register operands only, for five loop-invariants (zone offset, AI table base, tee pointer,
+  narrow aggression, narrow power); opcode/order/branch sequence is exact. Repeating all 190
+  declaration pair swaps, every nAttr declaration position and its int/s32/long/u32 types, the
+  zone and tee expression syntax sweeps, and nIQ type/cast/algebraic spellings gives no score below
+  11. Splitting `AI_FirstUsableClub` into its own local worsens to 97, while a max-distance local
+  or reusing nClub for first usable club is neutral. Guarding the loop with `goto` rather than the
+  existing `if` is byte-identical. `register` on each named local and selected combinations is
+  neutral. A 4,500-trial declaration-order anneal on the older 17 baseline found no improvement;
+  stopped when the fDumb lead superseded that baseline. No other source change kept.
+- 2026-09-26 codex/round3, non-monotonic register-order probes on 99.82620: a further 5,000-trial
+  declaration-order anneal on the 11-diff baseline found no improvement. Tee pointer/index syntax,
+  zone syntax, target-pointer syntax, and link-index syntax remain neutral/worse; splitting the
+  second distance expression into a float local is neutral, while reusing fDist2 changes code
+  shape. Compiler GC/1.3.2, 2.0, 2.0p1, 2.5, 2.6, and 2.7 all score 11 on the same source;
+  3.0a3 differs broadly. Localized pragma toggles around the loop and requirement gates were
+  byte-identical, as were full-width extra call-result copies; narrow aliases generally changed
+  instruction shape. A one-site inline zone-definition getter moves the zone offset to EA's r26
+  but worsens scratch 11 -> 21. A two-definition aggression-byte local moves that cast to EA's
+  r21 but worsens 11 -> 19. Their individual worsening is expected from the allocator's single
+  spill choice: rasim shows only all required virtual-order shifts together reach exact colours.
+  A two-definition power-byte local plus `void* pTargets` casts at both zone uses reaches 374
+  instructions / five normalized assembly differences in scratch and the full unit, with
+  AIbase/zone/power/aggression named registers exact. It moves the power cast before tee's `addi`,
+  so the official full-unit fuzzy report regresses 99.82620 -> 98.86364. This variant is scratch
+  only; tracked Golfer.c was restored to the 99.82620 baseline pending an exact-order source form.
+  Additional P+voidZ scratch: changing both nAggr and nPower locals to `long long` scores 4/4,
+  but the only four residual differences swap the source registers of the aggression and power
+  casts/compares. The assembly would check the wrong attribute, so this is an INVALID semantic
+  candidate despite its lower numeric score; do not apply it.
+- 2026-09-26 codex/round3, exact finish: on the `fDumb`-moved source, keep `pTargets` as a
+  `void*` alias and cast it back at both zone lookups; store the int-returned nPower/nAggr in
+  `long long` locals; declare `int powerByte` and assign `(s8)nPower` once after both aggression
+  gates, immediately before the high-power gate, which alone uses `powerByte`. The second power
+  gate keeps its original `(s8)nPower` cast. This source compiles to all 374 retail instructions,
+  exactly 1496 bytes: quicktrial 0/0 and full-unit report 100.0%. `cmp` confirms the built DOL is
+  byte-identical to the private retail DOL. The pointer/type/copy codegen levers are each marked
+  `// fake match:`; the original source forms are not proven. A second exact source form reused the
+  dead nClub local for the first aggression gate plus duplicate powerByte assignments in both
+  CPU branches, but the kept single-assignment variant is simpler and was independently built.
+  Commit b9ef8665. No asm, UB, signature changes, or behavior-changing values were used.
