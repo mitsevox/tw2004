@@ -555,7 +555,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             nEntry = *--pFrame->pC;
             pnList = (s32*)(*pList + (u32)pScreen->pData);  // port: EA sums the pointer as a u32
             if (nEntry < pnList[0]) {
-                pEntry = (UISNodeInfo*)((u8*)pScreen->pData + pnList[nEntry + 2]);
+                s32 nEntryOffset = pnList[nEntry + 2];
+                pEntry = (UISNodeInfo*)((uptr)nEntryOffset + (uptr)pScreen->pData);
                 if (pInfo != pEntry || pEntry->u4 == 0) {
                     data.aw[0] = nId;
                     *pA1 = 0;
