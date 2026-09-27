@@ -380,24 +380,37 @@ void fn_8012645C(int nPlayer) {
 // Once every player's nEA0 has reached n4 and they are all level, the player with the highest nEBC
 // wins (n8 = the player, bC set). A tie for the highest leaves no winner, and with n0 1 clears
 // every nEBC.
+// fake match: no loop unrolling in the frontend, so the second loop keeps the count in a register
+// and gets the backend's unroll (srwi by 8 + remainder) as EA's does. Not exact yet: EA computes
+// pScore after the second return test, ours before it (agents/tried/fn_801264B8.md).
+#pragma push
+#pragma opt_unroll_loops off
 void fn_801264B8(void) {
+    s32 nMin;
+    s32 nFirst;
+    s32* pScore;
+    Player* pPlayer;
+    s32 n;
     s32 i;
     s32 nWinner = 5;
     s32 nBest = -0x7FFFFFFF - 1;
     u8 bTie = 0;
-    s32* pScore;
 
-    for (i = 0; i < gSession.nNumPlayers; i++) {
-        if (PLAYER(i)->nEA0 < lbl_80195498.n4) {
+    nMin = lbl_80195498.n4;
+    nFirst = gPlayers[0].nEA0;
+    n = gSession.nNumPlayers;
+    for (i = 0; i < n; i++) {
+        pPlayer = PLAYER(i);
+        if (pPlayer->nEA0 < nMin) {
             return;
         }
-        if (gPlayers[0].nEA0 != PLAYER(i)->nEA0) {
+        pScore = &pPlayer->nEBC;
+        if (nFirst != pPlayer->nEA0) {
             return;
         }
-        pScore = &gPlayers[i].nEBC;
-        if (*pScore >= nBest) {
+        if (pPlayer->nEBC >= nBest) {
             bTie = 0;
-            if (nBest == *pScore && nWinner != 5) {
+            if (nBest == pPlayer->nEBC && nWinner != 5) {
                 bTie = 1;
             }
             nWinner = i;
@@ -410,12 +423,13 @@ void fn_801264B8(void) {
         lbl_80195498.n8 = 5;
         lbl_80195498.bC = 0;
         if (lbl_80195498.n0 == 1) {
-            for (i = 0; i < gSession.nNumPlayers; i++) {
+            for (i = 0; i < n; i++) {
                 PLAYER(i)->nEBC = 0;
             }
         }
     }
 }
+#pragma pop
 
 s32 fn_80126640(int n) {
     switch (n) {
