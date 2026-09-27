@@ -961,6 +961,12 @@ done:
     return nRet == 1;
 }
 
+// fake match: puts 1.0f in the constant pool ahead of AnimLib_PlanBank's 942080.0f (EA's
+// order). Unused, so the linker strips it.
+static f32 skalib_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 // Plans the clip bank for a slot: merges the slot's library with its overlays (clips with the
 // same name are shared, later copies pointing at the first), and, unless it is slot 2, trims
 // the result to the slot's budget (lbl_80281CDC, or its share of 920 KB when lbl_80281CD8 is
