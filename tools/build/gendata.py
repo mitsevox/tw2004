@@ -7,6 +7,10 @@ their bytes are Nintendo's, so the repository never holds them: configure.py run
 build.ninja reruns it when its inputs change) to write build/<version>/gen/<unit>.c from
 orig/<version>/sys/main.dol, which every build already needs. build/ is git-ignored.
 
+It also writes initializer fragments (FRAGMENTS) for game units whose data is a game asset (a
+font bitmap, sound samples, textures): the unit's own C defines the object and #includes the
+fragment, so those bytes never enter the repository either.
+
 Each symbol's section, address, size and alignment come from config/<version>/symbols.txt; the
 element type is the SDK header's (dolphin/ax.h, dolphin/ax/__ax.h).
 
@@ -29,6 +33,18 @@ UNITS = {
         ("axDspSlave", "unsigned short", 2, False),
         ("axDspSlaveLength", "unsigned short", 2, True),  # .sdata: 2 bytes, padded to 8
     ],
+}
+
+# Initializer fragments for game units whose data holds game assets (a font bitmap, sound samples,
+# textures): the unit's C defines the object and #includes the fragment between its braces, so the
+# bytes come from the user's main.dol and never enter the repository. The game units' include path
+# has build/<version>/gen. fragment file -> (symbol, element size)
+FRAGMENTS = {
+    "DiscError_font.inc": ("lbl_8018FFE0", 4),      # DiscError.c: the disc-error screens' font
+    "startUp_sound0.inc": ("lbl_8018F040", 1),      # startUp.c: the boot sounds' ADPCM data
+    "startUp_sound1.inc": ("lbl_8018F640", 1),
+    "Code8009AA28_tex0.inc": ("lbl_8018A028", 1),   # Code8009AA28.c: two raw blobs (textures)
+    "Code8009AA28_tex1.inc": ("lbl_8018A4D8", 1),
 }
 
 SYMBOL_RE = re.compile(
@@ -100,6 +116,25 @@ def generate(dol, symbols_path, out_dir):
             lines.append("")
         text = "\n".join(lines)
         path = out_dir / unit
+        if not path.exists() or path.read_text() != text:
+            path.write_text(text)
+    for fragment, (name, width) in FRAGMENTS.items():
+        if name not in symbols:
+            sys.exit(f"gendata: {name} is not in {symbols_path}")
+        section, addr, size, _ = symbols[name]
+        if section != ".data" or size % width:
+            sys.exit(f"gendata: {name} ({section}, 0x{size:X} bytes) cannot be a fragment")
+        count = size // width
+        values = struct.unpack(f">{count}{fmt[width]}", read(addr, size))
+        lines = [
+            f"// {fragment}: the initializer of {name}, generated from the user's main.dol by",
+            "// tools/build/gendata.py at build time; never committed.",
+        ]
+        per_row = 16 // width * 2 if width > 1 else 16
+        for i in range(0, count, per_row):
+            lines.append("    " + ", ".join(f"0x{v:0{width * 2}X}" for v in values[i:i + per_row]) + ",")
+        text = "\n".join(lines) + "\n"
+        path = out_dir / fragment
         if not path.exists() or path.read_text() != text:
             path.write_text(text)
 

@@ -5,6 +5,15 @@
 #include "camera.h"
 #include "core/startup.h"
 
+f32 lbl_80189DA8[6][8] = {
+    {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f},
+    {1.0f, 2.0f, 2.0f, 3.0f, 3.0f, 2.0f, 2.0f, 1.0f},
+    {1.0f, 2.0f, 3.0f, 4.0f, 4.0f, 3.0f, 2.0f, 1.0f},
+    {1.0f, 2.0f, 3.0f, 4.0f, 4.0f, 3.0f, 2.0f, 1.0f},
+    {1.0f, 2.0f, 2.0f, 3.0f, 3.0f, 2.0f, 2.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f},
+};
+
 // Sets lbl_802813B8->f0 so that all of lbl_80189DA8's weights together make 1.
 void fn_8009A250(void) {
     int y;
