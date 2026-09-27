@@ -381,6 +381,10 @@ GoCamCont.c:
 
 GoStaticCam.c:
 	.text       start:0x8006449C end:0x80065B44
+	.rodata     start:0x80183700 end:0x80183768
+	.data       start:0x801885F8 end:0x80188628
+	.sbss       start:0x80281E18 end:0x80281E20
+	.sdata2     start:0x80283728 end:0x80283748
 
 event.c:
 	.text       start:0x80065B44 end:0x80067710

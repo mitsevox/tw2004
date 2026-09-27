@@ -1,12 +1,29 @@
 # StaticCam_GetFlybyInformation (GoStaticCam.c, 0x80065488)
 
-Status: OPEN, 99.95% on 2026-09-25.
+Status: SOLVED 2026-09-26 (e-link1), fake match: block 2 as `fT = fT + (fHiT - fT) * (..);` (the
+fT form, fmadds into fT's f31 as EA's) plus three empty tests before the call, in this order:
+`if (pNext) {} else {}`, `if (pAfter) {} else {}`, `if (pPrev->v20) {} else {}`. The tests make the
+frontend load the address-taken shot pointers ahead of the call, which restores EA's argument
+schedule (r6 before r4, f2 before f1) that the fT form alone lost (7 diffs). GoStaticCam linked
+(.rodata, .data, .sbss lbl_80281E18, .sdata2).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
 "Attempts" (what, score before -> after). When it is exact: Status SOLVED, the fix, the commit.
 
 ## Attempts
+
+- 2026-09-26, e-link1 (quicktrial, base 2): call argument `Get(&fT)` / `Id(fT)` inlines, `(f32)fT`,
+  `fT * 1.0f`, `fT - 0.0f`, `-(-fT)`, `(f32)(f64)fT`, `fT = Id(fEnd)` / `Get(&fEnd)` / `fEnd * 1.0f` /
+  `-(-fEnd)`: 2 (all folded back to the temp); `fT = (f32)fEnd` / `(f32)(f64)fEnd` 7 (fEnd dropped,
+  the fT form); `*(f32*)(void*)&fT` 304. Empty tests on fT / fEnd / the whole expression / the
+  difference / the ratio / the product before or after the assignments or after the call, and
+  redundant `fT = fEnd` / `fEnd = E` again: 2-49. Permuter 20 min -j4 (5169 iterations): nothing.
+  mwccdbg: base pre-RA `fmadds f46; fmr f44(fT),f46; ..; fmr f3,f46`, f46 has no edge to fT, yet
+  is coalesced into f3. Sweep: 1-3 ordered empty tests from {pShot->f78, pNext->f78, pAfter->v20,
+  pShot->v20, pNext->v20, pPrev->v20, pAfter, pNext, pPrev, fHiT - fT} before the call or before
+  the assignment, with block 2 in the fT form: `pShot->f78` alone 6, (fHiT - fT, pNext->v20) 2,
+  **(pNext, pAfter, pPrev->v20): 0** (kept, either position).
 
 - 2026-09-26, r7-cam (reading only, nothing new built): with the call reading the temp, the
   temp has two copies (`fmr fT,tmp`, `fmr f3,tmp`) and is coalesced into the argument register

@@ -913,7 +913,7 @@ config.libs = [
             Object(Matching, "stateFunc.c"),
             Object(Matching, "GoCamCont.c"),
             Object(NonMatching, "skalib.c"),
-            Object(NonMatching, "GoStaticCam.c"),
+            Object(Matching, "GoStaticCam.c"),
             Object(Matching, "target.c"),
             Object(Matching, "emotion.c"),
             Object(Matching, "Replay.c"),
