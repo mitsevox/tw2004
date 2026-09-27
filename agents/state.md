@@ -3,7 +3,14 @@
 Updated 2026-09-25 ~21:30 CDT. How the machines, CI, the page and PC jobs fit together:
 docs/infrastructure.md. History: docs/journal.md.
 
-**2026-09-27 ~13:00 UTC:** 7,641/7,647 exact. IStudio hold LIFTED ~14:00 UTC (owner): Madden evidence in (docs/reference-builds/madden2003-ps2); lanes b12 fn_80166098,
+**100% (2026-09-27 ~17:45 UTC, f568ee7):** 7,647/7,647 functions exact; matched code 100%; code linked
+100%; data linked 100%; 453/453 units linked; `main.dol: OK`. The last function was UISStack.c's
+fn_80166098 (EA's UISStackProcess). objdiff "matched data" reads 79.95% (a scoring artifact: see the
+hygiene list below). Nothing is running. Next: the owner's after-100% list (bottom of this file).
+Nintendo SDK data (AXComp/DSPCode) and art/audio blobs are linked via C generated from main.dol at
+build time (tools/build/gendata.py), never committed.
+
+**Earlier (2026-09-27 ~13:00 UTC):** 7,641/7,647 exact. IStudio hold LIFTED ~14:00 UTC (owner): Madden evidence in (docs/reference-builds/madden2003-ps2); lanes b12 fn_80166098,
 b7 fn_80168918, b5 fn_80165670, b4 fn_80169DC4 rewrite toward EA's locals; Gemini works its own branch (compare at the end). Was: hold until the owner's research and the Madden NFL 2003 PS2 lead are in (Madden 2003 prototype, EA Tiburon
 2002, has IStudio with .mdebug/STABS: UIStudio.c, UISEvent.c; being extracted to
 docs/reference-builds/madden2003-ps2/, binary in /home/user/refs, off git). Open: IStudio x4 (held),
