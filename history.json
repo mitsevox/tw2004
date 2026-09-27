@@ -41685,5 +41685,21 @@
 "matched_functions": 7587,
 "total_functions": 7647,
 "exact": 7587
+},
+{
+"commit": "dd4c99c",
+"sha": "dd4c99c1cd2f30251ec8f0a43fe698d94a5f9e78",
+"time": 1790471075,
+"subject": "startUp.c: label fn_800B0748's per-function pragma as a fake match",
+"report": true,
+"matched_code": 1492592,
+"complete_code": 1311696,
+"matched_data": 723063,
+"complete_data": 868387,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7587,
+"total_functions": 7647,
+"exact": 7587
 }
 ]
