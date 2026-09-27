@@ -1228,7 +1228,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             nIndex = (uByte0 << 8) | uByte1;
             uByte0 = *pFrame->p10;
             pFrame->p10++;
-            fn_80168644(pStudio, pScreen, uByte0, (void*)(u + pFrame->pC[nIndex]), pTop[-1]);
+            u += pFrame->pC[nIndex];  // port: the sum is a 32-bit address
+            fn_80168644(pStudio, pScreen, uByte0, (void*)u, pTop[-1]);
             pFrame->pC--;
             break;
         }
