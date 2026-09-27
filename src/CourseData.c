@@ -229,3 +229,37 @@ int fn_800D31A4(int nPar) {
 int fn_800D3208(void) {
     return fn_800D31A4(4) + fn_800D31A4(5);
 }
+
+// Data order: after fn_800D30B4's jump table in .data; "Skillz" and "NA" land in .sdata.
+char* lbl_80191990[NUM_COURSES] = {
+    "Pebble Beach",
+    "Princeville Resort",
+    "TPC at Sawgrass",
+    "Black Rock Cove",
+    "Penguin Falls",
+    "Bethpage Black",
+    "Royal Birkdale",
+    "Skillz",
+    "Bay Hill Club",
+    "The Predator",
+    "Spyglass Hill",
+    "Poppy Hills",
+    "The Highlands",
+    "TPC of Scottsdale",
+    "Torrey Pines",
+    "St Andrews",
+    "Sahalee CC",
+    "Emerald Dragon",
+    "Wallaby Creek",
+    "Kapalua Plantation",
+    "Pinehurst No. 2",
+    "NA",
+    "Tiger's Dream 18",
+    "Random 18",
+    "Compilation 1",
+    "Compilation 2",
+    "Compilation 3",
+    "Compilation 4",
+    "Compilation 5",
+    "Compilation 6",
+};
