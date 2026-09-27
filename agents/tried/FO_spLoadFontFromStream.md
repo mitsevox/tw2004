@@ -42,6 +42,22 @@ unless you combine it with something new. Before you stop, add every attempt und
   nWidth or nX, `(u8)(*pSrc >> 4)`, `*pSrc >> 4` with & 0xF on uFirst (srawi stays), copies of
   pSrc/pDst inside the k loop (propagated away), `nX += 1`, `++k`, `nX++` in the compare,
   swapped if/else (layout), block-scope nX/k (no change), GC/1.3.2/2.0/2.6/2.7 (same), 2.0p1/3.0 worse.
+- 2026-09-27 b11, last (commit e8491f4, 99.49%): KEPT `if (nTileCol * 4 + k >= w)` with no nX
+  (the backend's induction temp is EA's r3 `mr r3,r4`; 95.95 -> 96.25), then the declaration order
+  from rasim (texel loop registers exact, 96.57), then **mask-first byte pairs in the uv block**
+  `aX[0] + ((aX[1] & 0xFFu) << 8)` (the shift-then-mask form leaves a dead `rlwinm` that register
+  allocation deletes, which makes the post-RA scheduler reschedule the loop-2 block; EA's order is
+  our pre-RA order) 96.57 -> 99.49. Split webs (a local reused in two loops) get @ vregs just above
+  the locals in declaration order; rasim does not renumber them when it permutes declarations.
+  LEFT (36 differing instructions, all registers): loop 1 (EA nPalette r3, i r4, IVs r7/r8,
+  cursor r3; ours i r3, nPalette r4, IVs r6/r7, cursor r8) and the entry copies (EA `mr r27,r4;
+  mr r30,r3; mr r28,r3`, ours `mr r28,r3; mr r27,r4; mr r30,r28`: the post-RA peephole rewrites a
+  load's base through the copy but never a `mr` source). Best lead (not applied, names): palette
+  in the texel counter `k` and the loop-1 cursor in `pSrc` (both become split webs): nPalette r3,
+  aligned 36 -> 31 (build/perm base). A real-compile declaration search on that variant was
+  started (scratch qsearch.py). No gain on loop 1: aCode spellings, a local for the code, a
+  `k` copy, `pGlyphRec = pRecs + i`, fresh counters per loop (the 256 guard needs `i` shared by
+  all three loops).
 
 - 2026-09-26 r6-misc: WHY the srawi forms: mwccdbg shows each peephole-forward pass folds only
   ONE `rlwinm; srawi` pair per basic block, the last one in the block (backend-01/-09/-13 fold
