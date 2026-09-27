@@ -1962,6 +1962,9 @@ src/MSL_C/PPCEABI/bare/H/string.c:
 	.rodata     start:0x801851B0 end:0x80185540
 	.sdata      start:0x80281B10 end:0x80281B18
 
+runtime/float.c:
+	.sdata      start:0x80281B18 end:0x80281B40
+
 src/MSL_C/strtold.c:
 	.text       start:0x8015A8D0 end:0x8015B8DC
 	.rodata     start:0x80185540 end:0x80185578
