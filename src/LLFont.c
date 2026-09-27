@@ -478,15 +478,17 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
                     // port: EA drops the colours fn_8001208C returns, so the gradients change
                     // nothing here.
                     if (pCtx->n10 & 4) {
-                        f32 fGYMid = 0.0f;
-                        fGYMid += pGlyph->f20;
+                        f32 fZero = 0.0f;
+                        f32 fGYMid;
+                        fGYMid = fZero + pGlyph->f20;
                         fn_8001208C(pCtx, fGradX, fGradY, 0.5f * pGlyph->fWidth + (fRun + pGlyph->f1C),
                                     0.5f * pGlyph->fHeight + fGYMid);
                     } else {
-                        f32 fGY0 = 0.0f;
+                        f32 fZero = 0.0f;
+                        f32 fGY0;
                         f32 fGX0 = fRun + pGlyph->f1C;
                         fGX1 = fGX0 + pGlyph->fWidth;
-                        fGY0 += pGlyph->f20;
+                        fGY0 = fZero + pGlyph->f20;
                         fGY1 = fGY0 + pGlyph->fHeight;
 
                         fn_8001208C(pCtx, fGradX, fGradY, fGX0, fGY0);
