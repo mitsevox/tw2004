@@ -61,7 +61,6 @@ LLFont* FO_spLoadFontFromStream(u8* pData, UFontState* pState) {
     LLTexelPair* pDst;
     u8* pRec;
     int k;
-    int nByte;
     int nRowBytes;
     LLFont* pFont;
     LLGlyphRec* pGlyphRec;
@@ -69,7 +68,6 @@ LLFont* FO_spLoadFontFromStream(u8* pData, UFontState* pState) {
     s32 i;
     u8* pSrc;
     int nTexHeight;
-    int nY;
     int nRow;
     f32 fX;
     f32 fY;
@@ -137,31 +135,27 @@ LLFont* FO_spLoadFontFromStream(u8* pData, UFontState* pState) {
 
     // Rows of texels (two per byte, first in the high nibble) become 8x8 tiles, first texel low.
     pDst = pFont->p470;
-    nY = 0;
     for (nTileRow = 0; nTileRow < nTexHeight / 8; nTileRow++) {
-        nByte = 0;
         for (nTileCol = 0; nTileCol < nRowBytes / 4; nTileCol++) {
             pSrc = pData + sizeof(LLFontBitmap);
-            pSrc += pFont->bitmap.nWidth / 2 * nY + nByte;
+            pSrc += pFont->bitmap.nWidth / 2 * (nTileRow * 8) + nTileCol * 4;
             for (nRow = 0; nRow < 8; nRow++) {
                 // EA compares the byte position with the width in texels.
-                nX = nByte;
+                nX = nTileCol * 4;
                 for (k = 0; k < 4; k++) {
                     if (nX >= pFont->bitmap.nWidth) {
                         pDst->uFirst = 0;
                         pDst->uSecond = 0;
                     } else {
                         pDst->uSecond = (*pSrc >> 4) & 0xF;
-                        pDst->uFirst = *pSrc++;
+                        pDst->uFirst = *pSrc++ & 0xF;
                     }
                     pDst++;
                     nX++;
                 }
                 pSrc += pFont->bitmap.nWidth / 2 - 4;
             }
-            nByte += 4;
         }
-        nY += 8;
     }
 
     pFont->n42C = 0;
