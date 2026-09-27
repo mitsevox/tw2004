@@ -988,7 +988,7 @@ config.libs = [
             Object(Matching, "SitDevStateVector.c"),
             Object(Matching, "SitDevTrigger.c"),
             Object(Matching, "GoGolfCam.c"),
-            Object(NonMatching, "CamSpline.c"),
+            Object(Matching, "CamSpline.c"),
             Object(Matching, "GoBreakLine.c"),
             Object(Matching, "AnimStream.c"),
             Object(Matching, "TerrainGround.c"),
