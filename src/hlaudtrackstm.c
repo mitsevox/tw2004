@@ -19,6 +19,11 @@ s32  fn_800AC328(void);
 void RemoveFromAudStreamQueue(AudTrack* pTrack);
 void fn_800AB99C(void* pDst, int nBytes, AudTrack* pTrack, u8 nId);
 
+// .bss/.sbss in reverse address order
+AudStreamQueue lbl_801F18B8;
+AudTrack* lbl_802820AC;
+u8 lbl_802820A8;
+
 // Applies a play list or stream change that came in while the track was busy.
 u8 CheckQueue(AudTrack* pTrack) {
     u8 bChanged;
@@ -417,12 +422,17 @@ u8 Stm_Tick(AudTrack* pTrack) {
         } else if (pTrack->nState != 3) {
             u32 uRemaining; // fake match: separate read length keeps the original register allocation
             s32 hFile = fn_800AC328();
-            u32 uOffset = pTrack->u.stm.pStream->uOffset + pTrack->u.stm.uReadPos;
+            // fake match: the cap first and the three volatile reads (same values) keep EA's load
+            // order; otherwise the last scheduling pass lifts the cap's shift above uReadPos's load
+            u32 uCap = pList->nChannels << 15;
+            AudStream* pStream = ((volatile AudTrack*)pTrack)->u.stm.pStream;
+            u32 uReadPos = ((volatile AudTrack*)pTrack)->u.stm.uReadPos;
+            u32 uOffset = ((volatile AudStream*)pStream)->uOffset + uReadPos;
             u8* pBuffer = pTrack->u.stm.pBuffer;
-            uRemaining = pTrack->u.stm.uLength - pTrack->u.stm.uReadPos;
+            uRemaining = pTrack->u.stm.uLength - uReadPos;
             uLen = uRemaining;
-            if (pList->nChannels << 15 <= uLen) {
-                uLen = pList->nChannels << 15;
+            if (uCap <= uLen) {
+                uLen = uCap;
             }
             fn_800AB4C0(hFile, pBuffer, uLen, uOffset, fn_800AB99C, pTrack, pTrack->u.stm.nReadId, 0);
         }

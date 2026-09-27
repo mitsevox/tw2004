@@ -15,6 +15,12 @@ void DF_vDrawBufferToScreen(int n);
 void fn_80045880(int n);
 void fn_800458B4(void);
 
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80283148), before the 0.0f fn_80045660 uses first; its body is unknown.
+static f32 DepthField_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 // Sets up the five layers (off, grey) and the textures of the image buffers and the screen copy.
 void fn_80045660(void) {
     lbl_80281D94 = 0.0f;
@@ -98,7 +104,7 @@ void fn_800458B4(void) {
 }
 
 // Clamps f to fLo..fHi (our helper). fake match: the f64 parameter gives the original's frsp before
-// the compares; 97.9%, the original reloads fHi instead of reusing the loop's 1.0 register.
+// the compares.
 static inline f32 DF_Clamp(f64 f, f32 fLo, f32 fHi) {
     return ((f32)f < fLo) ? fLo : (((f32)f > fHi) ? fHi : (f32)f);
 }
@@ -107,7 +113,10 @@ static inline f32 DF_Clamp(f64 f, f32 fLo, f32 fHi) {
 // pass shifted less than the one before (alternately left and right) and fainter.
 void DF_vDrawBufferToScreen(int n) {
     int i;
+    int j;
     int bOdd;
+    f32 fZ;
+    f32 fOffset;
     f32 aXY[8];
     f32 aUV[8];
     f32 aColour[4];
@@ -116,8 +125,6 @@ void DF_vDrawBufferToScreen(int n) {
     f32 fY0;
     f32 fX1;
     f32 fY1;
-    f32 fOffset;
-    f32 fZ;
 
     aColour[0] = lbl_801D5110[n].aColour[0];
     aColour[1] = lbl_801D5110[n].aColour[1];
@@ -145,23 +152,16 @@ void DF_vDrawBufferToScreen(int n) {
         aUV[5] = fY1;
         fZ = 1.0f - ((f32)i * ((f32)i * (lbl_80281118 * (f32)i)) + lbl_80281D90);
 
-        aXY[2] = fZ;
-        aXY[2] = DF_Clamp(aXY[2], 0.0f, 1.0f);
-        if (bOdd) {
-            aXY[0] += fOffset;
-            aXY[1] -= fOffset;
-        } else {
-            aXY[0] -= fOffset;
-            aXY[1] -= fOffset;
-        }
-        aXY[6] = fZ;
-        aXY[6] = DF_Clamp(aXY[6], 0.0f, 1.0f);
-        if (bOdd) {
-            aXY[4] += fOffset;
-            aXY[5] -= fOffset;
-        } else {
-            aXY[4] -= fOffset;
-            aXY[5] -= fOffset;
+        for (j = 0; j < 2; j++) {
+            aXY[j * 4 + 2] = fZ;
+            aXY[j * 4 + 2] = DF_Clamp(aXY[j * 4 + 2], 0.0f, 1.0f);
+            if (bOdd) {
+                aXY[j * 4 + 0] += fOffset;
+                aXY[j * 4 + 1] -= fOffset;
+            } else {
+                aXY[j * 4 + 0] -= fOffset;
+                aXY[j * 4 + 1] -= fOffset;
+            }
         }
 
         aColour[0] = lbl_801D5110[n].aColour[0];

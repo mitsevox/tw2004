@@ -533,6 +533,19 @@ They will be sorted into the sections below.
   call block (0). A switch per block: worth a try where only the order inside one block differs.
   Note: an entry block is merged into the prologue block (and rescheduled there) only when the
   prologue saves no FPRs.
+- **[verified] The last scheduling pass skips blocks the first pass scheduled unless an
+  instruction in the block was inserted or deleted after it; register allocation deleting
+  coalesced copies counts** (so does the post-RA deletion of a dead srawi: UISScreen
+  fn_8016A510). A block that starts with a call result's copies (`mr r128,r3; mr r35,r128`,
+  deleted when the value stays in r3) is always rescheduled after allocation; EA's may not have
+  been (hlaudtrackstm Stm_Tick: setting the mark in memory gave EA's block exactly). A real branch
+  between the call and the loads keeps the first pass's order but costs its compare: the frontend
+  folds every constant condition and no backend pass removes a compare.
+- **[verified, fake-match class] Volatile loads keep their order in both scheduling passes**, a
+  way to pin independent loads the last pass reorders: Stm_Tick 99.10 -> 100 with
+  `((volatile AudTrack*)pTrack)->u.stm.pStream` / `.uReadPos` and
+  `((volatile AudStream*)pStream)->uOffset` (same values), the cap computed first. Needs the exact
+  subset: any two of them, or one more (uLength), do not match.
 
 ### New from round 6 (2026-09-26 afternoon)
 
