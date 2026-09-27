@@ -341,7 +341,7 @@ typedef struct ClipTrack {
 
 // ska_shared.c: run on a clip just read from disc (skalib.c, AnimStream.c): moves nothing, but
 // takes the clip at pData rounded up to nAlign, byte-swaps it and lays it out in memory.
-Clip* SKA_LoadFromMem(u8* pData, u32* pu30, u32 nAlign);
+Clip* SKA_LoadFromMem(u8* pData, u32* iSize, u32 align);
 
 typedef struct SKABlendNode SKABlendNode;
 

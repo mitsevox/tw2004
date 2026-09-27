@@ -584,59 +584,59 @@ void fn_80020BC8(u8* p) {
     BYTESWAP_SWAPDATA(&pSrc, p, nBytes, 4);
 }
 
-// Takes the clip at pData rounded up to nAlign bytes, byte-swaps it in place and lays it out with
-// its frames in memory; *pu30 gets its u30 when pu30 is not NULL.
-Clip* SKA_LoadFromMem(u8* p, u32* pu30, u32 nAlign) {
-    Clip* pClip;
+// Takes the clip at pData rounded up to align bytes, byte-swaps it in place and lays it out with
+// its frames in memory; *iSize gets its u30 when iSize is not NULL.
+Clip* SKA_LoadFromMem(u8* pData, u32* iSize, u32 align) {
+    Clip* pSKA;
     u8* pSrc;
-    u32 uPad;
+    u32 iOffset;
     int nBytes;
 
-    uPad = nAlign - ((uptr)p & (nAlign - 1));
-    if (uPad == nAlign) {
-        uPad = 0;
+    iOffset = align - ((uptr)pData & (align - 1));
+    if (iOffset == align) {
+        iOffset = 0;
     }
-    pClip = (Clip*)(p + uPad);
-    fn_8002091C((Clip*)(p + uPad));  // fake match: the sum passed again, not pClip (register order)
-    pClip->pC0 = p;
-    p = (u8*)pClip + sizeof(Clip);
-    if (pClip->nEvents != 0) {
-        pClip->pEvents = (ClipEvent*)p;
-        fn_80020984((ClipEvent*)p, pClip->nEvents);
-        p += pClip->nEvents * sizeof(ClipEvent);
+    pSKA = (Clip*)(pData + iOffset);
+    fn_8002091C((Clip*)(pData + iOffset));  // fake match: the sum passed again, not pSKA (register order)
+    pSKA->pC0 = pData;
+    pData = (u8*)pSKA + sizeof(Clip);
+    if (pSKA->nEvents != 0) {
+        pSKA->pEvents = (ClipEvent*)pData;
+        fn_80020984((ClipEvent*)pData, pSKA->nEvents);
+        pData += pSKA->nEvents * sizeof(ClipEvent);
     }
-    if (pClip->uFlags & 2) {
-        pClip->pD8 = (BlendClip*)p;
-        fn_80020A20((BlendClip*)p);
-        p += sizeof(BlendClip);
+    if (pSKA->uFlags & 2) {
+        pSKA->pD8 = (BlendClip*)pData;
+        fn_80020A20((BlendClip*)pData);
+        pData += sizeof(BlendClip);
     }
-    pClip->pD0 = p;
-    fn_80020B2C(p, pClip->n1C);
-    p += pClip->n2C;
-    pClip->pC4 = p;
-    p += pClip->n54;
-    pClip->pC8 = pClip->pC4;
-    fn_800206C8(pClip, 0);
-    fn_80020858(pClip);
-    if (pClip->n64 != 0) {
-        pClip->pF4 = p;
-        fn_8001F110((MtaLib*)pClip->pF4, NULL);
-        p += pClip->n64;
+    pSKA->pD0 = pData;
+    fn_80020B2C(pData, pSKA->n1C);
+    pData += pSKA->n2C;
+    pSKA->pC4 = pData;
+    pData += pSKA->n54;
+    pSKA->pC8 = pSKA->pC4;
+    fn_800206C8(pSKA, 0);
+    fn_80020858(pSKA);
+    if (pSKA->n64 != 0) {
+        pSKA->pF4 = pData;
+        fn_8001F110((MtaLib*)pSKA->pF4, NULL);
+        pData += pSKA->n64;
     } else {
-        pClip->pF4 = NULL;
+        pSKA->pF4 = NULL;
     }
-    nBytes = (pClip->n1C * 2 + 31) / 32 * 4;
-    pClip->pF8 = p;
-    pSrc = p;
-    BYTESWAP_SWAPDATA(&pSrc, p, nBytes, 4);
-    p += nBytes;
-    pClip->pFC = p;
-    pSrc = p;
-    BYTESWAP_SWAPDATA(&pSrc, p, nBytes, 4);
-    if (pu30 != NULL) {
-        *pu30 = pClip->u30;
+    nBytes = (pSKA->n1C * 2 + 31) / 32 * 4;
+    pSKA->pF8 = pData;
+    pSrc = pData;
+    BYTESWAP_SWAPDATA(&pSrc, pData, nBytes, 4);
+    pData += nBytes;
+    pSKA->pFC = pData;
+    pSrc = pData;
+    BYTESWAP_SWAPDATA(&pSrc, pData, nBytes, 4);
+    if (iSize != NULL) {
+        *iSize = pSKA->u30;
     }
-    return pClip;
+    return pSKA;
 }
 
 // Links a clip already in our byte order in place: its events and BlendClip follow the header,
