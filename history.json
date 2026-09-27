@@ -41637,5 +41637,21 @@
 "matched_functions": 7585,
 "total_functions": 7647,
 "exact": 7585
+},
+{
+"commit": "e308516",
+"sha": "e3085165e52ef302839032db30fcc8dff4dcd1d2",
+"time": 1790467252,
+"subject": "state: endgame launched (6 lanes, Codex on Golfer, PC leversweep)",
+"report": true,
+"matched_code": 1491024,
+"complete_code": 1311696,
+"matched_data": 723063,
+"complete_data": 868387,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7585,
+"total_functions": 7647,
+"exact": 7585
 }
 ]
