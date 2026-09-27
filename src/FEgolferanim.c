@@ -122,7 +122,7 @@ void fn_80035FDC(UObject* pObj);
 void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
 void fn_800364A0(void);
 void fn_800B9EB8(char* szBall);
-void fn_8001A024(Character* pChar);
+void Character_ExecuteTextureSwapFE(Character* pChar);
 char* fn_800484E0(int i);
 void fn_80035600(void);
 void Character_UpdateAnimation(Character* pChar, int a, f32 f);
@@ -377,10 +377,10 @@ void fn_8008B4C0(void) {
     if (nGolfer == 7 || nGolfer == 29) {
         fn_80079974();
     }
-    fn_8001D4A4(lbl_80281EE0->pB8->pChar, lbl_80281ED4->nSlot);
+    Character_SetClubsAndClothes(lbl_80281EE0->pB8->pChar, lbl_80281ED4->nSlot);
     fn_800CEE88(0);
     fn_8010B098(lbl_80281EE0->pB8->pChar->a64[lbl_80281EE0->pB8->pChar->n74]);
-    fn_80019D64(lbl_80281EE0->pB8->pChar, fn_80019DE8, fn_80019E80);
+    Character_AddTextureLoadRequest(lbl_80281EE0->pB8->pChar, fn_80019DE8, fn_80019E80);
 }
 
 void fn_8008B570(void) {
@@ -407,8 +407,8 @@ void fn_8008B5FC(void) {
 
 // State 4: set up the golfer shown.
 void fn_8008B61C(void) {
-    fn_8001D4A4(lbl_80281EE0->pB4->pChar, lbl_80281ED4->nSlot);
-    fn_80019D64(lbl_80281EE0->pB4->pChar, fn_80019EF4, fn_8001A0FC);
+    Character_SetClubsAndClothes(lbl_80281EE0->pB4->pChar, lbl_80281ED4->nSlot);
+    Character_AddTextureLoadRequest(lbl_80281EE0->pB4->pChar, fn_80019EF4, fn_8001A0FC);
 }
 
 void fn_8008B674(void) {
@@ -616,7 +616,7 @@ void sFE_AdjustAndSetGolferPosition(void) {
                     }
                 } else if (lbl_80281EE0->n74 == 2 || lbl_80281EE0->b78 == 0) {
                     if (lbl_80281EE0->f7C <= 0.0f) {
-                        fn_8001A024(lbl_80281EE0->pB4->pChar);
+                        Character_ExecuteTextureSwapFE(lbl_80281EE0->pB4->pChar);
                         lbl_80281EE0->b81 = 0;
                     }
                     fn_8008E2F8(0, 0.0f);
@@ -632,14 +632,14 @@ void sFE_AdjustAndSetGolferPosition(void) {
                         }
                     }
                     if (lbl_80281EE0->n1BC >= 0) {
-                        fn_8001C5B4(lbl_80281EE0->pB4->pChar, lbl_80281EE0->n1BC);
+                        Character_SelectClub(lbl_80281EE0->pB4->pChar, lbl_80281EE0->n1BC);
                     }
                 }
             }
         } else if (lbl_80281EE0->n1C0 == 2) {
             if (lbl_80281EE0->n74 == 2 && (lbl_80281EE0->b78 == 0 || fTime > lbl_80281EE0->f7C)) {
                 lbl_80281EE0->f7C = 0.0f;
-                fn_8001A024(lbl_80281EE0->pB4->pChar);
+                Character_ExecuteTextureSwapFE(lbl_80281EE0->pB4->pChar);
                 lbl_80281EE0->b81 = 0;
             }
             if (fTime >= fEnd - 0.5f) {
@@ -653,7 +653,7 @@ void sFE_AdjustAndSetGolferPosition(void) {
                         lbl_80281EE0->b80 = 0;
                     }
                     if (lbl_80281EE0->n1BC >= 0) {
-                        fn_8001C5B4(lbl_80281EE0->pB4->pChar, lbl_80281EE0->n1B8);
+                        Character_SelectClub(lbl_80281EE0->pB4->pChar, lbl_80281EE0->n1B8);
                         lbl_80281EE0->n1BC = -1;
                     }
                     fn_8008DD50(0);
@@ -669,7 +669,7 @@ void sFE_AdjustAndSetGolferPosition(void) {
             }
         } else if (lbl_80281EE0->n1C0 == 3) {
             if (lbl_80281EE0->n74 == 2) {
-                fn_8001A024(lbl_80281EE0->pB4->pChar);
+                Character_ExecuteTextureSwapFE(lbl_80281EE0->pB4->pChar);
                 lbl_80281EE0->b81 = 0;
             }
             lbl_80281EE0->f14C = 0.5f * fTime / 0.5f;
@@ -682,7 +682,7 @@ void sFE_AdjustAndSetGolferPosition(void) {
             }
         } else {
             if (lbl_80281EE0->n74 == 2) {
-                fn_8001A024(lbl_80281EE0->pB4->pChar);
+                Character_ExecuteTextureSwapFE(lbl_80281EE0->pB4->pChar);
                 lbl_80281EE0->b81 = 0;
             }
             lbl_80281EE0->f14C = 0.5f;
@@ -716,7 +716,7 @@ void sFE_AdjustAndSetGolferPosition(void) {
         && (lbl_80281EE0->n0 == 2 || lbl_80281EE0->n0 == 1 || lbl_80281EE0->n0 == 4)
         && fLeft < fHalf && lbl_80281EE0->b82 == 0 && lbl_80281EE0->pB4->pChar->nClubClass == 3) {
         lbl_80281EE0->b82 = 1;
-        fn_8001BE88(lbl_80281EE0->pB4->pChar, lbl_80281EE0->pB4->pChar->pCurClip, 0, 0.5f);
+        Character_PlayClip(lbl_80281EE0->pB4->pChar, lbl_80281EE0->pB4->pChar->pCurClip, 0, 0.5f);
     } else if (lbl_80281EE0->pB4->pChar != NULL && lbl_80281EE0->n0 == 3 && fLeft < fHalf
                && lbl_80281EE0->b82 == 0 && lbl_80281EE0->n1C0 == 4 && lbl_80281EE0->n8 == 0) {
         lbl_80281EE0->b82 = 1;
@@ -821,7 +821,7 @@ void sFE_AdjustAndSetGolferPosition(void) {
             fn_800B9EB8(fn_800484E0(gGolferTable[lbl_80281EE0->pB4->nC].nOutfit));
         }
         lbl_80281EE0->b87 = 0;
-        fn_8001A024(pChar);
+        Character_ExecuteTextureSwapFE(pChar);
         for (i = 0; i < pChar->nSkins; i++) {
             fn_800CE170(pChar->apSkins[i], pChar->a64[pChar->n74]);
         }
@@ -1030,9 +1030,9 @@ void fn_8008D058(void) {
         lbl_80281EE0->f1A0 = 0.0f;
         fn_800957FC(lbl_80281EE0->pB4->pChar, 1);
         fn_800957B0(lbl_80281EE0->pB4->pChar, 1);
-        fn_8001C5B4(lbl_80281EE0->pB4->pChar, 5);
+        Character_SelectClub(lbl_80281EE0->pB4->pChar, 5);
         pClip = Char_SetClip(lbl_80281EE0->pB4->pChar, 0, 0, NULL);
-        fn_8001BE88(lbl_80281EE0->pB4->pChar, pClip, 1, 0.0f);
+        Character_PlayClip(lbl_80281EE0->pB4->pChar, pClip, 1, 0.0f);
         for (i = 0; i < 6; i++) {
             if (pClip->u90 == lbl_801B9638[i]) {
                 break;
@@ -1041,8 +1041,8 @@ void fn_8008D058(void) {
         if (i == 6) {
             i = 0;
         }
-        fn_8001C5B4(lbl_80281EE0->pB4->pChar, i);
-        fn_800192D4(lbl_80281EE0->pB4->pChar, lbl_80281EE0->f19C);
+        Character_SelectClub(lbl_80281EE0->pB4->pChar, i);
+        Character_SetOrientation(lbl_80281EE0->pB4->pChar, lbl_80281EE0->f19C);
         lbl_80281EE0->b85 = 1;
         lbl_80281EE0->b91 = 1;
         lbl_80281EE0->b84 = 1;
@@ -1055,9 +1055,9 @@ void fn_8008D058(void) {
         fn_8008EA44(FE_GetCurrentProfile()->choices.n113);
         fn_800957FC(lbl_80281EE0->pB4->pChar, 1);
         fn_800957B0(lbl_80281EE0->pB4->pChar, 1);
-        fn_8001C5B4(lbl_80281EE0->pB4->pChar, 3);
+        Character_SelectClub(lbl_80281EE0->pB4->pChar, 3);
         pClip = Char_SetClip(lbl_80281EE0->pB4->pChar, 0, 0, NULL);
-        fn_8001BE88(lbl_80281EE0->pB4->pChar, pClip, 1, 0.0f);
+        Character_PlayClip(lbl_80281EE0->pB4->pChar, pClip, 1, 0.0f);
         for (i = 0; i < 6; i++) {
             if (pClip->u90 == lbl_801B9638[i]) {
                 break;
@@ -1066,8 +1066,8 @@ void fn_8008D058(void) {
         if (i == 6) {
             i = 0;
         }
-        fn_8001C5B4(lbl_80281EE0->pB4->pChar, i);
-        fn_800192D4(lbl_80281EE0->pB4->pChar, lbl_80281EE0->f19C);
+        Character_SelectClub(lbl_80281EE0->pB4->pChar, i);
+        Character_SetOrientation(lbl_80281EE0->pB4->pChar, lbl_80281EE0->f19C);
         lbl_80281EE0->b85 = 0;
         lbl_80281EE0->b91 = 0;
         lbl_80281EE0->b84 = 0;
@@ -1094,16 +1094,16 @@ void fn_8008D058(void) {
         lbl_80281EE0->f19C = 0.0f;
         lbl_80281EE0->f1A0 = 0.0f;
         fn_8008DD50(0);
-        fn_800192D4(lbl_80281EE0->pB4->pChar, lbl_80281EE0->f19C);
+        Character_SetOrientation(lbl_80281EE0->pB4->pChar, lbl_80281EE0->f19C);
         break;
     case 2:
         lbl_80281EE0->f19C = 0.0f;
         lbl_80281EE0->f1A0 = 0.0f;
         fn_800957FC(lbl_80281EE0->pB4->pChar, 1);
         fn_800957B0(lbl_80281EE0->pB4->pChar, 1);
-        fn_8001C5B4(lbl_80281EE0->pB4->pChar, 3);
+        Character_SelectClub(lbl_80281EE0->pB4->pChar, 3);
         pClip = Char_SetClip(lbl_80281EE0->pB4->pChar, 0, 0, NULL);
-        fn_8001BE88(lbl_80281EE0->pB4->pChar, pClip, 1, 0.0f);
+        Character_PlayClip(lbl_80281EE0->pB4->pChar, pClip, 1, 0.0f);
         for (i = 0; i < 6; i++) {
             if (pClip->u90 == lbl_801B9638[i]) {
                 break;
@@ -1112,8 +1112,8 @@ void fn_8008D058(void) {
         if (i == 6) {
             i = 0;
         }
-        fn_8001C5B4(lbl_80281EE0->pB4->pChar, i);
-        fn_800192D4(lbl_80281EE0->pB4->pChar, lbl_80281EE0->f19C);
+        Character_SelectClub(lbl_80281EE0->pB4->pChar, i);
+        Character_SetOrientation(lbl_80281EE0->pB4->pChar, lbl_80281EE0->f19C);
         lbl_80281EE0->b85 = 0;
         lbl_80281EE0->b91 = 0;
         lbl_80281EE0->b84 = 0;
@@ -1302,14 +1302,14 @@ void fn_8008DD50(u8 bNoBlend) {
     if (lbl_80281EE0->pB4 == NULL || lbl_80281EE0->pB4->pChar == NULL) return;
     if (lbl_80281EE0->n8 != 0) {
         if (lbl_80281EE0->n8 == 1) {
-            fn_8001C5B4(lbl_80281EE0->pB4->pChar, 0);
+            Character_SelectClub(lbl_80281EE0->pB4->pChar, 0);
         } else {
-            fn_8001C5B4(lbl_80281EE0->pB4->pChar, 2);
+            Character_SelectClub(lbl_80281EE0->pB4->pChar, 2);
         }
         pClip = Char_SetClip(lbl_80281EE0->pB4->pChar, 8, 0, NULL);
         lbl_80281EE0->sz10[0] = '\0';
-        fn_8001BE88(lbl_80281EE0->pB4->pChar, pClip, !bNoBlend, 0.5f);
-        fn_8001C5B4(lbl_80281EE0->pB4->pChar, lbl_80281EE0->n1B8);
+        Character_PlayClip(lbl_80281EE0->pB4->pChar, pClip, !bNoBlend, 0.5f);
+        Character_SelectClub(lbl_80281EE0->pB4->pChar, lbl_80281EE0->n1B8);
         if (lbl_80281EE0->n8 == 1) {
             GolfCamera_SwitchCrAPCamera(pView, NULL, 3, bNoBlend, 0, 0);
             return;
@@ -1318,7 +1318,7 @@ void fn_8008DD50(u8 bNoBlend) {
         return;
     }
     if (lbl_80281EE0->n1B4 == 5 && lbl_80281EE0->b1DC == 0) {
-        fn_8001C5B4(lbl_80281EE0->pB4->pChar, 2);
+        Character_SelectClub(lbl_80281EE0->pB4->pChar, 2);
         lbl_80281EE0->n1B4 = -1;
         if (lbl_80281EE0->n4 == 0 || lbl_80281EE0->n4 == 2) {
             lbl_80281EE0->b1C8 = 1;
@@ -1326,7 +1326,7 @@ void fn_8008DD50(u8 bNoBlend) {
         }
         fn_8008E254(0);
     } else {
-        fn_8001C5B4(lbl_80281EE0->pB4->pChar, 0);
+        Character_SelectClub(lbl_80281EE0->pB4->pChar, 0);
         lbl_80281EE0->n1B4++;
         lbl_80281EE0->b1C8 = 0;
     }
@@ -1336,19 +1336,19 @@ void fn_8008DD50(u8 bNoBlend) {
         pClip = fn_8008E02C();
     }
     if (pClip->pD8 != NULL) {
-        if (!fn_8001EDF4(lbl_80281EE0->pB4->pChar) && FE_GetCurrentProfile()->choices.n113 != 0) {
+        if (!Character_IsLeftHanded(lbl_80281EE0->pB4->pChar) && FE_GetCurrentProfile()->choices.n113 != 0) {
             fn_8008E2F8(0, PI);
         }
         fn_8008EA44(FE_GetCurrentProfile()->choices.n113);
     } else {
-        if (fn_8001EDF4(lbl_80281EE0->pB4->pChar)) {
+        if (Character_IsLeftHanded(lbl_80281EE0->pB4->pChar)) {
             fn_8008E2F8(0, 0.0f);
         }
         fn_8008EA44(0);
     }
     lbl_80281EE0->sz10[0] = '\0';
-    fn_8001BE88(lbl_80281EE0->pB4->pChar, pClip, !bNoBlend, 0.5f);
-    fn_8001C5B4(lbl_80281EE0->pB4->pChar, lbl_80281EE0->n1B8);
+    Character_PlayClip(lbl_80281EE0->pB4->pChar, pClip, !bNoBlend, 0.5f);
+    Character_SelectClub(lbl_80281EE0->pB4->pChar, lbl_80281EE0->n1B8);
     GolfCamera_SwitchCrAPCamera(pView, NULL, lbl_80281EE0->n4, bNoBlend, lbl_80281EE0->b1DC, 0);
 }
 
@@ -1399,7 +1399,7 @@ void fn_8008E0B0(f32 fTurn) {
         }
     }
     if (lbl_80281EE0->pB4->pChar != NULL) {
-        fn_800192D4(lbl_80281EE0->pB4->pChar, lbl_80281EE0->f19C);
+        Character_SetOrientation(lbl_80281EE0->pB4->pChar, lbl_80281EE0->f19C);
     }
 }
 
@@ -1430,7 +1430,7 @@ void fn_8008E2F8(u8 bTarget, f32 fAngle) {
     lbl_80281EE0->f19C = fAngle;
     lbl_80281EE0->f1A0 = fAngle;
     if (lbl_80281EE0->pB4->pChar != NULL) {
-        fn_800192D4(lbl_80281EE0->pB4->pChar, lbl_80281EE0->f19C);
+        Character_SetOrientation(lbl_80281EE0->pB4->pChar, lbl_80281EE0->f19C);
     }
 }
 
@@ -1502,17 +1502,18 @@ u8 fn_8008E468(char* szAnim, char* szShot, u8 bNoBlend) {
             return 0;
         }
         if (pClip->pD8 != NULL) {
-            if (!fn_8001EDF4(lbl_80281EE0->pB4->pChar) && FE_GetCurrentProfile()->choices.n113 != 0) {
+            if (!Character_IsLeftHanded(lbl_80281EE0->pB4->pChar) && FE_GetCurrentProfile()->choices.n113
+                != 0) {
                 fn_8008E2F8(0, PI);
             }
             fn_8008EA44(FE_GetCurrentProfile()->choices.n113);
         } else {
-            if (fn_8001EDF4(lbl_80281EE0->pB4->pChar)) {
+            if (Character_IsLeftHanded(lbl_80281EE0->pB4->pChar)) {
                 fn_8008E2F8(0, 0.0f);
             }
             fn_8008EA44(0);
         }
-        fn_8001BE88(lbl_80281EE0->pB4->pChar, pClip, !bNoBlend, 0.5f);
+        Character_PlayClip(lbl_80281EE0->pB4->pChar, pClip, !bNoBlend, 0.5f);
         strcpy(lbl_80281EE0->sz10, szAnim);
         lbl_80281EE0->n1B4 = 0;
         return 1;
@@ -1531,7 +1532,7 @@ char* fn_8008E6BC(void) {
 void fn_8008E6D4(int n) {
     lbl_80281EE0->n1B8 = n;
     lbl_80281EE0->n1BC = -1;
-    fn_8001C5B4(lbl_80281EE0->pB4->pChar, lbl_80281EE0->n1B8);
+    Character_SelectClub(lbl_80281EE0->pB4->pChar, lbl_80281EE0->n1B8);
 }
 
 void fn_8008E718(int n) {
@@ -1628,12 +1629,12 @@ int fn_8008E9A8(void) {
 void fn_8008E9B4(void) {
     Clip* pClip;
 
-    fn_8001C5B4(lbl_80281EE0->pB4->pChar, 5);
+    Character_SelectClub(lbl_80281EE0->pB4->pChar, 5);
     pClip = Char_SetClip(lbl_80281EE0->pB4->pChar, 8, 0, NULL);
     if (pClip != NULL) {
-        fn_8001BE88(lbl_80281EE0->pB4->pChar, pClip, 0, 0.5f);
+        Character_PlayClip(lbl_80281EE0->pB4->pChar, pClip, 0, 0.5f);
     }
-    fn_8001C5B4(lbl_80281EE0->pB4->pChar, lbl_80281EE0->n1B8);
+    Character_SelectClub(lbl_80281EE0->pB4->pChar, lbl_80281EE0->n1B8);
 }
 
 void fn_8008EA38(u8 b) {

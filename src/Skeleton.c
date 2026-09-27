@@ -126,7 +126,7 @@ f32 fn_80026D18(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLink, int
     f32 fCos;
     int i;
 
-    fn_8001E880(pModel->pPoses[pChain->pLinks[pChain->nLinks - 1].nBone].v10, vEnd);
+    Vec4_CopyPoint(pModel->pPoses[pChain->pLinks[pChain->nLinks - 1].nBone].v10, vEnd);
     vToEnd[3] = 0.0f;
     vEnd[3] = 1.0f;
     for (i = nLink; i >= n; i--) {
@@ -182,7 +182,7 @@ void fn_80026F90(Skeleton* pSkel, IKChain* pChain, u8 bAll) {
         if (bAll || pChain->pLinks[i].f4 > 0.0f) {
             int nBone = pChain->pLinks[i].nBone;
             fn_80009710(pSkel->p20[nBone]);
-            fn_8001EB6C(pSkel->a10, nBone);
+            BitArray_Clear(pSkel->a10, nBone);
         }
     }
 }
@@ -270,7 +270,7 @@ void fn_800271A0(CharModel* pModel, IKChain* pChain) {
             Vec_Copy(pBone->v1C, pLink->v28);
         }
     }
-    fn_8001E880(pModel->pPoses[pChain->pLinks[pChain->nLinks - 1].nBone].v10, pChain->v8);
+    Vec4_CopyPoint(pModel->pPoses[pChain->pLinks[pChain->nLinks - 1].nBone].v10, pChain->v8);
 }
 
 // Solves the chain toward pTarget: up to nIterations steps, each followed by pfnError (when given)
@@ -330,7 +330,7 @@ void fn_80027478(CharModel* pModel, IKChain* pChain) {
             Quat_Add(pPrev->v10, vOffset, pPose->v10);
             pPose->v10[3] = 0.0f;
             Quat_QuatToMatrix(pPose->q0, pModel->pMatrices[nBone]);
-            fn_8001E880(pPose->v10, pModel->pMatrices[nBone][3]);
+            Vec4_CopyPoint(pPose->v10, pModel->pMatrices[nBone][3]);
             uDone |= (u64)1 << nBone;
         }
     }
@@ -358,7 +358,7 @@ f32 fn_800275F4(CharModel* pModel, IKChain* pChain, f32* pTarget) {
     }
     pChain->pLinks[0].v28[1] = pSkel->f10C8 + pSkel->v10A4[1];
     fn_80029C18(pTarget, pChain->v8, vDiff);
-    fn_8001E880(pChain->v8, pModel->pPoses[pChain->pLinks[pChain->nLinks - 1].nBone].v10);
+    Vec4_CopyPoint(pChain->v8, pModel->pPoses[pChain->pLinks[pChain->nLinks - 1].nBone].v10);
     return (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
 }
 
@@ -493,7 +493,7 @@ void fn_800279C0(Character* pChar) {
             Quat_Slerp(qGrip, pGrip->q0, pSkel->fIKWeight);
             fn_8001FBA4(pGrip->v10, vGrip, pGrip->v10, 1.0f - pSkel->fIKWeight);
             Quat_QuatToMatrix(pGrip->q0, pModel->pMatrices[nGrip]);
-            fn_8001E880(pGrip->v10, pModel->pMatrices[nGrip][3]);
+            Vec4_CopyPoint(pGrip->v10, pModel->pMatrices[nGrip][3]);
         }
     }
     fn_800271A0(pModel, pChain);
@@ -508,7 +508,7 @@ void fn_800279C0(Character* pChar) {
         SKEL_WeightIKChain(pSkel, pChain, pSkel->fIKWeight);
     }
     Quat_Multiply(pSkel->q107C, pGrip->q0, pPose28->q0);
-    fn_8001EB6C(pModel->a14, n28);
+    BitArray_Clear(pModel->a14, n28);
     BitArray_ClearAll(aBits, 0x80);
     BitArray_Set(aBits, CharModel_GetBoneIndexMapped(pModel, 0x23));
     SKEL_TransformBones(pModel, aBits);
@@ -754,8 +754,8 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int b) {
     for (i = 0; i < pModel->nBones; i++) {
         fn_80009710(pModel->pBones[i].q0C);
     }
-    fn_8001E8A4(pModel->a14, 0x80);
-    fn_8001E8A4(pModel->a24, 0x80);
+    BitArray_SetAll(pModel->a14, 0x80);
+    BitArray_SetAll(pModel->a24, 0x80);
     pModel->bEE = b;
     SKEL_GenerateBoneLookupTable(pModel);
     SKEL_GenerateLeftHandedTable(pModel);
@@ -764,7 +764,7 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int b) {
     } else {
         pModel->pSkel = NULL;
     }
-    fn_8001E8A4(aAll, 0x80);
+    BitArray_SetAll(aAll, 0x80);
     SKEL_TransformBones(pModel, aAll);
     pModel->pF0 = fn_80114270(pModel, CharModel_GetBoneIndex(pModel, 0xB), 0, 0);
     pModel->pF4 = fn_80114270(pModel, CharModel_GetBoneIndex(pModel, 0x57), 1, 0);
@@ -843,7 +843,7 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
     }
     fn_80021980(pModel->a14, pModel->a24, aModel, 0x80);
     Mtx_Identity(mScale);
-    if (fn_8001E9F4(aBits, aCur, 0x80)) {
+    if (BitArray_Intersects(aBits, aCur, 0x80)) {
         Quat_Copy(pModel->pBones[0].q0C, pModel->pPoses[0].q0);
         Quat_Copy(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
         Quat_QuatToMatrix(pModel->pPoses[0].q0, pModel->pMatrices[0]);
@@ -852,7 +852,7 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
         mScale[2][2] = pModel->a140[0][2];
         fn_800BADF8(pModel->pMatrices[0], mScale, mOut, 4);
         Mtx_Copy(mOut, pModel->pMatrices[0]);
-        fn_8001E880(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
+        Vec4_CopyPoint(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
         SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[0], 0);
     }
     fn_80029C60(aCur, aCur, 4, 1);
@@ -889,11 +889,11 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
                 BitArray_Set(pModel->a14, CharModel_GetBoneIndex(pModel, 0x35));
             }
         }
-        if (fn_8001E9F4(aBits, aCur, 0x80) || fn_8001E9F4(aBits, aParent, 0x80)) {
+        if (BitArray_Intersects(aBits, aCur, 0x80) || BitArray_Intersects(aBits, aParent, 0x80)) {
             pPose = &pModel->pPoses[i];
-            if (fn_8001E9F4(aModel, aCur, 0x80)) {
+            if (BitArray_Intersects(aModel, aCur, 0x80)) {
                 pParentPose = &pModel->pPoses[pBone->nParent];
-                if (fn_8001E9F4(pModel->a24, aCur, 0x80)) {
+                if (BitArray_Intersects(pModel->a24, aCur, 0x80)) {
                     Quat_RotateVector(pParentPose->q0, pBone->v1C, vPos);
                     Quat_Add(pParentPose->v10, vPos, pPose->v10);
                     pPose->v10[3] = 0.0f;
@@ -904,8 +904,8 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
                         }
                     }
                 }
-                if (fn_8001E9F4(pModel->a14, aCur, 0x80)) {
-                    if (fn_8001E9F4(aSkel, aCur, 0x80)) {
+                if (BitArray_Intersects(pModel->a14, aCur, 0x80)) {
+                    if (BitArray_Intersects(aSkel, aCur, 0x80)) {
                         Quat_Multiply(pSkelRot[i], pBone->q0C, qRot);
                         Quat_Multiply(qRot, pParentPose->q0, pPose->q0);
                     } else {
@@ -922,14 +922,14 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
             }
             fn_800BADF8(pModel->pMatrices[i], mScale, mOut, 4);
             Mtx_Copy(mOut, pModel->pMatrices[i]);
-            fn_8001E880(pPose->v10, pModel->pMatrices[i][3]);
+            Vec4_CopyPoint(pPose->v10, pModel->pMatrices[i][3]);
             SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[i], i);
             fn_80021980(aBits, aCur, aBits, 0x80);
         }
         fn_80029C60(aCur, aCur, 0x80, 1);
     }
-    fn_8001E8A4(pModel->a14, 0x80);
-    fn_8001E8A4(pModel->a24, 0x80);
+    BitArray_SetAll(pModel->a14, 0x80);
+    BitArray_SetAll(pModel->a24, 0x80);
 }
 
 // Copies a pose's bone rotations (bits a0) and positions (bits a10) into the model's bones; with
@@ -1009,11 +1009,11 @@ void fn_800293CC(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pO
     BitArray_ClearAll(pOut->a0, 0x80);
     BitArray_ClearAll(pOut->a10, 0x80);
     for (i = nBone; i <= nLast; i++) {
-        if (fn_8001E9F4(aRot, aCur, 0x80)) {
+        if (BitArray_Intersects(aRot, aCur, 0x80)) {
             fn_8001FB00(pA->aBones[i].q0, pB->aBones[i].q0, pOut->aBones[i].q0, fT);
             fn_80021980(pOut->a0, aCur, pOut->a0, 0x80);
         }
-        if (fn_8001E9F4(aPos, aCur, 0x80)) {
+        if (BitArray_Intersects(aPos, aCur, 0x80)) {
             fn_8001FBA4(pA->aBones[i].v10, pB->aBones[i].v10, pOut->aBones[i].v10, fT);
             fn_80021980(pOut->a10, aCur, pOut->a10, 0x80);
         }

@@ -1401,7 +1401,7 @@ typedef struct FadeNode {
 
 extern FadeNode* lbl_80281FA0;
 
-void fn_8001C804(int nPlayer, u8 a, u8 b);  // char.c: sets bits of the player's character's u10
+void Character_AlignShotWithTarget(int nPlayer, u8 a, u8 b);  // char.c: sets bits of the player's character's u10
 void fn_8001D8DC(int nPlayer);
 void Vec3_Scale(f32 f, f32* pIn, f32* pOut);   // scale a vector (paired singles)
 

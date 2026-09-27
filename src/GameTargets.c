@@ -58,7 +58,7 @@ void fn_800F1B60(int nPlayer, s8 n) {
     fn_800F1ABC(nPlayer, n);
     AI_DefaultTarget(nPlayer);
     Shot_Prepare(nPlayer, 1);
-    fn_8001C804(nPlayer, 1, 1);
+    Character_AlignShotWithTarget(nPlayer, 1, 1);
     fn_800957D8(gPlayers[nPlayer].pChar);
     fn_80095744(gPlayers[nPlayer].pChar, 5);
     fn_80062C38();

@@ -920,7 +920,7 @@ void GM_CheckForShotChanges(int nPlayer) {
                 Shot_Prepare(nPlayer, 1);
                 BreakLine_Reset(gPlayers[nPlayer].nView[0]);
                 fn_8009B970(gPlayers[nPlayer].nView[0]);
-                fn_8001C804(nPlayer, 1, 1);
+                Character_AlignShotWithTarget(nPlayer, 1, 1);
                 fn_800957D8(gPlayers[nPlayer].pChar);
                 fn_80095744(gPlayers[nPlayer].pChar, 5);
                 TARGET_SetupTarget(nPlayer);

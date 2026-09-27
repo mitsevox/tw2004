@@ -211,7 +211,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
     RenderState_Flush();
 
     // the object's own lens
-    pLens = fn_8001F004();
+    pLens = Camera_GetCurrentLens();
     CA_vInitCamera(lbl_802820CC);
     CA_vSetLookAt(lbl_802820CC, aEye, lbl_8018EC10);
     fn_80045470(lbl_802820CC, 0.00879646f);

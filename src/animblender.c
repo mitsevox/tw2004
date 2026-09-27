@@ -103,17 +103,17 @@ void fn_80071C28(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBl
         if ((*ppNode)->pPose == NULL) return;
         BitArray_ClearAll((*ppNode)->pPose->a0, 128);
         BitArray_ClearAll((*ppNode)->pPose->a10, 128);
-        fn_8001E8A4((*ppNode)->pPose->a20, 128);
-        fn_8001E8A4((*ppNode)->pPose->a30, 128);
+        BitArray_SetAll((*ppNode)->pPose->a20, 128);
+        BitArray_SetAll((*ppNode)->pPose->a30, 128);
     } else if ((*ppNode)->nFormat == 1) {
         (*ppNode)->pPose = AllocPoolMem(lbl_80281E88);
         if ((*ppNode)->pPose == NULL) return;
         BitArray_ClearAll(((SkelPose1*)(*ppNode)->pPose)->pose.a0, 128);
         BitArray_ClearAll(((SkelPose1*)(*ppNode)->pPose)->pose.a10, 128);
-        fn_8001E8A4(((SkelPose1*)(*ppNode)->pPose)->pose.a20, 128);
-        fn_8001E8A4(((SkelPose1*)(*ppNode)->pPose)->pose.a30, 128);
+        BitArray_SetAll(((SkelPose1*)(*ppNode)->pPose)->pose.a20, 128);
+        BitArray_SetAll(((SkelPose1*)(*ppNode)->pPose)->pose.a30, 128);
         for (i = 0; i < 3; i++) {
-            fn_8001E8A4(((SkelPose1*)(*ppNode)->pPose)->aBlocks[i].aBits, 20);
+            BitArray_SetAll(((SkelPose1*)(*ppNode)->pPose)->aBlocks[i].aBits, 20);
             for (j = 0; j < 20; j++) {
                 ((SkelPose1*)(*ppNode)->pPose)->aBlocks[i].af8[j] = 0.0f;
             }
@@ -215,7 +215,7 @@ void fn_800720C8(Character* pChar, SKABlendNode* pNew, SKABlendNode** ppNode, f3
                     fn_80017864(pChar, &((SkelPose1*)pNew->pPose)->pose);
                     for (j = 0; j < 3; j++) {
                         memset(&((SkelPose1*)pNew->pPose)->aBlocks[j], 0, sizeof(SkelPoseBlock));
-                        fn_8001E8A4(((SkelPose1*)pNew->pPose)->aBlocks[j].aBits, 20);
+                        BitArray_SetAll(((SkelPose1*)pNew->pPose)->aBlocks[j].aBits, 20);
                     }
                 }
             }
@@ -859,7 +859,7 @@ void fn_800736D8(SKABlendNode* pNode, s32 nBit) {
     int n = nBit;   // fake match: a copy of the parameter for the pose calls
 
     for (j = 0; j < 3; j++) {
-        fn_8001EB6C(((SkelPose1*)pNode->pPose)->aBlocks[j].aBits, n);
+        BitArray_Clear(((SkelPose1*)pNode->pPose)->aBlocks[j].aBits, n);
     }
     for (i = 0; i < 2; i++) {
         pChild = pNode->u.blend.apChild[i];
@@ -869,7 +869,7 @@ void fn_800736D8(SKABlendNode* pNode, s32 nBit) {
                 fn_800736D8(pChild, nBit);
             } else if (pChild->nType == 0 && pNode->nFormat == 1) {
                 for (j = 0; j < 3; j++) {
-                    fn_8001EB6C(((SkelPose1*)pChild->pPose)->aBlocks[j].aBits, n);
+                    BitArray_Clear(((SkelPose1*)pChild->pPose)->aBlocks[j].aBits, n);
                 }
             }
         }

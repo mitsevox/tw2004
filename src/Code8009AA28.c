@@ -174,7 +174,7 @@ void fn_8009B134(void) {
 
 // Per view, each frame: the frame buffer and viewport from the current rect; with the flare on,
 // where v4 falls on the view's screen, fn_8009A754's result for the field being drawn, and the
-// next depth copy (fn_8009A3F4). fn_8001F004's result is thrown away.
+// next depth copy (fn_8009A3F4). Camera_GetCurrentLens's result is thrown away.
 void SF_vUpdateSunFlare(s32 nView) {
     f32* pRect;
     s32 nCtx;
@@ -183,7 +183,7 @@ void SF_vUpdateSunFlare(s32 nView) {
 
     pRect = fn_8003526C();
     nCtx = fn_800171B0();
-    fn_8001F004();
+    Camera_GetCurrentLens();
     // port: fn_800171B0 is typed s32 in ViewController.c, but its value is a render context pointer
     fn_8001416C((GoFrameBuf*)nCtx);
     fn_80012ED8(pRect);

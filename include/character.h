@@ -71,7 +71,7 @@ typedef struct BonePose {
 LAYOUT_ASSERT(BonePose, 0x20);
 
 // A blend node's pose buffer (SKABlendNode.pPose; our name): bit arrays over the 128 bones
-// (fn_800177A0 clears the first two with BitArray_ClearAll and the next two with fn_8001E8A4), then a pose
+// (fn_800177A0 clears the first two with BitArray_ClearAll and the next two with BitArray_SetAll), then a pose
 // per bone. Format 0 is exactly this (0x1040 bytes); format 1 has 0x10C bytes more.
 typedef struct SkelPose {
     u32      a0[4];             // 0x000  bones the pose sets (BitArray_Test tests them)
@@ -110,7 +110,7 @@ typedef struct Skeleton {
     s32  nChains;               // 0x0004
     IKChainDef* pDefs;          // 0x0008  the chains' setups (CharModelDefs.pDefs)
     IKChain* pChains;           // 0x000C
-    u32  a10[4];                // 0x0010  a bit per bone (128; fn_8001EB6C clears one)
+    u32  a10[4];                // 0x0010  a bit per bone (128; BitArray_Clear clears one)
     f32  (*p20)[4];             // 0x0020  a quaternion per bone
     f32  (*p24)[4];             // 0x0024  a quaternion per bone
     f32  (*p28)[4];             // 0x0028  p20 at an IK weight of 0 or 1, otherwise p24
@@ -169,7 +169,7 @@ typedef struct CharModel {
                                 //        fills it in by name
     u8        aBone2[0x59];     // 0x095  the index CharModel_GetBoneIndexMapped gives while bEE is set, by bone index
                                 //        (SKEL_GenerateLeftHandedTable: itself, or the other bone of a pair)
-    u8        bEE;              // 0x0EE  fn_8001EDF4
+    u8        bEE;              // 0x0EE  Character_IsLeftHanded
     u8        unkEF;
     struct DynChain* pF0;       // 0x0F0  } freed with the model (fn_80114398)
     struct DynChain* pF4;       // 0x0F4  }
@@ -279,7 +279,7 @@ typedef struct Clip {
     s16    n0E;                 // 0x0E  the last key fn_8001FCF4 reads
     f32    f10;                 // 0x10  the time from one key to the next (fn_8001FCF4)
     u8     unk14[4];
-    f32    f18;                 // 0x18  fn_8001BE88 blends up to it
+    f32    f18;                 // 0x18  Character_PlayClip blends up to it
     s32    n1C;                 // 0x1C  how many tracks (pD0)
     u8     unk20[8];
     s16    n28;                 // 0x28  bytes fn_80020328 copies out of a frame of the first stream
@@ -481,7 +481,7 @@ LAYOUT_ASSERT(AnimPlayerEntry, 0x18);
 // An animation player (0x138 bytes); only what is read. Character has two: the one at 0x164, whose
 // fields are named in Character directly, and anim29C.
 typedef struct AnimPlayer {
-    s32   n00;                  // 0x00  } reset to 0 and -1 by fn_8001BE88
+    s32   n00;                  // 0x00  } reset to 0 and -1 by Character_PlayClip
     s32   uFlags;               // 0x04  fn_8007325C sets bit 2, SKATime_UnPause clears bits 1 and 2
     s32   n08;                  // 0x08  }
     s32   nC;                   // 0x0C  } set together by fn_800958EC
@@ -647,7 +647,7 @@ typedef struct Character {
     struct CharSkinSet* p16D8;  // 0x16D8  six more skins (SkinPart.c)
     s32   n16DC;                // 0x16DC  twice the players set up so far, in split screen 2
                                 //         (Player_SetGolfer)
-    s32   nStyle;               // 0x16E0  the animation style (fn_8001C7FC); at -1
+    s32   nStyle;               // 0x16E0  the animation style (Character_SetEmotion); at -1
                                 //         CharacterState_AddSKABlendData does nothing
     f32   aPoints[5][4];        // 0x16E4  points Character_PlaceFeetOnGround sets the heights of; the
                                 //         skeleton code (0x80027FF8) moves them in x and z
@@ -656,7 +656,7 @@ typedef struct Character {
     s32   n1784;                // 0x1784  set to -1 by Character_SetPosition
     Clip* pCurClip;             // 0x1788  the clip Char_SetClip picked
     struct MtaLib* p178C;       // 0x178C  the MAL library the second player plays (fn_80095FD0);
-                                //         cleared by fn_8001BE88
+                                //         cleared by Character_PlayClip
     Clip* p1790;                // 0x1790  cleared by fn_80062BFC; CharacterState_AddSKABlendData plays it for
                                 //         groups 5, 6 and 10
     void* p1794;                // 0x1794  cleared by fn_80062BE8; the same for group 9
@@ -671,7 +671,7 @@ typedef struct Character {
     s8    n17B4;                // 0x17B4  cleared by fn_8001942C; Skin.c hands it to fn_800CE02C as
                                 //         the a10A0 index
     u8    unk17B5[0x17B8 - 0x17B5];
-    struct SkinChoices* pChoices;   // 0x17B8  its look (fn_8001D4A4 dresses it from this); fn_8001A20C
+    struct SkinChoices* pChoices;   // 0x17B8  its look (Character_SetClubsAndClothes dresses it from this); fn_8001A20C
                                     //         puts its logos on the model (fn_8001744C)
 } Character;
 
@@ -770,16 +770,16 @@ void  fn_800177A0(Character* pChar, SkelPose* pPose);   // a blend node's pose f
 void  fn_80017864(Character* pChar, SkelPose* pPose);   // only its bit arrays
 void  fn_80018484(Character* pChar, CharModel* pModel);
 void  fn_8001C0E0(Character* pChar);    // frees the character
-void  fn_8001C5B4(Character* pChar, int n);
+void  Character_SelectClub(Character* pChar, int n);
 void  fn_8001D238(void);
-void  fn_8001D4A4(Character* pChar, int nSlot);   // dresses the character (its skins and clubs)
+void  Character_SetClubsAndClothes(Character* pChar, int nSlot);   // dresses the character (its skins and clubs)
 void  fn_8001DC64(Character* pChar, struct SkinChoices* pChoices);  // applies a look (char.c)
 void  fn_8001EE98(Character* pChar, u8 b);    // sets the model's bEE
 void  Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace);
-int   fn_8001C558(int nPlayer);          // the model id of the player's golfer
+int   Character_GetGolferModelID(int nPlayer);          // the model id of the player's golfer
 void  Character_SelectGameShotType(Character* pChar, int nKind);
 void  Character_SelectGameClub(Character* pChar, int nClub);
-void  fn_8001C7FC(Character* pChar, int nStyle);   // the animation style (nStyle)
+void  Character_SetEmotion(Character* pChar, int nStyle);   // the animation style (nStyle)
 Character* fn_8001D324(int nId);        // the character with this id (100: the flag, by its clips), or NULL
 void  fn_8001D624(int n);               // set gSession.aD2D[n]
 void  fn_8001D7A4(Character* pChar);
@@ -788,8 +788,8 @@ void  fn_8001DB04(Character* pChar, f32* pOut);    // the clip's point v80 place
 void  fn_8001DB98(Character* pChar);    // empty the character's four data buffers
 u8    fn_8001DBF4(Character* pChar);    // the clip's n1C is above bone 0x54's index
 void  Character_GetBallOnFingerPosition(Character* pChar, f32* pPos);
-f32 (*fn_8001ED08(Character* pChar, int nBone))[4];  // a bone's matrix
-u8    fn_8001EDF4(Character* pChar);    // the model's bEE
+f32 (*Character_GetBoneMatrix(Character* pChar, int nBone))[4];  // a bone's matrix
+u8    Character_IsLeftHanded(Character* pChar);    // the model's bEE
 int   fn_8001EE88(Character* pChar);    // n1658
 int   fn_8001EE90(Character* pChar);
 int   CharModel_GetBoneIndex(CharModel* pModel, int nBone);    // a bone's index
@@ -797,7 +797,7 @@ int   CharModel_GetBoneIndexMapped(CharModel* pModel, int nBone);
 f32   fn_8001F02C(struct Clip* pClip, u64 uEvent);   // an event's time (by its 64-bit id)
 void  Anim_SetRate(u8* pAnim, f32 fRate);           // 0x8001F084
 // Plays a clip on the character: blended in from the current one, or (bNoBlend) from scratch.
-void  fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime);
+void  Character_PlayClip(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime);
 void  Quat_Copy(f32* pSrc, f32* pDst);            // copy a quaternion
 void  SKEL_SetIKSolutionWeight(Skeleton* pSkel, f32 f);
 void  fn_80027108(Skeleton* pSkel);                                         // Skeleton.c
@@ -1017,7 +1017,7 @@ void* Char_SetClip(Character* pChar, int nGroup, int nStyle, const char* pName);
 void* fn_80017678(Character* pChar, int nGroup, int n);   // char.c: a random item of its 'MAL ' bank
 
 // char.c: turning the character, and its dynamic textures (the menu golfer, FEgolferanim.c).
-void  fn_800192D4(Character* pChar, f32 fAngle);void  fn_80019D64(Character* pChar, void (*pfnA)(Character* pChar), void (*pfnB)(Character* pChar));
+void  Character_SetOrientation(Character* pChar, f32 fAngle);void  Character_AddTextureLoadRequest(Character* pChar, void (*pfnA)(Character* pChar), void (*pfnB)(Character* pChar));
 void  fn_80019DE8(Character* pChar);
 void  fn_80019E80(Character* pChar);
 void  fn_80019EF4(Character* pChar);

@@ -42,7 +42,7 @@ u16 header (0), then 34 records of 320 bytes (record i at `2 + i*320`):
                                 (`Golfer_OnStatsLoaded`) byte-swaps them in place in 8-byte units
                                 (`Golfer_TableByteSwap`). Meaning unknown - f64s or u64s.
 
-**Character files.** `fn_8001C558(player)` returns the byte at `gGolferTable + golfer*0x140 + 1`
+**Character files.** `Character_GetGolferModelID(player)` returns the byte at `gGolferTable + golfer*0x140 + 1`
 (the byte before each record's name, i.e. the last byte of the previous record in the file), and
 the character files are `data/Chars/%02dchar.gcb` and `data/CharSac/%02dchrsac.gcb` with that
 number + 1:

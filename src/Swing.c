@@ -1027,7 +1027,7 @@ static f32 Swing_StrippedFn2(f32 x) {
 
 // Twist the club with the stick: how far through the backswing (animation 6, eased in) or the
 // downswing (7, eased out) the animation is, times 0.75 and a smoothed copy of the stick's X,
-// becomes a Z rotation on the model (fn_80027808), negated when fn_8001EDF4().
+// becomes a Z rotation on the model (fn_80027808), negated when Character_IsLeftHanded().
 void SW_vUIAdjustClub(Character* pObj, SwingData* pSw, int nStickX) {
     f32 fAmount = 0.0f;
     f32 fDelta;
@@ -1056,7 +1056,7 @@ void SW_vUIAdjustClub(Character* pObj, SwingData* pSw, int nStickX) {
     fRate = (fRate < 0.5f) ? 0.5f : ((fRate > 1.0f) ? 1.0f : fRate);
     pSw->f10 = 0.33333334f * (fDelta * fRate) + pSw->f10;
     fAmount = 0.75f * fAmount * pSw->f10;
-    if (fn_8001EDF4(pObj)) {
+    if (Character_IsLeftHanded(pObj)) {
         fAmount = -fAmount;
     }
     Quat_EulerAngles(0.0f, 0.0f, fAmount, vRot);
@@ -1510,9 +1510,9 @@ void fn_8005C15C(int nPlayer, f32* pSpinY, f32* pSpinX) {
     *pSpinY = gPlayers[nPlayer].swing.fSideSpin;
 }
 
-// The backswing's sideways angle as a fraction of a quarter turn, mirrored by fn_8001EDF4.
+// The backswing's sideways angle as a fraction of a quarter turn, mirrored by Character_IsLeftHanded.
 f32 fn_8005C1EC(int nPlayer) {
-    if (fn_8001EDF4(gPlayers[nPlayer].pChar)) {
+    if (Character_IsLeftHanded(gPlayers[nPlayer].pChar)) {
         return gPlayers[nPlayer].swing.fControllerSliceAngle / 1.5707964f;
     }
     return -(gPlayers[nPlayer].swing.fControllerSliceAngle / 1.5707964f);

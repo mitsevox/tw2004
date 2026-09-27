@@ -39,7 +39,7 @@ void  fn_80032770(void);
 void  fn_80032954(void);
 void  fn_80033F94(void* pHoleData, u32 nList);
 void  fn_8003546C(f32* pA, f32* pB, f32* pOut);
-f32   fn_8001EFFC(CamLens* pLens);
+f32   Camera_GetLensFovScale(CamLens* pLens);
 f32   fn_800351D8(u32 n, f32 fPeriod);
 void  fn_8003519C(int nRow, void* pData);   // calls row nRow's function of lbl_80188E88 with pData
 s32   fn_800318AC(const void* pA, const void* pB);
@@ -319,8 +319,8 @@ void fn_80030A40(void* pHoleData, int nView) {
     f32 fWideTan;
 
     lbl_801D3CB0.iCurrentViewContext = nView;
-    pLens = fn_8001F004();
-    lbl_801D3CB0.fFOVScale = 1.0f / fn_8001EFFC(pLens);
+    pLens = Camera_GetCurrentLens();
+    lbl_801D3CB0.fFOVScale = 1.0f / Camera_GetLensFovScale(pLens);
     lbl_801D3CB0.xCameraReferencePos[0] = pLens->m4[3][0];
     lbl_801D3CB0.xCameraReferencePos[1] = pLens->m4[3][1];
     lbl_801D3CB0.xCameraReferencePos[2] = pLens->m4[3][2];
@@ -2063,7 +2063,7 @@ void fn_800348DC(void) {
         if (n < 0) {
             n = 0;
         }
-        fn_8001BE88(pFlag, Char_SetClip(pFlag, 3, 0, aClips[n]), 1, 0.0f);
+        Character_PlayClip(pFlag, Char_SetClip(pFlag, 3, 0, aClips[n]), 1, 0.0f);
     }
 }
 
@@ -2101,7 +2101,7 @@ UObjMesh* fn_80034A20(u16 nPatch, u16 nObjList) {
 void fn_80034AE4(void) {
     int i;
     void* pHoleData = lbl_801D3CB0.pCurrentHoleData;
-    CamLens* pLens = fn_8001F004();
+    CamLens* pLens = Camera_GetCurrentLens();
     f32 vDiff[4];
     f32 fDist;
     f32 fTan;

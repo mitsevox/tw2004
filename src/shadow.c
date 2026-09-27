@@ -24,8 +24,8 @@ void fn_80035294(void);                 // GoTerrain.c
 void fn_800352BC(void);
 void fn_80035604(void);                 // GoTerrain.c
 void fn_800358E0(Character* pChar, u32 uFlags);
-u8   fn_8001EC48(Character* pChar);
-void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
+u8   Character_IsGolfer(Character* pChar);
+void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
 void fn_80013D5C(void* pCamera);        // makes it the current render camera
 void Mtx_Identity(f32 (*pMtx)[4]);       // identity
 void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: copy a 4x4 matrix
@@ -271,13 +271,13 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     fMinZ = fMinX;
     fMaxZ = fMaxX;
     // the point the shadow is centred on: between two bones, or the golfer's root
-    if (fn_8001EC48(pChar)) {
-        fn_8001EB8C(pChar, 0x47, vA);
-        fn_8001EB8C(pChar, 0x39, vB);
+    if (Character_IsGolfer(pChar)) {
+        Character_GetBonePos(pChar, 0x47, vA);
+        Character_GetBonePos(pChar, 0x39, vB);
         fn_800B3460(vA, vB, vPos);
         Vec_Scale(0.5f, vPos, vPos);
     } else {
-        fn_8001EB8C(pChar, 0, vPos);
+        Character_GetBonePos(pChar, 0, vPos);
     }
     // the ground under it: the higher surface unless there is none or it is above the golfer
     if (bFlat) {
@@ -359,7 +359,7 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     aView[3][1] = -vCentre[2] / fHalfZ;
     aView[3][2] = 1.0f / fn_80014280(0.5f * p->pLens->fFov);
     fn_800BADF8(aView, aLight, aMtx, 4);
-    fn_800B3484(fn_8001F004(), aMtx);
+    fn_800B3484(Camera_GetCurrentLens(), aMtx);
     fn_800352BC();
     fn_80013CCC(Camera_GetCurrent());
     fn_800140E8(0, p->nWidth, p->nHeight, 0, 4, 1);

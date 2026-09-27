@@ -126,7 +126,7 @@ void fn_800935CC(CourseLights* pLights) {
 
 void fn_80093824(void) {
     fn_8003532C();
-    fn_80093A04(0, fn_8001F004());
+    fn_80093A04(0, Camera_GetCurrentLens());
 }
 
 void fn_80093854(LightParams* pParams) {

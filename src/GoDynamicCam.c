@@ -35,7 +35,7 @@ void fn_80039754(UStreamObject* pObject);
 void fn_800397EC(UStreamObject* pObject);
 void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScript, CamShot* pShot, f32* pCam,
                             f32* pSub);
-void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
+void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
 void fn_8003D324(f32* pPos, f32* pDir, CamScript* pScript, CamShot* pShot, int nPlayer, f32 fSide, f32 fY);
 void DynamicCam_AddHeightOffset(f32* pPos, CamScript* pScript, CamShot* pShot, int nPlayer, f32 fY);
 void fn_8003AC50(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub);
@@ -989,22 +989,22 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         DynamicCam_GetSmoothBallLocation(pScript, pShot, nPlayer, pOut, 0);
         break;
     case 2:
-        fn_8001EB8C(gPlayers[nPlayer].pChar, 0x39, vBone39);
-        fn_8001EB8C(gPlayers[nPlayer].pChar, 0x47, vBone47);
+        Character_GetBonePos(gPlayers[nPlayer].pChar, 0x39, vBone39);
+        Character_GetBonePos(gPlayers[nPlayer].pChar, 0x47, vBone47);
         fn_8003DC30(vBone39, vBone47, vMid);
         Vec3_Scale(0.5f, vMid, vMid);
         Vec3Copy(vMid, pOut);
         break;
     case 6:
-        fn_8001EB8C(gPlayers[nPlayer].pChar, 10, vBone10);
+        Character_GetBonePos(gPlayers[nPlayer].pChar, 10, vBone10);
         Vec3Copy(vBone10, pOut);
         break;
     case 8:
-        fn_8001EB8C(gPlayers[nPlayer].pChar, 7, vBone7);
+        Character_GetBonePos(gPlayers[nPlayer].pChar, 7, vBone7);
         Vec3Copy(vBone7, pOut);
         break;
     case 4:
-        fn_8001EB8C(gPlayers[nPlayer].pChar, 1, vBone1);
+        Character_GetBonePos(gPlayers[nPlayer].pChar, 1, vBone1);
         Vec3Copy(vBone1, pOut);
         break;
     case 1:
@@ -1047,8 +1047,8 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         }
         break;
     case 17:
-        fn_8001EB8C(gPlayers[nPlayer].pChar, 10, vBone10);
-        pMatrix = fn_8001ED08(gPlayers[nPlayer].pChar, 10);
+        Character_GetBonePos(gPlayers[nPlayer].pChar, 10, vBone10);
+        pMatrix = Character_GetBoneMatrix(gPlayers[nPlayer].pChar, 10);
         if (pMatrix == NULL) {
             Vec3Copy(vBone10, pOut);
             break;
@@ -1060,8 +1060,8 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         fn_8003DC30(vBone10, vDir10, pOut);
         break;
     case 18:
-        fn_8001EB8C(gPlayers[nPlayer].pChar, 7, vBone7);
-        pMatrix = fn_8001ED08(gPlayers[nPlayer].pChar, 7);
+        Character_GetBonePos(gPlayers[nPlayer].pChar, 7, vBone7);
+        pMatrix = Character_GetBoneMatrix(gPlayers[nPlayer].pChar, 7);
         if (pMatrix == NULL) {
             Vec3Copy(vBone7, pOut);
             break;
@@ -1073,8 +1073,8 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         fn_8003DC30(vBone7, vDir7, pOut);
         break;
     case 19:
-        fn_8001EB8C(gPlayers[nPlayer].pChar, 1, vBone1);
-        pMatrix = fn_8001ED08(gPlayers[nPlayer].pChar, 1);
+        Character_GetBonePos(gPlayers[nPlayer].pChar, 1, vBone1);
+        pMatrix = Character_GetBoneMatrix(gPlayers[nPlayer].pChar, 1);
         if (pMatrix == NULL) {
             Vec3Copy(vBone1, pOut);
             break;
@@ -1089,9 +1089,9 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         if (nOther != 20 && nOther != 21) {
             DynamicCam_GetLocation(nOther, nPlayer, vFrom, pScript, pShot, pCam, pSub);
         } else {
-            fn_8001EB8C(gPlayers[nPlayer].pChar, 0, vFrom);
+            Character_GetBonePos(gPlayers[nPlayer].pChar, 0, vFrom);
         }
-        pMatrix = fn_8001ED08(gPlayers[nPlayer].pChar, 0);
+        pMatrix = Character_GetBoneMatrix(gPlayers[nPlayer].pChar, 0);
         if (pMatrix == NULL) {
             Vec3Copy(vFrom, pOut);
             break;
@@ -1106,9 +1106,9 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         if (nOther != 20 && nOther != 21) {
             DynamicCam_GetLocation(nOther, nPlayer, vFrom, pScript, pShot, pCam, pSub);
         } else {
-            fn_8001EB8C(gPlayers[nPlayer].pChar, 0, vFrom);
+            Character_GetBonePos(gPlayers[nPlayer].pChar, 0, vFrom);
         }
-        pMatrix = fn_8001ED08(gPlayers[nPlayer].pChar, 0);
+        pMatrix = Character_GetBoneMatrix(gPlayers[nPlayer].pChar, 0);
         if (pMatrix == NULL) {
             Vec3Copy(vFrom, pOut);
             break;
@@ -1665,18 +1665,18 @@ void DynamicCam_AddHeightOffset(f32* pPos, CamScript* pScript, CamShot* pShot, i
     }
     switch (pShot->bB2) {
     case 1:
-        fn_8001EB8C(gPlayers[nPlayer].pChar, 0x39, vBone39);
-        fn_8001EB8C(gPlayers[nPlayer].pChar, 0x47, vBone47);
+        Character_GetBonePos(gPlayers[nPlayer].pChar, 0x39, vBone39);
+        Character_GetBonePos(gPlayers[nPlayer].pChar, 0x47, vBone47);
         fn_8003DC30(vBone39, vBone47, vMid);
         Vec3_Scale(0.5f, vMid, vMid);
         pPos[1] = vMid[1];
         break;
     case 2:
-        fn_8001EB8C(gPlayers[nPlayer].pChar, 1, vBone1);
+        Character_GetBonePos(gPlayers[nPlayer].pChar, 1, vBone1);
         pPos[1] = vBone1[1];
         break;
     case 3:
-        fn_8001EB8C(gPlayers[nPlayer].pChar, 0xA, vBoneA);
+        Character_GetBonePos(gPlayers[nPlayer].pChar, 0xA, vBoneA);
         pPos[1] = vBoneA[1];
         break;
     case 4:

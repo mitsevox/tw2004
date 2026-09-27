@@ -20,7 +20,7 @@ s32   fn_800962F8(Character* pChar);
 s32   fn_80096508(void);
 int   CharacterState_UpdateGameEmotionState(Character* pChar);
 f32   fn_800971B8(Character* pChar);
-u8    fn_8001EC48(Character* pChar);                        // char.c
+u8    Character_IsGolfer(Character* pChar);                        // char.c
 void  Character_PlaceFeetOnGround(Character* pChar);        // char.c
 int   fn_8001BD18(Character* pChar, Clip* pClip);           // char.c
 void  fn_800175B0(Character* pChar, Clip* pBlend, f32 fStart);   // char.c
@@ -190,7 +190,7 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
             pChar->pBlend = NULL;
         }
     }
-    if (fn_8001EC48(pChar)) {
+    if (Character_IsGolfer(pChar)) {
         fn_8001BD18(pChar, pClip);
     }
     if (bReset) {
@@ -391,7 +391,7 @@ s32 fn_80096508(void) {
 int CharacterState_UpdateGameEmotionState(Character* pChar) {
     int aStyle[10] = {5, 6, 7, 2, 1, 0, 3, 4, 5, 2};
     int nResult    = fn_8006AA9C(pChar->nPlayer);
-    fn_8001C7FC(pChar, aStyle[nResult]);
+    Character_SetEmotion(pChar, aStyle[nResult]);
     return nResult;
 }
 
@@ -404,13 +404,13 @@ void CharacterState_SetTapInState(Character* pChar) {
     if (pChar == NULL) return;
     nScore = Hole_ScoreAfterTapIn(pChar->nPlayer);
     if (nScore < 0) {
-        fn_8001C7FC(pChar, 6);
+        Character_SetEmotion(pChar, 6);
     } else if (nScore == 0) {
-        fn_8001C7FC(pChar, 5);
+        Character_SetEmotion(pChar, 5);
     } else if (nScore == 0) {
-        fn_8001C7FC(pChar, 0);
+        Character_SetEmotion(pChar, 0);
     } else {
-        fn_8001C7FC(pChar, 2);
+        Character_SetEmotion(pChar, 2);
     }
     CharacterState_AddSKABlendData(pChar, 1, 9, fn_80072ACC, 1, 8, -10000.0f, -30000.0f, -10000.0f, 0.0f,
                                    -10000.0f);

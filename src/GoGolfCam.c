@@ -35,7 +35,7 @@ void     GolfCamera_ClampLookAngle(f32* pFrom, f32* pTo, f32* pOut);
 int      fn_800C4D2C(f32* pFrom, f32* pTo, f32* pOut, f32 fMax);
 // The segment crosses the outline (at pHit).
 u8       fn_8004B6F8(f32* pFrom, f32* pTo, f32* pHit);
-f32      fn_8001EFFC(u8* pLens);                        // the lens's fB0 (char.c: its parameter is u8*)
+f32      Camera_GetLensFovScale(u8* pLens);                 // the lens's fB0 (char.c: its parameter is u8*)
 void     fn_80038054(u8 a, int n, f32 f1, f32 f2);
 CamShot* GolfCamera_GetAlternateSwingCamera(int nFirst, int nPlayer);
 void     fn_800C5EC0(View* pView, f32* pCam, f32* pSub, int nPlayer);
@@ -369,7 +369,8 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
     if (pView->script.f108 >= 1.0f) {
         fFlatDist = 1.0f + lbl_80281F78->f4;
         fFlatDist *= 1.0f
-                / fn_8001EFFC((u8*)Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
+                / Camera_GetLensFovScale(
+                    (u8*)Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
     } else {
         fFlatDist = 10000.0f;
     }
@@ -531,7 +532,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
         }
         fHeight = lbl_80281F78->f44;
         pLens = Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0]));
-        fHeight *= 1.0f / fn_8001EFFC((u8*)pLens);
+        fHeight *= 1.0f / Camera_GetLensFovScale((u8*)pLens);
         // high enough to see the pin (up to 20 from the target) through the lens
         nPinSet = Game_CurrentPinSet();
         GolfCam_Vec3Sub(&pCourse->pin[nPinSet].x, vTarget, vPin);
@@ -2440,7 +2441,7 @@ void GolfCamera_ProcessFECamera(View* pView, int nPlayer) {
             }
             break;
         case 1:
-            if (fn_8001EDF4(lbl_80281EE0->pB4->pChar)) {
+            if (Character_IsLeftHanded(lbl_80281EE0->pB4->pChar)) {
                 pShot = DynamicCam_ChooseScript(0, 0x38, pView->p80);
                 if (pShot == NULL) {
                     pShot = DynamicCam_ChooseScript(0, 0x38, NULL);
@@ -2558,7 +2559,7 @@ void fn_800C3EDC(View* pView, int nPlayer) {
     f32 (*m)[4];
     pCam = CameraController_GetPosition(pView);
     pSub = CameraController_GetTarget(pView);
-    m = fn_8001ED08(gPlayers[nPlayer].pChar, 10);
+    m = Character_GetBoneMatrix(gPlayers[nPlayer].pChar, 10);
     Vec_Copy(m[3], pSub);
     fn_8000C5D4(pSub, m[1], 0.1f, pSub);
     Vec3_Scale(0.5f, m[2], pCam);
@@ -2611,7 +2612,8 @@ u8 fn_800C3FC0(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam) {
     } else {
         fBack = lbl_80281F78->f38;
     }
-    fBack *= 1.0f / fn_8001EFFC((u8*)Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
+    fBack *= 1.0f / Camera_GetLensFovScale(
+                        (u8*)Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
     if (fBack + lbl_80281F78->fC > fDist && gPlayers[nPlayer].nShotKind != 0) {
         if (fBack > fDist) {
             fBack = lbl_80281F78->f10 * fDist;

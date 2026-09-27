@@ -101,7 +101,7 @@ void fn_800488B4(UObject* pObj) {
 
     nLod = fn_80048AE8(pObj);
     pMesh = pObj->pModel->apLod[nLod];
-    fFov = fn_8001F004()->fFov;
+    fFov = Camera_GetCurrentLens()->fFov;
     fMax = 0.75f * fFov * fn_8001414C((u8*)fn_8003526C());
     fn_80035240(pObj->m80);
     fTemp = fFov <= fMax ? fFov : fMax;

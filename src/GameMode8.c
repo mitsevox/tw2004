@@ -447,7 +447,7 @@ void fn_800FA570(void) {
     for (i = 0; i < gNumPlayersSetUp; i++) {
         PLAYER(i)->nC3C = 0;
         PLAYER(i)->uC48 = 0;
-        fn_8001C804(i, 1, 1);
+        Character_AlignShotWithTarget(i, 1, 1);
         fn_80095744(PLAYER(i)->pChar, 1);
         Emotion_UpdatePlayerEmotion(i);
         GOLFERSTATE_Set(25, i);
@@ -477,7 +477,7 @@ void fn_800FA608(int nPlayer) {
         fn_8001704C(gPlayers[nPlayer].nView[i], nPlayer);
     }
     fn_8001D8DC(nPlayer);
-    fn_8001C804(nPlayer, 1, 1);
+    Character_AlignShotWithTarget(nPlayer, 1, 1);
     fn_800957D8(gPlayers[nPlayer].pChar);
     fn_80095744(gPlayers[nPlayer].pChar, 5);
     Emotion_UpdatePlayerEmotion(nPlayer);

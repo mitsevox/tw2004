@@ -19,7 +19,7 @@ TerSettings lbl_801D70A8;
 // Blend the colour for the camera's current heading.
 void fn_8006F154(void) {
     TerSettings* pSettings = lbl_802811E0;
-    CamLens* pLens = fn_8001F004();
+    CamLens* pLens = Camera_GetCurrentLens();
     f32 fX;
     f32 fZ;
     f32 fLen2;

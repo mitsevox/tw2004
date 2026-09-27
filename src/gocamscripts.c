@@ -18,7 +18,7 @@ void CameraScript_LagTargetPoint(int nPlayer, f32* pOut, f32* pCam, f32* pTarget
 f32  CameraScript_GetBallHeightWithMaxHeight(int nPlayer, CamScript* pScript, f32* pPos, f32* pCam, CamShot* pShot);
 void CameraScript_KeepPointInView(int nPlayer, f32* pCam, f32* pOut, f32* pTarget, CamScript* pScript, f32 fLag);
 void CameraScript_OffsetLookVector(f32* pPos, f32* pTarget, f32 fUp, f32 fSide);
-void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
+void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
 void fn_80038054(u8 a, int n, f32 f1, f32 f2);
 void fn_800457B8(int nPlayer, f32 f);
 f32  fn_800DC45C(f32 f);
@@ -48,7 +48,7 @@ u8   CameraScript_DontUpdateCameraDuringSlowMo(CamScript* pScript, int nPlayer);
 void fn_80044768(f32* pPos, f32* pOut);
 f32  fn_8003F790(CamScript* pScript);   // the blend's share (0..1) so far
 f32  fn_80044F58(int nPlayer, CamScript* pScript);
-f32  fn_8001EFFC(u8* pLens);            // the lens's fB0 (char.c: its parameter is u8*)
+f32  Camera_GetLensFovScale(u8* pLens);            // the lens's fB0 (char.c: its parameter is u8*)
 u8   fn_8004561C(void);
 u8   fn_80044E2C(int n);
 u8   fn_80044AA8(SurfaceType* pSurface);
@@ -1237,8 +1237,8 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
         }
         break;
     case 2:
-        fn_8001EB8C(gPlayers[nPlayer].pChar, 0x39, vBone39);
-        fn_8001EB8C(gPlayers[nPlayer].pChar, 0x47, vBone47);
+        Character_GetBonePos(gPlayers[nPlayer].pChar, 0x39, vBone39);
+        Character_GetBonePos(gPlayers[nPlayer].pChar, 0x47, vBone47);
         Vec3_Add(vBone39, vBone47, vMid);
         Vec3_Scale(0.5f, vMid, vMid);
         Vec3Copy(vMid, pOut);
@@ -1249,8 +1249,8 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
         }
         break;
     case 3:
-        fn_8001EB8C(gPlayers[nPlayer].pChar, 0x39, vBone39);
-        fn_8001EB8C(gPlayers[nPlayer].pChar, 0x47, vBone47);
+        Character_GetBonePos(gPlayers[nPlayer].pChar, 0x39, vBone39);
+        Character_GetBonePos(gPlayers[nPlayer].pChar, 0x47, vBone47);
         Vec3_Add(vBone39, vBone47, vMid);
         Vec3_Scale(0.5f, vMid, vMid);
         if (CameraScript_SnapToScript(pScript, pShot)) {
@@ -1265,7 +1265,7 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
         }
         break;
     case 4:
-        fn_8001EB8C(gPlayers[nPlayer].pChar, 1, vBone1);
+        Character_GetBonePos(gPlayers[nPlayer].pChar, 1, vBone1);
         Vec3Copy(vBone1, pOut);
         if (fn_800453C8(nPlayer, pShot)) {
             CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, -pShot->f70);
@@ -1274,7 +1274,7 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
         }
         break;
     case 5:
-        fn_8001EB8C(gPlayers[nPlayer].pChar, 1, vBone1);
+        Character_GetBonePos(gPlayers[nPlayer].pChar, 1, vBone1);
         if (CameraScript_SnapToScript(pScript, pShot)) {
             Vec3Copy(vBone1, pOut);
             if (fn_800453C8(nPlayer, pShot)) {
@@ -1287,7 +1287,7 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
         }
         break;
     case 6:
-        fn_8001EB8C(gPlayers[nPlayer].pChar, 10, vBone10);
+        Character_GetBonePos(gPlayers[nPlayer].pChar, 10, vBone10);
         Vec3Copy(vBone10, pOut);
         if (fn_800453C8(nPlayer, pShot)) {
             CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, -pShot->f70);
@@ -1296,7 +1296,7 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
         }
         break;
     case 7:
-        fn_8001EB8C(gPlayers[nPlayer].pChar, 10, vBone10);
+        Character_GetBonePos(gPlayers[nPlayer].pChar, 10, vBone10);
         if (CameraScript_SnapToScript(pScript, pShot)) {
             Vec3Copy(vBone10, pOut);
             if (fn_800453C8(nPlayer, pShot)) {
@@ -1419,7 +1419,8 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
         }
         Vec3_Sub(vGoal, pCam, vDir);
         fMin = lbl_80281F78->fF0;
-        fB = 1.0f / fn_8001EFFC((u8*)Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
+        fB = 1.0f / Camera_GetLensFovScale(
+                        (u8*)Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
         fMin *= fB;
         fMin *= -vDir[1];
         vDir[1] = 0.0f;
@@ -2021,7 +2022,7 @@ f32 CameraScript_GetBallHeightWithMaxHeight(int nPlayer, CamScript* pScript, f32
 
     if (fAbove > pShot->f6C) {
         fDrop = lbl_80281F78->fD0 * (fAbove - pShot->f6C);
-        fDrop *= fn_8001EFFC((u8*)fn_8001F004());
+        fDrop *= Camera_GetLensFovScale((u8*)Camera_GetCurrentLens());
         fY -= fDrop;
     }
     return fY;
@@ -2048,7 +2049,7 @@ void CameraScript_KeepPointInView(int nPlayer, f32* pCam, f32* pOut, f32* pTarge
     f32 fCos;
     f32 fSin;
 
-    fLag *= fn_8001EFFC((u8*)fn_8001F004());
+    fLag *= Camera_GetLensFovScale((u8*)Camera_GetCurrentLens());
     Vec3_Sub(pTarget, pCam, vToTarget);
     Vec3_Sub(pOut, pCam, vToOut);
     if ((0.0f == vToTarget[0] && 0.0f == vToTarget[1] && 0.0f == vToTarget[2]) ||
@@ -2178,7 +2179,7 @@ u8 CamScript_CheckObstructedCamera(f32* pCam, int nPlayer) {
         Vec3_Sub(pCam, &pCourse->pin[nPin].x, vDiff);
         vDiff[1] = 0.0f;
         fDist = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
-        fDist *= fn_8001EFFC((u8*)fn_8001F004());
+        fDist *= Camera_GetLensFovScale((u8*)Camera_GetCurrentLens());
         if (fDist < lbl_80281F78->f120
             && pCam[1] - pCourse->pin[nPin].y < lbl_80281F78->f124) {
             bBlocked = 1;
@@ -2383,7 +2384,7 @@ void CamScript_CheckFlagCollision(CamScript* pScript, f32* pCam, f32* pSub, int 
     Vec3_Sub(pCam, &pCourse->pin[nPin].x, vDiff);
     vDiff[1] = 0.0f;
     fDist = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
-    fDist *= fn_8001EFFC((u8*)fn_8001F004());
+    fDist *= Camera_GetLensFovScale((u8*)Camera_GetCurrentLens());
     if (fDist < lbl_80281F78->f120) {
         if (pCam[1] - pCourse->pin[nPin].y < lbl_80281F78->f124) {
             fAbove = pCam[1] - pCourse->pin[nPin].y;
@@ -2844,7 +2845,7 @@ u8 fn_800453C8(int nPlayer, CamShot* pShot) {
     if (gSession.nGameType == 3) {
         return 0;
     }
-    return fn_8001EDF4(gPlayers[nPlayer].pChar) != 0;
+    return Character_IsLeftHanded(gPlayers[nPlayer].pChar) != 0;
 }
 
 // a - b into out (three floats)

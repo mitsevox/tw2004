@@ -23,7 +23,7 @@ typedef struct CamLens {
     f32  fFov;                  // 0xA4  the field of view (GoGolfCam.c sets DEG(60.0f) or DEG(30.0f))
     f32  fA8;                   // 0xA8  CA_vInitCamera starts it at 0.1
     f32  fAC;                   // 0xAC  CA_vInitCamera starts it at 4096 (GoTerrain.c fn_800354B4 sets it)
-    f32  fB0;                   // 0xB0  fn_8001EFFC; the zoom-to-aim camera divides its distance by it
+    f32  fB0;                   // 0xB0  Camera_GetLensFovScale; the zoom-to-aim camera divides its distance by it
     f32  fB4;                  // 0xB4  a flat camera's view width (guess)
     f32  fB8;                   // 0xB8  its view height (guess)
 } CamLens;
@@ -657,7 +657,7 @@ u8       fn_8003D7A0(CamSequence* pSequence, int nPlayer);   // it suits the pla
 u8     fn_8003DC78(CamShot* pShot);     // the shot's bAC is 1..6 or 7
 // The ball's position, or the script's v70 when the ball is by the pin (with bKeep v70 follows it).
 void   DynamicCam_GetSmoothBallLocation(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pOut, u8 bKeep);
-// 0 when gSession.nGameType is 3, else fn_8001EDF4 of the player's golfer (Player.pChar) as a flag;
+// 0 when gSession.nGameType is 3, else Character_IsLeftHanded of the player's golfer (Player.pChar) as a flag;
 // the shot is not read.
 u8     fn_800453C8(int nPlayer, CamShot* pShot);
 
@@ -889,7 +889,7 @@ void     fn_80076A0C_SetType(CamLens* pLens, s32 nType);          // sets nType
 f32*     VM_spCreateViewport(void);                     // a new screen rectangle
 void     VM_vReleaseViewport(f32* pRect);               // free it
 void     fn_800B3438(f32* pRect, f32 x, f32 y); // shadow.c
-CamLens* fn_8001F004(void);                     // char.c
+CamLens* Camera_GetCurrentLens(void);                     // char.c
 
 // GoRenderCtx_Gc.c: a render camera made from a lens, a frame buffer and a screen rectangle.
 void*    fn_8001371C(CamLens* pLens, GoFrameBuf* pBuf, f32* pRect);

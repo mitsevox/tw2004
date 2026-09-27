@@ -45,7 +45,7 @@ void fn_80037AB8(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst) {
         }
         for (i = 0; i < pSkin->pModel->n14; i++) {
             Quat_QuatToMatrix(pSkin->pModel->p34[i].q0, aMtx);
-            fn_8001E880(pSkin->pModel->p34[i].v10, aMtx[3]);
+            Vec4_CopyPoint(pSkin->pModel->p34[i].v10, aMtx[3]);
             fn_8000A798(aMtx, pSkin->p1088[i]);
         }
     }

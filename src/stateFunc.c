@@ -202,7 +202,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
     }
     EVENT_Trigger(nPlayer, 0x2A, 0, -1);
     fn_8001D8DC(nPlayer);
-    fn_8001C804(nPlayer, 1, 1);
+    Character_AlignShotWithTarget(nPlayer, 1, 1);
     if (gpGame->b277 != 0) {
         fn_800957D8(gPlayers[nPlayer].pChar);
     }
@@ -507,7 +507,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
     nView = gPlayers[nPlayer].nView[0];
     CameraController_SetCameraMode(ViewController_GetCameraController(nView), 0xC, nPlayer, nView);
     GameEffects_ResetGameEffectSettings();
-    fn_8001C804(nPlayer, 1, 1);
+    Character_AlignShotWithTarget(nPlayer, 1, 1);
     TARGET_ResetMomentums(nPlayer);
     fn_800A562C((u8)nPlayer);
     fn_8006BAA8(nPlayer);
@@ -634,7 +634,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
             Shot_Prepare(nPlayer, 1);
             BreakLine_Reset(gPlayers[nPlayer].nView[0]);
             fn_8009B970(gPlayers[nPlayer].nView[0]);
-            fn_8001C804(nPlayer, 1, 1);
+            Character_AlignShotWithTarget(nPlayer, 1, 1);
             fn_800957D8(gPlayers[nPlayer].pChar);
             fn_80095744(gPlayers[nPlayer].pChar, 5);
             TARGET_SetupTarget(nPlayer);
@@ -689,7 +689,7 @@ void STATEFUNC_ReplaySwingInit(int nPlayer) {
             CameraController_SetCameraMode(pV, 0xD, nPlayer, gPlayers[nPlayer].nView[0]);
         }
     }
-    fn_8001C804(nPlayer, 1, 1);
+    Character_AlignShotWithTarget(nPlayer, 1, 1);
     fn_800957D8(gPlayers[nPlayer].pChar);
     gPlayers[nPlayer].pChar->n20 = 7;
     gPlayers[nPlayer].pChar->nAnim = 7;
@@ -1143,7 +1143,7 @@ void STATEFUNC_GreenMorphUpdate(int nPlayer) {
             }
             Shot_Prepare(nPlayer, 1);
             BreakLine_Reset(gPlayers[nPlayer].nView[0]);
-            fn_8001C804(nPlayer, 1, 1);
+            Character_AlignShotWithTarget(nPlayer, 1, 1);
             fn_800957D8(gPlayers[nPlayer].pChar);
             fn_80095744(gPlayers[nPlayer].pChar, 5);
             fn_80062C38();
@@ -1560,7 +1560,7 @@ void STATEFUNC_TapInInit(int nPlayer) {
     fn_80062BE8(gPlayers[nPlayer].pChar);
     Character_SelectGameClub(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nClub);
     Character_SelectGameShotType(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nShotKind);
-    fn_8001C804(nPlayer, 1, 1);
+    Character_AlignShotWithTarget(nPlayer, 1, 1);
     gPlayers[nPlayer].uFlags |= 8;
     gPlayers[nPlayer].fA64 = fn_800D0478(nPlayer);
     fn_800E4204();
@@ -1781,7 +1781,7 @@ void STATEFUNC_InitialFlyByInit(int nPlayer) {
     GM_MovePlayerToBall(nPlayer);
     Shot_Plan(nPlayer, 1);
     fn_8001D8DC(nPlayer);
-    fn_8001C804(nPlayer, 1, 1);
+    Character_AlignShotWithTarget(nPlayer, 1, 1);
     fn_800957D8(gPlayers[nPlayer].pChar);
     fn_80095744(gPlayers[nPlayer].pChar, 1);
     fn_8003349C(1.0f, 12.0f, 0.1f);
@@ -1943,7 +1943,7 @@ void STATEFUNC_PlaceBallInit(int nPlayer) {
     }
     Shot_Plan(nPlayer, 1);
     gPlayers[nPlayer].fThinkTime = 0.0f;
-    fn_8001C804(nPlayer, 1, 1);
+    Character_AlignShotWithTarget(nPlayer, 1, 1);
     fn_800957D8(gPlayers[nPlayer].pChar);
     GameEffects_ResetGameEffectSettings();
     fn_800D8D10(nPlayer);

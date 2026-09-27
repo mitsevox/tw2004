@@ -256,7 +256,7 @@ They will be sorted into the sections below.
   fn_80049298 80.5 -> 100).
 - **[verified] A struct's size can be proved by a `Mem_cpy` of it** (CamScript 0x118).
 - **[verified] `li r3/r4` missing before a call is not a missing argument**: CW reuses a still-live
-  argument register (char fn_8001D4A4).
+  argument register (char Character_SetClubsAndClothes).
 - **[verified] Two null tests that each go straight to the exit are two `return`s, not `||`** (`beq end;
   lwz; cmplwi; beq end`; animblender fn_80071F58 98.8 -> 100).
 - **[verified] Keep a call result in a named local when it is an index, a compare operand or an argument

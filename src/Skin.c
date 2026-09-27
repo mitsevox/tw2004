@@ -33,7 +33,7 @@ HwsMemBlock* fn_801128C8(SkinDesc* pDesc, s32 nSize);         // hwsOverride_Gc.
 HwsOverrideTable* fn_80112A10(SkinDesc* pDesc, s32 nMeshes);  // hwsOverride_Gc.c
 void  fn_80112B18(HwsOverrideTable* pTable, int i, void* p);   // hwsOverride_Gc.c
 
-u8    fn_8001EC48(Character* pChar);           // char.c
+u8    Character_IsGolfer(Character* pChar);           // char.c
 void  fn_80035810(Character* pChar);
 void  fn_80035D10(Character* pChar, int nView);
 void  fn_80035F40(void* pCamera);
@@ -354,13 +354,13 @@ void fn_80035D10(Character* pChar, int nView) {
     fn_800360D4(&lbl_801D4E78.aMesh[nView]);
 }
 
-// Runs fn_80035D10 for view nView on every character made so far, except those fn_8001EC48 picks
+// Runs fn_80035D10 for view nView on every character made so far, except those Character_IsGolfer picks
 // and those with flag 0x40 or 1.
 void fn_80035E98(int nView) {
     int i;
 
     for (i = 0; i < lbl_80281CA8; i++) {
-        if (!fn_8001EC48(lbl_801B9624[i]) && !(lbl_801B9624[i]->u10 & 0x41)) {
+        if (!Character_IsGolfer(lbl_801B9624[i]) && !(lbl_801B9624[i]->u10 & 0x41)) {
             fn_80035D10(lbl_801B9624[i], nView);
         }
     }
@@ -1065,10 +1065,10 @@ Skin* fn_800377FC(u8* pData, u8 b) {
     pSkin->b1044 = 0;
     pBones = pModel->p34;
     fn_80037574(pBones, pModel->n14);
-    fn_8001E8A4(pSkin->pose.a0, 0x80);
-    fn_8001E8A4(pSkin->pose.a10, 0x80);
-    fn_8001E8A4(pSkin->pose.a20, 0x80);
-    fn_8001E8A4(pSkin->pose.a30, 0x80);
+    BitArray_SetAll(pSkin->pose.a0, 0x80);
+    BitArray_SetAll(pSkin->pose.a10, 0x80);
+    BitArray_SetAll(pSkin->pose.a20, 0x80);
+    BitArray_SetAll(pSkin->pose.a30, 0x80);
     for (i = 0; i < pModel->n14; i++) {
         Quat_Copy(pBones[i].q0, pSkin->pose.aBones[i].q0);
         Quat_Copy(pBones[i].v10, pSkin->pose.aBones[i].v10);

@@ -445,7 +445,7 @@ void fn_80014A64(void) {
     fn_80015334(lbl_80186C44, fn_80014E78, fn_80014E90);
     fn_80015334(lbl_80186C50, fn_80014E68, fn_80014E80);
     for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
-        sprintf(szName, lbl_80186C5C, fn_8001C558(nPlayer) + 1);
+        sprintf(szName, lbl_80186C5C, Character_GetGolferModelID(nPlayer) + 1);
         fn_80015334(szName, fn_80014E68, fn_80014E80);
     }
     for (i = 0; i < 30; i++) {
@@ -467,7 +467,7 @@ void fn_80014BB4(void) {
         fn_80015334(lbl_80186C80, fn_80014E78, fn_80014E90);
     }
     for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
-        sprintf(szName, lbl_80186C8C, fn_8001C558(nPlayer) + 1);
+        sprintf(szName, lbl_80186C8C, Character_GetGolferModelID(nPlayer) + 1);
         fn_80015334(szName, fn_80014E68, fn_80014E80);
     }
 }
@@ -491,7 +491,7 @@ void fn_80014C9C(void) {
     }
     pSlot = &lbl_801C6068[nSlot];
     for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
-        nModel = fn_8001C558(nPlayer);
+        nModel = Character_GetGolferModelID(nPlayer);
         for (i = 0; i < pSlot->nOverlays; i++) {
             if (pSlot->overlays[i].n14 == nModel) {
                 break;
