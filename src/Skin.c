@@ -20,7 +20,7 @@ void  fn_8006E7A4(LightGroup* pGroup);         // GoLighting.c: load the group's
 void  fn_8006EADC(UObject* pObj);              // GoLighting.c: light the object
 void  fn_8006ED70(void);                       // GoLighting.c
 void  fn_801127A0(void* pDesc);                // hwsMaterial_Gc.c
-void  fn_800CEE88(u8 b);                       // SkinPart.c
+void  SkinPart_SetChangeAllCopies(u8 b);                       // SkinPart.c
 void  fn_800CEF04(SkinDesc* pDesc);            // SkinPart.c: offsets to pointers
 void  fn_800CD404(Skin* pSkin);                // SkinPart.c
 s32   fn_800CD700(Skin* pSkin);                // SkinPart.c
@@ -81,9 +81,9 @@ void fn_80035640(Character* pChar) {
 
     SKA_PackName(&uShadow, "shadow");
     fn_800CE02C(pChar->pSkin, pChar->n17B4);
-    nParts = fn_800CCA40(pChar->pSkin);
+    nParts = SkinPart_GetNumParts(pChar->pSkin);
     for (i = 0; i < nParts; i++) {
-        if (fn_800CCDDC(pChar->pSkin, i) == uShadow) {
+        if (SkinPart_GetPartId(pChar->pSkin, i) == uShadow) {
             // port: EA passes an argument fn_800CE0B0 ignores
             ((void (*)(Skin*, int, int))fn_800CE0B0)(pChar->pSkin, i, pChar->n17B4);
         }
@@ -94,7 +94,7 @@ void fn_80035640(Character* pChar) {
         if (pSkin != NULL) {
             fn_800CE02C(pSkin, pChar->n17B4);
             // port: EA passes an argument fn_800CE0B0 ignores
-            ((void (*)(Skin*, int, int))fn_800CE0B0)(pSkin, fn_800CDAFC(pSkin, uShadow),
+            ((void (*)(Skin*, int, int))fn_800CE0B0)(pSkin, SkinPart_FindPart(pSkin, uShadow),
                                                      pChar->n17B4);
             fn_800CE128(pSkin);
         }
@@ -109,9 +109,9 @@ void fn_80035754(Character* pChar) {
 
     SKA_PackName(&uShadow, "shadow");
     fn_800CE02C(pChar->pSkin, pChar->n17B4);
-    nParts = fn_800CCA40(pChar->pSkin);
+    nParts = SkinPart_GetNumParts(pChar->pSkin);
     for (i = 0; i < nParts; i++) {
-        if (fn_800CCDDC(pChar->pSkin, i) != uShadow) {
+        if (SkinPart_GetPartId(pChar->pSkin, i) != uShadow) {
             // port: EA passes an argument fn_800CE0B0 ignores
             ((void (*)(Skin*, int, int))fn_800CE0B0)(pChar->pSkin, i, pChar->n17B4);
         }
@@ -133,7 +133,7 @@ void fn_80035810(Character* pChar) {
         if (pSkin != NULL) {
             fn_800CE02C(pSkin, pChar->n17B4);
             nShadow = fn_800CDB70(pSkin, "shadow");
-            for (i = 0; i < fn_800CCA40(pSkin); i++) {
+            for (i = 0; i < SkinPart_GetNumParts(pSkin); i++) {
                 if (i != nShadow) {
                     // port: EA passes an argument fn_800CE0B0 ignores
                     ((void (*)(Skin*, int, int))fn_800CE0B0)(pSkin, i, pChar->n17B4);
@@ -1015,8 +1015,8 @@ Skin* fn_800377FC(u8* pData, u8 b) {
     int i;
     u8 bOld;
 
-    bOld = fn_800CEE90();
-    fn_800CEE88(1);
+    bOld = SkinPart_GetChangeAllCopies();
+    SkinPart_SetChangeAllCopies(1);
     pSkin = StaticMem_Alloc(sizeof(Skin), 2, 0x80, "Skin.c", 0x5C4);
     memset(pSkin, 0, sizeof(Skin));
     pModel = (SkinModel*)pData;     // the file's model, then the copy
@@ -1080,7 +1080,7 @@ Skin* fn_800377FC(u8* pData, u8 b) {
     }
     fn_800CD404(pSkin);
     fn_8011C9B0(pSkin);
-    fn_800CEE88(bOld);
+    SkinPart_SetChangeAllCopies(bOld);
     fn_800375AC(pSkin, 0);
     return pSkin;
 }

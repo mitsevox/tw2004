@@ -130,7 +130,7 @@ void fn_80035B40(Character* pChar, int n);
 void fn_80035FFC(void);
 void fn_80079974(void);
 void fn_800B9CF0(int n);
-void fn_800CEE88(u8 b);
+void SkinPart_SetChangeAllCopies(u8 b);
 void fn_8010B098(void* p);
 void fn_8010B9BC(void);
 u8   fn_8010BFE0(void);
@@ -372,13 +372,13 @@ void fn_8008B4C0(void) {
     int nGolfer;
 
     Session_SetupProfiles();
-    fn_800CEE88(1);
+    SkinPart_SetChangeAllCopies(1);
     nGolfer = lbl_80281EE0->pB8->pChar->nC;
     if (nGolfer == 7 || nGolfer == 29) {
         fn_80079974();
     }
     Character_SetClubsAndClothes(lbl_80281EE0->pB8->pChar, lbl_80281ED4->nSlot);
-    fn_800CEE88(0);
+    SkinPart_SetChangeAllCopies(0);
     fn_8010B098(lbl_80281EE0->pB8->pChar->a64[lbl_80281EE0->pB8->pChar->n74]);
     Character_AddTextureLoadRequest(lbl_80281EE0->pB8->pChar, fn_80019DE8, fn_80019E80);
 }

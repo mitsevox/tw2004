@@ -11,7 +11,7 @@
 #include "frontend/fe.h"
 #include "game/frontend.h"
 
-s32  fn_800CCEA0(Skin* pSkin);          // SkinPart.c: how many choices aSets[3] holds
+s32  SkinPart_GetNumSets(Skin* pSkin);          // SkinPart.c: how many choices aSets[3] holds
 
 // .data, in address order (0x80193228..)
 SwapField lbl_80193228[20] = {
@@ -292,8 +292,8 @@ void fn_80103D6C(void) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     Skin* pSkin = lbl_80281EE0->pB4->pChar->pSkin;
 
-    Mem_cpy(pProfile->choices.aParts, pSkin->aParts[3], fn_800CCA40(pSkin) * sizeof(SkinChoice));
-    Mem_cpy(pProfile->choices.aSets, pSkin->aSets[3], fn_800CCEA0(pSkin) * sizeof(SkinChoice));
+    Mem_cpy(pProfile->choices.aParts, pSkin->aParts[3], SkinPart_GetNumParts(pSkin) * sizeof(SkinChoice));
+    Mem_cpy(pProfile->choices.aSets, pSkin->aSets[3], SkinPart_GetNumSets(pSkin) * sizeof(SkinChoice));
 }
 
 // And the entries of its six other skins.
@@ -304,8 +304,10 @@ void fn_80103DE0(void) {
 
     for (i = 0; i < 6; i++) {
         pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[i];
-        Mem_cpy(pProfile->choices.aSkinParts[i], pSkin->aParts[3], fn_800CCA40(pSkin) * sizeof(SkinChoice));
-        Mem_cpy(pProfile->choices.aSkinSets[i], pSkin->aSets[3], fn_800CCEA0(pSkin) * sizeof(SkinChoice));
+        Mem_cpy(pProfile->choices.aSkinParts[i], pSkin->aParts[3], SkinPart_GetNumParts(pSkin)
+                * sizeof(SkinChoice));
+        Mem_cpy(pProfile->choices.aSkinSets[i], pSkin->aSets[3], SkinPart_GetNumSets(pSkin)
+                * sizeof(SkinChoice));
     }
 }
 
@@ -397,8 +399,8 @@ void sTurnOnLogo(s16 nPart, int b, int i) {
     pSkin = lbl_80281EE0->pB4->pChar->pSkin;
     fn_8008E944(0, 0.0f);
     SKA_PackName(&uSetId, lbl_801937C8[b]);
-    nSet = fn_800CDC2C(pSkin, uSetId);
-    fn_800CCF90(pSkin, nSet, i, 0);
+    nSet = SkinPart_FindSet(pSkin, uSetId);
+    SkinPart_ChooseSet(pSkin, nSet, i, 0);
     if (i > 0 && i <= 5) {
         sprintf(szLogo, "%s%d", "userlogo", nLogo);
         if (pProfile->choices.aLogo[nLogo].nShape == LOGO_SQUARE) {
@@ -408,9 +410,9 @@ void sTurnOnLogo(s16 nPart, int b, int i) {
         }
         SKA_PackName(&uSetId, szLogo);
         SKA_PackName(&uVariantId, szShape);
-        nSet = fn_800CDC2C(pSkin, uSetId);
-        nVariant = fn_800CDCE0(pSkin, nSet, uVariantId);
-        fn_800CCF90(pSkin, nSet, nVariant, 0);
+        nSet = SkinPart_FindSet(pSkin, uSetId);
+        nVariant = SkinPart_FindSetVariant(pSkin, nSet, uVariantId);
+        SkinPart_ChooseSet(pSkin, nSet, nVariant, 0);
     }
     fn_8001D624(lbl_80281EE0->pB4->n10);
     fn_80103D6C();
@@ -1063,10 +1065,10 @@ void fn_8010568C(s16 nPart, int b, int i, int n, u8* pColor) {
     } else {
         pSkin = lbl_80281EE0->pB4->pChar->pSkin;
     }
-    nSet = fn_800CDC2C(pSkin, pAsset->aSet[0]);
-    nVariant = fn_800CDCE0(pSkin, nSet, pAsset->aSetVariant[0]);
+    nSet = SkinPart_FindSet(pSkin, pAsset->aSet[0]);
+    nVariant = SkinPart_FindSetVariant(pSkin, nSet, pAsset->aSetVariant[0]);
     if (nSet >= 0 && nVariant >= 0) {
-        nOption = fn_800CDDB0(pSkin, nSet, nVariant, pAsset->aSetOption[0]);
+        nOption = SkinPart_FindSetOption(pSkin, nSet, nVariant, pAsset->aSetOption[0]);
         if (nOption >= 0) {
             // the option's data is three RGB colours, 0..1 each
             pOption = (f32*)fn_800CD248(pSkin, nSet, nVariant, nOption);
@@ -1217,13 +1219,13 @@ void FE_CheckSpecialCaseConnections(CrAPAsset* pAsset) {
         pSkin = lbl_80281EE0->pB4->pChar->pSkin;
         if (nPart == 9) {
             nSet = fn_800CDCA0(pSkin, "wire");
-            nVariant = fn_800CDD5C(pSkin, nSet, "nowire");
+            nVariant = SkinPart_FindSetVariantByName(pSkin, nSet, "nowire");
             if (nSet >= 0 && nVariant >= 0) {
                 fn_800CC9D8(lbl_80281EE0->pB4->pChar, nSet, nVariant, 0);
             }
         } else if (nPart == 1) {
             nSet = fn_800CDCA0(pSkin, "hands");
-            nVariant = fn_800CDD5C(pSkin, nSet, "nowire");
+            nVariant = SkinPart_FindSetVariantByName(pSkin, nSet, "nowire");
             if (nSet >= 0 && nVariant >= 0) {
                 fn_800CC9D8(lbl_80281EE0->pB4->pChar, nSet, nVariant, 0);
             }
@@ -1514,7 +1516,7 @@ void fn_80106A64(CrAPAsset* pAsset, Skin* pSkin) {
     s32 nVariant;
 
     for (i = 0; i < 4; i++) {
-        nPart = fn_800CDAFC(pSkin, pAsset->aPart[i]);
+        nPart = SkinPart_FindPart(pSkin, pAsset->aPart[i]);
         nVariant = fn_800CDBB0(pSkin, nPart, pAsset->aVariant[i]);
         if (nPart >= 0 && nVariant >= 0) {
             fn_800CCB08(pSkin, nPart, nVariant);
@@ -1530,12 +1532,12 @@ void fn_80106B04(CrAPAsset* pAsset, Skin* pSkin) {
     int i;
 
     for (i = 0; i < 4; i++) {
-        nSet =fn_800CDC2C(pSkin, pAsset->aSet[i]);
-        nVariant = fn_800CDCE0(pSkin, nSet, pAsset->aSetVariant[i]);
+        nSet =SkinPart_FindSet(pSkin, pAsset->aSet[i]);
+        nVariant = SkinPart_FindSetVariant(pSkin, nSet, pAsset->aSetVariant[i]);
         if (nSet >= 0 && nVariant >= 0) {
-            nOption = fn_800CDDB0(pSkin, nSet, nVariant, pAsset->aSetOption[i]);
-            fn_800CCF90(pSkin, nSet, nVariant, nOption);
-            if (fn_800CEE90() && nOption >= 0) {
+            nOption = SkinPart_FindSetOption(pSkin, nSet, nVariant, pAsset->aSetOption[i]);
+            SkinPart_ChooseSet(pSkin, nSet, nVariant, nOption);
+            if (SkinPart_GetChangeAllCopies() && nOption >= 0) {
                 fn_800CECE0(pSkin, nSet, nVariant, nOption,
                             lbl_80281EE0->pB4->pChar->a64[lbl_80281EE0->pB4->pChar->n74]);
             }
@@ -1553,16 +1555,16 @@ void fn_80106BF8(CrAPAsset* pAsset, Skin* pSkin) {
     int i;
 
     for (i = 0; i < 4; i++) {
-        nSet = fn_800CDC2C(pSkin, pAsset->aSet[i]);
-        nVariant = fn_800CDCE0(pSkin, nSet, pAsset->aSetVariant[i]);
-        nDefaultL = fn_800CDD5C(pSkin, nSet, "DefaultL");
+        nSet = SkinPart_FindSet(pSkin, pAsset->aSet[i]);
+        nVariant = SkinPart_FindSetVariant(pSkin, nSet, pAsset->aSetVariant[i]);
+        nDefaultL = SkinPart_FindSetVariantByName(pSkin, nSet, "DefaultL");
         if (nDefaultL >= 0 && FE_GetCurrentProfile()->choices.n113 == 1) {
             nVariant = nDefaultL;
         }
         if (nSet >= 0 && nVariant >= 0) {
-            nOption = fn_800CDDB0(pSkin, nSet, nVariant, pAsset->aSetOption[i]);
-            fn_800CCF90(pSkin, nSet, nVariant, nOption);
-            if (fn_800CEE90() && nOption >= 0) {
+            nOption = SkinPart_FindSetOption(pSkin, nSet, nVariant, pAsset->aSetOption[i]);
+            SkinPart_ChooseSet(pSkin, nSet, nVariant, nOption);
+            if (SkinPart_GetChangeAllCopies() && nOption >= 0) {
                 fn_800CECE0(pSkin, nSet, nVariant, nOption,
                             lbl_80281EE0->pB4->pChar->a64[lbl_80281EE0->pB4->pChar->n74]);
             }
@@ -1577,7 +1579,7 @@ void fn_80106D24(CrAPAsset* pAsset, Skin* pSkin) {
 
     if (pAsset != NULL) {
         for (i = 0; i < 4; i++) {
-            nPart = fn_800CDAFC(pSkin, pAsset->aPart[i]);
+            nPart = SkinPart_FindPart(pSkin, pAsset->aPart[i]);
             if (nPart >= 0) {
                 fn_800CCB08(pSkin, nPart, 0);
             }
@@ -1593,13 +1595,13 @@ void fn_80106DA0(CrAPAsset* pAsset, Skin* pSkin) {
 
     if (pAsset != NULL) {
         for (i = 0; i < 4; i++) {
-            nSet = fn_800CDC2C(pSkin, pAsset->aSet[i]);
+            nSet = SkinPart_FindSet(pSkin, pAsset->aSet[i]);
             if (nSet >= 0) {
-                nVariant = fn_800CDD5C(pSkin, nSet, "Defaults");
+                nVariant = SkinPart_FindSetVariantByName(pSkin, nSet, "Defaults");
                 if (nVariant < 0) {
                     nVariant = 0;
                 }
-                fn_800CCF90(pSkin, nSet, nVariant, 0);
+                SkinPart_ChooseSet(pSkin, nSet, nVariant, 0);
             }
         }
     }

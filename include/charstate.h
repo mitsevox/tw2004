@@ -629,15 +629,15 @@ extern s32   lbl_80281D78;              // }
 // pick a part's (or set's) variant.
 void  fn_800CC9D8(Character* pChar, int nSet, int nVariant, int nOption);
 void  fn_800CCB08(Skin* pSkin, int nPart, int nVariant);
-void  fn_800CCF90(Skin* pSkin, int nSet, int nVariant, int nOption);
+void  SkinPart_ChooseSet(Skin* pSkin, int nSet, int nVariant, int nOption);
 u8*   fn_800CD248(Skin* pSkin, int nSet, int nVariant, int nOption);    // SkinDesc8C.a08, or NULL
-s32   fn_800CDAFC(Skin* pSkin, u64 uId);
+s32   SkinPart_FindPart(Skin* pSkin, u64 uId);
 s32   fn_800CDBB0(Skin* pSkin, int nPart, u64 uId);
-s32   fn_800CDC2C(Skin* pSkin, u64 uId);
+s32   SkinPart_FindSet(Skin* pSkin, u64 uId);
 s32   fn_800CDCA0(Skin* pSkin, const char* pName);
-s32   fn_800CDCE0(Skin* pSkin, int nSet, u64 uId);
-s32   fn_800CDD5C(Skin* pSkin, int nSet, const char* pName);
-s32   fn_800CDDB0(Skin* pSkin, int nSet, int nVariant, u64 uId);
+s32   SkinPart_FindSetVariant(Skin* pSkin, int nSet, u64 uId);
+s32   SkinPart_FindSetVariantByName(Skin* pSkin, int nSet, const char* pName);
+s32   SkinPart_FindSetOption(Skin* pSkin, int nSet, int nVariant, u64 uId);
 void  CharSlider_UpdateCharacterBasedOnSliderValues(CharSliderDefs* pDefs, CharModel* pModel, Skin* pSkin, int nSliders, u8* aValues,
                   struct SKABlendNode* pNode);
                                         // applies slider values (Character.p17AC's definitions)
@@ -646,25 +646,25 @@ void  fn_800CE170(Skin* pSkin, SkinTarget* pTarget);
 void  fn_800CC1EC(Character* pChar, SkinChoices* pChoices);
 void  fn_800CC658(Character* pChar, char* pSet, char* pVariant, char* pOption);
 void  fn_800CC408(Character* pChar, SkinChoices* pChoices);
-void  fn_800CC710(Character* pChar, int nSkin, u64 uPart, u64 uVariant);
-void  fn_800CC7DC(Character* pChar, int nSkin, u64 uSet, u64 uVariant, u64 uOption);
+void  SkinPart_ChooseClubPartVariant(Character* pChar, int nSkin, u64 uPart, u64 uVariant);
+void  SkinPart_ChooseClubSet(Character* pChar, int nSkin, u64 uSet, u64 uVariant, u64 uOption);
 void  fn_800CC8BC(Character* pChar, u8 bOn);
 void  fn_800CEB1C(Skin** apSkins, int nSkins, struct DynTex* pTex);
 void  fn_800CEBE8(Skin** apSkins, int nSkins, struct DynTex* pTex, u64* aIds, int nIds);
 void  fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, struct DynTex* pTex);
-u8    fn_800CEE90(void);
+u8    SkinPart_GetChangeAllCopies(void);
 
 // SkinPart.c, as SkinBurn.c uses it: the part count, a part's variant and option, the mesh
 // iterator and an entry's copy.
-s32   fn_800CCA40(Skin* pSkin);
+s32   SkinPart_GetNumParts(Skin* pSkin);
 s32   fn_800CCD30(Skin* pSkin, int nPart, int nCopy);
 s32   fn_800CCD84(Skin* pSkin, int nPart, int nCopy);
 void  fn_800CD9EC(Skin* pSkin);
 s32   fn_800CE224(Skin* pSkin, SkinDesc14* pEntry, u8** ppOut, s32* pnOut, int nCopy);
-u8    fn_800CEEC0(SkinIter* pIter);
-void  fn_800CEEC8(SkinIter* pIter);
-SkinMesh* fn_800CEEF4(SkinIter* pIter);
-s32   fn_800CEEFC(SkinIter* pIter);
+u8    SkinIter_IsValid(SkinIter* pIter);
+void  SkinIter_Next(SkinIter* pIter);
+SkinMesh* SkinIter_GetMesh(SkinIter* pIter);
+s32   SkinIter_GetIndex(SkinIter* pIter);
 SkinIter* fn_80113B34(u8* pBuf, SkinIterArgs* pArgs);
 void  fn_80113BAC(SkinIter* pIter);
 SkinIter* fn_80113910(u8* pBuf, SkinIterArgs* pArgs);   // hwsRender_Gc.c: another mesh iterator
@@ -672,7 +672,7 @@ void  fn_80113A7C(SkinIter* pIter);     // and its end
 u8    fn_80112C04(void);                // hwsRender_Gc.c: 0 on course 14's hole 11 with four players
 
 // SkinPart.c, as Skin.c uses it.
-u64   fn_800CCDDC(Skin* pSkin, int nPart);
+u64   SkinPart_GetPartId(Skin* pSkin, int nPart);
 void  fn_800CD56C(Skin* pSkin);
 s32   fn_800CDB70(Skin* pSkin, const char* pName);
 void  fn_800CE02C(Skin* pSkin, int n);

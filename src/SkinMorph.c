@@ -211,12 +211,12 @@ void fn_8011C68C(SkinMorphWork* pWork, int n) {
     args.n = n;
     pIter = fn_80113910(aBuf, &args);
     nSet = 0;
-    while (fn_800CEEC0(pIter)) {
-        pMesh = fn_800CEEF4(pIter);
+    while (SkinIter_IsValid(pIter)) {
+        pMesh = SkinIter_GetMesh(pIter);
         if ((pMesh->uFlags & 0x100010) == 0x100010) {
             nPicked = fn_8011C5B4(pWork, pEntry, nSet);
             nSet++;
-            pDst = fn_80112A80(pWork->pBlock, pWork->pTable, fn_800CEEFC(pIter), 1);
+            pDst = fn_80112A80(pWork->pBlock, pWork->pTable, SkinIter_GetIndex(pIter), 1);
             if (pDst != NULL) {
                 if (nPicked == 0) {
                     memcpy(pDst, pMesh->pBits, pMesh->nSize);
@@ -235,7 +235,7 @@ void fn_8011C68C(SkinMorphWork* pWork, int n) {
                 }
             }
         }
-        fn_800CEEC8(pIter);
+        SkinIter_Next(pIter);
     }
 }
 

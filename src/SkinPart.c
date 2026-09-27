@@ -19,13 +19,13 @@ int   fn_8001005C(TexBank* pBank, u64 uHash);   // LLTex.c: the texture's index,
 void  fn_800CC588(Character* pChar, int nPart, int nVariant);
 void  fn_800CCA1C(void);
 void  fn_800CCA3C(void);
-s32   fn_800CCA70(Skin* pSkin, int nPart);
+s32   SkinPart_GetNumPartVariants(Skin* pSkin, int nPart);
 s32   fn_800CCAC0(Skin* pSkin, int nPart, int nVariant);
 void  fn_800CCC1C(Skin* pSkin, int nPart, int nOption);
 u64   fn_800CCE24(Skin* pSkin, int nPart, int nVariant);
-s32   fn_800CCEA0(Skin* pSkin);
-s32   fn_800CCED0(Skin* pSkin, int nSet);
-s32   fn_800CCF10(Skin* pSkin, int nSet, int nVariant);
+s32   SkinPart_GetNumSets(Skin* pSkin);
+s32   SkinPart_GetNumSetVariants(Skin* pSkin, int nSet);
+s32   SkinPart_GetNumSetOptions(Skin* pSkin, int nSet, int nVariant);
 s32   fn_800CD0B8(Skin* pSkin, int nSet, int nCopy);
 s32   fn_800CD124(Skin* pSkin, int nSet, int nVariant);
 s32   fn_800CD1D8(Skin* pSkin, int nSet, int nCopy);
@@ -49,7 +49,7 @@ u8*   fn_800CEAAC(int i, SkinListEntry* aList, int nList);
 s32   fn_800CEAE4(int i, SkinListEntry* aList, int nList);
 void  fn_800CEDE0(Skin* pSkin, DynTex* pTex, u64 uId);
 void  fn_800CEE04(Skin* pSkin, int nFrom, int nTo);
-void  fn_800CEE88(u8 b);
+void  SkinPart_SetChangeAllCopies(u8 b);
 void  fn_800CEE98(void);
 
 s32   lbl_80191748[11] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1};
@@ -77,19 +77,21 @@ void fn_800CC1EC(Character* pChar, SkinChoices* pChoices) {
         }
     }
     if (bEmpty) {
-        Mem_cpy(pChoices->aParts, pChar->pSkin->aParts[0], fn_800CCA40(pChar->pSkin) * sizeof(SkinChoice));
+        Mem_cpy(pChoices->aParts, pChar->pSkin->aParts[0], SkinPart_GetNumParts(pChar->pSkin)
+                * sizeof(SkinChoice));
     } else {
         for (j = 0; j < 4; j++) {
             Mem_cpy(pChar->pSkin->aParts[j], pChoices->aParts,
-                    fn_800CCA40(pChar->pSkin) * sizeof(SkinChoice));
+                    SkinPart_GetNumParts(pChar->pSkin) * sizeof(SkinChoice));
         }
     }
     if (bEmpty) {
-        Mem_cpy(pChoices->aSets, pChar->pSkin->aSets[0], fn_800CCEA0(pChar->pSkin) * sizeof(SkinChoice));
+        Mem_cpy(pChoices->aSets, pChar->pSkin->aSets[0], SkinPart_GetNumSets(pChar->pSkin)
+                * sizeof(SkinChoice));
     } else {
         for (k = 0; k < 4; k++) {
             Mem_cpy(pChar->pSkin->aSets[k], pChoices->aSets,
-                    fn_800CCEA0(pChar->pSkin) * sizeof(SkinChoice));
+                    SkinPart_GetNumSets(pChar->pSkin) * sizeof(SkinChoice));
         }
     }
 }
@@ -105,9 +107,9 @@ void fn_800CC408(Character* pChar, SkinChoices* pChoices) {
             // fake match: the (u32) on j (0-3, so the same index) keeps the array start and the offset
             // apart, as EA's code does (docs/decomp-notes.md, the (u32) index cast)
             Mem_cpy(pChar->p16D8->apSkins[i]->aParts[(u32)j], pChoices->aSkinParts[i],
-                    fn_800CCA40(pChar->p16D8->apSkins[i]) * sizeof(SkinChoice));
+                    SkinPart_GetNumParts(pChar->p16D8->apSkins[i]) * sizeof(SkinChoice));
             Mem_cpy(pChar->p16D8->apSkins[i]->aSets[(u32)j], pChoices->aSkinSets[i],
-                    fn_800CCEA0(pChar->p16D8->apSkins[i]) * sizeof(SkinChoice));
+                    SkinPart_GetNumSets(pChar->p16D8->apSkins[i]) * sizeof(SkinChoice));
         }
     }
 }
@@ -144,7 +146,7 @@ void fn_800CC5C0(Character* pChar, char* pPart, char* pVariant) {
 
     if (pChar == NULL || pChar->pSkin == NULL) return;
     SKA_PackName(&uId, pPart);
-    nPart = fn_800CDAFC(pChar->pSkin, uId);
+    nPart = SkinPart_FindPart(pChar->pSkin, uId);
     SKA_PackName(&uId, pVariant);
     nVariant = fn_800CDBB0(pChar->pSkin, nPart, uId);
     fn_800CC588(pChar, nPart, nVariant);
@@ -159,14 +161,14 @@ void fn_800CC658(Character* pChar, char* pSet, char* pVariant, char* pOption) {
     if (pChar == NULL || pChar->pSkin == NULL) return;
     if (pChar->pSkin->pModel != NULL) {
         nSet = fn_800CDCA0(pChar->pSkin, pSet);
-        nVariant = fn_800CDD5C(pChar->pSkin, nSet, pVariant);
+        nVariant = SkinPart_FindSetVariantByName(pChar->pSkin, nSet, pVariant);
         nOption = fn_800CDE80(pChar->pSkin, nSet, nVariant, pOption);
         fn_800CC9D8(pChar, nSet, nVariant, nOption);
     }
 }
 
 // Picks a variant of a part of one of the six skins by their name codes.
-void fn_800CC710(Character* pChar, int nSkin, u64 uPart, u64 uVariant) {
+void SkinPart_ChooseClubPartVariant(Character* pChar, int nSkin, u64 uPart, u64 uVariant) {
     int nPart;
     int nVariant;
     Skin* pSkin;
@@ -176,7 +178,7 @@ void fn_800CC710(Character* pChar, int nSkin, u64 uPart, u64 uVariant) {
     }
     if (pChar->pSkin->pModel != NULL) {
         pSkin = pChar->p16D8->apSkins[nSkin];
-        nPart = fn_800CDAFC(pSkin, uPart);
+        nPart = SkinPart_FindPart(pSkin, uPart);
         nVariant = fn_800CDBB0(pSkin, nPart, uVariant);
         if (nVariant < 0) {
             nVariant = 0;
@@ -186,7 +188,7 @@ void fn_800CC710(Character* pChar, int nSkin, u64 uPart, u64 uVariant) {
 }
 
 // Picks a set's variant and option of one of the six skins by their name codes.
-void fn_800CC7DC(Character* pChar, int nSkin, u64 uSet, u64 uVariant, u64 uOption) {
+void SkinPart_ChooseClubSet(Character* pChar, int nSkin, u64 uSet, u64 uVariant, u64 uOption) {
     int nSet;
     int nVariant;
     Skin* pSkin;
@@ -197,13 +199,13 @@ void fn_800CC7DC(Character* pChar, int nSkin, u64 uSet, u64 uVariant, u64 uOptio
     }
     if (pChar->pSkin->pModel != NULL) {
         pSkin = pChar->p16D8->apSkins[nSkin];
-        nSet = fn_800CDC2C(pSkin, uSet);
-        nVariant = fn_800CDCE0(pSkin, nSet, uVariant);
-        nOption = fn_800CDDB0(pSkin, nSet, nVariant, uOption);
+        nSet = SkinPart_FindSet(pSkin, uSet);
+        nVariant = SkinPart_FindSetVariant(pSkin, nSet, uVariant);
+        nOption = SkinPart_FindSetOption(pSkin, nSet, nVariant, uOption);
         if (nOption < 0) {
             nOption = 0;
         }
-        fn_800CCF90(pSkin, nSet, nVariant, nOption);
+        SkinPart_ChooseSet(pSkin, nSet, nVariant, nOption);
     }
 }
 
@@ -220,20 +222,20 @@ void fn_800CC8BC(Character* pChar, u8 bOn) {
 
     if (pChar == NULL || pChar->p16D8 == NULL || pChar->p16D8->apSkins == NULL) return;
     for (i = 0; i < 6; i++) {
-        nSets = fn_800CCEA0(pChar->p16D8->apSkins[i]);
+        nSets = SkinPart_GetNumSets(pChar->p16D8->apSkins[i]);
         for (j = 0; j < nSets; j++) {
-            nVariant = fn_800CDD5C(pChar->p16D8->apSkins[i], j, "DefaultL");
+            nVariant = SkinPart_FindSetVariantByName(pChar->p16D8->apSkins[i], j, "DefaultL");
             if (nVariant >= 0) {
-                b = fn_800CEE90();
+                b = SkinPart_GetChangeAllCopies();
                 nCopy = 3;
                 if (b) {
                     nCopy = 0;
                 }
                 nOption = fn_800CD1D8(pChar->p16D8->apSkins[i], j, nCopy);
                 if (bOn) {
-                    fn_800CCF90(pChar->p16D8->apSkins[i], j, nVariant, nOption);
+                    SkinPart_ChooseSet(pChar->p16D8->apSkins[i], j, nVariant, nOption);
                 } else {
-                    fn_800CCF90(pChar->p16D8->apSkins[i], j, 0, nOption);
+                    SkinPart_ChooseSet(pChar->p16D8->apSkins[i], j, 0, nOption);
                 }
             }
         }
@@ -243,7 +245,7 @@ void fn_800CC8BC(Character* pChar, u8 bOn) {
 void fn_800CC9D8(Character* pChar, int nSet, int nVariant, int nOption) {
     if (pChar == NULL || pChar->pSkin == NULL) return;
     if (pChar->pSkin->pModel != NULL) {
-        fn_800CCF90(pChar->pSkin, nSet, nVariant, nOption);
+        SkinPart_ChooseSet(pChar->pSkin, nSet, nVariant, nOption);
     }
 }
 
@@ -255,7 +257,7 @@ void fn_800CCA3C(void) {
 }
 
 // The skin's number of parts.
-s32 fn_800CCA40(Skin* pSkin) {
+s32 SkinPart_GetNumParts(Skin* pSkin) {
     if (pSkin->pModel == NULL) return 0;
     if (pSkin->pModel->pDesc != NULL) {
         return pSkin->pModel->pDesc->nParts;
@@ -264,7 +266,7 @@ s32 fn_800CCA40(Skin* pSkin) {
 }
 
 // A part's number of variants.
-s32 fn_800CCA70(Skin* pSkin, int nPart) {
+s32 SkinPart_GetNumPartVariants(Skin* pSkin, int nPart) {
     SkinDesc* pDesc;
 
     if (pSkin->pModel == NULL) return 0;
@@ -301,7 +303,7 @@ void fn_800CCB08(Skin* pSkin, int nPart, int nVariant) {
             if (nVariant < 0 || nVariant >= pDesc->pParts[nPart].nVariants) {
                 nVariant = -1;
             }
-            if (fn_800CEE90()) {
+            if (SkinPart_GetChangeAllCopies()) {
                 // fake match: `!=` (`i < 4` unrolls to add + stw, EA's is stwx)
                 for (i = 0; i != 4; i++) {
                     pSkin->aParts[i][nPart].nVariant = nVariant;
@@ -327,13 +329,13 @@ void fn_800CCC1C(Skin* pSkin, int nPart, int nOption) {
 
     if (pSkin->pModel != NULL && nPart >= 0 && (pDesc = pSkin->pModel->pDesc) != NULL
         && nPart < pDesc->nParts) {
-        for (i = 0; i < fn_800CCA70(pSkin, nPart); i++) {
+        for (i = 0; i < SkinPart_GetNumPartVariants(pSkin, nPart); i++) {
             pDesc = pSkin->pModel->pDesc;
             if (pDesc->pVariants[i + pDesc->pParts[nPart].nFirst].nOptions < nOption) {
                 nOption = 0;
             }
         }
-        if (fn_800CEE90()) {
+        if (SkinPart_GetChangeAllCopies()) {
             // fake match: `!=` (`i < 4` unrolls to add + stw 4(r3), EA's is addi + stwx)
             for (i = 0; i != 4; i++) {
                 pSkin->aParts[i][nPart].nOption = nOption;
@@ -364,7 +366,7 @@ s32 fn_800CCD84(Skin* pSkin, int nPart, int nCopy) {
 }
 
 // A part's name code.
-u64 fn_800CCDDC(Skin* pSkin, int nPart) {
+u64 SkinPart_GetPartId(Skin* pSkin, int nPart) {
     SkinDesc* pDesc;
 
     if (nPart < 0 || (pDesc = pSkin->pModel->pDesc) == NULL || nPart >= pDesc->nParts) return 0;
@@ -382,7 +384,7 @@ u64 fn_800CCE24(Skin* pSkin, int nPart, int nVariant) {
 }
 
 // The skin's number of sets.
-s32 fn_800CCEA0(Skin* pSkin) {
+s32 SkinPart_GetNumSets(Skin* pSkin) {
     if (pSkin->pModel == NULL) return 0;
     if (pSkin->pModel->pDesc != NULL) {
         return pSkin->pModel->pDesc->n70;
@@ -391,7 +393,7 @@ s32 fn_800CCEA0(Skin* pSkin) {
 }
 
 // A set's number of variants.
-s32 fn_800CCED0(Skin* pSkin, int nSet) {
+s32 SkinPart_GetNumSetVariants(Skin* pSkin, int nSet) {
     SkinDesc* pDesc;
 
     if (nSet >= 0) {
@@ -404,7 +406,7 @@ s32 fn_800CCED0(Skin* pSkin, int nSet) {
 }
 
 // A set variant's number of options.
-s32 fn_800CCF10(Skin* pSkin, int nSet, int nVariant) {
+s32 SkinPart_GetNumSetOptions(Skin* pSkin, int nSet, int nVariant) {
     SkinDesc* pDesc;
     s32 nFirst;
 
@@ -423,17 +425,17 @@ s32 fn_800CCF10(Skin* pSkin, int nSet, int nVariant) {
 }
 
 // Picks a set's variant (0 when out of range) and option (-1 when out of range).
-void fn_800CCF90(Skin* pSkin, int nSet, int nVariant, int nOption) {
+void SkinPart_ChooseSet(Skin* pSkin, int nSet, int nVariant, int nOption) {
     int i;
 
-    if (pSkin == NULL || nSet < 0 || nSet >= fn_800CCEA0(pSkin)) return;
-    if (nVariant < 0 || nVariant >= fn_800CCED0(pSkin, nSet)) {
+    if (pSkin == NULL || nSet < 0 || nSet >= SkinPart_GetNumSets(pSkin)) return;
+    if (nVariant < 0 || nVariant >= SkinPart_GetNumSetVariants(pSkin, nSet)) {
         nVariant = 0;
     }
-    if (nOption < 0 || nOption >= fn_800CCF10(pSkin, nSet, nVariant)) {
+    if (nOption < 0 || nOption >= SkinPart_GetNumSetOptions(pSkin, nSet, nVariant)) {
         nOption = -1;
     }
-    if (fn_800CEE90()) {
+    if (SkinPart_GetChangeAllCopies()) {
         // fake match: `!=` (`i < 4` unrolls to add + stw, EA's is addi + stwx)
         for (i = 0; i != 4; i++) {
             pSkin->aSets[i][nSet].nVariant = nVariant;
@@ -447,7 +449,7 @@ void fn_800CCF90(Skin* pSkin, int nSet, int nVariant, int nOption) {
 
 // A set's variant in one copy of the choices.
 s32 fn_800CD0B8(Skin* pSkin, int nSet, int nCopy) {
-    if (nSet < 0 || nSet >= fn_800CCEA0(pSkin)) return -1;
+    if (nSet < 0 || nSet >= SkinPart_GetNumSets(pSkin)) return -1;
     return pSkin->aSets[nCopy][nSet].nVariant;
 }
 
@@ -455,7 +457,7 @@ s32 fn_800CD124(Skin* pSkin, int nSet, int nVariant) {
     SkinDesc* pDesc;
     SkinDesc74* pSet;
 
-    if (pSkin->pModel->pDesc == NULL || nSet < 0 || nSet >= fn_800CCEA0(pSkin)) return -1;
+    if (pSkin->pModel->pDesc == NULL || nSet < 0 || nSet >= SkinPart_GetNumSets(pSkin)) return -1;
     if (nVariant < 0 || nVariant >= (pSet = &(pDesc = pSkin->pModel->pDesc)->p74[nSet])->n08) return -1;
     nVariant += pSet->n10;
     return pDesc->p7C[nVariant].n10;
@@ -463,7 +465,7 @@ s32 fn_800CD124(Skin* pSkin, int nSet, int nVariant) {
 
 // A set's option in one copy of the choices.
 s32 fn_800CD1D8(Skin* pSkin, int nSet, int nCopy) {
-    if (nSet < 0 || nSet >= fn_800CCEA0(pSkin)) return -1;
+    if (nSet < 0 || nSet >= SkinPart_GetNumSets(pSkin)) return -1;
     return pSkin->aSets[nCopy][nSet].nOption;
 }
 
@@ -474,11 +476,11 @@ u8* fn_800CD248(Skin* pSkin, int nSet, int nVariant, int nOption) {
     SkinDesc7C* pVariant;
 
     if (pSkin == NULL || pSkin->pModel == NULL || (pDesc = pSkin->pModel->pDesc) == NULL) return NULL;
-    if (nSet < 0 || nSet >= fn_800CCEA0(pSkin)) return NULL;
+    if (nSet < 0 || nSet >= SkinPart_GetNumSets(pSkin)) return NULL;
     pSet = &pDesc->p74[nSet];
-    if (nVariant < 0 || nVariant >= fn_800CCED0(pSkin, nSet)) return NULL;
+    if (nVariant < 0 || nVariant >= SkinPart_GetNumSetVariants(pSkin, nSet)) return NULL;
     pVariant = &pDesc->p7C[pSet->n10 + nVariant];
-    if (nOption >= 0 && nOption < fn_800CCF10(pSkin, nSet, nVariant)) {
+    if (nOption >= 0 && nOption < SkinPart_GetNumSetOptions(pSkin, nSet, nVariant)) {
         return pDesc->p8C[pVariant->n0C + nOption].a08;
     }
     return NULL;
@@ -512,8 +514,8 @@ void fn_800CD404(Skin* pSkin) {
     u32 nBytes;
     s32 nVariant;
 
-    nParts = fn_800CCA40(pSkin);
-    fn_800CCEA0(pSkin);
+    nParts = SkinPart_GetNumParts(pSkin);
+    SkinPart_GetNumSets(pSkin);
     nBytes = nParts * sizeof(SkinChoice);
     for (i = 0; i < 4; i++) {
         if (nParts != 0) {
@@ -522,19 +524,19 @@ void fn_800CD404(Skin* pSkin) {
         } else {
             pSkin->aParts[i] = NULL;
         }
-        nSets = fn_800CCEA0(pSkin);
+        nSets = SkinPart_GetNumSets(pSkin);
         if (nSets != 0) {
             // nSets * 8 is nSets SkinChoices; an int product here, so it is not shared with the
             // memset's size (sizeof makes that one unsigned)
             pSkin->aSets[i] = StaticMem_Alloc(nSets * 8, 2, 16, "SkinPart.c", 670);
             memset(pSkin->aSets[i], 0, nSets * sizeof(SkinChoice));
             for (j = 0; j < nSets; j++) {
-                if (fn_800CCF10(pSkin, j, 0) >= 1) {
+                if (SkinPart_GetNumSetOptions(pSkin, j, 0) >= 1) {
                     pSkin->aSets[i][j].nOption = 0;
                 } else {
                     pSkin->aSets[i][j].nOption = -1;
                 }
-                nVariant = fn_800CDD5C(pSkin, j, "Defaults");
+                nVariant = SkinPart_FindSetVariantByName(pSkin, j, "Defaults");
                 if (nVariant < 0) {
                     nVariant = 0;
                 }
@@ -572,8 +574,8 @@ s32 fn_800CD5D0(SkinDesc* pDesc, int n) {
     args.n = n;
     pIter = fn_80113B34(aBuf, &args);
     nBytes = 0;
-    for (; fn_800CEEC0(pIter); fn_800CEEC8(pIter)) {
-        pMesh = fn_800CEEF4(pIter);
+    for (; SkinIter_IsValid(pIter); SkinIter_Next(pIter)) {
+        pMesh = SkinIter_GetMesh(pIter);
         if ((pMesh->uFlags & 0x300000) == 0x300000) {
             nBytes += pMesh->nSize;
         }
@@ -660,10 +662,10 @@ void fn_800CD844(Skin* pSkin, int n) {
     if (n < 0 || n >= pDesc->n58) return;
     args.n = n;
     args.pDesc = pDesc;
-    for (pIter = fn_80113B34(aBuf, &args); fn_800CEEC0(pIter); fn_800CEEC8(pIter)) {
-        pMesh = fn_800CEEF4(pIter);
+    for (pIter = fn_80113B34(aBuf, &args); SkinIter_IsValid(pIter); SkinIter_Next(pIter)) {
+        pMesh = SkinIter_GetMesh(pIter);
         if ((pMesh->uFlags & 0x300000) == 0x300000) {
-            n = fn_800CD7CC(pSkin, fn_800CEEFC(pIter));
+            n = fn_800CD7CC(pSkin, SkinIter_GetIndex(pIter));
             if (pSkin->p10D0 != NULL) {
                 BitArray_Set(pSkin->p10D0, n);
             }
@@ -711,20 +713,20 @@ void fn_800CDA68(Skin* pSkin) {
         if (pSkin->p10D0 != NULL) {
             BitArray_ClearAll(pSkin->p10D0, pSkin->pModel->n40);
         }
-        for (i = 0; i < fn_800CCA40(pSkin); i++) {
+        for (i = 0; i < SkinPart_GetNumParts(pSkin); i++) {
             fn_800CD944(pSkin, i);
         }
     }
 }
 
 // The part with this name code, or -1.
-s32 fn_800CDAFC(Skin* pSkin, u64 uId) {
+s32 SkinPart_FindPart(Skin* pSkin, u64 uId) {
     s32 n;
     int i;
 
-    n = fn_800CCA40(pSkin);
+    n = SkinPart_GetNumParts(pSkin);
     for (i = 0; i < n; i++) {
-        if (fn_800CCDDC(pSkin, i) == uId) {
+        if (SkinPart_GetPartId(pSkin, i) == uId) {
             return i;
         }
     }
@@ -736,7 +738,7 @@ s32 fn_800CDB70(Skin* pSkin, const char* pName) {
     u64 uId;
 
     SKA_PackName(&uId, pName);
-    return fn_800CDAFC(pSkin, uId);
+    return SkinPart_FindPart(pSkin, uId);
 }
 
 // The part's variant with this name code, or -1.
@@ -744,7 +746,7 @@ s32 fn_800CDBB0(Skin* pSkin, int nPart, u64 uId) {
     s32 n;
     int i;
 
-    n = fn_800CCA70(pSkin, nPart);
+    n = SkinPart_GetNumPartVariants(pSkin, nPart);
     for (i = 0; i < n; i++) {
         if (fn_800CCE24(pSkin, nPart, i) == uId) {
             return i;
@@ -754,11 +756,11 @@ s32 fn_800CDBB0(Skin* pSkin, int nPart, u64 uId) {
 }
 
 // The set with this name code, or -1.
-s32 fn_800CDC2C(Skin* pSkin, u64 uId) {
+s32 SkinPart_FindSet(Skin* pSkin, u64 uId) {
     s32 n;
     int i;
 
-    n = fn_800CCEA0(pSkin);
+    n = SkinPart_GetNumSets(pSkin);
     for (i = 0; i < n; i++) {
         if (fn_800CD340(pSkin, i) == uId) {
             return i;
@@ -772,15 +774,15 @@ s32 fn_800CDCA0(Skin* pSkin, const char* pName) {
     u64 uId;
 
     SKA_PackName(&uId, pName);
-    return fn_800CDC2C(pSkin, uId);
+    return SkinPart_FindSet(pSkin, uId);
 }
 
 // The set's variant with this name code, or -1.
-s32 fn_800CDCE0(Skin* pSkin, int nSet, u64 uId) {
+s32 SkinPart_FindSetVariant(Skin* pSkin, int nSet, u64 uId) {
     s32 n;
     int i;
 
-    n = fn_800CCED0(pSkin, nSet);
+    n = SkinPart_GetNumSetVariants(pSkin, nSet);
     for (i = 0; i < n; i++) {
         if (fn_800CD388(pSkin, nSet, i) == uId) {
             return i;
@@ -790,16 +792,16 @@ s32 fn_800CDCE0(Skin* pSkin, int nSet, u64 uId) {
 }
 
 // The set's variant with this name, or -1.
-s32 fn_800CDD5C(Skin* pSkin, int nSet, const char* pName) {
+s32 SkinPart_FindSetVariantByName(Skin* pSkin, int nSet, const char* pName) {
     u64 uId;
 
     SKA_PackName(&uId, pName);
-    return fn_800CDCE0(pSkin, nSet, uId);
+    return SkinPart_FindSetVariant(pSkin, nSet, uId);
 }
 
 // The set variant's option with this name code, or -1 (0 when the set or the variant is out of
 // range).
-s32 fn_800CDDB0(Skin* pSkin, int nSet, int nVariant, u64 uId) {
+s32 SkinPart_FindSetOption(Skin* pSkin, int nSet, int nVariant, u64 uId) {
     SkinDesc* pDesc;
     SkinDesc74* pSet;
     SkinDesc7C* pVariant;
@@ -827,14 +829,14 @@ s32 fn_800CDE80(Skin* pSkin, int nSet, int nVariant, const char* pName) {
 
     if (pName == NULL) return -1;
     SKA_PackName(&uId, pName);
-    return fn_800CDDB0(pSkin, nSet, nVariant, uId);
+    return SkinPart_FindSetOption(pSkin, nSet, nVariant, uId);
 }
 
 // A part variant's number of links.
 s32 fn_800CDEF4(Skin* pSkin, int nPart, int nVariant) {
     SkinDesc* pDesc;
 
-    if (pSkin == NULL || nVariant < 0 || nVariant >= fn_800CCA70(pSkin, nPart)) return 0;
+    if (pSkin == NULL || nVariant < 0 || nVariant >= SkinPart_GetNumPartVariants(pSkin, nPart)) return 0;
     pDesc = pSkin->pModel->pDesc;
     return pDesc->pVariants[nVariant + pDesc->pParts[nPart].nFirst].nLinks;
 }
@@ -853,8 +855,8 @@ void fn_800CDF80(Skin* pSkin, int nPart, int nVariant, int nLink) {
     // fake match: the cast, as in fn_800CCAC0
     pLink = &pDesc->pLinks[((SkinVariant*)pDesc->pVariants)[nVariant + pDesc->pParts[nPart].nFirst].nFirstLink
                            + fn_800CDF80_Read(nLink)];
-    nOther = fn_800CDAFC(pSkin, pLink->uPart);
-    if (nOther >= 0 && nOther < fn_800CCA40(pSkin)) {
+    nOther = SkinPart_FindPart(pSkin, pLink->uPart);
+    if (nOther >= 0 && nOther < SkinPart_GetNumParts(pSkin)) {
         fn_800CCC1C(pSkin, nOther, pLink->nOption);
     }
 }
@@ -937,9 +939,9 @@ static inline void fn_800CE224_Loop(Skin* pSkin, SkinDesc14* pEntry, SkinDesc* p
                 if (n >= 0) {
                     (*pnB8) = n;
                 }
-                if ((*pnVariant) >= 0 && (*pnVariant) < fn_800CCED0(pSkin, i)) {
+                if ((*pnVariant) >= 0 && (*pnVariant) < SkinPart_GetNumSetVariants(pSkin, i)) {
                     pVariant = &pDesc->p7C[(*ppSet)->n10 + (*pnVariant)];
-                    if (nOption >= 0 && nOption < fn_800CCF10(pSkin, i, (*pnVariant))) {
+                    if (nOption >= 0 && nOption < SkinPart_GetNumSetOptions(pSkin, i, (*pnVariant))) {
                         pEntry->n18 = pVariant->n0C + nOption;
                     } else {
                         pEntry->n18 = -1;
@@ -1080,20 +1082,20 @@ s32 fn_800CE660(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, i
         if (apSkins[i] != NULL && apSkins[i]->pModel != NULL && apSkins[i]->pModel->pDesc != NULL) {
             pSkin = apSkins[i];
             pDesc = pSkin->pModel->pDesc;
-            for (j = 0; j < fn_800CCA40(pSkin); j++) {
+            for (j = 0; j < SkinPart_GetNumParts(pSkin); j++) {
                 bAll = 0;
                 nVariant = fn_800CCD30(pSkin, j, nCopy);
                 nOption = fn_800CCD84(pSkin, j, nCopy);
                 if (aIds != NULL) {
                     for (k = 0; k < nIds; k++) {
-                        if (aIds[k] == fn_800CCDDC(pSkin, j)) {
+                        if (aIds[k] == SkinPart_GetPartId(pSkin, j)) {
                             bAll = 1;
                             break;
                         }
                     }
                 }
                 if (bAll == 1) {
-                    for (v = 0; v < fn_800CCA70(pSkin, j); v++) {
+                    for (v = 0; v < SkinPart_GetNumPartVariants(pSkin, j); v++) {
                         for (m = 0; m < fn_800CCAC0(pSkin, j, v); m++) {
                             fn_800CE52C(pSkin, m + pDesc->pVariants[v + pDesc->pParts[j].nFirst].nFirstOption,
                                         *ppList, &nList, nCopy);
@@ -1137,8 +1139,8 @@ s32 fn_800CE8C0(Skin** apSkins, int nSkins, SkinListEntry** ppList) {
         if (apSkins[i] != NULL && apSkins[i]->pModel != NULL &&
             (pDesc = fn_800CE8C0_Read(apSkins[i]->pModel->pDesc)) != NULL) {
             pSkin = apSkins[i];
-            for (j = 0; j < fn_800CCA40(pSkin); j++) {
-                for (k = 0; k < fn_800CCA70(pSkin, j); k++) {
+            for (j = 0; j < SkinPart_GetNumParts(pSkin); j++) {
+                for (k = 0; k < SkinPart_GetNumPartVariants(pSkin, j); k++) {
                     n = k + pDesc->pParts[j].nFirst;
                     for (m = 0; m < pDesc->pVariants[n].nOptions; m++) {
                         fn_800CE52C(pSkin, m + pDesc->pVariants[n].nFirstOption, *ppList, &nList, 0);
@@ -1232,9 +1234,9 @@ void fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, DynTex* pTex)
     SkinDesc74* pSet;
     SkinDesc* pDesc;
 
-    if (pSkin == NULL || pSkin->pModel == NULL || nSet < 0 || nSet >= fn_800CCEA0(pSkin)) return;
-    if (nVariant < 0 || nVariant >= fn_800CCED0(pSkin, nSet)) return;
-    if (nOption < 0 || nOption >= fn_800CCF10(pSkin, nSet, nVariant)) return;
+    if (pSkin == NULL || pSkin->pModel == NULL || nSet < 0 || nSet >= SkinPart_GetNumSets(pSkin)) return;
+    if (nVariant < 0 || nVariant >= SkinPart_GetNumSetVariants(pSkin, nSet)) return;
+    if (nOption < 0 || nOption >= SkinPart_GetNumSetOptions(pSkin, nSet, nVariant)) return;
     pDesc = pSkin->pModel->pDesc;
     pSet = &pDesc->p74[nSet];
     for (i = 0; i < pSet->n0C; i++) {
@@ -1248,38 +1250,46 @@ void fn_800CEDE0(Skin* pSkin, DynTex* pTex, u64 uId) {
 
 // Copies one copy of the skin's choices over another.
 void fn_800CEE04(Skin* pSkin, int nFrom, int nTo) {
-    Mem_cpy(pSkin->aParts[nTo], pSkin->aParts[nFrom], fn_800CCA40(pSkin) * sizeof(SkinChoice));
-    Mem_cpy(pSkin->aSets[nTo], pSkin->aSets[nFrom], fn_800CCEA0(pSkin) * sizeof(SkinChoice));
+    Mem_cpy(pSkin->aParts[nTo], pSkin->aParts[nFrom], SkinPart_GetNumParts(pSkin) * sizeof(SkinChoice));
+    Mem_cpy(pSkin->aSets[nTo], pSkin->aSets[nFrom], SkinPart_GetNumSets(pSkin) * sizeof(SkinChoice));
 }
 
-void fn_800CEE88(u8 b) {
+// Sets whether a new choice goes into all four copies of a skin's choices at once (set) or only
+// into copy 3, the newest, from which char.c passes it down copy by copy (3 to 2 to 1 to 0) as the
+// textures load.
+void SkinPart_SetChangeAllCopies(u8 b) {
     lbl_80282238 = b;
 }
 
-u8 fn_800CEE90(void) {
+// Whether a new choice goes into all four copies of a skin's choices (see
+// SkinPart_SetChangeAllCopies).
+u8 SkinPart_GetChangeAllCopies(void) {
     return lbl_80282238;
 }
 
 void fn_800CEE98(void) {
-    fn_800CEE88(1);
+    SkinPart_SetChangeAllCopies(1);
 }
 
 void fn_800CEEBC(void) {
 }
 
-u8 fn_800CEEC0(SkinIter* pIter) {
+// Whether the iterator is on an entry; false once it has stepped past the last one.
+u8 SkinIter_IsValid(SkinIter* pIter) {
     return pIter->bValid;
 }
 
-void fn_800CEEC8(SkinIter* pIter) {
+// Steps the iterator to its next entry through its kind's step function.
+void SkinIter_Next(SkinIter* pIter) {
     (*pIter->ppfnNext)(pIter);
 }
 
-SkinMesh* fn_800CEEF4(SkinIter* pIter) {
+SkinMesh* SkinIter_GetMesh(SkinIter* pIter) {
     return pIter->pCur;
 }
 
-s32 fn_800CEEFC(SkinIter* pIter) {
+// The current entry's index in the description table the iterator walks (SkinDesc.p34 for a mesh).
+s32 SkinIter_GetIndex(SkinIter* pIter) {
     return pIter->nCur;
 }
 

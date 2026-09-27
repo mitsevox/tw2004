@@ -285,7 +285,7 @@ typedef struct CrAPAsset {
     u8   unk56[2];
     u8   aColor[6][4];          // 0x058  its colours, RGBA; assets of a category whose first
                                 //        colour differs are different choices (fn_80105C44)
-    u64  aPart[4];            // 0x070  } the ids of four skin parts it sets (fn_800CDAFC finds
+    u64  aPart[4];            // 0x070  } the ids of four skin parts it sets (SkinPart_FindPart finds
     u64  aVariant[4];           // 0x090  } them) and the id of each one's variant (fn_80106A64)
     u64  aSet[4];               // 0x0B0  the ids of four skin sets; taking the asset off puts
                                 //        them back to "Defaults" (fn_80106DA0)

@@ -173,9 +173,9 @@ void fn_80110A38(HwsBurn* pBurn, int n) {
     args.pDesc = pBurn->pDesc;
     args.n = n;
     pIter = fn_80110A38_Read(fn_80113910((u8*)&iterBuf, &args));  // fake match: through fn_80110A38_Read
-    while (fn_800CEEC0(pIter)) {
-        BitArray_Set(pBurn->p28, fn_800CEEFC(pIter));
-        fn_800CEEC8(pIter);
+    while (SkinIter_IsValid(pIter)) {
+        BitArray_Set(pBurn->p28, SkinIter_GetIndex(pIter));
+        SkinIter_Next(pIter);
     }
     fn_80113A7C(pIter);
 
@@ -215,8 +215,8 @@ void fn_80110C88(HwsBurn* pBurn, int n) {
 
     args.pDesc = pBurn->pDesc;
     args.n = n;
-    for (pIter = fn_80113A9C(aBuf, &args); fn_800CEEC0(pIter); fn_800CEEC8(pIter)) {
-        nMesh = fn_800CEEFC(pIter);
+    for (pIter = fn_80113A9C(aBuf, &args); SkinIter_IsValid(pIter); SkinIter_Next(pIter)) {
+        nMesh = SkinIter_GetIndex(pIter);
         fn_80110A38(pBurn, nMesh);
     }
     fn_80113B14(pIter);
@@ -680,12 +680,12 @@ SkinDesc* fn_80111850(HwsBurn* pBurn) {
             args.pDesc = pOut;
             args.n = i;
             pIter = fn_80113910((u8*)&iterBuf, &args);
-            while (fn_800CEEC0(pIter)) {
-                pMesh = fn_800CEEF4(pIter);
+            while (SkinIter_IsValid(pIter)) {
+                pMesh = SkinIter_GetMesh(pIter);
                 if ((pMesh->uFlags & 0x100000) && (pMesh->uFlags & 0x10)) {
                     pMesh->uFlags &= ~0x100000;
                 }
-                fn_800CEEC8(pIter);
+                SkinIter_Next(pIter);
             }
         }
     }

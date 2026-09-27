@@ -82,12 +82,12 @@ void fn_80127218(Skin* pSkin, s32 n) {
     args.pDesc = pSkin->pModel->pDesc;
     args.n = n;
     pIter = fn_80113B34(aBuf, &args);
-    while (fn_800CEEC0(pIter)) {
-        pMesh = fn_800CEEF4(pIter);
+    while (SkinIter_IsValid(pIter)) {
+        pMesh = SkinIter_GetMesh(pIter);
         if ((pMesh->uFlags & 1) && (pMesh->uFlags & 0x10)) {
             fn_801271E0(pSkin, pMesh);
         }
-        fn_800CEEC8(pIter);
+        SkinIter_Next(pIter);
     }
     fn_80113BAC(pIter);
 }
@@ -308,7 +308,7 @@ void fn_80127B98(Skin* pSkin, s32* aParts, s32* aList) {
 
     pBurn = fn_801104AC(pSkin->pModel->pDesc);
     fn_801109F0(pBurn, fn_80127B4C, pSkin);
-    nCount = fn_800CCA40(pSkin);
+    nCount = SkinPart_GetNumParts(pSkin);
     for (i = 0; i < nCount; i++) {
         for (j = 0; aParts[j] >= 0; j++) {
             if (i == aParts[j]) break;

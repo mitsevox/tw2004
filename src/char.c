@@ -182,8 +182,8 @@ void  fn_800C9FE0(void);
 void  fn_800CCA1C(void);
 void  fn_800CCA3C(void);
 void  fn_800CEE04(Skin* pSkin, int a, int b);
-s32   fn_800CCEA0(Skin* pSkin);         // SkinPart.c: how many choices aSets[3] holds
-void  fn_800CEE88(u8 b);
+s32   SkinPart_GetNumSets(Skin* pSkin);         // SkinPart.c: how many choices aSets[3] holds
+void  SkinPart_SetChangeAllCopies(u8 b);
 u8    fn_800FCC38(int nPlayer);
 void  fn_8010A668(void* p);
 void  fn_80008380(void);
@@ -1383,7 +1383,7 @@ void fn_80019EF4(Character* pArg) {
     ((void (*)(void*))fn_8010BEC4)(pModel);
     for (i = 0; i < pChar->nSkins; i++) {
         pSkin = pChar->apSkins[i];
-        for (j = 0; j < fn_800CCEA0(pSkin); j++) {
+        for (j = 0; j < SkinPart_GetNumSets(pSkin); j++) {
             if (memcmp(&pSkin->aSets[2][j], &pSkin->aSets[3][j], sizeof(SkinChoice)) != 0) {
                 fn_800CECE0(pSkin, j, pSkin->aSets[3][j].nVariant, pSkin->aSets[3][j].nOption, pModel);
             }
@@ -2286,7 +2286,7 @@ void fn_8001C254(void) {
     lbl_80280E20 = n;
     fn_800C937C();
     fn_800CCA1C();
-    fn_800CEE88(1);
+    SkinPart_SetChangeAllCopies(1);
     fn_80035C58();
 }
 
@@ -2307,7 +2307,7 @@ void fn_8001C304(void) {
     SKEL_EnableIK(0);
     lbl_80280E20 = 3;
     fn_800CCA1C();
-    fn_800CEE88(0);
+    SkinPart_SetChangeAllCopies(0);
     fn_80036460(1800);
     fn_80112C64(1);
 }
@@ -3083,76 +3083,76 @@ void Character_SetClubStatesForCharacter(Character* pChar, int nSlot, SkinChoice
         }
         if (nGolfer >= 0) {
             SKA_PackName(&uName, lbl_80186EC0[0]);
-            fn_800CC710(pChar, 0, uName, gGolferTable[nGolfer].aClubs[0].uPart);
+            SkinPart_ChooseClubPartVariant(pChar, 0, uName, gGolferTable[nGolfer].aClubs[0].uPart);
             SKA_PackName(&uName, lbl_80186FB0[0]);
             SKA_PackName(&uVariant, lbl_80187000[0]);
-            fn_800CC7DC(pChar, 0, uName, uVariant, gGolferTable[nGolfer].aClubs[0].uModel);
+            SkinPart_ChooseClubSet(pChar, 0, uName, uVariant, gGolferTable[nGolfer].aClubs[0].uModel);
             SKA_PackName(&uName, lbl_80186F10[0]);
             SKA_PackName(&uVariant, lbl_80186F60[0]);
-            fn_800CC7DC(pChar, 0, uName, uVariant, gGolferTable[nGolfer].aClubs[0].uShaft);
+            SkinPart_ChooseClubSet(pChar, 0, uName, uVariant, gGolferTable[nGolfer].aClubs[0].uShaft);
             SKA_PackName(&uName, lbl_80187050[0]);
             SKA_PackName(&uVariant, lbl_801870A0[0]);
-            fn_800CC7DC(pChar, 0, uName, uVariant, gGolferTable[nGolfer].aClubs[0].uGrip);
+            SkinPart_ChooseClubSet(pChar, 0, uName, uVariant, gGolferTable[nGolfer].aClubs[0].uGrip);
 
             SKA_PackName(&uName, lbl_80186EC0[1]);
-            fn_800CC710(pChar, 1, uName, gGolferTable[nGolfer].aClubs[1].uPart);
+            SkinPart_ChooseClubPartVariant(pChar, 1, uName, gGolferTable[nGolfer].aClubs[1].uPart);
             SKA_PackName(&uName, lbl_80186FB0[1]);
             SKA_PackName(&uVariant, lbl_80187000[1]);
-            fn_800CC7DC(pChar, 1, uName, uVariant, gGolferTable[nGolfer].aClubs[1].uModel);
+            SkinPart_ChooseClubSet(pChar, 1, uName, uVariant, gGolferTable[nGolfer].aClubs[1].uModel);
             SKA_PackName(&uName, lbl_80186F10[1]);
             SKA_PackName(&uVariant, lbl_80186F60[1]);
-            fn_800CC7DC(pChar, 1, uName, uVariant, gGolferTable[nGolfer].aClubs[1].uShaft);
+            SkinPart_ChooseClubSet(pChar, 1, uName, uVariant, gGolferTable[nGolfer].aClubs[1].uShaft);
             SKA_PackName(&uName, lbl_80187050[1]);
             SKA_PackName(&uVariant, lbl_801870A0[1]);
-            fn_800CC7DC(pChar, 1, uName, uVariant, gGolferTable[nGolfer].aClubs[1].uGrip);
+            SkinPart_ChooseClubSet(pChar, 1, uName, uVariant, gGolferTable[nGolfer].aClubs[1].uGrip);
 
             SKA_PackName(&uName, lbl_80186EC0[3]);
-            fn_800CC710(pChar, 3, uName, gGolferTable[nGolfer].aIronPart[0]);
+            SkinPart_ChooseClubPartVariant(pChar, 3, uName, gGolferTable[nGolfer].aIronPart[0]);
             SKA_PackName(&uName, lbl_80186FB0[3]);
             SKA_PackName(&uVariant, lbl_80187000[3]);
-            fn_800CC7DC(pChar, 3, uName, uVariant, gGolferTable[nGolfer].uIronModel);
+            SkinPart_ChooseClubSet(pChar, 3, uName, uVariant, gGolferTable[nGolfer].uIronModel);
             SKA_PackName(&uName, lbl_80186F10[3]);
             SKA_PackName(&uVariant, lbl_80186F60[3]);
-            fn_800CC7DC(pChar, 3, uName, uVariant, gGolferTable[nGolfer].uIronShaft);
+            SkinPart_ChooseClubSet(pChar, 3, uName, uVariant, gGolferTable[nGolfer].uIronShaft);
             SKA_PackName(&uName, lbl_80187050[3]);
             SKA_PackName(&uVariant, lbl_801870A0[3]);
-            fn_800CC7DC(pChar, 3, uName, uVariant, gGolferTable[nGolfer].uIronGrip);
+            SkinPart_ChooseClubSet(pChar, 3, uName, uVariant, gGolferTable[nGolfer].uIronGrip);
 
             SKA_PackName(&uName, lbl_80186EC0[4]);
-            fn_800CC710(pChar, 4, uName, gGolferTable[nGolfer].aIronPart[1]);
+            SkinPart_ChooseClubPartVariant(pChar, 4, uName, gGolferTable[nGolfer].aIronPart[1]);
             SKA_PackName(&uName, lbl_80186FB0[4]);
             SKA_PackName(&uVariant, lbl_80187000[4]);
-            fn_800CC7DC(pChar, 4, uName, uVariant, gGolferTable[nGolfer].uIronModel);
+            SkinPart_ChooseClubSet(pChar, 4, uName, uVariant, gGolferTable[nGolfer].uIronModel);
             SKA_PackName(&uName, lbl_80186F10[4]);
             SKA_PackName(&uVariant, lbl_80186F60[4]);
-            fn_800CC7DC(pChar, 4, uName, uVariant, gGolferTable[nGolfer].uIronShaft);
+            SkinPart_ChooseClubSet(pChar, 4, uName, uVariant, gGolferTable[nGolfer].uIronShaft);
             SKA_PackName(&uName, lbl_80187050[4]);
             SKA_PackName(&uVariant, lbl_801870A0[4]);
-            fn_800CC7DC(pChar, 4, uName, uVariant, gGolferTable[nGolfer].uIronGrip);
+            SkinPart_ChooseClubSet(pChar, 4, uName, uVariant, gGolferTable[nGolfer].uIronGrip);
 
             SKA_PackName(&uName, lbl_80186EC0[5]);
-            fn_800CC710(pChar, 5, uName, gGolferTable[nGolfer].wedges.uPart);
+            SkinPart_ChooseClubPartVariant(pChar, 5, uName, gGolferTable[nGolfer].wedges.uPart);
             SKA_PackName(&uName, lbl_80186FB0[5]);
             SKA_PackName(&uVariant, lbl_80187000[5]);
-            fn_800CC7DC(pChar, 5, uName, uVariant, gGolferTable[nGolfer].wedges.uModel);
+            SkinPart_ChooseClubSet(pChar, 5, uName, uVariant, gGolferTable[nGolfer].wedges.uModel);
             SKA_PackName(&uName, lbl_80186F10[5]);
             SKA_PackName(&uVariant, lbl_80186F60[5]);
-            fn_800CC7DC(pChar, 5, uName, uVariant, gGolferTable[nGolfer].wedges.uShaft);
+            SkinPart_ChooseClubSet(pChar, 5, uName, uVariant, gGolferTable[nGolfer].wedges.uShaft);
             SKA_PackName(&uName, lbl_80187050[5]);
             SKA_PackName(&uVariant, lbl_801870A0[5]);
-            fn_800CC7DC(pChar, 5, uName, uVariant, gGolferTable[nGolfer].wedges.uGrip);
+            SkinPart_ChooseClubSet(pChar, 5, uName, uVariant, gGolferTable[nGolfer].wedges.uGrip);
 
             SKA_PackName(&uName, lbl_80186EC0[2]);
-            fn_800CC710(pChar, 2, uName, gGolferTable[nGolfer].aClubs[2].uPart);
+            SkinPart_ChooseClubPartVariant(pChar, 2, uName, gGolferTable[nGolfer].aClubs[2].uPart);
             SKA_PackName(&uName, lbl_80186FB0[2]);
             SKA_PackName(&uVariant, lbl_80187000[2]);
-            fn_800CC7DC(pChar, 2, uName, uVariant, gGolferTable[nGolfer].aClubs[2].uModel);
+            SkinPart_ChooseClubSet(pChar, 2, uName, uVariant, gGolferTable[nGolfer].aClubs[2].uModel);
             SKA_PackName(&uName, lbl_80186F10[2]);
             SKA_PackName(&uVariant, lbl_80186F60[2]);
-            fn_800CC7DC(pChar, 2, uName, uVariant, gGolferTable[nGolfer].aClubs[2].uShaft);
+            SkinPart_ChooseClubSet(pChar, 2, uName, uVariant, gGolferTable[nGolfer].aClubs[2].uShaft);
             SKA_PackName(&uName, lbl_80187050[2]);
             SKA_PackName(&uVariant, lbl_801870A0[2]);
-            fn_800CC7DC(pChar, 2, uName, uVariant, gGolferTable[nGolfer].aClubs[2].uGrip);
+            SkinPart_ChooseClubSet(pChar, 2, uName, uVariant, gGolferTable[nGolfer].aClubs[2].uGrip);
         }
     } else {
         fn_800CC408(pChar, pChoices);
