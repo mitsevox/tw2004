@@ -71,3 +71,27 @@ headers say no counterpart (TW07 has GameModeCore.c / GameUI.c); GM_Pick_PlayOff
 GM_Currently_SkillZoneMode comments incomplete; SkinPart club-skin comments; fe.h CrAPDB.n4 /
 CrAPAsset.n40 are the gender; FE_Manager.c local prototypes of FE_CrAP_UnequipSlot and
 FE_CrAP_SetTriggerAnims disagree with the definitions (s16 / u8).
+
+## Round 3 (nm9-nm12) leftovers
+Applied: the GameRound/GameUI, FE_CrAPDB, MC_Gc and audio leads above (except where noted below).
+- MC.c: 0610 MC_ReplaceReplay, 09EC MC_GetNumReplay, 1758 MC_GetNumOptions, 19F4 MC_Debug, 2064
+  MC_OpenONCE, 2630/2668/26A0 MC_IsOptions/Replay/UserDataCorrupt, 270C MC_MemoryRequiredForUser,
+  2740 MC_MemoryRequiredForReplay, 27BC MC_ConvertCharToWideChar, maybe 27F4
+  MC_LastSavedUserFileIndex. MC_Gc: 8009ED34 probably MC_CheckSaveGame_WithRestore; T3 CARD
+  wrappers 8009CDA0 MC_CardRename, DFD8 MC_CardCreate, E130 MC_CardWrite, E280 MC_CardGetStatus,
+  E360 MC_CardSetStatus, E918 MC_CardFormat. TibExt.c: 80122834 SFIO_vFlushCallback, 80122868
+  SFIO_vSetAttrCallback. Save-exists group 8009F6A0 / 800A2194 / 800A218C: no TW2004 name yet.
+- GameAudio (TW07 order): 4084 FirstFrameInit, 4170 HeartBeatLoopCallback, 41A4
+  UpdateCommentVolDucking, 42B0 InitCrowdBuildup, 4374 ExitCrowdBuildup, 43DC UpdateCrowdBuildup,
+  49A4 StopAmbientStreamer, 4A24 GetAmbientStreamRange, 4C54 Gaud_Monitor, 75F4
+  Gaud_GetMusicStatus, 7644 Gaud_InitFlyBy, 7528 Gaud_RewardCommentaryIsPlaying, 6D48
+  Gaud_ExitSlowMo, 6148 Gaud_TextFall, 6448 Gaud_Tappa, 644C Gaud_Spina, 6450
+  Gaud_PlayTappaFeedback, 5980 Gaud_SwingBallHit. 62A4..640C: seven target-game hit sounds (TW07
+  BullsEye/BonusBall/LetterGained set, order differs: unnamed).
+- FE_CrAPDB: 801042D0 (sApplySlider?), 801048B0 (IsFadeOutCategory?), 80105644, 80105EFC left.
+- GameRound/GameUI: 800E4F88 (not GUI_Online_OpponentQuit), 800E2520 (1/2/4 per mode), 800E3B04
+  (message 31), the mode callback stubs E3AA0-E3AF4 left.
+More comments to re-check: GameAudio.c fn_8006BEA4 prototype says GoGolfCam.c (it is emotion.c);
+event.c calls fn_800A6448 / fn_800A644C (u8 nPlayer) but they are void(void); MC.c above
+fn_800A2630 ("Three callbacks of a table in .data") is MC.c's own lbl_8018C7D8 IsDataCorrupt
+column; E1CE8 / E22E4 / E234C and save.h a5004 could say par-5 eagle records.
