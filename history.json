@@ -44101,5 +44101,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "b366ce8",
+"sha": "b366ce8986a49b5074f6e21fb465bd41420d9420",
+"time": 1790553171,
+"subject": "comments: cr4's audio file headers (EA's HLAudEmitterPool.c / HLAudEmitter.c / GameAudio.c), prototype notes and gameaudio.h / audtrack.h field comments",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
