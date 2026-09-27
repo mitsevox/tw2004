@@ -732,10 +732,12 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs) {
             }
             if (pRate->u20 != 0) {
                 pfVar = fn_8016C1A4(pRate->u20, pRate->pInfo);
+                // fake match: fStep read into fValue before the scale test (EA loads it there)
+                fValue = pRate->fStep;
                 if (fScale < 0.0f) {
                     fScale = 1.0f;
                 }
-                fValue = pRate->fStep * fScale + *pfVar;
+                fValue = fValue * fScale + *pfVar;
                 if ((pRate->fStep > 0.0f && fValue < pRate->fTarget)
                     || (pRate->fStep < 0.0f && fValue > pRate->fTarget)) {
                     *pfVar = fValue;
