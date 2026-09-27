@@ -2162,6 +2162,8 @@ UISApi.c:
 
 UISScreen.c:
 	.text       start:0x8016A2D4 end:0x8016C718
+	.data       start:0x8019D118 end:0x8019D1FC
+	.sdata2     start:0x802851C0 end:0x802851E8
 
 Common/Checksum/ChecksumCRC32.c:
 	.text       start:0x8016C718 end:0x8016CC20
