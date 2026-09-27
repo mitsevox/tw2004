@@ -3,8 +3,8 @@
 Updated 2026-09-25 ~21:30 CDT. How the machines, CI, the page and PC jobs fit together:
 docs/infrastructure.md. History: docs/journal.md.
 
-**2026-09-27 ~13:00 UTC:** 7,641/7,647 exact. OWNER HOLD: no more matching work on IStudio (UIS*)
-until the owner's research and the Madden NFL 2003 PS2 lead are in (Madden 2003 prototype, EA Tiburon
+**2026-09-27 ~13:00 UTC:** 7,641/7,647 exact. IStudio hold LIFTED ~14:00 UTC (owner): Madden evidence in (docs/reference-builds/madden2003-ps2); lanes b12 fn_80166098,
+b7 fn_80168918, b5 fn_80165670, b4 fn_80169DC4 rewrite toward EA's locals; Gemini works its own branch (compare at the end). Was: hold until the owner's research and the Madden NFL 2003 PS2 lead are in (Madden 2003 prototype, EA Tiburon
 2002, has IStudio with .mdebug/STABS: UIStudio.c, UISEvent.c; being extracted to
 docs/reference-builds/madden2003-ps2/, binary in /home/user/refs, off git). Open: IStudio x4 (held),
 LLFont x2 (b11 lane; Codex fn_8001144C). /dev/null was deleted by a lane again (b11, 09:13); restored
