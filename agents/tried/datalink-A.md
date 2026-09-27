@@ -37,3 +37,14 @@ result.
   (the table builder); llpict.h already had the const externs.
 - Done: both defined in rcmp_mad_codec.c ahead of lbl_80184A68 (values from the DOL); the unit's
   .rodata now starts at 0x80183C78. main.dol: OK.
+
+## auto_05_80186838_data (16 B): lbl_80186838 (a zero f32[4]) -> urandom.c
+
+- Users: Skeleton (fn_80029BC8 copies it; GoLighting calls that), nothing in the files around it.
+- Position: after UMemPool.c's .data ("UMemPool.c" string, ends 0x80186833), before LoadData.c's.
+- Tried in UMemPool.c: at the top it lands before the string; after UMemPool_Create it follows the
+  string but at 0x80186834 (4-aligned inside the same section), so Skeleton's reference is off by
+  4 (doldiff 0x80029BDF). The original starts a new 8-aligned section: another file. The files
+  in between are urandom.c and ObjList.c (no other .data); nothing picks one, so urandom.c (the
+  next in link order), with a section note. explicit_zero_data as in uiobject.c's zero vector.
+- Result: main.dol: OK. Owner between urandom.c and ObjList.c is a guess (noted in the code).

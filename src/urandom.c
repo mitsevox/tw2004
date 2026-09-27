@@ -13,6 +13,13 @@ u32 lbl_80281BE8;               // the Park-Miller seed the tables are filled fr
 f32 lbl_80281BE4;               // the second normal value of the last Box-Muller pair
 u8  lbl_80281BE0;               // lbl_80281BE4 holds a value not yet handed out
 
+// section note: only Skeleton.c and GoLighting.c read this (fn_80029BC8). It starts a new 8-aligned
+// .data section after UMemPool.c's (in UMemPool.c it lands at 0x80186834), before LoadData.c's, so
+// its file is this one or ObjList.c.
+#pragma explicit_zero_data on
+f32 lbl_80186838[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+#pragma explicit_zero_data reset
+
 u32 Misc_PMRand(void);
 u32 Misc_CreateRandomSeed_Internal(void);
 u32 fn_8000B408(void);
