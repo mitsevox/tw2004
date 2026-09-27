@@ -8,6 +8,48 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-27, b3 (mwcc-debugger with a patched scratch copy that relinks / edits PCode before a
+  pass; quicktrial aligned, base 2). **Why the swap happens (verified):**
+  1. The final (post-RA) scheduler's output for B58 does not depend on its input order: 16
+     valid input orders of the block's 12 instructions (relinked in memory just before it) all
+     give `lbz, lwz 0x64, slwi, lwz 0x70`. What lifts the slwi is its WAR on r0 into
+     `lwz r0,0x80`: renaming that load's r0 to r8 in memory gives EA's order. EA has the same
+     registers, so EA's block cannot have gone through the final scheduler at all.
+  2. The scheduler (0x507c70 in GC/2.6) skips a block whose flag 0x8 ("scheduled") is set; the
+     pre-RA pass sets it; the generic PCode insert/remove routines (0x4dcf30/0x4dcf70/0x4dcfb0)
+     clear it. Our B58 loses it at register allocation because the coalesced copies of the call
+     result (`mr r128,r3; mr r35,r128`, hFile) are deleted there. Setting flag 0x8 on B58 in memory
+     before the final scheduler gives EA's block exactly. Blocks without deleted copies keep it
+     (B20, B66 ...), blocks with them lose it (B18, B23, B28, B58, B60 ...).
+  3. So EA's B58 had no copy to delete: the call's result reached fn_800AB4C0's r3 with no `mr` in
+     the block after the call. Check: passing an uninitialised hFile (call result discarded, UB,
+     not usable) gives EA's instruction order (only registers differ, hFile then sits in r27): 34.
+     A single precoloured copy (`mr r128,r3`, used in B60; edited in memory before copy
+     propagation) still clears the flag: copy propagation is local only (it removes a call-result
+     copy only when the use is in the same block, as in B66), so any named or temp variable for
+     the result that crosses the min's branch loses the match.
+  Tried for a copy-free form:
+  - nested `fn_800AB4C0(fn_800AC328(), ...)` with the min as a ternary (<, <=, >, >=): 80. The
+    frontend evaluates a ternary argument before the call, inline-call arguments before a plain
+    call (left to right among inline calls), plain calls next, simple arguments last. Min as an
+    inline function 80, `uLen = ternary` argument 73, comma form 81.
+  - inline wrappers Get() (returns fn_800AC328()) + inline Min/Buf/Off, all 24 combinations: best 7
+    (Get's return value is a copy again).
+  - `if (x) {} else {}` (6 conditions incl. `(hFile & 1) == 0`), `while (x) { break; }`,
+    `for (;;) { .. break; }`, `for (hFile = fn_800AC328(); ;)`, `do {} while (0)`,
+    `switch (0|hFile) { default: }`, `if (1)`, `goto L; L:`, right after the call or after
+    pStream/uReadPos/nChannels<<15 locals (all 6 orders): all 2. Every empty construct is gone
+    before backend-00 (checked in the dumps); no block boundary survives.
+  - volatile reads of uReadPos / uLength / nChannels / pStream / pBuffer: 2 (10 when uReadPos is
+    read twice).
+  - `#pragma scheduling once` on the function: 45; `off` 64; `601` 37, `603` 26, `604` 7, `7450`
+    26, `505`/`8240` 26, `750`/`7400`/`altivec`/`twice` 2; `peephole off` 35. Compilers GC/1.3 to
+    2.7 on the unchanged source: 2 (1.2.5n 58, 3.0a* 122).
+  Open question for whoever continues: what C gives a call result that reaches the next call's
+  r3 across a branch with no copy in the block after the call (or a block boundary between that
+  copy and the loads). Scratch tools (not in the repo): /home/user/scratch/tw/agents/b3/
+  dbgperm.py (env PERM_ORDER / PERM_REG / PERM_FLAGS / PRE_EDIT), runperm.py, sched.py.
+
 - 2026-09-26, e-link1 (quicktrial aligned, base 2): one empty test `if (e) {} else {}` for e in
   nChannels << 15, nChannels, uReadPos, uLength, uLength - uReadPos, uRemaining, uLen, uOffset,
   pBuffer, the cap compare, at every legal position in the read block: 2. Ordered 1-3 empty tests
