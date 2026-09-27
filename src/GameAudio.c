@@ -1724,9 +1724,8 @@ void fn_800A7644(void) {
 // Plays commentary line nMsg of playlist nKind on the commentary emitter (lbl_80281419), unless the
 // commentary volume option is 0. Within 15 frames of Gaud_StopComment the line is queued, and
 // Gaud_Cycle plays it when the wait runs out.
-// port: the callers pass nKind and nMsg as full ints (their prototype takes int), but this body
-// was compiled for a u8 nKind and a u16 nMsg: it stores and passes them on without masking. Kept
-// as int to match the callers, so this function stays at 91% (masks where the original has none).
+// port: the callers pass nKind and nMsg as full ints (their prototype takes int), but this body was
+// compiled for a u8 nKind and a u16 nMsg: it stores and passes them on without masking.
 void Gaud_StartComment(int nKind, int nMsg, int a) {
     if ((s8)gSession.options.a0[4] != 0) {
         if (lbl_80282054 != 0) {
