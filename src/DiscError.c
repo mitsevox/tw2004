@@ -30,6 +30,18 @@ void fn_800B7694(u8 b);
 // .bss (discerror.h)
 DiscGlyph lbl_801F66A8[107];
 
+// .sdata (discerror.h)
+u8 lbl_802814D0 = 1;
+u8 lbl_802814D1 = 1;
+u8 lbl_802814D2 = 1;
+
+// .sbss (discerror.h), in reverse address order as the compiler lays it out.
+u32  lbl_80282198;
+u16* lbl_80282194;
+u16  lbl_80282190;
+s32  lbl_8028218C;
+s32  lbl_80282188;
+
 // Write the drawn screen back from the CPU cache.
 void fn_800B6924(void) {
     DCStoreRange(lbl_80282194, lbl_80282198);
