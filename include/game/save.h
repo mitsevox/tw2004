@@ -284,9 +284,11 @@ typedef struct SaveProfile {
     Replay aReplay[5];          // 0x00438  a Replay each, saved with awards 0, 6, 9, 3 and 13
     s32  nTourCardLevel;        // 0x05000  0..6: level 1 comes from the lessons (GameMode11), the rest
                                 //          from fn_800D439C; it scales payouts (GM_Earnings_ComputeTOURCardModifiers)
-    u8   a5004[71];             // 0x05004  per marked hole 0..70 (GM_ConvertCourseAndHoleToPar5EagleIndex): fn_800588F4's kind 0
+    u8   a5004[71];             // 0x05004  per par-5 hole 0..70 (GM_ConvertCourseAndHoleToPar5EagleIndex): 1 once
+                                //          the profile has eagled it (Earnings.c); fn_800588F4's kind 0
     u8   unk504B;
-    s32  a504C[71];             // 0x0504C  the same, fn_800588F4's kind 1
+    s32  a504C[71];             // 0x0504C  the same holes: the date of that eagle (packed by fn_80078604);
+                                //          fn_800588F4's kind 1
     s32  n5168;                 // 0x05168  set to 3 with the medals by the profile setup
     s32  aMedal[29];           // 0x0516C  the best medal per challenge group (0 best, 3 none)
     u8   unk51E0[4];
@@ -331,8 +333,8 @@ typedef struct SaveProfile {
     u32  a10548[1];             // 0x10548  a bit array: FE_CrAPMessages.c's fn_80108E4C tests bit n; fn_80058304 tests one (bit 1 for FE_Manager)
     SaveLockEntry a1054C[11];   // 0x1054C  cleared by the profile setup; fn_80078008's lock kinds
                                 //          10 and 11 read them
-    u8   a10578[4];             // 0x10578  marked holes 71..74: fn_800588F4's kind 0
-    s32  a1057C[4];             // 0x1057C  and kind 1
+    u8   a10578[4];             // 0x10578  par-5 holes 71..74, as a5004: eagled (fn_800588F4's kind 0)
+    s32  a1057C[4];             // 0x1057C  and their eagle dates, as a504C (kind 1)
     u8   unk1058C[0x10600 - 0x1058C];
 } SaveProfile;
 LAYOUT_ASSERT(SaveProfile, 0x10600);
@@ -388,8 +390,8 @@ u8   fn_800587A8(SaveProfile* pProfile, int nKind, char* pName);  // pName is in
 void fn_800588D4(s16 n);            // set lbl_80281DF0 (switched on, value n)
 int  fn_800588E8(void);             // lbl_80281DF0's value (callers take it without extsh)
 
-// 0x800588F4: marked hole i's kind-0 byte (a5004/a10578) or kind-1 value (a504C/a1057C); -1 for
-// another kind.
+// 0x800588F4: par-5 eagle record i: kind 0 whether that hole is eagled (a5004/a10578), kind 1 the
+// eagle's date (a504C/a1057C); -1 for another kind.
 int  fn_800588F4(SaveProfile* pProfile, int nKind, int i);
 void fn_8005897C(SaveProfile* pProfile, int nKind, int i, int nValue);  // and set it
 

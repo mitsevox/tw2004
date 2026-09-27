@@ -1,9 +1,10 @@
 // hlaudemitter.c (TW06's name, by structure: golf/audio/engine/hl/hlaudemitter.c, after
-// hlaudvoice.c and before UAudContainers.c): the sound engine's emitter instances, a pool of 256
-// (0x34 bytes each, lbl_801F2740) found by id (Aud_CheckEmitterInstance). Most calls check the id (0xFF:
-// none),
-// then pass on to the functions at 0x800A8200-0x800A8524. Its extent is its data: it is the first
-// to use the .bss at 0x801F2668 and the .sdata2 block 0x80284008-0x80284018.
+// hlaudvoice.c and before UAudContainers.c; TW07 has the same Aud_Emi* functions, in the same
+// order, in golf/audio/engine/special/HLAudEmitterPool.c): the sound engine's emitter instances, a
+// pool of 256 (0x34 bytes each, lbl_801F2740) found by id (Aud_CheckEmitterInstance). Most calls
+// check the id (0xFF: none), then pass on to AudTable.c's Emi_* functions (TW07 HLAudEmitter.c).
+// Its extent is its data: it is the first to use the .bss at 0x801F2668 and the .sdata2 block
+// 0x80284008-0x80284018.
 // An instance's pCmd is its AudTable.c entry (Emi_AddInstance's AudSource, the same number).
 
 #include "core/audtrack.h"
@@ -27,7 +28,7 @@ static f32 hlaudemitter_StrippedFn(f32 x) {
 }
 
 // Sets up the instances, all on the free list, and empties every emitter. Always 1.
-int Aud_EmiInitOnce(void) {
+u8 Aud_EmiInitOnce(void) {
     AudInstance* pInst;
     int i;
 

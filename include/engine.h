@@ -503,10 +503,10 @@ typedef struct RenderState {
     f32  m74[4][4];             // 0x074  }
     f32  fB4;                   // 0x0B4  } a render camera's fn_80008360 and fn_80008368
     f32  fB8;                   // 0x0B8  } (GoRenderCtx_Gc.c fn_80013EA0)
-    s32  nBC;                   // 0x0BC  } a rectangle, bit 0x200 (LLVideo.c fn_800760B0: x,
-    s32  nC0;                   // 0x0C0  } width, y, height; the movies give 0, 512, 0, 448)
-    s32  nC4;                   // 0x0C4  }
-    s32  nC8;                   // 0x0C8  }
+    s32  nBC;                   // 0x0BC  } the scissor rectangle in screen pixels, both ends
+    s32  nC0;                   // 0x0C0  } inclusive: left, right, top, bottom; bit 0x200
+    s32  nC4;                   // 0x0C4  } (RenderState_SetViewport; LLVideo.c fn_800760B0 takes
+    s32  nC8;                   // 0x0C8  } left, top, right, bottom)
     f32  fCC;                   // 0x0CC  } a render camera's screen rectangle in frame buffer units:
     f32  fD0;                   // 0x0D0  } left, top, width, height, then 0 and 1; bit 0x800
     f32  fD4;                   // 0x0D4  } (GoRenderCtx_Gc.c RenderState_SetViewport)

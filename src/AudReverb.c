@@ -12,7 +12,7 @@
 void* fn_800AF114(u32 uSize);
 void fn_800AF140(void* p);
 void fn_800AF144(s8 nMode);
-int fn_800AF224(void);
+u8 fn_800AF224(void);
 u8 fn_800AF264(u8 nKind, u8 bOn);
 void fn_800AF2D8(void);
 void fn_800AF2DC(u8 bMute);
@@ -69,7 +69,7 @@ void fn_800AF144(s8 nMode) {
     }
 }
 
-int fn_800AF224(void) {
+u8 fn_800AF224(void) {
     lbl_802820D8 = fn_800B5BD8(0x20000);
     AXFXSetHooks(fn_800AF114, fn_800AF140);
     return 1;

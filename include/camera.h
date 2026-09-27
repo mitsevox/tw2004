@@ -21,8 +21,10 @@ typedef struct CamLens {
     f32  m84[2][4];             // 0x84  [1] the scale Camera_SetCameraPositionAndTargetWithOffsetAndScale puts on the world around a point,
                                 //       [0] its inverse; ViewController.c fn_8001728C sets all to 1.0
     f32  fFov;                  // 0xA4  the field of view (GoGolfCam.c sets DEG(60.0f) or DEG(30.0f))
-    f32  fA8;                   // 0xA8  CA_vInitCamera starts it at 0.1
-    f32  fAC;                   // 0xAC  CA_vInitCamera starts it at 4096 (GoTerrain.c fn_800354B4 sets it)
+    f32  fA8;                   // 0xA8  the near clip distance (RC_vUpdateRenderCtxScreenMatricesAndInfo
+                                //       builds the projection from it); CA_vInitCamera starts it at 0.1
+    f32  fAC;                   // 0xAC  the far clip distance; CA_vInitCamera starts it at 4096
+                                //       (GoTerrain.c fn_800354B4 sets it)
     f32  fB0;                   // 0xB0  Camera_GetLensFovScale; the zoom-to-aim camera divides its distance by it
     f32  fB4;                  // 0xB4  a flat camera's view width (guess)
     f32  fB8;                   // 0xB8  its view height (guess)

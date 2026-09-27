@@ -48,7 +48,7 @@ void  Ter_SetZWrite(int n);
 void  fn_80035170(u32 uClear, u32 uSet);
 void  fn_80035294(void);
 void  RC_UpdateCurrentScreenMatrices(void);
-void  fn_800354B4(u8* p, f32 v);        // sets the lens's f32 at 0xAC (fn_80014268 reads it)
+void  fn_800354B4(u8* p, f32 v);        // sets the lens's far clip distance, fAC (fn_80014268 reads it)
 f32   fn_80014268(u8* p);
 void  fn_80031938(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32 d);
 void  fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s32 n20, u8* pbFirst, u8 b1,
@@ -1074,8 +1074,8 @@ void Ter_SetZWrite(int n) {
 }
 
 // Draws render pass 0's fourth patch lists (pSortedPatchList[0][3]), if it has any, without z
-// writes; the lens's value at 0xAC is raised by 25 while the renderer is set up, then put back. In
-// split screen, patches with bit 0x8 of n1C are left out.
+// writes; the lens's far clip distance (0xAC) is raised by 25 while the renderer is set up, then
+// put back. In split screen, patches with bit 0x8 of n1C are left out.
 // fake match: the (u32) casts on the clip index, as in fn_80032518.
 void fn_80032770(void) {
     u8 bFirst = 1;

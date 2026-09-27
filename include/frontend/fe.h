@@ -273,7 +273,8 @@ typedef struct CrAPAsset {
     s8   nTierA;                // 0x03D  } it raises each to
     s8   nAttrB;                // 0x03E  }
     s8   nTierB;                // 0x03F  }
-    s8   n40;                   // 0x040  the database's n4 it is offered with (2: any; FE_IsValidCurrentGender)
+    s8   n40;                   // 0x040  the gender it is for (2: either); offered when it is the
+                                //        database's n4 or 2 (FE_CrAP_GetAssetGender, FE_IsValidCurrentGender)
     s8   nLockKind;             // 0x041  } how it is unlocked and the number that goes with it
     s16  nLock;                 // 0x042  } (fn_80078008)
     s16  n44;                   // 0x044
@@ -301,7 +302,8 @@ LAYOUT_ASSERT(CrAPAsset, 0x118);
 // The Create-A-Player database (0x18 bytes, allocated by FE_CrAP_InitModule).
 typedef struct CrAPDB {
     s32  nAssets;               // 0x00  how many assets pAssets holds
-    s8   n4;                    // 0x04  which assets are offered (FE_IsValidCurrentGender): FE_CrAP_SetCurrentGender sets it
+    s8   n4;                    // 0x04  the gender of the golfer being created, which picks the assets
+                                //       offered (FE_IsValidCurrentGender); FE_CrAP_SetCurrentGender sets it
     u8   unk5[3];
     CrAPAsset* pAssets;         // 0x08  the 'CR_A' object's data: every asset
     char* pStrings;             // 0x0C  } the 'CR_S' object's data (the names the assets use)

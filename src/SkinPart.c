@@ -96,7 +96,8 @@ void fn_800CC1EC(Character* pChar, SkinChoices* pChoices) {
     }
 }
 
-// Gives the six skins of p16D8 their choices from pChoices, in all four copies.
+// Gives the six club skins (p16D8, one per club class) their choices from pChoices, in all four
+// copies.
 void fn_800CC408(Character* pChar, SkinChoices* pChoices) {
     int i;
     int j;
@@ -213,8 +214,9 @@ void SkinPart_ChooseClubSet(Character* pChar, int nSkin, u64 uSet, u64 uVariant,
     }
 }
 
-// Sets every set of the six skins that has a "DefaultL" variant to it (bOn) or to its first
-// variant, keeping the option.
+// Makes the clubs left- or right-handed (char.c passes Character_IsLeftHanded): every set of the six
+// club skins that has a "DefaultL" variant gets it when bOn, else its first variant, keeping the
+// option of copy 3 (copy 0 when SkinPart_GetChangeAllCopies).
 void fn_800CC8BC(Character* pChar, u8 bOn) {
     int i;
     int j;

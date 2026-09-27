@@ -35,13 +35,13 @@ void     GolfCamera_ClampLookAngle(f32* pFrom, f32* pTo, f32* pOut);
 int      fn_800C4D2C(f32* pFrom, f32* pTo, f32* pOut, f32 fMax);
 // The segment crosses the outline (at pHit).
 u8       fn_8004B6F8(f32* pFrom, f32* pTo, f32* pHit);
-f32      Camera_GetLensFovScale(u8* pLens);                 // the lens's fB0 (char.c: its parameter is u8*)
+f32      Camera_GetLensFovScale(CamLens* pLens);            // char.c: the lens's fB0
 void     fn_80038054(u8 a, int n, f32 f1, f32 f2);
 CamShot* GolfCamera_GetAlternateSwingCamera(int nFirst, int nPlayer);
 void     fn_800C5EC0(View* pView, f32* pCam, f32* pSub, int nPlayer);
 f32      fn_800C7394(View* pView);
 void     Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);  // rotate a vector by a quaternion
-u8       fn_8006BEA4(void);                             // the GameBreaker letterbox is up, scripted
+u8       fn_8006BEA4(void);                             // emotion.c: a scripted GameBreaker's letterbox is up
 void     Gaud_InitSpecialShot(u8 nPlayer);
 void     fn_80039344(int nView, f32 f);                 // a per-view float (Swing.c's declaration)
 f32      Math_Tan(f32 x);                            // tan, as a float
@@ -370,7 +370,7 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
         fFlatDist = 1.0f + lbl_80281F78->f4;
         fFlatDist *= 1.0f
                 / Camera_GetLensFovScale(
-                    (u8*)Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
+                    Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
     } else {
         fFlatDist = 10000.0f;
     }
@@ -532,7 +532,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
         }
         fHeight = lbl_80281F78->f44;
         pLens = Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0]));
-        fHeight *= 1.0f / Camera_GetLensFovScale((u8*)pLens);
+        fHeight *= 1.0f / Camera_GetLensFovScale(pLens);
         // high enough to see the pin (up to 20 from the target) through the lens
         nPinSet = Game_CurrentPinSet();
         GolfCam_Vec3Sub(&pCourse->pin[nPinSet].x, vTarget, vPin);
@@ -2613,7 +2613,7 @@ u8 fn_800C3FC0(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam) {
         fBack = lbl_80281F78->f38;
     }
     fBack *= 1.0f / Camera_GetLensFovScale(
-                        (u8*)Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
+                        Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
     if (fBack + lbl_80281F78->fC > fDist && gPlayers[nPlayer].nShotKind != 0) {
         if (fBack > fDist) {
             fBack = lbl_80281F78->f10 * fDist;

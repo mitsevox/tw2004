@@ -1294,8 +1294,9 @@ s32 MC_GetNumEATitles(void) {
     return lbl_80281FF4;
 }
 
-// Three callbacks of a table in .data (0x80189CB0 area), one per save kind, each paired with one
-// of MC_MemoryRequiredForOptions/fn_800A270C/fn_800A2740: whether the file on the card was rejected as bad data.
+// Op 3 of this file's lbl_8018C7D8, one per save kind (fn_800A2630 options, fn_800A26A0 user,
+// fn_800A2668 replay), all three the same test: whether the save file on the card is bad data
+// (MC_ERR_BADDATA from fn_8009EE28, which mounts the card and checks the file and its backup).
 s32 fn_800A2630(MCCardPos* pPos) {
     return fn_8009EE28(pPos->nPort, pPos->nSlot) == MC_ERR_BADDATA;
 }

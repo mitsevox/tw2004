@@ -561,7 +561,6 @@ typedef struct SkinTarget {
     TexBank* pBank;             // 0x4  passed on to fn_80112614: its materials' textures come from it
 } SkinTarget;
 
-// What Character.p16D8 points at; only what SkinPart.c reads.
 // An 8-byte record fn_8001B208 makes for each skin of a CharSkinSet (fn_8001B1DC fills it;
 // CharSkinRef is our name).
 typedef struct CharSkinRef {
@@ -569,12 +568,15 @@ typedef struct CharSkinRef {
     Skin* pSkin;                // 0x4
 } CharSkinRef;
 
+// What Character.p16D8 points at: the golfer's clubs, made from the 'CLB ' object (fn_8001B208),
+// one entry per club class: Drivers, Fairwaywoods, Putters, 3Irons, 7Irons, Wedges (char.c
+// lbl_80186EC0).
 typedef struct CharSkinSet {
     s32  n0;                    // 0x00  cleared by fn_8001B208
     u8   unk4[4];
     s32  nCount;                // 0x08  how many club classes the 'CLB ' object holds
     f32  afC[6];                // 0x0C  per club class: the club head bone's height (Character_SelectClub)
-    Skin* apSkins[6];           // 0x24
+    Skin* apSkins[6];           // 0x24  per club class: its skin (SkinPart.c picks its parts and sets)
     f32  a3C[6][4];             // 0x3C  per club class: a point on the club, through bone 0x52's matrix
                                 //       (Character_UpdateTestPoints: aPoints[4])
     CharSkinRef* a9C[6];        // 0x9C  freed with fn_8001B1E8 (fn_8001B58C)

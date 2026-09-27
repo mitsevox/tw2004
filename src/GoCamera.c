@@ -9,7 +9,7 @@ void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: inverts a r
 void Mtx_Identity(f32 (*pMtx)[4]);                     // identity
 void fn_8001728C(CamLens* pLens);
 f32  Math_Tan(f32 x);                              // tan, as a float
-void fn_800354B4(u8* p, f32 v);                       // GoTerrain.c: sets the lens's fAC
+void fn_800354B4(u8* p, f32 v);                       // GoTerrain.c: sets the lens's far clip, fAC
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void CA_vSetMatrix(CamLens* pLens, f32 (*pMtx)[4]);
 void fn_800769C0(CamLens* pLens, f32 fA8, f32 fAC);

@@ -3029,7 +3029,7 @@ void fn_8007F2C0(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[9].p = nCourses;
 }
 
-// How many of the 71 marked holes the slot's profile has (fn_800588F4's kind 0).
+// How many of the first 71 par-5 holes the slot's profile has eagled (fn_800588F4's kind 0).
 void fn_8007F5CC(MsgArg* pArgs, MsgArg* pResult) {
     int n;
     int i;
@@ -3426,8 +3426,8 @@ void fn_800804E4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_UserHasEagledHole(pArgs[0].i, pArgs[1].i, pArgs[2].i - 1);
 }
 
-// For the working slot's marked hole pArgs[0], pArgs[1] (from 1): its value unpacked into
-// pArgs[2..4] (a date packed by fn_80078604), or zeros when the hole is not marked.
+// For the working slot's par-5 hole pArgs[0] (course), pArgs[1] (hole, from 1): the date it was
+// eagled, unpacked into pArgs[2..4] (fn_80078620), or zeros when it has not been eagled.
 void fn_8008052C(MsgArg* pArgs, MsgArg* pResult) {
     int nA = pArgs[0].i;
     int nB = pArgs[1].i - 1;

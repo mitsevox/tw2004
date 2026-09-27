@@ -523,7 +523,9 @@ u8 fn_800760A8_HasEnded(Video* pVideo) {
     return pVideo->bEnded;
 }
 
-// Sets the renderer's rectangle (x, y, width, height).
+// Sets the renderer's scissor rectangle in screen pixels (bit 0x200): left, top, then right and
+// bottom, both inclusive (RenderState.nBC..nC8; Code80015470.c passes GXSetScissor right - left + 1).
+// The parameters named nWidth and nHeight are the right and bottom edges.
 void fn_800760B0(int nX, int nY, int nWidth, int nHeight) {
     lbl_801B8980.nBC = nX;
     lbl_801B8980.nC4 = nY;

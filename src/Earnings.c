@@ -1129,9 +1129,9 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
     }
 }
 
-// The marked holes (GM_ConvertCourseAndHoleToPar5EagleIndex's items, kind 0). Without bCheck:
-// whether the profile has all 71. With it: whether this par 5 was played in eagle or better with 70
-// held and this hole the one missing.
+// The par-5 eagle records (GM_ConvertCourseAndHoleToPar5EagleIndex's items, kind 0). Without
+// bCheck: whether the profile has eagled all 71. With it: whether this par 5 was played in eagle or
+// better with 70 held and this hole the one missing.
 u8 fn_800D61E4(int nPlayer, u8 bCheck) {
     int nProfile;
     u8 bAll;

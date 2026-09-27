@@ -48,7 +48,7 @@ u8   CameraScript_DontUpdateCameraDuringSlowMo(CamScript* pScript, int nPlayer);
 void fn_80044768(f32* pPos, f32* pOut);
 f32  fn_8003F790(CamScript* pScript);   // the blend's share (0..1) so far
 f32  fn_80044F58(int nPlayer, CamScript* pScript);
-f32  Camera_GetLensFovScale(u8* pLens);            // the lens's fB0 (char.c: its parameter is u8*)
+f32  Camera_GetLensFovScale(CamLens* pLens);       // char.c: the lens's fB0
 u8   fn_8004561C(void);
 u8   fn_80044E2C(int n);
 u8   fn_80044AA8(SurfaceType* pSurface);
@@ -1421,7 +1421,7 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
         Vec3_Sub(vGoal, pCam, vDir);
         fMin = lbl_80281F78->fF0;
         fB = 1.0f / Camera_GetLensFovScale(
-                        (u8*)Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
+                        Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
         fMin *= fB;
         fMin *= -vDir[1];
         vDir[1] = 0.0f;
@@ -2025,7 +2025,7 @@ f32 CameraScript_GetBallHeightWithMaxHeight(int nPlayer, CamScript* pScript, f32
 
     if (fAbove > pShot->f6C) {
         fDrop = lbl_80281F78->fD0 * (fAbove - pShot->f6C);
-        fDrop *= Camera_GetLensFovScale((u8*)Camera_GetCurrentLens());
+        fDrop *= Camera_GetLensFovScale(Camera_GetCurrentLens());
         fY -= fDrop;
     }
     return fY;
@@ -2052,7 +2052,7 @@ void CameraScript_KeepPointInView(int nPlayer, f32* pCam, f32* pOut, f32* pTarge
     f32 fCos;
     f32 fSin;
 
-    fLag *= Camera_GetLensFovScale((u8*)Camera_GetCurrentLens());
+    fLag *= Camera_GetLensFovScale(Camera_GetCurrentLens());
     Vec3_Sub(pTarget, pCam, vToTarget);
     Vec3_Sub(pOut, pCam, vToOut);
     if ((0.0f == vToTarget[0] && 0.0f == vToTarget[1] && 0.0f == vToTarget[2]) ||
@@ -2182,7 +2182,7 @@ u8 CamScript_CheckObstructedCamera(f32* pCam, int nPlayer) {
         Vec3_Sub(pCam, &pCourse->pin[nPin].x, vDiff);
         vDiff[1] = 0.0f;
         fDist = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
-        fDist *= Camera_GetLensFovScale((u8*)Camera_GetCurrentLens());
+        fDist *= Camera_GetLensFovScale(Camera_GetCurrentLens());
         if (fDist < lbl_80281F78->f120
             && pCam[1] - pCourse->pin[nPin].y < lbl_80281F78->f124) {
             bBlocked = 1;
@@ -2387,7 +2387,7 @@ void CamScript_CheckFlagCollision(CamScript* pScript, f32* pCam, f32* pSub, int 
     Vec3_Sub(pCam, &pCourse->pin[nPin].x, vDiff);
     vDiff[1] = 0.0f;
     fDist = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
-    fDist *= Camera_GetLensFovScale((u8*)Camera_GetCurrentLens());
+    fDist *= Camera_GetLensFovScale(Camera_GetCurrentLens());
     if (fDist < lbl_80281F78->f120) {
         if (pCam[1] - pCourse->pin[nPin].y < lbl_80281F78->f124) {
             fAbove = pCam[1] - pCourse->pin[nPin].y;

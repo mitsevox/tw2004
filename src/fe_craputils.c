@@ -270,7 +270,9 @@ int fn_800588E8(void) {
     return lbl_80281DF0.n;
 }
 
-// Marked holes 0..70 are kept in a5004/a504C, 71..74 in a10578/a1057C.
+// Par-5 eagle record i (GM_ConvertCourseAndHoleToPar5EagleIndex): kind 0 whether the hole is
+// eagled, kind 1 the eagle's date; -1 for another kind. Records 0..70 are kept in a5004/a504C,
+// 71..74 in a10578/a1057C.
 int fn_800588F4(SaveProfile* pProfile, int nKind, int i) {
     u8 bFirst = i < 71;
 

@@ -25,8 +25,8 @@ void fn_8009220C(void);
 void fn_800A7644(int a);
 void fn_800A4FD8(void);
 void fn_80102AC4(void);
-void FE_CrAP_SetTriggerAnims(int a);
-void FE_CrAP_UnequipSlot(int nPart);            // FE_CrAPDB.c
+void FE_CrAP_SetTriggerAnims(u8 b);
+void FE_CrAP_UnequipSlot(s16 nSlot);            // FE_CrAPDB.c
 u8   PasswordManager_IsPasswordEntered(int a);
 u8   fn_800564AC(int n);
 s32  fn_801258E8(void);                 // EASportsBio.c

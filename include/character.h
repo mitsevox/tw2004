@@ -644,7 +644,7 @@ typedef struct Character {
     s32   nClub;                // 0x16CC  the club (Character_SelectGameClub)
     s32   nShotKind;            // 0x16D0  the player's shot kind (Character_SelectGameShotType)
     s32   n16D4;              // 0x16D4  the key for clip lookups (Char_SetClip)
-    struct CharSkinSet* p16D8;  // 0x16D8  six more skins (SkinPart.c)
+    struct CharSkinSet* p16D8;  // 0x16D8  its clubs: six club skins, one per club class (SkinPart.c)
     s32   n16DC;                // 0x16DC  twice the players set up so far, in split screen 2
                                 //         (Player_SetGolfer)
     s32   nStyle;               // 0x16E0  the animation style (Character_SetEmotion); at -1

@@ -27,7 +27,7 @@ void Aud_EmiSetTrackPitchFactor(u8 nId, u8 nTrack, f32 fPitch);
 void Aud_EmiAliasSet3DPos(s16 nKind, f32* pPos, f32* pLast, u8 b);  // types unproven
 
 void fn_8010D3D8(int nPlayer);
-u8   fn_8006BEA4(void);                    // GoGolfCam.c: the GameBreaker letterbox is up
+u8   fn_8006BEA4(void);                    // emotion.c: a scripted GameBreaker's letterbox is up
 void Aud_EmiSetTrackAttenuation(u8 nId, u8 nTrack, f32 fVolume);
 
 void fn_800DC6E8(int nPlayer);
@@ -179,9 +179,9 @@ void Mov_Start(void);
 void Mov_Tick(void);
 
 u8   Voc_InitModule(void);                   // hlaudvoice.c
-u8   Aud_EmiInitOnce(void);                   // no C yet; returns 1
-u8   fn_800AF224(void);                   // no C yet; returns 1
-void Aud_EmiCycle(void);                   // hlaudemitter.c, no C yet
+u8   Aud_EmiInitOnce(void);                  // hlaudemitter.c; always 1
+u8   fn_800AF224(void);                      // AudReverb.c; always 1
+void Aud_EmiCycle(void);                     // hlaudemitter.c
 void Aud_EmiExitSession(void);                   // hlaudemitter.c
 void fn_800B5B80(void);                   // UAudMemStack.c
 void Aud_EmiSetTrackStep(u8 nId, u8 nTrack, u8 n, int bCheck);
@@ -1243,10 +1243,12 @@ void fn_800A640C(void) {
     Aud_EmiAliasSetTrackStatus(3, 0, 1);
 }
 
-void fn_800A6448(void) {
+// Empty; nPlayer is unused (event.c passes it: TW07's Gaud_Tappa, empty too, takes the player).
+void fn_800A6448(u8 nPlayer) {
 }
 
-void fn_800A644C(void) {
+// Empty; nPlayer is unused (event.c passes it: TW07's Gaud_Spina, empty too, takes the player).
+void fn_800A644C(u8 nPlayer) {
 }
 
 void fn_800A6450(u8 nPlayer) {
