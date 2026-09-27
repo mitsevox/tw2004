@@ -41669,5 +41669,21 @@
 "matched_functions": 7586,
 "total_functions": 7647,
 "exact": 7586
+},
+{
+"commit": "0bb41e9",
+"sha": "0bb41e99b866237244a5d570f9cbe1231684d85b",
+"time": 1790471067,
+"subject": "Merge gemini/round4: startUp fn_800B0748 exact (per-function opt_propagation off)",
+"report": true,
+"matched_code": 1492592,
+"complete_code": 1311696,
+"matched_data": 723063,
+"complete_data": 868387,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7587,
+"total_functions": 7647,
+"exact": 7587
 }
 ]
