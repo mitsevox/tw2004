@@ -43637,5 +43637,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "6839245",
+"sha": "6839245e27d82cd720bc9449c69ff29a16de4514",
+"time": 1790537312,
+"subject": "state: pre-compact checkpoint (n1/n2/n3 landed, --allow-renames, next steps)",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
