@@ -12,6 +12,11 @@
 #include "game_types.h"
 #include "endian.h"
 
+// char_tex_manager.c and char.c were one translation unit (a unity build: TW07 compiles both in
+// golf2_unity.cpp): the .data of both is one 8-aligned block from 0x801870F0 ("_usrtextr", then
+// char.c's first string at 0x801870FC, which a separate char.o could not start at).
+#include "../src/char_tex_manager.c"
+
 void  fn_80014BB4(void);
 void  fn_80014C9C(void);
 void  fn_80014DC0(void);
@@ -160,26 +165,23 @@ void fn_8001B1DC(Skin* pSkin, CharSkinRef* pRef, s32 n);
 void fn_8001B1E8(void* p);
 void fn_8001C650(void* arg0, s32 arg1);
 
-void fn_8001B1DC(Skin* pSkin, CharSkinRef* pRef, s32 n) {
-    pRef->n0 = n;
-    pRef->pSkin = pSkin;
-}
-
-void fn_8001B1E8(void* p) {
-    fn_80009E70(p);
-}
-
-void fn_8001C650(void* arg0, s32 arg1) {
-    void* temp_r5;
-
-    temp_r5 = (*(void**)((u8*)(arg0) + 0x1798));
-    if ((temp_r5 != NULL) && ((u32) (*(u32*)((u8*)(temp_r5) + 0x2C)) == 6U) && (arg1 == 0)) {
-        (*(s32*)((u8*)(arg0) + 0x16D4)) = 4;
-    }
-    (*(s32*)((u8*)(arg0) + 0x16D4)) = arg1;
-}
-
 // ---- end of sweep code ----
+
+CharModelDefs lbl_80280E10 = { lbl_80186E80, 2 };
+CharModelDefs lbl_80280E18 = { lbl_80186EA0, 2 };
+s32 lbl_80280E20 = 3;
+CharSkinSet* lbl_80280E24[2] = { NULL, NULL };
+
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f, 2^30, 0.0f, -60000.0f and 3.0f (0x80282BC0), 1.0f and 3.0f before their first users
+// below; its body is unknown, this one only reproduces the order.
+static void char_StrippedFn(void) {
+    fn_800095F0(1.0f);
+    fn_800095F0(1073741824.0f);
+    fn_800095F0(0.0f);
+    fn_800095F0(-60000.0f);
+    fn_800095F0(3.0f);
+}
 
 // Clear the character's animation events: none set, all at time 2^30 (never).
 void fn_80017508(Character* pChar) {
@@ -1121,21 +1123,23 @@ void fn_8001971C(Character* pChar) {
 // use (fn_800CE8C0), the texture of that name (and the one after it when it goes with it) with its
 // palette, or an empty one. Then it opens the golfer's texture file.
 void fn_80019798(Character* pChar, Skin** apSkins, int nSkins) {
-    int nExtra;
+    TexEntry* pTexData;
+    TexPalette* pPalData;
     int nTex;
     int nTexBytes;
     int nPalBytes;
     u8* pData;
     SkinListEntry* pList;
-    TexEntry* pTexData;
-    TexPalette* pPalData;
-    u8 bAll;
     u8 bFound;
     int nPal;
-    int nNames;
+    u8 bAll;
+    int nExtra;
     int nOut;
     int i;
     int j;
+    int k;
+    int m;
+    int nNames;
 
     nExtra = 0;
     pList = NULL;
@@ -1199,18 +1203,18 @@ void fn_80019798(Character* pChar, Skin** apSkins, int nSkins) {
         }
     } else {
         nNames = pChar->nAC - nExtra;
-        for (i = nOut = 0; i < nNames; i++) {
+        for (k = nOut = 0; k < nNames; k++) {
             bFound = 0;
-            for (j = 0; j < nTex; j++) {
-                if (pList[i].uId == pTexData[j].u0) {
-                    Mem_cpy(&pChar->pA8[nOut], &pTexData[j], sizeof(TexEntry));
-                    if (pTexData[j].nPalette != -1) {
-                        Mem_cpy(&pChar->pB0[i], &pPalData[pTexData[j].nPalette], sizeof(TexPalette));
-                        pChar->pA8[nOut].nPalette = i;
+            for (m = 0; m < nTex; m++) {
+                if (pList[k].uId == pTexData[m].u0) {
+                    Mem_cpy(&pChar->pA8[nOut], &pTexData[m], sizeof(TexEntry));
+                    if (pTexData[m].nPalette != -1) {
+                        Mem_cpy(&pChar->pB0[k], &pPalData[pTexData[m].nPalette], sizeof(TexPalette));
+                        pChar->pA8[nOut].nPalette = k;
                     }
                     nOut++;
-                    if (pTexData[j].b47 & 1) {
-                        Mem_cpy(&pChar->pA8[nOut], &pTexData[j + 1], sizeof(TexEntry));
+                    if (pTexData[m].b47 & 1) {
+                        Mem_cpy(&pChar->pA8[nOut], &pTexData[m + 1], sizeof(TexEntry));
                         nOut++;
                     }
                     bFound = 1;
@@ -1806,6 +1810,17 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
     return pChar;
 }
 
+// ---- sweep code (not yet cleaned up) ----
+void fn_8001B1DC(Skin* pSkin, CharSkinRef* pRef, s32 n) {
+    pRef->n0 = n;
+    pRef->pSkin = pSkin;
+}
+
+void fn_8001B1E8(void* p) {
+    fn_80009E70(p);
+}
+// ---- end of sweep code ----
+
 // Makes a club skin set from a 'CLB ' object: per entry its club class, that class's afC, the
 // entry's size and, 4 bytes on, its skin (fn_800377FC); a3C gets the class's club point.
 CharSkinSet* fn_8001B208(u8* pData) {
@@ -2245,6 +2260,8 @@ void fn_8001C350(void) {
     fn_80112CEC();
 }
 
+ViewSlot gViewSlots[5] = { 0 };
+
 // Starts the character system (called once from the main loop): the animation libraries up, no
 // club skin sets, the club names read as 64-bit ids, no characters in the menu or player slots,
 // and no player marked.
@@ -2333,6 +2350,18 @@ void fn_8001C5B4(Character* pChar, int n) {
     }
 }
 
+// ---- sweep code (not yet cleaned up) ----
+void fn_8001C650(void* arg0, s32 arg1) {
+    void* temp_r5;
+
+    temp_r5 = (*(void**)((u8*)(arg0) + 0x1798));
+    if ((temp_r5 != NULL) && ((u32) (*(u32*)((u8*)(temp_r5) + 0x2C)) == 6U) && (arg1 == 0)) {
+        (*(s32*)((u8*)(arg0) + 0x16D4)) = 4;
+    }
+    (*(s32*)((u8*)(arg0) + 0x16D4)) = arg1;
+}
+// ---- end of sweep code ----
+
 // The player's golfer takes the player's shot kind and club; when either changed, it goes back
 // to animation 5.
 void fn_8001C680(int nPlayer) {
@@ -2351,6 +2380,17 @@ void fn_8001C680(int nPlayer) {
         fn_8001C804(nPlayer, 1, 1);
     }
 }
+
+s32 lbl_80187164[8] = { 8, 0, 6, 3, 2, 1, 10, 4 };
+
+f32 lbl_80187184[6][3] = {
+    { 0.058f, 0.0f, 0.025f },
+    { 0.058f, 0.0f, 0.025f },
+    { 0.045f, -0.024f, 0.05f },
+    { 0.04f, 0.0f, 0.075f },
+    { 0.04f, 0.0f, 0.075f },
+    { 0.045f, -0.0f, 0.075f },
+};
 
 // Set the character's shot kind and the clip key that goes with it.
 void Character_SelectGameShotType(Character* pChar, int nKind) {
