@@ -533,9 +533,14 @@ void fn_80169C0C(UIStudio* pStudio, u32 nScreens, u32 nHandlers, u32 nRateFns, u
 
 // The size of the block fn_80169C0C builds, for the given table sizes. The screen table has one
 // more entry's worth of room: the current record (UISCurrent, the same size).
+// fake match: the screen table's size as a 64-bit product (low word = (nScreens + 1) * 20); its
+// dead high word (li 20; mulhw) moves the handlers shift to the second slot of the pre-allocation
+// schedule as in the original, and is deleted after register allocation.
+// port: the product is truncated to 32 bits.
 u32 fn_80169D90(u32 nScreens, u32 nHandlers, u32 nRateFns, u32 n60, u32 nEventWords, u32 nWords2) {
-    return sizeof(UIStudio) + (nScreens + 1) * sizeof(UISScreen) + nHandlers * sizeof(UISHandlerFn) +
-           nRateFns * sizeof(UISRateFn) + n60 * sizeof(UISRecord60) + (nWords2 + nEventWords) * sizeof(s32);
+    return sizeof(UIStudio) + (u32)((s32)(nScreens + 1) * (s64)sizeof(UISScreen)) +
+           nHandlers * sizeof(UISHandlerFn) + nRateFns * sizeof(UISRateFn) + n60 * sizeof(UISRecord60) +
+           (nWords2 + nEventWords) * sizeof(s32);
 }
 
 // Turns a file offset stored in a pointer field into the pointer.
