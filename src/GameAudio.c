@@ -1,4 +1,4 @@
-// GameAudio.c (our name): the game's side of the sound engine. fn_800A3E3C starts the engine
+// GameAudio.c (our name): the game's side of the sound engine. Aud_InitOnce starts the engine
 // (memory stack, ARAM, sound table, movie sound, banks) one step after another; the rest drives
 // the sound emitters (hlaudemitter.c's fn_800AD*) from the game: the course, the game mode and the
 // pin set. Its extent is proven by its data: every section starts and ends on 8-byte boundaries
@@ -20,11 +20,11 @@ void Mas_SetSubmixAll(u8 nCurves, f32* pVolumes);
 // hlaudemitter.c
 void Aud_EmiSetTrackStatus(u8 nId, u8 nTrack, u8 bOn);
 u8   Aud_EmiGetTrackStatus(u8 nId, u8 nTrack);
-void fn_800AD790(u8 nId, u8 nTrack, u32 uParams);
+void Aud_EmiSetControllerInt(u8 nId, u8 nTrack, u32 uParams);
 void Aud_EmiSetTrackVarRange(u8 nId, u8 nTrack, u8 n);
 void Aud_EmiSet3DPos(u8 nId, f32* pPos, f32* pLast, u8 b);
-void fn_800ADAF0(u8 nId, u8 nTrack, f32 fPitch);
-void fn_800ADBC0(s16 nKind, f32* pPos, f32* pLast, u8 b);  // types unproven
+void Aud_EmiSetTrackPitchFactor(u8 nId, u8 nTrack, f32 fPitch);
+void Aud_EmiAliasSet3DPos(s16 nKind, f32* pPos, f32* pLast, u8 b);  // types unproven
 
 void fn_8010D3D8(int nPlayer);
 u8   fn_8006BEA4(void);                    // GoGolfCam.c: the GameBreaker letterbox is up
@@ -47,9 +47,9 @@ void fn_800A71E4(void);
 void fn_800A7294(void);
 void fn_800BA734(int n, s8 nTrack);
 
-void fn_800A3F38(u8 b, u8 b2);
+void Aud_Pause(u8 b, u8 b2);
 void Aud_SetSubmixAttn(u8 nCurve, f32 fVolume);
-void fn_800A3FD4(u8 nCurves, f32* pVolumes);
+void Aud_SetSubmixAll(u8 nCurves, f32* pVolumes);
 void fn_800A4084(void);
 void fn_800A41A4(void);
 void fn_800A43DC(void);
@@ -58,10 +58,10 @@ void fn_800A484C(void);
 void fn_800A4928(void);
 void fn_800A42B0(u8 n);
 void fn_800A7220(f32 fAmount);
-void fn_800A3F58(u8 bLow, u8 bHigh);
-void fn_800A3F94(u8 n);
+void Aud_Mute(u8 bLow, u8 bHigh);
+void Aud_SetOutputmode(u8 n);
 void fn_800A4044(u8 nIndex, u8 nValue);
-void fn_800A7AD0(s16 nSound, u8 nTrack, u8 bOn);
+void Aud_SesTmplOvrTrackRvbMode(s16 nSound, u8 nTrack, u8 bOn);
 void fn_800A4170(u8 nId, u8 nTrack, s32 n);
 void fn_800A5980(u8 nPlayer);
 void fn_800A6C98(u8 nPlayer, u8 n);
@@ -69,7 +69,7 @@ void fn_800A6660(u8 nPlayer);
 void Aud_EmiSetTrackVariation(u8 nId, u8 nTrack, u8 n);
 u8   fn_800A4A24(s32 nCourse, int n);
 u8   fn_800A4A88(void);
-void fn_800A7968(u8 nId, u8 nTrack, u8 a, u16 b, s32 c);
+void Aud_EmiSetTrackStream(u8 nId, u8 nTrack, u8 a, u16 b, s32 c);
 u8   Gaud_GetCommentStatus(void);
 u8   fn_800A7748(void);
 void fn_800A70E4(int n);
@@ -131,7 +131,7 @@ f32 lbl_80281454 = 2.0f;
 f32 lbl_80281458 = 21.0f;
 
 u32 lbl_80282054;                       // frames left before the queued sound starts (Gaud_Cycle)
-u8 lbl_80282052;                        // } the queued sound: fn_800A7968's arguments
+u8 lbl_80282052;                        // } the queued sound: Aud_EmiSetTrackStream's arguments
 u16 lbl_80282050;                       // }
 s32 lbl_8028204C;                       // }
 u32 lbl_80282048;                       // fn_800A6070: the frame it last played
@@ -179,10 +179,10 @@ void Mov_Start(void);
 void Mov_Tick(void);
 
 u8   Voc_InitModule(void);                   // hlaudvoice.c
-u8   fn_800ACECC(void);                   // no C yet; returns 1
+u8   Aud_EmiInitOnce(void);                   // no C yet; returns 1
 u8   fn_800AF224(void);                   // no C yet; returns 1
-void fn_800AD1C8(void);                   // hlaudemitter.c, no C yet
-void fn_800AD1C4(void);                   // hlaudemitter.c
+void Aud_EmiCycle(void);                   // hlaudemitter.c, no C yet
+void Aud_EmiExitSession(void);                   // hlaudemitter.c
 void fn_800B5B80(void);                   // UAudMemStack.c
 void Aud_EmiSetTrackStep(u8 nId, u8 nTrack, u8 n, int bCheck);
 
@@ -201,7 +201,7 @@ static f32 GameAudio_StrippedFn(f32 x) {
 
 // Starts the sound engine one step after another; stops at the first step that fails and
 // returns 0, else 1.
-u8 fn_800A3E3C(u8 nRate) {
+u8 Aud_InitOnce(u8 nRate) {
     u8 bOk;
 
     fn_800B5B80();
@@ -209,7 +209,7 @@ u8 fn_800A3E3C(u8 nRate) {
         && (bOk = fn_800AF224()) && (bOk = fn_800B0798()) && (bOk = fn_800A8604())
         && (bOk = fn_800A8D2C()) && (bOk = fn_800A7AF0()) && (bOk = Trk_InitModule())
         && (bOk = fn_800AAD18()) && (bOk = fn_800ABBC8()) && (bOk = fn_800A8754())
-        && (bOk = Voc_InitModule()) && (bOk = fn_800A8824()) && (bOk = fn_800ACECC())
+        && (bOk = Voc_InitModule()) && (bOk = fn_800A8824()) && (bOk = Aud_EmiInitOnce())
         && (bOk = fn_800A3FF4())) {
         fn_800B07A0();
         fn_800A86BC(nRate);
@@ -219,11 +219,13 @@ u8 fn_800A3E3C(u8 nRate) {
 }
 
 // Every caller passes a second flag (DiscError.c 1, this file 0); nothing here reads it.
-void fn_800A3F38(u8 b, u8 b2) {
+void Aud_Pause(u8 b, u8 b2) {
     fn_800A8F68(b);
 }
 
-void fn_800A3F58(u8 bLow, u8 bHigh) {
+// Sets the master mute mask: bLow mutes the low 16 channels, bHigh the high 16 (TW07 calls them
+// global and local); a flag of 0 unmutes its half.
+void Aud_Mute(u8 bLow, u8 bHigh) {
     s32 nMask;
 
     nMask = 0;
@@ -236,7 +238,7 @@ void fn_800A3F58(u8 bLow, u8 bHigh) {
     fn_800A874C(nMask);
 }
 
-void fn_800A3F94(u8 n) {
+void Aud_SetOutputmode(u8 n) {
     fn_800A8700(n);
 }
 
@@ -244,7 +246,7 @@ void Aud_SetSubmixAttn(u8 nCurve, f32 fVolume) {
     Mas_SetSubmixChan(nCurve, fVolume);
 }
 
-void fn_800A3FD4(u8 nCurves, f32* pVolumes) {
+void Aud_SetSubmixAll(u8 nCurves, f32* pVolumes) {
     Mas_SetSubmixAll(nCurves, pVolumes);
 }
 
@@ -587,8 +589,8 @@ u8 fn_800A4A88(void) {
     lbl_80281430 = 1.0f;
     lbl_80281434 = 0.6f;
     lbl_80281458 = 21.0f;
-    fn_800A3E3C(60);
-    fn_800A3FD4(32, lbl_8018E988);
+    Aud_InitOnce(60);
+    Aud_SetSubmixAll(32, lbl_8018E988);
     return 1;
 }
 
@@ -598,11 +600,11 @@ int fn_800A4BAC(void) {
 
 // Once a frame: the emitters, then the queued sound once its wait runs out.
 void Gaud_Cycle(void) {
-    fn_800AD1C8();
+    Aud_EmiCycle();
     fn_800A4080();
     if (lbl_80282054 != 0) {
         if (--lbl_80282054 == 0 && lbl_80282038) {
-            fn_800A7968(lbl_80281419, 0, lbl_80282052, lbl_80282050, lbl_8028204C);
+            Aud_EmiSetTrackStream(lbl_80281419, 0, lbl_80282052, lbl_80282050, lbl_8028204C);
             Aud_EmiSetTrackStatus(lbl_80281419, 0, 1);
             lbl_80282038 = 0;
         }
@@ -686,7 +688,7 @@ void fn_800A4E34(void) {
         fn_800A77E0(0.2f * (s8)gSession.options.a0[0]);
         fn_800A78F0(0.2f * (s8)gSession.options.a0[4]);
         Aud_SetSubmixAttn(15, 0.2f * (s8)gSession.options.a0[1] * lbl_8018E988[15]);
-        fn_800A3F94(2);
+        Aud_SetOutputmode(2);
         lbl_80282028 = 1;
     }
     vPos[0] = 0.0f;
@@ -739,7 +741,7 @@ void fn_800A500C(void) {
     pPlayer = gPlayers;
     if (lbl_80282028 == 0) {
         fn_800A78F0(0.2f * (s8)gSession.options.a0[4]);
-        fn_800A3F94(2);
+        Aud_SetOutputmode(2);
         lbl_80282028 = 1;
     }
     vPos[0] = 0.0f;
@@ -787,12 +789,12 @@ void fn_800A500C(void) {
     Aud_EmiSet3DPos(lbl_8028141D, vPos, NULL, 0);
     if (nCourse == 7 && n == 2) {
         fn_800A4044(0, 17);
-        fn_800A7AD0(2, 0, 1);
-        fn_800A7AD0(1, 0, 1);
-        fn_800A7AD0(1, 2, 1);
-        fn_800A7AD0(1, 1, 1);
+        Aud_SesTmplOvrTrackRvbMode(2, 0, 1);
+        Aud_SesTmplOvrTrackRvbMode(1, 0, 1);
+        Aud_SesTmplOvrTrackRvbMode(1, 2, 1);
+        Aud_SesTmplOvrTrackRvbMode(1, 1, 1);
     }
-    fn_800A3F38(0, 0);
+    Aud_Pause(0, 0);
     lbl_8028202A = 1;
     lbl_8028202B = 0;
     lbl_8028202C = 0;
@@ -855,7 +857,7 @@ void fn_800A5428(void) {
     lbl_8028141B = 0xFF;
     lbl_80281420 = 0xFF;
     lbl_80282029 = 0;
-    fn_800A3F58(0, 0);
+    Aud_Mute(0, 0);
 }
 
 void fn_800A5620(void) {
@@ -936,7 +938,7 @@ void fn_800A573C(u8 nPlayer) {
                     }
                     Aud_EmiSetTrackStep(nId, 0, 0, 1);
                     Aud_EmiSetTrackAttenuation(nId, 0, fVolume);
-                    fn_800ADAF0(nId, 0, fPitch);
+                    Aud_EmiSetTrackPitchFactor(nId, 0, fPitch);
                 }
                 pView->n18 = pPlayer->swing.nState;
             }
@@ -1083,9 +1085,9 @@ void fn_800A5CA4(u8 nPlayer) {
                 if (fVolume > 2.0f) {
                     fVolume = 2.0f;
                 }
-                fn_800ADBC0(4, pPlayer->ball.vPos, NULL, 0);
+                Aud_EmiAliasSet3DPos(4, pPlayer->ball.vPos, NULL, 0);
                 Aud_EmiAliasSetTrackStep(4, 0, pSurface->nSwingSoundId - 1, 0);
-                fn_800ADD54(4, 0, fVolume);
+                Aud_EmiAliasSetTrackAttenuation(4, 0, fVolume);
             } else {
                 nId = lbl_801F1790[pPlayer->nView[0]].n1;
                 if (pSurface->nSoundId == 4) {
@@ -1259,7 +1261,7 @@ void fn_800A64A8(u8 nPlayer, u8 b) {
     fn_800A4170(pView->n2, 2, 1);
     Aud_EmiSetTrackStatus(pView->n2, 2, 1);
     Aud_EmiSetTrackStatus(pView->n3, 2, 1);
-    fn_800A3F58(0, 1);
+    Aud_Mute(0, 1);
     Aud_EmiSetTrackAttenuation(lbl_80281420, 0, 0.0f);
     Aud_EmiSetTrackAttenuation(lbl_8028141C, 0, 0.0f);
     Aud_EmiSetTrackAttenuation(lbl_8028141C, 1, 0.0f);
@@ -1287,7 +1289,7 @@ void fn_800A6660(u8 nPlayer) {
     if (lbl_8028202B == 0) {
         Aud_EmiSetTrackStatus(pView->n2, 2, 0);
         Aud_EmiSetTrackStatus(pView->n3, 2, 0);
-        fn_800A3F58(0, 0);
+        Aud_Mute(0, 0);
         Aud_EmiSetTrackAttenuation(lbl_80281420, 0, 1.0f);
         Aud_EmiSetTrackAttenuation(lbl_8028141C, 0, lbl_80281430);
         Aud_EmiSetTrackAttenuation(lbl_8028141C, 1, lbl_80281430);
@@ -1337,7 +1339,7 @@ void fn_800A68C0(u8 nPlayer) {
     bPlay = 1;
     n = 0;
     if (Game_GetMode() < 6 || Game_GetMode() > 8) {
-        fn_800A3F58(0, 1);
+        Aud_Mute(0, 1);
         switch (nKind) {
         case 1:
         case 6:
@@ -1429,7 +1431,7 @@ void fn_800A6BA8(u8 nPlayer) {
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
     nKind = fn_800C7138(ViewController_GetCameraController(0));
     if (Game_GetMode() < 6 || Game_GetMode() > 8) {
-        fn_800A3F58(0, 0);
+        Aud_Mute(0, 0);
         Aud_EmiSetTrackStatus(pView->n2, 1, 0);
         Aud_EmiSetTrackStatus(pView->n3, 1, 0);
         if (nKind == 7) {
@@ -1604,7 +1606,7 @@ void fn_800A7350(u8 bOn) {
     if ((lbl_8028202B ^ bOn) != 0) {
         lbl_8028202B = bOn;
         if (lbl_8028202E == 0) {
-            fn_800A3F38(bOn, 0);
+            Aud_Pause(bOn, 0);
             if (bOn) {
                 fn_800A73C0(0, 1);
             } else {
@@ -1666,7 +1668,7 @@ s32 fn_800A7528(void) {
 
 void fn_800A754C(u8 a, u16 b) {
     if (lbl_8028203C == 1) {
-        fn_800A7968(lbl_80281418, 0, a, b, 2);
+        Aud_EmiSetTrackStream(lbl_80281418, 0, a, b, 2);
         Aud_EmiSetTrackStatus(lbl_80281418, 0, 1);
         fn_800BA734(1, b);
     }
@@ -1709,8 +1711,9 @@ void Gaud_StartComment(int nKind, int nMsg, int a) {
             lbl_8028204C = a;
             return;
         }
-        // port: EA passes nKind and nMsg as ints, unmasked, to fn_800A7968's u8 and u16 parameters
-        ((void (*)(u8, u8, int, int, s32))fn_800A7968)(lbl_80281419, 0, nKind, nMsg, a);
+        // port: EA passes nKind and nMsg as ints, unmasked, to Aud_EmiSetTrackStream's u8 and u16
+        // parameters
+        ((void (*)(u8, u8, int, int, s32))Aud_EmiSetTrackStream)(lbl_80281419, 0, nKind, nMsg, a);
         Aud_EmiSetTrackStatus(lbl_80281419, 0, 1);
     }
 }
@@ -1776,23 +1779,26 @@ void fn_800A7944(void) {
     fn_800A47A0();
 }
 
-void fn_800A7968(u8 nId, u8 nTrack, u8 a, u16 b, s32 c) {
-    fn_800AD790(nId, nTrack, (c << 24) | (a << 16) | b);
+// Picks what a streamed track of instance nId plays: play list a, stream b, play mode c, packed
+// into the track's controller value (mode in the top byte, list in the next, stream in the low 16
+// bits) for AudTable.c to hand to the streamer.
+void Aud_EmiSetTrackStream(u8 nId, u8 nTrack, u8 a, u16 b, s32 c) {
+    Aud_EmiSetControllerInt(nId, nTrack, (c << 24) | (a << 16) | b);
 }
 
-void fn_800A7994(void) {
+void Aud_InitMovie(void) {
     Mov_Init();
 }
 
-void fn_800A79B4(void) {
+void Aud_ExitMovie(void) {
     Mov_Exit();
 }
 
-void fn_800A79D4(void) {
+void Aud_StartMovie(void) {
     Mov_Start();
 }
 
-void fn_800A79F4(void) {
+void Aud_CycleMovie(void) {
     Mov_Tick();
 }
 
@@ -1801,21 +1807,23 @@ void fn_800A7A14(u8 nSound) {
 }
 
 // Every caller passes a fourth argument; nothing here reads it.
-s32 fn_800A7A34(u8 a, u8 b, u8 nListeners, int nUnused) {
-    fn_800AD0C4();
+s32 Aud_InitSession(u8 a, u8 b, u8 nListeners, int nUnused) {
+    Aud_EmiInitSession();
     fn_800A402C(nListeners);
     // port: EA passes an argument Ses_Init ignores
     ((u8 (*)(u8, u8, u8, int))Ses_Init)(a, b, nListeners, 0);
     return 1;
 }
 
-void fn_800A7A98(s32 n) {
-    fn_800AD1C4();
+void Aud_ExitSession(s32 n) {
+    Aud_EmiExitSession();
     fn_800A4038();
     // port: EA passes an argument fn_800A8D88 ignores
     ((void (*)(s32))fn_800A8D88)(n);
 }
 
-void fn_800A7AD0(s16 nSound, u8 nTrack, u8 bOn) {
+// Turns reverb on (bOn 1) or off for track nTrack of sound nSound's template, so for every instance
+// of that sound.
+void Aud_SesTmplOvrTrackRvbMode(s16 nSound, u8 nTrack, u8 bOn) {
     fn_800A94F4(nSound, nTrack, bOn);
 }

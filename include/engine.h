@@ -1373,7 +1373,7 @@ u8   Controller_AnyPadHasButtons(u32 uMask);            // any pad pressed these
 
 // ---- events, sound, effects ------------------------------------------------------------------
 
-void fn_800A7A98(s32 n);                // GameAudio.c
+void Aud_ExitSession(s32 n);                // GameAudio.c
 void Gaud_Cycle(void);                 // GameAudio.c: once a frame, the emitters and the queued sound
 u8   fn_800B7490(void);                 // DiscError.c: show the disc-error screen while the drive
                                         // reports a problem; 1: it was shown (UStream.c, DiscCheck.c)

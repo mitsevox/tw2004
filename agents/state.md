@@ -42,7 +42,7 @@ Next-batch input the lanes found (EA names ready, T2):
 Comments the lanes think wrong (for the audit, not edited): engine.h RenderState nBC..nC8 are left,
 right, top, bottom (inclusive), not x/width/y/height; camera.h CamLens fA8/fAC look like near/far Z;
 GoGolfCam.c:38 and gocamscripts.c:51 "char.c: its parameter is u8*" is stale; hlaudemitter.c header
-(TW07: HLAudEmitterPool.c); fn_800AD790's comment (TW07: Aud_EmiSetControllerInt, a controller value);
+(TW07: HLAudEmitterPool.c); Aud_EmiSetControllerInt's comment (TW07: Aud_EmiSetControllerInt, a controller value);
 GameAudio.c Gaud_StartComment's port note still says "stays at 91%".
 n1 pairing: confidence C is unreliable (lanes found many wrong); A/B held up.
 Tool follow-ups: merge.py's asm gate should pass a renamed asm signature; name.py's name rule rejects

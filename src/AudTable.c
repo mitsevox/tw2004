@@ -42,7 +42,7 @@ void fn_800A7C2C(void) {
 }
 
 // Clears entry nEntry and binds it to sound nSound.
-AudSource* fn_800A7C30(u8 nEntry, s16 nSound) {
+AudSource* Emi_AddInstance(u8 nEntry, s16 nSound) {
     AudSound* pSound;
     AudSource* pSource;
 
@@ -55,7 +55,7 @@ AudSource* fn_800A7C30(u8 nEntry, s16 nSound) {
 }
 
 // Updates entry nEntry's tracks. A placed sound out of earshot is stopped.
-void fn_800A7CA4(u8 nEntry, u8 uMaskA, u8 uMaskB, u32* auStreams, f32 (*aPos)[3], u16 uMask) {
+void Emi_UpdInstance(u8 nEntry, u8 uMaskA, u8 uMaskB, u32* auStreams, f32 (*aPos)[3], u16 uMask) {
     AudSource* pSource;
     f32 fDist;
     u8 bHeard;
@@ -221,7 +221,7 @@ void fn_800A8134(AudSource* pSource, u32* auStreams, u16 uMask) {
 }
 
 // Stops entry nEntry and frees it.
-void fn_800A8200(u8 nEntry) {
+void Emi_DelInstance(u8 nEntry) {
     AudSource* pSource;
 
     pSource = &lbl_80282058[nEntry];
@@ -276,7 +276,7 @@ void fn_800A8394(u8 nEntry, u8 nTrack, u8 n, int bCheck) {
 }
 
 // Sets a track's volume.
-void fn_800A8424(u8 nEntry, u8 nTrack, f32 fVolume) {
+void Emi_SetTrackAttenuation(u8 nEntry, u8 nTrack, f32 fVolume) {
     AudSource* pSource;
     AudTrack* pTrack;
 

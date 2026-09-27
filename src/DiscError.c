@@ -12,7 +12,7 @@
 #include "core/startup.h"
 
 void fn_8001437C(void);
-void fn_800A3F38(u8 b, u8 b2);
+void Aud_Pause(u8 b, u8 b2);
 void VIWaitForRetrace(void);
 void fn_800B6924(void);
 void fn_800B6C14(s16 nX, s16 nY, const char* pFmt, ...);

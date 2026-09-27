@@ -37,7 +37,7 @@ void fn_80091D84(void);
 void fn_80091E1C(void);
 void AI_TargetsClear(void);
 void fn_800918A4(void);
-s32  fn_800A7A34(u8 a, u8 b, u8 nListeners, int nUnused);
+s32  Aud_InitSession(u8 a, u8 b, u8 nListeners, int nUnused);
 void fn_8001A81C(void);
 void fn_8006F438(void);
 void fn_800A500C(void);
@@ -136,7 +136,7 @@ void fn_800083A4(void) {
             AI_TargetsClear();
             fn_800918A4();
             // one listener per view
-            fn_800A7A34(Game_GetCourse() + 1, 1, gSession.nSplitScreen ? 2 : 1, 0);
+            Aud_InitSession(Game_GetCourse() + 1, 1, gSession.nSplitScreen ? 2 : 1, 0);
             if (!fn_800E1734()) {
                 fn_8000882C();
                 fn_8001A81C();
@@ -177,7 +177,7 @@ void fn_800083A4(void) {
             }
             fn_8009554C();
             fn_8001A73C();
-            fn_800A7A98(1);
+            Aud_ExitSession(1);
             break;
         case 8:
             fn_8006CDC4();

@@ -330,7 +330,7 @@ typedef struct AudSource {
                                 //        sequencer's event fn_800AAB48 sets bits too)
     u8   u1;                    // 0x1    tracks switched off (and fn_800AAB48, for events whose n4 is 0)
     u16  uChanged;              // 0x2    bits 0-7: that track's auParams was set; 0x200: u0 / u1
-    u32  auParams[8];           // 0x4    per track (hlaudemitter.c's fn_800AD790)
+    u32  auParams[8];           // 0x4    per track (hlaudemitter.c's Aud_EmiSetControllerInt)
     f32  aPos[2][3];            // 0x24   where it is from each listener (fn_800B1A40 measures it)
     AudSound* pSound;           // 0x3C
     s16  nSound;                // 0x40   its number (fn_800A85CC)
@@ -350,7 +350,7 @@ extern AudSeqHandler lbl_801F1880[13];
 
 // One of hlaudemitter.c's 256 emitter instances (lbl_801F2740); only the fields read so far.
 typedef struct AudInstance {
-    AudSource* pCmd;            // 0x0    its sound source (fn_800A7C30, the same number)
+    AudSource* pCmd;            // 0x0    its sound source (Emi_AddInstance, the same number)
     struct AudInstance* pPrevActive;   // 0x4    the previous in AudEmitters.pActive's list
     struct AudInstance* pNextActive;   // 0x8    the next in AudEmitters.pActive's list (or pFree's)
     struct AudInstance* pNext;  // 0xC    the next instance of the same emitter (AudEmitters)
@@ -359,7 +359,7 @@ typedef struct AudInstance {
     s8   nEmitter;              // 0x21   the emitter whose list it is in (-1: none)
     u8   u22;                   // 0x22   bits cleared by Aud_EmiTrkCB
     u8   unk23;
-    s32  n24;                   // 0x24   1: fn_800AD1C8 sends vPos again every frame
+    s32  n24;                   // 0x24   1: Aud_EmiCycle sends vPos again every frame
     s32  n28;                   // 0x28   0: vPos is moved into each view's camera space
     u8   unk2C[0x30 - 0x2C];
     void (*pfnCallback)(u8 nId, u8 nBit, s32 n);  // 0x30
@@ -378,7 +378,7 @@ typedef struct AudEmitters {
     AudInstance* apFirst[32];   // 0x10   linked through AudInstance.pNext
     s16  anSound[32];           // 0x90   Aud_EmiAliasSetTrackVarRange hands it to Aud_EmiSetTrackVarRangeTmpl
     u32  nActive;               // 0xD0   instances in use (up to 256)
-    u32  uFlags;                // 0xD4   bit 0: set up (fn_800ACECC)
+    u32  uFlags;                // 0xD4   bit 0: set up (Aud_EmiInitOnce)
 } AudEmitters;
 LAYOUT_ASSERT(AudEmitters, 0xD8);
 
@@ -463,14 +463,14 @@ void  fn_800B5C04(void* p);
 u8             fn_800A7AF0(void);
 u8             fn_800A7C24(void);
 void           fn_800A7C2C(void);
-AudSource*     fn_800A7C30(u8 nEntry, s16 nSound);
-void           fn_800A7CA4(u8 nEntry, u8 uMaskA, u8 uMaskB, u32* auStreams, f32 (*aPos)[3], u16 uMask);
-void           fn_800A8200(u8 nEntry);
+AudSource*     Emi_AddInstance(u8 nEntry, s16 nSound);
+void           Emi_UpdInstance(u8 nEntry, u8 uMaskA, u8 uMaskB, u32* auStreams, f32 (*aPos)[3], u16 uMask);
+void           Emi_DelInstance(u8 nEntry);
 void           fn_800A8248(u8 nEntry, u8 nTrack, u8 n);
 void           fn_800A82CC(u8 nEntry, u8 nTrack, u8 n);
 void           fn_800A834C(s16 nSound, u8 nTrack, u8 n);       // the track's nA
 void           fn_800A8394(u8 nEntry, u8 nTrack, u8 n, int bCheck);
-void           fn_800A8424(u8 nEntry, u8 nTrack, f32 fVolume);
+void           Emi_SetTrackAttenuation(u8 nEntry, u8 nTrack, f32 fVolume);
 void           fn_800A84A4(u8 nEntry, u8 nTrack, f32 fPitch);
 void           fn_800A8524(AudSound* pSound, u16 n);
 void           fn_800A8584(AudSource* pSource, u8 nTrack, s32 n);
@@ -565,11 +565,11 @@ u8   fn_800ACE38(AudVoice* pVoice, u32* puPos);
 
 // hlaudemitter.c
 void Aud_EmiTrkCB(u8 nId, u8 nBit, s32 n);
-int  fn_800AD0C4(void);                 // Aud_EmiDel on every instance in use, emitters emptied
+int  Aud_EmiInitSession(void);                 // Aud_EmiDel on every instance in use, emitters emptied
 void Aud_EmiDel(u8 nId);
 void Aud_EmiAliasSetTrackStatus(s16 nEmitter, u8 nTrack, u8 bOn);   // for every instance of an emitter: Aud_EmiSetTrackStatus
 void Aud_EmiAliasSetTrackVarRange(s16 nEmitter, u8 nTrack, u8 n);     // Aud_EmiSetTrackVarRange
 void Aud_EmiAliasSetTrackStep(s16 nEmitter, u8 nTrack, u8 n, int bCheck);   // Aud_EmiSetTrackStep
-void fn_800ADD54(s16 nEmitter, u8 nTrack, f32 fVolume);        // Aud_EmiSetTrackAttenuation
+void Aud_EmiAliasSetTrackAttenuation(s16 nEmitter, u8 nTrack, f32 fVolume);        // Aud_EmiSetTrackAttenuation
 
 #endif

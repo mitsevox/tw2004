@@ -139,7 +139,7 @@ void fn_801102AC(void) {
     lbl_802824D4 = nDisc;
     DVDChangeDiskAsync(&block, &id, (DVDCBCallback)fn_80110234);
     fn_80006FE8();
-    fn_800A7A98(1);
+    Aud_ExitSession(1);
     do {
         nStatus = DVDGetDriveStatus();
         fn_80006EDC();
@@ -174,7 +174,7 @@ void fn_80110390(void) {
     memcpy(&lbl_80213B60, DVDGetCurrentDiskID(), sizeof(DVDDiskID));
     lbl_802824D4 = nDisc;
     lbl_80213B60.nDiskNumber = nDisc;
-    fn_800A7A98(1);
+    Aud_ExitSession(1);
     DVDChangeDiskAsync(&lbl_80213B80, &lbl_80213B60, (DVDCBCallback)fn_80110234);
     DVDGetDriveStatus();
     lbl_802824D8 = 0;

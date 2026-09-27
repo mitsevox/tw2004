@@ -4,7 +4,7 @@
 // none),
 // then pass on to the functions at 0x800A8200-0x800A8524. Its extent is its data: it is the first
 // to use the .bss at 0x801F2668 and the .sdata2 block 0x80284008-0x80284018.
-// An instance's pCmd is its AudTable.c entry (fn_800A7C30's AudSource, the same number).
+// An instance's pCmd is its AudTable.c entry (Emi_AddInstance's AudSource, the same number).
 
 #include "core/audtrack.h"
 #include "golfer.h"
@@ -27,7 +27,7 @@ static f32 hlaudemitter_StrippedFn(f32 x) {
 }
 
 // Sets up the instances, all on the free list, and empties every emitter. Always 1.
-int fn_800ACECC(void) {
+int Aud_EmiInitOnce(void) {
     AudInstance* pInst;
     int i;
 
@@ -54,7 +54,7 @@ int fn_800ACECC(void) {
 }
 
 // Runs Aud_EmiDel on every instance in use, then empties every emitter. Always 1.
-int fn_800AD0C4(void) {
+int Aud_EmiInitSession(void) {
     AudInstance* pInst;
     AudInstance* pNext;
     s32 i;
@@ -70,16 +70,16 @@ int fn_800AD0C4(void) {
     return 1;
 }
 
-void fn_800AD1C4(void) {
+void Aud_EmiExitSession(void) {
 }
 
 // Once a frame: hands every instance's commands to its entry and clears them (an instance with
 // n24 1 sends its position again), then runs the rest of the sound engine.
-void fn_800AD1C8(void) {
+void Aud_EmiCycle(void) {
     AudInstance* pInst;
 
     for (pInst = lbl_801F2668.pActive; pInst != NULL; pInst = pInst->pNextActive) {
-        fn_800A7CA4(pInst->nId, pInst->pCmd->u0, pInst->pCmd->u1, pInst->pCmd->auParams,
+        Emi_UpdInstance(pInst->nId, pInst->pCmd->u0, pInst->pCmd->u1, pInst->pCmd->auParams,
                     pInst->pCmd->aPos, pInst->pCmd->uChanged);
         pInst->pCmd->u0 = 0;
         pInst->pCmd->u1 = 0;
@@ -112,9 +112,9 @@ u8 Aud_EmiAdd(s16 nSound, s16 nEmitter, int n24, int n28, void (*pfnCallback)(u8
     } else {
         lbl_801F2668.pFreeTail = NULL;
     }
-    // port: EA passes five more arguments than fn_800A7C30 takes
-    pInst->pCmd = ((AudSource* (*)(u8, s16, int, int, int, int, int))fn_800A7C30)(pInst->nId, nSound, 0, 0,
-                                                                                  0, 0, 0);
+    // port: EA passes five more arguments than Emi_AddInstance takes
+    pInst->pCmd = ((AudSource* (*)(u8, s16, int, int, int, int, int))Emi_AddInstance)(pInst->nId, nSound,
+                                                                                      0, 0, 0, 0, 0);
     pInst->pCmd->u0 = 0;
     pInst->pCmd->u1 = 0;
     pInst->pCmd->uChanged = 0;
@@ -151,7 +151,7 @@ u8 Aud_EmiAdd(s16 nSound, s16 nEmitter, int n24, int n28, void (*pfnCallback)(u8
     pInst->pNext = NULL;
     Mem_set(pInst->pCmd->auParams, 0, sizeof(pInst->pCmd->auParams));
     Mem_set(pInst->pCmd->aPos, 0, sizeof(pInst->pCmd->aPos));
-    fn_800A7CA4(pInst->nId, 0, 0, pInst->pCmd->auParams, pInst->pCmd->aPos, 0);
+    Emi_UpdInstance(pInst->nId, 0, 0, pInst->pCmd->auParams, pInst->pCmd->aPos, 0);
     return pInst->nId;
 }
 
@@ -163,7 +163,7 @@ void Aud_EmiDel(u8 nId) {
     AudInstance* pPrev;
 
     if (nId != 0xFF && (lbl_801F2668.uFlags & 1)) {
-        fn_800A8200(nId);
+        Emi_DelInstance(nId);
         if (pInst == lbl_801F2668.pActiveTail) {
             if (pInst->pPrevActive != NULL) {
                 lbl_801F2668.pActiveTail = pInst->pPrevActive;
@@ -260,7 +260,7 @@ void Aud_EmiSetAllTrackStatus(u8 nId, int n) {
 }
 
 // Sets the parameters of one of an instance's tracks.
-void fn_800AD790(u8 nId, u8 nTrack, u32 uParams) {
+void Aud_EmiSetControllerInt(u8 nId, u8 nTrack, u32 uParams) {
     AudInstance* pInst = Aud_CheckEmitterInstance(nId);
     if (pInst != NULL) {
         pInst->pCmd->auParams[nTrack] = uParams;
@@ -338,11 +338,11 @@ void Aud_EmiSetTrackStep(u8 nId, u8 nTrack, u8 n, int bCheck) {
 // Sets the volume of track nTrack of emitter instance nId, if the instance is alive.
 void Aud_EmiSetTrackAttenuation(u8 nId, u8 nTrack, f32 fVolume) {
     if (Aud_CheckEmitterInstance(nId) != NULL) {
-        fn_800A8424(nId, nTrack, fVolume);
+        Emi_SetTrackAttenuation(nId, nTrack, fVolume);
     }
 }
 
-void fn_800ADAF0(u8 nId, u8 nTrack, f32 fPitch) {
+void Aud_EmiSetTrackPitchFactor(u8 nId, u8 nTrack, f32 fPitch) {
     if (Aud_CheckEmitterInstance(nId) != NULL) {
         fn_800A84A4(nId, nTrack, fPitch);
     }
@@ -356,7 +356,7 @@ void Aud_EmiAliasSetTrackStatus(s16 nEmitter, u8 nTrack, u8 bOn) {
     }
 }
 
-void fn_800ADBC0(s16 nEmitter, f32* pPos, f32* pLast, u8 nView) {
+void Aud_EmiAliasSet3DPos(s16 nEmitter, f32* pPos, f32* pLast, u8 nView) {
     AudInstance* pInst;
     for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
         Aud_EmiSet3DPos(pInst->nId, pPos, pLast, nView);
@@ -381,7 +381,7 @@ void Aud_EmiAliasSetTrackStep(s16 nEmitter, u8 nTrack, u8 n, int bCheck) {
     }
 }
 
-void fn_800ADD54(s16 nEmitter, u8 nTrack, f32 fVolume) {
+void Aud_EmiAliasSetTrackAttenuation(s16 nEmitter, u8 nTrack, f32 fVolume) {
     AudInstance* pInst;
     for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
         Aud_EmiSetTrackAttenuation(pInst->nId, nTrack, fVolume);

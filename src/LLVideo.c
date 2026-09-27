@@ -147,10 +147,10 @@ u8     fn_80075BF4_IsFrameDue(Video* pVideo);
 
 // GameAudio.c
 u8   fn_800A7770(void);
-void fn_800A7994(void);
-void fn_800A79B4(void);
-void fn_800A79D4(void);
-void fn_800A79F4(void);
+void Aud_InitMovie(void);
+void Aud_ExitMovie(void);
+void Aud_StartMovie(void);
+void Aud_CycleMovie(void);
 // the renderer
 void fn_80008380(void);
 void fn_800083A0(void);
@@ -305,7 +305,7 @@ void LLVideo_HandleChunk(VideoChunk* pChunk) {
 // Stops a running movie and gives back every chunk it still holds.
 void fn_8007599C_Stop(Video* pVideo) {
     if (pVideo->b1020) {
-        fn_800A79B4();
+        Aud_ExitMovie();
         pVideo->b1020 = 0;
         if (pVideo->p1018 != NULL) {
             LLVideo_ChunkReleaseBuffer(pVideo->p1018);
@@ -322,7 +322,7 @@ void fn_80075A14_Start(Video* pVideo) {
     do {
         Gaud_Cycle();
     } while (fn_800A7770());
-    fn_800A7994();
+    Aud_InitMovie();
     LLVideo_QueueReset(&pVideo->queue);
     pVideo->p1018 = NULL;
     pVideo->b1020 = 1;
@@ -345,7 +345,7 @@ void fn_80075A98_SetLastFrameTime(Video* pVideo) {
 void fn_80075AD0_UpdateAll(void) {
     Video* pVideo;
     s32 i;
-    fn_800A79F4();
+    Aud_CycleMovie();
     for (i = 0; i < NUM_VIDEO_SLOTS; i++) {
         pVideo = lbl_80281200->apVideo[i];
         if (pVideo != NULL && pVideo->b1020 && !pVideo->b1021 && fn_80075BF4_IsFrameDue(pVideo)) {
@@ -359,7 +359,7 @@ void fn_80075AD0_UpdateAll(void) {
                     fn_8002FF98(&pVideo->pict, &pVideo->stream);
                     pVideo->bFirstFrame = 1;
                     fn_8003009C(&pVideo->pict, &pVideo->stream, 0);
-                    fn_800A79D4();
+                    Aud_StartMovie();
                 }
                 fn_800300A0(&pVideo->pict, &pVideo->stream);
             }

@@ -221,7 +221,7 @@ void fn_800A3A84(void);
 void fn_800A4C54(void);
 void fn_800A4E34(void);
 void fn_800A4FD8(void);
-void fn_800A7A34(int a, int b, u8 c, int d);
+void Aud_InitSession(int a, int b, u8 c, int d);
 void fn_800AE338(void);
 void fn_800B1608(void);
 void fn_800B1D78(void);
@@ -468,7 +468,7 @@ void fn_8006C7A8(void) {
 
 // Shuts down what fn_8006C7A8 started.
 void fn_8006C854(void) {
-    fn_800A7A98(0);
+    Aud_ExitSession(0);
     fn_8000C0F0();
     fn_80046264();
     fn_80093580();
@@ -549,7 +549,7 @@ void GO_vInitFE(void) {
     RC_vSetCurrentRenderCtx(lbl_80281E54);
     TI_vResetCounter(2);
     TI_vStartCounter(2);
-    fn_800A7A34(0, 0, 1, 0);
+    Aud_InitSession(0, 0, 1, 0);
     fn_8000B884();
     fn_80124B54();
     fn_800773F8();
@@ -597,7 +597,7 @@ void fn_8006CB2C(void) {
     fn_80037F80();
     fn_800B9AAC();
     fn_801020BC();
-    fn_800A7A98(1);
+    Aud_ExitSession(1);
     fn_8002A020();
     fn_8006DD44();
     fn_8006C854();
@@ -621,7 +621,7 @@ void GO_vInitIG(void) {
     RC_vSetCurrentRenderCtx(lbl_80281E54);
     fn_80030254();
     fn_8004B1A4();
-    fn_800A7A34(1, 0, (gSession.nSplitScreen != 0) + 1, 0);
+    Aud_InitSession(1, 0, (gSession.nSplitScreen != 0) + 1, 0);
     fn_8006F608();
     fn_80014594();
     fn_80085120();

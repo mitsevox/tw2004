@@ -28,9 +28,11 @@ def split(line):
         elif c == ',' and stack and i + 1 < LIMIT and line[i + 1:i + 2] == ' ':
             cands.append((len(stack), i, 'comma', stack[-1]))
         elif c == ' ' and base < i < LIMIT:
-            m = re.match(r' (&&|\|\||<<|>>|[-+*/%&|^]|==|!=|<=|>=|<|>|=)', line[i:])
+            m = re.match(r' (&&|\|\||<<|>>|[-+*/%&|^]|==|!=|<=|>=|<|>|=) ', line[i:])
             if m:
-                cands.append((len(stack), i, 'op', stack[-1] if stack else None))
+                # an assignment's = is the last resort: `a->b\n = f(...)` strands the target alone
+                rank = len(stack) + (3 if m.group(1) == '=' else 0)
+                cands.append((rank, i, 'op', stack[-1] if stack else None))
     def parts(c):
         _, i, kind, paren = c
         indent = paren + 1 if paren is not None and paren + 1 <= 60 else base + 8

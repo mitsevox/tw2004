@@ -12,7 +12,7 @@
 #include "core/startup.h"
 
 void fn_8001437C(void);
-void fn_800A3F38(u8 b, u8 b2);
+void Aud_Pause(u8 b, u8 b2);
 void VIWaitForRetrace(void);
 void fn_800B6924(void);
 void fn_800B6FCC(int nLines);
@@ -138,7 +138,7 @@ u8 fn_800B7490(void) {
         }
         if (bShown == 0) {
             if (nStatus != 4 && nStatus != 6 && nStatus != 11) {
-                fn_800A3F38(1, 1);
+                Aud_Pause(1, 1);
             }
             fn_8001437C();
             bShown = 1;
@@ -146,7 +146,7 @@ u8 fn_800B7490(void) {
         fn_800B7210(nStatus);
     }
     if (bShown && gSession.nPaused == 0) {
-        fn_800A3F38(0, 1);
+        Aud_Pause(0, 1);
     }
     return bShown;
 }

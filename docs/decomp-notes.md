@@ -281,7 +281,7 @@ They will be sorted into the sections below.
 - **[verified] `!(a ^ b)`** gives the original's `xor.` where `a == b` gives `cmpw` (u8 field vs int
   parameter; Glows fn_800985FC).
 - **[verified] The order of a for-loop's increments sets the order of the `addi`s** (hlaudmovie
-  fn_800A929C, AudTable fn_800A7CA4).
+  fn_800A929C, AudTable Emi_UpdInstance).
 - **[verified] A `(u8)` cast on each argument to an `int` parameter is computed once (CSE)**; a `u8`
   parameter masks at every call (Particle fn_80094534 91.3 -> 96.4).
 - **[verified] Read fields into locals before a run of matrix stores**, or CW reloads them after each store
