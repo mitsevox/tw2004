@@ -73,3 +73,18 @@ result.
   string), doldiff 0x800142BF. EA's is 8-aligned: labelled aligned(8), the same fake as TibExt.c's
   lbl_80194758 (the functions from fn_800142A4 on were sweeps and may be another file).
 - Result: GoRenderCtx_Gc .data 0x80186AD8..0x80186BD8. main.dol: OK.
+
+## auto_05_80186CC8_data (1064 B): IK chain tables and club part names -> char.c
+
+- Contents: lbl_80186CC8 / lbl_80186D54 / lbl_80186E1C (IKLinkDef[7], [10], [5]; 0x14 each, only
+  referenced from lbl_80186E80/EA0), lbl_80186E80 / lbl_80186EA0 (IKChainDef[2]; char.c's
+  lbl_80280E10/E18 point at them), and the seven char[6][13] club part tables lbl_80186EC0 ..
+  lbl_801870A0 (80-byte stride), all used only by char. Ends where char.c's .data (0x801870F0)
+  began; the units in between (Code80015470, Code80016198, ViewController) have no .data.
+- First try: defined after the sweep declarations -> char_tex_manager.c's pooled strings
+  ("_usrtextr", used by the first function) come first, doldiff 0x80017346 (70F0 -> 6CC8).
+  Defined before the #include of char_tex_manager.c they lead the .data: main.dol OK. Data-order
+  note in the code.
+- Result: char.c .data 0x80186CC8..0x801871D0. main.dol: OK.
+- For the audit: char.c's file comment still says the unity's .data starts at 0x801870F0 (now
+  0x80186CC8); not changed here (matching lanes do not edit comments).
