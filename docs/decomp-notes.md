@@ -505,6 +505,14 @@ They will be sorted into the sections below.
   EA's `clrlwi, li, clrlwi`. UISScreen fn_8016C6C4 90.48 -> 100 and fn_8016C614 90.21 -> 100
   (labelled). File-wide it is wrong: 12 other UISScreen functions drop (fn_8016B09C 100 -> 72).
   Worth a try where only the order of independent entry-block instructions differs.
+- **[verified, fake-match class] A dead `(s64)` high word adds one register-allocation neighbour
+  to everything live at its def, but it disappears only in a call's argument block.** The post-RA
+  peephole deletes a dead `srawi` only when a later instruction in the SAME block overwrites its
+  register; the argument moves before a `bl` do, so put the `(s64)` on a call argument (the
+  parameter converts it back). Anywhere else (a pointer init, a loop condition, a loaded field)
+  the srawi stays in the output. UISEvent fn_80165ACC 99.08 -> 100: natural form (no copies) with
+  `fn_8016B0F8(pStudio, (s64)*pData, (s64)nArgs, pArgs)` lifts pStudio, uScreen and p from 27 to
+  29 neighbours, so they leave the graph in the second sweep and take r31/r30/r29 (rasim replay).
 
 ### New from round 6 (2026-09-26 afternoon)
 
