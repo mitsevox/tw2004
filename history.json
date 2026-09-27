@@ -43781,5 +43781,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "b064346",
+"sha": "b06434689d0b1b650bb7253f0095c88e1dbd9bf7",
+"time": 1790543238,
+"subject": "gitattributes: union merge for name_sources.tsv (parallel naming lanes append rows)",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
