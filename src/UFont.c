@@ -20,7 +20,11 @@ void fn_80012E1C(LLFont* pFont, s32 v);
 void fn_80012E24(LLFont* pFont, UFontContext* pCtx);
 s32  fn_80012E4C(LLFont* pFont);
 
-UFontState lbl_801A34C0;
+// Section note: 32-aligned, and the 16 bytes before it (after LLFont.c's .bss) are that
+// alignment's padding. UFontState's own padding says the same: the palettes start at 0x40 and the
+// size is 0x1E0, what a 32-aligned struct gets (EA's form was probably an aligned member; the pad
+// fields in engine.h stand in for it).
+UFontState lbl_801A34C0 __attribute__((aligned(32)));
 UFontState* lbl_80280DE0 = &lbl_801A34C0;
 
 // Empties every font's queue and both pools.
