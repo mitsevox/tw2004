@@ -88,3 +88,15 @@ result.
 - Result: char.c .data 0x80186CC8..0x801871D0. main.dol: OK.
 - For the audit: char.c's file comment still says the unity's .data starts at 0x801870F0 (now
   0x80186CC8); not changed here (matching lanes do not edit comments).
+
+## auto_05_801871D0_data (528 B) + auto_07_80280E78_sdata (504 B, lane D's; orchestrator agreed): bone names -> mtalib.c
+
+- Contents: lbl_80187278, char*[90] (the bone names, last NULL; Skeleton.c reads it), its nine
+  9-byte names in .data just before it (0x801871D0..) and its 81 short names in .sdata
+  (0x80280E78..0x80281070). One definition with string literals makes all three.
+- Owner: not char.c (the char lane: its "IGdriver" and "" are separate copies despite -str
+  reuse). .data order is char.c | table | "mtalib.c" (0x801873E0), .sdata order char.c | names |
+  skalib.c: the only file between them in both is mtalib.c, whose "mtalib.c" string follows the
+  table (a file-scope definition precedes the literals of later functions, as seen in UMemPool.c).
+- Done: defined at the top of mtalib.c; mtalib .data 0x801871D0..0x801873F0, .sdata
+  0x80280E78..0x80281070. main.dol: OK on the first try.
