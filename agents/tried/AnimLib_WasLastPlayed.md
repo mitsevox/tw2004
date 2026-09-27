@@ -1,6 +1,9 @@
 # AnimLib_WasLastPlayed (skalib.c, 0x80025808)
 
-Status: OPEN, 89.07% on 2026-09-25.
+Status: SOLVED 2026-09-27 (lane b6), 89.07 -> 100: the slot's byte offset accumulated in one
+int local, `nOff = player + kind; nOff += style; nOff += club;` (sizeof strides), then
+`(char*)lbl_80281D14 + nOff` for both the store and strcmp (labelled fake match, same element).
+Commit: `git log --grep AnimLib_WasLastPlayed` on agent/b6.
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -9,6 +12,17 @@ unless you combine it with something new. Before you stop, add every attempt und
 ## Attempts
 
 (add yours here: date, lane, what, score)
+
+- 2026-09-27 b6 (quicktrial aligned, base 12). mwccdbg: the sum's last add (r47) coalesces
+  with strcmp's r4 and the base load takes r6 because the partial sums r45/r46 are coloured
+  first and take r0; EA keeps one sum in r7 and the base in r0. `#pragma scheduling once` 24;
+  dead `(s64)` round trips in strcmp's arguments: pName 10 (nKind to EA's r10), index nKind 10,
+  nStyle 11, nPlayer 14, nClub 12 (with scheduling once 18-24); `&T[0]`, `!strcmp`, `(s64)` on the
+  slot argument: 12. An offset local written in one expression: 13 (int/u32); offset inline in
+  both arguments 16, operands reversed 17. **One local accumulated with `+=`**: every order and
+  grouping of the four products (int/u32, declared first or last): `pk/s/c` (player+kind, then
+  style, then club) 0; kp/s/c 1, spk/c 1, pk/cs 2, spkc 3. sizeof strides or hex constants,
+  int/s32/u32: all 0.
 
 - 2026-09-26 r2-terrain (12 aligned): inline getter for the slot (whole index, player+kind
   row): 12; s32 copy of nClub, kind kept in nGroup: 12; strcmp on *ppSlot: 11 (not EA's: it
