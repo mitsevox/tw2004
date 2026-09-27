@@ -1004,7 +1004,7 @@ config.libs = [
             Object(Matching, "GameAnalysis.c"),
             Object(Matching, "GameModeAlternateShot.c"),
             Object(Matching, "GameModeBattle.c"),
-            Object(NonMatching, "GameModeBestBall.c"),
+            Object(Matching, "GameModeBestBall.c"),
             Object(Matching, "GameModeFourBall.c"),
             Object(Matching, "GameModeMatch.c"),
             Object(Matching, "GameMode5.c"),

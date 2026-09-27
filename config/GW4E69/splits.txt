@@ -1024,6 +1024,8 @@ GameModeBattle.c:
 
 GameModeBestBall.c:
 	.text       start:0x800E81C4 end:0x800E8D58
+	.rodata     start:0x80184DB0 end:0x80184DC0
+	.sdata2     start:0x80284650 end:0x80284658
 
 GameModeFourBall.c:
 	.text       start:0x800E8D58 end:0x800E9E40

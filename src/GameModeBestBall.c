@@ -285,7 +285,7 @@ void fn_800E8A68(void) {
     int nMargin;
     int nRating1;
     int nRating2;
-    int nOurs;
+    s32 nOurs;
     int nOther2;
     int nMoney;
     int nOther;
