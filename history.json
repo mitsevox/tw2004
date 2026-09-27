@@ -43269,5 +43269,21 @@
 "matched_functions": 7644,
 "total_functions": 7647,
 "exact": 7644
+},
+{
+"commit": "5419303",
+"sha": "541930313879564e1fbf3b877fdf5382bfc81b9c",
+"time": 1790519323,
+"subject": "Merge agent/b7: UIStudio fn_80168918 (UISInternalActivateControl) exact (labelled two-definition operand)",
+"report": true,
+"matched_code": 1538968,
+"complete_code": 1532032,
+"matched_data": 792003,
+"complete_data": 992151,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7645,
+"total_functions": 7647,
+"exact": 7645
 }
 ]
