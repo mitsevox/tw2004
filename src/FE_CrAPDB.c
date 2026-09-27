@@ -919,7 +919,8 @@ void FE_CrAP_PostAssetsLoad(void) {
     fn_80077B78();
 }
 
-// A part's choice i: its name, and the fields below (0 or -1 when there is no such choice).
+// The name of choice i under entry b of a part's list, as the part picker shows it (NULL: no such
+// choice).
 char* FE_CrAP_GetPartName(s16 nPart, int b, int i) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
@@ -928,6 +929,8 @@ char* FE_CrAP_GetPartName(s16 nPart, int b, int i) {
     return pAsset->szName;
 }
 
+// The first of the three colour ids of choice i under entry b of a part's list (n44; TW06 color1);
+// 0 when there is no such choice.
 s16 FE_CrAP_GetPartColor1(s16 nPart, int b, int i) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
@@ -936,6 +939,8 @@ s16 FE_CrAP_GetPartColor1(s16 nPart, int b, int i) {
     return pAsset->n44;
 }
 
+// The second colour id of choice i under entry b of a part's list (n46); 0 when there is no such
+// choice.
 s16 FE_CrAP_GetPartColor2(s16 nPart, int b, int i) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
@@ -944,6 +949,8 @@ s16 FE_CrAP_GetPartColor2(s16 nPart, int b, int i) {
     return pAsset->n46;
 }
 
+// The third colour id of choice i under entry b of a part's list (n48); 0 when there is no such
+// choice.
 s16 FE_CrAP_GetPartColor3(s16 nPart, int b, int i) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
@@ -962,6 +969,8 @@ s16 FE_CrAP_GetPartSponsor(s16 nPart, int b, int i) {
     return pAsset->n2C;
 }
 
+// The price of choice i under entry b of a part's list (n30; -1: no such choice). Selling it back
+// returns a quarter of it.
 s32 FE_CrAP_GetPartRetailPrice(s16 nPart, int b, int i) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
@@ -970,6 +979,7 @@ s32 FE_CrAP_GetPartRetailPrice(s16 nPart, int b, int i) {
     return pAsset->n30;
 }
 
+// The sale price of choice i under entry b of a part's list (n34; -1: no such choice).
 s32 FE_CrAP_GetPartSalePrice(s16 nPart, int b, int i) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
@@ -978,6 +988,8 @@ s32 FE_CrAP_GetPartSalePrice(s16 nPart, int b, int i) {
     return pAsset->n34;
 }
 
+// The level of choice i under entry b of a part's list (n38; -1: no such choice); the assets of
+// level 0 are owned from the start.
 s32 FE_CrAP_GetPartLevel(s16 nPart, int b, int i) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
@@ -986,50 +998,66 @@ s32 FE_CrAP_GetPartLevel(s16 nPart, int b, int i) {
     return pAsset->n38;
 }
 
-// A part's choice i: the attributes it raises and the tiers (see FE_CrAP_GetPartAttributeUpgrade1ByAssetID).
+// The first attribute choice i under entry b of a part's list raises (-1: none;
+// FE_CrAP_GetPartAttributeUpgrade1ByAssetID). The choice must exist: for a missing one the index -1
+// is used unchecked (FE_CrAPMessages.c checks first).
 int FE_CrAP_GetPartAttributeUpgrade1(s16 nPart, int b, int i) {
     return FE_CrAP_GetPartAttributeUpgrade1ByAssetID(
             FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i));
 }
 
+// The tier choice i under entry b of a part's list raises its first attribute to; the choice must
+// exist, as for FE_CrAP_GetPartAttributeUpgrade1.
 int FE_CrAP_GetPartAttributeModifier1(s16 nPart, int b, int i) {
     return FE_CrAP_GetPartAttributeModifier1ByAssetID(
             FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i));
 }
 
+// The second attribute choice i under entry b of a part's list raises (-1: none); the choice must
+// exist, as for FE_CrAP_GetPartAttributeUpgrade1.
 int FE_CrAP_GetPartAttributeUpgrade2(s16 nPart, int b, int i) {
     return FE_CrAP_GetPartAttributeUpgrade2ByAssetID(
             FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i));
 }
 
+// The tier choice i under entry b of a part's list raises its second attribute to; the choice must
+// exist, as for FE_CrAP_GetPartAttributeUpgrade1.
 int FE_CrAP_GetPartAttributeModifier2(s16 nPart, int b, int i) {
     return FE_CrAP_GetPartAttributeModifier2ByAssetID(
             FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i));
 }
 
-// The attributes an asset raises (-1: none) and the tier it raises each to; an asset of lock kind
-// 28 has those of the asset it names.
+// The first attribute an asset raises (-1: none); an asset of lock kind 28 gives that of the asset
+// its nLock names (sGetLinkedAssetID).
 int FE_CrAP_GetPartAttributeUpgrade1ByAssetID(int nAsset) {
     nAsset = sGetLinkedAssetID(nAsset);
     return lbl_80282460->pAssets[nAsset].nAttrA;
 }
 
+// The tier an asset raises its first attribute to; lock kind 28 as in
+// FE_CrAP_GetPartAttributeUpgrade1ByAssetID.
 int FE_CrAP_GetPartAttributeModifier1ByAssetID(int nAsset) {
     nAsset = sGetLinkedAssetID(nAsset);
     return lbl_80282460->pAssets[nAsset].nTierA;
 }
 
+// The second attribute an asset raises (-1: none); lock kind 28 as in
+// FE_CrAP_GetPartAttributeUpgrade1ByAssetID.
 int FE_CrAP_GetPartAttributeUpgrade2ByAssetID(int nAsset) {
     nAsset = sGetLinkedAssetID(nAsset);
     return lbl_80282460->pAssets[nAsset].nAttrB;
 }
 
+// The tier an asset raises its second attribute to; lock kind 28 as in
+// FE_CrAP_GetPartAttributeUpgrade1ByAssetID.
 int FE_CrAP_GetPartAttributeModifier2ByAssetID(int nAsset) {
     nAsset = sGetLinkedAssetID(nAsset);
     return lbl_80282460->pAssets[nAsset].nTierB;
 }
 
-// A part's choice i: its lock kind and number (-1: no such choice).
+// How choice i under entry b of a part's list is unlocked: its lock kind (2: a Game Boy Advance
+// link, 12: an EA Sports Bio level, 17: an event's reward; 28: it shares another asset's attributes
+// instead), -1 when there is no such choice. fn_80078008 tests the kinds.
 s8 FE_CrAP_GetPartGMLockID(s16 nPart, int b, int i) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
@@ -1038,6 +1066,8 @@ s8 FE_CrAP_GetPartGMLockID(s16 nPart, int b, int i) {
     return pAsset->nLockKind;
 }
 
+// The number that goes with the lock kind of choice i under entry b of a part's list (the bio
+// level, the event, or for kind 28 the linked asset); -1 when there is no such choice.
 s16 FE_CrAP_GetPartGMLockVal(s16 nPart, int b, int i) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
@@ -1046,6 +1076,7 @@ s16 FE_CrAP_GetPartGMLockVal(s16 nPart, int b, int i) {
     return pAsset->nLock;
 }
 
+// An asset's lock kind (see FE_CrAP_GetPartGMLockID); -1 when nAsset is not an asset.
 s8 FE_CrAP_GetPartGMLockIDByAssetNum(int nAsset) {
     if (nAsset < 0 || nAsset >= lbl_80282460->nAssets) {
         return -1;
@@ -1053,6 +1084,8 @@ s8 FE_CrAP_GetPartGMLockIDByAssetNum(int nAsset) {
     return lbl_80282460->pAssets[nAsset].nLockKind;
 }
 
+// The number that goes with an asset's lock kind (see FE_CrAP_GetPartGMLockVal); -1 when nAsset is
+// not an asset.
 s16 FE_CrAP_GetPartGMLockValByAssetNum(int nAsset) {
     if (nAsset < 0 || nAsset >= lbl_80282460->nAssets) {
         return -1;
@@ -1211,6 +1244,7 @@ s32 FE_CrAP_GetPartLevelFromAssetIndex(int nAsset) {
     return pAsset->n38;
 }
 
+// The database is allocated (FE_CrAP_InitModule has run); its assets may still be on their way.
 u8 FE_CrAP_IsCrAPDBLoaded(void) {
     return lbl_80282460 != NULL;
 }
@@ -1350,7 +1384,8 @@ void FE_CrAP_GetEntryNumFromAssetIDCategorySubcategory(int nAsset, s16 nPart, in
     *pnPlace = nCount;
 }
 
-// An asset with this n40 is offered: it matches the database's n4, or 2 (any).
+// An asset of gender n is offered for the golfer being created: n is the current gender
+// (FE_CrAP_SetCurrentGender) or 2, either.
 u8 FE_IsValidCurrentGender(s8 n) {
     if (n == lbl_80282460->n4 || n == 2) {
         return 1;
@@ -1428,7 +1463,8 @@ u8 FE_CrAP_IsItemEquipped(s16 nPart, int b, int i) {
     return 0;
 }
 
-// Copy the name at nOffset in the 'CR_S' strings into pDst ("" for "NONE").
+// Copy the colour name at offset nOffset of the 'CR_S' names into pDst ("NONE" gives ""). 0 when
+// the names are not loaded, pDst is NULL or nOffset is -1.
 u8 FE_CrAP_GetColorNameFromID(int nOffset, char* pDst) {
     char* pStrings = lbl_80282460->pStrings;
     if (pStrings == NULL) {
@@ -1447,8 +1483,9 @@ u8 FE_CrAP_GetColorNameFromID(int nOffset, char* pDst) {
     return 1;
 }
 
-// The string at offset id in the 'CR_S' strings (the names the assets use: categories, animations,
-// camera shots); NULL when they are not loaded or id is -1.
+// The string at offset nCategory of the 'CR_S' names (any of the names the assets use: categories,
+// colours, animations, camera shots, unlock texts); NULL when they are not loaded or the offset is
+// -1.
 char* FE_CrAP_GetStringFromTable(int nCategory) {
     if (lbl_80282460->pStrings == NULL) {
         return NULL;
@@ -1459,8 +1496,9 @@ char* FE_CrAP_GetStringFromTable(int nCategory) {
     return lbl_80282460->pStrings + nCategory;
 }
 
-// Copy how a part's choice i is unlocked into pDst: the Game Boy Advance link for lock kind 2,
-// otherwise its text in 'CR_S' (pDst is left as it is when it has none).
+// Copy how choice i under entry b of a part's list is unlocked into pDst: "Game Boy Advance Link
+// Required" for lock kind 2, otherwise its unlock text from 'CR_S' (n110; pDst is left as it is
+// when it has none). 0 when the names are not loaded, pDst is NULL or there is no such choice.
 u8 FE_CrAP_GetUnlockMessageFrom(s16 nPart, int b, int i, char* pDst) {
     int nAsset;
     int nWanted = FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(nPart, b);
@@ -1523,8 +1561,9 @@ u8 FE_CrAP_TryClubSwappingAsset(CrAPAsset* pAsset) {
     return 1;
 }
 
-// The club skins an asset's category goes on, into apSkins; how many (0: not a club category).
-// The six skins are the drivers, fairway woods, putters, two of irons and the wedges.
+// Put the club skins an asset's category goes on into apSkins; how many (0: not a club category, or
+// no menu golfer with club skins). Of the six skins (0 drivers, 1 fairway woods, 2 putters, 3 and 4
+// irons, 5 wedges), shafts and grips go on all six.
 int FE_CrAP_GetClubSkinsForAsset(CrAPAsset* pAsset, Skin** apSkins) {
     char* szCategory = FE_CrAP_GetStringFromTable(pAsset->nCategory);
 
@@ -1565,7 +1604,9 @@ int FE_CrAP_GetClubSkinsForAsset(CrAPAsset* pAsset, Skin** apSkins) {
     return 0;
 }
 
-// A part 12 asset of the category "balls": make its ball the profile's (nGolferOutfit) and show it.
+// A part 12 asset of the category "balls": pass its ball's name (its first set variant) to
+// fn_8008E960 and store the ball's index (fn_800484F4) in the profile's nGolferOutfit; 1 when done.
+// 0 for any other asset, or when there is no menu golfer with club skins.
 u8 FE_CrAP_TryBallSwappingAsset(CrAPAsset* pAsset) {
     char szName[16];                    // the size is unknown (the frame allows up to 20)
     char* szCategory;
