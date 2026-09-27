@@ -6,17 +6,21 @@
 
 #include "game_types.h"
 
-// Four floats, copied as one (UISScreen.c).
-typedef struct UISVec4 {
-    f32 a[4];
-} UISVec4;
+// Four floats, copied as one (UISScreen.c). Names: EA's (Madden 2003 STABS).
+typedef struct UISColorVector_t {
+    f32 r;                          // 0x00
+    f32 g;                          // 0x04
+    f32 b;                          // 0x08
+    f32 a;                          // 0x0C
+} UISColorVectorT;
 
-// The values screen nodes are drawn with (UISScreen.c): each node adds its UISNodeInfo.afAdd to
-// the first and multiplies its afMul into the second for its children.
-extern UISVec4 _AdditiveColorFactor;
-extern UISVec4 _MultiplerColorFactor;
+// The values screen controls are drawn with (UISScreen.c): each control adds its
+// UISControlInfoT.Transform.AdditiveFactor to the first and multiplies its MultiplerFactor into the
+// second for its children.
+extern UISColorVectorT _AdditiveColorFactor;
+extern UISColorVectorT _MultiplerColorFactor;
 
-UISVec4* UISGetColorAdditive(void);
-UISVec4* UISGetColorMultipler(void);
+UISColorVectorT* UISGetColorAdditive(void);
+UISColorVectorT* UISGetColorMultipler(void);
 
 #endif

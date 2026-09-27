@@ -10,8 +10,8 @@
 
 // The file's globals: the UI Studio's colour multiply and add (UISGetColorMultipler,
 // UISGetColorAdditive), read again at each draw.
-UISVec4* lbl_80281F34;
-UISVec4* lbl_80281F30;
+UISColorVectorT* lbl_80281F34;
+UISColorVectorT* lbl_80281F30;
 
 // UFont.c's text state setters.
 void UFont_SetFont(s32 nFont);
@@ -122,11 +122,11 @@ void fn_800922A8(UIText* pText) {
         fX += (vEndOut.x - fX) / 2.0f;
     }
     if (pText->nFlags & 0x10) {
-        aColor[0] = (u8)(lbl_80281F30->a[0] * (pText->aShadowColor[0] + lbl_80281F34->a[0])) / 255.0f;
-        aColor[1] = (u8)(lbl_80281F30->a[1] * (pText->aShadowColor[1] + lbl_80281F34->a[1])) / 255.0f;
-        aColor[2] = (u8)(lbl_80281F30->a[2] * (pText->aShadowColor[2] + lbl_80281F34->a[2])) / 255.0f;
+        aColor[0] = (u8)(lbl_80281F30->r * (pText->aShadowColor[0] + lbl_80281F34->r)) / 255.0f;
+        aColor[1] = (u8)(lbl_80281F30->g * (pText->aShadowColor[1] + lbl_80281F34->g)) / 255.0f;
+        aColor[2] = (u8)(lbl_80281F30->b * (pText->aShadowColor[2] + lbl_80281F34->b)) / 255.0f;
         aColor[3] = t.f5C +
-                    (u8)(lbl_80281F30->a[3] * (pText->aShadowColor[3] + lbl_80281F34->a[3])) / 255.0f;
+                    (u8)(lbl_80281F30->a * (pText->aShadowColor[3] + lbl_80281F34->a)) / 255.0f;
         if (aColor[3] < 0.0f) {
             aColor[3] = 0.0f;
         }
@@ -151,10 +151,10 @@ void fn_800922A8(UIText* pText) {
         fB = pText->aColor[2];
         fA = pText->aColor[3];
     }
-    aColor[0] = (u8)(lbl_80281F30->a[0] * (fR + lbl_80281F34->a[0])) / 255.0f;
-    aColor[1] = (u8)(lbl_80281F30->a[1] * (fG + lbl_80281F34->a[1])) / 255.0f;
-    aColor[2] = (u8)(lbl_80281F30->a[2] * (fB + lbl_80281F34->a[2])) / 255.0f;
-    aColor[3] = (u8)(lbl_80281F30->a[3] * (fA + lbl_80281F34->a[3])) / 512.0f + t.f5C;
+    aColor[0] = (u8)(lbl_80281F30->r * (fR + lbl_80281F34->r)) / 255.0f;
+    aColor[1] = (u8)(lbl_80281F30->g * (fG + lbl_80281F34->g)) / 255.0f;
+    aColor[2] = (u8)(lbl_80281F30->b * (fB + lbl_80281F34->b)) / 255.0f;
+    aColor[3] = (u8)(lbl_80281F30->a * (fA + lbl_80281F34->a)) / 512.0f + t.f5C;
     if (aColor[3] < 0.0f) {
         aColor[3] = 0.0f;
     }

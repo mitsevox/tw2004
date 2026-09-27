@@ -9,46 +9,48 @@
 
 #include "frontend/uistudio.h"
 
-void _ParseHints(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent,
+void _ParseHints(UISInfoT* pStudio, UISScreenT* pScreen, UISStackInfoT* pStack, u32 nNode, u32 uEvent,
                  s32 nArgs, s32* pArgs);
 char* _WriteFloat(char* pOut, char* pEnd, s32 nWidth, s32 nPrec, f32 f);
 
 // .bss, reverse address order
-UISVec4 _MultiplerColorFactor;
-UISVec4 _AdditiveColorFactor;
+UISColorVectorT _MultiplerColorFactor;
+UISColorVectorT _AdditiveColorFactor;
 
 // Whether one of pNode's groups links to the node pInfo belongs to.
-static inline u8 UIS_NodeLinks(UISScreenFile* pData, UISNode* pNode, UISNodeInfo* pInfo) {
-    UISGroup* pGroup;
-    UISEntry* pEntry;
+static inline u8 UIS_NodeLinks(UISScrDataT* pData, UISControlT* pNode, UISControlInfoT* pInfo) {
+    UISLayerT* pGroup;
+    UISObjT* pEntry;
     u32 i;
     u32 j;
 
-    for (i = 0; i < pNode->nGroups; i++) {
-        pGroup = pNode->ppGroups[i];
-        for (j = 0; j < pGroup->nEntries; j++) {
-            pEntry = &pGroup->pEntries[j];
-            if (pEntry->uHandler == 0xFFFF && pData->pNodes[pEntry->u4.nNode].pInfo == pInfo) return 1;
+    for (i = 0; i < pNode->NumLayers; i++) {
+        pGroup = pNode->Layers[i];
+        for (j = 0; j < pGroup->NumObjs; j++) {
+            pEntry = &pGroup->Objs[j];
+            if (pEntry->PluginIndex == 0xFFFF && pData->Controls[pEntry->nNode].pControlInfo == pInfo) {
+                return 1;
+            }
         }
     }
     return 0;
 }
 
-// The info of the first node pNode links to whose u4 is set, or NULL.
-static inline UISNodeInfo* UIS_LinkedOn(UISScreenFile* pData, UISNode* pNode) {
-    UISGroup* pGroup;
-    UISEntry* pEntry;
-    UISNodeInfo* pLinked;
+// The info of the first node pNode links to whose IsEnabled is set, or NULL.
+static inline UISControlInfoT* UIS_LinkedOn(UISScrDataT* pData, UISControlT* pNode) {
+    UISLayerT* pGroup;
+    UISObjT* pEntry;
+    UISControlInfoT* pLinked;
     u32 i;
     u32 j;
 
-    for (i = 0; i < pNode->nGroups; i++) {
-        pGroup = pNode->ppGroups[i];
-        for (j = 0; j < pGroup->nEntries; j++) {
-            pEntry = &pGroup->pEntries[j];
-            if (pEntry->uHandler == 0xFFFF) {
-                pLinked = pData->pNodes[pEntry->u4.nNode].pInfo;
-                if (pLinked->u4 != 0) return pLinked;
+    for (i = 0; i < pNode->NumLayers; i++) {
+        pGroup = pNode->Layers[i];
+        for (j = 0; j < pGroup->NumObjs; j++) {
+            pEntry = &pGroup->Objs[j];
+            if (pEntry->PluginIndex == 0xFFFF) {
+                pLinked = pData->Controls[pEntry->nNode].pControlInfo;
+                if (pLinked->IsEnabled != 0) return pLinked;
             }
         }
     }
@@ -101,13 +103,13 @@ static inline char* UIS_PutString(char* pOut, char* pEnd, const char* sz, s32 nW
 // fake match: scheduled once, not twice: EA's entry block has `li i` between the two u16 masks,
 // which only the single scheduling pass gives (twice puts the li last). Code is unchanged.
 #pragma scheduling once
-u16 UISFindScreen(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
+u16 UISFindScreen(UISInfoT* pStudio, u16 uGroup, u16 uScreen) {
     u16 i;
-    UISScreen* pScreen;
+    UISScreenT* pScreen;
 
-    for (i = 0; i < pStudio->nScreens; i++) {
-        pScreen = &pStudio->pScreens[i];
-        if (pScreen->uGroup == uGroup && pScreen->uScreen == uScreen) break;
+    for (i = 0; i < pStudio->NumScreens; i++) {
+        pScreen = &pStudio->Screens[i];
+        if (pScreen->GroupID == uGroup && pScreen->ScreenID == uScreen) break;
     }
     return i;
 }
@@ -117,12 +119,12 @@ u16 UISFindScreen(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
 // fake match: not pasted into its callers: the file is built with -inline auto,deferred (see
 // configure.py), and EA calls this one.
 // A node's handler of the kind marked 0x8000 for an event.
-u8* UISFindEventPC(UISNode* pNode, u32 uEvent) {
+u8* UISFindEventPC(UISControlT* pNode, u32 uEvent) {
     u32 i;
-    for (i = 0; i < pNode->nHandlers; i++) {
-        UISHandler* pHandler = &pNode->pHandlers[i];
-        if ((pHandler->uFlags & 0x8000) && pHandler->uEvent == (u16)uEvent) {
-            return pHandler->u4.pScript;
+    for (i = 0; i < pNode->NumMaps; i++) {
+        UISMapT* pHandler = &pNode->Maps[i];
+        if ((pHandler->ControlIndex & 0x8000) && pHandler->EventID == (u16)uEvent) {
+            return pHandler->pFnc;
         }
     }
     return NULL;
@@ -136,14 +138,14 @@ u8* UISFindEventPC(UISNode* pNode, u32 uEvent) {
 // fake match: scheduled once, not twice: EA's entry block has `li i` between the two masks,
 // which only the single scheduling pass gives (twice puts the li last). Code is unchanged.
 #pragma scheduling once
-u8* UISFindSubControlEventPC(UISNode* pNode, u16 uId, u32 uEvent) {
+u8* UISFindSubControlEventPC(UISControlT* pNode, u16 uId, u32 uEvent) {
     u32 i;
     int nId = uId;
-    for (i = 0; i < pNode->nHandlers; i++) {
-        UISHandler* pHandler = &pNode->pHandlers[i];
-        if (!(pHandler->uFlags & 0xC000) && pHandler->uEvent == (u16)uEvent &&
-            (pHandler->uFlags & 0x2FFF) == nId) {
-            return pHandler->u4.pScript;
+    for (i = 0; i < pNode->NumMaps; i++) {
+        UISMapT* pHandler = &pNode->Maps[i];
+        if (!(pHandler->ControlIndex & 0xC000) && pHandler->EventID == (u16)uEvent &&
+            (pHandler->ControlIndex & 0x2FFF) == nId) {
+            return pHandler->pFnc;
         }
     }
     return NULL;
@@ -152,12 +154,12 @@ u8* UISFindSubControlEventPC(UISNode* pNode, u16 uId, u32 uEvent) {
 #pragma auto_inline reset
 
 // The node's handler of the kind marked 0x4000 for an event.
-u8* _UISFindHintPC(UISNode* pNode, u32 uEvent) {
+u8* _UISFindHintPC(UISControlT* pNode, u32 uEvent) {
     u32 i;
-    for (i = 0; i < pNode->nHandlers; i++) {
-        UISHandler* pHandler = &pNode->pHandlers[i];
-        if ((pHandler->uFlags & 0x4000) && pHandler->uEvent == (u16)uEvent) {
-            return pHandler->u4.pScript;
+    for (i = 0; i < pNode->NumMaps; i++) {
+        UISMapT* pHandler = &pNode->Maps[i];
+        if ((pHandler->ControlIndex & 0x4000) && pHandler->EventID == (u16)uEvent) {
+            return pHandler->pFnc;
         }
     }
     return NULL;
@@ -166,12 +168,12 @@ u8* _UISFindHintPC(UISNode* pNode, u32 uEvent) {
 // Pushes a call frame on pStack (the saved word, the extra word, both argument lists, the node's
 // info and a 0) and runs pScript on it. The frame stays on the stack only when the script
 // returns 3 (it paused).
-s32 UISExecuteFnc(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UISWordStack* pStack,
+s32 UISExecuteFnc(UISInfoT* pStudio, UISScreenT* pScreen, UISControlInfoT* pInfo, UISStackInfoT* pStack,
                   u8* pScript, s32 nArgs, s32* pArgs, u32 nArgs2, const s32* pArgs2, u8 bExtra, s32 nExtra,
                   s32* pnSaved) {
     // fake match: pStackCopy is pStack through a void* copy, declared first; the local's higher
     // variable number makes the allocator colour it before pFrame and pnSaved (EA's r31).
-    UISWordStack* pStackCopy = (UISWordStack*)(void*)pStack;
+    UISStackInfoT* pStackCopy = (UISStackInfoT*)(void*)pStack;
     s32* pFrame;
     u32 i;
     s32 nResult;
@@ -182,92 +184,92 @@ s32 UISExecuteFnc(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UIS
     // same encoding), which the allocator never coalesces, so pScript leaves r7 as in EA.
     // port: the pointer goes through a 32-bit integer
     pScript = (u8*)((u32)pScript | (u32)pScriptCopy);
-    pFrame = pStackCopy->pC;
+    pFrame = pStackCopy->pStack;
     if (pnSaved == NULL) {
         *pFrame = 0;
     } else {
         *pFrame = *pnSaved;
     }
-    pStackCopy->pC++;
+    pStackCopy->pStack++;
     if (bExtra) {
-        *pStackCopy->pC = nExtra;
-        pStackCopy->pC++;
+        *pStackCopy->pStack = nExtra;
+        pStackCopy->pStack++;
     }
     for (i = 0; i < nArgs; i++) {
-        *pStackCopy->pC = pArgs[i];
-        pStackCopy->pC++;
+        *pStackCopy->pStack = pArgs[i];
+        pStackCopy->pStack++;
     }
     for (i = 0; i < nArgs2; i++) {
-        *pStackCopy->pC = pArgs2[i];
-        pStackCopy->pC++;
+        *pStackCopy->pStack = pArgs2[i];
+        pStackCopy->pStack++;
     }
     // port: the frame keeps the info pointer in a word
-    *pStackCopy->pC = (s32)pInfo;
-    pStackCopy->pC++;
-    *pStackCopy->pC = 0;
-    pStackCopy->pC++;
-    pStackCopy->p10 = pScript;
+    *pStackCopy->pStack = (s32)pInfo;
+    pStackCopy->pStack++;
+    *pStackCopy->pStack = 0;
+    pStackCopy->pStack++;
+    pStackCopy->pPC = pScript;
     nResult = UISStackProcess(pStudio, pFrame, pStackCopy, pScreen, pInfo);
     if (pnSaved != NULL) {
         *pnSaved = *pFrame;
     }
     if (nResult != 3) {
-        pStackCopy->pC = pFrame;
+        pStackCopy->pStack = pFrame;
     }
     return nResult;
 }
 
-f32* UISGetActionPtrValue(s32 n20, UISNodeInfo* pInfo) {
+f32* UISGetActionPtrValue(s32 n20, UISControlInfoT* pInfo) {
     switch (n20) {
     case 16:
-        return &pInfo->af8[6];
+        return &pInfo->Transform.Rotation.x;
     case 17:
-        return &pInfo->af8[7];
+        return &pInfo->Transform.Rotation.y;
     case 18:
-        return &pInfo->af8[8];
+        return &pInfo->Transform.Rotation.z;
     case 19:
-        return &pInfo->af8[0];
+        return &pInfo->Transform.Offset.x;
     case 20:
-        return &pInfo->af8[1];
+        return &pInfo->Transform.Offset.y;
     case 21:
-        return &pInfo->af8[2];
+        return &pInfo->Transform.Offset.z;
     case 22:
-        return &pInfo->af8[9];
+        return &pInfo->Transform.Scale.x;
     case 23:
-        return &pInfo->af8[10];
+        return &pInfo->Transform.Scale.y;
     case 24:
-        return &pInfo->af8[11];
+        return &pInfo->Transform.Scale.z;
     case 25:
-        return &pInfo->af8[3];
+        return &pInfo->Transform.Pivot.x;
     case 26:
-        return &pInfo->af8[4];
+        return &pInfo->Transform.Pivot.y;
     case 27:
-        return &pInfo->af8[5];
+        return &pInfo->Transform.Pivot.z;
     case 32:
-        return &pInfo->afAdd[3];
+        return &pInfo->Transform.AdditiveFactor.a;
     case 33:
-        return &pInfo->afAdd[0];
+        return &pInfo->Transform.AdditiveFactor.r;
     case 34:
-        return &pInfo->afAdd[1];
+        return &pInfo->Transform.AdditiveFactor.g;
     case 35:
-        return &pInfo->afAdd[2];
+        return &pInfo->Transform.AdditiveFactor.b;
     case 36:
-        return &pInfo->afMul[3];
+        return &pInfo->Transform.MultiplerFactor.a;
     case 37:
-        return &pInfo->afMul[0];
+        return &pInfo->Transform.MultiplerFactor.r;
     case 38:
-        return &pInfo->afMul[1];
+        return &pInfo->Transform.MultiplerFactor.g;
     case 39:
-        return &pInfo->afMul[2];
+        return &pInfo->Transform.MultiplerFactor.b;
     default:
-        return &pInfo->afMul[3];
+        return &pInfo->Transform.MultiplerFactor.a;
     }
 }
 
 #pragma auto_inline off
 // fake match: not pasted into its callers: the file is built with -inline auto,deferred (see
 // configure.py), and EA calls this one.
-UISVec4* UISGetColorMultipler(void) {
+UISColorVectorT* UISGetColorMultipler(void) {
     return &_MultiplerColorFactor;
 }
 #pragma auto_inline reset
@@ -275,7 +277,7 @@ UISVec4* UISGetColorMultipler(void) {
 #pragma auto_inline off
 // fake match: not pasted into its callers: the file is built with -inline auto,deferred (see
 // configure.py), and EA calls this one.
-UISVec4* UISGetColorAdditive(void) {
+UISColorVectorT* UISGetColorAdditive(void) {
     return &_AdditiveColorFactor;
 }
 #pragma auto_inline reset
@@ -285,24 +287,24 @@ UISVec4* UISGetColorAdditive(void) {
 // configure.py), and EA calls this one.
 void UISSetColorMultipler(f32 f1, f32 f2, f32 f3, f32 f4) {
     // fake match: the original stores the fourth value second
-    _MultiplerColorFactor.a[0] = f1;
-    _MultiplerColorFactor.a[3] = f4;
-    _MultiplerColorFactor.a[1] = f2;
-    _MultiplerColorFactor.a[2] = f3;
+    _MultiplerColorFactor.r = f1;
+    _MultiplerColorFactor.a = f4;
+    _MultiplerColorFactor.g = f2;
+    _MultiplerColorFactor.b = f3;
 }
 #pragma auto_inline reset
 
 #pragma auto_inline off
 // fake match: not pasted into its callers: the file is built with -inline auto,deferred (see
 // configure.py), and EA calls this one.
-// The values every node is drawn with: _ParseObjects adds a node's afAdd to the first and
-// multiplies its afMul into the second for the node's children.
+// The values every node is drawn with: _ParseObjects adds a node's Transform.AdditiveFactor to the first and
+// multiplies its Transform.MultiplerFactor into the second for the node's children.
 void UISSetColorAdditive(f32 f1, f32 f2, f32 f3, f32 f4) {
     // fake match: the original stores the fourth value second
-    _AdditiveColorFactor.a[0] = f1;
-    _AdditiveColorFactor.a[3] = f4;
-    _AdditiveColorFactor.a[1] = f2;
-    _AdditiveColorFactor.a[2] = f3;
+    _AdditiveColorFactor.r = f1;
+    _AdditiveColorFactor.a = f4;
+    _AdditiveColorFactor.g = f2;
+    _AdditiveColorFactor.b = f3;
 }
 #pragma auto_inline reset
 
@@ -431,7 +433,7 @@ static inline char* fn_8016B844_Get(char* p) {
 
 // Formats szFormat with pArgs into pOut (nSize bytes). Returns the length written, or -1.
 // EA bug: '-' is never cleared, so every conversion after one with '-' is left-justified too.
-s32 UISSprintf(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UISWord* pArgs) {
+s32 UISSprintf(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UISParamT* pArgs) {
     // Register note: this declaration order gives EA's c r7, cPad r8 and nUpper r0.
     char* pEnd;
     s32 nArg;
@@ -488,12 +490,12 @@ s32 UISSprintf(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UIS
             nUpper = bUpper ? 'A' - 'a' : 0;
             switch (c) {
             case 'c':
-                *pOut++ = pArgs[nArg++].n;
+                *pOut++ = pArgs[nArg++].iValue;
                 continue;
             case 's': {
-                UISText* pText = pArgs[nArg++].pText;
-                if (pText->szText != NULL) {
-                    pOut = UIS_PutString(pOut, pEnd, pText->szText, nWidth, bLeft);
+                UISStringT* pText = pArgs[nArg++].strAddr;
+                if (pText->ptr != NULL) {
+                    pOut = UIS_PutString(pOut, pEnd, pText->ptr, nWidth, bLeft);
                 } else {
                     pOut = UIS_PutString(pOut, pEnd, "(null)", nWidth, bLeft);
                 }
@@ -507,7 +509,7 @@ s32 UISSprintf(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UIS
                 pOut = fn_8016B844_CaseD(pOut, pEnd, u, nWidth, cPad, bUnsigned);
                 continue;
             case 'f':
-                pOut = _WriteFloat(pOut, pEnd, nWidth, nPrec, pArgs[nArg++].f);
+                pOut = _WriteFloat(pOut, pEnd, nWidth, nPrec, pArgs[nArg++].fValue);
                 continue;
             case 'X':
             case 'p':
@@ -526,21 +528,21 @@ s32 UISSprintf(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UIS
 }
 
 // Formats pFormat's text with pArgs into pOut's buffer.
-void UISStringFormat(u32 u0, UISText* pOut, UISText* pFormat, s32 nArgs, const UISWord* pArgs) {
+void UISStringFormat(u32 u0, UISStringT* pOut, UISStringT* pFormat, s32 nArgs, const UISParamT* pArgs) {
     if (pFormat != NULL && pOut != NULL) {
-        UISSprintf(pOut->szText, pOut->nSize, pFormat->szText, nArgs, pArgs);
+        UISSprintf(pOut->ptr, pOut->length, pFormat->ptr, nArgs, pArgs);
     }
 }
 
 // Finds the node that links to pInfo's node and returns the info of the first node it links to
-// whose u4 is set.
-UISNodeInfo* UISFindSiblingEnableControl(UISScreen* pScreen, UISNodeInfo* pInfo) {
-    UISScreenFile* pData;
+// whose IsEnabled is set.
+UISControlInfoT* UISFindSiblingEnableControl(UISScreenT* pScreen, UISControlInfoT* pInfo) {
+    UISScrDataT* pData;
     u32 i;
 
-    pData = pScreen->pData;
-    for (i = 0; i < pData->nNodes; i++) {
-        UISNode* pNode = &pData->pNodes[i];
+    pData = pScreen->pScrData;
+    for (i = 0; i < pData->NumControls; i++) {
+        UISControlT* pNode = &pData->Controls[i];
         if (UIS_NodeLinks(pData, pNode, pInfo)) {
             return UIS_LinkedOn(pData, pNode);
         }
@@ -549,8 +551,8 @@ UISNodeInfo* UISFindSiblingEnableControl(UISScreen* pScreen, UISNodeInfo* pInfo)
 }
 
 // Moves a loaded screen nMove places up or down the screen table, one swap at a time, keeping
-// the current screen, the rate functions and the p60 records on the screens they named.
-void UISMoveScreenDrawPosition(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 nMove) {
+// the current screen, the rate functions and the ModalStack records on the screens they named.
+void UISMoveScreenDrawPosition(UISInfoT* pStudio, u16 uGroup, u16 uScreen, s32 nMove) {
     s32 nScreens;
     s32 nLimit;
     s32 nIndex;
@@ -560,10 +562,10 @@ void UISMoveScreenDrawPosition(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n
     u32 i;
     u32 j;
     s32 nStep;
-    UISScreen tmp;
+    UISScreenT tmp;
 
     nIndex = UISFindScreen(pStudio, uGroup, uScreen);
-    nScreens = pStudio->nScreens;
+    nScreens = pStudio->NumScreens;
     if (nIndex < nScreens) {
         if (nMove >= 0) {
             nCount = nMove;
@@ -581,49 +583,49 @@ void UISMoveScreenDrawPosition(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n
             nTo += nStep;
             if (nTo >= nLimit || nTo < 0) break;
             nLimit = nScreens;
-            if (pStudio->nCurScreen == nTo) {
-                pStudio->nCurScreen = nFrom;
-            } else if (pStudio->nCurScreen == nFrom) {
-                pStudio->nCurScreen = nTo;
+            if (pStudio->ActiveScreenIdx == nTo) {
+                pStudio->ActiveScreenIdx = nFrom;
+            } else if (pStudio->ActiveScreenIdx == nFrom) {
+                pStudio->ActiveScreenIdx = nTo;
             }
-            for (i = 0; i < pStudio->nRateFns; i++) {
-                if (pStudio->pRateFns[i].pScreen == &pStudio->pScreens[nTo]) {
-                    pStudio->pRateFns[i].pScreen = &pStudio->pScreens[nFrom];
-                } else if (pStudio->pRateFns[i].pScreen == &pStudio->pScreens[nFrom]) {
-                    pStudio->pRateFns[i].pScreen = &pStudio->pScreens[nTo];
+            for (i = 0; i < pStudio->NumRateFncs; i++) {
+                if (pStudio->RateFncs[i].pScreen == &pStudio->Screens[nTo]) {
+                    pStudio->RateFncs[i].pScreen = &pStudio->Screens[nFrom];
+                } else if (pStudio->RateFncs[i].pScreen == &pStudio->Screens[nFrom]) {
+                    pStudio->RateFncs[i].pScreen = &pStudio->Screens[nTo];
                 }
             }
-            for (j = 0; j < pStudio->n5C; j++) {
-                if (pStudio->p60[j].pScreen == &pStudio->pScreens[nTo]) {
-                    pStudio->p60[j].pScreen = &pStudio->pScreens[nFrom];
-                } else if (pStudio->p60[j].pScreen == &pStudio->pScreens[nFrom]) {
-                    pStudio->p60[j].pScreen = &pStudio->pScreens[nTo];
+            for (j = 0; j < pStudio->NumModals; j++) {
+                if (pStudio->ModalStack[j].pScreen == &pStudio->Screens[nTo]) {
+                    pStudio->ModalStack[j].pScreen = &pStudio->Screens[nFrom];
+                } else if (pStudio->ModalStack[j].pScreen == &pStudio->Screens[nFrom]) {
+                    pStudio->ModalStack[j].pScreen = &pStudio->Screens[nTo];
                 }
             }
-            memcpy(&tmp, &pStudio->pScreens[nTo], sizeof(UISScreen));
-            memcpy(&pStudio->pScreens[nTo], &pStudio->pScreens[nFrom], sizeof(UISScreen));
-            memcpy(&pStudio->pScreens[nFrom], &tmp, sizeof(UISScreen));
+            memcpy(&tmp, &pStudio->Screens[nTo], sizeof(UISScreenT));
+            memcpy(&pStudio->Screens[nTo], &pStudio->Screens[nFrom], sizeof(UISScreenT));
+            memcpy(&pStudio->Screens[nFrom], &tmp, sizeof(UISScreenT));
         }
     }
 }
 
 // Runs the 0x4000 handlers for an event of node nNode and of every node it links to, the linked
 // nodes first.
-void _ParseHints(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent,
+void _ParseHints(UISInfoT* pStudio, UISScreenT* pScreen, UISStackInfoT* pStack, u32 nNode, u32 uEvent,
                  s32 nArgs, s32* pArgs) {
-    UISNode* pNode;
+    UISControlT* pNode;
     u32 i;
     u8* pScript;
 
     // fake match: the byte offset as a 64-bit product (low word = nNode * 20, the same address as
-    // pNodes[nNode]); its dead high word (li 20; mulhw) goes first in the pre-allocation schedule,
-    // which moves the pStudio copy after the pData load as in the original, and is deleted later.
+    // Controls[nNode]); its dead high word (li 20; mulhw) goes first in the pre-allocation schedule,
+    // which moves the pStudio copy after the pScrData load as in the original, and is deleted later.
     // port: the offset is truncated to 32 bits.
-    pNode = (UISNode*)((u8*)pScreen->pData->pNodes + (s32)nNode * (s64)sizeof(UISNode));
-    for (i = 0; i < pNode->nHandlers; i++) {
-        UISHandler* pHandler = &pNode->pHandlers[i];
-        if (pHandler->uEvent == 0xFFFF) {
-            _ParseHints(pStudio, pScreen, pStack, pHandler->u4.nNode, uEvent, nArgs, pArgs);
+    pNode = (UISControlT*)((u8*)pScreen->pScrData->Controls + (s32)nNode * (s64)sizeof(UISControlT));
+    for (i = 0; i < pNode->NumMaps; i++) {
+        UISMapT* pHandler = &pNode->Maps[i];
+        if (pHandler->EventID == 0xFFFF) {
+            _ParseHints(pStudio, pScreen, pStack, pHandler->nNode, uEvent, nArgs, pArgs);
         }
     }
     // The node's script for the event (_UISFindHintPC's search). The original has _UISFindHintPC
@@ -631,27 +633,28 @@ void _ParseHints(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u3
     // better (93%) but adds a function the original does not have, so the unit could not link.
     pScript = _UISFindHintPC(pNode, uEvent);
     if (pScript != NULL) {
-        UISExecuteFnc(pStudio, pScreen, pNode->pInfo, pStack, pScript, nArgs, pArgs, 0, NULL, 0, 0, NULL);
+        UISExecuteFnc(pStudio, pScreen, pNode->pControlInfo, pStack, pScript, nArgs, pArgs, 0, NULL, 0, 0,
+                      NULL);
     }
 }
 
-void UISDoHint(UIStudio* pStudio, u32 uEvent, s32 nArgs, s32* pArgs) {
+void UISDoHint(UISInfoT* pStudio, u32 uEvent, s32 nArgs, s32* pArgs) {
     u32 i;
-    u32 nScreens = pStudio->nScreens;
+    u32 nScreens = pStudio->NumScreens;
     for (i = 0; i < nScreens; i++) {
-        UISScreen* pScreen = &pStudio->pScreens[i];
-        pStudio->uFlags |= 2;
-        _ParseHints(pStudio, pScreen, &pStudio->stack64, 0, uEvent, nArgs, pArgs);
-        pStudio->uFlags &= ~2;
+        UISScreenT* pScreen = &pStudio->Screens[i];
+        pStudio->CriticalRegions |= 2;
+        _ParseHints(pStudio, pScreen, &pStudio->EventStack, 0, uEvent, nArgs, pArgs);
+        pStudio->CriticalRegions &= ~2;
     }
 }
 
 // Send an event to every screen. While the studio is busy (flag 2: sending an event; 4: running
 // its rate functions), it is queued on the event stack instead.
-void fn_8016B09C(UIStudio* pStudio, u32 uEvent, s32 nArgs, s32* pArgs) {
-    UISEventData data;
-    if ((pStudio->uFlags & 2) || (pStudio->uFlags & 4)) {
-        data.au[0] = uEvent;
+void fn_8016B09C(UISInfoT* pStudio, u32 uEvent, s32 nArgs, s32* pArgs) {
+    UISThreadGroupInfoT data;
+    if ((pStudio->CriticalRegions & 2) || (pStudio->CriticalRegions & 4)) {
+        data.GenericInfo.Data[0] = uEvent;
         UISAddThreadAction(-1, -1, pStudio, 9, &data, nArgs, pArgs);
     } else {
         UISDoHint(pStudio, uEvent, nArgs, pArgs);
@@ -663,48 +666,48 @@ static inline u8 fn_8016AEEC_Read(u8 b) { return b; }
 
 // Runs the screen file's start entries that have not run yet, then every handler under node
 // nNode; a handler run with message -1 is marked as run.
-void _ParseInitialize(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
+void _ParseInitialize(UISInfoT* pStudio, UISScreenT* pScreen, u32 nNode, s32 nMsg) {
     // fake match: the second loop's pEntry is declared here, ahead of pNode and j, and shadowed by
     // the first loop's own pEntry; this order gives the original's loop registers.
     u8 bLast;
-    UISEntry* pEntry;
-    UISNode* pNode;
+    UISObjT* pEntry;
+    UISControlT* pNode;
     u32 j;
 
-    if (pScreen->pData != NULL) {
-        pNode = &pScreen->pData->pNodes[nNode];
+    if (pScreen->pScrData != NULL) {
+        pNode = &pScreen->pScrData->Controls[nNode];
         bLast = fn_8016AEEC_Read(nMsg == -1);
         // fake match: nNode (dead after pNode) is the counter of both entry loops, which gives the
         // original's loop registers.
-        for (nNode = 0; nNode < pScreen->pData->nStart; nNode++) {
-            UISEntry* pEntry = &pScreen->pData->pStart[nNode];
-            if (pEntry->n2 == 0) {
-                if (pEntry->uHandler < pStudio->nHandlers) {
-                    UISHandlerFn pfnHandler = pStudio->ppfnHandlers[pEntry->uHandler];
+        for (nNode = 0; nNode < pScreen->pScrData->NumStaticObjects; nNode++) {
+            UISObjT* pEntry = &pScreen->pScrData->StaticObjects[nNode];
+            if (pEntry->bInitialized == 0) {
+                if (pEntry->PluginIndex < pStudio->NumPlugins) {
+                    UISPluginFncT* pfnHandler = pStudio->Plugins[pEntry->PluginIndex].pFnc;
                     if (pfnHandler != NULL) {
-                        pfnHandler(pEntry->u4.pnOffset != NULL ? (u8*)pScreen->pData + *pEntry->u4.pnOffset
+                        pfnHandler(pEntry->pData != NULL ? (u8*)pScreen->pScrData + *pEntry->pData
                                                                : NULL,
                                    nMsg, 0, NULL, 0);
                     }
                 }
-                pEntry->n2 = 1;
+                pEntry->bInitialized = 1;
             }
         }
-        for (j = 0; j < pNode->nGroups; j++) {
+        for (j = 0; j < pNode->NumLayers; j++) {
             // fake match: b is bLast, and the stored `b | bLast` is bLast. The frontend cannot fold the
             // OR of two variables, so after the copy is propagated it stays as `or r30,r27,r27` (the
             // original's `mr r30,r27`, the same encoding), which the allocator never coalesces.
             int b = bLast;
-            UISGroup* pGroup = pNode->ppGroups[j];
-            for (nNode = 0; nNode < pGroup->nEntries; nNode++) {
-                pEntry = &pGroup->pEntries[nNode];
-                if (pEntry->uHandler == 0xFFFF) {
-                    _ParseInitialize(pStudio, pScreen, pEntry->u4.nNode, nMsg);
-                } else if (pEntry->uHandler < pStudio->nHandlers) {
-                    UISHandlerFn pfnHandler = pStudio->ppfnHandlers[pEntry->uHandler];
+            UISLayerT* pGroup = pNode->Layers[j];
+            for (nNode = 0; nNode < pGroup->NumObjs; nNode++) {
+                pEntry = &pGroup->Objs[nNode];
+                if (pEntry->PluginIndex == 0xFFFF) {
+                    _ParseInitialize(pStudio, pScreen, pEntry->nNode, nMsg);
+                } else if (pEntry->PluginIndex < pStudio->NumPlugins) {
+                    UISPluginFncT* pfnHandler = pStudio->Plugins[pEntry->PluginIndex].pFnc;
                     if (pfnHandler != NULL) {
-                        pfnHandler((u8*)pScreen->pData + *pEntry->u4.pnOffset, nMsg, 0, NULL, 0);
-                        pEntry->n2 = b | bLast;
+                        pfnHandler((u8*)pScreen->pScrData + *pEntry->pData, nMsg, 0, NULL, 0);
+                        pEntry->bInitialized = b | bLast;
                     }
                 }
             }
@@ -714,30 +717,30 @@ void _ParseInitialize(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg
 
 // Looks under a node (nKind 8) or a group (nKind 7) for the one pInfo belongs to and records it
 // as pInfo's owner. Returns -1 when it is not found.
-s32 _DetermineVisibility(UISScreen* pScreen, UISNodeInfo* pInfo, s32 nKind, void* p) {
+s32 _DetermineVisibility(UISScreenT* pScreen, UISControlInfoT* pInfo, s32 nKind, void* p) {
     // fake match: this declaration order (with the copies below) gives EA's registers.
-    UISGroup* pGroup;
+    UISLayerT* pGroup;
     u32 i;
-    UISNode* pNode;
-    // fake match: one count for both loops (nGroups, then nEntries): with it nEntries takes r28
+    UISControlT* pNode;
+    // fake match: one count for both loops (NumLayers, then NumObjs): with it NumObjs takes r28
     // and case 7's counter r27 (EA's li r27,0 / lwz r28 / mr r29,r27); with two, they swap.
     u32 nCount;
-    UISEntry* pEntry;
-    UISNode* pLoop8;
-    UISNode* pPrev8;
-    UISGroup* pLoop7;
+    UISObjT* pEntry;
+    UISControlT* pLoop8;
+    UISControlT* pPrev8;
+    UISLayerT* pLoop7;
     s32 nFound;
 
     if (pInfo == NULL || p == NULL || pScreen == NULL) return -1;
     switch (nKind) {
     case 8:
         pNode = p;
-        if (pNode->pInfo == pInfo) {
-            pInfo->p0 = pNode;
-            return pNode->pInfo->p0 != NULL;
+        if (pNode->pControlInfo == pInfo) {
+            pInfo->IsVisible = pNode;
+            return pNode->pControlInfo->IsVisible != NULL;
         }
-        if (pNode->pInfo != NULL && pNode->pInfo->p0 != NULL) {
-            nCount = pNode->nGroups;
+        if (pNode->pControlInfo != NULL && pNode->pControlInfo->IsVisible != NULL) {
+            nCount = pNode->NumLayers;
             // fake match: pLoop8 and pPrev8 always hold pNode; the copies carried round the loop
             // keep pNode apart from p (EA's mr r27,r6 with the first read through r6), and taking
             // pPrev8 before the copy keeps EA's argument order (li r5,7 before the lwzx).
@@ -745,7 +748,7 @@ s32 _DetermineVisibility(UISScreen* pScreen, UISNodeInfo* pInfo, s32 nKind, void
             for (i = 0; i < nCount; i++) {
                 pPrev8 = pLoop8;
                 pLoop8 = pNode;
-                nFound = _DetermineVisibility(pScreen, pInfo, 7, pPrev8->ppGroups[i]);
+                nFound = _DetermineVisibility(pScreen, pInfo, 7, pPrev8->Layers[i]);
                 // fake match: nFound goes through a 64-bit shift up and back down (the value is
                 // unchanged). The shifts become a chain of word copies; each copy-propagation pass
                 // removes one link, so EA's copy of the call result survives (mr r0,r3; cmpwi r0,-1).
@@ -758,21 +761,21 @@ s32 _DetermineVisibility(UISScreen* pScreen, UISNodeInfo* pInfo, s32 nKind, void
         break;
     case 7:
         pGroup = p;
-        if (pGroup->pInfo == pInfo) {
-            pInfo->p0 = pGroup;
-            return pGroup->pInfo->p0 != NULL;
+        if (pGroup->pLayerInfo == pInfo) {
+            pInfo->IsVisible = pGroup;
+            return pGroup->pLayerInfo->IsVisible != NULL;
         }
-        if (pGroup->pInfo != NULL && pGroup->pInfo->p0 != NULL) {
-            nCount = pGroup->nEntries;
+        if (pGroup->pLayerInfo != NULL && pGroup->pLayerInfo->IsVisible != NULL) {
+            nCount = pGroup->NumObjs;
             // fake match: pLoop7 always holds pGroup; the copy carried round the loop keeps pGroup
             // apart from p (EA's mr r26,r6 with the first read through r6).
             pLoop7 = pGroup;
             for (i = 0; i < nCount; i++) {
-                pEntry = &pLoop7->pEntries[i];
+                pEntry = &pLoop7->Objs[i];
                 pLoop7 = pGroup;
-                if (pEntry->uHandler == 0xFFFF) {
+                if (pEntry->PluginIndex == 0xFFFF) {
                     nFound = _DetermineVisibility(pScreen, pInfo, 8,
-                                                  &pScreen->pData->pNodes[pEntry->u4.nNode]);
+                                                  &pScreen->pScrData->Controls[pEntry->nNode]);
                     // fake match: the same 64-bit shift as in case 8, then a 64-bit round trip (both
                     // leave the value unchanged); this block needs one copy link more to keep EA's
                     // copy of the call result (mr r0,r3; cmpwi r0,-1).
@@ -790,26 +793,26 @@ s32 _DetermineVisibility(UISScreen* pScreen, UISNodeInfo* pInfo, s32 nKind, void
 
 // Runs every handler under a node (nKind 8) or a group (nKind 7) with message -4 and a pointer to
 // n. Without bAll, nodes and groups whose info has no owner are skipped.
-void _ParseVisibility(UIStudio* pStudio, UISScreen* pScreen, s32 n, s32 nKind, void* p, u8 bAll) {
+void _ParseVisibility(UISInfoT* pStudio, UISScreenT* pScreen, s32 n, s32 nKind, void* p, u8 bAll) {
     // fake match: this declaration order (with the copies below) gives EA's registers.
-    UISGroup* pGroup;
-    UISNode* pNode;
+    UISLayerT* pGroup;
+    UISControlT* pNode;
     u32 i;
-    // fake match: one count for both loops (nGroups, then nEntries), as in _DetermineVisibility: with it
+    // fake match: one count for both loops (NumLayers, then NumObjs), as in _DetermineVisibility: with it
     // case 7's counter and count take EA's registers (li r29,0 / lwz r30 / mr r31,r29).
     u32 nCount;
-    UISEntry* pEntry;
-    UISNode* pPrev8;
-    UISNode* pLoop8;
-    UISGroup* pLoop7;
+    UISObjT* pEntry;
+    UISControlT* pPrev8;
+    UISControlT* pLoop8;
+    UISLayerT* pLoop7;
 
     if (pStudio == NULL) return;
     if (pScreen == NULL || p == NULL) return;
     switch (nKind) {
     case 8:
         pNode = p;
-        if (pNode->pInfo != NULL && (bAll || pNode->pInfo->p0 != NULL)) {
-            nCount = pNode->nGroups;
+        if (pNode->pControlInfo != NULL && (bAll || pNode->pControlInfo->IsVisible != NULL)) {
+            nCount = pNode->NumLayers;
             // fake match: pLoop8 and pPrev8 always hold pNode; the copies carried round the loop
             // keep pNode apart from p (EA's mr r29,r7 with the first read through r7), and taking
             // pPrev8 before the copy keeps EA's argument order (the lwzx before li r6,7).
@@ -817,26 +820,26 @@ void _ParseVisibility(UIStudio* pStudio, UISScreen* pScreen, s32 n, s32 nKind, v
             for (i = 0; i < nCount; i++) {
                 pPrev8 = pLoop8;
                 pLoop8 = pNode;
-                _ParseVisibility(pStudio, pScreen, n, 7, pPrev8->ppGroups[i], 0);
+                _ParseVisibility(pStudio, pScreen, n, 7, pPrev8->Layers[i], 0);
             }
         }
         break;
     case 7:
         pGroup = p;
-        if (pGroup->pInfo != NULL && (bAll || pGroup->pInfo->p0 != NULL)) {
-            nCount = pGroup->nEntries;
+        if (pGroup->pLayerInfo != NULL && (bAll || pGroup->pLayerInfo->IsVisible != NULL)) {
+            nCount = pGroup->NumObjs;
             // fake match: pLoop7 always holds pGroup; the copy carried round the loop keeps pGroup
             // apart from p (EA's mr r28,r7 with the first read through r7).
             pLoop7 = pGroup;
             for (i = 0; i < nCount; i++) {
-                pEntry = &pLoop7->pEntries[i];
+                pEntry = &pLoop7->Objs[i];
                 pLoop7 = pGroup;
-                if (pEntry->uHandler == 0xFFFF) {
-                    _ParseVisibility(pStudio, pScreen, n, 8, &pScreen->pData->pNodes[pEntry->u4.nNode], 0);
-                } else if (pEntry->uHandler < pStudio->nHandlers) {
-                    UISHandlerFn pfnHandler = pStudio->ppfnHandlers[pEntry->uHandler];
+                if (pEntry->PluginIndex == 0xFFFF) {
+                    _ParseVisibility(pStudio, pScreen, n, 8, &pScreen->pScrData->Controls[pEntry->nNode], 0);
+                } else if (pEntry->PluginIndex < pStudio->NumPlugins) {
+                    UISPluginFncT* pfnHandler = pStudio->Plugins[pEntry->PluginIndex].pFnc;
                     if (pfnHandler != NULL) {
-                        pfnHandler((u8*)pScreen->pData + *pEntry->u4.pnOffset, -4, 1, &n, 0);
+                        pfnHandler((u8*)pScreen->pScrData + *pEntry->pData, -4, 1, &n, 0);
                     }
                 }
             }
@@ -847,21 +850,21 @@ void _ParseVisibility(UIStudio* pStudio, UISScreen* pScreen, s32 n, s32 nKind, v
 
 // Hands node nNode and every node it links to to the transform callback with operation nOp.
 // Operations 0 and 3 also reach groups whose info has no owner.
-void _ParseTransforms(UIStudio* pStudio, int nOp, UISScreen* pScreen, u32 nNode) {
-    UISNode* pNode;
+void _ParseTransforms(UISInfoT* pStudio, int nOp, UISScreenT* pScreen, u32 nNode) {
+    UISControlT* pNode;
     u32 i;
 
-    if (pScreen->pData != NULL) {
-        pNode = &pScreen->pData->pNodes[nNode];
-        pStudio->pfnTransform(nOp, pNode->pInfo->af8);
-        for (i = 0; i < pNode->nGroups; i++) {
-            UISGroup* pGroup = pNode->ppGroups[i];
-            if (pGroup->pInfo->p0 != NULL || nOp == 0 || nOp == 3) {
+    if (pScreen->pScrData != NULL) {
+        pNode = &pScreen->pScrData->Controls[nNode];
+        pStudio->pTransformFnc(nOp, &pNode->pControlInfo->Transform);
+        for (i = 0; i < pNode->NumLayers; i++) {
+            UISLayerT* pGroup = pNode->Layers[i];
+            if (pGroup->pLayerInfo->IsVisible != NULL || nOp == 0 || nOp == 3) {
                 u32 j;
-                for (j = 0; j < pGroup->nEntries; j++) {
-                    UISEntry* pEntry = &pGroup->pEntries[j];
-                    if (pEntry->uHandler == 0xFFFF) {
-                        _ParseTransforms(pStudio, nOp, pScreen, pEntry->u4.nNode);
+                for (j = 0; j < pGroup->NumObjs; j++) {
+                    UISObjT* pEntry = &pGroup->Objs[j];
+                    if (pEntry->PluginIndex == 0xFFFF) {
+                        _ParseTransforms(pStudio, nOp, pScreen, pEntry->nNode);
                     }
                 }
             }
@@ -871,79 +874,83 @@ void _ParseTransforms(UIStudio* pStudio, int nOp, UISScreen* pScreen, u32 nNode)
 
 // Draws node nNode and the nodes it links to: runs the screen file's start entries, then, if the
 // node is shown, draws its children with its own values folded into the studio's.
-void _ParseObjects(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
-    UISNode* pNode;
+void _ParseObjects(UISInfoT* pStudio, UISScreenT* pScreen, u32 nNode, s32 nMsg) {
+    UISControlT* pNode;
     u32 j;
-    UISVec4 mul;
-    UISVec4 add;
-    UISNodeInfo* pInfo;
+    UISColorVectorT mul;
+    UISColorVectorT add;
+    UISControlInfoT* pInfo;
 
     // fake match: pScreen through a 64-bit round trip (the same pointer); the conversion's dead
     // high word (srawi) is deleted by the register allocator, and it moves the pScreen copy after
-    // the pData load as in the original. port: truncates the pointer to 32 bits.
-    if (((UISScreen*)(s64)(s32)pScreen)->pData != NULL) {
-        pNode = &pScreen->pData->pNodes[nNode];
+    // the pScrData load as in the original. port: truncates the pointer to 32 bits.
+    if (((UISScreenT*)(s64)(s32)pScreen)->pScrData != NULL) {
+        pNode = &pScreen->pScrData->Controls[nNode];
         // fake match: nNode (dead after pNode) is the counter of both entry loops, which gives the
         // original's loop registers.
-        for (nNode = 0; nNode < pScreen->pData->nStart; nNode++) {
-            UISEntry* pEntry = &pScreen->pData->pStart[nNode];
-            if (pEntry->uHandler < pStudio->nHandlers) {
-                UISHandlerFn pfnHandler = pStudio->ppfnHandlers[pEntry->uHandler];
+        for (nNode = 0; nNode < pScreen->pScrData->NumStaticObjects; nNode++) {
+            UISObjT* pEntry = &pScreen->pScrData->StaticObjects[nNode];
+            if (pEntry->PluginIndex < pStudio->NumPlugins) {
+                UISPluginFncT* pfnHandler = pStudio->Plugins[pEntry->PluginIndex].pFnc;
                 if (pfnHandler != NULL) {
-                    pfnHandler(pEntry->u4.pnOffset != NULL ? (u8*)pScreen->pData + *pEntry->u4.pnOffset
+                    pfnHandler(pEntry->pData != NULL ? (u8*)pScreen->pScrData + *pEntry->pData
                                                            : NULL,
                                nMsg, 0, NULL, 0);
                 }
             }
         }
-        if (pNode->pInfo->p0 != NULL) {
+        if (pNode->pControlInfo->IsVisible != NULL) {
             mul = *UISGetColorMultipler();
             // fake match: the same 64-bit round trip on the pointer (the same address); its dead
             // high word gives the original's order for the copy's loads among the products.
             // port: truncates the pointer to 32 bits.
-            add = *(UISVec4*)(s64)(s32)UISGetColorAdditive();
-            pInfo = pNode->pInfo;
-            UISSetColorMultipler(mul.a[0] * pInfo->afMul[0], mul.a[1] * pInfo->afMul[1],
-                                 mul.a[2] * pInfo->afMul[2], mul.a[3] * pInfo->afMul[3]);
-            UISSetColorAdditive(add.a[0] + pInfo->afAdd[0], add.a[1] + pInfo->afAdd[1],
-                                add.a[2] + pInfo->afAdd[2], add.a[3] + pInfo->afAdd[3]);
-            pStudio->pfnTransform(1, pNode->pInfo->af8);
-            for (j = 0; j < pNode->nGroups; j++) {
-                UISGroup* pGroup = pNode->ppGroups[j];
-                if (pGroup->pInfo->p0 != NULL) {
-                    for (nNode = 0; nNode < pGroup->nEntries; nNode++) {
-                        UISEntry* pEntry = &pGroup->pEntries[nNode];
-                        if (pEntry->uHandler == 0xFFFF) {
-                            _ParseObjects(pStudio, pScreen, pEntry->u4.nNode, nMsg);
-                        } else if (pEntry->n2 != 0 && pEntry->uHandler < pStudio->nHandlers) {
-                            UISHandlerFn pfnHandler = pStudio->ppfnHandlers[pEntry->uHandler];
+            add = *(UISColorVectorT*)(s64)(s32)UISGetColorAdditive();
+            pInfo = pNode->pControlInfo;
+            UISSetColorMultipler(mul.r * pInfo->Transform.MultiplerFactor.r,
+                                 mul.g * pInfo->Transform.MultiplerFactor.g,
+                                 mul.b * pInfo->Transform.MultiplerFactor.b,
+                                 mul.a * pInfo->Transform.MultiplerFactor.a);
+            UISSetColorAdditive(add.r + pInfo->Transform.AdditiveFactor.r,
+                                add.g + pInfo->Transform.AdditiveFactor.g,
+                                add.b + pInfo->Transform.AdditiveFactor.b,
+                                add.a + pInfo->Transform.AdditiveFactor.a);
+            pStudio->pTransformFnc(1, &pNode->pControlInfo->Transform);
+            for (j = 0; j < pNode->NumLayers; j++) {
+                UISLayerT* pGroup = pNode->Layers[j];
+                if (pGroup->pLayerInfo->IsVisible != NULL) {
+                    for (nNode = 0; nNode < pGroup->NumObjs; nNode++) {
+                        UISObjT* pEntry = &pGroup->Objs[nNode];
+                        if (pEntry->PluginIndex == 0xFFFF) {
+                            _ParseObjects(pStudio, pScreen, pEntry->nNode, nMsg);
+                        } else if (pEntry->bInitialized != 0 && pEntry->PluginIndex < pStudio->NumPlugins) {
+                            UISPluginFncT* pfnHandler = pStudio->Plugins[pEntry->PluginIndex].pFnc;
                             if (pfnHandler != NULL) {
-                                pfnHandler((u8*)pScreen->pData + *pEntry->u4.pnOffset, nMsg, 0, NULL, 0);
+                                pfnHandler((u8*)pScreen->pScrData + *pEntry->pData, nMsg, 0, NULL, 0);
                             }
                         }
                     }
                 }
             }
-            UISSetColorMultipler(mul.a[0], mul.a[1], mul.a[2], mul.a[3]);
-            UISSetColorAdditive(add.a[0], add.a[1], add.a[2], add.a[3]);
-            pStudio->pfnTransform(2, pNode->pInfo->af8);
+            UISSetColorMultipler(mul.r, mul.g, mul.b, mul.a);
+            UISSetColorAdditive(add.r, add.g, add.b, add.a);
+            pStudio->pTransformFnc(2, &pNode->pControlInfo->Transform);
         }
     }
 }
 
 // Sends event uEvent to node nNode and, first, to the nodes it links to. A node takes events only
-// while its info has u4 and u60 set, except the studio's own events (n5 -2 to -5 and -8 to -11).
-// A linked node that answers with 1 gets the handler this node has for it. Returns 2 as soon as a
-// handler returns 2.
-s32 _ParseMaps(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent, u32 n5,
+// while its info has IsEnabled and CanHandleMessages set, except the studio's own events (n5 -2
+// to -5 and -8 to -11). A linked node that answers with 1 gets the handler this node has for it.
+// Returns 2 as soon as a handler returns 2.
+s32 _ParseMaps(UISInfoT* pStudio, UISScreenT* pScreen, UISStackInfoT* pStack, u32 nNode, u32 uEvent, u32 n5,
                s32 nArgs, s32* pArgs, u8* pbOut) {
     // fake match: uEventLoop, uEventPost and uEventPre all hold uEvent (see below); these copies,
     // this declaration order and the function-level pHandler / nRet / pLinked give EA's registers.
     s32 uEventLoop;
     u32 uEventPost;
     s32 uEventPre;
-    UISHandler* pHandler;
-    UISNode* pNode;
+    UISMapT* pHandler;
+    UISControlT* pNode;
     s32 nResult;
     u32 i;
     s32 nRet;
@@ -952,18 +959,18 @@ s32 _ParseMaps(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 
     u8 bOut;
 
     nResult = 0;
-    if (pScreen->pData == NULL || nNode >= pScreen->pData->nNodes) return 0;
+    if (pScreen->pScrData == NULL || nNode >= pScreen->pScrData->NumControls) return 0;
     uEventPost = uEvent;
-    pNode = &pScreen->pData->pNodes[nNode];
-    if ((pNode->pInfo->u4 != 0 && pNode->pInfo->u60 != 0) || n5 - (u32)-10 <= 2 ||
-        n5 - (u32)-5 <= 3 || n5 == (u32)-11) {
+    pNode = &pScreen->pScrData->Controls[nNode];
+    if ((pNode->pControlInfo->IsEnabled != 0 && pNode->pControlInfo->CanHandleMessages != 0) ||
+        n5 - (u32)-10 <= 2 || n5 - (u32)-5 <= 3 || n5 == (u32)-11) {
         // fake match: uEventPre is uEvent: the OR's low word is uEvent | 0 (uEvent shifted up only
         // fills the high word, which is dropped). It is a copy only after constant propagation, so
         // with the loop's two links below the late copy-propagation passes stop at this one: EA's
         // kept `mr r19,r28` for the linked handler's event. The dead high-word OR leaves no code.
         uEventPre = (s32)((u64)(u32)uEvent | ((u64)(u32)uEvent << 32));
-        for (i = 0; i < pNode->nHandlers; i++) {
-            pHandler = &pNode->pHandlers[i];
+        for (i = 0; i < pNode->NumMaps; i++) {
+            pHandler = &pNode->Maps[i];
             // fake match: uEventPost again (the same value); the second definition keeps it a
             // variable of its own.
             uEventPost = uEvent;
@@ -971,16 +978,16 @@ s32 _ParseMaps(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 
             // links of copies-after-constant-propagation, loop-variant so they stay in the loop.
             uEventLoop = (s32)((u64)(u32)uEventPre | ((u64)(u32)i << 32));
             uEventLoop = (s32)((u64)(u32)uEventLoop | ((u64)(u32)i << 32));
-            if (pHandler->uEvent == 0xFFFF) {
+            if (pHandler->EventID == 0xFFFF) {
                 bOut = 0;
-                nResult = _ParseMaps(pStudio, pScreen, pStack, pHandler->u4.nNode, uEvent, n5, nArgs, pArgs,
+                nResult = _ParseMaps(pStudio, pScreen, pStack, pHandler->nNode, uEvent, n5, nArgs, pArgs,
                                      &bOut);
                 // fake match: the (s32) gives EA's signed cmpwi
                 if ((s32)bOut == 1) {
-                    pLinked = UISFindSubControlEventPC(pNode, (u16)pHandler->u4.nNode, n5);
+                    pLinked = UISFindSubControlEventPC(pNode, (u16)pHandler->nNode, n5);
                     if (pLinked != NULL) {
-                        nRet = UISExecuteFnc(pStudio, pScreen, pNode->pInfo, pStack, pLinked, nArgs, pArgs, 0,
-                                             NULL, 1, uEventLoop, NULL);
+                        nRet = UISExecuteFnc(pStudio, pScreen, pNode->pControlInfo, pStack, pLinked, nArgs,
+                                             pArgs, 0, NULL, 1, uEventLoop, NULL);
                         // fake match: nRet through a 64-bit shift up and back down (unchanged), then
                         // a dropped identity conversion: the copy chain keeps EA's copy of the call
                         // result (mr r0,r3; cmpwi r0,2).
@@ -997,7 +1004,7 @@ s32 _ParseMaps(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 
         pScript = UISFindEventPC(pNode, n5);
         // Events -6 and -7 go only to the node their third word names.
         // port: the event word holds a pointer
-        if ((n5 == (u32)-6 || n5 == (u32)-7) && pNode->pInfo != (UISNodeInfo*)pArgs[2]) {
+        if ((n5 == (u32)-6 || n5 == (u32)-7) && pNode->pControlInfo != (UISControlInfoT*)pArgs[2]) {
             pScript = NULL;
         }
         // fake match: uEvent goes into the high word of a 64-bit OR whose low word is nResult, so
@@ -1007,11 +1014,11 @@ s32 _ParseMaps(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 
         // port: a port leaves this line out.
         nResult = (s32)((u64)(s64)nResult | ((u64)(u32)uEvent << 32));
         if (pScript != NULL) {
-            nResult = UISExecuteFnc(pStudio, pScreen, pNode->pInfo, pStack, pScript, nArgs, pArgs, 0, NULL, 1,
-                                    uEventPost, NULL);
+            nResult = UISExecuteFnc(pStudio, pScreen, pNode->pControlInfo, pStack, pScript, nArgs, pArgs, 0,
+                                    NULL, 1, uEventPost, NULL);
         }
         if (nResult == 2) return nResult;
     }
-    *pbOut = pNode->pInfo->u4;
+    *pbOut = pNode->pControlInfo->IsEnabled;
     return nResult;
 }

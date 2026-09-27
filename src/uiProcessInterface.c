@@ -115,7 +115,7 @@ void fn_8008F568(s32 nCmd, s32 unused1, s32 unused2, s32 unused3, s32 a, s32 b) 
     }
 }
 
-// The studio's UISLoadFn: screen uScreen's data from the UI file's pairs (0 past the end). The
+// The studio's UISResLoadFncT: screen uScreen's data from the UI file's pairs (0 past the end). The
 // group is ignored.
 void* fn_8008F610(u16 uGroup, u16 uScreen) {
     UIFilePair* pPair;
@@ -127,7 +127,7 @@ void* fn_8008F610(u16 uGroup, u16 uScreen) {
     return pPair->p4;
 }
 
-// The studio's UISUnloadFn: nothing to do, the screens' data stays in the UI file.
+// The studio's UISResUnloadFncT: nothing to do, the screens' data stays in the UI file.
 void fn_8008F644(u16 uGroup, u16 uScreen, void* pData) {
 }
 
@@ -460,17 +460,17 @@ FrontEnd* fn_8009005C(char* szSet) {
     lbl_80281F1C->pHandler = fn_80009B34(UISGetMemSize(10, 9, 256, 2, 2048, 128), 2, 16,
                                          "uiProcessInterface.c", 943);
     UISInit(lbl_80281F1C->pHandler, 10, 9, 256, 2, 2048, 128, 16);
-    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 0, (UISHandlerFn)fn_800914DC);
+    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 0, (UISPluginFncT*)fn_800914DC);
     UISRegisterPluginFnc(lbl_80281F1C->pHandler, 1, fn_800908BC);
     UISRegisterPluginFnc(lbl_80281F1C->pHandler, 2, fn_800908C0);
     UISRegisterPluginFnc(lbl_80281F1C->pHandler, 3, fn_800908C4);
     UISRegisterPluginFnc(lbl_80281F1C->pHandler, 4, fn_800908C8);
     UISRegisterPluginFnc(lbl_80281F1C->pHandler, 5, fn_800908CC);
     UISRegisterPluginFnc(lbl_80281F1C->pHandler, 6, fn_800908D0);
-    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 7, (UISHandlerFn)fn_800929E4);
-    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 8, (UISHandlerFn)fn_80103684);
+    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 7, (UISPluginFncT*)fn_800929E4);
+    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 8, (UISPluginFncT*)fn_80103684);
     UISRegisterResourceFncs(lbl_80281F1C->pHandler, fn_8008F610, fn_8008F644);
-    UISRegisterTransformFncs(lbl_80281F1C->pHandler, (UISTransformFn)fn_80093280);
+    UISRegisterTransformFncs(lbl_80281F1C->pHandler, (UISTransformFncT*)fn_80093280);
     UISRegisterMessageFnc(lbl_80281F1C->pHandler, fn_8008F568);
     // fake match: the original compares the count signed here (cmpw), unsigned in fn_8008F610
     for (i = 0; i < (s32)lbl_80281F1C->pFile->p4->nCount; i++) {
@@ -632,11 +632,11 @@ void fn_800907AC(int nValue, char* szOut) {
     sprintf(szOut, aBuf);       // EA: the result is used as a format; it holds only digits, '-' and ','
 }
 
-// The studio's report callback (UISReportFn): the retail game prints nothing.
+// The studio's report callback (UISRuntimeErrorFncT): the retail game prints nothing.
 void fn_80090890(s32 nLevel, const char* szFile, s32 nLine, const char* szMsg) {
 }
 
-// The studio's UISScreenDataFn: nothing to do.
+// The studio's UISScreenDrawDebugFncT: nothing to do.
 void fn_80090894(u16 uGroup, u16 uScreen, s32 n) {
 }
 
