@@ -619,16 +619,20 @@ static inline u8 fn_8016AEEC_Read(u8 b) { return b; }
 // Runs the screen file's start entries that have not run yet, then every handler under node
 // nNode; a handler run with message -1 is marked as run.
 void fn_8016AEEC(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
-    u32 j;
-    UISNode* pNode;
-    u32 i;
+    // fake match: the second loop's pEntry is declared here, ahead of pNode and j, and shadowed by
+    // the first loop's own pEntry; this order gives the original's loop registers.
     u8 bLast;
+    UISEntry* pEntry;
+    UISNode* pNode;
+    u32 j;
 
     if (pScreen->pData != NULL) {
         pNode = &pScreen->pData->pNodes[nNode];
         bLast = fn_8016AEEC_Read(nMsg == -1);
-        for (i = 0; i < pScreen->pData->nStart; i++) {
-            UISEntry* pEntry = &pScreen->pData->pStart[i];
+        // fake match: nNode (dead after pNode) is the counter of both entry loops, which gives the
+        // original's loop registers.
+        for (nNode = 0; nNode < pScreen->pData->nStart; nNode++) {
+            UISEntry* pEntry = &pScreen->pData->pStart[nNode];
             if (pEntry->n2 == 0) {
                 if (pEntry->uHandler < pStudio->nHandlers) {
                     UISHandlerFn pfnHandler = pStudio->ppfnHandlers[pEntry->uHandler];
@@ -642,16 +646,20 @@ void fn_8016AEEC(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
             }
         }
         for (j = 0; j < pNode->nGroups; j++) {
+            // fake match: b is bLast, and the stored `b | bLast` is bLast. The frontend cannot fold the
+            // OR of two variables, so after the copy is propagated it stays as `or r30,r27,r27` (the
+            // original's `mr r30,r27`, the same encoding), which the allocator never coalesces.
+            int b = bLast;
             UISGroup* pGroup = pNode->ppGroups[j];
-            for (i = 0; i < pGroup->nEntries; i++) {
-                UISEntry* pEntry = &pGroup->pEntries[i];
+            for (nNode = 0; nNode < pGroup->nEntries; nNode++) {
+                pEntry = &pGroup->pEntries[nNode];
                 if (pEntry->uHandler == 0xFFFF) {
                     fn_8016AEEC(pStudio, pScreen, pEntry->u4.nNode, nMsg);
                 } else if (pEntry->uHandler < pStudio->nHandlers) {
                     UISHandlerFn pfnHandler = pStudio->ppfnHandlers[pEntry->uHandler];
                     if (pfnHandler != NULL) {
                         pfnHandler((u8*)pScreen->pData + *pEntry->u4.pnOffset, nMsg, 0, NULL, 0);
-                        pEntry->n2 = bLast;
+                        pEntry->n2 = b | bLast;
                     }
                 }
             }
@@ -737,27 +745,46 @@ s32 fn_8016AD54(UISScreen* pScreen, UISNodeInfo* pInfo, s32 nKind, void* p) {
 // Runs every handler under a node (nKind 8) or a group (nKind 7) with message -4 and a pointer to
 // n. Without bAll, nodes and groups whose info has no owner are skipped.
 void fn_8016ABBC(UIStudio* pStudio, UISScreen* pScreen, s32 n, s32 nKind, void* p, u8 bAll) {
+    // fake match: this declaration order (with the copies below) gives EA's registers.
+    UISGroup* pGroup;
+    UISNode* pNode;
     u32 i;
+    // fake match: one count for both loops (nGroups, then nEntries), as in fn_8016AD54: with it
+    // case 7's counter and count take EA's registers (li r29,0 / lwz r30 / mr r31,r29).
+    u32 nCount;
+    UISEntry* pEntry;
+    UISNode* pPrev8;
+    UISNode* pLoop8;
+    UISGroup* pLoop7;
 
     if (pStudio == NULL) return;
     if (pScreen == NULL || p == NULL) return;
     switch (nKind) {
-    case 8: {
-        UISNode* pNode = p;
+    case 8:
+        pNode = p;
         if (pNode->pInfo != NULL && (bAll || pNode->pInfo->p0 != NULL)) {
-            u32 nGroups = pNode->nGroups;
-            for (i = 0; i < nGroups; i++) {
-                fn_8016ABBC(pStudio, pScreen, n, 7, pNode->ppGroups[i], 0);
+            nCount = pNode->nGroups;
+            // fake match: pLoop8 and pPrev8 always hold pNode; the copies carried round the loop
+            // keep pNode apart from p (EA's mr r29,r7 with the first read through r7), and taking
+            // pPrev8 before the copy keeps EA's argument order (the lwzx before li r6,7).
+            pLoop8 = pNode;
+            for (i = 0; i < nCount; i++) {
+                pPrev8 = pLoop8;
+                pLoop8 = pNode;
+                fn_8016ABBC(pStudio, pScreen, n, 7, pPrev8->ppGroups[i], 0);
             }
         }
         break;
-    }
-    case 7: {
-        UISGroup* pGroup = p;
+    case 7:
+        pGroup = p;
         if (pGroup->pInfo != NULL && (bAll || pGroup->pInfo->p0 != NULL)) {
-            u32 nEntries = pGroup->nEntries;
-            for (i = 0; i < nEntries; i++) {
-                UISEntry* pEntry = &pGroup->pEntries[i];
+            nCount = pGroup->nEntries;
+            // fake match: pLoop7 always holds pGroup; the copy carried round the loop keeps pGroup
+            // apart from p (EA's mr r28,r7 with the first read through r7).
+            pLoop7 = pGroup;
+            for (i = 0; i < nCount; i++) {
+                pEntry = &pLoop7->pEntries[i];
+                pLoop7 = pGroup;
                 if (pEntry->uHandler == 0xFFFF) {
                     fn_8016ABBC(pStudio, pScreen, n, 8, &pScreen->pData->pNodes[pEntry->u4.nNode], 0);
                 } else if (pEntry->uHandler < pStudio->nHandlers) {
@@ -769,7 +796,6 @@ void fn_8016ABBC(UIStudio* pStudio, UISScreen* pScreen, s32 n, s32 nKind, void* 
             }
         }
         break;
-    }
     }
 }
 
