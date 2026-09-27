@@ -321,6 +321,7 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
     s32 nSavedFont;
     GXColor uSavedColor;
     f32 fSavedY;
+    f32 fGY1;
     f32 fSavedX;
     f32 fGradX;
     f32 fGradY;
@@ -484,7 +485,6 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
                     } else {
                         f32 fGY0 = 0.0f;
                         f32 fGX0 = fRun + pGlyph->f1C;
-                        f32 fGY1;
                         fGX1 = fGX0 + pGlyph->fWidth;
                         fGY0 += pGlyph->f20;
                         fGY1 = fGY0 + pGlyph->fHeight;
