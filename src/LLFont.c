@@ -4,8 +4,8 @@
 #include "engine.h"
 #include "gx.h"
 
-static f32 lbl_801A3478[7];             // the projection saved while fonts draw
 static f32 lbl_801A3494[6];             // the viewport saved while fonts draw
+static f32 lbl_801A3478[7];             // the projection saved while fonts draw
 
 // The three glyph palettes: a grey level and an alpha (0x80 = opaque) per glyph pixel value.
 static GXColor lbl_801869C0[3][16] = {
@@ -35,6 +35,13 @@ static GXColor lbl_801869C0[3][16] = {
     },
 };
 
+u32 lbl_80186A80[19] = {
+    0x00000080, 0xFF404080, 0xFF000080, 0xFF000080, 0x40FF4080,
+    0x00FF0080, 0x00400080, 0x4040FF80, 0x0000FF80, 0x00004080,
+    0xA0A0A080, 0xFFFFFF80, 0xFFFF8080, 0xFFFF0080, 0xFF80FF80,
+    0xFF00FF80, 0x80FFFF80, 0x00FFFF80, 0x00000000,
+};
+
 void fn_80012444(const f32* pViewport);
 void fn_8001247C(s32 eDst, s32 eFunc, s32 eSrc, s32 nMtx);
 u32 fn_8001208C(UFontContext* pCtx, f32 fXScale, f32 fYScale, f32 fX, f32 fY);
@@ -49,6 +56,11 @@ static u8 lbl_80281C88;                 // set while fn_8001144C word-wraps (fn_
 // Byte swaps for a stream stored little-endian.
 #define LLFONT_SWAP32(x) (((u32)(x) >> 24) + (((x) & 0xFF0000) >> 8) + (((x) << 8) & 0xFF0000) + ((x) << 24))
 #define LLFONT_SWAP16(x) ((((x) & 0xFF00) >> 8) + (((x) << 8) & 0xFF00))
+
+// fake match: seeds 1.0f first in the constant pool, as a stripped function could have done.
+static f32 LLFont_StrippedFn(f32 fValue) {
+    return fValue + 1.0f;
+}
 
 // Makes a font from an 'sfn ' stream object: swaps a little-endian stream, allocates the font with
 // its glyph records and glyphs, builds each glyph's texture coordinates and sizes, and reorders the
