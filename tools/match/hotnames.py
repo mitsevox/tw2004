@@ -3,6 +3,10 @@
     python tools/match/hotnames.py --top N         the top N
     python tools/match/hotnames.py --unit NAME     only functions defined in that unit
     python tools/match/hotnames.py --tsv           every unnamed function, tab-separated
+    python tools/match/hotnames.py --units         per source file: named, commented, done (the
+                                                   naming lanes' territory map; worst files first)
+A function is done when it has a real name and, if its body is longer than 3 lines, a comment
+right above its definition (a short getter or setter reads from its name alone).
 Coverage = share of all call sites (bl/b to a function, counted in the original's split objects)
 whose target has a real name rather than fn_XXXXXXXX. Naming one function called from 300 places
 makes 300 lines readable, so this is the number the naming work moves. For each unnamed function:
@@ -44,6 +48,55 @@ def call_sites(path):
     return defined, sites
 
 
+DEF = re.compile(r'^(?:asm |static |inline )*[A-Za-z_][^;=(]*?\b([A-Za-z_]\w*)\s*\([^;]*\{\s*$')
+
+
+def comment_state(path):
+    """name -> (body lines, has a comment above) for each function defined in a source file."""
+    lines = path.read_bytes().decode('utf-8', 'surrogateescape').split('\n')
+    out = {}
+    for i, l in enumerate(lines):
+        m = DEF.match(l)
+        if not m or m.group(1) in ('if', 'while', 'for', 'switch'):
+            continue
+        j = i + 1
+        while j < len(lines) and not lines[j].startswith('}'):
+            j += 1
+        t = i
+        while t > 0 and lines[t - 1].startswith('#if'):
+            t -= 1
+        has = t > 0 and lines[t - 1].lstrip().startswith(('//', '/*', '*'))
+        name = m.group(1)
+        out[name] = (j - i - 1, has or out.get(name, (0, False))[1])
+    return out
+
+
+def units_report(unit_of, sites):
+    by_unit = collections.defaultdict(list)
+    for n, u in unit_of.items():
+        by_unit[u].append(n)
+    rows = []
+    for u, fns in by_unit.items():
+        src = ROOT / 'src' / (u + '.c')
+        if not src.exists():
+            continue
+        state = comment_state(src)
+        named = sum(1 for n in fns if not PLACEHOLDER.match(n))
+        need = [n for n in fns if state.get(n, (0, False))[0] > 3]
+        commented = sum(1 for n in need if state[n][1])
+        done = sum(1 for n in fns if not PLACEHOLDER.match(n)
+                   and (state.get(n, (0, False))[0] <= 3 or state[n][1]))
+        calls = sum(sites[n] for n in fns if PLACEHOLDER.match(n))
+        rows.append((done / len(fns), u, len(fns), named, len(need), commented, done, calls))
+    tot = [sum(r[i] for r in rows) for i in (2, 3, 4, 5, 6)]
+    print(f'all files: {tot[0]} functions, named {tot[1]} ({100 * tot[1] / tot[0]:.1f}%), '
+          f'commented {tot[3]}/{tot[2]} that need one ({100 * tot[3] / max(tot[2], 1):.1f}%), '
+          f'done {tot[4]} ({100 * tot[4] / tot[0]:.1f}%)')
+    print(f'\n{"done%":>6} {"fns":>5} {"named":>5} {"cmt":>9} {"unnamed calls":>13}  file')
+    for d, u, n, named, need, cmt, done, calls in sorted(rows):
+        print(f'{100 * d:6.1f} {n:5} {named:5} {cmt:4}/{need:<4} {calls:13}  {u}')
+
+
 def main():
     args = sys.argv[1:]
     top = int(args[args.index('--top') + 1]) if '--top' in args else 60
@@ -68,6 +121,9 @@ def main():
     unnamed_fns = [n for n in unit_of if PLACEHOLDER.match(n)]
     rows = sorted(((sites[n], fan_in[n], n) for n in unnamed_fns
                    if only is None or unit_of[n] == only), reverse=True)
+    if '--units' in args:
+        units_report(unit_of, sites)
+        return
     if '--tsv' in args:
         print('calls\tunits_calling\tname\tunit\tn1_suggestion')
         for c, f, n in rows:
