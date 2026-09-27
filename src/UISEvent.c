@@ -6,15 +6,16 @@
 
 #include "frontend/uistudio.h"
 
-// Pushes an event on the event stack whose top is *ppTop: the event record, with its type on
-// the top word, then its arguments below it, the last one first.
-static inline void UISEvent_Push(s32** ppTop, s16 nA, s16 nB, s32 nType, UISEventData* pData, s32 nArgs,
-                                 const s32* pArgs) {
+// Pushes an event on the event stack whose top is pTop: the event record, with its type on
+// the top word, then its arguments below it, the last one first. Returns the new top.
+// Signature (top by value, new top returned; pStudio unused): Madden 2003 STABS
+static inline s32* UISEvent_Push(UIStudio* pStudio, s32* pTop, UISEventData* pData, s16 nA, s16 nB,
+                                 s32 nType, s32 nArgs, const s32* pArgs) {
     UISEvent* pEvent;
     s32* pDst;
     s32 i;
 
-    pEvent = (UISEvent*)(*ppTop - 8);
+    pEvent = (UISEvent*)(pTop - 8);
     pEvent->nType = nType;
     pDst = (s32*)pEvent - 1;
     pEvent->nA = nA;
@@ -26,15 +27,17 @@ static inline void UISEvent_Push(s32** ppTop, s16 nA, s16 nB, s32 nType, UISEven
             *pDst-- = pArgs[i];
         }
     }
-    *ppTop = pDst;
+    return pDst;
 }
 
 // Whether no event from p up to the stack's top waits for the screen (uA, uB), loads and unloads
 // aside: a screen is unloaded only then.
-static inline u8 UISEvent_NoneWaiting(UIStudio* pStudio, s32* p, u16 uA, u16 uB) {
+// Parameter order and the nArgs local: Madden 2003 STABS
+static inline u8 UISEvent_NoneWaiting(u16 uA, u16 uB, UIStudio* pStudio, s32* p) {
     s32 nType;
     u16 uThisA;
     u16 uThisB;
+    s32 nArgs;
 
     while (p > pStudio->pEventTop) {
         nType = p[0];
@@ -42,7 +45,8 @@ static inline u8 UISEvent_NoneWaiting(UIStudio* pStudio, s32* p, u16 uA, u16 uB)
         uThisB = p[-2];
         if (nType != 0 && nType != 1 && uThisA == uA && uThisB == uB) return 0;
         p -= 8;
-        p -= *p;
+        nArgs = *p;
+        p -= nArgs;
         p--;
     }
     return 1;
@@ -192,6 +196,8 @@ void fn_80165C74(UIStudio* pStudio) {
     }
 }
 
+UISReportFn lbl_80282A28;
+
 void fn_80165C6C(UISReportFn pfnReport) {
     lbl_80282A28 = pfnReport;
 }
@@ -202,7 +208,7 @@ void fn_80165B90(s16 nA, s16 nB, UIStudio* pStudio, s32 nType, UISEventData* pDa
                  const s32* pArgs) {
     // fake match: nArgs goes through s64 and back (the value is unchanged); the dead high word
     // lives until register allocation and gives the original's order of the nA/nB sign extensions
-    UISEvent_Push(&pStudio->pEventTop, nA, nB, nType, pData, (s64)nArgs, pArgs);
+    pStudio->pEventTop = UISEvent_Push(pStudio, pStudio->pEventTop, pData, nA, nB, nType, (s64)nArgs, pArgs);
 }
 
 // Walks the event stack from the bottom up and, for each type 9 event queued for the given
@@ -242,6 +248,10 @@ s32 fn_80165ACC(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
 // Runs the event whose type word is at pTop and returns the next one's. An event that cannot run
 // yet (unloading a screen that still has events queued, or that fn_80168FC8 refuses) is pushed
 // again on the stack at *ppKeep.
+// fake match: optimization level 3 for this function only: at level 4 an extra copy-propagation
+// pass folds the copies of uA and uB that UISEvent_NoneWaiting's loop compares with (the original
+// keeps them: mr r4,r28; mr r3,r27)
+#pragma optimization_level 3
 s32* fn_80165670(UIStudio* pStudio, s32* pTop, s32** ppKeep) {
     s32 nType;
     UISEventData* pData;
@@ -252,14 +262,19 @@ s32* fn_80165670(UIStudio* pStudio, s32* pTop, s32** ppKeep) {
     u32 nIndex;
     UISScreen* pScreen;
 
+    // fake match: pTop goes through u64 and back (the value is unchanged); the copy chain keeps
+    // the original's copy of the parameter (mr r25,r4) through the copy-propagation passes
+    // port: a 32-bit pointer through u32; drop this line in a port
+    pTop =(s32*)(u32)((u64)(s64)((u64)(u32)pTop << 32) >> 32);
     nType = pTop[0];
-    nArgs = pTop[-8];
     uA = pTop[-1];
     uB = pTop[-2];
     pData = (UISEventData*)(pTop -= 7);
-    pTop -= 1;
+    pTop--;
+    nArgs = *pTop;
     pTop -= nArgs;
     pArgs = pTop;
+    pTop--;
     switch (nType) {
     case 0:
         fn_80169858(pStudio, pData->aw[0], pData->aw[1], pData->aw[2], pData->aw[3], nArgs, pArgs);
@@ -270,10 +285,10 @@ s32* fn_80165670(UIStudio* pStudio, s32* pTop, s32** ppKeep) {
             pScreen = &pStudio->pScreens[nIndex];
             pScreen->bUnloading = 1;
         }
-        if (!UISEvent_NoneWaiting(pStudio, pArgs - 1, uA, uB)) {
-            UISEvent_Push(ppKeep, uA, uB, nType, pData, nArgs, pArgs);
+        if (!UISEvent_NoneWaiting(uA, uB, pStudio, pTop)) {
+            *ppKeep = UISEvent_Push(pStudio, *ppKeep, pData, uA, uB, nType, nArgs, pArgs);
         } else if (!fn_80168FC8(pStudio, pData->aw[0], pData->aw[1], pData->au[2])) {
-            UISEvent_Push(ppKeep, uA, uB, nType, pData, nArgs, pArgs);
+            *ppKeep = UISEvent_Push(pStudio, *ppKeep, pData, uA, uB, nType, nArgs, pArgs);
         }
         break;
     case 9:
@@ -313,8 +328,9 @@ s32* fn_80165670(UIStudio* pStudio, s32* pTop, s32** ppKeep) {
         fn_8016B4D4(pStudio, pData->aw[0], pData->aw[1], pData->au[3]);
         break;
     }
-    return pArgs - 1;
+    return pTop;
 }
+#pragma optimization_level reset
 
 // Runs the event stack from the bottom up. With bScreenOnly only the type 5 and 6 events run
 // (each once), and they stay queued; otherwise every event runs and those that must wait are
