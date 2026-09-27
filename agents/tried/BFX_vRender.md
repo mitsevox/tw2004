@@ -8,6 +8,9 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26 e-render: permuter 20 min -j 3 (7.1k iterations; machine load ~27): best 1340,
+  1385, 1445: all `volatile int` temps for one colour byte (not usable). Nothing else.
+
 - 2026-09-26 e-render (aligned, base 31): red read through a flat index the frontend might not
   match with the row (`lbl_80189CB0[0][nPlayer * 4]`, `((u8*)lbl_80189CB0)[nPlayer * 4]` /
   `[nPlayer << 2]` / `* sizeof(row)`, `*((u8*)tab + nPlayer * 4)`, through `(u32)` arithmetic)

@@ -699,7 +699,8 @@ int fn_80011D0C(LLFont* pFont, UFontContext* pCtx, u8 bDraw, char* sz) {
 // (fn_8001144C's calls load only pCtx and the four floats, and drop the result.)
 u32 fn_8001208C(UFontContext* pCtx, f32 fXScale, f32 fYScale, f32 fX, f32 fY) {
     GXColor color;
-    int r; // EA bug: r, g, b, a are never set when neither gradient applies (callers ignore the result)
+    // EA bug: r, g, b, a are never set when neither gradient applies (callers ignore the result)
+    int r;
     int g;
     int b;
     int a;
