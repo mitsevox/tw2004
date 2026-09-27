@@ -166,16 +166,27 @@ f32 fn_800C79BC(f32* p0, f32* p1, f32* p2, f32* p3) {
     return fLength;
 }
 
+// fake match: puts -1.0f in the constant pool before fn_800C7A9C's step-count array, which the
+// compiler emits ahead of that function's own literals (EA's 128.0f was a pooled literal, after
+// the -1.0f). Unused, so the linker strips it.
+static f32 CamSpline_StrippedFn(f32 x) {
+    return x + -1.0f;
+}
+
 // The value of a fly-by path's curve at time fT (0..1; -1 when out of range): each key holds a
 // Hermite segment from (af[0], af[1]) to (af[2], af[3]) with tangents af[4..5] and af[6..7]. The
 // segment holding fT is walked in 128 steps and the value read off the straight step around fT.
+// fake match: loop-invariant motion off for this function only (not EA's build setting). With it
+// on, the frontend hoists the step count's load into its own temporary, numbered below the
+// conversion constant's, and the two trade f27/f28; with it off the backend hoists the load where
+// the divide first uses it, as in EA's code. The key count is read into nKeys so that the key
+// search still counts down in ctr.
+#pragma opt_loop_invariants off
 f32 fn_800C7A9C(FlyByPath* pPath, f32 fT) {
-    static const f32 aStep[1] = {128.0f}; // fake match: retain the original division/reload shape
-    f32 fT2;
-    f32 fT3;
-    f32 f2T2;
-    f32 f3T2;
-    f32 f2T3;
+    // fake match: the step count as a one-element const array, not the literal 128.0f: the literal
+    // divide becomes a multiply by 1/128 (CW does that for powers of two from 2 to 1024), while EA's
+    // code divides by the .sdata2 constant.
+    static const f32 aStep[1] = {128.0f};
     f32 fH00;
     f32 fH01;
     f32 fH10;
@@ -188,6 +199,7 @@ f32 fn_800C7A9C(FlyByPath* pPath, f32 fT) {
     f32 fStep;
     u32 i;
     u32 nStep;
+    u32 nKeys;
 
     if (pPath == NULL) {
         return -1.0f;
@@ -201,26 +213,22 @@ f32 fn_800C7A9C(FlyByPath* pPath, f32 fT) {
     if (1.0f == fT) {
         return pPath->aKeys[pPath->nKeys - 1].af[3];
     }
-    for (i = 0; i < pPath->nKeys; i++) {
+    nKeys = pPath->nKeys;
+    for (i = 0; i < nKeys; i++) {
         if (fT > pPath->aKeys[i].af[0] && fT <= pPath->aKeys[i].af[2]) {
             break;
         }
     }
     fLastX = pPath->aKeys[i].af[0];
     fLastY = pPath->aKeys[i].af[1];
-    for (nStep = 0; nStep < aStep[0]; nStep++) {
-        // fake match: reuse the later cubic temporary for the step quotient.
-        f3T2 = nStep / aStep[0];
-        fT1 = f3T2;
-        fT2 = fT1 * fT1;
-        f2T2 = 2.0f * fT1 * fT1;
-        f3T2 = 3.0f * fT1 * fT1;
-        fT3 = fT1 * fT2;
-        f2T3 = fT1 * f2T2;
-        fH00 = 1.0f + (f2T3 - f3T2);
-        fH01 = -f2T3 + f3T2;
-        fH10 = fT1 + (fT3 - f2T2);
-        fH11 = fT3 - fT2;
+    // fake match: the loop test reads the step count through a (no-op) pointer cast, so the
+    // frontend does not share one temporary between the test and the divide.
+    for (nStep = 0; nStep < *(const f32*)aStep; nStep++) {
+        fT1 = nStep / aStep[0];
+        fH00 = 1.0f + (fT1 * (2.0f * fT1 * fT1) - 3.0f * fT1 * fT1);
+        fH01 = -(fT1 * (2.0f * fT1 * fT1)) + 3.0f * fT1 * fT1;
+        fH10 = fT1 + (fT1 * (fT1 * fT1) - 2.0f * fT1 * fT1);
+        fH11 = fT1 * (fT1 * fT1) - fT1 * fT1;
         fX = fH11 * pPath->aKeys[i].af[6] +
              (fH10 * pPath->aKeys[i].af[4] + (fH00 * pPath->aKeys[i].af[0] + fH01 * pPath->aKeys[i].af[2]));
         fY = fH11 * pPath->aKeys[i].af[7] +
@@ -231,14 +239,14 @@ f32 fn_800C7A9C(FlyByPath* pPath, f32 fT) {
         fLastX = fX;
         fLastY = fY;
     }
-    // fake match: the original reloads this value after the loop.
-    if (nStep == *(const volatile f32*)&aStep[0]) {
+    if (nStep == aStep[0]) {
         fX = pPath->aKeys[i].af[2];
         fY = pPath->aKeys[i].af[3];
     }
     fStep = fX - fLastX;
     return fLastY * (1.0f - (fT - fLastX) / fStep) + fY * (1.0f - (fX - fT) / fStep);
 }
+#pragma opt_loop_invariants reset
 
 // A point fDist along the direction from pA to pB (flattened unless bKeepY, normalised unless
 // bRaw), then moved fSide sideways (across the flat direction).
