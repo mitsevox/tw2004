@@ -1,12 +1,28 @@
 # PictInt_Decode (LLPictInt.c, 0x8005620C)
 
-Status: OPEN, 93.26363% on 2026-09-26.
+Status: SOLVED 2026-09-27 (lane b1, EA form, no fake): both 32-bit swaps written in C,
+`pFile->uC = ((uC & 0xFF000000) >> 24) | ((uC & 0xFF0000) >> 8) | ((uC & 0xFF00) << 8) |
+((uC & 0xFF) << 24)`, and the sibling width spelling at both width swaps. The unit is linked
+(commit "LLPictInt.c: PictInt_Decode exact, unit linked (3/3)" on agent/b1).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
 "Attempts" (what, score before -> after). When it is exact: Status SOLVED, the fix, the commit.
 
 ## Attempts
+
+- 2026-09-27 b1 (quicktrial aligned, base 11): `#pragma scheduling once` 50 (with sibling width
+  51); scheduling 603 39, 604 20, 7450 23, 750/740/7400/altivec 11, off 62. Copy chains of 1-4
+  u32 locals for the value 11 (all propagated away). Dead `(s64)(s32)` on the __stwbrx value:
+  last swap only 10 (the dead srawi takes r3, the value r4, but stwbrx stays before `mr r3`),
+  first 16. **Key reading**: mwccdbg shows the C shift/mask 32-bit swap stays as
+  lwz + rlwinm + 3 rlwimi + stw through regalloc and the post-RA peephole turns it into
+  `addi; stwbrx` (backend-12), so its registers and order come from the rlwinm chain, not an
+  early stwbrx; this is EA's pattern (value in r4, `mr r3` / `lis r3` before the stwbrx).
+  Shift-first spelling `(v >> 24) | ((v >> 8) & 0xFF00) | ...`: last swap exact, first swap not
+  recognised (the pre-RA scheduler put li r4/r5 inside the chain). Mask-first spelling
+  `((v & 0xFF000000) >> 24) | ...`: with the sibling width at both swaps, all 24 term orders are
+  exact (0); with the old first width 1. Kept at both swaps: 93.26 -> 100%.
 
 - 2026-09-26 e-render (aligned, base 11): a Swap32 static inline on the address (`u32*` or
   `void*` parameter, value + address parameters, returning a value) at both / first / last
