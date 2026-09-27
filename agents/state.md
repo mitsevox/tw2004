@@ -152,3 +152,18 @@ headers 69 (phase 3, not started).
 
 See `../CLAUDE.md` "After 100% match": partition by audit status, phase 3 headers, **full cleanup of
 docs/gameplay.md** (unaudited behaviour claims), port-hazards doc, misfiled units.
+
+Hygiene items added 2026-09-27 (owner: after 100%, not right away):
+- **objdiff "matched data" (79.88% vs 99.93% linked):** cosmetic, no byte changes. Fix symbol sizes
+  in symbols.txt / declared types so objdiff's per-symbol .bss/.sdata comparison pairs up (biggest:
+  AXVPB .bss 70.9 KB unscorable, skalib .bss 52.6 KB at 99.98% fuzzy, LLFileIO_Gc .bss, AXOut .bss).
+- **Madden 2003 evidence:** apply EA's names for the 58 paired IStudio functions (pairing.md) and
+  replace IStudio fakes with EA forms where the STABS show them; lbl_80281B40 -> MSL __float_max.
+- **Fake-match inventory** incl. tonight's: UISStack pA/0x7C ternaries, GameMode22's 64-bit OR that
+  reads pPlayer uninitialised when there are no players (the one known UB-flavoured fake), UIS copy
+  chains; DiscError/Code800B7210 split point for the three setters is unproven; CharAnim owns the
+  0x801D9908 buffer on weak evidence; LLTex may be 2-3 EA files (aligned(8) .sbss gaps).
+- **Tools:** sched750.py skips lines without a source line number (hoisted code) and has no FPU/
+  call blocks; rasim decl search doesn't renumber split webs.
+- **Stale comments** (audit): char.c unity .data start, startup.h lbl_8018F040, fe.h lbl_80281374,
+  LLFont fn_8001208C, FE_CrAPDB const.
