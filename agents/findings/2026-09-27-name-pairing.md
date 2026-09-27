@@ -38,9 +38,9 @@ the TW06 PS2 globals of the shared packages are already named or differ (`gCRC` 
 `_ChecksumCRC32_State`). 311 of the 1,128 are used by a function that has a reference name (anchor or
 A/B pair): those would become nameable with a TW07 globals export (below).
 
-Struct fields: **1,477** placeholder-named fields with a known offset in top-level structs of
-`include/` (prefix + hex offset, `nC38`, `f2C`; 2,281 placeholder-named members counting nested
-ones; 480 `unk*` padding not counted). Only 7 of our structs pair with a reference layout in the repo
+Struct fields: **1,446** placeholder-named fields with a known offset in top-level structs of
+`include/` (prefix + hex offset, `nC38`, `f2C`; 2,249 placeholder-named members counting nested
+ones; 477 `unk*` padding not counted). Only 7 of our structs pair with a reference layout in the repo
 (TW06 Xbox key types, TW06 PS2 EA_DASH types); they hold 31 placeholders; **1 A, 0 B, 3 C**:
 `PgaStatCounts.n44` = TW06 `GM_Pga_StatCounts.monthlyWinnings` (A, anchors on both sides agree on a
 +4 shift); `Tournament.nC`/`n10` = `scenario`/`isEuro` (C, one-sided); `Ball.n6C` = `lie` (C: the
