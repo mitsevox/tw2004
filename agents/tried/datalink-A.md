@@ -111,3 +111,9 @@ result.
   adjacent in .text too, so it is one of them. Front-end unlock lists: FE_Manager.c, defined at
   file scope ahead of its functions, so they lead its .data.
 - Result: FE_Manager .data 0x801894D0..0x801896F0. main.dol: OK on the first try.
+
+## auto_05_80189CB0_data (24 B): lbl_80189CB0 -> goballfx.c
+
+- u8[6][4] (lighting.h), only user goballfx (BFX marker colours). goballfx.c lies between
+  uiTransform.c and GoShaderObject_Particle_Gc.c in .text, and the block between their .data.
+- Result: goballfx .data 0x80189CB0..0x80189CC8. main.dol: OK.
