@@ -492,11 +492,22 @@ void fn_80169B4C(UIStudio* pStudio) {
 
 // Sets the studio up in the block at pStudio (fn_80169D90 bytes): the header, then each table in
 // turn, the current record and the two word stacks.
-void fn_80169C0C(UIStudio* pStudio, u32 nScreens, u32 nHandlers, u32 nRateFns, u32 n60, u32 nEventWords,
-                 u32 nWords2, u32 uMsPerTick) {
+// fake match: optimization level 2 for this function only, the four table counts are copies of
+// the parameters, and the three non-power-of-two table sizes are 64-bit products (low word = the
+// 32-bit product). The copies and the products' dead high words fill the pre-allocation schedule
+// (all are gone after register allocation), which delays the offset adds as in the original: uOffset
+// in r12, the 0xFFFF in r31 and each table pointer computed after the one before it is stored.
+// port: the products are truncated to 32 bits.
+#pragma optimization_level 2
+void fn_80169C0C(UIStudio* pStudio, u32 nScreensArg, u32 nHandlersArg, u32 nRateFnsArg, u32 n60Arg,
+                 u32 nEventWords, u32 nWords2, u32 uMsPerTick) {
     u32 uOffset;
+    u32 nScreens = nScreensArg;
+    u32 nHandlers = nHandlersArg;
+    u32 nRateFns = nRateFnsArg;
+    u32 n60 = n60Arg;
 
-    uOffset = sizeof(UIStudio) + nScreens * sizeof(UISScreen);
+    uOffset = sizeof(UIStudio) + (u32)(nScreens * (u64)sizeof(UISScreen));
     pStudio->uMagic = UIS_MAGIC;
     pStudio->uFlags = 0;
     pStudio->bUnloadingAll = 0;
@@ -510,11 +521,11 @@ void fn_80169C0C(UIStudio* pStudio, u32 nScreens, u32 nHandlers, u32 nRateFns, u
     pStudio->nMaxRateFns = nRateFns;
     pStudio->nRateFns = 0;
     pStudio->pRateFns = (UISRateFn*)((u8*)pStudio + uOffset);
-    uOffset += nRateFns * sizeof(UISRateFn);
+    uOffset += (u32)(nRateFns * (u64)sizeof(UISRateFn));
     pStudio->nMax60 = n60;
     pStudio->n5C = 0;
     pStudio->p60 = (UISRecord60*)((u8*)pStudio + uOffset);
-    uOffset += n60 * sizeof(UISRecord60);
+    uOffset += (u32)(n60 * (u64)sizeof(UISRecord60));
     pStudio->pCurrent = (UISCurrent*)((u8*)pStudio + uOffset);
     uOffset += sizeof(UISCurrent);
     pStudio->pCurrent->nC = 0;
@@ -544,6 +555,7 @@ void fn_80169C0C(UIStudio* pStudio, u32 nScreens, u32 nHandlers, u32 nRateFns, u
     pStudio->pfnScreen28 = NULL;
     lbl_80282A28 = NULL;
 }
+#pragma optimization_level reset
 
 // The size of the block fn_80169C0C builds, for the given table sizes. The screen table has one
 // more entry's worth of room: the current record (UISCurrent, the same size).
