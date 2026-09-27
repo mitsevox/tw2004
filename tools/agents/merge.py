@@ -1,7 +1,9 @@
 """Merge one reviewed agent branch into main, verify, and push.
-    python tools/agents/merge.py <agent-name> ["merge message"] [--allow-asm]
+    python tools/agents/merge.py <agent-name> ["merge message"] [--allow-asm] [--allow-renames]
 --allow-asm: the merge may add asm that has its plain-C fallback, after the orchestrator checked by
 hand that it is EA's own asm (asmgate.py; without it any added asm is refused).
+--allow-renames: a naming lane's merge (after 100%): function renames pass only if each renamed
+address has its evidence row in config/GW4E69/name_sources.tsv.
 Steps: refresh main's report and save its exact-function set; merge agent/<name> with --no-ff (on a
 conflict: abort the merge and list the files, so the owning agent can merge main and resolve); run
 configure + a full build (DOL must be OK); rebuild the report and compare exact sets (no function may
@@ -15,7 +17,8 @@ import asmgate
 
 MAIN = paths.MAIN_S
 ALLOW_ASM = '--allow-asm' in sys.argv
-args = [a for a in sys.argv[1:] if a != '--allow-asm']
+ALLOW_RENAMES = '--allow-renames' in sys.argv
+args = [a for a in sys.argv[1:] if a not in ('--allow-asm', '--allow-renames')]
 name = args[0]
 msg = args[1] if len(args) > 1 else f'Merge agent/{name}'
 NL = '\n'
@@ -196,9 +199,20 @@ if stripped:
 # The audit baseline (tag audit-baseline-1, user's hard rule): matching never renames a function or
 # changes an audited comment; it may only ADD matching notes. Print what changed for review.
 ab = run('python tools/match/auditbaseline.py --list changed').stdout.splitlines()
-if any('name' in l.split('\t')[-1] for l in ab):
-    print(NL.join(l for l in ab if 'name' in l.split('\t')[-1])[:2000])
-    undo('a function name changed since the audit baseline (not pushed): matching never renames')
+renamed = [l for l in ab if 'name' in l.split('\t')[-1]]
+if renamed and ALLOW_RENAMES:
+    # After 100% (owner, 2026-09-27) naming lanes may rename, but every renamed function must have
+    # its evidence row in name_sources.tsv (address column), written by the naming pipeline.
+    logged = {l.split('\t')[0].lower() for l in open(APPLIED, encoding='utf-8') if l[:1] not in '#\n'}
+    missing = [l for l in renamed if l.split('\t')[0].lower() not in logged]
+    if missing:
+        print(NL.join(missing[:30]))
+        undo(f'{len(missing)} renamed function(s) have no name_sources.tsv row (not pushed)')
+    print(f'renames: {len(renamed)} function(s), all logged in name_sources.tsv')
+elif renamed:
+    print(NL.join(renamed)[:2000])
+    undo('a function name changed since the audit baseline (not pushed): matching never renames '
+         '(naming lanes: --allow-renames, with name_sources.tsv rows)')
 cm = [l for l in d if l[:1] in '+-' and l[:3] not in ('+++', '---') and re.search(r'//|/\*', l)]
 print('audit baseline: %d changed rows; comment lines in this merge: %d added, %d removed' % (
     len(ab), sum(l[0] == '+' for l in cm), sum(l[0] == '-' for l in cm)))
