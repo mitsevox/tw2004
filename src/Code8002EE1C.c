@@ -11,8 +11,11 @@
 
 // ---- the session and its options ---------------------------------------------------------------
 
-extern char gszEmpty[8];            // 0x802810B8  "" (small data)
+char gszEmpty[8] = "";              // 0x802810B8  "" (small data)
 extern char lbl_80187650[];         // "cl_bbsd" ... the default name at +0x1A
+
+// Defined here (declared in golfer.h): the .bss between Code8002DB80.c's and GoRenderSurface.c's.
+Session gSession;                   // 0x801CDD80
 
 void Options_SetDefaults(GameOptions* pOpt);
 
