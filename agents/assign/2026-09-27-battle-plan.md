@@ -20,6 +20,31 @@ Rules on top of agents/assign/2026-09-26-endgame.md (all its hard rules stand):
 - **Link on the last function.** If yours is the unit's last non-exact function, link the unit in
   the same branch (`graduate.py`, ranges from `datamap.py`). The build must end `main.dol: OK`.
 
+## Levers that closed functions tonight (read the code on main; details in docs/decomp-notes.md)
+
+- Per-function `#pragma scheduling once` / `reset` (UISScreen fn_8016C6C4, fn_8016C614).
+- Dead `(s64)` round trips on CALL ARGUMENTS add an allocator neighbour to everything live at the
+  call (UISEvent fn_80165ACC).
+- Signed 64-bit product `(s32)x * (s64)K`, K not a power of two: dead `li K; mulhw` join the
+  pre-allocation schedule and vanish after allocation (UISScreen fn_8016B188, UISApi fn_80169D90).
+- Dead `(s64)(s32)` round trip in a block: its srawi is deleted after allocation, which re-enables
+  post-allocation scheduling of that block (UISScreen fn_8016A510).
+- `x = (s32)((s64)((u64)x << 32) >> 32);` right after a call keeps the call result's copy through
+  every copy-propagation pass (UISApi fn_80169858). Kept-copy problems: try this first.
+- `(u8)(s32)(s8)x` before a compare: an extension the peephole folds away (UISApi fn_80168CD8).
+- Per-function `#pragma optimization_level 1` or `2` (+ local copies of params) when copy
+  propagation folds a value too early (UISApi fn_80168F5C, fn_801694A0).
+- Per-function `opt_loop_invariants off`; a literal float divide by a power of two 2..1024 becomes a
+  multiply, so a pooled divide needs a one-element const array (CamSpline fn_800C7A9C).
+- Volatile loads keep their order in both scheduling passes (hlaudtrackstm Stm_Tick).
+- A void* copy set in the first loop's condition (char fn_8001F110).
+- Byte offsets summed in one `+=` local in EA's add order (skalib AnimLib_WasLastPlayed).
+- EA forms: C mask/shift byte swaps become stwbrx (LLPictInt); runs of identical code are unrolled
+  loops (DepthField); one local per loop (char fn_80019798); mask-first bitfield packs (MAD codec);
+  a named if/else local (gocamscripts).
+- Linking: `<Unit>_StrippedFn` for constant-pool order; functions in address order; .bss/.sbss by
+  hand in reverse address order; two .c files may be one unity unit (char + char_tex_manager).
+
 ## Codex: UIStudio fn_80166098 (9,644 B, 97.84%, ~368 diff hunks)
 
 The biggest function left, the UI studio's event/command dispatcher. Your three sub-agents in
