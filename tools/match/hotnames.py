@@ -6,7 +6,9 @@
     python tools/match/hotnames.py --units         per source file: named, commented, done (the
                                                    naming lanes' territory map; worst files first)
 A function is done when it has a real name and, if its body is longer than 3 lines, a comment
-right above its definition (a short getter or setter reads from its name alone).
+right above its definition (a short getter or setter reads from its name alone). "reviewed" counts
+the functions a naming lane has read and logged (config/GW4E69/review.tsv, written by name.py):
+the plan's measure that a comment was checked, not just present.
 Coverage = share of all call sites (bl/b to a function, counted in the original's split objects)
 whose target has a real name rather than fn_XXXXXXXX. Naming one function called from 300 places
 makes 300 lines readable, so this is the number the naming work moves. For each unnamed function:
@@ -71,7 +73,23 @@ def comment_state(path):
     return out
 
 
+def reviewed_names():
+    """Names of the functions a naming lane has read (config/GW4E69/review.tsv, by address)."""
+    log = ROOT / 'config/GW4E69/review.tsv'
+    if not log.exists():
+        return set()
+    addrs = {l.split('\t')[0].upper() for l in log.read_text(encoding='utf-8').splitlines()
+             if l and l[0] != '#' and not l.startswith('address')}
+    names = set()
+    for l in (ROOT / 'config/GW4E69/symbols.txt').read_text(encoding='utf-8').splitlines():
+        m = re.match(r'^(\S+) = \.text:0x([0-9A-Fa-f]+);', l)
+        if m and m.group(2).upper() in addrs:
+            names.add(m.group(1))
+    return names
+
+
 def units_report(unit_of, sites):
+    seen = reviewed_names()
     by_unit = collections.defaultdict(list)
     for n, u in unit_of.items():
         by_unit[u].append(n)
@@ -87,14 +105,16 @@ def units_report(unit_of, sites):
         done = sum(1 for n in fns if not PLACEHOLDER.match(n)
                    and (state.get(n, (0, False))[0] <= 3 or state[n][1]))
         calls = sum(sites[n] for n in fns if PLACEHOLDER.match(n))
-        rows.append((done / len(fns), u, len(fns), named, len(need), commented, done, calls))
-    tot = [sum(r[i] for r in rows) for i in (2, 3, 4, 5, 6)]
+        rev = sum(1 for n in fns if n in seen)
+        rows.append((done / len(fns), u, len(fns), named, len(need), commented, done, calls, rev))
+    tot = [sum(r[i] for r in rows) for i in (2, 3, 4, 5, 6, 8)]
     print(f'all files: {tot[0]} functions, named {tot[1]} ({100 * tot[1] / tot[0]:.1f}%), '
           f'commented {tot[3]}/{tot[2]} that need one ({100 * tot[3] / max(tot[2], 1):.1f}%), '
-          f'done {tot[4]} ({100 * tot[4] / tot[0]:.1f}%)')
-    print(f'\n{"done%":>6} {"fns":>5} {"named":>5} {"cmt":>9} {"unnamed calls":>13}  file')
-    for d, u, n, named, need, cmt, done, calls in sorted(rows):
-        print(f'{100 * d:6.1f} {n:5} {named:5} {cmt:4}/{need:<4} {calls:13}  {u}')
+          f'done {tot[4]} ({100 * tot[4] / tot[0]:.1f}%), reviewed by a naming lane {tot[5]} '
+          f'({100 * tot[5] / tot[0]:.1f}%)')
+    print(f'\n{"done%":>6} {"fns":>5} {"named":>5} {"cmt":>9} {"reviewed":>8} {"unnamed calls":>13}  file')
+    for d, u, n, named, need, cmt, done, calls, rev in sorted(rows):
+        print(f'{100 * d:6.1f} {n:5} {named:5} {cmt:4}/{need:<4} {rev:8} {calls:13}  {u}')
 
 
 def main():

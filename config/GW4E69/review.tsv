@@ -1,0 +1,4 @@
+# Every function a naming lane has read (name.py): address, name, comment action
+# (keep: read and right; rewrite; add; none: needs none), who, date.
+address	name	comment	by	date
+80009E70	StaticMem_Free	keep	orchestrator (KEEP test)	2026-09-27
