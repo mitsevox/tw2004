@@ -646,11 +646,10 @@ void fn_8016AEEC(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
             }
         }
         for (j = 0; j < pNode->nGroups; j++) {
-            // fake match: bLast through a 64-bit value (the same value) into a second byte local, so
-            // the stored value is its own register (the original's r30) and bLast keeps r27. The
-            // original copies it with `mr r30,r27`; this gives `clrlwi r30,r27,24` (same value).
-            // port: none (the value is 0 or 1).
-            u8 b = (u8)(u64)bLast;
+            // fake match: b is bLast, and the stored `b | bLast` is bLast. The frontend cannot fold the
+            // OR of two variables, so after the copy is propagated it stays as `or r30,r27,r27` (the
+            // original's `mr r30,r27`, the same encoding), which the allocator never coalesces.
+            int b = bLast;
             UISGroup* pGroup = pNode->ppGroups[j];
             for (nNode = 0; nNode < pGroup->nEntries; nNode++) {
                 pEntry = &pGroup->pEntries[nNode];
@@ -660,7 +659,7 @@ void fn_8016AEEC(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
                     UISHandlerFn pfnHandler = pStudio->ppfnHandlers[pEntry->uHandler];
                     if (pfnHandler != NULL) {
                         pfnHandler((u8*)pScreen->pData + *pEntry->u4.pnOffset, nMsg, 0, NULL, 0);
-                        pEntry->n2 = b;
+                        pEntry->n2 = b | bLast;
                     }
                 }
             }

@@ -1,6 +1,6 @@
 # fn_8016AEEC (UISScreen.c, 0x8016AEEC)
 
-Status: OPEN, 99.44% on 2026-09-27 (one instruction: clrlwi for EA's mr r30,r27).
+Status: SOLVED 2026-09-27 (b12): j-block `int b = bLast;` stored as `b | bLast` (EA's mr is an or), loop-2 pEntry at function level, nNode as the loop counters.
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -74,6 +74,14 @@ unless you combine it with something new. Before you stop, add every attempt und
   loop-1 pEntry block-scoped and shadowing it, pGroup block-scoped, j-block `u8 b = (u8)(u64)bLast`):
   report 97.64 -> 99.44, only `clrlwi r30,r27,24` for `mr r30,r27`. Next lane: find what keeps
   that copy (anything that makes r30 and r27 interfere, or a post-RA source of `or r30,r27,r27`).
+- 2026-09-27 b12, SOLVED: EA's `mr r30,r27` is `or r30,r27,r27` (7F7EDB78 is both). Read from
+  mwcceppc.exe (GC/2.6, coalescing at 0x57b9b0): the allocator coalesces only PCode whose opcode
+  flags have 0x10 (IsMove: PC_MR yes, PC_OR no). So an OR whose two operands become one vreg
+  survives everything. `(s64)bLast | bLast` (and ~1100 similar) gives `mr r29,r27` (store temp
+  created after the j-offset temp, so r29/r30 swap; rasim --key confirms); a j-block
+  `int b = bLast;` stored as `pEntry->n2 = b | bLast;` makes the OR an inner-loop hoisted temp
+  (lower @ number, higher priority): r30, exact (310 of 3000 variants of that shape exact).
+  Fix: 99.44 -> 100 (labelled fake: `b | bLast` is bLast).
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
