@@ -56,7 +56,6 @@ static u8 lbl_80281C88;                 // set while fn_8001144C word-wraps (fn_
 LLFont* FO_spLoadFontFromStream(u8* pData, UFontState* pState) {
     int nPalette;
     int nTileCol;
-    int nX;
     int nTileRow;
     LLTexelPair* pDst;
     int nRow;
@@ -141,9 +140,8 @@ LLFont* FO_spLoadFontFromStream(u8* pData, UFontState* pState) {
             pSrc += pFont->bitmap.nWidth / 2 * (nTileRow * 8) + nTileCol * 4;
             for (nRow = 0; nRow < 8; nRow++) {
                 // EA compares the byte position with the width in texels.
-                nX = nTileCol * 4;
                 for (k = 0; k < 4; k++) {
-                    if (nX >= pFont->bitmap.nWidth) {
+                    if (nTileCol * 4 + k >= pFont->bitmap.nWidth) {
                         pDst->uFirst = 0;
                         pDst->uSecond = 0;
                     } else {
@@ -151,7 +149,6 @@ LLFont* FO_spLoadFontFromStream(u8* pData, UFontState* pState) {
                         pDst->uFirst = *pSrc++ & 0xF;
                     }
                     pDst++;
-                    nX++;
                 }
                 pSrc += pFont->bitmap.nWidth / 2 - 4;
             }

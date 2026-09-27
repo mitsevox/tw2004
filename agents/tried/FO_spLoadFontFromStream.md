@@ -33,6 +33,15 @@ unless you combine it with something new. Before you stop, add every attempt und
   Open: the texel loop's registers. EA colours nX (r3) and k (r7) before the loop temps (which
   take r23/r24/r26); ours: nX and k have 27 neighbours (<= 28) so they leave the graph in the
   first sweep and are coloured after the temps (r22/r23, temps r11/r12).
+- 2026-09-27 b11, later: rasim what-if (dummy neighbours) showed nX and k need 2 more neighbours
+  (29: then the loop temps get EA's r23/r24/r26 exactly). Found both, same code: `*pSrc++ & 0xF`
+  for uFirst (a mask temp the post-RA peephole folds into the rlwimi, +1) and the tile offsets
+  written from the loop counters, no nByte/nY: `pSrc += w / 2 * (nTileRow * 8) + nTileCol * 4;`
+  and `nX = nTileCol * 4;` (the backend's induction temps, +1). 95.38 -> 95.91; quicktrial
+  declaration climb 135 -> 105 aligned (95.95). No gain / changes code: `% 16`, `(s16)` casts on
+  nWidth or nX, `(u8)(*pSrc >> 4)`, `*pSrc >> 4` with & 0xF on uFirst (srawi stays), copies of
+  pSrc/pDst inside the k loop (propagated away), `nX += 1`, `++k`, `nX++` in the compare,
+  swapped if/else (layout), block-scope nX/k (no change), GC/1.3.2/2.0/2.6/2.7 (same), 2.0p1/3.0 worse.
 
 - 2026-09-26 r6-misc: WHY the srawi forms: mwccdbg shows each peephole-forward pass folds only
   ONE `rlwinm; srawi` pair per basic block, the last one in the block (backend-01/-09/-13 fold
