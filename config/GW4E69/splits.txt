@@ -213,6 +213,7 @@ Code8002DB80.c:
 
 Code8002EE1C.c:
 	.text       start:0x8002EE1C end:0x8002F1D4
+	.sdata2     start:0x80282F20 end:0x80282F30
 
 GoRenderSurface.c:
 	.text       start:0x8002F1D4 end:0x8002F4FC
