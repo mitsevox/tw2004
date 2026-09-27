@@ -36,6 +36,7 @@ extracted/
 
 # Build files
 build/
+!/tools/build/
 .ninja_*
 build.ninja
 

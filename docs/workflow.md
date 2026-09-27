@@ -310,6 +310,20 @@ Leave the unit `NonMatching` until the DOL passes. Linking is also the only real
 still scores 100% until the DOL comparison catches it. Until then, `constcheck.py --unit <Unit>`
 (see "Before you commit") is the check for the constants' values.
 
+Units generated from main.dol
+-----------------------------
+
+Two SDK units hold only Nintendo data that no public decomp has: the AX library's `AXComp.c`
+(`__AXCompressorTable`) and `DSPCode.c` (`axDspSlave`, the DSP microcode, and
+`axDspSlaveLength`). Their bytes may never be committed, so their C is generated from the user's
+own `orig/GW4E69/sys/main.dol`: `tools/build/gendata.py` reads each symbol's address, size and
+alignment from `config/GW4E69/symbols.txt`, maps the address to a file offset through the DOL
+header and writes `build/GW4E69/gen/AXComp.c` and `DSPCode.c` (git-ignored, like all of `build/`).
+`python configure.py` writes them (the Objects need the files to exist) and `build.ninja` rewrites
+them before compiling whenever the DOL, `symbols.txt` or the script changes. The two Objects in
+`configure.py` point at them with `src_dir=gen_dir`. CI runs the same configure and ninja steps
+after copying the DOL in, so it generates them too.
+
 When stuck
 ----------
 
