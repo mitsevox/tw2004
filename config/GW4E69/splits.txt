@@ -2208,8 +2208,12 @@ UISEvent.c:
 	.sbss       start:0x80282A28 end:0x80282A2C
 	.sdata2     start:0x80285198 end:0x802851A8
 
+UISStack.c:
+	.text       start:0x80166098 end:0x80168644
+
 UIStudio.c:
-	.text       start:0x80166098 end:0x80168C24
+	.text       start:0x80168644 end:0x80168C24
+	.rodata     start:0x801861A0 end:0x8018620C
 
 UISApi.c:
 	.text       start:0x80168C24 end:0x8016A2D4

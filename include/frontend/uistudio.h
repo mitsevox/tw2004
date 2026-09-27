@@ -278,9 +278,12 @@ void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, 
                  u8* pDoneScript, u8* pStepScript, u32 uTime, f32 fTarget, u32 u20);
 u32 fn_8016604C(UIStudio* pStudio, UISNodeInfo* pNodeInfo, u32 uId);
 
-// UIStudio.c
+// UISStack.c
 // Runs a screen's script from pFrame (a bytecode interpreter).
 s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, UISNodeInfo* pInfo);
+
+// UIStudio.c
+void fn_80168644(UIStudio* pStudio, UISScreen* pScreen, s32 nKind, void* p, s32 bOn);
 void fn_801686F8(UIStudio* pStudio, u8 bOn, u16 uGroup, u16 uScreen);
 void fn_80168918(UIStudio* pStudio, u8 bOn, s32 nId,UISNodeInfo* pInfo, s32* p, u16 uScreen, u16 uGroup);
 void fn_80168B80(UIStudio* pStudio, u32 uEvent);
