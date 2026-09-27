@@ -940,7 +940,7 @@ config.libs = [
             Object(Matching, "GameUICommands.c"),
             Object(Matching, "FEgolferanim.c"),
             Object(Matching, "uiLoadFile.c"),
-            Object(NonMatching, "uiProcessInterface.c"),
+            Object(Matching, "uiProcessInterface.c"),
             Object(Matching, "Code80090940.c"),
             Object(Matching, "fe_movies.c"),
             Object(Matching, "uiTransform.c"),
