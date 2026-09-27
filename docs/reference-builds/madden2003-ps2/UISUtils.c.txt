@@ -1,0 +1,772 @@
+// ../../../Source/Common/UIStudio\UISUtils.c
+// Derived from STABS in .mdebug (FDR 1235); functions in source order.
+
+// File-scope data
+static UISColorVectorT _MultiplerColorFactor; // bss 0x00563200
+static UISColorVectorT _AdditiveColorFactor; // bss 0x00563210
+
+Uint32 UISFindScreen(UISInfoT *pInfo, Uint16 GroupID, Uint16 ScreenID) // 0x003F7A58, 0x6C bytes, first line 118
+    // param pInfo                reg a0
+    // param GroupID              reg a1
+    // param ScreenID             reg a2
+{
+    UISScreenT *pScreen; // reg v0
+    Uint32 idx; // reg a3
+}
+
+void *UISFindEventPC(UISControlT *pControl, Uint32 EventID) // 0x003F7AC8, 0x58 bytes, first line 133
+    // param pControl             reg a0
+    // param EventID              reg a1
+{
+    Uint32 idxMap; // reg a3
+    UISMapT *pMap; // reg a2
+}
+
+void *UISFindSubControlEventPC(UISControlT *pControl, Uint16 idxControl, Uint32 EventID) // 0x003F7B20, 0x64 bytes, first line 153
+    // param pControl             reg a0
+    // param idxControl           reg a1
+    // param EventID              reg a2
+{
+    Uint32 idxMap; // reg t1
+    UISMapT *pMap; // reg a3
+}
+
+static void *_UISFindHintPC(UISControlT *pControl, Uint32 HintID) // 0x003F7B88, 0x58 bytes, first line 174
+    // param pControl             reg a0
+    // param HintID               reg a1
+{
+    Uint32 idxMap; // reg a3
+    UISMapT *pMap; // reg a2
+}
+
+Int32 UISExecuteFnc(UISInfoT *pInfo, UISScreenT *pScreen, UISControlInfoT *pControlInfo, UISStackInfoT *pStackInfo, void *pcEvent, Uint32 nParam, UISParamT *pParam, Uint32 nAppend, UISParamT *pAppend, int bUseChannel, Int32 Channel, UISParamT *pReturn) // 0x003F7BE0, 0x144 bytes, first line 198
+    // param pInfo                reg t4
+    // param pScreen              reg a3
+    // param pControlInfo         reg a2
+    // param pStackInfo           reg s0
+    // param pcEvent              reg t5
+    // param nParam               reg t1
+    // param pParam               reg t2
+    // param nAppend              reg t3
+    // param pAppend              stack +0
+    // param bUseChannel          stack +8, lives in v1
+    // param Channel              stack +16, lives in v1
+    // param pReturn              stack +24, lives in s2
+{
+    Int32 rVal; // reg v1
+    Uint32 idxParam; // reg t0
+    UISParamT *pStackBase; // reg s1
+}
+
+Float32 *UISGetActionPtrValue(Uint32 Action, UISControlInfoT *pControlInfo) // 0x003F7D28, 0xD0 bytes, first line 292
+    // param Action               reg a0
+    // param pControlInfo         reg a1
+{
+    Float32 *pfModVal; // reg v0
+}
+
+Uint32 UISIsScreenLoaded(UISInfoT *pInfo, Uint16 GroupID, Uint16 ScreenID) // 0xFFFFFFFF, 0x50 bytes, first line 330
+    // param pInfo                reg a0
+    // param GroupID              reg a1
+    // param ScreenID             reg a2
+{
+    UISScreenT *pScreen; // reg v0
+    Int32 idx; // reg a3
+}
+
+UISColorVectorT *UISGetColorMultipler(void) // 0x003F7DF8, 0xC bytes, first line 341
+{
+}
+
+UISColorVectorT *UISGetColorAdditive(void) // 0x003F7E08, 0xC bytes, first line 346
+{
+}
+
+void UISSetColorMultipler(Float32 r, Float32 g, Float32 b, Float32 a) // 0x003F7E18, 0x1C bytes, first line 351
+    // param r                    reg f18
+    // param g                    reg f19
+    // param b                    reg f20
+    // param a                    reg f21
+{
+}
+
+void UISSetColorAdditive(Float32 r, Float32 g, Float32 b, Float32 a) // 0x003F7E38, 0x1C bytes, first line 359
+    // param r                    reg f18
+    // param g                    reg f19
+    // param b                    reg f20
+    // param a                    reg f21
+{
+}
+
+static char *_WriteInt(int ival, char *buf, char *eob, char pad, int width, int bsigned) // 0x003F7E58, 0xE4 bytes, first line 376
+    // param ival                 reg a0
+    // param buf                  reg t4
+    // param eob                  reg a2
+    // param pad                  reg a3
+    // param width                reg t0
+    // param bsigned              reg t1
+{
+    char revStr[12]; // stack -16
+    int i; // reg t0
+    int n; // reg t3
+    int sign; // reg t5
+    unsigned int val; // reg t2
+}
+
+static char *_WriteFloat(float fval, char *buf, char *eob, int width, int precision) // 0x003F7F40, 0x1D8 bytes, first line 405
+    // param fval                 reg f18
+    // param buf                  reg a0
+    // param eob                  reg a1
+    // param width                reg t3
+    // param precision            reg t1
+{
+    char revStr[64]; // stack -64
+    int i; // reg a2
+    int val; // reg v0
+    int n; // reg a3
+    int sign; // reg t4
+    float fraction; // reg f9
+    float nextVal; // reg f7
+    float round; // reg f7
+}
+
+static char *_WriteHex(unsigned int uval, char *buf, char *eob, int width, char pad, int caseDelta) // 0x003F8118, 0xB4 bytes, first line 452
+    // param uval                 reg a0
+    // param buf                  reg a1
+    // param eob                  reg a2
+    // param width                reg a3
+    // param pad                  reg t0
+    // param caseDelta            reg t1
+{
+    char c; // reg t2
+    char revStr[10]; // stack -16
+    int i; // reg a3
+    int n; // reg t3
+}
+
+static char *_WriteString(char *s, char *buf, char *eob, int width, int precision, Bool leftadjust) // 0x003F81D0, 0x10C bytes, first line 477
+    // param s                    reg s2
+    // param buf                  reg s0
+    // param eob                  reg s4
+    // param width                reg s3
+    // param precision            reg t0
+    // param leftadjust           reg s5
+{
+    int i; // reg s1
+    int len; // reg v0
+}
+
+int UISSprintf(char *buf, int destSize, char *fmt, Uint32 nParam, UISParamT *pParam) // 0x003F82E0, 0x2E8 bytes, first line 520
+    // param buf                  reg a3
+    // param destSize             reg a1
+    // param fmt                  reg s0
+    // param nParam               reg a3
+    // param pParam               reg s3
+{
+    int width; // reg a2
+    int precision; // reg t0
+    int caseDelta; // reg t1
+    int bflag; // reg t4
+    char c; // reg a1
+    char pad; // reg t3
+    char *s; // reg a0
+    char *buf0; // reg s4
+    char *eob; // reg s2
+    Bool leftadjust; // reg s5
+    int iParam; // reg s1
+}
+
+void UISStringFormat(UISScrDataT *pScrData, UISStringT *pString, UISStringT *pFormatStr, Uint32 nParam, UISParamT *pParam) // 0x003F85C8, 0x28 bytes, first line 601
+    // param pScrData             reg a0
+    // param pString              reg v0
+    // param pFormatStr           reg a2
+    // param nParam               reg a3
+    // param pParam               reg t0
+{
+}
+
+static Bool _IsChildOfControl(UISScrDataT *pScrData, UISControlT *pControl, UISControlInfoT *pControlInfo) // 0x003F85F0, 0xA8 bytes, first line 615
+    // param pScrData             reg t4
+    // param pControl             reg a1
+    // param pControlInfo         reg a2
+{
+    Uint32 idxLayer; // reg t0
+    Uint32 idxObj; // reg a3
+    UISLayerT *pLayer; // reg a0
+    UISObjT *pObj; // reg v0
+}
+
+static UISControlInfoT *_GetFirstEnableControl(UISScrDataT *pScrData, UISControlT *pControl) // 0x003F8698, 0xAC bytes, first line 648
+    // param pScrData             reg t4
+    // param pControl             reg a1
+{
+    UISControlInfoT *pControlInfo; // reg v0
+    Uint32 idxLayer; // reg a3
+    Uint32 idxObj; // reg a2
+    UISLayerT *pLayer; // reg a0
+    UISObjT *pObj; // reg v0
+}
+
+UISControlInfoT *UISFindSiblingEnableControl(UISScreenT *pScreen, UISControlInfoT *pControlInfo) // 0x003F8748, 0xA0 bytes, first line 681
+    // param pScreen              reg a0
+    // param pControlInfo         reg s4
+{
+    UISControlT *pControl; // reg s0
+    UISScrDataT *pScrData; // reg s1
+    Uint32 idxControl; // reg s2
+}
+
+void UISMoveScreenDrawPosition(UISInfoT *pInfo, Uint16 GroupID, Uint16 ScreenID, Int32 iDir) // 0x003F87E8, 0x26C bytes, first line 776
+    // param pInfo                reg s0
+    // param GroupID              reg a1
+    // param ScreenID             reg a2
+    // param iDir                 reg s1
+{
+    Int32 iScreen; // reg v1
+    Int32 nScreens; // reg t6
+    UISScreenT TempScreen; // stack -112
+    Int32 iMovements; // reg a3
+    Uint32 idxRate; // reg t0
+    Uint32 idxModals; // reg t0
+    Int32 idxOld; // reg t1
+    Int32 idxNew; // reg a0
+    Int32 increment; // reg s1
+}
+
+static void _ParseHints(UISInfoT *pInfo, UISScreenT *pScreen, UISStackInfoT *pStackInfo, Uint32 idxControl, Uint32 HINT, Uint32 nParam, UISParamT *pParam) // 0x003F8A58, 0x12C bytes, first line 859
+    // param pInfo                reg s4
+    // param pScreen              reg s3
+    // param pStackInfo           reg s5
+    // param idxControl           reg a3
+    // param HINT                 reg s2
+    // param nParam               reg s6
+    // param pParam               reg s7
+{
+    UISControlT *pControl; // reg s1
+    Uint32 idxMap; // reg s0
+    UISMapT *pMap; // reg v0
+    void *pcEvent; // reg v0
+}
+
+void UISDoHint(UISInfoT *pInfo, Uint32 Hint, Uint32 nParms, UISParamT *pParam) // 0x003F8B88, 0xD4 bytes, first line 889
+    // param pInfo                reg s0
+    // param Hint                 reg s7
+    // param nParms               reg s6
+    // param pParam               reg s5
+{
+    UISScreenT *pScreen; // reg a1
+    Uint32 idxScreen; // reg s1
+    Uint32 numScreens; // reg s4
+}
+
+void UISProcessHint(UISInfoT *pInfo, Uint32 Hint, Uint32 nParms, UISParamT *pParam) // 0xFFFFFFFF, 0x54 bytes, first line 919
+    // param pInfo                reg a0
+    // param Hint                 reg a1
+    // param nParms               reg t1
+    // param pParam               reg a3
+{
+    {
+        UISThreadGroupInfoT ThreadInfo; // stack -32
+    }
+}
+
+Bool UISAreEventsEnabled(UISInfoT *pInfo, Uint16 GroupID, Uint16 ScreenID) // 0x003F8C68, 0x60 bytes, first line 943
+    // param pInfo                reg a0
+    // param GroupID              reg a1
+    // param ScreenID             reg a2
+{
+    UISScreenT *pScreen; // reg a3
+    Uint32 idx; // reg t0
+}
+
+// ---- Types used above (full definitions) ----
+typedef struct UISColorVector_t UISColorVectorT;
+
+struct UISColorVector_t { // size 0x10
+    Float32 r; // 0x0
+    Float32 g; // 0x4
+    Float32 b; // 0x8
+    Float32 a; // 0xC
+};
+
+typedef float Float32;
+
+typedef unsigned int Uint32;
+
+typedef struct UISInfo_t UISInfoT;
+
+struct UISInfo_t { // size 0xBC
+    Uint32 InfoID; // 0x0
+    Uint32 CriticalRegions; // 0x4
+    Uint32 MSPerTick; // 0x8
+    UISMessageFncT *pMessageFnc; // 0xC
+    UISResUnloadFncT *pShutdownScreenFnc; // 0x10
+    UISResLoadFncT *pLoadFnc; // 0x14
+    UISResUnloadFncT *pUnloadFnc; // 0x18
+    UISTransformFncT *pTransformFnc; // 0x1C
+    UISLocalizeFncT *pLocalizeFnc; // 0x20
+    UISScreenActivatedFncT *pScreenActivatedFnc; // 0x24
+    UISScreenDrawDebugFncT *pScreenDrawDebugFnc; // 0x28
+    Uint32 ActiveScreenIdx; // 0x2C
+    Uint32 MaxScreens; // 0x30
+    Uint32 NumScreens; // 0x34
+    UISScreenT *Screens; // 0x38
+    UISScreenT *pGlobalScript; // 0x3C
+    Uint32 MaxPlugins; // 0x40
+    Uint32 NumPlugins; // 0x44
+    UISPluginT *Plugins; // 0x48
+    Uint32 MaxRateFncs; // 0x4C
+    Uint32 NumRateFncs; // 0x50
+    UISRateFncT *RateFncs; // 0x54
+    Uint32 MaxModals; // 0x58
+    Uint32 NumModals; // 0x5C
+    UISModalStackT *ModalStack; // 0x60
+    UISStackInfoT EventStack; // 0x64
+    UISStackInfoT RateStack; // 0x78
+    UISColorVectorT MultiplerFactor; // 0x8C
+    UISColorVectorT AdditiveFactor; // 0x9C
+    UISLocalThreadInfoT ThreadInfo; // 0xAC
+    Uint32 bShuttingDown; // 0xB8
+};
+
+typedef void UISMessageFncT();
+
+typedef void UISResUnloadFncT();
+
+typedef void *UISResLoadFncT();
+
+typedef void UISTransformFncT();
+
+typedef UISVectorT UISLocalizeFncT();
+
+typedef struct UISVector_t UISVectorT;
+
+struct UISVector_t { // size 0xC
+    Float32 x; // 0x0
+    Float32 y; // 0x4
+    Float32 z; // 0x8
+};
+
+typedef void UISScreenActivatedFncT();
+
+typedef void UISScreenDrawDebugFncT();
+
+typedef struct UISScreen_t UISScreenT;
+
+struct UISScreen_t { // size 0x14
+    Uint32 ControllerDisable; // 0x0
+    Uint16 GroupID; // 0x4
+    Uint16 ScreenID; // 0x6
+    Uint16 ParentGroupID; // 0x8
+    Uint16 ParentScreenID; // 0xA
+    Int32 bWaitingToBeUnloaded; // 0xC
+    UISScrDataT *pScrData; // 0x10
+};
+
+typedef short unsigned int Uint16;
+
+typedef int Int32;
+
+typedef struct UISScrData_t UISScrDataT;
+
+struct UISScrData_t { // size 0x20
+    Uint32 NumControls; // 0x0
+    UISControlT *Controls; // 0x4
+    Uint32 NumStrings; // 0x8
+    UISStringT *Strings; // 0xC
+    Uint32 NumPatchStrings; // 0x10
+    Uint32 *StringPatchTable; // 0x14
+    Uint32 NumStaticObjects; // 0x18
+    UISObjT *StaticObjects; // 0x1C
+};
+
+typedef struct UISControl_t UISControlT;
+
+struct UISControl_t { // size 0x14
+    UISControlInfoT *pControlInfo; // 0x0
+    Uint32 NumLayers; // 0x4
+    UISLayerT **Layers; // 0x8
+    Uint32 NumMaps; // 0xC
+    UISMapT *Maps; // 0x10
+};
+
+typedef struct UISControlInfo_t UISControlInfoT;
+
+struct UISControlInfo_t { // size 0x64
+    Uint32 IsVisible; // 0x0
+    Uint32 IsEnabled; // 0x4
+    UISTransformT Transform; // 0x8
+    Int32 idxFocusChild; // 0x5C
+    Uint32 CanHandleMessages; // 0x60
+};
+
+typedef struct UISTransform_t UISTransformT;
+
+struct UISTransform_t { // size 0x54
+    UISVectorT Offset; // 0x0
+    UISVectorT Pivot; // 0xC
+    UISVectorT Rotation; // 0x18
+    UISVectorT Scale; // 0x24
+    void *pGlobalInfo; // 0x30
+    UISColorVectorT MultiplerFactor; // 0x34
+    UISColorVectorT AdditiveFactor; // 0x44
+};
+
+typedef struct UISLayer_t UISLayerT;
+
+struct UISLayer_t { // size 0xC
+    UISLayerInfoT *pLayerInfo; // 0x0
+    Uint32 NumObjs; // 0x4
+    UISObjT *Objs; // 0x8
+};
+
+typedef struct UISLayerInfo_t UISLayerInfoT;
+
+struct UISLayerInfo_t { // size 0x4
+    Uint32 IsVisible; // 0x0
+};
+
+typedef struct UISObj_t UISObjT;
+
+struct UISObj_t { // size 0x8
+    Uint16 PluginIndex; // 0x0
+    Int16 bInitialized; // 0x2
+    void *pData; // 0x4
+};
+
+typedef short int Int16;
+
+typedef struct UISMap_t UISMapT;
+
+struct UISMap_t { // size 0x8
+    Uint16 ControlIndex; // 0x0
+    Uint16 EventID; // 0x2
+    Uint8 *pFnc; // 0x4
+};
+
+typedef unsigned char Uint8;
+
+typedef struct UISString_t UISStringT;
+
+struct UISString_t { // size 0xC
+    Uint32 ID; // 0x0
+    Uint32 length; // 0x4
+    String ptr; // 0x8
+};
+
+typedef char *String;
+
+typedef struct UISPlugin_t UISPluginT;
+
+struct UISPlugin_t { // size 0x4
+    UISPluginFncT *pFnc; // 0x0
+};
+
+typedef void UISPluginFncT();
+
+typedef struct UISRateFnc_t UISRateFncT;
+
+struct UISRateFnc_t { // size 0x34
+    Uint32 RateFncID; // 0x0
+    Uint8 *pFnc; // 0x4
+    Uint32 MSCount; // 0x8
+    Uint32 MSLastCount; // 0xC
+    Uint32 MSRate; // 0x10
+    Uint32 State; // 0x14
+    UISControlInfoT *pControlInfo; // 0x18
+    UISScreenT *pScreen; // 0x1C
+    UISAnimateDataT AnimationData; // 0x20
+};
+
+typedef struct UISAnimateData_t UISAnimateDataT;
+
+struct UISAnimateData_t { // size 0x14
+    Uint32 iType; // 0x0
+    Float32 fEndValue; // 0x4
+    Float32 fStepValue; // 0x8
+    Uint8 *pEndFnc; // 0xC
+    UISControlInfoT *pSubControlInfo; // 0x10
+};
+
+typedef struct UISModalStack_t UISModalStackT;
+
+struct UISModalStack_t { // size 0x28
+    UISStackInfoT StackState; // 0x0
+    UISControlInfoT *pControlInfo; // 0x14
+    UISScreenT *pScreen; // 0x18
+    UISParamT *pRestoreStack; // 0x1C
+    UISStackInfoT *pRestoreState; // 0x20
+    Uint16 ScreenID; // 0x24
+    Uint16 GroupID; // 0x26
+};
+
+typedef struct UISStackInfo_t UISStackInfoT;
+
+struct UISStackInfo_t { // size 0x14
+    UISParamT *pStackStart; // 0x0
+    UISParamT *pStackCurrent; // 0x4
+    UISParamT *pStackEnd; // 0x8
+    UISParamT *pStack; // 0xC
+    Uint8 *pPC; // 0x10
+};
+
+typedef union UISParam_t UISParamT;
+
+union UISParam_t { // size 0x4
+    Float32 fValue; // 0x0
+    Float32 *pfValue; // 0x0
+    Int32 iValue; // 0x0
+    Int32 *piValue; // 0x0
+    UISStringT *strAddr; // 0x0
+    UISArrayT *pArray; // 0x0
+};
+
+typedef struct UISArray_t UISArrayT;
+
+struct UISArray_t { // size 0x8
+    Uint32 nDimensions; // 0x0
+    Uint32 Size[1]; // 0x4
+};
+
+typedef struct UISLocalThreadInfo_t UISLocalThreadInfoT;
+
+struct UISLocalThreadInfo_t { // size 0xC
+    UISParamT *pBeginParams; // 0x0
+    UISParamT *pCurrentParams; // 0x4
+    UISParamT **ppEndParams; // 0x8
+};
+
+typedef Uint8 Bool;
+
+typedef union { // size 0x10
+    UISThreadGroupInfoMessageT MessageInfo; // 0x0
+    UISThreadGroupInfoActivateT ActivateInfo; // 0x0
+    UISThreadGroupInfoScreenT ScreenInfo; // 0x0
+    UISThreadGroupInfoGenericT GenericInfo; // 0x0
+} UISThreadGroupInfoT;
+
+typedef struct UISThreadGroupInfoMessage_t UISThreadGroupInfoMessageT;
+
+struct UISThreadGroupInfoMessage_t { // size 0x10
+    Uint32 Message; // 0x0
+    Uint32 Controller; // 0x4
+    Uint32 pad1; // 0x8
+    Uint32 pad2; // 0xC
+};
+
+typedef struct UISThreadGroupInfoActivate_t UISThreadGroupInfoActivateT;
+
+struct UISThreadGroupInfoActivate_t { // size 0x10
+    Int16 iDir; // 0x0
+    Int16 iProcessed; // 0x2
+    UISControlListT *pTableEntry; // 0x4
+    UISControlInfoT *pControlInfo; // 0x8
+    Uint16 ScreenID; // 0xC
+    Uint16 GroupID; // 0xE
+};
+
+typedef struct UISControlList_t UISControlListT;
+
+struct UISControlList_t { // size 0xC
+    Int32 nList; // 0x0
+    Int32 ThisObject; // 0x4
+    Int32 Offsets[1]; // 0x8
+};
+
+typedef struct UISThreadGroupInfoScreen_t UISThreadGroupInfoScreenT;
+
+struct UISThreadGroupInfoScreen_t { // size 0x10
+    Uint16 GroupID; // 0x0
+    Uint16 ScreenID; // 0x2
+    Uint16 ParentGroupID; // 0x4
+    Uint16 ParentScreenID; // 0x6
+    Uint32 iRetVal; // 0x8
+    Int32 iDir; // 0xC
+};
+
+typedef struct UISThreadGroupInfoGeneric_t UISThreadGroupInfoGenericT;
+
+struct UISThreadGroupInfoGeneric_t { // size 0x10
+    Uint32 Data[4]; // 0x0
+};
+
+enum UISTransformAction_t {
+    UISTransformInit = 0,
+    UISTransformPush = 1,
+    UISTransformPop = 2,
+    UISTransformShutdown = 3,
+};
+
+typedef enum UISTransformAction_t UISTransformAction;
+
+typedef void UISRuntimeErrorFncT();
+
+typedef enum {
+    UIS_NOOP = 1,
+    UIS_LOAD_SCREEN = 2,
+    UIS_UNLOAD_SCREEN = 3,
+    UIS_LOAD_RATEFNC = 6,
+    UIS_UNLOAD_RATEFNC = 7,
+    UIS_SET_SCREEN_ACTIVE = 8,
+    UIS_SET_CONTROL_ACTIVE = 9,
+    UIS_PROCESS_OBJECT = 10,
+    UIS_SEND_MESSAGE = 11,
+    UIS_PROCESS_EVENT = 12,
+    UIS_BASE_ADDR = 13,
+    UIS_STRNCPY = 14,
+    UIS_PUSH_STR = 15,
+    UIS_PUSH_INT = 16,
+    UIS_PUSH_FLT = 17,
+    UIS_CAST_INT = 18,
+    UIS_CAST_FLT = 19,
+    UIS_CAST_INT_1 = 20,
+    UIS_CAST_FLT_1 = 21,
+    UIS_GET_D = 24,
+    UIS_PUT_D = 25,
+    UIS_GET_S = 26,
+    UIS_PUT_S = 27,
+    UIS_BAND = 28,
+    UIS_BOR = 29,
+    UIS_BNEG = 30,
+    UIS_LAND = 31,
+    UIS_LOR = 32,
+    UIS_LNOT = 33,
+    UIS_ABS = 34,
+    UIS_ABS_F = 35,
+    UIS_NEG = 36,
+    UIS_ADD = 37,
+    UIS_SUB = 38,
+    UIS_MUL = 39,
+    UIS_DIV = 40,
+    UIS_NEG_F = 41,
+    UIS_ADD_F = 42,
+    UIS_SUB_F = 43,
+    UIS_MUL_F = 44,
+    UIS_DIV_F = 45,
+    UIS_INC = 46,
+    UIS_DEC = 47,
+    UIS_INC_F = 48,
+    UIS_DEC_F = 49,
+    UIS_GE = 50,
+    UIS_LE = 51,
+    UIS_GT = 52,
+    UIS_LT = 53,
+    UIS_EQ = 54,
+    UIS_NE = 55,
+    UIS_GE_F = 56,
+    UIS_LE_F = 57,
+    UIS_GT_F = 58,
+    UIS_LT_F = 59,
+    UIS_EQ_F = 60,
+    UIS_NE_F = 61,
+    UIS_BRA_TRUE = 62,
+    UIS_BRA_FALSE = 63,
+    UIS_JUMP = 64,
+    UIS_PUSH = 65,
+    UIS_POP = 66,
+    UIS_CALL = 67,
+    UIS_RET = 68,
+    UIS_GOTONEXTSCREEN = 69,
+    UIS_DEACTIVECONTROL = 70,
+    UIS_ACTIVECONTROL = 71,
+    UIS_ACTIVEPARENTSCREEN = 72,
+    UIS_STR_GETLENTGH = 73,
+    UIS_STR_GETCHAR = 74,
+    UIS_STR_SETCHAR = 75,
+    UIS_STR_FORMAT = 76,
+    UIS_UPDATESCREENS = 77,
+    UIS_MAPLINE_DEBUGONLY = 78,
+    UIS_EVENTSON = 79,
+    UIS_EVENTSOFF = 80,
+    UIS_DOMODAL = 81,
+    UIS_SWAPSTACK = 82,
+    UIS_PRINT_DEBUGONLY = 83,
+    UIS_SET_SCREEN_OBJECT = 84,
+    UIS_GET_D_THIS = 85,
+    UIS_PUT_D_THIS = 86,
+    UIS_CALOFFSET_THIS = 87,
+    UIS_ADVRATEFNC = 88,
+    UIS_VISIBILITY_CHANGE = 89,
+    UIS_MOD = 90,
+    UIS_GET_ELEMENT_S = 91,
+    UIS_PUT_ELEMENT_S = 92,
+    UIS_GET_ELEMENT_D = 93,
+    UIS_PUT_ELEMENT_D = 94,
+    UIS_GET_ELEMENT_D_THIS = 95,
+    UIS_PUT_ELEMENT_D_THIS = 96,
+    UIS_GET_ELEMENT_ADDR = 97,
+    UIS_PUT_ELEMENT_ADDR = 98,
+    UIS_PUSH_MULTIPLE = 99,
+    UIS_POP_MULTIPLE = 100,
+    UIS_COPY_MULTIPLE = 101,
+    UIS_FILL_ARRAY_S = 102,
+    UIS_FILL_ARRAY_D = 103,
+    UIS_FILL_ARRAY_D_THIS = 104,
+    UIS_ADDR_S = 105,
+    UIS_ADDR_D = 106,
+    UIS_ADDR_D_THIS = 107,
+    UIS_ADDR_ELEMENT_S = 108,
+    UIS_ADDR_ELEMENT_D = 109,
+    UIS_ADDR_ELEMENT_D_THIS = 110,
+    UIS_PATCH_STRING = 111,
+    UIS_DOMODAL_PARAMS = 112,
+    UIS_LOAD_SCREEN_PARAMS = 113,
+    UIS_MOVE_SCREEN = 114,
+    UIS_IS_TIMER_LOADED = 115,
+    UIS_ENABLE_CONTROLLER = 116,
+    UIS_IS_CONTROLLER_ENABLED = 117,
+    UIS_HINT = 118,
+    UIS_ISINGROUP = 119,
+    UIS_GET_ACTIVE_SCREEN = 120,
+} UISStackOpCode;
+
+typedef enum {
+    UISThreadAction_Load = 0,
+    UISThreadAction_Unload = 1,
+    UISThreadAction_Update = 2,
+    UISThreadAction_ScreenActivate = 3,
+    UISThreadAction_ScreenDeactivate = 4,
+    UISThreadAction_ControlActivate = 5,
+    UISThreadAction_ControlDeactivate = 6,
+    UISThreadAction_ProcessEvent = 7,
+    UISThreadAction_MoveScreen = 8,
+    UISThreadAction_HINT = 9,
+} UISThreadActionT;
+
+enum {
+    UISRATE_LOAD = 0,
+    UISRATE_UNLOAD = 1,
+    UISRATE_ACTIVE = 2,
+};
+
+enum {
+    UIS_ACTION_NONE = 0,
+    UIS_ACTION_ROTATION_X = 16,
+    UIS_ACTION_ROTATION_Y = 17,
+    UIS_ACTION_ROTATION_Z = 18,
+    UIS_ACTION_TRANSLATE_X = 19,
+    UIS_ACTION_TRANSLATE_Y = 20,
+    UIS_ACTION_TRANSLATE_Z = 21,
+    UIS_ACTION_SCALE_X = 22,
+    UIS_ACTION_SCALE_Y = 23,
+    UIS_ACTION_SCALE_Z = 24,
+    UIS_ACTION_PIVOT_X = 25,
+    UIS_ACTION_PIVOT_Y = 26,
+    UIS_ACTION_PIVOT_Z = 27,
+    UIS_ACTION_ADD_ALPHA = 32,
+    UIS_ACTION_ADD_RED = 33,
+    UIS_ACTION_ADD_GREEN = 34,
+    UIS_ACTION_ADD_BLUE = 35,
+    UIS_ACTION_MULTIPLY_ALPHA = 36,
+    UIS_ACTION_MULTIPLY_RED = 37,
+    UIS_ACTION_MULTIPLY_GREEN = 38,
+    UIS_ACTION_MULTIPLY_BLUE = 39,
+};
+
+enum {
+    UISPROCESS_CONTINUE = 0,
+    UIS_PROCESSSUBONLY = 1,
+    UISPROCESS_HARDABORT = 2,
+    UISPROCESS_DOMODAL = 3,
+};
+
