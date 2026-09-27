@@ -521,6 +521,18 @@ They will be sorted into the sections below.
   pScreen before pStudio and loads pData into r4). `pNodes[(s64)n]` / `[(u64)n]` do nothing and
   `[(s64)(s32)n]` leaves code (20). Worth a try where only a parameter-copy order in the entry
   block differs.
+- **[verified, fake-match class] A dead `srawi` deleted after allocation makes that block get
+  scheduled again, on physical registers.** Blocks scheduled before allocation carry a
+  "scheduled" flag (mwccdbg `{000c}`) and the post-RA scheduler skips them; when the post-RA
+  peephole deletes an instruction in the block (the dead high word of a `(s64)(s32)` round trip
+  survives allocation as `srawi r0,rX,31`), the flag is cleared (`{0004}`) and the post-RA
+  scheduler reorders the block with the real registers (anti-dependences included). UISScreen
+  fn_8016A510 (with nNode as both loop counters, 12): `if (((UISScreen*)(s64)(s32)pScreen)->pData
+  != NULL)` gives EA's entry `mr r23,r3; lwz r3,0x10(r4); mr r24,r4` (10), and `add =
+  *(UISVec4*)(s64)(s32)fn_8016C18C();` EA's order of a struct copy's loads among fmuls in the
+  call block (0). A switch per block: worth a try where only the order inside one block differs.
+  Note: an entry block is merged into the prologue block (and rescheduled there) only when the
+  prologue saves no FPRs.
 - **[verified] The last scheduling pass skips blocks the first pass scheduled unless an
   instruction in the block was inserted or deleted after it; register allocation deleting
   coalesced copies counts** (so does the post-RA deletion of a dead srawi: UISScreen
