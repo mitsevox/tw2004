@@ -126,14 +126,14 @@ LLTexGrp.c:
 
 LLFont.c:
 	.text       start:0x800107F4 end:0x8001256C
-	.data       start:0x801869C0 end:0x80186AD8
+	.data       start:0x801869B8 end:0x80186AD8
 	.bss        start:0x801A3478 end:0x801A34B0
 	.sbss       start:0x80281C88 end:0x80281C90
 	.sdata2     start:0x80282B20 end:0x80282B48
 
 UFont.c:
 	.text       start:0x8001256C end:0x80012ED0
-	.bss        start:0x801A34C0 end:0x801A36A0
+	.bss        start:0x801A34B0 end:0x801A36A0
 	.sdata      start:0x80280DE0 end:0x80280DF0
 	.sdata2     start:0x80282B48 end:0x80282B58
 
@@ -727,6 +727,7 @@ CharAnim.c:
 	.text       start:0x800957FC end:0x80097208
 	.rodata     start:0x80183A70 end:0x80183A98
 	.data       start:0x80189CE8 end:0x80189D30
+	.bss        start:0x801D9908 end:0x801D99D0
 	.sdata2     start:0x80283CD8 end:0x80283D18
 
 GoShaderObjectCommon_MorphAnimManager_Gc.c:
@@ -954,12 +955,18 @@ GoARAM.c:
 	.sdata      start:0x802814C8 end:0x802814D0
 
 DiscError.c:
-	.text       start:0x800B6924 end:0x800B769C
-	.data       start:0x8018FFC8 end:0x80190FE0
+	.text       start:0x800B6924 end:0x800B7210
+	.data       start:0x8018FFC8 end:0x80190DB0
 	.bss        start:0x801F66A8 end:0x801F6858
 	.sdata      start:0x802814D0 end:0x802814D8
-	.sbss       start:0x80282188 end:0x802821A8
+	.sbss       start:0x80282188 end:0x802821A0
 	.sdata2     start:0x802841B0 end:0x802841C8
+
+Code800B7210.c:
+	.text       start:0x800B7210 end:0x800B769C
+	.data       start:0x80190DB0 end:0x80190FE0
+	.sdata      start:0x802814D8 end:0x802814E8
+	.sbss       start:0x802821A0 end:0x802821A8
 
 rcmp_mad_codec.c:
 	.text       start:0x800B769C end:0x800B90F4

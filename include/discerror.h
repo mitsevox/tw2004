@@ -29,7 +29,6 @@ extern u32        lbl_8018FFE0[107 * 8];   // the font: 8 rows of 8 nibbles for 
 extern DiscColor  lbl_80190D40[9];         // the colours (7 black, 8 grey)
 extern DiscGlyph  lbl_801F66A8[107];       // each character's columns, from fn_800B694C
 extern const char** lbl_802814D8;          // the screen's messages in the current language
-extern const char lbl_802814DC[6];         // "%s %d"
 extern u8         lbl_802814D0;            // fill the unset pixels with the background colour
 extern u8         lbl_802814D1;            // fixed width: every character 8 pixels
 extern u8         lbl_802814D2;            // positions in 8-pixel cells

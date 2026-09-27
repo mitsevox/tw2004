@@ -29,6 +29,12 @@ char* fn_801008A8(void);                                    // GameMode11.c
 void  fn_8000A144(f32 (*pSrc)[4], f32 (*pDst)[4]);          // UMemPool.c: copies three rows
 void  Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ);                    // Quaternion.c: a rotation matrix's quaternion
 
+// .bss (character.h). Section note: owner by link order only. Nothing here uses it (only skalib.c's
+// Skalib_Init clears [0]); it lies between LLTime.c's .bss and GoShaderObject_Glows_Gc.c's, and of
+// the units between them this is the one from skalib.c's source directory (TW06/TW07
+// golf/animation) and the one with a stripped function (below).
+u8 lbl_801D9908[0xC8];
+
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x80283CD8), before the 0.0f fn_800957FC uses first; its body is unknown.
 static f32 CharAnim_StrippedFn(f32 x) {
