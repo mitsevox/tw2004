@@ -64,6 +64,26 @@ unless you combine it with something new. Before you stop, add every attempt und
   a further 8-minute climb from 44: no better. With that order, dropping the nView copy or
   pSession: 116 / 84. Left: the preamble keeps nView in r3 (orig `mr r29,r3`), and the fX/fY/fZ
   / fU float registers.
+- 2026-09-26, e-link2 (quicktrial aligned, base 7), mwccdbg: the preamble registers follow the
+  pre-regalloc schedule. EA picks `slwi r28` (the front end's hoisted nView*4, placed at the end of
+  the block) before the 2nd lbl_802813C0 load and `addi r30,gSession` only after it; ours schedules
+  the addi early because `pSession = &gSession` is at the top of the block (a tie with r72 goes to
+  the earlier instruction). Moving the gSession address to the END of the block fixes the whole
+  preamble and loop 1: `pSession = &gSession;` inside each outer for body (after fAcross, fAlong or
+  fHeight; the backend hoists it into the preheader) -> preamble and first loop exact, aligned 7,
+  real 99.22 -> 99.10 (not kept): loop 2 then re-hoists its own lis/addi (EA reuses loop 1's r30;
+  EA's loop 2 preheader re-hoists only 0x4330) and r30/r31 swap (gSession vs 0x4330). So EA's
+  gSession base is a function-wide value placed after r72, used by both loops with `lwz 0x24(r30)`:
+  looks like a front-end CSE/hoist of the base &gSession (ours hoists &gSession+0x24 when both
+  loops read `gSession.nFrameCount`: 42). Not found: assigned in loop 1 only 20-21 (`mr` of the
+  named copy in the loop), in the do body 29, top of the for body 8, for-init / before loop 1 7;
+  mixed spellings per loop (`gSession.nFrameCount` / `((s32*)&gSession)[9]` / `*(s32*)((u8*)&gSession
+  + 0x24)` / `(&gSession)->` / `(&gSession)[0].`) 8 (per-loop hoist) or 42 (same spelling);
+  dead reads of other gSession fields 42; const/register/cast/`+ 0` pSession 7; inline helpers
+  (Session* param with &gSession, getter, whole fU) 19-60; pSession declaration x 11 positions x 3
+  spellings 7; `nIndices = nVerts = 0` chains 7-10; every local's type (13 int / 4 float types) 7;
+  GreenGrid field types (nVerts, nIndices, nCols, anRows, anColor, b104) and `int nView` 7;
+  per-function pragma sweep 7-...; permuter 20 min -j4: `nIndices = (bInGap = 0)` (aligned 13).
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 
