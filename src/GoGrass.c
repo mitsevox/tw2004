@@ -8,6 +8,15 @@
 #include "endian.h"
 #include "gx.h"
 
+// .bss, reverse address order.
+// fake match: EA's .bss has 4 zero bytes before lbl_802603B0 and 0x10 after lbl_802602C0's 0x90
+// (lbl_80260360 on a 32-byte boundary), which these types alone do not make; the aligned
+// attributes stand in for them (a larger EA type, or objects no code uses).
+GrassManager lbl_802603B0 __attribute__((aligned(8)));
+GXTexObj lbl_8026038C;
+UObjMesh lbl_80260360 __attribute__((aligned(32)));
+UObjMeshInfo lbl_802602C0;
+
 GrassManager* lbl_80281900 = &lbl_802603B0;
 
 // This file's .sbss (grassshader.h), in reverse address order as the compiler lays it out.

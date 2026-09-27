@@ -58,8 +58,11 @@ typedef struct ProfClock {
     ProfTime tStart;            // 0x00  when TI_vInitModule set it up
     ProfTime tNow;              // 0x08  the last reading
     ProfWatch aWatches[5];      // 0x10
+    u8   unk88[0x110 - 0x88];   // 0x88  no code found reads these (size: lbl_801D97F8's 0x110 bytes)
 } ProfClock;
+LAYOUT_ASSERT(ProfClock, 0x110);
 
+extern ProfClock  lbl_801D97F8;
 extern ProfClock* lbl_802813B0;
 
 // The particles' buffers (GoShaderObject_Particle_Gc.c, lbl_802813A8).
@@ -69,6 +72,7 @@ typedef struct ParticleBuffers {
     u32   n14;                  // 0x14  the first particle no system holds yet (fn_8009428C)
 } ParticleBuffers;
 
+extern ParticleBuffers  lbl_801D97E0;
 extern ParticleBuffers* lbl_802813A8;
 
 u32  fn_8000B3E8(void);                 // the tick (urandom.c)
@@ -948,6 +952,7 @@ typedef struct ScreenCopy {
     s32   nSize;                // 0x10  the buffer's size in bytes (fn_8002F454)
 } ScreenCopy;
 
+extern ScreenCopy  lbl_801D4F68;
 extern ScreenCopy* lbl_80281100;
 extern s32 lbl_80281B88;        // bit 0: the video field being drawn
 extern s32* lbl_802811F8;       // points at lbl_80281E80, a copy of lbl_80281B88 (fn_800718E4)

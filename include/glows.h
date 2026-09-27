@@ -146,6 +146,7 @@ typedef struct SunFlrState {
     u8   b1BF0;                 // 0x1BF0  set by fn_8009B314; fn_8009B134 does nothing without it
 } SunFlrState;
 
+extern SunFlrState  lbl_801E1470;
 extern SunFlrState* lbl_802813B8;
 
 // Code800BA940.c's glows: two at each view's ball (our names). Each grows from fStartSize to

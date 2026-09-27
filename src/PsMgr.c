@@ -16,6 +16,9 @@ void fn_800B4F24(void* pRain);
 void fn_800B4FA4(void* pRain);
 void fn_800B52D4(void* pRain, f32* pFrameTime, s32 n);
 
+void* lbl_801F16F4[PS_NUM_KINDS];
+char lbl_801F1640[20][9];
+
 PsMgrState* lbl_802813F8 = &lbl_80282010;
 
 // This file's .sbss (psmgr.h).

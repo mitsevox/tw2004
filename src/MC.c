@@ -18,6 +18,12 @@ s32 fn_800A0B18(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage);
 s32 fn_800A0BC8(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage);
 void MC_FillCRCTable(void);
 
+// .bss, reverse address order. lbl_801F1510 is mostly MC_Gc.c's to use, but it lies after this
+// file's other .bss, and MC_Gc.c's ends at 0x801F1100.
+MCCardState lbl_801F1510[MC_NUM_PORTS][MC_NUM_SLOTS];
+u32 lbl_801F1110[256];
+u32 lbl_801F1100[4];
+
 // At boot: no created golfer yet; try MC_LoadLastUser on each card, and at the first that succeeds mark
 // player slot 0's profile loaded and return 1.
 u8 MC_LoadInitialUser(void) {

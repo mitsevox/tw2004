@@ -268,6 +268,7 @@ void fn_800988A0(s32 p0, s32 p1, s32 p2, s32 p3);
 void fn_800988B8(f32 farg0, f32 farg1, f32 farg2);
 void fn_800988CC(s32 p0);
 // .bss in reverse address order (CodeWarrior lays it out last-defined-first)
+GlowQueue lbl_801D9A68[1];
 u8 lbl_801D9A40[0x28];
 GlowTable lbl_801D99D0;
 void fn_80036054();

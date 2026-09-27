@@ -15,6 +15,11 @@ void DF_vDrawBufferToScreen(int n);
 void fn_80045880(int n);
 void fn_800458B4(void);
 
+GxTexture lbl_801D51C8[2];
+GxTexture lbl_801D5198;
+DFBuffer lbl_801D5188;
+DFLayer lbl_801D5110[5];
+
 // This file's .sdata (engine.h).
 DFBuffer* lbl_80281110 = &lbl_801D5188;
 f32 lbl_80281114 = 0.011f;
