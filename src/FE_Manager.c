@@ -23,7 +23,7 @@ void fn_8008DBE8(void);
 void fn_80092198(void);
 void fn_8009220C(void);
 void fn_800A7644(int a);
-void fn_800A4FD8(void);
+void Gaud_ExitFE(void);
 void fn_80102AC4(void);
 void FE_CrAP_SetTriggerAnims(u8 b);
 void FE_CrAP_UnequipSlot(s16 nSlot);            // FE_CrAPDB.c
@@ -1267,7 +1267,7 @@ void fn_80079AD4(void) {
     lbl_801D7148.b11 = 0;
     lbl_801D87C0.b0 = 1;
     gSession.a8[0] = 0;
-    fn_800A4FD8();
+    Gaud_ExitFE();
     fn_80102AC4();
 }
 

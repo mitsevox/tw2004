@@ -40,11 +40,11 @@ void fn_800918A4(void);
 s32  Aud_InitSession(u8 a, u8 b, u8 nListeners, int nUnused);
 void fn_8001A81C(void);
 void fn_8006F438(void);
-void fn_800A500C(void);
+void Gaud_InitHole(void);
 void fn_80112D20(void);
 void fn_8009A16C(void);
 void fn_80112DA0(void);
-void fn_800A5428(void);
+void Gaud_ExitHole(void);
 void fn_8001C2E4(void);
 void fn_8006F568(void);
 void Luck_TightenOdds(void);
@@ -142,7 +142,7 @@ void fn_800083A4(void) {
                 fn_8001A81C();
             }
             fn_8006F438();
-            fn_800A500C();
+            Gaud_InitHole();
             fn_80112D20();
             gSession.nGameType = 6;
             break;
@@ -159,7 +159,7 @@ void fn_800083A4(void) {
             break;
         case 7:
             fn_80112DA0();
-            fn_800A5428();
+            Gaud_ExitHole();
             fn_8001C2E4();
             fn_8006F568();
             Luck_TightenOdds();

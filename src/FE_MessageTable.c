@@ -70,7 +70,7 @@ s32  MC_SaveOptions(MCCardPos* pPos);      // } MC.c, in lbl_8018C7D8 (sets 0, 2
 s32  fn_800A09EC(MCCardPos* pPos);      // }
 s32  MC_SaveUser(MCCardPos* pPos);      // }
 s32  MC_GetNumUser(MCCardPos* pPos);      // }
-void fn_800A4FD8(void);
+void Gaud_ExitFE(void);
 void fn_800A73F0(int n);
 void fn_8010F2FC(MsgArg* pArgs, MsgArg* pResult);
 void fn_8010F3A4(MsgArg* pArgs, MsgArg* pResult);
@@ -1367,7 +1367,7 @@ void fn_8007BCC4(MsgArg* pArgs, MsgArg* pResult) {
     GM_SetModeType((u8)pArgs[0].i);
     gSession.a8[0] = 1;
     lbl_801D87C0.b0 = 1;
-    fn_800A4FD8();
+    Gaud_ExitFE();
 }
 
 void fn_8007BD18(MsgArg* pArgs, MsgArg* pResult) {

@@ -263,7 +263,7 @@ s32   fn_80084FB4(CardPos* pPos);
 void  MC_ConnectCard(s32 nPort, s32 nSlot);
 s32   MC_SaveReplay(MCCardPos* pPos);
 s32   fn_800A0610(s32 nPort, s32 nSlot, s32 n);
-void  fn_800A6148(void);
+void  Gaud_TextFall(void);
 void  Gaud_PlayTextDitty(int n);
 void  fn_800A6F38(void);
 void  fn_800A7350(int a);
@@ -2296,7 +2296,7 @@ void fn_80089C84(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80089CAC(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800A6148();
+    Gaud_TextFall();
 }
 
 // Whether the player missed the cut.

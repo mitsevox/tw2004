@@ -63,7 +63,7 @@ void Aud_SetOutputmode(u8 n);
 void Aud_MicSetRvbPreset(u8 nIndex, u8 nValue);
 void Aud_SesTmplOvrTrackRvbMode(s16 nSound, u8 nTrack, u8 bOn);
 void HeartBeatLoopCallback(u8 nId, u8 nTrack, s32 n);
-void fn_800A5980(u8 nPlayer);
+void Gaud_SwingBallHit(u8 nPlayer);
 void Gaud_InitSlowMo(u8 nPlayer, u8 n);
 void Gaud_ExitGameBreaker(u8 nPlayer);
 void Aud_EmiSetTrackVariation(u8 nId, u8 nTrack, u8 n);
@@ -95,7 +95,7 @@ GameAudioCourseSound lbl_8018EA08[9] = {
     { 18, 18, 2 },
 };
 
-// fn_800A5980: the swing sound per club (Player.nClub) and per lie (Ball.nLie).
+// Gaud_SwingBallHit: the swing sound per club (Player.nClub) and per lie (Ball.nLie).
 const u8 lbl_80183AD8[28] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 3, 0, 0,
 };
@@ -670,10 +670,12 @@ void Gaud_Monitor(void) {
     }
 }
 
-// Starts a world object's sound. Kinds 0, 3 and 5 play as a pair of emitters lbl_80281450 either
-// side of the listener (kind 0 only once, lbl_80282042); the others play at the object. Kinds
+// Starts a sound actor of the course as it loads (UKernel.c fn_80048BDC). Its nKind is also the
+// emitter its instances join, so the Aud_EmiAlias calls drive them together (0 the wind and rain, 1
+// the trees); n goes to Aud_EmiAdd's n24. Kinds 0, 3 and 5 play as a pair of instances lbl_80281450
+// either side of the listener (kind 0 only once, lbl_80282042), the others at the object. Kinds
 // below 3 need gpGame->b288.
-void fn_800A4CB8(GameAudioSource** ppSource, int n) {
+void Gaud_ActorDownloadCallback(GameAudioSource** ppSource, int n) {
     GameAudioSource* pSource;
     u32 nKind;
     u8 bPlay;
@@ -719,7 +721,11 @@ void fn_800A4CB8(GameAudioSource** ppSource, int n) {
     }
 }
 
-void fn_800A4E34(void) {
+// Sets up the front end's sound (GO_vInitFE): no music, ambience or commentary yet; the first time
+// only (lbl_80282028), the SFX, commentary and music volumes from the options and output mode 2;
+// the menus' UI sound emitter (sound 1, lbl_8028141B) with its track 0 on; every flag off, with
+// FirstFrameInit due.
+void Gaud_InitFE(void) {
     f32 vPos[3];
 
     lbl_8028203C = 0;
@@ -757,16 +763,23 @@ void fn_800A4E34(void) {
     lbl_80282040 = 0;
 }
 
-void fn_800A4FD8(void) {
+// Leaving the front end: stops the music, forgets the UI sound and music emitters, and stops
+// Gaud_Monitor's work (lbl_80282029).
+void Gaud_ExitFE(void) {
     Gaud_StopMusic();
     lbl_8028141B = 0xFF;
     lbl_80281418 = 0xFF;
     lbl_80282029 = 0;
 }
 
-// Sets up the round's sounds: each view's emitters (0 the swing, 1 the ball, 2 and 3 a pair
-// either side), the music and the ambience.
-void fn_800A500C(void) {
+// Sets up a hole's sounds (GoEntry.c, before play): each view's emitters (the swing and the ball at
+// the player, the effects pair lbl_80281454 either side, the first with HeartBeatLoopCallback), the
+// in-game UI sounds (sound 10, lbl_8028141B), the commentary (sound 5, lbl_80281419), the music or
+// ambience (Gaud_SetStreamingContext) and the crowd pair (sound 7, lbl_80281458 either side).
+// Course 7's hole index 2 gets reverb preset 17 and reverb on the ball's track 0 and the swing's
+// tracks 0 to 2. Then resumes the sound and resets the flags; the crowd plays in modes 0-2, 4, 5,
+// 10, 18-21 and 23-25 (lbl_80282040).
+void Gaud_InitHole(void) {
     GameAudioView* pView;
     Player* pPlayer;
     int nViews;
@@ -855,8 +868,11 @@ void fn_800A500C(void) {
     lbl_80282040 = ((1 << nMode) & 0x03BC0437) != 0;
 }
 
-// Stops the game's sounds and clears every view's emitters.
-void fn_800A5428(void) {
+// After a hole's play (GoEntry.c): deletes the ambience emitter (or stops the music) and the
+// commentary emitter; stops the crowd, the zoom, the GameBreaker, slow motion, the special shot,
+// the top-of-arc build-up, the wind, the rain and the trees; forgets every other emitter
+// (Aud_ExitSession frees them) and unmutes. Gaud_Monitor stops until the next hole.
+void Gaud_ExitHole(void) {
     int nViews;
     int i;
 
@@ -903,13 +919,16 @@ void fn_800A5428(void) {
     Aud_Mute(0, 0);
 }
 
-void fn_800A5620(void) {
+// The hole is over (event 1): UpdateStreaming no longer restarts the ambience (lbl_8028202D).
+void Gaud_EndHole(void) {
     lbl_8028202D = 1;
 }
 
-// Resets the swing sound state and parks the view's swish emitter (emitter 0) at the club head
-// (bone 0x53), silent, before the swing meter starts.
-void fn_800A562C(u8 nPlayer) {
+// A swing is about to start (STATEFUNC_SwingInit): resets the swing sound flags, stops the crowd
+// reaction and the special shot's sounds, silences every track of the effects pair, deletes the
+// flag's sound when the flag is out, and parks the swing emitter at the club head (bone 0x53),
+// silent (step 1), for Gaud_UpdtSwing.
+void Gaud_InitSwing(u8 nPlayer) {
     GameAudioView* pView;
     Player* pPlayer;
     u8 nId;
@@ -941,7 +960,7 @@ void fn_800A562C(u8 nPlayer) {
 
 // The swish of the club in the backswing and downswing (swing states 1 and 3): its pitch and
 // volume follow how fast the club head (bone 0x53) moves.
-void fn_800A573C(u8 nPlayer) {
+void Gaud_UpdtSwing(u8 nPlayer) {
     Player* pPlayer;
     GameAudioView* pView;
     u8 nId;
@@ -996,9 +1015,16 @@ void fn_800A573C(u8 nPlayer) {
     }
 }
 
-// The swing: its sound by club and lie on the view's emitter 0. For a few calls after Gaud_InitSpecialShot
-// set lbl_80282034 it plays track 4 of the view's emitters 2 and 3 instead.
-void fn_800A5980(u8 nPlayer) {
+// The club hits the ball (the swing states, and Gaud_ExitSpecialShot when it was held back). While
+// lbl_80282034 counts down after Gaud_InitSpecialShot, plays only the special camera's sound (track
+// 4 of the effects pair: range 1, or by camera kind on the last count; kind 11 starts slow motion
+// instead). Otherwise the hit sound, track 1 of the swing emitter at the ball: its variation range
+// by club (lbl_80183AD8), its variation by lie (lbl_80183AF4; variation 5 in modes 22 and 26 when
+// the shot's power is over 1), twice as loud after a special swing camera, which adds its whoosh
+// (track 5 of the effects pair). A scripted GameBreaker starts the slow-motion sound; otherwise a
+// crowd reaction held back meanwhile plays now. Marks the swing for the crowd build-up
+// (lbl_80282033).
+void Gaud_SwingBallHit(u8 nPlayer) {
     Player* pPlayer;
     GameAudioView* pView;
     Clip* pClip;
@@ -1095,9 +1121,13 @@ void fn_800A5980(u8 nPlayer) {
     pView->tLast = TI_sReadCounter(1);
 }
 
-// The ball's impact sound, by the surface it hit (its nSoundId) and scaled by its speed; on
-// course 7's hole 2 a surface with a swing sound plays that instead.
-void fn_800A5CA4(u8 nPlayer) {
+// The ball lands or bounces (event.c's events 35 to 38): the impact sound of the surface it hit
+// (its nSoundId, a step of the ball emitter), louder the faster the ball ((0.03 x speed) squared,
+// at most 1; surface sound 4 always 1), none when too soft (0.1) or within 0.2 s of the last one.
+// On course 7's hole index 2 a surface with a swing sound plays that instead, under emitter 4, at
+// up to twice the volume. In the long-drive modes (22, 26) GameMode26.c's fn_8010D3D8 is told.
+// Always ends the top-of-arc build-up.
+void Gaud_BallBounce(u8 nPlayer) {
     Player* pPlayer;
     GameAudioView* pView;
     SurfaceType* pSurface;
@@ -1151,13 +1181,15 @@ void fn_800A5CA4(u8 nPlayer) {
     fn_800A707C();
 }
 
-void fn_800A5E94(u8 nPlayer) {
+void Gaud_BallStopped(u8 nPlayer) {
     fn_8006BAA8(nPlayer);
     ExitCrowdBuildup();
     fn_800A707C();
 }
 
-void fn_800A5EC0(u8 nPlayer) {
+// The ball drops in the cup (event 33): one of two cup sounds at random (steps 0x1A and 0x1C of the
+// ball emitter), at twice the volume, at the ball.
+void Gaud_BallInCup(u8 nPlayer) {
     Player* pPlayer;
     u8 nId;
     u8 nRand;
@@ -1170,7 +1202,9 @@ void fn_800A5EC0(u8 nPlayer) {
     Aud_EmiSetTrackStep(nId, 0, nRand == 0 ? 0x1A : 0x1C, 0);
 }
 
-void fn_800A5F60(u8 nPlayer) {
+// The ball hits the flagstick (event 38): step 0x17 of the ball emitter at full volume, at the
+// ball.
+void Gaud_BallHitPole(u8 nPlayer) {
     Player* pPlayer;
     u8 nId;
 
@@ -1181,7 +1215,9 @@ void fn_800A5F60(u8 nPlayer) {
     Aud_EmiSetTrackStep(nId, 0, 0x17, 0);
 }
 
-void fn_800A5FE8(u8 nPlayer) {
+// The ball hits a world object, a target game's target (event 39): the same sound as
+// Gaud_BallHitPole (step 0x17 of the ball emitter, full volume).
+void Gaud_BallHitMetalTarget(u8 nPlayer) {
     Player* pPlayer;
     u8 nId;
 
@@ -1192,7 +1228,8 @@ void fn_800A5FE8(u8 nPlayer) {
     Aud_EmiSetTrackStep(nId, 0, 0x17, 0);
 }
 
-// Plays variant 3 on track 1 of the view's emitters 2 and 3, at most every 300 frames with bLimit.
+// The camera-shake sound: variation range 3 of track 1 on the player's view's effects pair. With
+// bLimit (TW07: filter) at most once every 300 frames.
 void Gaud_CameraShake(u8 nPlayer, u8 bLimit) {
     Player* pPlayer;
     u8 nIdA;
@@ -1210,7 +1247,9 @@ void Gaud_CameraShake(u8 nPlayer, u8 bLimit) {
     }
 }
 
-void fn_800A6148(void) {
+// A UI script command's sound: the camera-shake sound (range 3 of track 1) on view 0's effects
+// pair, with no limit.
+void Gaud_TextFall(void) {
     u8 nIdA;
     u8 nIdB;
 
@@ -1281,15 +1320,17 @@ void fn_800A640C(void) {
     Aud_EmiAliasSetTrackStatus(3, 0, 1);
 }
 
-// Empty; nPlayer is unused (event.c passes it: TW07's Gaud_Tappa, empty too, takes the player).
-void fn_800A6448(u8 nPlayer) {
+// Event 45's sound, empty as in TW07; nPlayer is unused.
+void Gaud_Tappa(u8 nPlayer) {
 }
 
-// Empty; nPlayer is unused (event.c passes it: TW07's Gaud_Spina, empty too, takes the player).
-void fn_800A644C(u8 nPlayer) {
+// Event 46's sound, empty as in TW07; nPlayer is unused.
+void Gaud_Spina(u8 nPlayer) {
 }
 
-void fn_800A6450(u8 nPlayer) {
+// The power boost's feedback (event 47, when the swing has a power boost and a club 0 to 5): track
+// 2 of the player's swing emitter.
+void Gaud_PlayTappaFeedback(u8 nPlayer) {
     u8 nId;
 
     nId = lbl_801F1790[gPlayers[nPlayer].nView[0]].n0;
@@ -1383,7 +1424,7 @@ void Gaud_ExitCamZoom(u8 nPlayer) {
 
 // A special swing camera starts (camera 0's kind, View.n260). Outside speed golf (modes 6 to 8) it
 // mutes the high channels and, by kind, plays a swoosh (a variation range of track 1 on view 0's
-// emitters 2 and 3), the slow-motion sound or kind 7's sounds; lbl_80282034 tells fn_800A5980 what
+// emitters 2 and 3), the slow-motion sound or kind 7's sounds; lbl_80282034 tells Gaud_SwingBallHit what
 // to play on the next swing sounds.
 void Gaud_InitSpecialShot(u8 nPlayer) {
     GameAudioView* pView;
@@ -1500,7 +1541,7 @@ void Gaud_ExitSpecialShot(u8 nPlayer) {
             Aud_EmiSetTrackStatus(pView->n3, 2, 0);
         }
         if (lbl_80282032) {
-            fn_800A5980(nPlayer);
+            Gaud_SwingBallHit(nPlayer);
         }
     }
 }

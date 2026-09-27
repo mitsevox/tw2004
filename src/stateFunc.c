@@ -37,7 +37,7 @@ u8    fn_80062B90(void);
 u8    fn_80062B88(int nPlayer);
 void  fn_80062B84(int a);
 u8    fn_80062B7C(void);
-void  fn_800A5980(u8 nPlayer);
+void  Gaud_SwingBallHit(u8 nPlayer);
 void  TARGET_ResetMomentums(int nPlayer);
 f32   fn_800D04AC(int nPlayer);
 void  fn_800170F4(int nView);
@@ -46,13 +46,13 @@ void  fn_800D8D10(int nPlayer);
 void  PlaceBall_ResetMomentums(int nPlayer);
 void  fn_80062D98(void);
 void  DynObj_TeeAdd(Ball* pBall, int nPlayer, int a);  // tee the ball up
-void  fn_800A573C(u8 nPlayer);
+void  Gaud_UpdtSwing(u8 nPlayer);
 void  fn_800A3CB0(f32* pPos, int nPlayer);
 void  fn_800A3D6C(f32* pPos, int nPlayer);
 void  fn_800A3DF4(int nPlayer);
 void  fn_80062DDC(f32* pA, f32* pB, f32* pOut);  // a - b
 void  fn_8006BB5C(int nPlayer);
-void  fn_800A562C(u8 nPlayer);
+void  Gaud_InitSwing(u8 nPlayer);
 void  fn_800D1DAC(int nPlayer);
 void  fn_80062B68(int nPlayer);
 void  fn_80062B6C(int nPlayer);
@@ -509,7 +509,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
     GameEffects_ResetGameEffectSettings();
     Character_AlignShotWithTarget(nPlayer, 1, 1);
     TARGET_ResetMomentums(nPlayer);
-    fn_800A562C((u8)nPlayer);
+    Gaud_InitSwing((u8)nPlayer);
     fn_8006BAA8(nPlayer);
     EVENT_Trigger(nPlayer, 0x2A, 0, -1);
     Emotion_UpdatePlayerEmotion(nPlayer);
@@ -585,7 +585,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
         gPlayers[nPlayer].fC20 = 0.0f;
     }
     if (nClub != CLUB_PUTTER_e) {
-        fn_800A573C((u8)nPlayer);
+        Gaud_UpdtSwing((u8)nPlayer);
     }
     if (gpGame->b282 != 0) {
         if (GUI_UIVisible(nPlayer)) {
@@ -606,7 +606,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
         Misc_SetSeedFunc(1, gSession.nSeed);
         pV = ViewController_GetCameraController(gPlayers[nPlayer].nView[0]);
         GolfCamera_ChooseSpecialSwing(pV, nPlayer);
-        fn_800A5980((u8)nPlayer);
+        Gaud_SwingBallHit((u8)nPlayer);
         if (fn_800C7138(pV) == 0) {
             EVENT_Trigger(nPlayer, 0x3B, 0, 0);
         }
@@ -764,10 +764,10 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
             SW_vUIBlurReset(nPlayer);
             fn_80062D98();
         }
-        fn_800A5980(nPlayer);
+        Gaud_SwingBallHit(nPlayer);
     }
     if (gPlayers[nPlayer].nClub != CLUB_PUTTER_e) {
-        fn_800A573C(nPlayer);
+        Gaud_UpdtSwing(nPlayer);
     }
 }
 
@@ -1594,7 +1594,7 @@ void STATEFUNC_TapInUpdate(int nPlayer) {
         gPlayers[nPlayer].nController = CONTROLLER_CPU;
         SW_vImpact(nPlayer);
         gPlayers[nPlayer].nController = nController;
-        fn_800A5980((u8)nPlayer);
+        Gaud_SwingBallHit((u8)nPlayer);
         REPLAY_ResetController(nPlayer, nController);
         GOLFERSTATE_Switch(GS_SIMULATE, nPlayer);
     } else {
@@ -1602,7 +1602,7 @@ void STATEFUNC_TapInUpdate(int nPlayer) {
         gPlayers[nPlayer].nController = CONTROLLER_CPU;
         SW_vImpact(nPlayer);
         gPlayers[nPlayer].nController = nController;
-        fn_800A5980((u8)nPlayer);
+        Gaud_SwingBallHit((u8)nPlayer);
         REPLAY_ResetController(nPlayer, nController);
         GOLFERSTATE_Switch(GS_SIMULATE, nPlayer);
     }

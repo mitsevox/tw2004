@@ -17,8 +17,8 @@ typedef struct GameAudioView {
     u8   unk6[0x8 - 0x6];
     f32  f8;                    // 0x8
     f32  fC;                    // 0xC
-    u64  tLast;                 // 0x10   TI_sReadCounter(1)'s reading when fn_800A5CA4 last ran
-    s32  n18;                   // 0x18   the swing state fn_800A573C last saw
+    u64  tLast;                 // 0x10   TI_sReadCounter(1)'s reading when Gaud_BallBounce last ran
+    s32  n18;                   // 0x18   the swing state Gaud_UpdtSwing last saw
     u8   unk1C[0x20 - 0x1C];
 } GameAudioView;
 LAYOUT_ASSERT(GameAudioView, 0x20);
@@ -32,7 +32,7 @@ typedef struct GameAudioCourseSound {
 } GameAudioCourseSound;
 LAYOUT_ASSERT(GameAudioCourseSound, 0x8);
 
-// A world object's sound as fn_800A4CB8 is handed it (through a pointer to a pointer to it).
+// A world object's sound as Gaud_ActorDownloadCallback is handed it (through a pointer to a pointer to it).
 typedef struct GameAudioSource {
     u8   unk0[0x10];
     f32  vPos[3];               // 0x10   where it plays (kinds other than 0, 3 and 5)

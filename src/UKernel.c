@@ -22,7 +22,7 @@ void fn_8000C5A4(f32 (*pMtx)[4]);
 
 void fn_800646D0(UStreamObject* pObject);
 void fn_80064A0C(UStreamObject* pObject);
-void fn_800A4CB8(UStreamObject* pObject, int n);
+void Gaud_ActorDownloadCallback(UStreamObject* pObject, int n);
 void fn_800EADDC(void* pObj);
 
 void fn_80048B70(void* p);
@@ -85,7 +85,7 @@ void fn_80048BDC(UStreamObject* pObject) {
         fn_800EADDC(pObject);
         return;
     case 9:
-        fn_800A4CB8(pObject, 1);
+        Gaud_ActorDownloadCallback(pObject, 1);
         StaticMem_Free(pObject);
         return;
     }

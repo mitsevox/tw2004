@@ -219,8 +219,8 @@ void fn_800A2064(void);
 void fn_800A2E14(void);
 void fn_800A3A84(void);
 void Gaud_Monitor(void);
-void fn_800A4E34(void);
-void fn_800A4FD8(void);
+void Gaud_InitFE(void);
+void Gaud_ExitFE(void);
 void Aud_InitSession(int a, int b, u8 c, int d);
 void fn_800AE338(void);
 void fn_800B1608(void);
@@ -563,7 +563,7 @@ void GO_vInitFE(void) {
     CameraController_SetCameraMode(ViewController_GetCameraController(nView), 0x17, 0, nView);
     fn_8005D3A8(0);
     GOLFERSTATE_Set(0, 0);
-    fn_800A4E34();
+    Gaud_InitFE();
     fn_800B9B48();
     fn_80037DD8();
     fn_8010F748();
@@ -1141,7 +1141,7 @@ void fn_8006D8E8(void) {
         fn_800083A0();
         if (gSession.nGameType == 13) {
             if (gSession.uFlags & 0x1000) {
-                fn_800A4FD8();
+                Gaud_ExitFE();
                 fn_8010BF68();
             }
             return;

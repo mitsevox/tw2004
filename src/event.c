@@ -33,15 +33,15 @@ void fn_8009A16C(void);
 void fn_800A2FFC(int nPlayer, int nArg);
 void fn_800A31E0(Ball* pBall, int nPlayer);
 void fn_800A3348(Ball* pBall, int nPlayer);
-void fn_800A5620(void);
-void fn_800A5CA4(u8 nPlayer);
-void fn_800A5E94(u8 nPlayer);
-void fn_800A5EC0(u8 nPlayer);
-void fn_800A5F60(u8 nPlayer);
-void fn_800A5FE8(u8 nPlayer);
-void fn_800A6448(u8 nPlayer);
-void fn_800A644C(u8 nPlayer);
-void fn_800A6450(u8 nPlayer);
+void Gaud_EndHole(void);
+void Gaud_BallBounce(u8 nPlayer);
+void Gaud_BallStopped(u8 nPlayer);
+void Gaud_BallInCup(u8 nPlayer);
+void Gaud_BallHitPole(u8 nPlayer);
+void Gaud_BallHitMetalTarget(u8 nPlayer);
+void Gaud_Tappa(u8 nPlayer);
+void Gaud_Spina(u8 nPlayer);
+void Gaud_PlayTappaFeedback(u8 nPlayer);
 void Gaud_InitGameBreaker(u8 nPlayer, int a);
 void Gaud_ExitGameBreaker(u8 nPlayer);
 void Gaud_InitCamZoom(u8 nPlayer);
@@ -84,7 +84,7 @@ void fn_80065BE4(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!fn_80101AA8(nPlayer, 1)) {
         SitDev_QueueEvent(nPlayer, 2, 12);
     }
-    fn_800A5620();
+    Gaud_EndHole();
 }
 
 void fn_80065C30(int nPlayer, int nEvent, void* pData, int nArg) {
@@ -367,7 +367,7 @@ void fn_800667C0(int nPlayer, int nEvent, void* pData, int nArg) {
 
 void fn_80066828(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
-        fn_800A5E94(nPlayer);
+        Gaud_BallStopped(nPlayer);
         if (!fn_80101AA8(nPlayer, 32)) {
             SitDev_QueueEvent(nPlayer, 2, 8);
         }
@@ -383,7 +383,7 @@ void fn_800668A8(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         fn_80063CF0(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]), 8, nPlayer);
         fn_8006ACF8(nPlayer, 4);
-        fn_800A5EC0(nPlayer);
+        Gaud_BallInCup(nPlayer);
         SitDev_QueueEvent(nPlayer, 2, 9);
     }
 }
@@ -421,7 +421,7 @@ void fn_80066A14(int nPlayer, int nEvent, void* pData, int nArg) {
 void fn_80066A3C(int nPlayer, int nEvent, void* pData, int nArg) {
     if (gPlayers[nPlayer].ball.pHitActor != NULL) {
         gpGame->pfn268(nPlayer, gPlayers[nPlayer].ball.pHitActor->n140);
-        fn_800A5FE8(nPlayer);
+        Gaud_BallHitMetalTarget(nPlayer);
     }
 }
 
@@ -483,18 +483,18 @@ void fn_80066C08(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 void fn_80066C2C(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_800A644C(nPlayer);
+    Gaud_Spina(nPlayer);
     if (fn_80101AA8(nPlayer, 46)) return;   // the result is tested (clrlwi.) with nothing after it
 }
 
 void fn_80066C6C(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_800A6448(nPlayer);
+    Gaud_Tappa(nPlayer);
     if (fn_80101AA8(nPlayer, 45)) return;   // as in fn_80066C2C
 }
 
 void fn_80066CAC(int nPlayer, int nEvent, void* pData, int nArg) {
     if (fn_8005CB48(nPlayer) > 0 && gPlayers[nPlayer].nClub >= 0 && gPlayers[nPlayer].nClub <= 5) {
-        fn_800A6450(nPlayer);
+        Gaud_PlayTappaFeedback(nPlayer);
     }
 }
 
@@ -638,7 +638,7 @@ void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int b) {
 void fn_800670A8(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         fn_80063CF0(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]), 7, nPlayer);
-        fn_800A5CA4(nPlayer);
+        Gaud_BallBounce(nPlayer);
         fn_800A3348(pData, nPlayer);
         fn_8006ACF8(nPlayer, 1);
         if (nEvent == 36 && gPlayers[nPlayer].ball.pHitObject != NULL) {
@@ -647,7 +647,7 @@ void fn_800670A8(int nPlayer, int nEvent, void* pData, int nArg) {
         }
         if (nEvent == 38) {
             gPlayers[nPlayer].b30D = 1;
-            fn_800A5F60(nPlayer);
+            Gaud_BallHitPole(nPlayer);
         }
         if (nEvent == 36) {
             gPlayers[nPlayer].b30C = 1;
