@@ -43461,5 +43461,21 @@
 "matched_functions": 7646,
 "total_functions": 7647,
 "exact": 7646
+},
+{
+"commit": "1568576",
+"sha": "1568576256d9630f6666ba5441be1be96bf73eb9",
+"time": 1790527711,
+"subject": "Merge agent/b12: UISStack fn_80166098 99.77 -> 99.85 (event-word address phis without compares)",
+"report": true,
+"matched_code": 1541080,
+"complete_code": 1541080,
+"matched_data": 861843,
+"complete_data": 1078143,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7646,
+"total_functions": 7647,
+"exact": 7646
 }
 ]
