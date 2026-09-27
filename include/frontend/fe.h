@@ -264,11 +264,13 @@ typedef struct CrAPAsset {
     s16  nPart;                 // 0x028  the part it is a choice for
     s16  nCategory;             // 0x02A  its category: where the category's name ("Hats",
                                 //        "Visors") starts in the 'CR_S' strings (FE_CrAP_GetStringFromTable)
-    s16  n2C;                   // 0x02C
-    s16  n2E;                   // 0x02E  0..15; FE_CrAP_IsAssetRemovable tests it
-    s32  n30;                   // 0x030
-    s32  n34;                   // 0x034
-    s32  n38;                   // 0x038
+    s16  n2C;                   // 0x02C  its sponsor: an index into the brand names lbl_801935C8
+                                //        (FE_CrAP_GetPartSponsor; TW06 sponsorID)
+    s16  n2E;                   // 0x02E  its slot: the SaveProfile.aAF80 entry that holds it when worn
+                                //        (0..52; -1: none; FE_CrAP_EquipAsset; TW06 itemSlot)
+    s32  n30;                   // 0x030  its price (FE_CrAP_GetPartRetailPrice)
+    s32  n34;                   // 0x034  its sale price (FE_CrAP_GetPartSalePrice)
+    s32  n38;                   // 0x038  its level (FE_CrAP_GetPartLevel): level 0 assets are owned from the start
     s8   nAttrA;                // 0x03C  } the two attributes it raises (-1: none) and the tier
     s8   nTierA;                // 0x03D  } it raises each to
     s8   nAttrB;                // 0x03E  }
@@ -277,9 +279,9 @@ typedef struct CrAPAsset {
                                 //        database's n4 or 2 (FE_CrAP_GetAssetGender, FE_IsValidCurrentGender)
     s8   nLockKind;             // 0x041  } how it is unlocked and the number that goes with it
     s16  nLock;                 // 0x042  } (fn_80078008)
-    s16  n44;                   // 0x044
-    s16  n46;                   // 0x046
-    s16  n48;                   // 0x048
+    s16  n44;                   // 0x044  } its three colour ids (FE_CrAP_GetPartColor1..3;
+    s16  n46;                   // 0x046  } TW06 color1..color3)
+    s16  n48;                   // 0x048  }
     s8   a4A[6];                // 0x04A  indexed by fn_80105644's last argument
     s8   aColorKind[6];         // 0x050  per colour: 0..2 take the skin option's colour of that
                                 //        kind (FE_CrAP_GetPartColorRGBA); -1 and others use aColor
@@ -293,8 +295,8 @@ typedef struct CrAPAsset {
     u64  aSetVariant[4];        // 0x0D0  } putting it on gives each set the variant and option
     u64  aSetOption[4];         // 0x0F0  } with these ids (FE_CrAP_ApplyAssetSets)
     s16  n110;                  // 0x110  the offset in 'CR_S' of its unlock text (-1: none; FE_CrAP_GetUnlockMessageFrom)
-    s16  n112;                 // 0x112  } offsets of strings in 'CR_S' (FE_CrAP_GetStringFromTable); n114 is
-    s16  n114;                  // 0x114  } passed to fn_8008E724 with the asset's name (sTurnOnAnimation)
+    s16  n112;                  // 0x112  } the offsets in 'CR_S' of the animation the menu golfer plays to
+    s16  n114;                  // 0x114  } show it off and of its camera shot (FE_CrAP_TurnOnAsset, sApplySlider)
     s16  n116;                  // 0x116  (swapped by CrAPAssetsByteSwap)
 } CrAPAsset;
 LAYOUT_ASSERT(CrAPAsset, 0x118);
@@ -316,17 +318,17 @@ LAYOUT_ASSERT(CrAPDB, 0x18);
 // A 0x2C-byte record of the Create-A-Player database's table lbl_80282470 (64 of them,
 // FE_CrAP_InitModule); FE_CrAP_GetSponsorshipItemInfo copies one out.
 typedef struct CrAPRecord {
-    s16  n0;                    // 0x00
+    s16  n0;                    // 0x00  the sponsor (an index into lbl_801935C8)
     u8   unk2[2];
-    s32  n4;                    // 0x04
-    char sz8[0x2C - 0x8];       // 0x08
+    s32  n4;                    // 0x04  fn_800F0304 of the sponsorship entry (TW07: the cash bonus)
+    char sz8[0x2C - 0x8];       // 0x08  the worn asset's name (FE_CrAP_CollectSponsorshipItems)
 } CrAPRecord;
 LAYOUT_ASSERT(CrAPRecord, 0x2C);
 
 extern CrAPDB* lbl_80282460;
 extern UStreamObject* lbl_80282464;     // the 'CR_A' object (the assets), kept until freed
 extern UStreamObject* lbl_80282468;     // the 'CR_S' object (their names)
-extern s32 lbl_8028246C;                // cleared by FE_CrAP_InitModule
+extern s32 lbl_8028246C;                // how many records lbl_80282470 holds (FE_CrAP_CollectSponsorshipItems)
 extern CrAPRecord* lbl_80282470;        // 64 records (FE_CrAP_GetSponsorshipItemInfo); freed by FE_CrAP_CloseModule
 extern s32* lbl_80282474;               // per part: the index of its first asset
 extern s32* lbl_80282478;               // per part, 24 entries: the categories FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex found
@@ -334,7 +336,8 @@ extern s32* lbl_8028247C;               // 0x600 entries, rows 24 apart (FE_CrAP
                                         // each row's start); FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex stores a part's choice count
 extern s32* lbl_80282480;               // 24 entries (FE_CrAP_ResetLastCategoryTables sets them to -1)
 extern SwapField lbl_80193228[20];      // an asset's byte-swap layout (CrAPAssetsByteSwap)
-extern char lbl_801935C8[16][32];      // 16 names (FE_CrAP_GetSponsorName)
+extern char lbl_801935C8[16][32];      // the 16 sponsors' brand names ("adidas", "Callaway Golf"...;
+                                        // FE_CrAP_GetSponsorName)
 extern char lbl_801937C8[11][32];      // the skin sets a logo can go on ("ushirtlogof",
                                         // "uhatlogof", "uarmtattool"...; sTurnOnLogo)
 extern s32 lbl_802816E8;                // } an asset to put on and one to take off when

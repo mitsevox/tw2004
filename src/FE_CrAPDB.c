@@ -1,7 +1,10 @@
 // FE_CrAPDB.c (EA's name, from its asserts; TW06): the Create-A-Player database, every asset a
 // created golfer can wear or carry (hair, faces, shirts, hats, clubs...). The assets arrive in the
 // 'CR_A' stream object and the names they use in 'CR_S'; each asset belongs to one of the
-// CRAP_NUM_PARTS parts, has a category and a lock kind, and raises up to two attributes.
+// CRAP_NUM_PARTS parts, has a category and a lock kind, and raises up to two attributes. The part
+// picker shows each part as a list of entries (an "All ..." entry for some parts, then one per
+// category), each entry holding its choices; EA's names call the part the category, the entry the
+// subcategory index and the choice the entry number.
 
 #include "game_types.h"
 #include "charstate.h"
@@ -1942,9 +1945,6 @@ u8 FE_CrAP_IsAssetRemovable(int nAsset) {
     }
     return 0;
 }
-
-// Senders the EA Sports Bio screens (EASportsBio.c) use: message nMsg with its values to the front
-// end's handler, when there is a front end. A string value goes as a MsgString.
 
 // Send message nMsg with the value nA to the front end's handler (lbl_80281F1C), when there is a
 // front end. The EA Sports Bio screens (EASportsBio.c) use this file's FE_SendHint senders; a
