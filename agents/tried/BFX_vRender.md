@@ -8,6 +8,43 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-27 b2 (quicktrial aligned; current source 31, all four colour bytes read direct
+  `lbl_80189CB0[nPlayer][k]` = "DIRECT" 32). Scripts in the lane scratch (bfx*.py, climb*.py,
+  phsim*.py). Two real levers found, one wall:
+  1. **The schedule is fixed by a dead 64-bit high word on pPos**: `pPos = (f32*)((u8*)lbl_801D95C8
+     + (s64)nPlayer * 48);` with DIRECT reads -> 26, and every remaining difference is a register:
+     the instruction ORDER is EA's (pUV `lis` late, colour loads interleaved, lbzx for red). The
+     `li 0x30; mulhw; li 0` of the high word joins the pre-RA schedule and is gone before
+     allocation (0 neighbours). Spellings `nPlayer * (s64)48`, `(s64)nPlayer * (s64)sizeof(row)`,
+     `* 48u`, `* 12 * 4` all the same; `lbl_801D95C8[(s64)nPlayer]` 42 (srawi, pUV to r27); s64 on
+     pColour / pUV / the colour index alone: 42-46. The same s64 on the committed pSrc form: 27.
+  2. **pUV written straight into the global, as GoObjShadow fn_80093DB8 does**
+     (`lbl_801D94D8[nPlayer][k] = ..`, `desc.pUV = lbl_801D94D8[nPlayer]`, no pUV local) on top of
+     1: 20. n*32 becomes a frontend temp (coloured late); row, b, a get EA's r4/r8/r4. pColour
+     direct as well: 29 (34 with pPos too); pPos direct would need the s64 at each store (not tried).
+  3. **The wall: EA's n*32 is r10 and r9 is never used anywhere in the function.** In every graph we
+     produce (mwccdbg + rasim-style replays of the 26 and 20 variants), n*32's neighbours in EA's
+     colours hold r0,r3,r4,r5,r6,r8 (+r7 if its rlwinm is scheduled before the lbzx), so r10 needs a
+     neighbour holding r9 that leaves no instruction: a dead value allocated, then deleted.
+     Replays with one or two phantom neighbours (any live set) plus renumbering reach 1 wrong
+     (n*32 only), never 0. Dead `srawi`s from `(s64)(s32)` round trips (on a loaded byte or a
+     pointer) ARE deleted after allocation here, even in r0 with no later write in the block
+     (dump of the g/a variant), so they work as phantoms; but a srawi takes the lowest free register at
+     its def, and r9 needs r0,r3..r8 all live at one point. None of our pre-RA schedules has such a
+     point. Lead: before pPos's `add` (pPos lo r0, mulli r5, pUV lis r3, table r4/r6, off r7, n*16 r8)
+     would give it, if the pre-RA scheduler put the colour-table/pColour address work ahead of that add.
+  Other results: statement order of pColour=/rgba/pUV= (1,000+ placements): 32 on DIRECT, 26 on 1,
+  20 on 2 (CW reorders freely); 24 rgba orders x declaration orders: no gain; colour loop forms 26-30;
+  local uv table + loop 111; per-function pragmas on the 26/20/12 bases (scheduling once/750/7400/603,
+  opt_propagation/common_subs/dead_assignments/lifetimes/loop_invariants/strength_reduction off,
+  peephole off, optimization_level 3): never better, `scheduling once` 142; pSrc row forms on 2: 27-28;
+  64-bit adds (`(s64)(s32)base + ..`) leave addc/adde (53-90). Random climbs over (s64) / (s64)(s32) /
+  (s64)(s8) round trips on the 7 index/value sites + declaration + rgba order (7 climbs, ~10k compiles)
+  stall at 12 aligned (every byte store right; left: table base r4 vs r6, off r8 vs r7, n*16 r6 vs r8,
+  row r7 vs r4, n*32 r4 vs r10, pUV's add one slot early), with 4-6 casts: not a credible fake, not
+  applied. pPos written direct with the s64 at every store 55 (68 with a plain desc.pPos); direct
+  without s64 32. Nothing changed in src.
+
 - 2026-09-26 e-render: permuter 20 min -j 3 (7.1k iterations; machine load ~27): best 1340,
   1385, 1445: all `volatile int` temps for one colour byte (not usable). Nothing else.
 
