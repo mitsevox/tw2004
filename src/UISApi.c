@@ -697,6 +697,8 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs) {
     f32 fValue;
     UISWord wScale;
     s32 aArgs[3];
+    s32* pArg1;
+    s32* pArg2;
 
     fn_80165C74(pStudio);
     pStack = &pStudio->stack78;
@@ -707,6 +709,16 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs) {
         if (pRate->uState != 2) continue;
         pScreen = pRate->pScreen;
         if (pRate->u10 == 0) continue;
+        // fake match: &aArgs[1] / &aArgs[2] set on both arms of a test that is always true here (the
+        // branch reuses the continue's compare and disappears); the two definitions keep the stores'
+        // addresses in registers hoisted out of the loops (EA's addi r24,r1,0x20 / addi r23,r1,0x24).
+        if (pRate->u10) {
+            pArg1 = &aArgs[1];
+            pArg2 = &aArgs[2];
+        } else {
+            pArg1 = &aArgs[1];
+            pArg2 = &aArgs[2];
+        }
         pRate->n8 += uMs;
         nLeft = pRate->n8 - pRate->nC;
         while (nLeft >= (s32)pRate->u10) {
@@ -716,10 +728,10 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs) {
                 if (pRate->uState != 2) break;
                 wScale.f = 1.0f;
                 aArgs[0] = pRate->uId;
-                aArgs[1] = pRate->nC;
+                *pArg1 = pRate->nC;
                 if (pRate->u20 == 0) {
                     nArgs = 3;
-                    aArgs[2] = pRate->u10;
+                    *pArg2 = pRate->u10;
                 } else {
                     nArgs = 2;
                 }
@@ -731,10 +743,12 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs) {
             }
             if (pRate->u20 != 0) {
                 pfVar = fn_8016C1A4(pRate->u20, pRate->pInfo);
+                // fake match: fStep read into fValue before the scale test (EA loads it there)
+                fValue = pRate->fStep;
                 if (fScale < 0.0f) {
                     fScale = 1.0f;
                 }
-                fValue = pRate->fStep * fScale + *pfVar;
+                fValue = fValue * fScale + *pfVar;
                 if ((pRate->fStep > 0.0f && fValue < pRate->fTarget)
                     || (pRate->fStep < 0.0f && fValue > pRate->fTarget)) {
                     *pfVar = fValue;
