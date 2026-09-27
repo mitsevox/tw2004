@@ -255,9 +255,17 @@ u8 fn_80169308(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
 }
 
 // Goes to a screen: queued as event 0 while an event is being sent, at once otherwise.
-s32 fn_801694A0(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 nArgs, s32* pArgs) {
+// fake match: optimization level 2 for this function only, and uGroup / uScreen are copies of the
+// parameters. At level 4 the extra copy-propagation passes fold uScreen into r5 before the
+// argument setup, so pStudio is copied out of r3 instead of EA's `mr r8,r5` copy of uScreen.
+#pragma optimization_level 2
+s32 fn_801694A0(UIStudio* pStudio, u16 uGroupArg, u16 uScreenArg, u8 nArgs, s32* pArgs) {
     UISEventData data;
+    u16 uGroup;
+    u16 uScreen;
 
+    uGroup = uGroupArg;
+    uScreen = uScreenArg;
     if (pStudio->uFlags & 2) {
         data.aw[0] = uGroup;
         data.aw[1] = uScreen;
@@ -269,6 +277,7 @@ s32 fn_801694A0(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 nArgs, s32* pArgs
     }
     return 1;
 }
+#pragma optimization_level reset
 
 // Makes pFile the studio's UI file (pCurrent->p10), fixing up its offsets unless it already is
 // that file. Returns whether the file can be used; a file that cannot is dropped.
