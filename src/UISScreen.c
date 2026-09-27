@@ -388,8 +388,8 @@ static inline char* fn_8016B844_CaseX(char* pOut, char* pEnd, u32 u, s32 nWidth,
 
 // fake match: fn_8016B844's 'd' case as an inline, for the same preheader placement as
 // fn_8016B844_CaseX. `bUnsigned ^ 1` for !bUnsigned (it is 0 or 1) gives EA's xori, and
-// `bNeg = n >> 31` inside the && EA's srwi. whose result is the sign kept in r0. Code is
-// unchanged.
+// `bNeg = n >> 31` inside the && EA's srwi. whose result is the sign kept in r0. The caller
+// passes its own u as n, which keeps EA's `mr r11,r7` before the negate. Code is unchanged.
 static inline char* fn_8016B844_CaseD(char* pOut, char* pEnd, u32 n, s32 nWidth, char cPad, s32 bUnsigned) {
     s32 nDigits;
     s32 nPad;
@@ -418,9 +418,17 @@ static inline char* fn_8016B844_CaseD(char* pOut, char* pEnd, u32 n, s32 nWidth,
     return pOut;
 }
 
+// fake match: fn_8016B844's start pointer read through an inline whose parameter is changed (the
+// dead p++), so the parameter is a frontend variable numbered before every other inline's; the
+// start then ranks lowest of the saved registers (EA's r26). Returns p unchanged.
+static inline char* fn_8016B844_Get(char* p) {
+    return p++;
+}
+
 // Formats szFormat with pArgs into pOut (nSize bytes). Returns the length written, or -1.
 // EA bug: '-' is never cleared, so every conversion after one with '-' is left-justified too.
 s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UISWord* pArgs) {
+    // Register note: this declaration order gives EA's c r7, cPad r8 and nUpper r0.
     char* pEnd;
     s32 nArg;
     s32 nUpper;
@@ -434,7 +442,7 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
     char cPad;
     char* pStart;
 
-    pStart = pOut;
+    pStart = fn_8016B844_Get(pOut);
     pEnd = pOut + nSize;
     bLeft = 0;
     if (pOut == NULL || nSize == 0 || szFormat == NULL) return -1;
