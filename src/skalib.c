@@ -2125,12 +2125,15 @@ void fn_80026844(LibOverlay* pOv, int nSlot, int nGroup, int nClub, int nStyle, 
     s16 nOff;
     int nGroupOff;
     u8* pTree;
+    u8* pGroup;
 
     if (nNames == 0) return;
     nGroupOff = pOv->pWork->groups[20];
     if (nGroupOff < 0) return;
     pTree = pOv->pWork->pTree;
-    nOff = *(s16*)(pTree + (nGroupOff + 2));
+    pGroup = pTree;
+    pGroup += nGroupOff;
+    nOff = *(s16*)(pGroup + 2);
     if (nOff < 0) return;
     nOff = *(s16*)(pTree + nOff);
     if (nOff < 0) return;

@@ -992,7 +992,7 @@ config.libs = [
             Object(Matching, "GoBreakLine.c"),
             Object(Matching, "AnimStream.c"),
             Object(Matching, "TerrainGround.c"),
-            Object(NonMatching, "SkinPart.c"),
+            Object(Matching, "SkinPart.c"),
             Object(Matching, "HoleScore.c"),
             Object(Matching, "SwingTips.c"),
             Object(Matching, "Calendar.c"),
