@@ -420,7 +420,7 @@ void fn_800F3800(int nPlayer) {
 // shows text 0xD1 (through fn_800F1E1C, from a UI command).
 void fn_800F3828(void) {
     GOLFERSTATE_Switch(12, lbl_80282278);   // GS_SIMULATE
-    fn_800E3D90();
+    GUI_HideAllToggleUI();
     Gaud_StopShotClock();
     lbl_80282370 = 1;
 }

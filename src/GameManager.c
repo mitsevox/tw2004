@@ -126,7 +126,7 @@ void fn_800DCC04(void) {
 
 void fn_800DCC30(void) {
     (*(s32 (**)(void*))((u8*)(gpGame) + 0x1CC))(gpGame);
-    fn_800E3BEC();
+    GUI_DeInit();
     fn_800EDE78();
     fn_800EADD8();
     fn_800D33F0();
@@ -159,7 +159,7 @@ void GM_InitForHole(void) {
     Wind_Generate();
     gpGame->pfn1E4();
     GameEffects_ResetGameEffectSettings();
-    fn_800E3B28();
+    GUI_Init();
     fn_800DA36C();
     if (gpGame->b27F) {
         GM_FlyByMode_Init();
@@ -253,9 +253,9 @@ void GM_EndOfGolferTurn_GameFinished(int nPlayer) {
     if (gSession.b12 == 0 && gSession.a8[0] == 0) {
         if (gpGame->b275) {
             if (!gpGame->b274 || GM5_IsChallengeRunning()) {
-                fn_800E4D94(1);
+                GUI_EndOfGameScorecard(1);
             } else {
-                fn_800E4D94(0);
+                GUI_EndOfGameScorecard(0);
             }
         }
         GOLFERSTATE_Set(GS_WAIT, nPlayer);
@@ -272,15 +272,15 @@ void GM_HoleFinished_GameNotFinished(int nPlayer) {
     gpGame->pfn210(nPlayer);
     if (gpGame->b275 && !GUI_ScoreCardUp()) {
         if (!gpGame->b274 || GM5_IsChallengeRunning()) {
-            fn_800E4C20(1);
+            GUI_BetweenHolesScorecard(1);
         } else {
-            fn_800E4C20(0);
+            GUI_BetweenHolesScorecard(0);
         }
     }
     GOLFERSTATE_Set(GS_WAIT, nPlayer);
     nView = gPlayers[nPlayer].nView[0];
     CameraController_SetCameraMode(ViewController_GetCameraController(nView), 0x11, nPlayer, nView);
-    fn_800E3D90();
+    GUI_HideAllToggleUI();
 }
 
 // TW06: GM_CheckForAIConcede. A CPU concedes the hole when it is not holed and either nLevel (its
@@ -740,8 +740,8 @@ void GM_FlyByMode_Init(void) {
 void GM_Update(void) {
     if (gSession.nGameType == 6) {
         gpGame->pfn220();
-        if ((fn_800E5110() && GUI_IsPauseMenuOpen()) || fn_800E45CC()) {
-            fn_800E46B4();
+        if ((fn_800E5110() && GUI_IsPauseMenuOpen()) || GUI_GetUIMessageQued()) {
+            GUI_CheckMessageQue();
         } else if (gpGame->b27E && !GUI_ScoreCardUp()) {
             GM_SetupGolfer_IfAllWaiting();
         }
@@ -763,8 +763,8 @@ void GM_RestartHole(void) {
             GM_FlyByMode_Init();
         }
         gpGame->n12C = gSession.nFrameCount;
-        fn_800E3D90();
-        fn_800E3B28();
+        GUI_HideAllToggleUI();
+        GUI_Init();
         GameEffects_ResetGameEffectSettings();
         fn_800C6C8C();
         for (i = 0; i < gSession.nNumPlayers; i++) {
@@ -853,7 +853,7 @@ void GM_GolferConcede_Hole(int nPlayer) {
     }
     fn_800E5714(1);
     fn_800E5724(nPlayer);
-    fn_800E41C8();
+    GUI_FlagPostShotRequest();
     GOLFERSTATE_Switch(GS_CONCEDED, nPlayer);
 }
 
@@ -970,10 +970,10 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
         fn_80062D0C(nPlayer);
         return;
     }
-    if (fn_800E46B4()) {
+    if (GUI_CheckMessageQue()) {
         return;
     }
-    if (!fn_800E4254(nPlayer)) {
+    if (!GUI_IsPostShotUIAnimating(nPlayer)) {
         if (fn_80063C7C(pView)) {
             GM_EndOfGolferTurn(nPlayer);
             return;

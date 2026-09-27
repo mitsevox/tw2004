@@ -443,7 +443,7 @@ void fn_800F4894(int nPlayer) {
 // goes to player 1 if the leader is player 0, else to player 0.
 void fn_800F48C4(void) {
     GOLFERSTATE_Switch(12, lbl_80282278);   // GS_SIMULATE
-    fn_800E3D90();
+    GUI_HideAllToggleUI();
     Gaud_StopShotClock();
     lbl_8028237D = 1;
     if (lbl_8028238C != 5) {

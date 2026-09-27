@@ -995,7 +995,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   first gives `and. r0, rM, r3`, and swapping the operands in the source changes nothing. Applied
   to every single-use mask in Swing.c (States 04/05/08/09/10 exact, 06/12/14/22 closer).
 - **[verified] Statement order among plain stores matters**: `a[i] = 1; x = 0; y = 0;` and
-  `x = 0; a[i] = 1; y = 0;` give different register use (fn_800E4238). And a call made for an
+  `x = 0; a[i] = 1; y = 0;` give different register use (GUI_PostShotUIStart). And a call made for an
   argument that was never used (`fn_800E5DA0(lbl)` vs `fn_800E5DA0()`) changes the code.
 - **[verified] Chained assignment stores backwards.** `a[0] = a[1] = a[2] = 0` stores 2, 1, 0;
   the original wrote four statements in order.
@@ -1485,7 +1485,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   `fn_800FDC5C`, 89.9% -> 98.2%).
 - **[verified] An exact unit can still fail the link on function order.** objdiff scores each
   function by name, so a function defined out of address order reads 100% while the linked
-  `.text` shifts. GameUI `fn_800E3ECC` was defined after `GUI_PauseMenuClosed`; moving it fixed the DOL.
+  `.text` shifts. GameUI `GUI_SetEndOfGamePending` was defined after `GUI_PauseMenuClosed`; moving it fixed the DOL.
 - **[verified] A constant the original has twice means the original was two files.**
   CodeWarrior keeps one copy of each constant per file. GameMode10's code emits one int-to-float
   conversion double; the original has two (`lbl_80284688`, `lbl_802846A0`), each with the

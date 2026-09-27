@@ -1150,11 +1150,11 @@ u8 fn_800ED5C8(int nPlayer, u8 bCheck) {
     return lbl_8028231C(nPlayer, bCheck);
 }
 
-// The hole is over, the game is not: after a restart fn_800E4D88 runs and the restart flag and b275
-// are cleared; otherwise the mode's own callback runs.
+// The hole is over, the game is not: after a restart GUI_SetEndOfHolePending runs and the restart
+// flag and b275 are cleared; otherwise the mode's own callback runs.
 void fn_800ED604(int nPlayer) {
     if (lbl_802822FE) {
-        fn_800E4D88();
+        GUI_SetEndOfHolePending();
         lbl_802822FE = 0;
         gpGame->b275 = 0;
         return;

@@ -411,30 +411,30 @@ u8   GM_IsSpeedGolfMode(void);                 // modes 6, 7 and 8
 void fn_800E3B04(void);
 
 // GameUI.c
-void fn_800E3B28(void);
-void fn_800E3BEC(void);
+void GUI_Init(void);
+void GUI_DeInit(void);
 void GUI_ShowToggleFullScreenUI(u8 b);                 // show or hide the HUD on the single screen
-void fn_800E3C70(u8 b);
-void fn_800E3CD4(u8 b);
+void GUI_ShowTogglePlayer1UI(u8 b);
+void GUI_ShowTogglePlayer2UI(u8 b);
 void GUI_ToggleUI(int nPlayer, u8 b);    // show or hide a player's HUD
-void fn_800E3D90(void);                 // hide every HUD
-u8   fn_800E3DDC(int nPlayer);
+void GUI_HideAllToggleUI(void);                 // hide every HUD
+u8   GUI_UIVisible(int nPlayer);
 void GUI_PauseMenuClosed(void);
 u8   GUI_IsPauseMenuOpen(void);
 void GUI_StartPostShotUI(int nMsg, int nPlayer, f32 f);
-void fn_800E41C8(void);
+void GUI_FlagPostShotRequest(void);
 void GUI_AdvancePostShotUI(int nPlayer);
 void GUI_HideAllHelpTips(void);
-u8   fn_800E4254(int nPlayer);          // whether a message or screen still holds the player
-u8   fn_800E430C(int nPlayer);
+u8   GUI_IsPostShotUIAnimating(int nPlayer);          // whether a message or screen still holds the player
+u8   GUI_IsPausedOrPostShotUIAnimating(int nPlayer);
 void GUI_QueueMessage(u32 nQueue, int a, int b, int c);    // add an item to a display queue
 void GUI_GolfersTiedUIMessage(void);
-u8   fn_800E45CC(void);                 // whether a queued item, message or deferred screen waits
-u8   fn_800E46B4(void);                 // the display pump; nonzero while anything is showing
+u8   GUI_GetUIMessageQued(void);                 // whether a queued item, message or deferred screen waits
+u8   GUI_CheckMessageQue(void);                 // the display pump; nonzero while anything is showing
 u8   GUI_ScoreCardUp(void);
-void fn_800E4C20(u8 bHuman);            // opens the end-of-hole screen, or defers it
-void fn_800E4D88(void);
-void fn_800E4D94(u8 bHuman);            // opens the end-of-round screen, or defers it
+void GUI_BetweenHolesScorecard(u8 bHuman);            // opens the end-of-hole screen, or defers it
+void GUI_SetEndOfHolePending(void);
+void GUI_EndOfGameScorecard(u8 bHuman);            // opens the end-of-round screen, or defers it
 void fn_800E4F88(int nPlayer);
 void fn_800E5240(int i);                // GameMessages.c: clears slot i of lbl_80202B88
 

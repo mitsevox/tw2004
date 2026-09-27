@@ -588,7 +588,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
         fn_800A573C((u8)nPlayer);
     }
     if (gpGame->b282 != 0) {
-        if (fn_800E3DDC(nPlayer)) {
+        if (GUI_UIVisible(nPlayer)) {
             if (gPlayers[nPlayer].swing.nState != 0) {
                 GUI_ToggleUI(nPlayer, 0);
             }
@@ -1205,9 +1205,10 @@ void STATEFUNC_SimulateInit(int nPlayer) {
 // (fn_80062DCC) passes 0.5: GM_PlayerTookShot, the replay stops, holed -> state 13, else state 14.
 // Before that a ball that has come to rest sets the latch (a tap-in, flag 8, becomes LIE_INCUP_e).
 // The swing phase keeps running (the spin window); buttons 22/23 (any pad for a CPU) drive
-// fn_80045558/fn_80045494. A live human outside split screen (and not while fn_800E430C or
-// fn_80100294): button 24 with a replay recorded (and the game allowing it) replays the shot
-// (REPLAY_Play, state 11); button 25 with the mulligan allowed takes the shot back.
+// fn_80045558/fn_80045494. A live human outside split screen (and not while
+// GUI_IsPausedOrPostShotUIAnimating or fn_80100294): button 24 with a replay recorded (and the game
+// allowing it) replays the shot (REPLAY_Play, state 11); button 25 with the mulligan allowed takes
+// the shot back.
 void STATEFUNC_SimulateUpdate(int nPlayer) {
     u8    bA = 0;
     u8    bB = 0;
@@ -1268,7 +1269,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
     }
     if (Player_IsCPU(nPlayer)) return;
     if (gSession.nSplitScreen != 0) return;
-    if (fn_800E430C(nPlayer)) return;
+    if (GUI_IsPausedOrPostShotUIAnimating(nPlayer)) return;
     if (fn_80100294()) return;
     if (gReplayData.bF10 != 0 && gpGame->b287 != 0) {
         if ((Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x18, 0)) &&
@@ -1402,10 +1403,10 @@ const Vec4    lbl_80183620 = {0.0f, 0.0f, 0.0f, 0.5f};   // 0, 0, 0, 0.5 (assign
 
 // State 14: the ball has come to rest, not holed. First frame: the post-shot animation choice to
 // the view, the reaction (animation 9 or camera 15) and a rumble tick. Camera 15 once the animation
-// allows; the reaction shot lines up. Then, unless fn_800E46B4: without fn_800E4254, once the fade
-// has completed an OOB ball is replaced (low-IQ penalty) and the golfer's turn ends; before that,
-// when the reaction animation is far enough along, it is state 15 (fade to tap-in) if a gimme is
-// allowed, else a fade out starts. With fn_800E4254: a human outside split screen can take a
+// allows; the reaction shot lines up. Then, unless GUI_CheckMessageQue: without
+// GUI_IsPostShotUIAnimating, once the fade has completed an OOB ball is replaced (low-IQ penalty)
+// and the golfer's turn ends; before that, when the reaction animation is far enough along, it is
+// state 15 (fade to tap-in) if a gimme is allowed, else a fade out starts. With GUI_IsPostShotUIAnimating: a human outside split screen can take a
 // mulligan (button 25, if allowed), watch the replay (button 24, if recorded and allowed) or
 // continue (button 0, GUI_AdvancePostShotUI); a CPU continues on any pad's button 0.
 void STATEFUNC_ShowYardageUpdate(int nPlayer) {
@@ -1432,8 +1433,8 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
         fn_80095780(gPlayers[nPlayer].pChar) == 9 && !fn_800C6604(pV)) {
         GolfCamera_CutToGolferDoneAnimatingCam(pV, nPlayer);
     }
-    if (fn_800E46B4()) return;
-    if (!fn_800E4254(nPlayer)) {
+    if (GUI_CheckMessageQue()) return;
+    if (!GUI_IsPostShotUIAnimating(nPlayer)) {
         if (fn_80063C7C(pV)) {
             if (gPlayers[nPlayer].bLowIQPenalty != 0) {
                 GM_ReplaceOOBBall(nPlayer);

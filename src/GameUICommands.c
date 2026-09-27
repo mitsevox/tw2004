@@ -287,10 +287,10 @@ s32   fn_800DAD4C(void);
 s32   fn_800DADC0(void);
 int   GM_GetNextSelectedHole(void);
 int   GM_GetPlayerRoundScoreThroughHole(int nPlayer, int nHoles);
-void  fn_800E3E3C(void);
-void  fn_800E3ECC(void);
-void  fn_800E4238(int i);
-void  fn_800E42F4(int i);
+void  GUI_OpenPauseMenu(void);
+void  GUI_SetEndOfGamePending(void);
+void  GUI_PostShotUIStart(int i);
+void  GUI_PostShotUIFinished(int i);
 void  fn_800E508C(void);
 void  fn_800E50FC(void);
 void  fn_800E53A4(u8 b);
@@ -722,7 +722,7 @@ void fn_80086238(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_8008628C(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 9) {
-        fn_800E3ECC();
+        GUI_SetEndOfGamePending();
     } else {
         lbl_801D87C0.b0 = 1;
     }
@@ -748,7 +748,7 @@ void fn_80086300(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8008633C(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281F18 = GUI_ScoreCardUp() == 0;
     fn_800A7350(1);
-    fn_800E3E3C();
+    GUI_OpenPauseMenu();
 }
 
 void fn_80086378(MsgArg* pArgs, MsgArg* pResult) {
@@ -756,11 +756,11 @@ void fn_80086378(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80086384(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800E42F4(pArgs[0].i);
+    GUI_PostShotUIFinished(pArgs[0].i);
 }
 
 void fn_800863A8(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800E4238(pArgs[0].i);
+    GUI_PostShotUIStart(pArgs[0].i);
 }
 
 // The player's club.
@@ -2230,7 +2230,7 @@ void fn_80089AD0(MsgArg* pArgs, MsgArg* pResult) {
 // Whether the player whose turn it is may still play: nothing holds him, the hole is not over for
 // him and his ball is not in the cup.
 void fn_80089AD4(MsgArg* pArgs, MsgArg* pResult) {
-    if (fn_800E4254(lbl_80282278)) {
+    if (GUI_IsPostShotUIAnimating(lbl_80282278)) {
         pResult->i = 0;
         return;
     }

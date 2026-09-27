@@ -187,7 +187,7 @@ void fn_800F9B34(void) {
     s8 nState;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         nState = GOLFERSTATE_GetCurrentState(i);
-        if (nState < 1 || (nState > 12 && !fn_800E4254(i))) {
+        if (nState < 1 || (nState > 12 && !GUI_IsPostShotUIAnimating(i))) {
             if (!Player_IsHoled(i)) {
                 GOLFERSTATE_Set(1, i);
             } else {
@@ -489,9 +489,9 @@ void fn_800FA608(int nPlayer) {
     fn_800FE02C();
     fn_800F80D4(3);
     if (gPlayers[nPlayer].nC58 == 2) {
-        fn_800E3C70(1);
+        GUI_ShowTogglePlayer1UI(1);
     } else {
-        fn_800E3CD4(1);
+        GUI_ShowTogglePlayer2UI(1);
     }
     fn_800FDFFC(gPlayers[nPlayer].nC58, 1);
     fn_80062CB0(gPlayers[nPlayer].nC58, 1);

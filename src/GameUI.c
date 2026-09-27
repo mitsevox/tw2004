@@ -8,7 +8,7 @@
 void  fn_8001437C(void);
 void  fn_8006A8B0(void);
 
-void  fn_800E3E0C(void);
+void  GUI_UpdateAllUIData(void);
 
 // GameUI.c's data (declared in game.h), defined last address first: CodeWarrior lays each section
 // out in reverse order of definition.
@@ -69,7 +69,7 @@ u8  lbl_80282281;
 u8  lbl_80282280;
 
 // Clears every display flag and queue at the start of a hole (and when it restarts).
-void fn_800E3B28(void) {
+void GUI_Init(void) {
     lbl_802822DF = 0;
     lbl_802822DC[0] = 0;
     lbl_802822DC[1] = 0;
@@ -127,14 +127,14 @@ u8    fn_80127004(void);
 
 void  fn_800A7350(int a);
 
-void fn_800E3BEC(void) {
+void GUI_DeInit(void) {
     fn_8001437C();
 }
 
 // Show (b = 1) or hide the HUD on the single screen, and when.
 void GUI_ShowToggleFullScreenUI(u8 b) {
     if (b) {
-        fn_800E3E0C();
+        GUI_UpdateAllUIData();
         GameMsg_SendInt(2, 1);
     } else {
         GameMsg_SendInt(1, 1);
@@ -144,9 +144,9 @@ void GUI_ShowToggleFullScreenUI(u8 b) {
 }
 
 // The same for split screen's first view.
-void fn_800E3C70(u8 b) {
+void GUI_ShowTogglePlayer1UI(u8 b) {
     if (b) {
-        fn_800E3E0C();
+        GUI_UpdateAllUIData();
         GameMsg_SendInt(2, 2);
     } else {
         GameMsg_SendInt(1, 2);
@@ -156,9 +156,9 @@ void fn_800E3C70(u8 b) {
 }
 
 // And its second view.
-void fn_800E3CD4(u8 b) {
+void GUI_ShowTogglePlayer2UI(u8 b) {
     if (b) {
-        fn_800E3E0C();
+        GUI_UpdateAllUIData();
         GameMsg_SendInt(2, 3);
     } else {
         GameMsg_SendInt(1, 3);
@@ -171,27 +171,27 @@ void fn_800E3CD4(u8 b) {
 void GUI_ToggleUI(int nPlayer, u8 b) {
     if (gSession.nSplitScreen) {
         if (nPlayer == 0) {
-            fn_800E3C70(b);
+            GUI_ShowTogglePlayer1UI(b);
             return;
         }
-        fn_800E3CD4(b);
+        GUI_ShowTogglePlayer2UI(b);
         return;
     }
     GUI_ShowToggleFullScreenUI(b);
 }
 
 // Hides every HUD.
-void fn_800E3D90(void) {
+void GUI_HideAllToggleUI(void) {
     if (gSession.nSplitScreen) {
-        fn_800E3C70(0);
-        fn_800E3CD4(0);
+        GUI_ShowTogglePlayer1UI(0);
+        GUI_ShowTogglePlayer2UI(0);
         return;
     }
     GUI_ShowToggleFullScreenUI(0);
 }
 
 // Whether a player's HUD is up.
-u8 fn_800E3DDC(int nPlayer) {
+u8 GUI_UIVisible(int nPlayer) {
     if (gSession.nSplitScreen) {
         if (nPlayer == 0) {
             return lbl_802822D8;
@@ -201,7 +201,8 @@ u8 fn_800E3DDC(int nPlayer) {
     return lbl_802822D9;
 }
 
-void fn_800E3E0C(void) {
+// Refreshes every HUD readout; the show functions call it before a HUD comes up.
+void GUI_UpdateAllUIData(void) {
     fn_800E5450();
     fn_800E542C();
     fn_80062C38();
@@ -211,7 +212,7 @@ void fn_800E3E0C(void) {
 
 // Pauses the game once (gSession.nPaused and the flag GUI_IsPauseMenuOpen returns): rumble off, message
 // 0x23 with 0, watch 1 stopped, a GameBreaker paused, EASBio play state 0.
-void fn_800E3E3C(void) {
+void GUI_OpenPauseMenu(void) {
     if (gSession.nPaused == 0) {
         fn_800E5714(4);
         fn_8001437C();
@@ -229,7 +230,9 @@ void fn_800E3E3C(void) {
     }
 }
 
-void fn_800E3ECC(void) {
+// Marks the end-of-round screen as up (and the end-of-hole one not) without showing it, so the next
+// GUI_PauseMenuClosed ends the round; a menu command uses it in mode 9.
+void GUI_SetEndOfGamePending(void) {
     lbl_80282282 = 1;
     lbl_80282281 = 0;
 }
@@ -310,7 +313,9 @@ void GUI_StartPostShotUI(int nMsg, int nPlayer, f32 f) {
     }
 }
 
-void fn_800E41C8(void) {
+// Marks a post-shot display as requested (the flag GUI_StartPostShotUI sets), so
+// GUI_IsPostShotUIAnimating reports it until the UI starts or finishes it.
+void GUI_FlagPostShotRequest(void) {
     lbl_802822DB = 1;
 }
 
@@ -327,7 +332,9 @@ void GUI_HideAllHelpTips(void) {
     fn_800E5474(0);
 }
 
-void fn_800E4238(int i) {
+// The UI reports a post-shot display showing in screen slot i (the player's in split screen, else
+// 0); the request flags clear.
+void GUI_PostShotUIStart(int i) {
     lbl_802822DC[i] = 1;
     lbl_802822DA = 0;
     lbl_802822DB = 0;
@@ -335,7 +342,7 @@ void fn_800E4238(int i) {
 
 // Whether a message or screen still holds a player: the message flag, mode 26 or 22 while its
 // state is not 5 with a count left, or the player's own slot (slot 0 outside split screen).
-u8 fn_800E4254(int nPlayer) {
+u8 GUI_IsPostShotUIAnimating(int nPlayer) {
     if (lbl_802822DB) {
         return 1;
     }
@@ -351,15 +358,16 @@ u8 fn_800E4254(int nPlayer) {
     return lbl_802822DC[0];
 }
 
-void fn_800E42F4(int i) {
+// The UI reports the post-shot display in screen slot i gone; the request flags clear too.
+void GUI_PostShotUIFinished(int i) {
     lbl_802822DC[i] = 0;
     lbl_802822DA = 0;
     lbl_802822DB = 0;
 }
 
-u8 fn_800E430C(int nPlayer) {
+u8 GUI_IsPausedOrPostShotUIAnimating(int nPlayer) {
     int b = 0;
-    if (GUI_IsPauseMenuOpen() || fn_800E4254(nPlayer)) {
+    if (GUI_IsPauseMenuOpen() || GUI_IsPostShotUIAnimating(nPlayer)) {
         b = 1;
     }
     return b;
@@ -421,7 +429,7 @@ void GUI_GolfersTiedUIMessage(void) {
 }
 
 // Whether anything waits: a queued item (not queue 5), the pending message or a deferred screen.
-u8 fn_800E45CC(void) {
+u8 GUI_GetUIMessageQued(void) {
     if (lbl_802822B8 != 0 || lbl_802822B4 != 0 || lbl_802822B0 != 0 || lbl_802822AC != 0 ||
         lbl_802822A8 != 0 || lbl_802822A4 != 0 || lbl_802822C3 != 0 || lbl_802822C4 != 0 ||
         lbl_802822C1 != 0 || lbl_802822C2 != 0 || lbl_8028229C != 0 || lbl_80282298 != 0 ||
@@ -440,7 +448,7 @@ u8 fn_800E45CC(void) {
 // Two copy-and-paste slips in the original are kept: queue 4 reads its item's second and third
 // values with queue 3's count (always 0 here, so from the entry before the queue), and queue 8
 // reads its third value from one entry past the item.
-u8 fn_800E46B4(void) {
+u8 GUI_CheckMessageQue(void) {
     u8 bBusy = 0;
     if (lbl_802822BC) {
         return 1;
@@ -461,22 +469,22 @@ u8 fn_800E46B4(void) {
         }
         if (lbl_802822C3 && !lbl_802822DB) {
             lbl_802822C3 = 0;
-            fn_800E4C20(1);
+            GUI_BetweenHolesScorecard(1);
             return 1;
         }
         if (lbl_802822C4 && !lbl_802822DB) {
             lbl_802822C4 = 0;
-            fn_800E4C20(0);
+            GUI_BetweenHolesScorecard(0);
             return 1;
         }
         if (lbl_802822C1 && !lbl_802822DB) {
             lbl_802822C1 = 0;
-            fn_800E4D94(1);
+            GUI_EndOfGameScorecard(1);
             return 1;
         }
         if (lbl_802822C2 && !lbl_802822DB) {
             lbl_802822C2 = 0;
-            fn_800E4D94(0);
+            GUI_EndOfGameScorecard(0);
             return 1;
         }
         if (lbl_802822C0 && !lbl_802822DB) {
@@ -553,8 +561,8 @@ u8 fn_800E46B4(void) {
     return bBusy;
 }
 
-// Whether the end-of-hole or end-of-round scorecard is up (the flags fn_800E4C20 and fn_800E4D94
-// set; GUI_PauseMenuClosed acts on them and clears them).
+// Whether the end-of-hole or end-of-round scorecard is up (the flags GUI_BetweenHolesScorecard and
+// GUI_EndOfGameScorecard set; GUI_PauseMenuClosed acts on them and clears them).
 u8 GUI_ScoreCardUp(void) {
     int b = 0;
     if (lbl_80282282 || lbl_80282281) {
@@ -564,9 +572,9 @@ u8 GUI_ScoreCardUp(void) {
 }
 
 // The end-of-hole screen (message 14, kind 1): while a screen slot is up or anything is queued it
-// waits for fn_800E46B4; otherwise sound off (not in mode 7), next hole pending, effects reset,
+// waits for GUI_CheckMessageQue; otherwise sound off (not in mode 7), next hole pending, effects reset,
 // and event 0x41 when bHuman.
-void fn_800E4C20(u8 bHuman) {
+void GUI_BetweenHolesScorecard(u8 bHuman) {
     if (lbl_802822DC[0] || lbl_802822DC[1] || lbl_802822DC[2] || lbl_802822B8 != 0 || lbl_802822B4 != 0 ||
         lbl_802822B0 != 0 || lbl_802822AC != 0 || lbl_802822A8 != 0 || lbl_802822A4 != 0 ||
         lbl_8028229C != 0 || lbl_80282298 != 0 || lbl_80282294 != 0 || lbl_80282290 != 0 ||
@@ -592,13 +600,15 @@ void fn_800E4C20(u8 bHuman) {
     }
 }
 
-void fn_800E4D88(void) {
+// Marks the end-of-hole screen as up without showing it, so the next GUI_PauseMenuClosed moves on
+// (modes 5 and 9, when a hole ends early or restarts).
+void GUI_SetEndOfHolePending(void) {
     lbl_80282281 = 1;
 }
 
-// The end-of-round screen (message 14, kind 2), as fn_800E4C20 does the end-of-hole one; in
+// The end-of-round screen (message 14, kind 2), as GUI_BetweenHolesScorecard does the end-of-hole one; in
 // modes 22 and 26 in split screen both players' cameras are moved first.
-void fn_800E4D94(u8 bHuman) {
+void GUI_EndOfGameScorecard(u8 bHuman) {
     if (lbl_802822DC[0] || lbl_802822DC[1] || lbl_802822DC[2] || lbl_802822B8 != 0 || lbl_802822B4 != 0 ||
         lbl_802822B0 != 0 || lbl_802822AC != 0 || lbl_802822A8 != 0 || lbl_802822A4 != 0 ||
         lbl_8028229C != 0 || lbl_80282298 != 0 || lbl_80282294 != 0 || lbl_80282290 != 0 ||

@@ -110,16 +110,16 @@ u8 fn_800ED9AC(u8 bCheck) {
 // Game over: counted as won (EASBio), then the end-of-round screen.
 void fn_800EDA08(void) {
     EASBio_SetCurrentGameWon(1);
-    fn_800E4D94(0);
+    GUI_EndOfGameScorecard(0);
 }
 
 // The hole is over: if ended early, unpause and move on (GUI_PauseMenuClosed); else the end-of-hole screen.
 void fn_800EDA34(int nPlayer) {
     if (fn_800ED900()) {
-        fn_800E4D88();
+        GUI_SetEndOfHolePending();
         GUI_PauseMenuClosed();
     } else {
-        fn_800E4C20(0);
+        GUI_BetweenHolesScorecard(0);
     }
     fn_800ED9A0();
 }
