@@ -297,7 +297,7 @@ s32 MC_BlocksNeededForSave(s32 nPort, s32 nSlot, s32 arg2, s32 nKind) {
     case 3:
         return 0;
     }
-    if (!bMounted && MC_Unmount(nPort, nSlot) != 0) return 0;
+    if (!bMounted && MC_UnmountCard(nPort, nSlot) != 0) return 0;
     return 0;
 }
 
@@ -324,7 +324,7 @@ s32 fn_8009D3DC(s32 nPort, s32 nSlot) {
     if (!bMounted && MC_MountCard(nPort, nSlot) != 0) return 0;
     if (MC_FileExists(nPort, nSlot, MC_FILE_NAME) != 0) return 1;
     if (MC_FileExists(nPort, nSlot, MC_BACKUP_NAME) != 0) return 1;
-    if (!bMounted && MC_Unmount(nPort, nSlot) != 0) return 0;
+    if (!bMounted && MC_UnmountCard(nPort, nSlot) != 0) return 0;
     return 0;
 }
 
@@ -340,7 +340,7 @@ s32 fn_8009D50C(s32 nPort, s32 nSlot) {
     if (MC_CardProbe(nPort, nSlot) != 0) return 0;
     if (!bMounted && MC_MountCard(nPort, nSlot) != 0) return 0;
     if (MC_FileExists(nPort, nSlot, "EASB") != 0) return 1;
-    if (!bMounted && MC_Unmount(nPort, nSlot) != 0) return 0;
+    if (!bMounted && MC_UnmountCard(nPort, nSlot) != 0) return 0;
     return 0;
 }
 
@@ -401,7 +401,7 @@ s32 MC_MountCard(s32 nPort, s32 nSlot) {
     nResult = MC_CardProbe(nChan, nSlot);
     if (nResult != 0) return nResult;
     if (lbl_801F1510[nPort][nSlot].uFlags & MC_CARD_MOUNTED) {
-        nResult = MC_Unmount(nPort, nSlot);
+        nResult = MC_UnmountCard(nPort, nSlot);
         if (nResult != 0) return nResult;
         bWasMounted = 1;
     }
@@ -509,7 +509,7 @@ s32 MC_MountCard(s32 nPort, s32 nSlot) {
 }
 
 // Unmount the card if it is mounted, then park the save file images in ARAM (fn_8009EF98).
-s32 MC_Unmount(s32 nPort, s32 nSlot) {
+s32 MC_UnmountCard(s32 nPort, s32 nSlot) {
     s32 nResult;
     int nChan;
     if (lbl_801F1510[nPort][nSlot].uFlags & MC_CARD_MOUNTED) {
@@ -570,7 +570,7 @@ void fn_8009DCE8(void) {
 void fn_8009DCEC(s32 nPort, s32 nSlot) {
     s32 nResult = MC_MountCard(nPort, nSlot);
     fn_8009DC80(nPort, nSlot, nResult);
-    MC_Unmount(nPort, nSlot);
+    MC_UnmountCard(nPort, nSlot);
 }
 
 // Whether the card holds a save file (0) or its backup. pName is not used.
@@ -827,7 +827,7 @@ s32 MC_SaveFile(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen,
 
 // Delete file pName from the card ("EASB": the EA Sports Bio's file, by its number). Nothing to do
 // without a name; a card with an I/O error is not touched.
-s32 fn_8009E758(s32 nPort, s32 nSlot, const char* pName) {
+s32 MC_DeleteFile(s32 nPort, s32 nSlot, const char* pName) {
     int nChan;
     s32 nResult;
     if (pName == NULL) return 0;
@@ -905,13 +905,14 @@ s32 fn_8009E918(s32 nPort, s32 nSlot) {
 }
 
 // Take the stream objects: the save file's icon ('MCI ') and banner ('MCB '), and MC.c's 'eagm'.
-void fn_8009EA98(void) {
+void MC_RegisterStreamClients(void) {
     Stream_RegisterLoadChunkCallback('MCI ', fn_8009EB30);
     Stream_RegisterLoadChunkCallback('MCB ', fn_8009EB38);
     Stream_RegisterLoadChunkCallback('eagm', MC_LoadEAGameListfromStream);
 }
 
-void fn_8009EAF0(void) {
+// Drop the three stream handlers MC_RegisterStreamClients set up.
+void MC_UnRegisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('MCI ');
     Stream_UnregisterLoadChunkCallback('MCB ');
     Stream_UnregisterLoadChunkCallback('eagm');
@@ -931,7 +932,7 @@ void MC_OnBusy(s32 nPort, s32 nSlot) {
 
 // Look at every file on the card and mark the 'eagm' entries (MC.c) whose names match the file's
 // game code; return how many are marked. Mounts the card for the look if needed.
-s32 fn_8009EB44(s32 nPort, s32 nSlot) {
+s32 MC_NumEASaveGames(s32 nPort, s32 nSlot) {
     CARDStat stat;
     char szGameCode[5];     // size unknown (at most 8)
     s32 nMount;
@@ -954,7 +955,7 @@ s32 fn_8009EB44(s32 nPort, s32 nSlot) {
         }
     }
     if (nMount == 0) {
-        MC_Unmount(nPort, nSlot);
+        MC_UnmountCard(nPort, nSlot);
     }
     if (nResult == 0 || nResult == MC_ERR_NOFILE) return MC_TalleyEATitlesFound();
     return nResult;
@@ -966,13 +967,13 @@ s32 fn_8009EC30(s32 nPort, s32 nSlot, const char* pName, const char* pBackupName
     s32 nResult = MC_FileExists(nPort, nSlot, pBackupName);
     if (nResult == 0) {
         if (MC_FileExists(nPort, nSlot, pName) == 0) {
-            nResult = fn_8009E758(nPort, nSlot, pName);
+            nResult = MC_DeleteFile(nPort, nSlot, pName);
             if (nResult != 0) return nResult;
         }
         nResult = fn_8009EF68(nPort, nSlot);
         if (nResult == 0) return fn_8009CDA0(nPort, nSlot, pBackupName, pName);
         if (nResult == MC_ERR_BADDATA) {
-            nResult = fn_8009E758(nPort, nSlot, pBackupName);
+            nResult = MC_DeleteFile(nPort, nSlot, pBackupName);
             return (nResult != 0) ? nResult : -38;
         }
         return nResult;
@@ -995,7 +996,7 @@ s32 fn_8009ED34(s32 nPort, s32 nSlot, const char* pName, const char* pBackupName
     }
     if (nMain == 0) {
         if (nBackup != MC_ERR_NOFILE) {
-            fn_8009E758(nPort, nSlot, MC_BACKUP_NAME);
+            MC_DeleteFile(nPort, nSlot, MC_BACKUP_NAME);
         }
         return 0;
     }
@@ -1016,19 +1017,19 @@ s32 fn_8009EE28(s32 nPort, s32 nSlot) {
     if (nResult != 0) return nResult;
     nResult = fn_8009ED34(nPort, nSlot, MC_FILE_NAME, MC_BACKUP_NAME);
     if (nMount == 0) {
-        MC_Unmount(nPort, nSlot);
+        MC_UnmountCard(nPort, nSlot);
     }
     return nResult;
 }
 
-// Load the save file pName into the first image and check it (fn_800A233C): MC_ERR_BADDATA when it
+// Load the save file pName into the first image and check it (MC_SaveGameIsValid): MC_ERR_BADDATA when it
 // is not a good save.
 s32 fn_8009EECC(s32 nPort, s32 nSlot, const char* pName) {
     s32 nResult = MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME);
     if (nResult == 0) {
         nResult = MC_LoadFile(nPort, nSlot, pName, lbl_80281FE8, MC_BUFFER_SIZE);
         if (nResult == 0) {
-            if (fn_800A233C(lbl_80281FE8, &lbl_80281FE8->trailer)) return 0;
+            if (MC_SaveGameIsValid(lbl_80281FE8, &lbl_80281FE8->trailer)) return 0;
             return MC_ERR_BADDATA;
         }
     }
@@ -1086,7 +1087,7 @@ void fn_8009F02C(void) {
 // List the files on the card whose names hold pPattern, sorted by fn_8009F4D8: copy up to nMax
 // names into apName and the number found into pnFound. The last one found is noted as the file to
 // open (lbl_802813D8, lbl_80281FCC). nSlot is not used.
-s32 fn_8009F0F0(s32 nPort, s32 nSlot, const char* pPattern, char** apName, s32 nMax, s32* pnFound) {
+s32 MC_FindFiles(s32 nPort, s32 nSlot, const char* pPattern, char** apName, s32 nMax, s32* pnFound) {
     CARDStat stat;
     int nChan = nPort;
     int i;
@@ -1111,7 +1112,7 @@ s32 fn_8009F0F0(s32 nPort, s32 nSlot, const char* pPattern, char** apName, s32 n
 
 // Read nLen bytes of open file nFile into pBuf at the file position (lbl_80281FC8) and move the
 // position on; CARDRead's result is ignored. arg3 is not used (TibExt's SFIO_vReadCallback passes 0).
-s32 fn_8009F208(s32 nFile, void* pBuf, s32 nLen, s32 arg3) {
+s32 MC_ReadFile(s32 nFile, void* pBuf, s32 nLen, s32 arg3) {
     CARDRead(&lbl_801E3180[nFile], pBuf, nLen, lbl_80281FC8);
     lbl_80281FC8 += nLen;
     return 0;
@@ -1120,7 +1121,7 @@ s32 fn_8009F208(s32 nFile, void* pBuf, s32 nLen, s32 arg3) {
 // Write nLen bytes from pBuf to open file nFile on port 0 at the file position (lbl_80281FC8) and
 // move the position on. An I/O error marks the card in port 0 damaged; any other result clears that
 // and gives 0.
-s32 fn_8009F258(s32 nFile, void* pBuf, s32 nLen) {
+s32 MC_WriteFile(s32 nFile, void* pBuf, s32 nLen) {
     s32 nResult = fn_8009E130(0, 0, &lbl_801E3180[nFile], pBuf, nLen, lbl_80281FC8);
     lbl_80281FC8 += nLen;
     if (nResult == MC_ERR_IOERROR) {
@@ -1134,7 +1135,7 @@ s32 fn_8009F258(s32 nFile, void* pBuf, s32 nLen) {
 // Move the file position (lbl_80281FC8) to nOffset, from the start or from where it is. An nOffset
 // above 0x76000, or below 0 from the start, gives MC_ERR_BADDATA and puts the position back at the
 // start. nFile is not used.
-s32 fn_8009F2D8(s32 nFile, s32 nOffset, u8 bFromStart) {
+s32 MC_SeekFile(s32 nFile, s32 nOffset, u8 bFromStart) {
     if (bFromStart) {
         if (nOffset < 0) {
             lbl_80281FC8 = 0;
@@ -1153,30 +1154,34 @@ s32 fn_8009F2D8(s32 nFile, s32 nOffset, u8 bFromStart) {
     return 0;
 }
 
-s32 fn_8009F35C(void) {
+// Nothing to flush on the GameCube (TibExt's flush callback): always 0.
+s32 MC_FlushFile(void) {
     return 0;
 }
 
-s32 fn_8009F364(void) {
+// Does nothing on the GameCube (TibExt's set-attributes callback): always 0.
+s32 MC_SetAttributesOnFile(void) {
     return 0;
 }
 
 // The card's free space in bytes.
-s32 fn_8009F36C(s32 nPort, s32 nSlot, s32* pnFreeBytes) {
+s32 MC_GetFreeSpace(s32 nPort, s32 nSlot, s32* pnFreeBytes) {
     s32 nFreeFiles = 0;
     CARDFreeBlocks(nPort, pnFreeBytes, &nFreeFiles);
     return 0;
 }
 
-s32 fn_8009F3A0(s32 nPort, s32 nSlot, const char* pName, s32* pnFreeFiles) {
+// The card's free directory entries (CARDFreeBlocks' file count) into pnFreeFiles; the result is
+// always 0. pName is not used.
+s32 MC_GetNumFreeEntries(s32 nPort, s32 nSlot, const char* pName, s32* pnFreeFiles) {
     s32 nFreeBytes = 0;
     CARDFreeBlocks(nPort, &nFreeBytes, pnFreeFiles);
     return 0;
 }
 
-// Open the file fn_8009F0F0 or fn_8009F514 noted last (lbl_802813D8) and start at its beginning.
+// Open the file MC_FindFiles or MC_CreateDirectory noted last (lbl_802813D8) and start at its beginning.
 // pName "EASB" also hands it to the EA Sports Bio's code (fn_8012CCCC). uFlags is not used.
-s32 fn_8009F3D4(s32 nPort, s32 nSlot, const char* pName, u32 uFlags, s32* pnFile) {
+s32 MC_OpenFile(s32 nPort, s32 nSlot, const char* pName, u32 uFlags, s32* pnFile) {
     CARDFileInfo file;
     s32 nResult;
     lbl_80281FC8 = 0;
@@ -1193,14 +1198,14 @@ s32 fn_8009F3D4(s32 nPort, s32 nSlot, const char* pName, u32 uFlags, s32* pnFile
 }
 
 // Close open file nFile.
-s32 fn_8009F488(s32 nFile) {
+s32 MC_CloseFile(s32 nFile) {
     if (lbl_802813D8 == -1) return MC_ERR_NOFILE;
     CARDClose(&lbl_801E3180[nFile]);
     lbl_802813D8 = -1;
     return 0;
 }
 
-// fn_8009F0F0's qsort order, meant as newest first by the entries' time stamps (see the EA bug).
+// MC_FindFiles's qsort order, meant as newest first by the entries' time stamps (see the EA bug).
 s32 fn_8009F4D8(const void* pA, const void* pB) {
     // EA bug: the time stamps are read through the addresses of the two parameters, not through
     // the entries they point to, so this compares whatever is on the stack there and the order is
@@ -1213,7 +1218,7 @@ s32 fn_8009F4D8(const void* pA, const void* pB) {
 
 // Create pName with nLen bytes (only the EA Sports Bio's "EASB"), set its attribute bit 0x40 and
 // note it as the file to open (lbl_802813D8). An I/O error marks the card damaged.
-s32 fn_8009F514(s32 nPort, s32 nSlot, const char* pName, s32 nLen) {
+s32 MC_CreateDirectory(s32 nPort, s32 nSlot, const char* pName, s32 nLen) {
     CARDFileInfo file;
     u8 uAttr;
     s32 nResult;
@@ -1232,11 +1237,11 @@ s32 fn_8009F514(s32 nPort, s32 nSlot, const char* pName, s32 nLen) {
 }
 
 // Delete the save file, when pName is its name or the save directory's. No file is not an error.
-s32 fn_8009F5E4(s32 nPort, s32 nSlot, const char* pName) {
+s32 MC_DeleteDirectory(s32 nPort, s32 nSlot, const char* pName) {
     s32 nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) return nResult;
     if (strcmp(MC_FILE_NAME, pName) == 0 || strcmp(MC_DIR_NAME, pName) == 0) {
-        nResult = fn_8009E758(nPort, nSlot, MC_FILE_NAME);
+        nResult = MC_DeleteFile(nPort, nSlot, MC_FILE_NAME);
     }
     if (nResult != 0 && nResult != MC_ERR_NOFILE) return nResult;
     return 0;
@@ -1282,7 +1287,9 @@ void fn_8009F780(void) {
 void fn_8009F7E4(void) {
 }
 
-u8 fn_8009F7E8(int nPort) {
+// Whether a multitap is plugged into the port (lbl_80282008); MC_Connect sets it to 0 for both
+// ports.
+u8 MC_IsMultitapPluggedIn(int nPort) {
     return lbl_80282008[nPort];
 }
 

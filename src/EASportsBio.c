@@ -326,7 +326,7 @@ s32 fn_801252D0(s32 nPort, s32 nSlot) {
     EASBErrorE eError;
 
     nMount = MC_MountCard(0, 0);
-    MC_Unmount(0, 0);
+    MC_UnmountCard(0, 0);
     if (nMount == -25) return -25;
     eError = fn_8012D5E4(lbl_80281988->pIcon, lbl_80281988->pOurGameImage);
     if (eError != EASB_ERROR_NONE) return EASBio_ConvertError(eError);
@@ -341,7 +341,7 @@ s32 fn_80125354(s32 arg0, s32 arg1) {
     EASBErrorE eError;
 
     nMount = MC_MountCard(0, 0);
-    MC_Unmount(0, 0);
+    MC_UnmountCard(0, 0);
     if (nMount == -25) return -25;
     eError = fn_8012D560();
     if (eError != EASB_ERROR_NONE) return EASBio_ConvertError(eError);

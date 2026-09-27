@@ -105,7 +105,7 @@ The memory card
 
 | Data | Code | Swap | Overlay |
 |---|---|---|---|
-| the save profile (`SaveProfile`, include/game/save.h, 0x10600 bytes, with raw replays) | MC_Gc.c: `CARDReadAsync` (MC_LoadFile), `CARDWriteAsync` (fn_8009E130), `CARDRead` (fn_8009F208) | none seen: nothing in MC_Gc.c or MC.c calls a swap routine | yes: read and written as the struct's bytes (`gpSaveData`). The load and store are in MC_Gc.c (asm, lane C); `include/game/save.h` says a port reads and writes the profile field by field |
+| the save profile (`SaveProfile`, include/game/save.h, 0x10600 bytes, with raw replays) | MC_Gc.c: `CARDReadAsync` (MC_LoadFile), `CARDWriteAsync` (fn_8009E130), `CARDRead` (MC_ReadFile) | none seen: nothing in MC_Gc.c or MC.c calls a swap routine | yes: read and written as the struct's bytes (`gpSaveData`). The load and store are in MC_Gc.c (asm, lane C); `include/game/save.h` says a port reads and writes the profile field by field |
 
 Other byte-order facts
 ----------------------

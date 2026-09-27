@@ -104,7 +104,7 @@ void SFIO_vFindCallback(char* pSearchName, int eDevice) {
     for (i = 0; i < TIBEXT_MAX_FOUND; i++) {
         apName[i] = aszName[i];
     }
-    nErr = fn_8009F0F0(eDevice / 4, eDevice % 4, pSearchName, apName, TIBEXT_MAX_FOUND, &nFound);
+    nErr = MC_FindFiles(eDevice / 4, eDevice % 4, pSearchName, apName, TIBEXT_MAX_FOUND, &nFound);
     if (nErr != 0) {
         SFIO_vSetCurrentError(nErr);
         return;
@@ -140,7 +140,7 @@ void SFIO_vSetCurrentResult(s32 n) {
 void SFIO_vFreeSpaceCallback(int eDevice) {
     s32 nFree;
 
-    SFIO_vSetCurrentError(fn_8009F36C(eDevice / 4, eDevice % 4, &nFree));
+    SFIO_vSetCurrentError(MC_GetFreeSpace(eDevice / 4, eDevice % 4, &nFree));
     SFIO_vSetCurrentResult(nFree);
 }
 
@@ -148,7 +148,7 @@ void SFIO_vFreeSpaceCallback(int eDevice) {
 void SFIO_vFreeEntryCallback(int eDevice) {
     s32 nFree;
 
-    SFIO_vSetCurrentError(fn_8009F3A0(eDevice / 4, eDevice % 4, ".", &nFree));
+    SFIO_vSetCurrentError(MC_GetNumFreeEntries(eDevice / 4, eDevice % 4, ".", &nFree));
     SFIO_vSetCurrentResult(nFree);
 }
 
@@ -164,13 +164,13 @@ void SFIO_vMountCallback(int eDevice) {
 
 // Unmounts the card.
 void SFIO_vUnMountCallback(int eDevice) {
-    SFIO_vSetCurrentError(MC_Unmount(eDevice / 4, eDevice % 4));
+    SFIO_vSetCurrentError(MC_UnmountCard(eDevice / 4, eDevice % 4));
 }
 
 // Opens the save file; the result is its file number.
 void SFIO_vOpenCallback(const char* pDirName, char* pFileName, int eDevice, u32 uFlags) {
     s32 nFile;
-    s32 nErr = fn_8009F3D4(eDevice / 4, eDevice % 4, pFileName, uFlags, &nFile);
+    s32 nErr = MC_OpenFile(eDevice / 4, eDevice % 4, pFileName, uFlags, &nFile);
 
     SFIO_vSetCurrentError(nErr);
     if (nErr == 0) {
@@ -180,19 +180,19 @@ void SFIO_vOpenCallback(const char* pDirName, char* pFileName, int eDevice, u32 
 
 // Closes it.
 void SFIO_vCloseCallback(int uHandle) {
-    SFIO_vSetCurrentError(fn_8009F488(uHandle));
+    SFIO_vSetCurrentError(MC_CloseFile(uHandle));
 }
 
 // Creates it with uSize bytes.
 void SFIO_vCreateCallback(char* pFileName, u32 uSize, int eDevice) {
-    s32 nErr = fn_8009F514(eDevice / 4, eDevice % 4, pFileName, uSize);
+    s32 nErr = MC_CreateDirectory(eDevice / 4, eDevice % 4, pFileName, uSize);
 
     SFIO_vSetCurrentError(nErr);
     if (nErr != 0) return;
 }
 
 void SFIO_vDeleteCallback(char* pDirName, char* pFileName, int eDevice) {
-    s32 nErr = fn_8009E758(eDevice / 4, eDevice % 4, pFileName);
+    s32 nErr = MC_DeleteFile(eDevice / 4, eDevice % 4, pFileName);
 
     SFIO_vSetCurrentError(nErr);
     if (nErr != 0) return;
@@ -200,12 +200,12 @@ void SFIO_vDeleteCallback(char* pDirName, char* pFileName, int eDevice) {
 
 // Deletes the save file.
 void SFIO_vDestroyCallback(char* pDirName, int eDevice) {
-    SFIO_vSetCurrentError(fn_8009F5E4(eDevice / 4, eDevice % 4, pDirName));
+    SFIO_vSetCurrentError(MC_DeleteDirectory(eDevice / 4, eDevice % 4, pDirName));
 }
 
 // Reads from the open file; the result is the bytes read.
 void SFIO_vReadCallback(int uHandle, void* pBuffer, u32 uSize) {
-    s32 nErr = fn_8009F208(uHandle, pBuffer, uSize, 0);
+    s32 nErr = MC_ReadFile(uHandle, pBuffer, uSize, 0);
 
     SFIO_vSetCurrentError(nErr);
     if (nErr != 0) {
@@ -217,7 +217,7 @@ void SFIO_vReadCallback(int uHandle, void* pBuffer, u32 uSize) {
 
 // Writes to the open file; the result is the bytes written.
 void SFIO_vWriteCallback(int uHandle, void* pBuffer, u32 uSize) {
-    s32 nErr = fn_8009F258(uHandle, pBuffer, uSize);
+    s32 nErr = MC_WriteFile(uHandle, pBuffer, uSize);
 
     SFIO_vSetCurrentError(nErr);
     if (nErr != 0) {
@@ -228,21 +228,21 @@ void SFIO_vWriteCallback(int uHandle, void* pBuffer, u32 uSize) {
 }
 
 void SFIO_vSeekCallback(int uHandle, u32 uOffset, u32 uWhence) {
-    s32 nErr = fn_8009F2D8(uHandle, uOffset, uWhence == 0);
+    s32 nErr = MC_SeekFile(uHandle, uOffset, uWhence == 0);
 
     SFIO_vSetCurrentError(nErr);
     if (nErr != 0) return;
 }
 
 void fn_80122834(int uHandle) {
-    s32 nErr = fn_8009F35C();
+    s32 nErr = MC_FlushFile();
 
     SFIO_vSetCurrentError(nErr);
     if (nErr != 0) return;
 }
 
 void fn_80122868(int uHandle, u32 uValue) {
-    SFIO_vSetCurrentError(fn_8009F364());
+    SFIO_vSetCurrentError(MC_SetAttributesOnFile());
 }
 
 // The library's update call: every card call here finishes at once, so the process is always

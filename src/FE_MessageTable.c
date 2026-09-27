@@ -25,9 +25,9 @@ void fn_8008E354(void);                 // FEgolferanim.c
 void fn_8008F80C(s32 p0, s32 p1);       // uiProcessInterface.c
 void fn_8008E358(s32 p0);               // FEgolferanim.c
 s32  MC_LoadUser(MCCardPosStr* pPos);   // MC.c
-s32  fn_800A0230(MCCardPos* pPos);      // MC.c: load a replay from the card
+s32  MC_LoadReplay(MCCardPos* pPos);      // MC.c: load a replay from the card
 void MC_ConnectCard(s32 nPort, s32 nSlot); // MC_Gc.c
-s32  fn_8009EB44(s32 nPort, s32 nSlot); // MC_Gc.c
+s32  MC_NumEASaveGames(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_800A1164(s32 nPort, s32 nSlot, char* pName, s32 n);     // MC.c
 s32  MC_GetUser(s32 nPort, s32 nSlot, s32 n, char* szOut);     // MC.c: clears szOut first
 void fn_8007739C(Replay* pReplay);      // FE_Manager.c
@@ -1630,7 +1630,7 @@ void fn_8007C698(MsgArg* pArgs, MsgArg* pResult) {
     s32 nError;
     s32 n;
 
-    nError = fn_800A2100(pArgs[0].i, pArgs[1].i);
+    nError = MC_FormatCard(pArgs[0].i, pArgs[1].i);
     n = 1;
     if (nError != 0) {
         n = nError;
@@ -1732,7 +1732,7 @@ void fn_8007C94C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007C950(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_8009F7E8(pArgs[0].i);
+    pResult->i = MC_IsMultitapPluggedIn(pArgs[0].i);
 }
 
 void fn_8007C988(MsgArg* pArgs, MsgArg* pResult) {
@@ -2580,7 +2580,7 @@ void fn_8007E67C(MsgArg* pArgs, MsgArg* pResult) {
     pos.nPort = pArgs[0].i;
     pos.nSlot = pArgs[1].i;
     pos.n8 = pArgs[2].i;
-    pResult->i = fn_800A0230(&pos) == 0;
+    pResult->i = MC_LoadReplay(&pos) == 0;
     if (pResult->i != 0) {
         if (lbl_801D7148.aLoaded[0] == 1) {
             Session_SetGolfer(FIRST_CREATED_GOLFER, 0);
@@ -4303,7 +4303,7 @@ void fn_800826C4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80082708(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_8009EB44(pArgs[0].i, pArgs[1].i);
+    pResult->i = MC_NumEASaveGames(pArgs[0].i, pArgs[1].i);
     *(s32*)pArgs[2].p = MC_GetNumEATitles();
 }
 
@@ -4502,7 +4502,7 @@ void fn_80082E10(MsgArg* pArgs, MsgArg* pResult) {
     s32 nError;
     s32 n;
 
-    nError = fn_800A0A7C(pArgs[0].i, pArgs[1].i);
+    nError = MC_DeleteSaveGame(pArgs[0].i, pArgs[1].i);
     n = 1;
     if (nError != 0) {
         n = nError;

@@ -261,7 +261,7 @@ void  fn_80062B84(int a);
 void  fn_8006F4E0(void);
 s32   fn_80084FB4(CardPos* pPos);
 void  MC_ConnectCard(s32 nPort, s32 nSlot);
-s32   fn_800A036C(MCCardPos* pPos);
+s32   MC_SaveReplay(MCCardPos* pPos);
 s32   fn_800A0610(s32 nPort, s32 nSlot, s32 n);
 void  fn_800A6148(void);
 void  Gaud_PlayTextDitty(int n);
@@ -1456,7 +1456,7 @@ void fn_80087D34(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80087D54(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_8009F7E8(pArgs[0].i);
+    pResult->i = MC_IsMultitapPluggedIn(pArgs[0].i);
 }
 
 // Whether there is a card in the port and slot.
@@ -1493,7 +1493,7 @@ void fn_80087E80(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80087E9C(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800A2100(pArgs[0].i, pArgs[1].i);
+    pResult->i = MC_FormatCard(pArgs[0].i, pArgs[1].i);
 }
 
 void fn_80087ED8(MsgArg* pArgs, MsgArg* pResult) {
@@ -1507,7 +1507,7 @@ void fn_80087ED8(MsgArg* pArgs, MsgArg* pResult) {
     if (nPlayer < 5) {
         gPlayers[nPlayer].swing.bCanSpin = 0;
     }
-    pResult->i = fn_800A036C(&pos);
+    pResult->i = MC_SaveReplay(&pos);
 }
 
 void fn_80087F48(MsgArg* pArgs, MsgArg* pResult) {

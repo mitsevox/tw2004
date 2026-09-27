@@ -186,7 +186,7 @@ They will be sorted into the sections below.
 - **[verified] A range test on a state written as an unsigned byte: `(u8)(n - 2) <= 2`** gives
   `subi; clrlwi 24; cmplwi 2`. target fn_80067CD4 92.8 -> 98.0.
 - **[verified] Comparing a call's result with a field: the inline form puts the field first (`cmplw r0,r3`);
-  a local for the result puts it first (`cmplw r3,r0`).** MC fn_800A233C 99.69 -> 100.
+  a local for the result puts it first (`cmplw r3,r0`).** MC MC_SaveGameIsValid 99.69 -> 100.
 - **[verified] Writing a float's bits through a union drops an earlier dead store; a pointer cast
   (`*(u32*)&f = ...`) keeps it.** urandom Rand_Float 88.2 -> 100. Mark it `// port:` (a port needs
   `memcpy` or `-fno-strict-aliasing`).
@@ -754,7 +754,7 @@ Added 2026-09-27 (from the ledgers solved that night; each ledger has the full s
   the unroll to the backend (srwi scheme instead of cmpwi 8): GameMode22 fn_801264B8 (labelled).
 - **[verified] A 2-instruction block EA scheduled differently from ours means a deleted
   instruction**: our such preheaders are never scheduled (`{0004}` in every pass), so EA's block had a
-  third instruction, a copy coalesced away by allocation. MC fn_8009F8C8: EA's `add row; li k` =
+  third instruction, a copy coalesced away by allocation. MC MC_MergeRecords: EA's `add row; li k` =
   loops walking a named `SaveRecords*` view (labelled fake), 20 -> 0 aligned.
 - **[verified] The pre-RA scheduler breaks equal-height ties by block order** (the statement
   written first wins; pick order: critical-path urgent, then more successors made ready, then

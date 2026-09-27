@@ -59,8 +59,8 @@ void fn_800676B8();
 void fn_800676E8();
 void fn_8008EC68();
 void fn_8008ED28();
-void fn_8009EA98();
-void fn_8009EAF0();
+void MC_RegisterStreamClients();
+void MC_UnRegisterStreamClients();
 void fn_800A295C();
 void fn_800A298C();
 void fn_80014594(void);
@@ -224,7 +224,7 @@ void fn_80014594(void) {
     fn_8001FAA8();
     fn_8001CFF0();
     fn_8001D44C();
-    fn_8009EA98();
+    MC_RegisterStreamClients();
     fn_800A295C();
     fn_800676B8();
 }
@@ -239,7 +239,7 @@ void fn_800145E0(void) {
     fn_8001FAD8();
     fn_8001D268();
     fn_8001D47C();
-    fn_8009EAF0();
+    MC_UnRegisterStreamClients();
     fn_800A298C();
     fn_800676E8();
 }
@@ -263,7 +263,7 @@ void fn_80014668(void) {
     fn_8008D9AC();
     fn_800B9944();
     fn_8001D238();
-    fn_8009EA98();
+    MC_RegisterStreamClients();
     fn_80076F24();
     fn_80076F54();
     fn_8010508C();
@@ -285,7 +285,7 @@ void fn_800146C4(void) {
     fn_80076F58();
     fn_80105154();
     fn_80124A70();
-    fn_8009EAF0();
+    MC_UnRegisterStreamClients();
     UI_vEATraxUnRegisterStreamClients();
 }
 
@@ -325,7 +325,7 @@ void fn_800147A4(void) {
 void fn_800147D4(void) {
     fn_80010284();
     fn_8008EC68();
-    fn_8009EA98();
+    MC_RegisterStreamClients();
     fn_800B160C();
     fn_80014864();
 }
@@ -333,7 +333,7 @@ void fn_800147D4(void) {
 void fn_80014804(void) {
     fn_800102B4();
     fn_8008ED28();
-    fn_8009EAF0();
+    MC_UnRegisterStreamClients();
     fn_800B1644();
     fn_800148A8();
 }

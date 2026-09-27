@@ -15,8 +15,8 @@
 
 s32 MC_LoadLastUser(s32 nPort, s32 nSlot, s32 nProfile);
 s32 fn_800A2248(s32 nPort, s32 nSlot);
-s32 fn_800A0B18(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage);
-s32 fn_800A0BC8(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage);
+s32 MC_FindUserInSaveGame(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage);
+s32 MC_GetNextUserIndexInSaveGame(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage);
 void MC_FillCRCTable(void);
 s32 MC_SaveOptions(MCCardPos* pPos);
 s32 MC_LoadOptions(MCCardPos* pPos);
@@ -28,8 +28,8 @@ s32 MC_LoadUser(MCCardPosStr* pPos);
 s32 MC_GetNumUser(MCCardPos* pPos);
 s32 fn_800A26A0(MCCardPos* pPos);
 void fn_800A270C(MCCardPos* pPos);
-s32 fn_800A036C(MCCardPos* pPos);
-s32 fn_800A0230(MCCardPos* pPos);
+s32 MC_SaveReplay(MCCardPos* pPos);
+s32 MC_LoadReplay(MCCardPos* pPos);
 s32 fn_800A09EC(MCCardPos* pPos);
 s32 fn_800A2668(MCCardPos* pPos);
 void fn_800A2740(MCCardPos* pPos);
@@ -43,7 +43,7 @@ u32 lbl_8018C7C8[4] = {0x98, 0xA0, 0, 0xB0};
 MCOpSet lbl_8018C7D8[4] = {
     {{MC_SaveOptions, MC_LoadOptions, (MCOp)fn_800A1758, fn_800A2630, (MCOp)MC_MemoryRequiredForOptions}},
     {{MC_SaveUser, (MCOp)MC_LoadUser, MC_GetNumUser, fn_800A26A0, (MCOp)fn_800A270C}},
-    {{fn_800A036C, fn_800A0230, fn_800A09EC, fn_800A2668, (MCOp)fn_800A2740}},
+    {{MC_SaveReplay, MC_LoadReplay, fn_800A09EC, fn_800A2668, (MCOp)fn_800A2740}},
     {{(MCOp)fn_801251EC, NULL, (MCOp)fn_80125118, (MCOp)fn_8012555C, (MCOp)fn_801255C4}},
 };
 
@@ -70,7 +70,7 @@ u8 MC_LoadInitialUser(void) {
 // Merge a save's record tables into the game's: every entry the game's tables do not already hold
 // is offered to them (fn_800D8750) as nobody's. The course and the mode are switched to reach each
 // table, then put back.
-void fn_8009F8C8(SaveRecords* pRecords) {
+void MC_MergeRecords(SaveRecords* pRecords) {
     int nMode;
     int nCourse;
     int nHoleNum;
@@ -146,7 +146,7 @@ void fn_8009F8C8(SaveRecords* pRecords) {
 // At boot: find the save file on a card and read it into the second image; if it is good, take its
 // options and records into the game. Message 0x85 tells the front end which card is being read,
 // 0x86 that none was found.
-s32 fn_8009FAD0(void) {
+s32 MC_LoadOptionsFromFirstCardFound(void) {
     s32 nMount;
     u8 bFound;
     int nPort;
@@ -172,7 +172,7 @@ s32 fn_8009FAD0(void) {
                     }
                     nResult = MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE);
                     if (nResult == 0) {
-                        if (fn_800A233C(lbl_80281FDC, &lbl_80281FDC->trailer)) {
+                        if (MC_SaveGameIsValid(lbl_80281FDC, &lbl_80281FDC->trailer)) {
                             bFound = 1;
                         } else {
                             lbl_80281FDC->uFlags = 0;
@@ -183,7 +183,7 @@ s32 fn_8009FAD0(void) {
                 }
             }
             if (nMount == 0) {
-                MC_Unmount(nPort, nSlot);
+                MC_UnmountCard(nPort, nSlot);
             }
         }
     }
@@ -195,7 +195,7 @@ s32 fn_8009FAD0(void) {
             fn_8002EBA4((u8*)&gSession.options, gSession.options.a7[0]);
         }
         if (lbl_80281FDC->uFlags & MC_SAVE_RECORDS) {
-            fn_8009F8C8(&lbl_80281FDC->records);
+            MC_MergeRecords(&lbl_80281FDC->records);
         }
         fn_8009EF98();
     } else if (lbl_80281F1C != NULL) {
@@ -228,7 +228,7 @@ s32 MC_LoadOptions(MCCardPos* pPos) {
     if (nResult != 0) {
         nResult = MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FE8, MC_BUFFER_SIZE);
         if (nResult == 0) {
-            if (fn_800A233C(lbl_80281FE8, &lbl_80281FE8->trailer)) {
+            if (MC_SaveGameIsValid(lbl_80281FE8, &lbl_80281FE8->trailer)) {
                 bLoaded = 1;
                 Mem_cpy(lbl_80281FDC, lbl_80281FE8, MC_BUFFER_SIZE);
             } else {
@@ -239,7 +239,7 @@ s32 MC_LoadOptions(MCCardPos* pPos) {
         }
     }
     if (nMount == 0) {
-        MC_Unmount(nPort, nSlot);
+        MC_UnmountCard(nPort, nSlot);
     }
     if (bLoaded) {
         if (lbl_80281FDC->uFlags & MC_SAVE_4D0C0) {
@@ -252,7 +252,7 @@ s32 MC_LoadOptions(MCCardPos* pPos) {
             fn_8002EBA4((u8*)&gSession.options, gSession.options.a7[0]);
         }
         if (lbl_80281FDC->uFlags & MC_SAVE_RECORDS) {
-            fn_8009F8C8(&lbl_80281FDC->records);
+            MC_MergeRecords(&lbl_80281FDC->records);
         }
     }
     return nResult;
@@ -277,7 +277,7 @@ s32 MC_SaveOptions(MCCardPos* pPos) {
         if (lbl_801F1510[nPort][nSlot].nFreeBlocks < MC_BlocksNeededForSave(nPort, nSlot, 0, 0)) {
             return MC_ERR_INSSPACE;
         }
-        nResult = fn_8009F514(nPort, nSlot, MC_DIR_NAME, 0);
+        nResult = MC_CreateDirectory(nPort, nSlot, MC_DIR_NAME, 0);
         if (nResult != 0) return nResult;
         MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME);
         fn_8009E544(lbl_80281FDC->szGameName, lbl_80281FDC->szComment, lbl_80281FDC->aIcon,
@@ -290,24 +290,24 @@ s32 MC_SaveOptions(MCCardPos* pPos) {
         lbl_80281FDC->trailer.aMagic[0] = '@';
         lbl_80281FDC->trailer.aMagic[1] = 'B';
         lbl_80281FDC->trailer.aMagic[2] = 'E';
-        lbl_80281FDC->trailer.uChecksum = fn_800A23BC(lbl_80281FDC, &lbl_80281FDC->trailer);
+        lbl_80281FDC->trailer.uChecksum = MC_ComputeSaveGameCheckSum(lbl_80281FDC, &lbl_80281FDC->trailer);
         nResult = MC_SaveFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE, NULL);
         if (nResult != 0) {
-            fn_8009F5E4(nPort, nSlot, MC_DIR_NAME);
+            MC_DeleteDirectory(nPort, nSlot, MC_DIR_NAME);
             return nResult;
         }
     } else {
         if (MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FE8, MC_BUFFER_SIZE) != 0) {
             lbl_80281FE8->uFlags = 0;
             if (nMount == 0) {
-                MC_Unmount(nPort, nSlot);
+                MC_UnmountCard(nPort, nSlot);
             }
             return MC_ERR_BADDATA;
         }
-        if (!fn_800A233C(lbl_80281FE8, &lbl_80281FE8->trailer)) {
+        if (!MC_SaveGameIsValid(lbl_80281FE8, &lbl_80281FE8->trailer)) {
             lbl_80281FE8->uFlags = 0;
             if (nMount == 0) {
-                MC_Unmount(nPort, nSlot);
+                MC_UnmountCard(nPort, nSlot);
             }
             return MC_ERR_BADDATA;
         }
@@ -319,19 +319,19 @@ s32 MC_SaveOptions(MCCardPos* pPos) {
         lbl_80281FDC->trailer.aMagic[0] = '@';
         lbl_80281FDC->trailer.aMagic[1] = 'B';
         lbl_80281FDC->trailer.aMagic[2] = 'E';
-        lbl_80281FDC->trailer.uChecksum = fn_800A23BC(lbl_80281FDC, &lbl_80281FDC->trailer);
+        lbl_80281FDC->trailer.uChecksum = MC_ComputeSaveGameCheckSum(lbl_80281FDC, &lbl_80281FDC->trailer);
         nResult = MC_SaveFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE,
                               MC_BACKUP_NAME);
         if (nResult != 0) return nResult;
     }
     if (nMount == 0) {
-        MC_Unmount(nPort, nSlot);
+        MC_UnmountCard(nPort, nSlot);
     }
     return 0;
 }
 
 // Load replay pPos->n8 of the save on the card into gReplayData: -16 when the save has none there.
-s32 fn_800A0230(MCCardPos* pPos) {
+s32 MC_LoadReplay(MCCardPos* pPos) {
     s32 nMount;
     s32 nResult;
     s32 nPort;
@@ -349,13 +349,13 @@ s32 fn_800A0230(MCCardPos* pPos) {
     nResult = MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME);
     if (nResult != 0) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return nResult;
     }
     nResult = MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FEC, MC_BUFFER_SIZE);
     if (nResult == 0) {
-        if (!fn_800A233C(lbl_80281FEC, &lbl_80281FEC->trailer)) {
+        if (!MC_SaveGameIsValid(lbl_80281FEC, &lbl_80281FEC->trailer)) {
             nResult = MC_ERR_BADDATA;
         } else if (lbl_80281FEC->uFlags & MC_SAVE_REPLAY(nReplay)) {
             Mem_cpy(&gReplayData, &lbl_80281FEC->aReplay[nReplay], sizeof(Replay));
@@ -365,14 +365,14 @@ s32 fn_800A0230(MCCardPos* pPos) {
         }
     }
     if (nMount == 0) {
-        MC_Unmount(nPort, nSlot);
+        MC_UnmountCard(nPort, nSlot);
     }
     return nResult;
 }
 
 // Save gReplayData as replay pPos->n8 of the save on the card (-1: the first free one; -17 when none
 // is). With no save file on the card, one is made first (MC_SaveOptions).
-s32 fn_800A036C(MCCardPos* pPos) {
+s32 MC_SaveReplay(MCCardPos* pPos) {
     s32 nMount;
     s32 nResult;
     u8 bNewFile;
@@ -403,7 +403,7 @@ s32 fn_800A036C(MCCardPos* pPos) {
         lbl_80281FEC->uFlags = 0;
         return MC_ERR_BADDATA;
     }
-    if (!fn_800A233C(lbl_80281FEC, &lbl_80281FEC->trailer)) {
+    if (!MC_SaveGameIsValid(lbl_80281FEC, &lbl_80281FEC->trailer)) {
         lbl_80281FEC->uFlags = 0;
         return MC_ERR_BADDATA;
     }
@@ -426,7 +426,7 @@ s32 fn_800A036C(MCCardPos* pPos) {
     lbl_80281FE0->trailer.aMagic[0] = '@';
     lbl_80281FE0->trailer.aMagic[1] = 'B';
     lbl_80281FE0->trailer.aMagic[2] = 'E';
-    lbl_80281FE0->trailer.uChecksum = fn_800A23BC(lbl_80281FE0, &lbl_80281FE0->trailer);
+    lbl_80281FE0->trailer.uChecksum = MC_ComputeSaveGameCheckSum(lbl_80281FE0, &lbl_80281FE0->trailer);
     if (bNewFile) {
         nResult = MC_SaveFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FE0, MC_BUFFER_SIZE, NULL);
     } else {
@@ -434,7 +434,7 @@ s32 fn_800A036C(MCCardPos* pPos) {
                               MC_BACKUP_NAME);
     }
     if (nMount == 0) {
-        MC_Unmount(nPort, nSlot);
+        MC_UnmountCard(nPort, nSlot);
     }
     return nResult;
 }
@@ -454,7 +454,7 @@ s32 fn_800A0610(s32 nPort, s32 nSlot, s32 nReplay) {
     if (nResult != 0) return nResult;
     if (MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME) != 0) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return -16;
     }
@@ -462,7 +462,7 @@ s32 fn_800A0610(s32 nPort, s32 nSlot, s32 nReplay) {
         lbl_80281FEC->uFlags = 0;
         return MC_ERR_BADDATA;
     }
-    if (!fn_800A233C(lbl_80281FEC, &lbl_80281FEC->trailer)) {
+    if (!MC_SaveGameIsValid(lbl_80281FEC, &lbl_80281FEC->trailer)) {
         lbl_80281FEC->uFlags = 0;
         return MC_ERR_BADDATA;
     }
@@ -487,16 +487,16 @@ s32 fn_800A0610(s32 nPort, s32 nSlot, s32 nReplay) {
     lbl_80281FE0->trailer.aMagic[0] = '@';
     lbl_80281FE0->trailer.aMagic[1] = 'B';
     lbl_80281FE0->trailer.aMagic[2] = 'E';
-    lbl_80281FE0->trailer.uChecksum = fn_800A23BC(lbl_80281FE0, &lbl_80281FE0->trailer);
+    lbl_80281FE0->trailer.uChecksum = MC_ComputeSaveGameCheckSum(lbl_80281FE0, &lbl_80281FE0->trailer);
     nResult = MC_SaveFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FE0, MC_BUFFER_SIZE, MC_BACKUP_NAME);
     if (nMount == 0) {
-        MC_Unmount(nPort, nSlot);
+        MC_UnmountCard(nPort, nSlot);
     }
     return nResult;
 }
 
 // Note in the card's MCCardState which replays the save on it holds.
-void fn_800A0868(s32 nPort, s32 nSlot) {
+void MC_RefreshMCReplayInfo(s32 nPort, s32 nSlot) {
     MCCardState* pState;
     s32 nMount;
     int i;
@@ -509,25 +509,25 @@ void fn_800A0868(s32 nPort, s32 nSlot) {
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return;
     if (MC_CheckCardReady(nPort, nSlot) != 0) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return;
     }
     if (MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME) != 0) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return;
     }
     if (MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FEC, MC_BUFFER_SIZE) != 0) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return;
     }
-    if (!fn_800A233C(lbl_80281FEC, &lbl_80281FEC->trailer)) {
+    if (!MC_SaveGameIsValid(lbl_80281FEC, &lbl_80281FEC->trailer)) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return;
     }
@@ -537,7 +537,7 @@ void fn_800A0868(s32 nPort, s32 nSlot) {
         }
     }
     if (nMount == 0) {
-        MC_Unmount(nPort, nSlot);
+        MC_UnmountCard(nPort, nSlot);
     }
 }
 
@@ -551,7 +551,7 @@ s32 fn_800A09EC(MCCardPos* pPos) {
     nSlot = pPos->nSlot;
     nPort = pPos->nPort;
     pState = MC_pGetMC(nPort, nSlot);
-    fn_800A0868(nPort, nSlot);
+    MC_RefreshMCReplayInfo(nPort, nSlot);
     for (i = 0; i < NUM_SAVE_REPLAYS; i++) {
         if (BitArray_Test(pState->aReplayUsed, i)) {
             nCount++;
@@ -561,22 +561,22 @@ s32 fn_800A09EC(MCCardPos* pPos) {
 }
 
 // Delete the save file from the card.
-s32 fn_800A0A7C(s32 nPort, s32 nSlot) {
+s32 MC_DeleteSaveGame(s32 nPort, s32 nSlot) {
     s32 nMount;
     s32 nResult;
     nMount = MC_MountCard(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
     nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) return nResult;
-    nResult = fn_8009F5E4(nPort, nSlot, MC_DIR_NAME);
+    nResult = MC_DeleteDirectory(nPort, nSlot, MC_DIR_NAME);
     if (nMount == 0) {
-        MC_Unmount(nPort, nSlot);
+        MC_UnmountCard(nPort, nSlot);
     }
     return nResult;
 }
 
 // The profile in pImage named szName (any case), or -15. nPort and nSlot are not used.
-s32 fn_800A0B18(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage) {
+s32 MC_FindUserInSaveGame(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage) {
     int i;
     int bFound;
     if (szName == NULL) return -15;
@@ -595,10 +595,10 @@ s32 fn_800A0B18(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage) {
 }
 
 // Where to save the profile named szName in pImage: its own slot, else the first free one, else -36.
-s32 fn_800A0BC8(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage) {
+s32 MC_GetNextUserIndexInSaveGame(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage) {
     s32 nProfile;
     int i;
-    nProfile = fn_800A0B18(nPort, nSlot, szName, pImage);
+    nProfile = MC_FindUserInSaveGame(nPort, nSlot, szName, pImage);
     if (nProfile >= 0) return nProfile;
     for (i = 0; i < NUM_SAVE_PROFILES; i++) {
         if (!(pImage->uFlags & MC_SAVE_PROFILE(i))) return i;
@@ -628,37 +628,37 @@ s32 MC_LoadUser(MCCardPosStr* pPos) {
     nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return nResult;
     }
     nResult = MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME);
     if (nResult != 0) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return nResult;
     }
     nRead = MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FE4, MC_BUFFER_SIZE);
-    // EA bug: this return and the one after fn_800A0B18 leave a card it mounted mounted
+    // EA bug: this return and the one after MC_FindUserInSaveGame leave a card it mounted mounted
     if (nRead == MC_ERR_BADDATA) return MC_ERR_BADDATA;
     if (nRead != 0) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return -15;
     }
-    if (!fn_800A233C(lbl_80281FE4, &lbl_80281FE4->trailer)) {
+    if (!MC_SaveGameIsValid(lbl_80281FE4, &lbl_80281FE4->trailer)) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return MC_ERR_BADDATA;
     }
     Mem_cpy(lbl_80281FD8, lbl_80281FE4, MC_BUFFER_SIZE);
-    nFound = fn_800A0B18(nPort, nSlot, szName, lbl_80281FD8);
+    nFound = MC_FindUserInSaveGame(nPort, nSlot, szName, lbl_80281FD8);
     if (nFound < 0) return nFound;
     if (lbl_80281FD8->uFlags & MC_SAVE_RECORDS) {
-        fn_8009F8C8(&lbl_80281FD8->records);
+        MC_MergeRecords(&lbl_80281FD8->records);
     }
     Mem_cpy(&gpSaveData[nProfile], &lbl_80281FD8->aProfile[nFound], sizeof(SaveProfile));
     if (lbl_80281FE4->trailer.aMagic[2] != 'E') {
@@ -666,7 +666,7 @@ s32 MC_LoadUser(MCCardPosStr* pPos) {
         gpSaveData[nProfile].createdGolfer.nModelID = 7;
     }
     if (nMount == 0) {
-        MC_Unmount(nPort, nSlot);
+        MC_UnmountCard(nPort, nSlot);
     }
     return nRead;
 }
@@ -703,7 +703,7 @@ s32 MC_SaveUser(MCCardPos* pPos) {
         lbl_80281FE8->uFlags = 0;
         return MC_ERR_BADDATA;
     }
-    if (!fn_800A233C(lbl_80281FE8, &lbl_80281FE8->trailer)) {
+    if (!MC_SaveGameIsValid(lbl_80281FE8, &lbl_80281FE8->trailer)) {
         lbl_80281FE8->uFlags = 0;
         return MC_ERR_BADDATA;
     }
@@ -712,7 +712,7 @@ s32 MC_SaveUser(MCCardPos* pPos) {
     lbl_80281FDC->uFlags |= MC_SAVE_RECORDS;
     Mem_cpy(&lbl_80281FDC->options, &gSession.options, sizeof(GameOptions));
     Mem_cpy(&lbl_80281FDC->records, gSession.aCourseRecord, sizeof(SaveRecords));
-    nResult = fn_800A0BC8(nPort, nSlot, gpSaveData[nProfile].szName, lbl_80281FDC);
+    nResult = MC_GetNextUserIndexInSaveGame(nPort, nSlot, gpSaveData[nProfile].szName, lbl_80281FDC);
     if (nResult < 0) return nResult;
     lbl_80281FDC->uFlags |= MC_SAVE_PROFILE(nResult);
     Mem_cpy(&lbl_80281FDC->aProfile[nResult], &gpSaveData[nProfile], sizeof(SaveProfile));
@@ -721,7 +721,7 @@ s32 MC_SaveUser(MCCardPos* pPos) {
     lbl_80281FDC->trailer.aMagic[0] = '@';
     lbl_80281FDC->trailer.aMagic[1] = 'B';
     lbl_80281FDC->trailer.aMagic[2] = 'E';
-    lbl_80281FDC->trailer.uChecksum = fn_800A23BC(lbl_80281FDC, &lbl_80281FDC->trailer);
+    lbl_80281FDC->trailer.uChecksum = MC_ComputeSaveGameCheckSum(lbl_80281FDC, &lbl_80281FDC->trailer);
     if (bNewFile) {
         nResult = MC_SaveFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE, NULL);
     } else {
@@ -729,7 +729,7 @@ s32 MC_SaveUser(MCCardPos* pPos) {
                               MC_BACKUP_NAME);
     }
     if (nMount == 0) {
-        MC_Unmount(nPort, nSlot);
+        MC_UnmountCard(nPort, nSlot);
     }
     return nResult;
 }
@@ -748,7 +748,7 @@ s32 fn_800A1164(s32 nPort, s32 nSlot, const char* szName, s32 nProfile) {
     if (nResult != 0) return nResult;
     if (MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME) != 0) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return -15;
     }
@@ -756,12 +756,12 @@ s32 fn_800A1164(s32 nPort, s32 nSlot, const char* szName, s32 nProfile) {
         lbl_80281FE8->uFlags = 0;
         return MC_ERR_BADDATA;
     }
-    if (!fn_800A233C(lbl_80281FE8, &lbl_80281FE8->trailer)) {
+    if (!MC_SaveGameIsValid(lbl_80281FE8, &lbl_80281FE8->trailer)) {
         lbl_80281FE8->uFlags = 0;
         return MC_ERR_BADDATA;
     }
     Mem_cpy(lbl_80281FDC, lbl_80281FE8, MC_BUFFER_SIZE);
-    nFound = fn_800A0B18(nPort, nSlot, szName, lbl_80281FDC);
+    nFound = MC_FindUserInSaveGame(nPort, nSlot, szName, lbl_80281FDC);
     if (nFound < 0) return nFound;
     lbl_80281FD8->uFlags &= ~MC_SAVE_PROFILE(nFound);
     lbl_80281FD8->uFlags |= MC_SAVE_PROFILE(nFound);
@@ -775,10 +775,10 @@ s32 fn_800A1164(s32 nPort, s32 nSlot, const char* szName, s32 nProfile) {
     lbl_80281FDC->trailer.aMagic[0] = '@';
     lbl_80281FDC->trailer.aMagic[1] = 'B';
     lbl_80281FDC->trailer.aMagic[2] = 'E';
-    lbl_80281FDC->trailer.uChecksum = fn_800A23BC(lbl_80281FDC, &lbl_80281FDC->trailer);
+    lbl_80281FDC->trailer.uChecksum = MC_ComputeSaveGameCheckSum(lbl_80281FDC, &lbl_80281FDC->trailer);
     nResult = MC_SaveFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE, MC_BACKUP_NAME);
     if (nMount == 0) {
-        MC_Unmount(nPort, nSlot);
+        MC_UnmountCard(nPort, nSlot);
     }
     return nResult;
 }
@@ -801,12 +801,12 @@ s32 MC_LoadLastUser(s32 nPort, s32 nSlot, s32 nProfile) {
         if (nResult != 0) {
             return (nResult == MC_ERR_BADDATA) ? MC_ERR_BADDATA : -15;
         }
-        if (!fn_800A233C(lbl_80281FE8, &lbl_80281FE8->trailer)) return MC_ERR_BADDATA;
+        if (!MC_SaveGameIsValid(lbl_80281FE8, &lbl_80281FE8->trailer)) return MC_ERR_BADDATA;
         Mem_cpy(lbl_80281FDC, lbl_80281FE8, MC_BUFFER_SIZE);
         if (!(lbl_80281FDC->uFlags & MC_SAVE_4D0C0)) return -15;
         if (!(lbl_80281FDC->uFlags & MC_SAVE_PROFILE(lbl_80281FDC->n4D0C0))) return -15;
         if (lbl_80281FDC->uFlags & MC_SAVE_RECORDS) {
-            fn_8009F8C8(&lbl_80281FDC->records);
+            MC_MergeRecords(&lbl_80281FDC->records);
         }
         Mem_cpy(&gpSaveData[nProfile], &lbl_80281FDC->aProfile[lbl_80281FDC->n4D0C0],
                 sizeof(SaveProfile));
@@ -816,7 +816,7 @@ s32 MC_LoadLastUser(s32 nPort, s32 nSlot, s32 nProfile) {
         }
     }
     if (nMount == 0) {
-        MC_Unmount(nPort, nSlot);
+        MC_UnmountCard(nPort, nSlot);
     }
     return nResult;
 }
@@ -833,27 +833,27 @@ s32 MC_GetUser(s32 nPort, s32 nSlot, s32 nProfile, char* szName) {
     nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return nResult;
     }
     nResult = MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME);
     if (nResult != 0) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return nResult;
     }
     nResult = MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FE4, MC_BUFFER_SIZE);
     if (nResult != 0) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return nResult;
     }
-    if (!fn_800A233C(lbl_80281FE4, &lbl_80281FE4->trailer)) {
+    if (!MC_SaveGameIsValid(lbl_80281FE4, &lbl_80281FE4->trailer)) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return MC_ERR_BADDATA;
     }
@@ -861,12 +861,12 @@ s32 MC_GetUser(s32 nPort, s32 nSlot, s32 nProfile, char* szName) {
     if (lbl_80281FD8->uFlags & MC_SAVE_PROFILE(nProfile)) {
         strncpy(szName, lbl_80281FD8->aProfile[nProfile].szName, 0x1D);
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return 0;
     }
     if (nMount == 0) {
-        MC_Unmount(nPort, nSlot);
+        MC_UnmountCard(nPort, nSlot);
     }
     return -15;
 }
@@ -893,25 +893,25 @@ void MC_RefreshMCUserInfo(s32 nPort, s32 nSlot) {
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return;
     if (MC_CheckCardReady(nPort, nSlot) != 0) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return;
     }
     if (MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME) != 0) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return;
     }
     if (MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FE4, MC_BUFFER_SIZE) != 0) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return;
     }
-    if (!fn_800A233C(lbl_80281FE4, &lbl_80281FE4->trailer)) {
+    if (!MC_SaveGameIsValid(lbl_80281FE4, &lbl_80281FE4->trailer)) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return;
     }
@@ -923,7 +923,7 @@ void MC_RefreshMCUserInfo(s32 nPort, s32 nSlot) {
         }
     }
     if (nMount == 0) {
-        MC_Unmount(nPort, nSlot);
+        MC_UnmountCard(nPort, nSlot);
     }
 }
 
@@ -1031,7 +1031,7 @@ void MC_FreeEAGameList(void) {
 }
 
 // Trim szText in place: the white space at both ends, a final 0xFF, and every quote.
-void fn_800A1C58(char* szText) {
+void MC_CleanGameString(char* szText) {
     char aBuf[0x40]; // size unknown: the frame leaves room for 0x40 to 0x4C bytes
     s32 nLen;
     char* pStart;
@@ -1092,13 +1092,13 @@ void MC_LoadEAGameListfromStream(UStreamObject* pObject) {
         nLen = MC_StringLength(p);
         strncpy(lbl_80281FF0[i].szName, p, nLen);
         lbl_80281FF0[i].szName[nLen] = 0;
-        fn_800A1C58(lbl_80281FF0[i].szName);
+        MC_CleanGameString(lbl_80281FF0[i].szName);
         p = MC_SkipToNextLine(p);
         for (j = 0; j < lbl_80281FF0[i].n8; j++) {
             nLen = MC_StringLength(p);
             strncpy(lbl_80281FF0[i].p4 + j * 16, p, nLen);
             (lbl_80281FF0[i].p4 + j * 16)[nLen] = 0;
-            fn_800A1C58(lbl_80281FF0[i].p4 + j * 16);
+            MC_CleanGameString(lbl_80281FF0[i].p4 + j * 16);
             p = MC_SkipToNextLine(p);
         }
     }
@@ -1166,7 +1166,7 @@ void fn_800A2064(void) {
 }
 
 // Format the card. A card that is broken or has the wrong encoding can still be formatted.
-s32 fn_800A2100(s32 nPort, s32 nSlot) {
+s32 MC_FormatCard(s32 nPort, s32 nSlot) {
     s32 nMount;
     s32 nResult;
     nMount = MC_MountCard(nPort, nSlot);
@@ -1176,7 +1176,7 @@ s32 fn_800A2100(s32 nPort, s32 nSlot) {
     }
     nResult = fn_8009E918(nPort, nSlot);
     if (nMount == 0) {
-        MC_Unmount(nPort, nSlot);
+        MC_UnmountCard(nPort, nSlot);
     }
     return nResult;
 }
@@ -1194,13 +1194,13 @@ s32 fn_800A2194(s32 nPort, s32 nSlot) {
     nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return nResult;
     }
     nResult = fn_8009F6A0(nPort, nSlot);
     if (nMount == 0) {
-        MC_Unmount(nPort, nSlot);
+        MC_UnmountCard(nPort, nSlot);
     }
     return nResult;
 }
@@ -1214,33 +1214,33 @@ s32 fn_800A2248(s32 nPort, s32 nSlot) {
     nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return nResult;
     }
     nResult = MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME);
     if (nResult != 0) {
         if (nMount == 0) {
-            MC_Unmount(nPort, nSlot);
+            MC_UnmountCard(nPort, nSlot);
         }
         return nResult;
     }
     nResult = MC_FileExists(nPort, nSlot, MC_FILE_NAME);
     if (nMount == 0) {
-        MC_Unmount(nPort, nSlot);
+        MC_UnmountCard(nPort, nSlot);
     }
     return nResult;
 }
 
 // Whether the data from pData up to pTrailer is a good save: the mark "@BD" or "@BE", then the
 // checksum.
-u8 fn_800A233C(void* pData, SaveTrailer* pTrailer) {
+u8 MC_SaveGameIsValid(void* pData, SaveTrailer* pTrailer) {
     u32 uSum;
     if (pTrailer->aMagic[0] != '@' || pTrailer->aMagic[1] != 'B'
         || (pTrailer->aMagic[2] != 'D' && pTrailer->aMagic[2] != 'E')) {
         return 0;
     }
-    uSum = fn_800A23BC(pData, pTrailer);
+    uSum = MC_ComputeSaveGameCheckSum(pData, pTrailer);
     if (uSum != pTrailer->uChecksum) {
         return 0;
     }
@@ -1248,7 +1248,7 @@ u8 fn_800A233C(void* pData, SaveTrailer* pTrailer) {
 }
 
 // The save's CRC-32, over the table MC_FillCRCTable builds.
-u32 fn_800A23BC(void* pData, SaveTrailer* pTrailer) {
+u32 MC_ComputeSaveGameCheckSum(void* pData, SaveTrailer* pTrailer) {
     u32 i;
     u8* p = pData;
     u32 nLen = (u8*)&pTrailer->uChecksum - p;

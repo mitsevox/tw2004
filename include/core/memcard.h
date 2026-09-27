@@ -25,7 +25,7 @@
 typedef struct MCCardState {
     u32  uFlags;                // 0x00  MC_CARD_* below
     s32  nFreeBlocks;           // 0x04  free space, in whole sectors (CARDFreeBlocks' bytes, rounded up)
-    u32  aReplayUsed[1];        // 0x08  a bit per replay saved on the card (fn_800A0868; FE_MessageTable
+    u32  aReplayUsed[1];        // 0x08  a bit per replay saved on the card (MC_RefreshMCReplayInfo; FE_MessageTable
                                 //       fn_8007EA14 tests one)
     u32  aNameUsed[1];          // 0x0C  a bit per aszName entry that holds a profile's name (MC_RefreshMCUserInfo)
     char aszName[4][0x1D];      // 0x10  four names the menus show (FE_MessageTable fn_8007C3C8)
@@ -41,7 +41,7 @@ LAYOUT_ASSERT(MCCardState, 0x98);
 
 // MCCardState.uFlags. Each bit is set or cleared where the CARD library returns the result named.
 #define MC_CARD_PRESENT     0x02    // cleared on CARD_RESULT_NOCARD
-#define MC_CARD_MOUNTED     0x04    // set by a mount (MC_MountCard), cleared by an unmount (MC_Unmount)
+#define MC_CARD_MOUNTED     0x04    // set by a mount (MC_MountCard), cleared by an unmount (MC_UnmountCard)
 #define MC_CARD_FORMATTED   0x08    // cleared before a format and set when it succeeds (fn_8009E918);
                                     // without it MC_CheckCardReady answers -1
 #define MC_CARD_WRONGDEVICE 0x10    // CARD_RESULT_WRONGDEVICE: not a memory card
@@ -56,9 +56,9 @@ typedef enum MCError {
     MC_ERR_NOCARD       = -3,   // CARD_RESULT_NOCARD
     MC_ERR_INSSPACE     = -5,   // CARD_RESULT_INSSPACE: the card is full
     MC_ERR_NAMETOOLONG  = -6,   // CARD_RESULT_NAMETOOLONG
-    MC_ERR_NOFILE       = -12,  // CARD_RESULT_NOFILE: no such file; also "no file open" (fn_8009F488)
+    MC_ERR_NOFILE       = -12,  // CARD_RESULT_NOFILE: no such file; also "no file open" (MC_CloseFile)
     MC_ERR_BADDATA      = -18,  // the file read back is not a good save (the wrong size or
-                                // attributes, or fn_800A233C rejects it)
+                                // attributes, or MC_SaveGameIsValid rejects it)
     MC_ERR_MOUNTED      = -22,  // MC_MountCard: the card was mounted already (callers treat it as 0,
                                 // but do not unmount after)
     MC_ERR_NOPERM       = -23,  // CARD_RESULT_NOPERM
@@ -126,11 +126,11 @@ LAYOUT_ASSERT(MCOpCardName, 0xC);
 
 #define MC_BUFFER_SIZE  0x50000     // one save file image in memory
 
-// The end of the saved data: a mark and a checksum of everything before it (fn_800A23BC).
+// The end of the saved data: a mark and a checksum of everything before it (MC_ComputeSaveGameCheckSum).
 typedef struct SaveTrailer {
-    char aMagic[3];             // 0x0  "@BE" (fn_800A233C also takes "@BD")
+    char aMagic[3];             // 0x0  "@BE" (MC_SaveGameIsValid also takes "@BD")
     u8   unk3;
-    u32  uChecksum;             // 0x4  fn_800A23BC over the image up to here, this word read as 0
+    u32  uChecksum;             // 0x4  MC_ComputeSaveGameCheckSum over the image up to here, this word read as 0
 } SaveTrailer;
 LAYOUT_ASSERT(SaveTrailer, 0x8);
 
@@ -214,7 +214,7 @@ s32  fn_8009D3DC(s32 nPort, s32 nSlot);
 s32  fn_8009D50C(s32 nPort, s32 nSlot);     // new files an EA Sports Bio save needs (0 or 1)
 s32  MC_FileExists(s32 nPort, s32 nSlot, const char* pName);
 s32  MC_MountCard(s32 nPort, s32 nSlot);     // mount the card; 0, or -22 when it was mounted already
-s32  MC_Unmount(s32 nPort, s32 nSlot);     // unmount it
+s32  MC_UnmountCard(s32 nPort, s32 nSlot);     // unmount it
 void fn_8009DCEC(s32 nPort, s32 nSlot);
 s32  MC_GotoDirectory(s32 nPort, s32 nSlot, const char* pName);
 s32  MC_LoadFile(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen);  // read a file
@@ -223,31 +223,31 @@ void fn_8009E544(char* pGameName, char* pComment, u8* pIcon, u8* pBanner);
 // Write a file. pBackupName (the PS2's backup copy) is not used here.
 s32  MC_SaveFile(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen,
                  const char* pBackupName);
-s32  fn_8009E758(s32 nPort, s32 nSlot, const char* pName);
+s32  MC_DeleteFile(s32 nPort, s32 nSlot, const char* pName);
 s32  fn_8009E918(s32 nPort, s32 nSlot);     // format the card
-void fn_8009EA98(void);
-void fn_8009EAF0(void);
+void MC_RegisterStreamClients(void);
+void MC_UnRegisterStreamClients(void);
 s32  fn_8009EE28(s32 nPort, s32 nSlot);
 u32  fn_8009EF90(void);
 void fn_8009F02C(void);             // bring the images back, the first one from ARAM (fn_8009EF98)
 // Up to nMax names of the card's files whose name holds pPattern, into apName; how many in pnFound.
-s32  fn_8009F0F0(s32 nPort, s32 nSlot, const char* pPattern, char** apName, s32 nMax, s32* pnFound);
+s32  MC_FindFiles(s32 nPort, s32 nSlot, const char* pPattern, char** apName, s32 nMax, s32* pnFound);
 // Read from open file nFile at the file position, moving it on. arg3 is not used (TibExt passes 0).
-s32  fn_8009F208(s32 nFile, void* pBuf, s32 nLen, s32 arg3);
-s32  fn_8009F258(s32 nFile, void* pBuf, s32 nLen);          // write to open file nFile
-s32  fn_8009F2D8(s32 nFile, s32 nOffset, u8 bFromStart);    // move the open file's position
-s32  fn_8009F35C(void);             // always 0
-s32  fn_8009F364(void);             // always 0
-s32  fn_8009F36C(s32 nPort, s32 nSlot, s32* pnFreeBytes);   // the card's free space
+s32  MC_ReadFile(s32 nFile, void* pBuf, s32 nLen, s32 arg3);
+s32  MC_WriteFile(s32 nFile, void* pBuf, s32 nLen);          // write to open file nFile
+s32  MC_SeekFile(s32 nFile, s32 nOffset, u8 bFromStart);    // move the open file's position
+s32  MC_FlushFile(void);             // always 0
+s32  MC_SetAttributesOnFile(void);             // always 0
+s32  MC_GetFreeSpace(s32 nPort, s32 nSlot, s32* pnFreeBytes);   // the card's free space
 // The card's free directory entries. pName is not used.
-s32  fn_8009F3A0(s32 nPort, s32 nSlot, const char* pName, s32* pnFreeFiles);
+s32  MC_GetNumFreeEntries(s32 nPort, s32 nSlot, const char* pName, s32* pnFreeFiles);
 // Open the file noted in lbl_802813D8 (pName only picks the "EASB" extra); its number into pnFile.
-s32  fn_8009F3D4(s32 nPort, s32 nSlot, const char* pName, u32 uFlags, s32* pnFile);
-s32  fn_8009F488(s32 nFile);        // close open file nFile
+s32  MC_OpenFile(s32 nPort, s32 nSlot, const char* pName, u32 uFlags, s32* pnFile);
+s32  MC_CloseFile(s32 nFile);        // close open file nFile
 // Create pName with nLen bytes, but only when it is "EASB" (the EA Sports Bio's file); any other
 // name does nothing and gives 0.
-s32  fn_8009F514(s32 nPort, s32 nSlot, const char* pName, s32 nLen);
-s32  fn_8009F5E4(s32 nPort, s32 nSlot, const char* pName);    // delete the save file
+s32  MC_CreateDirectory(s32 nPort, s32 nSlot, const char* pName, s32 nLen);
+s32  MC_DeleteDirectory(s32 nPort, s32 nSlot, const char* pName);    // delete the save file
 
 // Look through the card's files for one whose name holds "BASLUS-20572": 0 if there is one, else
 // MC_ERR_NOFILE. nSlot is not used.
@@ -257,7 +257,7 @@ s32  fn_8009F6A0(s32 nPort, s32 nSlot);
 // encoding error from CARDMountAsync), -35 not mounted, else 0.
 s32  MC_CheckCardReady(s32 nPort, s32 nSlot);
 s32  fn_8009F728(int nPort);        // lbl_80281FD0[nPort] (the menus read it as a whole word)
-u8   fn_8009F7E8(int nPort);        // lbl_80282008[nPort]
+u8   MC_IsMultitapPluggedIn(int nPort);        // lbl_80282008[nPort]
 void MC_GetMC(MCCardState* pState, int nPort, int nSlot);   // copy out lbl_801F1510[nPort][nSlot]
 MCCardState* MC_pGetMC(s32 nPort, s32 nSlot);                 // &lbl_801F1510[nPort][nSlot]
 
@@ -265,23 +265,23 @@ MCCardState* MC_pGetMC(s32 nPort, s32 nSlot);                 // &lbl_801F1510[n
 
 u8   MC_LoadInitialUser(void);             // at boot: MC_LoadLastUser on each card until one succeeds
 
-s32  fn_8009FAD0(void);
-s32  fn_800A0A7C(s32 nPort, s32 nSlot);
+s32  MC_LoadOptionsFromFirstCardFound(void);
+s32  MC_DeleteSaveGame(s32 nPort, s32 nSlot);
 void MC_FreeEAGameList(void);
 void MC_LoadEAGameListfromStream(UStreamObject* pObject);  // the 'eagm' handler
 void MC_RecordEATitleByName(const char* szGameCode);   // mark the first matching 'eagm' entry
 s32  MC_TalleyEATitlesFound(void);                     // how many 'eagm' entries are marked
-s32  fn_800A2100(s32 nPort, s32 nSlot);
+s32  MC_FormatCard(s32 nPort, s32 nSlot);
 s32  fn_800A218C(s32 nPort, s32 nSlot);    // always MC_ERR_NOFILE
 s32  fn_800A2194(s32 nPort, s32 nSlot);
 
 // ---- the save file's checksum (0x800A233C) -------------------------------------------------------
 
 // Whether the data from pData up to pTrailer is a good save: the mark, then the checksum.
-u8   fn_800A233C(void* pData, SaveTrailer* pTrailer);
+u8   MC_SaveGameIsValid(void* pData, SaveTrailer* pTrailer);
 // The checksum (a CRC-32) of pData up to pTrailer's uChecksum, the mark included. uChecksum is
 // set to 0 while it runs and put back after, though the sum stops short of it.
-u32  fn_800A23BC(void* pData, SaveTrailer* pTrailer);
+u32  MC_ComputeSaveGameCheckSum(void* pData, SaveTrailer* pTrailer);
 
 // ---- the 'eagm' list and string helpers (MC.c) ----------------------------------------------------
 
@@ -299,12 +299,12 @@ void  fn_800A27BC(const char* szSrc, u16* szDst, s32 nMax);
 extern CARDFileInfo lbl_801E3180[127];  // the open files, by file number
 extern u8    lbl_801E7100[0xA000];      // the CARD library's work area (lbl_802813D0 points here)
 extern void* lbl_802813D0;      // the CARD library's work area, given to CARDMountAsync
-extern CARDStat lbl_801E3B6C[127];      // the directory entries fn_8009F0F0 found
-extern s32   lbl_80281FB0;      // how many fn_8009F0F0 found
-extern u8    lbl_802813D4;      // the last position move (fn_8009F2D8) was from the start
-extern s32   lbl_802813D8;      // the file open through fn_8009F3D4 (-1: none)
-extern s32   lbl_80281FC8;      // where the next fn_8009F208 read starts
-extern s32   lbl_80281FCC;      // the file number of the EA Sports Bio file, when fn_8009F3D4 opens it
+extern CARDStat lbl_801E3B6C[127];      // the directory entries MC_FindFiles found
+extern s32   lbl_80281FB0;      // how many MC_FindFiles found
+extern u8    lbl_802813D4;      // the last position move (MC_SeekFile) was from the start
+extern s32   lbl_802813D8;      // the file open through MC_OpenFile (-1: none)
+extern s32   lbl_80281FC8;      // where the next MC_ReadFile read starts
+extern s32   lbl_80281FCC;      // the file number of the EA Sports Bio file, when MC_OpenFile opens it
 extern s32   lbl_80281FB4;      // the size of the operation in progress (fn_8009CB9C)
 
 #endif

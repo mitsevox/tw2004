@@ -832,7 +832,7 @@ void fn_800B0960(void) {
         return;
     }
     MC_Connect();
-    fn_8009FAD0();
+    MC_LoadOptionsFromFirstCardFound();
     lbl_80282120 = MC_LoadInitialUser();
     MC_Disconnect();
 }
@@ -900,7 +900,7 @@ void fn_800B0B1C(void) {
     lbl_8028149C = -1;
     for (i = 0; i < MC_NUM_PORTS; i++) {
         lbl_80282140[i][0] = 0;
-        if (fn_8009F7E8(i)) {
+        if (MC_IsMultitapPluggedIn(i)) {
             lbl_80282138[i] = n = 1;
         } else {
             lbl_80282138[i] = n = 1;
@@ -1067,13 +1067,13 @@ void fn_800B1060(void) {
 }
 
 // Read every card's status; a changed status is marked not yet reported. Here and in fn_800B1180
-// and fn_800B13FC EA tests for a multitap (fn_8009F7E8) but gives the port one slot either way.
+// and fn_800B13FC EA tests for a multitap (MC_IsMultitapPluggedIn) but gives the port one slot either way.
 void fn_800B10A4(void) {
     int j;
     int i;
     s32 n;
     for (i = 0; i < MC_NUM_PORTS; i++) {
-        if (fn_8009F7E8(i)) {
+        if (MC_IsMultitapPluggedIn(i)) {
             n = 1;
         } else {
             n = 1;
@@ -1100,7 +1100,7 @@ u8 fn_800B1180(void) {
     int j;
     s32 n;
     for (i = 0; i < MC_NUM_PORTS; i++) {
-        if (fn_8009F7E8(i)) {
+        if (MC_IsMultitapPluggedIn(i)) {
             n = 1;
         } else {
             n = 1;
@@ -1166,7 +1166,7 @@ int fn_800B13FC(s32* pnPort, s32* pnSlot) {
     int j;
     s32 n;
     for (i = 0; i < MC_NUM_PORTS; i++) {
-        if (fn_8009F7E8(i)) {
+        if (MC_IsMultitapPluggedIn(i)) {
             lbl_80282138[i] = n = 1;
         } else {
             lbl_80282138[i] = n = 1;
@@ -1197,7 +1197,7 @@ int fn_800B14E4(s32* pnPort, s32* pnSlot) {
 
 void fn_800B1510(s32 a, s32 b) {
     MsgArg arg;
-    s32 n = fn_800A2100(a, b);
+    s32 n = MC_FormatCard(a, b);
     fn_8009DCEC(a, b);
     Mem_set(&arg, 0, sizeof(arg));
     arg.i = n;
@@ -1206,7 +1206,7 @@ void fn_800B1510(s32 a, s32 b) {
 
 void fn_800B158C(s32 a, s32 b) {
     MsgArg arg;
-    s32 n = fn_800A0A7C(a, b);
+    s32 n = MC_DeleteSaveGame(a, b);
     fn_8009DCEC(a, b);
     Mem_set(&arg, 0, sizeof(arg));
     arg.i = n;
@@ -1244,7 +1244,8 @@ void fn_800B166C(UStreamObject* pObject) {
 }
 
 // fn_800B0B1C without the messages: build the status table from scratch, then look for the first
-// status that is 3 or out of range and, when there is one, load from the card (fn_8009FAD0).
+// status that is 3 or out of range and, when there is one, load from the card
+// (MC_LoadOptionsFromFirstCardFound).
 void fn_800B1748(void) {
     int i;
     int j;
@@ -1255,7 +1256,7 @@ void fn_800B1748(void) {
     lbl_8028149C = -1;
     for (i = 0; i < MC_NUM_PORTS; i++) {
         lbl_80282140[i][0] = 0;
-        if (fn_8009F7E8(i)) {
+        if (MC_IsMultitapPluggedIn(i)) {
             lbl_80282138[i] = n = 1;
         } else {
             lbl_80282138[i] = n = 1;
@@ -1300,7 +1301,7 @@ done:
     lbl_8028149C = i;
     if (bFound) {
         MC_Connect();
-        if (fn_8009FAD0() == 0) {
+        if (MC_LoadOptionsFromFirstCardFound() == 0) {
             fn_80110458(1);
         } else {
             fn_80110458(0);
