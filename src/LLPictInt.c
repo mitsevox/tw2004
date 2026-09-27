@@ -27,10 +27,13 @@ LLPict* PictInt_Decode(PictFile* pFile) {
     if (pFile->uMagic != 'MADk') {
         return NULL;
     }
-    __stwbrx(pFile->uC, &pFile->uC, 0);
-    pFile->nWidth = (pFile->nWidth << 8) | ((pFile->nWidth >> 8) & 0xFF);
+    // the 32-bit swaps are written in C, which the compiler turns into lwz + stwbrx after register
+    // allocation: that gives EA's registers and order, __stwbrx() does not
+    pFile->uC = ((pFile->uC & 0xFF000000) >> 24) | ((pFile->uC & 0xFF0000) >> 8) |
+                ((pFile->uC & 0xFF00) << 8) | ((pFile->uC & 0xFF) << 24);
+    pFile->nWidth = ((u16)pFile->nWidth >> 8) | (((u16)pFile->nWidth & 0xFF) << 8);
     // fake match: the height's swap spelled high byte first with u16 casts gives EA's clrlslwi and
-    // rlwimi; the width's spelling does not (the width is not matched yet)
+    // rlwimi; the width's spelling does not
     pFile->nHeight = (((u16)pFile->nHeight >> 8) & 0xFF) | (((u16)pFile->nHeight & 0xFF) << 8);
     pPict =fn_80009B34(sizeof(LLPict), 1, 32, "LLPictInt.c", 142);
     if (pPict == NULL) {
@@ -53,7 +56,8 @@ LLPict* PictInt_Decode(PictFile* pFile) {
                         pFile->nWidth);
         }
     }
-    __stwbrx(pFile->uC, &pFile->uC, 0);
+    pFile->uC = ((pFile->uC & 0xFF000000) >> 24) | ((pFile->uC & 0xFF0000) >> 8) |
+                ((pFile->uC & 0xFF00) << 8) | ((pFile->uC & 0xFF) << 24);
     pFile->nWidth = ((u16)pFile->nWidth >> 8) | (((u16)pFile->nWidth & 0xFF) << 8);
     pFile->nHeight = (((u16)pFile->nHeight >> 8) & 0xFF) | (((u16)pFile->nHeight & 0xFF) << 8);
     return pPict;
