@@ -163,9 +163,9 @@ LLFont* FO_spLoadFontFromStream(u8* pData, UFontState* pState) {
     for (i = 0; i < pFile->nGlyphs; i++) {
         pFont->pGlyphs[i].pRec = &pFont->pRecs[i];
         pGlyphRec = &pFont->pRecs[i];
-        fX = pGlyphRec->aX[0] + ((pGlyphRec->aX[1] << 8) & 0xFF00u);
+        fX = pGlyphRec->aX[0] + ((pGlyphRec->aX[1] & 0xFFu) << 8);
         fX1 = fX + pGlyphRec->uWidth;
-        fY = pGlyphRec->aY[0] + ((pGlyphRec->aY[1] << 8) & 0xFF00u);
+        fY = pGlyphRec->aY[0] + ((pGlyphRec->aY[1] & 0xFFu) << 8);
         fY1 = fY + pGlyphRec->uHeight;
         fX /= nRowBytes * 2;
         fX1 /= nRowBytes * 2;
