@@ -30,6 +30,25 @@ Kept (91.62 -> 98.26%, aligned 205 -> 110):
   `ctx.nBytes = nBytesBefore; nBytesBefore2 = ctx.nBytes;`, end `nTrimmed = nBytesBefore2 - ...`.
   Order matters: B copied before A makes A's copy the temp's last use (coalesced, cost 9, kept
   in a register) and B interferes with A (spilled). 192 -> 110.
+- The frontend splits later live ranges of a reused local into its own temps (@1117 = loop 3's
+  use of pOvLib, @1118-@1121 = the second name search's k/pOther/m/pRecO), numbered above the
+  locals. EA's loop 3 pointer is coloured right after nOvs (r27): loop 1 gets its own local
+  (`pWork`), so loop 3 keeps pOvLib's local vreg; declaration order nOvs, pOvLib, pRec, j, nLeft,
+  i, pOther, k, pRecO, m, pWork (EA's colour order; pass-2 replay by rasim). 110 -> 62,
+  98.26 -> 98.77%.
+- Tail: `pSlot->pEnd = ...` before `lbl_801C6050[nSlot] = pBank` (EA loads pBank->pRecords
+  before the stwx) 62 -> 59; the ppClips loop with its own counter `n` (EA `li r7,0`, not a CSE
+  `mr` from the zero register: the loop's counter is not a split web of i) 59 -> 57. 99.42%.
+Left (57 aligned, all in the second half): one register shift. EA colours nClipsAll first
+(r15), then nTotal r16, copy-loop walkers r16-r19, nBytesBefore r20, &entry r21, arrays
+r22-r24, copy-loop i r25. Ours removes nClipsAll in simplify round 3 at 27 neighbours; rasim
+what-if: 2 permanent (coalesced) neighbours on nClipsAll, shaped like the temps of the
+nIndexSize/nRecSize block (r189-r194: live set nSlot, nOvs, pOvs, pLib, nClipsAll, ctx.nBytes),
+give EA's registers exactly; one extra temp alone does not; no declaration move of nClipsAll /
+nBudget / nTotal does. Not found yet: nIndexSize/nRecSize written in two steps (69), as
+assignment expressions inside nTotal (69), `* 16` (62), `/ 16` (67), an inline align helper
+(s32: 80-98, int: 62), any int/s32/u32/short type for nIndexSize/nRecSize/nClipsAll (>= 62),
+dead `(s64)` round trips on the setup's call arguments (62).
 Tried, worse or no change: nHdr split `nHdr = a + b; nHdr += 0x20` (214), nTotal split (208),
 single local with `nBytesBefore = ctx.nBytes + nHdr; ctx.nBytes = nBytesBefore;` (153 with the
 new declaration order), two locals with A the add's destination (v1/v2/v3: the frontend or the

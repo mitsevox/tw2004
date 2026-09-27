@@ -991,18 +991,20 @@ u32 AnimLib_PlanBank(u32 nSlot) {
     s32         nBytes;
     LibOverlay* pOvs;
     int         nOvs;
-    int         i;
-    int         j;
-    int         k;
-    int         m;
     AnimLib*    pOvLib;
-    AnimLib*    pOther;
     ClipRecord* pRec;
-    ClipRecord* pRecO;
+    int         j;
     s32         nLeft;
+    int         i;
+    AnimLib*    pOther;
+    int         k;
+    ClipRecord* pRecO;
+    int         m;
+    AnimLib*    pWork;
     s32         nTotal;
     s32         nBudget;
     ClipBank*   pBank;
+    int         n;
 
     if (lbl_801C6068[0].nOverlays != 0 && lbl_801C6068[1].nOverlays != 0) {
         bBoth = 1;
@@ -1025,16 +1027,16 @@ u32 AnimLib_PlanBank(u32 nSlot) {
     ctx.nBytes = nBytes;
     ctx.pCount = &nLibClips;
     for (i = 0; i < nOvs; i++) {
-        pOvLib = pOvs[i].pWork;
-        if (pOvLib != NULL) {
-            pOvs[i].nTree     = pOvLib->nTreeSize;
-            pOvLib->nTreeSize = 0;
+        pWork = pOvs[i].pWork;
+        if (pWork != NULL) {
+            pOvs[i].nTree    = pWork->nTreeSize;
+            pWork->nTreeSize = 0;
             if (pLib != NULL) {
-                pOvLib->nClips += pLib->nClips;
+                pWork->nClips += pLib->nClips;
             }
-            AnimLib_WalkPair(pLib, pOvLib, (AnimLibWalkFn)AnimLib_MergeSizeCb, NULL);
-            if (pOvLib->nTreeSize & 15) {
-                pOvLib->nTreeSize = ((pOvLib->nTreeSize >> 4) + 1) << 4;
+            AnimLib_WalkPair(pLib, pWork, (AnimLibWalkFn)AnimLib_MergeSizeCb, NULL);
+            if (pWork->nTreeSize & 15) {
+                pWork->nTreeSize = ((pWork->nTreeSize >> 4) + 1) << 4;
             }
             pOvs[i].n14 = pOvs[i].n10 - 3;
         }
@@ -1216,12 +1218,12 @@ u32 AnimLib_PlanBank(u32 nSlot) {
     pBank->uId     = 0;
     pBank->pFile   = NULL;
     pBank->ppClips = (void**)((u8*)pBank + 0x20);
-    for (i = 0; i < nClips; i++) {
-        pBank->ppClips[i] = NULL;
+    for (n = 0; n < nClips; n++) {
+        pBank->ppClips[n] = NULL;
     }
     pBank->pRecords      = (u8*)pBank->ppClips + nIndexSize;
-    lbl_801C6050[nSlot]  = pBank;
     pSlot->pEnd          = pBank->pRecords + nRecSize;
+    lbl_801C6050[nSlot]  = pBank;
 done:
     return nRet;
 }
