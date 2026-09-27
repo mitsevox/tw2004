@@ -157,8 +157,8 @@ void Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* pP
     fn_800BADF8(pLens->m4, pLens->m44, mB, 4);   // the result is never used
 }
 
-// A new lens's settings: a perspective camera, fA8 0.1, fAC 4096, a 60-degree field of view,
-// the identity matrix, a 20 x 20 flat view.
+// A new lens's settings: a perspective camera, near clip 0.1 and far clip 4096, a 60-degree field
+// of view, the identity matrix, a 20 x 20 flat view.
 void CA_vInitCamera(CamLens* pLens) {
     fn_80076A0C_SetType(pLens, 0);
     fn_800769C0(pLens, 0.1f, 4096.0f);

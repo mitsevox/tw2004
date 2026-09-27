@@ -93,3 +93,7 @@ address	name	comment	by	date
 800E4BF8	GUI_ScoreCardUp	keep	cr2 (replayed by orchestrator)	2026-09-27
 800E4D88	GUI_SetEndOfHolePending	keep	cr2 (replayed by orchestrator)	2026-09-27
 800E4FB0	GUI_ShowSwingTip	keep	cr2 (replayed by orchestrator)	2026-09-27
+800768E0	CA_vInitCamera	rewrite	cr1 (replayed by orchestrator)	2026-09-27
+800CC710	SkinPart_ChooseClubPartVariant	rewrite	cr1 (replayed by orchestrator)	2026-09-27
+800CC7DC	SkinPart_ChooseClubSet	rewrite	cr1 (replayed by orchestrator)	2026-09-27
+800E0564	GM_GetGameProgress	rewrite	cr1 (replayed by orchestrator)	2026-09-27
