@@ -499,6 +499,12 @@ They will be sorted into the sections below.
   unless both sides interfere; `void** q = &p;` gives EA's copy but adds a store. EA's source form
   is not found; AI_ChooseTarget's last miss (an extsb writing the frontend temp directly) is the
   same class.
+- **[verified, fake-match class] `#pragma scheduling once` ... `#pragma scheduling reset` around
+  one function runs one scheduling pass instead of two.** With two, the pre-RA pass always puts
+  an entry block's `li` after every independent rlwinm (whatever the C order); one pass keeps
+  EA's `clrlwi, li, clrlwi`. UISScreen fn_8016C6C4 90.48 -> 100 and fn_8016C614 90.21 -> 100
+  (labelled). File-wide it is wrong: 12 other UISScreen functions drop (fn_8016B09C 100 -> 72).
+  Worth a try where only the order of independent entry-block instructions differs.
 
 ### New from round 6 (2026-09-26 afternoon)
 
