@@ -10,6 +10,23 @@ hygiene list below). Nothing is running. Next: the owner's after-100% list (bott
 Nintendo SDK data (AXComp/DSPCode) and art/audio blobs are linked via C generated from main.dol at
 build time (tools/build/gendata.py), never committed.
 
+**After 100% (2026-09-27 ~19:15 UTC, pre-compact checkpoint): nothing running.** Landed since 100%:
+- n2: EA names applied with evidence (name_sources.tsv): 60 IStudio functions (Madden 2003 STABS) +
+  their types/fields/params/locals/enums (uistudio.h), MAD decoder (14 fn, 6 globals), ska_shared x2,
+  __float_max. 76 functions renamed vs the audit baseline.
+- n1: tools/match/pairnames.py + agents/findings/2026-09-27-name-pairing.{md,tsv}: of 5,272 `fn_`,
+  A 197 / B 375 (confident, ~3-7% error by hand check) / C 1,345 (evidence only) / none 3,355;
+  globals and fields need a TW07 DWARF export of variables and struct members on the owner's PC.
+  Recommended start: event, GoDynamicCam, emotion, GameEffects, GoComicCam, hlaudtrackseq,
+  SharedFileIO, PGATourSimulation, Swing, GoCamCont.
+- n3: src/README.md (the codebase map, 20 subsystems) + agents/findings/2026-09-27-codebase-health.md
+  (reviewer-lens recon: grades, top 10, the feedback loop).
+- **Merges now need `--allow-renames`** (renames since the baseline are on main; the flag checks each has
+  a name_sources.tsv row). Refresh src/README.md names after each rename batch (rename.py skips .md).
+- Queued, not started (owner: after the compact): the matched-data scoring lane (objdiff 79.95%;
+  biggest: AXVPB/AXOut .bss unscorable, skalib/LLFileIO .bss sizes; a symbols.txt-vs-object size
+  script for the tail). Next: plan the feedback loop with the owner.
+
 **Earlier (2026-09-27 ~13:00 UTC):** 7,641/7,647 exact. IStudio hold LIFTED ~14:00 UTC (owner): Madden evidence in (docs/reference-builds/madden2003-ps2); lanes b12 fn_80166098,
 b7 fn_80168918, b5 fn_80165670, b4 fn_80169DC4 rewrite toward EA's locals; Gemini works its own branch (compare at the end). Was: hold until the owner's research and the Madden NFL 2003 PS2 lead are in (Madden 2003 prototype, EA Tiburon
 2002, has IStudio with .mdebug/STABS: UIStudio.c, UISEvent.c; being extracted to
