@@ -563,6 +563,20 @@ They will be sorted into the sections below.
   `((volatile AudTrack*)pTrack)->u.stm.pStream` / `.uReadPos` and
   `((volatile AudStream*)pStream)->uOffset` (same values), the cap computed first. Needs the exact
   subset: any two of them, or one more (uLength), do not match.
+- **[verified, fake-match class] The "load deletion" pass removes an unused `li` only when
+  constant propagation changed something in the function.** An OR against a zero word triggers it:
+  `(((u64)(u32)p << 32) | (u64)(u32)p) >> 32` is p again, but the zero low word it folds makes the
+  pass run, and a leftover `li 0` (from other identity chains) is deleted instead of being reused
+  by the second CSE for a later `i = 0`. It also adds copy-propagation passes, so levers that
+  count copy-chain links need retuning after it. UISEvent fn_80165E9C 95.59 -> 100
+  (agents/tried/fn_80165E9C.md).
+- **[verified, fake-match class] A copy chain written after an instruction makes a parameter's
+  saved copy its LAST link, which fixes the entry order.** `p = (T*)(u32)((u64)(s64)((u64)(u32)p
+  << 32) >> 32);` (an identity; six of them in UISEvent fn_80165E9C) keeps copies of p until late
+  passes, so the pre-RA scheduler issues the pool base's `addi` before the `mr` of the parameter
+  (EA's order). Chain back into the parameter itself: a new local gets a higher vreg and the
+  wrong register; signed-shift or `(s64)(s32)` links leave dead srawi readers that pull the chain
+  early.
 - **[verified, fake-match class] A dead `(u32)(s64)(s32)x` can reorder a whole block through the
   first scheduling pass**, not only add an allocator neighbour: its `srawi` takes an issue slot
   and an integer unit (and the 750's rule that an integer op cannot issue beside a busy unit if it
