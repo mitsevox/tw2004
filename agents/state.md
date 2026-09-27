@@ -160,6 +160,23 @@ headers 69 (phase 3, not started).
 See `../CLAUDE.md` "After 100% match": partition by audit status, phase 3 headers, **full cleanup of
 docs/gameplay.md** (unaudited behaviour claims), port-hazards doc, misfiled units.
 
+**Goal reframe (owner, 2026-09-27 evening):** reviewers will judge this now: take it from "AI slop" to a
+genuinely good decomp (readable, named, understandable to a human or a fresh AI, faithful). Fakes may
+stay for now; every change keeps the byte match. Plan of attack = the procedural feedback loop in
+agents/findings/2026-09-27-codebase-health.md (per-file checklist, lint baselines, order of attack);
+to be fleshed out with the owner after the compaction. The DOL sha1 (`main.dol: OK`), not objdiff, is
+the gate: a type change can grow the DOL with every function still "exact" (n2 finding).
+
+**Naming policy (owner, 2026-09-27):** most names can't be proven; name anyway and roll with it.
+- Evidence first (EA/TW06/TW07/Madden names, n1's pairing), then descriptive names that state what
+  the code demonstrably does (the audited comments are the base), tier T3 "provisional" in
+  name_sources.tsv; confidence lives in the log, never in the identifier (no `_maybe`, no `?`).
+- EA's own style: subsystem prefix + verb/object (UISMgrInit, GM_BallHit, Physics_ShotImpact,
+  Golfer_IsLucky); consistency across the codebase over perfection of any one name.
+- Light verification for T3: one naming pass + an independent reviewer sampling; not two blind
+  readers for 5,000 functions. Hard rule kept: a name must never contradict the code.
+- merge.py `--allow-renames` requires a name_sources.tsv row per renamed function.
+
 Hygiene items added 2026-09-27 (owner: after 100%, not right away):
 - **objdiff "matched data" (79.88% vs 99.93% linked):** cosmetic, no byte changes. Fix symbol sizes
   in symbols.txt / declared types so objdiff's per-symbol .bss/.sdata comparison pairs up (biggest:
