@@ -56,19 +56,19 @@ static u8 lbl_80281C88;                 // set while fn_8001144C word-wraps (fn_
 LLFont* FO_spLoadFontFromStream(u8* pData, UFontState* pState) {
     int nPalette;
     int nTileCol;
-    int nTileRow;
     int nX;
+    int nTileRow;
     LLTexelPair* pDst;
+    int nRow;
     u8* pRec;
-    int k;
     int nRowBytes;
     LLFont* pFont;
     LLGlyphRec* pGlyphRec;
     LLFontFile* pFile;
     s32 i;
     u8* pSrc;
+    int k;
     int nTexHeight;
-    int nRow;
     f32 fX;
     f32 fY;
     f32 fX1;
