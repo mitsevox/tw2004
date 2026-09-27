@@ -15,7 +15,8 @@ u8  lbl_80281BE0;               // lbl_80281BE4 holds a value not yet handed out
 
 // section note: only Skeleton.c and GoLighting.c read this (fn_80029BC8). It starts a new 8-aligned
 // .data section after UMemPool.c's (in UMemPool.c it lands at 0x80186834), before LoadData.c's, so
-// its file is this one or ObjList.c.
+// its file is this one or ObjList.c; or UMemPool.c with the unexplained 8-alignment after a file
+// name string seen in TibExt.c and GoRenderCtx_Gc.c.
 #pragma explicit_zero_data on
 f32 lbl_80186838[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 #pragma explicit_zero_data reset

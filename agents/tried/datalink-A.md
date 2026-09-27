@@ -48,3 +48,28 @@ result.
   in between are urandom.c and ObjList.c (no other .data); nothing picks one, so urandom.c (the
   next in link order), with a section note. explicit_zero_data as in uiobject.c's zero vector.
 - Result: main.dol: OK. Owner between urandom.c and ObjList.c is a guess (noted in the code).
+- Later (see the next block): data 8-aligned after a file-name string in .data is a recurring
+  pattern (TibExt.c, GoRenderCtx_Gc.c), so UMemPool.c + aligned(8) is an equal candidate; the
+  section note in urandom.c says so.
+
+## auto_04_80185158_rodata (8 B): dropped (lane b2 linked it into runtime/locale.c)
+
+## auto_04_801861A0_rodata (108 B): skipped, UIStudio.c
+
+- lbl_801861A0 (the "Attempting to activate screen ..." message) and lbl_80186200 ("UIStudio.c"),
+  both used only by UIStudio. Not this lane's (UIStudio.c is still being matched).
+
+## auto_05_801869B8_data (288 B): skipped, LLFont.c
+
+- 8 zero bytes, then lbl_801869C0 (0xC0), lbl_80186A80 (0x4C) and lbl_80186ACC (a 9-byte string),
+  all used only by LLFont. Not this lane's (LLFont.c is still being matched).
+
+## auto_05_80186AF0_data (232 B): lbl_80186AF0 -> GoRenderCtx_Gc.c
+
+- One object, u32[1][58] (engine.h's extern: [][0xE8 / 4]); only user GoRenderCtx_Gc
+  (fn_800142AC). Follows GoRenderCtx_Gc.c's .data (its "GoRenderCtx_Gc.c" string), ends where
+  streammanagerhole.c's begins.
+- First try: plain definition before fn_800142A4 -> lands at 0x80186AEC (4-aligned after the
+  string), doldiff 0x800142BF. EA's is 8-aligned: labelled aligned(8), the same fake as TibExt.c's
+  lbl_80194758 (the functions from fn_800142A4 on were sweeps and may be another file).
+- Result: GoRenderCtx_Gc .data 0x80186AD8..0x80186BD8. main.dol: OK.
