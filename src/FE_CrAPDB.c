@@ -1645,7 +1645,8 @@ void FE_CrAP_ApplyAssetParts(CrAPAsset* pAsset, Skin* pSkin) {
     }
 }
 
-// And each of its sets the skin has gets the asset's variant and option.
+// Put the asset's sets on a skin: each of its four sets the skin has gets the asset's variant and
+// option; fn_800CECE0 gets them too when SkinPart_GetChangeAllCopies is set.
 void FE_CrAP_ApplyAssetSets(CrAPAsset* pAsset, Skin* pSkin) {
     s32 nSet;
     s32 nVariant;
@@ -1666,8 +1667,8 @@ void FE_CrAP_ApplyAssetSets(CrAPAsset* pAsset, Skin* pSkin) {
     }
 }
 
-// The same for a club skin, except that a set's "DefaultL" variant is used instead when it has one
-// and the profile's choices.n113 is 1.
+// FE_CrAP_ApplyAssetSets for a club skin: a set that has a "DefaultL" variant gets that one instead
+// when the profile's choices.n113 is 1.
 void FE_CrAP_ApplyAssetSetsToClubSkin(CrAPAsset* pAsset, Skin* pSkin) {
     s32 nSet;
     s32 nVariant;
@@ -1708,7 +1709,8 @@ void FE_CrAP_RemoveAssetParts(CrAPAsset* pAsset, Skin* pSkin) {
     }
 }
 
-// And its sets: each goes back to its "Defaults" variant (or 0).
+// Take the asset's sets off a skin: each goes back to its "Defaults" variant (or variant 0 when it
+// has none). Nothing for a NULL asset.
 void FE_CrAP_RemoveAssetSets(CrAPAsset* pAsset, Skin* pSkin) {
     int i;
     int nSet;
@@ -1728,7 +1730,8 @@ void FE_CrAP_RemoveAssetSets(CrAPAsset* pAsset, Skin* pSkin) {
     }
 }
 
-// How many of the profile's slots hold an asset whose n2C is n.
+// How many of the assets in the profile's 53 slots carry sponsor n's brand (n2C; lbl_801935C8 names
+// the brands).
 int FE_CrAP_GetNumEquippedItemsWithSponsor(s16 n) {
     s16 i;
     int nAsset;
@@ -1744,7 +1747,8 @@ int FE_CrAP_GetNumEquippedItemsWithSponsor(s16 n) {
     return nCount;
 }
 
-// How many offered assets have lock kind nKind and lock number nLock.
+// How many assets offered for the current gender unlock with lock kind nKind and number nLock:
+// EASportsBio.c asks how many a bio level (kind 12) unlocks.
 s32 FE_CrAP_GetNumItemsWithLockModeAndLockVal(s32 nKind, s32 nLock) {
     int i;
     int nCount = 0;
@@ -1758,7 +1762,9 @@ s32 FE_CrAP_GetNumItemsWithLockModeAndLockVal(s32 nKind, s32 nLock) {
     return nCount;
 }
 
-// Copy the names of the first three of those assets; how many there are, up to 3.
+// Copy the names of the first three assets offered for the current gender with lock kind nKind and
+// number nLock into szFirst, szSecond, szThird; how many there are, up to 3. EventInfo.c lists an
+// event's rewards (kind 17) this way.
 s32 FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(s32 nKind, s32 nLock, char* szFirst, char* szSecond, char* szThird) {
     int i;
     int nCount = 0;
@@ -1783,7 +1789,8 @@ s32 FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(s32 nKind, s32 nLock, char* szF
     return nCount;
 }
 
-// The lowest nLock above nAfter among the assets of lock kind nKind (-1: none).
+// The lowest lock number above nAfter among the assets of lock kind nKind, whatever their gender
+// (-1: none): EASportsBio.c's next bio level that unlocks something.
 s32 FE_CrAP_GetNextUnlockVal(s32 nKind, s32 nAfter) {
     int i;
     int nBest = 999999999;
@@ -1801,9 +1808,10 @@ s32 FE_CrAP_GetNextUnlockVal(s32 nKind, s32 nAfter) {
     return nBest;
 }
 
-// Fill lbl_80282470: a record for each of the profile's set a1054C entries and each asset in the
-// profile's slots whose n2C is that entry's n (with fn_800F0304 of the entry and the asset's name).
-// How many records there are.
+// Fill the sponsorship records (lbl_80282470, their count in lbl_8028246C): for each of the
+// profile's 11 a1054C entries that is on (b), one record per worn asset of its sponsor (n), holding
+// the sponsor, fn_800F0304 of the entry (TW07 calls it the cash bonus) and the asset's name.
+// Returns how many records there are.
 s32 FE_CrAP_CollectSponsorshipItems(void) {
     s32 aAssets[64];
     s16 nSlot;
@@ -1837,7 +1845,8 @@ s32 FE_CrAP_CollectSponsorshipItems(void) {
     return lbl_8028246C;
 }
 
-// Copy record n out of lbl_80282470.
+// Copy sponsorship record n (FE_CrAP_CollectSponsorshipItems): its sponsor, its bonus and the
+// asset's name.
 void FE_CrAP_GetSponsorshipItemInfo(int n, s16* pN0, s32* pN4, char* pDst) {
     *pN0 = lbl_80282470[n].n0;
     *pN4 = lbl_80282470[n].n4;
@@ -1849,6 +1858,8 @@ void FE_CrAP_GetSponsorName(s16 n, char* pDst) {
     strcpy(pDst, lbl_801935C8[n]);
 }
 
+// Count a part's assets offered for the current gender: the locked ones (fn_80078008), the owned
+// ones (aB1CC), those with their aB344 bit set (TW07 counts new ones here) and all of them.
 void FE_CrAP_GetCategoryInfo(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s32* pAll) {
     int i;
     SaveProfile* pProfile = FE_GetCurrentProfile();

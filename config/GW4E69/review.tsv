@@ -145,3 +145,13 @@ address	name	comment	by	date
 8010651C	FE_CrAP_GetUnlockMessageFrom	rewrite	cr3 (replayed by orchestrator)	2026-09-27
 80106750	FE_CrAP_GetClubSkinsForAsset	rewrite	cr3 (replayed by orchestrator)	2026-09-27
 801069AC	FE_CrAP_TryBallSwappingAsset	rewrite	cr3 (replayed by orchestrator)	2026-09-27
+80106B04	FE_CrAP_ApplyAssetSets	rewrite	cr3 (replayed by orchestrator)	2026-09-27
+80106BF8	FE_CrAP_ApplyAssetSetsToClubSkin	rewrite	cr3 (replayed by orchestrator)	2026-09-27
+80106DA0	FE_CrAP_RemoveAssetSets	rewrite	cr3 (replayed by orchestrator)	2026-09-27
+80106E48	FE_CrAP_GetNumEquippedItemsWithSponsor	rewrite	cr3 (replayed by orchestrator)	2026-09-27
+80106ED8	FE_CrAP_GetNumItemsWithLockModeAndLockVal	rewrite	cr3 (replayed by orchestrator)	2026-09-27
+80106F68	FE_CrAP_GetFirstThreeItemsWithLockModeAndVal	rewrite	cr3 (replayed by orchestrator)	2026-09-27
+80107084	FE_CrAP_GetNextUnlockVal	rewrite	cr3 (replayed by orchestrator)	2026-09-27
+801070F4	FE_CrAP_CollectSponsorshipItems	rewrite	cr3 (replayed by orchestrator)	2026-09-27
+80107244	FE_CrAP_GetSponsorshipItemInfo	rewrite	cr3 (replayed by orchestrator)	2026-09-27
+801072CC	FE_CrAP_GetCategoryInfo	add	cr3 (replayed by orchestrator)	2026-09-27
