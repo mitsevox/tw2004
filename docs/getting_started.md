@@ -1,5 +1,12 @@
 # Getting Started
 
+**New to the code?** Read [`src/README.md`](../src/README.md) first: the map of the game's
+source. It groups every game file in `src/` into its subsystem (boot and main loop, rendering,
+cameras, ball physics, golfers, characters, the round and game modes, front end and UI, audio,
+save data...), says in a line what each file is and where its name comes from, and points at the
+main loop, the game-state machine, a shot's path through the code and the UI script engine. The
+rest of this page is the build template's setup guide.
+
 See [Dependencies](dependencies.md) first.
 
 1. [Create a new repository from this template](https://github.com/new?template_name=dtk-template&template_owner=encounter), then clone it.
