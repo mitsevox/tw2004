@@ -619,16 +619,20 @@ static inline u8 fn_8016AEEC_Read(u8 b) { return b; }
 // Runs the screen file's start entries that have not run yet, then every handler under node
 // nNode; a handler run with message -1 is marked as run.
 void fn_8016AEEC(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
-    u32 j;
-    UISNode* pNode;
-    u32 i;
+    // fake match: the second loop's pEntry is declared here, ahead of pNode and j, and shadowed by
+    // the first loop's own pEntry; this order gives the original's loop registers.
     u8 bLast;
+    UISEntry* pEntry;
+    UISNode* pNode;
+    u32 j;
 
     if (pScreen->pData != NULL) {
         pNode = &pScreen->pData->pNodes[nNode];
         bLast = fn_8016AEEC_Read(nMsg == -1);
-        for (i = 0; i < pScreen->pData->nStart; i++) {
-            UISEntry* pEntry = &pScreen->pData->pStart[i];
+        // fake match: nNode (dead after pNode) is the counter of both entry loops, which gives the
+        // original's loop registers.
+        for (nNode = 0; nNode < pScreen->pData->nStart; nNode++) {
+            UISEntry* pEntry = &pScreen->pData->pStart[nNode];
             if (pEntry->n2 == 0) {
                 if (pEntry->uHandler < pStudio->nHandlers) {
                     UISHandlerFn pfnHandler = pStudio->ppfnHandlers[pEntry->uHandler];
@@ -642,16 +646,21 @@ void fn_8016AEEC(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
             }
         }
         for (j = 0; j < pNode->nGroups; j++) {
+            // fake match: bLast through a 64-bit value (the same value) into a second byte local, so
+            // the stored value is its own register (the original's r30) and bLast keeps r27. The
+            // original copies it with `mr r30,r27`; this gives `clrlwi r30,r27,24` (same value).
+            // port: none (the value is 0 or 1).
+            u8 b = (u8)(u64)bLast;
             UISGroup* pGroup = pNode->ppGroups[j];
-            for (i = 0; i < pGroup->nEntries; i++) {
-                UISEntry* pEntry = &pGroup->pEntries[i];
+            for (nNode = 0; nNode < pGroup->nEntries; nNode++) {
+                pEntry = &pGroup->pEntries[nNode];
                 if (pEntry->uHandler == 0xFFFF) {
                     fn_8016AEEC(pStudio, pScreen, pEntry->u4.nNode, nMsg);
                 } else if (pEntry->uHandler < pStudio->nHandlers) {
                     UISHandlerFn pfnHandler = pStudio->ppfnHandlers[pEntry->uHandler];
                     if (pfnHandler != NULL) {
                         pfnHandler((u8*)pScreen->pData + *pEntry->u4.pnOffset, nMsg, 0, NULL, 0);
-                        pEntry->n2 = bLast;
+                        pEntry->n2 = b;
                     }
                 }
             }
