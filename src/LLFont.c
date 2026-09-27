@@ -454,10 +454,12 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
                 fn_80012540(pGlyph->fU0, pGlyph->fV1);
                 fn_800124A8();
                 break;
-            case 1:
-                if (0.0f != pCtx->fB8) {
-                    fX0 = (fSin * pGlyph->f20 + fCos * pGlyph->f1C) * fScaleX + fLeft;
-                    fY0 = (fCos * pGlyph->f20 - fSin * pGlyph->f1C) * fScaleY + fTop;
+        case 1:
+            if (0.0f != pCtx->fB8) {
+                fOffX = fSin * pGlyph->f20 + fCos * pGlyph->f1C;
+                fX0 = fOffX * fScaleX + fLeft;
+                fOffY = fCos * pGlyph->f20 - fSin * pGlyph->f1C;
+                fY0 = fOffY * fScaleY + fTop;
                     fX1 = fCos * pGlyph->fWidth * fScaleX + fX0;
                     fY1 = fNegSin * pGlyph->fWidth * fScaleY + fY0;
                     fX3 = fX0 + fSin * pGlyph->fHeight * fScaleX;
