@@ -1252,12 +1252,12 @@ void fn_80168918(UIStudio* pStudio, u8 bOn, s32 nId, UISNodeInfo* pInfo, s32* p,
     UISNodeInfo* pFind;
     u32 nEventArg;
     s32 nEvent;
-    UISScreenFile* pFile;
-    u16 nIndex;
+    u32 nIndex;
     UISNodeInfo* pOther;
     UISNode* pCheck;
+    UISHandler* pMap; // name: Madden 2003 STABS
     s32 i;
-    u8* pScript;
+    void* pScript;
     u32 n;
     s32 aArgs[2];
 
@@ -1269,22 +1269,21 @@ void fn_80168918(UIStudio* pStudio, u8 bOn, s32 nId, UISNodeInfo* pInfo, s32* p,
     }
     pScreen = &pStudio->pScreens[nIndex];
     nEvent = bOn == 1 ? -6 : -7;
-    pFile = pScreen->pData;
-    nNode = pFile->nNodes;
+    nNode = pScreen->pData->nNodes;
     while (nNode-- != 0) {
-        pCheck = &pFile->pNodes[nNode];
+        pCheck = &pScreen->pData->pNodes[nNode];
         if (pCheck->pInfo == pInfo) {
             pNode = pCheck;
             break;
         }
     }
     pLinkNode = NULL;
-    n = pFile->nNodes;
+    n = pScreen->pData->nNodes;
     while (n-- != 0) {
-        pCheck = &pFile->pNodes[n];
+        pCheck = &pScreen->pData->pNodes[n];
         for (i = 0; i < (s32)pCheck->nHandlers; i++) {
-            if (!(pCheck->pHandlers[i].uFlags & 0xC000)
-                && (pCheck->pHandlers[i].uFlags & 0x2FFF) == (s16)nNode) {
+            pMap = &pCheck->pHandlers[i];
+            if (!(pMap->uFlags & 0xC000) && (pMap->uFlags & 0x2FFF) == (s16)nNode) {
                 pLinkNode = pCheck;
                 break;
             }
@@ -1297,6 +1296,8 @@ void fn_80168918(UIStudio* pStudio, u8 bOn, s32 nId, UISNodeInfo* pInfo, s32* p,
         }
     }
     // EA bug: pNode is NULL when no node of the screen has pInfo; nothing checks it.
+    // fake match: EA has one u32 event local (Madden 2003 STABS); a single u32 local changes the
+    // register allocation, the s32 copied into a second u32 local gives EA's.
     nEventArg = (u32)nEvent;
     pScript = fn_8016C674(pNode, nEventArg);
     pNode->pInfo->u4 = bOn;
