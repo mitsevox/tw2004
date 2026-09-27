@@ -20,8 +20,21 @@ f32* fn_80093268(void);                 // uiTransform.c
 void fn_800760D8(LLPict* pPict);        // LLVideo.c
 
 // The tint of the last draw (as fe_movies.c's lbl_80281F28/lbl_80281F2C); nothing here reads it.
-f32* lbl_80282458;
+// .sbss: defined in reverse address order (CodeWarrior lays it out last-defined-first).
 f32* lbl_8028245C;
+f32* lbl_80282458;
+
+// fake match: these two stand in for code the original linker stripped. The file's pool starts
+// with the u32 conversion's constant and then 1/511, before fn_80102AC8 uses 0.0f first; their
+// bodies are unknown, these only reproduce the order (a conversion's constant is pooled after the
+// function's literal constants, hence two functions).
+static f32 uiArc_StrippedFn(u32 n) {
+    return n;
+}
+
+static f32 uiArc_StrippedFn2(f32 x) {
+    return (1.0f / 511.0f) * x;
+}
 
 // Draw pArc: nSegments quads from its inner to its outer radius (v20 * v28 with flag 1, else the
 // centre; v28), from fStart to fEnd degrees (flag 0x10: the whole circle), textured like fe_movies.c's
@@ -136,8 +149,12 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     fU2[0] = !nHi + fU;
     fV2[0] = fV + nLo;
 
-    fStart = PI * ((pArc->uFlags & 0x10) ? 0.0f : pArc->fStart) / 180.0f;
-    fEnd = PI * ((pArc->uFlags & 0x10) ? 360.0f : pArc->fEnd) / 180.0f;
+    // fake match: uFlags through a dead 64-bit round trip (the low word is uFlags itself): its
+    // high word's srawi takes an issue slot in the first scheduling pass, which moves fV0's add
+    // after the other corners' conversions (EA's float registers); it is deleted after
+    // allocation. port: plain pArc->uFlags.
+    fStart = PI * (((s32)(s64)(s32)pArc->uFlags & 0x10) ? 0.0f : pArc->fStart) / 180.0f;
+    fEnd = PI * (((s32)(s64)(s32)pArc->uFlags & 0x10) ? 360.0f : pArc->fEnd) / 180.0f;
     colorA = pArc->colorA;
     colorB = pArc->colorB;
     if (fStart > fEnd) {
