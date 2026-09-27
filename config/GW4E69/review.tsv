@@ -2,3 +2,26 @@
 # (keep: read and right; rewrite; add; none: needs none), who, date.
 address	name	comment	by	date
 80009E70	StaticMem_Free	keep	orchestrator (KEEP test)	2026-09-27
+800E1260	GM_SelectHoleSet	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E1434	GM_InitializeCurrentHoleToFirstSelected	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E14E0	GM_SetCurrentCourse	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E1788	GM_GetPlayerRoundScore	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E1904	GM_GetGolferRelativeCumulativeScore	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E1CE8	GM_ConvertCourseAndHoleToPar5EagleIndex	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E22E4	GM_UserHasEagledHole	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E234C	GM_GetPar5EagleDate	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E23B0	GM_IsShotOverLimit	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E2520	GM_GetMinPlayersForMode	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E2680	GM_GetCourseName	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E276C	GameManager_GetHoleName	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E2810	Gimme_Allowed	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E299C	GM_InitBallsToTee	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E2B40	GM_IsBallOOB	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E2BA4	GM_Pick_PlayOffHole	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E2EAC	GM_RenderBallTarget	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E2F14	GM_SetupDefaultProfile	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E2FD8	GM_BuildDream18	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E3050	GM_BuildRegionalRound	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E30D4	GM_BuildRandom18	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E39F0	GM_Currently_SkillZoneMode	rewrite	cr2 (replayed by orchestrator)	2026-09-27
+800E3A54	GM_IsSpeedGolfMode	rewrite	cr2 (replayed by orchestrator)	2026-09-27

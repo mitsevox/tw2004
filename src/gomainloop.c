@@ -257,7 +257,7 @@ void fn_800DCBB8(void);
 void fn_800DCBBC(void);
 void fn_800DCC04(void);
 void fn_800DCC30(void);
-void fn_800E2F14(void);
+void GM_SetupDefaultProfile(void);
 void fn_800E5314(void);
 s32  fn_800FD6A4(int nPlayer);
 void fn_801020BC(void);
@@ -675,7 +675,7 @@ void GO_vInitIG(void) {
         fn_800EAF7C();
         gSession.nC = 0;
     }
-    fn_800E2F14();
+    GM_SetupDefaultProfile();
     fn_800E5314();
     Luck_ResetAllOdds2();
     fn_8011407C();

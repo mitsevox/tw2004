@@ -15,9 +15,9 @@ int  GM_GetPlayerRoundScoreThroughHole(int nPlayer, int nHoles);
 void GM_SetSplitScreen(u8 b);
 
 void  fn_800D8D5C(int nPlayer);   // clears the player's words at 0x314-0x350
-void  fn_800E30D4(void);
-void  fn_800E2FD8(void);
-void  fn_800E3050(int nCourse);
+void  GM_BuildRandom18(void);
+void  GM_BuildDream18(void);
+void  GM_BuildRegionalRound(int nCourse);
 
 // GameRound.c's data. The uninitialised globals are defined last address first (CodeWarrior lays
 // each section out in reverse order of definition).
@@ -334,8 +334,8 @@ void GM_ClearDataForNewGame(void) {
     gpGame->bD5 = 0;
 }
 
-// A hole-selection preset for the round: 0 none, 1 all, 2 the front nine, 3 the back nine,
-// 4/5/6 only the par 5s/4s/3s, 7 all; then the first selected hole.
+// Selects the round's holes by preset nPreset: 0 none, 1 all 18, 2 the front nine, 3 the back nine,
+// 4/5/6 only the par 5s/4s/3s, 7 all 18; then makes the first selected hole the current one.
 void GM_SelectHoleSet(int nPreset) {
     int i;
     for (i = 0; i < 18; i++) {
@@ -395,7 +395,8 @@ void GM_SelectSingleHole(int nHole) {
     GM_InitializeCurrentHoleToFirstSelected();
 }
 
-// Moves to the round's first hole.
+// Makes the round's first selected hole the current one (GM_SetCurrentHole); nothing changes when
+// no hole is selected.
 void GM_InitializeCurrentHoleToFirstSelected(void) {
     int i;
     for (i = 0; i < 18; i++) {
@@ -416,27 +417,28 @@ void GM_SetCurrentHole(int nHole) {
     }
 }
 
-// Sets the round's course. 23, 22 and 24..29 are the mixed rounds (built by fn_800E30D4,
-// fn_800E2FD8 and fn_800E3050); any other value is one course's holes 1..18 (while b136 is
-// set, only the current course changes).
+// Sets the round's course. 23 builds "Random 18" (GM_BuildRandom18, flag b137), 22 "Dream 18"
+// (GM_BuildDream18, b138) and 24..29 a regional round (GM_BuildRegionalRound, b139 = 1..6); 22 and
+// 24..29 then take the current hole's course from the built round. Any other value is one course
+// played as its holes 1..18; while a custom round is set up (b136) only the current course changes.
 void GM_SetCurrentCourse(int nCourse) {
     int i;
     if (nCourse == 23) {
-        fn_800E30D4();
+        GM_BuildRandom18();
         gpGame->b137 = 1;
         return;
     }
     gpGame->b137 = 0;
     if (nCourse == 22) {
         gpGame->b138 = 1;
-        fn_800E2FD8();
+        GM_BuildDream18();
         gpGame->nCurCourse = gpGame->nHoleCourse[gpGame->nCurHole];
         return;
     }
     gpGame->b138 = 0;
     if (nCourse >= 24 && nCourse < 30) {
         gpGame->b139 = nCourse - 23;
-        fn_800E3050(nCourse);
+        GM_BuildRegionalRound(nCourse);
         gpGame->nCurCourse = gpGame->nHoleCourse[gpGame->nCurHole];
     } else {
         gpGame->b139 = 0;
@@ -479,7 +481,7 @@ int Game_GetMulliganRule(void) {
     return gpGame->nMulligans;
 }
 
-// A player's total for the round (all 18 holes).
+// A player's total over all 18 holes in the mode's scoring: see GM_GetPlayerRoundScoreThroughHole.
 int GM_GetPlayerRoundScore(int nPlayer) {
     return GM_GetPlayerRoundScoreThroughHole(nPlayer, 18);
 }
@@ -514,8 +516,9 @@ int GM_GetGolferRelativeCurrentScore(int nPlayer, u8 bCurrent) {
     return nStrokes - nPar;
 }
 
-// The score shown for a player: the PGA TOUR simulation's while the tour runs, n2D8 in a playoff
-// (gpGame->bD4), else strokes against par while gpGame->nDC < nE0, and 0 after that.
+// The score against par shown for a player: the PGA TOUR simulation's while a tour event runs
+// (fn_800EE470), n2D8 in a playoff (gpGame->bD4), else GM_GetGolferRelativeCurrentScore while the
+// event's round number (gpGame->nDC) is below its round count (nE0), and 0 after the last round.
 int GM_GetGolferRelativeCumulativeScore(int nPlayer, u8 bCurrent) {
     if (fn_800EE470()) {
         return GM_PgaTourSim_GetRelativeScoreFromEntrantID(nPlayer, 0, bCurrent);
@@ -580,9 +583,11 @@ u8 GM_CurrentlyOnLastHole(void) {
     return b;
 }
 
-// The 75 marked holes (two to five per course, none on course 7; the items GM_GetGameProgress
-// counts with fn_800588F4): a course and hole to the item index, or -1. EA wrote the cases as 1-based hole
-// numbers; the courses are in the original's order, which numbers the items.
+// A course's par 5 to its index in the profile's par-5 eagle records (0..74: two to five per
+// course, none on course 7), or -1 for a hole that is not one; nHole counts from 0.
+// GM_UserHasEagledHole and GM_GetPar5EagleDate read the records (fn_800588F4) and
+// GM_GetGameProgress counts them. EA wrote the cases as 1-based hole numbers; the courses come in
+// the original's order, which numbers the records.
 int GM_ConvertCourseAndHoleToPar5EagleIndex(int nCourse, int nHole) {
     switch (nCourse) {
     case 0:
@@ -744,7 +749,8 @@ int GM_ConvertCourseAndHoleToPar5EagleIndex(int nCourse, int nHole) {
     return -1;
 }
 
-// Marked hole (course a, hole b)'s kind-0 byte in save slot nSlot (0 for an unmarked hole).
+// Whether save profile nSlot has eagled par 5 b (counted from 0) of course a: the record's flag
+// (fn_800588F4 kind 0); 0 when the hole is not a par 5.
 u8 GM_UserHasEagledHole(int nSlot, int a, int b) {
     int i = GM_ConvertCourseAndHoleToPar5EagleIndex(a, b);
     if (i != -1) {
@@ -753,7 +759,8 @@ u8 GM_UserHasEagledHole(int nSlot, int a, int b) {
     return 0;
 }
 
-// And its kind-1 value.
+// The date save profile nSlot eagled par 5 b of course a (fn_800588F4 kind 1); 0 when the hole is
+// not a par 5.
 int GM_GetPar5EagleDate(int nSlot, int a, int b) {
     int i = GM_ConvertCourseAndHoleToPar5EagleIndex(a, b);
     if (i != -1) {
@@ -762,8 +769,9 @@ int GM_GetPar5EagleDate(int nSlot, int a, int b) {
     return 0;
 }
 
-// The hole's stroke limit: with the session's limit option (0x5B39) on and the mode using it,
-// 10 strokes ends the hole (GM_PlayerTookShot picks the ball up).
+// Whether nStrokes has reached the hole's stroke limit of 10: only with the stroke-limit option on
+// (gSession.bStrokeLimit) and a mode that uses it (gpGame->bStrokeLimit); GM_PlayerTookShot then
+// picks the ball up. nPlayer is not read.
 u8 GM_IsShotOverLimit(int nPlayer, int nStrokes) {
     if (gSession.bStrokeLimit && gpGame->bStrokeLimit && nStrokes >= 10) {
         return 1;
@@ -794,9 +802,11 @@ void GM_ClearMulliganCounters(void) {
     }
 }
 
-// A number per game mode (1, 2 or 4; 0 for modes 3, 10-17, 22, 25 and any other): modes 6-8
-// give 1 or 2 by gpGame->n4.
-int fn_800E2520(int nMode) {
+// The fewest players game mode nMode takes, for the front end (FE_MessageTable messages 2, 4 and
+// 6): 1 for stroke play (0), 4, 5, 9, Stableford (18), 23 and 24; 2 for match play (1), skins (2)
+// and 26; 4 for the team modes 19-21 (best ball, four-ball, alternate shot); speed golf (6-8) 1 or
+// 2 by gpGame->n4; 0 for any other mode.
+int GM_GetMinPlayersForMode(int nMode) {
     switch (nMode) {
     case 0:
         return 1;
@@ -864,7 +874,9 @@ void GM_SetSplitScreenForMode(void) {
     }
 }
 
-// The course's folder name ("01_Peb" = Pebble Beach ...). Course 4's is "22_Ant".
+// The current course's folder name on the disc ("01_Peb" = Pebble Beach ...; course 4's is
+// "22_Ant"), "none" past course 20. StreamManagerHole and the disc check build their data paths
+// from it.
 char* GM_GetCourseName(void) {
     switch (Game_GetCourse()) {
     case 0:  return "01_Peb";
@@ -892,7 +904,8 @@ char* GM_GetCourseName(void) {
     return "none";
 }
 
-// "HOLE_01" .. "HOLE_18".
+// Hole nHole's folder name (nHole counted from 0): "HOLE_01" .. "HOLE_18", in one static buffer the
+// next call overwrites.
 char* GameManager_GetHoleName(int nHole) {
     sprintf(lbl_80282270, "HOLE_%02d", nHole + 1);
     return lbl_80282270;
@@ -910,11 +923,12 @@ int GM_GetElapsedHoleTime(void) {
     return (1.0f / FRAME_RATE) * (f32)(u32)(gSession.nFrameCount - gpGame->n12C);
 }
 
-// A gimme (formerly its own unit, Gimme.c): the Gimmes option is on, it is not split screen or a
-// replay, the session is not in the mode with both flag bits 0x4000 and 0x8000, the game mode
-// allows gimmes and its rules callback does not object, and the ball is within half a yard
-// (18 inches) of the pin - on the putter, or in any shot of a one-player game. Called from swing
-// state 14; yes leads to state 15 (the tap-in is planned) and 16 (played for the player).
+// Whether the player may be given a gimme (TW07: GM_CanPlayerTapIn, at the same place in
+// GameModeCore.c): the Gimmes option is on, not split screen, not a saved replay, not both session
+// flags 0x4000 and 0x8000, the mode allows gimmes (gpGame->bGimmesAllowed), the mode's
+// pfnHoleFinished(nPlayer, 1) does not already end the hole, and the ball is within half a yard (18
+// inches) of the pin; with more than one player the putter must also be in hand. Swing state 14
+// asks it; yes leads to state 15 (the tap-in is planned) and 16 (played for the player).
 u8 Gimme_Allowed(int nPlayer) {
     if (!gSession.options.bGimmes) return 0;
     if (gSession.nSplitScreen) return 0;
@@ -937,8 +951,9 @@ s32 GM_GetSecondHonors(void) {
     return gpGame->pfnGetHonors(gpGame->pfnGetHonors(5));
 }
 
-// The start of a hole: every player's ball on their tee, the look-ahead copy and the saved
-// positions reset, and everyone waiting.
+// Puts every set-up player's ball on their tee set's tee at the start of a hole (and on a restart):
+// lie 0, the physics ball reset, the before-shot copy (ballBefore) and the vBall/vA44 positions at
+// the tee, the golfer waiting (GS_WAIT) and the low-IQ penalty cleared.
 void GM_InitBallsToTee(void) {
     CourseInfo* pCourse = Ter_GetTGD();
     int         i;
@@ -971,7 +986,8 @@ void GM_SetupGolfer_IfAllWaiting(void) {
     }
 }
 
-// Out of bounds: outside the in-bounds area, or the ball out (state 5) or in lie 16.
+// Whether the ball is out of bounds: its position is outside the course's in-bounds area
+// (Ter_PointInOOBNetwork), or its physics state or lie already says so. nPlayer is not read.
 u8 GM_IsBallOOB(int nPlayer, Ball* pBall) {
     if (!Ter_PointInOOBNetwork(pBall->vPos)) {
         return 1;
@@ -982,7 +998,10 @@ u8 GM_IsBallOOB(int nPlayer, Ball* pBall) {
     return 0;
 }
 
-// A random hole from the round's selection, not the one just played.
+// Picks the next playoff hole: the first time (GM_GetNeedToBuildPlayoffHoleList) the round's
+// selected holes are saved as the pool (bHoleSaved); then the selection becomes one random pool
+// hole other than the current one, or the current hole again when there is no other, and it becomes
+// the current hole.
 void GM_Pick_PlayOffHole(void) {
     int  nHoles[18];
     int  n = 0;
@@ -1038,7 +1057,8 @@ u8 GM_CheckForBallInHole(int nPlayer) {
     return 0;
 }
 
-// Whether the player is placing the ball (state 22) or the mode says so.
+// Whether target.c draws the player's ball-placement target: while the golfer is placing the ball
+// (GS_PLACE_BALL), or when the mode's pfn230 says so.
 u8 GM_RenderBallTarget(int nPlayer) {
     s8  nState = GOLFERSTATE_GetCurrentState(nPlayer);
     int b = 0;
@@ -1048,8 +1068,9 @@ u8 GM_RenderBallTarget(int nPlayer) {
     return b;
 }
 
-// With none of the five save slots in use and player 1 human, fn_80057364(0).
-void fn_800E2F14(void) {
+// When play starts (GO_vInitIG): if no save profile is active and player 1 is human, save profile 0
+// is set up afresh as "USER1" (fn_80057364). The loop before it does nothing (see inside).
+void GM_SetupDefaultProfile(void) {
     int i;
     u8  bDead = 0;
     u8  bAny;
@@ -1073,8 +1094,9 @@ void fn_800E2F14(void) {
     }
 }
 
-// Builds mixed round 22 from its table: each hole's course and hole number.
-void fn_800E2FD8(void) {
+// Builds the "Dream 18" round (course 22): each hole's course and hole number from row 0 of the
+// 'CMPS' table (fn_800D3118, fn_800D315C; the table counts holes from 1).
+void GM_BuildDream18(void) {
     int i;
     for (i = 0; i < 18; i++) {
         gpGame->nHoleCourse[i] = fn_800D3118(22, i);
@@ -1082,8 +1104,9 @@ void fn_800E2FD8(void) {
     }
 }
 
-// The same for rounds 24-29.
-void fn_800E3050(int nCourse) {
+// Builds regional round nCourse (24..29: US Northwest, US Southwest, US East, Europe, Pacific, S.
+// Hemisphere) from its row of the 'CMPS' table, as GM_BuildDream18 does.
+void GM_BuildRegionalRound(int nCourse) {
     int i;
     for (i = 0; i < 18; i++) {
         gpGame->nHoleCourse[i] = fn_800D3118(nCourse, i);
@@ -1091,14 +1114,15 @@ void fn_800E3050(int nCourse) {
     }
 }
 
-// Builds a random mixed round: two par 3s on the front nine and two on the back (not on
-// neighbouring holes), then four par 5s on free holes the same way (kept apart from each other
-// only), then par 4s everywhere else. Each hole comes from a random course among the first
-// nAvail (the unlocked count) of the list that fn_80110180 passes; no hole twice, and no course
-// again while another is unused.
-// fake match: nCourse starts at 0 though every path sets it before use; without the initializer
-// the par-4 loop's registers come out differently (found by the permuter).
-void fn_800E30D4(void) {
+// Builds the "Random 18" round (course 23): two par 3s on the front nine and two on the back (not
+// on neighbouring holes), then four par 5s the same way on holes still free (kept apart from each
+// other only), then par 4s everywhere else. Each hole comes from a random course among the first
+// nAvail entries of lbl_80184D40 (nAvail = how many of its courses any profile has unlocked) whose
+// data is on the disc in the drive (fn_80110180; it retries until one is); no course and hole
+// twice, and no course again while another is unused. Ends on the round's first hole.
+// fake match: nCourse starts at 0 though every path sets it before use; without the initializer the
+// par-4 loop's registers come out differently (found by the permuter).
+void GM_BuildRandom18(void) {
     CourseList courses;
     u8  holes[18];      // the hole numbers (0..17) of the chosen par on the chosen course
     u8  bUsed[20];
@@ -1305,7 +1329,7 @@ void fn_800E30D4(void) {
     GM_InitializeCurrentHoleToFirstSelected();
 }
 
-// Modes 13-17.
+// Whether the game mode is one of the skill-zone games (modes 13-17).
 u8 GM_Currently_SkillZoneMode(void) {
     if (Game_GetMode() == 13 || Game_GetMode() == 14 || Game_GetMode() == 15 || Game_GetMode() == 16 ||
         Game_GetMode() == 17) {
@@ -1314,7 +1338,7 @@ u8 GM_Currently_SkillZoneMode(void) {
     return 0;
 }
 
-// Modes 6-8.
+// Whether the game mode is speed golf (modes 6-8).
 u8 GM_IsSpeedGolfMode(void) {
     if (Game_GetMode() == 6 || Game_GetMode() == 7 || Game_GetMode() == 8) {
         return 1;

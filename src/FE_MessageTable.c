@@ -40,9 +40,9 @@ s32  fn_800ED69C(int i, int k);         // GameMode5.c: its opponent k
 u8   GM_UserHasEagledHole(int nSlot, int a, int b);      // GameRound.c
 int  GM_GetPar5EagleDate(int nSlot, int a, int b);      // GameRound.c
 int  fn_800D3D10(int nGolfer);          // Earnings.c: the golfer's rating
-int  fn_800E2520(int nMode);            // GameRound.c
+int  GM_GetMinPlayersForMode(int nMode);            // GameRound.c
 void GM_SetSplitScreenForMode(void);                 // GameRound.c
-void fn_800E30D4(void);                 // GameRound.c: builds the random mixed round
+void GM_BuildRandom18(void);                 // GameRound.c: builds the random mixed round
 void fn_80101EE8(void);                 // GameMode11.c
 void fn_800EE2C8(void);                 // GameModeDriverPGATour.c
 u8*  fn_8010C718(void);                 // CharSliders.c
@@ -1333,15 +1333,15 @@ void fn_80079EA8(void) {
 }
 
 void fn_8007BBA0(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800E2520((u8)pArgs[0].i);
+    pResult->i = GM_GetMinPlayersForMode((u8)pArgs[0].i);
 }
 
 void fn_8007BBD8(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800E2520((u8)pArgs[0].i);
+    pResult->i = GM_GetMinPlayersForMode((u8)pArgs[0].i);
 }
 
 void fn_8007BC10(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800E2520((u8)pArgs[0].i);
+    pResult->i = GM_GetMinPlayersForMode((u8)pArgs[0].i);
 }
 
 void fn_8007BC48(MsgArg* pArgs, MsgArg* pResult) {
@@ -5369,7 +5369,7 @@ void fn_800849F8(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 10000) {
         if (gpGame->b137 == 0) {
             gpGame->b137 = 1;
-            fn_800E30D4();
+            GM_BuildRandom18();
         }
         pResult->i = fn_80110180();
         if (fn_8011027C() != 0) {
