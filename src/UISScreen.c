@@ -570,7 +570,11 @@ void fn_8016B188(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u3
     u32 i;
     u8* pScript;
 
-    pNode = &pScreen->pData->pNodes[nNode];
+    // fake match: the byte offset as a 64-bit product (low word = nNode * 20, the same address as
+    // pNodes[nNode]); its dead high word (li 20; mulhw) goes first in the pre-allocation schedule,
+    // which moves the pStudio copy after the pData load as in the original, and is deleted later.
+    // port: the offset is truncated to 32 bits.
+    pNode = (UISNode*)((u8*)pScreen->pData->pNodes + (s32)nNode * (s64)sizeof(UISNode));
     for (i = 0; i < pNode->nHandlers; i++) {
         UISHandler* pHandler = &pNode->pHandlers[i];
         if (pHandler->uEvent == 0xFFFF) {
