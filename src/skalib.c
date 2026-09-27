@@ -1271,25 +1271,23 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
     LibOverlay* pOv;
     ClipBank*   pBank;
     AnimLib*    pSrc;
-    u8*         pEnd;
+    Clip*       pHdr;
     u32         uAram;
-    s32         nStride1;
-    s32         nStride2;
+    u32         nStride1;
+    u32         nStride2;
     u8*         pSrc1;
     u8*         pSrc2;
     int         f;
-    s32         nCopied;
+    u32         nCopied;
     s32         n4C;
     s32         n50;
-    s32         nHdr;
+    u32         nHdr;
     u32         uPad;
     s32         n;
+    u32         uAl;
     u8*         pOut;
-    s32         n50Al;
     AnimLib*    pNew;
-    Character*  pChar;
     s32         nSize;
-    Clip*       pHdr;
     ClipRecord* pRec;
     s32*        pUsed;
     int         i;
@@ -1301,9 +1299,9 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
     BuildCtx    ctx;
     u32         o;
     int         j;
+    u32         s;
     int         p;
     u8          bFound;
-    u32         s;
     Player*     pPlayer;
 
     if (nSlot < 3) {
@@ -1331,22 +1329,23 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
     if (pSrc != NULL && pSlot->nOverlays != 0) {
         u32 aPad[4] = {0, 0, 0, 0};
 
-        pBank = lbl_801C6050[k];
         pUsed = &lbl_801C6008[k].n04;
-        pEnd  = pSlot->pEnd;
+        pBank = lbl_801C6050[k];
+        pHdr  = (Clip*)pSlot->pEnd;
         for (i = 0; i < pSrc->nRecords; i++) {
+            s32 n50Al;
+
             pRec = &pSrc->pRecords[i];
             if (pRec->n10 <= 0 || pRec->n18 == 0) continue;
-            pBank->ppClips[pSlot->n150] = pEnd;
+            pBank->ppClips[pSlot->n150] = pHdr;
             // port: a clip of an overlay library ('SAL '/'SAC '), little-endian on disc; a little-endian
             //       port does not swap here (Clip is then read in place)
             fn_80020BC8(pData + (uptr)pSrc->pRecords[i].pClip);
             pClipSrc = pData + (uptr)pSrc->pRecords[i].pClip;
-            pHdr     = (Clip*)pEnd;
             nHdr     = ((Clip*)pClipSrc)->pD0 - pClipSrc;
-            Mem_cpy(pEnd, pClipSrc, nHdr);
+            Mem_cpy(pHdr, pClipSrc, nHdr);
             nCopied = nHdr;
-            pOut    = pEnd + nHdr;
+            pOut    = (u8*)pHdr + nHdr;
             if (((Clip*)pClipSrc)->n2C != 0) {
                 Mem_cpy(pOut, ((Clip*)pClipSrc)->pD0, ((Clip*)pClipSrc)->n2C);
                 pOut += ((Clip*)pClipSrc)->n2C;
@@ -1381,29 +1380,37 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             Mem_cpy(pOut, ((Clip*)pClipSrc)->pFC, n);
             pHdr->pFC = pOut;
             nCopied += n;
-            nStride1 = pHdr->n8C * 2;
-            if (nStride1 & 31) {
-                nStride1 = ((nStride1 >> 5) + 1) << 5;
+            // fake match: the four sizes are rounded up to 32 through one u32 scratch, tested and
+            // rounded from the size itself (a local per size, or rounding the local in place, gives
+            // other registers and keeps no copy of the result)
+            uAl = pHdr->n8C * 2;
+            if (pHdr->n8C * 2 & 31) {
+                uAl = ((pHdr->n8C * 2 >> 5) + 1) << 5;
             }
-            nStride2 = pHdr->n8E;
-            if (nStride2 & 31) {
-                nStride2 = ((nStride2 >> 5) + 1) << 5;
+            nStride1 = uAl;
+            uAl      = pHdr->n8E;
+            if (pHdr->n8E & 31) {
+                uAl = ((pHdr->n8E >> 5) + 1) << 5;
             }
+            nStride2   = uAl;
             pSrc1      = (u8*)((Clip*)pClipSrc)->uAram;
             pSrc2      = ((Clip*)pClipSrc)->pE4;
             pHdr->n38  = nStride1 * pHdr->nFrames;
             pHdr->n04  = nStride2 * pHdr->nFrames;
+            nSize      = pHdr->n38 + pHdr->n04;
             n4C        = pHdr->n4C;
-            n4CAl      = n4C;
+            uAl        = n4C;
             if (n4C & 31) {
-                n4CAl = ((n4C >> 5) + 1) << 5;
+                uAl = ((n4C >> 5) + 1) << 5;
             }
+            n4CAl = uAl;
             n50   = pHdr->n50;
-            n50Al = n50;
+            uAl   = n50;
             if (n50 & 31) {
-                n50Al = ((n50 >> 5) + 1) << 5;
+                uAl = ((n50 >> 5) + 1) << 5;
             }
-            uAram      = GoARAM_Alloc(pHdr->n38 + pHdr->n04 + n50Al + n4CAl);
+            n50Al      = uAl;
+            uAram      = GoARAM_Alloc(n4CAl + n50Al + nSize);
             uAramStart = uAram;
             if (pHdr->n38 != 0) {
                 for (f = 0; f < pHdr->nFrames; f++) {
@@ -1421,7 +1428,9 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
                     pSrc2 += pHdr->n8E;
                 }
             }
-            pHdr->n8C = nStride1 / 2;
+            // fake match: the strides are u32 (as s32, the ARAM calls' (u32) conversion becomes a
+            // loop temp of its own); the halving is signed, as in the original
+            pHdr->n8C = (s32)nStride1 / 2;
             pHdr->n8E = nStride2;
             if (n50 != 0) {
                 Mem_cpy(lbl_80281CCC, ((Clip*)pClipSrc)->pEC, pHdr->n50);
@@ -1436,18 +1445,17 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             pHdr->n4C = n4CAl;
             fn_80020F60(pHdr, uAramStart);
             pBank->uId += nCopied;
-            pEnd += nCopied;
+            pHdr = (Clip*)((u8*)pHdr + nCopied);
             *pUsed += nCopied;
             pSrc->pRecords[i].pClip = pBank->ppClips[pSlot->n150];
             pSrc->pRecords[i].n12 |= 8;
             pSlot->n150++;
         }
-        pSlot->pEnd = pEnd;
+        pSlot->pEnd = (u8*)pHdr;
         if (nSlot >= 3) {
+            nSize = sizeof(AnimLib) + pSrc->nTreeSize + pSrc->nClips * 4;
+            pNew  = pOv->pChar->pLib;
             nRet  = 0x2800;
-            pChar = pOv->pChar;
-            pNew  = pChar->pLib;
-            nSize = pSrc->nTreeSize + pSrc->nClips * 4 + sizeof(AnimLib);
             Mem_cpy(pNew, pSrc, 21 * 4);
             pNew->n108      = pSrc->n108;
             pNew->nDefault  = pSrc->nDefault;
@@ -1462,23 +1470,24 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             pNew->nTreeSize = 0;
             pNew->nClips    = 0;
             pNew->pBank     = pBank;
-            if (pChar->pRecords == NULL) {
-                pChar->pRecords = fn_80009B34(pSrc->nClips * sizeof(ClipRecord), 2, 0, "skalib.c", 2943);
+            if (pOv->pChar->pRecords == NULL) {
+                pOv->pChar->pRecords = fn_80009B34(pSrc->nClips * sizeof(ClipRecord), 2, 0, "skalib.c", 2943);
             }
             ctx.pLib     = pNew;
-            ctx.pRecords = pChar->pRecords;
+            ctx.pRecords = pOv->pChar->pRecords;
             AnimLib_WalkPair(pLibFile, pSrc, (AnimLibWalkFn)AnimLib_BuildCb, &ctx);
             if (pNew->nTreeSize & 15) {
                 pNew->nTreeSize = ((pNew->nTreeSize >> 4) + 1) << 4;
             }
-            pChar->pLib = pNew;
+            pOv->pChar->pLib = pNew;
         } else {
             for (p = 0; p < gSession.nNumPlayers; p++) {
                 bFound = 0;
                 for (s = 0; s < 3; s++) {
                     if (bFound) break;
-                    for (o = 0; o < lbl_801C6068[k].nOverlays; o++) {
-                        if (lbl_801C6068[k].overlays[o].pChar == gPlayers[p].pChar) {
+                    pSlot = &lbl_801C6068[k];
+                    for (o = 0; o < pSlot->nOverlays; o++) {
+                        if (pSlot->overlays[o].pChar == gPlayers[p].pChar) {
                             bFound = 1;
                             break;
                         }
