@@ -309,7 +309,7 @@ typedef struct SaveProfile {
     u8   nGolferBallType;       // 0x054F9  -> PlayerProfile.nBallType
     u8   unk54FA[0x5500 - 0x54FA];
     // The created golfer's look: the body's parts and sets (fn_80103D6C), its six other skins'
-    // (fn_80103DE0), its sliders and its logos. char.c hands it to the character (fn_8001D4A4
+    // (fn_80103DE0), its sliders and its logos. char.c hands it to the character (Character_SetClubsAndClothes
     // passes FE_GetCurrentProfile() + 0x5500 as a SkinChoices*).
     SkinChoices choices;        // 0x05500
     s8   nDateMonth;            // 0x0AF7C  } a date, set and read by menu messages packed as

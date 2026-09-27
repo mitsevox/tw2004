@@ -893,7 +893,8 @@ void fn_800CB668(u8 bGlobal, int bFemale, int nPlayer, char* szPath) {
         sprintf(szPath, "%sdata\\CharStrm\\AnimGlob\\female.sac", lbl_80281530);
         return;
     }
-    sprintf(szPath, "%sdata\\CharStrm\\AnimChar\\%02dchr.sac", lbl_80281530, fn_8001C558(nPlayer) + 1);
+    sprintf(szPath, "%sdata\\CharStrm\\AnimChar\\%02dchr.sac", lbl_80281530,
+            Character_GetGolferModelID(nPlayer) + 1);
 }
 
 s32 lbl_80191520[128] = {

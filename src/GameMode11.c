@@ -430,7 +430,7 @@ void fn_801008F8(void) {
         Shot_Prepare(0, 1);
         BreakLine_Reset(gPlayers[0].nView[0]);
         fn_8009B970(gPlayers[0].nView[0]);
-        fn_8001C804(0, 1, 1);
+        Character_AlignShotWithTarget(0, 1, 1);
         fn_800957D8(gPlayers[0].pChar);
         SW_vInitSwing(0);
         if (lbl_80282428 != 8 && lbl_80282428 != 9 && lbl_80282428 != 10 && lbl_80282428 != 11) {
@@ -458,7 +458,7 @@ void fn_80100A3C(int nPlayer) {
     gPlayers[0].nClub = nClub;
     BreakLine_Reset(gPlayers[0].nView[0]);
     fn_8009B970(gPlayers[0].nView[0]);
-    fn_8001C804(0, 1, 1);
+    Character_AlignShotWithTarget(0, 1, 1);
     fn_800957D8(gPlayers[0].pChar);
     fn_80095744(gPlayers[0].pChar, 5);
     fn_80062C38();

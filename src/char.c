@@ -66,7 +66,7 @@ char lbl_801870A0[6][13] = {"Defaults", "Defaults", "Defaults", "Defaults", "Def
 void  fn_80014BB4(void);
 void  fn_80014C9C(void);
 void  fn_80014DC0(void);
-void  fn_8001A024(Character* pChar);
+void  Character_ExecuteTextureSwapFE(Character* pChar);
 void  fn_8001A288(void);
 void  fn_8001A33C(void);
 void  fn_8001A3B0(Character* pChar);
@@ -101,7 +101,7 @@ void  SKEL_TransformBones(CharModel* pModel, u32* auBits);
 void  fn_800B28D4(Character* pChar, int a, int b);
 void  fn_800B2FB0(Character* pChar, int a, int b);
 void  Mtx_MultVec4(f32 mtx[4][4], Vec4* src, Vec4* dst);    // VecMath.c: a point through a matrix
-void  fn_8001EB8C(Character* pChar, int nBone, f32* pPos);
+void  Character_GetBonePos(Character* pChar, int nBone, f32* pPos);
 void  fn_8001CCF8(UStreamObject* pObject);
 void  fn_8001CD80(UStreamObject* pObject);
 void  fn_8001CE5C(UStreamObject* pObject);
@@ -109,8 +109,8 @@ void  fn_8001D020(UStreamObject* pObject);
 void  fn_8001D3EC(UStreamObject* pObject);
 void  fn_8001D7EC(Character* pChar);
 void  fn_800BBADC(int nValue);         // SitDevFile.c
-void  fn_8001EBD8(Character* pChar, int nBone, f32* pPos);
-u8    fn_8001EC48(Character* pChar);
+void  Character_GetBonePos_FromIndex(Character* pChar, int nBone, f32* pPos);
+u8    Character_IsGolfer(Character* pChar);
 f32   fn_8001ED44(Character* pChar, int b);
 f32   fn_8001EE00(Character* pChar, int b);
 void  fn_80017DDC(Character* pChar);
@@ -139,9 +139,9 @@ void  fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f);            // CharAnim.c
 void  Quat_ExtractEulerAngles(f32* pQ, f32* pA, f32* pB, f32* pC);          // Quaternion.c: a rotation as angles
 void  fn_80029968(CharModel* pModel, SkelPose* pPose);          // Skeleton.c
 void  fn_8000AB40(f32 (*pSrc)[4], f32 (*pDst)[4]);              // UMemPool.c
-void  fn_8001EDA8(Character* pChar, int nBone, f32* pPos);
-void  fn_8001EF54(f32* pA, f32* pB, f32* pOut);
-void  fn_8001EF10(f32* pA, f32* pB, f32* pOut);
+void  Character_GetBonePosSwapIfLefty(Character* pChar, int nBone, f32* pPos);
+void  Char_Vec3Add(f32* pA, f32* pB, f32* pOut);
+void  Char_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 void  fn_80095558(void);
 void  fn_800253E0_ApplySavedChoices(int nSlot);                         // skalib.c
 void  fn_80025478(void);                                        // skalib.c
@@ -155,9 +155,9 @@ void  fn_800CEEBC(void);                                        // SkinPart.c: e
 void  fn_800100B0(TexBank* pBank, TexEntry* p8, TexPalette* pC, void* p10, void* p14, int nNumTex,
                   int nNumPalettes);                            // LLTex.c
 void  fn_8001EFD8(f32* pA, f32* pB, f32* pOut);
-f32 (*fn_8001EC6C(Character* pChar, int nBone))[4];
-f32 (*fn_8001ECA8(Character* pChar, int nBone))[4];
-f32   fn_8001EFFC(CamLens* pLens);
+f32 (*Character_GetBoneMatrixSwapIfLefty(Character* pChar, int nBone))[4];
+f32 (*Character_GetBoneMatrix_FromIndex(Character* pChar, int nBone))[4];
+f32   Camera_GetLensFovScale(CamLens* pLens);
 void  SKEL_EnableIK(u8 bOn);
 void  fn_80035C58(void);
 void  fn_80035CC0(void);
@@ -205,7 +205,7 @@ void  fn_80112C64(int n);
 void  fn_80112CEC(void);
 
 // ---- sweep code (not yet cleaned up) ----
-void fn_8001E8A4(u32* aBits, u32 nBits);
+void BitArray_SetAll(u32* aBits, u32 nBits);
 void BitArray_ClearAll(u32* aBits, u32 nBits);
 void fn_8001B1DC(Skin* pSkin, CharSkinRef* pRef, s32 n);
 void fn_8001B1E8(void* p);
@@ -315,8 +315,8 @@ void fn_800177A0(Character* pChar, SkelPose* pPose) {
     if (pSkin != NULL) {
         BitArray_ClearAll(pPose->a0, 0x80);
         BitArray_ClearAll(pPose->a10, 0x80);
-        fn_8001E8A4(pPose->a20, 0x80);
-        fn_8001E8A4(pPose->a30, 0x80);
+        BitArray_SetAll(pPose->a20, 0x80);
+        BitArray_SetAll(pPose->a30, 0x80);
         for (i = 0; i < pChar->pModel->nBones; i++) {
             Quat_Copy(pSkin->pose.aBones[i].q0, pPose->aBones[i].q0);
             Quat_Copy(pSkin->pose.aBones[i].v10, pPose->aBones[i].v10);
@@ -327,8 +327,8 @@ void fn_800177A0(Character* pChar, SkelPose* pPose) {
 // Only the bit arrays of fn_800177A0 (with a body skin): the last two set, the first two cleared.
 void fn_80017864(Character* pChar, SkelPose* pPose) {
     if (pChar->pSkin != NULL) {
-        fn_8001E8A4(pPose->a20, 0x80);
-        fn_8001E8A4(pPose->a30, 0x80);
+        BitArray_SetAll(pPose->a20, 0x80);
+        BitArray_SetAll(pPose->a30, 0x80);
         BitArray_ClearAll(pPose->a0, 0x80);
         BitArray_ClearAll(pPose->a10, 0x80);
     }
@@ -432,15 +432,15 @@ void Character_UpdateTestPoints(Character* pChar) {
     f32 fA;
     f32 fB;
 
-    if (!fn_8001EC48(pChar)) {
+    if (!Character_IsGolfer(pChar)) {
         return;
     }
-    pClubMtx = fn_8001ED08(pChar, 0x52);
+    pClubMtx = Character_GetBoneMatrix(pChar, 0x52);
     if (pChar->pSkin->b1044) {
-        pMtx48 = fn_8001EC6C(pChar, 0x48);
-        pMtx3A = fn_8001EC6C(pChar, 0x3A);
-        pMtx47 = fn_8001EC6C(pChar, 0x47);
-        pMtx39 = fn_8001EC6C(pChar, 0x39);
+        pMtx48 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x48);
+        pMtx3A = Character_GetBoneMatrixSwapIfLefty(pChar, 0x3A);
+        pMtx47 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x47);
+        pMtx39 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x39);
         Mtx_MultVec4(pMtx3A, (Vec4*)pChar->pSkin->a1048[0], (Vec4*)pChar->aPoints[0]);
         Mtx_MultVec4(pMtx48, (Vec4*)pChar->pSkin->a1048[1], (Vec4*)pChar->aPoints[1]);
         Mtx_MultVec4(pMtx39, (Vec4*)pChar->pSkin->a1048[2], (Vec4*)pChar->aPoints[2]);
@@ -448,10 +448,10 @@ void Character_UpdateTestPoints(Character* pChar) {
     } else {
         fA = 0.8f * pChar->pModel->f10;
         fB = 0.8f * pChar->pModel->fC;
-        pMtx48 = fn_8001EC6C(pChar, 0x48);
-        pMtx3A = fn_8001EC6C(pChar, 0x3A);
-        pMtx47 = fn_8001EC6C(pChar, 0x47);
-        pMtx39 = fn_8001EC6C(pChar, 0x39);
+        pMtx48 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x48);
+        pMtx3A = Character_GetBoneMatrixSwapIfLefty(pChar, 0x3A);
+        pMtx47 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x47);
+        pMtx39 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x39);
         fn_8000AE6C(pMtx3A[3], pMtx3A[1], pChar->pModel->f10, pChar->aPoints[0]);
         fn_8000AE6C(pMtx48[3], pMtx48[1], pChar->pModel->fC, pChar->aPoints[1]);
         fn_8000AE6C(pMtx39[3], pMtx3A[2], fA, pChar->aPoints[2]);
@@ -478,7 +478,7 @@ void fn_80017DDC(Character* pChar) {
     f32 fHead;
 
     if (pChar->p16D8 != NULL && pChar->a179C[1] > 0.9f) {
-        pMtx = fn_8001ED08(pChar, 0x52);
+        pMtx = Character_GetBoneMatrix(pChar, 0x52);
         if (pMtx != NULL && (pCourse = Ter_GetTGD()) != NULL) {
             fHeight = fn_8004D650(pCourse, pChar->aPoints[4], vNormal);
             // the else's return is the dead second `b` after the fUnder return; !(<) keeps the
@@ -526,7 +526,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
         return;
     }
     if (!bForce) {
-        if (fn_8001EC48(pChar)) {
+        if (Character_IsGolfer(pChar)) {
             // fake match: the state is compared as an s8 (see GOLFERSTATE_GetCurrentState)
             if ((s8)GOLFERSTATE_GetCurrentState(pChar->nPlayer) == 0x13) {
                 return;
@@ -559,7 +559,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     if (!gSession.b11) {
         SKATime_Update(&pChar->anim29C, &pChar->node3E0, fTime);
     }
-    if (fn_8001EC48(pChar)) {
+    if (Character_IsGolfer(pChar)) {
         CharacterState_UpdateSKAState(pChar);
         if (!gSession.b11) {
             fn_80096F0C(pChar);
@@ -570,13 +570,13 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     }
     if (pChar->blend.pPose != NULL) {
         fn_8007260C(pChar, &pChar->blend, pChar->pModel, pChar->fAnimTime);
-        if (fn_8001EC48(pChar) && pChar->p16D8 != NULL) {
+        if (Character_IsGolfer(pChar) && pChar->p16D8 != NULL) {
             // fake match: aBones[nClubHeadBone].v10[1] written as a flat float index (0x40 / 4 + 8 per
             // bone + 5), which gives the original's indexed store; the pose is all 4-byte words
             ((f32*)pChar->blend.pPose)[pChar->nClubHeadBone * 8 + 21] = pChar->p16D8->afC[pChar->nClubClass];
         }
         SKEL_UpdateState(pChar->pModel, pChar->blend.pPose, 0);
-        if (fn_8001EC48(pChar)) {
+        if (Character_IsGolfer(pChar)) {
             if (BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x36)) ||
                 BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x38)) ||
                 BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x39)) ||
@@ -591,7 +591,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
             }
         }
     }
-    if (!gSession.b11 && fn_8001EC48(pChar) && pChar->node3E0.pPose != NULL) {
+    if (!gSession.b11 && Character_IsGolfer(pChar) && pChar->node3E0.pPose != NULL) {
         fn_8007260C(pChar, &pChar->node3E0, pChar->pModel, pChar->anim29C.fTime);
         fn_80037C48(pChar->pSkin, pChar->node3E0.pPose);
     }
@@ -602,9 +602,9 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     if (pChar->pfn17B0 != NULL) {
         pChar->pfn17B0();
     }
-    fn_8001E8A4(auBits, 0x80);
+    BitArray_SetAll(auBits, 0x80);
     SKEL_TransformBones(pChar->pModel, auBits);
-    if (fn_8001EC48(pChar)) {
+    if (Character_IsGolfer(pChar)) {
         Character_UpdateTestPoints(pChar);
         Character_UpdateFeetTerrainInfo(pChar, bC860 || pChar->n20 != 5 || pChar->n26 == 1);
         if (pChar->n20 == 1 || pChar->n20 == 0 || pChar->n20 == 9 ||
@@ -613,7 +613,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
         }
         fn_8001899C(pChar, bLegA, bLegB);
     }
-    if (fn_8001EC48(pChar)) {
+    if (Character_IsGolfer(pChar)) {
         if (pChar->pModel->pSkel != NULL) {
             fn_800279C0(pChar);
         }
@@ -621,7 +621,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     }
     pChar->n1698 = 0;
     fn_8001B644(pChar);
-    if (fn_8001EC48(pChar)) {
+    if (Character_IsGolfer(pChar)) {
         fn_80029948(pChar->pModel, pChar->pModel->pF0, fTime);
         fn_80029948(pChar->pModel, pChar->pModel->pF4, fTime);
         fn_80029948(pChar->pModel, pChar->pModel->pF8, fTime);
@@ -667,11 +667,11 @@ void fn_800184E4(Character* pChar, Skin* pSkin) {
     if (pChar != NULL) {
         pChar->pSkin = pSkin;
         fn_80018710(pChar);
-        if (fn_8001EC48(pChar)) {
-            pMtx48 = fn_8001EC6C(pChar, 0x48);
-            pMtx3A = fn_8001EC6C(pChar, 0x3A);
-            pMtx47 = fn_8001EC6C(pChar, 0x47);
-            pMtx39 = fn_8001EC6C(pChar, 0x39);
+        if (Character_IsGolfer(pChar)) {
+            pMtx48 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x48);
+            pMtx3A = Character_GetBoneMatrixSwapIfLefty(pChar, 0x3A);
+            pMtx47 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x47);
+            pMtx39 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x39);
             fn_8000AB40(pMtx48, m48);
             fn_8000AB40(pMtx3A, m3A);
             fn_8000AB40(pMtx47, m47);
@@ -695,14 +695,14 @@ void fn_800184E4(Character* pChar, Skin* pSkin) {
                 vOffsetB.z = -0.025f;
                 vOffsetB.w = 1.0f;
             }
-            fn_8001EDA8(pChar, 0x48, &v48.x);
-            fn_8001EDA8(pChar, 0x3A, &v3A.x);
-            fn_8001EDA8(pChar, 0x47, &v47.x);
-            fn_8001EDA8(pChar, 0x39, &v39.x);
-            fn_8001EF54(&v48.x, &vOffsetA.x, &v48.x);
-            fn_8001EF54(&v3A.x, &vOffsetA.x, &v3A.x);
-            fn_8001EF54(&v47.x, &vOffsetB.x, &v47.x);
-            fn_8001EF54(&v39.x, &vOffsetB.x, &v39.x);
+            Character_GetBonePosSwapIfLefty(pChar, 0x48, &v48.x);
+            Character_GetBonePosSwapIfLefty(pChar, 0x3A, &v3A.x);
+            Character_GetBonePosSwapIfLefty(pChar, 0x47, &v47.x);
+            Character_GetBonePosSwapIfLefty(pChar, 0x39, &v39.x);
+            Char_Vec3Add(&v48.x, &vOffsetA.x, &v48.x);
+            Char_Vec3Add(&v3A.x, &vOffsetA.x, &v3A.x);
+            Char_Vec3Add(&v47.x, &vOffsetB.x, &v47.x);
+            Char_Vec3Add(&v39.x, &vOffsetB.x, &v39.x);
             Mtx_MultVec4(m3A, &v3A, (Vec4*)pChar->pSkin->a1048[0]);
             Mtx_MultVec4(m48, &v48, (Vec4*)pChar->pSkin->a1048[1]);
             Mtx_MultVec4(m39, &v39, (Vec4*)pChar->pSkin->a1048[2]);
@@ -756,13 +756,13 @@ void Character_PlaceFeetOnGround(Character* pChar) {
         return;
     }
     fLowest = 1073741824.0f;
-    if (fn_8001EC48(pChar)) {
+    if (Character_IsGolfer(pChar)) {
         pChar->a179C[0] = 0.0f;
         pChar->a179C[1] = 0.0f;
         pChar->a179C[2] = 0.0f;
         pChar->a179C[3] = 0.0f;
         for (i = 0; i < 4; i++) {
-            fn_8001EF54(pChar->aGroundNormal[i], pChar->a179C, pChar->a179C);
+            Char_Vec3Add(pChar->aGroundNormal[i], pChar->a179C, pChar->a179C);
             if (pChar->afGroundHeight[i] < fLowest) {
                 fLowest = pChar->afGroundHeight[i];
             }
@@ -808,7 +808,7 @@ void fn_8001899C(Character* pChar, u8 bLegA, u8 bLegB) {
         return;
     }
     BitArray_ClearAll(auBits, 0x80);
-    if (!fn_8001EC48(pChar)) {
+    if (!Character_IsGolfer(pChar)) {
         return;
     }
     pCourse = Ter_GetTGD();
@@ -833,7 +833,7 @@ void fn_8001899C(Character* pChar, u8 bLegA, u8 bLegB) {
         BitArray_Set(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x44));
         BitArray_Set(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x47));
     }
-    if (fn_8001E9F4(auBits, auBits, 0x80)) {
+    if (BitArray_Intersects(auBits, auBits, 0x80)) {
         SKEL_TransformBones(pChar->pModel, auBits);
     }
 }
@@ -888,10 +888,10 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     Skeleton* pSkel;
     Bone* pBone;
 
-    fn_8001EBD8(pChar, nBoneC, vC);
-    fn_8001EBD8(pChar, nBoneA, vA);
-    fn_8001EBD8(pChar, nBoneB, vB);
-    fn_8001EBD8(pChar, nBoneD, vD);
+    Character_GetBonePos_FromIndex(pChar, nBoneC, vC);
+    Character_GetBonePos_FromIndex(pChar, nBoneA, vA);
+    Character_GetBonePos_FromIndex(pChar, nBoneB, vB);
+    Character_GetBonePos_FromIndex(pChar, nBoneD, vD);
     Vec_Copy(pChar->aPoints[nPoint], vPoint);
     // how far each test point sits below the ground (0.165 in, in feet)
     fDropA = 0.165f / 12.0f + (pChar->afGroundHeight[nPoint] - vPoint[1]);
@@ -903,7 +903,7 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     if (fDrop < 0.0f) {
         return;
     }
-    fn_8001EF54(pChar->aGroundNormal[nPoint], pChar->aGroundNormal[nOther], vSlope);
+    Char_Vec3Add(pChar->aGroundNormal[nPoint], pChar->aGroundNormal[nOther], vSlope);
     Vec_NormalizeTo(vSlope, vSlope);
     if (fDrop > 0.33f / 12.0f) {
         fDrop = 1.0f;
@@ -918,11 +918,11 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     // the knee: the angle the thigh and shin must make for the hip to reach bone C raised by fDropA
     Vec3Copy(vC, vOld);
     vC[1] += fDropA;
-    fn_8001EF10(vA, vOld, vReach);
-    fn_8001EF10(vA, vC, vLeg);
-    fn_8001EF10(vB, vA, vThigh);
-    fn_8001EF10(vB, vOld, vShin);
-    fn_8001EF10(vOld, vD, vFoot);
+    Char_Vec3Sub(vA, vOld, vReach);
+    Char_Vec3Sub(vA, vC, vLeg);
+    Char_Vec3Sub(vB, vA, vThigh);
+    Char_Vec3Sub(vB, vOld, vShin);
+    Char_Vec3Sub(vOld, vD, vFoot);
     fReach = (f32)Math_Sqrt(Vec3_LengthSqClamped(vReach));
     fLeg = (f32)Math_Sqrt(Vec3_LengthSqClamped(vLeg));
     fThigh = (f32)Math_Sqrt(Vec3_LengthSqClamped(vThigh));
@@ -1011,7 +1011,7 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
 void Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace) {
     u32 auBits[4];
 
-    fn_8001E8A4(auBits, 0x80);
+    BitArray_SetAll(auBits, 0x80);
     if (pChar != NULL) {
         Vec_Copy(pPos, pChar->pModel->pBones->v1C);
         if (bPlace) {
@@ -1026,9 +1026,9 @@ void Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace) {
 
 // Turns the character's root bone to fAngle about y (half a turn more in game type 3 while the
 // model's bEE is set).
-void fn_800192D4(Character* pChar, f32 fAngle) {
+void Character_SetOrientation(Character* pChar, f32 fAngle) {
     if (pChar != NULL) {
-        if (gSession.nGameType == 3 && fn_8001EDF4(pChar)) {
+        if (gSession.nGameType == 3 && Character_IsLeftHanded(pChar)) {
             fAngle += PI;
         }
         Quat_EulerAngles(0.0f, fAngle, 0.0f, pChar->pModel->pBones->q0C);
@@ -1056,7 +1056,7 @@ void fn_80019358(Character* pChar, f32* pDir, f32 fAngle) {
         vec4flt_CrossProduct(mtx[0], mtx[1], mtx[2]);
         mtx[2][3] = 0.0f;
         fn_8000A4E0(mtx, &fYaw, &fB, &fC);
-        fn_800192D4(pChar, fYaw + fAngle);
+        Character_SetOrientation(pChar, fYaw + fAngle);
     }
 }
 
@@ -1321,7 +1321,8 @@ void fn_80019CEC(Character* pChar) {
 
 // Queues a dynamic texture job (LLDynTex.c) for the character with its two functions; the pool's
 // last entry points at the character, or at nothing when no job is free.
-void fn_80019D64(Character* pChar, void (*pfnA)(Character* pChar), void (*pfnB)(Character* pChar)) {
+void Character_AddTextureLoadRequest(Character* pChar, void (*pfnA)(Character* pChar),
+                                     void (*pfnB)(Character* pChar)) {
     DynTexJob* pJob = fn_8010B8EC();
 
     if (pJob != NULL) {
@@ -1397,7 +1398,7 @@ void fn_80019EF4(Character* pArg) {
 
 // Once the menu golfer is flagged (fn_8008EAD4): switches the character to its other model and
 // puts the profile's logos and the skins on it.
-void fn_8001A024(Character* pChar) {
+void Character_ExecuteTextureSwapFE(Character* pChar) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     int i;
     void* pModel;
@@ -1423,12 +1424,12 @@ void fn_8001A0FC(Character* pChar) {
     fn_8008E918(2);
     fn_8008EAC8(1);
     if (fn_8008E938() == 0) {
-        fn_8001A024(pChar);
+        Character_ExecuteTextureSwapFE(pChar);
     }
 }
 
 // Sets up the dynamic textures for the character's model in use (fn_8010B098), dresses it
-// (fn_8001D4A4) and puts its skins on the model; the last marked player (lbl_80281CAC) is
+// (Character_SetClubsAndClothes) and puts its skins on the model; the last marked player (lbl_80281CAC) is
 // dressed again.
 void fn_8001A14C(Character* pArg) {
     // fake match: a copy of the parameter through void* (a plain copy is merged into it)
@@ -1442,12 +1443,12 @@ void fn_8001A14C(Character* pArg) {
     fn_8010B098(pModel);
     // port: EA passes an argument fn_8010BEC4 ignores
     ((void (*)(void*))fn_8010BEC4)(pModel);
-    fn_8001D4A4(pChar, pChar->nPlayer);
+    Character_SetClubsAndClothes(pChar, pChar->nPlayer);
     fn_80019C1C(pChar);
     SKA_PackName(&uGlove, "Glove");
     fn_800CEBE8(pChar->apSkins, pChar->nSkins, pModel, &uGlove, 1);
     if (lbl_80281CAC >= 0) {
-        fn_8001D4A4(gPlayers[lbl_80281CAC].pChar, lbl_80281CAC);
+        Character_SetClubsAndClothes(gPlayers[lbl_80281CAC].pChar, lbl_80281CAC);
     }
     // port: EA passes an argument fn_8010BED4 ignores
     ((void (*)(void*))fn_8010BED4)(pModel);
@@ -1541,7 +1542,7 @@ void fn_8001A4BC(void) {
         i = gpGame->pfnGetHonors(5);
         pChar = gPlayers[i].pChar;
         fn_8001A418(pChar);
-        fn_80019D64(pChar, fn_8001A14C, fn_8001A20C);
+        Character_AddTextureLoadRequest(pChar, fn_8001A14C, fn_8001A20C);
         fn_8010BF68();
     }
 }
@@ -1580,7 +1581,7 @@ void fn_8001A58C(int nPlayer) {
                     pQueued->u10 |= 0x40;
                 }
                 fn_8001A418(pChar);
-                fn_80019D64(pChar, fn_8001A14C, fn_8001A20C);
+                Character_AddTextureLoadRequest(pChar, fn_8001A14C, fn_8001A20C);
                 fn_8010BF68();
             } else {
                 fn_8010BF68();
@@ -1592,7 +1593,7 @@ void fn_8001A58C(int nPlayer) {
             if (!pChar->bE0 && pChar != lbl_801B95E8.a[6].p) {
                 fn_8010BF68();
                 fn_8001A418(pChar);
-                fn_80019D64(pChar, fn_8001A14C, fn_8001A20C);
+                Character_AddTextureLoadRequest(pChar, fn_8001A14C, fn_8001A20C);
             }
         }
     }
@@ -1669,7 +1670,7 @@ void fn_8001A920(void) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
             pChar = gPlayers[i].pChar;
             fn_8001A418(pChar);
-            fn_80019D64(pChar, fn_8001A14C, fn_8001A20C);
+            Character_AddTextureLoadRequest(pChar, fn_8001A14C, fn_8001A20C);
             fn_8010BF68();
             if (gSession.nSplitScreen) {
                 fn_8001D6D8(i);
@@ -1738,7 +1739,7 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
     if (nFlag400 == 1) {
         pChar->u10 |= 0x400;
     }
-    bGolfer = fn_8001EC48(pChar);
+    bGolfer = Character_IsGolfer(pChar);
 
     // its skin
     BYTESWAP_SWAPDATA(&pData, (u8*)&nSize, 4, 4);
@@ -1749,7 +1750,7 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
         pChar->pSkin = fn_800377FC(pData, bLook);
         pChar->pSkin->f10D8 = fSkin;
         pChar->pSkin->f10DC = 1.0f;
-        if (gSession.nGameType != 10 && gSession.nGameType != 3 && fn_8001EC48(pChar)) {
+        if (gSession.nGameType != 10 && gSession.nGameType != 3 && Character_IsGolfer(pChar)) {
             fn_80037708(pChar->pSkin);
         }
     }
@@ -1861,7 +1862,7 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
         fn_8001DC64(pChar, pChoices);
         fn_800CC4EC(pChar);
     }
-    if (gSession.nSplitScreen && fn_8001EC48(pChar)) {
+    if (gSession.nSplitScreen && Character_IsGolfer(pChar)) {
         fn_800375AC(pChar->pSkin, 0);
         fn_80018710(pChar);
     }
@@ -1994,12 +1995,12 @@ void fn_8001B644(Character* pChar) {
     pChar->vMax[0] += 0.33f;
     pChar->vMax[1] += 0.33f;
     pChar->vMax[2] += 0.33f;
-    fn_8001EF54(pChar->vMin, pChar->vMax, vCentre);
+    Char_Vec3Add(pChar->vMin, pChar->vMax, vCentre);
     Vec3_Scale(0.5f, vCentre, vCentre);
     pChar->v1668[0] = vCentre[0];
     pChar->v1668[1] = vCentre[1];
     pChar->v1668[2] = vCentre[2];
-    fn_8001EF10(pChar->vMax, pChar->vMin, vDiff);
+    Char_Vec3Sub(pChar->vMax, pChar->vMin, vDiff);
     pChar->f1674 = (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff)) / 2.0f;
 }
 
@@ -2029,8 +2030,8 @@ void fn_8001B878(Character* pChar, int nPlayer) {
     pChar->n1654 = fn_80007D74(&sphere, Camera_GetCurrent(), 0);
     sphere.radius = 3.0f;
     pChar->n1658 = fn_80007D74(&sphere, Camera_GetCurrent(), 0);
-    fn_8001EFB4(pMtx[3], fn_8001F004()->m4[3], vDir);
-    fDist = Vec3_Dot(fn_8001F004()->m4[2], vDir);
+    fn_8001EFB4(pMtx[3], Camera_GetCurrentLens()->m4[3], vDir);
+    fDist = Vec3_Dot(Camera_GetCurrentLens()->m4[2], vDir);
     fLen = (f32)Math_Sqrt(Vec3_LengthSqClamped(vDir));
     if (fLen < pChar->f14) {
         pChar->f14 = fLen;
@@ -2041,7 +2042,7 @@ void fn_8001B878(Character* pChar, int nPlayer) {
     if (fDist > fn_8001EE00(pChar, gSession.nSplitScreen)) {
         pChar->n1658 = 2;
     }
-    fDepth *= fn_8001EFFC(fn_8001F004());
+    fDepth *= Camera_GetLensFovScale(Camera_GetCurrentLens());
     if (pChar->n1654 == 2) {
         pChar->f1664 = 0.0f;
     } else if (fDepth > 15.0f) {
@@ -2088,7 +2089,7 @@ void fn_8001BA74(void) {
 
 // With characters made: fn_80035604, then fn_800358E0 for every character that is not in state 2
 // (fn_8001EE90), not the camera's player (fn_800636EC), has neither bit 0x40 nor 1 of u10 set and,
-// when uFlags has bit 4, passes fn_8001EC48.
+// when uFlags has bit 4, passes Character_IsGolfer.
 void fn_8001BBD8(u32 uFlags) {
     int i;
     int nPlayer;
@@ -2099,7 +2100,7 @@ void fn_8001BBD8(u32 uFlags) {
             nPlayer = fn_800636EC();
             if (fn_8001EE90(lbl_801B9624[i]) != 2 && nPlayer != lbl_801B9624[i]->nPlayer &&
                 !(lbl_801B9624[i]->u10 & 0x41) &&
-                (fn_8001EC48(lbl_801B9624[i]) || (uFlags & 4) == 0)) {
+                (Character_IsGolfer(lbl_801B9624[i]) || (uFlags & 4) == 0)) {
                 fn_800358E0(lbl_801B9624[i], uFlags);
             }
         }
@@ -2139,7 +2140,7 @@ int fn_8001BD18(Character* pChar, Clip* pClip) {
         pChar->pModel->pBones[pChar->nGripBone].nParent = 0;
         Quat_Invert(pModel->pPoses[0].q0, qRoot);
         Quat_Multiply(pModel->pPoses[pChar->nGripBone].q0, qRoot, pChar->q16AC);
-        if (fn_8001EDF4(pChar)) {
+        if (Character_IsLeftHanded(pChar)) {
             Legacy_Quat_BuildFromPitch(PI, qTurn);
             Quat_Multiply(pChar->q16AC, qTurn, qGrip);
             Quat_Copy(qGrip, pChar->q16AC);
@@ -2148,7 +2149,7 @@ int fn_8001BD18(Character* pChar, Clip* pClip) {
         vOffset[3] = 0.0f;
         Quat_RotateVector(qRoot, vOffset, pChar->v16BC);
         pChar->v16BC[3] = 0.0f;
-        if (fn_8001EDF4(pChar)) {
+        if (Character_IsLeftHanded(pChar)) {
             pChar->v16BC[2] = -pChar->v16BC[2];
         }
         return 1;
@@ -2158,7 +2159,7 @@ int fn_8001BD18(Character* pChar, Clip* pClip) {
 
 // Plays pClip on the character. With bNoBlend the blend tree and the animation player start
 // over; otherwise the clip is blended in over its first f18 seconds from the current time.
-void fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) {
+void Character_PlayClip(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) {
     f32 aBlend[6];
     SKABlendNode* pNode;
     SKABlendNode* pNew;
@@ -2171,7 +2172,7 @@ void fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) {
     if (pClip == NULL) {
         return;
     }
-    if (fn_8001EC48(pChar)) {
+    if (Character_IsGolfer(pChar)) {
         fn_8001BD18(pChar, pClip);
     }
     pChar->p178C = NULL;
@@ -2249,7 +2250,7 @@ void fn_8001C0E0(Character* pChar) {
         if (pChar->pRecords != NULL) {
             StaticMem_Free(pChar->pRecords);
         }
-        if (fn_8001EC48(pChar)) {
+        if (Character_IsGolfer(pChar)) {
             fn_8001971C(pChar);
         }
         if (pChar->p17AC != NULL) {
@@ -2381,7 +2382,7 @@ void fn_8001C518(void) {
 }
 
 // The model id of the player's golfer.
-int fn_8001C558(int nPlayer) {
+int Character_GetGolferModelID(int nPlayer) {
     return gGolferTable[gSession.nGolfer[nPlayer]].nModelID;
 }
 
@@ -2395,7 +2396,7 @@ int fn_8001C584(int nPlayer) {
 }
 
 // Set the club class, and put the club head bone at the class's height.
-void fn_8001C5B4(Character* pChar, int n) {
+void Character_SelectClub(Character* pChar, int n) {
     int nBone;
 
     if (pChar == NULL || pChar->pModel == NULL || pChar->nSlot < 0 || pChar->nSlot >= 3) {
@@ -2435,7 +2436,7 @@ void fn_8001C680(int nPlayer) {
         pChar->nAnim = 0;
         pChar->u10 |= 0x80;
         fn_80095744(pChar, 5);
-        fn_8001C804(nPlayer, 1, 1);
+        Character_AlignShotWithTarget(nPlayer, 1, 1);
     }
 }
 
@@ -2459,22 +2460,24 @@ void Character_SelectGameShotType(Character* pChar, int nKind) {
 }
 
 void Character_SelectGameClub(Character* pChar, int nClub) {
-    // per club: what fn_8001C5B4 gets
+    // per club: what Character_SelectClub gets
     int aKind[26] = {0, 0, 0, 0, 0, 0, 1, 1, 1, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 2};
 
     if (pChar != NULL) {
         fn_800BBADC(nClub);
         pChar->nClub = nClub;
-        fn_8001C5B4(pChar, aKind[nClub]);
+        Character_SelectClub(pChar, aKind[nClub]);
     }
 }
 
-void fn_8001C7FC(Character* pChar, int nStyle) {
+// Sets the emotion (nStyle) the character's clips are picked with (Char_SetClip's style);
+// CharacterState_UpdateGameEmotionState and CharacterState_SetTapInState set it.
+void Character_SetEmotion(Character* pChar, int nStyle) {
     pChar->nStyle = nStyle;
 }
 
 // Flags on the player's character: bit 4 always, bit 8 set or cleared by b, bit 0x200 set by a.
-void fn_8001C804(int nPlayer, u8 a, u8 b) {
+void Character_AlignShotWithTarget(int nPlayer, u8 a, u8 b) {
     Character* pChar = gPlayers[nPlayer].pChar;
     pChar->u10 |= 4;
     if (b) {
@@ -2532,7 +2535,7 @@ void Character_SetupForShot(Character* pChar) {
     Quat_Copy(pModel->pBones[0].q0C, pModel->pPoses[0].q0);
     Quat_Copy(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
     Quat_QuatToMatrix(pModel->pPoses[0].q0, pModel->pMatrices[0]);
-    fn_8001E880(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
+    Vec4_CopyPoint(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
     if (bStance && (pSkel = pChar->pModel->pSkel) != NULL) {
         pOldClip = pChar->pCurClip;
         CharModel_GetBoneIndex(pChar->pModel, 1);      // the results are not used
@@ -2563,7 +2566,7 @@ void Character_SetupForShot(Character* pChar) {
         fn_8001EFD8(vOffsetX, pChar->pModel->pBones[0].v1C, pChar->pModel->pBones[0].v1C);
         fn_8001EFD8(vOffsetZ, pChar->pModel->pBones[0].v1C, pChar->pModel->pBones[0].v1C);
         Quat_Copy(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
-        fn_8001E880(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
+        Vec4_CopyPoint(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
         fn_80027108(pSkel);
         if (pChar->p16D8 != NULL) {
             pSkel->pose.aBones[pChar->nClubHeadBone].v10[1] = pChar->p16D8->afC[pChar->nClubClass];
@@ -2647,16 +2650,16 @@ void fn_8001CE5C(UStreamObject* pObject) {
 
     fn_800106B8(1);
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        nGolferModel = fn_8001C558(i);
+        nGolferModel = Character_GetGolferModelID(i);
         if (nGolferModel == uModel && gViewSlots[i].pChar == NULL) {
             fn_800106AC(i);
             nSet = gSession.nSplitScreen ? i : 0;
             gViewSlots[i].pChar = fn_8001C21C(fn_8001A9F4(pObject->pData, 0, nSet, uModel,
                                                           fn_8001C584(i), &gpSaveData[i].choices));
-            if (gViewSlots[i].pChar->pSkin != NULL && fn_8001EC48(gViewSlots[i].pChar)) {
-                fn_8001D4A4(gViewSlots[i].pChar, i);
+            if (gViewSlots[i].pChar->pSkin != NULL && Character_IsGolfer(gViewSlots[i].pChar)) {
+                Character_SetClubsAndClothes(gViewSlots[i].pChar, i);
             }
-            if (gViewSlots[i].pChar->pSkin != NULL && fn_8001EC48(gViewSlots[i].pChar)) {
+            if (gViewSlots[i].pChar->pSkin != NULL && Character_IsGolfer(gViewSlots[i].pChar)) {
                 pChar = gViewSlots[i].pChar;
                 pChar->apSkins[0] = pChar->pSkin;
                 pChar->apSkins[1] = pChar->p16D8->apSkins[0];
@@ -2704,13 +2707,13 @@ void fn_8001D020(UStreamObject* pObject) {
     fn_8008F35C();
     lbl_80281EE0->pB8->pChar->n16C = -1;
     Character_SetPosition(lbl_80281EE0->pB8->pChar, lbl_80189A30, 1);
-    fn_800192D4(lbl_80281EE0->pB8->pChar, lbl_80281EE0->f19C);
+    Character_SetOrientation(lbl_80281EE0->pB8->pChar, lbl_80281EE0->f19C);
     if (lbl_80281EE0->pB8->pChar->nC == 7 || lbl_80281EE0->pB8->pChar->nC == 29) {
         fn_8001DC64(lbl_80281EE0->pB8->pChar, &FE_GetCurrentProfile()->choices);
     }
-    fn_8001C5B4(lbl_80281EE0->pB8->pChar, 5);
+    Character_SelectClub(lbl_80281EE0->pB8->pChar, 5);
     pClip = Char_SetClip(lbl_80281EE0->pB8->pChar, 0, 0, NULL);
-    fn_8001BE88(lbl_80281EE0->pB8->pChar, pClip, 1, 0.0f);
+    Character_PlayClip(lbl_80281EE0->pB8->pChar, pClip, 1, 0.0f);
     if (lbl_80281EE0->pB8->nC == lbl_80281EE0->n8C) {
         pChar = lbl_80281EE0->pB8->pChar;
         pChar->nSkins = 7;
@@ -2794,7 +2797,7 @@ void fn_8001D47C(void) {
 // the profile's created golfer's look; otherwise its own look when fn_8001C584 says so), then the
 // "shirt" set (only when fn_8001C584 says no) and the "glove" set, as "shirt<n>" / "glove<n>" with
 // n from the slot's profile (no number when it is 0 or less).
-void fn_8001D4A4(Character* pChar, int nSlot) {
+void Character_SetClubsAndClothes(Character* pChar, int nSlot) {
     char szName[32];            // the size is not known
 
     if (gSession.nGameType == 3) {
@@ -2845,7 +2848,7 @@ void fn_8001D6D8(int n) {
     gSession.aD28[n] = 1;
 }
 
-// Every player flagged by fn_8001D6D8 has its character dressed again (fn_8001D4A4) and its
+// Every player flagged by fn_8001D6D8 has its character dressed again (Character_SetClubsAndClothes) and its
 // skins put on its model in use; the flag is cleared.
 void fn_8001D6F0(void) {
     int j;
@@ -2856,7 +2859,7 @@ void fn_8001D6F0(void) {
         if (gSession.aD28[i]) {
             fn_80008380();
             pChar = gPlayers[i].pChar;
-            fn_8001D4A4(pChar, i);
+            Character_SetClubsAndClothes(pChar, i);
             fn_80019CEC(pChar);
             for (j = 0; j < pChar->nSkins; j++) {
                 fn_800CE170(pChar->apSkins[j], pChar->a64[pChar->n74]);
@@ -2909,13 +2912,13 @@ void fn_8001D8DC(int nPlayer) {
 // Where the ball sits on the hand: bone 0x1A's position, moved 0.05 along the bone's x axis (the
 // other way while the model's bEE is set).
 void Character_GetBallOnFingerPosition(Character* pChar, f32* pPos) {
-    f32 (*pMtx)[4] = fn_8001EC6C(pChar, 0x1A);
+    f32 (*pMtx)[4] = Character_GetBoneMatrixSwapIfLefty(pChar, 0x1A);
     f32 vAxis[3];
 
     Vec_Copy(pMtx[3], pPos);
     Vec3Copy(pMtx[0], vAxis);
     Vec_NormalizeTo(vAxis, vAxis);
-    if (fn_8001EDF4(pChar)) {
+    if (Character_IsLeftHanded(pChar)) {
         fn_8000C5D4(pPos, vAxis, 0.05f, pPos);
     } else {
         fn_8000C5D4(pPos, vAxis, -0.05f, pPos);
@@ -2930,11 +2933,11 @@ void fn_8001DA04(Character* pChar, f32* pPos, f32* pAngles) {
     f32 vAxis[3];
 
     if (pChar != NULL && pChar->pModel != NULL) {
-        pMtx = fn_8001EC6C(pChar, 0x1A);
+        pMtx = Character_GetBoneMatrixSwapIfLefty(pChar, 0x1A);
         Vec_Copy(pMtx[3], pPos);
         Vec3Copy(pMtx[0], vAxis);
         Vec_NormalizeTo(vAxis, vAxis);
-        if (fn_8001EDF4(pChar)) {
+        if (Character_IsLeftHanded(pChar)) {
             fn_8000C5D4(pPos, vAxis, -0.000625f, pPos);
         } else {
             fn_8000C5D4(pPos, vAxis, 0.000625f, pPos);
@@ -2946,21 +2949,21 @@ void fn_8001DA04(Character* pChar, f32* pPos, f32* pAngles) {
     }
 }
 
-// The clip's point v80 through bone 0's matrix (fn_8001ED08) into pOut; without a clip, bone 0's
-// position (fn_8001EB8C).
+// The clip's point v80 through bone 0's matrix (Character_GetBoneMatrix) into pOut; without a clip, bone 0's
+// position (Character_GetBonePos).
 void fn_8001DB04(Character* pChar, f32* pOut) {
     Vec4 vPos;
     f32 (*pMtx)[4];
 
     if (pChar->pCurClip != NULL) {
         CharModel_GetBoneIndex(pChar->pModel, 1);  // the result is not used
-        pMtx = fn_8001ED08(pChar, 0);
+        pMtx = Character_GetBoneMatrix(pChar, 0);
         Vec3Copy(pChar->pCurClip->v80, &vPos.x);
         vPos.w = 1.0f;
         Mtx_MultVec4(pMtx, &vPos, (Vec4*)pOut);
         return;
     }
-    fn_8001EB8C(pChar, 0, pOut);
+    Character_GetBonePos(pChar, 0, pOut);
 }
 
 void fn_8001DB98(Character* pChar) {
@@ -3154,7 +3157,7 @@ void Character_SetClubStatesForCharacter(Character* pChar, int nSlot, SkinChoice
     } else {
         fn_800CC408(pChar, pChoices);
     }
-    fn_800CC8BC(pChar, fn_8001EDF4(pChar));
+    fn_800CC8BC(pChar, Character_IsLeftHanded(pChar));
 }
 
 // Every player for whom fn_800FCC38 says so has its animation played at normal speed.
@@ -3175,7 +3178,7 @@ void Quat_Copy(f32* pSrc, f32* pDst) {
     pDst[2] = pSrc[2];
 }
 
-void fn_8001E880(f32* pSrc, f32* pDst) {
+void Vec4_CopyPoint(f32* pSrc, f32* pDst) {
     pDst[0] = pSrc[0];
     pDst[1] = pSrc[1];
     pDst[2] = pSrc[2];
@@ -3183,7 +3186,7 @@ void fn_8001E880(f32* pSrc, f32* pDst) {
 }
 
 // Sets every bit of a bit array of nBits bits.
-void fn_8001E8A4(u32* aBits, u32 nBits) {
+void BitArray_SetAll(u32* aBits, u32 nBits) {
     u32 i;
 
     for (i = 0; i < (nBits + 31) >> 5; i++) {
@@ -3204,7 +3207,8 @@ u8 BitArray_Test(u32* aBits, u32 n) {
     return (aBits[n >> 5] & (1 << (n & 31))) != 0;
 }
 
-u8 fn_8001E9F4(u32* aA, u32* aB, u32 nBits) {
+// True when the two bit arrays of nBits bits have any bit set in both.
+u8 BitArray_Intersects(u32* aA, u32* aB, u32 nBits) {
     u32 i;
     for (i = 0; i < (nBits + 31) >> 5; i++) {
         if (aA[i] & aB[i]) {
@@ -3227,19 +3231,19 @@ void fn_8001EA54(u32* aA, u32* aB, u32* aOut, u32 nBits) {
     }
 }
 
-void fn_8001EB6C(u32* aBits, u32 n) {
+void BitArray_Clear(u32* aBits, u32 n) {
     aBits[n >> 5] &= ~(1 << (n & 31));
 }
 
 // A bone's position, by bone id.
-void fn_8001EB8C(Character* pChar, int nBone, f32* pPos) {
-    fn_8001EBD8(pChar, CharModel_GetBoneIndex(pChar->pModel, nBone), pPos);
+void Character_GetBonePos(Character* pChar, int nBone, f32* pPos) {
+    Character_GetBonePos_FromIndex(pChar, CharModel_GetBoneIndex(pChar->pModel, nBone), pPos);
 }
 
 // Bone n's position (bone 1's without an animation slot); nothing without a character.
-void fn_8001EBD8(Character* pChar, int nBone, f32* pPos) {
+void Character_GetBonePos_FromIndex(Character* pChar, int nBone, f32* pPos) {
     if (pChar != NULL) {
-        if (fn_8001EC48(pChar) == 0) {
+        if (Character_IsGolfer(pChar) == 0) {
             nBone = 1;
         }
         Vec_Copy(pChar->pModel->pMatrices[nBone][3], pPos);
@@ -3247,59 +3251,61 @@ void fn_8001EBD8(Character* pChar, int nBone, f32* pPos) {
 }
 
 // The character plays from animation slot 0 or 1.
-u8 fn_8001EC48(Character* pChar) {
+u8 Character_IsGolfer(Character* pChar) {
     if (pChar->nSlot >= 0 && pChar->nSlot < 2) {
         return 1;
     }
     return 0;
 }
 
-f32 (*fn_8001EC6C(Character* pChar, int nBone))[4] {
-    return fn_8001ECA8(pChar, CharModel_GetBoneIndexMapped(pChar->pModel, nBone));
+f32 (*Character_GetBoneMatrixSwapIfLefty(Character* pChar, int nBone))[4] {
+    return Character_GetBoneMatrix_FromIndex(pChar, CharModel_GetBoneIndexMapped(pChar->pModel, nBone));
 }
 
 // Bone n's matrix (bone 1's without an animation slot); NULL without a character.
-f32 (*fn_8001ECA8(Character* pChar, int nBone))[4] {
+f32 (*Character_GetBoneMatrix_FromIndex(Character* pChar, int nBone))[4] {
     int n = nBone;
     if (pChar == NULL) {
         return NULL;
     }
-    if (fn_8001EC48(pChar) == 0) {
+    if (Character_IsGolfer(pChar) == 0) {
         n = 1;
     }
     return pChar->pModel->pMatrices[n];
 }
 
 // A bone's matrix, by bone id.
-f32 (*fn_8001ED08(Character* pChar, int nBone))[4] {
-    return fn_8001ECA8(pChar, CharModel_GetBoneIndex(pChar->pModel, nBone));
+f32 (*Character_GetBoneMatrix(Character* pChar, int nBone))[4] {
+    return Character_GetBoneMatrix_FromIndex(pChar, CharModel_GetBoneIndex(pChar->pModel, nBone));
 }
 
 f32 fn_8001ED44(Character* pChar, int b) {
     if (b != 0) {
-        return pChar->f1660 * (0.5f / fn_8001EFFC(fn_8001F004()));
+        return pChar->f1660 * (0.5f / Camera_GetLensFovScale(Camera_GetCurrentLens()));
     }
-    return pChar->f1660 * (1.0f / fn_8001EFFC(fn_8001F004()));
+    return pChar->f1660 * (1.0f / Camera_GetLensFovScale(Camera_GetCurrentLens()));
 }
 
 // A bone's position, by bone id through CharModel_GetBoneIndexMapped.
-void fn_8001EDA8(Character* pChar, int nBone, f32* pPos) {
-    fn_8001EBD8(pChar, CharModel_GetBoneIndexMapped(pChar->pModel, nBone), pPos);
+void Character_GetBonePosSwapIfLefty(Character* pChar, int nBone, f32* pPos) {
+    Character_GetBonePos_FromIndex(pChar, CharModel_GetBoneIndexMapped(pChar->pModel, nBone), pPos);
 }
 
-u8 fn_8001EDF4(Character* pChar) {
+// True for a left-handed golfer: its model is mirrored, and bone ids looked up through
+// CharModel_GetBoneIndexMapped go through its second bone table.
+u8 Character_IsLeftHanded(Character* pChar) {
     return pChar->pModel->bEE;
 }
 
 f32 fn_8001EE00(Character* pChar, int b) {
     if (b != 0) {
-        return pChar->f165C * (0.5f / fn_8001EFFC(fn_8001F004()));
+        return pChar->f165C * (0.5f / Camera_GetLensFovScale(Camera_GetCurrentLens()));
     }
-    return pChar->f165C * (1.0f / fn_8001EFFC(fn_8001F004()));
+    return pChar->f165C * (1.0f / Camera_GetLensFovScale(Camera_GetCurrentLens()));
 }
 
 f32 (*fn_8001EE64(Character* pChar))[4] {
-    return fn_8001ED08(pChar, 1);
+    return Character_GetBoneMatrix(pChar, 1);
 }
 
 int fn_8001EE88(Character* pChar) {
@@ -3335,7 +3341,7 @@ int CharModel_GetBoneIndexMapped(CharModel* pModel, int nBone) {
 
 // a - b into out (three floats)
 #ifdef __MWERKS__
-asm void fn_8001EF10(register f32* pA, register f32* pB, register f32* pOut) {
+asm void Char_Vec3Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -3349,7 +3355,7 @@ asm void fn_8001EF10(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_8001EF10(f32* pA, f32* pB, f32* pOut) {
+void Char_Vec3Sub(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];
@@ -3380,7 +3386,7 @@ void Vec3_Scale(f32 f, f32* pIn, f32* pOut) {
 
 // b + a into out (three floats)
 #ifdef __MWERKS__
-asm void fn_8001EF54(register f32* pA, register f32* pB, register f32* pOut) {
+asm void Char_Vec3Add(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -3394,7 +3400,7 @@ asm void fn_8001EF54(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_8001EF54(f32* pA, f32* pB, f32* pOut) {
+void Char_Vec3Add(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pB[0] + pA[0];
     pOut[1] = pB[1] + pA[1];
     pOut[2] = pB[2] + pA[2];
@@ -3483,12 +3489,14 @@ void fn_8001EFD8(f32* pA, f32* pB, f32* pOut) {
 }
 #endif
 
-f32 fn_8001EFFC(CamLens* pLens) {
+// The lens's field-of-view scale, tan(fov / 2) / tan(30 degrees) (GoCamera.c): 1 for a 60-degree
+// lens, smaller when zoomed in. Visibility and camera distances are scaled by it.
+f32 Camera_GetLensFovScale(CamLens* pLens) {
     return pLens->fB0;
 }
 
 // The current render camera's lens.
-CamLens* fn_8001F004(void) {
+CamLens* Camera_GetCurrentLens(void) {
     return Camera_GetLens(*lbl_80280DF0);
 }
 

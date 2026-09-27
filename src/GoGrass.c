@@ -339,7 +339,7 @@ void fn_8011EB04(void) {
     f32 fX;
     f32 fZ;
 
-    fn_8001F004();
+    Camera_GetCurrentLens();
     fX = 0.5f * lbl_80281900->pLens->fB4 + lbl_80281900->fMinX;
     fZ = 0.5f * lbl_80281900->pLens->fB8 + lbl_80281900->fMinZ;
     aEye[0] = fX;
@@ -529,7 +529,7 @@ void fn_8011F3AC(void) {
     int i;
     GrassBuffer* pBuffer;
     s32 nBuffers;
-    CamLens* pLens = fn_8001F004();
+    CamLens* pLens = Camera_GetCurrentLens();
 
     nBuffers = lbl_80281900->anF8[lbl_80281900->n100];
     Vec_Copy(pLens->m4[2], vDir);
@@ -655,7 +655,7 @@ void fn_8011F7F8(void) {
     f32 fZ;
     f32 fCellX;
 
-    pLens = fn_8001F004();
+    pLens = Camera_GetCurrentLens();
     lbl_80281900->n100 = 1 - lbl_80281900->n100;
     lbl_80281900->anF8[lbl_80281900->n100] = 0;
     nOther = 1 - lbl_80281900->n100;

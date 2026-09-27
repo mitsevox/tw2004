@@ -250,7 +250,7 @@ void fn_800B52D4(RainObject* pRain, f32* pTime) {
     f32 fSize;
 
     pCamera = Camera_GetCurrent();
-    pLens = fn_8001F004();
+    pLens = Camera_GetCurrentLens();
     pData = &pRain->data;
     nBuf = lbl_802814B8->n0;
     nHalf = lbl_802814B8->n4;

@@ -46,15 +46,15 @@ void fn_80057FBC(SaveProfile* pProfile) {
             if (fn_80105C0C(i) == 0) {
                 BitArray_Set(pProfile->aB1CC, i);
             } else {
-                fn_8001EB6C(pProfile->aB1CC, i);
+                BitArray_Clear(pProfile->aB1CC, i);
             }
-            fn_8001EB6C(pProfile->aB344, i);
-            fn_8001EB6C(pProfile->aB4BC, i);
+            BitArray_Clear(pProfile->aB344, i);
+            BitArray_Clear(pProfile->aB4BC, i);
             fn_80103B8C(fn_80103BC0(i));
             if (fn_80078008(i, pProfile)) {
                 BitArray_Set(pProfile->aAssetLocked, i);
             } else {
-                fn_8001EB6C(pProfile->aAssetLocked, i);
+                BitArray_Clear(pProfile->aAssetLocked, i);
             }
         }
         fn_80103B8C(nOffered);
@@ -107,7 +107,7 @@ void fn_800582C4(SaveProfile* pProfile, int nBit, u8 bSet) {
     if (bSet) {
         BitArray_Set(pProfile->a10548, nBit);
     } else {
-        fn_8001EB6C(pProfile->a10548, nBit);
+        BitArray_Clear(pProfile->a10548, nBit);
     }
 }
 

@@ -70,7 +70,7 @@ void TARGET_Init(void) {
     }
 }
 
-f32  fn_8001EFFC(CamLens* pLens);      // char.c: the lens's fB0
+f32  Camera_GetLensFovScale(CamLens* pLens);      // char.c: the lens's fB0
 void fn_8006752C(void);
 
 // Each frame: while the ball is being placed, the placement cursor; otherwise, for a human
@@ -406,7 +406,7 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
     bInRange = 0;
     bMoved = 0;
     Vec3Copy(gPlayers[nPlayer].vTarget, vSaved);
-    fZoom = fn_8001EFFC(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
+    fZoom = Camera_GetLensFovScale(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
 
     // the turn eases off towards 0
     if (gPlayers[nPlayer].fA5C < 0.0f) {
@@ -448,7 +448,7 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
         gPlayers[nPlayer].vTarget[2] = fDZ + gPlayers[nPlayer].vBall[2];
         fn_8002BDEC_SetTarget(nPlayer, gPlayers[nPlayer].vTarget);
         Vec_Copy(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vTarget2);
-        fn_8001C804(nPlayer, 0, 1);
+        Character_AlignShotWithTarget(nPlayer, 0, 1);
         fn_80062C38();
         fn_8006A8B0();
     }
@@ -520,7 +520,7 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
             gPlayers[nPlayer].fPower = AI_PowerForTarget(nPlayer);
             Character_SelectGameClub(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nClub);
             Character_SelectGameShotType(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nShotKind);
-            fn_8001C804(nPlayer, 0, 1);
+            Character_AlignShotWithTarget(nPlayer, 0, 1);
             fn_80062C38();
             fn_8006A8B0();
         } else {
@@ -1018,7 +1018,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     }
 
     // the marker's height: kept where the camera can see it (within 3/4 of its field of view)
-    fHalfFov = fn_80014278(fn_8001F004());
+    fHalfFov = fn_80014278(Camera_GetCurrentLens());
     fHalfFov = 0.75f * fHalfFov * fn_8001414C((u8*)fn_8003526C());
     fn_8006A964(pView->v10, pView->v0, vDir);
     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {

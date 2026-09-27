@@ -11,7 +11,7 @@
 
 struct Character;
 
-// A job for the dynamic textures (0x14 bytes, ten in DynTexState): char.c's fn_80019D64 fills one
+// A job for the dynamic textures (0x14 bytes, ten in DynTexState): char.c's Character_AddTextureLoadRequest fills one
 // with a character and two of its functions.
 typedef struct DynTexJob {
     void* p0;                   // 0x00  the address of the character's p50

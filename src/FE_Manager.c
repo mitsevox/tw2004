@@ -749,7 +749,7 @@ void fn_80078680(SaveProfile* pProfile) {
             if (fn_80078008(i, pProfile)) {
                 BitArray_Set(pProfile->aAssetLocked, i);
             } else {
-                fn_8001EB6C(pProfile->aAssetLocked, i);
+                BitArray_Clear(pProfile->aAssetLocked, i);
             }
         }
         fn_80103B8C(nSaved);

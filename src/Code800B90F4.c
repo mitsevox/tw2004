@@ -315,7 +315,7 @@ void Mtx_Identity(f32 (*pMtx)[4]);                   // identity
 void fn_8000C5A4(f32 (*pMtx)[4]);
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
-void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);
+void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);
 void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
 int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
 
@@ -450,8 +450,8 @@ void fn_800B9CF0(u8 bTarget) {
         vPos[1] = lbl_802821CC;
         vPos[2] = lbl_802814EC;
         vPos[3] = 1.0f;
-        fn_8001EB8C(lbl_80281EE0->pB4->pChar, 0x54, vPos);
-        mBone = fn_8001ED08(lbl_80281EE0->pB4->pChar, 0x54);
+        Character_GetBonePos(lbl_80281EE0->pB4->pChar, 0x54, vPos);
+        mBone = Character_GetBoneMatrix(lbl_80281EE0->pB4->pChar, 0x54);
         Mtx_Identity(mScale);
         mScale[0][0] = lbl_802814F0;
         mScale[1][1] = lbl_802814F4;

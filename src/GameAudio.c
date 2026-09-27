@@ -38,7 +38,7 @@ f32  fn_8006C630(void);
 u8   fn_800AD280(s16 nSound, s16 nKind, int a, int b, void (*pfnCallback)(u8 nId, u8 nTrack, s32 n));
 void fn_800ADA08(s16 nSound, u8 nTrack, u8 n);
 void fn_800AD734(u8 nId, int n);
-void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);
+void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);
 void fn_800A6BA8(u8 nPlayer);
 void fn_800A6854(u8 nPlayer);
 void fn_800A6D48(u8 nPlayer);
@@ -886,7 +886,7 @@ void fn_800A562C(u8 nPlayer) {
         fn_800AD450(lbl_80281420);
         lbl_80281420 = 0xFF;
     }
-    fn_8001EB8C(pPlayer->pChar, 0x53, vPos);
+    Character_GetBonePos(pPlayer->pChar, 0x53, vPos);
     fn_800AD800(nId, vPos, NULL, 0);
     fn_800ADA28(nId, 0, 1, 1);
     pView->f8 = 0.0f;
@@ -912,7 +912,7 @@ void fn_800A573C(u8 nPlayer) {
     pView = &lbl_801F1790[pPlayer->nView[0]];
     nId = pView->n0;
     if (nId != 0xFF) {
-        fn_8001EB8C(pPlayer->pChar, 0x53, vPos);
+        Character_GetBonePos(pPlayer->pChar, 0x53, vPos);
         fn_800AD800(nId, vPos, vLast, 0);
         nState = pPlayer->swing.nState;
         if (nState == 1 || nState == 3) {

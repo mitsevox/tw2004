@@ -584,7 +584,7 @@ void fn_80108A0C(MsgArg* pArgs, MsgArg* pResult) {
         if (BitArray_Test(pProfile->aAssetLocked, i)) {
             BitArray_Set(aWasLocked, i);
         } else {
-            fn_8001EB6C(aWasLocked, i);
+            BitArray_Clear(aWasLocked, i);
         }
     }
     fn_80078680(pProfile);
@@ -625,8 +625,8 @@ void fn_80108C00(MsgArg* pArgs, MsgArg* pResult) {
 
     for (i = 0; i < nAssets; i++) {
         if (BitArray_Test(pProfile->aB344, i) && BitArray_Test(pProfile->aB4BC, i)) {
-            fn_8001EB6C(pProfile->aB344, i);
-            fn_8001EB6C(pProfile->aB4BC, i);
+            BitArray_Clear(pProfile->aB344, i);
+            BitArray_Clear(pProfile->aB4BC, i);
         }
     }
 }
@@ -686,7 +686,7 @@ void fn_80108DF4(MsgArg* pArgs, MsgArg* pResult) {
     if (bSet) {
         BitArray_Set(pProfile->a10548, nBit);
     } else {
-        fn_8001EB6C(pProfile->a10548, nBit);
+        BitArray_Clear(pProfile->a10548, nBit);
     }
 }
 
@@ -1112,7 +1112,7 @@ void fn_80109DE0(MsgArg* pArgs, MsgArg* pResult) {
     int nAsset = fn_80104FA8(nPart, b, i);
 
     pProfile->n6C += (s32)(0.25f * fn_80105368(nPart, b, i));
-    fn_8001EB6C(pProfile->aB1CC, nAsset);
+    BitArray_Clear(pProfile->aB1CC, nAsset);
 }
 
 // ---- sweep code (not yet cleaned up) ----

@@ -441,6 +441,6 @@ void fn_8011CE58(Skin* pSkin) {
     if (pSkin == NULL || pSkin->pMorph == NULL) {
         return;
     }
-    fn_8001E8A4(pSkin->pMorph->aChanged[0], pSkin->pMorph->nMorphs);
-    fn_8001E8A4(pSkin->pMorph->aChanged[1], pSkin->pMorph->nMorphs);
+    BitArray_SetAll(pSkin->pMorph->aChanged[0], pSkin->pMorph->nMorphs);
+    BitArray_SetAll(pSkin->pMorph->aChanged[1], pSkin->pMorph->nMorphs);
 }

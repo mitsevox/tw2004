@@ -438,7 +438,7 @@ typedef struct PlayerProfile {
     s8   n0;                    // 0x00  0..3; bumped for a CPU opponent playing the same golfer (GameMode5)
     u8   n1;                    // 0x01  cleared by Session_Init and the golfer setup
     s8   n2;                    // 0x02  a created golfer's byte 0x54C2 of its save slot, else 0; the
-                                //       glove variant's number (fn_8001D4A4, read signed)
+                                //       glove variant's number (Character_SetClubsAndClothes, read signed)
     u8   unk3[5];
     u64  aNames[6];             // 0x08  names, each packed into 64 bits (SKA_PackName)
     u8   nOutfit;               // 0x38  the golfer record's nOutfit, or the created golfer's

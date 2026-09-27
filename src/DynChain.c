@@ -120,8 +120,8 @@ void fn_801140AC(DynChainLink* pLink, CharModel* pModel, int nBone, s32 nType) {
         pLink->nParent = pModel->pBones[nBone].nParent;
         Vec_Copy(pModel->pMatrices[nBone][3], pLink->v04);
         if (nType == 0) {
-            fn_8001E880(pModel->pPoses[pLink->nParent].v10, vParent);
-            fn_8001E880(pModel->pPoses[nBone].v10, vBone);
+            Vec4_CopyPoint(pModel->pPoses[pLink->nParent].v10, vParent);
+            Vec4_CopyPoint(pModel->pPoses[nBone].v10, vBone);
             fn_801164D4(vBone, vParent, vDiff);
             pLink->fLength = fn_800BAFC0(vDiff, vDiff);
         } else {
@@ -457,7 +457,7 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         vPos[2] = vDiff[2] * pChain->pLinks[i].fLength + vParent[2];
         Quat_Copy(vPos, pChain->pLinks[i].v64);
         Quat_Copy(vPos, pModel->pPoses[pChain->nBone + i].v10);
-        fn_8001E880(vPos, pModel->pMatrices[pChain->nBone + i][3]);
+        Vec4_CopyPoint(vPos, pModel->pMatrices[pChain->nBone + i][3]);
         SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[pChain->nBone + i], pChain->nBone + i);
     }
 
