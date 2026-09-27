@@ -298,7 +298,7 @@ void fn_800C9F14(u8 bForce) {
     if (bForce || fn_800CB5B0(lbl_80282230->n1CC8, lbl_80282230->p0->pData)) {
         if (lbl_80282230->nResult > 0) {
             Mem_cpy(lbl_80282230->p0->pData, lbl_80282230->pRead, lbl_80282230->nResult);
-            fn_80020DD4(lbl_80282230->p0->pData, NULL, 16);
+            SKA_LoadFromMem(lbl_80282230->p0->pData, NULL, 16);
         }
         lbl_80282230->p4->b8 = 0;
         lbl_80282230->p4 = NULL;
@@ -690,7 +690,7 @@ void fn_800CACD4(int nPlayer) {
                                         lbl_80282230->bufs[nSlot][i][nStyle][nClub].nSize,
                                         pRecords[nFirst].n20);
                             lbl_80282230->bufs[nSlot][i][nStyle][nClub].pData =
-                                fn_80020DD4(lbl_80282230->bufs[nSlot][i][nStyle][nClub].pData, NULL, 16);
+                                SKA_LoadFromMem(lbl_80282230->bufs[nSlot][i][nStyle][nClub].pData, NULL, 16);
                             lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 = 0;
                         }
                     }
@@ -718,7 +718,7 @@ void fn_800CACD4(int nPlayer) {
                                         lbl_80282230->bufs[nSlot][i][nStyle][nClub].nSize,
                                         pRecords[nFirst].n20);
                             lbl_80282230->bufs[nSlot][i][nStyle][nClub].pData =
-                                fn_80020DD4(lbl_80282230->bufs[nSlot][i][nStyle][nClub].pData, NULL, 16);
+                                SKA_LoadFromMem(lbl_80282230->bufs[nSlot][i][nStyle][nClub].pData, NULL, 16);
                             lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 = 0;
                         }
                     }
@@ -770,8 +770,8 @@ void fn_800CB078(void) {
                                             lbl_80282230->bufs[nPlayer][i][nStyle][nClub].nSize,
                                             pRecords[nFirst].n20);
                                 lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData =
-                                    fn_80020DD4(lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData,
-                                                NULL, 16);
+                                    SKA_LoadFromMem(lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData,
+                                                    NULL, 16);
                                 lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 = 0;
                             }
                         }
@@ -827,8 +827,8 @@ void fn_800CB2B0(int nSlot) {
                                             lbl_80282230->bufs[nPlayer][i][nStyle][nClub].nSize,
                                             pRec->n20);
                                 lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData =
-                                    fn_80020DD4(lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData,
-                                                NULL, 16);
+                                    SKA_LoadFromMem(lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData,
+                                                    NULL, 16);
                                 lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 = 0;
                             }
                         }
