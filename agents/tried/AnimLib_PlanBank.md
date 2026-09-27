@@ -3,8 +3,8 @@
 Status: SOLVED 2026-09-27 (lane b8), 91.62 -> 100%. Fix: EA's array order, constant-first
 sums (`0x20 + ...`), two byte-count locals (labelled fake match), own locals for loop 1 (`pWork`)
 and the ppClips loop (`n`), declaration order for EA's spill slots and colours, the pEnd store
-before the bank-pointer store, and `nClips += nLibClips; nClipsAll = nClips;`. Commit: see
-"skalib.c: AnimLib_PlanBank exact" on agent/b8.
+before the bank-pointer store, and `nClips += nLibClips; nClipsAll = nClips;`. Commit: 3ad8935
+on agent/b8.
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
