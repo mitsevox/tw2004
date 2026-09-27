@@ -117,3 +117,10 @@ result.
 - u8[6][4] (lighting.h), only user goballfx (BFX marker colours). goballfx.c lies between
   uiTransform.c and GoShaderObject_Particle_Gc.c in .text, and the block between their .data.
 - Result: goballfx .data 0x80189CB0..0x80189CC8. main.dol: OK.
+
+## auto_05_80189DA8_data (192 B): lbl_80189DA8 -> SunFlr_Gc.c
+
+- f32[6][8] (glows.h), only user SunFlr_Gc; sits right before SunFlr_Gc.c's "SunFlr_Gc.c" string
+  (0x80189E68), after UFstPart.c's .data (BootCourse.c, between them in .text, has no .data).
+  Defined ahead of the functions so it leads the file's .data.
+- Result: SunFlr_Gc .data 0x80189DA8..0x80189E78. main.dol: OK.
