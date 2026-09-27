@@ -1301,6 +1301,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             s32 nGrow;
             u32 k;
             u8 bMatch;
+            u32 nGrowCopy;
 
             pRep = (UISText*)*--pFrame->pC;
             pFind = (UISText*)*--pFrame->pC;
@@ -1324,15 +1325,14 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                         nText = nFind != 0 ? nText : (u32)(s32)nText;
                         if (nText >= nFind) {
                             nRep = nText >= nFind ? nRep : (u32)(s32)nRep;
+                            nGrow = nRep - nFind;
+                            // fake match: nGrowCopy is nGrow, so every `nGrow | nGrowCopy` below is
+                            // nGrow. The allocator never merges an OR: it is EA's kept copy
+                            // (`mr r0,r7`), which the shift loops use while the tests use nGrow.
+                            nGrowCopy = nGrow;
                             for (j = 0; j < nText - nFind + 1; j++) {
-                                // fake match: loop-invariant, set here instead of before the loop
-                                // (the same value): EA's registers for nGrow.
-                                nGrow = nRep - nFind;
                                 bMatch = 1;
                                 for (k = j; k < j + nFind; k++) {
-                                    // fake match: repeat this invariant to reproduce EA's live
-                                    // range.
-                                    nGrow = nRep - nFind;
                                     if (k >= pText->nSize) {
                                         bMatch = 0;
                                         break;
@@ -1343,13 +1343,19 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                                     }
                                 }
                                 if (bMatch) {
+                                    // fake match: same-value ?: on the condition just tested (j
+                                    // unchanged): their temps are codeless allocator neighbours
+                                    // (the text pointers' saved registers, the second loop's k).
+                                    j = bMatch ? j : (u32)(s32)j;
                                     if (nGrow > 0) {
-                                        for (k = pText->nSize - 1; k >= j + nGrow; k--) {
-                                            pText->szText[k] = pText->szText[k - nGrow];
+                                        for (k = pText->nSize - 1; k >= j + (nGrow | nGrowCopy); k--) {
+                                            pText->szText[k] = pText->szText[k - (nGrow | nGrowCopy)];
                                         }
                                     } else if (nGrow < 0) {
-                                        for (k = j + nRep; k <= pText->nSize + nGrow; k++) {
-                                            pText->szText[k] = pText->szText[k - nGrow];
+                                        k = j + nRep;
+                                        j = nGrow < 0 ? j : (u32)(s32)j;
+                                        for (; k <= pText->nSize + (nGrow | nGrowCopy); k++) {
+                                            pText->szText[k] = pText->szText[k - (nGrow | nGrowCopy)];
                                         }
                                     }
                                     for (k = j; k < j + nRep && k < pText->nSize; k++) {

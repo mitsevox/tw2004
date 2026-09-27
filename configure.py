@@ -1124,7 +1124,7 @@ config.libs = [
             # - Read-only strings: the original's string pool is in .rodata (lbl_801860D8), apart
             #   from the switch tables in .data; the string offsets in fn_80165E9C match.
             Object(Matching, "UISEvent.c", extra_cflags=UIS_CFLAGS),
-            Object(NonMatching, "UISStack.c", extra_cflags=UIS_CFLAGS),
+            Object(Matching, "UISStack.c", extra_cflags=UIS_CFLAGS),
             Object(Matching, "UIStudio.c", extra_cflags=UIS_CFLAGS),
             Object(Matching, "UISApi.c", extra_cflags=UIS_CFLAGS),
             Object(Matching, "UISScreen.c", extra_cflags=UIS_CFLAGS),
