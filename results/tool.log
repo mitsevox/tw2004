@@ -1,0 +1,4 @@
+ready: C:/dev/actions-runner/_work/tw2004/tw2004/build/perm/fn_800CE224
+permuter stopped after the time limit (20.0 min)
+  iteration 12817, 1242 errors, score = 930
+  build\perm\fn_800CE224\output-125-1 (score 125, 0 = exact)

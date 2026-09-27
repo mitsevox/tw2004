@@ -1,0 +1,39 @@
+--- before
++++ after
+@@ -5608,18 +5608,20 @@
+   s32 bChanged;
+   s32 nB8;
+   SkinDescB8 *pB8;
++  SkinDesc14 *new_var;
+   bChanged = 0;
+   if ((((pSkin == 0) || (pSkin->pModel == 0)) || ((pDesc = pSkin->pModel->pDesc) == 0)) || (pEntry == 0))
+   {
+     return 0;
+   }
+   nB8 = 0;
++  j = nB8;
+   fn_800CE224_Loop(pSkin, pEntry, pDesc, nCopy, &j, &pSet, &bChanged, &nB8, &nVariant);
+   if (pEntry->u08 & 2)
+   {
+     if (pEntry->n16 > 0)
+     {
+-      if ((nB8 < 0) || (nB8 >= pEntry->n16))
++      if ((j < 0) || (j >= pEntry->n16))
+       {
+         nB8 = 0;
+       }
+@@ -5629,11 +5631,11 @@
+   }
+   if ((ppOut != 0) && (pnOut != 0))
+   {
+-    if ((pEntry->n18 >= 0) && (pEntry->n18 < pDesc->n88))
++    if ((pEntry->n18 >= 0) && ((new_var = pEntry)->n18 < pDesc->n88))
+     {
+       bChanged = 1;
+-      *ppOut = pDesc->p8C[pEntry->n18].a08;
+-      *pnOut = pDesc->p8C[pEntry->n18].n2C;
++      *ppOut = pDesc->p8C[new_var->n18].a08;
++      *pnOut = pDesc->p8C[new_var->n18].n2C;
+     }
+     else
+     {
