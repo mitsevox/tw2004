@@ -619,6 +619,7 @@ uiLoadFile.c:
 uiProcessInterface.c:
 	.text       start:0x8008F39C end:0x80090940
 	.data       start:0x80189B38 end:0x80189C00
+	.bss        start:0x801D87C0 end:0x801D8818
 	.sdata      start:0x80281368 end:0x80281370
 	.sbss       start:0x80281F18 end:0x80281F20
 	.sdata2     start:0x80283B78 end:0x80283B90
@@ -629,7 +630,7 @@ Code80090940.c:
 fe_movies.c:
 	.text       start:0x80090B80 end:0x800922A8
 	.data       start:0x80189C00 end:0x80189C38
-	.bss        start:0x801D8818 end:0x801D8890
+	.bss        start:0x801D8818 end:0x801D91F0
 	.sdata      start:0x80281378 end:0x80281380
 	.sbss       start:0x80281F20 end:0x80281F30
 	.sdata2     start:0x80283B90 end:0x80283BF0

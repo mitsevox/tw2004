@@ -17,6 +17,10 @@ u8 lbl_80281F1A;                // set: fn_8008FD60 passes events to the UI
 u8 lbl_80281F19;
 u8 lbl_80281F18;
 
+// .bss, reverse address order (declared in frontend/fe.h)
+FE801D880C lbl_801D880C;
+FEScreen lbl_801D87C0;
+
 s32 lbl_80189B38[8] = {0};
 UIButtonEvent lbl_80189B58[UI_NUM_BUTTON_EVENTS] = {
     {0x1000, 0x0}, {0x800, 0x6}, {0x100, 0x7}, {0x8, 0x2},
