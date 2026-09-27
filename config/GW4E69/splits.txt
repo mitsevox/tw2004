@@ -1602,7 +1602,7 @@ unsorted/sweep_8013B3C4.c:
 src/dolphin/dvd/dvd.c:
 	.text       start:0x8013B3C8 end:0x8013DCB4
 	.data       start:0x80199BB8 end:0x80199D38
-	.bss        start:0x8027A5A0 end:0x8027A638
+	.bss        start:0x8027A590 end:0x8027A638
 	.sdata      start:0x80281A18 end:0x80281A38
 	.sbss       start:0x802827E0 end:0x80282830
 
@@ -1769,7 +1769,7 @@ dolphin/os/OSMutex.c:
 
 dolphin/os/OSReboot.c:
 	.text       start:0x8014B70C end:0x8014B8F0
-	.bss        start:0x8027CA00 end:0x8027CA20
+	.bss        start:0x8027C9F8 end:0x8027CA20
 	.sbss       start:0x80282910 end:0x80282920
 
 dolphin/os/OSReset.c:
