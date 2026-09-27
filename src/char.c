@@ -423,7 +423,14 @@ void fn_80017DDC(Character* pChar) {
         pMtx = fn_8001ED08(pChar, 0x52);
         if (pMtx != NULL && (pCourse = fn_8000C594()) != NULL) {
             fHeight = fn_8004D650(pCourse, pChar->aPoints[4], vNormal);
-            if (fHeight < -60000.0f || (fUnder = fHeight - pChar->aPoints[4][1]) < 0.0f) {
+            // the else's return is the dead second `b` after the fUnder return; !(<) keeps the
+            // NaN case of `fHeight < -60000.0f`
+            if (!(fHeight < -60000.0f)) {
+                fUnder = fHeight - pChar->aPoints[4][1];
+                if (fUnder < 0.0f) {
+                    return;
+                }
+            } else {
                 return;
             }
             fDot = -fn_8001EEA4(pMtx[1], vNormal);
