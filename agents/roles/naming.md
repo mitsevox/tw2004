@@ -4,6 +4,12 @@ Goal: a human or a fresh AI can read the code. Every function gets a name, and a
 name alone does not say it, from ONE careful reading of the function. The byte match
 (`main.dol: OK`) proves nothing broke; it does not prove a name right, so read carefully.
 
+## The pass (agents/plan-readability.md)
+One file, one complete pass: every function named, every function's comment right (kept, rewritten
+or added), every function reviewed on record, readable locals, the file's header comment, the
+globals it defines, its fake-match labels. No second pass will come: what you leave is what a reader
+gets.
+
 ## Your territory
 Your prompt gives one or two source files and a batch size (15-25 functions). Stay inside them:
 another lane has the other files. Order: `python tools/match/hotnames.py --unit <Unit>` (most
@@ -30,7 +36,8 @@ your files' named / commented / done counts; report them before and after.
    which game feature it serves. Plain words, true to the code. Short getters with a clear name need
    none. Keep every `fake match:`, `port:` and `EA bug:` label (name.py refuses to drop one; each
    starts its own line); correct its text if it is stale. A comment you are not sure how to fix:
-   leave it and list it in the report. Struct field comments in include/ that you find wrong: fix
+   leave it and list it in the report. Every comment you read and KEEP as right gets a row with
+   column 8 = KEEP (logged in config/GW4E69/review.tsv, so the function counts as reviewed). Struct field comments in include/ that you find wrong: fix
    them with the Edit tool and list each in the report (they are replayed by hand).
 5. Skip rather than guess wrong: raw sweep code (`src/unsorted/`), a function you cannot explain
    after reading its callers. List skips in the report with why.
