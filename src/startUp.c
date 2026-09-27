@@ -153,8 +153,6 @@ KEEP_UNUSED u32 lbl_802820EC;
 
 Voice* lbl_802820E8;            // the voices, NUM_VOICES of them
 
-MsgHandler lbl_801F5DA8[30];
-
 // The mixer callback, run after every audio frame: for each voice, ask for a lost hardware voice
 // back, pass changed settings on to the hardware, start, release, pause and resume it, and step
 // its volume envelope.
@@ -765,12 +763,8 @@ u32 fn_800B06F4(void) {
 void fn_800B0748(u32 uAddr) {
     u32 uBit = 1;
     uAddr -= lbl_80282108;
-    // fake match: an empty test on the block's bit (a dead check) makes the frontend compute the
-    // divide before the flags load, so the load gets EA's register
-    if (uBit << (uAddr / 0xFE00)) {
-    } else {
-    }
-    lbl_802820F0 &= ~(uBit << (uAddr / 0xFE00));
+    uBit <<= uAddr / 0xFE00;
+    lbl_802820F0 &= ~uBit;
     lbl_802820F4--;
 }
 
