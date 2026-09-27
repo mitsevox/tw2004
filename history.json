@@ -43845,5 +43845,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "ee6a074",
+"sha": "ee6a074e0c4ed89495780c7447f53cc0fbd23de6",
+"time": 1790547973,
+"subject": "name.py: EA's own names (T1/T2 with E2) may keep EA's spelling",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
