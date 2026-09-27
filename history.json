@@ -43221,5 +43221,21 @@
 "matched_functions": 7643,
 "total_functions": 7647,
 "exact": 7643
+},
+{
+"commit": "d58d344",
+"sha": "d58d3441289acf371642de31817318b7e9a46113",
+"time": 1790517648,
+"subject": "Merge agent/b4: UISApi fn_80169DC4 (PatchScrData) exact (EA decl order + labelled fakes), UISApi linked",
+"report": true,
+"matched_code": 1538352,
+"complete_code": 1532032,
+"matched_data": 792003,
+"complete_data": 992151,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7644,
+"total_functions": 7647,
+"exact": 7644
 }
 ]
