@@ -19,8 +19,8 @@ f32 lbl_802821C8;               // } the held ball's offset in its bone (x, y); 
 PictFile* (*lbl_802821C4)(void* pArg);   // reads the next MAD file
 void* lbl_802821C0;             // what the read function is given
 
-void MAD_initdecode(u8* pData, int nMode, int nQuant);
-void MAD_decodemacroblock(u8* pRefY, u8* pRefU, u8* pRefV, u8* pY, u8* pU, u8* pV, int nStride);
+void MAD_initdecode(u8* src, int motion, int quality);
+void MAD_decodemacroblock(u8* src_y, u8* src_cb, u8* src_cr, u8* dest_y, u8* dest_cb, u8* dest_cr, int width);
 u32 fn_800B94B0(PictFile* pFile);
 void fn_800B95FC(PictFile* pFile);
 void fn_800B9624(PictFrame** apList, PictFrame* pFrame);

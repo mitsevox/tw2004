@@ -3,8 +3,8 @@
 
 #include "llpict.h"
 
-void MAD_initdecode(u8* pData, int a, int n);
-void MAD_decodemacroblock(u8* pRefY, u8* pRefU, u8* pRefV, u8* pY, u8* pU, u8* pV, int nStride);
+void MAD_initdecode(u8* src, int motion, int quality);
+void MAD_decodemacroblock(u8* src_y, u8* src_cb, u8* src_cr, u8* dest_y, u8* dest_cb, u8* dest_cr, int width);
 
 void fn_80056204(void) {
 }
