@@ -285,6 +285,7 @@ Skin.c:
 
 Code80037AB8.c:
 	.text       start:0x80037AB8 end:0x80037DD8
+	.bss        start:0x801D4F68 end:0x801D4F80
 	.sdata2     start:0x80283020 end:0x80283028
 
 GoPostFx.c:
@@ -313,6 +314,7 @@ gocamscripts.c:
 
 DepthField.c:
 	.text       start:0x80045660 end:0x80045D18
+	.bss        start:0x801D5110 end:0x801D5228
 	.sdata2     start:0x80283148 end:0x80283168
 
 UObject3D.c:

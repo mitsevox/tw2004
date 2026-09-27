@@ -948,6 +948,7 @@ typedef struct ScreenCopy {
     s32   nSize;                // 0x10  the buffer's size in bytes (fn_8002F454)
 } ScreenCopy;
 
+extern ScreenCopy  lbl_801D4F68;
 extern ScreenCopy* lbl_80281100;
 extern s32 lbl_80281B88;        // bit 0: the video field being drawn
 extern s32* lbl_802811F8;       // points at lbl_80281E80, a copy of lbl_80281B88 (fn_800718E4)
@@ -972,6 +973,7 @@ typedef struct DFBuffer {
 } DFBuffer;
 
 extern DFLayer lbl_801D5110[5];
+extern DFBuffer lbl_801D5188;
 extern DFBuffer* lbl_80281110;
 extern f32 lbl_80281D90;
 extern f32 lbl_80281D94;        // cleared by fn_80045660
