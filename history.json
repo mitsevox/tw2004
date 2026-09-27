@@ -42213,5 +42213,21 @@
 "matched_functions": 7609,
 "total_functions": 7647,
 "exact": 7609
+},
+{
+"commit": "a3a452b",
+"sha": "a3a452b141d68ad4a5f579e03254ea7b5826948d",
+"time": 1790479846,
+"subject": "Merge agent/b5: UISApi fn_801694A0 exact (per-function optimization_level 2, labelled)",
+"report": true,
+"matched_code": 1505716,
+"complete_code": 1375564,
+"matched_data": 779167,
+"complete_data": 925483,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7610,
+"total_functions": 7647,
+"exact": 7610
 }
 ]
