@@ -43717,5 +43717,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "27dd019",
+"sha": "27dd01941d5b1570d95c4b5020aad0888db20bdb",
+"time": 1790542481,
+"subject": "comments: batch 1's functions (16 one-line comments where the name alone does not say it)",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
