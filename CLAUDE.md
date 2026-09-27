@@ -28,10 +28,11 @@ decomp.dev and PC jobs: `docs/infrastructure.md`.
   backslashes. Use the editor tools; a repeated edit is a saved Python script, and its diff is read.
 - **Names and comments need evidence** (docs/style.md "Where names and comments come from"): EA's
   text, a TW06/TW07 name the code confirms, or two blind readers + a reconciler (agents/roles/audit.md).
-  Since 2026-09-27 (owner) a naming lane may also name a function and write its missing comment
-  from its own reading of the code (tier T3), in one pass through `tools/match/name.py`; never
-  contradicting the code, never overwriting an existing comment. Matching lanes write ONLY matching notes (`fake match:`, `EA bug:`, `port:`, register / data-order
-  / section notes), never rename, never change an existing comment.
+  Since 2026-09-27 (owner; the match is done, readability is the job) a naming lane names a
+  function from its own reading of the code (tier T3) and OWNS its comment: adds a missing one and
+  rewrites a wrong, stale or vague one, in one pass through `tools/match/name.py`. Never
+  contradicting the code; `fake match:` / `port:` / `EA bug:` labels are kept (their text may be
+  corrected). Matching lanes (reworking a match) write ONLY matching notes and never rename.
 - **The audit baseline** (git tag `audit-baseline-1`): every game function's name and comments were
   audited to 100% on 2026-09-24. `python tools/match/auditbaseline.py` sorts code into audited /
   draft / changed / new / headers. At 100% match the code gets partitioned with it.

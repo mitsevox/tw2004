@@ -21,10 +21,17 @@ your files' named / commented / done counts; report them before and after.
    `Vec_`/`Vec3_`, `Mtx_`, `Quat_`, `RenderState_`, `Ter_`, `GM_`, `MC_`, `SitDev_`, `Emi_`, `GUI_`,
    `FE_`, `EASB_`). Say what it does, not how. No address, no "maybe": the tier says how sure.
    A copy of a helper another file already has gets the file's prefix: `GolfCam_Vec3Sub`.
-4. Comment (column 8) when the name does not say everything a caller needs: units, ranges, what
-   0/NULL means, bit layouts, side effects, which game feature it serves. One or two sentences, plain
-   words, true to the code. Short getters with a clear name need none. A function that already has
-   a comment keeps it; if you think it is wrong, list it in your report (do not edit it).
+4. You OWN the comment of every function you touch (owner, 2026-09-27). Read the existing one
+   against the code. Keep it if it is right and clear. Otherwise write the whole comment in column
+   8 and name.py replaces the old one: wrong claims, stale matching-era notes ("stays at 91%",
+   "no C yet", "not matched"), `fn_`/`lbl_` names where a real name exists, vague text ("the
+   parameters", "a value") that a reader cannot use. Write one where there is none and the name does
+   not say everything a caller needs: units, ranges, what 0/NULL means, bit layouts, side effects,
+   which game feature it serves. Plain words, true to the code. Short getters with a clear name need
+   none. Keep every `fake match:`, `port:` and `EA bug:` label (name.py refuses to drop one; each
+   starts its own line); correct its text if it is stale. A comment you are not sure how to fix:
+   leave it and list it in the report. Struct field comments in include/ that you find wrong: fix
+   them with the Edit tool and list each in the report (they are replayed by hand).
 5. Skip rather than guess wrong: raw sweep code (`src/unsorted/`), a function you cannot explain
    after reading its callers. List skips in the report with why.
 

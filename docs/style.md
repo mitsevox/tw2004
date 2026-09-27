@@ -69,10 +69,11 @@ one of two things before it goes in:
   comments) that agree on what it does, reconciled against the code (`tools/match/blindview.py`,
   the audit ledger).
 - **One reading of the code (since 2026-09-27, owner):** a naming lane that has read a function
-  names it and, when it has no comment, writes one in the same pass (`tools/match/name.py`,
-  column 8): what it does in the game, read from the code, never contradicting it. Tier T3 in
-  `name_sources.tsv`; no address suffix or confidence marker in the name. An existing comment is
-  never overwritten by this: one that looks wrong is reported.
+  names it and owns its comment in the same pass (`tools/match/name.py`, column 8): adds one where
+  it is missing, rewrites one that is wrong, stale (status notes from the matching era) or vague.
+  What it does in the game, read from the code, never contradicting it. Tier T3 in
+  `name_sources.tsv`; no address suffix or confidence marker in the name. `fake match:`, `port:`
+  and `EA bug:` labels stay (name.py refuses to drop one); their text may be corrected.
 
 Matching work writes only matching notes (`fake match:`, `EA bug:`, `port:`, register, data-order
 and section notes) and keeps `fn_`/`lbl_` names. Behaviour comments and names come from the audit
