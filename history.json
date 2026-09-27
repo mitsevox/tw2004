@@ -43797,5 +43797,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "20f0e10",
+"sha": "20f0e106e9c8c676aedff3e3533df8516b9c7d3f",
+"time": 1790543539,
+"subject": "names: char.c (nm1: 25 names, 4 comments)",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
