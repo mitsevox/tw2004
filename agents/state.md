@@ -3,6 +3,13 @@
 Updated 2026-09-25 ~21:30 CDT. How the machines, CI, the page and PC jobs fit together:
 docs/infrastructure.md. History: docs/journal.md.
 
+**2026-09-27 ~13:00 UTC:** 7,641/7,647 exact. OWNER HOLD: no more matching work on IStudio (UIS*)
+until the owner's research and the Madden NFL 2003 PS2 lead are in (Madden 2003 prototype, EA Tiburon
+2002, has IStudio with .mdebug/STABS: UIStudio.c, UISEvent.c; being extracted to
+docs/reference-builds/madden2003-ps2/, binary in /home/user/refs, off git). Open: IStudio x4 (held),
+LLFont x2 (b11 lane; Codex fn_8001144C). /dev/null was deleted by a lane again (b11, 09:13); restored
+by the orchestrator with the owner's OK.
+
 **Running (BATTLE PLAN, 2026-09-27 02:17 UTC, agents/assign/2026-09-27-battle-plan.md):** one lane = one
 function, no permuter, refill from the queue. b1 char fn_8001F110, b2 uiProcessInterface fn_8008F820,
 b3 hlaudtrackstm Stm_Tick, b4 UISApi fn_80169D90, b5 UISApi fn_80168CD8, b6 UISScreen fn_8016C6C4,
