@@ -677,7 +677,7 @@ GoShaderObject_Particle_Gc.c:
 
 LLTime.c:
 	.text       start:0x800952D8 end:0x8009554C
-	.bss        start:0x801D97F8 end:0x801D9880
+	.bss        start:0x801D97F8 end:0x801D9908
 
 unsorted/sweep_8009554C.c:
 	.text       start:0x8009554C end:0x80095564

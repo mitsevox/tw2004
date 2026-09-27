@@ -58,7 +58,9 @@ typedef struct ProfClock {
     ProfTime tStart;            // 0x00  when TI_vInitModule set it up
     ProfTime tNow;              // 0x08  the last reading
     ProfWatch aWatches[5];      // 0x10
+    u8   unk88[0x110 - 0x88];   // 0x88  no code found reads these (size: lbl_801D97F8's 0x110 bytes)
 } ProfClock;
+LAYOUT_ASSERT(ProfClock, 0x110);
 
 extern ProfClock  lbl_801D97F8;
 extern ProfClock* lbl_802813B0;
