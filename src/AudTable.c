@@ -1,4 +1,6 @@
-// AudTable.c (our name): the sound engine's table of 256 playing sounds (AudSource, 0x7C bytes
+// AudTable.c (our name; EA's file is HLAudEmitter.c: TW07's golf/audio/engine/hl/HLAudEmitter.c
+// has these Emi_ functions and, inline, its statics FreeAllPerfs to PreprocessControllers; TW06
+// lists hl/hlaudemitter.c): the sound engine's table of 256 playing sounds (AudSource, 0x7C bytes
 // each), allocated from the audio memory stack (UAudMemStack.c's fn_800B5BD8) by Emi_InitModule and
 // reached through lbl_80282058. Each entry plays a bank sound's tracks and, for a sound placed in
 // the world, works out its volume, pan and doppler pitch from its distance to the listeners. Its

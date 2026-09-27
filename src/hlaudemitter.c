@@ -1,11 +1,13 @@
-// hlaudemitter.c (TW06's name, by structure: golf/audio/engine/hl/hlaudemitter.c, after
-// hlaudvoice.c and before UAudContainers.c; TW07 has the same Aud_Emi* functions, in the same
-// order, in golf/audio/engine/special/HLAudEmitterPool.c): the sound engine's emitter instances, a
-// pool of 256 (0x34 bytes each, lbl_801F2740) found by id (Aud_CheckEmitterInstance). Most calls
-// check the id (0xFF: none), then pass on to AudTable.c's Emi_* functions (TW07 HLAudEmitter.c).
-// Its extent is its data: it is the first to use the .bss at 0x801F2668 and the .sdata2 block
-// 0x80284008-0x80284018.
-// An instance's pCmd is its AudTable.c entry (Emi_AddInstance's AudSource, the same number).
+// hlaudemitter.c (our name; EA's file is HLAudEmitterPool.c: TW07's
+// golf/audio/engine/special/HLAudEmitterPool.c has these Aud_Emi functions in the same order, and
+// TW06 lists special/hlaudemitterpool.c too. EA's hl/hlaudemitter.c is our AudTable.c.): the sound
+// engine's emitter instances, the game's handles on playing sounds. A pool of 256 (0x34 bytes
+// each, lbl_801F2740) found by id (Aud_CheckEmitterInstance; 0xFF: none); instances of the same
+// sound can be grouped under an emitter (EA: an alias) and driven together (Aud_EmiAlias*). Most
+// calls check the id, then queue the command in the instance's AudTable.c entry (its pCmd, the
+// same number) or pass it on to AudTable.c's Emi_ function; Aud_EmiCycle hands the queued commands
+// over once a frame. Its extent is its data: it is the first to use the .bss at 0x801F2668 and the
+// .sdata2 block 0x80284008-0x80284018.
 
 #include "core/audtrack.h"
 #include "golfer.h"

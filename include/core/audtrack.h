@@ -330,7 +330,8 @@ typedef struct AudSource {
                                 //        sequencer's event fn_800AAB48 sets bits too)
     u8   u1;                    // 0x1    tracks switched off (and fn_800AAB48, for events whose n4 is 0)
     u16  uChanged;              // 0x2    bits 0-7: that track's auParams was set; 0x200: u0 / u1
-    u32  auParams[8];           // 0x4    per track (hlaudemitter.c's Aud_EmiSetControllerInt)
+    u32  auParams[8];           // 0x4    each track's controller value (Aud_EmiSetControllerInt;
+                                //        streamed tracks: PreprocessControllers)
     f32  aPos[2][3];            // 0x24   where it is from each listener (fn_800B1A40 measures it)
     AudSound* pSound;           // 0x3C
     s16  nSound;                // 0x40   its number (fn_800A85CC)
@@ -357,7 +358,8 @@ typedef struct AudInstance {
     f32  vPos[4];               // 0x10   its position (Aud_EmiSet3DPos)
     u8   nId;                   // 0x20   its number (its index in lbl_801F2740)
     s8   nEmitter;              // 0x21   the emitter whose list it is in (-1: none)
-    u8   u22;                   // 0x22   bits cleared by Aud_EmiTrkCB
+    u8   u22;                   // 0x22   tracks playing, a bit each (Aud_EmiGetTrackStatus; set by
+                                //        Aud_EmiSetTrackStatus, cleared by Aud_EmiTrkCB)
     u8   unk23;
     s32  n24;                   // 0x24   1: Aud_EmiCycle sends vPos again every frame
     s32  n28;                   // 0x28   0: vPos is moved into each view's camera space

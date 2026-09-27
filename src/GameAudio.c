@@ -1,7 +1,12 @@
-// GameAudio.c (our name): the game's side of the sound engine. Aud_InitOnce starts the engine
-// (memory stack, ARAM, sound table, movie sound, banks) one step after another; the rest drives
-// the sound emitters (hlaudemitter.c's fn_800AD*) from the game: the course, the game mode and the
-// pin set. Its extent is proven by its data: every section starts and ends on 8-byte boundaries
+// GameAudio.c (EA's name: TW07's golf/audio/GameAudio.c and TW06's gameaudio.c have its Gaud_
+// functions, mostly in the same order): the game's side of the sound engine. It sets up the front
+// end's and each hole's emitters (Gaud_InitFE, Gaud_InitHole) and plays through them what happens
+// in the game: the swing and the ball, the crowd, the commentary, the music or the course's
+// ambience, the weather, the GameBreaker and the special swing cameras, the target and long-drive
+// games. It also holds engine calls that TW07 keeps in HLAudEmitterPool.c (our hlaudemitter.c):
+// Aud_InitOnce, which starts the engine (memory stack, ARAM, sound table, movie sound, banks) one
+// step after another, Aud_Pause, Aud_Mute, the listener (Aud_Mic) calls, Aud_EmiSetTrackStream and
+// the movie and session calls; their data places them here. Its extent is proven by its data: every section starts and ends on 8-byte boundaries
 // shared with no other file (.rodata 0x80183AD8-0x80183B08, .data 0x8018E988-0x8018EB30,
 // .bss 0x801F1790-0x801F17D0, .sdata 0x80281418-0x80281460, .sbss 0x80282020-0x80282058,
 // .sdata2 0x80283F48-0x80283F88), and all its functions share those globals.
@@ -24,7 +29,7 @@ void Aud_EmiSetControllerInt(u8 nId, u8 nTrack, u32 uParams);
 void Aud_EmiSetTrackVarRange(u8 nId, u8 nTrack, u8 n);
 void Aud_EmiSet3DPos(u8 nId, f32* pPos, f32* pLast, u8 b);
 void Aud_EmiSetTrackPitchFactor(u8 nId, u8 nTrack, f32 fPitch);
-void Aud_EmiAliasSet3DPos(s16 nKind, f32* pPos, f32* pLast, u8 b);  // types unproven
+void Aud_EmiAliasSet3DPos(s16 nKind, f32* pPos, f32* pLast, u8 b);
 
 void fn_8010D3D8(int nPlayer);
 u8   fn_8006BEA4(void);                    // emotion.c: a scripted GameBreaker's letterbox is up
@@ -33,8 +38,9 @@ void Aud_EmiSetTrackAttenuation(u8 nId, u8 nTrack, f32 fVolume);
 void fn_800DC6E8(int nPlayer);
 u8   fn_8006BAD8(int nPlayer, s32* pOut);
 f32  fn_8006C630(void);
-// hlaudemitter.c: makes an emitter for sound nSound; the callback is told when a track stops
-// (Aud_EmiTrkCB). The other types are unproven.
+// hlaudemitter.c: an emitter instance for sound nSound, in emitter nKind's group (-1: none), a its
+// n24 (1: its position is sent every frame), b its n28 (0: placed in camera space); the callback
+// hears its tracks' reports (Aud_EmiTrkCB). 0xFF when all 256 are in use.
 u8   Aud_EmiAdd(s16 nSound, s16 nKind, int a, int b, void (*pfnCallback)(u8 nId, u8 nTrack, s32 n));
 void Aud_EmiSetTrackVarRangeTmpl(s16 nSound, u8 nTrack, u8 n);
 void Aud_EmiSetAllTrackStatus(u8 nId, int n);
