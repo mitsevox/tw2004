@@ -39,6 +39,31 @@ u8    lbl_801E7100[0xA000];
 CARDStat lbl_801E3B6C[127];
 CARDFileInfo lbl_801E3180[127];
 
+// This file's .sbss (core/memcard.h, frontend/fe.h), in reverse address order as the compiler
+// lays it out.
+u8    lbl_80282008[MC_NUM_PORTS];
+s32   lbl_80282000[MC_NUM_PORTS];
+s32   lbl_80281FFC;
+s32   lbl_80281FF8;
+s32   lbl_80281FF4;
+MCEagmEntry* lbl_80281FF0;
+SaveImage* lbl_80281FEC;
+SaveImage* lbl_80281FE8;
+SaveImage* lbl_80281FE4;
+SaveImage* lbl_80281FE0;
+SaveImage* lbl_80281FDC;
+SaveImage* lbl_80281FD8;
+u8    lbl_80281FD0[8];                  // 8 bytes in the original (the next object is at +8); only
+                                        // [0] and [1] are used
+s32   lbl_80281FCC;
+s32   lbl_80281FC8;
+u32   lbl_80281FC4;
+u32   lbl_80281FC0;
+UStreamObject* lbl_80281FBC;
+UStreamObject* lbl_80281FB8;
+s32   lbl_80281FB4;
+s32   lbl_80281FB0;
+
 // Before a mount, read, write, delete or format: note the operation's size (lbl_80281FB4) and the
 // CARD library's transfer count so far (nXferStart).
 void fn_8009CB9C(s32 nPort, s32 nSlot, s32 nSize) {
