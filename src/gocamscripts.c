@@ -66,6 +66,12 @@ u8   fn_800DC464(int nPlayer);          // GameEffects.c: the ball is simulated 
 u8   Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                                  SurfaceType** ppSurface, TerObject** ppObj);
 
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x802830A8), before the constants CamScript_RunScript uses first; its body is unknown.
+static f32 gocamscripts_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 // The camera script's frame (a view's &View.script; pShot is the view's hand-built shot19C). Unless
 // paused (or b), it eases the ball-update rate fEC, places the camera for the current and next
 // shots (fn_8003A148 for script shots, bA8 1), then either takes the current shot outright (its look-at
@@ -576,11 +582,17 @@ void fn_8003F2E0(CamScript* pScript, f32 fTime) {
         fn_80038010(1, fn_80016D10(), v);
         break;
     case 2:
-        v[3] = pScript->f94 > 0.0f ? pScript->v40[3] - pScript->v40[3] * (pScript->f90 / pScript->f94) : 0.0f;
         {
-            f32 f = v[3];
-            v[3] = f < 0.0f ? 0.0f : (f > pScript->v40[3] ? pScript->v40[3] : f);
+            f32 f;
+
+            if (pScript->f94 > 0.0f) {
+                f = pScript->v40[3] - pScript->v40[3] * (pScript->f90 / pScript->f94);
+            } else {
+                f = 0.0f;
+            }
+            v[3] = f;
         }
+        v[3] = v[3] < 0.0f ? 0.0f : (v[3] > pScript->v40[3] ? pScript->v40[3] : v[3]);
         fn_80038010(1, fn_80016D10(), v);
         break;
     case 3:
@@ -847,6 +859,64 @@ void fn_8003FD54(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     pScript->fA8 = fT * (pNext->f9C - pShot->f9C) + pShot->f9C;
 }
 
+// Blend kind 14: the camera moves on the straight line between the two shots' positions. The point
+// it looks at is the current shot's look-at point plus the share of the way from a point along the
+// current view direction (at the ball's level distance from the camera) to the next shot's look-at
+// point.
+void CamScript_LerpSwingToBallFlightCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev,
+                                            f32 fTime) {
+    f32 vDir[4];
+    f32 vFromAim[4];
+    f32 vMove[4];
+    f32 vPos[4];
+    f32 vBall[4];
+    CamShot* pShot = pScript->pShot;
+    CamShot* pNext = pScript->pNextShot;
+    f32 fT = fn_8003F790(pScript);
+    f32 f;
+    f32 f90;
+
+    fn_80045428(pScript->v10, pScript->v0, vMove);
+    fn_8001EF34(fT, vMove, vPos);
+    fn_8004544C(vPos, pScript->v0, vPos);
+    Vec3Copy(vPos, pCam);
+    fn_80045428(pScript->v0, pScript->a20, vFromAim);
+    CamScript_GetLookAtPoint(pShot, nPlayer, pScript->a20, pScript->v0, pScript, pPrev, fTime);
+    fn_80045428(pScript->a20, pScript->v0, vDir);
+    if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
+        fn_800BAF04(vDir, vDir);
+    }
+    fn_80045428(gPlayers[nPlayer].ball.vPos, pScript->v0, vBall);
+    vBall[1] = 0.0f;
+    fn_8001EF34(fn_80009680(fn_80009744(vBall)), vDir, vDir);
+    fn_8004544C(vDir, pScript->v0, vDir);
+    CamScript_GetLookAtPoint(pNext, nPlayer, &pScript->a20[4], pScript->v10, pScript, pPrev, fTime);
+    fn_80045428(&pScript->a20[4], vDir, vMove);
+    fn_8001EF34(fT, vMove, vPos);
+    fn_8004544C(vPos, pScript->a20, vPos);
+    Vec3Copy(vPos, pSub);
+    f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
+    f += GameEffects_FieldOfViewChange();
+    if (fn_80044E74(pScript->pShot)) {
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), f);
+    } else {
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), f);
+    }
+    f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
+    f += fn_800DC45C(f);
+    fn_800457B8(nPlayer, f);
+    f = fT * (pNext->f8C - pShot->f8C) + pShot->f8C;
+    f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
+    if (f > 0.0f || f90 > 0.0f) {
+        if (fn_80044E74(pShot)) {
+            fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f);
+        } else {
+            fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f);
+        }
+    }
+    pScript->fA8 = fT * (pNext->f9C - pShot->f9C) + pShot->f9C;
+}
+
 // Blend kind 3: the camera and the point it looks at follow splines (fn_800C7480) through the
 // current and next shots, with the shot before the current one (p44) and the one after the next
 // (p40) as the outer points (or the shots' own when there are none), the field of view with them;
@@ -1006,63 +1076,6 @@ void CamScript_CircleCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScri
     fn_800457B8(nPlayer, f);
     f = fShare * (pNext->f8C - pShot->f8C) + pShot->f8C;
     f90 = fShare * (pNext->f90 - pShot->f90) + pShot->f90;
-    if (f > 0.0f || f90 > 0.0f) {
-        if (fn_80044E74(pShot)) {
-            fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f);
-        } else {
-            fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f);
-        }
-    }
-    pScript->fA8 = fT * (pNext->f9C - pShot->f9C) + pShot->f9C;
-}
-
-// Blend kind 14: the camera moves on the straight line between the two shots' positions. The point
-// it looks at is the current shot's look-at point plus the share of the way from a point along the
-// current view direction (at the ball's level distance from the camera) to the next shot's look-at
-// point.
-void CamScript_LerpSwingToBallFlightCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
-    f32 vDir[4];
-    f32 vFromAim[4];
-    f32 vMove[4];
-    f32 vPos[4];
-    f32 vBall[4];
-    CamShot* pShot = pScript->pShot;
-    CamShot* pNext = pScript->pNextShot;
-    f32 fT = fn_8003F790(pScript);
-    f32 f;
-    f32 f90;
-
-    fn_80045428(pScript->v10, pScript->v0, vMove);
-    fn_8001EF34(fT, vMove, vPos);
-    fn_8004544C(vPos, pScript->v0, vPos);
-    Vec3Copy(vPos, pCam);
-    fn_80045428(pScript->v0, pScript->a20, vFromAim);
-    CamScript_GetLookAtPoint(pShot, nPlayer, pScript->a20, pScript->v0, pScript, pPrev, fTime);
-    fn_80045428(pScript->a20, pScript->v0, vDir);
-    if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-        fn_800BAF04(vDir, vDir);
-    }
-    fn_80045428(gPlayers[nPlayer].ball.vPos, pScript->v0, vBall);
-    vBall[1] = 0.0f;
-    fn_8001EF34(fn_80009680(fn_80009744(vBall)), vDir, vDir);
-    fn_8004544C(vDir, pScript->v0, vDir);
-    CamScript_GetLookAtPoint(pNext, nPlayer, &pScript->a20[4], pScript->v10, pScript, pPrev, fTime);
-    fn_80045428(&pScript->a20[4], vDir, vMove);
-    fn_8001EF34(fT, vMove, vPos);
-    fn_8004544C(vPos, pScript->a20, vPos);
-    Vec3Copy(vPos, pSub);
-    f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
-    f += GameEffects_FieldOfViewChange();
-    if (fn_80044E74(pScript->pShot)) {
-        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), f);
-    } else {
-        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), f);
-    }
-    f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
-    f += fn_800DC45C(f);
-    fn_800457B8(nPlayer, f);
-    f = fT * (pNext->f8C - pShot->f8C) + pShot->f8C;
-    f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
     if (f > 0.0f || f90 > 0.0f) {
         if (fn_80044E74(pShot)) {
             fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f);
@@ -2209,31 +2222,6 @@ void CamScript_CheckOutOfBounds(CamScript* pScript, f32* pCam, f32* pSub, int nP
     }
 }
 
-// With the flagstick in and no fairway fix running (bCF), a camera close to the pin (level
-// distance times the lens's fB0 under CamTuning.f120) is raised towards f124 above it, more the
-// closer it is.
-void CamScript_CheckFlagCollision(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pSaved, f32* pPrev) {
-    f32 vDiff[4];
-    int nPin = Game_CurrentPinSet();
-    CourseInfo* pCourse = fn_8000C594();
-    f32 fDist;
-    f32 fAbove;
-
-    if (pCourse == NULL) return;
-    if (pScript->bCF) return;
-    if (fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut) return;
-    fn_80045428(pCam, &pCourse->pin[nPin].x, vDiff);
-    vDiff[1] = 0.0f;
-    fDist = fn_80009680(fn_80009744(vDiff));
-    fDist *= fn_8001EFFC((u8*)fn_8001F004());
-    if (fDist < lbl_80281F78->f120) {
-        if (pCam[1] - pCourse->pin[nPin].y < lbl_80281F78->f124) {
-            fAbove = pCam[1] - pCourse->pin[nPin].y;
-            pCam[1] += (lbl_80281F78->f124 - fAbove) * (1.0f - fDist / lbl_80281F78->f120);
-        }
-    }
-}
-
 // A spot for the camera on the fairway: of the AI targets nearest the ball, nearest the player's
 // target and 3 past the pin (as seen from Player.vBall), taken nearest the ball first, the first
 // whose level direction to the ball is far enough from the camera's (pSub to the ball); else the
@@ -2374,6 +2362,32 @@ void CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCam, i
     if (!(fHeight < -60000.0f)) {
         vSpot[1] = fHeight + lbl_80281F78->f10C;
         Vec_Copy(vSpot, pOut);
+    }
+}
+
+// With the flagstick in and no fairway fix running (bCF), a camera close to the pin (level
+// distance times the lens's fB0 under CamTuning.f120) is raised towards f124 above it, more the
+// closer it is.
+void CamScript_CheckFlagCollision(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pSaved,
+                                  f32* pPrev) {
+    f32 vDiff[4];
+    int nPin = Game_CurrentPinSet();
+    CourseInfo* pCourse = fn_8000C594();
+    f32 fDist;
+    f32 fAbove;
+
+    if (pCourse == NULL) return;
+    if (pScript->bCF) return;
+    if (fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut) return;
+    fn_80045428(pCam, &pCourse->pin[nPin].x, vDiff);
+    vDiff[1] = 0.0f;
+    fDist = fn_80009680(fn_80009744(vDiff));
+    fDist *= fn_8001EFFC((u8*)fn_8001F004());
+    if (fDist < lbl_80281F78->f120) {
+        if (pCam[1] - pCourse->pin[nPin].y < lbl_80281F78->f124) {
+            fAbove = pCam[1] - pCourse->pin[nPin].y;
+            pCam[1] += (lbl_80281F78->f124 - fAbove) * (1.0f - fDist / lbl_80281F78->f120);
+        }
     }
 }
 

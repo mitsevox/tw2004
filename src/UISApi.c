@@ -104,6 +104,10 @@ void fn_80168EE8(UIStudio* pStudio, u16* puGroup, u16* puScreen) {
 }
 
 // Queues event 3 for a screen and runs the queue, unless an event is being sent right now.
+// fake match: optimization level 1 for this function only. At level 4 the copy-propagation passes
+// fold uScreen into r5 before the argument setup, so pStudio is set after the extsh's instead of
+// EA's `mr r0,r5` copy of uScreen and `mr r5,r31` first (see fn_801694A0).
+#pragma optimization_level 1
 void fn_80168F5C(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
     UISEventData data;
 
@@ -114,6 +118,7 @@ void fn_80168F5C(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
         fn_80165528(pStudio, 0);
     }
 }
+#pragma optimization_level reset
 
 // Unloads a screen. Screens that named it as their previous screen take its previous screen
 // instead; it gets event -1 and the type 9 events queued for it (fn_80165ACC), its nodes and rate
