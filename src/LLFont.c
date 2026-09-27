@@ -278,6 +278,11 @@ void fn_80011310(LLFont* pFont, UFontState* pState) {
     GXSetBlendMode(1, 4, 5, 15);
 }
 
+// fake match: the inline parameter keeps EA's multiply operand order without changing the value.
+static inline f32 fn_8001144C_Read(f32 fValue) {
+    return fValue;
+}
+
 // Draws sz (NULL: pCtx->szText) in pFont with pCtx's settings, one textured quad a glyph. uA8 set:
 // word-wrap it through fn_80011D0C, which calls back here a line at a time. n9C bit 0x10000
 // draws a shadow first (colour nC4/uC8, moved by fCC, fD0). The low byte of n9C aligns the text
@@ -469,10 +474,10 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
                     fX1 = fRight * fScaleX + fX0;
                     fBottom = fNegSin * pGlyph->fWidth;
                     fY1 = fBottom * fScaleY + fY0;
-                    fX3 = fX0 + fSin * pGlyph->fHeight * fScaleX;
+                    fX3 = fX0 + fSin * pGlyph->fHeight * fn_8001144C_Read(fScaleX);
                     fHeightY = fCos * pGlyph->fHeight;
                     fY2 = fY1 + fHeightY * fScaleY;
-                    fX2 = fX1 + fSin * pGlyph->fHeight * fScaleX;
+                    fX2 = fX1 + fSin * pGlyph->fHeight * fn_8001144C_Read(fScaleX);
                     fY3 = fY0 + fHeightY * fScaleY;
                 } else {
                     fX0 = fLeft + fOffX;
