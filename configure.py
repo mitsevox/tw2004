@@ -244,6 +244,7 @@ cflags_base = [
     "-multibyte",  # For Wii compilers, replace with `-enc SJIS`
     "-i include",
     f"-i build/{config.version}/include",
+    f"-i build/{config.version}/gen",   # tools/build/gendata.py's fragments of game data
     f"-DBUILD_VERSION={version_num}",
     f"-DVERSION_{config.version}",
     "-DVERSION=0",  # SDK revision selector for extern/sdk, see include/GameVersions.h
@@ -400,7 +401,11 @@ gen_dol = Path("orig") / config.version / "sys" / "main.dol"
 gen_symbols = Path("config") / config.version / "symbols.txt"
 gen_units = ["AXComp.c", "DSPCode.c"]
 if args.mode == "configure" and gen_dol.exists():
+    from tools.build.gendata import FRAGMENTS as gen_fragments
     from tools.build.gendata import generate as generate_data
+
+    # Game data the game units #include from the same directory (a font, sounds, textures).
+    gen_units += list(gen_fragments)
 
     generate_data(gen_dol, gen_symbols, gen_dir)
     config.custom_build_rules = [

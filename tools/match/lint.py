@@ -169,7 +169,8 @@ UB = [('ub-missing-return', 'return value expected'),
 CFLAGS = ['-nodefaults', '-proc', 'gekko', '-align', 'powerpc', '-enum', 'int', '-fp', 'hardware',
           '-Cpp_exceptions', 'off', '-O4,p', '-inline', 'smart', '-nosyspath', '-RTTI', 'off',
           '-fp_contract', 'on', '-str', 'reuse', '-common', 'on', '-multibyte', '-lang=c',
-          '-i', 'include', '-i', 'build/GW4E69/include', '-DBUILD_VERSION=0', '-DVERSION_GW4E69',
+          '-i', 'include', '-i', 'build/GW4E69/include', '-i', 'build/GW4E69/gen',
+          '-DBUILD_VERSION=0', '-DVERSION_GW4E69',
           '-DVERSION=0', '-DNDEBUG=1', '-w', 'all', '-msgstyle', 'gcc']
 
 

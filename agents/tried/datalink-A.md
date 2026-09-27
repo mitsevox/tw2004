@@ -137,3 +137,19 @@ result.
 - Done: both defined at the top of MC.c (with prototypes of the table's functions, and core/easb.h
   for two EASportsBio ones); entries whose definitions have other types are cast to MCOp, with a
   port: note. main.dol: OK.
+
+## auto_05_8018FFC8_data (4064 B): DiscError.c's .data (font generated at build time)
+
+- Contents: 24 zero bytes (unreferenced), the font lbl_8018FFE0 (u32[107 * 8]), the colours
+  lbl_80190D40 (DiscColor[9]), 4 zero bytes, the 15 English messages and their table
+  lbl_80190F6C; DiscError.c's .data (its switch table) followed at 0x80190FA8. All users DiscError.
+- Orchestrator decision: the font bitmap is game art, so its bytes never enter git.
+  tools/build/gendata.py now also writes initializer fragments (FRAGMENTS) into
+  build/GW4E69/gen from the user's main.dol; DiscError.c #includes DiscError_font.inc between the
+  braces; the game cflags (configure.py cflags_base) and lint.py's compile get -i build/GW4E69/gen;
+  the fragments are outputs of the existing pre-compile gendata step.
+- Tries: (1) the 24 zero bytes as an explicit_zero_data u32[6]: the linker strips it (nothing
+  references it; everything after shifted by 0x18). config.yml force_active: [lbl_8018FFC8] keeps
+  it. (2) the 4-byte gap before the messages: a 4-byte zero object goes to .sdata; instead the
+  first message is a named char array with aligned(8) (labelled fake match), the rest literals.
+- Result: DiscError .data 0x8018FFC8..0x80190FE0. main.dol: OK; `git ls-files` lists no .inc.
