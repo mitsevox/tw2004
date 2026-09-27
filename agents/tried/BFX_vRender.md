@@ -1,6 +1,6 @@
 # BFX_vRender (goballfx.c, 0x80093AE0)
 
-Status: OPEN, 90.12766% on 2026-09-25.
+Status: OPEN, 97.80142% on 2026-09-27 (b2: colours copied directly between the globals).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -21,6 +21,53 @@ unless you combine it with something new. Before you stop, add every attempt und
   `[(s64)n]`, per-site or all sites) on the 20 base: 25-80. One `(u32)(s64)(s32)nPlayer` round trip
   on any single `[nPlayer]` index, or `(u8)(s64)(s32)` on one loaded byte, on the 16 base, UV block
   at 4 places: 16 best (none), the rest 47-120 (breaks the frontend CSE).
+  On the 16 base, also no gain: GXColor-typed source and/or destination tables (16 each); a subset
+  of the bytes in locals, every declaration order (20-30); per-function pragmas (scheduling off/
+  once/604/7400, opt_propagation/common_subs/dead_assignments off 32-79, opt_lifetimes/
+  loop_invariants/strength_reduction/dead_code/unroll off and optimization_level 3: all 16,
+  level 2 54, level 1 331, peephole off 114); 64-bit spellings (`(s64)n << k`, `* N`, `(u64)`,
+  `(s32)(...)`, `[(s64)n]`, round trip) on the UV / pColour / colour-table row at all, first,
+  second or last use (22-107).
+  **Why the last two registers are hard (model, scratch ea_*.py, s750f.py, s750p.py):** the
+  allocator colours in descending vreg order, lowest free register. On this base the order is
+  backend temps, then O4 (n*4) @9, O16 (n*16) @10, R/G/B/A @11-14, O32 (n*32) @15. For blue to take
+  r8, a value in r7 must be live at blue's load and coloured before it; the only r7 value in EA's
+  code is n*4, whose last use is red's lbzx, which precedes blue's load in every schedule we get.
+  For n*32 to take r10, r7, r8 and r9 must be live somewhere in its range; nothing in EA's code is
+  ever in r9, so EA's pre-allocation code had a value there that vanished (a dead srawi). An
+  exhaustive replay (current pre-RA order, all positions and colouring slots): no single point
+  phantom, no two point phantoms (also with any one instruction moved) give EA's registers; two
+  phantoms WITH live ranges would (12k placements), but a dead srawi is a point: its consumer
+  (e.g. the dead `rlwinm hi,5` of `(s64)n << 5`) is deleted before liveness, so it only interferes
+  with values live across its def (checked: dump of `(s64)nPlayer << 5` on one UV store, srawi
+  r39 @15 has 7 neighbours, none defined after it). A dead srawi DOES extend the live range of the
+  value it reads (a round trip on n*4 keeps n*4 live to the srawi): the model finds blue right with
+  one such srawi on n*4 placed after blue's load, but n*32 still needs a point phantom in r9 inside
+  its short range while r0, r3..r8 are live, which none of the searched schedules has. With a free
+  pre-RA order the nearest solutions move the pPos `add` after the colour/UV address work (a
+  schedule the first pass never makes: the add is on the critical path). The first-pass model
+  (sched750 + an FPU unit, FP ops complete after 3 cycles, alias-aware memory edges: constant-pool
+  loads free, distinct globals unordered, pBall loads 'unknown'; the dump's B8 + B9-before-the-call
+  are one block to the scheduler) reproduces every GPR instruction of B8's real first pass on 7
+  dumps (only the stb / UV-stfs interleave differs). In that model dead srawis land at the block's
+  end (low height), extending their sources to the end.
+  What WOULD give EA's registers on today's pre-RA order (model, ea_src.py / ea_src3.py): (a) three
+  dead srawis inside n*32's range right after its rlwinm, two reading n*4 and one reading the UV
+  `lis` (or the pColour `addi`), the first coloured after the bytes and before n*32 (it takes r9);
+  or (b) `li r3,0x70` moved up to just after the UV `addi`, then two srawis: one reading any
+  live-through value inside n*32's range (r9) and a later one reading n*4. Neither is reachable:
+  in the first-pass model every single srawi (any source, any input position: 24 distinct
+  schedules) and every pair (1,152 distinct schedules, ea_pipe4.py) leaves blue and n*32 wrong,
+  and the srawis always issue after the UV `add`. A real `(s64)(s32)` round trip on the n*4 offset
+  breaks the CSE of the colour row (flat / row-pointer spellings with the round trip: 63-76).
+  Checked for decomp-notes (dead srawi deletion): in the dump of `r = lbl_80189CB0[(s64)nPlayer][0]`
+  (scratch dump_t1) `srawi r0,r30,31` is the block's last GPR def (nothing later in B8 writes r0;
+  B9 is the call) and backend-14 (post-RA peephole) has no srawi: the "later overwrite in the same
+  block" rule is incomplete; a register dead at the block's end (here r0 before a call) also
+  lets it go.
+  Next step if anyone continues: find a C form whose first pass issues `li r3,0x70` (the call
+  argument) or a round trip's srawi before the UV `add` (s750p.py predicts a variant's first pass
+  from a mwccdbg dump in seconds; ea_dump.py / ea_pipe3.py score the allocation).
 - 2026-09-27 b2 (quicktrial aligned; current source 31, all four colour bytes read direct
   `lbl_80189CB0[nPlayer][k]` = "DIRECT" 32). Scripts in the lane scratch (bfx*.py, climb*.py,
   phsim*.py). Two real levers found, one wall:
