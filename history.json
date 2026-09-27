@@ -43653,5 +43653,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "ceb57c8",
+"sha": "ceb57c878cceee2fc9d90686049401d5a647e68d",
+"time": 1790539190,
+"subject": "cleanup: drop matching-era records (tried-ledger, assignments, sweep and orphan-data dumps, dead ledger tools)",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
