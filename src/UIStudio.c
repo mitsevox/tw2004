@@ -17,6 +17,9 @@ void fn_80168644(UIStudio* pStudio, UISScreen* pScreen, s32 nKind, void* p, s32 
 // port: the stack keeps pointers in 32-bit words, like the rest of the studio.
 s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, UISNodeInfo* pInfo) {
     UISEventData data;
+    u16* pA1;
+    u16* pA2;
+    u16* pA3;
     UISWord word;
     u16 uGroup;
     u16 uScreen;
@@ -45,20 +48,31 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
     u8 nByte3;
 
     while (pFrame->p10 != NULL) {
+        // fake match: retain the event-word addresses across script instructions.
+        pA1 = &data.aw[1];
+        pA2 = &data.aw[2];
+        pA3 = &data.aw[3];
         uOp = *pFrame->p10;
         pTop = pFrame->pC;
         pFrame->p10++;
         switch (uOp) {
         case 0x02:  // send event 0 (a call to screen group|screen<<16 below the arguments)
+            pA2 = &data.aw[2];
+            pA3 = &data.aw[3];
+            // fake match: give the two opcodes separate address-phi predecessors.
+            goto event0;
         case 0x71:
+            pA2 = &data.aw[2];
+            pA3 = &data.aw[3];
+        event0:
             nArgs = *pFrame->p10;
             pFrame->p10++;
             pArgs = pFrame->pC - nArgs;
             u = pArgs[-1];
             data.aw[0] = u;
-            data.aw[1] = u >> 16;
-            data.aw[2] = pScreen->uGroup;
-            data.aw[3] = pScreen->uScreen;
+            *pA1 = u >> 16;
+            *pA2 = pScreen->uGroup;
+            *pA3 = pScreen->uScreen;
             fn_80165B90(data.aw[2], data.aw[3], pStudio, 0, &data, nArgs, pArgs);
             while (nArgs-- != 0) {
                 pFrame->pC--;
@@ -70,12 +84,12 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             u = *--pFrame->pC;
             uGroup = u;
             uScreen = u >> 16;
-            if (uGroup == 0xFFFF) {
-                uGroup = pScreen->uGroup;
-                uScreen = pScreen->uScreen;
-            }
+            // fake match: join the event-word pointer through the existing branch.
+            pA1 = (uGroup == 0xFFFF)
+                       ? (uGroup = pScreen->uGroup, uScreen = pScreen->uScreen, &data.aw[1])
+                       : &data.aw[1];
             data.aw[0] = uGroup;
-            data.aw[1] = uScreen;
+            *pA1 = uScreen;
             data.au[2] = n;
             fn_80165B90(pScreen->uGroup, pScreen->uScreen, pStudio, 1, &data, 0, NULL);
             break;
@@ -88,7 +102,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 uScreen = pScreen->uScreen;
             }
             data.aw[0] = uGroup;
-            data.aw[1] = uScreen;
+            *pA1 = uScreen;
             fn_80165B90(pScreen->uGroup, pScreen->uScreen, pStudio, 3, &data, 0, NULL);
             break;
         case 0x58: {  // start a rate function (the byte: how many script addresses follow)
@@ -272,6 +286,12 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             break;
         case 0x15:  // int to float, second
             *(f32*)&pTop[-2] = pTop[-2];
+            break;
+        case 0x6A:  // no-op opcode
+            // fake match: retain this opcode's distinct jump-table destination.
+            if (uOp) {
+                break;
+            }
             break;
         case 0x18:  // load through a pointer
             pTop[-1] = *(s32*)pTop[-1];
@@ -498,9 +518,9 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             u = *(u32*)(*(u32*)n + (u32)pScreen->pData);  // port: EA sums the pointer as a u32
             if (u != 0xFFFFFFFF) {
                 data.aw[0] = u;
-                data.aw[1] = u >> 16;
-                data.aw[2] = pScreen->uGroup;
-                data.aw[3] = pScreen->uScreen;
+                *pA1 = u >> 16;
+                *pA2 = pScreen->uGroup;
+                *pA3 = pScreen->uScreen;
                 fn_80165B90(data.aw[2], data.aw[3], pStudio, 0, &data, nArgs, pFrame->pC - nArgs);
                 fn_80165B90(pScreen->uGroup, pScreen->uScreen, pStudio, 3, &data, 0, NULL);
                 while (nArgs-- != 0) {
@@ -511,7 +531,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
         case 0x46:  // send event 6 for a node info
             n = *--pFrame->pC;
             data.aw[0] = 0;
-            data.aw[1] = 0;
+            *pA1 = 0;
             data.au[2] = n;
             data.au[1] = 0;
             data.aw[7] = pScreen->uGroup;
@@ -521,7 +541,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
         case 0x7E:  // send event 5 for a node info
             n = *--pFrame->pC;
             data.aw[0] = 0;
-            data.aw[1] = 0;
+            *pA1 = 0;
             data.au[2] = n;
             data.au[1] = 0;
             data.aw[7] = pScreen->uGroup;
@@ -541,7 +561,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 pEntry = (UISNodeInfo*)((u8*)pScreen->pData + pnList[nEntry + 2]);
                 if (pInfo != pEntry || pEntry->u4 == 0) {
                     data.aw[0] = nId;
-                    data.aw[1] = 0;
+                    *pA1 = 0;
                     data.ap[2] = pEntry;
                     data.ap[1] = pnList;
                     data.aw[7] = pScreen->uGroup;
@@ -553,7 +573,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
         }
         case 0x48:  // send event 3 to the screen that made this one current
             data.aw[0] = pScreen->uPrevGroup;
-            data.aw[1] = pScreen->uPrevScreen;
+            *pA1 = pScreen->uPrevScreen;
             fn_80165B90(pScreen->uGroup, pScreen->uScreen, pStudio, 3, &data, 0, NULL);
             break;
         case 0x49:  // a text's length
@@ -678,7 +698,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
         case 0x54:  // send event 5 for a node info
             n = *--pFrame->pC;
             data.aw[0] = 0;
-            data.aw[1] = 0;
+            *pA1 = 0;
             data.au[2] = n;
             data.au[1] = 0;
             data.aw[7] = pScreen->uGroup;
@@ -1039,9 +1059,9 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             n = *--pFrame->pC;
             u = *--pFrame->pC;
             data.aw[0] = u;
-            data.aw[1] = u >> 16;
-            data.aw[2] = pScreen->uGroup;
-            data.aw[3] = pScreen->uScreen;
+            *pA1 = u >> 16;
+            *pA2 = pScreen->uGroup;
+            *pA3 = pScreen->uScreen;
             data.au[3] = n;
             fn_80165B90(data.aw[2], data.aw[3], pStudio, 8, &data, 0, NULL);
             break;
