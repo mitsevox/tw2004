@@ -1250,7 +1250,7 @@ typedef struct UFontState {
 extern UFontState* lbl_80280DE0;
 
 // LLFont.c: the font renderer UFont.c draws through. A font is a loaded 'sfn ' stream object.
-LLFont* FO_spLoadFontFromStream(void* pData, UFontState* pState);
+LLFont* FO_spLoadFontFromStream(u8* pData, UFontState* pState);
 void fn_80011034(UFontState* pState);
 void fn_80011160(UFontState* pState);
 void fn_800111A4(LLFont* pFont);        // free a font

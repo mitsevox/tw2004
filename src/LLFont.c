@@ -53,12 +53,11 @@ static u8 lbl_80281C88;                 // set while fn_8001144C word-wraps (fn_
 // Makes a font from an 'sfn ' stream object: swaps a little-endian stream, allocates the font with
 // its glyph records and glyphs, builds each glyph's texture coordinates and sizes, and reorders the
 // bitmap's rows of 4-bit texels into the 8x8 tiles of a C4 texture.
-LLFont* FO_spLoadFontFromStream(void* pData, UFontState* pState) {
+LLFont* FO_spLoadFontFromStream(u8* pData, UFontState* pState) {
     LLFontFile* pFile;
-    u8* pBytes;
     LLFont* pFont;
     u8* pRec;
-    int i;
+    s32 i;
     int nPalette;
     int nRowBytes;
     int nTexHeight;
@@ -71,12 +70,13 @@ LLFont* FO_spLoadFontFromStream(void* pData, UFontState* pState) {
     int k;
     f32 fX;
     f32 fY;
+    f32 fX1;
+    f32 fY1;
     u8* pSrc;
     LLTexelPair* pDst;
     LLGlyphRec* pGlyphRec;
 
-    pFile = pData;
-    pBytes = pData;
+    pFile = (LLFontFile*)pData;
     if (pFile->n0C > 100) {
         pFile->n00 = LLFONT_SWAP32(pFile->n00);
         pFile->u04 = LLFONT_SWAP32(pFile->u04);
@@ -90,8 +90,9 @@ LLFont* FO_spLoadFontFromStream(void* pData, UFontState* pState) {
     pFont = fn_80009B34(sizeof(LLFont) + pFile->nGlyphs * sizeof(LLGlyphRec) +
                             pFile->nGlyphs * sizeof(LLGlyph),
                         2, 16, "LLFont.c", 630);
-    pFont->pRecs = (LLGlyphRec*)(pFont + 1);
-    pFont->pGlyphs = (LLGlyph*)((LLGlyphRec*)(pFont + 1) + pFile->nGlyphs);
+    pGlyphRec = (LLGlyphRec*)(pFont + 1);
+    pFont->pRecs = pGlyphRec;
+    pFont->pGlyphs = (LLGlyph*)(pGlyphRec + pFile->nGlyphs);
     fn_80012438(pFont);
     for (i = 0; i < 256; i++) {
         pFont->apGlyphs[i] = NULL;
@@ -109,7 +110,7 @@ LLFont* FO_spLoadFontFromStream(void* pData, UFontState* pState) {
     pFont->u464 = pState->a00[nPalette];
 
     // The glyph records: 12 bytes each from version 200, 11 before.
-    pRec = pBytes + pFile->uGlyphs;
+    pRec = pData + pFile->uGlyphs;
     for (i = 0; i < pFile->nGlyphs; i++) {
         pFont->pRecs[i] = *(LLGlyphRec*)pRec;
         if (pFile->uVersion >= 200) {
@@ -118,11 +119,11 @@ LLFont* FO_spLoadFontFromStream(void* pData, UFontState* pState) {
             pRec += 11;
         }
         pGlyphRec = &pFont->pRecs[i];
-        pFont->apGlyphs[pGlyphRec->aCode[0] + (pGlyphRec->aCode[1] << 8)] = &pFont->pGlyphs[i];
+        pFont->apGlyphs[pGlyphRec->aCode[0] + ((pGlyphRec->aCode[1] << 8) & 0xFF00u)] = &pFont->pGlyphs[i];
     }
 
-    pBytes += pFile->uBitmap;
-    Mem_cpy(&pFont->bitmap, pBytes, sizeof(LLFontBitmap));
+    pData += pFile->uBitmap;
+    Mem_cpy(&pFont->bitmap, pData, sizeof(LLFontBitmap));
     pFont->bitmap.nWidth = LLFONT_SWAP16(pFont->bitmap.nWidth);
     pFont->bitmap.nHeight = LLFONT_SWAP16(pFont->bitmap.nHeight);
     pFont->bitmap.n08 = LLFONT_SWAP16(pFont->bitmap.n08);
@@ -139,27 +140,20 @@ LLFont* FO_spLoadFontFromStream(void* pData, UFontState* pState) {
     for (nTileRow = 0; nTileRow < nTexHeight / 8; nTileRow++) {
         nByte = 0;
         for (nTileCol = 0; nTileCol < nRowBytes / 4; nTileCol++) {
-            pSrc = pBytes + sizeof(LLFontBitmap) + pFont->bitmap.nWidth / 2 * nY + nByte;
+            pSrc = pData + sizeof(LLFontBitmap);
+            pSrc += pFont->bitmap.nWidth / 2 * nY + nByte;
             for (nRow = 0; nRow < 8; nRow++) {
                 // EA compares the byte position with the width in texels.
                 nX = nByte;
-                for (k = 0; k < 2; k++) {
+                for (k = 0; k < 4; k++) {
                     if (nX >= pFont->bitmap.nWidth) {
-                        pDst[0].uFirst = 0;
-                        pDst[0].uSecond = 0;
+                        pDst->uFirst = 0;
+                        pDst->uSecond = 0;
                     } else {
-                        pDst[0].uSecond = *pSrc >> 4;
-                        pDst[0].uFirst = *pSrc++;
+                        pDst->uSecond = (*pSrc >> 4) & 0xF;
+                        pDst->uFirst = *pSrc++;
                     }
-                    nX++;
-                    if (nX >= pFont->bitmap.nWidth) {
-                        pDst[1].uFirst = 0;
-                        pDst[1].uSecond = 0;
-                    } else {
-                        pDst[1].uSecond = *pSrc >> 4;
-                        pDst[1].uFirst = *pSrc++;
-                    }
-                    pDst += 2;
+                    pDst++;
                     nX++;
                 }
                 pSrc += pFont->bitmap.nWidth / 2 - 4;
@@ -177,12 +171,18 @@ LLFont* FO_spLoadFontFromStream(void* pData, UFontState* pState) {
     for (i = 0; i < pFile->nGlyphs; i++) {
         pFont->pGlyphs[i].pRec = &pFont->pRecs[i];
         pGlyphRec = &pFont->pRecs[i];
-        fX = (u16)(pGlyphRec->aX[0] + (pGlyphRec->aX[1] << 8));
-        fY = (u16)(pGlyphRec->aY[0] + (pGlyphRec->aY[1] << 8));
-        pFont->pGlyphs[i].fU0 = fX / (nRowBytes * 2);
-        pFont->pGlyphs[i].fU1 = (fX + pGlyphRec->uWidth) / (nRowBytes * 2);
-        pFont->pGlyphs[i].fV0 = fY / nTexHeight;
-        pFont->pGlyphs[i].fV1 = (fY + pGlyphRec->uHeight) / nTexHeight;
+        fX = pGlyphRec->aX[0] + ((pGlyphRec->aX[1] << 8) & 0xFF00u);
+        fX1 = fX + pGlyphRec->uWidth;
+        fY = pGlyphRec->aY[0] + ((pGlyphRec->aY[1] << 8) & 0xFF00u);
+        fY1 = fY + pGlyphRec->uHeight;
+        fX /= nRowBytes * 2;
+        fX1 /= nRowBytes * 2;
+        fY /= nTexHeight;
+        fY1 /= nTexHeight;
+        pFont->pGlyphs[i].fU0 = fX;
+        pFont->pGlyphs[i].fU1 = fX1;
+        pFont->pGlyphs[i].fV0 = fY;
+        pFont->pGlyphs[i].fV1 = fY1;
         pFont->pGlyphs[i].f18 = pFont->pRecs[i].n08 * (1.0f / 512.0f);
         pFont->pGlyphs[i].f1C = pFont->pRecs[i].n09 * (1.0f / 512.0f);
         pFont->pGlyphs[i].f20 = pFont->pRecs[i].n0A / 448.0f;
