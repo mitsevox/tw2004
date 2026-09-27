@@ -322,11 +322,11 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
     GXColor uSavedColor;
     f32 fGY1;
     f32 fAlignY;
-    f32 fSizeY;
     f32 fGX0;
     f32 fGY0;
     f32 fSavedX;
     f32 fSizeX;
+    f32 fSizeY;
 
     if (pCtx->uA8 != 0 && lbl_80281C88 == 0) {
         lbl_80281C88 = 1;
@@ -395,15 +395,17 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
             fX -= fCos * (fWidth * fAlignX);
             fY += fSin * (fWidth * fAlignX);
         }
-        fX -= fSin * (pFont->f00 * fSizeY * fAlignY);
-        fY -= fCos * (pFont->f00 * fSizeY * fAlignY);
+        fBottom = pFont->f00 * fSizeY;
+        fX -= fSin * (fBottom * fAlignY);
+        fY -= fCos * (fBottom * fAlignY);
     } else {
         if (0.0f != fAlignX) {
             fWidth = fn_80011C90(pFont, pCtx, p);
             bMeasured = 1;
             fX -= fWidth * fAlignX;
         }
-        fY -= pFont->f00 * fSizeY * fAlignY;
+        fBottom = pFont->f00 * fSizeY;
+        fY -= fBottom * fAlignY;
     }
     fRun = 0.0f;
     fAdvScale = pCtx->f78;
@@ -489,9 +491,9 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
                         fGYMid = fZero + pGlyph->f20;
                         fn_8001208C(pCtx, fGradX, fGradY, 0.5f * pGlyph->fWidth + (fRun + pGlyph->f1C),
                                     0.5f * pGlyph->fHeight + fGYMid);
-                } else {
-                    f32 fZero = 0.0f;
-                    fGX0 = fRun + pGlyph->f1C;
+                    } else {
+                        f32 fZero = 0.0f;
+                        fGX0 = fRun + pGlyph->f1C;
                         fGX1 = fGX0 + pGlyph->fWidth;
                         fGY0 = fZero + pGlyph->f20;
                         fGY1 = fGY0 + pGlyph->fHeight;
