@@ -284,7 +284,7 @@ void fn_80011310(LLFont* pFont, UFontState* pState) {
 // across (1: right, 2: centre, 4: by fBC), bits 8-10 down (by fC0 for 0x400); fB8 turns it.
 void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
     f32 fAlignY;
-    f32 fSizeY;
+    f32 fX1;
     LLGlyph* pGlyph;
     char* p;
     f32 fAlignX;
@@ -303,7 +303,7 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
     u8 bMeasured;
     f32 fX0;
     f32 fOffY;
-    f32 fX1;
+    f32 fSizeY;
     f32 fY2;
     f32 fY1;
     f32 fX2;
@@ -485,8 +485,8 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
                                     0.5f * pGlyph->fHeight + fGYMid);
                     } else {
                         f32 fZero = 0.0f;
-                        f32 fGY0;
                         f32 fGX0 = fRun + pGlyph->f1C;
+                        f32 fGY0;
                         fGX1 = fGX0 + pGlyph->fWidth;
                         fGY0 = fZero + pGlyph->f20;
                         fGY1 = fGY0 + pGlyph->fHeight;
