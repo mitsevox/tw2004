@@ -4,7 +4,8 @@ Read `agents/brief.md` first. The "data linked" bar counts data bytes in linked 
 splitter could not assign sits in orphan units named `auto_NN_<ADDR>_<section>` in
 `build/GW4E69/report.json`; matching functions never links it.
 
-The map: `agents/findings/orphan-data/` (datamap.tsv: one row per orphan block with its owner runs;
+(All data is linked since 2026-09-27; this role is kept for reference.) The map (in git at commit
+`6839245`): `agents/findings/orphan-data/` (datamap.tsv: one row per orphan block with its owner runs;
 symbols.tsv: per symbol, the resolved owner and every unit referencing it; summary.txt; the data
 lane's notes). Owners were found from the units whose asm references each symbol, one owner per
 symbol by link order (every data section follows .text link order in this DOL; no common BSS).

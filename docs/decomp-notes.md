@@ -599,8 +599,7 @@ so try EA's own forms (TW07, one local per job, the unswitched loop) before them
   `(((u64)(u32)p << 32) | (u64)(u32)p) >> 32` is p again, but the zero low word it folds makes the
   pass run, and a leftover `li 0` (from other identity chains) is deleted instead of being reused
   by the second CSE for a later `i = 0`. It also adds copy-propagation passes, so levers that
-  count copy-chain links need retuning after it. UISEvent fn_80165E9C 95.59 -> 100
-  (agents/tried/fn_80165E9C.md).
+  count copy-chain links need retuning after it. UISEvent fn_80165E9C 95.59 -> 100.
 - **[verified, fake-match class] A copy chain written after an instruction makes a parameter's
   saved copy its LAST link, which fixes the entry order.** `p = (T*)(u32)((u64)(s64)((u64)(u32)p
   << 32) >> 32);` (an identity; six of them in UISEvent fn_80165E9C) keeps copies of p until late
@@ -835,9 +834,7 @@ Added 2026-09-27 (from the ledgers solved that night; each ledger has the full s
 
 ### New from round 5, the mwcc-debugger round (2026-09-26)
 
-Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "mwcc-debugger");
-per-function readings are in each `agents/tried/<fn>.md`, the batch in
-`agents/findings/2026-09-26-mwccdbg-batch.md`.
+Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "mwcc-debugger").
 
 - **[verified] The allocator's levels**: a variable with more than 28 remaining neighbours cannot be
   placed on the first level and jumps to the top (takes r31). One temp more or fewer is the lever.

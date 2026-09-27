@@ -13,9 +13,11 @@ its own context small. Start of a session (or after a compaction): read `../CLAU
 | `agents/brief.md` | what every lane reads first (rules, environment, reporting) |
 | `agents/roles/matching.md` | a matching / link lane |
 | `agents/roles/audit.md` | the blind name-and-comment audit (lane 1, lane 2, reconciler) |
-| `agents/roles/data.md` | attaching orphan data to its owning unit |
-| `agents/tried/` | **the tried-ledger: one file per function not yet exact** (every attempt, scores, sweep results); lanes read it first and add to it before stopping (`tools/agents/triedledger.py` starts files for new functions, never overwrites) |
-| `agents/findings/` | audit reports (EA bugs, misfiled units), the orphan-data map, older findings |
+| `agents/findings/` | audit reports (EA bugs, misfiled units), name evidence, research that feeds naming and cleanup |
+
+The matching-era records (the per-function tried-ledger `agents/tried/`, lane assignments
+`agents/assign/`, the data-linking role and orphan-data map) were removed after 100%; they are in git
+at commit `6839245`.
 | `tools/agents/` | `new_agent.py`, `merge.py`, `audit_apply.py`, `review.py`, `status.py`, `remain.py` |
 | `docs/reference-builds/` | TW06 (PS2/Xbox) and TW07 (PS3 debug build) inventories; `tw07-ps3/cu/` = EA's functions per source file with parameters and locals; `tw07-ps3/pairs.tsv` = our address -> TW07 function |
 
@@ -34,9 +36,7 @@ with `TW_MAIN`, `TW_WORKTREES`, `TW_SCRATCH`, `TW_PERMUTER`.
 
 Give each lane its own files (units). Shared headers: add, never change what others use; a change
 that touches many lanes' files (a prototype's parameter order, a struct layout) is scheduled for one
-lane while the others avoid those call sites. Rotate unit lists between rounds (fresh eyes), and
-tell lanes to read `agents/tried/<fn>.md` for what was already tried. When merging, check the lane
-added its attempts to the ledger files of the functions it worked on, and that solved ones say SOLVED.
+lane while the others avoid those call sites. Rotate unit lists between rounds (fresh eyes).
 
 ## Per report
 
@@ -53,11 +53,8 @@ added its attempts to the ledger files of the functions it worked on, and that s
 
 ## Outside agents and PC jobs
 
-- **Picking work**: `python tools/agents/diffkinds.py` sorts every non-exact function into LOGIC
-  (instructions missing/extra/different: fixable by reading the asm), CONST (a constant or offset) and
-  REG (register numbers only: roulette). Hand out LOGIC first, weighted by link gain.
-- **Outside agents** (Gemini, ChatGPT/Codex on the owner's Mac) get a written assignment in
-  `agents/assign/<date>-<who>.md`: disjoint unit lists (two agents on one unit tangle), their own
+- **Outside agents** (Gemini, ChatGPT/Codex on the owner's Mac) get a written assignment
+  (`agents/assign/<date>-<who>.md`, created when needed): disjoint unit lists (two agents on one unit tangle), their own
   worktree and branch (`gemini/...`, `codex/...`), the merge rules, what to report. The owner hands
   it over; update the file (a dated UPDATE section on top) when plans change.
 - **Merging their branches**: read the diff, then `git branch -f agent/<name> origin/<branch>` and
