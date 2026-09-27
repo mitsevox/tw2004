@@ -2197,6 +2197,7 @@ UISApi.c:
 UISScreen.c:
 	.text       start:0x8016A2D4 end:0x8016C718
 	.data       start:0x8019D118 end:0x8019D1FC
+	.bss        start:0x80280628 end:0x80280648
 	.sdata2     start:0x802851C0 end:0x802851E8
 
 Common/Checksum/ChecksumCRC32.c:
@@ -2228,7 +2229,7 @@ Common/TagFile/TagFile.c:
 dolphin/gba/GBA.c:
 	.text       start:0x80175F54 end:0x80176280
 	.data       start:0x8019D2C0 end:0x8019D300
-	.bss        start:0x80280660 end:0x80280B60
+	.bss        start:0x80280648 end:0x80280B60
 	.sdata      start:0x80281B60 end:0x80281B68
 	.sbss       start:0x80282A38 end:0x80282A40
 
