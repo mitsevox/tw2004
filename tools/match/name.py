@@ -192,8 +192,11 @@ def main():
         restore('rename.py failed:\n' + r.stdout + r.stderr)
     md = update_markdown(renames) if renames else 0
     ncom, kept = add_comments(rows)
-    for _ in range(3):
+    for _ in range(10):         # a reflowed comment spills into its next line: repeat until stable
+        before_wrap = run(['git', 'diff', '--stat']).stdout + run(['git', 'diff']).stdout[-4000:]
         run([PY, 'tools/match/wraplong.py', '--from-lint', '--diff', 'HEAD'])
+        if run(['git', 'diff', '--stat']).stdout + run(['git', 'diff']).stdout[-4000:] == before_wrap:
+            break
     today = datetime.date.today().isoformat()
     with open(SOURCES, 'a', encoding='utf-8') as f:
         for a, cur, new, tier, codes, ev, purpose, _ in renames:

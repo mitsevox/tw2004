@@ -1406,9 +1406,10 @@ const Vec4    lbl_80183620 = {0.0f, 0.0f, 0.0f, 0.5f};   // 0, 0, 0, 0.5 (assign
 // allows; the reaction shot lines up. Then, unless GUI_CheckMessageQue: without
 // GUI_IsPostShotUIAnimating, once the fade has completed an OOB ball is replaced (low-IQ penalty)
 // and the golfer's turn ends; before that, when the reaction animation is far enough along, it is
-// state 15 (fade to tap-in) if a gimme is allowed, else a fade out starts. With GUI_IsPostShotUIAnimating: a human outside split screen can take a
-// mulligan (button 25, if allowed), watch the replay (button 24, if recorded and allowed) or
-// continue (button 0, GUI_AdvancePostShotUI); a CPU continues on any pad's button 0.
+// state 15 (fade to tap-in) if a gimme is allowed, else a fade out starts. With
+// GUI_IsPostShotUIAnimating: a human outside split screen can take a mulligan (button 25, if
+// allowed), watch the replay (button 24, if recorded and allowed) or continue (button 0,
+// GUI_AdvancePostShotUI); a CPU continues on any pad's button 0.
 void STATEFUNC_ShowYardageUpdate(int nPlayer) {
     View* pV    = ViewController_GetCameraController(gPlayers[nPlayer].nView[0]);
     Vec4  vOffset;
