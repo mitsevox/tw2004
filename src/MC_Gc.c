@@ -18,7 +18,7 @@ void fn_8009DC80(s32 nPort, s32 nSlot, s32 nResult);
 void fn_8009DCE8(void);
 void fn_8009EB30(UStreamObject* pObject);
 void fn_8009EB38(UStreamObject* pObject);
-void fn_8009EB40(s32 nPort, s32 nSlot);
+void MC_OnBusy(s32 nPort, s32 nSlot);
 s32  fn_8009E280(s32 nPort, s32 nSlot, s32 nFile, CARDStat* pStat);
 s32  fn_8009ED34(s32 nPort, s32 nSlot, const char* pName, const char* pBackupName);
 s32  fn_8009EECC(s32 nPort, s32 nSlot, const char* pName);
@@ -113,7 +113,7 @@ void fn_8009CC88(void) {
 
 // Reset: lbl_80282008 0 and lbl_80282000 1 for both ports, no I/O error noted (lbl_80281FD0); then
 // mount slot 0 of each port once and unmount it again, which notes what is in it.
-void fn_8009CD10(void) {
+void MC_Connect(void) {
     int i;
     lbl_80282008[0] = 0;
     lbl_80282008[1] = 0;
@@ -126,10 +126,14 @@ void fn_8009CD10(void) {
     }
 }
 
-void fn_8009CD7C(void) {
+// Empty on the GameCube. The menus and the start-up checks call it when their card work is done;
+// that work begins with MC_Connect or MC_ConnectCard.
+void MC_Disconnect(void) {
 }
 
-void fn_8009CD80(s32 nPort, s32 nSlot) {
+// Looks at the card in nPort, nSlot once (mounts it, notes the result, unmounts it) so its noted
+// state is fresh; the menus call it before a card operation.
+void MC_ConnectCard(s32 nPort, s32 nSlot) {
     fn_8009DCEC(nPort, nSlot);
 }
 
@@ -139,7 +143,7 @@ s32 fn_8009CDA0(s32 nPort, s32 nSlot, const char* pOldName, const char* pNewName
     s32 nResult;
     CARDRenameAsync(nChan, pOldName, pNewName, NULL);
     while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
-        fn_8009EB40(nPort, nSlot);
+        MC_OnBusy(nPort, nSlot);
         fn_8006C63C();
         fn_800A4BDC();
     }
@@ -168,7 +172,7 @@ s32 fn_8009CDA0(s32 nPort, s32 nSlot, const char* pOldName, const char* pNewName
 }
 
 // Open file pName on the card into pFile.
-s32 fn_8009CEF8(int nPort, s32 nSlot, const char* pName, CARDFileInfo* pFile) {
+s32 MC_CardOpen(int nPort, s32 nSlot, const char* pName, CARDFileInfo* pFile) {
     s32 nResult;
     int nChan = nPort;
     do {
@@ -197,7 +201,7 @@ s32 fn_8009CEF8(int nPort, s32 nSlot, const char* pName, CARDFileInfo* pFile) {
 }
 
 // Close pFile.
-s32 fn_8009D010(s32 nPort, s32 nSlot, CARDFileInfo* pFile) {
+s32 MC_CardClose(s32 nPort, s32 nSlot, CARDFileInfo* pFile) {
     s32 nResult;
     do {
         fn_800A4BDC();
@@ -218,7 +222,7 @@ s32 fn_8009D010(s32 nPort, s32 nSlot, CARDFileInfo* pFile) {
 }
 
 // See whether there is a card in the port, and note its size and sector size.
-s32 fn_8009D0D4(s32 nPort, s32 nSlot) {
+s32 MC_CardProbe(s32 nPort, s32 nSlot) {
     s32 nMemSize;
     s32 nSectorSize;
     s32 nResult;
@@ -251,22 +255,22 @@ s32 fn_8009D0D4(s32 nPort, s32 nSlot) {
 // The space a save of kind nKind needs: 40 when its file is not on the card yet (the EA Sports
 // Bio's own size for kind 3), else 0; 40 also when there is no card. Mounts the card for the look
 // if needed. The EA bug of fn_8009D50C is here too.
-s32 fn_8009D1D8(s32 nPort, s32 nSlot, s32 arg2, s32 nKind) {
+s32 MC_BlocksNeededForSave(s32 nPort, s32 nSlot, s32 arg2, s32 nKind) {
     u32 uFlags = lbl_801F1510[nPort][nSlot].uFlags;
     u32 bMounted = (uFlags >> 2) & 1;   // MC_CARD_MOUNTED
     s32 nResult;
     if (nPort == -1 && nSlot == -1) return 40;
     if (!(uFlags & MC_CARD_PRESENT)) return 40;
-    if (fn_8009D0D4(nPort, nSlot) != 0) return 0;
-    if (!bMounted && fn_8009D74C(nPort, nSlot) != 0) return 0;
+    if (MC_CardProbe(nPort, nSlot) != 0) return 0;
+    if (!bMounted && MC_MountCard(nPort, nSlot) != 0) return 0;
     switch (nKind) {
     case 0:
     case 1:
     case 2:
-        nResult = fn_8009D614(nPort, nSlot, MC_FILE_NAME);
+        nResult = MC_FileExists(nPort, nSlot, MC_FILE_NAME);
         break;
     case 3:
-        nResult = fn_8009D614(nPort, nSlot, "EASB");
+        nResult = MC_FileExists(nPort, nSlot, "EASB");
         break;
     default:
         nResult = MC_ERR_NOFILE;
@@ -288,7 +292,7 @@ s32 fn_8009D1D8(s32 nPort, s32 nSlot, s32 arg2, s32 nKind) {
     case 0:
     case 1:
     case 2:
-        if (fn_8009D614(nPort, nSlot, MC_BACKUP_NAME) != 0) return 0;
+        if (MC_FileExists(nPort, nSlot, MC_BACKUP_NAME) != 0) return 0;
         break;
     case 3:
         return 0;
@@ -297,13 +301,13 @@ s32 fn_8009D1D8(s32 nPort, s32 nSlot, s32 arg2, s32 nKind) {
     return 0;
 }
 
-// fn_8009D1D8's count for the game's save, plus the EA Sports Bio's (fn_801255C4).
+// MC_BlocksNeededForSave's count for the game's save, plus the EA Sports Bio's (fn_801255C4).
 s32 fn_8009D390(s32 nPort, s32 nSlot) {
     s32 aPos[2];
     s32 nCount = 0;
     aPos[0] = nPort;
     aPos[1] = nSlot;
-    nCount += fn_8009D1D8(nPort, nSlot, 0, 0);
+    nCount += MC_BlocksNeededForSave(nPort, nSlot, 0, 0);
     nCount += fn_801255C4(aPos);
     return nCount;
 }
@@ -316,10 +320,10 @@ s32 fn_8009D3DC(s32 nPort, s32 nSlot) {
     u32 bMounted = (uFlags >> 2) & 1;   // MC_CARD_MOUNTED
     if (nPort == -1 && nSlot == -1) return 1;
     if (!(uFlags & MC_CARD_PRESENT)) return 1;
-    if (fn_8009D0D4(nPort, nSlot) != 0) return 0;
-    if (!bMounted && fn_8009D74C(nPort, nSlot) != 0) return 0;
-    if (fn_8009D614(nPort, nSlot, MC_FILE_NAME) != 0) return 1;
-    if (fn_8009D614(nPort, nSlot, MC_BACKUP_NAME) != 0) return 1;
+    if (MC_CardProbe(nPort, nSlot) != 0) return 0;
+    if (!bMounted && MC_MountCard(nPort, nSlot) != 0) return 0;
+    if (MC_FileExists(nPort, nSlot, MC_FILE_NAME) != 0) return 1;
+    if (MC_FileExists(nPort, nSlot, MC_BACKUP_NAME) != 0) return 1;
     if (!bMounted && MC_Unmount(nPort, nSlot) != 0) return 0;
     return 0;
 }
@@ -333,19 +337,19 @@ s32 fn_8009D50C(s32 nPort, s32 nSlot) {
     u32 bMounted = (uFlags >> 2) & 1;   // MC_CARD_MOUNTED
     if (nPort == -1 && nSlot == -1) return 1;
     if (!(uFlags & MC_CARD_PRESENT)) return 1;
-    if (fn_8009D0D4(nPort, nSlot) != 0) return 0;
-    if (!bMounted && fn_8009D74C(nPort, nSlot) != 0) return 0;
-    if (fn_8009D614(nPort, nSlot, "EASB") != 0) return 1;
+    if (MC_CardProbe(nPort, nSlot) != 0) return 0;
+    if (!bMounted && MC_MountCard(nPort, nSlot) != 0) return 0;
+    if (MC_FileExists(nPort, nSlot, "EASB") != 0) return 1;
     if (!bMounted && MC_Unmount(nPort, nSlot) != 0) return 0;
     return 0;
 }
 
 // Whether file pName is on the card (0), tried by opening and closing it. The name "EASB" means
 // the EA Sports Bio file, asked of its own code (fn_80125194), whose -44, -43 and -18 count as there.
-s32 fn_8009D614(s32 nPort, s32 nSlot, const char* pName) {
+s32 MC_FileExists(s32 nPort, s32 nSlot, const char* pName) {
     CARDFileInfo file;
     s32 nResult;
-    nResult = fn_8009F734(nPort, nSlot);
+    nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) return nResult;
     if (strcmp("EASB", pName) == 0) {
         nResult = fn_80125194(0, 0);
@@ -354,18 +358,18 @@ s32 fn_8009D614(s32 nPort, s32 nSlot, const char* pName) {
         }
         return nResult;
     }
-    nResult = fn_8009CEF8(nPort, nSlot, pName, &file);
+    nResult = MC_CardOpen(nPort, nSlot, pName, &file);
     if (nResult == 0) {
-        nResult = fn_8009D010(nPort, nSlot, &file);
+        nResult = MC_CardClose(nPort, nSlot, &file);
     }
     return nResult;
 }
 
 // Look for the save file, then for its backup: 0 when one is there.
 s32 fn_8009D6CC(s32 nPort, s32 nSlot) {
-    s32 nResult = fn_8009D614(nPort, nSlot, MC_FILE_NAME);
+    s32 nResult = MC_FileExists(nPort, nSlot, MC_FILE_NAME);
     if (nResult != 0) {
-        nResult = fn_8009D614(nPort, nSlot, MC_BACKUP_NAME);
+        nResult = MC_FileExists(nPort, nSlot, MC_BACKUP_NAME);
     }
     return nResult;
 }
@@ -382,7 +386,7 @@ void fn_8009D728(s32 nPort, s32 nResult) {
 // it and note what it holds: its encoding, free space and free directory entries. The flags start
 // again from present and formatted; b94 is cleared, but put back when the card is broken. A card
 // with an I/O error is not touched. Brings the save file images back (fn_8009F02C).
-s32 fn_8009D74C(s32 nPort, s32 nSlot) {
+s32 MC_MountCard(s32 nPort, s32 nSlot) {
     int nChan;
     s32 nFreeBytes;
     s32 nFreeFiles;
@@ -394,7 +398,7 @@ s32 fn_8009D74C(s32 nPort, s32 nSlot) {
     nChan = nPort;
     b94 = lbl_801F1510[nPort][nSlot].b94;
     lbl_801F1510[nPort][nSlot].b94 = 0;
-    nResult = fn_8009D0D4(nChan, nSlot);
+    nResult = MC_CardProbe(nChan, nSlot);
     if (nResult != 0) return nResult;
     if (lbl_801F1510[nPort][nSlot].uFlags & MC_CARD_MOUNTED) {
         nResult = MC_Unmount(nPort, nSlot);
@@ -408,7 +412,7 @@ s32 fn_8009D74C(s32 nPort, s32 nSlot) {
     CARDMountAsync(nChan, lbl_802813D0, fn_8009D728, NULL);
     while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
         fn_800A4BDC();
-        fn_8009EB40(nPort, nSlot);
+        MC_OnBusy(nPort, nSlot);
         fn_8006C63C();
     }
     switch (nResult) {
@@ -437,7 +441,7 @@ s32 fn_8009D74C(s32 nPort, s32 nSlot) {
     CARDCheckAsync(nChan, NULL);
     while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
         fn_800A4BDC();
-        fn_8009EB40(nPort, nSlot);
+        MC_OnBusy(nPort, nSlot);
         fn_8006C63C();
     }
     switch (nResult) {
@@ -498,7 +502,7 @@ s32 fn_8009D74C(s32 nPort, s32 nSlot) {
     default:
         return MC_ERR_UNKNOWN;
     }
-    fn_8009EB40(nPort, nSlot);
+    MC_OnBusy(nPort, nSlot);
     lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_MOUNTED;
     fn_8009F02C();
     return bWasMounted ? MC_ERR_MOUNTED : 0;
@@ -564,14 +568,14 @@ void fn_8009DCE8(void) {
 
 // Mount the card to see what is there, note the result, and unmount it.
 void fn_8009DCEC(s32 nPort, s32 nSlot) {
-    s32 nResult = fn_8009D74C(nPort, nSlot);
+    s32 nResult = MC_MountCard(nPort, nSlot);
     fn_8009DC80(nPort, nSlot, nResult);
     MC_Unmount(nPort, nSlot);
 }
 
 // Whether the card holds a save file (0) or its backup. pName is not used.
-s32 fn_8009DD44(s32 nPort, s32 nSlot, const char* pName) {
-    s32 nResult = fn_8009F734(nPort, nSlot);
+s32 MC_GotoDirectory(s32 nPort, s32 nSlot, const char* pName) {
+    s32 nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) return nResult;
     return fn_8009D6CC(nPort, nSlot);
 }
@@ -579,42 +583,42 @@ s32 fn_8009DD44(s32 nPort, s32 nSlot, const char* pName) {
 // Read the whole of file pName (nLen bytes) into pBuf, then check that it is one of the game's
 // saves: its banner and icon at 0x40 and its comments at the start, else MC_ERR_BADDATA. A card
 // with an I/O error is not touched.
-s32 fn_8009DD94(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen) {
+s32 MC_LoadFile(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen) {
     CARDFileInfo file;
     CARDStat stat;
     int nChan;
     s32 nResult;
     if (lbl_80281FD0[nPort] != 0) return MC_ERR_IOERROR;
-    nResult = fn_8009F734(nPort, nSlot);
+    nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) return nResult;
-    nResult = fn_8009D0D4(nPort, nSlot);
+    nResult = MC_CardProbe(nPort, nSlot);
     if (nResult != 0) return nResult;
-    nResult = fn_8009CEF8(nPort, nSlot, pName, &file);
+    nResult = MC_CardOpen(nPort, nSlot, pName, &file);
     if (nResult != 0) return nResult;
     fn_8009CB9C(nPort, nSlot, nLen);
     CARDReadAsync(&file, pBuf, nLen, 0, NULL);
     nChan = nPort;
     while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
         fn_800A4BDC();
-        fn_8009EB40(nPort, nSlot);
+        MC_OnBusy(nPort, nSlot);
         fn_8006C63C();
     }
     switch (nResult) {
     case CARD_RESULT_FATAL_ERROR:
-        fn_8009D010(nPort, nSlot, &file);
+        MC_CardClose(nPort, nSlot, &file);
         return MC_ERR_FATAL;
     case CARD_RESULT_NOCARD:
-        fn_8009D010(nPort, nSlot, &file);
+        MC_CardClose(nPort, nSlot, &file);
         lbl_801F1510[nPort][nSlot].uFlags &= ~MC_CARD_PRESENT;
         return MC_ERR_NOCARD;
     case CARD_RESULT_NOFILE:
-        fn_8009D010(nPort, nSlot, &file);
+        MC_CardClose(nPort, nSlot, &file);
         return MC_ERR_NOFILE;
     case CARD_RESULT_LIMIT:
-        fn_8009D010(nPort, nSlot, &file);
+        MC_CardClose(nPort, nSlot, &file);
         return MC_ERR_LIMIT;
     case CARD_RESULT_CANCELED:
-        fn_8009D010(nPort, nSlot, &file);
+        MC_CardClose(nPort, nSlot, &file);
         return MC_ERR_CANCELED;
     default:
         return MC_ERR_UNKNOWN;
@@ -622,10 +626,10 @@ s32 fn_8009DD94(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen) {
         nResult = fn_8009E280(nPort, nSlot, file.fileNo, &stat);
         if (nResult != 0) return nResult;
         if (stat.iconAddr != 0x40 || stat.commentAddr != 0) {
-            fn_8009D010(nPort, nSlot, &file);
+            MC_CardClose(nPort, nSlot, &file);
             return MC_ERR_BADDATA;
         }
-        nResult = fn_8009D010(nPort, nSlot, &file);
+        nResult = MC_CardClose(nPort, nSlot, &file);
         if (nResult != 0) return nResult;
         return 0;
     }
@@ -638,7 +642,7 @@ s32 fn_8009DFD8(s32 nPort, s32 nSlot, const char* pName, u32 uSize, CARDFileInfo
     CARDCreateAsync(nChan, pName, uSize, pFile, NULL);
     while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
         fn_800A4BDC();
-        fn_8009EB40(nPort, nSlot);
+        MC_OnBusy(nPort, nSlot);
         fn_8006C63C();
     }
     switch (nResult) {
@@ -672,7 +676,7 @@ s32 fn_8009E130(s32 nPort, s32 nSlot, CARDFileInfo* pFile, const void* pBuf, s32
     CARDWriteAsync(pFile, pBuf, nLen, nOffset, NULL);
     while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
         fn_800A4BDC();
-        fn_8009EB40(nPort, nSlot);
+        MC_OnBusy(nPort, nSlot);
         fn_8006C63C();
     }
     switch (nResult) {
@@ -791,16 +795,16 @@ void fn_8009E544(char* pGameName, char* pComment, u8* pIcon, u8* pBanner) {
 
 // Write nLen bytes from pBuf as file pName, creating it when it is not there, set its banner and
 // icon (fn_8009E47C), then load it back (fn_8009ED34) to check it.
-s32 fn_8009E604(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen,
+s32 MC_SaveFile(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen,
                 const char* pBackupName) {
     CARDFileInfo file;
     s32 nResult;
-    nResult = fn_8009F734(nPort, nSlot);
+    nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) return nResult;
-    nResult = fn_8009D0D4(nPort, nSlot);
+    nResult = MC_CardProbe(nPort, nSlot);
     if (nResult != 0) return nResult;
     fn_8009CB9C(nPort, nSlot, nLen + 0x6000);
-    nResult = fn_8009CEF8(nPort, nSlot, pName, &file);
+    nResult = MC_CardOpen(nPort, nSlot, pName, &file);
     if (nResult == MC_ERR_NOFILE) {
         nResult = fn_8009DFD8(nPort, nSlot, pName, nLen, &file);
         if (nResult != 0) return nResult;
@@ -809,12 +813,12 @@ s32 fn_8009E604(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen,
     }
     nResult = fn_8009E130(nPort, nSlot, &file, pBuf, nLen, 0);
     if (nResult != 0) {
-        fn_8009D010(nPort, nSlot, &file);
+        MC_CardClose(nPort, nSlot, &file);
         return nResult;
     }
     nResult = fn_8009E47C(nPort, nSlot, &file);
     if (nResult != 0) return nResult;
-    nResult = fn_8009D010(nPort, nSlot, &file);
+    nResult = MC_CardClose(nPort, nSlot, &file);
     if (nResult != 0) return nResult;
     nResult = fn_8009ED34(nPort, nSlot, pName, NULL);
     if (nResult != 0) return nResult;
@@ -828,10 +832,10 @@ s32 fn_8009E758(s32 nPort, s32 nSlot, const char* pName) {
     s32 nResult;
     if (pName == NULL) return 0;
     if (lbl_80281FD0[nPort] != 0) return MC_ERR_IOERROR;
-    nResult = fn_8009F734(nPort, nSlot);
+    nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) return nResult;
     nChan = nPort;
-    nResult = fn_8009D0D4(nPort, nSlot);
+    nResult = MC_CardProbe(nPort, nSlot);
     if (nResult != 0) return nResult;
     fn_8009CB9C(nPort, nSlot, 0x54000);
     if (strcmp("EASB", pName) == 0) {
@@ -841,7 +845,7 @@ s32 fn_8009E758(s32 nPort, s32 nSlot, const char* pName) {
     }
     while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
         fn_800A4BDC();
-        fn_8009EB40(nPort, nSlot);
+        MC_OnBusy(nPort, nSlot);
         fn_8006C63C();
     }
     switch (nResult) {
@@ -871,14 +875,14 @@ s32 fn_8009E918(s32 nPort, s32 nSlot) {
     if (!(lbl_801F1510[nPort][nSlot].uFlags & MC_CARD_PRESENT)) return -4;
     if (!(lbl_801F1510[nPort][nSlot].uFlags & MC_CARD_MOUNTED)) return MC_ERR_NOTMOUNTED;
     nChan = nPort;
-    nResult = fn_8009D0D4(nChan, nSlot);
+    nResult = MC_CardProbe(nChan, nSlot);
     if (nResult != 0) return nResult;
     lbl_801F1510[nPort][nSlot].uFlags &= ~MC_CARD_FORMATTED;
     fn_8009CB9C(nPort, nSlot, lbl_801F1510[nPort][nSlot].nMemSize + 0xA000);
     CARDFormatAsync(nChan, NULL);
     while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
         fn_800A4BDC();
-        fn_8009EB40(nPort, nSlot);
+        MC_OnBusy(nPort, nSlot);
         fn_8006C63C();
     }
     switch (nResult) {
@@ -922,7 +926,7 @@ void fn_8009EB38(UStreamObject* pObject) {
 }
 
 // Called while waiting for the CARD library.
-void fn_8009EB40(s32 nPort, s32 nSlot) {
+void MC_OnBusy(s32 nPort, s32 nSlot) {
 }
 
 // Look at every file on the card and mark the 'eagm' entries (MC.c) whose names match the file's
@@ -933,11 +937,11 @@ s32 fn_8009EB44(s32 nPort, s32 nSlot) {
     s32 nMount;
     int i;
     s32 nResult;
-    nMount = fn_8009D74C(nPort, nSlot);
+    nMount = MC_MountCard(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
-    nResult = fn_8009F734(nPort, nSlot);
+    nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult == 0) {
-        nResult = fn_8009D0D4(nPort, nSlot);
+        nResult = MC_CardProbe(nPort, nSlot);
         if (nResult == 0) {
             for (i = 0; i < 127; i++) {
                 nResult = fn_8009E280(nPort, nSlot, i, &stat);
@@ -959,9 +963,9 @@ s32 fn_8009EB44(s32 nPort, s32 nSlot) {
 // Make the backup the save file: when both are on the card, delete pName first; then load the
 // backup, and if it is good rename it to pName. A bad backup is deleted (-38). No backup: -37.
 s32 fn_8009EC30(s32 nPort, s32 nSlot, const char* pName, const char* pBackupName) {
-    s32 nResult = fn_8009D614(nPort, nSlot, pBackupName);
+    s32 nResult = MC_FileExists(nPort, nSlot, pBackupName);
     if (nResult == 0) {
-        if (fn_8009D614(nPort, nSlot, pName) == 0) {
+        if (MC_FileExists(nPort, nSlot, pName) == 0) {
             nResult = fn_8009E758(nPort, nSlot, pName);
             if (nResult != 0) return nResult;
         }
@@ -1002,13 +1006,13 @@ s32 fn_8009ED34(s32 nPort, s32 nSlot, const char* pName, const char* pBackupName
 }
 
 // Mount the card, load and check the save file and its backup (fn_8009ED34), and unmount it again
-// if this mounted it. When the card's state is bad (fn_8009F734) the card is left mounted.
+// if this mounted it. When the card's state is bad (MC_CheckCardReady) the card is left mounted.
 s32 fn_8009EE28(s32 nPort, s32 nSlot) {
     s32 nMount;
     s32 nResult;
-    nMount = fn_8009D74C(nPort, nSlot);
+    nMount = MC_MountCard(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
-    nResult = fn_8009F734(nPort, nSlot);
+    nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) return nResult;
     nResult = fn_8009ED34(nPort, nSlot, MC_FILE_NAME, MC_BACKUP_NAME);
     if (nMount == 0) {
@@ -1020,9 +1024,9 @@ s32 fn_8009EE28(s32 nPort, s32 nSlot) {
 // Load the save file pName into the first image and check it (fn_800A233C): MC_ERR_BADDATA when it
 // is not a good save.
 s32 fn_8009EECC(s32 nPort, s32 nSlot, const char* pName) {
-    s32 nResult = fn_8009DD44(nPort, nSlot, MC_DIR_NAME);
+    s32 nResult = MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME);
     if (nResult == 0) {
-        nResult = fn_8009DD94(nPort, nSlot, pName, lbl_80281FE8, MC_BUFFER_SIZE);
+        nResult = MC_LoadFile(nPort, nSlot, pName, lbl_80281FE8, MC_BUFFER_SIZE);
         if (nResult == 0) {
             if (fn_800A233C(lbl_80281FE8, &lbl_80281FE8->trailer)) return 0;
             return MC_ERR_BADDATA;
@@ -1229,7 +1233,7 @@ s32 fn_8009F514(s32 nPort, s32 nSlot, const char* pName, s32 nLen) {
 
 // Delete the save file, when pName is its name or the save directory's. No file is not an error.
 s32 fn_8009F5E4(s32 nPort, s32 nSlot, const char* pName) {
-    s32 nResult = fn_8009F734(nPort, nSlot);
+    s32 nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) return nResult;
     if (strcmp(MC_FILE_NAME, pName) == 0 || strcmp(MC_DIR_NAME, pName) == 0) {
         nResult = fn_8009E758(nPort, nSlot, MC_FILE_NAME);
@@ -1256,7 +1260,10 @@ s32 fn_8009F728(int nPort) {
     return lbl_80281FD0[nPort];
 }
 
-s32 fn_8009F734(s32 nPort, s32 nSlot) {
+// 0 when the card can be used for files (present, formatted and mounted), read from the flags
+// already noted without asking the card; else -4 (no card), -1 (not formatted) or
+// MC_ERR_NOTMOUNTED.
+s32 MC_CheckCardReady(s32 nPort, s32 nSlot) {
     u32 uFlags = lbl_801F1510[nPort][nSlot].uFlags;
     if (!(uFlags & MC_CARD_PRESENT)) return -4;
     if (!(uFlags & MC_CARD_FORMATTED)) return -1;
@@ -1279,10 +1286,12 @@ u8 fn_8009F7E8(int nPort) {
     return lbl_80282008[nPort];
 }
 
-void fn_8009F7F4(MCCardState* pState, int nPort, int nSlot) {
+// Copies the card's noted state (MCCardState) into pState. EA's MC_GetMC returns the struct by
+// value; pState is where that value goes.
+void MC_GetMC(MCCardState* pState, int nPort, int nSlot) {
     *pState = lbl_801F1510[nPort][nSlot];
 }
 
-MCCardState* fn_8009F834(s32 nPort, s32 nSlot) {
+MCCardState* MC_pGetMC(s32 nPort, s32 nSlot) {
     return &lbl_801F1510[nPort][nSlot];
 }

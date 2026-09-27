@@ -154,7 +154,7 @@ void SFIO_vFreeEntryCallback(int eDevice) {
 
 // Mounts the card.
 void SFIO_vMountCallback(int eDevice) {
-    s32 nErr = fn_8009D74C(eDevice / 4, eDevice % 4);
+    s32 nErr = MC_MountCard(eDevice / 4, eDevice % 4);
 
     SFIO_vSetCurrentError(nErr);
     if (nErr == 0) {

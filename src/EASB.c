@@ -129,11 +129,11 @@ EASBErrorE fn_8012D1A0(void) {
         if (lbl_802825B8->uLastTime <= uNow) {
             uElapsed = uNow - lbl_802825B8->uLastTime;
             if (lbl_802825B8->b11E0) {
-                lbl_802825B8->totals.u0 = fn_80128468(lbl_802825B8->totals.u0, uElapsed);
-                lbl_802825B8->product.u50 = fn_80128468(lbl_802825B8->product.u50, uElapsed);
+                lbl_802825B8->totals.u0 = EASB_AddSaturated(lbl_802825B8->totals.u0, uElapsed);
+                lbl_802825B8->product.u50 = EASB_AddSaturated(lbl_802825B8->product.u50, uElapsed);
             } else {
-                lbl_802825B8->totals.u4 = fn_80128468(lbl_802825B8->totals.u4, uElapsed);
-                lbl_802825B8->product.u54 = fn_80128468(lbl_802825B8->product.u54, uElapsed);
+                lbl_802825B8->totals.u4 = EASB_AddSaturated(lbl_802825B8->totals.u4, uElapsed);
+                lbl_802825B8->product.u54 = EASB_AddSaturated(lbl_802825B8->product.u54, uElapsed);
             }
             lbl_802825B8->uLastTime = uNow;
         }
@@ -361,8 +361,8 @@ EASBErrorE fn_8012D8C4(u32 uCount) {
     if (eError != EASB_ERROR_NONE) {
         return eError;
     } else {
-        lbl_802825B8->product.u58 = fn_80128468(lbl_802825B8->product.u58, uCount);
-        lbl_802825B8->totals.u8 = fn_80128468(lbl_802825B8->totals.u8, uCount);
+        lbl_802825B8->product.u58 = EASB_AddSaturated(lbl_802825B8->product.u58, uCount);
+        lbl_802825B8->totals.u8 = EASB_AddSaturated(lbl_802825B8->totals.u8, uCount);
         return eError;
     }
 }
@@ -375,8 +375,8 @@ EASBErrorE fn_8012D93C(u32 uCount) {
     if (eError != EASB_ERROR_NONE) {
         return eError;
     } else {
-        lbl_802825B8->product.u5C = fn_80128468(lbl_802825B8->product.u5C, uCount);
-        lbl_802825B8->totals.uC = fn_80128468(lbl_802825B8->totals.uC, uCount);
+        lbl_802825B8->product.u5C = EASB_AddSaturated(lbl_802825B8->product.u5C, uCount);
+        lbl_802825B8->totals.uC = EASB_AddSaturated(lbl_802825B8->totals.uC, uCount);
         return eError;
     }
 }

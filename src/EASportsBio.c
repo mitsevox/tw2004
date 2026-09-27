@@ -325,7 +325,7 @@ s32 fn_801252D0(s32 nPort, s32 nSlot) {
     s32 nError;
     EASBErrorE eError;
 
-    nMount = fn_8009D74C(0, 0);
+    nMount = MC_MountCard(0, 0);
     MC_Unmount(0, 0);
     if (nMount == -25) return -25;
     eError = fn_8012D5E4(lbl_80281988->pIcon, lbl_80281988->pOurGameImage);
@@ -340,7 +340,7 @@ s32 fn_80125354(s32 arg0, s32 arg1) {
     s32 nError;
     EASBErrorE eError;
 
-    nMount = fn_8009D74C(0, 0);
+    nMount = MC_MountCard(0, 0);
     MC_Unmount(0, 0);
     if (nMount == -25) return -25;
     eError = fn_8012D560();
@@ -423,7 +423,7 @@ s32 fn_8012555C(s32* pArgs) {
 }
 
 s32 fn_801255C4(s32* pArgs) {
-    return fn_8009D1D8(pArgs[0], pArgs[1], 0, 3);
+    return MC_BlocksNeededForSave(pArgs[0], pArgs[1], 0, 3);
 }
 
 s32 fn_801255F8(void) {

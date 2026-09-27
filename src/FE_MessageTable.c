@@ -26,7 +26,7 @@ void fn_8008F80C(s32 p0, s32 p1);       // uiProcessInterface.c
 void fn_8008E358(s32 p0);               // FEgolferanim.c
 s32  MC_LoadUser(MCCardPosStr* pPos);   // MC.c
 s32  fn_800A0230(MCCardPos* pPos);      // MC.c: load a replay from the card
-void fn_8009CD80(s32 nPort, s32 nSlot); // MC_Gc.c
+void MC_ConnectCard(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_8009EB44(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_800A1164(s32 nPort, s32 nSlot, char* pName, s32 n);     // MC.c
 s32  MC_GetUser(s32 nPort, s32 nSlot, s32 n, char* szOut);     // MC.c: clears szOut first
@@ -1524,7 +1524,7 @@ void fn_8007C330(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007C370(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
 
-    fn_8009F7F4(&state, pArgs[1].i, pArgs[2].i);
+    MC_GetMC(&state, pArgs[1].i, pArgs[2].i);
     strcpy(((MsgString*)pArgs[0].p)->pStr, state.aszName[pArgs[3].i]);
 }
 
@@ -1532,7 +1532,7 @@ void fn_8007C370(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007C3C8(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
 
-    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
     strcpy(((MsgString*)pArgs[2].p)->pStr, state.aszName[0]);
     strcpy(((MsgString*)pArgs[3].p)->pStr, state.aszName[1]);
     strcpy(((MsgString*)pArgs[4].p)->pStr, state.aszName[2]);
@@ -1543,7 +1543,7 @@ void fn_8007C3C8(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007C440(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
 
-    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
     pResult->i = (state.uFlags & MC_CARD_PRESENT) >> 1;
 }
 
@@ -1555,11 +1555,11 @@ void fn_8007C48C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007C4B8(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8009CD10();
+    MC_Connect();
 }
 
 void fn_8007C4D8(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8009CD7C();
+    MC_Disconnect();
 }
 
 // MC_LoadUser with a card, a profile slot and a string, then the slot's profile is marked loaded
@@ -1698,21 +1698,21 @@ void fn_8007C7EC(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007C81C(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
 
-    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
     pResult->i = (state.uFlags & 8) >> 3;
 }
 
 void fn_8007C864(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
 
-    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
     pResult->i = (state.uFlags & MC_CARD_WRONGDEVICE) >> 4;
 }
 
 void fn_8007C8AC(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
 
-    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
     pResult->i = state.nFreeBlocks;
 }
 
@@ -1723,9 +1723,9 @@ void fn_8007C8F0(MsgArg* pArgs, MsgArg* pResult) {
     pos.nPort = pArgs[0].i;
     pos.nSlot = pArgs[1].i;
     fn_80084FF0(0);
-    fn_8009CD80(pos.nPort, pos.nSlot);
+    MC_ConnectCard(pos.nPort, pos.nSlot);
     pResult->i = fn_80084FB4(&pos);
-    fn_8009CD7C();
+    MC_Disconnect();
 }
 
 void fn_8007C94C(MsgArg* pArgs, MsgArg* pResult) {
@@ -1890,10 +1890,10 @@ void fn_8007CD98(MsgArg* pArgs, MsgArg* pResult) {
 
     pos.nPort = pArgs[0].i;
     pos.nSlot = pArgs[1].i;
-    fn_8009CD80(pos.nPort, pos.nSlot);
+    MC_ConnectCard(pos.nPort, pos.nSlot);
     fn_80084FF0(1);
     pResult->i = fn_80084FB4(&pos);
-    fn_8009CD7C();
+    MC_Disconnect();
 }
 
 void fn_8007CDF0(MsgArg* pArgs, MsgArg* pResult) {
@@ -2620,7 +2620,7 @@ void fn_8007E79C(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
     int i;
 
-    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
     pResult->i = 0;
     for (i = 0; i < 4; i++) {
         if (strcmp(state.aszName[i], ((MsgString*)pArgs[2].p)->pStr) == 0) {
@@ -2719,7 +2719,7 @@ void fn_8007EA14(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
     u32 uBit = pArgs[2].i;
 
-    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
     pResult->i = BitArray_Test(state.aReplayUsed, uBit);
 }
 
@@ -3386,8 +3386,8 @@ void fn_80080334(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80080358(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8009CD80(pArgs[0].i, pArgs[1].i);
-    fn_8009CD7C();
+    MC_ConnectCard(pArgs[0].i, pArgs[1].i);
+    MC_Disconnect();
 }
 
 // Like fn_8007D428 (without its b11702 override), with the golfers of lbl_801894E8 unlocked
@@ -4340,7 +4340,7 @@ void fn_8008281C(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80082828(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
 
-    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
     if (state.nSectorSize != 0x2000) {
         *(s32*)pArgs[2].p = 1;
     } else {
@@ -4422,7 +4422,7 @@ void fn_80082A4C(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80082A50(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
 
-    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
     pResult->i = state.nFreeFiles;
 }
 
@@ -4710,20 +4710,20 @@ void fn_800834DC(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// For the card in slot pArgs[0], pArgs[1]: fn_8009D3DC's answer, and fn_8009D1D8's with kind 0.
+// For the card in slot pArgs[0], pArgs[1]: fn_8009D3DC's answer, and MC_BlocksNeededForSave's with kind 0.
 void fn_800834E8(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8009CD80(pArgs[0].i, pArgs[1].i);
+    MC_ConnectCard(pArgs[0].i, pArgs[1].i);
     *(s32*)pArgs[2].p = fn_8009D3DC(pArgs[0].i, pArgs[1].i);
-    *(s32*)pArgs[3].p = fn_8009D1D8(pArgs[0].i, pArgs[1].i, 0, 0);
-    fn_8009CD7C();
+    *(s32*)pArgs[3].p = MC_BlocksNeededForSave(pArgs[0].i, pArgs[1].i, 0, 0);
+    MC_Disconnect();
 }
 
-// The same for an EA Sports Bio save: the new files it needs, and fn_8009D1D8's with kind 3.
+// The same for an EA Sports Bio save: the new files it needs, and MC_BlocksNeededForSave's with kind 3.
 void fn_80083550(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8009CD80(pArgs[0].i, pArgs[1].i);
+    MC_ConnectCard(pArgs[0].i, pArgs[1].i);
     *(s32*)pArgs[2].p = fn_8009D50C(pArgs[0].i, pArgs[1].i);
-    *(s32*)pArgs[3].p = fn_8009D1D8(pArgs[0].i, pArgs[1].i, 0, 3);
-    fn_8009CD7C();
+    *(s32*)pArgs[3].p = MC_BlocksNeededForSave(pArgs[0].i, pArgs[1].i, 0, 3);
+    MC_Disconnect();
 }
 
 void fn_800835B8(MsgArg* pArgs, MsgArg* pResult) {

@@ -260,7 +260,7 @@ void  fn_8001A870(void);
 void  fn_80062B84(int a);
 void  fn_8006F4E0(void);
 s32   fn_80084FB4(CardPos* pPos);
-void  fn_8009CD80(s32 nPort, s32 nSlot);
+void  MC_ConnectCard(s32 nPort, s32 nSlot);
 s32   fn_800A036C(MCCardPos* pPos);
 s32   fn_800A0610(s32 nPort, s32 nSlot, s32 n);
 void  fn_800A6148(void);
@@ -1441,18 +1441,18 @@ void fn_80087CBC(MsgArg* pArgs, MsgArg* pResult) {
 
     pos.nPort = pArgs[0].i;
     pos.nSlot = pArgs[1].i;
-    fn_8009CD80(pos.nPort, pos.nSlot);
+    MC_ConnectCard(pos.nPort, pos.nSlot);
     fn_80084FF0(2);
     pResult->i = fn_80084FB4(&pos);
-    fn_8009CD7C();
+    MC_Disconnect();
 }
 
 void fn_80087D14(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8009CD10();
+    MC_Connect();
 }
 
 void fn_80087D34(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8009CD7C();
+    MC_Disconnect();
 }
 
 void fn_80087D54(MsgArg* pArgs, MsgArg* pResult) {
@@ -1463,14 +1463,14 @@ void fn_80087D54(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80087D8C(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState card;
 
-    fn_8009F7F4(&card, pArgs[0].i, pArgs[1].i);
+    MC_GetMC(&card, pArgs[0].i, pArgs[1].i);
     pResult->i = (card.uFlags & MC_CARD_PRESENT) != 0;
 }
 
 void fn_80087DD4(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState card;
 
-    fn_8009F7F4(&card, pArgs[0].i, pArgs[1].i);
+    MC_GetMC(&card, pArgs[0].i, pArgs[1].i);
     pResult->i = (card.uFlags & 0x08) != 0;
 }
 
@@ -1478,7 +1478,7 @@ void fn_80087DD4(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80087E1C(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState card;
 
-    fn_8009F7F4(&card, pArgs[0].i, pArgs[1].i);
+    MC_GetMC(&card, pArgs[0].i, pArgs[1].i);
     pResult->i = card.nFreeBlocks;
 }
 
@@ -1674,8 +1674,8 @@ void fn_80088538(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80088570(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8009CD80(pArgs[0].i, pArgs[1].i);
-    fn_8009CD7C();
+    MC_ConnectCard(pArgs[0].i, pArgs[1].i);
+    MC_Disconnect();
 }
 
 // The same as fn_80087CBC.
@@ -1684,10 +1684,10 @@ void fn_800885A0(MsgArg* pArgs, MsgArg* pResult) {
 
     pos.nPort = pArgs[0].i;
     pos.nSlot = pArgs[1].i;
-    fn_8009CD80(pos.nPort, pos.nSlot);
+    MC_ConnectCard(pos.nPort, pos.nSlot);
     fn_80084FF0(2);
     pResult->i = fn_80084FB4(&pos);
-    fn_8009CD7C();
+    MC_Disconnect();
 }
 
 void fn_800885F8(MsgArg* pArgs, MsgArg* pResult) {
@@ -2123,7 +2123,7 @@ void fn_800896D0(MsgArg* pArgs, MsgArg* pResult) {
 void fn_800896F0(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState card;
 
-    fn_8009F7F4(&card, pArgs[0].i, pArgs[1].i);
+    MC_GetMC(&card, pArgs[0].i, pArgs[1].i);
     if (card.nSectorSize != 0x2000) {
         *(s32*)pArgs[2].p = 1;
     } else {
@@ -2220,7 +2220,7 @@ void fn_80089A50(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80089A8C(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState card;
 
-    fn_8009F7F4(&card, pArgs[0].i, pArgs[1].i);
+    MC_GetMC(&card, pArgs[0].i, pArgs[1].i);
     pResult->i = card.nFreeFiles;
 }
 

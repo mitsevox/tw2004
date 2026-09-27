@@ -185,7 +185,7 @@ LAYOUT_ASSERT(TibExtCard, 0x90);
 extern TibExtCard* lbl_80281970;
 extern s32 lbl_80194758[46];        // the file library's code for each card error (by -error)
 
-// A storage operation's arguments, kept in EASBStorage.args while its steps run (fn_8012BF18).
+// A storage operation's arguments, kept in EASBStorage.args while its steps run (EASB_StartOperation).
 typedef struct EASBStorageArgs {
     char* szName;                   // 0x00: the product name the game's record must have (fn_8012AA7C)
     EASBTotals* pTotals;            // 0x04
@@ -200,7 +200,7 @@ typedef struct EASBStorageArgs {
 // tag-file library first and shuts it down after, and its steps in order.
 typedef struct EASBStorageOp {
     s32 nOperation;                 // 0x00: its own number
-    u8 bStartTagFile;               // 0x04: fn_8012BF18 starts the library (fn_8012CAA8)
+    u8 bStartTagFile;               // 0x04: EASB_StartOperation starts the library (fn_8012CAA8)
     u8 bStopTagFile;                // 0x05: fn_8012C03C shuts it down (fn_8012CC48)
     u8 unk6[2];
     s32 anSteps[8];                 // 0x08: EASB_STEP_END ends the list
@@ -256,7 +256,7 @@ u8 fn_801281B4(u16 uLanguage, u16* aLanguages, u8 nLanguages);  // is uLanguage 
 EASBErrorE fn_8012835C(const u16* sz, u32 uSize, u32* puLength);
 EASBErrorE fn_801283B0(EASBInitParams* pParams);
 void fn_80128488(EASBProduct* pProduct, u8 bValid, char* szName, u16* szGamesPlayedType, u16 uLanguage);
-u32 fn_80128468(u32 uA, u32 uB);    // uA + uB, saturating at 0xFFFFFFFF
+u32 EASB_AddSaturated(u32 uA, u32 uB);    // uA + uB, saturating at 0xFFFFFFFF
 void fn_80128528(EASBTotals* pTotals, EASBProduct* pProduct);
 void fn_80128624(EASBProduct* aProducts, u32 nCount);          // a shell sort of the records
 void fn_8012872C(EASBAccomplishment** apList, u32 nCount, s32 nSort);
