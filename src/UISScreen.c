@@ -161,41 +161,50 @@ u8* fn_8016C5C4(UISNode* pNode, u32 uEvent) {
 s32 fn_8016C270(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UISWordStack* pStack, u8* pScript,
                s32 nArgs, s32* pArgs, u32 nArgs2, const s32* pArgs2, u8 bExtra, s32 nExtra,
                s32* pnSaved) {
+    // fake match: pStackCopy is pStack through a void* copy, declared first; the local's higher
+    // variable number makes the allocator colour it before pFrame and pnSaved (EA's r31).
+    UISWordStack* pStackCopy = (UISWordStack*)(void*)pStack;
     s32* pFrame;
     u32 i;
     s32 nResult;
+    void* pScriptCopy = pScript;
 
-    pFrame = pStack->pC;
+    // fake match: pScriptCopy is pScript, so this OR leaves pScript unchanged. The frontend cannot
+    // fold the OR of two variables; it stays as `or r11,r7,r7` (the original's `mr r11,r7`, the
+    // same encoding), which the allocator never coalesces, so pScript leaves r7 as in EA.
+    // port: the pointer goes through a 32-bit integer
+    pScript = (u8*)((u32)pScript | (u32)pScriptCopy);
+    pFrame = pStackCopy->pC;
     if (pnSaved == NULL) {
         *pFrame = 0;
     } else {
         *pFrame = *pnSaved;
     }
-    pStack->pC++;
+    pStackCopy->pC++;
     if (bExtra) {
-        *pStack->pC = nExtra;
-        pStack->pC++;
+        *pStackCopy->pC = nExtra;
+        pStackCopy->pC++;
     }
     for (i = 0; i < nArgs; i++) {
-        *pStack->pC = pArgs[i];
-        pStack->pC++;
+        *pStackCopy->pC = pArgs[i];
+        pStackCopy->pC++;
     }
     for (i = 0; i < nArgs2; i++) {
-        *pStack->pC = pArgs2[i];
-        pStack->pC++;
+        *pStackCopy->pC = pArgs2[i];
+        pStackCopy->pC++;
     }
     // port: the frame keeps the info pointer in a word
-    *pStack->pC = (s32)pInfo;
-    pStack->pC++;
-    *pStack->pC = 0;
-    pStack->pC++;
-    pStack->p10 = pScript;
-    nResult = fn_80166098(pStudio, pFrame, pStack, pScreen, pInfo);
+    *pStackCopy->pC = (s32)pInfo;
+    pStackCopy->pC++;
+    *pStackCopy->pC = 0;
+    pStackCopy->pC++;
+    pStackCopy->p10 = pScript;
+    nResult = fn_80166098(pStudio, pFrame, pStackCopy, pScreen, pInfo);
     if (pnSaved != NULL) {
         *pnSaved = *pFrame;
     }
     if (nResult != 3) {
-        pStack->pC = pFrame;
+        pStackCopy->pC = pFrame;
     }
     return nResult;
 }
@@ -745,27 +754,46 @@ s32 fn_8016AD54(UISScreen* pScreen, UISNodeInfo* pInfo, s32 nKind, void* p) {
 // Runs every handler under a node (nKind 8) or a group (nKind 7) with message -4 and a pointer to
 // n. Without bAll, nodes and groups whose info has no owner are skipped.
 void fn_8016ABBC(UIStudio* pStudio, UISScreen* pScreen, s32 n, s32 nKind, void* p, u8 bAll) {
+    // fake match: this declaration order (with the copies below) gives EA's registers.
+    UISGroup* pGroup;
+    UISNode* pNode;
     u32 i;
+    // fake match: one count for both loops (nGroups, then nEntries), as in fn_8016AD54: with it
+    // case 7's counter and count take EA's registers (li r29,0 / lwz r30 / mr r31,r29).
+    u32 nCount;
+    UISEntry* pEntry;
+    UISNode* pPrev8;
+    UISNode* pLoop8;
+    UISGroup* pLoop7;
 
     if (pStudio == NULL) return;
     if (pScreen == NULL || p == NULL) return;
     switch (nKind) {
-    case 8: {
-        UISNode* pNode = p;
+    case 8:
+        pNode = p;
         if (pNode->pInfo != NULL && (bAll || pNode->pInfo->p0 != NULL)) {
-            u32 nGroups = pNode->nGroups;
-            for (i = 0; i < nGroups; i++) {
-                fn_8016ABBC(pStudio, pScreen, n, 7, pNode->ppGroups[i], 0);
+            nCount = pNode->nGroups;
+            // fake match: pLoop8 and pPrev8 always hold pNode; the copies carried round the loop
+            // keep pNode apart from p (EA's mr r29,r7 with the first read through r7), and taking
+            // pPrev8 before the copy keeps EA's argument order (the lwzx before li r6,7).
+            pLoop8 = pNode;
+            for (i = 0; i < nCount; i++) {
+                pPrev8 = pLoop8;
+                pLoop8 = pNode;
+                fn_8016ABBC(pStudio, pScreen, n, 7, pPrev8->ppGroups[i], 0);
             }
         }
         break;
-    }
-    case 7: {
-        UISGroup* pGroup = p;
+    case 7:
+        pGroup = p;
         if (pGroup->pInfo != NULL && (bAll || pGroup->pInfo->p0 != NULL)) {
-            u32 nEntries = pGroup->nEntries;
-            for (i = 0; i < nEntries; i++) {
-                UISEntry* pEntry = &pGroup->pEntries[i];
+            nCount = pGroup->nEntries;
+            // fake match: pLoop7 always holds pGroup; the copy carried round the loop keeps pGroup
+            // apart from p (EA's mr r28,r7 with the first read through r7).
+            pLoop7 = pGroup;
+            for (i = 0; i < nCount; i++) {
+                pEntry = &pLoop7->pEntries[i];
+                pLoop7 = pGroup;
                 if (pEntry->uHandler == 0xFFFF) {
                     fn_8016ABBC(pStudio, pScreen, n, 8, &pScreen->pData->pNodes[pEntry->u4.nNode], 0);
                 } else if (pEntry->uHandler < pStudio->nHandlers) {
@@ -777,7 +805,6 @@ void fn_8016ABBC(UIStudio* pStudio, UISScreen* pScreen, s32 n, s32 nKind, void* 
             }
         }
         break;
-    }
     }
 }
 

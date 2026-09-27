@@ -61,6 +61,7 @@ typedef struct SD_SShaderTypeData_Grass_Static {
 } SD_SShaderTypeData_Grass_Static;
 LAYOUT_ASSERT(SD_SShaderTypeData_Grass_Static, 0x378);
 
+extern SD_SShaderTypeData_Grass_Static SD_gGrassTypeData;
 extern SD_SShaderTypeData_Grass_Static* SD_gpGrassTypeData;
 
 // A grass data chunk as fn_8011E4D8 is given it: n2 0x30-byte entries follow the header, then the

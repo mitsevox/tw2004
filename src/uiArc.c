@@ -23,6 +23,12 @@ void fn_800760D8(LLPict* pPict);        // LLVideo.c
 f32* lbl_80282458;
 f32* lbl_8028245C;
 
+// fake match: the far edge's sine read through an inline, so its call result lands straight in
+// the variable's register (EA's `fmr f14,f1`) instead of through a copy.
+static inline f32 fn_80102AC8_Sin(f32 a) {
+    return fn_800095F0(a);
+}
+
 // Draw pArc: nSegments quads from its inner to its outer radius (v20 * v28 with flag 1, else the
 // centre; v28), from fStart to fEnd degrees (flag 0x10: the whole circle), textured like fe_movies.c's
 // quads, its colour aColorA (flag 0x20: shaded towards aColorB; with flag 4 and not 2, white with
@@ -39,33 +45,32 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     GXColor colorA;
     GXColor colorB;
     // fake match: scalar declaration order controls CodeWarrior's saved-FPR allocation.
-    f32 fInnerY;
-    f32 fZ;
+    f32 fCos2;
+    f64 fU0;            // f64: the original keeps these in 8-byte stack slots
     f32 fStart;
     f32 fEnd;
-    f32 fV;
-    f64 fU0;            // f64: the original keeps these in 8-byte stack slots
     f64 fV0;
+    f32 fInnerX;
+    f32 fOuterX;
     f64 fU1;
+    f32 fCos;
     f64 fV1;
-    f64 fU2;
-    f64 fV2;
+    f32 fU;
+    f32 fInnerY;
     f64 fU3;
     f64 fV3;
-    f32 fProj;
-    f32 fU;
-    f32 fAngle;
-    f32 fStep;
     f32 fOuterY;
     f32 fDist;
-    f32 fOuterX;
-    f32 fInnerX;
-    f32 fSin;
-    f32 fCos;
-    f32 fS;
-    f32 fT;
+    f32 fSin2;
+    f32 fProj;
+    f32 fStep;
+    f64 fU2;
+    f64 fV2;
     f32 fR;
+    f32 fAngle;
+    f32 fZ;
     f32 fG;
+    f32 fV;
     f32 fB;
     f32 fA;
     UIFileEntry* pEntry;
@@ -151,18 +156,16 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     for (i = 0; i < pArc->nSegments;) {
         if (i == 0) {
             if (pArc->uFlags & 0x20) {
-                fS = (f32)(pArc->nSegments - i) / pArc->nSegments;
-                fT = (f32)i / pArc->nSegments;
                 // fake match: keep EA's multiply-then-add colour interpolation.
-                fA = colorA.a * fS;
-                fA += colorB.a * fT;
+                fA = colorA.a * ((f32)(pArc->nSegments - i) / pArc->nSegments);
+                fA += colorB.a * ((f32)i / pArc->nSegments);
                 if (!(pArc->uFlags & 4) || (pArc->uFlags & 2)) {
-                    fR = colorA.r * fS;
-                    fR += colorB.r * fT;
-                    fG = colorA.g * fS;
-                    fG += colorB.g * fT;
-                    fB = colorA.b * fS;
-                    fB += colorB.b * fT;
+                    fR = colorA.r * ((f32)(pArc->nSegments - i) / pArc->nSegments);
+                    fR += colorB.r * ((f32)i / pArc->nSegments);
+                    fG = colorA.g * ((f32)(pArc->nSegments - i) / pArc->nSegments);
+                    fG += colorB.g * ((f32)i / pArc->nSegments);
+                    fB = colorA.b * ((f32)(pArc->nSegments - i) / pArc->nSegments);
+                    fB += colorB.b * ((f32)i / pArc->nSegments);
                 } else {
                     fB = fG = fR = 255.0f;
                 }
@@ -177,15 +180,20 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
                 }
             }
         }
+        // fake match: fU (free after the texture setup) holds the near edge's sine: a later use
+        // of a variable lets its call result land straight in the variable's register.
         if (i == 0) {
-            fSin = fn_800095F0(fStart);
+            fU = fn_800095F0(fStart);
             fCos = fn_80009638(fStart);
+        } else {
+            fU = fSin2;
+            fCos = fCos2;
         }
         i++;
         aVtx[0].f0 = fU0;
         aVtx[0].f4 = fV0;
         aVtx[0].f8 = fInnerX * fCos;
-        aVtx[0].fC = fInnerY * fSin;
+        aVtx[0].fC = fInnerY * fU;
         aVtx[0].f10 = 0.0f;
         aVtx[0].au14[0] = fR;
         aVtx[0].au14[1] = fG;
@@ -194,7 +202,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
         aVtx[1].f0 = fU1;
         aVtx[1].f4 = fV1;
         aVtx[1].f8 = fOuterX * fCos;
-        aVtx[1].fC = fOuterY * fSin;
+        aVtx[1].fC = fOuterY * fU;
         aVtx[1].f10 = 0.0f;
         aVtx[1].au14[0] = fR;
         aVtx[1].au14[1] = fG;
@@ -203,18 +211,16 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
 
         // the colour and angle at the segment's far edge (and the next segment's near edge)
         if (pArc->uFlags & 0x20) {
-            fS = (f32)(pArc->nSegments - i) / pArc->nSegments;
-            fT = (f32)i / pArc->nSegments;
             // fake match: keep EA's multiply-then-add colour interpolation.
-            fA = colorA.a * fS;
-            fA += colorB.a * fT;
+            fA = colorA.a * ((f32)(pArc->nSegments - i) / pArc->nSegments);
+            fA += colorB.a * ((f32)i / pArc->nSegments);
             if (!(pArc->uFlags & 4) || (pArc->uFlags & 2)) {
-                fR = colorA.r * fS;
-                fR += colorB.r * fT;
-                fG = colorA.g * fS;
-                fG += colorB.g * fT;
-                fB = colorA.b * fS;
-                fB += colorB.b * fT;
+                fR = colorA.r * ((f32)(pArc->nSegments - i) / pArc->nSegments);
+                fR += colorB.r * ((f32)i / pArc->nSegments);
+                fG = colorA.g * ((f32)(pArc->nSegments - i) / pArc->nSegments);
+                fG += colorB.g * ((f32)i / pArc->nSegments);
+                fB = colorA.b * ((f32)(pArc->nSegments - i) / pArc->nSegments);
+                fB += colorB.b * ((f32)i / pArc->nSegments);
             } else {
                 fB = fG = fR = 255.0f;
             }
@@ -233,12 +239,12 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
         } else {
             fAngle = fStep * i + fStart;
         }
-        fSin = fn_800095F0(fAngle);
-        fCos = fn_80009638(fAngle);
+        fSin2 = fn_80102AC8_Sin(fAngle);
+        fCos2 = fn_80009638(fAngle);
         aVtx[2].f0 = fU2;
         aVtx[2].f4 = fV2;
-        aVtx[2].f8 = fOuterX * fCos;
-        aVtx[2].fC = fOuterY * fSin;
+        aVtx[2].f8 = fOuterX * fCos2;
+        aVtx[2].fC = fOuterY * fSin2;
         aVtx[2].f10 = 0.0f;
         aVtx[2].au14[0] = fR;
         aVtx[2].au14[1] = fG;
@@ -246,8 +252,8 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
         aVtx[2].au14[3] = fA;
         aVtx[3].f0 = fU3;
         aVtx[3].f4 = fV3;
-        aVtx[3].f8 = fInnerX * fCos;
-        aVtx[3].fC = fInnerY * fSin;
+        aVtx[3].f8 = fInnerX * fCos2;
+        aVtx[3].fC = fInnerY * fSin2;
         aVtx[3].f10 = 0.0f;
         aVtx[3].au14[0] = fR;
         aVtx[3].au14[1] = fG;

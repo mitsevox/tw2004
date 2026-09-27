@@ -39,10 +39,20 @@ void fn_8009F8C8(SaveRecords* pRecords) {
     int nMode;
     int nCourse;
     int nHoleNum;
-    int i;
-    int k;
+    // fake match: this declaration order gives the loop variables EA's registers.
+    SaveRecords* pRow;
+    SaveRecords* pHole3;
     int j;
+    int k;
+    SaveRecords* pHole;
+    SaveRecords* pRow3;
+    int j2;
     int nHole;
+    int i;
+    int k2;
+    int nHole3;
+    int j3;
+    int k3;
 
     nMode = Game_GetMode();
     nHoleNum = gpGame->nCurHoleNum;
@@ -59,28 +69,36 @@ void fn_8009F8C8(SaveRecords* pRecords) {
             }
         }
     }
+    // fake match: the recB and recC loops walk a SaveRecords* view one RecordEntry at a time, so
+    // pRow->recB[0][0][0] is pRecords->recB[nHole][j2][k2] and pRow3->recC[0][0][0] is
+    // pRecords->recC[nHole3][j3][k3]. Written with indexes (as the first loop), the frontend's
+    // pointer temps take their registers before the counters, and each k loop starts li, add
+    // (EA: add, li; the copy into the walked pointer makes that block scheduled).
     gpGame->nMode = 16;
     for (nHole = 0; nHole < 3; nHole++) {
         gpGame->nCurHoleNum = nHole;
-        for (j = 0; j < 3; j++) {
-            for (k = 0; k < 5; k++) {
-                if (!fn_800D853C(j, pRecords->recB[(u32)nHole][(u32)j][k].nValue,
-                                 pRecords->recB[(u32)nHole][(u32)j][k].szName, nHole)) {
-                    fn_800D8750(j, pRecords->recB[(u32)nHole][(u32)j][k].nValue, 1,
-                                pRecords->recB[(u32)nHole][(u32)j][k].szName, 5);
+        pHole = (SaveRecords*)((RecordEntry*)pRecords + (u32)nHole * 15);
+        for (j2 = 0; j2 < 3; j2++) {
+            pRow = (SaveRecords*)((RecordEntry*)pHole + (u32)j2 * 5);
+            for (k2 = 0; k2 < 5; k2++, pRow = (SaveRecords*)((RecordEntry*)pRow + 1)) {
+                if (!fn_800D853C(j2, pRow->recB[0][0][0].nValue, pRow->recB[0][0][0].szName,
+                                 nHole)) {
+                    fn_800D8750(j2, pRow->recB[0][0][0].nValue, 1, pRow->recB[0][0][0].szName, 5);
                 }
             }
         }
     }
     gpGame->nMode = 22;
-    for (nHole = 0; nHole < 5; nHole++) {
-        gpGame->nCurHoleNum = nHole;
-        for (j = 0; j < 2; j++) {
-            for (k = 0; k < 5; k++) {
-                if (!fn_800D85DC(j, pRecords->recC[(u32)nHole][(u32)j][k].nValue,
-                                 pRecords->recC[(u32)nHole][(u32)j][k].szName, nHole)) {
-                    fn_800D8750(j, pRecords->recC[(u32)nHole][(u32)j][k].nValue, 1,
-                                pRecords->recC[(u32)nHole][(u32)j][k].szName, 5);
+    for (nHole3 = 0; nHole3 < 5; nHole3++) {
+        gpGame->nCurHoleNum = nHole3;
+        pHole3 = (SaveRecords*)((RecordEntry*)pRecords + (u32)nHole3 * 10);
+        for (j3 = 0; j3 < 2; j3++) {
+            pRow3 = (SaveRecords*)((RecordEntry*)pHole3 + (u32)j3 * 5);
+            for (k3 = 0; k3 < 5; k3++, pRow3 = (SaveRecords*)((RecordEntry*)pRow3 + 1)) {
+                if (!fn_800D85DC(j3, pRow3->recC[0][0][0].nValue, pRow3->recC[0][0][0].szName,
+                                 nHole3)) {
+                    fn_800D8750(j3, pRow3->recC[0][0][0].nValue, 1, pRow3->recC[0][0][0].szName,
+                                5);
                 }
             }
         }
@@ -507,6 +525,52 @@ s32 fn_800A09EC(MCCardPos* pPos) {
     return nCount;
 }
 
+// Delete the save file from the card.
+s32 fn_800A0A7C(s32 nPort, s32 nSlot) {
+    s32 nMount;
+    s32 nResult;
+    nMount = fn_8009D74C(nPort, nSlot);
+    if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
+    nResult = fn_8009F734(nPort, nSlot);
+    if (nResult != 0) return nResult;
+    nResult = fn_8009F5E4(nPort, nSlot, MC_DIR_NAME);
+    if (nMount == 0) {
+        fn_8009DBAC(nPort, nSlot);
+    }
+    return nResult;
+}
+
+// The profile in pImage named szName (any case), or -15. nPort and nSlot are not used.
+s32 fn_800A0B18(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage) {
+    int i;
+    int bFound;
+    if (szName == NULL) return -15;
+    i = 0;
+    bFound = 0;
+    while (i < NUM_SAVE_PROFILES && !bFound) {
+        if ((pImage->uFlags & MC_SAVE_PROFILE(i)) && stricmp(pImage->aProfile[i].szName, szName) == 0) {
+            bFound = 1;
+        }
+        if (!bFound) {
+            i++;
+        }
+    }
+    if (!bFound) return -15;
+    return i;
+}
+
+// Where to save the profile named szName in pImage: its own slot, else the first free one, else -36.
+s32 fn_800A0BC8(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage) {
+    s32 nProfile;
+    int i;
+    nProfile = fn_800A0B18(nPort, nSlot, szName, pImage);
+    if (nProfile >= 0) return nProfile;
+    for (i = 0; i < NUM_SAVE_PROFILES; i++) {
+        if (!(pImage->uFlags & MC_SAVE_PROFILE(i))) return i;
+    }
+    return -36;
+}
+
 // Load the profile named pPos->szC from the save on the card into profile pPos->pos.n8, and the
 // save's records into the game. A save marked "@BD" gets the profile's CrAP info reset and its
 // created golfer's model set to 7 (as MC_LoadLastUser).
@@ -635,55 +699,53 @@ s32 MC_SaveUser(MCCardPos* pPos) {
     return nResult;
 }
 
-// Delete the save file from the card.
-s32 fn_800A0A7C(s32 nPort, s32 nSlot) {
+// Save profile nProfile (gpSaveData) over the saved profile named szName, with the options and the
+// records; the save then remembers it as the last one saved (n4D0C0).
+s32 fn_800A1164(s32 nPort, s32 nSlot, const char* szName, s32 nProfile) {
     s32 nMount;
     s32 nResult;
+    s32 nFound;
+
     nMount = fn_8009D74C(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
+    // EA bug: this return and the ones below leave a card it mounted mounted
     nResult = fn_8009F734(nPort, nSlot);
     if (nResult != 0) return nResult;
-    nResult = fn_8009F5E4(nPort, nSlot, MC_DIR_NAME);
+    if (fn_8009DD44(nPort, nSlot, MC_DIR_NAME) != 0) {
+        if (nMount == 0) {
+            fn_8009DBAC(nPort, nSlot);
+        }
+        return -15;
+    }
+    if (fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FE8, MC_BUFFER_SIZE) != 0) {
+        lbl_80281FE8->uFlags = 0;
+        return MC_ERR_BADDATA;
+    }
+    if (!fn_800A233C(lbl_80281FE8, &lbl_80281FE8->trailer)) {
+        lbl_80281FE8->uFlags = 0;
+        return MC_ERR_BADDATA;
+    }
+    Mem_cpy(lbl_80281FDC, lbl_80281FE8, MC_BUFFER_SIZE);
+    nFound = fn_800A0B18(nPort, nSlot, szName, lbl_80281FDC);
+    if (nFound < 0) return nFound;
+    lbl_80281FD8->uFlags &= ~MC_SAVE_PROFILE(nFound);
+    lbl_80281FD8->uFlags |= MC_SAVE_PROFILE(nFound);
+    Mem_cpy(&lbl_80281FD8->aProfile[nFound], &gpSaveData[nProfile], sizeof(SaveProfile));
+    lbl_80281FDC->n4D0C0 = nFound;
+    lbl_80281FDC->uFlags |= MC_SAVE_4D0C0;
+    lbl_80281FDC->uFlags |= MC_SAVE_OPTIONS;
+    lbl_80281FDC->uFlags |= MC_SAVE_RECORDS;
+    Mem_cpy(&lbl_80281FDC->options, &gSession.options, sizeof(GameOptions));
+    Mem_cpy(&lbl_80281FDC->records, gSession.aCourseRecord, sizeof(SaveRecords));
+    lbl_80281FDC->trailer.aMagic[0] = '@';
+    lbl_80281FDC->trailer.aMagic[1] = 'B';
+    lbl_80281FDC->trailer.aMagic[2] = 'E';
+    lbl_80281FDC->trailer.uChecksum = fn_800A23BC(lbl_80281FDC, &lbl_80281FDC->trailer);
+    nResult = fn_8009E604(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE, MC_BACKUP_NAME);
     if (nMount == 0) {
         fn_8009DBAC(nPort, nSlot);
     }
     return nResult;
-}
-
-// The profile in pImage named szName (any case), or -15. nPort and nSlot are not used.
-s32 fn_800A0B18(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage) {
-    int i;
-    int bFound;
-    if (szName == NULL) return -15;
-    i = 0;
-    bFound = 0;
-    while (i < NUM_SAVE_PROFILES && !bFound) {
-        if ((pImage->uFlags & MC_SAVE_PROFILE(i)) && stricmp(pImage->aProfile[i].szName, szName) == 0) {
-            bFound = 1;
-        }
-        if (!bFound) {
-            i++;
-        }
-    }
-    if (!bFound) return -15;
-    return i;
-}
-
-// Where to save the profile named szName in pImage: its own slot, else the first free one, else -36.
-s32 fn_800A0BC8(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage) {
-    s32 nProfile;
-    int i;
-    nProfile = fn_800A0B18(nPort, nSlot, szName, pImage);
-    if (nProfile >= 0) return nProfile;
-    for (i = 0; i < NUM_SAVE_PROFILES; i++) {
-        if (!(pImage->uFlags & MC_SAVE_PROFILE(i))) return i;
-    }
-    return -36;
-}
-
-// Whether the card at pPos holds the save file (one of the file functions in lbl_8018C7D8).
-int fn_800A1758(MCCardPos* pPos) {
-    return fn_800A2248(pPos->nPort, pPos->nSlot) == 0;
 }
 
 // Load the save on the card and take the profile it was last saved from (n4D0C0) into profile
@@ -774,53 +836,9 @@ s32 MC_GetUser(s32 nPort, s32 nSlot, s32 nProfile, char* szName) {
     return -15;
 }
 
-// Save profile nProfile (gpSaveData) over the saved profile named szName, with the options and the
-// records; the save then remembers it as the last one saved (n4D0C0).
-s32 fn_800A1164(s32 nPort, s32 nSlot, const char* szName, s32 nProfile) {
-    s32 nMount;
-    s32 nResult;
-    s32 nFound;
-
-    nMount = fn_8009D74C(nPort, nSlot);
-    if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
-    // EA bug: this return and the ones below leave a card it mounted mounted
-    nResult = fn_8009F734(nPort, nSlot);
-    if (nResult != 0) return nResult;
-    if (fn_8009DD44(nPort, nSlot, MC_DIR_NAME) != 0) {
-        if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
-        }
-        return -15;
-    }
-    if (fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FE8, MC_BUFFER_SIZE) != 0) {
-        lbl_80281FE8->uFlags = 0;
-        return MC_ERR_BADDATA;
-    }
-    if (!fn_800A233C(lbl_80281FE8, &lbl_80281FE8->trailer)) {
-        lbl_80281FE8->uFlags = 0;
-        return MC_ERR_BADDATA;
-    }
-    Mem_cpy(lbl_80281FDC, lbl_80281FE8, MC_BUFFER_SIZE);
-    nFound = fn_800A0B18(nPort, nSlot, szName, lbl_80281FDC);
-    if (nFound < 0) return nFound;
-    lbl_80281FD8->uFlags &= ~MC_SAVE_PROFILE(nFound);
-    lbl_80281FD8->uFlags |= MC_SAVE_PROFILE(nFound);
-    Mem_cpy(&lbl_80281FD8->aProfile[nFound], &gpSaveData[nProfile], sizeof(SaveProfile));
-    lbl_80281FDC->n4D0C0 = nFound;
-    lbl_80281FDC->uFlags |= MC_SAVE_4D0C0;
-    lbl_80281FDC->uFlags |= MC_SAVE_OPTIONS;
-    lbl_80281FDC->uFlags |= MC_SAVE_RECORDS;
-    Mem_cpy(&lbl_80281FDC->options, &gSession.options, sizeof(GameOptions));
-    Mem_cpy(&lbl_80281FDC->records, gSession.aCourseRecord, sizeof(SaveRecords));
-    lbl_80281FDC->trailer.aMagic[0] = '@';
-    lbl_80281FDC->trailer.aMagic[1] = 'B';
-    lbl_80281FDC->trailer.aMagic[2] = 'E';
-    lbl_80281FDC->trailer.uChecksum = fn_800A23BC(lbl_80281FDC, &lbl_80281FDC->trailer);
-    nResult = fn_8009E604(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE, MC_BACKUP_NAME);
-    if (nMount == 0) {
-        fn_8009DBAC(nPort, nSlot);
-    }
-    return nResult;
+// Whether the card at pPos holds the save file (one of the file functions in lbl_8018C7D8).
+int fn_800A1758(MCCardPos* pPos) {
+    return fn_800A2248(pPos->nPort, pPos->nSlot) == 0;
 }
 
 // Read the names of the profiles saved on the card into its MCCardState, for the menus.
