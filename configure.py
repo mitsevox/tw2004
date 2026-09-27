@@ -952,7 +952,7 @@ config.libs = [
             Object(Matching, "GoShaderObject_Glows_Gc.c"),
             Object(Matching, "UFstPart.c"),
             Object(Matching, "BootCourse.c"),
-            Object(NonMatching, "SunFlr_Gc.c"),
+            Object(Matching, "SunFlr_Gc.c"),
             Object(Matching, "Code8009AA28.c"),
             Object(NonMatching, "GoGreenGrid.c"),
             Object(Matching, "MC_Gc.c"),
