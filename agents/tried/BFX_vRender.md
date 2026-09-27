@@ -8,6 +8,12 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26 e-render (aligned, base 31): red read through a flat index the frontend might not
+  match with the row (`lbl_80189CB0[0][nPlayer * 4]`, `((u8*)lbl_80189CB0)[nPlayer * 4]` /
+  `[nPlayer << 2]` / `* sizeof(row)`, `*((u8*)tab + nPlayer * 4)`, through `(u32)` arithmetic)
+  x g/b/a (row pointer for all three, g direct + row for b/a, all direct) x red before/after:
+  best 31 (current); still CSE'd.
+
 - 2026-09-26 r6-misc (quicktrial aligned, base 31): void* casts on the row (`pSrc = (u8*)(void*)
   lbl_80189CB0[nPlayer]` for all four 125, red direct + void* row for g/b/a 32, red through a
   void* row and g/b/a direct 32, `*(u8*)(void*)row` for red 32/31); red read at every statement

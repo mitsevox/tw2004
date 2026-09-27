@@ -705,29 +705,26 @@ u32 fn_8001208C(UFontContext* pCtx, f32 fXScale, f32 fYScale, f32 fX, f32 fY) {
     int a;
     UFontStop* pNext;
     UFontStop* pStop;
-    f32 fU;
-    f32 fV;
     f32 fT;
     s32 i;
 
-    fU = fX * fXScale;
-    fV = fY * fYScale;
+    fX *= fXScale;
+    fY *= fYScale;
     pStop = &pCtx->a14[0];
     pNext = pStop + 1;
-    fU -= pCtx->f04;
-    fU *= pCtx->f0C;
-    fU -= (s32)fU;
-    if (fU < 0.0f) {
-        fU = 1.0f + fU;
+    fX = pCtx->f0C * (fX - pCtx->f04);
+    fX -= (s32)fX;
+    if (fX < 0.0f) {
+        fX = 1.0f + fX;
     }
-    fV -= (s32)fV;
-    if (fV < 0.0f) {
-        fV = 1.0f + fV;
+    fY -= (s32)fY;
+    if (fY < 0.0f) {
+        fY = 1.0f + fY;
     }
     if (pCtx->n10 & 1) {
         for (i = 0; i < 4; i++) {
-            if (fU <= pNext->fPos) {
-                fT = pStop->fInvSpan * (fU - pStop->fPos);
+            if (fX <= pNext->fPos) {
+                fT = pStop->fInvSpan * (fX - pStop->fPos);
                 if (1.0f == fT) {
                     r = pNext->color.r;
                     g = pNext->color.g;
@@ -751,21 +748,21 @@ u32 fn_8001208C(UFontContext* pCtx, f32 fXScale, f32 fYScale, f32 fX, f32 fY) {
         }
     }
     if (pCtx->n10 & 2) {
-        if (1.0f == fV) {
+        if (1.0f == fY) {
             r = pCtx->a14[5].color.r;
             g = pCtx->a14[5].color.g;
             b = pCtx->a14[5].color.b;
             a = pCtx->a14[5].color.a;
-        } else if (0.0f == fV) {
+        } else if (0.0f == fY) {
             r = pCtx->a14[4].color.r;
             g = pCtx->a14[4].color.g;
             b = pCtx->a14[4].color.b;
             a = pCtx->a14[4].color.a;
         } else {
-            r = fV * (pCtx->a14[5].color.r - pCtx->a14[4].color.r) + pCtx->a14[4].color.r;
-            g = fV * (pCtx->a14[5].color.g - pCtx->a14[4].color.g) + pCtx->a14[4].color.g;
-            b = fV * (pCtx->a14[5].color.b - pCtx->a14[4].color.b) + pCtx->a14[4].color.b;
-            a = fV * (pCtx->a14[5].color.a - pCtx->a14[4].color.a) + pCtx->a14[4].color.a;
+            r = fY * (pCtx->a14[5].color.r - pCtx->a14[4].color.r) + pCtx->a14[4].color.r;
+            g = fY * (pCtx->a14[5].color.g - pCtx->a14[4].color.g) + pCtx->a14[4].color.g;
+            b = fY * (pCtx->a14[5].color.b - pCtx->a14[4].color.b) + pCtx->a14[4].color.b;
+            a = fY * (pCtx->a14[5].color.a - pCtx->a14[4].color.a) + pCtx->a14[4].color.a;
         }
     }
     color.r = r;
