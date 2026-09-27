@@ -14,13 +14,28 @@ LIMIT = 110
 
 
 def split(line):
-    """[first, rest] or None. Break points: after an argument comma, or before a binary operator.
-    The shallowest one (fewest open parentheses) that keeps the first part <= LIMIT wins, the
-    rightmost of those, so `a && f(x, y)` breaks at the && and not inside f's arguments."""
+    """[first, rest] or None. Break points: after an argument comma, before a binary operator, or
+    (last resort) right after an open parenthesis. The shallowest one (fewest open parentheses)
+    that keeps the first part <= LIMIT and shortens the line wins, the rightmost of those, so
+    `a && f(x, y)` breaks at the && and not inside f's arguments. Nothing inside a string or
+    character literal counts."""
     base = len(line) - len(line.lstrip())
-    stack, cands = [], []
-    for i, c in enumerate(line):
-        if c == '(':
+    stack, cands, quote, i = [], [], None, 0
+    while i < len(line):
+        c = line[i]
+        if quote:
+            if c == '\\':
+                i += 2
+                continue
+            if c == quote:
+                quote = None
+        elif c in '"\'':
+            quote = c
+        elif line.startswith('//', i):
+            break
+        elif c == '(':
+            if base < i < LIMIT - 1 and line[i + 1:i + 2] not in (')', ''):
+                cands.append((len(stack) + 2, i, 'paren', None))
             stack.append(i)
         elif c == ')':
             if stack:
@@ -33,11 +48,15 @@ def split(line):
                 # an assignment's = is the last resort: `a->b\n = f(...)` strands the target alone
                 rank = len(stack) + (3 if m.group(1) == '=' else 0)
                 cands.append((rank, i, 'op', stack[-1] if stack else None))
+        i += 1
+
     def parts(c):
         _, i, kind, paren = c
         indent = paren + 1 if paren is not None and paren + 1 <= 60 else base + 8
         if kind == 'comma':
             return [line[:i + 1].rstrip(), ' ' * indent + line[i + 1:].lstrip()]
+        if kind == 'paren':
+            return [line[:i + 1], ' ' * indent + line[i + 1:].lstrip()]
         return [line[:i].rstrip(), ' ' * indent + line[i + 1:]]
 
     cands = [c for c in cands if len(parts(c)[1]) < len(line)]     # a break must shorten the line
@@ -83,16 +102,23 @@ def main():
             if s.startswith('//') and ' ' in s[3:LIMIT - (len(l) - len(s))]:
                 # a whole-line comment: move the words past the limit to a new comment line
                 pre = l[:len(l) - len(s)] + '// '
-                cut = l.rfind(' ', 0, LIMIT + 1)
+                cut = l.rfind(' ', 0, 101)                    # docs/style.md: comments wrap at 100
                 if cut > len(pre):
-                    src[n - 1:n] = [l[:cut].rstrip(), pre + l[cut + 1:]]
+                    rest = l[cut + 1:]
+                    nxt = src[n] if n < len(src) else ''
+                    if nxt.startswith(pre) and not nxt[len(pre):].startswith((' ', '-', '*')):
+                        # the paragraph goes on: the spilled words join its next line (which
+                        # lint then reports again if it grew too long; name.py runs this 3 times)
+                        src[n - 1:n + 1] = [l[:cut].rstrip(), pre + rest + ' ' + nxt[len(pre):]]
+                    else:
+                        src[n - 1:n] = [l[:cut].rstrip(), pre + rest]
                     continue
-            if s.startswith(('//', '#', '/*', '*')) or '"' in l or "'" in l or '//' in l:
-                print(f'{f}:{n}: left alone (comment, string or preprocessor)')
+            if s.startswith(('//', '#', '/*', '*')) or re.search(r'\S\s*//', l):
+                print(f'{f}:{n}: left alone (comment or preprocessor line, or a trailing comment)')
                 continue
             w = wrap(l)
             if w is None:
-                print(f'{f}:{n}: no comma to break at')
+                print(f'{f}:{n}: no break point found')
                 continue
             src[n - 1:n] = w
         p.write_bytes(eol.join(src).encode('utf-8', 'surrogateescape'))
