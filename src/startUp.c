@@ -153,6 +153,8 @@ KEEP_UNUSED u32 lbl_802820EC;
 
 Voice* lbl_802820E8;            // the voices, NUM_VOICES of them
 
+MsgHandler lbl_801F5DA8[30];
+
 // The mixer callback, run after every audio frame: for each voice, ask for a lost hardware voice
 // back, pass changed settings on to the hardware, start, release, pause and resume it, and step
 // its volume envelope.
