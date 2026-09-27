@@ -17,6 +17,8 @@ u8   GameModeReplay_HoleFinished(int nPlayer, u8 bCheck);
 u8   GameModeReplay_GameFinished(u8 bCheck);
 void GameModeReplay_EndGame(void);
 
+f32 lbl_80211D38[40][4];
+
 // Mode 10 starts: one player, no mulligans, no split screen; hole 0 of the round is made current.
 void GameModeReplay_Init(void) {
     gpGame->pfnInit = GameModeReplay_Init;

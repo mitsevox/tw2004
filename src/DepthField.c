@@ -15,6 +15,11 @@ void DF_vDrawBufferToScreen(int n);
 void fn_80045880(int n);
 void fn_800458B4(void);
 
+GxTexture lbl_801D51C8[2];
+GxTexture lbl_801D5198;
+DFBuffer lbl_801D5188;
+DFLayer lbl_801D5110[5];
+
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x80283148), before the 0.0f fn_80045660 uses first; its body is unknown.
 static f32 DepthField_StrippedFn(f32 x) {

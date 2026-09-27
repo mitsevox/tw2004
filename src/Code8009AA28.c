@@ -9,6 +9,8 @@
 #include "glows.h"
 #include "camera.h"
 
+SunFlrState lbl_801E1470;
+
 // SunFlr_Gc.c
 void fn_8009A340(void);
 void fn_8009A3D0(s32 nView, SunFlrView* pView);
