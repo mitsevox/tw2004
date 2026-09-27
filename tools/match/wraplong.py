@@ -3,7 +3,8 @@ longer pushes call lines over). The continuation lines up under the open parenth
 statement's indent when that is too deep). Comment-only lines, preprocessor lines and lines holding a
 string or a // comment are left alone (reported instead).
     python tools/match/wraplong.py <file:line> ...        e.g. from `lint.py --diff main`
-    python tools/match/wraplong.py --from-lint            every long-line finding of lint --diff main
+    python tools/match/wraplong.py --from-lint [--diff REV]   every long-line finding of lint --diff REV
+                                                          (default main; name.py passes HEAD)
 Wrapping moves the following lines down, so a __LINE__ constant below it changes: rebuild and check
 main.dol: OK."""
 import pathlib, re, subprocess, sys
@@ -53,9 +54,12 @@ def wrap(line):
 def main():
     args = sys.argv[1:]
     if '--from-lint' in args:
-        res = subprocess.run([sys.executable, str(ROOT / 'tools/match/lint.py'), '--diff', 'main'],
+        rev = args[args.index('--diff') + 1] if '--diff' in args else 'main'
+        res = subprocess.run([sys.executable, str(ROOT / 'tools/match/lint.py'), '--diff', rev],
                              capture_output=True, text=True, cwd=ROOT).stdout
         args = [m.group(1) for m in re.finditer(r'^(\S+?:\d+): long-line', res, re.M)]
+        if not args:
+            return
     if not args:
         sys.exit(__doc__)
     by_file = {}
