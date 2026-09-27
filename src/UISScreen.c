@@ -662,44 +662,74 @@ void fn_8016AEEC(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
 // Looks under a node (nKind 8) or a group (nKind 7) for the one pInfo belongs to and records it
 // as pInfo's owner. Returns -1 when it is not found.
 s32 fn_8016AD54(UISScreen* pScreen, UISNodeInfo* pInfo, s32 nKind, void* p) {
+    // fake match: this declaration order (with the copies below) gives EA's registers.
+    UISGroup* pGroup;
     u32 i;
+    UISNode* pNode;
+    // fake match: one count for both loops (nGroups, then nEntries): with it nEntries takes r28
+    // and case 7's counter r27 (EA's li r27,0 / lwz r28 / mr r29,r27); with two, they swap.
+    u32 nCount;
+    UISEntry* pEntry;
+    UISNode* pLoop8;
+    UISNode* pPrev8;
+    UISGroup* pLoop7;
     s32 nFound;
 
     if (pInfo == NULL || p == NULL || pScreen == NULL) return -1;
     switch (nKind) {
-    case 8: {
-        UISNode* pNode = p;
+    case 8:
+        pNode = p;
         if (pNode->pInfo == pInfo) {
             pInfo->p0 = pNode;
             return pNode->pInfo->p0 != NULL;
         }
         if (pNode->pInfo != NULL && pNode->pInfo->p0 != NULL) {
-            u32 nGroups = pNode->nGroups;
-            for (i = 0; i < nGroups; i++) {
-                nFound = fn_8016AD54(pScreen, pInfo, 7, pNode->ppGroups[i]);
+            nCount = pNode->nGroups;
+            // fake match: pLoop8 and pPrev8 always hold pNode; the copies carried round the loop
+            // keep pNode apart from p (EA's mr r27,r6 with the first read through r6), and taking
+            // pPrev8 before the copy keeps EA's argument order (li r5,7 before the lwzx).
+            pLoop8 = pNode;
+            for (i = 0; i < nCount; i++) {
+                pPrev8 = pLoop8;
+                pLoop8 = pNode;
+                nFound = fn_8016AD54(pScreen, pInfo, 7, pPrev8->ppGroups[i]);
+                // fake match: nFound goes through a 64-bit shift up and back down (the value is
+                // unchanged). The shifts become a chain of word copies; each copy-propagation pass
+                // removes one link, so EA's copy of the call result survives (mr r0,r3; cmpwi r0,-1).
+                // port: relies on the conversion to s64 wrapping and on >> of a negative s64 being
+                // arithmetic.
+                nFound = (s32)((s64)((u64)(u32)nFound << 32) >> 32);
                 if (nFound != -1) return nFound;
             }
         }
         break;
-    }
-    case 7: {
-        UISGroup* pGroup = p;
+    case 7:
+        pGroup = p;
         if (pGroup->pInfo == pInfo) {
             pInfo->p0 = pGroup;
             return pGroup->pInfo->p0 != NULL;
         }
         if (pGroup->pInfo != NULL && pGroup->pInfo->p0 != NULL) {
-            u32 nEntries = pGroup->nEntries;
-            for (i = 0; i < nEntries; i++) {
-                UISEntry* pEntry = &pGroup->pEntries[i];
+            nCount = pGroup->nEntries;
+            // fake match: pLoop7 always holds pGroup; the copy carried round the loop keeps pGroup
+            // apart from p (EA's mr r26,r6 with the first read through r6).
+            pLoop7 = pGroup;
+            for (i = 0; i < nCount; i++) {
+                pEntry = &pLoop7->pEntries[i];
+                pLoop7 = pGroup;
                 if (pEntry->uHandler == 0xFFFF) {
                     nFound = fn_8016AD54(pScreen, pInfo, 8, &pScreen->pData->pNodes[pEntry->u4.nNode]);
+                    // fake match: the same 64-bit shift as in case 8, then a 64-bit round trip (both
+                    // leave the value unchanged); this block needs one copy link more to keep EA's
+                    // copy of the call result (mr r0,r3; cmpwi r0,-1).
+                    // port: as in case 8.
+                    nFound = (s32)((s64)((u64)(u32)nFound << 32) >> 32);
+                    nFound = (s32)(u64)(u32)nFound;
                     if (nFound != -1) return nFound;
                 }
             }
         }
         break;
-    }
     }
     return -1;
 }
