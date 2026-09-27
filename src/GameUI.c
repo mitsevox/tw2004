@@ -68,7 +68,9 @@ u8  lbl_80282282;
 u8  lbl_80282281;
 u8  lbl_80282280;
 
-// Clears every display flag and queue at the start of a hole (and when it restarts).
+// Clears every display flag, queue count and pending message at the start of a hole
+// (GM_InitForHole) and when it restarts (GM_RestartHole); also clears GameMessages' lbl_80203138
+// flags (fn_800E5DA0) and sends UI message 31 (fn_800E3B04).
 void GUI_Init(void) {
     lbl_802822DF = 0;
     lbl_802822DC[0] = 0;
@@ -127,11 +129,14 @@ u8    fn_80127004(void);
 
 void  fn_800A7350(int a);
 
+// Shuts the in-game HUD down: it only stops every controller's rumble (fn_8001437C).
 void GUI_DeInit(void) {
     fn_8001437C();
 }
 
-// Show (b = 1) or hide the HUD on the single screen, and when.
+// Shows (b = 1: readouts refreshed by GUI_UpdateAllUIData, then UI message 2) or hides (message 1)
+// the single-screen HUD, view 1; keeps the state for GUI_UIVisible and the frame count of the
+// toggle.
 void GUI_ShowToggleFullScreenUI(u8 b) {
     if (b) {
         GUI_UpdateAllUIData();
@@ -201,7 +206,8 @@ u8 GUI_UIVisible(int nPlayer) {
     return lbl_802822D9;
 }
 
-// Refreshes every HUD readout; the show functions call it before a HUD comes up.
+// Refreshes every HUD readout (five updates; TW07 inlines the course, golfer, lie, shot and wind
+// ones here); the show functions call it before a HUD comes up.
 void GUI_UpdateAllUIData(void) {
     fn_800E5450();
     fn_800E542C();
@@ -210,8 +216,10 @@ void GUI_UpdateAllUIData(void) {
     fn_8006A8B0();
 }
 
-// Pauses the game once (gSession.nPaused and the flag GUI_IsPauseMenuOpen returns): rumble off, message
-// 0x23 with 0, watch 1 stopped, a GameBreaker paused, EASBio play state 0.
+// Opens the pause menu, once (nothing while already paused): pending UI message 0x31 flagged
+// (fn_800E5714(4)), the controllers' rumble stopped, message 0x23 with 0, timer 1 stopped, the
+// pause flag GUI_IsPauseMenuOpen returns and gSession.nPaused set, a GameBreaker paused, EASBio's
+// play state 0, and in a GameMode5 challenge fn_800ECBE4.
 void GUI_OpenPauseMenu(void) {
     if (gSession.nPaused == 0) {
         fn_800E5714(4);
@@ -237,10 +245,16 @@ void GUI_SetEndOfGamePending(void) {
     lbl_80282281 = 0;
 }
 
-// Unpauses, and finishes whatever the pause was covering: the end-of-round screen (gSession.b12
-// ends the round) or the end-of-hole screen (the mode is told; mode 12 clears the hole's scores,
-// then it or bD4/b134 ask for a hole load (fn_8006F4B4), otherwise the next selected hole; every
-// ball goes back on the tee lie).
+// Closes the pause menu (nothing when not paused) and finishes what the pause was covering. Unless
+// a menu screen is still up (fn_800E5C84) it unpauses: timer 1 restarted, the pause flags cleared,
+// a GameBreaker resumed, sound unpaused, EASBio's play state 1. Then the save images are parked
+// (fn_8009EF98) and message 0x23 with 1 goes out in a replay outside modes 10 and 11. After the
+// end-of-round screen gSession.b12 = 1 ends the round. After the end-of-hole screen: event 0x46 and
+// the mode's pfn214, then in mode 12 every player's scores for the hole cleared and a hole load
+// asked for (fn_8006F4B4), the same load in a playoff (bD4) or with b134, otherwise
+// GM_GotoNextSelectedHole; every ball's lie goes back to 0. The game's sounds come back on after
+// either screen (and, with the music, in the skill-zone modes unless the round is ending);
+// commentary stops after either screen, and whenever options byte 4 is 0.
 void GUI_PauseMenuClosed(void) {
     int i;
     int j;
@@ -302,8 +316,10 @@ u8 GUI_IsPauseMenuOpen(void) {
     return lbl_802822DF;
 }
 
-// A HUD message: message nMsg for a player, with a number (a distance, strokes over par); not
-// in mode 11.
+// Shows a post-shot message on the HUD (TW07: type, yardage, player): UI message 5 with the message
+// type nMsg, the float f (a distance, strokes over par) and the player counted from 1, and a
+// post-shot display flagged as requested (GUI_IsPostShotUIAnimating). Nothing in mode 11 (the
+// lessons).
 void GUI_StartPostShotUI(int nMsg, int nPlayer, f32 f) {
     int nWho;
     if (Game_GetMode() != 11) {
@@ -325,7 +341,8 @@ void GUI_AdvancePostShotUI(int nPlayer) {
     GUI_HideAllHelpTips();
 }
 
-// Hides the HUD's prompts: mulligan (message 29), replay (46) and message 47.
+// Hides the HUD's button prompts: mulligan (message 29), replay (46) and tap-in (47); TW07 inlines
+// GUI_ToggleMulligan, GUI_ToggleReplay and GUI_ToggleTapin here.
 void GUI_HideAllHelpTips(void) {
     fn_800E0AC4(0);
     fn_800E0A98(0);
@@ -340,8 +357,9 @@ void GUI_PostShotUIStart(int i) {
     lbl_802822DB = 0;
 }
 
-// Whether a message or screen still holds a player: the message flag, mode 26 or 22 while its
-// state is not 5 with a count left, or the player's own slot (slot 0 outside split screen).
+// Whether a post-shot display still holds the player: one has been requested (GUI_StartPostShotUI,
+// GUI_FlagPostShotRequest), mode 26's or mode 22's end-of-game countdown is running, or the UI
+// reports one showing in the player's screen slot (slot 0 outside split screen).
 u8 GUI_IsPostShotUIAnimating(int nPlayer) {
     if (lbl_802822DB) {
         return 1;
@@ -373,7 +391,9 @@ u8 GUI_IsPausedOrPostShotUIAnimating(int nPlayer) {
     return b;
 }
 
-// Adds an item to one of the twelve display queues (queue 5 ignores an item already queued).
+// Adds an item (three values a, b, c) to display queue nQueue, 0..11 (TW07:
+// GUI_QueUIMessageMessage). Queue 5 skips an item whose a is already queued; no queue checks for
+// room (UI_QUEUE_LEN items each). GUI_CheckMessageQue shows the items, newest first.
 void GUI_QueueMessage(u32 nQueue, int a, int b, int c) {
     int i;
     switch (nQueue) {
@@ -424,6 +444,8 @@ void GUI_QueueMessage(u32 nQueue, int a, int b, int c) {
     }
 }
 
+// Queues the golfers-tied HUD message (post-shot message 14), which GUI_CheckMessageQue shows once
+// no screen slot is up; the modes call it when a game ends level and goes to a playoff.
 void GUI_GolfersTiedUIMessage(void) {
     lbl_802822A4 = 14;
 }
@@ -440,14 +462,13 @@ u8 GUI_GetUIMessageQued(void) {
     return 0;
 }
 
-// The display pump, every frame. With no screen slot up, queued items only raise message 16 and
-// the pending message and deferred screens go up one at a time; with a slot up, the newest item
-// of the first non-empty queue goes to that queue's handler (queue 5 is never taken). Returns
-// nonzero while anything is still showing.
-//
-// Two copy-and-paste slips in the original are kept: queue 4 reads its item's second and third
-// values with queue 3's count (always 0 here, so from the entry before the queue), and queue 8
-// reads its third value from one entry past the item.
+// The HUD message pump, every frame; returns nonzero while anything is still showing (always while
+// lbl_802822BC is set). With no screen slot up, queued items only raise message 16, and the pending
+// message and the deferred scorecards and messages go up one at a time. With a slot up, the newest
+// item of the first non-empty queue, taken in the order 0, 2, 1, 3, 4, 6..11 (queue 5 never), goes
+// to that queue's handler. Two copy-and-paste slips in the original are kept (marked inside): queue
+// 4 reads its item's second and third values with queue 3's count (always 0 there, so from the
+// entry before the queue), and queue 8 reads its third value from one entry past the item.
 u8 GUI_CheckMessageQue(void) {
     u8 bBusy = 0;
     if (lbl_802822BC) {
@@ -571,9 +592,10 @@ u8 GUI_ScoreCardUp(void) {
     return b;
 }
 
-// The end-of-hole screen (message 14, kind 1): while a screen slot is up or anything is queued it
-// waits for GUI_CheckMessageQue; otherwise sound off (not in mode 7), next hole pending, effects reset,
-// and event 0x41 when bHuman.
+// Shows the end-of-hole scorecard (UI message 14 with kind 1 and bHuman). While a screen slot is up
+// or anything is queued it is deferred (GUI_CheckMessageQue shows it later); otherwise the game's
+// sounds go off (not in mode 7), the end-of-hole flag is set for GUI_ScoreCardUp and
+// GUI_PauseMenuClosed, the GameBreaker settings are reset, and with bHuman event 0x41 fires.
 void GUI_BetweenHolesScorecard(u8 bHuman) {
     if (lbl_802822DC[0] || lbl_802822DC[1] || lbl_802822DC[2] || lbl_802822B8 != 0 || lbl_802822B4 != 0 ||
         lbl_802822B0 != 0 || lbl_802822AC != 0 || lbl_802822A8 != 0 || lbl_802822A4 != 0 ||
@@ -606,8 +628,9 @@ void GUI_SetEndOfHolePending(void) {
     lbl_80282281 = 1;
 }
 
-// The end-of-round screen (message 14, kind 2), as GUI_BetweenHolesScorecard does the end-of-hole one; in
-// modes 22 and 26 in split screen both players' cameras are moved first.
+// Shows the end-of-round scorecard (UI message 14 with kind 2), as GUI_BetweenHolesScorecard does
+// the end-of-hole one, setting the end-of-round flag; in modes 22 and 26 in split screen both
+// players' views have their black fade cleared at once first (CameraController_FadeIn over 0 s).
 void GUI_EndOfGameScorecard(u8 bHuman) {
     if (lbl_802822DC[0] || lbl_802822DC[1] || lbl_802822DC[2] || lbl_802822B8 != 0 || lbl_802822B4 != 0 ||
         lbl_802822B0 != 0 || lbl_802822AC != 0 || lbl_802822A8 != 0 || lbl_802822A4 != 0 ||

@@ -27,19 +27,19 @@ u8   lbl_8028227C;                          // game.h
 s32  lbl_80282278;                          // game.h
 char lbl_80282270[8];                       // the hole name
 
-void  fn_800E3AF4(void);
-s32   fn_800E3AEC(int a);
-u8    fn_800E3AE4(int nPlayer, u8 bCheck);
-u8    fn_800E3ADC(u8 bCheck);
-u8    fn_800E3AD4(u8 bCheck);
-void  fn_800E3AD0(int nPlayer);
-u8    fn_800E3AC8(int nPlayer);
-u8    fn_800E3AC0(void);
-u8    fn_800E3AB8(int nPlayer);
-s32   fn_800E3AB0(int nPlayer);
-void  fn_800E3AAC(int nPlayer, int nTime);
-void  fn_800E3AA8(int nPlayer, int nId);
-s32   fn_800E3AA0(int a, int nTarget);
+void  GM_DefaultNoOp(void);
+s32   GM_DefaultGetHonors(int a);
+u8    GM_DefaultHoleFinished(int nPlayer, u8 bCheck);
+u8    GM_DefaultGameFinished(u8 bCheck);
+u8    GM_DefaultGoToPlayoff(u8 bCheck);
+void  GM_DefaultNoOpPlayer(int nPlayer);
+u8    GM_DefaultFalsePlayer(int nPlayer);
+u8    GM_DefaultTrue(void);
+u8    GM_DefaultTruePlayer(int nPlayer);
+s32   GM_DefaultZeroPlayer(int nPlayer);
+void  GM_DefaultSetTimeLeft(int nPlayer, int nTime);
+void  GM_DefaultBonusCollected(int nPlayer, int nId);
+s32   GM_DefaultTargetState(int a, int nTarget);
 void  GameModeDriverPGATour_Init(void);
 void  fn_8010C4A0(void);
 void  fn_80125E68(void);
@@ -148,48 +148,48 @@ void GM_SetModeType(int nMode) {
     gpGame->n290 = 2;
     gpGame->n294 = 1;
     gpGame->b28E = 0;
-    gpGame->pfnInit = fn_800E3AF4;
-    gpGame->pfnShutdown = fn_800E3AF4;
-    gpGame->pfnSetupNextGolfer = fn_800E3AF4;
-    gpGame->pfnGetHonors = fn_800E3AEC;
-    gpGame->pfnHoleFinished = fn_800E3AE4;
-    gpGame->pfnGameFinished = fn_800E3ADC;
-    gpGame->pfnGoToPlayoff = fn_800E3AD4;
-    gpGame->pfn1E4 = fn_800E3AF4;
-    gpGame->pfnEndHole = fn_800E3AF4;
-    gpGame->pfn1EC = fn_800E3AF4;
-    gpGame->pfn1F0 = fn_800E3AF4;
-    gpGame->pfnEndGame = fn_800E3AF4;
+    gpGame->pfnInit = GM_DefaultNoOp;
+    gpGame->pfnShutdown = GM_DefaultNoOp;
+    gpGame->pfnSetupNextGolfer = GM_DefaultNoOp;
+    gpGame->pfnGetHonors = GM_DefaultGetHonors;
+    gpGame->pfnHoleFinished = GM_DefaultHoleFinished;
+    gpGame->pfnGameFinished = GM_DefaultGameFinished;
+    gpGame->pfnGoToPlayoff = GM_DefaultGoToPlayoff;
+    gpGame->pfn1E4 = GM_DefaultNoOp;
+    gpGame->pfnEndHole = GM_DefaultNoOp;
+    gpGame->pfn1EC = GM_DefaultNoOp;
+    gpGame->pfn1F0 = GM_DefaultNoOp;
+    gpGame->pfnEndGame = GM_DefaultNoOp;
     gpGame->pfn1F8 = fn_800CF158;
     gpGame->pfn1FC = fn_800CF450;
     gpGame->pfn200 = fn_800CFE74;
     gpGame->pfn204 = fn_800D0098;
     gpGame->pfn208 = fn_800D030C;
-    gpGame->pfn210 = fn_800E3AD0;
-    gpGame->pfn214 = fn_800E3AF4;
-    gpGame->pfn218 = fn_800E3AD0;
-    gpGame->pfn21C = fn_800E3AD0;
-    gpGame->pfn220 = fn_800E3AF4;
-    gpGame->pfn224 = fn_800E3AF4;
-    gpGame->pfn228 = fn_800E3AD0;
-    gpGame->pfn22C = fn_800E3AD0;
-    gpGame->pfn230 = fn_800E3AC8;
-    gpGame->pfn234 = fn_800E3AC0;
-    gpGame->pfn238 = fn_800E3AB8;
-    gpGame->pfn23C = fn_800E3AD0;
-    gpGame->pfn240 = fn_800E3AB0;
-    gpGame->pfn244 = fn_800E3AD0;
-    gpGame->pfnEndGolferTurn = fn_800E3AD0;
-    gpGame->pfn24C = fn_800E3AD0;
-    gpGame->pfn250 = fn_800E3AD0;
-    gpGame->pfn254 = fn_800E3AD0;
-    gpGame->pfn258 = fn_800E3AC8;
-    gpGame->pfn25C = fn_800E3AAC;
-    gpGame->pfn260 = fn_800E3AD0;
-    gpGame->pfn264 = fn_800E3AC8;
-    gpGame->pfn268 = fn_800E3AA8;
-    gpGame->pfn26C = fn_800E3AA0;
-    gpGame->pfn20C = fn_800E3AD0;
+    gpGame->pfn210 = GM_DefaultNoOpPlayer;
+    gpGame->pfn214 = GM_DefaultNoOp;
+    gpGame->pfn218 = GM_DefaultNoOpPlayer;
+    gpGame->pfn21C = GM_DefaultNoOpPlayer;
+    gpGame->pfn220 = GM_DefaultNoOp;
+    gpGame->pfn224 = GM_DefaultNoOp;
+    gpGame->pfn228 = GM_DefaultNoOpPlayer;
+    gpGame->pfn22C = GM_DefaultNoOpPlayer;
+    gpGame->pfn230 = GM_DefaultFalsePlayer;
+    gpGame->pfn234 = GM_DefaultTrue;
+    gpGame->pfn238 = GM_DefaultTruePlayer;
+    gpGame->pfn23C = GM_DefaultNoOpPlayer;
+    gpGame->pfn240 = GM_DefaultZeroPlayer;
+    gpGame->pfn244 = GM_DefaultNoOpPlayer;
+    gpGame->pfnEndGolferTurn = GM_DefaultNoOpPlayer;
+    gpGame->pfn24C = GM_DefaultNoOpPlayer;
+    gpGame->pfn250 = GM_DefaultNoOpPlayer;
+    gpGame->pfn254 = GM_DefaultNoOpPlayer;
+    gpGame->pfn258 = GM_DefaultFalsePlayer;
+    gpGame->pfn25C = GM_DefaultSetTimeLeft;
+    gpGame->pfn260 = GM_DefaultNoOpPlayer;
+    gpGame->pfn264 = GM_DefaultFalsePlayer;
+    gpGame->pfn268 = GM_DefaultBonusCollected;
+    gpGame->pfn26C = GM_DefaultTargetState;
+    gpGame->pfn20C = GM_DefaultNoOpPlayer;
     lbl_80282278 = 0;
     switch (Game_GetMode()) {
     case 0:
@@ -1347,52 +1347,52 @@ u8 GM_IsSpeedGolfMode(void) {
 }
 
 // The default mode callbacks GM_SetModeType installs.
-s32 fn_800E3AA0(int a, int nTarget) {
+s32 GM_DefaultTargetState(int a, int nTarget) {
     return 0;
 }
 
-void fn_800E3AA8(int nPlayer, int nId) {
+void GM_DefaultBonusCollected(int nPlayer, int nId) {
 }
 
-void fn_800E3AAC(int nPlayer, int nTime) {
+void GM_DefaultSetTimeLeft(int nPlayer, int nTime) {
 }
 
-s32 fn_800E3AB0(int nPlayer) {
+s32 GM_DefaultZeroPlayer(int nPlayer) {
     return 0;
 }
 
-u8 fn_800E3AB8(int nPlayer) {
+u8 GM_DefaultTruePlayer(int nPlayer) {
     return 1;
 }
 
-u8 fn_800E3AC0(void) {
+u8 GM_DefaultTrue(void) {
     return 1;
 }
 
-u8 fn_800E3AC8(int nPlayer) {
+u8 GM_DefaultFalsePlayer(int nPlayer) {
     return 0;
 }
 
-void fn_800E3AD0(int nPlayer) {
+void GM_DefaultNoOpPlayer(int nPlayer) {
 }
 
-u8 fn_800E3AD4(u8 bCheck) {
+u8 GM_DefaultGoToPlayoff(u8 bCheck) {
     return 0;
 }
 
-u8 fn_800E3ADC(u8 bCheck) {
+u8 GM_DefaultGameFinished(u8 bCheck) {
     return 0;
 }
 
-u8 fn_800E3AE4(int nPlayer, u8 bCheck) {
+u8 GM_DefaultHoleFinished(int nPlayer, u8 bCheck) {
     return 0;
 }
 
-s32 fn_800E3AEC(int a) {
+s32 GM_DefaultGetHonors(int a) {
     return 0;
 }
 
-void fn_800E3AF4(void) {
+void GM_DefaultNoOp(void) {
 }
 
 // Whether GM_Pick_PlayOffHole still has to save the round's hole selection as the playoff holes
