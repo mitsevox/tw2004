@@ -1,6 +1,8 @@
 # Session_SetupProfiles (Code8002EE1C.c, 0x8002EF64)
 
-Status: OPEN, 95.84% on 2026-09-25.
+Status: SOLVED 2026-09-26 (e-link2, 8d1ca71): SaveProfile.n54C2 is s8 in EA's struct (include/game/save.h,
+was u8). Unit Code8002EE1C linked (.sdata2 0x80282F20-0x80282F30, Code8002EE1C_StrippedFn for the
+1.0f that opens the pool).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -9,6 +11,17 @@ unless you combine it with something new. Before you stop, add every attempt und
 ## Attempts
 
 (add yours here: date, lane, what, score)
+
+- 2026-09-26, e-link2: SOLVED. mwcc-debugger: our registers were EA's, and EA's final order was our
+  order BEFORE the post-regalloc scheduling pass. That pass only reschedules blocks regalloc touched:
+  the block's `.n2 = gpSaveData[..].n54C2` store (s8 <- u8) left a dead `extsb` (peephole-forward
+  moved the stb onto the lbzx), regalloc deleted it and so cleared the block's "scheduled" flag
+  (`{400c}` -> `{4004}`), and the block was rescheduled. With `#pragma peephole off` the copy block
+  matched (15 aligned, other diffs elsewhere), which pointed at it. n54C2 declared s8 (no
+  conversion, no extsb): 14 -> 0, 95.84 -> 100. Also tried: `(u8)`/`(s8)` casts on the load 14,
+  `*(s8*)&` 0 (not used: the header type is the EA form; FE_MessageTable already reads it `(s8)`).
+  `#pragma scheduling 601/602/603/604/750/7400/off` 14-77; per-function pragma sweep 14-136;
+  permuter 20 min (base 470): nothing before the fix was found.
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 

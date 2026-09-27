@@ -213,6 +213,7 @@ Code8002DB80.c:
 
 Code8002EE1C.c:
 	.text       start:0x8002EE1C end:0x8002F1D4
+	.sdata2     start:0x80282F20 end:0x80282F30
 
 GoRenderSurface.c:
 	.text       start:0x8002F1D4 end:0x8002F4FC
@@ -1033,6 +1034,8 @@ GameModeBattle.c:
 
 GameModeBestBall.c:
 	.text       start:0x800E81C4 end:0x800E8D58
+	.rodata     start:0x80184DB0 end:0x80184DC0
+	.sdata2     start:0x80284650 end:0x80284658
 
 GameModeFourBall.c:
 	.text       start:0x800E8D58 end:0x800E9E40
