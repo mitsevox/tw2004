@@ -10,11 +10,26 @@ UISWord lbl_802805D8[20];
 
 void fn_80168644(UIStudio* pStudio, UISScreen* pScreen, s32 nKind, void* p, s32 bOn);
 
+// name: Madden 2003 STABS (UISStack.c)
+static inline u8* _UISPatchFncPC(UIStudio* pStudio, UISScreenFile* pData, u32 uOffset) {
+    u8* pRet;
+
+    if ((uOffset & 0x80000000) == 0x80000000) {
+        pRet = (u8*)pStudio->pCurrent->p10 + (uOffset & 0x7FFFFFFF);
+    } else {
+        pRet = (u8*)pData + uOffset;
+    }
+    return pRet;
+}
+
 // Runs a screen's script from pFrame->p10: a byte-code machine with a stack of 32-bit words
 // (ints, floats and pointers) that grows up from pFrame->pC. It stops at the script's end
 // (returns 0) or when the script waits for another screen (returns 3; fn_80169308 resumes it
 // from the p60 record it keeps). Immediates are big-endian; opcodes not listed do nothing.
 // port: the stack keeps pointers in 32-bit words, like the rest of the studio.
+// fake match: EA's build inlines _UISPatchFncPC here; ours needs a larger inline budget than CW's
+// default (7000). Deferred inlining reads the setting at the end of the file, so it stays set.
+#pragma inline_max_total_size(8000)
 s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, UISNodeInfo* pInfo) {
     s32* pTop;
     u8 uOp;
@@ -115,32 +130,10 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             if (nArgs >= 5) {
                 if (nArgs >= 6) {
                     u = *--pFrame->pC;
-                    // fake match: each script address is resolved through these temporaries, the
-                    // file base read first and the result copied, as from an inline helper.
-                    {
-                        u8* pBase = (u8*)pScreen->pData;
-                        u8* pRet;
-
-                        if ((u & 0x80000000) == 0x80000000) {
-                            pRet = (u8*)pStudio->pCurrent->p10 + (u & 0x7FFFFFFF);
-                        } else {
-                            pRet = (u8*)(u + (uptr)pBase);  // fake match: EA's add order; port: pointer-sized
-                        }
-                        pStepScript = pRet;
-                    }
+                    pStepScript = _UISPatchFncPC(pStudio, pScreen->pData, u);
                 }
                 u = *--pFrame->pC;
-                {
-                    u8* pBase = (u8*)pScreen->pData;
-                    u8* pRet;
-
-                    if ((u & 0x80000000) == 0x80000000) {
-                        pRet = (u8*)pStudio->pCurrent->p10 + (u & 0x7FFFFFFF);
-                    } else {
-                        pRet = (u8*)(u + (uptr)pBase);  // fake match: EA's add order; port: pointer-sized
-                    }
-                    pDoneScript = pRet;
-                }
+                pDoneScript = _UISPatchFncPC(pStudio, pScreen->pData, u);
             }
             nTime = *--pFrame->pC;
             fTarget = *(f32*)--pFrame->pC;
@@ -158,17 +151,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             u32 u;
 
             u = *--pFrame->pC;
-            {
-                u8* pBase = (u8*)pScreen->pData;
-                u8* pRet;
-
-                if ((u & 0x80000000) == 0x80000000) {
-                    pRet = (u8*)pStudio->pCurrent->p10 + (u & 0x7FFFFFFF);
-                } else {
-                    pRet = (u8*)(u + (uptr)pBase);  // fake match: EA's add order; port: pointer-sized
-                }
-                pStepScript = pRet;
-            }
+            pStepScript = _UISPatchFncPC(pStudio, pScreen->pData, u);
             nId = *--pFrame->pC;
             fn_80165D90(pStudio, pScreen, pNodeInfo, nId, pStepScript, nU10);
             break;
@@ -572,17 +555,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             u = (uByte0 << 24) | (uByte1 << 16) | (uByte2 << 8) | uByte3;
             *pFrame->pC = (s32)pFrame->p10;
             pFrame->pC++;
-            {
-                u8* pBase = (u8*)pScreen->pData;
-                u8* pRet;
-
-                if ((u & 0x80000000) == 0x80000000) {
-                    pRet = (u8*)pStudio->pCurrent->p10 + (u & 0x7FFFFFFF);
-                } else {
-                    pRet = pBase + u;
-                }
-                pFrame->p10 = pRet;
-            }
+            pFrame->p10 = _UISPatchFncPC(pStudio, pScreen->pData, u);
             break;
         }
         case 0x44:  // return to the popped address
