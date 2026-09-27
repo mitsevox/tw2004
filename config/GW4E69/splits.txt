@@ -828,6 +828,7 @@ PsBallFx.c:
 	.data       start:0x8018C868 end:0x8018E988
 	.bss        start:0x801F1708 end:0x801F1790
 	.sdata      start:0x80281408 end:0x80281418
+	.sbss       start:0x80282018 end:0x80282020
 	.sdata2     start:0x80283F28 end:0x80283F48
 
 GameAudio.c:
