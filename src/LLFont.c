@@ -296,7 +296,7 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
     f32 fAlignX;
     f32 fScaleY;
     f32 fWidth;
-    f32 fOffY;
+    f32 fY0;
     f32 fOffX;
     f32 fLeft;
     f32 fY;
@@ -304,24 +304,22 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
     f32 fScaleX;
     f32 fAdvance;
     f32 fSizeX;
-    f32 fGradX;
     f32 fX;
-    f32 fGradY;
     u32 uColor;
     u8 bMeasured;
     f32 fX0;
-    f32 fY0;
+    f32 fOffY;
     f32 fX1;
     f32 fY2;
     f32 fY1;
     f32 fX2;
-    f32 fX3;
+    f32 fNegSin;
     f32 fAdvScale;
     f32 fY3;
+    f32 fRun;
     f32 fSin;
     f32 fCos;
-    f32 fNegSin;
-    f32 fRun;
+    f32 fX3;
     f32 fRight;
     f32 fBottom;
     s32 nSaved;
@@ -329,6 +327,8 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
     GXColor uSavedColor;
     f32 fSavedY;
     f32 fSavedX;
+    f32 fGradX;
+    f32 fGradY;
 
     if (pCtx->uA8 != 0 && lbl_80281C88 == 0) {
         lbl_80281C88 = 1;
@@ -364,8 +364,8 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
     fAlignY = fAlignX;
     fSizeY = pCtx->f80;
     fSizeX = pCtx->f7C;
-    fScaleY = pCtx->f88 * (pCtx->n6C * fSizeY);
     fScaleX = pCtx->n68 * fSizeX;
+    fScaleY = pCtx->f88 * (pCtx->n6C * fSizeY);
     if (pCtx->n9C & 0xFF) {
         fWidth = fn_80011C90(pFont, pCtx, p);
         bMeasured = 1;
@@ -407,8 +407,8 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
         }
         fY -= pFont->f00 * fSizeY * fAlignY;
     }
-    fAdvScale = pCtx->f78;
     fRun = 0.0f;
+    fAdvScale = pCtx->f78;
     fLeft = fX * pCtx->n68 + pCtx->n60;
     fTop = pCtx->n64 * pCtx->f88 + (pCtx->f88 * (fY * pCtx->n6C) + (0.5f - 0.5f * pCtx->f88));
     if (pCtx->n10 != 0) {
@@ -425,7 +425,10 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
     }
     nSaved = pFont->n418;
     fNegSin = -fSin; // EA bug: fSin is only set for turned text (and only used then)
-    for (; *p != '\0'; p++) {
+    for (;; p++) {
+        if (*p == '\0') {
+            break;
+        }
         pGlyph = pFont->apGlyphs[(u8)*p];
         if (pGlyph == NULL) {
             pGlyph = pFont->apGlyphs[0xAC];
@@ -457,12 +460,12 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
                 break;
             case 1:
                 if (0.0f != pCtx->fB8) {
-                    fY0 = (fCos * pGlyph->f20 - fSin * pGlyph->f1C) * fScaleY + fTop;
                     fX0 = (fSin * pGlyph->f20 + fCos * pGlyph->f1C) * fScaleX + fLeft;
-                    fY1 = fNegSin * pGlyph->fWidth * fScaleY + fY0;
+                    fY0 = (fCos * pGlyph->f20 - fSin * pGlyph->f1C) * fScaleY + fTop;
                     fX1 = fCos * pGlyph->fWidth * fScaleX + fX0;
-                    fY2 = fY1 + fCos * pGlyph->fHeight * fScaleY;
+                    fY1 = fNegSin * pGlyph->fWidth * fScaleY + fY0;
                     fX3 = fX0 + fSin * pGlyph->fHeight * fScaleX;
+                    fY2 = fY1 + fCos * pGlyph->fHeight * fScaleY;
                     fX2 = fX1 + fSin * pGlyph->fHeight * fScaleX;
                     fY3 = fY0 + fCos * pGlyph->fHeight * fScaleY;
                 } else {
@@ -479,13 +482,17 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
                     // port: EA drops the colours fn_8001208C returns, so the gradients change
                     // nothing here.
                     if (pCtx->n10 & 4) {
+                        f32 fGYMid = 0.0f;
+                        fGYMid += pGlyph->f20;
                         fn_8001208C(pCtx, fGradX, fGradY, 0.5f * pGlyph->fWidth + (fRun + pGlyph->f1C),
-                                    0.5f * pGlyph->fHeight + (0.0f + pGlyph->f20));
+                                    0.5f * pGlyph->fHeight + fGYMid);
                     } else {
+                        f32 fGY0 = 0.0f;
                         f32 fGX0 = fRun + pGlyph->f1C;
-                        f32 fGY0 = 0.0f + pGlyph->f20;
                         f32 fGX1 = fGX0 + pGlyph->fWidth;
-                        f32 fGY1 = fGY0 + pGlyph->fHeight;
+                        f32 fGY1;
+                        fGY0 += pGlyph->f20;
+                        fGY1 = fGY0 + pGlyph->fHeight;
 
                         fn_8001208C(pCtx, fGradX, fGradY, fGX0, fGY0);
                         fn_8001208C(pCtx, fGradX, fGradY, fGX1, fGY0);
