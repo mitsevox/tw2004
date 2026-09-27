@@ -10,6 +10,16 @@
 #include "ball.h"
 #include "charstate.h"
 
+// .bss in reverse address order (CodeWarrior lays it out last-defined-first)
+SD_SShaderTypeData_Grass_Static SD_gGrassTypeData;
+f32 lbl_80260920[2][4];
+f32 lbl_80260900[2][4];
+f32 lbl_802608E0[8];
+f32 lbl_802608D0[4];
+f32 lbl_802607D0[16][4];
+
+SD_SShaderTypeData_Grass_Static* SD_gpGrassTypeData = &SD_gGrassTypeData;
+
 void SD_vShaderObject_Grass_Type_Init(void);
 void SD_vShaderObject_Grass_Type_Close(void);
 void SD_vShaderObject_Grass_Type_SetParameters(void* pParams);
@@ -32,6 +42,12 @@ void fn_801213F4(f32 fS, f32 fT);
 void fn_80121404(s32 nR, s32 nG, s32 nB, s32 nA);
 void fn_8012141C(f32 fX, f32 fY, f32 fZ);
 
+// fake match: puts 1.0f first in the constant pool, where EA's file has it (a stripped function
+// used it). Unused, so the linker strips it.
+static f32 GoShaderObject_Grass_Gc_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 // The grass type starts: a pool of 32 render records of 32 bytes.
 void SD_vShaderObject_Grass_Type_Init(void) {
     SD_gpGrassTypeData->pPool = UMemPool_Create(32, 32, 2, 16);
@@ -50,38 +66,39 @@ void SD_vShaderObject_Grass_Type_SetParameters(void* pParams) {
 // tile's new points in order along the axis. A set's two vertex runs are its rows in order and in
 // reverse. The first and last vertex of a row are clipped to the tile's edges.
 void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassBufferDesc* pDesc) {
+    // fake match: this declaration order (found by search) sets the register allocation
+    int nSet;
+    u16* pCur;
+    u16* pNew;
+    u16* pOld;
+    u16* pEnd;
+    u8* pNewStep;
+    u8* pOldStep;
+    u8 bFirst;
+    u32 nCount;
+    s32 nBit;
+    u8 uStep;
+    u8 bStart;
+    u32* pBits;
     f32 (*pVerts)[3] = fn_8000C594()->pVerts;
     u8* pTriFlags = fn_8000C594()->pTriFlags;
-    GrassRenderData* pRender = AllocPoolMem(SD_gpGrassTypeData->pPool);
-    s32 nSet;
     s32 nRow;
     s32 i;
-    u32* pBits;
-    u16 nBits;
-    u16* pRows;
-    u16 uHead;
-    u16* pCur;
-    u16* pEnd;
-    u16* pOld;
     u16* pNewEnd;
     u16* pNext;
-    u16* pNew;
-    u8* pOldStep;
-    u8* pNewStep;
-    u32 nCount;
-    s32 nPrev;
-    s32 nBit;
-    s32 nNewBit;
-    s32 nBitBase;
-    s32 nNewRows;
     s32 nOldRows;
+    s32 nNewRows;
     s32 nCur;
     s32 nOther;
+    s32 nPrev;
+    s32 nNewBit;
+    s32 nBitBase;
+    GrassRenderData* pRender = AllocPoolMem(SD_gpGrassTypeData->pPool);
+    s32 nBits;
+    u16* pRows;
+    u32 uHead;
     s32 nAxis;
-    u8 uStep;
     u8 uNewStep;
-    u8 bFirst;
-    u8 bStart;
     u8 bFlag;
     u8 bNewFlag;
     f32 fLo;
@@ -105,7 +122,7 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
             pRows++;
         }
         pBits = (u32*)pRows;
-        pRows = (u16*)((u32*)pRows + (nBits % 32 ? nBits / 32 + 1 : nBits / 32));
+        pRows += 2 * (nBits % 32 ? nBits / 32 + 1 : nBits / 32);
         nCount = 0;
         nCur = 0;
         nOther = 1;
@@ -113,11 +130,11 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
         if (nSet == 0) {
             nAxis = 0;
             fLo = pDesc->fX;
-            fHi = 2.5f + fLo;
+            fHi = 2.5f + pDesc->fX;
         } else {
             nAxis = 2;
             fLo = pDesc->fZ;
-            fHi = 2.5f + fLo;
+            fHi = 2.5f + pDesc->fZ;
         }
         GrassPacket_vBeginPacket(&pRender->apVerts[nSet][0]);
         for (nRow = 0; nRow < 10; nRow++) {
@@ -131,23 +148,24 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
             }
 
             // the row: a count word (points kept, points new), then both lists of point indexes
-            pCur = pRows + 1;
-            uHead = *pRows;
+            // fake match: this statement order (found by search) sets the schedule and registers
             nCur = 1 - nCur;
-            nPrev = nCount;
-            nCount = 0;
-            pEnd = pCur + (u8)(uHead >> 8);
+            uHead = *pRows;
             nOther = 1 - nOther;
-            nOldRows = (u8)(uHead >> 8);
             pNew = SD_gpGrassTypeData->a000[nOther];
-            pNewStep = SD_gpGrassTypeData->a200[nOther];
-            pOld = SD_gpGrassTypeData->a000[nCur];
-            pOldStep = SD_gpGrassTypeData->a200[nCur];
             nBit = nBitBase;
+            pCur = pRows + 1;
+            nPrev = nCount;
+            pOld = SD_gpGrassTypeData->a000[nCur];
+            pNewStep = SD_gpGrassTypeData->a200[nOther];
+            pOldStep = SD_gpGrassTypeData->a200[nCur];
+            nCount = 0;
+            nOldRows = (uHead >> 8) & 0xFF;
+            pEnd = pCur + nOldRows;
+            nNewRows = uHead & 0xFF;
             nNewBit = nBitBase + nOldRows;
-            nNewRows = (u8)uHead;
             pNewEnd = pEnd;
-            pNext = pEnd + (u8)uHead;
+            pNext = pEnd + nNewRows;
             uStep = fn_8001E9CC(pBits, nBit);
             uNewStep = fn_8001E9CC(pBits, nNewBit);
             bFirst = 1;
@@ -163,10 +181,15 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
                     uNewStep = fn_8001E9CC(pBits, nNewBit);
                 } else {
                     fn_80120C2C(pVerts, pTriFlags, afNew, *pOld, *pOldStep, &bNewFlag, nSet, fAt);
-                    while (pCur != pEnd &&
-                           afPoint[nAxis] <= afNew[nAxis] &&
-                           (afPoint[nAxis] != afNew[nAxis] ||
-                            (*pCur <= *pOld && (*pCur != *pOld || uStep <= *pOldStep)))) {
+                    while (pCur != pEnd && afPoint[nAxis] <= afNew[nAxis]) {
+                        if (afPoint[nAxis] == afNew[nAxis]) {
+                            if (*pCur > *pOld) {
+                                break;
+                            }
+                            if (*pCur == *pOld && uStep > *pOldStep) {
+                                break;
+                            }
+                        }
                         *pNew++ = *pCur;
                         *pNewStep++ = uStep;
                         GrassPacket_vAddVert(afPoint, bFirst);
@@ -177,8 +200,8 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
                             bStart = 0;
                         }
                         pCur++;
-                        nBit++;
                         nCount++;
+                        nBit++;
                         if (pCur != pEnd) {
                             uStep = fn_8001E9CC(pBits, nBit);
                             fn_80120C2C(pVerts, pTriFlags, afPoint, *pCur, uStep, &bFlag, nSet, fAt);
@@ -209,16 +232,15 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
                     bStart = 0;
                 }
                 pCur++;
-                nBit++;
                 nCount++;
+                nBit++;
                 if (pCur != pEnd) {
                     uStep = fn_8001E9CC(pBits, nBit);
                     fn_80120C2C(pVerts, pTriFlags, afPoint, *pCur, uStep, &bFlag, nSet, fAt);
                 }
             }
             pRows = pNext;
-            nBitBase += nNewRows;
-            nBitBase += nOldRows;
+            nBitBase += nOldRows + nNewRows;
             GrassPacket_vFlushRow();
             SD_gpGrassTypeData->aShells[nRow].nVerts = ((uptr)GrassPacket_pGetNextAvailableVertSlot() -
                                                         (uptr)SD_gpGrassTypeData->aShells[nRow].pStart) / 16;
