@@ -11,7 +11,7 @@
 // Signature (top by value, new top returned; pInfo unused): Madden 2003 STABS
 static inline s32* UISAddThreadActionAt(UISInfoT* pInfo, s32* pLocalThreadInfo,
                                         UISThreadGroupInfoT* pInputThreadInfo, s16 GroupID, s16 ScreenID,
-                                        s32 Action, s32 nParms, const s32* pParms) {
+                                        UISThreadActionT Action, s32 nParms, const s32* pParms) {
     UISEvent* pEvent;
     s32* pDst;
     s32 idxParams;
@@ -36,7 +36,7 @@ static inline s32* UISAddThreadActionAt(UISInfoT* pInfo, s32* pLocalThreadInfo,
 // aside: a screen is unloaded only then.
 // Parameter order and the nParms local: Madden 2003 STABS
 static inline u8 _UISCanDoUnloadAction(u16 GroupID, u16 ScreenID, UISInfoT* pInfo, s32* pLocalThreadInfo) {
-    s32 Action;
+    UISThreadActionT Action;
     u16 uThisA;
     u16 uThisB;
     s32 nParms;
@@ -45,7 +45,10 @@ static inline u8 _UISCanDoUnloadAction(u16 GroupID, u16 ScreenID, UISInfoT* pInf
         Action = pLocalThreadInfo[0];
         uThisA = pLocalThreadInfo[-1];
         uThisB = pLocalThreadInfo[-2];
-        if (Action != 0 && Action != 1 && uThisA == GroupID && uThisB == ScreenID) return 0;
+        if (Action != UISThreadAction_Load && Action != UISThreadAction_Unload && uThisA == GroupID
+            && uThisB == ScreenID) {
+            return 0;
+        }
         pLocalThreadInfo -= 8;
         nParms = *pLocalThreadInfo;
         pLocalThreadInfo -= nParms;
@@ -120,7 +123,7 @@ void UISLoadAdvRateFnc(UISInfoT* pInfo, UISScreenT* pScreen, UISControlInfoT* pC
     pRateFnc->MSRate = pInfo->MSPerTick;
     pRateFnc->MSCount = 0;
     pRateFnc->MSLastCount = 0;
-    pRateFnc->State = 0;
+    pRateFnc->State = UISRATE_LOAD;
     pRateFnc->AnimationData.iType = animType;
     pRateFnc->AnimationData.fEndValue = targValue;
     pRateFnc->AnimationData.pEndFnc = pEndFnc;
@@ -164,7 +167,7 @@ void UISLoadRateFnc(UISInfoT* pInfo, UISScreenT* pScreen, UISControlInfoT* pCont
     pRateFnc->MSCount = 0;
     pRateFnc->MSLastCount = 0;
     pRateFnc->pScreen = pScreen;
-    pRateFnc->State = 0;
+    pRateFnc->State = UISRATE_LOAD;
     pRateFnc->AnimationData.iType = 0;
     pRateFnc->AnimationData.fEndValue = 0.0f;
     pRateFnc->AnimationData.pEndFnc = NULL;
@@ -177,7 +180,7 @@ void UISUnloadRateFnc(UISInfoT* pInfo, UISControlInfoT* pControlInfo, u32 RateFn
 
     RateFnc = UISFindRateFnc(pInfo, pControlInfo, RateFncID);
     if (RateFnc < n) {
-        pInfo->RateFncs[RateFnc].State = 1;
+        pInfo->RateFncs[RateFnc].State = UISRATE_UNLOAD;
     }
 }
 
@@ -188,13 +191,13 @@ void UISRemoveUnNessaryRateFncs(UISInfoT* pInfo) {
 
     nRateFnc = pInfo->NumRateFncs;
     while (nRateFnc-- != 0) {
-        if (pInfo->RateFncs[nRateFnc].State == 1) {
+        if (pInfo->RateFncs[nRateFnc].State == UISRATE_UNLOAD) {
             pInfo->NumRateFncs--;
             for (nSlideFnc = nRateFnc; nSlideFnc < pInfo->NumRateFncs; nSlideFnc++) {
                 memmove(&pInfo->RateFncs[nSlideFnc], &pInfo->RateFncs[nSlideFnc + 1], sizeof(UISRateFncT));
             }
-        } else if (pInfo->RateFncs[nRateFnc].State == 0) {
-            pInfo->RateFncs[nRateFnc].State = 2;
+        } else if (pInfo->RateFncs[nRateFnc].State == UISRATE_LOAD) {
+            pInfo->RateFncs[nRateFnc].State = UISRATE_ACTIVE;
         }
     }
 }
@@ -207,7 +210,7 @@ void UISRegisterRuntimeErrorFnc(UISRuntimeErrorFncT* pRuntimeErrorFnc) {
 
 // Pushes an event on the studio's event stack: the event record, with its type on the top word,
 // then its arguments below it, the last one first.
-void UISAddThreadAction(s16 GroupID, s16 ScreenID, UISInfoT* pInfo, s32 Action,
+void UISAddThreadAction(s16 GroupID, s16 ScreenID, UISInfoT* pInfo, UISThreadActionT Action,
                         UISThreadGroupInfoT* pInputThreadInfo, s32 nParms, const s32* pParms) {
     // fake match: nParms goes through s64 and back (the value is unchanged); the dead high word
     // lives until register allocation and gives the original's order of the GroupID/ScreenID sign extensions
@@ -224,7 +227,7 @@ s32 UISThreadProcessHints(UISInfoT* pInfo, u16 GroupID, u16 ScreenID) {
     s32 nParms;
     s32* pParms;
     u16 uB;
-    s32 Action;
+    UISThreadActionT Action;
     u16 uA;
     s32* pLocalThreadInfo;
 
@@ -239,7 +242,7 @@ s32 UISThreadProcessHints(UISInfoT* pInfo, u16 GroupID, u16 ScreenID) {
         pLocalThreadInfo -= nParms;
         pParms = pLocalThreadInfo;
         pLocalThreadInfo -= 1;
-        if (uA == GroupID && uB == ScreenID && Action == 9
+        if (uA == GroupID && uB == ScreenID && Action == UISThreadAction_HINT
             && UISFindScreen(pInfo, uA, uB) < pInfo->NumScreens) {
             // fake match: *pLoadInfo and nParms go through s64 and back (the values are unchanged);
             // the two dead high words live until register allocation and give pLocalThreadInfo, pInfo and
@@ -258,7 +261,7 @@ s32 UISThreadProcessHints(UISInfoT* pInfo, u16 GroupID, u16 ScreenID) {
 // keeps them: mr r4,r28; mr r3,r27)
 #pragma optimization_level 3
 s32* _UISDoThreadAction(UISInfoT* pInfo, s32* pLocalThreadInfo, s32** pNextFrameThreadInfo) {
-    s32 Action;
+    UISThreadActionT Action;
     UISThreadGroupInfoT* pLoadInfo;
     s32 nParms;
     s32* pParms;
@@ -281,12 +284,12 @@ s32* _UISDoThreadAction(UISInfoT* pInfo, s32* pLocalThreadInfo, s32** pNextFrame
     pParms = pLocalThreadInfo;
     pLocalThreadInfo--;
     switch (Action) {
-    case 0:
+    case UISThreadAction_Load:
         UISInternalLoadScreen(pInfo, pLoadInfo->ScreenInfo.GroupID, pLoadInfo->ScreenInfo.ScreenID,
                               pLoadInfo->ScreenInfo.ParentGroupID, pLoadInfo->ScreenInfo.ParentScreenID,
                               nParms, pParms);
         break;
-    case 1:
+    case UISThreadAction_Unload:
         nIndex = UISFindScreen(pInfo, pLoadInfo->ScreenInfo.GroupID, pLoadInfo->ScreenInfo.ScreenID);
         if (nIndex < pInfo->NumScreens) {
             pScreen = &pInfo->Screens[nIndex];
@@ -301,24 +304,24 @@ s32* _UISDoThreadAction(UISInfoT* pInfo, s32* pLocalThreadInfo, s32** pNextFrame
                                                          ScreenID, Action, nParms, pParms);
         }
         break;
-    case 9:
+    case UISThreadAction_HINT:
         if (UISFindScreen(pInfo, GroupID, ScreenID) < pInfo->NumScreens) {
             UISDoHint(pInfo, pLoadInfo->GenericInfo.Data[0], nParms, pParms);
         }
         break;
-    case 2:
+    case UISThreadAction_Update:
         pInfo->CriticalRegions |= 2;
         UISProcessInternalEvents(pInfo, &pInfo->EventStack, pLoadInfo->GenericInfo.Data[0], -8, nParms,
                                  pParms, 1);
         pInfo->CriticalRegions &= ~2;
         break;
-    case 3:
+    case UISThreadAction_ScreenActivate:
         UISInternalActivateScreen(pInfo, 1, pLoadInfo->ScreenInfo.GroupID, pLoadInfo->ScreenInfo.ScreenID);
         break;
-    case 4:
+    case UISThreadAction_ScreenDeactivate:
         UISInternalActivateScreen(pInfo, 0, pLoadInfo->ScreenInfo.GroupID, pLoadInfo->ScreenInfo.ScreenID);
         break;
-    case 5:
+    case UISThreadAction_ControlActivate:
         if (pLoadInfo->ActivateInfo.iProcessed == 0) {
             UISInternalActivateControl(pInfo, 1, pLoadInfo->ActivateInfo.iDir,
                                        pLoadInfo->ActivateInfo.pControlInfo,
@@ -327,7 +330,7 @@ s32* _UISDoThreadAction(UISInfoT* pInfo, s32* pLocalThreadInfo, s32** pNextFrame
             pLoadInfo->ActivateInfo.iProcessed = 1;
         }
         break;
-    case 6:
+    case UISThreadAction_ControlDeactivate:
         if (pLoadInfo->ActivateInfo.iProcessed == 0) {
             UISInternalActivateControl(pInfo, 0, pLoadInfo->ActivateInfo.iDir,
                                        pLoadInfo->ActivateInfo.pControlInfo,
@@ -336,13 +339,13 @@ s32* _UISDoThreadAction(UISInfoT* pInfo, s32* pLocalThreadInfo, s32** pNextFrame
             pLoadInfo->ActivateInfo.iProcessed = 1;
         }
         break;
-    case 7:
+    case UISThreadAction_ProcessEvent:
         pInfo->CriticalRegions |= 2;
         UISProcessInternalEvents(pInfo, &pInfo->EventStack, pLoadInfo->MessageInfo.Controller,
                                  pLoadInfo->MessageInfo.Message, nParms, pParms, 0);
         pInfo->CriticalRegions &= ~2;
         break;
-    case 8:
+    case UISThreadAction_MoveScreen:
         UISMoveScreenDrawPosition(pInfo, pLoadInfo->ScreenInfo.GroupID, pLoadInfo->ScreenInfo.ScreenID,
                                   pLoadInfo->ScreenInfo.iDir);
         break;
@@ -361,7 +364,7 @@ void UISProcessThreadAction(UISInfoT* pInfo, u8 bControlEventsOnly) {
     s32* pLocalThreadInfo;
     s32* pNextFrameInfo;
     UISThreadGroupInfoT* pLoadInfo;
-    s32 Action;
+    UISThreadActionT Action;
     s32* pNext;
 
     if (pInfo->CriticalRegions & 1) return;
@@ -377,7 +380,7 @@ void UISProcessThreadAction(UISInfoT* pInfo, u8 bControlEventsOnly) {
             pNext--;
             pNext -= pLocalThreadInfo[-8];
             switch (Action) {
-            case 5:
+            case UISThreadAction_ControlActivate:
                 if (pLoadInfo->ActivateInfo.iProcessed == 0) {
                     UISInternalActivateControl(pInfo, 1, pLoadInfo->ActivateInfo.iDir,
                                                pLoadInfo->ActivateInfo.pControlInfo,
@@ -387,7 +390,7 @@ void UISProcessThreadAction(UISInfoT* pInfo, u8 bControlEventsOnly) {
                     pLoadInfo->ActivateInfo.iProcessed = 1;
                 }
                 break;
-            case 6:
+            case UISThreadAction_ControlDeactivate:
                 if (pLoadInfo->ActivateInfo.iProcessed == 0) {
                     UISInternalActivateControl(pInfo, 0, pLoadInfo->ActivateInfo.iDir,
                                                pLoadInfo->ActivateInfo.pControlInfo,

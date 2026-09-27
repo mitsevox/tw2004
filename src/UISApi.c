@@ -43,7 +43,7 @@ void _ParseRateFncs(UISInfoT* pInfo, u32 MSElapsed) {
     numRateFncs = pInfo->NumRateFncs;
     for (idxRateFnc = 0; idxRateFnc < numRateFncs; idxRateFnc++) {
         pRateFnc = &pInfo->RateFncs[idxRateFnc];
-        if (pRateFnc->State != 2) continue;
+        if (pRateFnc->State != UISRATE_ACTIVE) continue;
         pScreen = pRateFnc->pScreen;
         if (pRateFnc->MSRate == 0) continue;
         // fake match: &RateParams[1] / &RateParams[2] set on both arms of a test that is always true
@@ -63,7 +63,7 @@ void _ParseRateFncs(UISInfoT* pInfo, u32 MSElapsed) {
             iElapse -= pRateFnc->MSRate;
             pRateFnc->MSLastCount += pRateFnc->MSRate;
             if (pRateFnc->pFnc != NULL) {
-                if (pRateFnc->State != 2) break;
+                if (pRateFnc->State != UISRATE_ACTIVE) break;
                 ReturnParam.fValue = 1.0f;
                 RateParams[0] = pRateFnc->RateFncID;
                 *pArg1 = pRateFnc->MSLastCount;
@@ -102,7 +102,7 @@ void _ParseRateFncs(UISInfoT* pInfo, u32 MSElapsed) {
                     *pfModVal = newVal;
                 } else {
                     *pfModVal = pRateFnc->AnimationData.fEndValue;
-                    pRateFnc->State = 1;
+                    pRateFnc->State = UISRATE_UNLOAD;
                     if (pRateFnc->AnimationData.pEndFnc != NULL) {
                         RateParams[0] = pRateFnc->RateFncID;
                         UISExecuteFnc(pInfo, pScreen, pRateFnc->pControlInfo, pStackInfo,
@@ -328,7 +328,7 @@ void UISShutdown(UISInfoT* pInfo) {
         nArg = 0;
         data.ScreenInfo.GroupID = uGroup;
         data.ScreenInfo.ScreenID = uScreen;
-        UISAddThreadAction(uGroup, uScreen, pInfo, 1, &data, 1, &nArg);
+        UISAddThreadAction(uGroup, uScreen, pInfo, UISThreadAction_Unload, &data, 1, &nArg);
         UISProcessThreadAction(pInfo, 0);
     }
     pInfo->InfoID = 0;
@@ -374,7 +374,7 @@ static inline s32 _UISInternalReInitScreen(UISInfoT* pInfo, u16 GroupID, u16 Scr
     n = pInfo->NumRateFncs;
     for (i = 0; i < n; i++) {
         if (pInfo->RateFncs[i].pScreen == pScreen) {
-            pInfo->RateFncs[i].State = 1;
+            pInfo->RateFncs[i].State = UISRATE_UNLOAD;
         }
     }
     pInfo->CriticalRegions &= ~4;
@@ -435,7 +435,7 @@ s32 UISInternalLoadScreen(UISInfoT* pInfo, u16 GroupID, u16 ScreenID, u16 Parent
         _ParseMaps(pInfo, pScreen, &pInfo->EventStack, 0, -1, -9, 0, NULL, &bProcess);
         pInfo->CriticalRegions &= ~2;
     }
-    _ParseTransforms(pInfo, 0, pScreen, 0);
+    _ParseTransforms(pInfo, UISTransformInit, pScreen, 0);
     bProcess = 0;
     if (nParams == 0xFF) {
         nParams = pParams[10];
@@ -544,7 +544,7 @@ s32 UISLoadScreen(UISInfoT* pInfo, u16 GroupID, u16 ScreenID, u8 nParams, s32* p
         ThreadInfo.ScreenInfo.ScreenID = uScreen;
         ThreadInfo.ScreenInfo.ParentGroupID = 0xFFFF;
         ThreadInfo.ScreenInfo.ParentScreenID = 0xFFFF;
-        UISAddThreadAction(uGroup, uScreen, pInfo, 0, &ThreadInfo, nParams, pParams);
+        UISAddThreadAction(uGroup, uScreen, pInfo, UISThreadAction_Load, &ThreadInfo, nParams, pParams);
     } else {
         return _UISInternalLoad(pInfo, uGroup, uScreen, 0, nParams, pParams);
     }
@@ -584,7 +584,7 @@ u8 UISInternalUnloadModal(UISInfoT* pInfo, u16 GroupID, u16 ScreenID, s32 iRetVa
                     *pStackInfo = pModalStack->StackState;
                     pStackInfo->pStack[-1] = iRetVal;
                     if (UISStackProcess(pInfo, pModalStack->pRestoreStack, pStackInfo, pModalStack->pScreen,
-                                        pModalStack->pControlInfo) != 3) {
+                                        pModalStack->pControlInfo) != UISPROCESS_DOMODAL) {
                         pStackInfo->pStack = pStackBase;
                     }
                 }
@@ -640,11 +640,11 @@ u8 UISInternalUnloadScreen(UISInfoT* pInfo, u16 GroupID, u16 ScreenID, s32 iRetV
         pInfo->CriticalRegions &= ~2;
         UISThreadProcessHints(pInfo, GroupID, ScreenID);
         _ParseInitialize(pInfo, pScreen, 0, -3);
-        _ParseTransforms(pInfo, 3, pScreen, 0);
+        _ParseTransforms(pInfo, UISTransformShutdown, pScreen, 0);
         nRateFnc = pInfo->NumRateFncs;
         while (nRateFnc-- != 0) {
             if (pInfo->RateFncs[nRateFnc].pScreen == pScreen) {
-                pInfo->RateFncs[nRateFnc].State = 1;
+                pInfo->RateFncs[nRateFnc].State = UISRATE_UNLOAD;
             }
         }
         UISRemoveUnNessaryRateFncs(pInfo);
@@ -684,7 +684,7 @@ u8 UISInternalUnloadScreen(UISInfoT* pInfo, u16 GroupID, u16 ScreenID, s32 iRetV
                     ThreadInfo.ScreenInfo.GroupID = pScreen->GroupID;
                     ThreadInfo.ScreenInfo.ScreenID = pScreen->ScreenID;
                     UISAddThreadAction(ThreadInfo.ScreenInfo.GroupID, ThreadInfo.ScreenInfo.ScreenID, pInfo,
-                                       3, &ThreadInfo, 0, NULL);
+                                       UISThreadAction_ScreenActivate, &ThreadInfo, 0, NULL);
                 }
             } else {
                 pInfo->ActiveScreenIdx = -1;
@@ -704,7 +704,7 @@ void UISSetScreenActive(UISInfoT* pInfo, u16 GroupID, u16 ScreenID) {
 
     ThreadInfo.ScreenInfo.GroupID = GroupID;
     ThreadInfo.ScreenInfo.ScreenID = ScreenID;
-    UISAddThreadAction(GroupID, ScreenID, pInfo, 3, &ThreadInfo, 0, NULL);
+    UISAddThreadAction(GroupID, ScreenID, pInfo, UISThreadAction_ScreenActivate, &ThreadInfo, 0, NULL);
     if (!(pInfo->CriticalRegions & 2)) {
         UISProcessThreadAction(pInfo, 0);
     }

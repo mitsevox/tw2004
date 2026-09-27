@@ -21,6 +21,189 @@ typedef void UISRuntimeErrorFncT(s32 nLevel, const char* szFile, s32 nLine, cons
 
 extern UISRuntimeErrorFncT* RuntimeErrorFnc;
 
+// The thread actions: what an entry of the thread action stack does (UISAddThreadAction).
+typedef enum {
+    UISThreadAction_Load = 0,
+    UISThreadAction_Unload = 1,
+    UISThreadAction_Update = 2,
+    UISThreadAction_ScreenActivate = 3,
+    UISThreadAction_ScreenDeactivate = 4,
+    UISThreadAction_ControlActivate = 5,
+    UISThreadAction_ControlDeactivate = 6,
+    UISThreadAction_ProcessEvent = 7,
+    UISThreadAction_MoveScreen = 8,
+    UISThreadAction_HINT = 9,
+} UISThreadActionT;
+
+// A rate function's State.
+enum {
+    UISRATE_LOAD = 0,
+    UISRATE_UNLOAD = 1,
+    UISRATE_ACTIVE = 2,
+};
+
+// What the transform callback is asked to do (_ParseTransforms).
+typedef enum UISTransformAction_t {
+    UISTransformInit = 0,
+    UISTransformPush = 1,
+    UISTransformPop = 2,
+    UISTransformShutdown = 3,
+} UISTransformAction;
+
+// What UISStackProcess (and UISExecuteFnc) return.
+enum {
+    UISPROCESS_CONTINUE = 0,
+    UIS_PROCESSSUBONLY = 1,
+    UISPROCESS_HARDABORT = 2,
+    UISPROCESS_DOMODAL = 3,
+};
+
+// The control info float a rate function drives (UISGetActionPtrValue).
+enum {
+    UIS_ACTION_NONE = 0,
+    UIS_ACTION_ROTATION_X = 16,
+    UIS_ACTION_ROTATION_Y = 17,
+    UIS_ACTION_ROTATION_Z = 18,
+    UIS_ACTION_TRANSLATE_X = 19,
+    UIS_ACTION_TRANSLATE_Y = 20,
+    UIS_ACTION_TRANSLATE_Z = 21,
+    UIS_ACTION_SCALE_X = 22,
+    UIS_ACTION_SCALE_Y = 23,
+    UIS_ACTION_SCALE_Z = 24,
+    UIS_ACTION_PIVOT_X = 25,
+    UIS_ACTION_PIVOT_Y = 26,
+    UIS_ACTION_PIVOT_Z = 27,
+    UIS_ACTION_ADD_ALPHA = 32,
+    UIS_ACTION_ADD_RED = 33,
+    UIS_ACTION_ADD_GREEN = 34,
+    UIS_ACTION_ADD_BLUE = 35,
+    UIS_ACTION_MULTIPLY_ALPHA = 36,
+    UIS_ACTION_MULTIPLY_RED = 37,
+    UIS_ACTION_MULTIPLY_GREEN = 38,
+    UIS_ACTION_MULTIPLY_BLUE = 39,
+};
+
+// The script interpreter's opcodes (EA's file: UISStack.c). TW2004 adds 0x79-0x7E, which have no
+// names here.
+typedef enum {
+    UIS_NOOP = 1,
+    UIS_LOAD_SCREEN = 2,
+    UIS_UNLOAD_SCREEN = 3,
+    UIS_LOAD_RATEFNC = 6,
+    UIS_UNLOAD_RATEFNC = 7,
+    UIS_SET_SCREEN_ACTIVE = 8,
+    UIS_SET_CONTROL_ACTIVE = 9,
+    UIS_PROCESS_OBJECT = 10,
+    UIS_SEND_MESSAGE = 11,
+    UIS_PROCESS_EVENT = 12,
+    UIS_BASE_ADDR = 13,
+    UIS_STRNCPY = 14,
+    UIS_PUSH_STR = 15,
+    UIS_PUSH_INT = 16,
+    UIS_PUSH_FLT = 17,
+    UIS_CAST_INT = 18,
+    UIS_CAST_FLT = 19,
+    UIS_CAST_INT_1 = 20,
+    UIS_CAST_FLT_1 = 21,
+    UIS_GET_D = 24,
+    UIS_PUT_D = 25,
+    UIS_GET_S = 26,
+    UIS_PUT_S = 27,
+    UIS_BAND = 28,
+    UIS_BOR = 29,
+    UIS_BNEG = 30,
+    UIS_LAND = 31,
+    UIS_LOR = 32,
+    UIS_LNOT = 33,
+    UIS_ABS = 34,
+    UIS_ABS_F = 35,
+    UIS_NEG = 36,
+    UIS_ADD = 37,
+    UIS_SUB = 38,
+    UIS_MUL = 39,
+    UIS_DIV = 40,
+    UIS_NEG_F = 41,
+    UIS_ADD_F = 42,
+    UIS_SUB_F = 43,
+    UIS_MUL_F = 44,
+    UIS_DIV_F = 45,
+    UIS_INC = 46,
+    UIS_DEC = 47,
+    UIS_INC_F = 48,
+    UIS_DEC_F = 49,
+    UIS_GE = 50,
+    UIS_LE = 51,
+    UIS_GT = 52,
+    UIS_LT = 53,
+    UIS_EQ = 54,
+    UIS_NE = 55,
+    UIS_GE_F = 56,
+    UIS_LE_F = 57,
+    UIS_GT_F = 58,
+    UIS_LT_F = 59,
+    UIS_EQ_F = 60,
+    UIS_NE_F = 61,
+    UIS_BRA_TRUE = 62,
+    UIS_BRA_FALSE = 63,
+    UIS_JUMP = 64,
+    UIS_PUSH = 65,
+    UIS_POP = 66,
+    UIS_CALL = 67,
+    UIS_RET = 68,
+    UIS_GOTONEXTSCREEN = 69,
+    UIS_DEACTIVECONTROL = 70,
+    UIS_ACTIVECONTROL = 71,
+    UIS_ACTIVEPARENTSCREEN = 72,
+    UIS_STR_GETLENTGH = 73,
+    UIS_STR_GETCHAR = 74,
+    UIS_STR_SETCHAR = 75,
+    UIS_STR_FORMAT = 76,
+    UIS_UPDATESCREENS = 77,
+    UIS_MAPLINE_DEBUGONLY = 78,
+    UIS_EVENTSON = 79,
+    UIS_EVENTSOFF = 80,
+    UIS_DOMODAL = 81,
+    UIS_SWAPSTACK = 82,
+    UIS_PRINT_DEBUGONLY = 83,
+    UIS_SET_SCREEN_OBJECT = 84,
+    UIS_GET_D_THIS = 85,
+    UIS_PUT_D_THIS = 86,
+    UIS_CALOFFSET_THIS = 87,
+    UIS_ADVRATEFNC = 88,
+    UIS_VISIBILITY_CHANGE = 89,
+    UIS_MOD = 90,
+    UIS_GET_ELEMENT_S = 91,
+    UIS_PUT_ELEMENT_S = 92,
+    UIS_GET_ELEMENT_D = 93,
+    UIS_PUT_ELEMENT_D = 94,
+    UIS_GET_ELEMENT_D_THIS = 95,
+    UIS_PUT_ELEMENT_D_THIS = 96,
+    UIS_GET_ELEMENT_ADDR = 97,
+    UIS_PUT_ELEMENT_ADDR = 98,
+    UIS_PUSH_MULTIPLE = 99,
+    UIS_POP_MULTIPLE = 100,
+    UIS_COPY_MULTIPLE = 101,
+    UIS_FILL_ARRAY_S = 102,
+    UIS_FILL_ARRAY_D = 103,
+    UIS_FILL_ARRAY_D_THIS = 104,
+    UIS_ADDR_S = 105,
+    UIS_ADDR_D = 106,
+    UIS_ADDR_D_THIS = 107,
+    UIS_ADDR_ELEMENT_S = 108,
+    UIS_ADDR_ELEMENT_D = 109,
+    UIS_ADDR_ELEMENT_D_THIS = 110,
+    UIS_PATCH_STRING = 111,
+    UIS_DOMODAL_PARAMS = 112,
+    UIS_LOAD_SCREEN_PARAMS = 113,
+    UIS_MOVE_SCREEN = 114,
+    UIS_IS_TIMER_LOADED = 115,
+    UIS_ENABLE_CONTROLLER = 116,
+    UIS_IS_CONTROLLER_ENABLED = 117,
+    UIS_HINT = 118,
+    UIS_ISINGROUP = 119,
+    UIS_GET_ACTIVE_SCREEN = 120,
+} UISStackOpCode;
+
 // A text buffer the studio formats into and reads from (UISStringFormat, UISSprintf); a screen
 // file's string table (Strings) holds them too.
 typedef struct UISString_t {
@@ -328,7 +511,7 @@ LAYOUT_ASSERT(UISInfoT, 0xBC);
 void UISProcessThreadAction(UISInfoT* pInfo, u8 bControlEventsOnly);
 s32* _UISDoThreadAction(UISInfoT* pInfo, s32* pLocalThreadInfo, s32** pNextFrameThreadInfo);
 s32 UISThreadProcessHints(UISInfoT* pInfo, u16 GroupID, u16 ScreenID);
-void UISAddThreadAction(s16 GroupID, s16 ScreenID, UISInfoT* pInfo, s32 Action,
+void UISAddThreadAction(s16 GroupID, s16 ScreenID, UISInfoT* pInfo, UISThreadActionT Action,
                         UISThreadGroupInfoT* pInputThreadInfo, s32 nParms, const s32* pParms);
 void UISRegisterRuntimeErrorFnc(UISRuntimeErrorFncT* pRuntimeErrorFnc);
 void UISRemoveUnNessaryRateFncs(UISInfoT* pInfo);

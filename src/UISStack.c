@@ -37,10 +37,10 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
         pStack = pStackState->pStack;
         pStackState->pPC++;
         switch (OpCode) {
-        case 0x02:  // send event 0 (a call to screen group|screen<<16 below the arguments)
+        case UIS_LOAD_SCREEN:  // send event 0 (a call to screen group|screen<<16 below the arguments)
             // fake match: both opcodes share this event body.
             goto event0;
-        case 0x71:
+        case UIS_LOAD_SCREEN_PARAMS:
         event0: {
             u32 u;
             u8 nArgs;
@@ -55,14 +55,14 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             ThreadInfo.ScreenInfo.ParentGroupID = pScreen->GroupID;
             ThreadInfo.ScreenInfo.ParentScreenID = pScreen->ScreenID;
             UISAddThreadAction(ThreadInfo.ScreenInfo.ParentGroupID, ThreadInfo.ScreenInfo.ParentScreenID,
-                               pInfo, 0, &ThreadInfo, nArgs, pArgs);
+                               pInfo, UISThreadAction_Load, &ThreadInfo, nArgs, pArgs);
             while (nArgs-- != 0) {
                 pStackState->pStack--;
             }
             pStackState->pStack--;
             break;
         }
-        case 0x03: {  // send event 1 to a screen (0xFFFF: this one) with a word
+        case UIS_UNLOAD_SCREEN: {  // send event 1 to a screen (0xFFFF: this one) with a word
             u32 u;
             u16 uGroup;
             u16 uScreen;
@@ -80,10 +80,11 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             ThreadInfo.ScreenInfo.GroupID = uGroup;
             *pA1 = uScreen;
             ThreadInfo.ScreenInfo.iRetVal = n;
-            UISAddThreadAction(pScreen->GroupID, pScreen->ScreenID, pInfo, 1, &ThreadInfo, 0, NULL);
+            UISAddThreadAction(pScreen->GroupID, pScreen->ScreenID, pInfo, UISThreadAction_Unload,
+                               &ThreadInfo, 0, NULL);
             break;
         }
-        case 0x08: {  // send event 3 to a screen (0xFFFF: this one)
+        case UIS_SET_SCREEN_ACTIVE: {  // send event 3 to a screen (0xFFFF: this one)
             u32 u;
             u16 uGroup;
             u16 uScreen;
@@ -97,10 +98,11 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             }
             ThreadInfo.ScreenInfo.GroupID = uGroup;
             ThreadInfo.ScreenInfo.ScreenID = uScreen;
-            UISAddThreadAction(pScreen->GroupID, pScreen->ScreenID, pInfo, 3, &ThreadInfo, 0, NULL);
+            UISAddThreadAction(pScreen->GroupID, pScreen->ScreenID, pInfo, UISThreadAction_ScreenActivate,
+                               &ThreadInfo, 0, NULL);
             break;
         }
-        case 0x58: {  // start a rate function (the byte: how many script addresses follow)
+        case UIS_ADVRATEFNC: {  // start a rate function (the byte: how many script addresses follow)
             // Script addresses: an offset into the studio's current UI file when the top bit is
             // set, otherwise into the screen's own file.
             UISControlInfoT* pInternControlInfo;
@@ -134,7 +136,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
                               pAcelFnc, MSTime, Value, Type);
             break;
         }
-        case 0x06: {  // start a stepped rate function
+        case UIS_LOAD_RATEFNC: {  // start a stepped rate function
             UISControlInfoT* pNodeInfo = (UISControlInfoT*)*--pStackState->pStack;
             s32 nU10 = *--pStackState->pStack;
             u8* pStepScript;
@@ -147,14 +149,14 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             UISLoadRateFnc(pInfo, pScreen, pNodeInfo, nId, pStepScript, nU10);
             break;
         }
-        case 0x07: {  // stop a rate function
+        case UIS_UNLOAD_RATEFNC: {  // stop a rate function
             UISControlInfoT* pNodeInfo = (UISControlInfoT*)*--pStackState->pStack;
             s32 nId = *--pStackState->pStack;
 
             UISUnloadRateFnc(pInfo, pNodeInfo, nId);
             break;
         }
-        case 0x0A: {  // call one of the game's handlers with a variable of the screen file
+        case UIS_PROCESS_OBJECT: {  // call one of the game's handlers with a variable of the screen file
             s32 n;
             s32 i;
             s32 n2;
@@ -177,7 +179,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pInfo->Plugins[i].pFnc(pVar, n2, n, pArgs, (s32)(pArgs - 1));
             break;
         }
-        case 0x76: {  // send event 9 with n words
+        case UIS_HINT: {  // send event 9 with n words
             s32* pArgs;
             s32 n;
 
@@ -185,10 +187,11 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack--;
             pArgs = pStackState->pStack - n;
             ThreadInfo.GenericInfo.Data[0] = pArgs[0];
-            UISAddThreadAction(pScreen->GroupID, pScreen->ScreenID, pInfo, 9, &ThreadInfo, n, pArgs + 1);
+            UISAddThreadAction(pScreen->GroupID, pScreen->ScreenID, pInfo, UISThreadAction_HINT, &ThreadInfo,
+                               n, pArgs + 1);
             break;
         }
-        case 0x0B: {  // a command to the game (pMessageFnc)
+        case UIS_SEND_MESSAGE: {  // a command to the game (pMessageFnc)
             u16 uGroup;
             u16 uScreen;
             s32* pArgs;
@@ -203,21 +206,21 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pInfo->pMessageFnc(pArgs[0], uGroup, uScreen, n, (s32)(pArgs + 1), (s32)(pArgs - 1));
             break;
         }
-        case 0x0C: {  // send event 7 with two words and n more
+        case UIS_PROCESS_EVENT: {  // send event 7 with two words and n more
             s32 n;
 
             n = *--pStackState->pStack;
             ThreadInfo.MessageInfo.Message = *--pStackState->pStack;
             ThreadInfo.MessageInfo.Controller = *--pStackState->pStack;
-            UISAddThreadAction(pScreen->GroupID, pScreen->ScreenID, pInfo, 7, &ThreadInfo, n,
-                               pStackState->pStack - n);
+            UISAddThreadAction(pScreen->GroupID, pScreen->ScreenID, pInfo, UISThreadAction_ProcessEvent,
+                               &ThreadInfo, n, pStackState->pStack - n);
             break;
         }
-        case 0x0D:  // push the screen file
+        case UIS_BASE_ADDR:  // push the screen file
             *pStack = (s32)pScreen->pScrData;
             pStackState->pStack++;
             break;
-        case 0x0E: {  // copy a text
+        case UIS_STRNCPY: {  // copy a text
             UISStringT* pText;
             UISStringT* pFind;
             u32 u;
@@ -234,8 +237,8 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             }
             break;
         }
-        case 0x0F:  // push a word
-        case 0x10: {
+        case UIS_PUSH_STR:  // push a word
+        case UIS_PUSH_INT: {
             u32 u;
             u32 uByte0;
             u32 uByte1;
@@ -255,7 +258,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack++;
             break;
         }
-        case 0x11: {  // push a float
+        case UIS_PUSH_FLT: {  // push a float
             UISParamT word;
             u32 uByte0;
             u32 uByte1;
@@ -275,38 +278,38 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack++;
             break;
         }
-        case 0x12:  // float to int, top
+        case UIS_CAST_INT:  // float to int, top
             pStack[-1] = *(f32*)&pStack[-1];
             break;
-        case 0x13:  // int to float, top
+        case UIS_CAST_FLT:  // int to float, top
             *(f32*)&pStack[-1] = pStack[-1];
             break;
-        case 0x14:  // float to int, second
+        case UIS_CAST_INT_1:  // float to int, second
             pStack[-2] = *(f32*)&pStack[-2];
             break;
-        case 0x15:  // int to float, second
+        case UIS_CAST_FLT_1:  // int to float, second
             *(f32*)&pStack[-2] = pStack[-2];
             break;
-        case 0x6A:  // no-op opcode
+        case UIS_ADDR_D:  // no-op opcode
             // fake match: retain this opcode's distinct jump-table destination.
             if (OpCode) {
                 break;
             }
             break;
-        case 0x18:  // load through a pointer
+        case UIS_GET_D:  // load through a pointer
             pStack[-1] = *(s32*)pStack[-1];
             break;
-        case 0x19:  // store through a pointer
+        case UIS_PUT_D:  // store through a pointer
             *(s32*)pStack[-1] = pStack[-2];
             pStackState->pStack -= 2;
             break;
-        case 0x69:  // the address of a local
+        case UIS_ADDR_S:  // the address of a local
             pStack[-1] = (s32)&pStack[pStack[-1] - 1];  // port: a stack word holds the pointer
             break;
-        case 0x1A:  // load a local
+        case UIS_GET_S:  // load a local
             pStack[-1] = pStack[pStack[-1] - 1];
             break;
-        case 0x1B: {  // store a local
+        case UIS_PUT_S: {  // store a local
             s32 n;
 
             n = pStack[-1] - 1;
@@ -314,7 +317,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack -= 2;
             break;
         }
-        case 0x1C: {  // bitwise and
+        case UIS_BAND: {  // bitwise and
             s32 n;
             s32 n2;
 
@@ -324,7 +327,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack++;
             break;
         }
-        case 0x1D: {  // bitwise or
+        case UIS_BOR: {  // bitwise or
             s32 n;
             s32 n2;
 
@@ -334,7 +337,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack++;
             break;
         }
-        case 0x1E: {  // bitwise not
+        case UIS_BNEG: {  // bitwise not
             s32 n;
 
             n = *--pStackState->pStack;
@@ -342,7 +345,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack++;
             break;
         }
-        case 0x1F: {  // logical and
+        case UIS_LAND: {  // logical and
             s32 n;
             s32 n2;
 
@@ -352,7 +355,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack++;
             break;
         }
-        case 0x20: {  // logical or
+        case UIS_LOR: {  // logical or
             s32 n;
             s32 n2;
 
@@ -362,7 +365,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack++;
             break;
         }
-        case 0x21: {  // logical not
+        case UIS_LNOT: {  // logical not
             s32 n;
 
             n = *--pStackState->pStack;
@@ -370,14 +373,14 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack++;
             break;
         }
-        case 0x22: {  // int abs
+        case UIS_ABS: {  // int abs
             s32 n;
 
             n = pStack[-1];
             pStack[-1] = (n < 0) ? -n : n;
             break;
         }
-        case 0x23: {  // float abs
+        case UIS_ABS_F: {  // float abs
             f32 f;
 
             f = *(f32*)--pStackState->pStack;
@@ -385,27 +388,27 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack++;
             break;
         }
-        case 0x24:  // int negate
+        case UIS_NEG:  // int negate
             pStackState->pStack[-1] = -pStack[-1];
             break;
-        case 0x25:  // int add
+        case UIS_ADD:  // int add
             pStack[-2] = pStack[-2] + pStack[-1];
             pStackState->pStack--;
             break;
-        case 0x26:  // int subtract
+        case UIS_SUB:  // int subtract
             pStack = pStackState->pStack;
             pStack[-2] = pStack[-2] - pStack[-1];
             pStackState->pStack--;
             break;
-        case 0x27:  // int multiply
+        case UIS_MUL:  // int multiply
             pStack[-2] = pStack[-2] * pStack[-1];
             pStackState->pStack--;
             break;
-        case 0x28:  // int divide
+        case UIS_DIV:  // int divide
             pStack[-2] = pStack[-2] / pStack[-1];
             pStackState->pStack--;
             break;
-        case 0x29: {  // float negate
+        case UIS_NEG_F: {  // float negate
             f32 f;
 
             f = *(f32*)--pStackState->pStack;
@@ -413,19 +416,19 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack++;
             break;
         }
-        case 0x2A:  // float add
+        case UIS_ADD_F:  // float add
             *(f32*)&pStack[-2] = *(f32*)&pStack[-2] + *(f32*)&pStack[-1];
             pStackState->pStack--;
             break;
-        case 0x2B:  // float subtract
+        case UIS_SUB_F:  // float subtract
             *(f32*)&pStack[-2] = *(f32*)&pStack[-2] - *(f32*)&pStack[-1];
             pStackState->pStack--;
             break;
-        case 0x2C:  // float multiply
+        case UIS_MUL_F:  // float multiply
             *(f32*)&pStack[-2] = *(f32*)&pStack[-2] * *(f32*)&pStack[-1];
             pStackState->pStack--;
             break;
-        case 0x2D:  // float divide (0 by zero)
+        case UIS_DIV_F:  // float divide (0 by zero)
             if (*(f32*)&pStack[-1] != 0.0f) {
                 *(f32*)&pStack[-2] = *(f32*)&pStack[-2] / *(f32*)&pStack[-1];
             } else {
@@ -433,67 +436,67 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             }
             pStackState->pStack--;
             break;
-        case 0x2E:  // int increment
+        case UIS_INC:  // int increment
             pStack[-1] = pStack[-1] + 1;
             break;
-        case 0x2F:  // int decrement
+        case UIS_DEC:  // int decrement
             pStack[-1] = pStack[-1] - 1;
             break;
-        case 0x30:  // float increment
+        case UIS_INC_F:  // float increment
             *(f32*)&pStack[-1] += 1.0f;
             break;
-        case 0x31:  // float decrement
+        case UIS_DEC_F:  // float decrement
             *(f32*)&pStack[-1] -= 1.0f;
             break;
-        case 0x32:  // int >=
+        case UIS_GE:  // int >=
             pStack[-2] = pStack[-1] <= pStack[-2];
             pStackState->pStack--;
             break;
-        case 0x33:  // int <=
+        case UIS_LE:  // int <=
             pStack[-2] = pStack[-1] >= pStack[-2];
             pStackState->pStack--;
             break;
-        case 0x34:  // int >
+        case UIS_GT:  // int >
             pStack[-2] = pStack[-1] < pStack[-2];
             pStackState->pStack--;
             break;
-        case 0x35:  // int <
+        case UIS_LT:  // int <
             pStack[-2] = pStack[-1] > pStack[-2];
             pStackState->pStack--;
             break;
-        case 0x36:  // int ==
+        case UIS_EQ:  // int ==
             pStack[-2] = pStack[-1] == pStack[-2];
             pStackState->pStack--;
             break;
-        case 0x37:  // int !=
+        case UIS_NE:  // int !=
             pStack[-2] = pStack[-1] != pStack[-2];
             pStackState->pStack--;
             break;
-        case 0x38:  // float >=
+        case UIS_GE_F:  // float >=
             pStack[-2] = *(f32*)&pStack[-1] <= *(f32*)&pStack[-2];
             pStackState->pStack--;
             break;
-        case 0x39:  // float <=
+        case UIS_LE_F:  // float <=
             pStack[-2] = *(f32*)&pStack[-1] >= *(f32*)&pStack[-2];
             pStackState->pStack--;
             break;
-        case 0x3A:  // float >
+        case UIS_GT_F:  // float >
             pStack[-2] = *(f32*)&pStack[-1] < *(f32*)&pStack[-2];
             pStackState->pStack--;
             break;
-        case 0x3B:  // float <
+        case UIS_LT_F:  // float <
             pStack[-2] = *(f32*)&pStack[-1] > *(f32*)&pStack[-2];
             pStackState->pStack--;
             break;
-        case 0x3C:  // float ==
+        case UIS_EQ_F:  // float ==
             pStack[-2] = *(f32*)&pStack[-1] == *(f32*)&pStack[-2];
             pStackState->pStack--;
             break;
-        case 0x3D:  // float !=
+        case UIS_NE_F:  // float !=
             pStack[-2] = *(f32*)&pStack[-1] != *(f32*)&pStack[-2];
             pStackState->pStack--;
             break;
-        case 0x3E: {  // jump by an offset if true
+        case UIS_BRA_TRUE: {  // jump by an offset if true
             s32 n;
             u32 u;
 
@@ -504,7 +507,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             }
             break;
         }
-        case 0x3F: {  // jump by an offset if false
+        case UIS_BRA_FALSE: {  // jump by an offset if false
             s32 n;
             u32 u;
 
@@ -515,21 +518,21 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             }
             break;
         }
-        case 0x40: {  // jump by an offset
+        case UIS_JUMP: {  // jump by an offset
             s32 n;
 
             n = *--pStackState->pStack;
             pStackState->pPC += n;
             break;
         }
-        case 0x41:  // duplicate the top
+        case UIS_PUSH:  // duplicate the top
             pStack[0] = pStack[-1];
             pStackState->pStack++;
             break;
-        case 0x42:  // drop the top
+        case UIS_POP:  // drop the top
             pStackState->pStack--;
             break;
-        case 0x43: {  // call a script address, pushing the return address
+        case UIS_CALL: {  // call a script address, pushing the return address
             u32 uByte0;
             u32 uByte1;
             u32 uByte2;
@@ -550,10 +553,10 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pPC = _UISPatchFncPC(pInfo, pScreen->pScrData, u);
             break;
         }
-        case 0x44:  // return to the popped address
+        case UIS_RET:  // return to the popped address
             pStackState->pPC = (u8*)*--pStackState->pStack;
             break;
-        case 0x45: {  // send events 0 and 3 to the screen a file word names, with n words
+        case UIS_GOTONEXTSCREEN: {  // send events 0 and 3 to the screen a file word names, with n words
             u32 u;
             s32 n;
             u8 nArgs;
@@ -574,15 +577,17 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
                 ThreadInfo.ScreenInfo.ParentGroupID = pScreen->GroupID;
                 *pA3 = pScreen->ScreenID;
                 UISAddThreadAction(ThreadInfo.ScreenInfo.ParentGroupID, ThreadInfo.ScreenInfo.ParentScreenID,
-                                   pInfo, 0, &ThreadInfo, nArgs, pStackState->pStack - nArgs);
-                UISAddThreadAction(pScreen->GroupID, pScreen->ScreenID, pInfo, 3, &ThreadInfo, 0, NULL);
+                                   pInfo, UISThreadAction_Load, &ThreadInfo, nArgs,
+                                   pStackState->pStack - nArgs);
+                UISAddThreadAction(pScreen->GroupID, pScreen->ScreenID, pInfo, UISThreadAction_ScreenActivate,
+                                   &ThreadInfo, 0, NULL);
                 while (nArgs-- != 0) {
                     pStackState->pStack--;
                 }
             }
             break;
         }
-        case 0x46: {  // send event 6 for a node info
+        case UIS_DEACTIVECONTROL: {  // send event 6 for a node info
             s32 n;
 
             n = *--pStackState->pStack;
@@ -592,8 +597,8 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             ThreadInfo.ActivateInfo.pTableEntry = NULL;
             ThreadInfo.ActivateInfo.GroupID = pScreen->GroupID;
             ThreadInfo.ActivateInfo.ScreenID = pScreen->ScreenID;
-            UISAddThreadAction(ThreadInfo.ActivateInfo.GroupID, ThreadInfo.ActivateInfo.ScreenID, pInfo, 6,
-                               &ThreadInfo, 0, NULL);
+            UISAddThreadAction(ThreadInfo.ActivateInfo.GroupID, ThreadInfo.ActivateInfo.ScreenID, pInfo,
+                               UISThreadAction_ControlDeactivate, &ThreadInfo, 0, NULL);
             break;
         }
         case 0x7E: {  // send event 5 for a node info
@@ -606,11 +611,12 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             ThreadInfo.ActivateInfo.pTableEntry = NULL;
             ThreadInfo.ActivateInfo.GroupID = pScreen->GroupID;
             ThreadInfo.ActivateInfo.ScreenID = pScreen->ScreenID;
-            UISAddThreadAction(ThreadInfo.ActivateInfo.GroupID, ThreadInfo.ActivateInfo.ScreenID, pInfo, 5,
-                               &ThreadInfo, 0, NULL);
+            UISAddThreadAction(ThreadInfo.ActivateInfo.GroupID, ThreadInfo.ActivateInfo.ScreenID, pInfo,
+                               UISThreadAction_ControlActivate, &ThreadInfo, 0, NULL);
             break;
         }
-        case 0x47: {  // send event 5 for entry n of a list of node infos, unless it is this one and set
+        // send event 5 for entry n of a list of node infos, unless it is this one and set
+        case UIS_ACTIVECONTROL: {
             s32 nId = *--pStackState->pStack;
             s32* pList = (s32*)*--pStackState->pStack;
             s32* pnList;
@@ -633,17 +639,18 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
                     ThreadInfo.ActivateInfo.GroupID = pScreen->GroupID;
                     ThreadInfo.ActivateInfo.ScreenID = pScreen->ScreenID;
                     UISAddThreadAction(ThreadInfo.ActivateInfo.GroupID, ThreadInfo.ActivateInfo.ScreenID,
-                                       pInfo, 5, &ThreadInfo, 1, &nEntry);
+                                       pInfo, UISThreadAction_ControlActivate, &ThreadInfo, 1, &nEntry);
                 }
             }
             break;
         }
-        case 0x48:  // send event 3 to the screen that made this one current
+        case UIS_ACTIVEPARENTSCREEN:  // send event 3 to the screen that made this one current
             ThreadInfo.ScreenInfo.GroupID = pScreen->ParentGroupID;
             ThreadInfo.ScreenInfo.ScreenID = pScreen->ParentScreenID;
-            UISAddThreadAction(pScreen->GroupID, pScreen->ScreenID, pInfo, 3, &ThreadInfo, 0, NULL);
+            UISAddThreadAction(pScreen->GroupID, pScreen->ScreenID, pInfo, UISThreadAction_ScreenActivate,
+                               &ThreadInfo, 0, NULL);
             break;
-        case 0x49: {  // a text's length
+        case UIS_STR_GETLENTGH: {  // a text's length
             UISStringT* pText;
 
             pText = (UISStringT*)*--pStackState->pStack;
@@ -654,7 +661,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             }
             break;
         }
-        case 0x4A: {  // a text's character n
+        case UIS_STR_GETCHAR: {  // a text's character n
             u32 u;
             UISStringT* pText;
             s32 c = 0;
@@ -667,7 +674,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack[-1] = c;
             break;
         }
-        case 0x4B: {  // set a text's character n
+        case UIS_STR_SETCHAR: {  // set a text's character n
             s32 n;
             u32 u;
             UISStringT* pText;
@@ -680,7 +687,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             }
             break;
         }
-        case 0x4C: {  // format a text (at most 20 arguments)
+        case UIS_STR_FORMAT: {  // format a text (at most 20 arguments)
             s32 n;
             UISStringT* pFind;
             u32 k;
@@ -699,7 +706,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             UISStringFormat((u32)pScreen->pScrData, pText, pFind, n, uisFormatStringStack);
             break;
         }
-        case 0x77: {  // whether a group is this screen's
+        case UIS_ISINGROUP: {  // whether a group is this screen's
             u32 u;
 
             u = *--pStackState->pStack;
@@ -710,7 +717,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             }
             break;
         }
-        case 0x78: {  // the current screen, group|screen<<16
+        case UIS_GET_ACTIVE_SCREEN: {  // the current screen, group|screen<<16
             u16 uCurScreen;
             u16 uCurGroup;
 
@@ -718,18 +725,19 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack[-1] = ((u32)uCurScreen << 16) | uCurGroup;
             break;
         }
-        case 0x4D: {  // send event 2 with a word
+        case UIS_UPDATESCREENS: {  // send event 2 with a word
             s32 nArg;
 
             nArg = *--pStackState->pStack;
             ThreadInfo.GenericInfo.Data[0] = *--pStackState->pStack;
-            UISAddThreadAction(pScreen->GroupID, pScreen->ScreenID, pInfo, 2, &ThreadInfo, 1, &nArg);
+            UISAddThreadAction(pScreen->GroupID, pScreen->ScreenID, pInfo, UISThreadAction_Update,
+                               &ThreadInfo, 1, &nArg);
             break;
         }
-        case 0x4E:  // skip a word
+        case UIS_MAPLINE_DEBUGONLY:  // skip a word
             pStackState->pPC += 4;
             break;
-        case 0x52: {  // swap the top two
+        case UIS_SWAPSTACK: {  // swap the top two
             s32 n;
 
             n = pStackState->pStack[-1];
@@ -737,14 +745,14 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack[-2] = n;
             break;
         }
-        case 0x4F:  // clear the screen's event mask
+        case UIS_EVENTSON:  // clear the screen's event mask
             pScreen->ControllerDisable = 0;
             break;
-        case 0x50:  // set every bit of it
+        case UIS_EVENTSOFF:  // set every bit of it
             pScreen->ControllerDisable = -1;
             break;
-        case 0x51:  // call a screen and wait for it: the script pauses in a ModalStack record
-        case 0x70: {
+        case UIS_DOMODAL:  // call a screen and wait for it: the script pauses in a ModalStack record
+        case UIS_DOMODAL_PARAMS: {
             u32 u;
             s32 n;
             u8 nArgs;
@@ -762,7 +770,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
                 ThreadInfo.ScreenInfo.ParentGroupID = pScreen->GroupID;
                 ThreadInfo.ScreenInfo.ParentScreenID = pScreen->ScreenID;
                 UISAddThreadAction(ThreadInfo.ScreenInfo.ParentGroupID, ThreadInfo.ScreenInfo.ParentScreenID,
-                                   pInfo, 0, &ThreadInfo, nArgs, pArgs);
+                                   pInfo, UISThreadAction_Load, &ThreadInfo, nArgs, pArgs);
                 while (nArgs-- != 0) {
                     pStackState->pStack--;
                 }
@@ -781,14 +789,14 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
                 pRec->pScreen = pScreen;
                 pRec->pControlInfo = pControlInfo;
                 pInfo->NumModals++;
-                return 3;
+                return UISPROCESS_DOMODAL;
             }
             while (nArgs-- != 0) {
                 pStackState->pStack--;
             }
             break;
         }
-        case 0x54: {  // send event 5 for a node info
+        case UIS_SET_SCREEN_OBJECT: {  // send event 5 for a node info
             s32 n;
 
             n = *--pStackState->pStack;
@@ -798,12 +806,12 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             ThreadInfo.ActivateInfo.pTableEntry = NULL;
             ThreadInfo.ActivateInfo.GroupID = pScreen->GroupID;
             ThreadInfo.ActivateInfo.ScreenID = pScreen->ScreenID;
-            UISAddThreadAction(ThreadInfo.ActivateInfo.GroupID, ThreadInfo.ActivateInfo.ScreenID, pInfo, 5,
-                               &ThreadInfo, 0, NULL);
+            UISAddThreadAction(ThreadInfo.ActivateInfo.GroupID, ThreadInfo.ActivateInfo.ScreenID, pInfo,
+                               UISThreadAction_ControlActivate, &ThreadInfo, 0, NULL);
             break;
         }
-        case 0x55:  // push a word at a local's pointer plus an offset (0x6B: its address)
-        case 0x6B: {
+        case UIS_GET_D_THIS:  // push a word at a local's pointer plus an offset (0x6B: its address)
+        case UIS_ADDR_D_THIS: {
             u32 uOffset;
             u32 uByte0;
             u32 uByte1;
@@ -828,7 +836,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             n = (uByte0 << 8) | uByte1;
             uOffset += pStackState->pStack[(s16)n];
             pArgs = (s32*)uOffset;
-            if (OpCode == 0x6B) {
+            if (OpCode == UIS_ADDR_D_THIS) {
                 *pStackState->pStack = (s32)pArgs;  // port: a stack word holds the pointer
                 pStackState->pStack++;
             } else {
@@ -837,7 +845,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             }
             break;
         }
-        case 0x56: {  // store the top at a local's pointer plus an offset
+        case UIS_PUT_D_THIS: {  // store the top at a local's pointer plus an offset
             u32 uOffset;
             u32 uByte0;
             u32 uByte1;
@@ -864,7 +872,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack--;
             break;
         }
-        case 0x57: {  // push a local's pointer plus an offset
+        case UIS_CALOFFSET_THIS: {  // push a local's pointer plus an offset
             u32 uOffset;
             u32 uByte0;
             u32 uByte1;
@@ -892,17 +900,17 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack++;
             break;
         }
-        case 0x5A:  // int remainder
+        case UIS_MOD:  // int remainder
             pStack[-2] = pStack[-2] % pStack[-1];
             pStackState->pStack--;
             break;
-        case 0x5B:  // read an array element (0x6C-0x6E: its address); the array is a count of
-        case 0x5D:  // dimensions, the dimensions, then the elements; indexes are clamped
-        case 0x5F:
-        case 0x61:
-        case 0x6C:
-        case 0x6D:
-        case 0x6E: {
+        case UIS_GET_ELEMENT_S:  // read an array element (0x6C-0x6E: its address); the array is a count of
+        case UIS_GET_ELEMENT_D:  // dimensions, the dimensions, then the elements; indexes are clamped
+        case UIS_GET_ELEMENT_D_THIS:
+        case UIS_GET_ELEMENT_ADDR:
+        case UIS_ADDR_ELEMENT_S:
+        case UIS_ADDR_ELEMENT_D:
+        case UIS_ADDR_ELEMENT_D_THIS: {
             s32 i;
             s32* pArr;
             s32 nIndex;
@@ -915,22 +923,22 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             nMul = 1;
             bOnStack = 0;
             switch (OpCode) {
-            case 0x61:
+            case UIS_GET_ELEMENT_ADDR:
                 bOnStack = 1;
                 pArr = (s32*)pStack[pStack[-1] - 1];
                 break;
-            case 0x5B:
-            case 0x6C:
+            case UIS_GET_ELEMENT_S:
+            case UIS_ADDR_ELEMENT_S:
                 bOnStack = 1;
                 pArr = &pStack[pStack[-1] - 1];
                 break;
-            case 0x5D:
-            case 0x6D:
+            case UIS_GET_ELEMENT_D:
+            case UIS_ADDR_ELEMENT_D:
                 pArr = (s32*)pStack[-1];
                 bOnStack = 1;
                 break;
-            case 0x5F:
-            case 0x6E: {
+            case UIS_GET_ELEMENT_D_THIS:
+            case UIS_ADDR_ELEMENT_D_THIS: {
                 u32 uOffset;
                 u32 uByte0;
                 u32 uByte1;
@@ -971,7 +979,8 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
                 nIndex += nMul * n;
                 nMul *= dimSize;
             }
-            if (OpCode == 0x6C || OpCode == 0x6D || OpCode == 0x6E) {
+            if (OpCode == UIS_ADDR_ELEMENT_S || OpCode == UIS_ADDR_ELEMENT_D
+                || OpCode == UIS_ADDR_ELEMENT_D_THIS) {
                 // port: a stack word holds the pointer
                 pStack[-(nDims + bOnStack)] = (s32)&pArr[nDims + 1 + nIndex];
             } else {
@@ -980,10 +989,10 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack -= nDims - (1 - bOnStack);
             break;
         }
-        case 0x5C:  // write an array element
-        case 0x5E:
-        case 0x60:
-        case 0x62: {
+        case UIS_PUT_ELEMENT_S:  // write an array element
+        case UIS_PUT_ELEMENT_D:
+        case UIS_PUT_ELEMENT_D_THIS:
+        case UIS_PUT_ELEMENT_ADDR: {
             s32 i;
             s32* pArr;
             s32 nIndex;
@@ -996,19 +1005,19 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             nMul = 1;
             bOnStack = 0;
             switch (OpCode) {
-            case 0x62:
+            case UIS_PUT_ELEMENT_ADDR:
                 bOnStack = 1;
                 pArr = (s32*)pStack[pStack[-1] - 1];
                 break;
-            case 0x5C:
+            case UIS_PUT_ELEMENT_S:
                 bOnStack = 1;
                 pArr = &pStack[pStack[-1] - 1];
                 break;
-            case 0x5E:
+            case UIS_PUT_ELEMENT_D:
                 pArr = (s32*)pStack[-1];
                 bOnStack = 1;
                 break;
-            case 0x60: {
+            case UIS_PUT_ELEMENT_D_THIS: {
                 u32 uOffset;
                 u32 uByte0;
                 u32 uByte1;
@@ -1053,7 +1062,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack -= nDims + 1 + bOnStack;
             break;
         }
-        case 0x63: {  // push n copies of the top
+        case UIS_PUSH_MULTIPLE: {  // push n copies of the top
             s32 nCount;
             s32 i;
             u8 nByte0;
@@ -1076,7 +1085,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack += nCount;
             break;
         }
-        case 0x64: {  // drop n words
+        case UIS_POP_MULTIPLE: {  // drop n words
             s32 nCount;
             u8 nByte0;
             u8 nByte1;
@@ -1095,7 +1104,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack -= nCount;
             break;
         }
-        case 0x65: {  // push a copy of the top n words
+        case UIS_COPY_MULTIPLE: {  // push a copy of the top n words
             s32 i;
             s32 nCount;
             u8 nByte0;
@@ -1118,9 +1127,9 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack += nCount;
             break;
         }
-        case 0x66:  // fill an array with a value
-        case 0x67:
-        case 0x68: {
+        case UIS_FILL_ARRAY_S:  // fill an array with a value
+        case UIS_FILL_ARRAY_D:
+        case UIS_FILL_ARRAY_D_THIS: {
             int i2;  // an int: EA's loop guards compare it with the s32 bound
             s32* pArr;
             s32 nDims;
@@ -1131,15 +1140,15 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             nMul = 1;
             bOnStack = 0;
             switch (OpCode) {
-            case 0x66:
+            case UIS_FILL_ARRAY_S:
                 bOnStack = 1;
                 pArr = &pStack[pStack[-1] - 1];
                 break;
-            case 0x67:
+            case UIS_FILL_ARRAY_D:
                 pArr = (s32*)pStack[-1];
                 bOnStack = 1;
                 break;
-            case 0x68: {
+            case UIS_FILL_ARRAY_D_THIS: {
                 u32 uOffset;
                 u32 uByte0;
                 u32 uByte1;
@@ -1177,7 +1186,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack -= bOnStack + 1;
             break;
         }
-        case 0x6F: {  // entry n of the screen file's third table (0 past its end)
+        case UIS_PATCH_STRING: {  // entry n of the screen file's third table (0 past its end)
             u32 u;
 
             u = pStack[-1];
@@ -1188,7 +1197,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             }
             break;
         }
-        case 0x59: {  // switch a node on or off (UISUpdateVisibility)
+        case UIS_VISIBILITY_CHANGE: {  // switch a node on or off (UISUpdateVisibility)
             u32 u;
             u32 uByte0;
             u32 uByte1;
@@ -1217,7 +1226,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack--;
             break;
         }
-        case 0x73: {  // whether a rate function runs
+        case UIS_IS_TIMER_LOADED: {  // whether a rate function runs
             UISControlInfoT* pNodeInfo = (UISControlInfoT*)*--pStackState->pStack;
             s32 nId = *--pStackState->pStack;
 
@@ -1225,7 +1234,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             pStackState->pStack++;
             break;
         }
-        case 0x72: {  // send event 8 to a screen with a word
+        case UIS_MOVE_SCREEN: {  // send event 8 to a screen with a word
             s32 n;
             u32 u;
 
@@ -1237,10 +1246,10 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             ThreadInfo.ScreenInfo.ParentScreenID = pScreen->ScreenID;
             ThreadInfo.ScreenInfo.iDir = n;
             UISAddThreadAction(ThreadInfo.ScreenInfo.ParentGroupID, ThreadInfo.ScreenInfo.ParentScreenID,
-                               pInfo, 8, &ThreadInfo, 0, NULL);
+                               pInfo, UISThreadAction_MoveScreen, &ThreadInfo, 0, NULL);
             break;
         }
-        case 0x74: {  // set or clear a bit of the screen's event mask (-1: all)
+        case UIS_ENABLE_CONTROLLER: {  // set or clear a bit of the screen's event mask (-1: all)
             s32 n;
             s32 bOn;
             u32 uBits;
@@ -1255,7 +1264,7 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
             }
             break;
         }
-        case 0x75: {  // whether a bit of the event mask is clear
+        case UIS_IS_CONTROLLER_ENABLED: {  // whether a bit of the event mask is clear
             s32 n;
 
             n = *--pStackState->pStack;
@@ -1394,5 +1403,5 @@ s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState
         }
         }
     }
-    return 0;
+    return UISPROCESS_CONTINUE;
 }

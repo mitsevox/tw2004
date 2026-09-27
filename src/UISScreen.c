@@ -214,7 +214,7 @@ s32 UISExecuteFnc(UISInfoT* pInfo, UISScreenT* pScreen, UISControlInfoT* pContro
     if (pReturn != NULL) {
         *pReturn = *pStackBase;
     }
-    if (rVal != 3) {
+    if (rVal != UISPROCESS_DOMODAL) {
         pStackCopy->pStack = pStackBase;
     }
     return rVal;
@@ -222,45 +222,45 @@ s32 UISExecuteFnc(UISInfoT* pInfo, UISScreenT* pScreen, UISControlInfoT* pContro
 
 f32* UISGetActionPtrValue(s32 Action, UISControlInfoT* pControlInfo) {
     switch (Action) {
-    case 16:
+    case UIS_ACTION_ROTATION_X:
         return &pControlInfo->Transform.Rotation.x;
-    case 17:
+    case UIS_ACTION_ROTATION_Y:
         return &pControlInfo->Transform.Rotation.y;
-    case 18:
+    case UIS_ACTION_ROTATION_Z:
         return &pControlInfo->Transform.Rotation.z;
-    case 19:
+    case UIS_ACTION_TRANSLATE_X:
         return &pControlInfo->Transform.Offset.x;
-    case 20:
+    case UIS_ACTION_TRANSLATE_Y:
         return &pControlInfo->Transform.Offset.y;
-    case 21:
+    case UIS_ACTION_TRANSLATE_Z:
         return &pControlInfo->Transform.Offset.z;
-    case 22:
+    case UIS_ACTION_SCALE_X:
         return &pControlInfo->Transform.Scale.x;
-    case 23:
+    case UIS_ACTION_SCALE_Y:
         return &pControlInfo->Transform.Scale.y;
-    case 24:
+    case UIS_ACTION_SCALE_Z:
         return &pControlInfo->Transform.Scale.z;
-    case 25:
+    case UIS_ACTION_PIVOT_X:
         return &pControlInfo->Transform.Pivot.x;
-    case 26:
+    case UIS_ACTION_PIVOT_Y:
         return &pControlInfo->Transform.Pivot.y;
-    case 27:
+    case UIS_ACTION_PIVOT_Z:
         return &pControlInfo->Transform.Pivot.z;
-    case 32:
+    case UIS_ACTION_ADD_ALPHA:
         return &pControlInfo->Transform.AdditiveFactor.a;
-    case 33:
+    case UIS_ACTION_ADD_RED:
         return &pControlInfo->Transform.AdditiveFactor.r;
-    case 34:
+    case UIS_ACTION_ADD_GREEN:
         return &pControlInfo->Transform.AdditiveFactor.g;
-    case 35:
+    case UIS_ACTION_ADD_BLUE:
         return &pControlInfo->Transform.AdditiveFactor.b;
-    case 36:
+    case UIS_ACTION_MULTIPLY_ALPHA:
         return &pControlInfo->Transform.MultiplerFactor.a;
-    case 37:
+    case UIS_ACTION_MULTIPLY_RED:
         return &pControlInfo->Transform.MultiplerFactor.r;
-    case 38:
+    case UIS_ACTION_MULTIPLY_GREEN:
         return &pControlInfo->Transform.MultiplerFactor.g;
-    case 39:
+    case UIS_ACTION_MULTIPLY_BLUE:
         return &pControlInfo->Transform.MultiplerFactor.b;
     default:
         return &pControlInfo->Transform.MultiplerFactor.a;
@@ -657,7 +657,7 @@ void UISProcessHint(UISInfoT* pInfo, u32 Hint, s32 nParms, s32* pParam) {
     UISThreadGroupInfoT ThreadInfo;
     if ((pInfo->CriticalRegions & 2) || (pInfo->CriticalRegions & 4)) {
         ThreadInfo.GenericInfo.Data[0] = Hint;
-        UISAddThreadAction(-1, -1, pInfo, 9, &ThreadInfo, nParms, pParam);
+        UISAddThreadAction(-1, -1, pInfo, UISThreadAction_HINT, &ThreadInfo, nParms, pParam);
     } else {
         UISDoHint(pInfo, Hint, nParms, pParam);
     }
@@ -863,7 +863,8 @@ void _ParseTransforms(UISInfoT* pInfo, int action, UISScreenT* pScreen, u32 idxC
         pInfo->pTransformFnc(action, &pControl->pControlInfo->Transform);
         for (idxLayer = 0; idxLayer < pControl->NumLayers; idxLayer++) {
             UISLayerT* pLayer = pControl->Layers[idxLayer];
-            if (pLayer->pLayerInfo->IsVisible != NULL || action == 0 || action == 3) {
+            if (pLayer->pLayerInfo->IsVisible != NULL || action == UISTransformInit
+                || action == UISTransformShutdown) {
                 u32 idxObj;
                 for (idxObj = 0; idxObj < pLayer->NumObjs; idxObj++) {
                     UISObjT* pObj = &pLayer->Objs[idxObj];
@@ -918,7 +919,7 @@ void _ParseObjects(UISInfoT* pInfo, UISScreenT* pScreen, u32 idxControl, s32 Fnc
                                 oldAdditiveVector.g + pControlInfo->Transform.AdditiveFactor.g,
                                 oldAdditiveVector.b + pControlInfo->Transform.AdditiveFactor.b,
                                 oldAdditiveVector.a + pControlInfo->Transform.AdditiveFactor.a);
-            pInfo->pTransformFnc(1, &pControl->pControlInfo->Transform);
+            pInfo->pTransformFnc(UISTransformPush, &pControl->pControlInfo->Transform);
             for (idxLayer = 0; idxLayer < pControl->NumLayers; idxLayer++) {
                 UISLayerT* pLayer = pControl->Layers[idxLayer];
                 if (pLayer->pLayerInfo->IsVisible != NULL) {
@@ -939,7 +940,7 @@ void _ParseObjects(UISInfoT* pInfo, UISScreenT* pScreen, u32 idxControl, s32 Fnc
                                  oldMultiplerVector.a);
             UISSetColorAdditive(oldAdditiveVector.r, oldAdditiveVector.g, oldAdditiveVector.b,
                                 oldAdditiveVector.a);
-            pInfo->pTransformFnc(2, &pControl->pControlInfo->Transform);
+            pInfo->pTransformFnc(UISTransformPop, &pControl->pControlInfo->Transform);
         }
     }
 }
@@ -1001,7 +1002,7 @@ s32 _ParseMaps(UISInfoT* pInfo, UISScreenT* pScreen, UISStackInfoT* pStackInfo, 
                         // being arithmetic.
                         nRet = (s32)((s64)((u64)(u32)nRet << 32) >> 32);
                         nRet = (u32)(s32)nRet;
-                        if (nRet == 2) return nRet;
+                        if (nRet == UISPROCESS_HARDABORT) return nRet;
                     }
                 }
             }
@@ -1024,7 +1025,7 @@ s32 _ParseMaps(UISInfoT* pInfo, UISScreenT* pScreen, UISStackInfoT* pStackInfo, 
             rVal = UISExecuteFnc(pInfo, pScreen, pControl->pControlInfo, pStackInfo, pcEvent, nParam, pParam,
                                  0, NULL, 1, uEventPost, NULL);
         }
-        if (rVal == 2) return rVal;
+        if (rVal == UISPROCESS_HARDABORT) return rVal;
     }
     *bIsControlActive = pControl->pControlInfo->IsEnabled;
     return rVal;
