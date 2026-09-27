@@ -787,10 +787,12 @@ MC_Gc.c:
 MC.c:
 	.text       start:0x8009F850 end:0x800A27FC
 	.data       start:0x8018C828 end:0x8018C868
+	.bss        start:0x801F1100 end:0x801F1640
 	.sdata      start:0x802813F0 end:0x802813F8
 
 PsMgr.c:
 	.text       start:0x800A27FC end:0x800A2C3C
+	.bss        start:0x801F1640 end:0x801F1708
 	.sdata      start:0x802813F8 end:0x80281408
 	.sdata2     start:0x80283F18 end:0x80283F28
 
