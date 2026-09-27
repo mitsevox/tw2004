@@ -60,6 +60,7 @@ typedef struct ProfClock {
     ProfWatch aWatches[5];      // 0x10
 } ProfClock;
 
+extern ProfClock  lbl_801D97F8;
 extern ProfClock* lbl_802813B0;
 
 // The particles' buffers (GoShaderObject_Particle_Gc.c, lbl_802813A8).
@@ -69,6 +70,7 @@ typedef struct ParticleBuffers {
     u32   n14;                  // 0x14  the first particle no system holds yet (fn_8009428C)
 } ParticleBuffers;
 
+extern ParticleBuffers  lbl_801D97E0;
 extern ParticleBuffers* lbl_802813A8;
 
 u32  fn_8000B3E8(void);                 // the tick (urandom.c)

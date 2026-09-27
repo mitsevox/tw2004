@@ -671,11 +671,13 @@ GoObjShadow.c:
 GoShaderObject_Particle_Gc.c:
 	.text       start:0x8009414C end:0x800952D8
 	.data       start:0x80189CC8 end:0x80189CE8
+	.bss        start:0x801D97E0 end:0x801D97F8
 	.sbss       start:0x80281F58 end:0x80281F70
 	.sdata2     start:0x80283C80 end:0x80283CD8
 
 LLTime.c:
 	.text       start:0x800952D8 end:0x8009554C
+	.bss        start:0x801D97F8 end:0x801D9880
 
 unsorted/sweep_8009554C.c:
 	.text       start:0x8009554C end:0x80095564
