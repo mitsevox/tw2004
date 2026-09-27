@@ -43397,5 +43397,21 @@
 "matched_functions": 7646,
 "total_functions": 7647,
 "exact": 7646
+},
+{
+"commit": "f715cfe",
+"sha": "f715cfeda65251b18f3293f0bcdaddf851686e6b",
+"time": 1790522173,
+"subject": "Merge agent/b6: datalink lane D (small data, 452 B; errno.c, float.c)",
+"report": true,
+"matched_code": 1541080,
+"complete_code": 1541080,
+"matched_data": 865939,
+"complete_data": 1077903,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7646,
+"total_functions": 7647,
+"exact": 7646
 }
 ]
