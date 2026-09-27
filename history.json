@@ -41653,5 +41653,21 @@
 "matched_functions": 7585,
 "total_functions": 7647,
 "exact": 7585
+},
+{
+"commit": "45f8045",
+"sha": "45f8045b40f497ff6e158a4929eb06f8aa36ed6a",
+"time": 1790470846,
+"subject": "Merge codex/round3: Golfer AI_ChooseTarget exact (labelled fakes, logic checked)",
+"report": true,
+"matched_code": 1492520,
+"complete_code": 1311696,
+"matched_data": 723063,
+"complete_data": 868387,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7586,
+"total_functions": 7647,
+"exact": 7586
 }
 ]
