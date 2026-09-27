@@ -996,8 +996,22 @@ void fn_800CE4B8(u64 uId, SkinListEntry* aList, s32* pnList, u8* p, s32 n) {
     (*pnList)++;
 }
 
-// fake match: an identity read; it gives EA's register order.
-static inline s32 fn_800CE52C_Read(s32 n) { return n; }
+// fake match: fn_800CE52C's inner loop as an inline, everything it writes passed by pointer; its
+// pIndex parameter is a frontend variable, numbered after the hoisted p5C offset (EA's register
+// order). Same statements, same order.
+static inline void fn_800CE52C_Loop(Skin* pSkin, SkinDesc* pDesc, s32* pIndex, s32 nIndices,
+                                    SkinListEntry* aList, s32* pnList, int nCopy, SkinDesc14* pEntry,
+                                    u8** pp, s32* pnOut, int* pj) {
+    for (*pj = 0; *pj < nIndices; (*pj)++) {
+        if (!(pDesc->p14[*pIndex].u08 & 1)) {
+            Mem_cpy(pEntry, &pDesc->p14[*pIndex], sizeof(SkinDesc14));
+            *pp = NULL;
+            fn_800CE224(pSkin, pEntry, pp, pnOut, nCopy);
+            fn_800CE4B8(pEntry->uId, aList, pnList, *pp, *pnOut);
+        }
+        pIndex++;
+    }
+}
 
 // Lists the name codes of option n's p14 entries (as the chosen sets patch them).
 void fn_800CE52C(Skin* pSkin, int n, SkinListEntry* aList, s32* pnList, int nCopy) {
@@ -1009,7 +1023,6 @@ void fn_800CE52C(Skin* pSkin, int n, SkinListEntry* aList, s32* pnList, int nCop
     int i;
     int j;
     s32 nIndices;
-    s32* pIndex;
     s32 n44;
     SkinDesc* pDesc;
 
@@ -1020,17 +1033,9 @@ void fn_800CE52C(Skin* pSkin, int n, SkinListEntry* aList, s32* pnList, int nCop
         if (n44 >= 0) {
             p44 = &pDesc->p44[n44];
             if (p44->n8 != 0) {
-                nIndices = fn_800CE52C_Read(pDesc->p28[p44->nC].n0);
-                pIndex = &pDesc->p20[p44->n4];
-                for (j = 0; j < nIndices; j++) {
-                    if (!(pDesc->p14[*pIndex].u08 & 1)) {
-                        Mem_cpy(&entry, &pDesc->p14[*pIndex], sizeof(SkinDesc14));
-                        p = NULL;
-                        fn_800CE224(pSkin, &entry, &p, &nOut, nCopy);
-                        fn_800CE4B8(entry.uId, aList, pnList, p, nOut);
-                    }
-                    pIndex++;
-                }
+                nIndices = pDesc->p28[p44->nC].n0;
+                fn_800CE52C_Loop(pSkin, pDesc, &pDesc->p20[p44->n4], nIndices, aList, pnList, nCopy,
+                                 &entry, &p, &nOut, &j);
             }
         }
     }
