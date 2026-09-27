@@ -6,10 +6,11 @@
 // games. It also holds engine calls that TW07 keeps in HLAudEmitterPool.c (our hlaudemitter.c):
 // Aud_InitOnce, which starts the engine (memory stack, ARAM, sound table, movie sound, banks) one
 // step after another, Aud_Pause, Aud_Mute, the listener (Aud_Mic) calls, Aud_EmiSetTrackStream and
-// the movie and session calls; their data places them here. Its extent is proven by its data: every section starts and ends on 8-byte boundaries
-// shared with no other file (.rodata 0x80183AD8-0x80183B08, .data 0x8018E988-0x8018EB30,
-// .bss 0x801F1790-0x801F17D0, .sdata 0x80281418-0x80281460, .sbss 0x80282020-0x80282058,
-// .sdata2 0x80283F48-0x80283F88), and all its functions share those globals.
+// the movie and session calls; their data places them here. Its extent is proven by its data: every
+// section starts and ends on 8-byte boundaries shared with no other file (.rodata
+// 0x80183AD8-0x80183B08, .data 0x8018E988-0x8018EB30, .bss 0x801F1790-0x801F17D0, .sdata
+// 0x80281418-0x80281460, .sbss 0x80282020-0x80282058, .sdata2 0x80283F48-0x80283F88), and all its
+// functions share those globals.
 
 #include "core/gameaudio.h"
 #include "core/audtrack.h"
