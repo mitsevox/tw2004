@@ -21,3 +21,11 @@ result.
   ball.h to a new include/materialtypes.h (ball.h includes it) so MaterialTypes.c need not see
   ball.h's non-const extern; unit added to configure.py after GoTerrainCollision.c and to
   splits.txt (.rodata 0x8017E9B8..0x80181328). main.dol: OK.
+
+## auto_04_80183578_rodata (104 B): gClubCurve -> Swing.c
+
+- Contents: gClubCurve, s32[26] (0x68, the whole block). Only user: Swing (Swing.c declared it
+  extern). Position: between PasswordManager.c's and stateFunc.c's .rodata, as Swing.c's .data
+  lies between fe_craputils.c and stateFunc.c.
+- Done: the extern in Swing.c became the const definition; .rodata 0x80183578..0x801835E0 added
+  to Swing.c. main.dol: OK.
