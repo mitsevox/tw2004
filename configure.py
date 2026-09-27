@@ -611,8 +611,10 @@ config.libs = [
             Object(Matching, "MetroTRK/nubinit.c"),
             Object(Matching, "MetroTRK/msg.c"),
             Object(Matching, "MetroTRK/msgbuf.c"),
-            # gTRKInputPendingPtr is a common symbol: the linker puts it in .sbss (0x80282A10)
-            Object(Matching, "MetroTRK/serpoll.c", extra_cflags=["-common on"]),
+            # gTRKInputPendingPtr is in serpoll.c's own .sbss (0x80282A10, at its link position)
+            # while mainloop.c / nubinit.c address it absolutely (-sdata 0): a one-file outlier.
+            # (-common on instead left it to the auto unit; a linker-made common lands elsewhere.)
+            Object(Matching, "MetroTRK/serpoll.c", extra_cflags=["-sdata 8"]),
             Object(Matching, "MetroTRK/usr_put.c"),
             Object(Matching, "MetroTRK/dispatch.c"),
             Object(Matching, "MetroTRK/msghndlr.c"),
