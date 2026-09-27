@@ -161,3 +161,11 @@ result.
   startUp.c with the initializers #included from gendata.py fragments (startUp_sound0/1.inc).
 - Result: startUp .data 0x8018F040..0x8018FF68. main.dol: OK.
 - For the audit: startup.h's comment on these externs ("split before startUp.c's") is now stale.
+
+## auto_05_8018A028_data (9888 B): Code8009AA28's raw blobs -> Code8009AA28.c (generated)
+
+- lbl_8018A028 (u8[0x4B0]) and lbl_8018A4D8 (0x21F0), stored by Code8009AA28 (fn at line ~108:
+  p1928/p192C); directly after its lbl_80189E78, up to GoGreenGrid.c's .data. Parked in state.md as
+  probable textures; per the orchestrator's decision defined in Code8009AA28.c with gendata.py
+  fragments (Code8009AA28_tex0/1.inc).
+- Result: Code8009AA28 .data 0x80189E78..0x8018C6C8. main.dol: OK.
