@@ -684,12 +684,17 @@ s32 fn_80169DC4(UISScreenFile* pFile) {
 // reaches fTarget the function finishes and its done script (or the first node's event -14
 // handler) runs.
 void fn_8016A030(UIStudio* pStudio, u32 uMs) {
+    // fake match: this declaration order (with uMsCopy and the pfVar identity below) gives EA's
+    // registers: n, pArg1, pArg2 and uMsCopy leave the allocator's graph before the others.
+    u32 uMsCopy;
+    u32 n;
+    s32* pArg1;
+    s32* pArg2;
+    UISRateFn* pRate;
     u32 i;
     UISScreen* pScreen;
     UISWordStack* pStack;
     s32 nLeft;
-    u32 n;
-    UISRateFn* pRate;
     s32 nArgs;
     u8* pScript;
     f32 fScale;
@@ -697,9 +702,15 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs) {
     f32 fValue;
     UISWord wScale;
     s32 aArgs[3];
-    s32* pArg1;
-    s32* pArg2;
 
+    // fake match: uMsCopy is uMs: each OR's low word is the value | 0 (the value shifted up only
+    // fills the high word, which is dropped). The three become copies only after constant
+    // propagation, so one link reaches register allocation, which merges uMs into uMsCopy; the
+    // loop's value then has uMsCopy's higher number (EA's r22, removed before pStudio).
+    // port: a port writes uMsCopy = uMs.
+    uMsCopy = (u32)((u64)uMs | ((u64)uMs << 32));
+    uMsCopy = (u32)((u64)uMsCopy | ((u64)uMsCopy << 32));
+    uMsCopy = (u32)((u64)uMsCopy | ((u64)uMsCopy << 32));
     fn_80165C74(pStudio);
     pStack = &pStudio->stack78;
     pStudio->uFlags |= 4;
@@ -719,7 +730,7 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs) {
             pArg1 = &aArgs[1];
             pArg2 = &aArgs[2];
         }
-        pRate->n8 += uMs;
+        pRate->n8 += uMsCopy;
         nLeft = pRate->n8 - pRate->nC;
         while (nLeft >= (s32)pRate->u10) {
             nLeft -= pRate->u10;
@@ -743,6 +754,13 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs) {
             }
             if (pRate->u20 != 0) {
                 pfVar = fn_8016C1A4(pRate->u20, pRate->pInfo);
+                // fake match: pfVar goes through a 64-bit shift up and back down (the value is
+                // unchanged). The copy of the call's result it leaves is merged at register
+                // allocation and stays a neighbour of every variable live here: one more for each
+                // of them, which gives EA's allocation order.
+                // port: relies on the conversion to s64 wrapping and on >> of a negative s64 being
+                // arithmetic; truncates the pointer to 32 bits. A port leaves this line out.
+                pfVar = (f32*)(u32)((s64)((u64)(u32)pfVar << 32) >> 32);
                 // fake match: fStep read into fValue before the scale test (EA loads it there)
                 fValue = pRate->fStep;
                 if (fScale < 0.0f) {
