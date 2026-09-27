@@ -41621,5 +41621,21 @@
 "matched_functions": 7585,
 "total_functions": 7647,
 "exact": 7585
+},
+{
+"commit": "728335b",
+"sha": "728335bc7ab7e0830d2b3ab65fda7e54e60e5e6e",
+"time": 1790467203,
+"subject": "assign: endgame lanes brief (time-boxed EA form, then labelled fakes; hard rules)",
+"report": true,
+"matched_code": 1491024,
+"complete_code": 1311696,
+"matched_data": 723063,
+"complete_data": 868387,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7585,
+"total_functions": 7647,
+"exact": 7585
 }
 ]
