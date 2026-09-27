@@ -1,6 +1,6 @@
-// Golfer.c: golfer records, attribute access, and the CPU golfer's shot choice. No assert
-// names this file; "Golfer.c" is our name. CodeWarrior GC/2.5, -O4,p. What the code does is
-// written up in docs/gameplay.md; the record layout in docs/formats/game-data.md.
+// Golfer.c: the golfers' luck: the "1 in gLuckOdds[n]" odds per player (Luck_*) and the roll
+// against them (Golfer_IsLucky). No assert names this file; "Golfer.c" is our name, kept from
+// before the split. CodeWarrior GC/2.5, -O4,p.
 // Split 2026-09-27: the code before 0x8002D8A8 is ai_brain.c, Code8002BBB0.c and
 // Code8002C984.c; each part, compiled alone, reproduces its own .sdata2 pool byte for byte.
 // This part (0x8002D8A8-0x8002DB80) owns .sdata 0x802810B0-0x802810B8 (gLuckOdds) and .sdata2

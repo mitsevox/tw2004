@@ -12,7 +12,10 @@
 // ---- the session and its options ---------------------------------------------------------------
 
 char gszEmpty[8] = "";              // 0x802810B8  "" (small data)
-extern char lbl_80187650[];         // "cl_bbsd" ... the default name at +0x1A
+// 0x80187650: seven 13-byte club model names; entry 2 ("nike") is the default.
+char lbl_80187650[7][13] = {
+    "cl_bbsd", "cv_lnchr", "nike", "ping_si3", "tm_420", "tm_r580", "ts_z350",
+};
 
 // Defined here (declared in golfer.h): the .bss between Code8002DB80.c's and GoRenderSurface.c's.
 Session gSession;                   // 0x801CDD80
@@ -94,7 +97,7 @@ void Session_SetupProfiles(void) {
             gSession.aProfile[i].nBallType = gpSaveData[nGolfer - FIRST_CREATED_GOLFER].nGolferBallType;
             gSession.aProfile[i].nOutfit   = gpSaveData[nGolfer - FIRST_CREATED_GOLFER].nGolferOutfit;
         } else if (nGolfer == 0 || nGolfer == 1) {
-            fn_800CB700(&gSession.aProfile[i].aNames[0], lbl_80187650 + 0x1A);
+            fn_800CB700(&gSession.aProfile[i].aNames[0], lbl_80187650[2]);
             gSession.aProfile[i].n2        = 0;
             gSession.aProfile[i].nBallType = 0;
         } else if (fn_80077B18(nGolfer)) {
