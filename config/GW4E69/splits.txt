@@ -301,6 +301,7 @@ gocamscripts.c:
 
 DepthField.c:
 	.text       start:0x80045660 end:0x80045D18
+	.sdata2     start:0x80283148 end:0x80283168
 
 UObject3D.c:
 	.text       start:0x80045D18 end:0x80045F74
@@ -813,6 +814,9 @@ hlaudtrackseq.c:
 
 hlaudtrackstm.c:
 	.text       start:0x800AB3A4 end:0x800AC330
+	.data       start:0x8018EB78 end:0x8018EC10
+	.bss        start:0x801F18B8 end:0x801F19B8
+	.sbss       start:0x802820A8 end:0x802820B0
 
 hlaudvoice.c:
 	.text       start:0x800AC330 end:0x800ACECC
@@ -898,6 +902,10 @@ DiscError.c:
 
 rcmp_mad_codec.c:
 	.text       start:0x800B769C end:0x800B90F4
+	.rodata     start:0x80184A68 end:0x80184C68
+	.data       start:0x80190FE0 end:0x801910E0
+	.bss        start:0x801F6858 end:0x801F8458
+	.sbss       start:0x802821A8 end:0x802821C0
 
 Code800B90F4.c:
 	.text       start:0x800B90F4 end:0x800B9FF0

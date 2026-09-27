@@ -1,6 +1,9 @@
 # DF_vDrawBufferToScreen (DepthField.c, 0x80045908)
 
-Status: OPEN, 97.88% on 2026-09-25.
+Status: SOLVED 2026-09-27 (b10): the two vertices are a `for (j = 0; j < 2; j++)` loop over
+`aXY[j * 4 + ...]` (CW unrolls it after the first CSE, so the first clamp's 1.0 is not merged with
+fZ's), declarations `i, j, bOdd, fZ, fOffset, ...`. EA's form, no fake. Unit linked (commit on agent/b10,
+"DepthField.c: DF_vDrawBufferToScreen exact, unit linked").
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -42,6 +45,19 @@ unless you combine it with something new. Before you stop, add every attempt und
   from that. No C found for it this round (no attempts beyond the reading).
 
 (add yours here: date, lane, what, score)
+
+- 2026-09-27 b10 (quicktrial aligned, base 79): per-function pragmas optimization_level 3 (79), 2 (211),
+  1 (263), scheduling once (193) / off (219), peephole off (117), opt_common_subs off (87); compilers
+  GC/2.0, 2.6, 2.7, 1.3.2 (79), 2.0p1 (178), 3.0a3 (140). A `fOne` local for fZ's 1.0: 79; with
+  opt_propagation off 60 (decl first 52); reassigned `fOne = 1.0f` at the loop end (no pragma) 63
+  (decl first 55): EA's clamp shape, but fOne is a variable, so 1.0/magic swap f29/f30. Empty ifs,
+  `if (c) goto next; next:`, unreachable gotos: removed by the frontend (79). Any real join between
+  fZ and the first clamp gives EA's clamp shape (`if (bOdd) {aXY[2]=fZ;} else {aXY[2]=fZ;}` 70,
+  `if (fZ != fZ) { fZ = fZ; }` 61 with a dead fcmpu), proving the CSE reading.
+- 2026-09-27 b10: the join is an inner loop over the two vertices: `for (j = 0; j < 2; j++) { aXY[j*4+2]
+  = fZ; clamp; if (bOdd) ... aXY[j*4+0/1] }`, int or s32 j, index or `pV = &aXY[j*4]` forms: 14 (only
+  fOffset f2/f5, fZ f3/f2). Declarations `int i; int j; int bOdd; f32 fZ; f32 fOffset;` then the rest: 0.
+  objdiff 97.88 -> 100.
 
 - 2026-09-26 r2-modes (quicktrial aligned, base 79): fZ's 1.0 as `1`, `(f32)1.0`, `-(...) + 1.0f` x
   first clamp's bounds as `1`, `1.0`, `(f32)1.0`, `0`, `0.0`: all 79. Optimizer pragmas on the function
