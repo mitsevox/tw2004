@@ -37,8 +37,7 @@ static GXColor lbl_801869C0[3][16] = {
 
 void fn_80012444(const f32* pViewport);
 void fn_8001247C(s32 eDst, s32 eFunc, s32 eSrc, s32 nMtx);
-u32 fn_8001208C(UFontContext* pCtx, u8 r, u8 g, u8 b, u8 a, f32 fXScale, f32 fYScale, f32 fX,
-                f32 fY);
+u32 fn_8001208C(UFontContext* pCtx, f32 fXScale, f32 fYScale, f32 fX, f32 fY);
 void fn_800124A8(void);
 void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);
 void fn_80012540(f32 farg0, f32 farg1);
@@ -477,26 +476,21 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
                     fY3 = fY2;
                 }
                 if (pCtx->n10 != 0) {
-                    // port: EA calls fn_8001208C without its colour arguments and drops the
-                    // colours it returns, so the gradients change nothing here.
+                    // port: EA drops the colours fn_8001208C returns, so the gradients change
+                    // nothing here.
                     if (pCtx->n10 & 4) {
-                        ((u32 (*)(UFontContext*, f32, f32, f32, f32))fn_8001208C)(
-                            pCtx, fGradX, fGradY, 0.5f * pGlyph->fWidth + (fRun + pGlyph->f1C),
-                            0.5f * pGlyph->fHeight + (0.0f + pGlyph->f20));
+                        fn_8001208C(pCtx, fGradX, fGradY, 0.5f * pGlyph->fWidth + (fRun + pGlyph->f1C),
+                                    0.5f * pGlyph->fHeight + (0.0f + pGlyph->f20));
                     } else {
                         f32 fGX0 = fRun + pGlyph->f1C;
                         f32 fGY0 = 0.0f + pGlyph->f20;
                         f32 fGX1 = fGX0 + pGlyph->fWidth;
                         f32 fGY1 = fGY0 + pGlyph->fHeight;
 
-                        ((u32 (*)(UFontContext*, f32, f32, f32, f32))fn_8001208C)(pCtx, fGradX, fGradY,
-                                                                                   fGX0, fGY0);
-                        ((u32 (*)(UFontContext*, f32, f32, f32, f32))fn_8001208C)(pCtx, fGradX, fGradY,
-                                                                                   fGX1, fGY0);
-                        ((u32 (*)(UFontContext*, f32, f32, f32, f32))fn_8001208C)(pCtx, fGradX, fGradY,
-                                                                                   fGX0, fGY1);
-                        ((u32 (*)(UFontContext*, f32, f32, f32, f32))fn_8001208C)(pCtx, fGradX, fGradY,
-                                                                                   fGX1, fGY1);
+                        fn_8001208C(pCtx, fGradX, fGradY, fGX0, fGY0);
+                        fn_8001208C(pCtx, fGradX, fGradY, fGX1, fGY0);
+                        fn_8001208C(pCtx, fGradX, fGradY, fGX0, fGY1);
+                        fn_8001208C(pCtx, fGradX, fGradY, fGX1, fGY1);
                     }
                 }
                 fn_80012520(0x80, 7, 4);
@@ -703,34 +697,35 @@ int fn_80011D0C(LLFont* pFont, UFontContext* pCtx, u8 bDraw, char* sz) {
 // fX * fXScale from f04 to f08 and wraps, and the colour blends between the two stops around it;
 // down (bit 2) fY * fYScale wraps the same way and blends a14[4] into a14[5].
 // (fn_8001144C's calls load only pCtx and the four floats, and drop the result.)
-u32 fn_8001208C(UFontContext* pCtx, u8 r, u8 g, u8 b, u8 a, f32 fXScale, f32 fYScale, f32 fX,
-                f32 fY) {
+u32 fn_8001208C(UFontContext* pCtx, f32 fXScale, f32 fYScale, f32 fX, f32 fY) {
     GXColor color;
+    // EA bug: r, g, b, a are never set when neither gradient applies (callers ignore the result)
+    int r;
+    int g;
+    int b;
+    int a;
     UFontStop* pNext;
     UFontStop* pStop;
-    f32 fU;
-    f32 fV;
     f32 fT;
     s32 i;
 
-    fU = fX * fXScale;
-    fV = fY * fYScale;
+    fX *= fXScale;
+    fY *= fYScale;
     pStop = &pCtx->a14[0];
-    pNext = &pCtx->a14[1];
-    fU -= pCtx->f04;
-    fU *= pCtx->f0C;
-    fU -= (s32)fU;
-    if (fU < 0.0f) {
-        fU = 1.0f + fU;
+    pNext = pStop + 1;
+    fX = pCtx->f0C * (fX - pCtx->f04);
+    fX -= (s32)fX;
+    if (fX < 0.0f) {
+        fX = 1.0f + fX;
     }
-    fV -= (s32)fV;
-    if (fV < 0.0f) {
-        fV = 1.0f + fV;
+    fY -= (s32)fY;
+    if (fY < 0.0f) {
+        fY = 1.0f + fY;
     }
     if (pCtx->n10 & 1) {
         for (i = 0; i < 4; i++) {
-            if (fU <= pNext->fPos) {
-                fT = pStop->fInvSpan * (fU - pStop->fPos);
+            if (fX <= pNext->fPos) {
+                fT = pStop->fInvSpan * (fX - pStop->fPos);
                 if (1.0f == fT) {
                     r = pNext->color.r;
                     g = pNext->color.g;
@@ -754,21 +749,21 @@ u32 fn_8001208C(UFontContext* pCtx, u8 r, u8 g, u8 b, u8 a, f32 fXScale, f32 fYS
         }
     }
     if (pCtx->n10 & 2) {
-        if (1.0f == fV) {
+        if (1.0f == fY) {
             r = pCtx->a14[5].color.r;
             g = pCtx->a14[5].color.g;
             b = pCtx->a14[5].color.b;
             a = pCtx->a14[5].color.a;
-        } else if (0.0f == fV) {
+        } else if (0.0f == fY) {
             r = pCtx->a14[4].color.r;
             g = pCtx->a14[4].color.g;
             b = pCtx->a14[4].color.b;
             a = pCtx->a14[4].color.a;
         } else {
-            r = fV * (pCtx->a14[5].color.r - pCtx->a14[4].color.r) + pCtx->a14[4].color.r;
-            g = fV * (pCtx->a14[5].color.g - pCtx->a14[4].color.g) + pCtx->a14[4].color.g;
-            b = fV * (pCtx->a14[5].color.b - pCtx->a14[4].color.b) + pCtx->a14[4].color.b;
-            a = fV * (pCtx->a14[5].color.a - pCtx->a14[4].color.a) + pCtx->a14[4].color.a;
+            r = fY * (pCtx->a14[5].color.r - pCtx->a14[4].color.r) + pCtx->a14[4].color.r;
+            g = fY * (pCtx->a14[5].color.g - pCtx->a14[4].color.g) + pCtx->a14[4].color.g;
+            b = fY * (pCtx->a14[5].color.b - pCtx->a14[4].color.b) + pCtx->a14[4].color.b;
+            a = fY * (pCtx->a14[5].color.a - pCtx->a14[4].color.a) + pCtx->a14[4].color.a;
         }
     }
     color.r = r;

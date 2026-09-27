@@ -8,6 +8,12 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26 e-render (aligned, base 111; with `#pragma opt_propagation off` 109): the mip loop
+  through a `TexMip*` pointer (`for (j = 0, pMip = pTex->aMips; ..; j++, pMip++)`, set before
+  the loop and stepped in the body, `pMip[j]`, `pMip++->n8`) to give back the folded j*12 start
+  under the pragma: 111-113 with the pragma, 114-118 without. Under the pragma the rest differs
+  too (pBank r31 vs EA r27, the nSize adds' order), so the pragma is far from closing it.
+
 - 2026-09-26 r6-misc (quicktrial aligned, base 111): `#pragma opt_propagation off` around the
   function gives EA's whole head (`addi r25,r3,0x10; mr r28,r25; ...; addi r25,r25,8`, the
   frontend keeps every `p +=`): 109, but it breaks the texture loop (`j * 12` no longer folds to

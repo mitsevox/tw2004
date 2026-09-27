@@ -8,6 +8,15 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26 e-render (aligned, base 11): a Swap32 static inline on the address (`u32*` or
+  `void*` parameter, value + address parameters, returning a value) at both / first / last
+  swap: 11; base + offset parameters 12-13. The final swaps + `return pPict` as an inline
+  returning pPict, or `return (Swap(pFile), pPict)`: 11. Reading (mwccdbg backend-09): our
+  first schedule puts `stwbrx` right after its `lwz`/`addi` and `mr r3,pPict` after it, so the
+  value can take r3; EA's value in r4 means EA's `mr r3` (and at the first swap the string's
+  `lis r3`) was scheduled before the stwbrx, i.e. EA's stwbrx had a lower priority (fewer
+  dependent memory ops after it?).
+
 - 2026-09-26, r6-args: permuter 15 min -j2 (base 415): best 350, the height's high byte read into a new local before the width swap; by hand (quicktrial aligned) 11 -> 23. Not kept.
 
 - 2026-09-26, r6-args: the late parameter copy through void* (`T p = (T)(void*)pArg;`, the fn_800AB860 fix) on each pointer parameter, declared first or last: 11 (aligned, base 11).

@@ -8,6 +8,16 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-26 e-render: permuter ~18 min -j 3 (10.4k iterations, stopped at the checkpoint):
+  best 395 again changes behaviour (fOffset stored into fX0, read later). Reading (mwccdbg
+  backend-01): the call to fn_800141F8 ends a block (B11 | B12); fZ's `lfs 1.0` and the first
+  clamp's hi load sit in the extended block B12 -> B14, so CSE merges them.
+
+- 2026-09-26 e-render (aligned, base 79): a label (used by a `goto` or not) before the store,
+  before or after the first clamp, or inside the inline: 79 (no block split, CSE unchanged).
+  fZ computed inside the clamp's argument (`DF_Clamp(aXY[2] = fZ = 1.0f - ..., ..)`) 95,
+  `aXY[2] = fZ = ...` 79, `aXY[2] = (fZ = ...); DF_Clamp(fZ, ..)` 95.
+
 - 2026-09-26, r6-args: permuter 15 min -j2 (13.5k iterations, base 550): best 330 and 395, both change behaviour (fOffset stored into fX0 / fY0, which the next pass reads for aUV); not usable.
 
 - 2026-09-26, r6-args: an empty `if (n) { } else { }` (block boundary) after `aXY[2] = fZ` or before the first clamp: 79 (the CSE is not stopped).
