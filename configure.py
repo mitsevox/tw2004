@@ -958,7 +958,7 @@ config.libs = [
             Object(Matching, "Code8009AA28.c"),
             Object(Matching, "GoGreenGrid.c"),
             Object(Matching, "MC_Gc.c"),
-            Object(NonMatching, "MC.c"),
+            Object(Matching, "MC.c"),
             Object(Matching, "PsMgr.c"),
             Object(Matching, "PsBallFx.c"),
             Object(Matching, "GameAudio.c"),
