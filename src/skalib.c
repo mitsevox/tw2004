@@ -1455,7 +1455,9 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
         if (nSlot >= 3) {
             nSize = sizeof(AnimLib) + pSrc->nTreeSize + pSrc->nClips * 4;
             pNew  = pOv->pChar->pLib;
-            nRet  = 0x2800;
+            // fake match: += (nRet is still 0 here); with = the first scheduling pass issues the
+            // store's li before the size's slwi, which changes the registers
+            nRet += 0x2800;
             Mem_cpy(pNew, pSrc, 21 * 4);
             pNew->n108      = pSrc->n108;
             pNew->nDefault  = pSrc->nDefault;
