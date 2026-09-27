@@ -822,6 +822,10 @@ GoComicCam.c:
 
 GoShaderObject_Rain_Gc.c:
 	.text       start:0x800B4B5C end:0x800B5934
+	.data       start:0x8018FF88 end:0x8018FFA8
+	.bss        start:0x801F6320 end:0x801F6338
+	.sdata      start:0x802814B8 end:0x802814C8
+	.sdata2     start:0x80284148 end:0x802841B0
 
 AudLock.c:
 	.text       start:0x800B5934 end:0x800B5A14
