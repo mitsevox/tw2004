@@ -1684,6 +1684,7 @@ void** AnimLib_Find(AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, 
 // group, style and club class; *ppSlot gets that slot so the caller can record the new one.
 u8 AnimLib_WasLastPlayed(int nPlayer, const char* pName, char** ppSlot, int nGroup, int nStyle, int nClub) {
     int nKind;
+    int nOff;
     *ppSlot = NULL;
     switch (nGroup) {
     case 5:
@@ -1696,8 +1697,14 @@ u8 AnimLib_WasLastPlayed(int nPlayer, const char* pName, char** ppSlot, int nGro
         return 0;
     }
     if (nPlayer < 0 || nPlayer >= 4) return 0;
-    *ppSlot = lbl_80281D14[nPlayer][nKind][nStyle][nClub];
-    return strcmp(pName, lbl_80281D14[nPlayer][nKind][nStyle][nClub]) == 0;
+    // fake match: the slot's byte offset summed in one local, player and kind first, and added to
+    // the table's base: the same element as lbl_80281D14[nPlayer][nKind][nStyle][nClub], whose
+    // index form colours the sum and the base differently
+    nOff = nPlayer * sizeof(lbl_80281D14[0]) + nKind * sizeof(lbl_80281D14[0][0]);
+    nOff += nStyle * sizeof(lbl_80281D14[0][0][0]);
+    nOff += nClub * sizeof(lbl_80281D14[0][0][0][0]);
+    *ppSlot = (char*)lbl_80281D14 + nOff;
+    return strcmp(pName, (char*)lbl_80281D14 + nOff) == 0;
 }
 
 int   AnimLib_RandomIndex(u32 uUsed, int nCount);
