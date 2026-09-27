@@ -42,7 +42,7 @@ void     fn_800C5EC0(View* pView, f32* pCam, f32* pSub, int nPlayer);
 f32      fn_800C7394(View* pView);
 void     Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);  // rotate a vector by a quaternion
 u8       fn_8006BEA4(void);                             // the GameBreaker letterbox is up, scripted
-void     fn_800A68C0(u8 nPlayer);
+void     Gaud_InitSpecialShot(u8 nPlayer);
 void     fn_80039344(int nView, f32 f);                 // a per-view float (Swing.c's declaration)
 f32      Math_Tan(f32 x);                            // tan, as a float
 void     fn_800638B8(View* pView, int nPlayer);
@@ -3557,13 +3557,13 @@ void GolfCamera_ChooseSpecialSwing(View* pView, int nPlayer) {
         if (nPlayer == 0 && gPlayers[nPlayer].ball.nLie == 0) {
             pView->n260 = 2;
             SW_KillVibration(nPlayer);
-            fn_800A68C0(nPlayer);
+            Gaud_InitSpecialShot(nPlayer);
             return;
         }
         if (nPlayer == 1 && gPlayers[nPlayer].ball.nLie == 0) {
             pView->n260 = 11;
             SW_KillVibration(nPlayer);
-            fn_800A68C0(nPlayer);
+            Gaud_InitSpecialShot(nPlayer);
             return;
         }
         pView->n260 = 0;
@@ -3632,7 +3632,7 @@ void GolfCamera_ChooseSpecialSwing(View* pView, int nPlayer) {
         }
         if (pView->n260 != 0) {
             SW_KillVibration(nPlayer);
-            fn_800A68C0(nPlayer);
+            Gaud_InitSpecialShot(nPlayer);
         }
     } else {
         pView->n260 = 0;

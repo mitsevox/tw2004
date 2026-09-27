@@ -5462,7 +5462,7 @@ void fn_80084BE8(MsgArg* pArgs, MsgArg* pResult) {
         gSession.options.rows[0][pArgs[1].i] = 1;
         Gaud_StopMusic();
         Gaud_SetStreamingContext();
-        fn_800A754C(13, pArgs[1].i);
+        Gaud_StartMusic(13, pArgs[1].i);
         break;
     case 1:
         Gaud_StopMusic();

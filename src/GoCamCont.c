@@ -15,7 +15,7 @@ void fn_80064478(f32* pA, f32* pB, f32* pOut);
 void Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);      // Quaternion.c: a vector turned by it
 void fn_80016CD8(int nView);                            // ViewController.c: sets the current view
 void fn_80045824(int n);                                // DepthField.c: turns depth-of-field layer n off
-void fn_800A6070(u8 nPlayer, u8 bLimit);                // GameAudio.c
+void Gaud_CameraShake(u8 nPlayer, u8 bLimit);                // GameAudio.c
 f32  fn_8005CC18(f32* pV);                              // Swing.c
 void CameraController_ShakeCamera(View* pView);
 void fn_80064108(View* pView);
@@ -186,7 +186,7 @@ void CameraController_Idle(View* pView, int nPlayer) {
             if (fn_80048574(gPlayers[nPlayer].pChar, i + 5) && fn_80062BB0(gPlayers[nPlayer].pChar, i + 5)) {
                 fn_80062B98(gPlayers[nPlayer].pChar, i + 5);
                 fn_800642A4(pView, lbl_80281F78->f204, lbl_80281F78->f200);
-                fn_800A6070(nPlayer, 0);
+                Gaud_CameraShake(nPlayer, 0);
             }
         }
     }

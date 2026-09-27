@@ -99,7 +99,7 @@ void fn_800AA698(AudSeqEvent* pEvent, AudTrack* pTrack) {
             pTrack->u.seq.n66 = pEvent->n3;
             pTrack->bits.b.b7 = 1;
             if (pTmpl->n0 & 0x80) {
-                fn_800A8584(pTrack->pSource, pTmpl->n6, 1);
+                Emi_TrackCallback(pTrack->pSource, pTmpl->n6, 1);
             }
         }
     } else {

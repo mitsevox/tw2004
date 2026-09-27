@@ -11,7 +11,7 @@
 #include "unsorted/cull.h"
 
 AudInstance* Aud_CheckEmitterInstance(u8 nId);
-void fn_800ADE54(f32* pVec);
+void vec4flt_Zero3(f32* pVec);
 void Aud_EmiSet3DPos(u8 nId, f32* pPos, f32* pLast, u8 nView);
 void Voc_Cycle(void);                 // hlaudvoice.c
 void fn_800AF320(void);
@@ -123,7 +123,7 @@ u8 Aud_EmiAdd(s16 nSound, s16 nEmitter, int n24, int n28, void (*pfnCallback)(u8
     pInst->n24 = n24;
     pInst->n28 = n28;
     pInst->pfnCallback = pfnCallback;
-    fn_800ADE54(pInst->vPos);
+    vec4flt_Zero3(pInst->vPos);
     pInst->pPrevActive = lbl_801F2668.pActiveTail;
     pInst->pNextActive = NULL;
     if (pInst->pPrevActive != NULL) {
@@ -315,23 +315,23 @@ void Aud_EmiSet3DPos(u8 nId, f32* pPos, f32* pLast, u8 nView) {
 // Aud_EmiSetTrackVarRangeTmpl passes a sound number instead (its definition, shared by all its instances).
 void Aud_EmiSetTrackVariation(u8 nId, u8 nTrack, u8 n) {
     if (Aud_CheckEmitterInstance(nId) != NULL) {
-        fn_800A8248(nId, nTrack, n);
+        Emi_SetTrackVariation(nId, nTrack, n);
     }
 }
 
 void Aud_EmiSetTrackVarRange(u8 nId, u8 nTrack, u8 n) {
     if (Aud_CheckEmitterInstance(nId) != NULL) {
-        fn_800A82CC(nId, nTrack, n);
+        Emi_SetTrackVarRange(nId, nTrack, n);
     }
 }
 
 void Aud_EmiSetTrackVarRangeTmpl(s16 nSound, u8 nTrack, u8 n) {
-    fn_800A834C(nSound, nTrack, n);
+    Emi_SetTrackVarRangeTmpl(nSound, nTrack, n);
 }
 
 void Aud_EmiSetTrackStep(u8 nId, u8 nTrack, u8 n, int bCheck) {
     if (Aud_CheckEmitterInstance(nId) != NULL) {
-        fn_800A8394(nId, nTrack, n, bCheck);
+        Emi_SetTrackStep(nId, nTrack, n, bCheck);
     }
 }
 
@@ -344,7 +344,7 @@ void Aud_EmiSetTrackAttenuation(u8 nId, u8 nTrack, f32 fVolume) {
 
 void Aud_EmiSetTrackPitchFactor(u8 nId, u8 nTrack, f32 fPitch) {
     if (Aud_CheckEmitterInstance(nId) != NULL) {
-        fn_800A84A4(nId, nTrack, fPitch);
+        Emi_SetTrackPitchFactor(nId, nTrack, fPitch);
     }
 }
 
@@ -404,7 +404,7 @@ void Aud_EmiTrkCB(u8 nId, u8 nBit, s32 n) {
 }
 
 // Sets a four-float vector to (0, 0, 0, 1).
-void fn_800ADE54(f32* pVec) {
+void vec4flt_Zero3(f32* pVec) {
     pVec[2] = 0.0f;
     pVec[1] = 0.0f;
     pVec[0] = 0.0f;

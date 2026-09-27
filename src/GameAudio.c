@@ -39,8 +39,8 @@ u8   Aud_EmiAdd(s16 nSound, s16 nKind, int a, int b, void (*pfnCallback)(u8 nId,
 void Aud_EmiSetTrackVarRangeTmpl(s16 nSound, u8 nTrack, u8 n);
 void Aud_EmiSetAllTrackStatus(u8 nId, int n);
 void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);
-void fn_800A6BA8(u8 nPlayer);
-void fn_800A6854(u8 nPlayer);
+void Gaud_ExitSpecialShot(u8 nPlayer);
+void Gaud_ExitCamZoom(u8 nPlayer);
 void fn_800A6D48(u8 nPlayer);
 void fn_800A714C(void);
 void fn_800A71E4(void);
@@ -53,9 +53,9 @@ void Aud_SetSubmixAll(u8 nCurves, f32* pVolumes);
 void fn_800A4084(void);
 void fn_800A41A4(void);
 void fn_800A43DC(void);
-void fn_800A47A0(void);
-void fn_800A484C(void);
-void fn_800A4928(void);
+void StartBackgroundMusic(void);
+void StartAmbientStreamer(void);
+void UpdateStreaming(void);
 void fn_800A42B0(u8 n);
 void fn_800A7220(f32 fAmount);
 void Aud_Mute(u8 bLow, u8 bHigh);
@@ -64,8 +64,8 @@ void fn_800A4044(u8 nIndex, u8 nValue);
 void Aud_SesTmplOvrTrackRvbMode(s16 nSound, u8 nTrack, u8 bOn);
 void fn_800A4170(u8 nId, u8 nTrack, s32 n);
 void fn_800A5980(u8 nPlayer);
-void fn_800A6C98(u8 nPlayer, u8 n);
-void fn_800A6660(u8 nPlayer);
+void Gaud_InitSlowMo(u8 nPlayer, u8 n);
+void Gaud_ExitGameBreaker(u8 nPlayer);
 void Aud_EmiSetTrackVariation(u8 nId, u8 nTrack, u8 n);
 u8   fn_800A4A24(s32 nCourse, int n);
 u8   fn_800A4A88(void);
@@ -134,7 +134,7 @@ u32 lbl_80282054;                       // frames left before the queued sound s
 u8 lbl_80282052;                        // } the queued sound: Aud_EmiSetTrackStream's arguments
 u16 lbl_80282050;                       // }
 s32 lbl_8028204C;                       // }
-u32 lbl_80282048;                       // fn_800A6070: the frame it last played
+u32 lbl_80282048;                       // Gaud_CameraShake: the frame it last played
 f32 lbl_80282044;
 u8 lbl_80282042;
 u8 lbl_80282041;
@@ -188,7 +188,7 @@ void Aud_EmiSetTrackStep(u8 nId, u8 nTrack, u8 n, int bCheck);
 
 u8   fn_800A3FF4(void);
 void Gaud_StopMusic(void);
-void fn_800A68C0(u8 nPlayer);
+void Gaud_InitSpecialShot(u8 nPlayer);
 void fn_800A6EC8(void);
 void fn_800A73C0(u8 a, int n);
 
@@ -207,7 +207,7 @@ u8 Aud_InitOnce(u8 nRate) {
     fn_800B5B80();
     if ((bOk = fn_800AFAB0()) && (bOk = fn_800B0438()) && (bOk = fn_800B0568())
         && (bOk = fn_800AF224()) && (bOk = fn_800B0798()) && (bOk = fn_800A8604())
-        && (bOk = fn_800A8D2C()) && (bOk = fn_800A7AF0()) && (bOk = Trk_InitModule())
+        && (bOk = fn_800A8D2C()) && (bOk = Emi_InitModule()) && (bOk = Trk_InitModule())
         && (bOk = fn_800AAD18()) && (bOk = fn_800ABBC8()) && (bOk = fn_800A8754())
         && (bOk = Voc_InitModule()) && (bOk = fn_800A8824()) && (bOk = Aud_EmiInitOnce())
         && (bOk = fn_800A3FF4())) {
@@ -455,7 +455,7 @@ void Gaud_SetStreamingContext(void) {
 }
 
 // Steps to the next track switched on in the options' row lbl_8028142C (19 tracks) and plays it.
-void fn_800A47A0(void) {
+void StartBackgroundMusic(void) {
     u8 i;
     int nCount = 0;
 
@@ -472,14 +472,17 @@ void fn_800A47A0(void) {
                 lbl_8028142D = 0;
             }
             if (gSession.options.rows[lbl_8028142C][lbl_8028142D]) {
-                fn_800A754C(13, lbl_8028142D);
+                Gaud_StartMusic(13, lbl_8028142D);
                 return;
             }
         }
     }
 }
 
-void fn_800A484C(void) {
+// When ambience is what streams (lbl_8028203C 2): starts the ambience emitter's tracks 0 and 1,
+// track 2 when fn_80035574 (the course flag that also starts the rain sound), track 3 by course and
+// track 4 by course and hole (fn_800A4A24).
+void StartAmbientStreamer(void) {
     int nCourse;
     u8 n;
     u8 nSound;
@@ -502,17 +505,19 @@ void fn_800A484C(void) {
     }
 }
 
-void fn_800A4928(void) {
+// Once a frame: for ambience, starts its tracks when asked (lbl_80282041) and no ambient stream is
+// playing; for music, starts the next track when the current one has ended.
+void UpdateStreaming(void) {
     switch (lbl_8028203C) {
     case 2:
         if (lbl_80282041 != 0 && lbl_8028202D == 0 && !fn_800A7748()) {
             lbl_80282041 = 0;
-            fn_800A484C();
+            StartAmbientStreamer();
         }
         break;
     case 1:
         if (!fn_800A75F4()) {
-            fn_800A47A0();
+            StartBackgroundMusic();
         }
         break;
     }
@@ -531,7 +536,7 @@ void fn_800A49A4(u8 bKeepFirst) {
     }
 }
 
-// The sound for a course and n (fn_800A484C passes Game_GetCurHoleNum()), or 0xFF when it has none.
+// The sound for a course and n (StartAmbientStreamer passes Game_GetCurHoleNum()), or 0xFF when it has none.
 u8 fn_800A4A24(s32 nCourse, int n) {
     u8 nSound;
     int i;
@@ -623,7 +628,7 @@ void fn_800A4C54(void) {
         }
         fn_800A43DC();
         fn_800A41A4();
-        fn_800A4928();
+        UpdateStreaming();
     }
 }
 
@@ -828,10 +833,10 @@ void fn_800A5428(void) {
     Aud_EmiDel(lbl_80281419);
     lbl_80281419 = 0xFF;
     fn_800A6EC8();
-    fn_800A6854(0);
-    fn_800A6660(0);
+    Gaud_ExitCamZoom(0);
+    Gaud_ExitGameBreaker(0);
     fn_800A6D48(0);
-    fn_800A6BA8(0);
+    Gaud_ExitSpecialShot(0);
     fn_800A707C();
     fn_800A714C();
     fn_800A7294();
@@ -881,7 +886,7 @@ void fn_800A562C(u8 nPlayer) {
     lbl_8028202F = 0;
     lbl_80281424 = -1;
     fn_800A6EC8();
-    fn_800A6BA8(nPlayer);
+    Gaud_ExitSpecialShot(nPlayer);
     Aud_EmiSetAllTrackStatus(pView->n2, 0);
     Aud_EmiSetAllTrackStatus(pView->n3, 0);
     if (fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut) {
@@ -953,7 +958,7 @@ void fn_800A573C(u8 nPlayer) {
     }
 }
 
-// The swing: its sound by club and lie on the view's emitter 0. For a few calls after fn_800A68C0
+// The swing: its sound by club and lie on the view's emitter 0. For a few calls after Gaud_InitSpecialShot
 // set lbl_80282034 it plays track 4 of the view's emitters 2 and 3 instead.
 void fn_800A5980(u8 nPlayer) {
     Player* pPlayer;
@@ -978,7 +983,7 @@ void fn_800A5980(u8 nPlayer) {
     bRestore = 1;
     nMode = Game_GetMode();
     if (fn_8006BEA4()) {
-        fn_800A6C98(nPlayer, 0);
+        Gaud_InitSlowMo(nPlayer, 0);
         bRestore = 0;
     }
     if (lbl_80282034 > 0) {
@@ -1004,7 +1009,7 @@ void fn_800A5980(u8 nPlayer) {
                         }
                     }
                 }
-                fn_800A6C98(nPlayer, nCrowd);
+                Gaud_InitSlowMo(nPlayer, nCrowd);
                 break;
             default:
                 n = 0;
@@ -1150,7 +1155,7 @@ void fn_800A5FE8(u8 nPlayer) {
 }
 
 // Plays variant 3 on track 1 of the view's emitters 2 and 3, at most every 300 frames with bLimit.
-void fn_800A6070(u8 nPlayer, u8 bLimit) {
+void Gaud_CameraShake(u8 nPlayer, u8 bLimit) {
     Player* pPlayer;
     u8 nIdA;
     u8 nIdB;
@@ -1253,7 +1258,11 @@ void fn_800A6450(u8 nPlayer) {
     }
 }
 
-void fn_800A64A8(u8 nPlayer, u8 b) {
+// The GameBreaker starts: the heartbeat (track 2 of the view's emitters 2 and 3) with its
+// controller vibration, the high half of the channels muted, and the pin's, crowd and ambience
+// emitters silenced. b also starts the slow-motion sound. Nothing while it is already on
+// (lbl_8028202F) or lbl_8028202B is set.
+void Gaud_InitGameBreaker(u8 nPlayer, u8 b) {
     GameAudioView* pView;
 
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
@@ -1277,12 +1286,15 @@ void fn_800A64A8(u8 nPlayer, u8 b) {
     Aud_EmiSetTrackAttenuation(lbl_8028141D, 5, 0.0f);
     Aud_EmiSetTrackAttenuation(lbl_8028141A, 0, 0.0f);
     if (b) {
-        fn_800A6C98(nPlayer, 0);
+        Gaud_InitSlowMo(nPlayer, 0);
     }
     lbl_8028202F = 1;
 }
 
-void fn_800A6660(u8 nPlayer) {
+// The GameBreaker ends: the heartbeat stops, the channels are unmuted, the pin's and ambience
+// emitters go back to full and the crowd to lbl_80281430, and a crowd reaction held back meanwhile
+// (lbl_80281428) plays. Nothing while lbl_8028202B is set.
+void Gaud_ExitGameBreaker(u8 nPlayer) {
     GameAudioView* pView;
 
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
@@ -1312,7 +1324,8 @@ void fn_800A6660(u8 nPlayer) {
     }
 }
 
-void fn_800A67E8(u8 nPlayer) {
+// The zoom camera's sound: track 0 of the player's view's emitters 2 and 3, until Gaud_ExitCamZoom.
+void Gaud_InitCamZoom(u8 nPlayer) {
     GameAudioView* pView;
 
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
@@ -1320,7 +1333,7 @@ void fn_800A67E8(u8 nPlayer) {
     Aud_EmiSetTrackStatus(pView->n3, 0, 1);
 }
 
-void fn_800A6854(u8 nPlayer) {
+void Gaud_ExitCamZoom(u8 nPlayer) {
     GameAudioView* pView;
 
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
@@ -1328,7 +1341,11 @@ void fn_800A6854(u8 nPlayer) {
     Aud_EmiSetTrackStatus(pView->n3, 0, 0);
 }
 
-void fn_800A68C0(u8 nPlayer) {
+// A special swing camera starts (camera 0's kind, View.n260). Outside speed golf (modes 6 to 8) it
+// mutes the high channels and, by kind, plays a swoosh (a variation range of track 1 on view 0's
+// emitters 2 and 3), the slow-motion sound or kind 7's sounds; lbl_80282034 tells fn_800A5980 what
+// to play on the next swing sounds.
+void Gaud_InitSpecialShot(u8 nPlayer) {
     GameAudioView* pView;
     int nKind;
     u8 bPlay;
@@ -1352,7 +1369,7 @@ void fn_800A68C0(u8 nPlayer) {
             break;
         case 15:
         case 16:
-            fn_800A6C98(nPlayer, 2);
+            Gaud_InitSlowMo(nPlayer, 2);
             lbl_80282034 = 1;
             break;
         case 4:
@@ -1368,7 +1385,7 @@ void fn_800A68C0(u8 nPlayer) {
             Aud_EmiSetTrackVariation(pView->n3, 6, 1);
             Aud_EmiSetTrackStatus(pView->n2, 6, 1);
             Aud_EmiSetTrackStatus(pView->n3, 6, 1);
-            fn_800A6C98(nPlayer, 2);
+            Gaud_InitSlowMo(nPlayer, 2);
             bPlay = 0;
             lbl_80282034 = 1;
             break;
@@ -1405,7 +1422,9 @@ void fn_800A68C0(u8 nPlayer) {
     }
 }
 
-void fn_800A6AC8(u8 nPlayer, u8 n) {
+// For the comic-book camera (kinds 4 and 9), the sound of panel n: variation range n (n + 4 for
+// kind 4) of track 6 on the view's emitters 2 and 3.
+void Gaud_UpdtSpecialShot(u8 nPlayer, u8 n) {
     GameAudioView* pView;
 
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
@@ -1424,7 +1443,9 @@ void fn_800A6AC8(u8 nPlayer, u8 n) {
     }
 }
 
-void fn_800A6BA8(u8 nPlayer) {
+// The special swing camera ends (outside speed golf): unmutes, stops track 1 (and kind 7's track 2)
+// of the view's emitters 2 and 3, and plays the swing sound if it is still due (lbl_80282032).
+void Gaud_ExitSpecialShot(u8 nPlayer) {
     GameAudioView* pView;
     int nKind;
 
@@ -1444,7 +1465,9 @@ void fn_800A6BA8(u8 nPlayer) {
     }
 }
 
-void fn_800A6C98(u8 nPlayer, u8 n) {
+// Slow motion's sound: variation range n of track 3 on the player's view's emitters 2 and 3 (not in
+// speed golf, modes 6 to 8).
+void Gaud_InitSlowMo(u8 nPlayer, u8 n) {
     GameAudioView* pView;
 
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
@@ -1592,12 +1615,12 @@ void fn_800A72EC(u8 bOff, u8 bMusic) {
             fn_800A49A4(0);
             Gaud_StopMusic();
             fn_800A6EC8();
-            fn_800A6660(0);
+            Gaud_ExitGameBreaker(0);
             return;
         }
         if (bMusic) {
             Gaud_SetStreamingContext();
-            fn_800A47A0();
+            StartBackgroundMusic();
         }
     }
 }
@@ -1666,7 +1689,9 @@ s32 fn_800A7528(void) {
     return Gaud_GetCommentStatus();
 }
 
-void fn_800A754C(u8 a, u16 b) {
+// Plays track b of music play list a on the music emitter (track 0, streamed) and shows the song's
+// names; only while music is what streams (lbl_8028203C 1).
+void Gaud_StartMusic(u8 a, u16 b) {
     if (lbl_8028203C == 1) {
         Aud_EmiSetTrackStream(lbl_80281418, 0, a, b, 2);
         Aud_EmiSetTrackStatus(lbl_80281418, 0, 1);
@@ -1776,7 +1801,7 @@ void fn_800A7924(f32 f) {
 
 void fn_800A7944(void) {
     Gaud_SetStreamingContext();
-    fn_800A47A0();
+    StartBackgroundMusic();
 }
 
 // Picks what a streamed track of instance nId plays: play list a, stream b, play mode c, packed

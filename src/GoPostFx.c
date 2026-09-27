@@ -26,7 +26,7 @@ void fn_80038E7C(f32* pXY, f32* pColour, f32* pUV, int n, f32* pSrc, f32 fCX, f3
 void fn_80038A2C(int nField, RenderCamera* pCamera);
 void fn_80038A6C(int nField, void* pCamera);
 void fn_800390CC(int nField, RenderCamera* pCamera);
-void fn_800A6070(u8 nPlayer, u8 bLimit);      // GameAudio.c
+void Gaud_CameraShake(u8 nPlayer, u8 bLimit);      // GameAudio.c
 void fn_80016948(void);
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_800169AC(void);                     // apply lbl_80280E08's viewport
@@ -110,7 +110,7 @@ void fn_80038054(u8 b, int nView, f32 f4, f32 f8) {
     lbl_801D5090[nView].f4 = f4;
     lbl_801D5090[nView].f8 = f8;
     if (f4 >= 0.035f) {
-        fn_800A6070(0, 1);
+        Gaud_CameraShake(0, 1);
     }
 }
 

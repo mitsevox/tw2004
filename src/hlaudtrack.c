@@ -198,7 +198,7 @@ s32 Trk_FreePerf(AudTrack* pTrack) {
         Stm_Exit(pTrack);
     }
     if (pTmpl->n0 & 0x40) {
-        fn_800A8584(pSource, pTmpl->n6, 0);
+        Emi_TrackCallback(pSource, pTmpl->n6, 0);
     }
     pTrack->pTmpl = NULL;
     pTrack->nState = 0;

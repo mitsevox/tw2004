@@ -233,7 +233,7 @@ void fn_800A8D88(void) {
     fn_800A86B8();
     fn_800AC49C();
     Trk_ExitSession();
-    fn_800A7C2C();
+    Emi_ExitSession();
     fn_800A87B0();
     fn_800AF2D8();
     fn_800B0660();
@@ -258,7 +258,7 @@ u8 Ses_Init(u8 a, u8 b, u8 nListeners) {
     lbl_8028207C &= ~0x30;
     if ((bOk = fn_800AFB48()) && (bOk = fn_800B0440()) && (bOk = fn_800B0624()) &&
         (bOk = fn_800AF264(a, b)) && (bOk = fn_800A87A4(a, b, nListeners)) &&
-        (bOk = fn_800A7C24()) && (bOk = fn_800A9A50(a, b)) && (bOk = fn_800AC494()) &&
+        (bOk = Emi_InitSession()) && (bOk = fn_800A9A50(a, b)) && (bOk = fn_800AC494()) &&
         (bOk = fn_800A86B0())) {
         if (b == 0) {
             if (lbl_80282078 != NULL) {
@@ -341,7 +341,7 @@ void fn_800A8FFC(u32 uMemory) {
             pTrack->data.pPlayList = (AudPlayList*)(pData + (uptr)pTrack->data.pPlayList);
             pTrack->pEvents = (AudSeqEvent*)(pSampleData + (uptr)pTrack->pEvents);
         }
-        fn_800A8524(pSound, i);
+        Emi_CheckTemplate(pSound, i);
         pBank->apSounds[i] = pSound;
     }
     if (bBank0) {

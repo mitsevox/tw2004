@@ -7,7 +7,7 @@
 
 void RC_UpdateCurrentScreenMatrices(void);
 void fn_80038624(f32* pColour);
-void fn_800A6AC8(u8 nPlayer, u8 n);     // GameAudio.c
+void Gaud_UpdtSpecialShot(u8 nPlayer, u8 n);     // GameAudio.c
 
 void fn_800B39B8(ComicPanel* pPanel, f32* pRect, int nPlayer, f32 fFrameTime);
 u8   fn_800B3C64(ComicPanel* pPanel, int nPlayer);
@@ -294,7 +294,7 @@ void fn_800B3F9C(void) {
     lbl_80282178->fTime = 0.0f;
     lbl_80282178->nShown = 0;
     lbl_80282178->nPanels = 3;
-    fn_800A6AC8(0, 0);
+    Gaud_UpdtSpecialShot(0, 0);
 }
 
 // Layout 1: a 3x3 grid of small panels, shown in one of four orders picked at random; each panel
@@ -397,7 +397,7 @@ void fn_800B4108(void) {
     } else {
         lbl_80282178->nPanels = 9;
     }
-    fn_800A6AC8(0, (int)(lbl_80282178->aPanel[0].fLeft * 3.0f));
+    Gaud_UpdtSpecialShot(0, (int)(lbl_80282178->aPanel[0].fLeft * 3.0f));
 }
 
 // Is the comic camera finished? Layout 1: once the golfer is half a second past animation event 2
@@ -424,7 +424,7 @@ u8 fn_800B4908(void) {
 }
 
 // Move the camera on for the current panel: layout 0 to shot 0x28 + the panel, layout 1 to the next
-// of shots 0x2B..0x2D every 9 panels shown. Then hand fn_800A6AC8 (GameAudio.c) the panel's column
+// of shots 0x2B..0x2D every 9 panels shown. Then hand Gaud_UpdtSpecialShot (GameAudio.c) the panel's column
 // (3 for layout 1's last panel).
 void fn_800B4914(View* pView, int nPlayer) {
     f32* pCam = CameraController_GetPosition(pView);
@@ -442,7 +442,7 @@ void fn_800B4914(View* pView, int nPlayer) {
             CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f,
                                            0x19, 0.0f);
         }
-        fn_800A6AC8(nPlayer, nColumn);
+        Gaud_UpdtSpecialShot(nPlayer, nColumn);
         return;
     case 1:
         if (lbl_80282178->nShown % 9 == 0) {
@@ -463,7 +463,7 @@ void fn_800B4914(View* pView, int nPlayer) {
         if (lbl_80282178->nShown >= lbl_80282178->nPanels - 1 && 0.0f == lbl_80282178->fTime) {
             nColumn = 3;
         }
-        fn_800A6AC8(nPlayer, nColumn);
+        Gaud_UpdtSpecialShot(nPlayer, nColumn);
         return;
     }
 }

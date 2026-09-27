@@ -65,7 +65,7 @@ typedef struct AudVoiceParams {
     f32  fPitch;                // 0x0    an event sets it from its n4 / 65536
     s16  nVolume;               // 0x4
     u8   nPan;                  // 0x6    0 left, 0x40 centre, 0x7F right
-    u8   n7;                    // 0x7    a second pan (fn_800A7FA8's front/back), 0x7F for a movie
+    u8   n7;                    // 0x7    a second pan (Panning3D's front/back), 0x7F for a movie
     u8   a8[2];                 // 0x8    from an event, by its n3
     u8   unkA[0xC - 0xA];
     u16  nC;                    // 0xC
@@ -176,20 +176,20 @@ LAYOUT_ASSERT(AudSeqEvent, 0x8);
 typedef struct AudTrackTmpl {
     u8   n0;                    // 0x0    0x01: events run one at a time (n67); 0x08: streamed;
                                 //        0x20: cleared and set by fn_800A94F4;
-                                //        0x40/0x80: fn_800A8584 on free/on a variation change
+                                //        0x40/0x80: Emi_TrackCallback on free/on a variation change
     u8   n1;                    // 0x1    how the next variation is picked (fn_800AA4BC); 0: never
     u8   n2;                    // 0x2    its channel count (one voice each; for a streamed track,
                                 //        its play list's)
     u8   n3;                    // 0x3    events per variation
     u16  n4;                    // 0x4    0 or 1: a single variation
-    u8   n6;                    // 0x6    passed to fn_800A8584
+    u8   n6;                    // 0x6    passed to Emi_TrackCallback
     u8   n7;                    // 0x7    variations per set
     u8   n8;                    // 0x8    sets (the track's n68 picks one)
     u8   n9;                    // 0x9    the variation picked last
-    u8   nA;                    // 0xA    0xFF, or the set to use (set by fn_800A834C)
+    u8   nA;                    // 0xA    0xFF, or the set to use (set by Emi_SetTrackVarRangeTmpl)
     u8   unkB;
     f32  fC;                    // 0xC    copied to the track's f40
-    f32  f10;                   // 0x10   fn_800A7EA4's distance scale
+    f32  f10;                   // 0x10   Attenuation3D's distance scale
     union {
         AudPlayList* pPlayList; // 0x14   streamed tracks; its n3 is the track's volume curve
         AudSeqBank* pBank;      //        sequenced tracks; the same n3
@@ -460,20 +460,20 @@ void* fn_800B5BD8(u32 uSize);
 void  fn_800B5C04(void* p);
 
 // AudTable.c
-u8             fn_800A7AF0(void);
-u8             fn_800A7C24(void);
-void           fn_800A7C2C(void);
+u8             Emi_InitModule(void);
+u8             Emi_InitSession(void);
+void           Emi_ExitSession(void);
 AudSource*     Emi_AddInstance(u8 nEntry, s16 nSound);
 void           Emi_UpdInstance(u8 nEntry, u8 uMaskA, u8 uMaskB, u32* auStreams, f32 (*aPos)[3], u16 uMask);
 void           Emi_DelInstance(u8 nEntry);
-void           fn_800A8248(u8 nEntry, u8 nTrack, u8 n);
-void           fn_800A82CC(u8 nEntry, u8 nTrack, u8 n);
-void           fn_800A834C(s16 nSound, u8 nTrack, u8 n);       // the track's nA
-void           fn_800A8394(u8 nEntry, u8 nTrack, u8 n, int bCheck);
+void           Emi_SetTrackVariation(u8 nEntry, u8 nTrack, u8 n);
+void           Emi_SetTrackVarRange(u8 nEntry, u8 nTrack, u8 n);
+void           Emi_SetTrackVarRangeTmpl(s16 nSound, u8 nTrack, u8 n);       // the track's nA
+void           Emi_SetTrackStep(u8 nEntry, u8 nTrack, u8 n, int bCheck);
 void           Emi_SetTrackAttenuation(u8 nEntry, u8 nTrack, f32 fVolume);
-void           fn_800A84A4(u8 nEntry, u8 nTrack, f32 fPitch);
-void           fn_800A8524(AudSound* pSound, u16 n);
-void           fn_800A8584(AudSource* pSource, u8 nTrack, s32 n);
+void           Emi_SetTrackPitchFactor(u8 nEntry, u8 nTrack, f32 fPitch);
+void           Emi_CheckTemplate(AudSound* pSound, u16 n);
+void           Emi_TrackCallback(AudSource* pSource, u8 nTrack, s32 n);
 
 // HLAudMaster.c
 AudSound*    fn_800A85CC(s16 nSound);

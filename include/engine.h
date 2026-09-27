@@ -1004,7 +1004,7 @@ LAYOUT_ASSERT(PostFxTint, 0x14);
 typedef struct PostFx5090 {
     u8   b0;                    // 0x00  set: draw it this frame
     u8   unk1[3];
-    f32  f4;                    // 0x04  0.035 or more also calls fn_800A6070(0, 1)
+    f32  f4;                    // 0x04  0.035 or more also calls Gaud_CameraShake(0, 1)
     f32  f8;                    // 0x08
 } PostFx5090;
 LAYOUT_ASSERT(PostFx5090, 0xC);

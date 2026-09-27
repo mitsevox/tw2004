@@ -43,7 +43,7 @@ typedef struct GameAudioSource {
 
 // Called from other files: music by the menus (FE_MessageTable.c fn_80084BE8); startUp.c's sound.
 void Gaud_SetStreamingContext(void);                 // picks music or ambience and records it in lbl_8028203C
-void fn_800A754C(u8 a, u16 b);
+void Gaud_StartMusic(u8 a, u16 b);
 u8   fn_800A75F4(void);
 void fn_800A7944(void);
 void fn_800A7A14(u8 nSound);

@@ -1,24 +1,26 @@
 // AudTable.c (our name): the sound engine's table of 256 playing sounds (AudSource, 0x7C bytes
-// each), allocated from the audio memory stack (UAudMemStack.c's fn_800B5BD8) by fn_800A7AF0 and
+// each), allocated from the audio memory stack (UAudMemStack.c's fn_800B5BD8) by Emi_InitModule and
 // reached through lbl_80282058. Each entry plays a bank sound's tracks and, for a sound placed in
 // the world, works out its volume, pan and doppler pitch from its distance to the listeners. Its
 // data starts on its own 8-byte boundaries (.sbss 0x80282058, .sdata2 0x80283F88); where its code
-// starts before fn_800A7AF0 is not proven.
+// starts before Emi_InitModule is not proven.
 
 #include "core/audtrack.h"
 
 f32  fn_800B1A40(f32* pVec);                     // its length
 
-void fn_800A7E44(AudSource* pSource);
-f32  fn_800A7EA4(f32 fDist, f32 fScale);
-void fn_800A7F2C(AudSource* pSource);
-void fn_800A7FA8(AudSource* pSource);
-f32  fn_800A809C(AudSource* pSource, f32 (*aPos)[3]);
-void fn_800A8134(AudSource* pSource, u32* auStreams, u16 uMask);
+void FreeAllPerfs(AudSource* pSource);
+f32  Attenuation3D(f32 fDist, f32 fScale);
+void Doppler3D(AudSource* pSource);
+void Panning3D(AudSource* pSource);
+f32  Distance3D(AudSource* pSource, f32 (*aPos)[3]);
+void PreprocessControllers(AudSource* pSource, u32* auStreams, u16 uMask);
 
 AudSource* lbl_80282058;
 
-u8 fn_800A7AF0(void) {
+// Allocates the 256 sound entries from the audio memory stack, cleared, each at pitch 1. Nonzero
+// when it worked.
+u8 Emi_InitModule(void) {
     u8 bOk;
     s32 i;
 
@@ -34,11 +36,11 @@ u8 fn_800A7AF0(void) {
     return bOk;
 }
 
-u8 fn_800A7C24(void) {
+u8 Emi_InitSession(void) {
     return 1;
 }
 
-void fn_800A7C2C(void) {
+void Emi_ExitSession(void) {
 }
 
 // Clears entry nEntry and binds it to sound nSound.
@@ -71,15 +73,15 @@ void Emi_UpdInstance(u8 nEntry, u8 uMaskA, u8 uMaskB, u32* auStreams, f32 (*aPos
 
     pSource = &lbl_80282058[nEntry];
     if (uMask & 7) {
-        fn_800A8134(pSource, auStreams, uMask);
+        PreprocessControllers(pSource, auStreams, uMask);
     }
     if (pSource->pSound->n3 & 1) {
-        fDist = fn_800A809C(pSource, aPos);
+        fDist = Distance3D(pSource, aPos);
         bHeard = fDist - pSource->pSound->f4 < 0.0f;
         if (bHeard) {
             pSource->fDist = fDist;
-            fn_800A7FA8(pSource);
-            fn_800A7F2C(pSource);
+            Panning3D(pSource);
+            Doppler3D(pSource);
         }
     } else {
         bHeard = 1;
@@ -94,17 +96,17 @@ void Emi_UpdInstance(u8 nEntry, u8 uMaskA, u8 uMaskB, u32* auStreams, f32 (*aPos
             bOn = (uMaskA & uBit) != 0;
             bOff = (uMaskB & uBit) != 0;
             if (pSource->pSound->n3 & 1) {
-                fVolume = fn_800A7EA4(fDist, pTmpl->f10);
+                fVolume = Attenuation3D(fDist, pTmpl->f10);
             }
             Trk_UpdatePerf(pSource, pTrack, pTmpl, i, bOn, bOff, fVolume);
         }
         return;
     }
-    fn_800A7E44(pSource);
+    FreeAllPerfs(pSource);
 }
 
 // Stops every track of an entry.
-void fn_800A7E44(AudSource* pSource) {
+void FreeAllPerfs(AudSource* pSource) {
     u8 i;
 
     for (i = 0; i < pSource->pSound->nTracks; i++) {
@@ -113,7 +115,7 @@ void fn_800A7E44(AudSource* pSource) {
 }
 
 // A placed track's volume by distance: full up to 2, falling to a quarter at 5, then to nothing.
-f32 fn_800A7EA4(f32 fDist, f32 fScale) {
+f32 Attenuation3D(f32 fDist, f32 fScale) {
     f32 f;
     f32 fVolume;
 
@@ -133,7 +135,7 @@ f32 fn_800A7EA4(f32 fDist, f32 fScale) {
 }
 
 // The doppler pitch from how fast the sound nears the nearest listener (345: the speed of sound).
-void fn_800A7F2C(AudSource* pSource) {
+void Doppler3D(AudSource* pSource) {
     f32 fDist;
     u8 uFlags;
     f32 fSpeed;
@@ -159,7 +161,7 @@ void fn_800A7F2C(AudSource* pSource) {
 
 // The pan from where the sound is: with one listener, its side and its front or back; with two
 // (split screen) the sound is centred.
-void fn_800A7FA8(AudSource* pSource) {
+void Panning3D(AudSource* pSource) {
     f32 fInv;
     f32 fPan;
     f32 f68;
@@ -180,7 +182,7 @@ void fn_800A7FA8(AudSource* pSource) {
 
 // Measures the sound's distance from each listener; returns the nearest. aPos (the position as
 // each view hears it) is not used: the distances come from pSource->aPos.
-f32 fn_800A809C(AudSource* pSource, f32 (*aPos)[3]) {
+f32 Distance3D(AudSource* pSource, f32 (*aPos)[3]) {
     f32 fNearest;
     u8 i;
     f32 fDist;
@@ -198,7 +200,7 @@ f32 fn_800A809C(AudSource* pSource, f32 (*aPos)[3]) {
 
 // Sets the play list and stream of each streamed track in uMask: auStreams[i] holds the stream in
 // its low 16 bits, the play list above it and the mode in the top byte.
-void fn_800A8134(AudSource* pSource, u32* auStreams, u16 uMask) {
+void PreprocessControllers(AudSource* pSource, u32* auStreams, u16 uMask) {
     AudTrack* pTrack;
     u32 uStream;
     u8 i;
@@ -225,12 +227,13 @@ void Emi_DelInstance(u8 nEntry) {
     AudSource* pSource;
 
     pSource = &lbl_80282058[nEntry];
-    fn_800A7E44(pSource);
+    FreeAllPerfs(pSource);
     pSource->pSound = NULL;
     pSource->nSound = 0;
 }
 
-void fn_800A8248(u8 nEntry, u8 nTrack, u8 n) {
+// Picks variation n of entry nEntry's track nTrack, starting the track if it has not started.
+void Emi_SetTrackVariation(u8 nEntry, u8 nTrack, u8 n) {
     AudSource* pSource;
     AudTrackTmpl* pTmpl;
     AudTrack* pTrack;
@@ -245,7 +248,8 @@ void fn_800A8248(u8 nEntry, u8 nTrack, u8 n) {
     Trk_SelectVariation(pTrack, n);
 }
 
-void fn_800A82CC(u8 nEntry, u8 nTrack, u8 n) {
+// Picks variation range n of entry nEntry's track nTrack, starting the track if it has not started.
+void Emi_SetTrackVarRange(u8 nEntry, u8 nTrack, u8 n) {
     AudSource* pSource;
     AudTrack* pTrack;
 
@@ -258,11 +262,15 @@ void fn_800A82CC(u8 nEntry, u8 nTrack, u8 n) {
     Trk_SetVariationRange(pTrack, n);
 }
 
-void fn_800A834C(s16 nSound, u8 nTrack, u8 n) {
+// Sets the variation range that sound nSound's track nTrack uses (its template's nA), for every
+// entry that plays it.
+void Emi_SetTrackVarRangeTmpl(s16 nSound, u8 nTrack, u8 n) {
     fn_800A85CC(nSound)->aTracks[nTrack].nA = n;
 }
 
-void fn_800A8394(u8 nEntry, u8 nTrack, u8 n, int bCheck) {
+// Asks entry nEntry's track nTrack to play step n next (with bCheck, not when it is the current
+// one), starting the track if it has not started.
+void Emi_SetTrackStep(u8 nEntry, u8 nTrack, u8 n, int bCheck) {
     AudSource* pSource;
     AudTrack* pTrack;
 
@@ -290,7 +298,7 @@ void Emi_SetTrackAttenuation(u8 nEntry, u8 nTrack, f32 fVolume) {
 }
 
 // Sets a track's pitch.
-void fn_800A84A4(u8 nEntry, u8 nTrack, f32 fPitch) {
+void Emi_SetTrackPitchFactor(u8 nEntry, u8 nTrack, f32 fPitch) {
     AudSource* pSource;
     AudTrack* pTrack;
 
@@ -303,7 +311,9 @@ void fn_800A84A4(u8 nEntry, u8 nTrack, f32 fPitch) {
     pTrack->f4C = fPitch;
 }
 
-void fn_800A8524(AudSound* pSound, u16 n) {
+// Prepares each sequenced track template of a sound just loaded from a bank (fn_800AA3D4). n, the
+// sound's number in the bank, is not used.
+void Emi_CheckTemplate(AudSound* pSound, u16 n) {
     u8 i;
 
     for (i = 0; i < pSound->nTracks; i++) {
@@ -311,6 +321,8 @@ void fn_800A8524(AudSound* pSound, u16 n) {
     }
 }
 
-void fn_800A8584(AudSource* pSource, u8 nTrack, s32 n) {
+// Tells the emitter instance of this entry (same number) that track nTrack was freed (n 0) or
+// changed variation (n 1), through Aud_EmiTrkCB.
+void Emi_TrackCallback(AudSource* pSource, u8 nTrack, s32 n) {
     Aud_EmiTrkCB((u8)(pSource - lbl_80282058), nTrack, n);
 }

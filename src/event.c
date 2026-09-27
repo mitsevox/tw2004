@@ -42,11 +42,11 @@ void fn_800A5FE8(u8 nPlayer);
 void fn_800A6448(u8 nPlayer);
 void fn_800A644C(u8 nPlayer);
 void fn_800A6450(u8 nPlayer);
-void fn_800A64A8(u8 nPlayer, int a);
-void fn_800A6660(u8 nPlayer);
-void fn_800A67E8(u8 nPlayer);
-void fn_800A6854(u8 nPlayer);
-void fn_800A6BA8(u8 nPlayer);
+void Gaud_InitGameBreaker(u8 nPlayer, int a);
+void Gaud_ExitGameBreaker(u8 nPlayer);
+void Gaud_InitCamZoom(u8 nPlayer);
+void Gaud_ExitCamZoom(u8 nPlayer);
+void Gaud_ExitSpecialShot(u8 nPlayer);
 void fn_800C9FE0(void);
 void fn_800DC498(int nPlayer);
 void fn_800E5DE4(int n);
@@ -499,11 +499,11 @@ void fn_80066CAC(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 void fn_80066D0C(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_800A67E8(nPlayer);
+    Gaud_InitCamZoom(nPlayer);
 }
 
 void fn_80066D30(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_800A6854(nPlayer);
+    Gaud_ExitCamZoom(nPlayer);
 }
 
 void fn_80066D54(int nPlayer, int nEvent, void* pData, int nArg) {
@@ -536,7 +536,7 @@ void fn_80066D74(int nPlayer, int nEvent, void* pData, int nArg) {
 void fn_80066D78(int nPlayer, int nEvent, void* pData, int nArg) {
     fn_800A2FFC(nPlayer, nArg);
     if (nArg == 1) {
-        fn_800A6BA8(nPlayer);
+        Gaud_ExitSpecialShot(nPlayer);
     }
 }
 
@@ -548,22 +548,22 @@ void fn_80066DC4(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 void fn_80066E28(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_800A64A8(nPlayer, 0);
+    Gaud_InitGameBreaker(nPlayer, 0);
     if (fn_80067560()) {
         fn_800E5DE4((u8)(fn_80067560() + 15));
     }
 }
 
 void fn_80066E6C(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_800A6660(nPlayer);
+    Gaud_ExitGameBreaker(nPlayer);
 }
 
 void fn_80066E90(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_800A64A8(nPlayer, 1);
+    Gaud_InitGameBreaker(nPlayer, 1);
 }
 
 void fn_80066EB8(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_800A6660(nPlayer);
+    Gaud_ExitGameBreaker(nPlayer);
 }
 
 void fn_80066EDC(int nPlayer, int nEvent, void* pData, int nArg) {
