@@ -25,6 +25,42 @@ int   Skalib_HasOverlays(int nSlot);
 void  AnimLib_FreeCopies(void);
 void  ClipBank_FreeAram(void);
 
+// This file's .bss (character.h), in reverse address order as the compiler lays it out.
+UStreamObject* lbl_801C6488[3];
+u32            lbl_801C647C[3];
+u32            lbl_801C6470[3];
+LibSlot        lbl_801C6068[3];
+AnimLib*       lbl_801C605C[3];
+ClipBank*      lbl_801C6050[3];
+SlotStats      lbl_801C6008[3];
+u8             lbl_801C5E2C[0x1DC];
+u8             lbl_801C5C50[0x1DC];
+u8             lbl_801BF9C0[0x6290];
+u8             lbl_801B9730[0x6290];
+
+// This file's .sdata (character.h).
+s32 lbl_80281070 = 3;
+s32 lbl_80281074 = 6;
+u32 lbl_80281078 = 1;
+
+// This file's .sbss (character.h), in reverse address order as the compiler lays it out.
+f32            lbl_80281D1C;
+u32            lbl_80281D18;
+char (*lbl_80281D14)[2][8][6][16];
+u32            lbl_80281D0C[2];
+u32            lbl_80281D04[2];
+s16*           lbl_80281D00;
+s16*           lbl_80281CFC;
+s16*           lbl_80281CF8;
+s32            lbl_80281CF4;
+s32            lbl_80281CF0;
+s32            lbl_80281CEC;
+s32            lbl_80281CE8;
+u8             lbl_80281CE4;
+UStreamObject* lbl_80281CE0;
+u32            lbl_80281CDC;
+u8             lbl_80281CD8;
+
 // The clip with this name, or NULL.
 void* AnimLib_FindByName(AnimLib* pLib, const char* pName) {
     int i;
@@ -961,16 +997,27 @@ done:
     return nRet == 1;
 }
 
+// fake match: puts 1.0f in the constant pool ahead of AnimLib_PlanBank's 942080.0f (EA's
+// order). Unused, so the linker strips it.
+static f32 skalib_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 // Plans the clip bank for a slot: merges the slot's library with its overlays (clips with the
 // same name are shared, later copies pointing at the first), and, unless it is slot 2, trims
 // the result to the slot's budget (lbl_80281CDC, or its share of 920 KB when lbl_80281CD8 is
 // set): random picks first; if that cannot fit, the best-ranked picks from a fresh copy.
 // Allocates the bank (slots 0 and 1 reuse one they have) and returns its size.
 u32 AnimLib_PlanBank(u32 nSlot) {
+    // register note: the declaration order gives EA's spill slots (0xC8 pIndexCopy up to 0xEC
+    // nHdr, in reverse declaration order) and EA's register colouring order.
+    s32         nHdr;
+    s32         nIndexSize;
     LibSlot*    pSlot = &lbl_801C6068[nSlot];
     u32         nRet  = 0;
     u8          bBoth = 0;
     s32         nRecSize;
+    ClipRecord* apRecords[10];
     u8*         apTree[10];
     s16*        apIndex[10];
     MergeCtx    ctx;
@@ -979,29 +1026,29 @@ u32 AnimLib_PlanBank(u32 nSlot) {
     s32         nLibClips;
     s32         nOvClips;
     s32         nClipsAll;
-    s16*        pIndexCopy;
-    u8*         pTreeCopy;
-    ClipRecord* pRecordsCopy;
+    s32         nBytesBefore2;
     s32         nBytesBefore;
-    ClipRecord* apRecords[10];
-    s32         nIndexSize;
-    s32         nHdr;
+    ClipRecord* pRecordsCopy;
+    u8*         pTreeCopy;
+    s16*        pIndexCopy;
     AnimLib*    pLib;
     s32         nBytes;
     LibOverlay* pOvs;
     int         nOvs;
-    int         i;
-    int         j;
-    int         k;
-    int         m;
     AnimLib*    pOvLib;
-    AnimLib*    pOther;
     ClipRecord* pRec;
-    ClipRecord* pRecO;
+    int         j;
     s32         nLeft;
+    int         i;
+    AnimLib*    pOther;
+    int         k;
+    ClipRecord* pRecO;
+    int         m;
+    AnimLib*    pWork;
     s32         nTotal;
     s32         nBudget;
     ClipBank*   pBank;
+    int         n;
 
     if (lbl_801C6068[0].nOverlays != 0 && lbl_801C6068[1].nOverlays != 0) {
         bBoth = 1;
@@ -1024,16 +1071,16 @@ u32 AnimLib_PlanBank(u32 nSlot) {
     ctx.nBytes = nBytes;
     ctx.pCount = &nLibClips;
     for (i = 0; i < nOvs; i++) {
-        pOvLib = pOvs[i].pWork;
-        if (pOvLib != NULL) {
-            pOvs[i].nTree     = pOvLib->nTreeSize;
-            pOvLib->nTreeSize = 0;
+        pWork = pOvs[i].pWork;
+        if (pWork != NULL) {
+            pOvs[i].nTree    = pWork->nTreeSize;
+            pWork->nTreeSize = 0;
             if (pLib != NULL) {
-                pOvLib->nClips += pLib->nClips;
+                pWork->nClips += pLib->nClips;
             }
-            AnimLib_WalkPair(pLib, pOvLib, (AnimLibWalkFn)AnimLib_MergeSizeCb, NULL);
-            if (pOvLib->nTreeSize & 15) {
-                pOvLib->nTreeSize = ((pOvLib->nTreeSize >> 4) + 1) << 4;
+            AnimLib_WalkPair(pLib, pWork, (AnimLibWalkFn)AnimLib_MergeSizeCb, NULL);
+            if (pWork->nTreeSize & 15) {
+                pWork->nTreeSize = ((pWork->nTreeSize >> 4) + 1) << 4;
             }
             pOvs[i].n14 = pOvs[i].n10 - 3;
         }
@@ -1118,15 +1165,15 @@ u32 AnimLib_PlanBank(u32 nSlot) {
     }
     for (i = 0; i < nOvs; i++) {
     }
-    nClipsAll = nClips + nLibClips;
-    nClips    = nClipsAll;
+    nClips   += nLibClips;
+    nClipsAll = nClips;
     if (nClipsAll == 0) {
         // fake match: the shared exit as a jump (without: 88.7%, not 91.6%)
         goto done;
     }
     nIndexSize = ((nClipsAll * 4 >> 4) + 1) << 4;
     nRecSize   = ((nClipsAll >> 4) + 1) << 4;
-    nTotal     = ctx.nBytes + nIndexSize + nRecSize + 0x20;
+    nTotal     = 0x20 + ctx.nBytes + nIndexSize + nRecSize;
     if (nSlot != 2) {
         nBudget = lbl_80281CDC;
         if (lbl_80281CD8) {
@@ -1141,10 +1188,13 @@ u32 AnimLib_PlanBank(u32 nSlot) {
         lbl_801C6008[nSlot].nBytes    = ctx.nBytes;
         if (nTotal > nBudget) {
             ctx.pCount   = &nClips;
-            nHdr         = nIndexSize + nRecSize + 0x20;
+            nHdr         = 0x20 + nIndexSize + nRecSize;
             ctx.nTarget  = nBudget;
-            ctx.nBytes  += nHdr;
-            nBytesBefore = ctx.nBytes;
+            ctx.nBytes   += nHdr;
+            // fake match: two locals with the same value, set again in the retry (EA keeps one
+            // in r20 until the retry and spills the one read at the end; one local: 99.4%)
+            nBytesBefore2 = ctx.nBytes;
+            nBytesBefore  = ctx.nBytes;
             pRecordsCopy = fn_80009B34(pLib->nRecords * sizeof(ClipRecord), 1, 0, "skalib.c", 2078);
             Mem_cpy(pRecordsCopy, pLib->pRecords, pLib->nRecords * sizeof(ClipRecord));
             pIndexCopy = fn_80009B34(pLib->nClips2 * 2, 1, 0, "skalib.c", 2080);
@@ -1167,6 +1217,7 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                 lbl_801C6008[nSlot].nBytes   = ctx.nBytes;
                 nClips           = nClipsAll;
                 ctx.nBytes       = nBytesBefore;
+                nBytesBefore2    = ctx.nBytes;
                 Mem_cpy(pLib->pRecords, pRecordsCopy, pLib->nRecords * sizeof(ClipRecord));
                 Mem_cpy(pLib->pIndex, pIndexCopy, pLib->nClips2 * 2);
                 Mem_cpy(pLib->pTree, pTreeCopy, pLib->nTreeSize);
@@ -1195,7 +1246,7 @@ u32 AnimLib_PlanBank(u32 nSlot) {
             }
             lbl_801C6008[nSlot].nBytes    = ctx.nBytes - nHdr;
             lbl_801C6008[nSlot].nKeep     = ctx.nKeep;
-            lbl_801C6008[nSlot].nTrimmed  = nBytesBefore - ctx.nBytes;
+            lbl_801C6008[nSlot].nTrimmed  = nBytesBefore2 - ctx.nBytes;
             lbl_801C6008[nSlot].nMaxUsers = ctx.nMaxUsers;
         }
         lbl_801C6008[nSlot].nBudget = nBudget;
@@ -1213,12 +1264,12 @@ u32 AnimLib_PlanBank(u32 nSlot) {
     pBank->uId     = 0;
     pBank->pFile   = NULL;
     pBank->ppClips = (void**)((u8*)pBank + 0x20);
-    for (i = 0; i < nClips; i++) {
-        pBank->ppClips[i] = NULL;
+    for (n = 0; n < nClips; n++) {
+        pBank->ppClips[n] = NULL;
     }
     pBank->pRecords      = (u8*)pBank->ppClips + nIndexSize;
-    lbl_801C6050[nSlot]  = pBank;
     pSlot->pEnd          = pBank->pRecords + nRecSize;
+    lbl_801C6050[nSlot]  = pBank;
 done:
     return nRet;
 }
@@ -1271,27 +1322,24 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
     LibOverlay* pOv;
     ClipBank*   pBank;
     AnimLib*    pSrc;
-    u8*         pEnd;
+    Clip*       pHdr;
     u32         uAram;
-    s32         nStride1;
-    s32         nStride2;
+    u32         nStride1;
+    u32         nStride2;
     u8*         pSrc1;
     u8*         pSrc2;
     int         f;
-    s32         nCopied;
+    u32         nCopied;
     s32         n4C;
     s32         n50;
-    s32         nHdr;
+    u32         nHdr;
     u32         uPad;
     s32         n;
+    u32         uAl;
     u8*         pOut;
-    s32         n50Al;
     AnimLib*    pNew;
-    Character*  pChar;
     s32         nSize;
-    Clip*       pHdr;
     ClipRecord* pRec;
-    s32*        pUsed;
     int         i;
     s32         nRet = 0;
     AnimLib*    pLibFile;
@@ -1300,10 +1348,9 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
     s32         n4CAl;
     BuildCtx    ctx;
     u32         o;
-    int         j;
+    u32         s;
     int         p;
     u8          bFound;
-    u32         s;
     Player*     pPlayer;
 
     if (nSlot < 3) {
@@ -1314,8 +1361,8 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
     } else {
         for (k = 0; k < 3; k++) {
             pSlot = &lbl_801C6068[k];
-            for (j = 0; j < pSlot->nOverlays; j++) {
-                pOv = &pSlot->overlays[j];
+            for (i = 0; i < pSlot->nOverlays; i++) {
+                pOv = &pSlot->overlays[i];
                 if (pOv->n10 == nSlot) {
                     k        = pOv->pChar->nSlot;
                     pOv->n10 = -1;
@@ -1332,21 +1379,23 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
         u32 aPad[4] = {0, 0, 0, 0};
 
         pBank = lbl_801C6050[k];
-        pUsed = &lbl_801C6008[k].n04;
-        pEnd  = pSlot->pEnd;
+        pHdr  = (Clip*)pSlot->pEnd;
         for (i = 0; i < pSrc->nRecords; i++) {
+            // register note: n50Al is a block local so that it numbers after n4CAl (EA spills
+            // n4CAl, keeps n50Al in r14); n4CAl stays last at function level for the spill slots
+            s32 n50Al;
+
             pRec = &pSrc->pRecords[i];
             if (pRec->n10 <= 0 || pRec->n18 == 0) continue;
-            pBank->ppClips[pSlot->n150] = pEnd;
+            pBank->ppClips[pSlot->n150] = pHdr;
             // port: a clip of an overlay library ('SAL '/'SAC '), little-endian on disc; a little-endian
             //       port does not swap here (Clip is then read in place)
             fn_80020BC8(pData + (uptr)pSrc->pRecords[i].pClip);
             pClipSrc = pData + (uptr)pSrc->pRecords[i].pClip;
-            pHdr     = (Clip*)pEnd;
             nHdr     = ((Clip*)pClipSrc)->pD0 - pClipSrc;
-            Mem_cpy(pEnd, pClipSrc, nHdr);
+            Mem_cpy(pHdr, pClipSrc, nHdr);
             nCopied = nHdr;
-            pOut    = pEnd + nHdr;
+            pOut    = (u8*)pHdr + nHdr;
             if (((Clip*)pClipSrc)->n2C != 0) {
                 Mem_cpy(pOut, ((Clip*)pClipSrc)->pD0, ((Clip*)pClipSrc)->n2C);
                 pOut += ((Clip*)pClipSrc)->n2C;
@@ -1381,29 +1430,37 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             Mem_cpy(pOut, ((Clip*)pClipSrc)->pFC, n);
             pHdr->pFC = pOut;
             nCopied += n;
-            nStride1 = pHdr->n8C * 2;
-            if (nStride1 & 31) {
-                nStride1 = ((nStride1 >> 5) + 1) << 5;
+            // fake match: the four sizes are rounded up to 32 through one u32 scratch, tested and
+            // rounded from the size itself (a local per size, or rounding the local in place, gives
+            // other registers and keeps no copy of the result)
+            uAl = pHdr->n8C * 2;
+            if (pHdr->n8C * 2 & 31) {
+                uAl = ((pHdr->n8C * 2 >> 5) + 1) << 5;
             }
-            nStride2 = pHdr->n8E;
-            if (nStride2 & 31) {
-                nStride2 = ((nStride2 >> 5) + 1) << 5;
+            nStride1 = uAl;
+            uAl      = pHdr->n8E;
+            if (pHdr->n8E & 31) {
+                uAl = ((pHdr->n8E >> 5) + 1) << 5;
             }
+            nStride2   = uAl;
             pSrc1      = (u8*)((Clip*)pClipSrc)->uAram;
             pSrc2      = ((Clip*)pClipSrc)->pE4;
             pHdr->n38  = nStride1 * pHdr->nFrames;
             pHdr->n04  = nStride2 * pHdr->nFrames;
+            nSize      = pHdr->n38 + pHdr->n04;
             n4C        = pHdr->n4C;
-            n4CAl      = n4C;
+            uAl        = n4C;
             if (n4C & 31) {
-                n4CAl = ((n4C >> 5) + 1) << 5;
+                uAl = ((n4C >> 5) + 1) << 5;
             }
+            n4CAl = uAl;
             n50   = pHdr->n50;
-            n50Al = n50;
+            uAl   = n50;
             if (n50 & 31) {
-                n50Al = ((n50 >> 5) + 1) << 5;
+                uAl = ((n50 >> 5) + 1) << 5;
             }
-            uAram      = GoARAM_Alloc(pHdr->n38 + pHdr->n04 + n50Al + n4CAl);
+            n50Al      = uAl;
+            uAram      = GoARAM_Alloc(n4CAl + n50Al + nSize);
             uAramStart = uAram;
             if (pHdr->n38 != 0) {
                 for (f = 0; f < pHdr->nFrames; f++) {
@@ -1421,7 +1478,9 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
                     pSrc2 += pHdr->n8E;
                 }
             }
-            pHdr->n8C = nStride1 / 2;
+            // fake match: the strides are u32 (as s32, the ARAM calls' (u32) conversion becomes a
+            // loop temp of its own); the halving is signed, as in the original
+            pHdr->n8C = (s32)nStride1 / 2;
             pHdr->n8E = nStride2;
             if (n50 != 0) {
                 Mem_cpy(lbl_80281CCC, ((Clip*)pClipSrc)->pEC, pHdr->n50);
@@ -1436,18 +1495,19 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             pHdr->n4C = n4CAl;
             fn_80020F60(pHdr, uAramStart);
             pBank->uId += nCopied;
-            pEnd += nCopied;
-            *pUsed += nCopied;
+            pHdr = (Clip*)((u8*)pHdr + nCopied);
+            lbl_801C6008[k].n04 += nCopied;
             pSrc->pRecords[i].pClip = pBank->ppClips[pSlot->n150];
             pSrc->pRecords[i].n12 |= 8;
             pSlot->n150++;
         }
-        pSlot->pEnd = pEnd;
+        pSlot->pEnd = (u8*)pHdr;
         if (nSlot >= 3) {
-            nRet  = 0x2800;
-            pChar = pOv->pChar;
-            pNew  = pChar->pLib;
-            nSize = pSrc->nTreeSize + pSrc->nClips * 4 + sizeof(AnimLib);
+            nSize = sizeof(AnimLib) + pSrc->nTreeSize + pSrc->nClips * 4;
+            pNew  = pOv->pChar->pLib;
+            // fake match: += (nRet is still 0 here); with = the first scheduling pass issues the
+            // store's li before the size's slwi, which changes the registers
+            nRet += 0x2800;
             Mem_cpy(pNew, pSrc, 21 * 4);
             pNew->n108      = pSrc->n108;
             pNew->nDefault  = pSrc->nDefault;
@@ -1462,23 +1522,24 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             pNew->nTreeSize = 0;
             pNew->nClips    = 0;
             pNew->pBank     = pBank;
-            if (pChar->pRecords == NULL) {
-                pChar->pRecords = fn_80009B34(pSrc->nClips * sizeof(ClipRecord), 2, 0, "skalib.c", 2943);
+            if (pOv->pChar->pRecords == NULL) {
+                pOv->pChar->pRecords = fn_80009B34(pSrc->nClips * sizeof(ClipRecord), 2, 0, "skalib.c", 2943);
             }
             ctx.pLib     = pNew;
-            ctx.pRecords = pChar->pRecords;
+            ctx.pRecords = pOv->pChar->pRecords;
             AnimLib_WalkPair(pLibFile, pSrc, (AnimLibWalkFn)AnimLib_BuildCb, &ctx);
             if (pNew->nTreeSize & 15) {
                 pNew->nTreeSize = ((pNew->nTreeSize >> 4) + 1) << 4;
             }
-            pChar->pLib = pNew;
+            pOv->pChar->pLib = pNew;
         } else {
             for (p = 0; p < gSession.nNumPlayers; p++) {
                 bFound = 0;
                 for (s = 0; s < 3; s++) {
                     if (bFound) break;
-                    for (o = 0; o < lbl_801C6068[k].nOverlays; o++) {
-                        if (lbl_801C6068[k].overlays[o].pChar == gPlayers[p].pChar) {
+                    pSlot = &lbl_801C6068[k];
+                    for (o = 0; o < pSlot->nOverlays; o++) {
+                        if (pSlot->overlays[o].pChar == gPlayers[p].pChar) {
                             bFound = 1;
                             break;
                         }

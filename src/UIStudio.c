@@ -1243,18 +1243,21 @@ void fn_801686F8(UIStudio* pStudio, u8 bOn, u16 uGroup, u16 uScreen) {
 // switches off the one fn_8016B6BC finds set. The scripts get nId and pInfo's place in the
 // list p (a count, a word, then file offsets; -1 when not there).
 void fn_80168918(UIStudio* pStudio, u8 bOn, s32 nId, UISNodeInfo* pInfo, s32* p, u16 uScreen, u16 uGroup) {
+    u32 nNode;
     UISScreen* pScreen;
     UISNode* pLinkNode;
+    UISNode* pNode;
+    s32 nSlot;
+    void* pInfoAlias;
+    UISNodeInfo* pFind;
+    u32 nEventArg;
     s32 nEvent;
     UISScreenFile* pFile;
     u16 nIndex;
     UISNodeInfo* pOther;
     UISNode* pCheck;
-    UISNode* pNode;
     s32 i;
     u8* pScript;
-    s32 nSlot;
-    u32 nNode;
     u32 n;
     s32 aArgs[2];
 
@@ -1294,12 +1297,19 @@ void fn_80168918(UIStudio* pStudio, u8 bOn, s32 nId, UISNodeInfo* pInfo, s32* p,
         }
     }
     // EA bug: pNode is NULL when no node of the screen has pInfo; nothing checks it.
-    pScript = fn_8016C674(pNode, nEvent);
+    nEventArg = (u32)nEvent;
+    pScript = fn_8016C674(pNode, nEventArg);
     pNode->pInfo->u4 = bOn;
+    // fake match: two equal pointer values feed an OR that encodes as EA's retained mr.
+    // port: uptr preserves the full pointer width outside the 32-bit GameCube build.
+    pInfoAlias = pInfo;
     if (p != NULL) {
+        pFind = (UISNodeInfo*)((uptr)pInfoAlias | (uptr)pInfo);
         nSlot = p[0];
         while (nSlot-- != 0) {
-            if (pInfo == (UISNodeInfo*)((u8*)pScreen->pData + p[nSlot + 2])) {
+            // fake match: cancelling equal offsets keeps the slot load ahead of the data-base load.
+            if (pFind == (UISNodeInfo*)((uptr)pScreen->pData + (uptr)p[nSlot + 2]
+                                             - (uptr)p[nSlot + 2] + (uptr)p[nSlot + 2])) {
                 break;
             }
         }
@@ -1311,7 +1321,7 @@ void fn_80168918(UIStudio* pStudio, u8 bOn, s32 nId, UISNodeInfo* pInfo, s32* p,
                     NULL);
     }
     if (pLinkNode != NULL) {
-        pScript = fn_8016C614(pLinkNode, nNode, nEvent);
+        pScript = fn_8016C614(pLinkNode, nNode, nEventArg);
         if (pScript != NULL) {
             fn_8016C270(pStudio, pScreen, pLinkNode->pInfo, &pStudio->stack64, pScript, 2, aArgs, 0, NULL, 0,
                         0, NULL);

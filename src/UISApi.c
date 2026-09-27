@@ -339,18 +339,22 @@ static inline s32 Screen_BringBack(UIStudio* pStudio, u16 uGroup, u16 uScreen, u
 // Goes to a screen. A loaded one is brought back; otherwise it is loaded, and with bPush (forced
 // while p60 holds records) a p60 record is pushed for it that remembers the screen that was
 // current and the new screen's first node. Returns what fn_80169858 returned.
-// fake match: pStudio is a cast copy of the parameter, declared last (the register order)
-s32 fn_80169590(UIStudio* pStudioArg, u16 uGroup, u16 uScreen, u8 bPush, u8 nArgs, s32* pArgs) {
-    s16 nPrevScreen;
-    u32 nRecord;
+s32 fn_80169590(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 bPush, u8 nArgs, s32* pArgsArg) {
     s16 nPrevGroup;
-    u8 bLoaded;
-    s32 nResult;
     UISRecord60* pRec;
+    s16 nPrevScreen;
+    s32 nResult;
+    u32 bLoaded;
+    u32 nRecord;
     u16 uIndex;
-    UIStudio* pStudio;
+    s32* pArgs;
 
-    pStudio = (UIStudio*)pStudioArg;
+    // fake match: pArgs goes through a 64-bit shift up and back down (the value is unchanged).
+    // The shifts become a chain of word copies at the entry that register allocation coalesces;
+    // the merged copies stay neighbours of pStudio, which then leaves the graph last and takes
+    // EA's r31 (the u16 conversion of nPrevGroup, live only after the entry, keeps EA's r22).
+    // port: truncates the pointer to 32 bits; a port writes pArgs = pArgsArg.
+    pArgs = (s32*)(u32)((u64)((u64)(u32)pArgsArg << 32) >> 32);
     nRecord = 0;
     if (pStudio->nScreens == 0 || pStudio->nCurScreen == -1) {
         nPrevGroup = -1;
