@@ -360,6 +360,8 @@ Wind.c:
 
 LLPictInt.c:
 	.text       start:0x80056204 end:0x800563C4
+	.data       start:0x80187F78 end:0x80187F88
+	.sdata2     start:0x802835A8 end:0x802835B0
 
 user.c:
 	.text       start:0x800563C4 end:0x80056480
@@ -962,6 +964,7 @@ GoGolfCam.c:
 
 CamSpline.c:
 	.text       start:0x800C7480 end:0x800C808C
+	.sdata2     start:0x802843B8 end:0x802843F8
 
 GoBreakLine.c:
 	.text       start:0x800C808C end:0x800C937C
