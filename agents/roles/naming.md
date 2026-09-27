@@ -40,6 +40,11 @@ It renames everywhere, updates the Markdown docs, adds the comments, rewraps lon
 name in `config/GW4E69/name_sources.tsv`, builds and checks `main.dol: OK`, or puts everything back.
 Then read `git diff` (every name and comment in context), fix any lint line it lists with the
 Edit tool, and commit: `names: <Unit> batch N (<count> names, <count> comments)` plus `main.dol: OK`.
+**Your batch file is the deliverable.** Renames touch callers in other lanes' files, so lanes' branches
+are not merged: the orchestrator replays your batch file(s) on main with name.py. Keep every batch
+file in your scratch folder, and list in your report every hand edit you made beyond name.py (file,
+function, what), so it can be redone. A comment for a function that already has one above it (a
+`port:` or `fake match:` note, say) goes in by hand: put it in the report.
 Never edit C through the shell. Never add an AI footer or Co-Authored-By line.
 
 ## Report

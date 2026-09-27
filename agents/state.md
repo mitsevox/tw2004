@@ -17,9 +17,36 @@ file). Pipeline: `tools/match/name.py` (all or nothing); playbook `agents/roles/
 one area each, 15-25 functions per batch, fresh agent per batch. Comments go in the same pass.
 Cleanup done before it: 18 stale remote branches deleted (gemini/round4 and 2 young pc-results left),
 matching-era records removed (in history at 6839245), docs/README.md index.
-Running (launched ~21:00 UTC, owner usage 64%): nm1 char.c; nm2 GoTerrain.c + GoRenderCtx_Gc.c;
-nm3 GameAudio.c + hlaudemitter.c; nm4 MC_Gc.c + EASBStorage.c; 20 functions each. Merge each with
-`python tools/agents/merge.py <lane> --allow-renames` after reading the diff.
+Round 1 landed (nm1 char.c, nm2 GoTerrain + GoRenderCtx_Gc, nm3 GameAudio + hlaudemitter, nm4 MC_Gc +
+EASBStorage): 101 names; coverage 61.92% -> 66.65%. Nothing running. nm1/nm4 merged with merge.py
+(nm1 needed --allow-asm: renamed asm signatures only); nm2/nm3 conflicted on callers in other files,
+so their batch files were REPLAYED on main with name.py (now the standard: lanes hand in batch files).
+name_sources.tsv merges with merge=union (.gitattributes).
+Next-batch input the lanes found (EA names ready, T2):
+- MC_Gc: F0F0 MC_FindFiles, F36C MC_GetFreeSpace, F3A0 MC_GetNumFreeEntries, F3D4 MC_OpenFile, F488
+  MC_CloseFile, F208 MC_ReadFile, F258 MC_WriteFile, F2D8 MC_SeekFile, F35C MC_FlushFile, F364
+  MC_SetAttributesOnFile, F514 MC_CreateDirectory, F5E4 MC_DeleteDirectory, E758 MC_DeleteFile, EB44
+  MC_NumEASaveGames; MC_Unmount -> TW07 MC_UnmountCard; MC.c 800A0A7C MC_DeleteSaveGame, 800A0868
+  MC_RefreshMCReplayInfo.
+- hlaudemitter = TW07 HLAudEmitterPool.c (Aud_Emi*); AudTable.c = HLAudEmitter.c (Emi_*: 800A7CA4
+  Emi_UpdInstance, 800A8200 Emi_DelInstance, 800A8424 Emi_SetTrackAttenuation). Ready: ACECC
+  Aud_EmiInitOnce, AD1C8 Aud_EmiCycle, AD790 Aud_EmiSetControllerInt, ADAF0 Aud_EmiSetTrackPitchFactor,
+  ADBC0 Aud_EmiAliasSet3DPos, ADD54 Aud_EmiAliasSetTrackAttenuation. GameAudio.c holds TW07
+  HLAudEmitterPool code too (800A3E3C Aud_InitOnce, 3F38 Aud_Pause, 3F58 Aud_Mute, 3F94
+  Aud_SetOutputmode, 3FD4 Aud_SetSubmixAll, 7968 Aud_EmiSetTrackStream, 7994-79F4 Aud_Init/Exit/Start/
+  CycleMovie, 7A34 Aud_InitSession, 7A98 Aud_ExitSession, 7AD0 Aud_SesTmplOvrTrackRvbMode): file
+  extent to re-check.
+- GoRenderCtx: 8001416C FB_fGetFrameBufferWidth, 8001415C FB_fGetFrameBufferHeight, 8001414C
+  VM_fGetViewportHeightOverWidth. UObject header accessors (Ter_GetMesh*) have fn_ copies in
+  UObject.c/GoAnimalActors.c: one name for all.
+Comments the lanes think wrong (for the audit, not edited): engine.h RenderState nBC..nC8 are left,
+right, top, bottom (inclusive), not x/width/y/height; camera.h CamLens fA8/fAC look like near/far Z;
+GoGolfCam.c:38 and gocamscripts.c:51 "char.c: its parameter is u8*" is stale; hlaudemitter.c header
+(TW07: HLAudEmitterPool.c); fn_800AD790's comment (TW07: Aud_EmiSetControllerInt, a controller value);
+GameAudio.c Gaud_StartComment's port note still says "stays at 91%".
+n1 pairing: confidence C is unreliable (lanes found many wrong); A/B held up.
+Tool follow-ups: merge.py's asm gate should pass a renamed asm signature; name.py's name rule rejects
+EA's own lower-case or prefix-less names (vec4flt_ZeroW1, CheckEmitterInstance).
 
 **After 100% (2026-09-27 ~19:15 UTC, pre-compact checkpoint): nothing running.** Landed since 100%:
 - n2: EA names applied with evidence (name_sources.tsv): 60 IStudio functions (Madden 2003 STABS) +
