@@ -925,7 +925,8 @@ static inline void fn_800CE224_Loop(Skin* pSkin, SkinDesc14* pEntry, SkinDesc* p
     s32 nOption;
     s32 n;
 
-    for (i = 0; i < pDesc->n70; i++) {
+    // fake match: the repeated nB8 zero keeps EA's zero-load order before the set loop.
+    for (i = (*pnB8 = 0); i < pDesc->n70; i++) {
         (*ppSet) = &pDesc->p74[i];
         for ((*pj) = 0; (*pj) < (*ppSet)->n0C; (*pj)++) {
             if (pEntry->uId == pDesc->p84[(*ppSet)->n14 + (*pj)]) {
