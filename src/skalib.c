@@ -25,6 +25,42 @@ int   Skalib_HasOverlays(int nSlot);
 void  AnimLib_FreeCopies(void);
 void  ClipBank_FreeAram(void);
 
+// This file's .bss (character.h), in reverse address order as the compiler lays it out.
+UStreamObject* lbl_801C6488[3];
+u32            lbl_801C647C[3];
+u32            lbl_801C6470[3];
+LibSlot        lbl_801C6068[3];
+AnimLib*       lbl_801C605C[3];
+ClipBank*      lbl_801C6050[3];
+SlotStats      lbl_801C6008[3];
+u8             lbl_801C5E2C[0x1DC];
+u8             lbl_801C5C50[0x1DC];
+u8             lbl_801BF9C0[0x6290];
+u8             lbl_801B9730[0x6290];
+
+// This file's .sdata (character.h).
+s32 lbl_80281070 = 3;
+s32 lbl_80281074 = 6;
+u32 lbl_80281078 = 1;
+
+// This file's .sbss (character.h), in reverse address order as the compiler lays it out.
+f32            lbl_80281D1C;
+u32            lbl_80281D18;
+char (*lbl_80281D14)[2][8][6][16];
+u32            lbl_80281D0C[2];
+u32            lbl_80281D04[2];
+s16*           lbl_80281D00;
+s16*           lbl_80281CFC;
+s16*           lbl_80281CF8;
+s32            lbl_80281CF4;
+s32            lbl_80281CF0;
+s32            lbl_80281CEC;
+s32            lbl_80281CE8;
+u8             lbl_80281CE4;
+UStreamObject* lbl_80281CE0;
+u32            lbl_80281CDC;
+u8             lbl_80281CD8;
+
 // The clip with this name, or NULL.
 void* AnimLib_FindByName(AnimLib* pLib, const char* pName) {
     int i;
