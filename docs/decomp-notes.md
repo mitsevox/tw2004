@@ -505,6 +505,14 @@ They will be sorted into the sections below.
   EA's `clrlwi, li, clrlwi`. UISScreen fn_8016C6C4 90.48 -> 100 and fn_8016C614 90.21 -> 100
   (labelled). File-wide it is wrong: 12 other UISScreen functions drop (fn_8016B09C 100 -> 72).
   Worth a try where only the order of independent entry-block instructions differs.
+- **[verified, fake-match class] `#pragma optimization_level 1|2` ... `reset` around one function
+  keeps a parameter copy that -O4's extra copy-propagation passes fold.** Copy propagation works
+  per use; at -O4 uScreen is folded into its incoming r5 before a call's argument setup, which
+  forces `extsh r4,r5` ahead of `mr r5,pStudio` and a copy of pStudio instead of EA's copy of
+  uScreen (a 3-cycle of argument registers). UISApi fn_80168F5C 88.15 -> 100 with level 1 alone
+  (no source change); fn_801694A0 92.97 -> 100 with level 2 plus one u16 local copy each of
+  uGroup / uScreen (level 1 alone: 16, level 2 alone: 7). Worth a try where EA keeps a `mr` copy
+  of a parameter register and ours copies a different one.
 - **[verified, fake-match class] A dead `(s64)` high word adds one register-allocation neighbour
   to everything live at its def, but it disappears only in a call's argument block.** The post-RA
   peephole deletes a dead `srawi` only when a later instruction in the SAME block overwrites its
