@@ -596,6 +596,10 @@ uiLoadFile.c:
 
 uiProcessInterface.c:
 	.text       start:0x8008F39C end:0x80090940
+	.data       start:0x80189B38 end:0x80189C00
+	.sdata      start:0x80281368 end:0x80281370
+	.sbss       start:0x80281F18 end:0x80281F20
+	.sdata2     start:0x80283B78 end:0x80283B90
 
 Code80090940.c:
 	.text       start:0x80090940 end:0x80090B80
