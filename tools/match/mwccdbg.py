@@ -59,15 +59,26 @@ def main():
     if out.exists():
         shutil.rmtree(out)
     out.mkdir(parents=True)
-    # The emulator's gdb port (9001) is fixed: one run at a time per machine, others wait here.
+    # The emulator's gdb port (9001) is fixed (see below for how parallel runs avoid it).
     import fcntl, tempfile
     env = os.environ.copy()
     if '/opt/homebrew/bin' not in env.get('PATH', ''):     # macOS: gdb from Homebrew (Gemini, round 4)
         env['PATH'] = '/opt/homebrew/bin:' + env.get('PATH', '')
-    with open(os.path.join(tempfile.gettempdir(), 'mwccdbg.lock'), 'w') as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
-        r = subprocess.run([sys.executable, str(script), '-e', str(emu), '-a', shlex.join(args + ['-sym', 'on']),
-                            fn, str(out)], cwd=ROOT, capture_output=True, text=True, env=env)
+    dbg = [sys.executable, str(script), '-e', str(emu), '-a', shlex.join(args + ['-sym', 'on']), fn, str(out)]
+    # Linux: run each debugger in its own network namespace (its own loopback, so its own port
+    # 9001): parallel runs from many lanes no longer queue on one lock. The -c stub brings `lo` up
+    # (SIOCSIFFLAGS: IFF_UP|IFF_RUNNING) and execs the debugger. Elsewhere: the lock, one at a time.
+    up = ('import fcntl, os, socket, struct, sys; '
+          'fcntl.ioctl(socket.socket(), 0x8914, struct.pack("16sH14s", b"lo", 0x41, bytes(14))); '
+          'os.execv(sys.executable, [sys.executable] + sys.argv[1:])')
+    if sys.platform.startswith('linux') and shutil.which('unshare') and subprocess.run(
+            ['unshare', '-n', 'true'], capture_output=True).returncode == 0:
+        r = subprocess.run(['unshare', '-n', sys.executable, '-c', up] + dbg[1:],
+                           cwd=ROOT, capture_output=True, text=True, env=env)
+    else:
+        with open(os.path.join(tempfile.gettempdir(), 'mwccdbg.lock'), 'w') as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            r = subprocess.run(dbg, cwd=ROOT, capture_output=True, text=True, env=env)
     if not list(out.glob('*before-regalloc*')):
         sys.exit((r.stdout + r.stderr)[-1500:])
     # The emulated run writes no object: compile ours with the build's own command (GC/2.5, wibo).
