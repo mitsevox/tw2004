@@ -3,13 +3,15 @@
 Updated 2026-09-25 ~21:30 CDT. How the machines, CI, the page and PC jobs fit together:
 docs/infrastructure.md. History: docs/journal.md.
 
-**Running (ENDGAME, launched 2026-09-26 19:05 CDT, checkpoint 21:30 CDT, weekly 25%):** owner: get to 100%
-for the port; labelled logic-preserving fakes may close functions (agents/assign/2026-09-26-endgame.md). Lanes:
-e-char (char, SkinPart, skalib), e-link1 (StaticCam, Rain, startUp, Stm_Tick, SunFlr, rcmp, CamSpline), e-link2
-(uiProcessInterface, GoGreenGrid, gocamscripts, MC, Session, uiArc, BestBall, GameMode22), e-render (Particle,
-DepthField, LLFont, LLPictInt, goballfx, LLTex, Grass Init, LogoTexture), e-uisscreen, e-uisapi (UISEvent,
-UIStudio, UISApi). Golfer AI_ChooseTarget: Codex only (agents/assign/2026-09-26-codex-golfer.md; 99.746 on main).
-PC: leversweep --from-report (hints). Round 7 (4 lanes, 16:25-17:30 CDT) merged: Swing linked (SW_KillVibration),
+**Running:** nothing. ENDGAME checkpoint 1 (2026-09-26 ~21:00 CDT) merged: Golfer AI_ChooseTarget exact (Codex,
+labelled fakes), startUp exact (Gemini, labelled pragma) and linked; GoStaticCam, Rain, SunFlr, Code8002EE1C,
+GameModeBestBall linked; exact also char fn_80017DDC, SkinPart fn_800CE52C, UISScreen fn_8016B4D4, UISApi
+fn_80169308, LLFont fn_8001208C, GoGreenGrid GR_BuildGridRenderData. Exact but not linked: Golfer (46/46; its data
+proves it was 4 original files: A ai_brain AI_SetShotModifiers..AI_ApplyError, B AI_TargetsInit..AI_ChooseTarget,
+C Club_UsableForKind..Shot_FitTargetToClub, D Luck_*; ranges in the g-hoist report, see journal), GoGreenGrid (link
+failed on data order). Left: 49 functions in 23 units. Audit follow-ups: LLFont fn_8001208C's comment ("the colour
+passed in") and the FE_CrAPDB const comment are stale.
+Round 7 (4 lanes, 16:25-17:30 CDT) merged: Swing linked (SW_KillVibration),
 exact also Character_SetupForShot, CameraScript_LagAimMarker; AI_ChooseTarget 98.66 -> 99.56 (last miss:
 the kept-copy class); GR_BuildGridRenderData 99.22. rasim.py now models spills / later passes. UIS
 kept-copy source form not found (3 rounds): parked until the endgame unless new evidence. Levers:
@@ -94,7 +96,7 @@ GoDynamicCam/GoPostFx in link order, used only by GxUtil and gomainloop: owner u
 
 | exact functions | matched code | code linked | data linked | game units linked |
 |---|---|---|---|---|
-| 7,585 / 7,647 | 96.15% | 84.59% | 80.49% | 228 / 259 |
+| 7,598 / 7,647 | 96.79% | 86.33% | 80.58% | 234 / 259 |
 
 `python tools/agents/remain.py` lists what is left by unit; rank by code-bar gain per function.
 
