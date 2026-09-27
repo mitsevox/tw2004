@@ -44005,5 +44005,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "879e5a7",
+"sha": "879e5a7786cb738df2048e19e499568b3e3b5df0",
+"time": 1790551313,
+"subject": "rules: naming lanes own the comments of the functions they touch (owner, 2026-09-27): add, rewrite wrong/stale/vague ones, keep matching labels",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
