@@ -9,6 +9,13 @@
 f32  fn_800C79BC(f32* p0, f32* p1, f32* p2, f32* p3);
 void fn_800C8068(f32* pA, f32* pB, f32* pOut);
 
+f32 lbl_80191440[4][4] = {
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { -0.5f, 0.0f, 0.5f, 0.0f },
+    { 1.0f, -2.5f, 2.0f, -0.5f },
+    { -0.5f, 1.5f, -1.5f, 0.5f },
+};
+
 // The splined camera: the camera position on the spline through pPos0..3, the look angles on the
 // one through pLook0..3 (each angle first unwrapped to within half a turn of the one before), and
 // the field of view between fFov1 and fFov2, at share fT between the middle two.
