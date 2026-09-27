@@ -1946,6 +1946,9 @@ u8 FE_CrAP_IsAssetRemovable(int nAsset) {
 // Senders the EA Sports Bio screens (EASportsBio.c) use: message nMsg with its values to the front
 // end's handler, when there is a front end. A string value goes as a MsgString.
 
+// Send message nMsg with the value nA to the front end's handler (lbl_80281F1C), when there is a
+// front end. The EA Sports Bio screens (EASportsBio.c) use this file's FE_SendHint senders; a
+// string value goes as a MsgString (FE_SetHintString).
 void FE_SendHintInt(int nMsg, s32 nA) {
     MsgArg arg;
 
@@ -1955,6 +1958,8 @@ void FE_SendHintInt(int nMsg, s32 nA) {
     }
 }
 
+// Send message nMsg with the value nA and the string szB to the front end's handler (lbl_80281F1C),
+// when there is a front end.
 void FE_SendHintIntString(int nMsg, s32 nA, char* szB) {
     MsgString str;
     MsgArg args[2];
@@ -1967,6 +1972,8 @@ void FE_SendHintIntString(int nMsg, s32 nA, char* szB) {
     }
 }
 
+// Send message nMsg with the value nA, the string szB and the value nC to the front end's handler
+// (lbl_80281F1C), when there is a front end.
 void FE_SendHintIntStringInt(int nMsg, s32 nA, char* szB, s32 nC) {
     MsgArg args[3];
     MsgString str;
@@ -2002,6 +2009,8 @@ int FE_SendHintString(char* sz, int nMsg) {
     return 0;
 }
 
+// Send message nMsg with the six values nA..nF and the float fG to the front end's handler
+// (lbl_80281F1C), when there is a front end.
 void FE_SendHint7Args(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, f32 fG) {
     MsgArg args[7];
 
@@ -2017,6 +2026,8 @@ void FE_SendHint7Args(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, 
     }
 }
 
+// Send message nMsg with the ten values nA..nJ to the front end's handler (lbl_80281F1C), when
+// there is a front end.
 void FE_SendHint10Args(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, s32 nG, s32 nH, s32 nI,
                  s32 nJ) {
     MsgArg args[10];

@@ -155,3 +155,8 @@ address	name	comment	by	date
 801070F4	FE_CrAP_CollectSponsorshipItems	rewrite	cr3 (replayed by orchestrator)	2026-09-27
 80107244	FE_CrAP_GetSponsorshipItemInfo	rewrite	cr3 (replayed by orchestrator)	2026-09-27
 801072CC	FE_CrAP_GetCategoryInfo	add	cr3 (replayed by orchestrator)	2026-09-27
+80107554	FE_SendHintInt	add	cr3 (replayed by orchestrator)	2026-09-27
+80107594	FE_SendHintIntString	add	cr3 (replayed by orchestrator)	2026-09-27
+801075F8	FE_SendHintIntStringInt	add	cr3 (replayed by orchestrator)	2026-09-27
+8010771C	FE_SendHint7Args	add	cr3 (replayed by orchestrator)	2026-09-27
+80107774	FE_SendHint10Args	add	cr3 (replayed by orchestrator)	2026-09-27
