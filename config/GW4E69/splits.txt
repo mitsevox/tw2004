@@ -2166,6 +2166,7 @@ UIStudio.c:
 
 UISApi.c:
 	.text       start:0x80168C24 end:0x8016A2D4
+	.sdata2     start:0x802851B8 end:0x802851C0
 
 UISScreen.c:
 	.text       start:0x8016A2D4 end:0x8016C718
