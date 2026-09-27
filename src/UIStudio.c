@@ -1131,8 +1131,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 nFind = strlen(pFind->szText);
                 nRep = strlen(pRep->szText);
                 if (nText != 0 && nFind != 0 && nText >= nFind) {
-                    nGrow = nRep - nFind;
                     for (j = 0; j < nText - nFind + 1; j++) {
+                        nGrow = nRep - nFind;
                         bMatch = 1;
                         for (k = j; k < j + nFind; k++) {
                             if (k >= pText->nSize) {
