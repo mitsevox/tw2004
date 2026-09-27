@@ -967,10 +967,13 @@ done:
 // set): random picks first; if that cannot fit, the best-ranked picks from a fresh copy.
 // Allocates the bank (slots 0 and 1 reuse one they have) and returns its size.
 u32 AnimLib_PlanBank(u32 nSlot) {
+    s32         nHdr;
+    s32         nIndexSize;
     LibSlot*    pSlot = &lbl_801C6068[nSlot];
     u32         nRet  = 0;
     u8          bBoth = 0;
     s32         nRecSize;
+    ClipRecord* apRecords[10];
     u8*         apTree[10];
     s16*        apIndex[10];
     MergeCtx    ctx;
@@ -979,13 +982,11 @@ u32 AnimLib_PlanBank(u32 nSlot) {
     s32         nLibClips;
     s32         nOvClips;
     s32         nClipsAll;
-    s16*        pIndexCopy;
-    u8*         pTreeCopy;
-    ClipRecord* pRecordsCopy;
+    s32         nBytesBefore2;
     s32         nBytesBefore;
-    ClipRecord* apRecords[10];
-    s32         nIndexSize;
-    s32         nHdr;
+    ClipRecord* pRecordsCopy;
+    u8*         pTreeCopy;
+    s16*        pIndexCopy;
     AnimLib*    pLib;
     s32         nBytes;
     LibOverlay* pOvs;
@@ -1126,7 +1127,7 @@ u32 AnimLib_PlanBank(u32 nSlot) {
     }
     nIndexSize = ((nClipsAll * 4 >> 4) + 1) << 4;
     nRecSize   = ((nClipsAll >> 4) + 1) << 4;
-    nTotal     = ctx.nBytes + nIndexSize + nRecSize + 0x20;
+    nTotal     = 0x20 + ctx.nBytes + nIndexSize + nRecSize;
     if (nSlot != 2) {
         nBudget = lbl_80281CDC;
         if (lbl_80281CD8) {
@@ -1141,10 +1142,11 @@ u32 AnimLib_PlanBank(u32 nSlot) {
         lbl_801C6008[nSlot].nBytes    = ctx.nBytes;
         if (nTotal > nBudget) {
             ctx.pCount   = &nClips;
-            nHdr         = nIndexSize + nRecSize + 0x20;
+            nHdr         = 0x20 + nIndexSize + nRecSize;
             ctx.nTarget  = nBudget;
-            ctx.nBytes  += nHdr;
-            nBytesBefore = ctx.nBytes;
+            ctx.nBytes   += nHdr;
+            nBytesBefore2 = ctx.nBytes;
+            nBytesBefore  = ctx.nBytes;
             pRecordsCopy = fn_80009B34(pLib->nRecords * sizeof(ClipRecord), 1, 0, "skalib.c", 2078);
             Mem_cpy(pRecordsCopy, pLib->pRecords, pLib->nRecords * sizeof(ClipRecord));
             pIndexCopy = fn_80009B34(pLib->nClips2 * 2, 1, 0, "skalib.c", 2080);
@@ -1167,6 +1169,7 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                 lbl_801C6008[nSlot].nBytes   = ctx.nBytes;
                 nClips           = nClipsAll;
                 ctx.nBytes       = nBytesBefore;
+                nBytesBefore2    = ctx.nBytes;
                 Mem_cpy(pLib->pRecords, pRecordsCopy, pLib->nRecords * sizeof(ClipRecord));
                 Mem_cpy(pLib->pIndex, pIndexCopy, pLib->nClips2 * 2);
                 Mem_cpy(pLib->pTree, pTreeCopy, pLib->nTreeSize);
@@ -1195,7 +1198,7 @@ u32 AnimLib_PlanBank(u32 nSlot) {
             }
             lbl_801C6008[nSlot].nBytes    = ctx.nBytes - nHdr;
             lbl_801C6008[nSlot].nKeep     = ctx.nKeep;
-            lbl_801C6008[nSlot].nTrimmed  = nBytesBefore - ctx.nBytes;
+            lbl_801C6008[nSlot].nTrimmed  = nBytesBefore2 - ctx.nBytes;
             lbl_801C6008[nSlot].nMaxUsers = ctx.nMaxUsers;
         }
         lbl_801C6008[nSlot].nBudget = nBudget;
