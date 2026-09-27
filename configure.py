@@ -841,6 +841,7 @@ config.libs = [
             Object(Matching, "runtime/FILE_POS.c"),
             Object(Matching, "runtime/locale.c"),
             Object(Matching, "runtime/ctype.c"),
+            Object(Matching, "runtime/errno.c"),
             Object(Matching, "runtime/e_acos.c"),
             Object(Matching, "runtime/e_asin.c"),
             Object(Matching, "runtime/e_atan2.c"),
