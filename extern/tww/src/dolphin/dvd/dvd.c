@@ -10,8 +10,8 @@
 
 const char* __DVDVersion = "<< Dolphin SDK - DVD\trelease build: Sep  5 2002 05:34:06 (0x2301) >>";
 
-static DVDBB2 BB2;
-static DVDDiskID CurrDiskID;
+static DVDBB2 BB2 ATTRIBUTE_ALIGN(32);
+static DVDDiskID CurrDiskID ATTRIBUTE_ALIGN(32);
 static DVDCommandBlock DummyCommandBlock;
 static OSAlarm ResetAlarm;
 

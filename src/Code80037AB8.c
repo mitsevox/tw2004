@@ -11,6 +11,10 @@ void  Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);            // Quaterni
 void  Quat_QuatToMatrix(f32* pQ, f32 (*pMtx)[4]);                   // Quaternion.c: to a matrix
 void  fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);            // UMemPool.c: inverts a matrix
 
+// section note: the .bss between Skin.c's and GoPostFx.c's; only lbl_80281100 (the .sdata right
+// after Skin.c's) points at it. Skin.c's tail fits the addresses equally well.
+ScreenCopy lbl_801D4F68;
+
 // Once per skin model (flag 0x8000): turns its bone poses from relative to their parent (the
 // character model's bone parents, from bone nFirst on nSkip further along) into model space, then
 // stores each bone's inverse matrix in p1088.

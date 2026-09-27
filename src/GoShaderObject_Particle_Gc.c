@@ -19,6 +19,8 @@ u8* lbl_80281F60;                       // the end of the last block allocated
 u32 lbl_80281F5C;                       // the most ever allocated
 u32 lbl_80281F58;                       // allocated now, headers and padding included
 
+ParticleBuffers lbl_801D97E0;
+
 // The particles' four buffers, two of 90000 bytes and two of 10000.
 void fn_8009414C(void) {
     lbl_802813A8->apBuffers[0] = fn_80009B34(90000, 2, 32, "GoShaderObject_Particle_Gc.c", 109);

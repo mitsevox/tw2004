@@ -14,33 +14,45 @@
 #include "game/modes/pgatour.h"
 #include "game/modes/pgatoursim.h"
 
+// .bss, reverse address order (the ones not declared here are in game/earnings.h)
+EarningsTable lbl_80200538;
+s32 lbl_80200510[10];
+s32 lbl_802004E8[10];
+s32 lbl_802004C0[10];
+s32 lbl_80200498[10];
+s32 lbl_80200470[10];
+s32 lbl_80200448[10];
 // The working tables and their saved copies, ten entries each.
-extern s32 lbl_80200010[10];
-extern s32 lbl_80200038[10];
-extern s32 lbl_80200060[10];
-extern s32 lbl_80200088[10];
-extern s32 lbl_802000B0[10];
-extern s32 lbl_802000D8[10];
-extern s32 lbl_80200100[10];
-extern s32 lbl_80200128[10];
-extern s32 lbl_80200150[10];
-extern s32 lbl_80200178[10];
-extern s32 lbl_802001A0[10];
-extern s32 lbl_802001C8[10];
-extern s32 lbl_802001F0[10];
-extern s32 lbl_80200218[10];
-extern s32 lbl_80200240[10];
-extern s32 lbl_80200268[10];
-extern s32 lbl_80200290[10];
-extern s32 lbl_802002B8[10];
-extern s32 lbl_80200358[10];
-extern s32 lbl_80200380[10];
-extern s32 lbl_802003A8[10];
-extern s32 lbl_802003D0[10];
-extern s32 lbl_802003F8[10];
-extern s32 lbl_80200420[10];
-extern CourseMoneyTracking lbl_801FFAE8[10];
-extern CourseMoneyTracking lbl_801FFD90[10];     // the breakdown of each lbl_80200150 payout
+s32 lbl_80200420[10];
+s32 lbl_802003F8[10];
+s32 lbl_802003D0[10];
+s32 lbl_802003A8[10];
+s32 lbl_80200380[10];
+s32 lbl_80200358[10];
+s32 lbl_80200330[10];
+s32 lbl_80200308[10];
+s32 lbl_802002E0[10];
+s32 lbl_802002B8[10];
+s32 lbl_80200290[10];
+s32 lbl_80200268[10];
+s32 lbl_80200240[10];
+s32 lbl_80200218[10];
+s32 lbl_802001F0[10];
+s32 lbl_802001C8[10];
+s32 lbl_802001A0[10];
+s32 lbl_80200178[10];
+s32 lbl_80200150[10];
+s32 lbl_80200128[10];
+s32 lbl_80200100[10];
+s32 lbl_802000D8[10];
+s32 lbl_802000B0[10];
+s32 lbl_80200088[10];
+s32 lbl_80200060[10];
+s32 lbl_80200038[10];
+s32 lbl_80200010[10];
+CourseMoneyTracking lbl_801FFD90[10];     // the breakdown of each lbl_80200150 payout
+s32 lbl_801FFD68[10];
+CourseMoneyTracking lbl_801FFAE8[10];
 extern s32 lbl_80282248;
 extern s32 lbl_8028224C;
 extern s32 lbl_80282250;

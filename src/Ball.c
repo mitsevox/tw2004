@@ -395,6 +395,9 @@ u8     fn_80054040(Ball* pBall, f32 fTicks);
 s32 gTurfSpeed = 2;
 // options +0x1C (ROUGH LENGTH?), 0..2: class-5 friction x 0.7, 1, 1.3
 s32 gRoughSetting = 1;
+// .bss: defined in reverse address order.
+f32 lbl_801D58C8[4][4];
+f32 lbl_801D5888[4][4];
 // .sbss: defined in reverse address order.
 u8  lbl_80281DE4;                          // the two ground heights below are current
 f32 lbl_80281DE0;                         // ground height under the ball

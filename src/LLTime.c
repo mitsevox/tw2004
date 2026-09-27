@@ -3,6 +3,8 @@
 
 #include "engine.h"
 
+ProfClock lbl_801D97F8;
+
 void TI_vInitModule(void) {
     int i;
 

@@ -10,6 +10,8 @@
 #include "frontend/uisvec.h"
 #include "unsorted/cull.h"
 
+u32 lbl_801D8ED0[FE_NUM_801D8890];
+FE801D8890 lbl_801D8890[FE_NUM_801D8890];
 FE801D8858 lbl_801D8858;
 f32 lbl_801D8818[8][2];
 

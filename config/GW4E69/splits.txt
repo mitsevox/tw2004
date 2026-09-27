@@ -179,6 +179,7 @@ char.c:
 	.text       start:0x80017320 end:0x8001F32C
 	.rodata     start:0x8017DB80 end:0x8017DD78
 	.data       start:0x801870F0 end:0x801871D0
+	.bss        start:0x801B95C8 end:0x801B9668
 	.sdata      start:0x80280E10 end:0x80280E78
 	.sdata2     start:0x80282BC0 end:0x80282CA0
 
@@ -288,6 +289,7 @@ Skin.c:
 
 Code80037AB8.c:
 	.text       start:0x80037AB8 end:0x80037DD8
+	.bss        start:0x801D4F68 end:0x801D4F80
 	.sdata2     start:0x80283020 end:0x80283028
 
 GoPostFx.c:
@@ -316,6 +318,7 @@ gocamscripts.c:
 
 DepthField.c:
 	.text       start:0x80045660 end:0x80045D18
+	.bss        start:0x801D5110 end:0x801D5228
 	.sdata2     start:0x80283148 end:0x80283168
 
 UObject3D.c:
@@ -366,6 +369,7 @@ Ball.c:
 	.text       start:0x80050C2C end:0x80055F14
 	.rodata     start:0x80181328 end:0x801834C0
 	.data       start:0x80187E68 end:0x80187EF8
+	.bss        start:0x801D5888 end:0x801D5908
 	.sdata      start:0x80281130 end:0x80281138
 	.sbss       start:0x80281DD0 end:0x80281DE8
 	.sdata2     start:0x80283308 end:0x80283588
@@ -436,6 +440,7 @@ GoStaticCam.c:
 event.c:
 	.text       start:0x80065B44 end:0x80067710
 	.data       start:0x80188628 end:0x80188778
+	.bss        start:0x801D5AB0 end:0x801D5BF0
 	.sbss       start:0x80281E20 end:0x80281E28
 	.sdata2     start:0x80283748 end:0x80283770
 
@@ -618,6 +623,7 @@ uiLoadFile.c:
 uiProcessInterface.c:
 	.text       start:0x8008F39C end:0x80090940
 	.data       start:0x80189B38 end:0x80189C00
+	.bss        start:0x801D87C0 end:0x801D8818
 	.sdata      start:0x80281368 end:0x80281370
 	.sbss       start:0x80281F18 end:0x80281F20
 	.sdata2     start:0x80283B78 end:0x80283B90
@@ -628,7 +634,7 @@ Code80090940.c:
 fe_movies.c:
 	.text       start:0x80090B80 end:0x800922A8
 	.data       start:0x80189C00 end:0x80189C38
-	.bss        start:0x801D8818 end:0x801D8890
+	.bss        start:0x801D8818 end:0x801D91F0
 	.sdata      start:0x80281378 end:0x80281380
 	.sbss       start:0x80281F20 end:0x80281F30
 	.sdata2     start:0x80283B90 end:0x80283BF0
@@ -669,11 +675,13 @@ GoObjShadow.c:
 GoShaderObject_Particle_Gc.c:
 	.text       start:0x8009414C end:0x800952D8
 	.data       start:0x80189CC8 end:0x80189CE8
+	.bss        start:0x801D97E0 end:0x801D97F8
 	.sbss       start:0x80281F58 end:0x80281F70
 	.sdata2     start:0x80283C80 end:0x80283CD8
 
 LLTime.c:
 	.text       start:0x800952D8 end:0x8009554C
+	.bss        start:0x801D97F8 end:0x801D9908
 
 unsorted/sweep_8009554C.c:
 	.text       start:0x8009554C end:0x80095564
@@ -723,7 +731,7 @@ unsorted/sweep_80097E98.c:
 GoShaderObject_Glows_Gc.c:
 	.text       start:0x80097F44 end:0x80098A98
 	.data       start:0x80189D78 end:0x80189D98
-	.bss        start:0x801D99D0 end:0x801D9A68
+	.bss        start:0x801D99D0 end:0x801DB878
 	.sdata2     start:0x80283DF8 end:0x80283E20
 
 UFstPart.c:
@@ -755,6 +763,7 @@ Code8009A928.c:
 Code8009AA28.c:
 	.text       start:0x8009AA28 end:0x8009B314
 	.data       start:0x80189E78 end:0x8018A028
+	.bss        start:0x801E1470 end:0x801E3068
 	.sdata2     start:0x80283E98 end:0x80283EC0
 
 unsorted/sweep_8009B314.c:
@@ -782,10 +791,12 @@ MC_Gc.c:
 MC.c:
 	.text       start:0x8009F850 end:0x800A27FC
 	.data       start:0x8018C828 end:0x8018C868
+	.bss        start:0x801F1100 end:0x801F1640
 	.sdata      start:0x802813F0 end:0x802813F8
 
 PsMgr.c:
 	.text       start:0x800A27FC end:0x800A2C3C
+	.bss        start:0x801F1640 end:0x801F1708
 	.sdata      start:0x802813F8 end:0x80281408
 	.sdata2     start:0x80283F18 end:0x80283F28
 
@@ -1047,6 +1058,7 @@ CourseData.c:
 Earnings.c:
 	.text       start:0x800D3244 end:0x800D9E14
 	.data       start:0x80191A08 end:0x80192010
+	.bss        start:0x801FFAE8 end:0x80202828
 	.sdata      start:0x80281560 end:0x80281568
 	.sdata2     start:0x80284510 end:0x80284560
 
@@ -1154,6 +1166,7 @@ GameModeDriverRTE.c:
 
 GameModeReplay.c:
 	.text       start:0x800F125C end:0x800F19D4
+	.bss        start:0x80211D38 end:0x80211FB8
 	.sdata2     start:0x80284688 end:0x802846A0
 
 GameTargets.c:
@@ -1245,6 +1258,9 @@ GameMode4.c:
 	.sdata      start:0x802816E0 end:0x802816E8
 	.sbss       start:0x80282430 end:0x80282458
 
+Code80193188.c:
+	.data       start:0x80193188 end:0x801931E0
+
 uiArc.c:
 	.text       start:0x80102AC8 end:0x801037F8
 	.data       start:0x801931E0 end:0x80193228
@@ -1330,6 +1346,7 @@ hwsOverride_Gc.c:
 hwsRender_Gc.c:
 	.text       start:0x80112B80 end:0x80113E60
 	.data       start:0x80193DD8 end:0x80193DE8
+	.bss        start:0x80223BB0 end:0x80223C48
 	.sdata      start:0x802817E8 end:0x802817F8
 	.sbss       start:0x802824E0 end:0x802824F8
 	.sdata2     start:0x802848C8 end:0x802848E8
@@ -1380,6 +1397,7 @@ llrtclock.c:
 GoGrass.c:
 	.text       start:0x8011E170 end:0x80120298
 	.data       start:0x80194598 end:0x80194648
+	.bss        start:0x802602C0 end:0x802607D0
 	.sdata      start:0x80281900 end:0x80281908
 	.sdata2     start:0x80284A30 end:0x80284AD0
 
@@ -1392,6 +1410,7 @@ GoShaderObject_Grass_Gc.c:
 GameMode4Menu.c:
 	.text       start:0x80121430 end:0x801218BC
 	.data       start:0x80194648 end:0x80194660
+	.bss        start:0x80260CB8 end:0x80260D88
 	.sdata      start:0x80281910 end:0x80281928
 	.sdata2     start:0x80284B00 end:0x80284B08
 
@@ -1534,6 +1553,13 @@ src/ax/AXVPB.c:
 	.sbss       start:0x80282730 end:0x80282740
 	.sdata2     start:0x80284B60 end:0x80284B68
 
+src/ax/AXComp.c:
+	.data       start:0x80195F60 end:0x801979A0
+
+src/ax/DSPCode.c:
+	.data       start:0x801979A0 end:0x801998C0
+	.sdata      start:0x802819F0 end:0x802819F8
+
 src/ax/AXProf.c:
 	.text       start:0x80138184 end:0x801381CC
 	.sbss       start:0x80282740 end:0x80282750
@@ -1590,7 +1616,7 @@ unsorted/sweep_8013B3C4.c:
 src/dolphin/dvd/dvd.c:
 	.text       start:0x8013B3C8 end:0x8013DCB4
 	.data       start:0x80199BB8 end:0x80199D38
-	.bss        start:0x8027A5A0 end:0x8027A638
+	.bss        start:0x8027A590 end:0x8027A638
 	.sdata      start:0x80281A18 end:0x80281A38
 	.sbss       start:0x802827E0 end:0x80282830
 
@@ -1757,7 +1783,7 @@ dolphin/os/OSMutex.c:
 
 dolphin/os/OSReboot.c:
 	.text       start:0x8014B70C end:0x8014B8F0
-	.bss        start:0x8027CA00 end:0x8027CA20
+	.bss        start:0x8027C9F8 end:0x8027CA20
 	.sbss       start:0x80282910 end:0x80282920
 
 dolphin/os/OSReset.c:
@@ -2185,6 +2211,7 @@ UISApi.c:
 UISScreen.c:
 	.text       start:0x8016A2D4 end:0x8016C718
 	.data       start:0x8019D118 end:0x8019D1FC
+	.bss        start:0x80280628 end:0x80280648
 	.sdata2     start:0x802851C0 end:0x802851E8
 
 Common/Checksum/ChecksumCRC32.c:
@@ -2216,7 +2243,7 @@ Common/TagFile/TagFile.c:
 dolphin/gba/GBA.c:
 	.text       start:0x80175F54 end:0x80176280
 	.data       start:0x8019D2C0 end:0x8019D300
-	.bss        start:0x80280660 end:0x80280B60
+	.bss        start:0x80280648 end:0x80280B60
 	.sdata      start:0x80281B60 end:0x80281B68
 	.sbss       start:0x80282A38 end:0x80282A40
 
