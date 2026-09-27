@@ -2,6 +2,8 @@
 
 The user's rule: every existing function name and comment in EA game code is an UNVERIFIED CLAIM
 until this audit passes it. No fresh names or new comments anywhere until the audit reaches 100%.
+(2026-09-27: the audit finished; new names and comments now come from naming lanes,
+`agents/roles/naming.md`. This file is kept for re-audits.)
 SDK / Dolphin / MSL code is out of scope. Progress: `python tools/match/auditprogress.py`.
 
 Per unit, three agents: LANE 1 (Sonnet, evidence) and LANE 2 (Opus, behaviour) work BLIND and never

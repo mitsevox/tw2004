@@ -12,6 +12,7 @@ its own context small. Start of a session (or after a compaction): read `../CLAU
 | `agents/state.md` | current state only: numbers, running lanes, parked decisions, follow-ups |
 | `agents/brief.md` | what every lane reads first (rules, environment, reporting) |
 | `agents/roles/matching.md` | a matching / link lane |
+| `agents/roles/naming.md` | a naming lane: name and comment functions in one reading (`tools/match/name.py`) |
 | `agents/roles/audit.md` | the blind name-and-comment audit (lane 1, lane 2, reconciler) |
 | `agents/findings/` | audit reports (EA bugs, misfiled units), name evidence, research that feeds naming and cleanup |
 
