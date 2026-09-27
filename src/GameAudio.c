@@ -405,7 +405,7 @@ void Gaud_SetStreamingContext(void) {
     nState = 0;
     bOn = fVolume > 0.0f;
     Aud_SetSubmixAttn(15, fVolume * lbl_8018E988[15]);
-    fn_800A77E0(0.2f * (s8)gSession.options.a0[0]);
+    Gaud_SetSfxLevel(0.2f * (s8)gSession.options.a0[0]);
     if (bFixed) {
         nSound = 2;
         bMusic = 1;
@@ -734,7 +734,7 @@ void Gaud_InitFE(void) {
     lbl_80281418 = 0xFF;
     if (lbl_80282028 == 0) {
         // the options' volumes, 0.2 per step
-        fn_800A77E0(0.2f * (s8)gSession.options.a0[0]);
+        Gaud_SetSfxLevel(0.2f * (s8)gSession.options.a0[0]);
         Gaud_SetCommentLevel(0.2f * (s8)gSession.options.a0[4]);
         Aud_SetSubmixAttn(15, 0.2f * (s8)gSession.options.a0[1] * lbl_8018E988[15]);
         Aud_SetOutputmode(2);
@@ -833,7 +833,7 @@ void Gaud_InitHole(void) {
     vPos[2] = 10.0f;
     lbl_80281419 = Aud_EmiAdd(5, -1, 1, 1, NULL);
     Aud_EmiSet3DPos(lbl_80281419, vPos, NULL, 0);
-    fn_800A77E0(0.2f * (s8)gSession.options.a0[0]);
+    Gaud_SetSfxLevel(0.2f * (s8)gSession.options.a0[0]);
     Gaud_SetStreamingContext();
     lbl_8028141C = Aud_EmiAdd(7, -1, 1, 1, NULL);
     vPos[0] = lbl_80281458;
@@ -1415,6 +1415,8 @@ void Gaud_InitCamZoom(u8 nPlayer) {
     Aud_EmiSetTrackStatus(pView->n3, 0, 1);
 }
 
+// Stops the zoom camera's sound (track 0 of the player's view's effects pair) that Gaud_InitCamZoom
+// started.
 void Gaud_ExitCamZoom(u8 nPlayer) {
     GameAudioView* pView;
 
@@ -1895,7 +1897,7 @@ u8 Gaud_GetStreamingStatus(void) {
 
 // Scales the volume curves 1-6, 13 and 16-31 and emitter lbl_8028141B's tracks 0 and 1 (the
 // options menu passes 0.2 x options.a0[0]).
-void fn_800A77E0(f32 fVolume) {
+void Gaud_SetSfxLevel(f32 fVolume) {
     u8 i;
 
     for (i = 1; i < 5; i++) {

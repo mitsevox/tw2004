@@ -1443,7 +1443,7 @@ void Gaud_LongDriveUi_Stop(s32 nKind, int nTrack);            // GameAudio.c: st
 void Gaud_StartComment(int nKind, int nMsg, int a);
 void fn_8010D428(s32 p0, s32 p1);   // GameMode26.c: Gaud_StartComment(8, p0, p1)
 void Gaud_StopComment(void);
-void fn_800A77E0(f32 f);                // } the options menu passes them 0.2 x options.a0[0], a0[4]
+void Gaud_SetSfxLevel(f32 f);                // } the options menu passes them 0.2 x options.a0[0], a0[4]
 void Gaud_SetCommentLevel(f32 f);                // } and a0[1] (FE_MessageTable.c, GameUICommands.c)
 void Gaud_SetMusicLevel(f32 f);                // }
 void Vec_Normalize(f32* pSrc, f32* pDst);

@@ -287,3 +287,5 @@ address	name	comment	by	date
 800A7A14	Aud_PlayBuiltInSound	add	cr4 (replayed by orchestrator)	2026-09-27
 800A7A34	Aud_InitSession	rewrite	cr4 (replayed by orchestrator)	2026-09-27
 800A7A98	Aud_ExitSession	add	cr4 (replayed by orchestrator)	2026-09-27
+800A77E0	Gaud_SetSfxLevel	none	cr4 (replayed by orchestrator)	2026-09-27
+800A6854	Gaud_ExitCamZoom	add	cr4 (replayed by orchestrator)	2026-09-27

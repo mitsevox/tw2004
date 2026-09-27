@@ -2770,7 +2770,7 @@ void fn_8007EB70(MsgArg* pArgs, MsgArg* pResult) {
         gSession.options.a0[0] = 4;
         break;
     }
-    fn_800A77E0(0.2f * (s8)gSession.options.a0[0]);
+    Gaud_SetSfxLevel(0.2f * (s8)gSession.options.a0[0]);
 }
 
 // Option a0[1] as the menus' choice (1..6).

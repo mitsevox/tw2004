@@ -1375,7 +1375,7 @@ void fn_800879B4(MsgArg* pArgs, MsgArg* pResult) {
         return;
     case 2:
         gSession.options.a0[0] = pArgs[1].i;
-        fn_800A77E0(0.2f * (s8)gSession.options.a0[0]);
+        Gaud_SetSfxLevel(0.2f * (s8)gSession.options.a0[0]);
         return;
     case 3:
         switch (pArgs[1].i) {
