@@ -49,7 +49,8 @@ void  fn_80035FFC(void);
 void  fn_80036024(f32 f);
 void  fn_80093824(void);                                     // goballfx.c
 f32   fn_8004B78C(CourseInfo* pCourse, f32* pPos);           // GoTerrainCollision.c: the ground's light
-void  SD_SetShaderTypeParameters(int nRow, void* pData);                    // GoTerrain.c: calls row nRow's pfn8
+// GoTerrain.c: calls row nRow's pfn8
+void  SD_SetShaderTypeParameters(int nRow, void* pData);
 void  fn_8011CB5C(Skin* pSkin, int nView);                   // SkinMorph.c
 void  fn_800CE16C(void);                                     // SkinPart.c
 void  fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int nView);

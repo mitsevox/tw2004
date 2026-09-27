@@ -41,7 +41,8 @@ void  fn_80033F94(void* pHoleData, u32 nList);
 void  fn_8003546C(f32* pA, f32* pB, f32* pOut);
 f32   Camera_GetLensFovScale(CamLens* pLens);
 f32   Ter_GetTimeInCycle(u32 n, f32 fPeriod);
-void  SD_SetShaderTypeParameters(int nRow, void* pData);   // calls row nRow's function of lbl_80188E88 with pData
+// calls row nRow's function of lbl_80188E88 with pData
+void  SD_SetShaderTypeParameters(int nRow, void* pData);
 s32   fn_800318AC(const void* pA, const void* pB);
 void  Ter_SetZWrite(int n);
 void  fn_80035170(u32 uClear, u32 uSet);
@@ -1776,7 +1777,8 @@ void fn_80033744(void) {
             lbl_801D3CB0.pObjectStateList[i].f4 =
                 0.5f * fScale
                     * Math_Sin(6.2831855f
-                                  * Ter_GetTimeInCycle(gSession.nFrameCount, lbl_801D3CB0.pObjectStateList[i].f0)
+                                  * Ter_GetTimeInCycle(gSession.nFrameCount,
+                                                       lbl_801D3CB0.pObjectStateList[i].f0)
                                   / lbl_801D3CB0.pObjectStateList[i].f0)
                 + 0.5f * (fScale * fNoise)
                       * Math_Sin(6.2831855f
