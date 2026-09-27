@@ -43893,5 +43893,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "ccbdee3",
+"sha": "ccbdee30c8c93005c8b98007cc2f9297b4d5c152",
+"time": 1790548915,
+"subject": "findings: naming leads from lanes nm1-nm8 (ready EA names, comments to re-check); state: round 2 landed",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
