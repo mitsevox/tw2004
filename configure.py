@@ -1030,6 +1030,7 @@ config.libs = [
             Object(Matching, "GameModeStroke.c"),
             Object(Matching, "GameMode11.c"),
             Object(Matching, "GameMode4.c"),
+            Object(Matching, "Code80193188.c"),
             Object(Matching, "uiArc.c"),
             Object(Matching, "FE_CrAPDB.c"),
             Object(Matching, "FE_CrAPMessages.c"),
