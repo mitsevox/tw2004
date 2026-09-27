@@ -177,6 +177,20 @@ order of the locals' vregs lo..hi (their declaration order) for EA's registers, 
 a second without compiling. Write the winning order and confirm with a build (LLDynTex fn_8010A930:
 30 -> 4 aligned where climbs stalled, then exact).
 
+**Simulate the scheduler** (`tools/match/sched750.py`, from lane b8): MWCC's list scheduler and
+its 750 machine model, transcribed from mwcceppc.exe, run on a mwccdbg dump. Use it when the
+registers are right and only the order inside a block differs:
+
+```
+python tools/match/sched750.py predict build/mwccdbg/<fn> B23          # both passes vs the real ones
+python tools/match/sched750.py deadsearch build/mwccdbg/<fn> B23 ea.txt  # which dead value gives EA's order
+```
+
+`ea.txt` is EA's order of the block, one `op args` per line in the dump's notation. `deadsearch`
+tries a dead `srawi` (a `(u32)(s64)(s32)x` round trip) or an extra copy of each value of the block,
+with the registers held fixed; confirm a hit with a build. The docstring has the model, its exe
+addresses and its assumptions (fn_800949D0 closed from its lead).
+
 **The permuter** searches random rewrites for you. It is slow (minutes to hours) but has solved
 functions nothing else did (`fn_800F6ED4`: the loop counter had to be `long`).
 

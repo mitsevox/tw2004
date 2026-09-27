@@ -61,6 +61,13 @@ u32 fn_8016604C(UIStudio* pStudio, UISNodeInfo* pNodeInfo, u32 uId) {
     return i;
 }
 
+// fake match: an identity: x goes to the high word of a u64 and back down. The backend turns
+// it into a chain of word copies, and each copy-propagation pass removes only one link of a chain.
+// port: the (s64) conversion of a u64 relies on wrapping; callers pass pointers as u32.
+static inline u32 fn_80165E9C_Read(u32 x) {
+    return (u32)((u64)(s64)((u64)x << 32) >> 32);
+}
+
 // Loads a rate function that moves a variable to fTarget in uTime, replacing one with the same
 // ID. The step per tick is the distance left divided by the number of ticks.
 void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, s32 n30, u32 uId,
@@ -68,7 +75,18 @@ void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, 
     char szMsg[256];
     u32 i;
     UISRateFn* pRateFn;
+    f32* p;
 
+    // fake match: pStudio goes through six identity reads (the value is unchanged). The copies
+    // they leave reach the first scheduling pass, which then puts the string pool's base ahead
+    // of pStudio's saved copy (the original's addi r29 before mr r30,r3).
+    // port: pStudio is passed as a u32.
+    pStudio = (UIStudio*)fn_80165E9C_Read((u32)pStudio);
+    pStudio = (UIStudio*)fn_80165E9C_Read((u32)pStudio);
+    pStudio = (UIStudio*)fn_80165E9C_Read((u32)pStudio);
+    pStudio = (UIStudio*)fn_80165E9C_Read((u32)pStudio);
+    pStudio = (UIStudio*)fn_80165E9C_Read((u32)pStudio);
+    pStudio = (UIStudio*)fn_80165E9C_Read((u32)pStudio);
     if (uTime == 0) {
         lbl_80282A28(1, "UISEvent.c", 97,
                      "Attempting to load rate function with duration 0 ms.  Rate function not loaded");
@@ -99,8 +117,16 @@ void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, 
     pRateFn->u20 = u20;
     pRateFn->fTarget = fTarget;
     pRateFn->pDoneScript = pDoneScript;
-    pRateFn->fStep =
-        (fTarget - *fn_8016C1A4(pRateFn->u20, pRateFn->pInfo)) / ((f32)uTime / (f32)pStudio->uMsPerTick);
+    p = fn_8016C1A4(pRateFn->u20, pRateFn->pInfo);
+    // fake match: p goes through s64 and back, then its word is swapped into the high half of a
+    // u64 and back (the value is unchanged). The first leaves copies of the call's result that
+    // reach the first scheduling pass (the original's lis r4 before lwz r0 and the load in f1);
+    // the OR with the zero low word makes constant propagation run, and the load deletion after it
+    // drops the unused zero words the identity reads above leave in the entry block.
+    // port: p is passed as a u32.
+    p = (f32*)(u32)(s64)(s32)p;
+    p = (f32*)(u32)((((u64)(u32)p << 32) | (u64)(u32)p) >> 32);
+    pRateFn->fStep = (fTarget - *p) / ((f32)uTime / (f32)pStudio->uMsPerTick);
 }
 
 // Loads a rate function with no duration, replacing one with the same ID. Refused while the

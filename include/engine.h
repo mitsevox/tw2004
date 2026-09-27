@@ -230,6 +230,16 @@ typedef struct TexGXTlut {
     u8   unk0[0x18];
 } TexGXTlut;
 
+// A TexBank's first 8 bytes, as TX_spParseTextureGroupFromStream reads and copies them in one
+// struct copy (TW07's type for them: TX_STextureGroupHeader).
+typedef struct TexBankHeader {
+    u8   unk0[2];
+    s16  n2;                    // 0x2  TexBank.n2
+    s16  n4;                    // 0x4  TexBank.n4
+    u8   unk6[2];
+} TexBankHeader;
+LAYOUT_ASSERT(TexBankHeader, 0x8);
+
 // A loaded texture bank (0x30 bytes, followed by its tables; up to 200, listed at lbl_801A26DC).
 typedef struct TexBank {
     u8   unk0[2];
