@@ -630,7 +630,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             u16 uCurGroup;
 
             fn_80168EE8(pStudio, &uCurGroup, &uCurScreen);
-            pFrame->pC[-1] = uCurGroup | (uCurScreen << 16);
+            pFrame->pC[-1] = (uCurScreen << 16) | uCurGroup;
             break;
         }
         case 0x4D: {  // send event 2 with a word
