@@ -41957,5 +41957,21 @@
 "matched_functions": 7600,
 "total_functions": 7647,
 "exact": 7600
+},
+{
+"commit": "8f975b9",
+"sha": "8f975b940533265acfc8282919dd810ac6772bc8",
+"time": 1790475246,
+"subject": "assign: battle plan (one lane, one function; no permuter; Codex on UIStudio fn_80166098)",
+"report": true,
+"matched_code": 1502044,
+"complete_code": 1370024,
+"matched_data": 778927,
+"complete_data": 925243,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7600,
+"total_functions": 7647,
+"exact": 7600
 }
 ]
