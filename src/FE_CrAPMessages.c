@@ -10,15 +10,15 @@
 #include "charstate.h"
 #include "game.h"
 
-void fn_80103B74(u8 b);                 // FE_CrAPDB.c: set the database's b14
-void fn_801073DC(s16 nSlot);            // FE_CrAPDB.c
+void FE_CrAP_SetTriggerAnims(u8 b);                 // FE_CrAPDB.c: set the database's b14
+void FE_CrAP_UnequipSlot(s16 nSlot);            // FE_CrAPDB.c
 void fn_800A73F0(s32 n);
 u8   IsLeapYear(u32 nYear);            // Calendar.c: a leap year (1900 counts as one)
 
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_801077EC(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_801048EC(pArgs[0].i, pArgs[1].i);
+    pResult->i = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(pArgs[0].i, pArgs[1].i);
 }
 
 // ---- end of sweep code ----
@@ -27,7 +27,7 @@ void fn_801077EC(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80107828(MsgArg* pArgs, MsgArg* pResult) {
     s16 nPart = pArgs[0].i;
     int b = pArgs[1].i;
-    int nChoices = fn_801048EC(nPart, b);
+    int nChoices = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(nPart, b);
     int i = pArgs[2].i;
     int n = pArgs[3].i;
 
@@ -43,7 +43,7 @@ void fn_801078B8(MsgArg* pArgs, MsgArg* pResult) {
     u8 aColor[4];
     s16 nPart = pArgs[0].i;
     int b = pArgs[1].i;
-    int nChoices = fn_801048EC(nPart, b);
+    int nChoices = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(nPart, b);
     int i = pArgs[2].i;
     int n = pArgs[3].i;
 
@@ -171,11 +171,11 @@ void fn_80107A2C(MsgArg* pArgs, MsgArg* pResult) {
     if (nSlot == -1) {
         pResult->i = 0;
     } else {
-        n = fn_80103D14(nSlot);
+        n = FE_CrAP_GetEquippedAsset(nSlot);
         if (n < 0) {
             n = 0;
         } else {
-            fn_80105FF8(n, &nPart, &nEntry, &n);
+            FE_CrAP_GetCategorySubcategoryAndEntryNumFromAssetID(n, &nPart, &nEntry, &n);
         }
         pResult->i = n;
     }
@@ -211,7 +211,7 @@ void fn_80107C30(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80107C3C(MsgArg* pArgs, MsgArg* pResult) {
     s16 nPart = pArgs[0].i;
     int b = pArgs[1].i;
-    int nChoices = fn_801048EC(nPart, b);
+    int nChoices = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(nPart, b);
     int i = pArgs[2].i;
 
     if (i < 0 || i >= nChoices) {
@@ -239,7 +239,7 @@ void fn_80107C3C(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80107DBC(MsgArg* pArgs, MsgArg* pResult) {
     s16 nPart = pArgs[0].i;
     int b = pArgs[1].i;
-    int nChoices = fn_801048EC(nPart, b);
+    int nChoices = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(nPart, b);
     int i = pArgs[2].i;
 
     if (i < 0 || i >= nChoices) {
@@ -259,7 +259,7 @@ void fn_80107DBC(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80107EB0(MsgArg* pArgs, MsgArg* pResult) {
     s16 nPart = pArgs[0].i;
     int b = pArgs[1].i;
-    int nChoices = fn_801048EC(nPart, b);
+    int nChoices = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(nPart, b);
     int i = pArgs[2].i;
 
     if (i < 0 || i >= nChoices) {
@@ -276,7 +276,7 @@ void fn_80107EB0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Put a part's choice i on the created golfer and recompute its equipment tiers (fn_8007873C).
-// Part 17 is only turned on directly; for the others fn_80103F94 does it when fn_80103C98 and
+// Part 17 is only turned on directly; for the others fn_80103F94 does it when FE_CrAP_IsAssetEquipped and
 // fn_801074D4 allow.
 void fn_80107FAC(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
@@ -289,9 +289,9 @@ void fn_80107FAC(MsgArg* pArgs, MsgArg* pResult) {
         FE_CrAP_TurnOnPart(nPart, b, i);
         return;
     }
-    nAsset = fn_80104FA8(nPart, b, i);
+    nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (nAsset != -1) {
-        if (fn_80103C98(fn_80104F68(nAsset)) && fn_801074D4(nAsset)) {
+        if (FE_CrAP_IsAssetEquipped(FE_CrAP_GetAssetFromAssetIndex(nAsset)) && fn_801074D4(nAsset)) {
             fn_80103F94(nPart, b, i);
         } else {
             FE_CrAP_TurnOnPart(nPart, b, i);
@@ -315,9 +315,9 @@ void fn_80108070(MsgArg* pArgs, MsgArg* pResult) {
         FE_CrAP_TurnOnPart(nPart, b, i);
         return;
     }
-    nAsset = fn_80104FA8(nPart, b, i);
+    nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (nAsset != -1) {
-        if (fn_80103C98(fn_80104F68(nAsset)) && fn_801074D4(nAsset)) {
+        if (FE_CrAP_IsAssetEquipped(FE_CrAP_GetAssetFromAssetIndex(nAsset)) && fn_801074D4(nAsset)) {
             fn_80103F94(nPart, b, i);
             return;
         }
@@ -345,7 +345,7 @@ void fn_80108178(MsgArg* pArgs, MsgArg* pResult) {
         break;
     case 1:
         pProfile->choices.n5A7A = pArgs[2].i;
-        fn_80103B8C(pProfile->choices.n5A7A);
+        FE_CrAP_SetCurrentGender(pProfile->choices.n5A7A);
         break;
     case 2:
         fn_80078620(pArgs[2].i, &nMonth, &nDay, &nYear);
@@ -397,7 +397,8 @@ void fn_80108314(MsgArg* pArgs, MsgArg* pResult) {
     if (gSession.uFlags & 0x4000) {
         pResult->i = 0;
     } else {
-        pResult->i = fn_80078008(fn_80104FA8(nPart, b, i), pProfile);
+        pResult->i = fn_80078008(FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b,
+                i), pProfile);
     }
 }
 
@@ -405,7 +406,7 @@ void fn_80108314(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80108398(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
-    int nAsset = fn_80104FA8(pArgs[0].i, pArgs[1].i, pArgs[2].i);
+    int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(pArgs[0].i, pArgs[1].i, pArgs[2].i);
     pResult->i = BitArray_Test(pProfile->aB1CC, nAsset);
 }
 
@@ -419,7 +420,7 @@ void fn_8010840C(MsgArg* pArgs, MsgArg* pResult) {
     int b = pArgs[1].i;
     int i = pArgs[2].i;
     s32 nPrice = pArgs[3].i;
-    int nAsset = fn_80104FA8(nPart, b, i);
+    int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
 
     pProfile->n6C -= nPrice;
     BitArray_Set(pProfile->aB1CC, nAsset);
@@ -462,7 +463,7 @@ void fn_801084F4(MsgArg* pArgs, MsgArg* pResult) {
 // choices of its five random assets (fn_80077C1C).
 void fn_80108594(MsgArg* pArgs, MsgArg* pResult) {
     int nCategory = fn_80077BDC(pArgs[0].i);
-    s8 b = fn_80103BB4();
+    s8 b = FE_CrAP_GetCurrentGender();
 
     *(s32*)pArgs[1].p = lbl_80281ED4->aKind[b][nCategory];
     *(s32*)pArgs[2].p = lbl_80281ED4->aChoice[b][nCategory][0];
@@ -472,10 +473,11 @@ void fn_80108594(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[6].p = lbl_80281ED4->aChoice[b][nCategory][4];
 }
 
-// The entries (aPart, which fn_80104FA8 takes as b) of the five random assets of category pArgs[0].
+// The entries (aPart, which FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum takes
+// as b) of the five random assets of category pArgs[0].
 void fn_80108690(MsgArg* pArgs, MsgArg* pResult) {
     int nCategory = fn_80077BDC(pArgs[0].i);
-    s8 b = fn_80103BB4();
+    s8 b = FE_CrAP_GetCurrentGender();
 
     *(s32*)pArgs[1].p = lbl_80281ED4->aPart[b][nCategory][0];
     *(s32*)pArgs[2].p = lbl_80281ED4->aPart[b][nCategory][1];
@@ -491,8 +493,8 @@ void fn_80108768(MsgArg* pArgs, MsgArg* pResult) {
     s16 nPart = pArgs[0].i;
     int b = pArgs[1].i;
     int i = pArgs[2].i;
-    s8 nDb = fn_80103BB4();
-    int nAsset = fn_80104FA8(nPart, b, i);
+    s8 nDb = FE_CrAP_GetCurrentGender();
+    int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     int nKind;
     int nCategory;
 
@@ -521,7 +523,9 @@ void fn_80108768(MsgArg* pArgs, MsgArg* pResult) {
         return;
     }
     for (j = 0; j < 5; j++) {
-        if (nAsset == fn_80104FA8(lbl_80281ED4->aKind[nDb][nCategory], lbl_80281ED4->aPart[nDb][nCategory][j],
+        if (nAsset
+            == FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(
+                    lbl_80281ED4->aKind[nDb][nCategory], lbl_80281ED4->aPart[nDb][nCategory][j],
                                   lbl_80281ED4->aChoice[nDb][nCategory][j])) {
             pResult->i = 1;
             return;
@@ -576,7 +580,7 @@ void fn_80108A0C(MsgArg* pArgs, MsgArg* pResult) {
     u32 aWasLocked[94];                 // the size is unknown (the frame allows up to 97 words)
     int nUnlocked = 0;
     SaveProfile* pProfile = FE_GetCurrentProfile();
-    s32 nAssets = fn_80105C00();
+    s32 nAssets = FE_CrAP_GetNumEntriesInCrAPDB();
     int i;
 
     BitArray_ClearAll(aWasLocked, 3000);
@@ -590,7 +594,7 @@ void fn_80108A0C(MsgArg* pArgs, MsgArg* pResult) {
     fn_80078680(pProfile);
     for (i = 0; i < nAssets; i++) {
         if (!BitArray_Test(pProfile->aAssetLocked, i) && BitArray_Test(aWasLocked, i)) {
-            if (fn_801061C8(fn_80103BC0(i))) {
+            if (FE_IsValidCurrentGender(FE_CrAP_GetAssetGender(i))) {
                 nUnlocked++;
                 BitArray_Set(pProfile->aB344, i);
             }
@@ -603,13 +607,13 @@ void fn_80108A0C(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80108B10(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
-    int nAsset = fn_80104FA8(pArgs[0].i, pArgs[1].i, pArgs[2].i);
+    int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(pArgs[0].i, pArgs[1].i, pArgs[2].i);
     pResult->i = BitArray_Test(pProfile->aB344, nAsset);
 }
 
 void fn_80108B84(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
-    int nAsset = fn_80104FA8(pArgs[0].i, pArgs[1].i, pArgs[2].i);
+    int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(pArgs[0].i, pArgs[1].i, pArgs[2].i);
     if (BitArray_Test(pProfile->aB344, nAsset)) {
         BitArray_Set(pProfile->aB4BC, nAsset);
     }
@@ -620,7 +624,7 @@ void fn_80108B84(MsgArg* pArgs, MsgArg* pResult) {
 // Clear every asset's aB344 and aB4BC bits where both are set.
 void fn_80108C00(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
-    s32 nAssets = fn_80105C00();
+    s32 nAssets = FE_CrAP_GetNumEntriesInCrAPDB();
     u32 i;
 
     for (i = 0; i < nAssets; i++) {
@@ -706,7 +710,7 @@ void fn_80108E9C(MsgArg* pArgs, MsgArg* pResult) {
     char aCategories[5][64];
     char szCategory[64];
     SaveProfile* pProfile = FE_GetCurrentProfile();
-    s32 nAssets = fn_80105C00();
+    s32 nAssets = FE_CrAP_GetNumEntriesInCrAPDB();
     int nNames = 0;
     int nCategories = 0;
     int i;
@@ -718,7 +722,7 @@ void fn_80108E9C(MsgArg* pArgs, MsgArg* pResult) {
         strcpy(aCategories[i], " ");
     }
     for (i = 0; i < nAssets; i++) {
-        if (BitArray_Test(pProfile->aB344, i) && fn_801061C8(fn_80103BC0(i))) {
+        if (BitArray_Test(pProfile->aB344, i) && FE_IsValidCurrentGender(FE_CrAP_GetAssetGender(i))) {
             fn_8010745C(i, szCategory);
             if (nCategories < 5) {
                 bFound = 0;
@@ -834,7 +838,7 @@ void fn_80109388(MsgArg* pArgs, MsgArg* pResult) {
 void fn_801093B4(MsgArg* pArgs, MsgArg* pResult) {
     s16 nPart = pArgs[0].i;
     int b = pArgs[1].i;
-    int nChoices = fn_801048EC(nPart, b);
+    int nChoices = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(nPart, b);
     int i = pArgs[2].i;
 
     if (i < 0 || i >= nChoices) {
@@ -929,7 +933,7 @@ void fn_80109734(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80109738(MsgArg* pArgs, MsgArg* pResult) {
-    fn_80103B74(pArgs[0].i);
+    FE_CrAP_SetTriggerAnims(pArgs[0].i);
 }
 
 void fn_80109760(MsgArg* pArgs, MsgArg* pResult) {
@@ -1002,16 +1006,16 @@ void fn_801098B0(MsgArg* pArgs, MsgArg* pResult) {
     int nChoice;
 
     Misc_RandFunc(0);                       // drawn, not used
-    fn_80103B74(0);
-    fn_801073DC(2);
-    fn_801073DC(5);
-    fn_801073DC(6);
-    fn_801073DC(7);
-    fn_801073DC(8);
-    fn_801073DC(11);
-    fn_801073DC(12);
-    fn_801073DC(13);
-    fn_801073DC(14);
+    FE_CrAP_SetTriggerAnims(0);
+    FE_CrAP_UnequipSlot(2);
+    FE_CrAP_UnequipSlot(5);
+    FE_CrAP_UnequipSlot(6);
+    FE_CrAP_UnequipSlot(7);
+    FE_CrAP_UnequipSlot(8);
+    FE_CrAP_UnequipSlot(11);
+    FE_CrAP_UnequipSlot(12);
+    FE_CrAP_UnequipSlot(13);
+    FE_CrAP_UnequipSlot(14);
     FE_CrAP_TurnOnPart(5, 0, 0);
     FE_CrAP_TurnOnPart(6, 0, 0);
     FE_CrAP_TurnOnPart(4, 0, 0);
@@ -1053,16 +1057,16 @@ void fn_801098B0(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80109BA4(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
-    fn_80103B74(0);
-    fn_801073DC(2);
-    fn_801073DC(5);
-    fn_801073DC(6);
-    fn_801073DC(7);
-    fn_801073DC(8);
-    fn_801073DC(11);
-    fn_801073DC(12);
-    fn_801073DC(13);
-    fn_801073DC(14);
+    FE_CrAP_SetTriggerAnims(0);
+    FE_CrAP_UnequipSlot(2);
+    FE_CrAP_UnequipSlot(5);
+    FE_CrAP_UnequipSlot(6);
+    FE_CrAP_UnequipSlot(7);
+    FE_CrAP_UnequipSlot(8);
+    FE_CrAP_UnequipSlot(11);
+    FE_CrAP_UnequipSlot(12);
+    FE_CrAP_UnequipSlot(13);
+    FE_CrAP_UnequipSlot(14);
     FE_CrAP_RandomizePart(pProfile, 0, 80);
     FE_CrAP_RandomizePart(pProfile, 1, 0);
     FE_CrAP_RandomizePart(pProfile, 2, 0);
@@ -1083,7 +1087,7 @@ void fn_80109CBC(MsgArg* pArgs, MsgArg* pResult) {
     fn_8008E244();
     fn_8008E364(0);
     GolfCamera_SwitchCrAPCamera(pView, "Crap Idle", lbl_80281EE0->n4, 0, 0, 0);
-    fn_80103B74(0);
+    FE_CrAP_SetTriggerAnims(0);
     fn_80079664(pProfile);
     fn_8007873C(pProfile);
 }
@@ -1095,7 +1099,7 @@ void fn_80109D5C(MsgArg* pArgs, MsgArg* pResult) {
     fn_8008E244();
     fn_8008E364(1);
     GolfCamera_SwitchCrAPCamera(pView, "Crap Face", lbl_80281EE0->n4, 0, 0, 0);
-    fn_80103B74(0);
+    FE_CrAP_SetTriggerAnims(0);
     fn_80078E34(pProfile);
 }
 
@@ -1109,7 +1113,7 @@ void fn_80109DE0(MsgArg* pArgs, MsgArg* pResult) {
     s16 nPart = pArgs[0].i;
     int b = pArgs[1].i;
     int i = pArgs[2].i;
-    int nAsset = fn_80104FA8(nPart, b, i);
+    int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
 
     pProfile->n6C += (s32)(0.25f * fn_80105368(nPart, b, i));
     BitArray_Clear(pProfile->aB1CC, nAsset);
@@ -1129,12 +1133,13 @@ void fn_80109EE8(MsgArg* pArgs, MsgArg* pResult) {
     int i;
     s32* pnBought = pArgs[1].p;
     int nCategory = fn_80077BDC(pArgs[0].i);
-    s8 b = fn_80103BB4();
+    s8 b = FE_CrAP_GetCurrentGender();
     int nAsset;
 
     *pnBought = 0;
     for (i = 0; i < 5; i++) {
-        nAsset = fn_80104FA8(lbl_80281ED4->aKind[b][nCategory], lbl_80281ED4->aPart[b][nCategory][i],
+        nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(
+                lbl_80281ED4->aKind[b][nCategory], lbl_80281ED4->aPart[b][nCategory][i],
                              lbl_80281ED4->aChoice[b][nCategory][i]);
         if (BitArray_Test(pProfile->aB1CC, nAsset)) {
             (*pnBought)++;
@@ -1152,7 +1157,7 @@ void fn_80109FB4(MsgArg* pArgs, MsgArg* pResult) {
 
     Misc_RandFunc(0);                       // drawn, not used
     pProfile = FE_GetCurrentProfile();
-    fn_80103B74(0);
+    FE_CrAP_SetTriggerAnims(0);
     FE_CrAP_TurnOnPart(5, 0, 0);
     FE_CrAP_TurnOnPart(6, 0, 0);
     FE_CrAP_TurnOnPart(4, 0, 0);
@@ -1235,7 +1240,7 @@ void fn_8010A2C8(MsgArg* pArgs, MsgArg* pResult) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_8010A35C(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_80104F68(fn_80104FA8(pArgs[0].i, pArgs[1].i, pArgs[2].i))->n2E;
+    pResult->i = FE_CrAP_GetAssetFromAssetIndex(FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(pArgs[0].i, pArgs[1].i, pArgs[2].i))->n2E;
 }
 
 void fn_8010A3A4(MsgArg* pArgs, MsgArg* pResult) {
@@ -1254,7 +1259,7 @@ void fn_8010A3C8(MsgArg* pArgs, MsgArg* pResult) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_8010A400(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_801074D4(fn_80104FA8(pArgs[0].i, pArgs[1].i, pArgs[2].i));
+    pResult->i = fn_801074D4(FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(pArgs[0].i, pArgs[1].i, pArgs[2].i));
 }
 
 // ---- end of sweep code ----

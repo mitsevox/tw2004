@@ -219,10 +219,10 @@ They will be sorted into the sections below.
 - **[verified] A value compared inside a loop is often computed into a local as the loop's first
   statement** (GoARAM fn_800B5E88 94.3 -> 100).
 - **[verified] A call result kept in a named local and copied into the loop counter** (`nFirst = f(); for
-  (n = nFirst; ...)`) matches where initialising the counter directly does not (FE_CrAPDB fn_80104FA8,
+  (n = nFirst; ...)`) matches where initialising the counter directly does not (FE_CrAPDB FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum,
   fn_80106374).
 - **[verified] A lone flag test before a non-void return is `if (flag) return X; return X;`** (the void
-  rule above, for value returns; FE_CrAPDB fn_80104FA8 88.7 -> 94.0).
+  rule above, for value returns; FE_CrAPDB FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum 88.7 -> 94.0).
 - **[verified] `!(u & bit)` as an argument gives `rlwinm; cntlzw; srwi 5`; `(u & bit) == 0` gives
   `extrwi; xori`** (UKernel fn_800491C4 91.9 -> 100).
 - **[verified] `x * (1.0f / 512.0f)` puts the constant first in `fmuls`; `x / 512.0f` puts x first**

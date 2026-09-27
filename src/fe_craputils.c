@@ -40,8 +40,8 @@ void fn_80057FBC(SaveProfile* pProfile) {
     s32 i;
 
     if (FE_CrAP_IsCrAPDBLoaded()) {
-        nOffered = fn_80103BB4();
-        nAssets = fn_80105C00();
+        nOffered = FE_CrAP_GetCurrentGender();
+        nAssets = FE_CrAP_GetNumEntriesInCrAPDB();
         for (i = 0; i < nAssets; i++) {
             if (fn_80105C0C(i) == 0) {
                 BitArray_Set(pProfile->aB1CC, i);
@@ -50,14 +50,14 @@ void fn_80057FBC(SaveProfile* pProfile) {
             }
             BitArray_Clear(pProfile->aB344, i);
             BitArray_Clear(pProfile->aB4BC, i);
-            fn_80103B8C(fn_80103BC0(i));
+            FE_CrAP_SetCurrentGender(FE_CrAP_GetAssetGender(i));
             if (fn_80078008(i, pProfile)) {
                 BitArray_Set(pProfile->aAssetLocked, i);
             } else {
                 BitArray_Clear(pProfile->aAssetLocked, i);
             }
         }
-        fn_80103B8C(nOffered);
+        FE_CrAP_SetCurrentGender(nOffered);
         for (i = 0; i < 5; i++) {
             pProfile->choices.aLogo[i].b1020 = 0;
         }

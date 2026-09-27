@@ -111,12 +111,12 @@ CrAPDB* lbl_80282460;
 
 // This file, in address order.
 void fn_80103920(void);
-void fn_80103EFC(CrAPAsset* pAsset);
+void FE_CrAP_TurnOffAsset(CrAPAsset* pAsset);
 void sTurnOnLogo(s16 nPart, int b, int i);
 void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset);
 u8   fn_801048B0(int nPart);
-int  fn_80104F7C(CrAPAsset* pAsset);
-int  fn_80105140(s16 nPart);
+int  FE_CrAP_GetAssetIndexFromAsset(CrAPAsset* pAsset);
+int  FE_CrAP_GetFirstCategoryAssetID(s16 nPart);
 void fn_80105188(UStreamObject* pObject);
 void fn_801051F4(UStreamObject* pObject);
 void fn_80105240(void);
@@ -124,7 +124,7 @@ void fn_80105B80(CrAPAsset* pAsset, char* pName);
 void fn_80105DAC(void);
 void fn_80105EFC(void);
 void FE_CheckSpecialCaseConnections(CrAPAsset* pAsset);
-u8   fn_801061F8(s16 nPart, int nCategory, int nWanted);
+u8   FE_IsMatchingSubCategory(s16 nPart, int nCategory, int nWanted);
 u8   fn_80106658(CrAPAsset* pAsset);
 int  fn_80106750(CrAPAsset* pAsset, Skin** apSkins);
 u8   fn_801069AC(CrAPAsset* pAsset);
@@ -222,32 +222,37 @@ int fn_80103B28(int nAsset) {
 
 // The asset an asset takes its attributes from.
 CrAPAsset* fn_80103B4C(CrAPAsset* pAsset) {
-    return fn_80104F68(fn_80103B28(fn_80104F7C(pAsset)));
+    return FE_CrAP_GetAssetFromAssetIndex(fn_80103B28(FE_CrAP_GetAssetIndexFromAsset(pAsset)));
 }
 
-void fn_80103B74(u8 b) {
+// Let the menu golfer's animation and camera calls (FEgolferanim.c) run (1) or do nothing (0);
+// callers turn it off while putting on many parts at once.
+void FE_CrAP_SetTriggerAnims(u8 b) {
     lbl_80282460->b14 = b;
 }
 
-u8 fn_80103B80(void) {
+u8 FE_CrAP_GetTriggerAnims(void) {
     return lbl_80282460->b14;
 }
 
-void fn_80103B8C(s8 n) {
+// Set the gender of the golfer being created, which picks the assets offered, and clear the cached
+// list tables (fn_80103920).
+void FE_CrAP_SetCurrentGender(s8 n) {
     lbl_80282460->n4 = n;
     fn_80103920();
 }
 
-s8 fn_80103BB4(void) {
+s8 FE_CrAP_GetCurrentGender(void) {
     return lbl_80282460->n4;
 }
 
-s8 fn_80103BC0(int nAsset) {
+// An asset's gender, as FE_IsValidCurrentGender tests it (2: suits either).
+s8 FE_CrAP_GetAssetGender(int nAsset) {
     return lbl_80282460->pAssets[nAsset].n40;
 }
 
 // Empty the profile's slot of the asset.
-void fn_80103BD8(CrAPAsset* pAsset) {
+void FE_CrAP_ClearEquippedAsset(CrAPAsset* pAsset) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s16 nSlot = pAsset->n2E;
 
@@ -262,23 +267,24 @@ void fn_80103C2C(CrAPAsset* pAsset) {
     s16 nSlot = pAsset->n2E;
 
     if (nSlot >= 0 && nSlot < 53) {
-        pProfile->aAF80[nSlot] = fn_80104F7C(pAsset);
+        pProfile->aAF80[nSlot] = FE_CrAP_GetAssetIndexFromAsset(pAsset);
     }
 }
 
 // The asset (the one it takes its attributes from) is the one in its slot of the profile.
-u8 fn_80103C98(CrAPAsset* pAsset) {
+u8 FE_CrAP_IsAssetEquipped(CrAPAsset* pAsset) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     CrAPAsset* pBase = fn_80103B4C(pAsset);
     s16 nSlot = pBase->n2E;
 
     if (nSlot >= 0 && nSlot < 53) {
-        return pProfile->aAF80[nSlot] == fn_80104F7C(pBase);
+        return pProfile->aAF80[nSlot] == FE_CrAP_GetAssetIndexFromAsset(pBase);
     }
     return 0;
 }
 
-int fn_80103D14(s16 nSlot) {
+// The asset index in the profile's slot nSlot (-1: empty, or nSlot is not 0..52).
+int FE_CrAP_GetEquippedAsset(s16 nSlot) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
 
     if (nSlot >= 0 && nSlot < 53) {
@@ -324,7 +330,7 @@ void fn_80103E88(CrAPAsset* pAsset, int b) {
 
 // Take the asset (the one it takes its attributes from) off the golfer being edited and out of its
 // slot of the profile.
-void fn_80103EFC(CrAPAsset* pAsset) {
+void FE_CrAP_TurnOffAsset(CrAPAsset* pAsset) {
     Skin* pSkin;
     CrAPAsset* pBase;
 
@@ -337,7 +343,7 @@ void fn_80103EFC(CrAPAsset* pAsset) {
         fn_8008E944(0, 0.0f);
         fn_8001D624(lbl_80281EE0->pB4->n10);
         fn_80103D6C();
-        fn_80103BD8(pBase);
+        FE_CrAP_ClearEquippedAsset(pBase);
     }
 }
 
@@ -346,17 +352,18 @@ void fn_80103F94(s16 nPart, int b, int i) {
     CrAPAsset* pAsset;
 
     FE_GetCurrentProfile();
-    if (lbl_80281EE0->pB4->pChar != NULL && (pAsset = fn_80104E84(nPart, b, i)) != NULL) {
+    if (lbl_80281EE0->pB4->pChar != NULL
+        && (pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i)) != NULL) {
         if (nPart == 13) {
             fn_80103E88(pAsset, b);
         } else {
-            fn_80103EFC(pAsset);
+            FE_CrAP_TurnOffAsset(pAsset);
         }
     }
 }
 
 // The asset may be picked: it was not locked when last checked, and its aB1CC bit is set.
-u8 fn_80104020(int nAsset) {
+u8 FE_CrAP_IsAssetAvailableForUser(int nAsset) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     if (!BitArray_Test(pProfile->aAssetLocked, nAsset) && BitArray_Test(pProfile->aB1CC, nAsset)) {
         return 1;
@@ -376,7 +383,7 @@ void fn_80104094(CrAPAsset* pAsset, int b) {
     } else {
         fn_80058560(pProfile, b, szName);
         if (fn_8008E6BC() == NULL || strcmp(fn_8008E6BC(), szName) != 0) {
-            fn_8008E724(szName, fn_801064EC(pAsset->n114), 1, 0);
+            fn_8008E724(szName, FE_CrAP_GetStringFromTable(pAsset->n114), 1, 0);
         }
     }
     fn_8008E944(0, 0.0f);
@@ -426,8 +433,9 @@ void fn_801042D0(CrAPAsset* pAsset) {
         fn_8008E2F8(1, 0.0f);
     }
     fn_8008EAE0(pAsset->n0);
-    if (fn_8008E6BC() == NULL || strcmp(fn_8008E6BC(), fn_801064EC(pAsset->n112)) != 0) {
-        if (fn_8008E468(fn_801064EC(pAsset->n112), fn_801064EC(pAsset->n114), 1)) {
+    if (fn_8008E6BC() == NULL || strcmp(fn_8008E6BC(), FE_CrAP_GetStringFromTable(pAsset->n112)) != 0) {
+        if (fn_8008E468(FE_CrAP_GetStringFromTable(pAsset->n112), FE_CrAP_GetStringFromTable(pAsset->n114),
+                        1)) {
             fn_8008E818(1);
         }
     } else {
@@ -452,8 +460,8 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
     nPlay = 1;
     pSkin = lbl_80281EE0->pB4->pChar->pSkin;
     pAsset = fn_80103B4C(pAsset);
-    lbl_802816E8 = fn_80103D14(pAsset->n2E);
-    lbl_802816EC = fn_80104F7C(pAsset);
+    lbl_802816E8 = FE_CrAP_GetEquippedAsset(pAsset->n2E);
+    lbl_802816EC = FE_CrAP_GetAssetIndexFromAsset(pAsset);
     if (pAsset->n2E == -1) {
         return;
     }
@@ -462,19 +470,19 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
     if (fn_80106658(pAsset)) {
         fn_8008EABC(0);
         fn_8001D624(lbl_80281EE0->pB4->n10);
-        if (stricmp(fn_801064EC(pAsset->n112), "gdlcrp07") == 0 ||
-            stricmp(fn_801064EC(pAsset->n112), "fdlcrp07") == 0) {
+        if (stricmp(FE_CrAP_GetStringFromTable(pAsset->n112), "gdlcrp07") == 0 ||
+            stricmp(FE_CrAP_GetStringFromTable(pAsset->n112), "fdlcrp07") == 0) {
             fAngle = 4.0f;
             fn_8008E860(0);
         } else if (fn_8008E9A8() != 1) {
             fn_8008E8D0(1);
-            if (stricmp(fn_801064EC(pAsset->nCategory), "Fairway Woods") == 0) {
+            if (stricmp(FE_CrAP_GetStringFromTable(pAsset->nCategory), "Fairway Woods") == 0) {
                 fn_8008E718(1);
-            } else if (stricmp(fn_801064EC(pAsset->nCategory), "Iron Sets") == 0) {
+            } else if (stricmp(FE_CrAP_GetStringFromTable(pAsset->nCategory), "Iron Sets") == 0) {
                 fn_8008E718(3);
-            } else if (stricmp(fn_801064EC(pAsset->nCategory), "Wedge Sets") == 0) {
+            } else if (stricmp(FE_CrAP_GetStringFromTable(pAsset->nCategory), "Wedge Sets") == 0) {
                 fn_8008E718(5);
-            } else if (stricmp(fn_801064EC(pAsset->nCategory), "Putters") == 0) {
+            } else if (stricmp(FE_CrAP_GetStringFromTable(pAsset->nCategory), "Putters") == 0) {
                 fn_8008E718(2);
             }
         } else {
@@ -483,18 +491,18 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
             nPlay = 0;
         }
         fn_80103DE0();
-        fn_80103BD8(pAsset);
+        FE_CrAP_ClearEquippedAsset(pAsset);
     } else if (fn_801069AC(pAsset)) {
         if (fn_8008E9A8() != 2) {
             fn_8008E8D0(2);
         } else {
             nPlay = 0;
         }
-        fn_80103BD8(pAsset);
+        FE_CrAP_ClearEquippedAsset(pAsset);
     } else {
-        nOld = fn_80103D14(pAsset->n2E);
+        nOld = FE_CrAP_GetEquippedAsset(pAsset->n2E);
         if (nOld >= 0) {
-            fn_80103EFC(fn_80104F68(nOld));
+            FE_CrAP_TurnOffAsset(FE_CrAP_GetAssetFromAssetIndex(nOld));
         }
         fn_80106A64(pAsset, pSkin);
         fn_80106B04(pAsset, pSkin);
@@ -504,11 +512,13 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
             fn_8008E8D0(0);
         }
     }
-    if (strcmp(fn_801064EC(pAsset->n112), "") == 0 || strcmp(fn_801064EC(pAsset->n112), "0") == 0 ||
+    if (strcmp(FE_CrAP_GetStringFromTable(pAsset->n112), "") == 0
+        || strcmp(FE_CrAP_GetStringFromTable(pAsset->n112), "0") == 0 ||
         !fn_801048B0(nPart)) {
         fn_8008E944(0, 0.0f);
-        if (fn_8008E6BC() == NULL || strcmp(fn_8008E6BC(), fn_801064EC(pAsset->n112)) != 0) {
-            fn_8008E468(fn_801064EC(pAsset->n112), fn_801064EC(pAsset->n114), 1);
+        if (fn_8008E6BC() == NULL || strcmp(fn_8008E6BC(), FE_CrAP_GetStringFromTable(pAsset->n112)) != 0) {
+            fn_8008E468(FE_CrAP_GetStringFromTable(pAsset->n112), FE_CrAP_GetStringFromTable(pAsset->n114),
+                        1);
         } else {
             fn_8008E818(1);
         }
@@ -518,7 +528,8 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
         fn_8008EAF8(nPart);
     } else {
         fn_8008E944(1, fAngle);
-        fn_8008E724(fn_801064EC(pAsset->n112), fn_801064EC(pAsset->n114), nPlay, bLoop);
+        fn_8008E724(FE_CrAP_GetStringFromTable(pAsset->n112), FE_CrAP_GetStringFromTable(pAsset->n114),
+                    nPlay, bLoop);
     }
     fn_80103C2C(pAsset);
     FE_CheckSpecialCaseConnections(pAsset);
@@ -536,8 +547,8 @@ void FE_CrAP_TurnOnPart(s16 nPart, int b, int i) {
     }
     if (nPart != 17) {
         FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(nPart, b);
-        nAsset = fn_80104FA8(nPart, b, i);
-        pAsset = fn_80104F68(nAsset);
+        nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
+        pAsset = FE_CrAP_GetAssetFromAssetIndex(nAsset);
     }
     if (pAsset == NULL && nPart != 17) {
         return;
@@ -566,16 +577,16 @@ void fn_80104804(void) {
 
     FE_GetCurrentProfile();
     if (lbl_802816E8 != -1) {
-        fn_80103B74(0);
-        FE_CrAP_TurnOnAsset(fn_80104F68(lbl_802816E8));
-        fn_80103B74(1);
+        FE_CrAP_SetTriggerAnims(0);
+        FE_CrAP_TurnOnAsset(FE_CrAP_GetAssetFromAssetIndex(lbl_802816E8));
+        FE_CrAP_SetTriggerAnims(1);
     } else if (lbl_802816EC != -1) {
-        pAsset = fn_80104F68(lbl_802816EC);
+        pAsset = FE_CrAP_GetAssetFromAssetIndex(lbl_802816EC);
         if (pAsset->nPart == 13) {
-            fn_80105FF8(lbl_802816EC, &nKind, &nPart, &nChoice);
+            FE_CrAP_GetCategorySubcategoryAndEntryNumFromAssetID(lbl_802816EC, &nKind, &nPart, &nChoice);
             fn_80103E88(pAsset, nPart);
         } else {
-            fn_80103EFC(pAsset);
+            FE_CrAP_TurnOffAsset(pAsset);
         }
     }
     fn_8008EB70();
@@ -593,18 +604,19 @@ u8 fn_801048B0(int nPart) {
 }
 
 // How many offered assets of the part fit its entry b (kept in lbl_8028247C).
-int fn_801048EC(s16 nPart, int b) {
+int FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(s16 nPart, int b) {
     int nAsset;
     int nCount;
     int nWanted;
     int nFirst;
 
-    nFirst = fn_80105140(nPart);
+    nFirst = FE_CrAP_GetFirstCategoryAssetID(nPart);
     nCount = 0;
     nWanted = FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(nPart, b);
     for (nAsset = nFirst; nAsset < lbl_80282460->nAssets; nAsset++) {
-        if (nPart == lbl_80282460->pAssets[nAsset].nPart && fn_801061C8(lbl_80282460->pAssets[nAsset].n40) &&
-            fn_801061F8(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted)) {
+        if (nPart == lbl_80282460->pAssets[nAsset].nPart
+            && FE_IsValidCurrentGender(lbl_80282460->pAssets[nAsset].n40) &&
+            FE_IsMatchingSubCategory(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted)) {
             nCount++;
         }
     }
@@ -621,11 +633,13 @@ int FE_CrAP_GetNumberOfSubcategoryIndicesForCategory(s16 nPart) {
     u8 bLater;
 
     for (i = 0; i < lbl_80282460->nAssets; i++) {
-        if (nPart == lbl_80282460->pAssets[i].nPart && fn_801061C8(lbl_80282460->pAssets[i].n40)) {
+        if (nPart == lbl_80282460->pAssets[i].nPart
+            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].n40)) {
             // a category is counted at its last asset
             bLater = 0;
             for (j = i + 1; j < lbl_80282460->nAssets; j++) {
-                if (nPart == lbl_80282460->pAssets[j].nPart && fn_801061C8(lbl_80282460->pAssets[j].n40) &&
+                if (nPart == lbl_80282460->pAssets[j].nPart
+                    && FE_IsValidCurrentGender(lbl_80282460->pAssets[j].n40) &&
                     lbl_80282460->pAssets[j].nCategory == lbl_80282460->pAssets[i].nCategory) {
                     bLater = 1;
                     break;
@@ -654,7 +668,7 @@ int FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(s16 nPart, int n) {
     int bKnown;
     int nFirst;
 
-    nFirst = fn_80105140(nPart);
+    nFirst = FE_CrAP_GetFirstCategoryAssetID(nPart);
     if (lbl_801932C8[nPart][0] != '\0') {
         if (n == 0) {
             return -1;
@@ -662,7 +676,8 @@ int FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(s16 nPart, int n) {
         n--;
     }
     for (i = nFirst; i < lbl_80282460->nAssets; i++) {
-        if (nPart == lbl_80282460->pAssets[i].nPart && fn_801061C8(lbl_80282460->pAssets[i].n40)) {
+        if (nPart == lbl_80282460->pAssets[i].nPart
+            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].n40)) {
             bKnown = 0;
             for (j = 0; j < nFound; j++) {
                 if (aCategories[j] == lbl_80282460->pAssets[i].nCategory) {
@@ -694,9 +709,10 @@ int FE_CrAP_GetSubCategoryIndexForCategoryAndSubcategoryID(s16 nPart, int nCateg
     int bKnown;
     int nFirst;
 
-    nFirst = fn_80105140(nPart);
+    nFirst = FE_CrAP_GetFirstCategoryAssetID(nPart);
     for (i = nFirst; i < lbl_80282460->nAssets; i++) {
-        if (nPart == lbl_80282460->pAssets[i].nPart && fn_801061C8(lbl_80282460->pAssets[i].n40)) {
+        if (nPart == lbl_80282460->pAssets[i].nPart
+            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].n40)) {
             bKnown = 0;
             for (j = 0; j < nFound; j++) {
                 if (aCategories[j] == lbl_80282460->pAssets[i].nCategory) {
@@ -747,19 +763,21 @@ u8 FE_CrAP_GetSubCategoryNameForCategoryAndSubcategoryIndex(s16 nPart, int n, ch
     return 1;
 }
 
-CrAPAsset* fn_80104E84(s16 nPart, int b, int i) {
+// A part's choice i under its list entry b: the i-th asset offered for the current gender that fits
+// the entry (NULL: none).
+CrAPAsset* FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(s16 nPart, int b, int i) {
     int nAsset;
     int n;
     int nWanted;
     int nFirst;
 
-    nFirst = fn_80105140(nPart);
+    nFirst = FE_CrAP_GetFirstCategoryAssetID(nPart);
     nWanted = FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(nPart, b);
     n = 0;
     for (nAsset = nFirst; nAsset < lbl_80282460->nAssets; nAsset++) {
         if (nPart == lbl_80282460->pAssets[nAsset].nPart &&
-            fn_801061C8(lbl_80282460->pAssets[nAsset].n40) &&
-            fn_801061F8(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted)) {
+            FE_IsValidCurrentGender(lbl_80282460->pAssets[nAsset].n40) &&
+            FE_IsMatchingSubCategory(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted)) {
             if (n == i) {
                 return &lbl_80282460->pAssets[nAsset];
             }
@@ -769,26 +787,29 @@ CrAPAsset* fn_80104E84(s16 nPart, int b, int i) {
     return NULL;
 }
 
-CrAPAsset* fn_80104F68(int nAsset) {
+CrAPAsset* FE_CrAP_GetAssetFromAssetIndex(int nAsset) {
     return &lbl_80282460->pAssets[nAsset];
 }
 
-int fn_80104F7C(CrAPAsset* pAsset) {
+int FE_CrAP_GetAssetIndexFromAsset(CrAPAsset* pAsset) {
     return pAsset - lbl_80282460->pAssets;
 }
 
-int fn_80104FA8(s16 nPart, int b, int i) {
+// The asset index of a part's choice i under its list entry b: the i-th asset offered for the
+// current gender that fits the entry (-1: none).
+int FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(s16 nPart, int b, int i) {
     int nAsset;
     int n;
     int nWanted;
     int nFirst;
 
-    nFirst = fn_80105140(nPart);
+    nFirst = FE_CrAP_GetFirstCategoryAssetID(nPart);
     nWanted = FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(nPart, b);
     n = 0;
     for (nAsset = nFirst; nAsset < lbl_80282460->nAssets; nAsset++) {
-        if (nPart == lbl_80282460->pAssets[nAsset].nPart && fn_801061C8(lbl_80282460->pAssets[nAsset].n40) &&
-            fn_801061F8(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted)) {
+        if (nPart == lbl_80282460->pAssets[nAsset].nPart
+            && FE_IsValidCurrentGender(lbl_80282460->pAssets[nAsset].n40) &&
+            FE_IsMatchingSubCategory(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted)) {
             if (n == i) {
                 return nAsset;
             }
@@ -823,7 +844,8 @@ void fn_801050D0(void) {
     }
 }
 
-int fn_80105140(s16 nPart) {
+// The index of a part's first asset, as fn_801050D0 found it (0 when the part has none).
+int FE_CrAP_GetFirstCategoryAssetID(s16 nPart) {
     return lbl_80282474[nPart];
 }
 
@@ -861,7 +883,7 @@ void fn_80105240(void) {
 
 // A part's choice i: its name, and the fields below (0 or -1 when there is no such choice).
 char* fn_80105264(s16 nPart, int b, int i) {
-    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return NULL;
     }
@@ -869,7 +891,7 @@ char* fn_80105264(s16 nPart, int b, int i) {
 }
 
 s16 fn_80105298(s16 nPart, int b, int i) {
-    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return 0;
     }
@@ -877,7 +899,7 @@ s16 fn_80105298(s16 nPart, int b, int i) {
 }
 
 s16 fn_801052CC(s16 nPart, int b, int i) {
-    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return 0;
     }
@@ -885,7 +907,7 @@ s16 fn_801052CC(s16 nPart, int b, int i) {
 }
 
 s16 fn_80105300(s16 nPart, int b, int i) {
-    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return 0;
     }
@@ -893,7 +915,7 @@ s16 fn_80105300(s16 nPart, int b, int i) {
 }
 
 s16 fn_80105334(s16 nPart, int b, int i) {
-    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return -1;
     }
@@ -901,7 +923,7 @@ s16 fn_80105334(s16 nPart, int b, int i) {
 }
 
 s32 fn_80105368(s16 nPart, int b, int i) {
-    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return -1;
     }
@@ -909,7 +931,7 @@ s32 fn_80105368(s16 nPart, int b, int i) {
 }
 
 s32 fn_8010539C(s16 nPart, int b, int i) {
-    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return -1;
     }
@@ -917,7 +939,7 @@ s32 fn_8010539C(s16 nPart, int b, int i) {
 }
 
 s32 fn_801053D0(s16 nPart, int b, int i) {
-    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return -1;
     }
@@ -926,19 +948,23 @@ s32 fn_801053D0(s16 nPart, int b, int i) {
 
 // A part's choice i: the attributes it raises and the tiers (see FE_CrAP_GetPartAttributeUpgrade1ByAssetID).
 int FE_CrAP_GetPartAttributeUpgrade1(s16 nPart, int b, int i) {
-    return FE_CrAP_GetPartAttributeUpgrade1ByAssetID(fn_80104FA8(nPart, b, i));
+    return FE_CrAP_GetPartAttributeUpgrade1ByAssetID(
+            FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i));
 }
 
 int FE_CrAP_GetPartAttributeModifier1(s16 nPart, int b, int i) {
-    return FE_CrAP_GetPartAttributeModifier1ByAssetID(fn_80104FA8(nPart, b, i));
+    return FE_CrAP_GetPartAttributeModifier1ByAssetID(
+            FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i));
 }
 
 int FE_CrAP_GetPartAttributeUpgrade2(s16 nPart, int b, int i) {
-    return FE_CrAP_GetPartAttributeUpgrade2ByAssetID(fn_80104FA8(nPart, b, i));
+    return FE_CrAP_GetPartAttributeUpgrade2ByAssetID(
+            FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i));
 }
 
 int FE_CrAP_GetPartAttributeModifier2(s16 nPart, int b, int i) {
-    return FE_CrAP_GetPartAttributeModifier2ByAssetID(fn_80104FA8(nPart, b, i));
+    return FE_CrAP_GetPartAttributeModifier2ByAssetID(
+            FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i));
 }
 
 // The attributes an asset raises (-1: none) and the tier it raises each to; an asset of lock kind
@@ -965,7 +991,7 @@ int FE_CrAP_GetPartAttributeModifier2ByAssetID(int nAsset) {
 
 // A part's choice i: its lock kind and number (-1: no such choice).
 s8 FE_CrAP_GetPartGMLockID(s16 nPart, int b, int i) {
-    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return -1;
     }
@@ -973,7 +999,7 @@ s8 FE_CrAP_GetPartGMLockID(s16 nPart, int b, int i) {
 }
 
 s16 FE_CrAP_GetPartGMLockVal(s16 nPart, int b, int i) {
-    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return -1;
     }
@@ -995,7 +1021,7 @@ s16 FE_CrAP_GetPartGMLockValByAssetNum(int nAsset) {
 }
 
 int fn_80105644(s16 nPart, int b, int i, int n) {
-    CrAPAsset* pAsset = fn_80104E84(nPart, b, i);
+    CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return -1;
     }
@@ -1015,7 +1041,7 @@ void fn_8010568C(s16 nPart, int b, int i, int n, u8* pColor) {
     f32* pOption;
     Skin* pSkin;
 
-    pAsset = fn_80104E84(nPart, b, i);
+    pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         pColor[0] = 0;
         pColor[1] = 0;
@@ -1037,7 +1063,7 @@ void fn_8010568C(s16 nPart, int b, int i, int n, u8* pColor) {
         pColor[3] = pAsset->aColor[n][3];
         return;
     }
-    szCategory = fn_801064EC(pAsset->nCategory);
+    szCategory = FE_CrAP_GetStringFromTable(pAsset->nCategory);
     if (stricmp(szCategory, "drivers") == 0) {
         pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[0];
     } else if (stricmp(szCategory, "Fairway Woods") == 0) {
@@ -1112,7 +1138,7 @@ void fn_8010568C(s16 nPart, int b, int i, int n, u8* pColor) {
 }
 
 void fn_80105B4C(s16 nPart, int b, int i, char* pName) {
-    fn_80105B80(fn_80104E84(nPart, b, i), pName);
+    fn_80105B80(FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i), pName);
 }
 
 // Copy the name of the asset's first variant id. The ids are byte-swapped for the lookup and swapped
@@ -1129,7 +1155,7 @@ void fn_80105B80(CrAPAsset* pAsset, char* pName) {
     BYTESWAP_SWAPDATA(&pSrc, (u8*)pAsset->aVariant, sizeof(pAsset->aVariant), sizeof(u64));
 }
 
-s32 fn_80105C00(void) {
+s32 FE_CrAP_GetNumEntriesInCrAPDB(void) {
     return lbl_80282460->nAssets;
 }
 
@@ -1156,11 +1182,13 @@ int fn_80105C44(s16 nPart, int b) {
 
     nWanted = FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(nPart, b);
     for (i = 0; i < lbl_80282460->nAssets; i++) {
-        if (nPart == lbl_80282460->pAssets[i].nPart && fn_801061C8(lbl_80282460->pAssets[i].n40) &&
-            fn_801061F8(nPart, lbl_80282460->pAssets[i].nCategory, nWanted)) {
+        if (nPart == lbl_80282460->pAssets[i].nPart
+            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].n40) &&
+            FE_IsMatchingSubCategory(nPart, lbl_80282460->pAssets[i].nCategory, nWanted)) {
             bEarlier = 0;
             for (j = i - 1; j >= 0; j--) {
-                if (nPart == lbl_80282460->pAssets[j].nPart && fn_801061C8(lbl_80282460->pAssets[j].n40) &&
+                if (nPart == lbl_80282460->pAssets[j].nPart
+                    && FE_IsValidCurrentGender(lbl_80282460->pAssets[j].n40) &&
                     lbl_80282460->pAssets[j].nCategory == lbl_80282460->pAssets[i].nCategory &&
                     lbl_80282460->pAssets[j].aColor[0][0] == lbl_80282460->pAssets[i].aColor[0][0] &&
                     lbl_80282460->pAssets[j].aColor[0][1] == lbl_80282460->pAssets[i].aColor[0][1] &&
@@ -1233,17 +1261,21 @@ void FE_CheckSpecialCaseConnections(CrAPAsset* pAsset) {
     }
 }
 
-void fn_80105FF8(int nAsset, s16* pnPart, s32* pnEntry, s32* pnPlace) {
+// Where an asset sits in the menus: its part, the part's list entry for its category, and its place
+// among that entry's offered assets.
+void FE_CrAP_GetCategorySubcategoryAndEntryNumFromAssetID(int nAsset, s16* pnPart, s32* pnEntry,
+                                                          s32* pnPlace) {
     int i;
     int nCount = 0;
     int nFirst;
 
-    nFirst = fn_80105140(lbl_80282460->pAssets[nAsset].nPart);
+    nFirst = FE_CrAP_GetFirstCategoryAssetID(lbl_80282460->pAssets[nAsset].nPart);
     *pnPart = lbl_80282460->pAssets[nAsset].nPart;
     *pnEntry = FE_CrAP_GetSubCategoryIndexForCategoryAndSubcategoryID(*pnPart, lbl_80282460->pAssets[nAsset].nCategory);
     for (i = nFirst; i < nAsset; i++) {
-        if (*pnPart == lbl_80282460->pAssets[i].nPart && fn_801061C8(lbl_80282460->pAssets[i].n40)) {
-            if (fn_801061F8(*pnPart, lbl_80282460->pAssets[i].nCategory,
+        if (*pnPart == lbl_80282460->pAssets[i].nPart
+            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].n40)) {
+            if (FE_IsMatchingSubCategory(*pnPart, lbl_80282460->pAssets[i].nCategory,
                             lbl_80282460->pAssets[nAsset].nCategory)) {
                 nCount++;
             }
@@ -1260,12 +1292,13 @@ void fn_801060F0(int nAsset, s16 nPart, int n, s32* pnPlace) {
     int nFirst;
     int nWanted;
 
-    nFirst = fn_80105140(lbl_80282460->pAssets[nAsset].nPart);
+    nFirst = FE_CrAP_GetFirstCategoryAssetID(lbl_80282460->pAssets[nAsset].nPart);
     nWanted = FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(nPart, n);
 
     for (i = nFirst; i < nAsset; i++) {
-        if (nPart == lbl_80282460->pAssets[i].nPart && fn_801061C8(lbl_80282460->pAssets[i].n40) &&
-            fn_801061F8(nPart, lbl_80282460->pAssets[i].nCategory, nWanted)) {
+        if (nPart == lbl_80282460->pAssets[i].nPart
+            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].n40) &&
+            FE_IsMatchingSubCategory(nPart, lbl_80282460->pAssets[i].nCategory, nWanted)) {
             nCount++;
         }
     }
@@ -1273,7 +1306,7 @@ void fn_801060F0(int nAsset, s16 nPart, int n, s32* pnPlace) {
 }
 
 // An asset with this n40 is offered: it matches the database's n4, or 2 (any).
-u8 fn_801061C8(s8 n) {
+u8 FE_IsValidCurrentGender(s8 n) {
     if (n == lbl_80282460->n4 || n == 2) {
         return 1;
     }
@@ -1282,7 +1315,7 @@ u8 fn_801061C8(s8 n) {
 
 // An asset of category nCategory fits the category a part's list shows (nWanted); a part with an
 // "All ..." entry shows every category for -1.
-u8 fn_801061F8(s16 nPart, int nCategory, int nWanted) {
+u8 FE_IsMatchingSubCategory(s16 nPart, int nCategory, int nWanted) {
     if (lbl_801932C8[nPart][0] != '\0') {
         return nWanted == -1 || nCategory == nWanted;
     }
@@ -1296,7 +1329,7 @@ int fn_80106244(s16 nPart) {
 
     FE_GetCurrentProfile();
     for (i = 0; i < 53; i++) {
-        nAsset = fn_80103D14(i);
+        nAsset = FE_CrAP_GetEquippedAsset(i);
         if (nAsset >= 0 && nPart == lbl_80282460->pAssets[nAsset].nPart) {
             return nAsset;
         }
@@ -1315,10 +1348,10 @@ int fn_801062C8(s16 nPart, int n) {
     FE_GetCurrentProfile();
     nWanted = FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(nPart, n);
     for (i = 0; i < 53; i++) {
-        nAsset = fn_80103D14(i);
+        nAsset = FE_CrAP_GetEquippedAsset(i);
         if (nAsset >= 0) {
             pAsset = &lbl_80282460->pAssets[nAsset];
-            if (nPart == pAsset->nPart && fn_801061F8(nPart, pAsset->nCategory, nWanted)) {
+            if (nPart == pAsset->nPart && FE_IsMatchingSubCategory(nPart, pAsset->nCategory, nWanted)) {
                 return nAsset;
             }
         }
@@ -1334,16 +1367,16 @@ u8 fn_80106374(s16 nPart, int b, int i) {
     int nFirst;
 
     FE_GetCurrentProfile();
-    nFirst = fn_80105140(nPart);
+    nFirst = FE_CrAP_GetFirstCategoryAssetID(nPart);
     nWanted = FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(nPart, b);
     n = -1;
     for (nAsset = nFirst; nAsset < lbl_80282460->nAssets; nAsset++) {
         if (nPart == lbl_80282460->pAssets[nAsset].nPart &&
-            fn_801061F8(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted) &&
-            fn_801061C8(lbl_80282460->pAssets[nAsset].n40)) {
+            FE_IsMatchingSubCategory(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted) &&
+            FE_IsValidCurrentGender(lbl_80282460->pAssets[nAsset].n40)) {
             n++;
             if (n == i) {
-                return fn_80103C98(fn_80104F68(nAsset));
+                return FE_CrAP_IsAssetEquipped(FE_CrAP_GetAssetFromAssetIndex(nAsset));
             }
         }
     }
@@ -1369,7 +1402,9 @@ u8 FE_CrAP_GetColorNameFromID(int nOffset, char* pDst) {
     return 1;
 }
 
-char* fn_801064EC(int nCategory) {
+// The string at offset id in the 'CR_S' strings (the names the assets use: categories, animations,
+// camera shots); NULL when they are not loaded or id is -1.
+char* FE_CrAP_GetStringFromTable(int nCategory) {
     if (lbl_80282460->pStrings == NULL) {
         return NULL;
     }
@@ -1396,8 +1431,8 @@ u8 fn_8010651C(s16 nPart, int b, int i, char* pDst) {
     n = 0;
     for (nAsset = 0; nAsset < lbl_80282460->nAssets; nAsset++) {
         if (nPart == lbl_80282460->pAssets[nAsset].nPart &&
-            fn_801061C8(lbl_80282460->pAssets[nAsset].n40) &&
-            fn_801061F8(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted)) {
+            FE_IsValidCurrentGender(lbl_80282460->pAssets[nAsset].n40) &&
+            FE_IsMatchingSubCategory(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted)) {
             if (n == i) {
                 CrAPDB* pDB = lbl_80282460;
                 pAsset = &pDB->pAssets[nAsset];
@@ -1446,7 +1481,7 @@ u8 fn_80106658(CrAPAsset* pAsset) {
 // The club skins an asset's category goes on, into apSkins; how many (0: not a club category).
 // The six skins are the drivers, fairway woods, putters, two of irons and the wedges.
 int fn_80106750(CrAPAsset* pAsset, Skin** apSkins) {
-    char* szCategory = fn_801064EC(pAsset->nCategory);
+    char* szCategory = FE_CrAP_GetStringFromTable(pAsset->nCategory);
 
     if (lbl_80281EE0->pB4 == NULL || lbl_80281EE0->pB4->pChar == NULL ||
         lbl_80281EE0->pB4->pChar->p16D8 == NULL || apSkins == NULL) {
@@ -1494,7 +1529,7 @@ u8 fn_801069AC(CrAPAsset* pAsset) {
     if (pAsset->nPart != 12) {
         return 0;
     }
-    szCategory = fn_801064EC(pAsset->nCategory);
+    szCategory = FE_CrAP_GetStringFromTable(pAsset->nCategory);
     if (lbl_80281EE0->pB4 == NULL || lbl_80281EE0->pB4->pChar == NULL ||
         lbl_80281EE0->pB4->pChar->p16D8 == NULL) {
         return 0;
@@ -1615,7 +1650,7 @@ int fn_80106E48(s16 n) {
 
     FE_GetCurrentProfile();
     for (i = 0; i < 53; i++) {
-        nAsset = fn_80103D14(i);
+        nAsset = FE_CrAP_GetEquippedAsset(i);
         if (nAsset >= 0 && n == lbl_80282460->pAssets[nAsset].n2C) {
             nCount++;
         }
@@ -1630,7 +1665,7 @@ s32 fn_80106ED8(s32 nKind, s32 nLock) {
 
     for (i = 0; i < lbl_80282460->nAssets; i++) {
         if (nKind == lbl_80282460->pAssets[i].nLockKind && nLock == lbl_80282460->pAssets[i].nLock &&
-            fn_801061C8(lbl_80282460->pAssets[i].n40)) {
+            FE_IsValidCurrentGender(lbl_80282460->pAssets[i].n40)) {
             nCount++;
         }
     }
@@ -1644,7 +1679,7 @@ s32 FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(s32 nKind, s32 nLock, char* szF
 
     for (i = 0; i < lbl_80282460->nAssets; i++) {
         if (nKind == lbl_80282460->pAssets[i].nLockKind && nLock == lbl_80282460->pAssets[i].nLock &&
-            fn_801061C8(lbl_80282460->pAssets[i].n40)) {
+            FE_IsValidCurrentGender(lbl_80282460->pAssets[i].n40)) {
             nCount++;
             switch (nCount) {
             case 1:
@@ -1694,7 +1729,7 @@ s32 fn_801070F4(void) {
     int nAssets = 0;
 
     for (nSlot = 0; nSlot < 53; nSlot++) {
-        nAsset = fn_80103D14(nSlot);
+        nAsset = FE_CrAP_GetEquippedAsset(nSlot);
         if (nAsset >= 0 && nAssets < 64) {
             pBase[nAssets] = nAsset;
             nAssets++;
@@ -1736,7 +1771,8 @@ void FE_CrAP_GetCategoryInfo(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s3
     *pB344 = 0;
     *pAll = 0;
     for (i = 0; i < lbl_80282460->nAssets; i++) {
-        if (nPart == lbl_80282460->pAssets[i].nPart && fn_801061C8(lbl_80282460->pAssets[i].n40)) {
+        if (nPart == lbl_80282460->pAssets[i].nPart
+            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].n40)) {
             if (BitArray_Test(pProfile->aB1CC, i)) {
                 *pB1CC += 1;
             }
@@ -1752,15 +1788,15 @@ void FE_CrAP_GetCategoryInfo(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s3
 }
 
 // Take the asset in the profile's slot nSlot off the golfer being edited.
-void fn_801073DC(s16 nSlot) {
+void FE_CrAP_UnequipSlot(s16 nSlot) {
     int nAsset;
 
     if (lbl_80281EE0->pB4 == NULL || lbl_80281EE0->pB4->pChar == NULL) {
         return;
     }
-    nAsset = fn_80103D14(nSlot);
+    nAsset = FE_CrAP_GetEquippedAsset(nSlot);
     if (nAsset >= 0) {
-        fn_80103EFC(fn_80104F68(nAsset));
+        FE_CrAP_TurnOffAsset(FE_CrAP_GetAssetFromAssetIndex(nAsset));
     }
 }
 
@@ -1784,7 +1820,7 @@ void fn_8010749C(int nAsset, char* pDst) {
 }
 
 u8 fn_801074D4(int nAsset) {
-    s16 n2E = fn_80104F68(nAsset)->n2E;
+    s16 n2E = FE_CrAP_GetAssetFromAssetIndex(nAsset)->n2E;
 
     if (fn_8010742C(nAsset) == 13) {
         return 1;

@@ -1480,7 +1480,7 @@ u8 fn_8008E468(char* szAnim, char* szShot, u8 bNoBlend) {
     Clip* pClip;
 
     pView = ViewController_GetCameraController(fn_80016D10());
-    if (!fn_80103B80()) {
+    if (!FE_CrAP_GetTriggerAnims()) {
         return 0;
     }
     if (lbl_80281EE0->n8 == 1) {
@@ -1575,7 +1575,7 @@ void fn_8008E824(void) {
 void fn_8008E860(int n) {
     int nOld;
 
-    if (fn_80103B80()) {
+    if (FE_CrAP_GetTriggerAnims()) {
         nOld = lbl_80281EE0->n8;
         lbl_80281EE0->n8 = n;
         lbl_80281EE0->nC = 0;
@@ -1588,7 +1588,7 @@ void fn_8008E860(int n) {
 }
 
 void fn_8008E8D0(int n) {
-    if (fn_80103B80()) {
+    if (FE_CrAP_GetTriggerAnims()) {
         lbl_80281EE0->nC = n;
         lbl_80281EE0->b80 = 1;
     }

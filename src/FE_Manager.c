@@ -25,8 +25,8 @@ void fn_8009220C(void);
 void fn_800A7644(int a);
 void fn_800A4FD8(void);
 void fn_80102AC4(void);
-void fn_80103B74(int a);
-void fn_801073DC(int nPart);            // FE_CrAPDB.c
+void FE_CrAP_SetTriggerAnims(int a);
+void FE_CrAP_UnequipSlot(int nPart);            // FE_CrAPDB.c
 u8   PasswordManager_IsPasswordEntered(int a);
 u8   fn_800564AC(int n);
 s32  fn_801258E8(void);                 // EASportsBio.c
@@ -437,7 +437,7 @@ int fn_80077BDC(int n) {
 }
 
 // For b and category a (-1, -2 or -3), seeded by today's date: one of the category's asset kinds
-// at random, then up to five different random assets of that kind that fit b (fn_80103BC0 gives
+// at random, then up to five different random assets of that kind that fit b (FE_CrAP_GetAssetGender gives
 // b or 2) and pass fn_80078008. Then the random stream is seeded from the clock again.
 void fn_80077C1C(int a, int b) {
     int aFound[3000];
@@ -460,10 +460,10 @@ void fn_80077C1C(int a, int b) {
     int i;
     int nFound;
     int nKinds;
-    s8 nB;                  // b as fn_80103B8C and fn_80103BC0 take it
+    s8 nB;                  // b as FE_CrAP_SetCurrentGender and FE_CrAP_GetAssetGender take it
     pProfile = FE_GetCurrentProfile();
     nFound = 0;
-    nCount = fn_80105C00();
+    nCount = FE_CrAP_GetNumEntriesInCrAPDB();
     nKind = 0;
     nPart = 0;
     nChoice = 0;
@@ -503,20 +503,21 @@ void fn_80077C1C(int a, int b) {
     lbl_80281ED4->aKind[b][nCategory] = aKinds[Misc_RandFunc(0) % nKinds];
     nB = b;
     for (i = 0; i < nCount; i++) {
-        fn_80103B8C(fn_80103BC0(i));
+        FE_CrAP_SetCurrentGender(FE_CrAP_GetAssetGender(i));
         nKind = fn_8010742C(i);
         if (nKind == lbl_80281ED4->aKind[b][nCategory] &&
-            (fn_80103BC0(i) == nB || fn_80103BC0(i) == 2) &&
+            (FE_CrAP_GetAssetGender(i) == nB || FE_CrAP_GetAssetGender(i) == 2) &&
             !fn_80078008(i, pProfile) && fn_80107444(i) > 0) {
             aFound[nFound] = i;
             nFound++;
         }
     }
-    fn_80103B8C(nB);
+    FE_CrAP_SetCurrentGender(nB);
     for (j = 0; j < 5; j++) {
         if (j >= nFound) break;
     retry:
-        fn_80105FF8(aFound[Misc_RandFunc(0) % nFound], &nKind, &nPart, &nChoice);
+        FE_CrAP_GetCategorySubcategoryAndEntryNumFromAssetID(aFound[Misc_RandFunc(0) % nFound], &nKind,
+                &nPart, &nChoice);
         lbl_80281ED4->aPart[b][nCategory][j] = nPart;
         lbl_80281ED4->aChoice[b][nCategory][j] = nChoice;
         for (i = 0; i < j; i++) {
@@ -742,25 +743,25 @@ void fn_80078680(SaveProfile* pProfile) {
     int nCount;
     s8 nSaved;
     if (FE_CrAP_IsCrAPDBLoaded()) {
-        nSaved = fn_80103BB4();
-        nCount = fn_80105C00();
+        nSaved = FE_CrAP_GetCurrentGender();
+        nCount = FE_CrAP_GetNumEntriesInCrAPDB();
         for (i = 0; i < nCount; i++) {
-            fn_80103B8C(fn_80103BC0(i));
+            FE_CrAP_SetCurrentGender(FE_CrAP_GetAssetGender(i));
             if (fn_80078008(i, pProfile)) {
                 BitArray_Set(pProfile->aAssetLocked, i);
             } else {
                 BitArray_Clear(pProfile->aAssetLocked, i);
             }
         }
-        fn_80103B8C(nSaved);
+        FE_CrAP_SetCurrentGender(nSaved);
     }
 }
 
 // ---- the created golfer's parts -----------------------------------------------------------------
 
 // pProfile's created golfer's equipment tiers, from the equipment in the 53 slots of the profile
-// being worked on (fn_80103D14 reads that profile, not pProfile; every caller passes it): each slot
-// can raise up to two attributes' tiers.
+// being worked on (FE_CrAP_GetEquippedAsset reads that profile, not pProfile; every caller passes
+// it): each slot can raise up to two attributes' tiers.
 void fn_8007873C(SaveProfile* pProfile) {
     s32 i;
     int nAsset;
@@ -774,7 +775,7 @@ void fn_8007873C(SaveProfile* pProfile) {
             pProfile->createdGolfer.tier[i] = 0;
         }
         for (nSlot = 0; nSlot < 53; nSlot++) {
-            nAsset = fn_80103D14(nSlot);
+            nAsset = FE_CrAP_GetEquippedAsset(nSlot);
             if (nAsset >= 0) {
                 nAttrA = FE_CrAP_GetPartAttributeUpgrade1ByAssetID(nAsset);
                 nAttrB = FE_CrAP_GetPartAttributeUpgrade2ByAssetID(nAsset);
@@ -843,21 +844,23 @@ u8 FE_CrAP_IsAssetUndesirable(s16 nPart, CrAPAsset* pAsset) {
 }
 
 // Put a random choice on part nPart: an undesirable one (see FE_CrAP_IsAssetUndesirable) with a
-// chance of 100 - nChance percent, else a desirable one; only choices fn_80104020 allows.
+// chance of 100 - nChance percent, else a desirable one; only choices FE_CrAP_IsAssetAvailableForUser allows.
 void fn_80078A2C(s16 nPart, int nChance) {
     int aChoices[250];
     u32 bDesirable = (int)(Misc_RandFunc(0) % 100) < nChance;
     int nFound = 0;
-    int nCount = fn_801048EC(nPart, 0);
+    int nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(nPart, 0);
     int i;
     int nAsset;
     CrAPAsset* pAsset;
     for (i = 0; i < nCount; i++) {
-        nAsset = fn_80104FA8(nPart, 0, i);
-        pAsset = fn_80104F68(nAsset);
-        if (bDesirable && !FE_CrAP_IsAssetUndesirable(nPart, pAsset) && fn_80104020(nAsset)) {
+        nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, 0, i);
+        pAsset = FE_CrAP_GetAssetFromAssetIndex(nAsset);
+        if (bDesirable && !FE_CrAP_IsAssetUndesirable(nPart, pAsset)
+            && FE_CrAP_IsAssetAvailableForUser(nAsset)) {
             aChoices[nFound++] = i;
-        } else if (!bDesirable && FE_CrAP_IsAssetUndesirable(nPart, pAsset) && fn_80104020(nAsset)) {
+        } else if (!bDesirable && FE_CrAP_IsAssetUndesirable(nPart, pAsset)
+                   && FE_CrAP_IsAssetAvailableForUser(nAsset)) {
             aChoices[nFound++] = i;
         }
     }
@@ -904,11 +907,11 @@ u8 FE_CrAP_IsCrazyHat(CrAPAsset* pAsset) {
     if (pAsset == NULL) {
         return 0;
     }
-    if (stricmp(fn_801064EC(pAsset->nCategory), "Hats") == 0 &&
+    if (stricmp(FE_CrAP_GetStringFromTable(pAsset->nCategory), "Hats") == 0 &&
         strstr(pAsset->szName, "backwards") == NULL) {
         return 0;
     }
-    if (stricmp(fn_801064EC(pAsset->nCategory), "Visors") == 0) {
+    if (stricmp(FE_CrAP_GetStringFromTable(pAsset->nCategory), "Visors") == 0) {
         return 0;
     }
     return 1;
@@ -965,10 +968,10 @@ void fn_80078E34(SaveProfile* pProfile) {
 
     bChance = Misc_RandFunc(0) % 100 < 10;
     bPicking = 1;
-    nCount = fn_801048EC(3, 0);
+    nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(3, 0);
     while (bPicking) {
         nPick = Misc_RandFunc(0) % nCount;
-        pAsset = fn_80104E84(3, 0, nPick);
+        pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(3, 0, nPick);
         if (bChance && pAsset &&
             (stricmp(pAsset->szName, "Corn Rows") == 0 || stricmp(pAsset->szName, "Afro") == 0 ||
              stricmp(pAsset->szName, "Mohawk") == 0)) {
@@ -986,7 +989,7 @@ void fn_80078E34(SaveProfile* pProfile) {
 
     bChance = Misc_RandFunc(0) % 100 < 20;
     if (bChance) {
-        nCount = fn_801048EC(4, 0);
+        nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(4, 0);
         nPick = Misc_RandFunc(0) % (nCount - 1);
         nPick++;
         FE_CrAP_TurnOnPart(4, 0, nPick);
@@ -995,7 +998,7 @@ void fn_80078E34(SaveProfile* pProfile) {
     }
     bChance = Misc_RandFunc(0) % 100 < 10;
     if (bChance) {
-        nCount = fn_801048EC(5, 0);
+        nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(5, 0);
         nPick = Misc_RandFunc(0) % (nCount - 1);
         nPick++;
         FE_CrAP_TurnOnPart(5, 0, nPick);
@@ -1004,7 +1007,7 @@ void fn_80078E34(SaveProfile* pProfile) {
     }
     bChance = Misc_RandFunc(0) % 100 < 10;
     if (bChance) {
-        nCount = fn_801048EC(6, 0);
+        nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(6, 0);
         if (nCount != -1) {
             if (nCount > 1) {
                 nPick = Misc_RandFunc(0) % (nCount - 1);
@@ -1020,10 +1023,10 @@ void fn_80078E34(SaveProfile* pProfile) {
 
     bChance = Misc_RandFunc(0) % 100 < 80;
     bPicking = 1;
-    nCount = fn_801048EC(14, 0);
+    nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(14, 0);
     while (bPicking) {
         nPick = Misc_RandFunc(0) % nCount;
-        pAsset = fn_80104E84(14, 0, nPick);
+        pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(14, 0, nPick);
         if (bChance && !FE_CrAP_IsCrazyHairColor(pAsset)) {
             FE_CrAP_TurnOnPart(14, 0, nPick);
             bPicking = 0;
@@ -1040,10 +1043,10 @@ void fn_80078E34(SaveProfile* pProfile) {
     } else {
         bChance = Misc_RandFunc(0) % 100 < 80;
         bPicking = 1;
-        nCount = fn_801048EC(15, 0);
+        nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(15, 0);
         while (bPicking) {
             nPick = Misc_RandFunc(0) % nCount;
-            pAsset = fn_80104E84(15, 0, nPick);
+            pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(15, 0, nPick);
             if (bChance && !FE_CrAP_IsCrazyFaceHairColor(pAsset)) {
                 FE_CrAP_TurnOnPart(15, 0, nPick);
                 bPicking = 0;
@@ -1059,10 +1062,10 @@ void fn_80078E34(SaveProfile* pProfile) {
     if (bChance) {
         bChance = Misc_RandFunc(0) % 100 < 80;
         bPicking = 1;
-        nCount = fn_801048EC(0, 0);
+        nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(0, 0);
         while (bPicking) {
             nPick = Misc_RandFunc(0) % nCount;
-            pAsset = fn_80104E84(0, 0, nPick);
+            pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(0, 0, nPick);
             if (bChance && !FE_CrAP_IsCrazyHat(pAsset)) {
                 FE_CrAP_TurnOnPart(0, 0, nPick);
                 bPicking = 0;
@@ -1072,20 +1075,20 @@ void fn_80078E34(SaveProfile* pProfile) {
                 bPicking = 0;
             }
         }
-        nAsset = fn_80104FA8(0, 0, nPick);
+        nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(0, 0, nPick);
         sprintf(szDebug, "I hate everone: %d", nAsset);     // a leftover debug line; never shown
     } else {
         FE_CrAP_TurnOnPart(0, 0, 0);
     }
 
-    fn_801073DC(5);
-    fn_801073DC(6);
-    fn_801073DC(7);
-    fn_801073DC(8);
-    fn_801073DC(11);
-    fn_801073DC(12);
-    fn_801073DC(13);
-    fn_801073DC(14);
+    FE_CrAP_UnequipSlot(5);
+    FE_CrAP_UnequipSlot(6);
+    FE_CrAP_UnequipSlot(7);
+    FE_CrAP_UnequipSlot(8);
+    FE_CrAP_UnequipSlot(11);
+    FE_CrAP_UnequipSlot(12);
+    FE_CrAP_UnequipSlot(13);
+    FE_CrAP_UnequipSlot(14);
     if (Misc_RandFunc(0) % 100 < 30) {
         FE_CrAP_RandomizePart(pProfile, 19, 0);
     }
@@ -1094,17 +1097,17 @@ void fn_80078E34(SaveProfile* pProfile) {
     }
     bChance = Misc_RandFunc(0) % 100 < 20;
     if (bChance) {
-        nCount = fn_801048EC(19, 3);
+        nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(19, 3);
         nPick = Misc_RandFunc(0) % nCount;
-        fn_80104E84(19, 3, nPick);
+        FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(19, 3, nPick);
         FE_CrAP_TurnOnPart(19, 0, nPick);
     }
     bChance = Misc_RandFunc(0) % 100 < 5;
     if (bChance) {
-        nCount = fn_801048EC(8, 0);
+        nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(8, 0);
         FE_CrAP_TurnOnPart(8, 0, Misc_RandFunc(0) % nCount);
     } else {
-        fn_801073DC(13);
+        FE_CrAP_UnequipSlot(13);
     }
 }
 
@@ -1139,15 +1142,15 @@ int FE_CrAP_RandomizePart(SaveProfile* pProfile, s16 nPart, int nChance) {
 
 // Part nPart, b at a random choice, which is returned (-1: nothing was picked). With a chance of
 // nChance percent the part is left alone, except in the session's 0x4000 mode (which also skips
-// the intro movie), where it gets its first choice. Outside that mode only choices fn_80104020
-// allows are drawn (none: the first choice).
+// the intro movie), where it gets its first choice. Outside that mode only choices
+// FE_CrAP_IsAssetAvailableForUser allows are drawn (none: the first choice).
 int fn_800797E0(SaveProfile* pProfile, s16 nPart, int b, int nChance) {
     int aChoices[250];
     int nFound = 0;
     int nCount;
     int i;
     int nPick;
-    fn_80105C00();
+    FE_CrAP_GetNumEntriesInCrAPDB();
     if ((int)(Misc_RandFunc(0) % 100) + 1 <= nChance) {
         if (gSession.uFlags & 0x4000) {
             FE_CrAP_TurnOnPart(nPart, b, 0);
@@ -1156,16 +1159,17 @@ int fn_800797E0(SaveProfile* pProfile, s16 nPart, int b, int nChance) {
         return -1;
     }
     if (gSession.uFlags & 0x4000) {
-        nCount = fn_801048EC(nPart, b);
+        nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(nPart, b);
         if (nCount != 0) {
             nPick = Misc_RandFunc(0) % nCount;
             FE_CrAP_TurnOnPart(nPart, b, nPick);
             return nPick;
         }
     } else {
-        nCount = fn_801048EC(nPart, b);
+        nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(nPart, b);
         for (i = 0; i < nCount; i++) {
-            if (fn_80104020(fn_80104FA8(nPart, b, i))) {
+            if (FE_CrAP_IsAssetAvailableForUser(
+                    FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i))) {
                 aChoices[nFound] = i;
                 nFound++;
             }
@@ -1187,7 +1191,7 @@ void fn_80079974(void) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     int i;
     if (lbl_80281ED4->bCopy) {
-        fn_80103B74(0);
+        FE_CrAP_SetTriggerAnims(0);
         FE_CrAP_RandomizePart(pProfile, 9, 0);
         FE_CrAP_TurnOnPart(3, 0, 0);
         FE_CrAP_TurnOnPart(0xE, 0, 0);
@@ -1206,7 +1210,7 @@ void fn_80079974(void) {
             FE_CrAP_TurnOnPart(0xD, 1, i);
         }
         FE_CrAP_TurnOnPart(0xD, 2, 0);
-        fn_80103B74(1);
+        FE_CrAP_SetTriggerAnims(1);
     }
 }
 
