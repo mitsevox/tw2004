@@ -981,7 +981,7 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
         gPlayers[nPlayer].nPutts[Game_CurHoleIndex()]++;
     }
     nNeed = 0;                  // fake match: the flag is worked out in an int first
-    if (!bRoundOver && (!fn_800E1BBC() || Game_CurHoleIndex() != 17)) {
+    if (!bRoundOver && (!GM_FullRoundOfGolf() || Game_CurHoleIndex() != 17)) {
         nNeed = 1;
     }
     bMore = nNeed;
@@ -1032,14 +1032,15 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
         if (lbl_80200538.aHoleGoal[i].n17 != 0 &&
             lbl_80200538.aHoleGoal[i].n17 > fn_800D1330(nPlayer)) continue;
         if (lbl_80200538.aHoleGoal[i].nMaxStrokes != 0 &&
-            lbl_80200538.aHoleGoal[i].nMaxStrokes < fn_800E17AC(nPlayer)) continue;
+            lbl_80200538.aHoleGoal[i].nMaxStrokes < GM_GetPlayerRoundStrokes(nPlayer)) continue;
         if (lbl_80200538.aHoleGoal[i].nKind != 0) {
             if (lbl_80200538.aHoleGoal[i].nKind == 1 && !fn_800D61E4(nPlayer, bPreview)) continue;
             if (lbl_80200538.aHoleGoal[i].nKind == 2 && !fn_800D68CC(nPlayer, bPreview)) continue;
             if (lbl_80200538.aHoleGoal[i].nKind == 3) continue;
             if (lbl_80200538.aHoleGoal[i].nKind == 4 && !fn_800D69B8(nPlayer, bPreview)) continue;
             if (lbl_80200538.aHoleGoal[i].nKind == 5 && fn_800D0E74(nPlayer) != 0) continue;
-            if (lbl_80200538.aHoleGoal[i].nKind == 6 && fn_800D2FB4(0) <= fn_800E17AC(nPlayer)) continue;
+            if (lbl_80200538.aHoleGoal[i].nKind == 6 && fn_800D2FB4(0)
+                <= GM_GetPlayerRoundStrokes(nPlayer)) continue;
         }
         if (lbl_80200538.aHoleGoal[i].nAward >= 23 && lbl_80200538.aHoleGoal[i].nAward <= 38 &&
             (bPreview || !fn_800D9998(nPlayer, lbl_80200538.aHoleGoal[i].nAward))) continue;
@@ -1647,7 +1648,8 @@ int fn_800D782C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll) {
     lbl_80282258 = 0;
     if (gSession.uFlags & 0x4000) return 0;
     if (Player_IsCPU(nPlayer)) return 0;
-    if (Game_GetMode() == 12 || fn_800E39F0() || Game_GetMode() == 22 || Game_GetMode() == 26) return 0;
+    if (Game_GetMode() == 12 || GM_Currently_SkillZoneMode() || Game_GetMode() == 22 || Game_GetMode()
+        == 26) return 0;
     if (gpGame->b137) return 0;
     if (Game_GetMulliganRule() != 0) return 0;
     nProfile = gPlayers[nPlayer].nIndex;
@@ -1671,7 +1673,7 @@ int fn_800D782C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll) {
     }
     nPar = Course_GetCurHolePar();
     nClass = gSurfaceTypes[pBall->nStartSurface].nClass;
-    if (fn_800D8DB4(1) && (nPar == 4 || nPar == 5) && nClass == 1 && !fn_800E2B40(nPlayer, pBall)) {
+    if (fn_800D8DB4(1) && (nPar == 4 || nPar == 5) && nClass == 1 && !GM_IsBallOOB(nPlayer, pBall)) {
         nResult = fn_800D8750(1, (s32)fDist, a, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
             lbl_80200498[lbl_80282258] = nResult;
@@ -1698,7 +1700,8 @@ int fn_800D7B1C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll) {
     lbl_80282258 = 0;
     if (gSession.uFlags & 0x4000) return 0;
     if (Player_IsCPU(nPlayer)) return 0;
-    if (Game_GetMode() == 12 || fn_800E39F0() || Game_GetMode() == 22 || Game_GetMode() == 26) return 0;
+    if (Game_GetMode() == 12 || GM_Currently_SkillZoneMode() || Game_GetMode() == 22 || Game_GetMode()
+        == 26) return 0;
     if (gpGame->b137) return 0;
     if (Game_GetMulliganRule() != 0) return 0;
     nProfile = gPlayers[nPlayer].nIndex;
@@ -1729,7 +1732,8 @@ int fn_800D7B1C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll) {
 }
 
 // After a hole, the round records as fn_800D782C checks the drive: mode 22's (kind 9), the
-// fn_800E39F0 rounds' (kind 8), or the score (0), fn_800D1170's (3) and fn_800D0FBC's (5) counts,
+// GM_Currently_SkillZoneMode rounds' (kind 8), or the score (0), fn_800D1170's (3) and fn_800D0FBC's (5)
+// counts,
 // the holes under par (7) and at two under or better (6) and the putts (4). bCountStroke counts
 // the hole one stroke more meanwhile; the results go to lbl_80200448/lbl_802004C0 as there.
 int fn_800D7DA0(int nPlayer, int bSave, u8 bCountStroke, u8 bAll) {
@@ -1764,7 +1768,7 @@ int fn_800D7DA0(int nPlayer, int bSave, u8 bCountStroke, u8 bAll) {
         }
         return lbl_80282258;
     }
-    if (fn_800E39F0()) {
+    if (GM_Currently_SkillZoneMode()) {
         if (fn_800D8DB4(8)) {
             nResult = fn_800D8750(8, gPlayers[nPlayer].nDD8, bSave, szName, nPlayer);
             if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
@@ -1779,7 +1783,7 @@ int fn_800D7DA0(int nPlayer, int bSave, u8 bCountStroke, u8 bAll) {
     if (bCountStroke) {
         gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]++;
     }
-    nValue = fn_800E17AC(nPlayer);
+    nValue = GM_GetPlayerRoundStrokes(nPlayer);
     if (fn_800D8DB4(0)) {
         nResult = fn_800D8750(0, nValue, bSave, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
@@ -2122,13 +2126,13 @@ void fn_800D8D5C(int nPlayer) {
 
 // Whether records of kind nKind count now: never in modes 9 and 11 or when Game_GetMulliganRule says so;
 // kinds 0 and 3..7 need GM5_IsChallengeRunning off, a round of every hole and fn_8008AB40 off, kinds 1 and 2
-// only GM5_IsChallengeRunning off, kind 8 fn_800E39F0, kind 9 game mode 22.
+// only GM5_IsChallengeRunning off, kind 8 GM_Currently_SkillZoneMode, kind 9 game mode 22.
 u8 fn_800D8DB4(int nKind) {
     if (Game_GetMode() == 9 || Game_GetMode() == 11) return 0;
     if (Game_GetMulliganRule() != 0) return 0;
     switch (nKind) {
     case 0:
-        if (GM5_IsChallengeRunning() || !fn_800E1BBC() || fn_8008AB40()) return 0;
+        if (GM5_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
         return 1;
     case 1:
         if (GM5_IsChallengeRunning()) return 0;
@@ -2137,22 +2141,22 @@ u8 fn_800D8DB4(int nKind) {
         if (GM5_IsChallengeRunning()) return 0;
         return 1;
     case 3:
-        if (GM5_IsChallengeRunning() || !fn_800E1BBC() || fn_8008AB40()) return 0;
+        if (GM5_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
         return 1;
     case 4:
-        if (GM5_IsChallengeRunning() || !fn_800E1BBC() || fn_8008AB40()) return 0;
+        if (GM5_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
         return 1;
     case 5:
-        if (GM5_IsChallengeRunning() || !fn_800E1BBC() || fn_8008AB40()) return 0;
+        if (GM5_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
         return 1;
     case 6:
-        if (GM5_IsChallengeRunning() || !fn_800E1BBC() || fn_8008AB40()) return 0;
+        if (GM5_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
         return 1;
     case 7:
-        if (GM5_IsChallengeRunning() || !fn_800E1BBC() || fn_8008AB40()) return 0;
+        if (GM5_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
         return 1;
     case 8:
-        if (GM5_IsChallengeRunning() || !fn_800E39F0()) return 0;
+        if (GM5_IsChallengeRunning() || !GM_Currently_SkillZoneMode()) return 0;
         return 1;
     case 9:
         if (GM5_IsChallengeRunning() || Game_GetMode() != 22) return 0;
@@ -2362,10 +2366,10 @@ void fn_800D9834(int nPlayer) {
         if (Game_GetMulliganRule() == 0) {
             nProfile = gPlayers[nPlayer].nIndex;
             if (gpSaveData[nProfile].bActive) {
-                if (fn_800E1BBC()) {
+                if (GM_FullRoundOfGolf()) {
                     gpSaveData[nProfile].n7C++;
                     if (gpGame->n4 == 0) {
-                        nStrokes = fn_800E17AC(nPlayer);
+                        nStrokes = GM_GetPlayerRoundStrokes(nPlayer);
                         gpSaveData[nProfile].n74++;
                         gpSaveData[nProfile].n78 += nStrokes;
                         if (gpSaveData[nProfile].nA8 == 0) {
@@ -2483,7 +2487,7 @@ u8 fn_800D9998(int nPlayer, int nAward) {
     case 31:
         return pTour->n4E96 > 11;
     case 32:
-        return fn_800E17AC(nPlayer) < 59;
+        return GM_GetPlayerRoundStrokes(nPlayer) < 59;
     case 33:
         if (bSeasonEnd && bFullSeason &&
             GM_PgaTourSim_GetStatValueFromGolferID(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_SCORING) < 68.17f) {

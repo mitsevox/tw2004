@@ -110,7 +110,7 @@ void GameModeDriverRTE_StartEvent(void) {
     if (gRTEs.aEvent[lbl_80282350].bOff == 0) {
         if (gRTEs.aEvent[lbl_80282350].nChallenge != 0) {
             gSession.nNumPlayers = 1;
-            fn_800E0B38(5);
+            GM_SetModeType(5);
             fn_800EC544(gRTEs.aChallenge, 111);
             fn_800EAE38(gRTEs.aEvent[lbl_80282350].nChallenge - 1);
             fn_800EAF7C();

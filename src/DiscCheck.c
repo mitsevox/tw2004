@@ -144,7 +144,7 @@ void fn_801102AC(void) {
         nStatus = DVDGetDriveStatus();
         fn_80006EDC();
         if (gSession.nGameType == 6) {
-            fn_800E3C0C(0);
+            GUI_ShowToggleFullScreenUI(0);
         }
         fn_8006DBD4();
         fn_80006FE8();

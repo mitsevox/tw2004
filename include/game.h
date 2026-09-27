@@ -224,7 +224,7 @@ int  fn_800D1250(int nPlayer);          // HoleScore.c
 int  fn_800D13F4(int nPlayer);          // HoleScore.c
 int  fn_800D1530(int nPlayer);          // HoleScore.c
 s32  fn_8008AB4C(void);                 // GameUICommands.c
-int  fn_800E184C(int nPlayer, u8 bCurrent);        // GameRound.c
+int  GM_GetGolferRelativeCurrentScore(int nPlayer, u8 bCurrent);        // GameRound.c
 s32  fn_800E81A0(int nPlayer);          // GameModeBattle.c
 s32  fn_800BCCCC(int nPlayer);          // SitDevFile.c: gpGame->pfn208
 s32  fn_800BCCF8(int nPlayer);          // SitDevFile.c: gpGame->pfn200's answer (TW06: GetCurrentLead)
@@ -374,20 +374,20 @@ void fn_800E0AC4(int a);
 // GameRound.c
 void fn_800E0AF0(f32* pA, f32* pB, f32* pOut);
 void fn_800E0B14(f32* pA, f32* pB, f32* pOut);
-void fn_800E0B38(int nMode);            // set up game mode nMode: defaults, then the mode's own setup
+void GM_SetModeType(int nMode);            // set up game mode nMode: defaults, then the mode's own setup
 void fn_800E1018(int nPlayer, int nHole);
 void fn_800E1074(void);
-void fn_800E1260(int nPreset);          // a hole-selection preset for the round
-void fn_800E1404(int nHole);
-void fn_800E1434(void);
-void fn_800E1480(int nHole);            // make a hole of the round the current one
-void fn_800E14E0(int nCourse);
-u8   fn_800E1734(void);                 // the current hole is the round's first
+void GM_SelectHoleSet(int nPreset);          // a hole-selection preset for the round
+void GM_SelectSingleHole(int nHole);
+void GM_InitializeCurrentHoleToFirstSelected(void);
+void GM_SetCurrentHole(int nHole);            // make a hole of the round the current one
+void GM_SetCurrentCourse(int nCourse);
+u8   GM_OnFirstSelectedHole(void);                 // the current hole is the round's first
 int  Game_GetMulliganRule(void);
-int  fn_800E1788(int nPlayer);          // the player's total for the round
-int  fn_800E17AC(int nPlayer);          // the player's total strokes
-int  fn_800E1904(int nPlayer, u8 bCurrent);
-u8   fn_800E1BBC(void);                 // whether the round plays every hole
+int  GM_GetPlayerRoundScore(int nPlayer);          // the player's total for the round
+int  GM_GetPlayerRoundStrokes(int nPlayer);          // the player's total strokes
+int  GM_GetGolferRelativeCumulativeScore(int nPlayer, u8 bCurrent);
+u8   GM_FullRoundOfGolf(void);                 // whether the round plays every hole
 u8   fn_800E1CA8(void);                 // no selected hole is left after the current one
 int  fn_800E1CE8(int a, int b);         // a course and hole to its marked-hole index, or -1
 u8   fn_800E23B0(int nPlayer, int nStrokes);
@@ -402,36 +402,36 @@ s32  fn_800E292C(void);                 // the first player to play (the mode's 
 s32  fn_800E295C(void);                 // the player after that one
 void fn_800E299C(void);
 void fn_800E2A88(void);
-u8   fn_800E2B40(int nPlayer, Ball* pBall);   // out of bounds
-void fn_800E2BA4(void);                 // a random hole from the selection
+u8   GM_IsBallOOB(int nPlayer, Ball* pBall);   // out of bounds
+void GM_Pick_PlayOffHole(void);                 // a random hole from the selection
 u8   fn_800E2DB4(int nPlayer);
 u8   fn_800E2EAC(int nPlayer);          // placing the ball (state 22), or the mode says so
-u8   fn_800E39F0(void);
+u8   GM_Currently_SkillZoneMode(void);
 u8   fn_800E3A54(void);                 // modes 6, 7 and 8
 void fn_800E3B04(void);
 
 // GameUI.c
 void fn_800E3B28(void);
 void fn_800E3BEC(void);
-void fn_800E3C0C(u8 b);                 // show or hide the HUD on the single screen
+void GUI_ShowToggleFullScreenUI(u8 b);                 // show or hide the HUD on the single screen
 void fn_800E3C70(u8 b);
 void fn_800E3CD4(u8 b);
-void fn_800E3D38(int nPlayer, u8 b);    // show or hide a player's HUD
+void GUI_ToggleUI(int nPlayer, u8 b);    // show or hide a player's HUD
 void fn_800E3D90(void);                 // hide every HUD
 u8   fn_800E3DDC(int nPlayer);
-void fn_800E3EE0(void);
-u8   fn_800E415C(void);
-void fn_800E4164(int nMsg, int nPlayer, f32 f);
+void GUI_PauseMenuClosed(void);
+u8   GUI_IsPauseMenuOpen(void);
+void GUI_StartPostShotUI(int nMsg, int nPlayer, f32 f);
 void fn_800E41C8(void);
-void fn_800E41D4(int nPlayer);
-void fn_800E4204(void);
+void GUI_AdvancePostShotUI(int nPlayer);
+void GUI_HideAllHelpTips(void);
 u8   fn_800E4254(int nPlayer);          // whether a message or screen still holds the player
 u8   fn_800E430C(int nPlayer);
 void GUI_QueueMessage(u32 nQueue, int a, int b, int c);    // add an item to a display queue
 void GUI_GolfersTiedUIMessage(void);
 u8   fn_800E45CC(void);                 // whether a queued item, message or deferred screen waits
 u8   fn_800E46B4(void);                 // the display pump; nonzero while anything is showing
-u8   fn_800E4BF8(void);
+u8   GUI_ScoreCardUp(void);
 void fn_800E4C20(u8 bHuman);            // opens the end-of-hole screen, or defers it
 void fn_800E4D88(void);
 void fn_800E4D94(u8 bHuman);            // opens the end-of-round screen, or defers it
@@ -544,7 +544,7 @@ void fn_800E5DA0(void);
 
 // ---- the game modes --------------------------------------------------------------------------
 
-// Each mode's setup, called by fn_800E0B38.
+// Each mode's setup, called by GM_SetModeType.
 void GameModeAlternateShot_Init(void);                 // mode 21 (GameModeAlternateShot.c)
 void GameModeBattle_Init(void);                 // mode 25 (GameModeBattle.c)
 void fn_800E81C4(void);                 // mode 19 (GameModeBestBall.c)

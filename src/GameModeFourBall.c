@@ -324,7 +324,7 @@ u8 GameModeFourBall_GameFinished(u8 bCheck) {
         }
         if (!bCheck) {
             gpGame->nD8++;
-            fn_800E2BA4();
+            GM_Pick_PlayOffHole();
             CLEAR_ROUNDS(PLAYER_AT);
             GUI_GolfersTiedUIMessage();
         }
@@ -366,7 +366,7 @@ u8 GameModeFourBall_GoToPlayoff(u8 bCheck) {
                 gpGame->bD5 = 0;
             }
         }
-        fn_800E2BA4();
+        GM_Pick_PlayOffHole();
         CLEAR_ROUNDS(PLAYER);
         gpGame->bD4 = 1;
         gpGame->nD8++;
@@ -416,7 +416,7 @@ void GameModeFourBall_EndGame(void) {
     int i;
     int nMoney;
     int k;
-    if (fn_800E1BBC()) {
+    if (GM_FullRoundOfGolf()) {
         switch (GM5_IsChallengeRunning()) {
         case 0:
             break;

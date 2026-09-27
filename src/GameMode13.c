@@ -89,7 +89,7 @@ void fn_800F6A60(void) {
     gpGame->n290 = 0;
     gpGame->n294 = 0;
     gpGame->nDC = 0;
-    fn_800E1480(0);
+    GM_SetCurrentHole(0);
     lbl_80282360 = 0;
     gSession.nSplitScreen = 0;
     gSession.nPinSet = 0;
@@ -391,7 +391,7 @@ void fn_800F6ED4(int nPlayer) {
             nMsg = 0x14;
         }
     }
-    if (fLength > gPlayers[nPlayer].nDDC && !fn_800E2B40(nPlayer, &gPlayers[nPlayer].ball)) {
+    if (fLength > gPlayers[nPlayer].nDDC && !GM_IsBallOOB(nPlayer, &gPlayers[nPlayer].ball)) {
         gPlayers[nPlayer].nDDC = fLength;
     }
     if (nMsg != -1) {
@@ -562,7 +562,7 @@ s32 fn_800F80A0(s32 a) {
 
 void fn_800F80A8(void) {
     EASBio_SetCurrentGameWon(1);
-    fn_800E3C0C(0);
+    GUI_ShowToggleFullScreenUI(0);
 }
 
 void fn_800F80D4(s32 p0) {

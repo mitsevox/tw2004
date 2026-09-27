@@ -521,7 +521,7 @@ typedef struct GameState {
     s32  nCurHole;              // 0x064  0..17 in the round
     s32  nHoleNum[18];          // 0x068  and which hole of that course (a custom round mixes courses)
     u8   bHoleSelected[18];     // 0x0B0  holes this round plays (GM_GotoNextSelectedHole)
-    u8   bHoleSaved[18];        // 0x0C2  a copy of the selection (random-hole play, fn_800E2BA4)
+    u8   bHoleSaved[18];        // 0x0C2  a copy of the selection (random-hole play, GM_Pick_PlayOffHole)
     u8   bD4;                   // 0x0D4
     u8   bD5;                   // 0x0D5
     u8   unkD6[2];
@@ -544,7 +544,7 @@ typedef struct GameState {
     s32  n158[5];               // 0x158  per player, cleared at the start of a hole
     u8   b16C[5][18];           // 0x16C  per player and hole, cleared with the hole's score
     u8   unk1C6[0x1C8 - 0x1C6];
-    // The mode's callbacks (0x1C8..0x26C). fn_800E0B38 sets them all to defaults (mostly empty
+    // The mode's callbacks (0x1C8..0x26C). GM_SetModeType sets them all to defaults (mostly empty
     // stubs), then the mode's own setup replaces the ones it needs. The names are TW06's
     // GameModeBase methods, from the modes' implementations (GameModeStroke, GameModeMatch, ...).
     void (*pfnInit)(void);      // 0x1C8  the mode's setup. TW06: Init

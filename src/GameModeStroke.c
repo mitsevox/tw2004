@@ -24,7 +24,7 @@ void GameModeStroke_Init(void) {
     gpGame->nC = 4;
     gpGame->n10 = 1;
     gpGame->nDC = 0;
-    fn_800E1480(0);
+    GM_SetCurrentHole(0);
     gSession.nSplitScreen = 0;
 }
 
@@ -187,7 +187,7 @@ void GameModeStroke_EndGame(void) {
     int nProfile;
     u8 bFirst;
     bFirst = 1;
-    if (fn_800E1BBC()) {
+    if (GM_FullRoundOfGolf()) {
         switch (GM5_IsChallengeRunning()) {
         case 0:
             break;
@@ -197,10 +197,10 @@ void GameModeStroke_EndGame(void) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (!Player_IsCPU(i)) {
                 nBest = -1;
-                nScore = fn_800E1788(i);
+                nScore = GM_GetPlayerRoundScore(i);
                 for (j = 0; j < gNumPlayersSetUp; j++) {
                     if (i != j && Player_IsCPU(j)) {
-                        nOther = fn_800E1788(j);
+                        nOther = GM_GetPlayerRoundScore(j);
                         if (nScore < nOther) {
                             nRating = GM_Earnings_RateGolfer(j);
                             if (nRating > nBest) {

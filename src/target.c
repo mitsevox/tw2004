@@ -84,7 +84,7 @@ void fn_80067CD4(int nPlayer) {
         PlaceBall_RenderBallTarget(nPlayer);
         return;
     }
-    if ((s8)nState != GS_WAIT && !Player_IsCPU(nPlayer) && !fn_800E415C() && !fn_800E5098()
+    if ((s8)nState != GS_WAIT && !Player_IsCPU(nPlayer) && !GUI_IsPauseMenuOpen() && !fn_800E5098()
         && ((u8)(nState - GS_SHOT_SETUP) <= GS_ELEVATOR - GS_SHOT_SETUP || (s8)nState == GS_KNEE_CAM
             || (s8)nState == GS_SWING || (s8)nState == GS_GREEN_MORPH)
         && gPlayers[nPlayer].swing.nState == 0) {

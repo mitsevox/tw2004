@@ -188,7 +188,7 @@ void fn_8008F80C(s32 n, s32 b) {
 }
 
 // Read the controllers for the UI. The main stick works the D-pad in start-up, the menus and (when
-// fn_800E415C says so) game type 6. In a round, nothing happens while a player's view runs a
+// GUI_IsPauseMenuOpen says so) game type 6. In a round, nothing happens while a player's view runs a
 // scripted camera (fn_80063C90, or script camera 3) other than camera 0x15. Each plugged-in
 // controller's buttons (the stick's directions folded into the D-pad bits) are compared with last
 // frame's, a held button repeating every 9 frames; each newly pressed button sends its
@@ -212,7 +212,7 @@ void fn_8008F820(void) {
 
     fOne = 1.0f;
     if (gSession.nGameType == 3 || gSession.nGameType == 1 ||
-        (gSession.nGameType == 6 && fn_800E415C())) {
+        (gSession.nGameType == 6 && GUI_IsPauseMenuOpen())) {
         fn_800130EC(1);
     } else {
         fn_800130EC(0);

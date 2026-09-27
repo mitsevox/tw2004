@@ -11,7 +11,7 @@
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState and the (u8) on GOLFERSTATE_Set's player (see game.h).
 
-int  fn_800E19A4(int nPlayer, int nHoles);
+int  GM_GetPlayerRoundScoreThroughHole(int nPlayer, int nHoles);
 void fn_800E25CC(u8 b);
 
 void  fn_800D8D5C(int nPlayer);   // clears the player's words at 0x314-0x350
@@ -104,7 +104,7 @@ void fn_800E0B14(f32* pA, f32* pB, f32* pOut) {
 
 // Sets up a game mode: the rule flags and callbacks to their defaults (the callbacks are mostly
 // empty stubs), then the mode's own setup (26 modes; 3 has none), then the round as holes 1..18.
-void fn_800E0B38(int nMode) {
+void GM_SetModeType(int nMode) {
     int i;
     gpGame->nMode = nMode;
     gpGame->bD4 = 0;
@@ -336,7 +336,7 @@ void fn_800E1074(void) {
 
 // A hole-selection preset for the round: 0 none, 1 all, 2 the front nine, 3 the back nine,
 // 4/5/6 only the par 5s/4s/3s, 7 all; then the first selected hole.
-void fn_800E1260(int nPreset) {
+void GM_SelectHoleSet(int nPreset) {
     int i;
     for (i = 0; i < 18; i++) {
         switch (nPreset) {
@@ -386,21 +386,21 @@ void fn_800E1260(int nPreset) {
             break;
         }
     }
-    fn_800E1434();
+    GM_InitializeCurrentHoleToFirstSelected();
 }
 
 // Adds a hole to the round and moves to the round's first hole.
-void fn_800E1404(int nHole) {
+void GM_SelectSingleHole(int nHole) {
     gpGame->bHoleSelected[nHole] = 1;
-    fn_800E1434();
+    GM_InitializeCurrentHoleToFirstSelected();
 }
 
 // Moves to the round's first hole.
-void fn_800E1434(void) {
+void GM_InitializeCurrentHoleToFirstSelected(void) {
     int i;
     for (i = 0; i < 18; i++) {
         if (gpGame->bHoleSelected[i]) {
-            fn_800E1480(i);
+            GM_SetCurrentHole(i);
             return;
         }
     }
@@ -408,7 +408,7 @@ void fn_800E1434(void) {
 
 // Makes a hole of the round the current one: its number, and its course when the round mixes
 // courses.
-void fn_800E1480(int nHole) {
+void GM_SetCurrentHole(int nHole) {
     gpGame->nCurHole = nHole;
     gpGame->nCurHoleNum = gpGame->nHoleNum[nHole];
     if (gpGame->b136 || gpGame->b137 || gpGame->b139 || gpGame->b138) {
@@ -419,7 +419,7 @@ void fn_800E1480(int nHole) {
 // Sets the round's course. 23, 22 and 24..29 are the mixed rounds (built by fn_800E30D4,
 // fn_800E2FD8 and fn_800E3050); any other value is one course's holes 1..18 (while b136 is
 // set, only the current course changes).
-void fn_800E14E0(int nCourse) {
+void GM_SetCurrentCourse(int nCourse) {
     int i;
     if (nCourse == 23) {
         fn_800E30D4();
@@ -464,7 +464,7 @@ int fn_800E16F4(void) {
 }
 
 // Whether the current hole is the round's first.
-u8 fn_800E1734(void) {
+u8 GM_OnFirstSelectedHole(void) {
     int i;
     for (i = 0; i < 18; i++) {
         if (gpGame->bHoleSelected[i]) {
@@ -480,12 +480,12 @@ int Game_GetMulliganRule(void) {
 }
 
 // A player's total for the round (all 18 holes).
-int fn_800E1788(int nPlayer) {
-    return fn_800E19A4(nPlayer, 18);
+int GM_GetPlayerRoundScore(int nPlayer) {
+    return GM_GetPlayerRoundScoreThroughHole(nPlayer, 18);
 }
 
 // A player's total strokes for the round.
-int fn_800E17AC(int nPlayer) {
+int GM_GetPlayerRoundStrokes(int nPlayer) {
     int i;
     int n = 0;
     for (i = 0; i < 18; i++) {
@@ -496,7 +496,7 @@ int fn_800E17AC(int nPlayer) {
 
 // Strokes against par over the holes played so far (and the current one, when asked and the
 // ball is in the hole).
-int fn_800E184C(int nPlayer, u8 bCurrent) {
+int GM_GetGolferRelativeCurrentScore(int nPlayer, u8 bCurrent) {
     int nPar;
     int nStrokes = 0;
     int i;
@@ -516,7 +516,7 @@ int fn_800E184C(int nPlayer, u8 bCurrent) {
 
 // The score shown for a player: the PGA TOUR simulation's while the tour runs, n2D8 in a playoff
 // (gpGame->bD4), else strokes against par while gpGame->nDC < nE0, and 0 after that.
-int fn_800E1904(int nPlayer, u8 bCurrent) {
+int GM_GetGolferRelativeCumulativeScore(int nPlayer, u8 bCurrent) {
     if (fn_800EE470()) {
         return GM_PgaTourSim_GetRelativeScoreFromEntrantID(nPlayer, 0, bCurrent);
     }
@@ -524,14 +524,14 @@ int fn_800E1904(int nPlayer, u8 bCurrent) {
         return gPlayers[nPlayer].n2D8;
     }
     if (gpGame->nDC < gpGame->nE0) {
-        return fn_800E184C(nPlayer, bCurrent);
+        return GM_GetGolferRelativeCurrentScore(nPlayer, bCurrent);
     }
     return 0;
 }
 
 // A player's total for the first nHoles holes: the mode's points in mode 18 (Stableford), the
 // team's better score per hole (fn_800E8C24) in mode 19 (best ball), strokes otherwise.
-int fn_800E19A4(int nPlayer, int nHoles) {
+int GM_GetPlayerRoundScoreThroughHole(int nPlayer, int nHoles) {
     int n;
     int i;
     if (Game_GetMode() == 19) {
@@ -555,7 +555,7 @@ int fn_800E19A4(int nPlayer, int nHoles) {
 
 // Whether the round plays every hole (in a playoff, gpGame->bD4, the answer bD5 kept from
 // before the playoff narrowed the selection).
-u8 fn_800E1BBC(void) {
+u8 GM_FullRoundOfGolf(void) {
     int i;
     if (gpGame->bD4) {
         return gpGame->bD5;
@@ -968,7 +968,7 @@ void fn_800E2A88(void) {
 }
 
 // Out of bounds: outside the in-bounds area, or the ball out (state 5) or in lie 16.
-u8 fn_800E2B40(int nPlayer, Ball* pBall) {
+u8 GM_IsBallOOB(int nPlayer, Ball* pBall) {
     if (!Ter_PointInOOBNetwork(pBall->vPos)) {
         return 1;
     }
@@ -979,7 +979,7 @@ u8 fn_800E2B40(int nPlayer, Ball* pBall) {
 }
 
 // A random hole from the round's selection, not the one just played.
-void fn_800E2BA4(void) {
+void GM_Pick_PlayOffHole(void) {
     int  nHoles[18];
     int  n = 0;
     int  i;
@@ -998,15 +998,15 @@ void fn_800E2BA4(void) {
         }
     }
     if (n == 0) {
-        fn_800E1260(0);
-        fn_800E1480(nCur);
-        fn_800E1404(nCur);
+        GM_SelectHoleSet(0);
+        GM_SetCurrentHole(nCur);
+        GM_SelectSingleHole(nCur);
         return;
     }
-    fn_800E1260(0);
+    GM_SelectHoleSet(0);
     nCur = nHoles[Misc_RandFunc(0) % n];
-    fn_800E1480(nCur);
-    fn_800E1404(nCur);
+    GM_SetCurrentHole(nCur);
+    GM_SelectSingleHole(nCur);
 }
 
 // Whether the ball is in the hole (never in modes 13-17), setting its lie to holed: with
@@ -1018,7 +1018,7 @@ u8 fn_800E2DB4(int nPlayer) {
     f32         dz;
     f32         fDist;
     u8          b;
-    if (fn_800E39F0()) {
+    if (GM_Currently_SkillZoneMode()) {
         return 0;
     }
     pCourse = Ter_GetTGD();
@@ -1298,11 +1298,11 @@ void fn_800E30D4(void) {
             gpGame->nHoleNum[i] = nHole;
         }
     }
-    fn_800E1434();
+    GM_InitializeCurrentHoleToFirstSelected();
 }
 
 // Modes 13-17.
-u8 fn_800E39F0(void) {
+u8 GM_Currently_SkillZoneMode(void) {
     if (Game_GetMode() == 13 || Game_GetMode() == 14 || Game_GetMode() == 15 || Game_GetMode() == 16 ||
         Game_GetMode() == 17) {
         return 1;
@@ -1318,7 +1318,7 @@ u8 fn_800E3A54(void) {
     return 0;
 }
 
-// The default mode callbacks fn_800E0B38 installs.
+// The default mode callbacks GM_SetModeType installs.
 s32 fn_800E3AA0(int a, int nTarget) {
     return 0;
 }

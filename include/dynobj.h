@@ -391,8 +391,8 @@ typedef struct GoDynObjMgr {
     UObject* pTeo10000;         // 0xA54  'TEO ' 10000
     UObject* apTeo10030[4];     // 0xA58  'TEO ' 10030..10033
     UObject* apTeo10040[4];     // 0xA68  'TEO ' 10040..10043
-    UObject* apTeo10020[3];     // 0xA78  'TEO ' 10020..10022, only with fn_800E39F0
-    UObject* apTeo10006[4];     // 0xA84  'TEO ' 10006..10009, only with fn_800E39F0
+    UObject* apTeo10020[3];     // 0xA78  'TEO ' 10020..10022, only with GM_Currently_SkillZoneMode
+    UObject* apTeo10006[4];     // 0xA84  'TEO ' 10006..10009, only with GM_Currently_SkillZoneMode
     f32  fA94;                  // 0xA94
     f32  fA98;                  // 0xA98
     f32  fA9C;                  // 0xA9C

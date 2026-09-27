@@ -47,10 +47,10 @@ void fn_800E508C(void) {
 }
 
 // Nonzero holds shot input (lbl_802822BE). The first poll after fn_800E50FC instead calls
-// fn_800E3C0C(1), sends message 0x1E with 1, clears the request and returns 1.
+// GUI_ShowToggleFullScreenUI(1), sends message 0x1E with 1, clears the request and returns 1.
 u8 fn_800E5098(void) {
     if (lbl_802822BD) {
-        fn_800E3C0C(1);
+        GUI_ShowToggleFullScreenUI(1);
         fn_80062C80(gPlayers[lbl_80282278].nC58, 1);
         lbl_802822BD = 0;
         return 1;

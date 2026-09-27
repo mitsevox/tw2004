@@ -173,7 +173,7 @@ static f32 stateFunc_StrippedFn(f32 x) {
 // State 1 begins: addressing the ball. Camera 25 and the game's 0x20C hook; a fresh Shot_Plan
 // when the game asks (gpGame+0x276, and it ends any replay); the glove comes off for a putt;
 // both views attached; the ball teed up on the tee and kept as it lies; fA64 stored; events 0x2A
-// and 3; fn_800E3D38(n, 1) for a CPU outside game type 8; and if GM_DoPreshotAnimation says so,
+// and 3; GUI_ToggleUI(n, 1) for a CPU outside game type 8; and if GM_DoPreshotAnimation says so,
 // the pre-shot animation - 10 with a low-IQ penalty away from the tee (unless fn_80100294()),
 // else 1 - and camera 11.
 void STATEFUNC_PreShotInit(int nPlayer) {
@@ -232,7 +232,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
     gPlayers[nPlayer].fA64 = fn_800D04AC(nPlayer);
     EVENT_Trigger(nPlayer, 3, 0, -1);
     if (gSession.nGameType != 8 && Player_IsCPU(nPlayer)) {
-        fn_800E3D38(nPlayer, 1);
+        GUI_ToggleUI(nPlayer, 1);
     }
     if (GM_DoPreshotAnimation(nPlayer) != 0) {
         SKATime_UnPause(gPlayers[nPlayer].pChar->anim);
@@ -476,7 +476,7 @@ void STATEFUNC_ShotSetupUpdate(int nPlayer) {
 
 void STATEFUNC_ShotSetupExit(int nPlayer) {
     if (gSession.nGameType != 8 && gPlayers[nPlayer].ball.nLie != LIE_INCUP_e && !Player_IsCPU(nPlayer)) {
-        fn_800E3D38(nPlayer, 1);
+        GUI_ToggleUI(nPlayer, 1);
     }
 }
 
@@ -518,15 +518,15 @@ void STATEFUNC_SwingInit(int nPlayer) {
     if (gPlayers[nPlayer].bC2E == 0 && gpGame->b281 != 0 && !Player_IsCPU(nPlayer)) {
         if (fn_800DA264() && fn_800DA174()) {
             fn_800E505C(0);
-            fn_800E3D38(nPlayer, 0);
+            GUI_ToggleUI(nPlayer, 0);
             fn_80062C80(gPlayers[nPlayer].nC58, 0);
         } else if (fn_800DA264() && fn_800DA1D4()) {
             fn_800E505C(1);
-            fn_800E3D38(nPlayer, 0);
+            GUI_ToggleUI(nPlayer, 0);
             fn_80062C80(gPlayers[nPlayer].nC58, 0);
         } else if (fn_800DA264() && fn_800DA234()) {
             fn_800E505C(2);
-            fn_800E3D38(nPlayer, 0);
+            GUI_ToggleUI(nPlayer, 0);
             fn_80062C80(gPlayers[nPlayer].nC58, 0);
         } else {
             fn_800D1DAC(nPlayer);
@@ -538,7 +538,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
         } else {
             fn_800E4FFC(fn_800EAC7C());
         }
-        fn_800E3D38(nPlayer, 0);
+        GUI_ToggleUI(nPlayer, 0);
         fn_80062C80(gPlayers[nPlayer].nC58, 0);
         fn_800ED548();
     }
@@ -590,11 +590,11 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
     if (gpGame->b282 != 0) {
         if (fn_800E3DDC(nPlayer)) {
             if (gPlayers[nPlayer].swing.nState != 0) {
-                fn_800E3D38(nPlayer, 0);
+                GUI_ToggleUI(nPlayer, 0);
             }
         } else {
             if (gPlayers[nPlayer].swing.nState == 0) {
-                fn_800E3D38(nPlayer, 1);
+                GUI_ToggleUI(nPlayer, 1);
             }
         }
     }
@@ -646,7 +646,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
             TARGET_ResetMomentums(nPlayer);
             fn_800642D0_ReapplyCurrentShot(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]),
                                            nPlayer);
-            fn_800E3D38(nPlayer, 1);
+            GUI_ToggleUI(nPlayer, 1);
         } else {
             TARGET_ResetMomentums(nPlayer);
         }
@@ -907,13 +907,13 @@ void STATEFUNC_ElevatorExit(int nPlayer) {
         nView = gPlayers[nPlayer].nView[0];
         CameraController_SetCameraMode(ViewController_GetCameraController(nView), 0, nPlayer, nView);
     }
-    fn_800E3D38(nPlayer, 1);
+    GUI_ToggleUI(nPlayer, 1);
 }
 
 void STATEFUNC_GreenInit(int nPlayer) {
     int nView = gPlayers[nPlayer].nView[0];
     CameraController_SetCameraMode(ViewController_GetCameraController(nView), 4, nPlayer, nView);
-    fn_800E3D38(nPlayer, 0);
+    GUI_ToggleUI(nPlayer, 0);
 }
 
 // Pop the state once neither button 2 nor button 3 is held.
@@ -934,7 +934,7 @@ void STATEFUNC_GreenExit(int nPlayer) {
         nView = gPlayers[nPlayer].nView[0];
         CameraController_SetCameraMode(ViewController_GetCameraController(nView), 0, nPlayer, nView);
     }
-    fn_800E3D38(nPlayer, 1);
+    GUI_ToggleUI(nPlayer, 1);
 }
 
 // State 6: the putt preview. The caddie's solved shot is taken, the player is made a CPU for
@@ -964,7 +964,7 @@ void STATEFUNC_GreenWatchRollInit(int nPlayer) {
     Mem_cpy(pBall, &ballSaved, sizeof(Ball));
     Mem_cpy(pShot, shotSaved, 0x5C);   // port: as above
     REPLAY_Save(nPlayer);
-    fn_800E3D38(nPlayer, 0);
+    GUI_ToggleUI(nPlayer, 0);
 }
 
 // State 6, the putt preview playing. Button 0 ends it (any pad for a CPU). Otherwise the ghost
@@ -1035,7 +1035,7 @@ void STATEFUNC_GreenWatchRollExit(int nPlayer) {
         nView = gPlayers[nPlayer].nView[0];
         CameraController_SetCameraMode(ViewController_GetCameraController(nView), 0, nPlayer, nView);
     }
-    fn_800E3D38(nPlayer, 1);
+    GUI_ToggleUI(nPlayer, 1);
 }
 
 void STATEFUNC_GreenReversePuttInit(int nPlayer) {
@@ -1048,7 +1048,7 @@ void STATEFUNC_GreenReversePuttUpdate(int nPlayer) {
         && !(Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(5, 1))) {
         GOLFERSTATE_Pop(nPlayer);
     } else {
-        fn_800E3D38(nPlayer, 0);
+        GUI_ToggleUI(nPlayer, 0);
     }
 }
 
@@ -1061,7 +1061,7 @@ void STATEFUNC_GreenReversePuttExit(int nPlayer) {
         nView = gPlayers[nPlayer].nView[0];
         CameraController_SetCameraMode(ViewController_GetCameraController(nView), 0, nPlayer, nView);
     }
-    fn_800E3D38(nPlayer, 1);
+    GUI_ToggleUI(nPlayer, 1);
 }
 
 void STATEFUNC_KneeCamInit(int nPlayer) {
@@ -1113,7 +1113,7 @@ void STATEFUNC_KneeCamExit(int nPlayer) {
 void STATEFUNC_GreenMorphInit(int nPlayer) {
     int nView = gPlayers[nPlayer].nView[0];
     CameraController_SetCameraMode(ViewController_GetCameraController(nView), 4, nPlayer, nView);
-    fn_800E3D38(nPlayer, 0);
+    GUI_ToggleUI(nPlayer, 0);
 }
 
 // State 9: the putt-line view. Pops when neither button 46 nor 48 is held and the view's f54
@@ -1171,7 +1171,7 @@ void STATEFUNC_GreenMorphExit(int nPlayer) {
         nView = gPlayers[nPlayer].nView[0];
         CameraController_SetCameraMode(ViewController_GetCameraController(nView), 0, nPlayer, nView);
     }
-    fn_800E3D38(nPlayer, 1);
+    GUI_ToggleUI(nPlayer, 1);
 }
 
 // State 12: the ball is away. In a replay with the kept ball unset, a special path; otherwise
@@ -1407,7 +1407,7 @@ const Vec4    lbl_80183620 = {0.0f, 0.0f, 0.0f, 0.5f};   // 0, 0, 0, 0.5 (assign
 // when the reaction animation is far enough along, it is state 15 (fade to tap-in) if a gimme is
 // allowed, else a fade out starts. With fn_800E4254: a human outside split screen can take a
 // mulligan (button 25, if allowed), watch the replay (button 24, if recorded and allowed) or
-// continue (button 0, fn_800E41D4); a CPU continues on any pad's button 0.
+// continue (button 0, GUI_AdvancePostShotUI); a CPU continues on any pad's button 0.
 void STATEFUNC_ShowYardageUpdate(int nPlayer) {
     View* pV    = ViewController_GetCameraController(gPlayers[nPlayer].nView[0]);
     Vec4  vOffset;
@@ -1480,15 +1480,15 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
             }
         }
         if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0)) {
-            fn_800E41D4(nPlayer);
+            GUI_AdvancePostShotUI(nPlayer);
         }
     } else if (!Player_IsCPU(nPlayer)) {
         if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0)) {
-            fn_800E41D4(nPlayer);
+            GUI_AdvancePostShotUI(nPlayer);
         }
     } else {
         if (Controller_AnyPadHasButtons(Controller_GetButtonMask(0, 0))) {
-            fn_800E41D4(nPlayer);
+            GUI_AdvancePostShotUI(nPlayer);
         }
     }
 }
@@ -1564,7 +1564,7 @@ void STATEFUNC_TapInInit(int nPlayer) {
     Character_AlignShotWithTarget(nPlayer, 1, 1);
     gPlayers[nPlayer].uFlags |= 8;
     gPlayers[nPlayer].fA64 = fn_800D0478(nPlayer);
-    fn_800E4204();
+    GUI_HideAllHelpTips();
     fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut = 1;
 }
 
@@ -1858,7 +1858,7 @@ void STATEFUNC_MidHoleFlyByInit(int nPlayer) {
         }
     }
     GolfCamera_SetCameraMatrixMode(0);
-    fn_800E3D38(nPlayer, 0);
+    GUI_ToggleUI(nPlayer, 0);
     fn_80045824(nPlayer);
     fn_800DC9D4(1);
 }
@@ -1913,7 +1913,7 @@ void STATEFUNC_MidHoleFlyByExit(int nPlayer) {
                                            nPlayer, nView);
         }
     }
-    fn_800E3D38(nPlayer, 1);
+    GUI_ToggleUI(nPlayer, 1);
     fn_800DC9D4(0);
 }
 
@@ -2011,7 +2011,7 @@ void STATEFUNC_PlaceBallUpdate(int nPlayer) {
 }
 
 void STATEFUNC_PlaceBallExit(int nPlayer) {
-    fn_800E3C0C(1);
+    GUI_ShowToggleFullScreenUI(1);
 }
 
 void fn_80062B60(int nPlayer) {

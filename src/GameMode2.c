@@ -207,7 +207,7 @@ u8 GameModeSkins_GameFinished(u8 bCheck) {
         }
         nHole = Game_CurHoleIndex();
         while (nHole == Game_CurHoleIndex()) {
-            fn_800E1480(Misc_RandFunc(0) % 18);
+            GM_SetCurrentHole(Misc_RandFunc(0) % 18);
         }
         gpGame->bHoleSelected[Game_CurHoleIndex()] = 1;
         // Every player's scores are cleared for the new playoff hole.
@@ -268,7 +268,7 @@ u8 GameModeSkins_GoToPlayoff(u8 bCheck) {
     }
     nHole = Game_CurHoleIndex();
     while (nHole == Game_CurHoleIndex()) {
-        fn_800E1480(Misc_RandFunc(0) % 18);
+        GM_SetCurrentHole(Misc_RandFunc(0) % 18);
     }
     gpGame->bHoleSelected[Game_CurHoleIndex()] = 1;
     // Every player's scores are cleared for the playoff.
@@ -377,7 +377,7 @@ s32 GameModeSkins_CurrentHoleValue(void) {
     if (gpGame->bD4) {
         return lbl_802823C4;
     }
-    if (fn_800E4BF8()) {
+    if (GUI_ScoreCardUp()) {
         for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
             if (gpGame->bHoleSelected[h]) {
                 return lbl_802823C4 + GM_Earnings_GetSkinsHoleValue(GM_GetHighestRatedGolfer(), h);

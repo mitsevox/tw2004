@@ -81,7 +81,7 @@ void fn_800F4B40(void) {
     gpGame->nDC = 0;
     lbl_80282360 = 0;
     gSession.nPinSet = 0;
-    fn_800E1480(0);
+    GM_SetCurrentHole(0);
 }
 
 void fn_800F4D6C(void) {

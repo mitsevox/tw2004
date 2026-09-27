@@ -144,7 +144,7 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         nMode = Game_GetMode();
         SitDev_SetStateValue(pValues, 1, (int)nMode, pSetBits);                  // fake match: (int) re-masks
         SitDev_SetStateValue(pValues, 54, (int)fn_800BB3F8(nMode), pSetBits);    // fake match: (int) re-masks
-        SitDev_SetStateValue(pValues, 60, fn_800E1734(), pSetBits);
+        SitDev_SetStateValue(pValues, 60, GM_OnFirstSelectedHole(), pSetBits);
         SitDev_SetStateValue(pValues, 0, Game_GetCurHoleNum() + 1, pSetBits);
         SitDev_SetStateValue(pValues, 30, Game_GetCourse(), pSetBits);
         SitDev_SetStateValue(pValues, 83, GameModeDriverPGATour_GetCurrentEventID() + 1, pSetBits);
@@ -215,8 +215,8 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         SitDev_SetStateValue(pValues, 38, fn_800BCCF8(nPlayer), pSetBits);
         SitDev_SetStateValue(pValues, 51, fn_800CF848(nPlayer), pSetBits);
         SitDev_SetStateValue(pValues, 52, fn_800CF77C(nPlayer), pSetBits);
-        SitDev_SetStateValue(pValues, 37, fn_800E184C(nPlayer, 0), pSetBits);
-        SitDev_SetStateValue(pValues, 55, fn_800E1904(nPlayer, 0), pSetBits);
+        SitDev_SetStateValue(pValues, 37, GM_GetGolferRelativeCurrentScore(nPlayer, 0), pSetBits);
+        SitDev_SetStateValue(pValues, 55, GM_GetGolferRelativeCumulativeScore(nPlayer, 0), pSetBits);
         // radians to degrees
         nDeg = 180.0f * fn_800D0960(nPlayer) / PI;
         SitDev_SetStateValue(pValues, 17, nDeg, pSetBits);

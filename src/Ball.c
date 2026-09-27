@@ -1048,7 +1048,7 @@ static inline int Ball_Owner(Ball* pBall) {
 
 // The ground under a rolling ball: its surface and normal. No ground: if there is none under
 // the other source either (or it is more than 1 in above the ball), the ball may coast on for
-// up to two ticks on surface 109 (or its own) as if on flat ground - unless fn_800E2B40 says
+// up to two ticks on surface 109 (or its own) as if on flat ground - unless GM_IsBallOOB says
 // otherwise - and is a hazard after that. Returns 0 for a hazard.
 u8 Physics_GetSurfaceInfo(Ball* pBall, SurfaceType** ppSurface, f32* pNormal) {
     SurfaceType* pSurface;
@@ -1066,7 +1066,7 @@ u8 Physics_GetSurfaceInfo(Ball* pBall, SurfaceType** ppSurface, f32* pNormal) {
         }
         if (lbl_80281DDC < -60000.0f || fDrop > 0.028f) {
             nPlayer = Ball_Owner(pBall);
-            if (lbl_80281DDC < -60000.0f && pBall->fAC < 2.0f && !fn_800E2B40(nPlayer, pBall)) {
+            if (lbl_80281DDC < -60000.0f && pBall->fAC < 2.0f && !GM_IsBallOOB(nPlayer, pBall)) {
                 // EA bug: meant as a range check (nSurface >= 156); as written any valid surface
                 // becomes 109 and one past the table is kept and read below
                 if (pBall->nSurface < 0 || pBall->nSurface < 156) {

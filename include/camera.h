@@ -181,8 +181,8 @@ typedef struct CamSequence {
     u8   b47;                   // 0x47  0 humans, 1 CPU players, 2 not in a replay, 3 in a replay,
                                 //       4 in a replay or a CPU player (fn_8003CEEC); the swing camera
                                 //       starts its shot with blend 5, time 0 when it is nonzero
-    u8   b48;                   // 0x48  0 single-view play outside modes 9 and 11 and fn_800E39F0;
-                                //       1 split screen or modes 9 and 11; 2 fn_800E39F0 (fn_8003D140)
+    u8   b48;                   // 0x48  0 single-view play outside modes 9 and 11 and GM_Currently_SkillZoneMode;
+                                //       1 split screen or modes 9 and 11; 2 GM_Currently_SkillZoneMode (fn_8003D140)
     u8   b49;                   // 0x49  a bit mask
     u8   b4A;                   // 0x4A  a bit mask
     s8   n4B;                   // 0x4B  one bit per value of Course_GetCurHolePar

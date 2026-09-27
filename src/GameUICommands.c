@@ -286,7 +286,7 @@ u8    fn_800DAD44(void);
 s32   fn_800DAD4C(void);
 s32   fn_800DADC0(void);
 int   fn_800E16F4(void);
-int   fn_800E19A4(int nPlayer, int nHoles);
+int   GM_GetPlayerRoundScoreThroughHole(int nPlayer, int nHoles);
 void  fn_800E3E3C(void);
 void  fn_800E3ECC(void);
 void  fn_800E4238(int i);
@@ -667,11 +667,11 @@ void fn_80085F5C(MsgArg* pArgs, MsgArg* pResult) {
 // A player's strokes on a hole; "hole" 18 is the front nine, 19 the back nine, 20 the round.
 void fn_80085FDC(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[1].i == 18) {
-        pResult->i = fn_800E19A4(pArgs[0].i, 9);
+        pResult->i = GM_GetPlayerRoundScoreThroughHole(pArgs[0].i, 9);
     } else if (pArgs[1].i == 19) {
-        pResult->i = fn_800E1788(pArgs[0].i) - fn_800E19A4(pArgs[0].i, 9);
+        pResult->i = GM_GetPlayerRoundScore(pArgs[0].i) - GM_GetPlayerRoundScoreThroughHole(pArgs[0].i, 9);
     } else if (pArgs[1].i == 20) {
-        pResult->i = fn_800E1788(pArgs[0].i);
+        pResult->i = GM_GetPlayerRoundScore(pArgs[0].i);
     } else if (Game_GetMode() == 19) {
         pResult->i = fn_800E8C24((u8)pArgs[0].i, pArgs[1].i);
     } else {
@@ -682,11 +682,11 @@ void fn_80085FDC(MsgArg* pArgs, MsgArg* pResult) {
 // The same, but a hole's own value is the mode's points (the 18/19/20 totals are as above).
 void fn_800860C8(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[1].i == 18) {
-        pResult->i = fn_800E19A4(pArgs[0].i, 9);
+        pResult->i = GM_GetPlayerRoundScoreThroughHole(pArgs[0].i, 9);
     } else if (pArgs[1].i == 19) {
-        pResult->i = fn_800E1788(pArgs[0].i) - fn_800E19A4(pArgs[0].i, 9);
+        pResult->i = GM_GetPlayerRoundScore(pArgs[0].i) - GM_GetPlayerRoundScoreThroughHole(pArgs[0].i, 9);
     } else if (pArgs[1].i == 20) {
-        pResult->i = fn_800E1788(pArgs[0].i);
+        pResult->i = GM_GetPlayerRoundScore(pArgs[0].i);
     } else {
         pResult->i = gPlayers[pArgs[0].i].nModePoints[pArgs[1].i];
     }
@@ -736,7 +736,7 @@ void fn_8008628C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80086300(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800E3EE0();
+    GUI_PauseMenuClosed();
     if (lbl_801D87C0.b0 == 0) {
         fn_80100B38();
         return;
@@ -746,7 +746,7 @@ void fn_80086300(MsgArg* pArgs, MsgArg* pResult) {
 
 // Pause the game.
 void fn_8008633C(MsgArg* pArgs, MsgArg* pResult) {
-    lbl_80281F18 = fn_800E4BF8() == 0;
+    lbl_80281F18 = GUI_ScoreCardUp() == 0;
     fn_800A7350(1);
     fn_800E3E3C();
 }
@@ -1067,7 +1067,7 @@ void fn_80086E5C(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80086F0C(MsgArg* pArgs, MsgArg* pResult) {
     switch (Game_GetMode()) {
     case 18:
-        pResult->i = fn_800E1788(pArgs[0].i);
+        pResult->i = GM_GetPlayerRoundScore(pArgs[0].i);
         return;
     case 23:
         pResult->i = GM_PgaTourSim_GetRelativeScoreFromEntrantID(pArgs[0].i, 0, 0);
@@ -1076,7 +1076,7 @@ void fn_80086F0C(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = fn_800E8CA8(pArgs[0].i, 1);
         return;
     default:
-        pResult->i = fn_800E1904(pArgs[0].i, 1);
+        pResult->i = GM_GetGolferRelativeCumulativeScore(pArgs[0].i, 1);
         return;
     }
 }
@@ -1424,7 +1424,7 @@ void fn_80087C1C(MsgArg* pArgs, MsgArg* pResult) {
         fn_800E50FC();
         return;
     }
-    fn_800E3D38(lbl_80282278, 0);
+    GUI_ToggleUI(lbl_80282278, 0);
     fn_80062C80(gPlayers[lbl_80282278].nC58, 0);
     fn_800E508C();
 }
@@ -1585,7 +1585,7 @@ void fn_800881E8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80088208(MsgArg* pArgs, MsgArg* pResult) {
-    if (fn_800E39F0()) {
+    if (GM_Currently_SkillZoneMode()) {
         fn_800F1DF0();
         return;
     }
@@ -1607,7 +1607,7 @@ void fn_8008828C(MsgArg* pArgs, MsgArg* pResult) {
 
 // Whether the round plays every hole.
 void fn_800882C0(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800E1BBC();
+    pResult->i = GM_FullRoundOfGolf();
 }
 
 void fn_800882F4(MsgArg* pArgs, MsgArg* pResult) {
@@ -1692,7 +1692,7 @@ void fn_800885A0(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_800885F8(MsgArg* pArgs, MsgArg* pResult) {
     fn_800A7350(0);
-    fn_800E3EE0();
+    GUI_PauseMenuClosed();
     if (lbl_801D87C0.b0 == 0) {
         fn_80100B38();
     }
@@ -1761,7 +1761,7 @@ void fn_800887C4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80088804(MsgArg* pArgs, MsgArg* pResult) {
-    if (fn_800E39F0()) {
+    if (GM_Currently_SkillZoneMode()) {
         fn_800F1E1C();
     }
 }
@@ -2309,7 +2309,7 @@ void fn_80089CCC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80089D04(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800E4204();
+    GUI_HideAllHelpTips();
     fn_800E53AC();
 }
 
@@ -2755,11 +2755,11 @@ void fn_8008A9A0(MsgArg* pArgs, MsgArg* pResult) {
 // The same as fn_80085FDC, without mode 19's count.
 void fn_8008A9E8(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[1].i == 18) {
-        pResult->i = fn_800E19A4(pArgs[0].i, 9);
+        pResult->i = GM_GetPlayerRoundScoreThroughHole(pArgs[0].i, 9);
     } else if (pArgs[1].i == 19) {
-        pResult->i = fn_800E1788(pArgs[0].i) - fn_800E19A4(pArgs[0].i, 9);
+        pResult->i = GM_GetPlayerRoundScore(pArgs[0].i) - GM_GetPlayerRoundScoreThroughHole(pArgs[0].i, 9);
     } else if (pArgs[1].i == 20) {
-        pResult->i = fn_800E1788(pArgs[0].i);
+        pResult->i = GM_GetPlayerRoundScore(pArgs[0].i);
     } else {
         pResult->i = gPlayers[pArgs[0].i].nStrokes[pArgs[1].i];
     }

@@ -26,10 +26,10 @@ void GOLFERSTATE_OpenONCE(void) {
     gInSwingExit = 0;
 }
 
-// Run the current state's update for every player (none while fn_800E415C() is true).
+// Run the current state's update for every player (none while GUI_IsPauseMenuOpen() is true).
 void GOLFERSTATE_Update(void) {
     int i;
-    if (fn_800E415C()) return;
+    if (GUI_IsPauseMenuOpen()) return;
     switch (fn_8005D2DC()) {
     case 0:
         for (i = 0; i < 5; i++) {

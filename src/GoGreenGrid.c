@@ -153,11 +153,11 @@ void fn_8009B970(int nView) {
         + (PLAYER(ViewController_GetPlayer(nViewCopy))->vTarget[2] - fAlong * lbl_802813C0->aDir[nView][2]);
 }
 
-// Whether the grid shows for the player: never with fn_800E39F0; with the putter when
+// Whether the grid shows for the player: never with GM_Currently_SkillZoneMode; with the putter when
 // options.b84 is set; otherwise when the player's ground (nSurface) is of a class that
 // fn_8009BD94 lists.
 u8 fn_8009BD24(int nPlayer) {
-    if (fn_800E39F0()) {
+    if (GM_Currently_SkillZoneMode()) {
         return 0;
     }
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
@@ -426,7 +426,7 @@ void fn_8009C914(int nView) {
     if (Player_IsCPU(nPlayer)) {
         return;
     }
-    if (fn_800E415C()) {
+    if (GUI_IsPauseMenuOpen()) {
         return;
     }
     if (fn_800E5098()) {

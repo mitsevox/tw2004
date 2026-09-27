@@ -183,10 +183,10 @@ void fn_80100128(void) {
 // Round setup: course 10, hole 14 only, one CPU-controlled player (golfer 1), no mulligans, and
 // the options' nC and wind saved and replaced.
 void fn_80100160(void) {
-    fn_800E14E0(10);
-    fn_800E1260(0);
+    GM_SetCurrentCourse(10);
+    GM_SelectHoleSet(0);
     gpGame->bHoleSelected[13] = 1;
-    fn_800E1434();
+    GM_InitializeCurrentHoleToFirstSelected();
     gSession.nTeeSet[0] = 0;
     gSession.nTeeSet[1] = 0;
     gSession.nPinSet = 0;
@@ -486,7 +486,7 @@ void fn_80100B38(void) {
         lbl_802823E2 = 0;
         GM_EndOfGolferTurn(0);
         fn_80062C80(gPlayers[0].nC58, 0);
-        fn_800E3D38(0, 0);
+        GUI_ToggleUI(0, 0);
         fn_80101F40(0, 0);
         fn_80101F18(0);
         fn_800E5200(-1);

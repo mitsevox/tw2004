@@ -47,7 +47,7 @@ void fn_800ED738(void) {
     gpGame->nC = 1;
     gpGame->n10 = 1;
     gpGame->nDC = 0;
-    fn_800E1480(0);
+    GM_SetCurrentHole(0);
     lbl_80282330 = 0;
     gSession.nSplitScreen = 0;
 }
@@ -55,13 +55,13 @@ void fn_800ED738(void) {
 // Hole start: the ball is placed, the HUD hides.
 void fn_800ED890(void) {
     fn_800EDA74();
-    fn_800E3C0C(0);
+    GUI_ShowToggleFullScreenUI(0);
 }
 
 // Hole restart: the same.
 void fn_800ED8B8(void) {
     fn_800EDA74();
-    fn_800E3C0C(0);
+    GUI_ShowToggleFullScreenUI(0);
 }
 
 void fn_800ED8E0(void) {
@@ -113,11 +113,11 @@ void fn_800EDA08(void) {
     fn_800E4D94(0);
 }
 
-// The hole is over: if ended early, unpause and move on (fn_800E3EE0); else the end-of-hole screen.
+// The hole is over: if ended early, unpause and move on (GUI_PauseMenuClosed); else the end-of-hole screen.
 void fn_800EDA34(int nPlayer) {
     if (fn_800ED900()) {
         fn_800E4D88();
-        fn_800E3EE0();
+        GUI_PauseMenuClosed();
     } else {
         fn_800E4C20(0);
     }

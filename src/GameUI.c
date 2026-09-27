@@ -132,7 +132,7 @@ void fn_800E3BEC(void) {
 }
 
 // Show (b = 1) or hide the HUD on the single screen, and when.
-void fn_800E3C0C(u8 b) {
+void GUI_ShowToggleFullScreenUI(u8 b) {
     if (b) {
         fn_800E3E0C();
         GameMsg_SendInt(2, 1);
@@ -168,7 +168,7 @@ void fn_800E3CD4(u8 b) {
 }
 
 // Shows or hides a player's HUD.
-void fn_800E3D38(int nPlayer, u8 b) {
+void GUI_ToggleUI(int nPlayer, u8 b) {
     if (gSession.nSplitScreen) {
         if (nPlayer == 0) {
             fn_800E3C70(b);
@@ -177,7 +177,7 @@ void fn_800E3D38(int nPlayer, u8 b) {
         fn_800E3CD4(b);
         return;
     }
-    fn_800E3C0C(b);
+    GUI_ShowToggleFullScreenUI(b);
 }
 
 // Hides every HUD.
@@ -187,7 +187,7 @@ void fn_800E3D90(void) {
         fn_800E3CD4(0);
         return;
     }
-    fn_800E3C0C(0);
+    GUI_ShowToggleFullScreenUI(0);
 }
 
 // Whether a player's HUD is up.
@@ -209,7 +209,7 @@ void fn_800E3E0C(void) {
     fn_8006A8B0();
 }
 
-// Pauses the game once (gSession.nPaused and the flag fn_800E415C returns): rumble off, message
+// Pauses the game once (gSession.nPaused and the flag GUI_IsPauseMenuOpen returns): rumble off, message
 // 0x23 with 0, watch 1 stopped, a GameBreaker paused, EASBio play state 0.
 void fn_800E3E3C(void) {
     if (gSession.nPaused == 0) {
@@ -238,7 +238,7 @@ void fn_800E3ECC(void) {
 // ends the round) or the end-of-hole screen (the mode is told; mode 12 clears the hole's scores,
 // then it or bD4/b134 ask for a hole load (fn_8006F4B4), otherwise the next selected hole; every
 // ball goes back on the tee lie).
-void fn_800E3EE0(void) {
+void GUI_PauseMenuClosed(void) {
     int i;
     int j;
     if (gSession.nPaused != 0) {
@@ -260,7 +260,7 @@ void fn_800E3EE0(void) {
         if (gSession.bReplay && Game_GetMode() != 11 && Game_GetMode() != 10) {
             fn_80062CE0(1);
         }
-        if (fn_800E39F0() && !lbl_80282282) {
+        if (GM_Currently_SkillZoneMode() && !lbl_80282282) {
             fn_800A72EC(0, 1);
         }
         if (lbl_80282282) {
@@ -295,13 +295,13 @@ void fn_800E3EE0(void) {
     }
 }
 
-u8 fn_800E415C(void) {
+u8 GUI_IsPauseMenuOpen(void) {
     return lbl_802822DF;
 }
 
 // A HUD message: message nMsg for a player, with a number (a distance, strokes over par); not
 // in mode 11.
-void fn_800E4164(int nMsg, int nPlayer, f32 f) {
+void GUI_StartPostShotUI(int nMsg, int nPlayer, f32 f) {
     int nWho;
     if (Game_GetMode() != 11) {
         nWho = nPlayer + 1;
@@ -314,12 +314,14 @@ void fn_800E41C8(void) {
     lbl_802822DB = 1;
 }
 
-void fn_800E41D4(int nPlayer) {
+// Moves a player's post-shot display on (message 42) and hides the HUD prompts.
+void GUI_AdvancePostShotUI(int nPlayer) {
     GameMsg_SendInt(42, nPlayer + 1);
-    fn_800E4204();
+    GUI_HideAllHelpTips();
 }
 
-void fn_800E4204(void) {
+// Hides the HUD's prompts: mulligan (message 29), replay (46) and message 47.
+void GUI_HideAllHelpTips(void) {
     fn_800E0AC4(0);
     fn_800E0A98(0);
     fn_800E5474(0);
@@ -357,7 +359,7 @@ void fn_800E42F4(int i) {
 
 u8 fn_800E430C(int nPlayer) {
     int b = 0;
-    if (fn_800E415C() || fn_800E4254(nPlayer)) {
+    if (GUI_IsPauseMenuOpen() || fn_800E4254(nPlayer)) {
         b = 1;
     }
     return b;
@@ -448,12 +450,12 @@ u8 fn_800E46B4(void) {
             lbl_802822A8 != 0 || lbl_8028229C != 0 || lbl_80282298 != 0 || lbl_80282294 != 0 ||
             lbl_80282290 != 0 || lbl_8028228C != 0 || lbl_80282288 != 0) {
             if (!lbl_802822DB) {
-                fn_800E4164(16, 0, 0.0f);
+                GUI_StartPostShotUI(16, 0, 0.0f);
             }
             return 1;
         }
         if (lbl_802822A4 != 0 && !lbl_802822DB) {
-            fn_800E4164(lbl_802822A4, 0, 0.0f);
+            GUI_StartPostShotUI(lbl_802822A4, 0, 0.0f);
             lbl_802822A4 = 0;
             return 1;
         }
@@ -551,7 +553,9 @@ u8 fn_800E46B4(void) {
     return bBusy;
 }
 
-u8 fn_800E4BF8(void) {
+// Whether the end-of-hole or end-of-round scorecard is up (the flags fn_800E4C20 and fn_800E4D94
+// set; GUI_PauseMenuClosed acts on them and clears them).
+u8 GUI_ScoreCardUp(void) {
     int b = 0;
     if (lbl_80282282 || lbl_80282281) {
         b = 1;
@@ -629,7 +633,9 @@ void fn_800E4F88(int nPlayer) {
     GameMsg_SendInt(59, nPlayer);
 }
 
-void fn_800E4FB0(u8 a, int b) {
+// Shows a swing tip: message 0x22 with the kind a and the tip number b. Kind 1 is the full tip,
+// which also holds shot input (lbl_802822BE, see GameMessages.c); 2 is the short reminder.
+void GUI_ShowSwingTip(u8 a, int b) {
     GameMsg_Send2Ints(0x22, a, b);
     if (a == 1) {
         lbl_802822BE = 1;

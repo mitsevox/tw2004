@@ -53,7 +53,7 @@ void fn_800FEAFC(void) {
     gpGame->nC = 4;
     gpGame->n10 = 1;
     gpGame->nDC = 0;
-    fn_800E1480(0);
+    GM_SetCurrentHole(0);
     lbl_802823DC = -1;
     gSession.nSplitScreen = 0;
     gSession.options.nC = 0;
@@ -223,7 +223,7 @@ void fn_800FF288(void) {
     int i;
     int h;
     s32 nMoney;
-    if (fn_800E1BBC()) {
+    if (GM_FullRoundOfGolf()) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
             nMoney = 0;
             if (!Player_IsCPU(i)) {

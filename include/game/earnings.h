@@ -107,7 +107,7 @@ typedef struct HoleGoal {
     s8   n15;                   // 0x15  the run fn_800D10B0 finds
     s8   n16;                   // 0x16  the run fn_800D1250 finds
     s8   n17;                   // 0x17  putts over the round (fn_800D1330)
-    s8   nMaxStrokes;           // 0x18  the most strokes over the round (fn_800E17AC)
+    s8   nMaxStrokes;           // 0x18  the most strokes over the round (GM_GetPlayerRoundStrokes)
     u8   b19;                   // 0x19  counts on every hole; clear, only at the end (the full round's 18th
                                 //       hole, or after the round)
     u8   unk1A;                 // 0x1A

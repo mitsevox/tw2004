@@ -370,7 +370,7 @@ void fn_80116D28(void) {
     s32 nRound;
 
     Session_SetGolfer(30, 0);
-    fn_800E0B38(23);
+    GM_SetModeType(23);
     GameModeDriverPGATour_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
     fn_800EF9D0(nId);
 }
@@ -513,7 +513,7 @@ char* fn_8011710C(u16 nDate) {
 // Start today's event by the clock's date (fn_800F0E3C): golfer 30 in slot 0, game mode 24.
 void fn_8011714C(void) {
     Session_SetGolfer(30, 0);
-    fn_800E0B38(24);
+    GM_SetModeType(24);
     fn_800F0E3C();
 }
 

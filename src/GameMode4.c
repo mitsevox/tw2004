@@ -209,7 +209,7 @@ void GameMode4_StartEvent(void) {
     if (lbl_802124B8[nEvent].n1C == 0) {
         if (lbl_802124B8[nEvent].nChallenge != 0) {
             gSession.nNumPlayers = 1;
-            fn_800E0B38(5);
+            GM_SetModeType(5);
             fn_800EAE38(lbl_802124B8[nEvent].nChallenge - 1);
             fn_800EAF7C();
             lbl_80282450 = gpGame->pfnShutdown;
@@ -221,8 +221,8 @@ void GameMode4_StartEvent(void) {
             Session_SetNumPlayers(2);
             Session_SetGolfer(lbl_802124B8[nEvent].nGolfer, 1);
             gSession.nController[1] = CONTROLLER_CPU;
-            fn_800E14E0(lbl_802124B8[nEvent].nCourse);
-            fn_800E1260(lbl_802124B8[nEvent].nHoles);
+            GM_SetCurrentCourse(lbl_802124B8[nEvent].nCourse);
+            GM_SelectHoleSet(lbl_802124B8[nEvent].nHoles);
             nPins = lbl_802124B8[nEvent].nPins;
             gSession.nTeeSet[0] = lbl_802124B8[nEvent].nTeeSet;
             gSession.nTeeSet[1] = lbl_802124B8[nEvent].nTeeSet;

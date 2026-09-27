@@ -89,7 +89,7 @@ void fn_800F2984(void) {
     gpGame->n290 = 0;
     gpGame->n294 = 0;
     gpGame->nDC = 0;
-    fn_800E1480(0);
+    GM_SetCurrentHole(0);
     lbl_80282360 = 0;
     gSession.nSplitScreen = 0;
     gSession.nPinSet = 0;

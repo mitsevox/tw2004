@@ -1345,7 +1345,7 @@ void fn_8007BC10(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007BC48(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800E0B38((u8)pArgs[0].i);
+    GM_SetModeType((u8)pArgs[0].i);
     fn_800E25E0();
 }
 
@@ -1364,7 +1364,7 @@ void fn_8007BCA4(MsgArg* pArgs, MsgArg* pResult) {
 // Set up a game mode from the menus.
 void fn_8007BCC4(MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D7148.b11 = 1;
-    fn_800E0B38((u8)pArgs[0].i);
+    GM_SetModeType((u8)pArgs[0].i);
     gSession.a8[0] = 1;
     lbl_801D87C0.b0 = 1;
     fn_800A4FD8();
@@ -1374,16 +1374,16 @@ void fn_8007BD18(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007BD1C(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800E14E0((u8)pArgs[0].i);
+    GM_SetCurrentCourse((u8)pArgs[0].i);
 }
 
 void fn_8007BD44(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800E1260(0);
-    fn_800E1404((u8)pArgs[0].i - 1);
+    GM_SelectHoleSet(0);
+    GM_SelectSingleHole((u8)pArgs[0].i - 1);
 }
 
 void fn_8007BD84(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800E1260((u8)pArgs[0].i);
+    GM_SelectHoleSet((u8)pArgs[0].i);
 }
 
 // A golfer's attribute.
@@ -2220,7 +2220,7 @@ void fn_8007D924(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007D938(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800E1404((u8)pArgs[0].i - 1);
+    GM_SelectSingleHole((u8)pArgs[0].i - 1);
 }
 
 void fn_8007D964(MsgArg* pArgs, MsgArg* pResult) {
@@ -2589,7 +2589,7 @@ void fn_8007E67C(MsgArg* pArgs, MsgArg* pResult) {
         } else {
             Session_SetGolfer(gReplayData.player.golfer.nIndex, 0);
         }
-        fn_800E14E0(gReplayData.nCourse);
+        GM_SetCurrentCourse(gReplayData.nCourse);
         lbl_80281ED4->b0 = 0;
     }
 }
@@ -4035,7 +4035,7 @@ void fn_800819FC(MsgArg* pArgs, MsgArg* pResult) {
     gpGame->nSaveCourse = pArgs[2].i;
     if (gpGame->b136 != 0) {
         GM_SetupCustomHoleSelection();
-        fn_800E1434();
+        GM_InitializeCurrentHoleToFirstSelected();
     }
 }
 
@@ -5376,8 +5376,8 @@ void fn_800849F8(MsgArg* pArgs, MsgArg* pResult) {
             pResult->i = pResult->i == 0;
         }
     } else {
-        fn_800E14E0(pArgs[0].i);
-        fn_800E1434();
+        GM_SetCurrentCourse(pArgs[0].i);
+        GM_InitializeCurrentHoleToFirstSelected();
         pResult->i = fn_80110180();
         if (fn_8011027C() != 0) {
             pResult->i = pResult->i == 0;
@@ -5409,7 +5409,7 @@ void fn_80084AA8(MsgArg* pArgs, MsgArg* pResult) {
             n = 1;
             break;
         }
-        fn_800E0B38(nMode);
+        GM_SetModeType(nMode);
         fn_800E25E0();
         if (nMode == 22) {
             fn_80126F94(n);

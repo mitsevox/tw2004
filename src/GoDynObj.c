@@ -200,7 +200,7 @@ void DynObj_InitForHole(void) {
             }
         }
     }
-    if (fn_800E39F0()) {
+    if (GM_Currently_SkillZoneMode()) {
         for (i = 0; i < 4; i++) {
             if (lbl_80281DA0->apTeo10006[i] == NULL) {
                 nId = i + 10006;
@@ -226,7 +226,7 @@ void DynObj_InitForHole(void) {
         if (Game_GetMode() != 6 && Game_GetMode() != 7 && Game_GetMode() != 8) {
             pFlag->u10 |= 2;
         }
-        if (fn_800E39F0()) {
+        if (GM_Currently_SkillZoneMode()) {
             pFlag->u10 |= 0x40;
         }
     }
@@ -301,7 +301,7 @@ void fn_800467B4(void) {
     }
 }
 
-// Draws every object (message 3), and with fn_800E39F0 the targets' 'TEO ' models.
+// Draws every object (message 3), and with GM_Currently_SkillZoneMode the targets' 'TEO ' models.
 void fn_80046828(int nView) {
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetAlphaTest(1, 6, 0x80);
@@ -311,7 +311,7 @@ void fn_80046828(int nView) {
     fn_800352E4();
     RenderState_Flush();
     fn_80048F68(3, NULL, NULL);
-    if (fn_800E39F0()) {
+    if (GM_Currently_SkillZoneMode()) {
         fn_80046FDC(nView);
         fn_800470B0(nView);
     }

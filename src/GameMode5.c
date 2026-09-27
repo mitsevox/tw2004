@@ -164,16 +164,16 @@ void fn_800EAF7C(void) {
     if (gpSaveData[gPlayers[0].nIndex].bActive) {
         gpSaveData[gPlayers[0].nIndex].b70 = 1;
     }
-    fn_800E0B38(lbl_80281664[lbl_802822F4].nMode);
+    GM_SetModeType(lbl_80281664[lbl_802822F4].nMode);
     lbl_802822FC = 1;
-    fn_800E14E0(lbl_80281664[lbl_802822F4].nCourse);
-    fn_800E1260(lbl_80281664[lbl_802822F4].nType);
+    GM_SetCurrentCourse(lbl_80281664[lbl_802822F4].nCourse);
+    GM_SelectHoleSet(lbl_80281664[lbl_802822F4].nType);
     if (lbl_80281664[lbl_802822F4].nType == 0) {
-        fn_800E1404(lbl_80281664[lbl_802822F4].nHole - 1);
+        GM_SelectSingleHole(lbl_80281664[lbl_802822F4].nHole - 1);
     }
     if (lbl_80281664[lbl_802822F4].nType != 4 && lbl_80281664[lbl_802822F4].nType != 5 &&
         lbl_80281664[lbl_802822F4].nType != 6 && lbl_80281664[lbl_802822F4].nType != 7) {
-        fn_800E1480(lbl_80281664[lbl_802822F4].nHole - 1);
+        GM_SetCurrentHole(lbl_80281664[lbl_802822F4].nHole - 1);
     }
     for (h = 0; h < lbl_80281664[lbl_802822F4].nHole - 1; h++) {
         gpGame->bHoleSelected[h] = 0;
@@ -451,7 +451,7 @@ u8 fn_800EBD60(u8 bCheck) {
             }
         }
         lbl_8028230C += nStrokes;
-        fn_800E1260(0);
+        GM_SelectHoleSet(0);
         for (i = lbl_802822F4 + 1; i < lbl_80281668; i++) {
             if (lbl_80281664[i].nGroup == lbl_80281664[lbl_802822F4].nGroup) {
                 if (bCheck) {
@@ -459,10 +459,10 @@ u8 fn_800EBD60(u8 bCheck) {
                 }
                 lbl_802822F4 = i;
                 if (fn_800F0818()) {
-                    fn_800E0B38(24);
+                    GM_SetModeType(24);
                     fn_800F07C8();
                 } else {
-                    fn_800E0B38(5);
+                    GM_SetModeType(5);
                     fn_800EAF7C();
                 }
                 gpGame->b134 = 1;
@@ -763,7 +763,7 @@ int fn_800EC558(void) {
                 }
                 break;
             case 9:
-                if (fn_800E39F0() && gPlayers[0].nDD8 >= nMark) {
+                if (GM_Currently_SkillZoneMode() && gPlayers[0].nDD8 >= nMark) {
                     return m;
                 }
                 break;
@@ -814,7 +814,7 @@ int fn_800EC558(void) {
                 }
                 break;
             case 9:
-                if (fn_800E39F0() && gPlayers[0].nDD8 >= nMark) {
+                if (GM_Currently_SkillZoneMode() && gPlayers[0].nDD8 >= nMark) {
                     return m;
                 }
                 break;
@@ -904,7 +904,7 @@ int fn_800ECC14(void) {
     if (i == 2) {
         return gpGame->nD8;
     }
-    if (fn_800E39F0()) {
+    if (GM_Currently_SkillZoneMode()) {
         return gPlayers[0].nDD8;
     }
     i = 0;
@@ -917,7 +917,7 @@ int fn_800ECC14(void) {
     k = 0;
     nScore = lbl_80281664[lbl_802822F4].nTargetKind != 1 ? lbl_8028230C : 0;
     if (Game_GetMode() == 0 && lbl_80281664[lbl_802822F4].nTargetKind == 7) {
-        if (fn_800E4BF8()) {
+        if (GUI_ScoreCardUp()) {
             k = 1;
         }
         for (h = 0; h < k + Game_CurHoleIndex(); h++) {
@@ -988,7 +988,7 @@ int fn_800ED028(int i) {
             break;
         case 7:
             k = 0;
-            if (fn_800E4BF8()) {
+            if (GUI_ScoreCardUp()) {
                 k = 1;
             }
             for (h = 0; h < k + Game_CurHoleIndex(); h++) {
@@ -1097,9 +1097,9 @@ int fn_800ED314(void) {
     if (fn_800E5110()) {
         return 0;
     }
-    // fake match: the binary calls fn_800E4BF8 and branches on its result, but both paths return
+    // fake match: the binary calls GUI_ScoreCardUp and branches on its result, but both paths return
     // n (a bare call without the test loses the compare: 99.2%).
-    if (fn_800E4BF8()) {
+    if (GUI_ScoreCardUp()) {
         return n;
     }
     return n;

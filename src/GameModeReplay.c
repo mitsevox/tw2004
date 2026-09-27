@@ -45,7 +45,7 @@ void GameModeReplay_Init(void) {
     gpGame->nC = 1;
     gpGame->n10 = 1;
     gpGame->nDC = 0;
-    fn_800E1480(0);
+    GM_SetCurrentHole(0);
     gSession.nSplitScreen = 0;
     gSession.nNumPlayers = 1;
 }
@@ -73,9 +73,9 @@ void GameModeReplay_StartGamePreData(void) {
     for (i = 0; i < 18; i++) {
         gpGame->nPinSet[i] = Replay_SetPinSet();
     }
-    fn_800E14E0(gReplayData.nCourse);
-    fn_800E1260(0);
-    fn_800E1404(gReplayData.nHole);
+    GM_SetCurrentCourse(gReplayData.nCourse);
+    GM_SelectHoleSet(0);
+    GM_SelectSingleHole(gReplayData.nHole);
     Session_SetNumPlayers(1);
     gSession.bReplay = 1;
     // fake match: a no-op cast of &gSession; written plainly the address is scheduled

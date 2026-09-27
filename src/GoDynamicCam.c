@@ -1572,7 +1572,7 @@ u8 fn_8003D140(CamSequence* pSequence) {
         if (gSession.nSplitScreen) return 0;
         if (nMode == 9) return 0;
         if (nMode == 11) return 0;
-        if (fn_800E39F0()) return 0;
+        if (GM_Currently_SkillZoneMode()) return 0;
         return 1;
     }
     if (pSequence->b48 == 1) {
@@ -1581,7 +1581,7 @@ u8 fn_8003D140(CamSequence* pSequence) {
         return nMode == 11;
     }
     if (pSequence->b48 == 2) {
-        return fn_800E39F0() != 0;
+        return GM_Currently_SkillZoneMode() != 0;
     }
     return 0;
 }

@@ -2107,11 +2107,11 @@ void fn_8001BBD8(u32 uFlags) {
     }
 }
 
-// Advances every character's animation by fTime, except in game type 6 while fn_800E415C holds.
+// Advances every character's animation by fTime, except in game type 6 while GUI_IsPauseMenuOpen holds.
 void fn_8001BC8C(f32 fTime) {
     int i;
 
-    if (gSession.nGameType != 6 || !fn_800E415C()) {
+    if (gSession.nGameType != 6 || !GUI_IsPauseMenuOpen()) {
         for (i = 0; i < lbl_80281CA8; i++) {
             Character_UpdateAnimation(lbl_801B9624[i], 0, fTime);
         }

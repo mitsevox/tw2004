@@ -671,7 +671,7 @@ void GO_vInitIG(void) {
     TI_vResetCounter(1);
     TI_vStartCounter(1);
     if (gSession.nC == 3) {
-        fn_800E0B38(5);
+        GM_SetModeType(5);
         fn_800EAF7C();
         gSession.nC = 0;
     }

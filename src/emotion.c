@@ -310,7 +310,7 @@ void fn_8006B2C4(int nPlayer, u8 bBefore) {
     } else {
         pBall = &gPlayers[nPlayer].ball;
     }
-    if (fn_800E2B40(nPlayer, pBall)) {
+    if (GM_IsBallOOB(nPlayer, pBall)) {
         if (bBefore) {
             lbl_801D5F78[nPlayer].n10 = 3;
             lbl_801D5F78[nPlayer].nC = 1;

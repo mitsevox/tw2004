@@ -34,7 +34,7 @@ void DEMO_Start(void) {
     gSession.bReplay = 0;
     gSession.nPaused = 0;
     gSession.nNumPlayers = 2;
-    fn_800E0B38(0);
+    GM_SetModeType(0);
     gSession.nController[0] = 9;
     gSession.nGolfer[0] = lbl_80183AB8[lbl_80281F90];
     gSession.nTeeSet[0] = 2;
@@ -44,12 +44,12 @@ void DEMO_Start(void) {
     gSession.nTeeSet[1] = 2;
     gSession.aProfile[0].n0 = 0;
     gSession.options.nC = 0;
-    fn_800E14E0(lbl_80183A98[lbl_80281F90]);
-    fn_800E1260(0);
-    fn_800E1404(lbl_80183AA8[lbl_80281F90]);
+    GM_SetCurrentCourse(lbl_80183A98[lbl_80281F90]);
+    GM_SelectHoleSet(0);
+    GM_SelectSingleHole(lbl_80183AA8[lbl_80281F90]);
     n = lbl_80281F90;
     while (!fn_80110180()) {
-        fn_800E14E0(lbl_80183A98[n++]);
+        GM_SetCurrentCourse(lbl_80183A98[n++]);
         if (n == 4) {
             n = 0;
         }
@@ -75,23 +75,23 @@ void DEMO_Start(void) {
             gSession.nGolfer[0] = 1;
             break;
         }
-        fn_800E1260(0);
+        GM_SelectHoleSet(0);
         switch (lbl_80281F90) {
         case 0:
-            fn_800E14E0(20);
-            fn_800E1404(0);
+            GM_SetCurrentCourse(20);
+            GM_SelectSingleHole(0);
             break;
         case 1:
-            fn_800E14E0(19);
-            fn_800E1404(17);
+            GM_SetCurrentCourse(19);
+            GM_SelectSingleHole(17);
             break;
         case 2:
-            fn_800E14E0(17);
-            fn_800E1404(1);
+            GM_SetCurrentCourse(17);
+            GM_SelectSingleHole(1);
             break;
         case 3:
-            fn_800E14E0(18);
-            fn_800E1404(17);
+            GM_SetCurrentCourse(18);
+            GM_SelectSingleHole(17);
             break;
         }
         gpGame->nPinSet[Game_CurHoleIndex()] = Misc_RandFunc(0) & 3;

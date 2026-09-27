@@ -212,7 +212,8 @@ void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, 
             }
         }
         if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 12 && CameraScript_SnapToScript(pScript, pScript->pShot)
-            && pScript->pShot->bAD != 3 && !pScript->bCF && CamScript_CheckObstructedCamera(pCam, nPlayer) && !fn_800E39F0()) {
+            && pScript->pShot->bAD != 3 && !pScript->bCF && CamScript_CheckObstructedCamera(pCam, nPlayer)
+                    && !GM_Currently_SkillZoneMode()) {
             CamScript_PutBackOnFairway(pScript, pCam, pSub, nPlayer, pShot, vPrev);
         }
         if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 12 && !fn_8003A76C(pScript->pShot)) {

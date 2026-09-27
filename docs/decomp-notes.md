@@ -957,7 +957,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   variables. Fix: swap the declarations. Twelve 16-byte vectors in fn_8005A0FC matched once
   declared highest-address first.
 - **[verified] Taking a parameter's address puts it on the stack at the parameter's slot**;
-  copying it to a local first gives a different slot order (fn_800E4164, fn_800E53F0).
+  copying it to a local first gives a different slot order (GUI_StartPostShotUI, fn_800E53F0).
 - **[verified] An initialiser placed after early exits is in an inner block.** A local array copied
   from `.rodata` only after the function's first checks means `if (ok) { u32 aPad[4] = {0}; ... }`,
   not a declaration at the top (`AnimLib_MergeOverlay`).
@@ -1485,7 +1485,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   `fn_800FDC5C`, 89.9% -> 98.2%).
 - **[verified] An exact unit can still fail the link on function order.** objdiff scores each
   function by name, so a function defined out of address order reads 100% while the linked
-  `.text` shifts. GameUI `fn_800E3ECC` was defined after `fn_800E3EE0`; moving it fixed the DOL.
+  `.text` shifts. GameUI `fn_800E3ECC` was defined after `GUI_PauseMenuClosed`; moving it fixed the DOL.
 - **[verified] A constant the original has twice means the original was two files.**
   CodeWarrior keeps one copy of each constant per file. GameMode10's code emits one int-to-float
   conversion double; the original has two (`lbl_80284688`, `lbl_802846A0`), each with the

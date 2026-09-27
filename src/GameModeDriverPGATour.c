@@ -158,7 +158,7 @@ void fn_800EE0A0(s32 i) {
         gSession.nTeeSet[k] = nTee;
     }
     pEvent->nTeeSet = nTee;
-    fn_800E14E0(gPgaData.aTourEvent[i].aRound[gpGame->nDC].nCourse);
+    GM_SetCurrentCourse(gPgaData.aTourEvent[i].aRound[gpGame->nDC].nCourse);
     gSession.nPinSet = gPgaData.aTourEvent[i].aRound[gpSaveData[nPlayer].tour.nRound].nPinSet - 1;
     for (h = 0; h < 18; h++) {
         gpGame->nPinSet[h] = gPgaData.aTourEvent[i].aRound[gpSaveData[nPlayer].tour.nRound].nPinSet - 1;
@@ -197,7 +197,7 @@ void fn_800EE2C8(void) {
         if (gpSaveData[nPlayer].tour.nRound == 0) {
             pRec->nEvents++;
         }
-        fn_800E1260(1);
+        GM_SelectHoleSet(1);
     }
 }
 
@@ -247,8 +247,8 @@ u8 GameModeDriverPGATour_IsPuttForLead(int nPlayer) {
                GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(nPlayer, Game_CurHoleIndex());
     }
     bLead = 0;
-    if (fn_800E1904(nPlayer, 0) >= fn_80119588(nPlayer, 1) &&
-        fn_800E1904(nPlayer, 1) + 1 < fn_80119588(nPlayer, 1)) {
+    if (GM_GetGolferRelativeCumulativeScore(nPlayer, 0) >= fn_80119588(nPlayer, 1) &&
+        GM_GetGolferRelativeCumulativeScore(nPlayer, 1) + 1 < fn_80119588(nPlayer, 1)) {
         bLead = 1;
     }
     return bLead;
@@ -263,7 +263,7 @@ u8 GameModeDriverPGATour_IsPuttForWin(s32 nPlayer) {
     }
     nRounds = GameModeDriverPGATour_GetRounds(gpSaveData[nPlayer].tour.nEvent);
     return fn_8008AC00() == 1 && gpSaveData[nPlayer].tour.nRound + 1 >= nRounds &&
-           fn_800E1904(nPlayer, 1) + 1 < fn_80119588(nPlayer, 1);
+           GM_GetGolferRelativeCumulativeScore(nPlayer, 1) + 1 < fn_80119588(nPlayer, 1);
 }
 
 // Strokes ahead of the best other player, negative when behind (in a playoff, on this hole).
@@ -271,7 +271,7 @@ s32 GameModeDriverPGATour_GetCurrentLead(int nPlayer) {
     if (gpGame->bD4) {
         return GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(nPlayer, Game_CurHoleIndex()) - gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     }
-    return fn_80119588(nPlayer, 1) - fn_800E1904(nPlayer, 0);
+    return fn_80119588(nPlayer, 1) - GM_GetGolferRelativeCumulativeScore(nPlayer, 0);
 }
 
 s32 GameModeDriverPGATour_GetPotentialLead(int nPlayer) {
@@ -279,7 +279,7 @@ s32 GameModeDriverPGATour_GetPotentialLead(int nPlayer) {
         return GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(nPlayer, Game_CurHoleIndex()) -
                (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1);
     }
-    return fn_80119588(nPlayer, 1) - (fn_800E1904(nPlayer, 1) + 1);
+    return fn_80119588(nPlayer, 1) - (GM_GetGolferRelativeCumulativeScore(nPlayer, 1) + 1);
 }
 
 // The mode's pfn208 answer for every player (GameRound.c's default works it out).
@@ -461,7 +461,7 @@ void fn_800EF130(int nPlayer, u8 bQuick) {
     s32 nTourEvent;
     while (gpSaveData[nPlayer].tour.nRound < nRounds) {
         if (p->nTourEvent) {
-            fn_800E14E0(
+            GM_SetCurrentCourse(
                 gPgaData.aTourEvent[p->nTourEvent - 1].aRound[gpSaveData[nPlayer].tour.nRound].nCourse);
             k = 0;
             nTourEvent = gPgaData.aTournament[gpSaveData[nPlayer].tour.nEvent].nTourEvent - 1;
@@ -632,8 +632,8 @@ u8 GameModeDriverPGATour_GoToPlayoff(u8 bCheck) {
         if (lbl_80282340 > 17) {
             lbl_80282340 = 15;
         }
-        fn_800E1260(0);
-        fn_800E1404(lbl_80282340);
+        GM_SelectHoleSet(0);
+        GM_SelectSingleHole(lbl_80282340);
         gpGame->bD4 = 1;
         GUI_GolfersTiedUIMessage();
     }

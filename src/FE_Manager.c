@@ -257,9 +257,9 @@ void fn_8007734C(void) {
 // Play a saved shot: game mode 10 (the replay) with its golfer on its course.
 void fn_8007739C(Replay* pReplay) {
     Mem_cpy(&gReplayData, pReplay, sizeof(Replay));
-    fn_800E0B38(10);
+    GM_SetModeType(10);
     Session_SetGolfer(gReplayData.player.golfer.nIndex, 0);
-    fn_800E14E0(gReplayData.nCourse);
+    GM_SetCurrentCourse(gReplayData.nCourse);
 }
 
 void fn_800773F8(void) {

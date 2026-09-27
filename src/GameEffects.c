@@ -187,7 +187,8 @@ void fn_800DB30C(int nPlayer, int nReason) {
     }
     if (lbl_80202898.bGameBreaker != 1 && !Player_IsCPU(nPlayer)) {
         if (nReason == 12) {
-            if (fn_800E17AC(nPlayer) + 1 >= gSession.aCourseRecord[Game_GetCourse()].aRecord[0][0].nValue) {
+            if (GM_GetPlayerRoundStrokes(nPlayer) + 1
+                >= gSession.aCourseRecord[Game_GetCourse()].aRecord[0][0].nValue) {
                 return;
             }
         } else if (nReason == 15 && !(3.0f * gPlayers[nPlayer].fA64 >

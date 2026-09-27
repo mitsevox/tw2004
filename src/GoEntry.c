@@ -137,7 +137,7 @@ void fn_800083A4(void) {
             fn_800918A4();
             // one listener per view
             Aud_InitSession(Game_GetCourse() + 1, 1, gSession.nSplitScreen ? 2 : 1, 0);
-            if (!fn_800E1734()) {
+            if (!GM_OnFirstSelectedHole()) {
                 fn_8000882C();
                 fn_8001A81C();
             }

@@ -43,7 +43,7 @@ u8 fn_800CF158(int nPlayer) {
         // EA bug: nMine is never set when nPlayer is cut or not one of the players set up
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (!gPlayers[i].bPlayerCut) {
-                anTotal[i] = fn_800E1904(i, 0);
+                anTotal[i] = GM_GetGolferRelativeCumulativeScore(i, 0);
                 if (i == nPlayer) {
                     nMine = anTotal[i];
                 } else if (anTotal[i] < nBest) {
@@ -152,7 +152,7 @@ u8 fn_800CF450(int nPlayer) {
         nBest = 1000;
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (!gPlayers[i].bPlayerCut) {
-                anTotal[i] = fn_800E1904(i, 0);
+                anTotal[i] = GM_GetGolferRelativeCumulativeScore(i, 0);
                 if (i != nPlayer && anTotal[i] < nBest) {
                     nBest = anTotal[i];
                 }
@@ -281,7 +281,8 @@ u32 fn_800CF904(int nPlayer) {
         return 0;
     }
     if (fn_800D8DB4(0) && !gpGame->bD4 && Game_CurHoleIndex() == 17) {
-        if (fn_800E17AC(nPlayer) + 1 < gSession.aCourseRecord[Game_GetCourse()].aRecord[0][0].nValue) {
+        if (GM_GetPlayerRoundStrokes(nPlayer) + 1
+            < gSession.aCourseRecord[Game_GetCourse()].aRecord[0][0].nValue) {
             uFlags |= 0x1;
         }
     }
@@ -365,7 +366,8 @@ u32 fn_800CFD58(int nPlayer) {
 
 // gpGame->pfn200 (TW06: GetCurrentLead).
 // The player's lead in the round so far (strokes, holes won or skins by the scoring kind
-// fn_8008AB40): kind 0, the best other total (fn_800E1904; cut players left out) less the
+// fn_8008AB40): kind 0, the best other total (GM_GetGolferRelativeCumulativeScore; cut players left out) less
+// the
 // player's; kinds 1 and 2, the player's holes won (skins) less the best of the others'.
 s32 fn_800CFE74(int nPlayer) {
     int anTotal[4];   // one per player set up; the frame has room for four
@@ -383,7 +385,7 @@ s32 fn_800CFE74(int nPlayer) {
         // EA bug: nMine is never set when nPlayer is cut or not one of the players set up
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (!gPlayers[i].bPlayerCut) {
-                anTotal[i] = fn_800E1904(i, 0);
+                anTotal[i] = GM_GetGolferRelativeCumulativeScore(i, 0);
                 if (i == nPlayer) {
                     nMine = anTotal[i];
                 } else if (anTotal[i] < nBest) {
@@ -457,7 +459,7 @@ s32 fn_800D0098(int nPlayer) {
         // EA bug: nMine is never set when nPlayer is cut or not one of the players set up
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (!gPlayers[i].bPlayerCut) {
-                anTotal[i] = fn_800E1904(i, 0);
+                anTotal[i] = GM_GetGolferRelativeCumulativeScore(i, 0);
                 if (i == nPlayer) {
                     nMine = anTotal[i];
                     nMine += gPlayers[i].nStrokes[Game_CurHoleIndex()] + 1 - Course_GetCurHolePar();
@@ -743,7 +745,7 @@ int Hole_ScoreAfterTapIn(int nPlayer) {
 u8 fn_800D0AF4(void) {
     int i;
     int j;
-    if (fn_800E1734()) {
+    if (GM_OnFirstSelectedHole()) {
         return 0;
     }
     for (i = Game_CurHoleIndex() - 1; i >= 0; i--) {

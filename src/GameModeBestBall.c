@@ -35,7 +35,7 @@ void fn_800E81C4(void) {
     gpGame->nC = 4;
     gpGame->n10 = 4;
     gpGame->nDC = 0;
-    fn_800E1480(0);
+    GM_SetCurrentHole(0);
     gSession.nSplitScreen = 0;
 }
 
@@ -292,7 +292,7 @@ void fn_800E8A68(void) {
     int nPlayer;
     int nProfile;
     int nOtherTeam;
-    if (fn_800E1BBC()) {
+    if (GM_FullRoundOfGolf()) {
         switch (GM5_IsChallengeRunning()) {
         case 0:
             break;
@@ -311,11 +311,11 @@ void fn_800E8A68(void) {
                     nOtherTeam = 0;
                 }
                 if (Team_IsAllCPU(nOtherTeam)) {
-                    nOurs = fn_800E1788(nFirst);
-                    nOurs += fn_800E1788(nFirst + 1);
-                    nTheirs = fn_800E1788(nOther);
+                    nOurs = GM_GetPlayerRoundScore(nFirst);
+                    nOurs += GM_GetPlayerRoundScore(nFirst + 1);
+                    nTheirs = GM_GetPlayerRoundScore(nOther);
                     nOther2 = nOther + 1;
-                    nTheirs += fn_800E1788(nOther2);
+                    nTheirs += GM_GetPlayerRoundScore(nOther2);
                     if (nOurs < nTheirs) {
                         nMargin = nTheirs - nOurs;
                         if (nMargin > 5) {

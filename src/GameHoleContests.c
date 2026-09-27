@@ -46,7 +46,7 @@ void fn_800D9E14(void) {
 u8 fn_800D9E5C(void) {
     if (gpGame->nMulligans != 0) return 0;
     if (gSession.nNumPlayers == 1) return 0;
-    if (!fn_800E1BBC()) return 0;
+    if (!GM_FullRoundOfGolf()) return 0;
     if (gSession.a8[0] != 0) return 0;
     if (GM5_IsChallengeRunning()) return 0;
     if (fn_800ED6F0()) return 0;
@@ -160,7 +160,7 @@ static f32 GameHoleContests_StrippedFn(f32 x) {
 }
 
 // Clears every player's contest result and the result table (winner: nobody); on the round's first
-// hole (fn_800E1734) also draws the contest holes again (fn_800D9E14).
+// hole (GM_OnFirstSelectedHole) also draws the contest holes again (fn_800D9E14).
 void fn_800DA36C(void) {
     int i;
     int n;
@@ -177,7 +177,7 @@ void fn_800DA36C(void) {
     }
     lbl_80282261 = 0;
     lbl_80282264 = 5;
-    if (fn_800E1734()) {
+    if (GM_OnFirstSelectedHole()) {
         fn_800D9E14();
     }
 }

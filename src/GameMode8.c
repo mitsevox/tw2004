@@ -235,7 +235,7 @@ u8 fn_800F9D00(u8 bCheck) {
             return 1;
         }
         if (!bCheck) {
-            fn_800E2BA4();
+            GM_Pick_PlayOffHole();
         }
     } else {
         nLeft = 0;
@@ -263,7 +263,7 @@ void fn_800F9E00(void) {
     int nMargin;
     int nMoney;
     int nProfile;
-    if (fn_800E1BBC()) {
+    if (GM_FullRoundOfGolf()) {
         if (gPlayers[0].nHolesWon > gPlayers[1].nHolesWon) {
             nMargin = gPlayers[0].nHolesWon - gPlayers[1].nHolesWon;
             nWinner = 0;
@@ -306,7 +306,7 @@ u8 fn_800F9F04(u8 bCheck) {
                 gpGame->bD5 = 0;
             }
         }
-        fn_800E2BA4();
+        GM_Pick_PlayOffHole();
         for (i = 0; i < gNumPlayersSetUp; i++) {
             for (h = 0; h < 18; h++) {
                 PLAYER(i)->nStrokes[h] = 0;
@@ -1636,7 +1636,7 @@ s32 fn_800FDC5C(s32* pMoney) {
     int nWinner;
     int h;
     nHole = Game_CurHoleIndex();
-    if (!fn_800E1BBC()) {
+    if (!GM_FullRoundOfGolf()) {
         *pMoney = 0;
         return -1;
     }

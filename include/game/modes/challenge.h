@@ -21,7 +21,7 @@ typedef struct Challenge {
     s32 n0;                     // 0x00  offset of a line in the challenge text block (fn_800ED280)
     s32 n4;                     // 0x04  the same for a second line (fn_800ED2C8)
     s32 nGroup;                 // 0x08  challenges with the same group are played together
-    s32 nMode;                  // 0x0C  the game mode it is played as (fn_800E0B38)
+    s32 nMode;                  // 0x0C  the game mode it is played as (GM_SetModeType)
     s32 nCourse;                // 0x10
     s32 nType;                  // 0x14  0 one hole, 1 all 18, 2/3 a nine, 4/5/6 the par 5s/4s/3s
     s32 nHole;                  // 0x18  1-based

@@ -93,7 +93,7 @@ void fn_8009F8C8(SaveRecords* pRecords) {
     nHoleNum = gpGame->nCurHoleNum;
     nCourse = Game_GetCourse();
     for (i = 0; i < NUM_COURSE_RECORDS; i++) {
-        fn_800E14E0(i);
+        GM_SetCurrentCourse(i);
         for (j = 0; j < 8; j++) {
             for (k = 0; k < 5; k++) {
                 if (!fn_800D8458(j, pRecords->aCourseRecord[(u32)i].aRecord[(u32)j][k].nValue,
@@ -140,7 +140,7 @@ void fn_8009F8C8(SaveRecords* pRecords) {
     }
     gpGame->nMode = nMode;
     gpGame->nCurHoleNum = nHoleNum;
-    fn_800E14E0(nCourse);
+    GM_SetCurrentCourse(nCourse);
 }
 
 // At boot: find the save file on a card and read it into the second image; if it is good, take its

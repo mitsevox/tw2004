@@ -105,7 +105,7 @@ void GameModeBattle_EndGame(void) {
     int nMargin;
     int nMoney;
     int nProfile;
-    if (fn_800E1BBC()) {
+    if (GM_FullRoundOfGolf()) {
         switch (GM5_IsChallengeRunning()) {
         case 0:
             break;
