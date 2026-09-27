@@ -43557,5 +43557,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "b7cb602",
+"sha": "b7cb602f595d736ddbee7a054408292c9e503695",
+"time": 1790534528,
+"subject": "Merge agent/n3: codebase health recon (agents/findings/2026-09-27-codebase-health.md)",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
