@@ -6,63 +6,68 @@
 
 #include "frontend/uistudio.h"
 
-// Pushes an event on the event stack whose top is pTop: the event record, with its type on
+// Pushes an event on the event stack whose top is pLocalThreadInfo: the event record, with its type on
 // the top word, then its arguments below it, the last one first. Returns the new top.
-// Signature (top by value, new top returned; pStudio unused): Madden 2003 STABS
-static inline s32* UISEvent_Push(UIStudio* pStudio, s32* pTop, UISEventData* pData, s16 nA, s16 nB,
-                                 s32 nType, s32 nArgs, const s32* pArgs) {
+// Signature (top by value, new top returned; pInfo unused): Madden 2003 STABS
+static inline s32* UISAddThreadActionAt(UISInfoT* pInfo, s32* pLocalThreadInfo,
+                                        UISThreadGroupInfoT* pInputThreadInfo, s16 GroupID, s16 ScreenID,
+                                        UISThreadActionT Action, s32 nParms, const s32* pParms) {
     UISEvent* pEvent;
     s32* pDst;
-    s32 i;
+    s32 idxParams;
 
-    pEvent = (UISEvent*)(pTop - 8);
-    pEvent->nType = nType;
+    pEvent = (UISEvent*)(pLocalThreadInfo - 8);
+    pEvent->nType = Action;
     pDst = (s32*)pEvent - 1;
-    pEvent->nA = nA;
-    pEvent->nB = nB;
-    pEvent->data = *pData;
-    pEvent->nArgs = nArgs;
-    if (pArgs != NULL) {
-        for (i = nArgs - 1; i >= 0; i--) {
-            *pDst-- = pArgs[i];
+    pEvent->nA = GroupID;
+    pEvent->nB = ScreenID;
+    pEvent->data = *pInputThreadInfo;
+    pEvent->nArgs = nParms;
+    if (pParms != NULL) {
+        for (idxParams = nParms - 1; idxParams >= 0; idxParams--) {
+            *pDst-- = pParms[idxParams];
         }
     }
     return pDst;
 }
 
-// Whether no event from p up to the stack's top waits for the screen (uA, uB), loads and unloads
+// Whether no event from pLocalThreadInfo up to the stack's top waits for the screen (GroupID,
+// ScreenID), loads and unloads
 // aside: a screen is unloaded only then.
-// Parameter order and the nArgs local: Madden 2003 STABS
-static inline u8 UISEvent_NoneWaiting(u16 uA, u16 uB, UIStudio* pStudio, s32* p) {
-    s32 nType;
+// Parameter order and the nParms local: Madden 2003 STABS
+static inline u8 _UISCanDoUnloadAction(u16 GroupID, u16 ScreenID, UISInfoT* pInfo, s32* pLocalThreadInfo) {
+    UISThreadActionT Action;
     u16 uThisA;
     u16 uThisB;
-    s32 nArgs;
+    s32 nParms;
 
-    while (p > pStudio->pEventTop) {
-        nType = p[0];
-        uThisA = p[-1];
-        uThisB = p[-2];
-        if (nType != 0 && nType != 1 && uThisA == uA && uThisB == uB) return 0;
-        p -= 8;
-        nArgs = *p;
-        p -= nArgs;
-        p--;
+    while (pLocalThreadInfo > pInfo->ThreadInfo.pCurrentParams) {
+        Action = pLocalThreadInfo[0];
+        uThisA = pLocalThreadInfo[-1];
+        uThisB = pLocalThreadInfo[-2];
+        if (Action != UISThreadAction_Load && Action != UISThreadAction_Unload && uThisA == GroupID
+            && uThisB == ScreenID) {
+            return 0;
+        }
+        pLocalThreadInfo -= 8;
+        nParms = *pLocalThreadInfo;
+        pLocalThreadInfo -= nParms;
+        pLocalThreadInfo--;
     }
     return 1;
 }
 
 // Returns the index of a rate function, or the count when there is none.
 // The functions above it in this file (compiled after it: deferred build) have it inlined.
-u32 fn_8016604C(UIStudio* pStudio, UISNodeInfo* pNodeInfo, u32 uId) {
-    u32 i;
-    UISRateFn* pFn;
+u32 UISFindRateFnc(UISInfoT* pInfo, UISControlInfoT* pControlInfo, u32 RateFncID) {
+    u32 RateFnc;
+    UISRateFncT* pRateFnc;
 
-    for (i = 0; i < pStudio->nRateFns; i++) {
-        pFn = &pStudio->pRateFns[i];
-        if (pFn->uId == uId && pFn->pNodeInfo == pNodeInfo) break;
+    for (RateFnc = 0; RateFnc < pInfo->NumRateFncs; RateFnc++) {
+        pRateFnc = &pInfo->RateFncs[RateFnc];
+        if (pRateFnc->RateFncID == RateFncID && pRateFnc->pControlInfo == pControlInfo) break;
     }
-    return i;
+    return RateFnc;
 }
 
 // fake match: an identity: x goes to the high word of a u64 and back down. The backend turns
@@ -72,56 +77,57 @@ static inline u32 fn_80165E9C_Read(u32 x) {
     return (u32)((u64)(s64)((u64)x << 32) >> 32);
 }
 
-// Loads a rate function that moves a variable to fTarget in uTime, replacing one with the same
+// Loads a rate function that moves a variable to targValue in MSDur, replacing one with the same
 // ID. The step per tick is the distance left divided by the number of ticks.
-void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, s32 n30, u32 uId,
-                 u8* pDoneScript, u8* pStepScript, u32 uTime, f32 fTarget, u32 u20) {
+void UISLoadAdvRateFnc(UISInfoT* pInfo, UISScreenT* pScreen, UISControlInfoT* pControlInfo,
+                       UISControlInfoT* pSubControlInfo, u32 RateFncID, u8* pEndFnc, u8* pAcelFnc, u32 MSDur,
+                       f32 targValue, u32 animType) {
     char szMsg[256];
-    u32 i;
-    UISRateFn* pRateFn;
+    u32 RateFnc;
+    UISRateFncT* pRateFnc;
     f32* p;
 
-    // fake match: pStudio goes through six identity reads (the value is unchanged). The copies
+    // fake match: pInfo goes through six identity reads (the value is unchanged). The copies
     // they leave reach the first scheduling pass, which then puts the string pool's base ahead
-    // of pStudio's saved copy (the original's addi r29 before mr r30,r3).
-    // port: pStudio is passed as a u32.
-    pStudio = (UIStudio*)fn_80165E9C_Read((u32)pStudio);
-    pStudio = (UIStudio*)fn_80165E9C_Read((u32)pStudio);
-    pStudio = (UIStudio*)fn_80165E9C_Read((u32)pStudio);
-    pStudio = (UIStudio*)fn_80165E9C_Read((u32)pStudio);
-    pStudio = (UIStudio*)fn_80165E9C_Read((u32)pStudio);
-    pStudio = (UIStudio*)fn_80165E9C_Read((u32)pStudio);
-    if (uTime == 0) {
-        lbl_80282A28(1, "UISEvent.c", 97,
-                     "Attempting to load rate function with duration 0 ms.  Rate function not loaded");
+    // of pInfo's saved copy (the original's addi r29 before mr r30,r3).
+    // port: pInfo is passed as a u32.
+    pInfo = (UISInfoT*)fn_80165E9C_Read((u32)pInfo);
+    pInfo = (UISInfoT*)fn_80165E9C_Read((u32)pInfo);
+    pInfo = (UISInfoT*)fn_80165E9C_Read((u32)pInfo);
+    pInfo = (UISInfoT*)fn_80165E9C_Read((u32)pInfo);
+    pInfo = (UISInfoT*)fn_80165E9C_Read((u32)pInfo);
+    pInfo = (UISInfoT*)fn_80165E9C_Read((u32)pInfo);
+    if (MSDur == 0) {
+        RuntimeErrorFnc(1, "UISEvent.c", 97,
+                        "Attempting to load rate function with duration 0 ms.  Rate function not loaded");
         return;
     }
-    if (pScreen->bUnloading) {
+    if (pScreen->bWaitingToBeUnloaded) {
         sprintf(szMsg,
                 "Attempt to load rate function (ID: %d) ignored.  "
                 "The screen (Group: %d, Screen: %d) is being unloaded.",
-                uId, pScreen->uGroup, pScreen->uScreen);
-        lbl_80282A28(0, "UISEvent.c", 107, szMsg);
+                RateFncID, pScreen->GroupID, pScreen->ScreenID);
+        RuntimeErrorFnc(0, "UISEvent.c", 107, szMsg);
         return;
     }
-    i = fn_8016604C(pStudio, pNodeInfo, uId);
-    if (i == pStudio->nRateFns) {
-        pStudio->nRateFns++;
+    RateFnc = UISFindRateFnc(pInfo, pControlInfo, RateFncID);
+    if (RateFnc == pInfo->NumRateFncs) {
+        pInfo->NumRateFncs++;
     }
-    pRateFn = &pStudio->pRateFns[i];
-    pRateFn->pNodeInfo = pNodeInfo;
-    pRateFn->n30 = n30;
-    pRateFn->pScreen = pScreen;
-    pRateFn->uId = uId;
-    pRateFn->pStepScript = pStepScript;
-    pRateFn->u10 = pStudio->uMsPerTick;
-    pRateFn->n8 = 0;
-    pRateFn->nC = 0;
-    pRateFn->uState = 0;
-    pRateFn->u20 = u20;
-    pRateFn->fTarget = fTarget;
-    pRateFn->pDoneScript = pDoneScript;
-    p = fn_8016C1A4(pRateFn->u20, pRateFn->pInfo);
+    pRateFnc = &pInfo->RateFncs[RateFnc];
+    pRateFnc->pControlInfo = pControlInfo;
+    pRateFnc->AnimationData.pSubControlInfo = pSubControlInfo;
+    pRateFnc->pScreen = pScreen;
+    pRateFnc->RateFncID = RateFncID;
+    pRateFnc->pFnc = pAcelFnc;
+    pRateFnc->MSRate = pInfo->MSPerTick;
+    pRateFnc->MSCount = 0;
+    pRateFnc->MSLastCount = 0;
+    pRateFnc->State = UISRATE_LOAD;
+    pRateFnc->AnimationData.iType = animType;
+    pRateFnc->AnimationData.fEndValue = targValue;
+    pRateFnc->AnimationData.pEndFnc = pEndFnc;
+    p = UISGetActionPtrValue(pRateFnc->AnimationData.iType, pRateFnc->AnimationData.pSubControlInfo);
     // fake match: p goes through s64 and back, then its word is swapped into the high half of a
     // u64 and back (the value is unchanged). The first leaves copies of the call's result that
     // reach the first scheduling pass (the original's lis r4 before lwz r0 and the load in f1);
@@ -130,257 +136,279 @@ void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, 
     // port: p is passed as a u32.
     p = (f32*)(u32)(s64)(s32)p;
     p = (f32*)(u32)((((u64)(u32)p << 32) | (u64)(u32)p) >> 32);
-    pRateFn->fStep = (fTarget - *p) / ((f32)uTime / (f32)pStudio->uMsPerTick);
+    pRateFnc->AnimationData.fStepValue = (targValue - *p) / ((f32)MSDur / (f32)pInfo->MSPerTick);
 }
 
 // Loads a rate function with no duration, replacing one with the same ID. Refused while the
 // screen is being unloaded.
-void fn_80165D90(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, u32 uId, u8* pStepScript,
-                 u32 u10) {
+void UISLoadRateFnc(UISInfoT* pInfo, UISScreenT* pScreen, UISControlInfoT* pControlInfo, u32 RateFncID,
+                    u8* pFnc, u32 MSRate) {
     char szMsg[256];
-    u32 i;
-    UISRateFn* pRateFn;
+    u32 RateFnc;
+    UISRateFncT* pRateFnc;
 
-    if (pScreen->bUnloading) {
+    if (pScreen->bWaitingToBeUnloaded) {
         sprintf(szMsg,
                 "Attempt to load rate function (ID: %d) ignored.  "
                 "The screen (Group: %d, Screen: %d) is being unloaded.",
-                uId, pScreen->uGroup, pScreen->uScreen);
-        lbl_80282A28(0, "UISEvent.c", 151, szMsg);
+                RateFncID, pScreen->GroupID, pScreen->ScreenID);
+        RuntimeErrorFnc(0, "UISEvent.c", 151, szMsg);
         return;
     }
-    i = fn_8016604C(pStudio, pNodeInfo, uId);
-    if (i == pStudio->nRateFns) {
-        pStudio->nRateFns++;
+    RateFnc = UISFindRateFnc(pInfo, pControlInfo, RateFncID);
+    if (RateFnc == pInfo->NumRateFncs) {
+        pInfo->NumRateFncs++;
     }
-    pRateFn = &pStudio->pRateFns[i];
-    pRateFn->pNodeInfo = pNodeInfo;
-    pRateFn->uId = uId;
-    pRateFn->pStepScript = pStepScript;
-    pRateFn->u10 = u10;
-    pRateFn->n8 = 0;
-    pRateFn->nC = 0;
-    pRateFn->pScreen = pScreen;
-    pRateFn->uState = 0;
-    pRateFn->u20 = 0;
-    pRateFn->fTarget = 0.0f;
-    pRateFn->pDoneScript = NULL;
+    pRateFnc = &pInfo->RateFncs[RateFnc];
+    pRateFnc->pControlInfo = pControlInfo;
+    pRateFnc->RateFncID = RateFncID;
+    pRateFnc->pFnc = pFnc;
+    pRateFnc->MSRate = MSRate;
+    pRateFnc->MSCount = 0;
+    pRateFnc->MSLastCount = 0;
+    pRateFnc->pScreen = pScreen;
+    pRateFnc->State = UISRATE_LOAD;
+    pRateFnc->AnimationData.iType = 0;
+    pRateFnc->AnimationData.fEndValue = 0.0f;
+    pRateFnc->AnimationData.pEndFnc = NULL;
 }
 
 // Marks a rate function as finished.
-void fn_80165D2C(UIStudio* pStudio, UISNodeInfo* pNodeInfo, u32 uId) {
-    u32 i;
-    u32 n = pStudio->nRateFns;
+void UISUnloadRateFnc(UISInfoT* pInfo, UISControlInfoT* pControlInfo, u32 RateFncID) {
+    u32 RateFnc;
+    u32 n = pInfo->NumRateFncs;
 
-    i = fn_8016604C(pStudio, pNodeInfo, uId);
-    if (i < n) {
-        pStudio->pRateFns[i].uState = 1;
+    RateFnc = UISFindRateFnc(pInfo, pControlInfo, RateFncID);
+    if (RateFnc < n) {
+        pInfo->RateFncs[RateFnc].State = UISRATE_UNLOAD;
     }
 }
 
 // Drops the rate functions that have finished and marks the new ones as running.
-void fn_80165C74(UIStudio* pStudio) {
-    int i;
-    int j;
+void UISRemoveUnNessaryRateFncs(UISInfoT* pInfo) {
+    int nRateFnc;
+    int nSlideFnc;
 
-    i = pStudio->nRateFns;
-    while (i-- != 0) {
-        if (pStudio->pRateFns[i].uState == 1) {
-            pStudio->nRateFns--;
-            for (j = i; j < pStudio->nRateFns; j++) {
-                memmove(&pStudio->pRateFns[j], &pStudio->pRateFns[j + 1], sizeof(UISRateFn));
+    nRateFnc = pInfo->NumRateFncs;
+    while (nRateFnc-- != 0) {
+        if (pInfo->RateFncs[nRateFnc].State == UISRATE_UNLOAD) {
+            pInfo->NumRateFncs--;
+            for (nSlideFnc = nRateFnc; nSlideFnc < pInfo->NumRateFncs; nSlideFnc++) {
+                memmove(&pInfo->RateFncs[nSlideFnc], &pInfo->RateFncs[nSlideFnc + 1], sizeof(UISRateFncT));
             }
-        } else if (pStudio->pRateFns[i].uState == 0) {
-            pStudio->pRateFns[i].uState = 2;
+        } else if (pInfo->RateFncs[nRateFnc].State == UISRATE_LOAD) {
+            pInfo->RateFncs[nRateFnc].State = UISRATE_ACTIVE;
         }
     }
 }
 
-UISReportFn lbl_80282A28;
+UISRuntimeErrorFncT* RuntimeErrorFnc;
 
-void fn_80165C6C(UISReportFn pfnReport) {
-    lbl_80282A28 = pfnReport;
+void UISRegisterRuntimeErrorFnc(UISRuntimeErrorFncT* pRuntimeErrorFnc) {
+    RuntimeErrorFnc = pRuntimeErrorFnc;
 }
 
 // Pushes an event on the studio's event stack: the event record, with its type on the top word,
 // then its arguments below it, the last one first.
-void fn_80165B90(s16 nA, s16 nB, UIStudio* pStudio, s32 nType, UISEventData* pData, s32 nArgs,
-                 const s32* pArgs) {
-    // fake match: nArgs goes through s64 and back (the value is unchanged); the dead high word
-    // lives until register allocation and gives the original's order of the nA/nB sign extensions
-    pStudio->pEventTop = UISEvent_Push(pStudio, pStudio->pEventTop, pData, nA, nB, nType, (s64)nArgs, pArgs);
+void UISAddThreadAction(s16 GroupID, s16 ScreenID, UISInfoT* pInfo, UISThreadActionT Action,
+                        UISThreadGroupInfoT* pInputThreadInfo, s32 nParms, const s32* pParms) {
+    // fake match: nParms goes through s64 and back (the value is unchanged); the dead high word
+    // lives until register allocation and gives the original's order of the GroupID/ScreenID sign extensions
+    pInfo->ThreadInfo.pCurrentParams = UISAddThreadActionAt(pInfo, pInfo->ThreadInfo.pCurrentParams,
+                                                            pInputThreadInfo, GroupID, ScreenID, Action,
+                                                            (s64)nParms, pParms);
 }
 
 // Walks the event stack from the bottom up and, for each type 9 event queued for the given
-// screen, while that screen is still loaded, calls fn_8016B0F8 with the event's first data word
+// screen, while that screen is still loaded, calls UISDoHint with the event's first data word
 // and its arguments.
-s32 fn_80165ACC(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
-    s32* pData;
-    s32 nArgs;
-    s32* pArgs;
+s32 UISThreadProcessHints(UISInfoT* pInfo, u16 GroupID, u16 ScreenID) {
+    s32* pLoadInfo;
+    s32 nParms;
+    s32* pParms;
     u16 uB;
-    s32 nType;
+    UISThreadActionT Action;
     u16 uA;
-    s32* p;
+    s32* pLocalThreadInfo;
 
-    p = pStudio->pEventBase;
-    while (p > pStudio->pEventTop) {
-        nType = p[0];
-        uA = p[-1];
-        uB = p[-2];
-        pData = p -= 7;
-        nArgs = p[-1];
-        p -= 1;
-        p -= nArgs;
-        pArgs = p;
-        p -= 1;
-        if (uA == uGroup && uB == uScreen && nType == 9
-            && fn_8016C6C4(pStudio, uA, uB) < pStudio->nScreens) {
-            // fake match: *pData and nArgs go through s64 and back (the values are unchanged);
-            // the two dead high words live until register allocation and give p, pStudio and
-            // uScreen the extra neighbours that put them in the original's saved registers
-            fn_8016B0F8(pStudio, (s64)*pData, (s64)nArgs, pArgs);
+    pLocalThreadInfo = pInfo->ThreadInfo.pBeginParams;
+    while (pLocalThreadInfo > pInfo->ThreadInfo.pCurrentParams) {
+        Action = pLocalThreadInfo[0];
+        uA = pLocalThreadInfo[-1];
+        uB = pLocalThreadInfo[-2];
+        pLoadInfo = pLocalThreadInfo -= 7;
+        nParms = pLocalThreadInfo[-1];
+        pLocalThreadInfo -= 1;
+        pLocalThreadInfo -= nParms;
+        pParms = pLocalThreadInfo;
+        pLocalThreadInfo -= 1;
+        if (uA == GroupID && uB == ScreenID && Action == UISThreadAction_HINT
+            && UISFindScreen(pInfo, uA, uB) < pInfo->NumScreens) {
+            // fake match: *pLoadInfo and nParms go through s64 and back (the values are unchanged);
+            // the two dead high words live until register allocation and give pLocalThreadInfo, pInfo and
+            // ScreenID the extra neighbours that put them in the original's saved registers
+            UISDoHint(pInfo, (s64)*pLoadInfo, (s64)nParms, pParms);
         }
     }
     return 1;
 }
 
-// Runs the event whose type word is at pTop and returns the next one's. An event that cannot run
-// yet (unloading a screen that still has events queued, or that fn_80168FC8 refuses) is pushed
-// again on the stack at *ppKeep.
+// Runs the event whose type word is at pLocalThreadInfo and returns the next one's. An event that cannot run
+// yet (unloading a screen that still has events queued, or that UISInternalUnloadScreen refuses) is pushed
+// again on the stack at *pNextFrameThreadInfo.
 // fake match: optimization level 3 for this function only: at level 4 an extra copy-propagation
-// pass folds the copies of uA and uB that UISEvent_NoneWaiting's loop compares with (the original
+// pass folds the copies of GroupID and ScreenID that _UISCanDoUnloadAction's loop compares with (the original
 // keeps them: mr r4,r28; mr r3,r27)
 #pragma optimization_level 3
-s32* fn_80165670(UIStudio* pStudio, s32* pTop, s32** ppKeep) {
-    s32 nType;
-    UISEventData* pData;
-    s32 nArgs;
-    s32* pArgs;
-    u16 uA;
-    u16 uB;
+s32* _UISDoThreadAction(UISInfoT* pInfo, s32* pLocalThreadInfo, s32** pNextFrameThreadInfo) {
+    UISThreadActionT Action;
+    UISThreadGroupInfoT* pLoadInfo;
+    s32 nParms;
+    s32* pParms;
+    u16 GroupID;
+    u16 ScreenID;
     u32 nIndex;
-    UISScreen* pScreen;
+    UISScreenT* pScreen;
 
-    // fake match: pTop goes through u64 and back (the value is unchanged); the copy chain keeps
+    // fake match: pLocalThreadInfo goes through u64 and back (the value is unchanged); the copy chain keeps
     // the original's copy of the parameter (mr r25,r4) through the copy-propagation passes
     // port: a 32-bit pointer through u32; drop this line in a port
-    pTop =(s32*)(u32)((u64)(s64)((u64)(u32)pTop << 32) >> 32);
-    nType = pTop[0];
-    uA = pTop[-1];
-    uB = pTop[-2];
-    pData = (UISEventData*)(pTop -= 7);
-    pTop--;
-    nArgs = *pTop;
-    pTop -= nArgs;
-    pArgs = pTop;
-    pTop--;
-    switch (nType) {
-    case 0:
-        fn_80169858(pStudio, pData->aw[0], pData->aw[1], pData->aw[2], pData->aw[3], nArgs, pArgs);
+    pLocalThreadInfo =(s32*)(u32)((u64)(s64)((u64)(u32)pLocalThreadInfo << 32) >> 32);
+    Action = pLocalThreadInfo[0];
+    GroupID = pLocalThreadInfo[-1];
+    ScreenID = pLocalThreadInfo[-2];
+    pLoadInfo = (UISThreadGroupInfoT*)(pLocalThreadInfo -= 7);
+    pLocalThreadInfo--;
+    nParms = *pLocalThreadInfo;
+    pLocalThreadInfo -= nParms;
+    pParms = pLocalThreadInfo;
+    pLocalThreadInfo--;
+    switch (Action) {
+    case UISThreadAction_Load:
+        UISInternalLoadScreen(pInfo, pLoadInfo->ScreenInfo.GroupID, pLoadInfo->ScreenInfo.ScreenID,
+                              pLoadInfo->ScreenInfo.ParentGroupID, pLoadInfo->ScreenInfo.ParentScreenID,
+                              nParms, pParms);
         break;
-    case 1:
-        nIndex = fn_8016C6C4(pStudio, pData->aw[0], pData->aw[1]);
-        if (nIndex < pStudio->nScreens) {
-            pScreen = &pStudio->pScreens[nIndex];
-            pScreen->bUnloading = 1;
+    case UISThreadAction_Unload:
+        nIndex = UISFindScreen(pInfo, pLoadInfo->ScreenInfo.GroupID, pLoadInfo->ScreenInfo.ScreenID);
+        if (nIndex < pInfo->NumScreens) {
+            pScreen = &pInfo->Screens[nIndex];
+            pScreen->bWaitingToBeUnloaded = 1;
         }
-        if (!UISEvent_NoneWaiting(uA, uB, pStudio, pTop)) {
-            *ppKeep = UISEvent_Push(pStudio, *ppKeep, pData, uA, uB, nType, nArgs, pArgs);
-        } else if (!fn_80168FC8(pStudio, pData->aw[0], pData->aw[1], pData->au[2])) {
-            *ppKeep = UISEvent_Push(pStudio, *ppKeep, pData, uA, uB, nType, nArgs, pArgs);
-        }
-        break;
-    case 9:
-        if (fn_8016C6C4(pStudio, uA, uB) < pStudio->nScreens) {
-            fn_8016B0F8(pStudio, pData->au[0], nArgs, pArgs);
-        }
-        break;
-    case 2:
-        pStudio->uFlags |= 2;
-        fn_80168CD8(pStudio, &pStudio->stack64, pData->au[0], -8, nArgs, pArgs, 1);
-        pStudio->uFlags &= ~2;
-        break;
-    case 3:
-        fn_801686F8(pStudio, 1, pData->aw[0], pData->aw[1]);
-        break;
-    case 4:
-        fn_801686F8(pStudio, 0, pData->aw[0], pData->aw[1]);
-        break;
-    case 5:
-        if (pData->as[1] == 0) {
-            fn_80168918(pStudio, 1, pData->as[0], pData->ap[2], pData->ap[1], pData->aw[6], pData->aw[7]);
-            pData->as[1] = 1;
+        if (!_UISCanDoUnloadAction(GroupID, ScreenID, pInfo, pLocalThreadInfo)) {
+            *pNextFrameThreadInfo = UISAddThreadActionAt(pInfo, *pNextFrameThreadInfo, pLoadInfo, GroupID,
+                                                         ScreenID, Action, nParms, pParms);
+        } else if (!UISInternalUnloadScreen(pInfo, pLoadInfo->ScreenInfo.GroupID,
+                                            pLoadInfo->ScreenInfo.ScreenID, pLoadInfo->ScreenInfo.iRetVal)) {
+            *pNextFrameThreadInfo = UISAddThreadActionAt(pInfo, *pNextFrameThreadInfo, pLoadInfo, GroupID,
+                                                         ScreenID, Action, nParms, pParms);
         }
         break;
-    case 6:
-        if (pData->as[1] == 0) {
-            fn_80168918(pStudio, 0, pData->as[0], pData->ap[2], pData->ap[1], pData->aw[6], pData->aw[7]);
-            pData->as[1] = 1;
+    case UISThreadAction_HINT:
+        if (UISFindScreen(pInfo, GroupID, ScreenID) < pInfo->NumScreens) {
+            UISDoHint(pInfo, pLoadInfo->GenericInfo.Data[0], nParms, pParms);
         }
         break;
-    case 7:
-        pStudio->uFlags |= 2;
-        fn_80168CD8(pStudio, &pStudio->stack64, pData->au[1], pData->au[0], nArgs, pArgs, 0);
-        pStudio->uFlags &= ~2;
+    case UISThreadAction_Update:
+        pInfo->CriticalRegions |= 2;
+        UISProcessInternalEvents(pInfo, &pInfo->EventStack, pLoadInfo->GenericInfo.Data[0], -8, nParms,
+                                 pParms, 1);
+        pInfo->CriticalRegions &= ~2;
         break;
-    case 8:
-        fn_8016B4D4(pStudio, pData->aw[0], pData->aw[1], pData->au[3]);
+    case UISThreadAction_ScreenActivate:
+        UISInternalActivateScreen(pInfo, 1, pLoadInfo->ScreenInfo.GroupID, pLoadInfo->ScreenInfo.ScreenID);
+        break;
+    case UISThreadAction_ScreenDeactivate:
+        UISInternalActivateScreen(pInfo, 0, pLoadInfo->ScreenInfo.GroupID, pLoadInfo->ScreenInfo.ScreenID);
+        break;
+    case UISThreadAction_ControlActivate:
+        if (pLoadInfo->ActivateInfo.iProcessed == 0) {
+            UISInternalActivateControl(pInfo, 1, pLoadInfo->ActivateInfo.iDir,
+                                       pLoadInfo->ActivateInfo.pControlInfo,
+                                       pLoadInfo->ActivateInfo.pTableEntry, pLoadInfo->ActivateInfo.ScreenID,
+                                       pLoadInfo->ActivateInfo.GroupID);
+            pLoadInfo->ActivateInfo.iProcessed = 1;
+        }
+        break;
+    case UISThreadAction_ControlDeactivate:
+        if (pLoadInfo->ActivateInfo.iProcessed == 0) {
+            UISInternalActivateControl(pInfo, 0, pLoadInfo->ActivateInfo.iDir,
+                                       pLoadInfo->ActivateInfo.pControlInfo,
+                                       pLoadInfo->ActivateInfo.pTableEntry, pLoadInfo->ActivateInfo.ScreenID,
+                                       pLoadInfo->ActivateInfo.GroupID);
+            pLoadInfo->ActivateInfo.iProcessed = 1;
+        }
+        break;
+    case UISThreadAction_ProcessEvent:
+        pInfo->CriticalRegions |= 2;
+        UISProcessInternalEvents(pInfo, &pInfo->EventStack, pLoadInfo->MessageInfo.Controller,
+                                 pLoadInfo->MessageInfo.Message, nParms, pParms, 0);
+        pInfo->CriticalRegions &= ~2;
+        break;
+    case UISThreadAction_MoveScreen:
+        UISMoveScreenDrawPosition(pInfo, pLoadInfo->ScreenInfo.GroupID, pLoadInfo->ScreenInfo.ScreenID,
+                                  pLoadInfo->ScreenInfo.iDir);
         break;
     }
-    return pTop;
+    return pLocalThreadInfo;
 }
 #pragma optimization_level reset
 
-// Runs the event stack from the bottom up. With bScreenOnly only the type 5 and 6 events run
+// Runs the event stack from the bottom up. With bControlEventsOnly only the type 5 and 6 events run
 // (each once), and they stay queued; otherwise every event runs and those that must wait are
 // queued again, in order, from the bottom.
-// fake match: dead-assignment removal off for this function only: with it on, nType and the
+// fake match: dead-assignment removal off for this function only: with it on, Action and the
 // argument count read below trade r0 and r3 (no source spelling found that does the same)
 #pragma opt_dead_assignments off
-void fn_80165528(UIStudio* pStudio, u8 bScreenOnly) {
-    s32* p;
-    s32* pKeep;
-    UISEventData* pData;
-    s32 nType;
+void UISProcessThreadAction(UISInfoT* pInfo, u8 bControlEventsOnly) {
+    s32* pLocalThreadInfo;
+    s32* pNextFrameInfo;
+    UISThreadGroupInfoT* pLoadInfo;
+    UISThreadActionT Action;
     s32* pNext;
 
-    if (pStudio->uFlags & 1) return;
-    pStudio->uFlags |= 1;
-    p = pStudio->pEventBase;
-    pKeep = p;
-    if (bScreenOnly) {
-        while (p > pStudio->pEventTop) {
-            nType = p[0];
+    if (pInfo->CriticalRegions & 1) return;
+    pInfo->CriticalRegions |= 1;
+    pLocalThreadInfo = pInfo->ThreadInfo.pBeginParams;
+    pNextFrameInfo = pLocalThreadInfo;
+    if (bControlEventsOnly) {
+        while (pLocalThreadInfo > pInfo->ThreadInfo.pCurrentParams) {
+            Action = pLocalThreadInfo[0];
             // below the type word: the event's data, its argument count and its arguments
-            pNext = p - 7;
-            pData = (UISEventData*)pNext;
+            pNext = pLocalThreadInfo - 7;
+            pLoadInfo = (UISThreadGroupInfoT*)pNext;
             pNext--;
-            pNext -= p[-8];
-            switch (nType) {
-            case 5:
-                if (pData->as[1] == 0) {
-                    fn_80168918(pStudio, 1, pData->as[0], pData->ap[2], pData->ap[1], pData->aw[6],
-                                pData->aw[7]);
-                    pData->as[1] = 1;
+            pNext -= pLocalThreadInfo[-8];
+            switch (Action) {
+            case UISThreadAction_ControlActivate:
+                if (pLoadInfo->ActivateInfo.iProcessed == 0) {
+                    UISInternalActivateControl(pInfo, 1, pLoadInfo->ActivateInfo.iDir,
+                                               pLoadInfo->ActivateInfo.pControlInfo,
+                                               pLoadInfo->ActivateInfo.pTableEntry,
+                                               pLoadInfo->ActivateInfo.ScreenID,
+                                               pLoadInfo->ActivateInfo.GroupID);
+                    pLoadInfo->ActivateInfo.iProcessed = 1;
                 }
                 break;
-            case 6:
-                if (pData->as[1] == 0) {
-                    fn_80168918(pStudio, 0, pData->as[0], pData->ap[2], pData->ap[1], pData->aw[6],
-                                pData->aw[7]);
-                    pData->as[1] = 1;
+            case UISThreadAction_ControlDeactivate:
+                if (pLoadInfo->ActivateInfo.iProcessed == 0) {
+                    UISInternalActivateControl(pInfo, 0, pLoadInfo->ActivateInfo.iDir,
+                                               pLoadInfo->ActivateInfo.pControlInfo,
+                                               pLoadInfo->ActivateInfo.pTableEntry,
+                                               pLoadInfo->ActivateInfo.ScreenID,
+                                               pLoadInfo->ActivateInfo.GroupID);
+                    pLoadInfo->ActivateInfo.iProcessed = 1;
                 }
                 break;
             }
-            p = pNext - 1;
+            pLocalThreadInfo = pNext - 1;
         }
     } else {
-        while (p > pStudio->pEventTop) {
-            p = fn_80165670(pStudio, p, &pKeep);
+        while (pLocalThreadInfo > pInfo->ThreadInfo.pCurrentParams) {
+            pLocalThreadInfo = _UISDoThreadAction(pInfo, pLocalThreadInfo, &pNextFrameInfo);
         }
-        pStudio->pEventTop = pKeep;
+        pInfo->ThreadInfo.pCurrentParams = pNextFrameInfo;
     }
-    pStudio->uFlags &= ~1;
+    pInfo->CriticalRegions &= ~1;
 }
 #pragma opt_dead_assignments reset

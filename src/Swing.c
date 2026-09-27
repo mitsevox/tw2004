@@ -101,7 +101,7 @@ enum {
 #define GOLFER_GET_ATTRIBUTE_S8(p, nAttr, nMode) \
     (((s8 (*)(Player*, int, int))Golfer_GetAttribute)(p, nAttr, nMode))
 
-extern f32           lbl_80281B40[];             // FLT_MAX
+extern f32           __float_max[];              // FLT_MAX
 
 void  Swing_FaceVector(int nPlayer, f32* pOut);
 f32   fn_8005BA94_MishitAngle(int nPlayer);
@@ -1795,8 +1795,8 @@ void Vec_Sub(f32* pA, f32* pB, f32* pOut) {
 // A 4-vector's squared length, capped.
 f32 fn_8005CC18(f32* pV) {
     f32 f = pV[0] * pV[0] + pV[1] * pV[1] + pV[2] * pV[2] + pV[3] * pV[3];
-    if (f > lbl_80281B40[0]) {
-        f = lbl_80281B40[0];
+    if (f > __float_max[0]) {
+        f = __float_max[0];
     }
     return f;
 }

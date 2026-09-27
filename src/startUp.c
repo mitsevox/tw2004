@@ -828,7 +828,7 @@ void fn_800B0960(void) {
     MsgArg arg;
     if (!lbl_802814A0) {
         fn_80005AE8(&arg, 0, sizeof(arg));
-        fn_8016B0F8(lbl_80281F1C->pHandler, 0x86, 1, (s32*)&arg);
+        UISDoHint(lbl_80281F1C->pHandler, 0x86, 1, (s32*)&arg);
         return;
     }
     fn_8009CD10();
@@ -1003,67 +1003,67 @@ done:
 void fn_800B0DB8(void) {
     MsgArg arg;
     fn_80005AE8(&arg, 0, sizeof(arg));
-    fn_8016B0F8(lbl_80281F1C->pHandler, 0x87, 0, (s32*)&arg);
+    UISDoHint(lbl_80281F1C->pHandler, 0x87, 0, (s32*)&arg);
 }
 
 void fn_800B0DFC(void) {
     MsgArg arg;
     fn_80005AE8(&arg, 0, sizeof(arg));
-    fn_8016B0F8(lbl_80281F1C->pHandler, 0x88, 0, (s32*)&arg);
+    UISDoHint(lbl_80281F1C->pHandler, 0x88, 0, (s32*)&arg);
 }
 
 void fn_800B0E40(void) {
     MsgArg arg;
     fn_80005AE8(&arg, 0, sizeof(arg));
-    fn_8016B0F8(lbl_80281F1C->pHandler, 0x89, 0, (s32*)&arg);
+    UISDoHint(lbl_80281F1C->pHandler, 0x89, 0, (s32*)&arg);
 }
 
 void fn_800B0E84(void) {
     MsgArg arg;
     fn_80005AE8(&arg, 0, sizeof(arg));
-    fn_8016B0F8(lbl_80281F1C->pHandler, 0x8A, 0, (s32*)&arg);
+    UISDoHint(lbl_80281F1C->pHandler, 0x8A, 0, (s32*)&arg);
 }
 
 void fn_800B0EC8(void) {
     MsgArg arg;
     fn_80005AE8(&arg, 0, sizeof(arg));
-    fn_8016B0F8(lbl_80281F1C->pHandler, 0x8C, 0, (s32*)&arg);
+    UISDoHint(lbl_80281F1C->pHandler, 0x8C, 0, (s32*)&arg);
 }
 
 void fn_800B0F0C(void) {
     MsgArg arg;
     fn_80005AE8(&arg, 0, sizeof(arg));
-    fn_8016B0F8(lbl_80281F1C->pHandler, 0x83, 0, (s32*)&arg);
+    UISDoHint(lbl_80281F1C->pHandler, 0x83, 0, (s32*)&arg);
 }
 
 void fn_800B0F50(void) {
     MsgArg arg;
     fn_80005AE8(&arg, 0, sizeof(arg));
-    fn_8016B0F8(lbl_80281F1C->pHandler, 0x81, 0, (s32*)&arg);
+    UISDoHint(lbl_80281F1C->pHandler, 0x81, 0, (s32*)&arg);
 }
 
 void fn_800B0F94(void) {
     MsgArg arg;
     fn_80005AE8(&arg, 0, sizeof(arg));
-    fn_8016B0F8(lbl_80281F1C->pHandler, 0x8B, 0, (s32*)&arg);
+    UISDoHint(lbl_80281F1C->pHandler, 0x8B, 0, (s32*)&arg);
 }
 
 void fn_800B0FD8(void) {
     MsgArg arg;
     fn_80005AE8(&arg, 0, sizeof(arg));
-    fn_8016B0F8(lbl_80281F1C->pHandler, 0x80, 0, (s32*)&arg);
+    UISDoHint(lbl_80281F1C->pHandler, 0x80, 0, (s32*)&arg);
 }
 
 void fn_800B101C(void) {
     MsgArg arg;
     fn_80005AE8(&arg, 0, sizeof(arg));
-    fn_8016B0F8(lbl_80281F1C->pHandler, 0x82, 0, (s32*)&arg);
+    UISDoHint(lbl_80281F1C->pHandler, 0x82, 0, (s32*)&arg);
 }
 
 void fn_800B1060(void) {
     MsgArg arg;
     fn_80005AE8(&arg, 0, sizeof(arg));
-    fn_8016B0F8(lbl_80281F1C->pHandler, 0x8C, 0, (s32*)&arg);
+    UISDoHint(lbl_80281F1C->pHandler, 0x8C, 0, (s32*)&arg);
 }
 
 // Read every card's status; a changed status is marked not yet reported. Here and in fn_800B1180
@@ -1201,7 +1201,7 @@ void fn_800B1510(s32 a, s32 b) {
     fn_8009DCEC(a, b);
     fn_80005AE8(&arg, 0, sizeof(arg));
     arg.i = n;
-    fn_8016B0F8(lbl_80281F1C->pHandler, 0x84, 1, (s32*)&arg);
+    UISDoHint(lbl_80281F1C->pHandler, 0x84, 1, (s32*)&arg);
 }
 
 void fn_800B158C(s32 a, s32 b) {
@@ -1210,7 +1210,7 @@ void fn_800B158C(s32 a, s32 b) {
     fn_8009DCEC(a, b);
     fn_80005AE8(&arg, 0, sizeof(arg));
     arg.i = n;
-    fn_8016B0F8(lbl_80281F1C->pHandler, 0x8D, 1, (s32*)&arg);
+    UISDoHint(lbl_80281F1C->pHandler, 0x8D, 1, (s32*)&arg);
 }
 
 void fn_800B1608(void) {

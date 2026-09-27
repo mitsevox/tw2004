@@ -26,7 +26,7 @@ typedef struct PictFile {
     s16  nWidth;                // 0x10
     s16  nHeight;               // 0x12
     u8   unk14;
-    u8   n15;                   // 0x15  given to fn_800B8528
+    u8   n15;                   // 0x15  given to MAD_initdecode
     u8   unk16[2];
     u8   aData[4];              // 0x18  the coded picture (any length)
 } PictFile;

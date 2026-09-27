@@ -113,8 +113,8 @@ void fn_80090D28(FEQuad* pQuad) {
     pMtx = fn_80093274();
     pColour = fn_80093274();
     pAdd = fn_80093274();
-    lbl_80281F28 = fn_8016C198()->a;
-    lbl_80281F2C = fn_8016C18C()->a;
+    lbl_80281F28 = &UISGetColorMultipler()->r;
+    lbl_80281F2C = &UISGetColorAdditive()->r;
     bTint = 1;
     if (pQuad->n2 != -1) {
         pEntry = lbl_80281F1C->pFile->p8->apTables[pQuad->n2]->apEntries[pQuad->n0];
