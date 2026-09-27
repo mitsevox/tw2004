@@ -69,7 +69,7 @@ typedef struct UINamedList {
 
 typedef struct FrontEnd {
     UIFile* pFile;              // 0x0
-    void* pHandler;             // 0x4  where GameMessages.c sends its messages (fn_8016B09C)
+    void* pHandler;             // 0x4  where GameMessages.c sends its messages (UISProcessHint)
     struct UILoaded* p8;        // 0x8  the texture banks fn_8008F0FC frees (fn_80090400)
     UINamedList* pC;            // 0xC  a block uiLoadFile.c frees (fn_8008F24C)
     u32*  p10;                  // 0x10  the fonts table fn_8008F194 frees (fn_80090400)

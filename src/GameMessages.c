@@ -7,7 +7,7 @@
 #include "game/frontend.h"
 #include "frontend/fe.h"
 
-void  fn_8016B09C(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
+void  UISProcessHint(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
 void  fn_800E508C(void);
 void  fn_800E50FC(void);
 void  fn_800E5200(int n);
@@ -285,7 +285,7 @@ void fn_800E5798(void) {
             args[0].i = 15;
             args[1].f = 0.0f;
             args[2].i = lbl_802822E0;
-            fn_8016B09C(lbl_80281F1C->pHandler, 5, 3, args);
+            UISProcessHint(lbl_80281F1C->pHandler, 5, 3, args);
             fn_800E572C(1);
         }
         if (lbl_802822E4 & 2) {
@@ -317,7 +317,7 @@ void fn_800E58B4(int nMsg) {
     MsgArg arg;
     fn_800E5908(nMsg);
     fn_80005AE8(&arg, 0, sizeof(arg));
-    fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 0, &arg);
+    UISProcessHint(lbl_80281F1C->pHandler, nMsg, 0, &arg);
 }
 
 void fn_800E5908(int nMsg) {
@@ -334,7 +334,7 @@ void fn_800E590C(int nMsg, u32 uFloats, void* pA) {
     if (!(uFloats & 1)) {
         args[0].i = *(s32*)pA;
     }
-    fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 1, args);
+    UISProcessHint(lbl_80281F1C->pHandler, nMsg, 1, args);
 }
 
 // Two values.
@@ -353,7 +353,7 @@ void fn_800E5998(int nMsg, u32 uFloats, void* pA, void* pB) {
     } else {
         args[1].i = *(s32*)pB;
     }
-    fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 2, args);
+    UISProcessHint(lbl_80281F1C->pHandler, nMsg, 2, args);
 }
 
 // Three values.
@@ -377,7 +377,7 @@ void fn_800E5A4C(int nMsg, u32 uFloats, void* pA, void* pB, void* pC) {
     } else {
         args[2].i = *(s32*)pC;
     }
-    fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 3, args);
+    UISProcessHint(lbl_80281F1C->pHandler, nMsg, 3, args);
 }
 
 // Five values.
@@ -411,7 +411,7 @@ void fn_800E5B0C(int nMsg, u32 uFloats, void* pA, void* pB, void* pC, void* pD, 
     } else {
         args[4].i = *(s32*)pE;
     }
-    fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 5, args);
+    UISProcessHint(lbl_80281F1C->pHandler, nMsg, 5, args);
 }
 
 // Sends a message with a string.
@@ -423,7 +423,7 @@ void fn_800E5C08(int nMsg, char* pStr) {
     str.pStr = pStr;
     arg.p = &str;
     ((MsgString*)arg.p)->nLen = strlen(pStr);
-    fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 1, &arg);
+    UISProcessHint(lbl_80281F1C->pHandler, nMsg, 1, &arg);
 }
 
 u8 fn_800E5C84(void) {
@@ -443,7 +443,7 @@ void fn_800E5CA4(int a, int b, int c, int d, int e, int g, int h, f32 f) {
     args[5].f = f;
     args[6].i = g;
     args[7].i = h;
-    fn_8016B09C(lbl_80281F1C->pHandler, 0x42, 8, args);
+    UISProcessHint(lbl_80281F1C->pHandler, 0x42, 8, args);
 }
 
 void fn_800E5D40(int n) {

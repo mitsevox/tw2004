@@ -228,10 +228,7 @@ typedef struct UISAnimateData_t {
     f32 fStepValue;                 // 0x08 (0x28): the change per tick
     u8* pEndFnc;                    // 0x0C (0x2C): a script run when the target is reached (NULL:
                                     //       the first control's event -14 handler)
-    union {
-        UISControlInfoT* pSubControlInfo;  // 0x10 (0x30): the control the variable belongs to
-        s32 n30;                    //       ours: as UISLoadAdvRateFnc stores it
-    };
+    UISControlInfoT* pSubControlInfo;  // 0x10 (0x30): the control the variable belongs to
 } UISAnimateDataT;
 
 // A rate function: moves one variable of a screen towards a target, a step every tick.
@@ -301,7 +298,7 @@ typedef struct UISInfo_t {
     UISTransformFncT* pTransformFnc;  // 0x1C: UISRegisterTransformFncs
     UISLocalizeFncT* pLocalizeFnc;  // 0x20
     UISScreenActivatedFncT* pScreenActivatedFnc;  // 0x24
-    UISScreenDrawDebugFncT* pScreenDrawDebugFnc;  // 0x28: fn_80169B3C
+    UISScreenDrawDebugFncT* pScreenDrawDebugFnc;  // 0x28: UISRegisterScreenDrawDebugFnc
     u32 ActiveScreenIdx;            // 0x2C: index into Screens, -1 for none
     u32 MaxScreens;                 // 0x30
     u32 NumScreens;                 // 0x34
@@ -328,114 +325,120 @@ typedef struct UISInfo_t {
 LAYOUT_ASSERT(UISInfoT, 0xBC);
 
 // UISEvent.c
-void UISProcessThreadAction(UISInfoT* pStudio, u8 b);
-s32* _UISDoThreadAction(UISInfoT* pStudio, s32* pTop, s32** ppKeep);
-s32 UISThreadProcessHints(UISInfoT* pStudio, u16 uGroup, u16 uScreen);
-void UISAddThreadAction(s16 nA, s16 nB, UISInfoT* pStudio, s32 nType, UISThreadGroupInfoT* pData, s32 nArgs,
-                        const s32* pArgs);
-void UISRegisterRuntimeErrorFnc(UISRuntimeErrorFncT* pfnReport);
-void UISRemoveUnNessaryRateFncs(UISInfoT* pStudio);
-void UISUnloadRateFnc(UISInfoT* pStudio, UISControlInfoT* pNodeInfo, u32 uId);
-void UISLoadRateFnc(UISInfoT* pStudio, UISScreenT* pScreen, UISControlInfoT* pNodeInfo, u32 uId,
-                    u8* pStepScript, u32 u10);
-void UISLoadAdvRateFnc(UISInfoT* pStudio, UISScreenT* pScreen, UISControlInfoT* pNodeInfo, s32 n30, u32 uId,
-                       u8* pDoneScript, u8* pStepScript, u32 uTime, f32 fTarget, u32 u20);
-u32 UISFindRateFnc(UISInfoT* pStudio, UISControlInfoT* pNodeInfo, u32 uId);
+void UISProcessThreadAction(UISInfoT* pInfo, u8 bControlEventsOnly);
+s32* _UISDoThreadAction(UISInfoT* pInfo, s32* pLocalThreadInfo, s32** pNextFrameThreadInfo);
+s32 UISThreadProcessHints(UISInfoT* pInfo, u16 GroupID, u16 ScreenID);
+void UISAddThreadAction(s16 GroupID, s16 ScreenID, UISInfoT* pInfo, s32 Action,
+                        UISThreadGroupInfoT* pInputThreadInfo, s32 nParms, const s32* pParms);
+void UISRegisterRuntimeErrorFnc(UISRuntimeErrorFncT* pRuntimeErrorFnc);
+void UISRemoveUnNessaryRateFncs(UISInfoT* pInfo);
+void UISUnloadRateFnc(UISInfoT* pInfo, UISControlInfoT* pControlInfo, u32 RateFncID);
+void UISLoadRateFnc(UISInfoT* pInfo, UISScreenT* pScreen, UISControlInfoT* pControlInfo, u32 RateFncID,
+                    u8* pFnc, u32 MSRate);
+void UISLoadAdvRateFnc(UISInfoT* pInfo, UISScreenT* pScreen, UISControlInfoT* pControlInfo,
+                       UISControlInfoT* pSubControlInfo, u32 RateFncID, u8* pEndFnc, u8* pAcelFnc, u32 MSDur,
+                       f32 targValue, u32 animType);
+u32 UISFindRateFnc(UISInfoT* pInfo, UISControlInfoT* pControlInfo, u32 RateFncID);
 
 // UISStack.c
-// Runs a screen's script from pFrame (a bytecode interpreter).
-s8 UISStackProcess(UISInfoT* pStudio, s32* p, UISStackInfoT* pFrame, UISScreenT* pScreen,
-                   UISControlInfoT* pInfo);
+// Runs a screen's script from pStackState (a bytecode interpreter).
+s8 UISStackProcess(UISInfoT* pInfo, s32* pBeginStack, UISStackInfoT* pStackState, UISScreenT* pScreen,
+                   UISControlInfoT* pControlInfo);
 
 // UIStudio.c
-void UISUpdateVisibility(UISInfoT* pStudio, UISScreenT* pScreen, s32 nKind, void* p, s32 bOn);
-void UISInternalActivateScreen(UISInfoT* pStudio, u8 bOn, u16 uGroup, u16 uScreen);
-void UISInternalActivateControl(UISInfoT* pStudio, u8 bOn, s32 nId, UISControlInfoT* pInfo, s32* p,
-                                u16 uScreen, u16 uGroup);
-void UISIdleProcess(UISInfoT* pStudio, u32 uEvent);
+void UISUpdateVisibility(UISInfoT* pInfo, UISScreenT* pScreen, s32 targType, void* pTarget,
+                         s32 uNewVisibility);
+void UISInternalActivateScreen(UISInfoT* pInfo, u8 bActivate, u16 GroupID, u16 ScreenID);
+void UISInternalActivateControl(UISInfoT* pInfo, u8 bActivate, s32 iDir, UISControlInfoT* pControlInfo,
+                                s32* pTableEntry, u16 uScreen, u16 uGroup);
+void UISIdleProcess(UISInfoT* pInfo, u32 uEvent);
 
 // UISApi.c
-void UISDrawObjects(UISInfoT* pStudio, s32 nTicks);
-void UISProcessInternalEvents(UISInfoT* pStudio, UISStackInfoT* pStack, int uEvent, u32 n, s32 b, void* p,
-                              u8 bAll);
-void UISProcessEvent(UISInfoT* pStudio, u32 uEvent, s32 n, s32 b, void* p, u8 bAll);
-void UISGetActiveScreen(UISInfoT* pStudio, u16* puGroup, u16* puScreen);
-void UISSetScreenActive(UISInfoT* pStudio, u16 uGroup, u16 uScreen);
-u8 UISInternalUnloadScreen(UISInfoT* pStudio, u16 uGroup, u16 uScreen, s32 n);
-u8 UISInternalUnloadModal(UISInfoT* pStudio, u16 uGroup, u16 uScreen, s32 n);
-s32 UISLoadScreen(UISInfoT* pStudio, u16 uGroup, u16 uScreen, u8 nArgs, s32* pArgs);
-u8 UISSetGlobalScript(UISInfoT* pStudio, UISScrDataT* pFile);
-s32 _UISInternalLoad(UISInfoT* pStudio, u16 uGroup, u16 uScreen, u8 bPush, u8 nArgs, s32* pArgs);
-s32 UISInternalLoadScreen(UISInfoT* pStudio, u16 uGroup, u16 uScreen, u16 uPrevGroup, u16 uPrevScreen,
-                          u8 nArgs, s32* pArgs);
-void UISRegisterPluginFnc(UISInfoT* pStudio, s32 nIndex, UISPluginFncT* pfnHandler);
-void UISRegisterTransformFncs(UISInfoT* pStudio, UISTransformFncT* pfnTransform);
-void UISRegisterResourceFncs(UISInfoT* pStudio, UISResLoadFncT* pfnLoad, UISResUnloadFncT* pfnUnload);
-void fn_80169B3C(UISInfoT* pStudio, UISScreenDrawDebugFncT* pfnScreen28);
-void UISRegisterMessageFnc(UISInfoT* pStudio, UISMessageFncT* pfnCommand);
-void UISShutdown(UISInfoT* pStudio);
-void UISInit(UISInfoT* pStudio, u32 nScreens, u32 nHandlers, u32 nRateFns, u32 n60, u32 nEventWords,
-             u32 nWords2, u32 uMsPerTick);
-u32 UISGetMemSize(u32 nScreens, u32 nHandlers, u32 nRateFns, u32 n60, u32 nEventWords, u32 nWords2);
-s32 PatchScrData(UISScrDataT* pFile);
-void _ParseRateFncs(UISInfoT* pStudio, u32 uMs);
+void UISDrawObjects(UISInfoT* pInfo, s32 NumTicks);
+void UISProcessInternalEvents(UISInfoT* pInfo, UISStackInfoT* pStackInfo, int Channel, u32 Message,
+                              s32 nParam, void* pParam, u8 AllScreens);
+void UISProcessEvent(UISInfoT* pInfo, u32 Channel, s32 Message, s32 nParam, void* pParam, u8 AllScreens);
+void UISGetActiveScreen(UISInfoT* pInfo, u16* pGroupID, u16* pScreenID);
+void UISSetScreenActive(UISInfoT* pInfo, u16 GroupID, u16 ScreenID);
+u8 UISInternalUnloadScreen(UISInfoT* pInfo, u16 GroupID, u16 ScreenID, s32 iRetVal);
+u8 UISInternalUnloadModal(UISInfoT* pInfo, u16 GroupID, u16 ScreenID, s32 iRetVal);
+s32 UISLoadScreen(UISInfoT* pInfo, u16 GroupID, u16 ScreenID, u8 nParams, s32* pParams);
+u8 UISSetGlobalScript(UISInfoT* pInfo, UISScrDataT* pGlobalScriptData);
+s32 _UISInternalLoad(UISInfoT* pInfo, u16 GroupID, u16 ScreenID, u8 bModal, u8 nParams, s32* pParams);
+s32 UISInternalLoadScreen(UISInfoT* pInfo, u16 GroupID, u16 ScreenID, u16 ParentGroupID, u16 ParentScreenID,
+                          u8 nParams, s32* pParams);
+void UISRegisterPluginFnc(UISInfoT* pInfo, s32 PluginIndex, UISPluginFncT* pPluginFnc);
+void UISRegisterTransformFncs(UISInfoT* pInfo, UISTransformFncT* pTransformFnc);
+void UISRegisterResourceFncs(UISInfoT* pInfo, UISResLoadFncT* pLoadFnc, UISResUnloadFncT* pUnloadFnc);
+void UISRegisterScreenDrawDebugFnc(UISInfoT* pInfo, UISScreenDrawDebugFncT* pScreenDrawDebugFnc);
+void UISRegisterMessageFnc(UISInfoT* pInfo, UISMessageFncT* pMessageFnc);
+void UISShutdown(UISInfoT* pInfo);
+void UISInit(UISInfoT* pInfo, u32 MaxScreens, u32 MaxPlugins, u32 MaxRateFncs, u32 MaxModals, u32 StackSize,
+             u32 RateStackSize, u32 MSPerTick);
+u32 UISGetMemSize(u32 MaxScreens, u32 MaxPlugins, u32 MaxRateFncs, u32 MaxModals, u32 StackSize,
+                  u32 RateStackSize);
+s32 PatchScrData(UISScrDataT* pNewBase);
+void _ParseRateFncs(UISInfoT* pInfo, u32 MSElapsed);
 
 // UISScreen.c (0x8016A2D4-0x8016C718)
-// Sends event uEvent to node nNode of a screen and the nodes it links to; *pbOut gets the node's
-// UISControlInfoT.IsEnabled.
-s32 _ParseMaps(UISInfoT* pStudio, UISScreenT* pScreen, UISStackInfoT* pStack, u32 nNode, u32 uEvent, u32 n5,
-               s32 nArgs, s32* pArgs, u8* pbOut);
-void _ParseObjects(UISInfoT* pStudio, UISScreenT* pScreen, u32 nNode, s32 nMsg);
-void _ParseTransforms(UISInfoT* pStudio, int nOp, UISScreenT* pScreen, u32 nNode);
-void _ParseVisibility(UISInfoT* pStudio, UISScreenT* pScreen, s32 n, s32 nKind, void* p, u8 bAll);
-s32 _DetermineVisibility(UISScreenT* pScreen, UISControlInfoT* pInfo, s32 nKind, void* p);
-void _ParseInitialize(UISInfoT* pStudio, UISScreenT* pScreen, u32 nNode, s32 nMsg);
-void fn_8016B09C(UISInfoT* pStudio, u32 uEvent, s32 nArgs, s32* pArgs);
-void UISDoHint(UISInfoT* pStudio, u32 uEvent, s32 nArgs, s32* pArgs);
-void UISMoveScreenDrawPosition(UISInfoT* pStudio, u16 uGroup, u16 uScreen, s32 nMove);
-UISControlInfoT* UISFindSiblingEnableControl(UISScreenT* pScreen, UISControlInfoT* pInfo);
-void UISStringFormat(u32 u0, UISStringT* pOut, UISStringT* pFormat, s32 nArgs, const UISParamT* pArgs);
+// Sends event Channel to node idxControl of a screen and the nodes it links to; *bIsControlActive
+// gets the node's UISControlInfoT.IsEnabled.
+s32 _ParseMaps(UISInfoT* pInfo, UISScreenT* pScreen, UISStackInfoT* pStackInfo, u32 idxControl, u32 Channel,
+               u32 EventID, s32 nParam, s32* pParam, u8* bIsControlActive);
+void _ParseObjects(UISInfoT* pInfo, UISScreenT* pScreen, u32 idxControl, s32 FncID);
+void _ParseTransforms(UISInfoT* pInfo, int action, UISScreenT* pScreen, u32 idxControl);
+void _ParseVisibility(UISInfoT* pInfo, UISScreenT* pScreen, s32 uNewVisibility, s32 uChangeType,
+                      void* pChange, u8 bFirstPass);
+s32 _DetermineVisibility(UISScreenT* pScreen, UISControlInfoT* pTarget, s32 contextType, void* pContext);
+void _ParseInitialize(UISInfoT* pInfo, UISScreenT* pScreen, u32 idxControl, s32 FncID);
+void UISProcessHint(UISInfoT* pInfo, u32 Hint, s32 nParms, s32* pParam);
+void UISDoHint(UISInfoT* pInfo, u32 Hint, s32 nParms, s32* pParam);
+void UISMoveScreenDrawPosition(UISInfoT* pInfo, u16 GroupID, u16 ScreenID, s32 iDir);
+UISControlInfoT* UISFindSiblingEnableControl(UISScreenT* pScreen, UISControlInfoT* pControlInfo);
+void UISStringFormat(u32 pScrData, UISStringT* pString, UISStringT* pFormatStr, s32 nParam,
+                     const UISParamT* pParam);
 // The studio's printf: %c %s %d %i %u %f %x %X %p, with '-', '0', a width and a precision.
-s32 UISSprintf(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UISParamT* pArgs);
-void UISSetColorAdditive(f32 f1, f32 f2, f32 f3, f32 f4);
-void UISSetColorMultipler(f32 f1, f32 f2, f32 f3, f32 f4);
-// Returns a pointer to the float of pInfo that a rate function's n20 names.
-f32* UISGetActionPtrValue(s32 n20, UISControlInfoT* pInfo);
-// Runs pScript for node info pInfo with a call frame pushed on pStack.
-s32 UISExecuteFnc(UISInfoT* pStudio, UISScreenT* pScreen, UISControlInfoT* pInfo, UISStackInfoT* pStack,
-                  u8* pScript, s32 nArgs, s32* pArgs, u32 nArgs2, const s32* pArgs2, u8 bExtra, s32 nExtra,
-                  s32* pnSaved);
+s32 UISSprintf(char* buf, s32 destSize, const char* fmt, s32 nParam, const UISParamT* pParam);
+void UISSetColorAdditive(f32 r, f32 g, f32 b, f32 a);
+void UISSetColorMultipler(f32 r, f32 g, f32 b, f32 a);
+// Returns a pointer to the float of pControlInfo that Action (a rate function's
+// AnimationData.iType) names.
+f32* UISGetActionPtrValue(s32 Action, UISControlInfoT* pControlInfo);
+// Runs pcEvent for node info pControlInfo with a call frame pushed on pStackInfo.
+s32 UISExecuteFnc(UISInfoT* pInfo, UISScreenT* pScreen, UISControlInfoT* pControlInfo,
+                  UISStackInfoT* pStackInfo, u8* pcEvent, s32 nParam, s32* pParam, u32 nAppend,
+                  const s32* pAppend, u8 bUseChannel, s32 Channel, s32* pReturn);
 // A node's handler scripts for an event, by kind (0x4000, plain with an ID, 0x8000); NULL for none.
 // The event is a u32 (callers pass it unmasked; each function masks it to 16 bits).
-u8* _UISFindHintPC(UISControlT* pNode, u32 uEvent);
-u8* UISFindSubControlEventPC(UISControlT* pNode, u16 uId, u32 uEvent);
-u8* UISFindEventPC(UISControlT* pNode, u32 uEvent);
-u16 UISFindScreen(UISInfoT* pStudio, u16 uGroup, u16 uScreen);
+u8* _UISFindHintPC(UISControlT* pControl, u32 HintID);
+u8* UISFindSubControlEventPC(UISControlT* pControl, u16 idxControl, u32 EventID);
+u8* UISFindEventPC(UISControlT* pControl, u32 EventID);
+u16 UISFindScreen(UISInfoT* pInfo, u16 GroupID, u16 ScreenID);
 
-// Sends event uEvent to the current screen, or to every screen when bAll is set; n -8 skips a
-// screen being unloaded. UISProcessInternalEvents's body, which UIStudio.c has pasted in twice (the pasted
-// copies keep this block layout, with the loop set-up after the loop).
-static inline void UIStudio_Send(UISInfoT* pStudio, UISStackInfoT* pStack, u32 uEvent, s32 n, s32 b, void* p,
-                                 u8 bAll) {
-    u32 i;
-    u32 nEnd;
+// Sends event Channel to the current screen, or to every screen when AllScreens is set; Message -8
+// skips a screen being unloaded. UISProcessInternalEvents's body, which UIStudio.c has pasted in
+// twice (the pasted copies keep this block layout, with the loop set-up after the loop).
+static inline void UIStudio_Send(UISInfoT* pInfo, UISStackInfoT* pStackInfo, u32 Channel, s32 Message,
+                                 s32 nParam, void* pParam, u8 AllScreens) {
+    u32 idxScreen;
+    u32 numScreens;
     UISScreenT* pScreen;
-    u8 bOut;
+    u8 bProcess;
 
-    if (bAll) {
-        nEnd = pStudio->NumScreens;
-        i = 0;
+    if (AllScreens) {
+        numScreens = pInfo->NumScreens;
+        idxScreen = 0;
     } else {
-        i = pStudio->ActiveScreenIdx;
-        nEnd = i + 1;
-        if (i == -1) return;
+        idxScreen = pInfo->ActiveScreenIdx;
+        numScreens = idxScreen + 1;
+        if (idxScreen == -1) return;
     }
-    for (; i < nEnd; i++) {
-        pScreen = &pStudio->Screens[i];
+    for (; idxScreen < numScreens; idxScreen++) {
+        pScreen = &pInfo->Screens[idxScreen];
         // fake match: the original compares unsigned
-        if ((u32)n != -8 || pScreen->bWaitingToBeUnloaded != 1) {
-            bOut = 0;
-            _ParseMaps(pStudio, pScreen, pStack, 0, uEvent, n, b, p, &bOut);
+        if ((u32)Message != -8 || pScreen->bWaitingToBeUnloaded != 1) {
+            bProcess = 0;
+            _ParseMaps(pInfo, pScreen, pStackInfo, 0, Channel, Message, nParam, pParam, &bProcess);
         }
     }
 }

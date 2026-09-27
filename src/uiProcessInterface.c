@@ -173,10 +173,10 @@ void fn_8008F648(s32 nTicks) {
             fn_80005AE8(aArgs, 0, sizeof(aArgs));
             aArgs[0] = lbl_801D880C.n4;
             if (gSession.nGameType == 3) {
-                fn_8016B09C(lbl_80281F1C->pHandler, 0x23, 1, aArgs);
+                UISProcessHint(lbl_80281F1C->pHandler, 0x23, 1, aArgs);
             }
             if (gSession.nGameType >= 4 && gSession.nGameType <= 8) {
-                fn_8016B09C(lbl_80281F1C->pHandler, 0x24, 1, aArgs);
+                UISProcessHint(lbl_80281F1C->pHandler, 0x24, 1, aArgs);
             }
         }
         UFont_ResetContext();
@@ -280,7 +280,7 @@ void fn_8008F820(void) {
             lbl_80281368 = -1;
         }
         lbl_801D87C0.b49 = 0;
-        fn_8016B09C(lbl_80281F1C->pHandler, 0x2D, 1, aArgs);
+        UISProcessHint(lbl_80281F1C->pHandler, 0x2D, 1, aArgs);
         lbl_801D87C0.b40 = 0;
     }
     if (((Game_GetMode() == 7 && !lbl_801D7148.aCPU[0] && !lbl_801D7148.aCPU[1]) ||
@@ -289,7 +289,7 @@ void fn_8008F820(void) {
         if (lbl_80281368 == -1) {
             lbl_80281368 = lbl_80281EE0->b86;
         }
-        fn_8016B09C(lbl_80281F1C->pHandler, 0x34, 1, aArgs);
+        UISProcessHint(lbl_80281F1C->pHandler, 0x34, 1, aArgs);
         lbl_801D87C0.b40 = 1;
         lbl_801D87C0.b49 = 1;
     }
@@ -306,7 +306,7 @@ void fn_8008F820(void) {
                         pEvent++;
                     }
                     if (pButtons[k] != 0 && gSession.nGameType == 3) {
-                        fn_8016B09C(lbl_80281F1C->pHandler, 0x22, 1, aArgs);
+                        UISProcessHint(lbl_80281F1C->pHandler, 0x22, 1, aArgs);
                     }
                 }
                 if (gSession.nGameType == 6) {
@@ -490,7 +490,7 @@ FrontEnd* fn_8009005C(char* szSet) {
         fn_8008D8F4();
     }
     UISSetScreenActive(lbl_80281F1C->pHandler, 0, 0);
-    fn_80169B3C(lbl_80281F1C->pHandler, fn_80090894);
+    UISRegisterScreenDrawDebugFnc(lbl_80281F1C->pHandler, fn_80090894);
     UISRegisterRuntimeErrorFnc(fn_80090890);
     return lbl_80281F1C;
 }

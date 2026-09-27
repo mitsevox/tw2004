@@ -137,7 +137,7 @@ int  fn_8010766C(MsgArg* pArg, char* sz);
 
 // UISScreen.c's sender, with the front end's view of its arguments (as GameMessages.c declares it;
 // uistudio.h has UIStudio* and const s32*, and game/frontend.h cannot be included with it).
-void fn_8016B09C(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
+void UISProcessHint(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
 
 // Allocate the database, empty, and its tables.
 void FE_CrAP_InitModule(void) {
@@ -1813,7 +1813,7 @@ void fn_80107554(int nMsg, s32 nA) {
 
     if (lbl_80281F1C != NULL) {
         arg.i = nA;
-        fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 1, &arg);
+        UISProcessHint(lbl_80281F1C->pHandler, nMsg, 1, &arg);
     }
 }
 
@@ -1825,7 +1825,7 @@ void fn_80107594(int nMsg, s32 nA, char* szB) {
         args[0].i = nA;
         args[1].p = &str;
         fn_8010766C(&args[1], szB);
-        fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 2, args);
+        UISProcessHint(lbl_80281F1C->pHandler, nMsg, 2, args);
     }
 }
 
@@ -1838,7 +1838,7 @@ void fn_801075F8(int nMsg, s32 nA, char* szB, s32 nC) {
         args[1].p = &str;
         fn_8010766C(&args[1], szB);
         args[2].i = nC;
-        fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 3, args);
+        UISProcessHint(lbl_80281F1C->pHandler, nMsg, 3, args);
     }
 }
 
@@ -1858,7 +1858,7 @@ int fn_801076B0(char* sz, int nMsg) {
     }
     arg.p = &str;
     fn_8010766C(&arg, sz);
-    fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 1, &arg);
+    UISProcessHint(lbl_80281F1C->pHandler, nMsg, 1, &arg);
     return 0;
 }
 
@@ -1873,7 +1873,7 @@ void fn_8010771C(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, f32 f
         args[4].i = nE;
         args[5].i = nF;
         args[6].f = fG;
-        fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 7, args);
+        UISProcessHint(lbl_80281F1C->pHandler, nMsg, 7, args);
     }
 }
 
@@ -1892,6 +1892,6 @@ void fn_80107774(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, s32 n
         args[7].i = nH;
         args[8].i = nI;
         args[9].i = nJ;
-        fn_8016B09C(lbl_80281F1C->pHandler, nMsg, 10, args);
+        UISProcessHint(lbl_80281F1C->pHandler, nMsg, 10, args);
     }
 }
