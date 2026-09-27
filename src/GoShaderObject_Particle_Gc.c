@@ -114,6 +114,12 @@ void fn_800950DC(int r, int g, int b, int a);
 void fn_800950F4(f32 x, f32 y, f32 z);
 void fn_800124A8(void);                                 // LLFont.c: end the primitive
 
+// fake match: an identity inline for fn_80094534's colour bytes; its parameter is a frontend
+// variable numbered above the (u8) argument temps, which gives the original's registers for them
+static inline u8 fn_80094534_Get(u8 x) {
+    return x;
+}
+
 // Draws n particles as camera-facing quads. Each one's position runs from v0 along v60 with time,
 // plus its own velocity's difference from v60 eased out by 1 / (1 + f50 t)^4; it is skipped when
 // it ends up behind the camera. Its size, colour and alpha run linearly with time within limits,
@@ -123,6 +129,7 @@ void fn_80094534(f32 (*pMtx)[4], ParticleShape* pShape, ParticleVertex* pVerts, 
     // fake match: this declaration order (found by search) sets the float register allocation
     f32 fSin;
     f32 fDiff;
+    f32 fA;
     u8 nBlue;
     f32 fBlue;
     f32 fRed;
@@ -151,16 +158,21 @@ void fn_80094534(f32 (*pMtx)[4], ParticleShape* pShape, ParticleVertex* pVerts, 
         t = *pTimes;
         fEase = pShape->f50 * t + 1.0f;
         fEase = fEase * fEase;
-        fEase = 1.0f / (fEase * fEase);
-        fDiff = pVerts->vC[0] * pShape->f54;
-        fDiff = fDiff - pShape->v60[0] * pShape->f54;
-        v.x = pShape->v60[0] * t + pVerts->v0[0] + fDiff - fEase * fDiff;
-        fDiff = pVerts->vC[1] * pShape->f54;
-        fDiff = fDiff - pShape->v60[1] * pShape->f54;
-        v.y = pShape->v60[1] * t + pVerts->v0[1] + fDiff - fEase * fDiff;
-        fDiff = pVerts->vC[2] * pShape->f54;
-        fDiff = fDiff - pShape->v60[2] * pShape->f54;
-        v.z = pShape->v60[2] * t + pVerts->v0[2] + fDiff - fEase * fDiff;
+        fEase = fEase * fEase;
+        // fake match: fA holds each product and each base term, and the reciprocal is written in
+        // every axis (computed once): this gives the original's operand order and registers
+        fA = pVerts->vC[0] * pShape->f54;
+        fDiff = fA - pShape->v60[0] * pShape->f54;
+        fA = pShape->v60[0] * t + pVerts->v0[0];
+        v.x = fA + fDiff - (1.0f / fEase) * fDiff;
+        fA = pVerts->vC[1] * pShape->f54;
+        fDiff = fA - pShape->v60[1] * pShape->f54;
+        fA = pShape->v60[1] * t + pVerts->v0[1];
+        v.y = fA + fDiff - (1.0f / fEase) * fDiff;
+        fA = pVerts->vC[2] * pShape->f54;
+        fDiff = fA - pShape->v60[2] * pShape->f54;
+        fA = pShape->v60[2] * t + pVerts->v0[2];
+        v.z = fA + fDiff - (1.0f / fEase) * fDiff;
         fn_800BAD60(pMtx, &v, &v);
         if (v.z > 0.0f) {
             fSize = pShape->f48 * t + pVerts->f20;
@@ -169,20 +181,20 @@ void fn_80094534(f32 (*pMtx)[4], ParticleShape* pShape, ParticleVertex* pVerts, 
             if (fRed <= pShape->v20[0]) {
                 fRed = pShape->v20[0];
             }
-            nRed = 255.0f * ((fRed < pShape->v20[0]) ? pShape->v20[0]
-                             : (fRed > pShape->v30[0]) ? pShape->v30[0] : fRed);
+            nRed = fn_80094534_Get(255.0f * ((fRed < pShape->v20[0]) ? pShape->v20[0]
+                                             : (fRed > pShape->v30[0]) ? pShape->v30[0] : fRed));
             fGreen = pShape->v10[1] * t + pShape->v0[1];
             if (fGreen <= pShape->v20[1]) {
                 fGreen = pShape->v20[1];
             }
-            nGreen = 255.0f * ((fGreen < pShape->v20[1]) ? pShape->v20[1]
-                               : (fGreen > pShape->v30[1]) ? pShape->v30[1] : fGreen);
+            nGreen = fn_80094534_Get(255.0f * ((fGreen < pShape->v20[1]) ? pShape->v20[1]
+                                               : (fGreen > pShape->v30[1]) ? pShape->v30[1] : fGreen));
             fBlue = pShape->v10[2] * t + pShape->v0[2];
             if (fBlue <= pShape->v20[2]) {
                 fBlue = pShape->v20[2];
             }
-            nBlue = 255.0f * ((fBlue < pShape->v20[2]) ? pShape->v20[2]
-                              : (fBlue > pShape->v30[2]) ? pShape->v30[2] : fBlue);
+            nBlue = fn_80094534_Get(255.0f * ((fBlue < pShape->v20[2]) ? pShape->v20[2]
+                                              : (fBlue > pShape->v30[2]) ? pShape->v30[2] : fBlue));
             fAlpha = pShape->v10[3] * t + pShape->v0[3];
             if (fAlpha <= pShape->v20[3]) {
                 fAlpha = pShape->v20[3];
@@ -193,7 +205,8 @@ void fn_80094534(f32 (*pMtx)[4], ParticleShape* pShape, ParticleVertex* pVerts, 
             if (uAlpha <= fFade) {
                 fFade = uAlpha;
             }
-            fAngle = (pVerts->f1C * t + pVerts->f18) / (2.0f * PI);
+            fAngle = pVerts->f1C * t + pVerts->f18;
+            fAngle = fAngle / (2.0f * PI);
             fSin = fn_800095F0(fAngle);
             fCos = fn_80009638(fAngle);
             m[0][0] = -fCos;
