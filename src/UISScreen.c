@@ -53,39 +53,43 @@ static inline UISNodeInfo* UIS_LinkedOn(UISScreenFile* pData, UISNode* pNode) {
 
 // Copies sz to pOut, padded with spaces to nWidth characters (on the left, or on the right when
 // bLeft), stopping at pEnd. Returns the end of the copy.
+// Register note: the walking copies p and s and their declaration order (after nAbs, before
+// nCount) give EA's r22-r25 in both inlined copies.
 static inline char* UIS_PutString(char* pOut, char* pEnd, const char* sz, s32 nWidth, u8 bLeft) {
     s32 nAbs;
+    char* p;
+    const char* s;
     s32 nCount;
     s32 nPad;
     s32 nLen;
     s32 i;
 
     nAbs = nWidth;
+    p = pOut;
+    s = sz;
     nCount = 0;
     if (nWidth < 0) {
         nAbs = -nWidth;
     }
-    nLen = strlen(sz);
+    nLen = strlen(s);
     if (!bLeft) {
         nPad = nAbs - nLen;
-        for (i = nPad; i > 0; i--) {
-            *pOut++ = ' ';
-        }
-        if (nPad > 0) {
-            nCount = nPad;
+        while (nCount < nPad) {
+            nCount++;
+            *p++ = ' ';
         }
     }
-    while (*sz != 0) {
-        *pOut++ = *sz++;
+    while (*s != 0) {
+        *p++ = *s++;
         nCount++;
-        if (pOut == pEnd) break;
+        if (p == pEnd) break;
     }
     if (bLeft == 1) {
         for (i = nCount; i < nAbs; i++) {
-            *pOut++ = ' ';
+            *p++ = ' ';
         }
     }
-    return pOut;
+    return p;
 }
 
 // The index of a loaded screen, or the number of screens when it is not loaded. Written out, not
@@ -353,29 +357,92 @@ char* fn_8016BEDC(char* pOut, char* pEnd, s32 nWidth, s32 nPrec, f32 f) {
     return pOut;
 }
 
+// fake match: fn_8016B844's 'x' case as an inline. Inlined code gets the frontend's goto
+// cleanup that a large function body skips, which places the output loop's preheader at the
+// end of fn_8016B844 as in EA's code. Code is unchanged.
+static inline char* fn_8016B844_CaseX(char* pOut, char* pEnd, u32 u, s32 nWidth, char cPad, s32 nUpper) {
+    s32 nDigits;
+    s32 nPad;
+    char c;
+    char aHex[12];
+
+    nDigits = 0;
+    do {
+        c = (u & 0xF) + '0';
+        if (c > '9') {
+            c += nUpper + 'a' - '9' - 1;
+        }
+        u >>= 4;
+        aHex[nDigits++] = c;
+    } while (u != 0);
+    if (nWidth != 0) {
+        for (nPad = nWidth - nDigits; nPad > 0; nPad--) {
+            aHex[nDigits++] = cPad;
+        }
+    }
+    while (--nDigits >= 0 && pOut < pEnd) {
+        *pOut++ = aHex[nDigits];
+    }
+    return pOut;
+}
+
+// fake match: fn_8016B844's 'd' case as an inline, for the same preheader placement as
+// fn_8016B844_CaseX. `bUnsigned ^ 1` for !bUnsigned (it is 0 or 1) gives EA's xori, and
+// `bNeg = n >> 31` inside the && EA's srwi. whose result is the sign kept in r0. The caller
+// passes its own u as n, which keeps EA's `mr r11,r7` before the negate. Code is unchanged.
+static inline char* fn_8016B844_CaseD(char* pOut, char* pEnd, u32 n, s32 nWidth, char cPad, s32 bUnsigned) {
+    s32 nDigits;
+    s32 nPad;
+    s32 bNeg;
+    char aDec[20];
+    u32 u;
+
+    nDigits = 0;
+    bNeg = 0;
+    u = ((bUnsigned ^ 1) && (bNeg = n >> 31)) ? -n : n;
+    do {
+        aDec[nDigits++] = u + '0' - u / 10 * 10;
+        u /= 10;
+    } while (u != 0);
+    if (nWidth != 0) {
+        for (nPad = nWidth - bNeg - nDigits; nPad > 0; nPad--) {
+            aDec[nDigits++] = cPad;
+        }
+    }
+    if (bNeg) {
+        aDec[nDigits++] = '-';
+    }
+    while (--nDigits >= 0 && pOut < pEnd) {
+        *pOut++ = aDec[nDigits];
+    }
+    return pOut;
+}
+
+// fake match: fn_8016B844's start pointer read through an inline whose parameter is changed (the
+// dead p++), so the parameter is a frontend variable numbered before every other inline's; the
+// start then ranks lowest of the saved registers (EA's r26). Returns p unchanged.
+static inline char* fn_8016B844_Get(char* p) {
+    return p++;
+}
+
 // Formats szFormat with pArgs into pOut (nSize bytes). Returns the length written, or -1.
 // EA bug: '-' is never cleared, so every conversion after one with '-' is left-justified too.
 s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UISWord* pArgs) {
+    // Register note: this declaration order gives EA's c r7, cPad r8 and nUpper r0.
     char* pEnd;
-    u8 bLeft;
-    char* pStart;
     s32 nArg;
-    char c;
-    s32 bUnsigned;
+    s32 nUpper;
+    u32 u;
     s32 nWidth;
     s32 nPrec;
-    char cPad;
     s32 bUpper;
-    s32 nDigits;
-    s32 nPad;
-    u32 u;
-    s32 bNeg;
-    char* p;
-    s32 nUpper;
-    char aDec[20];
-    char aHex[12];
+    s32 bUnsigned;
+    u8 bLeft;
+    char c;
+    char cPad;
+    char* pStart;
 
-    pStart = pOut;
+    pStart = fn_8016B844_Get(pOut);
     pEnd = pOut + nSize;
     bLeft = 0;
     if (pOut == NULL || nSize == 0 || szFormat == NULL) return -1;
@@ -432,27 +499,8 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
                 bUnsigned = 1;
             case 'd':
             case 'i':
-                nDigits = 0;
                 u = pArgs[nArg++].u;
-                // fake match: `bUnsigned ^ 1` for !bUnsigned (it is 0 or 1) gives EA's xori, and
-                // `u >> 31` for (s32)u < 0 its srwi.
-                bNeg = (bUnsigned ^ 1) && (u >> 31);
-                u = bNeg ? -u : u;
-                do {
-                    aDec[nDigits++] = u + '0' - u / 10 * 10;
-                    u /= 10;
-                } while (u != 0);
-                if (nWidth != 0) {
-                    for (nPad = nWidth - bNeg - nDigits; nPad > 0; nPad--) {
-                        aDec[nDigits++] = cPad;
-                    }
-                }
-                if (bNeg) {
-                    aDec[nDigits++] = '-';
-                }
-                while (--nDigits >= 0 && pOut < pEnd) {
-                    *pOut++ = aDec[nDigits];
-                }
+                pOut = fn_8016B844_CaseD(pOut, pEnd, u, nWidth, cPad, bUnsigned);
                 continue;
             case 'f':
                 pOut = fn_8016BEDC(pOut, pEnd, nWidth, nPrec, pArgs[nArg++].f);
@@ -461,23 +509,7 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
             case 'p':
             case 'x':
                 u = pArgs[nArg++].u;
-                nDigits = 0;
-                do {
-                    c = (u & 0xF) + '0';
-                    if (c > '9') {
-                        c += nUpper + 'a' - '9' - 1;
-                    }
-                    u >>= 4;
-                    aHex[nDigits++] = c;
-                } while (u != 0);
-                if (nWidth != 0) {
-                    for (nPad = nWidth - nDigits; nPad > 0; nPad--) {
-                        aHex[nDigits++] = cPad;
-                    }
-                }
-                while (--nDigits >= 0 && pOut < pEnd) {
-                    *pOut++ = aHex[nDigits];
-                }
+                pOut = fn_8016B844_CaseX(pOut, pEnd, u, nWidth, cPad, nUpper);
                 continue;
             }
         }
