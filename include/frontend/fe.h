@@ -459,7 +459,7 @@ void fn_800779BC(int a, int b);         // swap backup rows a and b (p658)
 GolferRecord* fn_80077A80(int nGolfer); // a golfer's record (created golfers: the profile's)
 void fn_80078620(int n, int* pA, int* pB, int* pC);     // unpack n = b * 1000000 + a * 10000 + c
 void fn_80079AD4(void);
-void fn_800A75B4(void);                 // (0x800A75B4) FE_Manager.c calls it after queueing a movie
+void Gaud_StopMusic(void);                 // (0x800A75B4) FE_Manager.c calls it after queueing a movie
 
 // ---- the menus' message table (FE_MessageTable.c) --------------------------------------------
 

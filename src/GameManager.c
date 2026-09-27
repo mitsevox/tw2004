@@ -545,7 +545,7 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     fn_800BB0A8();
     fn_800E4204();
     fn_800335F8(1);
-    fn_800A76E4();
+    Gaud_StopComment();
     REPLAY_Restore(nPlayer);
     gPlayers[nPlayer].bC2E = 1;
     gPlayers[nPlayer].bC2F = 1;

@@ -411,7 +411,7 @@ void fn_800DBDA8(int nPlayer) {
                 fn_800BD83C(lbl_80202898.u4C, 0);
                 lbl_80202898.b4A = 0;
             }
-            fn_800A6DCC(3, 1);
+            Gaud_InitCrowdReactionSound(3, 1);
             return;
         case 0:
             EVENT_Trigger(lbl_80202898.nPlayer, 0x3E, 0, -1);
@@ -420,12 +420,12 @@ void fn_800DBDA8(int nPlayer) {
                     fn_800BD83C(lbl_80202898.u4C, 0);
                     lbl_80202898.b4A = 0;
                 }
-                fn_800A6DCC(3, 1);
+                Gaud_InitCrowdReactionSound(3, 1);
             } else {
                 if (lbl_80202898.b47) {
                     fn_800BD83C(lbl_80202898.u48, 0);
                 }
-                fn_800A6DCC(lbl_80202898.n4F, 1);
+                Gaud_InitCrowdReactionSound(lbl_80202898.n4F, 1);
                 lbl_80202898.b4E = 0;
             }
             lbl_80202898.b47 = 0;

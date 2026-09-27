@@ -38,11 +38,11 @@ typedef struct GameAudioSource {
     f32  vPos[3];               // 0x10   where it plays (kinds other than 0, 3 and 5)
     u8   unk1C[0x22 - 0x1C];
     s16  nSound;                // 0x22   the sound, 0 for none
-    u32  nKind;                 // 0x24   passed on to fn_800AD280; 0, 3 and 5 play as a stereo pair
+    u32  nKind;                 // 0x24   passed on to Aud_EmiAdd; 0, 3 and 5 play as a stereo pair
 } GameAudioSource;
 
 // Called from other files: music by the menus (FE_MessageTable.c fn_80084BE8); startUp.c's sound.
-void fn_800A44A0(void);                 // picks music or ambience and records it in lbl_8028203C
+void Gaud_SetStreamingContext(void);                 // picks music or ambience and records it in lbl_8028203C
 void fn_800A754C(u8 a, u16 b);
 u8   fn_800A75F4(void);
 void fn_800A7944(void);

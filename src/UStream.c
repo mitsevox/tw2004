@@ -714,8 +714,8 @@ u8 UStream_Update(void) {
     if (pObject == NULL) {
         if (gnCurStream == -1) return 0;
         pStream = &gStreams[gnCurStream];
-        (void)*(volatile UStream*)pStream;   // fake match: sequence pointer evaluation before fn_800A4BDC
-        fn_800A4BDC();
+        (void)*(volatile UStream*)pStream;   // fake match: sequence pointer evaluation before Gaud_Cycle
+        Gaud_Cycle();
         if (pStream->bEOF &&!gbReadPending && gReadyRing[gReadyRingTail] == NULL && gpCurList == NULL
             && gpUsedList == NULL) {
             return 0;

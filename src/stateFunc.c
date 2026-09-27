@@ -1805,7 +1805,7 @@ void STATEFUNC_InitialFlyByUpdate(int nPlayer) {
                 if (fn_80062B88(nPlayer)) {
                     bDone = 1;
                     fn_80062B84(0);
-                    fn_800A76E4();
+                    Gaud_StopComment();
                 } else if (fn_80062B7C()) {
                     fn_80062B84(0);
                 }
@@ -1878,12 +1878,12 @@ void STATEFUNC_MidHoleFlyByUpdate(int nPlayer) {
     } else if (!Player_IsCPU(nPlayer)) {
         if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0)) {
             bDone = 1;
-            fn_800A76E4();
+            Gaud_StopComment();
         }
     } else {
         if (fn_80014300(Controller_GetButtonMask(0, 0))) {
             bDone = 1;
-            fn_800A76E4();
+            Gaud_StopComment();
         }
     }
     if (bDone) {

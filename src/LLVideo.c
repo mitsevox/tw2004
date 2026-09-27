@@ -320,7 +320,7 @@ void fn_8007599C_Stop(Video* pVideo) {
 // Starts a movie: waits for the sound side, then reads ahead until 16 chunks are queued.
 void fn_80075A14_Start(Video* pVideo) {
     do {
-        fn_800A4BDC();
+        Gaud_Cycle();
     } while (fn_800A7770());
     fn_800A7994();
     LLVideo_QueueReset(&pVideo->queue);

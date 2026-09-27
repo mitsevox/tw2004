@@ -413,7 +413,7 @@ s32 fn_800F37F8(s32 a) {
 
 void fn_800F3800(int nPlayer) {
     fn_800F39CC(-1);
-    fn_800A6278();
+    Gaud_StopShotClock();
 }
 
 // The current golfer goes to state 12 and lbl_80282370 is set, so the shot claims nothing and
@@ -421,7 +421,7 @@ void fn_800F3800(int nPlayer) {
 void fn_800F3828(void) {
     GOLFERSTATE_Switch(12, lbl_80282278);   // GS_SIMULATE
     fn_800E3D90();
-    fn_800A6278();
+    Gaud_StopShotClock();
     lbl_80282370 = 1;
 }
 

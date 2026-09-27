@@ -2185,7 +2185,7 @@ void fn_8007D7E4(MsgArg* pArgs, MsgArg* pResult) {
 
     pMovie = fn_800770FC();
     pMovie->nKind = 2;
-    fn_800A75B4();
+    Gaud_StopMusic();
 }
 
 // Show golfer pArgs[0] (fn_8008B044), then give the profile's player (unless it is player 0) the
@@ -3449,7 +3449,7 @@ void fn_800805C4(MsgArg* pArgs, MsgArg* pResult) {
 
     pMovie = fn_800770FC();
     pMovie->nKind = FE_MOVIE_CREDITS;
-    fn_800A75B4();
+    Gaud_StopMusic();
 }
 
 void fn_800805F0(MsgArg* pArgs, MsgArg* pResult) {
@@ -4545,7 +4545,7 @@ void fn_80082F68(MsgArg* pArgs, MsgArg* pResult) {
     }
     gSession.options.b7E = pArgs[4].i == 1;
     gSession.options.n80 = pArgs[5].i;
-    fn_800A44A0();
+    Gaud_SetStreamingContext();
 }
 
 // Whether choice pArgs[0] is available: 1 always, 2 and 3 once a loaded profile or a cheat code
@@ -4646,7 +4646,7 @@ void fn_80083354(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Queue a bio movie (which bio is not set here: nBio keeps what the queue entry held), or the
-// credits for pArgs[0] -1; then fn_800A75B4.
+// credits for pArgs[0] -1; then Gaud_StopMusic.
 void fn_80083358(MsgArg* pArgs, MsgArg* pResult) {
     FEMovie* pMovie;
 
@@ -4655,11 +4655,11 @@ void fn_80083358(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == -1) {
         pMovie->nKind = FE_MOVIE_CREDITS;
     }
-    fn_800A75B4();
+    Gaud_StopMusic();
 }
 
 void fn_800833A4(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800A75B4();
+    Gaud_StopMusic();
 }
 
 void fn_800833C4(MsgArg* pArgs, MsgArg* pResult) {
@@ -5454,18 +5454,18 @@ void fn_80084BE4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Music commands: 0 turns music row 0 and its track pArgs[1] on and plays the track, 1 calls
-// fn_800A75B4, 2 calls fn_800A7944 unless fn_800A75F4 says not to.
+// Gaud_StopMusic, 2 calls fn_800A7944 unless fn_800A75F4 says not to.
 void fn_80084BE8(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 0:
         gSession.options.abRowOn[0] = 1;
         gSession.options.rows[0][pArgs[1].i] = 1;
-        fn_800A75B4();
-        fn_800A44A0();
+        Gaud_StopMusic();
+        Gaud_SetStreamingContext();
         fn_800A754C(13, pArgs[1].i);
         break;
     case 1:
-        fn_800A75B4();
+        Gaud_StopMusic();
         break;
     case 2:
         if (!fn_800A75F4()) {

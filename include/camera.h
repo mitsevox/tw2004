@@ -16,7 +16,7 @@ typedef struct CamLens {
                                 //       takes its angle to a light), m4[3] the camera's position
                                 //       (GameMode8 measures the ball's distance to it); the green
                                 //       zoom-to-aim camera copies m4[0] to View.v20
-    f32  m44[4][4];             // 0x44  world to camera space (hlaudemitter.c fn_800AD800 moves a
+    f32  m44[4][4];             // 0x44  world to camera space (hlaudemitter.c Aud_EmiSet3DPos moves a
                                 //       sound's position with it)
     f32  m84[2][4];             // 0x84  [1] the scale Camera_SetCameraPositionAndTargetWithOffsetAndScale puts on the world around a point,
                                 //       [0] its inverse; ViewController.c fn_8001728C sets all to 1.0

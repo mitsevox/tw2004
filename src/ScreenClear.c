@@ -70,7 +70,7 @@ void fn_800BA74C(u8 bFade) {
         RenderState_Flush();
         RenderView_DrawPrimitive(0xA1, xy, 0, NULL, 2);
         fn_80013400();
-        fn_800A4BDC();
+        Gaud_Cycle();
         if (!bOther) {
             fn_80007254();
         }

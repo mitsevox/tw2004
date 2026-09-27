@@ -316,13 +316,13 @@ void fn_80126184(void) {
         GameMsg_Send2Ints(0x4D, 0, nLength);
         if (nLength != 0 && nLength != lbl_80282584) {
             if (lbl_80282588 == 0) {
-                // port: EA passes two arguments fn_800A746C ignores
-                ((void (*)(s32, int, int, int, int))fn_800A746C)(0, 1, 0, 1, 0);
+                // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
+                ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 1, 0, 1, 0);
                 lbl_80282588 = 1;
             }
         } else if (lbl_80282588 != 0) {
-            // port: EA passes an argument fn_800A74E4 ignores
-            ((void (*)(s32, int, int))fn_800A74E4)(0, 1, 0);
+            // port: EA passes an argument Gaud_LongDriveUi_Stop ignores
+            ((void (*)(s32, int, int))Gaud_LongDriveUi_Stop)(0, 1, 0);
             lbl_80282588 = 0;
         }
         lbl_80282584 = nLength;
@@ -573,11 +573,11 @@ void fn_80126698(int nPlayer) {
         break;
     case 4:
         if (Game_GetCurHoleNum() == 4) {
-            // port: EA passes two arguments fn_800A746C ignores
-            ((void (*)(s32, int, int, int, int))fn_800A746C)(1, 0, 2, 0, 0);
+            // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
+            ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(1, 0, 2, 0, 0);
         } else {
-            // port: EA passes two arguments fn_800A746C ignores
-            ((void (*)(s32, int, int, int, int))fn_800A746C)(1, 0, 1, 0, 0);
+            // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
+            ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(1, 0, 1, 0, 0);
         }
         ADD_MSG(0x1E);
         nPoints = -100;
@@ -646,18 +646,18 @@ void fn_80126698(int nPlayer) {
 
     // A track the first time the score reaches 1200, 800 and 400.
     if (!lbl_8028259C[nPlayer] && gPlayers[nPlayer].nEBC >= 1200) {
-        // port: EA passes two arguments fn_800A746C ignores
-        ((void (*)(s32, int, int, int, int))fn_800A746C)(0, 0, 2, 0, 0);
+        // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
+        ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 0, 2, 0, 0);
         lbl_8028259C[nPlayer] = 1;
     }
     if (!lbl_80282594[nPlayer] && gPlayers[nPlayer].nEBC >= 800) {
-        // port: EA passes two arguments fn_800A746C ignores
-        ((void (*)(s32, int, int, int, int))fn_800A746C)(0, 0, 3, 0, 0);
+        // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
+        ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 0, 3, 0, 0);
         lbl_80282594[nPlayer] = 1;
     }
     if (!lbl_8028258C[nPlayer] && gPlayers[nPlayer].nEBC >= 400) {
-        // port: EA passes two arguments fn_800A746C ignores
-        ((void (*)(s32, int, int, int, int))fn_800A746C)(0, 0, 4, 0, 0);
+        // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
+        ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 0, 4, 0, 0);
         lbl_8028258C[nPlayer] = 1;
     }
 
@@ -667,8 +667,8 @@ void fn_80126698(int nPlayer) {
         Vec_Copy(pPlayer->ball.vPos, pPlayer->vEAC);
         if (gPlayers[nPlayer].nEA8 > gPlayers[1 - nPlayer].nEA8) {
             GameMsg_Send2Ints(0x4C, nLength, nPlayer);
-            // port: EA passes two arguments fn_800A746C ignores
-            ((void (*)(s32, int, int, int, int))fn_800A746C)(0, 0, 0, 0, 0);
+            // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
+            ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 0, 0, 0, 0);
         }
     }
 

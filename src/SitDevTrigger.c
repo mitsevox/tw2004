@@ -205,7 +205,7 @@ void fn_800BD580(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
         if (fn_800DC784()) {
             fn_800BD7D0(pDo->n4);
         } else {
-            fn_800A6DCC(pDo->n4, nEvent != 5);
+            Gaud_InitCrowdReactionSound(pDo->n4, nEvent != 5);
         }
         break;
     case 4:
@@ -262,9 +262,9 @@ void fn_800BD7E8(u16 uSound) {
 }
 
 void fn_800BD83C(int nSound, int a) {
-    fn_800A7664(0, nSound, a);
+    Gaud_StartComment(0, nSound, a);
 }
 
 void fn_800BD868(int nSound, int a) {
-    fn_800A7664(2, nSound, a);
+    Gaud_StartComment(2, nSound, a);
 }

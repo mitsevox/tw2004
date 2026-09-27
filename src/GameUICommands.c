@@ -264,7 +264,7 @@ void  MC_ConnectCard(s32 nPort, s32 nSlot);
 s32   fn_800A036C(MCCardPos* pPos);
 s32   fn_800A0610(s32 nPort, s32 nSlot, s32 n);
 void  fn_800A6148(void);
-void  fn_800A61C4(int n);
+void  Gaud_PlayTextDitty(int n);
 void  fn_800A6F38(void);
 void  fn_800A7350(int a);
 void  fn_800A73C0(u8 a, int b);
@@ -2546,50 +2546,50 @@ void fn_8008A468(MsgArg* pArgs, MsgArg* pResult) {
            GameModeDriverPGATour_GetName(GameModeDriverPGATour_GetCurrentEventID()));
 }
 
-// Pass on to fn_800A61C4 a number for pArgs[0] and pArgs[1] (0 or 2); nothing in modes 22 and 26.
+// Pass on to Gaud_PlayTextDitty a number for pArgs[0] and pArgs[1] (0 or 2); nothing in modes 22 and 26.
 void fn_8008A4A8(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 26 || Game_GetMode() == 22) return;
     switch (pArgs[1].i) {
     case 0:
         switch (pArgs[0].i) {
         case 0:
-            fn_800A61C4(2);
+            Gaud_PlayTextDitty(2);
             return;
         case 2:
-            fn_800A61C4(8);
+            Gaud_PlayTextDitty(8);
             return;
         case 3:
-            fn_800A61C4(12);
+            Gaud_PlayTextDitty(12);
             return;
         case 4:
-            fn_800A61C4(6);
+            Gaud_PlayTextDitty(6);
             return;
         case 5:
-            fn_800A61C4(2);
+            Gaud_PlayTextDitty(2);
             return;
         case 6:
-            fn_800A61C4(2);
+            Gaud_PlayTextDitty(2);
             return;
         case 7:
-            fn_800A61C4(2);
+            Gaud_PlayTextDitty(2);
             return;
         case 8:
-            fn_800A61C4(0);
+            Gaud_PlayTextDitty(0);
             return;
         case 9:
-            fn_800A61C4(4);
+            Gaud_PlayTextDitty(4);
             return;
         case 10:
-            fn_800A61C4(4);
+            Gaud_PlayTextDitty(4);
             return;
         case 11:
-            fn_800A61C4(4);
+            Gaud_PlayTextDitty(4);
             return;
         case 12:
-            fn_800A61C4(4);
+            Gaud_PlayTextDitty(4);
             return;
         case 13:
-            fn_800A61C4(10);
+            Gaud_PlayTextDitty(10);
             return;
         }
         break;
@@ -2598,43 +2598,43 @@ void fn_8008A4A8(MsgArg* pArgs, MsgArg* pResult) {
     case 2:
         switch (pArgs[0].i) {
         case 0:
-            fn_800A61C4(3);
+            Gaud_PlayTextDitty(3);
             return;
         case 2:
-            fn_800A61C4(9);
+            Gaud_PlayTextDitty(9);
             return;
         case 3:
-            fn_800A61C4(13);
+            Gaud_PlayTextDitty(13);
             return;
         case 4:
-            fn_800A61C4(7);
+            Gaud_PlayTextDitty(7);
             return;
         case 5:
-            fn_800A61C4(3);
+            Gaud_PlayTextDitty(3);
             return;
         case 6:
-            fn_800A61C4(3);
+            Gaud_PlayTextDitty(3);
             return;
         case 7:
-            fn_800A61C4(3);
+            Gaud_PlayTextDitty(3);
             return;
         case 8:
-            fn_800A61C4(1);
+            Gaud_PlayTextDitty(1);
             return;
         case 9:
-            fn_800A61C4(5);
+            Gaud_PlayTextDitty(5);
             return;
         case 10:
-            fn_800A61C4(5);
+            Gaud_PlayTextDitty(5);
             return;
         case 11:
-            fn_800A61C4(5);
+            Gaud_PlayTextDitty(5);
             return;
         case 12:
-            fn_800A61C4(5);
+            Gaud_PlayTextDitty(5);
             return;
         case 13:
-            fn_800A61C4(11);
+            Gaud_PlayTextDitty(11);
             break;
         }
         break;
@@ -2821,29 +2821,29 @@ void fn_8008AC48(int nPlayer, char* sz) {
 }
 
 void fn_8008AC4C(int nMsg, int a) {
-    fn_800A7664(14, nMsg, a);
+    Gaud_StartComment(14, nMsg, a);
 }
 
 void fn_8008AC78(int nMsg, int a) {
-    fn_800A7664(19, nMsg, a);
+    Gaud_StartComment(19, nMsg, a);
 }
 
 void fn_8008ACA4(int nMsg, int a) {
-    fn_800A7664(17, nMsg, a);
+    Gaud_StartComment(17, nMsg, a);
 }
 
 void fn_8008ACD0(int nMsg, int a) {
-    fn_800A7664(16, nMsg, a);
+    Gaud_StartComment(16, nMsg, a);
 }
 
 void fn_8008ACFC(int nMsg, int a) {
-    fn_800A7664(15, nMsg, a);
+    Gaud_StartComment(15, nMsg, a);
 }
 
 void fn_8008AD28(int nMsg, int a) {
-    fn_800A7664(20, nMsg, a);
+    Gaud_StartComment(20, nMsg, a);
 }
 
 void fn_8008AD54(int nMsg, int a) {
-    fn_800A7664(18, nMsg, a);
+    Gaud_StartComment(18, nMsg, a);
 }

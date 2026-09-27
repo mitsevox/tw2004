@@ -61,7 +61,7 @@ s32 lbl_802823CC;
 u8  lbl_802823CA;
 u8  lbl_802823C9;
 u8  lbl_802823C8;
-u8    fn_800A7720(void);
+u8    Gaud_GetCommentStatus(void);
 void  fn_800FE190(f32* pA, f32* pB, f32* pOut);
 // The run's pace (fCB4): a button press adds lbl_802816B0; it falls by lbl_802816B4 a frame, or
 // lbl_802816C0 once the button has not been pressed for lbl_802816C4 seconds; it stays within
@@ -1479,7 +1479,7 @@ void fn_800FD1C0(int nPlayer) {
 }
 
 // State 26, update: a player whose points ran out (bit 15) or who ran the other's out (bit 16)
-// gets event 40 or 41. When the countdown ends (and fn_800A7720 is clear), bit 14 becomes bit 13
+// gets event 40 or 41. When the countdown ends (and Gaud_GetCommentStatus is clear), bit 14 becomes bit 13
 // and the player's turn is over; if the other player is not in state 26 and their ball is at
 // rest, both get bit 3 and the turn is ended again.
 void fn_800FD534(int nPlayer) {
@@ -1493,7 +1493,7 @@ void fn_800FD534(int nPlayer) {
         gPlayers[nPlayer].nC3C &= ~0x10000;
         gPlayers[nPlayer].nC54 += 119;
     }
-    if (gPlayers[nPlayer].nC54-- <= 0 && !fn_800A7720()) {
+    if (gPlayers[nPlayer].nC54-- <= 0 && !Gaud_GetCommentStatus()) {
         if (gPlayers[nPlayer].nC3C & 0x4000) {
             gPlayers[nPlayer].nC3C ^= 0x6000;
         }
@@ -1766,7 +1766,7 @@ void fn_800FE138(s32 p0, s32 p1) {
 }
 
 void fn_800FE164(s32 p0, s32 p1) {
-    fn_800A7664(4, p0, p1);
+    Gaud_StartComment(4, p0, p1);
 }
 
 // Four floats of pA less pB into pOut.

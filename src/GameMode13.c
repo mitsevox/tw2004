@@ -17,7 +17,7 @@ s32 lbl_802823B8;                    // the seconds added by the last shot
 s32 lbl_802823B4;                    // the points multiplier from bonuses
 s32 lbl_802823B0;
 
-void  fn_800A624C(void);
+void  Gaud_StartShotClock(void);
 
 void  fn_800F6CC4(void);
 void  fn_800F6CE0(void);
@@ -399,10 +399,10 @@ void fn_800F6ED4(int nPlayer) {
     }
     if (gPlayers[nPlayer].n290[Game_CurHoleIndex()] + (nAddedFrames = nAdded * 60) > 600 &&
         gPlayers[nPlayer].n290[Game_CurHoleIndex()] <= 600) {
-        fn_800A6278();
+        Gaud_StopShotClock();
     }
     if (gPlayers[nPlayer].n290[Game_CurHoleIndex()] <= 0 && nAddedFrames <= 600 && nAdded > 0) {
-        fn_800A624C();
+        Gaud_StartShotClock();
     }
     fn_800F2664(nPlayer);
     fn_800F2668(nPlayer);
@@ -459,7 +459,7 @@ void fn_800F7CA0(void) {
     fn_800F7CD4();
     AI_DefaultTarget(0);
     fn_800F80D4(-1);
-    fn_800A6278();
+    Gaud_StopShotClock();
 }
 
 void fn_800F7CD4(void) {
@@ -489,7 +489,7 @@ s32 fn_800F7D9C(s32 a) {
 }
 
 void fn_800F7DA4(void) {
-    fn_800A624C();
+    Gaud_StartShotClock();
     if (!(Misc_RandFunc(0) & 1)) {
         fn_800F263C(0x15);
         return;
@@ -499,7 +499,7 @@ void fn_800F7DA4(void) {
 
 // The time ran out: a shot not yet taken ends the player's game; one in flight finishes first.
 void fn_800F7DE8(void) {
-    fn_800A6278();
+    Gaud_StopShotClock();
     if ((s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 1 ||
         (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 2 ||
         (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 3 ||

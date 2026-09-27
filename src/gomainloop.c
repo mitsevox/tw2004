@@ -369,10 +369,10 @@ f32 fn_8006C630(void) {
     return lbl_802811F0->f18;
 }
 
-// Run inside wait loops (memory card, AnimStream): the sound (fn_800A4BDC), the GBA cable
+// Run inside wait loops (memory card, AnimStream): the sound (Gaud_Cycle), the GBA cable
 // (fn_8012402C, unless Gba_GetState is -1, 0x11 or 0x12) and the reset button (latched).
 void fn_8006C63C(void) {
-    fn_800A4BDC();
+    Gaud_Cycle();
     if (Gba_GetState() != -1 && Gba_GetState() != 0x12 && Gba_GetState() != 0x11) {
         fn_8012402C();
     }
@@ -1081,7 +1081,7 @@ void fn_8006D8E8(void) {
             }
         }
         fn_800080D0();
-        fn_800A4BDC();
+        Gaud_Cycle();
         if (gSession.nGameType != 1) {
             fn_80095550();
         }

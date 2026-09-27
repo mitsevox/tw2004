@@ -1374,7 +1374,7 @@ u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 // ---- events, sound, effects ------------------------------------------------------------------
 
 void fn_800A7A98(s32 n);                // GameAudio.c
-void fn_800A4BDC(void);                 // GameAudio.c: once a frame, the emitters and the queued sound
+void Gaud_Cycle(void);                 // GameAudio.c: once a frame, the emitters and the queued sound
 u8   fn_800B7490(void);                 // DiscError.c: show the disc-error screen while the drive
                                         // reports a problem; 1: it was shown (UStream.c, DiscCheck.c)
 
@@ -1429,20 +1429,20 @@ void REPLAY_Stop(void);                 // clears gSession.bReplay: a saved repl
 void fn_8006F4B4(void);
 void fn_8009B970(int nView);
 void fn_8009EF98(void);
-void fn_800A6278(void);
+void Gaud_StopShotClock(void);
 void fn_800A6FE0(void);
 void fn_800A707C(void);
 void fn_800A62A4(void);
 void fn_800A62E0(void);
 void fn_800A6358(void);
 void fn_800A63D0(void);
-void fn_800A6DCC(int nMusic, int a);
+void Gaud_InitCrowdReactionSound(int nMusic, int a);
 void fn_800A72EC(u8 a, u8 b);
-void fn_800A746C(s32 nKind, int nTrack, int n);     // GameAudio.c: start a track
-void fn_800A74E4(s32 nKind, int nTrack);            // GameAudio.c: stop it
-void fn_800A7664(int nKind, int nMsg, int a);
-void fn_8010D428(s32 p0, s32 p1);   // GameMode26.c: fn_800A7664(8, p0, p1)
-void fn_800A76E4(void);
+void Gaud_LongDriveUi_Play(s32 nKind, int nTrack, int n);     // GameAudio.c: start a track
+void Gaud_LongDriveUi_Stop(s32 nKind, int nTrack);            // GameAudio.c: stop it
+void Gaud_StartComment(int nKind, int nMsg, int a);
+void fn_8010D428(s32 p0, s32 p1);   // GameMode26.c: Gaud_StartComment(8, p0, p1)
+void Gaud_StopComment(void);
 void fn_800A77E0(f32 f);                // } the options menu passes them 0.2 x options.a0[0], a0[4]
 void fn_800A78F0(f32 f);                // } and a0[1] (FE_MessageTable.c, GameUICommands.c)
 void fn_800A7924(f32 f);                // }
@@ -1451,7 +1451,7 @@ void Vec_NormalizeTo(f32* pSrc, f32* pDst);   // normalise
 void fn_800B5918(const f32* pSrc, f32* pDst);   // GoShaderObject_Rain_Gc.c: copy three floats
 f32  fn_800BAFC0(f32* pSrc, f32* pDst);   // VecMath.c: normalises pSrc into pDst, gives its length
 f32  Vec_Distance(f32* pA, f32* pB);
-void fn_800BD83C(int nSound, int a);      // SitDevFile.c: fn_800A7664(0, nSound, a)
+void fn_800BD83C(int nSound, int a);      // SitDevFile.c: Gaud_StartComment(0, nSound, a)
 void BreakLine_Reset(int nView);
 // The EA Sports Bio, game side (EASportsBio.c; TW06's names)
 void EASBio_SetGamePlayState(u8 bFlag);

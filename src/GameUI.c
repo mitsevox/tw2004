@@ -267,7 +267,7 @@ void fn_800E3EE0(void) {
             fn_800A72EC(0, 0);
             gSession.b12 = 1;
             lbl_80282282 = 0;
-            fn_800A76E4();
+            Gaud_StopComment();
         }
         if (lbl_80282281) {
             fn_800A72EC(0, 0);
@@ -287,10 +287,10 @@ void fn_800E3EE0(void) {
             for (j = 0; j < gNumPlayersSetUp; j++) {
                 gPlayers[j].ball.nLie = 0;
             }
-            fn_800A76E4();
+            Gaud_StopComment();
         }
         if ((s8)gSession.options.a0[4] == 0) {
-            fn_800A76E4();
+            Gaud_StopComment();
         }
     }
 }

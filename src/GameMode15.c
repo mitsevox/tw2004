@@ -434,7 +434,7 @@ s8 fn_800F4878(void) {
 
 void fn_800F4894(int nPlayer) {
     fn_800F39CC(-1);
-    fn_800A6278();
+    Gaud_StopShotClock();
     lbl_8028237C = 0;
 }
 
@@ -444,7 +444,7 @@ void fn_800F4894(int nPlayer) {
 void fn_800F48C4(void) {
     GOLFERSTATE_Switch(12, lbl_80282278);   // GS_SIMULATE
     fn_800E3D90();
-    fn_800A6278();
+    Gaud_StopShotClock();
     lbl_8028237D = 1;
     if (lbl_8028238C != 5) {
         if (lbl_8028238C == 0) {

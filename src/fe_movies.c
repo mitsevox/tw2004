@@ -450,7 +450,7 @@ void fn_8009198C(int nMode) {
     fn_80006FE8();
     fn_800083A0();
     fn_80007254();
-    fn_800A4BDC();
+    Gaud_Cycle();
     fn_80008380();
     if (lbl_801D8858.f10 > lbl_801D8858.f4 || lbl_801D8858.n1C == -1) {
         if (lbl_801D8858.f10 > lbl_801D8858.f4) {
@@ -479,7 +479,7 @@ void fn_80091B98(s32 p0) {
     fn_80006FE8();
     fn_80007254();
     fn_800083A0();
-    fn_800A4BDC();
+    Gaud_Cycle();
 }
 
 // Draw tile nPoint of the texture bank fn_80091778 loaded at point nPoint of lbl_801D8818, an
@@ -614,7 +614,7 @@ void fn_80091FC0(LLPict* pPict, int nFrames, f32 fStep) {
         fn_80006FE8();
         fn_80007254();
         fn_800083A0();
-        fn_800A4BDC();
+        Gaud_Cycle();
         fn_800B7490();
     }
 }

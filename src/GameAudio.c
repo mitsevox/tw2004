@@ -18,26 +18,26 @@ void Mas_SetSubmixChan(u8 nCurve, f32 fVolume);
 void Mas_SetSubmixAll(u8 nCurves, f32* pVolumes);
 
 // hlaudemitter.c
-void Emi_SetTrackEnabled(u8 nId, u8 nTrack, u8 bOn);
-u8   fn_800AD618(u8 nId, u8 nTrack);
+void Aud_EmiSetTrackStatus(u8 nId, u8 nTrack, u8 bOn);
+u8   Aud_EmiGetTrackStatus(u8 nId, u8 nTrack);
 void fn_800AD790(u8 nId, u8 nTrack, u32 uParams);
-void fn_800AD9AC(u8 nId, u8 nTrack, u8 n);
-void fn_800AD800(u8 nId, f32* pPos, f32* pLast, u8 b);
+void Aud_EmiSetTrackVarRange(u8 nId, u8 nTrack, u8 n);
+void Aud_EmiSet3DPos(u8 nId, f32* pPos, f32* pLast, u8 b);
 void fn_800ADAF0(u8 nId, u8 nTrack, f32 fPitch);
 void fn_800ADBC0(s16 nKind, f32* pPos, f32* pLast, u8 b);  // types unproven
 
 void fn_8010D3D8(int nPlayer);
 u8   fn_8006BEA4(void);                    // GoGolfCam.c: the GameBreaker letterbox is up
-void Emi_SetTrackAttenuation(u8 nId, u8 nTrack, f32 fVolume);
+void Aud_EmiSetTrackAttenuation(u8 nId, u8 nTrack, f32 fVolume);
 
 void fn_800DC6E8(int nPlayer);
 u8   fn_8006BAD8(int nPlayer, s32* pOut);
 f32  fn_8006C630(void);
 // hlaudemitter.c: makes an emitter for sound nSound; the callback is told when a track stops
 // (fn_800ADDC8). The other types are unproven.
-u8   fn_800AD280(s16 nSound, s16 nKind, int a, int b, void (*pfnCallback)(u8 nId, u8 nTrack, s32 n));
+u8   Aud_EmiAdd(s16 nSound, s16 nKind, int a, int b, void (*pfnCallback)(u8 nId, u8 nTrack, s32 n));
 void fn_800ADA08(s16 nSound, u8 nTrack, u8 n);
-void fn_800AD734(u8 nId, int n);
+void Aud_EmiSetAllTrackStatus(u8 nId, int n);
 void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);
 void fn_800A6BA8(u8 nPlayer);
 void fn_800A6854(u8 nPlayer);
@@ -48,7 +48,7 @@ void fn_800A7294(void);
 void fn_800BA734(int n, s8 nTrack);
 
 void fn_800A3F38(u8 b, u8 b2);
-void fn_800A3FB4(u8 nCurve, f32 fVolume);
+void Aud_SetSubmixAttn(u8 nCurve, f32 fVolume);
 void fn_800A3FD4(u8 nCurves, f32* pVolumes);
 void fn_800A4084(void);
 void fn_800A41A4(void);
@@ -66,11 +66,11 @@ void fn_800A4170(u8 nId, u8 nTrack, s32 n);
 void fn_800A5980(u8 nPlayer);
 void fn_800A6C98(u8 nPlayer, u8 n);
 void fn_800A6660(u8 nPlayer);
-void fn_800AD950(u8 nId, u8 nTrack, u8 n);
+void Aud_EmiSetTrackVariation(u8 nId, u8 nTrack, u8 n);
 u8   fn_800A4A24(s32 nCourse, int n);
 u8   fn_800A4A88(void);
 void fn_800A7968(u8 nId, u8 nTrack, u8 a, u16 b, s32 c);
-u8   fn_800A7720(void);
+u8   Gaud_GetCommentStatus(void);
 u8   fn_800A7748(void);
 void fn_800A70E4(int n);
 void fn_800A7198(int n);
@@ -130,7 +130,7 @@ f32 lbl_80281450 = 25.0f;
 f32 lbl_80281454 = 2.0f;
 f32 lbl_80281458 = 21.0f;
 
-u32 lbl_80282054;                       // frames left before the queued sound starts (fn_800A4BDC)
+u32 lbl_80282054;                       // frames left before the queued sound starts (Gaud_Cycle)
 u8 lbl_80282052;                        // } the queued sound: fn_800A7968's arguments
 u16 lbl_80282050;                       // }
 s32 lbl_8028204C;                       // }
@@ -139,7 +139,7 @@ f32 lbl_80282044;
 u8 lbl_80282042;
 u8 lbl_80282041;
 u8 lbl_80282040;
-s32 lbl_8028203C;                       // what fn_800A44A0 plays: 0 nothing, 1 music, 2 ambience
+s32 lbl_8028203C;                       // what Gaud_SetStreamingContext plays: 0 nothing, 1 music, 2 ambience
 u8 lbl_80282038;                        // a sound is queued
 s32 lbl_80282034;
 u8 lbl_80282033;
@@ -184,10 +184,10 @@ u8   fn_800AF224(void);                   // no C yet; returns 1
 void fn_800AD1C8(void);                   // hlaudemitter.c, no C yet
 void fn_800AD1C4(void);                   // hlaudemitter.c
 void fn_800B5B80(void);                   // UAudMemStack.c
-void fn_800ADA28(u8 nId, u8 nTrack, u8 n, int bCheck);
+void Aud_EmiSetTrackStep(u8 nId, u8 nTrack, u8 n, int bCheck);
 
 u8   fn_800A3FF4(void);
-void fn_800A75B4(void);
+void Gaud_StopMusic(void);
 void fn_800A68C0(u8 nPlayer);
 void fn_800A6EC8(void);
 void fn_800A73C0(u8 a, int n);
@@ -240,7 +240,7 @@ void fn_800A3F94(u8 n) {
     fn_800A8700(n);
 }
 
-void fn_800A3FB4(u8 nCurve, f32 fVolume) {
+void Aud_SetSubmixAttn(u8 nCurve, f32 fVolume) {
     Mas_SetSubmixChan(nCurve, fVolume);
 }
 
@@ -280,14 +280,14 @@ void fn_800A4084(void) {
     if (gSession.nGameType != 3 && gSession.nGameType != 1 && gSession.nGameType != 0) {
         Game_GetCurHoleNum();
         nWind = gSession.options.nWind;
-        fn_800A6DCC(0, 0);
+        Gaud_InitCrowdReactionSound(0, 0);
         fn_800A70E4(nWind);
         fn_800A7198(nWind);
         if (fn_80035574()) {
             fn_800A7220(fn_8006C630());
         }
-        lbl_80281420 = fn_800AD280(9, -1, 1, 0, NULL);
-        fn_800AD800(lbl_80281420, &gPlayers[0].ball.pCourse->pin[Game_CurrentPinSet()].x, NULL, 0);
+        lbl_80281420 = Aud_EmiAdd(9, -1, 1, 0, NULL);
+        Aud_EmiSet3DPos(lbl_80281420, &gPlayers[0].ball.pCourse->pin[Game_CurrentPinSet()].x, NULL, 0);
         fn_800ADA08(9, 0, nWind);
     }
     lbl_80282029 = 1;
@@ -301,16 +301,16 @@ void fn_800A4170(u8 nId, u8 nTrack, s32 n) {
 }
 
 void fn_800A41A4(void) {
-    if (fn_800A7720()) {
+    if (Gaud_GetCommentStatus()) {
         if (lbl_80282031 == 0) {
             if (lbl_8028203C == 1) {
-                fn_800A3FB4(15, lbl_8018E988[15] * (0.2f * (s8)gSession.options.a0[1] * lbl_80281434));
+                Aud_SetSubmixAttn(15, lbl_8018E988[15] * (0.2f * (s8)gSession.options.a0[1] * lbl_80281434));
             }
             lbl_80282031 = 1;
         }
     } else if (lbl_80282031 != 0) {
         if (lbl_8028203C == 1) {
-            fn_800A3FB4(15, 0.2f * (s8)gSession.options.a0[1] * lbl_8018E988[15]);
+            Aud_SetSubmixAttn(15, 0.2f * (s8)gSession.options.a0[1] * lbl_8018E988[15]);
         }
         lbl_80282031 = 0;
     }
@@ -318,22 +318,22 @@ void fn_800A41A4(void) {
 
 void fn_800A42B0(u8 n) {
     if (lbl_8028202F || !lbl_80282040) return;
-    fn_800AD9AC(lbl_8028141C, 2, n);
-    fn_800AD9AC(lbl_8028141D, 2, n);
-    fn_800AD9AC(lbl_8028141C, 3, n);
-    fn_800AD9AC(lbl_8028141D, 3, n);
-    Emi_SetTrackEnabled(lbl_8028141C, 2, 1);
-    Emi_SetTrackEnabled(lbl_8028141D, 2, 1);
-    Emi_SetTrackEnabled(lbl_8028141C, 3, 1);
-    Emi_SetTrackEnabled(lbl_8028141D, 3, 1);
+    Aud_EmiSetTrackVarRange(lbl_8028141C, 2, n);
+    Aud_EmiSetTrackVarRange(lbl_8028141D, 2, n);
+    Aud_EmiSetTrackVarRange(lbl_8028141C, 3, n);
+    Aud_EmiSetTrackVarRange(lbl_8028141D, 3, n);
+    Aud_EmiSetTrackStatus(lbl_8028141C, 2, 1);
+    Aud_EmiSetTrackStatus(lbl_8028141D, 2, 1);
+    Aud_EmiSetTrackStatus(lbl_8028141C, 3, 1);
+    Aud_EmiSetTrackStatus(lbl_8028141D, 3, 1);
 }
 
 void fn_800A4374(void) {
     if (lbl_80282040) {
-        Emi_SetTrackEnabled(lbl_8028141C, 2, 0);
-        Emi_SetTrackEnabled(lbl_8028141D, 2, 0);
-        Emi_SetTrackEnabled(lbl_8028141C, 3, 0);
-        Emi_SetTrackEnabled(lbl_8028141D, 3, 0);
+        Aud_EmiSetTrackStatus(lbl_8028141C, 2, 0);
+        Aud_EmiSetTrackStatus(lbl_8028141D, 2, 0);
+        Aud_EmiSetTrackStatus(lbl_8028141C, 3, 0);
+        Aud_EmiSetTrackStatus(lbl_8028141D, 3, 0);
     }
 }
 
@@ -343,7 +343,7 @@ void fn_800A43DC(void) {
     if (lbl_80282040 && lbl_80282033 && !lbl_80282030 && !lbl_8028202F && !lbl_80282032
         && lbl_80281428 == -1) {
         if (fn_8006BAD8(lbl_80282278, &n)) {
-            fn_800A6DCC((u8)(n + 4), 1);
+            Gaud_InitCrowdReactionSound((u8)(n + 4), 1);
             lbl_80282030 = 1;
         } else if (n >= 0) {
             if (--n < 0) {
@@ -357,7 +357,7 @@ void fn_800A43DC(void) {
 // Applies the sound options: the volumes, then the music. Game types 3 and 10 play music 2 on
 // row 0, others music 6 (two players at most, no replay) on the game mode's row, if the row is on
 // (skipped: a8[0] without flag 0x4000). Music 6 allowed but off: ambience (sound 8) if b288, SFX>0.
-void fn_800A44A0(void) {
+void Gaud_SetStreamingContext(void) {
     int nMode;
     f32 fVolume;
     u8 bFixed;
@@ -375,7 +375,7 @@ void fn_800A44A0(void) {
     bNoBreaker = !bFixed && gSession.a8[0];
     nState = 0;
     bOn = fVolume > 0.0f;
-    fn_800A3FB4(15, fVolume * lbl_8018E988[15]);
+    Aud_SetSubmixAttn(15, fVolume * lbl_8018E988[15]);
     fn_800A77E0(0.2f * (s8)gSession.options.a0[0]);
     if (bFixed) {
         nSound = 2;
@@ -420,19 +420,19 @@ void fn_800A44A0(void) {
     }
     if (bOn) {
         if (lbl_8028203C == 2) {
-            fn_800AD450(lbl_8028141A);
+            Aud_EmiDel(lbl_8028141A);
             lbl_8028141A = 0xFF;
         }
         if (bMusic) {
             nState = 1;
             if (lbl_80281418 == 0xFF) {
-                lbl_80281418 = fn_800AD280(nSound, -1, 1, 1, NULL);
+                lbl_80281418 = Aud_EmiAdd(nSound, -1, 1, 1, NULL);
             }
             lbl_8028142C = nRow;
         }
     } else {
         if (lbl_8028203C == 1) {
-            fn_800AD450(lbl_80281418);
+            Aud_EmiDel(lbl_80281418);
             lbl_80281418 = 0xFF;
         }
         if (bMusic && !bFixed && gpGame->b288 && (s8)gSession.options.a0[0] > 0) {
@@ -441,8 +441,8 @@ void fn_800A44A0(void) {
                 vPos[0] = 0.0f;
                 vPos[1] = 0.0f;
                 vPos[2] = 12.0f;
-                lbl_8028141A = fn_800AD280(8, -1, 1, 1, NULL);
-                fn_800AD800(lbl_8028141A, vPos, NULL, 0);
+                lbl_8028141A = Aud_EmiAdd(8, -1, 1, 1, NULL);
+                Aud_EmiSet3DPos(lbl_8028141A, vPos, NULL, 0);
             }
             if (lbl_8028203C != 2) {
                 lbl_80282041 = 1;
@@ -485,17 +485,17 @@ void fn_800A484C(void) {
     if (lbl_8028203C == 2) {
         nCourse = Game_GetCourse();
         n = Game_GetCurHoleNum();
-        Emi_SetTrackAttenuation(lbl_8028141A, 0, 1.0f);
-        Emi_SetTrackEnabled(lbl_8028141A, 1, 1);
+        Aud_EmiSetTrackAttenuation(lbl_8028141A, 0, 1.0f);
+        Aud_EmiSetTrackStatus(lbl_8028141A, 1, 1);
         if (fn_80035574()) {
-            Emi_SetTrackEnabled(lbl_8028141A, 2, 1);
+            Aud_EmiSetTrackStatus(lbl_8028141A, 2, 1);
         }
-        fn_800AD9AC(lbl_8028141A, 3, nCourse);
-        Emi_SetTrackEnabled(lbl_8028141A, 3, 1);
+        Aud_EmiSetTrackVarRange(lbl_8028141A, 3, nCourse);
+        Aud_EmiSetTrackStatus(lbl_8028141A, 3, 1);
         nSound = fn_800A4A24(nCourse, n);
         if (nSound != 0xFF) {
-            fn_800AD9AC(lbl_8028141A, 4, nSound);
-            Emi_SetTrackEnabled(lbl_8028141A, 4, 1);
+            Aud_EmiSetTrackVarRange(lbl_8028141A, 4, nSound);
+            Aud_EmiSetTrackStatus(lbl_8028141A, 4, 1);
         }
     }
 }
@@ -520,12 +520,12 @@ void fn_800A4928(void) {
 void fn_800A49A4(u8 bKeepFirst) {
     if (lbl_8028203C == 2) {
         if (!bKeepFirst) {
-            Emi_SetTrackEnabled(lbl_8028141A, 0, 0);
+            Aud_EmiSetTrackStatus(lbl_8028141A, 0, 0);
         }
-        Emi_SetTrackEnabled(lbl_8028141A, 1, 0);
-        Emi_SetTrackEnabled(lbl_8028141A, 2, 0);
-        Emi_SetTrackEnabled(lbl_8028141A, 3, 0);
-        Emi_SetTrackEnabled(lbl_8028141A, 4, 0);
+        Aud_EmiSetTrackStatus(lbl_8028141A, 1, 0);
+        Aud_EmiSetTrackStatus(lbl_8028141A, 2, 0);
+        Aud_EmiSetTrackStatus(lbl_8028141A, 3, 0);
+        Aud_EmiSetTrackStatus(lbl_8028141A, 4, 0);
     }
 }
 
@@ -597,13 +597,13 @@ int fn_800A4BAC(void) {
 }
 
 // Once a frame: the emitters, then the queued sound once its wait runs out.
-void fn_800A4BDC(void) {
+void Gaud_Cycle(void) {
     fn_800AD1C8();
     fn_800A4080();
     if (lbl_80282054 != 0) {
         if (--lbl_80282054 == 0 && lbl_80282038) {
             fn_800A7968(lbl_80281419, 0, lbl_80282052, lbl_80282050, lbl_8028204C);
-            Emi_SetTrackEnabled(lbl_80281419, 0, 1);
+            Aud_EmiSetTrackStatus(lbl_80281419, 0, 1);
             lbl_80282038 = 0;
         }
     }
@@ -616,7 +616,7 @@ void fn_800A4C54(void) {
     }
     if (lbl_80282029) {
         if (lbl_8028202C) {
-            fn_800A44A0();
+            Gaud_SetStreamingContext();
             lbl_8028202C = 0;
         }
         fn_800A43DC();
@@ -653,22 +653,22 @@ void fn_800A4CB8(GameAudioSource** ppSource, int n) {
                 }
             }
             if (bPlay) {
-                nId = fn_800AD280(pSource->nSound, pSource->nKind, nParam, 1, NULL);
+                nId = Aud_EmiAdd(pSource->nSound, pSource->nKind, nParam, 1, NULL);
                 vPos[0] = -lbl_80281450;
                 vPos[1] = 0.0f;
                 vPos[2] = 0.0f;
-                fn_800AD800(nId, vPos, NULL, 0);
+                Aud_EmiSet3DPos(nId, vPos, NULL, 0);
                 vPos[0] = lbl_80281450;
-                nId = fn_800AD280(pSource->nSound, pSource->nKind, nParam, 1, NULL);
-                fn_800AD800(nId, vPos, NULL, gSession.nSplitScreen != 0);
+                nId = Aud_EmiAdd(pSource->nSound, pSource->nKind, nParam, 1, NULL);
+                Aud_EmiSet3DPos(nId, vPos, NULL, gSession.nSplitScreen != 0);
             }
             break;
         default:
-            nId = fn_800AD280(pSource->nSound, nKind, nParam, 0, NULL);
+            nId = Aud_EmiAdd(pSource->nSound, nKind, nParam, 0, NULL);
             vPos[0] = pSource->vPos[0];
             vPos[1] = pSource->vPos[1];
             vPos[2] = pSource->vPos[2];
-            fn_800AD800(nId, vPos, NULL, 0);
+            Aud_EmiSet3DPos(nId, vPos, NULL, 0);
             break;
         }
     }
@@ -685,16 +685,16 @@ void fn_800A4E34(void) {
         // the options' volumes, 0.2 per step
         fn_800A77E0(0.2f * (s8)gSession.options.a0[0]);
         fn_800A78F0(0.2f * (s8)gSession.options.a0[4]);
-        fn_800A3FB4(15, 0.2f * (s8)gSession.options.a0[1] * lbl_8018E988[15]);
+        Aud_SetSubmixAttn(15, 0.2f * (s8)gSession.options.a0[1] * lbl_8018E988[15]);
         fn_800A3F94(2);
         lbl_80282028 = 1;
     }
     vPos[0] = 0.0f;
     vPos[1] = 0.0f;
     vPos[2] = 0.0f;
-    lbl_8028141B = fn_800AD280(1, -1, 1, 1, NULL);
-    fn_800AD800(lbl_8028141B, vPos, NULL, 0);
-    Emi_SetTrackEnabled(lbl_8028141B, 0, 1);
+    lbl_8028141B = Aud_EmiAdd(1, -1, 1, 1, NULL);
+    Aud_EmiSet3DPos(lbl_8028141B, vPos, NULL, 0);
+    Aud_EmiSetTrackStatus(lbl_8028141B, 0, 1);
     lbl_8028202B = 0;
     lbl_8028202C = 0;
     lbl_8028202E = 0;
@@ -713,7 +713,7 @@ void fn_800A4E34(void) {
 }
 
 void fn_800A4FD8(void) {
-    fn_800A75B4();
+    Gaud_StopMusic();
     lbl_8028141B = 0xFF;
     lbl_80281418 = 0xFF;
     lbl_80282029 = 0;
@@ -746,25 +746,25 @@ void fn_800A500C(void) {
     vPos[1] = 0.0f;
     vPos[2] = 0.0f;
     for (i = 0; i < nViews; i++, pPlayer++, pView++) {
-        pView->n0 = fn_800AD280(1, -1, 0, 0, NULL);
-        fn_800AD800(pView->n0, pPlayer->vBall, NULL, 0);
-        pView->n1 = fn_800AD280(2, -1, 0, 0, NULL);
-        fn_800AD800(pView->n1, pPlayer->ball.vPos, NULL, 0);
-        Emi_SetTrackEnabled(pView->n1, 0, 1);
-        pView->n2 = fn_800AD280(4, -1, 1, 1, fn_800A4170);
-        pView->n3 = fn_800AD280(4, -1, 1, 1, NULL);
+        pView->n0 = Aud_EmiAdd(1, -1, 0, 0, NULL);
+        Aud_EmiSet3DPos(pView->n0, pPlayer->vBall, NULL, 0);
+        pView->n1 = Aud_EmiAdd(2, -1, 0, 0, NULL);
+        Aud_EmiSet3DPos(pView->n1, pPlayer->ball.vPos, NULL, 0);
+        Aud_EmiSetTrackStatus(pView->n1, 0, 1);
+        pView->n2 = Aud_EmiAdd(4, -1, 1, 1, fn_800A4170);
+        pView->n3 = Aud_EmiAdd(4, -1, 1, 1, NULL);
         vPos[0] = -lbl_80281454;
         vPos[1] = 0.0f;
         vPos[2] = 0.0f;
-        fn_800AD800(pView->n2, vPos, NULL, 0);
+        Aud_EmiSet3DPos(pView->n2, vPos, NULL, 0);
         vPos[0] = lbl_80281454;
-        fn_800AD800(pView->n3, vPos, NULL, 0);
+        Aud_EmiSet3DPos(pView->n3, vPos, NULL, 0);
     }
     vPos[0] = 0.0f;
     vPos[1] = 0.0f;
     vPos[2] = 1.0f;
-    lbl_8028141B = fn_800AD280(10, -1, 1, 1, NULL);
-    fn_800AD800(lbl_8028141B, vPos, NULL, 0);
+    lbl_8028141B = Aud_EmiAdd(10, -1, 1, 1, NULL);
+    Aud_EmiSet3DPos(lbl_8028141B, vPos, NULL, 0);
     lbl_8028203C = 0;
     lbl_80281419 = 0xFF;
     lbl_8028141A = 0xFF;
@@ -773,18 +773,18 @@ void fn_800A500C(void) {
     vPos[0] = 0.0f;
     vPos[1] = 0.0f;
     vPos[2] = 10.0f;
-    lbl_80281419 = fn_800AD280(5, -1, 1, 1, NULL);
-    fn_800AD800(lbl_80281419, vPos, NULL, 0);
+    lbl_80281419 = Aud_EmiAdd(5, -1, 1, 1, NULL);
+    Aud_EmiSet3DPos(lbl_80281419, vPos, NULL, 0);
     fn_800A77E0(0.2f * (s8)gSession.options.a0[0]);
-    fn_800A44A0();
-    lbl_8028141C = fn_800AD280(7, -1, 1, 1, NULL);
+    Gaud_SetStreamingContext();
+    lbl_8028141C = Aud_EmiAdd(7, -1, 1, 1, NULL);
     vPos[0] = lbl_80281458;
     vPos[1] = 0.0f;
     vPos[2] = 0.0f;
-    fn_800AD800(lbl_8028141C, vPos, NULL, 0);
-    lbl_8028141D = fn_800AD280(7, -1, 1, 1, NULL);
+    Aud_EmiSet3DPos(lbl_8028141C, vPos, NULL, 0);
+    lbl_8028141D = Aud_EmiAdd(7, -1, 1, 1, NULL);
     vPos[0] = -lbl_80281458;
-    fn_800AD800(lbl_8028141D, vPos, NULL, 0);
+    Aud_EmiSet3DPos(lbl_8028141D, vPos, NULL, 0);
     if (nCourse == 7 && n == 2) {
         fn_800A4044(0, 17);
         fn_800A7AD0(2, 0, 1);
@@ -818,12 +818,12 @@ void fn_800A5428(void) {
     nViews = gSession.nSplitScreen ? 2 : 1;
     lbl_80282042 = 0;
     if (lbl_8028203C == 2) {
-        fn_800AD450(lbl_8028141A);
+        Aud_EmiDel(lbl_8028141A);
         lbl_8028141A = 0xFF;
     } else {
-        fn_800A75B4();
+        Gaud_StopMusic();
     }
-    fn_800AD450(lbl_80281419);
+    Aud_EmiDel(lbl_80281419);
     lbl_80281419 = 0xFF;
     fn_800A6EC8();
     fn_800A6854(0);
@@ -880,15 +880,15 @@ void fn_800A562C(u8 nPlayer) {
     lbl_80281424 = -1;
     fn_800A6EC8();
     fn_800A6BA8(nPlayer);
-    fn_800AD734(pView->n2, 0);
-    fn_800AD734(pView->n3, 0);
+    Aud_EmiSetAllTrackStatus(pView->n2, 0);
+    Aud_EmiSetAllTrackStatus(pView->n3, 0);
     if (fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut) {
-        fn_800AD450(lbl_80281420);
+        Aud_EmiDel(lbl_80281420);
         lbl_80281420 = 0xFF;
     }
     Character_GetBonePos(pPlayer->pChar, 0x53, vPos);
-    fn_800AD800(nId, vPos, NULL, 0);
-    fn_800ADA28(nId, 0, 1, 1);
+    Aud_EmiSet3DPos(nId, vPos, NULL, 0);
+    Aud_EmiSetTrackStep(nId, 0, 1, 1);
     pView->f8 = 0.0f;
     pView->fC = 1.0f / FRAME_RATE;
     pView->n18 = 0;
@@ -913,13 +913,13 @@ void fn_800A573C(u8 nPlayer) {
     nId = pView->n0;
     if (nId != 0xFF) {
         Character_GetBonePos(pPlayer->pChar, 0x53, vPos);
-        fn_800AD800(nId, vPos, vLast, 0);
+        Aud_EmiSet3DPos(nId, vPos, vLast, 0);
         nState = pPlayer->swing.nState;
         if (nState == 1 || nState == 3) {
             if (pView->fC > 0.0f) {
                 nLastState = pView->n18;
                 if (nLastState == 1 && nLastState != nState) {
-                    fn_800ADA28(nId, 0, 1, 1);
+                    Aud_EmiSetTrackStep(nId, 0, 1, 1);
                 } else {
                     fSpeed = Vec_Distance(vPos, vLast) / (FRAME_RATE * pView->fC);
                     fPitch = fSpeed * lbl_80281438;
@@ -934,14 +934,14 @@ void fn_800A573C(u8 nPlayer) {
                     if (pPlayer->swing.nState == 1) {
                         fVolume *= 0.35f;
                     }
-                    fn_800ADA28(nId, 0, 0, 1);
-                    Emi_SetTrackAttenuation(nId, 0, fVolume);
+                    Aud_EmiSetTrackStep(nId, 0, 0, 1);
+                    Aud_EmiSetTrackAttenuation(nId, 0, fVolume);
                     fn_800ADAF0(nId, 0, fPitch);
                 }
                 pView->n18 = pPlayer->swing.nState;
             }
         } else {
-            fn_800ADA28(nId, 0, 1, 1);
+            Aud_EmiSetTrackStep(nId, 0, 1, 1);
         }
         if (lbl_80202898.bSlowMo) {
             pView->fC = gSession.fFrameTime / lbl_80202898.fSlowMo;
@@ -1010,39 +1010,39 @@ void fn_800A5980(u8 nPlayer) {
             }
         }
         if (n) {
-            fn_800AD9AC(nIdA, 4, n);
-            fn_800AD9AC(nIdB, 4, n);
-            Emi_SetTrackEnabled(nIdA, 4, 1);
-            Emi_SetTrackEnabled(nIdB, 4, 1);
+            Aud_EmiSetTrackVarRange(nIdA, 4, n);
+            Aud_EmiSetTrackVarRange(nIdB, 4, n);
+            Aud_EmiSetTrackStatus(nIdA, 4, 1);
+            Aud_EmiSetTrackStatus(nIdB, 4, 1);
         }
         lbl_80282034--;
         return;
     }
     if (lbl_80282032) {
         if (nKind == 11) {
-            fn_800AD9AC(nIdA, 5, 2);
-            fn_800AD9AC(nIdB, 5, 2);
+            Aud_EmiSetTrackVarRange(nIdA, 5, 2);
+            Aud_EmiSetTrackVarRange(nIdB, 5, 2);
         } else {
-            fn_800AD9AC(nIdA, 5, 0);
-            fn_800AD9AC(nIdB, 5, 0);
+            Aud_EmiSetTrackVarRange(nIdA, 5, 0);
+            Aud_EmiSetTrackVarRange(nIdB, 5, 0);
         }
-        Emi_SetTrackAttenuation(nIdSwing, 1, 2.0f);
-        Emi_SetTrackEnabled(nIdA, 5, 1);
-        Emi_SetTrackEnabled(nIdB, 5, 1);
+        Aud_EmiSetTrackAttenuation(nIdSwing, 1, 2.0f);
+        Aud_EmiSetTrackStatus(nIdA, 5, 1);
+        Aud_EmiSetTrackStatus(nIdB, 5, 1);
         lbl_80282032 = 0;
     } else {
-        Emi_SetTrackAttenuation(nIdSwing, 1, 1.0f);
+        Aud_EmiSetTrackAttenuation(nIdSwing, 1, 1.0f);
     }
-    fn_800AD800(nIdSwing, pPlayer->ball.vPos, NULL, 0);
-    fn_800AD9AC(nIdSwing, 1, lbl_80183AD8[pPlayer->nClub]);
+    Aud_EmiSet3DPos(nIdSwing, pPlayer->ball.vPos, NULL, 0);
+    Aud_EmiSetTrackVarRange(nIdSwing, 1, lbl_80183AD8[pPlayer->nClub]);
     if ((nMode == 22 || nMode == 26) && fn_8005C280(nPlayer) > 1.0f) {
-        fn_800AD950(nIdSwing, 1, 5);
+        Aud_EmiSetTrackVariation(nIdSwing, 1, 5);
     } else {
-        fn_800AD950(nIdSwing, 1, lbl_80183AF4[pPlayer->ball.nLie]);
+        Aud_EmiSetTrackVariation(nIdSwing, 1, lbl_80183AF4[pPlayer->ball.nLie]);
     }
-    Emi_SetTrackEnabled(nIdSwing, 1, 1);
+    Aud_EmiSetTrackStatus(nIdSwing, 1, 1);
     if (bRestore && lbl_80281428 != -1) {
-        fn_800A6DCC(lbl_80281428, 1);
+        Gaud_InitCrowdReactionSound(lbl_80281428, 1);
         lbl_80281428 = -1;
         lbl_8028202F = 0;
     }
@@ -1084,7 +1084,7 @@ void fn_800A5CA4(u8 nPlayer) {
                     fVolume = 2.0f;
                 }
                 fn_800ADBC0(4, pPlayer->ball.vPos, NULL, 0);
-                fn_800ADCD0(4, 0, pSurface->nSwingSoundId - 1, 0);
+                Aud_EmiAliasSetTrackStep(4, 0, pSurface->nSwingSoundId - 1, 0);
                 fn_800ADD54(4, 0, fVolume);
             } else {
                 nId = lbl_801F1790[pPlayer->nView[0]].n1;
@@ -1094,9 +1094,9 @@ void fn_800A5CA4(u8 nPlayer) {
                 if (fVolume > 1.0f) {
                     fVolume = 1.0f;
                 }
-                fn_800AD800(nId, pPlayer->ball.vPos, NULL, 0);
-                fn_800ADA28(nId, 0, pSurface->nSoundId, 0);
-                Emi_SetTrackAttenuation(nId, 0, fVolume);
+                Aud_EmiSet3DPos(nId, pPlayer->ball.vPos, NULL, 0);
+                Aud_EmiSetTrackStep(nId, 0, pSurface->nSoundId, 0);
+                Aud_EmiSetTrackAttenuation(nId, 0, fVolume);
             }
             if (Game_GetMode() == 26 || Game_GetMode() == 22) {
                 fn_8010D3D8(nPlayer);
@@ -1119,10 +1119,10 @@ void fn_800A5EC0(u8 nPlayer) {
 
     pPlayer = &gPlayers[nPlayer];
     nId = lbl_801F1790[pPlayer->nView[0]].n1;
-    fn_800AD800(nId, pPlayer->ball.vPos, NULL, 0);
-    Emi_SetTrackAttenuation(nId, 0, 2.0f);
+    Aud_EmiSet3DPos(nId, pPlayer->ball.vPos, NULL, 0);
+    Aud_EmiSetTrackAttenuation(nId, 0, 2.0f);
     nRand = Misc_RandFunc(2) & 1;   // one of two sounds at random
-    fn_800ADA28(nId, 0, nRand == 0 ? 0x1A : 0x1C, 0);
+    Aud_EmiSetTrackStep(nId, 0, nRand == 0 ? 0x1A : 0x1C, 0);
 }
 
 void fn_800A5F60(u8 nPlayer) {
@@ -1131,9 +1131,9 @@ void fn_800A5F60(u8 nPlayer) {
 
     pPlayer = &gPlayers[nPlayer];
     nId = lbl_801F1790[pPlayer->nView[0]].n1;
-    fn_800AD800(nId, pPlayer->ball.vPos, NULL, 0);
-    Emi_SetTrackAttenuation(nId, 0, 1.0f);
-    fn_800ADA28(nId, 0, 0x17, 0);
+    Aud_EmiSet3DPos(nId, pPlayer->ball.vPos, NULL, 0);
+    Aud_EmiSetTrackAttenuation(nId, 0, 1.0f);
+    Aud_EmiSetTrackStep(nId, 0, 0x17, 0);
 }
 
 void fn_800A5FE8(u8 nPlayer) {
@@ -1142,9 +1142,9 @@ void fn_800A5FE8(u8 nPlayer) {
 
     pPlayer = &gPlayers[nPlayer];
     nId = lbl_801F1790[pPlayer->nView[0]].n1;
-    fn_800AD800(nId, pPlayer->ball.vPos, NULL, 0);
-    Emi_SetTrackAttenuation(nId, 0, 1.0f);
-    fn_800ADA28(nId, 0, 0x17, 0);
+    Aud_EmiSet3DPos(nId, pPlayer->ball.vPos, NULL, 0);
+    Aud_EmiSetTrackAttenuation(nId, 0, 1.0f);
+    Aud_EmiSetTrackStep(nId, 0, 0x17, 0);
 }
 
 // Plays variant 3 on track 1 of the view's emitters 2 and 3, at most every 300 frames with bLimit.
@@ -1158,10 +1158,10 @@ void fn_800A6070(u8 nPlayer, u8 bLimit) {
     nIdB = lbl_801F1790[pPlayer->nView[0]].n3;
     if (!bLimit || lbl_80282048 == 0 || lbl_80282048 + 300 < gSession.nFrameCount) {
         lbl_80282048 = gSession.nFrameCount;
-        fn_800AD9AC(nIdA, 1, 3);
-        fn_800AD9AC(nIdB, 1, 3);
-        Emi_SetTrackEnabled(nIdA, 1, 1);
-        Emi_SetTrackEnabled(nIdB, 1, 1);
+        Aud_EmiSetTrackVarRange(nIdA, 1, 3);
+        Aud_EmiSetTrackVarRange(nIdB, 1, 3);
+        Aud_EmiSetTrackStatus(nIdA, 1, 1);
+        Aud_EmiSetTrackStatus(nIdB, 1, 1);
     }
 }
 
@@ -1171,65 +1171,69 @@ void fn_800A6148(void) {
 
     nIdA = lbl_801F1790[0].n2;
     nIdB = lbl_801F1790[0].n3;
-    fn_800AD9AC(nIdA, 1, 3);
-    fn_800AD9AC(nIdB, 1, 3);
-    Emi_SetTrackEnabled(nIdA, 1, 1);
-    Emi_SetTrackEnabled(nIdB, 1, 1);
+    Aud_EmiSetTrackVarRange(nIdA, 1, 3);
+    Aud_EmiSetTrackVarRange(nIdB, 1, 3);
+    Aud_EmiSetTrackStatus(nIdA, 1, 1);
+    Aud_EmiSetTrackStatus(nIdB, 1, 1);
 }
 
-void fn_800A61C4(int n) {
+// Plays text ditty n (variation range n of track 7 on view 0's two emitters); a UI script command
+// picks n.
+void Gaud_PlayTextDitty(int n) {
     u8 nIdA;
     u8 nIdB;
 
     nIdA = lbl_801F1790[0].n2;
     nIdB = lbl_801F1790[0].n3;
-    fn_800AD9AC(nIdA, 7, n);
-    fn_800AD9AC(nIdB, 7, n);
-    Emi_SetTrackEnabled(nIdA, 7, 1);
-    Emi_SetTrackEnabled(nIdB, 7, 1);
+    Aud_EmiSetTrackVarRange(nIdA, 7, n);
+    Aud_EmiSetTrackVarRange(nIdB, 7, n);
+    Aud_EmiSetTrackStatus(nIdA, 7, 1);
+    Aud_EmiSetTrackStatus(nIdB, 7, 1);
 }
 
-void fn_800A624C(void) {
-    fn_800ADB4C(3, 1, 1);
+// Starts the shot clock's ticking (track 1 of emitter 3); the timed target game starts it for the
+// last 10 seconds.
+void Gaud_StartShotClock(void) {
+    Aud_EmiAliasSetTrackStatus(3, 1, 1);
 }
 
-void fn_800A6278(void) {
-    fn_800ADB4C(3, 1, 0);
+void Gaud_StopShotClock(void) {
+    Aud_EmiAliasSetTrackStatus(3, 1, 0);
 }
 
 void fn_800A62A4(void) {
-    fn_800ADC44(3, 0, 0);
-    fn_800ADB4C(3, 0, 1);
+    Aud_EmiAliasSetTrackVarRange(3, 0, 0);
+    Aud_EmiAliasSetTrackStatus(3, 0, 1);
 }
 
 void fn_800A62E0(void) {
-    fn_800ADC44(3, 0, 1);
-    fn_800ADB4C(3, 0, 1);
+    Aud_EmiAliasSetTrackVarRange(3, 0, 1);
+    Aud_EmiAliasSetTrackStatus(3, 0, 1);
 }
 
 void fn_800A631C(void) {
-    fn_800ADC44(3, 0, 2);
-    fn_800ADB4C(3, 0, 1);
+    Aud_EmiAliasSetTrackVarRange(3, 0, 2);
+    Aud_EmiAliasSetTrackStatus(3, 0, 1);
 }
 
 void fn_800A6358(void) {
-    fn_800ADC44(3, 0, 3);
-    fn_800ADB4C(3, 0, 1);
+    Aud_EmiAliasSetTrackVarRange(3, 0, 3);
+    Aud_EmiAliasSetTrackStatus(3, 0, 1);
 }
 
 void fn_800A6394(void) {
-    fn_800ADC44(3, 0, 4);
-    fn_800ADB4C(3, 0, 1);
+    Aud_EmiAliasSetTrackVarRange(3, 0, 4);
+    Aud_EmiAliasSetTrackStatus(3, 0, 1);
 }
 
 void fn_800A63D0(void) {
-    fn_800ADC44(3, 0, 6);
-    fn_800ADB4C(3, 0, 1);
+    Aud_EmiAliasSetTrackVarRange(3, 0, 6);
+    Aud_EmiAliasSetTrackStatus(3, 0, 1);
 }
 
 void fn_800A640C(void) {
-    fn_800ADC44(3, 0, 7);
-    fn_800ADB4C(3, 0, 1);
+    Aud_EmiAliasSetTrackVarRange(3, 0, 7);
+    Aud_EmiAliasSetTrackStatus(3, 0, 1);
 }
 
 void fn_800A6448(void) {
@@ -1243,7 +1247,7 @@ void fn_800A6450(u8 nPlayer) {
 
     nId = lbl_801F1790[gPlayers[nPlayer].nView[0]].n0;
     if (nId != 0xFF) {
-        Emi_SetTrackEnabled(nId, 2, 1);
+        Aud_EmiSetTrackStatus(nId, 2, 1);
     }
 }
 
@@ -1253,23 +1257,23 @@ void fn_800A64A8(u8 nPlayer, u8 b) {
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
     if (lbl_8028202B || lbl_8028202F) return;
     fn_800A4170(pView->n2, 2, 1);
-    Emi_SetTrackEnabled(pView->n2, 2, 1);
-    Emi_SetTrackEnabled(pView->n3, 2, 1);
+    Aud_EmiSetTrackStatus(pView->n2, 2, 1);
+    Aud_EmiSetTrackStatus(pView->n3, 2, 1);
     fn_800A3F58(0, 1);
-    Emi_SetTrackAttenuation(lbl_80281420, 0, 0.0f);
-    Emi_SetTrackAttenuation(lbl_8028141C, 0, 0.0f);
-    Emi_SetTrackAttenuation(lbl_8028141C, 1, 0.0f);
-    Emi_SetTrackAttenuation(lbl_8028141C, 2, 0.0f);
-    Emi_SetTrackAttenuation(lbl_8028141C, 3, 0.0f);
-    Emi_SetTrackAttenuation(lbl_8028141C, 4, 0.0f);
-    Emi_SetTrackAttenuation(lbl_8028141C, 5, 0.0f);
-    Emi_SetTrackAttenuation(lbl_8028141D, 0, 0.0f);
-    Emi_SetTrackAttenuation(lbl_8028141D, 1, 0.0f);
-    Emi_SetTrackAttenuation(lbl_8028141D, 2, 0.0f);
-    Emi_SetTrackAttenuation(lbl_8028141D, 3, 0.0f);
-    Emi_SetTrackAttenuation(lbl_8028141D, 4, 0.0f);
-    Emi_SetTrackAttenuation(lbl_8028141D, 5, 0.0f);
-    Emi_SetTrackAttenuation(lbl_8028141A, 0, 0.0f);
+    Aud_EmiSetTrackAttenuation(lbl_80281420, 0, 0.0f);
+    Aud_EmiSetTrackAttenuation(lbl_8028141C, 0, 0.0f);
+    Aud_EmiSetTrackAttenuation(lbl_8028141C, 1, 0.0f);
+    Aud_EmiSetTrackAttenuation(lbl_8028141C, 2, 0.0f);
+    Aud_EmiSetTrackAttenuation(lbl_8028141C, 3, 0.0f);
+    Aud_EmiSetTrackAttenuation(lbl_8028141C, 4, 0.0f);
+    Aud_EmiSetTrackAttenuation(lbl_8028141C, 5, 0.0f);
+    Aud_EmiSetTrackAttenuation(lbl_8028141D, 0, 0.0f);
+    Aud_EmiSetTrackAttenuation(lbl_8028141D, 1, 0.0f);
+    Aud_EmiSetTrackAttenuation(lbl_8028141D, 2, 0.0f);
+    Aud_EmiSetTrackAttenuation(lbl_8028141D, 3, 0.0f);
+    Aud_EmiSetTrackAttenuation(lbl_8028141D, 4, 0.0f);
+    Aud_EmiSetTrackAttenuation(lbl_8028141D, 5, 0.0f);
+    Aud_EmiSetTrackAttenuation(lbl_8028141A, 0, 0.0f);
     if (b) {
         fn_800A6C98(nPlayer, 0);
     }
@@ -1281,26 +1285,26 @@ void fn_800A6660(u8 nPlayer) {
 
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
     if (lbl_8028202B == 0) {
-        Emi_SetTrackEnabled(pView->n2, 2, 0);
-        Emi_SetTrackEnabled(pView->n3, 2, 0);
+        Aud_EmiSetTrackStatus(pView->n2, 2, 0);
+        Aud_EmiSetTrackStatus(pView->n3, 2, 0);
         fn_800A3F58(0, 0);
-        Emi_SetTrackAttenuation(lbl_80281420, 0, 1.0f);
-        Emi_SetTrackAttenuation(lbl_8028141C, 0, lbl_80281430);
-        Emi_SetTrackAttenuation(lbl_8028141C, 1, lbl_80281430);
-        Emi_SetTrackAttenuation(lbl_8028141C, 2, lbl_80281430);
-        Emi_SetTrackAttenuation(lbl_8028141C, 3, lbl_80281430);
-        Emi_SetTrackAttenuation(lbl_8028141C, 4, lbl_80281430);
-        Emi_SetTrackAttenuation(lbl_8028141C, 5, lbl_80281430);
-        Emi_SetTrackAttenuation(lbl_8028141D, 0, lbl_80281430);
-        Emi_SetTrackAttenuation(lbl_8028141D, 1, lbl_80281430);
-        Emi_SetTrackAttenuation(lbl_8028141D, 2, lbl_80281430);
-        Emi_SetTrackAttenuation(lbl_8028141D, 3, lbl_80281430);
-        Emi_SetTrackAttenuation(lbl_8028141D, 4, lbl_80281430);
-        Emi_SetTrackAttenuation(lbl_8028141D, 5, lbl_80281430);
-        Emi_SetTrackAttenuation(lbl_8028141A, 0, 1.0f);
+        Aud_EmiSetTrackAttenuation(lbl_80281420, 0, 1.0f);
+        Aud_EmiSetTrackAttenuation(lbl_8028141C, 0, lbl_80281430);
+        Aud_EmiSetTrackAttenuation(lbl_8028141C, 1, lbl_80281430);
+        Aud_EmiSetTrackAttenuation(lbl_8028141C, 2, lbl_80281430);
+        Aud_EmiSetTrackAttenuation(lbl_8028141C, 3, lbl_80281430);
+        Aud_EmiSetTrackAttenuation(lbl_8028141C, 4, lbl_80281430);
+        Aud_EmiSetTrackAttenuation(lbl_8028141C, 5, lbl_80281430);
+        Aud_EmiSetTrackAttenuation(lbl_8028141D, 0, lbl_80281430);
+        Aud_EmiSetTrackAttenuation(lbl_8028141D, 1, lbl_80281430);
+        Aud_EmiSetTrackAttenuation(lbl_8028141D, 2, lbl_80281430);
+        Aud_EmiSetTrackAttenuation(lbl_8028141D, 3, lbl_80281430);
+        Aud_EmiSetTrackAttenuation(lbl_8028141D, 4, lbl_80281430);
+        Aud_EmiSetTrackAttenuation(lbl_8028141D, 5, lbl_80281430);
+        Aud_EmiSetTrackAttenuation(lbl_8028141A, 0, 1.0f);
         lbl_8028202F = 0;
         if (lbl_80281428 != -1) {
-            fn_800A6DCC(lbl_80281428, 1);
+            Gaud_InitCrowdReactionSound(lbl_80281428, 1);
             lbl_80281428 = -1;
         }
     }
@@ -1310,16 +1314,16 @@ void fn_800A67E8(u8 nPlayer) {
     GameAudioView* pView;
 
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
-    Emi_SetTrackEnabled(pView->n2, 0, 1);
-    Emi_SetTrackEnabled(pView->n3, 0, 1);
+    Aud_EmiSetTrackStatus(pView->n2, 0, 1);
+    Aud_EmiSetTrackStatus(pView->n3, 0, 1);
 }
 
 void fn_800A6854(u8 nPlayer) {
     GameAudioView* pView;
 
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
-    Emi_SetTrackEnabled(pView->n2, 0, 0);
-    Emi_SetTrackEnabled(pView->n3, 0, 0);
+    Aud_EmiSetTrackStatus(pView->n2, 0, 0);
+    Aud_EmiSetTrackStatus(pView->n3, 0, 0);
 }
 
 void fn_800A68C0(u8 nPlayer) {
@@ -1354,14 +1358,14 @@ void fn_800A68C0(u8 nPlayer) {
             lbl_80282034 = 1;
             break;
         case 7:
-            Emi_SetTrackEnabled(pView->n2, 2, 1);
-            Emi_SetTrackEnabled(pView->n3, 2, 1);
-            fn_800AD9AC(pView->n2, 6, 5);
-            fn_800AD9AC(pView->n3, 6, 5);
-            fn_800AD950(pView->n2, 6, 0);
-            fn_800AD950(pView->n3, 6, 1);
-            Emi_SetTrackEnabled(pView->n2, 6, 1);
-            Emi_SetTrackEnabled(pView->n3, 6, 1);
+            Aud_EmiSetTrackStatus(pView->n2, 2, 1);
+            Aud_EmiSetTrackStatus(pView->n3, 2, 1);
+            Aud_EmiSetTrackVarRange(pView->n2, 6, 5);
+            Aud_EmiSetTrackVarRange(pView->n3, 6, 5);
+            Aud_EmiSetTrackVariation(pView->n2, 6, 0);
+            Aud_EmiSetTrackVariation(pView->n3, 6, 1);
+            Aud_EmiSetTrackStatus(pView->n2, 6, 1);
+            Aud_EmiSetTrackStatus(pView->n3, 6, 1);
             fn_800A6C98(nPlayer, 2);
             bPlay = 0;
             lbl_80282034 = 1;
@@ -1390,10 +1394,10 @@ void fn_800A68C0(u8 nPlayer) {
             break;
         }
         if (bPlay) {
-            fn_800AD9AC(pView->n2, 1, n);
-            fn_800AD9AC(pView->n3, 1, n);
-            Emi_SetTrackEnabled(pView->n2, 1, 1);
-            Emi_SetTrackEnabled(pView->n3, 1, 1);
+            Aud_EmiSetTrackVarRange(pView->n2, 1, n);
+            Aud_EmiSetTrackVarRange(pView->n3, 1, n);
+            Aud_EmiSetTrackStatus(pView->n2, 1, 1);
+            Aud_EmiSetTrackStatus(pView->n3, 1, 1);
         }
         lbl_80282032 = 1;
     }
@@ -1408,12 +1412,12 @@ void fn_800A6AC8(u8 nPlayer, u8 n) {
         n += 4;
         // fall through
     case 9:
-        fn_800AD9AC(pView->n2, 6, n);
-        fn_800AD9AC(pView->n3, 6, n);
-        fn_800AD950(pView->n2, 6, 0);
-        fn_800AD950(pView->n3, 6, 1);
-        Emi_SetTrackEnabled(pView->n2, 6, 1);
-        Emi_SetTrackEnabled(pView->n3, 6, 1);
+        Aud_EmiSetTrackVarRange(pView->n2, 6, n);
+        Aud_EmiSetTrackVarRange(pView->n3, 6, n);
+        Aud_EmiSetTrackVariation(pView->n2, 6, 0);
+        Aud_EmiSetTrackVariation(pView->n3, 6, 1);
+        Aud_EmiSetTrackStatus(pView->n2, 6, 1);
+        Aud_EmiSetTrackStatus(pView->n3, 6, 1);
         break;
     }
 }
@@ -1426,11 +1430,11 @@ void fn_800A6BA8(u8 nPlayer) {
     nKind = fn_800C7138(ViewController_GetCameraController(0));
     if (Game_GetMode() < 6 || Game_GetMode() > 8) {
         fn_800A3F58(0, 0);
-        Emi_SetTrackEnabled(pView->n2, 1, 0);
-        Emi_SetTrackEnabled(pView->n3, 1, 0);
+        Aud_EmiSetTrackStatus(pView->n2, 1, 0);
+        Aud_EmiSetTrackStatus(pView->n3, 1, 0);
         if (nKind == 7) {
-            Emi_SetTrackEnabled(pView->n2, 2, 0);
-            Emi_SetTrackEnabled(pView->n3, 2, 0);
+            Aud_EmiSetTrackStatus(pView->n2, 2, 0);
+            Aud_EmiSetTrackStatus(pView->n3, 2, 0);
         }
         if (lbl_80282032) {
             fn_800A5980(nPlayer);
@@ -1443,10 +1447,10 @@ void fn_800A6C98(u8 nPlayer, u8 n) {
 
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
     if (Game_GetMode() < 6 || Game_GetMode() > 8) {
-        fn_800AD9AC(pView->n2, 3, n);
-        fn_800AD9AC(pView->n3, 3, n);
-        Emi_SetTrackEnabled(pView->n2, 3, 1);
-        Emi_SetTrackEnabled(pView->n3, 3, 1);
+        Aud_EmiSetTrackVarRange(pView->n2, 3, n);
+        Aud_EmiSetTrackVarRange(pView->n3, 3, n);
+        Aud_EmiSetTrackStatus(pView->n2, 3, 1);
+        Aud_EmiSetTrackStatus(pView->n3, 3, 1);
     }
 }
 
@@ -1455,12 +1459,16 @@ void fn_800A6D48(u8 nPlayer) {
 
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
     if (Game_GetMode() < 6 || Game_GetMode() > 8) {
-        Emi_SetTrackEnabled(pView->n2, 3, 0);
-        Emi_SetTrackEnabled(pView->n3, 3, 0);
+        Aud_EmiSetTrackStatus(pView->n2, 3, 0);
+        Aud_EmiSetTrackStatus(pView->n3, 3, 0);
     }
 }
 
-void fn_800A6DCC(int nMusic, int a) {
+// Plays crowd reaction nMusic (a variation range of tracks 0 and 1 on both crowd emitters), after
+// stopping the crowd build-up. During the GameBreaker or a special shot it is kept in lbl_80281428
+// and played when that ends; a second argument of 1 also clears lbl_80282033, which the crowd
+// build-up needs.
+void Gaud_InitCrowdReactionSound(int nMusic, int a) {
     u8 n = nMusic;
 
     fn_800A4374();
@@ -1472,14 +1480,14 @@ void fn_800A6DCC(int nMusic, int a) {
         lbl_80281428 = nMusic;
         return;
     }
-    fn_800AD9AC(lbl_8028141C, 0, n);
-    fn_800AD9AC(lbl_8028141C, 1, n);
-    fn_800AD9AC(lbl_8028141D, 0, n);
-    fn_800AD9AC(lbl_8028141D, 1, n);
-    Emi_SetTrackEnabled(lbl_8028141C, 0, 1);
-    Emi_SetTrackEnabled(lbl_8028141C, 1, 1);
-    Emi_SetTrackEnabled(lbl_8028141D, 0, 1);
-    Emi_SetTrackEnabled(lbl_8028141D, 1, 1);
+    Aud_EmiSetTrackVarRange(lbl_8028141C, 0, n);
+    Aud_EmiSetTrackVarRange(lbl_8028141C, 1, n);
+    Aud_EmiSetTrackVarRange(lbl_8028141D, 0, n);
+    Aud_EmiSetTrackVarRange(lbl_8028141D, 1, n);
+    Aud_EmiSetTrackStatus(lbl_8028141C, 0, 1);
+    Aud_EmiSetTrackStatus(lbl_8028141C, 1, 1);
+    Aud_EmiSetTrackStatus(lbl_8028141D, 0, 1);
+    Aud_EmiSetTrackStatus(lbl_8028141D, 1, 1);
     lbl_80281424 = nMusic;
 }
 
@@ -1487,23 +1495,23 @@ void fn_800A6EC8(void) {
     if (lbl_80282040) {
         fn_800A4374();
         fn_800A707C();
-        Emi_SetTrackEnabled(lbl_8028141C, 0, 0);
-        Emi_SetTrackEnabled(lbl_8028141C, 1, 0);
-        Emi_SetTrackEnabled(lbl_8028141D, 0, 0);
-        Emi_SetTrackEnabled(lbl_8028141D, 1, 0);
+        Aud_EmiSetTrackStatus(lbl_8028141C, 0, 0);
+        Aud_EmiSetTrackStatus(lbl_8028141C, 1, 0);
+        Aud_EmiSetTrackStatus(lbl_8028141D, 0, 0);
+        Aud_EmiSetTrackStatus(lbl_8028141D, 1, 0);
     }
 }
 
 void fn_800A6F38(void) {
     if (lbl_80282040) {
-        fn_800AD9AC(lbl_8028141C, 0, 2);
-        fn_800AD9AC(lbl_8028141C, 1, 2);
-        fn_800AD9AC(lbl_8028141D, 0, 2);
-        fn_800AD9AC(lbl_8028141D, 1, 2);
-        Emi_SetTrackEnabled(lbl_8028141C, 0, 1);
-        Emi_SetTrackEnabled(lbl_8028141C, 1, 1);
-        Emi_SetTrackEnabled(lbl_8028141D, 0, 1);
-        Emi_SetTrackEnabled(lbl_8028141D, 1, 1);
+        Aud_EmiSetTrackVarRange(lbl_8028141C, 0, 2);
+        Aud_EmiSetTrackVarRange(lbl_8028141C, 1, 2);
+        Aud_EmiSetTrackVarRange(lbl_8028141D, 0, 2);
+        Aud_EmiSetTrackVarRange(lbl_8028141D, 1, 2);
+        Aud_EmiSetTrackStatus(lbl_8028141C, 0, 1);
+        Aud_EmiSetTrackStatus(lbl_8028141C, 1, 1);
+        Aud_EmiSetTrackStatus(lbl_8028141D, 0, 1);
+        Aud_EmiSetTrackStatus(lbl_8028141D, 1, 1);
     }
 }
 
@@ -1512,46 +1520,46 @@ void fn_800A6FE0(void) {
     if (gPlayers[lbl_80282278].ball.b99 == 0) {
         fn_800A6EC8();
     }
-    Emi_SetTrackEnabled(lbl_8028141C, 4, 1);
-    Emi_SetTrackEnabled(lbl_8028141D, 4, 1);
-    Emi_SetTrackEnabled(lbl_8028141C, 5, 1);
-    Emi_SetTrackEnabled(lbl_8028141D, 5, 1);
+    Aud_EmiSetTrackStatus(lbl_8028141C, 4, 1);
+    Aud_EmiSetTrackStatus(lbl_8028141D, 4, 1);
+    Aud_EmiSetTrackStatus(lbl_8028141C, 5, 1);
+    Aud_EmiSetTrackStatus(lbl_8028141D, 5, 1);
 }
 
 void fn_800A707C(void) {
     if (lbl_80282040) {
-        Emi_SetTrackEnabled(lbl_8028141C, 4, 0);
-        Emi_SetTrackEnabled(lbl_8028141D, 4, 0);
-        Emi_SetTrackEnabled(lbl_8028141C, 5, 0);
-        Emi_SetTrackEnabled(lbl_8028141D, 5, 0);
+        Aud_EmiSetTrackStatus(lbl_8028141C, 4, 0);
+        Aud_EmiSetTrackStatus(lbl_8028141D, 4, 0);
+        Aud_EmiSetTrackStatus(lbl_8028141C, 5, 0);
+        Aud_EmiSetTrackStatus(lbl_8028141D, 5, 0);
     }
 }
 
 void fn_800A70E4(int n) {
     if (gpGame->b288) {
-        fn_800ADB4C(0, 0, 1);
-        fn_800ADC44(0, 1, n);
-        fn_800ADB4C(0, 1, 1);
+        Aud_EmiAliasSetTrackStatus(0, 0, 1);
+        Aud_EmiAliasSetTrackVarRange(0, 1, n);
+        Aud_EmiAliasSetTrackStatus(0, 1, 1);
     }
 }
 
 void fn_800A714C(void) {
     if (gpGame->b288) {
-        fn_800ADB4C(0, 0, 0);
-        fn_800ADB4C(0, 1, 0);
+        Aud_EmiAliasSetTrackStatus(0, 0, 0);
+        Aud_EmiAliasSetTrackStatus(0, 1, 0);
     }
 }
 
 void fn_800A7198(int n) {
     if (gpGame->b288) {
-        fn_800ADC44(1, 0, n);
-        fn_800ADB4C(1, 1, 1);
+        Aud_EmiAliasSetTrackVarRange(1, 0, n);
+        Aud_EmiAliasSetTrackStatus(1, 1, 1);
     }
 }
 
 void fn_800A71E4(void) {
     if (gpGame->b288) {
-        fn_800ADB4C(1, 1, 0);
+        Aud_EmiAliasSetTrackStatus(1, 1, 0);
     }
 }
 
@@ -1560,16 +1568,16 @@ void fn_800A7220(f32 fAmount) {
 
     n = (u8)(int)(3.0f * fAmount);
     if (gpGame->b288) {
-        fn_800ADC44(0, 2, (n <= 2) ? n : 2);
-        fn_800ADB4C(0, 2, 1);
+        Aud_EmiAliasSetTrackVarRange(0, 2, (n <= 2) ? n : 2);
+        Aud_EmiAliasSetTrackStatus(0, 2, 1);
     }
 }
 
 void fn_800A7294(void) {
     if (gpGame->b288) {
-        fn_800ADB4C(0, 2, 0);
+        Aud_EmiAliasSetTrackStatus(0, 2, 0);
         if (lbl_8028203C == 2) {
-            Emi_SetTrackEnabled(lbl_8028141A, 2, 0);
+            Aud_EmiSetTrackStatus(lbl_8028141A, 2, 0);
         }
     }
 }
@@ -1580,13 +1588,13 @@ void fn_800A72EC(u8 bOff, u8 bMusic) {
         lbl_8028202E = bOff;
         if (bOff) {
             fn_800A49A4(0);
-            fn_800A75B4();
+            Gaud_StopMusic();
             fn_800A6EC8();
             fn_800A6660(0);
             return;
         }
         if (bMusic) {
-            fn_800A44A0();
+            Gaud_SetStreamingContext();
             fn_800A47A0();
         }
     }
@@ -1608,39 +1616,44 @@ void fn_800A7350(u8 bOn) {
 
 // a is unused.
 void fn_800A73C0(u8 a, int n) {
-    fn_800ADA28(lbl_8028141B, 0, n, 0);
+    Aud_EmiSetTrackStep(lbl_8028141B, 0, n, 0);
 }
 
 void fn_800A73F0(s32 n) {
     switch (n) {
     case 1:
-        fn_800ADA28(lbl_8028141B, 1, 0, 0);
+        Aud_EmiSetTrackStep(lbl_8028141B, 1, 0, 0);
         break;
     case 6:
-        fn_800ADA28(lbl_8028141B, 1, 1, 0);
+        Aud_EmiSetTrackStep(lbl_8028141B, 1, 1, 0);
         break;
     default:
-        fn_800ADA28(lbl_8028141B, 0, n, 0);
+        Aud_EmiSetTrackStep(lbl_8028141B, 0, n, 0);
         break;
     }
 }
 
-void fn_800A746C(s32 nKind, int nTrack, int n) {
+// The long-drive contests' sounds: script 0 plays variation range n on track nTrack of emitter 5,
+// script 1 steps track 0 of emitter 6 to n. Callers also pass a loop flag and a pan, which it
+// ignores.
+void Gaud_LongDriveUi_Play(s32 nKind, int nTrack, int n) {
     switch (nKind) {
     case 0:
-        fn_800ADC44(5, nTrack, n);
-        fn_800ADB4C(5, nTrack, 1);
+        Aud_EmiAliasSetTrackVarRange(5, nTrack, n);
+        Aud_EmiAliasSetTrackStatus(5, nTrack, 1);
         break;
     case 1:
-        fn_800ADCD0(6, 0, n, 0);
+        Aud_EmiAliasSetTrackStep(6, 0, n, 0);
         break;
     }
 }
 
-void fn_800A74E4(s32 nKind, int nTrack) {
+// Stops what Gaud_LongDriveUi_Play started with script 0; script 1 has nothing to stop. Callers
+// also pass the range, which it ignores.
+void Gaud_LongDriveUi_Stop(s32 nKind, int nTrack) {
     switch (nKind) {
     case 0:
-        fn_800ADB4C(5, nTrack, 0);
+        Aud_EmiAliasSetTrackStatus(5, nTrack, 0);
         break;
     case 1:
         break;
@@ -1648,20 +1661,21 @@ void fn_800A74E4(s32 nKind, int nTrack) {
 }
 
 s32 fn_800A7528(void) {
-    return fn_800A7720();
+    return Gaud_GetCommentStatus();
 }
 
 void fn_800A754C(u8 a, u16 b) {
     if (lbl_8028203C == 1) {
         fn_800A7968(lbl_80281418, 0, a, b, 2);
-        Emi_SetTrackEnabled(lbl_80281418, 0, 1);
+        Aud_EmiSetTrackStatus(lbl_80281418, 0, 1);
         fn_800BA734(1, b);
     }
 }
 
-void fn_800A75B4(void) {
+// Stops the background music; nothing when the ambience is what is streaming.
+void Gaud_StopMusic(void) {
     if (lbl_8028203C == 1) {
-        Emi_SetTrackEnabled(lbl_80281418, 0, 0);
+        Aud_EmiSetTrackStatus(lbl_80281418, 0, 0);
         lbl_8028203C = 0;
     }
 }
@@ -1670,20 +1684,20 @@ u8 fn_800A75F4(void) {
     int bResult;
 
     bResult = 0;
-    if (lbl_8028203C == 1 && fn_800AD618(lbl_80281418, 0)) {
+    if (lbl_8028203C == 1 && Aud_EmiGetTrackStatus(lbl_80281418, 0)) {
         bResult = 1;
     }
     return bResult;
 }
 
 void fn_800A7644(void) {
-    fn_800A44A0();
+    Gaud_SetStreamingContext();
 }
 
 // port: the callers pass nKind and nMsg as full ints (their prototype takes int), but this body
 // was compiled for a u8 nKind and a u16 nMsg: it stores and passes them on without masking. Kept
 // as int to match the callers, so this function stays at 91% (masks where the original has none).
-void fn_800A7664(int nKind, int nMsg, int a) {
+void Gaud_StartComment(int nKind, int nMsg, int a) {
     if ((s8)gSession.options.a0[4] != 0) {
         if (lbl_80282054 != 0) {
             lbl_80282052 = nKind;
@@ -1694,22 +1708,24 @@ void fn_800A7664(int nKind, int nMsg, int a) {
         }
         // port: EA passes nKind and nMsg as ints, unmasked, to fn_800A7968's u8 and u16 parameters
         ((void (*)(u8, u8, int, int, s32))fn_800A7968)(lbl_80281419, 0, nKind, nMsg, a);
-        Emi_SetTrackEnabled(lbl_80281419, 0, 1);
+        Aud_EmiSetTrackStatus(lbl_80281419, 0, 1);
     }
 }
 
-void fn_800A76E4(void) {
-    Emi_SetTrackEnabled(lbl_80281419, 0, 0);
+// Stops the commentary and drops a queued line; for the next 15 frames a new line waits
+// (Gaud_StartComment queues it).
+void Gaud_StopComment(void) {
+    Aud_EmiSetTrackStatus(lbl_80281419, 0, 0);
     lbl_80282054 = 15;
     lbl_80282038 = 0;
 }
 
-u8 fn_800A7720(void) {
-    return fn_800AD618(lbl_80281419, 0);
+u8 Gaud_GetCommentStatus(void) {
+    return Aud_EmiGetTrackStatus(lbl_80281419, 0);
 }
 
 u8 fn_800A7748(void) {
-    return fn_800AD618(lbl_8028141A, 0);
+    return Aud_EmiGetTrackStatus(lbl_8028141A, 0);
 }
 
 u8 fn_800A7770(void) {
@@ -1719,7 +1735,7 @@ u8 fn_800A7770(void) {
         return fn_800A75F4();
     }
     bResult = 0;
-    if (fn_800A7720() || fn_800A7748() || fn_800A75F4()) {
+    if (Gaud_GetCommentStatus() || fn_800A7748() || fn_800A75F4()) {
         bResult = 1;
     }
     return bResult;
@@ -1731,29 +1747,29 @@ void fn_800A77E0(f32 fVolume) {
     u8 i;
 
     for (i = 1; i < 5; i++) {
-        fn_800A3FB4(i, fVolume * lbl_8018E988[i]);
+        Aud_SetSubmixAttn(i, fVolume * lbl_8018E988[i]);
     }
-    fn_800A3FB4(13, lbl_8018E988[13] * fVolume);
-    fn_800A3FB4(5, lbl_8018E988[5] * fVolume);
-    fn_800A3FB4(6, lbl_8018E988[6] * fVolume);
-    Emi_SetTrackAttenuation(lbl_8028141B, 0, fVolume);
-    Emi_SetTrackAttenuation(lbl_8028141B, 1, fVolume);
+    Aud_SetSubmixAttn(13, lbl_8018E988[13] * fVolume);
+    Aud_SetSubmixAttn(5, lbl_8018E988[5] * fVolume);
+    Aud_SetSubmixAttn(6, lbl_8018E988[6] * fVolume);
+    Aud_EmiSetTrackAttenuation(lbl_8028141B, 0, fVolume);
+    Aud_EmiSetTrackAttenuation(lbl_8028141B, 1, fVolume);
     for (i = 16; i < 32; i++) {
-        fn_800A3FB4(i, fVolume * lbl_8018E988[i]);
+        Aud_SetSubmixAttn(i, fVolume * lbl_8018E988[i]);
     }
 }
 
 void fn_800A78F0(f32 fVolume) {
     fVolume *= lbl_8018E988[14];
-    fn_800A3FB4(14, fVolume);
+    Aud_SetSubmixAttn(14, fVolume);
 }
 
 void fn_800A7924(f32 f) {
-    fn_800A44A0();
+    Gaud_SetStreamingContext();
 }
 
 void fn_800A7944(void) {
-    fn_800A44A0();
+    Gaud_SetStreamingContext();
     fn_800A47A0();
 }
 

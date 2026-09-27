@@ -605,7 +605,7 @@ void fn_80123CBC(s32 a, s32 b) {
                 uStart = OSGetTick();
                 pStatus = &pCh->uStatus;
                 do {
-                    fn_800A4BDC();
+                    Gaud_Cycle();
                     fn_800B7490();
                     nErr = GBAGetStatus(nChan, pStatus);
                 } while (nErr != 0 && OSGetTick() - uStart < GBA_TICKS_PER_MS * 800);
@@ -678,7 +678,7 @@ void fn_80123E34(void) {
                     uStart = OSGetTick();
                     pType = fn_80123E34_Read(pCh);
                     do {
-                        fn_800A4BDC();
+                        Gaud_Cycle();
                         fn_800B7490();
                         *pType = SIProbe(nChan);
                     } while (*pType != 0x40000 && OSGetTick() - uStart < GBA_TICKS_PER_MS * 800);

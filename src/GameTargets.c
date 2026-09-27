@@ -396,5 +396,5 @@ s32 fn_800F2810(s32 n) {
 }
 
 void fn_800F2958(s32 nMsg, s32 a) {
-    fn_800A7664(7, nMsg, a);
+    Gaud_StartComment(7, nMsg, a);
 }

@@ -194,7 +194,7 @@ void FE_movieFade(void) {
         lbl_801D87C0.fFade += 0.05f;
         pMovie = &lbl_801D7148.aMovies[lbl_801D7148.nMovieNext];
         if (lbl_801D87C0.fFade >= 1.0f) {
-            fn_800A75B4();
+            Gaud_StopMusic();
             fn_800772E0();
             switch (pMovie->nKind) {
             case FE_MOVIE_CREDITS:

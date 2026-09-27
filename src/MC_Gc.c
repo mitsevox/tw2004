@@ -145,7 +145,7 @@ s32 fn_8009CDA0(s32 nPort, s32 nSlot, const char* pOldName, const char* pNewName
     while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
         MC_OnBusy(nPort, nSlot);
         fn_8006C63C();
-        fn_800A4BDC();
+        Gaud_Cycle();
     }
     switch (nResult) {
     case CARD_RESULT_FATAL_ERROR:
@@ -176,7 +176,7 @@ s32 MC_CardOpen(int nPort, s32 nSlot, const char* pName, CARDFileInfo* pFile) {
     s32 nResult;
     int nChan = nPort;
     do {
-        fn_800A4BDC();
+        Gaud_Cycle();
         nResult = CARDOpen(nChan, pName, pFile);
         fn_8006C63C();
     } while (nResult == CARD_RESULT_BUSY);
@@ -204,7 +204,7 @@ s32 MC_CardOpen(int nPort, s32 nSlot, const char* pName, CARDFileInfo* pFile) {
 s32 MC_CardClose(s32 nPort, s32 nSlot, CARDFileInfo* pFile) {
     s32 nResult;
     do {
-        fn_800A4BDC();
+        Gaud_Cycle();
         nResult = CARDClose(pFile);
         fn_8006C63C();
     } while (nResult == CARD_RESULT_BUSY);
@@ -230,7 +230,7 @@ s32 MC_CardProbe(s32 nPort, s32 nSlot) {
     lbl_801F1510[nPort][nSlot].nMemSize = 0;
     lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_PRESENT;
     do {
-        fn_800A4BDC();
+        Gaud_Cycle();
         nResult = CARDProbeEx(nPort, &nMemSize, &nSectorSize);
         fn_8006C63C();
     } while (nResult == CARD_RESULT_BUSY);
@@ -411,7 +411,7 @@ s32 MC_MountCard(s32 nPort, s32 nSlot) {
     lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_PRESENT | MC_CARD_FORMATTED;
     CARDMountAsync(nChan, lbl_802813D0, fn_8009D728, NULL);
     while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
-        fn_800A4BDC();
+        Gaud_Cycle();
         MC_OnBusy(nPort, nSlot);
         fn_8006C63C();
     }
@@ -440,7 +440,7 @@ s32 MC_MountCard(s32 nPort, s32 nSlot) {
     }
     CARDCheckAsync(nChan, NULL);
     while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
-        fn_800A4BDC();
+        Gaud_Cycle();
         MC_OnBusy(nPort, nSlot);
         fn_8006C63C();
     }
@@ -516,7 +516,7 @@ s32 MC_Unmount(s32 nPort, s32 nSlot) {
         lbl_801F1510[nPort][nSlot].uFlags &= ~MC_CARD_MOUNTED;
         nChan = nPort;
         do {
-            fn_800A4BDC();
+            Gaud_Cycle();
             nResult = CARDUnmount(nChan);
             fn_8006C63C();
         } while (nResult == CARD_RESULT_BUSY);
@@ -599,7 +599,7 @@ s32 MC_LoadFile(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen) {
     CARDReadAsync(&file, pBuf, nLen, 0, NULL);
     nChan = nPort;
     while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
-        fn_800A4BDC();
+        Gaud_Cycle();
         MC_OnBusy(nPort, nSlot);
         fn_8006C63C();
     }
@@ -641,7 +641,7 @@ s32 fn_8009DFD8(s32 nPort, s32 nSlot, const char* pName, u32 uSize, CARDFileInfo
     s32 nResult;
     CARDCreateAsync(nChan, pName, uSize, pFile, NULL);
     while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
-        fn_800A4BDC();
+        Gaud_Cycle();
         MC_OnBusy(nPort, nSlot);
         fn_8006C63C();
     }
@@ -675,7 +675,7 @@ s32 fn_8009E130(s32 nPort, s32 nSlot, CARDFileInfo* pFile, const void* pBuf, s32
     s32 nResult;
     CARDWriteAsync(pFile, pBuf, nLen, nOffset, NULL);
     while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
-        fn_800A4BDC();
+        Gaud_Cycle();
         MC_OnBusy(nPort, nSlot);
         fn_8006C63C();
     }
@@ -709,7 +709,7 @@ s32 fn_8009E280(s32 nPort, s32 nSlot, s32 nFile, CARDStat* pStat) {
     int nChan = nPort;
     int nFileNo = nFile;
     do {
-        fn_800A4BDC();
+        Gaud_Cycle();
         nResult = CARDGetStatus(nChan, nFileNo, pStat);
         fn_8006C63C();
     } while (nResult == CARD_RESULT_BUSY);
@@ -736,7 +736,7 @@ s32 fn_8009E360(s32 nPort, s32 nSlot, s32 nFile, CARDStat* pStat) {
     s32 nResult;
     CARDSetStatus(nChan, nFile, pStat);
     while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
-        fn_800A4BDC();
+        Gaud_Cycle();
         fn_8006C63C();
     }
     switch (nResult) {
@@ -844,7 +844,7 @@ s32 fn_8009E758(s32 nPort, s32 nSlot, const char* pName) {
         CARDDeleteAsync(nChan, pName, NULL);
     }
     while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
-        fn_800A4BDC();
+        Gaud_Cycle();
         MC_OnBusy(nPort, nSlot);
         fn_8006C63C();
     }
@@ -881,7 +881,7 @@ s32 fn_8009E918(s32 nPort, s32 nSlot) {
     fn_8009CB9C(nPort, nSlot, lbl_801F1510[nPort][nSlot].nMemSize + 0xA000);
     CARDFormatAsync(nChan, NULL);
     while ((nResult = CARDGetResultCode(nChan)) == CARD_RESULT_BUSY) {
-        fn_800A4BDC();
+        Gaud_Cycle();
         MC_OnBusy(nPort, nSlot);
         fn_8006C63C();
     }
