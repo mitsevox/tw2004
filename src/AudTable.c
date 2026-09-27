@@ -312,5 +312,5 @@ void fn_800A8524(AudSound* pSound, u16 n) {
 }
 
 void fn_800A8584(AudSource* pSource, u8 nTrack, s32 n) {
-    fn_800ADDC8((u8)(pSource - lbl_80282058), nTrack, n);
+    Aud_EmiTrkCB((u8)(pSource - lbl_80282058), nTrack, n);
 }

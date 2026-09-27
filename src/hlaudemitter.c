@@ -312,7 +312,7 @@ void Aud_EmiSet3DPos(u8 nId, f32* pPos, f32* pLast, u8 nView) {
 }
 
 // The calls below pass on to AudTable.c's entry nId (the same number as the instance);
-// fn_800ADA08 passes a sound number instead (its definition, shared by all its instances).
+// Aud_EmiSetTrackVarRangeTmpl passes a sound number instead (its definition, shared by all its instances).
 void Aud_EmiSetTrackVariation(u8 nId, u8 nTrack, u8 n) {
     if (Aud_CheckEmitterInstance(nId) != NULL) {
         fn_800A8248(nId, nTrack, n);
@@ -325,7 +325,7 @@ void Aud_EmiSetTrackVarRange(u8 nId, u8 nTrack, u8 n) {
     }
 }
 
-void fn_800ADA08(s16 nSound, u8 nTrack, u8 n) {
+void Aud_EmiSetTrackVarRangeTmpl(s16 nSound, u8 nTrack, u8 n) {
     fn_800A834C(nSound, nTrack, n);
 }
 
@@ -363,11 +363,11 @@ void fn_800ADBC0(s16 nEmitter, f32* pPos, f32* pLast, u8 nView) {
     }
 }
 
-// The emitter's own sound first (fn_800ADA08), when it has instances.
+// The emitter's own sound first (Aud_EmiSetTrackVarRangeTmpl), when it has instances.
 void Aud_EmiAliasSetTrackVarRange(s16 nEmitter, u8 nTrack, u8 n) {
     AudInstance* pInst = lbl_801F2668.apFirst[nEmitter];
     if (pInst != NULL) {
-        fn_800ADA08(lbl_801F2668.anSound[nEmitter], nTrack, n);
+        Aud_EmiSetTrackVarRangeTmpl(lbl_801F2668.anSound[nEmitter], nTrack, n);
     }
     for (; pInst != NULL; pInst = pInst->pNext) {
         Aud_EmiSetTrackVarRange(pInst->nId, nTrack, n);
@@ -389,7 +389,7 @@ void fn_800ADD54(s16 nEmitter, u8 nTrack, f32 fVolume) {
 }
 
 // Clears bit nBit of an instance's u22 and tells its callback.
-void fn_800ADDC8(u8 nId, u8 nBit, s32 n) {
+void Aud_EmiTrkCB(u8 nId, u8 nBit, s32 n) {
     AudInstance* pInst;
     void (*pfnCallback)(u8 nId, u8 nBit, s32 n);
 

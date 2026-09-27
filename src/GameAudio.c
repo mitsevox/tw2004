@@ -34,9 +34,9 @@ void fn_800DC6E8(int nPlayer);
 u8   fn_8006BAD8(int nPlayer, s32* pOut);
 f32  fn_8006C630(void);
 // hlaudemitter.c: makes an emitter for sound nSound; the callback is told when a track stops
-// (fn_800ADDC8). The other types are unproven.
+// (Aud_EmiTrkCB). The other types are unproven.
 u8   Aud_EmiAdd(s16 nSound, s16 nKind, int a, int b, void (*pfnCallback)(u8 nId, u8 nTrack, s32 n));
-void fn_800ADA08(s16 nSound, u8 nTrack, u8 n);
+void Aud_EmiSetTrackVarRangeTmpl(s16 nSound, u8 nTrack, u8 n);
 void Aud_EmiSetAllTrackStatus(u8 nId, int n);
 void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);
 void fn_800A6BA8(u8 nPlayer);
@@ -288,7 +288,7 @@ void fn_800A4084(void) {
         }
         lbl_80281420 = Aud_EmiAdd(9, -1, 1, 0, NULL);
         Aud_EmiSet3DPos(lbl_80281420, &gPlayers[0].ball.pCourse->pin[Game_CurrentPinSet()].x, NULL, 0);
-        fn_800ADA08(9, 0, nWind);
+        Aud_EmiSetTrackVarRangeTmpl(9, 0, nWind);
     }
     lbl_80282029 = 1;
 }

@@ -357,7 +357,7 @@ typedef struct AudInstance {
     f32  vPos[4];               // 0x10   its position (Aud_EmiSet3DPos)
     u8   nId;                   // 0x20   its number (its index in lbl_801F2740)
     s8   nEmitter;              // 0x21   the emitter whose list it is in (-1: none)
-    u8   u22;                   // 0x22   bits cleared by fn_800ADDC8
+    u8   u22;                   // 0x22   bits cleared by Aud_EmiTrkCB
     u8   unk23;
     s32  n24;                   // 0x24   1: fn_800AD1C8 sends vPos again every frame
     s32  n28;                   // 0x28   0: vPos is moved into each view's camera space
@@ -376,7 +376,7 @@ typedef struct AudEmitters {
     AudInstance* pActive;       // 0x8    the instances in use, linked through pNextActive
     AudInstance* pActiveTail;   // 0xC
     AudInstance* apFirst[32];   // 0x10   linked through AudInstance.pNext
-    s16  anSound[32];           // 0x90   Aud_EmiAliasSetTrackVarRange hands it to fn_800ADA08
+    s16  anSound[32];           // 0x90   Aud_EmiAliasSetTrackVarRange hands it to Aud_EmiSetTrackVarRangeTmpl
     u32  nActive;               // 0xD0   instances in use (up to 256)
     u32  uFlags;                // 0xD4   bit 0: set up (fn_800ACECC)
 } AudEmitters;
@@ -564,7 +564,7 @@ void Voc_Delete(AudVoice* pVoice);     // stop it now
 u8   fn_800ACE38(AudVoice* pVoice, u32* puPos);
 
 // hlaudemitter.c
-void fn_800ADDC8(u8 nId, u8 nBit, s32 n);
+void Aud_EmiTrkCB(u8 nId, u8 nBit, s32 n);
 int  fn_800AD0C4(void);                 // Aud_EmiDel on every instance in use, emitters emptied
 void Aud_EmiDel(u8 nId);
 void Aud_EmiAliasSetTrackStatus(s16 nEmitter, u8 nTrack, u8 bOn);   // for every instance of an emitter: Aud_EmiSetTrackStatus
