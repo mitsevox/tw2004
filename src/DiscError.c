@@ -36,6 +36,11 @@ u8 lbl_802814D1 = 1;
 u8 lbl_802814D2 = 1;
 
 // .sbss (discerror.h), in reverse address order as the compiler lays it out.
+// fake match: EA's lbl_802821A0 starts 8-aligned after lbl_80282198 (a 4-byte hole at
+// 0x8028219C, like the .sdata one before lbl_802814D8 and the .data one before lbl_80190DB0; the
+// cause is not known); the aligned attribute stands in for it.
+u32  lbl_802821A4;
+u8   lbl_802821A0 __attribute__((aligned(8)));
 u32  lbl_80282198;
 u16* lbl_80282194;
 u16  lbl_80282190;
