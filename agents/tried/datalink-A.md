@@ -29,3 +29,11 @@ result.
   lies between fe_craputils.c and stateFunc.c.
 - Done: the extern in Swing.c became the const definition; .rodata 0x80183578..0x801835E0 added
   to Swing.c. main.dol: OK.
+
+## auto_04_80183C78_rodata (3568 B): lbl_80183C78, lbl_80184268 -> rcmp_mad_codec.c
+
+- Contents: lbl_80183C78 (MadCode[95], 0x5F0) and lbl_80184268 (MadCode[128], 0x800); the
+  block ends where rcmp_mad_codec.c's .rodata (lbl_80184A68) begins. Only user: rcmp_mad_codec
+  (the table builder); llpict.h already had the const externs.
+- Done: both defined in rcmp_mad_codec.c ahead of lbl_80184A68 (values from the DOL); the unit's
+  .rodata now starts at 0x80183C78. main.dol: OK.
