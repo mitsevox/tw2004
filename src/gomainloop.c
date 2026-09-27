@@ -218,7 +218,7 @@ void fn_8009C914(int nView);
 void fn_800A2064(void);
 void fn_800A2E14(void);
 void fn_800A3A84(void);
-void fn_800A4C54(void);
+void Gaud_Monitor(void);
 void fn_800A4E34(void);
 void fn_800A4FD8(void);
 void Aud_InitSession(int a, int b, u8 c, int d);
@@ -1134,7 +1134,7 @@ void fn_8006D8E8(void) {
         fn_80090A60();
         fn_8002FEAC();
         fn_80007260();
-        fn_800A4C54();
+        Gaud_Monitor();
         if (!gSession.nSplitScreen && gSession.nGameType != 1) {
             fn_8006E0F8();
         }

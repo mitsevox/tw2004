@@ -16,7 +16,7 @@ void fn_80012FA4();
 void fn_80014524();
 void fn_8002F1D4();
 void fn_80095108();
-void fn_800A4BAC();
+void Gaud_InitOnce();
 void fn_800B5C30();
 void GoARAM_Init();
 
@@ -36,7 +36,7 @@ void fn_80005520(void) {
     UStream_AllocBuffers();
     Session_Init();
     fn_8002F1D4();
-    fn_800A4BAC();
+    Gaud_InitOnce();
     fn_80014524();
     fn_80012FA4();
 }

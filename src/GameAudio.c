@@ -50,32 +50,32 @@ void fn_800BA734(int n, s8 nTrack);
 void Aud_Pause(u8 b, u8 b2);
 void Aud_SetSubmixAttn(u8 nCurve, f32 fVolume);
 void Aud_SetSubmixAll(u8 nCurves, f32* pVolumes);
-void fn_800A4084(void);
-void fn_800A41A4(void);
-void fn_800A43DC(void);
+void FirstFrameInit(void);
+void UpdateCommentVolDucking(void);
+void UpdateCrowdBuildup(void);
 void StartBackgroundMusic(void);
 void StartAmbientStreamer(void);
 void UpdateStreaming(void);
-void fn_800A42B0(u8 n);
+void InitCrowdBuildup(u8 n);
 void fn_800A7220(f32 fAmount);
 void Aud_Mute(u8 bLow, u8 bHigh);
 void Aud_SetOutputmode(u8 n);
-void fn_800A4044(u8 nIndex, u8 nValue);
+void Aud_MicSetRvbPreset(u8 nIndex, u8 nValue);
 void Aud_SesTmplOvrTrackRvbMode(s16 nSound, u8 nTrack, u8 bOn);
-void fn_800A4170(u8 nId, u8 nTrack, s32 n);
+void HeartBeatLoopCallback(u8 nId, u8 nTrack, s32 n);
 void fn_800A5980(u8 nPlayer);
 void Gaud_InitSlowMo(u8 nPlayer, u8 n);
 void Gaud_ExitGameBreaker(u8 nPlayer);
 void Aud_EmiSetTrackVariation(u8 nId, u8 nTrack, u8 n);
-u8   fn_800A4A24(s32 nCourse, int n);
-u8   fn_800A4A88(void);
+u8   GetAmbientStreamRange(s32 nCourse, int n);
+u8   Gaud_ReInit(void);
 void Aud_EmiSetTrackStream(u8 nId, u8 nTrack, u8 a, u16 b, s32 c);
 u8   Gaud_GetCommentStatus(void);
 u8   fn_800A7748(void);
 void fn_800A70E4(int n);
 void fn_800A7198(int n);
 
-// Each volume curve's volume (fn_800A4A88 hands them to hlaudmovie.c).
+// Each volume curve's volume (Gaud_ReInit hands them to hlaudmovie.c).
 f32 lbl_8018E988[32] = {
     0.3f, 0.7f, 0.8f, 1.0f, 0.7f, 0.4f, 1.0f, 1.0f,
     1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.7f, 0.7f, 0.4f,
@@ -154,7 +154,7 @@ u8 lbl_8028202B;
 u8 lbl_8028202A;
 u8 lbl_80282029;
 u8 lbl_80282028;
-u8 lbl_80282024[4];                     // 4 bytes in the original; fn_800A3FF4 clears only two
+u8 lbl_80282024[4];                     // 4 bytes in the original; Aud_MicInitOnce clears only two
 u8 lbl_80282020;
 
 // startUp.c: the sound engine's start-up steps, each nonzero when it worked
@@ -186,14 +186,14 @@ void Aud_EmiExitSession(void);                   // hlaudemitter.c
 void fn_800B5B80(void);                   // UAudMemStack.c
 void Aud_EmiSetTrackStep(u8 nId, u8 nTrack, u8 n, int bCheck);
 
-u8   fn_800A3FF4(void);
+u8   Aud_MicInitOnce(void);
 void Gaud_StopMusic(void);
 void Gaud_InitSpecialShot(u8 nPlayer);
 void fn_800A6EC8(void);
 void fn_800A73C0(u8 a, int n);
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
-// 1.0f (0x80283F48), before the 0.2f and the int-to-float double fn_800A41A4 uses first; its
+// 1.0f (0x80283F48), before the 0.2f and the int-to-float double UpdateCommentVolDucking uses first; its
 // body is unknown.
 static f32 GameAudio_StrippedFn(f32 x) {
     return x + 1.0f;
@@ -210,7 +210,7 @@ u8 Aud_InitOnce(u8 nRate) {
         && (bOk = fn_800A8D2C()) && (bOk = Emi_InitModule()) && (bOk = Trk_InitModule())
         && (bOk = fn_800AAD18()) && (bOk = fn_800ABBC8()) && (bOk = fn_800A8754())
         && (bOk = Voc_InitModule()) && (bOk = fn_800A8824()) && (bOk = Aud_EmiInitOnce())
-        && (bOk = fn_800A3FF4())) {
+        && (bOk = Aud_MicInitOnce())) {
         fn_800B07A0();
         fn_800A86BC(nRate);
         bOk = 1;
@@ -218,7 +218,8 @@ u8 Aud_InitOnce(u8 nRate) {
     return bOk;
 }
 
-// Every caller passes a second flag (DiscError.c 1, this file 0); nothing here reads it.
+// Pauses (b 1) or resumes (b 0) all sound. b2 is TW07's spinupDelay: the disc-error check
+// (Code800B7210.c's fn_800B7490) passes 1, this file 0; nothing here reads it.
 void Aud_Pause(u8 b, u8 b2) {
     fn_800A8F68(b);
 }
@@ -250,33 +251,42 @@ void Aud_SetSubmixAll(u8 nCurves, f32* pVolumes) {
     Mas_SetSubmixAll(nCurves, pVolumes);
 }
 
-u8 fn_800A3FF4(void) {
+// The listeners' (EA: microphones') set-up at boot, the last step of Aud_InitOnce: no listeners and
+// reverb preset 0 for both. Always 1.
+u8 Aud_MicInitOnce(void) {
     Mem_set(lbl_80282024, 0, 2);
     lbl_80282020 = 0;
     return 1;
 }
 
-s32 fn_800A402C(u8 n) {
+// A session (the front end or a hole) has n listeners, one per view (Aud_InitSession). Always 1.
+s32 Aud_MicInitSession(u8 n) {
     lbl_80282020 = n;
     return 1;
 }
 
-void fn_800A4038(void) {
+void Aud_MicExitSession(void) {
     lbl_80282020 = 0;
 }
 
-void fn_800A4044(u8 nIndex, u8 nValue) {
+// Gives listener nIndex reverb preset nValue, passing it on to hlaudmovie.c (fn_800A87B4) only when
+// it changes. Gaud_InitHole uses preset 17 on course 7's hole index 2.
+void Aud_MicSetRvbPreset(u8 nIndex, u8 nValue) {
     if (lbl_80282024[nIndex] != nValue) {
         lbl_80282024[nIndex] = nValue;
         fn_800A87B4(nIndex, nValue);
     }
 }
 
-void fn_800A4080(void) {
+void Aud_MicCycle(void) {
 }
 
-// Starts the course's sounds (not in game types 0, 1 and 3): the wind and the pin's emitter.
-void fn_800A4084(void) {
+// On a hole's first frame (Gaud_Monitor): outside start-up and the front end (game types 0, 1, 3)
+// starts the course's ambient sounds: the crowd's idle murmur (crowd reaction 0), the wind and the
+// trees at the wind option's strength, the rain when fn_80035574 (at fn_8006C630's strength), and
+// the flag flapping at the pin (sound 9, lbl_80281420, by the wind). Then lets Gaud_Monitor run the
+// rest (lbl_80282029).
+void FirstFrameInit(void) {
     u8 nWind;
 
     if (gSession.nGameType != 3 && gSession.nGameType != 1 && gSession.nGameType != 0) {
@@ -295,14 +305,19 @@ void fn_800A4084(void) {
     lbl_80282029 = 1;
 }
 
-// An emitter callback (hlaudemitter.c's pfnCallback shape): when track 2 stops, tells GameEffects.c.
-void fn_800A4170(u8 nId, u8 nTrack, s32 n) {
+// The GameBreaker heartbeat's emitter callback (Gaud_InitHole hands it to Aud_EmiAdd): each report
+// of track 2, the heartbeat, rumbles the controller of view 0's player once (GameEffects.c
+// fn_800DC6E8, up to 40 beats). Gaud_InitGameBreaker calls it for the first beat.
+void HeartBeatLoopCallback(u8 nId, u8 nTrack, s32 n) {
     if (nTrack == 2) {
         fn_800DC6E8(ViewController_GetPlayer(0));
     }
 }
 
-void fn_800A41A4(void) {
+// Once a frame (Gaud_Monitor): while commentary plays, the music (curve 15) drops to lbl_80281434
+// (0.6) of its option volume, and goes back when it ends. The volume only changes while music is
+// what streams (lbl_8028203C 1).
+void UpdateCommentVolDucking(void) {
     if (Gaud_GetCommentStatus()) {
         if (lbl_80282031 == 0) {
             if (lbl_8028203C == 1) {
@@ -318,7 +333,10 @@ void fn_800A41A4(void) {
     }
 }
 
-void fn_800A42B0(u8 n) {
+// The crowd's build-up as the ball nears the hole: variation range n on tracks 2 and 3 of both
+// crowd emitters (lbl_8028141C / lbl_8028141D). Not during the GameBreaker (lbl_8028202F) or in a
+// mode without a crowd (lbl_80282040 0).
+void InitCrowdBuildup(u8 n) {
     if (lbl_8028202F || !lbl_80282040) return;
     Aud_EmiSetTrackVarRange(lbl_8028141C, 2, n);
     Aud_EmiSetTrackVarRange(lbl_8028141D, 2, n);
@@ -330,7 +348,8 @@ void fn_800A42B0(u8 n) {
     Aud_EmiSetTrackStatus(lbl_8028141D, 3, 1);
 }
 
-void fn_800A4374(void) {
+// Stops the crowd's build-up (tracks 2 and 3 of both crowd emitters), in a mode with a crowd.
+void ExitCrowdBuildup(void) {
     if (lbl_80282040) {
         Aud_EmiSetTrackStatus(lbl_8028141C, 2, 0);
         Aud_EmiSetTrackStatus(lbl_8028141D, 2, 0);
@@ -339,7 +358,11 @@ void fn_800A4374(void) {
     }
 }
 
-void fn_800A43DC(void) {
+// Once a frame (Gaud_Monitor), after a swing (lbl_80282033), in a mode with a crowd and while no
+// crowd reaction is due or held: asks emotion.c (fn_8006BAD8) how the current player's ball is
+// doing near the hole. When it has the result, plays crowd reaction n + 4 (once a shot,
+// lbl_80282030); else, when the closeness n changed, raises the build-up to n - 1 (at least 0).
+void UpdateCrowdBuildup(void) {
     s32 n;
 
     if (lbl_80282040 && lbl_80282033 && !lbl_80282030 && !lbl_8028202F && !lbl_80282032
@@ -351,14 +374,18 @@ void fn_800A43DC(void) {
             if (--n < 0) {
                 n = 0;
             }
-            fn_800A42B0(n);
+            InitCrowdBuildup(n);
         }
     }
 }
 
-// Applies the sound options: the volumes, then the music. Game types 3 and 10 play music 2 on
-// row 0, others music 6 (two players at most, no replay) on the game mode's row, if the row is on
-// (skipped: a8[0] without flag 0x4000). Music 6 allowed but off: ambience (sound 8) if b288, SFX>0.
+// Picks what streams, and records it in lbl_8028203C (0 nothing, 1 music, 2 ambience). Sets the
+// music volume (curve 15, option a0[1]) and the SFX level first. In the front end (game types 3 and
+// 10) the music is sound 2 on the options' row 0; in play, sound 6 on the game mode's row (1 to 3),
+// and only with two players at most and outside replays. The music plays when its volume is above 0
+// and its row is on (the row is not asked when gSession.a8[0] is set without flag 0x4000). When
+// in-game music does not play, the course ambience (sound 8, placed at (0, 0, 12)) streams instead
+// if gpGame->b288 and the SFX volume is above 0; UpdateStreaming starts it.
 void Gaud_SetStreamingContext(void) {
     int nMode;
     f32 fVolume;
@@ -481,7 +508,7 @@ void StartBackgroundMusic(void) {
 
 // When ambience is what streams (lbl_8028203C 2): starts the ambience emitter's tracks 0 and 1,
 // track 2 when fn_80035574 (the course flag that also starts the rain sound), track 3 by course and
-// track 4 by course and hole (fn_800A4A24).
+// track 4 by course and hole (GetAmbientStreamRange).
 void StartAmbientStreamer(void) {
     int nCourse;
     u8 n;
@@ -497,7 +524,7 @@ void StartAmbientStreamer(void) {
         }
         Aud_EmiSetTrackVarRange(lbl_8028141A, 3, nCourse);
         Aud_EmiSetTrackStatus(lbl_8028141A, 3, 1);
-        nSound = fn_800A4A24(nCourse, n);
+        nSound = GetAmbientStreamRange(nCourse, n);
         if (nSound != 0xFF) {
             Aud_EmiSetTrackVarRange(lbl_8028141A, 4, nSound);
             Aud_EmiSetTrackStatus(lbl_8028141A, 4, 1);
@@ -524,7 +551,7 @@ void UpdateStreaming(void) {
 }
 
 // Stops the ambience's tracks; track 0 too unless bKeepFirst.
-void fn_800A49A4(u8 bKeepFirst) {
+void StopAmbientStreamer(u8 bKeepFirst) {
     if (lbl_8028203C == 2) {
         if (!bKeepFirst) {
             Aud_EmiSetTrackStatus(lbl_8028141A, 0, 0);
@@ -536,8 +563,10 @@ void fn_800A49A4(u8 bKeepFirst) {
     }
 }
 
-// The sound for a course and n (StartAmbientStreamer passes Game_GetCurHoleNum()), or 0xFF when it has none.
-u8 fn_800A4A24(s32 nCourse, int n) {
+// The variation range the ambience's track 4 plays on course nCourse, hole index n
+// (StartAmbientStreamer passes Game_GetCurHoleNum(); the table lbl_8018EA08 lists hole numbers, n +
+// 1), or 0xFF when the hole has none.
+u8 GetAmbientStreamRange(s32 nCourse, int n) {
     u8 nSound;
     int i;
 
@@ -551,7 +580,11 @@ u8 fn_800A4A24(s32 nCourse, int n) {
     return nSound;
 }
 
-u8 fn_800A4A88(void) {
+// Sets the game's sound back to nothing (no emitters, both views' emitters cleared, every flag off,
+// crowd volume 1, music ducking 0.6, crowd pair 21 either side), then starts the sound engine
+// (Aud_InitOnce, 60 frames a second) and gives every volume curve its level (lbl_8018E988). Always
+// 1.
+u8 Gaud_ReInit(void) {
     int i;
 
     for (i = 0; i < 2; i++) {
@@ -599,14 +632,16 @@ u8 fn_800A4A88(void) {
     return 1;
 }
 
-int fn_800A4BAC(void) {
-    return fn_800A4A88() != 0;
+int Gaud_InitOnce(void) {
+    return Gaud_ReInit() != 0;
 }
 
-// Once a frame: the emitters, then the queued sound once its wait runs out.
+// Once a frame, also from the loading, movie and memory-card loops: runs the sound engine
+// (Aud_EmiCycle) and, when the 15 frames after Gaud_StopComment run out, plays the commentary line
+// Gaud_StartComment queued meanwhile.
 void Gaud_Cycle(void) {
     Aud_EmiCycle();
-    fn_800A4080();
+    Aud_MicCycle();
     if (lbl_80282054 != 0) {
         if (--lbl_80282054 == 0 && lbl_80282038) {
             Aud_EmiSetTrackStream(lbl_80281419, 0, lbl_80282052, lbl_80282050, lbl_8028204C);
@@ -616,18 +651,21 @@ void Gaud_Cycle(void) {
     }
 }
 
-void fn_800A4C54(void) {
+// Once a frame in play (gomainloop): on a hole's first frame FirstFrameInit; after it, re-picks the
+// stream when asked (lbl_8028202C: Gaud_Pause on resuming), and updates the crowd build-up, the
+// music ducking under commentary and the streams (UpdateStreaming).
+void Gaud_Monitor(void) {
     if (lbl_8028202A) {
         lbl_8028202A = 0;
-        fn_800A4084();
+        FirstFrameInit();
     }
     if (lbl_80282029) {
         if (lbl_8028202C) {
             Gaud_SetStreamingContext();
             lbl_8028202C = 0;
         }
-        fn_800A43DC();
-        fn_800A41A4();
+        UpdateCrowdBuildup();
+        UpdateCommentVolDucking();
         UpdateStreaming();
     }
 }
@@ -758,7 +796,7 @@ void fn_800A500C(void) {
         pView->n1 = Aud_EmiAdd(2, -1, 0, 0, NULL);
         Aud_EmiSet3DPos(pView->n1, pPlayer->ball.vPos, NULL, 0);
         Aud_EmiSetTrackStatus(pView->n1, 0, 1);
-        pView->n2 = Aud_EmiAdd(4, -1, 1, 1, fn_800A4170);
+        pView->n2 = Aud_EmiAdd(4, -1, 1, 1, HeartBeatLoopCallback);
         pView->n3 = Aud_EmiAdd(4, -1, 1, 1, NULL);
         vPos[0] = -lbl_80281454;
         vPos[1] = 0.0f;
@@ -793,7 +831,7 @@ void fn_800A500C(void) {
     vPos[0] = -lbl_80281458;
     Aud_EmiSet3DPos(lbl_8028141D, vPos, NULL, 0);
     if (nCourse == 7 && n == 2) {
-        fn_800A4044(0, 17);
+        Aud_MicSetRvbPreset(0, 17);
         Aud_SesTmplOvrTrackRvbMode(2, 0, 1);
         Aud_SesTmplOvrTrackRvbMode(1, 0, 1);
         Aud_SesTmplOvrTrackRvbMode(1, 2, 1);
@@ -1115,7 +1153,7 @@ void fn_800A5CA4(u8 nPlayer) {
 
 void fn_800A5E94(u8 nPlayer) {
     fn_8006BAA8(nPlayer);
-    fn_800A4374();
+    ExitCrowdBuildup();
     fn_800A707C();
 }
 
@@ -1269,7 +1307,7 @@ void Gaud_InitGameBreaker(u8 nPlayer, u8 b) {
 
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
     if (lbl_8028202B || lbl_8028202F) return;
-    fn_800A4170(pView->n2, 2, 1);
+    HeartBeatLoopCallback(pView->n2, 2, 1);
     Aud_EmiSetTrackStatus(pView->n2, 2, 1);
     Aud_EmiSetTrackStatus(pView->n3, 2, 1);
     Aud_Mute(0, 1);
@@ -1498,7 +1536,7 @@ void fn_800A6D48(u8 nPlayer) {
 void Gaud_InitCrowdReactionSound(int nMusic, int a) {
     u8 n = nMusic;
 
-    fn_800A4374();
+    ExitCrowdBuildup();
     fn_800A707C();
     if (a == 1) {
         lbl_80282033 = 0;
@@ -1520,7 +1558,7 @@ void Gaud_InitCrowdReactionSound(int nMusic, int a) {
 
 void fn_800A6EC8(void) {
     if (lbl_80282040) {
-        fn_800A4374();
+        ExitCrowdBuildup();
         fn_800A707C();
         Aud_EmiSetTrackStatus(lbl_8028141C, 0, 0);
         Aud_EmiSetTrackStatus(lbl_8028141C, 1, 0);
@@ -1614,7 +1652,7 @@ void fn_800A72EC(u8 bOff, u8 bMusic) {
     if (lbl_8028202E ^ bOff) {
         lbl_8028202E = bOff;
         if (bOff) {
-            fn_800A49A4(0);
+            StopAmbientStreamer(0);
             Gaud_StopMusic();
             fn_800A6EC8();
             Gaud_ExitGameBreaker(0);
@@ -1835,7 +1873,7 @@ void fn_800A7A14(u8 nSound) {
 // Every caller passes a fourth argument; nothing here reads it.
 s32 Aud_InitSession(u8 a, u8 b, u8 nListeners, int nUnused) {
     Aud_EmiInitSession();
-    fn_800A402C(nListeners);
+    Aud_MicInitSession(nListeners);
     // port: EA passes an argument Ses_Init ignores
     ((u8 (*)(u8, u8, u8, int))Ses_Init)(a, b, nListeners, 0);
     return 1;
@@ -1843,7 +1881,7 @@ s32 Aud_InitSession(u8 a, u8 b, u8 nListeners, int nUnused) {
 
 void Aud_ExitSession(s32 n) {
     Aud_EmiExitSession();
-    fn_800A4038();
+    Aud_MicExitSession();
     // port: EA passes an argument fn_800A8D88 ignores
     ((void (*)(s32))fn_800A8D88)(n);
 }

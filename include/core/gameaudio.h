@@ -23,11 +23,11 @@ typedef struct GameAudioView {
 } GameAudioView;
 LAYOUT_ASSERT(GameAudioView, 0x20);
 
-// An entry of lbl_8018EA08: the sound fn_800A4A24 picks for a course and a number.
+// An entry of lbl_8018EA08: the sound GetAmbientStreamRange picks for a course and a number.
 typedef struct GameAudioCourseSound {
     s32  nCourse;               // 0x0    Game_GetCourse()'s course
-    u8   n4;                    // 0x4    fn_800A4A24's n + 1
-    u8   nSound;                // 0x5    what fn_800A4A24 returns
+    u8   n4;                    // 0x4    GetAmbientStreamRange's n + 1
+    u8   nSound;                // 0x5    what GetAmbientStreamRange returns
     u8   unk6[0x8 - 0x6];
 } GameAudioCourseSound;
 LAYOUT_ASSERT(GameAudioCourseSound, 0x8);
