@@ -50,20 +50,17 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
     while (pFrame->p10 != NULL) {
         // fake match: retain the event-word addresses across script instructions.
         pA1 = &data.aw[1];
-        pA2 = &data.aw[2];
-        pA3 = &data.aw[3];
+        // fake match: the loop guard supplies the address-phi condition.
+        pA2 = pFrame->p10 ? &data.aw[2] : &data.aw[2];
+        pA3 = pFrame->p10 ? &data.aw[3] : &data.aw[3];
         uOp = *pFrame->p10;
         pTop = pFrame->pC;
         pFrame->p10++;
         switch (uOp) {
         case 0x02:  // send event 0 (a call to screen group|screen<<16 below the arguments)
-            pA2 = &data.aw[2];
-            pA3 = &data.aw[3];
-            // fake match: give the two opcodes separate address-phi predecessors.
+            // fake match: both opcodes share this event body.
             goto event0;
         case 0x71:
-            pA2 = &data.aw[2];
-            pA3 = &data.aw[3];
         event0:
             nArgs = *pFrame->p10;
             pFrame->p10++;
