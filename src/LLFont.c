@@ -54,20 +54,20 @@ static u8 lbl_80281C88;                 // set while fn_8001144C word-wraps (fn_
 // its glyph records and glyphs, builds each glyph's texture coordinates and sizes, and reorders the
 // bitmap's rows of 4-bit texels into the 8x8 tiles of a C4 texture.
 LLFont* FO_spLoadFontFromStream(u8* pData, UFontState* pState) {
-    int nPalette;
-    int nTileCol;
-    int nTileRow;
-    LLTexelPair* pDst;
-    int nRow;
     u8* pRec;
-    int nRowBytes;
-    LLFont* pFont;
-    LLGlyphRec* pGlyphRec;
-    LLFontFile* pFile;
-    s32 i;
-    u8* pSrc;
     int k;
+    LLFont* pFont;
+    LLFontFile* pFile;
+    u8* pSrc;
+    int nPalette;
+    int nRowBytes;
+    LLTexelPair* pDst;
+    s32 i;
+    int nRow;
+    LLGlyphRec* pGlyphRec;
+    int nTileCol;
     int nTexHeight;
+    int nTileRow;
     f32 fX;
     f32 fY;
     f32 fX1;
