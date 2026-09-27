@@ -25,3 +25,5 @@ message screen, whose switch is jumptable_80190FA8) and fn_800B7490 (the drive-s
 suggests DiscError.c's .text splits at 0x800B7210 into a second file (fn_800B7210..fn_800B7694,
 plus the message strings/table 0x80190DB0..0x80190FA8 and the jump table in .data). Not done:
 splitting a linked unit's .text is beyond this pass; the 16 + 8 bytes stay in auto units.
+| auto_07_80280DF0_sdata | 8 | GoRenderCtx_Gc.c | lbl_80280DF0 (= &lbl_80281C90) is read by many units, but of the units linked between UFont's and streammanagerhole's .sdata only GoRenderCtx_Gc uses it (fn_80013D5C sets the slot) | linked, main.dol OK |
+| auto_08_80281C88_sbss | 24 | GoRenderCtx_Gc.c 0x80281C90-0x80281CA0; 0x80281C88 is LLFont.c's (skipped) | lbl_80281C88 is LLFont.c's `static u8` (LLFont.c, not linked: left). lbl_80281C90 is only referenced by lbl_80280DF0's initialiser, lbl_80281C98 only by GoRenderCtx_Gc; both between LLFont's and ViewController's .sbss. lbl_80281C98 sits at +8, so lbl_80281C90 is an 8-byte object (void* [2], only [0] used): a 4-byte one packs C98 at +4 (unreferenced padding objects are stripped by the linker) | 16 B linked, main.dol OK; 8 B (LLFont) left |
