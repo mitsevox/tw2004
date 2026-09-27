@@ -2125,12 +2125,18 @@ void fn_80026844(LibOverlay* pOv, int nSlot, int nGroup, int nClub, int nStyle, 
     s16 nOff;
     int nGroupOff;
     u8* pTree;
+    u8* pBase;
 
     if (nNames == 0) return;
     nGroupOff = pOv->pWork->groups[20];
     if (nGroupOff < 0) return;
-    pTree = pOv->pWork->pTree;
-    nOff = *(s16*)(pTree + (nGroupOff + 2));
+    // fake match: temporarily shift the tree pointer for this first read, then restore its base;
+    // the address and later uses are unchanged, but the add/load and registers match EA's code.
+    pBase = pOv->pWork->pTree;
+    pTree = pBase;
+    pTree += nGroupOff;
+    nOff = *(s16*)(pTree + 2);
+    pTree = pBase;
     if (nOff < 0) return;
     nOff = *(s16*)(pTree + nOff);
     if (nOff < 0) return;
