@@ -10,6 +10,8 @@
 #include "frontend/fe.h"
 #include "game/modes/ladder.h"
 
+LadderMap lbl_80260CB8;
+
 // Places a node: node, x, y.
 void fn_80121430(MsgArg* pArgs, MsgArg* pResult) {
     int nNode = pArgs[0].i;
