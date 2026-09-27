@@ -10,6 +10,16 @@
 #include "ball.h"
 #include "charstate.h"
 
+// .bss in reverse address order (CodeWarrior lays it out last-defined-first)
+SD_SShaderTypeData_Grass_Static SD_gGrassTypeData;
+f32 lbl_80260920[2][4];
+f32 lbl_80260900[2][4];
+f32 lbl_802608E0[8];
+f32 lbl_802608D0[4];
+f32 lbl_802607D0[16][4];
+
+SD_SShaderTypeData_Grass_Static* SD_gpGrassTypeData = &SD_gGrassTypeData;
+
 void SD_vShaderObject_Grass_Type_Init(void);
 void SD_vShaderObject_Grass_Type_Close(void);
 void SD_vShaderObject_Grass_Type_SetParameters(void* pParams);
@@ -31,6 +41,12 @@ void fn_801213F0(void);
 void fn_801213F4(f32 fS, f32 fT);
 void fn_80121404(s32 nR, s32 nG, s32 nB, s32 nA);
 void fn_8012141C(f32 fX, f32 fY, f32 fZ);
+
+// fake match: puts 1.0f first in the constant pool, where EA's file has it (a stripped function
+// used it). Unused, so the linker strips it.
+static f32 GoShaderObject_Grass_Gc_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
 
 // The grass type starts: a pool of 32 render records of 32 bytes.
 void SD_vShaderObject_Grass_Type_Init(void) {
@@ -132,21 +148,22 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
             }
 
             // the row: a count word (points kept, points new), then both lists of point indexes
-            pCur = pRows + 1;
-            uHead = *pRows;
+            // fake match: this statement order (found by search) sets the schedule and registers
             nCur = 1 - nCur;
+            uHead = *pRows;
+            nOther = 1 - nOther;
+            pNew = SD_gpGrassTypeData->a000[nOther];
+            nBit = nBitBase;
+            pCur = pRows + 1;
             nPrev = nCount;
+            pOld = SD_gpGrassTypeData->a000[nCur];
+            pNewStep = SD_gpGrassTypeData->a200[nOther];
+            pOldStep = SD_gpGrassTypeData->a200[nCur];
             nCount = 0;
             nOldRows = (uHead >> 8) & 0xFF;
             pEnd = pCur + nOldRows;
-            nOther = 1 - nOther;
-            pNew = SD_gpGrassTypeData->a000[nOther];
-            pNewStep = SD_gpGrassTypeData->a200[nOther];
-            pOld = SD_gpGrassTypeData->a000[nCur];
-            pOldStep = SD_gpGrassTypeData->a200[nCur];
-            nBit = nBitBase;
-            nNewBit = nBitBase + nOldRows;
             nNewRows = uHead & 0xFF;
+            nNewBit = nBitBase + nOldRows;
             pNewEnd = pEnd;
             pNext = pEnd + nNewRows;
             uStep = fn_8001E9CC(pBits, nBit);

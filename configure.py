@@ -1052,7 +1052,7 @@ config.libs = [
             Object(Matching, "EventInfo.c"),
             Object(Matching, "llrtclock.c"),
             Object(Matching, "GoGrass.c"),
-            Object(NonMatching, "GoShaderObject_Grass_Gc.c"),
+            Object(Matching, "GoShaderObject_Grass_Gc.c"),
             Object(Matching, "GameMode4Menu.c"),
             Object(Matching, "LadderMap.c"),
             Object(Matching, "TibExt.c"),

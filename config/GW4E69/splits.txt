@@ -1361,6 +1361,9 @@ GoGrass.c:
 
 GoShaderObject_Grass_Gc.c:
 	.text       start:0x80120298 end:0x80121430
+	.bss        start:0x802607D0 end:0x80260CB8
+	.sdata      start:0x80281908 end:0x80281910
+	.sdata2     start:0x80284AD0 end:0x80284B00
 
 GameMode4Menu.c:
 	.text       start:0x80121430 end:0x801218BC
