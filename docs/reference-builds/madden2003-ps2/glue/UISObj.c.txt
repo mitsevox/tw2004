@@ -1,0 +1,730 @@
+// ../../Source/Common/Interface/Objects\UISObj.c
+// Derived from STABS in .mdebug (FDR 539); functions in source order.
+
+// File-scope data
+void *UISMainManager;
+void *UISTickerManager;
+void *UISBannerManager;
+void *UISChyronManager;
+UISColorTransformT *UISMgr_pColorTransform;
+String UISGrpAllFilename;
+String UISFontLibFilename;
+Bool _uisMgrPushDraw;
+static ResMgrHandleT *_UISMgr_hGroupResMgr; // data 0x005198D4
+static VptViewportT *_UISMgr_pMainViewport; // data 0x005198D8
+static CamHdrT *_UISMgr_pMainCamera; // data 0x005198DC
+static ObjListT *_UISMgr_pMainObjList; // data 0x005198E0
+static ObjHdrT *_UISMgr_pMainObj; // data 0x005198E4
+static VptViewportT *_UISMgr_pTickerViewport; // data 0x005198E8
+static CamHdrT *_UISMgr_pTickerCamera; // data 0x005198EC
+static ObjListT *_UISMgr_pTickerObjList; // data 0x005198F0
+static ObjHdrT *_UISMgr_pTickerObj; // data 0x005198F4
+static VptViewportT *_UISMgr_pBannerViewport; // data 0x005198F8
+static CamHdrT *_UISMgr_pBannerCamera; // data 0x005198FC
+static ObjListT *_UISMgr_pBannerObjList; // data 0x00519900
+static ObjHdrT *_UISMgr_pBannerObj; // data 0x00519904
+static VptViewportT *_UISMgr_pChyronViewport; // data 0x00519908
+static CamHdrT *_UISMgr_pChyronCamera; // data 0x0051990C
+static ObjListT *_UISMgr_pChyronObjList; // data 0x00519910
+static ObjHdrT *_UISMgr_pChyronObj; // data 0x00519914
+static Bool _UISMgr_NetworkUpdatePending; // data 0x00519918
+static Uint32 _UISMgr_ExclusiveChannel; // data 0x0051991C
+static Uint32 _UISMgr_Flags; // data 0x00519920
+static TimedEventT _TimedEvents[8]; // data 0x00478380
+static Uint32 _UISObj_CurMessageChannel; // data 0x00519940
+static Uint32 _UISMgr_RenderState; // bss 0x0051DA04
+static String _UISObj_GrpArrayInGame[25]; // bss 0x005396E8
+
+static void ReportUISError(Bool bAssert, char *szFile, Int32 iLine, char *szError) // 0x0027F3D8, 0x8 bytes, first line 355
+    // param bAssert              reg a0
+    // param szFile               reg a1
+    // param iLine                reg a2
+    // param szError              reg a3
+{
+}
+
+static void _UISMgrObjNew(ObjHdrT *pObj, void *pParms) // 0x0027F3E0, 0x8 bytes, first line 392
+    // param pObj                 reg a0
+    // param pParms               reg a1
+{
+}
+
+static void _UISMgrObjDel(ObjHdrT *pObj) // 0x0027F3E8, 0x8 bytes, first line 396
+    // param pObj                 reg a0
+{
+}
+
+void _UISObjShutownLibraries(void) // 0x0027F3F0, 0x20 bytes, first line 400
+{
+}
+
+void UISObjInitInstance(UISInfoT *pInfo) // 0x0027F410, 0x124 bytes, first line 413
+    // param pInfo                reg s0
+{
+}
+
+static Int32 _UISMgrObjProcess(ObjHdrT *pObj, Int32 NumTicks) // 0x0027F538, 0x148 bytes, first line 440
+    // param pObj                 reg s0
+    // param NumTicks             reg s1
+{
+    {
+    }
+}
+
+static void *_UISMgrResLoad(Uint16 Group, Uint16 Screen) // 0x0027F680, 0x7C bytes, first line 585
+    // param Group                reg a0
+    // param Screen               reg a1
+{
+    void *pData; // reg s0
+}
+
+static void _UISMgrResUnload(Uint16 Group, Uint16 Screen, void *pData) // 0x0027F700, 0x38 bytes, first line 610
+    // param Group                reg a0
+    // param Screen               reg a1
+    // param pData                reg a2
+{
+}
+
+static void _UISMgrScreenShutdown(Uint16 Group, Uint16 Screen, void *pScreenData) // 0x0027F738, 0x8 bytes, first line 625
+    // param Group                reg a0
+    // param Screen               reg a1
+    // param pScreenData          reg a2
+{
+}
+
+static Bool _UISMgrValidateChannel(Uint32 Channel) // 0x0027F740, 0x24 bytes, first line 654
+    // param Channel              reg a0
+{
+    Bool Ret; // reg v1
+}
+
+static TimedEventT *_UISMgrGetTimedEvent(Uint32 Channel, Uint32 Message, Uint32 Value) // 0x0027F768, 0x90 bytes, first line 700
+    // param Channel              reg a0
+    // param Message              reg a1
+    // param Value                reg a2
+{
+    TimedEventT *pTimedEvent; // reg a2
+}
+
+static void _UISMgrResetTimedEvent(TimedEventT *pTimedEvent) // 0x0027F7F8, 0x60 bytes, first line 720
+    // param pTimedEvent          reg a0
+{
+    {
+    }
+}
+
+static void _UISMgrMapMessage(Uint32 *pChannel, Uint32 *pMessage, Float32 *pValue) // 0x0027F858, 0x22C bytes, first line 746
+    // param pChannel             reg s2
+    // param pMessage             reg s4
+    // param pValue               reg s3
+{
+    Uint32 Channel; // reg s5
+    Uint32 Message; // reg s1
+    Float32 Value; // reg f26
+}
+
+static Bool _UISMgrFilterMessage(Uint32 *pChannel, Uint32 *pMessage, Float32 *pValue) // 0x0027FA88, 0x164 bytes, first line 834
+    // param pChannel             reg s3
+    // param pMessage             reg s4
+    // param pValue               reg s5
+{
+    Bool Pass; // reg s2
+    Uint32 Channel; // stack -128
+    Uint32 Message; // stack -124
+    Float32 Value; // stack -120
+    TimedEventT *pTimedEvent; // reg v0
+}
+
+static void _UISMgrActiveScreenCB(Uint16 GroupID, Uint16 ScreenID) // 0x0027FBF0, 0x8 bytes, first line 929
+    // param GroupID              reg a0
+    // param ScreenID             reg a1
+{
+}
+
+static void _UISMgrSetViewportPerspective(VptViewportT *pViewport) // 0x0027FBF8, 0x6C bytes, first line 935
+    // param pViewport            reg s0
+{
+}
+
+void _BlankProcess(void *pObjData, Uint32 ProcessID, Uint32 nParam, UISParamT *pParam, UISParamT *pReturn) // 0xFFFFFFFF, 0x8 bytes, first line 961
+    // param pObjData             reg a0
+    // param ProcessID            reg a1
+    // param nParam               reg a2
+    // param pParam               reg a3
+    // param pReturn              reg t0
+{
+}
+
+static void _UISMgrInitMainManager(void) // 0x0027FC68, 0x23C bytes, first line 965
+{
+    VptViewportParmsT OpenParmsVpt; // stack -80
+}
+
+static void _UISMgrInitTickerManager(void) // 0x0027FEA8, 0x21C bytes, first line 1050
+{
+    VptViewportParmsT OpenParmsVpt; // stack -80
+}
+
+static void _UISMgrInitBannerManager(void) // 0x002800C8, 0x204 bytes, first line 1131
+{
+    VptViewportParmsT OpenParmsVpt; // stack -80
+}
+
+static void _UISMgrInitChyronManager(void) // 0x002802D0, 0x204 bytes, first line 1212
+{
+    VptViewportParmsT OpenParmsVpt; // stack -80
+}
+
+void UISMgrInit(void) // 0x002804D8, 0x384 bytes, first line 1294
+{
+    Uint32 uGameModeType; // reg v1
+    ResMgrInitParamT ResMgrInitParam; // stack -32
+    {
+        Counter FileCounter; // reg a0
+    }
+    {
+        Counter FileCounter; // reg a0
+    }
+}
+
+static void _UISMgrShutdownMainManager(void) // 0x00280860, 0x84 bytes, first line 1554
+{
+}
+
+static void _UISMgrShutdownTickerManager(void) // 0x002808E8, 0x70 bytes, first line 1585
+{
+}
+
+static void _UISMgrShutdownBannerManager(void) // 0x00280958, 0x70 bytes, first line 1610
+{
+}
+
+static void _UISMgrShutdownChyronManager(void) // 0x002809C8, 0x70 bytes, first line 1635
+{
+}
+
+void UISMgrShutdown(void) // 0x00280A38, 0xF4 bytes, first line 1658
+{
+}
+
+Uint32 UISMgrGetCurMessageChannel(void) // 0x00280B30, 0x8 bytes, first line 1747
+{
+}
+
+void UISMgrSetCurMessageChannel(Uint32 Channel) // 0x00280B38, 0x8 bytes, first line 1752
+    // param Channel              reg a0
+{
+}
+
+void UISMgrMessage(Uint32 Channel, Uint32 Message, Float32 Value) // 0x00280B40, 0x170 bytes, first line 1757
+    // param Channel              stack -44
+    // param Message              stack -40
+    // param Value                stack -36
+{
+    Uint16 GroupID; // stack -48
+    Uint16 ScreenID; // stack -46
+    UISHelpT *pCurHelpInfo; // reg v0
+}
+
+Int32 UISObjCallHelp(Uint16 IdxGrp, Uint16 IdxScr, Int32 parm1, Int32 parm2) // 0x00280CB0, 0x8 bytes, first line 1903
+    // param IdxGrp               reg a0
+    // param IdxScr               reg a1
+    // param parm1                reg a2
+    // param parm2                reg a3
+{
+}
+
+void UISMgrPreLoadGroup(Uint32 Group) // 0x00280CB8, 0xC bytes, first line 1940
+    // param Group                reg a1
+{
+}
+
+void UISMgrPreUnloadGroup(Uint32 Group) // 0x00280CC8, 0xC bytes, first line 1948
+    // param Group                reg a1
+{
+}
+
+void UISMgrPreUnloadAllGroups(void) // 0xFFFFFFFF, 0x10 bytes, first line 1955
+{
+}
+
+void UISMgrPreLoadScreen(Uint32 Group, Uint32 Screen) // 0xFFFFFFFF, 0x48 bytes, first line 1962
+    // param Group                reg s0
+    // param Screen               reg s1
+{
+}
+
+void UISMgrPreUnloadScreen(Uint32 Group, Uint32 Screen) // 0xFFFFFFFF, 0x14 bytes, first line 1970
+    // param Group                reg v0
+    // param Screen               reg a2
+{
+}
+
+void UISMgrOpenLib(Uint32 uLib) // 0x00280CE0, 0x8 bytes, first line 1977
+    // param uLib                 reg a0
+{
+}
+
+void UISMgrCloseLib(Uint32 uLib) // 0x00280CE8, 0x8 bytes, first line 1987
+    // param uLib                 reg a0
+{
+}
+
+void UISObjIdleProcess(void) // 0x00280CF0, 0x60 bytes, first line 2033
+{
+}
+
+Uint32 UISMgrGetRenderState(void) // 0xFFFFFFFF, 0x8 bytes, first line 2102
+{
+}
+
+void UISMgrSetRenderState(Uint32 RenderState) // 0x00280D50, 0x24 bytes, first line 2137
+    // param RenderState          reg a0
+{
+}
+
+void UISMgrSetExclusiveChannel(Uint32 Channel) // 0x00280D78, 0x28 bytes, first line 2168
+    // param Channel              reg s0
+{
+}
+
+Uint32 UISMgrClrExclusiveChannel(void) // 0x00280DA0, 0x30 bytes, first line 2198
+{
+    Uint32 Channel; // reg v0
+}
+
+void UISMgrCanPumpDraw(Bool bPump) // 0x00280DD0, 0x8 bytes, first line 2247
+    // param bPump                reg a0
+{
+}
+
+void _UISPushThread(void) // 0xFFFFFFFF, 0x1C bytes, first line 2276
+{
+}
+
+void UISMgrForceDraw(void) // 0x00280DE0, 0x3C bytes, first line 2314
+{
+}
+
+void *UISMgrGetViewPort(void) // 0x00280E20, 0x8 bytes, first line 2357
+{
+}
+
+void *UISMgrGetBannerViewPort(void) // 0x00280E28, 0x8 bytes, first line 2362
+{
+}
+
+void *UISMgrGetTickerViewPort(void) // 0x00280E30, 0x8 bytes, first line 2367
+{
+}
+
+void UISMgrShowScreens(void *pScreenManager) // 0x00280E38, 0x64 bytes, first line 2372
+    // param pScreenManager       reg a0
+{
+}
+
+void UISMgrHideScreens(void *pScreenManager) // 0x00280EA0, 0x6C bytes, first line 2392
+    // param pScreenManager       reg a0
+{
+}
+
+void UISObj_SetNetWorkUpdatePending(Bool updatestate) // 0x00280F10, 0x8 bytes, first line 2436
+    // param updatestate          reg a0
+{
+}
+
+Bool UISObj_IsNetWorkUpdatePending(void) // 0x00280F18, 0x8 bytes, first line 2464
+{
+}
+
+// ---- Types used above (full definitions) ----
+typedef struct UISColorTransform_T UISColorTransformT;
+
+struct UISColorTransform_T { // size 0x20
+    UISColorVectorT Scale; // 0x0
+    UISColorVectorT Add; // 0x10
+};
+
+typedef struct UISColorVector_t UISColorVectorT;
+
+struct UISColorVector_t { // size 0x10
+    Float32 r; // 0x0
+    Float32 g; // 0x4
+    Float32 b; // 0x8
+    Float32 a; // 0xC
+};
+
+typedef float Float32;
+
+typedef char *String;
+
+typedef Uint8 Bool;
+
+typedef unsigned char Uint8;
+
+typedef void *ResMgrHandleT;
+
+typedef void VptViewportT;
+
+typedef struct CamHdr_t CamHdrT;
+
+struct CamHdr_t { // size 0x2C
+    ObjHdrT ObjHdr; // 0x0
+    Orient3T Angle; // 0x14
+    Float32 Fovy; // 0x20
+    Float32 Aspect; // 0x24
+    VptViewportT *pViewport; // 0x28
+};
+
+typedef struct ObjHdr_t ObjHdrT;
+
+struct ObjHdr_t { // size 0x14
+    Uint8 Type; // 0x0
+    Uint8 SubType; // 0x1
+    Uint8 NumLists; // 0x2
+    Uint8 Flags; // 0x3
+    Vec3T Pos; // 0x4
+    Uint16 SortPriority; // 0x10
+    Uint16 Pad; // 0x12
+};
+
+typedef struct Vec3_t Vec3T;
+
+struct Vec3_t { // size 0xC
+    Float32 vx; // 0x0
+    Float32 vy; // 0x4
+    Float32 vz; // 0x8
+};
+
+typedef short unsigned int Uint16;
+
+typedef struct Orient3_t Orient3T;
+
+struct Orient3_t { // size 0xC
+    AngleT vx; // 0x0
+    AngleT vy; // 0x4
+    AngleT vz; // 0x8
+};
+
+typedef Int32 AngleT;
+
+typedef int Int32;
+
+typedef void ObjListT;
+
+typedef unsigned int Uint32;
+
+typedef struct TimedEvent_t TimedEventT;
+
+struct TimedEvent_t { // size 0x18
+    Float32 Accum; // 0x0
+    Float32 Scale; // 0x4
+    Float32 Cur; // 0x8
+    Float32 Min; // 0xC
+    Float32 Max; // 0x10
+    Float32 Inc; // 0x14
+};
+
+typedef struct UISInfo_t UISInfoT;
+
+typedef union UISParam_t UISParamT;
+
+union UISParam_t { // size 0x4
+    Float32 fValue; // 0x0
+    Float32 *pfValue; // 0x0
+    Int32 iValue; // 0x0
+    Int32 *piValue; // 0x0
+    UISStringT *strAddr; // 0x0
+    UISArrayT *pArray; // 0x0
+};
+
+typedef struct UISString_t UISStringT;
+
+struct UISString_t { // size 0xC
+    Uint32 ID; // 0x0
+    Uint32 length; // 0x4
+    String ptr; // 0x8
+};
+
+typedef struct UISArray_t UISArrayT;
+
+struct UISArray_t { // size 0x8
+    Uint32 nDimensions; // 0x0
+    Uint32 Size[1]; // 0x4
+};
+
+typedef struct VptViewportParms_t VptViewportParmsT;
+
+struct VptViewportParms_t { // size 0x18
+    Uint16 Priority; // 0x0
+    Uint8 DrawRoutineIndex; // 0x2
+    Uint8 RenderRegionsDefined; // 0x3
+    void *pRenderRegions[3]; // 0x4
+    Uint16 Height; // 0x10
+    Uint16 Width; // 0x12
+    VptLLViewportParmsT LLParmBlock; // 0x14
+};
+
+typedef struct VptLLViewportParms_t VptLLViewportParmsT;
+
+struct VptLLViewportParms_t { // size 0x4
+    Uint32 Pad1; // 0x0
+};
+
+typedef struct ResMgrInit_t ResMgrInitParamT;
+
+struct ResMgrInit_t { // size 0x10
+    MemHeapID HeapID; // 0x0
+    Uint32 NumFiles; // 0x4
+    String RamBasedFileName; // 0x8
+    String *FileNames; // 0xC
+};
+
+typedef Uint32 MemHeapID;
+
+typedef Int32 Counter;
+
+typedef struct { // size 0x18
+    Uint8 uRelocated; // 0x0
+    Uint8 uNumStrings; // 0x1
+    Uint8 uNumGenericButtons; // 0x2
+    Uint8 uNumObjects; // 0x3
+    Uint16 uiNumHelp; // 0x4
+    Uint16 uiCurHelp; // 0x6
+    UISHelpIndivT *pIndexHelp; // 0x8
+    UISHelpButtonT *pButtons; // 0xC
+    UISHelpObjectsT *pHelpObjects; // 0x10
+    UISStringT **pStrings; // 0x14
+} UISHelpT;
+
+typedef struct { // size 0x4
+    Uint16 nBeginTitleStr; // 0x0
+    Uint8 uidxGenericButtons; // 0x2
+    Uint8 uNumGenericButtons; // 0x3
+} UISHelpIndivT;
+
+typedef struct { // size 0x4
+    Uint8 uType[2]; // 0x0
+    Uint8 uLogic; // 0x2
+    Uint8 uStringIdx; // 0x3
+} UISHelpButtonT;
+
+typedef struct { // size 0x4
+    Uint16 uButtons; // 0x0
+    Uint16 uStartIdx; // 0x2
+} UISHelpObjectsT;
+
+enum UISTransformAction_t {
+    UISTransformInit = 0,
+    UISTransformPush = 1,
+    UISTransformPop = 2,
+    UISTransformShutdown = 3,
+};
+
+typedef enum UISTransformAction_t UISTransformAction;
+
+struct UISVector_t { // size 0xC
+    Float32 x; // 0x0
+    Float32 y; // 0x4
+    Float32 z; // 0x8
+};
+
+typedef struct UISVector_t UISVectorT;
+
+struct UISTransform_t { // size 0x54
+    UISVectorT Offset; // 0x0
+    UISVectorT Pivot; // 0xC
+    UISVectorT Rotation; // 0x18
+    UISVectorT Scale; // 0x24
+    void *pGlobalInfo; // 0x30
+    UISColorVectorT MultiplerFactor; // 0x34
+    UISColorVectorT AdditiveFactor; // 0x44
+};
+
+typedef struct UISTransform_t UISTransformT;
+
+typedef void UISRuntimeErrorFncT();
+
+typedef void *UISResLoadFncT();
+
+typedef void UISResUnloadFncT();
+
+typedef void UISMessageFncT();
+
+typedef void UISTransformFncT();
+
+typedef UISVectorT UISLocalizeFncT();
+
+typedef void UISPluginFncT();
+
+typedef void UISScreenActivatedFncT();
+
+typedef void UISScreenDrawDebugFncT();
+
+typedef enum {
+    UISMGR_RENDERSTATE_NONE = 0,
+    UISMGR_RENDERSTATE_POLY = 1,
+    UISMGR_RENDERSTATE_FONT = 2,
+    UISMGR_RENDERSTATE_PLAYER = 3,
+    UISMGR_RENDERSTATE_MODEL = 4,
+    UISMGR_RENDERSTATE_PLAYART = 5,
+    UISMGR_RENDERSTATE_SPLINE = 6,
+    UISMGR_RENDERSTATE_CIRCLE = 7,
+} UISMgrRenderState;
+
+typedef struct { // size 0x4
+    Uint8 r; // 0x0
+    Uint8 g; // 0x1
+    Uint8 b; // 0x2
+    Uint8 a; // 0x3
+} UISColor32T;
+
+typedef enum {
+    TIBPLAYER_PROCESS_SETPOSITION = 0,
+    TIBPLAYER_PROCESS_SETANGLE = 1,
+    TIBPLAYER_PROCESS_SETANIMATION = 2,
+    TIBPLAYER_PROCESS_SETFACEANIMATION = 3,
+    TIBPLAYER_PROCESS_SETINFO = 4,
+    TIBPLAYER_PROCESS_SETMODELTYPE = 5,
+    TIBPLAYER_PROCESS_SETGEOMSTATE = 6,
+    TIBPLAYER_PROCESS_SETMATERIALSTATE = 7,
+    TIBPLAYER_PROCESS_SETFACEMAP = 8,
+    TIBPLAYER_PROCESS_UPDATECPMODEL = 9,
+    TIBPLAYER_PROCESS_SETSCALE = 10,
+    TIBPLAYER_PROCESS_SETALPHA = 11,
+    TIBPLAYER_PROCESS_SETUNIFORM = 12,
+    TIBPLAYER_PROCESS_CTUPDATEUNIFORM = 13,
+} UISTibPlayerProcessT;
+
+typedef void UISTibCustomDrawFncT();
+
+typedef enum {
+    UISHELP_TITLE = 0,
+    UISHELP_LINE1 = 1,
+    UISHELP_LINE2 = 2,
+    UISHELP_LINE3 = 3,
+    UISHELP_LINE4 = 4,
+} UISHelpIndex;
+
+typedef union { // size 0x4
+    struct {...} RGBA; // 0x0
+    struct {...} LookupVal; // 0x0
+} UISTibCSColorT;
+
+struct UISTibColorStyle_t { // size 0x8
+    Uint8 nColors; // 0x0
+    Uint8 Pad[3]; // 0x1
+    UISTibCSColorT pColors[1]; // 0x4
+};
+
+typedef struct UISTibColorStyle_t UISTibColorStyleT;
+
+struct UISTibCircle_t { // size 0x48
+    Int16 Item; // 0x0
+    Int16 Library; // 0x2
+    Int16 ColorStyleItem; // 0x4
+    Int16 ColorStyleLibrary; // 0x6
+    Uint16 Frame; // 0x8
+    Uint16 Flags; // 0xA
+    Uint16 nSegments; // 0xC
+    Uint16 nUVRotation; // 0xE
+    UISTibCSColorT StartColor; // 0x10
+    UISTibCSColorT EndColor; // 0x14
+    Float32 uOffset; // 0x18
+    Float32 vOffset; // 0x1C
+    Float32 InnerXRadius; // 0x20
+    Float32 InnerYRadius; // 0x24
+    Float32 OuterXRadius; // 0x28
+    Float32 OuterYRadius; // 0x2C
+    Float32 StartAngle; // 0x30
+    Float32 EndAngle; // 0x34
+    Vec3T CenterPoint; // 0x38
+    LLUISTibPolyTexNodeT *TexRef; // 0x44
+};
+
+typedef short int Int16;
+
+typedef struct LLUISTibPolyTexNode_t LLUISTibPolyTexNodeT;
+
+struct LLUISTibPolyTexNode_t { // size 0x50
+    Uint16 Library; // 0x0
+    Uint16 Item; // 0x2
+    GlibTextureT Texture; // 0x4
+    VramHandleT hVram; // 0x24
+    VramHandleT hClut; // 0x28
+    Uint32 NumPolys; // 0x2C
+    Bool IsBound; // 0x30
+    Uint64 Tex0 : 64; // 0x38
+    Uint64 Tex1 : 64; // 0x40
+    Uint64 Clamp : 64; // 0x48
+};
+
+typedef struct GlibTexture_t GlibTextureT;
+
+struct GlibTexture_t { // size 0x20
+    Uint16 Width; // 0x0
+    Uint16 Height; // 0x2
+    Uint8 ChannelOrder[4]; // 0x4
+    GlibTexStorageTypeT TexStorageType; // 0x8
+    void *pTexData; // 0xC
+    GlibPalStorageTypeT PalStorageType; // 0x10
+    void *pPaletteData; // 0x14
+    Uint32 TextureID; // 0x18
+    Uint8 Dirty; // 0x1C
+    Uint8 Pad1; // 0x1D
+    Uint16 Pad2; // 0x1E
+};
+
+typedef enum GlibTexStorageType_t GlibTexStorageTypeT;
+
+enum GlibTexStorageType_t {
+    GLIB_TEXSTORAGETYPE_4BIT = 0,
+    GLIB_TEXSTORAGETYPE_8BIT = 1,
+    GLIB_TEXSTORAGETYPE_16BIT1555 = 2,
+    GLIB_TEXSTORAGETYPE_24BIT = 3,
+    GLIB_TEXSTORAGETYPE_32BIT = 4,
+    GLIB_TEXSTORAGETYPE_MAX = 5,
+};
+
+typedef enum GlibPalStorageType_t GlibPalStorageTypeT;
+
+enum GlibPalStorageType_t {
+    GLIB_PALSTORAGETYPE_NONE = 0,
+    GLIB_PALSTORAGETYPE_16BIT1555 = 1,
+    GLIB_PALSTORAGETYPE_24BIT = 2,
+    GLIB_PALSTORAGETYPE_32BIT = 3,
+    GLIB_PALSTORAGETYPE_MAX = 4,
+};
+
+typedef Uint32 VramHandleT;
+
+typedef long unsigned int Uint64;
+
+typedef struct UISTibCircle_t UISTibCircleT;
+
+typedef void UISTibCircleFlushVerticesT();
+
+typedef void UISTibCircleDrawVertexT();
+
+typedef enum {
+    UISPLUGIN_TIBPOLY = 0,
+    UISPLUGIN_TIBSOUND = 1,
+    UISPLUGIN_TIBCUSTOMDRAW = 2,
+    UISPLUGIN_TIBMODEL = 3,
+    UISPLUGIN_TIBPLAYER = 4,
+    UISPLUGIN_TIBTEXT = 5,
+    UISPLUGIN_TIBHELP = 6,
+    UISPLUGIN_SPLINE = 7,
+    UISPLUGIN_CIRCLE = 8,
+    UIS_MAX_PLUGINS = 9,
+} UISObjTypesT;
+
+enum {
+    UIS_COACH_PART_HAIR = 0,
+    UIS_COACH_PART_FACE = 1,
+    UIS_COACH_PART_SKIN = 2,
+    UIS_COACH_PART_FACESHAPE = 3,
+    UIS_COACH_PART_GLASSES = 4,
+    UIS_COACH_PART_HEIGHT = 5,
+};
+

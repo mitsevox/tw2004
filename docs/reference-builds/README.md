@@ -15,6 +15,9 @@ artifacts.
 - `tw06-xbox/`: source/module/type indexes and selected type reconstructions from `default.pdb`.
 - `tw07-ps3/`: source, function, section, type, and DWARF-quality inventories from the reconstructed
   `Dev_Golf_Release_PS3.elf`.
+- `madden2003-ps2/`: EA Tiburon's UI Studio library (our UIS units) from the Madden NFL 2003 PS2
+  prototype's STABS debug info: signatures, locals in declaration order, types, and a pairing
+  with our functions (`tools/ref/mdebug.py`).
 
 ## Input fingerprints
 
@@ -31,3 +34,4 @@ artifacts.
 | TW07 PS3 archive | `cae74b0b527bdb2ba6153b7bedd86a050ed962001ade8e05fccc39fa65e04041` |
 | `Dev_Golf_Release_PS3.self` | `d1aa0d63870428bb44ad45deffb87e11c5361e0fd852803dade421d17b1bd08f` |
 | reconstructed `Dev_Golf_Release_PS3.elf` | `c6e219c312fe14957abdcdc3d8141033bbc689925d8d5487d48020063ec584ab` |
+| Madden NFL 2003 PS2 prototype `SLUS_205.29` | `8af61dbc3bfa6aa3cedda7fff695d524ac91af955777c2039d26db99d6c5fb29` |
