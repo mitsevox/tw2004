@@ -2303,6 +2303,7 @@ void fn_800350EC(u8 r, u8 g, u8 b) {
     lbl_801B8980.u110 |= 0x8;
 }
 
+// Sets the blend source and destination factors, applied with the next RenderState_Apply.
 void RenderState_SetBlendFactors(int a, int b) {
     lbl_801B8980.n10 = a;
     lbl_801B8980.n14 = b;

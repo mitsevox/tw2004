@@ -391,6 +391,8 @@ GolferRecord* fn_80077A80(int nGolfer) {
 
 // ---- the profile being worked on ---------------------------------------------------------------
 
+// The profile the front end is working on: its working copy while bCopy is set, else the slot's own
+// save profile.
 SaveProfile* FE_GetCurrentProfile(void) {
     if (lbl_80281ED4->bCopy) {
         return &lbl_80281ED4->profile;

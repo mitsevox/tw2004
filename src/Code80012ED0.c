@@ -29,15 +29,19 @@ f32* fn_80012EF0(void* pCamera) {
     return ((RenderCamera*)pCamera)->pRect;
 }
 
+// Hands GX the render state that changed (RenderState_Apply).
 void RenderState_Flush(void) {
     RenderState_Apply();
 }
 
+// Sets the depth compare function (GX_ALWAYS turns the depth test off), applied with the next
+// RenderState_Apply.
 void RenderState_SetDepthFunc(int a) {
     lbl_801B8980.n0 = a;
     lbl_801B8980.u110 |= 0x1;
 }
 
+// Turns depth-buffer writes on or off, applied with the next RenderState_Apply.
 void RenderState_SetDepthWrite(int a) {
     lbl_801B8980.b4 = a;
     lbl_801B8980.u110 |= 0x2;

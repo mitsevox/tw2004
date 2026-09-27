@@ -3319,6 +3319,8 @@ f32 fn_8001EEA4(f32* pA, f32* pB) {
     return pA[0] * pB[0] + pA[1] * pB[1] + pA[2] * pB[2] + pA[3] * pB[3];
 }
 
+// A bone id's index in the model's skeleton, without the second table
+// (CharModel_GetBoneIndexMapped).
 int CharModel_GetBoneIndex(CharModel* pModel, int nBone) {
     return pModel->aBone[nBone];
 }

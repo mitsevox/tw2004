@@ -142,6 +142,7 @@ void SitDev_ProcessEventQueue(void) {
     lbl_802811B8->n13C = 0;
 }
 
+// Stores value nIndex of the situation state vector and marks it as set.
 void SitDev_SetStateValue(u16* pValues, int nIndex, u16 uValue, u32* pSetBits) {
     pValues[nIndex] = (int)uValue;  // fake match: the no-op widening only moves the store in the schedule
     pSetBits[nIndex / 32] |= 1 << (nIndex % 32);

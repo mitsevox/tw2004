@@ -292,6 +292,8 @@ void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c) {
     lbl_801B8980.u110 |= 0x1000;
 }
 
+// Sets the draw flags (bit 0x10 textured, 0x40 blended); RenderState_Apply sets up the TEV stages
+// and blending from them.
 void RenderState_SetDrawFlags(int a) {
     lbl_801B8980.u20 = a;
     lbl_801B8980.u110 |= 0x20;

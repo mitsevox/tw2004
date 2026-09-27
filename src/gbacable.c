@@ -747,10 +747,12 @@ void fn_8012402C(void) {
     }
 }
 
+// Sets the GBA link state (the link code uses 3, 4 and 0x12; -1 at start).
 void Gba_SetState(s32 v) {
     lbl_80281980 = v;
 }
 
+// The GBA link state set by Gba_SetState.
 s32 Gba_GetState(void) {
     return lbl_80281980;
 }

@@ -303,6 +303,7 @@ void fn_80016124(s32 p0, s32 p1, s32 p2, s32 p3) {
     GXSetTexCoordGen2(p0, p1, p2, p3, 0, 125);
 }
 
+// The camera the renderer is drawing with.
 void* Camera_GetCurrent(void) {
     return *lbl_80280DF0;
 }

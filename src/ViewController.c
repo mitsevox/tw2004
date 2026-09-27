@@ -72,6 +72,7 @@ void fn_80016D18(int nView, f32 x, f32 y, f32 w, f32 h) {
     fn_80038054(0, nView, 0.0f, 0.0f);
 }
 
+// The controller of view nView (one per split-screen view).
 ViewController* ViewController_Get(int nView) {
     return &lbl_801B8BA8[nView];
 }
@@ -211,10 +212,12 @@ u8 fn_800172C4(View* pView) {
     return 0;
 }
 
+// The point the camera looks at (the pin, for camera 5).
 f32* CameraController_GetTarget(View* pView) {
     return pView->v10;
 }
 
+// The camera's position (inferred from its uses).
 f32* CameraController_GetPosition(View* pView) {
     return pView->v0;
 }

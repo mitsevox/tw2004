@@ -227,6 +227,8 @@ u8* fn_800136C4(int nController) {
     return (u8*)&lbl_801A36A0.aAnalog[nController];
 }
 
+// A controller's buttons: the held ones in the high 16 bits, the ones pressed this frame in the low
+// 16 (see Controller_GetButtonMask).
 u32 Controller_GetButtons(int nController) {
     return lbl_801A36A0.auButtons[nController];
 }

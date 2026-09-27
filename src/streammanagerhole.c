@@ -710,6 +710,7 @@ void fn_80015454(void) {
     lbl_80280DF8->aParams[3].nNumFiles = 0;
 }
 
+// The current hole's number on its course (Game_CurHoleIndex gives its 0..17 place in the round).
 int Game_GetCurHoleNum(void) {
     return gpGame->nCurHoleNum;
 }
