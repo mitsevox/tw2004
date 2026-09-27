@@ -1,0 +1,272 @@
+// ../../Source/Common/Interface/Objects\UISCallback.c
+// Derived from STABS in .mdebug (FDR 538); functions in source order.
+
+// File-scope data
+static Int32 _UISActiveController; // data 0x005198BC
+static Int32 _UISTabNumber; // data 0x005198C0
+static Int32 _UISTabIndex; // data 0x005198C4
+static Int32 _GMCommon_TotalUsersPlaying; // data 0x005198C8
+static Uint32 _UISCallback_CurControl; // data 0x005198CC
+static Bool _UISCallback_EnableUserTextVerify; // data 0x005198D0
+static Bool _UISWaiting; // data 0x005198D1
+static Bool _UIS_StartOnlyMode; // data 0x005198D2
+static Bool _UIS_UNI_TriangleDisabled; // data 0x005198D3
+static Float32 _UISCallbackTempArray[20]; // bss 0x00539660
+static Uint8 _UISCallback_BannerCount[56]; // bss 0x005396B0
+
+static void _UISCallbackSetTempVal(Int32 Slot, Float32 Value) // 0x0027DCB8, 0x18 bytes, first line 174
+    // param Slot                 reg a0
+    // param Value                reg f18
+{
+}
+
+static Float32 _UISCallbackGetTempVal(Int32 Slot) // 0x0027DCD0, 0x18 bytes, first line 181
+    // param Slot                 reg a0
+{
+}
+
+void UISCallbackMessageFnc(Uint32 MessageID, Uint16 idxGrp, Uint16 idxScreen, Uint32 nParam, UISParamT *pParam, UISParamT *pReturn) // 0x0027DCE8, 0x16B4 bytes, first line 190
+    // param MessageID            reg s2
+    // param idxGrp               reg s4
+    // param idxScreen            reg s3
+    // param nParam               reg a3
+    // param pParam               reg s0
+    // param pReturn              reg s1
+{
+    Bool Handled; // reg v1
+    {
+        Uint32 AwayUserID; // reg s0
+        Uint32 HomeUserID; // reg s2
+    }
+    {
+        Int32 iScreenFormat; // reg v1
+    }
+    {
+        Bool bPleaseWaitActive; // reg s0
+    }
+    {
+        Char strBuffer[75]; // stack -192
+        Char *strData[3]; // stack -112
+        Uint32 uNumLines; // reg s2
+    }
+}
+
+Int32 UISCallback_GetTabNumber(void) // 0x0027F3A0, 0x8 bytes, first line 1181
+{
+}
+
+Uint32 UISCallbackGetCurControl(void) // 0x0027F3A8, 0x8 bytes, first line 1186
+{
+}
+
+void UISCallbackSetCurControl(Uint32 Channel) // 0x0027F3B0, 0x8 bytes, first line 1191
+    // param Channel              reg a0
+{
+}
+
+void UISCallbackResetBannerCount(void) // 0x0027F3B8, 0x14 bytes, first line 1196
+{
+}
+
+void UISCallback_SetUniPopTriangleDisabled(Bool bData) // 0x0027F3D0, 0x8 bytes, first line 1203
+    // param bData                reg a0
+{
+}
+
+// ---- Types used above (full definitions) ----
+typedef int Int32;
+
+typedef unsigned int Uint32;
+
+typedef Uint8 Bool;
+
+typedef unsigned char Uint8;
+
+typedef float Float32;
+
+typedef short unsigned int Uint16;
+
+typedef union UISParam_t UISParamT;
+
+union UISParam_t { // size 0x4
+    Float32 fValue; // 0x0
+    Float32 *pfValue; // 0x0
+    Int32 iValue; // 0x0
+    Int32 *piValue; // 0x0
+    UISStringT *strAddr; // 0x0
+    UISArrayT *pArray; // 0x0
+};
+
+typedef struct UISString_t UISStringT;
+
+struct UISString_t { // size 0xC
+    Uint32 ID; // 0x0
+    Uint32 length; // 0x4
+    String ptr; // 0x8
+};
+
+typedef char *String;
+
+typedef struct UISArray_t UISArrayT;
+
+struct UISArray_t { // size 0x8
+    Uint32 nDimensions; // 0x0
+    Uint32 Size[1]; // 0x4
+};
+
+typedef char Char;
+
+enum UISTransformAction_t {
+    UISTransformInit = 0,
+    UISTransformPush = 1,
+    UISTransformPop = 2,
+    UISTransformShutdown = 3,
+};
+
+typedef enum UISTransformAction_t UISTransformAction;
+
+typedef struct UISInfo_t UISInfoT;
+
+struct UISVector_t { // size 0xC
+    Float32 x; // 0x0
+    Float32 y; // 0x4
+    Float32 z; // 0x8
+};
+
+typedef struct UISVector_t UISVectorT;
+
+struct UISColorVector_t { // size 0x10
+    Float32 r; // 0x0
+    Float32 g; // 0x4
+    Float32 b; // 0x8
+    Float32 a; // 0xC
+};
+
+typedef struct UISColorVector_t UISColorVectorT;
+
+struct UISTransform_t { // size 0x54
+    UISVectorT Offset; // 0x0
+    UISVectorT Pivot; // 0xC
+    UISVectorT Rotation; // 0x18
+    UISVectorT Scale; // 0x24
+    void *pGlobalInfo; // 0x30
+    UISColorVectorT MultiplerFactor; // 0x34
+    UISColorVectorT AdditiveFactor; // 0x44
+};
+
+typedef struct UISTransform_t UISTransformT;
+
+typedef void UISRuntimeErrorFncT();
+
+typedef void *UISResLoadFncT();
+
+typedef void UISResUnloadFncT();
+
+typedef void UISMessageFncT();
+
+typedef void UISTransformFncT();
+
+typedef UISVectorT UISLocalizeFncT();
+
+typedef void UISPluginFncT();
+
+typedef void UISScreenActivatedFncT();
+
+typedef void UISScreenDrawDebugFncT();
+
+typedef enum {
+    UISMGR_RENDERSTATE_NONE = 0,
+    UISMGR_RENDERSTATE_POLY = 1,
+    UISMGR_RENDERSTATE_FONT = 2,
+    UISMGR_RENDERSTATE_PLAYER = 3,
+    UISMGR_RENDERSTATE_MODEL = 4,
+    UISMGR_RENDERSTATE_PLAYART = 5,
+    UISMGR_RENDERSTATE_SPLINE = 6,
+    UISMGR_RENDERSTATE_CIRCLE = 7,
+} UISMgrRenderState;
+
+typedef struct { // size 0x4
+    Uint8 r; // 0x0
+    Uint8 g; // 0x1
+    Uint8 b; // 0x2
+    Uint8 a; // 0x3
+} UISColor32T;
+
+struct UISColorTransform_T { // size 0x20
+    UISColorVectorT Scale; // 0x0
+    UISColorVectorT Add; // 0x10
+};
+
+typedef struct UISColorTransform_T UISColorTransformT;
+
+typedef enum {
+    UISHELP_TITLE = 0,
+    UISHELP_LINE1 = 1,
+    UISHELP_LINE2 = 2,
+    UISHELP_LINE3 = 3,
+    UISHELP_LINE4 = 4,
+} UISHelpIndex;
+
+typedef struct { // size 0x4
+    Uint16 uButtons; // 0x0
+    Uint16 uStartIdx; // 0x2
+} UISHelpObjectsT;
+
+typedef struct { // size 0x4
+    Uint8 uType[2]; // 0x0
+    Uint8 uLogic; // 0x2
+    Uint8 uStringIdx; // 0x3
+} UISHelpButtonT;
+
+typedef struct { // size 0x4
+    Uint16 nBeginTitleStr; // 0x0
+    Uint8 uidxGenericButtons; // 0x2
+    Uint8 uNumGenericButtons; // 0x3
+} UISHelpIndivT;
+
+typedef struct { // size 0x18
+    Uint8 uRelocated; // 0x0
+    Uint8 uNumStrings; // 0x1
+    Uint8 uNumGenericButtons; // 0x2
+    Uint8 uNumObjects; // 0x3
+    Uint16 uiNumHelp; // 0x4
+    Uint16 uiCurHelp; // 0x6
+    UISHelpIndivT *pIndexHelp; // 0x8
+    UISHelpButtonT *pButtons; // 0xC
+    UISHelpObjectsT *pHelpObjects; // 0x10
+    UISStringT **pStrings; // 0x14
+} UISHelpT;
+
+typedef enum {
+    TIBPLAYER_PROCESS_SETPOSITION = 0,
+    TIBPLAYER_PROCESS_SETANGLE = 1,
+    TIBPLAYER_PROCESS_SETANIMATION = 2,
+    TIBPLAYER_PROCESS_SETFACEANIMATION = 3,
+    TIBPLAYER_PROCESS_SETINFO = 4,
+    TIBPLAYER_PROCESS_SETMODELTYPE = 5,
+    TIBPLAYER_PROCESS_SETGEOMSTATE = 6,
+    TIBPLAYER_PROCESS_SETMATERIALSTATE = 7,
+    TIBPLAYER_PROCESS_SETFACEMAP = 8,
+    TIBPLAYER_PROCESS_UPDATECPMODEL = 9,
+    TIBPLAYER_PROCESS_SETSCALE = 10,
+    TIBPLAYER_PROCESS_SETALPHA = 11,
+    TIBPLAYER_PROCESS_SETUNIFORM = 12,
+    TIBPLAYER_PROCESS_CTUPDATEUNIFORM = 13,
+} UISTibPlayerProcessT;
+
+enum {
+    UIS_COACH_PART_HAIR = 0,
+    UIS_COACH_PART_FACE = 1,
+    UIS_COACH_PART_SKIN = 2,
+    UIS_COACH_PART_FACESHAPE = 3,
+    UIS_COACH_PART_GLASSES = 4,
+    UIS_COACH_PART_HEIGHT = 5,
+};
+
+enum {
+    UIS_NETWORKSTATE_CTRLSTATES = 0,
+    UIS_NETWORKSTATE_TIMEOUTCALLED = 1,
+    UIS_NETWORKSTATE_CHALLENGEPLAY = 2,
+    UIS_NETWORKSTATE_RDYTOPLAY = 3,
+};
+
