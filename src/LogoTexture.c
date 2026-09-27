@@ -11,41 +11,26 @@
 // Copy a logo between its plain layout (rows of nWidth colour indexes) and the texture layout
 // (tiles of 8 x 4 pixels, 32 bytes each, a row of tiles after another): bToTexture 1 from the
 // logo in pSrc to the texture in pDst, 0 the other way. Then flush pDst for the GPU.
-// Not exact yet (78%): the same instructions, but nBase takes a volatile register where EA's
-// has a saved one, which reshuffles the unrolled loops' registers and schedule.
+// One loop with the direction test inside: the compiler unswitches it into the two unrolled copies.
 void fn_8010FC3C(u8* pDst, u8* pSrc, int bToTexture, int nWidth, int nHeight) {
     int nTileRow;
     int i;
     int nRow;
     int y;
     int x;
-    int nBase;
-    int n;
     int nPos;
 
     nTileRow = (nWidth == 64) ? 64 * 4 : 128 * 4;
     for (y = 0, nRow = 0; y < nHeight; y++, nRow += nWidth) {
-        nBase = (y % 4) * 8 + (y / 4) * nTileRow;
         i = nRow;
-        x = 0;
-        if (bToTexture) {
-            n = nWidth;
-            while (n-- > 0) {
-                nPos = nBase + x % 8;
-                nPos += (x / 8) * 32;
+        for (x = 0; x < nWidth; x++) {
+            nPos = (x / 8) * 32 + ((y % 4) * 8 + (y / 4) * nTileRow) + x % 8;
+            if (bToTexture) {
                 pDst[nPos] = pSrc[i];
-                i++;
-                x++;
-            }
-        } else {
-            n = nWidth;
-            while (n-- > 0) {
-                nPos = nBase + x % 8;
-                nPos += (x / 8) * 32;
+            } else {
                 pDst[i] = pSrc[nPos];
-                i++;
-                x++;
             }
+            i++;
         }
     }
     DCFlushRange(pDst, 64 * 64);
