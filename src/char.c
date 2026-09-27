@@ -1548,7 +1548,7 @@ void fn_8001A4BC(void) {
 }
 
 // With more than two players, the pool entries go to player nPlayer and the next player
-// (fn_800E295C): every other character holding entries (except the one queued last) gives them
+// (GM_GetSecondHonors): every other character holding entries (except the one queued last) gives them
 // back and gets bit 0x40 of u10; nPlayer's character loses that bit, and unless it has its entries
 // already it takes them (the queued character giving its back first) and queues its dynamic
 // textures. The next player's character is then queued the same way.
@@ -1587,7 +1587,7 @@ void fn_8001A58C(int nPlayer) {
                 fn_8010BF68();
             }
         }
-        i = fn_800E295C();
+        i = GM_GetSecondHonors();
         if (i < gSession.nNumPlayers) {
             pChar = gPlayers[i].pChar;
             if (!pChar->bE0 && pChar != lbl_801B95E8.a[6].p) {

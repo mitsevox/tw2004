@@ -275,7 +275,7 @@ void GUI_PauseMenuClosed(void) {
             gpGame->pfn214();
             if (Game_GetMode() == 12) {
                 for (i = 0; i < 5; i++) {
-                    fn_800E1018(i, Game_CurHoleIndex());
+                    GM_ClearPlayerHoleData(i, Game_CurHoleIndex());
                 }
                 fn_8006F4B4();
             } else if (gpGame->bD4 || gpGame->b134) {

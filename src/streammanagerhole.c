@@ -410,7 +410,7 @@ void StreamManagerHole_StreamFiles(void) {
     if (gSession.n5B34 != 0) {
         fn_8001529C(gSession.p5B30, fn_80014E7C, fn_80014E94);
     } else {
-        szCourse = fn_800E2680();
+        szCourse = GM_GetCourseName();
         szHole = GameManager_GetHoleName(Game_GetCurHoleNum());
         sprintf(szPath, lbl_80186C2C, szCourse);
         strcat(szPath, szHole);

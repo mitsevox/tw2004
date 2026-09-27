@@ -160,7 +160,7 @@ void fn_800EAF7C(void) {
     u8 bFound;
     lbl_80281660 = gSession.options.nC;
     lbl_802822F0 = gSession.options.nWind;
-    fn_800E1074();
+    GM_ClearDataForNewGame();
     if (gpSaveData[gPlayers[0].nIndex].bActive) {
         gpSaveData[gPlayers[0].nIndex].b70 = 1;
     }
@@ -1133,7 +1133,7 @@ void fn_800ED554(void) {
     GM_EndOfGolferTurn(0);
     gpGame->pfn224();
     fn_800E5714(2);
-    fn_800E1074();
+    GM_ClearDataForNewGame();
     if (fn_800F0818()) {
         GameModeDriverRTE_StartEvent();
     } else {

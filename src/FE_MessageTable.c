@@ -37,11 +37,11 @@ int  fn_80102134(void);                 // GameMode4.c: the current ladder event
 int  fn_801021FC(void);                 // GameMode4.c: the current ladder event
 s32  fn_800ED688(int i);                // GameMode5.c: challenge i's opponent count
 s32  fn_800ED69C(int i, int k);         // GameMode5.c: its opponent k
-u8   fn_800E22E4(int nSlot, int a, int b);      // GameRound.c
-int  fn_800E234C(int nSlot, int a, int b);      // GameRound.c
+u8   GM_UserHasEagledHole(int nSlot, int a, int b);      // GameRound.c
+int  GM_GetPar5EagleDate(int nSlot, int a, int b);      // GameRound.c
 int  fn_800D3D10(int nGolfer);          // Earnings.c: the golfer's rating
 int  fn_800E2520(int nMode);            // GameRound.c
-void fn_800E25E0(void);                 // GameRound.c
+void GM_SetSplitScreenForMode(void);                 // GameRound.c
 void fn_800E30D4(void);                 // GameRound.c: builds the random mixed round
 void fn_80101EE8(void);                 // GameMode11.c
 void fn_800EE2C8(void);                 // GameModeDriverPGATour.c
@@ -1346,12 +1346,12 @@ void fn_8007BC10(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_8007BC48(MsgArg* pArgs, MsgArg* pResult) {
     GM_SetModeType((u8)pArgs[0].i);
-    fn_800E25E0();
+    GM_SetSplitScreenForMode();
 }
 
 void fn_8007BC74(MsgArg* pArgs, MsgArg* pResult) {
     Session_SetNumPlayers((u8)pArgs[0].i);
-    fn_800E25E0();
+    GM_SetSplitScreenForMode();
 }
 
 void fn_8007BCA0(MsgArg* pArgs, MsgArg* pResult) {
@@ -3423,7 +3423,7 @@ void fn_800804D8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_800804E4(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800E22E4(pArgs[0].i, pArgs[1].i, pArgs[2].i - 1);
+    pResult->i = GM_UserHasEagledHole(pArgs[0].i, pArgs[1].i, pArgs[2].i - 1);
 }
 
 // For the working slot's marked hole pArgs[0], pArgs[1] (from 1): its value unpacked into
@@ -3435,8 +3435,8 @@ void fn_8008052C(MsgArg* pArgs, MsgArg* pResult) {
     int* pB = pArgs[3].p;
     int* pC = pArgs[4].p;
 
-    if (fn_800E22E4(lbl_80281ED4->nSlot, nA, nB)) {
-        fn_80078620(fn_800E234C(lbl_80281ED4->nSlot, nA, nB), pA, pB, pC);
+    if (GM_UserHasEagledHole(lbl_80281ED4->nSlot, nA, nB)) {
+        fn_80078620(GM_GetPar5EagleDate(lbl_80281ED4->nSlot, nA, nB), pA, pB, pC);
         return;
     }
     *pA = 0;
@@ -5410,7 +5410,7 @@ void fn_80084AA8(MsgArg* pArgs, MsgArg* pResult) {
             break;
         }
         GM_SetModeType(nMode);
-        fn_800E25E0();
+        GM_SetSplitScreenForMode();
         if (nMode == 22) {
             fn_80126F94(n);
         }

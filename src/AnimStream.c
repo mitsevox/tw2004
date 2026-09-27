@@ -174,7 +174,7 @@ void fn_800C9970(void) {
         fn_800C9F14(0);
     }
     if (lbl_80282230->p0 != NULL) return;
-    nFirst = fn_800E292C();
+    nFirst = GM_GetHonors();
     if (nFirst == 5) return;
     if ((nStart = lbl_80282230->players[nFirst].nId) < 0) {
         nStart = 0;
@@ -331,8 +331,8 @@ void fn_800C9FE0(void) {
         fn_800C9F14(0);
     }
     if (gSession.nNumPlayers > 2) {
-        nFirst = fn_800E292C();
-        nSecond = fn_800E295C();
+        nFirst = GM_GetHonors();
+        nSecond = GM_GetSecondHonors();
         if (nFirst != 5) {
             if (lbl_80282230->players[nFirst].nId < 0) {
                 for (i = 0; i < 2; i++) {

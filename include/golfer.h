@@ -532,7 +532,7 @@ typedef struct GameState {
     s32  n12C;                  // 0x12C
     f32* p130;                  // 0x130  a position: speed golf measures the ball's distance to it
     u8   b134;                  // 0x134  cleared at the start of a hole
-    u8   b135;                  // 0x135  set by fn_800E0A84
+    u8   b135;                  // 0x135  set by GM_SetNeedToBuildPlayoffHoleList
     u8   b136;                  // 0x136  the holes are not one course's 1..18 (four kinds, 0x136..0x139)
     u8   b137;                  // 0x137
     u8   b138;                  // 0x138

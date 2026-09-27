@@ -12,7 +12,7 @@
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState and the (u8) on GOLFERSTATE_Set's player (see game.h).
 
 int  GM_GetPlayerRoundScoreThroughHole(int nPlayer, int nHoles);
-void fn_800E25CC(u8 b);
+void GM_SetSplitScreen(u8 b);
 
 void  fn_800D8D5C(int nPlayer);   // clears the player's words at 0x314-0x350
 void  fn_800E30D4(void);
@@ -44,11 +44,11 @@ void  GameModeDriverPGATour_Init(void);
 void  fn_8010C4A0(void);
 void  fn_80125E68(void);
 
-u8    fn_800E3AF8(void);
+u8    GM_GetNeedToBuildPlayoffHoleList(void);
 
 // Four floats: pOut gets pA minus pB.
 #ifdef __MWERKS__
-asm void fn_800E0AF0(register f32* pA, register f32* pB, register f32* pOut) {
+asm void GM_Vec4Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 0, 0
@@ -62,7 +62,7 @@ asm void fn_800E0AF0(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_800E0AF0(f32* pA, f32* pB, f32* pOut) {
+void GM_Vec4Sub(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];
@@ -81,7 +81,7 @@ const CourseList lbl_80184D40 = {{0, 1, 2, 3, 0, 5, 6, 8, 9, 10, 11, 12, 13, 14,
 
 // Three floats: pOut gets pA minus pB.
 #ifdef __MWERKS__
-asm void fn_800E0B14(register f32* pA, register f32* pB, register f32* pOut) {
+asm void GM_Vec3Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -95,7 +95,7 @@ asm void fn_800E0B14(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_800E0B14(f32* pA, f32* pB, f32* pOut) {
+void GM_Vec3Sub(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];
@@ -277,7 +277,7 @@ void GM_SetModeType(int nMode) {
 }
 
 // Clears one player's record of one hole: strokes, putts, points and the rest.
-void fn_800E1018(int nPlayer, int nHole) {
+void GM_ClearPlayerHoleData(int nPlayer, int nHole) {
     gPlayers[nPlayer].nStrokes[nHole] = 0;
     gPlayers[nPlayer].nPutts[nHole] = 0;
     gPlayers[nPlayer].nModePoints[nHole] = 0;
@@ -292,13 +292,13 @@ void fn_800E1018(int nPlayer, int nHole) {
 
 // A new round: every player's holes and round totals cleared, the pin for every hole set from
 // the session's pin option (-1 = the first pin), and every player's mulligan given back.
-void fn_800E1074(void) {
+void GM_ClearDataForNewGame(void) {
     int     j;
     int     i;
     Player* p;
     for (i = 0; i < 5; i++) {
         for (j = 0; j < 18; j++) {
-            fn_800E1018(i, j);
+            GM_ClearPlayerHoleData(i, j);
         }
         p = PLAYER(i);
         for (j = 0; j < 4; j++) {
@@ -329,7 +329,7 @@ void fn_800E1074(void) {
             gpGame->nPinSet[i] = gSession.nPinSet;
         }
     }
-    fn_800E2470();
+    GM_ClearMulliganCounters();
     gpGame->nE0 = 1;
     gpGame->bD5 = 0;
 }
@@ -453,7 +453,7 @@ void GM_SetCurrentCourse(int nCourse) {
 }
 
 // The round's next hole after the current one, or -1.
-int fn_800E16F4(void) {
+int GM_GetNextSelectedHole(void) {
     int i;
     for (i = gpGame->nCurHole + 1; i < 18; i++) {
         if (gpGame->bHoleSelected[i]) {
@@ -569,7 +569,7 @@ u8 GM_FullRoundOfGolf(void) {
 }
 
 // Whether the current hole is the round's last.
-u8 fn_800E1CA8(void) {
+u8 GM_CurrentlyOnLastHole(void) {
     u8 b = 1;
     int i;
     for (i = gpGame->nCurHole + 1; i < 18; i++) {
@@ -583,7 +583,7 @@ u8 fn_800E1CA8(void) {
 // The 75 marked holes (two to five per course, none on course 7; the items GM_GetGameProgress
 // counts with fn_800588F4): a course and hole to the item index, or -1. EA wrote the cases as 1-based hole
 // numbers; the courses are in the original's order, which numbers the items.
-int fn_800E1CE8(int nCourse, int nHole) {
+int GM_ConvertCourseAndHoleToPar5EagleIndex(int nCourse, int nHole) {
     switch (nCourse) {
     case 0:
         switch (nHole + 1) {
@@ -745,8 +745,8 @@ int fn_800E1CE8(int nCourse, int nHole) {
 }
 
 // Marked hole (course a, hole b)'s kind-0 byte in save slot nSlot (0 for an unmarked hole).
-u8 fn_800E22E4(int nSlot, int a, int b) {
-    int i = fn_800E1CE8(a, b);
+u8 GM_UserHasEagledHole(int nSlot, int a, int b) {
+    int i = GM_ConvertCourseAndHoleToPar5EagleIndex(a, b);
     if (i != -1) {
         return fn_800588F4(&gpSaveData[nSlot], 0, i);
     }
@@ -754,8 +754,8 @@ u8 fn_800E22E4(int nSlot, int a, int b) {
 }
 
 // And its kind-1 value.
-int fn_800E234C(int nSlot, int a, int b) {
-    int i = fn_800E1CE8(a, b);
+int GM_GetPar5EagleDate(int nSlot, int a, int b) {
+    int i = GM_ConvertCourseAndHoleToPar5EagleIndex(a, b);
     if (i != -1) {
         return fn_800588F4(&gpSaveData[nSlot], 1, i);
     }
@@ -764,7 +764,7 @@ int fn_800E234C(int nSlot, int a, int b) {
 
 // The hole's stroke limit: with the session's limit option (0x5B39) on and the mode using it,
 // 10 strokes ends the hole (GM_PlayerTookShot picks the ball up).
-u8 fn_800E23B0(int nPlayer, int nStrokes) {
+u8 GM_IsShotOverLimit(int nPlayer, int nStrokes) {
     if (gSession.bStrokeLimit && gpGame->bStrokeLimit && nStrokes >= 10) {
         return 1;
     }
@@ -773,7 +773,7 @@ u8 fn_800E23B0(int nPlayer, int nStrokes) {
 
 // Whether a player may take a mulligan: humans only, the mode allows them, and in the
 // one-per-nine rule not already used.
-u8 fn_800E23EC(int nPlayer) {
+u8 GM_CanPlayerTakeMulligan(int nPlayer) {
     if (Player_IsCPU(nPlayer)) {
         return 0;
     }
@@ -787,7 +787,7 @@ u8 fn_800E23EC(int nPlayer) {
 }
 
 // Gives every player their mulligan back.
-void fn_800E2470(void) {
+void GM_ClearMulliganCounters(void) {
     int i;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         PLAYER(i)->bMulliganUsed = 0;
@@ -832,38 +832,40 @@ int fn_800E2520(int nMode) {
     return 0;
 }
 
-void fn_800E25CC(u8 b) {
+// Turns split screen on or off (gSession.nSplitScreen), keeping the choice in lbl_8028227C, from
+// which GameMode22.c restores it.
+void GM_SetSplitScreen(u8 b) {
     lbl_8028227C = b;
     gSession.nSplitScreen = b;
 }
 
 // Split screen for the mode: modes 0-2 as the session has it, 6, 7 and 26 always, others never.
-void fn_800E25E0(void) {
+void GM_SetSplitScreenForMode(void) {
     switch (Game_GetMode()) {
     case 6:
     case 7:
-        fn_800E25CC(1);
+        GM_SetSplitScreen(1);
         return;
     case 26:
-        fn_800E25CC(1);
+        GM_SetSplitScreen(1);
         return;
     case 0:
     case 1:
     case 2:
         if (gSession.nSplitScreen == 1) {
-            fn_800E25CC(1);
+            GM_SetSplitScreen(1);
             return;
         }
-        fn_800E25CC(0);
+        GM_SetSplitScreen(0);
         return;
     default:
-        fn_800E25CC(0);
+        GM_SetSplitScreen(0);
         return;
     }
 }
 
 // The course's folder name ("01_Peb" = Pebble Beach ...). Course 4's is "22_Ant".
-char* fn_800E2680(void) {
+char* GM_GetCourseName(void) {
     switch (Game_GetCourse()) {
     case 0:  return "01_Peb";
     case 1:  return "02_Pri";
@@ -896,13 +898,15 @@ char* GameManager_GetHoleName(int nHole) {
     return lbl_80282270;
 }
 
-u8 fn_800E27A8(void) {
+// Whether the mode allows the golfer's post-shot reactions (GM_ShowPostShotAnimation,
+// GM_ChooseRemoveBallState): gpGame->n294, on by default and cleared by modes 8, 13-15, 17 and 22.
+u8 GM_IsValidPostShotGameType(void) {
     return gpGame->n294 != 0;
 }
 
 // Seconds since the session's frame count was stored in gpGame->n12C (by GM_Update in game type
 // 6, and by GM_RestartHole).
-int fn_800E27C0(void) {
+int GM_GetElapsedHoleTime(void) {
     return (1.0f / FRAME_RATE) * (f32)(u32)(gSession.nFrameCount - gpGame->n12C);
 }
 
@@ -924,18 +928,18 @@ u8 Gimme_Allowed(int nPlayer) {
 }
 
 // The first player to play: the one the mode says plays after nobody (5).
-s32 fn_800E292C(void) {
+s32 GM_GetHonors(void) {
     return gpGame->pfnGetHonors(5);
 }
 
 // The player after the first (the mode's choice run twice).
-s32 fn_800E295C(void) {
+s32 GM_GetSecondHonors(void) {
     return gpGame->pfnGetHonors(gpGame->pfnGetHonors(5));
 }
 
 // The start of a hole: every player's ball on their tee, the look-ahead copy and the saved
 // positions reset, and everyone waiting.
-void fn_800E299C(void) {
+void GM_InitBallsToTee(void) {
     CourseInfo* pCourse = Ter_GetTGD();
     int         i;
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -951,7 +955,7 @@ void fn_800E299C(void) {
 
 // When every player is waiting (in split screen, those not holed yet are sent back to their
 // pre-shot state instead), the mode's pfnSetupNextGolfer callback.
-void fn_800E2A88(void) {
+void GM_SetupGolfer_IfAllWaiting(void) {
     int i;
     u8  bBusy = 0;
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -984,11 +988,11 @@ void GM_Pick_PlayOffHole(void) {
     int  n = 0;
     int  i;
     int  nCur;
-    if (fn_800E3AF8()) {
+    if (GM_GetNeedToBuildPlayoffHoleList()) {
         for (i = 0; i < 18; i++) {
             gpGame->bHoleSaved[i] = gpGame->bHoleSelected[i];
         }
-        fn_800E0A84(0);
+        GM_SetNeedToBuildPlayoffHoleList(0);
     }
     nCur = Game_CurHoleIndex();
     for (i = 0; i < 18; i++) {
@@ -1011,7 +1015,7 @@ void GM_Pick_PlayOffHole(void) {
 
 // Whether the ball is in the hole (never in modes 13-17), setting its lie to holed: with
 // Ter_Use3DCupGeometry on, when the lie already is; with it off, within half a yard of the pin.
-u8 fn_800E2DB4(int nPlayer) {
+u8 GM_CheckForBallInHole(int nPlayer) {
     CourseInfo* pCourse;
     int         nPinSet;
     f32         dx;
@@ -1035,7 +1039,7 @@ u8 fn_800E2DB4(int nPlayer) {
 }
 
 // Whether the player is placing the ball (state 22) or the mode says so.
-u8 fn_800E2EAC(int nPlayer) {
+u8 GM_RenderBallTarget(int nPlayer) {
     s8  nState = GOLFERSTATE_GetCurrentState(nPlayer);
     int b = 0;
     if (nState == GS_PLACE_BALL || gpGame->pfn230(nPlayer)) {
@@ -1311,7 +1315,7 @@ u8 GM_Currently_SkillZoneMode(void) {
 }
 
 // Modes 6-8.
-u8 fn_800E3A54(void) {
+u8 GM_IsSpeedGolfMode(void) {
     if (Game_GetMode() == 6 || Game_GetMode() == 7 || Game_GetMode() == 8) {
         return 1;
     }
@@ -1367,7 +1371,9 @@ s32 fn_800E3AEC(int a) {
 void fn_800E3AF4(void) {
 }
 
-u8 fn_800E3AF8(void) {
+// Whether GM_Pick_PlayOffHole still has to save the round's hole selection as the playoff holes
+// (gpGame->b135).
+u8 GM_GetNeedToBuildPlayoffHoleList(void) {
     return gpGame->b135;
 }
 

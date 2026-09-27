@@ -284,7 +284,7 @@ typedef struct SaveProfile {
     Replay aReplay[5];          // 0x00438  a Replay each, saved with awards 0, 6, 9, 3 and 13
     s32  nTourCardLevel;        // 0x05000  0..6: level 1 comes from the lessons (GameMode11), the rest
                                 //          from fn_800D439C; it scales payouts (GM_Earnings_ComputeTOURCardModifiers)
-    u8   a5004[71];             // 0x05004  per marked hole 0..70 (fn_800E1CE8): fn_800588F4's kind 0
+    u8   a5004[71];             // 0x05004  per marked hole 0..70 (GM_ConvertCourseAndHoleToPar5EagleIndex): fn_800588F4's kind 0
     u8   unk504B;
     s32  a504C[71];             // 0x0504C  the same, fn_800588F4's kind 1
     s32  n5168;                 // 0x05168  set to 3 with the medals by the profile setup

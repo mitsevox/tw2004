@@ -1101,7 +1101,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   byte arithmetic: `(Player*)((u8*)gPlayers + i * sizeof(Player))` (the `PLAYER(i)` macro in
   `golfer.h`). Every other spelling (`&gPlayers[i]`, `gPlayers + i`, a local base pointer, an
   unsized array, other counter types) walks one pointer instead. Found with ten-line test
-  functions (2026-09-23): `GM_RestartHole` exact, `fn_800E1074` 85 -> 98%, `GM_GolferConcede_Hole`
+  functions (2026-09-23): `GM_RestartHole` exact, `GM_ClearDataForNewGame` 85 -> 98%, `GM_GolferConcede_Hole`
   85 -> 99.6%. Not every player loop uses it (`GM_CheckForAIConcede` got worse).
 - **[verified] The PLAYER(i) byte-offset form also applies to plain arrays**: EA's loops over
   `lbl_8020315C[i]` next to `gPlayers[i]` index both by byte offset
@@ -1189,7 +1189,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] A parameter's type moves saved registers, in the callee and in callers.** startUp
   `fn_800B044C`: `u32 uLen` -> `int nLen` (98.75 -> 100). PGATour `fn_800EF130`: the callee's
   prototype `fn_800EF0E0(PlayerNumber_t)` -> `(s32)` fixed the CALLER (98.65 -> 100; `int` did not).
-- **[verified] A leftover argument can be an old value still in r4.** GameRound `fn_800E1074`:
+- **[verified] A leftover argument can be an old value still in r4.** GameRound `GM_ClearDataForNewGame`:
   `fn_800D8D5C(i, 0)` was really `fn_800D8D5C(i)`; the callee sets r4 itself, and the original's r4 = 0
   was the zero shared by earlier stores (97.85 -> 100). Sign: a `li rX, 0` for an argument the
   original lacks, and the callee overwriting that register before reading it.

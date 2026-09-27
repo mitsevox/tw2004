@@ -601,12 +601,12 @@ void fn_8006BB5C(int nPlayer) {
     }
 }
 
-// With bBefore, whether one more stroke reaches the hole's stroke limit (fn_800E23B0), unless the
+// With bBefore, whether one more stroke reaches the hole's stroke limit (GM_IsShotOverLimit), unless the
 // ball is already in the cup; without it, the player's bC2D.
 u8 fn_8006BDC8(int nPlayer, u8 bBefore) {
     if (bBefore) {
         if (gPlayers[nPlayer].ballBefore.nLie != LIE_INCUP_e) {
-            return fn_800E23B0(nPlayer, gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1) != 0;
+            return GM_IsShotOverLimit(nPlayer, gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1) != 0;
         }
         return 0;
     }

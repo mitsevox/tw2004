@@ -113,11 +113,11 @@ void fn_800DCBB8(void) {
 
 void fn_800DCBBC(void) {
     if (GM5_IsChallengeRunning() == 0) {
-        fn_800E1074();
+        GM_ClearDataForNewGame();
         GM_InitializeCurrentHoleToFirstSelected();
     }
     (*(s32 (**)(void*))((u8*)(gpGame) + 0x1EC))(gpGame);
-    fn_800E0A84(1);
+    GM_SetNeedToBuildPlayoffHoleList(1);
 }
 
 void fn_800DCC04(void) {
@@ -139,7 +139,7 @@ int GM_GotoNextSelectedHole(void) {
     for (i = gpGame->nCurHole + 1; i < 18; i++) {
         if (gpGame->bHoleSelected[i]) {
             if (Game_GetMulliganRule() == 2 && gpGame->nCurHole < 9 && i >= 9) {
-                fn_800E2470();
+                GM_ClearMulliganCounters();
             }
             GM_SetCurrentHole(i);
             fn_8006F4B4();
@@ -155,7 +155,7 @@ void GM_InitForHole(void) {
     int i;
     fn_800170C4(2, 0);
     fn_800170C4(3, 0);
-    fn_800E299C();
+    GM_InitBallsToTee();
     Wind_Generate();
     gpGame->pfn1E4();
     GameEffects_ResetGameEffectSettings();
@@ -196,7 +196,7 @@ void GM_EndOfGolferTurn(int nPlayer) {
         return;
     }
     bWait = 0;
-    if (fn_800E3A54()) {
+    if (GM_IsSpeedGolfMode()) {
         if (Player_IsHoled(nPlayer)) {
             bWait = 1;
         }
@@ -221,7 +221,7 @@ void GM_EndOfGolferTurn_HoleFinished(int nPlayer) {
     int i;
     EVENT_Trigger(nPlayer, 1, 0, -1);
     gpGame->pfnEndHole();
-    if (fn_800E1CA8() && !gpGame->bD4 && !fn_800E0A90(nPlayer)) {
+    if (GM_CurrentlyOnLastHole() && !gpGame->bD4 && !fn_800E0A90(nPlayer)) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
             fn_800D439C(i, 0);
             fn_800D9834(i);
@@ -453,7 +453,7 @@ void GM_BumpBallForObstructions(int nPlayer) {
 // 999), or messages 0x11-0x13 (dead: fn_8008AC40 is 0), or the yardage. A penalty goes to pfn250.
 void GM_PlayerTookShot(int nPlayer) {
     u8   bOut;
-    if (fn_800E23EC(nPlayer) && !(gPlayers[nPlayer].uFlags & 8)) {
+    if (GM_CanPlayerTakeMulligan(nPlayer) && !(gPlayers[nPlayer].uFlags & 8)) {
         fn_800E0AC4(1);
     }
     if (!Player_IsCPU(nPlayer) && gSession.nSplitScreen == 0 && gpGame->b287 && gReplayData.bF10) {
@@ -476,13 +476,13 @@ void GM_PlayerTookShot(int nPlayer) {
         }
     }
     if (!bOut) {
-        if (fn_800E2DB4(nPlayer)) {
+        if (GM_CheckForBallInHole(nPlayer)) {
             fn_800D9458(nPlayer);
             fn_800D4030(nPlayer);
             GM_CheckBallForUIHints(nPlayer);
             gpGame->pfn218(nPlayer);
         } else {
-            if (fn_800E23B0(nPlayer, gPlayers[nPlayer].nStrokes[gpGame->nCurHole])) {
+            if (GM_IsShotOverLimit(nPlayer, gPlayers[nPlayer].nStrokes[gpGame->nCurHole])) {
                 gPlayers[nPlayer].ball.nLie = LIE_INCUP_e;
                 gPlayers[nPlayer].bC2D = 1;
                 if (fn_800EE470()) {
@@ -582,7 +582,7 @@ int GM_DoPreshotAnimation(int nPlayer) {
         return 0;
     }
     if (Game_GetCourse() == 0x12 && Game_GetCurHoleNum() == 10) {
-        fn_800E0AF0(gPlayers[nPlayer].vBall, &Ter_GetTGD()->tee[gSession.nTeeSet[nPlayer]].x, v);
+        GM_Vec4Sub(gPlayers[nPlayer].vBall, &Ter_GetTGD()->tee[gSession.nTeeSet[nPlayer]].x, v);
         v[1] = 0.0f;
         if ((f32)Math_Sqrt(Vec3_LengthSqClamped(v)) < 40.0f) {
             return 0;
@@ -605,8 +605,8 @@ int GM_DoPreshotAnimation(int nPlayer) {
 }
 
 // TW06: GM_ShowPostShotAnimation. Whether the golfer plays a reaction after the shot. Never when
-// fn_800E27A8 says no, on course 18's 10th within 40 yards of the tee, for character group 11 on
-// start surface 45, or when the golfer stands out of bounds, on a surface without u34 bit 0, in
+// GM_IsValidPostShotGameType says no, on course 18's 10th within 40 yards of the tee, for character
+// group 11 on start surface 45, or when the golfer stands out of bounds, on a surface without u34 bit 0, in
 // water (class 7/16), or on a slope steeper than 0.1 with the ball 0.2 above. After the debug,
 // plan-ready, fn_8004560C, animation 9 and uFlags bit 0 cases, by how the shot turned out (0..4):
 // after a putt 80%, always, always, 70%, 90%, else 50%; after other shots 35%, always, always,
@@ -630,11 +630,11 @@ int GM_ShowPostShotAnimation(int nPlayer) {
     f32          fRise;
 
     nResult = fn_8006AA9C(nPlayer);
-    if (!fn_800E27A8()) {
+    if (!GM_IsValidPostShotGameType()) {
         return 0;
     }
     if (Game_GetCourse() == 0x12 && Game_GetCurHoleNum() == 10) {
-        fn_800E0AF0(gPlayers[nPlayer].vBall, &Ter_GetTGD()->tee[gSession.nTeeSet[nPlayer]].x, vTee);
+        GM_Vec4Sub(gPlayers[nPlayer].vBall, &Ter_GetTGD()->tee[gSession.nTeeSet[nPlayer]].x, vTee);
         vTee[1] = 0.0f;
         if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vTee)) < 40.0f) {
             return 0;
@@ -666,7 +666,7 @@ int GM_ShowPostShotAnimation(int nPlayer) {
                 pSurf = pSurfB;
             }
         }
-        fn_800E0B14(vPos, gPlayers[nPlayer].vBall, vFlat);
+        GM_Vec3Sub(vPos, gPlayers[nPlayer].vBall, vFlat);
         vFlat[1] = 0.0f;
         fLen  = Math_Sqrt(Vec3_LengthSqClamped(vFlat));
         fRise = gPlayers[nPlayer].vBall[1] - fHigh;
@@ -743,7 +743,7 @@ void GM_Update(void) {
         if ((fn_800E5110() && GUI_IsPauseMenuOpen()) || fn_800E45CC()) {
             fn_800E46B4();
         } else if (gpGame->b27E && !GUI_ScoreCardUp()) {
-            fn_800E2A88();
+            GM_SetupGolfer_IfAllWaiting();
         }
         gpGame->n12C = gSession.nFrameCount;
     }
@@ -755,9 +755,9 @@ void GM_RestartHole(void) {
     int i;
     if (gpGame->b279) {
         for (i = 0; i < 5; i++) {
-            fn_800E1018(i, gpGame->nCurHole);
+            GM_ClearPlayerHoleData(i, gpGame->nCurHole);
         }
-        fn_800E299C();
+        GM_InitBallsToTee();
         gpGame->pfn224();
         if (gpGame->b27F) {
             GM_FlyByMode_Init();
@@ -1021,7 +1021,7 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
 }
 
 // TW06: GM_ChooseRemoveBallState (by position). Whether the golfer takes the ball out of the cup
-// with the special animation: never in the special session mode, when fn_800E27A8 says no, or
+// with the special animation: never in the special session mode, when GM_IsValidPostShotGameType says no, or
 // after a picked-up ball. A shot of kind 2 first asks the mode (with the stroke taken back). Then
 // yes if 0xC2B is set; no during animation 9, beyond 5 yards (0xA64), or off the green; a scripted
 // answer in uFlags bits 0/1; otherwise 10% of the time two or more under par, else 25%.
@@ -1029,7 +1029,7 @@ int GM_ChooseRemoveBallState(int nPlayer) {
     if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
         return 0;
     }
-    if (!fn_800E27A8()) {
+    if (!GM_IsValidPostShotGameType()) {
         return 0;
     }
     if (gPlayers[nPlayer].bC2D) {
@@ -1137,7 +1137,7 @@ void GM_SimulateBallMovement(int nPlayer) {
         if (fn_800BB1F8(nPlayer)) {
             nResult = fn_8006AA9C(nPlayer);
             bReact  = nResult == 8 || nResult == 9;
-            bOn     = fn_800E27A8();
+            bOn     = GM_IsValidPostShotGameType();
             fDist   = fn_800D0478(nPlayer);
             if (bOn) {
                 if (gPlayers[nPlayer].uFlags & 1) {
@@ -1398,7 +1398,9 @@ f32 GM_GetBonusProgress(SaveProfile* pProfile) {
     return f;
 }
 
-void fn_800E0A84(u8 v) {
+// Sets whether GM_Pick_PlayOffHole has to build the playoff hole list (gpGame->b135): 1 at the
+// start of a game, 0 once the list is built.
+void GM_SetNeedToBuildPlayoffHoleList(u8 v) {
     gpGame->b135 = v;
 }
 

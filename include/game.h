@@ -12,7 +12,7 @@
 // ---- the round -------------------------------------------------------------------------------
 
 extern s32 lbl_80282278;                // the player whose turn it is
-extern u8  lbl_8028227C;                // the split-screen choice (fn_800E25CC); the modes that
+extern u8  lbl_8028227C;                // the split-screen choice (GM_SetSplitScreen); the modes that
                                         // force one view put it back when they end
 
 // Replay (a saved shot) is in game/save.h: the save profile holds five.
@@ -367,16 +367,16 @@ void GM_CheckForShotChanges(int nPlayer);
 void GM_DoPostShotInHoleUI(int nPlayer);
 int  GM_ChooseRemoveBallState(int nPlayer);
 void GM_SimulateBallMovement(int nPlayer);
-void fn_800E0A84(u8 b);
+void GM_SetNeedToBuildPlayoffHoleList(u8 b);
 void fn_800E0A98(int a);
 void fn_800E0AC4(int a);
 
 // GameRound.c
-void fn_800E0AF0(f32* pA, f32* pB, f32* pOut);
-void fn_800E0B14(f32* pA, f32* pB, f32* pOut);
+void GM_Vec4Sub(f32* pA, f32* pB, f32* pOut);
+void GM_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 void GM_SetModeType(int nMode);            // set up game mode nMode: defaults, then the mode's own setup
-void fn_800E1018(int nPlayer, int nHole);
-void fn_800E1074(void);
+void GM_ClearPlayerHoleData(int nPlayer, int nHole);
+void GM_ClearDataForNewGame(void);
 void GM_SelectHoleSet(int nPreset);          // a hole-selection preset for the round
 void GM_SelectSingleHole(int nHole);
 void GM_InitializeCurrentHoleToFirstSelected(void);
@@ -388,26 +388,26 @@ int  GM_GetPlayerRoundScore(int nPlayer);          // the player's total for the
 int  GM_GetPlayerRoundStrokes(int nPlayer);          // the player's total strokes
 int  GM_GetGolferRelativeCumulativeScore(int nPlayer, u8 bCurrent);
 u8   GM_FullRoundOfGolf(void);                 // whether the round plays every hole
-u8   fn_800E1CA8(void);                 // no selected hole is left after the current one
-int  fn_800E1CE8(int a, int b);         // a course and hole to its marked-hole index, or -1
-u8   fn_800E23B0(int nPlayer, int nStrokes);
-u8   fn_800E23EC(int nPlayer);
-void fn_800E2470(void);
-char* fn_800E2680(void);                // the course's folder name ("01_Peb")
+u8   GM_CurrentlyOnLastHole(void);                 // no selected hole is left after the current one
+int  GM_ConvertCourseAndHoleToPar5EagleIndex(int a, int b);         // a course and hole to its marked-hole index, or -1
+u8   GM_IsShotOverLimit(int nPlayer, int nStrokes);
+u8   GM_CanPlayerTakeMulligan(int nPlayer);
+void GM_ClearMulliganCounters(void);
+char* GM_GetCourseName(void);                // the course's folder name ("01_Peb")
 char* GameManager_GetHoleName(int nHole);   // "HOLE_01".."HOLE_18"
-u8   fn_800E27A8(void);
-int  fn_800E27C0(void);
+u8   GM_IsValidPostShotGameType(void);
+int  GM_GetElapsedHoleTime(void);
 u8   Gimme_Allowed(int nPlayer);
-s32  fn_800E292C(void);                 // the first player to play (the mode's choice after nobody)
-s32  fn_800E295C(void);                 // the player after that one
-void fn_800E299C(void);
-void fn_800E2A88(void);
+s32  GM_GetHonors(void);                 // the first player to play (the mode's choice after nobody)
+s32  GM_GetSecondHonors(void);                 // the player after that one
+void GM_InitBallsToTee(void);
+void GM_SetupGolfer_IfAllWaiting(void);
 u8   GM_IsBallOOB(int nPlayer, Ball* pBall);   // out of bounds
 void GM_Pick_PlayOffHole(void);                 // a random hole from the selection
-u8   fn_800E2DB4(int nPlayer);
-u8   fn_800E2EAC(int nPlayer);          // placing the ball (state 22), or the mode says so
+u8   GM_CheckForBallInHole(int nPlayer);
+u8   GM_RenderBallTarget(int nPlayer);          // placing the ball (state 22), or the mode says so
 u8   GM_Currently_SkillZoneMode(void);
-u8   fn_800E3A54(void);                 // modes 6, 7 and 8
+u8   GM_IsSpeedGolfMode(void);                 // modes 6, 7 and 8
 void fn_800E3B04(void);
 
 // GameUI.c

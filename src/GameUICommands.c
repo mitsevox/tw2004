@@ -285,7 +285,7 @@ s32   fn_800DAD30(int nPlayer);
 u8    fn_800DAD44(void);
 s32   fn_800DAD4C(void);
 s32   fn_800DADC0(void);
-int   fn_800E16F4(void);
+int   GM_GetNextSelectedHole(void);
 int   GM_GetPlayerRoundScoreThroughHole(int nPlayer, int nHoles);
 void  fn_800E3E3C(void);
 void  fn_800E3ECC(void);
@@ -834,7 +834,7 @@ void fn_800865E0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80086610(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800E27C0();
+    pResult->i = GM_GetElapsedHoleTime();
 }
 
 // The mode's points for a player on a hole.
@@ -1653,7 +1653,7 @@ void fn_80088474(MsgArg* pArgs, MsgArg* pResult) {
     s32 nPar = 0;
     s32 nLength = 0;
 
-    nHole = fn_800E16F4();
+    nHole = GM_GetNextSelectedHole();
 
     if (nHole != -1) {
         nPar = Course_GetHolePar(nHole);

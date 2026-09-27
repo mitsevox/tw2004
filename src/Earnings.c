@@ -468,7 +468,7 @@ u8 fn_800D4010(int nId) {
     return b;
 }
 
-// After the ball is holed (GM_PlayerTookShot, when fn_800E2DB4 says so), for a human player with a
+// After the ball is holed (GM_PlayerTookShot, when GM_CheckForBallInHole says so), for a human player with a
 // profile: the putt record check (fn_800D7B1C) with its messages, then two rounds of payouts from
 // the copies of the working tables as fn_800D3DDC pays them: the putt's (fn_800D4F14), then the
 // hole's (fn_800D588C; none in a playoff).
@@ -547,7 +547,7 @@ void fn_800D439C(int nPlayer, u8 bRoundOver) {
     f32 fProgress;
 
     nLevel = 0;
-    if (fn_800E3A54()) return;
+    if (GM_IsSpeedGolfMode()) return;
     if (Game_GetMulliganRule() != 0) return;
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return;
@@ -1129,9 +1129,9 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
     }
 }
 
-// The marked holes (fn_800E1CE8's items, kind 0). Without bCheck: whether the profile has all 71.
-// With it: whether this par 5 was played in eagle or better with 70 held and this hole the one
-// missing.
+// The marked holes (GM_ConvertCourseAndHoleToPar5EagleIndex's items, kind 0). Without bCheck:
+// whether the profile has all 71. With it: whether this par 5 was played in eagle or better with 70
+// held and this hole the one missing.
 u8 fn_800D61E4(int nPlayer, u8 bCheck) {
     int nProfile;
     u8 bAll;
@@ -1218,7 +1218,7 @@ u8 fn_800D61E4(int nPlayer, u8 bCheck) {
                 case 16: nItem = 26; break;
                 }
                 break;
-            // EA left out course 10 (items 27..30), which fn_800E1CE8 has.
+            // EA left out course 10 (items 27..30), which GM_ConvertCourseAndHoleToPar5EagleIndex has.
             case 11:
                 switch (Game_GetCurHoleNum() + 1) {
                 case 4: nItem = 31; break;
@@ -2170,7 +2170,7 @@ u8 fn_800D8DB4(int nKind) {
 // and the profile's longest and is counted in the profile; the first stroke's distance goes in
 // nC24; b2E4 marks a first stroke on a par 4 or 5 that finished on the fairway, the green or in the
 // hole, b2F6 a ball on the green or in the hole in par - 2 strokes or fewer. A putt (club 25) that
-// fn_800E2DB4 accepts can be the longest, in feet.
+// GM_CheckForBallInHole accepts can be the longest, in feet.
 void GM_RecordIndividualShotStats(int nPlayer) {
     u32 nClass;
     Ball* pBall;
@@ -2221,7 +2221,7 @@ void GM_RecordIndividualShotStats(int nPlayer) {
         gpSaveData[nProfile].n8C += (s32)fDist;
         gpSaveData[nProfile].b70 = 1;
     }
-    if (fn_800E2DB4(nPlayer) && gPlayers[nPlayer].nClub == 25) {
+    if (GM_CheckForBallInHole(nPlayer) && gPlayers[nPlayer].nClub == 25) {
         nPutt = 3.0f * gPlayers[nPlayer].fA64;
         if (nPutt > gPlayers[nPlayer].n2E0) {
             gPlayers[nPlayer].n2E0 = nPutt;
@@ -2337,7 +2337,7 @@ void fn_800D9458(int nPlayer) {
             }
             if (gpSaveData[nProfile].bActive && nPar == 5 &&
                 gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] <= 3) {
-                nMarked = fn_800E1CE8(gpGame->nCurCourse, Game_GetCurHoleNum());
+                nMarked = GM_ConvertCourseAndHoleToPar5EagleIndex(gpGame->nCurCourse, Game_GetCurHoleNum());
                 fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
                 nDate = fn_80078604(nMonth, nDay, nYear);
                 if (nMarked != -1) {

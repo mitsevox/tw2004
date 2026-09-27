@@ -208,7 +208,7 @@ void fn_800DA48C(int nPlayer) {
         fn_800DA6D0();
     }
     if (fn_800DA234()) {
-        if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 && fn_800E2DB4(nPlayer) &&
+        if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 && GM_CheckForBallInHole(nPlayer) &&
             gPlayers[nPlayer].bC2F == 0) {
             lbl_80282260 = 1;
             lbl_80282268 = 1;

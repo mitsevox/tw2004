@@ -704,7 +704,7 @@ u8 fn_800DC818(Ball* pBall, int nPlayer, u8 bNext) {
     } else {
         nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1;
     }
-    if ((pBall->nLie == LIE_INCUP_e && !fn_800E23B0(nPlayer, nStrokes - 1)) || bEagle || b || a) {
+    if ((pBall->nLie == LIE_INCUP_e && !GM_IsShotOverLimit(nPlayer, nStrokes - 1)) || bEagle || b || a) {
         return 1;
     }
     return 0;

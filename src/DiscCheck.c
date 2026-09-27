@@ -79,7 +79,7 @@ void fn_80110178(u8 b) {
 // the current hole's file in it.
 int fn_80110180(void) {
     char szPath[128];                   // the size is unknown (the frame allows up to 132)
-    char* szCourse = fn_800E2680();
+    char* szCourse = GM_GetCourseName();
     char* szHole = GameManager_GetHoleName(Game_GetCurHoleNum());
 
     sprintf(szPath, "data\\%s", szCourse);

@@ -347,7 +347,7 @@ u8 fn_800FA148(u8 bCheck) {
 // set (fn_800FDADC, a UI command, sets it when both golfers are in states 1 to 4 or 10).
 u8 fn_800FA1CC(int nPlayer, u8 bCheck) {
     if (gPlayers[0].n290[Game_CurHoleIndex()] == 0 && Player_IsHoled(0)) {
-        gPlayers[0].n290[Game_CurHoleIndex()] = fn_800E27C0();
+        gPlayers[0].n290[Game_CurHoleIndex()] = GM_GetElapsedHoleTime();
     }
     if (Player_IsHoled(0) || (gPlayers[0].nC3C & 0x04000000)) {
         return 1;

@@ -80,7 +80,7 @@ void fn_80067CD4(int nPlayer) {
     // states 2..4 are one unsigned range test
     int nState = GOLFERSTATE_GetCurrentState(nPlayer);
 
-    if (fn_800E2EAC(nPlayer)) {
+    if (GM_RenderBallTarget(nPlayer)) {
         PlaceBall_RenderBallTarget(nPlayer);
         return;
     }

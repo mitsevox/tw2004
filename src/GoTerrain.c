@@ -962,7 +962,7 @@ u8 fn_80032330(UObjMesh* pModel) {
 }
 
 // Adds a draw of pModel to a draw list: fills pDraw and counts it in *pCount. A model whose flags
-// (bytes 0 and 3) ask for it is skipped in modes 6-8 (fn_800E3A54); one with bits 0 and 1 of byte 0
+// (bytes 0 and 3) ask for it is skipped in modes 6-8 (GM_IsSpeedGolfMode); one with bits 0 and 1 of byte 0
 // is otherwise drawn as its node chosen by the object's state (n18).
 void fn_8003241C(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UObjMesh* pModel, f32 fAlpha,
                  f32 fMipmapBias, f32 fDistanceSquared, s32 iObject, s32 eClipMethod, u8 bUseFog,
@@ -983,11 +983,11 @@ void fn_8003241C(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UObjMesh* 
     uFlags3 = Ter_GetMeshFlags(pModel, 3);
     if (uFlags0 & 1) {
         if (uFlags0 & 2) {
-            if (fn_800E3A54()) return;
+            if (GM_IsSpeedGolfMode()) return;
             pDraw->pObject = Ter_GetMeshChild(pModel, lbl_801D3CB0.pObjectStateList[iObject].n18);
         }
     } else if ((uFlags3 & 4) || (uFlags3 & 0x10) || (uFlags3 & 0x20)) {
-        if (fn_800E3A54()) return;
+        if (GM_IsSpeedGolfMode()) return;
     }
     if (pDraw->pObject->p18 != NULL) {
         pDraw->eShaderObjectType = pDraw->pObject->p18->n0;
