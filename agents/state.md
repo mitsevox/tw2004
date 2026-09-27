@@ -17,6 +17,13 @@ file). Pipeline: `tools/match/name.py` (all or nothing); playbook `agents/roles/
 one area each, 15-25 functions per batch, fresh agent per batch. Comments go in the same pass.
 Cleanup done before it: 18 stale remote branches deleted (gemini/round4 and 2 young pc-results left),
 matching-era records removed (in history at 6839245), docs/README.md index.
+COMMENTS (owner, 2026-09-27, late): naming lanes OWN the comments of the functions they touch:
+rewrite wrong/stale/vague ones, add missing ones (name.py column 8 now replaces; labels kept).
+Rounds 1-3 left existing comments unreviewed: backfill running as comment lanes cr1 (the flagged
+list in naming-leads.md), cr2 GameRound + GameUI, cr3 FE_CrAPDB (+ fe.h fields), cr4 audio. Still to
+review: char.c, GoTerrain.c, GoRenderCtx_Gc.c, MC_Gc.c, MC.c, EASBStorage.c, SkinPart.c and the
+batch-1/2 files (StaticMemory, Quaternion, VecMath, ViewController, Controller_Gc, Code80012ED0...).
+Round 3 (nm9-nm12) landed: coverage 70.46%.
 Round 1 (nm1-nm4) and round 2 (nm5 FE_CrAPDB, nm6 SkinPart, nm7 GameRound + GameUI, nm8 audio)
 landed: coverage 61.92% -> 69.35%. Nothing running. Lanes hand in batch files; the orchestrator
 replays them on main with name.py (merging lane branches conflicts on callers in other files).
