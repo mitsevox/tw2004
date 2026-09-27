@@ -424,6 +424,12 @@ s32 fn_80169858(UIStudio* pStudio, u16 uGroup, u16 uScreen, u16 uPrevGroup, u16 
     pScreen->bUnloading = 0;
     pScreen->pData = pFile;
     bFixed = fn_80169DC4(pScreen->pData);
+    // fake match: bFixed goes through a 64-bit shift up and back down (the value is unchanged).
+    // The shifts become a chain of word copies after bFixed; each copy-propagation pass removes
+    // one link, so bFixed's copy from the call result survives them all (EA's mr r0,r3 ...
+    // mr r25,r0).
+    // port: relies on the conversion to s64 wrapping and on >> of a negative s64 being arithmetic.
+    bFixed = (s32)((s64)((u64)bFixed << 32) >> 32);
     fn_8016AEEC(pStudio, pScreen, 0, -1);
     pScreen->pData->pNodes[0].pInfo->u4 = 1;
     if (bFixed) {

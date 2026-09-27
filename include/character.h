@@ -524,6 +524,8 @@ typedef struct CharModelDefs {
 
 extern CharModelDefs lbl_80280E10;
 extern CharModelDefs lbl_80280E18;
+extern IKChainDef lbl_80186E80[2];   // lbl_80280E10's chains
+extern IKChainDef lbl_80186EA0[2];   // lbl_80280E18's chains
 
 // Per club class, an offset (x, y, z) Character_SetupForShot places the golfer by (0x4C bytes: one more
 // float follows the six).

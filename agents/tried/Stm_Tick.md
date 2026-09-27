@@ -1,12 +1,39 @@
 # Stm_Tick (hlaudtrackstm.c, 0x800ABDB0)
 
-Status: OPEN, 99.10% on 2026-09-25.
+Status: SOLVED 2026-09-27 (b3, fake match): cap computed first into `uCap`, then volatile reads
+of pStream and uReadPos (`((volatile AudTrack*)pTrack)->u.stm...`) and of the stream's uOffset
+(`((volatile AudStream*)pStream)->uOffset`), same values; hlaudtrackstm linked (.data, .bss,
+.sbss) in the same commit (agent/b3, "hlaudtrackstm.c: Stm_Tick exact, unit linked").
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
 "Attempts" (what, score before -> after). When it is exact: Status SOLVED, the fix, the commit.
 
 ## Attempts
+
+- 2026-09-27, b3 second attempt (quicktrial aligned, base 2; mwccdbg on full-unit variants).
+  **Solved by a load-ordering fake (volatile), not by the flag:** with `uCap = nChannels << 15`
+  first, then `pStream`, `uReadPos`, `uOffset = pStream->uOffset + uReadPos`, pBuffer, uRemaining,
+  volatile on exactly {pStream, uReadPos, pStream->uOffset}: 0. Volatile loads keep their order in
+  both schedulers (edges pStream -> uReadPos -> uOffset), which gives the uReadPos load the longer
+  path and keeps the shift after it. Sweep of all dependency-legal statement orders x 9 volatile
+  subsets of at most two fields: best 2; three volatiles without the cap first: 14; adding
+  volatile on uLength: 6; on pBuffer too: 3; ((volatile AudTrackStm*) view, volatile AudTrack*
+  local, or casts on pTrack: all 0 (casts on pTrack used). Other findings on the way:
+  - A real conditional between the call and the loads (e.g. `if ((u8)hFile <= 0xFF) {...}`,
+    `if (hFile == 0) hFile = 0;`, `if (bFed)`) gives EA's load order (the loads' block keeps its
+    pre-RA schedule) but costs its compare+branch: 3. Nothing zero-cost found: the frontend folds
+    every constant/self condition (x==x, x-x, x^x, x&0, inline constants, empty inlines,
+    `switch` with only break/return arms, `&& (h = f(), 1)`, if/else with identical arms -> a
+    select through a temp whose copy lands in the join block); the backend never folds a compare
+    (no pass removes cmp/branch; a branch to the next block goes only at emission, leaving the
+    compare: `hFile = hFile ? hFile : hFile` -> extra `cmpwi r3,0`, order still wrong because the
+    join block got the deleted copy). The compare is not CSE'd across the call (nState kept in a
+    local and retested: 5).
+  - Pre-RA scheduling (pass 14) merges a block ending in `b` into its predecessor; the post-RA
+    peephole (19) merges straight fallthrough pairs too (B0+B1), keeping the predecessor's flags.
+  - Nested call forms: complex arguments are evaluated right to left (a ternary 3rd argument
+    before a ternary 1st argument): 80/81/26.
 
 - 2026-09-27, b3 (mwcc-debugger with a patched scratch copy that relinks / edits PCode before a
   pass; quicktrial aligned, base 2). **Why the swap happens (verified):**

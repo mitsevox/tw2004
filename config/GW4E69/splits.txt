@@ -166,12 +166,12 @@ ViewController.c:
 	.sbss       start:0x80281CA0 end:0x80281CA8
 	.sdata2     start:0x80282BB8 end:0x80282BC0
 
-char_tex_manager.c:
-	.text       start:0x80017320 end:0x80017508
-	.data       start:0x801870F0 end:0x801870FC
-
 char.c:
-	.text       start:0x80017508 end:0x8001F32C
+	.text       start:0x80017320 end:0x8001F32C
+	.rodata     start:0x8017DB80 end:0x8017DD78
+	.data       start:0x801870F0 end:0x801871D0
+	.sdata      start:0x80280E10 end:0x80280E78
+	.sdata2     start:0x80282BC0 end:0x80282CA0
 
 mtalib.c:
 	.text       start:0x8001F32C end:0x8001FB00
@@ -295,9 +295,13 @@ GoDynamicCam.c:
 
 gocamscripts.c:
 	.text       start:0x8003DCE8 end:0x80045660
+	.rodata     start:0x8017E938 end:0x8017E9B8
+	.data       start:0x80187AA0 end:0x80187B88
+	.sdata2     start:0x802830A8 end:0x80283148
 
 DepthField.c:
 	.text       start:0x80045660 end:0x80045D18
+	.sdata2     start:0x80283148 end:0x80283168
 
 UObject3D.c:
 	.text       start:0x80045D18 end:0x80045F74
@@ -359,6 +363,8 @@ Wind.c:
 
 LLPictInt.c:
 	.text       start:0x80056204 end:0x800563C4
+	.data       start:0x80187F78 end:0x80187F88
+	.sdata2     start:0x802835A8 end:0x802835B0
 
 user.c:
 	.text       start:0x800563C4 end:0x80056480
@@ -808,6 +814,9 @@ hlaudtrackseq.c:
 
 hlaudtrackstm.c:
 	.text       start:0x800AB3A4 end:0x800AC330
+	.data       start:0x8018EB78 end:0x8018EC10
+	.bss        start:0x801F18B8 end:0x801F19B8
+	.sbss       start:0x802820A8 end:0x802820B0
 
 hlaudvoice.c:
 	.text       start:0x800AC330 end:0x800ACECC
@@ -893,6 +902,10 @@ DiscError.c:
 
 rcmp_mad_codec.c:
 	.text       start:0x800B769C end:0x800B90F4
+	.rodata     start:0x80184A68 end:0x80184C68
+	.data       start:0x80190FE0 end:0x801910E0
+	.bss        start:0x801F6858 end:0x801F8458
+	.sbss       start:0x802821A8 end:0x802821C0
 
 Code800B90F4.c:
 	.text       start:0x800B90F4 end:0x800B9FF0
@@ -961,6 +974,7 @@ GoGolfCam.c:
 
 CamSpline.c:
 	.text       start:0x800C7480 end:0x800C808C
+	.sdata2     start:0x802843B8 end:0x802843F8
 
 GoBreakLine.c:
 	.text       start:0x800C808C end:0x800C937C
