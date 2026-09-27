@@ -1,6 +1,13 @@
 # GR_BuildGridRenderData (GoGreenGrid.c, 0x8009C0BC)
 
-Status: OPEN, 99.22% on 2026-09-26 (r7-cam; only the preamble's GPRs left).
+Status: SOLVED 2026-09-26 (e-link2, c527c58), fake match: `pSession` declared without an
+initialiser and set in the first loop's test (`for (n = 0; pSession = &gSession, n < ...; n++)`);
+the backend then hoists &gSession to the end of the preamble (after the nView*4 temp), as EA's
+schedule has it, and loop 2 reuses it. Aligned 7 -> 0. In both loops' tests: 80; in loop 1's
+init clause 14; loop 1 increment clause 24. Unit NOT linked yet: graduate.py with .data
+0x8018C6C8-0x8018C6D8, .bss 0x801E3068-0x801E3180, .sdata 0x802813C0-0x802813D0, .sbss
+0x80281FA8-0x80281FB0, .sdata2 0x80283EC8-0x80283F18 failed the DOL (not investigated: checkpoint;
+next step doldiff.py; datamap shows several of our constants unmapped).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under

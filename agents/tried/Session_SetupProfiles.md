@@ -1,6 +1,6 @@
 # Session_SetupProfiles (Code8002EE1C.c, 0x8002EF64)
 
-Status: SOLVED 2026-09-26 (e-link2): SaveProfile.n54C2 is s8 in EA's struct (include/game/save.h,
+Status: SOLVED 2026-09-26 (e-link2, 8d1ca71): SaveProfile.n54C2 is s8 in EA's struct (include/game/save.h,
 was u8). Unit Code8002EE1C linked (.sdata2 0x80282F20-0x80282F30, Code8002EE1C_StrippedFn for the
 1.0f that opens the pool).
 
