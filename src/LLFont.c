@@ -283,18 +283,18 @@ void fn_80011310(LLFont* pFont, UFontState* pState) {
 // draws a shadow first (colour nC4/uC8, moved by fCC, fD0). The low byte of n9C aligns the text
 // across (1: right, 2: centre, 4: by fBC), bits 8-10 down (by fC0 for 0x400); fB8 turns it.
 void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
-    f32 fOffY;
-    f32 fSizeY;
-    LLGlyph* pGlyph;
-    char* p;
     f32 fX1;
     f32 fY1;
-    f32 fX2;
-    f32 fSavedY;
+    LLGlyph* pGlyph;
+    char* p;
     f32 fY0;
+    f32 fOffX;
+    f32 fX2;
     f32 fY2;
+    f32 fX0;
     f32 fLeft;
     f32 fTop;
+    f32 fWidth;
     f32 fScaleX;
     f32 fAdvance;
     f32 fScaleY;
@@ -302,29 +302,29 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
     u32 uColor;
     u8 bMeasured;
     f32 fGradY;
-    f32 fWidth;
     f32 fX;
-    f32 fY;
-    f32 fAlignX;
+    f32 fOffY;
     f32 fRun;
+    f32 fSin;
+    f32 fSavedY;
     f32 fNegSin;
     f32 fAdvScale;
     f32 fGX1;
     f32 fX3;
-    f32 fSin;
-    f32 fAlignY;
-    f32 fGY1;
+    f32 fY;
+    f32 fAlignX;
+    f32 fCos;
     f32 fY3;
     f32 fRight;
     f32 fBottom;
     s32 nSaved;
     s32 nSavedFont;
     GXColor uSavedColor;
-    f32 fSizeX;
-    f32 fCos;
+    f32 fGY1;
+    f32 fAlignY;
+    f32 fSizeY;
     f32 fSavedX;
-    f32 fX0;
-    f32 fOffX;
+    f32 fSizeX;
 
     if (pCtx->uA8 != 0 && lbl_80281C88 == 0) {
         lbl_80281C88 = 1;
