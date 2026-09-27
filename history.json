@@ -43685,5 +43685,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "5355cdf",
+"sha": "5355cdf0c3b592af1e6cd9833718bde6e528c737",
+"time": 1790541536,
+"subject": "names: batch 1, the 54 most-called unnamed functions (call sites to named functions 42.9% -> 59.4%)",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
