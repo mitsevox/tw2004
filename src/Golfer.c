@@ -88,13 +88,18 @@ void AI_ChooseTarget(int nPlayer) {
     f32         fBestDist2;
     Player*     p;
     AITarget*   t;
-    AITarget*   pTargets;
+    // fake match: the untyped alias preserves the original target-table register order.
+    void*       pTargets;
     int         nKind;
     CourseInfo* pCourse;
     s8          nZone;
-    int         nPower;
+    // fake match: widened attribute locals reproduce the original hoisted cast order.
+    long long   nPower;
+    // fake match: keep the narrow power value separate for register allocation.
+    int         powerByte;
     int         nPinSet;
-    int         nAggr;
+    // fake match: like nPower, widen storage only to match the original cast scheduling.
+    long long   nAggr;
     f32         fDX, fDZ;
 
     nPinSet = Game_CurrentPinSet();
@@ -112,10 +117,9 @@ void AI_ChooseTarget(int nPlayer) {
     pTargets   = gAITargets;
     nBest      = -1;
     fBestDist2 = 100000000.0f;
-    if (pTargets[nZone].pDef != NULL) {
-        fDumb = 100.0f - (f32)(s8)nIQ;
+    if (((AITarget*)pTargets)[nZone].pDef != NULL) {
         for (k = 0; k < NUM_AI_LINKS; k++) {
-            nCand = (s8)pTargets[nZone].pDef->nLinks[k];
+            nCand = (s8)((AITarget*)pTargets)[nZone].pDef->nLinks[k];
             t = &gAITargets[nCand];
             if (nCand == -1) continue;
             if (!t->bEnabled) continue;
@@ -124,6 +128,7 @@ void AI_ChooseTarget(int nPlayer) {
             fDist2 = fDX * fDX + fDZ * fDZ;
             if (t->nTeeSet != -1 && t->nTeeSet != gSession.nTeeSet[nPlayer]) continue;
             if (t->nPinSet != -1 && t->nPinSet != nPinSet) continue;
+            fDumb = 100.0f - (f32)(s8)nIQ;
             if (nBest == -1 && t->bPriority) {
                 fBestDist2 = fDist2;
                 nBest      = nCand;
@@ -156,7 +161,8 @@ void AI_ChooseTarget(int nPlayer) {
             if ((s8)nSkill < t->nSkillReq) continue;
             if (t->nAggrReq < 0 && (s8)nAggr > __abs(t->nAggrReq)) continue;
             if ((s8)nAggr < t->nAggrReq) continue;
-            if (t->nPowerReq < 0 && (s8)nPower > __abs(t->nPowerReq)) continue;
+            powerByte = (s8)nPower;
+            if (t->nPowerReq < 0 && powerByte > __abs(t->nPowerReq)) continue;
             if ((s8)nPower < t->nPowerReq) continue;
             if (fDist > AI_MaxDistance(nPlayer, nKind, AI_FirstUsableClub(nPlayer, nKind))) continue;
 
