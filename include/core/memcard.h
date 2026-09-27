@@ -165,7 +165,7 @@ LAYOUT_ASSERT(SaveImage, MC_BUFFER_SIZE);
 #define MC_SAVE_4D0C0       0x1000          // n4D0C0
 
 extern MCCardState lbl_801F1510[MC_NUM_PORTS][MC_NUM_SLOTS];
-extern u8    lbl_80281FD0[MC_NUM_PORTS];    // the card in this port had an I/O error: its
+extern u8    lbl_80281FD0[8];               // the card in this port had an I/O error: its
                                             // operations fail with -25 until the next start
 extern s32   lbl_80282000[MC_NUM_PORTS];    // slots per port (1)
 extern u8    lbl_80282008[MC_NUM_PORTS];    // the port has a multitap (0)

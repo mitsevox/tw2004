@@ -4,6 +4,7 @@
 #include "engine.h"
 
 ProfClock lbl_801D97F8;
+ProfClock* lbl_802813B0 = &lbl_801D97F8;
 
 void TI_vInitModule(void) {
     int i;

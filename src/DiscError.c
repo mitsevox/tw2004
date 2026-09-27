@@ -30,6 +30,23 @@ void fn_800B7694(u8 b);
 // .bss (discerror.h)
 DiscGlyph lbl_801F66A8[107];
 
+// .sdata (discerror.h)
+u8 lbl_802814D0 = 1;
+u8 lbl_802814D1 = 1;
+u8 lbl_802814D2 = 1;
+
+// .sbss (discerror.h), in reverse address order as the compiler lays it out.
+// fake match: EA's lbl_802821A0 starts 8-aligned after lbl_80282198 (a 4-byte hole at
+// 0x8028219C, like the .sdata one before lbl_802814D8 and the .data one before lbl_80190DB0; the
+// cause is not known); the aligned attribute stands in for it.
+u32  lbl_802821A4;
+u8   lbl_802821A0 __attribute__((aligned(8)));
+u32  lbl_80282198;
+u16* lbl_80282194;
+u16  lbl_80282190;
+s32  lbl_8028218C;
+s32  lbl_80282188;
+
 // .data. lbl_8018FFC8: 24 zero bytes nothing references; config.yml's force_active keeps the
 // linker from stripping them.
 #pragma explicit_zero_data on

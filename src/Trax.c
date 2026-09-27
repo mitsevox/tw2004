@@ -218,3 +218,8 @@ void fn_800BA734(int bShow, s8 nTrack) {
     lbl_801F8458.nTrack = nTrack;
     lbl_801F8458.nFrames = 0;
 }
+
+// data-order note: defined after the functions, so this .sdata pointer follows the file's string
+// literal "\"%s\"" (0x80281508), as in the original.
+s32 lbl_802821E8;
+s32* lbl_80281510 = &lbl_802821E8;

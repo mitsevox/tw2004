@@ -267,6 +267,7 @@ f32 lbl_8018E958[2][4] = { {131.0f, 125.0f, 111.0f, 128.0f}, {176.0f, 173.0f, 16
 
 PsBallFxState lbl_801F1708;                     // .bss
 PsBallFxState* lbl_80281408 = &lbl_801F1708;    // .sdata
+u32 lbl_80282018;                                // .sbss (core/audtrack.h)
 
 // Set up the mesh and its buffers (50 quads; the second buffer gets each quad's texture corners),
 // clear the emitters and find the "sandtrl" texture.

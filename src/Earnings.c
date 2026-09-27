@@ -53,10 +53,13 @@ s32 lbl_80200010[10];
 CourseMoneyTracking lbl_801FFD90[10];     // the breakdown of each lbl_80200150 payout
 s32 lbl_801FFD68[10];
 CourseMoneyTracking lbl_801FFAE8[10];
-extern s32 lbl_80282248;
-extern s32 lbl_8028224C;
-extern s32 lbl_80282250;
-extern s32 lbl_80282254;
+
+// .sbss, reverse address order (lbl_80282258 is in game/earnings.h)
+s32 lbl_80282258;
+s32 lbl_80282254;
+s32 lbl_80282250;
+s32 lbl_8028224C;
+s32 lbl_80282248;
 
 s32 lbl_80191A08[39] = {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,

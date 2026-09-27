@@ -8,6 +8,9 @@
 #include "game.h"
 #include "engine.h"
 
+// This file's .sbss (game.h).
+s8 lbl_80282360;
+
 void GameModeReplay_LoadHole(void);
 void GameModeReplay_RestartHole(void);
 void GameModeReplay_StartGamePreData(void);
