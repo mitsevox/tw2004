@@ -1,6 +1,6 @@
 # fn_8016AEEC (UISScreen.c, 0x8016AEEC)
 
-Status: OPEN, 97.27% on 2026-09-25.
+Status: SOLVED 2026-09-27 (b12): j-block `int b = bLast;` stored as `b | bLast` (EA's mr is an or), loop-2 pEntry at function level, nNode as the loop counters.
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -44,6 +44,44 @@ unless you combine it with something new. Before you stop, add every attempt und
   pNode) reused as the counter of the start loop and the inner entry loop: 22 (start only 28, inner
   only 36, outer j 33); with every order of the declarations 22; plus the store-local lever 22.
   Left at 22: EA's `mr r30,r27` and a register rotation of the loop pointers.
+- 2026-09-27 b12 (quicktrial aligned on base.c, base 25; scripts in scratch b12/aeec/t*.py):
+  REGISTERS SOLVED, 1 instruction left. nNode as both entry-loop counters (22) + a j-block
+  `u8 bStore = (u8)(u64)bLast;` stored as `pEntry->n2 = bStore` (18: the (u64) keeps a hoisted
+  `clrlwi r30,r27,24` at EA's `mr r30,r27` spot, so bLast and the store value are two variables)
+  + rasim search on that dump (`r56=r27 r40=r25 r42=r25 r38=r24 r37=r27 ...`: 0 wrong) -> the
+  loop pointers at function level, declared `u8 bLast; UISEntry* pEntry2; UISNode* pNode; u32 j;
+  UISEntry* pEntry1; UISGroup* pGroup;` (loop-2 entry first, loop-1 entry and group last): 1 diff,
+  only `clrlwi r30,r27,24` for EA's `mr r30,r27` (scratch b12/aeec/best1.c). Any u8/u16/(s64)/(u64)
+  conversion there gives clrlwi/extsh; any plain copy (u8/s16/int/u32 bStore, fn-level or j-block,
+  or no bStore) is propagated or coalesced (9: registers move too). Not the mr:
+  `(s32)((s64)((u64)x << 32) >> 32)` on bLast / bStore (before loop 2, in the j block, in the
+  store, 1-2 deep, x 6 types: 18-20 on the old order, 1-5 with clrlwi on best1), s64/u64 bStore
+  (pair-low vreg; still propagated, 1-9), nested 64-bit casts 1-3 deep (2480 variants, none with
+  the mr), `x | x`, `x & x`, `x > x ? x : x` (folded), bStore = 1 in / before loop 1 then = bLast
+  (9), `nMsg == -1` recomputed for bStore (21-24), bLast and pEntry2 as one u32 variable (frontend
+  propagates it, 9), a shared u32/void* identity inline for both (9-13), per-function pragmas
+  (opt level 3, loop invariants, propagation, dead code/assignments, peephole, unroll, lifetimes,
+  cse; 14 sets x 8 forms): none gives the mr.
+  Mechanism: a surviving `mr` is coalesced unless its two sides interfere; EA's bLast (r27) is dead
+  in loop 2 (r27 = pEntry2 there), so EA's r30 must interfere with it before the copy.
+  More, all without the mr: dead defs of the store local (`= 0`, `= nMsg`, `= 1`, self) before or in
+  loop 1 with opt_dead_assignments/opt_dead_code off (frontend drops or splits them into a new
+  temp: 9); a dead srawi into it (`(s32)((s64)(s32)bLast >> 32)` then `= bLast`; the frontend
+  renames the second web, 9); `bLast op j` with j = 0 (+ | ^ - << >>, folded, 9); 1-7 nested
+  64-bit shift chains, as one expression or statements (propagated, 5-13); loop 2 as a static
+  inline taking bLast (48); register/volatile locals; bLast as int/u32/long/s16/u16/void* (5-9).
+  COMMITTED (b12): the 1-diff form with the original names (loop-2 pEntry at function level,
+  loop-1 pEntry block-scoped and shadowing it, pGroup block-scoped, j-block `u8 b = (u8)(u64)bLast`):
+  report 97.64 -> 99.44, only `clrlwi r30,r27,24` for `mr r30,r27`. Next lane: find what keeps
+  that copy (anything that makes r30 and r27 interfere, or a post-RA source of `or r30,r27,r27`).
+- 2026-09-27 b12, SOLVED: EA's `mr r30,r27` is `or r30,r27,r27` (7F7EDB78 is both). Read from
+  mwcceppc.exe (GC/2.6, coalescing at 0x57b9b0): the allocator coalesces only PCode whose opcode
+  flags have 0x10 (IsMove: PC_MR yes, PC_OR no). So an OR whose two operands become one vreg
+  survives everything. `(s64)bLast | bLast` (and ~1100 similar) gives `mr r29,r27` (store temp
+  created after the j-offset temp, so r29/r30 swap; rasim --key confirms); a j-block
+  `int b = bLast;` stored as `pEntry->n2 = b | bLast;` makes the OR an inner-loop hoisted temp
+  (lower @ number, higher priority): r30, exact (310 of 3000 variants of that shape exact).
+  Fix: 99.44 -> 100 (labelled fake: `b | bLast` is bLast).
 
 ## Lever sweep, 2026-09-24 (the PC, levers before 543bf7b)
 

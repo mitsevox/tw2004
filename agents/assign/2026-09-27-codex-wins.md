@@ -17,8 +17,9 @@ per-function `#pragma optimization_level 1/2`.
 | 3 | fn_8001144C | LLFont | 89.78%, 2112 B, ~59 hunks |
 
 Other lanes: UISEvent fn_80165E9C is a Claude lane's (touch only fn_80165670 there). Nobody else is
-in UIStudio.c or LLFont.c. LLFont's other open function (FO_spLoadFontFromStream) is free if a
-sub-agent finishes early.
+in UIStudio.c or LLFont.c. UPDATE 06:20 UTC: LLFont's other open function
+(FO_spLoadFontFromStream) is now a Claude lane's (b11): don't take it. A sub-agent that finishes
+early goes back to UIStudio fn_80166098.
 
 Rules as before: EA's form first; else a labelled `// fake match:` (+ `// port:` when a 64-bit value
 is truncated) that leaves the logic exactly unchanged, checked by hand. Log attempts in

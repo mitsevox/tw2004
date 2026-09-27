@@ -1,6 +1,9 @@
 # fn_8016ABBC (UISScreen.c, 0x8016ABBC)
 
-Status: OPEN, 96.23% on 2026-09-25.
+Status: SOLVED 2026-09-27 (lane b12), 96.23 -> 100, labelled fake match: fn_8016AD54's recipe
+(pLoop8/pPrev8 copies carried round case 8's loop, pLoop7 round case 7's, one shared nCount for
+nGroups/nEntries) plus the declaration order pGroup, pNode, i, nCount, pEntry, pPrev8, pLoop8,
+pLoop7 (rasim.py search). No OR lever needed. Commit: see `git log -- agents/tried/fn_8016ABBC.md`.
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -9,6 +12,24 @@ unless you combine it with something new. Before you stop, add every attempt und
 ## Attempts
 
 (add yours here: date, lane, what, score)
+
+- 2026-09-27 b12 (quicktrial aligned, base 16; scripts /home/user/scratch/tw/agents/b12/o1.py,
+  qt.py, mk.py): OR lever (`s32 q = (s32)p; pNode = (UISNode*)(q | (u32)p)`, same for pGroup):
+  `void* q`/`T* q` copies fold (16); integer q of another type survives as `or r30,r7,r7` (15, EA's
+  shape, registers rotated). With function-level decls + one shared nCount + first read through p,
+  rasim order (pGroup, pNode, i, nCount, pEntry): 4, all registers right, only `lwz r3,0(r7)` is
+  scheduled before the `or` in both cases (pre-RA pass: the load is independent and on the
+  critical path). Load read through pNode: 2 (`lwz r3,0(r29)`: the post-RA peephole rewrites the
+  first load after a kept copy only for a real mr, not for an or). `#pragma scheduling once/off`:
+  19-34. Volatile first pInfo read: 8. Dead srawi deadsearch (sched750 --two) on the block: none.
+  Double 64-bit shift chain as pNode's init keeps a real `mr r28,r7` (17) but its dead srawis sit in
+  the block and make the final pass reschedule it (lwz first). Observation: block flag 0x8 in the
+  dumps looks like "scheduled, unchanged": the post-RA pass reschedules only blocks changed after
+  allocation (srawi deletion, coalesced copies), and the peephole's load rewrite alone seems not to
+  count; EA's `mr; lwz 0(r7)` order needs a real mr with nothing else deleted from the block.
+  Shift chain on p at the function top: 42-101. Then fn_8016AD54's closing recipe (pLoop8/pPrev8,
+  pLoop7, shared nCount): 6 (case 7 exact, case 8 pNode/i swapped); rasim.py search 38..45 ->
+  order pGroup, pNode, i, nCount, pEntry, pPrev8, pLoop8, pLoop7: 0. Exact in the build (report 100).
 
 - 2026-09-26 r6-uis (quicktrial aligned, base 16), mwcc-debugger: EA's `mr r29,r7; lwz r3,0x0(r7)`
   is NOT a partial copy propagation: it is the post-regalloc peephole (backend "after-peephole")

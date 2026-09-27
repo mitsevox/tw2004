@@ -478,6 +478,15 @@ They will be sorted into the sections below.
 
 ### New from round 7 (2026-09-26 evening)
 
+- **[verified, fake-match class] A kept `mr rX,rY` may be `or rX,rY,rY`** (the same encoding,
+  e.g. 7F7EDB78 = `mr r30,r27`). The register allocator only coalesces opcodes flagged "is a
+  move" (flag 0x10 in the opcode table; coalescing routine at 0x57b9b0 in GC/2.6 mwcceppc.exe):
+  PC_MR has it, PC_OR does not. So an OR whose two operands become one register survives every
+  copy-propagation pass and is never coalesced. Write `x | y` with y a separate local holding the
+  same value (`int b = bLast; ... = b | bLast;`); `x | x` and `x | Read(x)` fold in the frontend.
+  Where the OR sits sets its priority: in the inner loop's store it was a hoisted inner temp and
+  took r30 (EA); once at the outer loop level it took r29. UISScreen fn_8016AEEC 99.44 -> 100
+  (labelled). Try it first on UIS kept copies that no copy-chain form reproduces.
 - **[verified] A spilling function's final registers come from the LAST regalloc pass**: pass 1
   spills, pass 2 recolours. Read the last pass (mwccdbg's summary now marks superseded passes);
   `rasim.py --pass` replays it, including the spill-cost choice (lowest cost / remaining
