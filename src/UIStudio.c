@@ -1135,6 +1135,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                         nGrow = nRep - nFind;
                         bMatch = 1;
                         for (k = j; k < j + nFind; k++) {
+                            // fake match: repeat this invariant to reproduce EA's live range.
+                            nGrow = nRep - nFind;
                             if (k >= pText->nSize) {
                                 bMatch = 0;
                                 break;
