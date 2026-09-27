@@ -1,5 +1,5 @@
 // CamSpline.c (our name): the spline paths the scripted, static and dynamic cameras move along
-// (a Catmull-Rom basis matrix in lbl_80191440 applied with VecMath.c's fn_800BAD60).
+// (a Catmull-Rom basis matrix in lbl_80191440 applied with VecMath.c's Mtx_MultVec4).
 
 #include "game_types.h"
 #include "engine.h"
@@ -105,8 +105,8 @@ void fn_800C7480(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3, f32* pLook0, f3
     aPoints[1][3] = 0.0f;
     aPoints[2][3] = 0.0f;
     aPoints[3][3] = 0.0f;
-    fn_800BAD60(lbl_80191440, &vT, &vWeights);
-    fn_800BAD60(aPoints, &vWeights, &vOut);
+    Mtx_MultVec4(lbl_80191440, &vT, &vWeights);
+    Mtx_MultVec4(aPoints, &vWeights, &vOut);
     Vec3Copy(&vOut.x, pSub);
     *pFov = fT * (fFov2 - fFov1) + fFov1;
 }
@@ -132,8 +132,8 @@ void fn_800C7898(f32* p0, f32* p1, f32* p2, f32* p3, f32* pOut, f32 fT) {
     aPoints[1][3] = 0.0f;
     aPoints[2][3] = 0.0f;
     aPoints[3][3] = 0.0f;
-    fn_800BAD60(lbl_80191440, &vT, &vWeights);
-    fn_800BAD60(aPoints, &vWeights, &vOut);
+    Mtx_MultVec4(lbl_80191440, &vT, &vWeights);
+    Mtx_MultVec4(aPoints, &vWeights, &vOut);
     Vec3Copy(&vOut.x, pOut);
 }
 

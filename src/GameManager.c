@@ -112,7 +112,7 @@ void fn_800DCBB8(void) {
 }
 
 void fn_800DCBBC(void) {
-    if (fn_800EC550() == 0) {
+    if (GM5_IsChallengeRunning() == 0) {
         fn_800E1074();
         fn_800E1434();
     }
@@ -138,7 +138,7 @@ int GM_GotoNextSelectedHole(void) {
     int i;
     for (i = gpGame->nCurHole + 1; i < 18; i++) {
         if (gpGame->bHoleSelected[i]) {
-            if (fn_800E177C() == 2 && gpGame->nCurHole < 9 && i >= 9) {
+            if (Game_GetMulliganRule() == 2 && gpGame->nCurHole < 9 && i >= 9) {
                 fn_800E2470();
             }
             fn_800E1480(i);
@@ -252,7 +252,7 @@ void GM_EndOfGolferTurn_GameFinished(int nPlayer) {
     }
     if (gSession.b12 == 0 && gSession.a8[0] == 0) {
         if (gpGame->b275) {
-            if (!gpGame->b274 || fn_800EC550()) {
+            if (!gpGame->b274 || GM5_IsChallengeRunning()) {
                 fn_800E4D94(1);
             } else {
                 fn_800E4D94(0);
@@ -271,7 +271,7 @@ void GM_HoleFinished_GameNotFinished(int nPlayer) {
     int nView;
     gpGame->pfn210(nPlayer);
     if (gpGame->b275 && !fn_800E4BF8()) {
-        if (!gpGame->b274 || fn_800EC550()) {
+        if (!gpGame->b274 || GM5_IsChallengeRunning()) {
             fn_800E4C20(1);
         } else {
             fn_800E4C20(0);
@@ -312,7 +312,7 @@ u8 GM_CheckForAIConcede(int nPlayer) {
 // TW06: GM_BallHit.
 void GM_BallHit(int nPlayer) {
     gPlayers[nPlayer].bLowIQPenalty = 0;
-    fn_80062D6C(0x4E, nPlayer);
+    GameMsg_SendInt(0x4E, nPlayer);
     if (gpGame->b271) {
         fn_800E3D38(nPlayer, 0);
     }
@@ -527,7 +527,7 @@ void GM_PlayerTookShot(int nPlayer) {
 // view's flag comes out unless another player on that view is still off the green.
 u8 GM_PlayerTakeMulligan(int nPlayer) {
     int i;
-    if (fn_800E177C() == 0) {
+    if (Game_GetMulliganRule() == 0) {
         return 0;
     }
     if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_CONCEDED) {
@@ -536,7 +536,7 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     if (fn_800E53B8()) {
         return 0;
     }
-    if (fn_800E177C() == 2) {
+    if (Game_GetMulliganRule() == 2) {
         if (gPlayers[nPlayer].bMulliganUsed) {
             return 0;
         }
@@ -1406,9 +1406,9 @@ u8 fn_800E0A90(int nPlayer) {
 }
 
 void fn_800E0A98(int a) {
-    fn_80062D6C(46, (u8)a);
+    GameMsg_SendInt(46, (u8)a);
 }
 
 void fn_800E0AC4(int a) {
-    fn_80062D6C(29, (u8)a);
+    GameMsg_SendInt(29, (u8)a);
 }

@@ -229,7 +229,7 @@ void fn_800985FC(GlowQueue* pQueue, f32 (*pMtx)[4], int bOnTop) {
             v.y = pGlow->vPos[1];
             v.z = pGlow->vPos[2];
             v.w = 1.0f;
-            fn_800BAD60(pMtx, &v, &v);
+            Mtx_MultVec4(pMtx, &v, &v);
             if (v.z > 0.0f) {
                 fn_80098408(pGlow, &v.x);
             }
@@ -335,7 +335,7 @@ void ColGlow_RenderAllGlowInCurrentList(void) {
         // port: the lens's 0x04..0x44 block is used as a matrix here (CamLens has v4 there)
         fn_80013D9C(pCamera, pLens->m4);
         fn_80013EEC(Camera_GetCurrent());
-        fn_80016B9C();
+        RenderState_SetCameraMatrices();
         RenderState_SetBlendFactors(4, 1);
         RenderState_SetAlphaTest(0, 6, 0x80);
         RenderState_SetDepthWrite(0);

@@ -684,7 +684,7 @@ u8 fn_8006434C(void* pCamera, f32* pPos, f32* pX, f32* pY, f32* pZ) {
     u8 bInFront = 1;
 
     pPos[3] = 1.0f;
-    fn_800BAD60(((Camera*)pCamera)->mDC, (Vec4*)pPos, (Vec4*)v);
+    Mtx_MultVec4(((Camera*)pCamera)->mDC, (Vec4*)pPos, (Vec4*)v);
     if (v[3] >= 0.0f) {
         bInFront = 0;
     }

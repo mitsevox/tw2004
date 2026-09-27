@@ -54,7 +54,7 @@ typedef enum EASBProcessE {
     EASB_PROCESS_COMPLETE = 2
 } EASBProcessE;
 
-// What a call needs from the memory-card session (the argument of fn_8012CCD8).
+// What a call needs from the memory-card session (the argument of EASB_CheckState).
 #define EASB_NEED_FILE 0        // the Bio file must be open
 #define EASB_NEED_NO_FILE 1     // no file may be open
 #define EASB_NEED_ANY 2         // either
@@ -236,7 +236,7 @@ typedef struct EASBStorage {
     u8 unk16A[2];
     u32 uOldestTime;                // 0x16C: the oldest record seen by fn_8012A4C4
     s32 nFoundKind;                 // 0x170: how nFoundSlot was picked (becomes n94)
-    s32 nLastError;                 // 0x174: the tag-file library's last error (fn_8012C98C)
+    s32 nLastError;                 // 0x174: the tag-file library's last error (EASB_ErrorFromTagError)
     s32 nResult;                    // 0x178: the error that stopped nLastOperation (fn_8012C1AC)
     s32 nLastOperation;             // 0x17C: the operation that failed
     EASBStorageArgs args;           // 0x180: the running operation's arguments
@@ -290,7 +290,7 @@ EASBErrorE fn_8012C6D4(EASBTotals* pTotals, EASBProduct* pProduct, int eDevice, 
 s32 fn_8012CCC0(void);              // the operation that failed (EASBStorage.nLastOperation)
 
 // EASB.c
-EASBErrorE fn_8012CCD8(s32 nNeed);
+EASBErrorE EASB_CheckState(s32 nNeed);
 EASBErrorE fn_8012CD8C(void);
 EASBErrorE fn_8012CF00(void);
 EASBErrorE fn_8012CF64(void);

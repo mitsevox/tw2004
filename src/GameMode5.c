@@ -641,7 +641,8 @@ void fn_800EC544(Challenge* p0, s32 p1) {
     lbl_80281668 = p1;
 }
 
-u8 fn_800EC550(void) {
+// Whether one of the mode's challenges is being played (set when it starts, cleared when it ends).
+u8 GM5_IsChallengeRunning(void) {
     return lbl_802822FC;
 }
 
@@ -1196,5 +1197,5 @@ void fn_800ED6F8(f32 x0) {
 }
 
 void fn_800ED710(s32 p0) {
-    fn_80062D6C(18, p0);
+    GameMsg_SendInt(18, p0);
 }

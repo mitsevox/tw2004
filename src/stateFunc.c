@@ -26,7 +26,7 @@ void  SW_vImpact(int nPlayer);
 void  SW_UpdateVibration(int nPlayer);
 void  fn_80098C70(void);
 void  GOLFERSTATE_Pop(int nPlayer);
-void  fn_80067710(int nPlayer, int a, u8 nEvent);
+void  SitDev_QueueEvent(int nPlayer, int a, u8 nEvent);
 s8    GOLFERSTATE_GetPreviousState(int nPlayer);  // the state below the top of the stack
 void  fn_80017158(int nView);
 void  fn_80039344(int nView, f32 f);             // a per-view float (0x801D5010[nView])
@@ -532,7 +532,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
             fn_800D1DAC(nPlayer);
         }
     }
-    if (gPlayers[nPlayer].bC2E == 0 && !Player_IsCPU(nPlayer) && fn_800EC550() && fn_800ED540()) {
+    if (gPlayers[nPlayer].bC2E == 0 && !Player_IsCPU(nPlayer) && GM5_IsChallengeRunning() && fn_800ED540()) {
         if (fn_800F0818()) {
             fn_800E502C(fn_800EAC7C());
         } else {
@@ -790,7 +790,7 @@ void STATEFUNC_ZoomInit(int nPlayer) {
         nView = gPlayers[nPlayer].nView[0];
         CameraController_SetCameraMode(ViewController_GetCameraController(nView), 1, nPlayer, nView);
     }
-    fn_80062D38(0x62, 1, nPlayer);
+    GameMsg_Send2Ints(0x62, 1, nPlayer);
     lbl_80281E11 = 1;
 }
 
@@ -830,7 +830,7 @@ void STATEFUNC_ZoomUpdate(int nPlayer) {
     TARGET_UpdateMomentums(nPlayer);
     if (lbl_80281E11 != 0) {
         if (fn_800C7340(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]), nPlayer)) {
-            fn_80062D6C(0x67, nPlayer);
+            GameMsg_SendInt(0x67, nPlayer);
             lbl_80281E11 = 0;
         }
     }
@@ -1315,7 +1315,7 @@ void STATEFUNC_InTheHoleInit(int nPlayer) {
     ViewController_GetCameraController(gPlayers[nPlayer].nView[0]);
     Mem_cpy(&gPlayers[nPlayer].ballBefore, &gPlayers[nPlayer].ball, sizeof(Ball));
     Emotion_UpdatePlayerEmotion(nPlayer);
-    fn_80067710(nPlayer, 0, 0x21);
+    SitDev_QueueEvent(nPlayer, 0, 0x21);
     lbl_80281E12 = 1;
     if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
         fn_8006AAB4(nPlayer, 2);
@@ -1391,7 +1391,7 @@ void STATEFUNC_ShowYardageInit(int nPlayer) {
     ViewController_GetCameraController(gPlayers[nPlayer].nView[0]);
     Mem_cpy(&gPlayers[nPlayer].ballBefore, &gPlayers[nPlayer].ball, sizeof(Ball));
     Emotion_UpdatePlayerEmotion(nPlayer);
-    fn_80067710(nPlayer, 0, 0x21);
+    SitDev_QueueEvent(nPlayer, 0, 0x21);
     lbl_80281E13 = 1;
 }
 
@@ -2097,27 +2097,28 @@ void fn_80062C5C(void) {
 }
 
 void fn_80062C80(int a, u8 b) {
-    fn_80062D38(0x1E, a, b);
+    GameMsg_Send2Ints(0x1E, a, b);
 }
 
 void fn_80062CB0(int a, u8 b) {
-    fn_80062D38(0x14, a, b);
+    GameMsg_Send2Ints(0x14, a, b);
 }
 
 void fn_80062CE0(u8 a) {
-    fn_80062D6C(0x23, a);
+    GameMsg_SendInt(0x23, a);
 }
 
 void fn_80062D0C(int nPlayer) {
-    fn_80062D6C(9, nPlayer + 1);
+    GameMsg_SendInt(9, nPlayer + 1);
 }
 
-void fn_80062D38(int nMsg, int nA, int nB) {
-    fn_800E5998(nMsg, 0, &nA, &nB);
+void GameMsg_Send2Ints(int nMsg, int nA, int nB) {
+    GameMsg_Send2(nMsg, 0, &nA, &nB);
 }
 
-void fn_80062D6C(int nMsg, int nValue) {
-    fn_800E590C(nMsg, 0, &nValue);
+// Sends front-end message nMsg with one int value.
+void GameMsg_SendInt(int nMsg, int nValue) {
+    GameMsg_Send1(nMsg, 0, &nValue);
 }
 
 void fn_80062D98(void) {

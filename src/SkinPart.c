@@ -861,8 +861,8 @@ void fn_800CDF80(Skin* pSkin, int nPart, int nVariant, int nLink) {
 
 void fn_800CE02C(Skin* pSkin, int n) {
     if (pSkin->pModel->pDesc != NULL && (pSkin->u10D4 & 2)) {
-        fn_80035138(1);
-        fn_80016B9C();
+        RenderState_SetClipMode(1);
+        RenderState_SetCameraMatrices();
         RenderState_Flush();
         fn_8011387C(0x400);
         fn_801138CC(pSkin->pModel->pDesc);

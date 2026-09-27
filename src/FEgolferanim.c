@@ -891,10 +891,10 @@ void fn_8008C93C(void) {
     fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 1, 1);
     fn_80013EEC(Camera_GetCurrent());
     fn_8001425C(0);
-    fn_80014194(colour);
+    RenderView_SetColor(colour);
     RenderState_SetDrawFlags(0);
     RenderState_Flush();
-    fn_8001644C(0xA1, xy, 0, NULL, 2);
+    RenderView_DrawPrimitive(0xA1, xy, 0, NULL, 2);
     RenderState_SetDepthFunc(3);
     RenderState_SetDepthWrite(1);
     fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
@@ -917,11 +917,11 @@ void fn_8008CA88(void) {
     RenderState_SetDrawFlags(0x50);
     fn_8001425C(0);
     colour[3] = lbl_80281EE0->f14C;
-    fn_80014194(colour);
+    RenderView_SetColor(colour);
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
     fn_8002A608(&lbl_801D8714);
     RenderState_Flush();
-    fn_8001644C(0xA1, xy, 0, uv, 2);
+    RenderView_DrawPrimitive(0xA1, xy, 0, uv, 2);
     fn_80016B54(512, 448, 1.0f, 1.0f);
     RenderState_Flush();
 }
@@ -942,14 +942,14 @@ void fn_8008CC30(void) {
     fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 4, 1);
     fn_80013EEC(Camera_GetCurrent());
     fn_8001425C(0);
-    fn_80014194(colour1);
+    RenderView_SetColor(colour1);
     RenderState_SetDrawFlags(0);
     RenderState_Flush();
-    fn_8001644C(0xA1, xy1, 0, NULL, 2);
-    fn_80014194(colour2);
+    RenderView_DrawPrimitive(0xA1, xy1, 0, NULL, 2);
+    RenderView_SetColor(colour2);
     RenderState_SetDepthFunc(3);
     RenderState_Flush();
-    fn_8001644C(0xA1, xy2, 0, NULL, 2);
+    RenderView_DrawPrimitive(0xA1, xy2, 0, NULL, 2);
     RenderState_SetDepthFunc(3);
     RenderState_SetDepthWrite(1);
     fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
@@ -978,8 +978,8 @@ void fn_8008CE88(u8 bFull) {
         fn_80035240(lbl_80281EE0->mC0);
         fn_800352BC();
         fn_80013CCC(Camera_GetCurrent());
-        fn_80016B9C();
-        fn_80035138(1);
+        RenderState_SetCameraMatrices();
+        RenderState_SetClipMode(1);
         RenderState_SetAlphaTest(1, 6, 1);
         if (bFull) {
             fn_800140E8(1, 384, 528, 0, 1, 1);

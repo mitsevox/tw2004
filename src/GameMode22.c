@@ -313,7 +313,7 @@ void fn_80126184(void) {
     }
     if (lbl_802819A0-- <= 0) {
         nLength = fn_800D0550(lbl_80282278);
-        fn_80062D38(0x4D, 0, nLength);
+        GameMsg_Send2Ints(0x4D, 0, nLength);
         if (nLength != 0 && nLength != lbl_80282584) {
             if (lbl_80282588 == 0) {
                 // port: EA passes two arguments fn_800A746C ignores
@@ -598,7 +598,7 @@ void fn_80126698(int nPlayer) {
         if (nLength > lbl_80195498.f10) {
             if (lbl_80195498.f10 != 0.0f) {
                 if (nPlayer != lbl_80195498.n14 && lbl_80195498.n14 != 5) {
-                    fn_80062D38(0x4C, nLength, nPlayer);
+                    GameMsg_Send2Ints(0x4C, nLength, nPlayer);
                     ADD_MSG(0xB);
                     if (nPlayer == 0) {
                         ADD_MSG(5);
@@ -666,7 +666,7 @@ void fn_80126698(int nPlayer) {
         pPlayer->nEA8 = nLength;
         Vec_Copy(pPlayer->ball.vPos, pPlayer->vEAC);
         if (gPlayers[nPlayer].nEA8 > gPlayers[1 - nPlayer].nEA8) {
-            fn_80062D38(0x4C, nLength, nPlayer);
+            GameMsg_Send2Ints(0x4C, nLength, nPlayer);
             // port: EA passes two arguments fn_800A746C ignores
             ((void (*)(s32, int, int, int, int))fn_800A746C)(0, 0, 0, 0, 0);
         }

@@ -124,13 +124,13 @@ void BreakLine_Render(int nView) {
 
     if (gSession.options.a24[2]) {
         Vec_Distance(lbl_80282228->vPin, gPlayers[nPlayer].vTarget);
-        fn_80016B9C();
+        RenderState_SetCameraMatrices();
         RenderState_SetBlendFactors(4, 5);
         RenderState_SetAlphaTest(0, 6, 0x80);
         RenderState_SetDepthWrite(0);
         fn_8005CC64(lbl_80282228->pBank, lbl_80282228->pTex);
         RenderState_SetDrawFlags(0x70);
-        fn_80035138(0);
+        RenderState_SetClipMode(0);
         RenderState_Flush();
         fDist = Vec_Distance(lbl_80282228->aBall[nView].vPos, lbl_80282228->vPin);
         if (lbl_80282228->abA91C[nView]) {

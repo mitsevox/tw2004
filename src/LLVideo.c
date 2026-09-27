@@ -200,7 +200,7 @@ void fn_800755F0(int nFlags) {
     colour[1] = 0.0f;
     colour[2] = 0.0f;
     colour[3] = bFade ? 0.1f : 0.5f;
-    fn_80014194(colour);
+    RenderView_SetColor(colour);
     fn_800141F8(xy, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
     fn_80008380();
@@ -213,7 +213,7 @@ void fn_800755F0(int nFlags) {
     for (i = 0; i < nFrames; i++) {
         if (bFade && i >= nFrames - 2) {
             colour[3] = 0.5f;
-            fn_80014194(colour);
+            RenderView_SetColor(colour);
         }
         fn_800162A8();
         fn_80006EDC();
@@ -230,7 +230,7 @@ void fn_800755F0(int nFlags) {
         RenderState_SetAlphaTest(0, 6, 0x80);
         RenderState_SetDepthFunc(7);
         RenderState_Flush();
-        fn_8001644C(0xA1, xy, 0, NULL, 2);
+        RenderView_DrawPrimitive(0xA1, xy, 0, NULL, 2);
         fn_80013400();
         fn_80006FE8();
         fn_80008380();
@@ -394,7 +394,7 @@ void fn_80075C88(void) {
     fn_800760B0(0, 0, 512, 448);
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
-    fn_80014194(NULL);
+    RenderView_SetColor(NULL);
     lbl_80281200->n20 = FO_eGetCurrentAddMode();
     FO_vSetCurrentAddMode(1);
     fn_80012B2C(1.0f, 1.0f);
@@ -464,7 +464,7 @@ void fn_80075DEC_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nAr
         }
         fn_800760D8(&pVideo->pict);
         RenderState_Flush();
-        fn_8001644C(0xA1, xy, 0, uv, 2);
+        RenderView_DrawPrimitive(0xA1, xy, 0, uv, 2);
         while (fn_8006E118(TI_sReadCounter(0), tFrame) < 1.0f / 33.0f) {
         }
         fn_80006FE8();
@@ -538,7 +538,7 @@ void fn_800760D8(LLPict* pPict) {
     lbl_801B8980.uFlags |= 4;
 }
 
-// Fills the texture coordinates for drawing a picture (fn_8001644C).
+// Fills the texture coordinates for drawing a picture (RenderView_DrawPrimitive).
 void fn_800760F4(f32* pUV, LLPict* pPict) {
     pUV[0] = 0.0f;
     pUV[1] = 0.0f;

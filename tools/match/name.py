@@ -149,7 +149,7 @@ def add_comments(rows):
         if changed:
             p.write_bytes(eol.join(lines).encode('utf-8', 'surrogateescape'))
     skipped += [f'{n} (definition not found)' for n in want if n not in found]
-    return added, skipped
+    return added, list(dict.fromkeys(skipped))
 
 
 def main():

@@ -1,6 +1,6 @@
 // EASB.c (our name, after the library's "EASB" file tag): the public calls of the EA Sports Bio
 // library (the ones EASportsBio.c makes) and their helpers. Most first check the library's state
-// (lbl_802825B8) and the card session (fn_8012CCD8); file operations go to the storage code before it.
+// (lbl_802825B8) and the card session (EASB_CheckState); file operations go to the storage code before it.
 
 #include "core/easb.h"
 #include "platform.h"
@@ -9,7 +9,7 @@ EASBState* lbl_802825B8;
 
 // Checks that the library is running with a valid product, and that the Bio file is open or
 // closed as the call needs (EASB_NEED_*).
-EASBErrorE fn_8012CCD8(s32 nNeed) {
+EASBErrorE EASB_CheckState(s32 nNeed) {
     if (lbl_802825B8 == NULL) return EASB_ERROR_NOT_INITIALIZED;
     if (lbl_802825B8->product.bValid == 0) return EASB_ERROR_INVALID_PRODUCT;
     if (fn_8012C83C() == 1 && !fn_8012C848()) return EASB_ERROR_UNKNOWN;
@@ -120,7 +120,7 @@ EASBErrorE fn_8012D1A0(void) {
     u32 uStamp;
     u32 uElapsed;
 
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) {
         return eError;
     } else {
@@ -217,7 +217,7 @@ EASBErrorE fn_8012D394(EASBInitParams* pParams) {
 EASBErrorE fn_8012D560(void) {
     EASBErrorE eError;
 
-    eError = fn_8012CCD8(EASB_NEED_NO_FILE);
+    eError = EASB_CheckState(EASB_NEED_NO_FILE);
     if (eError != EASB_ERROR_NONE) {
         return eError;
     } else {
@@ -232,7 +232,7 @@ EASBErrorE fn_8012D560(void) {
 EASBErrorE fn_8012D5B0(void) {
     EASBErrorE eError;
 
-    eError = fn_8012CCD8(EASB_NEED_FILE);
+    eError = EASB_CheckState(EASB_NEED_FILE);
     if (eError != EASB_ERROR_NONE) {
         return eError;
     } else {
@@ -246,7 +246,7 @@ EASBErrorE fn_8012D5E4(void* pIcon, EASBImage* pImage) {
 
     if (pIcon == NULL) return EASB_ERROR_NULL_PARAMETERS;
     if (pImage != NULL) return EASB_ERROR_IMAGE_NOT_SUPPORTED;
-    eError = fn_8012CCD8(EASB_NEED_NO_FILE);
+    eError = EASB_CheckState(EASB_NEED_NO_FILE);
     if (eError != EASB_ERROR_NONE) return eError;
     eError = fn_80128200(pIcon, lbl_802825B8->uHeapID);
     if (eError != EASB_ERROR_NONE) return eError;
@@ -261,7 +261,7 @@ EASBErrorE fn_8012D5E4(void* pIcon, EASBImage* pImage) {
 EASBErrorE fn_8012D694(void) {
     EASBErrorE eError;
 
-    eError = fn_8012CCD8(EASB_NEED_NO_FILE);
+    eError = EASB_CheckState(EASB_NEED_NO_FILE);
     if (eError != EASB_ERROR_NONE) {
         return eError;
     } else {
@@ -273,7 +273,7 @@ EASBErrorE fn_8012D694(void) {
 EASBErrorE fn_8012D6C8(void) {
     EASBErrorE eError;
 
-    eError = fn_8012CCD8(EASB_NEED_FILE);
+    eError = EASB_CheckState(EASB_NEED_FILE);
     if (eError != EASB_ERROR_NONE) {
         return eError;
     } else {
@@ -288,7 +288,7 @@ EASBErrorE fn_8012D6C8(void) {
 EASBErrorE fn_8012D710(void) {
     EASBErrorE eError;
 
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) {
         return eError;
     } else {
@@ -301,7 +301,7 @@ EASBErrorE fn_8012D744(u32* pOut) {
     EASBErrorE eError;
 
     if (pOut == NULL) return EASB_ERROR_NULL_PARAMETERS;
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     return fn_8012C888(pOut);
 }
@@ -309,7 +309,7 @@ EASBErrorE fn_8012D744(u32* pOut) {
 EASBErrorE fn_8012D794(void* pImage) {
     EASBErrorE eError;
 
-    eError = fn_8012CCD8(EASB_NEED_FILE);
+    eError = EASB_CheckState(EASB_NEED_FILE);
     if (eError != EASB_ERROR_NONE) {
         return eError;
     } else {
@@ -333,7 +333,7 @@ EASBErrorE fn_8012D7F8(EASBProcessE* peProcess) {
     EASBErrorE eError;
 
     if (peProcess == NULL) return EASB_ERROR_NULL_PARAMETERS;
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     eError = fn_8012C388(peProcess, &nOperation);
     if (*peProcess == EASB_PROCESS_COMPLETE) {
@@ -357,7 +357,7 @@ EASBErrorE fn_8012D7F8(EASBProcessE* peProcess) {
 EASBErrorE fn_8012D8C4(u32 uCount) {
     EASBErrorE eError;
 
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) {
         return eError;
     } else {
@@ -371,7 +371,7 @@ EASBErrorE fn_8012D8C4(u32 uCount) {
 EASBErrorE fn_8012D93C(u32 uCount) {
     EASBErrorE eError;
 
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) {
         return eError;
     } else {
@@ -389,7 +389,7 @@ EASBErrorE fn_8012D9B4(u16* puLevel) {
     EASBErrorE eError;
 
     if (puLevel == NULL) return EASB_ERROR_NULL_PARAMETERS;
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     eError = fn_8012D290(EASB_PRODUCT_OURS, &pProduct);
     if (eError == EASB_ERROR_NONE) {
@@ -408,7 +408,7 @@ EASBErrorE fn_8012DA38(u16* puNextLevel) {
     u16 uLevel;
 
     if (puNextLevel == NULL) return EASB_ERROR_NULL_PARAMETERS;
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     eError = fn_8012D290(EASB_PRODUCT_OURS, &pProduct);
     if (eError == EASB_ERROR_NONE) {
@@ -423,7 +423,7 @@ EASBErrorE fn_8012DA38(u16* puNextLevel) {
 EASBErrorE fn_8012DAB8(u16 uLevel) {
     EASBErrorE eError;
 
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) {
         return eError;
     } else {
@@ -450,7 +450,7 @@ EASBErrorE fn_8012DB30(const u16* szName, u32 uValue, u16 uLanguage, u32 uTime) 
     u8 i;
 
     pSlot = NULL;
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     if (uValue > 250 || uValue == 0) return EASB_ERROR_INVALID_ACCOMPLISHMENT;
     if (!fn_801280F8(uLanguage)) return EASB_ERROR_INVALID_LANGUAGE;
@@ -497,7 +497,7 @@ EASBErrorE fn_8012DD24(u16* szName, u32 uValue, u16 uLanguage) {
 EASBErrorE fn_8012DD7C(u8 bFlag) {
     EASBErrorE eError;
 
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) {
         return eError;
     } else {
@@ -514,7 +514,7 @@ EASBErrorE fn_8012DDE0(u32* pOut) {
     EASBErrorE eError;
 
     if (pOut == NULL) return EASB_ERROR_NULL_PARAMETERS;
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     eResult = fn_8012D1A0();
     *pOut = lbl_802825B8->totals.u0;
@@ -526,7 +526,7 @@ EASBErrorE fn_8012DE38(u32* pOut) {
     EASBErrorE eError;
 
     if (pOut == NULL) return EASB_ERROR_NULL_PARAMETERS;
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     eResult = fn_8012D1A0();
     *pOut = lbl_802825B8->totals.u4;
@@ -539,7 +539,7 @@ EASBErrorE fn_8012DE90(u8* pnProducts) {
     u32 i;
 
     if (pnProducts == NULL) return EASB_ERROR_NULL_PARAMETERS;
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     if (lbl_802825B8->pProductBuffer == NULL) return EASB_ERROR_PRODUCT_NOT_LOADED;
     *pnProducts = 0;
@@ -556,7 +556,7 @@ EASBErrorE fn_8012DF4C(u16* puLevel, f32* pfProgress) {
     EASBErrorE eError;
 
     if (puLevel == NULL || pfProgress == NULL) return EASB_ERROR_NULL_PARAMETERS;
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     *puLevel = 0;
     *pfProgress = 0.0f;
@@ -572,7 +572,7 @@ EASBErrorE fn_8012DFDC(u8 nProduct, char* szName, u32 uSize) {
 
     if (szName == NULL) return EASB_ERROR_NULL_PARAMETERS;
     if (uSize < sizeof(pProduct->szName)) return EASB_ERROR_STRING_TOO_SMALL;
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     eError = fn_8012D290(nProduct, &pProduct);
     if (eError == EASB_ERROR_NONE) {
@@ -595,7 +595,7 @@ EASBErrorE fn_8012E084(u8 nProduct, u16* szGamesPlayedType, u32 uLength, u16* aL
         return EASB_ERROR_NULL_PARAMETERS;
     }
     if (uLength < sizeof(pProduct->szGamesPlayedType) / sizeof(u16)) return EASB_ERROR_STRING_TOO_SMALL;
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     eError = fn_8012D290(nProduct, &pProduct);
     if (eError == EASB_ERROR_NONE) {
@@ -617,7 +617,7 @@ EASBErrorE fn_8012E16C(u8 nProduct, u32* puTime) {
     EASBErrorE eError;
 
     if (puTime == NULL) return EASB_ERROR_NULL_PARAMETERS;
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     eError = fn_8012D290(nProduct, &pProduct);
     if (eError == EASB_ERROR_NONE) {
@@ -632,7 +632,7 @@ EASBErrorE fn_8012E1E0(u8 nProduct, u16* puLevel) {
     EASBErrorE eError;
 
     if (puLevel == NULL) return EASB_ERROR_NULL_PARAMETERS;
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     eError = fn_8012D290(nProduct, &pProduct);
     if (eError == EASB_ERROR_NONE) {
@@ -647,7 +647,7 @@ EASBErrorE fn_8012E25C(u8 nProduct, u32* pOut) {
     EASBErrorE eError;
 
     if (pOut == NULL) return EASB_ERROR_NULL_PARAMETERS;
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     eError = fn_8012D290(nProduct, &pProduct);
     if (eError == EASB_ERROR_NONE) {
@@ -663,7 +663,7 @@ EASBErrorE fn_8012E2D4(u8 nProduct, u32* pOut) {
     EASBErrorE eError;
 
     if (pOut == NULL) return EASB_ERROR_NULL_PARAMETERS;
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     eError = fn_8012D290(nProduct, &pProduct);
     if (eError == EASB_ERROR_NONE) {
@@ -679,7 +679,7 @@ EASBErrorE fn_8012E34C(u8 nProduct, u32* pOut) {
     EASBErrorE eError;
 
     if (pOut == NULL) return EASB_ERROR_NULL_PARAMETERS;
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     eError = fn_8012D290(nProduct, &pProduct);
     if (eError == EASB_ERROR_NONE) {
@@ -694,7 +694,7 @@ EASBErrorE fn_8012E3C0(u8 nProduct, u32* pOut) {
     EASBErrorE eError;
 
     if (pOut == NULL) return EASB_ERROR_NULL_PARAMETERS;
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     eError = fn_8012D290(nProduct, &pProduct);
     if (eError == EASB_ERROR_NONE) {
@@ -719,7 +719,7 @@ EASBErrorE fn_8012E434(u8 nProduct, u8 nIndex, s32 nSort, u16* szName, u32 uLeng
     if (uLength < EASB_ACCOMPLISHMENT_NAME_SIZE) return EASB_ERROR_STRING_TOO_SMALL;
     if (nSort == 0 && nIndex >= 5) return EASB_ERROR_INVALID_PARAMETERS;
     if (nSort == 1 && nIndex >= 27) return EASB_ERROR_INVALID_PARAMETERS;
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     eError = fn_8012D290(nProduct, &pProduct);
     if (eError != EASB_ERROR_NONE) return eError;
@@ -753,7 +753,7 @@ EASBErrorE fn_8012E670(u8 nProduct, s32 nSort, u8* pnCount) {
 
     bGap = 0;
     if (pnCount == NULL) return EASB_ERROR_NULL_PARAMETERS;
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     *pnCount = 0;
     eError = fn_8012D290(nProduct, &pProduct);
@@ -793,7 +793,7 @@ EASBErrorE fn_8012E820(u32 uTime, u16* pnDays, u8* pnHours, u8* pnMinutes, u8* p
     if (pnDays == NULL || pnHours == NULL || pnMinutes == NULL || pnSeconds == NULL) {
         return EASB_ERROR_NULL_PARAMETERS;
     }
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     return fn_8012881C(uTime, pnDays, pnHours, pnMinutes, pnSeconds);
 }
@@ -807,7 +807,7 @@ EASBErrorE fn_8012E8A8(u32 uTime, u16* pnYear, u8* pnMonth, u8* pnDay, u8* pnHou
         pnSeconds == NULL) {
         return EASB_ERROR_NULL_PARAMETERS;
     }
-    eError = fn_8012CCD8(EASB_NEED_ANY);
+    eError = EASB_CheckState(EASB_NEED_ANY);
     if (eError != EASB_ERROR_NONE) return eError;
     return fn_801288DC(uTime, pnYear, pnMonth, pnDay, pnHours, pnMinutes, pnSeconds);
 }

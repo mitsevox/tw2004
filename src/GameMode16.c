@@ -161,7 +161,7 @@ void fn_800F5014(int nPlayer) {
         }
         if (gPlayers[nPlayer].nDE4[nTarget] > 3) {
             lbl_80282398 = 0;
-            fn_800F3980(0x33, 0, 0, 0, 0xC8, 1);
+            GameMsg_Send5Ints(0x33, 0, 0, 0, 0xC8, 1);
             fn_800A63D0();
             nMsg = 2;
         } else {
@@ -174,7 +174,7 @@ void fn_800F5014(int nPlayer) {
                 GM_Earnings_AwardMoney(nPlayer, lbl_80282398, 0);
                 gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
                 gPlayers[nPlayer].nDD8 += lbl_80282398;
-                fn_800F3980(0x33, lbl_80282398, 0, 0, 0xCA, 1);
+                GameMsg_Send5Ints(0x33, lbl_80282398, 0, 0, 0xCA, 1);
                 lbl_80282398 = 0;
                 if ((s8)gPlayers[nPlayer].bE9E == 0) {
                     gPlayers[nPlayer].bE9E = 1;
@@ -232,7 +232,7 @@ void fn_800F5014(int nPlayer) {
                     }
                     break;
                 }
-                fn_800F3980(0x33, 0, 0, 0, nSurface, 1);
+                GameMsg_Send5Ints(0x33, 0, 0, 0, nSurface, 1);
             }
         }
     } else {
@@ -257,7 +257,7 @@ void fn_800F5014(int nPlayer) {
         } else {
             lbl_80282398 = 0;
             if (nMsg == -1) {
-                fn_800F3980(0x33, 0, 0, 0, 0xCB, 1);
+                GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCB, 1);
                 switch (Misc_RandFunc(0) & 3) {
                 case 0:
                     nMsg = 0x2F;
@@ -293,9 +293,9 @@ void fn_800F5014(int nPlayer) {
             gPlayers[nPlayer].nDD8 = 0;
         } else if (!gSession.bReplay) {
             if (fn_800F2788(nPlayer, fLength)) {
-                fn_800F3980(0x33, lbl_80282398, 0, 0, 0xD6, 1);
+                GameMsg_Send5Ints(0x33, lbl_80282398, 0, 0, 0xD6, 1);
             } else {
-                fn_800F3980(0x33, lbl_80282398, 0, 0, nSurface, 1);
+                GameMsg_Send5Ints(0x33, lbl_80282398, 0, 0, nSurface, 1);
             }
             if (lbl_80282398 > 0 && nSurface < 0x85) {
                 fn_800A62A4();

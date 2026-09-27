@@ -570,6 +570,6 @@ void fn_800AD450(u8 nId);
 void fn_800ADB4C(s16 nEmitter, u8 nTrack, u8 bOn);   // for every instance of an emitter: Emi_SetTrackEnabled
 void fn_800ADC44(s16 nEmitter, u8 nTrack, u8 n);     // fn_800AD9AC
 void fn_800ADCD0(s16 nEmitter, u8 nTrack, u8 n, int bCheck);   // fn_800ADA28
-void fn_800ADD54(s16 nEmitter, u8 nTrack, f32 fVolume);        // fn_800ADA94
+void fn_800ADD54(s16 nEmitter, u8 nTrack, f32 fVolume);        // Emi_SetTrackAttenuation
 
 #endif

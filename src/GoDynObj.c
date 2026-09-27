@@ -771,12 +771,12 @@ f32 fn_8004787C(int nPlayer) {
     fRadius = lbl_80281DA0->pTeo10000->pModel->apLod[0]->pInfo->f64 * lbl_80281128;
     Vec_Copy(gPlayers[nPlayer].ball.vPos, &vPos.x);
     vPos.w = 1.0f;
-    fn_800BAD60(pLens->m44, &vPos, &vAbove);
+    Mtx_MultVec4(pLens->m44, &vPos, &vAbove);
     Vec_Copy(&vAbove.x, &vBelow.x);
     vAbove.y += fRadius;
     vBelow.y -= fRadius;
-    fn_800BAD60(pCamera->m5C, &vAbove, &vTop);
-    fn_800BAD60(pCamera->m5C, &vBelow, &vBottom);
+    Mtx_MultVec4(pCamera->m5C, &vAbove, &vTop);
+    Mtx_MultVec4(pCamera->m5C, &vBelow, &vBottom);
     if (0.0f != vTop.w) {
         Vec_Scale(1.0f / vTop.w, &vTop.x, &vTop.x);
     }

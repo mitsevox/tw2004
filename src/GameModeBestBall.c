@@ -293,7 +293,7 @@ void fn_800E8A68(void) {
     int nProfile;
     int nOtherTeam;
     if (fn_800E1BBC()) {
-        switch (fn_800EC550()) {
+        switch (GM5_IsChallengeRunning()) {
         case 0:
             break;
         default:

@@ -114,10 +114,10 @@ void fn_800BA1A4(void) {
             vColour[2] = 0.9f;
             vColour[3] = fn_800BA504(0.15f);
         }
-        fn_80014194(vColour);
+        RenderView_SetColor(vColour);
         fn_800141F8(aXY, aUV, fn_800BA440(), fn_800BA40C(), fn_800BA440() + fn_800BA3D8(),
                     fn_800BA40C() + fn_800BA3A4());
-        fn_8001644C(0xA1, aXY, 0, aUV, 2);
+        RenderView_DrawPrimitive(0xA1, aXY, 0, aUV, 2);
         fn_800BA550();
         lbl_801F8458.nFrames++;
         return;

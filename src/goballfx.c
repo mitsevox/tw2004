@@ -51,7 +51,7 @@ void BFX_vRender(Ball* pBall, int nPlayer) {
     fGround = fn_8004D80C(Ter_GetTGD(), pBall->vPos);
     if (-65536.125f != fGround) {
         fn_8005CC64(lbl_80281F44, lbl_80281F48);
-        fn_80016B9C();
+        RenderState_SetCameraMatrices();
         RenderState_SetBlendFactors(4, 5);
         pPos = lbl_801D95C8[nPlayer];
         fSize = 0.02f;
@@ -106,7 +106,7 @@ void BFX_vRender(Ball* pBall, int nPlayer) {
         lbl_801D94D8[nPlayer][6] = 1.0f;
         lbl_801D94D8[nPlayer][7] = 1.0f;
         RenderState_SetDrawFlags(0x70);
-        fn_80035138(0);
+        RenderState_SetClipMode(0);
         RenderState_Flush();
         desc.n0 = 4;
         desc.nVerts = 4;

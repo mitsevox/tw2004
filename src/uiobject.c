@@ -196,7 +196,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
 
     // clear the depth under the object's corner of the screen
     fn_8001425C(0);
-    fn_80014194(aBlack);
+    RenderView_SetColor(aBlack);
     fn_80035F1C();
     RenderState_SetDrawFlags(0);
     RenderState_SetAlphaTest(0, 6, 0x80);
@@ -204,7 +204,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
     fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 2, 1);
     RenderState_Flush();
     GXSetZMode(1, 7, 1);
-    fn_8001644C(0xA1, aRect[0], NULL, NULL, 2);
+    RenderView_DrawPrimitive(0xA1, aRect[0], NULL, NULL, 2);
     RenderState_SetAlphaTest(1, 6, 0x80);
     RenderState_SetDepthFunc(3);
     fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
@@ -219,7 +219,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
     fn_800352BC();
     fn_80013CCC(Camera_GetCurrent());
     fn_80013EEC(Camera_GetCurrent());
-    fn_80016B9C();
+    RenderState_SetCameraMatrices();
 
     fBoost = (f32)gPlayers[nPlayer].swing.nPowerBoost / 8.0f;
     RenderState_SetDrawFlags(0x50);
@@ -237,8 +237,8 @@ void UI_Obj_RenderBoostUI(int nObj) {
         aXYZ[i][2] = aQuad[i][2] + lbl_801F5B98[nObj].a0[2];
         aXYZ[i][3] = 1.0f;
     }
-    fn_80014194(aBase);
-    fn_8001644C(0x98, aXYZ[0], NULL, aUV[0], 4);
+    RenderView_SetColor(aBase);
+    RenderView_DrawPrimitive(0x98, aXYZ[0], NULL, aUV[0], 4);
 
     // the same, grown by the boost level, in the level's colour
     for (i = 0; i < 4; i++) {
@@ -252,9 +252,9 @@ void UI_Obj_RenderBoostUI(int nObj) {
     if (gPlayers[nPlayer].swing.nPowerBoost > 0) {
         Vec3Copy(lbl_8018830C[gPlayers[nPlayer].swing.nPowerBoost - 1], aColour);
     }
-    fn_80014194(aColour);
+    RenderView_SetColor(aColour);
     RenderState_Flush();
-    fn_8001644C(0x98, aXYZ[0], NULL, aUV[0], 4);
+    RenderView_DrawPrimitive(0x98, aXYZ[0], NULL, aUV[0], 4);
 
     // a ring per level: each grows until it passes the largest size, fading out on the way
     fn_8005CC64(lbl_802820BC, lbl_802820C0);
@@ -280,8 +280,8 @@ void UI_Obj_RenderBoostUI(int nObj) {
                 aColour[2] = lbl_8018830C[i][2];
                 aColour[3] = 1.0f - (lbl_801F5B78[i] - fFade) / (fMax - fFade);
             }
-            fn_80014194(aColour);
-            fn_8001644C(0x98, aXYZ[0], NULL, aUV[0], 4);
+            RenderView_SetColor(aColour);
+            RenderView_DrawPrimitive(0x98, aXYZ[0], NULL, aUV[0], 4);
             lbl_801F5B78[i] += lbl_801F5B98[0].a28[2];
         }
     }
@@ -352,7 +352,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
     // the view as it was
     fn_80035240(NULL);
     fn_800AF0A8(pLens);
-    fn_80016B9C();
+    RenderState_SetCameraMatrices();
     fn_800352BC();
     fn_80013CCC(Camera_GetCurrent());
     fn_80035098(0);
@@ -376,8 +376,8 @@ void fn_800AEFE4(void) {
     RenderState_Flush();
     fn_80035240(lbl_802820D0->m80);
     fn_80035294();
-    fn_80016B9C();
-    fn_80035138(1);
+    RenderState_SetCameraMatrices();
+    RenderState_SetClipMode(1);
     RenderState_Flush();
     fn_800AF0D4(lbl_802820D0->pModel->apLod[0]);
     fn_8006ED70();

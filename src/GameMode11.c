@@ -1087,11 +1087,11 @@ void fn_80101EE8(void) {
 }
 
 void fn_80101F18(int nPlayer) {
-    fn_80062D6C(43, nPlayer);
+    GameMsg_SendInt(43, nPlayer);
 }
 
 void fn_80101F40(u8 a, int b) {
-    fn_80062D38(15, a, b);
+    GameMsg_Send2Ints(15, a, b);
 }
 
 void fn_80101F70(void) {
@@ -1099,7 +1099,7 @@ void fn_80101F70(void) {
 }
 
 void fn_80101F94(int a, int b) {
-    fn_80062D38(38, a, b);
+    GameMsg_Send2Ints(38, a, b);
 }
 
 void fn_80101FC0(int a, int b) {

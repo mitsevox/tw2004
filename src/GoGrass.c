@@ -54,7 +54,7 @@ void fn_80035F1C(void);
 void fn_80016948(void);
 s32  fn_8003505C(s32 n);           // sets a value, returns the old one
 void fn_80034AE4(void);
-void fn_80035138();
+void RenderState_SetClipMode();
 void fn_800352BC();
 void GrassRender_vBuildAndUploadOneTimeData(void);
 void fn_800738DC(TexBank* pBank, TexEntry* pTex, u8 bFirst);   // GoShaderObjectCommon
@@ -393,15 +393,15 @@ void fn_8011EC84(void) {
     fn_800352BC();
     fn_80013CCC(Camera_GetCurrent());
     fn_80013EEC(Camera_GetCurrent());
-    fn_80016B9C();
+    RenderState_SetCameraMatrices();
     RenderState_Flush();
     fn_8001425C(0);
     RenderState_SetDrawFlags(0);
-    fn_80014194(lbl_801945B8);
+    RenderView_SetColor(lbl_801945B8);
     RenderState_SetDepthWrite(0);
     RenderState_SetAlphaTest(0, 6, 128);
     RenderState_Flush();
-    fn_8001644C(161, lbl_801945C8, 0, lbl_801945C8, 2);
+    RenderView_DrawPrimitive(161, lbl_801945C8, 0, lbl_801945C8, 2);
     nOld = fn_8003505C(0);
     fn_80034AE4();
     fn_8003505C(nOld);
@@ -410,7 +410,7 @@ void fn_8011EC84(void) {
     fn_80013EEC(Camera_GetCurrent());
     fn_800352BC();
     fn_80013CCC(Camera_GetCurrent());
-    fn_80016B9C();
+    RenderState_SetCameraMatrices();
     fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
     fn_800760B0(0, 0, 512, 448);
     fn_80016B54(512, 448, 1.0f, 1.0f);
@@ -424,7 +424,7 @@ void fn_8011EC84(void) {
 void fn_8011EE4C(void) {
     fn_8001425C(0);
     RenderState_SetDrawFlags(16);
-    fn_80014194(lbl_801945E8);
+    RenderView_SetColor(lbl_801945E8);
     RenderState_SetDepthWrite(0);
     RenderState_SetAlphaTest(0, 6, 128);
     GXLoadTexObj(&lbl_8026038C, 0);
@@ -437,7 +437,7 @@ void fn_8011EE4C(void) {
     GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
     RenderState_SetDepthFunc(7);
     RenderState_Flush();
-    fn_8001644C(161, lbl_801945F8, 0, lbl_80194618, 2);
+    RenderView_DrawPrimitive(161, lbl_801945F8, 0, lbl_80194618, 2);
     RenderState_SetDepthFunc(3);
     RenderState_SetDepthWrite(1);
     RenderState_SetAlphaTest(1, 6, 128);
@@ -447,8 +447,8 @@ void fn_8011EE4C(void) {
 void fn_8011EF88(void) {
     fn_800352BC();
     fn_80013CCC(Camera_GetCurrent());
-    fn_80035138(0);
-    fn_80016B9C();
+    RenderState_SetClipMode(0);
+    RenderState_SetCameraMatrices();
     RenderState_SetAlphaTest(0, 6, 128);
     RenderState_SetDepthWrite(0);
     RenderState_SetDrawFlags(80);

@@ -618,8 +618,8 @@ void fn_800A3A84(void) {
     fn_80013CCC(Camera_GetCurrent());
     fn_80013EEC(Camera_GetCurrent());
     fn_80035240(0);
-    fn_80016B9C();
-    fn_80035138(0);
+    RenderState_SetCameraMatrices();
+    RenderState_SetClipMode(0);
     RenderState_SetAlphaTest(0, 6, 0x80);
     RenderState_SetDepthFunc(3);
     RenderState_SetBlendFactors(1, 1);

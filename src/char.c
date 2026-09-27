@@ -100,7 +100,7 @@ void  Character_PlaceFeetOnGround(Character* pChar);
 void  SKEL_TransformBones(CharModel* pModel, u32* auBits);
 void  fn_800B28D4(Character* pChar, int a, int b);
 void  fn_800B2FB0(Character* pChar, int a, int b);
-void  fn_800BAD60(f32 mtx[4][4], Vec4* src, Vec4* dst);    // VecMath.c: a point through a matrix
+void  Mtx_MultVec4(f32 mtx[4][4], Vec4* src, Vec4* dst);    // VecMath.c: a point through a matrix
 void  fn_8001EB8C(Character* pChar, int nBone, f32* pPos);
 void  fn_8001CCF8(UStreamObject* pObject);
 void  fn_8001CD80(UStreamObject* pObject);
@@ -441,10 +441,10 @@ void Character_UpdateTestPoints(Character* pChar) {
         pMtx3A = fn_8001EC6C(pChar, 0x3A);
         pMtx47 = fn_8001EC6C(pChar, 0x47);
         pMtx39 = fn_8001EC6C(pChar, 0x39);
-        fn_800BAD60(pMtx3A, (Vec4*)pChar->pSkin->a1048[0], (Vec4*)pChar->aPoints[0]);
-        fn_800BAD60(pMtx48, (Vec4*)pChar->pSkin->a1048[1], (Vec4*)pChar->aPoints[1]);
-        fn_800BAD60(pMtx39, (Vec4*)pChar->pSkin->a1048[2], (Vec4*)pChar->aPoints[2]);
-        fn_800BAD60(pMtx47, (Vec4*)pChar->pSkin->a1048[3], (Vec4*)pChar->aPoints[3]);
+        Mtx_MultVec4(pMtx3A, (Vec4*)pChar->pSkin->a1048[0], (Vec4*)pChar->aPoints[0]);
+        Mtx_MultVec4(pMtx48, (Vec4*)pChar->pSkin->a1048[1], (Vec4*)pChar->aPoints[1]);
+        Mtx_MultVec4(pMtx39, (Vec4*)pChar->pSkin->a1048[2], (Vec4*)pChar->aPoints[2]);
+        Mtx_MultVec4(pMtx47, (Vec4*)pChar->pSkin->a1048[3], (Vec4*)pChar->aPoints[3]);
     } else {
         fA = 0.8f * pChar->pModel->f10;
         fB = 0.8f * pChar->pModel->fC;
@@ -460,7 +460,7 @@ void Character_UpdateTestPoints(Character* pChar) {
         fn_8000AE6C(pChar->aPoints[1], pMtx48[2], 0.25f * fB, pChar->aPoints[1]);
     }
     if (pChar->p16D8 != NULL && pClubMtx != NULL) {
-        fn_800BAD60(pClubMtx, (Vec4*)pChar->p16D8->a3C[pChar->nClubClass], (Vec4*)pChar->aPoints[4]);
+        Mtx_MultVec4(pClubMtx, (Vec4*)pChar->p16D8->a3C[pChar->nClubClass], (Vec4*)pChar->aPoints[4]);
     }
 }
 
@@ -703,10 +703,10 @@ void fn_800184E4(Character* pChar, Skin* pSkin) {
             fn_8001EF54(&v3A.x, &vOffsetA.x, &v3A.x);
             fn_8001EF54(&v47.x, &vOffsetB.x, &v47.x);
             fn_8001EF54(&v39.x, &vOffsetB.x, &v39.x);
-            fn_800BAD60(m3A, &v3A, (Vec4*)pChar->pSkin->a1048[0]);
-            fn_800BAD60(m48, &v48, (Vec4*)pChar->pSkin->a1048[1]);
-            fn_800BAD60(m39, &v39, (Vec4*)pChar->pSkin->a1048[2]);
-            fn_800BAD60(m47, &v47, (Vec4*)pChar->pSkin->a1048[3]);
+            Mtx_MultVec4(m3A, &v3A, (Vec4*)pChar->pSkin->a1048[0]);
+            Mtx_MultVec4(m48, &v48, (Vec4*)pChar->pSkin->a1048[1]);
+            Mtx_MultVec4(m39, &v39, (Vec4*)pChar->pSkin->a1048[2]);
+            Mtx_MultVec4(m47, &v47, (Vec4*)pChar->pSkin->a1048[3]);
             pChar->pSkin->b1044 = 1;
         }
     }
@@ -2022,7 +2022,7 @@ void fn_8001B878(Character* pChar, int nPlayer) {
     }
     Vec3Copy(pChar->v1668, &vPos.x);
     vPos.w = 1.0f;
-    fn_800BAD60(((Camera*)Camera_GetCurrent())->viewMtx, &vPos, &vPos);
+    Mtx_MultVec4(((Camera*)Camera_GetCurrent())->viewMtx, &vPos, &vPos);
     Vec3Copy(&vPos.x, &sphere.x);
     sphere.radius = pChar->f1674;
     fDepth = sphere.z;
@@ -2957,7 +2957,7 @@ void fn_8001DB04(Character* pChar, f32* pOut) {
         pMtx = fn_8001ED08(pChar, 0);
         Vec3Copy(pChar->pCurClip->v80, &vPos.x);
         vPos.w = 1.0f;
-        fn_800BAD60(pMtx, &vPos, (Vec4*)pOut);
+        Mtx_MultVec4(pMtx, &vPos, (Vec4*)pOut);
         return;
     }
     fn_8001EB8C(pChar, 0, pOut);

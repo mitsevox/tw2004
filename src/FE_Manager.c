@@ -957,9 +957,9 @@ void fn_80078E34(SaveProfile* pProfile) {
     int nPick;
     int nPrev;
     CrAPAsset* pAsset;
-    fn_8007975C(pProfile, 10, 0);
-    fn_8007975C(pProfile, 9, 0);
-    fn_8007975C(pProfile, 16, 0);
+    FE_CrAP_RandomizePart(pProfile, 10, 0);
+    FE_CrAP_RandomizePart(pProfile, 9, 0);
+    FE_CrAP_RandomizePart(pProfile, 16, 0);
 
     bChance = Misc_RandFunc(0) % 100 < 10;
     bPicking = 1;
@@ -1085,10 +1085,10 @@ void fn_80078E34(SaveProfile* pProfile) {
     fn_801073DC(13);
     fn_801073DC(14);
     if (Misc_RandFunc(0) % 100 < 30) {
-        fn_8007975C(pProfile, 19, 0);
+        FE_CrAP_RandomizePart(pProfile, 19, 0);
     }
     if (Misc_RandFunc(0) % 100 < 30) {
-        fn_8007975C(pProfile, 20, 0);
+        FE_CrAP_RandomizePart(pProfile, 20, 0);
     }
     bChance = Misc_RandFunc(0) % 100 < 20;
     if (bChance) {
@@ -1115,16 +1115,16 @@ void fn_80079664(SaveProfile* pProfile) {
     FE_CrAP_TurnOnPart(0xC, 7, 0);
     FE_CrAP_TurnOnPart(0xC, 0, 0);
     fn_8008E6D4(0);
-    fn_8007975C(pProfile, 1, 0);
-    fn_8007975C(pProfile, 2, 0);
-    fn_8007975C(pProfile, 7, 0);
+    FE_CrAP_RandomizePart(pProfile, 1, 0);
+    FE_CrAP_RandomizePart(pProfile, 2, 0);
+    FE_CrAP_RandomizePart(pProfile, 7, 0);
     fn_800797E0(pProfile, 7, (Misc_RandFunc(0) & 1) + 1, 0);
     fn_80078E34(pProfile);
 }
 
 // Part nPart at a random b (FE_CrAP_GetNumberOfSubcategoryIndicesForCategory counts them), then at a random choice (fn_800797E0), which
 // is returned (FE_CrAPMessages.c fn_80109FB4 uses it).
-int fn_8007975C(SaveProfile* pProfile, s16 nPart, int nChance) {
+int FE_CrAP_RandomizePart(SaveProfile* pProfile, s16 nPart, int nChance) {
     int nCount = FE_CrAP_GetNumberOfSubcategoryIndicesForCategory(nPart);
     int nPick;
     if (nCount > 0) {
@@ -1186,7 +1186,7 @@ void fn_80079974(void) {
     int i;
     if (lbl_80281ED4->bCopy) {
         fn_80103B74(0);
-        fn_8007975C(pProfile, 9, 0);
+        FE_CrAP_RandomizePart(pProfile, 9, 0);
         FE_CrAP_TurnOnPart(3, 0, 0);
         FE_CrAP_TurnOnPart(0xE, 0, 0);
         FE_CrAP_TurnOnPart(0xF, 0, 0);

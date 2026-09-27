@@ -105,7 +105,7 @@ void fn_800FEC80(int nPlayer) {
                 nScore = nPoints * (nHits + 1);
                 gPlayers[nPlayer].nDB8 += nScore * gPlayers[nPlayer].nDBC;
                 if (!gSession.bReplay) {
-                    fn_800F3980(0x33, nScore, 512.0f * x, 448.0f * y, lbl_802823DC, nHits + 1);
+                    GameMsg_Send5Ints(0x33, nScore, 512.0f * x, 448.0f * y, lbl_802823DC, nHits + 1);
                 }
             }
             if (nMeter != 0) {

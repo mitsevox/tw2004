@@ -446,7 +446,7 @@ void fn_8007873C(SaveProfile* pProfile);
 void fn_80078A2C(s16 nPart, int nChance);
 void fn_80078E34(SaveProfile* pProfile);
 void fn_80079664(SaveProfile* pProfile);
-int  fn_8007975C(SaveProfile* pProfile, s16 nPart, int nChance);    // a random b and choice of
+int  FE_CrAP_RandomizePart(SaveProfile* pProfile, s16 nPart, int nChance);    // a random b and choice of
                                         // part nPart; returns the choice (fn_800797E0)
 int  fn_800797E0(SaveProfile* pProfile, s16 nPart, int b, int nChance);
 u8   fn_80077B18(int nGolfer);          // a yes/no list over golfers 0..28 (Golfer.c asks it)

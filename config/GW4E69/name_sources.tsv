@@ -772,3 +772,25 @@ address	name	previous_name	tier	codes	evidence	purpose	proposed_by	reviewed_by	d
 800D4EF8	Earnings_TestBit	fn_800D4EF8	T3	E6	(uMask & 1 << nBit) != 0	Tests a bit of a mask	orchestrator (naming batch 1)	orchestrator	2026-09-27
 8012408C	Gba_SetState	fn_8012408C	T3	E6	stores the link state lbl_80281980 (set to 3, 4, 0x12 by the link code)	Sets the GBA link state	orchestrator (naming batch 1)	orchestrator	2026-09-27
 80124094	Gba_GetState	fn_80124094	T3	E6	returns lbl_80281980	The GBA link state	orchestrator (naming batch 1)	orchestrator	2026-09-27
+800E590C	GameMsg_Send1	fn_800E590C	T3	E6	GameMessages.c: sends a front-end message with one value (bit 0 of uFloats: a float)	Sends a front-end message with one value	orchestrator (naming batch 2)		2026-09-27
+800E5998	GameMsg_Send2	fn_800E5998	T3	E6	GameMessages.c: the two-value form of GameMsg_Send1	Sends a front-end message with two values	orchestrator (naming batch 2)		2026-09-27
+800E5B0C	GameMsg_Send5	fn_800E5B0C	T3	E6	GameMessages.c: the five-value form of GameMsg_Send1	Sends a front-end message with five values	orchestrator (naming batch 2)		2026-09-27
+80062D6C	GameMsg_SendInt	fn_80062D6C	T3	E3	GameMsg_Send1(nMsg, 0, &nValue): one int value	Sends a front-end message with one int	orchestrator (naming batch 2)		2026-09-27
+80062D38	GameMsg_Send2Ints	fn_80062D38	T3	E3	GameMsg_Send2(nMsg, 0, &nA, &nB): two int values	Sends a front-end message with two ints	orchestrator (naming batch 2)		2026-09-27
+800F3980	GameMsg_Send5Ints	fn_800F3980	T3	E3	GameMsg_Send5(nMsg, 0, &a..&e): five int values	Sends a front-end message with five ints	orchestrator (naming batch 2)		2026-09-27
+800FAAB8	GM_TradeEventPoints	fn_800FAAB8	T3	E6	mode 7's event table lbl_80192908: flags and points moved from the other player; points run out = loss	Scores a player event in the two-player points game	orchestrator (naming batch 2)		2026-09-27
+8007975C	FE_CrAP_RandomizePart	fn_8007975C	T3	E6	random subcategory of the part (FE_CrAP_GetNumberOfSubcategoryIndicesForCategory), then fn_800797E0	Gives a profile a random choice for a create-a-player part	orchestrator (naming batch 2)		2026-09-27
+80016B9C	RenderState_SetCameraMatrices	fn_80016B9C	T3	E4	copies the current camera's m15C and m9C into the render state (dirty bit 0x100)	Hands the current camera's matrices to the render state	orchestrator (naming batch 2)		2026-09-27
+80035138	RenderState_SetClipMode	fn_80035138	T3	E4	sets nFC, dirty bit 0x400; RenderState_Apply passes it to GXSetClipMode	Sets the GX clip mode	orchestrator (naming batch 2)		2026-09-27
+8001644C	RenderView_DrawPrimitive	fn_8001644C	T3	E6	draws nVerts vertices as primitive ePrim with the view's viewport and matrices	Draws a primitive in the current render view	orchestrator (naming batch 2)		2026-09-27
+80014194	RenderView_SetColor	fn_80014194	T3	E6	copies pColour into the view's aColour, NULL restores the default grey	Sets the render view's vertex colour	orchestrator (naming batch 2)		2026-09-27
+800BAD60	Mtx_MultVec4	fn_800BAD60	T3	E6	paired-single 4x4 matrix times a four-float vector	Multiplies a four-float vector by a 4x4 matrix	orchestrator (naming batch 2)		2026-09-27
+8012C98C	EASB_ErrorFromTagError	fn_8012C98C	T3	E6	switch from the tag-file library's error codes to EASBErrorE	Converts a tag-file error to an EASB error	orchestrator (naming batch 2)		2026-09-27
+8012CCD8	EASB_CheckState	fn_8012CCD8	T3	E6	returns EASB_ERROR_NOT_INITIALIZED / INVALID_PRODUCT / NOFILE / FILE_OPEN as nNeed requires	Checks the Bio library is ready for a call	orchestrator (naming batch 2)		2026-09-27
+800ADA94	Emi_SetTrackAttenuation	fn_800ADA94	T2	E2	n1 pairing confidence B: TW07 Emi_SetTrackAttenuation; sets a live instance's track volume (fn_800A8424)	Sets the volume of an emitter instance's track	orchestrator (naming batch 2)		2026-09-27
+800EC550	GM5_IsChallengeRunning	fn_800EC550	T3	E6	returns lbl_802822FC: 1 while a challenge from the list is being played, 0 once it ends	Whether a mode-5 challenge is in progress	orchestrator (naming batch 2)		2026-09-27
+800C73DC	GolfCam_Vec3Sub	fn_800C73DC	T3	E6	psq 3-float a - b into out; GoGolfCam.c's own copy of Vec3_Sub	3-float vector subtraction (GoGolfCam.c's copy)	orchestrator (naming batch 2)		2026-09-27
+8004544C	Vec3_Add	fn_8004544C	T3	E6	psq 3-float a + b into out	3-float vector addition	orchestrator (naming batch 2)		2026-09-27
+80055D70	Ball_RotatePair	fn_80055D70	T3	E6	rotates (*pA, *pB) by the angle whose sine and cosine are given	Rotates a coordinate pair by a sine and cosine	orchestrator (naming batch 2)		2026-09-27
+800E177C	Game_GetMulliganRule	fn_800E177C	T3	E4	returns gpGame->nMulligans: 0 none, 1 any number, 2 one per player per nine	The round's mulligan rule	orchestrator (naming batch 2)		2026-09-27
+80067710	SitDev_QueueEvent	fn_80067710	T3	E6	queues event nEvent for nPlayer in the situation event queue	Queues a situation event for a player	orchestrator (naming batch 2)		2026-09-27

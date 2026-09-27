@@ -448,7 +448,7 @@ void fn_8009C914(int nView) {
         return;
     }
     GR_BuildGridRenderData(nView);
-    fn_80016B9C();
+    RenderState_SetCameraMatrices();
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetAlphaTest(0, 6, 0x80);
     RenderState_SetDepthWrite(0);
@@ -458,15 +458,15 @@ void fn_8009C914(int nView) {
     } else {
         RenderState_SetDrawFlags(0x60);
     }
-    fn_80035138(0);
+    RenderState_SetClipMode(0);
     pLens = ((Camera*)*lbl_80280DF0)->unk10;
     fAC = fn_80014268((u8*)pLens);
     fn_800354B4((u8*)pLens, 500.0f + fAC);
     fn_800352BC();
     fn_80035294();
-    fn_80016B9C();
-    fn_80016B9C();
-    fn_80016B9C();
+    RenderState_SetCameraMatrices();
+    RenderState_SetCameraMatrices();
+    RenderState_SetCameraMatrices();
     fn_800354B4((u8*)pLens, fAC);
     RenderState_Flush();
     draw.nPrims = 3;

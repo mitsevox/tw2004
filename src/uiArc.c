@@ -294,7 +294,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
             aUV[3][1] *= vPictUV[1];
         }
         for (j = 0; j < 4; j++) {
-            fn_800BAD60(pMtx->m, &aPos[j], &aOut[j]);
+            Mtx_MultVec4(pMtx->m, &aPos[j], &aOut[j]);
             fProj = fDist / (fDist + aOut[j].z);
             aOut[j].x *= fProj;
             aOut[j].y *= fProj;
@@ -305,9 +305,9 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
         if (aColour[0][3] != 0.0f || aColour[1][3] != 0.0f || aColour[2][3] != 0.0f
             || aColour[3][3] != 0.0f) {
             if (pArc->n2 == -1) {
-                fn_8001644C(0xA0, &aOut[0].x, aColour[0], NULL, 4);
+                RenderView_DrawPrimitive(0xA0, &aOut[0].x, aColour[0], NULL, 4);
             } else {
-                fn_8001644C(0xA0, &aOut[0].x, aColour[0], aUV[0], 4);
+                RenderView_DrawPrimitive(0xA0, &aOut[0].x, aColour[0], aUV[0], 4);
             }
         } else {
             break;

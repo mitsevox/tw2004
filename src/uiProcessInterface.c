@@ -151,7 +151,7 @@ void fn_8008F648(s32 nTicks) {
         if (lbl_80281370 && gSession.nGameType == 3) {
             fn_80091454();
         }
-        fn_80014194(NULL);
+        RenderView_SetColor(NULL);
         fn_80016B6C(1.0f / 512.0f, 1.0f / 448.0f);
         FO_vSetCurrentAddMode(1);
         fn_80012C54_SetWordWrap(1);

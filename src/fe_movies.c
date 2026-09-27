@@ -190,7 +190,7 @@ void fn_80090D28(FEQuad* pQuad) {
         aUV[3][1] *= vPictUV[1];
     }
     for (i = 0; i < 4; i++) {
-        fn_800BAD60(pMtx->m, &aPos[i], &aOut[i]);
+        Mtx_MultVec4(pMtx->m, &aPos[i], &aOut[i]);
         fProj = fDist / (fDist + aOut[i].z);
         aOut[i].x *= fProj;
         aOut[i].y *= fProj;
@@ -202,9 +202,9 @@ void fn_80090D28(FEQuad* pQuad) {
     if (aColour[0][3] != 0.0f || aColour[1][3] != 0.0f || aColour[2][3] != 0.0f
         || aColour[3][3] != 0.0f) {
         if (pQuad->n2 == -1) {
-            fn_8001644C(0xA0, &aOut[0].x, aColour[0], NULL, 4);
+            RenderView_DrawPrimitive(0xA0, &aOut[0].x, aColour[0], NULL, 4);
         } else {
-            fn_8001644C(0xA0, &aOut[0].x, aColour[0], aUV[0], 4);
+            RenderView_DrawPrimitive(0xA0, &aOut[0].x, aColour[0], aUV[0], 4);
         }
     }
 }
@@ -505,7 +505,7 @@ void fn_80091BDC(int nPoint) {
     afColour[1] = 0.5f;
     afColour[2] = 0.5f;
     afColour[3] = 0.5f;
-    fn_80014194(afColour);
+    RenderView_SetColor(afColour);
     fn_800141F8(afXY, NULL, lbl_801D8818[nPoint][0], lbl_801D8818[nPoint][1],
                 lbl_801D8818[nPoint][0] + 0.125f, lbl_801D8818[nPoint][1] + 0.142f);
     if (nPoint < 4) {
@@ -527,7 +527,7 @@ void fn_80091BDC(int nPoint) {
         afUV[6] = 0.0f;
         afUV[7] = 0.0f;
     }
-    fn_8001644C(0xA1, afXY, 0, afUV, 2);
+    RenderView_DrawPrimitive(0xA1, afXY, 0, afUV, 2);
 }
 
 void fn_80091D84(void) {
@@ -646,8 +646,8 @@ void fn_80092080(LLPict* pPict, f32 fAlpha) {
     afColour[3] = 0.5f * fAlpha;
     fn_800141F8(NULL, afXY, 0.0f, 0.0f, 1.0f, 1.0f);
     fn_800760F4(afUV, pPict);
-    fn_80014194(afColour);
-    fn_8001644C(0xA1, afXY, 0, afUV, 2);
+    RenderView_SetColor(afColour);
+    RenderView_DrawPrimitive(0xA1, afXY, 0, afUV, 2);
     fn_80092274(nOld);
 }
 

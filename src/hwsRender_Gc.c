@@ -323,7 +323,7 @@ void fn_801132C4(SkinMeshRefs* pRefs) {
             vNormalIn.z = pNormal[2] / 64.0f;
             vNormalIn.w = 1.0f;
             pMatrix = pMatrices[nMatrix];
-            fn_800BAD60(pMatrix, &vPosIn, &vPosOut);
+            Mtx_MultVec4(pMatrix, &vPosIn, &vPosOut);
             fn_800BADB4(pMatrix, &vNormalIn.x, &vNormalOut.x);
             pPosOut[0] = vPosOut.x;
             pPosOut[1] = vPosOut.y;

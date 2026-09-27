@@ -45,7 +45,7 @@ void fn_800BB0DC(void) {
 
 // Per frame while a ball is watched: 48 frames after it was hit, while it is flying or rolling,
 // trigger event 0x4B for its player; the first time it lands on surface 105, call
-// fn_80067710(player, 0, 0x22).
+// SitDev_QueueEvent(player, 0, 0x22).
 void fn_800BB0E8(void) {
     if (lbl_802821FC == NULL) return;
     switch (lbl_802821FC->nState) {
@@ -58,7 +58,7 @@ void fn_800BB0E8(void) {
         break;
     }
     if (lbl_802821FC->nSurface == 105 && !lbl_80282200) {
-        fn_80067710(lbl_802821FC->nPlayer, 0, 0x22);
+        SitDev_QueueEvent(lbl_802821FC->nPlayer, 0, 0x22);
         lbl_80282200 = 1;
     }
 }

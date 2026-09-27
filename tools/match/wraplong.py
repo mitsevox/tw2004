@@ -31,14 +31,18 @@ def split(line):
             m = re.match(r' (&&|\|\||<<|>>|[-+*/%&|^]|==|!=|<=|>=|<|>|=)', line[i:])
             if m:
                 cands.append((len(stack), i, 'op', stack[-1] if stack else None))
+    def parts(c):
+        _, i, kind, paren = c
+        indent = paren + 1 if paren is not None and paren + 1 <= 60 else base + 8
+        if kind == 'comma':
+            return [line[:i + 1].rstrip(), ' ' * indent + line[i + 1:].lstrip()]
+        return [line[:i].rstrip(), ' ' * indent + line[i + 1:]]
+
+    cands = [c for c in cands if len(parts(c)[1]) < len(line)]     # a break must shorten the line
     if not cands:
         return None
     depth = min(c[0] for c in cands)
-    _, i, kind, paren = max((c for c in cands if c[0] == depth), key=lambda c: c[1])
-    indent = paren + 1 if paren is not None and paren + 1 <= 60 else base + 8
-    if kind == 'comma':
-        return [line[:i + 1].rstrip(), ' ' * indent + line[i + 1:].lstrip()]
-    return [line[:i].rstrip(), ' ' * indent + line[i + 1:]]
+    return parts(max((c for c in cands if c[0] == depth), key=lambda c: c[1]))
 
 
 def wrap(line):
@@ -74,6 +78,13 @@ def main():
         for n in sorted(lines, reverse=True):
             l = src[n - 1]
             s = l.lstrip()
+            if s.startswith('//') and ' ' in s[3:LIMIT - (len(l) - len(s))]:
+                # a whole-line comment: move the words past the limit to a new comment line
+                pre = l[:len(l) - len(s)] + '// '
+                cut = l.rfind(' ', 0, LIMIT + 1)
+                if cut > len(pre):
+                    src[n - 1:n] = [l[:cut].rstrip(), pre + l[cut + 1:]]
+                    continue
             if s.startswith(('//', '#', '/*', '*')) or '"' in l or "'" in l or '//' in l:
                 print(f'{f}:{n}: left alone (comment, string or preprocessor)')
                 continue

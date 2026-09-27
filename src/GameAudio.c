@@ -28,7 +28,7 @@ void fn_800ADBC0(s16 nKind, f32* pPos, f32* pLast, u8 b);  // types unproven
 
 void fn_8010D3D8(int nPlayer);
 u8   fn_8006BEA4(void);                    // GoGolfCam.c: the GameBreaker letterbox is up
-void fn_800ADA94(u8 nId, u8 nTrack, f32 fVolume);
+void Emi_SetTrackAttenuation(u8 nId, u8 nTrack, f32 fVolume);
 
 void fn_800DC6E8(int nPlayer);
 u8   fn_8006BAD8(int nPlayer, s32* pOut);
@@ -485,7 +485,7 @@ void fn_800A484C(void) {
     if (lbl_8028203C == 2) {
         nCourse = Game_GetCourse();
         n = Game_GetCurHoleNum();
-        fn_800ADA94(lbl_8028141A, 0, 1.0f);
+        Emi_SetTrackAttenuation(lbl_8028141A, 0, 1.0f);
         Emi_SetTrackEnabled(lbl_8028141A, 1, 1);
         if (fn_80035574()) {
             Emi_SetTrackEnabled(lbl_8028141A, 2, 1);
@@ -935,7 +935,7 @@ void fn_800A573C(u8 nPlayer) {
                         fVolume *= 0.35f;
                     }
                     fn_800ADA28(nId, 0, 0, 1);
-                    fn_800ADA94(nId, 0, fVolume);
+                    Emi_SetTrackAttenuation(nId, 0, fVolume);
                     fn_800ADAF0(nId, 0, fPitch);
                 }
                 pView->n18 = pPlayer->swing.nState;
@@ -1026,12 +1026,12 @@ void fn_800A5980(u8 nPlayer) {
             fn_800AD9AC(nIdA, 5, 0);
             fn_800AD9AC(nIdB, 5, 0);
         }
-        fn_800ADA94(nIdSwing, 1, 2.0f);
+        Emi_SetTrackAttenuation(nIdSwing, 1, 2.0f);
         Emi_SetTrackEnabled(nIdA, 5, 1);
         Emi_SetTrackEnabled(nIdB, 5, 1);
         lbl_80282032 = 0;
     } else {
-        fn_800ADA94(nIdSwing, 1, 1.0f);
+        Emi_SetTrackAttenuation(nIdSwing, 1, 1.0f);
     }
     fn_800AD800(nIdSwing, pPlayer->ball.vPos, NULL, 0);
     fn_800AD9AC(nIdSwing, 1, lbl_80183AD8[pPlayer->nClub]);
@@ -1096,7 +1096,7 @@ void fn_800A5CA4(u8 nPlayer) {
                 }
                 fn_800AD800(nId, pPlayer->ball.vPos, NULL, 0);
                 fn_800ADA28(nId, 0, pSurface->nSoundId, 0);
-                fn_800ADA94(nId, 0, fVolume);
+                Emi_SetTrackAttenuation(nId, 0, fVolume);
             }
             if (Game_GetMode() == 26 || Game_GetMode() == 22) {
                 fn_8010D3D8(nPlayer);
@@ -1120,7 +1120,7 @@ void fn_800A5EC0(u8 nPlayer) {
     pPlayer = &gPlayers[nPlayer];
     nId = lbl_801F1790[pPlayer->nView[0]].n1;
     fn_800AD800(nId, pPlayer->ball.vPos, NULL, 0);
-    fn_800ADA94(nId, 0, 2.0f);
+    Emi_SetTrackAttenuation(nId, 0, 2.0f);
     nRand = Misc_RandFunc(2) & 1;   // one of two sounds at random
     fn_800ADA28(nId, 0, nRand == 0 ? 0x1A : 0x1C, 0);
 }
@@ -1132,7 +1132,7 @@ void fn_800A5F60(u8 nPlayer) {
     pPlayer = &gPlayers[nPlayer];
     nId = lbl_801F1790[pPlayer->nView[0]].n1;
     fn_800AD800(nId, pPlayer->ball.vPos, NULL, 0);
-    fn_800ADA94(nId, 0, 1.0f);
+    Emi_SetTrackAttenuation(nId, 0, 1.0f);
     fn_800ADA28(nId, 0, 0x17, 0);
 }
 
@@ -1143,7 +1143,7 @@ void fn_800A5FE8(u8 nPlayer) {
     pPlayer = &gPlayers[nPlayer];
     nId = lbl_801F1790[pPlayer->nView[0]].n1;
     fn_800AD800(nId, pPlayer->ball.vPos, NULL, 0);
-    fn_800ADA94(nId, 0, 1.0f);
+    Emi_SetTrackAttenuation(nId, 0, 1.0f);
     fn_800ADA28(nId, 0, 0x17, 0);
 }
 
@@ -1256,20 +1256,20 @@ void fn_800A64A8(u8 nPlayer, u8 b) {
     Emi_SetTrackEnabled(pView->n2, 2, 1);
     Emi_SetTrackEnabled(pView->n3, 2, 1);
     fn_800A3F58(0, 1);
-    fn_800ADA94(lbl_80281420, 0, 0.0f);
-    fn_800ADA94(lbl_8028141C, 0, 0.0f);
-    fn_800ADA94(lbl_8028141C, 1, 0.0f);
-    fn_800ADA94(lbl_8028141C, 2, 0.0f);
-    fn_800ADA94(lbl_8028141C, 3, 0.0f);
-    fn_800ADA94(lbl_8028141C, 4, 0.0f);
-    fn_800ADA94(lbl_8028141C, 5, 0.0f);
-    fn_800ADA94(lbl_8028141D, 0, 0.0f);
-    fn_800ADA94(lbl_8028141D, 1, 0.0f);
-    fn_800ADA94(lbl_8028141D, 2, 0.0f);
-    fn_800ADA94(lbl_8028141D, 3, 0.0f);
-    fn_800ADA94(lbl_8028141D, 4, 0.0f);
-    fn_800ADA94(lbl_8028141D, 5, 0.0f);
-    fn_800ADA94(lbl_8028141A, 0, 0.0f);
+    Emi_SetTrackAttenuation(lbl_80281420, 0, 0.0f);
+    Emi_SetTrackAttenuation(lbl_8028141C, 0, 0.0f);
+    Emi_SetTrackAttenuation(lbl_8028141C, 1, 0.0f);
+    Emi_SetTrackAttenuation(lbl_8028141C, 2, 0.0f);
+    Emi_SetTrackAttenuation(lbl_8028141C, 3, 0.0f);
+    Emi_SetTrackAttenuation(lbl_8028141C, 4, 0.0f);
+    Emi_SetTrackAttenuation(lbl_8028141C, 5, 0.0f);
+    Emi_SetTrackAttenuation(lbl_8028141D, 0, 0.0f);
+    Emi_SetTrackAttenuation(lbl_8028141D, 1, 0.0f);
+    Emi_SetTrackAttenuation(lbl_8028141D, 2, 0.0f);
+    Emi_SetTrackAttenuation(lbl_8028141D, 3, 0.0f);
+    Emi_SetTrackAttenuation(lbl_8028141D, 4, 0.0f);
+    Emi_SetTrackAttenuation(lbl_8028141D, 5, 0.0f);
+    Emi_SetTrackAttenuation(lbl_8028141A, 0, 0.0f);
     if (b) {
         fn_800A6C98(nPlayer, 0);
     }
@@ -1284,20 +1284,20 @@ void fn_800A6660(u8 nPlayer) {
         Emi_SetTrackEnabled(pView->n2, 2, 0);
         Emi_SetTrackEnabled(pView->n3, 2, 0);
         fn_800A3F58(0, 0);
-        fn_800ADA94(lbl_80281420, 0, 1.0f);
-        fn_800ADA94(lbl_8028141C, 0, lbl_80281430);
-        fn_800ADA94(lbl_8028141C, 1, lbl_80281430);
-        fn_800ADA94(lbl_8028141C, 2, lbl_80281430);
-        fn_800ADA94(lbl_8028141C, 3, lbl_80281430);
-        fn_800ADA94(lbl_8028141C, 4, lbl_80281430);
-        fn_800ADA94(lbl_8028141C, 5, lbl_80281430);
-        fn_800ADA94(lbl_8028141D, 0, lbl_80281430);
-        fn_800ADA94(lbl_8028141D, 1, lbl_80281430);
-        fn_800ADA94(lbl_8028141D, 2, lbl_80281430);
-        fn_800ADA94(lbl_8028141D, 3, lbl_80281430);
-        fn_800ADA94(lbl_8028141D, 4, lbl_80281430);
-        fn_800ADA94(lbl_8028141D, 5, lbl_80281430);
-        fn_800ADA94(lbl_8028141A, 0, 1.0f);
+        Emi_SetTrackAttenuation(lbl_80281420, 0, 1.0f);
+        Emi_SetTrackAttenuation(lbl_8028141C, 0, lbl_80281430);
+        Emi_SetTrackAttenuation(lbl_8028141C, 1, lbl_80281430);
+        Emi_SetTrackAttenuation(lbl_8028141C, 2, lbl_80281430);
+        Emi_SetTrackAttenuation(lbl_8028141C, 3, lbl_80281430);
+        Emi_SetTrackAttenuation(lbl_8028141C, 4, lbl_80281430);
+        Emi_SetTrackAttenuation(lbl_8028141C, 5, lbl_80281430);
+        Emi_SetTrackAttenuation(lbl_8028141D, 0, lbl_80281430);
+        Emi_SetTrackAttenuation(lbl_8028141D, 1, lbl_80281430);
+        Emi_SetTrackAttenuation(lbl_8028141D, 2, lbl_80281430);
+        Emi_SetTrackAttenuation(lbl_8028141D, 3, lbl_80281430);
+        Emi_SetTrackAttenuation(lbl_8028141D, 4, lbl_80281430);
+        Emi_SetTrackAttenuation(lbl_8028141D, 5, lbl_80281430);
+        Emi_SetTrackAttenuation(lbl_8028141A, 0, 1.0f);
         lbl_8028202F = 0;
         if (lbl_80281428 != -1) {
             fn_800A6DCC(lbl_80281428, 1);
@@ -1736,8 +1736,8 @@ void fn_800A77E0(f32 fVolume) {
     fn_800A3FB4(13, lbl_8018E988[13] * fVolume);
     fn_800A3FB4(5, lbl_8018E988[5] * fVolume);
     fn_800A3FB4(6, lbl_8018E988[6] * fVolume);
-    fn_800ADA94(lbl_8028141B, 0, fVolume);
-    fn_800ADA94(lbl_8028141B, 1, fVolume);
+    Emi_SetTrackAttenuation(lbl_8028141B, 0, fVolume);
+    Emi_SetTrackAttenuation(lbl_8028141B, 1, fVolume);
     for (i = 16; i < 32; i++) {
         fn_800A3FB4(i, fVolume * lbl_8018E988[i]);
     }

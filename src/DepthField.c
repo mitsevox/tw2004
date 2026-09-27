@@ -184,10 +184,10 @@ void DF_vDrawBufferToScreen(int n) {
         aColour[1] = lbl_801D5110[n].aColour[1];
         aColour[2] = lbl_801D5110[n].aColour[2];
         aColour[3] = lbl_801D5110[n].f4 * lbl_801D5110[n].f14 / (lbl_80281120[0] * (f32)(i + 1));
-        fn_80014194(aColour);
+        RenderView_SetColor(aColour);
         fn_80035154(255.0f * aColour[3]);
         RenderState_Flush();
-        fn_8001644C(0xA1, aXY, NULL, aUV, 2);
+        RenderView_DrawPrimitive(0xA1, aXY, NULL, aUV, 2);
     }
     RenderState_SetDepthWrite(1);
     fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);

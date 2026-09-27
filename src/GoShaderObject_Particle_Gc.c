@@ -192,7 +192,7 @@ void fn_80094534(f32 (*pMtx)[4], ParticleShape* pShape, ParticleVertex* pVerts, 
         fDiff = fA - pShape->v60[2] * pShape->f54;
         fA = pShape->v60[2] * t + pVerts->v0[2];
         v.z = fA + fDiff - (1.0f / fEase) * fDiff;
-        fn_800BAD60(pMtx, &v, &v);
+        Mtx_MultVec4(pMtx, &v, &v);
         if (v.z > 0.0f) {
             fSize = pShape->f48 * t + pVerts->f20;
             fSize = (fSize <= pShape->f4C) ? fSize : pShape->f4C;
@@ -281,7 +281,7 @@ void fn_800949D0(SD_SShaderObject_Static* pObject) {
         } else {
             RenderState_SetBlendFactors(4, 5);
         }
-        fn_80035138(0);
+        RenderState_SetClipMode(0);
         RenderState_Flush();
         pCamera = Camera_GetCurrent();
         GXClearVtxDesc();
@@ -424,7 +424,7 @@ void fn_80094E34(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {
             v.y = pVert->v0[1];
             v.z = pVert->v0[2];
             v.w = 1.0f;
-            fn_800BAD60(pMsg->u.emit.pMtx, &v, &v);
+            Mtx_MultVec4(pMsg->u.emit.pMtx, &v, &v);
             Vec3Copy(&v.x, pVert->v0);
             v.x = pVert->vC[0];
             v.y = pVert->vC[1];

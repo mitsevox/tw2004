@@ -848,7 +848,7 @@ void fn_8008666C(MsgArg* pArgs, MsgArg* pResult) {
     gReplayData.bF10 = 0;
     EVENT_Trigger(lbl_80282278, 2, NULL, 0);
     GM_RestartHole();
-    if (fn_800EC550()) {
+    if (GM5_IsChallengeRunning()) {
         fn_800ED554();
     }
     if (Game_GetMode() == 26 || Game_GetMode() == 22) {
@@ -1248,7 +1248,7 @@ void fn_80087658(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80087684(MsgArg* pArgs, MsgArg* pResult) {
-    if (fn_800EC550()) {
+    if (GM5_IsChallengeRunning()) {
         pResult->i = 1;
         return;
     }
@@ -2464,7 +2464,7 @@ void fn_8008A0CC(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_8008A128(MsgArg* pArgs, MsgArg* pResult) {
     fn_800885F8(NULL, NULL);
-    if (!fn_800EC550()) {
+    if (!GM5_IsChallengeRunning()) {
         fn_8006F4E0();
     }
     fn_80110178(1);

@@ -199,13 +199,13 @@ void fn_800358E0(Character* pChar, u32 uFlags) {
         Vec_Copy(aRow10, aData);
         switch (nMode) {
         case 2:
-            fn_80035138(1);
+            RenderState_SetClipMode(1);
             break;
         case 1:
-            fn_80035138(1);
+            RenderState_SetClipMode(1);
             break;
         default:
-            fn_80035138(0);
+            RenderState_SetClipMode(0);
             break;
         }
         RenderState_Flush();
@@ -214,13 +214,13 @@ void fn_800358E0(Character* pChar, u32 uFlags) {
     } else {
         switch (nMode) {
         case 2:
-            fn_80035138(1);
+            RenderState_SetClipMode(1);
             break;
         case 1:
-            fn_80035138(1);
+            RenderState_SetClipMode(1);
             break;
         default:
-            fn_80035138(0);
+            RenderState_SetClipMode(0);
             break;
         }
         RenderState_Flush();
@@ -348,7 +348,7 @@ void fn_80035D10(Character* pChar, int nView) {
     fill.pColour = lbl_801D4E78.aColor[nView];
     fill.pTexCoord = lbl_801D4E78.aUV[nView];
     RenderState_SetDrawFlags(0);
-    fn_80035138(0);
+    RenderState_SetClipMode(0);
     RenderState_Flush();
     fn_80036100(&lbl_801D4E78.aMesh[nView], &fill, 1);
     fn_800360D4(&lbl_801D4E78.aMesh[nView]);

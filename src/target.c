@@ -298,18 +298,18 @@ void TARGET_RenderBallTarget(int nPlayer) {
             aMarker[i][1] = aY0[i];
         }
         if (bOnScreen && gPlayers[nPlayer].nSurface != -1) {
-            fn_80014194(aFaint);
-            fn_8001644C(0x98, aMarker[0], NULL, aUV, 4);
+            RenderView_SetColor(aFaint);
+            RenderView_DrawPrimitive(0x98, aMarker[0], NULL, aUV, 4);
             for (i = 0; i < 4; i++) {
                 aMarker[i][1] = aY1[i];
             }
-            fn_80014194(aLight);
-            fn_8001644C(0x98, aMarker[0], NULL, aUV, 4);
+            RenderView_SetColor(aLight);
+            RenderView_DrawPrimitive(0x98, aMarker[0], NULL, aUV, 4);
             for (i = 0; i < 4; i++) {
                 aMarker[i][1] = aY2[i];
             }
-            fn_80014194(aSolid);
-            fn_8001644C(0x98, aMarker[0], NULL, aUV, 4);
+            RenderView_SetColor(aSolid);
+            RenderView_DrawPrimitive(0x98, aMarker[0], NULL, aUV, 4);
         }
     } else {
         fBob = fScale * lbl_801D5BF0[nPlayer].f18;
@@ -318,14 +318,14 @@ void TARGET_RenderBallTarget(int nPlayer) {
         aMarker[2][1] -= fBob;
         aMarker[3][1] -= fBob;
         if (bOnScreen && gPlayers[nPlayer].nSurface != -1) {
-            fn_80014194(aSolid);
-            fn_8001644C(0x98, aMarker[0], NULL, aUV, 4);
+            RenderView_SetColor(aSolid);
+            RenderView_DrawPrimitive(0x98, aMarker[0], NULL, aUV, 4);
         }
     }
     if (bOnScreen && gPlayers[nPlayer].nSurface != -1) {
         fn_8005CC64(lbl_80281E34, lbl_80281E38);
         RenderState_Flush();
-        fn_8001644C(0x98, aShadow[0], NULL, aUV, 4);
+        RenderView_DrawPrimitive(0x98, aShadow[0], NULL, aUV, 4);
     }
     RenderState_SetAlphaTest(1, 6, 0x80);
     RenderState_SetDepthFunc(3);
@@ -1083,15 +1083,15 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
         }
         lbl_801D5BF0[nPlayer].f1C = 0.07f * -lbl_801D5BF0[nPlayer].f0 + lbl_801D5BF0[nPlayer].f1C;
     }
-    fn_80014194(lbl_801887EC);
-    fn_8001644C(0x98, aMarker[0], NULL, aUV, 4);
+    RenderView_SetColor(lbl_801887EC);
+    RenderView_DrawPrimitive(0x98, aMarker[0], NULL, aUV, 4);
     fn_8005CC64(lbl_80281E34, lbl_80281E38);
     RenderState_Flush();
-    fn_8001644C(0x98, aShadow[0], NULL, aUV, 4);
+    RenderView_DrawPrimitive(0x98, aShadow[0], NULL, aUV, 4);
     RenderState_SetAlphaTest(1, 6, 0x80);
     RenderState_SetDepthFunc(3);
     RenderState_SetDepthWrite(1);
-    fn_80014194(lbl_801887CC);
+    RenderView_SetColor(lbl_801887CC);
     RenderState_Flush();
 
     if (!bBall) {

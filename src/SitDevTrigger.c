@@ -151,14 +151,14 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
 }
 
 // Whether an action is held back: at situations 21 and 22 in modes with odd holes (gpGame's
-// b136..b139), or while fn_800EC550 is set (at 22 only for a ball off the tee); for events 20 and
+// b136..b139), or while GM5_IsChallengeRunning is set (at 22 only for a ball off the tee); for events 20 and
 // 31 while the GameBreaker is up (not at situation 2); and commentary (kinds 1 and 2) during a
 // replay, in modes 6..8, where fn_800E39F0 says so, and in mode 11.
 u8 fn_800BD3F8(SitDevAction* pAction, int nSit, int nPlayer, u8 nEvent) {
     int nMode = Game_GetMode();
     if (nSit == 22 || nSit == 21) {
         if (gpGame->b136 || gpGame->b137 || gpGame->b138 || gpGame->b139) return 1;
-        if (fn_800EC550()) {
+        if (GM5_IsChallengeRunning()) {
             if (nSit == 21) return 1;
             if (nSit == 22 && gPlayers[nPlayer].ball.nLie != 0) return 1;
         }
@@ -166,7 +166,7 @@ u8 fn_800BD3F8(SitDevAction* pAction, int nSit, int nPlayer, u8 nEvent) {
     if (lbl_80202898.bGameBreaker && (nEvent == 20 || nEvent == 31) && nSit != 2) return 1;
     if (pAction->nKind != 1 && pAction->nKind != 2) return 0;
     if (gSession.bReplay || (u32)(nMode - 6) <= 2 || fn_800E39F0()) return 1;
-    if (!fn_800EC550() && nMode != 11) return 0;
+    if (!GM5_IsChallengeRunning() && nMode != 11) return 0;
     if (nMode == 11) return 1;
     return 0;
 }

@@ -192,7 +192,7 @@ void GM_Earnings_AwardMoney(int nPlayer, int nMoney, CourseMoneyTracking* pMoney
 
     if (nPlayer >= 5 || nPlayer == 4) return;
     if (Player_IsCPU(nPlayer)) return;
-    if (fn_800E177C() != 0) return;
+    if (Game_GetMulliganRule() != 0) return;
     nProfile = gPlayers[nPlayer].nIndex;
     if (nProfile >= 5 || nProfile == 4) return;
     if (gpSaveData[nProfile].bActive != 1) return;
@@ -221,7 +221,7 @@ void GM_Earnings_AwardMoney(int nPlayer, int nMoney, CourseMoneyTracking* pMoney
 int GM_Earnings_GetStrokeWinnings(int nWinner, int nLoser, int nMargin, int* pPrize) {
     int nRating;
 
-    if (fn_800E177C() != 0) return 0;
+    if (Game_GetMulliganRule() != 0) return 0;
     if (Player_IsCPU(nWinner) || !Player_IsCPU(nLoser)) return 0;
     nRating = GM_Earnings_RateGolfer(nLoser);
     if (nMargin > 5) {
@@ -245,7 +245,7 @@ int GM_Earnings_GetStrokeWinningsTeam(int nWinner, int nLoser, int nMargin, int*
     int nBase2;
     int nTotal;
 
-    if (fn_800E177C() != 0) return 0;
+    if (Game_GetMulliganRule() != 0) return 0;
     if (Team_IsAllCPU(nWinner) || !Team_IsAllCPU(nLoser)) return 0;
     if (nLoser == 0) {
         nFirst = 0;
@@ -277,7 +277,7 @@ int fn_800D38F0(int nWinner, int nLoser, int nMargin, s32* pPrize) {
     int nEvent;
     int nMoney;
 
-    if (fn_800E177C() != 0) return 0;
+    if (Game_GetMulliganRule() != 0) return 0;
     nEvent = fn_801021FC();
     if (nMargin > 5) {
         nMargin = 5;
@@ -298,7 +298,7 @@ void fn_800D39B4(int nPlayer, int nMoney) {
     CourseMoneyTracking money;
     s32 nPaid;
 
-    if (fn_800E177C() == 0) {
+    if (Game_GetMulliganRule() == 0) {
         nPaid = nMoney * 2;
         Mem_set(&money, 0, sizeof(money));
         money.n24 = nPaid;
@@ -424,7 +424,7 @@ void fn_800D3DDC(int nPlayer) {
     int nKind;
 
     if (Game_GetMode() == 10) return;
-    if (fn_800E177C() != 0) return;
+    if (Game_GetMulliganRule() != 0) return;
     gpGame->pfn244(nPlayer);
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return;
@@ -478,7 +478,7 @@ void fn_800D4030(int nPlayer) {
     int i;
 
     if (Game_GetMode() == 10) return;
-    if (fn_800E177C() != 0) return;
+    if (Game_GetMulliganRule() != 0) return;
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return;
     if (Player_IsCPU(nPlayer)) return;
@@ -548,7 +548,7 @@ void fn_800D439C(int nPlayer, u8 bRoundOver) {
 
     nLevel = 0;
     if (fn_800E3A54()) return;
-    if (fn_800E177C() != 0) return;
+    if (Game_GetMulliganRule() != 0) return;
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return;
     if (Player_IsCPU(nPlayer)) return;
@@ -647,7 +647,7 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
     if (Player_IsCPU(nPlayer)) return;
     if (!fn_800D748C(nPlayer)) return;
     if (fn_80100294()) return;
-    if (fn_800E177C() != 0) return;
+    if (Game_GetMulliganRule() != 0) return;
 
     if (pBall != NULL) {
         Mem_cpy(&saved, &gPlayers[nPlayer].ball, sizeof(Ball));
@@ -667,7 +667,7 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
     for (i = 0; i < NUM_SHOT_GOALS; i++) {
         if (!lbl_80200538.aShotGoal[i].bEnabled) continue;
         if (!Earnings_TestBit(lbl_80200538.aShotGoal[i].uModes, Game_GetMode())) continue;
-        if (fn_800EC550() && !fn_801025F4()
+        if (GM5_IsChallengeRunning() && !fn_801025F4()
             && !Earnings_TestBit(lbl_80200538.aShotGoal[i].uModes, 5)) continue;
         if (!Earnings_TestBit(lbl_80200538.aShotGoal[i].uPars, 0) && Course_GetCurHolePar() == 3) continue;
         if (!Earnings_TestBit(lbl_80200538.aShotGoal[i].uPars, 1) && Course_GetCurHolePar() == 4) continue;
@@ -807,8 +807,8 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
     if (gSession.uFlags & 0x4000) return;
     if (Player_IsCPU(nPlayer)) return;
     if (!fn_800D748C(nPlayer)) return;
-    if (fn_800EC550() && !fn_801025F4()) return;
-    if (fn_800E177C() != 0) return;
+    if (GM5_IsChallengeRunning() && !fn_801025F4()) return;
+    if (Game_GetMulliganRule() != 0) return;
 
     for (i = Game_CurHoleIndex() + 1; i < 18; i++) {
         gPlayers[nPlayer].nStrokes[i] = 999;
@@ -822,7 +822,7 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
     for (i = 0; i < NUM_PUTT_GOALS; i++) {
         if (!lbl_80200538.aPuttGoal[i].bEnabled) continue;
         if (!Earnings_TestBit(lbl_80200538.aPuttGoal[i].uModes, Game_GetMode())) continue;
-        if (fn_800EC550() && !fn_801025F4()
+        if (GM5_IsChallengeRunning() && !fn_801025F4()
             && !Earnings_TestBit(lbl_80200538.aPuttGoal[i].uModes, 5)) continue;
         if (!Earnings_TestBit(lbl_80200538.aPuttGoal[i].uPars, 0) && Course_GetCurHolePar() == 3) continue;
         if (!Earnings_TestBit(lbl_80200538.aPuttGoal[i].uPars, 1) && Course_GetCurHolePar() == 4) continue;
@@ -970,7 +970,7 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
     lbl_80282250 = 0;
     if (gSession.uFlags & 0x4000) return;
     if (!fn_800D748C(nPlayer)) return;
-    if (fn_800E177C() != 0) return;
+    if (Game_GetMulliganRule() != 0) return;
 
     for (i = Game_CurHoleIndex() + 1; i < 18; i++) {
         gPlayers[nPlayer].nStrokes[i] = 999;
@@ -991,7 +991,7 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
         if (!lbl_80200538.aHoleGoal[i].bEachHole && !bRoundOver) continue;
         if (!lbl_80200538.aHoleGoal[i].bEnabled) continue;
         if (!Earnings_TestBit(lbl_80200538.aHoleGoal[i].uModes, Game_GetMode())) continue;
-        if (fn_800EC550() && !fn_801025F4()
+        if (GM5_IsChallengeRunning() && !fn_801025F4()
             && !Earnings_TestBit(lbl_80200538.aHoleGoal[i].uModes, 5)) continue;
         if (!lbl_80200538.aHoleGoal[i].b19 && bMore) continue;
         if (lbl_80200538.aHoleGoal[i].aToPar[0] != 0 &&
@@ -1387,7 +1387,7 @@ s32 GM_Earnings_ComputeBonusModifiers(s32 nPoints, int nPlayer, u8 bCourse, u8 b
     s32 nBase;
     s32 nTotal;
 
-    if (fn_800E177C() != 0) return 0;
+    if (Game_GetMulliganRule() != 0) return 0;
     fTee = 1.0f;
     fHole = fTee;
     fCourse = fn_800D6EEC();
@@ -1516,13 +1516,13 @@ f32 fn_800D6EEC(void) {
 }
 
 // The TOUR card level raises the payout; the extra
-// goes in the breakdown. Nothing is paid when fn_800E177C says so.
+// goes in the breakdown. Nothing is paid when Game_GetMulliganRule says so.
 // TW06: GM_Earnings_ComputeTOURCardModifiers (by position).
 int GM_Earnings_ComputeTOURCardModifiers(int nReward, int nPlayer, CourseMoneyTracking* pMoney) {
     f32 fMult;
     s32 nTotal;
 
-    if (fn_800E177C() != 0) return 0;
+    if (Game_GetMulliganRule() != 0) return 0;
     fMult = 1.0f;
     if (gpSaveData[gPlayers[nPlayer].nIndex].bActive != 0) {
         switch (gpSaveData[gPlayers[nPlayer].nIndex].nTourCardLevel) {
@@ -1560,7 +1560,7 @@ int GM_Earnings_ComputeTOURCardModifiers(int nReward, int nPlayer, CourseMoneyTr
 // Whether a human player's profile can earn awards.
 u8 fn_800D748C(int nPlayer) {
     if (Player_IsCPU(nPlayer)) return 0;
-    if (fn_800E177C() != 0) return 0;
+    if (Game_GetMulliganRule() != 0) return 0;
     if (gpSaveData[gPlayers[nPlayer].nIndex].bActive != 1) return 0;
     return 1;
 }
@@ -1570,7 +1570,7 @@ u8 GM_Earnings_AwardTrophyBall(int nPlayer, int nAward) {
     PlayerNumber_t nProfile;
     int nSlot;
 
-    if (fn_800E177C() != 0) return 0;
+    if (Game_GetMulliganRule() != 0) return 0;
     if (fn_800D76AC(nPlayer, nAward)) {
         nProfile = gPlayers[nPlayer].nIndex;
         if (gpSaveData[nProfile].bActive != 1) return 0;
@@ -1608,7 +1608,7 @@ s32 fn_800D7684(int nPlayer, Ball* pBall, u8 b) {
 
 // Whether a human player can still win award nAward (0..38).
 u8 fn_800D76AC(int nPlayer, int nAward) {
-    if (fn_800E177C() != 0) return 0;
+    if (Game_GetMulliganRule() != 0) return 0;
     if (nAward == 39) return 0;
     if (Player_IsCPU(nPlayer)) return 0;
     if (gpSaveData[gPlayers[nPlayer].nIndex].bActive != 1) return 0;
@@ -1617,7 +1617,7 @@ u8 fn_800D76AC(int nPlayer, int nAward) {
 
 // Mark an award won, with today's date; 1 if it was not won before.
 u8 fn_800D7770(int nPlayer, Award* pAward) {
-    if (fn_800E177C() != 0) return 0;
+    if (Game_GetMulliganRule() != 0) return 0;
     if (Player_IsCPU(nPlayer)) return 0;
     if (gpSaveData[gPlayers[nPlayer].nIndex].bActive != 1) return 0;
     if (pAward->bWon) return 0;
@@ -1649,7 +1649,7 @@ int fn_800D782C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll) {
     if (Player_IsCPU(nPlayer)) return 0;
     if (Game_GetMode() == 12 || fn_800E39F0() || Game_GetMode() == 22 || Game_GetMode() == 26) return 0;
     if (gpGame->b137) return 0;
-    if (fn_800E177C() != 0) return 0;
+    if (Game_GetMulliganRule() != 0) return 0;
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return 0;
     if (lbl_801D7148.aLoaded[nProfile] == 0) {
@@ -1700,7 +1700,7 @@ int fn_800D7B1C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll) {
     if (Player_IsCPU(nPlayer)) return 0;
     if (Game_GetMode() == 12 || fn_800E39F0() || Game_GetMode() == 22 || Game_GetMode() == 26) return 0;
     if (gpGame->b137) return 0;
-    if (fn_800E177C() != 0) return 0;
+    if (Game_GetMulliganRule() != 0) return 0;
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return 0;
     if (lbl_801D7148.aLoaded[nProfile] == 0) {
@@ -1745,7 +1745,7 @@ int fn_800D7DA0(int nPlayer, int bSave, u8 bCountStroke, u8 bAll) {
     if (gSession.uFlags & 0x4000) return 0;
     if (Player_IsCPU(nPlayer)) return 0;
     if (Game_GetMode() == 12) return 0;
-    if (fn_800E177C() != 0) return 0;
+    if (Game_GetMulliganRule() != 0) return 0;
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return 0;
     if (lbl_801D7148.aLoaded[nProfile] == 0) {
@@ -2120,42 +2120,42 @@ void fn_800D8D5C(int nPlayer) {
     gPlayers[nPlayer].money.n24 = 0;
 }
 
-// Whether records of kind nKind count now: never in modes 9 and 11 or when fn_800E177C says so;
-// kinds 0 and 3..7 need fn_800EC550 off, a round of every hole and fn_8008AB40 off, kinds 1 and 2
-// only fn_800EC550 off, kind 8 fn_800E39F0, kind 9 game mode 22.
+// Whether records of kind nKind count now: never in modes 9 and 11 or when Game_GetMulliganRule says so;
+// kinds 0 and 3..7 need GM5_IsChallengeRunning off, a round of every hole and fn_8008AB40 off, kinds 1 and 2
+// only GM5_IsChallengeRunning off, kind 8 fn_800E39F0, kind 9 game mode 22.
 u8 fn_800D8DB4(int nKind) {
     if (Game_GetMode() == 9 || Game_GetMode() == 11) return 0;
-    if (fn_800E177C() != 0) return 0;
+    if (Game_GetMulliganRule() != 0) return 0;
     switch (nKind) {
     case 0:
-        if (fn_800EC550() || !fn_800E1BBC() || fn_8008AB40()) return 0;
+        if (GM5_IsChallengeRunning() || !fn_800E1BBC() || fn_8008AB40()) return 0;
         return 1;
     case 1:
-        if (fn_800EC550()) return 0;
+        if (GM5_IsChallengeRunning()) return 0;
         return 1;
     case 2:
-        if (fn_800EC550()) return 0;
+        if (GM5_IsChallengeRunning()) return 0;
         return 1;
     case 3:
-        if (fn_800EC550() || !fn_800E1BBC() || fn_8008AB40()) return 0;
+        if (GM5_IsChallengeRunning() || !fn_800E1BBC() || fn_8008AB40()) return 0;
         return 1;
     case 4:
-        if (fn_800EC550() || !fn_800E1BBC() || fn_8008AB40()) return 0;
+        if (GM5_IsChallengeRunning() || !fn_800E1BBC() || fn_8008AB40()) return 0;
         return 1;
     case 5:
-        if (fn_800EC550() || !fn_800E1BBC() || fn_8008AB40()) return 0;
+        if (GM5_IsChallengeRunning() || !fn_800E1BBC() || fn_8008AB40()) return 0;
         return 1;
     case 6:
-        if (fn_800EC550() || !fn_800E1BBC() || fn_8008AB40()) return 0;
+        if (GM5_IsChallengeRunning() || !fn_800E1BBC() || fn_8008AB40()) return 0;
         return 1;
     case 7:
-        if (fn_800EC550() || !fn_800E1BBC() || fn_8008AB40()) return 0;
+        if (GM5_IsChallengeRunning() || !fn_800E1BBC() || fn_8008AB40()) return 0;
         return 1;
     case 8:
-        if (fn_800EC550() || !fn_800E39F0()) return 0;
+        if (GM5_IsChallengeRunning() || !fn_800E39F0()) return 0;
         return 1;
     case 9:
-        if (fn_800EC550() || Game_GetMode() != 22) return 0;
+        if (GM5_IsChallengeRunning() || Game_GetMode() != 22) return 0;
         return 1;
     }
     return 1;
@@ -2181,7 +2181,7 @@ void GM_RecordIndividualShotStats(int nPlayer) {
     int nPutt;
 
     if (!gpGame->b27B) return;
-    if (fn_800E177C() != 0) return;
+    if (Game_GetMulliganRule() != 0) return;
     pBall = &gPlayers[nPlayer].ball;
     nPar = Course_GetCurHolePar();
     nClass = gSurfaceTypes[pBall->nStartSurface].nClass;
@@ -2236,7 +2236,7 @@ void fn_800D9350(int nPlayer) {
     int nStrokes;
     int nPar;
 
-    if (fn_800E177C() == 0) {
+    if (Game_GetMulliganRule() == 0) {
         nLie = gPlayers[nPlayer].ball.nLie;
         if (gPlayers[nPlayer].b30F) {
             gPlayers[nPlayer].b310 = 1;
@@ -2277,13 +2277,13 @@ void fn_800D9458(int nPlayer) {
 
     gpGame->b16C[nPlayer][Game_CurHoleIndex()] = 1;
     if (gpGame->b27C) {
-        switch (fn_800EC550()) {    // fake match: as in fn_800D9834
+        switch (GM5_IsChallengeRunning()) {    // fake match: as in fn_800D9834
         case 0:
             break;
         default:
             return;
         }
-        if (fn_800E177C() == 0) {
+        if (Game_GetMulliganRule() == 0) {
             f32* pPos = gPlayers[nPlayer].ball.vPos;
 
             // How far the ball ended from vBall; the result is not used.
@@ -2352,13 +2352,14 @@ void fn_800D9834(int nPlayer) {
     int nStrokes;
 
     if (gpGame->b27D) {
-        switch (fn_800EC550()) {    // fake match: a plain "if (...) return" folds the branch over a branch
+        // fake match: a plain "if (...) return" folds the branch over a branch
+        switch (GM5_IsChallengeRunning()) {
         case 0:
             break;
         default:
             return;
         }
-        if (fn_800E177C() == 0) {
+        if (Game_GetMulliganRule() == 0) {
             nProfile = gPlayers[nPlayer].nIndex;
             if (gpSaveData[nProfile].bActive) {
                 if (fn_800E1BBC()) {
@@ -2407,7 +2408,7 @@ u8 fn_800D9998(int nPlayer, int nAward) {
     PgaStatCounts* pStats;
     TourSeason* pTour;
 
-    if (fn_800E177C() != 0) return 0;
+    if (Game_GetMulliganRule() != 0) return 0;
     pProfile = &gpSaveData[nPlayer];
     if (!pProfile->bActive) return 0;
     pStats = &pProfile->tour.aStats[PGA_USER_GOLFER];

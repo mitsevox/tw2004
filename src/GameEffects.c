@@ -536,11 +536,11 @@ void fn_800DC290(f32 fHeight) {
     colour[2] = 0.0f;
     colour[3] = 0.5f;
     fn_800141F8(xy, uv, 0.0f, 0.0f, 1.0f, fHeight);
-    fn_80014194(colour);
-    fn_8001644C(0xA1, xy, 0, uv, 2);
+    RenderView_SetColor(colour);
+    RenderView_DrawPrimitive(0xA1, xy, 0, uv, 2);
     fn_800141F8(xy, uv, 0.0f, 1.0f - fHeight, 1.0f, 1.0f);
-    fn_80014194(colour);
-    fn_8001644C(0xA1, xy, 0, uv, 2);
+    RenderView_SetColor(colour);
+    RenderView_DrawPrimitive(0xA1, xy, 0, uv, 2);
     RenderState_SetDepthWrite(1);
     RenderState_SetAlphaTest(1, 6, 0x80);
     RenderState_SetDepthFunc(3);

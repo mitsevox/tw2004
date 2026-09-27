@@ -597,9 +597,9 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             vDir[2] = -1.0f;
             vDir[3] = 0.0f;
         }
-        fn_800BAD60(pModel->pMatrices[0], (Vec4*)vDir, (Vec4*)vWind);
+        Mtx_MultVec4(pModel->pMatrices[0], (Vec4*)vDir, (Vec4*)vWind);
     }
-    fn_800BAD60(pModel->pMatrices[0], (Vec4*)lbl_80193DE8[pChain->n10], (Vec4*)vFace);
+    Mtx_MultVec4(pModel->pMatrices[0], (Vec4*)lbl_80193DE8[pChain->n10], (Vec4*)vFace);
     vFace[1] = 0.0f;
     vWind[1] = 0.0f;
     fFacing = Vec3_Dot(vFace, vWind);

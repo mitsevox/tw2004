@@ -987,8 +987,8 @@ void fn_8005A850(int nPlayer) {
                     128.0f * pSw->fAlpha * (1.0f - (f32)i / pSw->nNumInBlurQueue);
                 idx[i + 1] = i + 1;
             }
-            fn_80035138(0);
-            fn_80016B9C();
+            RenderState_SetClipMode(0);
+            RenderState_SetCameraMatrices();
             fn_80013EEC(Camera_GetCurrent());
             RenderState_SetDrawFlags(0x50);
             RenderState_SetBlendFactors(4, 5);

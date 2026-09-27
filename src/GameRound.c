@@ -475,7 +475,7 @@ u8 fn_800E1734(void) {
 }
 
 // The mode's mulligan rule: 0 none, 1 any number, 2 one per player per nine.
-int fn_800E177C(void) {
+int Game_GetMulliganRule(void) {
     return gpGame->nMulligans;
 }
 
@@ -777,10 +777,10 @@ u8 fn_800E23EC(int nPlayer) {
     if (Player_IsCPU(nPlayer)) {
         return 0;
     }
-    if (fn_800E177C() == 0) {
+    if (Game_GetMulliganRule() == 0) {
         return 0;
     }
-    if (fn_800E177C() == 2 && gPlayers[nPlayer].bMulliganUsed) {
+    if (Game_GetMulliganRule() == 2 && gPlayers[nPlayer].bMulliganUsed) {
         return 0;
     }
     return 1;

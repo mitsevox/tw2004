@@ -135,9 +135,9 @@ void fn_800E3BEC(void) {
 void fn_800E3C0C(u8 b) {
     if (b) {
         fn_800E3E0C();
-        fn_80062D6C(2, 1);
+        GameMsg_SendInt(2, 1);
     } else {
-        fn_80062D6C(1, 1);
+        GameMsg_SendInt(1, 1);
     }
     lbl_802822D9 = b;
     lbl_802822D0 = gSession.nFrameCount;
@@ -147,9 +147,9 @@ void fn_800E3C0C(u8 b) {
 void fn_800E3C70(u8 b) {
     if (b) {
         fn_800E3E0C();
-        fn_80062D6C(2, 2);
+        GameMsg_SendInt(2, 2);
     } else {
-        fn_80062D6C(1, 2);
+        GameMsg_SendInt(1, 2);
     }
     lbl_802822D8 = b;
     lbl_802822CC = gSession.nFrameCount;
@@ -159,9 +159,9 @@ void fn_800E3C70(u8 b) {
 void fn_800E3CD4(u8 b) {
     if (b) {
         fn_800E3E0C();
-        fn_80062D6C(2, 3);
+        GameMsg_SendInt(2, 3);
     } else {
-        fn_80062D6C(1, 3);
+        GameMsg_SendInt(1, 3);
     }
     lbl_802822D7 = b;
     lbl_802822C8 = gSession.nFrameCount;
@@ -223,7 +223,7 @@ void fn_800E3E3C(void) {
         gSession.nPaused = 1;
         fn_800DC9D4(1);
         EASBio_SetGamePlayState(0);
-        if (fn_800EC550()) {
+        if (GM5_IsChallengeRunning()) {
             fn_800ECBE4();
         }
     }
@@ -315,7 +315,7 @@ void fn_800E41C8(void) {
 }
 
 void fn_800E41D4(int nPlayer) {
-    fn_80062D6C(42, nPlayer + 1);
+    GameMsg_SendInt(42, nPlayer + 1);
     fn_800E4204();
 }
 
@@ -580,11 +580,11 @@ void fn_800E4C20(u8 bHuman) {
         lbl_80282281 = 1;
         GameEffects_ResetGameEffectSettings();
         if (bHuman) {
-            fn_80062D38(0xE, 1, 1);
+            GameMsg_Send2Ints(0xE, 1, 1);
             EVENT_Trigger(0xFF, 0x41, 0, -1);
             return;
         }
-        fn_80062D38(0xE, 1, 0);
+        GameMsg_Send2Ints(0xE, 1, 0);
     }
 }
 
@@ -617,20 +617,20 @@ void fn_800E4D94(u8 bHuman) {
             CameraController_FadeIn(ViewController_GetCameraController(gPlayers[1].nView[0]), 0.0f, v);
         }
         if (bHuman) {
-            fn_80062D38(0xE, 2, 1);
+            GameMsg_Send2Ints(0xE, 2, 1);
             EVENT_Trigger(0xFF, 0x41, 0, -1);
             return;
         }
-        fn_80062D38(0xE, 2, 0);
+        GameMsg_Send2Ints(0xE, 2, 0);
     }
 }
 
 void fn_800E4F88(int nPlayer) {
-    fn_80062D6C(59, nPlayer);
+    GameMsg_SendInt(59, nPlayer);
 }
 
 void fn_800E4FB0(u8 a, int b) {
-    fn_80062D38(0x22, a, b);
+    GameMsg_Send2Ints(0x22, a, b);
     if (a == 1) {
         lbl_802822BE = 1;
     }

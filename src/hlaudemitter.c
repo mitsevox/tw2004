@@ -287,7 +287,7 @@ void fn_800AD800(u8 nId, f32* pPos, f32* pLast, u8 nView) {
                     pPos = pInst->vPos;
                 }
                 if (pInst->n28 == 0) {
-                    fn_800BAD60(pLens->m44, (Vec4*)pPos, &vRel);
+                    Mtx_MultVec4(pLens->m44, (Vec4*)pPos, &vRel);
                     pRel = &vRel.x;
                 } else if (i == nView) {
                     pRel = pPos;
@@ -334,7 +334,8 @@ void fn_800ADA28(u8 nId, u8 nTrack, u8 n, int bCheck) {
     }
 }
 
-void fn_800ADA94(u8 nId, u8 nTrack, f32 fVolume) {
+// Sets the volume of track nTrack of emitter instance nId, if the instance is alive.
+void Emi_SetTrackAttenuation(u8 nId, u8 nTrack, f32 fVolume) {
     if (fn_800AD674(nId) != NULL) {
         fn_800A8424(nId, nTrack, fVolume);
     }
@@ -382,7 +383,7 @@ void fn_800ADCD0(s16 nEmitter, u8 nTrack, u8 n, int bCheck) {
 void fn_800ADD54(s16 nEmitter, u8 nTrack, f32 fVolume) {
     AudInstance* pInst;
     for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
-        fn_800ADA94(pInst->nId, nTrack, fVolume);
+        Emi_SetTrackAttenuation(pInst->nId, nTrack, fVolume);
     }
 }
 

@@ -15,7 +15,7 @@ void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 
 #ifdef __MWERKS__
 // A four-float vector through the whole matrix.
-asm void fn_800BAD60(register float mtx[4][4], register Vec4* src, register Vec4* dst) {
+asm void Mtx_MultVec4(register float mtx[4][4], register Vec4* src, register Vec4* dst) {
     nofralloc
     psq_l     f0, 0(src), 0, 0
     psq_l     f1, 0(mtx), 0, 0
@@ -62,7 +62,7 @@ asm void fn_800BADB4(register f32 (*pMtx)[4], register f32* pIn, register f32* p
     blr
 }
 
-// fn_800BAD60 for nRows four-float vectors in a row.
+// Mtx_MultVec4 for nRows four-float vectors in a row.
 asm void fn_800BADF8(register f32 (*pMtx)[4], register f32 (*pSrc)[4], register f32 (*pDst)[4],
                      register int nRows) {
     nofralloc
@@ -124,7 +124,7 @@ loop:
 #else
 // port: untested, the plain-C versions for compilers without paired singles. The paired-single
 // code rounds each multiply-add the same way, so results can differ in the last bits.
-void fn_800BAD60(float mtx[4][4], Vec4* src, Vec4* dst) {
+void Mtx_MultVec4(float mtx[4][4], Vec4* src, Vec4* dst) {
     f32* pIn = (f32*)src;
     f32 out[4];
     int j;
@@ -150,7 +150,7 @@ void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut) {
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows) {
     int i;
     for (i = 0; i < nRows; i++) {
-        fn_800BAD60(pMtx, (Vec4*)pSrc[i], (Vec4*)pDst[i]);
+        Mtx_MultVec4(pMtx, (Vec4*)pSrc[i], (Vec4*)pDst[i]);
     }
 }
 

@@ -1010,7 +1010,7 @@ int fn_800D1530(int nPlayer) {
     fSin = Math_Sin(fAim);
     fCos = Math_Cos(fAim);
     Vec3Copy(vNormal, vTurned);
-    fn_80055D70(&vTurned[2], &vTurned[0], fSin, fCos);
+    Ball_RotatePair(&vTurned[2], &vTurned[0], fSin, fCos);
     fEpsilon = 0.000001f;
     if (vTurned[1] < fEpsilon && vTurned[1] > -fEpsilon) {
         if (vTurned[0] < 0.0f) {

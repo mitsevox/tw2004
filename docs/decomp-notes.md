@@ -1136,7 +1136,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] Two neighbouring words handled with 64-bit operations are one `u64`.** When the
   code ORs, ANDs and tests two adjacent words together (`and`/`xor`/`or.` on both halves, an AND
   with `li -1` for the upper word), declare one `u64` field. Player 0xC48/0xC4C as two `s32`s
-  could not match in any statement order; as `u64 uC48` GameMode8 `fn_800FAAB8` went 93.3% ->
+  could not match in any statement order; as `u64 uC48` GameMode8 `GM_TradeEventPoints` went 93.3% ->
   99.2%, then exact with statement order.
 - **[verified] Taking a field's address on a cast pointer reuses the base register.**
   `((Ball*)gPlayers[n].ball)->vPrev` gives `addi r4, r3, 0x10` where the original computes it
@@ -1261,7 +1261,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   `if (...) b = 1;` does not**: `bDown = (A || B) && (C || D) && (E || F);` (GameMode8
   `fn_800FCC38`, 98.9% -> 100).
 - **[verified] `n ? 0 : 1` and `n == 0` give the same instructions, different saved registers.**
-  GameMode8 `fn_800FAAB8`: `nOther = nPlayer ? 0 : 1;` put `nOther` in the original's register
+  GameMode8 `GM_TradeEventPoints`: `nOther = nPlayer ? 0 : 1;` put `nOther` in the original's register
   (91.7% -> 93.1); `nOther = nPlayer == 0;` and `!nPlayer` (89.4%) did not.
 - **[verified] Float compares.** `if (a < b) return;` gives `fcmpo; blt`; `if (a >= b) return;`
   gives `fcmpo; cror eq,gt,eq; beq` (the NaN-safe form). When the original has a plain `bge`,

@@ -173,7 +173,7 @@ void fn_800F5F58(int nPlayer) {
                 gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
                 bDone = 1;
                 gPlayers[nPlayer].nDD8 += lbl_802823A8;
-                fn_800F3980(0x33, lbl_802823A8, 0, 0, 0xCA, 1);
+                GameMsg_Send5Ints(0x33, lbl_802823A8, 0, 0, 0xCA, 1);
                 lbl_802823A8 = 0;
                 if ((s8)gPlayers[nPlayer].bE9E == 0) {
                     gPlayers[nPlayer].bE9E = 1;
@@ -282,10 +282,10 @@ void fn_800F5F58(int nPlayer) {
                 }
             }
             if (bDone == 0) {
-                fn_800F3980(0x33, 0, 0, 0, nSurface, 1);
+                GameMsg_Send5Ints(0x33, 0, 0, 0, nSurface, 1);
             }
         } else {
-            fn_800F3980(0x33, 0, 0, 0, 0xD0, 1);
+            GameMsg_Send5Ints(0x33, 0, 0, 0, 0xD0, 1);
             lbl_802823A8 = 0;
             gPlayers[nPlayer].nE90 = 0;
             lbl_802823A4 = 0;
@@ -323,9 +323,9 @@ void fn_800F5F58(int nPlayer) {
             gPlayers[nPlayer].nDD8 = 0;
         } else if (!gSession.bReplay) {
             if (fn_800F2788(nPlayer, fLength)) {
-                fn_800F3980(0x33, lbl_802823A8, 0, 0, 0xD6, 1);
+                GameMsg_Send5Ints(0x33, lbl_802823A8, 0, 0, 0xD6, 1);
             } else {
-                fn_800F3980(0x33, lbl_802823A8, 0, 0, nSurface, 1);
+                GameMsg_Send5Ints(0x33, lbl_802823A8, 0, 0, nSurface, 1);
             }
             if (lbl_802823A8 > 0 && nSurface < 0x85) {
                 fn_800A62A4();

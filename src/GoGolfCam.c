@@ -15,7 +15,7 @@ void     fn_800352BC(void);
 u8       fn_800635D0(int nPlayer);
 u8       fn_800B36F4(View* pView, int nPlayer, f32 fFrameTime);
 void     fn_800C73B8(f32* pA, f32* pB, f32* pOut);
-void     fn_800C73DC(f32* pA, f32* pB, f32* pOut);
+void     GolfCam_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 void     fn_800C7400(f32* pA, f32* pOut);
 f32      fn_800C741C(Character* pChar, u64 uEvent);
 void     GolfCamera_ChooseReactionCam(View* pView, int nPlayer, int a);
@@ -201,11 +201,11 @@ void GolfCamera_InitZoomToAimCamera(View* pView, int nPlayer) {
     pView->script.pShot = NULL;
     pView->script.f108 = -1.0f;
     if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SHOT_SETUP) {
-        fn_800C73DC(pSub, pCam, vDir);
+        GolfCam_Vec3Sub(pSub, pCam, vDir);
         if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
             Vec_NormalizeTo(vDir, vDir);
         }
-        fn_800C73DC(vAim, pCam, v);
+        GolfCam_Vec3Sub(vAim, pCam, v);
         Vec3_Scale(Math_Sqrt(Vec3_LengthSqClamped(v)), vDir, vDir);
         fn_800C73B8(pCam, vDir, pSub);
     }
@@ -254,20 +254,20 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
     fBase = lbl_80281F78->f0;
     fSlow = lbl_80281F78->f8;
     // flat distances to the goal: from the camera, from the aim and from where it started
-    fn_800C73DC(vGoal, pCam, vMove);
+    GolfCam_Vec3Sub(vGoal, pCam, vMove);
     vMove[1] = 0.0f;
     fDist = Math_Sqrt(Vec3_LengthSqClamped(vMove));
-    fn_800C73DC(vGoal, vAim, vAimMove);
+    GolfCam_Vec3Sub(vGoal, vAim, vAimMove);
     vAimMove[1] = 0.0f;
     fTotal = Math_Sqrt(Vec3_LengthSqClamped(vAimMove));
-    fn_800C73DC(vGoal, pView->shot19C.v30, vStart);
+    GolfCam_Vec3Sub(vGoal, pView->shot19C.v30, vStart);
     vStart[1] = 0.0f;
     f = Math_Sqrt(Vec3_LengthSqClamped(vStart));
     if (fTotal < f) {
         fTotal = f;
     }
     if (pView->script.f108 >= 1.0f) {
-        fn_800C73DC(vGoal, pCam, vCreep);
+        GolfCam_Vec3Sub(vGoal, pCam, vCreep);
         vCreep[1] = 0.0f;
         fSlow = Math_Sqrt(Vec3_LengthSqClamped(vCreep));
         if (vCreep[0] != 0.0f || vCreep[1] != 0.0f || vCreep[2] != 0.0f) {
@@ -463,11 +463,11 @@ void GolfCamera_InitGreenZoomToAimCamera(View* pView, int nPlayer) {
         pView->script.f108 = -1.0f;
         pView->script.f10C = 100000000.0f;
         if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SHOT_SETUP) {
-            fn_800C73DC(pSub, pCam, vDir);
+            GolfCam_Vec3Sub(pSub, pCam, vDir);
             if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
                 Vec_NormalizeTo(vDir, vDir);
             }
-            fn_800C73DC(vAim, pCam, v);
+            GolfCam_Vec3Sub(vAim, pCam, v);
             Vec3_Scale(Math_Sqrt(Vec3_LengthSqClamped(v)), vDir, vDir);
             fn_800C73B8(pCam, vDir, pSub);
         }
@@ -517,13 +517,13 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
         fBase = lbl_80281F78->f34;
         fSlow = lbl_80281F78->f30;
         // flat distances to the goal: from the camera, from the aim and from where it started
-        fn_800C73DC(vGoal, pCam, vMove);
+        GolfCam_Vec3Sub(vGoal, pCam, vMove);
         vMove[1] = 0.0f;
         fDist = Math_Sqrt(Vec3_LengthSqClamped(vMove));
-        fn_800C73DC(vGoal, vAim, vAimMove);
+        GolfCam_Vec3Sub(vGoal, vAim, vAimMove);
         vAimMove[1] = 0.0f;
         fTotal = Math_Sqrt(Vec3_LengthSqClamped(vAimMove));
-        fn_800C73DC(vGoal, pView->shot19C.v30, vStart);
+        GolfCam_Vec3Sub(vGoal, pView->shot19C.v30, vStart);
         vStart[1] = 0.0f;
         f = Math_Sqrt(Vec3_LengthSqClamped(vStart));
         if (fTotal < f) {
@@ -534,7 +534,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
         fHeight *= 1.0f / fn_8001EFFC((u8*)pLens);
         // high enough to see the pin (up to 20 from the target) through the lens
         nPinSet = Game_CurrentPinSet();
-        fn_800C73DC(&pCourse->pin[nPinSet].x, vTarget, vPin);
+        GolfCam_Vec3Sub(&pCourse->pin[nPinSet].x, vTarget, vPin);
         vPin[1] = 0.0f;
         f = Math_Sqrt(Vec3_LengthSqClamped(vPin));
         f += 1.5f;
@@ -544,7 +544,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
             fHeight = f;
         }
         if (pView->script.f108 >= 1.0f) {
-            fn_800C73DC(vGoal, pCam, vCreep);
+            GolfCam_Vec3Sub(vGoal, pCam, vCreep);
             vCreep[1] = 0.0f;
             fSlow = Math_Sqrt(Vec3_LengthSqClamped(vCreep));
             if (vCreep[0] != 0.0f || vCreep[1] != 0.0f || vCreep[2] != 0.0f) {
@@ -630,12 +630,12 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
         }
         CameraScript_LagAimMarker(nPlayer, pSub, pCam, &pView->shot19C, 0, 0, f, 0.0f, lbl_80281F78->fDC);
         if (pView->script.f108 < 1.0f) {
-            fn_800C73DC(pSub, pCam, vDiff);
+            GolfCam_Vec3Sub(pSub, pCam, vDiff);
             vSide[0] = vDiff[2];
             vSide[1] = 0.0f;
             vSide[2] = -vDiff[0];
         } else {
-            fn_800C73DC(vTarget, gPlayers[nPlayer].vBall, vDiff);
+            GolfCam_Vec3Sub(vTarget, gPlayers[nPlayer].vBall, vDiff);
             vSide[0] = vDiff[2];
             vSide[1] = 0.0f;
             vSide[2] = -vDiff[0];
@@ -1016,7 +1016,7 @@ void fn_800BFC80(View* pView, int nPlayer) {
         }
         nPinSet = Game_CurrentPinSet();
         Vec_Copy(pCam, pView->v30);
-        fn_800C73DC(pSub, pCam, v);
+        GolfCam_Vec3Sub(pSub, pCam, v);
         if (v[0] != 0.0f || v[1] != 0.0f || v[2] != 0.0f) {
             Vec_NormalizeTo(v, v);
         }
@@ -1176,7 +1176,7 @@ void fn_800C0414(View* pView, int nPlayer) {
     if (pCourse != NULL) {
         Vec3Copy(pCam, vOld);
         nPinSet = Game_CurrentPinSet();
-        fn_800C73DC(&pCourse->pin[nPinSet].x, gPlayers[nPlayer].vBall, vToPin);
+        GolfCam_Vec3Sub(&pCourse->pin[nPinSet].x, gPlayers[nPlayer].vBall, vToPin);
         vToPin[1] = 0.0f;
         fDist = Math_Sqrt(Vec3_LengthSqClamped(vToPin));
         if (fDist < 0.1f) {
@@ -1191,7 +1191,7 @@ void fn_800C0414(View* pView, int nPlayer) {
             fOut = lbl_80281F78->f50;
         }
         if (pView->script.fCamTime < fTime) {
-            fn_800C73DC(gPlayers[nPlayer].ballBefore.vPos, &pCourse->pin[nPinSet].x, vDir);
+            GolfCam_Vec3Sub(gPlayers[nPlayer].ballBefore.vPos, &pCourse->pin[nPinSet].x, vDir);
             vDir[1] = 0.0f;
             if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
                 Vec_NormalizeTo(vDir, vDir);
@@ -1686,7 +1686,7 @@ void fn_800C1790(View* pView, int nPlayer) {
         fn_80035240(NULL);
         fn_80013CCC(Camera_GetCurrent());
         fn_80013EEC(Camera_GetCurrent());
-        fn_80016B9C();
+        RenderState_SetCameraMatrices();
         RenderState_Flush();
         lbl_80282220->b56 = 0;
         lbl_80282220->b57 = 0;
@@ -1868,14 +1868,14 @@ void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
         } else {
             nClass = 10;
         }
-        fn_800C73DC(gPlayers[nPlayer].ballBefore.vPos, gPlayers[nPlayer].ball.vStart, vDiff);
+        GolfCam_Vec3Sub(gPlayers[nPlayer].ballBefore.vPos, gPlayers[nPlayer].ball.vStart, vDiff);
         fDist = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
     } else {
         fDist = AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
         fDist *= Physics_GetLiePowerPercentage(&gPlayers[nPlayer].ball);
         fDist *= SW_vGetShotPower(nPlayer);
         nClass = 2;
-        fn_800C73DC(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vBall, vAim);
+        GolfCam_Vec3Sub(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vBall, vAim);
         Vec_NormalizeTo(vAim, vAim);
         Vec3_Scale(fDist, vAim, vAim);
         fn_800C73B8(vAim, gPlayers[nPlayer].vBall, pView->script.v50);
@@ -2199,7 +2199,7 @@ void GolfCamera_ProcessPostShotCamera(View* pView, int nPlayer) {
         GolfCamera_InitPostShotCamera(pView, nPlayer);
     }
     if (pView->script.bCF && fn_8004562C(pView->script.pShot)) {
-        fn_800C73DC(pCam, gPlayers[nPlayer].ball.vPos, vDelta);
+        GolfCam_Vec3Sub(pCam, gPlayers[nPlayer].ball.vPos, vDelta);
         vDelta[1] = 0.0f;
         fDist = (f32)Math_Sqrt(Vec3_LengthSqClamped(vDelta)) / 30.0f;
         fDist = (fDist < 0.5f) ? 0.5f : ((fDist > 5.0f) ? 5.0f : fDist);
@@ -2590,7 +2590,7 @@ u8 fn_800C3FC0(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam) {
     Ter_GetTGD();
     Vec_Copy(gPlayers[nPlayer].vTargetCopy, vTarget);
     pBall = gPlayers[nPlayer].vBall;
-    fn_800C73DC(vTarget, pBall, vDir);
+    GolfCam_Vec3Sub(vTarget, pBall, vDir);
     vDir[1] = 0.0f;
     fDist = Math_Sqrt(Vec3_LengthSqClamped(vDir));
     if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
@@ -2601,7 +2601,7 @@ u8 fn_800C3FC0(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam) {
     pAim[0] += pView->shot19C.f64 * -Vec3_Dot(vDir, lbl_801913A8);
     pAim[2] += pView->shot19C.f64 * Vec3_Dot(vDir, lbl_80191398);
     pAim[1] = pView->shot19C.v30[1];
-    fn_800C73DC(vTarget, pAim, vBack);
+    GolfCam_Vec3Sub(vTarget, pAim, vBack);
     vBack[1] = 0.0f;
     if (vBack[0] != 0.0f || vBack[1] != 0.0f || vBack[2] != 0.0f) {
         Vec_NormalizeTo(vBack, vBack);
@@ -2649,16 +2649,16 @@ u8 fn_800C3FC0(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam) {
             pCam[2] = gPlayers[nPlayer].vBall[2] + (gPlayers[nPlayer].vBall[2] - pAim[2]);
         }
     }
-    fn_800C73DC(pCam, pSub, vBack);
+    GolfCam_Vec3Sub(pCam, pSub, vBack);
     vBack[1] = 0.0f;
-    fn_800C73DC(vTarget, pAim, vDir);
-    fn_800C73DC(pCam, pAim, v);
+    GolfCam_Vec3Sub(vTarget, pAim, vDir);
+    GolfCam_Vec3Sub(pCam, pAim, v);
     v[1] = 0.0f;
     vDir[1] = 0.0f;
     if (Vec3_Dot(vDir, v) < 0.0f) {
         pCam[0] = pAim[0];
         pCam[2] = pAim[2];
-        fn_800C73DC(pCam, pSub, vBack);
+        GolfCam_Vec3Sub(pCam, pSub, vBack);
         vBack[1] = 0.0f;
     }
     return bMoved;
@@ -2820,7 +2820,7 @@ void GolfCamera_ComputeSteepSlopeCamVectors(View* pView, int nPlayer) {
     vBase[1] = lbl_80281F78->f1EC + gPlayers[nPlayer].ball.vPos[1];
     vBase[2] = gPlayers[nPlayer].ball.vPos[2];
     vBase[3] = 0.0f;
-    fn_800C73DC(vTarget, vBase, vDelta);
+    GolfCam_Vec3Sub(vTarget, vBase, vDelta);
     if (vDelta[0] != 0.0f || vDelta[1] != 0.0f || vDelta[2] != 0.0f) {
         Vec_NormalizeTo(vDelta, vDir);
     } else {
@@ -2888,7 +2888,7 @@ void GolfCamera_ClampLookAngle(f32* pFrom, f32* pTo, f32* pOut) {
     f32 fMaxDown = PI * lbl_80281F78->fMaxPitchDown / 180.0f;
     f32 fAngle;
     u8 bClamp;
-    fn_800C73DC(pTo, pFrom, v);
+    GolfCam_Vec3Sub(pTo, pFrom, v);
     vFlat[0] = v[0];
     vFlat[1] = 0.0f;
     vFlat[2] = v[2];
@@ -2936,7 +2936,7 @@ int fn_800C4D2C(f32* pFrom, f32* pTo, f32* pOut, f32 fMax) {
     f32 v[4];
     f32 vStep[4];
     f32 fDist;
-    fn_800C73DC(pTo, pFrom, v);
+    GolfCam_Vec3Sub(pTo, pFrom, v);
     fDist = Math_Sqrt(Vec3_LengthSqClamped(v));
     if (fDist > fMax && fDist > 1e-6f) {
         Vec3_Scale(fMax / fDist, v, vStep);
@@ -3008,7 +3008,7 @@ void fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
     CamShot* pShot;
     int nOrder;
     Vec_Copy(pFrom, vFrom);
-    fn_800C73DC(pTo, vFrom, v);
+    GolfCam_Vec3Sub(pTo, vFrom, v);
     v[1] = 0.0f;
     fn_800C73B8(pTo, v, v);
     v[1] = vFrom[1];
@@ -3186,7 +3186,7 @@ void fn_800C56B4(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
     f32 fChange;
     CamTuning* pTune;
     Vec_Copy(pFrom, vFrom);
-    fn_800C73DC(pTo, vFrom, v);
+    GolfCam_Vec3Sub(pTo, vFrom, v);
     v[1] = 0.0f;
     fn_800C73B8(pTo, v, v);
     v[1] = vFrom[1];
@@ -3408,7 +3408,7 @@ u8 fn_800C5FE4(View* pView, int nPlayer) {
 // aim point.
 void fn_800C6010(View* pView, int nPlayer) {
     f32 v[4];
-    fn_800C73DC(gPlayers[nPlayer].vTarget2, gPlayers[nPlayer].vBall, v);
+    GolfCam_Vec3Sub(gPlayers[nPlayer].vTarget2, gPlayers[nPlayer].vBall, v);
     v[1] = 0.0f;
     if (pView->shot19C.f60 + 0.1f < (f32)Math_Sqrt(Vec3_LengthSqClamped(v)) - 3.0f) {
         pView->shot19C.f60 += 0.1f;
@@ -3449,7 +3449,7 @@ void GolfCamera_ChooseReactionCam(View* pView, int nPlayer, int a) {
     } else {
         nClass = 10;
     }
-    fn_800C73DC(gPlayers[nPlayer].ballBefore.vPos, gPlayers[nPlayer].ball.vStart, v);
+    GolfCam_Vec3Sub(gPlayers[nPlayer].ballBefore.vPos, gPlayers[nPlayer].ball.vStart, v);
     v[1] = 0.0f;
     fDist = Math_Sqrt(Vec3_LengthSqClamped(v));
     if (!DynamicCam_ChoosePairedSequenceOrCamera(nPlayer, 1, &pSeq, &pShot) && pShot == NULL) {
@@ -3907,8 +3907,8 @@ u8 fn_800C71A4(View* pView, int nPlayer) {
     if (pView->script.f98 > 5.0f) {
         return 0;
     }
-    fn_800C73DC(pView->v10, pView->v0, vLook);
-    fn_800C73DC(gPlayers[nPlayer].ball.vPos, pView->v0, vBall);
+    GolfCam_Vec3Sub(pView->v10, pView->v0, vLook);
+    GolfCam_Vec3Sub(gPlayers[nPlayer].ball.vPos, pView->v0, vBall);
     vLook[1] = 0.0f;
     vBall[1] = 0.0f;
     if (vLook[0] != 0.0f || vLook[1] != 0.0f || vLook[2] != 0.0f) {
@@ -3984,7 +3984,7 @@ void fn_800C73B8(f32* pA, f32* pB, f32* pOut) {
 
 // Subtracts pB from pA (three floats) into pOut.
 #ifdef __MWERKS__
-asm void fn_800C73DC(register f32* pA, register f32* pB, register f32* pOut) {
+asm void GolfCam_Vec3Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -3998,7 +3998,7 @@ asm void fn_800C73DC(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_800C73DC(f32* pA, f32* pB, f32* pOut) {
+void GolfCam_Vec3Sub(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];

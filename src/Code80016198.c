@@ -124,7 +124,7 @@ void fn_800162AC(f32* pPos, f32* pColour, f32* pUV, int nVerts) {
         } else {
             pQuadUV = NULL;
         }
-        fn_8001644C(0x98, aPos[0], pQuadColour, pQuadUV, 4);
+        RenderView_DrawPrimitive(0x98, aPos[0], pQuadColour, pQuadUV, 4);
     }
 }
 
@@ -132,7 +132,7 @@ void fn_800162AC(f32* pPos, f32* pColour, f32* pUV, int nVerts) {
 // vertex takes four floats of pPos, and of pColour and pUV when given; without pColour the view's
 // colour is used. Unless the view's nD0 is set, its viewport and matrices are used for the draw
 // and the GX state is put back afterwards.
-void fn_8001644C(int ePrim, f32* pPos, f32* pColour, f32* pUV, int nVerts) {
+void RenderView_DrawPrimitive(int ePrim, f32* pPos, f32* pColour, f32* pUV, int nVerts) {
     f32 aProjection[7];
     f32 aViewport[6];
     ViewState* pView = lbl_80280E08;
@@ -185,7 +185,7 @@ void fn_8001644C(int ePrim, f32* pPos, f32* pColour, f32* pUV, int nVerts) {
     if (pView->nD0 == 0) {
         GXSetProjectionv(aProjection);
         fn_80016C44(aViewport);
-        fn_80016B9C();
+        RenderState_SetCameraMatrices();
         RenderState_Flush();
     }
 }
@@ -268,7 +268,7 @@ void fn_80016B6C(f32 fX, f32 fY) {
 }
 
 // Give the renderer the current camera's matrices, with rows 0 and 2 of the first negated.
-void fn_80016B9C(void) {
+void RenderState_SetCameraMatrices(void) {
     Mtx_Copy(((Camera*)Camera_GetCurrent())->m15C, lbl_801B8980.m34);
     Mtx_Copy(((Camera*)Camera_GetCurrent())->m9C, lbl_801B8980.m74);
     fn_80016C28(lbl_801B8980.m34[0], lbl_801B8980.m34[0]);

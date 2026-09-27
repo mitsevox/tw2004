@@ -132,16 +132,16 @@ void fn_800488B4(UObject* pObj) {
     }
     switch (nClip) {
     case 2:
-        fn_80016B9C();
-        fn_80035138(1);
+        RenderState_SetCameraMatrices();
+        RenderState_SetClipMode(1);
         break;
     case 1:
-        fn_80016B9C();
-        fn_80035138(1);
+        RenderState_SetCameraMatrices();
+        RenderState_SetClipMode(1);
         break;
     default:
-        fn_80016B9C();
-        fn_80035138(0);
+        RenderState_SetCameraMatrices();
+        RenderState_SetClipMode(0);
         break;
     }
     RenderState_Flush();

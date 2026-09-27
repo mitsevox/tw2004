@@ -1015,24 +1015,24 @@ void fn_801098B0(MsgArg* pArgs, MsgArg* pResult) {
     FE_CrAP_TurnOnPart(5, 0, 0);
     FE_CrAP_TurnOnPart(6, 0, 0);
     FE_CrAP_TurnOnPart(4, 0, 0);
-    fn_8007975C(pProfile, 0, 80);
-    fn_8007975C(pProfile, 3, 0);
-    fn_8007975C(pProfile, 4, 80);
-    fn_8007975C(pProfile, 15, 0);
-    fn_8007975C(pProfile, 5, 90);
-    fn_8007975C(pProfile, 6, 90);
-    fn_8007975C(pProfile, 1, 0);
-    fn_8007975C(pProfile, 2, 0);
-    fn_8007975C(pProfile, 7, 0);
-    fn_8007975C(pProfile, 16, 0);
-    fn_8007975C(pProfile, 19, 70);
-    fn_8007975C(pProfile, 20, 70);
-    fn_8007975C(pProfile, 8, 70);
-    nChoice = fn_8007975C(pProfile, 14, 0);
+    FE_CrAP_RandomizePart(pProfile, 0, 80);
+    FE_CrAP_RandomizePart(pProfile, 3, 0);
+    FE_CrAP_RandomizePart(pProfile, 4, 80);
+    FE_CrAP_RandomizePart(pProfile, 15, 0);
+    FE_CrAP_RandomizePart(pProfile, 5, 90);
+    FE_CrAP_RandomizePart(pProfile, 6, 90);
+    FE_CrAP_RandomizePart(pProfile, 1, 0);
+    FE_CrAP_RandomizePart(pProfile, 2, 0);
+    FE_CrAP_RandomizePart(pProfile, 7, 0);
+    FE_CrAP_RandomizePart(pProfile, 16, 0);
+    FE_CrAP_RandomizePart(pProfile, 19, 70);
+    FE_CrAP_RandomizePart(pProfile, 20, 70);
+    FE_CrAP_RandomizePart(pProfile, 8, 70);
+    nChoice = FE_CrAP_RandomizePart(pProfile, 14, 0);
     if (Misc_RandFunc(0) % 100 < 95) {
         FE_CrAP_TurnOnPart(15, 0, nChoice);
     } else {
-        fn_8007975C(pProfile, 15, 0);
+        FE_CrAP_RandomizePart(pProfile, 15, 0);
     }
     if (nRoll < 75) {
         FE_CrAP_TurnOnPart(9, 0, Misc_RandFunc(0) % 3);
@@ -1063,13 +1063,13 @@ void fn_80109BA4(MsgArg* pArgs, MsgArg* pResult) {
     fn_801073DC(12);
     fn_801073DC(13);
     fn_801073DC(14);
-    fn_8007975C(pProfile, 0, 80);
-    fn_8007975C(pProfile, 1, 0);
-    fn_8007975C(pProfile, 2, 0);
-    fn_8007975C(pProfile, 7, 0);
-    fn_8007975C(pProfile, 19, 70);
-    fn_8007975C(pProfile, 20, 70);
-    fn_8007975C(pProfile, 8, 70);
+    FE_CrAP_RandomizePart(pProfile, 0, 80);
+    FE_CrAP_RandomizePart(pProfile, 1, 0);
+    FE_CrAP_RandomizePart(pProfile, 2, 0);
+    FE_CrAP_RandomizePart(pProfile, 7, 0);
+    FE_CrAP_RandomizePart(pProfile, 19, 70);
+    FE_CrAP_RandomizePart(pProfile, 20, 70);
+    FE_CrAP_RandomizePart(pProfile, 8, 70);
     fn_800797E0(pProfile, 7, (Misc_RandFunc(0) & 1) + 1, 0);
     fn_8007873C(pProfile);
 }
@@ -1157,20 +1157,20 @@ void fn_80109FB4(MsgArg* pArgs, MsgArg* pResult) {
     FE_CrAP_TurnOnPart(6, 0, 0);
     FE_CrAP_TurnOnPart(4, 0, 0);
     FE_CrAP_TurnOnPart(22, 0, 0);
-    fn_8007975C(pProfile, 3, 0);
-    fn_8007975C(pProfile, 4, 80);
-    fn_8007975C(pProfile, 15, 0);
-    fn_8007975C(pProfile, 5, 90);
-    fn_8007975C(pProfile, 6, 90);
-    fn_8007975C(pProfile, 16, 0);
-    fn_8007975C(pProfile, 22, 80);
-    fn_8007975C(pProfile, 21, 0);
-    fn_8007975C(pProfile, 11, 0);
-    nChoice = fn_8007975C(pProfile, 14, 0);
+    FE_CrAP_RandomizePart(pProfile, 3, 0);
+    FE_CrAP_RandomizePart(pProfile, 4, 80);
+    FE_CrAP_RandomizePart(pProfile, 15, 0);
+    FE_CrAP_RandomizePart(pProfile, 5, 90);
+    FE_CrAP_RandomizePart(pProfile, 6, 90);
+    FE_CrAP_RandomizePart(pProfile, 16, 0);
+    FE_CrAP_RandomizePart(pProfile, 22, 80);
+    FE_CrAP_RandomizePart(pProfile, 21, 0);
+    FE_CrAP_RandomizePart(pProfile, 11, 0);
+    nChoice = FE_CrAP_RandomizePart(pProfile, 14, 0);
     if (Misc_RandFunc(0) % 100 < 95) {
         FE_CrAP_TurnOnPart(15, 0, nChoice);
     } else {
-        fn_8007975C(pProfile, 15, 0);
+        FE_CrAP_RandomizePart(pProfile, 15, 0);
     }
     if (nRoll < 75) {
         FE_CrAP_TurnOnPart(9, 0, Misc_RandFunc(0) % 3);

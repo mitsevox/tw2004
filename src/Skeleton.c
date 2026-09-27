@@ -20,7 +20,7 @@ f32  fn_800275F4(CharModel* pModel, IKChain* pChain, f32* pTarget);   // an IK e
 void Quat_Invert(f32* pQ, f32* pOut);                   // Quaternion.c
 void fn_8001FBA4(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two points by fT
 void fn_8001FB00(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two rotations by fT
-void fn_800BAD60(f32 mtx[4][4], Vec4* src, Vec4* dst);  // VecMath.c: a point through a matrix
+void Mtx_MultVec4(f32 mtx[4][4], Vec4* src, Vec4* dst);  // VecMath.c: a point through a matrix
 void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);       // UMemPool.c: inverts a rotation+translation
 void Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ);                 // Quaternion.c: a rotation matrix's quaternion
 void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals);   // char.c
@@ -512,7 +512,7 @@ void fn_800279C0(Character* pChar) {
     BitArray_ClearAll(aBits, 0x80);
     BitArray_Set(aBits, CharModel_GetBoneIndexMapped(pModel, 0x23));
     SKEL_TransformBones(pModel, aBits);
-    fn_800BAD60(pModel->pMatrices[nGrip], (Vec4*)pChar->p16D8->a3C[pChar->nClubClass],
+    Mtx_MultVec4(pModel->pMatrices[nGrip], (Vec4*)pChar->p16D8->a3C[pChar->nClubClass],
                 (Vec4*)pChar->aPoints[4]);
     fn_80026F90(pModel->pSkel, pChain, 0);
 }
@@ -541,7 +541,7 @@ void fn_80027D14(Character* pChar) {
     fn_8000A798(mGrip, mInv);
     fn_800BADF8(mInv, pMtx28, mRel, 4);
     Quat_BuildFromMatrix(mRel, pModel->pSkel->q107C);
-    fn_800BAD60(mInv, (Vec4*)pMtx28[3], (Vec4*)pModel->pSkel->v108C);
+    Mtx_MultVec4(mInv, (Vec4*)pMtx28[3], (Vec4*)pModel->pSkel->v108C);
     pModel->pSkel->v108C[3] = 0.0f;
 }
 

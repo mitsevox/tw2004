@@ -1,7 +1,7 @@
 // event.c (TW06's golf/eventmanager/event.c): the game's event handlers. EVENT_Trigger calls the
 // handler for an event number from the file's table (lbl_80188628): stepping through the clubs and
 // shot kinds, the camera and commentary for each moment of a shot, and the lessons' checks
-// (fn_80101AA8 can block an event). Most handlers pass the moment on to fn_80067710.
+// (fn_80101AA8 can block an event). Most handlers pass the moment on to SitDev_QueueEvent.
 
 #include "game.h"
 #include "terrain.h"
@@ -67,7 +67,7 @@ void fn_80065B44(void) {
 
 void fn_80065B50(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!fn_80101AA8(nPlayer, 41)) {
-        fn_80067710(nPlayer, 2, 26);
+        SitDev_QueueEvent(nPlayer, 2, 26);
     }
 }
 
@@ -76,13 +76,13 @@ void fn_80065B98(int nPlayer, int nEvent, void* pData, int nArg) {
 
 void fn_80065B9C(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!fn_80101AA8(nPlayer, 0)) {
-        fn_80067710(nPlayer, 2, 1);
+        SitDev_QueueEvent(nPlayer, 2, 1);
     }
 }
 
 void fn_80065BE4(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!fn_80101AA8(nPlayer, 1)) {
-        fn_80067710(nPlayer, 2, 12);
+        SitDev_QueueEvent(nPlayer, 2, 12);
     }
     fn_800A5620();
 }
@@ -98,7 +98,7 @@ void fn_80065C30(int nPlayer, int nEvent, void* pData, int nArg) {
 
 void fn_80065C6C(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!fn_80101AA8(nPlayer, 3)) {
-        fn_80067710(nPlayer, 2, 2);
+        SitDev_QueueEvent(nPlayer, 2, 2);
     }
     fn_800C9FE0();
 }
@@ -109,13 +109,13 @@ void fn_80065CB8(int nPlayer, int nEvent, void* pData, int nArg) {
 
 void fn_80065CDC(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!fn_80101AA8(nPlayer, 6)) {
-        fn_80067710(nPlayer, 7, 3);
+        SitDev_QueueEvent(nPlayer, 7, 3);
     }
 }
 
 void fn_80065D24(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!fn_80101AA8(nPlayer, 7)) {
-        fn_80067710(nPlayer, 2, 25);
+        SitDev_QueueEvent(nPlayer, 2, 25);
     }
 }
 
@@ -124,7 +124,7 @@ void fn_80065D6C(int nPlayer, int nEvent, void* pData, int nArg) {
 
 void fn_80065D70(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!fn_80101AA8(nPlayer, 21)) {
-        fn_80067710(nPlayer, 2, 4);
+        SitDev_QueueEvent(nPlayer, 2, 4);
     }
 }
 
@@ -137,13 +137,13 @@ void fn_80065DB8(int nPlayer, int nEvent, void* pData, int nArg) {
         fn_80101AA8(nPlayer, 10);
         fn_800A31E0(pData, nPlayer);
         fn_800BB1A8(&gPlayers[nPlayer].ball);
-        fn_80067710(nPlayer, 2, 5);
+        SitDev_QueueEvent(nPlayer, 2, 5);
         fn_8010D3B8(nPlayer);
     }
 }
 
 void fn_80065E70(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_80067710(nPlayer, 2, 6);
+    SitDev_QueueEvent(nPlayer, 2, 6);
 }
 
 void fn_80065E98(int nPlayer, int nEvent, void* pData, int nArg) {
@@ -312,9 +312,9 @@ void fn_80066538(int nPlayer, int nEvent, void* pData, int nArg) {
 void fn_80066558(int nPlayer, int nEvent, void* pData, int nArg) {
     lbl_80281E20++;
     if (lbl_80281E20 % 60 == 0) {
-        fn_80067710(nPlayer, 5, 19);
+        SitDev_QueueEvent(nPlayer, 5, 19);
     } else if (lbl_80281E20 % 10 == 0) {
-        fn_80067710(nPlayer, 5, 18);
+        SitDev_QueueEvent(nPlayer, 5, 18);
     }
 }
 
@@ -334,7 +334,7 @@ void fn_80066664(int nPlayer, int nEvent, void* pData, int nArg) {
         fSpinY = 0.0f;
         fSpinX = 0.0f;
         if (!fn_80101AA8(nPlayer, 29)) {
-            fn_80067710(nPlayer, 2, 28);
+            SitDev_QueueEvent(nPlayer, 2, 28);
         }
         fn_80063CF0(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]), 3, nPlayer);
         fn_8006ACF8(nPlayer, 2);
@@ -369,7 +369,7 @@ void fn_80066828(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         fn_800A5E94(nPlayer);
         if (!fn_80101AA8(nPlayer, 32)) {
-            fn_80067710(nPlayer, 2, 8);
+            SitDev_QueueEvent(nPlayer, 2, 8);
         }
         if (Player_IsController8(nPlayer)) {
             fn_8006755C(nPlayer);
@@ -384,14 +384,14 @@ void fn_800668A8(int nPlayer, int nEvent, void* pData, int nArg) {
         fn_80063CF0(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]), 8, nPlayer);
         fn_8006ACF8(nPlayer, 4);
         fn_800A5EC0(nPlayer);
-        fn_80067710(nPlayer, 2, 9);
+        SitDev_QueueEvent(nPlayer, 2, 9);
     }
 }
 
 void fn_80066920(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1 && !fn_80101AA8(nPlayer, 34)) {
         fn_80063CF0(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]), 6, nPlayer);
-        fn_80067710(nPlayer, 2, 8);
+        SitDev_QueueEvent(nPlayer, 2, 8);
     }
 }
 
@@ -414,7 +414,7 @@ void fn_800669F4(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 void fn_80066A14(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_80067710(nPlayer, 2, 29);
+    SitDev_QueueEvent(nPlayer, 2, 29);
 }
 
 // Event 39: the ball hit a world object; tell the game mode which.
@@ -470,7 +470,7 @@ void fn_80066A9C(int nPlayer, int nEvent, void* pData, int nArg) {
 
 void fn_80066BB8(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
-        fn_80067710(nPlayer, 2, 7);
+        SitDev_QueueEvent(nPlayer, 2, 7);
     }
 }
 
@@ -541,7 +541,7 @@ void fn_80066D78(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 void fn_80066DC4(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_80067710(nPlayer, 2, 20);
+    SitDev_QueueEvent(nPlayer, 2, 20);
     if (gPlayers[nPlayer].ballBefore.nLie == LIE_INCUP_e) {
         fn_80063CF0(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]), 11, nPlayer);
     }
@@ -570,19 +570,19 @@ void fn_80066EDC(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!gSession.a8[0]) {
         EASBio_IncrementGamesPlayed(1);
     }
-    fn_80067710(nPlayer, 2, 13);
+    SitDev_QueueEvent(nPlayer, 2, 13);
 }
 
 void fn_80066F30(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_80067710(nPlayer, 4, 22);
+    SitDev_QueueEvent(nPlayer, 4, 22);
 }
 
 void fn_80066F58(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_80067710(nPlayer, 8, 23);
+    SitDev_QueueEvent(nPlayer, 8, 23);
 }
 
 void fn_80066F80(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_80067710(nPlayer, 8, 24);
+    SitDev_QueueEvent(nPlayer, 8, 24);
 }
 
 void fn_80066FA8(int nPlayer, int nEvent, void* pData, int nArg) {
@@ -600,17 +600,17 @@ void fn_80066FB4(int nPlayer, int nEvent, void* pData, int nArg) {
 
 void fn_80066FD4(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 5) {
-        fn_80067710(nPlayer, 2, 32);
+        SitDev_QueueEvent(nPlayer, 2, 32);
     }
 }
 
 void fn_80067004(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_80067710(nPlayer, 9, 30);
+    SitDev_QueueEvent(nPlayer, 9, 30);
 }
 
 void fn_8006702C(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!fn_80101AA8(nPlayer, 75)) {
-        fn_80067710(nPlayer, 2, 31);
+        SitDev_QueueEvent(nPlayer, 2, 31);
     }
 }
 
@@ -653,12 +653,12 @@ void fn_800670A8(int nPlayer, int nEvent, void* pData, int nArg) {
             gPlayers[nPlayer].b30C = 1;
         }
         if (nEvent == 37) {
-            fn_80067710(nPlayer, 2, 27);
+            SitDev_QueueEvent(nPlayer, 2, 27);
         }
         if (nEvent == 36 || nEvent == 37) {
-            fn_80067710(nPlayer, 2, 16);
+            SitDev_QueueEvent(nPlayer, 2, 16);
         } else if (nEvent == 38) {
-            fn_80067710(nPlayer, 2, 21);
+            SitDev_QueueEvent(nPlayer, 2, 21);
         }
         gpGame->pfn23C(nPlayer);
     } else if (nEvent == 36) {

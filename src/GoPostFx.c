@@ -202,7 +202,7 @@ void fn_80038128(void) {
     aColour[7][2] = 0.0f;
     aColour[7][3] = 0.0f;
 
-    fn_8001644C(0x98, aXY[0], aColour[0], NULL, 8);
+    RenderView_DrawPrimitive(0x98, aXY[0], aColour[0], NULL, 8);
     RenderState_SetDepthWrite(1);
     RenderState_SetDepthFunc(3);
     RenderState_SetAlphaTest(1, 6, 0x80);
@@ -278,11 +278,11 @@ void fn_80038438(void) {
             fn_80035240(NULL);
             fn_80013CCC(Camera_GetCurrent());
             fn_80013EEC(Camera_GetCurrent());
-            fn_80016B9C();
+            RenderState_SetCameraMatrices();
             RenderState_Flush();
             fn_800141F8(aXY, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
-            fn_80014194(lbl_801D50C0[i].aColour);
-            fn_8001644C(0xA1, aXY, NULL, NULL, 2);
+            RenderView_SetColor(lbl_801D50C0[i].aColour);
+            RenderView_DrawPrimitive(0xA1, aXY, NULL, NULL, 2);
             lbl_801D50C0[i].b0 = 0;
         }
     }
@@ -290,7 +290,7 @@ void fn_80038438(void) {
     fn_80035240(NULL);
     fn_80013CCC(Camera_GetCurrent());
     fn_80013EEC(Camera_GetCurrent());
-    fn_80016B9C();
+    RenderState_SetCameraMatrices();
     RenderState_SetDepthWrite(1);
     RenderState_SetDepthFunc(3);
     RenderState_SetAlphaTest(1, 6, 0x80);
@@ -311,8 +311,8 @@ void fn_80038624(f32* pColour) {
     RenderState_SetAlphaTest(0, 6, 0x80);
     RenderState_Flush();
     fn_800141F8(aXY, aUV, 0.0f, 0.0f, 1.0f, 1.0f);
-    fn_80014194(pColour);
-    fn_8001644C(0xA1, aXY, NULL, NULL, 2);
+    RenderView_SetColor(pColour);
+    RenderView_DrawPrimitive(0xA1, aXY, NULL, NULL, 2);
     RenderState_SetDepthWrite(1);
     RenderState_SetDepthFunc(3);
     RenderState_SetAlphaTest(1, 6, 0x80);
@@ -366,11 +366,11 @@ void fn_80038724(int nField, int nView, f32 fAlpha, f32 fShake) {
     aColour[1] = 0.5f;
     aColour[2] = 0.5f;
     aColour[3] = 1.0f;
-    fn_80014194(aColour);
+    RenderView_SetColor(aColour);
     fn_8001425C(0);
     RenderState_Flush();
     GXSetTevAlphaIn(1, 7, 7, 7, 0);
-    fn_8001644C(0xA1, aXY, NULL, aUV, 2);
+    RenderView_DrawPrimitive(0xA1, aXY, NULL, aUV, 2);
     RenderState_SetDepthWrite(1);
     RenderState_SetAlphaTest(1, 6, 0x80);
     RenderState_SetDepthFunc(3);
@@ -501,7 +501,7 @@ void fn_80038A90(f32* pColour, f32 fCX, f32 fCY, u8 bCopy, int nView, int nField
     aColour[17][1] = pColour[1];
     aColour[17][2] = pColour[2];
     aColour[17][3] = fAlpha;
-    fn_8001644C(0xA0, aXY[0], aColour[0], aUV[0], 18);
+    RenderView_DrawPrimitive(0xA0, aXY[0], aColour[0], aUV[0], 18);
     RenderState_SetDepthWrite(1);
     RenderState_SetAlphaTest(1, 6, 0x80);
     RenderState_SetDepthFunc(3);
@@ -590,10 +590,10 @@ void fn_800390CC(int nField, RenderCamera* pCamera) {
     aColour[1] = 0.5f;
     aColour[2] = 0.5f;
     aColour[3] = 1.0f;
-    fn_80014194(aColour);
+    RenderView_SetColor(aColour);
     fn_8001425C(0);
     RenderState_Flush();
-    fn_8001644C(0xA1, aXY, NULL, aUV, 2);
+    RenderView_DrawPrimitive(0xA1, aXY, NULL, aUV, 2);
     fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
     RenderState_SetDepthWrite(1);
     RenderState_SetAlphaTest(1, 6, 0x80);
@@ -640,10 +640,10 @@ void fn_80039358(int nView) {
         RenderState_SetDepthWrite(0);
         RenderState_SetDepthFunc(7);
         RenderState_SetAlphaTest(0, 6, 0x80);
-        fn_80014194(aColour);
+        RenderView_SetColor(aColour);
         RenderState_Flush();
         fn_800141F8(aXY, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
-        fn_8001644C(0xA1, aXY, NULL, NULL, 2);
+        RenderView_DrawPrimitive(0xA1, aXY, NULL, NULL, 2);
         RenderState_SetDepthWrite(1);
         RenderState_SetDepthFunc(3);
         RenderState_SetAlphaTest(1, 6, 0x80);

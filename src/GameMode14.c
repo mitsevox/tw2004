@@ -162,7 +162,7 @@ void fn_800F2E08(int nPlayer) {
     f32 fLength;
     s32 nMult;
     if (lbl_80282370) {
-        fn_800F3980(0x33, 0, 0, 0, 0xD1, 1);
+        GameMsg_Send5Ints(0x33, 0, 0, 0, 0xD1, 1);
         nMsg = 0x14;
     } else {
         nSurface = gPlayers[nPlayer].ball.nSurface;
@@ -171,11 +171,11 @@ void fn_800F2E08(int nPlayer) {
             nTarget = fn_800F1C74(nPlayer);
             nRank = fn_800F1E58(nSurface);
             if (lbl_80211FB8[nTarget].nRank == 0) {
-                fn_800F3980(0x33, 0, 0, 0, 0xCD, 1);
+                GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCD, 1);
                 fn_800A63D0();
                 nMsg = 2;
             } else if (nRank >= lbl_80211FB8[nTarget].nRank) {
-                fn_800F3980(0x33, 0, 0, 0, 0xCC, 1);
+                GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCC, 1);
                 nMsg = 0x10;
             } else {
                 nText = 0;
@@ -227,12 +227,12 @@ void fn_800F2E08(int nPlayer) {
                 lbl_80282374 = GM_Earnings_ComputeTOURCardModifiers(lbl_80282374, nPlayer, 0);
                 fn_800F36A4();
                 if (nText != 0) {
-                    fn_800F3980(0x33, lbl_80282374, 0, 0, nText, 1);
+                    GameMsg_Send5Ints(0x33, lbl_80282374, 0, 0, nText, 1);
                 }
                 if (!gSession.bReplay) {
-                    fn_800F3980(0x33, lbl_80282374, 0, 0, nSurface, 1);
+                    GameMsg_Send5Ints(0x33, lbl_80282374, 0, 0, nSurface, 1);
                     if (nKind == 0) {
-                        fn_800F3980(0x33, lbl_80282374, 0, 0, 0xD3, 1);
+                        GameMsg_Send5Ints(0x33, lbl_80282374, 0, 0, 0xD3, 1);
                     }
                     if (nRank == 0) {
                         Ball* pBall;
@@ -457,10 +457,11 @@ s32 fn_800F392C(int a, int i) {
     return lbl_80211FB8[i].nOwner == 1 ? 3 : 0;
 }
 
-void fn_800F3980(int nMsg, s32 a, s32 b, s32 c, s32 d, s32 e) {
-    fn_800E5B0C(nMsg, 0, &a, &b, &c, &d, &e);
+// Sends front-end message nMsg with five int values.
+void GameMsg_Send5Ints(int nMsg, s32 a, s32 b, s32 c, s32 d, s32 e) {
+    GameMsg_Send5(nMsg, 0, &a, &b, &c, &d, &e);
 }
 
 void fn_800F39CC(s32 p0) {
-    fn_80062D6C(55, p0);
+    GameMsg_SendInt(55, p0);
 }

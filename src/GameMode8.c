@@ -562,7 +562,7 @@ void fn_800FAA70(int nEvent) {
 
 // An event for a player: its flags, and its points taken from the other player. A player whose
 // points run out loses the game: 0 for them, 6000 for the other, both to state 26.
-void fn_800FAAB8(int nPlayer, int nEvent) {
+void GM_TradeEventPoints(int nPlayer, int nEvent) {
     int nOther;
     s32 nPoints;
     // lbl_80192908 has 42 rows, so the bound 0x2A lets one past the end through; no caller passes
@@ -670,18 +670,18 @@ u8 fn_800FAD54(int nPlayer) {
         pSurf = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].ball.pCourse, gPlayers[nPlayer].ball.vPos);
         if (pSurf != NULL && pSurf->nClass == 7) {
             if (gPlayers[nPlayer].nC3C & 0x10) {
-                fn_800FAAB8(nPlayer, 0x1F);
+                GM_TradeEventPoints(nPlayer, 0x1F);
             } else {
-                fn_800FAAB8(nPlayer, 5);
+                GM_TradeEventPoints(nPlayer, 5);
             }
             fn_800DEB5C(nPlayer);
             gPlayers[nPlayer].nC3C &= ~1;
             gPlayers[nPlayer].nC3C |= 0x800;
         } else {
             if (gPlayers[nPlayer].nC3C & 0x10) {
-                fn_800FAAB8(nPlayer, 0x1E);
+                GM_TradeEventPoints(nPlayer, 0x1E);
             } else {
-                fn_800FAAB8(nPlayer, 4);
+                GM_TradeEventPoints(nPlayer, 4);
             }
             gPlayers[nPlayer].nC3C &= ~1;
             GM_ReplaceOOBBall(nPlayer);
@@ -709,9 +709,9 @@ u8 fn_800FAD54(int nPlayer) {
             if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1) {
                 if ((gPlayers[nOther].nC3C & 0x20) && Course_GetCurHolePar() > 3) {
                     if (gPlayers[nPlayer].fC50 > gPlayers[nOther].fC50) {
-                        fn_800FAAB8(nPlayer, 1);
+                        GM_TradeEventPoints(nPlayer, 1);
                     } else if (gPlayers[nPlayer].fC50 < gPlayers[nOther].fC50) {
-                        fn_800FAAB8(nOther, 1);
+                        GM_TradeEventPoints(nOther, 1);
                     }
                 }
             }
@@ -721,11 +721,11 @@ u8 fn_800FAD54(int nPlayer) {
                 if (gPlayers[nOther].uC48 & 0x03000002) {
                     if (fDist > gPlayers[nOther].fC50) {
                         gPlayers[nOther].uC48 &= ~(u64)0x03000002;
-                        fn_800FAAB8(nPlayer, 0x18);
+                        GM_TradeEventPoints(nPlayer, 0x18);
                         gPlayers[nPlayer].fC50 = fDist;
                     }
                 } else if (fDist > gPlayers[nPlayer].fC50) {
-                    fn_800FAAB8(nPlayer, 0x19);
+                    GM_TradeEventPoints(nPlayer, 0x19);
                     gPlayers[nPlayer].fC50 = fDist;
                 }
             }
@@ -744,33 +744,33 @@ void fn_800FB204(int nPlayer, int nStrokes) {
     nPar = Course_GetCurHolePar();
     nUnder = nPar - nStrokes;
     if (nUnder >= 0 && (gPlayers[nPlayer].nC3C & 0xC00)) {
-        fn_800FAAB8(nPlayer, 0x17);
+        GM_TradeEventPoints(nPlayer, 0x17);
     }
     gPlayers[nPlayer].nC3C &= ~0xC00;
     if (nStrokes == 1) {
         if (nPar == 3) {
-            fn_800FAAB8(nPlayer, 0xC);
+            GM_TradeEventPoints(nPlayer, 0xC);
         } else {
-            fn_800FAAB8(nPlayer, 0xD);
+            GM_TradeEventPoints(nPlayer, 0xD);
         }
         if (gPlayers[nPlayer].nC3C & 0x200) {
-            fn_800FAAB8(nPlayer, 0xE);
+            GM_TradeEventPoints(nPlayer, 0xE);
         } else {
             gPlayers[nPlayer].nC3C |= 0x200;
         }
     } else if (nUnder >= 0) {
         switch (nUnder) {
         case 0:
-            fn_800FAAB8(nPlayer, 8);
+            GM_TradeEventPoints(nPlayer, 8);
             break;
         case 1:
-            fn_800FAAB8(nPlayer, 9);
+            GM_TradeEventPoints(nPlayer, 9);
             break;
         case 2:
-            fn_800FAAB8(nPlayer, 0xA);
+            GM_TradeEventPoints(nPlayer, 0xA);
             break;
         case 3:
-            fn_800FAAB8(nPlayer, 0xB);
+            GM_TradeEventPoints(nPlayer, 0xB);
             break;
         }
     }
@@ -783,13 +783,13 @@ void fn_800FB35C(int nPlayer, int nOther) {
     f32 fDist = fn_800FB41C(gPlayers[nPlayer].vPreShot, gPlayers[nPlayer].ball.vPos);
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
         if (fDist >= 20.0f / 3.0f) {
-            fn_800FAAB8(nPlayer, 0x11);
+            GM_TradeEventPoints(nPlayer, 0x11);
         }
     } else if (fDist >= 10.0f) {
         if (fDist >= 60.0f) {
-            fn_800FAAB8(nPlayer, 0x13);
+            GM_TradeEventPoints(nPlayer, 0x13);
         } else {
-            fn_800FAAB8(nPlayer, 0x12);
+            GM_TradeEventPoints(nPlayer, 0x12);
         }
     }
 }
@@ -975,12 +975,12 @@ void fn_800FBD2C(int nPlayer) {
     if (Game_GetMode() == 7) {
 
         if (!(gPlayers[nPlayer].uC48 & 1) && !(gPlayers[nOther].uC48 & 1)) {
-            fn_800FAAB8(nPlayer, 0);
+            GM_TradeEventPoints(nPlayer, 0);
         }
         if (p->vA44[0] == p->ball.vPos[0] && p->vA44[2] == p->ball.vPos[2] && (p->nC3C & 8)) {
             if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == gPlayers[nPlayer].nC60 &&
                 !(gPlayers[nPlayer].uC48 & 0x4000000000LL)) {
-                fn_800FAAB8(nPlayer, 0x26);
+                GM_TradeEventPoints(nPlayer, 0x26);
             }
         }
     }
@@ -1001,7 +1001,7 @@ void fn_800FBD2C(int nPlayer) {
                 if (gPlayers[nPlayer].nC3C & 8) {
                     gPlayers[nPlayer].nC3C |= 0x10;
                     if (!(gPlayers[nOther].nC3C & 8)) {
-                        fn_800FAAB8(nPlayer, 0x1D);
+                        GM_TradeEventPoints(nPlayer, 0x1D);
                     }
                     fn_800FB204(nPlayer, nStrokes - gPlayers[nPlayer].nC60);
                 } else {
@@ -1013,16 +1013,16 @@ void fn_800FBD2C(int nPlayer) {
                     if (gPlayers[nOther].nC3C & 8) {
                         if (nStrokes < gPlayers[nOther].nC60) {
                             if (!(gPlayers[nPlayer].uC48 & 0x2000000000LL)) {
-                                fn_800FAAB8(nPlayer, 0x25);
+                                GM_TradeEventPoints(nPlayer, 0x25);
                             }
                         } else if (nStrokes > gPlayers[nOther].nC60) {
                             if (!(gPlayers[nOther].uC48 & 0x2000000000LL)) {
-                                fn_800FAAB8(nOther, 0x25);
+                                GM_TradeEventPoints(nOther, 0x25);
                             }
                         }
                     } else if (nStrokes <= gPlayers[nOther].nStrokes[Game_CurHoleIndex()]) {
                         if (!(gPlayers[nPlayer].uC48 & 0x2000000000LL)) {
-                            fn_800FAAB8(nPlayer, 0x25);
+                            GM_TradeEventPoints(nPlayer, 0x25);
                         }
                     }
                 }
@@ -1035,7 +1035,7 @@ void fn_800FBD2C(int nPlayer) {
                     return;
                 }
                 if (!(gPlayers[nPlayer].uC48 & 4)) {
-                    fn_800FAAB8(nPlayer, 2);
+                    GM_TradeEventPoints(nPlayer, 2);
                 }
                 pHole = Ter_GetTGD();
                 Physics_InitBall(&p->ball, &pHole->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
@@ -1062,7 +1062,7 @@ void fn_800FBD2C(int nPlayer) {
         } else {
             if (!(gPlayers[nPlayer].nC3C & 8) && (gPlayers[nOther].nC3C & 8)) {
                 if (nStrokes >= gPlayers[nOther].nC60 && !(gPlayers[nOther].uC48 & 0x2000000000LL)) {
-                    fn_800FAAB8(nOther, 0x25);
+                    GM_TradeEventPoints(nOther, 0x25);
                 }
             }
             pBall = &p->ball;
@@ -1085,55 +1085,55 @@ void fn_800FBD2C(int nPlayer) {
                     if (Game_GetMode() == 7) {
                         fDist = fn_800FB41C(p->vPreShot, pBall->vPos);
                         if (fn_800FB41C(pBall->vPos, gpGame->p130) <= lbl_80284708[0] && fDist >= 20.0f) {
-                            fn_800FAAB8(nPlayer, 0x14);
+                            GM_TradeEventPoints(nPlayer, 0x14);
                         }
                         if (!(gPlayers[nPlayer].nC3C & 0x40)) {
                             gPlayers[nPlayer].nC3C |= 0x40;
                             gPlayers[nPlayer].nC64 = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
                             if (!(gPlayers[nOther].nC3C & 0x40)) {
-                                fn_800FAAB8(nPlayer, 3);
+                                GM_TradeEventPoints(nPlayer, 3);
                             }
                             fn_800FE190(p->ball.vPos, gpGame->p130, v);
                             p->fC68 = Math_Sqrt(v[0] * v[0] + v[2] * v[2]);
                             nDiff = nPar - 2 - gPlayers[nPlayer].nC64;
                             if (nDiff == 0) {
-                                fn_800FAAB8(nPlayer, 0x15);
+                                GM_TradeEventPoints(nPlayer, 0x15);
                             } else if (nDiff > 0) {
-                                fn_800FAAB8(nPlayer, 0x16);
+                                GM_TradeEventPoints(nPlayer, 0x16);
                             }
                             if ((gPlayers[nOther].uC48 & 0x600000) && nDiff >= 0) {
                                 if (gPlayers[nOther].fC68 > gPlayers[nPlayer].fC68) {
-                                    fn_800FAAB8(nPlayer, 7);
+                                    GM_TradeEventPoints(nPlayer, 7);
                                 } else if (gPlayers[nOther].fC68 < gPlayers[nPlayer].fC68) {
-                                    fn_800FAAB8(nOther, 7);
+                                    GM_TradeEventPoints(nOther, 7);
                                 }
                             }
                         } else if ((gPlayers[nPlayer].nC3C & 8) && !(gPlayers[nPlayer].nC3C & 0x80)) {
                             gPlayers[nPlayer].nC3C |= 0x80;
-                            fn_800FAAB8(nPlayer, 0x1C);
+                            GM_TradeEventPoints(nPlayer, 0x1C);
                             nDiff = nPar - 2 - (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] -
                                                 gPlayers[nPlayer].nC60);
                             if (nDiff == 0) {
-                                fn_800FAAB8(nPlayer, 0x15);
+                                GM_TradeEventPoints(nPlayer, 0x15);
                             } else if (nDiff > 0) {
-                                fn_800FAAB8(nPlayer, 0x16);
+                                GM_TradeEventPoints(nPlayer, 0x16);
                             }
                             if ((gPlayers[nOther].uC48 & 0x600000) && nDiff >= 0) {
                                 fn_800FE190(p->ball.vPos, gpGame->p130, v);
                                 fDist = Math_Sqrt(v[0] * v[0] + v[2] * v[2]);
                                 if (gPlayers[nPlayer].uC48 & 0x0C000080) {
                                     if (fDist < gPlayers[nPlayer].fC68) {
-                                        fn_800FAAB8(nPlayer, 0x1B);
+                                        GM_TradeEventPoints(nPlayer, 0x1B);
                                         gPlayers[nPlayer].fC68 = fDist;
                                     }
                                 } else if (gPlayers[nOther].uC48 & 0x0C000080) {
                                     if (fDist < gPlayers[nOther].fC68) {
-                                        fn_800FAAB8(nPlayer, 0x1A);
+                                        GM_TradeEventPoints(nPlayer, 0x1A);
                                         gPlayers[nPlayer].fC68 = fDist;
                                         gPlayers[nOther].uC48 &= ~(u64)0x0C000080;
                                     }
                                 } else {
-                                    fn_800FAAB8(nPlayer, 7);
+                                    GM_TradeEventPoints(nPlayer, 7);
                                     gPlayers[nPlayer].fC68 = fDist;
                                 }
                             }
@@ -1144,9 +1144,9 @@ void fn_800FBD2C(int nPlayer) {
                             gPlayers[nPlayer].ball.nLie == 8)) {
 
                     if (gPlayers[nPlayer].nC3C & 0x10) {
-                        fn_800FAAB8(nPlayer, 0x20);
+                        GM_TradeEventPoints(nPlayer, 0x20);
                     } else {
-                        fn_800FAAB8(nPlayer, 6);
+                        GM_TradeEventPoints(nPlayer, 6);
                     }
                     gPlayers[nPlayer].nC3C |= 0x400;
                 }
@@ -1347,7 +1347,7 @@ void fn_800FCCF0(void) {
                           (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 3 &&
                           (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 8 &&
                           (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 10))) {
-                        fn_800FAAB8(nPlayer, 0x27);
+                        GM_TradeEventPoints(nPlayer, 0x27);
                         pHole = Ter_GetTGD();
                         Physics_InitBall(&gPlayers[nPlayer].ball,
                                     &pHole->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
@@ -1463,15 +1463,15 @@ void fn_800FD1C0(int nPlayer) {
             }
             if (gPlayers[nPlayer].nC3C & 0x20000) {
                 gPlayers[nPlayer].nC3C &= ~0x20000;
-                fn_800FAAB8(nPlayer, 0x21);
+                GM_TradeEventPoints(nPlayer, 0x21);
                 gPlayers[nPlayer].nC54 += 119;
             } else if (gPlayers[nPlayer].nC3C & 0x40000) {
                 gPlayers[nPlayer].nC3C &= ~0x40000;
-                fn_800FAAB8(nPlayer, 0x22);
+                GM_TradeEventPoints(nPlayer, 0x22);
                 gPlayers[nPlayer].nC54 += 119;
             } else if (gPlayers[nPlayer].nC3C & 0x80000) {
                 gPlayers[nPlayer].nC3C &= ~0x80000;
-                fn_800FAAB8(nPlayer, 0x23);
+                GM_TradeEventPoints(nPlayer, 0x23);
                 gPlayers[nPlayer].nC54 += 119;
             }
         }
@@ -1485,11 +1485,11 @@ void fn_800FD1C0(int nPlayer) {
 void fn_800FD534(int nPlayer) {
     int nOther;
     if (gPlayers[nPlayer].nC3C & 0x8000) {
-        fn_800FAAB8(nPlayer, 0x28);
+        GM_TradeEventPoints(nPlayer, 0x28);
         gPlayers[nPlayer].nC3C &= ~0x8000;
         gPlayers[nPlayer].nC54 += 119;
     } else if (gPlayers[nPlayer].nC3C & 0x10000) {
-        fn_800FAAB8(nPlayer, 0x29);
+        GM_TradeEventPoints(nPlayer, 0x29);
         gPlayers[nPlayer].nC3C &= ~0x10000;
         gPlayers[nPlayer].nC54 += 119;
     }
@@ -1734,27 +1734,27 @@ void fn_800FDFC4(s32 p0, s32 p1, s32 p2) {
 }
 
 void fn_800FDFFC(s32 p0, s32 p1) {
-    fn_80062D38(19, p0, (p1 & 0xFF));
+    GameMsg_Send2Ints(19, p0, (p1 & 0xFF));
 }
 
 void fn_800FE02C(void) {
-    fn_80062D6C(16, 1);
+    GameMsg_SendInt(16, 1);
 }
 
 void fn_800FE054(s32 p0, s32 p1) {
-    fn_80062D38(44, p0, p1);
+    GameMsg_Send2Ints(44, p0, p1);
 }
 
 void fn_800FE080(s32 p0, s32 p1) {
-    fn_80062D38(41, p0, p1);
+    GameMsg_Send2Ints(41, p0, p1);
 }
 
 void fn_800FE0AC(s32 p0, s32 p1) {
-    fn_80062D38(37, p0, p1);
+    GameMsg_Send2Ints(37, p0, p1);
 }
 
 void fn_800FE0D8(void) {
-    fn_80062D6C(16, 2);
+    GameMsg_SendInt(16, 2);
 }
 
 void fn_800FE100(s32 p0, s32 p1, s32 p2) {
@@ -1762,7 +1762,7 @@ void fn_800FE100(s32 p0, s32 p1, s32 p2) {
 }
 
 void fn_800FE138(s32 p0, s32 p1) {
-    fn_80062D38(22, p0, p1);
+    GameMsg_Send2Ints(22, p0, p1);
 }
 
 void fn_800FE164(s32 p0, s32 p1) {

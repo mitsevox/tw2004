@@ -28,17 +28,17 @@ s32 lbl_802822E0;           // the value sent with some of them
 u8  lbl_80203138[14];       // the tips already shown (game.h)
 
 void fn_800E4FFC(int n) {
-    fn_80062D6C(48, n);
+    GameMsg_SendInt(48, n);
     lbl_802822BE = 1;
 }
 
 void fn_800E502C(int n) {
-    fn_80062D6C(97, n);
+    GameMsg_SendInt(97, n);
     lbl_802822BE = 1;
 }
 
 void fn_800E505C(int n) {
-    fn_80062D6C(57, n);
+    GameMsg_SendInt(57, n);
     lbl_802822BE = 1;
 }
 
@@ -94,11 +94,11 @@ void fn_800E5178(int nPlayer, f32 a, f32 b, f32 c, f32 d) {
     } else {
         nView = 0;
     }
-    fn_800E5B0C(0x19, 0xF, &a, &b, &c, &d, &nView);
+    GameMsg_Send5(0x19, 0xF, &a, &b, &c, &d, &nView);
 }
 
 void fn_800E5200(int n) {
-    fn_80062D6C(60, n);
+    GameMsg_SendInt(60, n);
 }
 
 void fn_800E5228(void) {
@@ -200,7 +200,7 @@ void fn_800E5450(void) {
 }
 
 void fn_800E5474(int n) {
-    fn_80062D6C(47, (n & 0xFF));
+    GameMsg_SendInt(47, (n & 0xFF));
 }
 
 void fn_800E54A0(int nA, int nB, int nC) {
@@ -291,7 +291,7 @@ void fn_800E5798(void) {
         if (lbl_802822E4 & 2) {
             fn_800E58B4(0x3D);
             fn_800E572C(2);
-            fn_80062D6C(1, 1);
+            GameMsg_SendInt(1, 1);
         }
         if (lbl_802822E4 & 4) {
             fn_800E58B4(0x31);
@@ -302,11 +302,11 @@ void fn_800E5798(void) {
             fn_800E572C(8);
         }
         if (lbl_802822E4 & 0x10) {
-            fn_80062D38(0x62, 0, lbl_802822E0);
+            GameMsg_Send2Ints(0x62, 0, lbl_802822E0);
             fn_800E572C(0x10);
         }
         if (lbl_802822E4 & 0x20) {
-            fn_80062D6C(0x21, lbl_802822E0);
+            GameMsg_SendInt(0x21, lbl_802822E0);
             fn_800E572C(0x20);
         }
     }
@@ -324,7 +324,7 @@ void fn_800E5908(int nMsg) {
 }
 
 // Sends a message with one value (bit 0 of uFloats: a float).
-void fn_800E590C(int nMsg, u32 uFloats, void* pA) {
+void GameMsg_Send1(int nMsg, u32 uFloats, void* pA) {
     MsgArg args[1];
     fn_800E5908(nMsg);
     Mem_set(args, 0, sizeof(args));
@@ -338,7 +338,7 @@ void fn_800E590C(int nMsg, u32 uFloats, void* pA) {
 }
 
 // Two values.
-void fn_800E5998(int nMsg, u32 uFloats, void* pA, void* pB) {
+void GameMsg_Send2(int nMsg, u32 uFloats, void* pA, void* pB) {
     MsgArg args[2];
     fn_800E5908(nMsg);
     Mem_set(args, 0, sizeof(args));
@@ -381,7 +381,7 @@ void fn_800E5A4C(int nMsg, u32 uFloats, void* pA, void* pB, void* pC) {
 }
 
 // Five values.
-void fn_800E5B0C(int nMsg, u32 uFloats, void* pA, void* pB, void* pC, void* pD, void* pE) {
+void GameMsg_Send5(int nMsg, u32 uFloats, void* pA, void* pB, void* pC, void* pD, void* pE) {
     MsgArg args[5];
     fn_800E5908(nMsg);
     Mem_set(args, 0, sizeof(args));
@@ -447,7 +447,7 @@ void fn_800E5CA4(int a, int b, int c, int d, int e, int g, int h, f32 f) {
 }
 
 void fn_800E5D40(int n) {
-    fn_80062D6C(89, n);
+    GameMsg_SendInt(89, n);
 }
 
 void fn_800E5D68(char* pStr) {

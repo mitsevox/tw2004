@@ -108,8 +108,8 @@ void fn_80013808(f32* pColour, u32 uFlags) {
     fn_800141F8(aXY, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
     aXY[2] = 0.0f;
     aXY[6] = 0.0f;
-    fn_80014194(pColour);
-    fn_8001644C(0xA1, aXY, NULL, NULL, 2);
+    RenderView_SetColor(pColour);
+    RenderView_DrawPrimitive(0xA1, aXY, NULL, NULL, 2);
     RenderState_SetAlphaTest(0, 6, 0x80);
     RenderState_SetDepthFunc(3);
     RenderState_SetDepthWrite(1);
@@ -348,7 +348,7 @@ f32 fn_8001418C(u8* p) {
 // ---- end of sweep code ----
 
 // Set the colour of the view's vertices (r, g, b, a); NULL: the default grey.
-void fn_80014194(f32* pColour) {
+void RenderView_SetColor(f32* pColour) {
     if (pColour == NULL) {
         fn_800141CC();
         return;

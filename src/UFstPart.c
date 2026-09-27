@@ -509,7 +509,7 @@ u32 fn_80099AE4(PsEmitter* pEmitter, Camera* pCamera) {
     if (pEmitter->params.f24 > 1000.0f) {
         return 1;
     }
-    fn_800BAD60(pCamera->viewMtx, (Vec4*)pEmitter->params.v70, &vView);
+    Mtx_MultVec4(pCamera->viewMtx, (Vec4*)pEmitter->params.v70, &vView);
     Vec3Copy(&vView.x, &sphere.x);
     sphere.radius = pEmitter->params.f24;
     return fn_80007D74(&sphere, pCamera, 0) != 2;

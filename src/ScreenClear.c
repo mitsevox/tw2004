@@ -40,7 +40,7 @@ void fn_800BA74C(u8 bFade) {
     colour[2] = 0.0f;
     bOther = lbl_802821F0 != 1;
     colour[3] = bFade ? 0.1f : 0.5f;
-    fn_80014194(colour);
+    RenderView_SetColor(colour);
     fn_800141F8(xy, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
     fn_80008380();
@@ -52,7 +52,7 @@ void fn_800BA74C(u8 bFade) {
     for (i = 0; i < nFrames; i++) {
         if (bFade && i >= nFrames - 2) {
             colour[3] = 0.5f;
-            fn_80014194(colour);
+            RenderView_SetColor(colour);
         }
         fn_800162A8();
         fn_80006EDC();
@@ -68,7 +68,7 @@ void fn_800BA74C(u8 bFade) {
         RenderState_SetAlphaTest(0, 6, 0x80);
         RenderState_SetDepthFunc(7);
         RenderState_Flush();
-        fn_8001644C(0xA1, xy, 0, NULL, 2);
+        RenderView_DrawPrimitive(0xA1, xy, 0, NULL, 2);
         fn_80013400();
         fn_800A4BDC();
         if (!bOther) {

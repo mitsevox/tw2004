@@ -268,9 +268,9 @@ void fn_80030894(void) {
     int i;
 
     fn_80035240(NULL);
-    fn_80016B9C();
-    fn_80016B9C();
-    fn_80016B9C();
+    RenderState_SetCameraMatrices();
+    RenderState_SetCameraMatrices();
+    RenderState_SetCameraMatrices();
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetAlphaTest(1, 6, 1);
     RenderState_SetDepthFunc(3);
@@ -1031,13 +1031,13 @@ void fn_80032518(int nRenderPass) {
                 if (lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][(u32)nClip] != NULL) {
                     switch (nClip) {
                     case 2:
-                        fn_80035138(1);
+                        RenderState_SetClipMode(1);
                         break;
                     case 1:
-                        fn_80035138(1);
+                        RenderState_SetClipMode(1);
                         break;
                     default:
-                        fn_80035138(0);
+                        RenderState_SetClipMode(0);
                         break;
                     }
                     RenderState_Flush();
@@ -1094,9 +1094,9 @@ void fn_80032770(void) {
         fn_800354B4((u8*)pLens, 25.0f + fAC);
         fn_800352BC();
         fn_80035294();
-        fn_80016B9C();
-        fn_80016B9C();
-        fn_80016B9C();
+        RenderState_SetCameraMatrices();
+        RenderState_SetCameraMatrices();
+        RenderState_SetCameraMatrices();
         fn_800354B4((u8*)pLens, fAC);
         RenderState_Flush();
         RenderState_SetDrawFlags(0x70);
@@ -1104,13 +1104,13 @@ void fn_80032770(void) {
             if (lbl_801D3CB0.pSortedPatchList[0][3][(u32)nClip] != NULL) {
                 switch (nClip) {
                 case 2:
-                    fn_80035138(1);
+                    RenderState_SetClipMode(1);
                     break;
                 case 1:
-                    fn_80035138(1);
+                    RenderState_SetClipMode(1);
                     break;
                 default:
-                    fn_80035138(0);
+                    RenderState_SetClipMode(0);
                     break;
                 }
                 RenderState_Flush();
@@ -1155,13 +1155,13 @@ void fn_800329CC(void) {
     for (i = 0; i < lbl_801D3CB0.iTotalPostDrawTerrainPatches; i++) {
         switch (lbl_801D3CB0.pPostDrawTerrainList[i].eClipMethod) {
         case 2:
-            fn_80035138(1);
+            RenderState_SetClipMode(1);
             break;
         case 1:
-            fn_80035138(1);
+            RenderState_SetClipMode(1);
             break;
         default:
-            fn_80035138(0);
+            RenderState_SetClipMode(0);
             break;
         }
         RenderState_Flush();
@@ -1288,13 +1288,13 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
             Mtx_Identity(mRaise);
             mRaise[3][1] = 0.005f;
             fn_80035240(mRaise);
-            fn_80016B9C();
+            RenderState_SetCameraMatrices();
             RenderState_SetDepthWrite(0);
             RenderState_Flush();
             fn_80035514((u8*)pMesh);
             RenderState_SetDepthWrite(1);
             fn_80035240(NULL);
-            fn_80016B9C();
+            RenderState_SetCameraMatrices();
             RenderState_Flush();
         }
         fn_800354BC(pMesh);
@@ -1342,13 +1342,13 @@ void fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFil
             eClipMethod = pDraw->eClipMethod;
             switch (eClipMethod) {
             case 2:
-                fn_80035138(1);
+                RenderState_SetClipMode(1);
                 break;
             case 1:
-                fn_80035138(1);
+                RenderState_SetClipMode(1);
                 break;
             default:
-                fn_80035138(0);
+                RenderState_SetClipMode(0);
                 break;
             }
             bDirty = 1;
@@ -2108,9 +2108,9 @@ void fn_80034AE4(void) {
     f32 fWideTan;
 
     fn_80035240(NULL);
-    fn_80016B9C();
-    fn_80016B9C();
-    fn_80016B9C();
+    RenderState_SetCameraMatrices();
+    RenderState_SetCameraMatrices();
+    RenderState_SetCameraMatrices();
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetAlphaTest(1, 6, 1);
     RenderState_SetDrawFlags(0x70);
@@ -2161,13 +2161,13 @@ void fn_80034CAC(int nRenderPass) {
         for (nClip = 0; nClip <= 2; nClip++) {
             switch (nClip) {
             case 2:
-                fn_80035138(1);
+                RenderState_SetClipMode(1);
                 break;
             case 1:
-                fn_80035138(1);
+                RenderState_SetClipMode(1);
                 break;
             default:
-                fn_80035138(0);
+                RenderState_SetClipMode(0);
                 break;
             }
             RenderState_Flush();
@@ -2201,13 +2201,13 @@ void fn_80034DE4(void) {
     for (nClip = 0; nClip <= 2; nClip++) {
         switch (nClip) {
         case 2:
-            fn_80035138(1);
+            RenderState_SetClipMode(1);
             break;
         case 1:
-            fn_80035138(1);
+            RenderState_SetClipMode(1);
             break;
         default:
-            fn_80035138(0);
+            RenderState_SetClipMode(0);
             break;
         }
         RenderState_Flush();
@@ -2309,7 +2309,8 @@ void RenderState_SetBlendFactors(int a, int b) {
     lbl_801B8980.u110 |= 0x10;
 }
 
-void fn_80035138(int a) {
+// Sets the GX clip mode, applied with the next RenderState_Apply.
+void RenderState_SetClipMode(int a) {
     lbl_801B8980.nFC = a;
     lbl_801B8980.u110 |= 0x400;
 }
@@ -2558,7 +2559,7 @@ void fn_80035600(void) {
 void fn_80035604(void) {
     fn_80035240(NULL);
     fn_80035294();
-    fn_80016B9C();
+    RenderState_SetCameraMatrices();
     RenderState_SetBlendFactors(4, 5);
     RenderState_Flush();
 }

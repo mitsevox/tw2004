@@ -10,7 +10,7 @@
 
 #define SITDEV_NUM_VALUES 96
 
-// An event queued for the scripts (fn_80067710 adds them, SitDev_ProcessEventQueue runs and clears them).
+// An event queued for the scripts (SitDev_QueueEvent adds them, SitDev_ProcessEventQueue runs and clears them).
 typedef struct SitDevEvent {
     s32   nPlayer;              // 0x00
     u8    nEvent;               // 0x04  event.c's event number
@@ -126,7 +126,7 @@ extern s32 lbl_801FA1AC[5];         // per player; 1: fn_800BB1F8 is true
 // Store uValue in pValues[nIndex] and set bit nIndex of pSetBits.
 void SitDev_SetStateValue(u16* pValues, int nIndex, u16 uValue, u32* pSetBits);
 
-void fn_80067710(int nPlayer, int a, u8 nEvent);    // event.c's handlers call it for most events
+void SitDev_QueueEvent(int nPlayer, int a, u8 nEvent);    // event.c's handlers call it for most events
 
 // SitDevFile.c
 void fn_800BB0C8(void);

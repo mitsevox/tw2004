@@ -163,7 +163,7 @@ void fn_800F3EBC(int nPlayer) {
     f32 y;
     nMsg = -1;
     if (lbl_8028237D) {
-        fn_800F3980(0x33, 0, 0, 0, 0xD1, 1);
+        GameMsg_Send5Ints(0x33, 0, 0, 0, 0xD1, 1);
         nMsg = 0x14;
     } else {
         nSurface = gPlayers[nPlayer].ball.nSurface;
@@ -188,12 +188,12 @@ void fn_800F3EBC(int nPlayer) {
                                 gPlayers[nPlayer].ball.vPrev, &x, &y,
                                 0);
                     fn_8006A8D4(ViewController_GetCamera(gPlayers[nPlayer].nView[0]), &x, &y);
-                    fn_800F3980(0x33, lbl_80282380, 512.0f * x, 448.0f * y, nSurface, 1);
+                    GameMsg_Send5Ints(0x33, lbl_80282380, 512.0f * x, 448.0f * y, nSurface, 1);
                 }
             }
             if (lbl_8028238C != 5) {
                 if (nTarget == lbl_80282384 && nRank == lbl_80282388) {
-                    fn_800F3980(0x33, 0, 0, 0, nSurface, 1);
+                    GameMsg_Send5Ints(0x33, 0, 0, 0, nSurface, 1);
                     if (nRank == 0) {
                         fn_800A62E0();
                         nMsg = 0x32;
@@ -215,7 +215,7 @@ void fn_800F3EBC(int nPlayer) {
                     lbl_8028238C = nPlayer;
                     lbl_80282388 = nRank;
                     lbl_80282384 = nTarget;
-                    fn_800F3980(0x33, 0, 0, 0, 0xCF, 1);
+                    GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCF, 1);
                     lbl_8028237C = 1;
                     if (nRank == 0) {
                         fn_800A62E0();
@@ -237,17 +237,17 @@ void fn_800F3EBC(int nPlayer) {
                 } else {
                     lbl_8028238C = 5;
                     gPlayers[nPlayer].nE88++;
-                    fn_80062D6C(0x38, gPlayers[nPlayer].nE88);
+                    GameMsg_SendInt(0x38, gPlayers[nPlayer].nE88);
                     fn_800A640C();
                     if (nTarget == lbl_80282384) {
-                        fn_800F3980(0x33, 0, 0, 0, 0xCE, 1);
+                        GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCE, 1);
                         if (!(Misc_RandFunc(0) & 1)) {
                             nMsg = 0xE;
                         } else {
                             nMsg = 0x10;
                         }
                     } else {
-                        fn_800F3980(0x33, 0, 0, 0, 0xD0, 1);
+                        GameMsg_Send5Ints(0x33, 0, 0, 0, 0xD0, 1);
                         if (!(Misc_RandFunc(0) & 1)) {
                             nMsg = 0xA;
                         } else {
@@ -259,7 +259,7 @@ void fn_800F3EBC(int nPlayer) {
                 lbl_8028238C = nPlayer;
                 lbl_80282388 = nRank;
                 lbl_80282384 = nTarget;
-                fn_800F3980(0x33, 0, 0, 0, nSurface, 1);
+                GameMsg_Send5Ints(0x33, 0, 0, 0, nSurface, 1);
                 if (nRank == 0) {
                     fn_800A62E0();
                     pBall = &gPlayers[nPlayer].ball;
@@ -296,8 +296,8 @@ void fn_800F3EBC(int nPlayer) {
         } else if (lbl_8028238C != 5) {
             lbl_8028238C = 5;
             gPlayers[nPlayer].nE88++;
-            fn_800F3980(0x33, 0, 0, 0, 0xCE, 1);
-            fn_80062D6C(0x38, gPlayers[nPlayer].nE88);
+            GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCE, 1);
+            GameMsg_SendInt(0x38, gPlayers[nPlayer].nE88);
             fn_800A640C();
             switch (gPlayers[nPlayer].nE88) {
             case 1:
@@ -449,10 +449,10 @@ void fn_800F48C4(void) {
     if (lbl_8028238C != 5) {
         if (lbl_8028238C == 0) {
             gPlayers[1].nE88++;
-            fn_80062D6C(0x38, gPlayers[1].nE88);
+            GameMsg_SendInt(0x38, gPlayers[1].nE88);
         } else {
             gPlayers[0].nE88++;
-            fn_80062D6C(0x38, gPlayers[0].nE88);
+            GameMsg_SendInt(0x38, gPlayers[0].nE88);
         }
         fn_800A6394();
     }

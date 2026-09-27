@@ -35,10 +35,10 @@ void fn_8002A024(u8 bOn, f32 x0, f32 y0, f32 x1, f32 y1) {
         colour[1] = 0.0f;
         colour[2] = 0.0f;
         colour[3] = 0.0f;
-        fn_80014194(colour);
+        RenderView_SetColor(colour);
         fn_8001425C(0);
         RenderState_Flush();
-        fn_8001644C(0xA1, xy, 0, NULL, 2);
+        RenderView_DrawPrimitive(0xA1, xy, 0, NULL, 2);
         RenderState_SetDepthWrite(1);
         RenderState_SetAlphaTest(1, 6, 0x80);
         RenderState_SetDepthFunc(3);

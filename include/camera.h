@@ -632,7 +632,7 @@ f32    fn_80012EE8(f32* pRect);         // [0]: its left
 void*  Camera_GetCurrent(void);               // the current render camera
 void   fn_80013CCC(void* pCamera);
 void   fn_80013EEC(void* pCamera);
-void   fn_80016B9C(void);
+void   RenderState_SetCameraMatrices(void);
 int    fn_80016D10(void);
 void   fn_800171D8(f32* pRect, f32 x, f32 y, f32 w, f32 h);   // set a screen rectangle (fractions)
 // A world position on screen (0..1 across and down; pZ, if not NULL, gets a third value). Returns

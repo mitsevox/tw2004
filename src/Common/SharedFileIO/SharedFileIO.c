@@ -15,7 +15,7 @@ enum { SFIO_STATE_BUSY_A = 0xB, SFIO_STATE_BUSY_B = 0xC, SFIO_STATE_BUSY_C = 0xD
 
 // Host (CodeWarrior side) functions. Signatures inferred from the calls.
 extern void  fn_8012C8D0(u32* pSize, int unused);   // adds up the save's record sizes
-extern int   fn_8012C98C(int eError);
+extern int   EASB_ErrorFromTagError(int eError);
 u32 SFIOGetHeaderSize(void);
 int SFIONumDevicesInMask(u16 uDeviceMask);
 int SFIOFirstDeviceFromMask(u16 uDeviceMask);
@@ -41,7 +41,7 @@ int fn_8016CFF8_SetSaveDescriptor(void* pHeader) {
     desc.uSize08 = 0;
     fn_8012C8D0(&desc.uDataSize, 0);
     eTagError = TagFile_SetDescriptor(&desc);
-    eError = fn_8012C98C(eTagError);
+    eError = EASB_ErrorFromTagError(eTagError);
     return eError;
 }
 

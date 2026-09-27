@@ -996,7 +996,7 @@ extern f32 lbl_80281120[2];     // 1, 0
 typedef struct PostFxTint {
     u8   b0;                    // 0x00  set: draw it this frame
     u8   unk1[3];
-    f32  aColour[4];            // 0x04  fn_80014194's colour
+    f32  aColour[4];            // 0x04  RenderView_SetColor's colour
 } PostFxTint;
 LAYOUT_ASSERT(PostFxTint, 0x14);
 
@@ -1359,12 +1359,12 @@ u8*  fn_800136C4(int nController);      // the pad's state: stick bytes at +0, +
 u32  Controller_GetButtons(int nController);      // buttons: held << 16 | pressed this frame
 void RenderState_SetDrawFlags(int a);
 // A screen quad (GameEffects' letter boxes, GxUtil.c's alpha clear): fn_800141F8 fills its corners
-// (x0, y0)-(x1, y1), fn_80014194 sets its colour (four floats), fn_8001644C draws it.
-void fn_80014194(f32* pColour);
+// (x0, y0)-(x1, y1), RenderView_SetColor sets its colour (four floats), RenderView_DrawPrimitive draws it.
+void RenderView_SetColor(f32* pColour);
 void fn_800141CC(void);                 // GoRenderCtx_Gc.c: the default vertex colour
 void fn_800141F8(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_8001425C(int a);
-void fn_8001644C(int a, f32* pXY, f32* pColour, f32* pUV, int c);
+void RenderView_DrawPrimitive(int a, f32* pXY, f32* pColour, f32* pUV, int c);
 void fn_800BA74C(u8 bFade);             // ScreenClear.c: a black screen for 1, 2 or 30 frames
 u32  Controller_GetButtonMask(int nButton, u8 bShift);   // a button's mask (bShift: moved up 16 bits)
 extern s8   lbl_80281C98;               // GoRenderCtx_Gc.c: the row of lbl_80186AF0 in use (fn_800142A4)

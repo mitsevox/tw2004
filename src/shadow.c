@@ -222,8 +222,8 @@ void fn_800B281C(void) {
     fn_800141F8(aXY, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
     aXY[2] = 0.0f;
     aXY[6] = 0.0f;
-    fn_80014194(aColour);
-    fn_8001644C(0xA1, aXY, 0, NULL, 2);
+    RenderView_SetColor(aColour);
+    RenderView_DrawPrimitive(0xA1, aXY, 0, NULL, 2);
 }
 
 // fake match: stands in for code the original linker stripped. The pool has 0.5f (0x802840CC)
@@ -322,7 +322,7 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
                 vCorner[1] = fY;
                 vCorner[2] = fZ;
                 vCorner[3] = 1.0f;
-                fn_800BAD60(aLight, (Vec4*)vCorner, (Vec4*)vOut);
+                Mtx_MultVec4(aLight, (Vec4*)vCorner, (Vec4*)vOut);
                 Vec_Scale(1.0f / vOut[3], vOut, vOut);
                 if (vOut[0] > fMaxX) {
                     fMaxX = vOut[0];
@@ -364,7 +364,7 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     fn_80013CCC(Camera_GetCurrent());
     fn_800140E8(0, p->nWidth, p->nHeight, 0, 4, 1);
     fn_80013EEC(Camera_GetCurrent());
-    fn_80016B9C();
+    RenderState_SetCameraMatrices();
     RenderState_SetDrawFlags(0);
     RenderState_SetDepthWrite(0);
     RenderState_SetAlphaTest(0, 6, 0x80);
@@ -427,8 +427,8 @@ void fn_800B2DB0(f32* pCentre, f32 (*pQuad)[4], f32 fHalfX, f32 fHalfZ) {
     fn_80013CCC(Camera_GetCurrent());
     RenderState_SetDrawFlags(0x70);
     fn_8002A608(&p->tex);
-    fn_80016B9C();
-    fn_80035138(0);
+    RenderState_SetCameraMatrices();
+    RenderState_SetClipMode(0);
     RenderState_SetAlphaTest(0, 6, 0x80);
     RenderState_SetDepthFunc(7);
     RenderState_SetDepthWrite(0);
@@ -521,8 +521,8 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     fn_80035294();
     fn_80013EEC(Camera_GetCurrent());
     RenderState_SetDrawFlags(0x70);
-    fn_80016B9C();
-    fn_80035138(0);
+    RenderState_SetCameraMatrices();
+    RenderState_SetClipMode(0);
     RenderState_SetDepthFunc(3);
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetAlphaTest(0, 6, 0x80);

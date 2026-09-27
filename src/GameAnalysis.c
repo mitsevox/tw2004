@@ -16,7 +16,7 @@ int fn_800E5E54(void) {
     u8 bFound;
     int nTip;
     u8 bAny;
-    if (fn_800EC550() || (Game_GetMode() != 0 && Game_GetMode() != 1 && Game_GetMode() != 2 &&
+    if (GM5_IsChallengeRunning() || (Game_GetMode() != 0 && Game_GetMode() != 1 && Game_GetMode() != 2 &&
                           Game_GetMode() != 4 && Game_GetMode() != 23)) {
         return 14;
     }

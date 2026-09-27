@@ -256,7 +256,7 @@ void fn_800B3F4C(f32* pRect, f32 fTop, f32 fLeft, f32 fWidth, f32 fHeight) {
     fn_80035240(NULL);
     fn_80013CCC(Camera_GetCurrent());
     fn_80013EEC(Camera_GetCurrent());
-    fn_80016B9C();
+    RenderState_SetCameraMatrices();
     RenderState_Flush();
 }
 

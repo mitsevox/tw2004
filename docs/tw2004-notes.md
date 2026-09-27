@@ -167,7 +167,7 @@ between `LLObj_Gc.c` and `GoEntry.c`. Types are in `include/unsorted/cull.h`.
 | `0x80008320` - `0x80008368` | ten getters | Return camera floats `0x220` down to `0x1F4` | matched |
 | `0x80008370`, `0x80008378` | getters | `cam->unk10`, then field 0 of that object; the cull test takes a different path when it is non-zero | matched |
 | `0x80008380` | `fn_80008380` | Calls `fn_800070DC`. Called from 21 functions | matched |
-| `0x800BAD60` | `fn_800BAD60` | 4x4 matrix times 4-float vector, uses paired-single math (hand-written assembly?) | not started |
+| `0x800BAD60` | `Mtx_MultVec4` | 4x4 matrix times 4-float vector, uses paired-single math (hand-written assembly?) | not started |
 
 The dispatch object stores its type index at offset `0x0`. The cull test reads offset `0x0` of
 `cam->unk10` to choose perspective or flat, so these are probably the same object (unconfirmed;
@@ -387,7 +387,7 @@ Leads and loose ends
   library built with an older compiler.
 - The GCC block is the file-reading layer (`TagFile`, `SharedFileIO`). Unoptimized code is the
   easiest to decompile, and it is the bridge to the asset formats.
-- 79 small functions contain real paired-single math (e.g. `fn_800BAD60`, `fn_800BADF8`,
+- 79 small functions contain real paired-single math (e.g. `Mtx_MultVec4`, `fn_800BADF8`,
   `fn_8001EF78`). Probably hand-written assembly; would be matched as assembly, not C.
 
 Suggested next steps

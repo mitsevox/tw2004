@@ -627,7 +627,7 @@ f32 fn_80051124(Ball* pBall, f32 fAim, f32* pNormal) {
     f32 fEps;
     Vec3Copy(pNormal, vN);
     fn_80055E28(fAim, &fSin, &fCos);
-    fn_80055D70(&vN[2], &vN[0], fSin, fCos);
+    Ball_RotatePair(&vN[2], &vN[0], fSin, fCos);
     fEps = 1e-6f;
     if (vN[1] < fEps && vN[1] > -fEps) {
         if (vN[0] < 0.0f) {
@@ -651,7 +651,7 @@ f32 fn_800511F0(Ball* pBall, f32 fAim, f32* pNormal) {
     f32 fEps;
     Vec3Copy(pNormal, vN);
     fn_80055E28(fAim, &fSin, &fCos);
-    fn_80055D70(&vN[2], &vN[0], fSin, fCos);
+    Ball_RotatePair(&vN[2], &vN[0], fSin, fCos);
     fEps = 1e-6f;
     if (vN[1] < fEps && vN[1] > -fEps) {
         if (vN[0] < 0.0f) {
@@ -762,7 +762,7 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
     if (nKind == SHOT_TYPE_PUTT_e || nClub == CLUB_PUTTER_e) {
         fSpeed *= 7.2f;
         Vec3_Scale(fSpeed, pB, vDir);
-        fn_80055D70(&vDir[0], &vDir[2], fSinAim, fCosAim);
+        Ball_RotatePair(&vDir[0], &vDir[2], fSinAim, fCosAim);
         Vec_NormalizeTo(vNormal, vNormal);
         fn_8000C5D4(vDir, vNormal, -Vec3_Dot(vDir, vNormal), pVel);
         Vec3_Scale(1.8f, pVel, pVel);
@@ -783,12 +783,12 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
         fMax = 0.017453292f * fMax;
         fSpeed *= (1.0f / fMax) * (fMax - fSlope);
         fn_80055E28(fSlope, &fSinF, &fCosF);
-        fn_80055D70(&vDir[2], &vDir[1], fSinF, fCosF);
+        Ball_RotatePair(&vDir[2], &vDir[1], fSinF, fCosF);
     }
     Vec3_Scale(fSpeed, vDir, vDir);
     if (nKind == 5) {
         fn_80055E28(0.7330383f, &fSin, &fCos);
-        fn_80055D70(&vDir[2], &vDir[1], fSin, fCos);
+        Ball_RotatePair(&vDir[2], &vDir[1], fSin, fCos);
     }
     if (nKind == 2) {
         fLaunch = gChipLoft[nClub];
@@ -803,7 +803,7 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
     fn_80055E28(Ball_Clamp(fLaunch, 0.0f, 1.3962634f), &fSin, &fCos);
     Vec3Copy(pA, vAxis);
     vAxis[3] = 0.0f;
-    fn_80055D70(&vAxis[2], &vAxis[1], fSin, fCos);
+    Ball_RotatePair(&vAxis[2], &vAxis[1], fSin, fCos);
     if (pBall->nPlayer == 4 ||
         (pBall->nPlayer >= 0 && pBall->nPlayer <= 3 && gPlayers[pBall->nPlayer].bPerfect)) {
         fSide = 0.0f;
@@ -816,7 +816,7 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
                 fSide = 0.7853982f;
             }
             fn_80055E28(0.2f * fSide, &fSinS, &fCosS);
-            fn_80055D70(&vAxis[0], &vAxis[1], fSinS, fCosS);
+            Ball_RotatePair(&vAxis[0], &vAxis[1], fSinS, fCosS);
         }
     }
     fn_80055EC4(vDir, vAxis, vAlong);
@@ -863,12 +863,12 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
     fn_80055EA0(vOff, vOffPart, vOff);
     if (fSide) {
         fn_80055E28(0.9f * fSide, &fSinS, &fCosS);
-        fn_80055D70(&vAxis[0], &vAxis[1], fSinS, fCosS);
+        Ball_RotatePair(&vAxis[0], &vAxis[1], fSinS, fCosS);
     }
     vec4flt_CrossProduct(vOff, vAxis, pSpin);
     Vec3_Scale(fSpin, pSpin, pSpin);
-    fn_80055D70(&pVel[0], &pVel[2], fSinAim, fCosAim);
-    fn_80055D70(&pSpin[0], &pSpin[2], fSinAim, fCosAim);
+    Ball_RotatePair(&pVel[0], &pVel[2], fSinAim, fCosAim);
+    Ball_RotatePair(&pSpin[0], &pSpin[2], fSinAim, fCosAim);
 done:
     return 1;
 }
@@ -1296,20 +1296,20 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
     fD    = fn_80055E1C(vDir[0], vDir[1], fB, fCo);
     fC    = fn_80055E10(vDir[1], vDir[0], fB, fCo);
     fS = vDir[2];
-    fn_80055D70(&pBall->vVel[0], &pBall->vVel[1], fB, fCo);
-    fn_80055D70(&pBall->vSpin[0], &pBall->vSpin[1], fB, fCo);
+    Ball_RotatePair(&pBall->vVel[0], &pBall->vVel[1], fB, fCo);
+    Ball_RotatePair(&pBall->vSpin[0], &pBall->vSpin[1], fB, fCo);
     fP  = -atan2f(vBent[2], vBent[1]);
     fE = Math_Sin(fP);
     fF = Math_Cos(fP);
     fT  = fn_80055E1C(fC, fS, fE, fF);
     fC  = fn_80055E10(fS, fT, fE, fF);
-    fn_80055D70(&pBall->vVel[1], &pBall->vVel[2], fE, fF);
-    fn_80055D70(&pBall->vSpin[1], &pBall->vSpin[2], fE, fF);
+    Ball_RotatePair(&pBall->vVel[1], &pBall->vVel[2], fE, fF);
+    Ball_RotatePair(&pBall->vSpin[1], &pBall->vSpin[2], fE, fF);
     fJ  = atan2f(fD, fC);
     fG = Math_Sin(fJ);
     fH = Math_Cos(fJ);
-    fn_80055D70(&pBall->vVel[0], &pBall->vVel[2], fG, fH);
-    fn_80055D70(&pBall->vSpin[0], &pBall->vSpin[2], fG, fH);
+    Ball_RotatePair(&pBall->vVel[0], &pBall->vVel[2], fG, fH);
+    Ball_RotatePair(&pBall->vSpin[0], &pBall->vSpin[2], fG, fH);
     vSlip[0] = 0.462857157f * (0.839999974f * pBall->vSpin[2] + pBall->vVel[0]);
     fRest = pSurface->f0C;
     if (fRest > 0.5f && fRest < 1.0f) {
@@ -1410,18 +1410,18 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
     fT  = -fJ;
     fBounce  = Math_Sin(fT);
     fT  = Math_Cos(fT);
-    fn_80055D70(&pBall->vVel[0], &pBall->vVel[2], fBounce, fT);
-    fn_80055D70(&pBall->vSpin[0], &pBall->vSpin[2], fBounce, fT);
+    Ball_RotatePair(&pBall->vVel[0], &pBall->vVel[2], fBounce, fT);
+    Ball_RotatePair(&pBall->vSpin[0], &pBall->vSpin[2], fBounce, fT);
     fT  = -fP;
     fBounce  = Math_Sin(fT);
     fT  = Math_Cos(fT);
-    fn_80055D70(&pBall->vVel[1], &pBall->vVel[2], fBounce, fT);
-    fn_80055D70(&pBall->vSpin[1], &pBall->vSpin[2], fBounce, fT);
+    Ball_RotatePair(&pBall->vVel[1], &pBall->vVel[2], fBounce, fT);
+    Ball_RotatePair(&pBall->vSpin[1], &pBall->vSpin[2], fBounce, fT);
     fT  = -fA;
     fBounce  = Math_Sin(fT);
     fT  = Math_Cos(fT);
-    fn_80055D70(&pBall->vVel[0], &pBall->vVel[1], fBounce, fT);
-    fn_80055D70(&pBall->vSpin[0], &pBall->vSpin[1], fBounce, fT);
+    Ball_RotatePair(&pBall->vVel[0], &pBall->vVel[1], fBounce, fT);
+    Ball_RotatePair(&pBall->vSpin[0], &pBall->vSpin[1], fBounce, fT);
     if (pSurface != NULL && pSurface->f0C >= 0.0f &&
         (pSurface->nClass == 4 || pSurface->nClass == 3 || pSurface->nClass == 2) &&
         pSurface->f24 <= 80.0f && fSpeed < pSurface->f24) {
@@ -1694,9 +1694,9 @@ u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* p
         }
         Vec_NormalizeTo(pNormal, pNormal);
         fn_80055E28(0.017453292f * nA, &fSin, &fCos);
-        fn_80055D70(&pNormal[0], &pNormal[1], fSin, fCos);
+        Ball_RotatePair(&pNormal[0], &pNormal[1], fSin, fCos);
         fn_80055E28(0.017453292f * nB, &fSin, &fCos);
-        fn_80055D70(&pNormal[2], &pNormal[1], fSin, fCos);
+        Ball_RotatePair(&pNormal[2], &pNormal[1], fSin, fCos);
     }
     Vec_NormalizeTo(pNormal, pNormal);
     pHit[1] += BALL_RADIUS;
@@ -1753,7 +1753,7 @@ u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* p
             fAngle = -atan2f(pBall->vVel[0], pBall->vVel[2]);
             fS = Math_Sin(fAngle);
             fC = Math_Cos(fAngle);
-            fn_80055D70(&vSpin[0], &vSpin[2], fS, fC);
+            Ball_RotatePair(&vSpin[0], &vSpin[2], fS, fC);
             Vec3Copy(vSpin, pBall->vSpin);
         }
         pBall->b9B = 1;
@@ -2138,20 +2138,20 @@ void Ball_GroundContact(Ball* pBall, f32 fTicks) {
         fA   = vAxis[0];
         fAngle = vAxis[2];
         fB   = vAxis[1];
-        fn_80055D70(&fA, &fB, fSin, fCos);
-        fn_80055D70(&pBall->vVel[0], &pBall->vVel[1], fSin, fCos);
+        Ball_RotatePair(&fA, &fB, fSin, fCos);
+        Ball_RotatePair(&pBall->vVel[0], &pBall->vVel[1], fSin, fCos);
         fAngle = -atan2f(fAngle, fB);
         fn_80055E28(fAngle, &fSin, &fCos);
-        fn_80055D70(&pBall->vVel[1], &pBall->vVel[2], fSin, fCos);
+        Ball_RotatePair(&pBall->vVel[1], &pBall->vVel[2], fSin, fCos);
         if (!bFlip) {
             fTurn = -fTurn;
         }
         fn_80055E28(fTurn, &fSin, &fCos);
-        fn_80055D70(&pBall->vVel[0], &pBall->vVel[2], fSin, fCos);
+        Ball_RotatePair(&pBall->vVel[0], &pBall->vVel[2], fSin, fCos);
         fn_80055E28(-fAngle, &fSin, &fCos);
-        fn_80055D70(&pBall->vVel[1], &pBall->vVel[2], fSin, fCos);
+        Ball_RotatePair(&pBall->vVel[1], &pBall->vVel[2], fSin, fCos);
         fn_80055E28(-fX, &fSin, &fCos);
-        fn_80055D70(&pBall->vVel[0], &pBall->vVel[1], fSin, fCos);
+        Ball_RotatePair(&pBall->vVel[0], &pBall->vVel[1], fSin, fCos);
     }
     Vec3_Scale(-(0.714285731f * (0.107170001f * vDir[1])), vDir, vAccel);
     fn_8000C5D4(pBall->vVel, vAccel, fTicks, pBall->vVel);
@@ -2534,7 +2534,7 @@ void fn_80055D6C(void) {
 }
 
 // Rotate the pair (*pA, *pB) by the angle whose sine and cosine are given.
-void fn_80055D70(f32* pA, f32* pB, f32 fSin, f32 fCos) {
+void Ball_RotatePair(f32* pA, f32* pB, f32 fSin, f32 fCos) {
     f32 fA = fn_80055E1C(*pA, *pB, fSin, fCos);
     *pB = fn_80055E10(*pB, *pA, fSin, fCos);
     *pA = fA;

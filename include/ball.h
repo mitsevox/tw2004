@@ -335,7 +335,7 @@ void fn_80055CD0(int n);
 void Wind_Set(int nDir, f32 fSpeed);
 f32  Wind_Get(f32* pOut);               // the wind's speed; its vector (direction x speed) into pOut
 void Wind_Generate(void);
-void fn_80055D70(f32* pA, f32* pB, f32 fSin, f32 fCos);   // turns the pair (*pA, *pB) by an angle
+void Ball_RotatePair(f32* pA, f32* pB, f32 fSin, f32 fCos);   // turns the pair (*pA, *pB) by an angle
 
 void fn_80047B6C(Ball* pBall, int nPlayer);
 void fn_80047BC0(Ball* pBall, int nPlayer);

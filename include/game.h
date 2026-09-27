@@ -105,8 +105,8 @@ void fn_80062C80(int a, u8 b);
 void fn_80062CB0(int a, u8 b);
 void fn_80062CE0(u8 a);
 void fn_80062D0C(int nPlayer);
-void fn_80062D38(int nMsg, int nA, int nB);    // send message nMsg with two values (fn_800E5998)
-void fn_80062D6C(int nMsg, int nValue);        // send message nMsg with one value (fn_800E590C)
+void GameMsg_Send2Ints(int nMsg, int nA, int nB);    // send message nMsg with two values (GameMsg_Send2)
+void GameMsg_SendInt(int nMsg, int nValue);        // send message nMsg with one value (GameMsg_Send1)
 
 // What lbl_802811F0 points to (its code, around 0x8006F650, is not decompiled; fn_8006F608 clears
 // it). GameMode5's fn_800ED6F8 sets f18 and flags it in b1C; SitDevFile.c tests the flags.
@@ -383,7 +383,7 @@ void fn_800E1434(void);
 void fn_800E1480(int nHole);            // make a hole of the round the current one
 void fn_800E14E0(int nCourse);
 u8   fn_800E1734(void);                 // the current hole is the round's first
-int  fn_800E177C(void);
+int  Game_GetMulliganRule(void);
 int  fn_800E1788(int nPlayer);          // the player's total for the round
 int  fn_800E17AC(int nPlayer);          // the player's total strokes
 int  fn_800E1904(int nPlayer, u8 bCurrent);
@@ -531,10 +531,10 @@ void fn_800E56D0(int a, int b, int c);
 void fn_800E5714(int a);
 void fn_800E5724(int a);
 void fn_800E58B4(int nMsg);             // send a message with no values
-void fn_800E590C(int nMsg, u32 uFloats, void* pA);    // one value; uFloats bit 0: a float
-void fn_800E5998(int nMsg, u32 uFloats, void* pA, void* pB);
+void GameMsg_Send1(int nMsg, u32 uFloats, void* pA);    // one value; uFloats bit 0: a float
+void GameMsg_Send2(int nMsg, u32 uFloats, void* pA, void* pB);
 void fn_800E5A4C(int nMsg, u32 uFloats, void* pA, void* pB, void* pC);   // three values; uFloats bit n: a float
-void fn_800E5B0C(int nMsg, u32 uFloats, void* pA, void* pB, void* pC, void* pD, void* pE);   // five values
+void GameMsg_Send5(int nMsg, u32 uFloats, void* pA, void* pB, void* pC, void* pD, void* pE);   // five values
 void fn_800E5C08(int nMsg, char* pStr);  // send a message with a string
 u8   fn_800E5C84(void);
 void fn_800E5CA4(int a, int b, int c, int d, int e, int g, int h, f32 f);    // message 0x42
@@ -586,7 +586,7 @@ int  fn_800EAC94(int n);
 void fn_800EADD8(void);
 void fn_800EAE38(s32 a);
 void fn_800EAF7C(void);
-u8   fn_800EC550(void);
+u8   GM5_IsChallengeRunning(void);
 int  fn_800EC558(void);
 void fn_800ECBE4(void);
 u8   fn_800ED540(void);
@@ -679,7 +679,7 @@ s32  fn_800F7D9C(s32 a);                // GameMode13.c
 s32  fn_800F80A0(s32 a);                // GameMode13.c
 
 void fn_800F3828(void);                 // GameMode14.c
-void fn_800F3980(int nMsg, s32 a, s32 b, s32 c, s32 d, s32 e);    // GameMode14.c
+void GameMsg_Send5Ints(int nMsg, s32 a, s32 b, s32 c, s32 d, s32 e);    // GameMode14.c
 void fn_800F39CC(s32 a);                // GameMode14.c
 void fn_800F48C4(void);                 // GameMode15.c
 void fn_800F7DE8(void);                 // GameMode13.c

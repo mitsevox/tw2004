@@ -194,7 +194,7 @@ void fn_800F6ED4(int nPlayer) {
                 gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
                 lbl_802823B8 = 0;
                 gPlayers[nPlayer].nDD8 += lbl_802823BC;
-                fn_800F3980(0x33, lbl_802823BC, 0, 0, 0xCA, 1);
+                GameMsg_Send5Ints(0x33, lbl_802823BC, 0, 0, 0xCA, 1);
                 lbl_802823BC = 0;
                 lbl_802823B8 = 0;
                 if ((s8)gPlayers[nPlayer].bE9E == 0) {
@@ -222,7 +222,7 @@ void fn_800F6ED4(int nPlayer) {
                 fn_800ED710(nPlayer);
                 fn_800F80D4(gPlayers[nPlayer].n290[Game_CurHoleIndex()] + lbl_802823B8 * 60);
                 nAdded = lbl_802823B8;
-                fn_800F3980(0x33, lbl_802823BC, 0, 0, 0xC9, 1);
+                GameMsg_Send5Ints(0x33, lbl_802823BC, 0, 0, 0xC9, 1);
                 fn_800E53F0(0x34, lbl_802823B8 * 60, 0, 0);
                 lbl_802823BC = 0;
                 lbl_802823B8 = 0;
@@ -255,7 +255,7 @@ void fn_800F6ED4(int nPlayer) {
             fScale = 0.0f;
             lbl_802823BC = 0;
             lbl_802823B8 = 0;
-            fn_800F3980(0x33, 0, 0, 0, 0xC8, 1);
+            GameMsg_Send5Ints(0x33, 0, 0, 0, 0xC8, 1);
             fn_800A63D0();
             nMsg = 2;
         } else {
@@ -299,7 +299,7 @@ void fn_800F6ED4(int nPlayer) {
             fScale = 0.0f;
             lbl_802823BC = 0;
             lbl_802823B8 = 0;
-            fn_800F3980(0x33, 0, 0, 0, 0xCB, 1);
+            GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCB, 1);
             switch (Misc_RandFunc(0) & 3) {
             case 0:
                 nMsg = 0x2F;
@@ -364,9 +364,9 @@ void fn_800F6ED4(int nPlayer) {
             gPlayers[nPlayer].nDD8 = 0;
         } else if (!gSession.bReplay) {
             if (fn_800F2788(nPlayer, fLength)) {
-                fn_800F3980(0x33, lbl_802823BC, 0, 0, 0xD6, 1);
+                GameMsg_Send5Ints(0x33, lbl_802823BC, 0, 0, 0xD6, 1);
             } else {
-                fn_800F3980(0x33, lbl_802823BC, 0, 0, nSurface, 1);
+                GameMsg_Send5Ints(0x33, lbl_802823BC, 0, 0, nSurface, 1);
             }
             if (lbl_802823BC > 0 && nSurface < 0x85) {
                 fn_800A62A4();
@@ -566,5 +566,5 @@ void fn_800F80A8(void) {
 }
 
 void fn_800F80D4(s32 p0) {
-    fn_80062D6C(17, p0);
+    GameMsg_SendInt(17, p0);
 }
