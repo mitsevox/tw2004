@@ -381,8 +381,7 @@ void fn_8012645C(int nPlayer) {
 // wins (n8 = the player, bC set). A tie for the highest leaves no winner, and with n0 1 clears
 // every nEBC.
 // fake match: no loop unrolling in the frontend, so the second loop keeps the count in a register
-// and gets the backend's unroll (srwi by 8 + remainder) as EA's does. Not exact yet: EA computes
-// pScore after the second return test, ours before it (agents/tried/fn_801264B8.md).
+// and gets the backend's unroll (srwi by 8 + remainder) as EA's does.
 #pragma push
 #pragma opt_unroll_loops off
 void fn_801264B8(void) {
@@ -404,19 +403,28 @@ void fn_801264B8(void) {
         if (pPlayer->nEA0 < nMin) {
             return;
         }
-        pScore = &pPlayer->nEBC;
         if (nFirst != pPlayer->nEA0) {
             return;
         }
-        if (pPlayer->nEBC >= nBest) {
+        pScore = &pPlayer->nEBC;
+        if (*pScore >= nBest) {
             bTie = 0;
-            if (nBest == pPlayer->nEBC && nWinner != 5) {
+            if (nBest == *pScore && nWinner != 5) {
                 bTie = 1;
             }
             nWinner = i;
-            nBest = *pScore;
+            // fake match: the (s32*) cast (same type) keeps this reload apart from the compare's
+            // load above, so the original's lwz through pScore stays.
+            nBest = *(s32*)pScore;
         }
     }
+    // fake match: pPlayer goes into the high word of a 64-bit OR whose low word is nWinner, so
+    // nWinner is unchanged. The dead OR keeps pPlayer live to the end of the loop at register
+    // allocation, which puts pPlayer and pScore in different registers (the original's r8 / r7:
+    // the peephole then loads through pPlayer + 0xEBC), and it is deleted after allocation.
+    // port: reads pPlayer uninitialised when there are no players (the value is discarded);
+    // truncates the pointer to 32 bits; a port leaves this line out.
+    nWinner = (s32)((u64)(s64)nWinner | ((u64)(u32)pPlayer << 32));
     lbl_80195498.n8 = nWinner;
     lbl_80195498.bC = 1;
     if (bTie) {
