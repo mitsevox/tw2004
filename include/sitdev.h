@@ -33,6 +33,7 @@ typedef struct SitDevData {
 } SitDevData;
 LAYOUT_ASSERT(SitDevData, 0x140);
 
+extern SitDevData  lbl_801D5AB0;
 extern SitDevData* lbl_802811B8;    // 0x802811B8 (.sdata): &lbl_801D5AB0
 
 // A halfword the loader rewrites (fn_800BB52C): on disc its two bit-fields are in the other bit
