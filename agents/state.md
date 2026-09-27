@@ -3,7 +3,11 @@
 Updated 2026-09-25 ~21:30 CDT. How the machines, CI, the page and PC jobs fit together:
 docs/infrastructure.md. History: docs/journal.md.
 
-**Running:** nothing. ENDGAME checkpoint 1 (2026-09-26 ~21:00 CDT) merged: Golfer AI_ChooseTarget exact (Codex,
+**Running:** nothing. Night: GoGreenGrid linked; Golfer.c split into its 4 original files (ai_brain.c,
+Code8002BBB0.c, Code8002C984.c, Golfer.c = the Luck part), all linked; gPlayers/gCurGolferRecord/gGolferTable
+defined in Code8002DB80.c, gSession/gszEmpty in Code8002EE1C.c. Follow-ups: Golfer.c's header comment still
+describes the old whole file (audit fix); lbl_80187650 (7 x 13-byte club-name strings, used by Code8002EE1C)
+unlinked. Codex/Gemini: agents/assign/2026-09-26-codex-gemini-velocity.md. ENDGAME checkpoint 1 (2026-09-26 ~21:00 CDT) merged: Golfer AI_ChooseTarget exact (Codex,
 labelled fakes), startUp exact (Gemini, labelled pragma) and linked; GoStaticCam, Rain, SunFlr, Code8002EE1C,
 GameModeBestBall linked; exact also char fn_80017DDC, SkinPart fn_800CE52C, UISScreen fn_8016B4D4, UISApi
 fn_80169308, LLFont fn_8001208C, GoGreenGrid GR_BuildGridRenderData. Exact but not linked: Golfer (46/46; its data
