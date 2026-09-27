@@ -898,7 +898,7 @@ config.libs = [
             Object(Matching, "GoPostFx.c"),
             Object(Matching, "GoDynamicCam.c"),
             Object(NonMatching, "gocamscripts.c"),
-            Object(NonMatching, "DepthField.c"),
+            Object(Matching, "DepthField.c"),
             Object(Matching, "UObject3D.c"),
             Object(Matching, "GoDynObj.c"),
             Object(Matching, "UObject.c"),
