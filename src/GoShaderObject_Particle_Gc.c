@@ -265,16 +265,13 @@ void fn_800949D0(SD_SShaderObject_Static* pObject) {
         GXSetVtxDesc(11, 1);
         GXSetVtxDesc(13, 1);
         GXInvalidateVtxCache();
-        // fake match: pVerts as a byte offset with nFirst's part through a dead 64-bit round trip
-        // (the same address as `apBuffers[nBuf] + nFirst + nStart`); the dead sign word keeps
-        // nFirst * 36 live past pAges's add, which gives the original's registers, and is deleted
-        // after allocation. port: the offsets are 32-bit.
-        pVerts = (ParticleVertex*)((u8*)lbl_802813A8->apBuffers[nBuf]
-                                   + (u32)(s64)(s32)((u32)pSys->nFirst * sizeof(ParticleVertex))
-                                   + nStart * sizeof(ParticleVertex));
+        pVerts = (ParticleVertex*)lbl_802813A8->apBuffers[nBuf] + pSys->nFirst + nStart;
         pAges = (f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst + nStart;
         n = pSys->nCount - nStart;
-        if (nLive <= n) {
+        // fake match: n compared through a dead 64-bit round trip (the low word is n itself); the
+        // dead sign word, deleted after allocation, moves the first scheduling pass to the
+        // original's order. port: a plain `nLive <= n`.
+        if (nLive <= (u32)(s64)(s32)n) {
             n = nLive;
         }
         fn_80094534(pCamera->viewMtx, &pSys->shape, pVerts, pAges, n);
