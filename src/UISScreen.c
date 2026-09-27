@@ -771,16 +771,20 @@ void fn_8016A830(UIStudio* pStudio, int nOp, UISScreen* pScreen, u32 nNode) {
 // node is shown, draws its children with its own values folded into the studio's.
 void fn_8016A510(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
     UISNode* pNode;
-    u32 i;
     u32 j;
     UISVec4 mul;
     UISVec4 add;
     UISNodeInfo* pInfo;
 
-    if (pScreen->pData != NULL) {
+    // fake match: pScreen through a 64-bit round trip (the same pointer); the conversion's dead
+    // high word (srawi) is deleted by the register allocator, and it moves the pScreen copy after
+    // the pData load as in the original. port: truncates the pointer to 32 bits.
+    if (((UISScreen*)(s64)(s32)pScreen)->pData != NULL) {
         pNode = &pScreen->pData->pNodes[nNode];
-        for (i = 0; i < pScreen->pData->nStart; i++) {
-            UISEntry* pEntry = &pScreen->pData->pStart[i];
+        // fake match: nNode (dead after pNode) is the counter of both entry loops, which gives the
+        // original's loop registers.
+        for (nNode = 0; nNode < pScreen->pData->nStart; nNode++) {
+            UISEntry* pEntry = &pScreen->pData->pStart[nNode];
             if (pEntry->uHandler < pStudio->nHandlers) {
                 UISHandlerFn pfnHandler = pStudio->ppfnHandlers[pEntry->uHandler];
                 if (pfnHandler != NULL) {
@@ -792,7 +796,10 @@ void fn_8016A510(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
         }
         if (pNode->pInfo->p0 != NULL) {
             mul = *fn_8016C198();
-            add = *fn_8016C18C();
+            // fake match: the same 64-bit round trip on the pointer (the same address); its dead
+            // high word gives the original's order for the copy's loads among the products.
+            // port: truncates the pointer to 32 bits.
+            add = *(UISVec4*)(s64)(s32)fn_8016C18C();
             pInfo = pNode->pInfo;
             fn_8016C174(mul.a[0] * pInfo->afMul[0], mul.a[1] * pInfo->afMul[1], mul.a[2] * pInfo->afMul[2],
                         mul.a[3] * pInfo->afMul[3]);
@@ -802,8 +809,8 @@ void fn_8016A510(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
             for (j = 0; j < pNode->nGroups; j++) {
                 UISGroup* pGroup = pNode->ppGroups[j];
                 if (pGroup->pInfo->p0 != NULL) {
-                    for (i = 0; i < pGroup->nEntries; i++) {
-                        UISEntry* pEntry = &pGroup->pEntries[i];
+                    for (nNode = 0; nNode < pGroup->nEntries; nNode++) {
+                        UISEntry* pEntry = &pGroup->pEntries[nNode];
                         if (pEntry->uHandler == 0xFFFF) {
                             fn_8016A510(pStudio, pScreen, pEntry->u4.nNode, nMsg);
                         } else if (pEntry->n2 != 0 && pEntry->uHandler < pStudio->nHandlers) {

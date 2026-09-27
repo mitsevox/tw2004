@@ -15,11 +15,12 @@
 #include "terrain.h"
 #include "llpict.h"
 
-s32 lbl_802821A8;               // the decoder's tables are built
-s32 lbl_802821AC;               // 0: a key frame, 1: coded against a reference
-s32 lbl_802821B0;               // bits left in lbl_802821B4
-u32 lbl_802821B4;               // the bit buffer, next bit at the top
+// .sbss and .bss: defined in reverse address order (CodeWarrior lays them out last-defined-first)
 u8* lbl_802821B8;               // the next coded byte
+u32 lbl_802821B4;               // the bit buffer, next bit at the top
+s32 lbl_802821B0;               // bits left in lbl_802821B4
+s32 lbl_802821AC;               // 0: a key frame, 1: coded against a reference
+s32 lbl_802821A8;               // the decoder's tables are built
 
 // MPEG-1's default intra quantizer matrix
 const s32 lbl_80184A68[64] = {
@@ -52,16 +53,16 @@ const s32 lbl_80184B68[64] = {
     23, 31, 38, 45, 52, 59, 60, 53, 46, 39, 47, 54, 61, 62, 55, 63,
 };
 
-u8 lbl_801F6858[512];           // a pixel value's clamp to 0..255, by its low 9 bits
-s32 lbl_801F6A58[2][64];        // a macroblock's U and V blocks
-s32 lbl_801F6C58[256];          // a macroblock's 16x16 Y block
-s32 lbl_801F7058[64];           // the quantizer for this picture
-u32 lbl_801F7158[64];           // looked up by the buffer's top 6 bits
-u32 lbl_801F7258[256];          // } the coefficient codes: the first 9 bits index
-u32 lbl_801F7658[256];          // } lbl_801F7A58; longer codes continue in these two
-u32 lbl_801F7A58[512];          // }
-s32 lbl_801F8258[64];           // the inverse DCT's first pass
 s32 lbl_801F8358[64];           // a block's coefficients
+s32 lbl_801F8258[64];           // the inverse DCT's first pass
+u32 lbl_801F7A58[512];          // } the coefficient codes: the first 9 bits index
+u32 lbl_801F7658[256];          // } lbl_801F7A58; longer codes continue in these two
+u32 lbl_801F7258[256];          // }
+u32 lbl_801F7158[64];           // looked up by the buffer's top 6 bits
+s32 lbl_801F7058[64];           // the quantizer for this picture
+s32 lbl_801F6C58[256];          // a macroblock's 16x16 Y block
+s32 lbl_801F6A58[2][64];        // a macroblock's U and V blocks
+u8 lbl_801F6858[512];           // a pixel value's clamp to 0..255, by its low 9 bits
 
 void fn_800B769C(void);
 u32 fn_800B8984(u8* pData, int nBytes);
@@ -71,7 +72,7 @@ int fn_800B8AA0(void);
 void fn_800B8F28(s32* pOut, int nStride);
 
 // A code's table entry: its length in the low byte, the run in bits 16-21, the level on top.
-#define MAD_ENTRY(nLen, nValue) ((nLen) | (((u32)(nValue) << 22) | (((nValue) << 6) & 0x3F0000)))
+#define MAD_ENTRY(nLen, nValue) ((nLen) | ((((u32)(nValue) & 0x3FF) << 22) | (((nValue) & 0xFC00) << 6)))
 
 // fake match: an identity inline around each MAD_ENTRY in fn_800B769C moves the entry's
 // computation after the loop setup, as in EA's code
@@ -83,6 +84,7 @@ static inline u32 fn_800B769C_Read(u32 uEntry) {
 void fn_800B769C(void) {
     s32 nCode;
     s32 nValue;
+    s32 nValue2;                        // fake match: the second table's value in its own local
     u32 uEntry;
     int nIndex;
     int nCount;
@@ -141,12 +143,12 @@ void fn_800B769C(void) {
     for (i = 0; i < 128; i++) {
         nCode = lbl_80184268[i].nCode;
         nLen = lbl_80184268[i].nLen;
-        nValue = lbl_80184268[i].nValue;
+        nValue2 = lbl_80184268[i].nValue;
         if (!(nCode & 0x8000)) {
             nBits = nLen - 1;
             nIndex = nCode >> 7;
             nCount = 1 << (8 - nBits);
-            uEntry = fn_800B769C_Read(MAD_ENTRY(nBits, nValue));
+            uEntry = fn_800B769C_Read(MAD_ENTRY(nBits, nValue2));
             for (j = 0; j < nCount; j++) {
                 lbl_801F7658[nIndex + j] = uEntry;
             }
@@ -154,7 +156,7 @@ void fn_800B769C(void) {
             nBits = nLen + 2;
             nIndex = nCode >> 10;
             nCount = 1 << (8 - nBits);
-            uEntry = fn_800B769C_Read(MAD_ENTRY(nBits, nValue));
+            uEntry = fn_800B769C_Read(MAD_ENTRY(nBits, nValue2));
             for (j = 0; j < nCount; j++) {
                 lbl_801F7258[nIndex + j] = uEntry;
             }
