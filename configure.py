@@ -966,7 +966,7 @@ config.libs = [
             Object(Matching, "AudTable.c"),
             Object(Matching, "HLAudMaster.c"),
             Object(Matching, "hlaudmovie.c"),
-            Object(NonMatching, "hlaudtrackstm.c"),
+            Object(Matching, "hlaudtrackstm.c"),
             Object(Matching, "UAudContainers.c"),
             Object(Matching, "uiobject.c"),
             Object(Matching, "startUp.c"),
