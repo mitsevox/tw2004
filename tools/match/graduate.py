@@ -25,7 +25,10 @@ r = (subprocess.run(['ninja'], cwd=ROOT, capture_output=True, text=True)
 ok = r.returncode == 0 and 'main.dol: OK' in r.stdout
 if r.returncode == 0 and not ok:
     # The hash target can be up to date; verify it without deleting its build marker.
-    check = subprocess.run([ROOT + '/build/tools/dtk', 'shasum', '-c',
+    dtk = ROOT + '/build/tools/dtk'
+    if not pathlib.Path(dtk).exists():
+        dtk += '.exe'
+    check = subprocess.run([dtk, 'shasum', '-c',
                             'config/GW4E69/build.sha1'], cwd=ROOT, capture_output=True, text=True)
     ok = check.returncode == 0 and 'main.dol: OK' in check.stdout
 print(unit, 'OK' if ok else 'FAILED')
