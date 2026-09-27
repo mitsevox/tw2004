@@ -53,39 +53,43 @@ static inline UISNodeInfo* UIS_LinkedOn(UISScreenFile* pData, UISNode* pNode) {
 
 // Copies sz to pOut, padded with spaces to nWidth characters (on the left, or on the right when
 // bLeft), stopping at pEnd. Returns the end of the copy.
+// Register note: the walking copies p and s and their declaration order (after nAbs, before
+// nCount) give EA's r22-r25 in both inlined copies.
 static inline char* UIS_PutString(char* pOut, char* pEnd, const char* sz, s32 nWidth, u8 bLeft) {
     s32 nAbs;
+    char* p;
+    const char* s;
     s32 nCount;
     s32 nPad;
     s32 nLen;
     s32 i;
 
     nAbs = nWidth;
+    p = pOut;
+    s = sz;
     nCount = 0;
     if (nWidth < 0) {
         nAbs = -nWidth;
     }
-    nLen = strlen(sz);
+    nLen = strlen(s);
     if (!bLeft) {
         nPad = nAbs - nLen;
-        for (i = nPad; i > 0; i--) {
-            *pOut++ = ' ';
-        }
-        if (nPad > 0) {
-            nCount = nPad;
+        while (nCount < nPad) {
+            nCount++;
+            *p++ = ' ';
         }
     }
-    while (*sz != 0) {
-        *pOut++ = *sz++;
+    while (*s != 0) {
+        *p++ = *s++;
         nCount++;
-        if (pOut == pEnd) break;
+        if (p == pEnd) break;
     }
     if (bLeft == 1) {
         for (i = nCount; i < nAbs; i++) {
-            *pOut++ = ' ';
+            *p++ = ' ';
         }
     }
-    return pOut;
+    return p;
 }
 
 // The index of a loaded screen, or the number of screens when it is not loaded. Written out, not
@@ -353,29 +357,92 @@ char* fn_8016BEDC(char* pOut, char* pEnd, s32 nWidth, s32 nPrec, f32 f) {
     return pOut;
 }
 
+// fake match: fn_8016B844's 'x' case as an inline. Inlined code gets the frontend's goto
+// cleanup that a large function body skips, which places the output loop's preheader at the
+// end of fn_8016B844 as in EA's code. Code is unchanged.
+static inline char* fn_8016B844_CaseX(char* pOut, char* pEnd, u32 u, s32 nWidth, char cPad, s32 nUpper) {
+    s32 nDigits;
+    s32 nPad;
+    char c;
+    char aHex[12];
+
+    nDigits = 0;
+    do {
+        c = (u & 0xF) + '0';
+        if (c > '9') {
+            c += nUpper + 'a' - '9' - 1;
+        }
+        u >>= 4;
+        aHex[nDigits++] = c;
+    } while (u != 0);
+    if (nWidth != 0) {
+        for (nPad = nWidth - nDigits; nPad > 0; nPad--) {
+            aHex[nDigits++] = cPad;
+        }
+    }
+    while (--nDigits >= 0 && pOut < pEnd) {
+        *pOut++ = aHex[nDigits];
+    }
+    return pOut;
+}
+
+// fake match: fn_8016B844's 'd' case as an inline, for the same preheader placement as
+// fn_8016B844_CaseX. `bUnsigned ^ 1` for !bUnsigned (it is 0 or 1) gives EA's xori, and
+// `bNeg = n >> 31` inside the && EA's srwi. whose result is the sign kept in r0. The caller
+// passes its own u as n, which keeps EA's `mr r11,r7` before the negate. Code is unchanged.
+static inline char* fn_8016B844_CaseD(char* pOut, char* pEnd, u32 n, s32 nWidth, char cPad, s32 bUnsigned) {
+    s32 nDigits;
+    s32 nPad;
+    s32 bNeg;
+    char aDec[20];
+    u32 u;
+
+    nDigits = 0;
+    bNeg = 0;
+    u = ((bUnsigned ^ 1) && (bNeg = n >> 31)) ? -n : n;
+    do {
+        aDec[nDigits++] = u + '0' - u / 10 * 10;
+        u /= 10;
+    } while (u != 0);
+    if (nWidth != 0) {
+        for (nPad = nWidth - bNeg - nDigits; nPad > 0; nPad--) {
+            aDec[nDigits++] = cPad;
+        }
+    }
+    if (bNeg) {
+        aDec[nDigits++] = '-';
+    }
+    while (--nDigits >= 0 && pOut < pEnd) {
+        *pOut++ = aDec[nDigits];
+    }
+    return pOut;
+}
+
+// fake match: fn_8016B844's start pointer read through an inline whose parameter is changed (the
+// dead p++), so the parameter is a frontend variable numbered before every other inline's; the
+// start then ranks lowest of the saved registers (EA's r26). Returns p unchanged.
+static inline char* fn_8016B844_Get(char* p) {
+    return p++;
+}
+
 // Formats szFormat with pArgs into pOut (nSize bytes). Returns the length written, or -1.
 // EA bug: '-' is never cleared, so every conversion after one with '-' is left-justified too.
 s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UISWord* pArgs) {
+    // Register note: this declaration order gives EA's c r7, cPad r8 and nUpper r0.
     char* pEnd;
-    u8 bLeft;
-    char* pStart;
     s32 nArg;
-    char c;
-    s32 bUnsigned;
+    s32 nUpper;
+    u32 u;
     s32 nWidth;
     s32 nPrec;
-    char cPad;
     s32 bUpper;
-    s32 nDigits;
-    s32 nPad;
-    u32 u;
-    s32 bNeg;
-    char* p;
-    s32 nUpper;
-    char aDec[20];
-    char aHex[12];
+    s32 bUnsigned;
+    u8 bLeft;
+    char c;
+    char cPad;
+    char* pStart;
 
-    pStart = pOut;
+    pStart = fn_8016B844_Get(pOut);
     pEnd = pOut + nSize;
     bLeft = 0;
     if (pOut == NULL || nSize == 0 || szFormat == NULL) return -1;
@@ -432,27 +499,8 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
                 bUnsigned = 1;
             case 'd':
             case 'i':
-                nDigits = 0;
                 u = pArgs[nArg++].u;
-                // fake match: `bUnsigned ^ 1` for !bUnsigned (it is 0 or 1) gives EA's xori, and
-                // `u >> 31` for (s32)u < 0 its srwi.
-                bNeg = (bUnsigned ^ 1) && (u >> 31);
-                u = bNeg ? -u : u;
-                do {
-                    aDec[nDigits++] = u + '0' - u / 10 * 10;
-                    u /= 10;
-                } while (u != 0);
-                if (nWidth != 0) {
-                    for (nPad = nWidth - bNeg - nDigits; nPad > 0; nPad--) {
-                        aDec[nDigits++] = cPad;
-                    }
-                }
-                if (bNeg) {
-                    aDec[nDigits++] = '-';
-                }
-                while (--nDigits >= 0 && pOut < pEnd) {
-                    *pOut++ = aDec[nDigits];
-                }
+                pOut = fn_8016B844_CaseD(pOut, pEnd, u, nWidth, cPad, bUnsigned);
                 continue;
             case 'f':
                 pOut = fn_8016BEDC(pOut, pEnd, nWidth, nPrec, pArgs[nArg++].f);
@@ -461,23 +509,7 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
             case 'p':
             case 'x':
                 u = pArgs[nArg++].u;
-                nDigits = 0;
-                do {
-                    c = (u & 0xF) + '0';
-                    if (c > '9') {
-                        c += nUpper + 'a' - '9' - 1;
-                    }
-                    u >>= 4;
-                    aHex[nDigits++] = c;
-                } while (u != 0);
-                if (nWidth != 0) {
-                    for (nPad = nWidth - nDigits; nPad > 0; nPad--) {
-                        aHex[nDigits++] = cPad;
-                    }
-                }
-                while (--nDigits >= 0 && pOut < pEnd) {
-                    *pOut++ = aHex[nDigits];
-                }
+                pOut = fn_8016B844_CaseX(pOut, pEnd, u, nWidth, cPad, nUpper);
                 continue;
             }
         }
@@ -900,29 +932,57 @@ void fn_8016A510(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
 // handler returns 2.
 s32 fn_8016A2D4(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent, u32 n5,
                 s32 nArgs, s32* pArgs, u8* pbOut) {
+    // fake match: uEventLoop, uEventPost and uEventPre all hold uEvent (see below); these copies,
+    // this declaration order and the function-level pHandler / nRet / pLinked give EA's registers.
+    s32 uEventLoop;
+    u32 uEventPost;
+    s32 uEventPre;
+    UISHandler* pHandler;
+    UISNode* pNode;
     s32 nResult;
     u32 i;
-    UISNode* pNode;
+    s32 nRet;
+    u8* pLinked;
     u8* pScript;
     u8 bOut;
 
     nResult = 0;
     if (pScreen->pData == NULL || nNode >= pScreen->pData->nNodes) return 0;
+    uEventPost = uEvent;
     pNode = &pScreen->pData->pNodes[nNode];
     if ((pNode->pInfo->u4 != 0 && pNode->pInfo->u60 != 0) || n5 - (u32)-10 <= 2 ||
         n5 - (u32)-5 <= 3 || n5 == (u32)-11) {
+        // fake match: uEventPre is uEvent: the OR's low word is uEvent | 0 (uEvent shifted up only
+        // fills the high word, which is dropped). It is a copy only after constant propagation, so
+        // with the loop's two links below the late copy-propagation passes stop at this one: EA's
+        // kept `mr r19,r28` for the linked handler's event. The dead high-word OR leaves no code.
+        uEventPre = (s32)((u64)(u32)uEvent | ((u64)(u32)uEvent << 32));
         for (i = 0; i < pNode->nHandlers; i++) {
-            UISHandler* pHandler = &pNode->pHandlers[i];
+            pHandler = &pNode->pHandlers[i];
+            // fake match: uEventPost again (the same value); the second definition keeps it a
+            // variable of its own.
+            uEventPost = uEvent;
+            // fake match: uEventLoop is uEventPre: i only goes into the dropped high word. Two
+            // links of copies-after-constant-propagation, loop-variant so they stay in the loop.
+            uEventLoop = (s32)((u64)(u32)uEventPre | ((u64)(u32)i << 32));
+            uEventLoop = (s32)((u64)(u32)uEventLoop | ((u64)(u32)i << 32));
             if (pHandler->uEvent == 0xFFFF) {
                 bOut = 0;
                 nResult = fn_8016A2D4(pStudio, pScreen, pStack, pHandler->u4.nNode, uEvent, n5, nArgs, pArgs,
                                       &bOut);
                 // fake match: the (s32) gives EA's signed cmpwi
                 if ((s32)bOut == 1) {
-                    u8* pLinked = fn_8016C614(pNode, (u16)pHandler->u4.nNode, n5);
+                    pLinked = fn_8016C614(pNode, (u16)pHandler->u4.nNode, n5);
                     if (pLinked != NULL) {
-                        s32 nRet = fn_8016C270(pStudio, pScreen, pNode->pInfo, pStack, pLinked, nArgs, pArgs,
-                                               0, NULL, 1, uEvent, NULL);
+                        nRet = fn_8016C270(pStudio, pScreen, pNode->pInfo, pStack, pLinked, nArgs, pArgs, 0,
+                                           NULL, 1, uEventLoop, NULL);
+                        // fake match: nRet through a 64-bit shift up and back down (unchanged), then
+                        // a dropped identity conversion: the copy chain keeps EA's copy of the call
+                        // result (mr r0,r3; cmpwi r0,2).
+                        // port: relies on the conversion to s64 wrapping and on >> of a negative s64
+                        // being arithmetic.
+                        nRet = (s32)((s64)((u64)(u32)nRet << 32) >> 32);
+                        nRet = (u32)(s32)nRet;
                         if (nRet == 2) return nRet;
                     }
                 }
@@ -935,9 +995,15 @@ s32 fn_8016A2D4(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32
         if ((n5 == (u32)-6 || n5 == (u32)-7) && pNode->pInfo != (UISNodeInfo*)pArgs[2]) {
             pScript = NULL;
         }
+        // fake match: uEvent goes into the high word of a 64-bit OR whose low word is nResult, so
+        // nResult is unchanged. The dead OR keeps uEvent live across the calls above at register
+        // allocation (its own register, copied from r7 with the other parameters, as in EA) and is
+        // deleted after allocation.
+        // port: a port leaves this line out.
+        nResult = (s32)((u64)(s64)nResult | ((u64)(u32)uEvent << 32));
         if (pScript != NULL) {
             nResult = fn_8016C270(pStudio, pScreen, pNode->pInfo, pStack, pScript, nArgs, pArgs, 0, NULL, 1,
-                                  uEvent, NULL);
+                                  uEventPost, NULL);
         }
         if (nResult == 2) return nResult;
     }
