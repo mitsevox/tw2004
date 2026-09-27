@@ -97,6 +97,14 @@ void   fn_800B1A9C(f32* v, f32 x, f32 y);
 // The save kinds (a table of functions at lbl_8018C7D8).
 s32    fn_80084FB4(CardPos* pPos);      // the picked save kind's size on that card
 
+// The sounds' ADPCM data is game data: tools/build/gendata.py writes the initializers from main.dol.
+u8 lbl_8018F040[0x600] = {
+#include "startUp_sound0.inc"
+};
+u8 lbl_8018F640[0x858] = {
+#include "startUp_sound1.inc"
+};
+
 // The two built-in sounds: where their data is, its size, its playback rate (16.16 fixed point:
 // 0.5 and 0.25) and its header, with the addresses counted from the data's start (fn_800B07A0
 // rebases them into ARAM).

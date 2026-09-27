@@ -153,3 +153,11 @@ result.
   it. (2) the 4-byte gap before the messages: a 4-byte zero object goes to .sdata; instead the
   first message is a named char array with aligned(8) (labelled fake match), the rest literals.
 - Result: DiscError .data 0x8018FFC8..0x80190FE0. main.dol: OK; `git ls-files` lists no .inc.
+
+## auto_05_8018F040_data (3672 B): the boot sounds' ADPCM data -> startUp.c (generated)
+
+- lbl_8018F040 (0x600) and lbl_8018F640 (0x858), the two BootSounds' samples; only user startUp
+  (its lbl_8018FE98 table points at them and follows them directly). Game data: defined in
+  startUp.c with the initializers #included from gendata.py fragments (startUp_sound0/1.inc).
+- Result: startUp .data 0x8018F040..0x8018FF68. main.dol: OK.
+- For the audit: startup.h's comment on these externs ("split before startUp.c's") is now stale.
