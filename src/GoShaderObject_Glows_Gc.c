@@ -13,6 +13,9 @@ void fn_800124A8(void);                                 // LLFont.c: end the pri
 void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);  // LLFont.c: GXBegin
 void fn_80070168(void);                                 // calls a display list (see fn_80098408)
 
+// This file's .sbss (glows.h).
+GlowQueue* lbl_80281F80;
+
 // Starts glow nGlow's display list, with room for nVerts vertices of 32 bytes and 1 KB more.
 GlowList* _StartGlowStrip(int nGlow, int nVerts) {
     u32 uSize;

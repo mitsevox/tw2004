@@ -126,14 +126,14 @@ LLTexGrp.c:
 
 LLFont.c:
 	.text       start:0x800107F4 end:0x8001256C
-	.data       start:0x801869C0 end:0x80186AD8
+	.data       start:0x801869B8 end:0x80186AD8
 	.bss        start:0x801A3478 end:0x801A34B0
 	.sbss       start:0x80281C88 end:0x80281C90
 	.sdata2     start:0x80282B20 end:0x80282B48
 
 UFont.c:
 	.text       start:0x8001256C end:0x80012ED0
-	.bss        start:0x801A34C0 end:0x801A36A0
+	.bss        start:0x801A34B0 end:0x801A36A0
 	.sdata      start:0x80280DE0 end:0x80280DF0
 	.sdata2     start:0x80282B48 end:0x80282B58
 
@@ -150,6 +150,8 @@ unsorted/sweep_800136F4.c:
 GoRenderCtx_Gc.c:
 	.text       start:0x8001371C end:0x800143B8
 	.data       start:0x80186AD8 end:0x80186BD8
+	.sdata      start:0x80280DF0 end:0x80280DF8
+	.sbss       start:0x80281C90 end:0x80281CA0
 	.sdata2     start:0x80282B58 end:0x80282B80
 
 streammanagerhole.c:
@@ -182,6 +184,7 @@ char.c:
 	.data       start:0x80186CC8 end:0x801871D0
 	.bss        start:0x801B95C8 end:0x801B9668
 	.sdata      start:0x80280E10 end:0x80280E78
+	.sbss       start:0x80281CA8 end:0x80281CB0
 	.sdata2     start:0x80282BC0 end:0x80282CA0
 
 mtalib.c:
@@ -196,6 +199,7 @@ mtalib.c:
 ska_shared.c:
 	.text       start:0x8001FB00 end:0x80021ADC
 	.rodata     start:0x8017DDC8 end:0x8017E020
+	.sbss       start:0x80281CC0 end:0x80281CD8
 	.sdata2     start:0x80282CC0 end:0x80282CF0
 
 skalib.c:
@@ -292,6 +296,7 @@ Skin.c:
 Code80037AB8.c:
 	.text       start:0x80037AB8 end:0x80037DD8
 	.bss        start:0x801D4F68 end:0x801D4F80
+	.sdata      start:0x80281100 end:0x80281108
 	.sdata2     start:0x80283020 end:0x80283028
 
 GoPostFx.c:
@@ -318,12 +323,11 @@ gocamscripts.c:
 	.data       start:0x80187AA0 end:0x80187B88
 	.sdata2     start:0x802830A8 end:0x80283148
 
-MaterialTypes.c:
-	.rodata     start:0x8017E9B8 end:0x80181328
-
 DepthField.c:
 	.text       start:0x80045660 end:0x80045D18
 	.bss        start:0x801D5110 end:0x801D5228
+	.sdata      start:0x80281110 end:0x80281128
+	.sbss       start:0x80281D90 end:0x80281D98
 	.sdata2     start:0x80283148 end:0x80283168
 
 UObject3D.c:
@@ -370,6 +374,10 @@ GoTerrainCollision.c:
 	.sbss       start:0x80281DC0 end:0x80281DD0
 	.sdata2     start:0x80283288 end:0x80283300
 
+MaterialTypes.c:
+	.rodata     start:0x8017E9B8 end:0x80181328
+	.sdata2     start:0x80283300 end:0x80283308
+
 Ball.c:
 	.text       start:0x80050C2C end:0x80055F14
 	.rodata     start:0x80181328 end:0x801834C0
@@ -393,6 +401,7 @@ LLPictInt.c:
 user.c:
 	.text       start:0x800563C4 end:0x80056480
 	.sdata      start:0x80281138 end:0x80281140
+	.sbss       start:0x80281DF0 end:0x80281E00
 
 PasswordManager.c:
 	.text       start:0x80056480 end:0x80057F18
@@ -447,6 +456,7 @@ event.c:
 	.text       start:0x80065B44 end:0x80067710
 	.data       start:0x80188628 end:0x80188778
 	.bss        start:0x801D5AB0 end:0x801D5BF0
+	.sdata      start:0x802811B8 end:0x802811C0
 	.sbss       start:0x80281E20 end:0x80281E28
 	.sdata2     start:0x80283748 end:0x80283770
 
@@ -641,7 +651,7 @@ fe_movies.c:
 	.text       start:0x80090B80 end:0x800922A8
 	.data       start:0x80189C00 end:0x80189C38
 	.bss        start:0x801D8818 end:0x801D91F0
-	.sdata      start:0x80281378 end:0x80281380
+	.sdata      start:0x80281370 end:0x80281380
 	.sbss       start:0x80281F20 end:0x80281F30
 	.sdata2     start:0x80283B90 end:0x80283BF0
 
@@ -683,12 +693,14 @@ GoShaderObject_Particle_Gc.c:
 	.text       start:0x8009414C end:0x800952D8
 	.data       start:0x80189CC8 end:0x80189CE8
 	.bss        start:0x801D97E0 end:0x801D97F8
+	.sdata      start:0x802813A8 end:0x802813B0
 	.sbss       start:0x80281F58 end:0x80281F70
 	.sdata2     start:0x80283C80 end:0x80283CD8
 
 LLTime.c:
 	.text       start:0x800952D8 end:0x8009554C
 	.bss        start:0x801D97F8 end:0x801D9908
+	.sdata      start:0x802813B0 end:0x802813B8
 
 unsorted/sweep_8009554C.c:
 	.text       start:0x8009554C end:0x80095564
@@ -715,6 +727,7 @@ CharAnim.c:
 	.text       start:0x800957FC end:0x80097208
 	.rodata     start:0x80183A70 end:0x80183A98
 	.data       start:0x80189CE8 end:0x80189D30
+	.bss        start:0x801D9908 end:0x801D99D0
 	.sdata2     start:0x80283CD8 end:0x80283D18
 
 GoShaderObjectCommon_MorphAnimManager_Gc.c:
@@ -739,6 +752,7 @@ GoShaderObject_Glows_Gc.c:
 	.text       start:0x80097F44 end:0x80098A98
 	.data       start:0x80189D78 end:0x80189D98
 	.bss        start:0x801D99D0 end:0x801DB878
+	.sbss       start:0x80281F80 end:0x80281F88
 	.sdata2     start:0x80283DF8 end:0x80283E20
 
 UFstPart.c:
@@ -771,6 +785,7 @@ Code8009AA28.c:
 	.text       start:0x8009AA28 end:0x8009B314
 	.data       start:0x80189E78 end:0x8018C6C8
 	.bss        start:0x801E1470 end:0x801E3068
+	.sdata      start:0x802813B8 end:0x802813C0
 	.sdata2     start:0x80283E98 end:0x80283EC0
 
 unsorted/sweep_8009B314.c:
@@ -794,6 +809,7 @@ MC_Gc.c:
 	.data       start:0x8018C6D8 end:0x8018C7C8
 	.bss        start:0x801E3180 end:0x801F1100
 	.sdata      start:0x802813D0 end:0x802813F0
+	.sbss       start:0x80281FB0 end:0x80282010
 
 MC.c:
 	.text       start:0x8009F850 end:0x800A27FC
@@ -805,6 +821,7 @@ PsMgr.c:
 	.text       start:0x800A27FC end:0x800A2C3C
 	.bss        start:0x801F1640 end:0x801F1708
 	.sdata      start:0x802813F8 end:0x80281408
+	.sbss       start:0x80282010 end:0x80282018
 	.sdata2     start:0x80283F18 end:0x80283F28
 
 PsBallFx.c:
@@ -812,6 +829,7 @@ PsBallFx.c:
 	.data       start:0x8018C868 end:0x8018E988
 	.bss        start:0x801F1708 end:0x801F1790
 	.sdata      start:0x80281408 end:0x80281418
+	.sbss       start:0x80282018 end:0x80282020
 	.sdata2     start:0x80283F28 end:0x80283F48
 
 GameAudio.c:
@@ -937,10 +955,18 @@ GoARAM.c:
 	.sdata      start:0x802814C8 end:0x802814D0
 
 DiscError.c:
-	.text       start:0x800B6924 end:0x800B769C
-	.data       start:0x8018FFC8 end:0x80190FE0
+	.text       start:0x800B6924 end:0x800B7210
+	.data       start:0x8018FFC8 end:0x80190DB0
 	.bss        start:0x801F66A8 end:0x801F6858
+	.sdata      start:0x802814D0 end:0x802814D8
+	.sbss       start:0x80282188 end:0x802821A0
 	.sdata2     start:0x802841B0 end:0x802841C8
+
+Code800B7210.c:
+	.text       start:0x800B7210 end:0x800B769C
+	.data       start:0x80190DB0 end:0x80190FE0
+	.sdata      start:0x802814D8 end:0x802814E8
+	.sbss       start:0x802821A0 end:0x802821A8
 
 rcmp_mad_codec.c:
 	.text       start:0x800B769C end:0x800B90F4
@@ -960,7 +986,8 @@ Trax.c:
 	.text       start:0x800B9FF0 end:0x800BA74C
 	.rodata     start:0x80184C68 end:0x80184C78
 	.bss        start:0x801F8458 end:0x801FA0F0
-	.sdata      start:0x80281508 end:0x80281510
+	.sdata      start:0x80281508 end:0x80281518
+	.sbss       start:0x802821E8 end:0x802821F0
 	.sdata2     start:0x802841E0 end:0x80284238
 
 ScreenClear.c:
@@ -1031,6 +1058,7 @@ AnimStream.c:
 	.text       start:0x800C937C end:0x800CB950
 	.data       start:0x80191490 end:0x80191748
 	.sdata      start:0x80281530 end:0x80281538
+	.sbss       start:0x80282230 end:0x80282238
 
 TerrainGround.c:
 	.text       start:0x800CB950 end:0x800CC1EC
@@ -1067,6 +1095,7 @@ Earnings.c:
 	.data       start:0x80191A08 end:0x80192010
 	.bss        start:0x801FFAE8 end:0x80202828
 	.sdata      start:0x80281560 end:0x80281568
+	.sbss       start:0x80282248 end:0x80282260
 	.sdata2     start:0x80284510 end:0x80284560
 
 GameHoleContests.c:
@@ -1174,6 +1203,7 @@ GameModeDriverRTE.c:
 GameModeReplay.c:
 	.text       start:0x800F125C end:0x800F19D4
 	.bss        start:0x80211D38 end:0x80211FB8
+	.sbss       start:0x80282360 end:0x80282368
 	.sdata2     start:0x80284688 end:0x802846A0
 
 GameTargets.c:
@@ -1229,7 +1259,7 @@ GameMode8.c:
 	.data       start:0x80192908 end:0x80192D00
 	.bss        start:0x802120F8 end:0x80212418
 	.sdata      start:0x802816B0 end:0x802816D0
-	.sbss       start:0x802823C8 end:0x802823D0
+	.sbss       start:0x802823C8 end:0x802823D8
 	.sdata2     start:0x80284708 end:0x802847A0
 
 GameModeStableford.c:
@@ -1406,6 +1436,7 @@ GoGrass.c:
 	.data       start:0x80194598 end:0x80194648
 	.bss        start:0x802602C0 end:0x802607D0
 	.sdata      start:0x80281900 end:0x80281908
+	.sbss       start:0x80282510 end:0x80282518
 	.sdata2     start:0x80284A30 end:0x80284AD0
 
 GoShaderObject_Grass_Gc.c:
@@ -1881,6 +1912,9 @@ src/MSL_C/PPCEABI/bare/H/alloc.c:
 	.bss        start:0x8027D5C0 end:0x8027D5F8
 	.sbss       start:0x802829F0 end:0x802829F8
 
+runtime/errno.c:
+	.sbss       start:0x802829F8 end:0x80282A00
+
 src/MSL_C/PPCEABI/bare/H/ansi_files.c:
 	.text       start:0x80152754 end:0x8015286C
 	.data       start:0x8019C3E0 end:0x8019C520
@@ -1947,6 +1981,9 @@ src/MSL_C/PPCEABI/bare/H/string.c:
 	.text       start:0x8015A450 end:0x8015A8D0
 	.rodata     start:0x801851B0 end:0x80185540
 	.sdata      start:0x80281B10 end:0x80281B18
+
+runtime/float.c:
+	.sdata      start:0x80281B18 end:0x80281B44
 
 src/MSL_C/strtold.c:
 	.text       start:0x8015A8D0 end:0x8015B8DC
@@ -2094,6 +2131,7 @@ MetroTRK/serpoll.c:
 	.text       start:0x80160608 end:0x801608C0
 	.rodata     start:0x80185908 end:0x80185A98
 	.bss        start:0x8027F2D8 end:0x8027F2F0
+	.sbss       start:0x80282A10 end:0x80282A18
 
 MetroTRK/usr_put.c:
 	.text       start:0x801608C0 end:0x8016094C

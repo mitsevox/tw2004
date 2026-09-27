@@ -10,6 +10,7 @@
 #include "camera.h"
 
 SunFlrState lbl_801E1470;
+SunFlrState* lbl_802813B8 = &lbl_801E1470;
 
 // SunFlr_Gc.c
 void fn_8009A340(void);

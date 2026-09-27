@@ -21,6 +21,13 @@ f32 fn_80014268(u8* p);
 f32 fn_80014270(u8* p);
 f32 fn_80014280(f32 x0);
 
+// This file's .sbss (engine.h), in reverse address order as the compiler lays it out.
+s8    lbl_80281C98;
+void* lbl_80281C90[2];          // 8 bytes in the DOL (lbl_80281C98 follows at +8); only [0] is used
+
+// This file's .sdata (camera.h).
+void** lbl_80280DF0 = lbl_80281C90;
+
 // Makes a render camera from a lens, a frame buffer and a screen rectangle.
 void* fn_8001371C(CamLens* pLens, GoFrameBuf* pBuf, f32* pRect) {
     Camera* pCamera;

@@ -4,6 +4,11 @@
 
 #include "game/save.h"
 
+// This file's .sbss (game/save.h), in reverse address order as the compiler lays it out.
+SaveProfile*  gpSaveData;
+SaveProfile*  lbl_80281DF4;
+SaveLockEntry lbl_80281DF0;
+
 void fn_800563C4(void) {
     int i;
 

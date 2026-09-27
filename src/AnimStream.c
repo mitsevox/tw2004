@@ -24,6 +24,9 @@ u8 fn_800CB5B0(int nPlayer, Clip* pClip);
 
 char lbl_80281530[8] = "";              // the folder the stream files' paths start from
 
+// This file's .sbss (character.h).
+AnimStream* lbl_80282230;
+
 AnimStreamGroup lbl_80191490[2] = {
     { 1, 0 },
     { 5, 1 },

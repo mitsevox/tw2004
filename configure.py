@@ -616,8 +616,10 @@ config.libs = [
             Object(Matching, "MetroTRK/nubinit.c"),
             Object(Matching, "MetroTRK/msg.c"),
             Object(Matching, "MetroTRK/msgbuf.c"),
-            # gTRKInputPendingPtr is a common symbol: the linker puts it in .sbss (0x80282A10)
-            Object(Matching, "MetroTRK/serpoll.c", extra_cflags=["-common on"]),
+            # gTRKInputPendingPtr is in serpoll.c's own .sbss (0x80282A10, at its link position)
+            # while mainloop.c / nubinit.c address it absolutely (-sdata 0): a one-file outlier.
+            # (-common on instead left it to the auto unit; a linker-made common lands elsewhere.)
+            Object(Matching, "MetroTRK/serpoll.c", extra_cflags=["-sdata 8"]),
             Object(Matching, "MetroTRK/usr_put.c"),
             Object(Matching, "MetroTRK/dispatch.c"),
             Object(Matching, "MetroTRK/msghndlr.c"),
@@ -844,6 +846,8 @@ config.libs = [
             Object(Matching, "runtime/FILE_POS.c"),
             Object(Matching, "runtime/locale.c"),
             Object(Matching, "runtime/ctype.c"),
+            Object(Matching, "runtime/errno.c"),
+            Object(Matching, "runtime/float.c"),
             Object(Matching, "runtime/e_acos.c"),
             Object(Matching, "runtime/e_asin.c"),
             Object(Matching, "runtime/e_atan2.c"),
@@ -1016,6 +1020,7 @@ config.libs = [
             Object(Matching, "UAudMemStack.c"),
             Object(Matching, "GoARAM.c"),
             Object(Matching, "DiscError.c"),
+            Object(Matching, "Code800B7210.c"),
             Object(Matching, "rcmp_mad_codec.c"),
             Object(Matching, "Code800B90F4.c"),
             Object(Matching, "Trax.c"),

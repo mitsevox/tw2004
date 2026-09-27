@@ -21,6 +21,9 @@ char lbl_801F1640[20][9];
 
 PsMgrState* lbl_802813F8 = &lbl_80282010;
 
+// This file's .sbss (psmgr.h).
+PsMgrState lbl_80282010;
+
 // Scales the colour of the hole's directional lights by fDir and of its point lights by fPoint,
 // then hands the lights to the light sets again.
 void fn_800A27FC(f32 fDir, f32 fPoint) {

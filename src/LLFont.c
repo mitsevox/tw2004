@@ -8,7 +8,10 @@ static f32 lbl_801A3494[6];             // the viewport saved while fonts draw
 static f32 lbl_801A3478[7];             // the projection saved while fonts draw
 
 // The three glyph palettes: a grey level and an alpha (0x80 = opaque) per glyph pixel value.
-static GXColor lbl_801869C0[3][16] = {
+// Section note: 32-aligned (0x801869C0); the 8 zero bytes before it (after LLTexGrp.c's .data,
+// which nothing refers to) are that alignment's padding. Why EA aligned it is not proven (palette
+// data for GX, like the 32-aligned palettes built from it in UFontState).
+static GXColor lbl_801869C0[3][16] __attribute__((aligned(32))) = {
     {
         { 0xFF, 0xFF, 0xFF, 0x00 }, { 0xFF, 0xFF, 0xFF, 0x08 }, { 0xFF, 0xFF, 0xFF, 0x11 },
         { 0xFF, 0xFF, 0xFF, 0x19 }, { 0xFF, 0xFF, 0xFF, 0x22 }, { 0xFF, 0xFF, 0xFF, 0x2A },

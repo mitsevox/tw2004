@@ -52,6 +52,8 @@ f32 fn_80092210(void);
 void fn_80013E30();
 void fn_80092274(s32 p0);
 
+u8 lbl_80281370 = 1;
+f32 lbl_80281374 = 0.25f;
 int lbl_80281378 = -1;
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with

@@ -53,6 +53,13 @@ void fn_8002148C(u8* pFrame, f32* pOut, s32 nBones, u32* pBits, u16* aBase);
 u8 fn_80020328(Clip* pClip, int nFrame, f32* pPose2, f32* pPose1, u8* pExtra);
 f32 fn_80021A98(Clip* pClip, f32 fTime);
 
+// This file's .sbss (character.h), in reverse address order as the compiler lays it out.
+u8* lbl_80281CD0;
+u8* lbl_80281CCC;
+u8* lbl_80281CC8;
+u8* lbl_80281CC4;
+u8  lbl_80281CC0;
+
 // Poses pPose from pClip at fTime: the two keys around it are decoded into two of the character's
 // buffers (kept while they still hold them) and blended by where fTime falls between them. A time
 // at or past the pending event n5CC is held there once.
