@@ -438,8 +438,8 @@ f32 fn_80009744(f32* pVec) {
     f32 f;
 
     f = pVec[0] * pVec[0] + pVec[1] * pVec[1] + pVec[2] * pVec[2];
-    if (f > lbl_80281B40[0]) {
-        f = lbl_80281B40[0];
+    if (f > __float_max[0]) {
+        f = __float_max[0];
     }
     return f;
 }
