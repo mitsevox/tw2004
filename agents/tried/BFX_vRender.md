@@ -8,6 +8,19 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-27 b2 (second agent; quicktrial aligned). **Colours copied straight between the globals,
+  as sibling GoObjShadow fn_80093DB8 writes its arrays: `lbl_801D9578[nPlayer][k] =
+  lbl_80189CB0[nPlayer][k & 3]` x16, no rgba / pColour locals, UV direct, `desc.pColour =
+  lbl_801D9578[nPlayer]`, pPos with the s64 product: 20 -> 16, real 90.13 -> 97.80 (applied).**
+  The four bytes become frontend CSE temps (@11-14) coloured after the n*4 / n*16 temps, which
+  fixes table base r6, n*4 r7, pColour hi r5, n*16 r8, red r5, green r6, alpha r4. Left: blue r7
+  (EA r8), n*32 r8 (EA r10), and 4 instructions of the red/pColour/UV cluster in a different order.
+  Same as a `for (i = 0; i < 4; i++)` loop with `[i * 4 + k]` (16); `i += 4` loop 69; pColour local
+  51+; UV before the colour stores 47-48; pPos plain 25, `(u64)` 22, `(f32*)base + (s64)n * 12` 39.
+  64-bit index spellings on the UV row / pColour / colour row (`(s64)n * 32`, `<< 5`, `(u64)`,
+  `[(s64)n]`, per-site or all sites) on the 20 base: 25-80. One `(u32)(s64)(s32)nPlayer` round trip
+  on any single `[nPlayer]` index, or `(u8)(s64)(s32)` on one loaded byte, on the 16 base, UV block
+  at 4 places: 16 best (none), the rest 47-120 (breaks the frontend CSE).
 - 2026-09-27 b2 (quicktrial aligned; current source 31, all four colour bytes read direct
   `lbl_80189CB0[nPlayer][k]` = "DIRECT" 32). Scripts in the lane scratch (bfx*.py, climb*.py,
   phsim*.py). Two real levers found, one wall:
