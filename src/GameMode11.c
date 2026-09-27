@@ -92,7 +92,7 @@ u8  lbl_802823E2;
 u8  lbl_802823E1;
 u8  lbl_802823E0;
 
-void  fn_800A6EC8(void);
+void  Gaud_ExitCrowdReactionSound(void);
 void  fn_800E5200(int a);
 u8    Gaud_GetCommentStatus(void);
 
@@ -1034,12 +1034,12 @@ void fn_80101CD8(void) {
 
 void fn_80101CFC(void) {
     lbl_802823E4 = 1;
-    fn_800A6EC8();
+    Gaud_ExitCrowdReactionSound();
 }
 
 void fn_80101D24(void) {
     lbl_802823E3 = 1;
-    fn_800A6EC8();
+    Gaud_ExitCrowdReactionSound();
 }
 
 // A CPU player in a lesson is always lucky, except in lessons 5, 8, 9 and 11; in lesson 7 only while

@@ -536,8 +536,8 @@ u8 fn_8006BAD8(int nPlayer, s32* pOut) {
     return bResult;
 }
 
-// Every frame of the shot: while the ball flies, fn_800A6FE0 runs once it comes within 40 of the
-// pin and fn_800A707C once it is out again; while it rolls near the pin it rates the putt by its
+// Every frame of the shot: while the ball flies, Gaud_InitTopOfArcBuildup runs once it comes within 40 of the
+// pin and Gaud_ExitTopOfArcBuildup once it is out again; while it rolls near the pin it rates the putt by its
 // closest approach (n20, a band from aBands) and notes when it stops heading for the hole.
 void fn_8006BB5C(int nPlayer) {
     PlayerEmotion* pEmotion = &lbl_801D5F78[nPlayer];
@@ -591,10 +591,10 @@ void fn_8006BB5C(int nPlayer) {
         if (!pEmotion->b1F) {
             if (fClosest < 40.0f) {
                 pEmotion->b1F = 1;
-                fn_800A6FE0();
+                Gaud_InitTopOfArcBuildup();
             }
         } else if (fClosest >= 40.0f) {
-            fn_800A707C();
+            Gaud_ExitTopOfArcBuildup();
             pEmotion->b1F = 0;
         }
         break;

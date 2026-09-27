@@ -41,10 +41,10 @@ void Aud_EmiSetAllTrackStatus(u8 nId, int n);
 void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);
 void Gaud_ExitSpecialShot(u8 nPlayer);
 void Gaud_ExitCamZoom(u8 nPlayer);
-void fn_800A6D48(u8 nPlayer);
-void fn_800A714C(void);
-void fn_800A71E4(void);
-void fn_800A7294(void);
+void Gaud_ExitSlowMo(u8 nPlayer);
+void Gaud_ExitWindSound(void);
+void Gaud_ExitTreeSound(void);
+void Gaud_ExitRainSound(void);
 void fn_800BA734(int n, s8 nTrack);
 
 void Aud_Pause(u8 b, u8 b2);
@@ -57,7 +57,7 @@ void StartBackgroundMusic(void);
 void StartAmbientStreamer(void);
 void UpdateStreaming(void);
 void InitCrowdBuildup(u8 n);
-void fn_800A7220(f32 fAmount);
+void Gaud_InitRainSound(f32 fAmount);
 void Aud_Mute(u8 bLow, u8 bHigh);
 void Aud_SetOutputmode(u8 n);
 void Aud_MicSetRvbPreset(u8 nIndex, u8 nValue);
@@ -72,8 +72,8 @@ u8   Gaud_ReInit(void);
 void Aud_EmiSetTrackStream(u8 nId, u8 nTrack, u8 a, u16 b, s32 c);
 u8   Gaud_GetCommentStatus(void);
 u8   fn_800A7748(void);
-void fn_800A70E4(int n);
-void fn_800A7198(int n);
+void Gaud_InitWindSound(int n);
+void Gaud_InitTreeSound(int n);
 
 // Each volume curve's volume (Gaud_ReInit hands them to hlaudmovie.c).
 f32 lbl_8018E988[32] = {
@@ -189,7 +189,7 @@ void Aud_EmiSetTrackStep(u8 nId, u8 nTrack, u8 n, int bCheck);
 u8   Aud_MicInitOnce(void);
 void Gaud_StopMusic(void);
 void Gaud_InitSpecialShot(u8 nPlayer);
-void fn_800A6EC8(void);
+void Gaud_ExitCrowdReactionSound(void);
 void fn_800A73C0(u8 a, int n);
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
@@ -293,10 +293,10 @@ void FirstFrameInit(void) {
         Game_GetCurHoleNum();
         nWind = gSession.options.nWind;
         Gaud_InitCrowdReactionSound(0, 0);
-        fn_800A70E4(nWind);
-        fn_800A7198(nWind);
+        Gaud_InitWindSound(nWind);
+        Gaud_InitTreeSound(nWind);
         if (fn_80035574()) {
-            fn_800A7220(fn_8006C630());
+            Gaud_InitRainSound(fn_8006C630());
         }
         lbl_80281420 = Aud_EmiAdd(9, -1, 1, 0, NULL);
         Aud_EmiSet3DPos(lbl_80281420, &gPlayers[0].ball.pCourse->pin[Game_CurrentPinSet()].x, NULL, 0);
@@ -886,15 +886,15 @@ void Gaud_ExitHole(void) {
     }
     Aud_EmiDel(lbl_80281419);
     lbl_80281419 = 0xFF;
-    fn_800A6EC8();
+    Gaud_ExitCrowdReactionSound();
     Gaud_ExitCamZoom(0);
     Gaud_ExitGameBreaker(0);
-    fn_800A6D48(0);
+    Gaud_ExitSlowMo(0);
     Gaud_ExitSpecialShot(0);
-    fn_800A707C();
-    fn_800A714C();
-    fn_800A7294();
-    fn_800A71E4();
+    Gaud_ExitTopOfArcBuildup();
+    Gaud_ExitWindSound();
+    Gaud_ExitRainSound();
+    Gaud_ExitTreeSound();
     for (i = 0; i < nViews; i++) {
         lbl_801F1790[i].n0 = 0xFF;
         lbl_801F1790[i].n1 = 0xFF;
@@ -942,7 +942,7 @@ void Gaud_InitSwing(u8 nPlayer) {
     lbl_80282034 = 0;
     lbl_8028202F = 0;
     lbl_80281424 = -1;
-    fn_800A6EC8();
+    Gaud_ExitCrowdReactionSound();
     Gaud_ExitSpecialShot(nPlayer);
     Aud_EmiSetAllTrackStatus(pView->n2, 0);
     Aud_EmiSetAllTrackStatus(pView->n3, 0);
@@ -1178,13 +1178,13 @@ void Gaud_BallBounce(u8 nPlayer) {
             }
         }
     }
-    fn_800A707C();
+    Gaud_ExitTopOfArcBuildup();
 }
 
 void Gaud_BallStopped(u8 nPlayer) {
     fn_8006BAA8(nPlayer);
     ExitCrowdBuildup();
-    fn_800A707C();
+    Gaud_ExitTopOfArcBuildup();
 }
 
 // The ball drops in the cup (event 33): one of two cup sounds at random (steps 0x1A and 0x1C of the
@@ -1339,10 +1339,11 @@ void Gaud_PlayTappaFeedback(u8 nPlayer) {
     }
 }
 
-// The GameBreaker starts: the heartbeat (track 2 of the view's emitters 2 and 3) with its
-// controller vibration, the high half of the channels muted, and the pin's, crowd and ambience
-// emitters silenced. b also starts the slow-motion sound. Nothing while it is already on
-// (lbl_8028202F) or lbl_8028202B is set.
+// The GameBreaker starts: the heartbeat (track 2 of the player's view's effects pair;
+// HeartBeatLoopCallback rumbles its first beat), the high half of the channels muted, and the
+// flag's, crowd and ambience emitters silenced. b (TW07: predicted) also starts the slow-motion
+// sound. Nothing while it is already on (lbl_8028202F) or the sound is paused (lbl_8028202B,
+// Gaud_Pause).
 void Gaud_InitGameBreaker(u8 nPlayer, u8 b) {
     GameAudioView* pView;
 
@@ -1372,9 +1373,9 @@ void Gaud_InitGameBreaker(u8 nPlayer, u8 b) {
     lbl_8028202F = 1;
 }
 
-// The GameBreaker ends: the heartbeat stops, the channels are unmuted, the pin's and ambience
+// The GameBreaker ends: the heartbeat stops, the channels are unmuted, the flag's and ambience
 // emitters go back to full and the crowd to lbl_80281430, and a crowd reaction held back meanwhile
-// (lbl_80281428) plays. Nothing while lbl_8028202B is set.
+// (lbl_80281428) plays. Nothing while the sound is paused (lbl_8028202B, Gaud_Pause).
 void Gaud_ExitGameBreaker(u8 nPlayer) {
     GameAudioView* pView;
 
@@ -1560,7 +1561,9 @@ void Gaud_InitSlowMo(u8 nPlayer, u8 n) {
     }
 }
 
-void fn_800A6D48(u8 nPlayer) {
+// Stops the slow-motion sound (track 3 of the player's view's effects pair), outside speed golf
+// (modes 6 to 8).
+void Gaud_ExitSlowMo(u8 nPlayer) {
     GameAudioView* pView;
 
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
@@ -1570,15 +1573,16 @@ void fn_800A6D48(u8 nPlayer) {
     }
 }
 
-// Plays crowd reaction nMusic (a variation range of tracks 0 and 1 on both crowd emitters), after
-// stopping the crowd build-up. During the GameBreaker or a special shot it is kept in lbl_80281428
-// and played when that ends; a second argument of 1 also clears lbl_80282033, which the crowd
-// build-up needs.
+// Plays crowd reaction nMusic (a variation range of tracks 0 and 1 on both crowd emitters) and
+// keeps it in lbl_80281424, after stopping both crowd build-ups (ExitCrowdBuildup,
+// Gaud_ExitTopOfArcBuildup). During the GameBreaker or a special shot it is kept in lbl_80281428
+// instead and played when that ends. A second argument of 1 also clears lbl_80282033, which the
+// crowd build-up needs.
 void Gaud_InitCrowdReactionSound(int nMusic, int a) {
     u8 n = nMusic;
 
     ExitCrowdBuildup();
-    fn_800A707C();
+    Gaud_ExitTopOfArcBuildup();
     if (a == 1) {
         lbl_80282033 = 0;
     }
@@ -1597,10 +1601,12 @@ void Gaud_InitCrowdReactionSound(int nMusic, int a) {
     lbl_80281424 = nMusic;
 }
 
-void fn_800A6EC8(void) {
+// Stops the crowd: both build-ups and the reaction (tracks 0 and 1 of both crowd emitters), in a
+// mode with a crowd (lbl_80282040).
+void Gaud_ExitCrowdReactionSound(void) {
     if (lbl_80282040) {
         ExitCrowdBuildup();
-        fn_800A707C();
+        Gaud_ExitTopOfArcBuildup();
         Aud_EmiSetTrackStatus(lbl_8028141C, 0, 0);
         Aud_EmiSetTrackStatus(lbl_8028141C, 1, 0);
         Aud_EmiSetTrackStatus(lbl_8028141D, 0, 0);
@@ -1608,7 +1614,10 @@ void fn_800A6EC8(void) {
     }
 }
 
-void fn_800A6F38(void) {
+// A quick cheer from the crowd at once (UI script commands): crowd reaction 2 on tracks 0 and 1 of
+// both crowd emitters, in a mode with a crowd. Unlike Gaud_InitCrowdReactionSound it is never held
+// back.
+void Gaud_FireQuickCheer(void) {
     if (lbl_80282040) {
         Aud_EmiSetTrackVarRange(lbl_8028141C, 0, 2);
         Aud_EmiSetTrackVarRange(lbl_8028141C, 1, 2);
@@ -1621,10 +1630,13 @@ void fn_800A6F38(void) {
     }
 }
 
-void fn_800A6FE0(void) {
+// The crowd's rising anticipation as the ball in flight comes within 40 of the pin (emotion.c
+// fn_8006BB5C): tracks 4 and 5 of both crowd emitters, after stopping the crowd reaction unless
+// ball.b99 is set. Not during the GameBreaker or in a mode without a crowd.
+void Gaud_InitTopOfArcBuildup(void) {
     if (lbl_8028202F || !lbl_80282040) return;
     if (gPlayers[lbl_80282278].ball.b99 == 0) {
-        fn_800A6EC8();
+        Gaud_ExitCrowdReactionSound();
     }
     Aud_EmiSetTrackStatus(lbl_8028141C, 4, 1);
     Aud_EmiSetTrackStatus(lbl_8028141D, 4, 1);
@@ -1632,7 +1644,9 @@ void fn_800A6FE0(void) {
     Aud_EmiSetTrackStatus(lbl_8028141D, 5, 1);
 }
 
-void fn_800A707C(void) {
+// Stops the top-of-arc build-up (tracks 4 and 5 of both crowd emitters), in a mode with a crowd:
+// the ball left the pin's range, landed or stopped, or a crowd reaction starts.
+void Gaud_ExitTopOfArcBuildup(void) {
     if (lbl_80282040) {
         Aud_EmiSetTrackStatus(lbl_8028141C, 4, 0);
         Aud_EmiSetTrackStatus(lbl_8028141D, 4, 0);
@@ -1641,7 +1655,9 @@ void fn_800A707C(void) {
     }
 }
 
-void fn_800A70E4(int n) {
+// The wind, when gpGame->b288: emitter 0's track 0, and its track 1 at variation range n
+// (FirstFrameInit passes the wind option).
+void Gaud_InitWindSound(int n) {
     if (gpGame->b288) {
         Aud_EmiAliasSetTrackStatus(0, 0, 1);
         Aud_EmiAliasSetTrackVarRange(0, 1, n);
@@ -1649,27 +1665,33 @@ void fn_800A70E4(int n) {
     }
 }
 
-void fn_800A714C(void) {
+// Stops the wind (emitter 0's tracks 0 and 1), when gpGame->b288.
+void Gaud_ExitWindSound(void) {
     if (gpGame->b288) {
         Aud_EmiAliasSetTrackStatus(0, 0, 0);
         Aud_EmiAliasSetTrackStatus(0, 1, 0);
     }
 }
 
-void fn_800A7198(int n) {
+// The trees in the wind, when gpGame->b288: sets emitter 1's track 0 to variation range n
+// (FirstFrameInit passes the wind option) and switches its track 1 on.
+void Gaud_InitTreeSound(int n) {
     if (gpGame->b288) {
         Aud_EmiAliasSetTrackVarRange(1, 0, n);
         Aud_EmiAliasSetTrackStatus(1, 1, 1);
     }
 }
 
-void fn_800A71E4(void) {
+// Stops the trees (emitter 1's track 1), when gpGame->b288.
+void Gaud_ExitTreeSound(void) {
     if (gpGame->b288) {
         Aud_EmiAliasSetTrackStatus(1, 1, 0);
     }
 }
 
-void fn_800A7220(f32 fAmount) {
+// The rain, when gpGame->b288: emitter 0's track 2 at variation range 3 x fAmount (the course's
+// rain strength, fn_8006C630), at most 2.
+void Gaud_InitRainSound(f32 fAmount) {
     u32 n;
 
     n = (u8)(int)(3.0f * fAmount);
@@ -1679,7 +1701,9 @@ void fn_800A7220(f32 fAmount) {
     }
 }
 
-void fn_800A7294(void) {
+// Stops the rain, when gpGame->b288: emitter 0's track 2, and the ambience's track 2 when the
+// ambience streams.
+void Gaud_ExitRainSound(void) {
     if (gpGame->b288) {
         Aud_EmiAliasSetTrackStatus(0, 2, 0);
         if (lbl_8028203C == 2) {
@@ -1688,14 +1712,17 @@ void fn_800A7294(void) {
     }
 }
 
-// Switches the game's sounds off (bOff); switching back on restarts only the music, if bMusic.
-void fn_800A72EC(u8 bOff, u8 bMusic) {
+// Switches the game's sounds off while the scorecard shows (bOff 1: GUI_BetweenHolesScorecard,
+// GUI_EndOfGameScorecard) and back on (GUI_PauseMenuClosed). Off stops the ambience's tracks, the
+// music, the crowd and the GameBreaker; on only re-picks and restarts the music, and only with
+// bMusic. Nothing when it is already in that state.
+void Gaud_OnScoreCard(u8 bOff, u8 bMusic) {
     if (lbl_8028202E ^ bOff) {
         lbl_8028202E = bOff;
         if (bOff) {
             StopAmbientStreamer(0);
             Gaud_StopMusic();
-            fn_800A6EC8();
+            Gaud_ExitCrowdReactionSound();
             Gaud_ExitGameBreaker(0);
             return;
         }
@@ -1706,7 +1733,11 @@ void fn_800A72EC(u8 bOff, u8 bMusic) {
     }
 }
 
-void fn_800A7350(u8 bOn) {
+// Pauses (bOn 1) or resumes the game's sound for the pause menu; pausing plays the pause sound
+// (fn_800A73C0, step 1), resuming re-picks the stream at the next Gaud_Monitor (lbl_8028202C). The
+// engine is left alone while Gaud_OnScoreCard has the sound off. Nothing when it is already in that
+// state.
+void Gaud_Pause(u8 bOn) {
     if ((lbl_8028202B ^ bOn) != 0) {
         lbl_8028202B = bOn;
         if (lbl_8028202E == 0) {

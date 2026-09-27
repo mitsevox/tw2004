@@ -179,7 +179,7 @@ u8 fn_800E53B8(void) {
 }
 
 void fn_800E53C0(void) {
-    fn_800A72EC(1, 0);
+    Gaud_OnScoreCard(1, 0);
 }
 
 void fn_800E53E8(u8 b) {

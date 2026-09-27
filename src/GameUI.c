@@ -129,7 +129,7 @@ u8    fn_80127004(void);
         (q)[i].n8 = c;       \
     }
 
-void  fn_800A7350(int a);
+void  Gaud_Pause(int a);
 
 // Shuts the in-game HUD down: it only stops every controller's rumble (fn_8001437C).
 void GUI_DeInit(void) {
@@ -272,7 +272,7 @@ void GUI_PauseMenuClosed(void) {
             lbl_802822DF = 0;
             gSession.nPaused = 0;
             fn_800DC9D4(0);
-            fn_800A7350(0);
+            Gaud_Pause(0);
             EASBio_SetGamePlayState(1);
         }
         fn_8009EF98();
@@ -280,16 +280,16 @@ void GUI_PauseMenuClosed(void) {
             fn_80062CE0(1);
         }
         if (GM_Currently_SkillZoneMode() && !lbl_80282282) {
-            fn_800A72EC(0, 1);
+            Gaud_OnScoreCard(0, 1);
         }
         if (lbl_80282282) {
-            fn_800A72EC(0, 0);
+            Gaud_OnScoreCard(0, 0);
             gSession.b12 = 1;
             lbl_80282282 = 0;
             Gaud_StopComment();
         }
         if (lbl_80282281) {
-            fn_800A72EC(0, 0);
+            Gaud_OnScoreCard(0, 0);
             EVENT_Trigger(0, 0x46, 0, -1);
             gpGame->pfn214();
             if (Game_GetMode() == 12) {
@@ -611,7 +611,7 @@ void GUI_BetweenHolesScorecard(u8 bHuman) {
         }
     } else {
         if (Game_GetMode() != 7) {
-            fn_800A72EC(1, 0);
+            Gaud_OnScoreCard(1, 0);
         }
         lbl_80282281 = 1;
         GameEffects_ResetGameEffectSettings();
@@ -646,7 +646,7 @@ void GUI_EndOfGameScorecard(u8 bHuman) {
         }
     } else {
         if (Game_GetMode() != 7) {
-            fn_800A72EC(1, 0);
+            Gaud_OnScoreCard(1, 0);
         }
         lbl_80282282 = 1;
         GameEffects_ResetGameEffectSettings();

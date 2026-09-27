@@ -265,8 +265,8 @@ s32   MC_SaveReplay(MCCardPos* pPos);
 s32   fn_800A0610(s32 nPort, s32 nSlot, s32 n);
 void  Gaud_TextFall(void);
 void  Gaud_PlayTextDitty(int n);
-void  fn_800A6F38(void);
-void  fn_800A7350(int a);
+void  Gaud_FireQuickCheer(void);
+void  Gaud_Pause(int a);
 void  fn_800A73C0(u8 a, int b);
 s32   fn_800A7528(void);
 void  fn_800A7944(void);
@@ -747,7 +747,7 @@ void fn_80086300(MsgArg* pArgs, MsgArg* pResult) {
 // Pause the game.
 void fn_8008633C(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281F18 = GUI_ScoreCardUp() == 0;
-    fn_800A7350(1);
+    Gaud_Pause(1);
     GUI_OpenPauseMenu();
 }
 
@@ -1691,7 +1691,7 @@ void fn_800885A0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_800885F8(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800A7350(0);
+    Gaud_Pause(0);
     GUI_PauseMenuClosed();
     if (lbl_801D87C0.b0 == 0) {
         fn_80100B38();
@@ -1699,7 +1699,7 @@ void fn_800885F8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80088634(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800A6F38();
+    Gaud_FireQuickCheer();
 }
 
 void fn_80088654(MsgArg* pArgs, MsgArg* pResult) {
@@ -2283,7 +2283,7 @@ void fn_80089C20(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80089C4C(MsgArg* pArgs, MsgArg* pResult) {
     int nMsg = pArgs[0].i;
 
-    fn_800A6F38();
+    Gaud_FireQuickCheer();
     fn_8008AC4C((u16)nMsg, 0);
 }
 
