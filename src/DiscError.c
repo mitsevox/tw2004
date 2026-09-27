@@ -41,14 +41,10 @@ u16  lbl_80282190;
 s32  lbl_8028218C;
 s32  lbl_80282188;
 
-// .data. lbl_8018FFC8: 24 zero bytes nothing references; config.yml's force_active keeps the
-// linker from stripping them.
-#pragma explicit_zero_data on
-u32 lbl_8018FFC8[6] = {0, 0, 0, 0, 0, 0};
-#pragma explicit_zero_data reset
-
+// .data. Section note: the font is 32-aligned (0x8018FFE0); the 24 zero bytes before it (after
+// GoARAM.c's .data, nothing refers to them) are that alignment's padding.
 // The font's bitmap is game data: tools/build/gendata.py writes its initializer from main.dol.
-u32 lbl_8018FFE0[107 * 8] = {
+u32 lbl_8018FFE0[107 * 8] __attribute__((aligned(32))) = {
 #include "DiscError_font.inc"
 };
 
