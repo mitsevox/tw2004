@@ -10,6 +10,10 @@
 
 GrassManager* lbl_80281900 = &lbl_802603B0;
 
+// This file's .sbss (grassshader.h), in reverse address order as the compiler lays it out.
+s32   lbl_80282514;
+void* lbl_80282510;
+
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_8011E170(void);

@@ -40,3 +40,4 @@ core/audtrack.h (its extern) and drives the emitters, so GameAudio is likelier, 
 header comment states its .sbss is 0x80282020-0x80282058 ("proven by its data"), and matching lanes
 may not change comments. Needs the orchestrator's call.
 | auto_08_80282230_sbss | 8 | AnimStream.c | lbl_80282230 (the stream state, allocated by fn_800C937C) used only by AnimStream; between GoBreakLine's and SkinPart's .sbss (AnimStream, TerrainGround in between) | linked, main.dol OK |
+| auto_08_80282510_sbss | 8 | GoGrass.c | lbl_80282510 (texture buffer) and lbl_80282514 used only by GoGrass; GoGrass is the only unit between fe_stats's and gbacable's .sbss that uses them (EventInfo, llrtclock, GoShaderObject_Grass_Gc, GameMode4Menu, LadderMap, TibExt in between) | linked, main.dol OK |
