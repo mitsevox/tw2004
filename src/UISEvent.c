@@ -197,11 +197,11 @@ s32 fn_80165ACC(UIStudio* pArg, u16 uGroup, u16 uScreen) {
 
     p = pStudio->pEventBase;
     while (p > pStudio->pEventTop) {
-        nArgs = p[-8];
         nType = p[0];
         uA = p[-1];
         uB = p[-2];
         pData = p -= 7;
+        nArgs = p[-1];
         p -= 1;
         p -= nArgs;
         pArgs = p;
