@@ -90,6 +90,9 @@ static inline char* UIS_PutString(char* pOut, char* pEnd, const char* sz, s32 nW
 
 // The index of a loaded screen, or the number of screens when it is not loaded. Written out, not
 // through UIS_FindScreen: returning an inlined call adds a copy of the index (88.6 -> 90.5%).
+// fake match: scheduled once, not twice: EA's entry block has `li i` between the two u16 masks,
+// which only the single scheduling pass gives (twice puts the li last). Code is unchanged.
+#pragma scheduling once
 u16 fn_8016C6C4(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
     u16 i;
     UISScreen* pScreen;
@@ -100,6 +103,7 @@ u16 fn_8016C6C4(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
     }
     return i;
 }
+#pragma scheduling reset
 
 #pragma auto_inline off
 // fake match: not pasted into its callers: the file is built with -inline auto,deferred (see
