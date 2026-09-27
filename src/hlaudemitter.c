@@ -74,8 +74,10 @@ int Aud_EmiInitSession(void) {
 void Aud_EmiExitSession(void) {
 }
 
-// Once a frame: hands every instance's commands to its entry and clears them (an instance with
-// n24 1 sends its position again), then runs the rest of the sound engine.
+// Once a frame (Gaud_Cycle): hands every instance's queued commands (tracks on / off, controller
+// values, position) to its AudTable.c entry through Emi_UpdInstance and clears them (an instance
+// with n24 1 sends its position again every frame), then ticks the tracks (Trk_Cycle) and voices
+// (Voc_Cycle) and counts the frame (lbl_80282018).
 void Aud_EmiCycle(void) {
     AudInstance* pInst;
 
@@ -216,7 +218,9 @@ void Aud_EmiDel(u8 nId) {
     }
 }
 
-// Whether bit nTrack of an instance's u22 is set; 0 for no instance.
+// Whether track nTrack of instance nId is playing: switched on by Aud_EmiSetTrackStatus /
+// Aud_EmiSetAllTrackStatus and not yet reported back through Aud_EmiTrkCB. 0 for no instance (id
+// 0xFF).
 u8 Aud_EmiGetTrackStatus(u8 nId, u8 nTrack) {
     AudInstance* pInst = Aud_CheckEmitterInstance(nId);
     if (pInst == NULL) {
@@ -234,7 +238,8 @@ AudInstance* Aud_CheckEmitterInstance(u8 nId) {
     return pInst;
 }
 
-// Switches an instance's track on (bOn 1: also marked in u22) or off.
+// Switches track nTrack of instance nId on (bOn 1; also marks it playing for Aud_EmiGetTrackStatus)
+// or off. Only queued in its entry: the sound engine gets it at the next Aud_EmiCycle.
 void Aud_EmiSetTrackStatus(u8 nId, u8 nTrack, u8 bOn) {
     AudInstance* pInst = Aud_CheckEmitterInstance(nId);
     u8 uBit = 1 << nTrack;
@@ -249,7 +254,8 @@ void Aud_EmiSetTrackStatus(u8 nId, u8 nTrack, u8 bOn) {
     }
 }
 
-// Sets which of an instance's tracks are on (the rest off), in u22 too.
+// Switches the tracks of instance nId whose bits are set in n on and all the others off (a bit per
+// track), and marks the same bits playing for Aud_EmiGetTrackStatus. Sent at the next Aud_EmiCycle.
 void Aud_EmiSetAllTrackStatus(u8 nId, int n) {
     AudInstance* pInst = Aud_CheckEmitterInstance(nId);
     if (pInst != NULL) {
@@ -260,7 +266,9 @@ void Aud_EmiSetAllTrackStatus(u8 nId, int n) {
     }
 }
 
-// Sets the parameters of one of an instance's tracks.
+// Sets controller nTrack of instance nId to uParams: one 32-bit value per track (for a streamed
+// track its stream, play list and play mode: AudTable.c's PreprocessControllers) and marks it
+// changed. Sent at the next Aud_EmiCycle.
 void Aud_EmiSetControllerInt(u8 nId, u8 nTrack, u32 uParams) {
     AudInstance* pInst = Aud_CheckEmitterInstance(nId);
     if (pInst != NULL) {
@@ -357,6 +365,7 @@ void Aud_EmiAliasSetTrackStatus(s16 nEmitter, u8 nTrack, u8 bOn) {
     }
 }
 
+// Aud_EmiSet3DPos for every instance of emitter nEmitter: they all move to pPos.
 void Aud_EmiAliasSet3DPos(s16 nEmitter, f32* pPos, f32* pLast, u8 nView) {
     AudInstance* pInst;
     for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
@@ -375,6 +384,7 @@ void Aud_EmiAliasSetTrackVarRange(s16 nEmitter, u8 nTrack, u8 n) {
     }
 }
 
+// Aud_EmiSetTrackStep for every instance of emitter nEmitter.
 void Aud_EmiAliasSetTrackStep(s16 nEmitter, u8 nTrack, u8 n, int bCheck) {
     AudInstance* pInst;
     for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
@@ -382,6 +392,7 @@ void Aud_EmiAliasSetTrackStep(s16 nEmitter, u8 nTrack, u8 n, int bCheck) {
     }
 }
 
+// Aud_EmiSetTrackAttenuation for every instance of emitter nEmitter: track nTrack's volume.
 void Aud_EmiAliasSetTrackAttenuation(s16 nEmitter, u8 nTrack, f32 fVolume) {
     AudInstance* pInst;
     for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
@@ -389,7 +400,10 @@ void Aud_EmiAliasSetTrackAttenuation(s16 nEmitter, u8 nTrack, f32 fVolume) {
     }
 }
 
-// Clears bit nBit of an instance's u22 and tells its callback.
+// A track of instance nId reports back (AudTable.c's Emi_TrackCallback): n 0 when the track was
+// freed (Trk_FreePerf), 1 from a sequencer event (fn_800AA698). Marks track nBit not playing
+// (Aud_EmiGetTrackStatus) and passes the report on to the instance's callback (Aud_EmiAdd's
+// pfnCallback), when it has one.
 void Aud_EmiTrkCB(u8 nId, u8 nBit, s32 n) {
     AudInstance* pInst;
     void (*pfnCallback)(u8 nId, u8 nBit, s32 n);

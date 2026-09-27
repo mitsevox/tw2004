@@ -43,7 +43,8 @@ u8 Emi_InitSession(void) {
 void Emi_ExitSession(void) {
 }
 
-// Clears entry nEntry and binds it to sound nSound.
+// Aud_EmiAdd's half: clears entry nEntry (the instance's own number) and binds it to bank sound
+// nSound. Returns the entry, which the instance keeps as its command block (AudInstance.pCmd).
 AudSource* Emi_AddInstance(u8 nEntry, s16 nSound) {
     AudSound* pSound;
     AudSource* pSource;
@@ -56,7 +57,12 @@ AudSource* Emi_AddInstance(u8 nEntry, s16 nSound) {
     return pSource;
 }
 
-// Updates entry nEntry's tracks. A placed sound out of earshot is stopped.
+// Applies instance nEntry's commands of this frame (Aud_EmiCycle): uMaskA / uMaskB are the tracks
+// switched on / off (a bit each), auStreams the controller value of each track, uMask what changed
+// (AudSource.uChanged; bits 0-2 hand the streams on through PreprocessControllers). A sound placed
+// in the world (AudSound.n3 bit 0) gets its distance, pan and doppler pitch, and each track its
+// volume by distance (Attenuation3D); one farther away than its sound's f4 is out of earshot and
+// all its tracks are freed.
 void Emi_UpdInstance(u8 nEntry, u8 uMaskA, u8 uMaskB, u32* auStreams, f32 (*aPos)[3], u16 uMask) {
     AudSource* pSource;
     f32 fDist;
@@ -114,7 +120,9 @@ void FreeAllPerfs(AudSource* pSource) {
     }
 }
 
-// A placed track's volume by distance: full up to 2, falling to a quarter at 5, then to nothing.
+// A placed track's volume (0 to 1) at distance fDist, scaled by its template's fScale
+// (AudTrackTmpl.f10): full up to 2, falling in a straight line to a quarter at 5 and to silence at
+// 10 (3276/65536 = 0.05 a unit).
 f32 Attenuation3D(f32 fDist, f32 fScale) {
     f32 f;
     f32 fVolume;
@@ -134,7 +142,12 @@ f32 Attenuation3D(f32 fDist, f32 fScale) {
     return fVolume;
 }
 
-// The doppler pitch from how fast the sound nears the nearest listener (345: the speed of sound).
+// The doppler pitch of a placed sound (1 when its sound has AudSound.n3 bit 1 or is not placed):
+// 345 / (345 - speed), 345 being the speed of sound and speed 32 times how much nearer to the
+// nearest listener it came since the last frame (at most 1); then keeps that nearest distance in
+// fDist.
+// EA bug: Emi_UpdInstance stores the new nearest distance in fDist before it calls this, so the
+// change is always 0 and the pitch stays 1.
 void Doppler3D(AudSource* pSource) {
     f32 fDist;
     u8 uFlags;
@@ -159,8 +172,9 @@ void Doppler3D(AudSource* pSource) {
     pSource->fDist = fDist;
 }
 
-// The pan from where the sound is: with one listener, its side and its front or back; with two
-// (split screen) the sound is centred.
+// The pan of a sound from where the one listener hears it: fPan -1 left to 1 right, f68 -1 to 1 by
+// its depth in the listener's view (AudVoiceParams.n7). With two listeners (split screen), or for a
+// sound not placed in the world, it is centred (0, 1).
 void Panning3D(AudSource* pSource) {
     f32 fInv;
     f32 fPan;
@@ -283,7 +297,8 @@ void Emi_SetTrackStep(u8 nEntry, u8 nTrack, u8 n, int bCheck) {
     Trk_Step(pTrack, n, bCheck);
 }
 
-// Sets a track's volume.
+// Sets the volume (AudTrack.f44) of entry nEntry's track nTrack, starting the track if it has not
+// started.
 void Emi_SetTrackAttenuation(u8 nEntry, u8 nTrack, f32 fVolume) {
     AudSource* pSource;
     AudTrack* pTrack;
@@ -297,7 +312,8 @@ void Emi_SetTrackAttenuation(u8 nEntry, u8 nTrack, f32 fVolume) {
     pTrack->f44 = fVolume;
 }
 
-// Sets a track's pitch.
+// Sets the pitch (AudTrack.f4C) of entry nEntry's track nTrack, starting the track if it has not
+// started.
 void Emi_SetTrackPitchFactor(u8 nEntry, u8 nTrack, f32 fPitch) {
     AudSource* pSource;
     AudTrack* pTrack;
@@ -321,8 +337,9 @@ void Emi_CheckTemplate(AudSound* pSound, u16 n) {
     }
 }
 
-// Tells the emitter instance of this entry (same number) that track nTrack was freed (n 0) or
-// changed variation (n 1), through Aud_EmiTrkCB.
+// Passes a track's report on to the emitter instance of this entry (the same number), through
+// Aud_EmiTrkCB: n 0 when the track was freed (Trk_FreePerf), 1 from a sequencer event
+// (fn_800AA698).
 void Emi_TrackCallback(AudSource* pSource, u8 nTrack, s32 n) {
     Aud_EmiTrkCB((u8)(pSource - lbl_80282058), nTrack, n);
 }
