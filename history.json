@@ -43189,5 +43189,21 @@
 "matched_functions": 7641,
 "total_functions": 7647,
 "exact": 7641
+},
+{
+"commit": "c5a174b",
+"sha": "c5a174b8d6668b549c2e132db962d9ccb5b38854",
+"time": 1790515466,
+"subject": "Merge agent/b11: LLFont FO_spLoadFontFromStream exact (EA form)",
+"report": true,
+"matched_code": 1536616,
+"complete_code": 1523296,
+"matched_data": 791935,
+"complete_data": 991883,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7642,
+"total_functions": 7647,
+"exact": 7642
 }
 ]
