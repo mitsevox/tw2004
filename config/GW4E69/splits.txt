@@ -994,6 +994,7 @@ GoGolfCam.c:
 
 CamSpline.c:
 	.text       start:0x800C7480 end:0x800C808C
+	.data       start:0x80191440 end:0x80191480
 	.sdata2     start:0x802843B8 end:0x802843F8
 
 GoBreakLine.c:
@@ -1006,7 +1007,7 @@ GoBreakLine.c:
 
 AnimStream.c:
 	.text       start:0x800C937C end:0x800CB950
-	.data       start:0x80191490 end:0x80191520
+	.data       start:0x80191490 end:0x80191748
 	.sdata      start:0x80281530 end:0x80281538
 
 TerrainGround.c:

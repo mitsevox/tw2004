@@ -893,6 +893,19 @@ void fn_800CB668(u8 bGlobal, int bFemale, int nPlayer, char* szPath) {
     sprintf(szPath, "%sdata\\CharStrm\\AnimChar\\%02dchr.sac", lbl_80281530, fn_8001C558(nPlayer) + 1);
 }
 
+s32 lbl_80191520[128] = {
+    0,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1,  -1, 2,  -1, -1,
+    3,  4,  5,  6,  7,  8,  9,  10, 11, 12, -1, -1, -1, -1, -1, -1,
+    -1, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
+    28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, -1, -1, -1, -1, 39,
+    -1, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
+    28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, -1, -1, -1, -1, -1,
+};
+
+char lbl_80191720[40] = "\0+-0123456789abcdefghijklmnopqrstuvwxyz_";
+
 // Packs up to 12 characters of pName into a base-40 code, stored with its bytes reversed. A
 // character without a code becomes '_'. Returns 0, 1 when the name is longer than 12 characters,
 // or 2 when a character was replaced.
