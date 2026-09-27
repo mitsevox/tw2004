@@ -90,11 +90,11 @@ typedef struct DynObjPair {
 
 // The header of a UObjMesh's data (UObjMesh.pInfo).
 typedef struct UObjMeshInfo {
-    s16  n0;                    // 0x00  how many meshes UObjMesh.p8 holds (GoTerrain.c fn_800354F4)
+    s16  n0;                    // 0x00  how many meshes UObjMesh.p8 holds (GoTerrain.c Ter_GetMeshChildCount)
     u8   unk2[0x4 - 0x2];
     s32  n4;                    // 0x04  not 0: a chunk follows; fn_8000799C passes n4 * 2 to fn_80007658
     u8   unk8[0x24 - 0x8];
-    s8   a24[0x54 - 0x24];      // 0x24  fn_80048AD4, GoTerrain.c fn_800354D0 (length unknown, at most this)
+    s8   a24[0x54 - 0x24];      // 0x24  fn_80048AD4, GoTerrain.c Ter_GetMeshFlags (length unknown, at most this)
     f32  f54;                   // 0x54  scales a terrain object's mipmap bias (GoTerrain.c fn_80035560)
     f32  v58[3];                // 0x58  copied to UObjModel.v2C by type 0's setup; with f64 the
                                 //       bounding sphere GoTerrain.c's fn_800354C4 returns
@@ -131,17 +131,17 @@ typedef struct UObjPartDesc {
 } UObjPartDesc;
 
 // One level of detail of a UObjModel. The terrain's hole data is a tree of them (GoTerrain.c,
-// fn_800354BC..fn_80035500): the root holds a mesh per patch in its p8[1], a patch's p8[0] is its
+// Ter_GetMeshNext..fn_80035500): the root holds a mesh per patch in its p8[1], a patch's p8[0] is its
 // ground and its p8[1] holds its object lists, whose meshes are the objects' (fn_80034A20).
 typedef struct UObjMesh {
     UObjMeshInfo* pInfo;        // 0x00
     u8   unk4[4];
     struct UObjMesh** p8;       // 0x08  alternatives, by UObject.n108 (fn_80048AC4); a terrain
-                                //       mesh's children (fn_800354E4)
+                                //       mesh's children (Ter_GetMeshChild)
     struct UObjMesh* pC;        // 0x0C  in a terrain patch's ground: the mesh drawn for it (fn_8003556C)
     struct UObjMesh* p10;       // 0x10  its first child, the rest by p14 (pInfo->n0 of them; LLObj_Gc.c
                                 //       fn_80007524)
-    struct UObjMesh* p14;       // 0x14  the next terrain mesh of a list (fn_800354BC); a patch's
+    struct UObjMesh* p14;       // 0x14  the next terrain mesh of a list (Ter_GetMeshNext); a patch's
                                 //       ground's is its objects (Ter_PatchReference.pObjects)
     struct UObjMeshPart* p18;   // 0x18  fn_80048A84 passes entry n28 to fn_800082CC
     u8   a1C[0x20 - 0x1C];      // 0x1C  nonzero: entry i of p18 is used

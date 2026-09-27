@@ -30,7 +30,7 @@ void fn_80093524(void) {
         fn_80093990(pSet);
         pSet++;
     }
-    fn_80035338(0);
+    LF_vSetCurrentLightFogEnvironment(0);
     fn_80035FFC();
     fn_80035308();
 }
@@ -55,7 +55,7 @@ void fn_800935CC(CourseLights* pLights) {
     u8 bSkip;
     int i;
 
-    pSet = fn_8003532C();
+    pSet = LF_spGetCurrentLightFogEnvironment();
     for (i = 0; i < 5; i++) {
         pDir = &pLights->aLight[i];
         if (pDir->nType == 1) break;
@@ -125,14 +125,14 @@ void fn_800935CC(CourseLights* pLights) {
 }
 
 void fn_80093824(void) {
-    fn_8003532C();
+    LF_spGetCurrentLightFogEnvironment();
     fn_80093A04(0, Camera_GetCurrentLens());
 }
 
 void fn_80093854(LightParams* pParams) {
     LightSet* pSet;
     GoLight* pLight;
-    pSet = fn_8003532C();
+    pSet = LF_spGetCurrentLightFogEnvironment();
     Vec3Copy(pParams->v0, pSet->group.v28);
     pLight = pSet->group.apLight[4];
     pLight->u.dir.f10 = pParams->f10;
@@ -156,7 +156,7 @@ void fn_80093854(LightParams* pParams) {
 
 void fn_80093900(CourseLightBlock* pBlock) {
     LightSet* pSet;
-    pSet = fn_8003532C();
+    pSet = LF_spGetCurrentLightFogEnvironment();
     fn_8006F430(pBlock->f80);
     fn_8006F400(pSet, 0, pBlock->a[0].v0, pBlock->a[0].f10);
     fn_8006F400(pSet, 1, pBlock->a[1].v0, pBlock->a[1].f10);
@@ -176,7 +176,7 @@ void fn_800939CC(LightSet* pSet) {
 
 // The angle between the camera's direction and light nLight of the current set.
 f32 fn_80093A04(s32 nLight, CamLens* pLens) {
-    return fn_80093A50(fn_8003532C()->group.apLight[nLight], pLens);
+    return fn_80093A50(LF_spGetCurrentLightFogEnvironment()->group.apLight[nLight], pLens);
 }
 
 f32 fn_80093A50(GoLight* pLight, CamLens* pLens) {

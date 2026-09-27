@@ -139,7 +139,7 @@ void fn_80090D28(FEQuad* pQuad) {
     } else {
         RenderState_SetDrawFlags(0x40);
     }
-    fn_80013EEC(Camera_GetCurrent());
+    RenderState_SetViewport(Camera_GetCurrent());
     vScale[0] = (1.0f / 511.0f) * pColour->w40.a[0];
     vScale[1] = (1.0f / 511.0f) * pColour->w40.a[1];
     vScale[2] = (1.0f / 511.0f) * pColour->w40.a[2];
@@ -494,7 +494,7 @@ void fn_80091BDC(int nPoint) {
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetAlphaTest(0, 6, 0x80);
     RenderState_SetDepthFunc(7);
-    fn_8001425C(0);
+    RenderView_SetUseCurrentMatrices(0);
     RenderState_SetDepthWrite(0);
     fn_8005CC64(lbl_80281F20, lbl_80281F24);
     RenderState_SetDrawFlags(0x50);
@@ -505,7 +505,7 @@ void fn_80091BDC(int nPoint) {
     afColour[2] = 0.5f;
     afColour[3] = 0.5f;
     RenderView_SetColor(afColour);
-    fn_800141F8(afXY, NULL, lbl_801D8818[nPoint][0], lbl_801D8818[nPoint][1],
+    RenderView_MakeQuad(afXY, NULL, lbl_801D8818[nPoint][0], lbl_801D8818[nPoint][1],
                 lbl_801D8818[nPoint][0] + 0.125f, lbl_801D8818[nPoint][1] + 0.142f);
     if (nPoint < 4) {
         afUV[0] = 0.25f * nPoint;
@@ -637,13 +637,13 @@ void fn_80092080(LLPict* pPict, f32 fAlpha) {
     FB_vSetFrameBuffer(&frameBuf, 0.0f, 0.0f, 512.0f, 448.0f, 1.0f, 1.0f);
     // port: the render slot is typed s32 but holds a pointer
     fn_80092274((s32)&frameBuf);
-    fn_80013EEC(Camera_GetCurrent());
+    RenderState_SetViewport(Camera_GetCurrent());
     RenderState_Flush();
     afColour[0] = 0.5f;
     afColour[1] = 0.5f;
     afColour[2] = 0.5f;
     afColour[3] = 0.5f * fAlpha;
-    fn_800141F8(NULL, afXY, 0.0f, 0.0f, 1.0f, 1.0f);
+    RenderView_MakeQuad(NULL, afXY, 0.0f, 0.0f, 1.0f, 1.0f);
     fn_800760F4(afUV, pPict);
     RenderView_SetColor(afColour);
     RenderView_DrawPrimitive(0xA1, afXY, 0, afUV, 2);

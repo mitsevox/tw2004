@@ -157,7 +157,7 @@ void fn_800083A0(void);
 void FO_vSetCurrentAddMode(s32 v);
 s32  FO_eGetCurrentAddMode(void);
 void fn_80012B2C(f32 x0, f32 x1);
-void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
+void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
 void fn_800137D0(void* pCamera);
@@ -201,7 +201,7 @@ void fn_800755F0(int nFlags) {
     colour[2] = 0.0f;
     colour[3] = bFade ? 0.1f : 0.5f;
     RenderView_SetColor(colour);
-    fn_800141F8(xy, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
+    RenderView_MakeQuad(xy, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
     fn_80008380();
     if (bFade) {
@@ -225,7 +225,7 @@ void fn_800755F0(int nFlags) {
             fn_800760B0(0, 0, 512, 448);
         }
         RenderState_SetBlendFactors(4, 5);
-        fn_8001425C(0);
+        RenderView_SetUseCurrentMatrices(0);
         RenderState_SetDrawFlags(0x40);
         RenderState_SetAlphaTest(0, 6, 0x80);
         RenderState_SetDepthFunc(7);
@@ -386,7 +386,7 @@ void fn_80075C68(void) {
 // Sets the renderer up for full-screen movie frames (512 x 448); fn_80075D58 puts it back.
 void fn_80075C88(void) {
     fn_80008380();
-    fn_800140E8(0, 512, 448, 0, 8, 1);
+    RenderState_SetRenderSurface(0, 512, 448, 0, 8, 1);
     RenderState_SetDrawFlags(0x10);
     RenderState_SetDepthWrite(0);
     RenderState_SetAlphaTest(0, 6, 0x80);
@@ -457,7 +457,7 @@ void fn_80075DEC_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nAr
             fn_800760B0(0, 0, 512, 448);
             RenderState_Flush();
             if (bFirst) {
-                fn_800141F8(xy, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
+                RenderView_MakeQuad(xy, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
                 fn_800760F4(uv, &pVideo->pict);
                 bFirst = 0;
             }

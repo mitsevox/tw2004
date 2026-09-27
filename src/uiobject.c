@@ -34,9 +34,9 @@ void fn_800AE380(void);
 void fn_800AE3C4(void);
 void UI_Obj_RenderBoostUI(int nObj);
 void fn_800AF0A8(CamLens* pLens);
-void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
+void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80035F1C(void);
-void fn_800352BC(void);
+void RC_UpdateCurrentScreenMatrices(void);
 void fn_8005C15C(int nPlayer, f32* pSpinY, f32* pSpinX);   // Swing.c: the spin asked for
 void Mtx_Identity(f32 (*pMtx)[4]);                          // identity
 void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
@@ -195,19 +195,19 @@ void UI_Obj_RenderBoostUI(int nObj) {
     aRect[1][3] = 1.0f;
 
     // clear the depth under the object's corner of the screen
-    fn_8001425C(0);
+    RenderView_SetUseCurrentMatrices(0);
     RenderView_SetColor(aBlack);
     fn_80035F1C();
     RenderState_SetDrawFlags(0);
     RenderState_SetAlphaTest(0, 6, 0x80);
     RenderState_SetDepthFunc(7);
-    fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 2, 1);
+    RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 2, 1);
     RenderState_Flush();
     GXSetZMode(1, 7, 1);
     RenderView_DrawPrimitive(0xA1, aRect[0], NULL, NULL, 2);
     RenderState_SetAlphaTest(1, 6, 0x80);
     RenderState_SetDepthFunc(3);
-    fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
+    RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
     RenderState_Flush();
 
     // the object's own lens
@@ -216,15 +216,15 @@ void UI_Obj_RenderBoostUI(int nObj) {
     CA_vSetLookAt(lbl_802820CC, aEye, lbl_8018EC10);
     fn_80045470(lbl_802820CC, 0.00879646f);
     fn_800AF0A8(lbl_802820CC);
-    fn_800352BC();
-    fn_80013CCC(Camera_GetCurrent());
-    fn_80013EEC(Camera_GetCurrent());
+    RC_UpdateCurrentScreenMatrices();
+    RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
+    RenderState_SetViewport(Camera_GetCurrent());
     RenderState_SetCameraMatrices();
 
     fBoost = (f32)gPlayers[nPlayer].swing.nPowerBoost / 8.0f;
     RenderState_SetDrawFlags(0x50);
     RenderState_SetDepthWrite(1);
-    fn_8001425C(1);
+    RenderView_SetUseCurrentMatrices(1);
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetAlphaTest(1, 4, 1);
 
@@ -350,12 +350,12 @@ void UI_Obj_RenderBoostUI(int nObj) {
     }
 
     // the view as it was
-    fn_80035240(NULL);
+    RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
     fn_800AF0A8(pLens);
     RenderState_SetCameraMatrices();
-    fn_800352BC();
-    fn_80013CCC(Camera_GetCurrent());
-    fn_80035098(0);
+    RC_UpdateCurrentScreenMatrices();
+    RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
+    RenderState_SetConstantAlphaOn(0);
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetAlphaTest(1, 6, 0x80);
     RenderState_SetDepthFunc(3);
@@ -371,10 +371,10 @@ void fn_800AEFE4(void) {
     fn_8003612C(&lbl_801F5B40);
     fn_8006EADC(lbl_802820D0);
     RenderState_SetBlendFactors(4, 5);
-    fn_80035098(1);
-    fn_80035154(255.0f * lbl_80281478);
+    RenderState_SetConstantAlphaOn(1);
+    RenderState_SetConstantAlpha(255.0f * lbl_80281478);
     RenderState_Flush();
-    fn_80035240(lbl_802820D0->m80);
+    RC_vSetCurrentRenderCtxTransformationMatrix(lbl_802820D0->m80);
     fn_80035294();
     RenderState_SetCameraMatrices();
     RenderState_SetClipMode(1);

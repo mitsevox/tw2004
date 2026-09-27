@@ -19,7 +19,7 @@ void Mtx_Identity(f32 (*pMtx)[4]);                       // identity
 void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void fn_8000C5A4(f32 (*pMtx)[4]);
 void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 f);
-f32  fn_800351D8(u32 n, f32 fPeriod);                   // GoTerrain.c
+f32  Ter_GetTimeInCycle(u32 n, f32 fPeriod);                   // GoTerrain.c
 int  fn_8004AB90(UObjMesh* pMesh, int i);
 UObjMesh* fn_8004ABA4(UObjMesh* pMesh, int i);
 UObjMesh* fn_8004ABB4(UObjModelRoot* pRoot);
@@ -303,7 +303,7 @@ void fn_8004A24C(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
 // A wave from 0 to 1 and back, fRate times a second, at frame nFrame (our macro: EA's code reads
 // fRate twice at each use, which an inline function would not).
 #define ANIMAL_WAVE(nFrame, fRate) \
-    (0.5f * Math_Sin(6.2831855f * (fRate) * fn_800351D8((nFrame), 1.0f / (fRate))) + 0.5f)
+    (0.5f * Math_Sin(6.2831855f * (fRate) * Ter_GetTimeInCycle((nFrame), 1.0f / (fRate))) + 0.5f)
 
 // Message 6, the per-frame update: moves the animal along its route, speeds it up or slows it
 // down (b1BC: moving), counts down its moving (f190) and resting (f18C) times, and animates its

@@ -319,7 +319,7 @@ They will be sorted into the sections below.
   written twice (`if (n < 30) { if (x) return 1; return t; } return t;`, fe_craputils fn_8005832C).
 - **[verified] `b = b != 0;`** before a test reproduces `clrlwi; neg; or; srwi.` (char fn_8001BA74).
 - **[verified] Two calls multiplied: the right-hand one runs first** (`f(a) * f(b)`; Skeleton fn_80026D18,
-  GoRenderCtx fn_80013EEC). `f = call(); f *= c;` puts the call result first in `fmuls`; `call() * c` puts
+  GoRenderCtx RenderState_SetViewport). `f = call(); f *= c;` puts the call result first in `fmuls`; `call() * c` puts
   the constant first (GoCamCont fn_80063F08, TexAnimManager fn_80076C20).
 - **[verified] A switch's compare tree shows its empty cases**: add `case 0: case 3: break;` to get it
   (GoAnimalActors fn_8004A578, GoLighting fn_8006E7A4); a one-case switch with default gives `beq A; b B`

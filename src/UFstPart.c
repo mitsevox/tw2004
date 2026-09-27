@@ -19,7 +19,7 @@ void fn_800360A0(ShaderObject* pObj);
 void fn_800360D4(ShaderObject* pObj);
 
 void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
-f32  fn_800351D8(u32 n, f32 fPeriod);                   // GoTerrain.c
+f32  Ter_GetTimeInCycle(u32 n, f32 fPeriod);                   // GoTerrain.c
 
 void fn_80098BDC(PsEmitter* pEmitter);
 u32  fn_8009912C(PsEmitter* pEmitter, int n, f32 fStep, f32 fLiveStep);
@@ -483,7 +483,7 @@ PsEmitter* fn_80099758(ParticleParams* pParams) {
     pEmitter->f4C = 0.0f;
     pEmitter->n50 = 0;
     if (pEmitter->params.f94) {
-        pEmitter->f48 = pEmitter->params.f94 - fn_800351D8(gSession.nFrameCount, pEmitter->params.f18);
+        pEmitter->f48 = pEmitter->params.f94 - Ter_GetTimeInCycle(gSession.nFrameCount, pEmitter->params.f18);
         if (pEmitter->f48 < 0.0f) {
             pEmitter->f48 += pEmitter->params.f18;
         }

@@ -2330,7 +2330,7 @@ u8 fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ) {
     return 1;
 }
 
-// A flag byte of a course object's model (GoTerrain.c's fn_800354D0 reads the same bytes).
+// A flag byte of a course object's model (GoTerrain.c's Ter_GetMeshFlags reads the same bytes).
 // Ter_CheckObjectAndHazardObstruction finds the model with fn_80034A20 (from the object's nPatch
 // and nObjList) and tests bit 0x40 of byte n = 0.
 int fn_80050BD8(UObjMesh* pModel, int n) {

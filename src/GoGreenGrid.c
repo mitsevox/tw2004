@@ -17,7 +17,7 @@ void fn_80036054(void* pMesh, int n, s32* pDesc);
 void fn_800360A0(void* pMesh);
 void fn_800360D4(u8* pMesh);
 void fn_80035294(void);
-void fn_800352BC(void);
+void RC_UpdateCurrentScreenMatrices(void);
 void fn_800354B4(u8* p, f32 v);         // sets the lens's f32 at 0xAC (fn_80014268 reads it)
 f32  fn_80014268(u8* p);
 
@@ -462,7 +462,7 @@ void fn_8009C914(int nView) {
     pLens = ((Camera*)*lbl_80280DF0)->unk10;
     fAC = fn_80014268((u8*)pLens);
     fn_800354B4((u8*)pLens, 500.0f + fAC);
-    fn_800352BC();
+    RC_UpdateCurrentScreenMatrices();
     fn_80035294();
     RenderState_SetCameraMatrices();
     RenderState_SetCameraMatrices();

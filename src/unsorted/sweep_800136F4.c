@@ -2,12 +2,12 @@
 
 #include "game_types.h"
 
-void fn_80013D5C();
+void RC_vSetCurrentRenderCtx();
 
 void fn_800136F4(void);
 void fn_80013718(void);
 void fn_800136F4(void) {
-    fn_80013D5C(0);
+    RC_vSetCurrentRenderCtx(0);
 }
 
 void fn_80013718(void) {

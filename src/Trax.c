@@ -94,7 +94,7 @@ void fn_800BA1A4(void) {
         RenderState_SetBlendFactors(4, 5);
         RenderState_SetAlphaTest(0, 6, 0x80);
         RenderState_SetDepthFunc(7);
-        fn_8001425C(0);
+        RenderView_SetUseCurrentMatrices(0);
         RenderState_SetDepthWrite(0);
         if (fn_800BA080()) {
             fn_8005CC64(pBank, pTex);
@@ -115,7 +115,7 @@ void fn_800BA1A4(void) {
             vColour[3] = fn_800BA504(0.15f);
         }
         RenderView_SetColor(vColour);
-        fn_800141F8(aXY, aUV, fn_800BA440(), fn_800BA40C(), fn_800BA440() + fn_800BA3D8(),
+        RenderView_MakeQuad(aXY, aUV, fn_800BA440(), fn_800BA40C(), fn_800BA440() + fn_800BA3D8(),
                     fn_800BA40C() + fn_800BA3A4());
         RenderView_DrawPrimitive(0xA1, aXY, 0, aUV, 2);
         fn_800BA550();

@@ -19,19 +19,19 @@ void fn_800B24D0(int nWidth, int nHeight);
 void fn_800B26DC(void);
 void fn_800B2724(void);
 void fn_800B2DB0(f32* pCentre, f32 (*pQuad)[4], f32 fHalfX, f32 fHalfZ);
-void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
+void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80035294(void);                 // GoTerrain.c
-void fn_800352BC(void);
+void RC_UpdateCurrentScreenMatrices(void);
 void fn_80035604(void);                 // GoTerrain.c
 void fn_800358E0(Character* pChar, u32 uFlags);
 u8   Character_IsGolfer(Character* pChar);
 void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
-void fn_80013D5C(void* pCamera);        // makes it the current render camera
+void RC_vSetCurrentRenderCtx(void* pCamera);        // makes it the current render camera
 void Mtx_Identity(f32 (*pMtx)[4]);       // identity
 void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: copy a 4x4 matrix
 void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: inverts a rotation+translation
 void fn_8001728C(CamLens* pLens);
-f32  fn_80014280(f32 x);                // tan, as a float
+f32  Math_Tan(f32 x);                // tan, as a float
 void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_800B2470(void);
@@ -144,7 +144,7 @@ void fn_800B251C_ShadowInit(u8 bHigh) {
     FB_vSetFrameBuffer(p->pFrameBuf, 0.0f, 0.0f, 256.0f, 256.0f, 1.0f, 1.0f);
     fn_800171D8(p->pRect, 0.0f, 0.0f, 1.0f, 1.0f);
     fn_800B3438(p->pRect, 1.0f, 1.0f);
-    p->pCamera = fn_8001371C(p->pLens, p->pFrameBuf, p->pRect);
+    p->pCamera = RC_spCreateRenderCtx(p->pLens, p->pFrameBuf, p->pRect);
     fn_800B24D0(256, 256);
     fn_800B26DC();
     fn_800B2438(bHigh);
@@ -183,7 +183,7 @@ void fn_800B2734(void) {
         p->pFrameBuf = NULL;
     }
     if (p->pCamera != NULL) {
-        fn_800137B0(p->pCamera);
+        RC_vReleaseRenderCtx(p->pCamera);
         p->pCamera = NULL;
     }
     if (p->pRect != NULL) {
@@ -211,7 +211,7 @@ void fn_800B281C(void) {
     fn_80016B54(lbl_802814A8->nWidth, lbl_802814A8->nHeight, 1.0f, 1.0f);
     fn_80016948();
     fn_800169AC();
-    fn_8001425C(0);
+    RenderView_SetUseCurrentMatrices(0);
     RenderState_SetDrawFlags(0);
     RenderState_SetAlphaTest(0, 6, 0x80);
     RenderState_Flush();
@@ -219,7 +219,7 @@ void fn_800B281C(void) {
     aColour[1] = 0.0f;
     aColour[2] = 0.0f;
     aColour[3] = 0.0f;
-    fn_800141F8(aXY, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
+    RenderView_MakeQuad(aXY, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
     aXY[2] = 0.0f;
     aXY[6] = 0.0f;
     RenderView_SetColor(aColour);
@@ -265,7 +265,7 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     int         k;
 
     pOldCamera = Camera_GetCurrent();
-    fn_80013D5C(p->pCamera);
+    RC_vSetCurrentRenderCtx(p->pCamera);
     fMinX = 1000000.0f;
     fMaxX = -1000000.0f;
     fMinZ = fMinX;
@@ -357,13 +357,13 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     aView[2][1] = 1.0f / fHalfZ;
     aView[3][0] = -vCentre[0] / fHalfX;
     aView[3][1] = -vCentre[2] / fHalfZ;
-    aView[3][2] = 1.0f / fn_80014280(0.5f * p->pLens->fFov);
+    aView[3][2] = 1.0f / Math_Tan(0.5f * p->pLens->fFov);
     fn_800BADF8(aView, aLight, aMtx, 4);
     fn_800B3484(Camera_GetCurrentLens(), aMtx);
-    fn_800352BC();
-    fn_80013CCC(Camera_GetCurrent());
-    fn_800140E8(0, p->nWidth, p->nHeight, 0, 4, 1);
-    fn_80013EEC(Camera_GetCurrent());
+    RC_UpdateCurrentScreenMatrices();
+    RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
+    RenderState_SetRenderSurface(0, p->nWidth, p->nHeight, 0, 4, 1);
+    RenderState_SetViewport(Camera_GetCurrent());
     RenderState_SetCameraMatrices();
     RenderState_SetDrawFlags(0);
     RenderState_SetDepthWrite(0);
@@ -380,10 +380,10 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     RenderState_SetDepthWrite(1);
     RenderState_SetAlphaTest(1, 6, 0x80);
     RenderState_SetDepthFunc(3);
-    fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
+    RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
     fn_800760B0(0, 0, 0x200, 0x1C0);
-    fn_80013D5C(pOldCamera);
-    fn_80013EEC(Camera_GetCurrent());
+    RC_vSetCurrentRenderCtx(pOldCamera);
+    RenderState_SetViewport(Camera_GetCurrent());
     RenderState_Flush();
 }
 
@@ -422,9 +422,9 @@ void fn_800B2DB0(f32* pCentre, f32 (*pQuad)[4], f32 fHalfX, f32 fHalfZ) {
         pUV[1] = fScaleZ * (pCentre[2] - pPos[2]);
         *pColour = 0x80000000;
     }
-    fn_80035240(lbl_80281EE0->mC0);
-    fn_800352BC();
-    fn_80013CCC(Camera_GetCurrent());
+    RC_vSetCurrentRenderCtxTransformationMatrix(lbl_80281EE0->mC0);
+    RC_UpdateCurrentScreenMatrices();
+    RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
     RenderState_SetDrawFlags(0x70);
     fn_8002A608(&p->tex);
     RenderState_SetCameraMatrices();
@@ -517,16 +517,16 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
         return;
     }
     nList = fn_800CB950(pCourse, aQuad[0], aQuad[1], aQuad[2], aQuad[3], aList, 0x200, 0x60);
-    fn_80035240(NULL);
+    RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
     fn_80035294();
-    fn_80013EEC(Camera_GetCurrent());
+    RenderState_SetViewport(Camera_GetCurrent());
     RenderState_SetDrawFlags(0x70);
     RenderState_SetCameraMatrices();
     RenderState_SetClipMode(0);
     RenderState_SetDepthFunc(3);
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetAlphaTest(0, 6, 0x80);
-    fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
+    RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
     fn_8002A608(&p->tex);
     RenderState_Flush();
 
@@ -581,7 +581,7 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     fn_800360D4(p->aMesh[nView]);
     RenderState_SetDepthFunc(3);
     RenderState_SetAlphaTest(1, 6, 0x80);
-    fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 1, 1);
+    RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 1, 1);
     RenderState_Flush();
 }
 

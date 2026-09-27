@@ -8,7 +8,7 @@ void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: copy a 4x4 mat
 void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: inverts a rotation+translation
 void Mtx_Identity(f32 (*pMtx)[4]);                     // identity
 void fn_8001728C(CamLens* pLens);
-f32  fn_80014280(f32 x);                              // tan, as a float
+f32  Math_Tan(f32 x);                              // tan, as a float
 void fn_800354B4(u8* p, f32 v);                       // GoTerrain.c: sets the lens's fAC
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void CA_vSetMatrix(CamLens* pLens, f32 (*pMtx)[4]);
@@ -19,7 +19,7 @@ void fn_80076A38(f32* pA, f32* pOut);
 
 // fB0 is 1 at the default 60-degree field of view: tan(fov / 2) over tan(30 degrees).
 void CA_vUpdateInternalFieldOfViewData(CamLens* pLens) {
-    pLens->fB0 = fn_80014280(0.5f * pLens->fFov) / 0.57735026f;
+    pLens->fB0 = Math_Tan(0.5f * pLens->fFov) / 0.57735026f;
 }
 
 CamLens* CA_spCreateCamera(void) {

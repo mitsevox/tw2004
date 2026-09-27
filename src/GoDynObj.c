@@ -306,7 +306,7 @@ void fn_80046828(int nView) {
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetAlphaTest(1, 6, 0x80);
     RenderState_SetDepthFunc(3);
-    fn_80035338(1);
+    LF_vSetCurrentLightFogEnvironment(1);
     fn_80035308();
     fn_800352E4();
     RenderState_Flush();
@@ -393,12 +393,12 @@ void fn_80046B8C(int nView) {
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetAlphaTest(1, 6, 0x80);
     RenderState_SetDepthFunc(3);
-    fn_80035338(1);
+    LF_vSetCurrentLightFogEnvironment(1);
     fn_80035308();
     fn_800352E4();
     RenderState_Flush();
     fn_8004731C(aState);
-    fn_80035240(NULL);
+    RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
     if (gSession.nSplitScreen == 0) {
         fn_80047290();
         if ((s8)GOLFERSTATE_GetCurrentState(ViewController_GetPlayer(nView)) != 9) {

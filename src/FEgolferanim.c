@@ -110,11 +110,11 @@ void fn_8008AD80(void);
 void fn_80007254(void);
 void fn_80008380(void);
 void Mtx_Identity(f32 (*m)[4]);          // identity matrix
-void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
+void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
 void fn_80016E90(int nView);
-void fn_800352BC(void);
+void RC_UpdateCurrentScreenMatrices(void);
 void fn_80035754(Character* pChar);
 void fn_80035810(Character* pChar);
 void fn_80035FBC(void);
@@ -726,11 +726,11 @@ void sFE_AdjustAndSetGolferPosition(void) {
     // fn_8008E254.
     if (lbl_80281EE0->pB4->pChar != NULL && lbl_80281EE0->n0 == 3) {
         if (lbl_80281EE0->b1C8 == 0) {
-            if (fn_80014300(Controller_GetButtonMask(0x33, 0))
-                || fn_80014300(Controller_GetButtonMask(0x33, 1))) {
+            if (Controller_AnyPadHasButtons(Controller_GetButtonMask(0x33, 0))
+                || Controller_AnyPadHasButtons(Controller_GetButtonMask(0x33, 1))) {
                 fn_8008E0B0(0.05f);
-            } else if (fn_80014300(Controller_GetButtonMask(0x34, 0))
-                       || fn_80014300(Controller_GetButtonMask(0x34, 1))) {
+            } else if (Controller_AnyPadHasButtons(Controller_GetButtonMask(0x34, 0))
+                       || Controller_AnyPadHasButtons(Controller_GetButtonMask(0x34, 1))) {
                 fn_8008E0B0(-0.05f);
             } else {
                 fn_8008E0B0(0.0f);
@@ -739,8 +739,8 @@ void sFE_AdjustAndSetGolferPosition(void) {
             fn_8008E0B0(0.0f);
         }
         if (lbl_80281EE0->b1C8 == 0 && lbl_80281EE0->n8 == 0
-            && (fn_80014300(Controller_GetButtonMask(0x35, 0))
-                || fn_80014300(Controller_GetButtonMask(0x35, 1)))) {
+            && (Controller_AnyPadHasButtons(Controller_GetButtonMask(0x35, 0))
+                || Controller_AnyPadHasButtons(Controller_GetButtonMask(0x35, 1)))) {
             fn_8008E254(1);
         } else {
             fn_8008E254(0);
@@ -833,7 +833,7 @@ void sFE_AdjustAndSetGolferPosition(void) {
         if (lbl_80281EE0->pB4->pChar->n1698 == 0) {
             fn_80035B40(lbl_80281EE0->pB4->pChar, 0);
         }
-        fn_80035338(0);
+        LF_vSetCurrentLightFogEnvironment(0);
         if (lbl_80281EE0->pB4->pChar->p44 != NULL) {
             // Screen kind 1 with b83 set lights him with all-zero settings; otherwise with his
             // own, which sit in p44's entry 21 (port: read as LightParams, both 0x30 bytes).
@@ -888,17 +888,17 @@ void fn_8008C93C(void) {
     RenderState_SetAlphaTest(0, 6, 0x80);
     RenderState_SetDepthFunc(7);
     RenderState_SetDepthWrite(1);
-    fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 1, 1);
-    fn_80013EEC(Camera_GetCurrent());
-    fn_8001425C(0);
+    RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 1, 1);
+    RenderState_SetViewport(Camera_GetCurrent());
+    RenderView_SetUseCurrentMatrices(0);
     RenderView_SetColor(colour);
     RenderState_SetDrawFlags(0);
     RenderState_Flush();
     RenderView_DrawPrimitive(0xA1, xy, 0, NULL, 2);
     RenderState_SetDepthFunc(3);
     RenderState_SetDepthWrite(1);
-    fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
-    fn_80013EEC(Camera_GetCurrent());
+    RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
+    RenderState_SetViewport(Camera_GetCurrent());
     RenderState_Flush();
 }
 
@@ -910,12 +910,12 @@ void fn_8008CA88(void) {
 
     RenderState_SetAlphaTest(0, 6, 0x80);
     RenderState_SetDepthFunc(7);
-    fn_80035098(0);
+    RenderState_SetConstantAlphaOn(0);
     RenderState_SetBlendFactors(4, 5);
-    fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
-    fn_80013EEC(Camera_GetCurrent());
+    RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
+    RenderState_SetViewport(Camera_GetCurrent());
     RenderState_SetDrawFlags(0x50);
-    fn_8001425C(0);
+    RenderView_SetUseCurrentMatrices(0);
     colour[3] = lbl_80281EE0->f14C;
     RenderView_SetColor(colour);
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
@@ -938,10 +938,10 @@ void fn_8008CC30(void) {
     RenderState_SetDepthFunc(7);
     RenderState_SetDepthWrite(0);
     RenderState_SetBlendFactors(4, 5);
-    fn_80035098(0);
-    fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 4, 1);
-    fn_80013EEC(Camera_GetCurrent());
-    fn_8001425C(0);
+    RenderState_SetConstantAlphaOn(0);
+    RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 4, 1);
+    RenderState_SetViewport(Camera_GetCurrent());
+    RenderView_SetUseCurrentMatrices(0);
     RenderView_SetColor(colour1);
     RenderState_SetDrawFlags(0);
     RenderState_Flush();
@@ -952,8 +952,8 @@ void fn_8008CC30(void) {
     RenderView_DrawPrimitive(0xA1, xy2, 0, NULL, 2);
     RenderState_SetDepthFunc(3);
     RenderState_SetDepthWrite(1);
-    fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
-    fn_80013EEC(Camera_GetCurrent());
+    RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
+    RenderState_SetViewport(Camera_GetCurrent());
     RenderState_Flush();
 }
 
@@ -975,18 +975,18 @@ void fn_8008CE88(u8 bFull) {
     }
     if (lbl_80281EE0->pB4->b18 && lbl_80281EE0->b86 == 0) {
         fn_80035FDC(NULL);
-        fn_80035240(lbl_80281EE0->mC0);
-        fn_800352BC();
-        fn_80013CCC(Camera_GetCurrent());
+        RC_vSetCurrentRenderCtxTransformationMatrix(lbl_80281EE0->mC0);
+        RC_UpdateCurrentScreenMatrices();
+        RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
         RenderState_SetCameraMatrices();
         RenderState_SetClipMode(1);
         RenderState_SetAlphaTest(1, 6, 1);
         if (bFull) {
-            fn_800140E8(1, 384, 528, 0, 1, 1);
+            RenderState_SetRenderSurface(1, 384, 528, 0, 1, 1);
         } else {
-            fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 1, 1);
+            RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 1, 1);
         }
-        fn_80013EEC(Camera_GetCurrent());
+        RenderState_SetViewport(Camera_GetCurrent());
         RenderState_Flush();
         RenderState_SetDepthWrite(1);
         RenderState_SetDepthFunc(3);
@@ -1001,8 +1001,8 @@ void fn_8008CE88(u8 bFull) {
             fn_80035810(lbl_80281EE0->pB4->pChar);
         }
         fn_80035FBC();
-        fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
-        fn_80013EEC(Camera_GetCurrent());
+        RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
+        RenderState_SetViewport(Camera_GetCurrent());
         RenderState_Flush();
     }
     if (lbl_80281EE0->pB4->b18 && lbl_80281EE0->b86 == 0) {
@@ -1217,7 +1217,7 @@ void fn_8008D9DC(UStreamObject* pObject) {
     pDst = lbl_80281EE4;
     ByteSwap_Records(&pSrc, &pDst, aHeader, sizeof(aHeader) / sizeof(aHeader[0]), 1);
     ByteSwap_Records(&pSrc, &pDst, aLight, sizeof(aLight) / sizeof(aLight[0]), lbl_80281EE4->nLights);
-    fn_80035338(0);
+    LF_vSetCurrentLightFogEnvironment(0);
     fn_800935CC(lbl_80281EE4);
     fn_8003534C();
     StaticMem_Free(pObject);

@@ -525,7 +525,7 @@ void fn_800DC290(f32 fHeight) {
     f32 colour[4];
     f32 xy[8];
     f32 uv[8];
-    fn_8001425C(0);
+    RenderView_SetUseCurrentMatrices(0);
     RenderState_SetDepthWrite(0);
     RenderState_SetDepthFunc(7);
     RenderState_SetAlphaTest(0, 6, 0x80);
@@ -535,10 +535,10 @@ void fn_800DC290(f32 fHeight) {
     colour[1] = 0.0f;
     colour[2] = 0.0f;
     colour[3] = 0.5f;
-    fn_800141F8(xy, uv, 0.0f, 0.0f, 1.0f, fHeight);
+    RenderView_MakeQuad(xy, uv, 0.0f, 0.0f, 1.0f, fHeight);
     RenderView_SetColor(colour);
     RenderView_DrawPrimitive(0xA1, xy, 0, uv, 2);
-    fn_800141F8(xy, uv, 0.0f, 1.0f - fHeight, 1.0f, 1.0f);
+    RenderView_MakeQuad(xy, uv, 0.0f, 1.0f - fHeight, 1.0f, 1.0f);
     RenderView_SetColor(colour);
     RenderView_DrawPrimitive(0xA1, xy, 0, uv, 2);
     RenderState_SetDepthWrite(1);

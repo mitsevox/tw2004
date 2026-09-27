@@ -33,7 +33,7 @@ typedef struct Camera {
     /* 0x000 */ float a0[4];         // 0, 0, 0.5, 0 at setup (GoRenderCtx_Gc.c fn_80013E48)
     /* 0x010 */ CamLens* unk10;
     /* 0x014 */ float* pRect;        // its screen rectangle (camera.h RenderCamera; fn_80013E28 sets it)
-    /* 0x018 */ GoFrameBuf* pBuf;    // its frame buffer (GoRenderCtx_Gc.c fn_8001371C)
+    /* 0x018 */ GoFrameBuf* pBuf;    // its frame buffer (GoRenderCtx_Gc.c RC_spCreateRenderCtx)
     /* 0x01C */ char pad1C[0x40];
     /* 0x05C */ float m5C[4][4];     // camera space to the screen (GoDynObj.c fn_8004787C divides by w)
     /* 0x09C */ float m9C[4][4];     // streammanagerhole.c RenderState_SetCameraMatrices copies it to lbl_801B8980.m74
@@ -64,7 +64,7 @@ typedef struct Camera {
     /* 0x22C */ int n22C;            // 0 (RC_vUpdate...)
     /* 0x230 */ float f230;          // -log2(f1E0 / 554.256) (RC_vUpdate...)
 } Camera;
-LAYOUT_ASSERT(Camera, 0x234);       // GoRenderCtx_Gc.c fn_8001371C allocates 0x234 bytes
+LAYOUT_ASSERT(Camera, 0x234);       // GoRenderCtx_Gc.c RC_spCreateRenderCtx allocates 0x234 bytes
 
 GoFrameBuf* fn_80013E40(Camera* pCamera);   // GoRenderCtx_Gc.c: the camera's frame buffer
 

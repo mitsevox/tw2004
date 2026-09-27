@@ -989,7 +989,7 @@ void fn_8005A850(int nPlayer) {
             }
             RenderState_SetClipMode(0);
             RenderState_SetCameraMatrices();
-            fn_80013EEC(Camera_GetCurrent());
+            RenderState_SetViewport(Camera_GetCurrent());
             RenderState_SetDrawFlags(0x50);
             RenderState_SetBlendFactors(4, 5);
             RenderState_SetAlphaTest(0, 6, 0x80);

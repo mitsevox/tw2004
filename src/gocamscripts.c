@@ -1663,9 +1663,11 @@ void CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPl
     pShot->f74 = 0.0f;
     pShot->bAA = 1;
     if (bView1) {
-        pShot->f78 = fn_80014278(Camera_GetLens(fn_80016CFC(gPlayers[nPlayer].nView[1])->pCamera));
+        pShot->f78
+                = CA_fGetCameraFieldOfView(Camera_GetLens(fn_80016CFC(gPlayers[nPlayer].nView[1])->pCamera));
     } else {
-        pShot->f78 = fn_80014278(Camera_GetLens(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera));
+        pShot->f78
+                = CA_fGetCameraFieldOfView(Camera_GetLens(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera));
         pShot->f78 -= GameEffects_FieldOfViewChange();
     }
     pShot->f7C = pShot->f78;

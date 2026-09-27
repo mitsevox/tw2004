@@ -10,7 +10,7 @@ UITransform       lbl_801D91FC;         // a copy of the current level
 f32               lbl_801D91F0[3];      // the UI view: field of view, tan of half of it, distance
 UITransformStack* lbl_80281F38;         // the stack (fn_8009349C)
 
-f32  fn_80014280(f32 x);                // tan
+f32  Math_Tan(f32 x);                // tan
 
 // 4x4 matrix helpers (the engine's; declared here until their own files are written).
 void Mtx_Identity(f32 m[4][4]);                                          // identity
@@ -155,7 +155,7 @@ void fn_80093280(int nOp, UITransformDesc* p) {
         lbl_80281F38->aLevel[lbl_80281F38->nTop].f6C = 1.0f;
         lbl_80281F38->aLevel[lbl_80281F38->nTop].f70 = 1.0f;
         lbl_801D91F0[0] = DEG(50.0f);
-        lbl_801D91F0[1] = fn_80014280(0.5f * lbl_801D91F0[0]);
+        lbl_801D91F0[1] = Math_Tan(0.5f * lbl_801D91F0[0]);
         lbl_801D91F0[2] = 256.0f * (1.0f / lbl_801D91F0[1]);
         break;
     case 1:

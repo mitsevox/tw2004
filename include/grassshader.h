@@ -173,7 +173,7 @@ typedef struct GrassManager {
     f32          f22C;          // 0x22C  16 * f410 * sin(f40C)
     f32          av230[16][4];  // 0x230  16 points around a circle of radius f41C, phase f414
     u8           unk330[0x348 - 0x330];
-    // 0x348..0x370: the block fn_8011F3AC hands to fn_8003519C (row 17) once per buffer and pass.
+    // 0x348..0x370: the block fn_8011F3AC hands to SD_SetShaderTypeParameters (row 17) once per buffer and pass.
     f32          f348;          // 0x348  f3D0
     f32          f34C;          // 0x34C  the buffer's f0
     f32          f350;          // 0x350  the buffer's f4

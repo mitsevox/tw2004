@@ -7,7 +7,7 @@
 #include "camera.h"
 #include "terrain.h"
 
-void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
+void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
 void fn_80035F1C(void);
 
@@ -152,14 +152,14 @@ void DF_vDrawBufferToScreen(int n) {
     fX1 = fX0 + pRect[2];
     fY1 = fY0 + pRect[3];
     fn_8002A608(&lbl_801D5198);
-    fn_8001425C(0);
+    RenderView_SetUseCurrentMatrices(0);
     RenderState_SetDrawFlags(0x50);
     RenderState_SetDepthWrite(0);
     RenderState_SetBlendFactors(4, 5);
-    fn_80035098(1);
+    RenderState_SetConstantAlphaOn(1);
     RenderState_SetAlphaTest(0, 6, 0x80);
     for (i = 0; i < 5; i++) {
-        fn_800141F8(aXY, aUV, 0.0f, 0.0f, 1.0f, 1.0f);
+        RenderView_MakeQuad(aXY, aUV, 0.0f, 0.0f, 1.0f, 1.0f);
         bOdd = i % 2;
         aUV[0] = fX0;
         fOffset = lbl_80281114 * ((f32)(5 - i) / (lbl_8028111C * (f32)(i + 1)));
@@ -185,15 +185,15 @@ void DF_vDrawBufferToScreen(int n) {
         aColour[2] = lbl_801D5110[n].aColour[2];
         aColour[3] = lbl_801D5110[n].f4 * lbl_801D5110[n].f14 / (lbl_80281120[0] * (f32)(i + 1));
         RenderView_SetColor(aColour);
-        fn_80035154(255.0f * aColour[3]);
+        RenderState_SetConstantAlpha(255.0f * aColour[3]);
         RenderState_Flush();
         RenderView_DrawPrimitive(0xA1, aXY, NULL, aUV, 2);
     }
     RenderState_SetDepthWrite(1);
-    fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
+    RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80035F1C();
     RenderState_SetAlphaTest(1, 6, 0x80);
-    fn_80035098(0);
+    RenderState_SetConstantAlphaOn(0);
     RenderState_Flush();
 }

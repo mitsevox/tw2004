@@ -332,7 +332,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
         if (gPlayers[nPlayer].ball.nState == 0 && !bInHand) {
             AI_RehearseShot(nPlayer, NULL, 0, CPU_TOLERANCE);
         }
-        if (!fn_80100294() && fn_80014300(Controller_GetButtonMask(0, 0))) {
+        if (!fn_80100294() && Controller_AnyPadHasButtons(Controller_GetButtonMask(0, 0))) {
             fn_800C70F8(pV, 1);
             if (!fn_80063C90(pV)) {
                 CameraController_FadeOut(pV, 0.25f, (f32*)&vOffset);
@@ -563,7 +563,8 @@ void STATEFUNC_SwingInit(int nPlayer) {
     fn_80062B68(nPlayer);
 }
 
-// State 10 every frame: the swing. The swing phase runs; an idle timer (reset by fn_80014300 or a
+// State 10 every frame: the swing. The swing phase runs; an idle timer (reset by Controller_AnyPadHasButtons
+// or a
 // swing phase past 0, wraps at 10 s). When the ball is hit: GM_BallHit, the RNG stream 1 is
 // reseeded from the session seed, the view told, and it is state 11 (the swing animation) on a
 // special camera (with gpGame+0x283) - or state 12 straight away. Otherwise, for a human outside a
@@ -577,7 +578,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
     if (fn_800E5098()) return;
     bSwung = fn_80058F5C(nPlayer);
     gPlayers[nPlayer].fC20 += gSession.fFrameTime;
-    if (fn_80014300(gPlayers[nPlayer].nController) || gPlayers[nPlayer].swing.nState != 0) {
+    if (Controller_AnyPadHasButtons(gPlayers[nPlayer].nController) || gPlayers[nPlayer].swing.nState != 0) {
         gPlayers[nPlayer].fC20 = 0.0f;
     }
     if (gPlayers[nPlayer].fC20 >= 10.0f) {
@@ -984,7 +985,7 @@ void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
             return;
         }
     } else {
-        if (fn_80014300(Controller_GetButtonMask(0, 0))) {
+        if (Controller_AnyPadHasButtons(Controller_GetButtonMask(0, 0))) {
             GOLFERSTATE_Pop(nPlayer);
             return;
         }
@@ -1244,9 +1245,9 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
     fn_8006BB5C(nPlayer);
     if (gpGame->b286 != 0 && !fn_8004560C()) {
         if (Player_IsCPU(nPlayer)) {
-            if (fn_80014300(Controller_GetButtonMask(0x16, 1))) {
+            if (Controller_AnyPadHasButtons(Controller_GetButtonMask(0x16, 1))) {
                 bA = 1;
-            } else if (fn_80014300(Controller_GetButtonMask(0x17, 1))) {
+            } else if (Controller_AnyPadHasButtons(Controller_GetButtonMask(0x17, 1))) {
                 bB = 1;
             }
         } else {
@@ -1486,7 +1487,7 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
             fn_800E41D4(nPlayer);
         }
     } else {
-        if (fn_80014300(Controller_GetButtonMask(0, 0))) {
+        if (Controller_AnyPadHasButtons(Controller_GetButtonMask(0, 0))) {
             fn_800E41D4(nPlayer);
         }
     }
@@ -1792,16 +1793,16 @@ void STATEFUNC_InitialFlyByInit(int nPlayer) {
 }
 
 // State 20 (the hole flyover): pops when the option skips cameras, the camera finishes, or button 0
-// is pressed on any pad (fn_80014300); the confirm hooks (fn_80062B88, fn_80062B7C) return 1.
+// is pressed on any pad (Controller_AnyPadHasButtons); the confirm hooks (fn_80062B88, fn_80062B7C) return 1.
 void STATEFUNC_InitialFlyByUpdate(int nPlayer) {
     u8 bDone = 0;
-    if (gSession.a8[0] == 0 || !fn_80014300(0)) {
+    if (gSession.a8[0] == 0 || !Controller_AnyPadHasButtons(0)) {
         if (gSession.options.bSkipCameras) {
             bDone = 1;
         } else if (fn_800172C4(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]))) {
             bDone = 1;
         } else if (!fn_80100294()) {
-            if (fn_80014300(Controller_GetButtonMask(0, 0)) || fn_80062B90()) {
+            if (Controller_AnyPadHasButtons(Controller_GetButtonMask(0, 0)) || fn_80062B90()) {
                 if (fn_80062B88(nPlayer)) {
                     bDone = 1;
                     fn_80062B84(0);
@@ -1881,7 +1882,7 @@ void STATEFUNC_MidHoleFlyByUpdate(int nPlayer) {
             Gaud_StopComment();
         }
     } else {
-        if (fn_80014300(Controller_GetButtonMask(0, 0))) {
+        if (Controller_AnyPadHasButtons(Controller_GetButtonMask(0, 0))) {
             bDone = 1;
             Gaud_StopComment();
         }

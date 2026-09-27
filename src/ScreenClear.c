@@ -41,7 +41,7 @@ void fn_800BA74C(u8 bFade) {
     bOther = lbl_802821F0 != 1;
     colour[3] = bFade ? 0.1f : 0.5f;
     RenderView_SetColor(colour);
-    fn_800141F8(xy, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
+    RenderView_MakeQuad(xy, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
     fn_80008380();
     if (bFade) {
@@ -63,7 +63,7 @@ void fn_800BA74C(u8 bFade) {
             fn_800760B0(0, 0, 512, 448);
         }
         RenderState_SetBlendFactors(4, 5);
-        fn_8001425C(0);
+        RenderView_SetUseCurrentMatrices(0);
         RenderState_SetDrawFlags(64);
         RenderState_SetAlphaTest(0, 6, 0x80);
         RenderState_SetDepthFunc(7);

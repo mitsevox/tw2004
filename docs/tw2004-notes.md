@@ -193,7 +193,7 @@ Frustum setup and widescreen codes
 `fn_80013950` (223 instructions, not yet decompiled) builds the camera's view volume each time it
 changes. Read from the disassembly, not yet verified by matching:
 
-- `cam+0x224` = result of `fn_80014280(0.5 * fov)` (looks like a tangent); `cam+0x228` = its reciprocal.
+- `cam+0x224` = result of `Math_Tan(0.5 * fov)` (looks like a tangent); `cam+0x228` = its reciprocal.
 - `cam+0x1FC` and `cam+0x200` = half-extents of the view, built from `0x224` and viewport values.
   `0x1FC` feeds the planes the cull test uses with `x`, `0x200` the ones used with `y`.
 - Each edge plane is made by normalizing `(1, extent, 0)` with `Vec_NormalizeTo`; the two results are

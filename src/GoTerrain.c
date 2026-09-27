@@ -18,7 +18,7 @@
 void  fn_80019358(Character* pChar, f32* pDir, f32 f);
 void  fn_800F199C(f32 x, f32 y, f32 z);
 f32   fn_8001414C(u8* p);
-f32   fn_80014280(f32 x);           // tan
+f32   Math_Tan(f32 x);           // tan
 void  fn_80030894(void);
 void  fn_80030A40(void* pHoleData, int nView);
 void  fn_80030CC8(void* pHoleData);
@@ -40,13 +40,13 @@ void  fn_80032954(void);
 void  fn_80033F94(void* pHoleData, u32 nList);
 void  fn_8003546C(f32* pA, f32* pB, f32* pOut);
 f32   Camera_GetLensFovScale(CamLens* pLens);
-f32   fn_800351D8(u32 n, f32 fPeriod);
-void  fn_8003519C(int nRow, void* pData);   // calls row nRow's function of lbl_80188E88 with pData
+f32   Ter_GetTimeInCycle(u32 n, f32 fPeriod);
+void  SD_SetShaderTypeParameters(int nRow, void* pData);   // calls row nRow's function of lbl_80188E88 with pData
 s32   fn_800318AC(const void* pA, const void* pB);
-void  fn_8003272C(int n);
+void  Ter_SetZWrite(int n);
 void  fn_80035170(u32 uClear, u32 uSet);
 void  fn_80035294(void);
-void  fn_800352BC(void);
+void  RC_UpdateCurrentScreenMatrices(void);
 void  fn_800354B4(u8* p, f32 v);        // sets the lens's f32 at 0xAC (fn_80014268 reads it)
 f32   fn_80014268(u8* p);
 void  fn_80031938(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32 d);
@@ -72,12 +72,12 @@ void  fn_80034DE4(void);
 void  fn_80034F28(void* pUnused);
 void  fn_80035490(f32* pA, f32* pB, f32* pOut);
 
-UObjMesh* fn_800354BC(UObjMesh* pNode);
+UObjMesh* Ter_GetMeshNext(UObjMesh* pNode);
 f32       fn_80035560(UObjMesh* pMesh);
 f32*      fn_800354C4(UObjMesh* pNode);
-s32       fn_800354D0(UObjMesh* pNode, s32 n);
-UObjMesh* fn_800354E4(UObjMesh* pNode, s32 n);
-s32       fn_800354F4(UObjMesh* pNode);
+s32       Ter_GetMeshFlags(UObjMesh* pNode, s32 n);
+UObjMesh* Ter_GetMeshChild(UObjMesh* pNode, s32 n);
+s32       Ter_GetMeshChildCount(UObjMesh* pNode);
 UObjMesh* fn_80035500(u8* pHoleData);
 UObjMesh* fn_8003556C(UObjMesh* pGround);
 s32       fn_80035554(UObjMesh* pMesh);
@@ -253,7 +253,7 @@ void fn_80030818(void) {
 }
 
 void fn_8003084C(void) {
-    fn_80035098(0);
+    RenderState_SetConstantAlphaOn(0);
     RenderState_SetAlphaTest(1, 6, 128);
     RenderState_SetDepthFunc(3);
     RenderState_SetDepthWrite(1);
@@ -267,35 +267,36 @@ void fn_80030894(void) {
     u32 nFrame;
     int i;
 
-    fn_80035240(NULL);
+    RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
     RenderState_SetCameraMatrices();
     RenderState_SetCameraMatrices();
     RenderState_SetCameraMatrices();
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetAlphaTest(1, 6, 1);
     RenderState_SetDepthFunc(3);
-    fn_80035338(2);
+    LF_vSetCurrentLightFogEnvironment(2);
     fn_80035308();
     fn_800352E4();
     RenderState_SetDrawFlags(0x70);
-    fn_80013EEC(Camera_GetCurrent());
+    RenderState_SetViewport(Camera_GetCurrent());
     RenderState_Flush();
     for (i = 0; i < 4; i++) {
         // fake match: the original's 1591.2 is one bit above the literal 1591.2f, as a folded float
         // product gives it; 26.52 x 60 is one such product (3 x 530.4 and 12 x 132.6 are others)
         f32 fPeriod = 26.52f * 60.0f * (5.5f + (f32)i) / 1000.0f;
 
-        wave.aWave[i] = 0.5f * Math_Sin(6.2831855f * fn_800351D8(gSession.nFrameCount, fPeriod) / fPeriod)
+        wave.aWave[i] = 0.5f
+                * Math_Sin(6.2831855f * Ter_GetTimeInCycle(gSession.nFrameCount, fPeriod) / fPeriod)
                         + 0.5f;
     }
     wave.nFrame = gSession.nFrameCount;
-    fn_8003519C(4, &wave);
+    SD_SetShaderTypeParameters(4, &wave);
     nFrame = gSession.nFrameCount;
-    fn_8003519C(5, &nFrame);
+    SD_SetShaderTypeParameters(5, &nFrame);
 }
 
 // fake match: these two stand in for code the original linker stripped. The file's pool has
-// fn_800351D8's constants (1/59.94, 59.94, 0.5/59.94, the u32 conversion's) and then 0.375, 4.15
+// Ter_GetTimeInCycle's constants (1/59.94, 59.94, 0.5/59.94, the u32 conversion's) and then 0.375, 4.15
 // and 10 (as fn_80035398 uses them) right after fn_80030894's; their bodies are unknown, these
 // only reproduce the order.
 static f32 GoTerrain_StrippedFn2(u32 n, f32 x) {
@@ -342,8 +343,8 @@ void fn_80030A40(void* pHoleData, int nView) {
                 &Ter_GetTGD()->pin[Game_CurrentPinSet()].x, vToPin);
     vToPin[1] = 0.0f;
     lbl_801D3CB0.fGolferDistanceToCup = Math_Sqrt(Vec3_LengthSqClamped(vToPin));
-    fTan = fn_80014280(0.5f * pLens->fFov);
-    fWideTan = fn_80014280(0.5f * (0.75f * pLens->fFov * fn_8001414C((u8*)fn_8003526C())));
+    fTan = Math_Tan(0.5f * pLens->fFov);
+    fWideTan = Math_Tan(0.5f * (0.75f * pLens->fFov * fn_8001414C((u8*)fn_8003526C())));
     lbl_801D3CB0.fCameraMinHalfFieldOfViewTan =
         (fTan <= fWideTan / ViewController_GetCameraController(nView)->f54) ? fTan : fWideTan
                 / ViewController_GetCameraController(nView)->f54;
@@ -418,13 +419,13 @@ void fn_80030CC8(void* pHoleData) {
         fn_80031154(pPatch, 0);
         return;
     }
-    if (fn_800354F4(pRoot) >= 1) {
-        pList = fn_800354E4(pRoot, 1);
-        nCount = fn_800354F4(pList);
-        pMesh = fn_800354E4(pList, 0);
+    if (Ter_GetMeshChildCount(pRoot) >= 1) {
+        pList = Ter_GetMeshChild(pRoot, 1);
+        nCount = Ter_GetMeshChildCount(pList);
+        pMesh = Ter_GetMeshChild(pList, 0);
         for (i = nCount; i > 0; i--) {
             lbl_801D3CB0.iPatchFirstObjectInstanceIndex[nCount - i] = nFirstObject;
-            uFlags = fn_800354D0(pMesh, 1);
+            uFlags = Ter_GetMeshFlags(pMesh, 1);
             if ((uFlags & uPinBit) || !(uFlags & 0xF)) {
                 if (uFlags & 0x40) {
                     iRenderPass = 1;
@@ -464,10 +465,10 @@ void fn_80030CC8(void* pHoleData) {
                     }
                 }
             }
-            if (fn_800354F4(pMesh) >= 2) {
-                nFirstObject += fn_800354F4(fn_800354E4(fn_800354E4(pMesh, 1), 0));
+            if (Ter_GetMeshChildCount(pMesh) >= 2) {
+                nFirstObject += Ter_GetMeshChildCount(Ter_GetMeshChild(Ter_GetMeshChild(pMesh, 1), 0));
             }
-            pMesh = fn_800354BC(pMesh);
+            pMesh = Ter_GetMeshNext(pMesh);
         }
     }
 }
@@ -481,13 +482,13 @@ void fn_80031084(UObjMesh* pNode, s32 eClipMethod, s32 iRenderPass, Ter_PatchRef
     pPatch->fBoundingRadius = fn_800354C4(pNode)[3];
     pPatch->eClipMethod = eClipMethod;
     pPatch->iRenderPass = iRenderPass;
-    nNodes = fn_800354F4(pNode);
-    pPatch->pGround = fn_800354E4(pNode, 0);
-    pPatch->n18 = fn_800354D0(pPatch->pGround, 3);
-    pPatch->n1C = fn_800354D0(pPatch->pGround, 2);
-    pPatch->n20 = fn_800354D0(pNode, 1);
+    nNodes = Ter_GetMeshChildCount(pNode);
+    pPatch->pGround = Ter_GetMeshChild(pNode, 0);
+    pPatch->n18 = Ter_GetMeshFlags(pPatch->pGround, 3);
+    pPatch->n1C = Ter_GetMeshFlags(pPatch->pGround, 2);
+    pPatch->n20 = Ter_GetMeshFlags(pNode, 1);
     if (nNodes >= 2) {
-        pPatch->pObjects = fn_800354BC(pPatch->pGround);
+        pPatch->pObjects = Ter_GetMeshNext(pPatch->pGround);
         return;
     }
     pPatch->pObjects = NULL;
@@ -531,35 +532,35 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
     u8 bHide;
     s32 nObjects;
 
-    nObjects = fn_800354F4(fn_800354E4(pPatch->pObjects, 0));
+    nObjects = Ter_GetMeshChildCount(Ter_GetMeshChild(pPatch->pObjects, 0));
     if (nObjects == 0) {
         return;
     }
     if (lbl_801D3CB0.bObjectTestMode) {
         nObjects = 1;
-        nLists = fn_800354F4(fn_800354E4(pPatch->pObjects, 0));
-        pLOD0 = fn_800354E4(fn_800354E4(pPatch->pObjects, 0), 0);
-        pLOD1 = nLists > 1 ? fn_800354E4(fn_800354E4(pPatch->pObjects, 0), 1) : pLOD0;
+        nLists = Ter_GetMeshChildCount(Ter_GetMeshChild(pPatch->pObjects, 0));
+        pLOD0 = Ter_GetMeshChild(Ter_GetMeshChild(pPatch->pObjects, 0), 0);
+        pLOD1 = nLists > 1 ? Ter_GetMeshChild(Ter_GetMeshChild(pPatch->pObjects, 0), 1) : pLOD0;
         if (nLists > 2) {
-            pLOD2 = fn_800354E4(fn_800354E4(pPatch->pObjects, 0), 2);
+            pLOD2 = Ter_GetMeshChild(Ter_GetMeshChild(pPatch->pObjects, 0), 2);
         } else {
             pLOD2 = pLOD1;
         }
     } else {
         if (lbl_801D3CB0.iLowLODListOffset == -1) {
-            if (fn_800354F4(pPatch->pObjects) == 5) {
+            if (Ter_GetMeshChildCount(pPatch->pObjects) == 5) {
                 lbl_801D3CB0.iLowLODListOffset = 2;
             } else {
                 lbl_801D3CB0.iLowLODListOffset = 0;
             }
         }
-        pLOD0 = fn_800354E4(fn_800354E4(pPatch->pObjects, 0), 0);
-        pLOD1 = fn_800354E4(fn_800354E4(pPatch->pObjects, lbl_801D3CB0.iLowLODListOffset + 1), 0);
-        pLOD2 = fn_800354E4(fn_800354E4(pPatch->pObjects, lbl_801D3CB0.iLowLODListOffset + 2), 0);
+        pLOD0 = Ter_GetMeshChild(Ter_GetMeshChild(pPatch->pObjects, 0), 0);
+        pLOD1 = Ter_GetMeshChild(Ter_GetMeshChild(pPatch->pObjects, lbl_801D3CB0.iLowLODListOffset + 1), 0);
+        pLOD2 = Ter_GetMeshChild(Ter_GetMeshChild(pPatch->pObjects, lbl_801D3CB0.iLowLODListOffset + 2), 0);
     }
     nLast = nObjects - 1 + nFirstObject;
     for (i = nObjects - 1; i >= 0; i--) {
-        uFlags2 = fn_800354D0(pLOD0, 2);
+        uFlags2 = Ter_GetMeshFlags(pLOD0, 2);
         if (gSession.nSplitScreen == 0 || !(uFlags2 & 8)) {
             pBounds = fn_80035508(pLOD0);
             fHeight = fabsf(lbl_801D3CB0.xCameraReferencePos[1] - pBounds[1]) - pBounds[7];
@@ -579,8 +580,8 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
             bHide = 0;
             if ((uFlags2 & 0x80) && fDistanceSquared > lbl_801D3CB0.fDistanceCullFrameYardsSquared) {
                 bHide = 1;
-            } else if ((fn_800354D0(pLOD0, 3) & 4) || (fn_800354D0(pLOD0, 3) & 0x10)
-                       || (fn_800354D0(pLOD0, 3) & 0x20)) {
+            } else if ((Ter_GetMeshFlags(pLOD0, 3) & 4) || (Ter_GetMeshFlags(pLOD0, 3) & 0x10)
+                       || (Ter_GetMeshFlags(pLOD0, 3) & 0x20)) {
                 pBall = gPlayers[ViewController_GetPlayer(lbl_801D3CB0.iCurrentViewContext)].vBall;
                 pPin = &Ter_GetTGD()->pin[Game_CurrentPinSet()].x;
                 fn_8003546C(pBounds, pBall, v28);
@@ -611,16 +612,16 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
                 } else if (fBallToObject > lbl_801D3CB0.fCrowdFullMaxDistanceFromGolfer
                            && fObjectToPin <= fPinToBall && (nLast - i) % 2 != 0) {
                     bHide = 1;
-                } else if (((fn_800354D0(pLOD0, 1) & 1)
+                } else if (((Ter_GetMeshFlags(pLOD0, 1) & 1)
                             && gSession.nTeeSet[ViewController_GetPlayer(lbl_801D3CB0.iCurrentViewContext)]
                                     != 0)
-                           || ((fn_800354D0(pLOD0, 1) & 2)
+                           || ((Ter_GetMeshFlags(pLOD0, 1) & 2)
                                && gSession.nTeeSet[ViewController_GetPlayer(lbl_801D3CB0.iCurrentViewContext)] != 1)
-                           || ((fn_800354D0(pLOD0, 1) & 4)
+                           || ((Ter_GetMeshFlags(pLOD0, 1) & 4)
                                && gSession.nTeeSet[ViewController_GetPlayer(lbl_801D3CB0.iCurrentViewContext)] != 2)) {
                     bHide = 1;
-                } else if (((fn_800354D0(pLOD0, 1) & 1) || (fn_800354D0(pLOD0, 1) & 2)
-                            || (fn_800354D0(pLOD0, 1) & 4))
+                } else if (((Ter_GetMeshFlags(pLOD0, 1) & 1) || (Ter_GetMeshFlags(pLOD0, 1) & 2)
+                            || (Ter_GetMeshFlags(pLOD0, 1) & 4))
                            && gPlayers[ViewController_GetPlayer(lbl_801D3CB0.iCurrentViewContext)].ball.nLie
                                    != 0) {
                     bHide = 1;
@@ -645,11 +646,12 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
                 pRef->eClipMethod = eClipMethod;
                 pRef->pContainerPatch = pPatch;
                 pRef->iGlobalObjectIndex = iObject;
-                lbl_801D3CB0.pObjectStateList[iObject].a20[0] = fn_800354D0(pLOD0, 0);
-                lbl_801D3CB0.pObjectStateList[iObject].a20[1] = fn_800354D0(pLOD0, 1);
-                lbl_801D3CB0.pObjectStateList[iObject].a20[2] = fn_800354D0(pLOD0, 2);
-                lbl_801D3CB0.pObjectStateList[iObject].a20[3] = fn_800354D0(pLOD0, 3);
-                if ((uFlags2 & 0x40) || (fn_800354D0(pLOD0, 3) & 0x10) || (fn_800354D0(pLOD0, 3) & 0x20)) {
+                lbl_801D3CB0.pObjectStateList[iObject].a20[0] = Ter_GetMeshFlags(pLOD0, 0);
+                lbl_801D3CB0.pObjectStateList[iObject].a20[1] = Ter_GetMeshFlags(pLOD0, 1);
+                lbl_801D3CB0.pObjectStateList[iObject].a20[2] = Ter_GetMeshFlags(pLOD0, 2);
+                lbl_801D3CB0.pObjectStateList[iObject].a20[3] = Ter_GetMeshFlags(pLOD0, 3);
+                if ((uFlags2 & 0x40) || (Ter_GetMeshFlags(pLOD0, 3) & 0x10)
+                    || (Ter_GetMeshFlags(pLOD0, 3) & 0x20)) {
                     pRef->nLODs = 1;
                     pRef->apObject[0] = pLOD0;
                 } else {
@@ -661,9 +663,9 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
                 lbl_801D3CB0.iTotalSortObjects++;
             }
         }
-        pLOD0 = fn_800354BC(pLOD0);
-        pLOD1 = fn_800354BC(pLOD1);
-        pLOD2 = fn_800354BC(pLOD2);
+        pLOD0 = Ter_GetMeshNext(pLOD0);
+        pLOD1 = Ter_GetMeshNext(pLOD1);
+        pLOD2 = Ter_GetMeshNext(pLOD2);
     }
 }
 
@@ -852,9 +854,9 @@ void fn_80031E58(void) {
     for (i = lbl_801D3CB0.iTotalSortObjects - 1; i >= 0; i--) {
         pRef = &lbl_801D3CB0.pObjectSortList[i];
         pModel = pRef->apObject[pRef->iOpaqueLOD];
-        uFlags0 = fn_800354D0(pModel, 0);
-        uFlags2 = fn_800354D0(pModel, 2);
-        if ((fn_800354D0(pModel, 3) & 0x10) || (fn_800354D0(pModel, 3) & 0x20)) {
+        uFlags0 = Ter_GetMeshFlags(pModel, 0);
+        uFlags2 = Ter_GetMeshFlags(pModel, 2);
+        if ((Ter_GetMeshFlags(pModel, 3) & 0x10) || (Ter_GetMeshFlags(pModel, 3) & 0x20)) {
             uFlags0 |= 0x20;
             uFlags2 &= ~0x80;
             uFlags0 &= ~0x40;
@@ -976,12 +978,12 @@ void fn_8003241C(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UObjMesh* 
     pDraw->eClipMethod = eClipMethod;
     pDraw->bUseFog = bUseFog;
     pDraw->bSetsPrimField = bSetsPrimField;
-    uFlags0 = fn_800354D0(pModel, 0);
-    uFlags3 = fn_800354D0(pModel, 3);
+    uFlags0 = Ter_GetMeshFlags(pModel, 0);
+    uFlags3 = Ter_GetMeshFlags(pModel, 3);
     if (uFlags0 & 1) {
         if (uFlags0 & 2) {
             if (fn_800E3A54()) return;
-            pDraw->pObject = fn_800354E4(pModel, lbl_801D3CB0.pObjectStateList[iObject].n18);
+            pDraw->pObject = Ter_GetMeshChild(pModel, lbl_801D3CB0.pObjectStateList[iObject].n18);
         }
     } else if ((uFlags3 & 4) || (uFlags3 & 0x10) || (uFlags3 & 0x20)) {
         if (fn_800E3A54()) return;
@@ -1014,7 +1016,7 @@ void fn_80032518(int nRenderPass) {
     }
     if (bAny) {
         if (nRenderPass == 2) {
-            fn_8003272C(0);
+            Ter_SetZWrite(0);
         }
         RenderState_Flush();
         RenderState_SetDrawFlags(0x70);
@@ -1022,9 +1024,9 @@ void fn_80032518(int nRenderPass) {
         for (nList = 0; nList <= 2; nList++) {
             if (nRenderPass != 2) {
                 if (nList == 0) {
-                    fn_8003272C(1);
+                    Ter_SetZWrite(1);
                 } else {
-                    fn_8003272C(0);
+                    Ter_SetZWrite(0);
                 }
             }
             for (nClip = 0; nClip <= 2; nClip++) {
@@ -1056,12 +1058,14 @@ void fn_80032518(int nRenderPass) {
         lbl_801D3CB0.iDeferredItems = 0;
         RenderState_SetAlphaTest(1, 6, 1);
         RenderState_Flush();
-        fn_8003272C(1);
+        Ter_SetZWrite(1);
         RenderState_Flush();
     }
 }
 
-void fn_8003272C(int n) {
+// Turns z writes on or off, only while the terrain manages them (boManageZUpdate), and remembers
+// the setting in lbl_802810CC (fn_80033308 compares against it).
+void Ter_SetZWrite(int n) {
     if (lbl_801D3CB0.boManageZUpdate) {
         RenderState_SetDepthWrite(n);
         lbl_802810CC = n;
@@ -1088,11 +1092,11 @@ void fn_80032770(void) {
         }
     }
     if (bAny) {
-        fn_8003272C(0);
+        Ter_SetZWrite(0);
         pLens = ((Camera*)*lbl_80280DF0)->unk10;
         fAC = fn_80014268((u8*)pLens);
         fn_800354B4((u8*)pLens, 25.0f + fAC);
-        fn_800352BC();
+        RC_UpdateCurrentScreenMatrices();
         fn_80035294();
         RenderState_SetCameraMatrices();
         RenderState_SetCameraMatrices();
@@ -1127,7 +1131,7 @@ void fn_80032770(void) {
         }
         RenderState_SetAlphaTest(1, 6, 1);
         RenderState_Flush();
-        fn_8003272C(1);
+        Ter_SetZWrite(1);
         RenderState_Flush();
     }
 }
@@ -1185,11 +1189,11 @@ void fn_80032AEC(void) {
     fn_80030894();
     fn_80032F88(lbl_801D3CB0.pPostDrawItemsList, lbl_801D3CB0.iPostDrawItems, lbl_801D3CB0.eObjectFilterMin,
                 lbl_801D3CB0.eObjectFilterMag);
-    fn_8003272C(0);
+    Ter_SetZWrite(0);
     fn_80032F88(lbl_801D3CB0.pNearbyObjectList, lbl_801D3CB0.iNearbyObjects, lbl_801D3CB0.eObjectFilterMin,
                 lbl_801D3CB0.eObjectFilterMag);
-    fn_8003272C(1);
-    fn_80035098(0);
+    Ter_SetZWrite(1);
+    RenderState_SetConstantAlphaOn(0);
     fn_8003084C();
     RenderState_SetAlphaTest(1, 6, 128);
     RenderState_Flush();
@@ -1221,7 +1225,7 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
     uPinBit = 1 << Game_CurrentPinSet();
     uOtherPins = ~(uPinBit | uPinBit) & 0xF;
     if (nPass >= 1 && nPass <= 2 && fNear > 100.0f * lbl_801D3CB0.fFOVScale
-        && !(fn_800354D0(pGround, 0) & 0x80)) {
+        && !(Ter_GetMeshFlags(pGround, 0) & 0x80)) {
         return;
     }
     nMesh = n1C & 7;
@@ -1233,13 +1237,13 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
     }
     if (n20 & 0x80) {
         if (!fn_800172C4(ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext))
-            && (fn_800354D0(pGround, 0) & 0x80)) {
+            && (Ter_GetMeshFlags(pGround, 0) & 0x80)) {
             return;
         }
         bLake = 1;
         fBias = lbl_801D3CB0.fLakeSurfaceMipmapBias;
     }
-    pGround = fn_800354E4(pGround, lbl_801D3A30[nPass][nMesh]);
+    pGround = Ter_GetMeshChild(pGround, lbl_801D3A30[nPass][nMesh]);
     bFirst = *pbFirst;
     if (bFirst == 0 && fFar > 0.0f && b2 == 0) {
         *pbFirst = 1;
@@ -1250,8 +1254,8 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
         RenderState_SetDrawFlags(0x50);
         RenderState_Flush();
     }
-    uFlags2 = fn_800354D0(pGround, 2);
-    pMesh = fn_800354E4(pGround, 0);
+    uFlags2 = Ter_GetMeshFlags(pGround, 2);
+    pMesh = Ter_GetMeshChild(pGround, 0);
     if ((n20 & uPinBit) && !(n20 & uOtherPins)) {
         RenderState_SetAlphaTest(1, 6, 1);
         RenderState_Flush();
@@ -1262,7 +1266,7 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
     }
     if (uFlags2 & 8) {
         fn_80035514((u8*)pMesh);
-        pMesh = fn_800354BC(pMesh);
+        pMesh = Ter_GetMeshNext(pMesh);
     }
     if (bLake) {
         RenderState_Flush();
@@ -1273,7 +1277,7 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
                         &lbl_801D3CB0.iDeferredItems, 50, pMesh, 1.0f, bLake ? fBias : 0.0f, 0.0f, 0x289,
                         eClipMethod, fFar > 0.0f, 0);
         }
-        pMesh = fn_800354BC(pMesh);
+        pMesh = Ter_GetMeshNext(pMesh);
     }
     if (uFlags2 & 0x20) {
         if (pMesh->n20 != 0) {
@@ -1281,23 +1285,23 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
                         &lbl_801D3CB0.iDeferredItems, 50, pMesh, 1.0f, bLake ? fBias : 0.0f, 0.0f, 0x289,
                         eClipMethod, fFar > 0.0f, 0);
         }
-        pMesh = fn_800354BC(pMesh);
+        pMesh = Ter_GetMeshNext(pMesh);
     }
     if (gSession.nSplitScreen == 0 && (uFlags2 & 0x40) && b2 == 0) {
         if (fNear < 60.0f * lbl_801D3CB0.fFOVScale && pMesh->n20 != 0) {
             Mtx_Identity(mRaise);
             mRaise[3][1] = 0.005f;
-            fn_80035240(mRaise);
+            RC_vSetCurrentRenderCtxTransformationMatrix(mRaise);
             RenderState_SetCameraMatrices();
             RenderState_SetDepthWrite(0);
             RenderState_Flush();
             fn_80035514((u8*)pMesh);
             RenderState_SetDepthWrite(1);
-            fn_80035240(NULL);
+            RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
             RenderState_SetCameraMatrices();
             RenderState_Flush();
         }
-        fn_800354BC(pMesh);
+        Ter_GetMeshNext(pMesh);
     }
     if (bPinSet) {
         RenderState_SetAlphaTest(0, 6, 1);
@@ -1314,7 +1318,8 @@ static inline void Ter_FlagBits(u32 uFlags) {
 // Draws nCount objects of a draw list, switching the renderer state only when it changes from one
 // object to the next: the clip method, the mipmap bias, and the flags (0x40, fog 0x20, and 0x10 for
 // shader types other than 1 and 3) unless the object sets its own. Objects whose state word 0 has
-// bit 0x1 hand their f4 to row 2 or 3 of fn_8003519C (by shader type); without bit 0x2 its swing
+// bit 0x1 hand their f4 to row 2 or 3 of SD_SetShaderTypeParameters (by shader type); without bit 0x2 its
+// swing
 // about 0.5 is cut by up to fTreeDampingMaxForce up close, less with distance (not at all from the
 // squared distance fTreeDampingDistance on). The filters are not read.
 void fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFilterMag) {
@@ -1388,10 +1393,10 @@ void fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFil
             }
             if (pDraw->eShaderObjectType == 2) {
                 fWave2 = fDamp * (lbl_801D3CB0.pObjectStateList[iObject].f4 - 0.5f) + 0.5f;
-                fn_8003519C(2, &fWave2);
+                SD_SetShaderTypeParameters(2, &fWave2);
             } else if (pDraw->eShaderObjectType == 3) {
                 fWave3 = fDamp * (lbl_801D3CB0.pObjectStateList[iObject].f4 - 0.5f) + 0.5f;
-                fn_8003519C(3, &fWave3);
+                SD_SetShaderTypeParameters(3, &fWave3);
             }
         } else if ((lbl_801D3CB0.pObjectStateList[iObject].a20[0] & 1)
                    && (lbl_801D3CB0.pObjectStateList[iObject].a20[0] & 2)) {
@@ -1401,10 +1406,10 @@ void fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFil
             }
             if (pDraw->eShaderObjectType == 2) {
                 fWave2 = lbl_801D3CB0.pObjectStateList[iObject].f4;
-                fn_8003519C(2, &fWave2);
+                SD_SetShaderTypeParameters(2, &fWave2);
             } else if (pDraw->eShaderObjectType == 3) {
                 fWave3 = lbl_801D3CB0.pObjectStateList[iObject].f4;
-                fn_8003519C(3, &fWave3);
+                SD_SetShaderTypeParameters(3, &fWave3);
             }
         } else if (bDirty) {
             RenderState_Flush();
@@ -1445,14 +1450,14 @@ u8 fn_80033308(Ter_ObjectDrawData* pDraw, u8 bForce) {
             RenderState_SetAlphaTest(1, 6, nRef);
             fn_80035170(0x40, ((uFlags & 0x40) ? 0x40 : 0)
                                   | (((uFlags & 0x10) ? 0x10 : 0) | ((uFlags & 0x20) ? 0x20 : 0)));
-            fn_8003272C(bZWrite);
-            fn_80035098(0);
+            Ter_SetZWrite(bZWrite);
+            RenderState_SetConstantAlphaOn(0);
             RenderState_SetBlendFactors(4, 5);
         } else {
             RenderState_SetAlphaTest(1, 6, fAlpha * nRef);
-            fn_8003272C(1);
-            fn_80035098(1);
-            fn_80035154(255.0f * (0.5f * fAlpha));
+            Ter_SetZWrite(1);
+            RenderState_SetConstantAlphaOn(1);
+            RenderState_SetConstantAlpha(255.0f * (0.5f * fAlpha));
         }
         RenderState_Flush();
         lbl_802810C8 = fAlpha;
@@ -1647,7 +1652,7 @@ void fn_80033744(void) {
                     lbl_801D3CB0.pObjectStateList[i].f4 =
                         0.5f * Math_Sin(10.0f
                                            * (6.2831855f
-                                              * fn_800351D8(lbl_801D3CB0.pObjectStateList[i].nC,
+                                              * Ter_GetTimeInCycle(lbl_801D3CB0.pObjectStateList[i].nC,
                                                             fPeriod / 10.0f)
                                               / fPeriod))
                         + 0.5f;
@@ -1655,7 +1660,7 @@ void fn_80033744(void) {
                     lbl_801D3CB0.pObjectStateList[i].f4 =
                         0.5f * Math_Sin(0.5f
                                            * (6.2831855f
-                                              * fn_800351D8(lbl_801D3CB0.pObjectStateList[i].nC,
+                                              * Ter_GetTimeInCycle(lbl_801D3CB0.pObjectStateList[i].nC,
                                                             fPeriod / 0.5f)
                                               / fPeriod))
                         + 0.5f;
@@ -1709,7 +1714,7 @@ void fn_80033744(void) {
                         lbl_801D3CB0.pObjectStateList[i].f4 =
                             0.5f * Math_Sin(10.0f
                                                * (6.2831855f
-                                                  * fn_800351D8(lbl_801D3CB0.pObjectStateList[i].nC,
+                                                  * Ter_GetTimeInCycle(lbl_801D3CB0.pObjectStateList[i].nC,
                                                                 fPeriod / 10.0f)
                                                   / fPeriod))
                             + 0.5f;
@@ -1717,7 +1722,7 @@ void fn_80033744(void) {
                         lbl_801D3CB0.pObjectStateList[i].f4 =
                             0.5f * Math_Sin(0.5f
                                                * (6.2831855f
-                                                  * fn_800351D8(lbl_801D3CB0.pObjectStateList[i].nC,
+                                                  * Ter_GetTimeInCycle(lbl_801D3CB0.pObjectStateList[i].nC,
                                                                 fPeriod / 0.5f)
                                                   / fPeriod))
                             + 0.5f;
@@ -1771,11 +1776,11 @@ void fn_80033744(void) {
             lbl_801D3CB0.pObjectStateList[i].f4 =
                 0.5f * fScale
                     * Math_Sin(6.2831855f
-                                  * fn_800351D8(gSession.nFrameCount, lbl_801D3CB0.pObjectStateList[i].f0)
+                                  * Ter_GetTimeInCycle(gSession.nFrameCount, lbl_801D3CB0.pObjectStateList[i].f0)
                                   / lbl_801D3CB0.pObjectStateList[i].f0)
                 + 0.5f * (fScale * fNoise)
                       * Math_Sin(6.2831855f
-                                    * fn_800351D8(gSession.nFrameCount,
+                                    * Ter_GetTimeInCycle(gSession.nFrameCount,
                                                   lbl_801D3CB0.fTreeNoisePeriodScale
                                                       * lbl_801D3CB0.pObjectStateList[i].f0)
                                     / (lbl_801D3CB0.fTreeNoisePeriodScale
@@ -1803,27 +1808,27 @@ void fn_80033F94(void* pHoleData, u32 nList) {
     if ((nList != 0 || lbl_802810EC) && (nList != 2 || lbl_802810ED)) {
         pRoot = fn_80035500(pHoleData);
         nItems = 0;
-        if (fn_800354F4(pRoot) >= (s32)(nList + 1)) {
-            pList = fn_800354E4(pRoot, nList);
-            nCount = fn_800354F4(pList);
-            pMesh = fn_800354E4(pList, 0);
+        if (Ter_GetMeshChildCount(pRoot) >= (s32)(nList + 1)) {
+            pList = Ter_GetMeshChild(pRoot, nList);
+            nCount = Ter_GetMeshChildCount(pList);
+            pMesh = Ter_GetMeshChild(pList, 0);
             for (i = 0; i < nCount; i++) {
                 if (nList == 0) {
                     if (fn_80035574()) {
                         if (i >= 0 && i <= 1) {
-                            pMesh = fn_800354BC(pMesh);
+                            pMesh = Ter_GetMeshNext(pMesh);
                             continue;
                         }
                     } else if (i >= 2 && i <= 3) {
-                        pMesh = fn_800354BC(pMesh);
+                        pMesh = Ter_GetMeshNext(pMesh);
                         continue;
                     }
                 }
                 if (nList == 2 && i >= nCount - lbl_80281D64) {
-                    pMesh = fn_800354BC(pMesh);
+                    pMesh = Ter_GetMeshNext(pMesh);
                     continue;
                 }
-                uFlags = fn_800354D0(pMesh, 2);
+                uFlags = Ter_GetMeshFlags(pMesh, 2);
                 if (!gSession.nSplitScreen || !(uFlags & 8)) {
                     pView = ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext);
                     nClip = fn_80007B2C(pMesh, Camera_GetCurrent(), 0.0f, lbl_801D3CB0.fCameraMinHalfFieldOfViewTan,
@@ -1837,12 +1842,12 @@ void fn_80033F94(void* pHoleData, u32 nList) {
                                     0x289 - i, nClip, uFlags, 0);
                     }
                 }
-                pMesh = fn_800354BC(pMesh);
+                pMesh = Ter_GetMeshNext(pMesh);
             }
         }
         fn_80032F88(lbl_801D3CB0.pPanoramaItemsList, nItems, lbl_801D3CB0.eTerrainFilterMin,
                     lbl_801D3CB0.eTerrainFilterMag);
-        fn_8003272C(1);
+        Ter_SetZWrite(1);
         RenderState_Flush();
     }
 }
@@ -1908,16 +1913,16 @@ void fn_800342F0(UStreamObject* pObject) {
         lbl_801D3CB0.pCourse->pin[i].w = 0.0f;
     }
     fn_8004B1EC(lbl_801D3CB0.pCourse);
-    fn_80035338(2);
+    LF_vSetCurrentLightFogEnvironment(2);
     fn_800935CC(&lbl_801D3CB0.pCourse->lights);
     fn_80093900(lbl_801D3CB0.pCourse->p38);
-    fn_80035338(0);
+    LF_vSetCurrentLightFogEnvironment(0);
     fn_800935CC(&lbl_801D3CB0.pCourse->lights);
     fn_80093900(lbl_801D3CB0.pCourse->p38);
-    fn_80035338(1);
+    LF_vSetCurrentLightFogEnvironment(1);
     fn_800935CC(&lbl_801D3CB0.pCourse->lights);
     fn_80093900(lbl_801D3CB0.pCourse->p38);
-    fn_80035338(3);
+    LF_vSetCurrentLightFogEnvironment(3);
     fn_80035370();
     fn_8003534C();
     pGlow = lbl_801D3CB0.pCourse->p3C;
@@ -2081,13 +2086,13 @@ UObjMesh* fn_80034A20(u16 nPatch, u16 nObjList) {
     UObjMesh* pModel = NULL;
     UObjMesh* pNode;
 
-    pNode = fn_800354E4(fn_80035500(lbl_801D3CB0.pCurrentHoleData), 1);
-    if (nPatch < fn_800354F4(pNode)) {
-        pNode = fn_800354E4(pNode, nPatch);
-        if (fn_800354F4(pNode) >= 2) {
-            pNode = fn_800354E4(fn_800354E4(pNode, 1), 0);
-            if (nObjList < fn_800354F4(pNode)) {
-                pModel = fn_800354E4(pNode, nObjList);
+    pNode = Ter_GetMeshChild(fn_80035500(lbl_801D3CB0.pCurrentHoleData), 1);
+    if (nPatch < Ter_GetMeshChildCount(pNode)) {
+        pNode = Ter_GetMeshChild(pNode, nPatch);
+        if (Ter_GetMeshChildCount(pNode) >= 2) {
+            pNode = Ter_GetMeshChild(Ter_GetMeshChild(pNode, 1), 0);
+            if (nObjList < Ter_GetMeshChildCount(pNode)) {
+                pModel = Ter_GetMeshChild(pNode, nObjList);
             }
         }
     }
@@ -2107,7 +2112,7 @@ void fn_80034AE4(void) {
     f32 fTan;
     f32 fWideTan;
 
-    fn_80035240(NULL);
+    RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
     RenderState_SetCameraMatrices();
     RenderState_SetCameraMatrices();
     RenderState_SetCameraMatrices();
@@ -2132,8 +2137,8 @@ void fn_80034AE4(void) {
             lbl_801D3CB0.fXZDistanceToClosestBallSquared = fDist;
         }
     }
-    fTan = fn_80014280(0.5f * pLens->fFov);
-    fWideTan = fn_80014280(0.5f * (0.75f * pLens->fFov * fn_8001414C((u8*)fn_8003526C())));
+    fTan = Math_Tan(0.5f * pLens->fFov);
+    fWideTan = Math_Tan(0.5f * (0.75f * pLens->fFov * fn_8001414C((u8*)fn_8003526C())));
     lbl_801D3CB0.fCameraMinHalfFieldOfViewTan =
         (fTan <= fWideTan / ViewController_GetCameraController(0)->f54) ? fTan : fWideTan
                 / ViewController_GetCameraController(0)->f54;
@@ -2183,7 +2188,7 @@ void fn_80034CAC(int nRenderPass) {
     }
     RenderState_SetAlphaTest(1, 6, 1);
     RenderState_Flush();
-    fn_8003272C(1);
+    Ter_SetZWrite(1);
     RenderState_Flush();
 }
 
@@ -2195,7 +2200,7 @@ void fn_80034DE4(void) {
     s32 nClip;
     Ter_PatchReference* pPatch;
 
-    fn_8003272C(0);
+    Ter_SetZWrite(0);
     RenderState_Flush();
     RenderState_SetDrawFlags(0x70);
     for (nClip = 0; nClip <= 2; nClip++) {
@@ -2221,7 +2226,7 @@ void fn_80034DE4(void) {
     }
     RenderState_SetAlphaTest(1, 6, 1);
     RenderState_Flush();
-    fn_8003272C(1);
+    Ter_SetZWrite(1);
     RenderState_Flush();
 }
 
@@ -2245,7 +2250,7 @@ void fn_80034F28(void* pUnused) {
     pGrass = lbl_801D3CB0.xpGrassPatchList;
     for (i = 0; i < lbl_801D3CB0.iTotalPatches; i++) {
         pPatch = &lbl_801D3CB0.pPatchList[i];
-        if ((pPatch->n1C & 0x80) || (fn_800354D0(fn_8003556C(pPatch->pGround), 3) & 8)) {
+        if ((pPatch->n1C & 0x80) || (Ter_GetMeshFlags(fn_8003556C(pPatch->pGround), 3) & 8)) {
             fRadius = fn_800354C4(fn_8003556C(pPatch->pGround))[3];
             fDist = Vec_Distance(lbl_801D3CB0.xCameraReferencePos, fn_800354C4(fn_8003556C(pPatch->pGround)))
                     - fRadius;
@@ -2280,7 +2285,10 @@ f32 Math_Floor(f32 x) {
 
 // ---- the renderer's state ----
 
-void fn_80035098(u8 b) {
+// Turns the constant alpha on (1) or off (0), applied with the next RenderState_Apply: on, the TEV
+// stages take the draw's alpha from RenderState_SetConstantAlpha's value (times the texture's)
+// instead of the vertex colour's.
+void RenderState_SetConstantAlphaOn(u8 b) {
     lbl_801B8980.b1D = b;
     lbl_801B8980.u110 |= 0x80;
 }
@@ -2316,7 +2324,8 @@ void RenderState_SetClipMode(int a) {
     lbl_801B8980.u110 |= 0x400;
 }
 
-void fn_80035154(u8 b) {
+// The constant alpha, 0..255, used while RenderState_SetConstantAlphaOn is on.
+void RenderState_SetConstantAlpha(u8 b) {
     lbl_801B8980.b1C = b;
     lbl_801B8980.u110 |= 0x80;
 }
@@ -2327,12 +2336,14 @@ void fn_80035170(u32 uClear, u32 uSet) {
     lbl_801B8980.u110 |= 0x20;
 }
 
-void fn_8003519C(int nRow, void* pData) {
+// Hands pData to shader type nRow's SetParameters hook (ModuleHooks.pfn8 of lbl_80188E88; row 17 is
+// the grass).
+void SD_SetShaderTypeParameters(int nRow, void* pData) {
     lbl_80188E88[nRow].pfn8(pData);
 }
 
 // Where n frames falls in a cycle of fPeriod seconds, in seconds.
-f32 fn_800351D8(u32 n, f32 fPeriod) {
+f32 Ter_GetTimeInCycle(u32 n, f32 fPeriod) {
     return FRAME_TIME * (f32)(n % (u32)(FRAME_RATE * (0.5f / FRAME_RATE + fPeriod)));
 }
 
@@ -2343,8 +2354,9 @@ void fn_80035398(void);
 void fn_8003541C();
 void fn_80035440(TerSettings* pSettings);
 
-void fn_80035240(f32 (*pMtx)[4]) {
-    fn_80013D9C(*lbl_80280DF0, pMtx);
+// Gives the current render camera the model matrix pMtx (NULL: the identity).
+void RC_vSetCurrentRenderCtxTransformationMatrix(f32 (*pMtx)[4]) {
+    RC_vSetRenderCtxTransformationMatrix(*lbl_80280DF0, pMtx);
 }
 
 f32* fn_8003526C(void) {
@@ -2352,10 +2364,12 @@ f32* fn_8003526C(void) {
 }
 
 void fn_80035294(void) {
-    fn_80013CCC(*(void**)lbl_80280DF0);
+    RC_vUpdateRenderCtxTransformationMatrices(*(void**)lbl_80280DF0);
 }
 
-void fn_800352BC(void) {
+// Works out the current render camera's screen values and projection again
+// (RC_vUpdateRenderCtxScreenMatricesAndInfo).
+void RC_UpdateCurrentScreenMatrices(void) {
     fn_80013D68(*(s32*)((u8*)lbl_80280DF0));
 }
 
@@ -2368,24 +2382,25 @@ void fn_800352E4(void) {
 
 // Takes the current light set's terrain colours as the current settings (fn_80035440).
 void fn_80035308(void) {
-    fn_80035440(&fn_8003532C()->settings);
+    fn_80035440(&LF_spGetCurrentLightFogEnvironment()->settings);
 }
 
-LightSet* fn_8003532C(void) {
+LightSet* LF_spGetCurrentLightFogEnvironment(void) {
     return lbl_80281380->pCur;
 }
 
-void fn_80035338(s32 nSet) {
+// Makes light set nSet of lbl_80281380 the current one.
+void LF_vSetCurrentLightFogEnvironment(s32 nSet) {
     lbl_80281380->pCur = &lbl_80281380->aSet[nSet];
 }
 
 // Resets the current light set's terrain colours to the defaults.
 void fn_8003534C(void) {
-    fn_8006F334(&fn_8003532C()->settings);
+    fn_8006F334(&LF_spGetCurrentLightFogEnvironment()->settings);
 }
 
 void fn_80035370(void) {
-    fn_8006EDC0(&fn_8003532C()->group);
+    fn_8006EDC0(&LF_spGetCurrentLightFogEnvironment()->group);
 }
 
 // Hands the renderer the colour and the two distances made from the current settings.
@@ -2469,7 +2484,7 @@ void fn_800354B4(u8* p, f32 v) {
 
 // ---- end of sweep code ----
 
-UObjMesh* fn_800354BC(UObjMesh* pNode) {
+UObjMesh* Ter_GetMeshNext(UObjMesh* pNode) {
     return pNode->p14;
 }
 
@@ -2479,16 +2494,16 @@ f32* fn_800354C4(UObjMesh* pNode) {
 }
 
 // A flag byte of the node (a24); this file reads bytes 0-3.
-s32 fn_800354D0(UObjMesh* pNode, s32 n) {
+s32 Ter_GetMeshFlags(UObjMesh* pNode, s32 n) {
     return pNode->pInfo->a24[n];
 }
 
-UObjMesh* fn_800354E4(UObjMesh* pNode, s32 n) {
+UObjMesh* Ter_GetMeshChild(UObjMesh* pNode, s32 n) {
     return pNode->p8[n];
 }
 
 // How many nodes the node holds.
-s32 fn_800354F4(UObjMesh* pNode) {
+s32 Ter_GetMeshChildCount(UObjMesh* pNode) {
     return pNode->pInfo->n0;
 }
 
@@ -2558,7 +2573,7 @@ void fn_80035600(void) {
 }
 
 void fn_80035604(void) {
-    fn_80035240(NULL);
+    RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
     fn_80035294();
     RenderState_SetCameraMatrices();
     RenderState_SetBlendFactors(4, 5);

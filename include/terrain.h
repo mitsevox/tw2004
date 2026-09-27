@@ -12,7 +12,7 @@
 
 struct CourseInfo;
 struct UStreamObject;
-struct UObjMesh;                    // dynobj.h: the hole data is a tree of them (fn_800354BC..fn_80035500)
+struct UObjMesh;                    // dynobj.h: the hole data is a tree of them (Ter_GetMeshNext..fn_80035500)
 
 // A patch of ground to draw (0x34 bytes; TW06: Ter_PatchReference, 0x2C, the same up to 0x10).
 // fn_80030CC8 fills Ter_TerrainRendererMgr.pPatchList with them and chains each into
@@ -26,7 +26,7 @@ typedef struct Ter_PatchReference {
                                 //       index of its pSortedPatchList rows. TW06: eClipMethod (at 0x24)
     s32    iRenderPass;         // 0x14  0..2: the first index of its pSortedPatchList rows. TW06:
                                 //       iRenderPass (at 0x20)
-    s32    n18;                 // 0x18  } bytes of its model (fn_800354D0 3, 2, 1)
+    s32    n18;                 // 0x18  } bytes of its model (Ter_GetMeshFlags 3, 2, 1)
     s32    n1C;                 // 0x1C  }   bits 0x1, 0x2, 0x4: the passes it is drawn in; with 0x80,
     s32    n20;                 // 0x20  }   the lists it goes in
     struct Ter_PatchReference* pNext[4];   // 0x24  the next in each of its lists. TW06: pNext
@@ -75,7 +75,7 @@ LAYOUT_ASSERT(Ter_ObjectDrawData, 0x20);
 // Found by patch: iPatchFirstObjectInstanceIndex[patch] + the object's number in it.
 typedef struct Ter_ObjectState {
     f32  f0;                    // 0x00  fn_80030254: fTreeMinPeriod plus a random share of fTreeDiffPeriod
-    f32  f4;                    // 0x04  handed to row 2 or 3 of fn_8003519C (fn_80032F88), 0.5 the rest;
+    f32  f4;                    // 0x04  handed to row 2 or 3 of SD_SetShaderTypeParameters (fn_80032F88), 0.5 the rest;
                                 //       fTreeOverdrive at first
     f32  f8;                    // 0x08
     s32  nC;                    // 0x0C
@@ -83,7 +83,7 @@ typedef struct Ter_ObjectState {
     f32  f14;                   // 0x14  }
     s32  n18;                   // 0x18
     s32  n1C;                   // 0x1C
-    s32  a20[4];                // 0x20  four flag words read from the object's model (fn_800354D0, 0..3)
+    s32  a20[4];                // 0x20  four flag words read from the object's model (Ter_GetMeshFlags, 0..3)
     struct {
         f32  f0;                // 0x0   fn_80031E58 sets 1 and n4 3 when it draws the object opaque
         s32  n4;                // 0x4
@@ -106,7 +106,7 @@ typedef struct TerPosData {
     u8   nIndex;                // 0x1C  its row of CourseInfo.tee or CourseInfo.pin
 } TerPosData;
 
-// What fn_80030894 hands to row 4 of the table fn_8003519C calls through: four values that swing
+// What fn_80030894 hands to row 4 of the table SD_SetShaderTypeParameters calls through: four values that swing
 // between 0 and 1 over cycles of different lengths, and the frame count they were made for.
 typedef struct TerWaveData {
     f32  aWave[4];              // 0x00
@@ -186,7 +186,7 @@ typedef struct Ter_TerrainRendererMgr {
     f32          fFOVScale;                     // 0x11A0
     f32          fDistanceCullYardsBase;        // 0x11A4
     f32          fDistanceCullFrameYardsSquared;    // 0x11A8  (fFOVScale x fDistanceCullYardsBase)^2
-    u8           boManageZUpdate;               // 0x11AC  fn_8003272C passes its value on only when set
+    u8           boManageZUpdate;               // 0x11AC  Ter_SetZWrite passes its value on only when set
     u8           unk11AD[3];
     s32          eTerrainFilterMin;             // 0x11B0
     s32          eTerrainFilterMag;             // 0x11B4
@@ -253,8 +253,8 @@ f32  Math_Floor(f32 x);            // floor
 void fn_80034720(struct UStreamObject* pObject);   // a tee's position (TerPosData)
 u8   fn_800347B4(struct UStreamObject* pObject);   // a pin's position (TerPosData)
 void RenderState_SetBlendFactors(int a, int b);     // renderer state: n10 and n14
-void fn_80035098(u8 b);             // renderer state
-void fn_80035154(u8 b);             // renderer state
+void RenderState_SetConstantAlphaOn(u8 b);             // renderer state
+void RenderState_SetConstantAlpha(u8 b);             // renderer state
 void RenderState_SetClipMode(int a);            // renderer state: nFC
 struct UObjMesh* fn_80034A20(u16 nPatch, u16 nObjList);    // a course object's model
 

@@ -38,11 +38,11 @@ void fn_800A27FC(f32 fDir, f32 fPoint) {
                         Ter_GetTGD()->lights.aLight[i].vColor);
         }
     }
-    fn_80035338(0);
+    LF_vSetCurrentLightFogEnvironment(0);
     fn_800935CC(&Ter_GetTGD()->lights);
     fn_80093900(Ter_GetTGD()->p38);
     if (Ter_GetTGD()->p44 != NULL) {
-        fn_80035338(2);
+        LF_vSetCurrentLightFogEnvironment(2);
         fn_80093900(Ter_GetTGD()->p44);
         fn_80035308();
         fn_800352E4();

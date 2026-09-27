@@ -41,13 +41,13 @@ f32 fn_80120244(f32 fX, f32 fM);
 void fn_80120268(f32* pA, f32* pB, f32* pOut);
 Sphere* fn_8012028C(RenderObj* pObj);
 int fn_80007CE8(RenderObj* pObj, Camera* pCamera, int nMode, f32 fScale);   // LLObj_Gc.c
-void fn_8003519C(int nRow, void* pData);   // GoTerrain.c: calls row nRow's function with pData
+void SD_SetShaderTypeParameters(int nRow, void* pData);   // GoTerrain.c: calls row nRow's function with pData
 void fn_8011E974(void);
 void fn_8011EAB8(void);
 void fn_8011EBF8(void);
 void fn_8011EC2C(void);
-void fn_80013D5C(void* pCamera);   // makes it the current render camera
-void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
+void RC_vSetCurrentRenderCtx(void* pCamera);   // makes it the current render camera
+void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
 void fn_80035F1C(void);
@@ -55,7 +55,7 @@ void fn_80016948(void);
 s32  fn_8003505C(s32 n);           // sets a value, returns the old one
 void fn_80034AE4(void);
 void RenderState_SetClipMode();
-void fn_800352BC();
+void RC_UpdateCurrentScreenMatrices();
 void GrassRender_vBuildAndUploadOneTimeData(void);
 void fn_800738DC(TexBank* pBank, TexEntry* pTex, u8 bFirst);   // GoShaderObjectCommon
 void fn_8011FDC4(GrassBuffer* pBuffer);
@@ -321,14 +321,14 @@ void fn_8011E9D8(void) {
     fn_80076A0C_SetType(lbl_80281900->pLens, 1);
     fn_80076948(lbl_80281900->pLens, 20.0f, 20.0f);
     lbl_80281900->pCamera =
-        fn_8001371C(lbl_80281900->pLens, lbl_80281900->pFrameBuf, lbl_80281900->pRect);
+        RC_spCreateRenderCtx(lbl_80281900->pLens, lbl_80281900->pFrameBuf, lbl_80281900->pRect);
 }
 
 void fn_8011EAB8(void) {
     FB_vReleaseFrameBuffer(lbl_80281900->pFrameBuf);
     CA_vReleaseCamera(lbl_80281900->pLens);
     VM_vReleaseViewport(lbl_80281900->pRect);
-    fn_800137B0(lbl_80281900->pCamera);
+    RC_vReleaseRenderCtx(lbl_80281900->pCamera);
 }
 
 // Points the grass lens straight down from f3B0 over the bounds' corner, offset by half its view
@@ -381,21 +381,21 @@ void fn_8011EC84(void) {
     void* pCamera;
 
     pCamera = Camera_GetCurrent();
-    fn_80013D5C(lbl_80281900->pCamera);
+    RC_vSetCurrentRenderCtx(lbl_80281900->pCamera);
     RenderState_SetDepthWrite(0);
     RenderState_SetDepthFunc(7);
     RenderState_SetAlphaTest(0, 6, 128);
-    fn_800140E8(1, 256, 256, 0, 1, 1);
+    RenderState_SetRenderSurface(1, 256, 256, 0, 1, 1);
     fn_800760B0(0, 0, 256, 256);
     fn_80016B54(256, 256, 1.0f, 1.0f);
     fn_80035F1C();
     fn_80016948();
-    fn_800352BC();
-    fn_80013CCC(Camera_GetCurrent());
-    fn_80013EEC(Camera_GetCurrent());
+    RC_UpdateCurrentScreenMatrices();
+    RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
+    RenderState_SetViewport(Camera_GetCurrent());
     RenderState_SetCameraMatrices();
     RenderState_Flush();
-    fn_8001425C(0);
+    RenderView_SetUseCurrentMatrices(0);
     RenderState_SetDrawFlags(0);
     RenderView_SetColor(lbl_801945B8);
     RenderState_SetDepthWrite(0);
@@ -406,12 +406,12 @@ void fn_8011EC84(void) {
     fn_80034AE4();
     fn_8003505C(nOld);
     fn_8011EC2C();
-    fn_80013D5C(pCamera);
-    fn_80013EEC(Camera_GetCurrent());
-    fn_800352BC();
-    fn_80013CCC(Camera_GetCurrent());
+    RC_vSetCurrentRenderCtx(pCamera);
+    RenderState_SetViewport(Camera_GetCurrent());
+    RC_UpdateCurrentScreenMatrices();
+    RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
     RenderState_SetCameraMatrices();
-    fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
+    RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
     fn_800760B0(0, 0, 512, 448);
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80035F1C();
@@ -422,7 +422,7 @@ void fn_8011EC84(void) {
 }
 
 void fn_8011EE4C(void) {
-    fn_8001425C(0);
+    RenderView_SetUseCurrentMatrices(0);
     RenderState_SetDrawFlags(16);
     RenderView_SetColor(lbl_801945E8);
     RenderState_SetDepthWrite(0);
@@ -445,8 +445,8 @@ void fn_8011EE4C(void) {
 }
 
 void fn_8011EF88(void) {
-    fn_800352BC();
-    fn_80013CCC(Camera_GetCurrent());
+    RC_UpdateCurrentScreenMatrices();
+    RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
     RenderState_SetClipMode(0);
     RenderState_SetCameraMatrices();
     RenderState_SetAlphaTest(0, 6, 128);
@@ -522,7 +522,7 @@ void fn_8011F374(void) {
 }
 
 // Draws the buffers in use in two passes: the camera's direction, flattened and normalised, picks
-// the quadrant; each buffer's position goes to fn_8003519C row 17, then the buffer is drawn.
+// the quadrant; each buffer's position goes to SD_SetShaderTypeParameters row 17, then the buffer is drawn.
 void fn_8011F3AC(void) {
     f32 vDir[4];
     s32 nPass;
@@ -558,7 +558,7 @@ void fn_8011F3AC(void) {
             lbl_80281900->f34C = pBuffer->f0;
             lbl_80281900->f350 = pBuffer->f4;
             lbl_80281900->n36C = nPass;
-            fn_8003519C(17, &lbl_80281900->f348);
+            SD_SetShaderTypeParameters(17, &lbl_80281900->f348);
             fn_800082CC((UObjMeshPart*)pBuffer->a14);
         }
     }

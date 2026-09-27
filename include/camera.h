@@ -28,7 +28,7 @@ typedef struct CamLens {
     f32  fB8;                   // 0xB8  its view height (guess)
 } CamLens;
 
-f32 fn_80014278(CamLens* pLens);        // GoRenderCtx_Gc.c: the lens's field of view
+f32 CA_fGetCameraFieldOfView(CamLens* pLens);        // GoRenderCtx_Gc.c: the lens's field of view
 
 // A camera shot (0xC0 bytes): a named script position the camera script moves to. The shots of a
 // sequence are chained through p40.
@@ -603,14 +603,14 @@ typedef struct RenderCamera {
 } RenderCamera;
 
 // Points at the slot holding the current render camera (lbl_80281C90): Camera_GetCurrent reads it,
-// fn_80013D5C sets it.
+// RC_vSetCurrentRenderCtx sets it.
 extern void** lbl_80280DF0;
 
 // GoTerrain.c: gives the current render camera the model matrix pMtx (NULL: the identity), through
-// fn_80013D9C.
-void   fn_80035240(f32 (*pMtx)[4]);
+// RC_vSetRenderCtxTransformationMatrix.
+void   RC_vSetCurrentRenderCtxTransformationMatrix(f32 (*pMtx)[4]);
 // GoRenderCtx_Gc.c: gives the camera the model matrix pMtx (NULL: the identity).
-void   fn_80013D9C(void* pCamera, f32 (*pMtx)[4]);
+void   RC_vSetRenderCtxTransformationMatrix(void* pCamera, f32 (*pMtx)[4]);
 f32*   fn_8003526C(void);               // GoTerrain.c: the current render camera's screen rectangle
 
 ViewController* fn_80016CF4(void);     // the current view (lbl_80281CA4)
@@ -630,8 +630,8 @@ f32    fn_80012ED8(f32* pRect);         // [2]: its width
 f32    fn_80012EE0(f32* pRect);         // [1]: its top
 f32    fn_80012EE8(f32* pRect);         // [0]: its left
 void*  Camera_GetCurrent(void);               // the current render camera
-void   fn_80013CCC(void* pCamera);
-void   fn_80013EEC(void* pCamera);
+void   RC_vUpdateRenderCtxTransformationMatrices(void* pCamera);
+void   RenderState_SetViewport(void* pCamera);
 void   RenderState_SetCameraMatrices(void);
 int    fn_80016D10(void);
 void   fn_800171D8(f32* pRect, f32 x, f32 y, f32 w, f32 h);   // set a screen rectangle (fractions)
@@ -892,7 +892,7 @@ void     fn_800B3438(f32* pRect, f32 x, f32 y); // shadow.c
 CamLens* Camera_GetCurrentLens(void);                     // char.c
 
 // GoRenderCtx_Gc.c: a render camera made from a lens, a frame buffer and a screen rectangle.
-void*    fn_8001371C(CamLens* pLens, GoFrameBuf* pBuf, f32* pRect);
-void     fn_800137B0(void* pCamera);            // free it
+void*    RC_spCreateRenderCtx(CamLens* pLens, GoFrameBuf* pBuf, f32* pRect);
+void     RC_vReleaseRenderCtx(void* pCamera);            // free it
 
 #endif

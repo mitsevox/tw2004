@@ -316,7 +316,7 @@ void fn_8000C5A4(f32 (*pMtx)[4]);
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);
-void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
+void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
 
 void fn_800B9944(void) {
@@ -457,11 +457,11 @@ void fn_800B9CF0(u8 bTarget) {
         mScale[1][1] = lbl_802814F4;
         mScale[2][2] = lbl_802814F8;
         if (bTarget) {
-            fn_800140E8(1, 0x180, 0x210, 0, 1, 1);
+            RenderState_SetRenderSurface(1, 0x180, 0x210, 0, 1, 1);
         } else {
-            fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 1, 1);
+            RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 1, 1);
         }
-        fn_80013EEC(Camera_GetCurrent());
+        RenderState_SetViewport(Camera_GetCurrent());
         RenderState_SetBlendFactors(4, 5);
         RenderState_SetAlphaTest(0, 6, 0x80);
         RenderState_SetDepthWrite(1);
@@ -477,9 +477,9 @@ void fn_800B9CF0(u8 bTarget) {
                 fn_800B9BF4(lbl_802821D8, mBone, mScale, vPos);
             }
         }
-        fn_80035240(NULL);
-        fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
-        fn_80013EEC(Camera_GetCurrent());
+        RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
+        RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
+        RenderState_SetViewport(Camera_GetCurrent());
         RenderState_Flush();
     }
 }

@@ -11,7 +11,7 @@
 void fn_80036054(ShaderObject* pObj, int nRow, const void* pDesc);  // Skin.c
 void fn_800360A0(ShaderObject* pObj);                               // Skin.c
 void fn_800360D4(ShaderObject* pObj);                               // Skin.c
-void fn_800352BC(void);
+void RC_UpdateCurrentScreenMatrices(void);
 void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer);   // below; Ball.c declares it too
 void fn_800A34C0(int nTrail, Ball* pBall, f32* pDir);     // below
 
@@ -614,10 +614,10 @@ void fn_800A3A84(void) {
         Vec_Copy(gPlayers[ViewController_GetPlayer(1)].ball.vPos, lbl_80281408->ap74[1]->mtx[3]);
     }
     RenderState_SetDrawFlags(0x70);
-    fn_800352BC();
-    fn_80013CCC(Camera_GetCurrent());
-    fn_80013EEC(Camera_GetCurrent());
-    fn_80035240(0);
+    RC_UpdateCurrentScreenMatrices();
+    RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
+    RenderState_SetViewport(Camera_GetCurrent());
+    RC_vSetCurrentRenderCtxTransformationMatrix(0);
     RenderState_SetCameraMatrices();
     RenderState_SetClipMode(0);
     RenderState_SetAlphaTest(0, 6, 0x80);

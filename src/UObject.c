@@ -14,12 +14,12 @@ UObjMesh* fn_80048AC4(UObjMesh* pMesh, int i);
 int  fn_80048AD4(UObjMesh* pMesh, int i);
 int  fn_80048AE8(UObject* pObj);
 f32  fn_8001414C(u8* p);
-f32  fn_80014280(f32 f);
+f32  Math_Tan(f32 f);
 void fn_8004B78C(CourseInfo* pCourse, f32* pPos);  // the ground's light at pPos
 void fn_80036024(f32 f);
 void fn_80035FFC(void);
 void fn_80035FDC(UObject* pObj);
-void fn_8003519C(int nRow, void* pData);
+void SD_SetShaderTypeParameters(int nRow, void* pData);
 void fn_80035FBC(void);
 
 // Sets the object up: the three matrices to identity, the model and flags; a model whose levels of
@@ -103,13 +103,13 @@ void fn_800488B4(UObject* pObj) {
     pMesh = pObj->pModel->apLod[nLod];
     fFov = Camera_GetCurrentLens()->fFov;
     fMax = 0.75f * fFov * fn_8001414C((u8*)fn_8003526C());
-    fn_80035240(pObj->m80);
+    RC_vSetCurrentRenderCtxTransformationMatrix(pObj->m80);
     fTemp = fFov <= fMax ? fFov : fMax;
     // fake match: n108's address is taken here only so the 0.5 is loaded after the min, as in the
     // original; nothing in TW07 shows EA wrote it so. A port reads pObj->n108 directly below.
     // Found by an anonymous decomp.me user: https://decomp.me/scratch/SOh7Q
     pN108 = &pObj->n108;
-    fFov = fn_80014280(0.5f * fTemp);
+    fFov = Math_Tan(0.5f * fTemp);
     nClip = fn_80007B2C(pMesh, Camera_GetCurrent(), 0.0f, fFov, 1.0f);
     if (nClip == 3) return;
     nFlags0 = fn_80048AD4(pMesh, 0);
@@ -128,7 +128,7 @@ void fn_800488B4(UObject* pObj) {
         }
         RenderState_Flush();
         fLod = pObj->f10C;
-        fn_8003519C(3, &fLod);
+        SD_SetShaderTypeParameters(3, &fLod);
     }
     switch (nClip) {
     case 2:

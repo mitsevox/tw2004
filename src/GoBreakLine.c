@@ -15,7 +15,7 @@ void fn_800360D4(u8* pMesh);           // Skin.c
 void fn_800C9310(f32* pA, f32* pB, f32* pOut);
 void fn_800C9334(f32* pA, f32* pB, f32* pOut);
 void fn_800C9358(f32* pA, f32* pB, f32* pOut);
-void fn_8003519C(int nRow, void* pData);   // GoTerrain.c: calls row nRow's function with pData
+void SD_SetShaderTypeParameters(int nRow, void* pData);   // GoTerrain.c: calls row nRow's function with pData
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x802843F8), before the 27.0f BreakLine_InitModule uses first; its body is unknown.
@@ -228,7 +228,7 @@ void BreakLine_Render(int nView) {
             desc.af18[2] = lbl_80282228->fAB18;
             desc.af18[3] = 1.0f / lbl_80282228->fAB18;
             nFrame = gSession.nFrameCount;
-            fn_8003519C(5, &nFrame);
+            SD_SetShaderTypeParameters(5, &nFrame);
             fn_80036100((ShaderObject*)lbl_80282228->aMesh[nView], &desc, 1);
             fn_800360D4(lbl_80282228->aMesh[nView]);
         }

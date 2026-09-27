@@ -509,11 +509,11 @@ typedef struct RenderState {
     s32  nC8;                   // 0x0C8  }
     f32  fCC;                   // 0x0CC  } a render camera's screen rectangle in frame buffer units:
     f32  fD0;                   // 0x0D0  } left, top, width, height, then 0 and 1; bit 0x800
-    f32  fD4;                   // 0x0D4  } (GoRenderCtx_Gc.c fn_80013EEC)
+    f32  fD4;                   // 0x0D4  } (GoRenderCtx_Gc.c RenderState_SetViewport)
     f32  fD8;                   // 0x0D8  }
     f32  fDC;                   // 0x0DC  }
     f32  fE0;                   // 0x0E0  }
-    s32  nE4;                   // 0x0E4  } fn_800140E8's six arguments, bit 0x1000
+    s32  nE4;                   // 0x0E4  } RenderState_SetRenderSurface's six arguments, bit 0x1000
     s32  nE8;                   // 0x0E8  }
     s32  nEC;                   // 0x0EC  }
     s32  nF0;                   // 0x0F0  }
@@ -770,7 +770,7 @@ typedef struct UObjSetFuncs {
 
 // One row of lbl_80188E88 (our name; 20 rows of 0x44 bytes): a module's hooks. The main loop
 // (gomainloop.c) calls each row's pfnC..pfn20 at six points of a frame (fn_8006DDA8 and its
-// neighbours), skipping NULL ones; fn_8003519C calls a row's pfn8 with data. Rows 0 and 1 hold
+// neighbours), skipping NULL ones; SD_SetShaderTypeParameters calls a row's pfn8 with data. Rows 0 and 1 hold
 // functions of 0x8006FED4-0x80070FB0 from +0x24 on.
 typedef struct ModuleHooks {
     void  (*pfn0)(void);          // 0x00  the type's init (row 17: SD_vShaderObject_Grass_Type_Init),
@@ -1358,18 +1358,18 @@ void fn_80013400(void);                 // read the controllers
 u8*  fn_800136C4(int nController);      // the pad's state: stick bytes at +0, +2, +3
 u32  Controller_GetButtons(int nController);      // buttons: held << 16 | pressed this frame
 void RenderState_SetDrawFlags(int a);
-// A screen quad (GameEffects' letter boxes, GxUtil.c's alpha clear): fn_800141F8 fills its corners
+// A screen quad (GameEffects' letter boxes, GxUtil.c's alpha clear): RenderView_MakeQuad fills its corners
 // (x0, y0)-(x1, y1), RenderView_SetColor sets its colour (four floats), RenderView_DrawPrimitive draws it.
 void RenderView_SetColor(f32* pColour);
 void fn_800141CC(void);                 // GoRenderCtx_Gc.c: the default vertex colour
-void fn_800141F8(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1);
-void fn_8001425C(int a);
+void RenderView_MakeQuad(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1);
+void RenderView_SetUseCurrentMatrices(int a);
 void RenderView_DrawPrimitive(int a, f32* pXY, f32* pColour, f32* pUV, int c);
 void fn_800BA74C(u8 bFade);             // ScreenClear.c: a black screen for 1, 2 or 30 frames
 u32  Controller_GetButtonMask(int nButton, u8 bShift);   // a button's mask (bShift: moved up 16 bits)
 extern s8   lbl_80281C98;               // GoRenderCtx_Gc.c: the row of lbl_80186AF0 in use (fn_800142A4)
 extern u32  lbl_80186AF0[][0xE8 / 4];   // GoRenderCtx_Gc.c: rows of button masks, by button
-u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
+u8   Controller_AnyPadHasButtons(u32 uMask);            // any pad pressed these buttons
 
 // ---- events, sound, effects ------------------------------------------------------------------
 

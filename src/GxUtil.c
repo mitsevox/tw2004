@@ -30,13 +30,13 @@ void fn_8002A024(u8 bOn, f32 x0, f32 y0, f32 x1, f32 y1) {
         RenderState_SetAlphaTest(0, 6, 0x80);
         RenderState_SetDepthFunc(7);
         RenderState_SetDrawFlags(0);
-        fn_800141F8(xy, NULL, x0, y0, x1, y1);
+        RenderView_MakeQuad(xy, NULL, x0, y0, x1, y1);
         colour[0] = 0.0f;
         colour[1] = 0.0f;
         colour[2] = 0.0f;
         colour[3] = 0.0f;
         RenderView_SetColor(colour);
-        fn_8001425C(0);
+        RenderView_SetUseCurrentMatrices(0);
         RenderState_Flush();
         RenderView_DrawPrimitive(0xA1, xy, 0, NULL, 2);
         RenderState_SetDepthWrite(1);

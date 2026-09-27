@@ -11,7 +11,7 @@
 #include "dyncam.h"
 
 CamLens* Camera_GetLens(void* pCamera);                    // the render camera's lens
-void     fn_800352BC(void);
+void     RC_UpdateCurrentScreenMatrices(void);
 u8       fn_800635D0(int nPlayer);
 u8       fn_800B36F4(View* pView, int nPlayer, f32 fFrameTime);
 void     fn_800C73B8(f32* pA, f32* pB, f32* pOut);
@@ -44,7 +44,7 @@ void     Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);  // rotate a vector
 u8       fn_8006BEA4(void);                             // the GameBreaker letterbox is up, scripted
 void     fn_800A68C0(u8 nPlayer);
 void     fn_80039344(int nView, f32 f);                 // a per-view float (Swing.c's declaration)
-f32      fn_80014280(f32 x);                            // tan, as a float
+f32      Math_Tan(f32 x);                            // tan, as a float
 void     fn_800638B8(View* pView, int nPlayer);
 f32      fn_800D04AC(int nPlayer);                      // Swing.c's declaration
 f32      fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer);
@@ -540,7 +540,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
         f = Math_Sqrt(Vec3_LengthSqClamped(vPin));
         f += 1.5f;
         fSpeed = (f < 0.0f) ? 0.0f : ((f > 20.0f) ? 20.0f : f);
-        f = fSpeed / fn_80014280(fn_80014278(pLens) / 2.0f);
+        f = fSpeed / Math_Tan(CA_fGetCameraFieldOfView(pLens) / 2.0f);
         if (f > fHeight) {
             fHeight = f;
         }
@@ -1683,10 +1683,10 @@ void fn_800C1790(View* pView, int nPlayer) {
     int nView = gPlayers[nPlayer].nView[0];
     if (lbl_80282220->b56) {
         fn_800171D8(fn_80012EF0(ViewController_GetCamera(nView)), 0.0f, 0.0f, 1.0f, 1.0f);
-        fn_800352BC();
-        fn_80035240(NULL);
-        fn_80013CCC(Camera_GetCurrent());
-        fn_80013EEC(Camera_GetCurrent());
+        RC_UpdateCurrentScreenMatrices();
+        RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
+        RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
+        RenderState_SetViewport(Camera_GetCurrent());
         RenderState_SetCameraMatrices();
         RenderState_Flush();
         lbl_80282220->b56 = 0;
@@ -2848,8 +2848,8 @@ void GolfCamera_ComputeSteepSlopeCamVectors(View* pView, int nPlayer) {
         fn_800B5918(pView->v10, vPrevSub);
         fn_800B5918(vCam, pView->v0);
         fn_800B5918(vTarget, pView->v10);
-        fn_800352BC();
-        fn_80013CCC(Camera_GetCurrent());
+        RC_UpdateCurrentScreenMatrices();
+        RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
         bHit = Ter_CheckForGroundCollision(pBall->pCourse, vCam, vTarget, vHit, vNormal, &pSurface, &pObj);
         fn_800636B4(nPlayer);
         if (bHit || bClear) {
@@ -3027,7 +3027,7 @@ void fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
     lbl_80282220->shot6C.f6C = 20.0f;
     fChange = GameEffects_FieldOfViewChange();
     lbl_80282220->shot6C.f78 =
-        fn_80014278(Camera_GetLens(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera)) - fChange;
+        CA_fGetCameraFieldOfView(Camera_GetLens(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera)) - fChange;
     lbl_80282220->shot6C.f7C = lbl_80282220->shot6C.f78;
     lbl_80282220->shot6C.f80 = 0.0f;
     lbl_80282220->shot6C.f4C = 1.0f;
@@ -3230,7 +3230,8 @@ void fn_800C56B4(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
     lbl_80282220->shot12C.f68 = 0.2f;
     lbl_80282220->shot12C.f6C = 20.0f;
     fChange = GameEffects_FieldOfViewChange();
-    lbl_80281F78->f80 = fn_80014278(Camera_GetLens(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera))
+    lbl_80281F78->f80
+            = CA_fGetCameraFieldOfView(Camera_GetLens(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera))
             - fChange;
     lbl_80282220->shot12C.f78 = lbl_80281F78->f80;
     lbl_80282220->shot12C.f7C = lbl_80282220->shot12C.f78;

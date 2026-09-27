@@ -13,13 +13,13 @@ void fn_80013E30(Camera* pCamera, GoFrameBuf* pBuf);
 void fn_80013E38(Camera* pCamera, CamLens* pLens);
 void fn_80013E48(Camera* pCamera);
 void fn_80013EA0(Camera* pCamera);
-void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
+void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_8000AB80(f32 (*pMtx)[4], f32 f1, f32 f2);   // matrix builders, not decompiled yet
 void fn_8000ABE8(f32 (*pMtx)[4], f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
 void fn_8000AC5C(f32 (*pMtx)[4], f32 f1, f32 f2, f32 f3, f32 f4);
 f32 fn_80014268(u8* p);
 f32 fn_80014270(u8* p);
-f32 fn_80014280(f32 x0);
+f32 Math_Tan(f32 x0);
 
 // This file's .sbss (engine.h), in reverse address order as the compiler lays it out.
 s8    lbl_80281C98;
@@ -29,7 +29,7 @@ void* lbl_80281C90[2];          // 8 bytes in the DOL (lbl_80281C98 follows at +
 void** lbl_80280DF0 = lbl_80281C90;
 
 // Makes a render camera from a lens, a frame buffer and a screen rectangle.
-void* fn_8001371C(CamLens* pLens, GoFrameBuf* pBuf, f32* pRect) {
+void* RC_spCreateRenderCtx(CamLens* pLens, GoFrameBuf* pBuf, f32* pRect) {
     Camera* pCamera;
 
     pCamera = StaticMem_Alloc(0x234, 2, 16, "GoRenderCtx_Gc.c", 96);
@@ -63,7 +63,7 @@ static f32 GoRenderCtx_Gc_StrippedFn(f32 x) {
 s32 Mtx_Copy();
 s32 fn_8000A714();
 s32 fn_800BADF8();
-void fn_80013D5C(s32 v);
+void RC_vSetCurrentRenderCtx(s32 v);
 void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera);   // not decompiled yet
 void fn_80013DD0(u8* arg0, f32 (*arg1)[4]);
 s32 Mtx_Identity();
@@ -76,36 +76,36 @@ f32 fn_8001417C(u8* p);
 f32 fn_80014184(u8* p);
 f32 fn_8001418C(u8* p);
 
-void fn_800137B0(void* pCamera) {
+void RC_vReleaseRenderCtx(void* pCamera) {
     StaticMem_Free(pCamera);
 }
 
 void fn_800137D0(Camera* pCamera) {
-    fn_80013EEC(pCamera);
+    RenderState_SetViewport(pCamera);
     RenderState_Flush();
     fn_80013EA0(pCamera);
 }
 
 // Draws a rectangle over the whole screen in pColour (r, g, b, a; NULL: the default grey), depth
 // test off. uFlags bit 0: keep RenderState_SetDepthWrite's setting; bit 1: pass 1 instead of 2 to the first
-// fn_800140E8 (colour and alpha written instead of neither).
+// RenderState_SetRenderSurface (colour and alpha written instead of neither).
 void fn_80013808(f32* pColour, u32 uFlags) {
     f32 aXY[8];
 
-    fn_8001425C(0);
+    RenderView_SetUseCurrentMatrices(0);
     RenderState_SetDrawFlags(0);
     if (!(uFlags & 1)) {
         RenderState_SetDepthWrite(0);
     }
     if (!(uFlags & 2)) {
-        fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 2, 1);
+        RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 2, 1);
     } else {
-        fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 1, 1);
+        RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 1, 1);
     }
     RenderState_SetAlphaTest(0, 6, 0x80);
     RenderState_SetDepthFunc(7);
     RenderState_Flush();
-    fn_800141F8(aXY, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
+    RenderView_MakeQuad(aXY, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
     aXY[2] = 0.0f;
     aXY[6] = 0.0f;
     RenderView_SetColor(pColour);
@@ -113,7 +113,7 @@ void fn_80013808(f32* pColour, u32 uFlags) {
     RenderState_SetAlphaTest(0, 6, 0x80);
     RenderState_SetDepthFunc(3);
     RenderState_SetDepthWrite(1);
-    fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
+    RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
     RenderState_Flush();
 }
 
@@ -132,7 +132,7 @@ void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
     pLens = pCamera->unk10;
     pRect = pCamera->pRect;
     pBuf = pCamera->pBuf;
-    pCamera->f224 = fn_80014280(fn_80014278(pLens) * 0.5f);
+    pCamera->f224 = Math_Tan(CA_fGetCameraFieldOfView(pLens) * 0.5f);
     pCamera->f228 = 1.0f / pCamera->f224;
     fn_8001415C(pBuf);
     fn_8001416C(pBuf);
@@ -186,7 +186,7 @@ void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
     fn_800BADF8(pCamera->m5C, pLens->m44, pCamera->mDC, 4);
 }
 
-void fn_80013CCC(void* pCamera) {
+void RC_vUpdateRenderCtxTransformationMatrices(void* pCamera) {
     u8* arg0 = pCamera;
 
     if ((u8) (*(u8*)((u8*)(arg0) + 0x1DC)) != 0) {
@@ -202,7 +202,8 @@ void fn_80013CCC(void* pCamera) {
 void fn_80013D58(Camera* pCamera) {
 }
 
-void fn_80013D5C(s32 v) {
+// Makes pCamera the current render camera (the one Camera_GetCurrent returns).
+void RC_vSetCurrentRenderCtx(s32 v) {
     *(s32*)(lbl_80280DF0 + 0x0) = v;
 }
 
@@ -212,9 +213,9 @@ void fn_80013D68(Camera* pCamera) {
 }
 
 // Gives the camera the model matrix pMtx (NULL: the identity).
-void fn_80013D9C(void* pCamera, f32 (*pMtx)[4]) {
+void RC_vSetRenderCtxTransformationMatrix(void* pCamera, f32 (*pMtx)[4]) {
     fn_80013DD0(pCamera, pMtx);
-    fn_80013CCC(pCamera);
+    RC_vUpdateRenderCtxTransformationMatrices(pCamera);
 }
 
 void fn_80013DD0(u8* arg0, f32 (*arg1)[4]) {
@@ -245,7 +246,7 @@ GoFrameBuf* fn_80013E40(Camera* pCamera) {
 
 // Starts a new camera: the identity model matrix and its first values.
 void fn_80013E48(Camera* pCamera) {
-    fn_80013D9C(pCamera, NULL);
+    RC_vSetRenderCtxTransformationMatrix(pCamera, NULL);
     pCamera->a0[0] = 0.0f;
     pCamera->a0[1] = 0.0f;
     pCamera->a0[2] = 0.5f;
@@ -262,7 +263,7 @@ void fn_80013EA0(Camera* pCamera) {
 
 // Hands the renderer the camera's screen rectangle: in frame buffer units (bit 0x800), and in
 // 512 x 448 screen pixels, left, right, top, bottom (bit 0x200).
-void fn_80013EEC(void* pCamera) {
+void RenderState_SetViewport(void* pCamera) {
     f32* pRect;
     GoFrameBuf* pBuf;
 
@@ -282,7 +283,9 @@ void fn_80013EEC(void* pCamera) {
     lbl_801B8980.u110 |= 0x200;
 }
 
-void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c) {
+// Selects render surface a (GoRenderSurface.c) with the next RenderState_Apply: its width, height
+// and field, and in b the channels drawing writes (1 both, 2 neither, 4 alpha only, 8 colour only).
+void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c) {
     lbl_801B8980.nE4 = a;
     lbl_801B8980.nE8 = nWidth;
     lbl_801B8980.nEC = nHeight;
@@ -368,7 +371,7 @@ void fn_800141CC(void) {
 
 // Fill a screen quad's two corners (x0, y0)-(x1, y1) and its texture coordinates (0,0)-(1,1),
 // four floats per vertex.
-void fn_800141F8(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1) {
+void RenderView_MakeQuad(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1) {
     if (pXY != NULL) {
         pXY[0] = x0;
         pXY[1] = y0;
@@ -398,7 +401,9 @@ void fn_800142A4(s8 v);
 void fn_800131C4(int nController);
 void fn_8001437C(void);
 
-void fn_8001425C(int a) {
+// 1: RenderView_DrawPrimitive draws with the viewport and matrices already set (the camera's); 0:
+// with the view's own screen projection and viewport, put back after the draw.
+void RenderView_SetUseCurrentMatrices(int a) {
     lbl_80280E08->nD0 = a;
 }
 
@@ -410,11 +415,11 @@ f32 fn_80014270(u8* p) {
     return *(f32*)(p + 0xA8);
 }
 
-f32 fn_80014278(CamLens* pLens) {
+f32 CA_fGetCameraFieldOfView(CamLens* pLens) {
     return pLens->fFov;
 }
 
-f32 fn_80014280(f32 x0) {
+f32 Math_Tan(f32 x0) {
     f32 t0;
     t0 = tan(x0);
     return t0;
@@ -447,7 +452,7 @@ u32 Controller_GetButtonMask(int nButton, u8 bShift) {
 }
 
 // Whether any of the four pads has any of the buttons in uMask (0: any button at all).
-u8 fn_80014300(u32 uMask) {
+u8 Controller_AnyPadHasButtons(u32 uMask) {
     u8 bPressed = 0;
     int nController = 0;
 

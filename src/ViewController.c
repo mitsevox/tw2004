@@ -64,7 +64,7 @@ void fn_80016D18(int nView, f32 x, f32 y, f32 w, f32 h) {
     pRect = VM_spCreateViewport();
     fn_800171D8(pRect, x, y, w, h);
     // port: fn_800171B0 is typed s32, but its value is the frame buffer
-    pCtrl->pCamera = fn_8001371C(pLens, (GoFrameBuf*)fn_800171B0(), pRect);
+    pCtrl->pCamera = RC_spCreateRenderCtx(pLens, (GoFrameBuf*)fn_800171B0(), pRect);
     fn_80062E40(&pCtrl->view);
     pCtrl->nPlayer = 5;
     pCtrl->b274 = 1;
@@ -84,7 +84,7 @@ void fn_80016E3C(int nView) {
     pCtrl = ViewController_Get(nView);
     CA_vReleaseCamera(Camera_GetLens(pCtrl->pCamera));
     VM_vReleaseViewport(fn_80012EF0(pCtrl->pCamera));
-    fn_800137B0(pCtrl->pCamera);
+    RC_vReleaseRenderCtx(pCtrl->pCamera);
     pCtrl->b274 = 0;
 }
 
@@ -113,7 +113,7 @@ void fn_80016E90(int nView) {
                     CameraController_GetTarget(pView));
     }
     fn_80013D68(pCamera);
-    fn_80013CCC(pCamera);
+    RC_vUpdateRenderCtxTransformationMatrices(pCamera);
 }
 
 void* ViewController_GetCamera(int nView) {

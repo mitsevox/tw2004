@@ -333,8 +333,8 @@ void ColGlow_RenderAllGlowInCurrentList(void) {
     if (lbl_80281F80 != NULL && lbl_80281F80->nCount > 0) {
         pMtx = pLens->m44;
         // port: the lens's 0x04..0x44 block is used as a matrix here (CamLens has v4 there)
-        fn_80013D9C(pCamera, pLens->m4);
-        fn_80013EEC(Camera_GetCurrent());
+        RC_vSetRenderCtxTransformationMatrix(pCamera, pLens->m4);
+        RenderState_SetViewport(Camera_GetCurrent());
         RenderState_SetCameraMatrices();
         RenderState_SetBlendFactors(4, 1);
         RenderState_SetAlphaTest(0, 6, 0x80);
@@ -354,8 +354,8 @@ void ColGlow_RenderAllGlowInCurrentList(void) {
         desc.pMtx = pMtx;
         fn_80036100((ShaderObject*)lbl_801D9A40, &desc, 1);
         fn_800360D4(lbl_801D9A40);
-        fn_80013D9C(pCamera, NULL);
-        fn_80013EEC(Camera_GetCurrent());
+        RC_vSetRenderCtxTransformationMatrix(pCamera, NULL);
+        RenderState_SetViewport(Camera_GetCurrent());
         RenderState_SetDepthWrite(1);
         RenderState_SetDepthFunc(3);
         RenderState_SetAlphaTest(1, 6, 0x80);

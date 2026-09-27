@@ -5,7 +5,7 @@
 #include "golfer.h"
 #include "comiccam.h"
 
-void fn_800352BC(void);
+void RC_UpdateCurrentScreenMatrices(void);
 void fn_80038624(f32* pColour);
 void fn_800A6AC8(u8 nPlayer, u8 n);     // GameAudio.c
 
@@ -252,10 +252,10 @@ void fn_800B3D68(ComicPanel* pPanel, f32* pRect, f32 fFrameTime) {
 // Set the render camera's screen rectangle pRect and bring the camera up to date.
 void fn_800B3F4C(f32* pRect, f32 fTop, f32 fLeft, f32 fWidth, f32 fHeight) {
     fn_800171D8(pRect, fLeft, fTop, fWidth, fHeight);
-    fn_800352BC();
-    fn_80035240(NULL);
-    fn_80013CCC(Camera_GetCurrent());
-    fn_80013EEC(Camera_GetCurrent());
+    RC_UpdateCurrentScreenMatrices();
+    RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
+    RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
+    RenderState_SetViewport(Camera_GetCurrent());
     RenderState_SetCameraMatrices();
     RenderState_Flush();
 }

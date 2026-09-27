@@ -1014,7 +1014,8 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
             && (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0))) {
             fn_800E41D4(nPlayer);
         }
-    } else if (Player_IsCPU(nPlayer) && !fn_8008AC40() && fn_80014300(Controller_GetButtonMask(0, 0))) {
+    } else if (Player_IsCPU(nPlayer) && !fn_8008AC40()
+               && Controller_AnyPadHasButtons(Controller_GetButtonMask(0, 0))) {
         fn_800E41D4(nPlayer);
     }
 }

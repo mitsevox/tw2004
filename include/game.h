@@ -38,7 +38,7 @@ extern ReplayBuffer* lbl_80281E48;      // 0x80281E48
 // gomainloop.c
 extern u8    lbl_80281B8E;              // the reset button was pressed (OSGetResetButtonState)
 extern u8    lbl_80281E50;              // set after a create-a-player frame, cleared otherwise
-extern void*       lbl_80281E54;        // the render camera made from the three below (fn_8001371C)
+extern void*       lbl_80281E54;        // the render camera made from the three below (RC_spCreateRenderCtx)
 extern void*       lbl_80281E58;        // } made by VM_spCreateViewport,
 extern GoFrameBuf* lbl_80281E5C;        // }   FB_spCreateFrameBuffer
 extern void*       lbl_80281E60;        // }   and CA_spCreateCamera when a game type starts

@@ -143,7 +143,7 @@ void fn_8008F648(s32 nTicks) {
     s32 aArgs[1];
 
     if (lbl_80281F1A) {
-        fn_8001425C(0);
+        RenderView_SetUseCurrentMatrices(0);
         RenderState_SetBlendFactors(4, 5);
         RenderState_SetDepthWrite(0);
         RenderState_SetAlphaTest(1, 6, 1);

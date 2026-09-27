@@ -123,7 +123,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     } else {
         RenderState_SetDrawFlags(0x40);
     }
-    fn_80013EEC(Camera_GetCurrent());
+    RenderState_SetViewport(Camera_GetCurrent());
     fInnerX = fInnerY = 0.0f;
     vScale[0] = (1.0f / 511.0f) * pColour->w40.a[0];
     vScale[1] = (1.0f / 511.0f) * pColour->w40.a[1];

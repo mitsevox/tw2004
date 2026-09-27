@@ -40,8 +40,8 @@ void fn_800136F4(void);
 void fn_80013718(void);
 void fn_800137D0(void* pCamera);
 void fn_80013808(void* pCamera, int n, void** ppSlot);
-void fn_80013D5C(void* pCamera);        // the current render camera (lbl_80280DF0)
-void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
+void RC_vSetCurrentRenderCtx(void* pCamera);        // the current render camera (lbl_80280DF0)
+void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80014594(void);
 void fn_800145E0(void);
 void fn_8001462C(void);
@@ -504,7 +504,7 @@ void fn_8006C854(void) {
 // quad (fn_8006DC4C) with flags 3 in a round for views 0 and 1 while fn_800642B0 is 0, else 1.
 void fn_8006C8EC(int nView) {
     fn_80016CD8();
-    fn_80013D5C(ViewController_GetCamera(nView));
+    RC_vSetCurrentRenderCtx(ViewController_GetCamera(nView));
     fn_8006DC78();
     fn_80035F1C();
     if (nView < 2 && !fn_800642B0() && gSession.nGameType == 6) {
@@ -521,7 +521,7 @@ void fn_8006C968(void) {
     f32 fB = 128.0f;
 
     RenderState_SetDepthWrite(1);
-    fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
+    RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
     fn_800350D0(46.875f);
     fn_800350B4(560.25f);
     fn_800350EC(fRG, fRG, fB);
@@ -545,8 +545,8 @@ void GO_vInitFE(void) {
     DynamicCam_Init();
     lbl_80281E5C = FB_spCreateFrameBuffer();
     lbl_80281E58 = VM_spCreateViewport();
-    lbl_80281E54 = fn_8001371C(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
-    fn_80013D5C(lbl_80281E54);
+    lbl_80281E54 = RC_spCreateRenderCtx(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
+    RC_vSetCurrentRenderCtx(lbl_80281E54);
     TI_vResetCounter(2);
     TI_vStartCounter(2);
     fn_800A7A34(0, 0, 1, 0);
@@ -573,7 +573,7 @@ void GO_vInitFE(void) {
 // Shuts the front end down.
 void fn_8006CB2C(void) {
     fn_8006DCA4(1);
-    fn_800137B0(lbl_80281E54);
+    RC_vReleaseRenderCtx(lbl_80281E54);
     fn_8010F794();
     fn_8008B00C();
     fn_80077428();
@@ -617,8 +617,8 @@ void GO_vInitIG(void) {
     lbl_80281E60 = CA_spCreateCamera();
     lbl_80281E5C = FB_spCreateFrameBuffer();
     lbl_80281E58 = VM_spCreateViewport();
-    lbl_80281E54 = fn_8001371C(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
-    fn_80013D5C(lbl_80281E54);
+    lbl_80281E54 = RC_spCreateRenderCtx(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
+    RC_vSetCurrentRenderCtx(lbl_80281E54);
     fn_80030254();
     fn_8004B1A4();
     fn_800A7A34(1, 0, (gSession.nSplitScreen != 0) + 1, 0);
@@ -684,7 +684,7 @@ void GO_vInitIG(void) {
 
 // Shuts a round down.
 void fn_8006CDC4(void) {
-    fn_800137B0(lbl_80281E54);
+    RC_vReleaseRenderCtx(lbl_80281E54);
     VM_vReleaseViewport(lbl_80281E58);
     FB_vReleaseFrameBuffer(lbl_80281E5C);
     CA_vReleaseCamera(lbl_80281E60);
@@ -749,8 +749,8 @@ void fn_8006CEFC(void) {
     lbl_80281E60 = CA_spCreateCamera();
     lbl_80281E5C = FB_spCreateFrameBuffer();
     lbl_80281E58 = VM_spCreateViewport();
-    lbl_80281E54 = fn_8001371C(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
-    fn_80013D5C(lbl_80281E54);
+    lbl_80281E54 = RC_spCreateRenderCtx(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
+    RC_vSetCurrentRenderCtx(lbl_80281E54);
     fn_800B1D78();
     fn_800147D4();
     fn_80014834();
@@ -768,7 +768,7 @@ void fn_8006CEFC(void) {
 void fn_8006CFC8(void) {
     fn_80090664();
     fn_8010F794();
-    fn_800137B0(lbl_80281E54);
+    RC_vReleaseRenderCtx(lbl_80281E54);
     VM_vReleaseViewport(lbl_80281E58);
     FB_vReleaseFrameBuffer(lbl_80281E5C);
     fn_80016E3C(0);
@@ -789,14 +789,14 @@ u8 fn_8006D01C(void) {
     } else if (gSession.nGameType == 6 && fn_8006DC34()) {
         bDone = 1;
     } else if (gSession.nGameType == 6 && !gSession.a8[0] && (gSession.uFlags & 0x4000)) {
-        if (fn_80014300(0)) {
+        if (Controller_AnyPadHasButtons(0)) {
             fn_8009A16C();
         }
         if (fn_8009A180()) {
             bDone = 1;
         }
     } else if (gSession.nGameType == 6 && gSession.a8[0]) {
-        if (fn_80014300(0)) {
+        if (Controller_AnyPadHasButtons(0)) {
             bDone = 1;
         }
         if ((gSession.uFlags & 0x4000) && fn_8009A180()) {
@@ -970,7 +970,7 @@ void fn_8006D27C(void) {
         }
         fn_8006DE28();
     }
-    fn_80013D5C(lbl_80281E54);
+    RC_vSetCurrentRenderCtx(lbl_80281E54);
     fn_8006DC78();
     fn_80035F1C();
     fn_80038968();
@@ -1097,7 +1097,7 @@ void fn_8006D8E8(void) {
             GM_Update();
         }
         fn_800C9970();
-        fn_80013D5C(lbl_80281E54);
+        RC_vSetCurrentRenderCtx(lbl_80281E54);
         fn_800718C4();
         fn_8006C968();
         fn_8006DC78();

@@ -239,7 +239,7 @@ void TARGET_RenderBallTarget(int nPlayer) {
     fn_8005CC64(lbl_80281E3C, lbl_80281E40);
     RenderState_SetDrawFlags(0x50);
     RenderState_Flush();
-    fn_8001425C(1);
+    RenderView_SetUseCurrentMatrices(1);
     fScale = 8.0f * fCamDist + 1.0f;
     for (i = 0; i < 4; i++) {
         aMarker[i][2] = fScale * (fCos * aMarkerQuad[i][0]) + fScale * (fSin * aMarkerQuad[i][2]);
@@ -1010,7 +1010,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     RenderState_SetDrawFlags(0x50);
     RenderState_SetDepthWrite(0);
     RenderState_Flush();
-    fn_8001425C(1);
+    RenderView_SetUseCurrentMatrices(1);
     for (i = 0; i < 4; i++) {
         aMarker[i][2] = fCos * aMarkerQuad[i][0] + fSin * aMarkerQuad[i][2];
         aMarker[i][0] = -fSin * aMarkerQuad[i][0] + fCos * aMarkerQuad[i][2];
@@ -1018,7 +1018,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     }
 
     // the marker's height: kept where the camera can see it (within 3/4 of its field of view)
-    fHalfFov = fn_80014278(Camera_GetCurrentLens());
+    fHalfFov = CA_fGetCameraFieldOfView(Camera_GetCurrentLens());
     fHalfFov = 0.75f * fHalfFov * fn_8001414C((u8*)fn_8003526C());
     fn_8006A964(pView->v10, pView->v0, vDir);
     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {

@@ -49,7 +49,7 @@ void  fn_80035FFC(void);
 void  fn_80036024(f32 f);
 void  fn_80093824(void);                                     // goballfx.c
 f32   fn_8004B78C(CourseInfo* pCourse, f32* pPos);           // GoTerrainCollision.c: the ground's light
-void  fn_8003519C(int nRow, void* pData);                    // GoTerrain.c: calls row nRow's pfn8
+void  SD_SetShaderTypeParameters(int nRow, void* pData);                    // GoTerrain.c: calls row nRow's pfn8
 void  fn_8011CB5C(Skin* pSkin, int nView);                   // SkinMorph.c
 void  fn_800CE16C(void);                                     // SkinPart.c
 void  fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int nView);
@@ -170,9 +170,9 @@ void fn_800358E0(Character* pChar, u32 uFlags) {
     if (!uShadow) {
         uSet3 = uFlags & 4;
         if (uSet3) {
-            fn_80035338(3);
+            LF_vSetCurrentLightFogEnvironment(3);
         } else {
-            fn_80035338(0);
+            LF_vSetCurrentLightFogEnvironment(0);
             if (pEntry != NULL) {
                 // port: Character.p44's entries are what lighting.h calls LightParams
                 fn_80093854((LightParams*)pEntry);
@@ -209,7 +209,7 @@ void fn_800358E0(Character* pChar, u32 uFlags) {
             break;
         }
         RenderState_Flush();
-        fn_8003519C(10, aData);
+        SD_SetShaderTypeParameters(10, aData);
         fn_80035640(pChar);
     } else {
         switch (nMode) {
@@ -390,11 +390,11 @@ void fn_80035FDC(UObject* pObj) {
 
 // Loads the current light set's lights.
 void fn_80035FFC(void) {
-    fn_8003612C(&fn_8003532C()->group);
+    fn_8003612C(&LF_spGetCurrentLightFogEnvironment()->group);
 }
 
 void fn_80036024(f32 f) {
-    fn_8003532C()->group.v18[0] = f;
+    LF_spGetCurrentLightFogEnvironment()->group.v18[0] = f;
 }
 
 // Sets up a shader object for row nRow of lbl_80188E88, handing its hooks pDesc.
