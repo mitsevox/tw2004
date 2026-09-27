@@ -42037,5 +42037,21 @@
 "matched_functions": 7603,
 "total_functions": 7647,
 "exact": 7603
+},
+{
+"commit": "cad68d0",
+"sha": "cad68d0a08b3fe8456331a47ce7ca06b33c174ee",
+"time": 1790477134,
+"subject": "Merge agent/b6: skalib AnimLib_WasLastPlayed exact (accumulated byte offset, labelled)",
+"report": true,
+"matched_code": 1502592,
+"complete_code": 1370024,
+"matched_data": 778927,
+"complete_data": 925243,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7604,
+"total_functions": 7647,
+"exact": 7604
 }
 ]
