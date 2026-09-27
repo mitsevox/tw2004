@@ -803,6 +803,7 @@ config.libs = [
             Object(Matching, "runtime/printf.c", mw_version="GC/2.5"),
             Object(Matching, "runtime/runtime.c"),
             Object(Matching, "runtime/FILE_POS.c"),
+            Object(Matching, "runtime/locale.c"),
             Object(Matching, "runtime/ctype.c"),
             Object(Matching, "runtime/e_acos.c"),
             Object(Matching, "runtime/e_asin.c"),
