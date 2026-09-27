@@ -43525,5 +43525,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "8feabb6",
+"sha": "8feabb66af2fb9b11b5e952fe5763f7420d05d5c",
+"time": 1790532907,
+"subject": "merge.py: --allow-renames for naming lanes (each rename needs a name_sources.tsv row)",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
