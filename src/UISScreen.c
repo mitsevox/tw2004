@@ -161,41 +161,50 @@ u8* fn_8016C5C4(UISNode* pNode, u32 uEvent) {
 s32 fn_8016C270(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UISWordStack* pStack, u8* pScript,
                s32 nArgs, s32* pArgs, u32 nArgs2, const s32* pArgs2, u8 bExtra, s32 nExtra,
                s32* pnSaved) {
+    // fake match: pStackCopy is pStack through a void* copy, declared first; the local's higher
+    // variable number makes the allocator colour it before pFrame and pnSaved (EA's r31).
+    UISWordStack* pStackCopy = (UISWordStack*)(void*)pStack;
     s32* pFrame;
     u32 i;
     s32 nResult;
+    void* pScriptCopy = pScript;
 
-    pFrame = pStack->pC;
+    // fake match: pScriptCopy is pScript, so this OR leaves pScript unchanged. The frontend cannot
+    // fold the OR of two variables; it stays as `or r11,r7,r7` (the original's `mr r11,r7`, the
+    // same encoding), which the allocator never coalesces, so pScript leaves r7 as in EA.
+    // port: the pointer goes through a 32-bit integer
+    pScript = (u8*)((u32)pScript | (u32)pScriptCopy);
+    pFrame = pStackCopy->pC;
     if (pnSaved == NULL) {
         *pFrame = 0;
     } else {
         *pFrame = *pnSaved;
     }
-    pStack->pC++;
+    pStackCopy->pC++;
     if (bExtra) {
-        *pStack->pC = nExtra;
-        pStack->pC++;
+        *pStackCopy->pC = nExtra;
+        pStackCopy->pC++;
     }
     for (i = 0; i < nArgs; i++) {
-        *pStack->pC = pArgs[i];
-        pStack->pC++;
+        *pStackCopy->pC = pArgs[i];
+        pStackCopy->pC++;
     }
     for (i = 0; i < nArgs2; i++) {
-        *pStack->pC = pArgs2[i];
-        pStack->pC++;
+        *pStackCopy->pC = pArgs2[i];
+        pStackCopy->pC++;
     }
     // port: the frame keeps the info pointer in a word
-    *pStack->pC = (s32)pInfo;
-    pStack->pC++;
-    *pStack->pC = 0;
-    pStack->pC++;
-    pStack->p10 = pScript;
-    nResult = fn_80166098(pStudio, pFrame, pStack, pScreen, pInfo);
+    *pStackCopy->pC = (s32)pInfo;
+    pStackCopy->pC++;
+    *pStackCopy->pC = 0;
+    pStackCopy->pC++;
+    pStackCopy->p10 = pScript;
+    nResult = fn_80166098(pStudio, pFrame, pStackCopy, pScreen, pInfo);
     if (pnSaved != NULL) {
         *pnSaved = *pFrame;
     }
     if (nResult != 3) {
-        pStack->pC = pFrame;
+        pStackCopy->pC = pFrame;
     }
     return nResult;
 }
