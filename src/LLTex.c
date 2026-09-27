@@ -548,8 +548,8 @@ void fn_8000FBAC(void) {
 // pointing into the data; otherwise it copies the pixels and colours and sets up the GX objects.
 // n is added to every level's n8 and every palette's n6.
 TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
-    TexBank* pBank;
-    TexBank* pHead;
+    int k;
+    TexBankHeader* pHead;
     TexSection* pSection;
     TexSection* pPixels;
     u8* pTables;
@@ -558,14 +558,16 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
     TexPalette* pPalette;
     int nSize;
     int i;
+    TexBank* pBank;
     int j;
-    int nOffset;
 
+    // port: `((T*)p)++` (a cast used as an lvalue) is a CodeWarrior extension, not ISO C; it means
+    // `x = (T*)p; p += sizeof(T);`. Written the plain way, the compiler folds every step into
+    // offsets from the parameter instead of keeping the cursor.
     p += 0x10;
-    pHead = (TexBank*)p;
-    p += 8;
-    nSize = sizeof(TexBank) + pHead->n2 * sizeof(TexEntry) + pHead->n4 * sizeof(TexPalette) +
-            pHead->n4 * sizeof(TexGXTlut) + pHead->n2 * sizeof(TexGXObj);
+    pHead = ((TexBankHeader*)p)++;
+    nSize = sizeof(TexBank) + pHead->n2 * sizeof(TexEntry) + pHead->n4 * sizeof(TexPalette);
+    nSize += pHead->n2 * sizeof(TexGXObj) + pHead->n4 * sizeof(TexGXTlut);
     if (pInto != NULL) {
         pBank = pInto;
     } else {
@@ -573,8 +575,7 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
         pInto = pBank;
     }
     // the bank's first 8 bytes (its counts n2 and n4) as the data has them
-    ((u32*)pBank)[0] = ((u32*)pHead)[0];
-    ((u32*)pBank)[1] = ((u32*)pHead)[1];
+    *(TexBankHeader*)pBank = *pHead;
     pTables = (u8*)(pInto + 1);
     pBank->p8 = (TexEntry*)pTables;
     pTables += pBank->n2 * sizeof(TexEntry);
@@ -584,16 +585,13 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
     pTables += pBank->n2 * sizeof(TexGXObj);
     pBank->p14 = (TexGXTlut*)pTables;
 
-    pSection = (TexSection*)p;
-    p += 8;
+    pSection = ((TexSection*)p)++;
     Mem_cpy(pBank->p8, p, pBank->n2 * sizeof(TexEntry));
     p += pSection->nSize;
-    pSection = (TexSection*)p;
-    p += 8;
+    pSection = ((TexSection*)p)++;
     Mem_cpy(pBank->pC, p, pBank->n4 * sizeof(TexPalette));
     p += pSection->nSize;
-    pPixels = (TexSection*)p;
-    p += 8;
+    pPixels = ((TexSection*)p)++;
     if (n != -2) {
         pBank->p18 = fn_80009B34(pPixels->nSize, 2, 0x20, "LLTex.c", 0x77A);
         pBank->n1C = pPixels->nSize;
@@ -609,20 +607,20 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
         pBank->b2D = 0;
     }
 
-    for (i = 0, nOffset = 0; i < pBank->n2; nOffset += sizeof(TexEntry), i++) {
-        pTex = (TexEntry*)((u8*)pBank->p8 + nOffset);
+    for (i = 0; i < pBank->n2; i++) {
+        pTex = &pBank->p8[i];
         for (j = 0; j < pTex->n41; j++) {
             pTex->aMips[j].n8 += (s16)pBank->n28;
         }
         if (n != -2) {
             if (pTex->nPalette == -1) {
                 GXInitTexObj((GXTexObj*)&pBank->p10[pTex->n3E], pBank->p18 + pTex->aMips[0].uPixels,
-                             pTex->nWidth, pTex->nHeight, pTex->b40, (pTex->b46 & 1) == 0,
-                             (pTex->b46 & 2) == 0, pTex->n41 > 1);
+                             pTex->nWidth, pTex->nHeight, pTex->b40, (pTex->b46 & 1) ? 0 : 1,
+                             (pTex->b46 & 2) ? 0 : 1, pTex->n41 > 1 ? 1 : 0);
             } else {
                 GXInitTexObjCI((GXTexObj*)&pBank->p10[pTex->n3E], pBank->p18 + pTex->aMips[0].uPixels,
-                               pTex->nWidth, pTex->nHeight, pTex->b40, (pTex->b46 & 1) == 0,
-                               (pTex->b46 & 2) == 0, 0, 0);
+                               pTex->nWidth, pTex->nHeight, pTex->b40, (pTex->b46 & 1) ? 0 : 1,
+                               (pTex->b46 & 2) ? 0 : 1, 0, 0);
             }
             if (pTex->n41 > 1) {
                 GXInitTexObjLOD((GXTexObj*)&pBank->p10[pTex->n3E], 5, 1, 0.0f, pTex->n41 - 1.0f, -2.0f,
@@ -632,8 +630,7 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
     }
 
     p += pPixels->nSize;
-    pSection = (TexSection*)p;
-    p += 8;
+    pSection = ((TexSection*)p)++;
     if (pSection->nSize > 0) {
         if (n != -2) {
             pBank->p20 = fn_80009B34(pSection->nSize, 2, 0x20, "LLTex.c", 0x7FB);
@@ -651,8 +648,8 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
         pColors = p;
     }
 
-    for (i = 0, nOffset = 0; i < pBank->n4; nOffset += sizeof(TexPalette), i++) {
-        pPalette = (TexPalette*)((u8*)pBank->pC + nOffset);
+    for (k = 0; k < pBank->n4; k++) {
+        pPalette = &pBank->pC[k];
         pPalette->n6 += (s16)pBank->n28;
         if (n != -2) {
             // every row is set up into the bank's first GX palette object
