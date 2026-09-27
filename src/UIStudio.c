@@ -918,6 +918,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
         }
         case 0x63: {  // push n copies of the top
             s32 nCount;
+            s32 i;
 
             nByte0 = *pFrame->p10;
             pFrame->p10++;
