@@ -513,6 +513,14 @@ They will be sorted into the sections below.
   the srawi stays in the output. UISEvent fn_80165ACC 99.08 -> 100: natural form (no copies) with
   `fn_8016B0F8(pStudio, (s64)*pData, (s64)nArgs, pArgs)` lifts pStudio, uScreen and p from 27 to
   29 neighbours, so they leave the graph in the second sweep and take r31/r30/r29 (rasim replay).
+- **[verified, fake-match class] An index written as a signed 64-bit product adds an early
+  instruction that leaves no trace.** `(u8*)p + (s32)n * (s64)sizeof(T)` in place of `&p[n]`
+  makes `li rK,size; mulhw` for the dead high word; the pre-RA scheduler issues the `li` in the
+  entry block's cycle 0, which moves the other cycle-0 instruction (a parameter copy) later, and
+  both dead instructions are gone after allocation. UISScreen fn_8016B188 99.86 -> 100 (EA copies
+  pScreen before pStudio and loads pData into r4). `pNodes[(s64)n]` / `[(u64)n]` do nothing and
+  `[(s64)(s32)n]` leaves code (20). Worth a try where only a parameter-copy order in the entry
+  block differs.
 
 ### New from round 6 (2026-09-26 afternoon)
 
