@@ -259,7 +259,7 @@ LAYOUT_ASSERT(FEGolferMachine, 0xC);
 // A Create-A-Player asset (0x118 bytes): a hat, a shirt, a colour... The 'CR_A' stream object is
 // the array of them all (FE_CrAP_LoadAssetsFromStream). Only what the cleaned code reads.
 typedef struct CrAPAsset {
-    s32  n0;                    // 0x000  part 18's assets pass it to fn_8008EAE0 (fn_801042D0)
+    s32  n0;                    // 0x000  part 18's assets pass it to fn_8008EAE0 (sApplySlider)
     char szName[0x28 - 0x4];    // 0x004  "White", "Bright Red", "... backwards" ...
     s16  nPart;                 // 0x028  the part it is a choice for
     s16  nCategory;             // 0x02A  its category: where the category's name ("Hats",

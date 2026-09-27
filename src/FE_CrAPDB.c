@@ -114,7 +114,7 @@ void FE_CrAP_ResetLastCategoryTables(void);
 void FE_CrAP_TurnOffAsset(CrAPAsset* pAsset);
 void sTurnOnLogo(s16 nPart, int b, int i);
 void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset);
-u8   fn_801048B0(int nPart);
+u8   FE_CrAP_IsFadeOutCategory(int nPart);
 int  FE_CrAP_GetAssetIndexFromAsset(CrAPAsset* pAsset);
 int  FE_CrAP_GetFirstCategoryAssetID(s16 nPart);
 void FE_CrAP_LoadAssetsFromStream(UStreamObject* pObject);
@@ -122,7 +122,7 @@ void FE_CrAP_LoadStringsFromStream(UStreamObject* pObject);
 void FE_CrAP_PostAssetsLoad(void);
 void FE_CrAP_GetAssetVariantName(CrAPAsset* pAsset, char* pName);
 void CrAPAssetsByteSwap(void);
-void fn_80105EFC(void);
+void FE_CrAP_PostStringsLoad(void);
 void FE_CheckSpecialCaseConnections(CrAPAsset* pAsset);
 u8   FE_IsMatchingSubCategory(s16 nPart, int nCategory, int nWanted);
 u8   FE_CrAP_TryClubSwappingAsset(CrAPAsset* pAsset);
@@ -139,7 +139,9 @@ int  FE_SetHintString(MsgArg* pArg, char* sz);
 // uistudio.h has UIStudio* and const s32*, and game/frontend.h cannot be included with it).
 void UISProcessHint(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
 
-// Allocate the database, empty, and its tables.
+// Allocate the Create-A-Player database (empty until the 'CR_A' and 'CR_S' objects load), its
+// per-part first-asset table, the list caches and the 64 sponsorship records (lbl_80282470), and
+// clear the caches.
 void FE_CrAP_InitModule(void) {
     lbl_80282460 = StaticMem_Alloc(sizeof(CrAPDB), 2, 0, "FE_CrAPDB.c", 211);
     lbl_80282460->pAssets = NULL;
@@ -159,7 +161,8 @@ void FE_CrAP_InitModule(void) {
     lbl_80282468 = NULL;
 }
 
-// Set every part's entries in the tables to -1 (none).
+// Forget the cached list sizes and categories: lbl_80282480, lbl_8028247C and lbl_80282478 go to -1
+// (FE_CrAP_SetCurrentGender calls it, since the lists change with the gender).
 void FE_CrAP_ResetLastCategoryTables(void) {
     int nPart;
     s32 i;
@@ -304,7 +307,8 @@ void FE_CrAP_SaveBodySkinChoices(void) {
     Mem_cpy(pProfile->choices.aSets, pSkin->aSets[3], SkinPart_GetNumSets(pSkin) * sizeof(SkinChoice));
 }
 
-// And the entries of its six other skins.
+// Save the six club skins' part and set choices of the golfer being edited in the profile
+// (choices.aSkinParts, aSkinSets), as FE_CrAP_SaveBodySkinChoices does for the body.
 void FE_CrAP_SaveClubSkinChoices(void) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     Skin* pSkin;
@@ -319,7 +323,8 @@ void FE_CrAP_SaveClubSkinChoices(void) {
     }
 }
 
-// Take the asset's name out of the profile's list b when it is there.
+// Part 13 (custom animations): take the asset's animation (its first variant's name) out of the
+// profile's animation list b, when it is there.
 void sTurnOffAnimation(CrAPAsset* pAsset, int b) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     char szName[16];
@@ -349,7 +354,9 @@ void FE_CrAP_TurnOffAsset(CrAPAsset* pAsset) {
     }
 }
 
-// Take a part's choice i off the golfer being edited (part 13 by its name, from the list b).
+// Take choice i under entry b of a part's list off the golfer being edited: a part 13 animation
+// comes out of the profile's list b, any other asset off the body skin and out of its slot. Nothing
+// without a menu golfer or such a choice.
 void FE_CrAP_TurnOffPart(s16 nPart, int b, int i) {
     CrAPAsset* pAsset;
 
@@ -364,7 +371,8 @@ void FE_CrAP_TurnOffPart(s16 nPart, int b, int i) {
     }
 }
 
-// The asset may be picked: it was not locked when last checked, and its aB1CC bit is set.
+// The player may pick the asset: it was not locked when last checked (aAssetLocked) and the profile
+// owns it (aB1CC: set for the level 0 assets, cleared when one is sold).
 u8 FE_CrAP_IsAssetAvailableForUser(int nAsset) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     if (!BitArray_Test(pProfile->aAssetLocked, nAsset) && BitArray_Test(pProfile->aB1CC, nAsset)) {
@@ -373,8 +381,9 @@ u8 FE_CrAP_IsAssetAvailableForUser(int nAsset) {
     return 0;
 }
 
-// Switch the asset's name in the profile's list b: take it out when it is there, otherwise add it
-// and have the menu golfer play it (unless it already does).
+// Part 13 (custom animations): take the asset's animation out of the profile's list b when it is
+// there; otherwise add it, and the menu golfer plays it with the asset's camera shot n114 unless it
+// already plays it.
 void sTurnOnAnimation(CrAPAsset* pAsset, int b) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     char szName[24];
@@ -391,8 +400,10 @@ void sTurnOnAnimation(CrAPAsset* pAsset, int b) {
     fn_8008E944(0, 0.0f);
 }
 
-// Part 17: set the logo place b (a set of lbl_801937C8) to variant i; for 1..5 that is the
-// profile's user logo i - 1, whose set gets the variant for its shape.
+// Part 17 (logos and tattoos): give logo place b (lbl_801937C8: the shirt, hat and glove logos, the
+// arm and leg tattoos) variant i. Variants 1..5 are the profile's user logos 0..4, whose own set
+// "userlogo<n>" then gets its "square" or "wide" variant from the logo's shape. Saves the body skin
+// choices.
 void sTurnOnLogo(s16 nPart, int b, int i) {
     char szLogo[32];
     char szShape[32];
@@ -427,9 +438,10 @@ void sTurnOnLogo(s16 nPart, int b, int i) {
     FE_CrAP_SaveBodySkinChoices();
 }
 
-// A part 18 asset: set the menu golfer's n0 from it and have the golfer play its animation (unless
-// it already does).
-void fn_801042D0(CrAPAsset* pAsset) {
+// Part 18 (the body sliders): show the slider asset on the menu golfer. The golfer turns to the
+// front when the asset's n0 differs from the last one shown (kept by fn_8008EAE0), then plays the
+// asset's animation n112 with its camera shot n114 unless that animation already plays.
+void sApplySlider(CrAPAsset* pAsset) {
     fn_8008E944(0, 0.0f);
     if (pAsset->n0 != fn_8008EAEC()) {
         fn_8008E2F8(1, 0.0f);
@@ -445,9 +457,14 @@ void fn_801042D0(CrAPAsset* pAsset) {
     }
 }
 
-// Put the asset (the one it takes its attributes from) on the golfer being edited, in place of the
-// one in its slot of the profile, and have the golfer show it off: club assets on the club skins
-// (the golfer takes up the club), balls, or the body skin; then play the asset's animation.
+// Put the asset (the one it takes its attributes from) on the golfer being edited and in its slot
+// of the profile, and show it off. Club assets go on the club skins (the golfer takes up that
+// club), balls on the ball; any other replaces its slot's asset on the body skin. Then its
+// animation n112 plays with its camera shot n114: for the fade-out parts
+// (FE_CrAP_IsFadeOutCategory) with the texture swap delayed (by 4 for the "gdlcrp07" and "fdlcrp07"
+// animations), otherwise at once, the golfer turning to the front when the part changes. The
+// replaced asset and this one are kept for FE_CrAP_RestoreLastRemovedAsset. Nothing for an asset
+// without a slot (n2E -1).
 void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
     int nPart;
     u8 bLoop;
@@ -516,7 +533,7 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
     }
     if (strcmp(FE_CrAP_GetStringFromTable(pAsset->n112), "") == 0
         || strcmp(FE_CrAP_GetStringFromTable(pAsset->n112), "0") == 0 ||
-        !fn_801048B0(nPart)) {
+        !FE_CrAP_IsFadeOutCategory(nPart)) {
         fn_8008E944(0, 0.0f);
         if (fn_8008E6BC() == NULL || strcmp(fn_8008E6BC(), FE_CrAP_GetStringFromTable(pAsset->n112)) != 0) {
             fn_8008E468(FE_CrAP_GetStringFromTable(pAsset->n112), FE_CrAP_GetStringFromTable(pAsset->n114),
@@ -537,8 +554,10 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
     FE_CheckSpecialCaseConnections(pAsset);
 }
 
-// Put a part's choice i (from the list b) on the golfer being edited: part 13 by its name, part 17
-// the logo, part 18 an animation, the others as an asset.
+// Put choice i under entry b of a part's list on the golfer being edited: part 13 toggles a custom
+// animation (and is noted for FE_CrAP_RestoreLastRemovedAsset), part 17 a logo (sTurnOnLogo), part
+// 18 a slider (sApplySlider), the others go through FE_CrAP_TurnOnAsset. Nothing without a menu
+// golfer.
 void FE_CrAP_TurnOnPart(s16 nPart, int b, int i) {
     int nAsset;
     CrAPAsset* pAsset = NULL;
@@ -563,14 +582,15 @@ void FE_CrAP_TurnOnPart(s16 nPart, int b, int i) {
     } else if (nPart == 17) {
         sTurnOnLogo(nPart, b, i);
     } else if (nPart == 18) {
-        fn_801042D0(pAsset);
+        sApplySlider(pAsset);
     } else if (pAsset != NULL) {
         FE_CrAP_TurnOnAsset(pAsset);
     }
 }
 
-// Put on the asset waiting in lbl_802816E8, or else take off the one in lbl_802816EC; then clear
-// both.
+// Undo the last FE_CrAP_TurnOnAsset or part 13 FE_CrAP_TurnOnPart: put back the asset it replaced
+// (lbl_802816E8, with the golfer's animations off), or when it replaced none take the new one
+// (lbl_802816EC) off again, a part 13 animation coming out of its list. Clears both.
 void FE_CrAP_RestoreLastRemovedAsset(void) {
     CrAPAsset* pAsset;
     s16 nKind;
@@ -596,16 +616,19 @@ void FE_CrAP_RestoreLastRemovedAsset(void) {
     lbl_802816EC = -1;
 }
 
-// The parts whose choices are grouped by category, with an "All ..." entry: headwear, shirts,
-// pants and shorts, shoes, eyewear, watches and jewelry, miscellaneous; and part 12.
-u8 fn_801048B0(int nPart) {
+// The parts whose new asset FE_CrAP_TurnOnAsset shows under its animation with the texture swap
+// delayed (fn_8008E944): headwear, shirts, pants and shorts (0..2), shoes and eyewear (7, 8), part
+// 12, watches and jewelry, miscellaneous (19, 20). TW07's version also takes the asset.
+u8 FE_CrAP_IsFadeOutCategory(int nPart) {
     if ((u32)nPart <= 2 || (u32)(nPart - 7) <= 1 || nPart == 12 || nPart == 19 || nPart == 20) {
         return 1;
     }
     return 0;
 }
 
-// How many offered assets of the part fit its entry b (kept in lbl_8028247C).
+// How many choices entry b of a part's list has: the part's assets offered for the current gender
+// that fit the entry's category (all of them for an "All ..." entry). Also written to lbl_8028247C,
+// which nothing reads.
 int FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(s16 nPart, int b) {
     int nAsset;
     int nCount;
@@ -659,9 +682,10 @@ int FE_CrAP_GetNumberOfSubcategoryIndicesForCategory(s16 nPart) {
     return nCount;
 }
 
-// The category of a part's entry n: its categories in the order its offered assets list them,
-// after the "All ..." entry when the part has one (-1 for that entry, 0x40: none). Kept in
-// lbl_80282478.
+// The category of entry n of a part's list, as the offset of its name in 'CR_S': the part's
+// categories in the order its assets offered for the current gender list them, after the "All ..."
+// entry when the part has one (-1 for that entry; 0x40: no such entry, or 64 categories found).
+// Also written to lbl_80282478, which nothing reads.
 int FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(s16 nPart, int n) {
     s32 aCategories[64];
     int i;
@@ -702,7 +726,9 @@ int FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(s16 nPart, int n) {
     return 0x40;
 }
 
-// The entry of a part's list that shows a category (-1: none); see FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex.
+// The entry of a part's list that shows category nCategory (-1: none), the reverse of
+// FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex. For a part with an "All ..." entry,
+// category j > 0 is entry j + 1 but the first category gives 0, the "All ..." entry.
 int FE_CrAP_GetSubCategoryIndexForCategoryAndSubcategoryID(s16 nPart, int nCategory) {
     s32 aCategories[64];
     int i;
@@ -741,6 +767,9 @@ int FE_CrAP_GetSubCategoryIndexForCategoryAndSubcategoryID(s16 nPart, int nCateg
     return -1;
 }
 
+// Copy the name of entry n of a part's list into pDst: the "All ..." name for entry 0 of a part
+// that has one, else its category's name from 'CR_S'. 0 when the names are not loaded, pDst is NULL
+// or there is no such entry.
 u8 FE_CrAP_GetSubCategoryNameForCategoryAndSubcategoryIndex(s16 nPart, int n, char* pDst) {
     int nCategory;
 
@@ -825,13 +854,15 @@ int FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(s16 nPart, i
     return -1;
 }
 
-// Take the database's stream objects as they load.
+// Have the stream loader hand the 'CR_A' (assets) and 'CR_S' (names) objects to
+// FE_CrAP_LoadAssetsFromStream and FE_CrAP_LoadStringsFromStream as they load.
 void FE_CrAP_RegisterStreamClients(void) {
     Stream_RegisterLoadChunkCallback('CR_A', FE_CrAP_LoadAssetsFromStream);
     Stream_RegisterLoadChunkCallback('CR_S', FE_CrAP_LoadStringsFromStream);
 }
 
-// Find each part's first asset (the assets are sorted by part; 0 when a part has none).
+// Note each part's first asset in lbl_80282474 (0 when the part has none); the list functions start
+// their scans there (FE_CrAP_GetFirstCategoryAssetID).
 void FE_CrAP_SetupFirstAssetIDs(void) {
     int nPart;
     int i;
@@ -857,7 +888,9 @@ void FE_CrAP_UnRegisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('CR_S');
 }
 
-// The 'CR_A' handler: the assets.
+// The 'CR_A' stream handler: the object's data becomes the asset array (0x118 bytes each),
+// byte-swapped; the object is kept for FE_CrAP_CloseModule to free, and FE_CrAP_PostAssetsLoad
+// runs.
 void FE_CrAP_LoadAssetsFromStream(UStreamObject* pObject) {
     if (pObject != NULL) {
         lbl_80282460->pAssets = (CrAPAsset*)pObject->pData;
@@ -868,12 +901,14 @@ void FE_CrAP_LoadAssetsFromStream(UStreamObject* pObject) {
     }
 }
 
-// The 'CR_S' handler: the names.
+// The 'CR_S' stream handler: the object's data becomes the names the assets use (categories,
+// colours, animations, camera shots, unlock texts); the object is kept for FE_CrAP_CloseModule to
+// free.
 void FE_CrAP_LoadStringsFromStream(UStreamObject* pObject) {
     if (pObject != NULL) {
         lbl_80282460->pStrings = (char*)pObject->pData;
         lbl_80282460->uStringsSize = pObject->uSize;
-        fn_80105EFC();
+        FE_CrAP_PostStringsLoad();
         lbl_80282468 = pObject;
     }
 }
@@ -1240,8 +1275,9 @@ void CrAPAssetsByteSwap(void) {
     }
 }
 
-// Called when the names arrive; empty in this build.
-void fn_80105EFC(void) {
+// Run when the 'CR_S' names have loaded, as FE_CrAP_PostAssetsLoad is for the assets; empty in this
+// build.
+void FE_CrAP_PostStringsLoad(void) {
 }
 
 // After putting on a part 9 or part 1 asset, switch the body skin's set "wire" (part 9) or "hands"
