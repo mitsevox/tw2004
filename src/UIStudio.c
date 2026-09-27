@@ -1295,23 +1295,28 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             break;
         }
         case 0x7C: {  // replace every pFind in a text by pRep
-            u8 bMatch;
-            s32 nGrow;
             u32 nRep;
-            u32 nFind;
             u32 nText;
             UISText* pText;
+            u32 nFind;
             UISText* pFind;
             UISText* pRep;
             u32 j;
+            s32 nGrow;
             u32 k;
+            u8 bMatch;
 
             pRep = (UISText*)*--pFrame->pC;
             pFind = (UISText*)*--pFrame->pC;
             pText = (UISText*)*--pFrame->pC;
             if (pText != NULL && pFind != NULL && pRep != NULL) {
                 nText = strlen(pText->szText);
+                // fake match: identity round trips keep EA's copies of the two lengths.
+                nText = (u32)((s64)((u64)(u32)nText << 32) >> 32);
+                nText = (u32)(u64)(u32)nText;
                 nFind = strlen(pFind->szText);
+                nFind = (u32)((s64)((u64)(u32)nFind << 32) >> 32);
+                nFind = (u32)(u64)(u32)nFind;
                 nRep = strlen(pRep->szText);
                 if (nText != 0 && nFind != 0 && nText >= nFind) {
                     for (j = 0; j < nText - nFind + 1; j++) {
