@@ -1,5 +1,8 @@
-// GameRound.c (our name): the round setup that follows GameManager.c - setting up a game mode, a
-// hole, the stroke limit, mixed-course rounds, hole names. TW06 has no counterpart file.
+// GameRound.c (our name; EA's file is GameModeCore.c: the functions it shares with TW07's
+// GameModeCore.c, GM_SetModeType to GM_RenderBallTarget, come in the same order): the round's
+// rules and state, after GameManager.c - a game mode's setup and default callbacks, the round's
+// holes and courses (Random 18, Dream 18, the regional rounds), scores against par, mulligans, the
+// stroke limit, gimmes, honors, playoff holes, par-5 eagle records, course and hole folder names.
 
 #include "golfer.h"
 #include "ball.h"
@@ -1401,6 +1404,8 @@ u8 GM_GetNeedToBuildPlayoffHoleList(void) {
     return gpGame->b135;
 }
 
+// Sends UI message 31 (no values): from GUI_Init at the start of a hole, and when the last
+// pause-menu screen closes (fn_800E5240).
 void fn_800E3B04(void) {
     fn_800E58B4(31);
 }

@@ -1,5 +1,7 @@
-// GameUI.c (our name): the in-round display flow after GameRound.c - HUD messages, the end-of-hole
-// and end-of-round screens, and the flags that say one of them is up. No TW06 counterpart found.
+// GameUI.c (EA's name: the GUI_ functions it shares with TW07's GameUI.c come in the same order):
+// the in-game HUD, after GameRound.c - showing and hiding each view's HUD, the pause menu,
+// post-shot messages, the twelve message queues, the end-of-hole and end-of-round scorecards, and
+// the flags that say one of them is up.
 
 #include "golfer.h"
 #include "game.h"
@@ -662,6 +664,9 @@ void GUI_EndOfGameScorecard(u8 bHuman) {
     }
 }
 
+// Sends UI message 59 with a controller number: uiProcessInterface's input loop (fn_8008F820)
+// calls it in game type 6 when that controller has held button 0x20 of the button table for more
+// than 10 frames.
 void fn_800E4F88(int nPlayer) {
     GameMsg_SendInt(59, nPlayer);
 }
