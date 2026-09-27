@@ -42789,5 +42789,21 @@
 "matched_functions": 7631,
 "total_functions": 7647,
 "exact": 7631
+},
+{
+"commit": "809e502",
+"sha": "809e502db67a7131f3734d4bbc50d0113e70cf40",
+"time": 1790490000,
+"subject": "assign: LLFont FO_spLoadFontFromStream to a Claude lane",
+"report": true,
+"matched_code": 1520544,
+"complete_code": 1478836,
+"matched_data": 788915,
+"complete_data": 936119,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7631,
+"total_functions": 7647,
+"exact": 7631
 }
 ]
