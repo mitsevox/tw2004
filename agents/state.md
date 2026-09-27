@@ -10,6 +10,17 @@ hygiene list below). Nothing is running. Next: the owner's after-100% list (bott
 Nintendo SDK data (AXComp/DSPCode) and art/audio blobs are linked via C generated from main.dol at
 build time (tools/build/gendata.py), never committed.
 
+**Naming phase (owner, 2026-09-27 evening): the one focus is names + comments, most-called first.**
+Measure: call sites to named functions (`python tools/match/hotnames.py`): 42.94% -> 61.92% after
+orchestrator batches 1-2 (76 names). Territory: `hotnames.py --units` (named / commented / done per
+file). Pipeline: `tools/match/name.py` (all or nothing); playbook `agents/roles/naming.md`. Lanes:
+one area each, 15-25 functions per batch, fresh agent per batch. Comments go in the same pass.
+Cleanup done before it: 18 stale remote branches deleted (gemini/round4 and 2 young pc-results left),
+matching-era records removed (in history at 6839245), docs/README.md index.
+Running (launched ~21:00 UTC, owner usage 64%): nm1 char.c; nm2 GoTerrain.c + GoRenderCtx_Gc.c;
+nm3 GameAudio.c + hlaudemitter.c; nm4 MC_Gc.c + EASBStorage.c; 20 functions each. Merge each with
+`python tools/agents/merge.py <lane> --allow-renames` after reading the diff.
+
 **After 100% (2026-09-27 ~19:15 UTC, pre-compact checkpoint): nothing running.** Landed since 100%:
 - n2: EA names applied with evidence (name_sources.tsv): 60 IStudio functions (Madden 2003 STABS) +
   their types/fields/params/locals/enums (uistudio.h), MAD decoder (14 fn, 6 globals), ska_shared x2,
