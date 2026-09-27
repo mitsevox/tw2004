@@ -62,8 +62,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     f32 fInnerX;
     f32 fSin;
     f32 fCos;
-    f32 fS;
-    f32 fT;
+    f32 fCos2;
     f32 fR;
     f32 fG;
     f32 fB;
@@ -151,18 +150,16 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     for (i = 0; i < pArc->nSegments;) {
         if (i == 0) {
             if (pArc->uFlags & 0x20) {
-                fS = (f32)(pArc->nSegments - i) / pArc->nSegments;
-                fT = (f32)i / pArc->nSegments;
                 // fake match: keep EA's multiply-then-add colour interpolation.
-                fA = colorA.a * fS;
-                fA += colorB.a * fT;
+                fA = colorA.a * ((f32)(pArc->nSegments - i) / pArc->nSegments);
+                fA += colorB.a * ((f32)i / pArc->nSegments);
                 if (!(pArc->uFlags & 4) || (pArc->uFlags & 2)) {
-                    fR = colorA.r * fS;
-                    fR += colorB.r * fT;
-                    fG = colorA.g * fS;
-                    fG += colorB.g * fT;
-                    fB = colorA.b * fS;
-                    fB += colorB.b * fT;
+                    fR = colorA.r * ((f32)(pArc->nSegments - i) / pArc->nSegments);
+                    fR += colorB.r * ((f32)i / pArc->nSegments);
+                    fG = colorA.g * ((f32)(pArc->nSegments - i) / pArc->nSegments);
+                    fG += colorB.g * ((f32)i / pArc->nSegments);
+                    fB = colorA.b * ((f32)(pArc->nSegments - i) / pArc->nSegments);
+                    fB += colorB.b * ((f32)i / pArc->nSegments);
                 } else {
                     fB = fG = fR = 255.0f;
                 }
@@ -180,6 +177,8 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
         if (i == 0) {
             fSin = fn_800095F0(fStart);
             fCos = fn_80009638(fStart);
+        } else {
+            fCos = fCos2;
         }
         i++;
         aVtx[0].f0 = fU0;
@@ -203,18 +202,16 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
 
         // the colour and angle at the segment's far edge (and the next segment's near edge)
         if (pArc->uFlags & 0x20) {
-            fS = (f32)(pArc->nSegments - i) / pArc->nSegments;
-            fT = (f32)i / pArc->nSegments;
             // fake match: keep EA's multiply-then-add colour interpolation.
-            fA = colorA.a * fS;
-            fA += colorB.a * fT;
+            fA = colorA.a * ((f32)(pArc->nSegments - i) / pArc->nSegments);
+            fA += colorB.a * ((f32)i / pArc->nSegments);
             if (!(pArc->uFlags & 4) || (pArc->uFlags & 2)) {
-                fR = colorA.r * fS;
-                fR += colorB.r * fT;
-                fG = colorA.g * fS;
-                fG += colorB.g * fT;
-                fB = colorA.b * fS;
-                fB += colorB.b * fT;
+                fR = colorA.r * ((f32)(pArc->nSegments - i) / pArc->nSegments);
+                fR += colorB.r * ((f32)i / pArc->nSegments);
+                fG = colorA.g * ((f32)(pArc->nSegments - i) / pArc->nSegments);
+                fG += colorB.g * ((f32)i / pArc->nSegments);
+                fB = colorA.b * ((f32)(pArc->nSegments - i) / pArc->nSegments);
+                fB += colorB.b * ((f32)i / pArc->nSegments);
             } else {
                 fB = fG = fR = 255.0f;
             }
@@ -234,10 +231,10 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
             fAngle = fStep * i + fStart;
         }
         fSin = fn_800095F0(fAngle);
-        fCos = fn_80009638(fAngle);
+        fCos2 = fn_80009638(fAngle);
         aVtx[2].f0 = fU2;
         aVtx[2].f4 = fV2;
-        aVtx[2].f8 = fOuterX * fCos;
+        aVtx[2].f8 = fOuterX * fCos2;
         aVtx[2].fC = fOuterY * fSin;
         aVtx[2].f10 = 0.0f;
         aVtx[2].au14[0] = fR;
@@ -246,7 +243,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
         aVtx[2].au14[3] = fA;
         aVtx[3].f0 = fU3;
         aVtx[3].f4 = fV3;
-        aVtx[3].f8 = fInnerX * fCos;
+        aVtx[3].f8 = fInnerX * fCos2;
         aVtx[3].fC = fInnerY * fSin;
         aVtx[3].f10 = 0.0f;
         aVtx[3].au14[0] = fR;
