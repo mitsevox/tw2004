@@ -893,6 +893,10 @@ DiscError.c:
 
 rcmp_mad_codec.c:
 	.text       start:0x800B769C end:0x800B90F4
+	.rodata     start:0x80184A68 end:0x80184C68
+	.data       start:0x80190FE0 end:0x801910E0
+	.bss        start:0x801F6858 end:0x801F8458
+	.sbss       start:0x802821A8 end:0x802821C0
 
 Code800B90F4.c:
 	.text       start:0x800B90F4 end:0x800B9FF0
