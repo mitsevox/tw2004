@@ -1,6 +1,10 @@
 # AnimLib_PlanBank (skalib.c, 0x80023F7C)
 
-Status: OPEN, 91.62% on 2026-09-25.
+Status: SOLVED 2026-09-27 (lane b8), 91.62 -> 100%. Fix: EA's array order, constant-first
+sums (`0x20 + ...`), two byte-count locals (labelled fake match), own locals for loop 1 (`pWork`)
+and the ppClips loop (`n`), declaration order for EA's spill slots and colours, the pEnd store
+before the bank-pointer store, and `nClips += nLibClips; nClipsAll = nClips;`. Commit: see
+"skalib.c: AnimLib_PlanBank exact" on agent/b8.
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -49,6 +53,13 @@ nBudget / nTotal does. Not found yet: nIndexSize/nRecSize written in two steps (
 assignment expressions inside nTotal (69), `* 16` (62), `/ 16` (67), an inline align helper
 (s32: 80-98, int: 62), any int/s32/u32/short type for nIndexSize/nRecSize/nClipsAll (>= 62),
 dead `(s64)` round trips on the setup's call arguments (62).
+- SOLVED by `nClips += nLibClips; nClipsAll = nClips;` in place of `nClipsAll = nClips +
+  nLibClips; nClips = nClipsAll;` (57 -> 0, 100%): the same values, but nClips' reload becomes
+  a copy of the stored sum (load deletion), which changes nClipsAll's place in the allocator
+  (EA's r15). Also exact: `nClipsAll = nClips += nLibClips` and reading nClips instead of
+  nClipsAll in the check / the size lines; `nClips = nClipsAll = nClips + nLibClips` is not (57).
+- Still needed: the two `goto done` shared exits (`return 0`/`return nRet` instead: 5 and 39
+  aligned differences; their comments' percentages are from before this round).
 Tried, worse or no change: nHdr split `nHdr = a + b; nHdr += 0x20` (214), nTotal split (208),
 single local with `nBytesBefore = ctx.nBytes + nHdr; ctx.nBytes = nBytesBefore;` (153 with the
 new declaration order), two locals with A the add's destination (v1/v2/v3: the frontend or the

@@ -967,6 +967,8 @@ done:
 // set): random picks first; if that cannot fit, the best-ranked picks from a fresh copy.
 // Allocates the bank (slots 0 and 1 reuse one they have) and returns its size.
 u32 AnimLib_PlanBank(u32 nSlot) {
+    // register note: the declaration order gives EA's spill slots (0xC8 pIndexCopy up to 0xEC
+    // nHdr, in reverse declaration order) and EA's register colouring order.
     s32         nHdr;
     s32         nIndexSize;
     LibSlot*    pSlot = &lbl_801C6068[nSlot];
@@ -1121,8 +1123,8 @@ u32 AnimLib_PlanBank(u32 nSlot) {
     }
     for (i = 0; i < nOvs; i++) {
     }
-    nClipsAll = nClips + nLibClips;
-    nClips    = nClipsAll;
+    nClips   += nLibClips;
+    nClipsAll = nClips;
     if (nClipsAll == 0) {
         // fake match: the shared exit as a jump (without: 88.7%, not 91.6%)
         goto done;
@@ -1147,6 +1149,8 @@ u32 AnimLib_PlanBank(u32 nSlot) {
             nHdr         = 0x20 + nIndexSize + nRecSize;
             ctx.nTarget  = nBudget;
             ctx.nBytes   += nHdr;
+            // fake match: two locals with the same value, set again in the retry (EA keeps one
+            // in r20 until the retry and spills the one read at the end; one local: 99.4%)
             nBytesBefore2 = ctx.nBytes;
             nBytesBefore  = ctx.nBytes;
             pRecordsCopy = fn_80009B34(pLib->nRecords * sizeof(ClipRecord), 1, 0, "skalib.c", 2078);
