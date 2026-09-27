@@ -504,10 +504,10 @@ void fn_80077C1C(int a, int b) {
     nB = b;
     for (i = 0; i < nCount; i++) {
         FE_CrAP_SetCurrentGender(FE_CrAP_GetAssetGender(i));
-        nKind = fn_8010742C(i);
+        nKind = FE_CrAP_GetCategoryFromAssetID(i);
         if (nKind == lbl_80281ED4->aKind[b][nCategory] &&
             (FE_CrAP_GetAssetGender(i) == nB || FE_CrAP_GetAssetGender(i) == 2) &&
-            !fn_80078008(i, pProfile) && fn_80107444(i) > 0) {
+            !fn_80078008(i, pProfile) && FE_CrAP_GetLevelFromAssetID(i) > 0) {
             aFound[nFound] = i;
             nFound++;
         }

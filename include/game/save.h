@@ -304,7 +304,7 @@ typedef struct SaveProfile {
     s8   n54C2;                 // 0x054C2  -> PlayerProfile.unk2
     u8   unk54C3[5];
     u64  aGolferNames[6];       // 0x054C8  -> PlayerProfile.aNames
-    s8   nGolferOutfit;         // 0x054F8  -> PlayerProfile.nOutfit; fn_801069AC stores a ball's
+    s8   nGolferOutfit;         // 0x054F8  -> PlayerProfile.nOutfit; FE_CrAP_TryBallSwappingAsset stores a ball's
                                 //          index there (fn_800484F4, -1: none)
     u8   nGolferBallType;       // 0x054F9  -> PlayerProfile.nBallType
     u8   unk54FA[0x5500 - 0x54FA];
@@ -320,7 +320,7 @@ typedef struct SaveProfile {
     // Four bit arrays with a bit per Create-A-Player asset (0x80057F18's loop over them all, which
     // also clears aB344 and aB4BC; BitArray_Test tests a bit).
     u32  aAssetLocked[94];      // 0x0B054  the asset was locked (fn_80078008) when last checked
-    u32  aB1CC[94];             // 0x0B1CC  set where fn_80105C0C gives 0; an asset of lock kind 0
+    u32  aB1CC[94];             // 0x0B1CC  set where FE_CrAP_GetPartLevelFromAssetIndex gives 0; an asset of lock kind 0
                                 //          stays locked until the bit its FE_CrAP_GetPartGMLockValByAssetNum names is set
     u32  aB344[94];             // 0x0B344
     u32  aB4BC[94];             // 0x0B4BC

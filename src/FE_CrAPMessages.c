@@ -226,12 +226,12 @@ void fn_80107C3C(MsgArg* pArgs, MsgArg* pResult) {
         *(s32*)pArgs[7].p = 0;
         *(s32*)pArgs[8].p = 0;
     } else {
-        strcpy(((MsgString*)pArgs[3].p)->pStr, fn_80105264(nPart, b, i));
-        *(s32*)pArgs[4].p = fn_80105298(nPart, b, i);
-        *(s32*)pArgs[5].p = fn_801052CC(nPart, b, i);
-        *(s32*)pArgs[6].p = fn_80105300(nPart, b, i);
-        *(s32*)pArgs[7].p = fn_80105334(nPart, b, i);
-        *(s32*)pArgs[8].p = fn_801053D0(nPart, b, i);
+        strcpy(((MsgString*)pArgs[3].p)->pStr, FE_CrAP_GetPartName(nPart, b, i));
+        *(s32*)pArgs[4].p = FE_CrAP_GetPartColor1(nPart, b, i);
+        *(s32*)pArgs[5].p = FE_CrAP_GetPartColor2(nPart, b, i);
+        *(s32*)pArgs[6].p = FE_CrAP_GetPartColor3(nPart, b, i);
+        *(s32*)pArgs[7].p = FE_CrAP_GetPartSponsor(nPart, b, i);
+        *(s32*)pArgs[8].p = FE_CrAP_GetPartLevel(nPart, b, i);
     }
 }
 
@@ -268,16 +268,16 @@ void fn_80107EB0(MsgArg* pArgs, MsgArg* pResult) {
         *(s32*)pArgs[5].p = 0;
         *(s32*)pArgs[6].p = 0;
     } else {
-        *(s32*)pArgs[3].p = fn_80105368(nPart, b, i);
-        *(s32*)pArgs[4].p = fn_8010539C(nPart, b, i);
+        *(s32*)pArgs[3].p = FE_CrAP_GetPartRetailPrice(nPart, b, i);
+        *(s32*)pArgs[4].p = FE_CrAP_GetPartSalePrice(nPart, b, i);
         *(s32*)pArgs[5].p = FE_CrAP_GetPartGMLockID(nPart, b, i);
         *(s32*)pArgs[6].p = FE_CrAP_GetPartGMLockVal(nPart, b, i);
     }
 }
 
 // Put a part's choice i on the created golfer and recompute its equipment tiers (fn_8007873C).
-// Part 17 is only turned on directly; for the others fn_80103F94 does it when FE_CrAP_IsAssetEquipped and
-// fn_801074D4 allow.
+// Part 17 is only turned on directly; for the others FE_CrAP_TurnOffPart does it when
+// FE_CrAP_IsAssetEquipped and fn_801074D4 allow.
 void fn_80107FAC(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s16 nPart = pArgs[0].i;
@@ -292,7 +292,7 @@ void fn_80107FAC(MsgArg* pArgs, MsgArg* pResult) {
     nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (nAsset != -1) {
         if (FE_CrAP_IsAssetEquipped(FE_CrAP_GetAssetFromAssetIndex(nAsset)) && fn_801074D4(nAsset)) {
-            fn_80103F94(nPart, b, i);
+            FE_CrAP_TurnOffPart(nPart, b, i);
         } else {
             FE_CrAP_TurnOnPart(nPart, b, i);
         }
@@ -318,7 +318,7 @@ void fn_80108070(MsgArg* pArgs, MsgArg* pResult) {
     nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (nAsset != -1) {
         if (FE_CrAP_IsAssetEquipped(FE_CrAP_GetAssetFromAssetIndex(nAsset)) && fn_801074D4(nAsset)) {
-            fn_80103F94(nPart, b, i);
+            FE_CrAP_TurnOffPart(nPart, b, i);
             return;
         }
         FE_CrAP_TurnOnPart(nPart, b, i);
@@ -432,7 +432,7 @@ void fn_8010840C(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80108494(MsgArg* pArgs, MsgArg* pResult) {
     FE_GetCurrentProfile();
-    if (fn_80106244(pArgs[0].i) >= 0) {
+    if (FE_CrAP_GetFirstEquippedIndexForCategory(pArgs[0].i) >= 0) {
         pResult->i = 1;
         return;
     }
@@ -442,7 +442,7 @@ void fn_80108494(MsgArg* pArgs, MsgArg* pResult) {
 // ---- end of sweep code ----
 
 // Part 13: choice i's name is in the profile's list b (fn_800587A8); other parts: choice i is the
-// asset in its slot of the profile (fn_80106374).
+// asset in its slot of the profile (FE_CrAP_IsItemEquipped).
 void fn_801084F4(MsgArg* pArgs, MsgArg* pResult) {
     char szName[16];                    // the size is unknown (the frame allows up to 20)
     SaveProfile* pProfile = FE_GetCurrentProfile();
@@ -455,7 +455,7 @@ void fn_801084F4(MsgArg* pArgs, MsgArg* pResult) {
         fn_80105B4C(nPart, b, i, szName);
         pResult->i = fn_800587A8(pProfile, b, szName);
     } else {
-        pResult->i = fn_80106374(nPart, b, i);
+        pResult->i = FE_CrAP_IsItemEquipped(nPart, b, i);
     }
 }
 
@@ -723,7 +723,7 @@ void fn_80108E9C(MsgArg* pArgs, MsgArg* pResult) {
     }
     for (i = 0; i < nAssets; i++) {
         if (BitArray_Test(pProfile->aB344, i) && FE_IsValidCurrentGender(FE_CrAP_GetAssetGender(i))) {
-            fn_8010745C(i, szCategory);
+            FE_CrAP_GetSubcategoryNameFromAssetID(i, szCategory);
             if (nCategories < 5) {
                 bFound = 0;
                 for (j = 0; j < nCategories; j++) {
@@ -834,7 +834,7 @@ void fn_80109388(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- end of sweep code ----
 
-// A part's choice i: its unlock text (fn_8010651C), when there is such a choice.
+// A part's choice i: its unlock text (FE_CrAP_GetUnlockMessageFrom), when there is such a choice.
 void fn_801093B4(MsgArg* pArgs, MsgArg* pResult) {
     s16 nPart = pArgs[0].i;
     int b = pArgs[1].i;
@@ -844,7 +844,7 @@ void fn_801093B4(MsgArg* pArgs, MsgArg* pResult) {
     if (i < 0 || i >= nChoices) {
         return;
     }
-    fn_8010651C(nPart, b, i, ((MsgString*)pArgs[3].p)->pStr);
+    FE_CrAP_GetUnlockMessageFrom(nPart, b, i, ((MsgString*)pArgs[3].p)->pStr);
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -1115,7 +1115,7 @@ void fn_80109DE0(MsgArg* pArgs, MsgArg* pResult) {
     int i = pArgs[2].i;
     int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
 
-    pProfile->n6C += (s32)(0.25f * fn_80105368(nPart, b, i));
+    pProfile->n6C += (s32)(0.25f * FE_CrAP_GetPartRetailPrice(nPart, b, i));
     BitArray_Clear(pProfile->aB1CC, nAsset);
 }
 
@@ -1212,8 +1212,9 @@ void fn_8010A238(MsgArg* pArgs, MsgArg* pResult) {
     nPart = pArgs[0].i;
     n = pArgs[1].i;
     nPlace = 0;
-    if (nPart >= 0 && nPart < 24 && (nAsset = fn_801062C8(nPart, n)) != -1) {
-        fn_801060F0(nAsset, nPart, n, &nPlace);
+    if (nPart >= 0 && nPart < 24
+        && (nAsset = FE_CrAP_GetFirstEquippedIndexForCategoryAndSubcategory(nPart, n)) != -1) {
+        FE_CrAP_GetEntryNumFromAssetIDCategorySubcategory(nAsset, nPart, n, &nPlace);
         nResult = nPlace;
     }
     pResult->i = nResult;
@@ -1244,7 +1245,7 @@ void fn_8010A35C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8010A3A4(MsgArg* pArgs, MsgArg* pResult) {
-    fn_80104804();
+    FE_CrAP_RestoreLastRemovedAsset();
 }
 
 void fn_8010A3C4(MsgArg* pArgs, MsgArg* pResult) {

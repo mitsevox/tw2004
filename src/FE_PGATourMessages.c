@@ -366,7 +366,7 @@ void fn_8010F10C(MsgArg* pArgs, MsgArg* pResult) {
     s32 n8 = fn_800F0304(i);
 
     if (pProfile->a1054C[i].b) {
-        nCount = fn_80106E48(pProfile->a1054C[i].n);
+        nCount = FE_CrAP_GetNumEquippedItemsWithSponsor(pProfile->a1054C[i].n);
     }
     if (nCount) {
         *pValue = nCount * n8;
@@ -413,7 +413,7 @@ void fn_8010F278(MsgArg* pArgs, MsgArg* pResult) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_8010F2CC(MsgArg* pArgs, MsgArg* pResult) {
-    fn_80107294(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
+    FE_CrAP_GetSponsorName(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }
 
 // ---- end of sweep code ----

@@ -262,7 +262,7 @@ void fn_800E5314(void);
 s32  fn_800FD6A4(int nPlayer);
 void fn_801020BC(void);
 void FE_CrAP_InitModule(void);
-void fn_80103A64(void);
+void FE_CrAP_CloseModule(void);
 void fn_8010A448(int nSize);
 void fn_8010A4E8(void);
 void fn_8010BF68(void);
@@ -587,7 +587,7 @@ void fn_8006CB2C(void) {
     fn_8001C518();
     Players_Reset();
     TI_sStopCounter(2);
-    fn_80103A64();
+    FE_CrAP_CloseModule();
     fn_8010A4E8();
     fn_80090664();
     fn_8000B8F4();

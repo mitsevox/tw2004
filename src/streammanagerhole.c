@@ -85,8 +85,8 @@ void fn_800B9944();
 void fn_800B9988();
 void UI_vEATraxRegisterStreamClients();
 void UI_vEATraxUnRegisterStreamClients();
-void fn_8010508C();
-void fn_80105154();
+void FE_CrAP_RegisterStreamClients();
+void FE_CrAP_UnRegisterStreamClients();
 void fn_80124A40();
 void fn_80124A70();
 void fn_80014668(void);
@@ -266,7 +266,7 @@ void fn_80014668(void) {
     MC_RegisterStreamClients();
     fn_80076F24();
     fn_80076F54();
-    fn_8010508C();
+    FE_CrAP_RegisterStreamClients();
     fn_80124A40();
     fn_8000B9E4();
     UI_vEATraxRegisterStreamClients();
@@ -283,7 +283,7 @@ void fn_800146C4(void) {
     fn_800B9988();
     fn_8001D268();
     fn_80076F58();
-    fn_80105154();
+    FE_CrAP_UnRegisterStreamClients();
     fn_80124A70();
     MC_UnRegisterStreamClients();
     UI_vEATraxUnRegisterStreamClients();

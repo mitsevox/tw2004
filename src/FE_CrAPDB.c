@@ -110,7 +110,7 @@ UStreamObject* lbl_80282464;
 CrAPDB* lbl_80282460;
 
 // This file, in address order.
-void fn_80103920(void);
+void FE_CrAP_ResetLastCategoryTables(void);
 void FE_CrAP_TurnOffAsset(CrAPAsset* pAsset);
 void sTurnOnLogo(s16 nPart, int b, int i);
 void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset);
@@ -127,7 +127,7 @@ void FE_CheckSpecialCaseConnections(CrAPAsset* pAsset);
 u8   FE_IsMatchingSubCategory(s16 nPart, int nCategory, int nWanted);
 u8   fn_80106658(CrAPAsset* pAsset);
 int  fn_80106750(CrAPAsset* pAsset, Skin** apSkins);
-u8   fn_801069AC(CrAPAsset* pAsset);
+u8   FE_CrAP_TryBallSwappingAsset(CrAPAsset* pAsset);
 void fn_80106A64(CrAPAsset* pAsset, Skin* pSkin);
 void fn_80106B04(CrAPAsset* pAsset, Skin* pSkin);
 void fn_80106BF8(CrAPAsset* pAsset, Skin* pSkin);
@@ -154,13 +154,13 @@ void FE_CrAP_InitModule(void) {
     lbl_80282474 = StaticMem_Alloc(CRAP_NUM_PARTS * sizeof(s32), 2, 0, "FE_CrAPDB.c", 222);
     lbl_80282470 = StaticMem_Alloc(64 * sizeof(CrAPRecord), 2, 0, "FE_CrAPDB.c", 224);
     lbl_8028246C = 0;
-    fn_80103920();
+    FE_CrAP_ResetLastCategoryTables();
     lbl_80282464 = NULL;
     lbl_80282468 = NULL;
 }
 
 // Set every part's entries in the tables to -1 (none).
-void fn_80103920(void) {
+void FE_CrAP_ResetLastCategoryTables(void) {
     int nPart;
     s32 i;
 
@@ -176,7 +176,7 @@ void fn_80103920(void) {
 }
 
 // Free the database: its stream objects, the database and its tables.
-void fn_80103A64(void) {
+void FE_CrAP_CloseModule(void) {
     if (lbl_80282464 != NULL) {
         StaticMem_Free(lbl_80282464);
     }
@@ -238,10 +238,10 @@ u8 FE_CrAP_GetTriggerAnims(void) {
 }
 
 // Set the gender of the golfer being created, which picks the assets offered, and clear the cached
-// list tables (fn_80103920).
+// list tables (FE_CrAP_ResetLastCategoryTables).
 void FE_CrAP_SetCurrentGender(s8 n) {
     lbl_80282460->n4 = n;
-    fn_80103920();
+    FE_CrAP_ResetLastCategoryTables();
 }
 
 s8 FE_CrAP_GetCurrentGender(void) {
@@ -320,7 +320,7 @@ void fn_80103DE0(void) {
 }
 
 // Take the asset's name out of the profile's list b when it is there.
-void fn_80103E88(CrAPAsset* pAsset, int b) {
+void sTurnOffAnimation(CrAPAsset* pAsset, int b) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     char szName[16];
 
@@ -350,14 +350,14 @@ void FE_CrAP_TurnOffAsset(CrAPAsset* pAsset) {
 }
 
 // Take a part's choice i off the golfer being edited (part 13 by its name, from the list b).
-void fn_80103F94(s16 nPart, int b, int i) {
+void FE_CrAP_TurnOffPart(s16 nPart, int b, int i) {
     CrAPAsset* pAsset;
 
     FE_GetCurrentProfile();
     if (lbl_80281EE0->pB4->pChar != NULL
         && (pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i)) != NULL) {
         if (nPart == 13) {
-            fn_80103E88(pAsset, b);
+            sTurnOffAnimation(pAsset, b);
         } else {
             FE_CrAP_TurnOffAsset(pAsset);
         }
@@ -375,7 +375,7 @@ u8 FE_CrAP_IsAssetAvailableForUser(int nAsset) {
 
 // Switch the asset's name in the profile's list b: take it out when it is there, otherwise add it
 // and have the menu golfer play it (unless it already does).
-void fn_80104094(CrAPAsset* pAsset, int b) {
+void sTurnOnAnimation(CrAPAsset* pAsset, int b) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     char szName[24];
 
@@ -494,7 +494,7 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
         }
         fn_80103DE0();
         FE_CrAP_ClearEquippedAsset(pAsset);
-    } else if (fn_801069AC(pAsset)) {
+    } else if (FE_CrAP_TryBallSwappingAsset(pAsset)) {
         if (fn_8008E9A8() != 2) {
             fn_8008E8D0(2);
         } else {
@@ -559,7 +559,7 @@ void FE_CrAP_TurnOnPart(s16 nPart, int b, int i) {
     if (nPart == 13) {
         lbl_802816EC = nAsset;
         lbl_802816E8 = -1;
-        fn_80104094(pAsset, b);
+        sTurnOnAnimation(pAsset, b);
     } else if (nPart == 17) {
         sTurnOnLogo(nPart, b, i);
     } else if (nPart == 18) {
@@ -571,7 +571,7 @@ void FE_CrAP_TurnOnPart(s16 nPart, int b, int i) {
 
 // Put on the asset waiting in lbl_802816E8, or else take off the one in lbl_802816EC; then clear
 // both.
-void fn_80104804(void) {
+void FE_CrAP_RestoreLastRemovedAsset(void) {
     CrAPAsset* pAsset;
     s16 nKind;
     s32 nPart;
@@ -586,7 +586,7 @@ void fn_80104804(void) {
         pAsset = FE_CrAP_GetAssetFromAssetIndex(lbl_802816EC);
         if (pAsset->nPart == 13) {
             FE_CrAP_GetCategorySubcategoryAndEntryNumFromAssetID(lbl_802816EC, &nKind, &nPart, &nChoice);
-            fn_80103E88(pAsset, nPart);
+            sTurnOffAnimation(pAsset, nPart);
         } else {
             FE_CrAP_TurnOffAsset(pAsset);
         }
@@ -826,13 +826,13 @@ int FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(s16 nPart, i
 }
 
 // Take the database's stream objects as they load.
-void fn_8010508C(void) {
+void FE_CrAP_RegisterStreamClients(void) {
     Stream_RegisterLoadChunkCallback('CR_A', fn_80105188);
     Stream_RegisterLoadChunkCallback('CR_S', fn_801051F4);
 }
 
 // Find each part's first asset (the assets are sorted by part; 0 when a part has none).
-void fn_801050D0(void) {
+void FE_CrAP_SetupFirstAssetIDs(void) {
     int nPart;
     int i;
     for (nPart = 0; nPart < CRAP_NUM_PARTS; nPart++) {
@@ -846,12 +846,13 @@ void fn_801050D0(void) {
     }
 }
 
-// The index of a part's first asset, as fn_801050D0 found it (0 when the part has none).
+// The index of a part's first asset, as FE_CrAP_SetupFirstAssetIDs found it (0 when the part has none).
 int FE_CrAP_GetFirstCategoryAssetID(s16 nPart) {
     return lbl_80282474[nPart];
 }
 
-void fn_80105154(void) {
+// Stop taking the database's stream objects ('CR_A' and 'CR_S').
+void FE_CrAP_UnRegisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('CR_A');
     Stream_UnregisterLoadChunkCallback('CR_S');
 }
@@ -879,12 +880,12 @@ void fn_801051F4(UStreamObject* pObject) {
 
 // With the assets loaded: index the parts and pick the day's random assets.
 void fn_80105240(void) {
-    fn_801050D0();
+    FE_CrAP_SetupFirstAssetIDs();
     fn_80077B78();
 }
 
 // A part's choice i: its name, and the fields below (0 or -1 when there is no such choice).
-char* fn_80105264(s16 nPart, int b, int i) {
+char* FE_CrAP_GetPartName(s16 nPart, int b, int i) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return NULL;
@@ -892,7 +893,7 @@ char* fn_80105264(s16 nPart, int b, int i) {
     return pAsset->szName;
 }
 
-s16 fn_80105298(s16 nPart, int b, int i) {
+s16 FE_CrAP_GetPartColor1(s16 nPart, int b, int i) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return 0;
@@ -900,7 +901,7 @@ s16 fn_80105298(s16 nPart, int b, int i) {
     return pAsset->n44;
 }
 
-s16 fn_801052CC(s16 nPart, int b, int i) {
+s16 FE_CrAP_GetPartColor2(s16 nPart, int b, int i) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return 0;
@@ -908,7 +909,7 @@ s16 fn_801052CC(s16 nPart, int b, int i) {
     return pAsset->n46;
 }
 
-s16 fn_80105300(s16 nPart, int b, int i) {
+s16 FE_CrAP_GetPartColor3(s16 nPart, int b, int i) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return 0;
@@ -916,7 +917,9 @@ s16 fn_80105300(s16 nPart, int b, int i) {
     return pAsset->n48;
 }
 
-s16 fn_80105334(s16 nPart, int b, int i) {
+// A part's choice i: its sponsor, an index into the brand names (lbl_801935C8); -1 when there is no
+// such choice.
+s16 FE_CrAP_GetPartSponsor(s16 nPart, int b, int i) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return -1;
@@ -924,7 +927,7 @@ s16 fn_80105334(s16 nPart, int b, int i) {
     return pAsset->n2C;
 }
 
-s32 fn_80105368(s16 nPart, int b, int i) {
+s32 FE_CrAP_GetPartRetailPrice(s16 nPart, int b, int i) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return -1;
@@ -932,7 +935,7 @@ s32 fn_80105368(s16 nPart, int b, int i) {
     return pAsset->n30;
 }
 
-s32 fn_8010539C(s16 nPart, int b, int i) {
+s32 FE_CrAP_GetPartSalePrice(s16 nPart, int b, int i) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return -1;
@@ -940,7 +943,7 @@ s32 fn_8010539C(s16 nPart, int b, int i) {
     return pAsset->n34;
 }
 
-s32 fn_801053D0(s16 nPart, int b, int i) {
+s32 FE_CrAP_GetPartLevel(s16 nPart, int b, int i) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return -1;
@@ -1161,7 +1164,9 @@ s32 FE_CrAP_GetNumEntriesInCrAPDB(void) {
     return lbl_80282460->nAssets;
 }
 
-s32 fn_80105C0C(int nAsset) {
+// An asset's level (n38, as FE_CrAP_GetPartLevel); fe_craputils makes the assets of level 0
+// available from the start.
+s32 FE_CrAP_GetPartLevelFromAssetIndex(int nAsset) {
     CrAPAsset* pAsset = &lbl_80282460->pAssets[nAsset];
     if (pAsset == NULL) {
         return -1;
@@ -1288,7 +1293,7 @@ void FE_CrAP_GetCategorySubcategoryAndEntryNumFromAssetID(int nAsset, s16* pnPar
 
 // How many offered assets of the part that fit its entry n come before the asset in the part's
 // list: the asset's place in that list.
-void fn_801060F0(int nAsset, s16 nPart, int n, s32* pnPlace) {
+void FE_CrAP_GetEntryNumFromAssetIDCategorySubcategory(int nAsset, s16 nPart, int n, s32* pnPlace) {
     int i;
     int nCount = 0;
     int nFirst;
@@ -1325,7 +1330,7 @@ u8 FE_IsMatchingSubCategory(s16 nPart, int nCategory, int nWanted) {
 }
 
 // The asset in the first of the profile's slots whose asset is of the part (-1: none).
-int fn_80106244(s16 nPart) {
+int FE_CrAP_GetFirstEquippedIndexForCategory(s16 nPart) {
     s16 i;
     int nAsset;
 
@@ -1341,7 +1346,7 @@ int fn_80106244(s16 nPart) {
 
 // The asset in the first of the profile's slots whose asset is of the part and fits the part's
 // entry n (-1: none).
-int fn_801062C8(s16 nPart, int n) {
+int FE_CrAP_GetFirstEquippedIndexForCategoryAndSubcategory(s16 nPart, int n) {
     s16 i;
     int nAsset;
     int nWanted;
@@ -1362,7 +1367,7 @@ int fn_801062C8(s16 nPart, int n) {
 }
 
 // A part's choice i is the asset in its slot of the profile.
-u8 fn_80106374(s16 nPart, int b, int i) {
+u8 FE_CrAP_IsItemEquipped(s16 nPart, int b, int i) {
     int nWanted;
     int nAsset;
     int n;
@@ -1418,7 +1423,7 @@ char* FE_CrAP_GetStringFromTable(int nCategory) {
 
 // Copy how a part's choice i is unlocked into pDst: the Game Boy Advance link for lock kind 2,
 // otherwise its text in 'CR_S' (pDst is left as it is when it has none).
-u8 fn_8010651C(s16 nPart, int b, int i, char* pDst) {
+u8 FE_CrAP_GetUnlockMessageFrom(s16 nPart, int b, int i, char* pDst) {
     int nAsset;
     int nWanted = FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(nPart, b);
     int n;
@@ -1523,7 +1528,7 @@ int fn_80106750(CrAPAsset* pAsset, Skin** apSkins) {
 }
 
 // A part 12 asset of the category "balls": make its ball the profile's (nGolferOutfit) and show it.
-u8 fn_801069AC(CrAPAsset* pAsset) {
+u8 FE_CrAP_TryBallSwappingAsset(CrAPAsset* pAsset) {
     char szName[16];                    // the size is unknown (the frame allows up to 20)
     char* szCategory;
     s8 nBall;
@@ -1645,7 +1650,7 @@ void fn_80106DA0(CrAPAsset* pAsset, Skin* pSkin) {
 }
 
 // How many of the profile's slots hold an asset whose n2C is n.
-int fn_80106E48(s16 n) {
+int FE_CrAP_GetNumEquippedItemsWithSponsor(s16 n) {
     s16 i;
     int nAsset;
     int nCount = 0;
@@ -1661,7 +1666,7 @@ int fn_80106E48(s16 n) {
 }
 
 // How many offered assets have lock kind nKind and lock number nLock.
-s32 fn_80106ED8(s32 nKind, s32 nLock) {
+s32 FE_CrAP_GetNumItemsWithLockModeAndLockVal(s32 nKind, s32 nLock) {
     int i;
     int nCount = 0;
 
@@ -1760,7 +1765,8 @@ void fn_80107244(int n, s16* pN0, s32* pN4, char* pDst) {
     strcpy(pDst, lbl_80282470[n].sz8);
 }
 
-void fn_80107294(s16 n, char* pDst) {
+// Copy sponsor n's brand name ("adidas", "Callaway Golf"...) into pDst.
+void FE_CrAP_GetSponsorName(s16 n, char* pDst) {
     strcpy(pDst, lbl_801935C8[n]);
 }
 
@@ -1803,16 +1809,16 @@ void FE_CrAP_UnequipSlot(s16 nSlot) {
 }
 
 // The part an asset is a choice for.
-s16 fn_8010742C(int nAsset) {
+s16 FE_CrAP_GetCategoryFromAssetID(int nAsset) {
     return lbl_80282460->pAssets[nAsset].nPart;
 }
 
-int fn_80107444(int nAsset) {
+int FE_CrAP_GetLevelFromAssetID(int nAsset) {
     return lbl_80282460->pAssets[nAsset].n38;
 }
 
 // Copy the name of an asset's category into pDst.
-void fn_8010745C(int nAsset, char* pDst) {
+void FE_CrAP_GetSubcategoryNameFromAssetID(int nAsset, char* pDst) {
     strcpy(pDst, lbl_80282460->pStrings + lbl_80282460->pAssets[nAsset].nCategory);
 }
 
@@ -1824,7 +1830,7 @@ void fn_8010749C(int nAsset, char* pDst) {
 u8 fn_801074D4(int nAsset) {
     s16 n2E = FE_CrAP_GetAssetFromAssetIndex(nAsset)->n2E;
 
-    if (fn_8010742C(nAsset) == 13) {
+    if (FE_CrAP_GetCategoryFromAssetID(nAsset) == 13) {
         return 1;
     }
     switch (n2E) {

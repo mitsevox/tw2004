@@ -43,7 +43,7 @@ void fn_80057FBC(SaveProfile* pProfile) {
         nOffered = FE_CrAP_GetCurrentGender();
         nAssets = FE_CrAP_GetNumEntriesInCrAPDB();
         for (i = 0; i < nAssets; i++) {
-            if (fn_80105C0C(i) == 0) {
+            if (FE_CrAP_GetPartLevelFromAssetIndex(i) == 0) {
                 BitArray_Set(pProfile->aB1CC, i);
             } else {
                 BitArray_Clear(pProfile->aB1CC, i);
