@@ -43669,5 +43669,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "4ce5f89",
+"sha": "4ce5f893ae97c38b791f645bb338b9fb3d18c949",
+"time": 1790539276,
+"subject": "docs: index of every doc with what it is and how far to trust it",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
