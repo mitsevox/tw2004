@@ -218,6 +218,12 @@ CharModelDefs lbl_80280E18 = { lbl_80186EA0, 2 };
 s32 lbl_80280E20 = 3;
 CharSkinSet* lbl_80280E24[2] = { NULL, NULL };
 
+u64 lbl_801B9638[6];
+Character* lbl_801B9624[5];
+CharPool lbl_801B95E8;
+f32 lbl_801B95D8[4];
+f32 lbl_801B95C8[4];
+
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f, 2^30, 0.0f, -60000.0f and 3.0f (0x80282BC0), 1.0f and 3.0f before their first users
 // below; its body is unknown, this one only reproduces the order.

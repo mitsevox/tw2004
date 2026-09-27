@@ -36,6 +36,10 @@ int lbl_802824E8;                       // set: fn_801132C4 skins the next mesh'
 u32 lbl_802824E4;                       // the next free offset in it (fn_801132C4)
 void* lbl_802824E0;                     // the skinned-vertex buffer (fn_80112C64)
 
+// .bss, reverse address order
+f32 lbl_80223C14[3][4];
+HwsRenderState lbl_80223BB0;
+
 // Whether the grass is on (GoGrass.c; fn_80112D20 makes its texture only then): one view, at most
 // three players (two on course 14's hole 11).
 u8 fn_80112B80(void) {

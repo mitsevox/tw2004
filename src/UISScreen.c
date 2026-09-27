@@ -13,6 +13,10 @@ void fn_8016B188(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u3
                  s32 nArgs, s32* pArgs);
 char* fn_8016BEDC(char* pOut, char* pEnd, s32 nWidth, s32 nPrec, f32 f);
 
+// .bss, reverse address order
+UISVec4 lbl_80280638;
+UISVec4 lbl_80280628;
+
 // Whether one of pNode's groups links to the node pInfo belongs to.
 static inline u8 UIS_NodeLinks(UISScreenFile* pData, UISNode* pNode, UISNodeInfo* pInfo) {
     UISGroup* pGroup;

@@ -47,6 +47,12 @@ MCOpSet lbl_8018C7D8[4] = {
     {{(MCOp)fn_801251EC, NULL, (MCOp)fn_80125118, (MCOp)fn_8012555C, (MCOp)fn_801255C4}},
 };
 
+// .bss, reverse address order. lbl_801F1510 is mostly MC_Gc.c's to use, but it lies after this
+// file's other .bss, and MC_Gc.c's ends at 0x801F1100.
+MCCardState lbl_801F1510[MC_NUM_PORTS][MC_NUM_SLOTS];
+u32 lbl_801F1110[256];
+u32 lbl_801F1100[4];
+
 // At boot: no created golfer yet; try MC_LoadLastUser on each card, and at the first that succeeds mark
 // player slot 0's profile loaded and return 1.
 u8 MC_LoadInitialUser(void) {
