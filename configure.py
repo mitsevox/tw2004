@@ -904,6 +904,7 @@ config.libs = [
             Object(Matching, "UKernel.c"),
             Object(Matching, "GoAnimalActors.c"),
             Object(Matching, "GoTerrainCollision.c"),
+            Object(Matching, "MaterialTypes.c"),
             Object(Matching, "Ball.c"),
             Object(Matching, "Wind.c"),
             Object(Matching, "LLPictInt.c"),
