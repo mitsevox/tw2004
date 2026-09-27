@@ -340,9 +340,9 @@ extern s32 lbl_802816EC;                // } fn_80104804 runs (-1: none)
 extern char lbl_801932C8[CRAP_NUM_PARTS][32];   // per part: the name of its "All ..." entry that
                                         // lists every category ("All Headwear"), or ""
 
-int  fn_80103B28(int nAsset);           // the asset nAsset takes its attributes from (itself,
+int  sGetLinkedAssetID(int nAsset);           // the asset nAsset takes its attributes from (itself,
                                         // or for lock kind 28 the asset its nLock names)
-CrAPAsset* fn_80103B4C(CrAPAsset* pAsset);  // the same, by asset
+CrAPAsset* sGetLinkedAsset(CrAPAsset* pAsset);  // the same, by asset
 u8   FE_CrAP_GetTriggerAnims(void);                 // the database's b14
 void FE_CrAP_SetCurrentGender(s8 n);                 // set the database's n4 (which assets are offered)
 s8   FE_CrAP_GetAssetGender(int nAsset);           // an asset's n40

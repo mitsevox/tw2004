@@ -211,7 +211,9 @@ void fn_80103A64(void) {
     lbl_80282460 = NULL;
 }
 
-int fn_80103B28(int nAsset) {
+// The asset an asset takes its attributes from: for lock kind 28 the asset its nLock names,
+// otherwise itself.
+int sGetLinkedAssetID(int nAsset) {
     CrAPAsset* pAsset = &lbl_80282460->pAssets[nAsset];
 
     if (pAsset->nLockKind == 28) {
@@ -221,8 +223,8 @@ int fn_80103B28(int nAsset) {
 }
 
 // The asset an asset takes its attributes from.
-CrAPAsset* fn_80103B4C(CrAPAsset* pAsset) {
-    return FE_CrAP_GetAssetFromAssetIndex(fn_80103B28(FE_CrAP_GetAssetIndexFromAsset(pAsset)));
+CrAPAsset* sGetLinkedAsset(CrAPAsset* pAsset) {
+    return FE_CrAP_GetAssetFromAssetIndex(sGetLinkedAssetID(FE_CrAP_GetAssetIndexFromAsset(pAsset)));
 }
 
 // Let the menu golfer's animation and camera calls (FEgolferanim.c) run (1) or do nothing (0);
@@ -262,7 +264,7 @@ void FE_CrAP_ClearEquippedAsset(CrAPAsset* pAsset) {
 }
 
 // Put the asset in its slot of the profile.
-void fn_80103C2C(CrAPAsset* pAsset) {
+void FE_CrAP_EquipAsset(CrAPAsset* pAsset) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s16 nSlot = pAsset->n2E;
 
@@ -274,7 +276,7 @@ void fn_80103C2C(CrAPAsset* pAsset) {
 // The asset (the one it takes its attributes from) is the one in its slot of the profile.
 u8 FE_CrAP_IsAssetEquipped(CrAPAsset* pAsset) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
-    CrAPAsset* pBase = fn_80103B4C(pAsset);
+    CrAPAsset* pBase = sGetLinkedAsset(pAsset);
     s16 nSlot = pBase->n2E;
 
     if (nSlot >= 0 && nSlot < 53) {
@@ -335,7 +337,7 @@ void FE_CrAP_TurnOffAsset(CrAPAsset* pAsset) {
     CrAPAsset* pBase;
 
     FE_GetCurrentProfile();
-    pBase = fn_80103B4C(pAsset);
+    pBase = sGetLinkedAsset(pAsset);
     if (pBase->n2E != -1) {
         pSkin = lbl_80281EE0->pB4->pChar->pSkin;
         fn_80106D24(pBase, pSkin);
@@ -459,7 +461,7 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
     bLoop = 0;
     nPlay = 1;
     pSkin = lbl_80281EE0->pB4->pChar->pSkin;
-    pAsset = fn_80103B4C(pAsset);
+    pAsset = sGetLinkedAsset(pAsset);
     lbl_802816E8 = FE_CrAP_GetEquippedAsset(pAsset->n2E);
     lbl_802816EC = FE_CrAP_GetAssetIndexFromAsset(pAsset);
     if (pAsset->n2E == -1) {
@@ -531,7 +533,7 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
         fn_8008E724(FE_CrAP_GetStringFromTable(pAsset->n112), FE_CrAP_GetStringFromTable(pAsset->n114),
                     nPlay, bLoop);
     }
-    fn_80103C2C(pAsset);
+    FE_CrAP_EquipAsset(pAsset);
     FE_CheckSpecialCaseConnections(pAsset);
 }
 
@@ -970,22 +972,22 @@ int FE_CrAP_GetPartAttributeModifier2(s16 nPart, int b, int i) {
 // The attributes an asset raises (-1: none) and the tier it raises each to; an asset of lock kind
 // 28 has those of the asset it names.
 int FE_CrAP_GetPartAttributeUpgrade1ByAssetID(int nAsset) {
-    nAsset = fn_80103B28(nAsset);
+    nAsset = sGetLinkedAssetID(nAsset);
     return lbl_80282460->pAssets[nAsset].nAttrA;
 }
 
 int FE_CrAP_GetPartAttributeModifier1ByAssetID(int nAsset) {
-    nAsset = fn_80103B28(nAsset);
+    nAsset = sGetLinkedAssetID(nAsset);
     return lbl_80282460->pAssets[nAsset].nTierA;
 }
 
 int FE_CrAP_GetPartAttributeUpgrade2ByAssetID(int nAsset) {
-    nAsset = fn_80103B28(nAsset);
+    nAsset = sGetLinkedAssetID(nAsset);
     return lbl_80282460->pAssets[nAsset].nAttrB;
 }
 
 int FE_CrAP_GetPartAttributeModifier2ByAssetID(int nAsset) {
-    nAsset = fn_80103B28(nAsset);
+    nAsset = sGetLinkedAssetID(nAsset);
     return lbl_80282460->pAssets[nAsset].nTierB;
 }
 
