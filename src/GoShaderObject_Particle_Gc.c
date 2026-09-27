@@ -20,6 +20,7 @@ u32 lbl_80281F5C;                       // the most ever allocated
 u32 lbl_80281F58;                       // allocated now, headers and padding included
 
 ParticleBuffers lbl_801D97E0;
+ParticleBuffers* lbl_802813A8 = &lbl_801D97E0;
 
 // The particles' four buffers, two of 90000 bytes and two of 10000.
 void fn_8009414C(void) {

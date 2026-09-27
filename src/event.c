@@ -9,6 +9,7 @@
 #include "core/easb.h"
 
 SitDevData lbl_801D5AB0;
+SitDevData* lbl_802811B8 = &lbl_801D5AB0;
 u32 lbl_80281E20;              // seconds counted by event 26
 
 void fn_8001C680(int nPlayer);

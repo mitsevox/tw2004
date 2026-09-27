@@ -290,6 +290,7 @@ Skin.c:
 Code80037AB8.c:
 	.text       start:0x80037AB8 end:0x80037DD8
 	.bss        start:0x801D4F68 end:0x801D4F80
+	.sdata      start:0x80281100 end:0x80281108
 	.sdata2     start:0x80283020 end:0x80283028
 
 GoPostFx.c:
@@ -444,6 +445,7 @@ event.c:
 	.text       start:0x80065B44 end:0x80067710
 	.data       start:0x80188628 end:0x80188778
 	.bss        start:0x801D5AB0 end:0x801D5BF0
+	.sdata      start:0x802811B8 end:0x802811C0
 	.sbss       start:0x80281E20 end:0x80281E28
 	.sdata2     start:0x80283748 end:0x80283770
 
@@ -679,12 +681,14 @@ GoShaderObject_Particle_Gc.c:
 	.text       start:0x8009414C end:0x800952D8
 	.data       start:0x80189CC8 end:0x80189CE8
 	.bss        start:0x801D97E0 end:0x801D97F8
+	.sdata      start:0x802813A8 end:0x802813B0
 	.sbss       start:0x80281F58 end:0x80281F70
 	.sdata2     start:0x80283C80 end:0x80283CD8
 
 LLTime.c:
 	.text       start:0x800952D8 end:0x8009554C
 	.bss        start:0x801D97F8 end:0x801D9908
+	.sdata      start:0x802813B0 end:0x802813B8
 
 unsorted/sweep_8009554C.c:
 	.text       start:0x8009554C end:0x80095564
@@ -768,6 +772,7 @@ Code8009AA28.c:
 	.text       start:0x8009AA28 end:0x8009B314
 	.data       start:0x80189E78 end:0x8018A028
 	.bss        start:0x801E1470 end:0x801E3068
+	.sdata      start:0x802813B8 end:0x802813C0
 	.sdata2     start:0x80283E98 end:0x80283EC0
 
 unsorted/sweep_8009B314.c:
