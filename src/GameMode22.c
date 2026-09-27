@@ -44,6 +44,13 @@ u8   fn_80127004(void);
 void fn_80127034(int nPlayer);
 s32 fn_80127098(s32 arg0);
 
+char* lbl_8019543C[4] = {
+    "Rookie of the Year",
+    "Player of the Year",
+    "PGA Tour\xAE Money Leader",
+    "PGA Tour\xAE Scoring Leader",
+};
+
 // Message handler (FE_MessageTable.c): one of the four trophies: whether it is won, its title,
 // and the day it was won (empty while not).
 void fn_8012597C(MsgArg* pArgs, MsgArg* pResult) {
@@ -187,6 +194,18 @@ void fn_80125DE0(MsgArg* pArgs, MsgArg* pResult) {
     }
     szOut[0] = '\0';
 }
+
+char lbl_80195488[16] = "D";
+GameMode22State lbl_80195498 = {0, 5, 5, 0, {0, 0, 0}, 0.0f, 5, 120};
+s32 lbl_802819A0 = 15;
+
+// Defined here, last address first (CodeWarrior lays out .bss in reverse).
+u8 lbl_8028259C[5];
+u8 lbl_80282594[5];
+u8 lbl_8028258C[5];
+s32 lbl_80282588;
+s32 lbl_80282584;
+s32 lbl_80282580;
 
 // The mode's setup: its callbacks and options, split screen as chosen, the per-player values
 // cleared, and its messages to show.

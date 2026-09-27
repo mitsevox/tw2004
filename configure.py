@@ -1059,7 +1059,7 @@ config.libs = [
             Object(Matching, "gbacable.c"),
             Object(Matching, "ShaderRow19.c"),
             Object(Matching, "EASportsBio.c"),
-            Object(NonMatching, "GameMode22.c"),
+            Object(Matching, "GameMode22.c"),
             Object(Matching, "SkinBurn.c"),
             Object(Matching, "EASBStorage.c"),
             Object(Matching, "EASB.c"),
