@@ -1,0 +1,90 @@
+UISScreen fn_8016B188
+base 187, 18 levers, 1053 variants (18 singles) in 62 s; best 128
+
+128 [review]
+  - take &pNode->pInfo into a pointer after `pScript = fn_8016C5C4(pNode, uEvent);`, later reads through it
+  - take &pNode->nHandlers into a pointer after `pNode = &pScreen->pData->pNodes[nNode];`, later reads through it
+  fake match: EA did not write this (an identity inline, or an address taken only to steer the compiler). Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for EA's real helper or macro at this spot and use it; otherwise keep it with a `// fake match:` comment (an inline named fn_<caller address>_Read).
+
+128 [review]
+  - take &pNode->pInfo into a pointer after `pNode = &pScreen->pData->pNodes[nNode];`, later reads through it
+  - take &pNode->nHandlers into a pointer after `pNode = &pScreen->pData->pNodes[nNode];`, later reads through it
+  fake match: EA did not write this (an identity inline, or an address taken only to steer the compiler). Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for EA's real helper or macro at this spot and use it; otherwise keep it with a `// fake match:` comment (an inline named fn_<caller address>_Read).
+
+128 [review]
+  - take &pNode->pInfo into a pointer after `pScript = fn_8016C5C4(pNode, uEvent);`, later reads through it
+  - take &pNode->nHandlers into a pointer after `pNode = &pScreen->pData->pNodes[nNode];`, later reads through it
+  - type of i: u32 -> unsigned int
+  fake match: EA did not write this (an identity inline, or an address taken only to steer the compiler). Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for EA's real helper or macro at this spot and use it; otherwise keep it with a `// fake match:` comment (an inline named fn_<caller address>_Read).
+
+128 [review]
+  - take &pNode->pInfo into a pointer after `pScript = fn_8016C5C4(pNode, uEvent);`, later reads through it
+  - take &pNode->nHandlers into a pointer after `pNode = &pScreen->pData->pNodes[nNode];`, later reads through it
+  - type of i: u32 -> int
+  fake match: EA did not write this (an identity inline, or an address taken only to steer the compiler). Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for EA's real helper or macro at this spot and use it; otherwise keep it with a `// fake match:` comment (an inline named fn_<caller address>_Read).
+
+128 [review]
+  - take &pNode->pInfo into a pointer after `pScript = fn_8016C5C4(pNode, uEvent);`, later reads through it
+  - take &pNode->nHandlers into a pointer after `pNode = &pScreen->pData->pNodes[nNode];`, later reads through it
+  - type of i: u32 -> s32
+  fake match: EA did not write this (an identity inline, or an address taken only to steer the compiler). Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for EA's real helper or macro at this spot and use it; otherwise keep it with a `// fake match:` comment (an inline named fn_<caller address>_Read).
+
+128 [review]
+  - take &pNode->pInfo into a pointer after `pScript = fn_8016C5C4(pNode, uEvent);`, later reads through it
+  - for loop #1 (`for (i = 0; i < pNode->nHandlers; i++) {`) as a while loop
+  - take &pNode->nHandlers into a pointer after `pNode = &pScreen->pData->pNodes[nNode];`, later reads through it
+  fake match: EA did not write this (an identity inline, or an address taken only to steer the compiler). Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for EA's real helper or macro at this spot and use it; otherwise keep it with a `// fake match:` comment (an inline named fn_<caller address>_Read).
+
+128 [review]
+  - take &pNode->pInfo into a pointer after `pNode = &pScreen->pData->pNodes[nNode];`, later reads through it
+  - for loop #1 (`for (i = 0; i < pNode->nHandlers; i++) {`) as a while loop
+  - take &pNode->nHandlers into a pointer after `pNode = &pScreen->pData->pNodes[nNode];`, later reads through it
+  fake match: EA did not write this (an identity inline, or an address taken only to steer the compiler). Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for EA's real helper or macro at this spot and use it; otherwise keep it with a `// fake match:` comment (an inline named fn_<caller address>_Read).
+
+128 [review]
+  - take &pNode->pInfo into a pointer after `pNode = &pScreen->pData->pNodes[nNode];`, later reads through it
+  - take &pNode->nHandlers into a pointer after `pNode = &pScreen->pData->pNodes[nNode];`, later reads through it
+  - type of i: u32 -> unsigned int
+  fake match: EA did not write this (an identity inline, or an address taken only to steer the compiler). Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for EA's real helper or macro at this spot and use it; otherwise keep it with a `// fake match:` comment (an inline named fn_<caller address>_Read).
+
+128 [review]
+  - take &pNode->pInfo into a pointer after `pNode = &pScreen->pData->pNodes[nNode];`, later reads through it
+  - take &pNode->nHandlers into a pointer after `pNode = &pScreen->pData->pNodes[nNode];`, later reads through it
+  - type of i: u32 -> int
+  fake match: EA did not write this (an identity inline, or an address taken only to steer the compiler). Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for EA's real helper or macro at this spot and use it; otherwise keep it with a `// fake match:` comment (an inline named fn_<caller address>_Read).
+
+128 [review]
+  - take &pNode->pInfo into a pointer after `pNode = &pScreen->pData->pNodes[nNode];`, later reads through it
+  - take &pNode->nHandlers into a pointer after `pNode = &pScreen->pData->pNodes[nNode];`, later reads through it
+  - type of i: u32 -> s32
+  fake match: EA did not write this (an identity inline, or an address taken only to steer the compiler). Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for EA's real helper or macro at this spot and use it; otherwise keep it with a `// fake match:` comment (an inline named fn_<caller address>_Read).
+
+128 [review]
+  - take &pNode->pInfo into a pointer after `pScript = fn_8016C5C4(pNode, uEvent);`, later reads through it
+  - take &pNode->nHandlers into a pointer after `pNode = &pScreen->pData->pNodes[nNode];`, later reads through it
+  - move `UISNode* pNode;` to line 1 of the declarations
+  fake match: EA did not write this (an identity inline, or an address taken only to steer the compiler). Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for EA's real helper or macro at this spot and use it; otherwise keep it with a `// fake match:` comment (an inline named fn_<caller address>_Read).
+
+128 [review]
+  - take &pNode->pInfo into a pointer after `pScript = fn_8016C5C4(pNode, uEvent);`, later reads through it
+  - take &pNode->nHandlers into a pointer after `pNode = &pScreen->pData->pNodes[nNode];`, later reads through it
+  - move `u8* pScript;` to line 1 of the declarations
+  fake match: EA did not write this (an identity inline, or an address taken only to steer the compiler). Look in TW07 (docs/reference-builds/tw07-ps3/cu/) for EA's real helper or macro at this spot and use it; otherwise keep it with a `// fake match:` comment (an inline named fn_<caller address>_Read).
+
+changed lines of the best variant (base.c):
+@@ -5,4 +5,7 @@
+ u8* pScript;
++__typeof__(pNode->pInfo)* __lv_a_pNode_pInfo;
++__typeof__(pNode->nHandlers)* __lv_a_pNode_nHandlers;
+ pNode = &pScreen->pData->pNodes[nNode];
+-for (i = 0; i < pNode->nHandlers; i++) {
++__lv_a_pNode_nHandlers = &pNode->nHandlers;
++for (i = 0; i < (*__lv_a_pNode_nHandlers); i++) {
+ UISHandler* pHandler = &pNode->pHandlers[i];
+@@ -13,4 +16,5 @@
+ pScript = fn_8016C5C4(pNode, uEvent);
++__lv_a_pNode_pInfo = &pNode->pInfo;
+ if (pScript != 0 ) {
+-fn_8016C270(pStudio, pScreen, pNode->pInfo, pStack, pScript, nArgs, pArgs, 0, 0 , 0, 0, 0 );
++fn_8016C270(pStudio, pScreen, (*__lv_a_pNode_pInfo), pStack, pScript, nArgs, pArgs, 0, 0 , 0, 0, 0 );
+ }

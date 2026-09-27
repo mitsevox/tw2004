@@ -1,0 +1,38 @@
+SkinPart fn_800CE52C
+base 5, 145 levers, 5211 variants (145 singles) in 362 s; best 5
+
+5 [safe]
+  - move `s32 nIndices;` to line 1 of the declarations
+
+5 [safe]
+  - move `s32 nIndices;` to line 2 of the declarations
+
+5 [safe]
+  - move `SkinDesc14 entry;` to line 1 of the declarations
+
+5 [safe]
+  - move `SkinDesc14 entry;` to line 4 of the declarations
+
+5 [safe]
+  - move `SkinDesc14 entry;` to line 5 of the declarations
+
+5 [safe]
+  - move `SkinDesc14 entry;` to line 6 of the declarations
+
+5 [safe]
+  - move `SkinDesc14 entry;` to line 7 of the declarations
+
+5 [safe]
+  - move `SkinDesc14 entry;` to line 8 of the declarations
+
+5 [safe]
+  - move `SkinDesc14 entry;` to line 9 of the declarations
+
+5 [safe]
+  - move `SkinDesc14 entry;` to line 10 of the declarations
+
+5 [safe]
+  - move `SkinDesc14 entry;` to line 11 of the declarations
+
+5 [safe]
+  - move `SkinDesc14 entry;` to line 12 of the declarations

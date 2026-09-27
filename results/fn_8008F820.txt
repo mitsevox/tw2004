@@ -1,0 +1,38 @@
+uiProcessInterface fn_8008F820
+base 2, 201 levers, 5413 variants (201 singles) in 364 s; best 2
+
+2 [safe]
+  - move `u32 uMask;` to line 11 of the declarations
+
+2 [safe]
+  - move `u32 uMask;` to line 12 of the declarations
+
+2 [safe]
+  - move `u32 uMask;` to line 13 of the declarations
+
+2 [safe]
+  - move `u32 uMask;` to line 14 of the declarations
+
+2 [safe]
+  - move `f32 fOne;` to line 1 of the declarations
+
+2 [safe]
+  - move `s32 aArgs[1];` to line 5 of the declarations
+
+2 [safe]
+  - move `s32 aArgs[1];` to line 6 of the declarations
+
+2 [safe]
+  - move `s32 aArgs[1];` to line 7 of the declarations
+
+2 [safe]
+  - move `s32 aArgs[1];` to line 8 of the declarations
+
+2 [safe]
+  - move `s32 aArgs[1];` to line 9 of the declarations
+
+2 [safe]
+  - move `s32 aArgs[1];` to line 10 of the declarations
+
+2 [safe]
+  - move `u32 aButtons[8];` to line 1 of the declarations
