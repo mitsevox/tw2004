@@ -650,6 +650,10 @@ GoLightFogEnv.c:
 
 goballfx.c:
 	.text       start:0x80093A80 end:0x80093D3C
+	.bss        start:0x801D94B0 end:0x801D96B8
+	.sdata      start:0x80281388 end:0x80281390
+	.sbss       start:0x80281F40 end:0x80281F50
+	.sdata2     start:0x80283C48 end:0x80283C68
 
 GoObjShadow.c:
 	.text       start:0x80093D3C end:0x8009414C

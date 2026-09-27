@@ -1,12 +1,54 @@
 # BFX_vRender (goballfx.c, 0x80093AE0)
 
-Status: OPEN, 97.80142% on 2026-09-27 (b2: colours copied directly between the globals).
+Status: SOLVED 2026-09-27 (b2, third agent): 100%, goballfx linked. Fix: `pPos = lbl_801D95C8[nPlayer];`
+(plain; the earlier `(s64)` product is gone) plus three labelled fake-match assignments that leave
+pPos unchanged and only add dead sign extensions (srawi) of a dead 64-bit high word: after store [3]
+`pPos = (f32*)(s32)((u64)(u32)pPos | (((u64)(s64)(s32)lbl_801D9578[nPlayer] >> 32 |
+(u64)(u32)lbl_801D94D8[nPlayer]) << 32));` and the same with `nPlayer * 4 | (s32)((s64)nPlayer >> 32)`
+/ `nPlayer`, and after UV store [0] the same with `nPlayer` / `nPlayer`. See the first attempt below.
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
 "Attempts" (what, score before -> after). When it is exact: Status SOLVED, the fix, the commit.
 
 ## Attempts
+
+- 2026-09-27 b2 (third agent; quicktrial aligned, 16 at start; scripts or*.py, combo*.py, whatif*.py,
+  ph_model.py, degturn.py in the lane scratch). **Mechanism facts (dumps):** the register
+  allocator's liveness skips a dead instruction entirely (its uses do not extend anything) EXCEPT
+  `srawi` (it sets XER[CA], so it is never "dead"): a dead srawi interferes with everything live
+  across it AND keeps its source live up to it; `or`/`rlwinm`/`mulhw`/`li` with a dead result get 0
+  neighbours (GameMode22's OR works through GLOBAL liveness across its loop, not inside a block).
+  So a dead `or` feeding a srawi IS live: `srawi(a | b)` keeps both a and b live to the srawi, and
+  both are deleted after allocation. Placing it: `pPos = (f32*)(s32)((u64)(u32)pPos | (((u64)(s64)(V)
+  >> 32 | (u64)(u32)(P)) << 32));` (low word = pPos, logic unchanged; the (s64)(V) is srawi V).
+  Frontend CSE temps (@N) are coloured after all backend temps, so a `(s64)nPlayer` shared with the
+  pPos product (hi word = srawi nPlayer = "X0") is coloured late, after the bytes: the only way to
+  get a value into r9 for n*32.
+  Results: (1) V = `(s32)lbl_801D9578[nPlayer]`, P = `lbl_801D94D8[nPlayer]`, after store [3]: 16 -> 9
+  (the red/UV instruction order is EA's). (2) + `(u8)(s32)(s64)(s32)` on store [2]'s byte and
+  V = `nPlayer * 4`, P = row[0] after store [15] + `lbl_80189CB0[(s32)(s64)nPlayer][0]` on store 12:
+  3 (only n*32 r7 vs r10 left). (3) chain V = `(nPlayer * 4 | (s32)lbl_801D94D8[nPlayer]) |
+  (s32)((s64)nPlayer >> 32)` (keeps n*4 and X0 live past the UV add): EVERY volatile register is
+  EA's (blue r8, n*32 r10, X0 in r9 and deleted) but the saved registers permute (pBall r28, pPos
+  r29, pColour r31): 43. Minimal form (m2: C1 of (1) + V = `nPlayer * 4 | (s32)((u64)(s64)nPlayer
+  >> 32)`, no store round trips): 43, same. Why (rasim replay + what-if): pColour and pUV must leave
+  the graph in the FIRST simplify sweep (<= 28 neighbours at their turn) so pPos/nPlayer/pBall are
+  coloured first; the dead-op temps live across pUV's def push pUV to 30 (needs 2 fewer: e.g. the
+  chain's or+srawi or C1's srawi scheduled before the UV add). Tried for that: chain duplicated
+  (no frontend CSE of or-expressions), chain held in locals (copy-propagated away), chain reading
+  the UV base instead of the row (still scheduled after the UV add), 256 chain spellings (atoms
+  n*4, UV row/base, X0 signed/unsigned, n*32, bytes; `|`/`+`): best 40/43; desc.pColour/pUV
+  spellings and desc statement orders (720 sampled): 43+.
+  **The fix (exact, e3 in scratch early.py):** drop the `(s64)` from the pPos product (plain
+  `lbl_801D95C8[nPlayer]`), put the chain statement (signed form `(s32)((s64)nPlayer >> 32)`)
+  right after C1 (so it is early in block order and the scheduler issues its or/srawi before the UV
+  add: they stop being pUV's neighbours), and give `(s64)nPlayer` its second occurrence late with
+  a third dead statement after UV store [0] (V = P = `nPlayer`), which keeps X0 a late-coloured
+  frontend temp (@ numbers follow the order of each expression's SECOND occurrence). Every register
+  is EA's; the only listed difference left was the aIndex `@13+4` relocation, which links fine.
+  Each statement is needed (dropping any one: 3-11 wrong registers). Metric used for the search:
+  aligned diff where register-only differences count as distinct renamings (regmetric.py).
 
 - 2026-09-27 b2 (second agent; quicktrial aligned). **Colours copied straight between the globals,
   as sibling GoObjShadow fn_80093DB8 writes its arrays: `lbl_801D9578[nPlayer][k] =
