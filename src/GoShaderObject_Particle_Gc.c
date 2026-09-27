@@ -120,6 +120,22 @@ static inline u8 fn_80094534_Get(u8 x) {
     return x;
 }
 
+// fake match: an identity inline and an inline holding the lower limit test, for fn_80094534's
+// colour channels. Their parameters are frontend temps: the value's copy into the second one's
+// parameter survives to register allocation and is coalesced there, one more allocator neighbour
+// per channel for t, the size and the constants, which gives the original's saved float
+// registers. port: `x = expr; if (x <= y) x = y;`
+static inline f32 fn_80094534_Read(f32 x) {
+    return x;
+}
+
+static inline f32 fn_80094534_Calc(f32 x, f32 y) {
+    if (x <= y) {
+        x = y;
+    }
+    return x;
+}
+
 // Draws n particles as camera-facing quads. Each one's position runs from v0 along v60 with time,
 // plus its own velocity's difference from v60 eased out by 1 / (1 + f50 t)^4; it is skipped when
 // it ends up behind the camera. Its size, colour and alpha run linearly with time within limits,
@@ -177,28 +193,20 @@ void fn_80094534(f32 (*pMtx)[4], ParticleShape* pShape, ParticleVertex* pVerts, 
         if (v.z > 0.0f) {
             fSize = pShape->f48 * t + pVerts->f20;
             fSize = (fSize <= pShape->f4C) ? fSize : pShape->f4C;
-            fRed = pShape->v10[0] * t + pShape->v0[0];
-            if (fRed <= pShape->v20[0]) {
-                fRed = pShape->v20[0];
-            }
+            fRed = fn_80094534_Calc(fn_80094534_Read(pShape->v10[0] * t + pShape->v0[0]),
+                                    pShape->v20[0]);
             nRed = fn_80094534_Get(255.0f * ((fRed < pShape->v20[0]) ? pShape->v20[0]
                                              : (fRed > pShape->v30[0]) ? pShape->v30[0] : fRed));
-            fGreen = pShape->v10[1] * t + pShape->v0[1];
-            if (fGreen <= pShape->v20[1]) {
-                fGreen = pShape->v20[1];
-            }
+            fGreen = fn_80094534_Calc(fn_80094534_Read(pShape->v10[1] * t + pShape->v0[1]),
+                                      pShape->v20[1]);
             nGreen = fn_80094534_Get(255.0f * ((fGreen < pShape->v20[1]) ? pShape->v20[1]
                                                : (fGreen > pShape->v30[1]) ? pShape->v30[1] : fGreen));
-            fBlue = pShape->v10[2] * t + pShape->v0[2];
-            if (fBlue <= pShape->v20[2]) {
-                fBlue = pShape->v20[2];
-            }
+            fBlue = fn_80094534_Calc(fn_80094534_Read(pShape->v10[2] * t + pShape->v0[2]),
+                                     pShape->v20[2]);
             nBlue = fn_80094534_Get(255.0f * ((fBlue < pShape->v20[2]) ? pShape->v20[2]
                                               : (fBlue > pShape->v30[2]) ? pShape->v30[2] : fBlue));
-            fAlpha = pShape->v10[3] * t + pShape->v0[3];
-            if (fAlpha <= pShape->v20[3]) {
-                fAlpha = pShape->v20[3];
-            }
+            fAlpha = fn_80094534_Calc(fn_80094534_Read(pShape->v10[3] * t + pShape->v0[3]),
+                                      pShape->v20[3]);
             uAlpha = 128.0f * ((fAlpha < pShape->v20[3]) ? pShape->v20[3]
                                : (fAlpha > pShape->v30[3]) ? pShape->v30[3] : fAlpha);
             fFade = 128.0f * (pShape->f44 * t + pShape->f40);

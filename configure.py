@@ -946,7 +946,7 @@ config.libs = [
             Object(Matching, "GoLightFogEnv.c"),
             Object(NonMatching, "goballfx.c"),
             Object(Matching, "GoObjShadow.c"),
-            Object(NonMatching, "GoShaderObject_Particle_Gc.c"),
+            Object(Matching, "GoShaderObject_Particle_Gc.c"),
             Object(Matching, "LLTime.c"),
             Object(Matching, "CharAnim.c"),
             Object(Matching, "GoShaderObjectCommon_MorphAnimManager_Gc.c"),
