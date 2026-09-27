@@ -23,21 +23,16 @@ void fn_80168C24(UIStudio* pStudio, s32 nTicks) {
 
 // Sends event uEvent to the current screen, or to every screen when bAll is set. Event -8 skips
 // a screen that is being unloaded.
-// fake match: UIStudio_Send's body written out, with cast copies of n, b and p (EA copies those
-// three at the top and uEvent late; the inline copies uEvent at the top).
-void fn_80168CD8(UIStudio* pStudio, UISWordStack* pStack, u32 uEvent, s32 n, s32 b, void* p, u8 bAll) {
+void fn_80168CD8(UIStudio* pStudio, UISWordStack* pStack, int uEvent, u32 n, s32 b, void* p, u8 bAll) {
     u32 i;
     u32 nEnd;
     UISScreen* pScreen;
     u8 bOut;
-    void* pCopy;
-    s32 bCopy;
-    u32 nCopy;
 
-    pCopy = (void*)p;
-    bCopy = (s32)b;
-    nCopy = (u32)n;
-    if (bAll) {
+    // fake match: the round trip through s8 gives back bAll for every u8, but the longer chain
+    // before the compare lets the scheduler put the pStudio and pStack copies ahead of it, as in
+    // EA's code (their registers follow from that)
+    if ((u8)(s32)(s8)bAll) {
         nEnd = pStudio->nScreens;
         i = 0;
     } else {
@@ -47,10 +42,9 @@ void fn_80168CD8(UIStudio* pStudio, UISWordStack* pStack, u32 uEvent, s32 n, s32
     }
     for (; i < nEnd; i++) {
         pScreen = &pStudio->pScreens[i];
-        if (nCopy != -8 || pScreen->bUnloading != 1) {
+        if (n != -8 || pScreen->bUnloading != 1) {
             bOut = 0;
-            // fake match: the (int) cast gives uEvent its late copy
-            fn_8016A2D4(pStudio, pScreen, pStack, 0, (int)uEvent, nCopy, bCopy, pCopy, &bOut);
+            fn_8016A2D4(pStudio, pScreen, pStack, 0, uEvent, n, b, p, &bOut);
         }
     }
 }
