@@ -961,6 +961,7 @@ GoGolfCam.c:
 
 CamSpline.c:
 	.text       start:0x800C7480 end:0x800C808C
+	.sdata2     start:0x802843B8 end:0x802843F8
 
 GoBreakLine.c:
 	.text       start:0x800C808C end:0x800C937C
