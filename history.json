@@ -42437,5 +42437,21 @@
 "matched_functions": 7620,
 "total_functions": 7647,
 "exact": 7620
+},
+{
+"commit": "f60fa8c",
+"sha": "f60fa8c314f1a0bcfd1b94d499725ffbc9c940fc",
+"time": 1790482979,
+"subject": "assign: battle plan lever roster",
+"report": true,
+"matched_code": 1513808,
+"complete_code": 1454928,
+"matched_data": 788491,
+"complete_data": 935543,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7620,
+"total_functions": 7647,
+"exact": 7620
 }
 ]
