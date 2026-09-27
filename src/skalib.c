@@ -1289,7 +1289,6 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
     AnimLib*    pNew;
     s32         nSize;
     ClipRecord* pRec;
-    s32*        pUsed;
     int         i;
     s32         nRet = 0;
     AnimLib*    pLibFile;
@@ -1298,7 +1297,6 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
     s32         n4CAl;
     BuildCtx    ctx;
     u32         o;
-    int         j;
     u32         s;
     int         p;
     u8          bFound;
@@ -1312,8 +1310,8 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
     } else {
         for (k = 0; k < 3; k++) {
             pSlot = &lbl_801C6068[k];
-            for (j = 0; j < pSlot->nOverlays; j++) {
-                pOv = &pSlot->overlays[j];
+            for (i = 0; i < pSlot->nOverlays; i++) {
+                pOv = &pSlot->overlays[i];
                 if (pOv->n10 == nSlot) {
                     k        = pOv->pChar->nSlot;
                     pOv->n10 = -1;
@@ -1329,10 +1327,11 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
     if (pSrc != NULL && pSlot->nOverlays != 0) {
         u32 aPad[4] = {0, 0, 0, 0};
 
-        pUsed = &lbl_801C6008[k].n04;
         pBank = lbl_801C6050[k];
         pHdr  = (Clip*)pSlot->pEnd;
         for (i = 0; i < pSrc->nRecords; i++) {
+            // register note: n50Al is a block local so that it numbers after n4CAl (EA spills
+            // n4CAl, keeps n50Al in r14); n4CAl stays last at function level for the spill slots
             s32 n50Al;
 
             pRec = &pSrc->pRecords[i];
@@ -1446,7 +1445,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             fn_80020F60(pHdr, uAramStart);
             pBank->uId += nCopied;
             pHdr = (Clip*)((u8*)pHdr + nCopied);
-            *pUsed += nCopied;
+            lbl_801C6008[k].n04 += nCopied;
             pSrc->pRecords[i].pClip = pBank->ppClips[pSlot->n150];
             pSrc->pRecords[i].n12 |= 8;
             pSlot->n150++;

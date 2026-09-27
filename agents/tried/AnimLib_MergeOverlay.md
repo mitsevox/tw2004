@@ -1,8 +1,9 @@
 # AnimLib_MergeOverlay (skalib.c, 0x80024B18)
 
-Status: OPEN, 96.26% on 2026-09-27 (b6; was 87.73%). Left: the loop preheader (EA sets the record
-offset IV with a copy of i, `lwz r31,0x38(r1)` from i's slot, ours `li r31,0`) and the order of
-`li r0,0x2800` (nRet) in the block before the Mem_cpy of the new library.
+Status: SOLVED 2026-09-27 (b6): 100%. EA form for the loops (i is also the overlay search
+counter; `lbl_801C6008[k].n04 += nCopied` with no pUsed local; one `Clip* pHdr` walk), plus
+labelled fakes: the u32 round-up scratch uAl, u32 strides with a signed halving, `nRet +=
+0x2800`, and a register note for the block-level n50Al. Commit on agent/b6 (see below).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -11,6 +12,30 @@ unless you combine it with something new. Before you stop, add every attempt und
 ## Attempts
 
 (add yours here: date, lane, what, score)
+
+- 2026-09-27 b6 (continued). 96.26 -> 97.36 -> 100.
+  * nRet: `nRet += 0x2800;` (nRet is still 0 there). With `=`, the first scheduling pass issues
+    the li at cycle 1 (it wins the tie with the Mem_cpy size's `li r5` by source order), the li's
+    spill temp overlaps nClips and the slwi takes r0; the frontend keeps `nRet = nRet + 0x2800`
+    (it does not fold nRet's 0 after the loop), the backend addi is scheduled late and then
+    constant-propagated into EA's `li r0,0x2800` after the slwi. 97.36.
+  * preheader: EA's offset IV is a copy of i (`lwz r31,0x38(r1)`) because EA's record loop is a
+    LATER web of i: EA uses i as the overlay search counter too (no j). The frontend keeps a
+    variable's name for its first web only; the record loop's web becomes a frontend temp, and
+    CSE then gives the frontend IV (`@IV = 0`) a copy of that temp's `li 0`. And EA has no pUsed
+    local: `lbl_801C6008[k].n04 += nCopied;` (the hoisted address is a temp too, so its spill
+    slot 0x3c comes after i's). Exact.
+  Tried before finding it (no change, all `li r31,0`): i = 0 as a statement anywhere before the
+  loop, at the top, at the join of both branches (mulli from i's reload), `i = nRet`, `k - k`,
+  `k ^ k`, `k & 0`, `(s64)0`, 0u/0L, u32/s16/s32 i, comma for-inits, while/do forms, an explicit
+  byte-offset local (`o = i`), (u64) identities before the loop (the OR form moves pEnd's load:
+  aligned 37 -> 18, not the IV), scheduling pragmas (7400: 32; once/603/604/off worse).
+  nRet also not: `(s64)` round trips on the Mem_cpy arguments / nSize / pLib, a pChar local,
+  volatile nRet (worse), nRet as u32/int, 10 << 10, 0x2800u.
+  Kept (each checked by reverting it on the exact version): uAl scratch (in place: 11 aligned),
+  u32 uAl (s32: 174), u32 strides (s32: 166), n50Al in the loop block (at the top: 28), `+=`
+  (13), s declared before p and bFound (9), `pSlot = &lbl_801C6068[k]` in the s loop (14),
+  one pHdr instead of pEnd + pHdr (200).
 
 - 2026-09-27 b6. 87.73 -> 96.26. Harness: build/perm snapshot + quicktrial compile, three scores
   (position diffs, aligned diffs, aligned with registers masked = "noreg"); base 409 / 276 / 65.
