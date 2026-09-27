@@ -31,6 +31,12 @@ GreenGrid* lbl_802813C0 = &lbl_801E3068;
 TexBank*  lbl_80281FAC;         // the "gridpt" texture's bank
 TexEntry* lbl_80281FA8;         // and the texture
 
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80283EC8), before the 0.0f GR_vInit uses first; its body is unknown.
+static f32 GoGreenGrid_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 void GR_vInit(void) {
     s32 desc[2];
     int i;
@@ -143,6 +149,32 @@ void fn_8009B970(int nView) {
         + (PLAYER(fn_8001707C(nViewCopy))->vTarget[0] - fAlong * lbl_802813C0->aDir[nView][0]);
     lbl_802813C0->aCorner[nView][2] = fAcross * fDirX
         + (PLAYER(fn_8001707C(nViewCopy))->vTarget[2] - fAlong * lbl_802813C0->aDir[nView][2]);
+}
+
+// Whether the grid shows for the player: never with fn_800E39F0; with the putter when
+// options.b84 is set; otherwise when the player's ground (nSurface) is of a class that
+// fn_8009BD94 lists.
+u8 fn_8009BD24(int nPlayer) {
+    if (fn_800E39F0()) {
+        return 0;
+    }
+    if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
+        return gSession.options.b84;
+    }
+    return fn_8009BD94(nPlayer);
+}
+
+u8 fn_8009BD94(int nPlayer) {
+    int bOn = 0;
+    int nSurface;
+    nSurface = gPlayers[nPlayer].nSurface;
+    // EA bug: only the first test checks for no surface (-1); the others read the row before
+    // gSurfaceTypes.
+    if ((nSurface >= 0 && gSurfaceTypes[nSurface].nClass == 3) || gSurfaceTypes[nSurface].nClass == 4
+        || gSurfaceTypes[nSurface].nClass == 12 || gSurfaceTypes[nSurface].nClass == 18) {
+        bOn = 1;
+    }
+    return bOn;
 }
 
 // Samples the ground height under up to four more of the view's grid points (a frame's share),
@@ -450,32 +482,6 @@ void fn_8009C914(int nView) {
     fn_80012F50(1, 6, 0x80);
     fn_80012F34(1);
     fn_80012EF8();
-}
-
-// Whether the grid shows for the player: never with fn_800E39F0; with the putter when
-// options.b84 is set; otherwise when the player's ground (nSurface) is of a class that
-// fn_8009BD94 lists.
-u8 fn_8009BD24(int nPlayer) {
-    if (fn_800E39F0()) {
-        return 0;
-    }
-    if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
-        return gSession.options.b84;
-    }
-    return fn_8009BD94(nPlayer);
-}
-
-u8 fn_8009BD94(int nPlayer) {
-    int bOn = 0;
-    int nSurface;
-    nSurface = gPlayers[nPlayer].nSurface;
-    // EA bug: only the first test checks for no surface (-1); the others read the row before
-    // gSurfaceTypes.
-    if ((nSurface >= 0 && gSurfaceTypes[nSurface].nClass == 3) || gSurfaceTypes[nSurface].nClass == 4
-        || gSurfaceTypes[nSurface].nClass == 12 || gSurfaceTypes[nSurface].nClass == 18) {
-        bOn = 1;
-    }
-    return bOn;
 }
 
 // a - b into out (four floats)
