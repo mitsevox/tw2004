@@ -966,7 +966,7 @@ config.libs = [
             Object(NonMatching, "hlaudtrackstm.c"),
             Object(Matching, "UAudContainers.c"),
             Object(Matching, "uiobject.c"),
-            Object(NonMatching, "startUp.c"),
+            Object(Matching, "startUp.c"),
             Object(Matching, "shadow.c"),
             Object(Matching, "GoComicCam.c"),
             Object(Matching, "GoShaderObject_Rain_Gc.c"),
