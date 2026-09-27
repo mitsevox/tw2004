@@ -15,6 +15,17 @@ void DF_vDrawBufferToScreen(int n);
 void fn_80045880(int n);
 void fn_800458B4(void);
 
+// This file's .sdata (engine.h).
+DFBuffer* lbl_80281110 = &lbl_801D5188;
+f32 lbl_80281114 = 0.011f;
+f32 lbl_80281118 = 0.00315f;
+f32 lbl_8028111C = 3.13f;
+f32 lbl_80281120[2] = {1.0f, 0.0f};
+
+// This file's .sbss (engine.h), in reverse address order as the compiler lays it out.
+f32 lbl_80281D94;
+f32 lbl_80281D90;
+
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x80283148), before the 0.0f fn_80045660 uses first; its body is unknown.
 static f32 DepthField_StrippedFn(f32 x) {

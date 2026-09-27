@@ -972,6 +972,7 @@ typedef struct DFBuffer {
 } DFBuffer;
 
 extern DFLayer lbl_801D5110[5];
+extern DFBuffer lbl_801D5188;
 extern DFBuffer* lbl_80281110;
 extern f32 lbl_80281D90;
 extern f32 lbl_80281D94;        // cleared by fn_80045660

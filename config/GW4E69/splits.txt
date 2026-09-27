@@ -312,6 +312,8 @@ gocamscripts.c:
 
 DepthField.c:
 	.text       start:0x80045660 end:0x80045D18
+	.sdata      start:0x80281110 end:0x80281128
+	.sbss       start:0x80281D90 end:0x80281D98
 	.sdata2     start:0x80283148 end:0x80283168
 
 UObject3D.c:
