@@ -568,6 +568,15 @@ They will be sorted into the sections below.
   (EA's order). Chain back into the parameter itself: a new local gets a higher vreg and the
   wrong register; signed-shift or `(s64)(s32)` links leave dead srawi readers that pull the chain
   early.
+- **[verified, fake-match class] A dead `(u32)(s64)(s32)x` can reorder a whole block through the
+  first scheduling pass**, not only add an allocator neighbour: its `srawi` takes an issue slot
+  and an integer unit (and the 750's rule that an integer op cannot issue beside a busy unit if it
+  touches the register just defined there), so the first pass's order changes, the registers
+  follow from the new live ranges, and the srawi is deleted after allocation.
+  `tools/match/sched750.py deadsearch` predicts which value to put it on. GoShaderObject_Particle_Gc
+  fn_800949D0 97.89 -> 100: the round trip on n in `if (nLive <= (u32)(s64)(s32)n)` gave EA's
+  order and registers (pVerts back to its plain form); the same round trip on nFirst * 36 had given
+  every register but left 4 instructions out of order, and one on `n = ...` itself keeps a copy.
 
 ### New from round 6 (2026-09-26 afternoon)
 

@@ -111,6 +111,11 @@ UStream.c:
 
 LLTex.c:
 	.text       start:0x8000E830 end:0x8001013C
+	.data       start:0x801868B0 end:0x801869A8
+	.bss        start:0x801A3438 end:0x801A3458
+	.sdata      start:0x80280DC8 end:0x80280DD8
+	.sbss       start:0x80281C60 end:0x80281C88
+	.sdata2     start:0x80282B08 end:0x80282B20
 
 LLTexGrp.c:
 	.text       start:0x8001013C end:0x800107F4
