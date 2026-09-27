@@ -865,6 +865,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             s32 nMul;
             s32 nDims;
             s32 bOnStack;
+            s32 i;
 
             pArr = NULL;
             nIndex = 0;
