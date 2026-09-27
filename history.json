@@ -42661,5 +42661,21 @@
 "matched_functions": 7626,
 "total_functions": 7647,
 "exact": 7626
+},
+{
+"commit": "aa3107e",
+"sha": "aa3107e85a7754480307c6154ede8262b7d01e31",
+"time": 1790487792,
+"subject": "mwccdbg.py: run each debugger in its own network namespace (parallel runs, no lock queue) on Linux",
+"report": true,
+"matched_code": 1517292,
+"complete_code": 1462140,
+"matched_data": 788811,
+"complete_data": 935903,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7626,
+"total_functions": 7647,
+"exact": 7626
 }
 ]
