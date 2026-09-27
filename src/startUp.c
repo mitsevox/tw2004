@@ -760,13 +760,18 @@ u32 fn_800B06F4(void) {
     return uAddr;
 }
 
+// fake match: a per-function pragma (not EA's build setting): without propagation the shift keeps
+// its own register and the flags load is numbered after the divide, as in EA's code (Gemini).
+#pragma opt_propagation off
 void fn_800B0748(u32 uAddr) {
+    u32 mask;
     u32 uBit = 1;
     uAddr -= lbl_80282108;
-    uBit <<= uAddr / 0xFE00;
-    lbl_802820F0 &= ~uBit;
+    mask = uBit << (uAddr / 0xFE00);
+    lbl_802820F0 &= ~mask;
     lbl_802820F4--;
 }
+#pragma opt_propagation reset
 
 int fn_800B0790(void) {
     return 0x4400;
