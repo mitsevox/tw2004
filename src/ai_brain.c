@@ -197,13 +197,15 @@ void fn_8002B020_OnTargetChosen(int nPlayer) {
 // shorter by one, longer by two... from the club it started with. The caller can force state 3
 // to make it stop: the best aim found so far, or +25 and a fresh target.
 
-extern u8  gSimAborted;             // 0x80281D30  raised by AI_SimAbort (the ball hit an object)
-extern u8  gSimHaveResult;          // 0x80281D31  at least one rehearsal landed
-extern u8  gSimClubTries[8];        // 0x80281D34  per player: club swaps tried
-extern f32 gSimBestDist;            // 0x802810A8  best miss squared
-extern f32 gSimBestAim[3];          // 0x801C64D8  the aim that produced it
-extern Ball gSimBall;               // 0x801C64E4  the rehearsal's own ball
-extern s32 gSimClub[6];             // 0x801C65A0  per player: club the rehearsal started with
+// Defined here, last address first in each section (CodeWarrior lays out .bss and .sbss in
+// reverse).
+s32  gSimClub[6];                   // 0x801C65A0  per player: club the rehearsal started with
+Ball gSimBall;                      // 0x801C64E4  the rehearsal's own ball
+f32  gSimBestAim[3];                // 0x801C64D8  the aim that produced it
+f32  gSimBestDist = 1e9f;           // 0x802810A8  best miss squared
+u8   gSimClubTries[8];              // 0x80281D34  per player: club swaps tried
+u8   gSimHaveResult;                // 0x80281D31  at least one rehearsal landed
+u8   gSimAborted;                   // 0x80281D30  raised by AI_SimAbort (the ball hit an object)
 
 // +n on every modifier the rehearsal cares about (not LUCK), aggression the other way.
 #define BUMP_MODIFIERS(p, n)                                                                       \

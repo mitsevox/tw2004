@@ -17,7 +17,7 @@
 void Luck_ResetAllOdds(void);
 void Luck_ResetOdds(int nPlayer);
 
-extern s8 gLuckOdds[8];                 // 0x802810B0  "1 in n" per player: 12 12 12 12
+s8 gLuckOdds[8] = {12, 12, 12, 12, 12}; // 0x802810B0  "1 in n" per player: 12 12 12 12
 
 // ---- luck -------------------------------------------------------------------------------------
 

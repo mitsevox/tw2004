@@ -19,7 +19,11 @@ void fn_8002C8B4(void);
 // Loaded from a course chunk: s16, s16 count, count x AITargetDef (0x30 each), then count x 8 bytes
 // of requirements (tee set, pin position, skill, aggression, priority, type, power, pad).
 
-extern u8 gAITargetsLoaded;             // 0x80281D40
+// Defined here, last address first (CodeWarrior lays out .sbss in reverse); gAITargets
+// (0x801C65B8) and gNumAITargets (0x80281D44) are declared in golfer.h.
+AITarget gAITargets[25];
+s32      gNumAITargets;
+u8       gAITargetsLoaded;              // 0x80281D40
 
 
 void AI_TargetsInit(void) {

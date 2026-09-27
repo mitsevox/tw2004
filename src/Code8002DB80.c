@@ -29,6 +29,13 @@ u8  gCaddieActive;           // 0x80281D4A
 u8  gCaddieDone;             // 0x80281D49
 u8  gNumPlayersSetUp;
 
+// Defined here, last address first (CodeWarrior lays out .bss in reverse); all three are declared
+// in golfer.h. They sit between Code8002BBB0.c's .bss and Code8002EE1C.c's gSession; this file
+// alone uses gCurGolferRecord and gGolferTable of the files around it.
+GolferRecord gGolferTable[34];      // 0x801CB300
+GolferRecord gCurGolferRecord;      // 0x801CB1C0
+Player       gPlayers[5];           // 0x801C66E8
+
 void Luck_ResetOdds(int nPlayer);
 void Golfer_OnStatsLoaded(UStreamObject* pObject);
 void Golfer_TableByteSwap(void);
