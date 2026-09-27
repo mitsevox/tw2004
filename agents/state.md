@@ -3,7 +3,13 @@
 Updated 2026-09-25 ~21:30 CDT. How the machines, CI, the page and PC jobs fit together:
 docs/infrastructure.md. History: docs/journal.md.
 
-**Running:** nothing. Round 7 (4 lanes, 16:25-17:30 CDT) merged: Swing linked (SW_KillVibration),
+**Running (ENDGAME, launched 2026-09-26 19:05 CDT, checkpoint 21:30 CDT, weekly 25%):** owner: get to 100%
+for the port; labelled logic-preserving fakes may close functions (agents/assign/2026-09-26-endgame.md). Lanes:
+e-char (char, SkinPart, skalib), e-link1 (StaticCam, Rain, startUp, Stm_Tick, SunFlr, rcmp, CamSpline), e-link2
+(uiProcessInterface, GoGreenGrid, gocamscripts, MC, Session, uiArc, BestBall, GameMode22), e-render (Particle,
+DepthField, LLFont, LLPictInt, goballfx, LLTex, Grass Init, LogoTexture), e-uisscreen, e-uisapi (UISEvent,
+UIStudio, UISApi). Golfer AI_ChooseTarget: Codex only (agents/assign/2026-09-26-codex-golfer.md; 99.746 on main).
+PC: leversweep --from-report (hints). Round 7 (4 lanes, 16:25-17:30 CDT) merged: Swing linked (SW_KillVibration),
 exact also Character_SetupForShot, CameraScript_LagAimMarker; AI_ChooseTarget 98.66 -> 99.56 (last miss:
 the kept-copy class); GR_BuildGridRenderData 99.22. rasim.py now models spills / later passes. UIS
 kept-copy source form not found (3 rounds): parked until the endgame unless new evidence. Levers:
