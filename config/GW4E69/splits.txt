@@ -803,7 +803,7 @@ startUp.c:
 	.data       start:0x8018FE98 end:0x8018FF68
 	.sdata      start:0x80281498 end:0x802814A8
 	.sbss       start:0x802820E8 end:0x80282158
-	.sdata2     start:0x80284070 end:0x802840B0
+	.sdata2     start:0x80284070 end:0x802840B8
 
 shadow.c:
 	.text       start:0x800B2314 end:0x800B34F0
