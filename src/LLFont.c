@@ -90,9 +90,10 @@ LLFont* FO_spLoadFontFromStream(u8* pData, UFontState* pState) {
     pFont = fn_80009B34(sizeof(LLFont) + pFile->nGlyphs * sizeof(LLGlyphRec) +
                             pFile->nGlyphs * sizeof(LLGlyph),
                         2, 16, "LLFont.c", 630);
-    pGlyphRec = (LLGlyphRec*)(pFont + 1);
-    pFont->pRecs = pGlyphRec;
-    pFont->pGlyphs = (LLGlyph*)(pGlyphRec + pFile->nGlyphs);
+    pRec = (u8*)(pFont + 1);
+    pFont->pRecs = (LLGlyphRec*)pRec;
+    pRec += pFile->nGlyphs * sizeof(LLGlyphRec);
+    pFont->pGlyphs = (LLGlyph*)pRec;
     fn_80012438(pFont);
     for (i = 0; i < 256; i++) {
         pFont->apGlyphs[i] = NULL;

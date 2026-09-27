@@ -8,6 +8,32 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-27 b11 (quicktrial with a register-blind score: instruction shapes only, then aligned):
+  KEPT, each checked on its own (noreg/aligned/raw from 77/361/521 on the r6 base):
+  the texel loop as ONE 4-step loop `for (k = 0; k < 4; k++) { ...; pDst++; nX++; }` (CW unrolls
+  it by 2: EA's `li 2; mtctr` with the dead `addi k,1` and nX++ per copy); `(*pSrc >> 4) & 0xF`
+  (EA's `rlwimi ..,28,28,31`, no srawi; `/ 16`, `(u32)`, `(*pSrc & 0xF0) >> 4` same);
+  `aCode[0] + ((aCode[1] << 8) & 0xFF00u)` (EA's clrlslwi); fX/fY `aX[0] + ((aX[1] << 8) &
+  0xFF00u)` unsigned (EA converts with the unsigned magic, no clrlwi 16) and the uv block as
+  `fX = ..; fX1 = fX + uWidth; fY = ..; fY1 = fY + uHeight; fX /= nRowBytes * 2; fX1 /= ..; fY /=
+  nTexHeight; fY1 /= ..;` then the four stores (EA loads uWidth/uHeight before any store; stack
+  slot order fX, uWidth, fY, uHeight); `pSrc = pData + 16; pSrc += w / 2 * nY + nByte;` (EA's add
+  order); `s32 i` (EA's unfolded `li r0,0; cmpwi r0,0x100` 256-loop guard; long counter);
+  **`u8* pData` parameter used as the byte cursor itself** (`pData += uBitmap`; engine.h prototype
+  void* -> u8*, UFont.c passes a void*): EA's pData r28 separate from pFile r30, aligned 249 ->
+  247, raw 240 -> 210 (a void* param with `(u8*)pData` casts: 240); compare through
+  `((LLFontFile*)pData)->n0C` (EA's `lwz r0,0xc(r3)`); `pRec = (u8*)(pFont + 1); pRecs = pRec;
+  pRec += n * sizeof(LLGlyphRec); pGlyphs = pRec` (EA's `add r4,r4,r0` into the same register);
+  `x / 512.0f` not `x * (1.0f / 512.0f)` (EA's fmuls operand order: value first); declaration
+  order from rasim (pFont r31, pFile r30, nTexHeight r29, pData r28). 87.02 -> 95.12 (report).
+  No gain: nX/k as `i`/`nPalette`/each other (webs split; `i` for nX adds a hoisted copy);
+  nX/k/nByte/nRow as s32/u32/short/u8 (int/s32 mismatch between nX and nByte adds a copy);
+  `nByte + k >= w` without nX (no strength reduction, k used); pFile as the parameter with a u8*
+  copy (coalesced); pGlyphs via `(pFont->pRecs = ..) + n`, `&pGlyphRec[n]`.
+  Open: the texel loop's registers. EA colours nX (r3) and k (r7) before the loop temps (which
+  take r23/r24/r26); ours: nX and k have 27 neighbours (<= 28) so they leave the graph in the
+  first sweep and are coloured after the temps (r22/r23, temps r11/r12).
+
 - 2026-09-26 r6-misc: WHY the srawi forms: mwccdbg shows each peephole-forward pass folds only
   ONE `rlwinm; srawi` pair per basic block, the last one in the block (backend-01/-09/-13 fold
   n0C, nGlyphs, uVersion in turn; n00 is never reached). EA's header swaps all keep srawi, so
