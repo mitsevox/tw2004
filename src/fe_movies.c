@@ -42,7 +42,6 @@ void fn_80007254();
 void fn_800083A0();
 void fn_80091BDC(int nPoint);
 void fn_80091B98(s32 p0);
-void RenderState_Flush(void);
 void fn_8005CC64();
 void fn_80091DB8(int nFrames);
 void fn_80091D84(void);

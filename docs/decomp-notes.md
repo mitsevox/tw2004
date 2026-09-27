@@ -357,7 +357,7 @@ They will be sorted into the sections below.
 - **[verified] Return a local instead of an expression** so the register restores come before the last
   arithmetic (LLDynTex fn_8010B6AC 90 -> 100); round up through a local written back
   (`n = a + *p; n = (n - 1) & ~(a - 1); *p = n;`, hwsBurn fn_80110E98); a round-up division only matches
-  as `(size - 1 + n) / size` (MC_Gc fn_8009D74C).
+  as `(size - 1 + n) / size` (MC_Gc MC_MountCard).
 - **[verified] `static const` locals for constant struct arguments** load just before each call where
   initialised locals load at entry; pass a global struct field by value directly, not through a local
   (streammanagerhole RenderState_Apply).

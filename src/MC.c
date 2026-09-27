@@ -2,7 +2,7 @@
 // card: finding the save file on either card, loading and saving it, and the results the menus turn
 // into messages. The GameCube calls are in MC_Gc.c (include/core/memcard.h).
 //
-// Each operation here mounts the card if it is not mounted yet (fn_8009D74C) and unmounts it
+// Each operation here mounts the card if it is not mounted yet (MC_MountCard) and unmounts it
 // again after only in that case.
 
 #include "charstate.h"
@@ -159,10 +159,10 @@ s32 fn_8009FAD0(void) {
     for (nPort = 0; nPort < MC_NUM_PORTS && !bFound; nPort++) {
         for (nSlot = 0; nSlot < MC_NUM_SLOTS && !bFound; nSlot++) {
             if (fn_8009EE28(nPort, nSlot) != 0) continue;
-            nMount = fn_8009D74C(nPort, nSlot);
+            nMount = MC_MountCard(nPort, nSlot);
             if (nMount != 0 && nMount != MC_ERR_MOUNTED) continue;
-            if (fn_8009F734(nPort, nSlot) == 0) {
-                nResult = fn_8009DD44(nPort, nSlot, MC_DIR_NAME);
+            if (MC_CheckCardReady(nPort, nSlot) == 0) {
+                nResult = MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME);
                 if (nResult == 0) {
                     if (lbl_80281F1C != NULL) {
                         Mem_set(args, 0, sizeof(args));
@@ -170,7 +170,7 @@ s32 fn_8009FAD0(void) {
                         args[1].i = nSlot;
                         UISDoHint(lbl_80281F1C->pHandler, 0x85, 2, (s32*)args);
                     }
-                    nResult = fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE);
+                    nResult = MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE);
                     if (nResult == 0) {
                         if (fn_800A233C(lbl_80281FDC, &lbl_80281FDC->trailer)) {
                             bFound = 1;
@@ -208,7 +208,7 @@ s32 fn_8009FAD0(void) {
 
 // Meant to load the save file from the card at pPos into the first image and, if it is good, make
 // it the game's copy (the second image) and take its options and records into the game. EA bug: it
-// reads only when fn_8009DD44 fails (its other callers read on 0), so with the save on the card
+// reads only when MC_GotoDirectory fails (its other callers read on 0), so with the save on the card
 // nothing is loaded and 0 comes back.
 s32 MC_LoadOptions(MCCardPos* pPos) {
     u8 bLoaded;
@@ -220,13 +220,13 @@ s32 MC_LoadOptions(MCCardPos* pPos) {
     bLoaded = 0;
     nSlot = pPos->nSlot;
     nPort = pPos->nPort;
-    nMount = fn_8009D74C(nPort, nSlot);
+    nMount = MC_MountCard(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
-    nResult = fn_8009F734(nPort, nSlot);
+    nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) return nResult;
-    nResult = fn_8009DD44(nPort, nSlot, MC_DIR_NAME);
+    nResult = MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME);
     if (nResult != 0) {
-        nResult = fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FE8, MC_BUFFER_SIZE);
+        nResult = MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FE8, MC_BUFFER_SIZE);
         if (nResult == 0) {
             if (fn_800A233C(lbl_80281FE8, &lbl_80281FE8->trailer)) {
                 bLoaded = 1;
@@ -268,18 +268,18 @@ s32 MC_SaveOptions(MCCardPos* pPos) {
 
     nSlot = pPos->nSlot;
     nPort = pPos->nPort;
-    nMount = fn_8009D74C(nPort, nSlot);
+    nMount = MC_MountCard(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
     // EA bug: this return and the failed writes below leave a card it mounted mounted
-    nResult = fn_8009F734(nPort, nSlot);
+    nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) return nResult;
-    if (fn_8009DD44(nPort, nSlot, MC_DIR_NAME) != 0) {
-        if (lbl_801F1510[nPort][nSlot].nFreeBlocks < fn_8009D1D8(nPort, nSlot, 0, 0)) {
+    if (MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME) != 0) {
+        if (lbl_801F1510[nPort][nSlot].nFreeBlocks < MC_BlocksNeededForSave(nPort, nSlot, 0, 0)) {
             return MC_ERR_INSSPACE;
         }
         nResult = fn_8009F514(nPort, nSlot, MC_DIR_NAME, 0);
         if (nResult != 0) return nResult;
-        fn_8009DD44(nPort, nSlot, MC_DIR_NAME);
+        MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME);
         fn_8009E544(lbl_80281FDC->szGameName, lbl_80281FDC->szComment, lbl_80281FDC->aIcon,
                     lbl_80281FDC->aBanner);
         lbl_80281FDC->uFlags = 0;
@@ -291,13 +291,13 @@ s32 MC_SaveOptions(MCCardPos* pPos) {
         lbl_80281FDC->trailer.aMagic[1] = 'B';
         lbl_80281FDC->trailer.aMagic[2] = 'E';
         lbl_80281FDC->trailer.uChecksum = fn_800A23BC(lbl_80281FDC, &lbl_80281FDC->trailer);
-        nResult = fn_8009E604(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE, NULL);
+        nResult = MC_SaveFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE, NULL);
         if (nResult != 0) {
             fn_8009F5E4(nPort, nSlot, MC_DIR_NAME);
             return nResult;
         }
     } else {
-        if (fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FE8, MC_BUFFER_SIZE) != 0) {
+        if (MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FE8, MC_BUFFER_SIZE) != 0) {
             lbl_80281FE8->uFlags = 0;
             if (nMount == 0) {
                 MC_Unmount(nPort, nSlot);
@@ -320,7 +320,7 @@ s32 MC_SaveOptions(MCCardPos* pPos) {
         lbl_80281FDC->trailer.aMagic[1] = 'B';
         lbl_80281FDC->trailer.aMagic[2] = 'E';
         lbl_80281FDC->trailer.uChecksum = fn_800A23BC(lbl_80281FDC, &lbl_80281FDC->trailer);
-        nResult = fn_8009E604(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE,
+        nResult = MC_SaveFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE,
                               MC_BACKUP_NAME);
         if (nResult != 0) return nResult;
     }
@@ -341,19 +341,19 @@ s32 fn_800A0230(MCCardPos* pPos) {
     nSlot = pPos->nSlot;
     nPort = pPos->nPort;
     nReplay = pPos->n8;
-    nMount = fn_8009D74C(nPort, nSlot);
+    nMount = MC_MountCard(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
     // EA bug: this return leaves a card it mounted mounted
-    nResult = fn_8009F734(nPort, nSlot);
+    nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) return nResult;
-    nResult = fn_8009DD44(nPort, nSlot, MC_DIR_NAME);
+    nResult = MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME);
     if (nResult != 0) {
         if (nMount == 0) {
             MC_Unmount(nPort, nSlot);
         }
         return nResult;
     }
-    nResult = fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FEC, MC_BUFFER_SIZE);
+    nResult = MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FEC, MC_BUFFER_SIZE);
     if (nResult == 0) {
         if (!fn_800A233C(lbl_80281FEC, &lbl_80281FEC->trailer)) {
             nResult = MC_ERR_BADDATA;
@@ -385,21 +385,21 @@ s32 fn_800A036C(MCCardPos* pPos) {
     nSlot = pPos->nSlot;
     nPort = pPos->nPort;
     nReplay = pPos->n8;
-    nMount = fn_8009D74C(nPort, nSlot);
+    nMount = MC_MountCard(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
     // EA bug: this return and the ones below leave a card it mounted mounted
-    nResult = fn_8009F734(nPort, nSlot);
+    nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) return nResult;
     bNewFile = 0;
-    if (fn_8009DD44(nPort, nSlot, MC_DIR_NAME) != 0) {
+    if (MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME) != 0) {
         bNewFile = 1;
-        if (lbl_801F1510[nPort][nSlot].nFreeBlocks < fn_8009D1D8(nPort, nSlot, 0, 0)) {
+        if (lbl_801F1510[nPort][nSlot].nFreeBlocks < MC_BlocksNeededForSave(nPort, nSlot, 0, 0)) {
             return MC_ERR_INSSPACE;
         }
         nResult = MC_SaveOptions(pPos);
         if (nResult != 0) return nResult;
     }
-    if (fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FEC, MC_BUFFER_SIZE) != 0) {
+    if (MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FEC, MC_BUFFER_SIZE) != 0) {
         lbl_80281FEC->uFlags = 0;
         return MC_ERR_BADDATA;
     }
@@ -428,9 +428,9 @@ s32 fn_800A036C(MCCardPos* pPos) {
     lbl_80281FE0->trailer.aMagic[2] = 'E';
     lbl_80281FE0->trailer.uChecksum = fn_800A23BC(lbl_80281FE0, &lbl_80281FE0->trailer);
     if (bNewFile) {
-        nResult = fn_8009E604(nPort, nSlot, MC_FILE_NAME, lbl_80281FE0, MC_BUFFER_SIZE, NULL);
+        nResult = MC_SaveFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FE0, MC_BUFFER_SIZE, NULL);
     } else {
-        nResult = fn_8009E604(nPort, nSlot, MC_FILE_NAME, lbl_80281FE0, MC_BUFFER_SIZE,
+        nResult = MC_SaveFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FE0, MC_BUFFER_SIZE,
                               MC_BACKUP_NAME);
     }
     if (nMount == 0) {
@@ -447,18 +447,18 @@ s32 fn_800A0610(s32 nPort, s32 nSlot, s32 nReplay) {
     int i;
     u8 bFree;
 
-    nMount = fn_8009D74C(nPort, nSlot);
+    nMount = MC_MountCard(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
     // EA bug: this return and the ones below leave a card it mounted mounted
-    nResult = fn_8009F734(nPort, nSlot);
+    nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) return nResult;
-    if (fn_8009DD44(nPort, nSlot, MC_DIR_NAME) != 0) {
+    if (MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME) != 0) {
         if (nMount == 0) {
             MC_Unmount(nPort, nSlot);
         }
         return -16;
     }
-    if (fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FEC, MC_BUFFER_SIZE) != 0) {
+    if (MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FEC, MC_BUFFER_SIZE) != 0) {
         lbl_80281FEC->uFlags = 0;
         return MC_ERR_BADDATA;
     }
@@ -488,7 +488,7 @@ s32 fn_800A0610(s32 nPort, s32 nSlot, s32 nReplay) {
     lbl_80281FE0->trailer.aMagic[1] = 'B';
     lbl_80281FE0->trailer.aMagic[2] = 'E';
     lbl_80281FE0->trailer.uChecksum = fn_800A23BC(lbl_80281FE0, &lbl_80281FE0->trailer);
-    nResult = fn_8009E604(nPort, nSlot, MC_FILE_NAME, lbl_80281FE0, MC_BUFFER_SIZE, MC_BACKUP_NAME);
+    nResult = MC_SaveFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FE0, MC_BUFFER_SIZE, MC_BACKUP_NAME);
     if (nMount == 0) {
         MC_Unmount(nPort, nSlot);
     }
@@ -501,25 +501,25 @@ void fn_800A0868(s32 nPort, s32 nSlot) {
     s32 nMount;
     int i;
 
-    pState = fn_8009F834(nPort, nSlot);
+    pState = MC_pGetMC(nPort, nSlot);
     // EA bug: clears 4 bits, but there are NUM_SAVE_REPLAYS (5) replays
     BitArray_ClearAll(pState->aReplayUsed, 4);
     if (nPort >= MC_NUM_PORTS || nSlot >= MC_NUM_SLOTS) return;
-    nMount = fn_8009D74C(nPort, nSlot);
+    nMount = MC_MountCard(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return;
-    if (fn_8009F734(nPort, nSlot) != 0) {
+    if (MC_CheckCardReady(nPort, nSlot) != 0) {
         if (nMount == 0) {
             MC_Unmount(nPort, nSlot);
         }
         return;
     }
-    if (fn_8009DD44(nPort, nSlot, MC_DIR_NAME) != 0) {
+    if (MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME) != 0) {
         if (nMount == 0) {
             MC_Unmount(nPort, nSlot);
         }
         return;
     }
-    if (fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FEC, MC_BUFFER_SIZE) != 0) {
+    if (MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FEC, MC_BUFFER_SIZE) != 0) {
         if (nMount == 0) {
             MC_Unmount(nPort, nSlot);
         }
@@ -550,7 +550,7 @@ s32 fn_800A09EC(MCCardPos* pPos) {
     s32 nCount = 0;
     nSlot = pPos->nSlot;
     nPort = pPos->nPort;
-    pState = fn_8009F834(nPort, nSlot);
+    pState = MC_pGetMC(nPort, nSlot);
     fn_800A0868(nPort, nSlot);
     for (i = 0; i < NUM_SAVE_REPLAYS; i++) {
         if (BitArray_Test(pState->aReplayUsed, i)) {
@@ -564,9 +564,9 @@ s32 fn_800A09EC(MCCardPos* pPos) {
 s32 fn_800A0A7C(s32 nPort, s32 nSlot) {
     s32 nMount;
     s32 nResult;
-    nMount = fn_8009D74C(nPort, nSlot);
+    nMount = MC_MountCard(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
-    nResult = fn_8009F734(nPort, nSlot);
+    nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) return nResult;
     nResult = fn_8009F5E4(nPort, nSlot, MC_DIR_NAME);
     if (nMount == 0) {
@@ -623,23 +623,23 @@ s32 MC_LoadUser(MCCardPosStr* pPos) {
     nPort = pPos->pos.nPort;
     nProfile = pPos->pos.n8;
     szName = pPos->szC;
-    nMount = fn_8009D74C(nPort, nSlot);
+    nMount = MC_MountCard(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
-    nResult = fn_8009F734(nPort, nSlot);
+    nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) {
         if (nMount == 0) {
             MC_Unmount(nPort, nSlot);
         }
         return nResult;
     }
-    nResult = fn_8009DD44(nPort, nSlot, MC_DIR_NAME);
+    nResult = MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME);
     if (nResult != 0) {
         if (nMount == 0) {
             MC_Unmount(nPort, nSlot);
         }
         return nResult;
     }
-    nRead = fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FE4, MC_BUFFER_SIZE);
+    nRead = MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FE4, MC_BUFFER_SIZE);
     // EA bug: this return and the one after fn_800A0B18 leave a card it mounted mounted
     if (nRead == MC_ERR_BADDATA) return MC_ERR_BADDATA;
     if (nRead != 0) {
@@ -685,21 +685,21 @@ s32 MC_SaveUser(MCCardPos* pPos) {
     nSlot = pPos->nSlot;
     nPort = pPos->nPort;
     nProfile = pPos->n8;
-    nMount = fn_8009D74C(nPort, nSlot);
+    nMount = MC_MountCard(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
     // EA bug: this return and the ones below leave a card it mounted mounted
-    nResult = fn_8009F734(nPort, nSlot);
+    nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) return nResult;
     bNewFile = 0;
-    if (fn_8009DD44(nPort, nSlot, MC_DIR_NAME) != 0) {
+    if (MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME) != 0) {
         bNewFile = 1;
-        if (lbl_801F1510[nPort][nSlot].nFreeBlocks < fn_8009D1D8(nPort, nSlot, 0, 0)) {
+        if (lbl_801F1510[nPort][nSlot].nFreeBlocks < MC_BlocksNeededForSave(nPort, nSlot, 0, 0)) {
             return MC_ERR_INSSPACE;
         }
         nResult = MC_SaveOptions(pPos);
         if (nResult != 0) return nResult;
     }
-    if (fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FE8, MC_BUFFER_SIZE) != 0) {
+    if (MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FE8, MC_BUFFER_SIZE) != 0) {
         lbl_80281FE8->uFlags = 0;
         return MC_ERR_BADDATA;
     }
@@ -723,9 +723,9 @@ s32 MC_SaveUser(MCCardPos* pPos) {
     lbl_80281FDC->trailer.aMagic[2] = 'E';
     lbl_80281FDC->trailer.uChecksum = fn_800A23BC(lbl_80281FDC, &lbl_80281FDC->trailer);
     if (bNewFile) {
-        nResult = fn_8009E604(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE, NULL);
+        nResult = MC_SaveFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE, NULL);
     } else {
-        nResult = fn_8009E604(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE,
+        nResult = MC_SaveFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE,
                               MC_BACKUP_NAME);
     }
     if (nMount == 0) {
@@ -741,18 +741,18 @@ s32 fn_800A1164(s32 nPort, s32 nSlot, const char* szName, s32 nProfile) {
     s32 nResult;
     s32 nFound;
 
-    nMount = fn_8009D74C(nPort, nSlot);
+    nMount = MC_MountCard(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
     // EA bug: this return and the ones below leave a card it mounted mounted
-    nResult = fn_8009F734(nPort, nSlot);
+    nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) return nResult;
-    if (fn_8009DD44(nPort, nSlot, MC_DIR_NAME) != 0) {
+    if (MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME) != 0) {
         if (nMount == 0) {
             MC_Unmount(nPort, nSlot);
         }
         return -15;
     }
-    if (fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FE8, MC_BUFFER_SIZE) != 0) {
+    if (MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FE8, MC_BUFFER_SIZE) != 0) {
         lbl_80281FE8->uFlags = 0;
         return MC_ERR_BADDATA;
     }
@@ -776,7 +776,7 @@ s32 fn_800A1164(s32 nPort, s32 nSlot, const char* szName, s32 nProfile) {
     lbl_80281FDC->trailer.aMagic[1] = 'B';
     lbl_80281FDC->trailer.aMagic[2] = 'E';
     lbl_80281FDC->trailer.uChecksum = fn_800A23BC(lbl_80281FDC, &lbl_80281FDC->trailer);
-    nResult = fn_8009E604(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE, MC_BACKUP_NAME);
+    nResult = MC_SaveFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE, MC_BACKUP_NAME);
     if (nMount == 0) {
         MC_Unmount(nPort, nSlot);
     }
@@ -790,14 +790,14 @@ s32 MC_LoadLastUser(s32 nPort, s32 nSlot, s32 nProfile) {
     s32 nMount;
     s32 nResult;
 
-    nMount = fn_8009D74C(nPort, nSlot);
+    nMount = MC_MountCard(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
     // EA bug: this return and the ones below leave a card it mounted mounted
-    nResult = fn_8009F734(nPort, nSlot);
+    nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) return nResult;
-    nResult = fn_8009DD44(nPort, nSlot, MC_DIR_NAME);
+    nResult = MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME);
     if (nResult == 0) {
-        nResult = fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FE8, MC_BUFFER_SIZE);
+        nResult = MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FE8, MC_BUFFER_SIZE);
         if (nResult != 0) {
             return (nResult == MC_ERR_BADDATA) ? MC_ERR_BADDATA : -15;
         }
@@ -828,23 +828,23 @@ s32 MC_GetUser(s32 nPort, s32 nSlot, s32 nProfile, char* szName) {
 
     if (nPort >= MC_NUM_PORTS || nSlot >= MC_NUM_SLOTS) return -15;
     szName[0] = 0;
-    nMount = fn_8009D74C(nPort, nSlot);
+    nMount = MC_MountCard(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
-    nResult = fn_8009F734(nPort, nSlot);
+    nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) {
         if (nMount == 0) {
             MC_Unmount(nPort, nSlot);
         }
         return nResult;
     }
-    nResult = fn_8009DD44(nPort, nSlot, MC_DIR_NAME);
+    nResult = MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME);
     if (nResult != 0) {
         if (nMount == 0) {
             MC_Unmount(nPort, nSlot);
         }
         return nResult;
     }
-    nResult = fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FE4, MC_BUFFER_SIZE);
+    nResult = MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FE4, MC_BUFFER_SIZE);
     if (nResult != 0) {
         if (nMount == 0) {
             MC_Unmount(nPort, nSlot);
@@ -882,28 +882,28 @@ void MC_RefreshMCUserInfo(s32 nPort, s32 nSlot) {
     s32 nMount;
     int i;
 
-    pState = fn_8009F834(nPort, nSlot);
+    pState = MC_pGetMC(nPort, nSlot);
     BitArray_ClearAll(pState->aNameUsed, 4);
     pState->aszName[0][0] = 0;
     pState->aszName[1][0] = 0;
     pState->aszName[2][0] = 0;
     pState->aszName[3][0] = 0;
     if (nPort >= MC_NUM_PORTS || nSlot >= MC_NUM_SLOTS) return;
-    nMount = fn_8009D74C(nPort, nSlot);
+    nMount = MC_MountCard(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return;
-    if (fn_8009F734(nPort, nSlot) != 0) {
+    if (MC_CheckCardReady(nPort, nSlot) != 0) {
         if (nMount == 0) {
             MC_Unmount(nPort, nSlot);
         }
         return;
     }
-    if (fn_8009DD44(nPort, nSlot, MC_DIR_NAME) != 0) {
+    if (MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME) != 0) {
         if (nMount == 0) {
             MC_Unmount(nPort, nSlot);
         }
         return;
     }
-    if (fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FE4, MC_BUFFER_SIZE) != 0) {
+    if (MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FE4, MC_BUFFER_SIZE) != 0) {
         if (nMount == 0) {
             MC_Unmount(nPort, nSlot);
         }
@@ -936,7 +936,7 @@ s32 MC_GetNumUser(MCCardPos* pPos) {
     s32 nCount = 0;
     nSlot = pPos->nSlot;
     nPort = pPos->nPort;
-    pState = fn_8009F834(nPort, nSlot);
+    pState = MC_pGetMC(nPort, nSlot);
     MC_RefreshMCUserInfo(nPort, nSlot);
     for (i = 0; i < 4; i++) {
         if (BitArray_Test(pState->aNameUsed, i)) {
@@ -1169,7 +1169,7 @@ void fn_800A2064(void) {
 s32 fn_800A2100(s32 nPort, s32 nSlot) {
     s32 nMount;
     s32 nResult;
-    nMount = fn_8009D74C(nPort, nSlot);
+    nMount = MC_MountCard(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED && nMount != MC_ERR_ENCODING &&
         nMount != MC_ERR_BROKEN) {
         return nMount;
@@ -1189,9 +1189,9 @@ s32 fn_800A218C(s32 nPort, s32 nSlot) {
 s32 fn_800A2194(s32 nPort, s32 nSlot) {
     s32 nMount;
     s32 nResult;
-    nMount = fn_8009D74C(nPort, nSlot);
+    nMount = MC_MountCard(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
-    nResult = fn_8009F734(nPort, nSlot);
+    nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) {
         if (nMount == 0) {
             MC_Unmount(nPort, nSlot);
@@ -1209,23 +1209,23 @@ s32 fn_800A2194(s32 nPort, s32 nSlot) {
 s32 fn_800A2248(s32 nPort, s32 nSlot) {
     s32 nMount;
     s32 nResult;
-    nMount = fn_8009D74C(nPort, nSlot);
+    nMount = MC_MountCard(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
-    nResult = fn_8009F734(nPort, nSlot);
+    nResult = MC_CheckCardReady(nPort, nSlot);
     if (nResult != 0) {
         if (nMount == 0) {
             MC_Unmount(nPort, nSlot);
         }
         return nResult;
     }
-    nResult = fn_8009DD44(nPort, nSlot, MC_DIR_NAME);
+    nResult = MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME);
     if (nResult != 0) {
         if (nMount == 0) {
             MC_Unmount(nPort, nSlot);
         }
         return nResult;
     }
-    nResult = fn_8009D614(nPort, nSlot, MC_FILE_NAME);
+    nResult = MC_FileExists(nPort, nSlot, MC_FILE_NAME);
     if (nMount == 0) {
         MC_Unmount(nPort, nSlot);
     }
@@ -1308,18 +1308,18 @@ s32 fn_800A26A0(MCCardPos* pPos) {
     return fn_8009EE28(pPos->nPort, pPos->nSlot) == MC_ERR_BADDATA;
 }
 
-// Ask fn_8009D1D8 for the space save kinds 0, 1 and 2 need (its last argument); the result is not
+// Ask MC_BlocksNeededForSave for the space save kinds 0, 1 and 2 need (its last argument); the result is not
 // kept.
 void MC_MemoryRequiredForOptions(MCCardPos* pPos) {
-    fn_8009D1D8(pPos->nPort, pPos->nSlot, 0, 0);
+    MC_BlocksNeededForSave(pPos->nPort, pPos->nSlot, 0, 0);
 }
 
 void fn_800A270C(MCCardPos* pPos) {
-    fn_8009D1D8(pPos->nPort, pPos->nSlot, 0, 1);
+    MC_BlocksNeededForSave(pPos->nPort, pPos->nSlot, 0, 1);
 }
 
 void fn_800A2740(MCCardPos* pPos) {
-    fn_8009D1D8(pPos->nPort, pPos->nSlot, 0, 2);
+    MC_BlocksNeededForSave(pPos->nPort, pPos->nSlot, 0, 2);
 }
 
 void MC_ConvertWideCharToChar(const u16* szSrc, char* szDst, s32 nMax) {

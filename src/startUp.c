@@ -831,10 +831,10 @@ void fn_800B0960(void) {
         UISDoHint(lbl_80281F1C->pHandler, 0x86, 1, (s32*)&arg);
         return;
     }
-    fn_8009CD10();
+    MC_Connect();
     fn_8009FAD0();
     lbl_80282120 = MC_LoadInitialUser();
-    fn_8009CD7C();
+    MC_Disconnect();
 }
 
 // The status of the card in nPort, nSlot for the status table (fn_800B10A4): 0 no card, 7 not a
@@ -850,7 +850,7 @@ s32 fn_800B09C8(int nPort, int nSlot) {
     s32 nBlocks3;
     s32 nFiles;
     lbl_802814A0 = 1;
-    fn_8009F7F4(&card, nPort, nSlot);
+    MC_GetMC(&card, nPort, nSlot);
     if (card.uFlags & MC_CARD_PRESENT) {
         if (card.uFlags & MC_CARD_WRONGDEVICE) {
             nStatus = 7;
@@ -895,7 +895,7 @@ void fn_800B0B1C(void) {
     int j;
     int n;
     u8 bFound;
-    fn_8009CD10();
+    MC_Connect();
     lbl_80281498 = -1;
     lbl_8028149C = -1;
     for (i = 0; i < MC_NUM_PORTS; i++) {
@@ -923,7 +923,7 @@ void fn_800B0B1C(void) {
                     lbl_80281498 = j;
                     lbl_8028149C = i;
                     fn_800B0F94();
-                    fn_8009CD7C();
+                    MC_Disconnect();
                     return;
                 }
                 break;
@@ -931,49 +931,49 @@ void fn_800B0B1C(void) {
                 lbl_80281498 = j;
                 lbl_8028149C = i;
                 fn_800B0F0C();
-                fn_8009CD7C();
+                MC_Disconnect();
                 return;
             case 10:
                 lbl_80281498 = j;
                 lbl_8028149C = i;
                 fn_800B1060();
-                fn_8009CD7C();
+                MC_Disconnect();
                 return;
             case 6:
                 lbl_80281498 = j;
                 lbl_8028149C = i;
                 fn_800B0DB8();
-                fn_8009CD7C();
+                MC_Disconnect();
                 return;
             case 7:
                 lbl_80281498 = j;
                 lbl_8028149C = i;
                 fn_800B0DFC();
-                fn_8009CD7C();
+                MC_Disconnect();
                 return;
             case 8:
                 lbl_80281498 = j;
                 lbl_8028149C = i;
                 fn_800B0E40();
-                fn_8009CD7C();
+                MC_Disconnect();
                 return;
             case 9:
                 lbl_80281498 = j;
                 lbl_8028149C = i;
                 fn_800B0E84();
-                fn_8009CD7C();
+                MC_Disconnect();
                 return;
             case 11:
                 lbl_80281498 = j;
                 lbl_8028149C = i;
                 fn_800B0EC8();
-                fn_8009CD7C();
+                MC_Disconnect();
                 return;
             case 2:
                 lbl_80281498 = j;
                 lbl_8028149C = i;
                 fn_800B101C();
-                fn_8009CD7C();
+                MC_Disconnect();
                 return;
             case 3:
             case 4:
@@ -986,7 +986,7 @@ void fn_800B0B1C(void) {
         }
     }
 done:
-    fn_8009CD7C();
+    MC_Disconnect();
     lbl_80281498 = j;
     lbl_8028149C = i;
     if (bFound) {
@@ -1250,7 +1250,7 @@ void fn_800B1748(void) {
     int j;
     int n;
     u8 bFound;
-    fn_8009CD10();
+    MC_Connect();
     lbl_80281498 = -1;
     lbl_8028149C = -1;
     for (i = 0; i < MC_NUM_PORTS; i++) {
@@ -1284,7 +1284,7 @@ void fn_800B1748(void) {
                 lbl_80281498 = j;
                 lbl_8028149C = i;
                 fn_80110458(0);
-                fn_8009CD7C();
+                MC_Disconnect();
                 break;
             case 3:     // fake match: listed although default covers it; it sets the compare order
             default:
@@ -1295,17 +1295,17 @@ void fn_800B1748(void) {
         }
     }
 done:
-    fn_8009CD7C();
+    MC_Disconnect();
     lbl_80281498 = j;
     lbl_8028149C = i;
     if (bFound) {
-        fn_8009CD10();
+        MC_Connect();
         if (fn_8009FAD0() == 0) {
             fn_80110458(1);
         } else {
             fn_80110458(0);
         }
-        fn_8009CD7C();
+        MC_Disconnect();
     } else {
         lbl_80281498 = -1;
         lbl_8028149C = -1;
@@ -1530,9 +1530,9 @@ void fn_800B1F20(MsgArg* pArgs, MsgArg* pResult) {
     if (nSlot < 0) {
         nSlot = 0;
     }
-    fn_8009CD10();
+    MC_Connect();
     pResult->i = fn_8009D390(nPort, nSlot);
-    fn_8009CD7C();
+    MC_Disconnect();
 }
 
 // Command 1.
@@ -1572,16 +1572,16 @@ void fn_800B208C(MsgArg* pArgs, MsgArg* pResult) {
 
 // Command 8: report the next card status not yet reported.
 void fn_800B20B8(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8009CD10();
+    MC_Connect();
     pResult->i = fn_800B12FC(pArgs[0].p, pArgs[1].p);
-    fn_8009CD7C();
+    MC_Disconnect();
 }
 
 // Command 9: report the card the reports reached again.
 void fn_800B2104(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8009CD10();
+    MC_Connect();
     pResult->i = fn_800B120C(pArgs[0].p, pArgs[1].p);
-    fn_8009CD7C();
+    MC_Disconnect();
 }
 
 // Command 10.
@@ -1596,7 +1596,7 @@ void fn_800B2150(MsgArg* pArgs, MsgArg* pResult) {
 // Command 18: byte b94 of the state of the card at a port and slot.
 void fn_800B218C(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
-    fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
+    MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
     pResult->i = state.b94;
 }
 
@@ -1620,9 +1620,9 @@ void fn_800B21E4(MsgArg* pArgs, MsgArg* pResult) {
 
 // Command 15.
 void fn_800B21F0(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8009CD10();
+    MC_Connect();
     pResult->i = fn_8009D3DC(pArgs[0].i, pArgs[1].i);
-    fn_8009CD7C();
+    MC_Disconnect();
 }
 
 // Command 16.

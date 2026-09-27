@@ -255,7 +255,7 @@ EASBErrorE fn_801283B0(EASBInitParams* pParams) {
 }
 
 // Adds x and y, saturating at 0xFFFFFFFF.
-u32 fn_80128468(u32 x, u32 y) {
+u32 EASB_AddSaturated(u32 x, u32 y) {
     u32 uSum;
 
     uSum = x + y;
@@ -301,11 +301,11 @@ void fn_80128528(EASBTotals* pTotals, EASBProduct* pProduct) {
 // Adds one product record into the totals.
 void fn_80128580(EASBTotals* pTotals, const EASBProduct* pProduct) {
     if (pProduct->bValid) {
-        pTotals->u0 = fn_80128468(pTotals->u0, pProduct->u50);
-        pTotals->u4 = fn_80128468(pTotals->u4, pProduct->u54);
-        pTotals->u8 = fn_80128468(pTotals->u8, pProduct->u58);
-        pTotals->uC = fn_80128468(pTotals->uC, pProduct->u5C);
-        pTotals->nProducts = fn_80128468(pTotals->nProducts, 1);
+        pTotals->u0 = EASB_AddSaturated(pTotals->u0, pProduct->u50);
+        pTotals->u4 = EASB_AddSaturated(pTotals->u4, pProduct->u54);
+        pTotals->u8 = EASB_AddSaturated(pTotals->u8, pProduct->u58);
+        pTotals->uC = EASB_AddSaturated(pTotals->uC, pProduct->u5C);
+        pTotals->nProducts = EASB_AddSaturated(pTotals->nProducts, 1);
         if (pTotals->uC > pTotals->u8) {
             pTotals->u8 = pTotals->uC;
         }
@@ -588,7 +588,7 @@ u32 fn_80128F58(u32 uValue, u32 uScaleB, u32 uDivisor, u32 uScaleA) {
             uB = 0xFFFFFFFF;
         }
     }
-    return fn_80128468(uA, uB);
+    return EASB_AddSaturated(uA, uB);
 }
 
 // The Bio's level from its totals: points for the games in it, the hours played and the two
@@ -617,10 +617,10 @@ EASBErrorE fn_80128FD4(const EASBTotals* pTotals, u16* puLevel, f32* pfProgress)
     uHours4 = fn_80128F58(nHours4, 5, 1, 0);
     u8Points = fn_80128F58(pTotals->u8, 50, 1, 0);
     uCPoints = fn_80128F58(pTotals->uC, 150, 1, 0);
-    uPoints = fn_80128468(uProducts, uHours0);
-    uPoints = fn_80128468(uPoints, uHours4);
-    uPoints = fn_80128468(uPoints, u8Points);
-    uPoints = fn_80128468(uPoints, uCPoints);
+    uPoints = EASB_AddSaturated(uProducts, uHours0);
+    uPoints = EASB_AddSaturated(uPoints, uHours4);
+    uPoints = EASB_AddSaturated(uPoints, u8Points);
+    uPoints = EASB_AddSaturated(uPoints, uCPoints);
     uLevelStart = 0;
     uLevelEnd = 0;
     for (nLevel = 1; nLevel <= EASB_MAX_LEVEL; nLevel++) {
@@ -694,7 +694,7 @@ EASBErrorE fn_80129218(u16 uLevel, u16 u1160, u16* puLevel) {
 // what it wrote or read.
 
 // Writes uValue, kept within uMin..uMax, as nBytes bytes, lowest first.
-void fn_80129290(u8* pBuffer, s32* pnOffset, u8 nBytes, u32 uValue, u32 uMin, u32 uMax) {
+void EASB_PackValue(u8* pBuffer, s32* pnOffset, u8 nBytes, u32 uValue, u32 uMin, u32 uMax) {
     u8 i;
 
     if (uValue < uMin) {
@@ -710,7 +710,7 @@ void fn_80129290(u8* pBuffer, s32* pnOffset, u8 nBytes, u32 uValue, u32 uMin, u3
 }
 
 // Reads a value of nBytes bytes, lowest first, and keeps it within uMin..uMax.
-u32 fn_801293F8(u8* pBuffer, s32* pnOffset, u8 nBytes, u32 uMin, u32 uMax) {
+u32 EASB_UnpackValue(u8* pBuffer, s32* pnOffset, u8 nBytes, u32 uMin, u32 uMax) {
     u32 uValue;
     u8 i;
 
@@ -789,11 +789,11 @@ void fn_80129754(EASBTotals* pTotals, u8* pBuffer, u32 uSize) {
 
     nOffset = 0;
     memset(pBuffer, 0, uSize);
-    fn_80129290(pBuffer, &nOffset, 4, pTotals->u0, 0, 0xFFFFFFFF);
-    fn_80129290(pBuffer, &nOffset, 4, pTotals->u4, 0, 0xFFFFFFFF);
-    fn_80129290(pBuffer, &nOffset, 4, pTotals->u8, 0, 0xFFFFFFFF);
-    fn_80129290(pBuffer, &nOffset, 4, pTotals->uC, 0, pTotals->u8);
-    fn_80129290(pBuffer, &nOffset, 1, pTotals->nProducts, 1, 250);
+    EASB_PackValue(pBuffer, &nOffset, 4, pTotals->u0, 0, 0xFFFFFFFF);
+    EASB_PackValue(pBuffer, &nOffset, 4, pTotals->u4, 0, 0xFFFFFFFF);
+    EASB_PackValue(pBuffer, &nOffset, 4, pTotals->u8, 0, 0xFFFFFFFF);
+    EASB_PackValue(pBuffer, &nOffset, 4, pTotals->uC, 0, pTotals->u8);
+    EASB_PackValue(pBuffer, &nOffset, 1, pTotals->nProducts, 1, 250);
 }
 
 // Unpacks the totals from a 'HEAD' record (uSize is not used).
@@ -802,11 +802,11 @@ void fn_80129828(EASBTotals* pTotals, u8* pBuffer, u32 uSize) {
 
     nOffset = 0;
     memset(pTotals, 0, sizeof(EASBTotals));
-    pTotals->u0 = fn_801293F8(pBuffer, &nOffset, 4, 0, 0xFFFFFFFF);
-    pTotals->u4 = fn_801293F8(pBuffer, &nOffset, 4, 0, 0xFFFFFFFF);
-    pTotals->u8 = fn_801293F8(pBuffer, &nOffset, 4, 0, 0xFFFFFFFF);
-    pTotals->uC = fn_801293F8(pBuffer, &nOffset, 4, 0, pTotals->u8);
-    pTotals->nProducts = fn_801293F8(pBuffer, &nOffset, 1, 0, 250);
+    pTotals->u0 = EASB_UnpackValue(pBuffer, &nOffset, 4, 0, 0xFFFFFFFF);
+    pTotals->u4 = EASB_UnpackValue(pBuffer, &nOffset, 4, 0, 0xFFFFFFFF);
+    pTotals->u8 = EASB_UnpackValue(pBuffer, &nOffset, 4, 0, 0xFFFFFFFF);
+    pTotals->uC = EASB_UnpackValue(pBuffer, &nOffset, 4, 0, pTotals->u8);
+    pTotals->nProducts = EASB_UnpackValue(pBuffer, &nOffset, 1, 0, 250);
 }
 
 // Packs a product record into pBuffer (uSize bytes, cleared first): names without their ends,
@@ -819,27 +819,27 @@ void fn_801298FC(EASBProduct* pProduct, u8* pBuffer, u32 uSize) {
     nOffset = 0;
     memset(pBuffer, 0, uSize);
     fn_8012956C(pBuffer, &nOffset, EASB_PRODUCT_NAME_SIZE - 1, pProduct->szName);
-    fn_80129290(pBuffer, &nOffset, 2, pProduct->uGamesPlayedTypeLanguage, 0, 0xFFFF);
+    EASB_PackValue(pBuffer, &nOffset, 2, pProduct->uGamesPlayedTypeLanguage, 0, 0xFFFF);
     fn_80129644(pBuffer, &nOffset, (EASB_GAMES_PLAYED_TYPE_SIZE - 1) * sizeof(u16),
                 pProduct->szGamesPlayedType, pProduct->uGamesPlayedTypeLanguage);
-    fn_80129290(pBuffer, &nOffset, 4, pProduct->uTime, EASB_TIME_FIRST, EASB_TIME_LAST);
-    fn_80129290(pBuffer, &nOffset, 4, pProduct->u50, 0, 0xFFFFFFFF);
-    fn_80129290(pBuffer, &nOffset, 4, pProduct->u54, 0, 0xFFFFFFFF);
-    fn_80129290(pBuffer, &nOffset, 4, pProduct->u58, 0, 0xFFFFFFFF);
-    fn_80129290(pBuffer, &nOffset, 4, pProduct->u5C, 0, pProduct->u58);
-    fn_80129290(pBuffer, &nOffset, 2, pProduct->u1160, 0, EASB_MAX_LEVEL);
-    fn_80129290(pBuffer, &nOffset, 2, pProduct->uLevel, 0, EASB_MAX_LEVEL + 1);
-    fn_80129290(pBuffer, &nOffset, 1, pProduct->bValid, 0, 1);
+    EASB_PackValue(pBuffer, &nOffset, 4, pProduct->uTime, EASB_TIME_FIRST, EASB_TIME_LAST);
+    EASB_PackValue(pBuffer, &nOffset, 4, pProduct->u50, 0, 0xFFFFFFFF);
+    EASB_PackValue(pBuffer, &nOffset, 4, pProduct->u54, 0, 0xFFFFFFFF);
+    EASB_PackValue(pBuffer, &nOffset, 4, pProduct->u58, 0, 0xFFFFFFFF);
+    EASB_PackValue(pBuffer, &nOffset, 4, pProduct->u5C, 0, pProduct->u58);
+    EASB_PackValue(pBuffer, &nOffset, 2, pProduct->u1160, 0, EASB_MAX_LEVEL);
+    EASB_PackValue(pBuffer, &nOffset, 2, pProduct->uLevel, 0, EASB_MAX_LEVEL + 1);
+    EASB_PackValue(pBuffer, &nOffset, 1, pProduct->bValid, 0, 1);
     for (i = 0; i < EASB_MAX_ACCOMPLISHMENTS; i++) {
         pAccomplishment = &pProduct->aAccomplishments[i];
-        fn_80129290(pBuffer, &nOffset, 2, pAccomplishment->uLanguage, 0, 0xFFFF);
+        EASB_PackValue(pBuffer, &nOffset, 2, pAccomplishment->uLanguage, 0, 0xFFFF);
         fn_80129644(pBuffer, &nOffset, (EASB_ACCOMPLISHMENT_NAME_SIZE - 1) * sizeof(u16),
                     pAccomplishment->szName, pAccomplishment->uLanguage);
-        fn_80129290(pBuffer, &nOffset, 4, pAccomplishment->uTime, EASB_TIME_FIRST, EASB_TIME_LAST);
+        EASB_PackValue(pBuffer, &nOffset, 4, pAccomplishment->uTime, EASB_TIME_FIRST, EASB_TIME_LAST);
         if (pAccomplishment->bValid == 1) {
-            fn_80129290(pBuffer, &nOffset, 1, pAccomplishment->u86, 1, 250);
+            EASB_PackValue(pBuffer, &nOffset, 1, pAccomplishment->u86, 1, 250);
         } else {
-            fn_80129290(pBuffer, &nOffset, 1, 0, 0, 0);
+            EASB_PackValue(pBuffer, &nOffset, 1, 0, 0, 0);
         }
     }
 }
@@ -855,26 +855,26 @@ void fn_80129B30(EASBProduct* pProduct, u8* pBuffer, u32 uSize) {
     memset(pProduct, 0, sizeof(EASBProduct));
     fn_801295D8(pBuffer, &nOffset, EASB_PRODUCT_NAME_SIZE - 1, pProduct->szName);
     pProduct->szName[EASB_PRODUCT_NAME_SIZE - 1] = '\0';
-    pProduct->uGamesPlayedTypeLanguage = fn_801293F8(pBuffer, &nOffset, 2, 0, 0xFFFF);
+    pProduct->uGamesPlayedTypeLanguage = EASB_UnpackValue(pBuffer, &nOffset, 2, 0, 0xFFFF);
     fn_801296CC(pBuffer, &nOffset, (EASB_GAMES_PLAYED_TYPE_SIZE - 1) * sizeof(u16),
                 pProduct->szGamesPlayedType, pProduct->uGamesPlayedTypeLanguage);
     pProduct->szGamesPlayedType[EASB_GAMES_PLAYED_TYPE_SIZE - 1] = 0;
-    pProduct->uTime = fn_801293F8(pBuffer, &nOffset, 4, EASB_TIME_FIRST, EASB_TIME_LAST);
-    pProduct->u50 = fn_801293F8(pBuffer, &nOffset, 4, 0, 0xFFFFFFFF);
-    pProduct->u54 = fn_801293F8(pBuffer, &nOffset, 4, 0, 0xFFFFFFFF);
-    pProduct->u58 = fn_801293F8(pBuffer, &nOffset, 4, 0, 0xFFFFFFFF);
-    pProduct->u5C = fn_801293F8(pBuffer, &nOffset, 4, 0, pProduct->u58);
-    pProduct->u1160 = fn_801293F8(pBuffer, &nOffset, 2, 0, EASB_MAX_LEVEL);
-    pProduct->uLevel = fn_801293F8(pBuffer, &nOffset, 2, 0, EASB_MAX_LEVEL + 1);
-    pProduct->bValid = fn_801293F8(pBuffer, &nOffset, 1, 0, 1);
+    pProduct->uTime = EASB_UnpackValue(pBuffer, &nOffset, 4, EASB_TIME_FIRST, EASB_TIME_LAST);
+    pProduct->u50 = EASB_UnpackValue(pBuffer, &nOffset, 4, 0, 0xFFFFFFFF);
+    pProduct->u54 = EASB_UnpackValue(pBuffer, &nOffset, 4, 0, 0xFFFFFFFF);
+    pProduct->u58 = EASB_UnpackValue(pBuffer, &nOffset, 4, 0, 0xFFFFFFFF);
+    pProduct->u5C = EASB_UnpackValue(pBuffer, &nOffset, 4, 0, pProduct->u58);
+    pProduct->u1160 = EASB_UnpackValue(pBuffer, &nOffset, 2, 0, EASB_MAX_LEVEL);
+    pProduct->uLevel = EASB_UnpackValue(pBuffer, &nOffset, 2, 0, EASB_MAX_LEVEL + 1);
+    pProduct->bValid = EASB_UnpackValue(pBuffer, &nOffset, 1, 0, 1);
     for (i = 0; i < EASB_MAX_ACCOMPLISHMENTS; i++) {
         pAccomplishment = &pProduct->aAccomplishments[i];
-        pAccomplishment->uLanguage = fn_801293F8(pBuffer, &nOffset, 2, 0, 0xFFFF);
+        pAccomplishment->uLanguage = EASB_UnpackValue(pBuffer, &nOffset, 2, 0, 0xFFFF);
         fn_801296CC(pBuffer, &nOffset, (EASB_ACCOMPLISHMENT_NAME_SIZE - 1) * sizeof(u16),
                     pAccomplishment->szName, pAccomplishment->uLanguage);
         pProduct->aAccomplishments[i].szName[EASB_ACCOMPLISHMENT_NAME_SIZE - 1] = 0;
-        pAccomplishment->uTime = fn_801293F8(pBuffer, &nOffset, 4, EASB_TIME_FIRST, EASB_TIME_LAST);
-        pAccomplishment->u86 = fn_801293F8(pBuffer, &nOffset, 1, 0, 250);
+        pAccomplishment->uTime = EASB_UnpackValue(pBuffer, &nOffset, 4, EASB_TIME_FIRST, EASB_TIME_LAST);
+        pAccomplishment->u86 = EASB_UnpackValue(pBuffer, &nOffset, 1, 0, 250);
         if (pAccomplishment->u86 == 0) {
             pAccomplishment->bValid = 0;
         } else {
@@ -892,14 +892,14 @@ void fn_80129D70(EASBImage* pImage, u8 bLoaded, u8* pBuffer, u32 uSize) {
 
     nOffset = 0;
     memset(pBuffer, 0, uSize);
-    fn_80129290(pBuffer, &nOffset, 1, bLoaded, 0, 1);
+    EASB_PackValue(pBuffer, &nOffset, 1, bLoaded, 0, 1);
     for (i = 0; i < 256; i++) {
-        fn_80129290(pBuffer, &nOffset, 1, pImage->aColorTable[i * 4 + 2], 0, 0xFF);
-        fn_80129290(pBuffer, &nOffset, 1, pImage->aColorTable[i * 4 + 1], 0, 0xFF);
-        fn_80129290(pBuffer, &nOffset, 1, pImage->aColorTable[i * 4 + 0], 0, 0xFF);
+        EASB_PackValue(pBuffer, &nOffset, 1, pImage->aColorTable[i * 4 + 2], 0, 0xFF);
+        EASB_PackValue(pBuffer, &nOffset, 1, pImage->aColorTable[i * 4 + 1], 0, 0xFF);
+        EASB_PackValue(pBuffer, &nOffset, 1, pImage->aColorTable[i * 4 + 0], 0, 0xFF);
     }
     for (j = 0; j < sizeof(pImage->aData); j++) {
-        fn_80129290(pBuffer, &nOffset, 1, pImage->aData[j], 0, 0xFF);
+        EASB_PackValue(pBuffer, &nOffset, 1, pImage->aData[j], 0, 0xFF);
     }
 }
 
@@ -911,24 +911,24 @@ void fn_80129E88(EASBImageSlot* pSlot, u8* pBuffer, u32 uSize) {
 
     nOffset = 0;
     memset(pSlot, 0, sizeof(EASBImageSlot));
-    pSlot->bLoaded = fn_801293F8(pBuffer, &nOffset, 1, 0, 1);
+    pSlot->bLoaded = EASB_UnpackValue(pBuffer, &nOffset, 1, 0, 1);
     for (i = 0; i < 256; i++) {
-        pSlot->aColorTable[i * 4 + 2] = fn_801293F8(pBuffer, &nOffset, 1, 0, 0xFF);
-        pSlot->aColorTable[i * 4 + 1] = fn_801293F8(pBuffer, &nOffset, 1, 0, 0xFF);
-        pSlot->aColorTable[i * 4 + 0] = fn_801293F8(pBuffer, &nOffset, 1, 0, 0xFF);
+        pSlot->aColorTable[i * 4 + 2] = EASB_UnpackValue(pBuffer, &nOffset, 1, 0, 0xFF);
+        pSlot->aColorTable[i * 4 + 1] = EASB_UnpackValue(pBuffer, &nOffset, 1, 0, 0xFF);
+        pSlot->aColorTable[i * 4 + 0] = EASB_UnpackValue(pBuffer, &nOffset, 1, 0, 0xFF);
     }
     for (j = 0; j < sizeof(pSlot->aData); j++) {
-        pSlot->aData[j] = fn_801293F8(pBuffer, &nOffset, 1, 0, 0xFF);
+        pSlot->aData[j] = EASB_UnpackValue(pBuffer, &nOffset, 1, 0, 0xFF);
     }
 }
 
 // Adds pAdd into pTotals, keeping u8 at least uC; the record count comes from pAdd, one more
 // (up to 250) unless nMode is 3.
 void fn_80129F98(EASBTotals* pTotals, const EASBTotals* pAdd, s32 nMode) {
-    pTotals->u0 = fn_80128468(pTotals->u0, pAdd->u0);
-    pTotals->u4 = fn_80128468(pTotals->u4, pAdd->u4);
-    pTotals->u8 = fn_80128468(pTotals->u8, pAdd->u8);
-    pTotals->uC = fn_80128468(pTotals->uC, pAdd->uC);
+    pTotals->u0 = EASB_AddSaturated(pTotals->u0, pAdd->u0);
+    pTotals->u4 = EASB_AddSaturated(pTotals->u4, pAdd->u4);
+    pTotals->u8 = EASB_AddSaturated(pTotals->u8, pAdd->u8);
+    pTotals->uC = EASB_AddSaturated(pTotals->uC, pAdd->uC);
     if (pTotals->uC > pTotals->u8) {
         pTotals->u8 = pTotals->uC;
     }
@@ -944,10 +944,10 @@ void fn_8012A050(EASBProduct* pInto, const EASBProduct* pFrom) {
     u32 i;
 
     if (!pInto->bValid || !pFrom->bValid) return;
-    pInto->u50 = fn_80128468(pInto->u50, pFrom->u50);
-    pInto->u54 = fn_80128468(pInto->u54, pFrom->u54);
-    pInto->u58 = fn_80128468(pInto->u58, pFrom->u58);
-    pInto->u5C = fn_80128468(pInto->u5C, pFrom->u5C);
+    pInto->u50 = EASB_AddSaturated(pInto->u50, pFrom->u50);
+    pInto->u54 = EASB_AddSaturated(pInto->u54, pFrom->u54);
+    pInto->u58 = EASB_AddSaturated(pInto->u58, pFrom->u58);
+    pInto->u5C = EASB_AddSaturated(pInto->u5C, pFrom->u5C);
     if (pInto->u5C > pInto->u58) {
         pInto->u58 = pInto->u5C;
     }
@@ -981,7 +981,7 @@ void fn_8012A050(EASBProduct* pInto, const EASBProduct* pFrom) {
 EASBErrorE fn_8012A4C4(EASBProcessE* peProcess);
 EASBErrorE EASB_ErrorFromTagError(int eTagError);
 EASBErrorE fn_8012CAA8(SFIOFuncTable* pCallbacks, int* pDevices);
-EASBErrorE fn_8012CB98(EASBProcessE* peProcess);
+EASBErrorE EASB_UpdateTagFile(EASBProcessE* peProcess);
 EASBErrorE fn_8012CC48(void);
 
 // Checks that the file holds nCount records tagged uTag, each uSize bytes.
@@ -1004,7 +1004,7 @@ EASBErrorE fn_8012A164(TagSession* pSession, u32 uTag, u32 nCount, u32 uSize) {
 }
 
 // Whether the HEAD record or any PROD record is in state nState.
-u8 fn_8012A20C(s32 nState) {
+u8 EASB_IsAnyRecordInState(s32 nState) {
     s32 i;
 
     if (lbl_802825B0->nHeadState == nState) {
@@ -1031,7 +1031,7 @@ EASBErrorE fn_8012A2A8(EASBProcessE* peProcess) {
         eError = EASB_ErrorFromTagError(TagFile_Open("EASB", SFIO_DEVICE_INVALID, 0));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
-        eError = fn_8012CB98(peProcess);
+        eError = EASB_UpdateTagFile(peProcess);
         if (eError == EASB_ERROR_NONE && *peProcess == EASB_PROCESS_COMPLETE) {
             eError = EASB_ErrorFromTagError(TagFile_GetSession(&lbl_802825B0->session));
             lbl_802825B0->bFileOpen = 1;
@@ -1060,7 +1060,7 @@ EASBErrorE fn_8012A364(EASBProcessE* peProcess) {
         eError = EASB_ErrorFromTagError(TagFile_Reopen(&lbl_802825B0->session));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
-        eError = fn_8012CB98(peProcess);
+        eError = EASB_UpdateTagFile(peProcess);
         if (eError == EASB_ERROR_NONE && *peProcess == EASB_PROCESS_COMPLETE) {
             eError = EASB_ErrorFromTagError(TagFile_GetSession(&lbl_802825B0->session));
             lbl_802825B0->bFileOpen = 1;
@@ -1081,7 +1081,7 @@ EASBErrorE fn_8012A434(EASBProcessE* peProcess) {
         eError = EASB_ErrorFromTagError(TagFile_End(&lbl_802825B0->session));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
-        eError = fn_8012CB98(peProcess);
+        eError = EASB_UpdateTagFile(peProcess);
     }
     if (*peProcess == EASB_PROCESS_COMPLETE) {
         lbl_802825B0->bFileOpen = 0;
@@ -1116,7 +1116,7 @@ EASBErrorE fn_8012A4C4(EASBProcessE* peProcess) {
                                           EASB_HEAD_SIZE));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
-        eError = fn_8012CB98(peProcess);
+        eError = EASB_UpdateTagFile(peProcess);
     }
     if (*peProcess == EASB_PROCESS_COMPLETE && lbl_802825B0->nRecord == EASB_PRODUCT_NONE) {
         if (eError == EASB_ERROR_NONE) {
@@ -1167,7 +1167,7 @@ EASBErrorE fn_8012A4C4(EASBProcessE* peProcess) {
             lbl_802825B0->n94 = lbl_802825B0->nFoundKind;
         }
     }
-    if (*peProcess == EASB_PROCESS_COMPLETE && eError == EASB_ERROR_NONE && fn_8012A20C(2)) {
+    if (*peProcess == EASB_PROCESS_COMPLETE && eError == EASB_ERROR_NONE && EASB_IsAnyRecordInState(2)) {
         eError = EASB_ERROR_SECTION_CORRUPT;
     }
     return eError;
@@ -1230,7 +1230,7 @@ EASBErrorE fn_8012A95C(EASBProcessE* peProcess) {
                                           EASB_HEAD_SIZE));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
-        eError = fn_8012CB98(peProcess);
+        eError = EASB_UpdateTagFile(peProcess);
     }
     if (eError == EASB_ERROR_NONE && *peProcess == EASB_PROCESS_COMPLETE) {
         fn_80129828(&lbl_802825B0->totals, lbl_802825B0->pBuffer, lbl_802825B0->uBufferSize);
@@ -1259,10 +1259,10 @@ EASBErrorE fn_8012AA7C(EASBProcessE* peProcess) {
     if (lbl_802825B0->nSlot == EASB_PRODUCT_NONE) {
         return EASB_ERROR_INTERNAL;
     }
-    if (fn_8012A20C(0)) {
+    if (EASB_IsAnyRecordInState(0)) {
         return EASB_ERROR_INTERNAL;
     }
-    if (fn_8012A20C(2)) {
+    if (EASB_IsAnyRecordInState(2)) {
         return EASB_ERROR_SECTION_CORRUPT;
     }
     if (lbl_802825B0->n94 != 3) {
@@ -1278,7 +1278,7 @@ EASBErrorE fn_8012AA7C(EASBProcessE* peProcess) {
                                           lbl_802825B0->pBuffer, EASB_PROD_SIZE));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
-        eError = fn_8012CB98(peProcess);
+        eError = EASB_UpdateTagFile(peProcess);
     }
     if (eError == EASB_ERROR_NONE && *peProcess == EASB_PROCESS_COMPLETE) {
         fn_80129B30(&product, lbl_802825B0->pBuffer, lbl_802825B0->uBufferSize);
@@ -1304,7 +1304,7 @@ EASBErrorE fn_8012AC40(EASBProcessE* peProcess) {
     if (lbl_802825B0->bFileOpen == 0) {
         return EASB_ERROR_INTERNAL;
     }
-    if (fn_8012A20C(0)) {
+    if (EASB_IsAnyRecordInState(0)) {
         return EASB_ERROR_INTERNAL;
     }
     if (*peProcess == EASB_PROCESS_NONE) {
@@ -1314,7 +1314,7 @@ EASBErrorE fn_8012AC40(EASBProcessE* peProcess) {
                                           lbl_802825B0->pBuffer, EASB_PROD_SIZE));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
-        eError = fn_8012CB98(peProcess);
+        eError = EASB_UpdateTagFile(peProcess);
     }
     if (*peProcess == EASB_PROCESS_COMPLETE) {
         if (eError == EASB_ERROR_NONE) {
@@ -1337,7 +1337,7 @@ EASBErrorE fn_8012AC40(EASBProcessE* peProcess) {
             *peProcess = EASB_PROCESS_CONTINUE;
         }
     }
-    if (*peProcess == EASB_PROCESS_COMPLETE && eError == EASB_ERROR_NONE && fn_8012A20C(2)) {
+    if (*peProcess == EASB_PROCESS_COMPLETE && eError == EASB_ERROR_NONE && EASB_IsAnyRecordInState(2)) {
         eError = EASB_ERROR_SECTION_CORRUPT;
     }
     return eError;
@@ -1355,10 +1355,10 @@ EASBErrorE fn_8012AE40(EASBProcessE* peProcess) {
     if (lbl_802825B0->bFileOpen == 0) {
         return EASB_ERROR_INTERNAL;
     }
-    if (fn_8012A20C(0)) {
+    if (EASB_IsAnyRecordInState(0)) {
         return EASB_ERROR_INTERNAL;
     }
-    if (fn_8012A20C(2)) {
+    if (EASB_IsAnyRecordInState(2)) {
         return EASB_ERROR_SECTION_CORRUPT;
     }
     if (*peProcess == EASB_PROCESS_NONE) {
@@ -1368,7 +1368,7 @@ EASBErrorE fn_8012AE40(EASBProcessE* peProcess) {
                                           lbl_802825B0->pBuffer, EASB_IMAG_SIZE));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
-        eError = fn_8012CB98(peProcess);
+        eError = EASB_UpdateTagFile(peProcess);
     }
     if (*peProcess == EASB_PROCESS_COMPLETE) {
         if (eError == EASB_ERROR_NONE) {
@@ -1410,7 +1410,7 @@ EASBErrorE fn_8012B004(EASBProcessE* peProcess) {
                                            EASB_HEAD_SIZE));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
-        eError = fn_8012CB98(peProcess);
+        eError = EASB_UpdateTagFile(peProcess);
     }
     if (*peProcess == EASB_PROCESS_COMPLETE && eError == EASB_ERROR_NONE) {
         lbl_802825B0->nHeadState = 1;
@@ -1436,7 +1436,7 @@ EASBErrorE fn_8012B0D8(EASBProcessE* peProcess) {
                                            lbl_802825B0->pBuffer, EASB_IMAG_SIZE));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
-        eError = fn_8012CB98(peProcess);
+        eError = EASB_UpdateTagFile(peProcess);
     }
     return eError;
 }
@@ -1459,7 +1459,7 @@ EASBErrorE fn_8012B190(EASBProcessE* peProcess) {
                                            lbl_802825B0->pBuffer, EASB_PROD_SIZE));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
-        eError = fn_8012CB98(peProcess);
+        eError = EASB_UpdateTagFile(peProcess);
     }
     if (*peProcess == EASB_PROCESS_COMPLETE && eError == EASB_ERROR_NONE) {
         lbl_802825B0->n94 = 3;
@@ -1487,7 +1487,7 @@ EASBErrorE fn_8012B27C(EASBProcessE* peProcess) {
         }
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
-        eError = fn_8012CB98(peProcess);
+        eError = EASB_UpdateTagFile(peProcess);
     }
     if (eError == EASB_ERROR_NONE && *peProcess == EASB_PROCESS_COMPLETE) {
         eError = EASB_ErrorFromTagError(TagFile_GetSession(&lbl_802825B0->session));
@@ -1518,7 +1518,7 @@ EASBErrorE fn_8012B3B0(EASBProcessE* peProcess) {
         eError = EASB_ErrorFromTagError(fn_80174DF0_Delete("EASB", SFIO_DEVICE_INVALID, 0));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
-        eError = fn_8012CB98(peProcess);
+        eError = EASB_UpdateTagFile(peProcess);
         if (eError == EASB_ERROR_NONE && *peProcess == EASB_PROCESS_COMPLETE) {
             memset(&lbl_802825B0->session, 0, sizeof(TagSession));
             memset(&lbl_802825B0->nHeadState, 0, sizeof(lbl_802825B0->nHeadState));
@@ -1555,7 +1555,7 @@ EASBErrorE fn_8012B4C0(EASBProcessE* peProcess) {
                                           EASB_HEAD_SIZE));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
-        eError = fn_8012CB98(peProcess);
+        eError = EASB_UpdateTagFile(peProcess);
     }
     if (*peProcess == EASB_PROCESS_COMPLETE && lbl_802825B0->nRecord == EASB_PRODUCT_NONE) {
         if (eError == EASB_ERROR_NONE) {
@@ -1605,7 +1605,7 @@ EASBErrorE fn_8012B708(EASBProcessE* peProcess) {
     if (lbl_802825B0->bFileOpen == 0) {
         return EASB_ERROR_INTERNAL;
     }
-    if (fn_8012A20C(0)) {
+    if (EASB_IsAnyRecordInState(0)) {
         return EASB_ERROR_INTERNAL;
     }
     if (*peProcess == EASB_PROCESS_NONE) {
@@ -1622,7 +1622,7 @@ EASBErrorE fn_8012B708(EASBProcessE* peProcess) {
             *peProcess = EASB_PROCESS_COMPLETE;
         }
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
-        eError = fn_8012CB98(peProcess);
+        eError = EASB_UpdateTagFile(peProcess);
     }
     if (*peProcess == EASB_PROCESS_COMPLETE && eError == EASB_ERROR_NONE) {
         nNext = lbl_802825B0->nRecord;
@@ -1662,11 +1662,11 @@ EASBErrorE fn_8012B8E4(EASBProcessE* peProcess) {
     if (lbl_802825B0->bFileOpen == 0) {
         return EASB_ERROR_INTERNAL;
     }
-    if (fn_8012A20C(0)) {
+    if (EASB_IsAnyRecordInState(0)) {
         return EASB_ERROR_INTERNAL;
     }
     if (*peProcess == EASB_PROCESS_CONTINUE) {
-        eError = fn_8012CB98(peProcess);
+        eError = EASB_UpdateTagFile(peProcess);
     }
     if (*peProcess == EASB_PROCESS_NONE
         || (*peProcess == EASB_PROCESS_COMPLETE && eError == EASB_ERROR_NONE)) {
@@ -1719,7 +1719,7 @@ EASBErrorE fn_8012BA58(EASBProcessE* peProcess) {
                                            lbl_802825B0->pBuffer, EASB_PROD_SIZE));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
-        eError = fn_8012CB98(peProcess);
+        eError = EASB_UpdateTagFile(peProcess);
     }
     if (eError == EASB_ERROR_NONE && *peProcess == EASB_PROCESS_COMPLETE) {
         lbl_802825B0->anProductState[lbl_802825B0->nRecord] = 1;
@@ -1759,7 +1759,7 @@ EASBErrorE fn_8012BBD8(EASBProcessE* peProcess) {
                                            lbl_802825B0->pBuffer, EASB_IMAG_SIZE));
         *peProcess = EASB_PROCESS_CONTINUE;
     } else if (*peProcess == EASB_PROCESS_CONTINUE) {
-        eError = fn_8012CB98(peProcess);
+        eError = EASB_UpdateTagFile(peProcess);
     }
     if (eError == EASB_ERROR_NONE && *peProcess == EASB_PROCESS_COMPLETE) {
         if (lbl_802825B0->nRecord < EASB_MAX_PRODUCTS - 1) {
@@ -1833,7 +1833,7 @@ EASBErrorE fn_8012BE74(void) {
 }
 
 // Starts operation nOperation with pArgs, first starting the tag-file library if it needs it.
-EASBErrorE fn_8012BF18(s32 nOperation, EASBStorageArgs* pArgs) {
+EASBErrorE EASB_StartOperation(s32 nOperation, EASBStorageArgs* pArgs) {
     int aDevices[2] = {SFIO_DEVICE_FIRST, SFIO_DEVICE_INVALID};
     EASBErrorE eError;
 
@@ -1930,7 +1930,7 @@ void fn_8012C1AC(EASBErrorE* peError, EASBProcessE* peProcess) {
     if (bCleanUp == 1) {
         lbl_802825B0->nOperation = EASB_OPERATION_NONE;
         memset(&args, 0, sizeof(EASBStorageArgs));
-        fn_8012BF18(EASB_OPERATION_ERROR, &args);
+        EASB_StartOperation(EASB_OPERATION_ERROR, &args);
         *peProcess = EASB_PROCESS_CONTINUE;
         lbl_802825B0->nLastOperation = nOperation;
         lbl_802825B0->nResult = *peError;
@@ -2067,19 +2067,19 @@ EASBErrorE fn_8012C5F8(EASBTotals* pTotals, EASBProduct* pProduct, char* szName)
         args.pTotals = pTotals;
         args.pProduct = pProduct;
         args.szName = szName;
-        return fn_8012BF18(4, &args);
+        return EASB_StartOperation(4, &args);
     }
     if (lbl_802825B0->b92 == 0) {
         return EASB_ERROR_CANNOT_REOPEN;
     }
-    return fn_8012BF18(5, &args);
+    return EASB_StartOperation(5, &args);
 }
 
 EASBErrorE fn_8012C69C(void) {
     EASBStorageArgs args;
 
     memset(&args, 0, sizeof(EASBStorageArgs));
-    return fn_8012BF18(6, &args);
+    return EASB_StartOperation(6, &args);
 }
 
 // Operation 0: creates the Bio file on eDevice.
@@ -2093,14 +2093,14 @@ EASBErrorE fn_8012C6D4(EASBTotals* pTotals, EASBProduct* pProduct, int eDevice, 
     args.eDevice = eDevice;
     args.pHeader = pHeader;
     args.pImage = pImage;
-    return fn_8012BF18(0, &args);
+    return EASB_StartOperation(0, &args);
 }
 
 EASBErrorE fn_8012C73C(void) {
     EASBStorageArgs args;
 
     memset(&args, 0, sizeof(EASBStorageArgs));
-    return fn_8012BF18(1, &args);
+    return EASB_StartOperation(1, &args);
 }
 
 EASBErrorE fn_8012C774(EASBProduct* pProducts) {
@@ -2108,7 +2108,7 @@ EASBErrorE fn_8012C774(EASBProduct* pProducts) {
 
     memset(&args, 0, sizeof(EASBStorageArgs));
     args.pProduct = pProducts;
-    return fn_8012BF18(8, &args);
+    return EASB_StartOperation(8, &args);
 }
 
 // Operation 7; not without a slot for the game.
@@ -2122,7 +2122,7 @@ EASBErrorE fn_8012C7BC(EASBTotals* pTotals, EASBProduct* pProduct, EASBImage* pI
     args.pTotals = pTotals;
     args.pProduct = pProduct;
     args.pImage = pImage;
-    return fn_8012BF18(7, &args);
+    return EASB_StartOperation(7, &args);
 }
 
 u8 fn_8012C83C(void) {
@@ -2269,7 +2269,7 @@ EASBErrorE fn_8012CAA8(SFIOFuncTable* pCallbacks, int* pDevices) {
 
 // Runs the tag-file library's current operation once: *peProcess becomes where it has got to,
 // or EASB_PROCESS_COMPLETE on an error.
-EASBErrorE fn_8012CB98(EASBProcessE* peProcess) {
+EASBErrorE EASB_UpdateTagFile(EASBProcessE* peProcess) {
     int nProcess;
     int nResult;
     EASBProcessE eProcess;

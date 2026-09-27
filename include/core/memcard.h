@@ -4,7 +4,7 @@
 //
 // A card is addressed as (nPort, nSlot), EA's PlayStation 2 scheme: nPort is the GameCube's card
 // slot (0 = slot A, 1 = slot B; the CARD library's channel) and nSlot a multitap slot, always 0 here
-// (one per port: fn_8009CD10 sets lbl_80282000[nPort] to 1 and lbl_80282008[nPort], "has a
+// (one per port: MC_Connect sets lbl_80282000[nPort] to 1 and lbl_80282008[nPort], "has a
 // multitap", to 0).
 //
 // port: MC_Gc.c is the layer a PC build replaces with file I/O; the functions below it marked
@@ -41,16 +41,16 @@ LAYOUT_ASSERT(MCCardState, 0x98);
 
 // MCCardState.uFlags. Each bit is set or cleared where the CARD library returns the result named.
 #define MC_CARD_PRESENT     0x02    // cleared on CARD_RESULT_NOCARD
-#define MC_CARD_MOUNTED     0x04    // set by a mount (fn_8009D74C), cleared by an unmount (MC_Unmount)
+#define MC_CARD_MOUNTED     0x04    // set by a mount (MC_MountCard), cleared by an unmount (MC_Unmount)
 #define MC_CARD_FORMATTED   0x08    // cleared before a format and set when it succeeds (fn_8009E918);
-                                    // without it fn_8009F734 answers -1
+                                    // without it MC_CheckCardReady answers -1
 #define MC_CARD_WRONGDEVICE 0x10    // CARD_RESULT_WRONGDEVICE: not a memory card
 #define MC_CARD_IOERROR     0x20    // CARD_RESULT_IOERROR
 #define MC_CARD_BROKEN      0x40    // CARD_RESULT_BROKEN
 #define MC_CARD_ENCODING    0x80    // CARD_RESULT_ENCODING, or a card with a non-ASCII encoding
 
 // The game's memory card results (0 is success). Most are MC_Gc.c's translation of a CARD library
-// result, named after it: fn_8009CDA0, fn_8009CEF8, fn_8009DFD8, fn_8009E130 and the others turn
+// result, named after it: fn_8009CDA0, MC_CardOpen, fn_8009DFD8, fn_8009E130 and the others turn
 // CARD_RESULT_X into MC_ERR_X. The rest are the game's own, named from where they are returned.
 typedef enum MCError {
     MC_ERR_NOCARD       = -3,   // CARD_RESULT_NOCARD
@@ -59,7 +59,7 @@ typedef enum MCError {
     MC_ERR_NOFILE       = -12,  // CARD_RESULT_NOFILE: no such file; also "no file open" (fn_8009F488)
     MC_ERR_BADDATA      = -18,  // the file read back is not a good save (the wrong size or
                                 // attributes, or fn_800A233C rejects it)
-    MC_ERR_MOUNTED      = -22,  // fn_8009D74C: the card was mounted already (callers treat it as 0,
+    MC_ERR_MOUNTED      = -22,  // MC_MountCard: the card was mounted already (callers treat it as 0,
                                 // but do not unmount after)
     MC_ERR_NOPERM       = -23,  // CARD_RESULT_NOPERM
     MC_ERR_BROKEN       = -24,  // CARD_RESULT_BROKEN
@@ -72,7 +72,7 @@ typedef enum MCError {
     MC_ERR_EXIST        = -32,  // CARD_RESULT_EXIST
     MC_ERR_FATAL        = -33,  // CARD_RESULT_FATAL_ERROR
     MC_ERR_LIMIT        = -34,  // CARD_RESULT_LIMIT
-    MC_ERR_NOTMOUNTED   = -35   // fn_8009F734, fn_8009E918: the card is not mounted
+    MC_ERR_NOTMOUNTED   = -35   // MC_CheckCardReady, fn_8009E918: the card is not mounted
 } MCError;
 
 // A card and something on it, as MC.c's file functions take them (12 bytes).
@@ -204,24 +204,24 @@ extern UStreamObject* lbl_80281FBC;     // the 'MCB ' object (fn_8009EB38)
 
 void fn_8009CC00(void);
 void fn_8009CC88(void);
-void fn_8009CD10(void);
-void fn_8009CD7C(void);
+void MC_Connect(void);
+void MC_Disconnect(void);
 // The space a save of kind nKind needs (0-2 the game's save, 3 the EA Sports Bio): compared with
 // MCCardState.nFreeBlocks. arg2 is not used.
-s32  fn_8009D1D8(s32 nPort, s32 nSlot, s32 arg2, s32 nKind);
+s32  MC_BlocksNeededForSave(s32 nPort, s32 nSlot, s32 arg2, s32 nKind);
 s32  fn_8009D390(s32 nPort, s32 nSlot);
 s32  fn_8009D3DC(s32 nPort, s32 nSlot);
 s32  fn_8009D50C(s32 nPort, s32 nSlot);     // new files an EA Sports Bio save needs (0 or 1)
-s32  fn_8009D614(s32 nPort, s32 nSlot, const char* pName);
-s32  fn_8009D74C(s32 nPort, s32 nSlot);     // mount the card; 0, or -22 when it was mounted already
+s32  MC_FileExists(s32 nPort, s32 nSlot, const char* pName);
+s32  MC_MountCard(s32 nPort, s32 nSlot);     // mount the card; 0, or -22 when it was mounted already
 s32  MC_Unmount(s32 nPort, s32 nSlot);     // unmount it
 void fn_8009DCEC(s32 nPort, s32 nSlot);
-s32  fn_8009DD44(s32 nPort, s32 nSlot, const char* pName);
-s32  fn_8009DD94(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen);  // read a file
+s32  MC_GotoDirectory(s32 nPort, s32 nSlot, const char* pName);
+s32  MC_LoadFile(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen);  // read a file
 // Fill in the file's comment strings (szGameName, szComment), banner and icon.
 void fn_8009E544(char* pGameName, char* pComment, u8* pIcon, u8* pBanner);
 // Write a file. pBackupName (the PS2's backup copy) is not used here.
-s32  fn_8009E604(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen,
+s32  MC_SaveFile(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen,
                  const char* pBackupName);
 s32  fn_8009E758(s32 nPort, s32 nSlot, const char* pName);
 s32  fn_8009E918(s32 nPort, s32 nSlot);     // format the card
@@ -255,11 +255,11 @@ s32  fn_8009F6A0(s32 nPort, s32 nSlot);
 // The card's state as an error code: -4 no card, -1 when uFlags bit 0x08 is clear (a mount sets it;
 // a format clears it until it succeeds, and so do a card check that finds the card broken and an
 // encoding error from CARDMountAsync), -35 not mounted, else 0.
-s32  fn_8009F734(s32 nPort, s32 nSlot);
+s32  MC_CheckCardReady(s32 nPort, s32 nSlot);
 s32  fn_8009F728(int nPort);        // lbl_80281FD0[nPort] (the menus read it as a whole word)
 u8   fn_8009F7E8(int nPort);        // lbl_80282008[nPort]
-void fn_8009F7F4(MCCardState* pState, int nPort, int nSlot);   // copy out lbl_801F1510[nPort][nSlot]
-MCCardState* fn_8009F834(s32 nPort, s32 nSlot);                 // &lbl_801F1510[nPort][nSlot]
+void MC_GetMC(MCCardState* pState, int nPort, int nSlot);   // copy out lbl_801F1510[nPort][nSlot]
+MCCardState* MC_pGetMC(s32 nPort, s32 nSlot);                 // &lbl_801F1510[nPort][nSlot]
 
 // ---- MC.c ---------------------------------------------------------------------------------------
 
