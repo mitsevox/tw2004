@@ -104,6 +104,10 @@ void fn_80168EE8(UIStudio* pStudio, u16* puGroup, u16* puScreen) {
 }
 
 // Queues event 3 for a screen and runs the queue, unless an event is being sent right now.
+// fake match: optimization level 1 for this function only. At level 4 the copy-propagation passes
+// fold uScreen into r5 before the argument setup, so pStudio is set after the extsh's instead of
+// EA's `mr r0,r5` copy of uScreen and `mr r5,r31` first (see fn_801694A0).
+#pragma optimization_level 1
 void fn_80168F5C(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
     UISEventData data;
 
@@ -114,6 +118,7 @@ void fn_80168F5C(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
         fn_80165528(pStudio, 0);
     }
 }
+#pragma optimization_level reset
 
 // Unloads a screen. Screens that named it as their previous screen take its previous screen
 // instead; it gets event -1 and the type 9 events queued for it (fn_80165ACC), its nodes and rate
@@ -255,9 +260,17 @@ u8 fn_80169308(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
 }
 
 // Goes to a screen: queued as event 0 while an event is being sent, at once otherwise.
-s32 fn_801694A0(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 nArgs, s32* pArgs) {
+// fake match: optimization level 2 for this function only, and uGroup / uScreen are copies of the
+// parameters. At level 4 the extra copy-propagation passes fold uScreen into r5 before the
+// argument setup, so pStudio is copied out of r3 instead of EA's `mr r8,r5` copy of uScreen.
+#pragma optimization_level 2
+s32 fn_801694A0(UIStudio* pStudio, u16 uGroupArg, u16 uScreenArg, u8 nArgs, s32* pArgs) {
     UISEventData data;
+    u16 uGroup;
+    u16 uScreen;
 
+    uGroup = uGroupArg;
+    uScreen = uScreenArg;
     if (pStudio->uFlags & 2) {
         data.aw[0] = uGroup;
         data.aw[1] = uScreen;
@@ -269,6 +282,7 @@ s32 fn_801694A0(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 nArgs, s32* pArgs
     }
     return 1;
 }
+#pragma optimization_level reset
 
 // Makes pFile the studio's UI file (pCurrent->p10), fixing up its offsets unless it already is
 // that file. Returns whether the file can be used; a file that cannot is dropped.
@@ -533,9 +547,14 @@ void fn_80169C0C(UIStudio* pStudio, u32 nScreens, u32 nHandlers, u32 nRateFns, u
 
 // The size of the block fn_80169C0C builds, for the given table sizes. The screen table has one
 // more entry's worth of room: the current record (UISCurrent, the same size).
+// fake match: the screen table's size as a 64-bit product (low word = (nScreens + 1) * 20); its
+// dead high word (li 20; mulhw) moves the handlers shift to the second slot of the pre-allocation
+// schedule as in the original, and is deleted after register allocation.
+// port: the product is truncated to 32 bits.
 u32 fn_80169D90(u32 nScreens, u32 nHandlers, u32 nRateFns, u32 n60, u32 nEventWords, u32 nWords2) {
-    return sizeof(UIStudio) + (nScreens + 1) * sizeof(UISScreen) + nHandlers * sizeof(UISHandlerFn) +
-           nRateFns * sizeof(UISRateFn) + n60 * sizeof(UISRecord60) + (nWords2 + nEventWords) * sizeof(s32);
+    return sizeof(UIStudio) + (u32)((s32)(nScreens + 1) * (s64)sizeof(UISScreen)) +
+           nHandlers * sizeof(UISHandlerFn) + nRateFns * sizeof(UISRateFn) + n60 * sizeof(UISRecord60) +
+           (nWords2 + nEventWords) * sizeof(s32);
 }
 
 // Turns a file offset stored in a pointer field into the pointer.
