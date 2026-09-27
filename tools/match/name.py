@@ -7,7 +7,7 @@ batch.tsv, tab-separated, one function per line (# lines skipped):
         T3 read from the code (docs/style.md "Names"); codes as in config/GW4E69/name_sources.tsv
         (E1 EA text, E2 TW06/TW07 name, E3 wrapper, E4 named data, E5 named neighbours, E6 the code);
   evidence: what in the code or the reference shows it; purpose: one line, what the function does;
-  comment (optional): the function's whole comment, written for a reader of the code (what it
+  comment (optional): KEEP (read, the existing comment is right: logged as reviewed), or the function's whole comment, written for a reader of the code (what it
         does in the game, units, what 0/NULL mean; read from the code, never contradicting it).
         It goes above the definition, wrapped at 100 columns, REPLACING an existing // comment:
         rewrite a comment that is wrong, stale or vague. Keep every `fake match:`, `port:` and
@@ -35,6 +35,7 @@ import datetime, pathlib, re, subprocess, sys
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 PY = sys.executable
 SOURCES = ROOT / 'config/GW4E69/name_sources.tsv'
+REVIEW = ROOT / 'config/GW4E69/review.tsv'
 NAME = re.compile(r'^[A-Z][A-Za-z0-9]*(_[A-Za-z0-9]+)+$')
 CODES = re.compile(r'^E[1-6][a-z]?(\([^)]*\))?(\+E[1-6][a-z]?(\([^)]*\))?)*$')
 PATHS = ['src', 'include', 'config', 'docs', 'agents']
@@ -124,6 +125,7 @@ def wrap_comment(text, indent=''):
 
 
 LABELS = ('fake match:', 'port:', 'EA bug:')
+REWRITTEN = set()
 
 
 def add_comments(rows):
@@ -133,7 +135,7 @@ def add_comments(rows):
     (fake match:, port:, EA bug:; the text after it may be corrected). Only the first definition in
     a file is commented (an #else plain-C copy keeps its own note). Returns (added, replaced, errors)."""
     added, replaced, errors = 0, 0, []
-    want = {new: com for _, _, new, *rest in rows for com in [rest[-1]] if com}
+    want = {new: com for _, _, new, *rest in rows for com in [rest[-1]] if com and com != 'KEEP'}
     if not want:
         return 0, 0, []
     found = set()
@@ -172,6 +174,7 @@ def add_comments(rows):
             lines[first:top] = wrap_comment(want[name])
             if first < top:
                 replaced += 1
+                REWRITTEN.add(name)
             else:
                 added += 1
         if defs:
@@ -215,6 +218,7 @@ def main():
         restore('rename.py failed:\n' + r.stdout + r.stderr)
     md = update_markdown(renames) if renames else 0
     ncom, nrep, cerr = add_comments(rows)
+    rewritten = REWRITTEN
     if cerr:
         restore('comment rows refused:\n  ' + '\n  '.join(cerr))
     for _ in range(10):         # a reflowed comment spills into its next line: repeat until stable
@@ -234,6 +238,16 @@ def main():
     if b.returncode or 'OK' not in check.stdout + check.stderr:
         tail = '\n'.join((b.stdout + b.stderr).splitlines()[-15:])
         restore('build or DOL check failed:\n' + tail + '\n' + check.stdout + check.stderr)
+    # the review log: every function this batch read, and what happened to its comment
+    new_log = not REVIEW.exists()
+    with open(REVIEW, 'a', encoding='utf-8') as f:
+        if new_log:
+            f.write('# Every function a naming lane has read (name.py): address, name, comment action\n'
+                    '# (keep: read and right; rewrite; add; none: needs none), who, date.\n'
+                    'address\tname\tcomment\tby\tdate\n')
+        for a, cur, new, *_rest, com in rows:
+            act = 'keep' if com == 'KEEP' else ('none' if not com else ('rewrite' if new in rewritten else 'add'))
+            f.write('\t'.join([a, new, act, by, today]) + '\n')
     after = coverage()
     lint = run([PY, 'tools/match/lint.py', '--diff', 'HEAD']).stdout
     left = [l for l in lint.splitlines() if re.match(r'^\S+:\d+: ', l)]

@@ -138,19 +138,8 @@ def main():
         visit(f, set())
     size = {f[0]: f[2] for f in funcs}
     only_unnamed = '--unnamed' in sys.argv
-    blind = None
-    if '--blind' in sys.argv:
-        # audit mode: game function names not yet audited at T1/T2 (and each function's own name)
-        # show as addresses, see blindview.py
-        import blindview
-        b = blindview.Blinder()
-
-        def blind(s, own):
-            return blindview.IDENT.sub(lambda m: 'fn_%08X' % b.game[m.group(0)]
-                                       if m.group(0) == own or b.hide(m.group(0)) else m.group(0), s)
-    else:
-        def blind(s, own):
-            return s
+    def blind(s, own):
+        return s
     print('%s: %d functions, %d still fn_ (leaves first)\n' % (
         unit, len(funcs), sum(1 for f in funcs if f[0].startswith('fn_'))))
     for f in order:

@@ -1,9 +1,9 @@
 """Merge one reviewed agent branch into main, verify, and push.
-    python tools/agents/merge.py <agent-name> ["merge message"] [--allow-asm] [--allow-renames]
+    python tools/agents/merge.py <agent-name> ["merge message"] [--allow-asm]
 --allow-asm: the merge may add asm that has its plain-C fallback, after the orchestrator checked by
 hand that it is EA's own asm (asmgate.py; without it any added asm is refused).
---allow-renames: a naming lane's merge (after 100%): function renames pass only if each renamed
-address has its evidence row in config/GW4E69/name_sources.tsv.
+Renamed functions (symbols.txt, by address) pass only with their evidence row in
+config/GW4E69/name_sources.tsv. (--allow-renames is accepted and ignored: renames are always checked.)
 Steps: refresh main's report and save its exact-function set; merge agent/<name> with --no-ff (on a
 conflict: abort the merge and list the files, so the owning agent can merge main and resolve); run
 configure + a full build (DOL must be OK); rebuild the report and compare exact sets (no function may
@@ -196,29 +196,22 @@ if stripped:
     print(NL.join(stripped[:10]))
     undo(f'backslashes stripped from {len(stripped)} line(s) (not pushed): a shell edit damaged the source. '
          f'-> ask the {name} agent to restore those lines with the Edit tool.')
-# The audit baseline (tag audit-baseline-1, user's hard rule): matching never renames a function or
-# changes an audited comment; it may only ADD matching notes. Print what changed for review.
-ab = run('python tools/match/auditbaseline.py --list changed').stdout.splitlines()
-renamed = [l for l in ab if 'name' in l.split('\t')[-1]]
-if renamed and ALLOW_RENAMES:
-    # After 100% (owner, 2026-09-27) naming lanes may rename, but every renamed function must have
-    # its evidence row in name_sources.tsv (address column), written by the naming pipeline.
+# Renames: every function whose name changed in this merge (symbols.txt, by address) needs its
+# evidence row in name_sources.tsv (tools/match/name.py writes it). Comments are reviewed in the diff.
+def fn_names(text):
+    return {m.group(2).lower(): m.group(1) for m in
+            re.finditer(r'^(\S+) = \.text:0x([0-9A-Fa-f]+);.*type:function', text, re.M)}
+old_syms = fn_names(run('git show HEAD:config/GW4E69/symbols.txt').stdout)
+new_syms = fn_names(open(MAIN + '/config/GW4E69/symbols.txt', encoding='utf-8').read())
+renamed = [f'{a}\t{old_syms[a]} -> {new_syms[a]}' for a in new_syms if a in old_syms and old_syms[a] != new_syms[a]]
+if renamed:
     logged = {l.split('\t')[0].lower() for l in open(APPLIED, encoding='utf-8') if l[:1] not in '#\n'}
-    missing = [l for l in renamed if l.split('\t')[0].lower() not in logged]
+    missing = [l for l in renamed if l.split('\t')[0] not in logged]
     if missing:
         print(NL.join(missing[:30]))
-        undo(f'{len(missing)} renamed function(s) have no name_sources.tsv row (not pushed)')
+        undo(f'{len(missing)} renamed function(s) have no name_sources.tsv row (not pushed): '
+             'rename through tools/match/name.py')
     print(f'renames: {len(renamed)} function(s), all logged in name_sources.tsv')
-elif renamed:
-    print(NL.join(renamed)[:2000])
-    undo('a function name changed since the audit baseline (not pushed): matching never renames '
-         '(naming lanes: --allow-renames, with name_sources.tsv rows)')
-cm = [l for l in d if l[:1] in '+-' and l[:3] not in ('+++', '---') and re.search(r'//|/\*', l)]
-print('audit baseline: %d changed rows; comment lines in this merge: %d added, %d removed' % (
-    len(ab), sum(l[0] == '+' for l in cm), sum(l[0] == '-' for l in cm)))
-if any(l[0] == '-' for l in cm):
-    print(NL.join(l[:160] for l in cm[:30]))
-    print('REVIEW: removed/changed comment lines above must be matching notes only, else revert them')
 c = run('git commit -q -m "%s"' % (msg + (f' (and drop {n} local prototypes the headers declare)' if n else '')))
 if c.returncode:
     undo('commit failed: ' + c.stdout[-300:] + c.stderr[-300:])

@@ -26,16 +26,14 @@ decomp.dev and PC jobs: `docs/infrastructure.md`.
   public decomps (`extern/`, each with its CREDITS/README) is fine.
 - **Never edit C or headers through the shell** (sed, heredocs, echo, `python -c`): it strips
   backslashes. Use the editor tools; a repeated edit is a saved Python script, and its diff is read.
-- **Names and comments need evidence** (docs/style.md "Where names and comments come from"): EA's
-  text, a TW06/TW07 name the code confirms, or two blind readers + a reconciler (agents/roles/audit.md).
-  Since 2026-09-27 (owner; the match is done, readability is the job) a naming lane names a
-  function from its own reading of the code (tier T3) and OWNS its comment: adds a missing one and
-  rewrites a wrong, stale or vague one, in one pass through `tools/match/name.py`. Never
-  contradicting the code; `fake match:` / `port:` / `EA bug:` labels are kept (their text may be
-  corrected). Matching lanes (reworking a match) write ONLY matching notes and never rename.
-- **The audit baseline** (git tag `audit-baseline-1`): every game function's name and comments were
-  audited to 100% on 2026-09-24. `python tools/match/auditbaseline.py` sorts code into audited /
-  draft / changed / new / headers. At 100% match the code gets partitioned with it.
+- **Names and comments are true to the code** (docs/style.md "Where names and comments come from"):
+  EA's name when a related build or EA's own text confirms it; otherwise a name read carefully from
+  the code (tier T3). Whoever reads a function owns its comment: keeps it if right, rewrites it if
+  wrong, stale or vague, adds it if missing. One pass, through `tools/match/name.py` (every name
+  logged with evidence in `config/GW4E69/name_sources.tsv`). `fake match:` / `port:` / `EA bug:`
+  labels are kept. Matching lanes (reworking a match) write only matching notes and never rename.
+- **At every phase change, re-read these rules and the agent docs**, and ask the owner about any
+  rule written for the previous phase. Never carry an old phase's rule into new work silently.
 - **Downloads, purchases, posts, messages: ask the owner first.** Secrets (tokens) are created and
   stored by the owner; never ask for their values.
 - The owner is **mits** (GitHub `mitsevox`).
@@ -63,27 +61,8 @@ first"), `docs/style.md` (how the C must read).
 - Usage: pace by the plan's 5-hour and weekly limits (agents/README.md "Pacing"); check usage
   before launching lanes; never let lanes get cut off at 100%.
 
-## After 100% match (parked on purpose)
+## Current phase: readability (from 2026-09-27)
 
-- Partition code into fully / semi / not audited (auditbaseline.py), re-check draft-audited comments.
-- Phase 3 audit: struct field comments in the 69 game headers; names of globals, types, fields,
-  parameters were never audited.
-- **docs/gameplay.md needs a full cleanup**: its behaviour claims were written during matching and
-  never audited (1 in 5 code comments from that era were wrong).
-- Port-hazards doc (EA bugs sorted by effect; raw material in agents/findings/).
-- Misfiled units and `src/unsorted/` placement (agents/state.md follow-ups).
-- **Apply the EA names found after the baseline** (the audit gate blocks renames until then): the
-  MAD video decoder in rcmp_mad_codec.c (14 functions, 5 globals, TW06 PDB + NFSMW decomp agree:
-  `agents/findings/2026-09-25-mad-names.tsv`) and ska_shared's SKAUtil_EulerAnglesToQTs8 /
-  SKA_LoadFromMem (TW07 + 007 EoN: `docs/reference-builds/007eon-ps2`). Log them in
-  `config/GW4E69/name_sources.tsv` with `tools/match/rename.py`.
-- **Compiler-flag audit (owner, 2026-09-26; #match-help: real devs set flags per LIBRARY, not per
-  file):** group every per-unit `extra_cflags` in configure.py by library (UIS, LL, hlaud, rcmp,
-  SDK...); flags consistent across a library are EA's; one-file outliers are marked as probable
-  fake matches. Mark only: no match progress is thrown away.
-- **Fake-match inventory:** list every `// fake match:` and every per-function `#pragma` (grep) with
-  its function, for later cleanup/labelling. They stay until a truer EA form is found.
-- **Give matched functions' placeholder locals their real names**: matching lanes may not name
-  things, so some exact functions carry letter locals. First: Ball.c Physics_HandleCollision (26
-  float locals fE, fF, fG...; TW07's names such as bankAngle, sinPitch, headingAngle are in
-  `docs/reference-builds/tw07-ps3/cu/`). Renaming locals changes no code; the match proves it.
+The plan, its order and its feedback loop: `agents/plan-readability.md`. Everything parked from the
+matching era (fields, globals, gameplay.md, port hazards, fake matches, placeholder locals,
+misfiled units, the compiler-flag audit) is scheduled there.

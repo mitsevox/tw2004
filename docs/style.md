@@ -57,43 +57,26 @@ Names
 Where names and comments come from
 ----------------------------------
 
-The name and comment audit (`config/GW4E69/audit.tsv`, from 2026-09-24) found about 7% of our
-function names and about 1 in 5 of our function comments wrong: swapped cases, claims the code
-does not show, text copied between similar game modes, stale status notes. They had been written
-during matching, where nothing checks them. So a name or a behaviour comment in EA game code needs
-one of two things before it goes in:
+The match is done (2026-09-27); the job now is code a person or a fresh AI can read. Names and
+comments are written in ONE pass per function, by whoever reads it (a naming lane), through
+`tools/match/name.py`, which logs every name with its evidence in `config/GW4E69/name_sources.tsv`.
 
-- **Hard evidence:** EA's own text in the binary (a string that names the job), or EA's name from
-  a related build that the code confirms (TW06, TW07; `docs/reference-builds/`). Say which.
-- **Two independent readers:** two blind reads of the function (neither sees the current name or
-  comments) that agree on what it does, reconciled against the code (`tools/match/blindview.py`,
-  the audit ledger).
-- **One reading of the code (since 2026-09-27, owner):** a naming lane that has read a function
-  names it and owns its comment in the same pass (`tools/match/name.py`, column 8): adds one where
-  it is missing, rewrites one that is wrong, stale (status notes from the matching era) or vague.
-  What it does in the game, read from the code, never contradicting it. Tier T3 in
-  `name_sources.tsv`; no address suffix or confidence marker in the name. `fake match:`, `port:`
-  and `EA bug:` labels stay (name.py refuses to drop one); their text may be corrected.
+- **EA's name first** when there is evidence: EA's text in the binary, or EA's name in a related
+  build that the code confirms (TW07 PS3, TW06, Madden 2003; `docs/reference-builds/`). Tier T1/T2,
+  spelled as EA did.
+- **Otherwise name it from a careful reading of the code:** tier T3, what it does, EA's style. Most
+  names can never be proven; a clear true name beats `fn_`. Never contradict the code.
+- **The reader owns the comment:** keep it if it is right and clear; rewrite it if it is wrong,
+  stale (matching-era status notes), vague, or uses `fn_`/`lbl_` names that now have real ones; add
+  one where the name does not say everything a caller needs. Plain words, what it does in the game.
+- **Labels stay:** `fake match:`, `port:` and `EA bug:` notes mark later work; their text may be
+  corrected but the label is kept (name.py refuses to drop one).
+- Struct field, global, type and parameter names and comments: same rules; the reader fixes what
+  it finds wrong in the headers of the code it reads.
 
-Matching work writes only matching notes (`fake match:`, `EA bug:`, `port:`, register, data-order
-and section notes) and keeps `fn_`/`lbl_` names. Behaviour comments and names come from the audit
-process above, never as a side effect of making bytes match.
-
-**The audit baseline** (git tag `audit-baseline-1`, `config/GW4E69/audit_baseline.tsv`): the
-function audit reached 100% (6,610 functions) on 2026-09-24, and the baseline fingerprints each
-function's name, comments and code as audited. `python tools/match/auditbaseline.py` sorts the
-game code into:
-
-- **audited:** unchanged since the audit, which read byte-matching C (6,422 functions at the tag).
-- **draft:** audited, but from our non-exact draft C (188 functions at the tag). Once it matches,
-  re-check its comments against the final code.
-- **changed:** its name, comments or code changed after the tag; `git diff audit-baseline-1 --
-  <file>` shows what. A new matching note is fine, anything else needs the audit process.
-- **new:** a function the baseline does not have.
-- **headers:** struct field comments in game headers (phase 3, not audited).
-
-Never audited: the names of globals, types, struct fields and parameters. Treat them as claims.
-Never rewrite the baseline file by hand; a later audit milestone writes a new one with a new tag.
+History: a blind two-reader audit (2026-09-24, tag `audit-baseline-1`) checked every function name
+and comment of the matching era and found about 7% of names and 1 in 5 comments wrong: matching-era
+text is a claim until someone reads it against the code. Its tooling was retired on 2026-09-27.
 
 Data access
 -----------

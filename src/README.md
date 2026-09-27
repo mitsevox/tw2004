@@ -45,8 +45,8 @@ see [Game modes](#game-modes).
 | SitDev | the situation scripts: commentary, sounds and music triggered by what happens in a shot (`SitDev*.c`) |
 | UIS / UI Studio | EA Tiburon's IStudio menu library (`UIS*.c`, `UIStudio.c`) |
 | EASB | EA Sports Bio, EA's cross-game player profile on the memory card |
-| `fn_8XXXXXXX`, `lbl_8XXXXXXX` | a function or global with no proven name, by its address. `fn_<addr>_<Guess>` is a provisional (tier T3) name |
-| Name tiers | from the name audit (`agents/roles/audit.md`): T1 EA's own text or a TW06/TW07 name the code confirms; T2 two blind readers agree, backed by EA-named things; T3 agreed behaviour but only our deduction: `fn_<addr>_<Guess>` |
+| `fn_8XXXXXXX`, `lbl_8XXXXXXX` | a function or global not named yet, by its address |
+| Name tiers | in `config/GW4E69/name_sources.tsv`: T1/T2 EA's own name (its text in the binary, or TW06/TW07/Madden 2003 confirmed by the code); T3 named from a careful reading of the code |
 | `n290`, `pfn1E4`, `u04`, `b0F` | struct fields not named yet: a type letter and the field's offset |
 | `// fake match:` | C written a non-natural way only to reproduce EA's bytes; logic unchanged |
 | `// EA bug:` / `// port:` | a bug in EA's code (kept); a hazard for a later PC port (32-bit pointers, endianness) |

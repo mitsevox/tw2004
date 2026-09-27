@@ -1,7 +1,8 @@
 # Agent brief (every lane reads this first)
 
 You are one of several agents working in parallel on the Tiger Woods PGA Tour 2004 (GameCube)
-matching decomp. An orchestrator reviews your work, merges it into `main` and pushes it. Code
+decomp. The match is 100% (2026-09-27); the current phase is readability (agents/plan-readability.md):
+names, comments, types. Your role file says what you do; where this brief and it differ, it wins. An orchestrator reviews your work, merges it into `main` and pushes it. Code
 quality matters as much as the match: experienced decomp people will review it, and every agent must
 write as if one author wrote everything. The hard rules in `../CLAUDE.md` apply to you; this file
 adds how lanes work. Then read your role file in `agents/roles/`.
@@ -29,7 +30,7 @@ if things are going well.
 - Your scratch folder (in your prompt) holds m2c output, trial scripts and notes. Nothing from
   scratch goes into the repo. Write your per-function notes there as you go (tried / result).
 - Start: `date`; `git merge main`; `python tools/match/rename.py config/GW4E69/name_sources.tsv
-  --refs-only` (functions get renamed on main by the audit; this rewrites old names you use; again
+  --refs-only` (functions get renamed on main by naming lanes; this rewrites old names you use; again
   after every `git merge main`); `python configure.py && ninja` (`main.dol: OK`);
   `ninja build/GW4E69/report.json`.
 - Merge main again right before your final commit and report, then rebuild and lint.
@@ -52,15 +53,16 @@ if things are going well.
   <file>` to undo your own edit is fine.
 - **A helper you add for a match has no name evidence:** name it after its caller,
   `fn_<caller address>_Read` (or `_Calc`, `_Get`: mechanical, never a guess at its job), with a
-  `// fake match:` comment. A name that says what it does needs the audit (docs/style.md).
+  `// fake match:` comment.
 - **Edit C and headers only with the editor tools.** For one edit repeated in many places, save a
   Python script with the Write tool, run it, read the whole `git diff`, and name it in your report.
   No sed / heredocs / `python -c` / `python -` on anything, scratch scripts included.
 - **Float constants: EA's exact expression** (`1.0f/72.0f`, `59.94f/60.0f`), never a rounded
   decimal: objdiff masks constant values; `constcheck.py` does not.
-- **Names and comments:** write only matching notes (`fake match:`, `EA bug:`, `port:`, register /
-  data-order / section notes). Never rename a function, never change or remove an existing comment,
-  never write a behaviour comment. Keep `fn_`/`lbl_` names and prefix+offset fields.
+- **Names and comments depend on your role.** Naming lanes (the current phase, roles/naming.md) name
+  functions and own their comments: add, rewrite, keep, through `tools/match/name.py`. Matching
+  lanes (reworking a match, e.g. replacing a fake match) write only matching notes (`fake match:`,
+  `EA bug:`, `port:`, register / data-order / section notes) and never rename.
 - **Do not edit `docs/`.** Report findings instead.
 - **Shared files:** headers: add fields (offset order, `// 0xOFFSET` comment) and prototypes; change
   an existing one only with proof, and list it. `configure.py` / `splits.txt`: only through

@@ -5,7 +5,7 @@ Read `agents/brief.md` first. Your prompt gives your units (in priority order) a
 **Goal: link units.** A unit counts toward "code linked" only when every function is exact and the
 unit is linked (Matching). Work your list in order: units one function from linking first. When a
 unit reaches 100%, link it before moving on (`python tools/match/graduate.py`, docs/workflow.md
-"Finishing a unit"), and attach its orphan `.bss` too (`agents/roles/data.md`).
+"Finishing a unit").
 
 Priority when the orchestrator orders units: code-bar gain per remaining function (unit code size /
 functions left), `python tools/agents/remain.py` lists what is left per unit.

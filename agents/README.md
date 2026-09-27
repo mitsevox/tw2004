@@ -1,7 +1,7 @@
 # Running agent lanes (the orchestrator's playbook)
 
 One session, the **orchestrator**, runs parallel agent **lanes**, reviews and merges their work, and
-keeps the docs current. Lanes do the matching / auditing; the orchestrator keeps quality uniform and
+keeps the docs current. Lanes do the work (now: naming and comments); the orchestrator keeps quality uniform and
 its own context small. Start of a session (or after a compaction): read `../CLAUDE.md`, then
 `state.md`, then `python tools/agents/status.py`. If state.md says PAUSED, wait for the owner.
 
@@ -13,13 +13,12 @@ its own context small. Start of a session (or after a compaction): read `../CLAU
 | `agents/brief.md` | what every lane reads first (rules, environment, reporting) |
 | `agents/roles/matching.md` | a matching / link lane |
 | `agents/roles/naming.md` | a naming lane: name and comment functions in one reading (`tools/match/name.py`) |
-| `agents/roles/audit.md` | the blind name-and-comment audit (lane 1, lane 2, reconciler) |
 | `agents/findings/` | audit reports (EA bugs, misfiled units), name evidence, research that feeds naming and cleanup |
 
 The matching-era records (the per-function tried-ledger `agents/tried/`, lane assignments
 `agents/assign/`, the data-linking role and orphan-data map) were removed after 100%; they are in git
 at commit `6839245`.
-| `tools/agents/` | `new_agent.py`, `merge.py`, `audit_apply.py`, `review.py`, `status.py`, `remain.py` |
+| `tools/agents/` | `new_agent.py`, `merge.py`, `review.py`, `status.py`, `remain.py` |
 | `docs/reference-builds/` | TW06 (PS2/Xbox) and TW07 (PS3 debug build) inventories; `tw07-ps3/cu/` = EA's functions per source file with parameters and locals; `tw07-ps3/pairs.tsv` = our address -> TW07 function |
 
 Paths (`tools/agents/paths.py`): the main checkout, worktrees in `<parent>/tw2004-agents/<lane>`
@@ -46,8 +45,8 @@ lane while the others avoid those call sites. Rotate unit lists between rounds (
 2. `python tools/agents/merge.py <lane> ["message"]`, one lane at a time. It merges without
    committing and runs the gates: `main.dol: OK`, `ninja all_source`, exact functions by address (a
    rename is not a loss), lint on merged lines, typeaudit / symaudit counts, constcheck (constant
-   values), stripped backslashes, and the **audit baseline** (a renamed function is refused; removed
-   or changed comment lines are printed: they must be matching notes only). It commits and pushes
+   values), stripped backslashes, and renames (each renamed function needs its name_sources.tsv
+   row). It commits and pushes
    only if all pass, else undoes the merge. A conflict goes back to the lane (`git merge main`).
 3. Verified findings go into `docs/decomp-notes.md` (a docs commit), and into the next prompts.
 4. Tell the owner what landed, in game terms, with the numbers side by side.
@@ -72,10 +71,8 @@ lane while the others avoid those call sites. Rotate unit lists between rounds (
 - `main.dol: OK` after every merge; only exact 100% counts; no function loses its exact match.
 - Parity counts never rise: `typeaudit.py --count`, `symaudit.py --count`, whole-file `lint.py`.
 - A unit is DONE when every function is exact, its data is in C and it is linked (Matching).
-  Linking a unit also attaches its orphan `.bss` (roles/data.md).
-- `python tools/match/auditbaseline.py` after merges: "changed" rows must be explainable (added
-  matching notes, code changed by a matching fix). Never rewrite `config/GW4E69/audit_baseline.tsv`
-  by hand; `--rehash` only when the fingerprint method itself changes.
+- Naming lanes hand in batch files; the orchestrator replays them on main with `tools/match/name.py`
+  (merging their branches conflicts on callers in other files).
 
 ## Pacing (measure, don't guess)
 
