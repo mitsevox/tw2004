@@ -914,7 +914,7 @@ config.libs = [
             Object(Matching, "Code8005D2E4.c"),
             Object(Matching, "stateFunc.c"),
             Object(Matching, "GoCamCont.c"),
-            Object(NonMatching, "skalib.c"),
+            Object(Matching, "skalib.c"),
             Object(Matching, "GoStaticCam.c"),
             Object(Matching, "target.c"),
             Object(Matching, "emotion.c"),
