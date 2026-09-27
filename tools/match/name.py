@@ -24,6 +24,9 @@ Steps, in order; the first failure stops it and puts every touched file back:
   7. configure + ninja, and the DOL check must print main.dol: OK;
   8. report: call-site coverage before -> after (hotnames.py) and lint findings left on the lines
      the batch changed.
+A row whose new_name equals current_name is comment-only: column 8 is added (tier, codes and
+evidence still say where the comment comes from), nothing is renamed and no name_sources row is
+written. Use it for functions that already have a name.
 Needs a clean tree under src/, include/, config/ and docs/ (commit or stash first)."""
 import datetime, pathlib, re, subprocess, sys
 
@@ -163,14 +166,17 @@ def main():
     errors += [f'{d}: used twice in the batch' for d in dup]
     tmp = ROOT / 'build/name_batch.tsv'
     tmp.parent.mkdir(exist_ok=True)
-    tmp.write_text(''.join(f'{r[0]}\t{r[1]}\t{r[2]}\n' for r in rows), encoding='utf-8')
-    dry = run([PY, 'tools/match/rename.py', str(tmp), '--dry-run'])
-    if dry.returncode:
+    renames = [r for r in rows if r[1] != r[2]]
+    errors += [f'{r[2]}: comment-only row without a comment' for r in rows if r[1] == r[2] and not r[7]]
+    tmp.write_text(''.join(f'{r[0]}\t{r[1]}\t{r[2]}\n' for r in renames), encoding='utf-8')
+    dry = run([PY, 'tools/match/rename.py', str(tmp), '--dry-run']) if renames else None
+    if dry is not None and dry.returncode:
         errors.append(dry.stdout.strip() + dry.stderr.strip())
     if errors:
         sys.exit('name.py: batch refused, nothing changed:\n  ' + '\n  '.join(errors))
     if '--check' in args:
-        print(f'name.py: {len(rows)} name(s) pass the checks ({dry.stdout.strip()})')
+        print(f'name.py: {len(rows)} row(s) pass the checks'
+              + (f' ({dry.stdout.strip()})' if dry is not None else ' (comments only)'))
         return
     if '--by' not in args:
         sys.exit('name.py: say who proposed the batch: --by "<lane or model>"')
@@ -179,16 +185,16 @@ def main():
         sys.exit('name.py: src/, include/, config/, docs/ or agents/ has uncommitted changes; commit them first')
 
     before = coverage()
-    r = run([PY, 'tools/match/rename.py', str(tmp)])
-    if r.returncode:
+    r = run([PY, 'tools/match/rename.py', str(tmp)]) if renames else None
+    if r is not None and r.returncode:
         restore('rename.py failed:\n' + r.stdout + r.stderr)
-    md = update_markdown(rows)
+    md = update_markdown(renames) if renames else 0
     ncom, kept = add_comments(rows)
     for _ in range(3):
         run([PY, 'tools/match/wraplong.py', '--from-lint', '--diff', 'HEAD'])
     today = datetime.date.today().isoformat()
     with open(SOURCES, 'a', encoding='utf-8') as f:
-        for a, cur, new, tier, codes, ev, purpose, _ in rows:
+        for a, cur, new, tier, codes, ev, purpose, _ in renames:
             f.write('\t'.join([a, new, cur, tier, codes, ev, purpose, by, '', today]) + '\n')
     if run([PY, 'configure.py']).returncode:
         restore('configure.py failed')
@@ -201,7 +207,8 @@ def main():
     after = coverage()
     lint = run([PY, 'tools/match/lint.py', '--diff', 'HEAD']).stdout
     left = [l for l in lint.splitlines() if re.match(r'^\S+:\d+: ', l)]
-    print(f'name.py: {len(rows)} name(s) applied ({r.stdout.strip()}); {md} Markdown mention(s) updated')
+    print(f'name.py: {len(renames)} name(s) applied' + (f' ({r.stdout.strip()})' if r else '')
+          + f'; {md} Markdown mention(s) updated')
     print(f'comments added: {ncom}' + (f'; kept the existing comment of: {", ".join(kept)}' if kept else ''))
     print('main.dol: OK')
     print(f'call sites to named functions: {before:.2f}% -> {after:.2f}%')
