@@ -1074,6 +1074,7 @@ Earnings.c:
 	.data       start:0x80191A08 end:0x80192010
 	.bss        start:0x801FFAE8 end:0x80202828
 	.sdata      start:0x80281560 end:0x80281568
+	.sbss       start:0x80282248 end:0x80282260
 	.sdata2     start:0x80284510 end:0x80284560
 
 GameHoleContests.c:
