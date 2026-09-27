@@ -1257,7 +1257,7 @@ void fn_80168918(UIStudio* pStudio, u8 bOn, s32 nId, UISNodeInfo* pInfo, s32* p,
     UISNode* pCheck;
     UISHandler* pMap; // name: Madden 2003 STABS
     s32 i;
-    s16 nNode16;
+    s32 nNode16;
     void* pScript;
     u32 n;
     s32 aArgs[2];
@@ -1280,13 +1280,14 @@ void fn_80168918(UIStudio* pStudio, u8 bOn, s32 nId, UISNodeInfo* pInfo, s32* p,
     }
     pLinkNode = NULL;
     n = pScreen->pData->nNodes;
+    // fake match: EA compares (s16)nNode directly. Set once from a 64-bit value and again (the
+    // same value) in the inner loop's step, the compare's operand has two definitions: the inner
+    // loop's hoisted conversion reaches it through a copy that survives copy propagation and is
+    // coalesced by the register allocator, which gives EA's registers and preheader order.
+    nNode16 = (s16)(s64)nNode;
     while (n-- != 0) {
-        // fake match: EA compares (s16)nNode directly. Set here from a 64-bit value, the frontend
-        // leaves the conversion to the inner loop's hoisted temp instead of hoisting it out of
-        // this loop, which gives EA's registers.
-        nNode16 = (s16)(s64)nNode;
         pCheck = &pScreen->pData->pNodes[n];
-        for (i = 0; i < (s32)pCheck->nHandlers; i++) {
+        for (i = 0; i < (s32)pCheck->nHandlers; i++, nNode16 = (s16)nNode) {
             pMap = &pCheck->pHandlers[i];
             if (!(pMap->uFlags & 0xC000) && (pMap->uFlags & 0x2FFF) == nNode16) {
                 pLinkNode = pCheck;
