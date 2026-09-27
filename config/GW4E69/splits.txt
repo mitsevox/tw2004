@@ -727,6 +727,7 @@ GoShaderObject_Glows_Gc.c:
 	.text       start:0x80097F44 end:0x80098A98
 	.data       start:0x80189D78 end:0x80189D98
 	.bss        start:0x801D99D0 end:0x801D9A68
+	.sbss       start:0x80281F80 end:0x80281F88
 	.sdata2     start:0x80283DF8 end:0x80283E20
 
 UFstPart.c:
