@@ -124,3 +124,16 @@ result.
   (0x80189E68), after UFstPart.c's .data (BootCourse.c, between them in .text, has no .data).
   Defined ahead of the functions so it leads the file's .data.
 - Result: SunFlr_Gc .data 0x80189DA8..0x80189E78. main.dol: OK.
+
+## auto_05_8018C7C8_data (96 B): lbl_8018C7C8 + lbl_8018C7D8 -> MC.c
+
+- lbl_8018C7D8: MCOpSet[4] (memcard.h), the memory-card operations: 15 of its 20 entries are
+  MC.c functions (plus four EASportsBio.c ones and a NULL); users FE_MessageTable, startUp.
+  lbl_8018C7C8: u32[4] GX primitive kinds (engine.h), only user DynamicRenderingBuffer.
+- Position: after MC_Gc.c's .data ("BASLUS-20572", ends 0x8018C7C5), before MC.c's
+  ("../BASLUS-20757" at 0x8018C828); 0x8018C7C8 is 8-aligned, so both can open MC.c's .data.
+  lbl_8018C7C8's owner is not proven (MC_Gc.c after its strings would also fit); it goes with
+  its neighbour into MC.c.
+- Done: both defined at the top of MC.c (with prototypes of the table's functions, and core/easb.h
+  for two EASportsBio ones); entries whose definitions have other types are cast to MCOp, with a
+  port: note. main.dol: OK.

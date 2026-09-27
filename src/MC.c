@@ -11,12 +11,41 @@
 #include "game/earnings.h"
 #include "game/frontend.h"
 #include "frontend/uistudio.h"
+#include "core/easb.h"
 
 s32 MC_LoadLastUser(s32 nPort, s32 nSlot, s32 nProfile);
 s32 fn_800A2248(s32 nPort, s32 nSlot);
 s32 fn_800A0B18(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage);
 s32 fn_800A0BC8(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage);
 void MC_FillCRCTable(void);
+s32 MC_SaveOptions(MCCardPos* pPos);
+s32 MC_LoadOptions(MCCardPos* pPos);
+int fn_800A1758(MCCardPos* pPos);
+s32 fn_800A2630(MCCardPos* pPos);
+void MC_MemoryRequiredForOptions(MCCardPos* pPos);
+s32 MC_SaveUser(MCCardPos* pPos);
+s32 MC_LoadUser(MCCardPosStr* pPos);
+s32 MC_GetNumUser(MCCardPos* pPos);
+s32 fn_800A26A0(MCCardPos* pPos);
+void fn_800A270C(MCCardPos* pPos);
+s32 fn_800A036C(MCCardPos* pPos);
+s32 fn_800A0230(MCCardPos* pPos);
+s32 fn_800A09EC(MCCardPos* pPos);
+s32 fn_800A2668(MCCardPos* pPos);
+void fn_800A2740(MCCardPos* pPos);
+s32 fn_8012555C(s32* pArgs);            // EASportsBio.c
+s32 fn_801255C4(s32* pArgs);            // EASportsBio.c
+
+u32 lbl_8018C7C8[4] = {0x98, 0xA0, 0, 0xB0};
+
+// port: the table calls every entry as an MCOp; the entries cast here have other types in their
+// definitions (void results, int, MCCardPosStr*, s32*), which a port gives one signature.
+MCOpSet lbl_8018C7D8[4] = {
+    {{MC_SaveOptions, MC_LoadOptions, (MCOp)fn_800A1758, fn_800A2630, (MCOp)MC_MemoryRequiredForOptions}},
+    {{MC_SaveUser, (MCOp)MC_LoadUser, MC_GetNumUser, fn_800A26A0, (MCOp)fn_800A270C}},
+    {{fn_800A036C, fn_800A0230, fn_800A09EC, fn_800A2668, (MCOp)fn_800A2740}},
+    {{(MCOp)fn_801251EC, NULL, (MCOp)fn_80125118, (MCOp)fn_8012555C, (MCOp)fn_801255C4}},
+};
 
 // At boot: no created golfer yet; try MC_LoadLastUser on each card, and at the first that succeeds mark
 // player slot 0's profile loaded and return 1.
