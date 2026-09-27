@@ -1078,7 +1078,7 @@ config.libs = [
             #   from the switch tables in .data; the string offsets in fn_80165E9C match.
             Object(Matching, "UISEvent.c", extra_cflags=UIS_CFLAGS),
             Object(NonMatching, "UIStudio.c", extra_cflags=UIS_CFLAGS),
-            Object(NonMatching, "UISApi.c", extra_cflags=UIS_CFLAGS),
+            Object(Matching, "UISApi.c", extra_cflags=UIS_CFLAGS),
             Object(Matching, "UISScreen.c", extra_cflags=UIS_CFLAGS),
             Object(Matching, "GoDynObjTypes.c"),
             Object(Matching, "unsorted/sweep_800977CC.c"),
