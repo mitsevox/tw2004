@@ -41845,5 +41845,21 @@
 "matched_functions": 7598,
 "total_functions": 7647,
 "exact": 7598
+},
+{
+"commit": "1dc48c1",
+"sha": "1dc48c12de27c696f737b7bb3f9a318cba250d56",
+"time": 1790472774,
+"subject": "Merge g-ea: GoGreenGrid linked (constant-pool stand-in, functions in address order)",
+"report": true,
+"matched_code": 1500968,
+"complete_code": 1344236,
+"matched_data": 723887,
+"complete_data": 869763,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7598,
+"total_functions": 7647,
+"exact": 7598
 }
 ]
