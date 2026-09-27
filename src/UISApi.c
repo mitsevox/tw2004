@@ -588,9 +588,13 @@ static inline void* UISFile_Fix(UISScreenFile* pFile, void* p) {
 // Fixes up a UI file the first time it is seen: every offset in it becomes a pointer, and each
 // link word names its pEntriesC entry by pointer (0 when out of range). Returns 1, or -1 when the
 // file was already fixed up (its node table then lies after its start).
-// fake match: the file's address is held in three integer locals (unsigned int for most fixes,
-// int for the entries' and unsigned int for the handlers'), and the entry, pEntriesC and link
-// loops have their own counters (for EA's hoisted copies).
+// fake match: the file's address is held in integer locals (nBase1 for most fixes, nBase2 for the
+// entries'), and the entry, pEntriesC and link loops have their own counters (for EA's hoisted
+// copies). The handlers' base and the pEntriesC, link and start loops' bases are an OR of the
+// address with a second copy of it (x | x == x): the frontend cannot fold an OR of two variables,
+// so it stays as `or rD,rS,rS`, the original's `mr rD,rS` (the same encoding), which neither copy
+// propagation nor the register allocator removes. The tail copies use different integer types
+// so the frontend does not share one OR between the loops.
 // port: the fixes add 32-bit offsets to the file's address held in an integer.
 s32 fn_80169DC4(UISScreenFile* pFile) {
     u32 i;
@@ -604,15 +608,18 @@ s32 fn_80169DC4(UISScreenFile* pFile) {
     UISHandler* pHandler;
     unsigned int nBase1;
     int nBase2;
-    unsigned int nBase3;
+    u32 nBase3;
     u32 i1;
     u32 i2;
+    u32 nBase4;
+    long nBase5;
+    int nBase6;
 
     if ((u8*)pFile->pNodes < (u8*)pFile) {
         pFile->pNodes = (UISNode*)UISFile_Fix(pFile, pFile->pNodes);
         nBase1 = (unsigned int)pFile;
-        nBase2 = (int)pFile;
-        nBase3 = (unsigned int)pFile;
+        nBase2 = (int)(u32)nBase1;
+        nBase3 = (u32)nBase1;
         for (i = 0; i < pFile->nNodes; i++) {
             pNode = &pFile->pNodes[i];
             pNode->pInfo = (UISNodeInfo*)(nBase1 + (u32)pNode->pInfo);
@@ -637,30 +644,34 @@ s32 fn_80169DC4(UISScreenFile* pFile) {
             while (k-- != 0) {
                 pHandler = &pNode->pHandlers[k];
                 if (pHandler->uEvent != 0xFFFF) {
-                    pHandler->u4.pScript = (u8*)(nBase3 + (u32)pHandler->u4.pScript);
+                    pHandler->u4.pScript = (u8*)(((unsigned int)nBase3 | nBase1) + (u32)pHandler->u4.pScript);
                 }
             }
         }
+        nBase4 = (u32)pFile;
         pFile->pEntriesC = (UISFileEntryC*)UISFile_Fix(pFile, pFile->pEntriesC);
         i1 = pFile->nEntriesC;
         while (i1-- != 0) {
-            pFile->pEntriesC[i1].p8 = (void*)(nBase1 + (u32)pFile->pEntriesC[i1].p8);
+            pFile->pEntriesC[i1].p8 = (void*)((nBase4 | (u32)pFile) + (u32)pFile->pEntriesC[i1].p8);
         }
+        nBase5 = (long)pFile;
         pFile->pLinks = (u32*)UISFile_Fix(pFile, pFile->pLinks);
         i2 = pFile->nLinks;
         while (i2-- != 0) {
-            pLink = (u32*)((u8*)pFile + pFile->pLinks[i2]);
+            pLink = (u32*)((u8*)(nBase5 | (long)pFile) + pFile->pLinks[i2]);
             if (*pLink < pFile->nEntriesC) {
                 *pLink = (uptr)&pFile->pEntriesC[*pLink];  // port: a pointer stored in a 32-bit word
             } else {
                 *pLink = 0;
             }
         }
+        nBase6 = (int)pFile;
         pFile->pStart = (UISEntry*)UISFile_Fix(pFile, pFile->pStart);
         i = pFile->nStart;
         while (i-- != 0) {
             if (pFile->pStart[i].u4.pnOffset != NULL) {
-                pFile->pStart[i].u4.pnOffset = (u32*)(nBase1 + (u32)pFile->pStart[i].u4.pnOffset);
+                pFile->pStart[i].u4.pnOffset =
+                    (u32*)((nBase6 | (int)pFile) + (u32)pFile->pStart[i].u4.pnOffset);
             }
         }
         return 1;
@@ -673,12 +684,17 @@ s32 fn_80169DC4(UISScreenFile* pFile) {
 // reaches fTarget the function finishes and its done script (or the first node's event -14
 // handler) runs.
 void fn_8016A030(UIStudio* pStudio, u32 uMs) {
+    // fake match: this declaration order (with uMsCopy and the pfVar identity below) gives EA's
+    // registers: n, pArg1, pArg2 and uMsCopy leave the allocator's graph before the others.
+    u32 uMsCopy;
+    u32 n;
+    s32* pArg1;
+    s32* pArg2;
+    UISRateFn* pRate;
     u32 i;
     UISScreen* pScreen;
     UISWordStack* pStack;
     s32 nLeft;
-    u32 n;
-    UISRateFn* pRate;
     s32 nArgs;
     u8* pScript;
     f32 fScale;
@@ -687,6 +703,14 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs) {
     UISWord wScale;
     s32 aArgs[3];
 
+    // fake match: uMsCopy is uMs: each OR's low word is the value | 0 (the value shifted up only
+    // fills the high word, which is dropped). The three become copies only after constant
+    // propagation, so one link reaches register allocation, which merges uMs into uMsCopy; the
+    // loop's value then has uMsCopy's higher number (EA's r22, removed before pStudio).
+    // port: a port writes uMsCopy = uMs.
+    uMsCopy = (u32)((u64)uMs | ((u64)uMs << 32));
+    uMsCopy = (u32)((u64)uMsCopy | ((u64)uMsCopy << 32));
+    uMsCopy = (u32)((u64)uMsCopy | ((u64)uMsCopy << 32));
     fn_80165C74(pStudio);
     pStack = &pStudio->stack78;
     pStudio->uFlags |= 4;
@@ -696,7 +720,17 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs) {
         if (pRate->uState != 2) continue;
         pScreen = pRate->pScreen;
         if (pRate->u10 == 0) continue;
-        pRate->n8 += uMs;
+        // fake match: &aArgs[1] / &aArgs[2] set on both arms of a test that is always true here (the
+        // branch reuses the continue's compare and disappears); the two definitions keep the stores'
+        // addresses in registers hoisted out of the loops (EA's addi r24,r1,0x20 / addi r23,r1,0x24).
+        if (pRate->u10) {
+            pArg1 = &aArgs[1];
+            pArg2 = &aArgs[2];
+        } else {
+            pArg1 = &aArgs[1];
+            pArg2 = &aArgs[2];
+        }
+        pRate->n8 += uMsCopy;
         nLeft = pRate->n8 - pRate->nC;
         while (nLeft >= (s32)pRate->u10) {
             nLeft -= pRate->u10;
@@ -705,10 +739,10 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs) {
                 if (pRate->uState != 2) break;
                 wScale.f = 1.0f;
                 aArgs[0] = pRate->uId;
-                aArgs[1] = pRate->nC;
+                *pArg1 = pRate->nC;
                 if (pRate->u20 == 0) {
                     nArgs = 3;
-                    aArgs[2] = pRate->u10;
+                    *pArg2 = pRate->u10;
                 } else {
                     nArgs = 2;
                 }
@@ -720,10 +754,19 @@ void fn_8016A030(UIStudio* pStudio, u32 uMs) {
             }
             if (pRate->u20 != 0) {
                 pfVar = fn_8016C1A4(pRate->u20, pRate->pInfo);
+                // fake match: pfVar goes through a 64-bit shift up and back down (the value is
+                // unchanged). The copy of the call's result it leaves is merged at register
+                // allocation and stays a neighbour of every variable live here: one more for each
+                // of them, which gives EA's allocation order.
+                // port: relies on the conversion to s64 wrapping and on >> of a negative s64 being
+                // arithmetic; truncates the pointer to 32 bits. A port leaves this line out.
+                pfVar = (f32*)(u32)((s64)((u64)(u32)pfVar << 32) >> 32);
+                // fake match: fStep read into fValue before the scale test (EA loads it there)
+                fValue = pRate->fStep;
                 if (fScale < 0.0f) {
                     fScale = 1.0f;
                 }
-                fValue = pRate->fStep * fScale + *pfVar;
+                fValue = fValue * fScale + *pfVar;
                 if ((pRate->fStep > 0.0f && fValue < pRate->fTarget)
                     || (pRate->fStep < 0.0f && fValue > pRate->fTarget)) {
                     *pfVar = fValue;

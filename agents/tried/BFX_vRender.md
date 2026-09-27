@@ -1,6 +1,11 @@
 # BFX_vRender (goballfx.c, 0x80093AE0)
 
-Status: OPEN, 90.12766% on 2026-09-25.
+Status: SOLVED 2026-09-27 (b2, third agent): 100%, goballfx linked. Fix: `pPos = lbl_801D95C8[nPlayer];`
+(plain; the earlier `(s64)` product is gone) plus three labelled fake-match assignments that leave
+pPos unchanged and only add dead sign extensions (srawi) of a dead 64-bit high word: after store [3]
+`pPos = (f32*)(s32)((u64)(u32)pPos | (((u64)(s64)(s32)lbl_801D9578[nPlayer] >> 32 |
+(u64)(u32)lbl_801D94D8[nPlayer]) << 32));` and the same with `nPlayer * 4 | (s32)((s64)nPlayer >> 32)`
+/ `nPlayer`, and after UV store [0] the same with `nPlayer` / `nPlayer`. See the first attempt below.
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -8,6 +13,103 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-27 b2 (third agent; quicktrial aligned, 16 at start; scripts or*.py, combo*.py, whatif*.py,
+  ph_model.py, degturn.py in the lane scratch). **Mechanism facts (dumps):** the register
+  allocator's liveness skips a dead instruction entirely (its uses do not extend anything) EXCEPT
+  `srawi` (it sets XER[CA], so it is never "dead"): a dead srawi interferes with everything live
+  across it AND keeps its source live up to it; `or`/`rlwinm`/`mulhw`/`li` with a dead result get 0
+  neighbours (GameMode22's OR works through GLOBAL liveness across its loop, not inside a block).
+  So a dead `or` feeding a srawi IS live: `srawi(a | b)` keeps both a and b live to the srawi, and
+  both are deleted after allocation. Placing it: `pPos = (f32*)(s32)((u64)(u32)pPos | (((u64)(s64)(V)
+  >> 32 | (u64)(u32)(P)) << 32));` (low word = pPos, logic unchanged; the (s64)(V) is srawi V).
+  Frontend CSE temps (@N) are coloured after all backend temps, so a `(s64)nPlayer` shared with the
+  pPos product (hi word = srawi nPlayer = "X0") is coloured late, after the bytes: the only way to
+  get a value into r9 for n*32.
+  Results: (1) V = `(s32)lbl_801D9578[nPlayer]`, P = `lbl_801D94D8[nPlayer]`, after store [3]: 16 -> 9
+  (the red/UV instruction order is EA's). (2) + `(u8)(s32)(s64)(s32)` on store [2]'s byte and
+  V = `nPlayer * 4`, P = row[0] after store [15] + `lbl_80189CB0[(s32)(s64)nPlayer][0]` on store 12:
+  3 (only n*32 r7 vs r10 left). (3) chain V = `(nPlayer * 4 | (s32)lbl_801D94D8[nPlayer]) |
+  (s32)((s64)nPlayer >> 32)` (keeps n*4 and X0 live past the UV add): EVERY volatile register is
+  EA's (blue r8, n*32 r10, X0 in r9 and deleted) but the saved registers permute (pBall r28, pPos
+  r29, pColour r31): 43. Minimal form (m2: C1 of (1) + V = `nPlayer * 4 | (s32)((u64)(s64)nPlayer
+  >> 32)`, no store round trips): 43, same. Why (rasim replay + what-if): pColour and pUV must leave
+  the graph in the FIRST simplify sweep (<= 28 neighbours at their turn) so pPos/nPlayer/pBall are
+  coloured first; the dead-op temps live across pUV's def push pUV to 30 (needs 2 fewer: e.g. the
+  chain's or+srawi or C1's srawi scheduled before the UV add). Tried for that: chain duplicated
+  (no frontend CSE of or-expressions), chain held in locals (copy-propagated away), chain reading
+  the UV base instead of the row (still scheduled after the UV add), 256 chain spellings (atoms
+  n*4, UV row/base, X0 signed/unsigned, n*32, bytes; `|`/`+`): best 40/43; desc.pColour/pUV
+  spellings and desc statement orders (720 sampled): 43+.
+  **The fix (exact, e3 in scratch early.py):** drop the `(s64)` from the pPos product (plain
+  `lbl_801D95C8[nPlayer]`), put the chain statement (signed form `(s32)((s64)nPlayer >> 32)`)
+  right after C1 (so it is early in block order and the scheduler issues its or/srawi before the UV
+  add: they stop being pUV's neighbours), and give `(s64)nPlayer` its second occurrence late with
+  a third dead statement after UV store [0] (V = P = `nPlayer`), which keeps X0 a late-coloured
+  frontend temp (@ numbers follow the order of each expression's SECOND occurrence). Every register
+  is EA's; the only listed difference left was the aIndex `@13+4` relocation, which links fine.
+  Each statement is needed (dropping any one: 3-11 wrong registers). Metric used for the search:
+  aligned diff where register-only differences count as distinct renamings (regmetric.py).
+
+- 2026-09-27 b2 (second agent; quicktrial aligned). **Colours copied straight between the globals,
+  as sibling GoObjShadow fn_80093DB8 writes its arrays: `lbl_801D9578[nPlayer][k] =
+  lbl_80189CB0[nPlayer][k & 3]` x16, no rgba / pColour locals, UV direct, `desc.pColour =
+  lbl_801D9578[nPlayer]`, pPos with the s64 product: 20 -> 16, real 90.13 -> 97.80 (applied).**
+  The four bytes become frontend CSE temps (@11-14) coloured after the n*4 / n*16 temps, which
+  fixes table base r6, n*4 r7, pColour hi r5, n*16 r8, red r5, green r6, alpha r4. Left: blue r7
+  (EA r8), n*32 r8 (EA r10), and 4 instructions of the red/pColour/UV cluster in a different order.
+  Same as a `for (i = 0; i < 4; i++)` loop with `[i * 4 + k]` (16); `i += 4` loop 69; pColour local
+  51+; UV before the colour stores 47-48; pPos plain 25, `(u64)` 22, `(f32*)base + (s64)n * 12` 39.
+  64-bit index spellings on the UV row / pColour / colour row (`(s64)n * 32`, `<< 5`, `(u64)`,
+  `[(s64)n]`, per-site or all sites) on the 20 base: 25-80. One `(u32)(s64)(s32)nPlayer` round trip
+  on any single `[nPlayer]` index, or `(u8)(s64)(s32)` on one loaded byte, on the 16 base, UV block
+  at 4 places: 16 best (none), the rest 47-120 (breaks the frontend CSE).
+  On the 16 base, also no gain: GXColor-typed source and/or destination tables (16 each); a subset
+  of the bytes in locals, every declaration order (20-30); per-function pragmas (scheduling off/
+  once/604/7400, opt_propagation/common_subs/dead_assignments off 32-79, opt_lifetimes/
+  loop_invariants/strength_reduction/dead_code/unroll off and optimization_level 3: all 16,
+  level 2 54, level 1 331, peephole off 114); 64-bit spellings (`(s64)n << k`, `* N`, `(u64)`,
+  `(s32)(...)`, `[(s64)n]`, round trip) on the UV / pColour / colour-table row at all, first,
+  second or last use (22-107).
+  **Why the last two registers are hard (model, scratch ea_*.py, s750f.py, s750p.py):** the
+  allocator colours in descending vreg order, lowest free register. On this base the order is
+  backend temps, then O4 (n*4) @9, O16 (n*16) @10, R/G/B/A @11-14, O32 (n*32) @15. For blue to take
+  r8, a value in r7 must be live at blue's load and coloured before it; the only r7 value in EA's
+  code is n*4, whose last use is red's lbzx, which precedes blue's load in every schedule we get.
+  For n*32 to take r10, r7, r8 and r9 must be live somewhere in its range; nothing in EA's code is
+  ever in r9, so EA's pre-allocation code had a value there that vanished (a dead srawi). An
+  exhaustive replay (current pre-RA order, all positions and colouring slots): no single point
+  phantom, no two point phantoms (also with any one instruction moved) give EA's registers; two
+  phantoms WITH live ranges would (12k placements), but a dead srawi is a point: its consumer
+  (e.g. the dead `rlwinm hi,5` of `(s64)n << 5`) is deleted before liveness, so it only interferes
+  with values live across its def (checked: dump of `(s64)nPlayer << 5` on one UV store, srawi
+  r39 @15 has 7 neighbours, none defined after it). A dead srawi DOES extend the live range of the
+  value it reads (a round trip on n*4 keeps n*4 live to the srawi): the model finds blue right with
+  one such srawi on n*4 placed after blue's load, but n*32 still needs a point phantom in r9 inside
+  its short range while r0, r3..r8 are live, which none of the searched schedules has. With a free
+  pre-RA order the nearest solutions move the pPos `add` after the colour/UV address work (a
+  schedule the first pass never makes: the add is on the critical path). The first-pass model
+  (sched750 + an FPU unit, FP ops complete after 3 cycles, alias-aware memory edges: constant-pool
+  loads free, distinct globals unordered, pBall loads 'unknown'; the dump's B8 + B9-before-the-call
+  are one block to the scheduler) reproduces every GPR instruction of B8's real first pass on 7
+  dumps (only the stb / UV-stfs interleave differs). In that model dead srawis land at the block's
+  end (low height), extending their sources to the end.
+  What WOULD give EA's registers on today's pre-RA order (model, ea_src.py / ea_src3.py): (a) three
+  dead srawis inside n*32's range right after its rlwinm, two reading n*4 and one reading the UV
+  `lis` (or the pColour `addi`), the first coloured after the bytes and before n*32 (it takes r9);
+  or (b) `li r3,0x70` moved up to just after the UV `addi`, then two srawis: one reading any
+  live-through value inside n*32's range (r9) and a later one reading n*4. Neither is reachable:
+  in the first-pass model every single srawi (any source, any input position: 24 distinct
+  schedules) and every pair (1,152 distinct schedules, ea_pipe4.py) leaves blue and n*32 wrong,
+  and the srawis always issue after the UV `add`. A real `(s64)(s32)` round trip on the n*4 offset
+  breaks the CSE of the colour row (flat / row-pointer spellings with the round trip: 63-76).
+  Checked for decomp-notes (dead srawi deletion): in the dump of `r = lbl_80189CB0[(s64)nPlayer][0]`
+  (scratch dump_t1) `srawi r0,r30,31` is the block's last GPR def (nothing later in B8 writes r0;
+  B9 is the call) and backend-14 (post-RA peephole) has no srawi: the "later overwrite in the same
+  block" rule is incomplete; a register dead at the block's end (here r0 before a call) also
+  lets it go.
+  Next step if anyone continues: find a C form whose first pass issues `li r3,0x70` (the call
+  argument) or a round trip's srawi before the UV `add` (s750p.py predicts a variant's first pass
+  from a mwccdbg dump in seconds; ea_dump.py / ea_pipe3.py score the allocation).
 - 2026-09-27 b2 (quicktrial aligned; current source 31, all four colour bytes read direct
   `lbl_80189CB0[nPlayer][k]` = "DIRECT" 32). Scripts in the lane scratch (bfx*.py, climb*.py,
   phsim*.py). Two real levers found, one wall:

@@ -476,7 +476,35 @@ They will be sorted into the sections below.
 - Other compiler versions (GC 2.0, 2.0p1, 2.6, 2.7, 1.3.2) gave output identical to 2.5 on 18 near-miss
   functions tried today: not a lever for these.
 
-### New from round 7 (2026-09-26 evening)
+### New from round 7 (2026-09-26 evening to 2026-09-27)
+
+**Which lever first** (symptom -> first try; each has its entry below). Read the compiler's view
+first (mwccdbg last pass, `rasim.py` replay, `sched750.py`); most of these are labelled fake matches,
+so try EA's own forms (TW07, one local per job, the unswitched loop) before them.
+
+- Only the order inside one block differs, registers right -> `sched750.py deadsearch`, then a dead
+  `(s64)(s32)` round trip on the value it names (its srawi takes an issue slot; also reorders float
+  ops). Entry-block parameter copies in the wrong order -> a signed 64-bit index product
+  (non-power-of-two size). Independent entry `li`/`rlwinm` order -> `#pragma scheduling once`.
+- A kept `mr rX,rY` that no copy chain reproduces -> the OR lever (`x | y`, y a separate integer
+  local). A call result's `mr r0,r3 ... mr rN,r0` -> the 64-bit shift self-assignment after the call.
+- EA copies a different parameter register than ours -> `#pragma optimization_level 1|2`, or the
+  late `void*` copy.
+- Register order rotated, the candidates sitting at 28 neighbours (rasim trace) -> add one codeless
+  neighbour: a dead srawi (inside a block), a 64-bit OR high word (across blocks), a coalesced
+  inline-parameter phantom, a `(s64)` call argument. Remove one: a local declared later, a separate
+  local per job.
+- Float saved-register order wrong (constants or call temps coloured first) -> inline-parameter
+  phantoms (two-definition inline parameter), or one-element arrays numbered by first use.
+- A value must stay live with no code -> across blocks: a 64-bit OR high word; inside one block:
+  only a dead srawi (nothing else extends liveness).
+- A local must colour above/below a frontend temp (declaration order cannot do it) -> change the
+  webs: a fresh local per job stays a local; a reused variable's later webs become temps.
+- A hoisted address or constant folded into its users -> a two-definition phi (if/else, same value).
+- EA puts loop preheaders at the function's end -> the code in an inline (goto cleanup).
+- A 2-instruction block in the wrong order that our build never schedules -> EA's block had a third
+  instruction (a coalesced copy) there.
+- Spill slots or spill set wrong -> declaration order (slots follow vreg order).
 
 - **[verified, fake-match class] A kept `mr rX,rY` may be `or rX,rY,rY`** (the same encoding,
   e.g. 7F7EDB78 = `mr r30,r27`). The register allocator only coalesces opcodes flagged "is a
@@ -530,6 +558,9 @@ They will be sorted into the sections below.
   the srawi stays in the output. UISEvent fn_80165ACC 99.08 -> 100: natural form (no copies) with
   `fn_8016B0F8(pStudio, (s64)*pData, (s64)nArgs, pArgs)` lifts pStudio, uScreen and p from 27 to
   29 neighbours, so they leave the graph in the second sweep and take r31/r30/r29 (rasim replay).
+  Completed 2026-09-27: the deletion rule is "not live out of the block": a srawi whose register
+  is dead at the block's end also goes (BFX_vRender: r0 before a call), and inside a loop a dead
+  srawi is never deleted (GameMode22 fn_801264B8 lab tests).
 - **[verified, fake-match class] An index written as a signed 64-bit product adds an early
   instruction that leaves no trace.** `(u8*)p + (s32)n * (s64)sizeof(T)` in place of `&p[n]`
   makes `li rK,size; mulhw` for the dead high word; the pre-RA scheduler issues the `li` in the
@@ -563,6 +594,20 @@ They will be sorted into the sections below.
   `((volatile AudTrack*)pTrack)->u.stm.pStream` / `.uReadPos` and
   `((volatile AudStream*)pStream)->uOffset` (same values), the cap computed first. Needs the exact
   subset: any two of them, or one more (uLength), do not match.
+- **[verified, fake-match class] The "load deletion" pass removes an unused `li` only when
+  constant propagation changed something in the function.** An OR against a zero word triggers it:
+  `(((u64)(u32)p << 32) | (u64)(u32)p) >> 32` is p again, but the zero low word it folds makes the
+  pass run, and a leftover `li 0` (from other identity chains) is deleted instead of being reused
+  by the second CSE for a later `i = 0`. It also adds copy-propagation passes, so levers that
+  count copy-chain links need retuning after it. UISEvent fn_80165E9C 95.59 -> 100
+  (agents/tried/fn_80165E9C.md).
+- **[verified, fake-match class] A copy chain written after an instruction makes a parameter's
+  saved copy its LAST link, which fixes the entry order.** `p = (T*)(u32)((u64)(s64)((u64)(u32)p
+  << 32) >> 32);` (an identity; six of them in UISEvent fn_80165E9C) keeps copies of p until late
+  passes, so the pre-RA scheduler issues the pool base's `addi` before the `mr` of the parameter
+  (EA's order). Chain back into the parameter itself: a new local gets a higher vreg and the
+  wrong register; signed-shift or `(s64)(s32)` links leave dead srawi readers that pull the chain
+  early.
 - **[verified, fake-match class] A dead `(u32)(s64)(s32)x` can reorder a whole block through the
   first scheduling pass**, not only add an allocator neighbour: its `srawi` takes an issue slot
   and an integer unit (and the 750's rule that an integer op cannot issue beside a busy unit if it
@@ -572,6 +617,189 @@ They will be sorted into the sections below.
   fn_800949D0 97.89 -> 100: the round trip on n in `if (nLive <= (u32)(s64)(s32)n)` gave EA's
   order and registers (pVerts back to its plain form); the same round trip on nFirst * 36 had given
   every register but left 4 instructions out of order, and one on `n = ...` itself keeps a copy.
+
+Added 2026-09-27 (from the ledgers solved that night; each ledger has the full story):
+
+*Codeless neighbours and liveness*
+
+- **[verified] Inside a block, only a dead `srawi` extends liveness.** The allocator's liveness
+  skips a dead instruction entirely, except `srawi` (it sets XER[CA], so it is never "dead"): a
+  dead srawi interferes with everything live across it and keeps its source live up to it. A dead
+  `or`/`rlwinm`/`mulhw`/`li` gets 0 neighbours, but a dead `or` feeding a srawi is live, so
+  `srawi(a | b)` keeps both a and b live, and both go after allocation. Fake-match form (low word
+  = pPos, logic unchanged): `pPos = (f32*)(s32)((u64)(u32)pPos | (((u64)(s64)(V) >> 32 |
+  (u64)(u32)(P)) << 32));`. goballfx BFX_vRender 16 -> 0 aligned with three such statements
+  (placed early in block order so they issue before the UV add), 97.80 -> 100.
+- **[verified, fake-match class] A 64-bit OR high word keeps a value live ACROSS blocks and leaves
+  no code.** The backend has no dead-code pass for non-copies: the high word of a 64-bit op whose
+  low word is used survives to allocation, and the post-RA peephole deletes it outside loops.
+  `nWinner = (s32)((u64)(s64)nWinner | ((u64)(u32)pPlayer << 32));` after loop 1 keeps pPlayer live
+  to the loop's end (11 -> 24 neighbours): GameMode22 fn_801264B8 97.96 -> 100. The low word must
+  reduce to a copy (`+` leaves `addc`; an unsigned OR/XOR folds the high word to a copy: use the
+  `(s64)` form). Within a block it does nothing (liveness is global there; use a srawi). Also
+  UISScreen fn_8016A2D4 (uEvent kept live across the calls). Dead copies never get this far: the
+  first copy-propagation pass deletes every dead copy at once, even under `opt_dead_assignments off`.
+- **[verified, fake-match class] A dead srawi fixes float scheduling too.** A srawi that is ready
+  early takes the first free issue slot whatever its source, pushing a float op back: uiArc
+  fn_80102AC8 (EA's first pass issued fV0's `fadds` after the other corners' `fsubs`, the one
+  interference rasim said was missing). Host it on an int already live through the block, or its
+  GPR moves: `((s32)(s64)(s32)pArc->uFlags & 0x10)` in both ternaries, 98.26 -> 100.
+  `(s32)(s64)x` without the inner `(s32)` makes no srawi.
+- **[verified, fake-match class] More evidence for the signed 64-bit product**: UISApi fn_80169D90
+  66.85 -> 100 (`(u32)((s32)(nScreens + 1) * (s64)sizeof(UISScreen))` on the screen term: its
+  `li; mulhw` joins the pre-RA schedule). A power-of-two size folds to a shift and leaves no mulhw
+  (the handlers term: no effect). UISApi fn_80169C0C needed seven dead instructions in total:
+  `#pragma optimization_level 2` + four u32 parameter copies + three `(u32)(x * (u64)sizeof(T))`
+  products (64 -> 0 aligned; six gave 1).
+
+*Kept copies*
+
+- **[verified, fake-match class] A call result's kept copy (`mr r0,r3 ... mr rN,r0`): a 64-bit
+  shift self-assignment right after the call**, `x = (s32)((s64)((u64)x << 32) >> 32);`: it becomes
+  a copy chain after x, so the call-result copy survives the copy-propagation passes. UISApi
+  fn_80169858 99.34 -> 100; UISScreen fn_8016A2D4 (nRet), fn_8016AD54. For a signed value keep
+  the inner `(u64)(u32)` (a `(u64)(s32)` leaves a dead srawi of x that takes r0: fn_8016AD54 31 vs
+  8). Each extra copy-propagation pass in a function eats one link: add
+  `x = (s32)(u64)(u32)x;` for exactly one more. Works only on copies from a physical register
+  (fn_80169DC4: no effect on plain local copies).
+- **[verified] `x = (u32)(s32)x;` as a statement** is dropped by the frontend but still counts as a
+  redefinition for its copy substitution: later reads keep x instead of its source (UISScreen
+  fn_8016A2D4; it also restored the nRet chain after an OR woke constant propagation).
+- **[verified, fake-match class] Loop-carried copies**: `pLoop = pNode;` before the loop and again
+  inside it keeps EA's copies of a pointer (UISScreen fn_8016AD54, then fn_8016ABBC 96.23 -> 100
+  with the same recipe + rasim declaration order). A copy that steals a pre-RA slot from the load
+  after it: read the carried copy into a second local first (`pPrev8 = pLoop8; pLoop8 = pNode;
+  call(.., pPrev8->ppGroups[i])`, 3 -> 0). Needs the source copy and the carried copy in different
+  blocks; in a one-block preheader they interfere and the in-loop copy stays (fn_80169DC4).
+- **[verified] OR lever, details**: the second operand must be an integer local of another type
+  (`void*`/`T*` copies fold; `(u32)p | x` with `u32 x` folds; UISScreen fn_8016C270 153 -> 81, then
+  exact with a `(void*)` copy of pStack declared first). Several ORs of one source in one
+  preheader are merged by the backend CSE unless each uses a different integer type (u32 / long /
+  int: UISApi fn_80169DC4 96.74 -> 99.39). The post-RA peephole rewrites the first load after a
+  kept copy to the copy's source only for a real `mr`, not for an `or` (fn_8016ABBC).
+- **[verified] Copies the allocator coalesces**: only temp -> temp copies (a named local is never
+  merged, a parameter copy excepted), and a copy whose source stays live is not coalesced; a copy's
+  destination does not interfere with its direct source. A parameter vreg that dies before the
+  first call is always merged with its incoming register (UISScreen fn_8016A2D4, UISApi
+  fn_80169DC4, Particle fn_80094534). The frontend keeps a user copy variable only when its right
+  side is the first occurrence of a CSE'd cast; `int` and `long` casts form one CSE group, `(u8*)`
+  another, `unsigned int` none (fn_80169DC4).
+- **[verified, fake-match class] A two-definition phi keeps a hoisted stack address**:
+  `if (pRate->u10) { pArg1 = &aArgs[1]; pArg2 = &aArgs[2]; } else { same }` right after
+  `if (pRate->u10 == 0) continue;` stops every folding pass from putting `addi rX,r1,4` back into
+  the stores; CSE reuses the continue test's cr0, the branch disappears. UISApi fn_8016A030 94.83
+  -> 96.33 (every instruction EA's; lever from UIStudio fn_80166098).
+- **[verified] A u8 flag test can delete a loop's `li i,0`**: constant propagation turns the u8
+  `!bLoaded` test's rlwinm into a copy, which lets load deletion drop the loop counter's `li 0`
+  (the late CSE then makes the offset a copy of i). `u32 bLoaded` keeps EA's code: UISApi
+  fn_80169590 5 -> 0 aligned (int/s32 2, u16 5).
+- **[verified, fake-match class] A longer compare chain at entry adds the neighbour a parameter
+  lacks**: `if ((u8)(s32)(s8)bAll)` (extsb -> rlwinm -> cmpli, folded back to `clrlwi.` after
+  allocation) gives the test temp a second pre-RA slot touching pStack: UISApi fn_80168CD8 26 -> 0.
+  Other UIS entry-copy-order misses may share the cause.
+
+*How the frontend numbers variables*
+
+- **[verified] The frontend keeps a variable's name only for its FIRST web; each later independent
+  web becomes a frontend temp** (@N, numbered after the loop IVs and CSE temps, in first-def order,
+  and coloured before every local). Both directions are levers: a fresh local per job stays a
+  local (char fn_80019798: k/m for the second name loop, 28 -> 0; skalib AnimLib_PlanBank `pWork`,
+  own `n`; LLTex TX_spParseTextureGroupFromStream palette counter k); reusing a variable makes the
+  later web a temp (skalib AnimLib_MergeOverlay: i also as the overlay search counter gives EA's
+  `mr` IV copy, 97.36 -> 100). Giving a pointer an earlier dummy use turns its later array webs
+  into temps (uiProcessInterface fn_8008F820: `pPressed = &n38; pButtons = (u32*)(void*)pPressed;
+  *pButtons = 0;`, 99.94 -> 100).
+- **[verified] Frontend CSE temps are numbered in order of each expression's SECOND occurrence**
+  (the first one only records it): add a late extra use to get a late-coloured temp (goballfx
+  BFX_vRender, the third dead statement).
+- **[verified] A one-element local array (`f32 fR[1]`) is scalarized into a frontend temp numbered
+  in order of first use**; a dead store (`fR[0] = 0`, removed) counts as a first use. That puts
+  locals among the temps: uiArc fn_80102AC8, every saved FPR EA's (98.08 -> 98.26, labelled).
+- **[verified] Inlined variables are numbered above the caller's hoisted temps**: an inlined
+  function's locals get vregs above them (first declared = lowest), its parameters between the
+  temps and those locals (UISApi fn_8016A030
+  64 -> 18 aligned, not exact). A `static inline char* Get(char* p) { return p++; }` parameter is
+  numbered before every other inline temp (UISScreen fn_8016B844: pStart r26, 34 -> 0).
+- **[verified, fake-match class] An inline parameter assigned twice gives coalesced float
+  phantoms.** A copy is coalesced only into a frontend temp (inline parameters are temps) and only
+  if it survives copy propagation (the destination has a second definition): `Calc(f32 x, f32 y)
+  { if (x <= y) x = y; return x; }` around an identity `Read(expr)` makes one permanent neighbour
+  per call, which fixed the saved-FPR order of the loop constants: Particle fn_80094534 99.36 ->
+  100 (`fRed = Calc(Read(v10 * t + v0), v20)` for each channel; a named copy local does nothing).
+- **[verified] Spill slots are handed out in vreg order** (locals in reverse declaration order),
+  so declaration order sets EA's slot map (skalib AnimLib_PlanBank; uiArc's f64 corners). A local
+  declared inside a loop body numbers after all function-level ones (AnimLib_MergeOverlay n50Al:
+  the spill tie goes to the higher vreg). A value that is stored and read back (`nClips +=
+  nLibClips; nClipsAll = nClips;` instead of the sum into nClipsAll) turns the reload into a copy
+  (load deletion) and moves the variable's allocator priority: AnimLib_PlanBank 57 -> 0 aligned.
+- **[verified] The spill cost**: each def costs its loop weight, each use twice its loop weight
+  (named vregs all agree); when every node is stuck, the lowest cost / remaining neighbours is
+  picked and coloured last (UISScreen fn_8016A2D4 ledger: one store inside a loop made uEvt cost
+  17 against pbOut's 3).
+
+*Control flow and loops*
+
+- **[verified] The frontend's goto/label cleanup runs only for small functions and inlined code**:
+  it moves loop preheaders to the function's end (EA's layout in UISScreen fn_8016B844). A few extra
+  statements anywhere turn it off; the 'd'/'x' cases as inlines brought it back (226 -> 189). The
+  same function: `while (nCount < nPad) { nCount++; *p++ = ' '; }` gives EA's single `ble` and the
+  counter's final value on the ctr loop's exit path (any `if (n > 0)` around a counted loop keeps
+  two branches).
+- **[verified, EA form] One loop with an invariant `if` is unswitched into two copies that share
+  every temp**: LogoTexture fn_8010FC3C, the two copy loops written as one with `if (bToTexture)`
+  inside (nBase 38 -> 29 neighbours) and the tile base inline in the index (a plain nBase local is
+  reassociated: `shl + (nBase + x%8)`): 144 -> 0 aligned, no fake.
+- **[verified, EA form] A small constant loop is unrolled after the first CSE**, so its copies'
+  constants are not merged with earlier ones: DepthField DF_vDrawBufferToScreen, the two vertices
+  as `for (j = 0; j < 2; j++)` (97.88 -> 100). `#pragma opt_unroll_loops off` on one function hands
+  the unroll to the backend (srwi scheme instead of cmpwi 8): GameMode22 fn_801264B8 (labelled).
+- **[verified] A 2-instruction block EA scheduled differently from ours means a deleted
+  instruction**: our such preheaders are never scheduled (`{0004}` in every pass), so EA's block had a
+  third instruction, a copy coalesced away by allocation. MC fn_8009F8C8: EA's `add row; li k` =
+  loops walking a named `SaveRecords*` view (labelled fake), 20 -> 0 aligned.
+- **[verified] The pre-RA scheduler breaks equal-height ties by block order** (the statement
+  written first wins; pick order: critical-path urgent, then more successors made ready, then
+  height). GoShaderObject_Particle_Gc fn_800949D0 ledger; `sched750.py` models it.
+- **[verified, fake-match class] A copy in the loop condition extends a parameter's life without a
+  copy**: `for (i = 0; i < (pLib = (MtaLib*)(void*)pArg)->nRecords; i++)`, statements before the loop
+  on pArg: pArg and pLib get one register, the copy vanishes, the entry block keeps EA's `li` first
+  (char fn_8001F110 2 -> 0).
+- **[verified, EA form] A float join set by if/else into a named block local**, then stored and
+  clamped in place (`{ f32 f; if (c) f = E; else f = 0.0f; v[3] = f; } v[3] = v[3] < 0.0f ? ..`):
+  gocamscripts fn_8003F2E0 8 -> 0 (store-to-load forwarding gives EA's `frsp`).
+
+*Types, forms and floats*
+
+- **[verified] `x / c` becomes `x * (1/c)` only for positive powers of two from 2.0 to 1024.0**
+  (2048, 4096, 16384, 0.5, 0.25, -128 stay `fdivs`), in every spelling and every compiler 1.0 -
+  3.0a5.2. The frontend always hoists a loop test's load; `#pragma opt_loop_invariants off` on the
+  function plus the test spelled differently from the divide (`*(const f32*)aStep` vs `aStep[0]`)
+  gave CamSpline fn_800C7A9C 98.48 -> 100 (labelled).
+- **[verified, EA form] A byte swap in C, mask first**, `((v & 0xFF000000) >> 24) | ((v & 0xFF0000)
+  >> 8) | ((v & 0xFF00) << 8) | ((v & 0xFF) << 24)`, stays rlwinm/rlwimi through allocation and the
+  post-RA peephole makes it `stwbrx`: LLPictInt PictInt_Decode 93.26 -> 100 (the shift-first
+  spelling is not recognised at one swap). Mask-first also fixed rcmp_mad_codec fn_800B769C's
+  `MAD_ENTRY` (`((u32)v & 0x3FF) << 22`).
+- **[verified, EA form] CodeWarrior's cast-lvalue post-increment keeps a moving cursor**:
+  `pSection = ((TexSection*)p)++;` is not folded by the IRO (`((char*)p) += n` and helpers are):
+  LLTex TX_spParseTextureGroupFromStream 111 -> 106, exact with the other forms in its ledger.
+- **[verified] A `long` (s32) passed to an `int` parameter inside a loop makes the frontend hoist
+  `(int)x` into loop-invariant copies** (spilled): `int nSet` gave EA's single register
+  (GoShaderObject_Grass_Gc SD_vShaderObject_Grass_Static_Init 265 -> 231). Its last miss was a
+  temp's live range: sched750's first-pass model ranked 7628 statement orders by that range, a
+  climb from the best reached 0 (labelled statement-order fake).
+
+*Linking*
+
+- **[verified] Unity builds**: char.o's `.data` would start at 0x801870FC, which our 8-aligned
+  sections cannot do; `#include "char_tex_manager.c"` into char.c (one TU, as TW07's
+  golf2_unity.cpp) links it (char fn_80019798 ledger). Suspect one when a unit's data starts
+  off 8-byte alignment.
+- **[verified] 4-byte `.sbss` gaps before 8-aligned small globals**: `__attribute__((aligned(8)))`
+  on the two u8s links LLTex (labelled fake; likely several EA files there, boundaries at the gaps).
+- **[verified] Pool order**: a function static (even block-scope) is emitted when its function
+  starts, and an int -> float conversion's constant is pooled after the function's literal
+  constants; `<Unit>_StrippedFn` stand-ins fix both (CamSpline, uiArc).
 
 ### New from round 6 (2026-09-26 afternoon)
 
@@ -636,6 +864,8 @@ per-function readings are in each `agents/tried/<fn>.md`, the batch in
   pData): Particle fn_800951A0 92.0 -> 100 (`void* pBlock = pData`, the header field's own type).
 - **[observed] Unsolved pattern: EA keeps a copy our backend's first copy-propagation pass folds**
   (UISScreen fn_8016AD54, fn_8016ABBC, fn_8016B4D4, fn_8016AEEC, fn_8016A2D4): no flag or form found.
+  Update 2026-09-27: all five are exact with labelled fakes (round 7: the OR lever, the call-result
+  shift chain, loop-carried copies, the 64-bit OR high word); EA's own form is still not known.
 
 ### New from the evening push (2026-09-25)
 

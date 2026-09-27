@@ -193,6 +193,12 @@ ska_shared.c:
 
 skalib.c:
 	.text       start:0x80021ADC end:0x80026B4C
+	.rodata     start:0x8017E020 end:0x8017E1B0
+	.data       start:0x801873F0 end:0x80187400
+	.bss        start:0x801B9730 end:0x801C6498
+	.sdata      start:0x80281070 end:0x80281080
+	.sbss       start:0x80281CD8 end:0x80281D20
+	.sdata2     start:0x80282CF0 end:0x80282D10
 
 Skeleton.c:
 	.text       start:0x80026B4C end:0x80029FC8
@@ -644,6 +650,10 @@ GoLightFogEnv.c:
 
 goballfx.c:
 	.text       start:0x80093A80 end:0x80093D3C
+	.bss        start:0x801D94B0 end:0x801D96B8
+	.sdata      start:0x80281388 end:0x80281390
+	.sbss       start:0x80281F40 end:0x80281F50
+	.sdata2     start:0x80283C48 end:0x80283C68
 
 GoObjShadow.c:
 	.text       start:0x80093D3C end:0x8009414C
@@ -1231,6 +1241,9 @@ GameMode4.c:
 
 uiArc.c:
 	.text       start:0x80102AC8 end:0x801037F8
+	.data       start:0x801931E0 end:0x80193228
+	.sbss       start:0x80282458 end:0x80282460
+	.sdata2     start:0x80284808 end:0x80284838
 
 FE_CrAPDB.c:
 	.text       start:0x801037F8 end:0x801077EC
@@ -1409,6 +1422,10 @@ EASportsBio.c:
 
 GameMode22.c:
 	.text       start:0x8012597C end:0x801270F0
+	.data       start:0x801953E0 end:0x80195500
+	.sdata      start:0x80281998 end:0x802819A8
+	.sbss       start:0x80282580 end:0x802825A8
+	.sdata2     start:0x80284B28 end:0x80284B38
 
 SkinBurn.c:
 	.text       start:0x801270F0 end:0x80127D84
@@ -2152,6 +2169,8 @@ UISApi.c:
 
 UISScreen.c:
 	.text       start:0x8016A2D4 end:0x8016C718
+	.data       start:0x8019D118 end:0x8019D1FC
+	.sdata2     start:0x802851C0 end:0x802851E8
 
 Common/Checksum/ChecksumCRC32.c:
 	.text       start:0x8016C718 end:0x8016CC20
