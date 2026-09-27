@@ -11,6 +11,11 @@ UISWord lbl_802805D8[20];
 void fn_80168644(UIStudio* pStudio, UISScreen* pScreen, s32 nKind, void* p, s32 bOn);
 
 // name: Madden 2003 STABS (UISStack.c)
+// fake match: EA's build inlines this into fn_80166098, whose source here is over CW's default
+// inline budget (7000); a larger budget, and a callee size limit that keeps fn_80168644 a call.
+// Deferred inlining reads both at the end of the file.
+#pragma inline_max_total_size(12000)
+#pragma inline_max_size(64)
 static inline u8* _UISPatchFncPC(UIStudio* pStudio, UISScreenFile* pData, u32 uOffset) {
     u8* pRet;
 
@@ -27,9 +32,6 @@ static inline u8* _UISPatchFncPC(UIStudio* pStudio, UISScreenFile* pData, u32 uO
 // (returns 0) or when the script waits for another screen (returns 3; fn_80169308 resumes it
 // from the p60 record it keeps). Immediates are big-endian; opcodes not listed do nothing.
 // port: the stack keeps pointers in 32-bit words, like the rest of the studio.
-// fake match: EA's build inlines _UISPatchFncPC here; ours needs a larger inline budget than CW's
-// default (7000). Deferred inlining reads the setting at the end of the file, so it stays set.
-#pragma inline_max_total_size(8000)
 s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, UISNodeInfo* pInfo) {
     s32* pTop;
     u8 uOp;
@@ -954,13 +956,15 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             nDims = pArr[0];
             for (i = 1; i <= nDims; i++) {
                 s32 n;
+                s32 dimSize;  // name: Madden 2003 STABS
 
                 n = pTop[-(i + bOnStack)];
-                if (n >= pArr[i] || n < 0) {
-                    n = pArr[i] - 1;
+                dimSize = pArr[i];
+                if (n >= dimSize || n < 0) {
+                    n = dimSize - 1;
                 }
                 nIndex += nMul * n;
-                nMul *= pArr[i];
+                nMul *= dimSize;
             }
             if (uOp == 0x6C || uOp == 0x6D || uOp == 0x6E) {
                 // port: a stack word holds the pointer
@@ -1030,13 +1034,15 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             nDims = pArr[0];
             for (i = 1; i <= nDims; i++) {
                 s32 n;
+                s32 dimSize;  // name: Madden 2003 STABS
 
                 n = pTop[-(i + 1 + bOnStack)];
-                if (n >= pArr[i] || n < 0) {
-                    n = pArr[i] - 1;
+                dimSize = pArr[i];
+                if (n >= dimSize || n < 0) {
+                    n = dimSize - 1;
                 }
                 nIndex += nMul * n;
-                nMul *= pArr[i];
+                nMul *= dimSize;
             }
             pArr[nDims + 1 + nIndex] = pTop[-1 - bOnStack];
             pFrame->pC -= nDims + 1 + bOnStack;
