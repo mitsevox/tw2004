@@ -390,6 +390,38 @@ cflags_gcc = [
 # EA Tiburon's IStudio library (the UIS units): its own library setting, see the units' comment.
 UIS_CFLAGS = ['-pragma "pool_data on"', "-inline auto,deferred", "-str reuse,readonly"]
 
+# The AX library's data-only units AXComp.c and DSPCode.c are Nintendo's bytes (a table and the DSP
+# microcode): their C is generated from the user's own main.dol into build/<version>/gen by
+# tools/build/gendata.py, never committed (docs/workflow.md "Units generated from main.dol").
+# configure.py writes them (the Objects need the files to exist); build.ninja rewrites them when
+# the DOL, symbols.txt or the script change.
+gen_dir = Path(config.build_dir) / config.version / "gen"
+gen_dol = Path("orig") / config.version / "sys" / "main.dol"
+gen_symbols = Path("config") / config.version / "symbols.txt"
+gen_units = ["AXComp.c", "DSPCode.c"]
+if args.mode == "configure" and gen_dol.exists():
+    from tools.build.gendata import generate as generate_data
+
+    generate_data(gen_dol, gen_symbols, gen_dir)
+    config.custom_build_rules = [
+        {
+            "name": "gendata",
+            "command": f"$python tools/build/gendata.py --dol $in --symbols {gen_symbols} -o {gen_dir}",
+            "description": "GENDATA $out",
+            "restat": True,
+        },
+    ]
+    config.custom_build_steps = {
+        "pre-compile": [
+            {
+                "rule": "gendata",
+                "inputs": gen_dol,
+                "implicit": [gen_symbols, Path("tools/build/gendata.py")],
+                "outputs": [gen_dir / unit for unit in gen_units],
+            },
+        ],
+    }
+
 config.libs = [
     {
         "lib": "sonicheroes_sdk_0",
@@ -477,6 +509,8 @@ config.libs = [
             Object(Matching, "src/ax/AXOut.c"),
             Object(Matching, "src/ax/AXSPB.c"),
             Object(Matching, "src/ax/AXVPB.c"),
+            Object(Matching, "src/ax/AXComp.c", src_dir=gen_dir, source="AXComp.c"),
+            Object(Matching, "src/ax/DSPCode.c", src_dir=gen_dir, source="DSPCode.c"),
             Object(Matching, "src/ax/AXProf.c"),
             Object(Matching, "src/axfx/reverb_hi.c"),
             Object(Matching, "src/axfx/delay.c"),
