@@ -603,8 +603,7 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
         case 0x4C: {  // format a text (at most 20 arguments)
             UISText* pFind;
 
-            pFrame->pC--;
-            n = pTop[-1];
+            n = *--pFrame->pC;
             for (k = 0; k < n; k++) {
                 if (k < 20) {
                     lbl_802805D8[n - k - 1].n = *--pFrame->pC;
