@@ -1,6 +1,10 @@
 # FO_spLoadFontFromStream (LLFont.c, 0x800107F4)
 
-Status: OPEN, 87.02% on 2026-09-26 (r6-misc).
+Status: SOLVED 2026-09-27 (b11, second attempt), EA form, no fake: the `void*` parameter pData is
+reused as the glyph-record cursor of loop 1 (`pData = pBytes + pFile->uGlyphs; ...
+pData = (u8*)pData + 12;`), with `pFile = (LLFontFile*)pData; pBytes = (u8*)pData;` at entry
+(main's names; engine.h prototype back to `void*`). Commit "LLFont.c: FO_spLoadFontFromStream
+exact". Was 87.02% on 2026-09-26 (r6-misc), 99.49% before this.
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
@@ -8,6 +12,24 @@ unless you combine it with something new. Before you stop, add every attempt und
 
 ## Attempts
 
+- 2026-09-27 b11 (second attempt): **SOLVED, 36 -> 0 (99.49 -> 100), EA form.** rasim what-ifs
+  on the 99.49 dump (scratch r2/whatif.py, whatif2.py): EA's loop-1 colour order is cursor, i,
+  the loop temps, the IVs; no declaration order gives it (the cursor has 26 neighbours, and every
+  extra neighbour it could get in the preheader also hits the IVs, already at 28); only a cursor
+  coloured first does. The frontend never splits a parameter into webs, so the parameter reused
+  as the cursor is ONE vreg from entry to loop 1, and CodeWarrior merges it with the incoming r3
+  (no call inside either web): cursor r3, so i r4, nPalette r3, temps r5/r6, IVs r7/r8. Because
+  the parameter is redefined, both entry copies survive copy propagation and read r3 (EA's
+  `mr r27,r4; mr r30,r3; mr r28,r3`). The copies need casts from a `void*` parameter: with a
+  `u8*` parameter and plain `pBytes = pData` 37 (copy propagation rewrites the cursor's
+  `pBytes +` to the parameter), `pBytes = (u8*)pFile` 3, `(void*)` casts on a u8* parameter 0
+  (compare through pBytes: 2). With EA's `void*` parameter (main's prototype; UFont.c passes a
+  void*): `pData = (u8*)pData + 12;` 0 and the cast-lvalue `((u8*)pData) += 12;` 0 (plain
+  `pData += 12` on void*: compile error). Kept the plain-C form. No gain on the way: an inline
+  helper for loop 1 (not inlined under `-inline smart`, even with `always_inline`), a block-scope
+  cursor (numbered with the locals), the cursor init moved between the two palette stores (39),
+  `pBytes` as a second u8* local with the parameter dying early (entry copies coalesced, 62),
+  identity 64-bit shift chains on pData / pFile / pState at entry (36, 62-68).
 - 2026-09-27 b11 (quicktrial with a register-blind score: instruction shapes only, then aligned):
   KEPT, each checked on its own (noreg/aligned/raw from 77/361/521 on the r6 base):
   the texel loop as ONE 4-step loop `for (k = 0; k < 4; k++) { ...; pDst++; nX++; }` (CW unrolls
