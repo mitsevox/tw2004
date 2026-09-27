@@ -386,6 +386,7 @@ LLPictInt.c:
 user.c:
 	.text       start:0x800563C4 end:0x80056480
 	.sdata      start:0x80281138 end:0x80281140
+	.sbss       start:0x80281DF0 end:0x80281E00
 
 PasswordManager.c:
 	.text       start:0x80056480 end:0x80057F18
