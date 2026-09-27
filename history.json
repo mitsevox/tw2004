@@ -43701,5 +43701,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "4c95341",
+"sha": "4c95341664e321e5734f7b9f10ed3449362aff71",
+"time": 1790542355,
+"subject": "names: batch 2 through name.py (22 names, 5 comments; call sites to named functions 59.4% -> 61.9%)",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
