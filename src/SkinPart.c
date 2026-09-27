@@ -921,13 +921,14 @@ static inline void fn_800CE224_Loop(Skin* pSkin, SkinDesc14* pEntry, SkinDesc* p
                                     int* pj, SkinDesc74** ppSet, s32* pbChanged, s32* pnB8,
                                     int* pnVariant) {
     int i;
+    int k;
     SkinDesc7C* pVariant;
     s32 nOption;
     s32 n;
 
-    // fake match: the repeated nB8 zero keeps EA's zero-load order before the set loop.
-    for (i = (*pnB8 = 0); i < pDesc->n70; i++) {
-        (*ppSet) = &pDesc->p74[i];
+    // fake match: the repeated nB8 zero and parallel k counter keep EA's induction zero loads.
+    for (i = (*pnB8 = 0), k = 0; i < pDesc->n70; k++, i++) {
+        (*ppSet) = &pDesc->p74[k];
         for ((*pj) = 0; (*pj) < (*ppSet)->n0C; (*pj)++) {
             if (pEntry->uId == pDesc->p84[(*ppSet)->n14 + (*pj)]) {
                 (*pnVariant) = fn_800CD0B8(pSkin, i, nCopy);

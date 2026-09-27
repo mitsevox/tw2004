@@ -947,6 +947,9 @@ TerrainGround.c:
 
 SkinPart.c:
 	.text       start:0x800CC1EC end:0x800CF158
+	.data       start:0x80191748 end:0x80191798
+	.sdata      start:0x80281538 end:0x80281548
+	.sbss       start:0x80282238 end:0x80282240
 
 HoleScore.c:
 	.text       start:0x800CF158 end:0x800D1698
