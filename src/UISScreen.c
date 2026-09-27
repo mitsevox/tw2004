@@ -8,6 +8,7 @@
 // are written here from the highest address down.
 
 #include "frontend/uistudio.h"
+#include "frontend/uistudio_tiburon.h"
 
 void fn_8016B188(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent,
                  s32 nArgs, s32* pArgs);
@@ -613,45 +614,43 @@ void fn_8016B09C(UIStudio* pStudio, u32 uEvent, s32 nArgs, s32* pArgs) {
     }
 }
 
-// fake match: an identity read; it gives EA's register order.
-static inline u8 fn_8016AEEC_Read(u8 b) { return b; }
-
 // Runs the screen file's start entries that have not run yet, then every handler under node
 // nNode; a handler run with message -1 is marked as run.
-void fn_8016AEEC(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
-    u32 j;
-    UISNode* pNode;
-    u32 i;
-    u8 bLast;
+void fn_8016AEEC(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, int nMsg) {
+    int bInit;
+    Uint32 idxObj;
+    UISControlT* pControl;
+    Uint32 idxLayer;
+    UISLayerT* pLayer;
+    UISObjT* pObj;
 
     if (pScreen->pData != NULL) {
-        pNode = &pScreen->pData->pNodes[nNode];
-        bLast = fn_8016AEEC_Read(nMsg == -1);
-        for (i = 0; i < pScreen->pData->nStart; i++) {
-            UISEntry* pEntry = &pScreen->pData->pStart[i];
-            if (pEntry->n2 == 0) {
-                if (pEntry->uHandler < pStudio->nHandlers) {
-                    UISHandlerFn pfnHandler = pStudio->ppfnHandlers[pEntry->uHandler];
+        pControl = (UISControlT*)&pScreen->pData->pNodes[nNode];
+        bInit = (nMsg == -1);
+        for (idxObj = 0; idxObj < pScreen->pData->nStart; idxObj++) {
+            pObj = (UISObjT*)&pScreen->pData->pStart[idxObj];
+            if (pObj->bInitialized == 0) {
+                if (pObj->PluginIndex < pStudio->nHandlers) {
+                    UISHandlerFn pfnHandler = pStudio->ppfnHandlers[pObj->PluginIndex];
                     if (pfnHandler != NULL) {
-                        pfnHandler(pEntry->u4.pnOffset != NULL ? (u8*)pScreen->pData + *pEntry->u4.pnOffset
-                                                               : NULL,
+                        pfnHandler(pObj->pData != NULL ? (u8*)pScreen->pData + *(u32*)pObj->pData : NULL,
                                    nMsg, 0, NULL, 0);
                     }
                 }
-                pEntry->n2 = 1;
+                pObj->bInitialized = 1;
             }
         }
-        for (j = 0; j < pNode->nGroups; j++) {
-            UISGroup* pGroup = pNode->ppGroups[j];
-            for (i = 0; i < pGroup->nEntries; i++) {
-                UISEntry* pEntry = &pGroup->pEntries[i];
-                if (pEntry->uHandler == 0xFFFF) {
-                    fn_8016AEEC(pStudio, pScreen, pEntry->u4.nNode, nMsg);
-                } else if (pEntry->uHandler < pStudio->nHandlers) {
-                    UISHandlerFn pfnHandler = pStudio->ppfnHandlers[pEntry->uHandler];
+        for (idxLayer = 0; idxLayer < pControl->NumLayers; idxLayer++) {
+            pLayer = pControl->Layers[idxLayer];
+            for (idxObj = 0; idxObj < pLayer->NumObjs; idxObj++) {
+                pObj = &pLayer->Objs[idxObj];
+                if (pObj->PluginIndex == 0xFFFF) {
+                    fn_8016AEEC(pStudio, pScreen, (u32)pObj->pData, nMsg);
+                } else if (pObj->PluginIndex < pStudio->nHandlers) {
+                    UISHandlerFn pfnHandler = pStudio->ppfnHandlers[pObj->PluginIndex];
                     if (pfnHandler != NULL) {
-                        pfnHandler((u8*)pScreen->pData + *pEntry->u4.pnOffset, nMsg, 0, NULL, 0);
-                        pEntry->n2 = bLast;
+                        pfnHandler((u8*)pScreen->pData + *(u32*)pObj->pData, nMsg, 0, NULL, 0);
+                        pObj->bInitialized = bInit;
                     }
                 }
             }
@@ -662,44 +661,42 @@ void fn_8016AEEC(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
 // Looks under a node (nKind 8) or a group (nKind 7) for the one pInfo belongs to and records it
 // as pInfo's owner. Returns -1 when it is not found.
 s32 fn_8016AD54(UISScreen* pScreen, UISNodeInfo* pInfo, s32 nKind, void* p) {
-    u32 i;
-    s32 nFound;
+    u32 uNumItems;
+    u32 uIdxItems;
+    s32 iResult;
+    UISEntry* pEntry;
 
     if (pInfo == NULL || p == NULL || pScreen == NULL) return -1;
     switch (nKind) {
-    case 8: {
-        UISNode* pNode = p;
-        if (pNode->pInfo == pInfo) {
-            pInfo->p0 = pNode;
-            return pNode->pInfo->p0 != NULL;
+    case 8:
+        if (((UISNode*)p)->pInfo == pInfo) {
+            pInfo->p0 = p;
+            return ((UISNode*)p)->pInfo->p0 != NULL;
         }
-        if (pNode->pInfo != NULL && pNode->pInfo->p0 != NULL) {
-            u32 nGroups = pNode->nGroups;
-            for (i = 0; i < nGroups; i++) {
-                nFound = fn_8016AD54(pScreen, pInfo, 7, pNode->ppGroups[i]);
-                if (nFound != -1) return nFound;
+        if (((UISNode*)p)->pInfo != NULL && ((UISNode*)p)->pInfo->p0 != NULL) {
+            uNumItems = ((UISNode*)p)->nGroups;
+            for (uIdxItems = 0; uIdxItems < uNumItems; uIdxItems++) {
+                iResult = fn_8016AD54(pScreen, pInfo, 7, ((UISNode*)p)->ppGroups[uIdxItems]);
+                if (iResult != -1) return iResult;
             }
         }
         break;
-    }
-    case 7: {
-        UISGroup* pGroup = p;
-        if (pGroup->pInfo == pInfo) {
-            pInfo->p0 = pGroup;
-            return pGroup->pInfo->p0 != NULL;
+    case 7:
+        if (((UISGroup*)p)->pInfo == pInfo) {
+            pInfo->p0 = p;
+            return ((UISGroup*)p)->pInfo->p0 != NULL;
         }
-        if (pGroup->pInfo != NULL && pGroup->pInfo->p0 != NULL) {
-            u32 nEntries = pGroup->nEntries;
-            for (i = 0; i < nEntries; i++) {
-                UISEntry* pEntry = &pGroup->pEntries[i];
+        if (((UISGroup*)p)->pInfo != NULL && ((UISGroup*)p)->pInfo->p0 != NULL) {
+            uNumItems = ((UISGroup*)p)->nEntries;
+            for (uIdxItems = 0; uIdxItems < uNumItems; uIdxItems++) {
+                pEntry = &((UISGroup*)p)->pEntries[uIdxItems];
                 if (pEntry->uHandler == 0xFFFF) {
-                    nFound = fn_8016AD54(pScreen, pInfo, 8, &pScreen->pData->pNodes[pEntry->u4.nNode]);
-                    if (nFound != -1) return nFound;
+                    iResult = fn_8016AD54(pScreen, pInfo, 8, &pScreen->pData->pNodes[pEntry->u4.nNode]);
+                    if (iResult != -1) return iResult;
                 }
             }
         }
         break;
-    }
     }
     return -1;
 }
@@ -707,39 +704,38 @@ s32 fn_8016AD54(UISScreen* pScreen, UISNodeInfo* pInfo, s32 nKind, void* p) {
 // Runs every handler under a node (nKind 8) or a group (nKind 7) with message -4 and a pointer to
 // n. Without bAll, nodes and groups whose info has no owner are skipped.
 void fn_8016ABBC(UIStudio* pStudio, UISScreen* pScreen, s32 n, s32 nKind, void* p, u8 bAll) {
-    u32 i;
+    u32 uIdxItems;
+    u32 uNumItems;
+    UISControlT* pControl;
+    UISObjT* pObj;
 
-    if (pStudio == NULL) return;
-    if (pScreen == NULL || p == NULL) return;
+    pControl = (UISControlT*)p;
+    if (pStudio == NULL || pScreen == NULL || pControl == NULL) return;
     switch (nKind) {
-    case 8: {
-        UISNode* pNode = p;
-        if (pNode->pInfo != NULL && (bAll || pNode->pInfo->p0 != NULL)) {
-            u32 nGroups = pNode->nGroups;
-            for (i = 0; i < nGroups; i++) {
-                fn_8016ABBC(pStudio, pScreen, n, 7, pNode->ppGroups[i], 0);
+    case 8:
+        if (((UISControlT*)p)->pControlInfo != NULL && (bAll || ((UISControlT*)p)->pControlInfo->IsVisible != 0)) {
+            uNumItems = ((UISControlT*)p)->NumLayers;
+            for (uIdxItems = 0; uIdxItems < uNumItems; uIdxItems++) {
+                fn_8016ABBC(pStudio, pScreen, n, 7, ((UISControlT*)p)->Layers[uIdxItems], 0);
             }
         }
         break;
-    }
-    case 7: {
-        UISGroup* pGroup = p;
-        if (pGroup->pInfo != NULL && (bAll || pGroup->pInfo->p0 != NULL)) {
-            u32 nEntries = pGroup->nEntries;
-            for (i = 0; i < nEntries; i++) {
-                UISEntry* pEntry = &pGroup->pEntries[i];
-                if (pEntry->uHandler == 0xFFFF) {
-                    fn_8016ABBC(pStudio, pScreen, n, 8, &pScreen->pData->pNodes[pEntry->u4.nNode], 0);
-                } else if (pEntry->uHandler < pStudio->nHandlers) {
-                    UISHandlerFn pfnHandler = pStudio->ppfnHandlers[pEntry->uHandler];
+    case 7:
+        if (((UISLayerT*)p)->pLayerInfo != NULL && (bAll || ((UISLayerT*)p)->pLayerInfo->IsVisible != 0)) {
+            uNumItems = ((UISLayerT*)p)->NumObjs;
+            for (uIdxItems = 0; uIdxItems < uNumItems; uIdxItems++) {
+                pObj = &((UISLayerT*)p)->Objs[uIdxItems];
+                if (pObj->PluginIndex == 0xFFFF) {
+                    fn_8016ABBC(pStudio, pScreen, n, 8, &pScreen->pData->pNodes[(u32)pObj->pData], 0);
+                } else if (pObj->PluginIndex < pStudio->nHandlers) {
+                    UISHandlerFn pfnHandler = pStudio->ppfnHandlers[pObj->PluginIndex];
                     if (pfnHandler != NULL) {
-                        pfnHandler((u8*)pScreen->pData + *pEntry->u4.pnOffset, -4, 1, &n, 0);
+                        pfnHandler((u8*)pScreen->pData + *(u32*)pObj->pData, -4, 1, &n, 0);
                     }
                 }
             }
         }
         break;
-    }
     }
 }
 
