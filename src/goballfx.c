@@ -15,6 +15,15 @@ void fn_800360D4(u8* pMesh);
 // GoTerrainCollision.c
 f32 fn_8004D80C(CourseInfo* pCourse, f32* pPos);
 
+// .bss and .sbss in reverse address order (CodeWarrior lays them out last-defined-first).
+f32       lbl_801D95C8[5][12];
+u8        lbl_801D9578[5][16];
+f32       lbl_801D94D8[5][8];
+u8        lbl_801D94B0[0x28];
+TexEntry* lbl_80281F48;
+TexBank*  lbl_80281F44;
+u8        lbl_80281F40;
+
 void BFX_vInit(void) {
     s32 desc[2];
     fn_800102DC(fn_8000BEE4("marker"), &lbl_80281F44, &lbl_80281F48);
@@ -40,10 +49,7 @@ void BFX_vRender(Ball* pBall, int nPlayer) {
         fn_8005CC64(lbl_80281F44, lbl_80281F48);
         fn_80016B9C();
         fn_80035118(4, 5);
-        // fake match: the row offset as a signed 64-bit product (&lbl_801D95C8[nPlayer]); its dead
-        // high word joins the first scheduling pass and is gone after register allocation.
-        // port: the product is truncated back to a 32-bit pointer offset.
-        pPos = (f32*)((u8*)lbl_801D95C8 + (s64)nPlayer * 48);
+        pPos = lbl_801D95C8[nPlayer];
         fSize = 0.02f;
         pPos[0] = pBall->vPos[0] - fSize;
         pPos[1] = 0.01f + fGround;
@@ -61,6 +67,18 @@ void BFX_vRender(Ball* pBall, int nPlayer) {
         lbl_801D9578[nPlayer][1] = lbl_80189CB0[nPlayer][1];
         lbl_801D9578[nPlayer][2] = lbl_80189CB0[nPlayer][2];
         lbl_801D9578[nPlayer][3] = lbl_80189CB0[nPlayer][3];
+        // fake match: these three assignments leave pPos unchanged: each ORs a value into the high
+        // word of a 64-bit copy of pPos and keeps the low word. Only the sign extensions (srawi)
+        // of that dead high word survive to register allocation, and they are deleted after it:
+        // the first moves the red load / UV row setup to the original's order, the second keeps
+        // nPlayer * 4 and the sign word of (s64)nPlayer live past the UV row setup (blue in r8,
+        // nPlayer * 32 in r10), and the third's (s64)nPlayer makes that sign word a late-coloured
+        // frontend temp (r9 in the original, where nothing else uses r9).
+        // port: truncates pPos to 32 bits; a port leaves all three lines out.
+        pPos = (f32*)(s32)((u64)(u32)pPos | (((u64)(s64)(s32)lbl_801D9578[nPlayer] >> 32 |
+                                               (u64)(u32)lbl_801D94D8[nPlayer]) << 32));
+        pPos = (f32*)(s32)((u64)(u32)pPos | (((u64)(s64)(nPlayer * 4 | (s32)((s64)nPlayer >> 32)) >> 32 |
+                                               (u64)(u32)nPlayer) << 32));
         lbl_801D9578[nPlayer][4] = lbl_80189CB0[nPlayer][0];
         lbl_801D9578[nPlayer][5] = lbl_80189CB0[nPlayer][1];
         lbl_801D9578[nPlayer][6] = lbl_80189CB0[nPlayer][2];
@@ -74,6 +92,8 @@ void BFX_vRender(Ball* pBall, int nPlayer) {
         lbl_801D9578[nPlayer][14] = lbl_80189CB0[nPlayer][2];
         lbl_801D9578[nPlayer][15] = lbl_80189CB0[nPlayer][3];
         lbl_801D94D8[nPlayer][0] = 0.0f;
+        // fake match: pPos unchanged (see above). port: leave it out.
+        pPos = (f32*)(s32)((u64)(u32)pPos | (((u64)(s64)nPlayer >> 32 | (u64)(u32)nPlayer) << 32));
         lbl_801D94D8[nPlayer][1] = 0.0f;
         lbl_801D94D8[nPlayer][2] = 0.0f;
         lbl_801D94D8[nPlayer][3] = 1.0f;
