@@ -33,6 +33,15 @@ SunFlrSet lbl_80189E78[3] = {
     { { { {0}, 1.0f, 1.0f, 1.0f, 0.3f, -1.0f, 0.4f, {0}, 1, 3 } }, 1 },
 };
 
+// Two raw blobs (probably textures) are game data: tools/build/gendata.py writes their
+// initializers from main.dol.
+u8 lbl_8018A028[0x4B0] = {
+#include "Code8009AA28_tex0.inc"
+};
+u8 lbl_8018A4D8[0x21F0] = {
+#include "Code8009AA28_tex1.inc"
+};
+
 // Fills a24 from [1] with four sweeps of ten steps of 0.1 round the unit square's edge: [0] up
 // (with [1] at 1), then [1] down, then [0] down, then [1] up ([2] and [3] always 1), aCA4 with
 // zeros alongside, and closes the loop with a copy of entry 1.

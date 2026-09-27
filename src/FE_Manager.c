@@ -71,6 +71,10 @@ u32 lbl_80281ED0;
 u32 lbl_80281ECC;
 FEBio* lbl_80281EC8;
 
+s32 lbl_801894D0[6] = {3, 9, 12, 17, 18, 4};
+s32 lbl_801894E8[16] = {0, 18, 21, 3, 5, 7, 11, 23, 10, 13, 14, 28, 22, 24, 4, 12};
+s32 lbl_80189528[14] = {9, 16, 6, 26, 29, 2, 8, 15, 17, 19, 20, 25, 27, 1};
+
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x80283AC0), before the 0.0f and 0.05f FE_movieFade uses first; its body is unknown.
 static f32 FE_Manager_StrippedFn(f32 x) {

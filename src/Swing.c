@@ -102,7 +102,6 @@ enum {
     (((s8 (*)(Player*, int, int))Golfer_GetAttribute)(p, nAttr, nMode))
 
 extern f32           lbl_80281B40[];             // FLT_MAX
-extern s32           gClubCurve[CLUB_MAX_e];      // 0x80183578  per club, 0..26: how much it can shape
 
 void  Swing_FaceVector(int nPlayer, f32* pOut);
 f32   fn_8005BA94_MishitAngle(int nPlayer);
@@ -150,6 +149,11 @@ u8    Swing_UpdateAfterImpact(int nPlayer);
 u8    Swing_PhaseIdle6(int nPlayer);
 
 SwingState lbl_801D5968;
+
+// 0x80183578  per club, 0..26: how much it can shape
+const s32 gClubCurve[CLUB_MAX_e] = {
+    0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 16, 16, 16, 17
+};
 
 SwingState* gpSwing = &lbl_801D5968;               // 0x80281188
 

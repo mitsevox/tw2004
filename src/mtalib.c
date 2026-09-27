@@ -8,6 +8,18 @@ static MalBank* lbl_80281CB4[2];
 static int lbl_80281CB0;                // bytes the banks have allocated
 static u8 lbl_801B9668[200];
 
+char* lbl_80187278[90] = {
+    "", "root", "ctrgrav", "waist", "s1", "s2", "s3", "s4", "s5", "neck", "head", "tail1", "tail2",
+    "tail3", "tail4", "skull", "rcolr", "rshld", "rbictwst", "relb", "r4rm", "rwrst", "rf1", "rf2",
+    "rf3", "ri1", "ri2", "ri3", "rt1", "rt2", "rt3", "rslvBjnt", "rslvFjnt", "rslvHjnt", "rshlddef",
+    "lcolr", "lshld", "lbictwst", "lelb", "l4rm", "lwrst", "lf1", "lf2", "lf3", "li1", "li2", "li3",
+    "lt1", "lt2", "lt3", "lslvBjnt", "lslvFjnt", "lslvHjnt", "lshlddef", "rhip", "rthitwst",
+    "rknee", "rankl", "rtoe", "ropnt1", "ropnt2", "ropnt3", "rbpnt1", "rbpnt2", "rbpnt3", "rfpnt1",
+    "rfpnt2", "rfpnt3", "lhip", "lthitwst", "lknee", "lankl", "ltoe", "lopnt1", "lopnt2", "lopnt3",
+    "lbpnt1", "lbpnt2", "lbpnt3", "lfpnt1", "lfpnt2", "lfpnt3", "IGdriver", "clubhead", "GBall1",
+    "tail5", "tail6", "rboob", "lboob", NULL,
+};
+
 void fn_8001F6D8(MalBank* pBank);
 
 // The entry's values at the two frames around fTime (clamped to its last frame) into *pfA and *pfB;

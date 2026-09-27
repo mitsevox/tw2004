@@ -324,6 +324,16 @@ them before compiling whenever the DOL, `symbols.txt` or the script changes. The
 `configure.py` point at them with `src_dir=gen_dir`. CI runs the same configure and ninja steps
 after copying the DOL in, so it generates them too.
 
+Game data that is an asset (art, sound) is handled the same way, one object at a time: the game
+unit's own C defines the object and `#include`s its initializer between the braces, and
+gendata.py's `FRAGMENTS` table writes that fragment (`build/GW4E69/gen/<name>.inc`, a comment
+saying it is generated and never committed, then the values) in the same pre-compile step. The
+game units' flags (and `lint.py`'s compile) have `-i build/GW4E69/gen`. So far: DiscError.c's
+font (`DiscError_font.inc`), startUp.c's two boot sounds (`startUp_sound0.inc`, `_sound1.inc`)
+and Code8009AA28.c's two blobs (`Code8009AA28_tex0.inc`, `_tex1.inc`). To add one, add a line to
+`FRAGMENTS` (symbol and element size) and write the definition in the unit. Code, tables and
+text stay ordinary C.
+
 When stuck
 ----------
 

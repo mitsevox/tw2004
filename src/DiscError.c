@@ -42,6 +42,44 @@ u16  lbl_80282190;
 s32  lbl_8028218C;
 s32  lbl_80282188;
 
+// .data. lbl_8018FFC8: 24 zero bytes nothing references; config.yml's force_active keeps the
+// linker from stripping them.
+#pragma explicit_zero_data on
+u32 lbl_8018FFC8[6] = {0, 0, 0, 0, 0, 0};
+#pragma explicit_zero_data reset
+
+// The font's bitmap is game data: tools/build/gendata.py writes its initializer from main.dol.
+u32 lbl_8018FFE0[107 * 8] = {
+#include "DiscError_font.inc"
+};
+
+DiscColor lbl_80190D40[9] = {
+    {0xB4, 0x80, 0x80}, {0xA2, 0x2C, 0x8E}, {0x83, 0x9C, 0x2C}, {0x70, 0x48, 0x3A}, {0x54, 0xB8, 0xC6},
+    {0x41, 0x64, 0xD4}, {0x23, 0xD4, 0x72}, {0x10, 0x80, 0x80}, {0x80, 0x80, 0x80},
+};
+
+// fake match: EA's messages start 8-aligned after the 0x6C-byte colour table (the cause is not
+// known); the first one is a named, aligned array here instead of a literal.
+char lbl_80190DB0[] __attribute__((aligned(8))) = "The Disc Cover is open.";
+
+const char* lbl_80190F6C[15] = {
+    lbl_80190DB0,
+    "If you want to continue the game,",
+    "please close the Disc Cover.",
+    "Please insert the",
+    "Tiger Woods PGA TOUR (R) 2004 Game Disc 1",
+    "The Game Disc could not be read.",
+    "Please read the",
+    "Nintendo GameCube\x80 Instruction Booklet",
+    "for more information.",
+    "An error has occurred.",
+    "Turn the power off and refer to the",
+    "for further instructions.",
+    "Unrecognized Dvd Status",
+    "This is not the",
+    "Tiger Woods PGA TOUR (R) 2004 Game Disc 2",
+};
+
 // Write the drawn screen back from the CPU cache.
 void fn_800B6924(void) {
     DCStoreRange(lbl_80282194, lbl_80282198);

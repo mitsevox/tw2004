@@ -24,6 +24,10 @@ TexEntry* lbl_80281F48;
 TexBank*  lbl_80281F44;
 u8        lbl_80281F40;
 
+u8 lbl_80189CB0[6][4] = {
+    {0x32, 0x80, 0x32, 0x80}, {0x80, 0x32, 0x32, 0x80}, {0x80, 0x80, 0x32, 0x80}, {0x32, 0x80, 0x80, 0x80},
+};
+
 void BFX_vInit(void) {
     s32 desc[2];
     fn_800102DC(fn_8000BEE4("marker"), &lbl_80281F44, &lbl_80281F48);

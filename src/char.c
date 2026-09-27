@@ -12,6 +12,52 @@
 #include "game_types.h"
 #include "endian.h"
 
+// data order: these lead the unity's .data (0x80186CC8), ahead of char_tex_manager.c's
+// "_usrtextr", so they are defined before its #include.
+IKLinkDef lbl_80186CC8[7] = {
+    {1, 0.0f, -1, 0.0f, 0.0f},
+    {3, 1.0f, -1, 0.0f, 0.0f},
+    {7, 0.5f, -1, 0.0f, 0.0f},
+    {17, 1.0f, -1, 0.0f, 0.0f},
+    {21, 0.25f, -1, 0.0f, 0.0f},
+    {82, 0.0f, -1, 0.0f, 0.0f},
+    {83, 0.0f, -1, 0.0f, 0.0f},
+};
+IKLinkDef lbl_80186D54[10] = {
+    {1, 0.0f, -1, 0.0f, 0.0f},
+    {3, 1.0f, -1, 0.0f, 0.0f},
+    {4, 0.5f, -1, 0.0f, 0.0f},
+    {7, 0.1f, -1, 0.0f, 0.0f},
+    {16, 0.25f, -1, 0.0f, 0.0f},
+    {17, 0.5f, -1, 0.0f, 0.0f},
+    {20, 0.5f, -1, 0.0f, 0.0f},
+    {21, 0.25f, -1, 0.0f, 0.0f},
+    {82, 0.0f, -1, 0.0f, 0.0f},
+    {83, 0.0f, -1, 0.0f, 0.0f},
+};
+IKLinkDef lbl_80186E1C[5] = {
+    {7, 0.0f, -1, 0.0f, 0.0f},
+    {35, 0.25f, -1, 0.0f, 0.0f},
+    {36, 0.5f, -1, 0.0f, 0.0f},
+    {39, 0.0f, -1, 0.0f, 0.0f},
+    {40, 0.0f, -1, 0.0f, 0.0f},
+};
+IKChainDef lbl_80186E80[2] = {
+    {lbl_80186D54, 10, 20, 0.01f},
+    {lbl_80186E1C, 5, 20, 0.01f},
+};
+IKChainDef lbl_80186EA0[2] = {
+    {lbl_80186CC8, 7, 10, 0.01f},
+    {lbl_80186E1C, 5, 20, 0.01f},
+};
+char lbl_80186EC0[6][13] = {"Drivers", "Fairwaywoods", "Putters", "3Irons", "7Irons", "Wedges"};
+char lbl_80186F10[6][13] = {"fwd_shaft", "fwd_shaft", "pwi_shaft", "pwi_shaft", "pwi_shaft", "pwi_shaft"};
+char lbl_80186F60[6][13] = {"Defaults", "Defaults", "Defaults", "Defaults", "Defaults", "Defaults"};
+char lbl_80186FB0[6][13] = {"EA_Driver", "EA_Fairway", "EA_Putter", "EA_3Iron", "EA_7Iron", "EA_Wedge"};
+char lbl_80187000[6][13] = {"Defaults", "Defaults", "Defaults", "Defaults", "Defaults", "Defaults"};
+char lbl_80187050[6][13] = {"fwd_grip", "fwd_grip", "pwi_grip", "pwi_grip", "pwi_grip", "pwi_grip"};
+char lbl_801870A0[6][13] = {"Defaults", "Defaults", "Defaults", "Defaults", "Defaults", "Defaults"};
+
 // char_tex_manager.c and char.c were one translation unit (a unity build: TW07 compiles both in
 // golf2_unity.cpp): the .data of both is one 8-aligned block from 0x801870F0 ("_usrtextr", then
 // char.c's first string at 0x801870FC, which a separate char.o could not start at).
