@@ -8,6 +8,21 @@
 
 void fn_80010114(int nDst, int nFunc, int nSrc, int nMtx);
 
+// .sbss and .bss, defined in reverse address order (CodeWarrior lays them out last-defined-first).
+// fake match: EA's .sbss has 4 zero bytes before lbl_80281C68 and before lbl_80281C80, which one
+// object does not make (the u8s pack after the words); aligned(8) stands in for them. They look
+// like object boundaries: this unit may be two or three of EA's files.
+static u8 lbl_80281C80 __attribute__((aligned(8)));
+int* lbl_80281C78;
+int* lbl_80281C74;
+int* lbl_80281C70;
+int* lbl_80281C6C;
+u8 lbl_80281C68 __attribute__((aligned(8)));
+LLTexItemList* lbl_80281C60;
+int lbl_801A3438[8];
+
+u8* lbl_80280DC8 = &lbl_80281C80;
+
 // Builds a bank from a 'txf ' object's data, into pInto or, when it is NULL, a new allocation.
 TexBank* TX_spParseTextureGroupFromStream(u8* pData, TexBank* pInto, int n);
 

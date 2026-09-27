@@ -1,12 +1,41 @@
 # TX_spParseTextureGroupFromStream (LLTex.c, 0x8000FBB0)
 
-Status: OPEN, 84.95% on 2026-09-25.
+Status: SOLVED 2026-09-27 (lane b3), commit 1c9b8ca "LLTex.c: TX_spParseTextureGroupFromStream
+exact (16/16)": EA-style forms, no fake in the function (b3 entries below).
 
 Read all of this before working on the function. Do not repeat an attempt listed here
 unless you combine it with something new. Before you stop, add every attempt under
 "Attempts" (what, score before -> after). When it is exact: Status SOLVED, the fix, the commit.
 
 ## Attempts
+
+- 2026-09-27 b3 (quicktrial aligned, base 111; "struct" = aligned count with registers masked):
+  - The cursor: `pSection = ((TexSection*)p)++;` (a CodeWarrior cast-lvalue post-increment) for
+    every 8-byte step, `pHead = ((TexBankHeader*)p)++`, keeps EA's moving cursor (`addi r25,r3,0x10;
+    mr r28,r25; addi r25,r25,8`, and the last section's `mr r28,r25; addi r25,r25,8`): 111 -> 106
+    (struct 34). The IRO does not fold a step written this way. Tried first, no effect:
+    `((char*)p) += n` (111), `*(u32*)&p += n` (139), inline `Step(u8** pp, n)` / `Adv()` helpers
+    and a `u8** pp = &p` block (all 111), every GC compiler 1.3.2-2.7 (111), per-function pragmas
+    (opt_propagation off 109, opt_lifetimes off 108, optimization_level 2 115 / 1 173,
+    global_optimizer off 137: the fold is the IRO's).
+  - Header copy as one 8-byte struct copy through a new TexBankHeader type (TW07's
+    TX_STextureGroupHeader): 106 -> 101.
+  - nSize in two statements: `nSize = sizeof(TexBank) + n2 * sizeof(TexEntry) + n4 *
+    sizeof(TexPalette); nSize += n2 * sizeof(TexGXObj) + n4 * sizeof(TexGXTlut);` (a sweep of all
+    term orders, `+=` splits and a two-local form; 3 forms give EA's block): 101 -> 95.
+  - GXInitTexObj(CI) wrap flags as `(pTex->b46 & 1) ? 0 : 1` / `(pTex->b46 & 2) ? 0 : 1`: 88
+    (`!x`, `x ^ 1`, `~b46 & 1`, `>> 1` forms no better); mipmap flag `pTex->n41 > 1 ? 1 : 0`: 65,
+    struct 1.
+  - Texture loop `pTex = &pBank->p8[i]` (no nOffset; the strength-reduced offset is its own vreg
+    and takes r31): struct 0; palette loop `&pBank->pC[i]`: 1 (EA `li r28,0; li r25,0`, ours
+    `mr r25,r28`: the backend's second CSE copies the loop-split i's 0 into the offset).
+  - Registers (mwccdbg + rasim search 35..46): pBank declared after i: 9 -> 1; a separate palette
+    counter `k` (declared before pColors, or first) instead of reusing i: 0, exact.
+  - Linking LLTex: its .sbss (0x80281C60-0x80281C88) has 4 zero bytes at 0x80281C64 and 0x80281C7C,
+    before the two u8s lbl_80281C68 and lbl_80281C80 (both 8-aligned); one object packs them
+    (unreferenced gap globals are dead-stripped by the link). `__attribute__((aligned(8)))` on the
+    two u8s links it (main.dol: OK): labelled fake. Likely LLTex.c is several of EA's files
+    (object boundaries at 0x80281C68 and 0x80281C80).
 
 - 2026-09-26 e-render (aligned, base 111; with `#pragma opt_propagation off` 109): the mip loop
   through a `TexMip*` pointer (`for (j = 0, pMip = pTex->aMips; ..; j++, pMip++)`, set before
