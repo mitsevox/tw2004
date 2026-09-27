@@ -912,7 +912,7 @@ config.libs = [
             Object(Matching, "UStream.c"),
             Object(Matching, "LLTex.c"),
             Object(Matching, "LLTexGrp.c"),
-            Object(NonMatching, "LLFont.c"),
+            Object(Matching, "LLFont.c"),
             Object(Matching, "UFont.c"),
             Object(Matching, "GoRenderCtx_Gc.c"),
             Object(Matching, "streammanagerhole.c"),

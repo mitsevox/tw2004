@@ -4,8 +4,8 @@
 #include "engine.h"
 #include "gx.h"
 
-static f32 lbl_801A3478[7];             // the projection saved while fonts draw
 static f32 lbl_801A3494[6];             // the viewport saved while fonts draw
+static f32 lbl_801A3478[7];             // the projection saved while fonts draw
 
 // The three glyph palettes: a grey level and an alpha (0x80 = opaque) per glyph pixel value.
 static GXColor lbl_801869C0[3][16] = {
@@ -35,6 +35,13 @@ static GXColor lbl_801869C0[3][16] = {
     },
 };
 
+u32 lbl_80186A80[19] = {
+    0x00000080, 0xFF404080, 0xFF000080, 0xFF000080, 0x40FF4080,
+    0x00FF0080, 0x00400080, 0x4040FF80, 0x0000FF80, 0x00004080,
+    0xA0A0A080, 0xFFFFFF80, 0xFFFF8080, 0xFFFF0080, 0xFF80FF80,
+    0xFF00FF80, 0x80FFFF80, 0x00FFFF80, 0x00000000,
+};
+
 void fn_80012444(const f32* pViewport);
 void fn_8001247C(s32 eDst, s32 eFunc, s32 eSrc, s32 nMtx);
 u32 fn_8001208C(UFontContext* pCtx, f32 fXScale, f32 fYScale, f32 fX, f32 fY);
@@ -49,6 +56,11 @@ static u8 lbl_80281C88;                 // set while fn_8001144C word-wraps (fn_
 // Byte swaps for a stream stored little-endian.
 #define LLFONT_SWAP32(x) (((u32)(x) >> 24) + (((x) & 0xFF0000) >> 8) + (((x) << 8) & 0xFF0000) + ((x) << 24))
 #define LLFONT_SWAP16(x) ((((x) & 0xFF00) >> 8) + (((x) << 8) & 0xFF00))
+
+// fake match: seeds 1.0f first in the constant pool, as a stripped function could have done.
+static f32 LLFont_StrippedFn(f32 fValue) {
+    return fValue + 1.0f;
+}
 
 // Makes a font from an 'sfn ' stream object: swaps a little-endian stream, allocates the font with
 // its glyph records and glyphs, builds each glyph's texture coordinates and sizes, and reorders the
@@ -278,51 +290,61 @@ void fn_80011310(LLFont* pFont, UFontState* pState) {
     GXSetBlendMode(1, 4, 5, 15);
 }
 
+// fake match: the inline parameter keeps EA's multiply operand order without changing the value.
+static inline f32 fn_8001144C_Read(f32 fValue) {
+    return fValue;
+}
+
 // Draws sz (NULL: pCtx->szText) in pFont with pCtx's settings, one textured quad a glyph. uA8 set:
 // word-wrap it through fn_80011D0C, which calls back here a line at a time. n9C bit 0x10000
 // draws a shadow first (colour nC4/uC8, moved by fCC, fD0). The low byte of n9C aligns the text
 // across (1: right, 2: centre, 4: by fBC), bits 8-10 down (by fC0 for 0x400); fB8 turns it.
 void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
-    f32 fAlignY;
-    f32 fSizeY;
+    f32 fX1;
+    f32 fY1;
     LLGlyph* pGlyph;
     char* p;
-    f32 fAlignX;
-    f32 fScaleY;
-    f32 fWidth;
     f32 fY0;
     f32 fOffX;
+    f32 fX2;
+    f32 fY2;
+    f32 fX0;
     f32 fLeft;
-    f32 fY;
     f32 fTop;
+    f32 fWidth;
     f32 fScaleX;
     f32 fAdvance;
-    f32 fSizeX;
-    f32 fX;
+    f32 fScaleY;
+    f32 fGradX;
     u32 uColor;
     u8 bMeasured;
-    f32 fX0;
+    f32 fGradY;
+    f32 fX;
     f32 fOffY;
-    f32 fX1;
-    f32 fY2;
-    f32 fY1;
-    f32 fX2;
-    f32 fNegSin;
-    f32 fAdvScale;
-    f32 fY3;
     f32 fRun;
     f32 fSin;
-    f32 fCos;
+    f32 fSavedY;
+    f32 fNegSin;
+    f32 fAdvScale;
+    f32 fGX1;
     f32 fX3;
+    f32 fY;
+    f32 fAlignX;
+    f32 fCos;
+    f32 fY3;
     f32 fRight;
     f32 fBottom;
+    f32 fHeightY;
     s32 nSaved;
     s32 nSavedFont;
     GXColor uSavedColor;
-    f32 fSavedY;
+    f32 fGY1;
+    f32 fAlignY;
+    f32 fGX0;
+    f32 fGY0;
     f32 fSavedX;
-    f32 fGradX;
-    f32 fGradY;
+    f32 fSizeX;
+    f32 fSizeY;
 
     if (pCtx->uA8 != 0 && lbl_80281C88 == 0) {
         lbl_80281C88 = 1;
@@ -391,15 +413,17 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
             fX -= fCos * (fWidth * fAlignX);
             fY += fSin * (fWidth * fAlignX);
         }
-        fX -= fSin * (pFont->f00 * fSizeY * fAlignY);
-        fY -= fCos * (pFont->f00 * fSizeY * fAlignY);
+        fBottom = pFont->f00 * fSizeY;
+        fX -= fSin * (fBottom * fAlignY);
+        fY -= fCos * (fBottom * fAlignY);
     } else {
         if (0.0f != fAlignX) {
             fWidth = fn_80011C90(pFont, pCtx, p);
             bMeasured = 1;
             fX -= fWidth * fAlignX;
         }
-        fY -= pFont->f00 * fSizeY * fAlignY;
+        fBottom = pFont->f00 * fSizeY;
+        fY -= fBottom * fAlignY;
     }
     fRun = 0.0f;
     fAdvScale = pCtx->f78;
@@ -454,14 +478,19 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
                 break;
             case 1:
                 if (0.0f != pCtx->fB8) {
-                    fX0 = (fSin * pGlyph->f20 + fCos * pGlyph->f1C) * fScaleX + fLeft;
-                    fY0 = (fCos * pGlyph->f20 - fSin * pGlyph->f1C) * fScaleY + fTop;
-                    fX1 = fCos * pGlyph->fWidth * fScaleX + fX0;
-                    fY1 = fNegSin * pGlyph->fWidth * fScaleY + fY0;
-                    fX3 = fX0 + fSin * pGlyph->fHeight * fScaleX;
-                    fY2 = fY1 + fCos * pGlyph->fHeight * fScaleY;
-                    fX2 = fX1 + fSin * pGlyph->fHeight * fScaleX;
-                    fY3 = fY0 + fCos * pGlyph->fHeight * fScaleY;
+                    fOffX = fSin * pGlyph->f20 + fCos * pGlyph->f1C;
+                    fX0 = fOffX * fScaleX + fLeft;
+                    fOffY = fCos * pGlyph->f20 - fSin * pGlyph->f1C;
+                    fY0 = fOffY * fScaleY + fTop;
+                    fRight = fCos * pGlyph->fWidth;
+                    fX1 = fRight * fScaleX + fX0;
+                    fBottom = fNegSin * pGlyph->fWidth;
+                    fY1 = fBottom * fScaleY + fY0;
+                    fX3 = fX0 + fSin * pGlyph->fHeight * fn_8001144C_Read(fScaleX);
+                    fHeightY = fCos * pGlyph->fHeight;
+                    fY2 = fY1 + fHeightY * fScaleY;
+                    fX2 = fX1 + fSin * pGlyph->fHeight * fn_8001144C_Read(fScaleX);
+                    fY3 = fY0 + fHeightY * fScaleY;
                 } else {
                     fX0 = fLeft + fOffX;
                     fY0 = fTop + fOffY;
@@ -476,16 +505,16 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
                     // port: EA drops the colours fn_8001208C returns, so the gradients change
                     // nothing here.
                     if (pCtx->n10 & 4) {
-                        f32 fGYMid = 0.0f;
-                        fGYMid += pGlyph->f20;
+                        f32 fZero = 0.0f;
+                        f32 fGYMid;
+                        fGYMid = fZero + pGlyph->f20;
                         fn_8001208C(pCtx, fGradX, fGradY, 0.5f * pGlyph->fWidth + (fRun + pGlyph->f1C),
                                     0.5f * pGlyph->fHeight + fGYMid);
                     } else {
-                        f32 fGY0 = 0.0f;
-                        f32 fGX0 = fRun + pGlyph->f1C;
-                        f32 fGX1 = fGX0 + pGlyph->fWidth;
-                        f32 fGY1;
-                        fGY0 += pGlyph->f20;
+                        f32 fZero = 0.0f;
+                        fGX0 = fRun + pGlyph->f1C;
+                        fGX1 = fGX0 + pGlyph->fWidth;
+                        fGY0 = fZero + pGlyph->f20;
                         fGY1 = fGY0 + pGlyph->fHeight;
 
                         fn_8001208C(pCtx, fGradX, fGradY, fGX0, fGY0);
