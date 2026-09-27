@@ -915,6 +915,43 @@ void fn_800CE170(Skin* pSkin, SkinTarget* pTarget) {
     }
 }
 
+// fake match: keep the set loop's counter as an inlined local so its register follows the
+// pointer-induction temporary; the loop body and all writes are unchanged.
+static inline void fn_800CE224_Loop(Skin* pSkin, SkinDesc14* pEntry, SkinDesc* pDesc, int nCopy,
+                                    int* pj, SkinDesc74** ppSet, s32* pbChanged, s32* pnB8,
+                                    int* pnVariant) {
+    int i;
+    SkinDesc7C* pVariant;
+    s32 nOption;
+    s32 n;
+
+    for (i = 0; i < pDesc->n70; i++) {
+        (*ppSet) = &pDesc->p74[i];
+        for ((*pj) = 0; (*pj) < (*ppSet)->n0C; (*pj)++) {
+            if (pEntry->uId == pDesc->p84[(*ppSet)->n14 + (*pj)]) {
+                (*pnVariant) = fn_800CD0B8(pSkin, i, nCopy);
+                nOption = fn_800CD1D8(pSkin, i, nCopy);
+                n = fn_800CD124(pSkin, i, (*pnVariant));
+                if (n >= 0) {
+                    (*pnB8) = n;
+                }
+                if ((*pnVariant) >= 0 && (*pnVariant) < fn_800CCED0(pSkin, i)) {
+                    pVariant = &pDesc->p7C[(*ppSet)->n10 + (*pnVariant)];
+                    if (nOption >= 0 && nOption < fn_800CCF10(pSkin, i, (*pnVariant))) {
+                        pEntry->n18 = pVariant->n0C + nOption;
+                    } else {
+                        pEntry->n18 = -1;
+                    }
+                    if ((*pnVariant) > 0) {
+                        (*pbChanged) = 1;
+                        pEntry->uId = pDesc->p84[(*pnVariant) * (*ppSet)->n0C + (*pj) + (*ppSet)->n14];
+                    }
+                }
+            }
+        }
+    }
+}
+
 // Patches a p14 entry for the chosen sets: an entry whose name code a set lists takes the chosen
 // variant's name code (from the second variant on) and the chosen option's p8C entry, and with
 // bit 2 its a20 from pB8. Gives the p8C entry's data and n2C too when asked. Returns whether
@@ -922,46 +959,18 @@ void fn_800CE170(Skin* pSkin, SkinTarget* pTarget) {
 s32 fn_800CE224(Skin* pSkin, SkinDesc14* pEntry, u8** ppOut, s32* pnOut, int nCopy) {
     SkinDesc* pDesc;
     int j;
-    int i;
+    int nVariant;
     SkinDesc74* pSet;
     s32 bChanged;
     s32 nB8;
-    SkinDesc7C* pVariant;
     SkinDescB8* pB8;
-    s32 nVariant;
-    s32 nOption;
-    s32 n;
 
     bChanged = 0;
     if (pSkin == NULL || pSkin->pModel == NULL || (pDesc = pSkin->pModel->pDesc) == NULL || pEntry == NULL) {
         return 0;
     }
     nB8 = 0;
-    for (i = 0; i < pDesc->n70; i++) {
-        pSet = &pDesc->p74[i];
-        for (j = 0; j < pSet->n0C; j++) {
-            if (pEntry->uId == pDesc->p84[pSet->n14 + j]) {
-                nVariant = fn_800CD0B8(pSkin, i, nCopy);
-                nOption = fn_800CD1D8(pSkin, i, nCopy);
-                n = fn_800CD124(pSkin, i, nVariant);
-                if (n >= 0) {
-                    nB8 = n;
-                }
-                if (nVariant >= 0 && nVariant < fn_800CCED0(pSkin, i)) {
-                    pVariant = &pDesc->p7C[pSet->n10 + nVariant];
-                    if (nOption >= 0 && nOption < fn_800CCF10(pSkin, i, nVariant)) {
-                        pEntry->n18 = pVariant->n0C + nOption;
-                    } else {
-                        pEntry->n18 = -1;
-                    }
-                    if (nVariant > 0) {
-                        bChanged = 1;
-                        pEntry->uId = pDesc->p84[nVariant * pSet->n0C + j + pSet->n14];
-                    }
-                }
-            }
-        }
-    }
+    fn_800CE224_Loop(pSkin, pEntry, pDesc, nCopy, &j, &pSet, &bChanged, &nB8, &nVariant);
     if (pEntry->u08 & 2) {
         if (pEntry->n16 > 0) {
             if (nB8 < 0 || nB8 >= pEntry->n16) {
