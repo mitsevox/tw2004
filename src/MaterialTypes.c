@@ -165,3 +165,7 @@ const SurfaceType gSurfaceTypes[NUM_SURFACE_TYPES] = {
     {1.0f, 0.0f, 0.975f, 0.07f, 0.25f, 0.7f, 0.7f, 0.375f, 0.2f, 48.0f, 0.2f, 3, 11, 0x9, 0, 0, 0},
     {0.99f, 0.01f, 0.95f, 0.068f, 0.25f, 0.7f, 0.7f, 0.375f, 0.3f, 60.0f, 0.22f, 2, 14, 0x9, 0, 0, 0},
 };
+
+// This file's .sdata2 (ball.h).
+const f32 gRealBallRadiusIn = 0.84f;
+const f32 lbl_80283304 = 0.7056f;

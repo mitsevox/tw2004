@@ -59,3 +59,4 @@ is most likely MSL's __float_max, appended to this float.c version after the ext
 extern/sdk float.c has no __float_max, and defining it there needs the symbol named __float_max
 (the game code references lbl_80281B40): a rename the audit gate holds back. The next unit's .sdata
 (CipherXOR.c) starts at 0x80281B44, so the 4 bytes belong to float.c or a unit before CipherXOR.
+| auto_09_80283300_sdata2 | 8 | MaterialTypes.c (lane A's data-only unit) | gRealBallRadiusIn (0.84f) and lbl_80283304 (0.7056f; the DOL has 0.7056f's bits, not 0.84f*0.84f's) are const globals (ball.h) read by GoDynObj, stateFunc, startUp, Swing; neither GoTerrainCollision.c nor Ball.c, the .sdata2 neighbours, uses them, and MaterialTypes.c links exactly between them (TW06: golf/physics/materialtypes.c, the physics data file) | linked, main.dol OK |
