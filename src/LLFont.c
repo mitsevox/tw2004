@@ -317,6 +317,7 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
     f32 fY3;
     f32 fRight;
     f32 fBottom;
+    f32 fHeightY;
     s32 nSaved;
     s32 nSavedFont;
     GXColor uSavedColor;
@@ -469,9 +470,10 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
                     fBottom = fNegSin * pGlyph->fWidth;
                     fY1 = fBottom * fScaleY + fY0;
                     fX3 = fX0 + fSin * pGlyph->fHeight * fScaleX;
-                    fY2 = fY1 + fCos * pGlyph->fHeight * fScaleY;
+                    fHeightY = fCos * pGlyph->fHeight;
+                    fY2 = fY1 + fHeightY * fScaleY;
                     fX2 = fX1 + fSin * pGlyph->fHeight * fScaleX;
-                    fY3 = fY0 + fCos * pGlyph->fHeight * fScaleY;
+                    fY3 = fY0 + fHeightY * fScaleY;
                 } else {
                     fX0 = fLeft + fOffX;
                     fY0 = fTop + fOffY;
