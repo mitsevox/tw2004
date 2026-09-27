@@ -392,7 +392,7 @@ void fn_8010F1B4(MsgArg* pArgs, MsgArg* pResult) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_8010F248(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_801070F4();
+    pResult->i = FE_CrAP_CollectSponsorshipItems();
 }
 
 // ---- end of sweep code ----
@@ -406,7 +406,7 @@ void fn_8010F278(MsgArg* pArgs, MsgArg* pResult) {
     s32* pN0 = (s32*)pArgs[1].p;
 
     n0 = 0;
-    fn_80107244(n, &n0, pN4, szName);
+    FE_CrAP_GetSponsorshipItemInfo(n, &n0, pN4, szName);
     *pN0 = n0;
 }
 
@@ -522,7 +522,7 @@ void fn_8010F63C(MsgArg* pArgs, MsgArg* pResult) {
     char sz[0x34];                      // a CrAPRecord's name (0x24); size unknown, the frame fits 0x34
     s32 n4;
     s16 n0;
-    s32 nRecords = fn_801070F4();
+    s32 nRecords = FE_CrAP_CollectSponsorshipItems();
     int i;
     s32 nTotal;
 
@@ -530,7 +530,7 @@ void fn_8010F63C(MsgArg* pArgs, MsgArg* pResult) {
     nTotal = 0;
     n4 = 0;
     for (i = 0; i < nRecords; i++) {
-        fn_80107244(i, &n0, &n4, sz);
+        FE_CrAP_GetSponsorshipItemInfo(i, &n0, &n4, sz);
         nTotal += n4;
     }
     pResult->i = nTotal;

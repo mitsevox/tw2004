@@ -117,23 +117,23 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset);
 u8   fn_801048B0(int nPart);
 int  FE_CrAP_GetAssetIndexFromAsset(CrAPAsset* pAsset);
 int  FE_CrAP_GetFirstCategoryAssetID(s16 nPart);
-void fn_80105188(UStreamObject* pObject);
-void fn_801051F4(UStreamObject* pObject);
-void fn_80105240(void);
-void fn_80105B80(CrAPAsset* pAsset, char* pName);
-void fn_80105DAC(void);
+void FE_CrAP_LoadAssetsFromStream(UStreamObject* pObject);
+void FE_CrAP_LoadStringsFromStream(UStreamObject* pObject);
+void FE_CrAP_PostAssetsLoad(void);
+void FE_CrAP_GetAssetVariantName(CrAPAsset* pAsset, char* pName);
+void CrAPAssetsByteSwap(void);
 void fn_80105EFC(void);
 void FE_CheckSpecialCaseConnections(CrAPAsset* pAsset);
 u8   FE_IsMatchingSubCategory(s16 nPart, int nCategory, int nWanted);
-u8   fn_80106658(CrAPAsset* pAsset);
-int  fn_80106750(CrAPAsset* pAsset, Skin** apSkins);
+u8   FE_CrAP_TryClubSwappingAsset(CrAPAsset* pAsset);
+int  FE_CrAP_GetClubSkinsForAsset(CrAPAsset* pAsset, Skin** apSkins);
 u8   FE_CrAP_TryBallSwappingAsset(CrAPAsset* pAsset);
-void fn_80106A64(CrAPAsset* pAsset, Skin* pSkin);
-void fn_80106B04(CrAPAsset* pAsset, Skin* pSkin);
-void fn_80106BF8(CrAPAsset* pAsset, Skin* pSkin);
-void fn_80106D24(CrAPAsset* pAsset, Skin* pSkin);
-void fn_80106DA0(CrAPAsset* pAsset, Skin* pSkin);
-int  fn_8010766C(MsgArg* pArg, char* sz);
+void FE_CrAP_ApplyAssetParts(CrAPAsset* pAsset, Skin* pSkin);
+void FE_CrAP_ApplyAssetSets(CrAPAsset* pAsset, Skin* pSkin);
+void FE_CrAP_ApplyAssetSetsToClubSkin(CrAPAsset* pAsset, Skin* pSkin);
+void FE_CrAP_RemoveAssetParts(CrAPAsset* pAsset, Skin* pSkin);
+void FE_CrAP_RemoveAssetSets(CrAPAsset* pAsset, Skin* pSkin);
+int  FE_SetHintString(MsgArg* pArg, char* sz);
 
 // UISScreen.c's sender, with the front end's view of its arguments (as GameMessages.c declares it;
 // uistudio.h has UIStudio* and const s32*, and game/frontend.h cannot be included with it).
@@ -296,7 +296,7 @@ int FE_CrAP_GetEquippedAsset(s16 nSlot) {
 }
 
 // Save the created golfer's body skin entries in the profile.
-void fn_80103D6C(void) {
+void FE_CrAP_SaveBodySkinChoices(void) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     Skin* pSkin = lbl_80281EE0->pB4->pChar->pSkin;
 
@@ -305,7 +305,7 @@ void fn_80103D6C(void) {
 }
 
 // And the entries of its six other skins.
-void fn_80103DE0(void) {
+void FE_CrAP_SaveClubSkinChoices(void) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     Skin* pSkin;
     int i;
@@ -324,7 +324,7 @@ void sTurnOffAnimation(CrAPAsset* pAsset, int b) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     char szName[16];
 
-    fn_80105B80(pAsset, szName);
+    FE_CrAP_GetAssetVariantName(pAsset, szName);
     if (fn_800587A8(pProfile, b, szName)) {
         fn_80058624(pProfile, b, szName);
     }
@@ -340,11 +340,11 @@ void FE_CrAP_TurnOffAsset(CrAPAsset* pAsset) {
     pBase = sGetLinkedAsset(pAsset);
     if (pBase->n2E != -1) {
         pSkin = lbl_80281EE0->pB4->pChar->pSkin;
-        fn_80106D24(pBase, pSkin);
-        fn_80106DA0(pBase, pSkin);
+        FE_CrAP_RemoveAssetParts(pBase, pSkin);
+        FE_CrAP_RemoveAssetSets(pBase, pSkin);
         fn_8008E944(0, 0.0f);
         fn_8001D624(lbl_80281EE0->pB4->n10);
-        fn_80103D6C();
+        FE_CrAP_SaveBodySkinChoices();
         FE_CrAP_ClearEquippedAsset(pBase);
     }
 }
@@ -379,7 +379,7 @@ void sTurnOnAnimation(CrAPAsset* pAsset, int b) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     char szName[24];
 
-    fn_80105B80(pAsset, szName);
+    FE_CrAP_GetAssetVariantName(pAsset, szName);
     if (fn_800587A8(pProfile, b, szName)) {
         fn_80058624(pProfile, b, szName);
     } else {
@@ -424,7 +424,7 @@ void sTurnOnLogo(s16 nPart, int b, int i) {
         SkinPart_ChooseSet(pSkin, nSet, nVariant, 0);
     }
     fn_8001D624(lbl_80281EE0->pB4->n10);
-    fn_80103D6C();
+    FE_CrAP_SaveBodySkinChoices();
 }
 
 // A part 18 asset: set the menu golfer's n0 from it and have the golfer play its animation (unless
@@ -469,7 +469,7 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
     }
     nPart = pAsset->nPart;
     fn_8008EA38(1);
-    if (fn_80106658(pAsset)) {
+    if (FE_CrAP_TryClubSwappingAsset(pAsset)) {
         fn_8008EABC(0);
         fn_8001D624(lbl_80281EE0->pB4->n10);
         if (stricmp(FE_CrAP_GetStringFromTable(pAsset->n112), "gdlcrp07") == 0 ||
@@ -492,7 +492,7 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
             bLoop = 1;
             nPlay = 0;
         }
-        fn_80103DE0();
+        FE_CrAP_SaveClubSkinChoices();
         FE_CrAP_ClearEquippedAsset(pAsset);
     } else if (FE_CrAP_TryBallSwappingAsset(pAsset)) {
         if (fn_8008E9A8() != 2) {
@@ -506,10 +506,10 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
         if (nOld >= 0) {
             FE_CrAP_TurnOffAsset(FE_CrAP_GetAssetFromAssetIndex(nOld));
         }
-        fn_80106A64(pAsset, pSkin);
-        fn_80106B04(pAsset, pSkin);
+        FE_CrAP_ApplyAssetParts(pAsset, pSkin);
+        FE_CrAP_ApplyAssetSets(pAsset, pSkin);
         fn_8001D624(lbl_80281EE0->pB4->n10);
-        fn_80103D6C();
+        FE_CrAP_SaveBodySkinChoices();
         if (fn_8008E9A8() != 0) {
             fn_8008E8D0(0);
         }
@@ -827,8 +827,8 @@ int FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(s16 nPart, i
 
 // Take the database's stream objects as they load.
 void FE_CrAP_RegisterStreamClients(void) {
-    Stream_RegisterLoadChunkCallback('CR_A', fn_80105188);
-    Stream_RegisterLoadChunkCallback('CR_S', fn_801051F4);
+    Stream_RegisterLoadChunkCallback('CR_A', FE_CrAP_LoadAssetsFromStream);
+    Stream_RegisterLoadChunkCallback('CR_S', FE_CrAP_LoadStringsFromStream);
 }
 
 // Find each part's first asset (the assets are sorted by part; 0 when a part has none).
@@ -858,18 +858,18 @@ void FE_CrAP_UnRegisterStreamClients(void) {
 }
 
 // The 'CR_A' handler: the assets.
-void fn_80105188(UStreamObject* pObject) {
+void FE_CrAP_LoadAssetsFromStream(UStreamObject* pObject) {
     if (pObject != NULL) {
         lbl_80282460->pAssets = (CrAPAsset*)pObject->pData;
         lbl_80282460->nAssets = pObject->uSize / sizeof(CrAPAsset);
-        fn_80105DAC();
+        CrAPAssetsByteSwap();
         lbl_80282464 = pObject;
-        fn_80105240();
+        FE_CrAP_PostAssetsLoad();
     }
 }
 
 // The 'CR_S' handler: the names.
-void fn_801051F4(UStreamObject* pObject) {
+void FE_CrAP_LoadStringsFromStream(UStreamObject* pObject) {
     if (pObject != NULL) {
         lbl_80282460->pStrings = (char*)pObject->pData;
         lbl_80282460->uStringsSize = pObject->uSize;
@@ -879,7 +879,7 @@ void fn_801051F4(UStreamObject* pObject) {
 }
 
 // With the assets loaded: index the parts and pick the day's random assets.
-void fn_80105240(void) {
+void FE_CrAP_PostAssetsLoad(void) {
     FE_CrAP_SetupFirstAssetIDs();
     fn_80077B78();
 }
@@ -1036,7 +1036,7 @@ int fn_80105644(s16 nPart, int b, int i, int n) {
 // Colour n of a part's choice i (from the list b), as RGBA bytes: the asset's own aColor[n], or for
 // colour kinds 0..2 that colour of the skin option the asset picks, on the club skin its category
 // uses (shafts and grips: the drivers' for the "fwd_" sets, else the irons') or the body skin.
-void fn_8010568C(s16 nPart, int b, int i, int n, u8* pColor) {
+void FE_CrAP_GetPartColorRGBA(s16 nPart, int b, int i, int n, u8* pColor) {
     char szSet[16];                     // the size is unknown (the frame allows up to 16)
     CrAPAsset* pAsset;
     char* szCategory;
@@ -1142,13 +1142,15 @@ void fn_8010568C(s16 nPart, int b, int i, int n, u8* pColor) {
     pColor[3] = pAsset->aColor[n][3];
 }
 
-void fn_80105B4C(s16 nPart, int b, int i, char* pName) {
-    fn_80105B80(FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i), pName);
+// Copy the name of a part's choice i's first variant (its animation name, for part 13) into pName.
+void FE_CrAP_GetPartVariantName(s16 nPart, int b, int i, char* pName) {
+    FE_CrAP_GetAssetVariantName(FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i),
+                                pName);
 }
 
 // Copy the name of the asset's first variant id. The ids are byte-swapped for the lookup and swapped
 // back after.
-void fn_80105B80(CrAPAsset* pAsset, char* pName) {
+void FE_CrAP_GetAssetVariantName(CrAPAsset* pAsset, char* pName) {
     u64 nId;
     u8* pSrc;
 
@@ -1180,7 +1182,7 @@ u8 FE_CrAP_IsCrAPDBLoaded(void) {
 
 // How many different choices fit a part's entry b: assets of the same category and the same first
 // colour count once.
-int fn_80105C44(s16 nPart, int b) {
+int FE_CrAP_GetNumberUniqueGeometries(s16 nPart, int b) {
     int nCount = 0;
     int i;
     int j;
@@ -1214,7 +1216,7 @@ int fn_80105C44(s16 nPart, int b) {
 }
 
 // Swap every asset from the disc's byte order.
-void fn_80105DAC(void) {
+void CrAPAssetsByteSwap(void) {
     u8* pSrc;
     u8* pDst;
     u32 i;
@@ -1458,10 +1460,10 @@ u8 FE_CrAP_GetUnlockMessageFrom(s16 nPart, int b, int i, char* pDst) {
     return 0;
 }
 
-// A club asset (a category fn_80106750 knows): put it on all six club skins (see the EA bug
+// A club asset (a category FE_CrAP_GetClubSkinsForAsset knows): put it on all six club skins (see the EA bug
 // below), not only the ones its category uses. 0 when it is not a club asset or the golfer has no
 // club skins.
-u8 fn_80106658(CrAPAsset* pAsset) {
+u8 FE_CrAP_TryClubSwappingAsset(CrAPAsset* pAsset) {
     Skin* apSkins[6];
     int nSkins;
     int i;
@@ -1470,7 +1472,7 @@ u8 fn_80106658(CrAPAsset* pAsset) {
         lbl_80281EE0->pB4->pChar->p16D8 == NULL) {
         return 0;
     }
-    nSkins = fn_80106750(pAsset, apSkins);
+    nSkins = FE_CrAP_GetClubSkinsForAsset(pAsset, apSkins);
     if (nSkins <= 0) {
         return 0;
     }
@@ -1478,8 +1480,8 @@ u8 fn_80106658(CrAPAsset* pAsset) {
         // EA bug: the inner loop reuses i, so every club skin gets the asset once, whatever nSkins
         // is, and apSkins is never read
         for (i = 0; i < 6; i++) {
-            fn_80106A64(pAsset, lbl_80281EE0->pB4->pChar->p16D8->apSkins[i]);
-            fn_80106BF8(pAsset, lbl_80281EE0->pB4->pChar->p16D8->apSkins[i]);
+            FE_CrAP_ApplyAssetParts(pAsset, lbl_80281EE0->pB4->pChar->p16D8->apSkins[i]);
+            FE_CrAP_ApplyAssetSetsToClubSkin(pAsset, lbl_80281EE0->pB4->pChar->p16D8->apSkins[i]);
         }
     }
     return 1;
@@ -1487,7 +1489,7 @@ u8 fn_80106658(CrAPAsset* pAsset) {
 
 // The club skins an asset's category goes on, into apSkins; how many (0: not a club category).
 // The six skins are the drivers, fairway woods, putters, two of irons and the wedges.
-int fn_80106750(CrAPAsset* pAsset, Skin** apSkins) {
+int FE_CrAP_GetClubSkinsForAsset(CrAPAsset* pAsset, Skin** apSkins) {
     char* szCategory = FE_CrAP_GetStringFromTable(pAsset->nCategory);
 
     if (lbl_80281EE0->pB4 == NULL || lbl_80281EE0->pB4->pChar == NULL ||
@@ -1552,7 +1554,7 @@ u8 FE_CrAP_TryBallSwappingAsset(CrAPAsset* pAsset) {
 }
 
 // Put the asset on a skin: each of its parts the skin has gets the asset's variant.
-void fn_80106A64(CrAPAsset* pAsset, Skin* pSkin) {
+void FE_CrAP_ApplyAssetParts(CrAPAsset* pAsset, Skin* pSkin) {
     int i;
     s32 nPart;
     s32 nVariant;
@@ -1567,7 +1569,7 @@ void fn_80106A64(CrAPAsset* pAsset, Skin* pSkin) {
 }
 
 // And each of its sets the skin has gets the asset's variant and option.
-void fn_80106B04(CrAPAsset* pAsset, Skin* pSkin) {
+void FE_CrAP_ApplyAssetSets(CrAPAsset* pAsset, Skin* pSkin) {
     s32 nSet;
     s32 nVariant;
     s32 nOption;
@@ -1589,7 +1591,7 @@ void fn_80106B04(CrAPAsset* pAsset, Skin* pSkin) {
 
 // The same for a club skin, except that a set's "DefaultL" variant is used instead when it has one
 // and the profile's choices.n113 is 1.
-void fn_80106BF8(CrAPAsset* pAsset, Skin* pSkin) {
+void FE_CrAP_ApplyAssetSetsToClubSkin(CrAPAsset* pAsset, Skin* pSkin) {
     s32 nSet;
     s32 nVariant;
     s32 nDefaultL;
@@ -1615,7 +1617,7 @@ void fn_80106BF8(CrAPAsset* pAsset, Skin* pSkin) {
 }
 
 // Take the asset's parts off a skin: each goes back to variant 0.
-void fn_80106D24(CrAPAsset* pAsset, Skin* pSkin) {
+void FE_CrAP_RemoveAssetParts(CrAPAsset* pAsset, Skin* pSkin) {
     int i;
     s32 nPart;
 
@@ -1630,7 +1632,7 @@ void fn_80106D24(CrAPAsset* pAsset, Skin* pSkin) {
 }
 
 // And its sets: each goes back to its "Defaults" variant (or 0).
-void fn_80106DA0(CrAPAsset* pAsset, Skin* pSkin) {
+void FE_CrAP_RemoveAssetSets(CrAPAsset* pAsset, Skin* pSkin) {
     int i;
     int nSet;
     s32 nVariant;
@@ -1725,7 +1727,7 @@ s32 FE_CrAP_GetNextUnlockVal(s32 nKind, s32 nAfter) {
 // Fill lbl_80282470: a record for each of the profile's set a1054C entries and each asset in the
 // profile's slots whose n2C is that entry's n (with fn_800F0304 of the entry and the asset's name).
 // How many records there are.
-s32 fn_801070F4(void) {
+s32 FE_CrAP_CollectSponsorshipItems(void) {
     s32 aAssets[64];
     s16 nSlot;
     SaveProfile* pProfile = FE_GetCurrentProfile();
@@ -1759,7 +1761,7 @@ s32 fn_801070F4(void) {
 }
 
 // Copy record n out of lbl_80282470.
-void fn_80107244(int n, s16* pN0, s32* pN4, char* pDst) {
+void FE_CrAP_GetSponsorshipItemInfo(int n, s16* pN0, s32* pN4, char* pDst) {
     *pN0 = lbl_80282470[n].n0;
     *pN4 = lbl_80282470[n].n4;
     strcpy(pDst, lbl_80282470[n].sz8);
@@ -1823,11 +1825,13 @@ void FE_CrAP_GetSubcategoryNameFromAssetID(int nAsset, char* pDst) {
 }
 
 // Copy an asset's name into pDst.
-void fn_8010749C(int nAsset, char* pDst) {
+void FE_CrAP_GetAssetNameFromAssetID(int nAsset, char* pDst) {
     strcpy(pDst, lbl_80282460->pAssets[nAsset].szName);
 }
 
-u8 fn_801074D4(int nAsset) {
+// Whether picking the equipped asset again takes it off (FE_CrAPMessages): yes for animations (part
+// 13) and the assets of slots 2 and 4..14, no for the other slots.
+u8 FE_CrAP_IsAssetRemovable(int nAsset) {
     s16 n2E = FE_CrAP_GetAssetFromAssetIndex(nAsset)->n2E;
 
     if (FE_CrAP_GetCategoryFromAssetID(nAsset) == 13) {
@@ -1854,7 +1858,7 @@ u8 fn_801074D4(int nAsset) {
 // Senders the EA Sports Bio screens (EASportsBio.c) use: message nMsg with its values to the front
 // end's handler, when there is a front end. A string value goes as a MsgString.
 
-void fn_80107554(int nMsg, s32 nA) {
+void FE_SendHintInt(int nMsg, s32 nA) {
     MsgArg arg;
 
     if (lbl_80281F1C != NULL) {
@@ -1863,39 +1867,41 @@ void fn_80107554(int nMsg, s32 nA) {
     }
 }
 
-void fn_80107594(int nMsg, s32 nA, char* szB) {
+void FE_SendHintIntString(int nMsg, s32 nA, char* szB) {
     MsgString str;
     MsgArg args[2];
 
     if (lbl_80281F1C != NULL) {
         args[0].i = nA;
         args[1].p = &str;
-        fn_8010766C(&args[1], szB);
+        FE_SetHintString(&args[1], szB);
         UISProcessHint(lbl_80281F1C->pHandler, nMsg, 2, args);
     }
 }
 
-void fn_801075F8(int nMsg, s32 nA, char* szB, s32 nC) {
+void FE_SendHintIntStringInt(int nMsg, s32 nA, char* szB, s32 nC) {
     MsgArg args[3];
     MsgString str;
 
     if (lbl_80281F1C != NULL) {
         args[0].i = nA;
         args[1].p = &str;
-        fn_8010766C(&args[1], szB);
+        FE_SetHintString(&args[1], szB);
         args[2].i = nC;
         UISProcessHint(lbl_80281F1C->pHandler, nMsg, 3, args);
     }
 }
 
 // Point the string value pArg holds at sz.
-int fn_8010766C(MsgArg* pArg, char* sz) {
+int FE_SetHintString(MsgArg* pArg, char* sz) {
     ((MsgString*)pArg->p)->pStr = sz;
     ((MsgString*)pArg->p)->nLen = strlen(sz);
     return 0;
 }
 
-int fn_801076B0(char* sz, int nMsg) {
+// Send message nMsg with the string sz to the front end's handler (note the string comes first); -1
+// when there is no front end, else 0.
+int FE_SendHintString(char* sz, int nMsg) {
     MsgArg arg;
     MsgString str;
 
@@ -1903,12 +1909,12 @@ int fn_801076B0(char* sz, int nMsg) {
         return -1;
     }
     arg.p = &str;
-    fn_8010766C(&arg, sz);
+    FE_SetHintString(&arg, sz);
     UISProcessHint(lbl_80281F1C->pHandler, nMsg, 1, &arg);
     return 0;
 }
 
-void fn_8010771C(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, f32 fG) {
+void FE_SendHint7Args(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, f32 fG) {
     MsgArg args[7];
 
     if (lbl_80281F1C != NULL) {
@@ -1923,7 +1929,7 @@ void fn_8010771C(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, f32 f
     }
 }
 
-void fn_80107774(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, s32 nG, s32 nH, s32 nI,
+void FE_SendHint10Args(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, s32 nG, s32 nH, s32 nI,
                  s32 nJ) {
     MsgArg args[10];
 

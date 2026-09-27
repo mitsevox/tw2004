@@ -161,16 +161,16 @@ void fn_80124C10(void) {
     uLanguage = 'en';
     if (lbl_8028257D) {
         fn_8012DE90(&nProducts);
-        fn_80107554(0xAD, nProducts);
+        FE_SendHintInt(0xAD, nProducts);
         fn_8012DF4C(&uBioLevel, &fProgress);
         for (i = lbl_80282578, n = 0; i < nProducts; n++, i++) {
             fn_8012E1E0(i, &uLevel);
             bUnlocked = uBioLevel >= uLevel;
             fn_8012DFDC(i, szName, sizeof(szName));
-            fn_801075F8(0xAC, n, szName, bUnlocked);
+            FE_SendHintIntStringInt(0xAC, n, szName, bUnlocked);
         }
         for (i = nProducts; i < 11; i++) {
-            fn_801075F8(0xAC, i, lbl_80281994, 0);
+            FE_SendHintIntStringInt(0xAC, i, lbl_80281994, 0);
         }
         lbl_8028257D = 0;
     }
@@ -178,17 +178,17 @@ void fn_80124C10(void) {
         nCount = 0;
         bByTime = lbl_80282568 == 0;
         fn_8012E670(lbl_80282570, bByTime, &nCount);
-        fn_80107554(0xAF, nCount);
+        FE_SendHintInt(0xAF, nCount);
         for (i = lbl_80282574, n = 0; i < nCount; i++) {
             if (fn_8012E434(lbl_80282570, i, bByTime, szWide, EASB_ACCOMPLISHMENT_NAME_SIZE, &uTime,
                             &uWantLanguage, 1, &uLanguage) == EASB_ERROR_NONE) {
                 MC_ConvertWideCharToChar(szWide, szAccomplishment, 0x3F);
-                fn_80107594(0xAE, n, szAccomplishment);
+                FE_SendHintIntString(0xAE, n, szAccomplishment);
                 n++;
             }
         }
         for (; n < 10; n++) {
-            fn_80107594(0xAE, n, lbl_80281994);
+            FE_SendHintIntString(0xAE, n, lbl_80281994);
         }
         lbl_8028257C = 0;
     }
@@ -205,7 +205,7 @@ void fn_80124C10(void) {
         fn_8012DE38(&uTimeB);
         fn_8012E820(uTimeA + uTimeB, (u16*)&nDays, &nHours, &nMinutes, &nSeconds);
         fn_8012DE90(&nProducts);
-        fn_8010771C(0xB1, uBioLevel, nProducts, nDays, nHours, nMinutes, nSeconds, uBioLevel);
+        FE_SendHint7Args(0xB1, uBioLevel, nProducts, nDays, nHours, nMinutes, nSeconds, uBioLevel);
         lbl_8028198C = 15;
     }
     if (lbl_80282569 && lbl_80281990-- <= 0) {
@@ -221,7 +221,7 @@ void fn_80124C10(void) {
         uUnused = 0;
         fProgress = 0.0f;
         fn_8012DFDC(lbl_80282570, szName, sizeof(szName));
-        fn_801076B0(szName, 0xB3);
+        FE_SendHintString(szName, 0xB3);
         fn_8012E25C(lbl_80282570, &uTimeA);
         fn_8012E2D4(lbl_80282570, &uTimeB);
         fn_8012E820(uTimeA + uTimeB, (u16*)&nDays, &nHours, &nMinutes, &nSeconds);
@@ -239,9 +239,9 @@ void fn_80124C10(void) {
         fn_8012E084(lbl_80282570, szGamesPlayedType, EASB_GAMES_PLAYED_TYPE_SIZE, &uWantLanguage, 1,
                     &uLanguage);
         MC_ConvertWideCharToChar(szGamesPlayedType, szGamesPlayed, 0x3F);
-        fn_801076B0(szGamesPlayed, 0xBF);
-        fn_801076B0(szName, 0xB3);
-        fn_80107774(0xB2, nDays, nHours, nMinutes, nSeconds, nMonth, nDay, nYear, nPlayed, nPercent,
+        FE_SendHintString(szGamesPlayed, 0xBF);
+        FE_SendHintString(szName, 0xB3);
+        FE_SendHint10Args(0xB2, nDays, nHours, nMinutes, nSeconds, nMonth, nDay, nYear, nPlayed, nPercent,
                     uGameLevel);
         lbl_80281990 = 15;
     }

@@ -82,8 +82,8 @@ Objects delivered by UStream
 | `RTEn` | fn_800F060C | GameModeDriverRTE.c | none seen | bytes: names, copied |
 | `TCM ` | fn_8010237C | GameMode4.c | none seen | yes: copied over `lbl_802124B8` (`LadderEvent[25]`, GameMode4.c); `port:` note in the handler |
 | `TCMS` | fn_801023A8 | GameMode4.c | none seen | bytes: text, copied |
-| `CR_A` | fn_80105188 | FE_CrAPDB.c | swapped: fn_80105DAC > ByteSwap_Records | little-endian on disc |
-| `CR_S` | fn_801051F4 | FE_CrAPDB.c | none seen | asm |
+| `CR_A` | FE_CrAP_LoadAssetsFromStream | FE_CrAPDB.c | swapped: CrAPAssetsByteSwap > ByteSwap_Records | little-endian on disc |
+| `CR_S` | FE_CrAP_LoadStringsFromStream | FE_CrAPDB.c | none seen | asm |
 | `PGST` | fn_80117694 | sweep | none seen | asm |
 | `gras` | fn_8011E584 | GoGrass.c | none seen | asm; GoGrass.c has a swapping function (fn_8011E4D8) the handler does not reach within four calls: probably swapped later (inferred) |
 | `EASI` | fn_80124B10 | sweep | none seen | asm |

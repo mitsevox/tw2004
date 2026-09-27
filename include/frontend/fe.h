@@ -257,7 +257,7 @@ LAYOUT_ASSERT(FEGolferMachine, 0xC);
 #define CRAP_NUM_PARTS 24
 
 // A Create-A-Player asset (0x118 bytes): a hat, a shirt, a colour... The 'CR_A' stream object is
-// the array of them all (fn_80105188). Only what the cleaned code reads.
+// the array of them all (FE_CrAP_LoadAssetsFromStream). Only what the cleaned code reads.
 typedef struct CrAPAsset {
     s32  n0;                    // 0x000  part 18's assets pass it to fn_8008EAE0 (fn_801042D0)
     char szName[0x28 - 0x4];    // 0x004  "White", "Bright Red", "... backwards" ...
@@ -265,7 +265,7 @@ typedef struct CrAPAsset {
     s16  nCategory;             // 0x02A  its category: where the category's name ("Hats",
                                 //        "Visors") starts in the 'CR_S' strings (FE_CrAP_GetStringFromTable)
     s16  n2C;                   // 0x02C
-    s16  n2E;                   // 0x02E  0..15; fn_801074D4 tests it
+    s16  n2E;                   // 0x02E  0..15; FE_CrAP_IsAssetRemovable tests it
     s32  n30;                   // 0x030
     s32  n34;                   // 0x034
     s32  n38;                   // 0x038
@@ -281,20 +281,20 @@ typedef struct CrAPAsset {
     s16  n48;                   // 0x048
     s8   a4A[6];                // 0x04A  indexed by fn_80105644's last argument
     s8   aColorKind[6];         // 0x050  per colour: 0..2 take the skin option's colour of that
-                                //        kind (fn_8010568C); -1 and others use aColor
+                                //        kind (FE_CrAP_GetPartColorRGBA); -1 and others use aColor
     u8   unk56[2];
     u8   aColor[6][4];          // 0x058  its colours, RGBA; assets of a category whose first
-                                //        colour differs are different choices (fn_80105C44)
+                                //        colour differs are different choices (FE_CrAP_GetNumberUniqueGeometries)
     u64  aPart[4];            // 0x070  } the ids of four skin parts it sets (SkinPart_FindPart finds
-    u64  aVariant[4];           // 0x090  } them) and the id of each one's variant (fn_80106A64)
+    u64  aVariant[4];           // 0x090  } them) and the id of each one's variant (FE_CrAP_ApplyAssetParts)
     u64  aSet[4];               // 0x0B0  the ids of four skin sets; taking the asset off puts
-                                //        them back to "Defaults" (fn_80106DA0)
+                                //        them back to "Defaults" (FE_CrAP_RemoveAssetSets)
     u64  aSetVariant[4];        // 0x0D0  } putting it on gives each set the variant and option
-    u64  aSetOption[4];         // 0x0F0  } with these ids (fn_80106B04)
+    u64  aSetOption[4];         // 0x0F0  } with these ids (FE_CrAP_ApplyAssetSets)
     s16  n110;                  // 0x110  the offset in 'CR_S' of its unlock text (-1: none; FE_CrAP_GetUnlockMessageFrom)
     s16  n112;                 // 0x112  } offsets of strings in 'CR_S' (FE_CrAP_GetStringFromTable); n114 is
     s16  n114;                  // 0x114  } passed to fn_8008E724 with the asset's name (sTurnOnAnimation)
-    s16  n116;                  // 0x116  (swapped by fn_80105DAC)
+    s16  n116;                  // 0x116  (swapped by CrAPAssetsByteSwap)
 } CrAPAsset;
 LAYOUT_ASSERT(CrAPAsset, 0x118);
 
@@ -312,7 +312,7 @@ typedef struct CrAPDB {
 LAYOUT_ASSERT(CrAPDB, 0x18);
 
 // A 0x2C-byte record of the Create-A-Player database's table lbl_80282470 (64 of them,
-// FE_CrAP_InitModule); fn_80107244 copies one out.
+// FE_CrAP_InitModule); FE_CrAP_GetSponsorshipItemInfo copies one out.
 typedef struct CrAPRecord {
     s16  n0;                    // 0x00
     u8   unk2[2];
@@ -325,13 +325,13 @@ extern CrAPDB* lbl_80282460;
 extern UStreamObject* lbl_80282464;     // the 'CR_A' object (the assets), kept until freed
 extern UStreamObject* lbl_80282468;     // the 'CR_S' object (their names)
 extern s32 lbl_8028246C;                // cleared by FE_CrAP_InitModule
-extern CrAPRecord* lbl_80282470;        // 64 records (fn_80107244); freed by FE_CrAP_CloseModule
+extern CrAPRecord* lbl_80282470;        // 64 records (FE_CrAP_GetSponsorshipItemInfo); freed by FE_CrAP_CloseModule
 extern s32* lbl_80282474;               // per part: the index of its first asset
 extern s32* lbl_80282478;               // per part, 24 entries: the categories FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex found
 extern s32* lbl_8028247C;               // 0x600 entries, rows 24 apart (FE_CrAP_ResetLastCategoryTables clears 64 from
                                         // each row's start); FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex stores a part's choice count
 extern s32* lbl_80282480;               // 24 entries (FE_CrAP_ResetLastCategoryTables sets them to -1)
-extern SwapField lbl_80193228[20];      // an asset's byte-swap layout (fn_80105DAC)
+extern SwapField lbl_80193228[20];      // an asset's byte-swap layout (CrAPAssetsByteSwap)
 extern char lbl_801935C8[16][32];      // 16 names (FE_CrAP_GetSponsorName)
 extern char lbl_801937C8[11][32];      // the skin sets a logo can go on ("ushirtlogof",
                                         // "uhatlogof", "uarmtattool"...; sTurnOnLogo)
@@ -352,7 +352,7 @@ int  FE_CrAP_GetNumberOfSubcategoryIndicesForCategory(s16 nPart);
 void FE_CrAP_RestoreLastRemovedAsset(void);
 u8   FE_CrAP_GetSubCategoryNameForCategoryAndSubcategoryIndex(s16 nPart, int n, char* pDst); // copy the name of a part's entry n (for 0 its
                                         // "All ..." entry when it has one); 0 if there is none
-int  fn_80105C44(s16 nPart, int b);     // how many different choices fit a part's entry b
+int  FE_CrAP_GetNumberUniqueGeometries(s16 nPart, int b);     // how many different choices fit a part's entry b
 void FE_CrAP_GetCategorySubcategoryAndEntryNumFromAssetID(int nAsset, s16* pnPart, s32* pnEntry, s32* pnPlace); // where an asset is listed:
                                         // its part, the entry of its category, its place there
 u8   FE_IsValidCurrentGender(s8 n);                 // an asset with this n40 is offered
@@ -361,7 +361,7 @@ int  FE_CrAP_GetFirstEquippedIndexForCategory(s16 nPart);            // the asse
 u8   FE_CrAP_GetColorNameFromID(int nOffset, char* pDst);  // copy a 'CR_S' name ("" for "NONE")
 void FE_CrAP_GetCategoryInfo(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s32* pAll);  // count a part's
                                         // offered assets: locked, with each bit set, and all
-u8   fn_801074D4(int nAsset);
+u8   FE_CrAP_IsAssetRemovable(int nAsset);
 s16  FE_CrAP_GetCategoryFromAssetID(int nAsset);           // the part an asset is a choice for
 int  FE_CrAP_GetLevelFromAssetID(int nAsset);           // an asset's n38
 u8   FE_CrAP_IsAssetAvailableForUser(int nAsset);           // the asset may be picked: not locked when last checked,
@@ -399,12 +399,12 @@ int  FE_CrAP_GetPartAttributeModifier2(s16 nPart, int b, int i);
 s8   FE_CrAP_GetPartGMLockID(s16 nPart, int b, int i);
 s16  FE_CrAP_GetPartGMLockVal(s16 nPart, int b, int i);
 int  fn_80105644(s16 nPart, int b, int i, int n);
-void fn_8010568C(s16 nPart, int b, int i, int n, u8* pColor);  // pColor: 4 bytes
-void fn_80105B4C(s16 nPart, int b, int i, char* pName);
+void FE_CrAP_GetPartColorRGBA(s16 nPart, int b, int i, int n, u8* pColor);  // pColor: 4 bytes
+void FE_CrAP_GetPartVariantName(s16 nPart, int b, int i, char* pName);
 u8   FE_CrAP_IsItemEquipped(s16 nPart, int b, int i);
 u8   FE_CrAP_GetUnlockMessageFrom(s16 nPart, int b, int i, char* pDst);
 void FE_CrAP_GetSubcategoryNameFromAssetID(int nAsset, char* pDst);   // copy the name of an asset's category
-void fn_8010749C(int nAsset, char* pDst);   // copy an asset's name
+void FE_CrAP_GetAssetNameFromAssetID(int nAsset, char* pDst);   // copy an asset's name
 void FE_CrAP_GetEntryNumFromAssetIDCategorySubcategory(int nAsset, s16 nPart, int n, s32* pnPlace);  // the asset's place in the list
                                         // of the part's offered assets that fit its entry n
 int  FE_CrAP_GetFirstEquippedIndexForCategoryAndSubcategory(s16 nPart, int n);     // the asset in the first slot of aAF80 of the part that
@@ -424,16 +424,16 @@ extern struct TexEntry* lbl_80281F24;
 extern f32 lbl_801D8818[8][2];          // eight x, y points fn_8009170C sets, fn_80091BDC reads
 void FE_CrAP_TurnOnPart(s16 nPart, int b, int c);      // FE_CrAPDB.c
 int  FE_CrAP_GetNumEquippedItemsWithSponsor(s16 n);                // FE_CrAPDB.c: the profile's assets whose n2C is n
-s32  fn_801070F4(void);                 // FE_CrAPDB.c: fill lbl_80282470; how many records
-void fn_80107244(int n, s16* pN0, s32* pN4, char* pDst);   // FE_CrAPDB.c: copy record n out
+s32  FE_CrAP_CollectSponsorshipItems(void);                 // FE_CrAPDB.c: fill lbl_80282470; how many records
+void FE_CrAP_GetSponsorshipItemInfo(int n, s16* pN0, s32* pN4, char* pDst);   // FE_CrAPDB.c: copy record n out
 void FE_CrAP_GetSponsorName(s16 n, char* pDst);    // FE_CrAPDB.c: name n of lbl_801935C8
 // FE_CrAPDB.c: send message nMsg with its values to the front end (the EA Sports Bio screens).
-void fn_80107554(int nMsg, s32 nA);
-void fn_80107594(int nMsg, s32 nA, char* szB);
-void fn_801075F8(int nMsg, s32 nA, char* szB, s32 nC);
-int  fn_801076B0(char* sz, int nMsg);
-void fn_8010771C(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, f32 fG);
-void fn_80107774(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, s32 nG, s32 nH, s32 nI,
+void FE_SendHintInt(int nMsg, s32 nA);
+void FE_SendHintIntString(int nMsg, s32 nA, char* szB);
+void FE_SendHintIntStringInt(int nMsg, s32 nA, char* szB, s32 nC);
+int  FE_SendHintString(char* sz, int nMsg);
+void FE_SendHint7Args(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, f32 fG);
+void FE_SendHint10Args(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, s32 nG, s32 nH, s32 nI,
                  s32 nJ);
 SaveProfile* FE_GetCurrentProfile(void);         // the profile being worked on
 u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);  // the asset is locked (FE_Manager.c)

@@ -53,7 +53,7 @@ void fn_801078B8(MsgArg* pArgs, MsgArg* pResult) {
         *(s32*)pArgs[6].p = 0;
         *(s32*)pArgs[7].p = 0xFF;
     } else {
-        fn_8010568C(nPart, b, i, n, aColor);
+        FE_CrAP_GetPartColorRGBA(nPart, b, i, n, aColor);
         *(s32*)pArgs[4].p = aColor[0];
         *(s32*)pArgs[5].p = aColor[1];
         *(s32*)pArgs[6].p = aColor[2];
@@ -197,7 +197,7 @@ void fn_80107BA8(MsgArg* pArgs, MsgArg* pResult) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80107BF4(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_80105C44(pArgs[0].i, pArgs[1].i);
+    pResult->i = FE_CrAP_GetNumberUniqueGeometries(pArgs[0].i, pArgs[1].i);
 }
 
 void fn_80107C30(MsgArg* pArgs, MsgArg* pResult) {
@@ -277,7 +277,7 @@ void fn_80107EB0(MsgArg* pArgs, MsgArg* pResult) {
 
 // Put a part's choice i on the created golfer and recompute its equipment tiers (fn_8007873C).
 // Part 17 is only turned on directly; for the others FE_CrAP_TurnOffPart does it when
-// FE_CrAP_IsAssetEquipped and fn_801074D4 allow.
+// FE_CrAP_IsAssetEquipped and FE_CrAP_IsAssetRemovable allow.
 void fn_80107FAC(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s16 nPart = pArgs[0].i;
@@ -291,7 +291,8 @@ void fn_80107FAC(MsgArg* pArgs, MsgArg* pResult) {
     }
     nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (nAsset != -1) {
-        if (FE_CrAP_IsAssetEquipped(FE_CrAP_GetAssetFromAssetIndex(nAsset)) && fn_801074D4(nAsset)) {
+        if (FE_CrAP_IsAssetEquipped(FE_CrAP_GetAssetFromAssetIndex(nAsset))
+            && FE_CrAP_IsAssetRemovable(nAsset)) {
             FE_CrAP_TurnOffPart(nPart, b, i);
         } else {
             FE_CrAP_TurnOnPart(nPart, b, i);
@@ -317,7 +318,8 @@ void fn_80108070(MsgArg* pArgs, MsgArg* pResult) {
     }
     nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (nAsset != -1) {
-        if (FE_CrAP_IsAssetEquipped(FE_CrAP_GetAssetFromAssetIndex(nAsset)) && fn_801074D4(nAsset)) {
+        if (FE_CrAP_IsAssetEquipped(FE_CrAP_GetAssetFromAssetIndex(nAsset))
+            && FE_CrAP_IsAssetRemovable(nAsset)) {
             FE_CrAP_TurnOffPart(nPart, b, i);
             return;
         }
@@ -452,7 +454,7 @@ void fn_801084F4(MsgArg* pArgs, MsgArg* pResult) {
 
     FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(nPart, b);
     if (nPart == 13) {
-        fn_80105B4C(nPart, b, i, szName);
+        FE_CrAP_GetPartVariantName(nPart, b, i, szName);
         pResult->i = fn_800587A8(pProfile, b, szName);
     } else {
         pResult->i = FE_CrAP_IsItemEquipped(nPart, b, i);
@@ -748,7 +750,7 @@ void fn_80108E9C(MsgArg* pArgs, MsgArg* pResult) {
                 }
             }
             if (nNames < 5) {
-                fn_8010749C(i, aNames[nNames]);
+                FE_CrAP_GetAssetNameFromAssetID(i, aNames[nNames]);
             }
             nNames++;
         }
@@ -1230,7 +1232,7 @@ void fn_8010A2C8(MsgArg* pArgs, MsgArg* pResult) {
     int i = pArgs[2].i;
 
     if (lbl_80281EE0->pB4 != NULL && nPart == 13) {
-        fn_80105B4C(nPart, b, i, szName);
+        FE_CrAP_GetPartVariantName(nPart, b, i, szName);
         if (AnimLib_FindByName(lbl_80281EE0->pB4->pChar->pLib, szName) == NULL) {
             bFound = 0;
         }
@@ -1260,7 +1262,7 @@ void fn_8010A3C8(MsgArg* pArgs, MsgArg* pResult) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_8010A400(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_801074D4(FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(pArgs[0].i, pArgs[1].i, pArgs[2].i));
+    pResult->i = FE_CrAP_IsAssetRemovable(FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(pArgs[0].i, pArgs[1].i, pArgs[2].i));
 }
 
 // ---- end of sweep code ----
