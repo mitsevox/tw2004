@@ -1291,12 +1291,12 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             break;
         }
         case 0x7C: {  // replace every pFind in a text by pRep
-            u32 nRep;
-            u32 nText;
+            UISText* pRep;
+            UISText* pFind;
             UISText* pText;
             u32 nFind;
-            UISText* pFind;
-            UISText* pRep;
+            u32 nText;
+            u32 nRep;
             u32 j;
             s32 nGrow;
             u32 k;
@@ -1314,36 +1314,50 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
                 nFind = (u32)((s64)((u64)(u32)nFind << 32) >> 32);
                 nFind = (u32)(u64)(u32)nFind;
                 nRep = strlen(pRep->szText);
-                if (nText != 0 && nFind != 0 && nText >= nFind) {
-                    nGrow = nRep - nFind;
-                    for (j = 0; j < nText - nFind + 1; j++) {
-                        bMatch = 1;
-                        for (k = j; k < j + nFind; k++) {
-                            // fake match: repeat this invariant to reproduce EA's live range.
-                            nGrow = nRep - nFind;
-                            if (k >= pText->nSize) {
-                                bMatch = 0;
-                                break;
-                            }
-                            if (pText->szText[k] != pFind->szText[k - j]) {
-                                bMatch = 0;
-                                break;
-                            }
-                        }
-                        if (bMatch) {
-                            if (nGrow > 0) {
-                                for (k = pText->nSize - 1; k >= j + nGrow; k--) {
-                                    pText->szText[k] = pText->szText[k - nGrow];
+                // fake match: EA tests nText != 0 && nFind != 0 && nText >= nFind. One test per
+                // level, each followed by a same-value ?: on the condition just tested (always
+                // true there, both arms equal): the ?: temps become three codeless allocator
+                // neighbours of the text pointers and lengths, which gives EA's saved registers.
+                if (nText != 0) {
+                    nRep = nText != 0 ? nRep : (u32)(s32)nRep;
+                    if (nFind != 0) {
+                        nText = nFind != 0 ? nText : (u32)(s32)nText;
+                        if (nText >= nFind) {
+                            nRep = nText >= nFind ? nRep : (u32)(s32)nRep;
+                            for (j = 0; j < nText - nFind + 1; j++) {
+                                // fake match: loop-invariant, set here instead of before the loop
+                                // (the same value): EA's registers for nGrow.
+                                nGrow = nRep - nFind;
+                                bMatch = 1;
+                                for (k = j; k < j + nFind; k++) {
+                                    // fake match: repeat this invariant to reproduce EA's live
+                                    // range.
+                                    nGrow = nRep - nFind;
+                                    if (k >= pText->nSize) {
+                                        bMatch = 0;
+                                        break;
+                                    }
+                                    if (pText->szText[k] != pFind->szText[k - j]) {
+                                        bMatch = 0;
+                                        break;
+                                    }
                                 }
-                            } else if (nGrow < 0) {
-                                for (k = j + nRep; k <= pText->nSize + nGrow; k++) {
-                                    pText->szText[k] = pText->szText[k - nGrow];
+                                if (bMatch) {
+                                    if (nGrow > 0) {
+                                        for (k = pText->nSize - 1; k >= j + nGrow; k--) {
+                                            pText->szText[k] = pText->szText[k - nGrow];
+                                        }
+                                    } else if (nGrow < 0) {
+                                        for (k = j + nRep; k <= pText->nSize + nGrow; k++) {
+                                            pText->szText[k] = pText->szText[k - nGrow];
+                                        }
+                                    }
+                                    for (k = j; k < j + nRep && k < pText->nSize; k++) {
+                                        pText->szText[k] = pRep->szText[k - j];
+                                    }
+                                    j += nRep - 1;
                                 }
                             }
-                            for (k = j; k < j + nRep && k < pText->nSize; k++) {
-                                pText->szText[k] = pRep->szText[k - j];
-                            }
-                            j += nRep - 1;
                         }
                     }
                 }
