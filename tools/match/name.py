@@ -68,10 +68,12 @@ def load(path):
         if not re.fullmatch(r'[0-9A-Fa-f]{8}', addr):
             errors.append(f'line {n}: address {addr!r} is not 8 hex digits')
         ea_own = tier in ('T1', 'T2') and 'E2' in codes     # EA's own name, spelled as EA did
-        if not NAME.match(new) and not (ea_own and re.fullmatch(r'[A-Za-z_]\w*', new)):
+        if cur == new:
+            pass                                            # comment-only row: the name is not new
+        elif not NAME.match(new) and not (ea_own and re.fullmatch(r'[A-Za-z_]\w*', new)):
             errors.append(f'line {n}: {new!r} is not EA style System_Verb (Mem_set, RenderState_SetDepthFunc);'
                           ' EA\'s own name (T1/T2 with E2) may be spelled as EA did')
-        if re.search(r'_[0-9A-Fa-f]{8}$|maybe|guess|unk|Unknown', new):
+        if cur != new and re.search(r'_[0-9A-Fa-f]{8}$|maybe|guess|unk|Unknown', new):
             errors.append(f'line {n}: {new!r} carries an address or a confidence marker; the tier says that')
         if tier not in ('T1', 'T2', 'T3'):
             errors.append(f'line {n}: tier {tier!r} is not T1, T2 or T3')
