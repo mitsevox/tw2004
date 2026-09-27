@@ -43973,5 +43973,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "0395baf",
+"sha": "0395bafee3e96dbdab84bf553f85ec2a64edf902",
+"time": 1790550402,
+"subject": "name.py: rewrap until nothing changes (a reflowed comment paragraph can need more than 3 passes); stateFunc.c comment reflowed",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
