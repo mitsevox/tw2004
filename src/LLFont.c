@@ -54,30 +54,30 @@ static u8 lbl_80281C88;                 // set while fn_8001144C word-wraps (fn_
 // its glyph records and glyphs, builds each glyph's texture coordinates and sizes, and reorders the
 // bitmap's rows of 4-bit texels into the 8x8 tiles of a C4 texture.
 LLFont* FO_spLoadFontFromStream(u8* pData, UFontState* pState) {
-    LLFontFile* pFile;
-    LLFont* pFont;
-    u8* pRec;
-    s32 i;
+    LLTexelPair* pDst;
+    u8* pSrc;
     int nPalette;
-    int nRowBytes;
-    int nTexHeight;
-    int nTileRow;
     int nTileCol;
-    int nRow;
-    int nByte;
     int nX;
-    int nY;
+    int nRow;
+    u8* pRec;
     int k;
+    int nByte;
+    int nRowBytes;
+    LLFont* pFont;
+    LLGlyphRec* pGlyphRec;
+    LLFontFile* pFile;
+    s32 i;
+    int nTileRow;
+    int nTexHeight;
+    int nY;
     f32 fX;
     f32 fY;
     f32 fX1;
     f32 fY1;
-    u8* pSrc;
-    LLTexelPair* pDst;
-    LLGlyphRec* pGlyphRec;
 
     pFile = (LLFontFile*)pData;
-    if (pFile->n0C > 100) {
+    if (((LLFontFile*)pData)->n0C > 100) {
         pFile->n00 = LLFONT_SWAP32(pFile->n00);
         pFile->u04 = LLFONT_SWAP32(pFile->u04);
         pFile->uVersion = LLFONT_SWAP16(pFile->uVersion);
@@ -183,10 +183,10 @@ LLFont* FO_spLoadFontFromStream(u8* pData, UFontState* pState) {
         pFont->pGlyphs[i].fU1 = fX1;
         pFont->pGlyphs[i].fV0 = fY;
         pFont->pGlyphs[i].fV1 = fY1;
-        pFont->pGlyphs[i].f18 = pFont->pRecs[i].n08 * (1.0f / 512.0f);
-        pFont->pGlyphs[i].f1C = pFont->pRecs[i].n09 * (1.0f / 512.0f);
+        pFont->pGlyphs[i].f18 = pFont->pRecs[i].n08 / 512.0f;
+        pFont->pGlyphs[i].f1C = pFont->pRecs[i].n09 / 512.0f;
         pFont->pGlyphs[i].f20 = pFont->pRecs[i].n0A / 448.0f;
-        pFont->pGlyphs[i].fWidth = pFont->pRecs[i].uWidth * (1.0f / 512.0f);
+        pFont->pGlyphs[i].fWidth = pFont->pRecs[i].uWidth / 512.0f;
         pFont->pGlyphs[i].fHeight = pFont->pRecs[i].uHeight / 448.0f;
     }
     pFont->f00 = pFile->n13 / 448.0f;
