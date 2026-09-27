@@ -381,6 +381,10 @@ GoCamCont.c:
 
 GoStaticCam.c:
 	.text       start:0x8006449C end:0x80065B44
+	.rodata     start:0x80183700 end:0x80183768
+	.data       start:0x801885F8 end:0x80188628
+	.sbss       start:0x80281E18 end:0x80281E20
+	.sdata2     start:0x80283728 end:0x80283748
 
 event.c:
 	.text       start:0x80065B44 end:0x80067710
@@ -680,6 +684,8 @@ BootCourse.c:
 
 SunFlr_Gc.c:
 	.text       start:0x8009A250 end:0x8009A844
+	.data       start:0x80189E68 end:0x80189E78
+	.sdata2     start:0x80283E78 end:0x80283E90
 
 unsorted/sweep_8009A844.c:
 	.text       start:0x8009A844 end:0x8009A928
@@ -822,6 +828,10 @@ GoComicCam.c:
 
 GoShaderObject_Rain_Gc.c:
 	.text       start:0x800B4B5C end:0x800B5934
+	.data       start:0x8018FF88 end:0x8018FFA8
+	.bss        start:0x801F6320 end:0x801F6338
+	.sdata      start:0x802814B8 end:0x802814C8
+	.sdata2     start:0x80284148 end:0x802841B0
 
 AudLock.c:
 	.text       start:0x800B5934 end:0x800B5A14

@@ -205,7 +205,22 @@ u32 fn_8009A708(u8* pImage, int x, int y) {
     u8* p;
     u32 uColour;
 
-    p = &pImage[(x & 3) * 2 + (y & 3) * 8 + (x / 4 + y / 4 * 3) * 64];
+    // fake match: empty tests (dead checks) on the column and row offsets and on the tile and
+    // tile+row pointers make the frontend build the address in the original's order: pImage + tile,
+    // then + row, then + column
+    if ((x & 3) * 2) {
+    } else {
+    }
+    if ((y & 3) * 8) {
+    } else {
+    }
+    if (pImage + (x / 4 + y / 4 * 3) * 64) {
+    } else {
+    }
+    if (pImage + (x / 4 + y / 4 * 3) * 64 + (y & 3) * 8) {
+    } else {
+    }
+    p = pImage + (x / 4 + y / 4 * 3) * 64 + (y & 3) * 8 + (x & 3) * 2;
     uColour = (p[1] << 16) | (p[0x20] << 8);
     return uColour | p[0x21];
 }
