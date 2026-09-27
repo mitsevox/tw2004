@@ -100,3 +100,14 @@ result.
   table (a file-scope definition precedes the literals of later functions, as seen in UMemPool.c).
 - Done: defined at the top of mtalib.c; mtalib .data 0x801871D0..0x801873F0, .sdata
   0x80280E78..0x80281070. main.dol: OK on the first try.
+
+## auto_05_801894D0_data (144 B): the unlock lists -> FE_Manager.c
+
+- Contents: lbl_801894D0 (s32[6], courses), lbl_801894E8 (s32[16], golfers), lbl_80189528
+  (s32[14], golfers); users GameManager, PasswordManager, FE_MessageTable (externs in fe.h and
+  game/save.h).
+- Position: after GoShaderObjectCommon_TexAnimManager_Gc.c's .data (its file-name string, then
+  8-alignment), right before FE_Manager.c's "FE_Manager.c" at 0x80189560; the two units are
+  adjacent in .text too, so it is one of them. Front-end unlock lists: FE_Manager.c, defined at
+  file scope ahead of its functions, so they lead its .data.
+- Result: FE_Manager .data 0x801894D0..0x801896F0. main.dol: OK on the first try.
