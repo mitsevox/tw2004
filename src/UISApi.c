@@ -216,22 +216,21 @@ u8 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
 // Called before a screen is unloaded. If the last p60 record names the screen, it is dropped:
 // the screen it holds becomes current, and its paused script runs on with n on the top of its
 // stack. Returns 0 when an older record names the screen, or holds it: it cannot go yet.
-// fake match: pStudio is a cast copy of the parameter, declared before pFrame and p1C (the register
-// order: EA keeps pStudio above them)
-u8 fn_80169308(UIStudio* pStudioArg, u16 uGroup, u16 uScreen, s32 n) {
+u8 fn_80169308(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
     s32 i;
     UISRecord60* pRec;
     UISScreen* pScreen;
-    UIStudio* pStudio;
     UISFrame* pFrame;
     s32* p1C;
 
-    pStudio = (UIStudio*)pStudioArg;
     i = pStudio->n5C;
     if (i > 0) {
         pRec = &pStudio->p60[i - 1];
         if (pRec->u24 == uScreen && pRec->u26 == uGroup) {
-            pStudio->n5C = i - 1;
+            // fake match: i - 1 goes through s64 and back (the stored value is unchanged); the
+            // dead high word gives pStudio one neighbour more in register allocation, so it
+            // takes EA's r29 above pFrame and p1C
+            pStudio->n5C = (s64)(i - 1);
             if (pRec->pScreen != NULL) {
                 pStudio->nCurScreen = fn_8016C6C4(pStudio, pRec->pScreen->uGroup, pRec->pScreen->uScreen);
             } else {
@@ -398,14 +397,17 @@ s32 fn_80169858(UIStudio* pStudio, u16 uGroup, u16 uScreen, u16 uPrevGroup, u16 
     s32 bFixed;
     u8 bOut;
 
+    // fake match: nScreens and nIndex go through s32 -> s64 -> u32 (the values are unchanged);
+    // the dead high words give uGroup, uScreen and uPrevGroup the neighbours that put them in
+    // pStudio's allocation level, so they take EA's r25-r27 above pStudio's r24
     nIndex = fn_8016C6C4(pStudio, uGroup, uScreen);
-    if (nIndex < pStudio->nScreens) {
+    if (nIndex < (u32)(s64)(s32)pStudio->nScreens) {
         return Screen_BringBack(pStudio, uGroup, uScreen, nArgs, pArgs);
     }
     pFile = pStudio->pfnLoad(uGroup, uScreen);
     if (pFile == NULL) return 0;
-    pStudio->nScreens++;
-    pScreen = &pStudio->pScreens[nIndex];
+    pStudio->nScreens = (u32)(s64)(s32)(pStudio->nScreens + 1);
+    pScreen = &pStudio->pScreens[(u32)(s64)(s32)nIndex];
     pScreen->uGroup = uGroup;
     pScreen->uScreen = uScreen;
     pScreen->uPrevGroup = uPrevGroup;
