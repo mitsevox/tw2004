@@ -1079,7 +1079,7 @@ config.libs = [
             Object(NonMatching, "UISEvent.c", extra_cflags=UIS_CFLAGS),
             Object(NonMatching, "UIStudio.c", extra_cflags=UIS_CFLAGS),
             Object(NonMatching, "UISApi.c", extra_cflags=UIS_CFLAGS),
-            Object(NonMatching, "UISScreen.c", extra_cflags=UIS_CFLAGS),
+            Object(Matching, "UISScreen.c", extra_cflags=UIS_CFLAGS),
             Object(Matching, "GoDynObjTypes.c"),
             Object(Matching, "unsorted/sweep_800977CC.c"),
             Object(Matching, "GoDynObjBase.c"),

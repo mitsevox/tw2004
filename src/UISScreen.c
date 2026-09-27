@@ -932,29 +932,57 @@ void fn_8016A510(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
 // handler returns 2.
 s32 fn_8016A2D4(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent, u32 n5,
                 s32 nArgs, s32* pArgs, u8* pbOut) {
+    // fake match: uEventLoop, uEventPost and uEventPre all hold uEvent (see below); these copies,
+    // this declaration order and the function-level pHandler / nRet / pLinked give EA's registers.
+    s32 uEventLoop;
+    u32 uEventPost;
+    s32 uEventPre;
+    UISHandler* pHandler;
+    UISNode* pNode;
     s32 nResult;
     u32 i;
-    UISNode* pNode;
+    s32 nRet;
+    u8* pLinked;
     u8* pScript;
     u8 bOut;
 
     nResult = 0;
     if (pScreen->pData == NULL || nNode >= pScreen->pData->nNodes) return 0;
+    uEventPost = uEvent;
     pNode = &pScreen->pData->pNodes[nNode];
     if ((pNode->pInfo->u4 != 0 && pNode->pInfo->u60 != 0) || n5 - (u32)-10 <= 2 ||
         n5 - (u32)-5 <= 3 || n5 == (u32)-11) {
+        // fake match: uEventPre is uEvent: the OR's low word is uEvent | 0 (uEvent shifted up only
+        // fills the high word, which is dropped). It is a copy only after constant propagation, so
+        // with the loop's two links below the late copy-propagation passes stop at this one: EA's
+        // kept `mr r19,r28` for the linked handler's event. The dead high-word OR leaves no code.
+        uEventPre = (s32)((u64)(u32)uEvent | ((u64)(u32)uEvent << 32));
         for (i = 0; i < pNode->nHandlers; i++) {
-            UISHandler* pHandler = &pNode->pHandlers[i];
+            pHandler = &pNode->pHandlers[i];
+            // fake match: uEventPost again (the same value); the second definition keeps it a
+            // variable of its own.
+            uEventPost = uEvent;
+            // fake match: uEventLoop is uEventPre: i only goes into the dropped high word. Two
+            // links of copies-after-constant-propagation, loop-variant so they stay in the loop.
+            uEventLoop = (s32)((u64)(u32)uEventPre | ((u64)(u32)i << 32));
+            uEventLoop = (s32)((u64)(u32)uEventLoop | ((u64)(u32)i << 32));
             if (pHandler->uEvent == 0xFFFF) {
                 bOut = 0;
                 nResult = fn_8016A2D4(pStudio, pScreen, pStack, pHandler->u4.nNode, uEvent, n5, nArgs, pArgs,
                                       &bOut);
                 // fake match: the (s32) gives EA's signed cmpwi
                 if ((s32)bOut == 1) {
-                    u8* pLinked = fn_8016C614(pNode, (u16)pHandler->u4.nNode, n5);
+                    pLinked = fn_8016C614(pNode, (u16)pHandler->u4.nNode, n5);
                     if (pLinked != NULL) {
-                        s32 nRet = fn_8016C270(pStudio, pScreen, pNode->pInfo, pStack, pLinked, nArgs, pArgs,
-                                               0, NULL, 1, uEvent, NULL);
+                        nRet = fn_8016C270(pStudio, pScreen, pNode->pInfo, pStack, pLinked, nArgs, pArgs, 0,
+                                           NULL, 1, uEventLoop, NULL);
+                        // fake match: nRet through a 64-bit shift up and back down (unchanged), then
+                        // a dropped identity conversion: the copy chain keeps EA's copy of the call
+                        // result (mr r0,r3; cmpwi r0,2).
+                        // port: relies on the conversion to s64 wrapping and on >> of a negative s64
+                        // being arithmetic.
+                        nRet = (s32)((s64)((u64)(u32)nRet << 32) >> 32);
+                        nRet = (u32)(s32)nRet;
                         if (nRet == 2) return nRet;
                     }
                 }
@@ -967,9 +995,15 @@ s32 fn_8016A2D4(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32
         if ((n5 == (u32)-6 || n5 == (u32)-7) && pNode->pInfo != (UISNodeInfo*)pArgs[2]) {
             pScript = NULL;
         }
+        // fake match: uEvent goes into the high word of a 64-bit OR whose low word is nResult, so
+        // nResult is unchanged. The dead OR keeps uEvent live across the calls above at register
+        // allocation (its own register, copied from r7 with the other parameters, as in EA) and is
+        // deleted after allocation.
+        // port: a port leaves this line out.
+        nResult = (s32)((u64)(s64)nResult | ((u64)(u32)uEvent << 32));
         if (pScript != NULL) {
             nResult = fn_8016C270(pStudio, pScreen, pNode->pInfo, pStack, pScript, nArgs, pArgs, 0, NULL, 1,
-                                  uEvent, NULL);
+                                  uEventPost, NULL);
         }
         if (nResult == 2) return nResult;
     }
