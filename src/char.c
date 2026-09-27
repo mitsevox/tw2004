@@ -3436,8 +3436,7 @@ void fn_8001F08C(void** ppSrc, void** ppDst, SwapField* pFormat, int nFields, in
 // record's entries after those, then each entry's data (each start rounded up to 4 bytes).
 // *pnSize gets the library's size.
 MtaLib* fn_8001F110(MtaLib* pArg, s32* pnSize) {
-    // fake match: a copy of the parameter through void* (a plain copy is merged into it)
-    MtaLib* pLib = (MtaLib*)(void*)pArg;
+    MtaLib* pLib;
     SwapField aHeader[10] = {
         { 16, 1 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 2, 2 }, { 6, 1 },
         { 4, 4 },
@@ -3460,14 +3459,17 @@ MtaLib* fn_8001F110(MtaLib* pArg, s32* pnSize) {
     int nPad;
     MtaRecord* pRecord2;
 
-    pSrc = pDst = pLib;
+    pSrc = pDst = pArg;
     fn_8001F08C(&pSrc, &pDst, aHeader, 10, 1);
-    pRecords = (MtaRecord*)(pLib + 1);
+    pRecords = (MtaRecord*)(pArg + 1);
     pSrc = pDst = pRecords;
-    fn_8001F08C(&pSrc, &pDst, aRecord, 5, pLib->nRecords);
-    pLib->pRecords = pRecords;
-    nOffset = sizeof(MtaLib) + pLib->nRecords * sizeof(MtaRecord);
-    for (i = 0; i < pLib->nRecords; i++) {
+    fn_8001F08C(&pSrc, &pDst, aRecord, 5, pArg->nRecords);
+    pArg->pRecords = pRecords;
+    nOffset = sizeof(MtaLib) + pArg->nRecords * sizeof(MtaRecord);
+    // fake match: pLib is set from the parameter (through void*) in the first loop's condition, the
+    // same value every time; the two then share EA's r31 and the copy disappears. A copy before
+    // the loop schedules the entry block differently, a plain copy is merged into pArg.
+    for (i = 0; i < (pLib = (MtaLib*)(void*)pArg)->nRecords; i++) {
         pRecord = &pLib->pRecords[i];
         pSrc = pDst = (u8*)pLib + nOffset;
         fn_8001F08C(&pSrc, &pDst, aEntry, 11, pRecord->nEntries);
