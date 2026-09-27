@@ -3,7 +3,13 @@
 Updated 2026-09-25 ~21:30 CDT. How the machines, CI, the page and PC jobs fit together:
 docs/infrastructure.md. History: docs/journal.md.
 
-**Running:** nothing. Night: GoGreenGrid linked; Golfer.c split into its 4 original files (ai_brain.c,
+**Running (BATTLE PLAN, 2026-09-27 02:17 UTC, agents/assign/2026-09-27-battle-plan.md):** one lane = one
+function, no permuter, refill from the queue. b1 char fn_8001F110, b2 uiProcessInterface fn_8008F820,
+b3 hlaudtrackstm Stm_Tick, b4 UISApi fn_80169D90, b5 UISApi fn_80168CD8, b6 UISScreen fn_8016C6C4,
+b7 UISScreen fn_8016B188, b8 UISEvent fn_80165ACC. Codex: UIStudio fn_80166098. Gemini: out of usage.
+Merged just before: Codex SkinPart fn_800CE224 (fake, SkinPart linked) + skalib fn_80026844 (EA form):
+7,600/7,647 exact, 96.86% matched, 88.35% code / 85.76% data linked.
+Night: GoGreenGrid linked; Golfer.c split into its 4 original files (ai_brain.c,
 Code8002BBB0.c, Code8002C984.c, Golfer.c = the Luck part), all linked; gPlayers/gCurGolferRecord/gGolferTable
 defined in Code8002DB80.c, gSession/gszEmpty in Code8002EE1C.c. Golfer.c header fixed; the club-name table 0x80187650 linked (Code8002EE1C.c). Codex/Gemini: agents/assign/2026-09-26-codex-gemini-velocity.md. ENDGAME checkpoint 1 (2026-09-26 ~21:00 CDT) merged: Golfer AI_ChooseTarget exact (Codex,
 labelled fakes), startUp exact (Gemini, labelled pragma) and linked; GoStaticCam, Rain, SunFlr, Code8002EE1C,
