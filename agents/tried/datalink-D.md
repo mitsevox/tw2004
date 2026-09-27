@@ -72,6 +72,6 @@ setters?) whose sections start 8-aligned. Splitting it would link the last 16 by
 and drop both aligned(8) fakes.
 | auto_09_802851A8_sdata2 | 16 | not linked (UISStack.c) | lbl_802851A8/AC/B0 used only by code now in UISStack.c (split from UIStudio.c on main, still NonMatching); it and UIStudio.c are the units between UISEvent's and UISApi's .sdata2 | left: links with UISStack.c |
 
-Summary: 452 B linked by this lane over 26 commits; taken by other lanes: 0x80280E78 (504 B, lane A),
+Summary: 452 B linked by this lane (22 commits); taken by other lanes: 0x80280E78 (504 B, lane A),
 0x80281550 and 0x802819F0 (lane B), 0x80281C88's LLFont byte and 0x80282B20 (linked on main with
 LLFont). Left: 0x802814D8 (16 B, DiscError split) and 0x802851A8 (16 B, UISStack.c).
