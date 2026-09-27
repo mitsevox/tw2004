@@ -1122,6 +1122,8 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             UISText* pText;
             UISText* pFind;
             UISText* pRep;
+            u32 j;
+            u32 k;
 
             pRep = (UISText*)*--pFrame->pC;
             pFind = (UISText*)*--pFrame->pC;
