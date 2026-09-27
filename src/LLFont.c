@@ -323,6 +323,8 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
     f32 fGY1;
     f32 fAlignY;
     f32 fSizeY;
+    f32 fGX0;
+    f32 fGY0;
     f32 fSavedX;
     f32 fSizeX;
 
@@ -487,10 +489,9 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
                         fGYMid = fZero + pGlyph->f20;
                         fn_8001208C(pCtx, fGradX, fGradY, 0.5f * pGlyph->fWidth + (fRun + pGlyph->f1C),
                                     0.5f * pGlyph->fHeight + fGYMid);
-                    } else {
-                        f32 fZero = 0.0f;
-                        f32 fGX0 = fRun + pGlyph->f1C;
-                        f32 fGY0;
+                } else {
+                    f32 fZero = 0.0f;
+                    fGX0 = fRun + pGlyph->f1C;
                         fGX1 = fGX0 + pGlyph->fWidth;
                         fGY0 = fZero + pGlyph->f20;
                         fGY1 = fGY0 + pGlyph->fHeight;
