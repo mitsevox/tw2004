@@ -240,10 +240,10 @@ typedef struct SaveProfile {
     u8   aCourseUnlocked[23];   // 0x0003A  per course
     u8   aRewardUnlocked[0x64 - 0x51];  // 0x00051  per reward (fn_80058428 sets); the
                                 //          "THEKITCHENSINK" code (0x80056568) sets the first 18
-    s32  n64;                   // 0x00064  money: every payout is added (fn_800D3548); a course unlocks
+    s32  n64;                   // 0x00064  money: every payout is added (GM_Earnings_AwardMoney); a course unlocks
                                 //          when it reaches the course's price (fn_800D3A20)
     s32  n68;                   // 0x00068  cleared by the profile setup (fn_80057438)
-    s32  n6C;                  // 0x0006C  money: every payout is added here too (fn_800D3548)
+    s32  n6C;                  // 0x0006C  money: every payout is added here too (GM_Earnings_AwardMoney)
     u8   b70;                   // 0x00070  set when an award is won, a round is counted or a challenge
                                 //          starts; cleared when a round is set up (GameRound.c)
     u8   unk71[3];
@@ -310,7 +310,7 @@ typedef struct SaveProfile {
     u8   unk54FA[0x5500 - 0x54FA];
     // The created golfer's look: the body's parts and sets (fn_80103D6C), its six other skins'
     // (fn_80103DE0), its sliders and its logos. char.c hands it to the character (fn_8001D4A4
-    // passes fn_80077ACC() + 0x5500 as a SkinChoices*).
+    // passes FE_GetCurrentProfile() + 0x5500 as a SkinChoices*).
     SkinChoices choices;        // 0x05500
     s8   nDateMonth;            // 0x0AF7C  } a date, set and read by menu messages packed as
     s8   nDateDay;              // 0x0AF7D  } fn_80078604 packs it (FE_CrAPMessages.c
@@ -318,7 +318,7 @@ typedef struct SaveProfile {
     s32  aAF80[53];             // 0x0AF80  per slot: a Create-A-Player asset (FE_CrAPDB.c
                                 //          fn_80103D14), -1 for none; an asset's n2E is its slot
     // Four bit arrays with a bit per Create-A-Player asset (0x80057F18's loop over them all, which
-    // also clears aB344 and aB4BC; fn_8001E9CC tests a bit).
+    // also clears aB344 and aB4BC; BitArray_Test tests a bit).
     u32  aAssetLocked[94];      // 0x0B054  the asset was locked (fn_80078008) when last checked
     u32  aB1CC[94];             // 0x0B1CC  set where fn_80105C0C gives 0; an asset of lock kind 0
                                 //          stays locked until the bit its FE_CrAP_GetPartGMLockValByAssetNum names is set

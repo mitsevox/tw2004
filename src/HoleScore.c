@@ -56,9 +56,10 @@ u8 fn_800CF158(int nPlayer) {
                 if (!gPlayers[i].bPlayerCut) {
                     if (i == nPlayer) {
                         nMineStrokes = anTotal[i] + gPlayers[i].nStrokes[Game_CurHoleIndex()] + 1 -
-                                       fn_800D2B08();
+                                       Course_GetCurHolePar();
                     } else {
-                        nOther = anTotal[i] + gPlayers[i].nStrokes[Game_CurHoleIndex()] - fn_800D2B08();
+                        nOther = anTotal[i] + gPlayers[i].nStrokes[Game_CurHoleIndex()]
+                                - Course_GetCurHolePar();
                         if (gPlayers[i].ball.nLie != LIE_INCUP_e) {
                             nOther++;
                         }
@@ -162,9 +163,9 @@ u8 fn_800CF450(int nPlayer) {
             if (!gPlayers[i].bPlayerCut) {
                 if (i == nPlayer) {
                     nMineStrokes = anTotal[i] + gPlayers[i].nStrokes[Game_CurHoleIndex()] + 1 -
-                                   fn_800D2B08();
+                                   Course_GetCurHolePar();
                 } else {
-                    nOther = anTotal[i] + gPlayers[i].nStrokes[Game_CurHoleIndex()] - fn_800D2B08();
+                    nOther = anTotal[i] + gPlayers[i].nStrokes[Game_CurHoleIndex()] - Course_GetCurHolePar();
                     if (gPlayers[i].ball.nLie != LIE_INCUP_e) {
                         nOther++;
                     }
@@ -292,7 +293,7 @@ u32 fn_800CF904(int nPlayer) {
         uFlags |= 0x4;
     }
     if (fn_800D8DB4(3) && !gpGame->bD4 && pBall->nLie != LIE_GREEN_e && pBall->nLie != LIE_FRINGE_e &&
-        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= fn_800D2B08() - 2) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= Course_GetCurHolePar() - 2) {
         if (fn_800D1170(nPlayer, 0) + 1 > gSession.aCourseRecord[Game_GetCourse()].aRecord[3][0].nValue) {
             uFlags |= 0x8;
         }
@@ -309,19 +310,19 @@ u32 fn_800CF904(int nPlayer) {
             uFlags |= 0x10;
         }
     }
-    if (fn_800D8DB4(5) && !gpGame->bD4 && pBall->nLie == LIE_TEE_e && fn_800D2B08() >= 4) {
+    if (fn_800D8DB4(5) && !gpGame->bD4 && pBall->nLie == LIE_TEE_e && Course_GetCurHolePar() >= 4) {
         if (fn_800D0FBC(nPlayer) + 1 > gSession.aCourseRecord[Game_GetCourse()].aRecord[5][0].nValue) {
             uFlags |= 0x20;
         }
     }
     if (fn_800D8DB4(6) && !gpGame->bD4 &&
-        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= fn_800D2B08() - 2) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= Course_GetCurHolePar() - 2) {
         if (fn_800D06FC(nPlayer, 0, 0) + 1 > gSession.aCourseRecord[Game_GetCourse()].aRecord[6][0].nValue) {
             uFlags |= 0x40;
         }
     }
     if (fn_800D8DB4(7) && !gpGame->bD4 &&
-        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= fn_800D2B08() - 1) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= Course_GetCurHolePar() - 1) {
         if (fn_800D0620(nPlayer, 0, 0) + 1 > gSession.aCourseRecord[Game_GetCourse()].aRecord[7][0].nValue) {
             uFlags |= 0x80;
         }
@@ -425,10 +426,10 @@ int fn_800CFFE4(int nPlayer) {
         return 0;
     }
     for (i = 0; i < Game_CurHoleIndex(); i++) {
-        nPar += fn_800D2AD8(i);
+        nPar += Course_GetHolePar(i);
         nStrokes += gPlayers[nPlayer].nStrokes[i];
     }
-    return (nStrokes - nPar) + gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 - fn_800D2B08();
+    return (nStrokes - nPar) + gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 - Course_GetCurHolePar();
 }
 
 // gpGame->pfn204 (TW06: GetPotentialLead).
@@ -459,11 +460,11 @@ s32 fn_800D0098(int nPlayer) {
                 anTotal[i] = fn_800E1904(i, 0);
                 if (i == nPlayer) {
                     nMine = anTotal[i];
-                    nMine += gPlayers[i].nStrokes[Game_CurHoleIndex()] + 1 - fn_800D2B08();
+                    nMine += gPlayers[i].nStrokes[Game_CurHoleIndex()] + 1 - Course_GetCurHolePar();
                 } else {
                     nOther = anTotal[i];
                     if (gPlayers[i].ball.nLie == LIE_INCUP_e) {
-                        nOther += gPlayers[i].nStrokes[Game_CurHoleIndex()] - fn_800D2B08();
+                        nOther += gPlayers[i].nStrokes[Game_CurHoleIndex()] - Course_GetCurHolePar();
                     }
                     if (nOther < nBest) {
                         nBest = nOther;
@@ -601,19 +602,19 @@ f32 fn_800D0550(int nPlayer) {
     f32 vDiff[3];
     fn_800D1674(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].ball.vStart, vDiff);
     vDiff[1] = 0.0f;
-    return fn_80009680(fn_80009744(vDiff));
+    return Math_Sqrt(Vec3_LengthSqClamped(vDiff));
 }
 
 // A point's distance from the current pin along the ground; 0 with no hole loaded.
 f32 fn_800D05A4(f32* pPos) {
     f32 vDiff[3];
-    CourseInfo* pCourse = fn_8000C594();
+    CourseInfo* pCourse = Ter_GetTGD();
     int nPin;
     if (pCourse == NULL) return 0.0f;
     nPin = Game_CurrentPinSet();
     fn_800D1674(pPos, &pCourse->pin[nPin].x, vDiff);
     vDiff[1] = 0.0f;
-    return fn_80009680(fn_80009744(vDiff));
+    return Math_Sqrt(Vec3_LengthSqClamped(vDiff));
 }
 
 // The round's holes the player finished under par, counting back from the current hole (with
@@ -628,7 +629,7 @@ int fn_800D0620(int nPlayer, u8 bCurrent, u8 bOnlyFlagged) {
     }
     for (; i >= 0; i--) {
         if (gpGame->bHoleSelected[i] && gPlayers[nPlayer].nStrokes[i] > 0 &&
-            gPlayers[nPlayer].nStrokes[i] <= fn_800D2AD8(i) - 1 &&
+            gPlayers[nPlayer].nStrokes[i] <= Course_GetHolePar(i) - 1 &&
             (gpGame->b16C[nPlayer][i] == 1 || !bOnlyFlagged)) {
             nCount++;
         }
@@ -647,7 +648,7 @@ int fn_800D06FC(int nPlayer, u8 bCurrent, u8 bOnlyFlagged) {
     }
     for (; i >= 0; i--) {
         if (gpGame->bHoleSelected[i] && gPlayers[nPlayer].nStrokes[i] > 0 &&
-            gPlayers[nPlayer].nStrokes[i] <= fn_800D2AD8(i) - 2 &&
+            gPlayers[nPlayer].nStrokes[i] <= Course_GetHolePar(i) - 2 &&
             (gpGame->b16C[nPlayer][i] == 1 || !bOnlyFlagged)) {
             nCount++;
         }
@@ -667,7 +668,8 @@ int fn_800D07D8(int nPlayer, u8 bCurrent) {
     }
     for (; i >= 0; i--) {
         if (gpGame->bHoleSelected[i]) {
-            if (gPlayers[nPlayer].nStrokes[i] <= 0 || gPlayers[nPlayer].nStrokes[i] > fn_800D2AD8(i) - 1) {
+            if (gPlayers[nPlayer].nStrokes[i] <= 0 || gPlayers[nPlayer].nStrokes[i] > Course_GetHolePar(i)
+                - 1) {
                 break;
             }
             nRun++;
@@ -687,7 +689,8 @@ int fn_800D089C(int nPlayer, u8 bCurrent) {
     }
     for (; i >= 0; i--) {
         if (gpGame->bHoleSelected[i]) {
-            if (gPlayers[nPlayer].nStrokes[i] <= 0 || gPlayers[nPlayer].nStrokes[i] > fn_800D2AD8(i) - 2) {
+            if (gPlayers[nPlayer].nStrokes[i] <= 0 || gPlayers[nPlayer].nStrokes[i] > Course_GetHolePar(i)
+                - 2) {
                 break;
             }
             nRun++;
@@ -711,13 +714,13 @@ f32 fn_800D0960(int nPlayer) {
     vToPin[1] = 0.0f;
     fn_800D1674(vView, gPlayers[nPlayer].ball.vStart, vToView);
     vToView[1] = 0.0f;
-    if ((f32)fn_80009680(fn_80009744(vToPin)) > 0.0f) {
-        fn_800BAF04(vToPin, vToPin);
+    if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vToPin)) > 0.0f) {
+        Vec_NormalizeTo(vToPin, vToPin);
     }
-    if ((f32)fn_80009680(fn_80009744(vToView)) > 0.0f) {
-        fn_800BAF04(vToView, vToView);
+    if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vToView)) > 0.0f) {
+        Vec_NormalizeTo(vToView, vToView);
     }
-    fCos = fn_8000C5FC(vToView, vToPin);
+    fCos = Vec3_Dot(vToView, vToPin);
     if (fCos < -1.0f) {
         fCos = -1.0f;
     } else if (fCos > 1.0f) {
@@ -732,7 +735,7 @@ f32 fn_800D0960(int nPlayer) {
 
 // The score the hole will finish on once the tap-in drops: strokes so far plus one, minus par.
 int Hole_ScoreAfterTapIn(int nPlayer) {
-    return gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 - fn_800D2B08();
+    return gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 - Course_GetCurHolePar();
 }
 
 // Whether nobody took anything (mode points or n22C) on the last hole played before this one; 0
@@ -776,7 +779,7 @@ u8 fn_800D0BF8(int nPlayer, u8 bUnder, u8 bAnyLie) {
 
     pSurface = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].ball.pCourse, gPlayers[nPlayer].vBall);
     if (pSurface != NULL) {
-        nPar = fn_800D2B08();
+        nPar = Course_GetCurHolePar();
         if (bAnyLie) {
             nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
             if (bUnder) {
@@ -819,7 +822,7 @@ int fn_800D0DC8(int nPlayer, int nToPar) {
     int i;
     for (i = 0; i < 18; i++) {
         if (gpGame->bHoleSelected[i]) {
-            if (gPlayers[nPlayer].nStrokes[i] - fn_800D2AD8(i) <= nToPar ||
+            if (gPlayers[nPlayer].nStrokes[i] - Course_GetHolePar(i) <= nToPar ||
                 (gPlayers[nPlayer].nStrokes[i] == 1 && nToPar < -3)) {
                 nCount++;
             }
@@ -834,7 +837,7 @@ int fn_800D0E74(int nPlayer) {
     int i;
     for (i = 0; i < 18; i++) {
         if (gpGame->bHoleSelected[i]) {
-            if (gPlayers[nPlayer].nStrokes[i] - fn_800D2AD8(i) >= 1) {
+            if (gPlayers[nPlayer].nStrokes[i] - Course_GetHolePar(i) >= 1) {
                 nCount++;
             }
         }
@@ -851,7 +854,7 @@ int fn_800D0F04(int nPlayer, int nToPar) {
     nRun = 0;
     for (i = 0; i < 18; i++) {
         if (gpGame->bHoleSelected[i]) {
-            if (gPlayers[nPlayer].nStrokes[i] - fn_800D2AD8(i) <= nToPar ||
+            if (gPlayers[nPlayer].nStrokes[i] - Course_GetHolePar(i) <= nToPar ||
                 (gPlayers[nPlayer].nStrokes[i] == 1 && nToPar < -3)) {
                 nRun++;
             } else {
@@ -890,7 +893,7 @@ int fn_800D10B0(int nPlayer) {
     for (i = 0; i < 18; i++) {
         if (gpGame->bHoleSelected[i] && gPlayers[nPlayer].b2E4[i]) {
             nRun++;
-        } else if (fn_800D2AD8(i) != 3) {
+        } else if (Course_GetHolePar(i) != 3) {
             if (nRun > nBest) {
                 nBest = nRun;
             }
@@ -996,16 +999,16 @@ int fn_800D1530(int nPlayer) {
     f32 fDegrees;
     f32 fEpsilon;
 
-    if (!Ter_GetSupportingGroundNormal(fn_8000C594(), gPlayers[nPlayer].ball.vPos, vNormal)) {
+    if (!Ter_GetSupportingGroundNormal(Ter_GetTGD(), gPlayers[nPlayer].ball.vPos, vNormal)) {
         return 0;
     }
-    fLength = fn_80009744(vNormal);
+    fLength = Vec3_LengthSqClamped(vNormal);
     if (fLength > 1.01f || fLength < 0.99f) {
         return 0;
     }
     fAim = gPlayers[nPlayer].fAim;
-    fSin = fn_800095F0(fAim);
-    fCos = fn_80009638(fAim);
+    fSin = Math_Sin(fAim);
+    fCos = Math_Cos(fAim);
     Vec3Copy(vNormal, vTurned);
     fn_80055D70(&vTurned[2], &vTurned[0], fSin, fCos);
     fEpsilon = 0.000001f;

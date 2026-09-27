@@ -158,7 +158,7 @@ Functions still unnamed or named from TW06:
 | `8011EFE4` | `GrassRender_vBuildAndUploadOneTimeData` | `GrassRender_vBuildAndUploadOneTimeData` | strong | Xbox anchor(1) |
 | `801220D4` | `TibExtMemAlloc` | `TibExtMemAlloc` | strong | both builds: Xbox anchor(1), PS2 xbox:anchor(1) |
 | `8000C140` | `fn_8000C140` | `wn_PnPoly` | medium | PS2 nbr(r7,2) |
-| `8000C594` | `fn_8000C594` | `Ter_TerrainGameDataMgr::GetTGD` | medium | PS2 calls(r0,8) |
+| `8000C594` | `Ter_GetTGD` | `Ter_TerrainGameDataMgr::GetTGD` | medium | PS2 calls(r0,8) |
 | `8001966C` | `fn_8001966C` | `Character_AlignCharacterForShotImpact` | medium | PS2 nbr(r1,2) |
 | `8001FCF4` | `fn_8001FCF4` | `SKA_Update` | medium | PS2 nbr(r4,2) |
 | `80026BF4` | `fn_80026BF4` | `SKEL_TransformIKChain` | medium | Xbox calls(r0,1) |
@@ -216,7 +216,7 @@ Functions still unnamed or named from TW06:
 | `8011E020` | `fn_8011E020` | `GetLocalTime` | medium | Xbox calls(r1,1) |
 | `8007706C` | `fn_8007706C` | - | conflict | Xbox: sfsnprintf calls(r0,1) / PS2: FE_MakeMoviePathWithSubDir anchor(1) |
 | `800C4AB0` | `GolfCamera_ClampLookAngle` | - | conflict | Xbox: GolfCamera_ClampLookAngle nbr(r9,3) / PS2: CameraController_BallIsOnScreen nbr2(r8,2) |
-| `800BAF04` | `fn_800BAF04` | ~~-~~ | rejected | Xbox: vec4flt_LengthSquared3 nbr(r7,11) / PS2: GetGamePlayerCoreShotInfo nbr(r1,7); our code shows it normalises a vector |
+| `800BAF04` | `Vec_NormalizeTo` | ~~-~~ | rejected | Xbox: vec4flt_LengthSquared3 nbr(r7,11) / PS2: GetGamePlayerCoreShotInfo nbr(r1,7); our code shows it normalises a vector |
 
 Functions we had named by hand, with their TW06 equivalents (our names kept):
 

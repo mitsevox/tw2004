@@ -19,14 +19,14 @@ TexAnimManager* lbl_80281EC0;       // the manager
 void fn_80076B7C(void) {
     TexAnimManager* pMgr;
 
-    pMgr = fn_80009B34(sizeof(TexAnimManager), 2, 32, "GoShaderObjectCommon_TexAnimManager_Gc.c", 100);
+    pMgr = StaticMem_Alloc(sizeof(TexAnimManager), 2, 32, "GoShaderObjectCommon_TexAnimManager_Gc.c", 100);
     lbl_80281EC0 = pMgr;
-    fn_80005AE8(pMgr, 0, sizeof(TexAnimManager));
+    Mem_set(pMgr, 0, sizeof(TexAnimManager));
 }
 
 // Free the manager.
 void fn_80076BC4(void) {
-    fn_80009E70(lbl_80281EC0);
+    StaticMem_Free(lbl_80281EC0);
     lbl_80281EC0 = 0;
 }
 

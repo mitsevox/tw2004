@@ -146,18 +146,18 @@ void DF_vDrawBufferToScreen(int n) {
     aColour[1] = lbl_801D5110[n].aColour[1];
     aColour[2] = lbl_801D5110[n].aColour[2];
     aColour[3] = lbl_801D5110[n].f4 * lbl_801D5110[n].f14;
-    pRect = ((RenderCamera*)fn_8001614C())->pRect;
+    pRect = ((RenderCamera*)Camera_GetCurrent())->pRect;
     fX0 = pRect[0];
     fY0 = pRect[1];
     fX1 = fX0 + pRect[2];
     fY1 = fY0 + pRect[3];
     fn_8002A608(&lbl_801D5198);
     fn_8001425C(0);
-    fn_80014118(0x50);
-    fn_80012F34(0);
-    fn_80035118(4, 5);
+    RenderState_SetDrawFlags(0x50);
+    RenderState_SetDepthWrite(0);
+    RenderState_SetBlendFactors(4, 5);
     fn_80035098(1);
-    fn_80012F50(0, 6, 0x80);
+    RenderState_SetAlphaTest(0, 6, 0x80);
     for (i = 0; i < 5; i++) {
         fn_800141F8(aXY, aUV, 0.0f, 0.0f, 1.0f, 1.0f);
         bOdd = i % 2;
@@ -186,14 +186,14 @@ void DF_vDrawBufferToScreen(int n) {
         aColour[3] = lbl_801D5110[n].f4 * lbl_801D5110[n].f14 / (lbl_80281120[0] * (f32)(i + 1));
         fn_80014194(aColour);
         fn_80035154(255.0f * aColour[3]);
-        fn_80012EF8();
+        RenderState_Flush();
         fn_8001644C(0xA1, aXY, NULL, aUV, 2);
     }
-    fn_80012F34(1);
+    RenderState_SetDepthWrite(1);
     fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80035F1C();
-    fn_80012F50(1, 6, 0x80);
+    RenderState_SetAlphaTest(1, 6, 0x80);
     fn_80035098(0);
-    fn_80012EF8();
+    RenderState_Flush();
 }

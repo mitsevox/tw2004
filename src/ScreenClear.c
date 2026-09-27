@@ -62,12 +62,12 @@ void fn_800BA74C(u8 bFade) {
         } else {
             fn_800760B0(0, 0, 512, 448);
         }
-        fn_80035118(4, 5);
+        RenderState_SetBlendFactors(4, 5);
         fn_8001425C(0);
-        fn_80014118(64);
-        fn_80012F50(0, 6, 0x80);
-        fn_80012F18(7);
-        fn_80012EF8();
+        RenderState_SetDrawFlags(64);
+        RenderState_SetAlphaTest(0, 6, 0x80);
+        RenderState_SetDepthFunc(7);
+        RenderState_Flush();
         fn_8001644C(0xA1, xy, 0, NULL, 2);
         fn_80013400();
         fn_800A4BDC();
@@ -81,9 +81,9 @@ void fn_800BA74C(u8 bFade) {
             fn_80007260();
         }
     }
-    fn_80012F50(0, 6, 0x80);
-    fn_80012F18(3);
-    fn_80012EF8();
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_SetDepthFunc(3);
+    RenderState_Flush();
     fn_800083A0();
     fn_80008380();
 }

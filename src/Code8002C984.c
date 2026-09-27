@@ -126,7 +126,7 @@ f32 Shot_AimAngle(int nPlayer) {
 u8 AI_GreenTowardPin(int nPlayer, f32 fDist) {
     u8          bGreen  = 0;
     int         nPinSet = Game_CurrentPinSet();
-    CourseInfo* pCourse = fn_8000C594();
+    CourseInfo* pCourse = Ter_GetTGD();
     f32         vDir[4];
     f32         fHeight;
     SurfaceType* pSurface;
@@ -382,7 +382,7 @@ void fn_8002D680_CpuShapeDir(int nPlayer, f32* pOut) {
 // Aim at the pin without changing the shot shape.
 void AI_AimAtPin(int nPlayer) {
     Player*     p       = &gPlayers[nPlayer];
-    CourseInfo* pCourse = fn_8000C594();
+    CourseInfo* pCourse = Ter_GetTGD();
     int         nPinSet = Game_CurrentPinSet();
     p->vTarget[0] = pCourse->pin[nPinSet].x;
     p->vTarget[2] = pCourse->pin[nPinSet].z;
@@ -397,8 +397,8 @@ void Shot_FitTargetToClub(int nPlayer) {
     f32     fMax = AI_MaxDistance(nPlayer, p->nShotKind, p->nClub);
     f32     fSin, fCos, fDX, fDZ;
     if (p->fDistance > fMax) {
-        fSin = fn_800095F0(p->fAim);
-        fCos = fn_80009638(p->fAim);
+        fSin = Math_Sin(p->fAim);
+        fCos = Math_Cos(p->fAim);
         fDZ  = fMax * fCos;
         fDX  = fMax * -fSin;
         p->vTarget[0] = p->vBall[0] + fDX;
@@ -408,8 +408,8 @@ void Shot_FitTargetToClub(int nPlayer) {
         if (Controller_IsCPU(p->nController)) return;
         if (p->nClub == CLUB_PUTTER_e) return;
         if (p->nShotKind == SHOT_TYPE_CHIP_e) return;
-        fSin = fn_800095F0(p->fAim);
-        fCos = fn_80009638(p->fAim);
+        fSin = Math_Sin(p->fAim);
+        fCos = Math_Cos(p->fAim);
         fDZ  = fMax * fCos;
         fDX  = fMax * -fSin;
         p->vTarget[0] = p->vBall[0] + fDX;

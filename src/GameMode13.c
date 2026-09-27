@@ -190,7 +190,7 @@ void fn_800F6ED4(int nPlayer) {
                 lbl_802823BC = fn_800F2578();
                 lbl_802823BC = GM_Earnings_ComputeBonusModifiers(lbl_802823BC, nPlayer, 1, 1, 1, 0);
                 lbl_802823BC = GM_Earnings_ComputeTOURCardModifiers(lbl_802823BC, nPlayer, 0);
-                fn_800D3548(nPlayer, lbl_802823BC, 0);
+                GM_Earnings_AwardMoney(nPlayer, lbl_802823BC, 0);
                 gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
                 lbl_802823B8 = 0;
                 gPlayers[nPlayer].nDD8 += lbl_802823BC;
@@ -212,7 +212,7 @@ void fn_800F6ED4(int nPlayer) {
                 lbl_802823BC = fn_800F266C(lbl_802823BC, nTarget);
                 lbl_802823BC = GM_Earnings_ComputeBonusModifiers(lbl_802823BC, nPlayer, 1, 1, 1, 0);
                 lbl_802823BC = GM_Earnings_ComputeTOURCardModifiers(lbl_802823BC, nPlayer, 0);
-                fn_800D3548(nPlayer, lbl_802823BC, 0);
+                GM_Earnings_AwardMoney(nPlayer, lbl_802823BC, 0);
                 gPlayers[nPlayer].aCD4[gPlayers[nPlayer].nCD0] = nSurface;
                 gPlayers[nPlayer].nCD0++;
                 gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
@@ -355,9 +355,9 @@ void fn_800F6ED4(int nPlayer) {
         gPlayers[nPlayer].nCD0++;
         gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
         if (lbl_802823BC + gPlayers[nPlayer].nDD8 < 0) {
-            fn_800D3548(nPlayer, -gPlayers[nPlayer].nDD8, 0);
+            GM_Earnings_AwardMoney(nPlayer, -gPlayers[nPlayer].nDD8, 0);
         } else {
-            fn_800D3548(nPlayer, lbl_802823BC, 0);
+            GM_Earnings_AwardMoney(nPlayer, lbl_802823BC, 0);
         }
         gPlayers[nPlayer].nDD8 += lbl_802823BC;
         if (gPlayers[nPlayer].nDD8 < 0) {

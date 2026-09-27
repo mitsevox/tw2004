@@ -11,7 +11,7 @@
 #include "golfer.h"
 #include "camera.h"
 
-CamLens* fn_80008370(void* pCamera);                        // the render camera's lens
+CamLens* Camera_GetLens(void* pCamera);                        // the render camera's lens
 void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);      // a rotation matrix from three angles
 void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 f32  fn_800C79BC(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3);
@@ -46,21 +46,21 @@ void fn_800644F4(UStreamObject* pObject) {
 
     pSrc = pObject->pData;
     pDst = &lbl_80281E18->u1E5C;
-    fn_8001F08C(&pSrc, &pDst, aHeader, 2, 1);
+    ByteSwap_Records(&pSrc, &pDst, aHeader, 2, 1);
     if (lbl_80281E18->nPaths != 0) {
         lbl_80281E18->pPaths =
-            fn_80009B34(lbl_80281E18->nPaths * sizeof(FlyByPath), 2, 0, "GoStaticCam.c", 190);
+            StaticMem_Alloc(lbl_80281E18->nPaths * sizeof(FlyByPath), 2, 0, "GoStaticCam.c", 190);
     }
     for (i = 0; i < lbl_80281E18->nPaths; i++) {
         pDst = &lbl_80281E18->pPaths[i];
-        fn_8001F08C(&pSrc, &pDst, aPath, 4, 1);
+        ByteSwap_Records(&pSrc, &pDst, aPath, 4, 1);
         for (j = 0; j < lbl_80281E18->pPaths[i].nKeys; j++) {
             pDst = &lbl_80281E18->pPaths[i].aKeys[j];
-            fn_8001F08C(&pSrc, &pDst, aKey, 3, 1);
+            ByteSwap_Records(&pSrc, &pDst, aKey, 3, 1);
             pSrc = (u8*)pSrc + 2;   // the keys are 0x22 bytes in the file
         }
     }
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // A fly-by camera arrived (a 'Cact' object of type 200): the next one of aFlyBy.
@@ -108,7 +108,7 @@ void fn_800646D0(UStreamObject* pObject) {
         lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].bAA = 0;
     }
     lbl_80281E18->nFlyBy++;
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // A static camera arrived (a 'Cact' object of type 201): the next one of aStatic. It looks from
@@ -162,18 +162,18 @@ void fn_80064A0C(UStreamObject* pObject) {
                 lbl_80281E18->aStatic[lbl_80281E18->nStatic].v20,
                 lbl_80281E18->aStatic[lbl_80281E18->nStatic].v30);
     lbl_80281E18->nStatic++;
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 void StaticCam_Init(void) {
-    lbl_80281E18 = fn_80009B34(sizeof(StaticCams), 2, 0, "GoStaticCam.c", 380);
+    lbl_80281E18 = StaticMem_Alloc(sizeof(StaticCams), 2, 0, "GoStaticCam.c", 380);
     lbl_80281E18->pPaths = NULL;
     StaticCam_Reset();
 }
 
 void StaticCam_DeInit(void) {
     StaticCam_Reset();
-    fn_80009E70(lbl_80281E18);
+    StaticMem_Free(lbl_80281E18);
     lbl_80281E18 = NULL;
 }
 
@@ -193,7 +193,7 @@ void StaticCam_Reset(void) {
     lbl_80281E18->apPath[8] = NULL;
     lbl_80281E18->apPath[9] = NULL;
     if (lbl_80281E18->pPaths != NULL) {
-        fn_80009E70(lbl_80281E18->pPaths);
+        StaticMem_Free(lbl_80281E18->pPaths);
     }
     lbl_80281E18->pPaths = NULL;
     lbl_80281E18->nPaths = 0;
@@ -205,7 +205,7 @@ void fn_80064F54(CamShot* pShot, int nPlayer, f32* pOut) {
 
 // A random static camera for shot kind nKind whose area holds one of nPlayer's ball positions,
 // other than pNot (bNotKind5: none with bAC 5). NULL except on course 12's hole index 10
-// (fn_80015464) for kind 0x20, so every other kind gets none.
+// (Game_GetCurHoleNum) for kind 0x20, so every other kind gets none.
 CamShot* StaticCam_ChooseScript(int nPlayer, int nKind, u8 bNotKind5, CamShot* pNot) {
     int aFound[NUM_STATIC_CAMS];
     int* pFound;
@@ -213,7 +213,7 @@ CamShot* StaticCam_ChooseScript(int nPlayer, int nKind, u8 bNotKind5, CamShot* p
     int nFound;
 
     nFound = 0;
-    if (Game_GetCourse() != 12 || fn_80015464() != 10 || nKind != 0x20) {
+    if (Game_GetCourse() != 12 || Game_GetCurHoleNum() != 10 || nKind != 0x20) {
         return NULL;
     }
     pFound = aFound;
@@ -386,7 +386,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
     fTarget = fShare * lbl_80281E18->afPathLength[nPath];
     StaticCam_SetupFlybyCameraPointers(pShot, &pPrev, &pNext, &pAfter);
     Vec_Copy(pCam, vLast);
-    *pFov = fn_80014278(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])));
+    *pFov = fn_80014278(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
     if (0.0f == fTarget) {
         fn_800C7480(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20, pPrev->v30, pShot->v30, pNext->v30,
                     pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
@@ -409,7 +409,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
             fn_800C7480(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20, pPrev->v30, pShot->v30, pNext->v30,
                         pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
             fn_80065B20(pCam, vLast, vDiff);
-            fDist += (f32)fn_80009680(fn_80009744(vDiff));
+            fDist += (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
             if (fTarget > fDist) {
                 Vec_Copy(pCam, vLast);
             }
@@ -447,7 +447,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
             fn_800C7480(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20, pPrev->v30, pShot->v30, pNext->v30,
                         pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
             fn_80065B20(pCam, vLast, vDiff);
-            fDist = fLastDist + (f32)fn_80009680(fn_80009744(vDiff));
+            fDist = fLastDist + (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
             i++;
         } while (i < 4);
         if (fDist > fTarget) {
@@ -456,7 +456,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
             fn_800C7480(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20, pPrev->v30, pShot->v30, pNext->v30,
                         pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
             fn_80065B20(pCam, vLast, vDiff);
-            fDist = fLastDist + (f32)fn_80009680(fn_80009744(vDiff));
+            fDist = fLastDist + (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
         } else if (fDist < fTarget) {
             fT = fT + (fHiT - fT) * ((fTarget - fDist) / (fHiDist - fDist));
             // fake match: empty tests (dead checks) on the shot pointers make the frontend load them
@@ -473,7 +473,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
             fn_800C7480(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20, pPrev->v30, pShot->v30, pNext->v30,
                         pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
             fn_80065B20(pCam, vLast, vDiff);
-            fDist = fLastDist + (f32)fn_80009680(fn_80009744(vDiff));
+            fDist = fLastDist + (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
         }
     }
     pScript->pShot = pShot;

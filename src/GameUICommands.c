@@ -879,8 +879,8 @@ void fn_80086738(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = 1;
         return;
     }
-    bView6E44 = fn_800C6E44(fn_80017028(gPlayers[pArgs[0].i].nView[0]));
-    bView708C = fn_800C708C(fn_80017028(gPlayers[pArgs[0].i].nView[0]));
+    bView6E44 = fn_800C6E44(ViewController_GetCameraController(gPlayers[pArgs[0].i].nView[0]));
+    bView708C = fn_800C708C(ViewController_GetCameraController(gPlayers[pArgs[0].i].nView[0]));
     bCharFlag = fn_80062C1C(gPlayers[pArgs[0].i].pChar);
     bOtherN20 = gPlayers[pArgs[0].i].pChar->n20 != 9 && gPlayers[pArgs[0].i].pChar->n20 != 11 &&
                 gPlayers[pArgs[0].i].pChar->n20 != 12;
@@ -901,7 +901,7 @@ void fn_8008685C(MsgArg* pArgs, MsgArg* pResult) {
     } else if (pArgs[0].i == 20) {
         pResult->i = fn_800D2FB4(gSession.nTeeSet[pArgs[1].i]);
     } else {
-        pResult->i = fn_800D2AD8(pArgs[0].i);
+        pResult->i = Course_GetHolePar(pArgs[0].i);
     }
 }
 
@@ -1519,7 +1519,7 @@ void fn_80087F48(MsgArg* pArgs, MsgArg* pResult) {
 
 // Whether the saved replay is on this hole of this course.
 void fn_80087FAC(MsgArg* pArgs, MsgArg* pResult) {
-    if (gReplayData.bF10 != 0 && gReplayData.nHole == fn_80015464() &&
+    if (gReplayData.bF10 != 0 && gReplayData.nHole == Game_GetCurHoleNum() &&
         gReplayData.nCourse == Game_GetCourse()) {
         pResult->i = 1;
         return;
@@ -1656,7 +1656,7 @@ void fn_80088474(MsgArg* pArgs, MsgArg* pResult) {
     nHole = fn_800E16F4();
 
     if (nHole != -1) {
-        nPar = fn_800D2AD8(nHole);
+        nPar = Course_GetHolePar(nHole);
         nLength = fn_800D2C30(nHole, gSession.nTeeSet[0]);
     }
     pResult->i = nHole;
@@ -1786,25 +1786,25 @@ void fn_8008886C(MsgArg* pArgs, MsgArg* pResult) {
         return;
     }
     if (Game_GetMode() == 16) {
-        sprintf(((MsgString*)pArgs[3].p)->pStr, "%s", gSession.recB[fn_80015464()][0][pArgs[2].i].szName);
+        sprintf(((MsgString*)pArgs[3].p)->pStr, "%s", gSession.recB[Game_GetCurHoleNum()][0][pArgs[2].i].szName);
         return;
     }
     if (Game_GetMode() == 17) {
-        sprintf(((MsgString*)pArgs[3].p)->pStr, "%s", gSession.recB[fn_80015464()][1][pArgs[2].i].szName);
+        sprintf(((MsgString*)pArgs[3].p)->pStr, "%s", gSession.recB[Game_GetCurHoleNum()][1][pArgs[2].i].szName);
         return;
     }
     if (Game_GetMode() == 13) {
-        sprintf(((MsgString*)pArgs[3].p)->pStr, "%s", gSession.recB[fn_80015464()][2][pArgs[2].i].szName);
+        sprintf(((MsgString*)pArgs[3].p)->pStr, "%s", gSession.recB[Game_GetCurHoleNum()][2][pArgs[2].i].szName);
         return;
     }
     if (Game_GetMode() == 22 && fn_80126FA0() == 0) {
         sprintf(((MsgString*)pArgs[3].p)->pStr, "%s",
-                gSession.recC[fn_80127098(fn_80015464())][0][pArgs[2].i].szName);
+                gSession.recC[fn_80127098(Game_GetCurHoleNum())][0][pArgs[2].i].szName);
         return;
     }
     if (Game_GetMode() == 22 && fn_80126FA0() == 1) {
         sprintf(((MsgString*)pArgs[3].p)->pStr, "%s",
-                gSession.recC[fn_80127098(fn_80015464())][1][pArgs[2].i].szName);
+                gSession.recC[fn_80127098(Game_GetCurHoleNum())][1][pArgs[2].i].szName);
         return;
     }
     sprintf(((MsgString*)pArgs[3].p)->pStr, "%s",
@@ -1822,23 +1822,23 @@ void fn_80088AD4(MsgArg* pArgs, MsgArg* pResult) {
         return;
     }
     if (Game_GetMode() == 16) {
-        pResult->i = gSession.recB[fn_80015464()][0][pArgs[2].i].nValue;
+        pResult->i = gSession.recB[Game_GetCurHoleNum()][0][pArgs[2].i].nValue;
         return;
     }
     if (Game_GetMode() == 17) {
-        pResult->i = gSession.recB[fn_80015464()][1][pArgs[2].i].nValue;
+        pResult->i = gSession.recB[Game_GetCurHoleNum()][1][pArgs[2].i].nValue;
         return;
     }
     if (Game_GetMode() == 13) {
-        pResult->i = gSession.recB[fn_80015464()][2][pArgs[2].i].nValue;
+        pResult->i = gSession.recB[Game_GetCurHoleNum()][2][pArgs[2].i].nValue;
         return;
     }
     if (Game_GetMode() == 22 && fn_80126FA0() == 0) {
-        pResult->i = gSession.recC[fn_80127098(fn_80015464())][0][pArgs[2].i].nValue;
+        pResult->i = gSession.recC[fn_80127098(Game_GetCurHoleNum())][0][pArgs[2].i].nValue;
         return;
     }
     if (Game_GetMode() == 22 && fn_80126FA0() == 1) {
-        pResult->i = gSession.recC[fn_80127098(fn_80015464())][1][pArgs[2].i].nValue;
+        pResult->i = gSession.recC[fn_80127098(Game_GetCurHoleNum())][1][pArgs[2].i].nValue;
         return;
     }
     pResult->i = gSession.aCourseRecord[Game_GetCourse()].aRecord[pArgs[1].i][pArgs[2].i].nValue;
@@ -2409,7 +2409,7 @@ void fn_80089F24(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80089F6C(MsgArg* pArgs, MsgArg* pResult) {
-    View* pView = fn_80017028(gPlayers[0].nView[0]);
+    View* pView = ViewController_GetCameraController(gPlayers[0].nView[0]);
     f32 vZero[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 
     pResult->i = 0;

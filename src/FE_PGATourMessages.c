@@ -145,7 +145,7 @@ void fn_8010EA24(MsgArg* pArgs, MsgArg* pResult) {
     s32 i;
 
     if (lbl_802824B0 == NULL) {
-        lbl_802824B0 = fn_80009B34(nEvents * 4, 1, 16, "FE_PGATourMessages.c", 263);
+        lbl_802824B0 = StaticMem_Alloc(nEvents * 4, 1, 16, "FE_PGATourMessages.c", 263);
     }
     for (i = 0; i < nEvents; i++) {
         if (fn_800EFD38(i)) {
@@ -310,7 +310,7 @@ void fn_8010EF8C(MsgArg* pArgs, MsgArg* pResult) {
     s32 n8;
     s32 n4;
     int i;
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     s32* p0 = (s32*)pArgs[0].p;
     s32* pKind = (s32*)pArgs[1].p;
     s32* p8 = (s32*)pArgs[2].p;
@@ -358,7 +358,7 @@ void fn_8010EF8C(MsgArg* pArgs, MsgArg* pResult) {
 // Lock entry pArgs[0]'s value: its n8 for each of the profile's assets of its kind. Gives
 // whether there is one.
 void fn_8010F10C(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 i = pArgs[0].i;
     s32* pValue = (s32*)pArgs[1].p;
     s32* pKind = (s32*)pArgs[2].p;
@@ -467,11 +467,11 @@ void fn_8010F440(MsgArg* pArgs, MsgArg* pResult) {
     char* szMoney = ((MsgString*)pArgs[4].p)->pStr;
     s32* pScore = (s32*)pArgs[5].p;
 
-    CalDate_ToString(fn_80077ACC()->aC8[nEvent].award.nDate, ((MsgString*)pArgs[1].p)->pStr);
-    strcpy(szName, fn_80077ACC()->szName);
+    CalDate_ToString(FE_GetCurrentProfile()->aC8[nEvent].award.nDate, ((MsgString*)pArgs[1].p)->pStr);
+    strcpy(szName, FE_GetCurrentProfile()->szName);
     GameModeDriverPGATour_GetPurseString(nEvent, szEarnings);
-    fn_800907AC(fn_80077ACC()->aC8[nEvent].n6 * 1000, szMoney);
-    *pScore = fn_80077ACC()->aC8[nEvent].nScore;
+    fn_800907AC(FE_GetCurrentProfile()->aC8[nEvent].n6 * 1000, szMoney);
+    *pScore = FE_GetCurrentProfile()->aC8[nEvent].nScore;
 }
 
 void fn_8010F4EC(MsgArg* pArgs, MsgArg* pResult) {
@@ -500,7 +500,7 @@ void fn_8010F574(MsgArg* pArgs, MsgArg* pResult) {
 
 // Lock entry pArgs[0]: its kind (-1 when not set) and its n8.
 void fn_8010F5AC(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 i = pArgs[0].i;
     s32* pKind = (s32*)pArgs[1].p;
     s32* p8 = (s32*)pArgs[2].p;

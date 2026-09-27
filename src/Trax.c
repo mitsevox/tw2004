@@ -66,13 +66,13 @@ void UI_vEATraxUnRegisterStreamClients(void) {
 // The song list.
 void fn_800BA118(UStreamObject* pObject) {
     Mem_cpy(lbl_801F846C, pObject->pData, sizeof(lbl_801F846C));
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // The logo's texture bank.
 void fn_800BA15C(UStreamObject* pObject) {
     lbl_801F8458.nLogo = fn_800107C0(pObject, NULL, 0);
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // Draw the box (with the logo when it is loaded) and the song's names.
@@ -91,18 +91,18 @@ void fn_800BA1A4(void) {
             pBank = fn_800106C4(lbl_801F8458.nLogo);
             pTex = fn_800922A0(pBank);
         }
-        fn_80035118(4, 5);
-        fn_80012F50(0, 6, 0x80);
-        fn_80012F18(7);
+        RenderState_SetBlendFactors(4, 5);
+        RenderState_SetAlphaTest(0, 6, 0x80);
+        RenderState_SetDepthFunc(7);
         fn_8001425C(0);
-        fn_80012F34(0);
+        RenderState_SetDepthWrite(0);
         if (fn_800BA080()) {
             fn_8005CC64(pBank, pTex);
-            fn_80014118(0x50);
+            RenderState_SetDrawFlags(0x50);
         } else {
-            fn_80014118(0x40);
+            RenderState_SetDrawFlags(0x40);
         }
-        fn_80012EF8();
+        RenderState_Flush();
         if (fn_800BA080()) {
             vColour[0] = 0.5f;
             vColour[1] = 0.5f;

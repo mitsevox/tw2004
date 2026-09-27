@@ -586,7 +586,7 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
     if (pInto != NULL) {
         pBank = pInto;
     } else {
-        pBank = fn_80009B34(nSize, 2, 0x10, "LLTex.c", 0x717);
+        pBank = StaticMem_Alloc(nSize, 2, 0x10, "LLTex.c", 0x717);
         pInto = pBank;
     }
     // the bank's first 8 bytes (its counts n2 and n4) as the data has them
@@ -608,7 +608,7 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
     p += pSection->nSize;
     pPixels = ((TexSection*)p)++;
     if (n != -2) {
-        pBank->p18 = fn_80009B34(pPixels->nSize, 2, 0x20, "LLTex.c", 0x77A);
+        pBank->p18 = StaticMem_Alloc(pPixels->nSize, 2, 0x20, "LLTex.c", 0x77A);
         pBank->n1C = pPixels->nSize;
         Mem_cpy(pBank->p18, p, pPixels->nSize);
     } else {
@@ -648,7 +648,7 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
     pSection = ((TexSection*)p)++;
     if (pSection->nSize > 0) {
         if (n != -2) {
-            pBank->p20 = fn_80009B34(pSection->nSize, 2, 0x20, "LLTex.c", 0x7FB);
+            pBank->p20 = StaticMem_Alloc(pSection->nSize, 2, 0x20, "LLTex.c", 0x7FB);
             pBank->n24 = pSection->nSize;
             Mem_cpy(pBank->p20, p, pSection->nSize);
         } else {
@@ -678,18 +678,18 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
 // Frees a bank's pixel and palette data, unless they are not its own.
 void fn_8000FFAC(TexBank* pBank) {
     if (pBank->p18 != NULL && pBank->b2D != 1) {
-        fn_80009E70(pBank->p18);
+        StaticMem_Free(pBank->p18);
         pBank->p18 = NULL;
     }
     if (pBank->p20 != NULL && pBank->p20 != pBank->p18 && pBank->b2D != 1) {
-        fn_80009E70(pBank->p20);
+        StaticMem_Free(pBank->p20);
         pBank->p20 = NULL;
     }
 }
 
 void fn_80010028(TexBank* pBank) {
     fn_8000FFAC(pBank);
-    fn_80009E70(pBank);
+    StaticMem_Free(pBank);
 }
 
 // The index of the bank's texture with this name hash, or 0x80000000.
@@ -706,7 +706,7 @@ int fn_8001005C(TexBank* pBank, u64 uHash) {
 
 void fn_800100B0(TexBank* pBank, TexEntry* p8, TexPalette* pC, void* p10, void* p14, int nNumTex,
                  int nNumPalettes) {
-    fn_80005AE8(pBank, 0, sizeof(TexBank));
+    Mem_set(pBank, 0, sizeof(TexBank));
     pBank->p8 = p8;
     pBank->pC = pC;
     pBank->p10 = p10;

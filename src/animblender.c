@@ -101,15 +101,15 @@ void fn_80071C28(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBl
     if ((*ppNode)->nFormat == 0) {
         (*ppNode)->pPose = AllocPoolMem(lbl_80281E8C);
         if ((*ppNode)->pPose == NULL) return;
-        fn_8001E938((*ppNode)->pPose->a0, 128);
-        fn_8001E938((*ppNode)->pPose->a10, 128);
+        BitArray_ClearAll((*ppNode)->pPose->a0, 128);
+        BitArray_ClearAll((*ppNode)->pPose->a10, 128);
         fn_8001E8A4((*ppNode)->pPose->a20, 128);
         fn_8001E8A4((*ppNode)->pPose->a30, 128);
     } else if ((*ppNode)->nFormat == 1) {
         (*ppNode)->pPose = AllocPoolMem(lbl_80281E88);
         if ((*ppNode)->pPose == NULL) return;
-        fn_8001E938(((SkelPose1*)(*ppNode)->pPose)->pose.a0, 128);
-        fn_8001E938(((SkelPose1*)(*ppNode)->pPose)->pose.a10, 128);
+        BitArray_ClearAll(((SkelPose1*)(*ppNode)->pPose)->pose.a0, 128);
+        BitArray_ClearAll(((SkelPose1*)(*ppNode)->pPose)->pose.a10, 128);
         fn_8001E8A4(((SkelPose1*)(*ppNode)->pPose)->pose.a20, 128);
         fn_8001E8A4(((SkelPose1*)(*ppNode)->pPose)->pose.a30, 128);
         for (i = 0; i < 3; i++) {
@@ -556,7 +556,8 @@ void fn_80072ACC(SKABlendNode* pNode, CharModel* pModel, f32 fTime) {
         } else if (pNode->u.blend.apChild[nPlaying]->nFormat == 1) {
             memcpy(pNode->pPose, pNode->u.blend.apChild[nPlaying]->pPose, sizeof(SkelPose1));
             for (i = 0; i < 3; i++) {
-                fn_8001E938(((SkelPose1*)pNode->u.blend.apChild[nPlaying]->pPose)->aBlocks[i].aBits, 20);
+                BitArray_ClearAll(((SkelPose1*)pNode->u.blend.apChild[nPlaying]->pPose)->aBlocks[i].aBits,
+                                  20);
             }
         }
     }
@@ -689,8 +690,8 @@ void SKATime_Idle(Character* pChar, int nPlayer, AnimPlayer* pPlayer, SKABlendNo
     f32 fDelta;
 
     pPlayer->f34 += fT;
-    fWave = 1.0f - (3.0f + (fn_80009638(pPlayer->f34 / 5.0f) +
-                            (fn_80009638(5.0f * pPlayer->f34) + fn_80009638(7.0f * pPlayer->f34 / 3.0f)))) /
+    fWave = 1.0f - (3.0f + (Math_Cos(pPlayer->f34 / 5.0f) +
+                            (Math_Cos(5.0f * pPlayer->f34) + Math_Cos(7.0f * pPlayer->f34 / 3.0f)))) /
                        6.0f;
     if (gPlayers[nPlayer].nClub == 25) {
         if (pChar->nGroup == 9) {

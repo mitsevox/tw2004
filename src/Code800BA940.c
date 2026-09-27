@@ -62,7 +62,7 @@ void fn_800BAA50(int nPlayer) {
     int nView;
     int i;
 
-    fn_80008370(fn_8001614C());
+    Camera_GetLens(Camera_GetCurrent());
     if (gSession.nPaused == 0 && lbl_80281F80 != NULL) {
         nView = gPlayers[nPlayer].nView[0];
         ColGlow_ResetCurrentList();
@@ -90,7 +90,7 @@ void fn_800BAB80(int nPlayer) {
     int nView;
     int i;
 
-    pLens = fn_80008370(fn_8001614C());
+    pLens = Camera_GetLens(Camera_GetCurrent());
     pBall = &gPlayers[nPlayer].ball;
     nView = gPlayers[nPlayer].nView[0];
     fScale = lbl_80281518->fDistScale * Vec_Distance(pLens->m4[3], pBall->vPos);

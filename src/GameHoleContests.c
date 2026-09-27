@@ -63,13 +63,13 @@ void fn_800D9F34(void) {
 
     bFound = 0;
     for (i = 0; i < 18; i++) {
-        if (fn_800D2AD8(i) > 3 && fn_800D304C(i)) {
+        if (Course_GetHolePar(i) > 3 && fn_800D304C(i)) {
             bFound = 1;
         }
     }
     if (bFound) {
         lbl_80281568 = Misc_RandFunc(0) % 18;
-        while (fn_800D2AD8(lbl_80281568) == 3 || !fn_800D304C(lbl_80281568)) {
+        while (Course_GetHolePar(lbl_80281568) == 3 || !fn_800D304C(lbl_80281568)) {
             lbl_80281568 = Misc_RandFunc(0) % 18;
         }
     } else {
@@ -78,13 +78,13 @@ void fn_800D9F34(void) {
 
     bFound = 0;
     for (i = 0; i < 18; i++) {
-        if (fn_800D2AD8(i) == 3) {
+        if (Course_GetHolePar(i) == 3) {
             bFound = 1;
         }
     }
     if (bFound) {
         lbl_8028156C = Misc_RandFunc(0) % 18;
-        while (fn_800D2AD8(lbl_8028156C) > 3) {
+        while (Course_GetHolePar(lbl_8028156C) > 3) {
             lbl_8028156C = Misc_RandFunc(0) % 18;
         }
     } else {
@@ -94,13 +94,13 @@ void fn_800D9F34(void) {
     if ((int)(Misc_RandFunc(0) % 100) < 20) {
         bFound = 0;
         for (i = 0; i < 18; i++) {
-            if (fn_800D2AD8(i) == 3 && i != lbl_8028156C) {
+            if (Course_GetHolePar(i) == 3 && i != lbl_8028156C) {
                 bFound = 1;
             }
         }
         if (bFound) {
             lbl_80281570 = Misc_RandFunc(0) % 18;
-            while (fn_800D2AD8(lbl_80281570) > 3 || lbl_80281570 == lbl_8028156C) {
+            while (Course_GetHolePar(lbl_80281570) > 3 || lbl_80281570 == lbl_8028156C) {
                 lbl_80281570 = Misc_RandFunc(0) % 18;
             }
         } else {
@@ -212,14 +212,14 @@ void fn_800DA48C(int nPlayer) {
             gPlayers[nPlayer].bC2F == 0) {
             lbl_80282260 = 1;
             lbl_80282268 = 1;
-            fn_80005AE8(&money, 0, sizeof(money));
+            Mem_set(&money, 0, sizeof(money));
             money.n24 = 100000;
             money.n0 = 100000;
             money.n38 = 100000;
-            fn_800D3548(nPlayer, 100000, &money);
+            GM_Earnings_AwardMoney(nPlayer, 100000, &money);
             nIndex = gPlayers[nPlayer].nIndex;
             if (gpSaveData[nIndex].bActive) {
-                fn_800E4364(0, 0x74, 100000, nIndex);
+                GUI_QueueMessage(0, 0x74, 100000, nIndex);
             }
         }
     }
@@ -395,11 +395,11 @@ void fn_800DAD54(void) {
     lbl_80282261 = 1;
     if (lbl_80282264 == 5) return;
     if (!lbl_80282260) return;
-    fn_80005AE8(&money, 0, sizeof(money));
+    Mem_set(&money, 0, sizeof(money));
     money.n24 = 2500;
     money.n0 = 2500;
     money.n38 = 2500;
-    fn_800D3548(lbl_80282264, 2500, &money);
+    GM_Earnings_AwardMoney(lbl_80282264, 2500, &money);
 }
 
 // The winner's ball: 1 holed, 2 within a foot of the pin, else 0.

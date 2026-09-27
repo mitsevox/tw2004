@@ -81,7 +81,7 @@ typedef struct ARAMState {
     ARAMTransfer* pTransfers;   // 0xC    p8 or p18
     ARAMTransfer* pQueued;      // 0x10
     ARAMTransfer* pUnused;      // 0x14
-    void*         p18;          // 0x18   the transfers, from fn_80009B34 when p8 is NULL
+    void*         p18;          // 0x18   the transfers, from StaticMem_Alloc when p8 is NULL
     s32           nTransfers;   // 0x1C
     s32           nQueued;      // 0x20
     s32           nUnused;      // 0x24

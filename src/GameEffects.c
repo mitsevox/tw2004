@@ -263,7 +263,7 @@ void fn_800DB714(int nPlayer) {
         fDist *= SW_vGetShotPower(nPlayer);
         fn_80045494(0, nPlayer);
         fn_80045558(0, nPlayer);
-        pView = fn_80017028(gPlayers[nPlayer].nView[0]);
+        pView = ViewController_GetCameraController(gPlayers[nPlayer].nView[0]);
         pView->p74 = fn_8003BDBC(nPlayer, nLie, 3, 0xC, 1, fDist);
         lbl_80202898.b19 = 1;
         if (lbl_80202898.f24 > 0.8f) {
@@ -284,14 +284,14 @@ int fn_800DB86C(int nPlayer) {
     CourseInfo* pCourse;
     void* pSurface;
     f32 fDist;
-    pCourse = fn_8000C594();
+    pCourse = Ter_GetTGD();
     if (!pCourse) {
         return 0;
     }
     if (!gpGame->b285) {
         return 0;
     }
-    nPar = fn_800D2B08();
+    nPar = Course_GetCurHolePar();
     nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1;
     pSurface = Ter_GetSupportingGroundMaterial(pCourse, gPlayers[nPlayer].vTarget2);
     fDist = fn_800D0478(nPlayer);
@@ -341,7 +341,7 @@ void fn_800DBA50(int nPlayer) {
     if (!(gPlayers[nPlayer].uFlags & 8) && !Player_IsCPU(nPlayer) && lbl_80202898.bGameBreaker != 1) {
         fn_800DCB84(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].ballBefore.vPos, v);
         v[1] = 0.0f;
-        fDist = fn_80009680(fn_80009744(v));
+        fDist = Math_Sqrt(Vec3_LengthSqClamped(v));
         if (gPlayers[nPlayer].nClub == 25) {
             if (fDist < 1.0f) {
                 return;
@@ -353,10 +353,10 @@ void fn_800DBA50(int nPlayer) {
         } else if (fDist < 5.0f) {
             return;
         }
-        if (!gPlayers[nPlayer].b30D && fn_8000C594()) {
+        if (!gPlayers[nPlayer].b30D && Ter_GetTGD()) {
             fn_800DCB84(gPlayers[nPlayer].ball.vStart, gPlayers[nPlayer].ballBefore.vPos, v2);
             v2[1] = 0.0f;
-            fDist = fn_80009680(fn_80009744(v2));
+            fDist = Math_Sqrt(Vec3_LengthSqClamped(v2));
             nLie = gPlayers[nPlayer].ball.nLie;
             if (gPlayers[nPlayer].ballBefore.nSurface >= 0) {
                 nClass = gSurfaceTypes[gPlayers[nPlayer].ballBefore.nSurface].nClass;
@@ -373,7 +373,7 @@ void fn_800DBA50(int nPlayer) {
             lbl_80202898.nHeartbeats = 0;
             fn_80045494(0, nPlayer);
             fn_80045558(0, nPlayer);
-            pView = fn_80017028(gPlayers[nPlayer].nView[0]);
+            pView = ViewController_GetCameraController(gPlayers[nPlayer].nView[0]);
             pSeq = fn_8003BDBC(nPlayer, nLie, nClass, 0xB, 1, fDist);
             pShot = DynamicCam_ChooseScriptInSequence(pSeq, 0, &nKind, &fTime, &f2, &nB, &f3, nPlayer);
             if (pShot != NULL && pView->script.pShot != pShot && pView->script.pNextShot != pShot &&
@@ -464,7 +464,7 @@ void fn_800DBFAC(void) {
     pGE = &lbl_80202898;       // fake match: steers the register choice (found by the permuter)
     fn_800DCB84(gPlayers[pGE->nPlayer].ball.vPos, gPlayers[pGE->nPlayer].ballBefore.vPos, v);
     v[1] = 0.0f;
-    fDist = fn_80009680(fn_80009744(v));
+    fDist = Math_Sqrt(Vec3_LengthSqClamped(v));
     if (!Player_IsCPU(lbl_80202898.nPlayer)) {
         if (gPlayers[lbl_80202898.nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
             if (fDist < 2.0f && !lbl_80202898.bClosing) {
@@ -526,11 +526,11 @@ void fn_800DC290(f32 fHeight) {
     f32 xy[8];
     f32 uv[8];
     fn_8001425C(0);
-    fn_80012F34(0);
-    fn_80012F18(7);
-    fn_80012F50(0, 6, 0x80);
-    fn_80014118(0);
-    fn_80012EF8();
+    RenderState_SetDepthWrite(0);
+    RenderState_SetDepthFunc(7);
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_SetDrawFlags(0);
+    RenderState_Flush();
     colour[0] = 0.0f;
     colour[1] = 0.0f;
     colour[2] = 0.0f;
@@ -541,10 +541,10 @@ void fn_800DC290(f32 fHeight) {
     fn_800141F8(xy, uv, 0.0f, 1.0f - fHeight, 1.0f, 1.0f);
     fn_80014194(colour);
     fn_8001644C(0xA1, xy, 0, uv, 2);
-    fn_80012F34(1);
-    fn_80012F50(1, 6, 0x80);
-    fn_80012F18(3);
-    fn_80012EF8();
+    RenderState_SetDepthWrite(1);
+    RenderState_SetAlphaTest(1, 6, 0x80);
+    RenderState_SetDepthFunc(3);
+    RenderState_Flush();
 }
 
 // TW06: GameEffects_FieldOfViewChange (by position). The GameBreaker's field-of-view change: up to
@@ -684,7 +684,7 @@ u8 fn_800DC818(Ball* pBall, int nPlayer, u8 bNext) {
     int nStrokes;
     if (pBall->nLie != LIE_GREEN_e || !(lbl_80202898.uFlags & 0x4000)) {
         bEagle = 0;
-    } else if (fn_800D2B08() != 5) {
+    } else if (Course_GetCurHolePar() != 5) {
         bEagle = 0;
     } else if (bNext && gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] != 1) {
         bEagle = 0;

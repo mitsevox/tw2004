@@ -35,9 +35,12 @@ Files
 Names
 -----
 
-- **Functions and globals:** use a real name only with the evidence described in "Where names and
-  comments come from" below. Otherwise keep the address name (`fn_800FA518`, `lbl_80211D38`). Do
-  not invent names from guesses.
+- **Functions and globals:** EA's name when there is evidence for it ("Where names and comments
+  come from" below). Otherwise, since 2026-09-27 (owner): name it from what the code does and roll
+  with it; most names can never be proven. Such a name is tier T3 in
+  `config/GW4E69/name_sources.tsv` with the code reading as its evidence (code E6), carries no
+  confidence marker or address suffix, and must never contradict the code. Work most-called first
+  (`python tools/match/hotnames.py`): one name makes every call site readable.
 - **Renaming a global or function** is done in `config/GW4E69/symbols.txt`, so every file and the
   assembly see the new name. Never alias with `#define NICE_NAME lbl_XXXXXXXX`.
 - **Style of names:** EA's own. Functions `System_Verb` (`View_SetCamera`, `Session_SetNumPlayers`)

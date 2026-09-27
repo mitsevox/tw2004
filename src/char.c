@@ -206,7 +206,7 @@ void  fn_80112CEC(void);
 
 // ---- sweep code (not yet cleaned up) ----
 void fn_8001E8A4(u32* aBits, u32 nBits);
-void fn_8001E938(u32* aBits, u32 nBits);
+void BitArray_ClearAll(u32* aBits, u32 nBits);
 void fn_8001B1DC(Skin* pSkin, CharSkinRef* pRef, s32 n);
 void fn_8001B1E8(void* p);
 void fn_8001C650(void* arg0, s32 arg1);
@@ -232,11 +232,11 @@ f32 lbl_801B95C8[4];
 // 1.0f, 2^30, 0.0f, -60000.0f and 3.0f (0x80282BC0), 1.0f and 3.0f before their first users
 // below; its body is unknown, this one only reproduces the order.
 static void char_StrippedFn(void) {
-    fn_800095F0(1.0f);
-    fn_800095F0(1073741824.0f);
-    fn_800095F0(0.0f);
-    fn_800095F0(-60000.0f);
-    fn_800095F0(3.0f);
+    Math_Sin(1.0f);
+    Math_Sin(1073741824.0f);
+    Math_Sin(0.0f);
+    Math_Sin(-60000.0f);
+    Math_Sin(3.0f);
 }
 
 // Clear the character's animation events: none set, all at time 2^30 (never).
@@ -313,13 +313,13 @@ void fn_800177A0(Character* pChar, SkelPose* pPose) {
     Skin* pSkin = pChar->pSkin;
 
     if (pSkin != NULL) {
-        fn_8001E938(pPose->a0, 0x80);
-        fn_8001E938(pPose->a10, 0x80);
+        BitArray_ClearAll(pPose->a0, 0x80);
+        BitArray_ClearAll(pPose->a10, 0x80);
         fn_8001E8A4(pPose->a20, 0x80);
         fn_8001E8A4(pPose->a30, 0x80);
         for (i = 0; i < pChar->pModel->nBones; i++) {
-            fn_8001E85C(pSkin->pose.aBones[i].q0, pPose->aBones[i].q0);
-            fn_8001E85C(pSkin->pose.aBones[i].v10, pPose->aBones[i].v10);
+            Quat_Copy(pSkin->pose.aBones[i].q0, pPose->aBones[i].q0);
+            Quat_Copy(pSkin->pose.aBones[i].v10, pPose->aBones[i].v10);
         }
     }
 }
@@ -329,8 +329,8 @@ void fn_80017864(Character* pChar, SkelPose* pPose) {
     if (pChar->pSkin != NULL) {
         fn_8001E8A4(pPose->a20, 0x80);
         fn_8001E8A4(pPose->a30, 0x80);
-        fn_8001E938(pPose->a0, 0x80);
-        fn_8001E938(pPose->a10, 0x80);
+        BitArray_ClearAll(pPose->a0, 0x80);
+        BitArray_ClearAll(pPose->a10, 0x80);
     }
 }
 
@@ -344,7 +344,7 @@ void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals) {
     int nLast;
     int nStep;
 
-    if (fn_8000C594() != NULL) {
+    if (Ter_GetTGD() != NULL) {
         pChar->n1784 = -1;
         if (pChar->n1784 < 0) {
             pChar->n1784 = 0;
@@ -390,7 +390,7 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
     CourseInfo* pCourse;
 
     if (pChar != NULL) {
-        if ((pCourse = fn_8000C594()) != NULL) {
+        if ((pCourse = Ter_GetTGD()) != NULL) {
             Vec_Copy(pPos, vPos);
             vPos[1] += 0.66f / 12.0f;
             Ter_GetEnclosingGroundData(pCourse, vPos, &fLow, &pLowSurface, lbl_801B95D8, &fHigh,
@@ -479,7 +479,7 @@ void fn_80017DDC(Character* pChar) {
 
     if (pChar->p16D8 != NULL && pChar->a179C[1] > 0.9f) {
         pMtx = fn_8001ED08(pChar, 0x52);
-        if (pMtx != NULL && (pCourse = fn_8000C594()) != NULL) {
+        if (pMtx != NULL && (pCourse = Ter_GetTGD()) != NULL) {
             fHeight = fn_8004D650(pCourse, pChar->aPoints[4], vNormal);
             // the else's return is the dead second `b` after the fUnder return; !(<) keeps the
             // NaN case of `fHeight < -60000.0f`
@@ -496,7 +496,7 @@ void fn_80017DDC(Character* pChar) {
                 fHead = pChar->p16D8->afC[pChar->nClubClass];
                 fLength = (fHead - fUnder * vNormal[1] / fDot) / fHead;
                 if (fLength > 0.75f) {
-                    fn_8001EF34(fLength, pMtx[1], pMtx[1]);
+                    Vec3_Scale(fLength, pMtx[1], pMtx[1]);
                     SKEL_UpdateSkinningMatrix(pChar->pModel, pMtx, 0x52);
                 }
             }
@@ -577,16 +577,16 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
         }
         SKEL_UpdateState(pChar->pModel, pChar->blend.pPose, 0);
         if (fn_8001EC48(pChar)) {
-            if (fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x36)) ||
-                fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x38)) ||
-                fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x39)) ||
-                fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x3A))) {
+            if (BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x36)) ||
+                BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x38)) ||
+                BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x39)) ||
+                BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x3A))) {
                 bLegA = 1;
             }
-            if (fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x44)) ||
-                fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x46)) ||
-                fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x47)) ||
-                fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x48))) {
+            if (BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x44)) ||
+                BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x46)) ||
+                BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x47)) ||
+                BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x48))) {
                 bLegB = 1;
             }
         }
@@ -639,9 +639,9 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
 void fn_80018484(Character* pChar, CharModel* pModel) {
     if (pChar != NULL) {
         pChar->pModel        = pModel;
-        pChar->nClubHeadBone = fn_8001EED8(pChar->pModel, 0x53);
-        pChar->nGripBone     = fn_8001EED8(pChar->pModel, 0x52);
-        pChar->n16A8         = fn_8001EEE4(pChar->pModel, 0x15);
+        pChar->nClubHeadBone = CharModel_GetBoneIndex(pChar->pModel, 0x53);
+        pChar->nGripBone     = CharModel_GetBoneIndex(pChar->pModel, 0x52);
+        pChar->n16A8         = CharModel_GetBoneIndexMapped(pChar->pModel, 0x15);
     }
 }
 
@@ -751,7 +751,7 @@ void Character_PlaceFeetOnGround(Character* pChar) {
     if (pChar == NULL) {
         return;
     }
-    pCourse = fn_8000C594();
+    pCourse = Ter_GetTGD();
     if (pCourse == NULL) {
         return;
     }
@@ -767,7 +767,7 @@ void Character_PlaceFeetOnGround(Character* pChar) {
                 fLowest = pChar->afGroundHeight[i];
             }
         }
-        fn_800BAF04(pChar->a179C, pChar->a179C);
+        Vec_NormalizeTo(pChar->a179C, pChar->a179C);
         if (fLowest < -60000.0f) {
             return;
         }
@@ -807,29 +807,31 @@ void fn_8001899C(Character* pChar, u8 bLegA, u8 bLegB) {
     if (pChar == NULL) {
         return;
     }
-    fn_8001E938(auBits, 0x80);
+    BitArray_ClearAll(auBits, 0x80);
     if (!fn_8001EC48(pChar)) {
         return;
     }
-    pCourse = fn_8000C594();
+    pCourse = Ter_GetTGD();
     if (pCourse == NULL) {
         return;
     }
     if (bLegA) {
-        Character_IKLegToGround(pChar, pCourse, 0, fn_8001EEE4(pChar->pModel, 0x36),
-                                fn_8001EEE4(pChar->pModel, 0x38), fn_8001EEE4(pChar->pModel, 0x39),
-                                fn_8001EEE4(pChar->pModel, 0x3A), 2, 0);
-        fn_8001EA34(auBits, fn_8001EEE4(pChar->pModel, 0x38));
-        fn_8001EA34(auBits, fn_8001EEE4(pChar->pModel, 0x36));
-        fn_8001EA34(auBits, fn_8001EEE4(pChar->pModel, 0x39));
+        Character_IKLegToGround(pChar, pCourse, 0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x36),
+                                CharModel_GetBoneIndexMapped(pChar->pModel,
+                                        0x38), CharModel_GetBoneIndexMapped(pChar->pModel, 0x39),
+                                CharModel_GetBoneIndexMapped(pChar->pModel, 0x3A), 2, 0);
+        BitArray_Set(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x38));
+        BitArray_Set(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x36));
+        BitArray_Set(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x39));
     }
     if (bLegB) {
-        Character_IKLegToGround(pChar, pCourse, 1, fn_8001EEE4(pChar->pModel, 0x44),
-                                fn_8001EEE4(pChar->pModel, 0x46), fn_8001EEE4(pChar->pModel, 0x47),
-                                fn_8001EEE4(pChar->pModel, 0x48), 3, 1);
-        fn_8001EA34(auBits, fn_8001EEE4(pChar->pModel, 0x46));
-        fn_8001EA34(auBits, fn_8001EEE4(pChar->pModel, 0x44));
-        fn_8001EA34(auBits, fn_8001EEE4(pChar->pModel, 0x47));
+        Character_IKLegToGround(pChar, pCourse, 1, CharModel_GetBoneIndexMapped(pChar->pModel, 0x44),
+                                CharModel_GetBoneIndexMapped(pChar->pModel,
+                                        0x46), CharModel_GetBoneIndexMapped(pChar->pModel, 0x47),
+                                CharModel_GetBoneIndexMapped(pChar->pModel, 0x48), 3, 1);
+        BitArray_Set(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x46));
+        BitArray_Set(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x44));
+        BitArray_Set(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x47));
     }
     if (fn_8001E9F4(auBits, auBits, 0x80)) {
         SKEL_TransformBones(pChar->pModel, auBits);
@@ -902,7 +904,7 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
         return;
     }
     fn_8001EF54(pChar->aGroundNormal[nPoint], pChar->aGroundNormal[nOther], vSlope);
-    fn_800BAF04(vSlope, vSlope);
+    Vec_NormalizeTo(vSlope, vSlope);
     if (fDrop > 0.33f / 12.0f) {
         fDrop = 1.0f;
     } else {
@@ -921,10 +923,10 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     fn_8001EF10(vB, vA, vThigh);
     fn_8001EF10(vB, vOld, vShin);
     fn_8001EF10(vOld, vD, vFoot);
-    fReach = (f32)fn_80009680(fn_80009744(vReach));
-    fLeg = (f32)fn_80009680(fn_80009744(vLeg));
-    fThigh = (f32)fn_80009680(fn_80009744(vThigh));
-    fShin = (f32)fn_80009680(fn_80009744(vShin));
+    fReach = (f32)Math_Sqrt(Vec3_LengthSqClamped(vReach));
+    fLeg = (f32)Math_Sqrt(Vec3_LengthSqClamped(vLeg));
+    fThigh = (f32)Math_Sqrt(Vec3_LengthSqClamped(vThigh));
+    fShin = (f32)Math_Sqrt(Vec3_LengthSqClamped(vShin));
     if (fLeg > fThigh + fShin) {
         fLeg = fThigh + fShin;
     }
@@ -951,25 +953,25 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
         }
     }
     if (fabsf(fTurn) > 0.0001f) {
-        fn_8001EF34(fTurn, vNormal, vAxis);
+        Vec3_Scale(fTurn, vNormal, vAxis);
         Quat_BuildFromVector(vAxis, qTurn);
         Quat_Invert(pChar->pModel->pPoses[nBoneB].q0, qA8);
         Quat_RotateVector(qA8, qTurn, q98);
         Quat_Multiply(q98, pChar->pModel->pBones[nBoneB].q0C, qB8);
-        fn_8001E85C(qB8, pChar->pModel->pBones[nBoneB].q0C);
+        Quat_Copy(qB8, pChar->pModel->pBones[nBoneB].q0C);
     }
 
     // the hip: turned by the change in the angle between the thigh and the hip-to-foot line
-    fTurn2 = fn_8000965C(fShin * fn_800095F0(fAngleA) / fReach);
-    fTurn2 -= fn_8000965C(fShin * fn_800095F0(fAngleB) / fLeg);
+    fTurn2 = fn_8000965C(fShin * Math_Sin(fAngleA) / fReach);
+    fTurn2 -= fn_8000965C(fShin * Math_Sin(fAngleB) / fLeg);
     if (fabsf(fTurn2) > 0.0001f) {
-        fn_8001EF34(fTurn2, vNormal, vAxis);
+        Vec3_Scale(fTurn2, vNormal, vAxis);
         vAxis[3] = 0.0f;
         Quat_BuildFromVector(vAxis, qTurn);
         Quat_Invert(pChar->pModel->pPoses[nBoneA].q0, qA8);
         Quat_RotateVector(qA8, qTurn, q98);
         Quat_Multiply(q98, pChar->pModel->pBones[nBoneA].q0C, qB8);
-        fn_8001E85C(qB8, pChar->pModel->pBones[nBoneA].q0C);
+        Quat_Copy(qB8, pChar->pModel->pBones[nBoneA].q0C);
     }
 
     // the ankle: tilted about the horizontal axis across the slope, by the slope's angle
@@ -983,7 +985,7 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     vAxis[1] = 0.0f;
     vAxis[2] = -vSlope[0];
     vAxis[3] = 0.0f;
-    fLen = (f32)fn_80009680(vAxis[0] * vAxis[0] + vAxis[2] * vAxis[2]);
+    fLen = (f32)Math_Sqrt(vAxis[0] * vAxis[0] + vAxis[2] * vAxis[2]);
     if (fLen < 0.01f) {
         return;
     }
@@ -993,14 +995,14 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     fTurn3 = fn_80009614((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
     fTurn3 *= fDrop;
     if (fabsf(fTurn3) > 0.0001f) {
-        fn_8001EF34(fTurn3, vAxis, vAxis);
+        Vec3_Scale(fTurn3, vAxis, vAxis);
         Quat_Multiply(q48, q68, q38);
         Quat_Invert(q38, q28);
         vAxis[3] = 0.0f;
         Quat_BuildFromVector(vAxis, qTurn);
         Quat_RotateVector(q28, qTurn, qB8);
         Quat_Multiply(qB8, q48, q18);
-        fn_8001E85C(q18, pChar->pModel->pBones[nBoneC].q0C);
+        Quat_Copy(q18, pChar->pModel->pBones[nBoneC].q0C);
     }
 }
 
@@ -1043,9 +1045,9 @@ void fn_80019358(Character* pChar, f32* pDir, f32 fAngle) {
     f32 fC;
 
     if (pChar != NULL) {
-        fLen = fn_80009680(fn_80009744(pDir));
+        fLen = Math_Sqrt(Vec3_LengthSqClamped(pDir));
         if (fLen < 0.01f) return;
-        fn_8001EF34(1.0f / fLen, pDir, mtx[0]);
+        Vec3_Scale(1.0f / fLen, pDir, mtx[0]);
         mtx[0][3] = 0.0f;
         mtx[1][0] = 0.0f;
         mtx[1][1] = 1.0f;
@@ -1066,7 +1068,7 @@ Character* fn_8001942C(void) {
     int i;
 
     pNode = NULL;
-    pChar = fn_80009B34(sizeof(Character), 2, 0x40, "char.c", 0x8A4);
+    pChar = StaticMem_Alloc(sizeof(Character), 2, 0x40, "char.c", 0x8A4);
     pChar->pfn17B0 = NULL;
     for (i = 0; i < 4; i++) {
         pChar->buffers[i].n00 = -1;
@@ -1074,7 +1076,7 @@ Character* fn_8001942C(void) {
         pChar->buffers[i].p0C = NULL;
         pChar->buffers[i].p10 = NULL;
         pChar->buffers[i].p14 = NULL;
-        pChar->buffers[i].pBuf = fn_80009B34(0x890, 2, 0x40, "char.c", 0x8AF);
+        pChar->buffers[i].pBuf = StaticMem_Alloc(0x890, 2, 0x40, "char.c", 0x8AF);
     }
     pNode = &pChar->blend;
     fn_80072D90((AnimPlayer*)pChar->anim);
@@ -1158,16 +1160,16 @@ void fn_8001966C(Character* pChar) {
 void fn_8001971C(Character* pChar) {
     fn_8001A3B0(pChar);
     if (pChar->pA8 != NULL) {
-        fn_80009E70(pChar->pA8);
+        StaticMem_Free(pChar->pA8);
     }
     if (pChar->pB0 != NULL) {
-        fn_80009E70(pChar->pB0);
+        StaticMem_Free(pChar->pB0);
     }
     if (pChar->pB8 != NULL) {
-        fn_80009E70(pChar->pB8);
+        StaticMem_Free(pChar->pB8);
     }
     if (pChar->pBC != NULL) {
-        fn_80009E70(pChar->pBC);
+        StaticMem_Free(pChar->pBC);
     }
     if (pChar->hFile >= 0) {
         fn_8000633C(pChar->hFile);
@@ -1243,12 +1245,12 @@ void fn_80019798(Character* pChar, Skin** apSkins, int nSkins) {
     pChar->pB0 = NULL;
     pChar->pBC = NULL;
     if (pChar->nAC != 0) {
-        pChar->pA8 = fn_80009B34(pChar->nAC * sizeof(TexEntry), 2, 0x10, "char.c", 0x9A9);
-        pChar->pB8 = fn_80009B34(pChar->nAC * 64, 2, 0x10, "char.c", 0x9AE);
+        pChar->pA8 = StaticMem_Alloc(pChar->nAC * sizeof(TexEntry), 2, 0x10, "char.c", 0x9A9);
+        pChar->pB8 = StaticMem_Alloc(pChar->nAC * 64, 2, 0x10, "char.c", 0x9AE);
     }
     if (pChar->nB4 != 0) {
-        pChar->pB0 = fn_80009B34(nPalBytes, 2, 0x10, "char.c", 0x9B8);
-        pChar->pBC = fn_80009B34(nPal, 2, 0x10, "char.c", 0x9BD);
+        pChar->pB0 = StaticMem_Alloc(nPalBytes, 2, 0x10, "char.c", 0x9B8);
+        pChar->pBC = StaticMem_Alloc(nPal, 2, 0x10, "char.c", 0x9BD);
     }
     if (bAll) {
         if (pChar->nAC != 0) {
@@ -1285,7 +1287,7 @@ void fn_80019798(Character* pChar, Skin** apSkins, int nSkins) {
         }
     }
     if (pList != NULL) {
-        fn_80009E70(pList);
+        StaticMem_Free(pList);
     }
     fn_800100B0(&pChar->bank78, pChar->pA8, pChar->pB0, pChar->pB8, pChar->pBC, pChar->nAC, pChar->nB4);
     pChar->p50 = &pChar->bank78;
@@ -1356,7 +1358,7 @@ void fn_80019DE8(Character* pArg) {
 void fn_80019E80(Character* pChar) {
     fn_80019C84(pChar);
     fn_80019CEC(pChar);
-    fn_8001744C(pChar, pChar->a64[pChar->n74], &fn_80077ACC()->choices);
+    fn_8001744C(pChar, pChar->a64[pChar->n74], &FE_GetCurrentProfile()->choices);
     fn_8010BA2C(pChar->a64[pChar->n74]);
     fn_8008EA38(1);
 }
@@ -1396,7 +1398,7 @@ void fn_80019EF4(Character* pArg) {
 // Once the menu golfer is flagged (fn_8008EAD4): switches the character to its other model and
 // puts the profile's logos and the skins on it.
 void fn_8001A024(Character* pChar) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     int i;
     void* pModel;
 
@@ -1442,7 +1444,7 @@ void fn_8001A14C(Character* pArg) {
     ((void (*)(void*))fn_8010BEC4)(pModel);
     fn_8001D4A4(pChar, pChar->nPlayer);
     fn_80019C1C(pChar);
-    fn_800CB700(&uGlove, "Glove");
+    SKA_PackName(&uGlove, "Glove");
     fn_800CEBE8(pChar->apSkins, pChar->nSkins, pModel, &uGlove, 1);
     if (lbl_80281CAC >= 0) {
         fn_8001D4A4(gPlayers[lbl_80281CAC].pChar, lbl_80281CAC);
@@ -1605,7 +1607,7 @@ void fn_8001A73C(void) {
 //       (fn_80020BC8 > BYTESWAP_SWAPDATA): a little-endian port does not swap there.
 void fn_8001A75C(UStreamObject* pObject) {
     AnimLib_MergeOverlay(pObject->pData, pObject->uId);
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 void fn_8001A798(void) {
@@ -1756,7 +1758,7 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
     // the p44 entries
     BYTESWAP_SWAPDATA(&pData, (u8*)&pChar->n40, 4, 4);
     pData += 0xC;
-    pChar->p44 = fn_80009B34(pChar->n40 * sizeof(CharEntry44), 2, 0x40, "char.c", 0xE04);
+    pChar->p44 = StaticMem_Alloc(pChar->n40 * sizeof(CharEntry44), 2, 0x40, "char.c", 0xE04);
     for (i = 0; i < pChar->n40; i++) {
         BYTESWAP_SWAPDATA(&pData, (u8*)pChar->p44[i].v0, 0xC, 4);
         pChar->p44[i].fC = 1.0f;
@@ -1807,9 +1809,9 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
         pPeek = pData + 0x13C;
         BYTESWAP_SWAPDATA(&pPeek, (u8*)&uLibFlags, 4, 4);
         if (pChar->nSlot == 2 || nBank != 0 || (uLibFlags & 1)) {
-            pCopy = fn_80009B34(nSize, 2, 0x40, "char.c", 0xE54);
+            pCopy = StaticMem_Alloc(nSize, 2, 0x40, "char.c", 0xE54);
         } else {
-            pCopy = fn_80009B34(nSize, 1, 0x40, "char.c", 0xE57);
+            pCopy = StaticMem_Alloc(nSize, 1, 0x40, "char.c", 0xE57);
         }
         Mem_cpy(pCopy, pData, nSize);
         pLib = AnimLib_Load(pCopy, ClipBank_Get(pChar->nSlot));
@@ -1818,7 +1820,7 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
         } else {
             lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].pWork = pLib;
             lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].pCopy =
-                fn_80009B34(nSize, 2, 0x40, "char.c", 0xE68);
+                StaticMem_Alloc(nSize, 2, 0x40, "char.c", 0xE68);
             Mem_cpy(lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].pCopy,
                     pData, nSize);
             lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].nSize = nSize;
@@ -1826,7 +1828,7 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
             lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].n10 = nId + 3;
             lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].bActive = bLook;
             lbl_801C6068[pChar->nSlot].nOverlays++;
-            pChar->pLib = fn_80009B34(0x2800, 2, 0x40, "char.c", 0xE75);
+            pChar->pLib = StaticMem_Alloc(0x2800, 2, 0x40, "char.c", 0xE75);
         }
         pData += nSize;
     } else {
@@ -1838,7 +1840,7 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
     fn_80018710(pChar);
     if (bGolfer) {
         pChar->p16D8 = lbl_80280E24[nSet];
-        pChar->nClubHeadBone = fn_8001EED8(pChar->pModel, 0x53);
+        pChar->nClubHeadBone = CharModel_GetBoneIndex(pChar->pModel, 0x53);
         pChar->f165C = 100.0f;
         pChar->f1660 = 200.0f;
     } else {
@@ -1850,7 +1852,7 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
         for (i = 0; i < 6; i++) {
             pSkin = pChar->p16D8->apSkins[i];
             if (pSkin != NULL) {
-                fn_80037AB8(pSkin, pChar->pModel, fn_8001EED8(pChar->pModel, 0x52) - 0x52, 0x52);
+                fn_80037AB8(pSkin, pChar->pModel, CharModel_GetBoneIndex(pChar->pModel, 0x52) - 0x52, 0x52);
             }
         }
     }
@@ -1873,7 +1875,7 @@ void fn_8001B1DC(Skin* pSkin, CharSkinRef* pRef, s32 n) {
 }
 
 void fn_8001B1E8(void* p) {
-    fn_80009E70(p);
+    StaticMem_Free(p);
 }
 // ---- end of sweep code ----
 
@@ -1885,7 +1887,7 @@ CharSkinSet* fn_8001B208(u8* pData) {
     s32 nClass;
     int i;
 
-    pSet = fn_80009B34(sizeof(CharSkinSet), 2, 0x40, "char.c", 0xF15);
+    pSet = StaticMem_Alloc(sizeof(CharSkinSet), 2, 0x40, "char.c", 0xF15);
     if (pSet == NULL) {
         return NULL;
     }
@@ -1903,7 +1905,7 @@ CharSkinSet* fn_8001B208(u8* pData) {
         BYTESWAP_SWAPDATA(&pData, (u8*)&nSize, 4, 4);
         pData += 4;
         pSet->apSkins[nClass] = fn_800377FC(pData, 0);
-        pSet->a9C[nClass] = fn_80009B34(sizeof(CharSkinRef), 2, 0x40, "char.c", 0xF25);
+        pSet->a9C[nClass] = StaticMem_Alloc(sizeof(CharSkinRef), 2, 0x40, "char.c", 0xF25);
         fn_8001B1DC(pSet->apSkins[nClass], pSet->a9C[nClass], sizeof(CharSkinRef));
         if (nClass == 0 || nClass == 1) {
             pSet->a3C[nClass][0] = 0.065f;
@@ -1958,7 +1960,7 @@ void fn_8001B58C(CharSkinSet* pSet) {
                     fn_8001B1E8(lbl_80280E24[i]->a9C[j]);
                 }
             }
-            fn_80009E70(lbl_80280E24[i]);
+            StaticMem_Free(lbl_80280E24[i]);
             lbl_80280E24[i] = NULL;
         }
     }
@@ -1993,12 +1995,12 @@ void fn_8001B644(Character* pChar) {
     pChar->vMax[1] += 0.33f;
     pChar->vMax[2] += 0.33f;
     fn_8001EF54(pChar->vMin, pChar->vMax, vCentre);
-    fn_8001EF34(0.5f, vCentre, vCentre);
+    Vec3_Scale(0.5f, vCentre, vCentre);
     pChar->v1668[0] = vCentre[0];
     pChar->v1668[1] = vCentre[1];
     pChar->v1668[2] = vCentre[2];
     fn_8001EF10(pChar->vMax, pChar->vMin, vDiff);
-    pChar->f1674 = (f32)fn_80009680(fn_80009744(vDiff)) / 2.0f;
+    pChar->f1674 = (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff)) / 2.0f;
 }
 
 // How the camera sees the character: n1654 and n1658 are fn_80007D74's answers for its bounding
@@ -2014,22 +2016,22 @@ void fn_8001B878(Character* pChar, int nPlayer) {
     f32 vDir[4];
 
     pMtx = fn_8001EE64(pChar);
-    if (nPlayer != 1000 && nPlayer != fn_8001707C(fn_80016D10())) {
+    if (nPlayer != 1000 && nPlayer != ViewController_GetPlayer(fn_80016D10())) {
         pChar->n1654 = pChar->n1658 = 2;
         return;
     }
     Vec3Copy(pChar->v1668, &vPos.x);
     vPos.w = 1.0f;
-    fn_800BAD60(((Camera*)fn_8001614C())->viewMtx, &vPos, &vPos);
+    fn_800BAD60(((Camera*)Camera_GetCurrent())->viewMtx, &vPos, &vPos);
     Vec3Copy(&vPos.x, &sphere.x);
     sphere.radius = pChar->f1674;
     fDepth = sphere.z;
-    pChar->n1654 = fn_80007D74(&sphere, fn_8001614C(), 0);
+    pChar->n1654 = fn_80007D74(&sphere, Camera_GetCurrent(), 0);
     sphere.radius = 3.0f;
-    pChar->n1658 = fn_80007D74(&sphere, fn_8001614C(), 0);
+    pChar->n1658 = fn_80007D74(&sphere, Camera_GetCurrent(), 0);
     fn_8001EFB4(pMtx[3], fn_8001F004()->m4[3], vDir);
-    fDist = fn_8000C5FC(fn_8001F004()->m4[2], vDir);
-    fLen = (f32)fn_80009680(fn_80009744(vDir));
+    fDist = Vec3_Dot(fn_8001F004()->m4[2], vDir);
+    fLen = (f32)Math_Sqrt(Vec3_LengthSqClamped(vDir));
     if (fLen < pChar->f14) {
         pChar->f14 = fLen;
     }
@@ -2140,7 +2142,7 @@ int fn_8001BD18(Character* pChar, Clip* pClip) {
         if (fn_8001EDF4(pChar)) {
             Legacy_Quat_BuildFromPitch(PI, qTurn);
             Quat_Multiply(pChar->q16AC, qTurn, qGrip);
-            fn_8001E85C(qGrip, pChar->q16AC);
+            Quat_Copy(qGrip, pChar->q16AC);
         }
         fn_8001EFB4(pModel->pPoses[pChar->nGripBone].v10, pModel->pPoses[0].v10, vOffset);
         vOffset[3] = 0.0f;
@@ -2239,13 +2241,13 @@ void fn_8001C0E0(Character* pChar) {
         SKEL_Free(pChar->pModel);
         pChar->pModel = NULL;
         for (i = 0; i < 4; i++) {
-            fn_80009E70(pChar->buffers[i].pBuf);
+            StaticMem_Free(pChar->buffers[i].pBuf);
         }
         if (pChar->p44 != NULL) {
-            fn_80009E70(pChar->p44);
+            StaticMem_Free(pChar->p44);
         }
         if (pChar->pRecords != NULL) {
-            fn_80009E70(pChar->pRecords);
+            StaticMem_Free(pChar->pRecords);
         }
         if (fn_8001EC48(pChar)) {
             fn_8001971C(pChar);
@@ -2253,7 +2255,7 @@ void fn_8001C0E0(Character* pChar) {
         if (pChar->p17AC != NULL) {
             CharSlider_Free(pChar->p17AC);
         }
-        fn_80009E70(pChar);
+        StaticMem_Free(pChar);
         if (gSession.nGameType == 3) {
             ClipBank_Release(nSlot);
         }
@@ -2399,7 +2401,7 @@ void fn_8001C5B4(Character* pChar, int n) {
     if (pChar == NULL || pChar->pModel == NULL || pChar->nSlot < 0 || pChar->nSlot >= 3) {
         return;
     }
-    nBone = fn_8001EED8(pChar->pModel, 0x53);
+    nBone = CharModel_GetBoneIndex(pChar->pModel, 0x53);
     if (pChar->p16D8 != NULL) {
         pChar->nClubClass = n;
         pChar->pModel->pBones[nBone].v1C[1] = pChar->p16D8->afC[pChar->nClubClass];
@@ -2527,14 +2529,14 @@ void Character_SetupForShot(Character* pChar) {
     fn_8001EFB4(pPlayer->vTarget, pBallPos, vDir);
     vDir[1] = 0.0f;
     fn_80019358(pChar, vDir, 0.0f);
-    fn_8001E85C(pModel->pBones[0].q0C, pModel->pPoses[0].q0);
-    fn_8001E85C(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
+    Quat_Copy(pModel->pBones[0].q0C, pModel->pPoses[0].q0);
+    Quat_Copy(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
     Quat_QuatToMatrix(pModel->pPoses[0].q0, pModel->pMatrices[0]);
     fn_8001E880(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
     if (bStance && (pSkel = pChar->pModel->pSkel) != NULL) {
         pOldClip = pChar->pCurClip;
-        fn_8001EED8(pChar->pModel, 1);      // the results are not used
-        fn_8001EED8(pChar->pModel, 0x52);
+        CharModel_GetBoneIndex(pChar->pModel, 1);      // the results are not used
+        CharModel_GetBoneIndex(pChar->pModel, 0x52);
         pClip = Char_SetClip(pChar, 0, pChar->nStyle, NULL);
         if (pClip->pD8 == NULL) {
             fn_80027108(pSkel);
@@ -2552,15 +2554,15 @@ void Character_SetupForShot(Character* pChar) {
             }
         }
         fn_8001BD18(pChar, pSkel->pClip);
-        fn_8000AE28(-lbl_80187184[pChar->nClubClass][0], pChar->pModel->pMatrices[0][0], vOffsetX);
-        fn_8000AE28(-lbl_80187184[pChar->nClubClass][2], pChar->pModel->pMatrices[0][2], vOffsetZ);
+        Vec_Scale(-lbl_80187184[pChar->nClubClass][0], pChar->pModel->pMatrices[0][0], vOffsetX);
+        Vec_Scale(-lbl_80187184[pChar->nClubClass][2], pChar->pModel->pMatrices[0][2], vOffsetZ);
         if (pChar->pModel->bEE) {
             vOffsetZ[0] = -vOffsetZ[0];
             vOffsetZ[2] = -vOffsetZ[2];
         }
         fn_8001EFD8(vOffsetX, pChar->pModel->pBones[0].v1C, pChar->pModel->pBones[0].v1C);
         fn_8001EFD8(vOffsetZ, pChar->pModel->pBones[0].v1C, pChar->pModel->pBones[0].v1C);
-        fn_8001E85C(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
+        Quat_Copy(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
         fn_8001E880(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
         fn_80027108(pSkel);
         if (pChar->p16D8 != NULL) {
@@ -2609,7 +2611,7 @@ void fn_8001CCF8(UStreamObject* pObject) {
             lbl_80280E24[1] = NULL;
         }
     }
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 void fn_8001CD80(UStreamObject* pObject) {
@@ -2617,7 +2619,7 @@ void fn_8001CD80(UStreamObject* pObject) {
         lbl_80280E24[0] = fn_8001B208(pObject->pData);
         lbl_80280E24[1] = NULL;
     }
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // The 'CLB ' stream objects: two handlers for the same type.
@@ -2669,7 +2671,7 @@ void fn_8001CE5C(UStreamObject* pObject) {
         }
     }
     fn_800106B8(0);
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // The 'CHR ' stream objects: two handlers for the same type.
@@ -2693,7 +2695,7 @@ void fn_8001D020(UStreamObject* pObject) {
     fn_8008F310();
     pCopy = fn_8008F354();
     Mem_cpy(pCopy, pObject, pObject->uSize + 0x80);
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
     pCopy->pData = (u8*)pCopy + 0x80;
     lbl_80281EE0->pB8->pChar = fn_8001A9F4(pCopy->pData, 0, 0, pCopy->uId, 0, NULL);
     fn_8000A0D4();
@@ -2704,7 +2706,7 @@ void fn_8001D020(UStreamObject* pObject) {
     Character_SetPosition(lbl_80281EE0->pB8->pChar, lbl_80189A30, 1);
     fn_800192D4(lbl_80281EE0->pB8->pChar, lbl_80281EE0->f19C);
     if (lbl_80281EE0->pB8->pChar->nC == 7 || lbl_80281EE0->pB8->pChar->nC == 29) {
-        fn_8001DC64(lbl_80281EE0->pB8->pChar, &fn_80077ACC()->choices);
+        fn_8001DC64(lbl_80281EE0->pB8->pChar, &FE_GetCurrentProfile()->choices);
     }
     fn_8001C5B4(lbl_80281EE0->pB8->pChar, 5);
     pClip = Char_SetClip(lbl_80281EE0->pB8->pChar, 0, 0, NULL);
@@ -2777,7 +2779,7 @@ void fn_8001D3EC(UStreamObject* pObject) {
     Character* pChar = fn_8001C21C(fn_8001A9F4(pObject->pData, 0, 0, pObject->uId, 0, NULL));
     pChar->nPlayer = 1000;
     pChar->uId     = pObject->uId;
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 void fn_8001D44C(void) {
@@ -2797,7 +2799,7 @@ void fn_8001D4A4(Character* pChar, int nSlot) {
 
     if (gSession.nGameType == 3) {
         if (pChar->nC == 7 || pChar->nC == 29) {
-            Character_SetClubStatesForCharacter(pChar, nSlot, &fn_80077ACC()->choices);
+            Character_SetClubStatesForCharacter(pChar, nSlot, &FE_GetCurrentProfile()->choices);
         } else {
             Character_SetClubStatesForCharacter(pChar, nSlot, NULL);
         }
@@ -2912,7 +2914,7 @@ void Character_GetBallOnFingerPosition(Character* pChar, f32* pPos) {
 
     Vec_Copy(pMtx[3], pPos);
     Vec3Copy(pMtx[0], vAxis);
-    fn_800BAF04(vAxis, vAxis);
+    Vec_NormalizeTo(vAxis, vAxis);
     if (fn_8001EDF4(pChar)) {
         fn_8000C5D4(pPos, vAxis, 0.05f, pPos);
     } else {
@@ -2931,13 +2933,14 @@ void fn_8001DA04(Character* pChar, f32* pPos, f32* pAngles) {
         pMtx = fn_8001EC6C(pChar, 0x1A);
         Vec_Copy(pMtx[3], pPos);
         Vec3Copy(pMtx[0], vAxis);
-        fn_800BAF04(vAxis, vAxis);
+        Vec_NormalizeTo(vAxis, vAxis);
         if (fn_8001EDF4(pChar)) {
             fn_8000C5D4(pPos, vAxis, -0.000625f, pPos);
         } else {
             fn_8000C5D4(pPos, vAxis, 0.000625f, pPos);
         }
-        Quat_ExtractEulerAngles(pChar->pModel->pPoses[fn_8001EEE4(pChar->pModel, 0x15)].q0, &pAngles[0], &pAngles[1],
+        Quat_ExtractEulerAngles(pChar->pModel->pPoses[CharModel_GetBoneIndexMapped(pChar->pModel, 0x15)].q0,
+                                &pAngles[0], &pAngles[1],
                     &pAngles[2]);
         pAngles[1] += 30.0f / 180.0f * PI;
     }
@@ -2950,7 +2953,7 @@ void fn_8001DB04(Character* pChar, f32* pOut) {
     f32 (*pMtx)[4];
 
     if (pChar->pCurClip != NULL) {
-        fn_8001EED8(pChar->pModel, 1);  // the result is not used
+        CharModel_GetBoneIndex(pChar->pModel, 1);  // the result is not used
         pMtx = fn_8001ED08(pChar, 0);
         Vec3Copy(pChar->pCurClip->v80, &vPos.x);
         vPos.w = 1.0f;
@@ -2974,8 +2977,8 @@ void fn_8001DB98(Character* pChar) {
 // 1 when there is a current clip, the model has bone 0x54 and the clip's n1C is above that bone's
 // index (Swing.c then puts the ball on bone 0x54).
 u8 fn_8001DBF4(Character* pChar) {
-    if (pChar->pCurClip != NULL && fn_8001EED8(pChar->pModel, 0x54) != 0xFF &&
-        pChar->pCurClip->n1C > fn_8001EED8(pChar->pModel, 0x54)) {
+    if (pChar->pCurClip != NULL && CharModel_GetBoneIndex(pChar->pModel, 0x54) != 0xFF &&
+        pChar->pCurClip->n1C > CharModel_GetBoneIndex(pChar->pModel, 0x54)) {
         return 1;
     }
     return 0;
@@ -3024,12 +3027,12 @@ void fn_8001DD18(u8* pData, int nBytes) {
             for (j = 0; j < 4; j++) {
                 pDst = pData;
                 pSrc = pData;
-                fn_8001F08C(&pSrc, &pDst, aRecord, 5, 1);
+                ByteSwap_Records(&pSrc, &pDst, aRecord, 5, 1);
                 pData += 12;
             }
             pDst = pData;
             pSrc = pData;
-            fn_8001F08C(&pSrc, &pDst, aTail, 14, 1);
+            ByteSwap_Records(&pSrc, &pDst, aTail, 14, 1);
             if (pEntry->b40 == 0) {
                 fn_800CB868(&pEntry->u0, szName);
                 if (i != 0 && pEntry->u0 == pEntry[-1].u0 && (pEntry[-1].b47 & 1)) {
@@ -3052,7 +3055,7 @@ void fn_8001DEC8(u8* pData, int nBytes) {
     for (i = 0; i < nBytes / 12; i++) {
         pDst = pData;
         pSrc = pData;
-        fn_8001F08C(&pSrc, &pDst, aFormat, 5, 1);
+        ByteSwap_Records(&pSrc, &pDst, aFormat, 5, 1);
         pData += 12;
     }
 }
@@ -3076,76 +3079,76 @@ void Character_SetClubStatesForCharacter(Character* pChar, int nSlot, SkinChoice
             nGolfer = 7;
         }
         if (nGolfer >= 0) {
-            fn_800CB700(&uName, lbl_80186EC0[0]);
+            SKA_PackName(&uName, lbl_80186EC0[0]);
             fn_800CC710(pChar, 0, uName, gGolferTable[nGolfer].aClubs[0].uPart);
-            fn_800CB700(&uName, lbl_80186FB0[0]);
-            fn_800CB700(&uVariant, lbl_80187000[0]);
+            SKA_PackName(&uName, lbl_80186FB0[0]);
+            SKA_PackName(&uVariant, lbl_80187000[0]);
             fn_800CC7DC(pChar, 0, uName, uVariant, gGolferTable[nGolfer].aClubs[0].uModel);
-            fn_800CB700(&uName, lbl_80186F10[0]);
-            fn_800CB700(&uVariant, lbl_80186F60[0]);
+            SKA_PackName(&uName, lbl_80186F10[0]);
+            SKA_PackName(&uVariant, lbl_80186F60[0]);
             fn_800CC7DC(pChar, 0, uName, uVariant, gGolferTable[nGolfer].aClubs[0].uShaft);
-            fn_800CB700(&uName, lbl_80187050[0]);
-            fn_800CB700(&uVariant, lbl_801870A0[0]);
+            SKA_PackName(&uName, lbl_80187050[0]);
+            SKA_PackName(&uVariant, lbl_801870A0[0]);
             fn_800CC7DC(pChar, 0, uName, uVariant, gGolferTable[nGolfer].aClubs[0].uGrip);
 
-            fn_800CB700(&uName, lbl_80186EC0[1]);
+            SKA_PackName(&uName, lbl_80186EC0[1]);
             fn_800CC710(pChar, 1, uName, gGolferTable[nGolfer].aClubs[1].uPart);
-            fn_800CB700(&uName, lbl_80186FB0[1]);
-            fn_800CB700(&uVariant, lbl_80187000[1]);
+            SKA_PackName(&uName, lbl_80186FB0[1]);
+            SKA_PackName(&uVariant, lbl_80187000[1]);
             fn_800CC7DC(pChar, 1, uName, uVariant, gGolferTable[nGolfer].aClubs[1].uModel);
-            fn_800CB700(&uName, lbl_80186F10[1]);
-            fn_800CB700(&uVariant, lbl_80186F60[1]);
+            SKA_PackName(&uName, lbl_80186F10[1]);
+            SKA_PackName(&uVariant, lbl_80186F60[1]);
             fn_800CC7DC(pChar, 1, uName, uVariant, gGolferTable[nGolfer].aClubs[1].uShaft);
-            fn_800CB700(&uName, lbl_80187050[1]);
-            fn_800CB700(&uVariant, lbl_801870A0[1]);
+            SKA_PackName(&uName, lbl_80187050[1]);
+            SKA_PackName(&uVariant, lbl_801870A0[1]);
             fn_800CC7DC(pChar, 1, uName, uVariant, gGolferTable[nGolfer].aClubs[1].uGrip);
 
-            fn_800CB700(&uName, lbl_80186EC0[3]);
+            SKA_PackName(&uName, lbl_80186EC0[3]);
             fn_800CC710(pChar, 3, uName, gGolferTable[nGolfer].aIronPart[0]);
-            fn_800CB700(&uName, lbl_80186FB0[3]);
-            fn_800CB700(&uVariant, lbl_80187000[3]);
+            SKA_PackName(&uName, lbl_80186FB0[3]);
+            SKA_PackName(&uVariant, lbl_80187000[3]);
             fn_800CC7DC(pChar, 3, uName, uVariant, gGolferTable[nGolfer].uIronModel);
-            fn_800CB700(&uName, lbl_80186F10[3]);
-            fn_800CB700(&uVariant, lbl_80186F60[3]);
+            SKA_PackName(&uName, lbl_80186F10[3]);
+            SKA_PackName(&uVariant, lbl_80186F60[3]);
             fn_800CC7DC(pChar, 3, uName, uVariant, gGolferTable[nGolfer].uIronShaft);
-            fn_800CB700(&uName, lbl_80187050[3]);
-            fn_800CB700(&uVariant, lbl_801870A0[3]);
+            SKA_PackName(&uName, lbl_80187050[3]);
+            SKA_PackName(&uVariant, lbl_801870A0[3]);
             fn_800CC7DC(pChar, 3, uName, uVariant, gGolferTable[nGolfer].uIronGrip);
 
-            fn_800CB700(&uName, lbl_80186EC0[4]);
+            SKA_PackName(&uName, lbl_80186EC0[4]);
             fn_800CC710(pChar, 4, uName, gGolferTable[nGolfer].aIronPart[1]);
-            fn_800CB700(&uName, lbl_80186FB0[4]);
-            fn_800CB700(&uVariant, lbl_80187000[4]);
+            SKA_PackName(&uName, lbl_80186FB0[4]);
+            SKA_PackName(&uVariant, lbl_80187000[4]);
             fn_800CC7DC(pChar, 4, uName, uVariant, gGolferTable[nGolfer].uIronModel);
-            fn_800CB700(&uName, lbl_80186F10[4]);
-            fn_800CB700(&uVariant, lbl_80186F60[4]);
+            SKA_PackName(&uName, lbl_80186F10[4]);
+            SKA_PackName(&uVariant, lbl_80186F60[4]);
             fn_800CC7DC(pChar, 4, uName, uVariant, gGolferTable[nGolfer].uIronShaft);
-            fn_800CB700(&uName, lbl_80187050[4]);
-            fn_800CB700(&uVariant, lbl_801870A0[4]);
+            SKA_PackName(&uName, lbl_80187050[4]);
+            SKA_PackName(&uVariant, lbl_801870A0[4]);
             fn_800CC7DC(pChar, 4, uName, uVariant, gGolferTable[nGolfer].uIronGrip);
 
-            fn_800CB700(&uName, lbl_80186EC0[5]);
+            SKA_PackName(&uName, lbl_80186EC0[5]);
             fn_800CC710(pChar, 5, uName, gGolferTable[nGolfer].wedges.uPart);
-            fn_800CB700(&uName, lbl_80186FB0[5]);
-            fn_800CB700(&uVariant, lbl_80187000[5]);
+            SKA_PackName(&uName, lbl_80186FB0[5]);
+            SKA_PackName(&uVariant, lbl_80187000[5]);
             fn_800CC7DC(pChar, 5, uName, uVariant, gGolferTable[nGolfer].wedges.uModel);
-            fn_800CB700(&uName, lbl_80186F10[5]);
-            fn_800CB700(&uVariant, lbl_80186F60[5]);
+            SKA_PackName(&uName, lbl_80186F10[5]);
+            SKA_PackName(&uVariant, lbl_80186F60[5]);
             fn_800CC7DC(pChar, 5, uName, uVariant, gGolferTable[nGolfer].wedges.uShaft);
-            fn_800CB700(&uName, lbl_80187050[5]);
-            fn_800CB700(&uVariant, lbl_801870A0[5]);
+            SKA_PackName(&uName, lbl_80187050[5]);
+            SKA_PackName(&uVariant, lbl_801870A0[5]);
             fn_800CC7DC(pChar, 5, uName, uVariant, gGolferTable[nGolfer].wedges.uGrip);
 
-            fn_800CB700(&uName, lbl_80186EC0[2]);
+            SKA_PackName(&uName, lbl_80186EC0[2]);
             fn_800CC710(pChar, 2, uName, gGolferTable[nGolfer].aClubs[2].uPart);
-            fn_800CB700(&uName, lbl_80186FB0[2]);
-            fn_800CB700(&uVariant, lbl_80187000[2]);
+            SKA_PackName(&uName, lbl_80186FB0[2]);
+            SKA_PackName(&uVariant, lbl_80187000[2]);
             fn_800CC7DC(pChar, 2, uName, uVariant, gGolferTable[nGolfer].aClubs[2].uModel);
-            fn_800CB700(&uName, lbl_80186F10[2]);
-            fn_800CB700(&uVariant, lbl_80186F60[2]);
+            SKA_PackName(&uName, lbl_80186F10[2]);
+            SKA_PackName(&uVariant, lbl_80186F60[2]);
             fn_800CC7DC(pChar, 2, uName, uVariant, gGolferTable[nGolfer].aClubs[2].uShaft);
-            fn_800CB700(&uName, lbl_80187050[2]);
-            fn_800CB700(&uVariant, lbl_801870A0[2]);
+            SKA_PackName(&uName, lbl_80187050[2]);
+            SKA_PackName(&uVariant, lbl_801870A0[2]);
             fn_800CC7DC(pChar, 2, uName, uVariant, gGolferTable[nGolfer].aClubs[2].uGrip);
         }
     } else {
@@ -3165,7 +3168,7 @@ void fn_8001E7DC(void) {
 }
 
 // Copy a quaternion (Skeleton.c's use).
-void fn_8001E85C(f32* pSrc, f32* pDst) {
+void Quat_Copy(f32* pSrc, f32* pDst) {
     pDst[3] = pSrc[3];
     pDst[0] = pSrc[0];
     pDst[1] = pSrc[1];
@@ -3189,7 +3192,7 @@ void fn_8001E8A4(u32* aBits, u32 nBits) {
 }
 
 // Clears every bit of a bit array of nBits bits.
-void fn_8001E938(u32* aBits, u32 nBits) {
+void BitArray_ClearAll(u32* aBits, u32 nBits) {
     u32 i;
 
     for (i = 0; i < (nBits + 31) >> 5; i++) {
@@ -3197,7 +3200,7 @@ void fn_8001E938(u32* aBits, u32 nBits) {
     }
 }
 
-u8 fn_8001E9CC(u32* aBits, u32 n) {
+u8 BitArray_Test(u32* aBits, u32 n) {
     return (aBits[n >> 5] & (1 << (n & 31))) != 0;
 }
 
@@ -3211,7 +3214,7 @@ u8 fn_8001E9F4(u32* aA, u32* aB, u32 nBits) {
     return 0;
 }
 
-void fn_8001EA34(u32* aBits, u32 n) {
+void BitArray_Set(u32* aBits, u32 n) {
     aBits[n >> 5] |= 1 << (n & 31);
 }
 
@@ -3230,7 +3233,7 @@ void fn_8001EB6C(u32* aBits, u32 n) {
 
 // A bone's position, by bone id.
 void fn_8001EB8C(Character* pChar, int nBone, f32* pPos) {
-    fn_8001EBD8(pChar, fn_8001EED8(pChar->pModel, nBone), pPos);
+    fn_8001EBD8(pChar, CharModel_GetBoneIndex(pChar->pModel, nBone), pPos);
 }
 
 // Bone n's position (bone 1's without an animation slot); nothing without a character.
@@ -3252,7 +3255,7 @@ u8 fn_8001EC48(Character* pChar) {
 }
 
 f32 (*fn_8001EC6C(Character* pChar, int nBone))[4] {
-    return fn_8001ECA8(pChar, fn_8001EEE4(pChar->pModel, nBone));
+    return fn_8001ECA8(pChar, CharModel_GetBoneIndexMapped(pChar->pModel, nBone));
 }
 
 // Bone n's matrix (bone 1's without an animation slot); NULL without a character.
@@ -3269,7 +3272,7 @@ f32 (*fn_8001ECA8(Character* pChar, int nBone))[4] {
 
 // A bone's matrix, by bone id.
 f32 (*fn_8001ED08(Character* pChar, int nBone))[4] {
-    return fn_8001ECA8(pChar, fn_8001EED8(pChar->pModel, nBone));
+    return fn_8001ECA8(pChar, CharModel_GetBoneIndex(pChar->pModel, nBone));
 }
 
 f32 fn_8001ED44(Character* pChar, int b) {
@@ -3279,9 +3282,9 @@ f32 fn_8001ED44(Character* pChar, int b) {
     return pChar->f1660 * (1.0f / fn_8001EFFC(fn_8001F004()));
 }
 
-// A bone's position, by bone id through fn_8001EEE4.
+// A bone's position, by bone id through CharModel_GetBoneIndexMapped.
 void fn_8001EDA8(Character* pChar, int nBone, f32* pPos) {
-    fn_8001EBD8(pChar, fn_8001EEE4(pChar->pModel, nBone), pPos);
+    fn_8001EBD8(pChar, CharModel_GetBoneIndexMapped(pChar->pModel, nBone), pPos);
 }
 
 u8 fn_8001EDF4(Character* pChar) {
@@ -3316,12 +3319,12 @@ f32 fn_8001EEA4(f32* pA, f32* pB) {
     return pA[0] * pB[0] + pA[1] * pB[1] + pA[2] * pB[2] + pA[3] * pB[3];
 }
 
-int fn_8001EED8(CharModel* pModel, int nBone) {
+int CharModel_GetBoneIndex(CharModel* pModel, int nBone) {
     return pModel->aBone[nBone];
 }
 
 // A bone's index, through the second table while the model's bEE is set.
-int fn_8001EEE4(CharModel* pModel, int nBone) {
+int CharModel_GetBoneIndexMapped(CharModel* pModel, int nBone) {
     if (pModel->bEE) {
         return pModel->aBone2[pModel->aBone[nBone]];
     }
@@ -3353,7 +3356,7 @@ void fn_8001EF10(f32* pA, f32* pB, f32* pOut) {
 
 // in scaled by f into out (three floats)
 #ifdef __MWERKS__
-asm void fn_8001EF34(register f32 f, register f32* pIn, register f32* pOut) {
+asm void Vec3_Scale(register f32 f, register f32* pIn, register f32* pOut) {
     nofralloc
     fmr      f2, f
     psq_l    f0, 0(pIn), 0, 0
@@ -3366,7 +3369,7 @@ asm void fn_8001EF34(register f32 f, register f32* pIn, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_8001EF34(f32 f, f32* pIn, f32* pOut) {
+void Vec3_Scale(f32 f, f32* pIn, f32* pOut) {
     pOut[0] = pIn[0] * f;
     pOut[1] = pIn[1] * f;
     pOut[2] = pIn[2] * f;
@@ -3484,7 +3487,7 @@ f32 fn_8001EFFC(CamLens* pLens) {
 
 // The current render camera's lens.
 CamLens* fn_8001F004(void) {
-    return fn_80008370(*lbl_80280DF0);
+    return Camera_GetLens(*lbl_80280DF0);
 }
 
 // The time of the blend's event uEvent, 0 when it has none.
@@ -3511,7 +3514,7 @@ void Anim_SetRate(u8* p, f32 v) {
 
 // Byte-swaps nCount records laid out as pFormat's nFields fields from *ppSrc to *ppDst; both
 // pointers are left after the last record.
-void fn_8001F08C(void** ppSrc, void** ppDst, SwapField* pFormat, int nFields, int nCount) {
+void ByteSwap_Records(void** ppSrc, void** ppDst, SwapField* pFormat, int nFields, int nCount) {
     SwapField* pField;
     int i;
 
@@ -3556,10 +3559,10 @@ MtaLib* fn_8001F110(MtaLib* pArg, s32* pnSize) {
     MtaRecord* pRecord2;
 
     pSrc = pDst = pArg;
-    fn_8001F08C(&pSrc, &pDst, aHeader, 10, 1);
+    ByteSwap_Records(&pSrc, &pDst, aHeader, 10, 1);
     pRecords = (MtaRecord*)(pArg + 1);
     pSrc = pDst = pRecords;
-    fn_8001F08C(&pSrc, &pDst, aRecord, 5, pArg->nRecords);
+    ByteSwap_Records(&pSrc, &pDst, aRecord, 5, pArg->nRecords);
     pArg->pRecords = pRecords;
     nOffset = sizeof(MtaLib) + pArg->nRecords * sizeof(MtaRecord);
     // fake match: pLib is set from the parameter (through void*) in the first loop's condition, the
@@ -3568,7 +3571,7 @@ MtaLib* fn_8001F110(MtaLib* pArg, s32* pnSize) {
     for (i = 0; i < (pLib = (MtaLib*)(void*)pArg)->nRecords; i++) {
         pRecord = &pLib->pRecords[i];
         pSrc = pDst = (u8*)pLib + nOffset;
-        fn_8001F08C(&pSrc, &pDst, aEntry, 11, pRecord->nEntries);
+        ByteSwap_Records(&pSrc, &pDst, aEntry, 11, pRecord->nEntries);
         pRecord->pEntries = (MtaEntry*)((u8*)pLib + nOffset);
         nOffset += pRecord->nEntries * sizeof(MtaEntry);
     }

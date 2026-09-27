@@ -81,9 +81,9 @@ void fn_80067710(int nPlayer, int a, u8 nEvent) {
         if (nEvent == 20 || nEvent == 29) {
             fn_80067B5C(gPlayers[nPlayer].ballBefore.vPos, gPlayers[nPlayer].ball.vStart, vDiff);
             vDiff[1] = 0.0f;
-            nInches = 36.0f * (f32)fn_80009680(fn_80009744(vDiff));
-            fn_80067B1C(lbl_802811B8->aValue, 18, nInches, lbl_802811B8->aSetBits);
-            fn_80067B1C(lbl_802811B8->aValue, 19, nInches, lbl_802811B8->aSetBits);
+            nInches = 36.0f * (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+            SitDev_SetStateValue(lbl_802811B8->aValue, 18, nInches, lbl_802811B8->aSetBits);
+            SitDev_SetStateValue(lbl_802811B8->aValue, 19, nInches, lbl_802811B8->aSetBits);
         }
     }
 }
@@ -121,7 +121,7 @@ void SitDev_ProcessEventQueue(void) {
         }
         if (bFound) {
             if (pEntry->b2.s.n5 != 22) {
-                fn_80067B1C(lbl_802811B8->aValue, 0, Game_CurHoleIndex() + 1, pData->aSetBits);
+                SitDev_SetStateValue(lbl_802811B8->aValue, 0, Game_CurHoleIndex() + 1, pData->aSetBits);
             }
             if (fn_800BB7AC(pEntry, lbl_802811B8, pEvent->nPlayer) &&
                 (pEntry->n0 == 0 || !lbl_802811B8->pD4[pEntry->n0])) {
@@ -141,7 +141,7 @@ void SitDev_ProcessEventQueue(void) {
     lbl_802811B8->n13C = 0;
 }
 
-void fn_80067B1C(u16* pValues, int nIndex, u16 uValue, u32* pSetBits) {
+void SitDev_SetStateValue(u16* pValues, int nIndex, u16 uValue, u32* pSetBits) {
     pValues[nIndex] = (int)uValue;  // fake match: the no-op widening only moves the store in the schedule
     pSetBits[nIndex / 32] |= 1 << (nIndex % 32);
 }

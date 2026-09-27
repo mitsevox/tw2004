@@ -283,10 +283,10 @@ void PsBallFx_InitModule(void) {
     // into saved registers ahead of every call.
     for (j = 0; j < 1; j++) {
         fn_80036054(&lbl_80281408->mesh[j], 0, &size);
-        lbl_80281408->ap2C[j] = fn_80009B34(0x640, 2, 16, "PsBallFx.c", 1435);
-        lbl_80281408->ap30[j] = fn_80009B34(0x320, 2, 16, "PsBallFx.c", 1440);
-        lbl_80281408->ap28[j] = fn_80009B34(0x960, 2, 16, "PsBallFx.c", 1445);
-        lbl_80281408->ap50[j] = fn_80009B34(0x4B0, 2, 16, "PsBallFx.c", 1450);
+        lbl_80281408->ap2C[j] = StaticMem_Alloc(0x640, 2, 16, "PsBallFx.c", 1435);
+        lbl_80281408->ap30[j] = StaticMem_Alloc(0x320, 2, 16, "PsBallFx.c", 1440);
+        lbl_80281408->ap28[j] = StaticMem_Alloc(0x960, 2, 16, "PsBallFx.c", 1445);
+        lbl_80281408->ap50[j] = StaticMem_Alloc(0x4B0, 2, 16, "PsBallFx.c", 1450);
         for (i = 0; i < 50; i++) {
             lbl_80281408->ap2C[j][i * 8 + 0] = 0.0f;
             lbl_80281408->ap2C[j][i * 8 + 1] = 0.0f;
@@ -308,14 +308,14 @@ void PsBallFx_InitModule(void) {
 
 void fn_800A2E14(void) {
     fn_800360A0(&lbl_80281408->mesh[0]);
-    fn_80009E70(lbl_80281408->ap28[0]);
-    fn_80009E70(lbl_80281408->ap2C[0]);
-    fn_80009E70(lbl_80281408->ap30[0]);
-    fn_80009E70(lbl_80281408->ap50[0]);
+    StaticMem_Free(lbl_80281408->ap28[0]);
+    StaticMem_Free(lbl_80281408->ap2C[0]);
+    StaticMem_Free(lbl_80281408->ap30[0]);
+    StaticMem_Free(lbl_80281408->ap50[0]);
 }
 
 // Clear the sand trail's state and give emitters 0, 6 and 14 the current course's vectors (on
-// course 18, lbl_8018E958's when fn_80015464 is 0, 1, 2 or 17).
+// course 18, lbl_8018E958's when Game_GetCurHoleNum is 0, 1, 2 or 17).
 void fn_800A2E68(void) {
     int i;
 
@@ -330,8 +330,9 @@ void fn_800A2E68(void) {
     for (i = 0; i < 4; i++) {
         lbl_80281408->a64[0][i] = 0.0f;
     }
-    if (Game_GetCourse() == 18 && (fn_80015464() == 0 || fn_80015464() == 1 || fn_80015464() == 2 ||
-                                   fn_80015464() == 17)) {
+    if (Game_GetCourse() == 18
+        && (Game_GetCurHoleNum() == 0 || Game_GetCurHoleNum() == 1 || Game_GetCurHoleNum() == 2 ||
+                                   Game_GetCurHoleNum() == 17)) {
         Vec_Copy(lbl_8018E958[0], lbl_8018CA98[0].vF0);
         Vec_Copy(lbl_8018E958[1], lbl_8018CA98[14].vF0);
         Vec_Copy(lbl_8018E958[1], lbl_8018CA98[6].vF0);
@@ -405,7 +406,7 @@ void fn_800A31E0(Ball* pBall, int nPlayer) {
     vPos[1] = pBall->vPos[1];
     vPos[2] = pBall->vPos[2];
     vPos[3] = 1.0f;
-    if (TER_NO_GROUND != Ter_GetSupportingGroundData(fn_8000C594(), vPos, &pSurface, vNormal)) {
+    if (TER_NO_GROUND != Ter_GetSupportingGroundData(Ter_GetTGD(), vPos, &pSurface, vNormal)) {
         if (0.375f != pSurface->f1C) {
             return;
         }
@@ -450,8 +451,8 @@ void fn_800A3348(Ball* pBall, int nPlayer) {
         if (pSurface->nClass == 7 || pSurface->nClass == 16) {
             gPlayers[nPlayer].b30E = 1;
         }
-        fn_8004DBB0(fn_8000C594(), vPos, &pGround, vNormal);
-        fDot = fn_8000C5FC(gPlayers[nPlayer].ball.vVel, vNormal);
+        fn_8004DBB0(Ter_GetTGD(), vPos, &pGround, vNormal);
+        fDot = Vec3_Dot(gPlayers[nPlayer].ball.vVel, vNormal);
         if (fDot < 0.0f) {
             fDot *= -1.0f;
         }
@@ -513,7 +514,7 @@ void fn_800A34C0(int nTrail, Ball* pBall, f32* pDir) {
         fGap = 0.0f;
     }
     if (fGap <= 0.1f) {
-        fDot = fn_8000C5FC(pDir, lbl_80281408->a64[nTrail]);
+        fDot = Vec3_Dot(pDir, lbl_80281408->a64[nTrail]);
     } else {
         fDot = 1.0f;
     }
@@ -579,14 +580,14 @@ void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer) {
     vPos[1] = pBall->vPos[1];
     vPos[2] = pBall->vPos[2];
     vPos[3] = 1.0f;
-    if (TER_NO_GROUND == Ter_GetSupportingGroundData(fn_8000C594(), vPos, &pSurface, vNormal) ||
+    if (TER_NO_GROUND == Ter_GetSupportingGroundData(Ter_GetTGD(), vPos, &pSurface, vNormal) ||
         0.375f != pSurface->f1C || (int)pSurface->nClass != 6) {    // EA compares the class signed here
         return;
     }
     Vec_Copy(gPlayers[nPlayer].ball.vVel, vDir);
     vDir[1] = 0.0f;
     if (vDir[0] != 0.0f || vDir[2] != 0.0f) {
-        fn_800BAF04(vDir, vDir);
+        Vec_NormalizeTo(vDir, vDir);
         fn_800A34C0(0, pBall, vDir);
     }
 }
@@ -604,28 +605,28 @@ void fn_800A3A84(void) {
 
     pEmitter = lbl_80281408->ap74[0];
     if (pEmitter != NULL && (pEmitter->params.u58 & 0x20000)) {
-        Vec_Copy(gPlayers[fn_8001707C(0)].ball.vPos, pEmitter->params.v80);
-        Vec_Copy(gPlayers[fn_8001707C(0)].ball.vPos, lbl_80281408->ap74[0]->mtx[3]);
+        Vec_Copy(gPlayers[ViewController_GetPlayer(0)].ball.vPos, pEmitter->params.v80);
+        Vec_Copy(gPlayers[ViewController_GetPlayer(0)].ball.vPos, lbl_80281408->ap74[0]->mtx[3]);
     }
     pEmitter = lbl_80281408->ap74[1];
     if (pEmitter != NULL && (pEmitter->params.u58 & 0x20000)) {
-        Vec_Copy(gPlayers[fn_8001707C(1)].ball.vPos, pEmitter->params.v80);
-        Vec_Copy(gPlayers[fn_8001707C(1)].ball.vPos, lbl_80281408->ap74[1]->mtx[3]);
+        Vec_Copy(gPlayers[ViewController_GetPlayer(1)].ball.vPos, pEmitter->params.v80);
+        Vec_Copy(gPlayers[ViewController_GetPlayer(1)].ball.vPos, lbl_80281408->ap74[1]->mtx[3]);
     }
-    fn_80014118(0x70);
+    RenderState_SetDrawFlags(0x70);
     fn_800352BC();
-    fn_80013CCC(fn_8001614C());
-    fn_80013EEC(fn_8001614C());
+    fn_80013CCC(Camera_GetCurrent());
+    fn_80013EEC(Camera_GetCurrent());
     fn_80035240(0);
     fn_80016B9C();
     fn_80035138(0);
-    fn_80012F50(0, 6, 0x80);
-    fn_80012F18(3);
-    fn_80035118(1, 1);
-    fn_80012EF8();
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_SetDepthFunc(3);
+    RenderState_SetBlendFactors(1, 1);
+    RenderState_Flush();
     if (lbl_80281408->an44[0] > 2) {
         fn_8005CC64(lbl_80281408->pBank, lbl_80281408->pTex);
-        fn_80012EF8();
+        RenderState_Flush();
         nFirst = lbl_80281408->an40[0];
         nEnd = lbl_80281408->an38[0];
         pDraw = aDraws;
@@ -652,8 +653,8 @@ void fn_800A3A84(void) {
         fn_80036100(&lbl_80281408->mesh[0], &fill, 1);
         fn_800360D4(&lbl_80281408->mesh[0]);
     }
-    fn_80012F50(1, 6, 0x80);
-    fn_80012EF8();
+    RenderState_SetAlphaTest(1, 6, 0x80);
+    RenderState_Flush();
 }
 
 // Start emitter 15 at pPos for nPlayer's view, drifting with a tenth of the wind.
@@ -662,7 +663,7 @@ void fn_800A3CB0(f32* pPos, int nPlayer) {
     int nView = gPlayers[nPlayer].nView[0];
 
     Wind_Get(vWind);
-    fn_8000AE28(0.1f, vWind, vWind);
+    Vec_Scale(0.1f, vWind, vWind);
     Vec3Copy(pPos, lbl_8018CA98[15].v80);
     Vec3Copy(vWind, lbl_8018CA98[15].vA0);
     lbl_80281408->apEmitter[nView] = fn_80099758(&lbl_8018CA98[15]);

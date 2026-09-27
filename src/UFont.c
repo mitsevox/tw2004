@@ -50,14 +50,14 @@ void UFont_LoadFontFromStream(UStreamObject* pObject) {
         bFlag = 1;
     }
     UFont_LoadFont(uId & ~0x80, pObject->pData, bFlag);
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 void FO_vInitModule(void) {
     Stream_RegisterLoadChunkCallback('sfn ', UFont_LoadFontFromStream);
     fn_80011034(lbl_80280DE0);
-    lbl_80280DE0->pQueuePool = fn_80009B34(50 * sizeof(UFontContext), 2, 0x10, "UFont.c", 0x125);
-    lbl_80280DE0->pStrings = fn_80009B34(0x1F4, 2, 0x10, "UFont.c", 0x12F);
+    lbl_80280DE0->pQueuePool = StaticMem_Alloc(50 * sizeof(UFontContext), 2, 0x10, "UFont.c", 0x125);
+    lbl_80280DE0->pStrings = StaticMem_Alloc(0x1F4, 2, 0x10, "UFont.c", 0x12F);
     FO_vClearPacketLists();
     UFont_ResetContext();
     lbl_80280DE0->apFonts[0] = NULL;
@@ -77,8 +77,8 @@ void FO_vCloseModule(void) {
         }
     }
     fn_80011160(lbl_80280DE0);
-    fn_80009E70(lbl_80280DE0->pQueuePool);
-    fn_80009E70(lbl_80280DE0->pStrings);
+    StaticMem_Free(lbl_80280DE0->pQueuePool);
+    StaticMem_Free(lbl_80280DE0->pStrings);
 }
 
 // Sets mode 0 (queued) and resets most text settings (u5C, a14, f70/f74, a8C and nC4 to fD0
@@ -290,17 +290,17 @@ s32 UFont_FindFreeSlot(void) {
 
 void FO_vSetFontContext(void) {
     fn_800111D8();
-    fn_80012F50(1, 6, 1);
-    fn_80012F34(0);
-    fn_80012F18(7);
-    fn_80012EF8();
+    RenderState_SetAlphaTest(1, 6, 1);
+    RenderState_SetDepthWrite(0);
+    RenderState_SetDepthFunc(7);
+    RenderState_Flush();
 }
 
 void FO_vRestoreFontContext(void) {
     fn_800112DC();
-    fn_80012F34(1);
-    fn_80012F18(3);
-    fn_80012EF8();
+    RenderState_SetDepthWrite(1);
+    RenderState_SetDepthFunc(3);
+    RenderState_Flush();
 }
 
 void fn_80012E00_CalcGradientScale(UFontContext* pCtx) {

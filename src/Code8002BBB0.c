@@ -35,7 +35,7 @@ void AI_TargetsInit(void) {
 void AI_TargetsClear(void) {
     int i;
     for (i = 0; i < NUM_AI_TARGETS; i++) {
-        fn_80005AE8(&gAITargets[i], 0, sizeof(AITarget));
+        Mem_set(&gAITargets[i], 0, sizeof(AITarget));
         gAITargets[i].nPinSet  = -1;
         gAITargets[i].nTeeSet  = -1;
         gAITargets[i].bEnabled = 1;
@@ -97,7 +97,7 @@ void fn_8002BDEC_SetTarget(int nPlayer, f32* pTarget) {
         if (nType == 98 || nType == 105) {
             // The cup (surfaces 98 and 105 hole the ball, see Ball.c): aim at the pin's height
             // instead and flag it.
-            fHeight = fn_8000C594()->pin[Game_CurrentPinSet()].y;
+            fHeight = Ter_GetTGD()->pin[Game_CurrentPinSet()].y;
             gPlayers[nPlayer].nSurface = 16;
             gPlayers[nPlayer].uFlagsEF0 |= 2;
         } else {
@@ -114,7 +114,7 @@ void fn_8002BDEC_SetTarget(int nPlayer, f32* pTarget) {
     if (0.0f == fDX && 0.0f == fDZ) {
         gPlayers[nPlayer].fDistance = 10.0f;
     } else {
-        gPlayers[nPlayer].fDistance = fn_80009680(fDX * fDX + fDZ * fDZ);
+        gPlayers[nPlayer].fDistance = Math_Sqrt(fDX * fDX + fDZ * fDZ);
     }
     if (!Player_IsCPU(nPlayer)) {
         // A human whose distance is a hair under the club's reach gets the full reach.
@@ -138,8 +138,8 @@ void AI_NudgeAim(int nPlayer, f32 fDelta) {
     } else if (gPlayers[nPlayer].fAim > PI) {
         gPlayers[nPlayer].fAim -= 2 * PI;
     }
-    fSin = fn_800095F0(gPlayers[nPlayer].fAim);
-    fCos = fn_80009638(gPlayers[nPlayer].fAim);
+    fSin = Math_Sin(gPlayers[nPlayer].fAim);
+    fCos = Math_Cos(gPlayers[nPlayer].fAim);
     vTarget[0] = gPlayers[nPlayer].vBall[0] + -fSin * gPlayers[nPlayer].fDistance;
     vTarget[2] = gPlayers[nPlayer].vBall[2] + fCos * gPlayers[nPlayer].fDistance;
     fn_8002BDEC_SetTarget(nPlayer, vTarget);
@@ -151,8 +151,8 @@ void AI_NudgeDistance(int nPlayer, f32 fDelta) {
     f32     fSin, fCos;
 
     gPlayers[nPlayer].fDistance += fDelta;
-    fSin = fn_800095F0(gPlayers[nPlayer].fAim);
-    fCos = fn_80009638(gPlayers[nPlayer].fAim);
+    fSin = Math_Sin(gPlayers[nPlayer].fAim);
+    fCos = Math_Cos(gPlayers[nPlayer].fAim);
     vTarget[0] = gPlayers[nPlayer].vBall[0] + -fSin * gPlayers[nPlayer].fDistance;
     vTarget[2] = gPlayers[nPlayer].vBall[2] + fCos * gPlayers[nPlayer].fDistance;
     fn_8002BDEC_SetTarget(nPlayer, vTarget);
@@ -161,7 +161,7 @@ void AI_NudgeDistance(int nPlayer, f32 fDelta) {
 // Aim at the pin.
 void AI_DefaultTarget(int nPlayer) {
     int         nPinSet = Game_CurrentPinSet();
-    CourseInfo* pCourse = fn_8000C594();
+    CourseInfo* pCourse = Ter_GetTGD();
     Player*     p       = &gPlayers[nPlayer];
     f32*        pTarget;
     p->vTarget[0]    = pCourse->pin[nPinSet].x;
@@ -228,7 +228,7 @@ void AI_ChooseTarget(int nPlayer) {
     f32         fDX, fDZ;
 
     nPinSet = Game_CurrentPinSet();
-    pCourse = fn_8000C594();
+    pCourse = Ter_GetTGD();
     p       = &gPlayers[nPlayer];
     nAggr   = Golfer_GetAttribute(p, ATTR_AGGRESSION, ATTR_TOTAL);
     nIQ     = Golfer_GetAttribute(p, ATTR_IQ, ATTR_TOTAL);
@@ -263,7 +263,7 @@ void AI_ChooseTarget(int nPlayer) {
 
             fDX    = p->vBall[0] - t->pDef->x;
             fDZ    = p->vBall[2] - t->pDef->z;
-            fDist  = fn_80009680(fDX * fDX + fDZ * fDZ);
+            fDist  = Math_Sqrt(fDX * fDX + fDZ * fDZ);
             nKind  = AI_ShotKindForDistance(nPlayer, fDist);
             nClub  = AI_ClubForShot(nPlayer, nKind, 0, fDist);
             nAttr  = Shot_GoverningAttribute(nPlayer, nClub, p->ball.nLie, nKind);
@@ -333,7 +333,7 @@ void AI_ChooseTarget(int nPlayer) {
     // Already closer to the pin than the chosen point: aim normally instead.
     fDX = p->vBall[0] - pCourse->pin[nPinSet].x;
     fDZ = p->vBall[2] - pCourse->pin[nPinSet].z;
-    if (fDX * fDX + fDZ * fDZ < fBestDist2 && !(gpGame->nCurCourse == 3 && fn_80015464() == 17)) {
+    if (fDX * fDX + fDZ * fDZ < fBestDist2 && !(gpGame->nCurCourse == 3 && Game_GetCurHoleNum() == 17)) {
         AI_DefaultTarget(nPlayer);
         return;
     }
@@ -369,7 +369,7 @@ int Shot_GoverningAttribute(int nPlayer, int nClub, int nLie, int nKind) {
     if (nLie == 8 || nLie == 13 || nLie == 11 || nLie == 3 || nLie == 4 || nLie == 6 || nLie == 7) {
         return ATTR_RECOVERY;
     }
-    if (nKind == SHOT_TYPE_DRIVE_e && nClub < 13 && fn_800D2B08() == 3) {
+    if (nKind == SHOT_TYPE_DRIVE_e && nClub < 13 && Course_GetCurHolePar() == 3) {
         return ATTR_BALL_STRIKING;
     }
     return ATTR_APPROACH;

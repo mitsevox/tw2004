@@ -22,7 +22,7 @@ BufferPoolBlock* lbl_80281D98;      // the block holding the display list
 // display list that hands GX the renderer's state, after setting that state's b4 to 1.
 void fn_80045D18(void) {
     lbl_80281D98 = fn_80045E80();
-    fn_80012F34(1);
+    RenderState_SetDepthWrite(1);
     fn_80045E60(lbl_80281D98);
     fn_80045E40(lbl_80281D98);
     fn_80045E3C(0);
@@ -41,7 +41,7 @@ UObjModel* fn_80045D80(u8* pData) {
     int nLods;
     int i;
 
-    pModel = fn_80009B34(sizeof(UObjModel), 2, 0x80, "UObject3D.c", 506);
+    pModel = StaticMem_Alloc(sizeof(UObjModel), 2, 0x80, "UObject3D.c", 506);
     pModel->p10 = fn_800073B4(pData, 0);
     pGroup = fn_80045F5C(fn_80045F6C(pModel->p10), 0);
     nLods = fn_80045F50(pGroup);
@@ -76,13 +76,13 @@ void fn_80045EA0(BufferPoolBlock* pBlock) {
     fn_80045F38(pBlock);
 }
 
-// Records fn_80015624's GX commands (the renderer state groups that changed) as a display list in
+// Records RenderState_Apply's GX commands (the renderer state groups that changed) as a display list in
 // the block,
 // and keeps the list's size in u1000, which also marks the block as in use.
 void fn_80045EC0(BufferPoolBlock* pBlock) {
     DCInvalidateRange(pBlock->unk0, sizeof(pBlock->unk0));
     GXBeginDisplayList(pBlock->unk0, sizeof(pBlock->unk0));
-    fn_80015624();
+    RenderState_Apply();
     pBlock->u1000 = GXEndDisplayList();
     DCFlushRange(pBlock->unk0, pBlock->u1000);
 }

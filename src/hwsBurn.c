@@ -14,7 +14,7 @@ SkinDesc* fn_80111850(HwsBurn* pBurn);
 // A burn of pDesc: its tables sized from the description, the bit sets cleared, and no variant or
 // option chosen yet (-1).
 HwsBurn* fn_801104AC(SkinDesc* pDesc) {
-    HwsBurn* pBurn = fn_80009B34(sizeof(HwsBurn), 1, 16, "hwsBurn.c", 46);
+    HwsBurn* pBurn = StaticMem_Alloc(sizeof(HwsBurn), 1, 16, "hwsBurn.c", 46);
     int i;
     int nBytes;
 
@@ -28,47 +28,47 @@ HwsBurn* fn_801104AC(SkinDesc* pDesc) {
     pBurn->n60 = pDesc->n10;
     pBurn->n70 = pDesc->n88;
     if (pBurn->nParts != 0) {
-        pBurn->aVariant = fn_80009B34(pBurn->nParts * 4, 1, 16, "hwsBurn.c", 61);
+        pBurn->aVariant = StaticMem_Alloc(pBurn->nParts * 4, 1, 16, "hwsBurn.c", 61);
         memset(pBurn->aVariant, 0, pBurn->nParts * 4);
-        pBurn->aOption = fn_80009B34(pBurn->nParts * 4, 1, 16, "hwsBurn.c", 64);
+        pBurn->aOption = StaticMem_Alloc(pBurn->nParts * 4, 1, 16, "hwsBurn.c", 64);
         for (i = 0; i < pBurn->nParts; i++) {
             pBurn->aOption[i] = -1;
             pBurn->aVariant[i] = -1;
         }
     }
     if (pBurn->n18 != 0) {
-        pBurn->a1C = fn_80009B34(pBurn->n18 * 4, 1, 16, "hwsBurn.c", 76);
+        pBurn->a1C = StaticMem_Alloc(pBurn->n18 * 4, 1, 16, "hwsBurn.c", 76);
         memset(pBurn->a1C, 0, pBurn->n18 * 4);
     }
     if (pBurn->n20 != 0) {
-        pBurn->p28 = fn_80009B34((pBurn->n20 + 31) / 32 * 4, 1, 16, "hwsBurn.c", 83);
-        fn_8001E938(pBurn->p28, pBurn->n20);
-        pBurn->a2C = fn_80009B34(pBurn->n20 * 4, 1, 16, "hwsBurn.c", 87);
-        pBurn->a30 = fn_80009B34(pBurn->n20 * 4, 1, 16, "hwsBurn.c", 88);
+        pBurn->p28 = StaticMem_Alloc((pBurn->n20 + 31) / 32 * 4, 1, 16, "hwsBurn.c", 83);
+        BitArray_ClearAll(pBurn->p28, pBurn->n20);
+        pBurn->a2C = StaticMem_Alloc(pBurn->n20 * 4, 1, 16, "hwsBurn.c", 87);
+        pBurn->a30 = StaticMem_Alloc(pBurn->n20 * 4, 1, 16, "hwsBurn.c", 88);
     }
     if (pBurn->n34 != 0) {
         nBytes = (pBurn->n34 + 31) / 32 * 4;
-        pBurn->p3C = fn_80009B34(nBytes, 1, 16, "hwsBurn.c", 94);
-        pBurn->p40 = fn_80009B34(nBytes, 1, 16, "hwsBurn.c", 95);
-        fn_8001E938(pBurn->p3C, pBurn->n34);
-        fn_8001E938(pBurn->p40, pBurn->n34);
-        pBurn->a44 = fn_80009B34(pBurn->n34 * 4, 1, 16, "hwsBurn.c", 100);
-        pBurn->a48 = fn_80009B34(pBurn->n34 * 4, 1, 16, "hwsBurn.c", 101);
+        pBurn->p3C = StaticMem_Alloc(nBytes, 1, 16, "hwsBurn.c", 94);
+        pBurn->p40 = StaticMem_Alloc(nBytes, 1, 16, "hwsBurn.c", 95);
+        BitArray_ClearAll(pBurn->p3C, pBurn->n34);
+        BitArray_ClearAll(pBurn->p40, pBurn->n34);
+        pBurn->a44 = StaticMem_Alloc(pBurn->n34 * 4, 1, 16, "hwsBurn.c", 100);
+        pBurn->a48 = StaticMem_Alloc(pBurn->n34 * 4, 1, 16, "hwsBurn.c", 101);
     }
     if (pBurn->n4C != 0) {
-        pBurn->p54 = fn_80009B34((pBurn->n4C + 31) / 32 * 4, 1, 16, "hwsBurn.c", 107);
-        fn_8001E938(pBurn->p54, pBurn->n4C);
-        pBurn->a58 = fn_80009B34(pBurn->n4C * 4, 1, 16, "hwsBurn.c", 111);
-        pBurn->a5C = fn_80009B34(pBurn->n4C * 4, 1, 16, "hwsBurn.c", 112);
+        pBurn->p54 = StaticMem_Alloc((pBurn->n4C + 31) / 32 * 4, 1, 16, "hwsBurn.c", 107);
+        BitArray_ClearAll(pBurn->p54, pBurn->n4C);
+        pBurn->a58 = StaticMem_Alloc(pBurn->n4C * 4, 1, 16, "hwsBurn.c", 111);
+        pBurn->a5C = StaticMem_Alloc(pBurn->n4C * 4, 1, 16, "hwsBurn.c", 112);
     }
     if (pBurn->n60 != 0) {
-        pBurn->a64 = fn_80009B34(pBurn->n60 * sizeof(SkinDesc14), 1, 16, "hwsBurn.c", 120);
+        pBurn->a64 = StaticMem_Alloc(pBurn->n60 * sizeof(SkinDesc14), 1, 16, "hwsBurn.c", 120);
     }
     if (pBurn->n70 != 0) {
-        pBurn->p78 = fn_80009B34((pBurn->n70 + 31) / 32 * 4, 1, 16, "hwsBurn.c", 127);
-        fn_8001E938(pBurn->p78, pBurn->n70);
-        pBurn->a7C = fn_80009B34(pBurn->n70 * 4, 1, 16, "hwsBurn.c", 131);
-        pBurn->a80 = fn_80009B34(pBurn->n70 * 4, 1, 16, "hwsBurn.c", 132);
+        pBurn->p78 = StaticMem_Alloc((pBurn->n70 + 31) / 32 * 4, 1, 16, "hwsBurn.c", 127);
+        BitArray_ClearAll(pBurn->p78, pBurn->n70);
+        pBurn->a7C = StaticMem_Alloc(pBurn->n70 * 4, 1, 16, "hwsBurn.c", 131);
+        pBurn->a80 = StaticMem_Alloc(pBurn->n70 * 4, 1, 16, "hwsBurn.c", 132);
     }
     return pBurn;
 }
@@ -76,57 +76,57 @@ HwsBurn* fn_801104AC(SkinDesc* pDesc) {
 // Free a burn and its tables.
 void fn_801108B0(HwsBurn* pBurn) {
     if (pBurn->aVariant != NULL) {
-        fn_80009E70(pBurn->aVariant);
+        StaticMem_Free(pBurn->aVariant);
     }
     if (pBurn->aOption != NULL) {
-        fn_80009E70(pBurn->aOption);
+        StaticMem_Free(pBurn->aOption);
     }
     if (pBurn->a1C != NULL) {
-        fn_80009E70(pBurn->a1C);
+        StaticMem_Free(pBurn->a1C);
     }
     if (pBurn->p28 != NULL) {
-        fn_80009E70(pBurn->p28);
+        StaticMem_Free(pBurn->p28);
     }
     if (pBurn->a2C != NULL) {
-        fn_80009E70(pBurn->a2C);
+        StaticMem_Free(pBurn->a2C);
     }
     if (pBurn->a30 != NULL) {
-        fn_80009E70(pBurn->a30);
+        StaticMem_Free(pBurn->a30);
     }
     if (pBurn->p3C != NULL) {
-        fn_80009E70(pBurn->p3C);
+        StaticMem_Free(pBurn->p3C);
     }
     if (pBurn->p40 != NULL) {
-        fn_80009E70(pBurn->p40);
+        StaticMem_Free(pBurn->p40);
     }
     if (pBurn->a44 != NULL) {
-        fn_80009E70(pBurn->a44);
+        StaticMem_Free(pBurn->a44);
     }
     if (pBurn->a48 != NULL) {
-        fn_80009E70(pBurn->a48);
+        StaticMem_Free(pBurn->a48);
     }
     if (pBurn->p54 != NULL) {
-        fn_80009E70(pBurn->p54);
+        StaticMem_Free(pBurn->p54);
     }
     if (pBurn->a58 != NULL) {
-        fn_80009E70(pBurn->a58);
+        StaticMem_Free(pBurn->a58);
     }
     if (pBurn->a5C != NULL) {
-        fn_80009E70(pBurn->a5C);
+        StaticMem_Free(pBurn->a5C);
     }
     if (pBurn->a64 != NULL) {
-        fn_80009E70(pBurn->a64);
+        StaticMem_Free(pBurn->a64);
     }
     if (pBurn->p78 != NULL) {
-        fn_80009E70(pBurn->p78);
+        StaticMem_Free(pBurn->p78);
     }
     if (pBurn->a7C != NULL) {
-        fn_80009E70(pBurn->a7C);
+        StaticMem_Free(pBurn->a7C);
     }
     if (pBurn->a80 != NULL) {
-        fn_80009E70(pBurn->a80);
+        StaticMem_Free(pBurn->a80);
     }
-    fn_80009E70(pBurn);
+    StaticMem_Free(pBurn);
 }
 
 void fn_801109F0(HwsBurn* pBurn, void (*pfn)(Skin* pSkin, SkinDesc14* pEntry), Skin* pSkin) {
@@ -168,13 +168,13 @@ void fn_80110A38(HwsBurn* pBurn, int n) {
     int i;
     int j;
 
-    fn_8001EA34(pBurn->p3C, n);
-    fn_8001EA34(pBurn->p40, n);
+    BitArray_Set(pBurn->p3C, n);
+    BitArray_Set(pBurn->p40, n);
     args.pDesc = pBurn->pDesc;
     args.n = n;
     pIter = fn_80110A38_Read(fn_80113910((u8*)&iterBuf, &args));  // fake match: through fn_80110A38_Read
     while (fn_800CEEC0(pIter)) {
-        fn_8001EA34(pBurn->p28, fn_800CEEFC(pIter));
+        BitArray_Set(pBurn->p28, fn_800CEEFC(pIter));
         fn_800CEEC8(pIter);
     }
     fn_80113A7C(pIter);
@@ -189,7 +189,7 @@ void fn_80110A38(HwsBurn* pBurn, int n) {
             }
         }
         for (j = 0; j < nLast; j++) {
-            fn_8001EA34(pBurn->p40, pEntry->n10 + j);
+            BitArray_Set(pBurn->p40, pEntry->n10 + j);
         }
     }
 
@@ -202,7 +202,7 @@ void fn_80110A38(HwsBurn* pBurn, int n) {
         }
     }
     for (i = 0; i < nCount; i++) {
-        fn_8001EA34(pBurn->p54, pEntry->n0 + i);
+        BitArray_Set(pBurn->p54, pEntry->n0 + i);
     }
 }
 
@@ -301,7 +301,7 @@ s32 fn_80110F2C(HwsBurn* pBurn, s32 nAlign) {
     int n = 0;
 
     for (i = 0; i < nBits; i++) {
-        if (fn_8001E9CC(pBurn->p40, i)) {
+        if (BitArray_Test(pBurn->p40, i)) {
             pBurn->a44[n] = i;
             pBurn->a48[i] = n;
             n++;
@@ -338,7 +338,7 @@ SkinDesc44* fn_80110FB4(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
     for (i = 0; i < n; i++) {
         nEntry = pBurn->a44[i];
         pOut = fn_80110E98(pBase, pOffset, &pDesc->p44[nEntry], sizeof(SkinDesc44), 1);
-        if (!fn_8001E9CC(pBurn->p3C, nEntry)) {
+        if (!BitArray_Test(pBurn->p3C, nEntry)) {
             pOut->n8 = 0;
             pOut->n0 = 0;
             pOut->u24 &= ~2;
@@ -348,7 +348,7 @@ SkinDesc44* fn_80110FB4(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
         if (pOut->u24 & 2) {
             nMorphs = pOut->n14;
             for (j = 0; j < nMorphs; j++) {
-                if (!fn_8001E9CC(pBurn->p40, pOut->n10 + j)) {
+                if (!BitArray_Test(pBurn->p40, pOut->n10 + j)) {
                     break;
                 }
             }
@@ -378,7 +378,7 @@ s32 fn_80111124(HwsBurn* pBurn, s32 nAlign) {
     n = 0;
 
     for (i = 0; i < nBits; i++) {
-        if (fn_8001E9CC(pBurn->p28, i)) {
+        if (BitArray_Test(pBurn->p28, i)) {
             pBurn->a2C[n] = i;
             pBurn->a30[i] = n;
             n++;
@@ -460,7 +460,7 @@ s32 fn_80111424(HwsBurn* pBurn, s32 nAlign) {
     int n = 0;
 
     for (i = 0; i < nBits; i++) {
-        if (fn_8001E9CC(pBurn->p54, i)) {
+        if (BitArray_Test(pBurn->p54, i)) {
             pBurn->a58[n] = i;
             pBurn->a5C[i] = n;
             n++;
@@ -535,15 +535,15 @@ s32 fn_80111658(HwsBurn* pBurn, s32 nAlign) {
     int nBits = pBurn->n70;
     int n;
 
-    fn_8001E938(pBurn->p78, pBurn->n70);
+    BitArray_ClearAll(pBurn->p78, pBurn->n70);
     for (i = 0; i < nEntries; i++) {
         if (pBurn->a64[i].n18 >= 0 && pBurn->a64[i].n18 < nBits) {
-            fn_8001EA34(pBurn->p78, pBurn->a64[i].n18);
+            BitArray_Set(pBurn->p78, pBurn->a64[i].n18);
         }
     }
     n = 0;
     for (i = 0; i < nBits; i++) {
-        if (fn_8001E9CC(pBurn->p78, i)) {
+        if (BitArray_Test(pBurn->p78, i)) {
             pBurn->a7C[n] = i;
             pBurn->a80[i] = n;
             n++;
@@ -641,7 +641,7 @@ SkinDesc* fn_80111850(HwsBurn* pBurn) {
     nBytes += fn_80110E74(pDesc->pB8, pDesc->nB4, sizeof(SkinDescB8), 16);
 
     // The copy.
-    pBlock = fn_80009B34(nBytes, 2, 16, "hwsBurn.c", 979);
+    pBlock = StaticMem_Alloc(nBytes, 2, 16, "hwsBurn.c", 979);
     nOffset = 0;
     pOut = fn_80110E98(pBlock, &nOffset, pDesc, sizeof(SkinDesc), 16);
     pOut->n08 = nBytes;

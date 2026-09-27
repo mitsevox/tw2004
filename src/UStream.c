@@ -220,7 +220,7 @@ static int UStream_BeginObject(UStreamFill* pFill, UStreamChunk* pChunk) {
         }
         uPad = (uExtra + sizeof(UStreamObject)) & 0x7F;
         uPad = uPad ? 0x80 - uPad : 0;
-        pObject = fn_80009B34(sizeof(UStreamObject) + uExtra + uPad + pChunk->uSize, pChunk->uFlags,
+        pObject = StaticMem_Alloc(sizeof(UStreamObject) + uExtra + uPad + pChunk->uSize, pChunk->uFlags,
                               0x80, "UStream.c", 732);
         pFill->pObject = pObject;
         pObject->nUnk14 = 0;
@@ -745,7 +745,7 @@ u8 UStream_Update(void) {
         pObject->uRef30 += gRPNSBase;
         switch ((int)pObject->uType) {   // the original compares the tag signed (cmpw)
         case TAG('C', 'c', 't', 'r'):
-            fn_80009E70(pObject);
+            StaticMem_Free(pObject);
             break;
         case TAG('R', 'P', 'N', 'S'):
             if (fn_8000B508(pObject)) {
@@ -753,7 +753,7 @@ u8 UStream_Update(void) {
                 if (pOld != NULL) {
                     if (pObject->uSize == pOld->uSize
                         && fn_80005BC8(pObject->pData, pOld->pData, pObject->uSize) == 0) {
-                        fn_80009E70(pObject);
+                        StaticMem_Free(pObject);
                         break;
                     }
                     fn_8000B588(pOld);
@@ -771,7 +771,7 @@ u8 UStream_Update(void) {
                 }
             }
             if (i >= gnNumHandlers) {
-                fn_80009E70(pObject);
+                StaticMem_Free(pObject);
             }
             break;
         }
@@ -854,7 +854,7 @@ int UStream_Close(int nStream) {
     if (gpUsedList != NULL && nStream > 0) return -1;
     if (fn_8000633C(gStreams[(u32)nStream].hFile) != 0) return -1;
     if (gFill.pObject != NULL) {
-        fn_80009E70(gFill.pObject);
+        StaticMem_Free(gFill.pObject);
         gFill.pObject = NULL;
     }
     gnCurStream--;
@@ -1022,7 +1022,7 @@ u32 Stream_StreamLoadFixedSize(UStreamObject* pObject, u32 uMax, void* pDst) {
         }
         Mem_cpy(pDst, pObject->pData, uSize);
     }
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
     return uSize;
 }
 

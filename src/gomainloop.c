@@ -278,7 +278,7 @@ void fn_8011E3B0(void);
 void fn_8011E6E8(void);
 void fn_8011E974(void);
 void fn_8012402C(void);
-s32  fn_80124094(void);
+s32  Gba_GetState(void);
 void fn_801242D0(void);
 void EASBio_InitOnce(void);
 void fn_80124B54(void);
@@ -370,10 +370,10 @@ f32 fn_8006C630(void) {
 }
 
 // Run inside wait loops (memory card, AnimStream): the sound (fn_800A4BDC), the GBA cable
-// (fn_8012402C, unless fn_80124094 is -1, 0x11 or 0x12) and the reset button (latched).
+// (fn_8012402C, unless Gba_GetState is -1, 0x11 or 0x12) and the reset button (latched).
 void fn_8006C63C(void) {
     fn_800A4BDC();
-    if (fn_80124094() != -1 && fn_80124094() != 0x12 && fn_80124094() != 0x11) {
+    if (Gba_GetState() != -1 && Gba_GetState() != 0x12 && Gba_GetState() != 0x11) {
         fn_8012402C();
     }
     if (!lbl_80281B8E) {
@@ -504,7 +504,7 @@ void fn_8006C854(void) {
 // quad (fn_8006DC4C) with flags 3 in a round for views 0 and 1 while fn_800642B0 is 0, else 1.
 void fn_8006C8EC(int nView) {
     fn_80016CD8();
-    fn_80013D5C(fn_80017004(nView));
+    fn_80013D5C(ViewController_GetCamera(nView));
     fn_8006DC78();
     fn_80035F1C();
     if (nView < 2 && !fn_800642B0() && gSession.nGameType == 6) {
@@ -520,12 +520,12 @@ void fn_8006C968(void) {
     f32 fRG = 100.0f;
     f32 fB = 128.0f;
 
-    fn_80012F34(1);
+    RenderState_SetDepthWrite(1);
     fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
     fn_800350D0(46.875f);
     fn_800350B4(560.25f);
     fn_800350EC(fRG, fRG, fB);
-    fn_80012EF8();
+    RenderState_Flush();
 }
 
 // Starts the front end (game type 3).
@@ -560,7 +560,7 @@ void GO_vInitFE(void) {
     fn_800146C4();
     Player_SetGolfer(0, 0, 0, 0, 0);
     nView = gPlayers[0].nView[0];
-    CameraController_SetCameraMode(fn_80017028(nView), 0x17, 0, nView);
+    CameraController_SetCameraMode(ViewController_GetCameraController(nView), 0x17, 0, nView);
     fn_8005D3A8(0);
     GOLFERSTATE_Set(0, 0);
     fn_800A4E34();
@@ -759,7 +759,7 @@ void fn_8006CEFC(void) {
     fn_8006DCA8(0, 0, 0, 4);
     fn_80037DD8();
     nView = gPlayers[0].nView[0];
-    CameraController_SetCameraMode(fn_80017028(nView), 0x19, 0, nView);
+    CameraController_SetCameraMode(ViewController_GetCameraController(nView), 0x19, 0, nView);
     fn_8010F748();
     fn_8010FF9C();
 }
@@ -820,7 +820,7 @@ u8 fn_8006D01C(void) {
 // Whether view nView's golfer is drawn normally: in mode 9 except while placing the ball (state
 // 22); never while paused; in modes 7 and 8 not when nC3C has bit 0x1 or 0x02000000.
 u8 fn_8006D1C0(int nView) {
-    int nPlayer = fn_8001707C(nView);
+    int nPlayer = ViewController_GetPlayer(nView);
 
     if (Game_GetMode() == 9) {
         return (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_PLACE_BALL;
@@ -859,7 +859,7 @@ void fn_8006D27C(void) {
     for (i = 0; i < 4; i++) {
         nView = lbl_801888D0[i];
         if (!fn_800170A0(nView)) continue;
-        nState = GOLFERSTATE_GetCurrentState(fn_8001707C(nView));
+        nState = GOLFERSTATE_GetCurrentState(ViewController_GetPlayer(nView));
         fn_8006DFA8();
         fn_8006C8EC(nView);
         fn_80016E90(nView);
@@ -880,27 +880,27 @@ void fn_8006D27C(void) {
             if (nState != GS_GREEN_MORPH) {
                 fn_80046B8C(nView);
             }
-            fn_80017004(nView);
+            ViewController_GetCamera(nView);
             fn_80099BA0();
             fn_800A3A84();
             fn_8006DF28();
-            fn_80045848(fn_8001707C(nView));
+            fn_80045848(ViewController_GetPlayer(nView));
             if (Game_GetMode() == 7 || Game_GetMode() == 8) {
-                if ((u8)fn_800FD6A4(fn_8001707C(nView))) {
-                    fn_800BAB80(fn_8001707C(nView));
-                    fn_800BAA50(fn_8001707C(nView));
+                if ((u8)fn_800FD6A4(ViewController_GetPlayer(nView))) {
+                    fn_800BAB80(ViewController_GetPlayer(nView));
+                    fn_800BAA50(ViewController_GetPlayer(nView));
                 }
             }
         }
         if (!fn_8006D1C0(nView) || nState == GS_GREEN_MORPH) {
-            gPlayers[fn_8001707C(nView)].pChar->u10 |= 1;
+            gPlayers[ViewController_GetPlayer(nView)].pChar->u10 |= 1;
         }
         for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
             fn_8001B878(gPlayers[nPlayer].pChar, nPlayer);
         }
         fn_8001D384();
         if (nView < 2) {
-            fn_8005A478(fn_8001707C(nView));
+            fn_8005A478(ViewController_GetPlayer(nView));
         }
         fn_8006DEA8();
         fn_8001BA74();
@@ -935,11 +935,11 @@ void fn_8006D27C(void) {
         fn_800A2C08(nView);
         fn_8006DEA8();
         if (nView < 2) {
-            fn_8005A0FC(fn_8001707C(nView));
-            fn_8005A850(fn_8001707C(nView));
+            fn_8005A0FC(ViewController_GetPlayer(nView));
+            fn_8005A850(ViewController_GetPlayer(nView));
         }
         if (!fn_8006D1C0(nView) || nState == GS_GREEN_MORPH) {
-            gPlayers[fn_8001707C(nView)].pChar->u10 &= ~1;
+            gPlayers[ViewController_GetPlayer(nView)].pChar->u10 &= ~1;
         }
         if (!gSession.nSplitScreen && !gSession.b11 && nView < 2) {
             fn_8011E974();
@@ -953,7 +953,7 @@ void fn_8006D27C(void) {
         }
         fn_8006DF28();
         if (nView < 2) {
-            fn_80067CD4(fn_8001707C(nView));
+            fn_80067CD4(ViewController_GetPlayer(nView));
         }
         fn_8006DEA8();
         if (nView < 2 && (!fn_80035574() || (fn_80035574() && fn_8006E0C0()))) {
@@ -966,7 +966,7 @@ void fn_8006D27C(void) {
         }
         fn_8006DEA8();
         if (nView < 2) {
-            fn_8005A7A0(fn_8001707C(nView));
+            fn_8005A7A0(ViewController_GetPlayer(nView));
         }
         fn_8006DE28();
     }
@@ -979,7 +979,7 @@ void fn_8006D27C(void) {
     }
     fn_8008F648(1);
     UFont_DrawQueue();
-    fn_800DC664(fn_8001707C(0));
+    fn_800DC664(ViewController_GetPlayer(0));
     fn_800DBF34();
     fn_800389C0();
     fn_8009069C();

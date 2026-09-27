@@ -38,9 +38,9 @@ void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80035F1C(void);
 void fn_800352BC(void);
 void fn_8005C15C(int nPlayer, f32* pSpinY, f32* pSpinX);   // Swing.c: the spin asked for
-void fn_8000ADC0(f32 (*pMtx)[4]);                          // identity
+void Mtx_Identity(f32 (*pMtx)[4]);                          // identity
 void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
-void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);          // copy a matrix
+void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);          // copy a matrix
 void fn_8000C5A4(f32 (*pMtx)[4]);
 void fn_800AEFE4(void);
 void fn_800AF0D4(UObjMesh* pMesh);
@@ -173,7 +173,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
     int i;
     int j;
 
-    nPlayer = fn_8001707C(nObj);
+    nPlayer = ViewController_GetPlayer(nObj);
     // the object rises with the GameBreaker letterbox
     if (lbl_80202898.bGameBreaker == 0) {
         fY = -0.23f;
@@ -198,17 +198,17 @@ void UI_Obj_RenderBoostUI(int nObj) {
     fn_8001425C(0);
     fn_80014194(aBlack);
     fn_80035F1C();
-    fn_80014118(0);
-    fn_80012F50(0, 6, 0x80);
-    fn_80012F18(7);
+    RenderState_SetDrawFlags(0);
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_SetDepthFunc(7);
     fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 2, 1);
-    fn_80012EF8();
+    RenderState_Flush();
     GXSetZMode(1, 7, 1);
     fn_8001644C(0xA1, aRect[0], NULL, NULL, 2);
-    fn_80012F50(1, 6, 0x80);
-    fn_80012F18(3);
+    RenderState_SetAlphaTest(1, 6, 0x80);
+    RenderState_SetDepthFunc(3);
     fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
-    fn_80012EF8();
+    RenderState_Flush();
 
     // the object's own lens
     pLens = fn_8001F004();
@@ -217,20 +217,20 @@ void UI_Obj_RenderBoostUI(int nObj) {
     fn_80045470(lbl_802820CC, 0.00879646f);
     fn_800AF0A8(lbl_802820CC);
     fn_800352BC();
-    fn_80013CCC(fn_8001614C());
-    fn_80013EEC(fn_8001614C());
+    fn_80013CCC(Camera_GetCurrent());
+    fn_80013EEC(Camera_GetCurrent());
     fn_80016B9C();
 
     fBoost = (f32)gPlayers[nPlayer].swing.nPowerBoost / 8.0f;
-    fn_80014118(0x50);
-    fn_80012F34(1);
+    RenderState_SetDrawFlags(0x50);
+    RenderState_SetDepthWrite(1);
     fn_8001425C(1);
-    fn_80035118(4, 5);
-    fn_80012F50(1, 4, 1);
+    RenderState_SetBlendFactors(4, 5);
+    RenderState_SetAlphaTest(1, 4, 1);
 
     // the base quad
     fn_8005CC64(lbl_802820BC, lbl_802820C8);
-    fn_80012EF8();
+    RenderState_Flush();
     for (i = 0; i < 4; i++) {
         aXYZ[i][0] = aQuad[i][0] + lbl_801F5B98[nObj].a0[0];
         aXYZ[i][1] = aQuad[i][1] + lbl_801F5B98[nObj].a0[1];
@@ -248,17 +248,17 @@ void UI_Obj_RenderBoostUI(int nObj) {
         aXYZ[i][3] = 1.0f;
     }
     fn_8005CC64(lbl_802820BC, lbl_802820C4);
-    fn_80012F50(0, 6, 0x80);
+    RenderState_SetAlphaTest(0, 6, 0x80);
     if (gPlayers[nPlayer].swing.nPowerBoost > 0) {
         Vec3Copy(lbl_8018830C[gPlayers[nPlayer].swing.nPowerBoost - 1], aColour);
     }
     fn_80014194(aColour);
-    fn_80012EF8();
+    RenderState_Flush();
     fn_8001644C(0x98, aXYZ[0], NULL, aUV[0], 4);
 
     // a ring per level: each grows until it passes the largest size, fading out on the way
     fn_8005CC64(lbl_802820BC, lbl_802820C0);
-    fn_80012EF8();
+    RenderState_Flush();
     fMax = lbl_801F5B98[0].a28[0];
     fFade = lbl_801F5B98[0].a28[1];
     for (i = 0; i < gPlayers[nPlayer].swing.nPowerBoost; i++) {
@@ -294,24 +294,24 @@ void UI_Obj_RenderBoostUI(int nObj) {
             aDir[1] = fSpinY;
             aDir[2] = 0.0f;
             aDir[3] = 1.0f;
-            fn_800BAF04(aDir, aDir);
-            fDot = (fn_8000C5FC(aUp, aDir) < -1.0f) ? -1.0f
-                 : ((fn_8000C5FC(aUp, aDir) > 1.0f) ? 1.0f : fn_8000C5FC(aUp, aDir));
+            Vec_NormalizeTo(aDir, aDir);
+            fDot = (Vec3_Dot(aUp, aDir) < -1.0f) ? -1.0f
+                 : ((Vec3_Dot(aUp, aDir) > 1.0f) ? 1.0f : Vec3_Dot(aUp, aDir));
             lbl_801F5B98[nObj].a0[5] = fn_80009614(fDot);
             if (fSpinY < 0.0f) {
                 lbl_801F5B98[nObj].a0[5] = -lbl_801F5B98[nObj].a0[5];
             }
-            fn_8000ADC0(mRot);
-            fn_8000ADC0(mRoll);
-            fn_8000ADC0(mTilt);
-            fn_8000ADC0(mScale);
+            Mtx_Identity(mRot);
+            Mtx_Identity(mRoll);
+            Mtx_Identity(mTilt);
+            Mtx_Identity(mScale);
             mScale[0][0] = lbl_801F5B98[nObj].a0[6];
             mScale[1][1] = lbl_801F5B98[nObj].a0[6];
             mScale[2][2] = lbl_801F5B98[nObj].a0[6];
-            fSinRoll = fn_800095F0(lbl_801F5B98[nObj].a0[9]);
-            fCosRoll = fn_80009638(lbl_801F5B98[nObj].a0[9]);
-            fSinTilt = fn_800095F0(lbl_801F5B98[nObj].a0[5]);
-            fCosTilt = fn_80009638(lbl_801F5B98[nObj].a0[5]);
+            fSinRoll = Math_Sin(lbl_801F5B98[nObj].a0[9]);
+            fCosRoll = Math_Cos(lbl_801F5B98[nObj].a0[9]);
+            fSinTilt = Math_Sin(lbl_801F5B98[nObj].a0[5]);
+            fCosTilt = Math_Cos(lbl_801F5B98[nObj].a0[5]);
             if (fSpinX < 0.0f && fSpinY < 0.0f) {
                 lbl_801F5B98[nObj].a0[9] += (fabsf(fSpinX) > fabsf(fSpinY)) ? fabsf(fSpinX) : fabsf(fSpinY);
             } else {
@@ -333,9 +333,9 @@ void UI_Obj_RenderBoostUI(int nObj) {
             fn_800BAE5C(mTilt, mRoll, mRot, 3);
 
             // draw it with the rotation, scale and position, then put its matrices back
-            fn_8000A0E8(lbl_802820D0->m0, mSave0);
-            fn_8000A0E8(lbl_802820D0->m40, mSave40);
-            fn_8000A0E8(lbl_802820D0->m80, mSave80);
+            Mtx_Copy(lbl_802820D0->m0, mSave0);
+            Mtx_Copy(lbl_802820D0->m40, mSave40);
+            Mtx_Copy(lbl_802820D0->m80, mSave80);
             fn_800BAE5C(mRot, lbl_802820D0->m0, lbl_802820D0->m0, 3);
             fn_800BAE5C(mScale, lbl_802820D0->m40, lbl_802820D0->m40, 3);
             fn_8000C5A4(lbl_802820D0->m0);
@@ -343,9 +343,9 @@ void UI_Obj_RenderBoostUI(int nObj) {
             lbl_802820D0->m80[3][3] = 1.0f;
             fn_800AEFE4();
             // EA bug: m0's copy goes back into m40 and m40's into m0
-            fn_8000A0E8(mSave0, lbl_802820D0->m40);
-            fn_8000A0E8(mSave40, lbl_802820D0->m0);
-            fn_8000A0E8(mSave80, lbl_802820D0->m80);
+            Mtx_Copy(mSave0, lbl_802820D0->m40);
+            Mtx_Copy(mSave40, lbl_802820D0->m0);
+            Mtx_Copy(mSave80, lbl_802820D0->m80);
         }
     }
 
@@ -354,12 +354,12 @@ void UI_Obj_RenderBoostUI(int nObj) {
     fn_800AF0A8(pLens);
     fn_80016B9C();
     fn_800352BC();
-    fn_80013CCC(fn_8001614C());
+    fn_80013CCC(Camera_GetCurrent());
     fn_80035098(0);
-    fn_80035118(4, 5);
-    fn_80012F50(1, 6, 0x80);
-    fn_80012F18(3);
-    fn_80012EF8();
+    RenderState_SetBlendFactors(4, 5);
+    RenderState_SetAlphaTest(1, 6, 0x80);
+    RenderState_SetDepthFunc(3);
+    RenderState_Flush();
 }
 
 // Draw the object: its light's colour, the renderer state, the view, then the model.
@@ -370,15 +370,15 @@ void fn_800AEFE4(void) {
     lbl_801F5B40.apLight[0]->u.dir.vColor[3] = 0.0f;
     fn_8003612C(&lbl_801F5B40);
     fn_8006EADC(lbl_802820D0);
-    fn_80035118(4, 5);
+    RenderState_SetBlendFactors(4, 5);
     fn_80035098(1);
     fn_80035154(255.0f * lbl_80281478);
-    fn_80012EF8();
+    RenderState_Flush();
     fn_80035240(lbl_802820D0->m80);
     fn_80035294();
     fn_80016B9C();
     fn_80035138(1);
-    fn_80012EF8();
+    RenderState_Flush();
     fn_800AF0D4(lbl_802820D0->pModel->apLod[0]);
     fn_8006ED70();
 }

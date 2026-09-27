@@ -58,10 +58,10 @@ void fn_8012597C(MsgArg* pArgs, MsgArg* pResult) {
     char* szName = ((MsgString*)pArgs[1].p)->pStr;
     char* szDate = ((MsgString*)pArgs[2].p)->pStr;
 
-    pResult->i = fn_80077ACC()->a1C0[nTrophy + 12].bWon;
+    pResult->i = FE_GetCurrentProfile()->a1C0[nTrophy + 12].bWon;
     strcpy(szName, lbl_8019543C[nTrophy]);
     if (pResult->i) {
-        CalDate_ToString(fn_80077ACC()->a1C0[nTrophy + 12].nDate, szDate);
+        CalDate_ToString(FE_GetCurrentProfile()->a1C0[nTrophy + 12].nDate, szDate);
         return;
     }
     szDate[0] = '\0';
@@ -100,7 +100,7 @@ void fn_80125AA4(MsgArg* pArgs, MsgArg* pResult) {
 
     nCount = 0;
     nMonth = pArgs[0].i + 1;
-    pProfile = fn_80077ACC();
+    pProfile = FE_GetCurrentProfile();
     for (i = 0; i < 118; i++) {
         nDate = fn_800F0FBC(i);
         CalDate_GetMDY(&nDate, &nEventMonth, &nDay, &nDay);
@@ -131,7 +131,7 @@ void fn_80125BB8(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80125BD8(MsgArg* pArgs, MsgArg* pResult) {
     s32 nGroup = pArgs[0].i;
     char* szOut = ((MsgString*)pArgs[1].p)->pStr;
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
 
     if (nGroup == 0) {
         szOut[0] = '\0';
@@ -150,11 +150,11 @@ void fn_80125C5C(MsgArg* pArgs, MsgArg* pResult) {
     s32 nEvent = pArgs[0].i;
     char* szCourse = ((MsgString*)pArgs[1].p)->pStr;
     char* szDate = ((MsgString*)pArgs[2].p)->pStr;
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
 
     strcpy(szCourse, lbl_80191990[GameMode4_GetEventCourse(nEvent)]);
     if (pProfile->aLadderAward[nEvent].bWon) {
-        CalDate_ToString(fn_80077ACC()->aLadderAward[nEvent].nDate, szDate);
+        CalDate_ToString(FE_GetCurrentProfile()->aLadderAward[nEvent].nDate, szDate);
         return;
     }
     szDate[0] = '\0';
@@ -163,7 +163,7 @@ void fn_80125C5C(MsgArg* pArgs, MsgArg* pResult) {
 // Message handler (FE_MessageTable.c): a ladder event's course, and whether it is won.
 void fn_80125D08(MsgArg* pArgs, MsgArg* pResult) {
     s32 nEvent = pArgs[0].i;
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
 
     *(s32*)pArgs[1].p = GameMode4_GetEventCourse(nEvent);
     pResult->i = pProfile->aLadderAward[nEvent].bWon;
@@ -171,7 +171,7 @@ void fn_80125D08(MsgArg* pArgs, MsgArg* pResult) {
 
 // Message handler (FE_MessageTable.c): fn_800F1154 of a won real-time event, else -1.
 void fn_80125D78(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 nEvent = pArgs[0].i;
 
     if (pProfile->aRTEAward[nEvent].bWon) {
@@ -187,8 +187,8 @@ void fn_80125DE0(MsgArg* pArgs, MsgArg* pResult) {
     char* szOut = ((MsgString*)pArgs[1].p)->pStr;
     char szDate[12];    // the size is not known (the frame leaves room for 12 bytes)
 
-    if (fn_80077ACC()->aAward[nAward].bWon == 1) {
-        CalDate_ToString(fn_80077ACC()->aAward[nAward].nDate, szDate);
+    if (FE_GetCurrentProfile()->aAward[nAward].bWon == 1) {
+        CalDate_ToString(FE_GetCurrentProfile()->aAward[nAward].nDate, szDate);
         sprintf(szOut, "Earned on %s", szDate);
         return;
     }
@@ -291,7 +291,7 @@ void fn_80126150(void) {
     s32 nPlayer;
 
     fn_80126FB0(&nPlayer);
-    fn_800D3548(nPlayer, 5000, NULL);
+    GM_Earnings_AwardMoney(nPlayer, 5000, NULL);
 }
 
 // The mode's frame: its message once when asked, every 16 frames the current shot's length sent
@@ -572,7 +572,7 @@ void fn_80126698(int nPlayer) {
         gPlayers[nPlayer].nED4++;
         break;
     case 4:
-        if (fn_80015464() == 4) {
+        if (Game_GetCurHoleNum() == 4) {
             // port: EA passes two arguments fn_800A746C ignores
             ((void (*)(s32, int, int, int, int))fn_800A746C)(1, 0, 2, 0, 0);
         } else {

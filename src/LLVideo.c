@@ -124,7 +124,7 @@ void* fn_800754C0(void* pArg) {
         }
         nSize += apChunk[i]->uSize;
     }
-    pData = fn_80009B34(nSize, 1, 0x20, "LLVideo.c", 0x3C4);
+    pData = StaticMem_Alloc(nSize, 1, 0x20, "LLVideo.c", 0x3C4);
     pDst = pData;
     for (i = 0; i < nChunks; i++) {
         memcpy(pDst, apChunk[i]->aData, apChunk[i]->uSize);
@@ -217,19 +217,19 @@ void fn_800755F0(int nFlags) {
         }
         fn_800162A8();
         fn_80006EDC();
-        fn_800137D0(fn_8001614C());
+        fn_800137D0(Camera_GetCurrent());
         // the original tests bBit0 here although both branches make the same call
         if (bBit0) {
             fn_800760B0(0, 0, 512, 448);
         } else {
             fn_800760B0(0, 0, 512, 448);
         }
-        fn_80035118(4, 5);
+        RenderState_SetBlendFactors(4, 5);
         fn_8001425C(0);
-        fn_80014118(0x40);
-        fn_80012F50(0, 6, 0x80);
-        fn_80012F18(7);
-        fn_80012EF8();
+        RenderState_SetDrawFlags(0x40);
+        RenderState_SetAlphaTest(0, 6, 0x80);
+        RenderState_SetDepthFunc(7);
+        RenderState_Flush();
         fn_8001644C(0xA1, xy, 0, NULL, 2);
         fn_80013400();
         fn_80006FE8();
@@ -257,7 +257,7 @@ void fn_800757B8(void) {
 
 // Makes a movie (not yet in a slot or running), at 33 frames a second.
 Video* fn_80075800(void) {
-    Video* pVideo = fn_80009B34(sizeof(Video), 2, 0x40, "LLVideo.c", 0x5C1);
+    Video* pVideo = StaticMem_Alloc(sizeof(Video), 2, 0x40, "LLVideo.c", 0x5C1);
     fn_8002FEB0(&pVideo->pict, &pVideo->stream, fn_800754C0, pVideo);
     pVideo->nSlot = -1;
     pVideo->b1020 = 0;
@@ -277,7 +277,7 @@ void fn_800758B4(Video* pVideo) {
         fn_80075904(pVideo->nSlot, NULL);
     }
     fn_8002FF38(&pVideo->pict, &pVideo->stream);
-    fn_80009E70(pVideo);
+    StaticMem_Free(pVideo);
 }
 
 // Puts a movie (or NULL) in a slot; returns the movie that was there.
@@ -387,10 +387,10 @@ void fn_80075C68(void) {
 void fn_80075C88(void) {
     fn_80008380();
     fn_800140E8(0, 512, 448, 0, 8, 1);
-    fn_80014118(0x10);
-    fn_80012F34(0);
-    fn_80012F50(0, 6, 0x80);
-    fn_80012F18(7);
+    RenderState_SetDrawFlags(0x10);
+    RenderState_SetDepthWrite(0);
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_SetDepthFunc(7);
     fn_800760B0(0, 0, 512, 448);
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
@@ -407,12 +407,12 @@ void fn_80075D58(void) {
     fn_80006EDC();
     fn_80012B2C(1.0f, 1.0f);
     FO_vSetCurrentAddMode(lbl_80281200->n20);
-    fn_80012F34(1);
-    fn_80012F50(0, 6, 0x80);
-    fn_80012F18(3);
+    RenderState_SetDepthWrite(1);
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_SetDepthFunc(3);
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
-    fn_80012EF8();
+    RenderState_Flush();
     fn_80006FE8();
     fn_800083A0();
     fn_80008380();
@@ -455,7 +455,7 @@ void fn_80075DEC_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nAr
             fn_80006EDC();
             fn_800162A8();
             fn_800760B0(0, 0, 512, 448);
-            fn_80012EF8();
+            RenderState_Flush();
             if (bFirst) {
                 fn_800141F8(xy, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
                 fn_800760F4(uv, &pVideo->pict);
@@ -463,7 +463,7 @@ void fn_80075DEC_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nAr
             }
         }
         fn_800760D8(&pVideo->pict);
-        fn_80012EF8();
+        RenderState_Flush();
         fn_8001644C(0xA1, xy, 0, uv, 2);
         while (fn_8006E118(TI_sReadCounter(0), tFrame) < 1.0f / 33.0f) {
         }

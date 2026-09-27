@@ -393,7 +393,7 @@ u8 fn_800AFAB0(void) {
     AXSetMode(0);
     MIXSetSoundMode(OSGetSoundMode());
     lbl_802820E8 = fn_800B5BD8(NUM_VOICES * sizeof(Voice));
-    fn_80005AE8(lbl_802820E8, 0, NUM_VOICES * sizeof(Voice));
+    Mem_set(lbl_802820E8, 0, NUM_VOICES * sizeof(Voice));
     for (i = 0; i < NUM_VOICES; i++) {
         fn_800AF9BC(i);
         fn_800AFA2C(i);
@@ -722,7 +722,7 @@ u8 fn_800B0568(void) {
     lbl_802820F8 = GoARAM_HeapInit(ARAM_HEAP_SIZE, lbl_802820FC, 32, lbl_8028210C);
     lbl_80282100 = GoARAM_HeapAlloc(lbl_802820F8, ARAM_ZERO_SIZE, 32);
     lbl_80282104 = fn_800951A0(ARAM_ZERO_SIZE, 32, 1);
-    fn_80005AE8(lbl_80282104, 0, ARAM_ZERO_SIZE);
+    Mem_set(lbl_80282104, 0, ARAM_ZERO_SIZE);
     fn_800B044C(lbl_80282100, lbl_80282104, ARAM_ZERO_SIZE, fn_800B055C, 0);
     lbl_80282108 = GoARAM_HeapAlloc(lbl_802820F8, 0x7F000, 32);
     return 1;
@@ -827,7 +827,7 @@ void fn_800B0954(void) {
 void fn_800B0960(void) {
     MsgArg arg;
     if (!lbl_802814A0) {
-        fn_80005AE8(&arg, 0, sizeof(arg));
+        Mem_set(&arg, 0, sizeof(arg));
         UISDoHint(lbl_80281F1C->pHandler, 0x86, 1, (s32*)&arg);
         return;
     }
@@ -1002,67 +1002,67 @@ done:
 
 void fn_800B0DB8(void) {
     MsgArg arg;
-    fn_80005AE8(&arg, 0, sizeof(arg));
+    Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(lbl_80281F1C->pHandler, 0x87, 0, (s32*)&arg);
 }
 
 void fn_800B0DFC(void) {
     MsgArg arg;
-    fn_80005AE8(&arg, 0, sizeof(arg));
+    Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(lbl_80281F1C->pHandler, 0x88, 0, (s32*)&arg);
 }
 
 void fn_800B0E40(void) {
     MsgArg arg;
-    fn_80005AE8(&arg, 0, sizeof(arg));
+    Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(lbl_80281F1C->pHandler, 0x89, 0, (s32*)&arg);
 }
 
 void fn_800B0E84(void) {
     MsgArg arg;
-    fn_80005AE8(&arg, 0, sizeof(arg));
+    Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(lbl_80281F1C->pHandler, 0x8A, 0, (s32*)&arg);
 }
 
 void fn_800B0EC8(void) {
     MsgArg arg;
-    fn_80005AE8(&arg, 0, sizeof(arg));
+    Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(lbl_80281F1C->pHandler, 0x8C, 0, (s32*)&arg);
 }
 
 void fn_800B0F0C(void) {
     MsgArg arg;
-    fn_80005AE8(&arg, 0, sizeof(arg));
+    Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(lbl_80281F1C->pHandler, 0x83, 0, (s32*)&arg);
 }
 
 void fn_800B0F50(void) {
     MsgArg arg;
-    fn_80005AE8(&arg, 0, sizeof(arg));
+    Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(lbl_80281F1C->pHandler, 0x81, 0, (s32*)&arg);
 }
 
 void fn_800B0F94(void) {
     MsgArg arg;
-    fn_80005AE8(&arg, 0, sizeof(arg));
+    Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(lbl_80281F1C->pHandler, 0x8B, 0, (s32*)&arg);
 }
 
 void fn_800B0FD8(void) {
     MsgArg arg;
-    fn_80005AE8(&arg, 0, sizeof(arg));
+    Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(lbl_80281F1C->pHandler, 0x80, 0, (s32*)&arg);
 }
 
 void fn_800B101C(void) {
     MsgArg arg;
-    fn_80005AE8(&arg, 0, sizeof(arg));
+    Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(lbl_80281F1C->pHandler, 0x82, 0, (s32*)&arg);
 }
 
 void fn_800B1060(void) {
     MsgArg arg;
-    fn_80005AE8(&arg, 0, sizeof(arg));
+    Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(lbl_80281F1C->pHandler, 0x8C, 0, (s32*)&arg);
 }
 
@@ -1199,7 +1199,7 @@ void fn_800B1510(s32 a, s32 b) {
     MsgArg arg;
     s32 n = fn_800A2100(a, b);
     fn_8009DCEC(a, b);
-    fn_80005AE8(&arg, 0, sizeof(arg));
+    Mem_set(&arg, 0, sizeof(arg));
     arg.i = n;
     UISDoHint(lbl_80281F1C->pHandler, 0x84, 1, (s32*)&arg);
 }
@@ -1208,7 +1208,7 @@ void fn_800B158C(s32 a, s32 b) {
     MsgArg arg;
     s32 n = fn_800A0A7C(a, b);
     fn_8009DCEC(a, b);
-    fn_80005AE8(&arg, 0, sizeof(arg));
+    Mem_set(&arg, 0, sizeof(arg));
     arg.i = n;
     UISDoHint(lbl_80281F1C->pHandler, 0x8D, 1, (s32*)&arg);
 }
@@ -1231,16 +1231,16 @@ void fn_800B166C(UStreamObject* pObject) {
     s32 nPad = 128 - (s32)pObject->uSize % 128;
     if (lbl_80282124 == 0) {
         lbl_8028212C = pObject->uSize + nPad;
-        lbl_80282134 = fn_80009B34(lbl_8028212C, 2, 16, "startUp.c", 882);
+        lbl_80282134 = StaticMem_Alloc(lbl_8028212C, 2, 16, "startUp.c", 882);
         Mem_cpy(lbl_80282134, pObject->pData, lbl_8028212C);
         lbl_80282124++;
     } else if (lbl_80282124 == 1) {
         lbl_80282128 = pObject->uSize + nPad;
-        lbl_80282130 = fn_80009B34(lbl_80282128, 2, 16, "startUp.c", 891);
+        lbl_80282130 = StaticMem_Alloc(lbl_80282128, 2, 16, "startUp.c", 891);
         Mem_cpy(lbl_80282130, pObject->pData, lbl_80282128);
         lbl_80282124++;
     }
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // fn_800B0B1C without the messages: build the status table from scratch, then look for the first
@@ -1401,11 +1401,11 @@ u8 fn_800B1B18(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, HitOb
             fDZ = pTo[2] - vCenter[2];
             fDX = pTo[0] - vCenter[0];
             fFlat = fDX * fDX + fDZ * fDZ;
-            fDist = fn_80009680(fFlat);
+            fDist = Math_Sqrt(fFlat);
             fReach = gRealBallRadiusIn / 36.0f + fRadius;
             if (fDist < fReach) {
                 fDY = pTo[1] - vCenter[1];
-                if ((f32)fn_80009680(fDY * fDY + fFlat) < fReach && fn_800B1AA8(&pObj->obj, pTo)) {
+                if ((f32)Math_Sqrt(fDY * fDY + fFlat) < fReach && fn_800B1AA8(&pObj->obj, pTo)) {
                     fDist = Vec_Distance(pFrom, vCenter);
                     if (pBest == NULL || fDist < fBest) {
                         fBest = fDist;
@@ -1420,7 +1420,7 @@ u8 fn_800B1B18(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, HitOb
         pBest->pfnHandler(12, pBest, (void*)nPlayer, NULL);
         fn_800B1AB0(pBest, vCenter, &fRadius);
         fn_800B1D18(pTo, vCenter, vNormal);
-        fn_800BAF04(vNormal, vNormal);
+        Vec_NormalizeTo(vNormal, vNormal);
         if (pHit != NULL) {
             fn_8000C5D4(vCenter, vNormal, fRadius, pHit);
         }

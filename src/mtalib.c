@@ -69,7 +69,7 @@ void fn_8001F42C(MtaEntry* pEntry, SkelPoseBlock* pBlock, int nMorph, SkelPose1*
     // pPose and fWeight are unused: fn_8001F494 passes them
     fT = fn_8001F32C(pEntry, &fA, &fB, fTime);
     pBlock->af8[nMorph] = fT * (fB - fA) + fA;
-    fn_8001EA34(pBlock->aBits, nMorph);
+    BitArray_Set(pBlock->aBits, nMorph);
 }
 
 // Sets every morph weight the library drives in pPose from its tracks at fTime.
@@ -93,7 +93,7 @@ int fn_8001F494(void* pUnused, MtaLib* pLib, SkelPose1* pPose, f32 fTime) {
 }
 
 void fn_8001F558(void* pItem) {
-    fn_80009E70(pItem);
+    StaticMem_Free(pItem);
 }
 
 // Links a library that is already in the machine's byte order (fn_8001F110 without the swap): the
@@ -157,10 +157,10 @@ void fn_8001F6D8(MalBank* pBank) {
             for (j = 0; j < pBank->aGroup[i].nNum; j++) {
                 fn_8001F558(pBank->aGroup[i].apItem[j]);
             }
-            fn_80009E70(pBank->aGroup[i].apItem);
+            StaticMem_Free(pBank->aGroup[i].apItem);
         }
     }
-    fn_80009E70(pBank);
+    StaticMem_Free(pBank);
 }
 
 // EA bug: nBank is only range-checked; bank 0 is returned either way.
@@ -207,7 +207,7 @@ MalBank* fn_8001F804(u8* pData) {
     MalBank* pBank;
     MtaLib* pLib;
 
-    pBank = fn_80009B34(sizeof(MalBank), 2, 0x40, "mtalib.c", 474);
+    pBank = StaticMem_Alloc(sizeof(MalBank), 2, 0x40, "mtalib.c", 474);
     lbl_80281CB0 += sizeof(MalBank);
     BYTESWAP_SWAPDATA(&pData, (u8*)&pBank->nNumGroups, 4, 4);
     if ((uptr)pData & 0xF) {
@@ -218,20 +218,20 @@ MalBank* fn_8001F804(u8* pData) {
         pGroup = &pBank->aGroup[nGroup];
         BYTESWAP_SWAPDATA(&pData, (u8*)&pGroup->nNum, 4, 4);
         if (pGroup->nNum != 0) {
-            pGroup->apItem = fn_80009B34(pGroup->nNum * 4, 2, 0x40, "mtalib.c", 490);
+            pGroup->apItem = StaticMem_Alloc(pGroup->nNum * 4, 2, 0x40, "mtalib.c", 490);
             for (j = 0; j < pGroup->nNum; j++) {
                 if ((uptr)pData & 0xF) {
                     pData = (u8*)(((uptr)pData & ~0xF) + 0x10);
                 }
                 // swap the header in place to read the library's size, then swap it back
                 pB = pA = pData;
-                fn_8001F08C(&pA, &pB, aHeader, 10, 1);
+                ByteSwap_Records(&pA, &pB, aHeader, 10, 1);
                 pLib = (MtaLib*)pData;
-                pGroup->apItem[j] = fn_80009B34(pLib->nBytes, 2, 0x40, "mtalib.c", 501);
+                pGroup->apItem[j] = StaticMem_Alloc(pLib->nBytes, 2, 0x40, "mtalib.c", 501);
                 lbl_80281CB0 += pLib->nBytes;
                 nSize = pLib->nBytes;
                 pB = pA = pData;
-                fn_8001F08C(&pA, &pB, aHeader, 10, 1);
+                ByteSwap_Records(&pA, &pB, aHeader, 10, 1);
                 memcpy(pGroup->apItem[j], pData, nSize);
                 pGroup->apItem[j] = fn_8001F110(pGroup->apItem[j], &nSize);
                 pData += nSize;
@@ -251,7 +251,7 @@ void fn_8001FA3C(UStreamObject* pObject) {
     if (uSlot < 2 && lbl_80281CB4[uSlot] == NULL) {
         lbl_80281CB4[uSlot] = fn_8001F804(pObject->pData);
     }
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 void fn_8001FAA8(void) {

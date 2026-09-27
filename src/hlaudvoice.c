@@ -37,7 +37,7 @@ void fn_800AC330(void) {
     AudVoice* pVoiceEnd;
     u16 nVoice;
 
-    fn_80005AE8(pPool, 0, sizeof(lbl_801F19B8));
+    Mem_set(pPool, 0, sizeof(lbl_801F19B8));
     for (; pPool < pEnd; pPool++) {
         pList = pPool->aLists;
         pVoice = pPool->aVoices;
@@ -194,7 +194,7 @@ void fn_800AC7DC(AudVoice* pVoice, u32 uLen, u32 nRate, u8 bLoud) {
     pVoice->uC = nRate;
     pVoice->n14 = 0x7F;
     pVoice->flags.b.bA_0 = 1;
-    fn_80005AE8(&hdr, 0, sizeof(hdr));
+    Mem_set(&hdr, 0, sizeof(hdr));
     hdr.uC = 1;
     // the buffer's start and end in 4-bit units, past the first frame's header
     hdr.u0 = hdr.u4 = pVoice->uAram;

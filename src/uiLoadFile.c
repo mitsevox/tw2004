@@ -85,10 +85,10 @@ void fn_8008ED80(UStreamObject* pObject) {
     if (lbl_80281EF8 == 0 && gSession.nGameType == 10) {
         lbl_80281EFC = ((pObject->uSize >> 5) + 1) << 5;
     }
-    pData = fn_80009B34(pObject->uSize, 2, 32, "uiLoadFile.c", 165);
+    pData = StaticMem_Alloc(pObject->uSize, 2, 32, "uiLoadFile.c", 165);
     Mem_cpy(pData, pObject->pData, pObject->uSize);
     lbl_80281F0C = pData;
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // 'TXFS': a texture bank, kept when fn_8008F204 wants the object's kind.
@@ -97,7 +97,7 @@ void fn_8008EE1C(UStreamObject* pObject) {
         lbl_801D87A8.ap4[lbl_801D87A8.nCount] = fn_8000FB88(pObject, NULL, 0);
         lbl_801D87A8.nCount++;
     }
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // .sdata order: defined here, after fn_8008EC68's "ingame" and "startup", as in the original.
@@ -115,18 +115,18 @@ void fn_8008EEB8(UStreamObject* pObject) {
         }
         if (lbl_80281360) {
             GoARAM_WaitTransfer(GoARAM_CopyToAram(pObject->pData, lbl_80281EF0, lbl_80281EF4));
-            pData = fn_80009B34(pObject->uSize, 1, 32, "uiLoadFile.c", 247);
+            pData = StaticMem_Alloc(pObject->uSize, 1, 32, "uiLoadFile.c", 247);
             lbl_80281360 = 0;
         } else {
-            fn_80009E70(pObject);
+            StaticMem_Free(pObject);
             return;
         }
     } else {
-        pData = fn_80009B34(pObject->uSize, 2, 32, "uiLoadFile.c", 257);
+        pData = StaticMem_Alloc(pObject->uSize, 2, 32, "uiLoadFile.c", 257);
     }
     Mem_cpy(pData, pObject->pData, pObject->uSize);
     fn_8008EFC0(pData);
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // Turn the table's offsets into pointers.
@@ -153,7 +153,7 @@ void fn_8008EFFC(UStreamObject* pObject) {
     int nSlot;
     u32 uFont;
 
-    pData = fn_80009B34(pObject->uSize, 2, 32, "uiLoadFile.c", 348);
+    pData = StaticMem_Alloc(pObject->uSize, 2, 32, "uiLoadFile.c", 348);
     Mem_cpy(pData, pObject->pData, pObject->uSize);
     lbl_80281F08 = pData;
     for (i = 0; i < lbl_80281F08[0]; i++) {
@@ -164,7 +164,7 @@ void fn_8008EFFC(UStreamObject* pObject) {
         UFont_LoadFont(nSlot, &((UIFont*)lbl_80281F08[1 + i])->nSlot, 0);
         ((UIFont*)lbl_80281F08[1 + i])->nSlot = nSlot;
     }
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // szUnused: EA passes the UI set's name (fn_8009005C) to this getter and the three below.
@@ -174,7 +174,7 @@ void* fn_8008F0C0(char* szUnused) {
 
 void fn_8008F0C8(void* p) {
     if (p != NULL) {
-        fn_80009E70(p);
+        StaticMem_Free(p);
     }
 }
 
@@ -200,7 +200,7 @@ UINamedList* fn_8008F15C(char* szUnused) {
 
 void fn_8008F164(void* p) {
     if (p != NULL) {
-        fn_80009E70(p);
+        StaticMem_Free(p);
     }
 }
 
@@ -216,7 +216,7 @@ void fn_8008F194(u32* pTable) {
         for (i = 0; i < pTable[0]; i++) {
             UFont_FreeFont(((UIFont*)pTable[1 + i])->nSlot);
         }
-        fn_80009E70(pTable);
+        StaticMem_Free(pTable);
     }
 }
 
@@ -241,7 +241,7 @@ void fn_8008F294(void) {
     UINamedList* pData;
 
     if (lbl_80281F1C->pC == NULL) {
-        pData = fn_80009B34(lbl_80281EF4, 1, 32, "uiLoadFile.c", 585);
+        pData = StaticMem_Alloc(lbl_80281EF4, 1, 32, "uiLoadFile.c", 585);
         GoARAM_WaitTransfer(GoARAM_CopyFromAram(pData, lbl_80281EF0, lbl_80281EF4));
         fn_8008EFC0(pData);
         lbl_80281F1C->pC = lbl_80281F04;

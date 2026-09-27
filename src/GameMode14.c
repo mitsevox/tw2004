@@ -437,7 +437,7 @@ void fn_800F3860(void) {
             }
         } else {
             EASBio_SetCurrentGameWon(1);
-            fn_800D3548(i, PLAYER(i)->nDD8, 0);
+            GM_Earnings_AwardMoney(i, PLAYER(i)->nDD8, 0);
         }
     }
     if (nMsg != -1) {

@@ -236,7 +236,7 @@ void fn_8006B0B8(int nPlayer) {
     }
     fn_8006BE80(gPlayers[nPlayer].vBall, gPlayers[nPlayer].vTarget, vToTarget);
     vToTarget[1] = 0.0f;
-    fDist = fn_80009680(fn_80009744(vToTarget));
+    fDist = Math_Sqrt(Vec3_LengthSqClamped(vToTarget));
     lbl_801D5F78[nPlayer].n0 = 2;
     switch (gPlayers[nPlayer].nShotKind) {
     case 0:
@@ -403,7 +403,7 @@ void fn_8006B6D0(int nPlayer) {
 
 // Reaction 2: from the surface class under the ball.
 void fn_8006B6F0(int nPlayer) {
-    SurfaceType* pSurface = Ter_GetSupportingGroundMaterial(fn_8000C594(), gPlayers[nPlayer].ball.vPos);
+    SurfaceType* pSurface = Ter_GetSupportingGroundMaterial(Ter_GetTGD(), gPlayers[nPlayer].ball.vPos);
 
     if (pSurface == NULL) {
         lbl_801D5F78[nPlayer].n0 = 4;
@@ -445,12 +445,12 @@ void fn_8006B87C(int nPlayer) {
     vAim[1] = 0.0f;
     vShot[1] = 0.0f;
     if (0.0f != vAim[0] && 0.0f != vAim[2]) {
-        fn_800BAF04(vAim, vAim);
+        Vec_NormalizeTo(vAim, vAim);
     }
     if (0.0f != vShot[0] && 0.0f != vShot[2]) {
-        fn_800BAF04(vShot, vShot);
+        Vec_NormalizeTo(vShot, vShot);
     }
-    fDot = fn_8000C5FC(vAim, vShot);
+    fDot = Vec3_Dot(vAim, vShot);
     nLevel = lbl_801D5F78[nPlayer].n4;
     if (lbl_801D5F78[nPlayer].n0 == 0) {
         if (fDot > 0.9f) {
@@ -542,7 +542,7 @@ u8 fn_8006BAD8(int nPlayer, s32* pOut) {
 void fn_8006BB5C(int nPlayer) {
     PlayerEmotion* pEmotion = &lbl_801D5F78[nPlayer];
     Ball* pBall = &gPlayers[nPlayer].ball;
-    CourseInfo* pCourse = fn_8000C594();
+    CourseInfo* pCourse = Ter_GetTGD();
     f32 vToPin[4];
     f32 aBands[4] = {0.5f, 2.0f, 4.5f, 9.3f};
     f32 vVel[4];
@@ -561,8 +561,8 @@ void fn_8006BB5C(int nPlayer) {
         if (fClosest < 9.3f && fClosest > 3.5f / 36.0f && pBall->fSpeed > 0.0f) {
             bNoBreak = pEmotion->nC == 0 && pEmotion->n10 >= 1;
             pEmotion->b1C = 1;
-            fn_8001EF34(1.0f / fClosest, vToPin, vToPin);
-            fn_8001EF34(1.0f / ((12.0f * (3.0f * pBall->fSpeed)) / 60.0f), pBall->vVel, vVel);
+            Vec3_Scale(1.0f / fClosest, vToPin, vToPin);
+            Vec3_Scale(1.0f / ((12.0f * (3.0f * pBall->fSpeed)) / 60.0f), pBall->vVel, vVel);
             if (vToPin[0] * vVel[0] + vToPin[2] * vVel[2] < 0.866f && !bNoBreak) {
                 pEmotion->b1D = 1;
                 return;

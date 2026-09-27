@@ -5,7 +5,7 @@
 
 #include "dynobj.h"
 
-void fn_8000ADC0(f32 (*pMtx)[4]);                                           // identity
+void Mtx_Identity(f32 (*pMtx)[4]);                                           // identity
 void fn_8000C5A4(f32 (*pMtx)[4]);
 
 // Type 6's message 2: set the object up from its definition, with no flags and n14E at -1.
@@ -64,8 +64,8 @@ void fn_8004ABBC(DynObj* pObj, DynObjSetup* pSetup) {
     } else {
         fn_800486F4(&pObj->obj,NULL, nFlags);
     }
-    fn_8000ADC0(pObj->obj.m0);
-    fn_8000ADC0(pObj->obj.m40);
+    Mtx_Identity(pObj->obj.m0);
+    Mtx_Identity(pObj->obj.m40);
     fn_8000C5A4(pObj->obj.m0);
     pObj->obj.m80[3][0] = pDef->aPos[0];
     pObj->obj.m80[3][1] = pDef->aPos[1];
@@ -136,8 +136,8 @@ void fn_8004ADDC(DynObj* pObj, DynObjSetup* pSetup) {
         pObj->uFlags |= 0x02000000;
     }
     fn_800486F4(&pObj->obj,NULL, 0);
-    fn_8000ADC0(pObj->obj.m0);
-    fn_8000ADC0(pObj->obj.m40);
+    Mtx_Identity(pObj->obj.m0);
+    Mtx_Identity(pObj->obj.m40);
     fn_8000C5A4(pObj->obj.m0);
     pObj->obj.m80[3][0] = pDef->aPos[0];
     pObj->obj.m80[3][1] = pDef->aPos[1];

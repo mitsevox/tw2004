@@ -42,7 +42,7 @@ void fn_80007254();
 void fn_800083A0();
 void fn_80091BDC(int nPoint);
 void fn_80091B98(s32 p0);
-void fn_80012EF8();
+void RenderState_Flush(void);
 void fn_8005CC64();
 void fn_80091DB8(int nFrames);
 void fn_80091D84(void);
@@ -136,11 +136,11 @@ void fn_80090D28(FEQuad* pQuad) {
             pPict = (LLPict*)pEntry->p8;
             fn_800760D8(pPict);
         }
-        fn_80014118(0x50);
+        RenderState_SetDrawFlags(0x50);
     } else {
-        fn_80014118(0x40);
+        RenderState_SetDrawFlags(0x40);
     }
-    fn_80013EEC(fn_8001614C());
+    fn_80013EEC(Camera_GetCurrent());
     vScale[0] = (1.0f / 511.0f) * pColour->w40.a[0];
     vScale[1] = (1.0f / 511.0f) * pColour->w40.a[1];
     vScale[2] = (1.0f / 511.0f) * pColour->w40.a[2];
@@ -196,9 +196,9 @@ void fn_80090D28(FEQuad* pQuad) {
         aOut[i].y *= fProj;
         aOut[i].z = fZ;
     }
-    fn_80012F34(0);
-    fn_80012F18(7);
-    fn_80012EF8();
+    RenderState_SetDepthWrite(0);
+    RenderState_SetDepthFunc(7);
+    RenderState_Flush();
     if (aColour[0][3] != 0.0f || aColour[1][3] != 0.0f || aColour[2][3] != 0.0f
         || aColour[3][3] != 0.0f) {
         if (pQuad->n2 == -1) {
@@ -492,14 +492,14 @@ void fn_80091BDC(int nPoint) {
     f32 afUV[8];
 
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
-    fn_80035118(4, 5);
-    fn_80012F50(0, 6, 0x80);
-    fn_80012F18(7);
+    RenderState_SetBlendFactors(4, 5);
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_SetDepthFunc(7);
     fn_8001425C(0);
-    fn_80012F34(0);
+    RenderState_SetDepthWrite(0);
     fn_8005CC64(lbl_80281F20, lbl_80281F24);
-    fn_80014118(0x50);
-    fn_80012EF8();
+    RenderState_SetDrawFlags(0x50);
+    RenderState_Flush();
     afColour[0] = 0.5f;
     afColour[3] = 0.25f;        // EA code: overwritten at once
     afColour[1] = 0.5f;
@@ -533,7 +533,7 @@ void fn_80091BDC(int nPoint) {
 void fn_80091D84(void) {
     fn_80091DB8(30);
     fn_8005CC64(0, 0);
-    fn_80012EF8();
+    RenderState_Flush();
 }
 
 // Decode the picture in the 'load' object, show it for nFrames frames (fading in over 30), then
@@ -570,7 +570,7 @@ void fn_80091E1C(void) {
         fn_80007254();
     }
     fn_8005CC64(0, 0);
-    fn_80012EF8();
+    RenderState_Flush();
 }
 
 void fn_80091EE4(void) {
@@ -596,7 +596,7 @@ void fn_80091EE8(void) {
     fn_80091FC0(pPict, 180, 1.0f / 30.0f);
     fn_80008380();
     fn_8002FE70(pPict);
-    fn_80009E70(lbl_80282134);
+    StaticMem_Free(lbl_80282134);
     lbl_80282134 = NULL;
 }
 
@@ -630,16 +630,16 @@ void fn_80092080(LLPict* pPict, f32 fAlpha) {
     s32 nOld;
 
     fn_800760D8(pPict);
-    fn_80035118(4, 5);
-    fn_80014118(0x50);
-    fn_80012F50(0, 6, 0x80);
-    fn_80012F18(7);
+    RenderState_SetBlendFactors(4, 5);
+    RenderState_SetDrawFlags(0x50);
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_SetDepthFunc(7);
     nOld = fn_800171B0();
     FB_vSetFrameBuffer(&frameBuf, 0.0f, 0.0f, 512.0f, 448.0f, 1.0f, 1.0f);
     // port: the render slot is typed s32 but holds a pointer
     fn_80092274((s32)&frameBuf);
-    fn_80013EEC(fn_8001614C());
-    fn_80012EF8();
+    fn_80013EEC(Camera_GetCurrent());
+    RenderState_Flush();
     afColour[0] = 0.5f;
     afColour[1] = 0.5f;
     afColour[2] = 0.5f;

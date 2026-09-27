@@ -11,7 +11,7 @@
 #include "engine.h"
 #include "game/earnings.h"
 
-// Score multipliers for fn_800F266C, one table per value of fn_80015464.
+// Score multipliers for fn_800F266C, one table per value of Game_GetCurHoleNum.
 f32 lbl_80192810[13] = {
     1.0f, 1.0f, 1.3f, 1.1f, 1.0f, 1.1f, 1.2f, 1.3f, 1.3f, 1.4f, 1.4f, 1.3f, 1.0f,
 };
@@ -31,7 +31,7 @@ void fn_800F19D4(void) {
     f32 tmp[4];
     int i;
     int j;
-    f32* pTee = &fn_8000C594()->tee[gSession.nTeeSet[0]].x;
+    f32* pTee = &Ter_GetTGD()->tee[gSession.nTeeSet[0]].x;
     for (i = 0; i < lbl_80282360 - 1; i++) {
         for (j = i + 1; j < lbl_80282360; j++) {
             if (Vec_Distance(lbl_80211D38[i], pTee) > Vec_Distance(lbl_80211D38[j], pTee)) {
@@ -47,7 +47,7 @@ void fn_800F19D4(void) {
 void fn_800F1ABC(int nPlayer, s8 n) {
     Character* pChar;
     gPlayers[nPlayer].nTarget = n % lbl_80282360;
-    Vec_Copy(lbl_80211D38[gPlayers[nPlayer].nTarget], (f32*)fn_8000C594()->pin);
+    Vec_Copy(lbl_80211D38[gPlayers[nPlayer].nTarget], (f32*)Ter_GetTGD()->pin);
     pChar = fn_8001D324(100);
     if (pChar != NULL) {
         Character_SetPosition(pChar, lbl_80211D38[gPlayers[nPlayer].nTarget], 1);
@@ -329,15 +329,15 @@ void fn_800F2664(int nPlayer) {
 void fn_800F2668(int nPlayer) {
 }
 
-// Scale n by table entry i; which table depends on fn_80015464 (0..2).
+// Scale n by table entry i; which table depends on Game_GetCurHoleNum (0..2).
 s32 fn_800F266C(s32 n, int i) {
-    if (fn_80015464() == 0) {
+    if (Game_GetCurHoleNum() == 0) {
         return n * lbl_80192810[i];
     }
-    if (fn_80015464() == 1) {
+    if (Game_GetCurHoleNum() == 1) {
         return n * lbl_80192844[i];
     }
-    if (fn_80015464() == 2) {
+    if (Game_GetCurHoleNum() == 2) {
         return n * lbl_80192880[i];
     }
     return n;
@@ -367,7 +367,7 @@ u8 fn_800F2788(int nPlayer, f32 f) {
 }
 
 s32 fn_800F2810(s32 n) {
-    if (fn_80015464() == 0) {
+    if (Game_GetCurHoleNum() == 0) {
         switch (n) {
         case 0xD7: return 0;
         case 0xD5: return 1;
@@ -375,7 +375,7 @@ s32 fn_800F2810(s32 n) {
         case 0xD6: return 3;
         case 0xD8: return 4;
         }
-    } else if (fn_80015464() == 1) {
+    } else if (Game_GetCurHoleNum() == 1) {
         switch (n) {
         case 0x3B: return 0;
         case 0x3C: return 1;
@@ -383,7 +383,7 @@ s32 fn_800F2810(s32 n) {
         case 0x3E: return 3;
         case 0x3F: return 4;
         }
-    } else if (fn_80015464() == 2) {
+    } else if (Game_GetCurHoleNum() == 2) {
         switch (n) {
         case 24: return 0;
         case 25: return 1;

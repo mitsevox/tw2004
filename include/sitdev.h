@@ -19,7 +19,7 @@ typedef struct SitDevEvent {
 
 // The block lbl_802811B8 points at (lbl_801D5AB0, 0x140 bytes).
 typedef struct SitDevData {
-    u16   aValue[SITDEV_NUM_VALUES];            // 0x000  set through fn_80067B1C
+    u16   aValue[SITDEV_NUM_VALUES];            // 0x000  set through SitDev_SetStateValue
     u32   aSetBits[SITDEV_NUM_VALUES / 32];     // 0x0C0  bit n: aValue[n] has been set
     void* pCC;                                  // 0x0CC  SitDev_LoadScripts' argument; freed by fn_8006765C
     void* pD0;                                  // 0x0D0  freed by fn_8006765C when set
@@ -94,7 +94,7 @@ typedef struct SitDevScripts {
 extern SitDevScripts* lbl_80282208; // 0x80282208 (.sbss), NULL until the scripts are loaded
 extern s32 lbl_80282210;            // 0x80282210 (.sbss): entries in use in lbl_801FA1C0 (fn_800BB6DC)
 
-// The byte-swap layouts of the header and the p14, p18 and p1C entries (fn_8001F08C).
+// The byte-swap layouts of the header and the p14, p18 and p1C entries (ByteSwap_Records).
 extern SwapField lbl_80191168[9];
 extern SwapField lbl_801911B0[7];
 extern SwapField lbl_801911E8[5];
@@ -124,7 +124,7 @@ extern s32 lbl_801FA198[5];         // per player; cleared by fn_800BB1C0
 extern s32 lbl_801FA1AC[5];         // per player; 1: fn_800BB1F8 is true
 
 // Store uValue in pValues[nIndex] and set bit nIndex of pSetBits.
-void fn_80067B1C(u16* pValues, int nIndex, u16 uValue, u32* pSetBits);
+void SitDev_SetStateValue(u16* pValues, int nIndex, u16 uValue, u32* pSetBits);
 
 void fn_80067710(int nPlayer, int a, u8 nEvent);    // event.c's handlers call it for most events
 

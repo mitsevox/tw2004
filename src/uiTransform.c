@@ -13,10 +13,10 @@ UITransformStack* lbl_80281F38;         // the stack (fn_8009349C)
 f32  fn_80014280(f32 x);                // tan
 
 // 4x4 matrix helpers (the engine's; declared here until their own files are written).
-void fn_8000ADC0(f32 m[4][4]);                                          // identity
+void Mtx_Identity(f32 m[4][4]);                                          // identity
 void fn_800BADF8(f32 a[4][4], f32 b[4][4], f32 out[4][4], int nRows);   // out = a x b, 4 rows
 void fn_800BAE5C(f32 a[4][4], f32 b[4][4], f32 out[4][4], int nRows);   // out = a x b, 3 rows
-void fn_8000A0E8(f32 src[4][4], f32 dst[4][4]);                         // copy 4 rows
+void Mtx_Copy(f32 src[4][4], f32 dst[4][4]);                         // copy 4 rows
 void fn_8000A144(f32 src[4][4], f32 dst[4][4]);                         // copy 3 rows
 
 // Multiply a translation, a scale or a rotation (radians, about x, y or z) into a level's matrix.
@@ -41,18 +41,18 @@ static void uiTransform_StrippedFn(f32* p) {
 void fn_80092CE8(UITransform* p, f32 x, f32 y, f32 z) {
     f32 mMove[4][4];
     f32 mOut[4][4];
-    fn_8000ADC0(mMove);
+    Mtx_Identity(mMove);
     mMove[3][0] = x;
     mMove[3][1] = y;
     mMove[3][2] = z;
     fn_800BADF8(p->m, mMove, mOut, 4);
-    fn_8000A0E8(mOut, p->m);
+    Mtx_Copy(mOut, p->m);
 }
 
 void fn_80092D68(UITransform* p, f32 x, f32 y, f32 z) {
     f32 mScale[4][4];
     f32 mOut[4][4];
-    fn_8000ADC0(mScale);
+    Mtx_Identity(mScale);
     mScale[0][0] = x;
     mScale[1][1] = y;
     mScale[2][2] = z;
@@ -65,9 +65,9 @@ void fn_80092DE8(UITransform* p, f32 fAngle) {
     f32 mOut[4][4];
     f32 fSin;
     f32 fCos;
-    fn_8000ADC0(mRot);
-    fSin = fn_800095F0(fAngle);
-    fCos = fn_80009638(fAngle);
+    Mtx_Identity(mRot);
+    fSin = Math_Sin(fAngle);
+    fCos = Math_Cos(fAngle);
     mRot[1][1] = fCos;
     mRot[1][2] = fSin;
     mRot[2][1] = -fSin;
@@ -81,9 +81,9 @@ void fn_80092E74(UITransform* p, f32 fAngle) {
     f32 mOut[4][4];
     f32 fSin;
     f32 fCos;
-    fn_8000ADC0(mRot);
-    fSin = fn_800095F0(fAngle);
-    fCos = fn_80009638(fAngle);
+    Mtx_Identity(mRot);
+    fSin = Math_Sin(fAngle);
+    fCos = Math_Cos(fAngle);
     mRot[0][0] = fCos;
     mRot[0][2] = -fSin;
     mRot[2][0] = fSin;
@@ -97,9 +97,9 @@ void fn_80092F00(UITransform* p, f32 fAngle) {
     f32 mOut[4][4];
     f32 fSin;
     f32 fCos;
-    fn_8000ADC0(mRot);
-    fSin = fn_800095F0(fAngle);
-    fCos = fn_80009638(fAngle);
+    Mtx_Identity(mRot);
+    fSin = Math_Sin(fAngle);
+    fCos = Math_Cos(fAngle);
     mRot[0][0] = fCos;
     mRot[0][1] = fSin;
     mRot[1][0] = -fSin;
@@ -176,12 +176,12 @@ void fn_80093280(int nOp, UITransformDesc* p) {
 
 // Allocate the stack with its bottom level at identity.
 void fn_8009349C(void) {
-    lbl_80281F38 = fn_80009B34(sizeof(UITransformStack), 2, 16, "uiTransform.c", 203);
+    lbl_80281F38 = StaticMem_Alloc(sizeof(UITransformStack), 2, 16, "uiTransform.c", 203);
     lbl_80281F38->nTop = 0;
-    fn_8000ADC0(lbl_80281F38->aLevel[lbl_80281F38->nTop].m);
+    Mtx_Identity(lbl_80281F38->aLevel[lbl_80281F38->nTop].m);
 }
 
 void fn_800934F8(void) {
-    fn_80009E70(lbl_80281F38);
+    StaticMem_Free(lbl_80281F38);
     lbl_80281F38 = NULL;
 }

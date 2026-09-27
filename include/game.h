@@ -242,10 +242,10 @@ s32  CalDate_GetDay(u16 nDate);            // Calendar.c
 u32  CalDate_GetMonth(u16 nDate);            // Calendar.c (unsigned: callers compare it with cmplw)
 u16  CalDate_GetToday(void);                 // today's date
 int  fn_800D2ABC(int nCourse, int nHole);   // a hole's par on a course
-int  fn_800D2AD8(int nHole);            // a hole's par
+int  Course_GetHolePar(int nHole);            // a hole's par
 s32  fn_800D2C30(int nHole, int nTee);  // CourseData.c: a round hole's length from tee set nTee
 s32  GM_Earnings_TournamentPayout(int nTotal, int n, int nRow);  // Earnings.c: the prize for a finishing row
-void fn_800D3548(int nPlayer, int nMoney, CourseMoneyTracking* pMoney);   // pMoney may be NULL
+void GM_Earnings_AwardMoney(int nPlayer, int nMoney, CourseMoneyTracking* pMoney);   // pMoney may be NULL
 int  GM_Earnings_GetStrokeWinnings(int nWinner, int nLoser, int nMargin, int* pPrize);
 int  GM_Earnings_GetStrokeWinningsTeam(int nWinner, int nLoser, int nMargin, int* pPrize);
 int  GM_Earnings_RateGolfer(int nPlayer);          // the player's earnings rating, 0..25
@@ -427,7 +427,7 @@ void fn_800E41D4(int nPlayer);
 void fn_800E4204(void);
 u8   fn_800E4254(int nPlayer);          // whether a message or screen still holds the player
 u8   fn_800E430C(int nPlayer);
-void fn_800E4364(u32 nQueue, int a, int b, int c);    // add an item to a display queue
+void GUI_QueueMessage(u32 nQueue, int a, int b, int c);    // add an item to a display queue
 void GUI_GolfersTiedUIMessage(void);
 u8   fn_800E45CC(void);                 // whether a queued item, message or deferred screen waits
 u8   fn_800E46B4(void);                 // the display pump; nonzero while anything is showing

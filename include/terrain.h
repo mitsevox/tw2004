@@ -123,7 +123,7 @@ typedef struct TerLODData {
 // The terrain renderer (0x11C8 bytes): TW06's Ter_TerrainRendererMgr up to its 0x11C8 (TW06's goes
 // on to 0x1238). Every field from 0x10 on has TW06's name and offset, and the code here uses each
 // named one the way its name says; 0x8 and 0xC differ (TW06 keeps its sky there; here it is the
-// course, which TW06 keeps in Ter_TerrainGameDataMgr: GetTGD, fn_8000C594, returns pCourse).
+// course, which TW06 keeps in Ter_TerrainGameDataMgr: GetTGD, Ter_GetTGD, returns pCourse).
 typedef struct Ter_TerrainRendererMgr {
     void*        pCurrentHoleData;              // 0x000  made from the 'ter ' chunk's data (fn_800073B4)
     struct UStreamObject* pCurrentHoleDataStreamData;   // 0x004  the 'ter ' chunk
@@ -163,7 +163,7 @@ typedef struct Ter_TerrainRendererMgr {
     f32          fDefaultObjectMipmapBias[3];   // 0x1140  a row of lbl_801876D8 (fn_80034648)
     u8           bObjectTestMode;               // 0x114C
     u8           unk114D[3];
-    s32          iCurrentViewContext;           // 0x1150  a view number (fn_80017028)
+    s32          iCurrentViewContext;           // 0x1150  a view number (ViewController_GetCameraController)
     s32          iLowLODListOffset;             // 0x1154  -1 once unloaded
     f32          fTreeOverdrive;                // 0x1158
     f32          fTreeMinPeriod;                // 0x115C
@@ -249,10 +249,10 @@ void fn_800306B8(void);             // frees the terrain
 void fn_800335F8(u8 bReset);
 f32  fn_800336E4(void);
 f32  fn_800336F4(void);
-f32  fn_80035074(f32 x);            // floor
+f32  Math_Floor(f32 x);            // floor
 void fn_80034720(struct UStreamObject* pObject);   // a tee's position (TerPosData)
 u8   fn_800347B4(struct UStreamObject* pObject);   // a pin's position (TerPosData)
-void fn_80035118(int a, int b);     // renderer state: n10 and n14
+void RenderState_SetBlendFactors(int a, int b);     // renderer state: n10 and n14
 void fn_80035098(u8 b);             // renderer state
 void fn_80035154(u8 b);             // renderer state
 void fn_80035138(int a);            // renderer state: nFC

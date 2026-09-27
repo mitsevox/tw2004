@@ -47,7 +47,7 @@ void fn_80101EE8(void);                 // GameMode11.c
 void fn_800EE2C8(void);                 // GameModeDriverPGATour.c
 u8*  fn_8010C718(void);                 // CharSliders.c
 void fn_801260C0(void);                 // GameMode22.c
-s32  fn_80124094(void);                 // gbacable.c
+s32  Gba_GetState(void);                 // gbacable.c
 void fn_8012409C(void);                 // gbacable.c
 void fn_801240A8(void);                 // gbacable.c
 s32  fn_801255C4(s32* pPos);            // EASportsBio.c
@@ -76,7 +76,7 @@ void fn_8010F2FC(MsgArg* pArgs, MsgArg* pResult);
 void fn_8010F3A4(MsgArg* pArgs, MsgArg* pResult);
 void fn_8011DF90(MsgArg* pArgs, MsgArg* pResult);
 void fn_80123FF8(void);
-void fn_8012408C(s32 v);
+void Gba_SetState(s32 v);
 s32  fn_8012411C(void);
 void fn_80124138(s32 n);
 s32  fn_80124174(void);
@@ -1972,7 +1972,7 @@ void fn_8007D028(MsgArg* pArgs, MsgArg* pResult) {
 // Give the created golfer being edited model pArgs[1], in the profile and in its golfer record
 // (golfers 30 on are the slots' created golfers).
 void fn_8007D0E0(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     int nSlot = lbl_80281ED4->nSlot;
 
     pProfile->createdGolfer.nModelID = pArgs[1].i;
@@ -2047,11 +2047,11 @@ void fn_8007D2D4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007D380(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_80077ACC()->n6C;
+    pResult->i = FE_GetCurrentProfile()->n6C;
 }
 
 void fn_8007D3B4(MsgArg* pArgs, MsgArg* pResult) {
-    fn_80057438(fn_80077ACC());
+    fn_80057438(FE_GetCurrentProfile());
 }
 
 void fn_8007D3D8(MsgArg* pArgs, MsgArg* pResult) {
@@ -2166,7 +2166,7 @@ void fn_8007D708(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007D76C(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile;
 
-    pProfile = fn_80077ACC();
+    pProfile = FE_GetCurrentProfile();
     pProfile->n6C = pArgs[1].i;
 }
 
@@ -2176,7 +2176,7 @@ void fn_8007D7A0(MsgArg* pArgs, MsgArg* pResult) {
     int nAttr;
 
     nAttr = pArgs[1].i;
-    pProfile = fn_80077ACC();
+    pProfile = FE_GetCurrentProfile();
     pProfile->createdGolfer.attr[nAttr] = pArgs[2].i;
 }
 
@@ -2197,7 +2197,7 @@ void fn_8007D810(MsgArg* pArgs, MsgArg* pResult) {
     GolferRecord* pMine;
     GolferRecord* pOther;
 
-    fn_80077ACC();
+    FE_GetCurrentProfile();
     fn_8008B044(pArgs[0].i, pArgs[1].i, pArgs[2].i);
     for (i = 0; i <= lbl_80281ED4->nSlot; i++) {
         pMine = fn_80077A80(gSession.nGolfer[lbl_80281ED4->nSlot]);
@@ -2232,7 +2232,7 @@ void fn_8007D968(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->nSlot = pArgs[0].i;
     if (lbl_80281EE0->pB4->pChar != NULL &&
         (lbl_80281EE0->pB4->pChar->nC == 7 || lbl_80281EE0->pB4->pChar->nC == 29)) {
-        fn_8001DC64(lbl_80281EE0->pB4->pChar, &fn_80077ACC()->choices);
+        fn_8001DC64(lbl_80281EE0->pB4->pChar, &FE_GetCurrentProfile()->choices);
     }
 }
 
@@ -2435,7 +2435,7 @@ void fn_8007E0F8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007E128(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
 
     pResult->i = pProfile->aAward[pArgs[0].i + 23].bWon;
 }
@@ -2720,7 +2720,7 @@ void fn_8007EA14(MsgArg* pArgs, MsgArg* pResult) {
     u32 uBit = pArgs[2].i;
 
     fn_8009F7F4(&state, pArgs[0].i, pArgs[1].i);
-    pResult->i = fn_8001E9CC(state.aReplayUsed, uBit);
+    pResult->i = BitArray_Test(state.aReplayUsed, uBit);
 }
 
 // Option a0[1]: the menus' choices 1..6 are the values 5, 0, 1, 2, 3, 4; it is passed on times 0.2.
@@ -2964,7 +2964,7 @@ void fn_8007F0D0(MsgArg* pArgs, MsgArg* pResult) {
 
     n = 0;
     for (i = 0; i < 3000; i++) {
-        if (fn_8001E9CC(gpSaveData[nProfile].aB1CC, i)) {
+        if (BitArray_Test(gpSaveData[nProfile].aB1CC, i)) {
             n++;
         }
     }
@@ -3552,8 +3552,8 @@ void fn_80080AE8(MsgArg* pArgs, MsgArg* pResult) {
     v.y = *(f32*)pArgs[2].p;
     v.z = 0.0f;
     v.w = 0.0f;
-    fSin = fn_800095F0(fAngle);
-    fCos = fn_80009638(fAngle);
+    fSin = Math_Sin(fAngle);
+    fCos = Math_Cos(fAngle);
     mtx[0][0] = fCos;
     mtx[0][1] = fSin;
     mtx[1][0] = -fSin;
@@ -4982,28 +4982,28 @@ void fn_80083D88(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80083E48(MsgArg* pArgs, MsgArg* pResult) {
     fn_80123FF8();
-    fn_8012408C(0);
+    Gba_SetState(0);
 }
 
 void fn_80083E70(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8012408C(6);
+    Gba_SetState(6);
 }
 
 void fn_80083E94(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8012408C(8);
+    Gba_SetState(8);
 }
 
 void fn_80083EB8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80083EBC(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8012408C(18);
+    Gba_SetState(18);
 }
 
 // The first time only (bit 1 of the working profile's a10548 not yet set): run fn_801240A8 and
 // fn_8012409C, set the bit and answer 1; else 0.
 void fn_80083EE0(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
 
     if (!fn_80058304(pProfile, 1)) {
         fn_801240A8();
@@ -5019,10 +5019,10 @@ void fn_80083F54(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// The Game Boy Advance link's state (fn_80124094) as the menus number it; other states leave
+// The Game Boy Advance link's state (Gba_GetState) as the menus number it; other states leave
 // the result as it was.
 void fn_80083F60(MsgArg* pArgs, MsgArg* pResult) {
-    switch (fn_80124094()) {
+    switch (Gba_GetState()) {
     case 1:
         pResult->i = 0;
         break;
@@ -5054,28 +5054,28 @@ void fn_80083F60(MsgArg* pArgs, MsgArg* pResult) {
 
 // Read five values over the Game Boy Advance link (gbacable.c) into the words pArgs[0..4] point
 // at: fn_80124174's after request 0x70, then fn_80124190's after requests 0xB0 with 0 to 3. It
-// stops once the link's state (fn_80124094) is 18 or -1. Then, if fn_80124224 says so, a state
+// stops once the link's state (Gba_GetState) is 18 or -1. Then, if fn_80124224 says so, a state
 // of 7 or 9 becomes 12 or 13.
 void fn_80084008(MsgArg* pArgs, MsgArg* pResult) {
     u32 i;
 
-    if (fn_80124094() != 18 && fn_80124094() != -1) {
+    if (Gba_GetState() != 18 && Gba_GetState() != -1) {
         fn_80123CBC(0x70, 0);
-        if (fn_80124094() != 18 && fn_80124094() != -1) {
+        if (Gba_GetState() != 18 && Gba_GetState() != -1) {
             *(s32*)pArgs[0].p = fn_80124174();
             for (i = 0; i < 4; i++) {
                 fn_80123CBC(0xB0, i);
-                if (fn_80124094() == 18 || fn_80124094() == -1) break;
+                if (Gba_GetState() == 18 || Gba_GetState() == -1) break;
                 *(s32*)pArgs[1 + i].p = fn_80124190();
             }
         }
     }
     fn_801241D4(0);
     if (fn_80124224()) {
-        if (fn_80124094() == 7) {
-            fn_8012408C(12);
-        } else if (fn_80124094() == 9) {
-            fn_8012408C(13);
+        if (Gba_GetState() == 7) {
+            Gba_SetState(12);
+        } else if (Gba_GetState() == 9) {
+            Gba_SetState(13);
         }
         fn_8012421C(0);
     }
@@ -5103,9 +5103,9 @@ void fn_80084190(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_80124174();
 }
 
-// Whether gbacable.c's fn_80124094 answers 18.
+// Whether gbacable.c's Gba_GetState answers 18.
 void fn_800841C0(MsgArg* pArgs, MsgArg* pResult) {
-    if (fn_80124094() == 18) {
+    if (Gba_GetState() == 18) {
         pResult->i = 1;
         return;
     }
@@ -5113,7 +5113,7 @@ void fn_800841C0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80084208(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8012408C(5);
+    Gba_SetState(5);
 }
 
 // ---- the EA Sports Bio screens (EASportsBio.c does the work) ----

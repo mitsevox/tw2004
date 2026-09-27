@@ -89,7 +89,7 @@ typedef struct CourseLightBlock {
     f32  f80;                   // 0x80
 } CourseLightBlock;
 
-// The current hole's terrain data (fn_8000C594): the ground as collision data. TW06:
+// The current hole's terrain data (Ter_GetTGD): the ground as collision data. TW06:
 // TGD_TerrainInfo, the same offsets up to 0x2C; TW06 has three more pointers before the polygon
 // list. The ground is triangle strips: each TerPolyRef names a first vertex and a triangle count,
 // and triangle k of a strip is vertices k, k+1, k+2.
@@ -244,7 +244,7 @@ typedef struct CourseLoader {
 } CourseLoader;
 LAYOUT_ASSERT(CourseLoader, 0x8);
 
-CourseInfo* fn_8000C594(void);          // the current hole's terrain data
+CourseInfo* Ter_GetTGD(void);          // the current hole's terrain data
 u8   Course_RegisterLoader(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4: pfn gets the hole's chunk nChunk
 void fn_8000C0F0(void);                 // network count 0, loader count -1
 void fn_8000C104(void);                 // register the 'Cnet' handler, clear the loaders

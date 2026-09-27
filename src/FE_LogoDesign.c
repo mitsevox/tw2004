@@ -21,26 +21,26 @@ LogoEdit* lbl_802824B8;
 
 // Allocate the palette, empty. (The allocator records EA's file name and line.)
 void fn_8010F6C8(void) {
-    lbl_802824BC = fn_80009B34(256 * sizeof(s16), 0, 0, "FE_LogoDesign.c", 47);
-    fn_80005AE8(lbl_802824BC, 0, 256 * sizeof(s16));
+    lbl_802824BC = StaticMem_Alloc(256 * sizeof(s16), 0, 0, "FE_LogoDesign.c", 47);
+    Mem_set(lbl_802824BC, 0, 256 * sizeof(s16));
     lbl_802824C0 = 0;
 }
 
 void fn_8010F718(void) {
-    fn_80009E70(lbl_802824BC);
+    StaticMem_Free(lbl_802824BC);
     lbl_802824BC = NULL;
     lbl_802824C0 = 0;
 }
 
 // Start editing: the editor state (LogoEdit) cleared, and the palette if it is not loaded yet.
 void fn_8010F748(void) {
-    lbl_802824B8 = fn_80009B34(sizeof(LogoEdit), 2, 0, "FE_LogoDesign.c", 67);
-    fn_80005AE8(lbl_802824B8, 0, sizeof(LogoEdit));
+    lbl_802824B8 = StaticMem_Alloc(sizeof(LogoEdit), 2, 0, "FE_LogoDesign.c", 67);
+    Mem_set(lbl_802824B8, 0, sizeof(LogoEdit));
     fn_8010FAF4();
 }
 
 void fn_8010F794(void) {
-    fn_80009E70(lbl_802824B8);
+    StaticMem_Free(lbl_802824B8);
     lbl_802824B8 = NULL;
 }
 
@@ -176,7 +176,7 @@ LogoRecord* fn_8010FB70(void) {
     if (lbl_80281ED4->b10640) {
         return &lbl_80281ED4->logo106E0;
     }
-    return &fn_80077ACC()->choices.aLogo[lbl_802824B8->n0];
+    return &FE_GetCurrentProfile()->choices.aLogo[lbl_802824B8->n0];
 }
 
 // The palette.

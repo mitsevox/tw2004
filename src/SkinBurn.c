@@ -118,10 +118,10 @@ void fn_801272B4(Skin* pSkin) {
     if (nBits == 0) {
         return;
     }
-    aBits = fn_80009B34((nBits + 31) / 32 * sizeof(u32), 1, 16, "SkinBurn.c", 205);
-    fn_8001E938(aBits, nBits);
-    aOld = fn_80009B34(nBits * sizeof(s32), 1, 16, "SkinBurn.c", 209);
-    aNew = fn_80009B34(nBits * sizeof(s32), 1, 16, "SkinBurn.c", 210);
+    aBits = StaticMem_Alloc((nBits + 31) / 32 * sizeof(u32), 1, 16, "SkinBurn.c", 205);
+    BitArray_ClearAll(aBits, nBits);
+    aOld = StaticMem_Alloc(nBits * sizeof(s32), 1, 16, "SkinBurn.c", 209);
+    aNew = StaticMem_Alloc(nBits * sizeof(s32), 1, 16, "SkinBurn.c", 210);
     memset(aOld, -1, nBits * sizeof(s32));
     memset(aNew, -1, nBits * sizeof(s32));
 
@@ -131,7 +131,7 @@ void fn_801272B4(Skin* pSkin) {
         n = pModel->n50;
     }
     for (i = 0; i < n; i++) {
-        fn_8001EA34(aBits, i);
+        BitArray_Set(aBits, i);
     }
 
     // Mark the bits the options use, in aBits instead of the skin's own array.
@@ -145,7 +145,7 @@ void fn_801272B4(Skin* pSkin) {
     nKept = 0;
     lbl_802825A8 = aNew;
     for (j = 0; j < nBits; j++) {
-        if (fn_8001E9CC(aBits, j)) {
+        if (BitArray_Test(aBits, j)) {
             *pOld++ = j;
             *pNew = nKept++;
         }
@@ -177,9 +177,9 @@ void fn_801272B4(Skin* pSkin) {
     }
 
     pModel->n50 = nKept;
-    fn_80009E70(aBits);
-    fn_80009E70(aOld);
-    fn_80009E70(aNew);
+    StaticMem_Free(aBits);
+    StaticMem_Free(aOld);
+    StaticMem_Free(aNew);
 }
 
 // The bytes nCount items of nSize take, rounded up to nAlign (a power of two); 0 when there is no
@@ -251,7 +251,7 @@ void fn_801276E4(Skin* pSkin) {
     }
     nSize += fn_801275F0(&pOld, nIndexes, sizeof(s32), 16);
 
-    pBase = fn_80009B34(nSize, 2, 16, "SkinBurn.c", 434);
+    pBase = StaticMem_Alloc(nSize, 2, 16, "SkinBurn.c", 434);
     nOffset = 0;
     pNew = fn_80127614(pBase, &nOffset, pOld, sizeof(SkinModel), 16);
     pNew->n08 = nSize;
@@ -274,7 +274,7 @@ void fn_801276E4(Skin* pSkin) {
         nFirst += pEntry->n8;
     }
     pSkin->pModel = pNew;
-    fn_80009E70(pOld);
+    StaticMem_Free(pOld);
 }
 
 void fn_80127B10(Skin* pSkin, HwsBurn* pBurn) {
@@ -336,7 +336,7 @@ void fn_80127B98(Skin* pSkin, s32* aParts, s32* aList) {
     pDesc = fn_80111EB0(pBurn);
     pOld = pSkin->pModel->pDesc;
     pSkin->pModel->pDesc = pDesc;
-    fn_80009E70(pOld);
+    StaticMem_Free(pOld);
     fn_80127B10(pSkin, pBurn);
     fn_801108B0(pBurn);
     fn_8011CD3C(pSkin, pBlock, pTable);

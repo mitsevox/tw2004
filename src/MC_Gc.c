@@ -78,10 +78,10 @@ void fn_8009CC00(void) {
     if (lbl_80281FC4 == 0) {
         lbl_80281FC4 = GoARAM_Alloc(MC_BUFFER_SIZE + 0x20);
     }
-    lbl_80281FE8 = fn_80009B34(MC_BUFFER_SIZE, 1, 0x20, "MC_Gc.c", 129);
+    lbl_80281FE8 = StaticMem_Alloc(MC_BUFFER_SIZE, 1, 0x20, "MC_Gc.c", 129);
     lbl_80281FE4 = lbl_80281FE8;
     lbl_80281FEC = lbl_80281FE8;
-    lbl_80281FDC = fn_80009B34(MC_BUFFER_SIZE, 1, 0x20, "MC_Gc.c", 133);
+    lbl_80281FDC = StaticMem_Alloc(MC_BUFFER_SIZE, 1, 0x20, "MC_Gc.c", 133);
     lbl_80281FD8 = lbl_80281FDC;
     lbl_80281FE0 = lbl_80281FDC;
     fn_8009EF98();
@@ -91,16 +91,16 @@ void fn_8009CC00(void) {
 // ARAM. The second image is not freed.
 void fn_8009CC88(void) {
     if (lbl_80281FB8 != NULL) {
-        fn_80009E70(lbl_80281FB8);
+        StaticMem_Free(lbl_80281FB8);
         lbl_80281FB8 = NULL;
     }
     if (lbl_80281FBC != NULL) {
-        fn_80009E70(lbl_80281FBC);
+        StaticMem_Free(lbl_80281FBC);
         lbl_80281FBC = NULL;
     }
     MC_FreeEAGameList();
     if (lbl_80281FE8 != NULL) {
-        fn_80009E70(lbl_80281FE8);
+        StaticMem_Free(lbl_80281FE8);
         lbl_80281FEC = NULL;
         lbl_80281FE4 = NULL;
         lbl_80281FE8 = NULL;
@@ -293,7 +293,7 @@ s32 fn_8009D1D8(s32 nPort, s32 nSlot, s32 arg2, s32 nKind) {
     case 3:
         return 0;
     }
-    if (!bMounted && fn_8009DBAC(nPort, nSlot) != 0) return 0;
+    if (!bMounted && MC_Unmount(nPort, nSlot) != 0) return 0;
     return 0;
 }
 
@@ -320,7 +320,7 @@ s32 fn_8009D3DC(s32 nPort, s32 nSlot) {
     if (!bMounted && fn_8009D74C(nPort, nSlot) != 0) return 0;
     if (fn_8009D614(nPort, nSlot, MC_FILE_NAME) != 0) return 1;
     if (fn_8009D614(nPort, nSlot, MC_BACKUP_NAME) != 0) return 1;
-    if (!bMounted && fn_8009DBAC(nPort, nSlot) != 0) return 0;
+    if (!bMounted && MC_Unmount(nPort, nSlot) != 0) return 0;
     return 0;
 }
 
@@ -336,7 +336,7 @@ s32 fn_8009D50C(s32 nPort, s32 nSlot) {
     if (fn_8009D0D4(nPort, nSlot) != 0) return 0;
     if (!bMounted && fn_8009D74C(nPort, nSlot) != 0) return 0;
     if (fn_8009D614(nPort, nSlot, "EASB") != 0) return 1;
-    if (!bMounted && fn_8009DBAC(nPort, nSlot) != 0) return 0;
+    if (!bMounted && MC_Unmount(nPort, nSlot) != 0) return 0;
     return 0;
 }
 
@@ -397,7 +397,7 @@ s32 fn_8009D74C(s32 nPort, s32 nSlot) {
     nResult = fn_8009D0D4(nChan, nSlot);
     if (nResult != 0) return nResult;
     if (lbl_801F1510[nPort][nSlot].uFlags & MC_CARD_MOUNTED) {
-        nResult = fn_8009DBAC(nPort, nSlot);
+        nResult = MC_Unmount(nPort, nSlot);
         if (nResult != 0) return nResult;
         bWasMounted = 1;
     }
@@ -505,7 +505,7 @@ s32 fn_8009D74C(s32 nPort, s32 nSlot) {
 }
 
 // Unmount the card if it is mounted, then park the save file images in ARAM (fn_8009EF98).
-s32 fn_8009DBAC(s32 nPort, s32 nSlot) {
+s32 MC_Unmount(s32 nPort, s32 nSlot) {
     s32 nResult;
     int nChan;
     if (lbl_801F1510[nPort][nSlot].uFlags & MC_CARD_MOUNTED) {
@@ -566,7 +566,7 @@ void fn_8009DCE8(void) {
 void fn_8009DCEC(s32 nPort, s32 nSlot) {
     s32 nResult = fn_8009D74C(nPort, nSlot);
     fn_8009DC80(nPort, nSlot, nResult);
-    fn_8009DBAC(nPort, nSlot);
+    MC_Unmount(nPort, nSlot);
 }
 
 // Whether the card holds a save file (0) or its backup. pName is not used.
@@ -950,7 +950,7 @@ s32 fn_8009EB44(s32 nPort, s32 nSlot) {
         }
     }
     if (nMount == 0) {
-        fn_8009DBAC(nPort, nSlot);
+        MC_Unmount(nPort, nSlot);
     }
     if (nResult == 0 || nResult == MC_ERR_NOFILE) return MC_TalleyEATitlesFound();
     return nResult;
@@ -1012,7 +1012,7 @@ s32 fn_8009EE28(s32 nPort, s32 nSlot) {
     if (nResult != 0) return nResult;
     nResult = fn_8009ED34(nPort, nSlot, MC_FILE_NAME, MC_BACKUP_NAME);
     if (nMount == 0) {
-        fn_8009DBAC(nPort, nSlot);
+        MC_Unmount(nPort, nSlot);
     }
     return nResult;
 }
@@ -1050,8 +1050,8 @@ void fn_8009EF98(void) {
             Skalib_ScratchFromAram(0);
             Skalib_ScratchFromAram(1);
         } else {
-            fn_80009E70(lbl_80281FE8);
-            fn_80009E70(lbl_80281FDC);
+            StaticMem_Free(lbl_80281FE8);
+            StaticMem_Free(lbl_80281FDC);
         }
         lbl_80281FE8 = NULL;
         lbl_80281FEC = NULL;
@@ -1071,9 +1071,9 @@ void fn_8009F02C(void) {
             lbl_80281FDC = lbl_80281FE0 = lbl_80281FD8 = (SaveImage*)Skalib_ScratchToAram(1);
         } else {
             lbl_80281FE8 = lbl_80281FEC = lbl_80281FE4 =
-                fn_80009B34(lbl_80281FC0, 1, 0x20, "MC_Gc.c", 2805);
+                StaticMem_Alloc(lbl_80281FC0, 1, 0x20, "MC_Gc.c", 2805);
             lbl_80281FDC = lbl_80281FE0 = lbl_80281FD8 =
-                fn_80009B34(lbl_80281FC0, 1, 0x20, "MC_Gc.c", 2810);
+                StaticMem_Alloc(lbl_80281FC0, 1, 0x20, "MC_Gc.c", 2810);
         }
         GoARAM_WaitTransfer(GoARAM_CopyFromAram(lbl_80281FE8, lbl_80281FC4, lbl_80281FC0));
     }

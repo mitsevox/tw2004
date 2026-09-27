@@ -11,7 +11,7 @@
 #include "unsorted/cull.h"
 #include "core/startup.h"
 
-void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);      // UMemPool.c: copy a 4x4 matrix
+void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);      // UMemPool.c: copy a 4x4 matrix
 void fn_80070168(void);                                 // calls a display list (see fn_800B4FA4)
 void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);  // LLFont.c: GXBegin
 void fn_800124A8(void);                                // LLFont.c: end the primitive
@@ -80,7 +80,7 @@ void fn_800B4C00(RainList* pList, int nDrops) {
     int i;
 
     uSize = ((nDrops * 32 + 31) & ~31) + 0x400;
-    pBuf = fn_80009B34(uSize, 1, 0x20, "GoShaderObject_Rain_Gc.c", 218);
+    pBuf = StaticMem_Alloc(uSize, 1, 0x20, "GoShaderObject_Rain_Gc.c", 218);
     DCInvalidateRange(pBuf, uSize);
     GXBeginDisplayList(pBuf, uSize);
     GXResetWriteGatherPipe();
@@ -100,10 +100,10 @@ void fn_800B4C00(RainList* pList, int nDrops) {
     }
     fn_800124A8();
     uSize = GXEndDisplayList();
-    pList->pList = fn_80009B34(uSize, 2, 0x20, "GoShaderObject_Rain_Gc.c", 251);
+    pList->pList = StaticMem_Alloc(uSize, 2, 0x20, "GoShaderObject_Rain_Gc.c", 251);
     Mem_cpy(pList->pList, pBuf, uSize);
     DCFlushRange(pBuf, uSize);
-    fn_80009E70(pBuf);
+    StaticMem_Free(pBuf);
     pList->uSize = uSize;
 }
 
@@ -116,11 +116,11 @@ void SD_vShaderObject_Rain_Dynamic_Init(RainObject* pRain, f32* pStrength) {
 
     fn_800B4C00(&pData->list, 900);
     for (i = 0; i < 4; i++) {
-        pData->apA[i] = fn_80009B34(RAIN_BUF_A_SIZE, 2, 0x20, "GoShaderObject_Rain_Gc.c", 280);
+        pData->apA[i] = StaticMem_Alloc(RAIN_BUF_A_SIZE, 2, 0x20, "GoShaderObject_Rain_Gc.c", 280);
         memset(pData->apA[i], 0, RAIN_BUF_A_SIZE);
     }
     for (i = 0; i < 2; i++) {
-        pData->apB[i] = fn_80009B34(RAIN_BUF_B_SIZE, 2, 0x20, "GoShaderObject_Rain_Gc.c", 292);
+        pData->apB[i] = StaticMem_Alloc(RAIN_BUF_B_SIZE, 2, 0x20, "GoShaderObject_Rain_Gc.c", 292);
         memset(pData->apB[i], 0, RAIN_BUF_B_SIZE);
     }
     uSplash = fn_8000BEE4("splash");
@@ -132,12 +132,12 @@ void fn_800B4F24(RainObject* pRain) {
     RainData* pData = &pRain->data;
     int i;
 
-    fn_80009E70(pData->list.pList);
+    StaticMem_Free(pData->list.pList);
     for (i = 0; i < 4; i++) {
-        fn_80009E70(pData->apA[i]);
+        StaticMem_Free(pData->apA[i]);
     }
     for (i = 0; i < 2; i++) {
-        fn_80009E70(pData->apB[i]);
+        StaticMem_Free(pData->apB[i]);
     }
 }
 
@@ -158,19 +158,19 @@ void fn_800B4FA4(RainObject* pRain) {
     int nAlpha;
     RainPoint* pPoint;
 
-    pCamera = fn_8001614C();
+    pCamera = Camera_GetCurrent();
     pData = &pRain->data;
     nBuf = lbl_802814B8->n0;
     nHalf = lbl_802814B8->n4;
-    fn_80035118(4, 5);
-    fn_80014118(0x40);
-    fn_80012F50(0, 7, 0);
-    fn_80012F18(3);
+    RenderState_SetBlendFactors(4, 5);
+    RenderState_SetDrawFlags(0x40);
+    RenderState_SetAlphaTest(0, 7, 0);
+    RenderState_SetDepthFunc(3);
     fn_8005CC64(NULL, NULL);
-    fn_80012EF8();
-    fn_8000A0E8(pCamera->viewMtx, mView);
+    RenderState_Flush();
+    Mtx_Copy(pCamera->viewMtx, mView);
     mView[3][0] = mView[3][1] = mView[3][2] = 0.0f;
-    fn_8000A0E8(((Camera*)fn_8001614C())->m15C, mPos);
+    Mtx_Copy(((Camera*)Camera_GetCurrent())->m15C, mPos);
     fn_800B58FC(mPos[0], mPos[0]);
     fn_800B58FC(mPos[2], mPos[2]);
     for (i = 0; i < 3; i++) {
@@ -195,10 +195,10 @@ void fn_800B4FA4(RainObject* pRain) {
         }
     }
 
-    fn_80014118(0x50);
+    RenderState_SetDrawFlags(0x50);
     fn_8005CC64(lbl_802814B8->pBank, lbl_802814B8->pTex);
-    fn_80012EF8();
-    fn_8000A0E8(((Camera*)fn_8001614C())->m15C, mPos);
+    RenderState_Flush();
+    Mtx_Copy(((Camera*)Camera_GetCurrent())->m15C, mPos);
     fn_800B58FC(mPos[0], mPos[0]);
     fn_800B58FC(mPos[2], mPos[2]);
     GXLoadPosMtxImm(mPos, 0);
@@ -249,7 +249,7 @@ void fn_800B52D4(RainObject* pRain, f32* pTime) {
     f32 fFade;
     f32 fSize;
 
-    pCamera = fn_8001614C();
+    pCamera = Camera_GetCurrent();
     pLens = fn_8001F004();
     pData = &pRain->data;
     nBuf = lbl_802814B8->n0;
@@ -264,7 +264,7 @@ void fn_800B52D4(RainObject* pRain, f32* pTime) {
     vCenter.y = 0.0f;
     fOff = (vCenter.z >= 0.0f) ? 17.5f : -17.5f;
     vCenter.z = vCenter.z - 35.0f * (int)(vCenter.z / 35.0f) - fOff;
-    fn_8000A0E8(pCamera->viewMtx, mView);
+    Mtx_Copy(pCamera->viewMtx, mView);
     mView[3][0] = mView[3][1] = mView[3][2] = 0.0f;
     for (i = 0; i < 3; i++) {
         fX = 35.0f * (i - 1);
@@ -329,8 +329,8 @@ void fn_800B52D4(RainObject* pRain, f32* pTime) {
         vCenter.x = (20.0f * Misc_RandFuncf(1) + pLens->m4[3][0]) - 10.0f;
         vCenter.y = pLens->m4[3][1];
         vCenter.z = (20.0f * Misc_RandFuncf(1) + pLens->m4[3][2]) - 10.0f;
-        vCenter.y = 0.1f + Ter_GetHighestGroundHeight(fn_8000C594(), &vCenter.x);
-        Ter_GetSupportingGroundNormal(fn_8000C594(), &vCenter.x, &vPos.x);
+        vCenter.y = 0.1f + Ter_GetHighestGroundHeight(Ter_GetTGD(), &vCenter.x);
+        Ter_GetSupportingGroundNormal(Ter_GetTGD(), &vCenter.x, &vPos.x);
         fn_800B5918(&vCenter.x, pSplash->av[0]);
         pSplash->av[1][0] = pSplash->av[0][0] + fSize;
         pSplash->av[1][2] = pSplash->av[0][2];

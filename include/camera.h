@@ -7,7 +7,7 @@
 
 #include "engine.h"
 
-// A render camera's lens (our name; unsorted/cull.h called it CameraSub): what fn_80008370 returns,
+// A render camera's lens (our name; unsorted/cull.h called it CameraSub): what Camera_GetLens returns,
 // the pointer at the render camera's +0x10. Only the fields read so far; its size is unknown.
 typedef struct CamLens {
     s32  nType;                 // 0x00  0: a perspective camera, else flat (LLObj_Gc.c)
@@ -185,7 +185,7 @@ typedef struct CamSequence {
                                 //       1 split screen or modes 9 and 11; 2 fn_800E39F0 (fn_8003D140)
     u8   b49;                   // 0x49  a bit mask
     u8   b4A;                   // 0x4A  a bit mask
-    s8   n4B;                   // 0x4B  one bit per value of fn_800D2B08
+    s8   n4B;                   // 0x4B  one bit per value of Course_GetCurHolePar
     struct CamChoice* p4C;      // 0x4C  its shot choices (dyncam.h)
 } CamSequence;
 LAYOUT_ASSERT(CamSequence, 0x50);
@@ -253,8 +253,8 @@ LAYOUT_ASSERT(CamScript, 0x118);    // CameraScript_WillGolferBeOccludedInThisVi
 // A view's camera controller (CameraController_SetCameraMode, EA's name in TW06 and TW07): the
 // camera mode, its shots and script. It sits at +4 in a ViewController; only the fields read so far.
 typedef struct View {
-    f32      v0[4];             // 0x000  what fn_8001731C returns: the camera's position (inferred)
-    f32      v10[4];            // 0x010  what fn_80017314 returns: where it looks (the pin, for camera 5)
+    f32      v0[4];             // 0x000  what CameraController_GetPosition returns: the camera's position (inferred)
+    f32      v10[4];            // 0x010  what CameraController_GetTarget returns: where it looks (the pin, for camera 5)
     f32      v20[4];            // 0x020
     f32      v30[4];            // 0x030
     f32      v40[4];            // 0x040
@@ -288,8 +288,8 @@ LAYOUT_ASSERT(View, 0x26C);
 // viewControllerID, index them): the render camera, the view's camera controller, the player it
 // follows.
 typedef struct ViewController {
-    void*    pCamera;           // 0x000  the render camera (fn_80017004)
-    View     view;              // 0x004  (fn_80017028)
+    void*    pCamera;           // 0x000  the render camera (ViewController_GetCamera)
+    View     view;              // 0x004  (ViewController_GetCameraController)
     s32      nPlayer;           // 0x270  set by fn_8001704C
     u8       b274;              // 0x274  the view is set up (fn_80016D18) and not yet shut down
     u8       bFlagOut;          // 0x275  the flagstick is out (set while every player on this view is on the
@@ -602,7 +602,7 @@ typedef struct RenderCamera {
     f32* pRect;                 // 0x14  its screen rectangle: left, top, width, height (fn_80012EF0)
 } RenderCamera;
 
-// Points at the slot holding the current render camera (lbl_80281C90): fn_8001614C reads it,
+// Points at the slot holding the current render camera (lbl_80281C90): Camera_GetCurrent reads it,
 // fn_80013D5C sets it.
 extern void** lbl_80280DF0;
 
@@ -615,21 +615,21 @@ f32*   fn_8003526C(void);               // GoTerrain.c: the current render camer
 
 ViewController* fn_80016CF4(void);     // the current view (lbl_80281CA4)
 ViewController* fn_80016CFC(int nView);
-void*  fn_80017004(int nView);          // the view's render camera
-View*  fn_80017028(int nView);
+void*  ViewController_GetCamera(int nView);          // the view's render camera
+View*  ViewController_GetCameraController(int nView);
 void   fn_8001704C(int nView, int nPlayer);   // the player the view follows
-int    fn_8001707C(int nView);          // the player the view follows (as set above)
+int    ViewController_GetPlayer(int nView);          // the player the view follows (as set above)
 u8     fn_800170A0(int nView);          // the view is in use
 void   fn_800170C4(int nView, u8 b);    // sets ViewController.b274
-f32*   fn_8001731C(View* pView);        // the camera's position (v0)
-f32*   fn_80017314(View* pView);        // where it looks (v10), or a script shot's angles
+f32*   CameraController_GetPosition(View* pView);        // the camera's position (v0)
+f32*   CameraController_GetTarget(View* pView);        // where it looks (v10), or a script shot's angles
 u8     fn_800172C4(View* pView);        // 0: the script's shot aims by angles (fn_80016E90)
 f32*   fn_80012EF0(void* pCamera);      // a render camera's screen rectangle
 f32    fn_80012ED0(f32* pRect);         // the rectangle's [3]: its height
 f32    fn_80012ED8(f32* pRect);         // [2]: its width
 f32    fn_80012EE0(f32* pRect);         // [1]: its top
 f32    fn_80012EE8(f32* pRect);         // [0]: its left
-void*  fn_8001614C(void);               // the current render camera
+void*  Camera_GetCurrent(void);               // the current render camera
 void   fn_80013CCC(void* pCamera);
 void   fn_80013EEC(void* pCamera);
 void   fn_80016B9C(void);
@@ -663,7 +663,7 @@ u8     fn_800453C8(int nPlayer, CamShot* pShot);
 
 // ---- the camera scripts (gocamscripts.c, 0x8003DCE8..) ----------------------------------------
 
-// pCam and pSub are the view's camera position and where it looks (fn_8001731C, fn_80017314).
+// pCam and pSub are the view's camera position and where it looks (CameraController_GetPosition, CameraController_GetTarget).
 void     CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b,
                      f32 fFrameTime);
 void     CamScript_RunFEScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, int a,

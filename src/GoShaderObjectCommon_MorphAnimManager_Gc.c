@@ -12,13 +12,13 @@ void fn_800975B0(MorphAnim* pAnim);
 void fn_800975FC(MorphAnim* pAnim);
 
 void fn_80097208(void) {
-    lbl_80281F70 = fn_80009B34(sizeof(MorphAnimMgr), 2, 32, "GoShaderObjectCommon_MorphAnimManager_Gc.c",
+    lbl_80281F70 = StaticMem_Alloc(sizeof(MorphAnimMgr), 2, 32, "GoShaderObjectCommon_MorphAnimManager_Gc.c",
                                85);
-    fn_80005AE8(lbl_80281F70, 0, sizeof(MorphAnimMgr));
+    Mem_set(lbl_80281F70, 0, sizeof(MorphAnimMgr));
 }
 
 void fn_80097250(void) {
-    fn_80009E70(lbl_80281F70);
+    StaticMem_Free(lbl_80281F70);
     lbl_80281F70 = NULL;
 }
 
@@ -31,9 +31,9 @@ void fn_8009727C(MorphAnim* pAnim) {
         pAnim->p14 = NULL;
         pAnim->p18 = NULL;
         pAnim->p1C = NULL;
-        pAnim->p10 = fn_80009B34(2000, 1, 32, "GoShaderObjectCommon_MorphAnimManager_Gc.c", 127);
-        pAnim->p14 = fn_80009B34(12000, 1, 32, "GoShaderObjectCommon_MorphAnimManager_Gc.c", 129);
-        pAnim->p18 = fn_80009B34(3000, 1, 32, "GoShaderObjectCommon_MorphAnimManager_Gc.c", 131);
+        pAnim->p10 = StaticMem_Alloc(2000, 1, 32, "GoShaderObjectCommon_MorphAnimManager_Gc.c", 127);
+        pAnim->p14 = StaticMem_Alloc(12000, 1, 32, "GoShaderObjectCommon_MorphAnimManager_Gc.c", 129);
+        pAnim->p18 = StaticMem_Alloc(3000, 1, 32, "GoShaderObjectCommon_MorphAnimManager_Gc.c", 131);
     }
 }
 
@@ -65,11 +65,11 @@ void fn_80097474(MorphAnim* pAnim) {
     s8* p18 = pAnim->p18;
     if (!fn_80112C04()) return;
     if (pAnim->nFrames != 0) {
-        pAnim->p10 = fn_80009B34(pAnim->nFrames * sizeof(u16), 2, 32,
+        pAnim->p10 = StaticMem_Alloc(pAnim->nFrames * sizeof(u16), 2, 32,
                                  "GoShaderObjectCommon_MorphAnimManager_Gc.c", 206);
-        pAnim->p14 = fn_80009B34(pAnim->nFrames * 12, 2, 32, "GoShaderObjectCommon_MorphAnimManager_Gc.c",
+        pAnim->p14 = StaticMem_Alloc(pAnim->nFrames * 12, 2, 32, "GoShaderObjectCommon_MorphAnimManager_Gc.c",
                                  208);
-        pAnim->p18 = fn_80009B34(pAnim->nFrames * 3, 2, 32, "GoShaderObjectCommon_MorphAnimManager_Gc.c",
+        pAnim->p18 = StaticMem_Alloc(pAnim->nFrames * 3, 2, 32, "GoShaderObjectCommon_MorphAnimManager_Gc.c",
                                  210);
         Mem_cpy(pAnim->p10, p10, pAnim->nFrames * sizeof(u16));
         Mem_cpy(pAnim->p14, p14, pAnim->nFrames * 12);
@@ -80,9 +80,9 @@ void fn_80097474(MorphAnim* pAnim) {
         pAnim->p14 = NULL;
         pAnim->p18 = NULL;
     }
-    fn_80009E70(p10);
-    fn_80009E70(p14);
-    fn_80009E70(p18);
+    StaticMem_Free(p10);
+    StaticMem_Free(p14);
+    StaticMem_Free(p18);
 }
 
 // Add an animation: it takes the next slot, which starts empty.
@@ -102,9 +102,9 @@ void fn_800975FC(MorphAnim* pAnim) {
 // Free an animation's data.
 void fn_80097624(MorphAnim* pAnim) {
     if (pAnim->nFrames != 0) {
-        fn_80009E70(pAnim->p10);
-        fn_80009E70(pAnim->p14);
-        fn_80009E70(pAnim->p18);
+        StaticMem_Free(pAnim->p10);
+        StaticMem_Free(pAnim->p14);
+        StaticMem_Free(pAnim->p18);
         pAnim->p10 = NULL;
         pAnim->p14 = NULL;
         pAnim->p18 = NULL;

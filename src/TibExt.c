@@ -36,15 +36,15 @@ TibExtCard lbl_80260D88;
 TibExtCard* lbl_80281970 = &lbl_80260D88;
 
 void* TibExtMemAlloc(u32 uHeapID, u32 uSize, u32 uAlign) {
-    return fn_80009B34(uSize, fn_8000A0B4(), uAlign, "TibExt.c", 42);
+    return StaticMem_Alloc(uSize, fn_8000A0B4(), uAlign, "TibExt.c", 42);
 }
 
 void TibExtMemFree(u32 uHeapID, void* p, u32 uSize, u32 uAlign) {
-    fn_80009E70(p);
+    StaticMem_Free(p);
 }
 
 // The library's assert handler: does nothing in the retail game.
-void fn_8012214C(const char* pFile, int uLine, const char* pExpr, int unused) {
+void TibExt_AssertHandler(const char* pFile, int uLine, const char* pExpr, int unused) {
 }
 
 // The clock in seconds since 1970-01-01.
@@ -164,7 +164,7 @@ void SFIO_vMountCallback(int eDevice) {
 
 // Unmounts the card.
 void SFIO_vUnMountCallback(int eDevice) {
-    SFIO_vSetCurrentError(fn_8009DBAC(eDevice / 4, eDevice % 4));
+    SFIO_vSetCurrentError(MC_Unmount(eDevice / 4, eDevice % 4));
 }
 
 // Opens the save file; the result is its file number.

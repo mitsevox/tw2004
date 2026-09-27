@@ -32,9 +32,9 @@ void Quat_Slerp(f32* pA, f32* pB, f32 fT) {
     }
     if (1.0f - fCos > 0.01f) {
         fAngle = fn_80009614(fCos);
-        fSin = fn_800095F0(fAngle);
-        fScaleA = fn_800095F0((1.0f - fT) * fAngle) / fSin;
-        fScaleB = fn_800095F0(fT * fAngle) / fSin;
+        fSin = Math_Sin(fAngle);
+        fScaleA = Math_Sin((1.0f - fT) * fAngle) / fSin;
+        fScaleB = Math_Sin(fT * fAngle) / fSin;
     } else {
         fScaleA = 1.0f - fT;
         fScaleB = fT;
@@ -58,7 +58,7 @@ void Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ) {
 
     fTrace = m[2][2] + (m[0][0] + m[1][1]);
     if (fTrace > 0.0f) {
-        fS = fn_80009680(fTrace + 1.0f);
+        fS = Math_Sqrt(fTrace + 1.0f);
         pQ[3] = 0.5f * fS;
         fS = 0.5f / fS;
         pQ[0] = fS * -(m[1][2] - m[2][1]);
@@ -75,7 +75,7 @@ void Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ) {
     }
     j = anNext[i];
     k = anNext[j];
-    fS = fn_80009680(m[i][i] - (m[j][j] + m[k][k]) + 1.0f);
+    fS = Math_Sqrt(m[i][i] - (m[j][j] + m[k][k]) + 1.0f);
     aQ[i] = 0.5f * fS;
     if (fS != 0.0f) {
         fS = 0.5f / fS;
@@ -89,7 +89,7 @@ void Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ) {
     pQ[2] = -aQ[2];
 }
 
-// fake match: puts fn_80009680's double constants (0.0, 0.5, 3.0) in the pool where the original
+// fake match: puts Math_Sqrt's double constants (0.0, 0.5, 3.0) in the pool where the original
 // has them, right after Quat_BuildFromMatrix's (0x80282A98); why EA's pool has them there is unknown.
 static double Quaternion_StrippedFn(double x) {
     double g = 0.0;
@@ -122,14 +122,14 @@ void Quat_EulerAngles(f32 fA, f32 fB, f32 fC, f32* pOut) {
         if (fB != 0.0f) {
             if (fC != 0.0f) {
                 fHalf = 0.5f * fA;
-                fSinA = fn_800095F0(fHalf);
-                fCosA = fn_80009638(fHalf);
+                fSinA = Math_Sin(fHalf);
+                fCosA = Math_Cos(fHalf);
                 fHalf = 0.5f * fB;
-                fSinB = fn_800095F0(fHalf);
-                fCosB = fn_80009638(fHalf);
+                fSinB = Math_Sin(fHalf);
+                fCosB = Math_Cos(fHalf);
                 fHalf = 0.5f * fC;
-                fSinC = fn_800095F0(fHalf);
-                fCosC = fn_80009638(fHalf);
+                fSinC = Math_Sin(fHalf);
+                fCosC = Math_Cos(fHalf);
                 fSS = fSinB * fSinA;
                 fCS = fCosB * fSinA;
                 fSC = fSinB * fCosA;
@@ -141,11 +141,11 @@ void Quat_EulerAngles(f32 fA, f32 fB, f32 fC, f32* pOut) {
                 return;
             }
             fHalf = 0.5f * fA;
-            fSinA = fn_800095F0(fHalf);
-            fCosA = fn_80009638(fHalf);
+            fSinA = Math_Sin(fHalf);
+            fCosA = Math_Cos(fHalf);
             fHalf = 0.5f * fB;
-            fSinB = fn_800095F0(fHalf);
-            fCosB = fn_80009638(fHalf);
+            fSinB = Math_Sin(fHalf);
+            fCosB = Math_Cos(fHalf);
             pOut[3] = fCosB * fCosA;
             pOut[0] = -fSinB * fSinA;
             pOut[1] = fSinB * fCosA;
@@ -154,11 +154,11 @@ void Quat_EulerAngles(f32 fA, f32 fB, f32 fC, f32* pOut) {
         }
         if (fC != 0.0f) {
             fHalf = 0.5f * fA;
-            fSinA = fn_800095F0(fHalf);
-            fCosA = fn_80009638(fHalf);
+            fSinA = Math_Sin(fHalf);
+            fCosA = Math_Cos(fHalf);
             fHalf = 0.5f * fC;
-            fSinC = fn_800095F0(fHalf);
-            fCosC = fn_80009638(fHalf);
+            fSinC = Math_Sin(fHalf);
+            fCosC = Math_Cos(fHalf);
             pOut[3] = fCosC * fCosA;
             pOut[0] = fSinC * fCosA;
             pOut[1] = fSinC * fSinA;
@@ -166,8 +166,8 @@ void Quat_EulerAngles(f32 fA, f32 fB, f32 fC, f32* pOut) {
             return;
         }
         fHalf = 0.5f * fA;
-        fSinA = fn_800095F0(fHalf);
-        pOut[3] = fn_80009638(fHalf);
+        fSinA = Math_Sin(fHalf);
+        pOut[3] = Math_Cos(fHalf);
         pOut[0] = 0.0f;
         pOut[1] = 0.0f;
         pOut[2] = fSinA;
@@ -176,11 +176,11 @@ void Quat_EulerAngles(f32 fA, f32 fB, f32 fC, f32* pOut) {
     if (fB != 0.0f) {
         if (fC != 0.0f) {
             fHalf = 0.5f * fB;
-            fSinB = fn_800095F0(fHalf);
-            fCosB = fn_80009638(fHalf);
+            fSinB = Math_Sin(fHalf);
+            fCosB = Math_Cos(fHalf);
             fHalf = 0.5f * fC;
-            fSinC = fn_800095F0(fHalf);
-            fCosC = fn_80009638(fHalf);
+            fSinC = Math_Sin(fHalf);
+            fCosC = Math_Cos(fHalf);
             pOut[3] = fCosC * fCosB;
             pOut[0] = fSinC * fCosB;
             pOut[1] = fCosC * fSinB;
@@ -188,8 +188,8 @@ void Quat_EulerAngles(f32 fA, f32 fB, f32 fC, f32* pOut) {
             return;
         }
         fHalf = 0.5f * fB;
-        fSinB = fn_800095F0(fHalf);
-        pOut[3] = fn_80009638(fHalf);
+        fSinB = Math_Sin(fHalf);
+        pOut[3] = Math_Cos(fHalf);
         pOut[0] = 0.0f;
         pOut[1] = fSinB;
         pOut[2] = 0.0f;
@@ -197,8 +197,8 @@ void Quat_EulerAngles(f32 fA, f32 fB, f32 fC, f32* pOut) {
     }
     if (fC != 0.0f) {
         fHalf = 0.5f * fC;
-        fSinC = fn_800095F0(fHalf);
-        pOut[3] = fn_80009638(fHalf);
+        fSinC = Math_Sin(fHalf);
+        pOut[3] = Math_Cos(fHalf);
         pOut[0] = fSinC;
         pOut[1] = 0.0f;
         pOut[2] = 0.0f;
@@ -307,13 +307,13 @@ void Quat_BuildFromVector(f32* pRot, f32* pOut) {
     f32 fAngle;
     f32 fScale;
 
-    fAngle = fn_80009680(fn_80009744(pRot));
+    fAngle = Math_Sqrt(Vec3_LengthSqClamped(pRot));
     if (fAngle < 0.001f) {
         fn_80009710(pOut);
         return;
     }
-    pOut[3] = fn_80009638(fAngle / 2.0f);
-    fScale = -(f32)fn_80009680(1.0f - pOut[3] * pOut[3]) / fAngle;
+    pOut[3] = Math_Cos(fAngle / 2.0f);
+    fScale = -(f32)Math_Sqrt(1.0f - pOut[3] * pOut[3]) / fAngle;
     pOut[0] = pRot[0] * fScale;
     pOut[1] = pRot[1] * fScale;
     pOut[2] = pRot[2] * fScale;
@@ -326,9 +326,9 @@ void Quat_BuildFromVectorAndScale(f32* pAxis, f32* pOut, f32 fAngle) {
         fn_80009710(pOut);
         return;
     }
-    pOut[3] = fn_80009638(fAngle / 2.0f);
+    pOut[3] = Math_Cos(fAngle / 2.0f);
     // fake match: fAngle is reused for the axis scale (the original keeps both in one register)
-    fAngle = -(f32)fn_80009680(1.0f - pOut[3] * pOut[3]) / fAngle;
+    fAngle = -(f32)Math_Sqrt(1.0f - pOut[3] * pOut[3]) / fAngle;
     pOut[0] = pAxis[0] * fAngle;
     pOut[1] = pAxis[1] * fAngle;
     pOut[2] = pAxis[2] * fAngle;
@@ -340,8 +340,8 @@ void Legacy_Quat_BuildFromYaw(f32 fAngle, f32* pOut) {
 
     fn_8000972C(pOut);
     fHalf = 0.5f * -fAngle;
-    pOut[2] = fn_800095F0(fHalf);
-    pOut[3] = fn_80009638(fHalf);
+    pOut[2] = Math_Sin(fHalf);
+    pOut[3] = Math_Cos(fHalf);
 }
 
 // A rotation by -fAngle about y, as a quaternion into pOut.
@@ -350,8 +350,8 @@ void Legacy_Quat_BuildFromPitch(f32 fAngle, f32* pOut) {
 
     fn_8000972C(pOut);
     fHalf = 0.5f * -fAngle;
-    pOut[1] = fn_800095F0(fHalf);
-    pOut[3] = fn_80009638(fHalf);
+    pOut[1] = Math_Sin(fHalf);
+    pOut[3] = Math_Cos(fHalf);
 }
 
 // A rotation by -fAngle about x, as a quaternion into pOut.
@@ -360,8 +360,8 @@ void Legacy_Quat_BuildFromRoll(f32 fAngle, f32* pOut) {
 
     fn_8000972C(pOut);
     fHalf = 0.5f * -fAngle;
-    pOut[0] = fn_800095F0(fHalf);
-    pOut[3] = fn_80009638(fHalf);
+    pOut[0] = Math_Sin(fHalf);
+    pOut[3] = Math_Cos(fHalf);
 }
 
 // The three angles of a unit quaternion, into *pA, *pB and *pC (the middle one from an asin,
@@ -382,7 +382,7 @@ void Quat_ExtractEulerAngles(f32* pQ, f32* pA, f32* pB, f32* pC) {
     *pC = atan(fTanC);
 }
 
-f32 fn_800095F0(f32 fAngle) {
+f32 Math_Sin(f32 fAngle) {
     return sin(fAngle);
 }
 
@@ -390,7 +390,7 @@ f32 fn_80009614(f32 x) {
     return acos(x);
 }
 
-f32 fn_80009638(f32 fAngle) {
+f32 Math_Cos(f32 fAngle) {
     return cos(fAngle);
 }
 
@@ -400,7 +400,7 @@ f32 fn_8000965C(f32 x) {
 
 // Square root: four Newton steps from the reciprocal-root estimate; 0 for 0, NaN for a negative
 // x or a NaN (the infinity at the end is never reached).
-double fn_80009680(double x) {
+double Math_Sqrt(double x) {
     double g;
 
     if (x > 0.0) {
@@ -434,7 +434,7 @@ void fn_8000972C(f32* pQ) {
 }
 
 // The vector's squared length, at most FLT_MAX.
-f32 fn_80009744(f32* pVec) {
+f32 Vec3_LengthSqClamped(f32* pVec) {
     f32 f;
 
     f = pVec[0] * pVec[0] + pVec[1] * pVec[1] + pVec[2] * pVec[2];

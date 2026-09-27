@@ -14,12 +14,12 @@
 
 void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen);    // returns pDst
 void* fn_80005884(void* pDst, const void* pSrc, u32 uLen); // a copy the ranges may overlap in
-void* fn_80005AE8(void* pDst, int nValue, u32 uLen);      // memset; returns pDst
+void* Mem_set(void* pDst, int nValue, u32 uLen);      // memset; returns pDst
 int   fn_80005BC8(const void* pA, const void* pB, u32 uLen);   // memcmp
 // Allocates (StaticMemory.c): nMode picks the system heap or a part of the static heap (see there).
-void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine);
-void  fn_80009E70(void* p);             // free
-void  fn_8000A0AC(s32 v);               // } a value TibExtMemAlloc passes on as fn_80009B34's nMode
+void* StaticMem_Alloc(int nSize, int nMode, int nAlign, const char* pFile, int nLine);
+void  StaticMem_Free(void* p);             // free
+void  fn_8000A0AC(s32 v);               // } a value TibExtMemAlloc passes on as StaticMem_Alloc's nMode
 s32   fn_8000A0B4(void);                // } (EASportsBio.c sets 0 while the Bio starts, then 2)
 void  fn_8000A0BC(void);                // start a new count of the bytes taken
 void  fn_8000A0C8(void);                // } counting on / off
@@ -85,7 +85,7 @@ u64  TI_sReadCounter(int nWatch);           // the reading
 f32  fn_8006E118(u64 uNow, u64 uLast);  // seconds between two readings (gomainloop.c)
 void TI_vResetCounter(int nWatch);           // reset to 0
 // Pack up to 12 characters of pName into a 64-bit code (base 40, table lbl_80191520).
-int   fn_800CB700(u64* pId, const char* pName);
+int   SKA_PackName(u64* pId, const char* pName);
 // And back: the 12 characters a code was made from (table lbl_80191720); szName takes 13 bytes.
 void  fn_800CB868(u64* pId, char* szName);
 void  fn_800CB8F0(u64* pId, char* szName);      // for a code stored with its bytes reversed
@@ -132,11 +132,11 @@ void RTClock_GetDateTimeString(char* szOut);   // "M/D/YYYY H:MM AM"
 #define DEG(x) ((x) * (PI / 180.0f))
 
 void Vec3Copy(const f32* pSrc, f32* pDst);   // 0x80008304 (const: see code_800082F8.c)
-f32  fn_800095F0(f32 fAngle);           // sin
-f32  fn_80009638(f32 fAngle);           // cos
+f32  Math_Sin(f32 fAngle);           // sin
+f32  Math_Cos(f32 fAngle);           // cos
 f32  fn_8000965C(f32 x);                // asin
-double fn_80009680(double x);           // sqrt
-f32  fn_80009744(f32* pVec);            // dot with itself (at most FLT_MAX)
+double Math_Sqrt(double x);           // sqrt
+f32  Vec3_LengthSqClamped(f32* pVec);            // dot with itself (at most FLT_MAX)
 extern f32 __float_max[];               // FLT_MAX (MSL's)
 void Vec_Copy(const f32* pSrc, f32* pDst);   // 0x8000AD10 (const: see Vec3Copy)
 f32  atan2f(f32 y, f32 x);         // atan2f
@@ -167,9 +167,9 @@ void Legacy_Quat_BuildFromRoll(f32 fAngle, f32* pOut); // the quaternion of a ro
 void fn_80009710(f32* pQ);              // the identity quaternion (0, 0, 0, 1)
 f32  fn_80029B64(f32 x);                // square root (Skeleton.c); x itself when x <= 0
 void fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b
-f32  fn_8000C5FC(f32* pA, f32* pB);     // dot product
+f32  Vec3_Dot(f32* pA, f32* pB);     // dot product
 f32  fn_80009614(f32 x);                // arc cosine
-void fn_8000AE28(f32 f, f32* pIn, f32* pOut);   // scale a vector (four floats)
+void Vec_Scale(f32 f, f32* pIn, f32* pOut);   // scale a vector (four floats)
 void fn_8000AE6C(f32* pA, f32* pB, f32 fScale, f32* pOut);   // out = a + fScale x b (four floats)
 double pow(double x, double y);         // 0x8015F824 (MSL)
 f32  powf(f32 x, f32 y);                // 0x8002C8D0 (Golfer.c): pow rounded to a float
@@ -497,7 +497,7 @@ typedef struct RenderState {
     s32  n24;                   // 0x024  2 at reset
     f32  f28;                   // 0x028  } bit 0x8, with c30. fn_80035398 sets all three from
     f32  f2C;                   // 0x02C  } lbl_802811E0
-    GXColor c30;                // 0x030  the fog colour (fn_80015624): three bytes given, the
+    GXColor c30;                // 0x030  the fog colour (RenderState_Apply): three bytes given, the
                                 //        fourth always 0x80; all 0xFF at reset
     f32  m34[4][4];             // 0x034  } set to identity at reset
     f32  m74[4][4];             // 0x074  }
@@ -531,7 +531,7 @@ typedef struct RenderState {
 LAYOUT_ASSERT(RenderState, 0x118);
 
 extern RenderState lbl_801B8980;
-void fn_80015624(void);                 // hand GX the groups of lbl_801B8980 that changed
+void RenderState_Apply(void);                 // hand GX the groups of lbl_801B8980 that changed
 
 // A pool of 20 blocks of 0x1000 bytes (our names; lbl_801A4900, 0x14080 bytes, reached through
 // the pointer lbl_80280E00). fn_80015470 frees them all; fn_800154F4 moves nNext past the used ones.
@@ -1343,10 +1343,10 @@ typedef struct TrailMeshDescEx {
 } TrailMeshDescEx;
 
 int  fn_80012FA4(void);                 // controller init
-void fn_80012EF8(void);
-void fn_80012F18(int a);
-void fn_80012F34(int a);
-void fn_80012F50(int a, int b, int c);
+void RenderState_Flush(void);
+void RenderState_SetDepthFunc(int a);
+void RenderState_SetDepthWrite(int a);
+void RenderState_SetAlphaTest(int a, int b, int c);
 void fn_80013030(void);
 u32  fn_80013050(int nChan);            // the pad's device type (SIProbe)
 u8   fn_80013070(int nChan);            // a controller the game takes is plugged in
@@ -1356,8 +1356,8 @@ void fn_80013130(int nController, int nStrength);   // rumble strength
 void fn_800131C4(int nController);      // rumble off
 void fn_80013400(void);                 // read the controllers
 u8*  fn_800136C4(int nController);      // the pad's state: stick bytes at +0, +2, +3
-u32  fn_800136DC(int nController);      // buttons: held << 16 | pressed this frame
-void fn_80014118(int a);
+u32  Controller_GetButtons(int nController);      // buttons: held << 16 | pressed this frame
+void RenderState_SetDrawFlags(int a);
 // A screen quad (GameEffects' letter boxes, GxUtil.c's alpha clear): fn_800141F8 fills its corners
 // (x0, y0)-(x1, y1), fn_80014194 sets its colour (four floats), fn_8001644C draws it.
 void fn_80014194(f32* pColour);
@@ -1366,7 +1366,7 @@ void fn_800141F8(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_8001425C(int a);
 void fn_8001644C(int a, f32* pXY, f32* pColour, f32* pUV, int c);
 void fn_800BA74C(u8 bFade);             // ScreenClear.c: a black screen for 1, 2 or 30 frames
-u32  fn_800142AC(int nButton, u8 bShift);   // a button's mask (bShift: moved up 16 bits)
+u32  Controller_GetButtonMask(int nButton, u8 bShift);   // a button's mask (bShift: moved up 16 bits)
 extern s8   lbl_80281C98;               // GoRenderCtx_Gc.c: the row of lbl_80186AF0 in use (fn_800142A4)
 extern u32  lbl_80186AF0[][0xE8 / 4];   // GoRenderCtx_Gc.c: rows of button masks, by button
 u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
@@ -1403,7 +1403,7 @@ extern FadeNode* lbl_80281FA0;
 
 void fn_8001C804(int nPlayer, u8 a, u8 b);  // char.c: sets bits of the player's character's u10
 void fn_8001D8DC(int nPlayer);
-void fn_8001EF34(f32 f, f32* pIn, f32* pOut);   // scale a vector (paired singles)
+void Vec3_Scale(f32 f, f32* pIn, f32* pOut);   // scale a vector (paired singles)
 
 void fn_80045494(u8 bOn, int nPlayer);
 void fn_80045558(u8 bOn, int nPlayer);
@@ -1447,7 +1447,7 @@ void fn_800A77E0(f32 f);                // } the options menu passes them 0.2 x 
 void fn_800A78F0(f32 f);                // } and a0[1] (FE_MessageTable.c, GameUICommands.c)
 void fn_800A7924(f32 f);                // }
 void Vec_Normalize(f32* pSrc, f32* pDst);
-void fn_800BAF04(f32* pSrc, f32* pDst);   // normalise
+void Vec_NormalizeTo(f32* pSrc, f32* pDst);   // normalise
 void fn_800B5918(const f32* pSrc, f32* pDst);   // GoShaderObject_Rain_Gc.c: copy three floats
 f32  fn_800BAFC0(f32* pSrc, f32* pDst);   // VecMath.c: normalises pSrc into pDst, gives its length
 f32  Vec_Distance(f32* pA, f32* pB);

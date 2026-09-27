@@ -190,7 +190,7 @@ void Golfer_UnregisterStatsHandler(void) {
 void Golfer_OnStatsLoaded(UStreamObject* pObject) {
     Mem_cpy(gGolferTable, pObject->pData, pObject->uSize);
     Golfer_TableByteSwap();
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
     Golfer_TableSetup();
 }
 
@@ -322,7 +322,7 @@ void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int b
             p->nView[1] = 2;
             fn_8001704C(p->nView[1], nPlayer);
             nView = p->nView[1];
-            CameraController_SetCameraMode(fn_80017028(nView), 0x19, nPlayer, nView);
+            CameraController_SetCameraMode(ViewController_GetCameraController(nView), 0x19, nPlayer, nView);
         } else {
             p->nView[1] = 0;
             fn_8001704C(p->nView[1], nPlayer);
@@ -517,7 +517,7 @@ void Session_OnRecordsLoaded(UStreamObject* pObject) {
     // port: the records are big-endian on disc and copied straight over the course-record structs;
     // a little-endian port converts them field by field here.
     Mem_cpy(gSession.aCourseRecord, pObject->pData, pObject->uSize);
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 void Session_RegisterRecordsHandler(void) {

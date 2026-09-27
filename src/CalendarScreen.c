@@ -163,7 +163,7 @@ void fn_801124D0(MsgArg* pArgs, MsgArg* pResult) {
 
 // A square root.
 void fn_80112548(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->f = fn_80009680(pArgs[0].f);
+    pResult->f = Math_Sqrt(pArgs[0].f);
 }
 
 void fn_80112580(MsgArg* pArgs, MsgArg* pResult) {

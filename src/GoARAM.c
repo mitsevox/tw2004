@@ -55,7 +55,7 @@ ARAMHeap* GoARAM_HeapInit(u32 uSize, u32 uBase, u32 nBlocks, ARAMHeap* pHeap) {
 
 void fn_800B5D08(ARAMHeap* pHeap) {
     if (pHeap->p20 != NULL) {
-        fn_80009E70(pHeap->p20);
+        StaticMem_Free(pHeap->p20);
     }
 }
 
@@ -294,7 +294,7 @@ void GoARAM_Init(void) {
     lbl_802814C8->p8 = fn_800951A0(ARAM_NUM_TRANSFERS * sizeof(ARAMTransfer), 16, 1);
     lbl_802814C8->nTransfers = ARAM_NUM_TRANSFERS;
     if (lbl_802814C8->p8 == NULL) {
-        lbl_802814C8->p18 = fn_80009B34(ARAM_NUM_TRANSFERS * sizeof(ARAMTransfer), 2, 16, "GoARAM.c", 192);
+        lbl_802814C8->p18 = StaticMem_Alloc(ARAM_NUM_TRANSFERS * sizeof(ARAMTransfer), 2, 16, "GoARAM.c", 192);
         lbl_802814C8->pTransfers = lbl_802814C8->p18;
     } else {
         lbl_802814C8->p18 = NULL;
@@ -323,7 +323,7 @@ void GoARAM_Init(void) {
 
 void GoARAM_Shutdown(void) {
     if (lbl_802814C8->p18 != NULL) {
-        fn_80009E70(lbl_802814C8->p18);
+        StaticMem_Free(lbl_802814C8->p18);
         lbl_802814C8->p18 = NULL;
     }
     fn_8009527C(lbl_802814C8->p8);

@@ -256,9 +256,9 @@ void SW_vInitModule(void) {
         gPlayers[i].swing.fAlpha = 0.0f;
     }
     for (i = 0; i < 2; i++) {
-        gpSwing->p94[i] = fn_80009B34(0x138, 2, 0x10, "Swing.c", 555);
-        gpSwing->p9C[i] = fn_80009B34(0x68, 2, 0x10, "Swing.c", 556);
-        gpSwing->pA4[i] = fn_80009B34(0xD0, 2, 0x10, "Swing.c", 557);
+        gpSwing->p94[i] = StaticMem_Alloc(0x138, 2, 0x10, "Swing.c", 555);
+        gpSwing->p9C[i] = StaticMem_Alloc(0x68, 2, 0x10, "Swing.c", 556);
+        gpSwing->pA4[i] = StaticMem_Alloc(0xD0, 2, 0x10, "Swing.c", 557);
     }
 }
 
@@ -267,9 +267,9 @@ void fn_80058DB4(void) {
     fn_800360A0(gpSwing->mesh[0]);
     fn_800360A0(gpSwing->mesh[1]);
     for (i = 0; i < 2; i++) {
-        fn_80009E70(gpSwing->p94[i]);
-        fn_80009E70(gpSwing->p9C[i]);
-        fn_80009E70(gpSwing->pA4[i]);
+        StaticMem_Free(gpSwing->p94[i]);
+        StaticMem_Free(gpSwing->p9C[i]);
+        StaticMem_Free(gpSwing->pA4[i]);
     }
 }
 
@@ -486,7 +486,7 @@ u8 Swing_UpdateBackswing(int nPlayer) {
         } else {
             int nDX = Swing_DeadZone(nX);
             int nDY = Swing_DeadZone(nY);
-            fMag = (f32)fn_80009680((nDX - 128) * (nDX - 128) + (nDY - 128) * (nDY - 128));
+            fMag = (f32)Math_Sqrt((nDX - 128) * (nDX - 128) + (nDY - 128) * (nDY - 128));
         }
         if (fMag > 100.0f) {
             fMag = 100.0f;
@@ -779,8 +779,8 @@ void fn_8005A0FC(int nPlayer) {
     f32        v8[4];
     Character*   pObj = gPlayers[nPlayer].pChar;
     SwingData* pSw  = &gPlayers[nPlayer].swing;
-    int        nHead = fn_8001EED8(pObj->pModel, 0x53);
-    int        nGrip = fn_8001EED8(pObj->pModel, 0x52);
+    int        nHead = CharModel_GetBoneIndex(pObj->pModel, 0x53);
+    int        nGrip = CharModel_GetBoneIndex(pObj->pModel, 0x52);
     f32        f;                  // the head's move, then the blend step
     f32        fLen;
     int        k;
@@ -788,7 +788,7 @@ void fn_8005A0FC(int nPlayer) {
 
     Vec_Copy(pObj->pModel->pMatrices[nHead][3], v98);
     Vec_Sub(v98, pSw->prevClub[0].vClubPos, vB8);
-    f = fn_80009680(fn_8005CC18(vB8));
+    f = Math_Sqrt(fn_8005CC18(vB8));
     Vec_Copy(v98, vA8);
     if (f > 0.3f && pSw->nNumInBlurQueue != 0) {
         v18[3] = 0.0f;
@@ -800,11 +800,11 @@ void fn_8005A0FC(int nPlayer) {
         Vec_Sub(v68, v58, v48);
         Vec_Sub(v88, v78, v38);
         Vec_Sub(v88, v68, v8);
-        fLen = fn_80009680(fn_8005CC18(v8));
+        fLen = Math_Sqrt(fn_8005CC18(v8));
         for (i = 1; i <= 5; i++) {
             f = (f32)i / 5.0f;
-            fn_8001EF34(f, v38, v18);
-            fn_8001EF34(f, v48, v28);
+            Vec3_Scale(f, v38, v18);
+            Vec3_Scale(f, v48, v28);
             Vec_Add(v18, v78, v18);
             Vec_Add(v28, v58, v28);
             Vec_Sub(v18, v28, v8);
@@ -812,7 +812,7 @@ void fn_8005A0FC(int nPlayer) {
                 v8[3] = 0.0f;
                 Vec_Normalize(v8, v8);
             }
-            fn_8001EF34(fLen, v8, v8);
+            Vec3_Scale(fLen, v8, v8);
             Vec_Add(v8, v28, v8);
             for (k = 24; k > 0; k--) {
                 Mem_cpy(&pSw->prevClub[k], &pSw->prevClub[k - 1], sizeof(pSw->prevClub[k]));
@@ -844,7 +844,7 @@ void fn_8005A0FC(int nPlayer) {
 // one side.
 void fn_8005A478(int nPlayer) {
     Character*   pObj  = gPlayers[nPlayer].pChar;
-    int        nBone = fn_8001EED8(pObj->pModel, 0x53);
+    int        nBone = CharModel_GetBoneIndex(pObj->pModel, 0x53);
     SwingData* pSw;
     int        nStickX;
     u8*        pPad;
@@ -944,7 +944,7 @@ void fn_8005A850(int nPlayer) {
     pSw   = &gPlayers[nPlayer].swing;
     pObj  = gPlayers[nPlayer].pChar;
     nView = gPlayers[nPlayer].nView[0];
-    nGrip = fn_8001EED8(pObj->pModel, 0x52);
+    nGrip = CharModel_GetBoneIndex(pObj->pModel, 0x52);
     if (Player_IsCPU(nPlayer)) {
         if (Game_GetMode() != 11) return;
         if (fn_8005CC5C() != 8) {
@@ -989,17 +989,17 @@ void fn_8005A850(int nPlayer) {
             }
             fn_80035138(0);
             fn_80016B9C();
-            fn_80013EEC(fn_8001614C());
-            fn_80014118(0x50);
-            fn_80035118(4, 5);
-            fn_80012F50(0, 6, 0x80);
-            fn_80012F34(0);
+            fn_80013EEC(Camera_GetCurrent());
+            RenderState_SetDrawFlags(0x50);
+            RenderState_SetBlendFactors(4, 5);
+            RenderState_SetAlphaTest(0, 6, 0x80);
+            RenderState_SetDepthWrite(0);
             if (pObj->nAnim == 6) {
                 fn_8005CC64(gpSwing->pBank, gpSwing->pClubBack);
             } else if (pObj->nAnim == 7) {
                 fn_8005CC64(gpSwing->pBank, gpSwing->pClubDown);
             }
-            fn_80012EF8();
+            RenderState_Flush();
             draw.nPrims   = 1;
             draw.nFirst   = 0;
             draw.nCount   = pSw->nNumInBlurQueue + 1;
@@ -1012,9 +1012,9 @@ void fn_8005A850(int nPlayer) {
             mesh.pUV      = gpSwing->pA4[nView];
             fn_80036100((ShaderObject*)gpSwing->mesh[nView], &mesh, 1);
             fn_800360D4(gpSwing->mesh[nView]);
-            fn_80012F50(1, 6, 0x80);
-            fn_80012F34(1);
-            fn_80012EF8();
+            RenderState_SetAlphaTest(1, 6, 0x80);
+            RenderState_SetDepthWrite(1);
+            RenderState_Flush();
         }
     }
 }
@@ -1033,9 +1033,9 @@ void SW_vUIAdjustClub(Character* pObj, SwingData* pSw, int nStickX) {
     f32 fDelta;
     f32 fRate;
     f32 vRot[3];
-    fn_8001EEE4(pObj->pModel, 0x24);
-    fn_8001EEE4(pObj->pModel, 0x11);
-    fn_8001EED8(pObj->pModel, 0x52);
+    CharModel_GetBoneIndexMapped(pObj->pModel, 0x24);
+    CharModel_GetBoneIndexMapped(pObj->pModel, 0x11);
+    CharModel_GetBoneIndex(pObj->pModel, 0x52);
     if (pObj->nAnim == 6) {
         fAmount = (pObj->fAnimTime - pSw->fTimeSwingStart) / (pSw->fTimeSwingTop - pSw->fTimeSwingStart);
         fAmount *= fAmount;
@@ -1137,7 +1137,7 @@ void SW_vSetSwingStrength(int nPlayer) {
     f32  fPower = gPlayers[nPlayer].pChar->fBackswing;
     f32  fPenalty;
     if (!Player_IsCPU(nPlayer)) {
-        fPower = (f32)fn_80009680(fPower);
+        fPower = (f32)Math_Sqrt(fPower);
     }
     if (1.0f - fPower < 0.03f) {
         fPower = 1.0f;
@@ -1294,8 +1294,8 @@ void Swing_FaceVector(int nPlayer, f32* pOut) {
         fAngle = fn_8005CC84((fTopX - fCentreX) / fDY);
         gPlayers[nPlayer].swing.fControllerSliceAngle = fAngle;
         fAngle = Swing_CurveAngle(&gPlayers[nPlayer].nClub, fAngle);
-        fSin   = fn_800095F0(fAngle);
-        fCos   = fn_80009638(fAngle);
+        fSin   = Math_Sin(fAngle);
+        fCos   = Math_Cos(fAngle);
         pOut[0] = -fSin;
         pOut[1] = 0.0f;
         pOut[2] = fCos;
@@ -1456,11 +1456,11 @@ void SW_vCheckForSwingBoost(int nPlayer) {
 
     if (Player_IsCPU(nPlayer)) return;
     if (gSession.options.bBoostEnabled == 0) return;
-    uButtons    = fn_800136DC(gPlayers[nPlayer].nController);
+    uButtons    = Controller_GetButtons(gPlayers[nPlayer].nController);
     nY   = Swing_StickY(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));
     nX   = Swing_StickX(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));
-    fMag = (f32)fn_80009680((nX - 128) * (nX - 128) + (nY - 128) * (nY - 128));
-    if ((uButtons & fn_800142AC(0x1F, 0)) && fMag > 93.0f) {
+    fMag = (f32)Math_Sqrt((nX - 128) * (nX - 128) + (nY - 128) * (nY - 128));
+    if ((uButtons & Controller_GetButtonMask(0x1F, 0)) && fMag > 93.0f) {
         if (gPlayers[nPlayer].swing.nPowerBoost < 8) {
             (gPlayers[nPlayer].swing.nPowerBoost)++;
             EVENT_Trigger(nPlayer, 0x2D, 0, 0);
@@ -1539,8 +1539,8 @@ void Swing_SpinInput(int nPlayer) {
     int     nX, nY;
     if (Player_IsCPU(nPlayer)) return;
     if (gSession.options.bSpinEnabled == 0) return;
-    uButtons    = fn_800136DC(gPlayers[nPlayer].nController);
-    if (!(uButtons & fn_800142AC(0x20, 0))) return;
+    uButtons    = Controller_GetButtons(gPlayers[nPlayer].nController);
+    if (!(uButtons & Controller_GetButtonMask(0x20, 0))) return;
     if (gPlayers[nPlayer].swing.bCanSpin == 0) return;
     EVENT_Trigger(nPlayer, 0x2E, 0, 0);
     nX = Swing_StickX(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));

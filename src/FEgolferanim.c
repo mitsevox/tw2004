@@ -109,7 +109,7 @@ void fn_8008AD80(void);
 
 void fn_80007254(void);
 void fn_80008380(void);
-void fn_8000ADC0(f32 (*m)[4]);          // identity matrix
+void Mtx_Identity(f32 (*m)[4]);          // identity matrix
 void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
@@ -149,7 +149,7 @@ void fn_8008AD80(void) {
     int nPrev;
     int nNext;
 
-    lbl_80281EE0 = fn_80009B34(sizeof(CrAPState), 2, 0, "FEgolferanim.c", 337);
+    lbl_80281EE0 = StaticMem_Alloc(sizeof(CrAPState), 2, 0, "FEgolferanim.c", 337);
     lbl_80281EE0->n0 = 0;
     lbl_80281EE0->n4 = 0;
     lbl_80281EE0->n1B8 = 0;
@@ -220,7 +220,7 @@ void fn_8008B00C(void) {
     fn_8008B820();
     fn_8008DBE8();
     fn_8008DC10();
-    fn_80009E70(lbl_80281EE0);
+    StaticMem_Free(lbl_80281EE0);
     lbl_80281EE0 = NULL;
 }
 
@@ -511,9 +511,9 @@ int fn_8008B990(void) {
 void fn_8008B9A0(void) {
     View* pView;
 
-    pView = fn_80017028(fn_80016D10());
+    pView = ViewController_GetCameraController(fn_80016D10());
     fn_80016E90(fn_80016D10());
-    fn_8000ADC0(lbl_80281EE0->mC0);
+    Mtx_Identity(lbl_80281EE0->mC0);
     Vec_Copy(pView->v0, lbl_80281EE0->v100);
     Vec_Copy(pView->v10, lbl_80281EE0->v110);
     switch (lbl_80281EE0->n0) {
@@ -554,7 +554,7 @@ void sFE_AdjustAndSetGolferPosition(void) {
     int i;
 
     fBlend = 1.0f;
-    pView = fn_80017028(fn_80016D10());
+    pView = ViewController_GetCameraController(fn_80016D10());
     fn_8008F24C();
     fn_800364A0();
     for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
@@ -726,9 +726,11 @@ void sFE_AdjustAndSetGolferPosition(void) {
     // fn_8008E254.
     if (lbl_80281EE0->pB4->pChar != NULL && lbl_80281EE0->n0 == 3) {
         if (lbl_80281EE0->b1C8 == 0) {
-            if (fn_80014300(fn_800142AC(0x33, 0)) || fn_80014300(fn_800142AC(0x33, 1))) {
+            if (fn_80014300(Controller_GetButtonMask(0x33, 0))
+                || fn_80014300(Controller_GetButtonMask(0x33, 1))) {
                 fn_8008E0B0(0.05f);
-            } else if (fn_80014300(fn_800142AC(0x34, 0)) || fn_80014300(fn_800142AC(0x34, 1))) {
+            } else if (fn_80014300(Controller_GetButtonMask(0x34, 0))
+                       || fn_80014300(Controller_GetButtonMask(0x34, 1))) {
                 fn_8008E0B0(-0.05f);
             } else {
                 fn_8008E0B0(0.0f);
@@ -737,7 +739,8 @@ void sFE_AdjustAndSetGolferPosition(void) {
             fn_8008E0B0(0.0f);
         }
         if (lbl_80281EE0->b1C8 == 0 && lbl_80281EE0->n8 == 0
-            && (fn_80014300(fn_800142AC(0x35, 0)) || fn_80014300(fn_800142AC(0x35, 1)))) {
+            && (fn_80014300(Controller_GetButtonMask(0x35, 0))
+                || fn_80014300(Controller_GetButtonMask(0x35, 1)))) {
             fn_8008E254(1);
         } else {
             fn_8008E254(0);
@@ -809,8 +812,8 @@ void sFE_AdjustAndSetGolferPosition(void) {
         }
         fn_80008380();
         if (lbl_80281EE0->pB4->nC == 7 || lbl_80281EE0->pB4->nC == 29) {
-            if (fn_80077ACC()->nGolferOutfit >= 0) {
-                fn_800B9EB8(fn_800484E0(fn_80077ACC()->nGolferOutfit));
+            if (FE_GetCurrentProfile()->nGolferOutfit >= 0) {
+                fn_800B9EB8(fn_800484E0(FE_GetCurrentProfile()->nGolferOutfit));
             } else {
                 fn_800B9EB8(NULL);
             }
@@ -836,7 +839,7 @@ void sFE_AdjustAndSetGolferPosition(void) {
             // own, which sit in p44's entry 21 (port: read as LightParams, both 0x30 bytes).
             pLight = (LightParams*)&lbl_80281EE0->pB4->pChar->p44[21];
             if (lbl_80281EE0->n0 == 1 && lbl_80281EE0->b83) {
-                fn_80005AE8(&params, 0, sizeof(params));
+                Mem_set(&params, 0, sizeof(params));
                 fn_80093854(&params);
             } else {
                 fn_80093854(pLight);
@@ -882,21 +885,21 @@ void fn_8008C93C(void) {
     f32 xy[8] = { 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
     f32 colour[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-    fn_80012F50(0, 6, 0x80);
-    fn_80012F18(7);
-    fn_80012F34(1);
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_SetDepthFunc(7);
+    RenderState_SetDepthWrite(1);
     fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 1, 1);
-    fn_80013EEC(fn_8001614C());
+    fn_80013EEC(Camera_GetCurrent());
     fn_8001425C(0);
     fn_80014194(colour);
-    fn_80014118(0);
-    fn_80012EF8();
+    RenderState_SetDrawFlags(0);
+    RenderState_Flush();
     fn_8001644C(0xA1, xy, 0, NULL, 2);
-    fn_80012F18(3);
-    fn_80012F34(1);
+    RenderState_SetDepthFunc(3);
+    RenderState_SetDepthWrite(1);
     fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
-    fn_80013EEC(fn_8001614C());
-    fn_80012EF8();
+    fn_80013EEC(Camera_GetCurrent());
+    RenderState_Flush();
 }
 
 // Draw the screen-copy texture (lbl_801D8714) as a quad in grey, its alpha lbl_80281EE0->f14C.
@@ -905,22 +908,22 @@ void fn_8008CA88(void) {
     f32 colour[4] = { 0.5f, 0.5f, 0.5f, 0.5f };
     f32 uv[8] = { 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
 
-    fn_80012F50(0, 6, 0x80);
-    fn_80012F18(7);
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_SetDepthFunc(7);
     fn_80035098(0);
-    fn_80035118(4, 5);
+    RenderState_SetBlendFactors(4, 5);
     fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
-    fn_80013EEC(fn_8001614C());
-    fn_80014118(0x50);
+    fn_80013EEC(Camera_GetCurrent());
+    RenderState_SetDrawFlags(0x50);
     fn_8001425C(0);
     colour[3] = lbl_80281EE0->f14C;
     fn_80014194(colour);
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
     fn_8002A608(&lbl_801D8714);
-    fn_80012EF8();
+    RenderState_Flush();
     fn_8001644C(0xA1, xy, 0, uv, 2);
     fn_80016B54(512, 448, 1.0f, 1.0f);
-    fn_80012EF8();
+    RenderState_Flush();
 }
 
 // Draw two quads, the first in black at half alpha, the second in (0, 0, 0, 0), then set the
@@ -931,27 +934,27 @@ void fn_8008CC30(void) {
     f32 colour1[4] = { 0.0f, 0.0f, 0.0f, 0.5f };
     f32 colour2[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-    fn_80012F50(0, 6, 0x80);
-    fn_80012F18(7);
-    fn_80012F34(0);
-    fn_80035118(4, 5);
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_SetDepthFunc(7);
+    RenderState_SetDepthWrite(0);
+    RenderState_SetBlendFactors(4, 5);
     fn_80035098(0);
     fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 4, 1);
-    fn_80013EEC(fn_8001614C());
+    fn_80013EEC(Camera_GetCurrent());
     fn_8001425C(0);
     fn_80014194(colour1);
-    fn_80014118(0);
-    fn_80012EF8();
+    RenderState_SetDrawFlags(0);
+    RenderState_Flush();
     fn_8001644C(0xA1, xy1, 0, NULL, 2);
     fn_80014194(colour2);
-    fn_80012F18(3);
-    fn_80012EF8();
+    RenderState_SetDepthFunc(3);
+    RenderState_Flush();
     fn_8001644C(0xA1, xy2, 0, NULL, 2);
-    fn_80012F18(3);
-    fn_80012F34(1);
+    RenderState_SetDepthFunc(3);
+    RenderState_SetDepthWrite(1);
     fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
-    fn_80013EEC(fn_8001614C());
-    fn_80012EF8();
+    fn_80013EEC(Camera_GetCurrent());
+    RenderState_Flush();
 }
 
 // Copy the frame buffer's golfer (from (128, 0), 384 x 448) into the screen-copy texture.
@@ -974,24 +977,24 @@ void fn_8008CE88(u8 bFull) {
         fn_80035FDC(NULL);
         fn_80035240(lbl_80281EE0->mC0);
         fn_800352BC();
-        fn_80013CCC(fn_8001614C());
+        fn_80013CCC(Camera_GetCurrent());
         fn_80016B9C();
         fn_80035138(1);
-        fn_80012F50(1, 6, 1);
+        RenderState_SetAlphaTest(1, 6, 1);
         if (bFull) {
             fn_800140E8(1, 384, 528, 0, 1, 1);
         } else {
             fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 1, 1);
         }
-        fn_80013EEC(fn_8001614C());
-        fn_80012EF8();
-        fn_80012F34(1);
-        fn_80012F18(3);
-        fn_80012EF8();
+        fn_80013EEC(Camera_GetCurrent());
+        RenderState_Flush();
+        RenderState_SetDepthWrite(1);
+        RenderState_SetDepthFunc(3);
+        RenderState_Flush();
         if (lbl_80281EE0->n0 == 3) {
             fn_800760B0(0, 0, 512, 448.0f * lbl_80281348);
         }
-        fn_80012EF8();
+        RenderState_Flush();
         if (lbl_80281EE0->n8 == 0) {
             fn_80035754(lbl_80281EE0->pB4->pChar);
         } else if (lbl_80281EE0->n8 == 1) {
@@ -999,8 +1002,8 @@ void fn_8008CE88(u8 bFull) {
         }
         fn_80035FBC();
         fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
-        fn_80013EEC(fn_8001614C());
-        fn_80012EF8();
+        fn_80013EEC(Camera_GetCurrent());
+        RenderState_Flush();
     }
     if (lbl_80281EE0->pB4->b18 && lbl_80281EE0->b86 == 0) {
         lbl_80281340 = lbl_80281EE0->pB4->nC;
@@ -1049,7 +1052,7 @@ void fn_8008D058(void) {
     case 4:
         lbl_80281EE0->f19C = 0.0f;
         lbl_80281EE0->f1A0 = 0.0f;
-        fn_8008EA44(fn_80077ACC()->choices.n113);
+        fn_8008EA44(FE_GetCurrentProfile()->choices.n113);
         fn_800957FC(lbl_80281EE0->pB4->pChar, 1);
         fn_800957B0(lbl_80281EE0->pB4->pChar, 1);
         fn_8001C5B4(lbl_80281EE0->pB4->pChar, 3);
@@ -1132,15 +1135,15 @@ void fn_8008D6CC(void) {
     u8 bBall;
 
     pModel = lbl_80281EE0->pB4->pChar->pModel;
-    pBone1 = &pModel->pBones[fn_8001EED8(pModel, 1)];
-    pBone52 = &pModel->pBones[fn_8001EED8(pModel, 0x52)];
-    fn_8001EED8(pModel, 0x54);              // EA looks bone 0x54 up here without using it
+    pBone1 = &pModel->pBones[CharModel_GetBoneIndex(pModel, 1)];
+    pBone52 = &pModel->pBones[CharModel_GetBoneIndex(pModel, 0x52)];
+    CharModel_GetBoneIndex(pModel, 0x54);              // EA looks bone 0x54 up here without using it
     bBall = fn_8001DBF4(lbl_80281EE0->pB4->pChar);
     if (lbl_80281EE0->b85 == 0) {
         return;
     }
     if (bBall) {
-        pBone54 = &pModel->pBones[fn_8001EED8(pModel, 0x54)];
+        pBone54 = &pModel->pBones[CharModel_GetBoneIndex(pModel, 0x54)];
     }
     if (lbl_80281EE0->pB4->pChar->u10 & 0x4000) {
         fn_8008EC0C(pBone52->v1C, pBone1->v1C, v52);
@@ -1209,15 +1212,15 @@ void fn_8008D9DC(UStreamObject* pObject) {
     void* pSrc;
     void* pDst;
 
-    lbl_80281EE4 = fn_80009B34(pObject->uSize, 2, 16, "FEgolferanim.c", 3143);
+    lbl_80281EE4 = StaticMem_Alloc(pObject->uSize, 2, 16, "FEgolferanim.c", 3143);
     pSrc = pObject->pData;
     pDst = lbl_80281EE4;
-    fn_8001F08C(&pSrc, &pDst, aHeader, sizeof(aHeader) / sizeof(aHeader[0]), 1);
-    fn_8001F08C(&pSrc, &pDst, aLight, sizeof(aLight) / sizeof(aLight[0]), lbl_80281EE4->nLights);
+    ByteSwap_Records(&pSrc, &pDst, aHeader, sizeof(aHeader) / sizeof(aHeader[0]), 1);
+    ByteSwap_Records(&pSrc, &pDst, aLight, sizeof(aLight) / sizeof(aLight[0]), lbl_80281EE4->nLights);
     fn_80035338(0);
     fn_800935CC(lbl_80281EE4);
     fn_8003534C();
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // Stop loading, and show the next golfer of lbl_801899E0 (screen 0) or none (screen 4).
@@ -1295,7 +1298,7 @@ void fn_8008DD50(u8 bNoBlend) {
     View* pView;
     Clip* pClip;
 
-    pView = fn_80017028(fn_80016D10());
+    pView = ViewController_GetCameraController(fn_80016D10());
     if (lbl_80281EE0->pB4 == NULL || lbl_80281EE0->pB4->pChar == NULL) return;
     if (lbl_80281EE0->n8 != 0) {
         if (lbl_80281EE0->n8 == 1) {
@@ -1333,10 +1336,10 @@ void fn_8008DD50(u8 bNoBlend) {
         pClip = fn_8008E02C();
     }
     if (pClip->pD8 != NULL) {
-        if (!fn_8001EDF4(lbl_80281EE0->pB4->pChar) && fn_80077ACC()->choices.n113 != 0) {
+        if (!fn_8001EDF4(lbl_80281EE0->pB4->pChar) && FE_GetCurrentProfile()->choices.n113 != 0) {
             fn_8008E2F8(0, PI);
         }
-        fn_8008EA44(fn_80077ACC()->choices.n113);
+        fn_8008EA44(FE_GetCurrentProfile()->choices.n113);
     } else {
         if (fn_8001EDF4(lbl_80281EE0->pB4->pChar)) {
             fn_8008E2F8(0, 0.0f);
@@ -1405,7 +1408,7 @@ void fn_8008E244(void) {
 }
 
 void fn_8008E254(u8 b) {
-    View* pView = fn_80017028(fn_80016D10());
+    View* pView = ViewController_GetCameraController(fn_80016D10());
 
     if (b) {
         if (lbl_80281EE0->b1DC != 1) {
@@ -1476,7 +1479,7 @@ u8 fn_8008E468(char* szAnim, char* szShot, u8 bNoBlend) {
     View* pView;
     Clip* pClip;
 
-    pView = fn_80017028(fn_80016D10());
+    pView = ViewController_GetCameraController(fn_80016D10());
     if (!fn_80103B80()) {
         return 0;
     }
@@ -1499,10 +1502,10 @@ u8 fn_8008E468(char* szAnim, char* szShot, u8 bNoBlend) {
             return 0;
         }
         if (pClip->pD8 != NULL) {
-            if (!fn_8001EDF4(lbl_80281EE0->pB4->pChar) && fn_80077ACC()->choices.n113 != 0) {
+            if (!fn_8001EDF4(lbl_80281EE0->pB4->pChar) && FE_GetCurrentProfile()->choices.n113 != 0) {
                 fn_8008E2F8(0, PI);
             }
-            fn_8008EA44(fn_80077ACC()->choices.n113);
+            fn_8008EA44(FE_GetCurrentProfile()->choices.n113);
         } else {
             if (fn_8001EDF4(lbl_80281EE0->pB4->pChar)) {
                 fn_8008E2F8(0, 0.0f);

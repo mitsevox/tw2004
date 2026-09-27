@@ -101,7 +101,7 @@ LLFont* FO_spLoadFontFromStream(void* pData, UFontState* pState) {
         pFile->u18 = LLFONT_SWAP32(pFile->u18);
         pFile->uBitmap = LLFONT_SWAP32(pFile->uBitmap);
     }
-    pFont = fn_80009B34(sizeof(LLFont) + pFile->nGlyphs * sizeof(LLGlyphRec) +
+    pFont = StaticMem_Alloc(sizeof(LLFont) + pFile->nGlyphs * sizeof(LLGlyphRec) +
                             pFile->nGlyphs * sizeof(LLGlyph),
                         2, 16, "LLFont.c", 630);
     pRec = (u8*)(pFont + 1);
@@ -147,7 +147,7 @@ LLFont* FO_spLoadFontFromStream(void* pData, UFontState* pState) {
     pFont->bitmap.n0E = LLFONT_SWAP16(pFont->bitmap.n0E);
     nRowBytes = (pFont->bitmap.nWidth + 7) / 8 * 8 / 2;
     nTexHeight = (pFont->bitmap.nHeight + 7) / 8 * 8;
-    pFont->p470 = fn_80009B34(nRowBytes * nTexHeight, 2, 32, "LLFont.c", 795);
+    pFont->p470 = StaticMem_Alloc(nRowBytes * nTexHeight, 2, 32, "LLFont.c", 795);
 
     // Rows of texels (two per byte, first in the high nibble) become 8x8 tiles, first texel low.
     pDst = pFont->p470;
@@ -233,14 +233,14 @@ void fn_80011160(UFontState* pState) {
 
 void fn_80011164(LLFont* pFont) {
     if (pFont->p470 != NULL) {
-        fn_80009E70(pFont->p470);
+        StaticMem_Free(pFont->p470);
         pFont->p470 = NULL;
     }
 }
 
 void fn_800111A4(LLFont* pFont) {
     fn_80011164(pFont);
-    fn_80009E70(pFont);
+    StaticMem_Free(pFont);
 }
 
 // Sets GX up to draw text in 2D: position, colour and texture coordinates per vertex, no culling
@@ -408,8 +408,8 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
     fX = pCtx->f70;
     fY = pCtx->f74;
     if (0.0f != pCtx->fB8) {
-        fSin = fn_800095F0(pCtx->fB8);
-        fCos = fn_80009638(pCtx->fB8);
+        fSin = Math_Sin(pCtx->fB8);
+        fCos = Math_Cos(pCtx->fB8);
         if (0.0f != fAlignX) {
             fWidth = fn_80011C90(pFont, pCtx, p);
             bMeasured = 1;

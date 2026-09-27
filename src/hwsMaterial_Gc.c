@@ -41,7 +41,7 @@ void fn_801126F0(SkinDesc* pDesc, s32 nUnused) {
     int i;
 
     if (pDesc->p18 == NULL) {
-        pDesc->p18 = fn_80009B34(pDesc->n10 * sizeof(SkinDesc18), 2, 16, "hwsMaterial_Gc.c", 76);
+        pDesc->p18 = StaticMem_Alloc(pDesc->n10 * sizeof(SkinDesc18), 2, 16, "hwsMaterial_Gc.c", 76);
     }
     for (i = 0; i < pDesc->n10; i++) {
         fn_80112614(&pDesc->p14[i], &pDesc->p18[i], NULL);
@@ -55,7 +55,7 @@ void fn_801127A0(SkinDesc* pDesc) {
 // Free the skin's materials.
 void fn_801127C4(SkinDesc* pDesc) {
     if (pDesc->p18 != NULL) {
-        fn_80009E70(pDesc->p18);
+        StaticMem_Free(pDesc->p18);
         pDesc->p18 = NULL;
     }
 }

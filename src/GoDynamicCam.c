@@ -11,7 +11,7 @@
 
 DynCamTables* lbl_80281D88;
 
-u8   fn_8001E9CC(u32* pBits, int nBit);         // the bit is set
+u8   BitArray_Test(u32* pBits, int nBit);         // the bit is set
 void fn_80039884(u8* pSrc, u8* pDst, int nCount);
 void fn_800399E0(u8* pSrc, CamShot* pDst, u32 nCount);
 void fn_80039A48(u8* pSrc, DynCamSet* pDst, u32 nCount);
@@ -105,22 +105,22 @@ void fn_80039554(UStreamObject* pObject) {
         lbl_80281D88->n1C = 1;
     }
     if (lbl_80281D88->pSequences != NULL) {
-        fn_80009E70(pObject);
+        StaticMem_Free(pObject);
         return;
     }
     pSrc = pObject->pData;
     BYTESWAP_SWAPDATA(&pSrc, (u8*)&nSequences, sizeof(nSequences), 4);
     pSrc = pObject->pData + 4;
     BYTESWAP_SWAPDATA(&pSrc, (u8*)&nChoices, sizeof(nChoices), 4);
-    lbl_80281D88->pSequences = fn_80009B34(nSequences * sizeof(CamSequence), 2, 0, "GoDynamicCam.c", 403);
-    lbl_80281D88->pChoices = fn_80009B34(nChoices * sizeof(CamChoice), 2, 0, "GoDynamicCam.c", 404);
+    lbl_80281D88->pSequences = StaticMem_Alloc(nSequences * sizeof(CamSequence), 2, 0, "GoDynamicCam.c", 403);
+    lbl_80281D88->pChoices = StaticMem_Alloc(nChoices * sizeof(CamChoice), 2, 0, "GoDynamicCam.c", 404);
     lbl_80281D88->nSequences = 0;
     lbl_80281D88->nChoicesUsed = 0;
     pSrc = pObject->pData + 8;
     fn_80039884(pSrc, (u8*)lbl_80281D88->pSequences, nSequences);
     fn_80039D0C(nSequences);
     fn_80039E58();
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // The stream handler for the shot file: takes the shots unless some are loaded already.
@@ -130,38 +130,38 @@ void fn_80039690(UStreamObject* pObject) {
         lbl_80281D88->n1C = 1;
     }
     if (lbl_80281D88->pShots != NULL) {
-        fn_80009E70(pObject);
+        StaticMem_Free(pObject);
         return;
     }
-    lbl_80281D88->pShots = fn_80009B34(pObject->uSize, 2, 0, "GoDynamicCam.c", 454);
+    lbl_80281D88->pShots = StaticMem_Alloc(pObject->uSize, 2, 0, "GoDynamicCam.c", 454);
     fn_800399E0(pObject->pData, lbl_80281D88->pShots, pObject->uSize / sizeof(CamShot));
     fn_80039B14(pObject->uSize);
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // The stream handler for another shot file: the same, but the load is not counted and the shots
 // are not clamped (fn_80039C5C).
 void fn_80039754(UStreamObject* pObject) {
     if (lbl_80281D88->pShots != NULL) {
-        fn_80009E70(pObject);
+        StaticMem_Free(pObject);
         return;
     }
-    lbl_80281D88->pShots = fn_80009B34(pObject->uSize, 2, 0, "GoDynamicCam.c", 495);
+    lbl_80281D88->pShots = StaticMem_Alloc(pObject->uSize, 2, 0, "GoDynamicCam.c", 495);
     fn_800399E0(pObject->pData, lbl_80281D88->pShots, pObject->uSize / sizeof(CamShot));
     fn_80039C5C(pObject->uSize);
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // The stream handler for the file of sets (a shot and four sequences each).
 void fn_800397EC(UStreamObject* pObject) {
     if (lbl_80281D88->pSets != NULL) {
-        fn_80009E70(pObject);
+        StaticMem_Free(pObject);
         return;
     }
-    lbl_80281D88->pSets = fn_80009B34(pObject->uSize, 2, 0, "GoDynamicCam.c", 536);
+    lbl_80281D88->pSets = StaticMem_Alloc(pObject->uSize, 2, 0, "GoDynamicCam.c", 536);
     fn_80039A48(pObject->pData, lbl_80281D88->pSets, pObject->uSize / sizeof(DynCamSet));
     fn_80039EB8(pObject->uSize);
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // Copies nCount sequences from the file (little-endian) into pDst, swapping each value's bytes.
@@ -182,13 +182,14 @@ void fn_80039884(u8* pSrc, u8* pDst, int nCount) {
     int i;
 
     for (i = 0; i < nCount; i++) {
-        fn_8001F08C((void**)&pSrc, (void**)&pDst, aSequence, sizeof(aSequence) / sizeof(aSequence[0]), 1);
+        ByteSwap_Records((void**)&pSrc, (void**)&pDst, aSequence, sizeof(aSequence) / sizeof(aSequence[0]),
+                         1);
         // pDst is now at the sequence's p4C
         *(CamChoice**)pDst = &lbl_80281D88->pChoices[lbl_80281D88->nChoicesUsed];
         pSrc += sizeof(CamChoice*);
         pDst += sizeof(CamChoice*);
         pChoice = &lbl_80281D88->pChoices[lbl_80281D88->nChoicesUsed];
-        fn_8001F08C((void**)&pSrc, (void**)&pChoice, aChoice, sizeof(aChoice) / sizeof(aChoice[0]),
+        ByteSwap_Records((void**)&pSrc, (void**)&pChoice, aChoice, sizeof(aChoice) / sizeof(aChoice[0]),
                     lbl_80281D88->pSequences[i].nChoices);
         lbl_80281D88->nChoicesUsed += lbl_80281D88->pSequences[i].nChoices;
     }
@@ -208,7 +209,7 @@ void fn_800399E0(u8* pSrc, CamShot* pDst, u32 nCount) {
         { 13, 1 },
     };
 
-    fn_8001F08C((void**)&pSrc, (void**)&pDst, aFormat, sizeof(aFormat) / sizeof(aFormat[0]), nCount);
+    ByteSwap_Records((void**)&pSrc, (void**)&pDst, aFormat, sizeof(aFormat) / sizeof(aFormat[0]), nCount);
 }
 
 // The same for nCount shot sets.
@@ -220,7 +221,7 @@ void fn_80039A48(u8* pSrc, DynCamSet* pDst, u32 nCount) {
         { 3, 1 },
     };
 
-    fn_8001F08C((void**)&pSrc, (void**)&pDst, aFormat, sizeof(aFormat) / sizeof(aFormat[0]), nCount);
+    ByteSwap_Records((void**)&pSrc, (void**)&pDst, aFormat, sizeof(aFormat) / sizeof(aFormat[0]), nCount);
 }
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
@@ -369,7 +370,7 @@ void fn_80039EB8(int nSize) {
 
 // Allocates the dynamic cameras' tables, empty.
 void DynamicCam_Init(void) {
-    DynCamTables* pTables = fn_80009B34(sizeof(DynCamTables), 2, 0, "GoDynamicCam.c", 938);
+    DynCamTables* pTables = StaticMem_Alloc(sizeof(DynCamTables), 2, 0, "GoDynamicCam.c", 938);
 
     lbl_80281D88 = pTables;
     pTables->pSequences = NULL;
@@ -389,27 +390,27 @@ void DynamicCam_DeInit(void) {
     lbl_80281D88->nSets = 0;
     lbl_80281D88->nChoicesUsed = 0;
     if (lbl_80281D88->pSequences != NULL) {
-        fn_80009E70(lbl_80281D88->pSequences);
+        StaticMem_Free(lbl_80281D88->pSequences);
         lbl_80281D88->pSequences = NULL;
     }
     if (lbl_80281D88->pShots != NULL) {
-        fn_80009E70(lbl_80281D88->pShots);
+        StaticMem_Free(lbl_80281D88->pShots);
         lbl_80281D88->pShots = NULL;
     }
     if (lbl_80281D88->pSets != NULL) {
-        fn_80009E70(lbl_80281D88->pSets);
+        StaticMem_Free(lbl_80281D88->pSets);
         lbl_80281D88->pSets = NULL;
     }
     if (lbl_80281D88->pChoices != NULL) {
-        fn_80009E70(lbl_80281D88->pChoices);
+        StaticMem_Free(lbl_80281D88->pChoices);
         lbl_80281D88->pChoices = NULL;
     }
     lbl_80281D88->n1C = 0;
-    fn_80009E70(lbl_80281D88);
+    StaticMem_Free(lbl_80281D88);
 }
 
 // Places a shot's camera at pOut by its placement kind (bB1), then keeps it above the ground under
-// it (on course 12 when fn_80015464 is 10, within 40 of the tee, fn_8004D5F0's height): at least
+// it (on course 12 when Game_GetCurHoleNum is 10, within 40 of the tee, fn_8004D5F0's height): at least
 // f68 above it, eased in under f6C. A kind 3 camera then moves a limited step from where it was.
 void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub,
                  f32 f) {
@@ -457,13 +458,13 @@ void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
         fn_8003B6D0(pShot, nPlayer, pScript, pOut, pCam, pSub);
         break;
     }
-    pCourse = fn_8000C594();
+    pCourse = Ter_GetTGD();
     if (pCourse != NULL) {
         if (CameraScript_SnapToScript(pScript, pShot) && pShot != pScript->pNextShot) {
-            if (Game_GetCourse() == 12 && fn_80015464() == 10) {
+            if (Game_GetCourse() == 12 && Game_GetCurHoleNum() == 10) {
                 fn_8003DC54(&pCourse->tee[gSession.nTeeSet[nPlayer]].x, pOut, aOff);
                 aOff[1] = 0.0f;
-                if ((f32)fn_80009680(fn_80009744(aOff)) < 40.0f) {
+                if ((f32)Math_Sqrt(Vec3_LengthSqClamped(aOff)) < 40.0f) {
                     fGround = fn_8004D5F0(pCourse, pOut);
                 } else {
                     fGround = CamScript_GuessBestPlayableHeight(pOut, NULL);
@@ -476,7 +477,7 @@ void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
                 }
                 pScript->fD8 = fGround;
                 if (pScript->fD8 < -60000.0f) {
-                    pScript->fD8 = fn_8000C594()->fFloor;
+                    pScript->fD8 = Ter_GetTGD()->fFloor;
                 }
             } else {
                 fGround = CamScript_GuessBestPlayableHeight(pOut, NULL);
@@ -488,7 +489,7 @@ void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
                 }
                 pScript->fD8 = fGround;
                 if (pScript->fD8 < -60000.0f) {
-                    pScript->fD8 = fn_8000C594()->fFloor;
+                    pScript->fD8 = Ter_GetTGD()->fFloor;
                 }
             }
         } else {
@@ -549,9 +550,9 @@ void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
     if (pShot->bB1 == 3 && !CameraScript_SnapToScript(pScript, pShot) &&
         (pScript->pNextShot != pShot || pScript->fCamTime > 0.0f)) {
         fn_8003DC54(pOut, aOld, aStep);
-        fDist = (f32)fn_80009680(fn_80009744(aStep));
+        fDist = (f32)Math_Sqrt(Vec3_LengthSqClamped(aStep));
         if (aStep[0] != 0.0f || aStep[1] != 0.0f || aStep[2] != 0.0f) {
-            fn_800BAF04(aStep, aDir);
+            Vec_NormalizeTo(aStep, aDir);
         } else {
             aDir[0] = 0.0f;
             aDir[1] = 0.0f;
@@ -564,7 +565,7 @@ void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
             fStep = fDist * (1.0f - (fLimit - fDist) / fLimit);
             fStep = fStep * fStep;
         }
-        fn_8001EF34(fStep, aDir, aStep);
+        Vec3_Scale(fStep, aDir, aStep);
         fn_8003DC30(aOld, aStep, pOut);
     }
 }
@@ -664,7 +665,7 @@ CamShot* DynamicCam_ChooseScriptInSequence(CamSequence* pSequence, int nKind, in
 
 // The choice may be used on the current hole.
 u8 fn_8003AB94(CamChoice* pChoice) {
-    if (fn_8001E9CC(pChoice->aNoHoles, Game_GetCourse() * 18 + fn_80015464())) return 0;
+    if (BitArray_Test(pChoice->aNoHoles, Game_GetCourse() * 18 + Game_GetCurHoleNum())) return 0;
     return 1;
 }
 
@@ -755,7 +756,7 @@ void fn_8003ADF8(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
                     fScale = (fFar - lbl_80281F78->f23C) / (lbl_80281F78->f244 - lbl_80281F78->f23C);
                     fScale = lbl_80281F78->f240 - fScale * (lbl_80281F78->f240 - lbl_80281F78->f248);
                 }
-                fn_8001EF34(fScale, vOff, vOff);
+                Vec3_Scale(fScale, vOff, vOff);
                 fn_8003DC30(vOff, pSub, pOut);
             }
         } else {
@@ -807,7 +808,7 @@ void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
         aBallDir[1] = 0.0f;
     }
     if (aBallDir[0] != 0.0f || aBallDir[1] != 0.0f || aBallDir[2] != 0.0f) {
-        fn_800BAF04(aBallDir, aBallDir);
+        Vec_NormalizeTo(aBallDir, aBallDir);
     }
     fn_8003D810(aBallDir, pOut, aFrom);
     if (pScript->pNextShot != NULL && pScript->pShot->bB1 == pScript->pNextShot->bB1) {
@@ -865,41 +866,41 @@ void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
     }
     fn_8003DC54(pOut, aFrom, aCurOff);
     fn_8003DC54(aTarget, aFrom, aTgtOff);
-    fCurDist = (f32)fn_80009680(fn_80009744(aCurOff));
-    fStep = (f32)fn_80009680(fn_80009744(aTgtOff)) - fCurDist;
+    fCurDist = (f32)Math_Sqrt(Vec3_LengthSqClamped(aCurOff));
+    fStep = (f32)Math_Sqrt(Vec3_LengthSqClamped(aTgtOff)) - fCurDist;
     fStep *= fMove;
     if (aCurOff[0] != 0.0f || aCurOff[1] != 0.0f || aCurOff[2] != 0.0f) {
-        fn_800BAF04(aCurOff, aCurDir);
+        Vec_NormalizeTo(aCurOff, aCurDir);
     } else {
         aCurDir[0] = 0.0f;
         aCurDir[1] = 0.0f;
         aCurDir[2] = 0.0f;
     }
     if (aTgtOff[0] != 0.0f || aTgtOff[1] != 0.0f || aTgtOff[2] != 0.0f) {
-        fn_800BAF04(aTgtOff, aTgtDir);
+        Vec_NormalizeTo(aTgtOff, aTgtDir);
     } else {
         aTgtDir[0] = 0.0f;
         aTgtDir[1] = 0.0f;
         aTgtDir[2] = 0.0f;
     }
-    fAngle = fn_80009614(fn_8000C5FC(aCurDir, aTgtDir));
+    fAngle = fn_80009614(Vec3_Dot(aCurDir, aTgtDir));
     fTurn = fAngle * fTurn;
     vec4flt_CrossProduct(aCurDir, aTgtDir, aAxis);
     if (aAxis[0] != 0.0f || aAxis[1] != 0.0f || aAxis[2] != 0.0f) {
-        fn_800BAF04(aAxis, aAxis);
+        Vec_NormalizeTo(aAxis, aAxis);
     }
-    fn_8001EF34(fTurn, aAxis, aAxis);
+    Vec3_Scale(fTurn, aAxis, aAxis);
     Quat_BuildFromVector(aAxis, aTurn);
     aCurDir[3] = 0.0f;
     Quat_RotateVector(aTurn, aCurDir, aNew);
     if (aNew[0] != 0.0f || aNew[1] != 0.0f || aNew[2] != 0.0f) {
-        fn_800BAF04(aNew, aNewDir);
+        Vec_NormalizeTo(aNew, aNewDir);
     } else {
         aNewDir[0] = 0.0f;
         aNewDir[1] = 0.0f;
         aNewDir[2] = 0.0f;
     }
-    fn_8001EF34(fCurDist + fStep, aNewDir, aNew);
+    Vec3_Scale(fCurDist + fStep, aNewDir, aNew);
     fn_8003DC30(aFrom, aNew, pOut);
 }
 
@@ -922,7 +923,7 @@ void fn_8003B534(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
     DynamicCam_GetLocation(0, nPlayer, vFrom, pScript, pShot, pCam, pSub);
     Vec3Copy(gPlayers[nPlayer].ball.vVel, vDir);
     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-        fn_800BAF04(vDir, vDir);
+        Vec_NormalizeTo(vDir, vDir);
     }
     if (gPlayers[nPlayer].ball.fSpeed < lbl_80281F78->f198) return;
     if (pScript->pNextShot != NULL && pScript->pShot->bB1 == pScript->pNextShot->bB1) {
@@ -991,7 +992,7 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         fn_8001EB8C(gPlayers[nPlayer].pChar, 0x39, vBone39);
         fn_8001EB8C(gPlayers[nPlayer].pChar, 0x47, vBone47);
         fn_8003DC30(vBone39, vBone47, vMid);
-        fn_8001EF34(0.5f, vMid, vMid);
+        Vec3_Scale(0.5f, vMid, vMid);
         Vec3Copy(vMid, pOut);
         break;
     case 6:
@@ -1017,12 +1018,12 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         break;
     case 10:
         nPin = Game_CurrentPinSet();
-        pCourse = fn_8000C594();
+        pCourse = Ter_GetTGD();
         Vec3Copy(&pCourse->pin[nPin].x, pOut);
         break;
     case 11:
         nTee = gSession.nTeeSet[nPlayer];
-        pCourse = fn_8000C594();
+        pCourse = Ter_GetTGD();
         Vec3Copy(&pCourse->tee[nTee].x, pOut);
         break;
     case 24:
@@ -1054,7 +1055,7 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         }
         Vec3Copy(pMatrix[2], vDir10);
         if (0.0f != vDir10[0] || 0.0f != vDir10[1] || 0.0f != vDir10[2]) {
-            fn_800BAF04(vDir10, vDir10);
+            Vec_NormalizeTo(vDir10, vDir10);
         }
         fn_8003DC30(vBone10, vDir10, pOut);
         break;
@@ -1067,7 +1068,7 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         }
         Vec3Copy(pMatrix[2], vDir7);
         if (0.0f != vDir7[0] || 0.0f != vDir7[1] || 0.0f != vDir7[2]) {
-            fn_800BAF04(vDir7, vDir7);
+            Vec_NormalizeTo(vDir7, vDir7);
         }
         fn_8003DC30(vBone7, vDir7, pOut);
         break;
@@ -1080,7 +1081,7 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         }
         Vec3Copy(pMatrix[2], vDir1);
         if (0.0f != vDir1[0] || 0.0f != vDir1[1] || 0.0f != vDir1[2]) {
-            fn_800BAF04(vDir1, vDir1);
+            Vec_NormalizeTo(vDir1, vDir1);
         }
         fn_8003DC30(vBone1, vDir1, pOut);
         break;
@@ -1097,7 +1098,7 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         }
         Vec3Copy(pMatrix[0], vDir);
         if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-            fn_800BAF04(vDir, vDir);
+            Vec_NormalizeTo(vDir, vDir);
         }
         fn_8003DC30(vFrom, vDir, pOut);
         break;
@@ -1114,7 +1115,7 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         }
         Vec3Copy(pMatrix[2], vDir);
         if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-            fn_800BAF04(vDir, vDir);
+            Vec_NormalizeTo(vDir, vDir);
         }
         fn_8003DC30(vFrom, vDir, pOut);
         break;
@@ -1156,7 +1157,7 @@ CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, u8 a, f32
     }
     nClassBit = fn_8003CB80(nClass, nPlayer);
     nPinSet = Game_CurrentPinSet();
-    pCourse = fn_8000C594();
+    pCourse = Ter_GetTGD();
     if (pCourse == NULL) {
         return NULL;
     }
@@ -1242,7 +1243,7 @@ CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind
     }
     fPinDist = fn_800D0478(nPlayer);
     nPinSet = Game_CurrentPinSet();
-    pCourse = fn_8000C594();
+    pCourse = Ter_GetTGD();
     if (pCourse == NULL) {
         return NULL;
     }
@@ -1528,9 +1529,9 @@ u8 fn_8003D00C(CamSequence* pSequence) {
     return (pSequence->uCourses & (1 << Game_GetCourse())) != 0;
 }
 
-// The sequence is used for fn_800D2B08's current value.
+// The sequence is used for Course_GetCurHolePar's current value.
 u8 fn_8003D054(CamSequence* pSequence) {
-    return (pSequence->n4B & (1 << fn_800D2B08())) != 0;
+    return (pSequence->n4B & (1 << Course_GetCurHolePar())) != 0;
 }
 
 // Bit nBit of the mask is set.
@@ -1627,7 +1628,7 @@ void fn_8003D324(f32* pPos, f32* pDir, CamScript* pScript, CamShot* pShot, int n
     Vec3Copy(pDir, vDir);
     vDir[1] = 0.0f;
     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-        fn_800BAF04(vDir, vDir);
+        Vec_NormalizeTo(vDir, vDir);
     }
     pPos[0] += fSide * -vDir[2];
     pPos[2] += fSide * vDir[0];
@@ -1667,7 +1668,7 @@ void DynamicCam_AddHeightOffset(f32* pPos, CamScript* pScript, CamShot* pShot, i
         fn_8001EB8C(gPlayers[nPlayer].pChar, 0x39, vBone39);
         fn_8001EB8C(gPlayers[nPlayer].pChar, 0x47, vBone47);
         fn_8003DC30(vBone39, vBone47, vMid);
-        fn_8001EF34(0.5f, vMid, vMid);
+        Vec3_Scale(0.5f, vMid, vMid);
         pPos[1] = vMid[1];
         break;
     case 2:
@@ -1688,7 +1689,7 @@ void DynamicCam_AddHeightOffset(f32* pPos, CamScript* pScript, CamShot* pShot, i
         break;
     case 6:
         nPin = Game_CurrentPinSet();
-        pCourse = fn_8000C594();
+        pCourse = Ter_GetTGD();
         if (pCourse != NULL) {
             pPos[1] = pCourse->pin[nPin].y;
         }
@@ -1708,7 +1709,7 @@ void DynamicCam_AddHeightOffset(f32* pPos, CamScript* pScript, CamShot* pShot, i
     }
     for (i = 0; i < nSteps; i++) {
         fn_8003DC54(vPoint, pScript->v70, vOff);
-        fn_8001EF34((f32)(i + 1) / (f32)nSteps, vOff, vOff);
+        Vec3_Scale((f32)(i + 1) / (f32)nSteps, vOff, vOff);
         fn_8003DC30(pScript->v70, vOff, vStep);
         pPos[1] = vStep[1];
         pPos[1] += pShot->f80;
@@ -1731,7 +1732,7 @@ void DynamicCam_AddHeightOffset(f32* pPos, CamScript* pScript, CamShot* pShot, i
             }
         }
         if (pScript->f98 < lbl_80281F78->fD4) {
-            dSmooth = fn_80009680((f32)fn_80009680(pScript->f98 / lbl_80281F78->fD4));
+            dSmooth = Math_Sqrt((f32)Math_Sqrt(pScript->f98 / lbl_80281F78->fD4));
             fEase = 1.0f - (f32)dSmooth * (1.0f - fEase);
         }
         pPos[1] = fEase * (pPos[1] - fY) + fY;
@@ -1759,26 +1760,26 @@ void fn_8003D810(f32* pDir, f32* pA, f32* pB) {
     if (0.0f == pDir[0] && 0.0f == pDir[2]) {
         fn_8003DC54(pB, pA, pDir);
         if (0.0f != pDir[0] || 0.0f != pDir[1] || 0.0f != pDir[2]) {
-            fn_800BAF04(pDir, pDir);
+            Vec_NormalizeTo(pDir, pDir);
         }
         return;
     }
     Vec3Copy(pDir, vLevel);
     vLevel[1] = 0.0f;
     if (0.0f != vLevel[0] || 0.0f != vLevel[1] || 0.0f != vLevel[2]) {
-        fn_800BAF04(vLevel, vLevel);
+        Vec_NormalizeTo(vLevel, vLevel);
     }
-    if (fabsf(fn_80009614(fn_8000C5FC(vLevel, pDir))) > lbl_80281F78->f19C) {
+    if (fabsf(fn_80009614(Vec3_Dot(vLevel, pDir))) > lbl_80281F78->f19C) {
         vec4flt_CrossProduct(pDir, vLevel, vAxis);
         if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
-            fn_800BAF04(vAxis, vAxis);
+            Vec_NormalizeTo(vAxis, vAxis);
         }
-        fn_8001EF34(lbl_80281F78->f19C, vAxis, vAxis);
+        Vec3_Scale(lbl_80281F78->f19C, vAxis, vAxis);
         Quat_BuildFromVector(vAxis, qTurn);
         vLevel[3] = 0.0f;
         Quat_RotateVector(qTurn, vLevel, pDir);
         if (0.0f != pDir[0] || 0.0f != pDir[1] || 0.0f != pDir[2]) {
-            fn_800BAF04(pDir, pDir);
+            Vec_NormalizeTo(pDir, pDir);
         }
     }
 }
@@ -1788,7 +1789,7 @@ void fn_8003D810(f32* pDir, f32* pA, f32* pB) {
 // v70 takes the ball's position whenever it is not used.
 void DynamicCam_GetSmoothBallLocation(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pOut, u8 bKeep) {
     u8 bNear = 0;
-    CourseInfo* pCourse = fn_8000C594();
+    CourseInfo* pCourse = Ter_GetTGD();
     int nPin = Game_CurrentPinSet();
 
     if ((gPlayers[nPlayer].ball.nSurface == 0x62 || gPlayers[nPlayer].ball.nSurface == 0x69
@@ -1842,10 +1843,10 @@ void fn_8003DAC8(CamShot* pShot, int nPlayer, f32* pA, f32* pB) {
 
 // Scales the value by 10 on three holes: course 9's hole 12 and course 3's holes 13 and 15.
 f32 fn_8003DBA8(f32 f) {
-    if (Game_GetCourse() == 9 && fn_80015464() == 12) {
+    if (Game_GetCourse() == 9 && Game_GetCurHoleNum() == 12) {
         return 10.0f * f;
     }
-    if (Game_GetCourse() == 3 && (fn_80015464() == 13 || fn_80015464() == 15)) {
+    if (Game_GetCourse() == 3 && (Game_GetCurHoleNum() == 13 || Game_GetCurHoleNum() == 15)) {
         return 10.0f * f;
     }
     return f;

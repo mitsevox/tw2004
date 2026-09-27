@@ -80,8 +80,8 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
     u8 uStep;
     u8 bStart;
     u32* pBits;
-    f32 (*pVerts)[3] = fn_8000C594()->pVerts;
-    u8* pTriFlags = fn_8000C594()->pTriFlags;
+    f32 (*pVerts)[3] = Ter_GetTGD()->pVerts;
+    u8* pTriFlags = Ter_GetTGD()->pTriFlags;
     s32 nRow;
     s32 i;
     u16* pNewEnd;
@@ -166,8 +166,8 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
             nNewBit = nBitBase + nOldRows;
             pNewEnd = pEnd;
             pNext = pEnd + nNewRows;
-            uStep = fn_8001E9CC(pBits, nBit);
-            uNewStep = fn_8001E9CC(pBits, nNewBit);
+            uStep = BitArray_Test(pBits, nBit);
+            uNewStep = BitArray_Test(pBits, nNewBit);
             bFirst = 1;
             bStart = 1;
             if (pCur != pEnd) {
@@ -178,7 +178,7 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
                     // the point is dropped from this row
                     nNewBit++;
                     pNewEnd++;
-                    uNewStep = fn_8001E9CC(pBits, nNewBit);
+                    uNewStep = BitArray_Test(pBits, nNewBit);
                 } else {
                     fn_80120C2C(pVerts, pTriFlags, afNew, *pOld, *pOldStep, &bNewFlag, nSet, fAt);
                     while (pCur != pEnd && afPoint[nAxis] <= afNew[nAxis]) {
@@ -203,7 +203,7 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
                         nCount++;
                         nBit++;
                         if (pCur != pEnd) {
-                            uStep = fn_8001E9CC(pBits, nBit);
+                            uStep = BitArray_Test(pBits, nBit);
                             fn_80120C2C(pVerts, pTriFlags, afPoint, *pCur, uStep, &bFlag, nSet, fAt);
                         }
                     }
@@ -235,7 +235,7 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
                 nCount++;
                 nBit++;
                 if (pCur != pEnd) {
-                    uStep = fn_8001E9CC(pBits, nBit);
+                    uStep = BitArray_Test(pBits, nBit);
                     fn_80120C2C(pVerts, pTriFlags, afPoint, *pCur, uStep, &bFlag, nSet, fAt);
                 }
             }

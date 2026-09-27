@@ -29,22 +29,22 @@ f32* fn_80012EF0(void* pCamera) {
     return ((RenderCamera*)pCamera)->pRect;
 }
 
-void fn_80012EF8(void) {
-    fn_80015624();
+void RenderState_Flush(void) {
+    RenderState_Apply();
 }
 
-void fn_80012F18(int a) {
+void RenderState_SetDepthFunc(int a) {
     lbl_801B8980.n0 = a;
     lbl_801B8980.u110 |= 0x1;
 }
 
-void fn_80012F34(int a) {
+void RenderState_SetDepthWrite(int a) {
     lbl_801B8980.b4 = a;
     lbl_801B8980.u110 |= 0x2;
 }
 
 // DepthField.c passes (0 or 1, 6, 0x80). c becomes c * 2 + 1, kept to a byte.
-void fn_80012F50(int a, int b, int c) {
+void RenderState_SetAlphaTest(int a, int b, int c) {
     int n;
 
     n = c * 2 + 1;

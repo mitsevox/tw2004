@@ -17,7 +17,7 @@ UMemPool* lbl_80281DA8;
 
 DynObj* fn_80049018(DynObjSetup* pSetup);
 void fn_8000E830(DynObj* pObj);
-void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity
+void Mtx_Identity(f32 (*pMtx)[4]);                   // identity
 void fn_8000C5A4(f32 (*pMtx)[4]);
 
 void fn_800646D0(UStreamObject* pObject);
@@ -37,7 +37,7 @@ void* fn_80048AF4_DynObjAlloc(int nSize) {
     if (nSize < 528 && lbl_80281DA8->nFree != 0) {
         return AllocPoolMem(lbl_80281DA8);
     }
-    return fn_80009B34(nSize, 1, 16, "UKernel.c", 201);
+    return StaticMem_Alloc(nSize, 1, 16, "UKernel.c", 201);
 }
 
 // Gives an object's memory back to the pool it came from, or to the heap.
@@ -47,7 +47,7 @@ void fn_80048B70(void* p) {
     } else if ((u8*)p > (u8*)lbl_80281DA8 && (u8*)p < lbl_80281DA8->pEnd) {
         ReturnPoolMem(lbl_80281DA8, p);
     } else {
-        fn_80009E70(p);
+        StaticMem_Free(p);
     }
 }
 
@@ -76,17 +76,17 @@ void fn_80048BDC(UStreamObject* pObject) {
         break;
     case 7:
         fn_8009943C((PsEmitterRecord*)pObject->pData, pObject->uSize);
-        fn_80009E70(pObject);
+        StaticMem_Free(pObject);
         return;
     case 8:
-        fn_80009E70(pObject);
+        StaticMem_Free(pObject);
         return;
     case 10:
         fn_800EADDC(pObject);
         return;
     case 9:
         fn_800A4CB8(pObject, 1);
-        fn_80009E70(pObject);
+        StaticMem_Free(pObject);
         return;
     }
     pChunk = fn_8000B7B0(pObject->pData, pObject->uSize, 'aRSL', pObject->uId);
@@ -107,7 +107,7 @@ void fn_80048BDC(UStreamObject* pObject) {
     pObject->pData = (u8*)setup.pModel;
     pObject->pfn8 = NULL;
     pObject->uUnk4 = fn_800490B8(&setup);
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // Sets the kernel up: the 'Cact' stream handler, the two node pools and an empty list.
@@ -421,8 +421,8 @@ void fn_80049514(DynObj* pObj, DynObjSetup* pSetup) {
     } else {
         fn_800486F4(&pObj->obj, NULL, nFlags);
     }
-    fn_8000ADC0(pObj->obj.m0);
-    fn_8000ADC0(pObj->obj.m40);
+    Mtx_Identity(pObj->obj.m0);
+    Mtx_Identity(pObj->obj.m40);
     fn_8000C5A4(pObj->obj.m0);
     pObj->obj.m80[3][0] = pDef->aPos[0];
     pObj->obj.m80[3][1] = pDef->aPos[1];

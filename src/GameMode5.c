@@ -98,7 +98,7 @@ void fn_800EADDC(void* pObj) {
         lbl_80203170[i].f4 = d->v[1];
         lbl_80203170[i].f8 = d->v[2];
     }
-    fn_80009E70(pObj);
+    StaticMem_Free(pObj);
 }
 
 void fn_800EAE38(s32 p0) {
@@ -140,7 +140,7 @@ void fn_800EAF18(UStreamObject* pObject) {
     if (nSize) {
         lbl_80282310 = fn_800951A0(nSize, 0x10, 1);
         Mem_cpy(lbl_80282310, pData, nSize);
-        fn_80009E70(pObject);
+        StaticMem_Free(pObject);
     }
 }
 
@@ -251,17 +251,17 @@ void fn_800EAF7C(void) {
         } else {
             nSum0 = 0;
             for (h = 0; h < Game_CurHoleIndex(); h++) {
-                gPlayers[0].nStrokes[h] = fn_800D2AD8(h);
+                gPlayers[0].nStrokes[h] = Course_GetHolePar(h);
                 nSum0 += gPlayers[0].nStrokes[h];
             }
             nDiff = lbl_80281664[lbl_802822F4].nTargetBase - nSum0;
             while (nDiff != 0) {
                 h = Misc_RandFunc(0) % (Game_CurHoleIndex() + 1);
                 if (nDiff < 0) {
-                    if (gPlayers[0].nStrokes[h] > fn_800D2AD8(h) - 1) {
+                    if (gPlayers[0].nStrokes[h] > Course_GetHolePar(h) - 1) {
                         gPlayers[0].nStrokes[h]--;
                     }
-                } else if (gPlayers[0].nStrokes[h] < fn_800D2AD8(h) + 1) {
+                } else if (gPlayers[0].nStrokes[h] < Course_GetHolePar(h) + 1) {
                     gPlayers[0].nStrokes[h]++;
                 }
                 nSum = 0;
@@ -283,17 +283,17 @@ void fn_800EAF7C(void) {
         } else {
             nSum0 = 0;
             for (h = 0; h < Game_CurHoleIndex(); h++) {
-                gPlayers[0].nStrokes[h] = fn_800D2AD8(h);
+                gPlayers[0].nStrokes[h] = Course_GetHolePar(h);
                 nSum0 += gPlayers[0].nStrokes[h];
             }
             nDiff = lbl_80281664[lbl_802822F4].nTargetBase;
             while (nDiff != 0) {
                 h = Misc_RandFunc(0) % (Game_CurHoleIndex() + 1);
                 if (nDiff < 0) {
-                    if (gPlayers[0].nStrokes[h] > fn_800D2AD8(h) - 1) {
+                    if (gPlayers[0].nStrokes[h] > Course_GetHolePar(h) - 1) {
                         gPlayers[0].nStrokes[h]--;
                     }
-                } else if (gPlayers[0].nStrokes[h] < fn_800D2AD8(h) + 1) {
+                } else if (gPlayers[0].nStrokes[h] < Course_GetHolePar(h) + 1) {
                     gPlayers[0].nStrokes[h]++;
                 }
                 nSum = 0;
@@ -306,17 +306,17 @@ void fn_800EAF7C(void) {
         break;
     case 3:
         for (h = 0; h < Game_CurHoleIndex(); h++) {
-            gPlayers[0].nStrokes[h] = fn_800D2AD8(h) - 1;
+            gPlayers[0].nStrokes[h] = Course_GetHolePar(h) - 1;
         }
         break;
     case 4:
         for (h = 0; h < Game_CurHoleIndex(); h++) {
-            gPlayers[0].nStrokes[h] = fn_800D2AD8(h);
+            gPlayers[0].nStrokes[h] = Course_GetHolePar(h);
         }
         break;
     case 5:
         for (h = 0; h < Game_CurHoleIndex(); h++) {
-            gPlayers[0].nStrokes[h] = fn_800D2AD8(h) + 1;
+            gPlayers[0].nStrokes[h] = Course_GetHolePar(h) + 1;
         }
         break;
     case 7:
@@ -340,20 +340,20 @@ void fn_800EAF7C(void) {
         if (gpGame->n4 == 0) {
             nSum0 = 0;
             for (h = 0; h < Game_CurHoleIndex(); h++) {
-                gPlayers[0].nStrokes[h] = fn_800D2AD8(h);
+                gPlayers[0].nStrokes[h] = Course_GetHolePar(h);
                 nSum0 += gPlayers[0].nStrokes[h];
                 for (i = 1; i < gNumPlayersSetUp; i++) {
-                    gPlayers[(u32)i].nStrokes[h] = fn_800D2AD8(h);
+                    gPlayers[(u32)i].nStrokes[h] = Course_GetHolePar(h);
                 }
             }
             nDiff = lbl_80281664[lbl_802822F4].nTargetBase;
             while (nDiff != 0) {
                 i = Misc_RandFunc(0) % (Game_CurHoleIndex() + 1);
                 if (nDiff < 0) {
-                    if (gPlayers[0].nStrokes[i] > fn_800D2AD8(i) - 1) {
+                    if (gPlayers[0].nStrokes[i] > Course_GetHolePar(i) - 1) {
                         gPlayers[0].nStrokes[i]--;
                     }
-                } else if (gPlayers[0].nStrokes[i] < fn_800D2AD8(i) + 1) {
+                } else if (gPlayers[0].nStrokes[i] < Course_GetHolePar(i) + 1) {
                     gPlayers[0].nStrokes[i]++;
                 }
                 nSum = 0;
@@ -373,16 +373,17 @@ void fn_800EAF7C(void) {
         gPlayers[0].nStrokes[Game_CurHoleIndex()] = lbl_80281664[lbl_802822F4].nHoleExtra;
         break;
     case 2:
-        gPlayers[0].nStrokes[Game_CurHoleIndex()] = lbl_80281664[lbl_802822F4].nHoleExtra + fn_800D2B08();
+        gPlayers[0].nStrokes[Game_CurHoleIndex()] = lbl_80281664[lbl_802822F4].nHoleExtra
+                + Course_GetCurHolePar();
         break;
     case 3:
-        gPlayers[0].nStrokes[Game_CurHoleIndex()] = fn_800D2B08() - 1;
+        gPlayers[0].nStrokes[Game_CurHoleIndex()] = Course_GetCurHolePar() - 1;
         break;
     case 4:
-        gPlayers[0].nStrokes[Game_CurHoleIndex()] = fn_800D2B08();
+        gPlayers[0].nStrokes[Game_CurHoleIndex()] = Course_GetCurHolePar();
         break;
     case 5:
-        gPlayers[0].nStrokes[Game_CurHoleIndex()] = fn_800D2B08() + 1;
+        gPlayers[0].nStrokes[Game_CurHoleIndex()] = Course_GetCurHolePar() + 1;
         break;
     }
     if (lbl_80281664[lbl_802822F4].b4D) {
@@ -444,7 +445,7 @@ u8 fn_800EBD60(u8 bCheck) {
         for (h = 0; h < 18; h++) {
             if (gpGame->bHoleSelected[h]) {
                 nStrokes += gPlayers[0].nStrokes[h];
-                lbl_80282308 += fn_800D2AD8(h);
+                lbl_80282308 += Course_GetHolePar(h);
                 lbl_80282304++;
                 lbl_80282300 += gPlayers[0].n290[h];
             }
@@ -555,7 +556,7 @@ s32 lbl_801925F0[3][3] = {
 // A message of kind n: one of three at random.
 void fn_800EC170(int n) {
     s32 nMsg = lbl_801925F0[n][Misc_RandFunc(0) % 3];
-    fn_800E4364(7, nMsg, 0, 0);
+    GUI_QueueMessage(7, nMsg, 0, 0);
 }
 
 // The challenge is over: a better medal than the profile's best is saved (with a stamp); the medal's
@@ -593,25 +594,25 @@ void fn_800EC1E0(void) {
                 if (nMoney) {
                     switch (nMedal) {
                     case 0:
-                        fn_800E4364(0, 0x6F, nMoney, nProfile);
+                        GUI_QueueMessage(0, 0x6F, nMoney, nProfile);
                         break;
                     case 1:
-                        fn_800E4364(0, 0x70, nMoney, nProfile);
+                        GUI_QueueMessage(0, 0x70, nMoney, nProfile);
                         break;
                     case 2:
-                        fn_800E4364(0, 0x71, nMoney, nProfile);
+                        GUI_QueueMessage(0, 0x71, nMoney, nProfile);
                         break;
                     }
                 }
-                fn_800D3548(0, nMoney, (CourseMoneyTracking*)aOut);
+                GM_Earnings_AwardMoney(0, nMoney, (CourseMoneyTracking*)aOut);
                 if (fn_800ED6F0() && fn_800D9998(0, 0x1C) && GM_Earnings_AwardTrophyBall(0, 0x1C)) {
-                    fn_800E4364(6, 0x1C, lbl_80200538.nA24, nProfile);
-                    fn_800D3548(0, lbl_80200538.nA24, 0);
+                    GUI_QueueMessage(6, 0x1C, lbl_80200538.nA24, nProfile);
+                    GM_Earnings_AwardMoney(0, lbl_80200538.nA24, 0);
                     gPlayers[0].money.n8 += lbl_80200538.nA24;
                 }
                 if (fn_800EC4F0(nProfile) && GM_Earnings_AwardTrophyBall(0, 0xC)) {
-                    fn_800E4364(2, 0xC, lbl_80200538.n9E4, nProfile);
-                    fn_800D3548(0, lbl_80200538.n9E4, 0);
+                    GUI_QueueMessage(2, 0xC, lbl_80200538.n9E4, nProfile);
+                    GM_Earnings_AwardMoney(0, lbl_80200538.n9E4, 0);
                     gPlayers[0].money.n8 += lbl_80200538.n9E4;
                 }
             }
@@ -769,7 +770,7 @@ int fn_800EC558(void) {
             break;
         case 1:
             nStrokes = gPlayers[0].nStrokes[Game_CurHoleIndex()];
-            nPar = fn_800D2B08();
+            nPar = Course_GetCurHolePar();
             switch (nRule) {
             case 1:
                 if (nStrokes <= nMark) {

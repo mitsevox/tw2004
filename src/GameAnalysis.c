@@ -99,7 +99,7 @@ int fn_800E6204(int nPlayer, int nRel) {
     int h;
     int n = 0;
     for (h = Game_CurHoleIndex() - 1; h >= 0; h--) {
-        if (gpGame->bHoleSelected[h] && gPlayers[nPlayer].nStrokes[h] == nRel + fn_800D2AD8(h)) {
+        if (gpGame->bHoleSelected[h] && gPlayers[nPlayer].nStrokes[h] == nRel + Course_GetHolePar(h)) {
             n++;
         }
     }
@@ -111,7 +111,7 @@ int fn_800E62B4(int nPlayer, int nRel) {
     int h;
     int n = 0;
     for (h = Game_CurHoleIndex() - 1; h >= 0; h--) {
-        if (gpGame->bHoleSelected[h] && gPlayers[nPlayer].nStrokes[h] > nRel + fn_800D2AD8(h)) {
+        if (gpGame->bHoleSelected[h] && gPlayers[nPlayer].nStrokes[h] > nRel + Course_GetHolePar(h)) {
             n++;
         }
     }

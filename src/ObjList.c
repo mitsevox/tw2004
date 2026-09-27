@@ -92,7 +92,7 @@ void fn_8000B588(UStreamObject* pObject) {
         }
     }
     if (pObject != &lbl_801A25B8) {
-        fn_80009E70(pObject);
+        StaticMem_Free(pObject);
     }
 }
 
@@ -193,5 +193,5 @@ void fn_8000B830(UStreamObject* pObject) {
         }
         p = p->pPrev;
     }
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }

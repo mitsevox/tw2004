@@ -7,7 +7,7 @@
 #include "terrain.h"
 #include "golfer.h"
 
-void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity
+void Mtx_Identity(f32 (*pMtx)[4]);                   // identity
 void fn_800488B4(UObject* pObj);
 void fn_80048A84(UObjMesh* pMesh);
 UObjMesh* fn_80048AC4(UObjMesh* pMesh, int i);
@@ -27,9 +27,9 @@ void fn_80035FBC(void);
 void fn_800486F4(UObject* pObj, UObjModel* pModel, u32 uFlags) {
     f32 fScale;
 
-    fn_8000ADC0(pObj->m0);
-    fn_8000ADC0(pObj->m40);
-    fn_8000ADC0(pObj->m80);
+    Mtx_Identity(pObj->m0);
+    Mtx_Identity(pObj->m40);
+    Mtx_Identity(pObj->m80);
     pObj->pModel = pModel;
     pObj->uFlags = uFlags;
     pObj->n104 = 0;
@@ -62,7 +62,7 @@ void fn_80048804(UObject* pObj) {
 
 // A new object of the model, from the heap.
 UObject* fn_80048808(UObjModel* pModel) {
-    UObject* pObj = fn_80009B34(sizeof(UObject), 2, 1, "UObject.c", 368);
+    UObject* pObj = StaticMem_Alloc(sizeof(UObject), 2, 1, "UObject.c", 368);
 
     fn_800486F4(pObj, pModel, 0);
     return pObj;
@@ -71,7 +71,7 @@ UObject* fn_80048808(UObjModel* pModel) {
 // Frees an object fn_80048808 made.
 void fn_80048860(UObject* pObj) {
     fn_80048804(pObj);
-    fn_80009E70(pObj);
+    StaticMem_Free(pObj);
 }
 
 void fn_80048894(UObject* pObj) {
@@ -110,14 +110,14 @@ void fn_800488B4(UObject* pObj) {
     // Found by an anonymous decomp.me user: https://decomp.me/scratch/SOh7Q
     pN108 = &pObj->n108;
     fFov = fn_80014280(0.5f * fTemp);
-    nClip = fn_80007B2C(pMesh, fn_8001614C(), 0.0f, fFov, 1.0f);
+    nClip = fn_80007B2C(pMesh, Camera_GetCurrent(), 0.0f, fFov, 1.0f);
     if (nClip == 3) return;
     nFlags0 = fn_80048AD4(pMesh, 0);
     nFlags2 = fn_80048AD4(pMesh, 2);
     bLit = nFlags2 & 4;
     if (bLit) {
         if (gSession.nGameType != 3) {
-            fn_8004B78C(fn_8000C594(), pObj->m80[3]);
+            fn_8004B78C(Ter_GetTGD(), pObj->m80[3]);
             fn_80036024(0.8f);
         }
         fn_80035FFC();
@@ -126,7 +126,7 @@ void fn_800488B4(UObject* pObj) {
         if ((nFlags0 & 2) || (nFlags2 & 1) || (nFlags2 & 2)) {
             pMesh = fn_80048AC4(pMesh, *pN108);
         }
-        fn_80012EF8();
+        RenderState_Flush();
         fLod = pObj->f10C;
         fn_8003519C(3, &fLod);
     }
@@ -144,7 +144,7 @@ void fn_800488B4(UObject* pObj) {
         fn_80035138(0);
         break;
     }
-    fn_80012EF8();
+    RenderState_Flush();
     fn_80048A84(pMesh);
     if (bLit) {
         fn_80035FBC();

@@ -22,7 +22,7 @@ GlowList* _StartGlowStrip(int nGlow, int nVerts) {
     void* pList;
 
     uSize = ((nVerts * 32 + 31) & ~31) + 0x400;
-    pList = fn_80009B34(uSize, 1, 32, "GoShaderObject_Glows_Gc.c", 134);
+    pList = StaticMem_Alloc(uSize, 1, 32, "GoShaderObject_Glows_Gc.c", 134);
     DCInvalidateRange(pList, uSize);
     GXBeginDisplayList(pList, uSize);
     GXResetWriteGatherPipe();
@@ -41,10 +41,10 @@ void _EndGlowStrip(GlowList* pList) {
     u32 uSize;
 
     uSize = GXEndDisplayList();
-    pCopy = fn_80009B34(uSize, 2, 32, "GoShaderObject_Glows_Gc.c", 159);
+    pCopy = StaticMem_Alloc(uSize, 2, 32, "GoShaderObject_Glows_Gc.c", 159);
     Mem_cpy(pCopy, pList->p4, uSize);
     DCFlushRange(pCopy, uSize);
-    fn_80009E70(pList->p4);
+    StaticMem_Free(pList->p4);
     pList->p4 = pCopy;
     pList->n0 = uSize;
     lbl_801D99D0.nCount++;
@@ -69,8 +69,8 @@ void _CreateRing(int nGlow, int nSides) {
     fn_80097EC4(vStart);
     for (i = 1; i < nSides; i++) {
         fAngle = (2.0f * PI) * ((f32)i / (f32)nSides);
-        vRim[0] = fn_80009638(fAngle);
-        vRim[1] = fn_800095F0(fAngle);
+        vRim[0] = Math_Cos(fAngle);
+        vRim[1] = Math_Sin(fAngle);
         vRim[2] = 0.0f;
         fn_80097EC4(vRim);
     }
@@ -101,8 +101,8 @@ void fn_800981D0(int nGlow, int nPoints) {
             } else {
                 fRadius = 1.0f;
             }
-            v[0] = fRadius * fn_80009638(fAngle);
-            v[1] = fRadius * fn_800095F0(fAngle);
+            v[0] = fRadius * Math_Cos(fAngle);
+            v[1] = fRadius * Math_Sin(fAngle);
             v[2] = 0.0f;
             fn_80097EC4(v);
         }
@@ -150,8 +150,8 @@ void fn_80098408(GlowQueued* pGlow, const f32* pPos) {
 
     if (!(pGlow->n25 & 0x80)) {
         if (0.0f != pGlow->f20) {
-            fSin = fn_800095F0(pGlow->f20);
-            fCos = fn_80009638(pGlow->f20);
+            fSin = Math_Sin(pGlow->f20);
+            fCos = Math_Cos(pGlow->f20);
         } else {
             fSin = 0.0f;
             fCos = 1.0f;
@@ -214,7 +214,7 @@ void fn_800985FC(GlowQueue* pQueue, f32 (*pMtx)[4], int bOnTop) {
     int i;
     Vec4 v;
 
-    fn_8001614C();
+    Camera_GetCurrent();
     GXSetClipMode(0);
     GXSetChanCtrl(4, 0, 0, 1, 0, 0, 2);
     GXSetNumTevStages(1);
@@ -252,7 +252,7 @@ void GlowsRenderData_CloseModule(void) {
     int i;
     for (i = 0; i < NUM_GLOWS; i++) {
         if (lbl_801D99D0.a[i].p4 != NULL) {
-            fn_80009E70(lbl_801D99D0.a[i].p4);
+            StaticMem_Free(lbl_801D99D0.a[i].p4);
             lbl_801D99D0.nCount--;
         }
     }
@@ -327,39 +327,39 @@ void fn_800360D4(u8* pMesh);
 // the camera's identity view matrix back.
 void ColGlow_RenderAllGlowInCurrentList(void) {
     GlowDrawDesc desc;
-    void* pCamera = fn_8001614C();
-    CamLens* pLens = fn_80008370(pCamera);
+    void* pCamera = Camera_GetCurrent();
+    CamLens* pLens = Camera_GetLens(pCamera);
     f32 (*pMtx)[4];
     if (lbl_80281F80 != NULL && lbl_80281F80->nCount > 0) {
         pMtx = pLens->m44;
         // port: the lens's 0x04..0x44 block is used as a matrix here (CamLens has v4 there)
         fn_80013D9C(pCamera, pLens->m4);
-        fn_80013EEC(fn_8001614C());
+        fn_80013EEC(Camera_GetCurrent());
         fn_80016B9C();
-        fn_80035118(4, 1);
-        fn_80012F50(0, 6, 0x80);
-        fn_80012F34(0);
-        fn_80014118(0x40);
-        fn_80012F18(3);
-        fn_80012EF8();
+        RenderState_SetBlendFactors(4, 1);
+        RenderState_SetAlphaTest(0, 6, 0x80);
+        RenderState_SetDepthWrite(0);
+        RenderState_SetDrawFlags(0x40);
+        RenderState_SetDepthFunc(3);
+        RenderState_Flush();
         desc.pQueue = lbl_80281F80;
         desc.bFirst = 1;
         desc.pMtx = pMtx;
         fn_80036100((ShaderObject*)lbl_801D9A40, &desc, 1);
         fn_800360D4(lbl_801D9A40);
-        fn_80012F18(7);
-        fn_80012EF8();
+        RenderState_SetDepthFunc(7);
+        RenderState_Flush();
         desc.pQueue = lbl_80281F80;
         desc.bFirst = 0;
         desc.pMtx = pMtx;
         fn_80036100((ShaderObject*)lbl_801D9A40, &desc, 1);
         fn_800360D4(lbl_801D9A40);
         fn_80013D9C(pCamera, NULL);
-        fn_80013EEC(fn_8001614C());
-        fn_80012F34(1);
-        fn_80012F18(3);
-        fn_80012F50(1, 6, 0x80);
-        fn_80035118(4, 5);
-        fn_80012EF8();
+        fn_80013EEC(Camera_GetCurrent());
+        RenderState_SetDepthWrite(1);
+        RenderState_SetDepthFunc(3);
+        RenderState_SetAlphaTest(1, 6, 0x80);
+        RenderState_SetBlendFactors(4, 5);
+        RenderState_Flush();
     }
 }

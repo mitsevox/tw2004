@@ -102,8 +102,8 @@ void Skalib_Init(void) {
     if (gSession.nGameType == 3 || gSession.nGameType == 10) {
         lbl_80281D18 = 0;
     }
-    lbl_80281D14 = fn_80009B34(4 * sizeof(*lbl_80281D14), 2, 0, "skalib.c", 508);   // four players
-    fn_80005AE8(lbl_80281D14, 0, 4 * sizeof(*lbl_80281D14));
+    lbl_80281D14 = StaticMem_Alloc(4 * sizeof(*lbl_80281D14), 2, 0, "skalib.c", 508);   // four players
+    Mem_set(lbl_80281D14, 0, 4 * sizeof(*lbl_80281D14));
     lbl_80281CC4 = lbl_801C5E2C;
     lbl_80281CC4 = (u8*)((((uptr)lbl_80281CC4 >> 5) + 1) << 5);
     lbl_80281CC8 = lbl_801C5C50;
@@ -121,7 +121,7 @@ void Skalib_Shutdown(void) {
     int i;
 
     AnimLib_FreeCopies();
-    fn_80009E70(lbl_80281D14);
+    StaticMem_Free(lbl_80281D14);
     lbl_80281D14 = NULL;
     for (i = 0; i < 3; i++) {
         if (lbl_801C605C[i] != NULL) {
@@ -144,23 +144,23 @@ void Skalib_Shutdown(void) {
 void AnimLib_Free(AnimLib* pLib) {
     if (pLib->pFile != NULL) {
         if (pLib->pClipData != NULL) {
-            fn_80009E70(pLib->ppClips);
+            StaticMem_Free(pLib->ppClips);
         }
-        fn_80009E70(pLib->pFile);
+        StaticMem_Free(pLib->pFile);
     } else {
         if (pLib->ppClips != NULL) {
-            fn_80009E70(pLib->ppClips);
+            StaticMem_Free(pLib->ppClips);
         }
         if (pLib->pIndex != NULL) {
-            fn_80009E70(pLib->pIndex);
+            StaticMem_Free(pLib->pIndex);
         }
         if (pLib->pTree != NULL) {
-            fn_80009E70(pLib->pTree);
+            StaticMem_Free(pLib->pTree);
         }
         if (pLib->pRecords != NULL) {
-            fn_80009E70(pLib->pRecords);
+            StaticMem_Free(pLib->pRecords);
         }
-        fn_80009E70(pLib);
+        StaticMem_Free(pLib);
     }
 }
 
@@ -176,9 +176,9 @@ void ClipBank_Free(ClipBank* pBank) {
         }
     }
     if (pBank->pFile != NULL) {
-        fn_80009E70(pBank->pFile);
+        StaticMem_Free(pBank->pFile);
     } else {
-        fn_80009E70(pBank);
+        StaticMem_Free(pBank);
     }
 }
 
@@ -1195,19 +1195,19 @@ u32 AnimLib_PlanBank(u32 nSlot) {
             // in r20 until the retry and spills the one read at the end; one local: 99.4%)
             nBytesBefore2 = ctx.nBytes;
             nBytesBefore  = ctx.nBytes;
-            pRecordsCopy = fn_80009B34(pLib->nRecords * sizeof(ClipRecord), 1, 0, "skalib.c", 2078);
+            pRecordsCopy = StaticMem_Alloc(pLib->nRecords * sizeof(ClipRecord), 1, 0, "skalib.c", 2078);
             Mem_cpy(pRecordsCopy, pLib->pRecords, pLib->nRecords * sizeof(ClipRecord));
-            pIndexCopy = fn_80009B34(pLib->nClips2 * 2, 1, 0, "skalib.c", 2080);
+            pIndexCopy = StaticMem_Alloc(pLib->nClips2 * 2, 1, 0, "skalib.c", 2080);
             Mem_cpy(pIndexCopy, pLib->pIndex, pLib->nClips2 * 2);
-            pTreeCopy = fn_80009B34(pLib->nTreeSize, 1, 0, "skalib.c", 2082);
+            pTreeCopy = StaticMem_Alloc(pLib->nTreeSize, 1, 0, "skalib.c", 2082);
             Mem_cpy(pTreeCopy, pLib->pTree, pLib->nTreeSize);
             for (i = 0; i < nOvs; i++) {
                 apRecords[i] =
-                    fn_80009B34(pOvs[i].pWork->nRecords * sizeof(ClipRecord), 1, 0, "skalib.c", 2086);
+                    StaticMem_Alloc(pOvs[i].pWork->nRecords * sizeof(ClipRecord), 1, 0, "skalib.c", 2086);
                 Mem_cpy(apRecords[i], pOvs[i].pWork->pRecords, pOvs[i].pWork->nRecords * sizeof(ClipRecord));
-                apIndex[i] = fn_80009B34(pOvs[i].pWork->nClips2 * 2, 1, 0, "skalib.c", 2088);
+                apIndex[i] = StaticMem_Alloc(pOvs[i].pWork->nClips2 * 2, 1, 0, "skalib.c", 2088);
                 Mem_cpy(apIndex[i], pOvs[i].pWork->pIndex, pOvs[i].pWork->nClips2 * 2);
-                apTree[i] = fn_80009B34(pOvs[i].nTree, 1, 0, "skalib.c", 2090);
+                apTree[i] = StaticMem_Alloc(pOvs[i].nTree, 1, 0, "skalib.c", 2090);
                 Mem_cpy(apTree[i], pOvs[i].pWork->pTree, pOvs[i].nTree);
             }
             if (!AnimLib_TrimToFit(&ctx, pLib, pOvs, nOvs, 0)) {
@@ -1236,13 +1236,13 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                     }
                 }
             }
-            fn_80009E70(pRecordsCopy);
-            fn_80009E70(pIndexCopy);
-            fn_80009E70(pTreeCopy);
+            StaticMem_Free(pRecordsCopy);
+            StaticMem_Free(pIndexCopy);
+            StaticMem_Free(pTreeCopy);
             for (i = 0; i < nOvs; i++) {
-                fn_80009E70(apRecords[i]);
-                fn_80009E70(apIndex[i]);
-                fn_80009E70(apTree[i]);
+                StaticMem_Free(apRecords[i]);
+                StaticMem_Free(apIndex[i]);
+                StaticMem_Free(apTree[i]);
             }
             lbl_801C6008[nSlot].nBytes    = ctx.nBytes - nHdr;
             lbl_801C6008[nSlot].nKeep     = ctx.nKeep;
@@ -1253,11 +1253,11 @@ u32 AnimLib_PlanBank(u32 nSlot) {
         lbl_801C6008[nSlot].n04     = 0;
         pBank = lbl_801C6050[nSlot];
         if (pBank == NULL) {
-            pBank = fn_80009B34(nBudget, 2, 0x40, "skalib.c", 2159);
+            pBank = StaticMem_Alloc(nBudget, 2, 0x40, "skalib.c", 2159);
         }
         nRet = nBudget;
     } else {
-        pBank = fn_80009B34(nTotal, 2, 0x40, "skalib.c", 2175);
+        pBank = StaticMem_Alloc(nTotal, 2, 0x40, "skalib.c", 2175);
         nRet  = nTotal;
     }
     pBank->nClips  = nClips;
@@ -1523,7 +1523,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             pNew->nClips    = 0;
             pNew->pBank     = pBank;
             if (pOv->pChar->pRecords == NULL) {
-                pOv->pChar->pRecords = fn_80009B34(pSrc->nClips * sizeof(ClipRecord), 2, 0, "skalib.c", 2943);
+                pOv->pChar->pRecords = StaticMem_Alloc(pSrc->nClips * sizeof(ClipRecord), 2, 0, "skalib.c", 2943);
             }
             ctx.pLib     = pNew;
             ctx.pRecords = pOv->pChar->pRecords;
@@ -1593,13 +1593,13 @@ void AnimLib_FreeCopies(void) {
         if (pSlot->nOverlays != 0) {
             for (j = 0; j < pSlot->nOverlays; j++) {
                 pOv = &pSlot->overlays[j];
-                fn_80009E70(pOv->pCopy);
+                StaticMem_Free(pOv->pCopy);
                 pOv->pCopy = NULL;
             }
         }
         pSlot->nOverlays = 0;
         if (pSlot->pCopy != NULL) {
-            fn_80009E70(pSlot->pCopy);
+            StaticMem_Free(pSlot->pCopy);
         }
         pSlot->pCopy = NULL;
     }
@@ -1651,13 +1651,13 @@ void AnimLib_ReloadSlot(void) {
     }
     pSlot = &lbl_801C6068[nSlot];
     if (pSlot->nOverlays != 0) {
-        pSlot->pLib = fn_80009B34(pSlot->nSize, 1, 0x40, "skalib.c", 3193);
+        pSlot->pLib = StaticMem_Alloc(pSlot->nSize, 1, 0x40, "skalib.c", 3193);
         Mem_cpy(pSlot->pLib, pSlot->pCopy, pSlot->nSize);
         pLib = AnimLib_Load((u8*)pSlot->pLib, ClipBank_Get(nSlot));
         pLib->pFile = pSlot->pLib;
         for (j = 0; j < pSlot->nOverlays; j++) {
             pOv        = &pSlot->overlays[j];
-            pOv->pWork = fn_80009B34(pOv->nSize, 1, 0x40, "skalib.c", 3207);
+            pOv->pWork = StaticMem_Alloc(pOv->nSize, 1, 0x40, "skalib.c", 3207);
             Mem_cpy(pOv->pWork, pOv->pCopy, pOv->nSize);
             AnimLib_Load((u8*)pOv->pWork, ClipBank_Get(nSlot));
             pOv->n10 = pOv->n14 + 3;
@@ -1852,32 +1852,32 @@ void ClipBank_SwapHeader(void* p) {
     void*     pSrc = p;
     void*     pDst = p;
     // port: a clip bank's header ('BNK '), little-endian on disc; a little-endian port does not swap here
-    fn_8001F08C(&pSrc, &pDst, fmt, 5, 1);
+    ByteSwap_Records(&pSrc, &pDst, fmt, 5, 1);
 }
 
 // Swap one node of the clip tree (see AnimLib).
 void AnimLib_SwapGroupNode(void* pSrc, void* pDst) {
     SwapField fmt[3] = {{2, 2}, {0x10, 2}, {2, 1}};
     // port: a clip-tree group node ('SAL '), little-endian on disc; a little-endian port does not swap here
-    fn_8001F08C(&pSrc, &pDst, fmt, 3, 1);
+    ByteSwap_Records(&pSrc, &pDst, fmt, 3, 1);
 }
 
 void AnimLib_SwapStyleNode(void* pSrc, void* pDst) {
     SwapField fmt[2] = {{12, 2}, {2, 1}};
     // port: a clip-tree style node ('SAL '), little-endian on disc; a little-endian port does not swap here
-    fn_8001F08C(&pSrc, &pDst, fmt, 2, 1);
+    ByteSwap_Records(&pSrc, &pDst, fmt, 2, 1);
 }
 
 void AnimLib_SwapClubNode(void* pSrc, void* pDst) {
     SwapField fmt[5] = {{2, 2}, {2, 2}, {0x16, 2}, {2, 2}, {4, 4}};
     // port: a clip-tree club node ('SAL '), little-endian on disc; a little-endian port does not swap here
-    fn_8001F08C(&pSrc, &pDst, fmt, 5, 1);
+    ByteSwap_Records(&pSrc, &pDst, fmt, 5, 1);
 }
 
 void AnimLib_SwapLeaf(void* pSrc, void* pDst) {
     SwapField fmt[3] = {{2, 2}, {2, 2}, {4, 4}};
     // port: a clip-tree leaf ('SAL '), little-endian on disc; a little-endian port does not swap here
-    fn_8001F08C(&pSrc, &pDst, fmt, 3, 1);
+    ByteSwap_Records(&pSrc, &pDst, fmt, 3, 1);
 }
 
 // Swaps the whole clip tree, walking it the way AnimLib_Find does.
@@ -1953,7 +1953,7 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
     // port: an animation library's header ('SAL ', and 'SAC ' overlays), little-endian on disc; a
     //       little-endian port does not swap here.
     // port: The library is then used in place (AnimLib over the bytes; its offsets become 32-bit pointers).
-    fn_8001F08C(&pSrc, &pDst, hdrFmt, 19, 1);
+    ByteSwap_Records(&pSrc, &pDst, hdrFmt, 19, 1);
     if (pLib->pBank != NULL) {
         if (pBank == NULL) return NULL;
         pLib->pClipData = NULL;
@@ -1964,7 +1964,7 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
         pDst = pSrc = pLib->ppClips;
         // port: the library's clip numbers into its bank, little-endian on disc; a little-endian port does
         //       not swap here
-        BYTESWAP_SWAPDATA((u8**)&pSrc, pDst, pLib->nClips * 4, 4);   // port: pSrc is a void* (fn_8001F08C's)
+        BYTESWAP_SWAPDATA((u8**)&pSrc, pDst, pLib->nClips * 4, 4);   // port: pSrc is a void* (ByteSwap_Records's)
         if (pLib->uId != pBank->uId) {
             for (i = 0; i < pLib->nClips; i++) {
                 pLib->ppClips[i] = pBank->ppClips[0];
@@ -1992,13 +1992,13 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
         pDst = pSrc = pLib->pRecords;
         // port: the library's clip records (ClipRecord, laid over the bytes), little-endian on disc; a
         //       little-endian port does not swap here
-        fn_8001F08C(&pSrc, &pDst, recFmt, 7, pLib->nRecords);
+        ByteSwap_Records(&pSrc, &pDst, recFmt, 7, pLib->nRecords);
         if (pLib->uFlags & 1) {
             if ((uptr)pData & 15) {
                 pData = (u8*)((((uptr)pData >> 4) + 1) << 4);
             }
             pLib->pClipData = pData;
-            pLib->ppClips   = fn_80009B34(pLib->nClips * 4, 2, 0x40, "skalib.c", 4164);
+            pLib->ppClips   = StaticMem_Alloc(pLib->nClips * 4, 2, 0x40, "skalib.c", 4164);
             for (i = 0; i < pLib->nRecords; i++) {
                 pLib->pRecords[i].pClip =
                     SKA_LoadFromMem(pLib->pClipData + (uptr)pLib->pRecords[i].pClip, NULL, 16);
@@ -2063,7 +2063,7 @@ void AnimLib_OnLoaded(UStreamObject* pFile) {
     AnimLib* pLib;
 
     if (nSlot < 3 && lbl_801C605C[nSlot] == NULL) {
-        lbl_801C6068[nSlot].pCopy = fn_80009B34(pFile->uSize, 2, 0x40, "skalib.c", 4520);
+        lbl_801C6068[nSlot].pCopy = StaticMem_Alloc(pFile->uSize, 2, 0x40, "skalib.c", 4520);
         Mem_cpy(lbl_801C6068[nSlot].pCopy, pFile->pData, pFile->uSize);
         lbl_801C6068[nSlot].nSize = pFile->uSize;
         pLib = AnimLib_Load(pFile->pData, ClipBank_Get(nSlot));
@@ -2076,7 +2076,7 @@ void AnimLib_OnLoaded(UStreamObject* pFile) {
         bFree = 0;
     }
     if (bFree) {
-        fn_80009E70(pFile);
+        StaticMem_Free(pFile);
     }
 }
 
@@ -2100,7 +2100,7 @@ void ClipBank_Install(UStreamObject* pFile) {
         lbl_801C6050[nSlot]->pFile = pFile;
     }
     if (bFree) {
-        fn_80009E70(pFile);
+        StaticMem_Free(pFile);
     }
 }
 
@@ -2130,11 +2130,11 @@ void ClipBank_Stash(int nSlot) {
         }
         GoARAM_WaitTransfer(GoARAM_CopyToAram(lbl_801C6488[nSlot], lbl_801C6470[nSlot], lbl_801C647C[nSlot]));
         if (lbl_801C6488[nSlot] != lbl_80281CE0) {
-            fn_80009E70(lbl_801C6488[nSlot]);
+            StaticMem_Free(lbl_801C6488[nSlot]);
         }
         lbl_801C6488[nSlot] = NULL;
         if (nSlot == 0 && lbl_80281CE0 == NULL) {
-            lbl_80281CE0 = fn_80009B34(lbl_801C647C[nSlot], 2, 0x20, "skalib.c", 4671);
+            lbl_80281CE0 = StaticMem_Alloc(lbl_801C647C[nSlot], 2, 0x20, "skalib.c", 4671);
         }
     }
 }
@@ -2159,7 +2159,7 @@ void ClipBank_FreeAram(void) {
         }
     }
     if (lbl_80281CE0 != NULL) {
-        fn_80009E70(lbl_80281CE0);
+        StaticMem_Free(lbl_80281CE0);
         lbl_80281CE0 = NULL;
     }
 }

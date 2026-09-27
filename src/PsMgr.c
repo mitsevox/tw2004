@@ -29,21 +29,21 @@ PsMgrState lbl_80282010;
 void fn_800A27FC(f32 fDir, f32 fPoint) {
     int i;
 
-    for (i = 0; i < fn_8000C594()->lights.nLights; i++) {
-        if (fn_8000C594()->lights.aLight[i].nType == 1) {
-            fn_8000AE28(fDir, fn_8000C594()->lights.aLight[i].vColor,
-                        fn_8000C594()->lights.aLight[i].vColor);
-        } else if (fn_8000C594()->lights.aLight[i].nType == 2) {
-            fn_8000AE28(fPoint, fn_8000C594()->lights.aLight[i].vColor,
-                        fn_8000C594()->lights.aLight[i].vColor);
+    for (i = 0; i < Ter_GetTGD()->lights.nLights; i++) {
+        if (Ter_GetTGD()->lights.aLight[i].nType == 1) {
+            Vec_Scale(fDir, Ter_GetTGD()->lights.aLight[i].vColor,
+                        Ter_GetTGD()->lights.aLight[i].vColor);
+        } else if (Ter_GetTGD()->lights.aLight[i].nType == 2) {
+            Vec_Scale(fPoint, Ter_GetTGD()->lights.aLight[i].vColor,
+                        Ter_GetTGD()->lights.aLight[i].vColor);
         }
     }
     fn_80035338(0);
-    fn_800935CC(&fn_8000C594()->lights);
-    fn_80093900(fn_8000C594()->p38);
-    if (fn_8000C594()->p44 != NULL) {
+    fn_800935CC(&Ter_GetTGD()->lights);
+    fn_80093900(Ter_GetTGD()->p38);
+    if (Ter_GetTGD()->p44 != NULL) {
         fn_80035338(2);
-        fn_80093900(fn_8000C594()->p44);
+        fn_80093900(Ter_GetTGD()->p44);
         fn_80035308();
         fn_800352E4();
     }
@@ -88,7 +88,7 @@ void fn_800A29B4(UStreamObject* pObject) {
         strcpy(lbl_801F1640[i], szName);
         i++;
     }
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // fake match: stands in for a function the original linker stripped. The file's pool has 1.0 before
@@ -106,7 +106,7 @@ s32 fn_800A2A80(s32 nKind, f32* pArg, s32 n3) {
         }
         break;
     case 0:
-        lbl_801F16F4[0] = fn_80009B34(0x28, 2, 32, "PsMgr.c", 530);    // the rain object
+        lbl_801F16F4[0] = StaticMem_Alloc(0x28, 2, 32, "PsMgr.c", 530);    // the rain object
         if (pArg != NULL) {
             fStrength = *pArg;
         } else {
@@ -126,7 +126,7 @@ void fn_800A2B34(s32 nKind) {
     case 0:
         if (lbl_801F16F4[nKind] != NULL) {
             fn_800B4F24(lbl_801F16F4[nKind]);
-            fn_80009E70(lbl_801F16F4[nKind]);
+            StaticMem_Free(lbl_801F16F4[nKind]);
             lbl_801F16F4[nKind] = NULL;
         }
         break;

@@ -54,11 +54,11 @@ void GR_vInit(void) {
     desc[1] = 1;
     for (i = 0; i < nViews; i++) {
         fn_80036054(lbl_802813C0->aMesh[i], 0x13, desc);
-        lbl_802813C0->apVert[i] = fn_80009B34(desc[0] * 12, 2, 16, "GoGreenGrid.c", 94);
-        lbl_802813C0->apUV[i] = fn_80009B34(desc[0] * 8, 2, 16, "GoGreenGrid.c", 99);
-        lbl_802813C0->apColor[i] = fn_80009B34(desc[0] * 4, 2, 16, "GoGreenGrid.c", 104);
-        lbl_802813C0->apIndex[i] = fn_80009B34(desc[0] * 2, 2, 16, "GoGreenGrid.c", 109);
-        lbl_802813C0->apHeight[i] = fn_80009B34(nRows * 16, 2, 16, "GoGreenGrid.c", 114);
+        lbl_802813C0->apVert[i] = StaticMem_Alloc(desc[0] * 12, 2, 16, "GoGreenGrid.c", 94);
+        lbl_802813C0->apUV[i] = StaticMem_Alloc(desc[0] * 8, 2, 16, "GoGreenGrid.c", 99);
+        lbl_802813C0->apColor[i] = StaticMem_Alloc(desc[0] * 4, 2, 16, "GoGreenGrid.c", 104);
+        lbl_802813C0->apIndex[i] = StaticMem_Alloc(desc[0] * 2, 2, 16, "GoGreenGrid.c", 109);
+        lbl_802813C0->apHeight[i] = StaticMem_Alloc(nRows * 16, 2, 16, "GoGreenGrid.c", 114);
         lbl_802813C0->aTarget[i][0] = 0.0f;
         lbl_802813C0->aTarget[i][1] = 0.0f;
         lbl_802813C0->aTarget[i][2] = 0.0f;
@@ -92,18 +92,18 @@ void fn_8009B898(void) {
     int i;
     for (i = 0; i < nViews; i++) {
         fn_800360A0(lbl_802813C0->aMesh[i]);
-        fn_80009E70(lbl_802813C0->apVert[i]);
-        fn_80009E70(lbl_802813C0->apUV[i]);
-        fn_80009E70(lbl_802813C0->apColor[i]);
-        fn_80009E70(lbl_802813C0->apIndex[i]);
-        fn_80009E70(lbl_802813C0->apHeight[i]);
+        StaticMem_Free(lbl_802813C0->apVert[i]);
+        StaticMem_Free(lbl_802813C0->apUV[i]);
+        StaticMem_Free(lbl_802813C0->apColor[i]);
+        StaticMem_Free(lbl_802813C0->apIndex[i]);
+        StaticMem_Free(lbl_802813C0->apHeight[i]);
     }
 }
 
 // Lays the view's grid out for its player's target: with the putter it runs from beyond the pin
 // back past the ball (at most 8 or 16 rows), otherwise it is a square of nCols x nCols points.
 void fn_8009B970(int nView) {
-    // fake match: an s32 (long) copy of nView, kept in its own register, for the fn_8001707C calls
+    // fake match: an s32 (long) copy of nView, kept in its own register, for the ViewController_GetPlayer calls
     s32 nViewCopy;
     f32 vPin[4];
     f32 fNegZ;
@@ -113,21 +113,23 @@ void fn_8009B970(int nView) {
     f32 fDist;
     f32 fLen;
     nViewCopy = nView;
-    if (!fn_8009BD24(fn_8001707C(nViewCopy))) {
+    if (!fn_8009BD24(ViewController_GetPlayer(nViewCopy))) {
         return;
     }
-    Vec_Copy(PLAYER(fn_8001707C(nViewCopy))->vTarget, lbl_802813C0->aTarget[nView]);
+    Vec_Copy(PLAYER(ViewController_GetPlayer(nViewCopy))->vTarget, lbl_802813C0->aTarget[nView]);
     lbl_802813C0->anDone[nView] = 0;
-    fn_8009CB78(PLAYER(fn_8001707C(nViewCopy))->vTarget, PLAYER(fn_8001707C(nViewCopy))->ball.vPos,
+    fn_8009CB78(PLAYER(ViewController_GetPlayer(nViewCopy))->vTarget,
+                PLAYER(ViewController_GetPlayer(nViewCopy))->ball.vPos,
                 lbl_802813C0->aDir[nView]);
     lbl_802813C0->aDir[nView][1] = 0.0f;
-    fDist = (f32)fn_80009680(fn_80009744(lbl_802813C0->aDir[nView]));
-    fn_800BAF04(lbl_802813C0->aDir[nView], lbl_802813C0->aDir[nView]);
-    if (PLAYER(fn_8001707C(nViewCopy))->nClub == CLUB_PUTTER_e) {
-        fn_8009CB78(&fn_8000C594()->pin[Game_CurrentPinSet()].x, PLAYER(fn_8001707C(nViewCopy))->ball.vPos,
+    fDist = (f32)Math_Sqrt(Vec3_LengthSqClamped(lbl_802813C0->aDir[nView]));
+    Vec_NormalizeTo(lbl_802813C0->aDir[nView], lbl_802813C0->aDir[nView]);
+    if (PLAYER(ViewController_GetPlayer(nViewCopy))->nClub == CLUB_PUTTER_e) {
+        fn_8009CB78(&Ter_GetTGD()->pin[Game_CurrentPinSet()].x,
+                    PLAYER(ViewController_GetPlayer(nViewCopy))->ball.vPos,
                     vPin);
         vPin[1] = 0.0f;
-        fLen = 2.0f + (f32)fn_80009680(fn_80009744(vPin));
+        fLen = 2.0f + (f32)Math_Sqrt(Vec3_LengthSqClamped(vPin));
         lbl_802813C0->anRows[nView] = 2.0f * fLen;
         if (gSession.nSplitScreen && lbl_802813C0->anRows[nView] > 8) {
             lbl_802813C0->anRows[nView] = 8;
@@ -146,9 +148,9 @@ void fn_8009B970(int nView) {
     fDirX = lbl_802813C0->aDir[nView][0];
     fNegZ = -lbl_802813C0->aDir[nView][2];
     lbl_802813C0->aCorner[nView][0] = fAcross * fNegZ
-        + (PLAYER(fn_8001707C(nViewCopy))->vTarget[0] - fAlong * lbl_802813C0->aDir[nView][0]);
+        + (PLAYER(ViewController_GetPlayer(nViewCopy))->vTarget[0] - fAlong * lbl_802813C0->aDir[nView][0]);
     lbl_802813C0->aCorner[nView][2] = fAcross * fDirX
-        + (PLAYER(fn_8001707C(nViewCopy))->vTarget[2] - fAlong * lbl_802813C0->aDir[nView][2]);
+        + (PLAYER(ViewController_GetPlayer(nViewCopy))->vTarget[2] - fAlong * lbl_802813C0->aDir[nView][2]);
 }
 
 // Whether the grid shows for the player: never with fn_800E39F0; with the putter when
@@ -184,8 +186,8 @@ void fn_8009BE08(int nView) {
     int n;
     int nRow;
     int nCol;
-    CourseInfo* pCourse = fn_8000C594();
-    // fake match: an s32 (long) copy of nView, kept in its own register, for the fn_8001707C calls
+    CourseInfo* pCourse = Ter_GetTGD();
+    // fake match: an s32 (long) copy of nView, kept in its own register, for the ViewController_GetPlayer calls
     s32 nViewCopy;
     f32 vPoint[4];
     f32 vNormal[4];
@@ -196,12 +198,12 @@ void fn_8009BE08(int nView) {
     f32 fDirX;
     f32 fDirZ;
     nViewCopy = nView;
-    if (!fn_8009BD24(fn_8001707C(nViewCopy))) {
+    if (!fn_8009BD24(ViewController_GetPlayer(nViewCopy))) {
         return;
     }
-    if (lbl_802813C0->aTarget[nView][0] != PLAYER(fn_8001707C(nViewCopy))->vTarget[0]
-        || lbl_802813C0->aTarget[nView][1] != PLAYER(fn_8001707C(nViewCopy))->vTarget[1]
-        || lbl_802813C0->aTarget[nView][2] != PLAYER(fn_8001707C(nViewCopy))->vTarget[2]) {
+    if (lbl_802813C0->aTarget[nView][0] != PLAYER(ViewController_GetPlayer(nViewCopy))->vTarget[0]
+        || lbl_802813C0->aTarget[nView][1] != PLAYER(ViewController_GetPlayer(nViewCopy))->vTarget[1]
+        || lbl_802813C0->aTarget[nView][2] != PLAYER(ViewController_GetPlayer(nViewCopy))->vTarget[2]) {
         fn_8009B970(nView);
     }
     fDirX = lbl_802813C0->aDir[nView][0];
@@ -213,7 +215,7 @@ void fn_8009BE08(int nView) {
         fAcross = nCol * lbl_802813C0->fCellW;
         fAlong = nRow * lbl_802813C0->fCellD;
         vPoint[0] = fAcross * fDirZ + (fAlong * fDirX + lbl_802813C0->aCorner[nView][0]);
-        vPoint[1] = 2.0f + PLAYER(fn_8001707C(nViewCopy))->vTarget[1];
+        vPoint[1] = 2.0f + PLAYER(ViewController_GetPlayer(nViewCopy))->vTarget[1];
         vPoint[2] = (fAlong * fDirZ + lbl_802813C0->aCorner[nView][2]) - fAcross * fDirX;
         vPoint[3] = 1.0f;
         lbl_802813C0->apHeight[nView][n] =
@@ -305,7 +307,7 @@ void GR_BuildGridRenderData(s32 nView) {
                     (k == nEdge) ? 0 : (u8)lbl_802813C0->anColor[3];
                 if (k == 0 && lbl_802813C0->nVerts > 0) {
                     fU = (u32)pSession->nFrameCount * lbl_802813C0->f100 * (fPrev - fHeight);
-                    fU = fU - fn_80035074(fU);
+                    fU = fU - Math_Floor(fU);
                     lbl_802813C0->apUV[nView][lbl_802813C0->nVerts * 2 + 0] = fU;
                     lbl_802813C0->apUV[nView][lbl_802813C0->nVerts * 2 + 1] = 0.75f;
                     lbl_802813C0->apUV[nView][lbl_802813C0->nVerts * 2 - 2] = fU + lbl_802813C0->fFC;
@@ -359,7 +361,7 @@ void GR_BuildGridRenderData(s32 nView) {
                     (k == nEdge) ? 0 : (u8)lbl_802813C0->anColor[3];
                 if (k == 0 && lbl_802813C0->nVerts > 0) {
                     fU = (u32)pSession->nFrameCount * lbl_802813C0->f100 * (fPrev - fHeight);
-                    if ((s8)GOLFERSTATE_GetCurrentState(fn_8001707C(nView)) == GS_ZOOM) {
+                    if ((s8)GOLFERSTATE_GetCurrentState(ViewController_GetPlayer(nView)) == GS_ZOOM) {
                         fV = 0.75f;
                         fGap = 0.0625f;
                     } else {
@@ -374,7 +376,7 @@ void GR_BuildGridRenderData(s32 nView) {
                         }
                         fU = fU + ((1.0f + fGap) - fPeriod);
                     } else {
-                        fU = fU - fn_80035074(fU);
+                        fU = fU - Math_Floor(fU);
                     }
                     lbl_802813C0->apUV[nView][lbl_802813C0->nVerts * 2 + 0] = fU;
                     lbl_802813C0->apUV[nView][lbl_802813C0->nVerts * 2 + 1] = fV;
@@ -404,7 +406,7 @@ void GR_BuildGridRenderData(s32 nView) {
 // Draws the view's grid once every point has been sampled: only for a human player standing over
 // the ball (set-up, aiming and green cameras, or the swing before it starts).
 void fn_8009C914(int nView) {
-    // fake match: an s32 (long) copy of nView, kept in its own register, for the fn_8001707C calls
+    // fake match: an s32 (long) copy of nView, kept in its own register, for the ViewController_GetPlayer calls
     s32 nViewCopy;
     TrailDraw draw;
     TrailMeshDesc desc;
@@ -413,10 +415,10 @@ void fn_8009C914(int nView) {
     int nPlayer;
     int nState;
     nViewCopy = nView;
-    if (!fn_8009BD24(fn_8001707C(nView))) {
+    if (!fn_8009BD24(ViewController_GetPlayer(nView))) {
         return;
     }
-    nPlayer = fn_8001707C(nViewCopy);
+    nPlayer = ViewController_GetPlayer(nViewCopy);
     nState = GOLFERSTATE_GetCurrentState(nPlayer);
     if ((s8)nState == GS_WAIT) {
         return;
@@ -447,14 +449,14 @@ void fn_8009C914(int nView) {
     }
     GR_BuildGridRenderData(nView);
     fn_80016B9C();
-    fn_80035118(4, 5);
-    fn_80012F50(0, 6, 0x80);
-    fn_80012F34(0);
+    RenderState_SetBlendFactors(4, 5);
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_SetDepthWrite(0);
     fn_8005CC64(lbl_80281FAC, lbl_80281FA8);
     if (lbl_802813C0->b104) {
-        fn_80014118(0x70);
+        RenderState_SetDrawFlags(0x70);
     } else {
-        fn_80014118(0x60);
+        RenderState_SetDrawFlags(0x60);
     }
     fn_80035138(0);
     pLens = ((Camera*)*lbl_80280DF0)->unk10;
@@ -466,7 +468,7 @@ void fn_8009C914(int nView) {
     fn_80016B9C();
     fn_80016B9C();
     fn_800354B4((u8*)pLens, fAC);
-    fn_80012EF8();
+    RenderState_Flush();
     draw.nPrims = 3;
     draw.nFirst = 0;
     draw.nCount = lbl_802813C0->nIndices;
@@ -479,9 +481,9 @@ void fn_8009C914(int nView) {
     desc.pUV = lbl_802813C0->apUV[nView];
     fn_80036100((ShaderObject*)lbl_802813C0->aMesh[nView], &desc, 1);
     fn_800360D4(lbl_802813C0->aMesh[nView]);
-    fn_80012F50(1, 6, 0x80);
-    fn_80012F34(1);
-    fn_80012EF8();
+    RenderState_SetAlphaTest(1, 6, 0x80);
+    RenderState_SetDepthWrite(1);
+    RenderState_Flush();
 }
 
 // a - b into out (four floats)

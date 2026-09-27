@@ -141,18 +141,18 @@ void UISProcessHint(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
 
 // Allocate the database, empty, and its tables.
 void FE_CrAP_InitModule(void) {
-    lbl_80282460 = fn_80009B34(sizeof(CrAPDB), 2, 0, "FE_CrAPDB.c", 211);
+    lbl_80282460 = StaticMem_Alloc(sizeof(CrAPDB), 2, 0, "FE_CrAPDB.c", 211);
     lbl_80282460->pAssets = NULL;
     lbl_80282460->pStrings = NULL;
     lbl_80282460->nAssets = 0;
     lbl_80282460->uStringsSize = 0;
     lbl_80282460->n4 = 0;
     lbl_80282460->b14 = 1;
-    lbl_80282480 = fn_80009B34(CRAP_NUM_PARTS * sizeof(s32), 2, 0, "FE_CrAPDB.c", 219);
-    lbl_8028247C = fn_80009B34(CRAP_NUM_PARTS * 64 * sizeof(s32), 2, 0, "FE_CrAPDB.c", 220);
-    lbl_80282478 = fn_80009B34(CRAP_NUM_PARTS * 64 * sizeof(s32), 2, 0, "FE_CrAPDB.c", 221);
-    lbl_80282474 = fn_80009B34(CRAP_NUM_PARTS * sizeof(s32), 2, 0, "FE_CrAPDB.c", 222);
-    lbl_80282470 = fn_80009B34(64 * sizeof(CrAPRecord), 2, 0, "FE_CrAPDB.c", 224);
+    lbl_80282480 = StaticMem_Alloc(CRAP_NUM_PARTS * sizeof(s32), 2, 0, "FE_CrAPDB.c", 219);
+    lbl_8028247C = StaticMem_Alloc(CRAP_NUM_PARTS * 64 * sizeof(s32), 2, 0, "FE_CrAPDB.c", 220);
+    lbl_80282478 = StaticMem_Alloc(CRAP_NUM_PARTS * 64 * sizeof(s32), 2, 0, "FE_CrAPDB.c", 221);
+    lbl_80282474 = StaticMem_Alloc(CRAP_NUM_PARTS * sizeof(s32), 2, 0, "FE_CrAPDB.c", 222);
+    lbl_80282470 = StaticMem_Alloc(64 * sizeof(CrAPRecord), 2, 0, "FE_CrAPDB.c", 224);
     lbl_8028246C = 0;
     fn_80103920();
     lbl_80282464 = NULL;
@@ -178,30 +178,30 @@ void fn_80103920(void) {
 // Free the database: its stream objects, the database and its tables.
 void fn_80103A64(void) {
     if (lbl_80282464 != NULL) {
-        fn_80009E70(lbl_80282464);
+        StaticMem_Free(lbl_80282464);
     }
     if (lbl_80282468 != NULL) {
-        fn_80009E70(lbl_80282468);
+        StaticMem_Free(lbl_80282468);
     }
     lbl_80282468 = NULL;
     lbl_80282464 = NULL;
     if (lbl_80282460 != NULL) {
-        fn_80009E70(lbl_80282460);
+        StaticMem_Free(lbl_80282460);
     }
     if (lbl_80282480 != NULL) {
-        fn_80009E70(lbl_80282480);
+        StaticMem_Free(lbl_80282480);
     }
     if (lbl_8028247C != NULL) {
-        fn_80009E70(lbl_8028247C);
+        StaticMem_Free(lbl_8028247C);
     }
     if (lbl_80282478 != NULL) {
-        fn_80009E70(lbl_80282478);
+        StaticMem_Free(lbl_80282478);
     }
     if (lbl_80282474 != NULL) {
-        fn_80009E70(lbl_80282474);
+        StaticMem_Free(lbl_80282474);
     }
     if (lbl_80282470 != NULL) {
-        fn_80009E70(lbl_80282470);
+        StaticMem_Free(lbl_80282470);
     }
     lbl_80282480 = NULL;
     lbl_8028247C = NULL;
@@ -248,7 +248,7 @@ s8 fn_80103BC0(int nAsset) {
 
 // Empty the profile's slot of the asset.
 void fn_80103BD8(CrAPAsset* pAsset) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     s16 nSlot = pAsset->n2E;
 
     if (nSlot >= 0 && nSlot < 53) {
@@ -258,7 +258,7 @@ void fn_80103BD8(CrAPAsset* pAsset) {
 
 // Put the asset in its slot of the profile.
 void fn_80103C2C(CrAPAsset* pAsset) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     s16 nSlot = pAsset->n2E;
 
     if (nSlot >= 0 && nSlot < 53) {
@@ -268,7 +268,7 @@ void fn_80103C2C(CrAPAsset* pAsset) {
 
 // The asset (the one it takes its attributes from) is the one in its slot of the profile.
 u8 fn_80103C98(CrAPAsset* pAsset) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     CrAPAsset* pBase = fn_80103B4C(pAsset);
     s16 nSlot = pBase->n2E;
 
@@ -279,7 +279,7 @@ u8 fn_80103C98(CrAPAsset* pAsset) {
 }
 
 int fn_80103D14(s16 nSlot) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
 
     if (nSlot >= 0 && nSlot < 53) {
         return pProfile->aAF80[nSlot];
@@ -289,7 +289,7 @@ int fn_80103D14(s16 nSlot) {
 
 // Save the created golfer's body skin entries in the profile.
 void fn_80103D6C(void) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     Skin* pSkin = lbl_80281EE0->pB4->pChar->pSkin;
 
     Mem_cpy(pProfile->choices.aParts, pSkin->aParts[3], fn_800CCA40(pSkin) * sizeof(SkinChoice));
@@ -298,7 +298,7 @@ void fn_80103D6C(void) {
 
 // And the entries of its six other skins.
 void fn_80103DE0(void) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     Skin* pSkin;
     int i;
 
@@ -311,7 +311,7 @@ void fn_80103DE0(void) {
 
 // Take the asset's name out of the profile's list b when it is there.
 void fn_80103E88(CrAPAsset* pAsset, int b) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     char szName[16];
 
     fn_80105B80(pAsset, szName);
@@ -326,7 +326,7 @@ void fn_80103EFC(CrAPAsset* pAsset) {
     Skin* pSkin;
     CrAPAsset* pBase;
 
-    fn_80077ACC();
+    FE_GetCurrentProfile();
     pBase = fn_80103B4C(pAsset);
     if (pBase->n2E != -1) {
         pSkin = lbl_80281EE0->pB4->pChar->pSkin;
@@ -343,7 +343,7 @@ void fn_80103EFC(CrAPAsset* pAsset) {
 void fn_80103F94(s16 nPart, int b, int i) {
     CrAPAsset* pAsset;
 
-    fn_80077ACC();
+    FE_GetCurrentProfile();
     if (lbl_80281EE0->pB4->pChar != NULL && (pAsset = fn_80104E84(nPart, b, i)) != NULL) {
         if (nPart == 13) {
             fn_80103E88(pAsset, b);
@@ -355,8 +355,8 @@ void fn_80103F94(s16 nPart, int b, int i) {
 
 // The asset may be picked: it was not locked when last checked, and its aB1CC bit is set.
 u8 fn_80104020(int nAsset) {
-    SaveProfile* pProfile = fn_80077ACC();
-    if (!fn_8001E9CC(pProfile->aAssetLocked, nAsset) && fn_8001E9CC(pProfile->aB1CC, nAsset)) {
+    SaveProfile* pProfile = FE_GetCurrentProfile();
+    if (!BitArray_Test(pProfile->aAssetLocked, nAsset) && BitArray_Test(pProfile->aB1CC, nAsset)) {
         return 1;
     }
     return 0;
@@ -365,7 +365,7 @@ u8 fn_80104020(int nAsset) {
 // Switch the asset's name in the profile's list b: take it out when it is there, otherwise add it
 // and have the menu golfer play it (unless it already does).
 void fn_80104094(CrAPAsset* pAsset, int b) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     char szName[24];
 
     fn_80105B80(pAsset, szName);
@@ -387,7 +387,7 @@ void sTurnOnLogo(s16 nPart, int b, int i) {
     char szShape[32];
     u64 uSetId;
     u64 uVariantId;
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     Skin* pSkin;
     int nLogo = i - 1;
     s32 nSet;
@@ -396,7 +396,7 @@ void sTurnOnLogo(s16 nPart, int b, int i) {
     fn_8008EA38(1);
     pSkin = lbl_80281EE0->pB4->pChar->pSkin;
     fn_8008E944(0, 0.0f);
-    fn_800CB700(&uSetId, lbl_801937C8[b]);
+    SKA_PackName(&uSetId, lbl_801937C8[b]);
     nSet = fn_800CDC2C(pSkin, uSetId);
     fn_800CCF90(pSkin, nSet, i, 0);
     if (i > 0 && i <= 5) {
@@ -406,8 +406,8 @@ void sTurnOnLogo(s16 nPart, int b, int i) {
         } else {
             strcpy(szShape, "wide");
         }
-        fn_800CB700(&uSetId, szLogo);
-        fn_800CB700(&uVariantId, szShape);
+        SKA_PackName(&uSetId, szLogo);
+        SKA_PackName(&uVariantId, szShape);
         nSet = fn_800CDC2C(pSkin, uSetId);
         nVariant = fn_800CDCE0(pSkin, nSet, uVariantId);
         fn_800CCF90(pSkin, nSet, nVariant, 0);
@@ -444,7 +444,7 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
     f32 fAngle;
     int nOld;
 
-    fn_80077ACC();
+    FE_GetCurrentProfile();
     fAngle = 0.0f;
     bLoop = 0;
     nPlay = 1;
@@ -528,7 +528,7 @@ void FE_CrAP_TurnOnPart(s16 nPart, int b, int i) {
     int nAsset;
     CrAPAsset* pAsset = NULL;
 
-    fn_80077ACC();
+    FE_GetCurrentProfile();
     if (lbl_80281EE0->pB4->pChar == NULL) {
         return;
     }
@@ -562,7 +562,7 @@ void fn_80104804(void) {
     s32 nPart;
     s32 nChoice;
 
-    fn_80077ACC();
+    FE_GetCurrentProfile();
     if (lbl_802816E8 != -1) {
         fn_80103B74(0);
         FE_CrAP_TurnOnAsset(fn_80104F68(lbl_802816E8));
@@ -1185,7 +1185,7 @@ void fn_80105DAC(void) {
     for (i = 0; i < lbl_80282460->nAssets; i++) {
         pSrc = (u8*)&lbl_80282460->pAssets[i];
         pDst = (u8*)&lbl_80282460->pAssets[i];
-        fn_8001F08C((void**)&pSrc, (void**)&pDst, lbl_80193228, 20, 1);
+        ByteSwap_Records((void**)&pSrc, (void**)&pDst, lbl_80193228, 20, 1);
         pSrc = (u8*)&lbl_80282460->pAssets[i].n110;
         pDst = (u8*)&lbl_80282460->pAssets[i].n110;
         BYTESWAP_SWAPDATA(&pSrc, pDst, sizeof(s16), sizeof(s16));
@@ -1292,7 +1292,7 @@ int fn_80106244(s16 nPart) {
     s16 i;
     int nAsset;
 
-    fn_80077ACC();
+    FE_GetCurrentProfile();
     for (i = 0; i < 53; i++) {
         nAsset = fn_80103D14(i);
         if (nAsset >= 0 && nPart == lbl_80282460->pAssets[nAsset].nPart) {
@@ -1310,7 +1310,7 @@ int fn_801062C8(s16 nPart, int n) {
     int nWanted;
     CrAPAsset* pAsset;
 
-    fn_80077ACC();
+    FE_GetCurrentProfile();
     nWanted = FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(nPart, n);
     for (i = 0; i < 53; i++) {
         nAsset = fn_80103D14(i);
@@ -1331,7 +1331,7 @@ u8 fn_80106374(s16 nPart, int b, int i) {
     int n;
     int nFirst;
 
-    fn_80077ACC();
+    FE_GetCurrentProfile();
     nFirst = fn_80105140(nPart);
     nWanted = FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(nPart, b);
     n = -1;
@@ -1501,7 +1501,7 @@ u8 fn_801069AC(CrAPAsset* pAsset) {
         fn_800CB8F0(&pAsset->aSetVariant[0], szName);
         fn_8008E960(szName);
         nBall = fn_800484F4(szName);
-        fn_80077ACC()->nGolferOutfit = nBall;
+        FE_GetCurrentProfile()->nGolferOutfit = nBall;
         return 1;
     }
     return 0;
@@ -1556,7 +1556,7 @@ void fn_80106BF8(CrAPAsset* pAsset, Skin* pSkin) {
         nSet = fn_800CDC2C(pSkin, pAsset->aSet[i]);
         nVariant = fn_800CDCE0(pSkin, nSet, pAsset->aSetVariant[i]);
         nDefaultL = fn_800CDD5C(pSkin, nSet, "DefaultL");
-        if (nDefaultL >= 0 && fn_80077ACC()->choices.n113 == 1) {
+        if (nDefaultL >= 0 && FE_GetCurrentProfile()->choices.n113 == 1) {
             nVariant = nDefaultL;
         }
         if (nSet >= 0 && nVariant >= 0) {
@@ -1611,7 +1611,7 @@ int fn_80106E48(s16 n) {
     int nAsset;
     int nCount = 0;
 
-    fn_80077ACC();
+    FE_GetCurrentProfile();
     for (i = 0; i < 53; i++) {
         nAsset = fn_80103D14(i);
         if (nAsset >= 0 && n == lbl_80282460->pAssets[nAsset].n2C) {
@@ -1684,7 +1684,7 @@ s32 FE_CrAP_GetNextUnlockVal(s32 nKind, s32 nAfter) {
 s32 fn_801070F4(void) {
     s32 aAssets[64];
     s16 nSlot;
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     s32* pBase = aAssets;
     int nAsset;
     int i;
@@ -1727,7 +1727,7 @@ void fn_80107294(s16 n, char* pDst) {
 
 void FE_CrAP_GetCategoryInfo(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s32* pAll) {
     int i;
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
 
     *pLocked = 0;
     *pB1CC = 0;
@@ -1735,10 +1735,10 @@ void FE_CrAP_GetCategoryInfo(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s3
     *pAll = 0;
     for (i = 0; i < lbl_80282460->nAssets; i++) {
         if (nPart == lbl_80282460->pAssets[i].nPart && fn_801061C8(lbl_80282460->pAssets[i].n40)) {
-            if (fn_8001E9CC(pProfile->aB1CC, i)) {
+            if (BitArray_Test(pProfile->aB1CC, i)) {
                 *pB1CC += 1;
             }
-            if (fn_8001E9CC(pProfile->aB344, i)) {
+            if (BitArray_Test(pProfile->aB344, i)) {
                 *pB344 += 1;
             }
             if (fn_80078008(i, pProfile)) {

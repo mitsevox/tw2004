@@ -25,7 +25,7 @@ u8 fn_800A7AF0(void) {
     bOk = 0;
     lbl_80282058 = fn_800B5BD8(256 * sizeof(AudSource));
     if (lbl_80282058 != NULL) {
-        fn_80005AE8(lbl_80282058, 0, 256 * sizeof(AudSource));
+        Mem_set(lbl_80282058, 0, 256 * sizeof(AudSource));
         for (i = 0; i < 256; i++) {
             lbl_80282058[i].fPitch = 1.0f;
         }
@@ -48,7 +48,7 @@ AudSource* fn_800A7C30(u8 nEntry, s16 nSound) {
 
     pSound = fn_800A85CC(nSound);
     pSource = &lbl_80282058[nEntry];
-    fn_80005AE8(pSource, 0, sizeof(AudSource));
+    Mem_set(pSource, 0, sizeof(AudSource));
     pSource->nSound = nSound;
     pSource->pSound = pSound;
     return pSource;

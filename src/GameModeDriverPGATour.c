@@ -124,7 +124,7 @@ void GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream(UStreamObject* 
     if (nSize) {
         gPgaData.pNames = fn_800951A0(nSize, 0x10, 1);
         Mem_cpy(gPgaData.pNames, pData, nSize);
-        fn_80009E70(pObject);
+        StaticMem_Free(pObject);
     }
 }
 
@@ -192,7 +192,7 @@ void fn_800EE2C8(void) {
         fn_80117DE8(0, 0);
         GM_PgaTourSim_SimRound(0, &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent],
                     gpSaveData[nPlayer].tour.nRound, gPgaData.aTourEvent[nFormat].a40[fn_800EF0E0(0)], 5);
-        fn_80005AE8(pRec, 0, sizeof(*pRec));
+        Mem_set(pRec, 0, sizeof(*pRec));
         pRec->nRounds++;
         if (gpSaveData[nPlayer].tour.nRound == 0) {
             pRec->nEvents++;
@@ -300,7 +300,7 @@ void fn_800EE8C4(void) {
     int nWins;
     if (lbl_80205F30.b0 == 1) {
         if (fn_800F02A8() == 0) {
-            fn_800E4364(5, 31, 0, 0);
+            GUI_QueueMessage(5, 31, 0, 0);
         }
         if (p->nC) {
             nWins = 0;
@@ -310,14 +310,14 @@ void fn_800EE8C4(void) {
                 }
             }
             if (nWins >= 3) {
-                fn_800E4364(5, 8, 0, 0);
+                GUI_QueueMessage(5, 8, 0, 0);
             } else {
-                fn_800E4364(5, (Misc_RandFunc(1) & 3) + 27, 0, 0);
+                GUI_QueueMessage(5, (Misc_RandFunc(1) & 3) + 27, 0, 0);
             }
         } else if (gpSaveData[nPlayer].tour.nEvent == 9) {
-            fn_800E4364(5, 9, 0, 0);
+            GUI_QueueMessage(5, 9, 0, 0);
         } else if (gpSaveData[nPlayer].tour.nEvent == 8) {
-            fn_800E4364(5, 10, 0, 0);
+            GUI_QueueMessage(5, 10, 0, 0);
         }
     }
 }
@@ -338,7 +338,7 @@ void fn_800EEA3C(int nPlayer) {
     }
     nMoney = GM_PgaTourSim_GetLeaderboardWinningsFromEntrantID(nPlayer, 0);
     if (nMoney) {
-        fn_800D3548(0, nMoney, NULL);
+        GM_Earnings_AwardMoney(0, nMoney, NULL);
         gPlayers[nPlayer].money.n4 += nMoney;
     }
 }
@@ -505,7 +505,7 @@ void GameModeDriverPGATour_EndHole(void) {
     nPlayer = PLR_1_e;
     p = &gPlayers[0];
     nHole = Game_CurHoleIndex();
-    nPar = fn_800D2B08();
+    nPar = Course_GetCurHolePar();
     nStrokes = gPlayers[0].nStrokes[nHole];
     nPutts = gPlayers[0].nPutts[nHole];
     bUnder = nStrokes < nPar;
@@ -569,7 +569,7 @@ void GameModeDriverPGATour_EndHole(void) {
     }
     if (nHole >= 1 && bUnder) {
         nPrev = nHole - 1;
-        if (p->nStrokes[nPrev] > fn_800D2AD8(nPrev)) {
+        if (p->nStrokes[nPrev] > Course_GetHolePar(nPrev)) {
             pRound->nBirdiesAfterBogey++;
         }
     }

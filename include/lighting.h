@@ -40,7 +40,7 @@ typedef struct GoLight {
 typedef struct LightGroup {
     GoLight* apLight[NUM_SET_LIGHTS];   // 0x00  goballfx.c: [4] is the directional light
     s32  nLights;               // 0x14
-    f32  v18[4];                // 0x18  given to fn_8001EF34 with the lights' colours (fn_8006E460)
+    f32  v18[4];                // 0x18  given to Vec3_Scale with the lights' colours (fn_8006E460)
     f32  v28[4];                // 0x28  goballfx.c: LightParams.v0
 } LightGroup;
 LAYOUT_ASSERT(LightGroup, 0x38);

@@ -19,8 +19,8 @@ enum {
 #define SFIO_DEVICE_MASK(e) ((u16)(1 << (u16)(e)))
 
 // Retail build: the assert handler is a 4-byte stub, but every call site survives.
-extern void fn_8012214C(const char* pFile, int uLine, const char* pExpr, int unused);
-#define SFIO_ASSERT(cond) { u8 bSkip = 0; if (!((cond) | bSkip)) fn_8012214C(__FILE__, __LINE__, #cond, 0); }
+extern void TibExt_AssertHandler(const char* pFile, int uLine, const char* pExpr, int unused);
+#define SFIO_ASSERT(cond) { u8 bSkip = 0; if (!((cond) | bSkip)) TibExt_AssertHandler(__FILE__, __LINE__, #cond, 0); }
 
 // What the host describes a save with (SFIOSetDescriptor). On the GameCube every save file starts
 // with one card block holding the banner, icon and comment, followed by the data.

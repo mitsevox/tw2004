@@ -17,7 +17,7 @@ int fn_80012FA4(void) {
     int i;
 
     PADInit();
-    fn_80005AE8(&lbl_801A36A0, 0, sizeof(Controllers));
+    Mem_set(&lbl_801A36A0, 0, sizeof(Controllers));
     lbl_801A36A0.nRead = 0;
     lbl_801A36A0.nRead = 0;
     lbl_801A36A0.nRead = 0;
@@ -227,6 +227,6 @@ u8* fn_800136C4(int nController) {
     return (u8*)&lbl_801A36A0.aAnalog[nController];
 }
 
-u32 fn_800136DC(int nController) {
+u32 Controller_GetButtons(int nController) {
     return lbl_801A36A0.auButtons[nController];
 }

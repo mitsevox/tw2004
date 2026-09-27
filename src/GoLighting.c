@@ -21,7 +21,7 @@ void    fn_8006F080(GoLight* pLight);
 
 void fn_8000AE48(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
 void fn_80029BC8(f32* pVec);                        // sets a vector to lbl_80186838
-void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity
+void Mtx_Identity(f32 (*pMtx)[4]);                   // identity
 void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
 void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: inverts a rotation+translation
@@ -44,7 +44,7 @@ void fn_8006E2A4(void) {
     s32 i;
 
     lbl_802811D8->nPool = NUM_POOL_LIGHTS;
-    lbl_802811D8->pPool = fn_80009B34(NUM_POOL_LIGHTS * sizeof(GoLight), 2, 0x10, "GoLighting.c", 0xF8);
+    lbl_802811D8->pPool = StaticMem_Alloc(NUM_POOL_LIGHTS * sizeof(GoLight), 2, 0x10, "GoLighting.c", 0xF8);
     lbl_802811D8->p0 = lbl_802811D8->pPool;
     lbl_802811D8->pUsed = NULL;
     lbl_802811D8->pFree = NULL;
@@ -84,7 +84,7 @@ void fn_8006E2A4(void) {
 // Frees the pool.
 void fn_8006E424(void) {
     if (lbl_802811D8->pPool != NULL) {
-        fn_80009E70(lbl_802811D8->pPool);
+        StaticMem_Free(lbl_802811D8->pPool);
         lbl_802811D8->pPool = NULL;
     }
 }
@@ -103,7 +103,7 @@ void fn_8006E460(LightGroup* pGroup) {
         vScale[1] = 1.0f;
         vScale[2] = 1.0f;
         vScale[3] = 1.0f;
-        fn_8001EF34(pGroup->v18[0], vScale, vScale);
+        Vec3_Scale(pGroup->v18[0], vScale, vScale);
     } else {
         vScale[0] = 1.0f;
         vScale[1] = 1.0f;
@@ -123,7 +123,7 @@ void fn_8006E460(LightGroup* pGroup) {
     if (pGroup != NULL) {
         pGroup->v28[3] = 1.0f;
         fn_8000AE48(pGroup->v28, vScale, vScale);
-        fn_8001EF34(pGroup->v18[0], vScale, vScale);
+        Vec3_Scale(pGroup->v18[0], vScale, vScale);
     }
     fn_8000AE48(lbl_802811D8->aPointColour[0], vScale, lbl_802811D8->aPointColour2[0]);
     for (n = lbl_802811D8->nPoints; n < NUM_POINT_LIGHTS; n++) {
@@ -169,15 +169,15 @@ void LI_vEulerAnglesRYP(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
     f32 mB[4][4];
     f32 mC[4][4];
 
-    fn_8000ADC0(mA);
-    fn_8000ADC0(mB);
-    fn_8000ADC0(mC);
-    mA[2][0] = fn_800095F0(fA);
-    mA[2][2] = fn_80009638(fA);
-    mB[1][2] = fn_800095F0(fB);
-    mB[1][1] = fn_80009638(fB);
-    mC[0][1] = fn_800095F0(fC);
-    mC[0][0] = fn_80009638(fC);
+    Mtx_Identity(mA);
+    Mtx_Identity(mB);
+    Mtx_Identity(mC);
+    mA[2][0] = Math_Sin(fA);
+    mA[2][2] = Math_Cos(fA);
+    mB[1][2] = Math_Sin(fB);
+    mB[1][1] = Math_Cos(fB);
+    mC[0][1] = Math_Sin(fC);
+    mC[0][0] = Math_Cos(fC);
     mA[0][2] = -mA[2][0];
     mA[0][0] = mA[2][2];
     mB[2][1] = -mB[1][2];
@@ -251,7 +251,7 @@ void fn_8006E7A4(LightGroup* pGroup) {
 // channel 4, then each point light, turned into pObj's space and through the camera's view,
 // placed 999999 times as far out with x and z negated, and lit on channel 0.
 void fn_8006EADC(UObject* pObj) {
-    Camera* pCamera = fn_8001614C();
+    Camera* pCamera = Camera_GetCurrent();
     GXColor colour;
     f32 vPos[4];
     f32 mInv[4][4];

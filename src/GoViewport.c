@@ -28,14 +28,14 @@ void VM_vCloseModule(void) {
 
 // A new viewport, set to the default.
 f32* VM_spCreateViewport(void) {
-    f32* pRect = fn_80009B34(13 * sizeof(f32), 2, 16, "GoViewport.c", 137);
+    f32* pRect = StaticMem_Alloc(13 * sizeof(f32), 2, 16, "GoViewport.c", 137);
 
     VM_vSetDefaultViewport(pRect);
     return pRect;
 }
 
 void VM_vReleaseViewport(f32* pRect) {
-    fn_80009E70(pRect);
+    StaticMem_Free(pRect);
 }
 
 // The default viewport: at 0,0, size 1 by 1, scale 1 and 0.75.

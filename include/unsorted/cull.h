@@ -81,7 +81,7 @@ float fn_80008350(Camera* cam);
 float fn_80008358(Camera* cam);
 float fn_80008360(Camera* cam);
 float fn_80008368(Camera* cam);
-CamLens* fn_80008370(Camera* cam);
+CamLens* Camera_GetLens(Camera* cam);
 int fn_80008378(CamLens* sub);
 
 #endif

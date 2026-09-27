@@ -208,7 +208,7 @@ They will be sorted into the sections below.
   registers**; swapping `(f32* pOut, f32 fAngle)` flips `fmr f31,f1` / `mr r31,r3` (Quaternion fn_800093AC
   92.0 -> 100). Only reorder when the callers' asm agrees.
 - **[verified] `if (n > 0) do {...} while (--n > 0);`** gives `mr. rN; ble ... subic. rN; bgt` (char
-  fn_8001F08C 91.7 -> 100).
+  ByteSwap_Records 91.7 -> 100).
 - **[verified] In a loop whose condition loads `*p`, write `*p = *p + 1`, not `(*p)++`**: the original
   reuses the loaded value (EASBStorage fn_8012835C 95.0 -> 100).
 - **[verified] A string copy that walks a copy of its destination returns the destination** (r3 untouched
@@ -360,7 +360,7 @@ They will be sorted into the sections below.
   as `(size - 1 + n) / size` (MC_Gc fn_8009D74C).
 - **[verified] `static const` locals for constant struct arguments** load just before each call where
   initialised locals load at entry; pass a global struct field by value directly, not through a local
-  (streammanagerhole fn_80015624).
+  (streammanagerhole RenderState_Apply).
 - **[verified] A local pointer to the array element flips `cmpw` operands** where swapping the `==`
   operands doesn't (GoTerrain fn_80034DE4); `if (x) return 0; return 1;` in a `u8` function gives
   `cntlzw; srwi` where `return x == 0;` adds a mask (hwsRender_Gc fn_80112B80).
@@ -415,7 +415,7 @@ They will be sorted into the sections below.
 - **[verified] Copy a real struct member, not a cast byte array:** the struct copy keeps the original's
   load/store order (FE_MessageTable fn_8007F8A0 86 -> 100 with `SaveProfile.aReplay` as `Replay[5]`).
 - **[verified] EA's vector-scale helpers take the scale first** (TW07 `LLMath_Scale3(float, const float*,
-  float*)`): fn_8001EF34 / fn_8000AE28 fixed in 149 calls; Ball_FlightStep became exact.
+  float*)`): Vec3_Scale / Vec_Scale fixed in 149 calls; Ball_FlightStep became exact.
 - **Permuter traps:** it ignores branch targets, so a "score 0" result can move a statement out of its `if`
   and change the behaviour (uiText fn_800922A8); check the diff's meaning. A float operand swap can
   score higher but fuse the other multiply into `fmadds` and round differently (AI_ChooseTarget): check
@@ -991,7 +991,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] `a()->arr[b()].f`** evaluates `b()` first and scales the index before calling
   `a()`; splitting `b()` into a local first moves the shift after the call.
 - **[verified] `(fn() & uMask)` operand order.** `and. r0, r3, rM` (call result first) comes from
-  the mask call inline: `if (fn_800136DC(x) & fn_800142AC(k, m))`. A `uMask` local assigned
+  the mask call inline: `if (Controller_GetButtons(x) & Controller_GetButtonMask(k, m))`. A `uMask` local assigned
   first gives `and. r0, rM, r3`, and swapping the operands in the source changes nothing. Applied
   to every single-use mask in Swing.c (States 04/05/08/09/10 exact, 06/12/14/22 closer).
 - **[verified] Statement order among plain stores matters**: `a[i] = 1; x = 0; y = 0;` and

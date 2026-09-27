@@ -43,7 +43,7 @@ u8 fn_800A8754(void) {
     bOk = 0;
     lbl_8028206C = fn_800B5BD8(sizeof(AudBlock48));
     if (lbl_8028206C != NULL) {
-        fn_80005AE8(lbl_8028206C, 0, sizeof(AudBlock48));
+        Mem_set(lbl_8028206C, 0, sizeof(AudBlock48));
         bOk = 1;
     }
     return bOk;

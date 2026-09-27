@@ -63,7 +63,7 @@ void Session_Init(void) {
         gSession.aProfile[i].n1 = 0;
         gSession.aProfile[i].n2 = 0;
         for (j = 0; j < 6; j++) {
-            fn_800CB700(&gSession.aProfile[i].aNames[j], gszEmpty);
+            SKA_PackName(&gSession.aProfile[i].aNames[j], gszEmpty);
         }
     }
     gSession.f5B3C = 0.0f;
@@ -85,7 +85,7 @@ void Session_SetupProfiles(void) {
         nSpin = gGolferTable[pSession->nGolfer[i]].attr[ATTR_SPIN];
         gSession.aProfile[i].n1 = 0;
         for (j = 0; j < 6; j++) {
-            fn_800CB700(&gSession.aProfile[i].aNames[j], gszEmpty);
+            SKA_PackName(&gSession.aProfile[i].aNames[j], gszEmpty);
         }
         gSession.aProfile[i].nOutfit = gGolferTable[pSession->nGolfer[i]].nOutfit;
         nGolfer = pSession->nGolfer[i];
@@ -97,7 +97,7 @@ void Session_SetupProfiles(void) {
             gSession.aProfile[i].nBallType = gpSaveData[nGolfer - FIRST_CREATED_GOLFER].nGolferBallType;
             gSession.aProfile[i].nOutfit   = gpSaveData[nGolfer - FIRST_CREATED_GOLFER].nGolferOutfit;
         } else if (nGolfer == 0 || nGolfer == 1) {
-            fn_800CB700(&gSession.aProfile[i].aNames[0], lbl_80187650[2]);
+            SKA_PackName(&gSession.aProfile[i].aNames[0], lbl_80187650[2]);
             gSession.aProfile[i].n2        = 0;
             gSession.aProfile[i].nBallType = 0;
         } else if (fn_80077B18(nGolfer)) {

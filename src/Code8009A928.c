@@ -48,9 +48,9 @@ void GLW_vUpdateGlows(s32 nView) {
 // identity (fn_80013D9C with NULL). nView: gomainloop passes the view; unused here.
 void GLW_vRenderGlows(int nView) {
     fn_8009B57C();
-    fn_8001614C();
+    Camera_GetCurrent();
     ColGlow_RenderAllGlowInCurrentList();
-    fn_80013D9C(fn_8001614C(), NULL);
+    fn_80013D9C(Camera_GetCurrent(), NULL);
 }
 
 // Makes queue n the one glows are queued on.

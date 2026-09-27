@@ -43,7 +43,7 @@ HwsRenderState lbl_80223BB0;
 // Whether the grass is on (GoGrass.c; fn_80112D20 makes its texture only then): one view, at most
 // three players (two on course 14's hole 11).
 u8 fn_80112B80(void) {
-    int nHole = fn_80015464();
+    int nHole = Game_GetCurHoleNum();
 
     if (Game_GetCourse() == 14 && nHole == 11 && gSession.nNumPlayers > 2) {
         return 0;
@@ -59,7 +59,7 @@ u8 fn_80112B80(void) {
 
 // The same limit for course 14's hole 11 alone: at most three players.
 u8 fn_80112C04(void) {
-    int nHole = fn_80015464();
+    int nHole = Game_GetCurHoleNum();
 
     if (Game_GetCourse() == 14 && nHole == 11 && gSession.nNumPlayers > 3) {
         return 0;
@@ -70,10 +70,10 @@ u8 fn_80112C04(void) {
 // Allocate the skinned-vertex buffer: bigger for split screen.
 void fn_80112C64(int bSplit) {
     if (bSplit == 0) {
-        lbl_802824E0 = fn_80009B34(0x30C00, 2, 32, "hwsRender_Gc.c", 266);
+        lbl_802824E0 = StaticMem_Alloc(0x30C00, 2, 32, "hwsRender_Gc.c", 266);
         lbl_802824EC = 0x30C00;
     } else {
-        lbl_802824E0 = fn_80009B34(0x5DC00, 2, 32, "hwsRender_Gc.c", 271);
+        lbl_802824E0 = StaticMem_Alloc(0x5DC00, 2, 32, "hwsRender_Gc.c", 271);
         lbl_802824EC = 0x5DC00;
     }
 }
@@ -88,7 +88,7 @@ void fn_80112DA0(void);
 
 void fn_80112CEC(void) {
     if (lbl_802824E0 != NULL) {
-        fn_80009E70(lbl_802824E0);
+        StaticMem_Free(lbl_802824E0);
         lbl_802824E0 = NULL;
     }
 }

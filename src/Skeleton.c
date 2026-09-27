@@ -35,8 +35,8 @@ void Quat_Add(f32* pA, f32* pB, f32* pOut);           // Quaternion.c
 void Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);       // Quaternion.c: a vector turned by it
 void Quat_BuildFromVectorAndScale(f32* pAxis, f32* pOut, f32 fAngle);     // Quaternion.c: an axis-angle rotation
 void Quat_QuatToMatrix(f32* pQ, f32 (*pMtx)[4]);               // Quaternion.c: a rotation's matrix
-void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies a matrix
-void fn_8000ADC0(f32 (*pMtx)[4]);                        // identity
+void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies a matrix
+void Mtx_Identity(f32 (*pMtx)[4]);                        // identity
 void fn_80029A00(CharModel* pModel, int nA, int nB, f32* pRot);
 void fn_80029BF4(f32* pA, f32* pB, f32* pOut);
 void fn_80029C3C(f32* pA, f32* pB, f32* pOut);
@@ -88,8 +88,8 @@ void fn_80026BF4(CharModel* pModel, IKChain* pChain) {
     int nBone;
     Skeleton* pSkel = pModel->pSkel;
 
-    fn_8001E85C(pChain->pLinks[0].q18, pModel->pPoses[pChain->pLinks[0].nBone].q0);
-    fn_8001E85C(pChain->pLinks[0].v28, pModel->pPoses[pChain->pLinks[0].nBone].v10);
+    Quat_Copy(pChain->pLinks[0].q18, pModel->pPoses[pChain->pLinks[0].nBone].q0);
+    Quat_Copy(pChain->pLinks[0].v28, pModel->pPoses[pChain->pLinks[0].nBone].v10);
     for (i = 1; i < pChain->nLinks; i++) {
         pLink = &pChain->pLinks[i];
         nBone = pLink->nBone;
@@ -135,8 +135,8 @@ f32 fn_80026D18(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLink, int
             nBone = pLink->nBone;
             fn_80029C18(vEnd, pModel->pPoses[nBone].v10, vToEnd);
             fn_80029C18(pTarget, pModel->pPoses[nBone].v10, vToTarget);
-            fLen = fn_80029B64(fn_80009744(vToEnd) * fn_80009744(vToTarget));
-            fCos = fn_8000C5FC(vToEnd, vToTarget) / fLen;
+            fLen = fn_80029B64(Vec3_LengthSqClamped(vToEnd) * Vec3_LengthSqClamped(vToTarget));
+            fCos = Vec3_Dot(vToEnd, vToTarget) / fLen;
             if (fCos > 1.0f || fCos < -1.0f) {
                 fAngle = 0.0f;
             } else {
@@ -152,8 +152,8 @@ f32 fn_80026D18(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLink, int
                 if (pLink->n8 >= 0) {
                     vLocal[pLink->n8] = 0.0f;
                 }
-                fn_800BAF04(vLocal, vLocal);
-                fn_8001EF34(fAngle, vLocal, vLocal);
+                Vec_NormalizeTo(vLocal, vLocal);
+                Vec3_Scale(fAngle, vLocal, vLocal);
                 fn_80029BF4(vLocal, pLink->v58, pLink->v58);
                 Quat_BuildFromVectorAndScale(vLocal, qTurn, fAngle);
                 Quat_RotateVector(pModel->pPoses[nBone].q0, qTurn, qRot);
@@ -165,7 +165,7 @@ f32 fn_80026D18(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLink, int
     fn_80026B4C(pSkel, pChain);
     Vec3Copy(vEnd, pChain->v8);
     fn_80029C18(vEnd, pTarget, vDiff);
-    return (f32)fn_80009680(fn_80009744(vDiff));
+    return (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
 }
 
 // fake match: EA's file had a function here that the linker stripped; it used the 0.5 and 3.0 of
@@ -193,7 +193,7 @@ void SKEL_WeightIKChain(Skeleton* pSkel, IKChain* pChain, f32 fWeight) {
     int i;
     for (i = 0; i < pChain->nLinks; i++) {
         int nBone = pChain->pLinks[i].nBone;
-        fn_8001E85C(pSkel->p20[nBone], pSkel->p24[nBone]);
+        Quat_Copy(pSkel->p20[nBone], pSkel->p24[nBone]);
         if (fWeight < 1.0f) {
             Quat_Slerp(lbl_801C6498, pSkel->p24[nBone], fWeight);
             Vec_Normalize(pSkel->p24[nBone], pSkel->p24[nBone]);
@@ -207,7 +207,7 @@ void fn_80027108(Skeleton* pSkel) {
     int i;
 
     pSkel->f1074 = 0.0f;
-    fn_8001E938(pSkel->a10, 0x80);
+    BitArray_ClearAll(pSkel->a10, 0x80);
     fn_80029BC8(pSkel->v10A4);
     fn_80029BC8(pSkel->v10B4);
     pSkel->f10C4 = 1.0f;
@@ -240,7 +240,7 @@ void fn_800271A0(CharModel* pModel, IKChain* pChain) {
         pLink->b0 = 0;
         fn_80029BC8(pLink->v58);
         if (pLink->f4 > 0.0f) {
-            fn_8001EA34(pSkel->a10, pLink->nBone);
+            BitArray_Set(pSkel->a10, pLink->nBone);
         }
         if (i > 0) {
             pPrevLink = &pChain->pLinks[nPrev];
@@ -248,9 +248,9 @@ void fn_800271A0(CharModel* pModel, IKChain* pChain) {
             pPrevLink = NULL;
         }
         if (i == 0) {
-            fn_8001E85C(pModel->pPoses[nBone].q0, pLink->q18);
+            Quat_Copy(pModel->pPoses[nBone].q0, pLink->q18);
         } else {
-            fn_8001E85C(pBone->q0C, pLink->q18);
+            Quat_Copy(pBone->q0C, pLink->q18);
         }
         if (pPrevLink != NULL && pPrevLink->nBone != pBone->nParent) {
             Quat_Invert(pModel->pPoses[nPrevBone].q0, qInv);
@@ -260,8 +260,8 @@ void fn_800271A0(CharModel* pModel, IKChain* pChain) {
             Quat_RotateVector(qInv, vDelta, pLink->v28);
             pLink->v28[3] = 0.0f;
             if (pBone->nParent < pChain->pLinks[0].nBone) {
-                fn_8001E85C(pLink->q18, pLink->q38);
-                fn_8001E85C(pLink->v28, pLink->v48);
+                Quat_Copy(pLink->q18, pLink->q38);
+                Quat_Copy(pLink->v28, pLink->v48);
                 pLink->b0 |= 1;
             }
         } else if (i == 0) {
@@ -307,7 +307,7 @@ void fn_80027478(CharModel* pModel, IKChain* pChain) {
     BonePose* pPose;
     BonePose* pPrev;
 
-    fn_8001EED8(pModel, 0x52);  // EA drops the answer
+    CharModel_GetBoneIndex(pModel, 0x52);  // EA drops the answer
     uDone = 0;
     for (i = 0; i < pChain->nLinks; i++) {
         pLink = &pChain->pLinks[i];
@@ -344,7 +344,7 @@ f32 fn_800275F4(CharModel* pModel, IKChain* pChain, f32* pTarget) {
     Skeleton* pSkel = pModel->pSkel;
     f32 fDy;
 
-    fn_8001EED8(pModel, 1);  // EA drops the answer
+    CharModel_GetBoneIndex(pModel, 1);  // EA drops the answer
     fDy = pTarget[1] - pChain->v8[1];
     pSkel->v10A4[1] = fDy * pSkel->f10CC + pSkel->v10A4[1];
     if (pSkel->v10A4[1] > pSkel->f109C) {
@@ -359,7 +359,7 @@ f32 fn_800275F4(CharModel* pModel, IKChain* pChain, f32* pTarget) {
     pChain->pLinks[0].v28[1] = pSkel->f10C8 + pSkel->v10A4[1];
     fn_80029C18(pTarget, pChain->v8, vDiff);
     fn_8001E880(pChain->v8, pModel->pPoses[pChain->pLinks[pChain->nLinks - 1].nBone].v10);
-    return (f32)fn_80009680(fn_80009744(vDiff));
+    return (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
 }
 
 // Turns the IK on or off.
@@ -386,14 +386,14 @@ void SKEL_SetIKSolutionWeight(Skeleton* pSkel, f32 fWeight) {
         pSkel->p28 = pSkel->p24;
     }
     pSkel->f10C4 = fWeight;
-    fn_8001EF34(fWeight, pSkel->v10A4, pSkel->v10B4);
+    Vec3_Scale(fWeight, pSkel->v10A4, pSkel->v10B4);
 }
 
 // Gives the skeleton a rotation; below full IK weight it is blended toward the identity by the
 // weight.
 void fn_80027808(CharModel* pModel, f32* pRot) {
     if (pModel->pSkel != NULL) {
-        fn_8001E85C(pRot, pModel->pSkel->q10D4);
+        Quat_Copy(pRot, pModel->pSkel->q10D4);
         if (pModel->pSkel->fIKWeight < 1.0f) {
             Quat_Slerp(lbl_801C6498, pModel->pSkel->q10D4, pModel->pSkel->fIKWeight);
             Vec_Normalize(pModel->pSkel->q10D4, pModel->pSkel->q10D4);
@@ -410,8 +410,8 @@ void fn_8002787C(CharModel* pModel) {
     if (pSkel == NULL) return;
     if (lbl_802810A6 == 0 || pSkel->fIKWeight <= 0.0f) return;
     if (pSkel->n10E4 != 0) {
-        Quat_Multiply(pSkel->q10D4, pSkel->p20[fn_8001EEE4(pModel, 0x11)], qRot);
-        fn_8001E85C(qRot, pModel->pSkel->p20[fn_8001EEE4(pModel, 0x11)]);
+        Quat_Multiply(pSkel->q10D4, pSkel->p20[CharModel_GetBoneIndexMapped(pModel, 0x11)], qRot);
+        Quat_Copy(qRot, pModel->pSkel->p20[CharModel_GetBoneIndexMapped(pModel, 0x11)]);
     }
 }
 
@@ -477,15 +477,15 @@ void fn_800279C0(Character* pChar) {
     pChain = &pSkel->pChains[1];
     if (pSkel->n10E4 != 0) {
         Quat_Invert(pSkel->q10D4, qInv);
-        Quat_Multiply(qInv, pSkel->p20[fn_8001EEE4(pModel, 0x11)], qRot);
-        fn_8001E85C(qRot, pSkel->p20[fn_8001EEE4(pModel, 0x11)]);
+        Quat_Multiply(qInv, pSkel->p20[CharModel_GetBoneIndexMapped(pModel, 0x11)], qRot);
+        Quat_Copy(qRot, pSkel->p20[CharModel_GetBoneIndexMapped(pModel, 0x11)]);
         pSkel->n10E4--;
     }
-    nGrip = fn_8001EED8(pModel, 0x52);
+    nGrip = CharModel_GetBoneIndex(pModel, 0x52);
     pGrip = &pModel->pPoses[nGrip];
     if (pSkel->fIKWeight > 0.0f && pSkel->fIKWeight < 1.0f) {
-        fn_8001E85C(pGrip->q0, qGrip);
-        fn_8001E85C(pGrip->v10, vGrip);
+        Quat_Copy(pGrip->q0, qGrip);
+        Quat_Copy(pGrip->v10, vGrip);
     }
     fn_80027478(pModel, pSkel->pChains);
     if (pChar->u10 & 0x4000) {
@@ -497,8 +497,8 @@ void fn_800279C0(Character* pChar) {
         }
     }
     fn_800271A0(pModel, pChain);
-    fn_8001EEE4(pModel, 0x15);  // EA drops the answer
-    n28 = fn_8001EEE4(pModel, 0x28);
+    CharModel_GetBoneIndexMapped(pModel, 0x15);  // EA drops the answer
+    n28 = CharModel_GetBoneIndexMapped(pModel, 0x28);
     pPose28 = &pModel->pPoses[n28];
     Quat_RotateVector(pGrip->q0, pSkel->v108C, vTarget);
     Quat_Add(vTarget, pGrip->v10, vTarget);
@@ -509,8 +509,8 @@ void fn_800279C0(Character* pChar) {
     }
     Quat_Multiply(pSkel->q107C, pGrip->q0, pPose28->q0);
     fn_8001EB6C(pModel->a14, n28);
-    fn_8001E938(aBits, 0x80);
-    fn_8001EA34(aBits, fn_8001EEE4(pModel, 0x23));
+    BitArray_ClearAll(aBits, 0x80);
+    BitArray_Set(aBits, CharModel_GetBoneIndexMapped(pModel, 0x23));
     SKEL_TransformBones(pModel, aBits);
     fn_800BAD60(pModel->pMatrices[nGrip], (Vec4*)pChar->p16D8->a3C[pChar->nClubClass],
                 (Vec4*)pChar->aPoints[4]);
@@ -529,14 +529,14 @@ void fn_80027D14(Character* pChar) {
     f32 (*pGripMtx)[4];
 
     if (pModel->pSkel == NULL || lbl_802810A6 == 0) return;
-    pMtx28 = pModel->pMatrices[fn_8001EEE4(pModel, 0x28)];
-    pGripMtx = pModel->pMatrices[fn_8001EED8(pModel, 0x52)];
+    pMtx28 = pModel->pMatrices[CharModel_GetBoneIndexMapped(pModel, 0x28)];
+    pGripMtx = pModel->pMatrices[CharModel_GetBoneIndex(pModel, 0x52)];
     if (pModel->bEE) {
-        fn_8000ADC0(mFlip);
+        Mtx_Identity(mFlip);
         mFlip[0][0] = -1.0f;
         fn_800BADF8(pGripMtx, mFlip, mGrip, 4);
     } else {
-        fn_8000A0E8(pGripMtx, mGrip);
+        Mtx_Copy(pGripMtx, mGrip);
     }
     fn_8000A798(mGrip, mInv);
     fn_800BADF8(mInv, pMtx28, mRel, 4);
@@ -580,7 +580,7 @@ f32 fn_80027E8C(CharModel* pModel, IKChain* pChain, f32* pTarget, int bNormals) 
         fDrop *= 0.75f;
         fDx = pChain->v8[0] - pChain->pLinks[0].v28[0];
         fDz = pChain->v8[2] - pChain->pLinks[0].v28[2];
-        fScale = fDrop / (f32)fn_80009680(fDx * fDx + fDz * fDz);
+        fScale = fDrop / (f32)Math_Sqrt(fDx * fDx + fDz * fDz);
         fDx *= fScale;
         fDz *= fScale;
         pChain->pLinks[0].v28[0] += fDx;
@@ -646,10 +646,10 @@ void SKEL_CreateIKChain(CharModel* pModel, IKChain* pChain, IKChainDef* pDef) {
     pChain->nLinks = pDef->nLinks;
     pChain->n18 = pDef->n8;
     pChain->f1C = pDef->fC;
-    pChain->pLinks = fn_80009B34(pChain->nLinks * sizeof(IKLink), 2, 64, "Skeleton.c", 1126);
+    pChain->pLinks = StaticMem_Alloc(pChain->nLinks * sizeof(IKLink), 2, 64, "Skeleton.c", 1126);
     for (i = 0; i < pChain->nLinks; i++) {
         pLink = &pChain->pLinks[i];
-        pLink->nBone = fn_8001EEE4(pModel, pDef->pLinks[i].nBone);
+        pLink->nBone = CharModel_GetBoneIndexMapped(pModel, pDef->pLinks[i].nBone);
         pLink->nPrev = nPrev;
         nPrev = i;
         pLink->b0 = 0;
@@ -668,19 +668,19 @@ Skeleton* SKEL_CreateIKSkeleton(CharModel* pModel, CharModelDefs* pDefs) {
     IKChainDef* pChainDefs = pDefs->pDefs;
     s8 nChains = pDefs->nDefs;
 
-    pSkel = fn_80009B34(sizeof(Skeleton), 2, 64, "Skeleton.c", 1148);
+    pSkel = StaticMem_Alloc(sizeof(Skeleton), 2, 64, "Skeleton.c", 1148);
     pSkel->nChains = nChains;
-    pSkel->pChains = fn_80009B34(nChains * sizeof(IKChain), 2, 64, "Skeleton.c", 1151);
+    pSkel->pChains = StaticMem_Alloc(nChains * sizeof(IKChain), 2, 64, "Skeleton.c", 1151);
     for (i = 0; i < pSkel->nChains; i++) {
         SKEL_CreateIKChain(pModel, &pSkel->pChains[i], &pChainDefs[i]);
     }
     pSkel->pDefs = pChainDefs;
-    pSkel->p20 = fn_80009B34(pModel->nBones * sizeof(f32[4]), 2, 64, "Skeleton.c", 1159);
-    pSkel->p24 = fn_80009B34(pModel->nBones * sizeof(f32[4]), 2, 64, "Skeleton.c", 1160);
+    pSkel->p20 = StaticMem_Alloc(pModel->nBones * sizeof(f32[4]), 2, 64, "Skeleton.c", 1159);
+    pSkel->p24 = StaticMem_Alloc(pModel->nBones * sizeof(f32[4]), 2, 64, "Skeleton.c", 1160);
     pSkel->p28 = pSkel->p20;
     pSkel->n112C = -1;
     pSkel->n1130 = -1;
-    fn_8001E938(pSkel->a10, 0x80);
+    BitArray_ClearAll(pSkel->a10, 0x80);
     pSkel->n0 = 0;
     pSkel->f109C = 0.1f;
     pSkel->f10A0 = 0.2f;
@@ -691,10 +691,10 @@ Skeleton* SKEL_CreateIKSkeleton(CharModel* pModel, CharModelDefs* pDefs) {
     pSkel->f10CC = 1.0f;
     pSkel->pClip = NULL;
     pSkel->f1074 = 0.0f;
-    pSkel->a1108[0] = fn_8001EEE4(pModel, 0x24);
-    pSkel->a1108[1] = fn_8001EEE4(pModel, 0x25);
-    pSkel->a1108[2] = fn_8001EEE4(pModel, 0x11);
-    pSkel->a1108[3] = fn_8001EEE4(pModel, 0x12);
+    pSkel->a1108[0] = CharModel_GetBoneIndexMapped(pModel, 0x24);
+    pSkel->a1108[1] = CharModel_GetBoneIndexMapped(pModel, 0x25);
+    pSkel->a1108[2] = CharModel_GetBoneIndexMapped(pModel, 0x11);
+    pSkel->a1108[3] = CharModel_GetBoneIndexMapped(pModel, 0x12);
     SKEL_SetIKSolutionWeight(pSkel, 0.0f);
     fn_80009710(pSkel->q10D4);
     pSkel->n10E4 = 0;
@@ -705,12 +705,12 @@ Skeleton* SKEL_CreateIKSkeleton(CharModel* pModel, CharModelDefs* pDefs) {
 void SKEL_FreeIKSkeleton(Skeleton* pSkel) {
     int i;
     for (i = 0; i < pSkel->nChains; i++) {
-        fn_80009E70(pSkel->pChains[i].pLinks);
+        StaticMem_Free(pSkel->pChains[i].pLinks);
     }
-    fn_80009E70(pSkel->pChains);
-    fn_80009E70(pSkel->p24);
-    fn_80009E70(pSkel->p20);
-    fn_80009E70(pSkel);
+    StaticMem_Free(pSkel->pChains);
+    StaticMem_Free(pSkel->p24);
+    StaticMem_Free(pSkel->p20);
+    StaticMem_Free(pSkel);
 }
 
 // Loads a model from pData: its bone count, two floats, then per bone its id, parent and position.
@@ -722,7 +722,7 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int b) {
     CharModel* pModel;
     int i;
 
-    pModel = fn_80009B34(sizeof(CharModel), 2, 64, "Skeleton.c", 1228);
+    pModel = StaticMem_Alloc(sizeof(CharModel), 2, 64, "Skeleton.c", 1228);
     memset(pModel, 0, sizeof(CharModel));
     BYTESWAP_SWAPDATA(&pData, (u8*)&pModel->nBones, 4, 4);
     if (nExtra < 0) {
@@ -732,7 +732,7 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int b) {
         }
     }
     nTotal = pModel->nBones + nExtra;
-    pModel->pBones = fn_80009B34(nTotal * sizeof(Bone), 2, 64, "Skeleton.c", 1242);
+    pModel->pBones = StaticMem_Alloc(nTotal * sizeof(Bone), 2, 64, "Skeleton.c", 1242);
     BYTESWAP_SWAPDATA(&pData, (u8*)&pModel->f10, 4, 4);
     BYTESWAP_SWAPDATA(&pData, (u8*)&pModel->fC, 4, 4);
     for (i = 0; i < pModel->nBones; i++) {
@@ -749,8 +749,8 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int b) {
         pModel->pBones[i].uId = *(u64*)lbl_80187278[0x54];  // port: reads 8 bytes of the name
     }
     pModel->nBones = nTotal;
-    pModel->pMatrices = fn_80009B34(pModel->nBones * sizeof(f32[4][4]), 2, 64, "Skeleton.c", 1265);
-    pModel->pPoses = fn_80009B34(pModel->nBones * sizeof(BonePose), 2, 64, "Skeleton.c", 1266);
+    pModel->pMatrices = StaticMem_Alloc(pModel->nBones * sizeof(f32[4][4]), 2, 64, "Skeleton.c", 1265);
+    pModel->pPoses = StaticMem_Alloc(pModel->nBones * sizeof(BonePose), 2, 64, "Skeleton.c", 1266);
     for (i = 0; i < pModel->nBones; i++) {
         fn_80009710(pModel->pBones[i].q0C);
     }
@@ -766,14 +766,14 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int b) {
     }
     fn_8001E8A4(aAll, 0x80);
     SKEL_TransformBones(pModel, aAll);
-    pModel->pF0 = fn_80114270(pModel, fn_8001EED8(pModel, 0xB), 0, 0);
-    pModel->pF4 = fn_80114270(pModel, fn_8001EED8(pModel, 0x57), 1, 0);
-    pModel->pF8 = fn_80114270(pModel, fn_8001EED8(pModel, 0x58), 1, 1);
+    pModel->pF0 = fn_80114270(pModel, CharModel_GetBoneIndex(pModel, 0xB), 0, 0);
+    pModel->pF4 = fn_80114270(pModel, CharModel_GetBoneIndex(pModel, 0x57), 1, 0);
+    pModel->pF8 = fn_80114270(pModel, CharModel_GetBoneIndex(pModel, 0x58), 1, 1);
     for (i = 0; i < 6; i++) {
-        pModel->apFC[i] = fn_80114270(pModel, fn_8001EED8(pModel, lbl_80281098[i]), 2, i);
+        pModel->apFC[i] = fn_80114270(pModel, CharModel_GetBoneIndex(pModel, lbl_80281098[i]), 2, i);
     }
     for (i = 0; i < 6; i++) {
-        pModel->ap114[i] = fn_80114270(pModel, fn_8001EED8(pModel, lbl_802810A0[i]), 3, i);
+        pModel->ap114[i] = fn_80114270(pModel, CharModel_GetBoneIndex(pModel, lbl_802810A0[i]), 3, i);
     }
     for (i = 0; i < pModel->nBones; i++) {
         pModel->a140[i][0] = 1.0f;
@@ -828,30 +828,30 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
     f32 (*pSkelRot)[4];
     int i;
 
-    fn_8001E938(aCur, 0x80);
-    fn_8001EA34(aCur, 0);
+    BitArray_ClearAll(aCur, 0x80);
+    BitArray_Set(aCur, 0);
     if (pModel->pSkel != NULL) {
         if (0.0f == pModel->pSkel->fIKWeight) {
-            fn_8001E938(aSkel, 0x80);
+            BitArray_ClearAll(aSkel, 0x80);
         } else {
             fn_80029EF4(pModel->pSkel->a10, aSkel, 0x80);
         }
         pSkelRot = pModel->pSkel->p28;
     } else {
-        fn_8001E938(aSkel, 0x80);
+        BitArray_ClearAll(aSkel, 0x80);
         pSkelRot = NULL;
     }
     fn_80021980(pModel->a14, pModel->a24, aModel, 0x80);
-    fn_8000ADC0(mScale);
+    Mtx_Identity(mScale);
     if (fn_8001E9F4(aBits, aCur, 0x80)) {
-        fn_8001E85C(pModel->pBones[0].q0C, pModel->pPoses[0].q0);
-        fn_8001E85C(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
+        Quat_Copy(pModel->pBones[0].q0C, pModel->pPoses[0].q0);
+        Quat_Copy(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
         Quat_QuatToMatrix(pModel->pPoses[0].q0, pModel->pMatrices[0]);
         mScale[0][0] = pModel->a140[0][0];
         mScale[1][1] = pModel->a140[0][1];
         mScale[2][2] = pModel->a140[0][2];
         fn_800BADF8(pModel->pMatrices[0], mScale, mOut, 4);
-        fn_8000A0E8(mOut, pModel->pMatrices[0]);
+        Mtx_Copy(mOut, pModel->pMatrices[0]);
         fn_8001E880(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
         SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[0], 0);
     }
@@ -859,32 +859,34 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
 
     for (i = 1; i < pModel->nBones; i++) {
         pBone = &pModel->pBones[i];
-        fn_8001E938(aParent, 0x80);
-        fn_8001EA34(aParent, pBone->nParent);
-        if (i == fn_8001EED8(pModel, 0x22)) {
-            fn_80029A00(pModel, fn_8001EED8(pModel, 0x22), fn_8001EED8(pModel, 0x11), pModel->q740);
-            if (fn_8001E9CC(aBits, fn_8001EED8(pModel, 0x11))) {
-                fn_8001EA34(aBits, fn_8001EED8(pModel, 0x22));
+        BitArray_ClearAll(aParent, 0x80);
+        BitArray_Set(aParent, pBone->nParent);
+        if (i == CharModel_GetBoneIndex(pModel, 0x22)) {
+            fn_80029A00(pModel, CharModel_GetBoneIndex(pModel, 0x22), CharModel_GetBoneIndex(pModel, 0x11),
+                        pModel->q740);
+            if (BitArray_Test(aBits, CharModel_GetBoneIndex(pModel, 0x11))) {
+                BitArray_Set(aBits, CharModel_GetBoneIndex(pModel, 0x22));
             }
-            if (fn_8001E9CC(aModel, fn_8001EED8(pModel, 0x11))) {
-                fn_8001EA34(aModel, fn_8001EED8(pModel, 0x22));
+            if (BitArray_Test(aModel, CharModel_GetBoneIndex(pModel, 0x11))) {
+                BitArray_Set(aModel, CharModel_GetBoneIndex(pModel, 0x22));
             }
-            fn_8001EA34(pModel->a24, fn_8001EED8(pModel, 0x22));
-            if (fn_8001E9CC(pModel->a14, fn_8001EED8(pModel, 0x11))) {
-                fn_8001EA34(pModel->a14, fn_8001EED8(pModel, 0x22));
+            BitArray_Set(pModel->a24, CharModel_GetBoneIndex(pModel, 0x22));
+            if (BitArray_Test(pModel->a14, CharModel_GetBoneIndex(pModel, 0x11))) {
+                BitArray_Set(pModel->a14, CharModel_GetBoneIndex(pModel, 0x22));
             }
-        } else if (i == fn_8001EED8(pModel, 0x35)) {
+        } else if (i == CharModel_GetBoneIndex(pModel, 0x35)) {
             // EA passes bone 0x22 here too
-            fn_80029A00(pModel, fn_8001EED8(pModel, 0x22), fn_8001EED8(pModel, 0x11), pModel->q750);
-            if (fn_8001E9CC(aBits, fn_8001EED8(pModel, 0x24))) {
-                fn_8001EA34(aBits, fn_8001EED8(pModel, 0x35));
+            fn_80029A00(pModel, CharModel_GetBoneIndex(pModel, 0x22), CharModel_GetBoneIndex(pModel, 0x11),
+                        pModel->q750);
+            if (BitArray_Test(aBits, CharModel_GetBoneIndex(pModel, 0x24))) {
+                BitArray_Set(aBits, CharModel_GetBoneIndex(pModel, 0x35));
             }
-            if (fn_8001E9CC(aModel, fn_8001EED8(pModel, 0x24))) {
-                fn_8001EA34(aModel, fn_8001EED8(pModel, 0x35));
+            if (BitArray_Test(aModel, CharModel_GetBoneIndex(pModel, 0x24))) {
+                BitArray_Set(aModel, CharModel_GetBoneIndex(pModel, 0x35));
             }
-            fn_8001EA34(pModel->a24, fn_8001EED8(pModel, 0x35));
-            if (fn_8001E9CC(pModel->a14, fn_8001EED8(pModel, 0x24))) {
-                fn_8001EA34(pModel->a14, fn_8001EED8(pModel, 0x35));
+            BitArray_Set(pModel->a24, CharModel_GetBoneIndex(pModel, 0x35));
+            if (BitArray_Test(pModel->a14, CharModel_GetBoneIndex(pModel, 0x24))) {
+                BitArray_Set(pModel->a14, CharModel_GetBoneIndex(pModel, 0x35));
             }
         }
         if (fn_8001E9F4(aBits, aCur, 0x80) || fn_8001E9F4(aBits, aParent, 0x80)) {
@@ -915,11 +917,11 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
             mScale[0][0] = pModel->a140[i][0];
             mScale[1][1] = pModel->a140[i][1];
             mScale[2][2] = pModel->a140[i][2];
-            if (pModel->bEE && i == fn_8001EED8(pModel, 0x52)) {
+            if (pModel->bEE && i == CharModel_GetBoneIndex(pModel, 0x52)) {
                 mScale[0][0] = -mScale[0][0];   // with bEE set, bone 0x52's x is flipped
             }
             fn_800BADF8(pModel->pMatrices[i], mScale, mOut, 4);
-            fn_8000A0E8(mOut, pModel->pMatrices[i]);
+            Mtx_Copy(mOut, pModel->pMatrices[i]);
             fn_8001E880(pPose->v10, pModel->pMatrices[i][3]);
             SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[i], i);
             fn_80021980(aBits, aCur, aBits, 0x80);
@@ -943,43 +945,44 @@ void SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform) {
     fn_80029EF4(pPose->a0, aRot, 0x80);
     fn_80029EF4(pPose->a10, aPos, 0x80);
     for (i = 0; i < pModel->nBones; i++) {
-        if (fn_8001E9CC(aRot, i)) {
+        if (BitArray_Test(aRot, i)) {
             if (pModel->bEE) {
-                if (i == fn_8001EED8(pModel, 1)) {
+                if (i == CharModel_GetBoneIndex(pModel, 1)) {
                     Legacy_Quat_BuildFromPitch(PI, qTurn);
                     Quat_Multiply(pPose->aBones[i].q0, qTurn, pModel->pBones[pModel->aBone2[i]].q0C);
-                    fn_8001EA34(pPose->a0, pModel->aBone2[i]);
-                } else if (i == fn_8001EED8(pModel, 0x52)) {
+                    BitArray_Set(pPose->a0, pModel->aBone2[i]);
+                } else if (i == CharModel_GetBoneIndex(pModel, 0x52)) {
                     if (pModel->pBones[i].nParent == 0) {
                         Legacy_Quat_BuildFromPitch(PI, qTurn);
                         Quat_Multiply(pPose->aBones[i].q0, qTurn, pModel->pBones[pModel->aBone2[i]].q0C);
-                        fn_8001EA34(pPose->a0, pModel->aBone2[i]);
+                        BitArray_Set(pPose->a0, pModel->aBone2[i]);
                     } else {
-                        fn_8001E85C(pPose->aBones[i].q0, pModel->pBones[pModel->aBone2[i]].q0C);
-                        fn_8001EA34(pPose->a0, pModel->aBone2[i]);
+                        Quat_Copy(pPose->aBones[i].q0, pModel->pBones[pModel->aBone2[i]].q0C);
+                        BitArray_Set(pPose->a0, pModel->aBone2[i]);
                     }
                 } else {
-                    fn_8001E85C(pPose->aBones[i].q0, pModel->pBones[pModel->aBone2[i]].q0C);
-                    fn_8001EA34(pPose->a0, pModel->aBone2[i]);
+                    Quat_Copy(pPose->aBones[i].q0, pModel->pBones[pModel->aBone2[i]].q0C);
+                    BitArray_Set(pPose->a0, pModel->aBone2[i]);
                 }
             } else {
-                fn_8001E85C(pPose->aBones[i].q0, pModel->pBones[i].q0C);
+                Quat_Copy(pPose->aBones[i].q0, pModel->pBones[i].q0C);
             }
         }
-        if (fn_8001E9CC(aPos, i)) {
-            if (pModel->bEE && (i == fn_8001EED8(pModel, 1) || i == fn_8001EED8(pModel, 0x54))) {
-                fn_8001E85C(pPose->aBones[i].v10, pModel->pBones[i].v1C);
+        if (BitArray_Test(aPos, i)) {
+            if (pModel->bEE
+                && (i == CharModel_GetBoneIndex(pModel, 1) || i == CharModel_GetBoneIndex(pModel, 0x54))) {
+                Quat_Copy(pPose->aBones[i].v10, pModel->pBones[i].v1C);
                 pModel->pBones[i].v1C[2] = -pModel->pBones[i].v1C[2];
-            } else if (pModel->bEE && i == fn_8001EED8(pModel, 0x52)) {
+            } else if (pModel->bEE && i == CharModel_GetBoneIndex(pModel, 0x52)) {
                 if (pModel->pBones[i].nParent == 0) {
-                    fn_8001E85C(pPose->aBones[i].v10, pModel->pBones[i].v1C);
+                    Quat_Copy(pPose->aBones[i].v10, pModel->pBones[i].v1C);
                     pModel->pBones[i].v1C[2] = -pModel->pBones[i].v1C[2];
                 } else {
-                    fn_8001E85C(pPose->aBones[i].v10, pModel->pBones[i].v1C);
+                    Quat_Copy(pPose->aBones[i].v10, pModel->pBones[i].v1C);
                     pModel->pBones[i].v1C[0] = -pModel->pBones[i].v1C[0];
                 }
             } else {
-                fn_8001E85C(pPose->aBones[i].v10, pModel->pBones[i].v1C);
+                Quat_Copy(pPose->aBones[i].v10, pModel->pBones[i].v1C);
             }
         }
     }
@@ -1000,11 +1003,11 @@ void fn_800293CC(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pO
 
     fn_8001EA54(pA->a20, pB->a20, aPos, 0x80);
     fn_8001EA54(pA->a30, pB->a30, aRot, 0x80);
-    fn_8001E938(aCur, 0x80);
-    fn_8001EA34(aCur, nBone);
+    BitArray_ClearAll(aCur, 0x80);
+    BitArray_Set(aCur, nBone);
     nLast = nBone + nCount - 1;
-    fn_8001E938(pOut->a0, 0x80);
-    fn_8001E938(pOut->a10, 0x80);
+    BitArray_ClearAll(pOut->a0, 0x80);
+    BitArray_ClearAll(pOut->a10, 0x80);
     for (i = nBone; i <= nLast; i++) {
         if (fn_8001E9F4(aRot, aCur, 0x80)) {
             fn_8001FB00(pA->aBones[i].q0, pB->aBones[i].q0, pOut->aBones[i].q0, fT);
@@ -1033,9 +1036,9 @@ void SKEL_CloseModule(void) {
 void SKEL_Free(CharModel* pModel) {
     int i;
 
-    fn_80009E70(pModel->pBones);
-    fn_80009E70(pModel->pMatrices);
-    fn_80009E70(pModel->pPoses);
+    StaticMem_Free(pModel->pBones);
+    StaticMem_Free(pModel->pMatrices);
+    StaticMem_Free(pModel->pPoses);
     if (pModel->pF0 != NULL) {
         fn_80114398(pModel->pF0);
     }
@@ -1058,7 +1061,7 @@ void SKEL_Free(CharModel* pModel) {
     if (pModel->pSkel != NULL) {
         SKEL_FreeIKSkeleton(pModel->pSkel);
     }
-    fn_80009E70(pModel);
+    StaticMem_Free(pModel);
 }
 
 // Fills in aBone: finds each model bone's id by its name (the first 8 bytes of its uId). Of the
@@ -1115,8 +1118,8 @@ void SKEL_GenerateLeftHandedTable(CharModel* pModel) {
         pModel->aBone2[i] = i;
     }
     for (i = 0; i < 0x29; i++) {
-        nA = fn_8001EED8(pModel, lbl_8018742C[i][0]);
-        nB = fn_8001EED8(pModel, lbl_8018742C[i][1]);
+        nA = CharModel_GetBoneIndex(pModel, lbl_8018742C[i][0]);
+        nB = CharModel_GetBoneIndex(pModel, lbl_8018742C[i][1]);
         if (nA != 0xFF && nB != 0xFF) {
             pModel->aBone2[nA] = nB;
         }
@@ -1142,20 +1145,20 @@ void fn_80029948(CharModel* pModel, struct DynChain* pChain, f32 f) {
 // Copies bone 0x22's rotation in pPose into q740 and q750, when the model has that bone. EA looks
 // the same bone up for both.
 void fn_80029968(CharModel* pModel, SkelPose* pPose) {
-    int nFirst = fn_8001EED8(pModel, 0x22);
-    int nSecond = fn_8001EED8(pModel, 0x22);
+    int nFirst = CharModel_GetBoneIndex(pModel, 0x22);
+    int nSecond = CharModel_GetBoneIndex(pModel, 0x22);
 
     if (nFirst != 0xFF) {
-        fn_8001E85C(pPose->aBones[nFirst].q0, pModel->q740);
+        Quat_Copy(pPose->aBones[nFirst].q0, pModel->q740);
     }
     if (nSecond != 0xFF) {
-        fn_8001E85C(pPose->aBones[nSecond].q0, pModel->q750);
+        Quat_Copy(pPose->aBones[nSecond].q0, pModel->q750);
     }
 }
 
 // Gives bone nA the rotation pRot, then sets it halfway between that and bone nB's.
 void fn_80029A00(CharModel* pModel, int nA, int nB, f32* pRot) {
-    fn_8001E85C(pRot, pModel->pBones[nA].q0C);
+    Quat_Copy(pRot, pModel->pBones[nA].q0C);
     Quat_Slerp(pModel->pBones[nB].q0C, pModel->pBones[nA].q0C, 0.5f);
 }
 

@@ -24,14 +24,14 @@ void FB_vCloseModule(void) {
 }
 
 GoFrameBuf* FB_spCreateFrameBuffer(void) {
-    GoFrameBuf* pBuf = fn_80009B34(sizeof(GoFrameBuf), 2, 16, "GoFrameBuf.c", 137);
+    GoFrameBuf* pBuf = StaticMem_Alloc(sizeof(GoFrameBuf), 2, 16, "GoFrameBuf.c", 137);
 
     FB_vSetDefaultFrameBuffer(pBuf);
     return pBuf;
 }
 
 void FB_vReleaseFrameBuffer(GoFrameBuf* pBuf) {
-    fn_80009E70(pBuf);
+    StaticMem_Free(pBuf);
 }
 
 void FB_vSetDefaultFrameBuffer(GoFrameBuf* pBuf) {

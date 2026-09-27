@@ -192,7 +192,9 @@ void SF_vUpdateSunFlare(s32 nView) {
     pState = lbl_802813B8;
     if (pState->b1BF0) {
         pView = &pState->aView[nView];
-        pView->bA4 = fn_8006434C(fn_80017004(nView), pState->v4, &pView->f98, &pView->f9C, &pView->fA0);
+        pView->bA4
+                = fn_8006434C(ViewController_GetCamera(nView), pState->v4, &pView->f98, &pView->f9C,
+                              &pView->fA0);
         pView->af90[1 - (lbl_80281B88 & 1)] = fn_8009A754(nView, pView);
         fn_8009A3F4(nView);
     }

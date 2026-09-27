@@ -23,7 +23,7 @@ void  fn_8000A194(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC);  // UMemPool.c: a rot
 void  fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);          // UMemPool.c: inverts a rotation+translation
 void  fn_8001728C(CamLens* pLens);
 
-ViewController* fn_80016E28(int nView);
+ViewController* ViewController_Get(int nView);
 s32  fn_800171B0(void);
 f32* fn_800172B4(View* pView);
 f32* fn_800172BC(View* pView);
@@ -59,7 +59,7 @@ void fn_80016D18(int nView, f32 x, f32 y, f32 w, f32 h) {
     CamLens* pLens;
     f32* pRect;
 
-    pCtrl = fn_80016E28(nView);
+    pCtrl = ViewController_Get(nView);
     pLens = CA_spCreateCamera();
     pRect = VM_spCreateViewport();
     fn_800171D8(pRect, x, y, w, h);
@@ -72,7 +72,7 @@ void fn_80016D18(int nView, f32 x, f32 y, f32 w, f32 h) {
     fn_80038054(0, nView, 0.0f, 0.0f);
 }
 
-ViewController* fn_80016E28(int nView) {
+ViewController* ViewController_Get(int nView) {
     return &lbl_801B8BA8[nView];
 }
 
@@ -80,8 +80,8 @@ ViewController* fn_80016E28(int nView) {
 void fn_80016E3C(int nView) {
     ViewController* pCtrl;
 
-    pCtrl = fn_80016E28(nView);
-    CA_vReleaseCamera(fn_80008370(pCtrl->pCamera));
+    pCtrl = ViewController_Get(nView);
+    CA_vReleaseCamera(Camera_GetLens(pCtrl->pCamera));
     VM_vReleaseViewport(fn_80012EF0(pCtrl->pCamera));
     fn_800137B0(pCtrl->pCamera);
     pCtrl->b274 = 0;
@@ -92,47 +92,51 @@ void fn_80016E90(int nView) {
     void* pCamera;
     View* pView;
 
-    pCamera = fn_80017004(nView);
-    pView = fn_80017028(nView);
-    CameraController_Idle(pView, fn_8001707C(nView));
+    pCamera = ViewController_GetCamera(nView);
+    pView = ViewController_GetCameraController(nView);
+    CameraController_Idle(pView, ViewController_GetPlayer(nView));
     if (pView->nCurCamera == 2) {
-        CA_vSetLookAtSide(fn_80008370(pCamera), fn_8001731C(pView), fn_80017314(pView), pView->v20);
+        CA_vSetLookAtSide(Camera_GetLens(pCamera), CameraController_GetPosition(pView),
+                          CameraController_GetTarget(pView), pView->v20);
     } else if (fn_800172C4(pView)) {
         if (pView->nCurCamera == 4) {
-            Camera_SetCameraPositionAndTargetWithOffsetAndScale(fn_80008370(pCamera), fn_8001731C(pView), fn_80017314(pView),
+            Camera_SetCameraPositionAndTargetWithOffsetAndScale(Camera_GetLens(pCamera),
+                    CameraController_GetPosition(pView), CameraController_GetTarget(pView),
                         fn_800172BC(pView), fn_800172B4(pView));
         } else {
-            CA_vSetLookAtSide(fn_80008370(pCamera), fn_8001731C(pView), fn_80017314(pView), pView->v20);
+            CA_vSetLookAtSide(Camera_GetLens(pCamera), CameraController_GetPosition(pView),
+                              CameraController_GetTarget(pView), pView->v20);
         }
     } else {
-        fn_80017208(fn_80008370(pCamera), fn_8001731C(pView), fn_80017314(pView));
+        fn_80017208(Camera_GetLens(pCamera), CameraController_GetPosition(pView),
+                    CameraController_GetTarget(pView));
     }
     fn_80013D68(pCamera);
     fn_80013CCC(pCamera);
 }
 
-void* fn_80017004(int nView) {
-    return fn_80016E28(nView)->pCamera;
+void* ViewController_GetCamera(int nView) {
+    return ViewController_Get(nView)->pCamera;
 }
 
-View* fn_80017028(int nView) {
-    return &fn_80016E28(nView)->view;
+View* ViewController_GetCameraController(int nView) {
+    return &ViewController_Get(nView)->view;
 }
 
 void fn_8001704C(int nView, int nPlayer) {
-    fn_80016E28(nView)->nPlayer = nPlayer;
+    ViewController_Get(nView)->nPlayer = nPlayer;
 }
 
-int fn_8001707C(int nView) {
-    return fn_80016E28(nView)->nPlayer;
+int ViewController_GetPlayer(int nView) {
+    return ViewController_Get(nView)->nPlayer;
 }
 
 u8 fn_800170A0(int nView) {
-    return fn_80016E28(nView)->b274;
+    return ViewController_Get(nView)->b274;
 }
 
 void fn_800170C4(int nView, u8 b) {
-    fn_80016E28(nView)->b274 = b;
+    ViewController_Get(nView)->b274 = b;
 }
 
 // Saves the render camera's screen rectangle (fn_80017158 puts it back).
@@ -140,8 +144,8 @@ void fn_800170F4(int nView) {
     ViewController* pCtrl;
     f32* pRect;
 
-    pCtrl = fn_80016E28(nView);
-    pRect = fn_80012EF0(fn_80017004(nView));
+    pCtrl = ViewController_Get(nView);
+    pRect = fn_80012EF0(ViewController_GetCamera(nView));
     pCtrl->f284 = pRect[0];
     pCtrl->f280 = pRect[1];
     pCtrl->f27C = pRect[2];
@@ -151,8 +155,9 @@ void fn_800170F4(int nView) {
 void fn_80017158(int nView) {
     ViewController* pCtrl;
 
-    pCtrl = fn_80016E28(nView);
-    fn_800171D8(fn_80012EF0(fn_80017004(nView)), pCtrl->f284, pCtrl->f280, pCtrl->f27C, pCtrl->f278);
+    pCtrl = ViewController_Get(nView);
+    fn_800171D8(fn_80012EF0(ViewController_GetCamera(nView)), pCtrl->f284, pCtrl->f280, pCtrl->f27C,
+                pCtrl->f278);
 }
 
 s32 fn_800171B0(void) {
@@ -206,10 +211,10 @@ u8 fn_800172C4(View* pView) {
     return 0;
 }
 
-f32* fn_80017314(View* pView) {
+f32* CameraController_GetTarget(View* pView) {
     return pView->v10;
 }
 
-f32* fn_8001731C(View* pView) {
+f32* CameraController_GetPosition(View* pView) {
     return pView->v0;
 }

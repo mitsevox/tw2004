@@ -132,7 +132,7 @@ u8 fn_800D1AE0(void) {
 // A tip test: the player's first shot on a par 5 of 500 or more (the hole's value for the tee).
 u8 fn_800D1B10(int nPlayer) {
     s32 nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
-    int nPar = fn_800D2B08();
+    int nPar = Course_GetCurHolePar();
     s32 nLength = fn_800D2C68(gSession.nTeeSet[nPlayer]);
     if (nPar == 5 && nStrokes == 0 && nLength >= 500) {
         return 1;
@@ -143,7 +143,7 @@ u8 fn_800D1B10(int nPlayer) {
 // A tip test: the player's first shot on a par 4 of 325 or less.
 u8 fn_800D1BA4(int nPlayer) {
     s32 nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
-    int nPar = fn_800D2B08();
+    int nPar = Course_GetCurHolePar();
     s32 nLength = fn_800D2C68(gSession.nTeeSet[nPlayer]);
     if (nPar == 4 && nStrokes == 0 && nLength <= 325) {
         return 1;
@@ -161,7 +161,7 @@ u8 fn_800D1C38(int nPlayer) {
 // A tip test: the player's first shot on a par 4 of 425 or more.
 u8 fn_800D1C9C(int nPlayer) {
     s32 nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
-    int nPar = fn_800D2B08();
+    int nPar = Course_GetCurHolePar();
     s32 nLength = fn_800D2C68(gSession.nTeeSet[nPlayer]);
     if (nPar == 4 && nStrokes == 0 && nLength >= 425) {
         return 1;

@@ -27,13 +27,13 @@ void fn_800B5A14(UAudMemStack* pStack, u8* pMem, u32 uSize, u32 nMaxBlocks, UAud
     pStack->nAlign = nAlign;
     if (pBlocks == NULL) {
         pStack->pBlocks =
-            fn_80009B34(nMaxBlocks * sizeof(UAudMemStackBlock), 0, nAlign, "UAudMemStack.c", 40);
+            StaticMem_Alloc(nMaxBlocks * sizeof(UAudMemStackBlock), 0, nAlign, "UAudMemStack.c", 40);
         pStack->bOwnBlocks = 1;
     } else {
         pStack->pBlocks = pBlocks;
         pStack->bOwnBlocks = 0;
     }
-    fn_80005AE8(pStack->pBlocks, 0, pStack->nMaxBlocks * sizeof(UAudMemStackBlock));
+    Mem_set(pStack->pBlocks, 0, pStack->nMaxBlocks * sizeof(UAudMemStackBlock));
 }
 
 // Cuts a block of uSize bytes (rounded up to the alignment) from the top; NULL when the table or

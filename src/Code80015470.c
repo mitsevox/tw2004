@@ -19,7 +19,7 @@ BufferPool* lbl_80280E00 = &lbl_801A4900;
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8000ADC0(f32 (*m)[4]);          // identity matrix
+void Mtx_Identity(f32 (*m)[4]);          // identity matrix
 void fn_80015620(void);
 void fn_80016124(s32 p0, s32 p1, s32 p2, s32 p3);
 void fn_80016158(u8 nAlpha);
@@ -78,8 +78,8 @@ void fn_80015540(void) {
     p->f28 = 100.0f;
     p->f2C = 2048.0f;
     *(u32*)&p->c30 = 0xFFFFFFFF; // port: all four GXColor bytes 0xFF, stored as one word
-    fn_8000ADC0(p->m34);
-    fn_8000ADC0(lbl_801B8980.m74);
+    Mtx_Identity(p->m34);
+    Mtx_Identity(lbl_801B8980.m74);
     p->p100 = NULL;
     p->p104 = NULL;
     lbl_801B8980.u110 = 0;
@@ -98,7 +98,7 @@ void fn_80015620(void) {
 // Hand GX every group of the renderer's state that changed (u110), then the texture of the next
 // draw (uFlags). While fn_8002A164's screen copy is drawn with, it takes TEV stage 0 and the
 // draw's stages start at 1.
-void fn_80015624(void) {
+void RenderState_Apply(void) {
     f32 mNormal[3][4];
     Camera* pCamera;
     int nStage;
@@ -179,7 +179,7 @@ void fn_80015624(void) {
                      lbl_801B8980.f2C, lbl_801B8980.fB4, lbl_801B8980.fB8, lbl_801B8980.c30);
         }
         if (lbl_801B8980.u110 & 0x100) {
-            pCamera = fn_8001614C();
+            pCamera = Camera_GetCurrent();
             GXLoadPosMtxImm(lbl_801B8980.m34, 0);
             PSMTXInvXpose(lbl_801B8980.m34, mNormal);
             GXLoadNrmMtxImm(mNormal, 0);
@@ -303,7 +303,7 @@ void fn_80016124(s32 p0, s32 p1, s32 p2, s32 p3) {
     GXSetTexCoordGen2(p0, p1, p2, p3, 0, 125);
 }
 
-void* fn_8001614C(void) {
+void* Camera_GetCurrent(void) {
     return *lbl_80280DF0;
 }
 

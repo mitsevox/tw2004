@@ -45,7 +45,7 @@ void SitDev_LoadScripts(SitDevScripts** ppScripts) {
         fn_800BB4B4(lbl_80282208);
         fn_800BB52C();
     }
-    lbl_802811B8->pD4 = fn_80009B34(lbl_80282208->n10, 2, 16, "SitDevFile.c", 105);
+    lbl_802811B8->pD4 = StaticMem_Alloc(lbl_80282208->n10, 2, 16, "SitDevFile.c", 105);
     fn_800BD74C();
 }
 
@@ -64,7 +64,7 @@ void fn_800BB4B4(SitDevScripts* pScripts) {
 void fn_800BB4E8(void) {
     void* pSrc = lbl_80282208;
     void* pDst = lbl_80282208;
-    fn_8001F08C(&pSrc, &pDst, lbl_80191168, 9, 1);
+    ByteSwap_Records(&pSrc, &pDst, lbl_80191168, 9, 1);
 }
 
 // Byte-swap the tables in place, then put the bit-fields of the p14 and p1C entries in order.
@@ -78,12 +78,12 @@ void fn_800BB52C(void) {
     if (lbl_80282208->nEntries != 0) {
         pSrc = lbl_80282208->p14;
         pDst = lbl_80282208->p14;
-        fn_8001F08C(&pSrc, &pDst, lbl_801911B0, 7, lbl_80282208->nEntries);
+        ByteSwap_Records(&pSrc, &pDst, lbl_801911B0, 7, lbl_80282208->nEntries);
     }
     if (lbl_80282208->n04 != 0) {
         pSrc = lbl_80282208->p18;
         pDst = lbl_80282208->p18;
-        fn_8001F08C(&pSrc, &pDst, lbl_801911E8, 5, lbl_80282208->n04);
+        ByteSwap_Records(&pSrc, &pDst, lbl_801911E8, 5, lbl_80282208->n04);
     }
     if (lbl_80282208->n08 != 0) {
         // fake match: pEntry8 carries the source pointer here (permuter find): it gives the i / pEntry8
@@ -91,13 +91,13 @@ void fn_800BB52C(void) {
         pEntry8 = lbl_80282208->p1C;
         pSrc = pEntry8;
         pDst = lbl_80282208->p1C;
-        fn_8001F08C(&pSrc, &pDst, lbl_80191210, 4, lbl_80282208->n08);
+        ByteSwap_Records(&pSrc, &pDst, lbl_80191210, 4, lbl_80282208->n08);
     }
     if (lbl_80282208->n0C != 0) {
         pSrc = lbl_80282208->p20;
         pDst = lbl_80282208->p20;
         // EA bug: the byte count and the value width are swapped, and the address of pDst is
-        // passed for pDst (the call is shaped like fn_8001F08C's)
+        // passed for pDst (the call is shaped like ByteSwap_Records's)
         BYTESWAP_SWAPDATA((u8**)&pSrc, (u8*)&pDst, 4, lbl_80282208->n0C * 4);
     }
     for (i = 0; i < lbl_80282208->nEntries; i++) {

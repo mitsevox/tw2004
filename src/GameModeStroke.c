@@ -107,7 +107,7 @@ s32 GameModeStroke_GetHonors(int nPlayer) {
     if (nPlayer == 5 && nBest == 5) {
         return 5;
     }
-    pCourse = fn_8000C594();
+    pCourse = Ter_GetTGD();
     nPinSet = Game_CurrentPinSet();
     fBest = 0.0f;
     nBest = 5;
@@ -116,7 +116,7 @@ s32 GameModeStroke_GetHonors(int nPlayer) {
             PLAYER(i)->ball.nLie != LIE_GREEN_e) {
             dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
             dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
-            d = fn_80009680(dx * dx + dz * dz);
+            d = Math_Sqrt(dx * dx + dz * dz);
             if (d > fBest) {
                 fBest = d;
                 nBest = i;
@@ -130,7 +130,7 @@ s32 GameModeStroke_GetHonors(int nPlayer) {
             if (i != nPlayer && !Player_IsHoled(i) && !PLAYER(i)->bPlayerCut) {
                 dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
                 dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
-                d = fn_80009680(dx * dx + dz * dz);
+                d = Math_Sqrt(dx * dx + dz * dz);
                 if (d > fBest) {
                     fBest = d;
                     nBest = i;
@@ -223,9 +223,9 @@ void GameModeStroke_EndGame(void) {
                             bFirst = 0;
                         }
                         if (nBase) {
-                            fn_800E4364(0, 0x6A, nBase, nProfile);
+                            GUI_QueueMessage(0, 0x6A, nBase, nProfile);
                         }
-                        fn_800D3548(i, nMoney, NULL);
+                        GM_Earnings_AwardMoney(i, nMoney, NULL);
                     }
                 }
             }

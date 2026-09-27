@@ -119,11 +119,11 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
             pPict = (LLPict*)pEntry->p8;
             fn_800760D8(pPict);
         }
-        fn_80014118(0x50);
+        RenderState_SetDrawFlags(0x50);
     } else {
-        fn_80014118(0x40);
+        RenderState_SetDrawFlags(0x40);
     }
-    fn_80013EEC(fn_8001614C());
+    fn_80013EEC(Camera_GetCurrent());
     fInnerX = fInnerY = 0.0f;
     vScale[0] = (1.0f / 511.0f) * pColour->w40.a[0];
     vScale[1] = (1.0f / 511.0f) * pColour->w40.a[1];
@@ -201,8 +201,8 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
         }
         if (i == 0) {
             fCos2[0] = 0.0f;    // fake match: a dead store, numbers fCos2 before fSin2
-            fSin2[0] = fn_800095F0(fStart);
-            fCos = fn_80009638(fStart);
+            fSin2[0] = Math_Sin(fStart);
+            fCos = Math_Cos(fStart);
         } else {
             fCos = fCos2[0];
         }
@@ -256,8 +256,8 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
         } else {
             fAngle = fStep * i + fStart;
         }
-        fSin2[0] = fn_800095F0(fAngle);
-        fCos2[0] = fn_80009638(fAngle);
+        fSin2[0] = Math_Sin(fAngle);
+        fCos2[0] = Math_Cos(fAngle);
         aVtx[2].f0 = fU2[0];
         aVtx[2].f4 = fV2[0];
         aVtx[2].f8 = fOuterX * fCos2[0];
@@ -300,8 +300,8 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
             aOut[j].y *= fProj;
             aOut[j].z = fZ;
         }
-        fn_80012F18(7);
-        fn_80012EF8();
+        RenderState_SetDepthFunc(7);
+        RenderState_Flush();
         if (aColour[0][3] != 0.0f || aColour[1][3] != 0.0f || aColour[2][3] != 0.0f
             || aColour[3][3] != 0.0f) {
             if (pArc->n2 == -1) {

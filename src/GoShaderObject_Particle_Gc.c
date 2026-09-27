@@ -24,10 +24,10 @@ ParticleBuffers* lbl_802813A8 = &lbl_801D97E0;
 
 // The particles' four buffers, two of 90000 bytes and two of 10000.
 void fn_8009414C(void) {
-    lbl_802813A8->apBuffers[0] = fn_80009B34(90000, 2, 32, "GoShaderObject_Particle_Gc.c", 109);
-    lbl_802813A8->apBuffers[1] = fn_80009B34(90000, 2, 32, "GoShaderObject_Particle_Gc.c", 111);
-    lbl_802813A8->apBuffers[2] = fn_80009B34(10000, 2, 32, "GoShaderObject_Particle_Gc.c", 113);
-    lbl_802813A8->apBuffers[3] = fn_80009B34(10000, 2, 32, "GoShaderObject_Particle_Gc.c", 115);
+    lbl_802813A8->apBuffers[0] = StaticMem_Alloc(90000, 2, 32, "GoShaderObject_Particle_Gc.c", 109);
+    lbl_802813A8->apBuffers[1] = StaticMem_Alloc(90000, 2, 32, "GoShaderObject_Particle_Gc.c", 111);
+    lbl_802813A8->apBuffers[2] = StaticMem_Alloc(10000, 2, 32, "GoShaderObject_Particle_Gc.c", 113);
+    lbl_802813A8->apBuffers[3] = StaticMem_Alloc(10000, 2, 32, "GoShaderObject_Particle_Gc.c", 115);
     lbl_802813A8->n14 = 0;
     lbl_802813A8->b10 = 0;
 }
@@ -35,10 +35,10 @@ void fn_8009414C(void) {
 void fn_80094214(void) {
     lbl_802813A8->n14 = 0;
     lbl_802813A8->b10 = 0;
-    fn_80009E70(lbl_802813A8->apBuffers[0]);
-    fn_80009E70(lbl_802813A8->apBuffers[1]);
-    fn_80009E70(lbl_802813A8->apBuffers[2]);
-    fn_80009E70(lbl_802813A8->apBuffers[3]);
+    StaticMem_Free(lbl_802813A8->apBuffers[0]);
+    StaticMem_Free(lbl_802813A8->apBuffers[1]);
+    StaticMem_Free(lbl_802813A8->apBuffers[2]);
+    StaticMem_Free(lbl_802813A8->apBuffers[3]);
 }
 
 void fn_80094274(void) {
@@ -54,7 +54,7 @@ void fn_8009428C(SD_SShaderObject_Static* pObject, ParticleCreate* pCreate) {
     ParticleSystem* pSys;
 
     if (pCreate->bAlloc) {
-        pObject->pData = fn_80009B34(sizeof(ParticleSystem), 2, 32, "GoShaderObject_Particle_Gc.c", 201);
+        pObject->pData = StaticMem_Alloc(sizeof(ParticleSystem), 2, 32, "GoShaderObject_Particle_Gc.c", 201);
         ((ParticleSystem*)pObject->pData)->nFirst = lbl_802813A8->n14;
         lbl_802813A8->n14 += pCreate->pParams->nCount;
         return;
@@ -74,10 +74,10 @@ void fn_8009428C(SD_SShaderObject_Static* pObject, ParticleCreate* pCreate) {
     Vec_Copy(pCreate->pParams->vF0, pSys->shape.v0);
     pSys->shape.f40 = pCreate->pParams->f104;
     pSys->shape.f44 = pCreate->pParams->f108;
-    fn_8000AE28(1.0f / 256.0f, pSys->shape.v10, pSys->shape.v10);
-    fn_8000AE28(1.0f / 256.0f, pSys->shape.v20, pSys->shape.v20);
-    fn_8000AE28(1.0f / 256.0f, pSys->shape.v30, pSys->shape.v30);
-    fn_8000AE28(1.0f / 256.0f, pSys->shape.v0, pSys->shape.v0);
+    Vec_Scale(1.0f / 256.0f, pSys->shape.v10, pSys->shape.v10);
+    Vec_Scale(1.0f / 256.0f, pSys->shape.v20, pSys->shape.v20);
+    Vec_Scale(1.0f / 256.0f, pSys->shape.v30, pSys->shape.v30);
+    Vec_Scale(1.0f / 256.0f, pSys->shape.v0, pSys->shape.v0);
     pSys->shape.f40 = pSys->shape.f40 / 256.0f;
     pSys->shape.f44 = pSys->shape.f44 / 256.0f;
     pSys->shape.f48 = 1.4142f * pCreate->pParams->f118;
@@ -87,7 +87,7 @@ void fn_8009428C(SD_SShaderObject_Static* pObject, ParticleCreate* pCreate) {
     pSys->shape.f58 = 1.0f / (2.0f * PI);
     pSys->shape.f5C = 0.5f;
     fn_8000AE6C(pCreate->pParams->vB0, pCreate->pParams->vA0, pCreate->pParams->f110, pSys->shape.v60);
-    fn_8000AE28(pSys->shape.f54, pSys->shape.v60, pSys->shape.v60);
+    Vec_Scale(pSys->shape.f54, pSys->shape.v60, pSys->shape.v60);
     pSys->shape.v60[3] = 0.0f;
     pSys->shape.aSin[0] = 2.0f * PI;
     pSys->shape.aSin[1] = -(2.0f * PI) * (2.0f * PI) * (2.0f * PI) / 6.0f;
@@ -109,7 +109,7 @@ void fn_800944F8(SD_SShaderObject_Static* pObject) {
     if (lbl_802813A8->n14 > pSys->nFirst) {
         lbl_802813A8->n14 = pSys->nFirst;
     }
-    fn_80009E70(pSys);
+    StaticMem_Free(pSys);
 }
 
 void fn_800950CC(f32 s, f32 t);
@@ -218,8 +218,8 @@ void fn_80094534(f32 (*pMtx)[4], ParticleShape* pShape, ParticleVertex* pVerts, 
             }
             fAngle = pVerts->f1C * t + pVerts->f18;
             fAngle = fAngle / (2.0f * PI);
-            fSin = fn_800095F0(fAngle);
-            fCos = fn_80009638(fAngle);
+            fSin = Math_Sin(fAngle);
+            fCos = Math_Cos(fAngle);
             m[0][0] = -fCos;
             m[0][1] = fSin;
             m[0][3] = -v.x;
@@ -269,21 +269,21 @@ void fn_800949D0(SD_SShaderObject_Static* pObject) {
     nLive = pSys->anLive[nBuf];
     nStart = pSys->anStart[nBuf];
     if (nLive != 0) {
-        fn_80012F50(0, 6, 0x80);
-        fn_80012F18(3);
-        fn_80012F34(0);
-        fn_80014118(0x70);
+        RenderState_SetAlphaTest(0, 6, 0x80);
+        RenderState_SetDepthFunc(3);
+        RenderState_SetDepthWrite(0);
+        RenderState_SetDrawFlags(0x70);
         fn_8005CC64(pSys->pBank, pSys->pTex);
         if (pSys->u18 & 0x80) {
-            fn_80035118(4, 1);
+            RenderState_SetBlendFactors(4, 1);
         } else if (pSys->u18 & 0x100) {
-            fn_80035118(1, 1);
+            RenderState_SetBlendFactors(1, 1);
         } else {
-            fn_80035118(4, 5);
+            RenderState_SetBlendFactors(4, 5);
         }
         fn_80035138(0);
-        fn_80012EF8();
-        pCamera = fn_8001614C();
+        RenderState_Flush();
+        pCamera = Camera_GetCurrent();
         GXClearVtxDesc();
         GXSetVtxDesc(9, 1);                     // position, colour, texture coordinates: direct
         GXSetVtxDesc(11, 1);
@@ -305,9 +305,9 @@ void fn_800949D0(SD_SShaderObject_Static* pObject) {
             pAges = (f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst;
             fn_80094534(pCamera->viewMtx, &pSys->shape, pVerts, pAges, nLive - n);
         }
-        fn_80012F34(1);
-        fn_80012F50(1, 6, 0x80);
-        fn_80012EF8();
+        RenderState_SetDepthWrite(1);
+        RenderState_SetAlphaTest(1, 6, 0x80);
+        RenderState_Flush();
     }
 }
 

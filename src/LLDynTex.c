@@ -41,8 +41,8 @@ DynTexState* lbl_80282488;
 
 // Set up: the state and its nSize-byte block (gomainloop.c: 0x18000, later 0x6000).
 void fn_8010A448(int nSize) {
-    lbl_80282488 = fn_80009B34(sizeof(DynTexState), 2, 16, "LLDynTex.c", 105);
-    lbl_80282488->p0 = fn_80009B34(nSize, 2, 64, "LLDynTex.c", 108);
+    lbl_80282488 = StaticMem_Alloc(sizeof(DynTexState), 2, 16, "LLDynTex.c", 105);
+    lbl_80282488->p0 = StaticMem_Alloc(nSize, 2, 64, "LLDynTex.c", 108);
     lbl_80282488->p8 = NULL;
     lbl_80282488->b975 = 1;
     lbl_80282488->b974 = 1;
@@ -55,9 +55,9 @@ void fn_8010A448(int nSize) {
 
 void fn_8010A4E8(void) {
     if (lbl_80282488->p0 != NULL) {
-        fn_80009E70(lbl_80282488->p0);
+        StaticMem_Free(lbl_80282488->p0);
     }
-    fn_80009E70(lbl_80282488);
+    StaticMem_Free(lbl_80282488);
 }
 
 // ---- end of sweep code ----
@@ -72,10 +72,10 @@ DynTex* fn_8010A520(int nC, int nSize, int n2, int n3, int n4) {
     nBytes = (s32)sizeof(DynTex) + nC * (s32)sizeof(DynTexEntry) + nC * (s32)sizeof(DynTexObj) +
              nC * (s32)sizeof(DynTexPalette) + nC * (s32)sizeof(DynTex40) +
              nC * (s32)sizeof(DynTex18);
-    pTex = fn_80009B34(nBytes, 2, 16, "LLDynTex.c", 151);
+    pTex = StaticMem_Alloc(nBytes, 2, 16, "LLDynTex.c", 151);
     memset(pTex, 0, nBytes);
     pTex->nC = nC;
-    pTex->p18 = fn_80009B34(nSize, 2, 32, "LLDynTex.c", 161);
+    pTex->p18 = StaticMem_Alloc(nSize, 2, 32, "LLDynTex.c", 161);
     pTex->n10 = nSize;
     pHeader = &pTex->header;
     pTex->p4 = pHeader;
@@ -100,8 +100,8 @@ DynTex* fn_8010A520(int nC, int nSize, int n2, int n3, int n4) {
 // Free a dynamic texture.
 void fn_8010A668(DynTex* pTex) {
     fn_8001052C(pTex->n1C);
-    fn_80009E70(pTex->p18);
-    fn_80009E70(pTex);
+    StaticMem_Free(pTex->p18);
+    StaticMem_Free(pTex);
 }
 
 // ---- end of sweep code ----

@@ -255,8 +255,8 @@ void GameMode4_EndGame(void) {
         nProfile = gPlayers[0].nIndex;
         if (gpSaveData[nProfile].bActive) {
             EASBio_SetCurrentGameWon(1);
-            fn_800E4364(0, 0x6E, nPrize, nProfile);
-            fn_800D3548(0, nMoney, NULL);
+            GUI_QueueMessage(0, 0x6E, nPrize, nProfile);
+            GM_Earnings_AwardMoney(0, nMoney, NULL);
             nEvent = fn_801021FC();
             gPlayers[0].money.nC += lbl_80200538.aLadderPrize[nEvent].nBase;
             gPlayers[0].money.n10 += lbl_80200538.aLadderPrize[nEvent].nPerHole * nMargin;
@@ -273,8 +273,8 @@ void fn_80102704_WinSkinsEvent(void) {
     if (nMoney != 0) {
         int nIndex = gPlayers[0].nIndex;
         if (gpSaveData[nIndex].bActive) {
-            fn_800E4364(0, 0x6E, nPrize, nIndex);
-            fn_800D3548(0, nMoney, NULL);
+            GUI_QueueMessage(0, 0x6E, nPrize, nIndex);
+            GM_Earnings_AwardMoney(0, nMoney, NULL);
             gPlayers[0].money.nC += nMoney;
         }
     }
@@ -285,22 +285,22 @@ void fn_80102704_WinSkinsEvent(void) {
 void fn_801027A4(void) {
     switch (fn_801021FC()) {
     case 11:
-        fn_800E4364(11, 3, 0, 0);
+        GUI_QueueMessage(11, 3, 0, 0);
         break;
     case 3:
-        fn_800E4364(11, 4, 0, 0);
+        GUI_QueueMessage(11, 4, 0, 0);
         break;
     case 19:
-        fn_800E4364(11, 5, 0, 0);
+        GUI_QueueMessage(11, 5, 0, 0);
         break;
     case 7:
-        fn_800E4364(11, 7, 0, 0);
+        GUI_QueueMessage(11, 7, 0, 0);
         break;
     case 15:
-        fn_800E4364(11, 8, 0, 0);
+        GUI_QueueMessage(11, 8, 0, 0);
         break;
     case 23:
-        fn_800E4364(11, 13, 0, 0);
+        GUI_QueueMessage(11, 13, 0, 0);
         break;
     }
 }
@@ -319,11 +319,11 @@ void GameMode4_WinEvent(void) {
         fn_800D7770(nProfile, &gpSaveData[nProfile].aLadderAward[nEvent]);
         if (lbl_80282448 != 34 && !fn_8005832C(nProfile, lbl_80282448)) {
             fn_80058278(nProfile, lbl_80282448);
-            fn_800E4364(4, lbl_80282448, 0, nProfile);
+            GUI_QueueMessage(4, lbl_80282448, 0, nProfile);
         }
         if (lbl_80282444 != 0) {
             fn_80058428(nProfile, lbl_80282444 - 1);
-            fn_800E4364(3, 0x16, lbl_80282444, nProfile);
+            GUI_QueueMessage(3, 0x16, lbl_80282444, nProfile);
         }
         if (lbl_8028244C != 0) {
             fn_800D39B4(0, lbl_8028244C);
@@ -334,14 +334,14 @@ void GameMode4_WinEvent(void) {
                 bLast = 1;
             }
             if (bLast == 1) {
-                fn_800E4364(5, 0x1A, 0, nProfile);
+                GUI_QueueMessage(5, 0x1A, 0, nProfile);
                 if (GM_Earnings_AwardTrophyBall(0, 15)) {
-                    fn_800E4364(2, 15, lbl_80200538.nLadderDone, nProfile);
-                    fn_800D3548(0, lbl_80200538.nLadderDone, NULL);
+                    GUI_QueueMessage(2, 15, lbl_80200538.nLadderDone, nProfile);
+                    GM_Earnings_AwardMoney(0, lbl_80200538.nLadderDone, NULL);
                     gPlayers[0].money.n8 += lbl_80200538.nLadderDone;
                 }
             } else if ((nEvent + 1) % 4 == 0) {
-                fn_800E4364(5, nEvent / 4 + 20, 0, nProfile);
+                GUI_QueueMessage(5, nEvent / 4 + 20, 0, nProfile);
             }
         }
     }

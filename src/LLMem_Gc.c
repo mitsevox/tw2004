@@ -121,7 +121,7 @@ void* fn_80005884(void* pDst, const void* pSrc, u32 uLen) {
 
 // memset: short fills byte by byte; longer ones align to 8 and store the byte pattern 32 and then
 // 8 bytes at a time through a double.
-void* fn_80005AE8(void* pDst, int nValue, u32 uLen) {
+void* Mem_set(void* pDst, int nValue, u32 uLen) {
     u8* p;
     u8* pWide;
     int n;

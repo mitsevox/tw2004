@@ -76,12 +76,12 @@ int fn_800AF224(void) {
 }
 
 // Pick the effect: the mode 0 reverb when bOn is 0, the mode 2 reverb for nKind 8 on hole index 2
-// (fn_80015464), otherwise the delay.
+// (Game_GetCurHoleNum), otherwise the delay.
 u8 fn_800AF264(u8 nKind, u8 bOn) {
     s8 nHole;                           // fake match: EA keeps the hole index as a signed byte
     s8 nMode;
 
-    nHole = fn_80015464();
+    nHole = Game_GetCurHoleNum();
     if (bOn == 0) {
         nMode = 0;
     } else if (nKind == 8 && nHole == 2) {

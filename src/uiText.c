@@ -161,7 +161,7 @@ void fn_800922A8(UIText* pText) {
     if (aColor[3] > 0.5f) {
         aColor[3] = 0.5f;
     }
-    fn_80013EEC(fn_8001614C());
+    fn_80013EEC(Camera_GetCurrent());
     fn_8006A9AC(aColor);
     fn_80012CB4_SetWordWrapBox(fX, fY, fW, fH);
     if (pText->nFlags & 1) {
@@ -173,7 +173,7 @@ void fn_800922A8(UIText* pText) {
     if (0.0f != aColor[3]) {
         UFont_DrawString(szText, 0.0f, 0.0f);
         fn_800760B0(0, 0, 0x200, 0x1C0);
-        fn_80012EF8();
+        RenderState_Flush();
     }
 }
 

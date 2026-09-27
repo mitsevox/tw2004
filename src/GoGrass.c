@@ -154,7 +154,7 @@ void fn_8011E3B4(void) {
             fn_8011FDC4(lbl_80281900->apF0[lbl_80281900->n100][i]);
         }
         fn_8011FF58();
-        fn_80009E70(lbl_80281900->p370);
+        StaticMem_Free(lbl_80281900->p370);
         lbl_80281900->p370 = NULL;
         fn_80120194();
         fn_8011EAB8();
@@ -277,14 +277,14 @@ void fn_8011E6E8(void) {
     if (lbl_80281900->n3E4 != 0) {
         fn_8011EC84();
     }
-    fSin = fn_800095F0(lbl_80281900->f40C);
-    fCos = fn_80009638(lbl_80281900->f40C);
+    fSin = Math_Sin(lbl_80281900->f40C);
+    fCos = Math_Cos(lbl_80281900->f40C);
     for (i = 0; i < 16; i++) {
         vPoint[0] = fCos * lbl_80281900->f41C *
-                    fn_800095F0(lbl_80281900->f414 + 2.0f * PI * ((f32)i / 16.0f));
+                    Math_Sin(lbl_80281900->f414 + 2.0f * PI * ((f32)i / 16.0f));
         vPoint[1] = 0.0f;
         vPoint[2] = fSin * lbl_80281900->f41C *
-                    fn_800095F0(lbl_80281900->f414 + 2.0f * PI * ((f32)i / 16.0f));
+                    Math_Sin(lbl_80281900->f414 + 2.0f * PI * ((f32)i / 16.0f));
         vPoint[3] = 0.0f;
         Vec_Copy(vPoint, lbl_80281900->av230[i]);
     }
@@ -355,13 +355,13 @@ void fn_8011EB04(void) {
 
 // The grass's 256x256 texture: its buffer and texture object.
 void fn_8011EB80(void) {
-    lbl_80282510 = fn_80009B34(GXGetTexBufferSize(256, 256, 4, 0, 0), 2, 32, "GoGrass.c", 1311);
+    lbl_80282510 = StaticMem_Alloc(GXGetTexBufferSize(256, 256, 4, 0, 0), 2, 32, "GoGrass.c", 1311);
     GXInitTexObj(&lbl_8026038C, lbl_80282510, 256, 256, 4, 0, 0, 0);
 }
 
 void fn_8011EBF8(void) {
     if (lbl_80282510 != NULL) {
-        fn_80009E70(lbl_80282510);
+        StaticMem_Free(lbl_80282510);
     }
     lbl_80282510 = NULL;
 }
@@ -380,53 +380,53 @@ void fn_8011EC84(void) {
     s32 nOld;
     void* pCamera;
 
-    pCamera = fn_8001614C();
+    pCamera = Camera_GetCurrent();
     fn_80013D5C(lbl_80281900->pCamera);
-    fn_80012F34(0);
-    fn_80012F18(7);
-    fn_80012F50(0, 6, 128);
+    RenderState_SetDepthWrite(0);
+    RenderState_SetDepthFunc(7);
+    RenderState_SetAlphaTest(0, 6, 128);
     fn_800140E8(1, 256, 256, 0, 1, 1);
     fn_800760B0(0, 0, 256, 256);
     fn_80016B54(256, 256, 1.0f, 1.0f);
     fn_80035F1C();
     fn_80016948();
     fn_800352BC();
-    fn_80013CCC(fn_8001614C());
-    fn_80013EEC(fn_8001614C());
+    fn_80013CCC(Camera_GetCurrent());
+    fn_80013EEC(Camera_GetCurrent());
     fn_80016B9C();
-    fn_80012EF8();
+    RenderState_Flush();
     fn_8001425C(0);
-    fn_80014118(0);
+    RenderState_SetDrawFlags(0);
     fn_80014194(lbl_801945B8);
-    fn_80012F34(0);
-    fn_80012F50(0, 6, 128);
-    fn_80012EF8();
+    RenderState_SetDepthWrite(0);
+    RenderState_SetAlphaTest(0, 6, 128);
+    RenderState_Flush();
     fn_8001644C(161, lbl_801945C8, 0, lbl_801945C8, 2);
     nOld = fn_8003505C(0);
     fn_80034AE4();
     fn_8003505C(nOld);
     fn_8011EC2C();
     fn_80013D5C(pCamera);
-    fn_80013EEC(fn_8001614C());
+    fn_80013EEC(Camera_GetCurrent());
     fn_800352BC();
-    fn_80013CCC(fn_8001614C());
+    fn_80013CCC(Camera_GetCurrent());
     fn_80016B9C();
     fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
     fn_800760B0(0, 0, 512, 448);
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80035F1C();
-    fn_80012F50(1, 6, 128);
-    fn_80012F34(1);
-    fn_80012F18(3);
-    fn_80012EF8();
+    RenderState_SetAlphaTest(1, 6, 128);
+    RenderState_SetDepthWrite(1);
+    RenderState_SetDepthFunc(3);
+    RenderState_Flush();
 }
 
 void fn_8011EE4C(void) {
     fn_8001425C(0);
-    fn_80014118(16);
+    RenderState_SetDrawFlags(16);
     fn_80014194(lbl_801945E8);
-    fn_80012F34(0);
-    fn_80012F50(0, 6, 128);
+    RenderState_SetDepthWrite(0);
+    RenderState_SetAlphaTest(0, 6, 128);
     GXLoadTexObj(&lbl_8026038C, 0);
     GXSetNumTexGens(1);
     GXSetTevOrder(0, 0, 0, 4);
@@ -435,24 +435,24 @@ void fn_8011EE4C(void) {
     GXSetTevColorOp(0, 0, 0, 1, 1, 0);
     GXSetTevAlphaIn(0, 7, 4, 5, 7);
     GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
-    fn_80012F18(7);
-    fn_80012EF8();
+    RenderState_SetDepthFunc(7);
+    RenderState_Flush();
     fn_8001644C(161, lbl_801945F8, 0, lbl_80194618, 2);
-    fn_80012F18(3);
-    fn_80012F34(1);
-    fn_80012F50(1, 6, 128);
-    fn_80012EF8();
+    RenderState_SetDepthFunc(3);
+    RenderState_SetDepthWrite(1);
+    RenderState_SetAlphaTest(1, 6, 128);
+    RenderState_Flush();
 }
 
 void fn_8011EF88(void) {
     fn_800352BC();
-    fn_80013CCC(fn_8001614C());
+    fn_80013CCC(Camera_GetCurrent());
     fn_80035138(0);
     fn_80016B9C();
-    fn_80012F50(0, 6, 128);
-    fn_80012F34(0);
-    fn_80014118(80);
-    fn_80012EF8();
+    RenderState_SetAlphaTest(0, 6, 128);
+    RenderState_SetDepthWrite(0);
+    RenderState_SetDrawFlags(80);
+    RenderState_Flush();
     GrassRender_vBuildAndUploadOneTimeData();
 }
 
@@ -512,13 +512,13 @@ void GrassRender_vBuildAndUploadOneTimeData(void) {
     SD_vSetGrassParamsOnce(lbl_80281900->af208, lbl_80281900->af218, lbl_80281900->af108,
                            lbl_80281900->af168, lbl_80281900->af148, lbl_80281900->av230,
                            lbl_80281900->f228, lbl_80281900->f22C);
-    fn_80012EF8();
+    RenderState_Flush();
 }
 
 void fn_8011F374(void) {
-    fn_80012F50(1, 6, 128);
-    fn_80012F34(1);
-    fn_80012EF8();
+    RenderState_SetAlphaTest(1, 6, 128);
+    RenderState_SetDepthWrite(1);
+    RenderState_Flush();
 }
 
 // Draws the buffers in use in two passes: the camera's direction, flattened and normalised, picks
@@ -535,7 +535,7 @@ void fn_8011F3AC(void) {
     Vec_Copy(pLens->m4[2], vDir);
     vDir[1] = 0.0f;
     if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
-        fn_800BAF04(vDir, vDir);
+        Vec_NormalizeTo(vDir, vDir);
     }
     if (vDir[2] < 0.0f) {
         lbl_80281900->n360 = 0;
@@ -672,7 +672,7 @@ void fn_8011F7F8(void) {
     Vec3Copy(pLens->m4[2], vLook);
     Vec3Copy(vLook, vFlat);
     if (vLook[0] != 0.0f || vLook[1] != 0.0f || vLook[2] != 0.0f) {
-        fn_800BAF04(vLook, vLook);
+        Vec_NormalizeTo(vLook, vLook);
     }
     lbl_80281900->f3F8 =
         (vLook[1] - lbl_80281900->f400) / (lbl_80281900->f3FC - lbl_80281900->f400);
@@ -684,10 +684,10 @@ void fn_8011F7F8(void) {
     }
     vFlat[1] = 0.0f;
     if (vFlat[0] != 0.0f || vFlat[1] != 0.0f || vFlat[2] != 0.0f) {
-        fn_800BAF04(vFlat, vFlat);
+        Vec_NormalizeTo(vFlat, vFlat);
     }
     Vec_Copy(pLens->m4[3], vPos);
-    fn_8000AE28(lbl_80281900->f3EC, vFlat, vAhead);
+    Vec_Scale(lbl_80281900->f3EC, vFlat, vAhead);
     fn_80120268(vAhead, vPos, vCentre);
     if (vCentre[0] < 0.0f) {
         fX = vCentre[0] - (2.5f - (f32)fabs(fn_80120244(vCentre[0], 2.5f)));
@@ -715,14 +715,14 @@ void fn_8011F7F8(void) {
             pTile = &lbl_80281900->pC[lbl_80281900->p8[nX + nZ * lbl_80281900->n18]];
             // the cell's sphere: its centre, and the radius over half its height and the
             // 1.25 x 1.25 half cell
-            pSphere->radius = fn_80009680(
+            pSphere->radius = Math_Sqrt(
                 3.125f + (0.5f * (pTile->f8 + lbl_80281900->f3B8 - pTile->f4)) *
                              (0.5f * (pTile->f8 + lbl_80281900->f3B8 - pTile->f4)));
             pSphere->x = 1.25f + ((f32)lbl_80281900->n14 + fCellX);
             pSphere->y = 0.5f * (lbl_80281900->f3B8 + (pTile->f4 + pTile->f8));
             pSphere->z = 1.25f + (2.5f * (f32)nZ + (f32)lbl_80281900->n16);
-            nCull = fn_80007CE8((RenderObj*)&lbl_80260360, fn_8001614C(),
-                                0, fn_80017028(lbl_801D3CB0.iCurrentViewContext)->f54);
+            nCull = fn_80007CE8((RenderObj*)&lbl_80260360, Camera_GetCurrent(),
+                                0, ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext)->f54);
             if (nCull == 2) {
                 continue;
             }
@@ -807,11 +807,11 @@ s32 fn_8011FFCC(void) {
     lbl_80281900->nE0 = 16;
     lbl_80281900->anF8[0] = 0;
     lbl_80281900->anF8[1] = 0;
-    lbl_80281900->pEC = fn_80009B34(16 * sizeof(GrassBuffer), 2, 16, "GoGrass.c", 3707);
-    lbl_80281900->apF0[0] = fn_80009B34(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3709);
-    lbl_80281900->apF0[1] = fn_80009B34(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3711);
-    lbl_80281900->apD8 = fn_80009B34(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3714);
-    lbl_80281900->apDC = fn_80009B34(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3716);
+    lbl_80281900->pEC = StaticMem_Alloc(16 * sizeof(GrassBuffer), 2, 16, "GoGrass.c", 3707);
+    lbl_80281900->apF0[0] = StaticMem_Alloc(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3709);
+    lbl_80281900->apF0[1] = StaticMem_Alloc(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3711);
+    lbl_80281900->apD8 = StaticMem_Alloc(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3714);
+    lbl_80281900->apDC = StaticMem_Alloc(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3716);
     nBytes = 16 * sizeof(GrassBuffer) + 4 * (16 * sizeof(GrassBuffer*));
     for (i = 0; i < lbl_80281900->nE0; i++) {
         if (i < 4) {
@@ -820,7 +820,7 @@ s32 fn_8011FFCC(void) {
             nVerts = 450;
         }
         nSize = nVerts * 16;
-        lbl_80281900->pEC[i].p40 = fn_80009B34(nSize, 2, 16, "GoGrass.c", 3729);
+        lbl_80281900->pEC[i].p40 = StaticMem_Alloc(nSize, 2, 16, "GoGrass.c", 3729);
         nBytes += nSize;
         lbl_80281900->pEC[i].n44 = nVerts;
     }
@@ -836,13 +836,13 @@ s32 fn_8011FFCC(void) {
 void fn_80120194(void) {
     int i;
     for (i = 0; i < lbl_80281900->nE0; i++) {
-        fn_80009E70(lbl_80281900->pEC[i].p40);
+        StaticMem_Free(lbl_80281900->pEC[i].p40);
     }
-    fn_80009E70(lbl_80281900->apF0[0]);
-    fn_80009E70(lbl_80281900->apF0[1]);
-    fn_80009E70(lbl_80281900->pEC);
-    fn_80009E70(lbl_80281900->apDC);
-    fn_80009E70(lbl_80281900->apD8);
+    StaticMem_Free(lbl_80281900->apF0[0]);
+    StaticMem_Free(lbl_80281900->apF0[1]);
+    StaticMem_Free(lbl_80281900->pEC);
+    StaticMem_Free(lbl_80281900->apDC);
+    StaticMem_Free(lbl_80281900->apD8);
 }
 
 s32 fn_8012022C(void);

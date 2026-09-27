@@ -31,7 +31,7 @@ int fn_800ACECC(void) {
     int i;
 
     pInst = lbl_801F2740;
-    fn_80005AE8(lbl_801F2740, 0, sizeof(lbl_801F2740));
+    Mem_set(lbl_801F2740, 0, sizeof(lbl_801F2740));
     for (i = 0; i < 256; i++, pInst++) {
         pInst->nId = i;
         pInst->pPrevActive = pInst - 1;
@@ -148,8 +148,8 @@ u8 fn_800AD280(s16 nSound, s16 nEmitter, int n24, int n28, void (*pfnCallback)(u
     }
     pInst->nEmitter = nEmitter;
     pInst->pNext = NULL;
-    fn_80005AE8(pInst->pCmd->auParams, 0, sizeof(pInst->pCmd->auParams));
-    fn_80005AE8(pInst->pCmd->aPos, 0, sizeof(pInst->pCmd->aPos));
+    Mem_set(pInst->pCmd->auParams, 0, sizeof(pInst->pCmd->auParams));
+    Mem_set(pInst->pCmd->aPos, 0, sizeof(pInst->pCmd->aPos));
     fn_800A7CA4(pInst->nId, 0, 0, pInst->pCmd->auParams, pInst->pCmd->aPos, 0);
     return pInst->nId;
 }
@@ -233,7 +233,7 @@ AudInstance* fn_800AD674(u8 nId) {
 }
 
 // Switches an instance's track on (bOn 1: also marked in u22) or off.
-void fn_800AD698(u8 nId, u8 nTrack, u8 bOn) {
+void Emi_SetTrackEnabled(u8 nId, u8 nTrack, u8 bOn) {
     AudInstance* pInst = fn_800AD674(nId);
     u8 uBit = 1 << nTrack;
     if (pInst != NULL) {
@@ -281,8 +281,8 @@ void fn_800AD800(u8 nId, f32* pPos, f32* pLast, u8 nView) {
     pInst = fn_800AD674(nId);
     if (pInst != NULL) {
         for (i = 0; i < 2; i++) {
-            if ((gSession.nGameType == 3 || fn_800170A0(i)) && fn_80017004(i) != NULL) {
-                pLens = ((Camera*)fn_80017004(i))->unk10;
+            if ((gSession.nGameType == 3 || fn_800170A0(i)) && ViewController_GetCamera(i) != NULL) {
+                pLens = ((Camera*)ViewController_GetCamera(i))->unk10;
                 if (pPos == NULL) {
                     pPos = pInst->vPos;
                 }
@@ -350,7 +350,7 @@ void fn_800ADAF0(u8 nId, u8 nTrack, f32 fPitch) {
 void fn_800ADB4C(s16 nEmitter, u8 nTrack, u8 bOn) {
     AudInstance* pInst;
     for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
-        fn_800AD698(pInst->nId, nTrack, bOn);
+        Emi_SetTrackEnabled(pInst->nId, nTrack, bOn);
     }
 }
 

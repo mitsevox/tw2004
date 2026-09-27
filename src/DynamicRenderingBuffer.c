@@ -24,16 +24,16 @@ void fn_80070B68(u16 nIndex);
 DynRenderBuffer* fn_8007018C(int nMaxVerts, int nMaxDraws) {
     DynRenderBuffer* pBuf;
 
-    pBuf = fn_80009B34(sizeof(DynRenderBuffer), 2, 32, DRB_FILE, 163);
+    pBuf = StaticMem_Alloc(sizeof(DynRenderBuffer), 2, 32, DRB_FILE, 163);
     // room for 1.6 indices per vertex
-    pBuf->pIndices = fn_80009B34((int)(1.6f * (nMaxVerts * sizeof(u16))), 2, 32, DRB_FILE, 173);
-    pBuf->apPos[0] = fn_80009B34(nMaxVerts * 12, 2, 32, DRB_FILE, 181);
-    pBuf->apPos[1] = fn_80009B34(nMaxVerts * 12, 2, 32, DRB_FILE, 188);
-    pBuf->apColour[0] = fn_80009B34(nMaxVerts * 4, 2, 32, DRB_FILE, 195);
-    pBuf->apColour[1] = fn_80009B34(nMaxVerts * 4, 2, 32, DRB_FILE, 202);
-    pBuf->apTexCoord[0] = fn_80009B34(nMaxVerts * 8, 2, 32, DRB_FILE, 209);
-    pBuf->apTexCoord[1] = fn_80009B34(nMaxVerts * 8, 2, 32, DRB_FILE, 216);
-    pBuf->pDraws = fn_80009B34(nMaxDraws * sizeof(DynRenderDraw) + 4, 2, 32, DRB_FILE, 223);
+    pBuf->pIndices = StaticMem_Alloc((int)(1.6f * (nMaxVerts * sizeof(u16))), 2, 32, DRB_FILE, 173);
+    pBuf->apPos[0] = StaticMem_Alloc(nMaxVerts * 12, 2, 32, DRB_FILE, 181);
+    pBuf->apPos[1] = StaticMem_Alloc(nMaxVerts * 12, 2, 32, DRB_FILE, 188);
+    pBuf->apColour[0] = StaticMem_Alloc(nMaxVerts * 4, 2, 32, DRB_FILE, 195);
+    pBuf->apColour[1] = StaticMem_Alloc(nMaxVerts * 4, 2, 32, DRB_FILE, 202);
+    pBuf->apTexCoord[0] = StaticMem_Alloc(nMaxVerts * 8, 2, 32, DRB_FILE, 209);
+    pBuf->apTexCoord[1] = StaticMem_Alloc(nMaxVerts * 8, 2, 32, DRB_FILE, 216);
+    pBuf->pDraws = StaticMem_Alloc(nMaxDraws * sizeof(DynRenderDraw) + 4, 2, 32, DRB_FILE, 223);
     pBuf->nMaxVerts = nMaxVerts;
     pBuf->nMaxDraws = nMaxDraws;
     pBuf->nBuffer = 0;
@@ -43,15 +43,15 @@ DynRenderBuffer* fn_8007018C(int nMaxVerts, int nMaxDraws) {
 }
 
 void fn_80070348(DynRenderBuffer* pBuf) {
-    fn_80009E70(pBuf->pDraws);
-    fn_80009E70(pBuf->apTexCoord[1]);
-    fn_80009E70(pBuf->apTexCoord[0]);
-    fn_80009E70(pBuf->apColour[1]);
-    fn_80009E70(pBuf->apColour[0]);
-    fn_80009E70(pBuf->apPos[1]);
-    fn_80009E70(pBuf->apPos[0]);
-    fn_80009E70(pBuf->pIndices);
-    fn_80009E70(pBuf);
+    StaticMem_Free(pBuf->pDraws);
+    StaticMem_Free(pBuf->apTexCoord[1]);
+    StaticMem_Free(pBuf->apTexCoord[0]);
+    StaticMem_Free(pBuf->apColour[1]);
+    StaticMem_Free(pBuf->apColour[0]);
+    StaticMem_Free(pBuf->apPos[1]);
+    StaticMem_Free(pBuf->apPos[0]);
+    StaticMem_Free(pBuf->pIndices);
+    StaticMem_Free(pBuf);
 }
 
 // Draw nCount of the buffer's indices from nStart as one primitive, from the vertex arrays last

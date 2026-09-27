@@ -43,7 +43,7 @@ u8 Trk_InitModule(void) {
     bOk = 0;
     lbl_802820A0 = fn_800B5BD8(32 * sizeof(AudTrack));
     if (lbl_802820A0 != NULL) {
-        fn_80005AE8(lbl_802820A0, 0, 32 * sizeof(AudTrack));
+        Mem_set(lbl_802820A0, 0, 32 * sizeof(AudTrack));
         for (i = 0; i < 32; i++) {
             lbl_802820A0[i].nIndex = i;
             lbl_802820A0[i].nState = 0;
@@ -161,7 +161,7 @@ AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f3
     pTrack->bits.b.bSorted = bSorted;
     pTrack->bits.b.b5 = pSource->nSound >= 0;
     pTrack->params.flags.n = 0;
-    fn_80005AE8(pTrack->apVoices, 0, sizeof(pTrack->apVoices));
+    Mem_set(pTrack->apVoices, 0, sizeof(pTrack->apVoices));
     if (bSorted == 0) {
         fn_800ADEC8(pList, &pTrack->link);
     } else {

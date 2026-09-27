@@ -83,7 +83,7 @@ void GameModeDriverRTE_Locale_LoadRTEnFromStream(UStreamObject* pObject) {
     if (nSize) {
         gRTEs.pNames = fn_800951A0(nSize, 0x10, 1);
         Mem_cpy(gRTEs.pNames, pData, nSize);
-        fn_80009E70(pObject);
+        StaticMem_Free(pObject);
     }
 }
 
@@ -155,56 +155,56 @@ void fn_800F08A8(void) {
     u8 bFirst = 0;
     u8 bSaid;
     if (!fn_800F0820()) {
-        fn_800E4364(10, 0, 0, 0);
+        GUI_QueueMessage(10, 0, 0, 0);
         bFirst = 1;
     }
     bSaid = 1;
     switch (lbl_80282350) {
     case 0x0:
-        fn_800E4364(10, 0xD, 0, 0);
+        GUI_QueueMessage(10, 0xD, 0, 0);
         break;
     case 0x2:
     case 0x6:
-        fn_800E4364(10, 0xE, 0, 0);
+        GUI_QueueMessage(10, 0xE, 0, 0);
         break;
     case 0x7:
-        fn_800E4364(10, 0xF, 0, 0);
+        GUI_QueueMessage(10, 0xF, 0, 0);
         break;
     case 0x12:
     case 0xE:
-        fn_800E4364(10, 0x10, 0, 0);
+        GUI_QueueMessage(10, 0x10, 0, 0);
         break;
     case 0x16:
-        fn_800E4364(10, 0x11, 0, 0);
+        GUI_QueueMessage(10, 0x11, 0, 0);
         break;
     case 0x1F:
-        fn_800E4364(10, 0x12, 0, 0);
+        GUI_QueueMessage(10, 0x12, 0, 0);
         break;
     case 0x41:
-        fn_800E4364(10, 0x13, 0, 0);
+        GUI_QueueMessage(10, 0x13, 0, 0);
         break;
     case 0x55:
-        fn_800E4364(10, 0x14, 0, 0);
+        GUI_QueueMessage(10, 0x14, 0, 0);
         break;
     case 0x5D:
-        fn_800E4364(10, 0x15, 0, 0);
+        GUI_QueueMessage(10, 0x15, 0, 0);
         break;
     case 0x6D:
-        fn_800E4364(10, 0x16, 0, 0);
+        GUI_QueueMessage(10, 0x16, 0, 0);
         break;
     case 0x6E:
-        fn_800E4364(10, 0x17, 0, 0);
+        GUI_QueueMessage(10, 0x17, 0, 0);
         break;
     case 0x6F:
-        fn_800E4364(10, 0x18, 0, 0);
+        GUI_QueueMessage(10, 0x18, 0, 0);
         break;
     case 0x56:
     case 0x17:
-        fn_800E4364(10, 0x19, 0, 0);
+        GUI_QueueMessage(10, 0x19, 0, 0);
         break;
     case 0x18:
     case 0x1E:
-        fn_800E4364(10, 5, 0, 0);
+        GUI_QueueMessage(10, 5, 0, 0);
         break;
     default:
         bSaid = 0;
@@ -213,16 +213,16 @@ void fn_800F08A8(void) {
     if (!bFirst && !bSaid) {
         switch (Misc_RandFunc(0) & 3) {
         case 0:
-            fn_800E4364(10, 2, 0, 0);
+            GUI_QueueMessage(10, 2, 0, 0);
             return;
         case 1:
-            fn_800E4364(10, 3, 0, 0);
+            GUI_QueueMessage(10, 3, 0, 0);
             return;
         case 2:
-            fn_800E4364(10, 4, 0, 0);
+            GUI_QueueMessage(10, 4, 0, 0);
             return;
         default:
-            fn_800E4364(10, 7, 0, 0);
+            GUI_QueueMessage(10, 7, 0, 0);
             break;
         }
     }
@@ -234,8 +234,8 @@ void fn_800F0BBC(void) {
     lbl_80282358();
     if (fn_800EC558() != 3) {
         nReward = gRTEs.aChallenge[gRTEs.aEvent[lbl_80282350].nChallenge - 1].aMedal[0].nReward;
-        fn_800D3548(0, nReward, 0);
-        fn_800E4364(0, 0x6F, nReward, 0);
+        GM_Earnings_AwardMoney(0, nReward, 0);
+        GUI_QueueMessage(0, 0x6F, nReward, 0);
         fn_800F08A8();
         fn_800D7770(0, &gpSaveData->aRTEAward[gRTEs.aEvent[lbl_80282350].nId]);
     }

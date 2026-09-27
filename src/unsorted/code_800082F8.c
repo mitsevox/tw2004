@@ -24,7 +24,7 @@ float fn_80008350(Camera* cam) { return cam->unk20C; }
 float fn_80008358(Camera* cam) { return cam->unk204; }
 float fn_80008360(Camera* cam) { return cam->unk1F4; }
 float fn_80008368(Camera* cam) { return cam->unk1F8; }
-CamLens* fn_80008370(Camera* cam) { return cam->unk10; }
+CamLens* Camera_GetLens(Camera* cam) { return cam->unk10; }
 int fn_80008378(CamLens* sub) { return sub->nType; }
 
 void fn_80008380(void) {

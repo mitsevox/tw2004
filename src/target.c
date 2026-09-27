@@ -145,12 +145,14 @@ void TARGET_RenderBallTarget(int nPlayer) {
     int   i;
     u8    bOnScreen;
 
-    pCamera = fn_80017004(gPlayers[nPlayer].nView[0]);
+    pCamera = ViewController_GetCamera(gPlayers[nPlayer].nView[0]);
     aMarkerQuad[0][0] = 2.0f * lbl_801D5BF0[nPlayer].f24;
-    aMarkerQuad[0][1] = 2.0f * lbl_801D5BF0[nPlayer].f24 / fn_80017028(gPlayers[nPlayer].nView[0])->f54;
+    aMarkerQuad[0][1] = 2.0f * lbl_801D5BF0[nPlayer].f24
+            / ViewController_GetCameraController(gPlayers[nPlayer].nView[0])->f54;
     aMarkerQuad[0][2] = -lbl_801D5BF0[nPlayer].f24;
     aMarkerQuad[1][0] = 2.0f * lbl_801D5BF0[nPlayer].f24;
-    aMarkerQuad[1][1] = 2.0f * lbl_801D5BF0[nPlayer].f24 / fn_80017028(gPlayers[nPlayer].nView[0])->f54;
+    aMarkerQuad[1][1] = 2.0f * lbl_801D5BF0[nPlayer].f24
+            / ViewController_GetCameraController(gPlayers[nPlayer].nView[0])->f54;
     aMarkerQuad[1][2] = lbl_801D5BF0[nPlayer].f24;
     aMarkerQuad[2][0] = 0.0f;
     aMarkerQuad[2][1] = 0.0f;
@@ -180,20 +182,20 @@ void TARGET_RenderBallTarget(int nPlayer) {
         aShadowQuad[3][1] -= 1.0f / 9.0f;
     }
 
-    pView = fn_80017028(gPlayers[nPlayer].nView[0]);
-    pCamPos = fn_8001731C(pView);
-    pLook = fn_80017314(pView);
+    pView = ViewController_GetCameraController(gPlayers[nPlayer].nView[0]);
+    pCamPos = CameraController_GetPosition(pView);
+    pLook = CameraController_GetTarget(pView);
     fCamDist = Vec_Distance(pCamPos, vPos);
     fn_8006A964(pLook, pCamPos, vDir);
     vDir[1] = 0.0f;
     if (0.0f == vDir[0] && 0.0f == vDir[2]) {
         return;
     }
-    fn_800BAF04(vDir, vDir);
-    fDot = fn_8000C5FC(vUp, vDir);
+    Vec_NormalizeTo(vDir, vDir);
+    fDot = Vec3_Dot(vUp, vDir);
     vec4flt_CrossProduct(vDir, vUp, vCross);
     fCos = (fDot < -1.0f) ? -1.0f : ((fDot > 1.0f) ? 1.0f : fDot);
-    fSin = fn_80009680(1.0f - fCos * fCos);
+    fSin = Math_Sqrt(1.0f - fCos * fCos);
     if (vCross[1] < 0.0f) {
         fSin = -fSin;
     }
@@ -230,13 +232,13 @@ void TARGET_RenderBallTarget(int nPlayer) {
     }
     fn_800E5178(nPlayer, fDist, fTilt, fStep, fShare);
 
-    fn_80012F50(0, 6, 0x7F);
-    fn_80012F18(3);
-    fn_80012F34(0);
-    fn_80035118(4, 5);
+    RenderState_SetAlphaTest(0, 6, 0x7F);
+    RenderState_SetDepthFunc(3);
+    RenderState_SetDepthWrite(0);
+    RenderState_SetBlendFactors(4, 5);
     fn_8005CC64(lbl_80281E3C, lbl_80281E40);
-    fn_80014118(0x50);
-    fn_80012EF8();
+    RenderState_SetDrawFlags(0x50);
+    RenderState_Flush();
     fn_8001425C(1);
     fScale = 8.0f * fCamDist + 1.0f;
     for (i = 0; i < 4; i++) {
@@ -322,13 +324,13 @@ void TARGET_RenderBallTarget(int nPlayer) {
     }
     if (bOnScreen && gPlayers[nPlayer].nSurface != -1) {
         fn_8005CC64(lbl_80281E34, lbl_80281E38);
-        fn_80012EF8();
+        RenderState_Flush();
         fn_8001644C(0x98, aShadow[0], NULL, aUV, 4);
     }
-    fn_80012F50(1, 6, 0x80);
-    fn_80012F18(3);
-    fn_80012F34(1);
-    fn_80012EF8();
+    RenderState_SetAlphaTest(1, 6, 0x80);
+    RenderState_SetDepthFunc(3);
+    RenderState_SetDepthWrite(1);
+    RenderState_Flush();
 
     nX = 512.0f * fX;
     nY = 416.0f * fY;
@@ -404,7 +406,7 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
     bInRange = 0;
     bMoved = 0;
     Vec3Copy(gPlayers[nPlayer].vTarget, vSaved);
-    fZoom = fn_8001EFFC(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])));
+    fZoom = fn_8001EFFC(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
 
     // the turn eases off towards 0
     if (gPlayers[nPlayer].fA5C < 0.0f) {
@@ -424,9 +426,10 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
         if (gPlayers[nPlayer].nShotKind == 0) {
             fTurn = PI / 360.0f * gPlayers[nPlayer].fA5C;
         }
-        fn_8006A964(fn_80017028(gPlayers[nPlayer].nView[0])->v0, gPlayers[nPlayer].vBall, vToCamera);
+        fn_8006A964(ViewController_GetCameraController(gPlayers[nPlayer].nView[0])->v0,
+                    gPlayers[nPlayer].vBall, vToCamera);
         vToCamera[1] = 0.0f;
-        fCameraDist = 0.05f * (f32)fn_80009680(fn_80009744(vToCamera));
+        fCameraDist = 0.05f * (f32)Math_Sqrt(Vec3_LengthSqClamped(vToCamera));
         if (fCameraDist > 1.0f) {
             fTurn /= fCameraDist;
         }
@@ -437,8 +440,8 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
         } else if (gPlayers[nPlayer].fAim > PI) {
             gPlayers[nPlayer].fAim -= 2.0f * PI;
         }
-        fSin = fn_800095F0(gPlayers[nPlayer].fAim);
-        fCos = fn_80009638(gPlayers[nPlayer].fAim);
+        fSin = Math_Sin(gPlayers[nPlayer].fAim);
+        fCos = Math_Cos(gPlayers[nPlayer].fAim);
         fDX = -fSin * gPlayers[nPlayer].fDistance;
         fDZ = fCos * gPlayers[nPlayer].fDistance;
         gPlayers[nPlayer].vTarget[0] = fDX + gPlayers[nPlayer].vBall[0];
@@ -475,15 +478,15 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
         }
         bMoved = 1;
         fStep *= gSession.fFrameTime * (60.0f * gPlayers[nPlayer].fA60);
-        fSin = fn_800095F0(gPlayers[nPlayer].fAim);
-        fCos = fn_80009638(gPlayers[nPlayer].fAim);
+        fSin = Math_Sin(gPlayers[nPlayer].fAim);
+        fCos = Math_Cos(gPlayers[nPlayer].fAim);
         fDX = fStep * -fSin;
         fDZ = fStep * fCos;
         gPlayers[nPlayer].vTarget[0] += fDX;
         gPlayers[nPlayer].vTarget[2] += fDZ;
         fn_8006A964(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vBall, vDir);
         vDir[1] = 0.0f;
-        fAimDist = fn_80009680(fn_80009744(vDir));
+        fAimDist = Math_Sqrt(Vec3_LengthSqClamped(vDir));
         if (gPlayers[nPlayer].fA60 < 0.0f && fAimDist >= fMin) {
             bInRange = 1;
         } else if (gPlayers[nPlayer].fA60 > 0.0f
@@ -498,8 +501,8 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
         }
         if (bInRange) {
             fn_8002BDEC_SetTarget(nPlayer, gPlayers[nPlayer].vTarget);
-            fSin = fn_800095F0(gPlayers[nPlayer].fAim);
-            fCos = fn_80009638(gPlayers[nPlayer].fAim);
+            fSin = Math_Sin(gPlayers[nPlayer].fAim);
+            fCos = Math_Cos(gPlayers[nPlayer].fAim);
             fDX = -fSin * gPlayers[nPlayer].fDistance;
             fDZ = fCos * gPlayers[nPlayer].fDistance;
             gPlayers[nPlayer].vTarget[0] = fDX + gPlayers[nPlayer].vBall[0];
@@ -581,7 +584,7 @@ u8 PlaceBall_IsValidDropLocation(f32* pPos) {
     SurfaceType* pSurface;
     f32          vNormal[4];
 
-    Ter_GetSupportingGroundData(fn_8000C594(), pPos, &pSurface, vNormal);
+    Ter_GetSupportingGroundData(Ter_GetTGD(), pPos, &pSurface, vNormal);
     if (Ter_PointInOOBNetwork(pPos) && !Ter_PointInFreeDropNetwork(pPos) && pSurface != NULL
         && (pSurface->u34 & 1) && pSurface->nClass != 7 && pSurface->nClass != 16 && pSurface->nClass != 12
         && fabsf(vNormal[1]) > 0.86603f) {
@@ -765,8 +768,8 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
 
     if (bMoved) {
         fHeading = gPlayers[nPlayer].fA88;
-        fSin = fn_800095F0(fHeading);
-        fCos = fn_80009638(fHeading);
+        fSin = Math_Sin(fHeading);
+        fCos = Math_Cos(fHeading);
         fBaseX = gPlayers[nPlayer].vPlacement[0];
         fBaseZ = gPlayers[nPlayer].vPlacement[2];
         vPos[0] = fZ * -fSin + fBaseX + fX * fCos;
@@ -784,8 +787,8 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
                 if (fHeading > PI) {
                     fHeading -= 2.0f * PI;
                 }
-                fSin = fn_800095F0(fHeading);
-                fCos = fn_80009638(fHeading);
+                fSin = Math_Sin(fHeading);
+                fCos = Math_Cos(fHeading);
                 vPos[0] = fZ * -fSin + fBaseX + fX * fCos;
                 vPos[2] = fZ * fCos + fBaseZ + fX * fSin;
                 if (PlaceBall_CheckInBounds(vPos)) {
@@ -796,8 +799,8 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
                 if (fHeading < -PI) {
                     fHeading += 2.0f * PI;
                 }
-                fSin = fn_800095F0(fHeading);
-                fCos = fn_80009638(fHeading);
+                fSin = Math_Sin(fHeading);
+                fCos = Math_Cos(fHeading);
                 vPos[0] = fZ * -fSin + fBaseX + fX * fCos;
                 vPos[2] = fZ * fCos + fBaseZ + fX * fSin;
                 if (PlaceBall_CheckInBounds(vPos)) {
@@ -935,7 +938,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     u8    bBall;
 
     bBall = 0;
-    pCamera = fn_80017004(gPlayers[nPlayer].nView[0]);
+    pCamera = ViewController_GetCamera(gPlayers[nPlayer].nView[0]);
     aMarkerQuad[0][0] = 0.0f;
     aMarkerQuad[0][1] = lbl_801D5BF0[nPlayer].f24;
     aMarkerQuad[0][2] = -lbl_801D5BF0[nPlayer].f24;
@@ -973,40 +976,40 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     Vec_Copy(gPlayers[nPlayer].vPlacement, vPos);
     if (bBall) {
         fn_8006A988(vPos, gPlayers[nPlayer].ball.vPos, vBallDir);
-        fBallDist = fn_80009680(vBallDir[0] * vBallDir[0] + vBallDir[2] * vBallDir[2]);
+        fBallDist = Math_Sqrt(vBallDir[0] * vBallDir[0] + vBallDir[2] * vBallDir[2]);
     } else {
         fn_8006A988(vPos, gPlayers[nPlayer].vA44, vTeeDir);
-        fTeeDist = fn_80009680(vTeeDir[0] * vTeeDir[0] + vTeeDir[2] * vTeeDir[2]);
+        fTeeDist = Math_Sqrt(vTeeDir[0] * vTeeDir[0] + vTeeDir[2] * vTeeDir[2]);
     }
     fn_8006A988(vPos, gpGame->p130, vHoleDir);
-    fHoleDist = fn_80009680(vHoleDir[0] * vHoleDir[0] + vHoleDir[2] * vHoleDir[2]);
+    fHoleDist = Math_Sqrt(vHoleDir[0] * vHoleDir[0] + vHoleDir[2] * vHoleDir[2]);
     bInBounds = Ter_PointInOOBNetwork(vPos);
 
     // the marker faces the camera: turned about y by the camera's heading
-    pView = fn_80017028(gPlayers[nPlayer].nView[0]);
-    pCamPos = fn_8001731C(pView);
-    pLook = fn_80017314(pView);
+    pView = ViewController_GetCameraController(gPlayers[nPlayer].nView[0]);
+    pCamPos = CameraController_GetPosition(pView);
+    pLook = CameraController_GetTarget(pView);
     Vec_Distance(pCamPos, vPos);
     fn_8006A964(pLook, pCamPos, vDir);
     vDir[1] = 0.0f;
     if (0.0f == vDir[0] && 0.0f == vDir[2]) {
         return;
     }
-    fn_800BAF04(vDir, vDir);
-    fDot = fn_8000C5FC(vUp, vDir);
+    Vec_NormalizeTo(vDir, vDir);
+    fDot = Vec3_Dot(vUp, vDir);
     vec4flt_CrossProduct(vDir, vUp, vCross);
     fCos = (fDot < -1.0f) ? -1.0f : ((fDot > 1.0f) ? 1.0f : fDot);
-    fSin = fn_80009680(1.0f - fCos * fCos);
+    fSin = Math_Sqrt(1.0f - fCos * fCos);
     if (vCross[1] < 0.0f) {
         fSin = -fSin;
     }
-    fn_80012F50(0, 6, 0x7F);
-    fn_80012F18(3);
-    fn_80035118(4, 5);
+    RenderState_SetAlphaTest(0, 6, 0x7F);
+    RenderState_SetDepthFunc(3);
+    RenderState_SetBlendFactors(4, 5);
     fn_8005CC64(lbl_80281E3C, lbl_80281E40);
-    fn_80014118(0x50);
-    fn_80012F34(0);
-    fn_80012EF8();
+    RenderState_SetDrawFlags(0x50);
+    RenderState_SetDepthWrite(0);
+    RenderState_Flush();
     fn_8001425C(1);
     for (i = 0; i < 4; i++) {
         aMarker[i][2] = fCos * aMarkerQuad[i][0] + fSin * aMarkerQuad[i][2];
@@ -1019,12 +1022,12 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     fHalfFov = 0.75f * fHalfFov * fn_8001414C((u8*)fn_8003526C());
     fn_8006A964(pView->v10, pView->v0, vDir);
     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-        fn_800BAF04(vDir, vDir);
+        Vec_NormalizeTo(vDir, vDir);
     }
     fn_8006A964(vPos, pView->v0, vRel);
     fDotX = vDir[0] * vRel[0];
     fDotZ = vDir[2] * vRel[2];
-    fCos2 = fn_80009638(fHalfFov / 2.0f - PI / 180.0f);
+    fCos2 = Math_Cos(fHalfFov / 2.0f - PI / 180.0f);
     fA = fCos2 * fCos2 - vDir[1] * vDir[1];
     fB = -(2.0f * fDotX * vDir[1]) - 2.0f * fDotZ * vDir[1];
     fC = vRel[0] * (vRel[0] * (fCos2 * fCos2)) + vRel[2] * (vRel[2] * (fCos2 * fCos2))
@@ -1033,7 +1036,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     if (fDisc < 0.0f) {
         fDenom = 0.0f;
     } else {
-        fDisc = fn_80009680(fDisc);
+        fDisc = Math_Sqrt(fDisc);
         fDenom = 2.0f * fA;
     }
     if (0.0f != fDenom) {
@@ -1083,13 +1086,13 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     fn_80014194(lbl_801887EC);
     fn_8001644C(0x98, aMarker[0], NULL, aUV, 4);
     fn_8005CC64(lbl_80281E34, lbl_80281E38);
-    fn_80012EF8();
+    RenderState_Flush();
     fn_8001644C(0x98, aShadow[0], NULL, aUV, 4);
-    fn_80012F50(1, 6, 0x80);
-    fn_80012F18(3);
-    fn_80012F34(1);
+    RenderState_SetAlphaTest(1, 6, 0x80);
+    RenderState_SetDepthFunc(3);
+    RenderState_SetDepthWrite(1);
     fn_80014194(lbl_801887CC);
-    fn_80012EF8();
+    RenderState_Flush();
 
     if (!bBall) {
         // the distances, under the marker and kept on screen

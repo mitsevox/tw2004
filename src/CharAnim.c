@@ -58,7 +58,8 @@ void fn_800957FC(Character* pChar, u8 bReset) {
         fn_800725BC(pNode, fn_80072ACC, 0.5f);
     }
     if (gSession.nGameType == 3 && pChar->p17AC != NULL) {
-        CharSlider_UpdateCharacterBasedOnSliderValues(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, fn_80077ACC()->choices.a9B4,
+        CharSlider_UpdateCharacterBasedOnSliderValues(pChar->p17AC, pChar->pModel, pChar->pSkin, 26,
+                                                      FE_GetCurrentProfile()->choices.a9B4,
                     &pChar->node3E0);
     }
 }
@@ -167,11 +168,11 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
                 pChar->p1794 = pClip;
             }
         }
-        if (strcmp(pClip->name, "gplptt12") == 0 && (pCourse = fn_8000C594()) != NULL &&
+        if (strcmp(pClip->name, "gplptt12") == 0 && (pCourse = Ter_GetTGD()) != NULL &&
             Ter_GetSupportingGroundNormal(pCourse, pChar->pModel->pMatrices[0][3], vNormal)) {
             Vec_Copy(pChar->a179C, m[1]);
             vec4flt_CrossProduct(pChar->pModel->pMatrices[0][0], pChar->a179C, m[2]);
-            fn_800BAF04(m[2], m[2]);
+            Vec_NormalizeTo(m[2], m[2]);
             vec4flt_CrossProduct(pChar->a179C, m[2], m[0]);
             m[0][3] = 0.0f;
             m[1][3] = 0.0f;
@@ -285,7 +286,8 @@ void fn_80095FD0(Character* pChar, MtaLib* pLib, u8 bReset, int nGroup, SKABlend
     fn_800958EC(&pChar->anim29C, nAnim, fTime);
     pChar->p178C = pLib;
     if (gSession.nGameType == 3 && pChar->p17AC != NULL) {
-        CharSlider_UpdateCharacterBasedOnSliderValues(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, fn_80077ACC()->choices.a9B4,
+        CharSlider_UpdateCharacterBasedOnSliderValues(pChar->p17AC, pChar->pModel, pChar->pSkin, 26,
+                                                      FE_GetCurrentProfile()->choices.a9B4,
                     &pChar->node3E0);
     }
 }

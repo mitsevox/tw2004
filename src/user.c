@@ -14,8 +14,8 @@ void fn_800563C4(void) {
 
     lbl_80281DF0.b = 0;
     lbl_80281DF0.n = 0;
-    gpSaveData = fn_80009B34(5 * sizeof(SaveProfile), 0, 32, "user.c", 97);
-    lbl_80281DF4 = fn_80009B34(sizeof(SaveProfile), 0, 32, "user.c", 98);
+    gpSaveData = StaticMem_Alloc(5 * sizeof(SaveProfile), 0, 32, "user.c", 97);
+    lbl_80281DF4 = StaticMem_Alloc(sizeof(SaveProfile), 0, 32, "user.c", 98);
     for (i = 0; i < 5; i++) {
         fn_80057364(i);
     }
@@ -23,6 +23,6 @@ void fn_800563C4(void) {
 }
 
 void fn_80056454(void) {
-    fn_80009E70(gpSaveData);
-    fn_80009E70(lbl_80281DF4);
+    StaticMem_Free(gpSaveData);
+    StaticMem_Free(lbl_80281DF4);
 }

@@ -364,7 +364,7 @@ u8 fn_800E430C(int nPlayer) {
 }
 
 // Adds an item to one of the twelve display queues (queue 5 ignores an item already queued).
-void fn_800E4364(u32 nQueue, int a, int b, int c) {
+void GUI_QueueMessage(u32 nQueue, int a, int b, int c) {
     int i;
     switch (nQueue) {
     case 0:
@@ -613,8 +613,8 @@ void fn_800E4D94(u8 bHuman) {
         GameEffects_ResetGameEffectSettings();
         if ((Game_GetMode() == 26 || Game_GetMode() == 22) && gSession.nSplitScreen) {
             f32 v[4] = {0.0f, 0.0f, 0.0f, 1.0f};
-            CameraController_FadeIn(fn_80017028(gPlayers[0].nView[0]), 0.0f, v);
-            CameraController_FadeIn(fn_80017028(gPlayers[1].nView[0]), 0.0f, v);
+            CameraController_FadeIn(ViewController_GetCameraController(gPlayers[0].nView[0]), 0.0f, v);
+            CameraController_FadeIn(ViewController_GetCameraController(gPlayers[1].nView[0]), 0.0f, v);
         }
         if (bHuman) {
             fn_80062D38(0xE, 2, 1);

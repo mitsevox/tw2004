@@ -17,9 +17,9 @@ ViewState* lbl_80280E08 = &lbl_801B8A98;
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8000ADC0(f32 (*m)[4]);          // identity matrix
+void Mtx_Identity(f32 (*m)[4]);          // identity matrix
 s32  fn_800072E0(void);
-void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: copy a 4x4 matrix
+void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: copy a 4x4 matrix
 void fn_80016C28(f32* pSrc, f32* pDst);             // negate four floats
 void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);  // LLFont.c: GXBegin
 void fn_800124A8(void);                                // LLFont.c: end the primitive
@@ -186,7 +186,7 @@ void fn_8001644C(int ePrim, f32* pPos, f32* pColour, f32* pUV, int nVerts) {
         GXSetProjectionv(aProjection);
         fn_80016C44(aViewport);
         fn_80016B9C();
-        fn_80012EF8();
+        RenderState_Flush();
     }
 }
 
@@ -244,7 +244,7 @@ void fn_800169AC(void) {
     pView->n7C = pView->fE0 * pView->nE8;
     pView->m40[0][0] = pView->fF4;
     pView->m40[1][1] = pView->fF8;
-    fn_8000ADC0(pView->m80);
+    Mtx_Identity(pView->m80);
     pView->m80[3][0] += pView->n70;
     pView->m80[3][1] += pView->n74;
     pView->m80[0][0] = pView->n78 * pView->fF4;
@@ -269,8 +269,8 @@ void fn_80016B6C(f32 fX, f32 fY) {
 
 // Give the renderer the current camera's matrices, with rows 0 and 2 of the first negated.
 void fn_80016B9C(void) {
-    fn_8000A0E8(((Camera*)fn_8001614C())->m15C, lbl_801B8980.m34);
-    fn_8000A0E8(((Camera*)fn_8001614C())->m9C, lbl_801B8980.m74);
+    Mtx_Copy(((Camera*)Camera_GetCurrent())->m15C, lbl_801B8980.m34);
+    Mtx_Copy(((Camera*)Camera_GetCurrent())->m9C, lbl_801B8980.m74);
     fn_80016C28(lbl_801B8980.m34[0], lbl_801B8980.m34[0]);
     fn_80016C28(lbl_801B8980.m34[2], lbl_801B8980.m34[2]);
     lbl_801B8980.u110 |= 0x100;

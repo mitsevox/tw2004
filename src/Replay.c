@@ -17,12 +17,12 @@ f32  fn_80055F80(void);                 // Ball.c: the wind's speed
 f32  fn_8006C630(void);                 // gomainloop.c
 
 void REPLAY_InitModule(void) {
-    lbl_80281E48 = fn_80009B34(sizeof(ReplayBuffer), 2, 0, "Replay.c", 77);
+    lbl_80281E48 = StaticMem_Alloc(sizeof(ReplayBuffer), 2, 0, "Replay.c", 77);
     lbl_80281E48->b1525C = 0;
 }
 
 void REPLAY_CloseModule(void) {
-    fn_80009E70(lbl_80281E48);
+    StaticMem_Free(lbl_80281E48);
     lbl_80281E48 = NULL;
 }
 
@@ -64,7 +64,7 @@ void REPLAY_Save(int nPlayer) {
     lbl_80281E48->aQueueCount[10] = lbl_8028228C;
     lbl_80281E48->aQueueCount[11] = lbl_80282288;
     gReplayData.nCourse = Game_GetCourse();
-    gReplayData.nHole = fn_80015464();
+    gReplayData.nHole = Game_GetCurHoleNum();
     gReplayData.nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     gReplayData.nTeeSet = gSession.nTeeSet[nPlayer];
     gReplayData.nPinSet = Game_CurrentPinSet();

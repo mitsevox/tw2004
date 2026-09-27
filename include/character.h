@@ -16,7 +16,7 @@ void** AnimLib_Find(AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, 
 // A link of an IK chain: one bone.
 typedef struct IKLink {
     u8   b0;                    // 0x00  cleared by SKEL_CreateIKChain
-    u8   nBone;                 // 0x01  the model's bone index (fn_8001EEE4)
+    u8   nBone;                 // 0x01  the model's bone index (CharModel_GetBoneIndexMapped)
     u8   pad2[2];
     f32  f4;                    // 0x04  only links above 0 are posed (fn_80026B4C, fn_80026F90)
     s32  n8;                    // 0x08
@@ -46,7 +46,7 @@ LAYOUT_ASSERT(IKChain, 0x20);
 
 // An IK link's setup (our name): what SKEL_CreateIKChain copies into an IKLink.
 typedef struct IKLinkDef {
-    s32  nBone;                 // 0x00  a bone id (fn_8001EEE4 gives its index)
+    s32  nBone;                 // 0x00  a bone id (CharModel_GetBoneIndexMapped gives its index)
     f32  f4;                    // 0x04  } IKLink's f4, n8, fC and f10
     s32  n8;                    // 0x08  }
     f32  fC;                    // 0x0C  }
@@ -71,10 +71,10 @@ typedef struct BonePose {
 LAYOUT_ASSERT(BonePose, 0x20);
 
 // A blend node's pose buffer (SKABlendNode.pPose; our name): bit arrays over the 128 bones
-// (fn_800177A0 clears the first two with fn_8001E938 and the next two with fn_8001E8A4), then a pose
+// (fn_800177A0 clears the first two with BitArray_ClearAll and the next two with fn_8001E8A4), then a pose
 // per bone. Format 0 is exactly this (0x1040 bytes); format 1 has 0x10C bytes more.
 typedef struct SkelPose {
-    u32      a0[4];             // 0x000  bones the pose sets (fn_8001E9CC tests them)
+    u32      a0[4];             // 0x000  bones the pose sets (BitArray_Test tests them)
     u32      a10[4];            // 0x010
     u32      a20[4];            // 0x020
     u32      a30[4];            // 0x030
@@ -157,7 +157,7 @@ LAYOUT_ASSERT(Bone, 0x30);
 typedef struct CharModel {
     s32       nBones;           // 0x000
     Bone*     pBones;           // 0x004
-    f32     (*pMatrices)[4][4]; // 0x008  one per bone (fn_8001EED8 gives a bone's index); row 3 is its
+    f32     (*pMatrices)[4][4]; // 0x008  one per bone (CharModel_GetBoneIndex gives a bone's index); row 3 is its
                                 //        position
     f32       fC;               // 0x00C  } lengths Character_UpdateTestPoints sets points 0-3 out by
     f32       f10;              // 0x010  } along the leg bones' axes when the skin has no a1048
@@ -165,9 +165,9 @@ typedef struct CharModel {
     u32       a24[4];           // 0x024  }   and moves one set in a24, then sets them all again
     BonePose* pPoses;           // 0x034  one per bone; freed with the model
     Skeleton* pSkel;            // 0x038
-    u8        aBone[0x59];      // 0x03C  each bone id's index (fn_8001EED8), 0xFF none; SKEL_GenerateBoneLookupTable
+    u8        aBone[0x59];      // 0x03C  each bone id's index (CharModel_GetBoneIndex), 0xFF none; SKEL_GenerateBoneLookupTable
                                 //        fills it in by name
-    u8        aBone2[0x59];     // 0x095  the index fn_8001EEE4 gives while bEE is set, by bone index
+    u8        aBone2[0x59];     // 0x095  the index CharModel_GetBoneIndexMapped gives while bEE is set, by bone index
                                 //        (SKEL_GenerateLeftHandedTable: itself, or the other bone of a pair)
     u8        bEE;              // 0x0EE  fn_8001EDF4
     u8        unkEF;
@@ -638,7 +638,7 @@ typedef struct Character {
     s32   nClubClass;           // 0x169C  the club class for clip lookups (Char_SetClip; 1 looks up as 0)
     s32   nClubHeadBone;        // 0x16A0  bone 0x53's index: the club head (the swing trail's end)
     s32   nGripBone;            // 0x16A4  bone 0x52's index: the grip (the trail's other end)
-    s32   n16A8;                // 0x16A8  fn_8001EEE4's answer for bone 0x15
+    s32   n16A8;                // 0x16A8  CharModel_GetBoneIndexMapped's answer for bone 0x15
     f32   q16AC[4];             // 0x16AC  } the grip bone's rotation and offset from the root while
     f32   v16BC[4];             // 0x16BC  } flag 0x4000 holds it (fn_8001BD18)
     s32   nClub;                // 0x16CC  the club (Character_SelectGameClub)
@@ -792,13 +792,13 @@ f32 (*fn_8001ED08(Character* pChar, int nBone))[4];  // a bone's matrix
 u8    fn_8001EDF4(Character* pChar);    // the model's bEE
 int   fn_8001EE88(Character* pChar);    // n1658
 int   fn_8001EE90(Character* pChar);
-int   fn_8001EED8(CharModel* pModel, int nBone);    // a bone's index
-int   fn_8001EEE4(CharModel* pModel, int nBone);
+int   CharModel_GetBoneIndex(CharModel* pModel, int nBone);    // a bone's index
+int   CharModel_GetBoneIndexMapped(CharModel* pModel, int nBone);
 f32   fn_8001F02C(struct Clip* pClip, u64 uEvent);   // an event's time (by its 64-bit id)
 void  Anim_SetRate(u8* pAnim, f32 fRate);           // 0x8001F084
 // Plays a clip on the character: blended in from the current one, or (bNoBlend) from scratch.
 void  fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime);
-void  fn_8001E85C(f32* pSrc, f32* pDst);            // copy a quaternion
+void  Quat_Copy(f32* pSrc, f32* pDst);            // copy a quaternion
 void  SKEL_SetIKSolutionWeight(Skeleton* pSkel, f32 f);
 void  fn_80027108(Skeleton* pSkel);                                         // Skeleton.c
 void  SKEL_TranslateIKChainY(CharModel* pModel, IKChain* pChain, f32 f);   // Skeleton.c

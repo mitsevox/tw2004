@@ -178,7 +178,7 @@ int fn_80121E1C(u8* abCandidate) {
             fDY = fY - lbl_80260CB8.aNode[i].fY;
             fDX *= fDX;
             fDY *= fDY;
-            fDist = fn_80009680(fDX + fDY);
+            fDist = Math_Sqrt(fDX + fDY);
             if (fDist < fBest) {
                 nBest = i;
                 fBest = fDist;

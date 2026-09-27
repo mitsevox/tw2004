@@ -143,9 +143,9 @@ void fn_800CC5C0(Character* pChar, char* pPart, char* pVariant) {
     int nVariant;
 
     if (pChar == NULL || pChar->pSkin == NULL) return;
-    fn_800CB700(&uId, pPart);
+    SKA_PackName(&uId, pPart);
     nPart = fn_800CDAFC(pChar->pSkin, uId);
-    fn_800CB700(&uId, pVariant);
+    SKA_PackName(&uId, pVariant);
     nVariant = fn_800CDBB0(pChar->pSkin, nPart, uId);
     fn_800CC588(pChar, nPart, nVariant);
 }
@@ -517,7 +517,7 @@ void fn_800CD404(Skin* pSkin) {
     nBytes = nParts * sizeof(SkinChoice);
     for (i = 0; i < 4; i++) {
         if (nParts != 0) {
-            pSkin->aParts[i] = fn_80009B34(nBytes, 2, 16, "SkinPart.c", 655);
+            pSkin->aParts[i] = StaticMem_Alloc(nBytes, 2, 16, "SkinPart.c", 655);
             memset(pSkin->aParts[i], 0, nBytes);
         } else {
             pSkin->aParts[i] = NULL;
@@ -526,7 +526,7 @@ void fn_800CD404(Skin* pSkin) {
         if (nSets != 0) {
             // nSets * 8 is nSets SkinChoices; an int product here, so it is not shared with the
             // memset's size (sizeof makes that one unsigned)
-            pSkin->aSets[i] = fn_80009B34(nSets * 8, 2, 16, "SkinPart.c", 670);
+            pSkin->aSets[i] = StaticMem_Alloc(nSets * 8, 2, 16, "SkinPart.c", 670);
             memset(pSkin->aSets[i], 0, nSets * sizeof(SkinChoice));
             for (j = 0; j < nSets; j++) {
                 if (fn_800CCF10(pSkin, j, 0) >= 1) {
@@ -552,10 +552,10 @@ void fn_800CD56C(Skin* pSkin) {
 
     for (i = 0; i < 4; i++) {
         if (pSkin->aParts[i] != NULL) {
-            fn_80009E70(pSkin->aParts[i]);
+            StaticMem_Free(pSkin->aParts[i]);
         }
         if (pSkin->aSets[i] != NULL) {
-            fn_80009E70(pSkin->aSets[i]);
+            StaticMem_Free(pSkin->aSets[i]);
         }
     }
 }
@@ -643,7 +643,7 @@ void fn_800CD7D4(Skin* pSkin, SkinMesh* pMesh) {
 
     pBit = pMesh->pBits;
     for (i = 0; i < pMesh->n8; i++) {
-        fn_8001EA34(pSkin->p10CC, pBit->nBit);
+        BitArray_Set(pSkin->p10CC, pBit->nBit);
         pBit++;
     }
 }
@@ -665,7 +665,7 @@ void fn_800CD844(Skin* pSkin, int n) {
         if ((pMesh->uFlags & 0x300000) == 0x300000) {
             n = fn_800CD7CC(pSkin, fn_800CEEFC(pIter));
             if (pSkin->p10D0 != NULL) {
-                fn_8001EA34(pSkin->p10D0, n);
+                BitArray_Set(pSkin->p10D0, n);
             }
         }
         if ((pMesh->uFlags & 1) && (pMesh->uFlags & 0x10)) {
@@ -707,9 +707,9 @@ void fn_800CDA68(Skin* pSkin) {
 
     if (pSkin->u10D4 & 1) {
         pSkin->u10D4 &= ~1;
-        fn_8001E938(pSkin->p10CC, pSkin->pModel->n50);
+        BitArray_ClearAll(pSkin->p10CC, pSkin->pModel->n50);
         if (pSkin->p10D0 != NULL) {
-            fn_8001E938(pSkin->p10D0, pSkin->pModel->n40);
+            BitArray_ClearAll(pSkin->p10D0, pSkin->pModel->n40);
         }
         for (i = 0; i < fn_800CCA40(pSkin); i++) {
             fn_800CD944(pSkin, i);
@@ -735,7 +735,7 @@ s32 fn_800CDAFC(Skin* pSkin, u64 uId) {
 s32 fn_800CDB70(Skin* pSkin, const char* pName) {
     u64 uId;
 
-    fn_800CB700(&uId, pName);
+    SKA_PackName(&uId, pName);
     return fn_800CDAFC(pSkin, uId);
 }
 
@@ -771,7 +771,7 @@ s32 fn_800CDC2C(Skin* pSkin, u64 uId) {
 s32 fn_800CDCA0(Skin* pSkin, const char* pName) {
     u64 uId;
 
-    fn_800CB700(&uId, pName);
+    SKA_PackName(&uId, pName);
     return fn_800CDC2C(pSkin, uId);
 }
 
@@ -793,7 +793,7 @@ s32 fn_800CDCE0(Skin* pSkin, int nSet, u64 uId) {
 s32 fn_800CDD5C(Skin* pSkin, int nSet, const char* pName) {
     u64 uId;
 
-    fn_800CB700(&uId, pName);
+    SKA_PackName(&uId, pName);
     return fn_800CDCE0(pSkin, nSet, uId);
 }
 
@@ -826,7 +826,7 @@ s32 fn_800CDE80(Skin* pSkin, int nSet, int nVariant, const char* pName) {
     u64 uId;
 
     if (pName == NULL) return -1;
-    fn_800CB700(&uId, pName);
+    SKA_PackName(&uId, pName);
     return fn_800CDDB0(pSkin, nSet, nVariant, uId);
 }
 
@@ -863,7 +863,7 @@ void fn_800CE02C(Skin* pSkin, int n) {
     if (pSkin->pModel->pDesc != NULL && (pSkin->u10D4 & 2)) {
         fn_80035138(1);
         fn_80016B9C();
-        fn_80012EF8();
+        RenderState_Flush();
         fn_8011387C(0x400);
         fn_801138CC(pSkin->pModel->pDesc);
         fn_801138D8(pSkin->a10A0[n]);
@@ -1075,7 +1075,7 @@ s32 fn_800CE660(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, i
         }
     }
     nList = 0;
-    *ppList = fn_80009B34(n * sizeof(SkinListEntry), 1, 0, "SkinPart.c", 1980);
+    *ppList = StaticMem_Alloc(n * sizeof(SkinListEntry), 1, 0, "SkinPart.c", 1980);
     for (i = 0; i < nSkins; i++) {
         if (apSkins[i] != NULL && apSkins[i]->pModel != NULL && apSkins[i]->pModel->pDesc != NULL) {
             pSkin = apSkins[i];
@@ -1131,7 +1131,7 @@ s32 fn_800CE8C0(Skin** apSkins, int nSkins, SkinListEntry** ppList) {
             n += apSkins[i]->pModel->pDesc->n10;
         }
     }
-    *ppList = fn_80009B34(n * sizeof(SkinListEntry), 1, 0, "SkinPart.c", 2068);
+    *ppList = StaticMem_Alloc(n * sizeof(SkinListEntry), 1, 0, "SkinPart.c", 2068);
     nList = 0;
     for (i = 0; i < nSkins; i++) {
         if (apSkins[i] != NULL && apSkins[i]->pModel != NULL &&
@@ -1195,7 +1195,7 @@ void fn_800CEB1C(Skin** apSkins, int nSkins, DynTex* pTex) {
     }
     fn_8010ADA4(pTex);
     if (pList != NULL) {
-        fn_80009E70(pList);
+        StaticMem_Free(pList);
     }
 }
 
@@ -1222,7 +1222,7 @@ void fn_800CEBE8(Skin** apSkins, int nSkins, DynTex* pTex, u64* aIds, int nIds) 
         }
     }
     if (pList != NULL) {
-        fn_80009E70(pList);
+        StaticMem_Free(pList);
     }
 }
 

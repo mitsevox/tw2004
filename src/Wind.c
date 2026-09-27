@@ -37,7 +37,7 @@ void fn_80055F18(void) {
 f32 Wind_Get(f32* pOut) {
     if (pOut != NULL) {
         f32 v[4];
-        fn_8000AE28(gWindSpeed, gWindDirs[gWindDir], v);
+        Vec_Scale(gWindSpeed, gWindDirs[gWindDir], v);
         Vec_Copy(v, pOut);
     }
     return gWindSpeed;

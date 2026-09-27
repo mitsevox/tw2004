@@ -567,7 +567,7 @@ u8   fn_800ACE38(AudVoice* pVoice, u32* puPos);
 void fn_800ADDC8(u8 nId, u8 nBit, s32 n);
 int  fn_800AD0C4(void);                 // fn_800AD450 on every instance in use, emitters emptied
 void fn_800AD450(u8 nId);
-void fn_800ADB4C(s16 nEmitter, u8 nTrack, u8 bOn);   // for every instance of an emitter: fn_800AD698
+void fn_800ADB4C(s16 nEmitter, u8 nTrack, u8 bOn);   // for every instance of an emitter: Emi_SetTrackEnabled
 void fn_800ADC44(s16 nEmitter, u8 nTrack, u8 n);     // fn_800AD9AC
 void fn_800ADCD0(s16 nEmitter, u8 nTrack, u8 n, int bCheck);   // fn_800ADA28
 void fn_800ADD54(s16 nEmitter, u8 nTrack, f32 fVolume);        // fn_800ADA94

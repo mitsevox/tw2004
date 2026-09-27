@@ -44,7 +44,7 @@ void fn_80057FBC(SaveProfile* pProfile) {
         nAssets = fn_80105C00();
         for (i = 0; i < nAssets; i++) {
             if (fn_80105C0C(i) == 0) {
-                fn_8001EA34(pProfile->aB1CC, i);
+                BitArray_Set(pProfile->aB1CC, i);
             } else {
                 fn_8001EB6C(pProfile->aB1CC, i);
             }
@@ -52,7 +52,7 @@ void fn_80057FBC(SaveProfile* pProfile) {
             fn_8001EB6C(pProfile->aB4BC, i);
             fn_80103B8C(fn_80103BC0(i));
             if (fn_80078008(i, pProfile)) {
-                fn_8001EA34(pProfile->aAssetLocked, i);
+                BitArray_Set(pProfile->aAssetLocked, i);
             } else {
                 fn_8001EB6C(pProfile->aAssetLocked, i);
             }
@@ -105,14 +105,14 @@ void fn_80058278(int nProfile, int nGolfer) {
 
 void fn_800582C4(SaveProfile* pProfile, int nBit, u8 bSet) {
     if (bSet) {
-        fn_8001EA34(pProfile->a10548, nBit);
+        BitArray_Set(pProfile->a10548, nBit);
     } else {
         fn_8001EB6C(pProfile->a10548, nBit);
     }
 }
 
 u8 fn_80058304(SaveProfile* pProfile, int nBit) {
-    return fn_8001E9CC(pProfile->a10548, nBit);
+    return BitArray_Test(pProfile->a10548, nBit);
 }
 
 // Golfer nGolfer is unlocked for profile nProfile, or available to everyone.

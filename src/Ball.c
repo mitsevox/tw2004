@@ -761,11 +761,11 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
     fn_80055E28(fAim, &fSinAim, &fCosAim);
     if (nKind == SHOT_TYPE_PUTT_e || nClub == CLUB_PUTTER_e) {
         fSpeed *= 7.2f;
-        fn_8001EF34(fSpeed, pB, vDir);
+        Vec3_Scale(fSpeed, pB, vDir);
         fn_80055D70(&vDir[0], &vDir[2], fSinAim, fCosAim);
-        fn_800BAF04(vNormal, vNormal);
-        fn_8000C5D4(vDir, vNormal, -fn_8000C5FC(vDir, vNormal), pVel);
-        fn_8001EF34(1.8f, pVel, pVel);
+        Vec_NormalizeTo(vNormal, vNormal);
+        fn_8000C5D4(vDir, vNormal, -Vec3_Dot(vDir, vNormal), pVel);
+        Vec3_Scale(1.8f, pVel, pVel);
         pSpin[0] = 0.0f;
         pSpin[1] = 0.0f;
         pSpin[2] = 0.0f;
@@ -785,7 +785,7 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
         fn_80055E28(fSlope, &fSinF, &fCosF);
         fn_80055D70(&vDir[2], &vDir[1], fSinF, fCosF);
     }
-    fn_8001EF34(fSpeed, vDir, vDir);
+    Vec3_Scale(fSpeed, vDir, vDir);
     if (nKind == 5) {
         fn_80055E28(0.7330383f, &fSin, &fCos);
         fn_80055D70(&vDir[2], &vDir[1], fSin, fCos);
@@ -821,7 +821,7 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
     }
     fn_80055EC4(vDir, vAxis, vAlong);
     fn_80055EA0(vDir, vAlong, vOff);
-    fn_8001EF34(1.0f - 0.9f, vOff, vOffPart);   // 0x3DCCCCD0, one bit above 0.1f
+    Vec3_Scale(1.0f - 0.9f, vOff, vOffPart);   // 0x3DCCCCD0, one bit above 0.1f
     nLie = pBall->nLie;
     switch (nLie) {
     case LIE_SAND_HIGH_e:
@@ -856,7 +856,7 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
         fKeep -= 0.1f;
     }
     fn_80055E7C(vAlong, vOffPart, vAlong);
-    fn_8001EF34(fKeep, vAlong, pVel);
+    Vec3_Scale(fKeep, vAlong, pVel);
     fKeep = gClubSpin[nClub] * gKindSpin[nKind];
     fKeep *= 0.85f;
     fSpin = 1.1904762f * (fKeep * fSpin);
@@ -866,7 +866,7 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
         fn_80055D70(&vAxis[0], &vAxis[1], fSinS, fCosS);
     }
     vec4flt_CrossProduct(vOff, vAxis, pSpin);
-    fn_8001EF34(fSpin, pSpin, pSpin);
+    Vec3_Scale(fSpin, pSpin, pSpin);
     fn_80055D70(&pVel[0], &pVel[2], fSinAim, fCosAim);
     fn_80055D70(&pSpin[0], &pSpin[2], fSinAim, fCosAim);
 done:
@@ -879,7 +879,7 @@ void Physics_ThrowBall(Ball* pBall, f32* pDir, f32 fSpeed, f32* pFrom) {
     Vec_Copy(pFrom, pBall->vStart);
     Vec_Copy(pFrom, pBall->vPos);
     Vec_Copy(pFrom, pBall->vPrev);
-    fn_8001EF34(0.48888889f * fSpeed, pDir, pBall->vVel);
+    Vec3_Scale(0.48888889f * fSpeed, pDir, pBall->vVel);
     pBall->vSpin[0] = 0.0f;
     pBall->vSpin[1] = 0.0f;
     pBall->vSpin[2] = 0.0f;
@@ -991,12 +991,12 @@ void Ball_FlightStep(Ball* pBall, f32 fTicks) {
         if (fHeight < 0.0f) {
             fHeight = 0.0f;
         }
-        fn_8001EF34(0.75f * (fHeight / 8.333333f) + 0.25f, vWind, vWind);
+        Vec3_Scale(0.75f * (fHeight / 8.333333f) + 0.25f, vWind, vWind);
     }
     fn_8000C5D4(pBall->vVel, vWind, -0.190666676f, vRel);
-    fSpeed2 = fn_80009744(vRel);
-    fSpeed  = fn_80009680(fSpeed2);
-    fSpin   = fn_80009680(fn_80009744(pBall->vSpin));
+    fSpeed2 = Vec3_LengthSqClamped(vRel);
+    fSpeed  = Math_Sqrt(fSpeed2);
+    fSpin   = Math_Sqrt(Vec3_LengthSqClamped(pBall->vSpin));
     if (fSpeed != 0.0f) {
         fDrag = 0.000780952396f * fSpeed;
         fDrag = -(fSpeed2 * (0.000474568689f
@@ -1005,13 +1005,13 @@ void Ball_FlightStep(Ball* pBall, f32 fTicks) {
     } else {
         fDrag = 0.0f;
     }
-    fn_8001EF34(fDrag, vRel, vDrag);
+    Vec3_Scale(fDrag, vRel, vDrag);
     fLift = -0.000201047602f * fSpeed;
     fLift = fSpeed2 * (0.000474568689f
                        * (0.0847342834f + (fSpin * (-0.000628289126f * fSpeed + 0.0407094695f) + fLift)));
     vec4flt_CrossProduct(pBall->vSpin, vRel, vLift);
-    fLen = fn_80009680(fn_80009744(vLift));
-    fn_8001EF34(fLen != 0.0f ? fLift / fLen : 0.0f, vLift, vAccel);
+    fLen = Math_Sqrt(Vec3_LengthSqClamped(vLift));
+    Vec3_Scale(fLen != 0.0f ? fLift / fLen : 0.0f, vLift, vAccel);
     fn_80055E7C(vDrag, vAccel, vAccel);
     vAccel[1] -= 0.107170001f;
     if (!gSimulating || gSimFullCup) {
@@ -1029,14 +1029,14 @@ void Ball_FlightStep(Ball* pBall, f32 fTicks) {
     }
     fInto  = vWind[0] * pBall->vVel[0] + vWind[2] * pBall->vVel[2];
     if (fInto < 0.0f) {
-        fK = fTicks * fInto / fn_80009744(pBall->vVel);
+        fK = fTicks * fInto / Vec3_LengthSqClamped(pBall->vVel);
         fX = fK * pBall->vVel[0];
         fZ = fK * pBall->vVel[2];
-        fExtra = 0.3f * (f32)fn_80009680(fX * fX + fZ * fZ);
+        fExtra = 0.3f * (f32)Math_Sqrt(fX * fX + fZ * fZ);
     } else {
         fExtra = 0.0f;
     }
-    fn_8001EF34(1.0f - fTicks * (0.003f * (1.0f + fExtra)), pBall->vSpin, pBall->vSpin);
+    Vec3_Scale(1.0f - fTicks * (0.003f * (1.0f + fExtra)), pBall->vSpin, pBall->vSpin);
 }
 
 // The player a ball belongs to, 4 for a ball with none. An inline in the original: its early
@@ -1112,7 +1112,7 @@ void Physics_BallRollingandSlipping(Ball* pBall, f32 fTicks) {
     f32          fPull, fDot, fFric;
     if (!Physics_GetSurfaceInfo(pBall, &pSurface, vNormal)) return;
     pBall->nSurface = fn_80050BEC(pSurface);
-    fn_800BAF04(vNormal, vNormal);
+    Vec_NormalizeTo(vNormal, vNormal);
     fPull = 1.0f - pSurface->f14;
     if (pSurface->nClass == 3) {
         fPull *= 2.0f - gGreenSpeedMul[gGreenSpeedSetting];
@@ -1130,9 +1130,9 @@ void Physics_BallRollingandSlipping(Ball* pBall, f32 fTicks) {
     vAccel[0] = -(fPull * (vNormal[0] * fDot));
     vAccel[1] = fPull * (-0.107170001f - vNormal[1] * fDot);
     vAccel[2] = -(fPull * (vNormal[2] * fDot));
-    fn_8000C5D4(pBall->vVel, vNormal, -fn_8000C5FC(pBall->vVel, vNormal), vTmp);
-    fn_800BAF04(vTmp, vDir);
-    fn_8001EF34(fn_80009680(fn_80009744(pBall->vVel)), vDir, pBall->vVel);
+    fn_8000C5D4(pBall->vVel, vNormal, -Vec3_Dot(pBall->vVel, vNormal), vTmp);
+    Vec_NormalizeTo(vTmp, vDir);
+    Vec3_Scale(Math_Sqrt(Vec3_LengthSqClamped(pBall->vVel)), vDir, pBall->vVel);
     fFric = 1.5f * (pSurface->f18 * (-0.107170001f * vNormal[1]));
     if (pSurface->nClass == 3) {
         fFric *= 2.0f - gGreenSpeedMul[gGreenSpeedSetting];
@@ -1148,11 +1148,11 @@ void Physics_BallRollingandSlipping(Ball* pBall, f32 fTicks) {
     }
     fFric = 2.97619057f * fFric;
     vec4flt_CrossProduct(vDir, vNormal, vSpinAdd);
-    fn_8001EF34(fFric, vSpinAdd, vSpinAdd);
+    Vec3_Scale(fFric, vSpinAdd, vSpinAdd);
     fn_8000C5D4(pBall->vVel, vAccel, fTicks, pBall->vVel);
     fn_8000C5D4(pBall->vSpin, vSpinAdd, fTicks, pBall->vSpin);
-    fTicks = fn_80009680(fn_80009744(pBall->vVel));
-    if (0.84f * (f32)fn_80009680(fn_80009744(pBall->vSpin)) >= fTicks) {
+    fTicks = Math_Sqrt(Vec3_LengthSqClamped(pBall->vVel));
+    if (0.84f * (f32)Math_Sqrt(Vec3_LengthSqClamped(pBall->vSpin)) >= fTicks) {
         pBall->nState = 4;
     }
     if (pBall->nPlayer >= 0) {
@@ -1221,20 +1221,20 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
     // direction) and fBounce (the sines of the turns back) give EA's float registers.
     pBall->nCollideCount++;
     if (pSurface->nClass == 7 || pSurface->nClass == 16) {
-        fn_8001EF34(0.25f, pBall->vSpin, pBall->vSpin);
+        Vec3_Scale(0.25f, pBall->vSpin, pBall->vSpin);
     } else {
         fT = 0.84f * pBall->vSpin[0];
         fA = 0.84f * pBall->vSpin[2];
         fT = fT * fT;
         fA = fA * fA;
-        fSi = fn_80009680(fT + fA);
-        fT = fn_80009680(pBall->vVel[0] * pBall->vVel[0] + pBall->vVel[2] * pBall->vVel[2]);
+        fSi = Math_Sqrt(fT + fA);
+        fT = Math_Sqrt(pBall->vVel[0] * pBall->vVel[0] + pBall->vVel[2] * pBall->vVel[2]);
         if (fT < 5.28000021f) {
             if (fSi > 2.9333334f) {
-                fn_8001EF34(2.9333334f / fSi, pBall->vSpin, pBall->vSpin);
+                Vec3_Scale(2.9333334f / fSi, pBall->vSpin, pBall->vSpin);
             }
         } else if (fSi > fT) {
-            fn_8001EF34(fT / fSi, pBall->vSpin, pBall->vSpin);
+            Vec3_Scale(fT / fSi, pBall->vSpin, pBall->vSpin);
         }
     }
     bFlip = 0;
@@ -1244,8 +1244,8 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
         fn_80055EF8(pBall->vSpin, pBall->vSpin);
         bFlip = 1;
     }
-    fSpeed = fn_80009680(fn_80009744(pBall->vVel));
-    fD     = fn_8000C5FC(pBall->vVel, pNormal);
+    fSpeed = Math_Sqrt(Vec3_LengthSqClamped(pBall->vVel));
+    fD     = Vec3_Dot(pBall->vVel, pNormal);
     fImpact = (pNormal[0] * fD) * (pNormal[0] * fD) + (pNormal[1] * fD) * (pNormal[1] * fD)
               + (pNormal[2] * fD) * (pNormal[2] * fD);
     fn_8000C5D4(pNormal, pBall->vVel, 1.0f / fSpeed, vBent);
@@ -1271,25 +1271,25 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
         fC *= 0.5f;
     }
     fA += fC;
-    fT = fn_80009680(fn_80009744(vBent));
+    fT = Math_Sqrt(Vec3_LengthSqClamped(vBent));
     if (fT < fA) {
         fn_80055EF8(pBall->vVel, pNormal);
     } else if (fT != 0.0f) {
         fn_8000C5D4(pNormal, vBent, fA / fT, pNormal);
     }
-    fn_800BAF04(pNormal, pNormal);
-    fn_8001EF34(-0.839999974f, pNormal, vDown);
+    Vec_NormalizeTo(pNormal, pNormal);
+    Vec3_Scale(-0.839999974f, pNormal, vDown);
     vec4flt_CrossProduct(pBall->vSpin, vDown, vCon);
     fn_80055E7C(vCon, pBall->vVel, vCon);
-    fn_8000C5D4(vCon, pNormal, -fn_8000C5FC(vCon, pNormal), vSlide);
-    if (fn_80009744(vSlide) != 0.0f) {
-        fn_800BAF04(vSlide, vDir);
+    fn_8000C5D4(vCon, pNormal, -Vec3_Dot(vCon, pNormal), vSlide);
+    if (Vec3_LengthSqClamped(vSlide) != 0.0f) {
+        Vec_NormalizeTo(vSlide, vDir);
     } else {
         Vec3Copy(pNormal, vDir);
     }
     fA  = atan2f(pNormal[0], pNormal[1]);
-    fB  = fn_800095F0(fA);
-    fCo = fn_80009638(fA);
+    fB  = Math_Sin(fA);
+    fCo = Math_Cos(fA);
     vBent[0] = fn_80055E1C(pNormal[0], pNormal[1], fB, fCo);
     vBent[1] = fn_80055E10(pNormal[1], pNormal[0], fB, fCo);
     vBent[2] = pNormal[2];
@@ -1299,15 +1299,15 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
     fn_80055D70(&pBall->vVel[0], &pBall->vVel[1], fB, fCo);
     fn_80055D70(&pBall->vSpin[0], &pBall->vSpin[1], fB, fCo);
     fP  = -atan2f(vBent[2], vBent[1]);
-    fE = fn_800095F0(fP);
-    fF = fn_80009638(fP);
+    fE = Math_Sin(fP);
+    fF = Math_Cos(fP);
     fT  = fn_80055E1C(fC, fS, fE, fF);
     fC  = fn_80055E10(fS, fT, fE, fF);
     fn_80055D70(&pBall->vVel[1], &pBall->vVel[2], fE, fF);
     fn_80055D70(&pBall->vSpin[1], &pBall->vSpin[2], fE, fF);
     fJ  = atan2f(fD, fC);
-    fG = fn_800095F0(fJ);
-    fH = fn_80009638(fJ);
+    fG = Math_Sin(fJ);
+    fH = Math_Cos(fJ);
     fn_80055D70(&pBall->vVel[0], &pBall->vVel[2], fG, fH);
     fn_80055D70(&pBall->vSpin[0], &pBall->vSpin[2], fG, fH);
     vSlip[0] = 0.462857157f * (0.839999974f * pBall->vSpin[2] + pBall->vVel[0]);
@@ -1352,7 +1352,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
     }
     vSlip[1] = 1.62f * (fBounce * pBall->vVel[1]);
     vSlip[2] = 0.462857157f * (pBall->vVel[2] - 0.839999974f * pBall->vSpin[0]);
-    fLen = fn_80009680(vSlip[0] * vSlip[0] + vSlip[2] * vSlip[2]);
+    fLen = Math_Sqrt(vSlip[0] * vSlip[0] + vSlip[2] * vSlip[2]);
     fGrip = pSurface->f10 * fabsf(vSlip[1]);
     fGrip *= 0.3f;
     if (pSurface->nClass == 4 || pSurface->nClass == 3 || pSurface->nClass == 2) {
@@ -1373,7 +1373,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
         pBall->vSpin[0] = 1.83715463f * vSlip[2] + pBall->vSpin[0];
         pBall->vSpin[2] = 1.83715463f * vSlip[0] + pBall->vSpin[2];
     } else {
-        fn_8001EF34(1.0f + fRest, pBall->vSpin, pBall->vSpin);
+        Vec3_Scale(1.0f + fRest, pBall->vSpin, pBall->vSpin);
     }
     if (pSurface->nClass == 5 || pSurface->nClass == 11) {
         if (pSurface->nClass == 5) {
@@ -1381,15 +1381,15 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
         } else {
             fBite = 0.6f;
         }
-        fn_8001EF34(fBite, pBall->vVel, pBall->vVel);
-        fn_8001EF34(fBite, pBall->vSpin, pBall->vSpin);
+        Vec3_Scale(fBite, pBall->vVel, pBall->vVel);
+        Vec3_Scale(fBite, pBall->vSpin, pBall->vSpin);
     }
     if (pSurface != NULL && pSurface->f0C >= 0.0f && pBall->vVel[1] < 0.674666584f &&
-        (f32)fn_80009680(pBall->vVel[0] * pBall->vVel[0] + pBall->vVel[2] * pBall->vVel[2]) < 1.90666652f) {
+        (f32)Math_Sqrt(pBall->vVel[0] * pBall->vVel[0] + pBall->vVel[2] * pBall->vVel[2]) < 1.90666652f) {
         if (pBall->nSolidCollideCount < 6
             && (pSurface->nClass == 4 || pSurface->nClass == 3 || pSurface->nClass == 2) &&
             gTurfSpeedMul[gTurfSpeed] > 0.7f &&
-            (f32)fn_80009680((pBall->vPos[0] - pBall->vStart[0]) * (pBall->vPos[0] - pBall->vStart[0]) +
+            (f32)Math_Sqrt((pBall->vPos[0] - pBall->vStart[0]) * (pBall->vPos[0] - pBall->vStart[0]) +
                              (pBall->vPos[2] - pBall->vStart[2]) * (pBall->vPos[2] - pBall->vStart[2]))
                 > 63.0f) {
             fQ = 13.333333f * (0.3f * pSurface->f10);
@@ -1408,18 +1408,18 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
         }
     }
     fT  = -fJ;
-    fBounce  = fn_800095F0(fT);
-    fT  = fn_80009638(fT);
+    fBounce  = Math_Sin(fT);
+    fT  = Math_Cos(fT);
     fn_80055D70(&pBall->vVel[0], &pBall->vVel[2], fBounce, fT);
     fn_80055D70(&pBall->vSpin[0], &pBall->vSpin[2], fBounce, fT);
     fT  = -fP;
-    fBounce  = fn_800095F0(fT);
-    fT  = fn_80009638(fT);
+    fBounce  = Math_Sin(fT);
+    fT  = Math_Cos(fT);
     fn_80055D70(&pBall->vVel[1], &pBall->vVel[2], fBounce, fT);
     fn_80055D70(&pBall->vSpin[1], &pBall->vSpin[2], fBounce, fT);
     fT  = -fA;
-    fBounce  = fn_800095F0(fT);
-    fT  = fn_80009638(fT);
+    fBounce  = Math_Sin(fT);
+    fT  = Math_Cos(fT);
     fn_80055D70(&pBall->vVel[0], &pBall->vVel[1], fBounce, fT);
     fn_80055D70(&pBall->vSpin[0], &pBall->vSpin[1], fBounce, fT);
     if (pSurface != NULL && pSurface->f0C >= 0.0f &&
@@ -1469,7 +1469,7 @@ u8 fn_80053240(Ball* pBall, f32 fTicks) {
     if (0.375f != pSurface->f1C) {
         pSurface = &gSurfaceTypes[14];
     }
-    fn_800BAF04(vNormal, vNormal);
+    Vec_NormalizeTo(vNormal, vNormal);
     if (pSurface->f0C >= 0.0f) {
         Vec3Copy(vHit, pBall->vPos);
         pBall->vPos[1] += 0.027055556f;
@@ -1692,13 +1692,13 @@ u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* p
         if (r & 31) {
             nB = -nB;
         }
-        fn_800BAF04(pNormal, pNormal);
+        Vec_NormalizeTo(pNormal, pNormal);
         fn_80055E28(0.017453292f * nA, &fSin, &fCos);
         fn_80055D70(&pNormal[0], &pNormal[1], fSin, fCos);
         fn_80055E28(0.017453292f * nB, &fSin, &fCos);
         fn_80055D70(&pNormal[2], &pNormal[1], fSin, fCos);
     }
-    fn_800BAF04(pNormal, pNormal);
+    Vec_NormalizeTo(pNormal, pNormal);
     pHit[1] += BALL_RADIUS;
     if (pNormal[1] > 0.0f) {
         pHit[1] += 0.0013888889f;
@@ -1751,8 +1751,8 @@ u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* p
             fPrev *= 1.95f - gGreenSpeedMul[gGreenSpeedSetting];
             vSpin[2] = fPrev * Ball_SpinKeep(pBall);
             fAngle = -atan2f(pBall->vVel[0], pBall->vVel[2]);
-            fS = fn_800095F0(fAngle);
-            fC = fn_80009638(fAngle);
+            fS = Math_Sin(fAngle);
+            fC = Math_Cos(fAngle);
             fn_80055D70(&vSpin[0], &vSpin[2], fS, fC);
             Vec3Copy(vSpin, pBall->vSpin);
         }
@@ -1946,7 +1946,7 @@ u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
     fImpact = Physics_HandleCollision(pBall, vNormal, pSurface);
     if (pSurface->nClass == 6 && !pBall->bGotFirstSandPos) {
         pBall->bGotFirstSandPos       = 1;
-        pBall->fFirstSandVMag = fn_80009680(fImpact);
+        pBall->fFirstSandVMag = Math_Sqrt(fImpact);
         Vec3Copy(pBall->vPos, pBall->vFirstSandPos);
     }
     if (pSurface->nClass == 12 || pSurface->nClass == 18 ||
@@ -1986,7 +1986,7 @@ u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
     if (pSurface->nClass == 7 || pSurface->nClass == 16) {
         nIndex = fn_80050BEC(pSurface);
         if ((nIndex == 47 || nIndex == 41 || nIndex == 104) && pBall->vVel[1] > 2.9333334f) {
-            fAcross = fn_80009680(pBall->vVel[0] * pBall->vVel[0] + pBall->vVel[2] * pBall->vVel[2]);
+            fAcross = Math_Sqrt(pBall->vVel[0] * pBall->vVel[0] + pBall->vVel[2] * pBall->vVel[2]);
             if (fAcross > 1.71f * pBall->vVel[1] && fAcross > 5.86666679f) {
                 pBall->vVel[1] *= 0.25f;
                 return 1;
@@ -2000,7 +2000,7 @@ u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
 
 // Distance from a point to the pin, 1000 when there is no course.
 f32 Ball_DistanceToPin(f32* pPos) {
-    CourseInfo* pCourse = fn_8000C594();
+    CourseInfo* pCourse = Ter_GetTGD();
     if (pCourse != NULL) {
         return Vec_Distance(pPos, &pCourse->pin[Game_CurrentPinSet()].x);
     }
@@ -2100,25 +2100,25 @@ void Ball_GroundContact(Ball* pBall, f32 fTicks) {
             return;
         }
     }
-    fn_800BAF04(vNormal, vNormal);
-    fn_8000C5D4(pBall->vVel, vNormal, -fn_8000C5FC(pBall->vVel, vNormal), vTmp);
-    fn_800BAF04(vTmp, vDir);
-    fn_8001EF34(fn_80009680(fn_80009744(pBall->vVel)), vDir, pBall->vVel);
-    fn_8001EF34(-0.839999974f, vNormal, vDown);
+    Vec_NormalizeTo(vNormal, vNormal);
+    fn_8000C5D4(pBall->vVel, vNormal, -Vec3_Dot(pBall->vVel, vNormal), vTmp);
+    Vec_NormalizeTo(vTmp, vDir);
+    Vec3_Scale(Math_Sqrt(Vec3_LengthSqClamped(pBall->vVel)), vDir, pBall->vVel);
+    Vec3_Scale(-0.839999974f, vNormal, vDown);
     fZ   = -0.173615396f * vDown[2];
     fX   = 0.173615396f * vDown[0];
-    fLen = fn_80009680(fZ * fZ + fX * fX);
+    fLen = Math_Sqrt(fZ * fZ + fX * fX);
     if (fLen != 0.0f) {
         fK = fabsf(fZ * vDir[0] + fX * vDir[2]) / fLen;
         fX *= fK;
         fZ *= fK;
-        fLen = pSurface->f1C * (f32)fn_80009680(fZ * fZ + fX * fX);
+        fLen = pSurface->f1C * (f32)Math_Sqrt(fZ * fZ + fX * fX);
         if (pSurface->nClass == 3) {
             fLen *= 0.6f;
         }
         vec4flt_CrossProduct(pBall->vVel, vDown, pBall->vSpin);
-        fn_8001EF34(1.41723347f, pBall->vSpin, pBall->vSpin);
-        fAngle = 0.45722881f * (f32)fn_80009680(fn_80009744(pBall->vSpin));
+        Vec3_Scale(1.41723347f, pBall->vSpin, pBall->vSpin);
+        fAngle = 0.45722881f * (f32)Math_Sqrt(Vec3_LengthSqClamped(pBall->vSpin));
         fTurn = 0.0f;
         if (fTurn != fAngle) {
             fTurn = fLen / fAngle;
@@ -2153,7 +2153,7 @@ void Ball_GroundContact(Ball* pBall, f32 fTicks) {
         fn_80055E28(-fX, &fSin, &fCos);
         fn_80055D70(&pBall->vVel[0], &pBall->vVel[1], fSin, fCos);
     }
-    fn_8001EF34(-(0.714285731f * (0.107170001f * vDir[1])), vDir, vAccel);
+    Vec3_Scale(-(0.714285731f * (0.107170001f * vDir[1])), vDir, vAccel);
     fn_8000C5D4(pBall->vVel, vAccel, fTicks, pBall->vVel);
     if (!gSimulating || gSimFullCup) {
         Ball_CupPull(pBall, fTicks);
@@ -2189,7 +2189,7 @@ void Ball_GroundContact(Ball* pBall, f32 fTicks) {
         fTurn *= 2.0f - gRoughMul[gRoughSetting];
     }
     fTurn *= fTicks;
-    if ((f32)fn_80009680(fn_80009744(pBall->vVel)) < fTurn) {
+    if ((f32)Math_Sqrt(Vec3_LengthSqClamped(pBall->vVel)) < fTurn) {
         Physics_StopBall(pBall);
         return;
     }
@@ -2235,9 +2235,9 @@ f32 Physics_GetBallAltitude(Ball* pBall) {
             fHeight  = fHeight2;
             pSurface = pSurface2;
         } else {
-            if (pBall->vPos[1] > fn_8000C594()->fFloor) {
+            if (pBall->vPos[1] > Ter_GetTGD()->fFloor) {
                 pBall->nSurface = -1;
-                return pBall->vPos[1] - fn_8000C594()->fFloor;
+                return pBall->vPos[1] - Ter_GetTGD()->fFloor;
             }
             Physics_OutOfBounds(pBall, 1);
             return 0.0f;
@@ -2294,7 +2294,7 @@ done:
     if (pBall->bHoled || pBall->nState == 1 || pBall->nState == 5) {
         pBall->fSpeed = 0.0f;
     } else {
-        fDist = fn_80009680(fn_80009744(pBall->vVel));
+        fDist = Math_Sqrt(Vec3_LengthSqClamped(pBall->vVel));
         pBall->fSpeed  = 60.0f * (fDist / 36.0f);
         pBall->fHeight = Physics_GetBallAltitude(pBall);
         fDist = Ball_DistanceToPin(pBall->vPos);
@@ -2433,7 +2433,7 @@ u8 Physics_InitBall(Ball* pBall, f32* pPos, int nPlayer) {
     pBall->vVel[1]       = 0.0f;
     pBall->vVel[2]       = 0.0f;
     pBall->f2C           = 0.0f;
-    pBall->pCourse = fn_8000C594();
+    pBall->pCourse = Ter_GetTGD();
     if (pBall->pCourse == NULL) return 1;
     pBall->vPos[1] += 0.053444445f;
     fGround = Ter_GetSupportingGroundHeight(pBall->pCourse, pBall->vPos);
@@ -2549,8 +2549,8 @@ f32 fn_80055E1C(f32 a, f32 b, f32 fSin, f32 fCos) {
 }
 
 void fn_80055E28(f32 fAngle, f32* pSin, f32* pCos) {
-    *pSin = fn_800095F0(fAngle);
-    *pCos = fn_80009638(fAngle);
+    *pSin = Math_Sin(fAngle);
+    *pCos = Math_Cos(fAngle);
 }
 
 // b + a into out (three floats)

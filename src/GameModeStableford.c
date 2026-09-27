@@ -44,7 +44,7 @@ void GameModeStableford_Init(void) {
 // left is double bogey, which scores no better than giving up.
 u8 GameModeStableford_PlayerDoneHole(int nPlayer) {
     if (!Player_IsHoled(nPlayer) && !gPlayers[nPlayer].bPlayerCut &&
-        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] < fn_800D2B08() + 1) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] < Course_GetCurHolePar() + 1) {
         return 0;
     }
     return 1;
@@ -129,7 +129,7 @@ s32 GameModeStableford_GetHonors(int nPlayer) {
     if (nPlayer == 5 && nBest == 5) {
         return 5;
     }
-    pCourse = fn_8000C594();
+    pCourse = Ter_GetTGD();
     nPinSet = Game_CurrentPinSet();
     fBest = 0.0f;
     nBest = 5;
@@ -137,7 +137,7 @@ s32 GameModeStableford_GetHonors(int nPlayer) {
         if (i != nPlayer && PLAYER(i)->ball.nLie != LIE_GREEN_e && !GameModeStableford_PlayerDoneHole(i)) {
             dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
             dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
-            d = fn_80009680(dx * dx + dz * dz);
+            d = Math_Sqrt(dx * dx + dz * dz);
             if (d > fBest) {
                 fBest = d;
                 nBest = i;
@@ -151,7 +151,7 @@ s32 GameModeStableford_GetHonors(int nPlayer) {
             if (i != nPlayer && !GameModeStableford_PlayerDoneHole(i)) {
                 dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
                 dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
-                d = fn_80009680(dx * dx + dz * dz);
+                d = Math_Sqrt(dx * dx + dz * dz);
                 if (d > fBest) {
                     fBest = d;
                     nBest = i;
@@ -200,7 +200,7 @@ void GameModeStableford_EndHole(void) {
     int i;
     int nDiff;
     nHole = Game_CurHoleIndex();
-    nPar = fn_800D2B08();
+    nPar = Course_GetCurHolePar();
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (!Player_IsHoled(i)) {
             gPlayers[(u32)i].nStrokes[nHole] = nPar + 2;
@@ -262,9 +262,9 @@ void GameModeStableford_EndGame(void) {
                             bFirst = 0;
                         }
                         if (nBase) {
-                            fn_800E4364(0, 0x75, nBase, nProfile);
+                            GUI_QueueMessage(0, 0x75, nBase, nProfile);
                         }
-                        fn_800D3548(i, nMoney, 0);
+                        GM_Earnings_AwardMoney(i, nMoney, 0);
                     }
                 }
             }

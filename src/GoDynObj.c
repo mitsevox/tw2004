@@ -55,12 +55,12 @@ void fn_800F196C(int i, f32* pOut);     // GameModeReplay.c: target i's position
 void fn_80093DB8(Ball* pBall, int nPlayer);    // GoObjShadow.c
 void BFX_vRender(Ball* pBall, int nPlayer);    // GoObjShadow.c
 void fn_80048584(UObject* pObj, s8 nLod);
-void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity
+void Mtx_Identity(f32 (*pMtx)[4]);                   // identity
 int  fn_800636EC(void);
 void fn_8004858C(f32* pOut, f32 fTurn, f32 fTilt);
 void fn_8000C5A4(f32 (*pMtx)[4]);
 void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
-void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);
+void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_8000A144(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies three rows
 void fn_80048680(f32* pA, f32* pB, f32* pOut);
@@ -105,8 +105,8 @@ void fn_80045FC8(UStreamObject* pObject) {
     pBank = fn_8000FB88(pObject, NULL, -2);
     for (i = 0; i < gSession.nNumPlayers; i++) {
         if ((s8)gSession.aProfile[i].nOutfit >= 0) {
-            fn_800CB700(&uLogo, lbl_80187B98[(s8)gSession.aProfile[i].nOutfit]);
-            fn_800CB700(&uSlot, lbl_80187CF8[i]);
+            SKA_PackName(&uLogo, lbl_80187B98[(s8)gSession.aProfile[i].nOutfit]);
+            SKA_PackName(&uSlot, lbl_80187CF8[i]);
             fn_800102DC(uSlot, &pSlotBank, &pSlot);
             nLogo = fn_8001005C(pBank, uLogo);
             pLogo = &pBank->p8[nLogo];
@@ -118,8 +118,8 @@ void fn_80045FC8(UStreamObject* pObject) {
             }
         }
     }
-    fn_80009E70(pBank);
-    fn_80009E70(pObject);
+    StaticMem_Free(pBank);
+    StaticMem_Free(pObject);
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -129,7 +129,7 @@ void fn_800460F8(UStreamObject* arg0) {
 
     temp_r31 = (*(void**)((u8*)(arg0) + 4));
     fn_800075CC(*(UObjModelRoot**)((u8*)(temp_r31) + 0x10));
-    fn_80009E70(temp_r31);
+    StaticMem_Free(temp_r31);
 }
 
 // ---- end of sweep code ----
@@ -146,7 +146,7 @@ void fn_80046174(void) {
 
 // Allocates the state; no 'TEO ' models yet.
 void fn_800461A8(void) {
-    lbl_80281DA0 = fn_80009B34(sizeof(GoDynObjMgr), 2, 16, "GoDynObj.c", 283);
+    lbl_80281DA0 = StaticMem_Alloc(sizeof(GoDynObjMgr), 2, 16, "GoDynObj.c", 283);
     lbl_80281DA0->pTeo10000 = NULL;
     lbl_80281DA0->apTeo10030[0] = NULL;
     lbl_80281DA0->apTeo10030[1] = NULL;
@@ -169,7 +169,7 @@ void fn_800461A8(void) {
 s32 lbl_80187D38[4] = {1, 0, 3, 2};
 
 void fn_80046264(void) {
-    fn_80009E70(lbl_80281DA0);
+    StaticMem_Free(lbl_80281DA0);
 }
 
 // Makes the models of the 'TEO ' objects that are loaded, puts the flag (character 100) at the
@@ -222,7 +222,7 @@ void DynObj_InitForHole(void) {
     }
     pFlag = fn_8001D324(100);
     if (pFlag != NULL) {
-        Character_SetPosition(pFlag, &fn_8000C594()->pin[Game_CurrentPinSet()].x, 1);
+        Character_SetPosition(pFlag, &Ter_GetTGD()->pin[Game_CurrentPinSet()].x, 1);
         if (Game_GetMode() != 6 && Game_GetMode() != 7 && Game_GetMode() != 8) {
             pFlag->u10 |= 2;
         }
@@ -303,13 +303,13 @@ void fn_800467B4(void) {
 
 // Draws every object (message 3), and with fn_800E39F0 the targets' 'TEO ' models.
 void fn_80046828(int nView) {
-    fn_80035118(4, 5);
-    fn_80012F50(1, 6, 0x80);
-    fn_80012F18(3);
+    RenderState_SetBlendFactors(4, 5);
+    RenderState_SetAlphaTest(1, 6, 0x80);
+    RenderState_SetDepthFunc(3);
     fn_80035338(1);
     fn_80035308();
     fn_800352E4();
-    fn_80012EF8();
+    RenderState_Flush();
     fn_80048F68(3, NULL, NULL);
     if (fn_800E39F0()) {
         fn_80046FDC(nView);
@@ -390,18 +390,18 @@ u8 fn_80046B1C(int nPlayer) {
 void fn_80046B8C(int nView) {
     u8 aState[8];
 
-    fn_80035118(4, 5);
-    fn_80012F50(1, 6, 0x80);
-    fn_80012F18(3);
+    RenderState_SetBlendFactors(4, 5);
+    RenderState_SetAlphaTest(1, 6, 0x80);
+    RenderState_SetDepthFunc(3);
     fn_80035338(1);
     fn_80035308();
     fn_800352E4();
-    fn_80012EF8();
+    RenderState_Flush();
     fn_8004731C(aState);
     fn_80035240(NULL);
     if (gSession.nSplitScreen == 0) {
         fn_80047290();
-        if ((s8)GOLFERSTATE_GetCurrentState(fn_8001707C(nView)) != 9) {
+        if ((s8)GOLFERSTATE_GetCurrentState(ViewController_GetPlayer(nView)) != 9) {
             fn_80047208(aState);
         }
     }
@@ -423,9 +423,9 @@ void fn_80046C34(f32* pPos, int nPlayer) {
     vPos[1] = pPos[1];
     vPos[2] = pPos[2];
     vPos[3] = 1.0f;
-    fGround = Ter_GetSupportingGroundData(fn_8000C594(), vPos, &pSurface, vNormal);
+    fGround = Ter_GetSupportingGroundData(Ter_GetTGD(), vPos, &pSurface, vNormal);
     if (TER_NO_GROUND != fGround && pSurface->nClass == 3 && fGround - pPos[1] < 0.02f &&
-        (f32)fn_80009680(fn_80009744(gPlayers[nPlayer].ball.vVel)) >= 10.0f) {
+        (f32)Math_Sqrt(Vec3_LengthSqClamped(gPlayers[nPlayer].ball.vVel)) >= 10.0f) {
         if (lbl_80281DA0->apRing[lbl_80281DA0->nRing] == NULL) {
             // EA bug: def.n1A is never set, and type 0's setup copies it to DynObj.n14E
             def.n0 = 0;
@@ -472,7 +472,7 @@ void fn_80046E1C(f32* pPos, int nPlayer) {
     vPos[1] = pPos[1];
     vPos[2] = pPos[2];
     vPos[3] = 1.0f;
-    fGround = Ter_GetSupportingGroundData(fn_8000C594(), vPos, &pSurface, vNormal);
+    fGround = Ter_GetSupportingGroundData(Ter_GetTGD(), vPos, &pSurface, vNormal);
     if (lbl_80281DA0->apPlayer[nPlayer] == NULL) {
         // EA bug: def.n1A is never set, and type 0's setup copies it to DynObj.n14E
         vPos[1] = 0.01f + fGround;
@@ -494,11 +494,11 @@ void fn_80046E1C(f32* pPos, int nPlayer) {
             lbl_80281DA0->apPlayer[nPlayer] = fn_80048E4C(nId);
         }
     }
-    fn_8000ADC0(mTurn);
-    fn_8000ADC0(lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
+    Mtx_Identity(mTurn);
+    Mtx_Identity(lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
     fn_8000A194(mTurn, -gPlayers[nPlayer].fAim, 0.0f, 0.0f);
     fn_800BADF8(lbl_80281DA0->apPlayer[nPlayer]->obj.m0, mTurn, mObj, 4);
-    fn_8000A0E8(mObj, lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
+    Mtx_Copy(mObj, lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
     Vec_Copy(vPos, lbl_80281DA0->apPlayer[nPlayer]->obj.m80[3]);
     fn_8000C5A4(lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
 }
@@ -511,10 +511,10 @@ void fn_80046FDC(s32 nView) {
 
     for (i = 0; i < fn_800F1960(); i++) {
         fn_800F196C(i, vPos);
-        nKind = gpGame->pfn26C(fn_8001707C(nView), i);
+        nKind = gpGame->pfn26C(ViewController_GetPlayer(nView), i);
         if (lbl_80281DA0->apTeo10006[nKind] != NULL) {
             fn_80048584(lbl_80281DA0->apTeo10006[nKind], 0);
-            fn_8000ADC0(lbl_80281DA0->apTeo10006[nKind]->m80);
+            Mtx_Identity(lbl_80281DA0->apTeo10006[nKind]->m80);
             Vec_Copy(vPos, lbl_80281DA0->apTeo10006[nKind]->m80[3]);
             fn_80048894(lbl_80281DA0->apTeo10006[nKind]);
         }
@@ -527,12 +527,12 @@ void fn_800470B0(s32 nView) {
     int i;
     int nModel;
 
-    fn_80012F50(0, 6, 0x80);
-    fn_80012F34(0);
-    fn_80012EF8();
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_SetDepthWrite(0);
+    RenderState_Flush();
     for (i = 0; i < fn_800F1960(); i++) {
         fn_800F196C(i, vPos);
-        switch (gpGame->pfn26C(fn_8001707C(nView), i)) {
+        switch (gpGame->pfn26C(ViewController_GetPlayer(nView), i)) {
         case 0:
             nModel = 0;
             break;
@@ -548,14 +548,14 @@ void fn_800470B0(s32 nView) {
         }
         if (nModel != -1 && lbl_80281DA0->apTeo10020[nModel] != NULL) {
             fn_80048584(lbl_80281DA0->apTeo10020[nModel], 0);
-            fn_8000ADC0(lbl_80281DA0->apTeo10020[nModel]->m80);
+            Mtx_Identity(lbl_80281DA0->apTeo10020[nModel]->m80);
             Vec_Copy(vPos, lbl_80281DA0->apTeo10020[nModel]->m80[3]);
             fn_80048894(lbl_80281DA0->apTeo10020[nModel]);
         }
     }
-    fn_80012F50(1, 6, 0x80);
-    fn_80012F34(1);
-    fn_80012EF8();
+    RenderState_SetAlphaTest(1, 6, 0x80);
+    RenderState_SetDepthWrite(1);
+    RenderState_Flush();
 }
 
 void fn_80047208(u8* aState) {
@@ -618,10 +618,10 @@ void fn_8004731C(u8* pState) {
             fT *= lbl_80283304;
             fTurn = 60.0f;
             fTurn *= fT / 36.0f;
-            fn_8001EF34(fTurn, gPlayers[i].ball.vSpin, aSpin);
+            Vec3_Scale(fTurn, gPlayers[i].ball.vSpin, aSpin);
             Quat_BuildFromVector(aSpin, aTurn);
             Quat_Multiply(gPlayers[i].vOrient, aTurn, aRot);
-            fn_8001E85C(aRot, gPlayers[i].vOrient);
+            Quat_Copy(aRot, gPlayers[i].vOrient);
             Quat_QuatToMatrix(aRot, pBall->m0);
             if (pLogoA != NULL) {
                 Quat_QuatToMatrix(aRot, pLogoA->m0);
@@ -664,24 +664,24 @@ void fn_8004731C(u8* pState) {
                 fn_80048584(pLogoB, 0);
             }
         }
-        fn_8000ADC0(pBall->m40);
+        Mtx_Identity(pBall->m40);
         if (pLogoA != NULL) {
-            fn_8000ADC0(pLogoA->m40);
+            Mtx_Identity(pLogoA->m40);
         }
         if (pLogoB != NULL) {
-            fn_8000ADC0(pLogoB->m40);
+            Mtx_Identity(pLogoB->m40);
         }
         pBall->m40[0][0] = lbl_80281128;
-        pBall->m40[1][1] = lbl_80281128 / fn_80017028(gPlayers[i].nView[0])->f54;
+        pBall->m40[1][1] = lbl_80281128 / ViewController_GetCameraController(gPlayers[i].nView[0])->f54;
         pBall->m40[2][2] = lbl_80281128;
         if (pLogoA != NULL) {
             pLogoA->m40[0][0] = lbl_80281128;
-            pLogoA->m40[1][1] = lbl_80281128 / fn_80017028(gPlayers[i].nView[0])->f54;
+            pLogoA->m40[1][1] = lbl_80281128 / ViewController_GetCameraController(gPlayers[i].nView[0])->f54;
             pLogoA->m40[2][2] = lbl_80281128;
         }
         if (pLogoB != NULL) {
             pLogoB->m40[0][0] = lbl_80281128;
-            pLogoB->m40[1][1] = lbl_80281128 / fn_80017028(gPlayers[i].nView[0])->f54;
+            pLogoB->m40[1][1] = lbl_80281128 / ViewController_GetCameraController(gPlayers[i].nView[0])->f54;
             pLogoB->m40[2][2] = lbl_80281128;
         }
         Vec_Copy(gPlayers[i].ball.vPos, pBall->m80[3]);
@@ -711,26 +711,26 @@ void fn_8004731C(u8* pState) {
         if (fSize < 1.5f) {
             fGrow = 1.0f / (fSize / 1.5f);
             fGrow = 0.7f * (fGrow - 1.0f) + 1.0f;
-            fn_8000AE28(fGrow, pBall->m40[0], pBall->m40[0]);
-            fn_8000AE28(fGrow, pBall->m40[1], pBall->m40[1]);
-            fn_8000AE28(fGrow, pBall->m40[2], pBall->m40[2]);
+            Vec_Scale(fGrow, pBall->m40[0], pBall->m40[0]);
+            Vec_Scale(fGrow, pBall->m40[1], pBall->m40[1]);
+            Vec_Scale(fGrow, pBall->m40[2], pBall->m40[2]);
             if (pLogoA != NULL) {
-                fn_8000AE28(fGrow, pLogoA->m40[0], pLogoA->m40[0]);
-            }
-            if (pLogoA != NULL) {
-                fn_8000AE28(fGrow, pLogoA->m40[1], pLogoA->m40[1]);
+                Vec_Scale(fGrow, pLogoA->m40[0], pLogoA->m40[0]);
             }
             if (pLogoA != NULL) {
-                fn_8000AE28(fGrow, pLogoA->m40[2], pLogoA->m40[2]);
+                Vec_Scale(fGrow, pLogoA->m40[1], pLogoA->m40[1]);
+            }
+            if (pLogoA != NULL) {
+                Vec_Scale(fGrow, pLogoA->m40[2], pLogoA->m40[2]);
             }
             if (pLogoB != NULL) {
-                fn_8000AE28(fGrow, pLogoB->m40[0], pLogoB->m40[0]);
+                Vec_Scale(fGrow, pLogoB->m40[0], pLogoB->m40[0]);
             }
             if (pLogoB != NULL) {
-                fn_8000AE28(fGrow, pLogoB->m40[1], pLogoB->m40[1]);
+                Vec_Scale(fGrow, pLogoB->m40[1], pLogoB->m40[1]);
             }
             if (pLogoB != NULL) {
-                fn_8000AE28(fGrow, pLogoB->m40[2], pLogoB->m40[2]);
+                Vec_Scale(fGrow, pLogoB->m40[2], pLogoB->m40[2]);
             }
         }
         fn_8000C5A4(pBall->m0);
@@ -766,8 +766,8 @@ f32 fn_8004787C(int nPlayer) {
     CamLens* pLens;
     f32 fRadius;
 
-    pCamera = fn_8001614C();
-    pLens = fn_80008370(pCamera);
+    pCamera = Camera_GetCurrent();
+    pLens = Camera_GetLens(pCamera);
     fRadius = lbl_80281DA0->pTeo10000->pModel->apLod[0]->pInfo->f64 * lbl_80281128;
     Vec_Copy(gPlayers[nPlayer].ball.vPos, &vPos.x);
     vPos.w = 1.0f;
@@ -778,10 +778,10 @@ f32 fn_8004787C(int nPlayer) {
     fn_800BAD60(pCamera->m5C, &vAbove, &vTop);
     fn_800BAD60(pCamera->m5C, &vBelow, &vBottom);
     if (0.0f != vTop.w) {
-        fn_8000AE28(1.0f / vTop.w, &vTop.x, &vTop.x);
+        Vec_Scale(1.0f / vTop.w, &vTop.x, &vTop.x);
     }
     if (0.0f != vBottom.w) {
-        fn_8000AE28(1.0f / vBottom.w, &vBottom.x, &vBottom.x);
+        Vec_Scale(1.0f / vBottom.w, &vBottom.x, &vBottom.x);
     }
     vTop.z = 0.0f;
     vTop.x = 256.0f * (1.0f + vTop.x);
@@ -790,7 +790,7 @@ f32 fn_8004787C(int nPlayer) {
     vBottom.x = 256.0f * (1.0f + vBottom.x);
     vBottom.y = 224.0f * (1.0f + vBottom.y);
     fn_80048680(&vTop.x, &vBottom.x, vDiff);
-    return (f32)fn_80009680(fn_80009744(vDiff));
+    return (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
 }
 
 // Puts the player's 'TEO ' 10002 object at pPos, facing against the aim; the first time it is made
@@ -830,7 +830,7 @@ void fn_80047A24(f32* pPos, int nPlayer) {
         }
         pB->bF4 = 1;
     } else {
-        fn_8000ADC0(pB->pF0->obj.m0);
+        Mtx_Identity(pB->pF0->obj.m0);
         Vec_Copy(pB->v20, pB->pF0->obj.m80[3]);
         fn_8000C5A4(pB->pF0->obj.m0);
     }
@@ -868,14 +868,14 @@ void fn_80047C24(int nPlayer) {
     if (!pB->bF4) return;
     pB->b0 = 0;
     if (pB->bF5) {
-        fn_8000ADC0(pB->mB0);
+        Mtx_Identity(pB->mB0);
         fn_8000A194(pB->mB0, pB->fC, 0.0f, 0.0f);
         fn_800BADF8(pB->pF0->obj.m0, pB->mB0, mTmp, 4);
-        fn_8000A0E8(mTmp, pB->pF0->obj.m0);
+        Mtx_Copy(mTmp, pB->pF0->obj.m0);
         fn_8000C5A4(pB->pF0->obj.m0);
         Vec_Copy(pB->v20, pB->v30);
         fn_8004858C(pB->v40, pB->fC, lbl_80281DA0->fAA0);
-        fn_8000AE28(lbl_80281DA0->fA98 * (0.5f * Misc_RandFuncf(1) + 0.5f), pB->v40, pB->v40);
+        Vec_Scale(lbl_80281DA0->fA98 * (0.5f * Misc_RandFuncf(1) + 0.5f), pB->v40, pB->v40);
         pB->v40[3] = pB->v40[1];
         pB->bF5 = 0;
         pB->b0 = 1;
@@ -893,19 +893,19 @@ void fn_80047C24(int nPlayer) {
     }
     pB->f10 += gSession.fFrameTime;
     Wind_Get(vWind);
-    fn_8000AE28(0.48888f * 0.3f, vWind, vWind);
+    Vec_Scale(0.48888f * 0.3f, vWind, vWind);
     fn_800486C8(vWind, pB->v40, vMove);
-    fn_8001EF34(pB->f10, vMove, vMove);
+    Vec3_Scale(pB->f10, vMove, vMove);
     vMove[1] = vMove[1] + -4.9f * pB->f10 * pB->f10;
     fn_800486C8(vMove, pB->v20, pB->v30);
     pB->b0 = 1;
-    fGround = fn_8004D5F0(fn_8000C594(), pB->v30);
+    fGround = fn_8004D5F0(Ter_GetTGD(), pB->v30);
     if (pB->v30[1] < fGround) {
         pB->v30[1] = 0.01f + fGround;
         pB->b0 = 0;
     }
     fn_800486A4(pB->v60, pB->v50, pB->v50);
-    fn_8000ADC0(pB->mB0);
+    Mtx_Identity(pB->mB0);
     fn_8000A194(pB->mB0, pB->fC + pB->v50[0], pB->v50[1], pB->v50[2]);
     fn_8000A144(pB->mB0, pB->pF0->obj.m0);
     fn_8000C5A4(pB->pF0->obj.m0);
@@ -951,7 +951,7 @@ void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
             pA->pF4 = fn_80048E4C(nId);
         }
         pA->bF8 = 1;
-        fn_8000ADC0(pA->mB4);
+        Mtx_Identity(pA->mB4);
         Vec_Copy(pA->v20, pA->v30);
         Vec_Copy(pA->v20, pA->pF4->obj.m80[3]);
         fn_8000C5A4(pA->pF4->obj.m0);
@@ -980,7 +980,7 @@ void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
             }
         }
     }
-    fn_8000ADC0(pA->mB4);
+    Mtx_Identity(pA->mB4);
     fn_8000A194(pA->mB4, pA->v50[0], pA->v50[1], pA->v50[2]);
     fn_8000A144(pA->mB4, pA->pF4->obj.m0);
     Vec_Copy(pA->v20, pA->v30);
@@ -1009,14 +1009,14 @@ void fn_80048184(int nPlayer) {
         pA->b0 = 0;
         if (pA->bF9) {
             pA->fC = -gPlayers[nPlayer].fAim + Misc_RandFuncf(1) - 0.5f;
-            fn_8000ADC0(pA->mB4);
+            Mtx_Identity(pA->mB4);
             fn_8000A194(pA->mB4, pA->fC, 0.0f, 0.0f);
             fn_800BADF8(pA->pF4->obj.m0, pA->mB4, mTmp, 4);
-            fn_8000A0E8(mTmp, pA->pF4->obj.m0);
+            Mtx_Copy(mTmp, pA->pF4->obj.m0);
             fn_8000C5A4(pA->pF4->obj.m0);
             Vec_Copy(pA->v20, pA->v30);
             fn_8004858C(pA->v40, pA->fC, lbl_80281DA0->fA9C);
-            fn_8000AE28(lbl_80281DA0->fA94 * Misc_RandFuncf(1), pA->v40, pA->v40);
+            Vec_Scale(lbl_80281DA0->fA94 * Misc_RandFuncf(1), pA->v40, pA->v40);
             pA->v40[3] = pA->v40[1];
             pA->bF9 = 0;
             pA->b0 = 1;
@@ -1034,26 +1034,26 @@ void fn_80048184(int nPlayer) {
         }
         pA->f10 += gSession.fFrameTime;
         Wind_Get(vWind);
-        fn_8000AE28(0.48888f, vWind, vWind);
+        Vec_Scale(0.48888f, vWind, vWind);
         fn_800486C8(vWind, pA->v40, vMove);
-        fn_8001EF34(pA->f10, vMove, vMove);
+        Vec3_Scale(pA->f10, vMove, vMove);
         vMove[1] = vMove[1] + -4.9f * pA->f10 * pA->f10;
         fn_800486C8(vMove, pA->v20, pA->v30);
         pA->b0 = 1;
-        fGround = fn_8004D5F0(fn_8000C594(), pA->v30);
+        fGround = fn_8004D5F0(Ter_GetTGD(), pA->v30);
         if (pA->v30[1] < fGround) {
             pA->v30[1] = 0.01f + fGround;
             pA->b0 = 0;
         }
         fn_800486A4(pA->v60, pA->v50, pA->v50);
-        fn_8000ADC0(pA->mB4);
+        Mtx_Identity(pA->mB4);
         fn_8000A194(pA->mB4, pA->fC + pA->v50[0], pA->v50[1], pA->v50[2]);
         fn_8000A144(pA->mB4, pA->pF4->obj.m0);
         fn_8000C5A4(pA->pF4->obj.m0);
         Vec_Copy(pA->v30, pA->pF4->obj.m80[3]);
         pA->pF4->obj.m80[3][3] = 1.0f;
     } else {
-        fn_8000ADC0(pA->mB4);
+        Mtx_Identity(pA->mB4);
         fn_8000A194(pA->mB4, pA->v50[0], pA->v50[1], pA->v50[2]);
         fn_8000A144(pA->mB4, pA->pF4->obj.m0);
         fn_8000C5A4(pA->pF4->obj.m0);
@@ -1102,15 +1102,15 @@ void fn_8004858C(f32* pOut, f32 fTurn, f32 fTilt) {
         pOut[2] = 0.0f;
         pOut[0] = 0.0f;
     } else {
-        fSinTilt = fn_800095F0(fTilt);
-        fCosTilt = fn_80009638(fTilt);
+        fSinTilt = Math_Sin(fTilt);
+        fCosTilt = Math_Cos(fTilt);
         if (0.0f == fTurn) {
             pOut[0] = 0.0f;
             pOut[1] = fCosTilt;
             pOut[2] = fSinTilt;
         } else {
-            fSinTurn = fn_800095F0(fTurn);
-            fCosTurn = fn_80009638(fTurn);
+            fSinTurn = Math_Sin(fTurn);
+            fCosTurn = Math_Cos(fTurn);
             pOut[1] = fCosTilt;
             pOut[0] = fSinTilt * fSinTurn;
             pOut[2] = fSinTilt * fCosTurn;

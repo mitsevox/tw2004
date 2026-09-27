@@ -27,7 +27,7 @@ typedef struct GreenGrid {
     f32  fCellD;                // 0x0F8  spacing along
     f32  fFC;                   // 0x0FC
     f32  f100;                  // 0x100  0.125, scales the frame count for the texture scroll
-    s32  b104;                  // 0x104  1; picks fn_80014118(0x70) over 0x60
+    s32  b104;                  // 0x104  1; picks RenderState_SetDrawFlags(0x70) over 0x60
     s32  anColor[4];            // 0x108  the vertex colour bytes, in order (0x80, 0x80, 0x40, 0x41)
 } GreenGrid;
 LAYOUT_ASSERT(GreenGrid, 0x118);

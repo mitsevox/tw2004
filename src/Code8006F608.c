@@ -83,7 +83,7 @@ void fn_8006F650(void) {
         }
         if (lbl_802811F0->b1C) {
             lbl_802811F0->uFlags |= 2;
-        } else if (Game_GetCourse() != 4 || fn_80015464() != 17) {
+        } else if (Game_GetCourse() != 4 || Game_GetCurHoleNum() != 17) {
             switch (gSession.options.nC) {
             case 0:
             case 4:

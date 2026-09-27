@@ -200,7 +200,7 @@ store:
 }
 
 // Normalise a three-float vector from pSrc into pDst; a near-zero one is copied.
-asm void fn_800BAF04(register f32* pSrc, register f32* pDst) {
+asm void Vec_NormalizeTo(register f32* pSrc, register f32* pDst) {
     nofralloc
     psq_l    f3, 0(pSrc), 0, 0
     psq_l    f4, 8(pSrc), 1, 0
@@ -258,7 +258,7 @@ zero:
     blr
 }
 
-// fn_800BAF04 that also returns the length (0 for a near-zero vector).
+// Vec_NormalizeTo that also returns the length (0 for a near-zero vector).
 asm f32 fn_800BAFC0(register f32* pSrc, register f32* pDst) {
     nofralloc
     psq_l    f3, 0(pSrc), 0, 0
@@ -350,7 +350,7 @@ void Vec_Normalize(f32* pSrc, f32* pDst) {
     }
 }
 
-void fn_800BAF04(f32* pSrc, f32* pDst) {
+void Vec_NormalizeTo(f32* pSrc, f32* pDst) {
     f32 s = Vec3_LengthSq(pSrc);
     f32 k = 1.0f;
     int i;

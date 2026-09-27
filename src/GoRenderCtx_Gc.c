@@ -32,7 +32,7 @@ void** lbl_80280DF0 = lbl_80281C90;
 void* fn_8001371C(CamLens* pLens, GoFrameBuf* pBuf, f32* pRect) {
     Camera* pCamera;
 
-    pCamera = fn_80009B34(0x234, 2, 16, "GoRenderCtx_Gc.c", 96);
+    pCamera = StaticMem_Alloc(0x234, 2, 16, "GoRenderCtx_Gc.c", 96);
     fn_80013E38(pCamera, pLens);
     fn_80013E30(pCamera, pBuf);
     fn_80013E28(pCamera, pRect);
@@ -60,13 +60,13 @@ static f32 GoRenderCtx_Gc_StrippedFn(f32 x) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-s32 fn_8000A0E8();
+s32 Mtx_Copy();
 s32 fn_8000A714();
 s32 fn_800BADF8();
 void fn_80013D5C(s32 v);
 void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera);   // not decompiled yet
 void fn_80013DD0(u8* arg0, f32 (*arg1)[4]);
-s32 fn_8000ADC0();
+s32 Mtx_Identity();
 f32 fn_80014134(u8* p);
 f32 fn_8001413C(u8* p);
 f32 fn_80014144(u8* p);
@@ -77,44 +77,44 @@ f32 fn_80014184(u8* p);
 f32 fn_8001418C(u8* p);
 
 void fn_800137B0(void* pCamera) {
-    fn_80009E70(pCamera);
+    StaticMem_Free(pCamera);
 }
 
 void fn_800137D0(Camera* pCamera) {
     fn_80013EEC(pCamera);
-    fn_80012EF8();
+    RenderState_Flush();
     fn_80013EA0(pCamera);
 }
 
 // Draws a rectangle over the whole screen in pColour (r, g, b, a; NULL: the default grey), depth
-// test off. uFlags bit 0: keep fn_80012F34's setting; bit 1: pass 1 instead of 2 to the first
+// test off. uFlags bit 0: keep RenderState_SetDepthWrite's setting; bit 1: pass 1 instead of 2 to the first
 // fn_800140E8 (colour and alpha written instead of neither).
 void fn_80013808(f32* pColour, u32 uFlags) {
     f32 aXY[8];
 
     fn_8001425C(0);
-    fn_80014118(0);
+    RenderState_SetDrawFlags(0);
     if (!(uFlags & 1)) {
-        fn_80012F34(0);
+        RenderState_SetDepthWrite(0);
     }
     if (!(uFlags & 2)) {
         fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 2, 1);
     } else {
         fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 1, 1);
     }
-    fn_80012F50(0, 6, 0x80);
-    fn_80012F18(7);
-    fn_80012EF8();
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_SetDepthFunc(7);
+    RenderState_Flush();
     fn_800141F8(aXY, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
     aXY[2] = 0.0f;
     aXY[6] = 0.0f;
     fn_80014194(pColour);
     fn_8001644C(0xA1, aXY, NULL, NULL, 2);
-    fn_80012F50(0, 6, 0x80);
-    fn_80012F18(3);
-    fn_80012F34(1);
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_SetDepthFunc(3);
+    RenderState_SetDepthWrite(1);
     fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
-    fn_80012EF8();
+    RenderState_Flush();
 }
 
 // Works out the camera's screen values from its lens, screen rectangle and frame buffer, then its
@@ -150,25 +150,25 @@ void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
     aSrc[0] = 1.0f;
     aSrc[1] = pCamera->f1FC;
     aSrc[2] = 0.0f;
-    fn_800BAF04(aSrc, aDst);
+    Vec_NormalizeTo(aSrc, aDst);
     pCamera->unk204 = aDst[1];
     pCamera->unk20C = aDst[0];
     aSrc[0] = 1.0f;
     aSrc[1] = pCamera->f200;
     aSrc[2] = 0.0f;
-    fn_800BAF04(aSrc, aDst);
+    Vec_NormalizeTo(aSrc, aDst);
     pCamera->unk208 = aDst[1];
     pCamera->unk210 = aDst[0];
     aSrc[0] = 1.0f;
     aSrc[1] = pCamera->f1FC * 2.0f;
     aSrc[2] = 0.0f;
-    fn_800BAF04(aSrc, aDst);
+    Vec_NormalizeTo(aSrc, aDst);
     pCamera->unk214 = aDst[1];
     pCamera->unk218 = aDst[0];
     aSrc[0] = 1.0f;
     aSrc[1] = pCamera->f200 * 2.0f;
     aSrc[2] = 0.0f;
-    fn_800BAF04(aSrc, aDst);
+    Vec_NormalizeTo(aSrc, aDst);
     pCamera->unk21C = aDst[1];
     pCamera->unk220 = aDst[0];
 
@@ -190,8 +190,8 @@ void fn_80013CCC(void* pCamera) {
     u8* arg0 = pCamera;
 
     if ((u8) (*(u8*)((u8*)(arg0) + 0x1DC)) != 0) {
-        fn_8000A0E8((*(s32*)((u8*)(arg0) + 0x10)) + 0x44, arg0 + 0x11C);
-        fn_8000A0E8(arg0 + 0xDC, arg0 + 0x19C);
+        Mtx_Copy((*(s32*)((u8*)(arg0) + 0x10)) + 0x44, arg0 + 0x11C);
+        Mtx_Copy(arg0 + 0xDC, arg0 + 0x19C);
     } else {
         fn_800BADF8((*(s32*)((u8*)(arg0) + 0x10)) + 0x44, arg0 + 0x1C, arg0 + 0x11C, 4);
         fn_800BADF8(arg0 + 0xDC, arg0 + 0x1C, arg0 + 0x19C, 4);
@@ -219,11 +219,11 @@ void fn_80013D9C(void* pCamera, f32 (*pMtx)[4]) {
 
 void fn_80013DD0(u8* arg0, f32 (*arg1)[4]) {
     if (arg1 == NULL) {
-        fn_8000ADC0(arg0 + 0x1C);
+        Mtx_Identity(arg0 + 0x1C);
         (*(s8*)((u8*)(arg0) + 0x1DC)) = 1;
         return;
     }
-    fn_8000A0E8(arg1, arg0 + 0x1C);
+    Mtx_Copy(arg1, arg0 + 0x1C);
     (*(s8*)((u8*)(arg0) + 0x1DC)) = 0;
 }
 
@@ -292,7 +292,7 @@ void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c) {
     lbl_801B8980.u110 |= 0x1000;
 }
 
-void fn_80014118(int a) {
+void RenderState_SetDrawFlags(int a) {
     lbl_801B8980.u20 = a;
     lbl_801B8980.u110 |= 0x20;
 }
@@ -437,7 +437,7 @@ void fn_800142A4(s8 v) {
 }
 
 // A button's mask in the row in use; bShift moves it up 16 bits.
-u32 fn_800142AC(int nButton, u8 bShift) {
+u32 Controller_GetButtonMask(int nButton, u8 bShift) {
     if (bShift) {
         return lbl_80186AF0[lbl_80281C98][nButton] << 16;
     }
@@ -450,7 +450,7 @@ u8 fn_80014300(u32 uMask) {
     int nController = 0;
 
     do {
-        if ((uMask == 0 && fn_800136DC(nController) != 0) || (uMask & fn_800136DC(nController))) {
+        if ((uMask == 0 && Controller_GetButtons(nController) != 0) || (uMask & Controller_GetButtons(nController))) {
             bPressed = 1;
         }
         nController++;

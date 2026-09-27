@@ -9,13 +9,13 @@ f32* lbl_80281BD8;                      // the log2 table: 1024 entries over the
 
 int  fn_8000A818(f32 (*pA)[4], f32 (*pB)[4]);
 void fn_8000AD34(f32* pA, f32* pB);
-void fn_8000ADC0(f32 (*pDst)[4]);
+void Mtx_Identity(f32 (*pDst)[4]);
 void fn_8000AE0C(f32* pSrc, f32* pDst);
 void fn_8000AE9C(void);
 void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 
 // Copies a 4x4 matrix, one row at a time.
-void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]) {
+void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]) {
     Vec_Copy(pSrc[0], pDst[0]);
     Vec_Copy(pSrc[1], pDst[1]);
     Vec_Copy(pSrc[2], pDst[2]);
@@ -49,8 +49,8 @@ void fn_8000A194(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
             pMtx[1][0] = 0.0f;
             pMtx[0][1] = 0.0f;
             if (fA != 0.0f) {
-                fSinA = fn_800095F0(fA);
-                fCosA = fn_80009638(fA);
+                fSinA = Math_Sin(fA);
+                fCosA = Math_Cos(fA);
                 pMtx[2][2] = fCosA;
                 pMtx[0][0] = fCosA;
                 pMtx[2][0] = fSinA;
@@ -62,8 +62,8 @@ void fn_8000A194(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
                 pMtx[0][2] = 0.0f;
             }
         } else {
-            fSinB = fn_800095F0(fB);
-            fCosB = fn_80009638(fB);
+            fSinB = Math_Sin(fB);
+            fCosB = Math_Cos(fB);
             if (fA == 0.0f) {
                 pMtx[0][0] = 1.0f;
                 pMtx[2][0] = 0.0f;
@@ -75,8 +75,8 @@ void fn_8000A194(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
                 pMtx[1][2] = fSinB;
                 pMtx[2][1] = -fSinB;
             } else {
-                fSinA = fn_800095F0(fA);
-                fCosA = fn_80009638(fA);
+                fSinA = Math_Sin(fA);
+                fCosA = Math_Cos(fA);
                 pMtx[0][0] = fCosA;
                 pMtx[0][1] = 0.0f;
                 pMtx[0][2] = -fSinA;
@@ -89,8 +89,8 @@ void fn_8000A194(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
             }
         }
     } else {
-        fSinC = fn_800095F0(fC);
-        fCosC = fn_80009638(fC);
+        fSinC = Math_Sin(fC);
+        fCosC = Math_Cos(fC);
         if (fB == 0.0f) {
             if (fA == 0.0f) {
                 pMtx[2][2] = 1.0f;
@@ -103,8 +103,8 @@ void fn_8000A194(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
                 pMtx[0][1] = fSinC;
                 pMtx[1][0] = -fSinC;
             } else {
-                fSinA = fn_800095F0(fA);
-                fCosA = fn_80009638(fA);
+                fSinA = Math_Sin(fA);
+                fCosA = Math_Cos(fA);
                 pMtx[2][0] = fSinA;
                 pMtx[2][1] = 0.0f;
                 pMtx[2][2] = fCosA;
@@ -116,8 +116,8 @@ void fn_8000A194(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
                 pMtx[1][2] = fSinC * fSinA;
             }
         } else {
-            fSinB = fn_800095F0(fB);
-            fCosB = fn_80009638(fB);
+            fSinB = Math_Sin(fB);
+            fCosB = Math_Cos(fB);
             if (fA == 0.0f) {
                 pMtx[2][0] = 0.0f;
                 pMtx[2][1] = -fSinB;
@@ -129,8 +129,8 @@ void fn_8000A194(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
                 pMtx[1][1] = fCosC * fCosB;
                 pMtx[1][2] = fCosC * fSinB;
             } else {
-                fSinA = fn_800095F0(fA);
-                fCosA = fn_80009638(fA);
+                fSinA = Math_Sin(fA);
+                fCosA = Math_Cos(fA);
                 pMtx[2][1] = -fSinB;
                 fSinCSinB = fSinC * fSinB;
                 fSinBCosC = fSinB * fCosC;
@@ -164,7 +164,7 @@ void fn_8000A4E0(f32 (*pMtx)[4], f32* pA, f32* pB, f32* pC) {
         if (pMtx[1][1] != 0.0f) {
             fC = atan2f(pMtx[0][1], pMtx[1][1]);
         } else if (pMtx[0][1] != 0.0f) {
-            if (pMtx[0][1] * fn_80009638(fB) > 0.0f) {
+            if (pMtx[0][1] * Math_Cos(fB) > 0.0f) {
                 fC = PI / 2.0f;
             } else {
                 fC = -PI / 2.0f;
@@ -189,14 +189,14 @@ void fn_8000A4E0(f32 (*pMtx)[4], f32* pA, f32* pB, f32* pC) {
         }
     } else {
         fB = -fn_8000965C(pMtx[2][1]);
-        if (pMtx[2][0] * fn_80009638(fB) > 0.0f) {
+        if (pMtx[2][0] * Math_Cos(fB) > 0.0f) {
             fA = PI / 2.0f;
         } else {
             fA = -PI / 2.0f;
         }
         if (pMtx[1][1] != 0.0f) {
             fC = atan2f(pMtx[0][1], pMtx[1][1]);
-        } else if (pMtx[0][1] * fn_80009638(fB) > 0.0f) {
+        } else if (pMtx[0][1] * Math_Cos(fB) > 0.0f) {
             fC = PI / 2.0f;
         } else {
             fC = -PI / 2.0f;
@@ -318,8 +318,8 @@ int fn_8000A818(f32 (*pA)[4], f32 (*pB)[4]) {
         }
         fPivInv = 1.0f / pA[nCol][nCol];
         pA[nCol][nCol] = 1.0f;
-        fn_8000AE28(fPivInv, pA[nCol], pA[nCol]);
-        fn_8000AE28(fPivInv, pB[nCol], pB[nCol]);
+        Vec_Scale(fPivInv, pA[nCol], pA[nCol]);
+        Vec_Scale(fPivInv, pB[nCol], pB[nCol]);
         for (j = 0; j < 4; j++) {
             if (j != nCol) {
                 fDum = -pA[j][nCol];
@@ -346,14 +346,14 @@ int fn_8000A818(f32 (*pA)[4], f32 (*pB)[4]) {
 void fn_8000AB40(f32 (*pSrc)[4], f32 (*pDst)[4]) {
     f32 aIdentity[4][4];
 
-    fn_8000A0E8(pSrc, pDst);
-    fn_8000ADC0(aIdentity);
+    Mtx_Copy(pSrc, pDst);
+    Mtx_Identity(aIdentity);
     fn_8000A818(pDst, aIdentity);
 }
 
 // A 2D projection: the identity, scaled so fWidth by fHeight spans 2 units (-1 to 1).
 void fn_8000AB80(f32 (*pDst)[4], f32 fWidth, f32 fHeight) {
-    fn_8000ADC0(pDst);
+    Mtx_Identity(pDst);
     pDst[0][0] = 2.0f / fWidth;
     pDst[1][1] = 2.0f / fHeight;
 }
@@ -382,7 +382,7 @@ void fn_8000ABE8(f32 (*pDst)[4], f32 fScale, f32 fScaleX, f32 fScaleY, f32 fNear
 // A perspective projection with its x and y scales given, w = -z: depth fFar maps to 0 and
 // fNear to -1 / fNear (-1 only when fNear is 1; fn_8000ABE8 maps it to -1).
 void fn_8000AC5C(f32 (*pDst)[4], f32 fScaleX, f32 fScaleY, f32 fNear, f32 fFar) {
-    fn_8000ADC0(pDst);
+    Mtx_Identity(pDst);
     pDst[0][0] = fScaleX;
     pDst[1][1] = fScaleY;
     pDst[2][2] = -1.0f / (fFar - fNear);
@@ -426,7 +426,7 @@ f32 fabsf(f32 x) {
 }
 
 // Sets a 4x4 matrix to the identity.
-void fn_8000ADC0(f32 (*pDst)[4]) {
+void Mtx_Identity(f32 (*pDst)[4]) {
     pDst[0][0] = 1.0f;
     pDst[0][1] = 0.0f;
     pDst[0][2] = 0.0f;
@@ -468,7 +468,7 @@ void fn_8000AE0C(f32* pSrc, f32* pDst) {
 
 // Scales a 4-float vector into pOut.
 #ifdef __MWERKS__
-asm void fn_8000AE28(register f32 fScale, register f32* pIn, register f32* pOut) {
+asm void Vec_Scale(register f32 fScale, register f32* pIn, register f32* pOut) {
     nofralloc
     fmr      f2, fScale
     psq_l    f0, 0(pIn), 0, 0
@@ -481,7 +481,7 @@ asm void fn_8000AE28(register f32 fScale, register f32* pIn, register f32* pOut)
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_8000AE28(f32 fScale, f32* pIn, f32* pOut) {
+void Vec_Scale(f32 fScale, f32* pIn, f32* pOut) {
     pOut[0] = pIn[0] * fScale;
     pOut[1] = pIn[1] * fScale;
     pOut[2] = pIn[2] * fScale;
@@ -593,7 +593,7 @@ UMemPool* UMemPool_Create(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign) {
     uSize = uAlign + uNodeSize;
     uSize = (uSize - 1) & ~(uAlign - 1);
     uTotal = uAlign + nNodes * uSize;
-    pPool = fn_80009B34(uTotal, uFlags, uAlign, "UMemPool.c", 82);
+    pPool = StaticMem_Alloc(uTotal, uFlags, uAlign, "UMemPool.c", 82);
     if (pPool != NULL) {
         pPool->nNodes = nNodes;
         pPool->nFree = nNodes;
@@ -603,7 +603,7 @@ UMemPool* UMemPool_Create(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign) {
         pNode = (u8*)pPool + uAlign;
         pPrev = NULL;
         while (nNodes-- > 0) {
-            fn_80005AE8(pNode, 0xDD, uSize);
+            Mem_set(pNode, 0xDD, uSize);
             ((UMemPoolNode*)pNode)->pNext = pPrev;
             pPrev = (UMemPoolNode*)pNode;
             pNode += uSize;
@@ -614,7 +614,7 @@ UMemPool* UMemPool_Create(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign) {
 }
 
 void DeleteMemPool(UMemPool* pPool) {
-    fn_80009E70(pPool);
+    StaticMem_Free(pPool);
 }
 
 // Takes a node off the free list and fills it with 0xBB; NULL when the pool is empty.
@@ -625,7 +625,7 @@ void* AllocPoolMem(UMemPool* pPool) {
     if (pNode != NULL) {
         pPool->pFree = pNode->pNext;
         pPool->nFree--;
-        fn_80005AE8(pNode, 0xBB, pPool->uNodeSize);
+        Mem_set(pNode, 0xBB, pPool->uNodeSize);
     }
     return pNode;
 }
@@ -635,7 +635,7 @@ void ReturnPoolMem(UMemPool* pPool, void* p) {
     UMemPoolNode* pNode;
 
     pNode = p;
-    fn_80005AE8(pNode, 0x99, pPool->uNodeSize);
+    Mem_set(pNode, 0x99, pPool->uNodeSize);
     pNode->pNext = pPool->pFree;
     pPool->pFree = pNode;
     pPool->nFree++;

@@ -320,7 +320,7 @@ void fn_80066558(int nPlayer, int nEvent, void* pData, int nArg) {
 
 void fn_800665D4(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1 && !fn_80101AA8(nPlayer, 28)) {
-        fn_80063CF0(fn_80017028(gPlayers[nPlayer].nView[0]), 1, nPlayer);
+        fn_80063CF0(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]), 1, nPlayer);
         fn_8006ACF8(nPlayer, 3);
         fn_80095744(gPlayers[nPlayer].pChar, 13);
     }
@@ -336,7 +336,7 @@ void fn_80066664(int nPlayer, int nEvent, void* pData, int nArg) {
         if (!fn_80101AA8(nPlayer, 29)) {
             fn_80067710(nPlayer, 2, 28);
         }
-        fn_80063CF0(fn_80017028(gPlayers[nPlayer].nView[0]), 3, nPlayer);
+        fn_80063CF0(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]), 3, nPlayer);
         fn_8006ACF8(nPlayer, 2);
         if (Player_IsController8(nPlayer)) {
             fn_80067554(nPlayer);
@@ -353,13 +353,13 @@ void fn_80066664(int nPlayer, int nEvent, void* pData, int nArg) {
 
 void fn_8006676C(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
-        fn_80063CF0(fn_80017028(gPlayers[nPlayer].nView[0]), 30, nPlayer);
+        fn_80063CF0(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]), 30, nPlayer);
     }
 }
 
 void fn_800667C0(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
-        fn_80063CF0(fn_80017028(gPlayers[nPlayer].nView[0]), 31, nPlayer);
+        fn_80063CF0(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]), 31, nPlayer);
         fn_8005C298(nPlayer);
         fn_8005A788(nPlayer, 0);
     }
@@ -381,7 +381,7 @@ void fn_80066828(int nPlayer, int nEvent, void* pData, int nArg) {
 
 void fn_800668A8(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
-        fn_80063CF0(fn_80017028(gPlayers[nPlayer].nView[0]), 8, nPlayer);
+        fn_80063CF0(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]), 8, nPlayer);
         fn_8006ACF8(nPlayer, 4);
         fn_800A5EC0(nPlayer);
         fn_80067710(nPlayer, 2, 9);
@@ -390,7 +390,7 @@ void fn_800668A8(int nPlayer, int nEvent, void* pData, int nArg) {
 
 void fn_80066920(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1 && !fn_80101AA8(nPlayer, 34)) {
-        fn_80063CF0(fn_80017028(gPlayers[nPlayer].nView[0]), 6, nPlayer);
+        fn_80063CF0(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]), 6, nPlayer);
         fn_80067710(nPlayer, 2, 8);
     }
 }
@@ -543,7 +543,7 @@ void fn_80066D78(int nPlayer, int nEvent, void* pData, int nArg) {
 void fn_80066DC4(int nPlayer, int nEvent, void* pData, int nArg) {
     fn_80067710(nPlayer, 2, 20);
     if (gPlayers[nPlayer].ballBefore.nLie == LIE_INCUP_e) {
-        fn_80063CF0(fn_80017028(gPlayers[nPlayer].nView[0]), 11, nPlayer);
+        fn_80063CF0(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]), 11, nPlayer);
     }
 }
 
@@ -637,7 +637,7 @@ void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int b) {
 // nArg 1: the camera, sounds, effects and commentary; otherwise event 36 aborts the simulation.
 void fn_800670A8(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
-        fn_80063CF0(fn_80017028(gPlayers[nPlayer].nView[0]), 7, nPlayer);
+        fn_80063CF0(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]), 7, nPlayer);
         fn_800A5CA4(nPlayer);
         fn_800A3348(pData, nPlayer);
         fn_8006ACF8(nPlayer, 1);
@@ -780,7 +780,7 @@ int fn_80067560(void) {
 }
 
 void fn_80067608(void) {
-    fn_80005AE8(lbl_802811B8, 0, sizeof(SitDevData));
+    Mem_set(lbl_802811B8, 0, sizeof(SitDevData));
     lbl_802811B8->pE8 = NULL;
     lbl_802811B8->n13C = 0;
     Course_RegisterLoader(5, fn_800BB6DC);
@@ -789,10 +789,10 @@ void fn_80067608(void) {
 
 void fn_8006765C(void) {
     if (lbl_802811B8->pD0 != NULL) {
-        fn_80009E70(lbl_802811B8->pD0);
+        StaticMem_Free(lbl_802811B8->pD0);
     }
-    fn_80009E70(lbl_802811B8->pCC);
-    fn_80009E70(lbl_802811B8->pD4);
+    StaticMem_Free(lbl_802811B8->pCC);
+    StaticMem_Free(lbl_802811B8->pD4);
     lbl_80282208 = NULL;
 }
 

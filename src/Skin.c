@@ -78,7 +78,7 @@ void fn_80035640(Character* pChar) {
     int i;
     Skin* pSkin;
 
-    fn_800CB700(&uShadow, "shadow");
+    SKA_PackName(&uShadow, "shadow");
     fn_800CE02C(pChar->pSkin, pChar->n17B4);
     nParts = fn_800CCA40(pChar->pSkin);
     for (i = 0; i < nParts; i++) {
@@ -106,7 +106,7 @@ void fn_80035754(Character* pChar) {
     s32 nParts;
     int i;
 
-    fn_800CB700(&uShadow, "shadow");
+    SKA_PackName(&uShadow, "shadow");
     fn_800CE02C(pChar->pSkin, pChar->n17B4);
     nParts = fn_800CCA40(pChar->pSkin);
     for (i = 0; i < nParts; i++) {
@@ -126,7 +126,7 @@ void fn_80035810(Character* pChar) {
     s32 nShadow;
     int i;
 
-    fn_800CB700(&uShadow, "shadow");
+    SKA_PackName(&uShadow, "shadow");
     if (pChar->p16D8 != NULL) {
         pSkin = pChar->p16D8->apSkins[pChar->nClubClass];
         if (pSkin != NULL) {
@@ -182,7 +182,7 @@ void fn_800358E0(Character* pChar, u32 uFlags) {
             fn_80093824();
         }
         fn_8003614C(pChar, aRoot);
-        fn_80036024(0.5f * fn_8004B78C(fn_8000C594(), aRoot) + 0.5f);
+        fn_80036024(0.5f * fn_8004B78C(Ter_GetTGD(), aRoot) + 0.5f);
         fn_80035FFC();
         fn_80035308();
     }
@@ -208,7 +208,7 @@ void fn_800358E0(Character* pChar, u32 uFlags) {
             fn_80035138(0);
             break;
         }
-        fn_80012EF8();
+        RenderState_Flush();
         fn_8003519C(10, aData);
         fn_80035640(pChar);
     } else {
@@ -223,19 +223,19 @@ void fn_800358E0(Character* pChar, u32 uFlags) {
             fn_80035138(0);
             break;
         }
-        fn_80012EF8();
+        RenderState_Flush();
         fn_80035754(pChar);
     }
     fn_80035FBC();
 }
 
-// The current course, except on course 7, where fn_80015464's value picks another.
+// The current course, except on course 7, where Game_GetCurHoleNum's value picks another.
 int fn_80035A9C(void) {
     int nCourse;
 
     nCourse = Game_GetCourse();
     if (nCourse == 7) {
-        switch (fn_80015464()) {
+        switch (Game_GetCurHoleNum()) {
         case 0:
             return nCourse;
         case 1:
@@ -278,7 +278,7 @@ void fn_80035B40(Character* pChar, int n) {
     if (pChar->p16D8 != NULL) {
         pClub = pChar->p16D8->apSkins[pChar->nClubClass];
         if (pClub != NULL) {
-            fn_8003662C(pClub, pChar->pModel, fn_8001EED8(pChar->pModel, 0x52) - 0x52, 0x52,
+            fn_8003662C(pClub, pChar->pModel, CharModel_GetBoneIndex(pChar->pModel, 0x52) - 0x52, 0x52,
                         pChar->n17B4);
             fn_80036790(pClub, pChar->n17B4);
         }
@@ -347,9 +347,9 @@ void fn_80035D10(Character* pChar, int nView) {
     fill.pPos = lbl_801D4E78.aPos[nView];
     fill.pColour = lbl_801D4E78.aColor[nView];
     fill.pTexCoord = lbl_801D4E78.aUV[nView];
-    fn_80014118(0);
+    RenderState_SetDrawFlags(0);
     fn_80035138(0);
-    fn_80012EF8();
+    RenderState_Flush();
     fn_80036100(&lbl_801D4E78.aMesh[nView], &fill, 1);
     fn_800360D4(&lbl_801D4E78.aMesh[nView]);
 }
@@ -369,7 +369,7 @@ void fn_80035E98(int nView) {
 // ---- sweep code (tidied) ----
 
 void fn_80035F1C(void) {
-    fn_80035F40(fn_8001614C());
+    fn_80035F40(Camera_GetCurrent());
 }
 
 // Hands the camera's screen rectangle on to fn_80016978.
@@ -450,12 +450,12 @@ void fn_80036180(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fWeight) {
         fn_80021980(pBlockA->aBits, pBlockB->aBits, aBits, 20);
         fn_80029EF4(aBits, pBlockOut->aBits, 20);
         for (j = 0; j < 20; j++) {
-            if (fn_8001E9CC(aBits, j)) {
+            if (BitArray_Test(aBits, j)) {
                 pBlockOut->af8[j] = fWeight * (pBlockB->af8[j] - pBlockA->af8[j]) + pBlockA->af8[j];
             }
         }
-        fn_8001E938(pBlockA->aBits, 20);
-        fn_8001E938(pBlockB->aBits, 20);
+        BitArray_ClearAll(pBlockA->aBits, 20);
+        BitArray_ClearAll(pBlockB->aBits, 20);
     }
 }
 
@@ -469,7 +469,7 @@ void fn_80036278(SkinModel44* pEntries, s32 nEntries) {
 
     for (i = 0; i < nEntries; i++) {
         pSrc = pDst = pEntry;
-        fn_8001F08C(&pSrc, &pDst, aFormat, 5, 1);
+        ByteSwap_Records(&pSrc, &pDst, aFormat, 5, 1);
         pEntry++;
     }
 }
@@ -498,7 +498,7 @@ void fn_800363B4(SkinModel54* pEntries, s32 nEntries) {
 
     for (i = 0; i < nEntries; i++) {
         pSrc = pDst = pEntry;
-        fn_8001F08C(&pSrc, &pDst, aFormat, 3, 1);
+        ByteSwap_Records(&pSrc, &pDst, aFormat, 3, 1);
         pEntry++;
     }
 }
@@ -508,7 +508,7 @@ void fn_80036460(int n) {
 
 void fn_80036464(void) {
     if (lbl_80281D70 != NULL) {
-        fn_80009E70(lbl_80281D70);
+        StaticMem_Free(lbl_80281D70);
     }
     lbl_80281D70 = NULL;
     lbl_80281D78 = 0;
@@ -598,7 +598,7 @@ void fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int 
     }
     aMtx = pSkin->p108C;
     for (i = pSkin->pModel->n14; i < nMatrices; i++) {
-        if (fn_8001E9CC(pSkin->p10CC, i)) {
+        if (BitArray_Test(pSkin->p10CC, i)) {
             pEntry = &pSkin->pModel->p54[i];
             nBones = pEntry->nBones;
             memset(aMtx[i], 0, sizeof(aMtx[i]));
@@ -623,7 +623,7 @@ void fn_80036790(Skin* pSkin, int n) {
         pTable = pSkin->a10A0[n];
         nEntries = pSkin->pModel->n40;
         for (i = 0; i < nEntries; i++) {
-            if (fn_8001E9CC(pSkin->p10D0, i)) {
+            if (BitArray_Test(pSkin->p10D0, i)) {
                 fn_80112B18(pTable, pSkin->pModel->p44[i].n0, pSkin->p108C);
             }
         }
@@ -640,7 +640,7 @@ void fn_8003682C(SkinModel* pModel) {
     void* pDst;
 
     pDst = pSrc = pModel;
-    fn_8001F08C(&pSrc, &pDst, aFormat, 26, 1);
+    ByteSwap_Records(&pSrc, &pDst, aFormat, 26, 1);
 }
 
 // Byte-swaps a skin description's header.
@@ -656,7 +656,7 @@ void fn_80036894(SkinDesc* pDesc) {
     void* pDst;
 
     pDst = pSrc = pDesc;
-    fn_8001F08C(&pSrc, &pDst, aFormat, 48, 1);
+    ByteSwap_Records(&pSrc, &pDst, aFormat, 48, 1);
 }
 
 // fake match: EA takes the mesh through an inline; &pDesc->p34[j] in place allocates pMesh r19, not r18
@@ -702,7 +702,7 @@ void fn_800368FC(SkinDesc* pDesc) {
         p = (u8*)pDesc->p14;
         for (j = 0; j < pDesc->n10; j++) {
             pSrc = pDst = p;
-            fn_8001F08C(&pSrc, &pDst, aDesc14, 10, 1);
+            ByteSwap_Records(&pSrc, &pDst, aDesc14, 10, 1);
             p += sizeof(SkinDesc14);
         }
     } else if (pDesc->nVersion == 8 && pDesc->n04 == 0) {
@@ -710,7 +710,7 @@ void fn_800368FC(SkinDesc* pDesc) {
         if (pData != NULL) {
             for (i = 0; i < pDesc->n10; i++) {
                 pSrc = pDst = pData;
-                fn_8001F08C(&pSrc, &pDst, aOld14, 9, 1);
+                ByteSwap_Records(&pSrc, &pDst, aOld14, 9, 1);
                 pData += sizeof(SkinDesc14);
             }
             for (i = 0; i < pDesc->n10; i++) {
@@ -734,7 +734,7 @@ void fn_800368FC(SkinDesc* pDesc) {
     if (pData != NULL) {
         for (i = 0; i < pDesc->n10; i++) {
             pSrc = pDst = pData;
-            fn_8001F08C(&pSrc, &pDst, aDesc18, 3, 1);
+            ByteSwap_Records(&pSrc, &pDst, aDesc18, 3, 1);
             pData += sizeof(SkinDesc18);
         }
     }
@@ -749,7 +749,7 @@ void fn_800368FC(SkinDesc* pDesc) {
     if (pData != NULL && pDesc->n24 != 0) {
         for (i = 0; i < pDesc->n24; i++) {
             pSrc = pDst = pData;
-            fn_8001F08C(&pSrc, &pDst, aDesc28, 5, 1);
+            ByteSwap_Records(&pSrc, &pDst, aDesc28, 5, 1);
             pData += sizeof(SkinDesc28);
         }
         for (i = 0; i < pDesc->n24; i++) {
@@ -763,7 +763,7 @@ void fn_800368FC(SkinDesc* pDesc) {
     if (pData != NULL && pDesc->n2C != 0) {
         for (i = 0; i < pDesc->n2C; i++) {
             pSrc = pDst = pData;
-            fn_8001F08C(&pSrc, &pDst, aMesh, 4, 1);
+            ByteSwap_Records(&pSrc, &pDst, aMesh, 4, 1);
             pData += sizeof(SkinMesh);
         }
     }
@@ -818,7 +818,7 @@ void fn_800368FC(SkinDesc* pDesc) {
     pData = (u8*)pDesc->p44;
     for (i = 0; i < pDesc->n40; i++) {
         pSrc = pDst = pData;
-        fn_8001F08C(&pSrc, &pDst, aDesc44, 12, 1);
+        ByteSwap_Records(&pSrc, &pDst, aDesc44, 12, 1);
         pData += sizeof(SkinDesc44);
     }
 
@@ -826,7 +826,7 @@ void fn_800368FC(SkinDesc* pDesc) {
     if (pData != NULL && pDesc->nParts != 0) {
         for (i = 0; i < pDesc->nParts; i++) {
             pSrc = pDst = pData;
-            fn_8001F08C(&pSrc, &pDst, aPart, 3, 1);
+            ByteSwap_Records(&pSrc, &pDst, aPart, 3, 1);
             pData += sizeof(SkinPartDef);
         }
     }
@@ -835,7 +835,7 @@ void fn_800368FC(SkinDesc* pDesc) {
     if (pData != NULL && pDesc->nVariants != 0) {
         for (i = 0; i < pDesc->nVariants; i++) {
             pSrc = pDst = pData;
-            fn_8001F08C(&pSrc, &pDst, aVariant, 5, 1);
+            ByteSwap_Records(&pSrc, &pDst, aVariant, 5, 1);
             pData += sizeof(SkinVariant);
         }
     }
@@ -852,7 +852,7 @@ void fn_800368FC(SkinDesc* pDesc) {
     if (pData != NULL && pDesc->nLinks != 0) {
         for (i = 0; i < pDesc->nLinks; i++) {
             pSrc = pDst = pData;
-            fn_8001F08C(&pSrc, &pDst, aLink, 2, 1);
+            ByteSwap_Records(&pSrc, &pDst, aLink, 2, 1);
             pData += sizeof(SkinLink);
         }
     }
@@ -867,7 +867,7 @@ void fn_800368FC(SkinDesc* pDesc) {
     if (pData != NULL && pDesc->n70 != 0) {
         for (i = 0; i < pDesc->n70; i++) {
             pSrc = pDst = pData;
-            fn_8001F08C(&pSrc, &pDst, aDesc74, 5, 1);
+            ByteSwap_Records(&pSrc, &pDst, aDesc74, 5, 1);
             pData += sizeof(SkinDesc74);
         }
     }
@@ -876,7 +876,7 @@ void fn_800368FC(SkinDesc* pDesc) {
     if (pData != NULL && pDesc->n78 != 0) {
         for (i = 0; i < pDesc->n78; i++) {
             pSrc = pDst = pData;
-            fn_8001F08C(&pSrc, &pDst, aDesc7C, 4, 1);
+            ByteSwap_Records(&pSrc, &pDst, aDesc7C, 4, 1);
             pData += sizeof(SkinDesc7C);
         }
     }
@@ -885,7 +885,7 @@ void fn_800368FC(SkinDesc* pDesc) {
     if (pData != NULL && pDesc->n88 != 0) {
         for (i = 0; i < pDesc->n88; i++) {
             pSrc = pDst = pData;
-            fn_8001F08C(&pSrc, &pDst, aDesc8C, 5, 1);
+            ByteSwap_Records(&pSrc, &pDst, aDesc8C, 5, 1);
             pData += sizeof(SkinDesc8C);
         }
     }
@@ -894,7 +894,7 @@ void fn_800368FC(SkinDesc* pDesc) {
     if (pData != NULL && pDesc->n90 != 0) {
         for (i = 0; i < pDesc->n90; i++) {
             pSrc = pDst = pData;
-            fn_8001F08C(&pSrc, &pDst, aDesc94, 3, 1);
+            ByteSwap_Records(&pSrc, &pDst, aDesc94, 3, 1);
             pData += 0x50;
         }
     }
@@ -915,7 +915,7 @@ void fn_800368FC(SkinDesc* pDesc) {
     if (pData != NULL && pDesc->nB4 != 0) {
         for (i = 0; i < pDesc->nB4; i++) {
             pSrc = pDst = pData;
-            fn_8001F08C(&pSrc, &pDst, aDescB8, 2, 1);
+            ByteSwap_Records(&pSrc, &pDst, aDescB8, 2, 1);
             pData += sizeof(SkinDescB8);
         }
     }
@@ -941,11 +941,11 @@ s32 fn_800375AC(Skin* pSkin, u8 b) {
     }
     pModel = pSkin->pModel;
     pDesc = pModel->pDesc;
-    pSkin->p108C = fn_80009B34(pModel->n50 * sizeof(*pSkin->p108C), 2, 0x80, "Skin.c", 0x500);
-    pSkin->p10CC = fn_80009B34((pModel->n50 + 31) / 32 * 4, 2, 0, "Skin.c", 0x50C);
-    pSkin->p10D0 = fn_80009B34((pModel->n40 + 31) / 32 * 4, 2, 0, "Skin.c", 0x50D);
-    fn_8001E938(pSkin->p10CC, pModel->n50);
-    fn_8001E938(pSkin->p10D0, pModel->n40);
+    pSkin->p108C = StaticMem_Alloc(pModel->n50 * sizeof(*pSkin->p108C), 2, 0x80, "Skin.c", 0x500);
+    pSkin->p10CC = StaticMem_Alloc((pModel->n50 + 31) / 32 * 4, 2, 0, "Skin.c", 0x50C);
+    pSkin->p10D0 = StaticMem_Alloc((pModel->n40 + 31) / 32 * 4, 2, 0, "Skin.c", 0x50D);
+    BitArray_ClearAll(pSkin->p10CC, pModel->n50);
+    BitArray_ClearAll(pSkin->p10D0, pModel->n40);
     if (pDesc != NULL) {
         fn_800CD700(pSkin);
         nSize = fn_8011CDE8(pSkin);
@@ -983,15 +983,15 @@ s32 fn_80037708(Skin* pSkin) {
     }
     ((void (*)(Skin*))fn_800CE168)(pSkin);  // port: EA passes an argument fn_800CE168 ignores
     if (pSkin->p108C != NULL) {
-        fn_80009E70(pSkin->p108C);
+        StaticMem_Free(pSkin->p108C);
     }
     pSkin->p108C = NULL;
     if (pSkin->p10CC != NULL) {
-        fn_80009E70(pSkin->p10CC);
+        StaticMem_Free(pSkin->p10CC);
     }
     pSkin->p10CC = NULL;
     if (pSkin->p10D0 != NULL) {
-        fn_80009E70(pSkin->p10D0);
+        StaticMem_Free(pSkin->p10D0);
     }
     pSkin->p10D0 = NULL;
     pSkin->u10D4 = pSkin->u10D4 & ~2;
@@ -1016,7 +1016,7 @@ Skin* fn_800377FC(u8* pData, u8 b) {
 
     bOld = fn_800CEE90();
     fn_800CEE88(1);
-    pSkin = fn_80009B34(sizeof(Skin), 2, 0x80, "Skin.c", 0x5C4);
+    pSkin = StaticMem_Alloc(sizeof(Skin), 2, 0x80, "Skin.c", 0x5C4);
     memset(pSkin, 0, sizeof(Skin));
     pModel = (SkinModel*)pData;     // the file's model, then the copy
     if ((pModel->u30 & 0x40000002) != 0x40000002) {
@@ -1041,9 +1041,9 @@ Skin* fn_800377FC(u8* pData, u8 b) {
         nDescSize = 0;
     }
     if (b) {
-        pSkin->pModel = fn_80009B34(nSize, 1, 0x80, "Skin.c", 0x5EF);
+        pSkin->pModel = StaticMem_Alloc(nSize, 1, 0x80, "Skin.c", 0x5EF);
     } else {
-        pSkin->pModel = fn_80009B34(nSize, 2, 0x80, "Skin.c", 0x5F3);
+        pSkin->pModel = StaticMem_Alloc(nSize, 2, 0x80, "Skin.c", 0x5F3);
     }
     memcpy(pSkin->pModel, pModel, nSize);
     pModel = pSkin->pModel;
@@ -1051,9 +1051,9 @@ Skin* fn_800377FC(u8* pData, u8 b) {
     pModel->n08 = nSize;
     if (nDescSize != 0) {
         if (b) {
-            pModel->pDesc = fn_80009B34(nDescSize, 1, 0x80, "Skin.c", 0x604);
+            pModel->pDesc = StaticMem_Alloc(nDescSize, 1, 0x80, "Skin.c", 0x604);
         } else {
-            pModel->pDesc = fn_80009B34(nDescSize, 2, 0x80, "Skin.c", 0x608);
+            pModel->pDesc = StaticMem_Alloc(nDescSize, 2, 0x80, "Skin.c", 0x608);
         }
         memcpy(pModel->pDesc, pDesc, nDescSize);
         fn_800CEF04(pModel->pDesc);
@@ -1070,10 +1070,10 @@ Skin* fn_800377FC(u8* pData, u8 b) {
     fn_8001E8A4(pSkin->pose.a20, 0x80);
     fn_8001E8A4(pSkin->pose.a30, 0x80);
     for (i = 0; i < pModel->n14; i++) {
-        fn_8001E85C(pBones[i].q0, pSkin->pose.aBones[i].q0);
-        fn_8001E85C(pBones[i].v10, pSkin->pose.aBones[i].v10);
+        Quat_Copy(pBones[i].q0, pSkin->pose.aBones[i].q0);
+        Quat_Copy(pBones[i].v10, pSkin->pose.aBones[i].v10);
     }
-    pSkin->p1088 = fn_80009B34(pModel->n14 * sizeof(*pSkin->p1088), 2, 0x80, "Skin.c", 0x62A);
+    pSkin->p1088 = StaticMem_Alloc(pModel->n14 * sizeof(*pSkin->p1088), 2, 0x80, "Skin.c", 0x62A);
     if (pDesc != NULL) {
         fn_801127A0(pDesc);
     }

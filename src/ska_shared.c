@@ -12,7 +12,7 @@
 // Blends rotation pA toward pB by fT into pOut (a slerp from pA to pOut after copying pB there);
 // a non-zero result is renormalised.
 void fn_8001FB00(f32* pA, f32* pB, f32* pOut, f32 fT) {
-    fn_8001E85C(pB, pOut);
+    Quat_Copy(pB, pOut);
     Quat_Slerp(pA, pOut, fT);
     if (0.0f != pOut[0] || 0.0f != pOut[1] || 0.0f != pOut[2] || 0.0f != pOut[3]) {
         Vec_Normalize(pOut, pOut);
@@ -98,8 +98,8 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
     if (pClip->pD8 != NULL) {
         pClip->fCC = fn_80021A98(pClip, fTime);
     }
-    fn_8001E938(pPose->a0, 0x80);
-    fn_8001E938(pPose->a10, 0x80);
+    BitArray_ClearAll(pPose->a0, 0x80);
+    BitArray_ClearAll(pPose->a10, 0x80);
     if (fTime < 0.0f) {
         fTime = 0.0f;
     }
@@ -161,7 +161,7 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
                             pClip->n60 * 16);
                     pChar->buffers[aSlot[i]].p10 = pChar->buffers[aSlot[i]].pBuf + pClip->n60 * 16;
                 } else if (pClip->pE8 != NULL) {
-                    fn_8001E938(aTmp, 0x80);
+                    BitArray_ClearAll(aTmp, 0x80);
                     fn_80021134((u16*)pClip->pE8, (f32*)pChar->buffers[aSlot[i]].p0C, pClip->n60, aTmp);
                     pChar->buffers[aSlot[i]].p10 = pChar->buffers[aSlot[i]].pBuf + pClip->n60 * 16;
                 } else {
@@ -173,7 +173,7 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
             if (fn_80020328(pClip, aFrame[i], (f32*)pChar->buffers[aSlot[i]].p10,
                             (f32*)pChar->buffers[aSlot[i]].p14, pChar->buffers[aSlot[i]].p18) == 0 &&
                 aBits != NULL) {
-                fn_8001E938(aBits, 0x80);
+                BitArray_ClearAll(aBits, 0x80);
             }
             if (nKey == nNext) {
                 aSlot[1] = aSlot[0];
@@ -214,7 +214,7 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
         pBone = &pPose->aBones[i];
         uFlags = pTrack->uFlags;
         if (uFlags & 4) {
-            fn_8001E85C(pRot, pBone->q0);
+            Quat_Copy(pRot, pBone->q0);
             pRot += 4;
         } else if (uFlags & 8) {
             if (uFlags & 0x20) {
@@ -229,12 +229,12 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
         } else {
             continue;
         }
-        fn_8001EA34(pPose->a0, i);
+        BitArray_Set(pPose->a0, i);
         if (pTrack->pKeys != NULL) {
             fn_8001FC0C(pTrack->pKeys + nKey * 3, pTrack->aRange, aA);
             fn_8001FC0C(pTrack->pKeys + nNext * 3, pTrack->aRange, aB);
             fn_8001FBA4(aA, aB, pBone->v10, fFrac);
-            fn_8001EA34(pPose->a10, i);
+            BitArray_Set(pPose->a10, i);
         }
     }
     if (aBits != NULL) {
@@ -474,7 +474,7 @@ void fn_8002091C(Clip* pClip) {
         { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
     };
 
-    fn_8001F08C(&pSrc, &pDst, aHeader, 57, 1);
+    ByteSwap_Records(&pSrc, &pDst, aHeader, 57, 1);
 }
 
 // Byte-swaps nCount of a clip's events (four words each) in place.
@@ -485,7 +485,7 @@ void fn_80020984(ClipEvent* pEvents, int nCount) {
 
     pSrc = pEvents;
     pDst = pEvents;
-    fn_8001F08C(&pSrc, &pDst, aEvent, 4, nCount);
+    ByteSwap_Records(&pSrc, &pDst, aEvent, 4, nCount);
 }
 
 // Byte-swaps a clip's BlendClip in place: its four header words, then its 20 keys.
@@ -497,8 +497,8 @@ void fn_80020A20(BlendClip* pBlend) {
 
     pSrc = pBlend;
     pDst = pBlend;
-    fn_8001F08C(&pSrc, &pDst, aHeader, 4, 1);
-    fn_8001F08C(&pSrc, &pDst, aKey, 6, 20);
+    ByteSwap_Records(&pSrc, &pDst, aHeader, 4, 1);
+    ByteSwap_Records(&pSrc, &pDst, aKey, 6, 20);
 }
 
 // Byte-swaps nCount 16-byte records (four words each) in place.
@@ -509,7 +509,7 @@ void fn_80020B2C(void* pRecords, int nCount) {
 
     pSrc = pRecords;
     pDst = pRecords;
-    fn_8001F08C(&pSrc, &pDst, aRecord, 4, nCount);
+    ByteSwap_Records(&pSrc, &pDst, aRecord, 4, nCount);
 }
 
 // Byte-swaps the clip read from disc at p in place: header, events, BlendClip and tracks, then the
@@ -679,14 +679,14 @@ void fn_80020FF8(f32* pOut, f32 fX, f32 fY, f32 fZ) {
     f32 fCosXY;
 
     fHalfX = 0.5f * fX;
-    fSinX = fn_800095F0(fHalfX);
-    fCosX = fn_80009638(fHalfX);
+    fSinX = Math_Sin(fHalfX);
+    fCosX = Math_Cos(fHalfX);
     fHalfZ = 0.5f * fZ;
-    fSinZ = fn_800095F0(fHalfZ);
-    fCosZ = fn_80009638(fHalfZ);
+    fSinZ = Math_Sin(fHalfZ);
+    fCosZ = Math_Cos(fHalfZ);
     fHalfY = 0.5f * fY;
-    fSinY = fn_800095F0(fHalfY);
-    fCosY = fn_80009638(fHalfY);
+    fSinY = Math_Sin(fHalfY);
+    fCosY = Math_Cos(fHalfY);
     fCosXY = fCosX * fCosY;
     pOut[3] = fCosZ * fCosXY - fSinZ * (fSinX * fSinY);
     pOut[0] = fSinZ * (fCosX * fSinY) + fSinX * (fCosZ * fCosY);
@@ -705,10 +705,10 @@ void fn_80021134(u16* p, f32* pOut, s32 nBones, u32* pBits) {
 
     for (i = 0, nBit = 0; i < nBones; pOut += 4, nBit += 2, i++) {
         uKind = 0;
-        if (fn_8001E9CC(pBits, (u32)i * 2)) {
+        if (BitArray_Test(pBits, (u32)i * 2)) {
             uKind = 1;
         }
-        if (fn_8001E9CC(pBits, nBit + 1)) {
+        if (BitArray_Test(pBits, nBit + 1)) {
             uKind |= 2;
         }
         switch (uKind) {
@@ -755,10 +755,10 @@ void SKAUtil_EulerAnglesToQTs8(u8* p, f32* pOut, s32 nBones, u32* pBits, u16* aB
 
     for (i = 0, nBit = 0; i < nBones; aBase += 3, pOut += 4, nBit += 2, i++) {
         uKind = 0;
-        if (fn_8001E9CC(pBits, (u32)i * 2)) {
+        if (BitArray_Test(pBits, (u32)i * 2)) {
             uKind = 1;
         }
-        if (fn_8001E9CC(pBits, nBit + 1)) {
+        if (BitArray_Test(pBits, nBit + 1)) {
             uKind |= 2;
         }
         switch (uKind) {

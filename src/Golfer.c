@@ -79,8 +79,8 @@ u8 Golfer_IsLucky(int nPlayer) {
     if (gPlayers[nPlayer].ball.nLie != LIE_GREEN_e && gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e &&
         !gSession.nSplitScreen) {
         Game_CurrentPinSet();
-        fn_8000C594();
-        if (fn_800D2B08() == 3) {
+        Ter_GetTGD();
+        if (Course_GetCurHolePar() == 3) {
             bLucky = 1;
         } else if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PITCH_e) {
             bLucky = 1;

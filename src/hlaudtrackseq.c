@@ -344,7 +344,7 @@ void fn_800AAE08(AudTrack* pTrack) {
     pTrack->u.seq.n67 = 0xFF;
     pTrack->u.seq.n68 = 0;
     pTrack->u.seq.n69 = 0;
-    fn_80005AE8(pTrack->u.seq.apEvents, 0, sizeof(pTrack->u.seq.apEvents));
+    Mem_set(pTrack->u.seq.apEvents, 0, sizeof(pTrack->u.seq.apEvents));
 }
 
 void fn_800AAE70(AudTrack* pTrack) {

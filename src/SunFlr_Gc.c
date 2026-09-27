@@ -44,7 +44,7 @@ void fn_8009A340(void) {
 void fn_8009A344(s32 nView, SunFlrView* pView) {
     memset(pView->aPart, 0, 2 * sizeof(pView->aPart[0]));
     pView->nC = 576;
-    pView->pBuffer = fn_80009B34(4 * 576, 2, 32, "SunFlr_Gc.c", 110);
+    pView->pBuffer = StaticMem_Alloc(4 * 576, 2, 32, "SunFlr_Gc.c", 110);
     pView->aPart[0].p1C = pView->pBuffer;
     pView->aPart[1].p1C = pView->pBuffer + 576;
     pView->aPart[2].p1C = pView->pBuffer + 2 * 576;
@@ -53,7 +53,7 @@ void fn_8009A344(s32 nView, SunFlrView* pView) {
 
 // Frees view nView's buffer (the view number is not used).
 void fn_8009A3D0(s32 nView, SunFlrView* pView) {
-    fn_80009E70(pView->pBuffer);
+    StaticMem_Free(pView->pBuffer);
 }
 
 // ---- end of sweep code ----
@@ -87,7 +87,7 @@ void fn_8009A3F4(s32 nView) {
     int nHeight;
 
     pView = &lbl_802813B8->aView[nView];
-    pCamera = fn_80017004(nView);
+    pCamera = ViewController_GetCamera(nView);
 
     // The sun on the screen, kept within +-500000.
     v[0] = pView->f98;

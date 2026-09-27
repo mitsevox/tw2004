@@ -39,7 +39,7 @@ void fn_80035F40(void* pCamera);            // Skin.c
 void fn_80037DD8(void) {
     lbl_80281D80 = NULL;
     if (gSession.nGameType >= 4 && gSession.nGameType <= 8) {
-        lbl_80281D80 = fn_80009B34(GXGetTexBufferSize(256, 224, 6, 0, 0), 2, 0x20, "GoPostFx.c", 119);
+        lbl_80281D80 = StaticMem_Alloc(GXGetTexBufferSize(256, 224, 6, 0, 0), 2, 0x20, "GoPostFx.c", 119);
     }
     fn_80037E50();
 }
@@ -81,7 +81,7 @@ void fn_800392D0(void);
 
 void fn_80037F80(void) {
     if (lbl_80281D80 != NULL) {
-        fn_80009E70(lbl_80281D80);
+        StaticMem_Free(lbl_80281D80);
         lbl_80281D80 = NULL;
     }
 }
@@ -129,12 +129,12 @@ void fn_80038128(void) {
     f32 aColour[8][4];
 
     fn_8001425C(0);
-    fn_80012F34(0);
-    fn_80012F18(7);
-    fn_80014118(0x40);
-    fn_80035118(4, 5);
-    fn_80012F50(0, 6, 0x80);
-    fn_80012EF8();
+    RenderState_SetDepthWrite(0);
+    RenderState_SetDepthFunc(7);
+    RenderState_SetDrawFlags(0x40);
+    RenderState_SetBlendFactors(4, 5);
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_Flush();
 
     aXY[0][0] = 0.495f;
     aXY[0][1] = 0.0f;
@@ -203,10 +203,10 @@ void fn_80038128(void) {
     aColour[7][3] = 0.0f;
 
     fn_8001644C(0x98, aXY[0], aColour[0], NULL, 8);
-    fn_80012F34(1);
-    fn_80012F18(3);
-    fn_80012F50(1, 6, 0x80);
-    fn_80012EF8();
+    RenderState_SetDepthWrite(1);
+    RenderState_SetDepthFunc(3);
+    RenderState_SetAlphaTest(1, 6, 0x80);
+    RenderState_Flush();
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -260,26 +260,26 @@ void fn_80038438(void) {
     f32 fW;
 
     fn_8001425C(0);
-    fn_80012F34(0);
-    fn_80014118(0x40);
-    fn_80012F18(7);
-    fn_80035118(4, 5);
-    fn_80012F50(0, 6, 0x80);
-    fn_80012EF8();
-    pRect = fn_80012EF0(fn_8001614C());
+    RenderState_SetDepthWrite(0);
+    RenderState_SetDrawFlags(0x40);
+    RenderState_SetDepthFunc(7);
+    RenderState_SetBlendFactors(4, 5);
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_Flush();
+    pRect = fn_80012EF0(Camera_GetCurrent());
     fX = pRect[0];
     fY = pRect[1];
     fW = pRect[2];
     fH = pRect[3];
     for (i = 0; i < 4; i++) {
         if (lbl_801D50C0[i].b0 && fn_800170A0(i)) {
-            pViewRect = fn_80012EF0(fn_80017004(i));
+            pViewRect = fn_80012EF0(ViewController_GetCamera(i));
             fn_800171D8(pRect, pViewRect[0], pViewRect[1], pViewRect[2], pViewRect[3]);
             fn_80035240(NULL);
-            fn_80013CCC(fn_8001614C());
-            fn_80013EEC(fn_8001614C());
+            fn_80013CCC(Camera_GetCurrent());
+            fn_80013EEC(Camera_GetCurrent());
             fn_80016B9C();
-            fn_80012EF8();
+            RenderState_Flush();
             fn_800141F8(aXY, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
             fn_80014194(lbl_801D50C0[i].aColour);
             fn_8001644C(0xA1, aXY, NULL, NULL, 2);
@@ -288,13 +288,13 @@ void fn_80038438(void) {
     }
     fn_800171D8(pRect, fX, fY, fW, fH);
     fn_80035240(NULL);
-    fn_80013CCC(fn_8001614C());
-    fn_80013EEC(fn_8001614C());
+    fn_80013CCC(Camera_GetCurrent());
+    fn_80013EEC(Camera_GetCurrent());
     fn_80016B9C();
-    fn_80012F34(1);
-    fn_80012F18(3);
-    fn_80012F50(1, 6, 0x80);
-    fn_80012EF8();
+    RenderState_SetDepthWrite(1);
+    RenderState_SetDepthFunc(3);
+    RenderState_SetAlphaTest(1, 6, 0x80);
+    RenderState_Flush();
 }
 
 // Draws pColour over the whole screen.
@@ -304,19 +304,19 @@ void fn_80038624(f32* pColour) {
 
     fn_8001425C(0);
     fn_80016948();
-    fn_80012F34(0);
-    fn_80012F18(7);
-    fn_80014118(0x40);
-    fn_80035118(4, 5);
-    fn_80012F50(0, 6, 0x80);
-    fn_80012EF8();
+    RenderState_SetDepthWrite(0);
+    RenderState_SetDepthFunc(7);
+    RenderState_SetDrawFlags(0x40);
+    RenderState_SetBlendFactors(4, 5);
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_Flush();
     fn_800141F8(aXY, aUV, 0.0f, 0.0f, 1.0f, 1.0f);
     fn_80014194(pColour);
     fn_8001644C(0xA1, aXY, NULL, NULL, 2);
-    fn_80012F34(1);
-    fn_80012F18(3);
-    fn_80012F50(1, 6, 0x80);
-    fn_80012EF8();
+    RenderState_SetDepthWrite(1);
+    RenderState_SetDepthFunc(3);
+    RenderState_SetAlphaTest(1, 6, 0x80);
+    RenderState_Flush();
 }
 
 // Copies view nView's colour to pOut.
@@ -338,18 +338,18 @@ void fn_80038724(int nField, int nView, f32 fAlpha, f32 fShake) {
     f32 fDX;
     f32 fDY;
 
-    pRect = ((RenderCamera*)fn_80017004(nView))->pRect;
+    pRect = ((RenderCamera*)ViewController_GetCamera(nView))->pRect;
     fX = pRect[0];
     fY = pRect[1];
     fRight = pRect[0] + pRect[2];
     fBottom = pRect[1] + pRect[3];
-    fn_80012F34(0);
-    fn_80014118(0x50);
-    fn_80035118(4, 5);
+    RenderState_SetDepthWrite(0);
+    RenderState_SetDrawFlags(0x50);
+    RenderState_SetBlendFactors(4, 5);
     fn_80035098(1);
     fn_80035154(255.0f * fAlpha);
-    fn_80012F50(0, 1, 0x80);
-    fn_80012F18(7);
+    RenderState_SetAlphaTest(0, 1, 0x80);
+    RenderState_SetDepthFunc(7);
     fn_8002A608(nField ? &lbl_801D4FB0[0] : &lbl_801D4FB0[1]);
     fn_800141F8(aXY, NULL, fX, fY, fRight, fBottom);
     aUV[0] = aXY[0];
@@ -368,14 +368,14 @@ void fn_80038724(int nField, int nView, f32 fAlpha, f32 fShake) {
     aColour[3] = 1.0f;
     fn_80014194(aColour);
     fn_8001425C(0);
-    fn_80012EF8();
+    RenderState_Flush();
     GXSetTevAlphaIn(1, 7, 7, 7, 0);
     fn_8001644C(0xA1, aXY, NULL, aUV, 2);
-    fn_80012F34(1);
-    fn_80012F50(1, 6, 0x80);
-    fn_80012F18(3);
+    RenderState_SetDepthWrite(1);
+    RenderState_SetAlphaTest(1, 6, 0x80);
+    RenderState_SetDepthFunc(3);
     fn_80035098(0);
-    fn_80012EF8();
+    RenderState_Flush();
 }
 
 // With any view's lbl_801D5090 effect set, calls fn_80038A2C for the current render camera.
@@ -384,7 +384,7 @@ void fn_80038968(void) {
 
     for (i = 0; i < 4; i++) {
         if (lbl_801D5090[i].b0) {
-            fn_80038A2C(lbl_80281B88 & 1, fn_8001614C());
+            fn_80038A2C(lbl_80281B88 & 1, Camera_GetCurrent());
             return;
         }
     }
@@ -396,7 +396,7 @@ void fn_800389C0(void) {
 
     for (i = 0; i < 4; i++) {
         if (lbl_801D5090[i].b0) {
-            fn_80038A6C(lbl_80281B88 & 1, fn_80017004(i));
+            fn_80038A6C(lbl_80281B88 & 1, ViewController_GetCamera(i));
         }
     }
 }
@@ -430,7 +430,7 @@ void fn_80038A90(f32* pColour, f32 fCX, f32 fCY, u8 bCopy, int nView, int nField
     f32 fDYSq;
     f32 fAlpha;
 
-    pCamera = fn_80017004(nView);
+    pCamera = ViewController_GetCamera(nView);
     pRect = pCamera->pRect;
     if (bCopy) {
         fn_800390CC(nField, pCamera);
@@ -441,30 +441,30 @@ void fn_80038A90(f32* pColour, f32 fCX, f32 fCY, u8 bCopy, int nView, int nField
     fY1 = fY0 + pRect[3];
     fCX = fCX * pRect[2] + pRect[0];
     fCY = fCY * pRect[3] + pRect[1];
-    fn_80012F34(0);
+    RenderState_SetDepthWrite(0);
     if (bCopy) {
-        fn_80014118(0x50);
+        RenderState_SetDrawFlags(0x50);
     } else {
-        fn_80014118(0x40);
+        RenderState_SetDrawFlags(0x40);
     }
-    fn_80035118(4, 5);
-    fn_80012F50(0, 1, 0x80);
-    fn_80012F18(7);
+    RenderState_SetBlendFactors(4, 5);
+    RenderState_SetAlphaTest(0, 1, 0x80);
+    RenderState_SetDepthFunc(7);
     fn_8002A608(&lbl_801D4F80);
     fn_8001425C(0);
-    fn_80012EF8();
+    RenderState_Flush();
 
     // The distance to the farthest corner of the screen.
     if (fCX < 0.5f) {
         if (fCY < 0.5f) {
-            fMaxDist = fn_80009680((1.0f - fCY) * (1.0f - fCY) + (1.0f - fCX) * (1.0f - fCX));
+            fMaxDist = Math_Sqrt((1.0f - fCY) * (1.0f - fCY) + (1.0f - fCX) * (1.0f - fCX));
         } else {
-            fMaxDist = fn_80009680(fCY * fCY + (1.0f - fCX) * (1.0f - fCX));
+            fMaxDist = Math_Sqrt(fCY * fCY + (1.0f - fCX) * (1.0f - fCX));
         }
     } else if (fCY < 0.5f) {
-        fMaxDist = fn_80009680(fCX * fCX + (1.0f - fCY) * (1.0f - fCY));
+        fMaxDist = Math_Sqrt(fCX * fCX + (1.0f - fCY) * (1.0f - fCY));
     } else {
-        fMaxDist = fn_80009680(fCY * fCY + fCX * fCX);
+        fMaxDist = Math_Sqrt(fCY * fCY + fCX * fCX);
     }
 
     aXY[0][0] = fCX;
@@ -495,17 +495,17 @@ void fn_80038A90(f32* pColour, f32 fCX, f32 fCY, u8 bCopy, int nView, int nField
     aUV[17][1] = 224.0f * fY0 / 128.0f;
     aUV[17][2] = 1.0f;
     aUV[17][3] = 1.0f;
-    fAlpha = pColour[3] * ((f32)fn_80009680(fDXSq + fDYSq) / fMaxDist);
+    fAlpha = pColour[3] * ((f32)Math_Sqrt(fDXSq + fDYSq) / fMaxDist);
     fAlpha = (fAlpha < 0.0f) ? 0.0f : ((fAlpha > pColour[3]) ? pColour[3] : fAlpha);
     aColour[17][0] = pColour[0];
     aColour[17][1] = pColour[1];
     aColour[17][2] = pColour[2];
     aColour[17][3] = fAlpha;
     fn_8001644C(0xA0, aXY[0], aColour[0], aUV[0], 18);
-    fn_80012F34(1);
-    fn_80012F50(1, 6, 0x80);
-    fn_80012F18(3);
-    fn_80012EF8();
+    RenderState_SetDepthWrite(1);
+    RenderState_SetAlphaTest(1, 6, 0x80);
+    RenderState_SetDepthFunc(3);
+    RenderState_Flush();
 }
 
 // Fills n vertices of a fan edge running from (fX0, fY0) towards (fX1, fY1): each gets pSrc's
@@ -535,7 +535,7 @@ void fn_80038E7C(f32* pXY, f32* pColour, f32* pUV, int n, f32* pSrc, f32 fCX, f3
         fY = (f32)i * ((fY1 - fY0) / (f32)nVerts) + fY0;
         fDXSq = (fX - fCX) * (fX - fCX);
         fDYSq = (fY - fCY) * (fY - fCY);
-        fAlpha = pIn[3] * ((f32)fn_80009680(fDXSq + fDYSq) / fMaxDist);
+        fAlpha = pIn[3] * ((f32)Math_Sqrt(fDXSq + fDYSq) / fMaxDist);
         fAlpha = (fAlpha < 0.0f) ? 0.0f : ((fAlpha > pIn[3]) ? pIn[3] : fAlpha);
         pOutXY[0] = fX;
         pOutXY[1] = fY;
@@ -572,10 +572,10 @@ void fn_800390CC(int nField, RenderCamera* pCamera) {
     fY = pRect[1];
     fRight = pRect[0] + pRect[2];
     fBottom = pRect[1] + pRect[3];
-    fn_80012F34(0);
-    fn_80014118(0x10);
-    fn_80012F50(0, 1, 0x80);
-    fn_80012F18(7);
+    RenderState_SetDepthWrite(0);
+    RenderState_SetDrawFlags(0x10);
+    RenderState_SetAlphaTest(0, 1, 0x80);
+    RenderState_SetDepthFunc(7);
     fn_8002A608(nField ? &lbl_801D4FB0[1] : &lbl_801D4FB0[0]);
     fn_800140E8(1, 256, 224, 0, 1, 1);
     fn_80016B54(256, 128, 1.0f, 1.0f);
@@ -592,15 +592,15 @@ void fn_800390CC(int nField, RenderCamera* pCamera) {
     aColour[3] = 1.0f;
     fn_80014194(aColour);
     fn_8001425C(0);
-    fn_80012EF8();
+    RenderState_Flush();
     fn_8001644C(0xA1, aXY, NULL, aUV, 2);
     fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
-    fn_80012F34(1);
-    fn_80012F50(1, 6, 0x80);
-    fn_80012F18(3);
+    RenderState_SetDepthWrite(1);
+    RenderState_SetAlphaTest(1, 6, 0x80);
+    RenderState_SetDepthFunc(3);
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80035F40(pCamera);
-    fn_80012EF8();
+    RenderState_Flush();
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -635,18 +635,18 @@ void fn_80039358(int nView) {
         aColour[2] = 0.0f;
         aColour[3] = lbl_80281F78->f208 * f;
         fn_8001425C(0);
-        fn_80014118(0x40);
-        fn_80035118(4, 5);
-        fn_80012F34(0);
-        fn_80012F18(7);
-        fn_80012F50(0, 6, 0x80);
+        RenderState_SetDrawFlags(0x40);
+        RenderState_SetBlendFactors(4, 5);
+        RenderState_SetDepthWrite(0);
+        RenderState_SetDepthFunc(7);
+        RenderState_SetAlphaTest(0, 6, 0x80);
         fn_80014194(aColour);
-        fn_80012EF8();
+        RenderState_Flush();
         fn_800141F8(aXY, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
         fn_8001644C(0xA1, aXY, NULL, NULL, 2);
-        fn_80012F34(1);
-        fn_80012F18(3);
-        fn_80012F50(1, 6, 0x80);
-        fn_80012EF8();
+        RenderState_SetDepthWrite(1);
+        RenderState_SetDepthFunc(3);
+        RenderState_SetAlphaTest(1, 6, 0x80);
+        RenderState_Flush();
     }
 }

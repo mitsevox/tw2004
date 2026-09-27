@@ -39,14 +39,14 @@ void fn_800B90F4(PictFile* (*pfnRead)(void* pArg), void* pArg) {
 
 void fn_800B9100(PictFrame* pFrame, int nWidth, int nHeight) {
     pFrame->nRefs = 0;
-    pFrame->pPixels = fn_80009B34((u32)(nHeight * nWidth * 3) >> 1, 1, 32, "rcmp_mad_codec.c", 79);
+    pFrame->pPixels = StaticMem_Alloc((u32)(nHeight * nWidth * 3) >> 1, 1, 32, "rcmp_mad_codec.c", 79);
     pFrame->nWidth = nWidth;
     pFrame->nHeight = nHeight;
 }
 
 void fn_800B9178(PictFrame* pFrame) {
     if (pFrame->pPixels != NULL) {
-        fn_80009E70(pFrame->pPixels);
+        StaticMem_Free(pFrame->pPixels);
         pFrame->pPixels = NULL;
     }
 }
@@ -78,7 +78,7 @@ void fn_800B920C(MadDecoder* p) {
         }
     }
     if (p->pFrames != NULL) {
-        fn_80009E70(p->pFrames);
+        StaticMem_Free(p->pFrames);
     }
 }
 
@@ -176,7 +176,7 @@ PictFrame* fn_800B94CC(MadDecoder* p, PictFile* pFile) {
         p->fFrameTime = 1000.0f / (p->nRate / 65535.0f);
         p->nWidth = pFile->nWidth;
         p->nHeight = pFile->nHeight;
-        pFrame = fn_80009B34(6 * sizeof(PictFrame), 1, 32, "rcmp_mad_codec.c", 473);
+        pFrame = StaticMem_Alloc(6 * sizeof(PictFrame), 1, 32, "rcmp_mad_codec.c", 473);
         p->pFrames = pFrame;
         for (i = 0; i < 6; i++) {
             fn_800B9100(pFrame, p->nWidth, p->nHeight);
@@ -192,7 +192,7 @@ PictFrame* fn_800B94CC(MadDecoder* p, PictFile* pFile) {
 
 void fn_800B95FC(PictFile* pFile) {
     if (pFile != NULL) {
-        fn_80009E70(pFile);
+        StaticMem_Free(pFile);
     }
 }
 
@@ -310,8 +310,8 @@ char lbl_802814FC[] = "logoea";
 
 void fn_800B99BC(UStreamObject* pObject);
 void fn_800B99FC(UStreamObject* arg0);
-void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);
-void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity
+void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);
+void Mtx_Identity(f32 (*pMtx)[4]);                   // identity
 void fn_8000C5A4(f32 (*pMtx)[4]);
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
@@ -332,7 +332,7 @@ void fn_800B9988(void) {
 // A 'BALF' object is a texture bank.
 void fn_800B99BC(UStreamObject* pObject) {
     lbl_802821D4 = fn_8000FB88(pObject, NULL, 0);
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -352,7 +352,7 @@ void fn_800B9A50(void* arg0) {
 
     temp_r31 = (*(void**)((u8*)(arg0) + 4));
     fn_800075CC(*(UObjModelRoot**)((u8*)(temp_r31) + 0x10));
-    fn_80009E70(temp_r31);
+    StaticMem_Free(temp_r31);
 }
 
 // ---- end of sweep code ----
@@ -381,11 +381,11 @@ void fn_800B9AAC(void) {
     lbl_802821D8 = NULL;
     if (lbl_802821D4 != NULL) {
         fn_8000FFAC(lbl_802821D4);
-        fn_80009E70(lbl_802821D4);
+        StaticMem_Free(lbl_802821D4);
         lbl_802821D4 = NULL;
     }
     if (lbl_802821D0 != NULL) {
-        fn_80009E70(lbl_802821D0);
+        StaticMem_Free(lbl_802821D0);
         lbl_802821D0 = NULL;
     }
 }
@@ -422,20 +422,20 @@ void fn_800B9BF4(UObject* pObj, f32 (*mBone)[4], f32 (*mScale)[4], f32* pPos) {
     f32 m40[4][4];
     f32 m80[4][4];
 
-    fn_8000A0E8(pObj->m0, m0);
-    fn_8000A0E8(pObj->m40, m40);
-    fn_8000A0E8(pObj->m80, m80);
+    Mtx_Copy(pObj->m0, m0);
+    Mtx_Copy(pObj->m40, m40);
+    Mtx_Copy(pObj->m80, m80);
     fn_800BAE5C(mBone, pObj->m0, pObj->m0, 3);
     fn_800BAE5C(mScale, pObj->m40, pObj->m40, 3);
     fn_8000C5A4(pObj->m0);
     Vec_Copy(pPos, pObj->m80[3]);
     pObj->m80[3][3] = 1.0f;
     fn_800BADF8(lbl_80281EE0->mC0, pObj->m80, pObj->m80, 4);
-    fn_8000ADC0(pObj->m0);
+    Mtx_Identity(pObj->m0);
     fn_80048894(pObj);
-    fn_8000A0E8(m0, pObj->m0);
-    fn_8000A0E8(m40, pObj->m40);
-    fn_8000A0E8(m80, pObj->m80);
+    Mtx_Copy(m0, pObj->m0);
+    Mtx_Copy(m40, pObj->m40);
+    Mtx_Copy(m80, pObj->m80);
 }
 
 // Draw the ball in the create-a-player golfer's hand (bone 0x54), when he holds it: to the
@@ -452,7 +452,7 @@ void fn_800B9CF0(u8 bTarget) {
         vPos[3] = 1.0f;
         fn_8001EB8C(lbl_80281EE0->pB4->pChar, 0x54, vPos);
         mBone = fn_8001ED08(lbl_80281EE0->pB4->pChar, 0x54);
-        fn_8000ADC0(mScale);
+        Mtx_Identity(mScale);
         mScale[0][0] = lbl_802814F0;
         mScale[1][1] = lbl_802814F4;
         mScale[2][2] = lbl_802814F8;
@@ -461,11 +461,11 @@ void fn_800B9CF0(u8 bTarget) {
         } else {
             fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 1, 1);
         }
-        fn_80013EEC(fn_8001614C());
-        fn_80035118(4, 5);
-        fn_80012F50(0, 6, 0x80);
-        fn_80012F34(1);
-        fn_80012EF8();
+        fn_80013EEC(Camera_GetCurrent());
+        RenderState_SetBlendFactors(4, 5);
+        RenderState_SetAlphaTest(0, 6, 0x80);
+        RenderState_SetDepthWrite(1);
+        RenderState_Flush();
         if (lbl_802821E0 != NULL) {
             fn_800B9BF4(lbl_802821E0, mBone, mScale, vPos);
         }
@@ -479,8 +479,8 @@ void fn_800B9CF0(u8 bTarget) {
         }
         fn_80035240(NULL);
         fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
-        fn_80013EEC(fn_8001614C());
-        fn_80012EF8();
+        fn_80013EEC(Camera_GetCurrent());
+        RenderState_Flush();
     }
 }
 
@@ -502,8 +502,8 @@ void fn_800B9EB8(char* szBall) {
         lbl_802814E8 = 0;
         return;
     }
-    fn_800CB700(&uLogo, szBall);
-    fn_800CB700(&uSlot, lbl_802814FC);
+    SKA_PackName(&uLogo, szBall);
+    SKA_PackName(&uSlot, lbl_802814FC);
     fn_800102DC(uSlot, &pSlotBank, &pSlot);
     if (pSlotBank == NULL || pSlot == NULL) {
         return;

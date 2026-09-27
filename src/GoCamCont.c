@@ -194,9 +194,9 @@ void CameraController_Idle(View* pView, int nPlayer) {
         CameraController_ShakeCamera(pView);
         pView->script.fF0 -= gSession.fFrameTime;
     }
-    if ((f32)fn_80009680(fn_8005CC18(pView->v20)) == 0.0f) {
+    if ((f32)Math_Sqrt(fn_8005CC18(pView->v20)) == 0.0f) {
         fn_80064108(pView);
-        if ((f32)fn_80009680(fn_8005CC18(pView->v20)) == 0.0f) {
+        if ((f32)Math_Sqrt(fn_8005CC18(pView->v20)) == 0.0f) {
             pView->v20[0] = 1.0f;
             pView->v20[1] = 0.0f;
             pView->v20[2] = 0.0f;
@@ -212,8 +212,8 @@ void CameraController_Idle(View* pView, int nPlayer) {
 void CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int nView) {
     int nPrevView;
 
-    fn_8001731C(pView);
-    fn_80017314(pView);
+    CameraController_GetPosition(pView);
+    CameraController_GetTarget(pView);
     if (pView->nCurCamera == nCamera) {
         return;
     }
@@ -303,8 +303,8 @@ void CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int n
 
 // Starts the player's shot of kind nKind on the view and runs its script from the start.
 void fn_8006351C(View* pView, int nPlayer, int nKind) {
-    f32* pPos = fn_8001731C(pView);
-    f32* pAt = fn_80017314(pView);
+    f32* pPos = CameraController_GetPosition(pView);
+    f32* pAt = CameraController_GetTarget(pView);
     CamShot* pShot = DynamicCam_ChooseScript(nPlayer, nKind, NULL);
 
     if (pShot != NULL) {
@@ -343,7 +343,7 @@ u8 fn_80063608(int nPlayer, f32* pPos, f32 fMargin) {
     f32 fY;
     f32 fZ;
 
-    if (fn_8006434C(fn_80017004(gPlayers[nPlayer].nView[0]), pPos, &fX, &fY, &fZ)) {
+    if (fn_8006434C(ViewController_GetCamera(gPlayers[nPlayer].nView[0]), pPos, &fX, &fY, &fZ)) {
         if (fX < 1.0f - fMargin && fX > fMargin && fY < 1.0f - fMargin && fY > fMargin) {
             return 1;
         }
@@ -384,13 +384,13 @@ int fn_80063758(void) {
     return -2;
 }
 
-// View nView is the player's first view and fn_8001707C gives it to the player, and its shots pass
+// View nView is the player's first view and ViewController_GetPlayer gives it to the player, and its shots pass
 // the tests below (camera 4 when it has no shot).
 u8 fn_800637C4(int nPlayer, int nView) {
     View* pView;
 
-    if (gPlayers[nPlayer].nView[0] == nView && fn_8001707C(nView) == nPlayer) {
-        pView = fn_80017028(gPlayers[nPlayer].nView[0]);
+    if (gPlayers[nPlayer].nView[0] == nView && ViewController_GetPlayer(nView) == nPlayer) {
+        pView = ViewController_GetCameraController(gPlayers[nPlayer].nView[0]);
         if (pView->script.pShot != NULL) {
             if ((pView->nCurCamera == 15 || pView->nCurCamera == 16) && fn_800C72DC(pView)) {
                 return 1;
@@ -422,8 +422,8 @@ void fn_800638B8(View* pView, int nPlayer) {
 // toward the object, not too fast, while looking toward it goes back on the fairway. Directions
 // are taken flat.
 void fn_80063920(int nView, f32* pBounds) {
-    View* pView = fn_80017028(nView);
-    int nPlayer = fn_8001707C(nView);
+    View* pView = ViewController_GetCameraController(nView);
+    int nPlayer = ViewController_GetPlayer(nView);
     f32 vObj[4];
     f32 vToObj[4];
     f32 vLook[4];
@@ -440,8 +440,8 @@ void fn_80063920(int nView, f32* pBounds) {
     if (!gpGame->b289) {
         return;
     }
-    pPos = fn_8001731C(pView);
-    pAt = fn_80017314(pView);
+    pPos = CameraController_GetPosition(pView);
+    pAt = CameraController_GetTarget(pView);
     if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SIMULATE) {   // fake match: (s8), see game.h
         return;
     }
@@ -460,22 +460,22 @@ void fn_80063920(int nView, f32* pBounds) {
     vMove[0] = pView->script.v60[0];
     vMove[1] = 0.0f;
     vMove[2] = pView->script.v60[2];
-    fSpeed = fn_80009680(fn_80009744(vMove));
+    fSpeed = Math_Sqrt(Vec3_LengthSqClamped(vMove));
     fn_80064478(vObj, pPos, vToObj);
     vToObj[1] = 0.0f;
     if (vToObj[0] != 0.0f || vToObj[1] != 0.0f || vToObj[2] != 0.0f) {
-        fn_800BAF04(vToObj, vToObj);
+        Vec_NormalizeTo(vToObj, vToObj);
     }
     if (vMove[0] != 0.0f || vMove[1] != 0.0f || vMove[2] != 0.0f) {
-        fn_800BAF04(vMove, vMove);
+        Vec_NormalizeTo(vMove, vMove);
     }
-    fMoveCos = fn_8000C5FC(vMove, vToObj);
+    fMoveCos = Vec3_Dot(vMove, vToObj);
     fn_80064478(pAt, pPos, vLook);
     vLook[1] = 0.0f;
     if (vLook[0] != 0.0f || vLook[1] != 0.0f || vLook[2] != 0.0f) {
-        fn_800BAF04(vLook, vLook);
+        Vec_NormalizeTo(vLook, vLook);
     }
-    fLookCos = fn_8000C5FC(vLook, vToObj);
+    fLookCos = Vec3_Dot(vLook, vToObj);
     if (fSpeed <= 0.0f) {
         return;
     }
@@ -535,8 +535,8 @@ void fn_80063CBC(View* pView, f32* pVec) {
 // only 5, 8 and 10 replace it, 6 is never taken, 2 and 3 do not replace 7, and 7 does not replace
 // 2 or 3.
 void fn_80063CF0(View* pView, int nKind, int nPlayer) {
-    f32* pPos = fn_8001731C(pView);
-    f32* pAt = fn_80017314(pView);
+    f32* pPos = CameraController_GetPosition(pView);
+    f32* pAt = CameraController_GetTarget(pView);
     f32 vNormal[4];
     f32 vSpeed[4] = {0.1f, 0.1f, 0.1f, 0.5f};
     SurfaceType* pSurface;
@@ -560,7 +560,7 @@ void fn_80063CF0(View* pView, int nKind, int nPlayer) {
         }
     }
     if (nKind == 7) {
-        if (!(fn_8004DBB0(fn_8000C594(), gPlayers[nPlayer].ball.vPos, &pSurface, vNormal) < -60000.0f)
+        if (!(fn_8004DBB0(Ter_GetTGD(), gPlayers[nPlayer].ball.vPos, &pSurface, vNormal) < -60000.0f)
             && pSurface != NULL && (pSurface->nClass == 7 || pSurface->nClass == 16)) {
             nKind = 10;
         }
@@ -599,28 +599,28 @@ void fn_80063F08(f32* pA, f32* pB, f32* pOut) {
         return;
     }
     if (pA[0] != 0.0f || pA[1] != 0.0f || pA[2] != 0.0f) {
-        fn_800BAF04(pA, vA);
+        Vec_NormalizeTo(pA, vA);
     } else {
         vA[0] = 0.0f;
         vA[1] = 0.0f;
         vA[2] = 0.0f;
     }
     if (pB[0] != 0.0f || pB[1] != 0.0f || pB[2] != 0.0f) {
-        fn_800BAF04(pB, vB);
+        Vec_NormalizeTo(pB, vB);
     } else {
         vB[0] = 0.0f;
         vB[1] = 0.0f;
         vB[2] = 0.0f;
     }
-    fAngle = fn_80009614(fn_8000C5FC(vA, vB) < -1.0f  ? -1.0f
-                         : fn_8000C5FC(vA, vB) > 1.0f ? 1.0f
-                                                      : fn_8000C5FC(vA, vB));
+    fAngle = fn_80009614(Vec3_Dot(vA, vB) < -1.0f  ? -1.0f
+                         : Vec3_Dot(vA, vB) > 1.0f ? 1.0f
+                                                      : Vec3_Dot(vA, vB));
     fAngle *= 0.2f;
     vec4flt_CrossProduct(vA, vB, vAxis);
     if (vAxis[0] != 0.0f || vAxis[1] != 0.0f || vAxis[2] != 0.0f) {
-        fn_800BAF04(vAxis, vAxis);
+        Vec_NormalizeTo(vAxis, vAxis);
     }
-    fn_8001EF34(fAngle, vAxis, vAxis);
+    Vec3_Scale(fAngle, vAxis, vAxis);
     Quat_BuildFromVector(vAxis, qTurn);
     vA[3] = 0.0f;
     Quat_RotateVector(qTurn, vA, pOut);
@@ -640,13 +640,13 @@ void fn_80064108(View* pView) {
         vDir[0] = 0.01f;
     }
     if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
-        fn_800BAF04(vDir, vDir);
+        Vec_NormalizeTo(vDir, vDir);
     }
     vec4flt_CrossProduct(vUp, vDir, vSide);
     if (pView->script.pShot == NULL) {
         pView->script.fA8 = 0.0f;
     }
-    fn_8001EF34(pView->script.fA8, vDir, vDir);
+    Vec3_Scale(pView->script.fA8, vDir, vDir);
     Quat_BuildFromVector(vDir, qTurn);
     vSide[3] = 0.0f;
     Quat_RotateVector(qTurn, vSide, pView->v20);
@@ -670,9 +670,10 @@ u8 fn_800642B0(void) {
 
 // Blends the view's script into its current shot.
 void fn_800642D0_ReapplyCurrentShot(View* pView, int nPlayer) {
-    f32* pPos = fn_8001731C(pView);
+    f32* pPos = CameraController_GetPosition(pView);
 
-    CameraScript_InterpToNewScript(&pView->script, pView->script.pShot, nPlayer, pPos, fn_80017314(pView), 5,
+    CameraScript_InterpToNewScript(&pView->script, pView->script.pShot, nPlayer, pPos,
+                                   CameraController_GetTarget(pView), 5,
                                    0.0f, 100.0f, 25, 0.0f);
 }
 
@@ -688,11 +689,11 @@ u8 fn_8006434C(void* pCamera, f32* pPos, f32* pX, f32* pY, f32* pZ) {
         bInFront = 0;
     }
     if (v[3] < -0.0001f || v[3] > 0.0001f) {
-        fn_8000AE28(1.0f / v[3], v, v);
+        Vec_Scale(1.0f / v[3], v, v);
     } else if (v[3] < 0.0f) {
-        fn_8000AE28(-10000.0f, v, v);
+        Vec_Scale(-10000.0f, v, v);
     } else {
-        fn_8000AE28(10000.0f, v, v);
+        Vec_Scale(10000.0f, v, v);
     }
     if (pX != NULL) {
         *pX = 0.5f * (1.0f + v[0]);

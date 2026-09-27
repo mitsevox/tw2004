@@ -92,14 +92,14 @@ s32 EASBio_WaitForAsyncProcessToComplete(void) {
 // Copies the 'EASI' icon into the manager's buffer.
 void fn_80124B10(UStreamObject* pObject) {
     Mem_cpy(lbl_80281988->pIcon, pObject->pData, pObject->uSize);
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // Sets up the manager for the front end: no pictures yet, room for the icon, nothing pending.
 void fn_80124B54(void) {
     lbl_80281988->pCurrentGameImage = NULL;
     lbl_80281988->pOurGameImage = NULL;
-    lbl_80281988->pIcon = fn_80009B34(0x2000, 2, 32, "EASportsBio.c", 454);
+    lbl_80281988->pIcon = StaticMem_Alloc(0x2000, 2, 32, "EASportsBio.c", 454);
     lbl_8028257D = 0;
     lbl_8028257C = 0;
     lbl_80282578 = 0;
@@ -249,13 +249,13 @@ void fn_80124C10(void) {
 
 void fn_801250C0(void) {
     if (lbl_80281988->pCurrentGameImage != NULL) {
-        fn_80009E70(lbl_80281988->pCurrentGameImage);
+        StaticMem_Free(lbl_80281988->pCurrentGameImage);
     }
     if (lbl_80281988->pOurGameImage != NULL) {
-        fn_80009E70(lbl_80281988->pOurGameImage);
+        StaticMem_Free(lbl_80281988->pOurGameImage);
     }
     if (lbl_80281988->pIcon != NULL) {
-        fn_80009E70(lbl_80281988->pIcon);
+        StaticMem_Free(lbl_80281988->pIcon);
     }
 }
 
@@ -326,7 +326,7 @@ s32 fn_801252D0(s32 nPort, s32 nSlot) {
     EASBErrorE eError;
 
     nMount = fn_8009D74C(0, 0);
-    fn_8009DBAC(0, 0);
+    MC_Unmount(0, 0);
     if (nMount == -25) return -25;
     eError = fn_8012D5E4(lbl_80281988->pIcon, lbl_80281988->pOurGameImage);
     if (eError != EASB_ERROR_NONE) return EASBio_ConvertError(eError);
@@ -341,7 +341,7 @@ s32 fn_80125354(s32 arg0, s32 arg1) {
     EASBErrorE eError;
 
     nMount = fn_8009D74C(0, 0);
-    fn_8009DBAC(0, 0);
+    MC_Unmount(0, 0);
     if (nMount == -25) return -25;
     eError = fn_8012D560();
     if (eError != EASB_ERROR_NONE) return EASBio_ConvertError(eError);

@@ -196,7 +196,7 @@ changes. Read from the disassembly, not yet verified by matching:
 - `cam+0x224` = result of `fn_80014280(0.5 * fov)` (looks like a tangent); `cam+0x228` = its reciprocal.
 - `cam+0x1FC` and `cam+0x200` = half-extents of the view, built from `0x224` and viewport values.
   `0x1FC` feeds the planes the cull test uses with `x`, `0x200` the ones used with `y`.
-- Each edge plane is made by normalizing `(1, extent, 0)` with `fn_800BAF04`; the two results are
+- Each edge plane is made by normalizing `(1, extent, 0)` with `Vec_NormalizeTo`; the two results are
   stored as a pair (set A: `0x204`/`0x20C` and `0x208`/`0x210`).
 - **Set B (`0x214` - `0x220`) is the same thing with the extents multiplied by 2.0** (constant at
   `0x80282B7C`). So mode 1 of the cull test is a view twice as wide: a loose second-chance test.
@@ -292,7 +292,7 @@ The assert strings settle it: the four `../../../Source/...` files are EA's cros
 - `TagFile.c` (`src/Common/TagFile/TagFile.c`, 41 functions, done): the save-data container.
   See "Save file format" below.
 - `ChecksumCRC32.c` guards the save data; the XOR cipher scrambles it.
-- The host game calls in through an assert stub `fn_8012214C` (4 bytes in retail) and an allocator
+- The host game calls in through an assert stub `TibExt_AssertHandler` (4 bytes in retail) and an allocator
   `fn_801220D4(pAllocator, size, align, __FILE__, __LINE__)` / `fn_80122128(...)`.
 
 Save file format (from TagFile.c)
@@ -381,7 +381,7 @@ Leads and loose ends
 - `fn_8000B508`, `fn_8000B54C`, `fn_8000B70C`: linked-list search family (head pointer at
   `0x80281BFC`, `next` at `0xC`, two ID fields at `0x1C` and `0x20`). C for `fn_8000B70C` already
   produces matching bytes; not yet added to the project.
-- `fn_8001E85C`: copies four floats one at a time, unlike `Vec3Copy` which interleaves. Different
+- `Quat_Copy`: copies four floats one at a time, unlike `Vec3Copy` which interleaves. Different
   source form (struct assignment?) or different file flags. Unexplained.
 - Eleven functions in the EA region use the old-style function opening. Unexamined; may be a
   library built with an older compiler.

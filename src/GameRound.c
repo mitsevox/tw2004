@@ -361,21 +361,21 @@ void fn_800E1260(int nPreset) {
             }
             break;
         case 4:
-            if (fn_800D2AD8(i) == 5) {
+            if (Course_GetHolePar(i) == 5) {
                 gpGame->bHoleSelected[i] = 1;
             } else {
                 gpGame->bHoleSelected[i] = 0;
             }
             break;
         case 5:
-            if (fn_800D2AD8(i) == 4) {
+            if (Course_GetHolePar(i) == 4) {
                 gpGame->bHoleSelected[i] = 1;
             } else {
                 gpGame->bHoleSelected[i] = 0;
             }
             break;
         case 6:
-            if (fn_800D2AD8(i) == 3) {
+            if (Course_GetHolePar(i) == 3) {
                 gpGame->bHoleSelected[i] = 1;
             } else {
                 gpGame->bHoleSelected[i] = 0;
@@ -507,7 +507,7 @@ int fn_800E184C(int nPlayer, u8 bCurrent) {
     }
     for (i = 0; i < nEnd; i++) {
         if (gpGame->bHoleSelected[i]) {
-            nPar += fn_800D2AD8(i);
+            nPar += Course_GetHolePar(i);
             nStrokes += gPlayers[nPlayer].nStrokes[i];
         }
     }
@@ -936,7 +936,7 @@ s32 fn_800E295C(void) {
 // The start of a hole: every player's ball on their tee, the look-ahead copy and the saved
 // positions reset, and everyone waiting.
 void fn_800E299C(void) {
-    CourseInfo* pCourse = fn_8000C594();
+    CourseInfo* pCourse = Ter_GetTGD();
     int         i;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         gPlayers[i].ball.nLie = 0;
@@ -1021,11 +1021,11 @@ u8 fn_800E2DB4(int nPlayer) {
     if (fn_800E39F0()) {
         return 0;
     }
-    pCourse = fn_8000C594();
+    pCourse = Ter_GetTGD();
     nPinSet = Game_CurrentPinSet();
     dx = gPlayers[nPlayer].ball.vPos[0] - pCourse->pin[nPinSet].x;
     dz = gPlayers[nPlayer].ball.vPos[2] - pCourse->pin[nPinSet].z;
-    fDist = fn_80009680(dx * dx + dz * dz);
+    fDist = Math_Sqrt(dx * dx + dz * dz);
     b = Ter_Use3DCupGeometry();
     if ((b && gPlayers[nPlayer].ball.nLie == LIE_INCUP_e) || (!b && fDist < 0.5f)) {
         gPlayers[nPlayer].ball.nLie = LIE_INCUP_e;

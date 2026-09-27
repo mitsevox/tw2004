@@ -41,7 +41,7 @@ void fn_80037AB8(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst) {
             Quat_Add(pParent->v10, aTurned, pSkin->pModel->p34[i].v10);
             pSkin->pModel->p34[i].v10[3] = 0.0f;
             Quat_Multiply(pSkin->pModel->p34[i].q0, pParent->q0, aQuat);
-            fn_8001E85C(aQuat, pSkin->pModel->p34[i].q0);
+            Quat_Copy(aQuat, pSkin->pModel->p34[i].q0);
         }
         for (i = 0; i < pSkin->pModel->n14; i++) {
             Quat_QuatToMatrix(pSkin->pModel->p34[i].q0, aMtx);
@@ -60,11 +60,11 @@ void fn_80037C48(Skin* pSkin, SkelPose* pPose) {
     if (pSkin != NULL) {
         pBlock = &((SkelPose1*)pPose)->aBlocks[0];
         for (i = 5; i < 20; i++) {
-            if (fn_8001E9CC(pBlock->aBits, i)) {
+            if (BitArray_Test(pBlock->aBits, i)) {
                 fn_8011CADC(pSkin, i - 5, pBlock->af8[i]);
             }
         }
-        fn_8001E938(pBlock->aBits, 20);
+        BitArray_ClearAll(pBlock->aBits, 20);
     }
 }
 
@@ -80,14 +80,14 @@ void fn_80037CD8(Skin* pSkin) {
     if (pModel != NULL) {
         if (pModel->pDesc != NULL) {
             fn_801127C4(pModel->pDesc);
-            fn_80009E70(pSkin->pModel->pDesc);
+            StaticMem_Free(pSkin->pModel->pDesc);
         }
-        fn_80009E70(pSkin->pModel);
+        StaticMem_Free(pSkin->pModel);
     }
     if (pSkin->p1088 != NULL) {
-        fn_80009E70(pSkin->p1088);
+        StaticMem_Free(pSkin->p1088);
     }
-    fn_80009E70(pSkin);
+    StaticMem_Free(pSkin);
 }
 
 // ---- end of sweep code ----
@@ -98,7 +98,7 @@ void fn_80037D5C(SkinDesc* pDesc) {
 
     for (i = 0; i < pDesc->n2C; i++) {
         if (pDesc->p34[i].pBits != NULL && (pDesc->p34[i].uFlags & 0x400000)) {
-            fn_80009E70(pDesc->p34[i].pBits);
+            StaticMem_Free(pDesc->p34[i].pBits);
         }
     }
 }

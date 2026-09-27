@@ -97,7 +97,7 @@ s32 GameModeMatch_GetHonors(int nPlayer) {
     if (nPlayer == 5 && nBest == 5) {
         return 5;
     }
-    pCourse = fn_8000C594();
+    pCourse = Ter_GetTGD();
     nPinSet = Game_CurrentPinSet();
     fBest = 0.0f;
     nBest = 5;
@@ -105,7 +105,7 @@ s32 GameModeMatch_GetHonors(int nPlayer) {
         if (i != nPlayer && !Player_IsHoled(i) && PLAYER(i)->ball.nLie != LIE_GREEN_e) {
             dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
             dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
-            d = fn_80009680(dx * dx + dz * dz);
+            d = Math_Sqrt(dx * dx + dz * dz);
             if (d > fBest) {
                 fBest = d;
                 nBest = i;
@@ -119,7 +119,7 @@ s32 GameModeMatch_GetHonors(int nPlayer) {
             if (i != nPlayer && !Player_IsHoled(i)) {
                 dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
                 dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
-                d = fn_80009680(dx * dx + dz * dz);
+                d = Math_Sqrt(dx * dx + dz * dz);
                 if (d > fBest) {
                     fBest = d;
                     nBest = i;
@@ -312,8 +312,8 @@ void GameModeMatch_EndGame(void) {
             if (gpSaveData[nProfile].bActive) {
                 EASBio_SetCurrentGameWon(1);
                 if (nMoney) {
-                    fn_800E4364(0, 0x6B, nPrize, nProfile);
-                    fn_800D3548(nWinner, nMoney, 0);
+                    GUI_QueueMessage(0, 0x6B, nPrize, nProfile);
+                    GM_Earnings_AwardMoney(nWinner, nMoney, 0);
                     gPlayers[nWinner].money.n14 += nPrize;
                     gPlayers[nWinner].money.n10 = gPlayers[nWinner].money.n24 - nPrize;
                 }

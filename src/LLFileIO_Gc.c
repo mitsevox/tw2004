@@ -136,7 +136,7 @@ int fn_80005EC0(void) {
 
     DVDInit();
     OSInitSemaphore(&lbl_8019D540, 0);
-    fn_80005AE8(lbl_8019EAD0, 0, sizeof(lbl_8019EAD0));
+    Mem_set(lbl_8019EAD0, 0, sizeof(lbl_8019EAD0));
     for (j = 0; j < 32; j++) {
         lbl_8019EAD0[j].nEntry = -1;
         lbl_8019EAD0[j].szPath[0] = 0;
@@ -146,8 +146,8 @@ int fn_80005EC0(void) {
     for (; i < 2; i++) {
         pQueue = &lbl_8019E868[i];
         pPool = &lbl_8019E880[i];
-        fn_80005AE8(pQueue, 0, sizeof(FileQueue));
-        fn_80005AE8(pPool, 0, sizeof(FileReqPool));
+        Mem_set(pQueue, 0, sizeof(FileQueue));
+        Mem_set(pPool, 0, sizeof(FileReqPool));
         pQueue->pNext = (FileReq*)pQueue;
         pPool->pNext = (FileReq*)pPool;
         pQueue->pPrev = (FileReq*)pQueue;
@@ -347,7 +347,7 @@ void* fn_800065C8(const char* szPath, u32* puSize, int nAlign) {
     }
     nLen = info.uLength;
     uSize = nLen;
-    pData = fn_80009B34(nLen, 1, nAlign, "LLFileIO_Gc.c", 750);
+    pData = StaticMem_Alloc(nLen, 1, nAlign, "LLFileIO_Gc.c", 750);
     if (pData == NULL) {
         return NULL;
     }

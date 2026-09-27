@@ -39,7 +39,7 @@ void fn_8000B8F4(void) {
         if (lbl_801A2614[i]) {
             fn_8000FFAC(lbl_801A26DC[i]);
         }
-        fn_80009E70(lbl_801A26DC[i]);
+        StaticMem_Free(lbl_801A26DC[i]);
         lbl_801A26DC[i] = NULL;
     }
 }
@@ -69,7 +69,7 @@ void fn_8000BA6C(void) {
 void fn_8000BA94(UStreamObject* pObject) {
     lbl_801A25F0.uSize = pObject->uSize;
     Mem_cpy(lbl_80281C04, pObject->pData, pObject->uSize);
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 void fn_8000BAE0(void) {
@@ -126,12 +126,12 @@ void fn_8000BCA0(UStreamObject* pObject) {
         Mem_cpy(lbl_80281C0C, pObject, sizeof(UStreamObject));
         Mem_cpy(lbl_80281C08, pObject->pData, TXF2_KEPT_SIZE);
         lbl_80281C0C->pData = lbl_80281C08;
-        fn_80009E70(pObject);
+        StaticMem_Free(pObject);
         return;
     }
     lbl_801A26DC[n] = fn_8000FB88(pObject, NULL, 0);
     lbl_801A2614[n] = 1;
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
     lbl_80281C00++;
 }
 
@@ -186,6 +186,6 @@ int Game_GetMode(void) {
 u64 fn_8000BEE4(char* pName) {
     u64 uHash = 0;
 
-    fn_800CB700(&uHash, pName);
+    SKA_PackName(&uHash, pName);
     return uHash;
 }

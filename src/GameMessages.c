@@ -281,7 +281,7 @@ void fn_800E5798(void) {
     MsgArg args[3];
     if ((s8)lbl_802822E4 != 0) {
         if (lbl_802822E4 & 1) {
-            fn_80005AE8(args, 0, sizeof(args));
+            Mem_set(args, 0, sizeof(args));
             args[0].i = 15;
             args[1].f = 0.0f;
             args[2].i = lbl_802822E0;
@@ -316,7 +316,7 @@ void fn_800E5798(void) {
 void fn_800E58B4(int nMsg) {
     MsgArg arg;
     fn_800E5908(nMsg);
-    fn_80005AE8(&arg, 0, sizeof(arg));
+    Mem_set(&arg, 0, sizeof(arg));
     UISProcessHint(lbl_80281F1C->pHandler, nMsg, 0, &arg);
 }
 
@@ -327,7 +327,7 @@ void fn_800E5908(int nMsg) {
 void fn_800E590C(int nMsg, u32 uFloats, void* pA) {
     MsgArg args[1];
     fn_800E5908(nMsg);
-    fn_80005AE8(args, 0, sizeof(args));
+    Mem_set(args, 0, sizeof(args));
     if (uFloats & 1) {
         args[0].f = *(f32*)pA;
     }
@@ -341,7 +341,7 @@ void fn_800E590C(int nMsg, u32 uFloats, void* pA) {
 void fn_800E5998(int nMsg, u32 uFloats, void* pA, void* pB) {
     MsgArg args[2];
     fn_800E5908(nMsg);
-    fn_80005AE8(args, 0, sizeof(args));
+    Mem_set(args, 0, sizeof(args));
     if (uFloats & 1) {
         args[0].f = *(f32*)pA;
     }
@@ -359,7 +359,7 @@ void fn_800E5998(int nMsg, u32 uFloats, void* pA, void* pB) {
 // Three values.
 void fn_800E5A4C(int nMsg, u32 uFloats, void* pA, void* pB, void* pC) {
     MsgArg args[3];
-    fn_80005AE8(args, 0, sizeof(args));
+    Mem_set(args, 0, sizeof(args));
     fn_800E5908(nMsg);
     if (uFloats & 1) {
         args[0].f = *(f32*)pA;
@@ -384,7 +384,7 @@ void fn_800E5A4C(int nMsg, u32 uFloats, void* pA, void* pB, void* pC) {
 void fn_800E5B0C(int nMsg, u32 uFloats, void* pA, void* pB, void* pC, void* pD, void* pE) {
     MsgArg args[5];
     fn_800E5908(nMsg);
-    fn_80005AE8(args, 0, sizeof(args));
+    Mem_set(args, 0, sizeof(args));
     if (uFloats & 1) {
         args[0].f = *(f32*)pA;
     }
@@ -419,7 +419,7 @@ void fn_800E5C08(int nMsg, char* pStr) {
     MsgString str;
     MsgArg arg;
     fn_800E5908(nMsg);
-    fn_80005AE8(&arg, 0, sizeof(arg));
+    Mem_set(&arg, 0, sizeof(arg));
     str.pStr = pStr;
     arg.p = &str;
     ((MsgString*)arg.p)->nLen = strlen(pStr);
@@ -434,7 +434,7 @@ u8 fn_800E5C84(void) {
 void fn_800E5CA4(int a, int b, int c, int d, int e, int g, int h, f32 f) {
     MsgArg args[8];
     fn_800E5908(0x42);
-    fn_80005AE8(args, 0, sizeof(args));
+    Mem_set(args, 0, sizeof(args));
     args[0].i = a;
     args[1].i = b;
     args[2].i = c;

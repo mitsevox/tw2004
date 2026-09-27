@@ -27,8 +27,8 @@ void fn_800358E0(Character* pChar, u32 uFlags);
 u8   fn_8001EC48(Character* pChar);
 void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
 void fn_80013D5C(void* pCamera);        // makes it the current render camera
-void fn_8000ADC0(f32 (*pMtx)[4]);       // identity
-void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: copy a 4x4 matrix
+void Mtx_Identity(f32 (*pMtx)[4]);       // identity
+void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: copy a 4x4 matrix
 void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: inverts a rotation+translation
 void fn_8001728C(CamLens* pLens);
 f32  fn_80014280(f32 x);                // tan, as a float
@@ -133,11 +133,11 @@ void fn_800B251C_ShadowInit(u8 bHigh) {
     s32 aDesc[2];
 
     fn_800B2314();
-    lbl_80282170 = fn_80009B34(0x6000, 2, 16, "shadow.c", 180);
-    lbl_8028216C = fn_80009B34(0x2000, 2, 16, "shadow.c", 181);
-    lbl_80282168 = fn_80009B34(0x4000, 2, 16, "shadow.c", 182);
-    lbl_80282164 = fn_80009B34(0x1000, 2, 16, "shadow.c", 183);
-    lbl_80282160 = fn_80009B34(0x1000, 2, 16, "shadow.c", 184);
+    lbl_80282170 = StaticMem_Alloc(0x6000, 2, 16, "shadow.c", 180);
+    lbl_8028216C = StaticMem_Alloc(0x2000, 2, 16, "shadow.c", 181);
+    lbl_80282168 = StaticMem_Alloc(0x4000, 2, 16, "shadow.c", 182);
+    lbl_80282164 = StaticMem_Alloc(0x1000, 2, 16, "shadow.c", 183);
+    lbl_80282160 = StaticMem_Alloc(0x1000, 2, 16, "shadow.c", 184);
     p->pLens = CA_spCreateCamera();
     p->pRect = VM_spCreateViewport();
     p->pFrameBuf = FB_spCreateFrameBuffer();
@@ -195,11 +195,11 @@ void fn_800B2734(void) {
         p->pLens = NULL;
     }
     fn_800B246C();
-    fn_80009E70(lbl_80282170);
-    fn_80009E70(lbl_8028216C);
-    fn_80009E70(lbl_80282168);
-    fn_80009E70(lbl_80282164);
-    fn_80009E70(lbl_80282160);
+    StaticMem_Free(lbl_80282170);
+    StaticMem_Free(lbl_8028216C);
+    StaticMem_Free(lbl_80282168);
+    StaticMem_Free(lbl_80282164);
+    StaticMem_Free(lbl_80282160);
     fn_800B235C();
 }
 
@@ -212,9 +212,9 @@ void fn_800B281C(void) {
     fn_80016948();
     fn_800169AC();
     fn_8001425C(0);
-    fn_80014118(0);
-    fn_80012F50(0, 6, 0x80);
-    fn_80012EF8();
+    RenderState_SetDrawFlags(0);
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_Flush();
     aColour[0] = 0.0f;
     aColour[1] = 0.0f;
     aColour[2] = 0.0f;
@@ -264,7 +264,7 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     int         j;
     int         k;
 
-    pOldCamera = fn_8001614C();
+    pOldCamera = Camera_GetCurrent();
     fn_80013D5C(p->pCamera);
     fMinX = 1000000.0f;
     fMaxX = -1000000.0f;
@@ -275,7 +275,7 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
         fn_8001EB8C(pChar, 0x47, vA);
         fn_8001EB8C(pChar, 0x39, vB);
         fn_800B3460(vA, vB, vPos);
-        fn_8000AE28(0.5f, vPos, vPos);
+        Vec_Scale(0.5f, vPos, vPos);
     } else {
         fn_8001EB8C(pChar, 0, vPos);
     }
@@ -283,7 +283,7 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     if (bFlat) {
         fGround = 0.0f;
     } else {
-        pCourse = fn_8000C594();
+        pCourse = Ter_GetTGD();
         if (pCourse != NULL) {
             Ter_GetEnclosingGroundHeight(pCourse, vPos, &fLow, &fHigh);
             fGround = fHigh;
@@ -323,7 +323,7 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
                 vCorner[2] = fZ;
                 vCorner[3] = 1.0f;
                 fn_800BAD60(aLight, (Vec4*)vCorner, (Vec4*)vOut);
-                fn_8000AE28(1.0f / vOut[3], vOut, vOut);
+                Vec_Scale(1.0f / vOut[3], vOut, vOut);
                 if (vOut[0] > fMaxX) {
                     fMaxX = vOut[0];
                 }
@@ -349,7 +349,7 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     p->f424 = fHalfX;
     p->f428 = fHalfZ;
     // the shadow camera: the square seen from above, scaled to fill the texture
-    fn_8000ADC0(aView);
+    Mtx_Identity(aView);
     aView[0][0] = 1.0f / fHalfX;
     aView[2][2] = 0.0f;
     aView[1][1] = 0.0f;
@@ -361,30 +361,30 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     fn_800BADF8(aView, aLight, aMtx, 4);
     fn_800B3484(fn_8001F004(), aMtx);
     fn_800352BC();
-    fn_80013CCC(fn_8001614C());
+    fn_80013CCC(Camera_GetCurrent());
     fn_800140E8(0, p->nWidth, p->nHeight, 0, 4, 1);
-    fn_80013EEC(fn_8001614C());
+    fn_80013EEC(Camera_GetCurrent());
     fn_80016B9C();
-    fn_80014118(0);
-    fn_80012F34(0);
-    fn_80012F50(0, 6, 0x80);
-    fn_80012F18(7);
+    RenderState_SetDrawFlags(0);
+    RenderState_SetDepthWrite(0);
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_SetDepthFunc(7);
     fn_800760B0(0, 0, p->nWidth, p->nHeight);
     fn_800B281C();
     fn_800760B0(1, 1, p->nWidth - 1, p->nHeight - 1);
-    fn_80012EF8();
+    RenderState_Flush();
     ((void (*)(int))fn_80035604)(2);   // port: EA passes an argument fn_80035604 ignores
     fn_800358E0(pChar, 2);
     fn_800B2470();
     fn_80016B54(0x200, 0x1C0, 1.0f, 1.0f);
-    fn_80012F34(1);
-    fn_80012F50(1, 6, 0x80);
-    fn_80012F18(3);
+    RenderState_SetDepthWrite(1);
+    RenderState_SetAlphaTest(1, 6, 0x80);
+    RenderState_SetDepthFunc(3);
     fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
     fn_800760B0(0, 0, 0x200, 0x1C0);
     fn_80013D5C(pOldCamera);
-    fn_80013EEC(fn_8001614C());
-    fn_80012EF8();
+    fn_80013EEC(Camera_GetCurrent());
+    RenderState_Flush();
 }
 
 // The flat shadow: the square pQuad (four corners around pCentre, 2*fHalfX by 2*fHalfZ) as one
@@ -424,16 +424,16 @@ void fn_800B2DB0(f32* pCentre, f32 (*pQuad)[4], f32 fHalfX, f32 fHalfZ) {
     }
     fn_80035240(lbl_80281EE0->mC0);
     fn_800352BC();
-    fn_80013CCC(fn_8001614C());
-    fn_80014118(0x70);
+    fn_80013CCC(Camera_GetCurrent());
+    RenderState_SetDrawFlags(0x70);
     fn_8002A608(&p->tex);
     fn_80016B9C();
     fn_80035138(0);
-    fn_80012F50(0, 6, 0x80);
-    fn_80012F18(7);
-    fn_80012F34(0);
-    fn_80035118(4, 5);
-    fn_80012EF8();
+    RenderState_SetAlphaTest(0, 6, 0x80);
+    RenderState_SetDepthFunc(7);
+    RenderState_SetDepthWrite(0);
+    RenderState_SetBlendFactors(4, 5);
+    RenderState_Flush();
     desc.n0 = 4;
     desc.nVerts = 4;
     desc.pDraw = NULL;
@@ -443,9 +443,9 @@ void fn_800B2DB0(f32* pCentre, f32 (*pQuad)[4], f32 fHalfX, f32 fHalfZ) {
     desc.pUV = aUV[0];
     fn_80036100((ShaderObject*)p->aMesh[0], &desc, 1);
     fn_800360D4(p->aMesh[0]);
-    fn_80012F50(1, 6, 0x80);
-    fn_80012F18(6);
-    fn_80012F34(1);
+    RenderState_SetAlphaTest(1, 6, 0x80);
+    RenderState_SetDepthFunc(6);
+    RenderState_SetDepthWrite(1);
 }
 
 // Draw the golfer's shadow texture onto the ground: a square 2*f424 by 2*f428 around v414. When
@@ -512,23 +512,23 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
         fn_800B2DB0(vCentre, aQuad, fHalfX, fHalfZ);
         return;
     }
-    pCourse = fn_8000C594();
+    pCourse = Ter_GetTGD();
     if (pCourse == NULL) {
         return;
     }
     nList = fn_800CB950(pCourse, aQuad[0], aQuad[1], aQuad[2], aQuad[3], aList, 0x200, 0x60);
     fn_80035240(NULL);
     fn_80035294();
-    fn_80013EEC(fn_8001614C());
-    fn_80014118(0x70);
+    fn_80013EEC(Camera_GetCurrent());
+    RenderState_SetDrawFlags(0x70);
     fn_80016B9C();
     fn_80035138(0);
-    fn_80012F18(3);
-    fn_80035118(4, 5);
-    fn_80012F50(0, 6, 0x80);
+    RenderState_SetDepthFunc(3);
+    RenderState_SetBlendFactors(4, 5);
+    RenderState_SetAlphaTest(0, 6, 0x80);
     fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
     fn_8002A608(&p->tex);
-    fn_80012EF8();
+    RenderState_Flush();
 
     fScaleX = 1.0f / (2.0f * fHalfX);
     fScaleZ = 1.0f / (2.0f * fHalfZ);
@@ -579,10 +579,10 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     desc.pUV = lbl_80282168;
     fn_80036100((ShaderObject*)p->aMesh[nView], &desc, 1);
     fn_800360D4(p->aMesh[nView]);
-    fn_80012F18(3);
-    fn_80012F50(1, 6, 0x80);
+    RenderState_SetDepthFunc(3);
+    RenderState_SetAlphaTest(1, 6, 0x80);
     fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 1, 1);
-    fn_80012EF8();
+    RenderState_Flush();
 }
 
 void fn_800B3438(f32* pRect, f32 x, f32 y) {
@@ -620,10 +620,10 @@ void fn_800B3460(f32* pA, f32* pB, f32* pOut) {
 void fn_800B3484(CamLens* pLens, f32 (*pMtx)[4]) {
     if (pMtx == NULL) {
         // the matrix at +0x04 overlaps the v4/v24/v34 rows (camera.h)
-        fn_8000ADC0(pLens->m4);
-        fn_8000ADC0(pLens->m44);
+        Mtx_Identity(pLens->m4);
+        Mtx_Identity(pLens->m44);
     } else {
-        fn_8000A0E8(pMtx, pLens->m44);
+        Mtx_Copy(pMtx, pLens->m44);
         fn_8000A798(pMtx, pLens->m4);
     }
     fn_8001728C(pLens);

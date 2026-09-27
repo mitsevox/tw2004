@@ -23,17 +23,17 @@ void fn_800B4914(View* pView, int nPlayer);
 ComicCam* lbl_80282178;
 
 void fn_800B34F0(void) {
-    lbl_80282178 = fn_80009B34(sizeof(ComicCam), 2, 0, "GoComicCam.c", 91);
+    lbl_80282178 = StaticMem_Alloc(sizeof(ComicCam), 2, 0, "GoComicCam.c", 91);
 }
 
 void fn_800B352C(void) {
-    fn_80009E70(lbl_80282178);
+    StaticMem_Free(lbl_80282178);
 }
 
 // Start the comic camera for nPlayer's view with layout nKind.
 void fn_800B3550(int nKind, View* pView, int nPlayer) {
-    f32* pCam = fn_8001731C(pView);
-    f32* pSub = fn_80017314(pView);
+    f32* pCam = CameraController_GetPosition(pView);
+    f32* pSub = CameraController_GetTarget(pView);
     int i;
     int nShot;
     CamShot* pShot;
@@ -71,7 +71,7 @@ u8 fn_800B36F4(View* pView, int nPlayer, f32 fFrameTime) {
     f32* pRect;
     ComicPanel* pPanel = &lbl_80282178->aPanel[lbl_80282178->nPanel];
 
-    pRect = fn_80012EF0(fn_80017004(gPlayers[nPlayer].nView[0]));
+    pRect = fn_80012EF0(ViewController_GetCamera(gPlayers[nPlayer].nView[0]));
     if (gSession.nPaused != 0) {
         lbl_80282178->n8 = -2;
     }
@@ -254,10 +254,10 @@ void fn_800B3F4C(f32* pRect, f32 fTop, f32 fLeft, f32 fWidth, f32 fHeight) {
     fn_800171D8(pRect, fLeft, fTop, fWidth, fHeight);
     fn_800352BC();
     fn_80035240(NULL);
-    fn_80013CCC(fn_8001614C());
-    fn_80013EEC(fn_8001614C());
+    fn_80013CCC(Camera_GetCurrent());
+    fn_80013EEC(Camera_GetCurrent());
     fn_80016B9C();
-    fn_80012EF8();
+    RenderState_Flush();
 }
 
 // Layout 0: three panels side by side.
@@ -427,8 +427,8 @@ u8 fn_800B4908(void) {
 // of shots 0x2B..0x2D every 9 panels shown. Then hand fn_800A6AC8 (GameAudio.c) the panel's column
 // (3 for layout 1's last panel).
 void fn_800B4914(View* pView, int nPlayer) {
-    f32* pCam = fn_8001731C(pView);
-    f32* pSub = fn_80017314(pView);
+    f32* pCam = CameraController_GetPosition(pView);
+    f32* pSub = CameraController_GetTarget(pView);
     int nPanel = lbl_80282178->nPanel;
     ComicPanel* pPanel = &lbl_80282178->aPanel[nPanel];
     u8 nColumn = (int)(pPanel->fLeft * 3.0f);

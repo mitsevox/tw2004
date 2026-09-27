@@ -205,7 +205,7 @@ s32 GameModeFourBall_GetHonors(int nPlayer) {
             return aOrder[j];
         }
     }
-    pCourse = fn_8000C594();
+    pCourse = Ter_GetTGD();
     nPinSet = Game_CurrentPinSet();
     fBest = 0.0f;
     nBest = 5;
@@ -215,7 +215,7 @@ s32 GameModeFourBall_GetHonors(int nPlayer) {
             PLAYER(i)->ball.nLie != LIE_GREEN_e) {
             dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
             dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
-            d = fn_80009680(dx * dx + dz * dz);
+            d = Math_Sqrt(dx * dx + dz * dz);
             if (d > fBest) {
                 fBest = d;
                 nBest = i;
@@ -230,7 +230,7 @@ s32 GameModeFourBall_GetHonors(int nPlayer) {
                 !GameModeFourBall_TeamDone(GameModeFourBall_GetPlayerTeam(i))) {
                 dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
                 dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
-                d = fn_80009680(dx * dx + dz * dz);
+                d = Math_Sqrt(dx * dx + dz * dz);
                 if (d > fBest) {
                     fBest = d;
                     nBest = i;
@@ -441,8 +441,8 @@ void GameModeFourBall_EndGame(void) {
             for (k = 0, i = nFirst; k < 2; k++, i++) {
                 p = PLAYER(i);
                 if (gpSaveData[p->nIndex].bActive && nMoney) {
-                    fn_800E4364(0, 0x6B, nPrize, p->nIndex);
-                    fn_800D3548(i, nMoney, 0);
+                    GUI_QueueMessage(0, 0x6B, nPrize, p->nIndex);
+                    GM_Earnings_AwardMoney(i, nMoney, 0);
                     p->money.n14 += nMoney;
                 }
             }

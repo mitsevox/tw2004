@@ -15,7 +15,7 @@ AnimalStep lbl_80187DF0[6] = {
     { 1, 0, 0, 0.0f, 0.5f },
 };
 
-void fn_8000ADC0(f32 (*pMtx)[4]);                       // identity
+void Mtx_Identity(f32 (*pMtx)[4]);                       // identity
 void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void fn_8000C5A4(f32 (*pMtx)[4]);
 void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 f);
@@ -98,13 +98,13 @@ void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 fDt) {
             aTan[i][3] = 0.0f;
         }
         if (aTan[i][0] || aTan[i][1] || aTan[i][2]) {
-            fn_800BAF04(aTan[i], aTan[i]);
+            Vec_NormalizeTo(aTan[i], aTan[i]);
         }
     }
     fn_800C7480(aPos[0], aPos[1], aPos[2], aPos[3], aTan[0], aTan[1], aTan[2], aTan[3],
                 pAnimal->base.obj.m80[3], vDir, &fUnused, 0.0f, 0.0f, fT);
     vDir[3] = 0.0f;
-    if (pAnimal->b1BD && (pCourse = fn_8000C594()) != NULL) {
+    if (pAnimal->b1BD && (pCourse = Ter_GetTGD()) != NULL) {
         vGround[0] = pAnimal->base.obj.m80[3][0];
         vGround[1] = 10.0f + pAnimal->base.obj.m80[3][1];
         vGround[2] = pAnimal->base.obj.m80[3][2];
@@ -118,14 +118,14 @@ void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 fDt) {
 
     // face the heading: row 2 along it, row 0 level across it, row 1 up
     if (vDir[0] || vDir[1] || vDir[2]) {
-        fn_800BAF04(vDir, pAnimal->base.obj.m0[2]);
+        Vec_NormalizeTo(vDir, pAnimal->base.obj.m0[2]);
     }
     if (fabsf(pAnimal->base.obj.m0[2][1]) < 0.98f) {
         pAnimal->base.obj.m0[0][0] = pAnimal->base.obj.m0[2][2];
         pAnimal->base.obj.m0[0][1] = 0.0f;
         pAnimal->base.obj.m0[0][2] = -pAnimal->base.obj.m0[2][0];
         pAnimal->base.obj.m0[0][3] = 0.0f;
-        fn_800BAF04(pAnimal->base.obj.m0[0], pAnimal->base.obj.m0[0]);
+        Vec_NormalizeTo(pAnimal->base.obj.m0[0], pAnimal->base.obj.m0[0]);
     }
     vec4flt_CrossProduct(pAnimal->base.obj.m0[2], pAnimal->base.obj.m0[0], pAnimal->base.obj.m0[1]);
 
@@ -183,7 +183,7 @@ void fn_8004A14C(DynObjAnimal* pAnimal) {
             vStep[1] = pNext->vPos[1] - pNode->vPos[1];
             vStep[2] = pNext->vPos[2] - pNode->vPos[2];
             vStep[3] = 1.0f;
-            fLength += (f32)fn_80009680(fn_80009744(vStep));
+            fLength += (f32)Math_Sqrt(Vec3_LengthSqClamped(vStep));
             pNode = pNext;
         }
         pAnimal->f16C /= fLength;
@@ -259,7 +259,7 @@ void fn_8004A24C(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
     pAnimal->b1BD = 0;
     if (pModel != NULL && (u32)pModel->nEntries > 1) {  // fake match: EA compares unsigned here
         pAnimal->pRoute = (AnimalRoute*)(pModel->aEntries[1].u.pRef->pData + 12);
-        pCourse = fn_8000C594();
+        pCourse = Ter_GetTGD();
         for (i = 0; i < pAnimal->pRoute->nNodes; i++) {
             vPos[0] = pAnimal->pRoute->aNodes[i].vPos[0];
             vPos[1] = 10.0f + pAnimal->pRoute->aNodes[i].vPos[1];
@@ -288,7 +288,7 @@ void fn_8004A24C(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
     pAnimal->f1A0 = 0.0f;
     fn_8000A194(pAnimal->base.obj.m0, pDef->aAngles[1] * (PI / 180.0f), pDef->aAngles[0] * (PI / 180.0f),
                 pDef->aAngles[2] * (PI / 180.0f));
-    fn_8000ADC0(pAnimal->base.obj.m40);
+    Mtx_Identity(pAnimal->base.obj.m40);
     fn_8000C5A4(pAnimal->base.obj.m0);
     if (pAnimal->pRoute != NULL) {
         ActAnimal_SetWorldMatrix(pAnimal, 0.0f);
@@ -303,7 +303,7 @@ void fn_8004A24C(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
 // A wave from 0 to 1 and back, fRate times a second, at frame nFrame (our macro: EA's code reads
 // fRate twice at each use, which an inline function would not).
 #define ANIMAL_WAVE(nFrame, fRate) \
-    (0.5f * fn_800095F0(6.2831855f * (fRate) * fn_800351D8((nFrame), 1.0f / (fRate))) + 0.5f)
+    (0.5f * Math_Sin(6.2831855f * (fRate) * fn_800351D8((nFrame), 1.0f / (fRate))) + 0.5f)
 
 // Message 6, the per-frame update: moves the animal along its route, speeds it up or slows it
 // down (b1BC: moving), counts down its moving (f190) and resting (f18C) times, and animates its

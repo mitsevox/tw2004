@@ -181,7 +181,7 @@ void fn_800AB860(AudTrack* pTrack) {
     // the memset's 0 before its size, as in EA's schedule
     AudTrack* pCopy = (AudTrack*)(void*)pTrack;
 
-    fn_80005AE8(pCopy->u.stm.pBuffer, 0, sizeof(StreamChunk));
+    Mem_set(pCopy->u.stm.pBuffer, 0, sizeof(StreamChunk));
     fn_800AB72C(pCopy, fn_800AB818, 0, 0);
 }
 
@@ -278,7 +278,7 @@ void fn_800ABA28(AudTrack* pTrack) {
 
 // Sets up the read queue (the module's start-up).
 u8 fn_800ABBC8(void) {
-    fn_80005AE8(lbl_801F18B8.aReads, 0, sizeof(lbl_801F18B8.aReads));
+    Mem_set(lbl_801F18B8.aReads, 0, sizeof(lbl_801F18B8.aReads));
     fn_800AE00C(&lbl_801F18B8.queue, lbl_801F18B8.aReads, 8, sizeof(AudStreamRead));
     lbl_801F18B8.bBusy = 0;
     return 1;

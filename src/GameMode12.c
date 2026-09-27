@@ -91,9 +91,9 @@ void fn_800FEC80(int nPlayer) {
         fn_800FEF00(lbl_802823DC, &nPoints, &nMeter, &nMult);
         nHits = fn_800FEFF8(nPlayer, lbl_802823DC);
         if (!SurfaceUsedUp(&nPoints, nHits)) {
-            fn_8006434C(fn_80017004(gPlayers[nPlayer].nView[0]), gPlayers[nPlayer].ball.vPrev,
+            fn_8006434C(ViewController_GetCamera(gPlayers[nPlayer].nView[0]), gPlayers[nPlayer].ball.vPrev,
                         &x, &y, 0);
-            fn_8006A8D4(fn_80017004(gPlayers[nPlayer].nView[0]), &x, &y);
+            fn_8006A8D4(ViewController_GetCamera(gPlayers[nPlayer].nView[0]), &x, &y);
             if (nMult > gPlayers[nPlayer].nDBC) {
                 gPlayers[nPlayer].nDBC = nMult;
                 fn_800E53F0(0x35, nMult, 512.0f * x, 448.0f * y);
@@ -186,7 +186,7 @@ void fn_800FF114(void) {
         if (PLAYER(i)->nStrokes[Game_CurHoleIndex()] == 1) {
             fMult = 32.0f;
         } else {
-            switch (PLAYER(i)->nStrokes[Game_CurHoleIndex()] - fn_800D2B08()) {
+            switch (PLAYER(i)->nStrokes[Game_CurHoleIndex()] - Course_GetCurHolePar()) {
             case -3:
                 fMult = 16.0f;
                 break;
@@ -214,7 +214,7 @@ void fn_800FF114(void) {
             }
         }
         PLAYER(i)->nD28[Game_CurHoleIndex()] = fMult * PLAYER(i)->nD28[Game_CurHoleIndex()];
-        fn_800E4364(0, 0x73, PLAYER(i)->nD28[Game_CurHoleIndex()], PLAYER(i)->nIndex);
+        GUI_QueueMessage(0, 0x73, PLAYER(i)->nD28[Game_CurHoleIndex()], PLAYER(i)->nIndex);
     }
 }
 
@@ -233,9 +233,9 @@ void fn_800FF288(void) {
             }
             if (gpSaveData[PLAYER(i)->nIndex].bActive) {
                 if (nMoney) {
-                    fn_800E4364(0, 0x6A, nMoney, PLAYER(i)->nIndex);
+                    GUI_QueueMessage(0, 0x6A, nMoney, PLAYER(i)->nIndex);
                 }
-                fn_800D3548(i, nMoney, 0);
+                GM_Earnings_AwardMoney(i, nMoney, 0);
             }
         }
     }

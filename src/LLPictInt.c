@@ -35,7 +35,7 @@ LLPict* PictInt_Decode(PictFile* pFile) {
     // fake match: the height's swap spelled high byte first with u16 casts gives EA's clrlslwi and
     // rlwimi; the width's spelling does not
     pFile->nHeight = (((u16)pFile->nHeight >> 8) & 0xFF) | (((u16)pFile->nHeight & 0xFF) << 8);
-    pPict =fn_80009B34(sizeof(LLPict), 1, 32, "LLPictInt.c", 142);
+    pPict =StaticMem_Alloc(sizeof(LLPict), 1, 32, "LLPictInt.c", 142);
     if (pPict == NULL) {
         return NULL;
     }
@@ -44,7 +44,7 @@ LLPict* PictInt_Decode(PictFile* pFile) {
     pPict->nHeight = pFile->nHeight;
     pPict->f6C = 1.0f;
     pPict->f70 = 1.0f;
-    pPict->pPixels = fn_80009B34(pPict->nWidth * pPict->nHeight * 3 / 2, 1, 32, "LLPictInt.c", 150);
+    pPict->pPixels = StaticMem_Alloc(pPict->nWidth * pPict->nHeight * 3 / 2, 1, 32, "LLPictInt.c", 150);
     pY = fn_8003020C(pPict);
     pU = fn_800301F4(pPict);
     pV = fn_800301D0(pPict);

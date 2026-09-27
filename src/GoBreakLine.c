@@ -24,7 +24,7 @@ static f32 GoBreakLine_StrippedFn(f32 x) {
 }
 
 void BreakLine_InitModule(void) {
-    lbl_80282228 = fn_80009B34(sizeof(BreakLine), 2, 16, "GoBreakLine.c", 93);
+    lbl_80282228 = StaticMem_Alloc(sizeof(BreakLine), 2, 16, "GoBreakLine.c", 93);
     lbl_80282228->fAB30 = 27.0f;
     lbl_80282228->fAB34 = 0.0f;
     lbl_80282228->fAB38 = 20.0f;
@@ -32,13 +32,13 @@ void BreakLine_InitModule(void) {
 }
 
 void fn_800C8108(void) {
-    fn_80009E70(lbl_80282228);
+    StaticMem_Free(lbl_80282228);
     lbl_80282228 = NULL;
 }
 
 // Sets the line up for a hole: its settings, a mesh per view, the "brkline" texture and the pin.
 void fn_800C8134(void) {
-    CourseInfo* pCourse = fn_8000C594();
+    CourseInfo* pCourse = Ter_GetTGD();
     int nPin = Game_CurrentPinSet();
     s32 desc[2];
     u64 uHash;
@@ -86,7 +86,7 @@ void fn_800C830C(void) {
 // pin (EA's test; distances in yards). A view's first call after the line is set up only clears
 // its abSkip.
 void BreakLine_Update(int nView) {
-    int nPlayer = fn_8001707C(nView);
+    int nPlayer = ViewController_GetPlayer(nView);
     f32 fDist;
 
     fDist = Vec_Distance(lbl_80282228->vPin, gPlayers[nPlayer].vTarget);
@@ -107,7 +107,7 @@ void BreakLine_Update(int nView) {
 // at the end, and trigger events 0x28 / 0x29 when it stops or starts to move away from the pin.
 void BreakLine_Render(int nView) {
     f32 vAxis[4] = {0.0f, 0.0f, 1.0f, 0.0f};
-    int nPlayer = fn_8001707C(nView);
+    int nPlayer = ViewController_GetPlayer(nView);
     TrailMeshDescEx desc;
     s16 aIndex[BREAKLINE_VERTS];        // the frame fits at least this many; the size is not known
     s32 nFrame;
@@ -125,13 +125,13 @@ void BreakLine_Render(int nView) {
     if (gSession.options.a24[2]) {
         Vec_Distance(lbl_80282228->vPin, gPlayers[nPlayer].vTarget);
         fn_80016B9C();
-        fn_80035118(4, 5);
-        fn_80012F50(0, 6, 0x80);
-        fn_80012F34(0);
+        RenderState_SetBlendFactors(4, 5);
+        RenderState_SetAlphaTest(0, 6, 0x80);
+        RenderState_SetDepthWrite(0);
         fn_8005CC64(lbl_80282228->pBank, lbl_80282228->pTex);
-        fn_80014118(0x70);
+        RenderState_SetDrawFlags(0x70);
         fn_80035138(0);
-        fn_80012EF8();
+        RenderState_Flush();
         fDist = Vec_Distance(lbl_80282228->aBall[nView].vPos, lbl_80282228->vPin);
         if (lbl_80282228->abA91C[nView]) {
             if ((lbl_80282228->aBall[nView].nState == 2 || lbl_80282228->aBall[nView].nState == 3 ||
@@ -153,13 +153,13 @@ void BreakLine_Render(int nView) {
                 vDir[1] = 0.0f;
                 // EA bug: tests y, just cleared, where z was surely meant
                 if (vDir[0] != 0.0f || vDir[1] != 0.0f) {
-                    fn_800BAF04(vDir, vDir);
+                    Vec_NormalizeTo(vDir, vDir);
                 }
-                fAngle = fn_80009614(fn_8000C5FC(vDir, vAxis));
+                fAngle = fn_80009614(Vec3_Dot(vDir, vAxis));
                 vec4flt_CrossProduct(vDir, vAxis, vCross);
                 fAngle = fAngle * (vCross[1] < 0.0f ? -1.0f : 1.0f);
-                fSin = fn_800095F0(fAngle);
-                fCos = fn_80009638(fAngle);
+                fSin = Math_Sin(fAngle);
+                fCos = Math_Cos(fAngle);
                 // Turn the new pair of vertices to the heading and move them to the ball.
                 for (i = lbl_80282228->anVerts[nView]; i <= lbl_80282228->anVerts[nView] + 1; i++) {
                     fX = lbl_80282228->aVert[nView][i][0];
@@ -232,9 +232,9 @@ void BreakLine_Render(int nView) {
             fn_80036100((ShaderObject*)lbl_80282228->aMesh[nView], &desc, 1);
             fn_800360D4(lbl_80282228->aMesh[nView]);
         }
-        fn_80012F50(1, 6, 0x80);
-        fn_80012F34(1);
-        fn_80012EF8();
+        RenderState_SetAlphaTest(1, 6, 0x80);
+        RenderState_SetDepthWrite(1);
+        RenderState_Flush();
     }
 }
 
@@ -245,7 +245,7 @@ void fn_800C8C3C(int nView, f32* pOut) {
 
 // fake match: EA reads the player through an inline; written in place, pPlayer is allocated r29, not r31
 static inline Player* fn_800C8C70_Read(int nView) {
-    return &gPlayers[fn_8001707C(nView)];
+    return &gPlayers[ViewController_GetPlayer(nView)];
 }
 
 // Starts view nView's line when its player stands over a putt within 75 of the hole: lays out the
@@ -306,9 +306,9 @@ void BreakLine_Reset(int nView) {
 // the side). 0, 0 in split screen or when the points coincide; -999 when there is no tip, 999
 // when the caddie gave up.
 void fn_800C9038(int nView, f32* pLong, f32* pSide) {
-    int nPlayer = fn_8001707C(nView);
+    int nPlayer = ViewController_GetPlayer(nView);
     int nPin = Game_CurrentPinSet();
-    CourseInfo* pCourse = fn_8000C594();
+    CourseInfo* pCourse = Ter_GetTGD();
     s8 nTip;
     f32 vTip[4];
     f32 vPin[4];
@@ -377,17 +377,17 @@ void fn_800C9038(int nView, f32* pLong, f32* pSide) {
         return;
     }
     fn_800C9358(vHole, vBall, vToHole);
-    fn_800BAF04(vToHole, vToHole);
+    Vec_NormalizeTo(vToHole, vToHole);
     fn_800C9358(vAim, vBall, vToAim);
-    fn_800BAF04(vToAim, vToAim);
-    fDot = fn_8000C5FC(vToHole, vToAim);
+    Vec_NormalizeTo(vToAim, vToAim);
+    fDot = Vec3_Dot(vToHole, vToAim);
     if (0.0f == fDot) {
         *pLong = 0.0f;
         *pSide = 0.0f;
         return;
     }
     fAlong = fDot * fAimDist;
-    fSide = fAimDist * fn_800095F0(fn_80009614(fDot));
+    fSide = fAimDist * Math_Sin(fn_80009614(fDot));
     vec4flt_CrossProduct(vToHole, vToAim, vCross);
     fAlong = fAlong - fHoleDist;
     if (vCross[1] < 0.0f) {

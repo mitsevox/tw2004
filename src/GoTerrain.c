@@ -65,7 +65,7 @@ void  fn_800332F4(void);
 u8    fn_8003505C(u8 b);
 f32*  fn_80035508(UObjMesh* pMesh);
 u8    fn_80033308(Ter_ObjectDrawData* pDraw, u8 bForce);
-void  fn_8000ADC0(f32 (*pMtx)[4]);  // identity matrix
+void  Mtx_Identity(f32 (*pMtx)[4]);  // identity matrix
 void  fn_80035370(void);
 void  fn_80034CAC(int nRenderPass);
 void  fn_80034DE4(void);
@@ -141,22 +141,22 @@ void fn_80030254(void) {
     s32 j;
     s32 nBits;
 
-    lbl_801D3CB0.pPatchList = fn_80009B34(1024 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 567);
+    lbl_801D3CB0.pPatchList = StaticMem_Alloc(1024 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 567);
     lbl_801D3CB0.pPostDrawTerrainList =
-        fn_80009B34(20 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 572);
-    lbl_801D3CB0.pObjectSortList = fn_80009B34(650 * sizeof(Ter_ObjectReference), 2, 16, "GoTerrain.c", 577);
-    lbl_801D3CB0.pOpaqueObjectList = fn_80009B34(650 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 582);
+        StaticMem_Alloc(20 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 572);
+    lbl_801D3CB0.pObjectSortList = StaticMem_Alloc(650 * sizeof(Ter_ObjectReference), 2, 16, "GoTerrain.c", 577);
+    lbl_801D3CB0.pOpaqueObjectList = StaticMem_Alloc(650 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 582);
     lbl_801D3CB0.pTranslucentObjectList =
-        fn_80009B34(200 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 587);
-    lbl_801D3CB0.pNearbyObjectList = fn_80009B34(70 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 592);
-    lbl_801D3CB0.pDeferredItemsList = fn_80009B34(50 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 597);
+        StaticMem_Alloc(200 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 587);
+    lbl_801D3CB0.pNearbyObjectList = StaticMem_Alloc(70 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 592);
+    lbl_801D3CB0.pDeferredItemsList = StaticMem_Alloc(50 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 597);
     lbl_801D3CB0.pPanoramaItemsList =
-        fn_80009B34(300 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 602);
+        StaticMem_Alloc(300 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 602);
     lbl_801D3CB0.pPostDrawItemsList =
-        fn_80009B34(400 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 607);
+        StaticMem_Alloc(400 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 607);
     lbl_801D3CB0.pObjectStateList =
-        fn_80009B34(TER_NUM_OBJECTS * sizeof(Ter_ObjectState), 2, 16, "GoTerrain.c", 612);
-    lbl_801D3CB0.xpGrassPatchList = fn_80009B34(128 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 633);
+        StaticMem_Alloc(TER_NUM_OBJECTS * sizeof(Ter_ObjectState), 2, 16, "GoTerrain.c", 612);
+    lbl_801D3CB0.xpGrassPatchList = StaticMem_Alloc(128 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 633);
     lbl_801D3CB0.fTreeMinPeriod = 3.7f;
     lbl_801D3CB0.fTreeDiffPeriod = 1.6f;
     lbl_801D3CB0.fTreeOverdrive = 1.0f;
@@ -171,7 +171,7 @@ void fn_80030254(void) {
             lbl_80281D60 * lbl_801D3CB0.fTreeDiffPeriod + lbl_801D3CB0.fTreeMinPeriod;
         lbl_80281D60 *= 131.2934f;
         lbl_80281D60 += 82.459f;
-        lbl_80281D60 -= fn_80035074(lbl_80281D60);
+        lbl_80281D60 -= Math_Floor(lbl_80281D60);
         lbl_801D3CB0.pObjectStateList[i].f4 = lbl_801D3CB0.fTreeOverdrive;
         lbl_801D3CB0.pObjectStateList[i].f8 = 0.0f;
         lbl_801D3CB0.pObjectStateList[i].nC = 0;
@@ -220,22 +220,22 @@ void fn_80030254(void) {
 }
 
 void fn_800306B8(void) {
-    fn_80009E70(lbl_801D3CB0.pPatchList);
-    fn_80009E70(lbl_801D3CB0.pPostDrawTerrainList);
-    fn_80009E70(lbl_801D3CB0.pObjectSortList);
-    fn_80009E70(lbl_801D3CB0.pOpaqueObjectList);
-    fn_80009E70(lbl_801D3CB0.pTranslucentObjectList);
-    fn_80009E70(lbl_801D3CB0.pNearbyObjectList);
-    fn_80009E70(lbl_801D3CB0.pDeferredItemsList);
-    fn_80009E70(lbl_801D3CB0.pPanoramaItemsList);
-    fn_80009E70(lbl_801D3CB0.pPostDrawItemsList);
-    fn_80009E70(lbl_801D3CB0.pObjectStateList);
+    StaticMem_Free(lbl_801D3CB0.pPatchList);
+    StaticMem_Free(lbl_801D3CB0.pPostDrawTerrainList);
+    StaticMem_Free(lbl_801D3CB0.pObjectSortList);
+    StaticMem_Free(lbl_801D3CB0.pOpaqueObjectList);
+    StaticMem_Free(lbl_801D3CB0.pTranslucentObjectList);
+    StaticMem_Free(lbl_801D3CB0.pNearbyObjectList);
+    StaticMem_Free(lbl_801D3CB0.pDeferredItemsList);
+    StaticMem_Free(lbl_801D3CB0.pPanoramaItemsList);
+    StaticMem_Free(lbl_801D3CB0.pPostDrawItemsList);
+    StaticMem_Free(lbl_801D3CB0.pObjectStateList);
     if (lbl_801D3CB0.pCurrentHoleData != NULL) {
         fn_800075CC(lbl_801D3CB0.pCurrentHoleData);
         lbl_801D3CB0.pCurrentHoleData = NULL;
     }
     if (lbl_801D3CB0.pCourse != NULL) {
-        fn_80009E70(lbl_801D3CB0.pCourse);
+        StaticMem_Free(lbl_801D3CB0.pCourse);
         lbl_801D3CB0.pCourse = NULL;
     }
 }
@@ -254,10 +254,10 @@ void fn_80030818(void) {
 
 void fn_8003084C(void) {
     fn_80035098(0);
-    fn_80012F50(1, 6, 128);
-    fn_80012F18(3);
-    fn_80012F34(1);
-    fn_80012EF8();
+    RenderState_SetAlphaTest(1, 6, 128);
+    RenderState_SetDepthFunc(3);
+    RenderState_SetDepthWrite(1);
+    RenderState_Flush();
 }
 
 // Sets the renderer up for the terrain, then hands rows 4 and 5 of lbl_80188E88 the frame count,
@@ -271,21 +271,21 @@ void fn_80030894(void) {
     fn_80016B9C();
     fn_80016B9C();
     fn_80016B9C();
-    fn_80035118(4, 5);
-    fn_80012F50(1, 6, 1);
-    fn_80012F18(3);
+    RenderState_SetBlendFactors(4, 5);
+    RenderState_SetAlphaTest(1, 6, 1);
+    RenderState_SetDepthFunc(3);
     fn_80035338(2);
     fn_80035308();
     fn_800352E4();
-    fn_80014118(0x70);
-    fn_80013EEC(fn_8001614C());
-    fn_80012EF8();
+    RenderState_SetDrawFlags(0x70);
+    fn_80013EEC(Camera_GetCurrent());
+    RenderState_Flush();
     for (i = 0; i < 4; i++) {
         // fake match: the original's 1591.2 is one bit above the literal 1591.2f, as a folded float
         // product gives it; 26.52 x 60 is one such product (3 x 530.4 and 12 x 132.6 are others)
         f32 fPeriod = 26.52f * 60.0f * (5.5f + (f32)i) / 1000.0f;
 
-        wave.aWave[i] = 0.5f * fn_800095F0(6.2831855f * fn_800351D8(gSession.nFrameCount, fPeriod) / fPeriod)
+        wave.aWave[i] = 0.5f * Math_Sin(6.2831855f * fn_800351D8(gSession.nFrameCount, fPeriod) / fPeriod)
                         + 0.5f;
     }
     wave.nFrame = gSession.nFrameCount;
@@ -333,20 +333,21 @@ void fn_80030A40(void* pHoleData, int nView) {
     for (i = 0; i < gNumPlayersSetUp; i++) {
         fn_80035490(gPlayers[i].ball.vPos, lbl_801D3CB0.xCameraReferencePos, vDiff);
         vDiff[1] = 0.0f;
-        fDist = fn_80009744(vDiff);
+        fDist = Vec3_LengthSqClamped(vDiff);
         if (fDist < lbl_801D3CB0.fXZDistanceToClosestBallSquared) {
             lbl_801D3CB0.fXZDistanceToClosestBallSquared = fDist;
         }
     }
-    fn_8003546C(gPlayers[fn_8001707C(lbl_801D3CB0.iCurrentViewContext)].vBall,
-                &fn_8000C594()->pin[Game_CurrentPinSet()].x, vToPin);
+    fn_8003546C(gPlayers[ViewController_GetPlayer(lbl_801D3CB0.iCurrentViewContext)].vBall,
+                &Ter_GetTGD()->pin[Game_CurrentPinSet()].x, vToPin);
     vToPin[1] = 0.0f;
-    lbl_801D3CB0.fGolferDistanceToCup = fn_80009680(fn_80009744(vToPin));
+    lbl_801D3CB0.fGolferDistanceToCup = Math_Sqrt(Vec3_LengthSqClamped(vToPin));
     fTan = fn_80014280(0.5f * pLens->fFov);
     fWideTan = fn_80014280(0.5f * (0.75f * pLens->fFov * fn_8001414C((u8*)fn_8003526C())));
     lbl_801D3CB0.fCameraMinHalfFieldOfViewTan =
-        (fTan <= fWideTan / fn_80017028(nView)->f54) ? fTan : fWideTan / fn_80017028(nView)->f54;
-    fn_80012EF8();
+        (fTan <= fWideTan / ViewController_GetCameraController(nView)->f54) ? fTan : fWideTan
+                / ViewController_GetCameraController(nView)->f54;
+    RenderState_Flush();
     if (!lbl_801D3CB0.bObjectTestMode) {
         fn_80033F94(pHoleData, 0);
     }
@@ -363,10 +364,10 @@ void fn_80030A40(void* pHoleData, int nView) {
     fn_80032518(1);
     fn_80032518(2);
     fn_80032954();
-    fn_80035118(4, 5);
-    fn_80012F50(1, 6, 0x80);
-    fn_80014118(0x70);
-    fn_80012EF8();
+    RenderState_SetBlendFactors(4, 5);
+    RenderState_SetAlphaTest(1, 6, 0x80);
+    RenderState_SetDrawFlags(0x70);
+    RenderState_Flush();
 }
 
 // Builds the patch lists: clears the counts and pSortedPatchList, then takes each patch of the hole
@@ -383,7 +384,7 @@ void fn_80030CC8(void* pHoleData) {
     s32 eClipMethod;
     s32 nFirstObject = 0;
     u32 uPinBit = 1 << Game_CurrentPinSet();
-    void* pCamera = fn_8001614C();
+    void* pCamera = Camera_GetCurrent();
     s32 uFlags;
     f32 fRadius;
     f32 fDist;
@@ -438,7 +439,7 @@ void fn_80030CC8(void* pHoleData) {
                     fDist = 0.0f;
                 }
                 eClipMethod = fn_80007B2C(pMesh, pCamera, fDist, lbl_801D3CB0.fCameraMinHalfFieldOfViewTan,
-                                          fn_80017028(lbl_801D3CB0.iCurrentViewContext)->f54);
+                                          ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext)->f54);
                 if (eClipMethod != 3) {
                     pPatch = &lbl_801D3CB0.pPatchList[lbl_801D3CB0.iTotalPatches++];
                     fn_80031084(pMesh, eClipMethod, iRenderPass, pPatch, fDist);
@@ -567,7 +568,7 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
             }
             fn_8003546C(pBounds, lbl_801D3CB0.xCameraReferencePos, v48);
             v48[1] = 0.0f;
-            fXZ = (f32)fn_80009680(fn_80009744(v48)) - pBounds[3];
+            fXZ = (f32)Math_Sqrt(Vec3_LengthSqClamped(v48)) - pBounds[3];
             if (fXZ < 0.0f) {
                 fXZ = 0.0f;
             }
@@ -580,27 +581,27 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
                 bHide = 1;
             } else if ((fn_800354D0(pLOD0, 3) & 4) || (fn_800354D0(pLOD0, 3) & 0x10)
                        || (fn_800354D0(pLOD0, 3) & 0x20)) {
-                pBall = gPlayers[fn_8001707C(lbl_801D3CB0.iCurrentViewContext)].vBall;
-                pPin = &fn_8000C594()->pin[Game_CurrentPinSet()].x;
+                pBall = gPlayers[ViewController_GetPlayer(lbl_801D3CB0.iCurrentViewContext)].vBall;
+                pPin = &Ter_GetTGD()->pin[Game_CurrentPinSet()].x;
                 fn_8003546C(pBounds, pBall, v28);
                 v28[1] = 0.0f;
-                fBallToObject = (f32)fn_80009680(fn_80009744(v28)) - pBounds[3];
+                fBallToObject = (f32)Math_Sqrt(Vec3_LengthSqClamped(v28)) - pBounds[3];
                 if (fBallToObject < 0.0f) {
                     fBallToObject = 0.0f;
                 }
                 fn_8003546C(pPin, pBall, v18);
                 v18[1] = 0.0f;
-                fPinToBall = fn_80009680(fn_80009744(v18));
+                fPinToBall = Math_Sqrt(Vec3_LengthSqClamped(v18));
                 if (fPinToBall < 0.0f) {
                     fPinToBall = 0.0f;
                 }
                 fn_8003546C(pBounds, pPin, v8);
                 v8[1] = 0.0f;
-                fObjectToPin = (f32)fn_80009680(fn_80009744(v8)) - pBounds[3];
+                fObjectToPin = (f32)Math_Sqrt(Vec3_LengthSqClamped(v8)) - pBounds[3];
                 if (fObjectToPin < 0.0f) {
                     fObjectToPin = 0.0f;
                 }
-                if (!fn_800172C4(fn_80017028(lbl_801D3CB0.iCurrentViewContext))) {
+                if (!fn_800172C4(ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext))) {
                     bHide = 1;
                 } else if (fBallToObject > lbl_801D3CB0.fCrowdHalfMaxDistanceFromGolfer) {
                     bHide = 1;
@@ -611,15 +612,17 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
                            && fObjectToPin <= fPinToBall && (nLast - i) % 2 != 0) {
                     bHide = 1;
                 } else if (((fn_800354D0(pLOD0, 1) & 1)
-                            && gSession.nTeeSet[fn_8001707C(lbl_801D3CB0.iCurrentViewContext)] != 0)
+                            && gSession.nTeeSet[ViewController_GetPlayer(lbl_801D3CB0.iCurrentViewContext)]
+                                    != 0)
                            || ((fn_800354D0(pLOD0, 1) & 2)
-                               && gSession.nTeeSet[fn_8001707C(lbl_801D3CB0.iCurrentViewContext)] != 1)
+                               && gSession.nTeeSet[ViewController_GetPlayer(lbl_801D3CB0.iCurrentViewContext)] != 1)
                            || ((fn_800354D0(pLOD0, 1) & 4)
-                               && gSession.nTeeSet[fn_8001707C(lbl_801D3CB0.iCurrentViewContext)] != 2)) {
+                               && gSession.nTeeSet[ViewController_GetPlayer(lbl_801D3CB0.iCurrentViewContext)] != 2)) {
                     bHide = 1;
                 } else if (((fn_800354D0(pLOD0, 1) & 1) || (fn_800354D0(pLOD0, 1) & 2)
                             || (fn_800354D0(pLOD0, 1) & 4))
-                           && gPlayers[fn_8001707C(lbl_801D3CB0.iCurrentViewContext)].ball.nLie != 0) {
+                           && gPlayers[ViewController_GetPlayer(lbl_801D3CB0.iCurrentViewContext)].ball.nLie
+                                   != 0) {
                     bHide = 1;
                 }
             }
@@ -628,16 +631,16 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
             } else if (pPatch->eClipMethod == 2) {
                 eClipMethod = 2;
             } else {
-                pView = fn_80017028(lbl_801D3CB0.iCurrentViewContext);
-                eClipMethod = fn_80007B2C(pLOD0, fn_8001614C(), fn_80009680(fDistanceSquared),
+                pView = ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext);
+                eClipMethod = fn_80007B2C(pLOD0, Camera_GetCurrent(), Math_Sqrt(fDistanceSquared),
                                           lbl_801D3CB0.fCameraMinHalfFieldOfViewTan, pView->f54);
             }
             if (eClipMethod != 3) {
                 pRef = &lbl_801D3CB0.pObjectSortList[lbl_801D3CB0.iTotalSortObjects];
                 pRef->fDistanceSquared = fDistanceSquared;
-                pRef->f14 = fn_80009744(v48);
+                pRef->f14 = Vec3_LengthSqClamped(v48);
                 fn_8003546C(pBounds, lbl_801D3CB0.xCameraReferencePos, v38);
-                pRef->f18 = fn_8000C5FC(lbl_801D3CB0.xCameraLookVector, v38);
+                pRef->f18 = Vec3_Dot(lbl_801D3CB0.xCameraLookVector, v38);
                 iObject = nLast - i;
                 pRef->eClipMethod = eClipMethod;
                 pRef->pContainerPatch = pPatch;
@@ -755,7 +758,7 @@ void fn_80031AB4(void) {
                 for (nLOD = 0; nLOD < nLast; nLOD++) {
                     if (fDistanceSquared <= pPlanes[nLOD].fEnd * pPlanes[nLOD].fEnd) break;
                 }
-                if (!fn_800172C4(fn_80017028(lbl_801D3CB0.iCurrentViewContext))) {
+                if (!fn_800172C4(ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext))) {
                     uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
                     if (!(uFlags & 4) && !(uFlags & 0x10) && !(uFlags & 0x20) && fn_80031E40() && nLOD == 0) {
                         nLOD = 1;
@@ -776,7 +779,7 @@ void fn_80031AB4(void) {
         for (nLOD = 0; nLOD < nLast; nLOD++) {
             if (fDistanceSquared <= pPlanes[nLOD].fEnd * pPlanes[nLOD].fEnd) break;
         }
-        if (!fn_800172C4(fn_80017028(lbl_801D3CB0.iCurrentViewContext))) {
+        if (!fn_800172C4(ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext))) {
             uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
             if (!(uFlags & 4) && !(uFlags & 0x10) && !(uFlags & 0x20) && fn_80031E40() && nLOD == 0) {
                 nLOD = 1;
@@ -785,7 +788,7 @@ void fn_80031AB4(void) {
         if (nLOD < nLast
             && fDistanceSquared > pPlanes[nLOD + 1].fBegin * pPlanes[nLOD + 1].fBegin) {
             // between this plane's end and the next one's start: fade over to the next level
-            fT = (f32)fn_80009680(fDistanceSquared);
+            fT = (f32)Math_Sqrt(fDistanceSquared);
             fT = (fT - pPlanes[nLOD + 1].fBegin) / (pPlanes[nLOD].fEnd - pPlanes[nLOD + 1].fBegin);
             if (fT < 0.5f) {
                 nTranslucent = nLOD + 1;
@@ -856,7 +859,7 @@ void fn_80031E58(void) {
             uFlags2 &= ~0x80;
             uFlags0 &= ~0x40;
         }
-        if (!fn_800172C4(fn_80017028(lbl_801D3CB0.iCurrentViewContext))) {
+        if (!fn_800172C4(ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext))) {
             uFlags0 &= ~0x20;
         }
         uCrowd = uFlags0 & 0x20;
@@ -887,7 +890,7 @@ void fn_80031E58(void) {
                         lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD], pRef->fDistanceSquared,
                         pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0);
         } else if (lbl_801D3CB0.pObjectSortList[i].fDistanceSquared < fFarSquared) {
-            fDistance = fn_80009680(lbl_801D3CB0.pObjectSortList[i].fDistanceSquared);
+            fDistance = Math_Sqrt(lbl_801D3CB0.pObjectSortList[i].fDistanceSquared);
             if (fDistance > fFar || (uFlags0 & 0x40)
                 || (uCrowd == 0
                     && ((lbl_801D3CB0.pObjectSortList[i].f14 > lbl_801D3CB0.fXZDistanceToClosestBallSquared
@@ -1013,9 +1016,9 @@ void fn_80032518(int nRenderPass) {
         if (nRenderPass == 2) {
             fn_8003272C(0);
         }
-        fn_80012EF8();
-        fn_80014118(0x70);
-        fn_80012F50(0, 6, 1);
+        RenderState_Flush();
+        RenderState_SetDrawFlags(0x70);
+        RenderState_SetAlphaTest(0, 6, 1);
         for (nList = 0; nList <= 2; nList++) {
             if (nRenderPass != 2) {
                 if (nList == 0) {
@@ -1037,7 +1040,7 @@ void fn_80032518(int nRenderPass) {
                         fn_80035138(0);
                         break;
                     }
-                    fn_80012EF8();
+                    RenderState_Flush();
                     for (pPatch =
                              lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][(u32)nClip];
                          pPatch != NULL; pPatch = pPatch->pNext[nList]) {
@@ -1051,16 +1054,16 @@ void fn_80032518(int nRenderPass) {
         fn_80032F88(lbl_801D3CB0.pDeferredItemsList, lbl_801D3CB0.iDeferredItems,
                     lbl_801D3CB0.eTerrainFilterMin, lbl_801D3CB0.eTerrainFilterMag);
         lbl_801D3CB0.iDeferredItems = 0;
-        fn_80012F50(1, 6, 1);
-        fn_80012EF8();
+        RenderState_SetAlphaTest(1, 6, 1);
+        RenderState_Flush();
         fn_8003272C(1);
-        fn_80012EF8();
+        RenderState_Flush();
     }
 }
 
 void fn_8003272C(int n) {
     if (lbl_801D3CB0.boManageZUpdate) {
-        fn_80012F34(n);
+        RenderState_SetDepthWrite(n);
         lbl_802810CC = n;
     }
 }
@@ -1095,8 +1098,8 @@ void fn_80032770(void) {
         fn_80016B9C();
         fn_80016B9C();
         fn_800354B4((u8*)pLens, fAC);
-        fn_80012EF8();
-        fn_80014118(0x70);
+        RenderState_Flush();
+        RenderState_SetDrawFlags(0x70);
         for (nClip = 0; nClip <= 2; nClip++) {
             if (lbl_801D3CB0.pSortedPatchList[0][3][(u32)nClip] != NULL) {
                 switch (nClip) {
@@ -1110,7 +1113,7 @@ void fn_80032770(void) {
                     fn_80035138(0);
                     break;
                 }
-                fn_80012EF8();
+                RenderState_Flush();
                 for (pPatch =
                          lbl_801D3CB0.pSortedPatchList[0][3][(u32)nClip];
                      pPatch != NULL; pPatch = pPatch->pNext[3]) {
@@ -1122,10 +1125,10 @@ void fn_80032770(void) {
                 }
             }
         }
-        fn_80012F50(1, 6, 1);
-        fn_80012EF8();
+        RenderState_SetAlphaTest(1, 6, 1);
+        RenderState_Flush();
         fn_8003272C(1);
-        fn_80012EF8();
+        RenderState_Flush();
     }
 }
 
@@ -1136,8 +1139,8 @@ void fn_80032954(void) {
         fn_80032F88(lbl_801D3CB0.pTranslucentObjectList, lbl_801D3CB0.iTranslucentObjects,
                     lbl_801D3CB0.eObjectFilterMin, lbl_801D3CB0.eObjectFilterMag);
     }
-    fn_80012F50(1, 6, 128);
-    fn_80012EF8();
+    RenderState_SetAlphaTest(1, 6, 128);
+    RenderState_Flush();
 }
 
 // Draws the post-draw terrain patches, each in every pass (bits 0..2 of n1C) it takes part in.
@@ -1148,7 +1151,7 @@ void fn_800329CC(void) {
     int nPassBit;
 
     fn_80030894();
-    fn_80014118(0x70);
+    RenderState_SetDrawFlags(0x70);
     for (i = 0; i < lbl_801D3CB0.iTotalPostDrawTerrainPatches; i++) {
         switch (lbl_801D3CB0.pPostDrawTerrainList[i].eClipMethod) {
         case 2:
@@ -1161,7 +1164,7 @@ void fn_800329CC(void) {
             fn_80035138(0);
             break;
         }
-        fn_80012EF8();
+        RenderState_Flush();
         for (nPass = 0, nPassBit = 1; nPass <= 2; nPass++, nPassBit <<= 1) {
             if (nPassBit & lbl_801D3CB0.pPostDrawTerrainList[i].n1C) {
                 fn_80032B7C(lbl_801D3CB0.pPostDrawTerrainList[i].pGround,
@@ -1188,8 +1191,8 @@ void fn_80032AEC(void) {
     fn_8003272C(1);
     fn_80035098(0);
     fn_8003084C();
-    fn_80012F50(1, 6, 128);
-    fn_80012EF8();
+    RenderState_SetAlphaTest(1, 6, 128);
+    RenderState_Flush();
 }
 
 // Draws one patch's ground in render pass nPass: its mesh for the pass and the patch's bits (n1C
@@ -1229,7 +1232,8 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
         nMesh |= 0x10;
     }
     if (n20 & 0x80) {
-        if (!fn_800172C4(fn_80017028(lbl_801D3CB0.iCurrentViewContext)) && (fn_800354D0(pGround, 0) & 0x80)) {
+        if (!fn_800172C4(ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext))
+            && (fn_800354D0(pGround, 0) & 0x80)) {
             return;
         }
         bLake = 1;
@@ -1239,29 +1243,29 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
     bFirst = *pbFirst;
     if (bFirst == 0 && fFar > 0.0f && b2 == 0) {
         *pbFirst = 1;
-        fn_80014118(0x70);
-        fn_80012EF8();
+        RenderState_SetDrawFlags(0x70);
+        RenderState_Flush();
     } else if ((fFar <= 0.0f || b2 != 0) && bFirst != 0) {
         *pbFirst = 0;
-        fn_80014118(0x50);
-        fn_80012EF8();
+        RenderState_SetDrawFlags(0x50);
+        RenderState_Flush();
     }
     uFlags2 = fn_800354D0(pGround, 2);
     pMesh = fn_800354E4(pGround, 0);
     if ((n20 & uPinBit) && !(n20 & uOtherPins)) {
-        fn_80012F50(1, 6, 1);
-        fn_80012EF8();
+        RenderState_SetAlphaTest(1, 6, 1);
+        RenderState_Flush();
         bPinSet = 1;
     }
     if (bLake) {
-        fn_80012EF8();
+        RenderState_Flush();
     }
     if (uFlags2 & 8) {
         fn_80035514((u8*)pMesh);
         pMesh = fn_800354BC(pMesh);
     }
     if (bLake) {
-        fn_80012EF8();
+        RenderState_Flush();
     }
     if ((uFlags2 & 0x10) && b2 == 0) {
         if (pMesh->n20 != 0) {
@@ -1281,30 +1285,30 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
     }
     if (gSession.nSplitScreen == 0 && (uFlags2 & 0x40) && b2 == 0) {
         if (fNear < 60.0f * lbl_801D3CB0.fFOVScale && pMesh->n20 != 0) {
-            fn_8000ADC0(mRaise);
+            Mtx_Identity(mRaise);
             mRaise[3][1] = 0.005f;
             fn_80035240(mRaise);
             fn_80016B9C();
-            fn_80012F34(0);
-            fn_80012EF8();
+            RenderState_SetDepthWrite(0);
+            RenderState_Flush();
             fn_80035514((u8*)pMesh);
-            fn_80012F34(1);
+            RenderState_SetDepthWrite(1);
             fn_80035240(NULL);
             fn_80016B9C();
-            fn_80012EF8();
+            RenderState_Flush();
         }
         fn_800354BC(pMesh);
     }
     if (bPinSet) {
-        fn_80012F50(0, 6, 1);
-        fn_80012EF8();
+        RenderState_SetAlphaTest(0, 6, 1);
+        RenderState_Flush();
     }
 }
 
 // fake match: EA passes the flags through an inline; CodeWarrior substitutes the argument expression at
 // each use, so it is built twice and its bits are taken apart again.
 static inline void Ter_FlagBits(u32 uFlags) {
-    fn_80014118(((uFlags & 0x10) ? 0x10 : 0) | ((uFlags & 0x20) ? 0x20 : 0) | 0x40);
+    RenderState_SetDrawFlags(((uFlags & 0x10) ? 0x10 : 0) | ((uFlags & 0x20) ? 0x20 : 0) | 0x40);
 }
 
 // Draws nCount objects of a draw list, switching the renderer state only when it changes from one
@@ -1379,7 +1383,7 @@ void fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFil
                 }
             }
             if (bDirty) {
-                fn_80012EF8();
+                RenderState_Flush();
                 bDirty = 0;
             }
             if (pDraw->eShaderObjectType == 2) {
@@ -1392,7 +1396,7 @@ void fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFil
         } else if ((lbl_801D3CB0.pObjectStateList[iObject].a20[0] & 1)
                    && (lbl_801D3CB0.pObjectStateList[iObject].a20[0] & 2)) {
             if (bDirty) {
-                fn_80012EF8();
+                RenderState_Flush();
                 bDirty = 0;
             }
             if (pDraw->eShaderObjectType == 2) {
@@ -1403,7 +1407,7 @@ void fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFil
                 fn_8003519C(3, &fWave3);
             }
         } else if (bDirty) {
-            fn_80012EF8();
+            RenderState_Flush();
             bDirty = 0;
         }
         fn_80035514((u8*)pDraw->pObject);
@@ -1438,19 +1442,19 @@ u8 fn_80033308(Ter_ObjectDrawData* pDraw, u8 bForce) {
     }
     if (fAlpha != lbl_802810C8 || (s8)bZWrite != lbl_802810CC || bForce) {
         if (1.0f == fAlpha) {
-            fn_80012F50(1, 6, nRef);
+            RenderState_SetAlphaTest(1, 6, nRef);
             fn_80035170(0x40, ((uFlags & 0x40) ? 0x40 : 0)
                                   | (((uFlags & 0x10) ? 0x10 : 0) | ((uFlags & 0x20) ? 0x20 : 0)));
             fn_8003272C(bZWrite);
             fn_80035098(0);
-            fn_80035118(4, 5);
+            RenderState_SetBlendFactors(4, 5);
         } else {
-            fn_80012F50(1, 6, fAlpha * nRef);
+            RenderState_SetAlphaTest(1, 6, fAlpha * nRef);
             fn_8003272C(1);
             fn_80035098(1);
             fn_80035154(255.0f * (0.5f * fAlpha));
         }
-        fn_80012EF8();
+        RenderState_Flush();
         lbl_802810C8 = fAlpha;
         return 1;
     }
@@ -1485,7 +1489,7 @@ void fn_8003349C(f32 fPercentage, f32 fDuration, f32 fDelay) {
                 }
                 fRand *= 131.2934f;
                 fRand += 82.459f;
-                fRand -= fn_80035074(fRand);
+                fRand -= Math_Floor(fRand);
             } else if ((nFlags & 2) && (nFlags3 & 0x40)) {
                 if (fPercentage >= fRand) {
                     lbl_801D3CB0.pObjectStateList[i].n1C = 1;
@@ -1493,7 +1497,7 @@ void fn_8003349C(f32 fPercentage, f32 fDuration, f32 fDelay) {
                 }
                 fRand *= 131.2934f;
                 fRand += 82.459f;
-                fRand -= fn_80035074(fRand);
+                fRand -= Math_Floor(fRand);
             }
         }
     }
@@ -1641,7 +1645,7 @@ void fn_80033744(void) {
                 fPeriod = 4.0f * (lbl_801D3CB0.pObjectStateList[i].f0 - lbl_801D3CB0.fTreeMinPeriod) + 1.5f;
                 if (lbl_801D3CB0.pObjectStateList[i].n18 == 3) {
                     lbl_801D3CB0.pObjectStateList[i].f4 =
-                        0.5f * fn_800095F0(10.0f
+                        0.5f * Math_Sin(10.0f
                                            * (6.2831855f
                                               * fn_800351D8(lbl_801D3CB0.pObjectStateList[i].nC,
                                                             fPeriod / 10.0f)
@@ -1649,7 +1653,7 @@ void fn_80033744(void) {
                         + 0.5f;
                 } else {
                     lbl_801D3CB0.pObjectStateList[i].f4 =
-                        0.5f * fn_800095F0(0.5f
+                        0.5f * Math_Sin(0.5f
                                            * (6.2831855f
                                               * fn_800351D8(lbl_801D3CB0.pObjectStateList[i].nC,
                                                             fPeriod / 0.5f)
@@ -1703,7 +1707,7 @@ void fn_80033744(void) {
                         4.0f * (lbl_801D3CB0.pObjectStateList[i].f0 - lbl_801D3CB0.fTreeMinPeriod) + 1.5f;
                     if (lbl_801D3CB0.pObjectStateList[i].n18 == 1) {
                         lbl_801D3CB0.pObjectStateList[i].f4 =
-                            0.5f * fn_800095F0(10.0f
+                            0.5f * Math_Sin(10.0f
                                                * (6.2831855f
                                                   * fn_800351D8(lbl_801D3CB0.pObjectStateList[i].nC,
                                                                 fPeriod / 10.0f)
@@ -1711,7 +1715,7 @@ void fn_80033744(void) {
                             + 0.5f;
                     } else {
                         lbl_801D3CB0.pObjectStateList[i].f4 =
-                            0.5f * fn_800095F0(0.5f
+                            0.5f * Math_Sin(0.5f
                                                * (6.2831855f
                                                   * fn_800351D8(lbl_801D3CB0.pObjectStateList[i].nC,
                                                                 fPeriod / 0.5f)
@@ -1766,11 +1770,11 @@ void fn_80033744(void) {
             fNoise = lbl_801D3CB0.fTreeNoiseAmplitudeScale;
             lbl_801D3CB0.pObjectStateList[i].f4 =
                 0.5f * fScale
-                    * fn_800095F0(6.2831855f
+                    * Math_Sin(6.2831855f
                                   * fn_800351D8(gSession.nFrameCount, lbl_801D3CB0.pObjectStateList[i].f0)
                                   / lbl_801D3CB0.pObjectStateList[i].f0)
                 + 0.5f * (fScale * fNoise)
-                      * fn_800095F0(6.2831855f
+                      * Math_Sin(6.2831855f
                                     * fn_800351D8(gSession.nFrameCount,
                                                   lbl_801D3CB0.fTreeNoisePeriodScale
                                                       * lbl_801D3CB0.pObjectStateList[i].f0)
@@ -1821,8 +1825,8 @@ void fn_80033F94(void* pHoleData, u32 nList) {
                 }
                 uFlags = fn_800354D0(pMesh, 2);
                 if (!gSession.nSplitScreen || !(uFlags & 8)) {
-                    pView = fn_80017028(lbl_801D3CB0.iCurrentViewContext);
-                    nClip = fn_80007B2C(pMesh, fn_8001614C(), 0.0f, lbl_801D3CB0.fCameraMinHalfFieldOfViewTan,
+                    pView = ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext);
+                    nClip = fn_80007B2C(pMesh, Camera_GetCurrent(), 0.0f, lbl_801D3CB0.fCameraMinHalfFieldOfViewTan,
                                         pView->f54);
                     if (nClip != 3) {
                         // fake match: uFlags is reused for bUseFog (fog unless flag 0x20); a new local
@@ -1839,7 +1843,7 @@ void fn_80033F94(void* pHoleData, u32 nList) {
         fn_80032F88(lbl_801D3CB0.pPanoramaItemsList, nItems, lbl_801D3CB0.eTerrainFilterMin,
                     lbl_801D3CB0.eTerrainFilterMag);
         fn_8003272C(1);
-        fn_80012EF8();
+        RenderState_Flush();
     }
 }
 
@@ -1851,7 +1855,7 @@ void fn_800341A4(UStreamObject* pObject) {
 
     lbl_802810E4 = pData->fC;
     lbl_802810E8 = pData->f10;
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
     // A value that is not a multiple of lbl_802810D8 gets its remainder added (a multiple only
     // when the remainder was half of it); EA's rounding as it is.
     nRem = lbl_802810E4 % (s32)lbl_802810D8;
@@ -1956,14 +1960,14 @@ void fn_800342F0(UStreamObject* pObject) {
         gSession.f5B44 = v8[2];
         gSession.f5B48 = v8[3];
     }
-    fLength = fn_80009680(gSession.f5B3C * gSession.f5B3C + gSession.f5B44 * gSession.f5B44);
+    fLength = Math_Sqrt(gSession.f5B3C * gSession.f5B3C + gSession.f5B44 * gSession.f5B44);
     if (gSession.f5B40 < fLength) {
         gSession.f5B40 = fLength;
     }
     // port: f5B3C..f5B48 are read as one vector
-    fLength = fn_80009680(fn_80009744(&gSession.f5B3C));
+    fLength = Math_Sqrt(Vec3_LengthSqClamped(&gSession.f5B3C));
     if (fLength < 2000.0f && fLength > 0.0f) {
-        fn_8001EF34(2000.0f / fLength, &gSession.f5B3C, &gSession.f5B3C);
+        Vec3_Scale(2000.0f / fLength, &gSession.f5B3C, &gSession.f5B3C);
     }
     i = Game_GetCourse();
     if (i >= 21) {
@@ -1984,10 +1988,10 @@ void fn_8003467C(void) {
     if (lbl_801D3CB0.pCurrentHoleData != NULL) {
         fn_800075CC(lbl_801D3CB0.pCurrentHoleData);
         lbl_801D3CB0.pCurrentHoleData = NULL;
-        fn_80009E70(lbl_801D3CB0.pCurrentHoleDataStreamData);
+        StaticMem_Free(lbl_801D3CB0.pCurrentHoleDataStreamData);
     }
     if (lbl_801D3CB0.pCourse != NULL) {
-        fn_80009E70(lbl_801D3CB0.pCourseStreamData);
+        StaticMem_Free(lbl_801D3CB0.pCourseStreamData);
         lbl_801D3CB0.pCourse = NULL;
     }
     lbl_801D3CB0.iLowLODListOffset = -1;
@@ -2007,7 +2011,7 @@ void fn_80034720(UStreamObject* pObject) {
         lbl_801D3CB0.pCourse->tee[pTee->nIndex].z = pTee->vPos[2];
         lbl_801D3CB0.pCourse->tee[pTee->nIndex].w = 1.0f;
     }
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // A pin position arrived (UKernel.c hands it on). With fn_800E39F0 set it goes to fn_800F199C;
@@ -2030,7 +2034,7 @@ u8 fn_800347B4(UStreamObject* pObject) {
             lbl_801D3CB0.pCourse->pin[pPin->nIndex].w = 1.0f;
         }
     }
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
     return 0;
 }
 
@@ -2107,10 +2111,10 @@ void fn_80034AE4(void) {
     fn_80016B9C();
     fn_80016B9C();
     fn_80016B9C();
-    fn_80035118(4, 5);
-    fn_80012F50(1, 6, 1);
-    fn_80014118(0x70);
-    fn_80012EF8();
+    RenderState_SetBlendFactors(4, 5);
+    RenderState_SetAlphaTest(1, 6, 1);
+    RenderState_SetDrawFlags(0x70);
+    RenderState_Flush();
     lbl_801D3CB0.xCameraReferencePos[0] = pLens->m4[3][0];
     lbl_801D3CB0.xCameraReferencePos[1] = pLens->m4[3][1];
     lbl_801D3CB0.xCameraReferencePos[2] = pLens->m4[3][2];
@@ -2123,7 +2127,7 @@ void fn_80034AE4(void) {
     for (i = 0; i < gNumPlayersSetUp; i++) {
         fn_80035490(gPlayers[i].ball.vPos, lbl_801D3CB0.xCameraReferencePos, vDiff);
         vDiff[1] = 0.0f;
-        fDist = fn_80009744(vDiff);
+        fDist = Vec3_LengthSqClamped(vDiff);
         if (fDist < lbl_801D3CB0.fXZDistanceToClosestBallSquared) {
             lbl_801D3CB0.fXZDistanceToClosestBallSquared = fDist;
         }
@@ -2131,8 +2135,9 @@ void fn_80034AE4(void) {
     fTan = fn_80014280(0.5f * pLens->fFov);
     fWideTan = fn_80014280(0.5f * (0.75f * pLens->fFov * fn_8001414C((u8*)fn_8003526C())));
     lbl_801D3CB0.fCameraMinHalfFieldOfViewTan =
-        (fTan <= fWideTan / fn_80017028(0)->f54) ? fTan : fWideTan / fn_80017028(0)->f54;
-    fn_80012EF8();
+        (fTan <= fWideTan / ViewController_GetCameraController(0)->f54) ? fTan : fWideTan
+                / ViewController_GetCameraController(0)->f54;
+    RenderState_Flush();
     fn_80034F28(pHoleData);
     fn_80034CAC(0);
     fn_80034DE4();
@@ -2150,8 +2155,8 @@ void fn_80034CAC(int nRenderPass) {
     int nPassBit;
     s32 nClip;
 
-    fn_80012EF8();
-    fn_80014118(0x70);
+    RenderState_Flush();
+    RenderState_SetDrawFlags(0x70);
     for (nPass = 0, nPassBit = 1; nPass < 1; nPass++, nPassBit <<= 1) {
         for (nClip = 0; nClip <= 2; nClip++) {
             switch (nClip) {
@@ -2165,7 +2170,7 @@ void fn_80034CAC(int nRenderPass) {
                 fn_80035138(0);
                 break;
             }
-            fn_80012EF8();
+            RenderState_Flush();
             for (i = lbl_801D3CB0.iNumGrassPatches - 1; i >= 0; i--) {
                 pPatch = &lbl_801D3CB0.xpGrassPatchList[i];
                 if (pPatch->eClipMethod == nClip && pPatch->iRenderPass == nRenderPass
@@ -2176,10 +2181,10 @@ void fn_80034CAC(int nRenderPass) {
             }
         }
     }
-    fn_80012F50(1, 6, 1);
-    fn_80012EF8();
+    RenderState_SetAlphaTest(1, 6, 1);
+    RenderState_Flush();
     fn_8003272C(1);
-    fn_80012EF8();
+    RenderState_Flush();
 }
 
 // Draws the grass patches in list 0x80 of n1C (pass 3), from the end of the list, one clip method
@@ -2191,8 +2196,8 @@ void fn_80034DE4(void) {
     Ter_PatchReference* pPatch;
 
     fn_8003272C(0);
-    fn_80012EF8();
-    fn_80014118(0x70);
+    RenderState_Flush();
+    RenderState_SetDrawFlags(0x70);
     for (nClip = 0; nClip <= 2; nClip++) {
         switch (nClip) {
         case 2:
@@ -2205,7 +2210,7 @@ void fn_80034DE4(void) {
             fn_80035138(0);
             break;
         }
-        fn_80012EF8();
+        RenderState_Flush();
         for (i = lbl_801D3CB0.iNumGrassPatches - 1; i >= 0; i--) {
             pPatch = &lbl_801D3CB0.xpGrassPatchList[i];
             if (pPatch->eClipMethod == nClip && (pPatch->n1C & 0x80)) {
@@ -2214,10 +2219,10 @@ void fn_80034DE4(void) {
             }
         }
     }
-    fn_80012F50(1, 6, 1);
-    fn_80012EF8();
+    RenderState_SetAlphaTest(1, 6, 1);
+    RenderState_Flush();
     fn_8003272C(1);
-    fn_80012EF8();
+    RenderState_Flush();
 }
 
 // Builds the grass list: every patch of this frame in render pass 0's fourth list (bit 0x80 of
@@ -2235,7 +2240,7 @@ void fn_80034F28(void* pUnused) {
     s32 nClip;
 
     // pUnused: the one caller, fn_80034AE4, passes the hole data, which this function does not read
-    pCamera = fn_8001614C();
+    pCamera = Camera_GetCurrent();
     lbl_801D3CB0.iNumGrassPatches = 0;
     pGrass = lbl_801D3CB0.xpGrassPatchList;
     for (i = 0; i < lbl_801D3CB0.iTotalPatches; i++) {
@@ -2247,7 +2252,7 @@ void fn_80034F28(void* pUnused) {
             if (fDist < 0.0f) {
                 fDist = 0.0f;
             }
-            pView = fn_80017028(lbl_801D3CB0.iCurrentViewContext);
+            pView = ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext);
             nClip = fn_80007B2C(fn_8003556C(pPatch->pGround), pCamera, fDist,
                                 lbl_801D3CB0.fCameraMinHalfFieldOfViewTan, pView->f54);
             if (nClip != 3) {
@@ -2269,7 +2274,7 @@ u8 fn_8003505C(u8 b) {
     return bOld;
 }
 
-f32 fn_80035074(f32 x) {
+f32 Math_Floor(f32 x) {
     return floor(x);
 }
 
@@ -2298,7 +2303,7 @@ void fn_800350EC(u8 r, u8 g, u8 b) {
     lbl_801B8980.u110 |= 0x8;
 }
 
-void fn_80035118(int a, int b) {
+void RenderState_SetBlendFactors(int a, int b) {
     lbl_801B8980.n10 = a;
     lbl_801B8980.n14 = b;
     lbl_801B8980.u110 |= 0x10;
@@ -2396,7 +2401,7 @@ void fn_800355E0(s32 arg0);
 void fn_80035600(void);
 
 void fn_8003541C(void) {
-    fn_8001614C();
+    Camera_GetCurrent();
     fn_8006F154();
 }
 
@@ -2554,8 +2559,8 @@ void fn_80035604(void) {
     fn_80035240(NULL);
     fn_80035294();
     fn_80016B9C();
-    fn_80035118(4, 5);
-    fn_80012EF8();
+    RenderState_SetBlendFactors(4, 5);
+    RenderState_Flush();
 }
 
 // ---- end of sweep code ----

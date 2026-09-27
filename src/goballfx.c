@@ -48,11 +48,11 @@ void BFX_vRender(Ball* pBall, int nPlayer) {
     f32* pPos;
     f32 fGround;
     f32 fSize;
-    fGround = fn_8004D80C(fn_8000C594(), pBall->vPos);
+    fGround = fn_8004D80C(Ter_GetTGD(), pBall->vPos);
     if (-65536.125f != fGround) {
         fn_8005CC64(lbl_80281F44, lbl_80281F48);
         fn_80016B9C();
-        fn_80035118(4, 5);
+        RenderState_SetBlendFactors(4, 5);
         pPos = lbl_801D95C8[nPlayer];
         fSize = 0.02f;
         pPos[0] = pBall->vPos[0] - fSize;
@@ -105,9 +105,9 @@ void BFX_vRender(Ball* pBall, int nPlayer) {
         lbl_801D94D8[nPlayer][5] = 0.0f;
         lbl_801D94D8[nPlayer][6] = 1.0f;
         lbl_801D94D8[nPlayer][7] = 1.0f;
-        fn_80014118(0x70);
+        RenderState_SetDrawFlags(0x70);
         fn_80035138(0);
-        fn_80012EF8();
+        RenderState_Flush();
         desc.n0 = 4;
         desc.nVerts = 4;
         desc.pDraw = NULL;

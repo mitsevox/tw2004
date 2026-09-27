@@ -50,23 +50,23 @@ void fn_80093DB8(Ball* pBall, int nPlayer) {
     TrailMeshDesc desc;
     f32 fGround;
     int i;
-    fGround = fn_8004D80C(fn_8000C594(), pBall->vPos);
+    fGround = fn_8004D80C(Ter_GetTGD(), pBall->vPos);
     if (-65536.125f != fGround) {
         fn_8005CC64(lbl_80281F50, lbl_80281F54);
-        fn_80012F34(0);
-        fn_80012F50(0, 6, 0x80);
-        fn_80012F18(3);
-        fn_80035118(4, 5);
+        RenderState_SetDepthWrite(0);
+        RenderState_SetAlphaTest(0, 6, 0x80);
+        RenderState_SetDepthFunc(3);
+        RenderState_SetBlendFactors(4, 5);
         fn_80016B9C();
-        fn_80014118(0x70);
+        RenderState_SetDrawFlags(0x70);
         fn_80035138(0);
-        fn_80012EF8();
+        RenderState_Flush();
         vAway[0] = pBall->vPos[0] - gSession.f5B3C;
         vAway[1] = 0.0f;
         vAway[2] = pBall->vPos[2] - gSession.f5B44;
         vAway[3] = 1.0f;
-        fn_800BAF04(vAway, vAway);
-        fn_8001EF34(lbl_802813A0, vAway, vAway);
+        Vec_NormalizeTo(vAway, vAway);
+        Vec3_Scale(lbl_802813A0, vAway, vAway);
         lbl_801D97B0[0] = vAway[0] + (pBall->vPos[0] - lbl_8028139C);
         lbl_801D97B0[1] = 0.005f + fGround;
         lbl_801D97B0[2] = vAway[2] + (pBall->vPos[2] - lbl_8028139C);
@@ -102,10 +102,10 @@ void fn_80093DB8(Ball* pBall, int nPlayer) {
         desc.pUV = lbl_801D9780;
         fn_80036100((ShaderObject*)lbl_801D96B8[nPlayer], &desc, 1);
         fn_800360D4(lbl_801D96B8[nPlayer]);
-        fn_80012F34(1);
-        fn_80012F50(1, 6, 0x80);
-        fn_80012F18(3);
-        fn_80012EF8();
+        RenderState_SetDepthWrite(1);
+        RenderState_SetAlphaTest(1, 6, 0x80);
+        RenderState_SetDepthFunc(3);
+        RenderState_Flush();
     }
 }
 

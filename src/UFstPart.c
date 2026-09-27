@@ -34,7 +34,7 @@ void fn_80098A98(void) {
     int i;
 
     for (i = 0; i < 6; i++) {
-        lbl_801DB888[i] = fn_80009B34(sizeof(PsEmitter), 2, 64, "UFstPart.c", 408);
+        lbl_801DB888[i] = StaticMem_Alloc(sizeof(PsEmitter), 2, 64, "UFstPart.c", 408);
         lbl_801DB888[i]->b5C = 0;
         memset(&params, 0, sizeof(ParticleParams));
         params.nCount = 128;
@@ -59,7 +59,7 @@ void fn_80098B5C(void) {
     lbl_80281F88 = NULL;
     for (i = 0; i < 6; i++) {
         fn_800360A0(&lbl_801DB888[i]->mesh);
-        fn_80009E70(lbl_801DB888[i]);
+        StaticMem_Free(lbl_801DB888[i]);
     }
 }
 
@@ -67,7 +67,7 @@ void fn_80098BDC(PsEmitter* pEmitter) {
     pEmitter->b5C = 0;
     if (pEmitter->params.n54 < 0) {
         fn_800360A0(&pEmitter->mesh);
-        fn_80009E70(pEmitter);
+        StaticMem_Free(pEmitter);
     }
 }
 
@@ -124,22 +124,22 @@ void fn_80098CDC(ParticleParams* pParams, f32* pPos, f32* pVel, f32* p18, f32* p
     if (pParams->u58 & 0x20) {
         fRand = Misc_RandFuncf(1);
         if (pParams->u58 & 0x10) {
-            fRand = fn_80009680(fRand);
+            fRand = Math_Sqrt(fRand);
         }
         fDist = pParams->f34 * fRand + pParams->f30;
     } else {
         fDist = pParams->f30;
     }
     fTurn = 2.0f * PI * Misc_RandFuncf(1);
-    fSinTurn = fn_800095F0(fTurn);
-    fCosTurn = fn_80009638(fTurn);
+    fSinTurn = Math_Sin(fTurn);
+    fCosTurn = Math_Cos(fTurn);
     if (pParams->u58 & 0x40) {
         fPitch = pParams->f3C * Misc_RandFuncf(1) + pParams->f38;
     } else {
         fPitch = pParams->f38;
     }
-    fSinPitch = fn_800095F0(fPitch);
-    fCosPitch = fn_80009638(fPitch);
+    fSinPitch = Math_Sin(fPitch);
+    fCosPitch = Math_Cos(fPitch);
     fDistXZ = fDist * fCosPitch;
     fSpeedXZ = fSpeed * fCosPitch;
     pPos[0] = fDistXZ * fCosTurn;
@@ -153,11 +153,11 @@ void fn_80098CDC(ParticleParams* pParams, f32* pPos, f32* pVel, f32* p18, f32* p
     if (pParams->u58 & 0x200) {
         if (pParams->u58 & 0x400) {
             fTurn = 2.0f * PI * Misc_RandFuncf(1);
-            fSinTurn = fn_800095F0(fTurn);
-            fCosTurn = fn_80009638(fTurn);
+            fSinTurn = Math_Sin(fTurn);
+            fCosTurn = Math_Cos(fTurn);
             fPitch = 2.0f * PI * Misc_RandFuncf(1);
-            fSinPitch = fn_800095F0(fPitch);
-            fCosPitch = fn_80009638(fPitch);
+            fSinPitch = Math_Sin(fPitch);
+            fCosPitch = Math_Cos(fPitch);
             if (pParams->u58 & 0x800) {
                 fRand = Misc_RandFuncf(1);
                 fRandXZ = fRand * fSinPitch;
@@ -444,7 +444,7 @@ PsEmitter* fn_80099758(ParticleParams* pParams) {
         pParams->nCount = 128;
     }
     if (pParams->n54 < 0) {
-        pEmitter = fn_80009B34(sizeof(PsEmitter), 2, 64, "UFstPart.c", 967);
+        pEmitter = StaticMem_Alloc(sizeof(PsEmitter), 2, 64, "UFstPart.c", 967);
         create.bAlloc = 1;
         create.pParams = pParams;
         fn_80036054(&pEmitter->mesh, 9, &create);
@@ -468,14 +468,14 @@ PsEmitter* fn_80099758(ParticleParams* pParams) {
     pEmitter->params.v70[3] = 1.0f;
     if (pEmitter->params.f4) {
         pEmitter->params.f24 = pParams->f114 + (pEmitter->params.f30 + pEmitter->params.f34);
-        pEmitter->params.f24 += (f32)fn_80009680(pEmitter->params.v60[0] * pEmitter->params.v60[0]
+        pEmitter->params.f24 += (f32)Math_Sqrt(pEmitter->params.v60[0] * pEmitter->params.v60[0]
                                                  + pEmitter->params.v60[1] * pEmitter->params.v60[1]
                                                  + pEmitter->params.v60[2] * pEmitter->params.v60[2]);
         pEmitter->params.f24 += pEmitter->params.f4
                               * (pEmitter->params.f28 + pEmitter->params.f2C
-                                 + (f32)fn_80009680(fn_80009744(pEmitter->params.vA0)));
+                                 + (f32)Math_Sqrt(Vec3_LengthSqClamped(pEmitter->params.vA0)));
         pEmitter->params.f24 += 0.5f * pEmitter->params.f4 * pEmitter->params.f4
-                              * (f32)fn_80009680(fn_80009744(pParams->vB0));
+                              * (f32)Math_Sqrt(Vec3_LengthSqClamped(pParams->vB0));
     }
     pEmitter->p40 = NULL;
     fn_8000A194(pEmitter->mtx, pEmitter->params.f40, pEmitter->params.f44, pEmitter->params.f48);
@@ -523,7 +523,7 @@ void fn_80099B74(PsEmitter* pEmitter) {
 // Sort the emitters by their distance from pCamera's lens (fn_80099E34), then fn_80099B74 each
 // one fn_80099AE4 passes (skipping those with flag 0x80000000).
 void fn_80099BA0(Camera* pCamera) {
-    CamLens* pLens = fn_80008370(pCamera);
+    CamLens* pLens = Camera_GetLens(pCamera);
     PsEmitter* pEmitter;
 
     lbl_801DB878[0] = pLens->m4[3][0];

@@ -19,7 +19,7 @@ void SKEL_TransformBones(CharModel* pModel, u32* auBits);
 f32  fn_80116304(u32 nFrame, f32 fPhase, f32 fStrength);
 f32  fn_80116468(void);
 void Quat_QuatToMatrix(f32* pQ, f32 (*pMtx)[4]);                                    // Quaternion.c
-void fn_8000ADC0(f32 (*pMtx)[4]);                                             // identity
+void Mtx_Identity(f32 (*pMtx)[4]);                                             // identity
 void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);  // VecMath.c
 void fn_80114540(CharModel* pModel, DynChain* pChain, f32 f);
 void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 f);
@@ -43,7 +43,7 @@ DynChainSettings* lbl_802824F8;
 
 // Make the chains' settings, with their starting values.
 void fn_80113E60(void) {
-    lbl_802824F8 = fn_80009B34(sizeof(DynChainSettings), 2, 0, "DynChain.c", 173);
+    lbl_802824F8 = StaticMem_Alloc(sizeof(DynChainSettings), 2, 0, "DynChain.c", 173);
     lbl_802824F8->aParams[1].a0[0] = 3.6f;
     lbl_802824F8->aParams[1].a0[1] = 6.0f;
     lbl_802824F8->aParams[1].a0[2] = 9.9f;
@@ -103,7 +103,7 @@ void fn_8011407C(void) {
 }
 
 void fn_80114080(void) {
-    fn_80009E70(lbl_802824F8);
+    StaticMem_Free(lbl_802824F8);
     lbl_802824F8 = NULL;
 }
 
@@ -128,10 +128,10 @@ void fn_801140AC(DynChainLink* pLink, CharModel* pModel, int nBone, s32 nType) {
             pLink->fLength = 0.5f;
         }
         pLink->f8C = 0.0f;
-        fn_8001E85C(pModel->pPoses[nBone].q0, pLink->q44);
-        fn_8001E85C(pModel->pPoses[nBone].q0, pLink->q54);
-        fn_8001E85C(pModel->pPoses[nBone].v10, pLink->v64);
-        fn_8001E85C(pModel->pPoses[nBone].v10, pLink->v74);
+        Quat_Copy(pModel->pPoses[nBone].q0, pLink->q44);
+        Quat_Copy(pModel->pPoses[nBone].q0, pLink->q54);
+        Quat_Copy(pModel->pPoses[nBone].v10, pLink->v64);
+        Quat_Copy(pModel->pPoses[nBone].v10, pLink->v74);
         fn_80029BC8(pLink->v24);
     }
 }
@@ -175,8 +175,8 @@ DynChain* fn_80114270(CharModel* pModel, int nBone, s32 nType, s32 n10) {
             }
         }
     }
-    pChain = fn_80009B34(sizeof(DynChain), 2, 64, "DynChain.c", 390);
-    pChain->pLinks = fn_80009B34(nLinks * sizeof(DynChainLink), 2, 64, "DynChain.c", 392);
+    pChain = StaticMem_Alloc(sizeof(DynChain), 2, 64, "DynChain.c", 390);
+    pChain->pLinks = StaticMem_Alloc(nLinks * sizeof(DynChainLink), 2, 64, "DynChain.c", 392);
     pChain->nLinks = nLinks;
     pChain->nBone = nBone;
     pChain->nType = nType;
@@ -189,8 +189,8 @@ DynChain* fn_80114270(CharModel* pModel, int nBone, s32 nType, s32 n10) {
 
 // Free a chain.
 void fn_80114398(DynChain* pChain) {
-    fn_80009E70(pChain->pLinks);
-    fn_80009E70(pChain);
+    StaticMem_Free(pChain->pLinks);
+    StaticMem_Free(pChain);
 }
 
 // pIn (x, y, z, w) through pMtx's rotation into pOut; w is copied.
@@ -280,9 +280,9 @@ void fn_80114540(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     fn_801143D0(pModel->pMatrices[pChain->nBone], vUnitY, vUp);
     fn_801143D0(pModel->pMatrices[pChain->nBone], vUnitX, vX);
     fn_801143D0(pModel->pMatrices[pChain->nBone], vUnitZ, vZ);
-    fn_800BAF04(vZ, vZ);
-    fn_800BAF04(vX, vX);
-    fn_800BAF04(vUp, vUp);
+    Vec_NormalizeTo(vZ, vZ);
+    Vec_NormalizeTo(vX, vX);
+    Vec_NormalizeTo(vUp, vUp);
     Vec3Copy(vZ, vWas);
     vHang[0] = vZ[0] * pChain->pLinks->fLength + pModel->pMatrices[pChain->nBone][3][0];
     vHang[1] = vZ[1] * pChain->pLinks->fLength + pModel->pMatrices[pChain->nBone][3][1];
@@ -290,51 +290,51 @@ void fn_80114540(CharModel* pModel, DynChain* pChain, f32 fDelta) {
 
     // Pulled toward where it hangs, and by gravity.
     fn_801164D4(vHang, pChain->pLinks->v04, vDiff);
-    fLag = fn_80009680(fn_80009744(vDiff));
-    fn_8001EF34(fDelta, vDiff, vDiff);
+    fLag = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+    Vec3_Scale(fDelta, vDiff, vDiff);
     fn_801164F8(pChain->pLinks->v24, vDiff, pChain->pLinks->v24);
     pChain->pLinks->v24[1] -= 0.018f * fDelta;
-    fSpeed = fn_80009680(fn_80009744(pChain->pLinks->v24));
+    fSpeed = Math_Sqrt(Vec3_LengthSqClamped(pChain->pLinks->v24));
     if (fSpeed > fMaxSpeed) {
         fSpeed = fMaxSpeed;
-        fn_800BAF04(pChain->pLinks->v24, pChain->pLinks->v24);
-        fn_8001EF34(fMaxSpeed, pChain->pLinks->v24, pChain->pLinks->v24);
+        Vec_NormalizeTo(pChain->pLinks->v24, pChain->pLinks->v24);
+        Vec3_Scale(fMaxSpeed, pChain->pLinks->v24, pChain->pLinks->v24);
     }
     if (fLag > fMaxLag) {
         // Too far behind: put it back at the limit, moving toward where it hangs.
-        fn_800BAF04(vDiff, vDiff);
-        fn_8001EF34(-fMaxLag, vDiff, vBack);
+        Vec_NormalizeTo(vDiff, vDiff);
+        Vec3_Scale(-fMaxLag, vDiff, vBack);
         fn_801164F8(vHang, vBack, pChain->pLinks->v04);
         fn_801164D4(vHang, pChain->pLinks->v04, vDiff);
-        fn_800BAF04(vDiff, vDiff);
-        fn_8001EF34(fSpeed, vDiff, pChain->pLinks->v24);
+        Vec_NormalizeTo(vDiff, vDiff);
+        Vec3_Scale(fSpeed, vDiff, pChain->pLinks->v24);
     }
     fDrag = -0.069f * fDelta;
     if (fabs(fDrag) < fabs(fSpeed)) {
-        fn_800BAF04(pChain->pLinks->v24, vDrag);
-        fn_8001EF34(fDrag, vDrag, vDrag);
+        Vec_NormalizeTo(pChain->pLinks->v24, vDrag);
+        Vec3_Scale(fDrag, vDrag, vDrag);
         fn_801164F8(pChain->pLinks->v24, vDrag, pChain->pLinks->v24);
         fn_801164F8(pChain->pLinks->v24, pChain->pLinks->v04, pChain->pLinks->v04);
     }
 
     // Drop the part of its offset along the matrix's y axis.
     fn_801164D4(vHang, pChain->pLinks->v04, vDiff);
-    fn_8001EF34(fn_8000C5FC(vDiff, vUp), vUp, vMove);
+    Vec3_Scale(Vec3_Dot(vDiff, vUp), vUp, vMove);
     fn_801164F8(vMove, pChain->pLinks->v04, pChain->pLinks->v04);
     fn_801164D4(pChain->pLinks->v04, pModel->pMatrices[pChain->nBone][3], vTo);
-    fn_800BAF04(vTo, vTo);
+    Vec_NormalizeTo(vTo, vTo);
     pChain->pLinks->f8C = fLag;
 
     // Turn the bone from its z axis to the link.
     if ((vWas[0] - vTo[0]) * (vWas[0] - vTo[0]) + (vWas[1] - vTo[1]) * (vWas[1] - vTo[1]) +
             (vWas[2] - vTo[2]) * (vWas[2] - vTo[2]) >
         0.00001f) {
-        fn_800BAF04(vTo, vTo);
-        fn_800BAF04(vWas, vWas);
+        Vec_NormalizeTo(vTo, vTo);
+        Vec_NormalizeTo(vWas, vWas);
         vec4flt_CrossProduct(vTo, vWas, vAxis);
-        fAngle = fn_80009614(fn_8000C5FC(vTo, vWas));
+        fAngle = fn_80009614(Vec3_Dot(vTo, vWas));
         if (fAngle > 0.00001f) {
-            fn_800BAF04(vAxis, vAxis);
+            Vec_NormalizeTo(vAxis, vAxis);
             vAxis[0] *= fAngle;
             vAxis[1] *= fAngle;
             vAxis[2] *= fAngle;
@@ -342,7 +342,7 @@ void fn_80114540(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             Quat_Multiply(pModel->pPoses[pChain->nBone].q0, qTurn, pModel->pPoses[pChain->nBone].q0);
         }
         Quat_QuatToMatrix(pModel->pPoses[pChain->nBone].q0, mRot);
-        fn_8000ADC0(mScale);
+        Mtx_Identity(mScale);
         mScale[0][0] = pModel->a140[pChain->nBone][0];
         mScale[1][1] = pModel->a140[pChain->nBone][1];
         mScale[2][2] = pModel->a140[pChain->nBone][2];
@@ -392,9 +392,9 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     vUnitZ[1] = 0.0f;
     vUnitZ[2] = 1.0f;
     fn_801143D0(pModel->pMatrices[pChain->nBone], vUnitZ, vZ);
-    fn_800BAF04(vZ, vZ);
+    Vec_NormalizeTo(vZ, vZ);
     Vec3Copy(pModel->pMatrices[pChain->nBone][3], vTop);
-    fn_8001EF34(0.025f, vZ, vOff);
+    Vec3_Scale(0.025f, vZ, vOff);
     fn_801164F8(vTop, vOff, vTop);
 
     // Each link's offset to the next bone as the model stands now.
@@ -414,7 +414,7 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     fPull = 30.0f * fStiff * fDelta;
     for (i = 1; i < pChain->nLinks; i++) {
         fDown = (f32)i / (f32)(pChain->nLinks + 1);
-        fn_8001E85C(pModel->pPoses[pChain->nBone + i].v10, vPos);
+        Quat_Copy(pModel->pPoses[pChain->nBone + i].v10, vPos);
         pChain->pLinks[i].v64[3] = 1.0f;
         vPos[3] = 1.0f;
         vDiff[0] = vPos[0] - pChain->pLinks[i].v64[0];
@@ -439,24 +439,24 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         vPoint[1] = vPos[1];
         vPoint[2] = vPos[2];
         fn_801164D4(vTop, vPoint, vOff);
-        fDot = fn_8000C5FC(vOff, vZ);
+        fDot = Vec3_Dot(vOff, vZ);
         if (fDot < 0.0f) {
             vPos[0] += vZ[0] * fDot;
             vPos[1] += vZ[1] * fDot;
             vPos[2] += vZ[2] * fDot;
         }
-        fn_8001E85C(pModel->pPoses[pChain->pLinks[i].nParent].v10, vParent);
+        Quat_Copy(pModel->pPoses[pChain->pLinks[i].nParent].v10, vParent);
         vDiff[0] = vPos[0] - vParent[0];
         vDiff[1] = vPos[1] - vParent[1];
         vDiff[2] = vPos[2] - vParent[2];
         if (0.0f != vDiff[0] && 0.0f != vDiff[1] && 0.0f != vDiff[2]) {
-            fn_800BAF04(vDiff, vDiff);
+            Vec_NormalizeTo(vDiff, vDiff);
         }
         vPos[0] = vDiff[0] * pChain->pLinks[i].fLength + vParent[0];
         vPos[1] = vDiff[1] * pChain->pLinks[i].fLength + vParent[1];
         vPos[2] = vDiff[2] * pChain->pLinks[i].fLength + vParent[2];
-        fn_8001E85C(vPos, pChain->pLinks[i].v64);
-        fn_8001E85C(vPos, pModel->pPoses[pChain->nBone + i].v10);
+        Quat_Copy(vPos, pChain->pLinks[i].v64);
+        Quat_Copy(vPos, pModel->pPoses[pChain->nBone + i].v10);
         fn_8001E880(vPos, pModel->pMatrices[pChain->nBone + i][3]);
         SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[pChain->nBone + i], pChain->nBone + i);
     }
@@ -473,19 +473,19 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             vBone[3] = 0.0f;
             Vec3Copy(pChain->pLinks[i].v34, vWas);
             if (0.0f != vBone[0] || 0.0f != vBone[1] || 0.0f != vBone[2]) {
-                fn_800BAF04(vBone, vBone);
+                Vec_NormalizeTo(vBone, vBone);
             }
             if (0.0f != vWas[0] || 0.0f != vWas[1] || 0.0f != vWas[2]) {
-                fn_800BAF04(vWas, vWas);
+                Vec_NormalizeTo(vWas, vWas);
             }
-            if ((f32)fn_80009680((vWas[0] - vBone[0]) * (vWas[0] - vBone[0]) +
+            if ((f32)Math_Sqrt((vWas[0] - vBone[0]) * (vWas[0] - vBone[0]) +
                                  (vWas[1] - vBone[1]) * (vWas[1] - vBone[1]) +
                                  (vWas[2] - vBone[2]) * (vWas[2] - vBone[2])) > 0.001f) {
                 vec4flt_CrossProduct(vWas, vBone, vAxis);
-                fAngle = fn_80009614(fn_8000C5FC(vBone, vWas));
+                fAngle = fn_80009614(Vec3_Dot(vBone, vWas));
                 if (fabs(fAngle) > 0.01f) {
                     if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
-                        fn_800BAF04(vAxis, vAxis);
+                        Vec_NormalizeTo(vAxis, vAxis);
                     }
                     vAxis[0] *= fAngle;
                     vAxis[1] *= fAngle;
@@ -496,7 +496,7 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
                 }
             }
             Quat_QuatToMatrix(pModel->pPoses[pChain->nBone + i].q0, mRot);
-            fn_8000ADC0(mScale);
+            Mtx_Identity(mScale);
             mScale[0][0] = pModel->a140[pChain->nBone + i][0];
             mScale[1][1] = pModel->a140[pChain->nBone + i][1];
             mScale[2][2] = pModel->a140[pChain->nBone + i][2];
@@ -507,10 +507,10 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         } else {
             // The last bone takes the rotation of the one above it (not in 4-link chains).
             if (pChain->nLinks != 4) {
-                fn_8001E85C(pModel->pPoses[pChain->nBone + i - 1].q0, pModel->pPoses[pChain->nBone + i].q0);
+                Quat_Copy(pModel->pPoses[pChain->nBone + i - 1].q0, pModel->pPoses[pChain->nBone + i].q0);
             }
             Quat_QuatToMatrix(pModel->pPoses[pChain->nBone + i].q0, mRot);
-            fn_8000ADC0(mScale);
+            Mtx_Identity(mScale);
             mScale[0][0] = pModel->a140[pChain->nBone + i][0];
             mScale[1][1] = pModel->a140[pChain->nBone + i][1];
             mScale[2][2] = pModel->a140[pChain->nBone + i][2];
@@ -519,8 +519,8 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             Vec_Copy(vSave, pModel->pMatrices[pChain->nBone + i][3]);
             SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[pChain->nBone + i], pChain->nBone + i);
         }
-        fn_8001E85C(pChain->pLinks[i].q44, pChain->pLinks[i].q54);
-        fn_8001E85C(pChain->pLinks[i].v64, pChain->pLinks[i].v74);
+        Quat_Copy(pChain->pLinks[i].q44, pChain->pLinks[i].q54);
+        Quat_Copy(pChain->pLinks[i].v64, pChain->pLinks[i].v74);
     }
 }
 
@@ -558,7 +558,7 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     if (gSession.nGameType == 3) {
         return;
     }
-    fn_8001E938(auBits, 128);
+    BitArray_ClearAll(auBits, 128);
     fStrength = fn_80116468();
     nFrames = 60.0f * (FRAME_RATE * fDelta);
     if (pChain->n10 < 3) {
@@ -602,7 +602,7 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     fn_800BAD60(pModel->pMatrices[0], (Vec4*)lbl_80193DE8[pChain->n10], (Vec4*)vFace);
     vFace[1] = 0.0f;
     vWind[1] = 0.0f;
-    fFacing = fn_8000C5FC(vFace, vWind);
+    fFacing = Vec3_Dot(vFace, vWind);
     fFacing = (1.0f + fFacing) / 2.0f;
     fFacing *= fFaceAmt;
     fSpeedA = (1.0f - lbl_802824F8->f7C) * fFacing + lbl_802824F8->f7C;
@@ -651,18 +651,18 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         if (0.0f != fPeriod) {
             nPeriod = fPeriod;
             fT = (f32)(pChain->n18 % nPeriod) / fPeriod;
-            fAngle = fSize * fn_800095F0(2.0f * PI * fT + PI * (2.0f * lbl_802824F8->aParams[0].a18[i]));
+            fAngle = fSize * Math_Sin(2.0f * PI * fT + PI * (2.0f * lbl_802824F8->aParams[0].a18[i]));
             fAngle += PI * lbl_802824F8->aParams[0].a24[i] / 180.0f;
         } else {
             fAngle = 0.0f;
         }
-        fn_8000AE28(fAngle, vAxis1, vAxis1);
+        Vec_Scale(fAngle, vAxis1, vAxis1);
         Quat_BuildFromVector(vAxis1, qTurn);
-        fn_8001E85C(pModel->pBones[pChain->pLinks[i].nBone].q0C, pChain->pLinks[i].q44);
+        Quat_Copy(pModel->pBones[pChain->pLinks[i].nBone].q0C, pChain->pLinks[i].q44);
         if (lbl_802824F8->an9C[pChain->n10] != 0) {
             Quat_Multiply(pModel->pBones[pChain->pLinks[i].nBone].q0C, qTurn, qOut);
-            fn_8001E85C(qOut, pModel->pBones[pChain->pLinks[i].nBone].q0C);
-            fn_8001EA34(auBits, pChain->pLinks[i].nBone);
+            Quat_Copy(qOut, pModel->pBones[pChain->pLinks[i].nBone].q0C);
+            BitArray_Set(auBits, pChain->pLinks[i].nBone);
         }
     }
 
@@ -696,22 +696,22 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         if (0.0f != fPeriod) {
             nPeriod = fPeriod;
             fT = (f32)(pChain->n18 % nPeriod) / fPeriod;
-            fAngle = fSize * fn_800095F0(2.0f * PI * fT + PI * (2.0f * lbl_802824F8->aParams[1].a18[i]));
+            fAngle = fSize * Math_Sin(2.0f * PI * fT + PI * (2.0f * lbl_802824F8->aParams[1].a18[i]));
             fAngle += PI * lbl_802824F8->aParams[1].a24[i] / 180.0f;
         } else {
             fAngle = 0.0f;
         }
-        fn_8000AE28(fAngle, vAxis2, vAxis2);
+        Vec_Scale(fAngle, vAxis2, vAxis2);
         Quat_BuildFromVector(vAxis2, qTurn);
         if (lbl_802824F8->an9C[pChain->n10] != 0) {
             Quat_Multiply(pModel->pBones[pChain->pLinks[i].nBone].q0C, qTurn, qOut);
-            fn_8001E85C(qOut, pModel->pBones[pChain->pLinks[i].nBone].q0C);
-            fn_8001EA34(auBits, pChain->pLinks[i].nBone);
+            Quat_Copy(qOut, pModel->pBones[pChain->pLinks[i].nBone].q0C);
+            BitArray_Set(auBits, pChain->pLinks[i].nBone);
         }
     }
     SKEL_TransformBones(pModel, auBits);
     for (i = 0; i < pChain->nLinks; i++) {
-        fn_8001E85C(pChain->pLinks[i].q44, pModel->pBones[pChain->pLinks[i].nBone].q0C);
+        Quat_Copy(pChain->pLinks[i].q44, pModel->pBones[pChain->pLinks[i].nBone].q0C);
     }
 }
 
@@ -769,7 +769,7 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
                 vBone);
     if (0.0f != vBone[0] || 0.0f != vBone[1] || 0.0f != vBone[2]) {
         // Bend down, by how level the link is and how near it points to the kind's direction.
-        fn_800BAF04(vBone, vBoneN);
+        Vec_NormalizeTo(vBone, vBoneN);
         fLevel = 1.0f - fabsf(vBoneN[1]);
         Quat_ExtractEulerAngles(pModel->pPoses[pChain->pLinks->nParent].q0, &fX, &fY, &fZ);
         fOff = fabsf(180.0f / PI * fY - lbl_80193E48[pChain->n10]);
@@ -786,8 +786,8 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         vDown[1] = vDown[1] - 1.0f;
         vec4flt_CrossProduct(vBone, vDown, vAxis);
         if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
-            fn_800BAF04(vAxis, vAxisN);
-            fn_8000AE28(DEG(lbl_802824F8->f68) * fLevel, vAxisN, vTurn);
+            Vec_NormalizeTo(vAxis, vAxisN);
+            Vec_Scale(DEG(lbl_802824F8->f68) * fLevel, vAxisN, vTurn);
             Quat_BuildFromVector(vTurn, qTurn);
             Quat_RotateVector(qTurn, vBone, vNew);
             fn_801164F8(vNew, pModel->pMatrices[pChain->pLinks->nParent][3],
@@ -819,39 +819,39 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             fAmp *= fSize;
             if (0.0f != fPeriod) {
                 nPeriod = fPeriod;
-                fWave = fn_800095F0(2.0f * PI * ((f32)(pChain->n18 % nPeriod) / fPeriod) +
+                fWave = Math_Sin(2.0f * PI * ((f32)(pChain->n18 % nPeriod) / fPeriod) +
                                     pChain->n10 / 0.5f);
                 fAngle = fAmp * fWave;
             } else {
                 fAngle = 0.0f;
             }
-            fn_8001E85C(pModel->pBones[pChain->pLinks->nBone].q0C, pChain->pLinks->q44);
+            Quat_Copy(pModel->pBones[pChain->pLinks->nBone].q0C, pChain->pLinks->q44);
             fn_8011651C(pModel->pMatrices[pChain->pLinks->nBone][3],
                         pModel->pMatrices[pChain->pLinks->nParent][3], vDir);
             if (!(fabsf(vDir[0]) < 0.001f) || !(fabsf(vDir[1]) < 0.001f) || !(fabsf(vDir[2]) < 0.001f)) {
-                fn_800BAF04(vDir, vDirN);
+                Vec_NormalizeTo(vDir, vDirN);
                 if (pChain->n10 < 3) {
-                    nRef = fn_8001EED8(pModel, 0x12);
+                    nRef = CharModel_GetBoneIndex(pModel, 0x12);
                 } else {
-                    nRef = fn_8001EED8(pModel, 0x25);
+                    nRef = CharModel_GetBoneIndex(pModel, 0x25);
                 }
                 fn_8011651C(pModel->pMatrices[nRef][3], pModel->pMatrices[pChain->pLinks->nParent][3], vRef);
                 if (!(fabsf(vRef[0]) < 0.001f) || !(fabsf(vRef[1]) < 0.001f) || !(fabsf(vRef[2]) < 0.001f)) {
-                    fn_800BAF04(vRef, vRefN);
+                    Vec_NormalizeTo(vRef, vRefN);
                     vec4flt_CrossProduct(vRefN, vDirN, vSide);
                     if (!(fabsf(vSide[0]) < 0.001f) || !(fabsf(vSide[1]) < 0.001f) ||
                         !(fabsf(vSide[2]) < 0.001f)) {
-                        fn_800BAF04(vSide, vSide);
+                        Vec_NormalizeTo(vSide, vSide);
                         vec4flt_CrossProduct(vSide, vDirN, vAxis);
                         if (!(fabsf(vAxis[0]) < 0.001f) || !(fabsf(vAxis[1]) < 0.001f) ||
                             !(fabsf(vAxis[2]) < 0.001f)) {
-                            fn_800BAF04(vAxis, vAxis);
-                            fn_8001EF34(lbl_802824F8->f6C, vSide, vSide);
+                            Vec_NormalizeTo(vAxis, vAxis);
+                            Vec3_Scale(lbl_802824F8->f6C, vSide, vSide);
                             fn_801164F8(vSide, vAxis, vAxis);
                             if (!(fabsf(vAxis[0]) < 0.001f) || !(fabsf(vAxis[1]) < 0.001f) ||
                                 !(fabsf(vAxis[2]) < 0.001f)) {
-                                fn_800BAF04(vAxis, vAxis);
-                                fn_8000AE28(fAngle, vAxis, vAxis);
+                                Vec_NormalizeTo(vAxis, vAxis);
+                                Vec_Scale(fAngle, vAxis, vAxis);
                                 Quat_BuildFromVector(vAxis, qTurn);
                                 Quat_RotateVector(qTurn, vDir, vSwung);
                                 fn_801164F8(vSwung, pModel->pMatrices[pChain->pLinks->nParent][3],
@@ -859,7 +859,7 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
                                 SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[pChain->pLinks->nBone],
                                             pChain->pLinks->nBone);
                                 for (i = 0; i < pChain->nLinks; i++) {
-                                    fn_8001E85C(pChain->pLinks[i].q44,
+                                    Quat_Copy(pChain->pLinks[i].q44,
                                                 pModel->pBones[pChain->pLinks[i].nBone].q0C);
                                 }
                             }
@@ -884,9 +884,9 @@ f32 fn_80116304(u32 nFrame, f32 fPhase, f32 fStrength) {
 
     fAngle = PI * (2.0f * ((f32)(nFrame % (u32)fPeriod) / fPeriod));
     // Four waves; CodeWarrior calls the right operand first, so the 3x wave is made first.
-    fWave = fn_800095F0(7.0f * fAngle + 6.0f + fPhase) +
-            (fn_800095F0(5.0f * fAngle + 4.0f + fPhase) +
-             (fn_800095F0(fAngle + fPhase) + fn_800095F0(3.0f * fAngle + 2.0f + fPhase)));
+    fWave = Math_Sin(7.0f * fAngle + 6.0f + fPhase) +
+            (Math_Sin(5.0f * fAngle + 4.0f + fPhase) +
+             (Math_Sin(fAngle + fPhase) + Math_Sin(3.0f * fAngle + 2.0f + fPhase)));
     fSway = fOne * fWave;
     fSway += lbl_802824F8->f94 + fStrength * (lbl_802824F8->f98 - lbl_802824F8->f94) / 35.0f;
     fSway = (fSway < 0.0f) ? 0.0f : ((fSway > fOne) ? fOne : fSway);

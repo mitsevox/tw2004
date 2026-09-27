@@ -435,7 +435,7 @@ int  fn_801076B0(char* sz, int nMsg);
 void fn_8010771C(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, f32 fG);
 void fn_80107774(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, s32 nG, s32 nH, s32 nI,
                  s32 nJ);
-SaveProfile* fn_80077ACC(void);         // the profile being worked on
+SaveProfile* FE_GetCurrentProfile(void);         // the profile being worked on
 u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);  // the asset is locked (FE_Manager.c)
 int  fn_80078604(int a, int b, int c);  // a date (month, day, year from fn_8011E020) packed
 int  fn_80077B08(void);                 // its player slot

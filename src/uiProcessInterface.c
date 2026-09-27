@@ -144,10 +144,10 @@ void fn_8008F648(s32 nTicks) {
 
     if (lbl_80281F1A) {
         fn_8001425C(0);
-        fn_80035118(4, 5);
-        fn_80012F34(0);
-        fn_80012F50(1, 6, 1);
-        fn_80012EF8();
+        RenderState_SetBlendFactors(4, 5);
+        RenderState_SetDepthWrite(0);
+        RenderState_SetAlphaTest(1, 6, 1);
+        RenderState_Flush();
         if (lbl_80281370 && gSession.nGameType == 3) {
             fn_80091454();
         }
@@ -162,15 +162,15 @@ void fn_8008F648(s32 nTicks) {
         fn_800908D4(1.0f);
         fn_80012C54_SetWordWrap(0);
         fn_80016B6C(1.0f, 1.0f);
-        fn_80012F34(1);
-        fn_80012F50(1, 6, 0x80);
-        fn_80012F18(3);
-        fn_80012EF8();
+        RenderState_SetDepthWrite(1);
+        RenderState_SetAlphaTest(1, 6, 0x80);
+        RenderState_SetDepthFunc(3);
+        RenderState_Flush();
         if (lbl_801D880C.n0 <= 2 && lbl_801D880C.n0 >= 0) {
             lbl_801D880C.n0++;
         } else if (lbl_801D880C.n0 > 2) {
             lbl_801D880C.n0 = -1;
-            fn_80005AE8(aArgs, 0, sizeof(aArgs));
+            Mem_set(aArgs, 0, sizeof(aArgs));
             aArgs[0] = lbl_801D880C.n4;
             if (gSession.nGameType == 3) {
                 UISProcessHint(lbl_80281F1C->pHandler, 0x23, 1, aArgs);
@@ -219,7 +219,7 @@ void fn_8008F820(void) {
     }
     if (gSession.nGameType >= 4 && gSession.nGameType <= 8 && gSession.nPaused == 0) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
-            pView = fn_80017028(gPlayers[i].nView[0]);
+            pView = ViewController_GetCameraController(gPlayers[i].nView[0]);
             if ((fn_80063C90(pView) || pView->script.nCamera == 3) && pView->nCurCamera != 0x15) {
                 return;
             }
@@ -232,7 +232,7 @@ void fn_8008F820(void) {
     pPressed = (u32*)&lbl_801D87C0.n38;
     pButtons = (u32*)(void*)pPressed;
     *pButtons = 0;
-    fn_80005AE8(aArgs, 0, sizeof(aArgs));
+    Mem_set(aArgs, 0, sizeof(aArgs));
     pButtons = aButtons;
     pPressed = aPressed;
     for (i = 0; i < 4; i++) {
@@ -244,7 +244,7 @@ void fn_8008F820(void) {
             lbl_801D87C0.a1[i] = 0;
         }
         if (lbl_801D87C0.a1[i]) {
-            pButtons[i] = fn_800136DC(i);
+            pButtons[i] = Controller_GetButtons(i);
             if (pButtons[i] & 0x40000) {
                 pButtons[i] |= 4;
             }
@@ -313,8 +313,8 @@ void fn_8008F820(void) {
                     fn_800E5240(k);
                 }
                 if (gSession.nGameType == 6) {
-                    uMask = fn_800142AC(0x20, 1);
-                    uButtons = fn_800136DC(k);
+                    uMask = Controller_GetButtonMask(0x20, 1);
+                    uButtons = Controller_GetButtons(k);
                     if (uButtons & uMask) {
                         lbl_80189B38[k]++;
                     } else {
@@ -439,7 +439,7 @@ FrontEnd* fn_8009005C(char* szSet) {
     lbl_80281F1A = 1;
     lbl_80281F1B = 0;
     fn_8008EC60(szSet);
-    lbl_80281F1C = fn_80009B34(sizeof(FrontEnd), 2, 16, "uiProcessInterface.c", 904);
+    lbl_80281F1C = StaticMem_Alloc(sizeof(FrontEnd), 2, 16, "uiProcessInterface.c", 904);
     lbl_80281F1C->f18 = 0.0f;
     lbl_80281F1C->pFile = fn_8008F0C0(szSet);
     lbl_80281F1C->p8 = fn_8008F0F0(szSet);
@@ -457,7 +457,7 @@ FrontEnd* fn_8009005C(char* szSet) {
     fn_8008F488(lbl_80281F1C);
     fn_8008FE88(lbl_80281F1C);
     fn_8008FDDC(lbl_80281F1C);
-    lbl_80281F1C->pHandler = fn_80009B34(UISGetMemSize(10, 9, 256, 2, 2048, 128), 2, 16,
+    lbl_80281F1C->pHandler = StaticMem_Alloc(UISGetMemSize(10, 9, 256, 2, 2048, 128), 2, 16,
                                          "uiProcessInterface.c", 943);
     UISInit(lbl_80281F1C->pHandler, 10, 9, 256, 2, 2048, 128, 16);
     UISRegisterPluginFnc(lbl_80281F1C->pHandler, 0, (UISPluginFncT*)fn_800914DC);
@@ -522,8 +522,8 @@ void fn_80090400(FrontEnd* pFE) {
     fn_8008F164(pFE->pC);
     fn_8008F0FC(pFE->p8);
     fn_8008F0C8(pFE->pFile);
-    fn_80009E70(lbl_80281F1C->pHandler);
-    fn_80009E70(lbl_80281F1C);
+    StaticMem_Free(lbl_80281F1C->pHandler);
+    StaticMem_Free(lbl_80281F1C);
     lbl_80281F1C = NULL;
 }
 

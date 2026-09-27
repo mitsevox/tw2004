@@ -29,33 +29,33 @@ void CharSlider_Free(CharSliderDefs* pDefs) {
         if (pDefs->pDefs != NULL) {
             for (i = 0; i < pDefs->nSliders; i++) {
                 if (pDefs->pDefs[i].pLinks != NULL) {
-                    fn_80009E70(pDefs->pDefs[i].pLinks);
+                    StaticMem_Free(pDefs->pDefs[i].pLinks);
                 }
                 if (pDefs->pDefs[i].pLimits != NULL) {
-                    fn_80009E70(pDefs->pDefs[i].pLimits);
+                    StaticMem_Free(pDefs->pDefs[i].pLimits);
                 }
                 if (pDefs->pDefs[i].pBoneRanges != NULL) {
                     for (j = 0; j < pDefs->pDefs[i].nBoneRanges; j++) {
-                        fn_80009E70(pDefs->pDefs[i].pBoneRanges[j].items.pBones);
+                        StaticMem_Free(pDefs->pDefs[i].pBoneRanges[j].items.pBones);
                     }
-                    fn_80009E70(pDefs->pDefs[i].pBoneRanges);
+                    StaticMem_Free(pDefs->pDefs[i].pBoneRanges);
                 }
                 if (pDefs->pDefs[i].pMorphRanges != NULL) {
                     for (j = 0; j < pDefs->pDefs[i].nMorphRanges; j++) {
-                        fn_80009E70(pDefs->pDefs[i].pMorphRanges[j].items.pMorphs);
+                        StaticMem_Free(pDefs->pDefs[i].pMorphRanges[j].items.pMorphs);
                     }
-                    fn_80009E70(pDefs->pDefs[i].pMorphRanges);
+                    StaticMem_Free(pDefs->pDefs[i].pMorphRanges);
                 }
             }
-            fn_80009E70(pDefs->pDefs);
+            StaticMem_Free(pDefs->pDefs);
         }
         if (pDefs->pValues != NULL) {
-            fn_80009E70(pDefs->pValues);
+            StaticMem_Free(pDefs->pValues);
         }
         if (pDefs->aMorphIds != NULL) {
-            fn_80009E70(pDefs->aMorphIds);
+            StaticMem_Free(pDefs->aMorphIds);
         }
-        fn_80009E70(pDefs);
+        StaticMem_Free(pDefs);
     }
 }
 
@@ -82,21 +82,21 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
         return NULL;
     }
 
-    pDefs = fn_80009B34(sizeof(CharSliderDefs), 2, 0, "CharSliders.c", 1010);
-    fn_80005AE8(pDefs, 0, sizeof(CharSliderDefs));
+    pDefs = StaticMem_Alloc(sizeof(CharSliderDefs), 2, 0, "CharSliders.c", 1010);
+    Mem_set(pDefs, 0, sizeof(CharSliderDefs));
     pDefs->nSliders = nSliders;
-    pDefs->pDefs = fn_80009B34(pDefs->nSliders * sizeof(CharSliderDef), 2, 0, "CharSliders.c", 1014);
-    fn_80005AE8(pDefs->pDefs, 0, pDefs->nSliders * sizeof(CharSliderDef));
-    pDefs->pValues = fn_80009B34(pDefs->nSliders * sizeof(CharSliderValue), 2, 0, "CharSliders.c", 1016);
-    fn_80005AE8(pDefs->pValues, 0, pDefs->nSliders * sizeof(CharSliderValue));
+    pDefs->pDefs = StaticMem_Alloc(pDefs->nSliders * sizeof(CharSliderDef), 2, 0, "CharSliders.c", 1014);
+    Mem_set(pDefs->pDefs, 0, pDefs->nSliders * sizeof(CharSliderDef));
+    pDefs->pValues = StaticMem_Alloc(pDefs->nSliders * sizeof(CharSliderValue), 2, 0, "CharSliders.c", 1016);
+    Mem_set(pDefs->pValues, 0, pDefs->nSliders * sizeof(CharSliderValue));
     pDefs->nMorphs = nMorphs;
-    pDefs->aMorphIds = fn_80009B34(pDefs->nMorphs * sizeof(u64), 2, 0, "CharSliders.c", 1020);
-    fn_80005AE8(pDefs->aMorphIds, 0, pDefs->nMorphs * sizeof(u64));
+    pDefs->aMorphIds = StaticMem_Alloc(pDefs->nMorphs * sizeof(u64), 2, 0, "CharSliders.c", 1020);
+    Mem_set(pDefs->aMorphIds, 0, pDefs->nMorphs * sizeof(u64));
 
     // The sliders; the pointers read with them are not valid yet.
     for (i = 0; i < pDefs->nSliders; i++) {
         pDst = &pDefs->pDefs[i];
-        fn_8001F08C((void**)ppData, &pDst, lbl_80193C30, 10, 1);
+        ByteSwap_Records((void**)ppData, &pDst, lbl_80193C30, 10, 1);
         pDefs->pDefs[i].pBoneRanges = NULL;
         pDefs->pDefs[i].pMorphRanges = NULL;
         pDefs->pDefs[i].pLinks = NULL;
@@ -104,21 +104,21 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
     }
     for (i = 0; i < pDefs->nSliders; i++) {
         if (pDefs->pDefs[i].nLinks > 0) {
-            pDefs->pDefs[i].pLinks = fn_80009B34(pDefs->pDefs[i].nLinks * sizeof(CharSliderLink), 2, 0,
+            pDefs->pDefs[i].pLinks = StaticMem_Alloc(pDefs->pDefs[i].nLinks * sizeof(CharSliderLink), 2, 0,
                                                  "CharSliders.c", 1039);
             for (j = 0; j < pDefs->pDefs[i].nLinks; j++) {
                 pDst = &pDefs->pDefs[i].pLinks[j];
-                fn_8001F08C((void**)ppData, &pDst, lbl_80193BF0, 6, 1);
+                ByteSwap_Records((void**)ppData, &pDst, lbl_80193BF0, 6, 1);
             }
         }
     }
     for (i = 0; i < pDefs->nSliders; i++) {
         if (pDefs->pDefs[i].nLimits > 0) {
-            pDefs->pDefs[i].pLimits = fn_80009B34(pDefs->pDefs[i].nLimits * sizeof(CharSliderLimit), 2, 0,
+            pDefs->pDefs[i].pLimits = StaticMem_Alloc(pDefs->pDefs[i].nLimits * sizeof(CharSliderLimit), 2, 0,
                                                   "CharSliders.c", 1053);
             for (nLimit = 0; nLimit < pDefs->pDefs[i].nLimits; nLimit++) {
                 pDst = &pDefs->pDefs[i].pLimits[nLimit];
-                fn_8001F08C((void**)ppData, &pDst, lbl_80193C20, 2, 1);
+                ByteSwap_Records((void**)ppData, &pDst, lbl_80193C20, 2, 1);
             }
         }
     }
@@ -126,11 +126,12 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
     // The bone ranges, then the bones of each.
     for (i = 0; i < pDefs->nSliders; i++) {
         if (pDefs->pDefs[i].nBoneRanges > 0) {
-            pDefs->pDefs[i].pBoneRanges = fn_80009B34(pDefs->pDefs[i].nBoneRanges * sizeof(CharSliderRange),
+            pDefs->pDefs[i].pBoneRanges
+                    = StaticMem_Alloc(pDefs->pDefs[i].nBoneRanges * sizeof(CharSliderRange),
                                                       2, 0, "CharSliders.c", 1067);
             for (nBoneRange = 0; nBoneRange < pDefs->pDefs[i].nBoneRanges; nBoneRange++) {
                 pDst = &pDefs->pDefs[i].pBoneRanges[nBoneRange];
-                fn_8001F08C((void**)ppData, &pDst, lbl_80193B98, 4, 1);
+                ByteSwap_Records((void**)ppData, &pDst, lbl_80193B98, 4, 1);
                 pDefs->pDefs[i].pBoneRanges[nBoneRange].items.pBones = NULL;
             }
         }
@@ -139,11 +140,11 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
         for (j = 0; j < pDefs->pDefs[i].nBoneRanges; j++) {
             if (pDefs->pDefs[i].pBoneRanges[j].nItems > 0) {
                 pDefs->pDefs[i].pBoneRanges[j].items.pBones =
-                    fn_80009B34(pDefs->pDefs[i].pBoneRanges[j].nItems * sizeof(CharSliderBone), 2, 0,
+                    StaticMem_Alloc(pDefs->pDefs[i].pBoneRanges[j].nItems * sizeof(CharSliderBone), 2, 0,
                                 "CharSliders.c", 1084);
                 for (nBone = 0; nBone < pDefs->pDefs[i].pBoneRanges[j].nItems; nBone++) {
                     pDst = &pDefs->pDefs[i].pBoneRanges[j].items.pBones[nBone];
-                    fn_8001F08C((void**)ppData, &pDst, lbl_80193B70, 5, 1);
+                    ByteSwap_Records((void**)ppData, &pDst, lbl_80193B70, 5, 1);
                 }
             }
         }
@@ -152,11 +153,12 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
     // The morph target ranges, then the morph targets of each.
     for (i = 0; i < pDefs->nSliders; i++) {
         if (pDefs->pDefs[i].nMorphRanges > 0) {
-            pDefs->pDefs[i].pMorphRanges = fn_80009B34(pDefs->pDefs[i].nMorphRanges * sizeof(CharSliderRange),
+            pDefs->pDefs[i].pMorphRanges
+                    = StaticMem_Alloc(pDefs->pDefs[i].nMorphRanges * sizeof(CharSliderRange),
                                                        2, 0, "CharSliders.c", 1100);
             for (nMorphRange = 0; nMorphRange < pDefs->pDefs[i].nMorphRanges; nMorphRange++) {
                 pDst = &pDefs->pDefs[i].pMorphRanges[nMorphRange];
-                fn_8001F08C((void**)ppData, &pDst, lbl_80193BD0, 4, 1);
+                ByteSwap_Records((void**)ppData, &pDst, lbl_80193BD0, 4, 1);
                 pDefs->pDefs[i].pMorphRanges[nMorphRange].items.pMorphs = NULL;
             }
         }
@@ -165,11 +167,11 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
         for (j = 0; j < pDefs->pDefs[i].nMorphRanges; j++) {
             if (pDefs->pDefs[i].pMorphRanges[j].nItems > 0) {
                 pDefs->pDefs[i].pMorphRanges[j].items.pMorphs =
-                    fn_80009B34(pDefs->pDefs[i].pMorphRanges[j].nItems * sizeof(CharSliderMorph), 2, 0,
+                    StaticMem_Alloc(pDefs->pDefs[i].pMorphRanges[j].nItems * sizeof(CharSliderMorph), 2, 0,
                                 "CharSliders.c", 1117);
                 for (k = 0; k < pDefs->pDefs[i].pMorphRanges[j].nItems; k++) {
                     pDst = &pDefs->pDefs[i].pMorphRanges[j].items.pMorphs[k];
-                    fn_8001F08C((void**)ppData, &pDst, lbl_80193BB8, 3, 1);
+                    ByteSwap_Records((void**)ppData, &pDst, lbl_80193BB8, 3, 1);
                 }
             }
         }
@@ -178,7 +180,7 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
     // The morph targets' ids.
     for (i = 0; i < pDefs->nMorphs; i++) {
         pDst = &pDefs->aMorphIds[i];
-        fn_8001F08C((void**)ppData, &pDst, lbl_80281788, 1, 1);
+        ByteSwap_Records((void**)ppData, &pDst, lbl_80281788, 1, 1);
     }
     return pDefs;
 }
@@ -263,7 +265,7 @@ void CharSlider_NormalizePairs(CharSliderDefs* pDefs) {
                     if (n >= 0) {
                         pOther = &pDefs->pValues[n];
                         if (pOther->bFixed == 0) {
-                            fLength = fn_80009680(pValue->fValue * pValue->fValue
+                            fLength = Math_Sqrt(pValue->fValue * pValue->fValue
                                                   + pOther->fValue * pOther->fValue);
                             if (!(fLength <= pLimit->fLength) && fLength != 0.0f) {
                                 pValue->fValue = pLimit->fLength * (pValue->fValue / fLength);

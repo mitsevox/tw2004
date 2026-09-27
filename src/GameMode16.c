@@ -171,7 +171,7 @@ void fn_800F5014(int nPlayer) {
                 lbl_80282398 = fn_800F2578();
                 lbl_80282398 = GM_Earnings_ComputeBonusModifiers(lbl_80282398, nPlayer, 1, 1, 1, 0);
                 lbl_80282398 = GM_Earnings_ComputeTOURCardModifiers(lbl_80282398, nPlayer, 0);
-                fn_800D3548(nPlayer, lbl_80282398, 0);
+                GM_Earnings_AwardMoney(nPlayer, lbl_80282398, 0);
                 gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
                 gPlayers[nPlayer].nDD8 += lbl_80282398;
                 fn_800F3980(0x33, lbl_80282398, 0, 0, 0xCA, 1);
@@ -284,9 +284,9 @@ void fn_800F5014(int nPlayer) {
             fn_800F263C(0x4E);
         }
         if (lbl_80282398 + gPlayers[nPlayer].nDD8 < 0) {
-            fn_800D3548(nPlayer, -gPlayers[nPlayer].nDD8, 0);
+            GM_Earnings_AwardMoney(nPlayer, -gPlayers[nPlayer].nDD8, 0);
         } else {
-            fn_800D3548(nPlayer, lbl_80282398, 0);
+            GM_Earnings_AwardMoney(nPlayer, lbl_80282398, 0);
         }
         gPlayers[nPlayer].nDD8 += lbl_80282398;
         if (gPlayers[nPlayer].nDD8 < 0) {

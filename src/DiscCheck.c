@@ -80,7 +80,7 @@ void fn_80110178(u8 b) {
 int fn_80110180(void) {
     char szPath[128];                   // the size is unknown (the frame allows up to 132)
     char* szCourse = fn_800E2680();
-    char* szHole = GameManager_GetHoleName(fn_80015464());
+    char* szHole = GameManager_GetHoleName(Game_GetCurHoleNum());
 
     sprintf(szPath, "data\\%s", szCourse);
     if (fn_801100AC(szPath)) {

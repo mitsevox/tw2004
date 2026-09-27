@@ -315,7 +315,7 @@ void fn_8010CA2C(PlayerNumber_t nPlayer) {
         gPlayers[nPlayer].nED4++;
         break;
     case 4:
-        if (fn_80015464() == 4) {
+        if (Game_GetCurHoleNum() == 4) {
             // port: EA passes two arguments fn_800A746C ignores
             ((void (*)(s32, int, int, int, int))fn_800A746C)(1, 0, 2, 0, 0);
         } else {

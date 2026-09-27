@@ -4,9 +4,9 @@
 
 #include "camera.h"
 
-void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: copy a 4x4 matrix
+void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: copy a 4x4 matrix
 void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: inverts a rotation+translation
-void fn_8000ADC0(f32 (*pMtx)[4]);                     // identity
+void Mtx_Identity(f32 (*pMtx)[4]);                     // identity
 void fn_8001728C(CamLens* pLens);
 f32  fn_80014280(f32 x);                              // tan, as a float
 void fn_800354B4(u8* p, f32 v);                       // GoTerrain.c: sets the lens's fAC
@@ -23,14 +23,14 @@ void CA_vUpdateInternalFieldOfViewData(CamLens* pLens) {
 }
 
 CamLens* CA_spCreateCamera(void) {
-    CamLens* pLens = fn_80009B34(sizeof(CamLens), 2, 16, "GoCamera.c", 152);
+    CamLens* pLens = StaticMem_Alloc(sizeof(CamLens), 2, 16, "GoCamera.c", 152);
 
     CA_vInitCamera(pLens);
     return pLens;
 }
 
 void CA_vReleaseCamera(CamLens* pLens) {
-    fn_80009E70(pLens);
+    StaticMem_Free(pLens);
 }
 
 // fake match: stands in for a function the original linker stripped. The file's pool has 0.1,
@@ -54,14 +54,14 @@ void CA_vSetLookAt(CamLens* pLens, f32* pPos, f32* pTarget) {
     pLens->m4[3][3] = 1.0f;
     vDir[3] = 0.0f;
     fn_80076A14(pTarget, pPos, vDir);
-    if ((f32)fn_80009680(fn_80009744(vDir)) > 0.1f) {
-        fn_800BAF04(vDir, pLens->m4[2]);
+    if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vDir)) > 0.1f) {
+        Vec_NormalizeTo(vDir, pLens->m4[2]);
         if (fabsf(pLens->m4[2][1]) < 0.99f) {
             pLens->m4[0][0] = pLens->m4[2][2];
             pLens->m4[0][1] = 0.0f;
             pLens->m4[0][2] = -pLens->m4[2][0];
             pLens->m4[0][3] = 0.0f;
-            fn_800BAF04(pLens->m4[0], pLens->m4[0]);
+            Vec_NormalizeTo(pLens->m4[0], pLens->m4[0]);
         }
         vec4flt_CrossProduct(pLens->m4[2], pLens->m4[0], pLens->m4[1]);
     }
@@ -79,13 +79,13 @@ void CA_vSetLookAtSide(CamLens* pLens, f32* pPos, f32* pTarget, f32* pSide) {
     pLens->m4[3][3] = 1.0f;
     vDir[3] = 0.0f;
     fn_80076A14(pTarget, pPos, vDir);
-    if ((f32)fn_80009680(fn_80009744(vDir)) > 0.1f) {
-        fn_800BAF04(vDir, pLens->m4[2]);
+    if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vDir)) > 0.1f) {
+        Vec_NormalizeTo(vDir, pLens->m4[2]);
         pLens->m4[0][0] = pSide[0];
         pLens->m4[0][1] = pSide[1];
         pLens->m4[0][2] = pSide[2];
         pLens->m4[0][3] = 0.0f;
-        fn_800BAF04(pLens->m4[0], pLens->m4[0]);
+        Vec_NormalizeTo(pLens->m4[0], pLens->m4[0]);
         vec4flt_CrossProduct(pLens->m4[2], pLens->m4[0], pLens->m4[1]);
     }
     fn_8000A798(pLens->m4, pLens->m44);
@@ -107,53 +107,53 @@ void Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* pP
     pLens->m4[3][3] = 1.0f;
     vDir[3] = 0.0f;
     fn_80076A14(pTarget, pPos, vDir);
-    if ((f32)fn_80009680(fn_80009744(vDir)) > 0.1f) {
-        fn_800BAF04(vDir, pLens->m4[2]);
+    if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vDir)) > 0.1f) {
+        Vec_NormalizeTo(vDir, pLens->m4[2]);
         if (fabsf(pLens->m4[2][1]) < 0.99f) {
             pLens->m4[0][0] = pLens->m4[2][2];
             pLens->m4[0][1] = 0.0f;
             pLens->m4[0][2] = -pLens->m4[2][0];
             pLens->m4[0][3] = 0.0f;
-            fn_800BAF04(pLens->m4[0], pLens->m4[0]);
+            Vec_NormalizeTo(pLens->m4[0], pLens->m4[0]);
         }
         vec4flt_CrossProduct(pLens->m4[2], pLens->m4[0], pLens->m4[1]);
     }
     fn_8000A798(pLens->m4, pLens->m44);
 
     // world to camera: move pCenter to the origin, scale, move it back
-    fn_8000ADC0(mTmp);
+    Mtx_Identity(mTmp);
     mTmp[3][0] = pCenter[0];
     mTmp[3][1] = pCenter[1];
     mTmp[3][2] = pCenter[2];
     fn_800BADF8(mTmp, pLens->m44, mB, 4);
-    fn_8000ADC0(mTmp);
+    Mtx_Identity(mTmp);
     mTmp[0][0] = pScale[0];
     mTmp[1][1] = pScale[1];
     mTmp[2][2] = pScale[2];
     fn_800BADF8(mTmp, mB, mA, 4);
-    fn_8000ADC0(mTmp);
+    Mtx_Identity(mTmp);
     mTmp[3][0] = -pCenter[0];
     mTmp[3][1] = -pCenter[1];
     mTmp[3][2] = -pCenter[2];
     fn_800BADF8(mTmp, mA, pLens->m44, 4);
 
     // camera to world: the same with the inverse scale
-    fn_8000ADC0(mTmp);
+    Mtx_Identity(mTmp);
     mTmp[3][0] = pCenter[0];
     mTmp[3][1] = pCenter[1];
     mTmp[3][2] = pCenter[2];
-    fn_8000ADC0(mB);
+    Mtx_Identity(mB);
     mB[0][0] = pLens->m84[0][0];
     mB[1][1] = pLens->m84[0][1];
     mB[2][2] = pLens->m84[0][2];
     fn_800BADF8(mB, mTmp, mA, 4);
-    fn_8000ADC0(mTmp);
+    Mtx_Identity(mTmp);
     mTmp[3][0] = -pCenter[0];
     mTmp[3][1] = -pCenter[1];
     mTmp[3][2] = -pCenter[2];
     fn_800BADF8(mTmp, mA, mB, 4);
     fn_800BADF8(pLens->m4, mB, mA, 4);
-    fn_8000A0E8(mA, pLens->m4);
+    Mtx_Copy(mA, pLens->m4);
     fn_800BADF8(pLens->m4, pLens->m44, mB, 4);   // the result is never used
 }
 
@@ -175,10 +175,10 @@ void fn_80076948(CamLens* pLens, f32 fB4, f32 fB8) {
 // Sets the lens's camera-to-world matrix (pMtx, or the identity when NULL) and its inverse.
 void CA_vSetMatrix(CamLens* pLens, f32 (*pMtx)[4]) {
     if (pMtx == NULL) {
-        fn_8000ADC0(pLens->m4);
-        fn_8000ADC0(pLens->m44);
+        Mtx_Identity(pLens->m4);
+        Mtx_Identity(pLens->m44);
     } else {
-        fn_8000A0E8(pMtx, pLens->m4);
+        Mtx_Copy(pMtx, pLens->m4);
         fn_8000A798(pMtx, pLens->m44);
     }
     fn_8001728C(pLens);

@@ -58,10 +58,10 @@ int fn_800CB950(CourseInfo* pCourse, f32* pA, f32* pB, f32* pC, f32* pD, TerPoly
     TER_GROW_BOX(pC);
     TER_GROW_BOX(pD);
 
-    nX0 = (int)fn_80035074((fMinX - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    nZ0 = (int)fn_80035074((fMinZ - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
-    nX1 = (int)fn_80035074((fMaxX - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    nZ1 = (int)fn_80035074((fMaxZ - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    nX0 = (int)Math_Floor((fMinX - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nZ0 = (int)Math_Floor((fMinZ - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    nX1 = (int)Math_Floor((fMaxX - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    nZ1 = (int)Math_Floor((fMaxZ - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
 
     for (nX = nX0; nX <= nX1; nX++) {
         for (nZ = nZ0; nZ <= nZ1; nZ++) {
@@ -144,8 +144,8 @@ f32 Ter_GetSupportingGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** pp
                 s32* pTri) {
     u32 uPinSet = 1 << Game_CurrentPinSet();
     f32 fBest = TER_NO_GROUND;
-    int nX = (int)fn_80035074((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    int nZ = (int)fn_80035074((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    int nX = (int)Math_Floor((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
+    int nZ = (int)Math_Floor((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
     TerCell* pCell;
     TerPolyRef* pRef;
     f32 (*pVert)[3];

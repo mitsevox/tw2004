@@ -248,7 +248,7 @@ s32 fn_80116858(char* sz, u16 nDate, s32* pLook, s32* pButton) {
         }
         if (bSelected) {
             *pLook = 4;
-        } else if (fn_80077ACC()->aC8[nId].award.bWon &&
+        } else if (FE_GetCurrentProfile()->aC8[nId].award.bWon &&
                    (nDate < lbl_80223C48.nToday ||
                     (lbl_80223C48.bSeasonOver && nDate == lbl_80223C48.nToday))) {
             *pLook = 5;

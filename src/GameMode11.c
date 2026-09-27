@@ -319,7 +319,7 @@ void fn_80100508(void) {
     CourseInfo* pCourse;
     if (-1.0f == lbl_80192DF8[n].vPos[0] && -1.0f == lbl_80192DF8[n].vPos[1] &&
         -1.0f == lbl_80192DF8[n].vPos[2]) {
-        pCourse = fn_8000C594();
+        pCourse = Ter_GetTGD();
         Vec_Copy(&pCourse->tee[gSession.nTeeSet[0]].x, gPlayers[0].vBall);
     } else {
         fHeight = CamScript_GuessBestPlayableHeight(lbl_80192DF8[n].vPos, NULL);
@@ -526,7 +526,7 @@ void fn_80100C08(void) {
     }
     switch (lbl_80282428) {
     case 0:
-        if (fn_800136DC(gPlayers[0].nController) & fn_800142AC(0, 0)) {
+        if (Controller_GetButtons(gPlayers[0].nController) & Controller_GetButtonMask(0, 0)) {
             lbl_80282428 = lbl_80282424;
         }
         break;
@@ -538,12 +538,12 @@ void fn_80100C08(void) {
             if (lbl_80282424 == 13) {
                 lbl_80282428 = 18;
                 lbl_80282424 = 13;
-                CameraController_FadeOut(fn_80017028(gPlayers[0].nView[0]), 0.25f, v);
+                CameraController_FadeOut(ViewController_GetCameraController(gPlayers[0].nView[0]), 0.25f, v);
             }
         }
         break;
     case 18:
-        if (fn_80063C7C(fn_80017028(gPlayers[0].nView[0]))) {
+        if (fn_80063C7C(ViewController_GetCameraController(gPlayers[0].nView[0]))) {
             lbl_80282428 = lbl_80282424;
         }
         break;
@@ -817,9 +817,9 @@ void fn_80100C08(void) {
         }
         // falls through
     case 19:
-        if (fn_80063C7C(fn_80017028(gPlayers[0].nView[0]))) {
+        if (fn_80063C7C(ViewController_GetCameraController(gPlayers[0].nView[0]))) {
             nView = gPlayers[0].nView[0];
-            CameraController_SetCameraMode(fn_80017028(nView), 18, 0, nView);
+            CameraController_SetCameraMode(ViewController_GetCameraController(nView), 18, 0, nView);
             if (lbl_802823FC == 12) {
                 lbl_80282424 = 13;
                 lbl_80282428 = 1;

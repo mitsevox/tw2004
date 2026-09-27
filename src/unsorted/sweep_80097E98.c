@@ -3,7 +3,7 @@
 #include "game_types.h"
 
 extern s32 lbl_80281F78;
-void fn_80009E70();
+void StaticMem_Free();
 void fn_800988A0();
 void fn_800988B8();
 void fn_800988CC();
@@ -11,7 +11,7 @@ void fn_800988CC();
 void fn_80097E98(void);
 void fn_80097EC4(f32* pPos);
 void fn_80097E98(void) {
-    fn_80009E70(lbl_80281F78);
+    StaticMem_Free(lbl_80281F78);
     lbl_80281F78 = 0;
 }
 

@@ -38,13 +38,13 @@ UObjModelRoot* fn_800073B4(u8* pData, int n) {
     }
     pHead = (UObjModelHead*)pData;
     pData += sizeof(UObjModelHead);
-    pRoot = fn_80009B34(sizeof(UObjModelRoot) + pHead->nMeshes * sizeof(UObjMesh) +
+    pRoot = StaticMem_Alloc(sizeof(UObjModelRoot) + pHead->nMeshes * sizeof(UObjMesh) +
                         (pHead->nMeshes - 1) * sizeof(UObjMesh*), 2, 16, "LLObj_Gc.c", 198);
     pNext = (u8*)pRoot;
     pRoot->pE4 = NULL;
     pRoot->pE0 = pStart;
     pRoot->pE8 = pHead;
-    fn_80005AE8(pRoot, 0, sizeof(pRoot->aSets));
+    Mem_set(pRoot, 0, sizeof(pRoot->aSets));
     pRoot->aSets[0].n30 = -1;
     pRoot->aSets[1].n30 = -1;
     pRoot->aSets[2].n30 = -1;
@@ -68,7 +68,7 @@ void fn_80007524(UObjMesh* pMesh) {
         }
     }
     if (pMesh->p18 != NULL) {
-        fn_80009E70(pMesh->p18);
+        StaticMem_Free(pMesh->p18);
     }
     pChild = pMesh->p10;
     for (i = 0; i < pMesh->pInfo->n0; i++) {
@@ -89,9 +89,9 @@ void fn_800075CC(UObjModelRoot* pRoot) {
     }
     fn_80007524(pRoot->pMesh);
     if (pRoot->pE4 != NULL) {
-        fn_80009E70(pRoot->pE4);
+        StaticMem_Free(pRoot->pE4);
     }
-    fn_80009E70(pRoot);
+    StaticMem_Free(pRoot);
 }
 
 // Makes a mesh's parts from the model data at pData: the first gets its type (pInfo->n88) set up
@@ -104,9 +104,9 @@ void fn_80007658(UObjModelRoot* pRoot, UObjMesh* pMesh, u8* pData, int nCount, i
     if (nCount == 0) {
         return;
     }
-    pMesh->p18 = fn_80009B34(pMesh->pInfo->n8C * sizeof(UObjMeshPart), 2, 32, "LLObj_Gc.c", 398);
-    fn_80005AE8(pMesh->p18, 0, pMesh->pInfo->n8C * sizeof(UObjMeshPart));
-    fn_80005AE8(pMesh->a1C, 0, sizeof(pMesh->a1C));
+    pMesh->p18 = StaticMem_Alloc(pMesh->pInfo->n8C * sizeof(UObjMeshPart), 2, 32, "LLObj_Gc.c", 398);
+    Mem_set(pMesh->p18, 0, pMesh->pInfo->n8C * sizeof(UObjMeshPart));
+    Mem_set(pMesh->a1C, 0, sizeof(pMesh->a1C));
     desc.n0 = pMesh->pInfo->n8C;
     desc.n4 = nCount;
     desc.u0A = 0;
@@ -142,7 +142,7 @@ void fn_80007824(UObjModelRoot* pRoot, int nSet) {
     for (i = 0; i < 5; i++) {
         if (pRoot->aSets[0].an20[i] != 0) {
             uSize = (pRoot->aSets[0].an20[i] * 12 + 31) & ~31;
-            pRoot->aSets[nSet].ap0[i] = fn_80009B34(uSize, 2, 32, "LLObj_Gc.c", 473);
+            pRoot->aSets[nSet].ap0[i] = StaticMem_Alloc(uSize, 2, 32, "LLObj_Gc.c", 473);
             Mem_cpy(pRoot->aSets[nSet].ap0[i], pRoot->aSets[0].ap0[i], uSize);
         }
     }
@@ -154,7 +154,7 @@ void fn_80007930(UObjModelRoot* pRoot, int nSet) {
 
     for (i = 0; i < 5; i++) {
         if (pRoot->aSets[0].an20[i] != 0) {
-            fn_80009E70(pRoot->aSets[nSet].ap0[i]);
+            StaticMem_Free(pRoot->aSets[nSet].ap0[i]);
         }
     }
 }
@@ -177,7 +177,7 @@ int fn_8000799C(UObjModelRoot* pRoot, UObjMesh* pMesh, int n, u8** ppData, u8** 
     pMesh->n24 = 0;
     pMesh->p18 = NULL;
     pMesh->n28 = 0;
-    fn_80005AE8(pMesh->a1C, 0, sizeof(pMesh->a1C));
+    Mem_set(pMesh->a1C, 0, sizeof(pMesh->a1C));
     if (pMesh->pInfo->n4 != 0) {
         pChunk = *ppData;
         *ppData += 8;
@@ -271,7 +271,7 @@ int fn_80007D74(Sphere* s, Camera* cam, int mode) {
     float px, pz, dist;
     int result;
 
-    if (fn_80008378(fn_80008370(cam)) == 0) {
+    if (fn_80008378(Camera_GetLens(cam)) == 0) {
         if (s->z + s->radius > fn_80008368(cam)) return 2;
         if (s->z + s->radius < fn_80008360(cam)) return 2;
 
@@ -311,10 +311,10 @@ int fn_80007D74(Sphere* s, Camera* cam, int mode) {
         }
         return result;
     } else {
-        float top    =  fn_80008370(cam)->fB8 / 2.0f;
-        float bottom = -fn_80008370(cam)->fB8 / 2.0f;
-        float right  =  fn_80008370(cam)->fB4 / 2.0f;
-        float left   = -fn_80008370(cam)->fB4 / 2.0f;
+        float top    =  Camera_GetLens(cam)->fB8 / 2.0f;
+        float bottom = -Camera_GetLens(cam)->fB8 / 2.0f;
+        float right  =  Camera_GetLens(cam)->fB4 / 2.0f;
+        float left   = -Camera_GetLens(cam)->fB4 / 2.0f;
 
         if (s->z + s->radius > fn_80008368(cam)) return 2;
         if (s->z + s->radius < fn_80008360(cam)) return 2;

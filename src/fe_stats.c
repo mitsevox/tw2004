@@ -77,7 +77,7 @@ void UIStatsRankings_GetRow(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8011D05C(MsgArg* pArgs, MsgArg* pResult) {
     char* szOut = ((MsgString*)pArgs[0].p)->pStr;
 
-    strcpy(szOut, fn_80077ACC()->szName);
+    strcpy(szOut, FE_GetCurrentProfile()->szName);
 }
 
 // Picks the category the leader board shows.

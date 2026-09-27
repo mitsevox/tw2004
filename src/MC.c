@@ -165,7 +165,7 @@ s32 fn_8009FAD0(void) {
                 nResult = fn_8009DD44(nPort, nSlot, MC_DIR_NAME);
                 if (nResult == 0) {
                     if (lbl_80281F1C != NULL) {
-                        fn_80005AE8(args, 0, sizeof(args));
+                        Mem_set(args, 0, sizeof(args));
                         args[0].i = nPort;
                         args[1].i = nSlot;
                         UISDoHint(lbl_80281F1C->pHandler, 0x85, 2, (s32*)args);
@@ -183,7 +183,7 @@ s32 fn_8009FAD0(void) {
                 }
             }
             if (nMount == 0) {
-                fn_8009DBAC(nPort, nSlot);
+                MC_Unmount(nPort, nSlot);
             }
         }
     }
@@ -199,7 +199,7 @@ s32 fn_8009FAD0(void) {
         }
         fn_8009EF98();
     } else if (lbl_80281F1C != NULL) {
-        fn_80005AE8(&arg, 0, sizeof(arg));
+        Mem_set(&arg, 0, sizeof(arg));
         UISDoHint(lbl_80281F1C->pHandler, 0x86, 1, (s32*)&arg);
     }
     // EA bug: nResult is never set when no card gets as far as the file check
@@ -239,7 +239,7 @@ s32 MC_LoadOptions(MCCardPos* pPos) {
         }
     }
     if (nMount == 0) {
-        fn_8009DBAC(nPort, nSlot);
+        MC_Unmount(nPort, nSlot);
     }
     if (bLoaded) {
         if (lbl_80281FDC->uFlags & MC_SAVE_4D0C0) {
@@ -300,14 +300,14 @@ s32 MC_SaveOptions(MCCardPos* pPos) {
         if (fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FE8, MC_BUFFER_SIZE) != 0) {
             lbl_80281FE8->uFlags = 0;
             if (nMount == 0) {
-                fn_8009DBAC(nPort, nSlot);
+                MC_Unmount(nPort, nSlot);
             }
             return MC_ERR_BADDATA;
         }
         if (!fn_800A233C(lbl_80281FE8, &lbl_80281FE8->trailer)) {
             lbl_80281FE8->uFlags = 0;
             if (nMount == 0) {
-                fn_8009DBAC(nPort, nSlot);
+                MC_Unmount(nPort, nSlot);
             }
             return MC_ERR_BADDATA;
         }
@@ -325,7 +325,7 @@ s32 MC_SaveOptions(MCCardPos* pPos) {
         if (nResult != 0) return nResult;
     }
     if (nMount == 0) {
-        fn_8009DBAC(nPort, nSlot);
+        MC_Unmount(nPort, nSlot);
     }
     return 0;
 }
@@ -349,7 +349,7 @@ s32 fn_800A0230(MCCardPos* pPos) {
     nResult = fn_8009DD44(nPort, nSlot, MC_DIR_NAME);
     if (nResult != 0) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return nResult;
     }
@@ -365,7 +365,7 @@ s32 fn_800A0230(MCCardPos* pPos) {
         }
     }
     if (nMount == 0) {
-        fn_8009DBAC(nPort, nSlot);
+        MC_Unmount(nPort, nSlot);
     }
     return nResult;
 }
@@ -434,7 +434,7 @@ s32 fn_800A036C(MCCardPos* pPos) {
                               MC_BACKUP_NAME);
     }
     if (nMount == 0) {
-        fn_8009DBAC(nPort, nSlot);
+        MC_Unmount(nPort, nSlot);
     }
     return nResult;
 }
@@ -454,7 +454,7 @@ s32 fn_800A0610(s32 nPort, s32 nSlot, s32 nReplay) {
     if (nResult != 0) return nResult;
     if (fn_8009DD44(nPort, nSlot, MC_DIR_NAME) != 0) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return -16;
     }
@@ -490,7 +490,7 @@ s32 fn_800A0610(s32 nPort, s32 nSlot, s32 nReplay) {
     lbl_80281FE0->trailer.uChecksum = fn_800A23BC(lbl_80281FE0, &lbl_80281FE0->trailer);
     nResult = fn_8009E604(nPort, nSlot, MC_FILE_NAME, lbl_80281FE0, MC_BUFFER_SIZE, MC_BACKUP_NAME);
     if (nMount == 0) {
-        fn_8009DBAC(nPort, nSlot);
+        MC_Unmount(nPort, nSlot);
     }
     return nResult;
 }
@@ -503,41 +503,41 @@ void fn_800A0868(s32 nPort, s32 nSlot) {
 
     pState = fn_8009F834(nPort, nSlot);
     // EA bug: clears 4 bits, but there are NUM_SAVE_REPLAYS (5) replays
-    fn_8001E938(pState->aReplayUsed, 4);
+    BitArray_ClearAll(pState->aReplayUsed, 4);
     if (nPort >= MC_NUM_PORTS || nSlot >= MC_NUM_SLOTS) return;
     nMount = fn_8009D74C(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return;
     if (fn_8009F734(nPort, nSlot) != 0) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return;
     }
     if (fn_8009DD44(nPort, nSlot, MC_DIR_NAME) != 0) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return;
     }
     if (fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FEC, MC_BUFFER_SIZE) != 0) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return;
     }
     if (!fn_800A233C(lbl_80281FEC, &lbl_80281FEC->trailer)) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return;
     }
     for (i = 0; i < NUM_SAVE_REPLAYS; i++) {
         if (lbl_80281FEC->uFlags & MC_SAVE_REPLAY(i)) {
-            fn_8001EA34(pState->aReplayUsed, i);
+            BitArray_Set(pState->aReplayUsed, i);
         }
     }
     if (nMount == 0) {
-        fn_8009DBAC(nPort, nSlot);
+        MC_Unmount(nPort, nSlot);
     }
 }
 
@@ -553,7 +553,7 @@ s32 fn_800A09EC(MCCardPos* pPos) {
     pState = fn_8009F834(nPort, nSlot);
     fn_800A0868(nPort, nSlot);
     for (i = 0; i < NUM_SAVE_REPLAYS; i++) {
-        if (fn_8001E9CC(pState->aReplayUsed, i)) {
+        if (BitArray_Test(pState->aReplayUsed, i)) {
             nCount++;
         }
     }
@@ -570,7 +570,7 @@ s32 fn_800A0A7C(s32 nPort, s32 nSlot) {
     if (nResult != 0) return nResult;
     nResult = fn_8009F5E4(nPort, nSlot, MC_DIR_NAME);
     if (nMount == 0) {
-        fn_8009DBAC(nPort, nSlot);
+        MC_Unmount(nPort, nSlot);
     }
     return nResult;
 }
@@ -628,14 +628,14 @@ s32 MC_LoadUser(MCCardPosStr* pPos) {
     nResult = fn_8009F734(nPort, nSlot);
     if (nResult != 0) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return nResult;
     }
     nResult = fn_8009DD44(nPort, nSlot, MC_DIR_NAME);
     if (nResult != 0) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return nResult;
     }
@@ -644,13 +644,13 @@ s32 MC_LoadUser(MCCardPosStr* pPos) {
     if (nRead == MC_ERR_BADDATA) return MC_ERR_BADDATA;
     if (nRead != 0) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return -15;
     }
     if (!fn_800A233C(lbl_80281FE4, &lbl_80281FE4->trailer)) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return MC_ERR_BADDATA;
     }
@@ -666,7 +666,7 @@ s32 MC_LoadUser(MCCardPosStr* pPos) {
         gpSaveData[nProfile].createdGolfer.nModelID = 7;
     }
     if (nMount == 0) {
-        fn_8009DBAC(nPort, nSlot);
+        MC_Unmount(nPort, nSlot);
     }
     return nRead;
 }
@@ -729,7 +729,7 @@ s32 MC_SaveUser(MCCardPos* pPos) {
                               MC_BACKUP_NAME);
     }
     if (nMount == 0) {
-        fn_8009DBAC(nPort, nSlot);
+        MC_Unmount(nPort, nSlot);
     }
     return nResult;
 }
@@ -748,7 +748,7 @@ s32 fn_800A1164(s32 nPort, s32 nSlot, const char* szName, s32 nProfile) {
     if (nResult != 0) return nResult;
     if (fn_8009DD44(nPort, nSlot, MC_DIR_NAME) != 0) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return -15;
     }
@@ -778,7 +778,7 @@ s32 fn_800A1164(s32 nPort, s32 nSlot, const char* szName, s32 nProfile) {
     lbl_80281FDC->trailer.uChecksum = fn_800A23BC(lbl_80281FDC, &lbl_80281FDC->trailer);
     nResult = fn_8009E604(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE, MC_BACKUP_NAME);
     if (nMount == 0) {
-        fn_8009DBAC(nPort, nSlot);
+        MC_Unmount(nPort, nSlot);
     }
     return nResult;
 }
@@ -816,7 +816,7 @@ s32 MC_LoadLastUser(s32 nPort, s32 nSlot, s32 nProfile) {
         }
     }
     if (nMount == 0) {
-        fn_8009DBAC(nPort, nSlot);
+        MC_Unmount(nPort, nSlot);
     }
     return nResult;
 }
@@ -833,27 +833,27 @@ s32 MC_GetUser(s32 nPort, s32 nSlot, s32 nProfile, char* szName) {
     nResult = fn_8009F734(nPort, nSlot);
     if (nResult != 0) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return nResult;
     }
     nResult = fn_8009DD44(nPort, nSlot, MC_DIR_NAME);
     if (nResult != 0) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return nResult;
     }
     nResult = fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FE4, MC_BUFFER_SIZE);
     if (nResult != 0) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return nResult;
     }
     if (!fn_800A233C(lbl_80281FE4, &lbl_80281FE4->trailer)) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return MC_ERR_BADDATA;
     }
@@ -861,12 +861,12 @@ s32 MC_GetUser(s32 nPort, s32 nSlot, s32 nProfile, char* szName) {
     if (lbl_80281FD8->uFlags & MC_SAVE_PROFILE(nProfile)) {
         strncpy(szName, lbl_80281FD8->aProfile[nProfile].szName, 0x1D);
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return 0;
     }
     if (nMount == 0) {
-        fn_8009DBAC(nPort, nSlot);
+        MC_Unmount(nPort, nSlot);
     }
     return -15;
 }
@@ -883,7 +883,7 @@ void MC_RefreshMCUserInfo(s32 nPort, s32 nSlot) {
     int i;
 
     pState = fn_8009F834(nPort, nSlot);
-    fn_8001E938(pState->aNameUsed, 4);
+    BitArray_ClearAll(pState->aNameUsed, 4);
     pState->aszName[0][0] = 0;
     pState->aszName[1][0] = 0;
     pState->aszName[2][0] = 0;
@@ -893,37 +893,37 @@ void MC_RefreshMCUserInfo(s32 nPort, s32 nSlot) {
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return;
     if (fn_8009F734(nPort, nSlot) != 0) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return;
     }
     if (fn_8009DD44(nPort, nSlot, MC_DIR_NAME) != 0) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return;
     }
     if (fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FE4, MC_BUFFER_SIZE) != 0) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return;
     }
     if (!fn_800A233C(lbl_80281FE4, &lbl_80281FE4->trailer)) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return;
     }
     Mem_cpy(lbl_80281FD8, lbl_80281FE4, MC_BUFFER_SIZE);
     for (i = 0; i < NUM_SAVE_PROFILES; i++) {
         if (lbl_80281FD8->uFlags & MC_SAVE_PROFILE(i)) {
-            fn_8001EA34(pState->aNameUsed, i);
+            BitArray_Set(pState->aNameUsed, i);
             strncpy(pState->aszName[i], lbl_80281FD8->aProfile[i].szName, 0x1D);
         }
     }
     if (nMount == 0) {
-        fn_8009DBAC(nPort, nSlot);
+        MC_Unmount(nPort, nSlot);
     }
 }
 
@@ -939,7 +939,7 @@ s32 MC_GetNumUser(MCCardPos* pPos) {
     pState = fn_8009F834(nPort, nSlot);
     MC_RefreshMCUserInfo(nPort, nSlot);
     for (i = 0; i < 4; i++) {
-        if (fn_8001E9CC(pState->aNameUsed, i)) {
+        if (BitArray_Test(pState->aNameUsed, i)) {
             nCount++;
         }
     }
@@ -1023,9 +1023,9 @@ void MC_FreeEAGameList(void) {
     int i;
     if (lbl_80281FF0 != NULL) {
         for (i = 0; i < lbl_80281FF4; i++) {
-            fn_80009E70(lbl_80281FF0[i].p4);
+            StaticMem_Free(lbl_80281FF0[i].p4);
         }
-        fn_80009E70(lbl_80281FF0);
+        StaticMem_Free(lbl_80281FF0);
         lbl_80281FF0 = NULL;
     }
 }
@@ -1069,19 +1069,19 @@ void MC_LoadEAGameListfromStream(UStreamObject* pObject) {
     s32 nLen;
 
     if (lbl_80281FF0 != NULL) {
-        fn_80009E70(pObject);
+        StaticMem_Free(pObject);
         return;
     }
     p = (char*)pObject->pData;
     lbl_80281FF4 = MC_CountTitles(p);
     if (lbl_80281FF4 == 0) {
-        fn_80009E70(pObject);
+        StaticMem_Free(pObject);
         return;
     }
-    lbl_80281FF0 = fn_80009B34(lbl_80281FF4 * sizeof(MCEagmEntry), 2, 0x10, "MC.c", 3336);
+    lbl_80281FF0 = StaticMem_Alloc(lbl_80281FF4 * sizeof(MCEagmEntry), 2, 0x10, "MC.c", 3336);
     for (i = 0; i < lbl_80281FF4; i++) {
         lbl_80281FF0[i].n8 = MC_CountSlusNumbers(p);
-        lbl_80281FF0[i].p4 = fn_80009B34(lbl_80281FF0[i].n8 * 16, 2, 0x10, "MC.c", 3349);
+        lbl_80281FF0[i].p4 = StaticMem_Alloc(lbl_80281FF0[i].n8 * 16, 2, 0x10, "MC.c", 3349);
         for (j = 0; j < lbl_80281FF0[i].n8 + 1; j++) {
             p = MC_SkipToNextLine(p);
         }
@@ -1102,7 +1102,7 @@ void MC_LoadEAGameListfromStream(UStreamObject* pObject) {
             p = MC_SkipToNextLine(p);
         }
     }
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // Find the first 'eagm' entry holding a name that szGameCode starts with: mark it and set its bit
@@ -1115,7 +1115,7 @@ void MC_RecordEATitleByName(const char* szGameCode) {
             if (strncmp(lbl_80281FF0[i].p4 + j * 16, szGameCode,
                         strlen(lbl_80281FF0[i].p4 + j * 16)) == 0) {
                 lbl_80281FF0[i].b0 = 1;
-                fn_8001EA34(lbl_801F1100, i);
+                BitArray_Set(lbl_801F1100, i);
                 return;
             }
         }
@@ -1162,7 +1162,7 @@ void fn_800A2064(void) {
             lbl_801F1510[nPort][nSlot].b94 = 0;
         }
     }
-    fn_8001E938(lbl_801F1100, 0x80);
+    BitArray_ClearAll(lbl_801F1100, 0x80);
 }
 
 // Format the card. A card that is broken or has the wrong encoding can still be formatted.
@@ -1176,7 +1176,7 @@ s32 fn_800A2100(s32 nPort, s32 nSlot) {
     }
     nResult = fn_8009E918(nPort, nSlot);
     if (nMount == 0) {
-        fn_8009DBAC(nPort, nSlot);
+        MC_Unmount(nPort, nSlot);
     }
     return nResult;
 }
@@ -1194,13 +1194,13 @@ s32 fn_800A2194(s32 nPort, s32 nSlot) {
     nResult = fn_8009F734(nPort, nSlot);
     if (nResult != 0) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return nResult;
     }
     nResult = fn_8009F6A0(nPort, nSlot);
     if (nMount == 0) {
-        fn_8009DBAC(nPort, nSlot);
+        MC_Unmount(nPort, nSlot);
     }
     return nResult;
 }
@@ -1214,20 +1214,20 @@ s32 fn_800A2248(s32 nPort, s32 nSlot) {
     nResult = fn_8009F734(nPort, nSlot);
     if (nResult != 0) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return nResult;
     }
     nResult = fn_8009DD44(nPort, nSlot, MC_DIR_NAME);
     if (nResult != 0) {
         if (nMount == 0) {
-            fn_8009DBAC(nPort, nSlot);
+            MC_Unmount(nPort, nSlot);
         }
         return nResult;
     }
     nResult = fn_8009D614(nPort, nSlot, MC_FILE_NAME);
     if (nMount == 0) {
-        fn_8009DBAC(nPort, nSlot);
+        MC_Unmount(nPort, nSlot);
     }
     return nResult;
 }

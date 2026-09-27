@@ -418,7 +418,7 @@ void fn_8011DEF0(MsgArg* pArgs, MsgArg* pResult) {
 // A real-time event's award: its name and prize (fn_800F11A0, fn_800F1154) and the day the player
 // won it. Gives whether it is won.
 void fn_8011DF90(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 nId = pArgs[2].i;
     char* szDate = ((MsgString*)pArgs[3].p)->pStr;
     s32* pPrize = (s32*)pArgs[5].p;

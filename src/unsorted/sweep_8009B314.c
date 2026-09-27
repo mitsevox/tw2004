@@ -10,5 +10,5 @@ void fn_8009B314(u8 v) {
 }
 
 void fn_8009B320(void* p) {
-    fn_80009E70(p);
+    StaticMem_Free(p);
 }

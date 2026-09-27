@@ -411,7 +411,7 @@ void StreamManagerHole_StreamFiles(void) {
         fn_8001529C(gSession.p5B30, fn_80014E7C, fn_80014E94);
     } else {
         szCourse = fn_800E2680();
-        szHole = GameManager_GetHoleName(fn_80015464());
+        szHole = GameManager_GetHoleName(Game_GetCurHoleNum());
         sprintf(szPath, lbl_80186C2C, szCourse);
         strcat(szPath, szHole);
         strcat(szPath, lbl_80186C38);
@@ -710,7 +710,7 @@ void fn_80015454(void) {
     lbl_80280DF8->aParams[3].nNumFiles = 0;
 }
 
-int fn_80015464(void) {
+int Game_GetCurHoleNum(void) {
     return gpGame->nCurHoleNum;
 }
 

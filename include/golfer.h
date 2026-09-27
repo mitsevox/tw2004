@@ -95,7 +95,7 @@ typedef struct GolferRecord {
     u8   unk8F;                 // 0x08F
     u32  uBagMask;              // 0x090  bit n set = club n is in the bag. TW06: clubAvailable
     u8   unk94[4];
-    // The golfer's club models as name codes (fn_800CB700) for the character's club skins
+    // The golfer's club models as name codes (SKA_PackName) for the character's club skins
     // (Character_SetClubStatesForCharacter). The irons' two skins share one set of options.
     ClubLook aClubs[3];         // 0x098  drivers, fairway woods, putters
     u64  aIronPart[2];          // 0x0F8  the "3Irons" and "7Irons" parts' variants
@@ -223,7 +223,7 @@ typedef struct SwingData {
 LAYOUT_ASSERT(SwingData, 0x634);
 
 // Money by kind (0x40 bytes; TW06: CourseMoneyTracking_t): how a payout was made up (Earnings.c
-// fills it in), and a player's totals (Player.money), which fn_800D3548 adds it to field by field.
+// fills it in), and a player's totals (Player.money), which GM_Earnings_AwardMoney adds it to field by field.
 typedef struct CourseMoneyTracking {
     s32  n0;                    // 0x00  the payout
     s32  n4;                    // 0x04  a PGA TOUR tournament's prize money (GameModeDriverPGATour)
@@ -280,7 +280,7 @@ typedef struct Player {
     u8   b311;                  // 0x311  set after a shot with b30E (fn_800D9350)
     u8   b312;                  // 0x312  set when a shot finished on the green or in the hole (fn_800D9350)
     u8   unk313;
-    CourseMoneyTracking money;  // 0x314  the round's money by kind (fn_800D3548)
+    CourseMoneyTracking money;  // 0x314  the round's money by kind (GM_Earnings_AwardMoney)
     // Shot block, TW06 AIshot_t (which has 6 preferred clubs where we have 8).
     s32  nClub;                 // 0x354  TW06: club
     s32  nClubPerKind[8];       // 0x358  the club Shot_Prepare would pick for each shot kind. TW06: preferredClub
@@ -440,7 +440,7 @@ typedef struct PlayerProfile {
     s8   n2;                    // 0x02  a created golfer's byte 0x54C2 of its save slot, else 0; the
                                 //       glove variant's number (fn_8001D4A4, read signed)
     u8   unk3[5];
-    u64  aNames[6];             // 0x08  names, each packed into 64 bits (fn_800CB700)
+    u64  aNames[6];             // 0x08  names, each packed into 64 bits (SKA_PackName)
     u8   nOutfit;               // 0x38  the golfer record's nOutfit, or the created golfer's
     u8   nBallType;             // 0x39  0..3, from the SPIN attribute for a pro
     u8   unk3A[6];
@@ -718,11 +718,11 @@ extern f32          gClubPowerStep[CLUB_MAX_e];      // 0x801875E8  reach gained
 int  Game_GetMode(void);                // 0x8000BED8
 int  Golfer_FindById(int nId);          // the gGolferTable row with that nModelID, -1 none
 void fn_8002EBA4(u8* pObj, u8 nValue);  // set byte 7 of the options (a7[0]) and apply it (Golfer.c)
-int  fn_800D2B08(void);
+int  Course_GetCurHolePar(void);
 s32  fn_800D2C68(int nTee);             // CourseData.c: the current hole's value for tee set nTee
 int  fn_80100744(void);                 // shot kind override, 8 = none
 int  fn_801006F0(int nPlayer);          // club override, 26 = none
-int  fn_80015464(void);
+int  Game_GetCurHoleNum(void);
 u8   fn_80101DF4(void);
 f32  Swing_SpinScale(int nSpin);         // how much spin SPIN allows: 0.15 at 0 .. 1.0 at 110 (Swing.c)
 f32  fn_8005C280(int nPlayer);          // the swing's fNonPowerShotPower (Swing.c)

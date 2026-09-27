@@ -26,10 +26,10 @@ void fn_8002A024(u8 bOn, f32 x0, f32 y0, f32 x1, f32 y1) {
     if (bOn) {
         GXSetAlphaUpdate(1);
         GXSetColorUpdate(0);
-        fn_80012F34(0);
-        fn_80012F50(0, 6, 0x80);
-        fn_80012F18(7);
-        fn_80014118(0);
+        RenderState_SetDepthWrite(0);
+        RenderState_SetAlphaTest(0, 6, 0x80);
+        RenderState_SetDepthFunc(7);
+        RenderState_SetDrawFlags(0);
         fn_800141F8(xy, NULL, x0, y0, x1, y1);
         colour[0] = 0.0f;
         colour[1] = 0.0f;
@@ -37,13 +37,13 @@ void fn_8002A024(u8 bOn, f32 x0, f32 y0, f32 x1, f32 y1) {
         colour[3] = 0.0f;
         fn_80014194(colour);
         fn_8001425C(0);
-        fn_80012EF8();
+        RenderState_Flush();
         fn_8001644C(0xA1, xy, 0, NULL, 2);
-        fn_80012F34(1);
-        fn_80012F50(1, 6, 0x80);
-        fn_80012F18(3);
+        RenderState_SetDepthWrite(1);
+        RenderState_SetAlphaTest(1, 6, 0x80);
+        RenderState_SetDepthFunc(3);
         GXSetColorUpdate(1);
-        fn_80012EF8();
+        RenderState_Flush();
     } else {
         GXSetAlphaUpdate(1);
     }
@@ -56,8 +56,8 @@ void fn_8002A164(int nMode) {
     GXCopyTex(fn_8002A624(), 0);
     GXPixModeSync();
     fn_8002A608(&lbl_801C64A8);
-    fn_80012F50(1, 4, 0);
-    fn_80012EF8();
+    RenderState_SetAlphaTest(1, 4, 0);
+    RenderState_Flush();
     GXSetNumTevStages(1);
     if (nMode == 0) {
         GXSetTevOrder(0, 0, 0, 4);
@@ -79,8 +79,8 @@ void fn_8002A164(int nMode) {
 // The end of fn_8002A164's drawing.
 void fn_8002A2FC(void) {
     GXSetAlphaUpdate(0);
-    fn_80012F50(1, 6, 0x80);
-    fn_80012EF8();
+    RenderState_SetAlphaTest(1, 6, 0x80);
+    RenderState_Flush();
     lbl_80281D28 = 0;
     GXSetTevColorIn(1, 15, 0, 12, 15);
     GXSetTevColorOp(1, 0, 0, 0, 1, 0);

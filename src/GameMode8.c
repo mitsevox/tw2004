@@ -278,9 +278,9 @@ void fn_800F9E00(void) {
             nProfile = gPlayers[nWinner].nIndex;
             if (gpSaveData[nProfile].bActive) {
                 if (nPrize) {
-                    fn_800E4364(0, 0x6B, nPrize, nProfile);
+                    GUI_QueueMessage(0, 0x6B, nPrize, nProfile);
                 }
-                fn_800D3548(nWinner, nMoney, NULL);
+                GM_Earnings_AwardMoney(nWinner, nMoney, NULL);
                 gPlayers[nWinner].money.n1C += nMoney;
             }
         }
@@ -481,9 +481,9 @@ void fn_800FA608(int nPlayer) {
     fn_800957D8(gPlayers[nPlayer].pChar);
     fn_80095744(gPlayers[nPlayer].pChar, 5);
     Emotion_UpdatePlayerEmotion(nPlayer);
-    fn_80062F1C(fn_80017028(gPlayers[nPlayer].nView[0]));
+    fn_80062F1C(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]));
     i = gPlayers[nPlayer].nView[0];
-    CameraController_SetCameraMode(fn_80017028(i), 12, nPlayer, i);
+    CameraController_SetCameraMode(ViewController_GetCameraController(i), 12, nPlayer, i);
     gPlayers[nPlayer].nC54 = 74;
     gPlayers[nPlayer].nC3C |= 2;
     fn_800FE02C();
@@ -702,12 +702,12 @@ u8 fn_800FAD54(int nPlayer) {
     if (fX == gPlayers[nPlayer].vA44[0] && fZ == gPlayers[nPlayer].vA44[2]) {
         dx = gPlayers[nPlayer].ball.vPos[0] - fX;
         dz = gPlayers[nPlayer].ball.vPos[2] - fZ;
-        fDist = fn_80009680(dx * dx + dz * dz);
+        fDist = Math_Sqrt(dx * dx + dz * dz);
         if (!(gPlayers[nPlayer].nC3C & 0x20)) {
             gPlayers[nPlayer].fC50 = fDist;
             gPlayers[nPlayer].nC3C |= 0x20;
             if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1) {
-                if ((gPlayers[nOther].nC3C & 0x20) && fn_800D2B08() > 3) {
+                if ((gPlayers[nOther].nC3C & 0x20) && Course_GetCurHolePar() > 3) {
                     if (gPlayers[nPlayer].fC50 > gPlayers[nOther].fC50) {
                         fn_800FAAB8(nPlayer, 1);
                     } else if (gPlayers[nPlayer].fC50 < gPlayers[nOther].fC50) {
@@ -717,7 +717,7 @@ u8 fn_800FAD54(int nPlayer) {
             }
         } else if (gPlayers[nPlayer].nC3C & 8) {
             if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == gPlayers[nPlayer].nC60 + 1 &&
-                fn_800D2B08() > 3) {
+                Course_GetCurHolePar() > 3) {
                 if (gPlayers[nOther].uC48 & 0x03000002) {
                     if (fDist > gPlayers[nOther].fC50) {
                         gPlayers[nOther].uC48 &= ~(u64)0x03000002;
@@ -736,12 +736,12 @@ u8 fn_800FAD54(int nPlayer) {
 
 // The hole is finished in nStrokes: its events. Event 23 at or under par when nC3C bits 10-11
 // are set (then cleared); a hole in one is event 12 on a par 3, 13 otherwise, plus 14 when nC3C
-// bit 9 is already set (a second one; the first sets it); otherwise par (fn_800D2B08) less the
+// bit 9 is already set (a second one; the first sets it); otherwise par (Course_GetCurHolePar) less the
 // strokes picks events 8 to 11 (par to 3 under).
 void fn_800FB204(int nPlayer, int nStrokes) {
     int nPar;
     int nUnder;
-    nPar = fn_800D2B08();
+    nPar = Course_GetCurHolePar();
     nUnder = nPar - nStrokes;
     if (nUnder >= 0 && (gPlayers[nPlayer].nC3C & 0xC00)) {
         fn_800FAAB8(nPlayer, 0x17);
@@ -798,7 +798,7 @@ void fn_800FB35C(int nPlayer, int nOther) {
 f32 fn_800FB41C(f32* pA, f32* pB) {
     f32 v[4];
     fn_800FE190(pB, pB, v);     // EA bug: pB less itself, so the distance is always 0
-    return fn_80009680(v[0] * v[0] + v[2] * v[2]);
+    return Math_Sqrt(v[0] * v[0] + v[2] * v[2]);
 }
 
 // The pad's sticks (beyond the 96..160 dead zone) scaled to -1..1 into the player's fA7C..fA8C;
@@ -844,14 +844,14 @@ void fn_800FB774(int nPlayer) {
     f32 fStep;
     if (!fn_800FA118(nPlayer, 1)) {
         fn_800FB460(nPlayer);
-        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x1A, 1)) {
+        if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1A, 1)) {
             EVENT_Trigger(nPlayer, 0x16, 0, -1);
-        } else if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x1B, 1)) {
+        } else if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1B, 1)) {
             EVENT_Trigger(nPlayer, 0x17, 0, -1);
         }
-        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x1C, 1)) {
+        if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1C, 1)) {
             EVENT_Trigger(nPlayer, 0x18, 0, -1);
-        } else if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x1D, 1)) {
+        } else if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1D, 1)) {
             EVENT_Trigger(nPlayer, 0x19, 0, -1);
         }
         if (gPlayers[nPlayer].nC3C & 0x200000) {
@@ -889,7 +889,7 @@ void fn_800FB774(int nPlayer) {
             }
         }
         fStep = FRAME_RATE / 60.0f * (FRAME_RATE * gSession.fFrameTime);
-        if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x24, 0)) {
+        if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x24, 0)) {
             gPlayers[nPlayer].fCB4 += lbl_802816B0;
             gPlayers[nPlayer].nCB8 = 0;
         } else if (gPlayers[nPlayer].nCB8 > (s32)(FRAME_RATE * lbl_802816C4)) {
@@ -912,7 +912,7 @@ void fn_800FBB30(Player* p) {
     f32 fLow;
     fn_800FE190(p->ball.vPos, p->vPlacement, v);
     fDistSq = v[0] * v[0] + v[2] * v[2];
-    fn_800BAF04(v, v);
+    Vec_NormalizeTo(v, v);
     fAngle = p->fA88 - atan2f(v[2], v[0]) - PI / 2.0f;
     while (fAngle < -PI) {
         fAngle += TWOPI;
@@ -1037,7 +1037,7 @@ void fn_800FBD2C(int nPlayer) {
                 if (!(gPlayers[nPlayer].uC48 & 4)) {
                     fn_800FAAB8(nPlayer, 2);
                 }
-                pHole = fn_8000C594();
+                pHole = Ter_GetTGD();
                 Physics_InitBall(&p->ball, &pHole->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
                 Vec_Copy(&pHole->tee[gSession.nTeeSet[nPlayer]].x, p->vBall);
                 Vec_Copy(&pHole->tee[gSession.nTeeSet[nPlayer]].x, p->vA44);
@@ -1080,7 +1080,7 @@ void fn_800FBD2C(int nPlayer) {
             } else {
                 gPlayers[nPlayer].ball.nState = 0;
                 Mem_cpy(&p->ballBefore, pBall, sizeof(Ball));
-                nPar = fn_800D2B08();
+                nPar = Course_GetCurHolePar();
                 if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e) {
                     if (Game_GetMode() == 7) {
                         fDist = fn_800FB41C(p->vPreShot, pBall->vPos);
@@ -1094,7 +1094,7 @@ void fn_800FBD2C(int nPlayer) {
                                 fn_800FAAB8(nPlayer, 3);
                             }
                             fn_800FE190(p->ball.vPos, gpGame->p130, v);
-                            p->fC68 = fn_80009680(v[0] * v[0] + v[2] * v[2]);
+                            p->fC68 = Math_Sqrt(v[0] * v[0] + v[2] * v[2]);
                             nDiff = nPar - 2 - gPlayers[nPlayer].nC64;
                             if (nDiff == 0) {
                                 fn_800FAAB8(nPlayer, 0x15);
@@ -1120,7 +1120,7 @@ void fn_800FBD2C(int nPlayer) {
                             }
                             if ((gPlayers[nOther].uC48 & 0x600000) && nDiff >= 0) {
                                 fn_800FE190(p->ball.vPos, gpGame->p130, v);
-                                fDist = fn_80009680(v[0] * v[0] + v[2] * v[2]);
+                                fDist = Math_Sqrt(v[0] * v[0] + v[2] * v[2]);
                                 if (gPlayers[nPlayer].uC48 & 0x0C000080) {
                                     if (fDist < gPlayers[nPlayer].fC68) {
                                         fn_800FAAB8(nPlayer, 0x1B);
@@ -1169,7 +1169,7 @@ void fn_800FBD2C(int nPlayer) {
         PlaceBall_Set(nPlayer, vStart);
         PlaceBall_SetupTarget(nPlayer);
         n = gPlayers[nPlayer].nView[0];
-        CameraController_SetCameraMode(fn_80017028(n), 9, nPlayer, n);
+        CameraController_SetCameraMode(ViewController_GetCameraController(n), 9, nPlayer, n);
         gPlayers[nPlayer].nC3C |= 1;
         fn_80062C80(gPlayers[nPlayer].nC58, 0);
         gPlayers[nPlayer].fCB4 = lbl_802816B8;
@@ -1227,14 +1227,15 @@ void fn_800FBD2C(int nPlayer) {
         }
         fn_800FE0AC(gPlayers[nPlayer].nC58, n);
         fn_800FE190(pBall->vPos, pTarget, vDir);
-        fToPlace = fn_80009680(vDir[0] * vDir[0] + vDir[2] * vDir[2]);
+        fToPlace = Math_Sqrt(vDir[0] * vDir[0] + vDir[2] * vDir[2]);
         // the distance to the view's camera lens position, if that is nearer; the second square
         // root is written twice, as a MIN() macro would expand
-        fn_800FE190(pBall->vPos, fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera)->m4[3], vDir);
-        fDist = (fToPlace <= (f32)fn_80009680(vDir[0] * vDir[0] + vDir[2] * vDir[2]))
+        fn_800FE190(pBall->vPos, Camera_GetLens(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera)->m4[3],
+                    vDir);
+        fDist = (fToPlace <= (f32)Math_Sqrt(vDir[0] * vDir[0] + vDir[2] * vDir[2]))
 
                     ? fToPlace
-                    : (f32)fn_80009680(vDir[0] * vDir[0] + vDir[2] * vDir[2]);
+                    : (f32)Math_Sqrt(vDir[0] * vDir[0] + vDir[2] * vDir[2]);
         if (gPlayers[nPlayer].ball.nState == 0) {
             if (fDist < 5.0f) {
                 Vec_Copy(pBall->vPos, p->vBall);
@@ -1252,7 +1253,8 @@ void fn_800FBD2C(int nPlayer) {
             }
         } else if (fDist < 5.0f) {
             if (!Player_IsCPU(nPlayer)) {
-                if (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x23, 0)) {
+                if (Controller_GetButtons(gPlayers[nPlayer].nController)
+                    & Controller_GetButtonMask(0x23, 0)) {
                     if (gPlayers[nPlayer].ball.nState != 1) {
                         Physics_DropBall(pBall, lbl_801D5888[nPlayer]);
                         gPlayers[nPlayer].ball.nState = 1;
@@ -1271,7 +1273,7 @@ void fn_800FBD2C(int nPlayer) {
 // States 12 and 24, exit: camera 25.
 void fn_800FCBDC(int nPlayer) {
     int nView = gPlayers[nPlayer].nView[0];
-    CameraController_SetCameraMode(fn_80017028(nView), 25, nPlayer, nView);
+    CameraController_SetCameraMode(ViewController_GetCameraController(nView), 25, nPlayer, nView);
 }
 
 // 1 when the player's pad has buttons 0x1000, 0x400 and 0x800 (Start, X and Y on a GameCube pad)
@@ -1282,11 +1284,11 @@ u8 fn_800FCC38(int nPlayer) {
     if (nCtrl >= 8) {
         return 0;
     }
-    bDown = (fn_800136DC(nCtrl) & 0x1000 || fn_800136DC(gPlayers[nPlayer].nController) & 0x10000000) &&
-            (fn_800136DC(gPlayers[nPlayer].nController) & 0x400 ||
-             fn_800136DC(gPlayers[nPlayer].nController) & 0x4000000) &&
-            (fn_800136DC(gPlayers[nPlayer].nController) & 0x800 ||
-             fn_800136DC(gPlayers[nPlayer].nController) & 0x8000000);
+    bDown = (Controller_GetButtons(nCtrl) & 0x1000 || Controller_GetButtons(gPlayers[nPlayer].nController) & 0x10000000) &&
+            (Controller_GetButtons(gPlayers[nPlayer].nController) & 0x400 ||
+             Controller_GetButtons(gPlayers[nPlayer].nController) & 0x4000000) &&
+            (Controller_GetButtons(gPlayers[nPlayer].nController) & 0x800 ||
+             Controller_GetButtons(gPlayers[nPlayer].nController) & 0x8000000);
     return bDown;
 }
 
@@ -1334,7 +1336,8 @@ void fn_800FCCF0(void) {
                 gPlayers[nPlayer].nCB8++;
                 if (!Player_IsCPU(nPlayer) && !fn_800FA118(nPlayer, 1) &&
                     lbl_80192908[0x27].nPoints + gPlayers[nPlayer].nC44 > 0) {
-                    if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x25, 0)) &&
+                    if ((Controller_GetButtons(gPlayers[nPlayer].nController)
+                         & Controller_GetButtonMask(0x25, 0)) &&
                         !fn_800FCC38(nPlayer) &&
                         ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 24 ||
                          (gPlayers[nPlayer].ball.nLie != 0 && gPlayers[nPlayer].ball.nLie != LIE_INCUP_e &&
@@ -1345,7 +1348,7 @@ void fn_800FCCF0(void) {
                           (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 8 &&
                           (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 10))) {
                         fn_800FAAB8(nPlayer, 0x27);
-                        pHole = fn_8000C594();
+                        pHole = Ter_GetTGD();
                         Physics_InitBall(&gPlayers[nPlayer].ball,
                                     &pHole->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
                         Vec_Copy(&pHole->tee[gSession.nTeeSet[nPlayer]].x,
@@ -1365,11 +1368,12 @@ void fn_800FCCF0(void) {
             }
         } else if (Game_GetMode() == 8) {
             i = PLR_1_e;
-            if ((fn_800136DC(gPlayers[i].nController) & fn_800142AC(0x25, 0)) && !fn_800FCC38(i) &&
+            if ((Controller_GetButtons(gPlayers[i].nController) & Controller_GetButtonMask(0x25, 0))
+                && !fn_800FCC38(i) &&
                 ((s8)GOLFERSTATE_GetCurrentState(i) == 24 ||
                  (gPlayers[i].ball.nLie != 0 && gPlayers[i].ball.nLie != LIE_INCUP_e &&
                   gPlayers[i].ball.nLie != 16))) {
-                pHole = fn_8000C594();
+                pHole = Ter_GetTGD();
                 Physics_InitBall(&gPlayers[i].ball, &pHole->tee[gSession.nTeeSet[i]].x, i);
                 Vec_Copy(&pHole->tee[gSession.nTeeSet[i]].x, gPlayers[i].vBall);
                 Vec_Copy(&pHole->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
@@ -1657,7 +1661,7 @@ s32 fn_800FDC5C(s32* pMoney) {
             nWinner = -1;
         }
         if (nWinner != -1) {
-            fn_800D3548(nWinner, n, NULL);
+            GM_Earnings_AwardMoney(nWinner, n, NULL);
             gPlayers[nWinner].money.n1C += n;
         }
     } else {
@@ -1675,7 +1679,7 @@ s32 fn_800FDC5C(s32* pMoney) {
             if (n >= 3000) {
                 n = 4500;
             }
-            fn_800D3548(nWinner, n, NULL);
+            GM_Earnings_AwardMoney(nWinner, n, NULL);
             gPlayers[nWinner].money.n1C += n;
         }
     }
@@ -1719,7 +1723,7 @@ u8 fn_800FDF60(void) {
         if (gPlayers[0].nC54 < 71) {
             return 1;
         }
-    } else if (!fn_80063C90(fn_80017028(gPlayers[0].nView[0]))) {
+    } else if (!fn_80063C90(ViewController_GetCameraController(gPlayers[0].nView[0]))) {
         return 1;
     }
     return 0;

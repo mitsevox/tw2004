@@ -188,7 +188,7 @@ s32 GameModeAlternateShot_GetHonors(int nPlayer) {
             return aOrder[h];
         }
     }
-    pCourse = fn_8000C594();
+    pCourse = Ter_GetTGD();
     nPinSet = Game_CurrentPinSet();
     fBest = 0.0f;
     nBest = 5;
@@ -197,7 +197,7 @@ s32 GameModeAlternateShot_GetHonors(int nPlayer) {
             !GameModeAlternateShot_TeamDone(GetGamePlayerTeam(i)) && PLAYER(i)->ball.nLie != LIE_GREEN_e) {
             dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
             dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
-            d = fn_80009680(dx * dx + dz * dz);
+            d = Math_Sqrt(dx * dx + dz * dz);
             if (d > fBest) {
                 fBest = d;
                 nBest = i;
@@ -212,7 +212,7 @@ s32 GameModeAlternateShot_GetHonors(int nPlayer) {
                 !GameModeAlternateShot_TeamDone(GetGamePlayerTeam(i))) {
                 dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
                 dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
-                d = fn_80009680(dx * dx + dz * dz);
+                d = Math_Sqrt(dx * dx + dz * dz);
                 if (d > fBest) {
                     fBest = d;
                     nBest = i;
@@ -425,8 +425,8 @@ void GameModeAlternateShot_EndGame(void) {
                 if (gpSaveData[nProfile].bActive) {
                     EASBio_SetCurrentGameWon(1);
                     if (nMoney) {
-                        fn_800E4364(0, 0x6B, nPrize, nProfile);
-                        fn_800D3548(i, nMoney, 0);
+                        GUI_QueueMessage(0, 0x6B, nPrize, nProfile);
+                        GM_Earnings_AwardMoney(i, nMoney, 0);
                         p->money.n14 += nMoney;
                     }
                 }

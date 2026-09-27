@@ -26,13 +26,13 @@ s32 fn_800B920C();
 void fn_8002F4FC(void) {
     void* t1;
     fn_80056204();
-    t1 = fn_80009B34(2048, 2, 32, "LLPict_Gc.c", 68);
+    t1 = StaticMem_Alloc(2048, 2, 32, "LLPict_Gc.c", 68);
     *lbl_802810C0 = t1;
 }
 
 void fn_8002F540(void) {
     fn_80056208();
-    fn_80009E70(*lbl_802810C0);
+    StaticMem_Free(*lbl_802810C0);
 }
 
 // ---- end of sweep code ----
@@ -109,8 +109,8 @@ LLPict* fn_8002FD00(u8* pData, u32 uSize) {
 
 void fn_8002FE70(LLPict* pPict) {
     if (pPict != NULL) {
-        fn_80009E70(pPict->pPixels);
-        fn_80009E70(pPict);
+        StaticMem_Free(pPict->pPixels);
+        StaticMem_Free(pPict);
     }
 }
 
@@ -119,7 +119,7 @@ void fn_8002FEAC(void) {
 
 void fn_8002FEB0(LLPict* pPict, PictStream* pStream, void* (*pfnRead)(void* pArg), void* pArg) {
     pPict->pPixels = NULL;
-    pStream->pDecoder = fn_80009B34(80, 1, 32, "LLPict_Gc.c", 278);
+    pStream->pDecoder = StaticMem_Alloc(80, 1, 32, "LLPict_Gc.c", 278);
     pStream->pFrame = NULL;
     fn_800B90F4(pfnRead, pArg);
     fn_800B91B8(pStream->pDecoder);
@@ -130,13 +130,13 @@ void fn_8002FEB0(LLPict* pPict, PictStream* pStream, void* (*pfnRead)(void* pArg
 // Frees the picture's pixels and the stream's frame and decoder.
 void fn_8002FF38(LLPict* pPict, PictStream* pStream) {
     if (pPict->pPixels != NULL) {
-        fn_80009E70(pPict->pPixels);
+        StaticMem_Free(pPict->pPixels);
     }
     if (pStream->pFrame != NULL) {
         fn_800B9808(pStream->pDecoder, pStream->pFrame);
     }
     fn_800B920C(pStream->pDecoder);
-    fn_80009E70(pStream->pDecoder);
+    StaticMem_Free(pStream->pDecoder);
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -151,7 +151,7 @@ void fn_8002FF98(LLPict* pPict, PictStream* pStream) {
     pPict->nWidth = pStream->pFrame->nWidth;
     pPict->nHeight = pStream->pFrame->nHeight;
     pPict->pPixels =
-        fn_80009B34(pPict->nWidth * pPict->nHeight * 3 / 2, 1, 32, "LLPict_Gc.c", 346);
+        StaticMem_Alloc(pPict->nWidth * pPict->nHeight * 3 / 2, 1, 32, "LLPict_Gc.c", 346);
     pPict->f6C = 1.0f;
     pPict->f70 = 1.0f;
 }

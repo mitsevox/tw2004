@@ -11,7 +11,7 @@ CamTuning* lbl_80281F78;
 
 // Allocate the camera tuning values and set every one.
 void CameraTuning_Init(void) {
-    lbl_80281F78 = fn_80009B34(sizeof(CamTuning), 2, 0, "GoCamTuningVars.c", 24);
+    lbl_80281F78 = StaticMem_Alloc(sizeof(CamTuning), 2, 0, "GoCamTuningVars.c", 24);
     lbl_80281F78->f0 = 10.0f;
     lbl_80281F78->f4 = 15.0f;
     lbl_80281F78->f8 = 0.0f;

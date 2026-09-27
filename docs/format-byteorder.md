@@ -11,7 +11,7 @@ How the columns were filled (2026-09-23):
 - **Handler**: every `UStream_RegisterHandler` call in the DOL (63; tag and function recovered from
   the call's `r3`/`r4` in the assembly, C or asm alike).
 - **Swap**: *swapped* = the handler reaches one of the two byte-swap routines, `fn_80076158` (swap a
-  run of values) or `fn_8001F08C` (swap by a field-format table), within four calls; the path is
+  run of values) or `ByteSwap_Records` (swap by a field-format table), within four calls; the path is
   given; "little-endian on disc" below is inferred from that swap. *none seen* = no such call within four calls and no `lwbrx`/`lhbrx`. A "none seen" format
   is used as big-endian as far as the code shows; a deferred swap further away (as for `BNK `) is
   possible, so "none seen" is not proof.
@@ -46,8 +46,8 @@ Objects delivered by UStream
 | `CLB ` (2) | fn_8001CCF8, fn_8001CD80 | char.c (asm) | swapped: fn_8001B208 > fn_80076158 | little-endian on disc |
 | `CHR ` (2) | fn_8001CE5C, fn_8001D020 | char.c (asm) | swapped: fn_80019798 > fn_80076158 | little-endian on disc |
 | `SKLO` | fn_8001D3EC | char.c (sweep block) | swapped: fn_8001A9F4 > fn_80076158 | little-endian on disc; a `port:` note at the handler |
-| `MAL ` | fn_8001FA3C | sweep | swapped: fn_8001F804 > fn_8001F08C | little-endian on disc |
-| `SAL ` | AnimLib_OnLoaded | skalib.c | swapped: AnimLib_Load > fn_8001F08C | little-endian on disc; swapped by field tables (`SwapField`); yes: `AnimLib`, `ClipRecord` and `Clip` are then read in place, their offsets turned into 32-bit pointers. `port:` notes at every swap call (header, clip numbers, index, records, tree nodes): a little-endian port does not swap there |
+| `MAL ` | fn_8001FA3C | sweep | swapped: fn_8001F804 > ByteSwap_Records | little-endian on disc |
+| `SAL ` | AnimLib_OnLoaded | skalib.c | swapped: AnimLib_Load > ByteSwap_Records | little-endian on disc; swapped by field tables (`SwapField`); yes: `AnimLib`, `ClipRecord` and `Clip` are then read in place, their offsets turned into 32-bit pointers. `port:` notes at every swap call (header, clip numbers, index, records, tree nodes): a little-endian port does not swap there |
 | `BNK ` | ClipBank_OnLoaded | skalib.c | swapped later | the handler only stashes the file; `ClipBank_Install` > `ClipBank_Load` swaps it (`ClipBank_SwapHeader`, fn_80020BC8 per clip); yes: `ClipBank` is used in place, its clip offsets turned into 32-bit pointers. `port:` notes at the swap calls |
 | `stat` | Golfer_OnStatsLoaded | Golfer.c | swapped: Golfer_TableByteSwap > fn_80076158 | yes: copied over `gGolferTable[34]` (`GolferRecord`); only 0x98..0x140 of each record is swapped, in 8-byte units; the u32 at 0x90 is not. A `port:` note at the swap call |
 | `rcrd` | Session_OnRecordsLoaded | Golfer.c | none seen | yes: copied straight over `gSession.aCourseRecord`, big-endian; a `port:` note there (a little-endian port converts the records field by field) |
@@ -55,15 +55,15 @@ Objects delivered by UStream
 | `tgd ` | fn_800342F0 | GoTerrain.c | none seen | yes: the course's collision data; `Ter_InitTGD` (fn_8004B1EC, GoTerrainCollision.c) lays `CourseInfo` (ball.h) over it and turns its offsets into pointers in place (`TER_RELOCATE`, 32-bit); `TerCell`, `TerPolyRef`, `TerObject` and the vertex list are read in place |
 | `tLOD` | fn_800341A4 | GoTerrain.c | none seen | asm |
 | `CAMS` | fn_80039554 | GoDynamicCam.c | swapped: fn_80076158 | little-endian on disc |
-| `CAMV` (2) | fn_80039690, fn_80039754 | GoDynamicCam.c | swapped: fn_800399E0 > fn_8001F08C | little-endian on disc |
-| `CAMA` | fn_800397EC | GoDynamicCam.c | swapped: fn_80039A48 > fn_8001F08C | little-endian on disc |
+| `CAMV` (2) | fn_80039690, fn_80039754 | GoDynamicCam.c | swapped: fn_800399E0 > ByteSwap_Records | little-endian on disc |
+| `CAMA` | fn_800397EC | GoDynamicCam.c | swapped: fn_80039A48 > ByteSwap_Records | little-endian on disc |
 | `TEO ` | fn_80045F74 | sweep | none seen | asm |
 | `BALL` | fn_80045FC8 | asm | none seen | asm |
 | `Cact` | fn_80048BDC | UKernel.c | none seen | asm; its type-10 objects go to fn_800EADDC (GameMode5.c), which reads a challenge's ball spot in place through `ChallengeSpotRecord` (`port:` note there) |
-| `CAMC` | fn_800644F4 | GoStaticCam.c | swapped: fn_8001F08C | little-endian on disc |
-| `sscr` | SitDev_LoadScripts | SitDevFile.c | swapped: fn_800BB52C > fn_8001F08C | little-endian on disc |
+| `CAMC` | fn_800644F4 | GoStaticCam.c | swapped: ByteSwap_Records | little-endian on disc |
+| `sscr` | SitDev_LoadScripts | SitDevFile.c | swapped: fn_800BB52C > ByteSwap_Records | little-endian on disc |
 | `BIO ` | fn_80076F80 | FE_Manager.c | none seen | asm |
-| `LITE` | fn_8008D9DC | FEgolferanim.c | swapped: fn_8001F08C | little-endian on disc |
+| `LITE` | fn_8008D9DC | FEgolferanim.c | swapped: ByteSwap_Records | little-endian on disc |
 | `DATS`, `TXFS`, `FONS`, `GRPS`, `MPCS` | fn_8008ED80, fn_8008EE1C, fn_8008EFFC, fn_8008EEB8 (two tags) | uiLoadFile.c | none seen | asm |
 | `MCI `, `MCB ` | fn_8009EB30, fn_8009EB38 | MC_Gc.c | none seen | the handlers only keep the object |
 | `eagm` | fn_800A1D4C | MC.c | none seen | asm |
@@ -82,7 +82,7 @@ Objects delivered by UStream
 | `RTEn` | fn_800F060C | GameModeDriverRTE.c | none seen | bytes: names, copied |
 | `TCM ` | fn_8010237C | GameMode4.c | none seen | yes: copied over `lbl_802124B8` (`LadderEvent[25]`, GameMode4.c); `port:` note in the handler |
 | `TCMS` | fn_801023A8 | GameMode4.c | none seen | bytes: text, copied |
-| `CR_A` | fn_80105188 | FE_CrAPDB.c | swapped: fn_80105DAC > fn_8001F08C | little-endian on disc |
+| `CR_A` | fn_80105188 | FE_CrAPDB.c | swapped: fn_80105DAC > ByteSwap_Records | little-endian on disc |
 | `CR_S` | fn_801051F4 | FE_CrAPDB.c | none seen | asm |
 | `PGST` | fn_80117694 | sweep | none seen | asm |
 | `gras` | fn_8011E584 | GoGrass.c | none seen | asm; GoGrass.c has a swapping function (fn_8011E4D8) the handler does not reach within four calls: probably swapped later (inferred) |

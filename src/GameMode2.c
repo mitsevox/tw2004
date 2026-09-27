@@ -110,7 +110,7 @@ s32 GameModeSkins_GetHonors(int nPlayer) {
     if (nPlayer == 5 && nBest == 5) {
         return 5;
     }
-    pCourse = fn_8000C594();
+    pCourse = Ter_GetTGD();
     nPinSet = Game_CurrentPinSet();
     fBest = 0.0f;
     nBest = 5;
@@ -119,7 +119,7 @@ s32 GameModeSkins_GetHonors(int nPlayer) {
             PLAYER(i)->nStrokes[Game_CurHoleIndex()] < nLow) {
             dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
             dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
-            d = fn_80009680(dx * dx + dz * dz);
+            d = Math_Sqrt(dx * dx + dz * dz);
             if (d > fBest) {
                 fBest = d;
                 nBest = i;
@@ -133,7 +133,7 @@ s32 GameModeSkins_GetHonors(int nPlayer) {
             if (i != nPlayer && !Player_IsHoled(i) && PLAYER(i)->nStrokes[Game_CurHoleIndex()] < nLow) {
                 dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
                 dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
-                d = fn_80009680(dx * dx + dz * dz);
+                d = Math_Sqrt(dx * dx + dz * dz);
                 if (d > fBest) {
                     fBest = d;
                     nBest = i;
@@ -345,9 +345,9 @@ void GameModeSkins_EndGame(void) {
                             EASBio_IncrementGamesWon(1);
                             bFirst = 0;
                         }
-                        fn_800E4364(0, 0x6C, PLAYER(i)->n274, nProfile);
+                        GUI_QueueMessage(0, 0x6C, PLAYER(i)->n274, nProfile);
                     }
-                    fn_800D3548(i, PLAYER(i)->n274, 0);
+                    GM_Earnings_AwardMoney(i, PLAYER(i)->n274, 0);
                     PLAYER(i)->money.n18 += PLAYER(i)->n274;
                 }
             }

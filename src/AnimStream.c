@@ -1,7 +1,7 @@
 // AnimStream.c (EA's name, from its asserts): streams animation clips for groups 1 and 5 per
 // player, style and club class, reading them from disc into double buffers. Its set-up
 // (fn_800C937C) turns streaming off in every case, so the reads never happen. The file also holds
-// the base-40 name codes (fn_800CB700..fn_800CB8F0). The types are in character.h.
+// the base-40 name codes (SKA_PackName..fn_800CB8F0). The types are in character.h.
 
 #include "game.h"
 #include "endian.h"
@@ -42,7 +42,7 @@ void fn_800C937C(void) {
     int k;
     int m;
 
-    lbl_80282230 = fn_80009B34(sizeof(AnimStream), 2, 0, "AnimStream.c", 158);
+    lbl_80282230 = StaticMem_Alloc(sizeof(AnimStream), 2, 0, "AnimStream.c", 158);
     lbl_80282230->p0 = NULL;
     lbl_80282230->p4 = NULL;
     lbl_80282230->pRead = NULL;
@@ -99,20 +99,20 @@ void fn_800C9764(void) {
     int m;
 
     if (lbl_80282230->pRead != NULL) {
-        fn_80009E70(lbl_80282230->pRead);
+        StaticMem_Free(lbl_80282230->pRead);
     }
     for (i = 0; i < 2; i++) {
         for (j = 0; j < 2; j++) {
             for (k = 0; k < 8; k++) {
                 for (m = 0; m < 6; m++) {
                     if (lbl_80282230->bufs[i][j][k][m].pData != NULL) {
-                        fn_80009E70(lbl_80282230->bufs[i][j][k][m].pData);
+                        StaticMem_Free(lbl_80282230->bufs[i][j][k][m].pData);
                     }
                 }
             }
         }
     }
-    fn_80009E70(lbl_80282230);
+    StaticMem_Free(lbl_80282230);
     lbl_80282230 = NULL;
 }
 
@@ -553,7 +553,7 @@ void fn_800CA7E0(void) {
                 if (nSize > 0) {
                     for (j = 0; j < 2; j++) {
                         lbl_80282230->bufs[j][i][nStyle][nClub].pData =
-                            fn_80009B34(nSize, 2, 64, "AnimStream.c", 1005);
+                            StaticMem_Alloc(nSize, 2, 64, "AnimStream.c", 1005);
                         lbl_80282230->bufs[j][i][nStyle][nClub].nSize = nSize;
                         lbl_80282230->nBytes += nSize;
                     }
@@ -562,7 +562,7 @@ void fn_800CA7E0(void) {
         }
     }
     if (nMax > 0) {
-        lbl_80282230->pRead = fn_80009B34(nMax, 2, 64, "AnimStream.c", 1018);
+        lbl_80282230->pRead = StaticMem_Alloc(nMax, 2, 64, "AnimStream.c", 1018);
         lbl_80282230->nReadSize = nMax;
         lbl_80282230->nBytes += nMax;
     }
@@ -912,7 +912,7 @@ char lbl_80191720[40] = "\0+-0123456789abcdefghijklmnopqrstuvwxyz_";
 // Packs up to 12 characters of pName into a base-40 code, stored with its bytes reversed. A
 // character without a code becomes '_'. Returns 0, 1 when the name is longer than 12 characters,
 // or 2 when a character was replaced.
-int fn_800CB700(u64* pId, const char* pName) {
+int SKA_PackName(u64* pId, const char* pName) {
     int nResult = 0;
     int i;
     char c;
@@ -949,7 +949,7 @@ int fn_800CB700(u64* pId, const char* pName) {
     return nResult;
 }
 
-// Unpacks a name code (fn_800CB700) into its 12 characters.
+// Unpacks a name code (SKA_PackName) into its 12 characters.
 void fn_800CB868(u64* pId, char* szName) {
     int i;
     u64 uId = *pId;

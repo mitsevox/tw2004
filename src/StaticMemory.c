@@ -70,7 +70,7 @@ void fn_8000989C(void) {
     s32 nSize;
 
     nSize = lbl_80281BBC;
-    fn_80005AE8(lbl_80281BC0, 0x77, nSize);
+    Mem_set(lbl_80281BC0, 0x77, nSize);
     // port: addresses stored as integers (see the top of the file).
     lbl_80281BD4[0] = (s32)lbl_80281BC0;
     // port: as above.
@@ -167,7 +167,7 @@ int fn_80009A60(int nSize) {
 // high end of the first fitting span searching down from the cursor, 4 of the best fitting one. When one way fails the other is
 // tried once: the static heap for mode 0, the system heap for the others. New memory is filled
 // with 0x33 (low end) or 0x55 (high end).
-void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine) {
+void* StaticMem_Alloc(int nSize, int nMode, int nAlign, const char* pFile, int nLine) {
     s32 nBlock;
     int nWanted;
     int bRetry;
@@ -223,7 +223,7 @@ void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine
                 nBlock = nAddr;
             }
             // port: as above.
-            fn_80005AE8((void*)nBlock, 0x33, nWanted);
+            Mem_set((void*)nBlock, 0x33, nWanted);
             lbl_80281BD4[i] += nSize;
             pSpan = &lbl_80281BD4[i];
             if (pSpan[0] == pSpan[1] && lbl_80281BD0 > 3) {
@@ -259,7 +259,7 @@ void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine
             // port: as above.
             ((s32*)nBlock)[-2] = lbl_80281BD4[i + 1];
             // port: as above.
-            fn_80005AE8((void*)nBlock, 0x55, nWanted);
+            Mem_set((void*)nBlock, 0x55, nWanted);
             pSpan = &lbl_80281BD4[i];
             if (pSpan[0] == pSpan[1] && lbl_80281BD0 > 3) {
                 Mem_cpy(pSpan, pSpan + 2, (lbl_80281BD0 - i - 1) * sizeof(s32));
@@ -303,7 +303,7 @@ int fn_80009E04(s32 nAddr) {
 
 // Frees a block (filled with 0x11): merged into the free span it touches, or a new span. A block
 // from outside the heap goes back to the system heap.
-void fn_80009E70(void* p) {
+void StaticMem_Free(void* p) {
     int i;
     s32 nStart;
     s32 nEnd;
@@ -317,7 +317,7 @@ void fn_80009E70(void* p) {
         nEnd = nStart + nSize;
         i = fn_80009E04(nStart);
         // port: as above.
-        fn_80005AE8((void*)nStart, 0x11, nEnd - nStart);
+        Mem_set((void*)nStart, 0x11, nEnd - nStart);
         if (lbl_80281BB0) {
             lbl_80281BB4 -= nSize;
         }

@@ -167,7 +167,7 @@ f32 fn_800C79BC(f32* p0, f32* p1, f32* p2, f32* p3) {
         fT += 1.0f / 32.0f;
         fn_800C7898(p0, p1, p2, p3, &vPoint.x, fT);
         fn_800C8068(&vPoint.x, &vLast.x, &vDelta.x);
-        fLength += (f32)fn_80009680(fn_80009744(&vDelta.x));
+        fLength += (f32)Math_Sqrt(Vec3_LengthSqClamped(&vDelta.x));
         Vec3Copy(&vPoint.x, &vLast.x);
     }
     return fLength;
@@ -265,12 +265,12 @@ void fn_800C7D14(f32* pA, f32* pB, u8 bKeepY, u8 bRaw, f32* pOut, f32 fDist, f32
         aDir[1] = 0.0f;
     }
     if (!bRaw && (0.0f != aDir[0] || 0.0f != aDir[1] || 0.0f != aDir[2])) {
-        fn_800BAF04(aDir, aDir);
+        Vec_NormalizeTo(aDir, aDir);
     }
     fn_8000C5D4(pA, aDir, fDist, pOut);
     aDir[1] = 0.0f;
     if (0.0f != aDir[0] || 0.0f != aDir[1] || 0.0f != aDir[2]) {
-        fn_800BAF04(aDir, aDir);
+        Vec_NormalizeTo(aDir, aDir);
     }
     pOut[0] = fSide * -aDir[2] + pOut[0];
     pOut[2] = fSide * aDir[0] + pOut[2];
@@ -329,13 +329,13 @@ void fn_800C7E50(f32* pA, f32* pB, f32* pC, int nDir, f32* pOut, f32 fT) {
             fAngleTo += 2.0f * PI;
         }
     }
-    fDistFrom = fn_80009680(fn_80009744(&vFrom.x));
-    fDistTo = fn_80009680(fn_80009744(&vTo.x));
+    fDistFrom = Math_Sqrt(Vec3_LengthSqClamped(&vFrom.x));
+    fDistTo = Math_Sqrt(Vec3_LengthSqClamped(&vTo.x));
     fDist = fT * (fDistTo - fDistFrom) + fDistFrom;
     fAngle = fT * (fAngleTo - fAngleFrom) + fAngleFrom;
-    pOut[0] = fDist * fn_80009638(fAngle) + pC[0];
+    pOut[0] = fDist * Math_Cos(fAngle) + pC[0];
     pOut[1] = fT * (pB[1] - pA[1]) + pA[1];
-    pOut[2] = fDist * fn_800095F0(fAngle) + pC[2];
+    pOut[2] = fDist * Math_Sin(fAngle) + pC[2];
 }
 
 // Three floats: pOut gets pA minus pB.

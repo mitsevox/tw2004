@@ -166,7 +166,7 @@ s32 fn_800E84B0(int nPlayer) {
             return aOrder[h];
         }
     }
-    pCourse = fn_8000C594();
+    pCourse = Ter_GetTGD();
     nPinSet = Game_CurrentPinSet();
     fBest = 0.0f;
     nBest = 5;
@@ -175,7 +175,7 @@ s32 fn_800E84B0(int nPlayer) {
             PLAYER(i)->ball.nLie != LIE_GREEN_e) {
             dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
             dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
-            d = fn_80009680(dx * dx + dz * dz);
+            d = Math_Sqrt(dx * dx + dz * dz);
             if (d > fBest) {
                 fBest = d;
                 nBest = i;
@@ -190,7 +190,7 @@ s32 fn_800E84B0(int nPlayer) {
                 !fn_800E82AC(fn_800E8848(i))) {
                 dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
                 dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
-                d = fn_80009680(dx * dx + dz * dz);
+                d = Math_Sqrt(dx * dx + dz * dz);
                 if (d > fBest) {
                     fBest = d;
                     nBest = i;
@@ -337,9 +337,9 @@ void fn_800E8A68(void) {
                             if (gpSaveData[nProfile].bActive) {
                                 EASBio_SetCurrentGameWon(1);
                                 if (nOurs) {
-                                    fn_800E4364(0, 0x76, nOurs, nProfile);
+                                    GUI_QueueMessage(0, 0x76, nOurs, nProfile);
                                 }
-                                fn_800D3548(nPlayer, nMoney, 0);
+                                GM_Earnings_AwardMoney(nPlayer, nMoney, 0);
                             }
                         }
                     }
@@ -372,7 +372,7 @@ int fn_800E8CA8(int nPlayer, u8 bCurrent) {
     }
     for (h = 0; h < n; h++) {
         if (gpGame->bHoleSelected[h]) {
-            nPar += fn_800D2AD8(h);
+            nPar += Course_GetHolePar(h);
             nScore += fn_800E8C24(nPlayer, h);
         }
     }

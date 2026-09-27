@@ -137,8 +137,8 @@ void GameModeBattle_EndGame(void) {
             if (gpSaveData[nProfile].bActive) {
                 EASBio_SetCurrentGameWon(1);
                 if (nMoney) {
-                    fn_800E4364(0, 0x6B, nPrize, nProfile);
-                    fn_800D3548(nWinner, nMoney, 0);
+                    GUI_QueueMessage(0, 0x6B, nPrize, nProfile);
+                    GM_Earnings_AwardMoney(nWinner, nMoney, 0);
                     gPlayers[nWinner].money.n14 += nMoney;
                 }
             }

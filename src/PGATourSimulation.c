@@ -87,7 +87,7 @@ void fn_80117694(UStreamObject* pObject) {
 void fn_801176C0(TourSeason* pTour) {
     int i;
 
-    fn_80005AE8(pTour, 0, sizeof(*pTour));
+    Mem_set(pTour, 0, sizeof(*pTour));
     for (i = 0; i < 31; i++) {
         strcpy(pTour->aEvent[i].szChampName, GameModeDriverPGATour_GetInitialChampName(i));
         pTour->aEvent[i].nChampScore = GameModeDriverPGATour_GetInitialChampScore(i);
@@ -103,7 +103,7 @@ void fn_80117860(TourSeason* pTour) {
     int i;
 
     for (i = 0; i < PGA_NUM_GOLFERS; i++) {
-        fn_80005AE8(&pTour->aStats[i], 0, (u8*)&pTour->aStats[0].unk4B - (u8*)&pTour->aStats[0]);
+        Mem_set(&pTour->aStats[i], 0, (u8*)&pTour->aStats[0].unk4B - (u8*)&pTour->aStats[0]);
     }
 }
 
@@ -117,9 +117,9 @@ void GM_PgaTourSim_SimRound(int nPlayer, SeasonEvent* pEvent, int nRound, int n,
     int nHole;
     int i;
 
-    fn_80005AE8(&lbl_80223C70, 0, sizeof(lbl_80223C70));
+    Mem_set(&lbl_80223C70, 0, sizeof(lbl_80223C70));
     gbScoresDirty = 1;
-    fn_80005AE8(lbl_80224070, 0, sizeof(lbl_80224070));
+    Mem_set(lbl_80224070, 0, sizeof(lbl_80224070));
     if (nRound == 0) {
         pEvent->nEventPar = 0;
         pEvent->nUserBracket = fn_800EF0E0(nPlayer);
@@ -163,7 +163,7 @@ void GM_PgaTourSim_SimRound(int nPlayer, SeasonEvent* pEvent, int nRound, int n,
 
 // A new tournament: the field emptied, no winner yet.
 void fn_80117AF8(int nPlayer) {
-    fn_80005AE8(&gpSaveData[nPlayer].tour.field, 0, sizeof(PgaField));
+    Mem_set(&gpSaveData[nPlayer].tour.field, 0, sizeof(PgaField));
     gpSaveData[nPlayer].tour.field.nWinner = -1;
 }
 
@@ -894,7 +894,7 @@ void GM_PgaTourSim_SimEntrantScoresOnHole(int nPlayer, int nRound, int nEntrant,
     } else {
         pPro = &lbl_8024B9CC[pEntrantMC->nGolfer];
     }
-    nPar = fn_800D2AD8(nHole);
+    nPar = Course_GetHolePar(nHole);
     fRound = pPro->fPar3Avg * fn_800D31A4(3) + pPro->fPar4Avg * fn_800D31A4(4)
            + pPro->fPar5Avg * fn_800D31A4(5);
     fScale = 0.25f * pEntrantMC->nTargetScore / fRound;
@@ -1021,7 +1021,7 @@ void fn_8011A074(int nPlayer, int nRound, int nEntrant, int nHole) {
     } else {
         pPro = &lbl_8024B9CC[0];
     }
-    nPar = fn_800D2AD8(nHole);
+    nPar = Course_GetHolePar(nHole);
     nStrokes = pEntrant->aHoleStrokes[nHole];
 
     pStats->nHoles++;
@@ -1040,7 +1040,7 @@ void fn_8011A074(int nPlayer, int nRound, int nEntrant, int nHole) {
     } else if (nStrokes > nPar) {
         pStats->nBogeys++;
     }
-    if (nHole > 0 && nStrokes < nPar && pEntrant->aHoleStrokes[nHole - 1] > fn_800D2AD8(nHole - 1)) {
+    if (nHole > 0 && nStrokes < nPar && pEntrant->aHoleStrokes[nHole - 1] > Course_GetHolePar(nHole - 1)) {
         pStats->nBirdiesAfterBogey++;
     }
     switch (nPar) {

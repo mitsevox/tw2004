@@ -41,7 +41,7 @@ f32 fn_8000BF20(const f32* pPos) {
     v[1] = 1.0f / 3.0f + pPos[1];
     v[2] = pPos[2];
     v[3] = 1.0f;
-    pCourse = fn_8000C594();
+    pCourse = Ter_GetTGD();
     if (pCourse != NULL) {
         fHeight = Ter_GetSupportingGroundHeight(pCourse, v);
         if (fHeight != -65536.125f) {
@@ -259,7 +259,7 @@ u8 fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit) {
             fDz = v[2] - pFrom[2];
             fDist = fDx * fDx;      // fake match: the squares as statements, so they do not fuse
             fDz = fDz * fDz;
-            fDist = fn_80009680(fDist + fDz);
+            fDist = Math_Sqrt(fDist + fDz);
             bHit = 1;
             if (fDist < fBest) {
                 fBest = fDist;
@@ -300,7 +300,7 @@ u8 fn_8000C4E0(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes) {
 }
 
 // TW06: Ter_TerrainGameDataMgr::GetTGD.
-CourseInfo* fn_8000C594(void) {
+CourseInfo* Ter_GetTGD(void) {
     return lbl_801D3CB0.pCourse;
 }
 
@@ -332,6 +332,6 @@ void fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut) {
 }
 #endif
 
-f32 fn_8000C5FC(f32* pA, f32* pB) {
+f32 Vec3_Dot(f32* pA, f32* pB) {
     return pA[2] * pB[2] + (pA[0] * pB[0] + pA[1] * pB[1]);
 }

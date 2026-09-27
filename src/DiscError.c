@@ -271,14 +271,14 @@ void fn_800B6FCC(int nLines) {
             if (i == 0) {
                 szLine[0] = 0x82;
                 szLine[0x27] = 0x83;
-                fn_80005AE8(p, 0x86, sizeof(szLine) - 3);
+                Mem_set(p, 0x86, sizeof(szLine) - 3);
             } else {
                 szLine[0] = 0x84;
                 szLine[0x27] = 0x85;
-                fn_80005AE8(p, 0x88, sizeof(szLine) - 3);
+                Mem_set(p, 0x88, sizeof(szLine) - 3);
             }
         } else {
-            fn_80005AE8(p, ' ', sizeof(szLine) - 3);
+            Mem_set(p, ' ', sizeof(szLine) - 3);
             szLine[0] = 0x89;
             szLine[0x27] = 0x87;
         }

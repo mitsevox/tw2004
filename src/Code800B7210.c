@@ -115,8 +115,9 @@ u8 fn_800B7490(void) {
         fn_80013400();
         nLast = nStatus;
         nStatus = DVDGetDriveStatus();
-        if ((fn_800136DC(0) & 0x01000000) || (fn_800136DC(1) & 0x01000000) ||
-            (fn_800136DC(2) & 0x01000000) || (fn_800136DC(3) & 0x01000000) || nStatus == 6 ||
+        if ((Controller_GetButtons(0) & 0x01000000) || (Controller_GetButtons(1) & 0x01000000) ||
+            (Controller_GetButtons(2) & 0x01000000) || (Controller_GetButtons(3) & 0x01000000) || nStatus
+                    == 6 ||
             nStatus == 10) {
             if (nStatus != -1) {
                 fn_800066E4(1, 1, 1, 0);

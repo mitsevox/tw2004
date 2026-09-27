@@ -105,7 +105,7 @@ void fn_80076E48(void) {
 // Free the copy of the 'BIO ' stream object's data.
 void fn_80076EEC(void) {
     if (lbl_80281EC8 != NULL) {
-        fn_80009E70(lbl_80281EC8);
+        StaticMem_Free(lbl_80281EC8);
         lbl_80281EC8 = NULL;
     }
 }
@@ -126,9 +126,9 @@ void fn_80076F58(void) {
 
 // The 'BIO ' stream object's handler: keep a copy of its data.
 void fn_80076F80(UStreamObject* pObject) {
-    lbl_80281EC8 = fn_80009B34(pObject->uSize, 2, 32, "FE_Manager.c", 285);
+    lbl_80281EC8 = StaticMem_Alloc(pObject->uSize, 2, 32, "FE_Manager.c", 285);
     Mem_cpy(lbl_80281EC8, pObject->pData, pObject->uSize);
-    fn_80009E70(pObject);
+    StaticMem_Free(pObject);
 }
 
 // A movie's skip test (LLVideo_PlayFile's pfnStop, whose arguments it ignores): any button on any
@@ -137,7 +137,7 @@ u8 fn_80076FDC(Video* pVideo, int nArg) {
     int i;
     fn_80013400();
     for (i = 0; i < 4; i++) {
-        if (fn_800136DC(i)) {
+        if (Controller_GetButtons(i)) {
             return 1;
         }
     }
@@ -278,8 +278,8 @@ void fn_80077428(void) {
 // Set up the profile being worked on, cleared, and the logo textures' hashes.
 void fn_8007744C(void) {
     int i;
-    lbl_80281ED4 = fn_80009B34(sizeof(FEProfile), 2, 16, "FE_Manager.c", 1035);
-    fn_80005AE8(lbl_80281ED4, 0, sizeof(FEProfile));
+    lbl_80281ED4 = StaticMem_Alloc(sizeof(FEProfile), 2, 16, "FE_Manager.c", 1035);
+    Mem_set(lbl_80281ED4, 0, sizeof(FEProfile));
     lbl_80281ED4->bCopy = 0;
     lbl_80281ED4->b10640 = 0;
     lbl_80281ED4->nSlot = 0;
@@ -325,7 +325,7 @@ void fn_800775BC_LoadCreatedFromSave(void) {
     }
     fn_80076EEC();
     fn_80076F20();
-    fn_80009E70(lbl_80281ED4);
+    StaticMem_Free(lbl_80281ED4);
 }
 
 // Back up every slot's profile, where one is loaded.
@@ -373,16 +373,16 @@ void fn_80077968(int nSlot) {
 
 // Swap two backup rows.
 void fn_800779BC(int a, int b) {
-    SaveProfile* pTemp = fn_80009B34(sizeof(SaveProfile), 1, 32, "FE_Manager.c", 1194);
+    SaveProfile* pTemp = StaticMem_Alloc(sizeof(SaveProfile), 1, 32, "FE_Manager.c", 1194);
     Mem_cpy(pTemp, &lbl_801D7148.p658[b], sizeof(SaveProfile));
     Mem_cpy(&lbl_801D7148.p658[b], &lbl_801D7148.p658[a], sizeof(SaveProfile));
     Mem_cpy(&lbl_801D7148.p658[a], pTemp, sizeof(SaveProfile));
-    fn_80009E70(pTemp);
+    StaticMem_Free(pTemp);
 }
 
 // A golfer's record: a table golfer, or the profile's created golfer.
 GolferRecord* fn_80077A80(int nGolfer) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     if (nGolfer < FIRST_CREATED_GOLFER) {
         return &gGolferTable[nGolfer];
     }
@@ -391,7 +391,7 @@ GolferRecord* fn_80077A80(int nGolfer) {
 
 // ---- the profile being worked on ---------------------------------------------------------------
 
-SaveProfile* fn_80077ACC(void) {
+SaveProfile* FE_GetCurrentProfile(void) {
     if (lbl_80281ED4->bCopy) {
         return &lbl_80281ED4->profile;
     }
@@ -459,7 +459,7 @@ void fn_80077C1C(int a, int b) {
     int nFound;
     int nKinds;
     s8 nB;                  // b as fn_80103B8C and fn_80103BC0 take it
-    pProfile = fn_80077ACC();
+    pProfile = FE_GetCurrentProfile();
     nFound = 0;
     nCount = fn_80105C00();
     nKind = 0;
@@ -548,7 +548,7 @@ u8 fn_80078008(s32 nAsset, SaveProfile* pProfile) {
     }
     switch (nKind) {
     case 0:
-        bLocked = fn_8001E9CC(pProfile->aB1CC, n) == 0;
+        bLocked = BitArray_Test(pProfile->aB1CC, n) == 0;
         break;
     case 2:
         bLocked = !fn_80058304(pProfile, 1);
@@ -560,7 +560,7 @@ u8 fn_80078008(s32 nAsset, SaveProfile* pProfile) {
         bLocked = 0;
         break;
     case 6:
-        bLocked = fn_8001E9CC(lbl_801D5948, aBits[n]) == 0;
+        bLocked = BitArray_Test(lbl_801D5948, aBits[n]) == 0;
         break;
     case 7:
         bLocked = !pProfile->aC8[n].award.bWon;
@@ -745,7 +745,7 @@ void fn_80078680(SaveProfile* pProfile) {
         for (i = 0; i < nCount; i++) {
             fn_80103B8C(fn_80103BC0(i));
             if (fn_80078008(i, pProfile)) {
-                fn_8001EA34(pProfile->aAssetLocked, i);
+                BitArray_Set(pProfile->aAssetLocked, i);
             } else {
                 fn_8001EB6C(pProfile->aAssetLocked, i);
             }
@@ -1182,7 +1182,7 @@ int fn_800797E0(SaveProfile* pProfile, s16 nPart, int b, int nChance) {
 
 // With a working copy of the profile: a random part 9, and a fixed set of parts turned on.
 void fn_80079974(void) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     int i;
     if (lbl_80281ED4->bCopy) {
         fn_80103B74(0);
@@ -1275,7 +1275,7 @@ void fn_80079D30(void) {
             lbl_80281ED0 = GoARAM_Alloc(FE_BACKUP_SIZE);
         }
         GoARAM_WaitTransfer(GoARAM_CopyToAram(lbl_801D7148.p658, lbl_80281ED0, lbl_80281ECC));
-        fn_80009E70(lbl_801D7148.p658);
+        StaticMem_Free(lbl_801D7148.p658);
         lbl_801D7148.p658 = NULL;
     }
 }
@@ -1284,7 +1284,7 @@ void fn_80079D30(void) {
 void fn_80079DAC(void) {
     if (lbl_801D7148.p658 == NULL) {
         lbl_80281ECC = FE_BACKUP_SIZE;
-        lbl_801D7148.p658 = fn_80009B34(lbl_80281ECC, 2, 32, "FE_Manager.c", 2778);
+        lbl_801D7148.p658 = StaticMem_Alloc(lbl_80281ECC, 2, 32, "FE_Manager.c", 2778);
         memset(lbl_801D7148.p658, 0, lbl_80281ECC);
         if (lbl_80281ED0 != 0) {
             GoARAM_WaitTransfer(GoARAM_CopyFromAram(lbl_801D7148.p658, lbl_80281ED0, lbl_80281ECC));

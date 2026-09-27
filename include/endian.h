@@ -25,7 +25,7 @@ typedef struct SwapField {
 } SwapField;
 
 // Byte-swap nCount records laid out as pFormat's nFields fields from *ppSrc to *ppDst.
-void fn_8001F08C(void** ppSrc, void** ppDst, SwapField* pFormat, int nFields, int nCount);
+void ByteSwap_Records(void** ppSrc, void** ppDst, SwapField* pFormat, int nFields, int nCount);
 
 #ifdef __MWERKS__
 

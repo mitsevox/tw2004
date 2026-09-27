@@ -53,13 +53,13 @@ int fn_800D2ABC(int nCourse, int nHole) {
 }
 
 // The par of the round's hole nHole.
-int fn_800D2AD8(int nHole) {
+int Course_GetHolePar(int nHole) {
     return lbl_801FA2F4[gpGame->nHoleCourse[nHole]].aHoles[gpGame->nHoleNum[nHole]].nPar;
 }
 
 // The current hole's par.
-int fn_800D2B08(void) {
-    return lbl_801FA2F4[Game_GetCourse()].aHoles[fn_80015464()].nPar;
+int Course_GetCurHolePar(void) {
+    return lbl_801FA2F4[Game_GetCourse()].aHoles[Game_GetCurHoleNum()].nPar;
 }
 
 s32 fn_800D2B4C(int nHole) {
@@ -86,16 +86,16 @@ s32 fn_800D2C30(int nHole, int nTee) {
 }
 
 s32 fn_800D2C68(int nTee) {
-    return fn_800D2B80(Game_GetCourse(), fn_80015464(), nTee);
+    return fn_800D2B80(Game_GetCourse(), Game_GetCurHoleNum(), nTee);
 }
 
 // The current hole's wind: its direction and its speed.
 int fn_800D2CB0_HoleWindDir(void) {
-    return lbl_801FA2F4[Game_GetCourse()].aHoles[fn_80015464()].nWindDir;
+    return lbl_801FA2F4[Game_GetCourse()].aHoles[Game_GetCurHoleNum()].nWindDir;
 }
 
 f32 fn_800D2CF8_HoleWindSpeed(void) {
-    return lbl_801FA2F4[Game_GetCourse()].aHoles[fn_80015464()].fWindSpeed;
+    return lbl_801FA2F4[Game_GetCourse()].aHoles[Game_GetCurHoleNum()].fWindSpeed;
 }
 
 // fn_800D2C30 added up over the round's 18 holes, the front nine and the back nine.
@@ -131,7 +131,7 @@ s32 fn_800D2E60(void) {
     s32 nPar = 0;
     int i;
     for (i = 0; i < 9; i++) {
-        nPar += fn_800D2AD8(i);
+        nPar += Course_GetHolePar(i);
     }
     return nPar;
 }
@@ -140,7 +140,7 @@ s32 fn_800D2EB0(void) {
     s32 nPar = 0;
     int i;
     for (i = 9; i < 18; i++) {
-        nPar += fn_800D2AD8(i);
+        nPar += Course_GetHolePar(i);
     }
     return nPar;
 }
@@ -167,13 +167,13 @@ s32 fn_800D2FB4(s32 nTeeSet) {
     s32 nPar = 0;
     int i;
     for (i = 0; i < 18; i++) {
-        nPar += fn_800D2AD8(i);
+        nPar += Course_GetHolePar(i);
     }
     return nPar;
 }
 
 u8 fn_800D3004(void) {
-    return lbl_801FA2F4[Game_GetCourse()].aHoles[fn_80015464()].b34;
+    return lbl_801FA2F4[Game_GetCourse()].aHoles[Game_GetCurHoleNum()].b34;
 }
 
 u8 fn_800D304C(int nHole) {
@@ -218,7 +218,7 @@ int fn_800D31A4(int nPar) {
     int nCount = 0;
     int i;
     for (i = 0; i < 18; i++) {
-        if (nPar == fn_800D2AD8(i)) {
+        if (nPar == Course_GetHolePar(i)) {
             nCount++;
         }
     }

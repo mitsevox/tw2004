@@ -10,7 +10,7 @@
 #include "game/save.h"              // SkinChoice, SkinChoices
 
 // ---- a skin's parts (SkinPart.c) ----------------------------------------------------------------
-// Parts, variants and the other entries are found by a 64-bit name code: fn_800CB700 packs a name
+// Parts, variants and the other entries are found by a 64-bit name code: SKA_PackName packs a name
 // ("Glove", "GloveOn") into one. The description comes from a file: fn_800CEF04 turns its offsets
 // into pointers.
 
@@ -711,14 +711,14 @@ extern s32* lbl_802825A8;               // the new number of each mesh bit (fn_8
 
 // Bit n of a bit array of 32-bit words: test, set, clear.
 void  fn_8001E8A4(u32* aBits, u32 nBits);  // sets every bit of a bit array
-void  fn_8001E938(u32* aBits, u32 nBits);  // clears a bit array
-u8    fn_8001E9CC(u32* aBits, u32 n);
-void  fn_8001EA34(u32* aBits, u32 n);
+void  BitArray_ClearAll(u32* aBits, u32 nBits);  // clears a bit array
+u8    BitArray_Test(u32* aBits, u32 n);
+void  BitArray_Set(u32* aBits, u32 n);
 void  fn_8001EA54(u32* aA, u32* aB, u32* aOut, u32 nBits);  // the bits set in both
 void  fn_8001EB6C(u32* aBits, u32 n);
 u8    fn_8001E9F4(u32* aA, u32* aB, u32 nBits);  // two bit arrays share a set bit
 
-// 4-vectors (the quaternion copy, fn_8001E85C, is in character.h).
+// 4-vectors (the quaternion copy, Quat_Copy, is in character.h).
 void  fn_8001E880(f32* pSrc, f32* pDst);  // a point to a 4-vector with w = 1
 f32   fn_8001EEA4(f32* pA, f32* pB);      // dot product
 

@@ -6,7 +6,7 @@
 #include "camera.h"
 #include "golfer.h"
 
-void fn_8000ADC0(f32 (*pMtx)[4]);                                           // identity
+void Mtx_Identity(f32 (*pMtx)[4]);                                           // identity
 void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_8000C5A4(f32 (*pMtx)[4]);
@@ -88,21 +88,21 @@ int fn_80049820(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
         // flag 0x200: not while the flagstick is out
         if (pObj->obj.pModel != NULL &&(!(pObj->uFlags & 0x200) || !fn_80016CF4()->bFlagOut)) {
             if (pObj->uFlags & 0x400) {
-                fn_80012F34(0);
+                RenderState_SetDepthWrite(0);
             }
             if (pObj->uFlags & 0x800) {
-                fn_80012F50(0, 6, 0x80);
+                RenderState_SetAlphaTest(0, 6, 0x80);
             }
             fn_80048894(&pObj->obj);
             if (pObj->uFlags & 0x400) {
-                fn_80012F34(1);
-                fn_80012EF8();
+                RenderState_SetDepthWrite(1);
+                RenderState_Flush();
             }
             if (pObj->uFlags & 0x800) {
-                fn_80012F50(1, 6, 0x80);
+                RenderState_SetAlphaTest(1, 6, 0x80);
             }
             if ((pObj->uFlags & 0x400) || (pObj->uFlags & 0x800)) {
-                fn_80012EF8();
+                RenderState_Flush();
             }
         }
         return 0;
@@ -157,7 +157,7 @@ void fn_80049A14(DynObjTurning* pObj, DynObjSetup* pSetup) {
 void fn_80049A54(DynObjTurning* pObj, void* pArg) {
     f32 mTurn[4][4];
 
-    fn_8000ADC0(mTurn);
+    Mtx_Identity(mTurn);
     fn_8000A194(mTurn, 2.0f * PI * (pObj->fSpeed / 360.0f) / 60.0f, 0.0f, 0.0f);
     fn_800BADF8(pObj->base.obj.m0, mTurn, pObj->base.obj.m0, 4);
     fn_8000C5A4(pObj->base.obj.m0);

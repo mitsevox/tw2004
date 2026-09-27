@@ -74,7 +74,7 @@ void fn_80107998(MsgArg* pArgs, MsgArg* pResult) {
 // Set slider pArgs[0] of the created golfer to pArgs[1]; the menu golfer, when there is one, takes
 // the new sliders and part 18 is turned on with the slider's number.
 void fn_8010799C(MsgArg* pArgs, MsgArg* pResult) {
-    SkinChoices* pChoices = &fn_80077ACC()->choices;
+    SkinChoices* pChoices = &FE_GetCurrentProfile()->choices;
     int n = pArgs[0].i;
     Character* pChar;
 
@@ -190,7 +190,7 @@ void fn_80107BA4(MsgArg* pArgs, MsgArg* pResult) {
 
 // Slider n of the created golfer (the profile's choices.a9B4, read signed).
 void fn_80107BA8(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     pResult->i = (s8)pProfile->choices.a9B4[pArgs[0].i];
 }
 
@@ -279,7 +279,7 @@ void fn_80107EB0(MsgArg* pArgs, MsgArg* pResult) {
 // Part 17 is only turned on directly; for the others fn_80103F94 does it when fn_80103C98 and
 // fn_801074D4 allow.
 void fn_80107FAC(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     s16 nPart = pArgs[0].i;
     int b = pArgs[1].i;
     int i = pArgs[2].i;
@@ -307,7 +307,7 @@ void fn_80108070(MsgArg* pArgs, MsgArg* pResult) {
     int i;
     int nAsset;
 
-    fn_80077ACC();
+    FE_GetCurrentProfile();
     nPart = pArgs[0].i;
     b = pArgs[1].i;
     i = pArgs[2].i;
@@ -337,7 +337,7 @@ void fn_80108178(MsgArg* pArgs, MsgArg* pResult) {
     int nMonth;
     int nDay;
     int nYear;
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
 
     switch (pArgs[0].i) {
     case 0:
@@ -361,7 +361,7 @@ void fn_80108178(MsgArg* pArgs, MsgArg* pResult) {
 
 // Read one of the profile's settings (see fn_80108178).
 void fn_80108244(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
 
     switch (pArgs[0].i) {
     case 0:
@@ -389,7 +389,7 @@ void fn_80108300(MsgArg* pArgs, MsgArg* pResult) {
 
 // A part's choice i is locked (never in the session's 0x4000 mode).
 void fn_80108314(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     s16 nPart = pArgs[0].i;
     int b = pArgs[1].i;
     int i = pArgs[2].i;
@@ -404,9 +404,9 @@ void fn_80108314(MsgArg* pArgs, MsgArg* pResult) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80108398(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     int nAsset = fn_80104FA8(pArgs[0].i, pArgs[1].i, pArgs[2].i);
-    pResult->i = fn_8001E9CC(pProfile->aB1CC, nAsset);
+    pResult->i = BitArray_Test(pProfile->aB1CC, nAsset);
 }
 
 // ---- end of sweep code ----
@@ -414,7 +414,7 @@ void fn_80108398(MsgArg* pArgs, MsgArg* pResult) {
 // Buy a part's choice i: take the price pArgs[3] from the money, mark it bought (aB1CC), put it on
 // the created golfer and recompute its equipment tiers (fn_8007873C).
 void fn_8010840C(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     s16 nPart = pArgs[0].i;
     int b = pArgs[1].i;
     int i = pArgs[2].i;
@@ -422,7 +422,7 @@ void fn_8010840C(MsgArg* pArgs, MsgArg* pResult) {
     int nAsset = fn_80104FA8(nPart, b, i);
 
     pProfile->n6C -= nPrice;
-    fn_8001EA34(pProfile->aB1CC, nAsset);
+    BitArray_Set(pProfile->aB1CC, nAsset);
     FE_CrAP_TurnOnPart(nPart, b, i);
     fn_8007873C(pProfile);
 }
@@ -430,7 +430,7 @@ void fn_8010840C(MsgArg* pArgs, MsgArg* pResult) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80108494(MsgArg* pArgs, MsgArg* pResult) {
-    fn_80077ACC();
+    FE_GetCurrentProfile();
     if (fn_80106244(pArgs[0].i) >= 0) {
         pResult->i = 1;
         return;
@@ -444,7 +444,7 @@ void fn_80108494(MsgArg* pArgs, MsgArg* pResult) {
 // asset in its slot of the profile (fn_80106374).
 void fn_801084F4(MsgArg* pArgs, MsgArg* pResult) {
     char szName[16];                    // the size is unknown (the frame allows up to 20)
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     s16 nPart = pArgs[0].i;
     int b = pArgs[1].i;
     int i = pArgs[2].i;
@@ -575,24 +575,24 @@ void fn_801089DC(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80108A0C(MsgArg* pArgs, MsgArg* pResult) {
     u32 aWasLocked[94];                 // the size is unknown (the frame allows up to 97 words)
     int nUnlocked = 0;
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 nAssets = fn_80105C00();
     int i;
 
-    fn_8001E938(aWasLocked, 3000);
+    BitArray_ClearAll(aWasLocked, 3000);
     for (i = 0; i < nAssets; i++) {
-        if (fn_8001E9CC(pProfile->aAssetLocked, i)) {
-            fn_8001EA34(aWasLocked, i);
+        if (BitArray_Test(pProfile->aAssetLocked, i)) {
+            BitArray_Set(aWasLocked, i);
         } else {
             fn_8001EB6C(aWasLocked, i);
         }
     }
     fn_80078680(pProfile);
     for (i = 0; i < nAssets; i++) {
-        if (!fn_8001E9CC(pProfile->aAssetLocked, i) && fn_8001E9CC(aWasLocked, i)) {
+        if (!BitArray_Test(pProfile->aAssetLocked, i) && BitArray_Test(aWasLocked, i)) {
             if (fn_801061C8(fn_80103BC0(i))) {
                 nUnlocked++;
-                fn_8001EA34(pProfile->aB344, i);
+                BitArray_Set(pProfile->aB344, i);
             }
         }
     }
@@ -602,16 +602,16 @@ void fn_80108A0C(MsgArg* pArgs, MsgArg* pResult) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80108B10(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     int nAsset = fn_80104FA8(pArgs[0].i, pArgs[1].i, pArgs[2].i);
-    pResult->i = fn_8001E9CC(pProfile->aB344, nAsset);
+    pResult->i = BitArray_Test(pProfile->aB344, nAsset);
 }
 
 void fn_80108B84(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     int nAsset = fn_80104FA8(pArgs[0].i, pArgs[1].i, pArgs[2].i);
-    if (fn_8001E9CC(pProfile->aB344, nAsset)) {
-        fn_8001EA34(pProfile->aB4BC, nAsset);
+    if (BitArray_Test(pProfile->aB344, nAsset)) {
+        BitArray_Set(pProfile->aB4BC, nAsset);
     }
 }
 
@@ -619,12 +619,12 @@ void fn_80108B84(MsgArg* pArgs, MsgArg* pResult) {
 
 // Clear every asset's aB344 and aB4BC bits where both are set.
 void fn_80108C00(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 nAssets = fn_80105C00();
     u32 i;
 
     for (i = 0; i < nAssets; i++) {
-        if (fn_8001E9CC(pProfile->aB344, i) && fn_8001E9CC(pProfile->aB4BC, i)) {
+        if (BitArray_Test(pProfile->aB344, i) && BitArray_Test(pProfile->aB4BC, i)) {
             fn_8001EB6C(pProfile->aB344, i);
             fn_8001EB6C(pProfile->aB4BC, i);
         }
@@ -636,7 +636,7 @@ void fn_80108CA8(MsgArg* pArgs, MsgArg* pResult) {
     int i;
 
     for (i = 0; i < 4; i++) {
-        if (fn_80013070(i) && (fn_800136DC(i) & 0x1000000)) {
+        if (fn_80013070(i) && (Controller_GetButtons(i) & 0x1000000)) {
             pResult->i = 1;
             return;
         }
@@ -654,22 +654,22 @@ void fn_80108D1C(MsgArg* pArgs, MsgArg* pResult) {
     s32* pD = pArgs[4].p;
 
     if (fn_80013070(nChan)) {
-        if (fn_800136DC(nChan) & 0x80000) {
+        if (Controller_GetButtons(nChan) & 0x80000) {
             *pA = 1;
         } else {
             *pA = 0;
         }
-        if (fn_800136DC(nChan) & 0x40000) {
+        if (Controller_GetButtons(nChan) & 0x40000) {
             *pB = 1;
         } else {
             *pB = 0;
         }
-        if (fn_800136DC(nChan) & 0x10000) {
+        if (Controller_GetButtons(nChan) & 0x10000) {
             *pC = 1;
         } else {
             *pC = 0;
         }
-        if (fn_800136DC(nChan) & 0x20000) {
+        if (Controller_GetButtons(nChan) & 0x20000) {
             *pD = 1;
         } else {
             *pD = 0;
@@ -679,12 +679,12 @@ void fn_80108D1C(MsgArg* pArgs, MsgArg* pResult) {
 
 // Set or clear bit pArgs[0] of the profile's a10548.
 void fn_80108DF4(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 bSet = pArgs[1].i;
     s32 nBit = pArgs[0].i;
 
     if (bSet) {
-        fn_8001EA34(pProfile->a10548, nBit);
+        BitArray_Set(pProfile->a10548, nBit);
     } else {
         fn_8001EB6C(pProfile->a10548, nBit);
     }
@@ -693,8 +693,8 @@ void fn_80108DF4(MsgArg* pArgs, MsgArg* pResult) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80108E4C(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
-    pResult->i = fn_8001E9CC(pProfile->a10548, pArgs[0].i);
+    SaveProfile* pProfile = FE_GetCurrentProfile();
+    pResult->i = BitArray_Test(pProfile->a10548, pArgs[0].i);
 }
 
 // ---- end of sweep code ----
@@ -705,7 +705,7 @@ void fn_80108E9C(MsgArg* pArgs, MsgArg* pResult) {
     char aNames[5][64];
     char aCategories[5][64];
     char szCategory[64];
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 nAssets = fn_80105C00();
     int nNames = 0;
     int nCategories = 0;
@@ -718,7 +718,7 @@ void fn_80108E9C(MsgArg* pArgs, MsgArg* pResult) {
         strcpy(aCategories[i], " ");
     }
     for (i = 0; i < nAssets; i++) {
-        if (fn_8001E9CC(pProfile->aB344, i) && fn_801061C8(fn_80103BC0(i))) {
+        if (BitArray_Test(pProfile->aB344, i) && fn_801061C8(fn_80103BC0(i))) {
             fn_8010745C(i, szCategory);
             if (nCategories < 5) {
                 bFound = 0;
@@ -800,13 +800,13 @@ void fn_8010920C(MsgArg* pArgs, MsgArg* pResult) {
 
 // The profile's logo n's b1020.
 void fn_80109248(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     pResult->i = pProfile->choices.aLogo[pArgs[0].i].b1020;
 }
 
 // Keep the edited logo: copy it into the profile's logo fn_8010F7D8.
 void fn_80109294(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 nLogo = fn_8010F7D8();
 
     lbl_80281ED4->logo106E0.b1020 = 1;
@@ -875,7 +875,7 @@ void fn_80109500(MsgArg* pArgs, MsgArg* pResult) {
 // starts blank (colour 0x1C), named "MyLogo <n>".
 void fn_80109514(MsgArg* pArgs, MsgArg* pResult) {
     char szName[32];                    // the size is unknown (the frame allows up to 0x20)
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 bStart = pArgs[0].i;
     s32 nLogo = fn_8010F7D8();
 
@@ -997,7 +997,7 @@ void fn_801098AC(MsgArg* pArgs, MsgArg* pResult) {
 // of 80% for 0 and 4, 90% for 5 and 6, 70% for 8, 19 and 20), parts 15, 9 and 10 as fn_80109FB4
 // does, part 7 at b 1 or 2, then its equipment tiers again (fn_8007873C).
 void fn_801098B0(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     int nRoll = Misc_RandFunc(0) % 100;
     int nChoice;
 
@@ -1052,7 +1052,7 @@ void fn_801098B0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80109BA4(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     fn_80103B74(0);
     fn_801073DC(2);
     fn_801073DC(5);
@@ -1077,8 +1077,8 @@ void fn_80109BA4(MsgArg* pArgs, MsgArg* pResult) {
 // The CrAP camera to the "Crap Idle" shot; then a random created golfer (fn_80079664) and its
 // equipment tiers again (fn_8007873C).
 void fn_80109CBC(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
-    View* pView = fn_80017028(fn_80016D10());
+    SaveProfile* pProfile = FE_GetCurrentProfile();
+    View* pView = ViewController_GetCameraController(fn_80016D10());
     fn_800A73F0((Misc_RandFunc(0) & 7) + 11);
     fn_8008E244();
     fn_8008E364(0);
@@ -1090,8 +1090,8 @@ void fn_80109CBC(MsgArg* pArgs, MsgArg* pResult) {
 
 // The CrAP camera to the "Crap Face" shot; then fn_80078E34 dresses the created golfer at random.
 void fn_80109D5C(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
-    View* pView = fn_80017028(fn_80016D10());
+    SaveProfile* pProfile = FE_GetCurrentProfile();
+    View* pView = ViewController_GetCameraController(fn_80016D10());
     fn_8008E244();
     fn_8008E364(1);
     GolfCamera_SwitchCrAPCamera(pView, "Crap Face", lbl_80281EE0->n4, 0, 0, 0);
@@ -1105,7 +1105,7 @@ void fn_80109DDC(MsgArg* pArgs, MsgArg* pResult) {
 // Sell a part's choice i back: a quarter of its price goes back into the money, and its bought
 // bit (aB1CC) is cleared.
 void fn_80109DE0(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     s16 nPart = pArgs[0].i;
     int b = pArgs[1].i;
     int i = pArgs[2].i;
@@ -1125,7 +1125,7 @@ void fn_80109EAC(MsgArg* pArgs, MsgArg* pResult) {
 
 // How many of the five random assets of category pArgs[0] have been bought (aB1CC).
 void fn_80109EE8(MsgArg* pArgs, MsgArg* pResult) {
-    SaveProfile* pProfile = fn_80077ACC();
+    SaveProfile* pProfile = FE_GetCurrentProfile();
     int i;
     s32* pnBought = pArgs[1].p;
     int nCategory = fn_80077BDC(pArgs[0].i);
@@ -1136,7 +1136,7 @@ void fn_80109EE8(MsgArg* pArgs, MsgArg* pResult) {
     for (i = 0; i < 5; i++) {
         nAsset = fn_80104FA8(lbl_80281ED4->aKind[b][nCategory], lbl_80281ED4->aPart[b][nCategory][i],
                              lbl_80281ED4->aChoice[b][nCategory][i]);
-        if (fn_8001E9CC(pProfile->aB1CC, nAsset)) {
+        if (BitArray_Test(pProfile->aB1CC, nAsset)) {
             (*pnBought)++;
         }
     }
@@ -1151,7 +1151,7 @@ void fn_80109FB4(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile;
 
     Misc_RandFunc(0);                       // drawn, not used
-    pProfile = fn_80077ACC();
+    pProfile = FE_GetCurrentProfile();
     fn_80103B74(0);
     FE_CrAP_TurnOnPart(5, 0, 0);
     FE_CrAP_TurnOnPart(6, 0, 0);

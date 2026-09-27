@@ -41,7 +41,7 @@ LAYOUT_ASSERT(MCCardState, 0x98);
 
 // MCCardState.uFlags. Each bit is set or cleared where the CARD library returns the result named.
 #define MC_CARD_PRESENT     0x02    // cleared on CARD_RESULT_NOCARD
-#define MC_CARD_MOUNTED     0x04    // set by a mount (fn_8009D74C), cleared by an unmount (fn_8009DBAC)
+#define MC_CARD_MOUNTED     0x04    // set by a mount (fn_8009D74C), cleared by an unmount (MC_Unmount)
 #define MC_CARD_FORMATTED   0x08    // cleared before a format and set when it succeeds (fn_8009E918);
                                     // without it fn_8009F734 answers -1
 #define MC_CARD_WRONGDEVICE 0x10    // CARD_RESULT_WRONGDEVICE: not a memory card
@@ -214,7 +214,7 @@ s32  fn_8009D3DC(s32 nPort, s32 nSlot);
 s32  fn_8009D50C(s32 nPort, s32 nSlot);     // new files an EA Sports Bio save needs (0 or 1)
 s32  fn_8009D614(s32 nPort, s32 nSlot, const char* pName);
 s32  fn_8009D74C(s32 nPort, s32 nSlot);     // mount the card; 0, or -22 when it was mounted already
-s32  fn_8009DBAC(s32 nPort, s32 nSlot);     // unmount it
+s32  MC_Unmount(s32 nPort, s32 nSlot);     // unmount it
 void fn_8009DCEC(s32 nPort, s32 nSlot);
 s32  fn_8009DD44(s32 nPort, s32 nSlot, const char* pName);
 s32  fn_8009DD94(s32 nPort, s32 nSlot, const char* pName, void* pBuf, s32 nLen);  // read a file
