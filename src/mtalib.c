@@ -71,7 +71,7 @@ void fn_8001F42C(MtaEntry* pEntry, SkelPoseBlock* pBlock, int nMorph, SkelPose1*
     // pPose and fWeight are unused: fn_8001F494 passes them
     fT = fn_8001F32C(pEntry, &fA, &fB, fTime);
     pBlock->af8[nMorph] = fT * (fB - fA) + fA;
-    BitArray_Set(pBlock->aBits, nMorph);
+    BitArray_SetBit(pBlock->aBits, nMorph);
 }
 
 // Sets every morph weight the library drives in pPose from its tracks at fTime.

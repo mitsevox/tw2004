@@ -71,10 +71,10 @@ typedef struct BonePose {
 LAYOUT_ASSERT(BonePose, 0x20);
 
 // A blend node's pose buffer (SKABlendNode.pPose; our name): bit arrays over the 128 bones
-// (Character_InitBoneState clears the first two with BitArray_ClearAll and the next two with BitArray_SetAll), then a pose
+// (Character_InitBoneState clears the first two with BitArray_ClearArray and the next two with BitArray_FillArray), then a pose
 // per bone. Format 0 is exactly this (0x1040 bytes); format 1 has 0x10C bytes more.
 typedef struct SkelPose {
-    u32      a0[4];             // 0x000  bones the pose sets (BitArray_Test tests them)
+    u32      a0[4];             // 0x000  bones the pose sets (BitArray_TestBit tests them)
     u32      a10[4];            // 0x010
     u32      a20[4];            // 0x020
     u32      a30[4];            // 0x030
@@ -110,7 +110,7 @@ typedef struct Skeleton {
     s32  nChains;               // 0x0004
     IKChainDef* pDefs;          // 0x0008  the chains' setups (CharModelDefs.pDefs)
     IKChain* pChains;           // 0x000C
-    u32  a10[4];                // 0x0010  a bit per bone (128; BitArray_Clear clears one)
+    u32  a10[4];                // 0x0010  a bit per bone (128; BitArray_ClearBit clears one)
     f32  (*p20)[4];             // 0x0020  a quaternion per bone
     f32  (*p24)[4];             // 0x0024  a quaternion per bone
     f32  (*p28)[4];             // 0x0028  p20 at an IK weight of 0 or 1, otherwise p24
@@ -549,7 +549,7 @@ typedef struct Character {
                                 //        cleared by CharacterState_AddSKABlendData
     f32   f14;                  // 0x014  set to 2^30 (never) by Character_UpdateAnimation; for a
                                 //        character that is not a golfer it is tested against
-                                //        fn_8001ED44 first
+                                //        Character_ComputeMaxVisableDistance first
     s32   n18;                  // 0x018  cleared with the animation state (Character_ResetBlenders)
     s32   nAnim;            // 0x01C  the playing animation (6 backswing, 7 downswing)
     s32   n20;                  // 0x020
@@ -635,9 +635,9 @@ typedef struct Character {
     f32   f1644;                // 0x1644
     u8    unk1648[0x1650 - 0x1648];
     s32   n1650;                // 0x1650  cleared by Character_Create
-    s32   n1654;                // 0x1654  (fn_8001EE90)
+    s32   n1654;                // 0x1654  (Character_GetClipResult)
     s32   n1658;                // 0x1658
-    f32   f165C;                // 0x165C  } scaled by the view's lens (fn_8001EE00, fn_8001ED44)
+    f32   f165C;                // 0x165C  } scaled by the view's lens (Character_ComputeMaxVisableShadowDistance, Character_ComputeMaxVisableDistance)
     f32   f1660;                // 0x1660  }
     f32   f1664;                // 0x1664  } Character_ClipTest: 1 near the camera, fading to 0 from 6 to 15
     f32   v1668[3];             // 0x1668  } its bounding sphere, tested against the camera
@@ -791,7 +791,7 @@ void  Character_SelectClub(Character* pChar, int n);
 void  Character_RegisterGolferStreamClientFE(void);
 void  Character_SetClubsAndClothes(Character* pChar, int nSlot);   // dresses the character (its skins and clubs)
 void  Character_ApplyCrAPSettings(Character* pChar, struct SkinChoices* pChoices);  // applies a look (char.c)
-void  fn_8001EE98(Character* pChar, u8 b);    // sets the model's bEE
+void  Character_SetLeftHanded(Character* pChar, u8 b);    // sets the model's bEE
 void  Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace);
 int   Character_GetGolferModelID(int nPlayer);          // the model id of the player's golfer
 void  Character_SelectGameShotType(Character* pChar, int nKind);
@@ -807,8 +807,8 @@ u8    Character_IsHoldingBall(Character* pChar);    // the clip's n1C is above b
 void  Character_GetBallOnFingerPosition(Character* pChar, f32* pPos);
 f32 (*Character_GetBoneMatrix(Character* pChar, int nBone))[4];  // a bone's matrix
 u8    Character_IsLeftHanded(Character* pChar);    // the model's bEE
-int   fn_8001EE88(Character* pChar);    // n1658
-int   fn_8001EE90(Character* pChar);
+int   Character_GetShadowClipResult(Character* pChar);    // n1658
+int   Character_GetClipResult(Character* pChar);
 int   CharModel_GetBoneIndex(CharModel* pModel, int nBone);    // a bone's index
 int   CharModel_GetBoneIndexMapped(CharModel* pModel, int nBone);
 f32   fn_8001F02C(struct Clip* pClip, u64 uEvent);   // an event's time (by its 64-bit id)

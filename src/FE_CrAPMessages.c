@@ -410,7 +410,7 @@ void fn_80108314(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80108398(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(pArgs[0].i, pArgs[1].i, pArgs[2].i);
-    pResult->i = BitArray_Test(pProfile->aB1CC, nAsset);
+    pResult->i = BitArray_TestBit(pProfile->aB1CC, nAsset);
 }
 
 // ---- end of sweep code ----
@@ -426,7 +426,7 @@ void fn_8010840C(MsgArg* pArgs, MsgArg* pResult) {
     int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
 
     pProfile->n6C -= nPrice;
-    BitArray_Set(pProfile->aB1CC, nAsset);
+    BitArray_SetBit(pProfile->aB1CC, nAsset);
     FE_CrAP_TurnOnPart(nPart, b, i);
     fn_8007873C(pProfile);
 }
@@ -586,20 +586,20 @@ void fn_80108A0C(MsgArg* pArgs, MsgArg* pResult) {
     s32 nAssets = FE_CrAP_GetNumEntriesInCrAPDB();
     int i;
 
-    BitArray_ClearAll(aWasLocked, 3000);
+    BitArray_ClearArray(aWasLocked, 3000);
     for (i = 0; i < nAssets; i++) {
-        if (BitArray_Test(pProfile->aAssetLocked, i)) {
-            BitArray_Set(aWasLocked, i);
+        if (BitArray_TestBit(pProfile->aAssetLocked, i)) {
+            BitArray_SetBit(aWasLocked, i);
         } else {
-            BitArray_Clear(aWasLocked, i);
+            BitArray_ClearBit(aWasLocked, i);
         }
     }
     fn_80078680(pProfile);
     for (i = 0; i < nAssets; i++) {
-        if (!BitArray_Test(pProfile->aAssetLocked, i) && BitArray_Test(aWasLocked, i)) {
+        if (!BitArray_TestBit(pProfile->aAssetLocked, i) && BitArray_TestBit(aWasLocked, i)) {
             if (FE_IsValidCurrentGender(FE_CrAP_GetAssetGender(i))) {
                 nUnlocked++;
-                BitArray_Set(pProfile->aB344, i);
+                BitArray_SetBit(pProfile->aB344, i);
             }
         }
     }
@@ -611,14 +611,14 @@ void fn_80108A0C(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80108B10(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(pArgs[0].i, pArgs[1].i, pArgs[2].i);
-    pResult->i = BitArray_Test(pProfile->aB344, nAsset);
+    pResult->i = BitArray_TestBit(pProfile->aB344, nAsset);
 }
 
 void fn_80108B84(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(pArgs[0].i, pArgs[1].i, pArgs[2].i);
-    if (BitArray_Test(pProfile->aB344, nAsset)) {
-        BitArray_Set(pProfile->aB4BC, nAsset);
+    if (BitArray_TestBit(pProfile->aB344, nAsset)) {
+        BitArray_SetBit(pProfile->aB4BC, nAsset);
     }
 }
 
@@ -631,9 +631,9 @@ void fn_80108C00(MsgArg* pArgs, MsgArg* pResult) {
     u32 i;
 
     for (i = 0; i < nAssets; i++) {
-        if (BitArray_Test(pProfile->aB344, i) && BitArray_Test(pProfile->aB4BC, i)) {
-            BitArray_Clear(pProfile->aB344, i);
-            BitArray_Clear(pProfile->aB4BC, i);
+        if (BitArray_TestBit(pProfile->aB344, i) && BitArray_TestBit(pProfile->aB4BC, i)) {
+            BitArray_ClearBit(pProfile->aB344, i);
+            BitArray_ClearBit(pProfile->aB4BC, i);
         }
     }
 }
@@ -691,9 +691,9 @@ void fn_80108DF4(MsgArg* pArgs, MsgArg* pResult) {
     s32 nBit = pArgs[0].i;
 
     if (bSet) {
-        BitArray_Set(pProfile->a10548, nBit);
+        BitArray_SetBit(pProfile->a10548, nBit);
     } else {
-        BitArray_Clear(pProfile->a10548, nBit);
+        BitArray_ClearBit(pProfile->a10548, nBit);
     }
 }
 
@@ -701,7 +701,7 @@ void fn_80108DF4(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80108E4C(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
-    pResult->i = BitArray_Test(pProfile->a10548, pArgs[0].i);
+    pResult->i = BitArray_TestBit(pProfile->a10548, pArgs[0].i);
 }
 
 // ---- end of sweep code ----
@@ -725,7 +725,7 @@ void fn_80108E9C(MsgArg* pArgs, MsgArg* pResult) {
         strcpy(aCategories[i], " ");
     }
     for (i = 0; i < nAssets; i++) {
-        if (BitArray_Test(pProfile->aB344, i) && FE_IsValidCurrentGender(FE_CrAP_GetAssetGender(i))) {
+        if (BitArray_TestBit(pProfile->aB344, i) && FE_IsValidCurrentGender(FE_CrAP_GetAssetGender(i))) {
             FE_CrAP_GetSubcategoryNameFromAssetID(i, szCategory);
             if (nCategories < 5) {
                 bFound = 0;
@@ -1119,7 +1119,7 @@ void fn_80109DE0(MsgArg* pArgs, MsgArg* pResult) {
     int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
 
     pProfile->n6C += (s32)(0.25f * FE_CrAP_GetPartRetailPrice(nPart, b, i));
-    BitArray_Clear(pProfile->aB1CC, nAsset);
+    BitArray_ClearBit(pProfile->aB1CC, nAsset);
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -1144,7 +1144,7 @@ void fn_80109EE8(MsgArg* pArgs, MsgArg* pResult) {
         nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(
                 lbl_80281ED4->aKind[b][nCategory], lbl_80281ED4->aPart[b][nCategory][i],
                              lbl_80281ED4->aChoice[b][nCategory][i]);
-        if (BitArray_Test(pProfile->aB1CC, nAsset)) {
+        if (BitArray_TestBit(pProfile->aB1CC, nAsset)) {
             (*pnBought)++;
         }
     }

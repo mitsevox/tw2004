@@ -480,12 +480,12 @@ void SKN_BlendMorphWeights(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fW
         fn_80021980(pBlockA->aBits, pBlockB->aBits, aBits, 20);
         fn_80029EF4(aBits, pBlockOut->aBits, 20);
         for (j = 0; j < 20; j++) {
-            if (BitArray_Test(aBits, j)) {
+            if (BitArray_TestBit(aBits, j)) {
                 pBlockOut->af8[j] = fWeight * (pBlockB->af8[j] - pBlockA->af8[j]) + pBlockA->af8[j];
             }
         }
-        BitArray_ClearAll(pBlockA->aBits, 20);
-        BitArray_ClearAll(pBlockB->aBits, 20);
+        BitArray_ClearArray(pBlockA->aBits, 20);
+        BitArray_ClearArray(pBlockB->aBits, 20);
     }
 }
 
@@ -635,7 +635,7 @@ void SKN_BuildMatrices(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst
     }
     aMtx = pSkin->p108C;
     for (i = pSkin->pModel->n14; i < nMatrices; i++) {
-        if (BitArray_Test(pSkin->aMtxBits, i)) {
+        if (BitArray_TestBit(pSkin->aMtxBits, i)) {
             pEntry = &pSkin->pModel->p54[i];
             nBones = pEntry->nBones;
             memset(aMtx[i], 0, sizeof(aMtx[i]));
@@ -662,7 +662,7 @@ void SKN_SetMeshMatrices(Skin* pSkin, int n) {
         pTable = pSkin->a10A0[n];
         nEntries = pSkin->pModel->n40;
         for (i = 0; i < nEntries; i++) {
-            if (BitArray_Test(pSkin->aMeshBits, i)) {
+            if (BitArray_TestBit(pSkin->aMeshBits, i)) {
                 fn_80112B18(pTable, pSkin->pModel->p44[i].n0, pSkin->p108C);
             }
         }
@@ -987,8 +987,8 @@ s32 SKN_AllocRenderData(Skin* pSkin, u8 b) {
     pSkin->p108C = StaticMem_Alloc(pModel->n50 * sizeof(*pSkin->p108C), 2, 0x80, "Skin.c", 0x500);
     pSkin->aMtxBits = StaticMem_Alloc((pModel->n50 + 31) / 32 * 4, 2, 0, "Skin.c", 0x50C);
     pSkin->aMeshBits = StaticMem_Alloc((pModel->n40 + 31) / 32 * 4, 2, 0, "Skin.c", 0x50D);
-    BitArray_ClearAll(pSkin->aMtxBits, pModel->n50);
-    BitArray_ClearAll(pSkin->aMeshBits, pModel->n40);
+    BitArray_ClearArray(pSkin->aMtxBits, pModel->n50);
+    BitArray_ClearArray(pSkin->aMeshBits, pModel->n40);
     if (pDesc != NULL) {
         SkinPart_GetMaxOptionsSize(pSkin);
         nSize = fn_8011CDE8(pSkin);
@@ -1115,10 +1115,10 @@ Skin* SKN_Create(u8* pData, u8 b) {
     pSkin->bFootPoints = 0;
     pBones = pModel->p34;
     SKN_SwapBonePoses(pBones, pModel->n14);
-    BitArray_SetAll(pSkin->pose.a0, 0x80);
-    BitArray_SetAll(pSkin->pose.a10, 0x80);
-    BitArray_SetAll(pSkin->pose.a20, 0x80);
-    BitArray_SetAll(pSkin->pose.a30, 0x80);
+    BitArray_FillArray(pSkin->pose.a0, 0x80);
+    BitArray_FillArray(pSkin->pose.a10, 0x80);
+    BitArray_FillArray(pSkin->pose.a20, 0x80);
+    BitArray_FillArray(pSkin->pose.a30, 0x80);
     for (i = 0; i < pModel->n14; i++) {
         Quat_Copy(pBones[i].q0, pSkin->pose.aBones[i].q0);
         Quat_Copy(pBones[i].v10, pSkin->pose.aBones[i].v10);

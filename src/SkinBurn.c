@@ -119,7 +119,7 @@ void fn_801272B4(Skin* pSkin) {
         return;
     }
     aBits = StaticMem_Alloc((nBits + 31) / 32 * sizeof(u32), 1, 16, "SkinBurn.c", 205);
-    BitArray_ClearAll(aBits, nBits);
+    BitArray_ClearArray(aBits, nBits);
     aOld = StaticMem_Alloc(nBits * sizeof(s32), 1, 16, "SkinBurn.c", 209);
     aNew = StaticMem_Alloc(nBits * sizeof(s32), 1, 16, "SkinBurn.c", 210);
     memset(aOld, -1, nBits * sizeof(s32));
@@ -131,7 +131,7 @@ void fn_801272B4(Skin* pSkin) {
         n = pModel->n50;
     }
     for (i = 0; i < n; i++) {
-        BitArray_Set(aBits, i);
+        BitArray_SetBit(aBits, i);
     }
 
     // Mark the bits the options use, in aBits instead of the skin's own array.
@@ -145,7 +145,7 @@ void fn_801272B4(Skin* pSkin) {
     nKept = 0;
     lbl_802825A8 = aNew;
     for (j = 0; j < nBits; j++) {
-        if (BitArray_Test(aBits, j)) {
+        if (BitArray_TestBit(aBits, j)) {
             *pOld++ = j;
             *pNew = nKept++;
         }

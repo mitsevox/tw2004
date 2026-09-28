@@ -98,8 +98,8 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
     if (pClip->pD8 != NULL) {
         pClip->fCC = fn_80021A98(pClip, fTime);
     }
-    BitArray_ClearAll(pPose->a0, 0x80);
-    BitArray_ClearAll(pPose->a10, 0x80);
+    BitArray_ClearArray(pPose->a0, 0x80);
+    BitArray_ClearArray(pPose->a10, 0x80);
     if (fTime < 0.0f) {
         fTime = 0.0f;
     }
@@ -161,7 +161,7 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
                             pClip->n60 * 16);
                     pChar->buffers[aSlot[i]].p10 = pChar->buffers[aSlot[i]].pBuf + pClip->n60 * 16;
                 } else if (pClip->pE8 != NULL) {
-                    BitArray_ClearAll(aTmp, 0x80);
+                    BitArray_ClearArray(aTmp, 0x80);
                     fn_80021134((u16*)pClip->pE8, (f32*)pChar->buffers[aSlot[i]].p0C, pClip->n60, aTmp);
                     pChar->buffers[aSlot[i]].p10 = pChar->buffers[aSlot[i]].pBuf + pClip->n60 * 16;
                 } else {
@@ -173,7 +173,7 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
             if (fn_80020328(pClip, aFrame[i], (f32*)pChar->buffers[aSlot[i]].p10,
                             (f32*)pChar->buffers[aSlot[i]].p14, pChar->buffers[aSlot[i]].p18) == 0 &&
                 aBits != NULL) {
-                BitArray_ClearAll(aBits, 0x80);
+                BitArray_ClearArray(aBits, 0x80);
             }
             if (nKey == nNext) {
                 aSlot[1] = aSlot[0];
@@ -229,12 +229,12 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
         } else {
             continue;
         }
-        BitArray_Set(pPose->a0, i);
+        BitArray_SetBit(pPose->a0, i);
         if (pTrack->pKeys != NULL) {
             fn_8001FC0C(pTrack->pKeys + nKey * 3, pTrack->aRange, aA);
             fn_8001FC0C(pTrack->pKeys + nNext * 3, pTrack->aRange, aB);
             fn_8001FBA4(aA, aB, pBone->v10, fFrac);
-            BitArray_Set(pPose->a10, i);
+            BitArray_SetBit(pPose->a10, i);
         }
     }
     if (aBits != NULL) {
@@ -705,10 +705,10 @@ void fn_80021134(u16* p, f32* pOut, s32 nBones, u32* pBits) {
 
     for (i = 0, nBit = 0; i < nBones; pOut += 4, nBit += 2, i++) {
         uKind = 0;
-        if (BitArray_Test(pBits, (u32)i * 2)) {
+        if (BitArray_TestBit(pBits, (u32)i * 2)) {
             uKind = 1;
         }
-        if (BitArray_Test(pBits, nBit + 1)) {
+        if (BitArray_TestBit(pBits, nBit + 1)) {
             uKind |= 2;
         }
         switch (uKind) {
@@ -755,10 +755,10 @@ void SKAUtil_EulerAnglesToQTs8(u8* p, f32* pOut, s32 nBones, u32* pBits, u16* aB
 
     for (i = 0, nBit = 0; i < nBones; aBase += 3, pOut += 4, nBit += 2, i++) {
         uKind = 0;
-        if (BitArray_Test(pBits, (u32)i * 2)) {
+        if (BitArray_TestBit(pBits, (u32)i * 2)) {
             uKind = 1;
         }
-        if (BitArray_Test(pBits, nBit + 1)) {
+        if (BitArray_TestBit(pBits, nBit + 1)) {
             uKind |= 2;
         }
         switch (uKind) {

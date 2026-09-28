@@ -60,11 +60,11 @@ void fn_80037C48(Skin* pSkin, SkelPose* pPose) {
     if (pSkin != NULL) {
         pBlock = &((SkelPose1*)pPose)->aBlocks[0];
         for (i = 5; i < 20; i++) {
-            if (BitArray_Test(pBlock->aBits, i)) {
+            if (BitArray_TestBit(pBlock->aBits, i)) {
                 fn_8011CADC(pSkin, i - 5, pBlock->af8[i]);
             }
         }
-        BitArray_ClearAll(pBlock->aBits, 20);
+        BitArray_ClearArray(pBlock->aBits, 20);
     }
 }
 

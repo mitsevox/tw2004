@@ -559,7 +559,7 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     if (gSession.nGameType == 3) {
         return;
     }
-    BitArray_ClearAll(auBits, 128);
+    BitArray_ClearArray(auBits, 128);
     fStrength = fn_80116468();
     nFrames = 60.0f * (FRAME_RATE * fDelta);
     if (pChain->n10 < 3) {
@@ -663,7 +663,7 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         if (lbl_802824F8->an9C[pChain->n10] != 0) {
             Quat_Multiply(pModel->pBones[pChain->pLinks[i].nBone].q0C, qTurn, qOut);
             Quat_Copy(qOut, pModel->pBones[pChain->pLinks[i].nBone].q0C);
-            BitArray_Set(auBits, pChain->pLinks[i].nBone);
+            BitArray_SetBit(auBits, pChain->pLinks[i].nBone);
         }
     }
 
@@ -707,7 +707,7 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         if (lbl_802824F8->an9C[pChain->n10] != 0) {
             Quat_Multiply(pModel->pBones[pChain->pLinks[i].nBone].q0C, qTurn, qOut);
             Quat_Copy(qOut, pModel->pBones[pChain->pLinks[i].nBone].q0C);
-            BitArray_Set(auBits, pChain->pLinks[i].nBone);
+            BitArray_SetBit(auBits, pChain->pLinks[i].nBone);
         }
     }
     SKEL_TransformBones(pModel, auBits);

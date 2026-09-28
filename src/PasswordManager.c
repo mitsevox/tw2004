@@ -23,12 +23,12 @@ char* lbl_80188024[16] = {
 
 // Bit n of lbl_801D5948: the cheat that sets it has been entered.
 u8 PasswordManager_IsPasswordEntered(int n) {
-    return BitArray_Test(lbl_801D5948, n);
+    return BitArray_TestBit(lbl_801D5948, n);
 }
 
 // Bit n of lbl_801D5908.
 u8 fn_800564AC(int n) {
-    return BitArray_Test(lbl_801D5908, n);
+    return BitArray_TestBit(lbl_801D5908, n);
 }
 
 // Tests a typed code; if it is a cheat, sets what it unlocks and returns 1.
@@ -128,7 +128,7 @@ u8 PasswordManager_TestPassword(char* szCode) {
         return 1;
     }
     if (stricmp(szCode, "SHERWOOD TARGET") == 0) {
-        BitArray_Set(lbl_801D5948, 6);
+        BitArray_SetBit(lbl_801D5948, 6);
         return 1;
     }
     // This code does nothing: the test is made and its result is not used.
@@ -136,13 +136,13 @@ u8 PasswordManager_TestPassword(char* szCode) {
     }
     for (i = 0; i < 16; i++) {
         if (strcmp(szCode, lbl_80188024[i]) == 0) {
-            BitArray_Set(lbl_801D5908, i);
+            BitArray_SetBit(lbl_801D5908, i);
             return 1;
         }
     }
     for (i = 0; i < 5; i++) {
         if (strcmp(szCode, aszCode[i]) == 0) {
-            BitArray_Set(lbl_801D5948, aBit[i]);
+            BitArray_SetBit(lbl_801D5948, aBit[i]);
             return 1;
         }
     }
@@ -155,8 +155,8 @@ void fn_80056B8C(void) {
     int i;
 
     fn_80057438(lbl_80281DF4);
-    BitArray_ClearAll(lbl_801D5948, 7);
-    BitArray_ClearAll(lbl_801D5908, 16);
+    BitArray_ClearArray(lbl_801D5948, 7);
+    BitArray_ClearArray(lbl_801D5908, 16);
     lbl_80281DF4->bActive = 0;
     for (i = 0; i < 16; i++) {
         lbl_80281DF4->aGolferUnlocked[lbl_801894E8[i]] = 1;
@@ -382,7 +382,7 @@ void fn_80057438(SaveProfile* pProfile) {
     pProfile->nGolferBallType = 0;
     pProfile->nGolferOutfit = -1;
     fn_801176C0(&pProfile->tour);
-    BitArray_ClearAll(pProfile->a10548, 2);
+    BitArray_ClearArray(pProfile->a10548, 2);
     FE_CrAP_InitCrAPInfo(pProfile);
     if (lbl_80281DF0.b) {
         pProfile->a1054C[0].b = 1;

@@ -2720,7 +2720,7 @@ void fn_8007EA14(MsgArg* pArgs, MsgArg* pResult) {
     u32 uBit = pArgs[2].i;
 
     MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
-    pResult->i = BitArray_Test(state.aReplayUsed, uBit);
+    pResult->i = BitArray_TestBit(state.aReplayUsed, uBit);
 }
 
 // Option a0[1]: the menus' choices 1..6 are the values 5, 0, 1, 2, 3, 4; it is passed on times 0.2.
@@ -2964,7 +2964,7 @@ void fn_8007F0D0(MsgArg* pArgs, MsgArg* pResult) {
 
     n = 0;
     for (i = 0; i < 3000; i++) {
-        if (BitArray_Test(gpSaveData[nProfile].aB1CC, i)) {
+        if (BitArray_TestBit(gpSaveData[nProfile].aB1CC, i)) {
             n++;
         }
     }

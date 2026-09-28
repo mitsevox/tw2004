@@ -281,7 +281,7 @@ u8 fn_8011C8B0(Skin* pSkin, int nView, int n) {
     nFirst = pEntry->n18;
     nCount = pEntry->n14;
     for (i = 0; i < nCount; i++) {
-        if (BitArray_Test(pMorph->aChanged[nView], nFirst + i)) {
+        if (BitArray_TestBit(pMorph->aChanged[nView], nFirst + i)) {
             pTarget = &pDesc->p44[pEntry->n10 + i];
             for (j = 0; j < pTarget->n8; j++) {
                 nMesh = pDesc->p3C[pTarget->n0 + j];
@@ -316,8 +316,8 @@ void fn_8011C9B0(Skin* pSkin) {
     nBytes = (nMorphs + 31) / 32 * sizeof(u32);
     pMorph->aChanged[0] = StaticMem_Alloc(nBytes, 2, 16, "SkinMorph.c", 95);
     pMorph->aChanged[1] = StaticMem_Alloc(nBytes, 2, 16, "SkinMorph.c", 96);
-    BitArray_ClearAll(pMorph->aChanged[0], nMorphs);
-    BitArray_ClearAll(pMorph->aChanged[1], nMorphs);
+    BitArray_ClearArray(pMorph->aChanged[0], nMorphs);
+    BitArray_ClearArray(pMorph->aChanged[1], nMorphs);
     pMorph->afWeights = StaticMem_Alloc(nMorphs * sizeof(f32), 2, 16, "SkinMorph.c", 100);
     memset(pMorph->afWeights, 0, nMorphs * sizeof(f32));
     pSkin->pMorph = pMorph;
@@ -332,8 +332,8 @@ void fn_8011CADC(Skin* pSkin, int nMorph, f32 fWeight) {
     }
     if (fWeight != pMorph->afWeights[nMorph]) {
         pMorph->afWeights[nMorph] = fWeight;
-        BitArray_Set(pMorph->aChanged[0], nMorph);
-        BitArray_Set(pMorph->aChanged[1], nMorph);
+        BitArray_SetBit(pMorph->aChanged[0], nMorph);
+        BitArray_SetBit(pMorph->aChanged[1], nMorph);
     }
 }
 
@@ -358,7 +358,7 @@ void fn_8011CB5C(Skin* pSkin, int nView) {
         }
     }
     fn_8011C84C(pWork);
-    BitArray_ClearAll(pSkin->pMorph->aChanged[nView], pSkin->pMorph->nMorphs);
+    BitArray_ClearArray(pSkin->pMorph->aChanged[nView], pSkin->pMorph->nMorphs);
 }
 
 // Makes a mesh table and a memory block for the skin's morphed meshes and blends every morph
@@ -441,6 +441,6 @@ void fn_8011CE58(Skin* pSkin) {
     if (pSkin == NULL || pSkin->pMorph == NULL) {
         return;
     }
-    BitArray_SetAll(pSkin->pMorph->aChanged[0], pSkin->pMorph->nMorphs);
-    BitArray_SetAll(pSkin->pMorph->aChanged[1], pSkin->pMorph->nMorphs);
+    BitArray_FillArray(pSkin->pMorph->aChanged[0], pSkin->pMorph->nMorphs);
+    BitArray_FillArray(pSkin->pMorph->aChanged[1], pSkin->pMorph->nMorphs);
 }

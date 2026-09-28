@@ -81,7 +81,7 @@ void SkeletalObject_RenderShadowsAll(void);
 void SkeletalObject_ClipTestAll(void);
 void Character_UpdateClothesFE(void);
 void Character_UpdateClothesIG(void);
-void fn_8001E7DC(void);
+void Character_ResetTimeScalesOnCombo(void);
 void fn_80029FC8(void);
 void fn_8002A020(void);
 void fn_8002E258(void);
@@ -908,7 +908,7 @@ void fn_8006D27C(void) {
         if (!gSession.b11 && nView < 2) {
             for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
                 Character_ClipTest(gPlayers[nPlayer].pChar, nPlayer);
-                if (fn_8001EE88(gPlayers[nPlayer].pChar) != 2 && nPlayer != fn_80063758()
+                if (Character_GetShadowClipResult(gPlayers[nPlayer].pChar) != 2 && nPlayer != fn_80063758()
                     && !(gPlayers[nPlayer].pChar->u10 & 0x40) && !(gPlayers[nPlayer].pChar->u10 & 1)) {
                     fn_800B28D4(gPlayers[nPlayer].pChar, 0, 0);
                 }
@@ -922,7 +922,7 @@ void fn_8006D27C(void) {
         if (!gSession.b11 && nView < 2) {
             for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
                 Character_ClipTest(gPlayers[nPlayer].pChar, nPlayer);
-                if (fn_8001EE88(gPlayers[nPlayer].pChar) != 2 && nPlayer != fn_80063758()
+                if (Character_GetShadowClipResult(gPlayers[nPlayer].pChar) != 2 && nPlayer != fn_80063758()
                     && !(gPlayers[nPlayer].pChar->u10 & 0x40) && !(gPlayers[nPlayer].pChar->u10 & 1)) {
                     fn_800B2FB0(gPlayers[nPlayer].pChar, 0, 0);
                 }
@@ -1049,7 +1049,7 @@ void fn_8006D8E8(void) {
         fn_80110390();
         fn_800B7490();
         if (gSession.nGameType == 6) {
-            fn_8001E7DC();
+            Character_ResetTimeScalesOnCombo();
         }
         fn_8006C69C();
         fn_80006EDC();

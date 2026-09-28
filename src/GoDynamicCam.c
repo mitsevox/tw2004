@@ -11,7 +11,7 @@
 
 DynCamTables* lbl_80281D88;
 
-u8   BitArray_Test(u32* pBits, int nBit);         // the bit is set
+u8   BitArray_TestBit(u32* pBits, int nBit);         // the bit is set
 void fn_80039884(u8* pSrc, u8* pDst, int nCount);
 void fn_800399E0(u8* pSrc, CamShot* pDst, u32 nCount);
 void fn_80039A48(u8* pSrc, DynCamSet* pDst, u32 nCount);
@@ -665,7 +665,7 @@ CamShot* DynamicCam_ChooseScriptInSequence(CamSequence* pSequence, int nKind, in
 
 // The choice may be used on the current hole.
 u8 fn_8003AB94(CamChoice* pChoice) {
-    if (BitArray_Test(pChoice->aNoHoles, Game_GetCourse() * 18 + Game_GetCurHoleNum())) return 0;
+    if (BitArray_TestBit(pChoice->aNoHoles, Game_GetCourse() * 18 + Game_GetCurHoleNum())) return 0;
     return 1;
 }
 

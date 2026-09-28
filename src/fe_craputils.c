@@ -44,17 +44,17 @@ void fn_80057FBC(SaveProfile* pProfile) {
         nAssets = FE_CrAP_GetNumEntriesInCrAPDB();
         for (i = 0; i < nAssets; i++) {
             if (FE_CrAP_GetPartLevelFromAssetIndex(i) == 0) {
-                BitArray_Set(pProfile->aB1CC, i);
+                BitArray_SetBit(pProfile->aB1CC, i);
             } else {
-                BitArray_Clear(pProfile->aB1CC, i);
+                BitArray_ClearBit(pProfile->aB1CC, i);
             }
-            BitArray_Clear(pProfile->aB344, i);
-            BitArray_Clear(pProfile->aB4BC, i);
+            BitArray_ClearBit(pProfile->aB344, i);
+            BitArray_ClearBit(pProfile->aB4BC, i);
             FE_CrAP_SetCurrentGender(FE_CrAP_GetAssetGender(i));
             if (fn_80078008(i, pProfile)) {
-                BitArray_Set(pProfile->aAssetLocked, i);
+                BitArray_SetBit(pProfile->aAssetLocked, i);
             } else {
-                BitArray_Clear(pProfile->aAssetLocked, i);
+                BitArray_ClearBit(pProfile->aAssetLocked, i);
             }
         }
         FE_CrAP_SetCurrentGender(nOffered);
@@ -105,14 +105,14 @@ void fn_80058278(int nProfile, int nGolfer) {
 
 void fn_800582C4(SaveProfile* pProfile, int nBit, u8 bSet) {
     if (bSet) {
-        BitArray_Set(pProfile->a10548, nBit);
+        BitArray_SetBit(pProfile->a10548, nBit);
     } else {
-        BitArray_Clear(pProfile->a10548, nBit);
+        BitArray_ClearBit(pProfile->a10548, nBit);
     }
 }
 
 u8 fn_80058304(SaveProfile* pProfile, int nBit) {
-    return BitArray_Test(pProfile->a10548, nBit);
+    return BitArray_TestBit(pProfile->a10548, nBit);
 }
 
 // Golfer nGolfer is unlocked for profile nProfile, or available to everyone.

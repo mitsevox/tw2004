@@ -863,7 +863,7 @@ void fn_8005A478(int nPlayer) {
         }
     }
     if ((pObj->nAnim != 6 && pObj->nAnim != 7) || gPlayers[nPlayer].nShotKind == 0 || pObj->n1698 != 0 ||
-        fn_8001EE90(pObj) == 2) {
+        Character_GetClipResult(pObj) == 2) {
         return;
     }
     if (pObj->nAnim == 6 || pObj->nAnim == 7) {
@@ -957,7 +957,8 @@ void fn_8005A850(int nPlayer) {
         }
     }
     {
-        if ((pObj->nAnim == 6 || pObj->nAnim == 7) && fn_8001EE90(pObj) != 2 && pSw->nNumInBlurQueue >= 2 &&
+        if ((pObj->nAnim == 6 || pObj->nAnim == 7) && Character_GetClipResult(pObj) != 2
+            && pSw->nNumInBlurQueue >= 2 &&
             gSession.options.a24[7] != 0) {
             LLMath_CopyVec(pObj->pModel->pMatrices[nGrip][3], vGrip);
             nBlue = 255.0f * pSw->fBlueColor;

@@ -691,7 +691,7 @@ void SkinPart_MarkMeshMatrices(Skin* pSkin, SkinMesh* pMesh) {
 
     pBit = pMesh->pBits;
     for (i = 0; i < pMesh->n8; i++) {
-        BitArray_Set(pSkin->aMtxBits, pBit->nBit);
+        BitArray_SetBit(pSkin->aMtxBits, pBit->nBit);
         pBit++;
     }
 }
@@ -715,7 +715,7 @@ void SkinPart_MarkOption(Skin* pSkin, int n) {
         if ((pMesh->uFlags & 0x300000) == 0x300000) {
             n = SkinPart_GetMeshBit(pSkin, SkinIter_GetIndex(pIter));
             if (pSkin->aMeshBits != NULL) {
-                BitArray_Set(pSkin->aMeshBits, n);
+                BitArray_SetBit(pSkin->aMeshBits, n);
             }
         }
         if ((pMesh->uFlags & 1) && (pMesh->uFlags & 0x10)) {
@@ -762,9 +762,9 @@ void SkinPart_UpdateMarks(Skin* pSkin) {
 
     if (pSkin->uFlags & 1) {
         pSkin->uFlags &= ~1;
-        BitArray_ClearAll(pSkin->aMtxBits, pSkin->pModel->n50);
+        BitArray_ClearArray(pSkin->aMtxBits, pSkin->pModel->n50);
         if (pSkin->aMeshBits != NULL) {
-            BitArray_ClearAll(pSkin->aMeshBits, pSkin->pModel->n40);
+            BitArray_ClearArray(pSkin->aMeshBits, pSkin->pModel->n40);
         }
         for (i = 0; i < SkinPart_GetNumParts(pSkin); i++) {
             SkinPart_MarkPart(pSkin, i);

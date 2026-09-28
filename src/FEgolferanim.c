@@ -1655,7 +1655,7 @@ void fn_8008EA44(u8 b) {
                 return;
             }
         }
-        fn_8001EE98(lbl_80281EE0->pB4->pChar, b);
+        Character_SetLeftHanded(lbl_80281EE0->pB4->pChar, b);
         Character_SetSkeleton(lbl_80281EE0->pB4->pChar, lbl_80281EE0->pB4->pChar->pModel);
     }
 }

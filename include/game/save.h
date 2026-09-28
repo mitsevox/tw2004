@@ -321,7 +321,7 @@ typedef struct SaveProfile {
     s32  aAF80[53];             // 0x0AF80  per slot: a Create-A-Player asset (FE_CrAPDB.c
                                 //          FE_CrAP_GetEquippedAsset), -1 for none; an asset's n2E is its slot
     // Four bit arrays with a bit per Create-A-Player asset (0x80057F18's loop over them all, which
-    // also clears aB344 and aB4BC; BitArray_Test tests a bit).
+    // also clears aB344 and aB4BC; BitArray_TestBit tests a bit).
     u32  aAssetLocked[94];      // 0x0B054  the asset was locked (fn_80078008) when last checked
     u32  aB1CC[94];             // 0x0B1CC  set where FE_CrAP_GetPartLevelFromAssetIndex gives 0; an asset of lock kind 0
                                 //          stays locked until the bit its FE_CrAP_GetPartGMLockValByAssetNum names is set

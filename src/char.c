@@ -91,7 +91,7 @@ void  SkinPart_BurnBodySkin(Character* pChar);                // SkinPart.c
 void* CharSlider_CreateDefinitionsFromMem(u8** ppData);
 void  Character_FreeClubSkinSets(CharSkinSet* pSet);
 void  Character_ClipTest(Character* pChar, int nPlayer);
-f32 (*fn_8001EE64(Character* pChar))[4];                        // bone 1's matrix
+f32 (*Character_GetRootMatrix(Character* pChar))[4];                        // bone 1's matrix
 Character* Character_Add(Character* pChar);
 void  Character_UpdateAnimation(Character* pChar, int a, f32 f);
 void  Character_UpdateTestPoints(Character* pChar);
@@ -112,8 +112,8 @@ void  Character_ResetBlenders(Character* pChar);
 void  fn_800BBADC(int nValue);         // SitDevFile.c
 void  Character_GetBonePos_FromIndex(Character* pChar, int nBone, f32* pPos);
 u8    Character_IsGolfer(Character* pChar);
-f32   fn_8001ED44(Character* pChar, int b);
-f32   fn_8001EE00(Character* pChar, int b);
+f32   Character_ComputeMaxVisableDistance(Character* pChar, int b);
+f32   Character_ComputeMaxVisableShadowDistance(Character* pChar, int b);
 void  Character_KeepClubOutOfGround(Character* pChar);
 void  Character_IKLegsToGround(Character* pChar, u8 bRightLeg, u8 bLeftLeg);
 void  Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, int nHip, int nKnee,
@@ -206,8 +206,8 @@ void  fn_80112C64(int n);
 void  fn_80112CEC(void);
 
 // ---- sweep code (not yet cleaned up) ----
-void BitArray_SetAll(u32* aBits, u32 nBits);
-void BitArray_ClearAll(u32* aBits, u32 nBits);
+void BitArray_FillArray(u32* aBits, u32 nBits);
+void BitArray_ClearArray(u32* aBits, u32 nBits);
 void CharSkinRef_Init(Skin* pSkin, CharSkinRef* pRef, s32 n);
 void CharSkinRef_Free(void* p);
 void Character_SelectShotType(void* arg0, s32 arg1);
@@ -318,10 +318,10 @@ void Character_InitBoneState(Character* pChar, SkelPose* pPose) {
     Skin* pSkin = pChar->pSkin;
 
     if (pSkin != NULL) {
-        BitArray_ClearAll(pPose->a0, 0x80);
-        BitArray_ClearAll(pPose->a10, 0x80);
-        BitArray_SetAll(pPose->a20, 0x80);
-        BitArray_SetAll(pPose->a30, 0x80);
+        BitArray_ClearArray(pPose->a0, 0x80);
+        BitArray_ClearArray(pPose->a10, 0x80);
+        BitArray_FillArray(pPose->a20, 0x80);
+        BitArray_FillArray(pPose->a30, 0x80);
         for (i = 0; i < pChar->pModel->nBones; i++) {
             Quat_Copy(pSkin->pose.aBones[i].q0, pPose->aBones[i].q0);
             Quat_Copy(pSkin->pose.aBones[i].v10, pPose->aBones[i].v10);
@@ -333,10 +333,10 @@ void Character_InitBoneState(Character* pChar, SkelPose* pPose) {
 // two cleared.
 void Character_InitBoneStateBits(Character* pChar, SkelPose* pPose) {
     if (pChar->pSkin != NULL) {
-        BitArray_SetAll(pPose->a20, 0x80);
-        BitArray_SetAll(pPose->a30, 0x80);
-        BitArray_ClearAll(pPose->a0, 0x80);
-        BitArray_ClearAll(pPose->a10, 0x80);
+        BitArray_FillArray(pPose->a20, 0x80);
+        BitArray_FillArray(pPose->a30, 0x80);
+        BitArray_ClearArray(pPose->a0, 0x80);
+        BitArray_ClearArray(pPose->a10, 0x80);
     }
 }
 
@@ -505,7 +505,7 @@ void Character_KeepClubOutOfGround(Character* pChar) {
             } else {
                 return;
             }
-            fDot = -fn_8001EEA4(pMtx[1], vNormal);
+            fDot = -Vec4_Dot(pMtx[1], vNormal);
             if (fDot > 0.707f) {
                 fHead = pChar->pClubSet->afC[pChar->nClubClass];
                 fLength = (fHead - fUnder * vNormal[1] / fDot) / fHead;
@@ -521,7 +521,7 @@ void Character_KeepClubOutOfGround(Character* pChar) {
 // Advances the character's animation by fTime: both animation players and their blend trees, the
 // pose (the club head at the club class's height), the bones, the feet on the ground and the
 // model's dynamic chains. Unless bForce, it waits while a golfer's state is 0x13 and while f14 of
-// any other character is above fn_8001ED44.
+// any other character is above Character_ComputeMaxVisableDistance.
 void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     u32 auBits[4];
     int bSetupForShot = 0;
@@ -545,7 +545,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
             if ((s8)GOLFERSTATE_GetCurrentState(pChar->nPlayer) == 0x13) {
                 return;
             }
-        } else if (pChar->f14 > fn_8001ED44(pChar, gSession.nSplitScreen)) {
+        } else if (pChar->f14 > Character_ComputeMaxVisableDistance(pChar, gSession.nSplitScreen)) {
             pChar->f14 = 1073741824.0f;
             pChar->n1698 = 0;
             return;
@@ -592,16 +592,16 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
         }
         SKEL_UpdateState(pChar->pModel, pChar->blend.pPose, 0);
         if (Character_IsGolfer(pChar)) {
-            if (BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x36)) ||
-                BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x38)) ||
-                BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x39)) ||
-                BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x3A))) {
+            if (BitArray_TestBit(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x36)) ||
+                BitArray_TestBit(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x38)) ||
+                BitArray_TestBit(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x39)) ||
+                BitArray_TestBit(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x3A))) {
                 bRightLegIK = 1;
             }
-            if (BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x44)) ||
-                BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x46)) ||
-                BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x47)) ||
-                BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x48))) {
+            if (BitArray_TestBit(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x44)) ||
+                BitArray_TestBit(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x46)) ||
+                BitArray_TestBit(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x47)) ||
+                BitArray_TestBit(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x48))) {
                 bLeftLegIK = 1;
             }
         }
@@ -617,7 +617,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     if (pChar->pfnPreBones != NULL) {
         pChar->pfnPreBones();
     }
-    BitArray_SetAll(auBits, 0x80);
+    BitArray_FillArray(auBits, 0x80);
     SKEL_TransformBones(pChar->pModel, auBits);
     if (Character_IsGolfer(pChar)) {
         Character_UpdateTestPoints(pChar);
@@ -826,7 +826,7 @@ void Character_IKLegsToGround(Character* pChar, u8 bRightLeg, u8 bLeftLeg) {
     if (pChar == NULL) {
         return;
     }
-    BitArray_ClearAll(auBits, 0x80);
+    BitArray_ClearArray(auBits, 0x80);
     if (!Character_IsGolfer(pChar)) {
         return;
     }
@@ -839,18 +839,18 @@ void Character_IKLegsToGround(Character* pChar, u8 bRightLeg, u8 bLeftLeg) {
                                 CharModel_GetBoneIndexMapped(pChar->pModel,
                                         0x38), CharModel_GetBoneIndexMapped(pChar->pModel, 0x39),
                                 CharModel_GetBoneIndexMapped(pChar->pModel, 0x3A), 2, 0);
-        BitArray_Set(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x38));
-        BitArray_Set(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x36));
-        BitArray_Set(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x39));
+        BitArray_SetBit(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x38));
+        BitArray_SetBit(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x36));
+        BitArray_SetBit(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x39));
     }
     if (bLeftLeg) {
         Character_IKLegToGround(pChar, pCourse, 1, CharModel_GetBoneIndexMapped(pChar->pModel, 0x44),
                                 CharModel_GetBoneIndexMapped(pChar->pModel,
                                         0x46), CharModel_GetBoneIndexMapped(pChar->pModel, 0x47),
                                 CharModel_GetBoneIndexMapped(pChar->pModel, 0x48), 3, 1);
-        BitArray_Set(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x46));
-        BitArray_Set(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x44));
-        BitArray_Set(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x47));
+        BitArray_SetBit(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x46));
+        BitArray_SetBit(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x44));
+        BitArray_SetBit(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x47));
     }
     if (BitArray_Intersects(auBits, auBits, 0x80)) {
         SKEL_TransformBones(pChar->pModel, auBits);
@@ -1031,7 +1031,7 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
 void Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace) {
     u32 auBits[4];
 
-    BitArray_SetAll(auBits, 0x80);
+    BitArray_FillArray(auBits, 0x80);
     if (pChar != NULL) {
         LLMath_CopyVec(pPos, pChar->pModel->pBones->v1C);
         if (bPlace) {
@@ -2089,9 +2089,9 @@ void Character_CalculateClipPoints(Character* pChar) {
 // (nPlayer 1000: any character); for another player both answers are 2 (out of view). n1654 is
 // fn_80007D74's answer for its bounding sphere (v1668, f1674; 2 = out of view) and n1658 the same
 // for a 3-unit sphere (its shadow); each is 2 as well past its distance along the lens
-// (fn_8001ED44, fn_8001EE00; halved in split screen). f14 keeps the nearest bone 1 has been to the
-// camera; f1664 is 1 up close, fading to 0 between 6 and 15 units deep (scaled by the lens's field
-// of view).
+// (Character_ComputeMaxVisableDistance, Character_ComputeMaxVisableShadowDistance; halved in split
+// screen). f14 keeps the nearest bone 1 has been to the camera; f1664 is 1 up close, fading to 0
+// between 6 and 15 units deep (scaled by the lens's field of view).
 void Character_ClipTest(Character* pChar, int nPlayer) {
     f32 (*pMat)[4];
     f32 fDistInViewSpace;
@@ -2101,7 +2101,7 @@ void Character_ClipTest(Character* pChar, int nPlayer) {
     Vec4 xSpherePosInCamSpace;
     f32 vDir[4];
 
-    pMat = fn_8001EE64(pChar);
+    pMat = Character_GetRootMatrix(pChar);
     if (nPlayer != 1000 && nPlayer
         != ViewController_GetActivePlayerNumber(ViewController_GetCurrentViewControllerID())) {
         pChar->n1654 = pChar->n1658 = 2;
@@ -2123,10 +2123,10 @@ void Character_ClipTest(Character* pChar, int nPlayer) {
     if (fDist < pChar->f14) {
         pChar->f14 = fDist;
     }
-    if (fDot > fn_8001ED44(pChar, gSession.nSplitScreen)) {
+    if (fDot > Character_ComputeMaxVisableDistance(pChar, gSession.nSplitScreen)) {
         pChar->n1654 = 2;
     }
-    if (fDot > fn_8001EE00(pChar, gSession.nSplitScreen)) {
+    if (fDot > Character_ComputeMaxVisableShadowDistance(pChar, gSession.nSplitScreen)) {
         pChar->n1658 = 2;
     }
     fDistInViewSpace *= Camera_GetLensFovScale(Camera_GetCurrentLens());
@@ -2164,8 +2164,8 @@ void Character_PreRenderAll(void) {
                 lbl_801B9624[i]->u10 &= ~1;
             }
         }
-        bState = fn_8001EE90(lbl_801B9624[i]) != 2;
-        bPreRender = bState || fn_8001EE88(lbl_801B9624[i]) != 2;
+        bState = Character_GetClipResult(lbl_801B9624[i]) != 2;
+        bPreRender = bState || Character_GetShadowClipResult(lbl_801B9624[i]) != 2;
         bPreRender = bPreRender && iPlayer2Clip != lbl_801B9624[i]->nPlayer;
         bPreRender = bPreRender && !(lbl_801B9624[i]->u10 & 0x1041);
         // fake match: the original turns bPreRender into 0/1 again (neg; or; srwi)
@@ -2187,7 +2187,7 @@ void Character_RenderAll(u32 uFlags) {
         fn_80035604();
         for (i = 0; i < lbl_80281CA8; i++) {
             iPlayer2Clip = fn_800636EC();
-            if (fn_8001EE90(lbl_801B9624[i]) != 2 && iPlayer2Clip != lbl_801B9624[i]->nPlayer &&
+            if (Character_GetClipResult(lbl_801B9624[i]) != 2 && iPlayer2Clip != lbl_801B9624[i]->nPlayer &&
                 !(lbl_801B9624[i]->u10 & 0x41) &&
                 (Character_IsGolfer(lbl_801B9624[i]) || (uFlags & 4) == 0)) {
                 SKN_DrawCharacter(lbl_801B9624[i], uFlags);
@@ -3165,9 +3165,9 @@ void Character_ApplyCrAPSettings(Character* pChar, SkinChoices* pChoices) {
                 &pChar->node3E0);
     if (gSession.nGameType != 3 || lbl_80281EE0->n0 == 1 || lbl_80281EE0->n0 == 4) {
         if (pChoices->n113 == 0) {
-            fn_8001EE98(pChar, 0);
+            Character_SetLeftHanded(pChar, 0);
         } else {
-            fn_8001EE98(pChar, 1);
+            Character_SetLeftHanded(pChar, 1);
         }
     }
     Character_SetSkeleton(pChar, pChar->pModel);
@@ -3235,9 +3235,13 @@ void Character_SwapTexPalettes(u8* pData, int nBytes) {
     }
 }
 
-// Dresses the character's six club skins: from pChoices when it is given, else from the golfer's
-// gGolferTable row (golfer 7's own row in the 0x4000 session mode). The front end's golfer is
-// left until fn_8008EAB0 allows it.
+// Dresses the character's six club skins (driver, fairway wood, putter, 3 and 7 irons, wedge: the
+// lbl_80186EC0 classes): from pChoices when given (SkinPart_ApplyClubChoices), else from the
+// golfer's gGolferTable row found by its id nC (row 7 itself for golfer 7 while gSession.uFlags has
+// 0x4000), each class's part variant and its head, shaft and grip sets; then the clubs are mirrored
+// for a left-handed golfer. In the front end (game type 3) a call while the menu golfer's b1D1 is
+// clear only sets it (fn_8008EABC) and returns. nSlot is not used; nothing without a character or
+// its club set.
 void Character_SetClubStatesForCharacter(Character* pChar, int nSlot, SkinChoices* pChoices) {
     int nGolfer;
     u64 uName;
@@ -3332,8 +3336,10 @@ void Character_SetClubStatesForCharacter(Character* pChar, int nSlot, SkinChoice
     SkinPart_SetClubsLeftHanded(pChar, Character_IsLeftHanded(pChar));
 }
 
-// Every player for whom fn_800FCC38 says so has its animation played at normal speed.
-void fn_8001E7DC(void) {
+// Every frame in game type 6 (the main loop): each player whose pad holds Start, X and Y together
+// (fn_800FCC38) gets its golfer's animation back to normal speed (time scale 1), undoing a slowed
+// or held animation such as the swing's hold at the top (0.008).
+void Character_ResetTimeScalesOnCombo(void) {
     int i;
     for (i = 0; i < gSession.nNumPlayers; i++) {
         if (fn_800FCC38(i)) {
@@ -3342,7 +3348,7 @@ void fn_8001E7DC(void) {
     }
 }
 
-// Copy a quaternion (Skeleton.c's use).
+// Copies a quaternion (four floats; w is copied first).
 void Quat_Copy(f32* pSrc, f32* pDst) {
     pDst[3] = pSrc[3];
     pDst[0] = pSrc[0];
@@ -3350,6 +3356,7 @@ void Quat_Copy(f32* pSrc, f32* pDst) {
     pDst[2] = pSrc[2];
 }
 
+// Copies the point pSrc (x, y, z) into the four-float pDst, with w = 1.
 void Vec4_CopyPoint(f32* pSrc, f32* pDst) {
     pDst[0] = pSrc[0];
     pDst[1] = pSrc[1];
@@ -3358,7 +3365,7 @@ void Vec4_CopyPoint(f32* pSrc, f32* pDst) {
 }
 
 // Sets every bit of a bit array of nBits bits.
-void BitArray_SetAll(u32* aBits, u32 nBits) {
+void BitArray_FillArray(u32* aBits, u32 nBits) {
     u32 i;
 
     for (i = 0; i < (nBits + 31) >> 5; i++) {
@@ -3367,7 +3374,7 @@ void BitArray_SetAll(u32* aBits, u32 nBits) {
 }
 
 // Clears every bit of a bit array of nBits bits.
-void BitArray_ClearAll(u32* aBits, u32 nBits) {
+void BitArray_ClearArray(u32* aBits, u32 nBits) {
     u32 i;
 
     for (i = 0; i < (nBits + 31) >> 5; i++) {
@@ -3375,7 +3382,7 @@ void BitArray_ClearAll(u32* aBits, u32 nBits) {
     }
 }
 
-u8 BitArray_Test(u32* aBits, u32 n) {
+u8 BitArray_TestBit(u32* aBits, u32 n) {
     return (aBits[n >> 5] & (1 << (n & 31))) != 0;
 }
 
@@ -3390,12 +3397,12 @@ u8 BitArray_Intersects(u32* aA, u32* aB, u32 nBits) {
     return 0;
 }
 
-void BitArray_Set(u32* aBits, u32 n) {
+void BitArray_SetBit(u32* aBits, u32 n) {
     aBits[n >> 5] |= 1 << (n & 31);
 }
 
 // Each bit of aOut is set where both aA and aB have it (bit arrays of nBits bits).
-void fn_8001EA54(u32* aA, u32* aB, u32* aOut, u32 nBits) {
+void BitArray_MergeArrayWithAnd(u32* aA, u32* aB, u32* aOut, u32 nBits) {
     u32 i;
 
     for (i = 0; i < (nBits + 31) >> 5; i++) {
@@ -3403,7 +3410,7 @@ void fn_8001EA54(u32* aA, u32* aB, u32* aOut, u32 nBits) {
     }
 }
 
-void BitArray_Clear(u32* aBits, u32 n) {
+void BitArray_ClearBit(u32* aBits, u32 n) {
     aBits[n >> 5] &= ~(1 << (n & 31));
 }
 
@@ -3412,7 +3419,8 @@ void Character_GetBonePos(Character* pChar, int nBone, f32* pPos) {
     Character_GetBonePos_FromIndex(pChar, CharModel_GetBoneIndex(pChar->pModel, nBone), pPos);
 }
 
-// Bone n's position (bone 1's without an animation slot); nothing without a character.
+// The position of the bone at index nBone of the model (row 3 of its matrix) into pPos; a character
+// that is not a golfer (Character_IsGolfer) gives index 1's instead. Nothing without a character.
 void Character_GetBonePos_FromIndex(Character* pChar, int nBone, f32* pPos) {
     if (pChar != NULL) {
         if (Character_IsGolfer(pChar) == 0) {
@@ -3422,7 +3430,9 @@ void Character_GetBonePos_FromIndex(Character* pChar, int nBone, f32* pPos) {
     }
 }
 
-// The character plays from animation slot 0 or 1.
+// True for a golfer: a character playing from animation slot 0 or 1 (skalib's clip banks). For the
+// other characters (the flagstick and the like) the bone getters give bone index 1's matrix
+// whatever bone is asked for (Character_GetBoneMatrix_FromIndex).
 u8 Character_IsGolfer(Character* pChar) {
     if (pChar->nSlot >= 0 && pChar->nSlot < 2) {
         return 1;
@@ -3451,14 +3461,19 @@ f32 (*Character_GetBoneMatrix(Character* pChar, int nBone))[4] {
     return Character_GetBoneMatrix_FromIndex(pChar, CharModel_GetBoneIndex(pChar->pModel, nBone));
 }
 
-f32 fn_8001ED44(Character* pChar, int b) {
+// How far along the camera's view the character is still drawn: f1660 (200, or 100 for a
+// non-golfer) over the lens's field-of-view scale, so farther when zoomed in, and half that when
+// bSplitScreen. Past it Character_ClipTest marks the body out of view, and
+// Character_UpdateAnimation stops animating a character that is not a golfer.
+f32 Character_ComputeMaxVisableDistance(Character* pChar, int b) {
     if (b != 0) {
         return pChar->f1660 * (0.5f / Camera_GetLensFovScale(Camera_GetCurrentLens()));
     }
     return pChar->f1660 * (1.0f / Camera_GetLensFovScale(Camera_GetCurrentLens()));
 }
 
-// A bone's position, by bone id through CharModel_GetBoneIndexMapped.
+// A bone's position by bone id; for a left-handed golfer the bone of the other side
+// (CharModel_GetBoneIndexMapped).
 void Character_GetBonePosSwapIfLefty(Character* pChar, int nBone, f32* pPos) {
     Character_GetBonePos_FromIndex(pChar, CharModel_GetBoneIndexMapped(pChar->pModel, nBone), pPos);
 }
@@ -3469,41 +3484,49 @@ u8 Character_IsLeftHanded(Character* pChar) {
     return pChar->pModel->bEE;
 }
 
-f32 fn_8001EE00(Character* pChar, int b) {
+// How far along the camera's view the character's shadow is still drawn: f165C (100, or 50 for a
+// non-golfer) over the lens's field-of-view scale, and half that when bSplitScreen. Past it
+// Character_ClipTest marks the shadow out of view.
+f32 Character_ComputeMaxVisableShadowDistance(Character* pChar, int b) {
     if (b != 0) {
         return pChar->f165C * (0.5f / Camera_GetLensFovScale(Camera_GetCurrentLens()));
     }
     return pChar->f165C * (1.0f / Camera_GetLensFovScale(Camera_GetCurrentLens()));
 }
 
-f32 (*fn_8001EE64(Character* pChar))[4] {
+f32 (*Character_GetRootMatrix(Character* pChar))[4] {
     return Character_GetBoneMatrix(pChar, 1);
 }
 
-int fn_8001EE88(Character* pChar) {
+// Character_ClipTest's answer for the character's shadow (a 3-unit sphere): 2 = out of view.
+int Character_GetShadowClipResult(Character* pChar) {
     return pChar->n1658;
 }
 
-int fn_8001EE90(Character* pChar) {
+// Character_ClipTest's answer for the character's body (its bounding sphere): 2 = out of view.
+int Character_GetClipResult(Character* pChar) {
     return pChar->n1654;
 }
 
-void fn_8001EE98(Character* pChar, u8 b) {
+// Makes the golfer left-handed (bLeftHanded 1) or right-handed; the callers set the skeleton again
+// after it (Character_SetSkeleton).
+void Character_SetLeftHanded(Character* pChar, u8 b) {
     pChar->pModel->bEE = b;
 }
 
 // The dot product of two 4-vectors.
-f32 fn_8001EEA4(f32* pA, f32* pB) {
+f32 Vec4_Dot(f32* pA, f32* pB) {
     return pA[0] * pB[0] + pA[1] * pB[1] + pA[2] * pB[2] + pA[3] * pB[3];
 }
 
-// A bone id's index in the model's skeleton, without the second table
-// (CharModel_GetBoneIndexMapped).
+// A bone id's index in the model's skeleton (0xFF: the model has no such bone).
+// CharModel_GetBoneIndexMapped is the form that swaps sides for a left-hander.
 int CharModel_GetBoneIndex(CharModel* pModel, int nBone) {
     return pModel->aBone[nBone];
 }
 
-// A bone's index, through the second table while the model's bEE is set.
+// A bone id's index in the model's skeleton; while the model is left-handed (bEE) it goes through
+// aBone2 to the bone of the other side, so right-hand bone ids find the left hand's bones.
 int CharModel_GetBoneIndexMapped(CharModel* pModel, int nBone) {
     if (pModel->bEE) {
         return pModel->aBone2[pModel->aBone[nBone]];

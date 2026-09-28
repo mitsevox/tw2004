@@ -382,7 +382,7 @@ void FE_CrAP_TurnOffPart(s16 nPart, int b, int i) {
 // owns it (aB1CC: set for the level 0 assets, cleared when one is sold).
 u8 FE_CrAP_IsAssetAvailableForUser(int nAsset) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
-    if (!BitArray_Test(pProfile->aAssetLocked, nAsset) && BitArray_Test(pProfile->aB1CC, nAsset)) {
+    if (!BitArray_TestBit(pProfile->aAssetLocked, nAsset) && BitArray_TestBit(pProfile->aB1CC, nAsset)) {
         return 1;
     }
     return 0;
@@ -1887,10 +1887,10 @@ void FE_CrAP_GetCategoryInfo(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s3
     for (i = 0; i < lbl_80282460->nAssets; i++) {
         if (nPart == lbl_80282460->pAssets[i].nPart
             && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].n40)) {
-            if (BitArray_Test(pProfile->aB1CC, i)) {
+            if (BitArray_TestBit(pProfile->aB1CC, i)) {
                 *pB1CC += 1;
             }
-            if (BitArray_Test(pProfile->aB344, i)) {
+            if (BitArray_TestBit(pProfile->aB344, i)) {
                 *pB344 += 1;
             }
             if (fn_80078008(i, pProfile)) {

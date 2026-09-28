@@ -503,7 +503,7 @@ void MC_RefreshMCReplayInfo(s32 nPort, s32 nSlot) {
 
     pState = MC_pGetMC(nPort, nSlot);
     // EA bug: clears 4 bits, but there are NUM_SAVE_REPLAYS (5) replays
-    BitArray_ClearAll(pState->aReplayUsed, 4);
+    BitArray_ClearArray(pState->aReplayUsed, 4);
     if (nPort >= MC_NUM_PORTS || nSlot >= MC_NUM_SLOTS) return;
     nMount = MC_MountCard(nPort, nSlot);
     if (nMount != 0 && nMount != MC_ERR_MOUNTED) return;
@@ -533,7 +533,7 @@ void MC_RefreshMCReplayInfo(s32 nPort, s32 nSlot) {
     }
     for (i = 0; i < NUM_SAVE_REPLAYS; i++) {
         if (lbl_80281FEC->uFlags & MC_SAVE_REPLAY(i)) {
-            BitArray_Set(pState->aReplayUsed, i);
+            BitArray_SetBit(pState->aReplayUsed, i);
         }
     }
     if (nMount == 0) {
@@ -553,7 +553,7 @@ s32 fn_800A09EC(MCCardPos* pPos) {
     pState = MC_pGetMC(nPort, nSlot);
     MC_RefreshMCReplayInfo(nPort, nSlot);
     for (i = 0; i < NUM_SAVE_REPLAYS; i++) {
-        if (BitArray_Test(pState->aReplayUsed, i)) {
+        if (BitArray_TestBit(pState->aReplayUsed, i)) {
             nCount++;
         }
     }
@@ -883,7 +883,7 @@ void MC_RefreshMCUserInfo(s32 nPort, s32 nSlot) {
     int i;
 
     pState = MC_pGetMC(nPort, nSlot);
-    BitArray_ClearAll(pState->aNameUsed, 4);
+    BitArray_ClearArray(pState->aNameUsed, 4);
     pState->aszName[0][0] = 0;
     pState->aszName[1][0] = 0;
     pState->aszName[2][0] = 0;
@@ -918,7 +918,7 @@ void MC_RefreshMCUserInfo(s32 nPort, s32 nSlot) {
     Mem_cpy(lbl_80281FD8, lbl_80281FE4, MC_BUFFER_SIZE);
     for (i = 0; i < NUM_SAVE_PROFILES; i++) {
         if (lbl_80281FD8->uFlags & MC_SAVE_PROFILE(i)) {
-            BitArray_Set(pState->aNameUsed, i);
+            BitArray_SetBit(pState->aNameUsed, i);
             strncpy(pState->aszName[i], lbl_80281FD8->aProfile[i].szName, 0x1D);
         }
     }
@@ -939,7 +939,7 @@ s32 MC_GetNumUser(MCCardPos* pPos) {
     pState = MC_pGetMC(nPort, nSlot);
     MC_RefreshMCUserInfo(nPort, nSlot);
     for (i = 0; i < 4; i++) {
-        if (BitArray_Test(pState->aNameUsed, i)) {
+        if (BitArray_TestBit(pState->aNameUsed, i)) {
             nCount++;
         }
     }
@@ -1115,7 +1115,7 @@ void MC_RecordEATitleByName(const char* szGameCode) {
             if (strncmp(lbl_80281FF0[i].p4 + j * 16, szGameCode,
                         strlen(lbl_80281FF0[i].p4 + j * 16)) == 0) {
                 lbl_80281FF0[i].b0 = 1;
-                BitArray_Set(lbl_801F1100, i);
+                BitArray_SetBit(lbl_801F1100, i);
                 return;
             }
         }
@@ -1162,7 +1162,7 @@ void fn_800A2064(void) {
             lbl_801F1510[nPort][nSlot].b94 = 0;
         }
     }
-    BitArray_ClearAll(lbl_801F1100, 0x80);
+    BitArray_ClearArray(lbl_801F1100, 0x80);
 }
 
 // Format the card. A card that is broken or has the wrong encoding can still be formatted.

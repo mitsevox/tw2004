@@ -551,7 +551,7 @@ u8 fn_80078008(s32 nAsset, SaveProfile* pProfile) {
     }
     switch (nKind) {
     case 0:
-        bLocked = BitArray_Test(pProfile->aB1CC, n) == 0;
+        bLocked = BitArray_TestBit(pProfile->aB1CC, n) == 0;
         break;
     case 2:
         bLocked = !fn_80058304(pProfile, 1);
@@ -563,7 +563,7 @@ u8 fn_80078008(s32 nAsset, SaveProfile* pProfile) {
         bLocked = 0;
         break;
     case 6:
-        bLocked = BitArray_Test(lbl_801D5948, aBits[n]) == 0;
+        bLocked = BitArray_TestBit(lbl_801D5948, aBits[n]) == 0;
         break;
     case 7:
         bLocked = !pProfile->aC8[n].award.bWon;
@@ -748,9 +748,9 @@ void fn_80078680(SaveProfile* pProfile) {
         for (i = 0; i < nCount; i++) {
             FE_CrAP_SetCurrentGender(FE_CrAP_GetAssetGender(i));
             if (fn_80078008(i, pProfile)) {
-                BitArray_Set(pProfile->aAssetLocked, i);
+                BitArray_SetBit(pProfile->aAssetLocked, i);
             } else {
-                BitArray_Clear(pProfile->aAssetLocked, i);
+                BitArray_ClearBit(pProfile->aAssetLocked, i);
             }
         }
         FE_CrAP_SetCurrentGender(nSaved);

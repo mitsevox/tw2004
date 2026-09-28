@@ -182,7 +182,7 @@ void fn_80026F90(Skeleton* pSkel, IKChain* pChain, u8 bAll) {
         if (bAll || pChain->pLinks[i].f4 > 0.0f) {
             int nBone = pChain->pLinks[i].nBone;
             Quat_IdentifyForMul(pSkel->p20[nBone]);
-            BitArray_Clear(pSkel->a10, nBone);
+            BitArray_ClearBit(pSkel->a10, nBone);
         }
     }
 }
@@ -207,7 +207,7 @@ void fn_80027108(Skeleton* pSkel) {
     int i;
 
     pSkel->f1074 = 0.0f;
-    BitArray_ClearAll(pSkel->a10, 0x80);
+    BitArray_ClearArray(pSkel->a10, 0x80);
     fn_80029BC8(pSkel->v10A4);
     fn_80029BC8(pSkel->v10B4);
     pSkel->f10C4 = 1.0f;
@@ -240,7 +240,7 @@ void fn_800271A0(CharModel* pModel, IKChain* pChain) {
         pLink->b0 = 0;
         fn_80029BC8(pLink->v58);
         if (pLink->f4 > 0.0f) {
-            BitArray_Set(pSkel->a10, pLink->nBone);
+            BitArray_SetBit(pSkel->a10, pLink->nBone);
         }
         if (i > 0) {
             pPrevLink = &pChain->pLinks[nPrev];
@@ -508,9 +508,9 @@ void fn_800279C0(Character* pChar) {
         SKEL_WeightIKChain(pSkel, pChain, pSkel->fIKWeight);
     }
     Quat_Multiply(pSkel->q107C, pGrip->q0, pPose28->q0);
-    BitArray_Clear(pModel->a14, n28);
-    BitArray_ClearAll(aBits, 0x80);
-    BitArray_Set(aBits, CharModel_GetBoneIndexMapped(pModel, 0x23));
+    BitArray_ClearBit(pModel->a14, n28);
+    BitArray_ClearArray(aBits, 0x80);
+    BitArray_SetBit(aBits, CharModel_GetBoneIndexMapped(pModel, 0x23));
     SKEL_TransformBones(pModel, aBits);
     LLMath_mat44fltMultiply(pModel->pMatrices[nGrip], (Vec4*)pChar->pClubSet->a3C[pChar->nClubClass],
                 (Vec4*)pChar->aTestPoints[4]);
@@ -680,7 +680,7 @@ Skeleton* SKEL_CreateIKSkeleton(CharModel* pModel, CharModelDefs* pDefs) {
     pSkel->p28 = pSkel->p20;
     pSkel->n112C = -1;
     pSkel->n1130 = -1;
-    BitArray_ClearAll(pSkel->a10, 0x80);
+    BitArray_ClearArray(pSkel->a10, 0x80);
     pSkel->n0 = 0;
     pSkel->f109C = 0.1f;
     pSkel->f10A0 = 0.2f;
@@ -754,8 +754,8 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int b) {
     for (i = 0; i < pModel->nBones; i++) {
         Quat_IdentifyForMul(pModel->pBones[i].q0C);
     }
-    BitArray_SetAll(pModel->a14, 0x80);
-    BitArray_SetAll(pModel->a24, 0x80);
+    BitArray_FillArray(pModel->a14, 0x80);
+    BitArray_FillArray(pModel->a24, 0x80);
     pModel->bEE = b;
     SKEL_GenerateBoneLookupTable(pModel);
     SKEL_GenerateLeftHandedTable(pModel);
@@ -764,7 +764,7 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int b) {
     } else {
         pModel->pSkel = NULL;
     }
-    BitArray_SetAll(aAll, 0x80);
+    BitArray_FillArray(aAll, 0x80);
     SKEL_TransformBones(pModel, aAll);
     pModel->pF0 = fn_80114270(pModel, CharModel_GetBoneIndex(pModel, 0xB), 0, 0);
     pModel->pF4 = fn_80114270(pModel, CharModel_GetBoneIndex(pModel, 0x57), 1, 0);
@@ -828,17 +828,17 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
     f32 (*pSkelRot)[4];
     int i;
 
-    BitArray_ClearAll(aCur, 0x80);
-    BitArray_Set(aCur, 0);
+    BitArray_ClearArray(aCur, 0x80);
+    BitArray_SetBit(aCur, 0);
     if (pModel->pSkel != NULL) {
         if (0.0f == pModel->pSkel->fIKWeight) {
-            BitArray_ClearAll(aSkel, 0x80);
+            BitArray_ClearArray(aSkel, 0x80);
         } else {
             fn_80029EF4(pModel->pSkel->a10, aSkel, 0x80);
         }
         pSkelRot = pModel->pSkel->p28;
     } else {
-        BitArray_ClearAll(aSkel, 0x80);
+        BitArray_ClearArray(aSkel, 0x80);
         pSkelRot = NULL;
     }
     fn_80021980(pModel->a14, pModel->a24, aModel, 0x80);
@@ -859,34 +859,34 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
 
     for (i = 1; i < pModel->nBones; i++) {
         pBone = &pModel->pBones[i];
-        BitArray_ClearAll(aParent, 0x80);
-        BitArray_Set(aParent, pBone->nParent);
+        BitArray_ClearArray(aParent, 0x80);
+        BitArray_SetBit(aParent, pBone->nParent);
         if (i == CharModel_GetBoneIndex(pModel, 0x22)) {
             fn_80029A00(pModel, CharModel_GetBoneIndex(pModel, 0x22), CharModel_GetBoneIndex(pModel, 0x11),
                         pModel->q740);
-            if (BitArray_Test(aBits, CharModel_GetBoneIndex(pModel, 0x11))) {
-                BitArray_Set(aBits, CharModel_GetBoneIndex(pModel, 0x22));
+            if (BitArray_TestBit(aBits, CharModel_GetBoneIndex(pModel, 0x11))) {
+                BitArray_SetBit(aBits, CharModel_GetBoneIndex(pModel, 0x22));
             }
-            if (BitArray_Test(aModel, CharModel_GetBoneIndex(pModel, 0x11))) {
-                BitArray_Set(aModel, CharModel_GetBoneIndex(pModel, 0x22));
+            if (BitArray_TestBit(aModel, CharModel_GetBoneIndex(pModel, 0x11))) {
+                BitArray_SetBit(aModel, CharModel_GetBoneIndex(pModel, 0x22));
             }
-            BitArray_Set(pModel->a24, CharModel_GetBoneIndex(pModel, 0x22));
-            if (BitArray_Test(pModel->a14, CharModel_GetBoneIndex(pModel, 0x11))) {
-                BitArray_Set(pModel->a14, CharModel_GetBoneIndex(pModel, 0x22));
+            BitArray_SetBit(pModel->a24, CharModel_GetBoneIndex(pModel, 0x22));
+            if (BitArray_TestBit(pModel->a14, CharModel_GetBoneIndex(pModel, 0x11))) {
+                BitArray_SetBit(pModel->a14, CharModel_GetBoneIndex(pModel, 0x22));
             }
         } else if (i == CharModel_GetBoneIndex(pModel, 0x35)) {
             // EA passes bone 0x22 here too
             fn_80029A00(pModel, CharModel_GetBoneIndex(pModel, 0x22), CharModel_GetBoneIndex(pModel, 0x11),
                         pModel->q750);
-            if (BitArray_Test(aBits, CharModel_GetBoneIndex(pModel, 0x24))) {
-                BitArray_Set(aBits, CharModel_GetBoneIndex(pModel, 0x35));
+            if (BitArray_TestBit(aBits, CharModel_GetBoneIndex(pModel, 0x24))) {
+                BitArray_SetBit(aBits, CharModel_GetBoneIndex(pModel, 0x35));
             }
-            if (BitArray_Test(aModel, CharModel_GetBoneIndex(pModel, 0x24))) {
-                BitArray_Set(aModel, CharModel_GetBoneIndex(pModel, 0x35));
+            if (BitArray_TestBit(aModel, CharModel_GetBoneIndex(pModel, 0x24))) {
+                BitArray_SetBit(aModel, CharModel_GetBoneIndex(pModel, 0x35));
             }
-            BitArray_Set(pModel->a24, CharModel_GetBoneIndex(pModel, 0x35));
-            if (BitArray_Test(pModel->a14, CharModel_GetBoneIndex(pModel, 0x24))) {
-                BitArray_Set(pModel->a14, CharModel_GetBoneIndex(pModel, 0x35));
+            BitArray_SetBit(pModel->a24, CharModel_GetBoneIndex(pModel, 0x35));
+            if (BitArray_TestBit(pModel->a14, CharModel_GetBoneIndex(pModel, 0x24))) {
+                BitArray_SetBit(pModel->a14, CharModel_GetBoneIndex(pModel, 0x35));
             }
         }
         if (BitArray_Intersects(aBits, aCur, 0x80) || BitArray_Intersects(aBits, aParent, 0x80)) {
@@ -928,8 +928,8 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
         }
         fn_80029C60(aCur, aCur, 0x80, 1);
     }
-    BitArray_SetAll(pModel->a14, 0x80);
-    BitArray_SetAll(pModel->a24, 0x80);
+    BitArray_FillArray(pModel->a14, 0x80);
+    BitArray_FillArray(pModel->a24, 0x80);
 }
 
 // Copies a pose's bone rotations (bits a0) and positions (bits a10) into the model's bones; with
@@ -945,30 +945,30 @@ void SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform) {
     fn_80029EF4(pPose->a0, aRot, 0x80);
     fn_80029EF4(pPose->a10, aPos, 0x80);
     for (i = 0; i < pModel->nBones; i++) {
-        if (BitArray_Test(aRot, i)) {
+        if (BitArray_TestBit(aRot, i)) {
             if (pModel->bEE) {
                 if (i == CharModel_GetBoneIndex(pModel, 1)) {
                     Legacy_Quat_BuildFromPitch(PI, qTurn);
                     Quat_Multiply(pPose->aBones[i].q0, qTurn, pModel->pBones[pModel->aBone2[i]].q0C);
-                    BitArray_Set(pPose->a0, pModel->aBone2[i]);
+                    BitArray_SetBit(pPose->a0, pModel->aBone2[i]);
                 } else if (i == CharModel_GetBoneIndex(pModel, 0x52)) {
                     if (pModel->pBones[i].nParent == 0) {
                         Legacy_Quat_BuildFromPitch(PI, qTurn);
                         Quat_Multiply(pPose->aBones[i].q0, qTurn, pModel->pBones[pModel->aBone2[i]].q0C);
-                        BitArray_Set(pPose->a0, pModel->aBone2[i]);
+                        BitArray_SetBit(pPose->a0, pModel->aBone2[i]);
                     } else {
                         Quat_Copy(pPose->aBones[i].q0, pModel->pBones[pModel->aBone2[i]].q0C);
-                        BitArray_Set(pPose->a0, pModel->aBone2[i]);
+                        BitArray_SetBit(pPose->a0, pModel->aBone2[i]);
                     }
                 } else {
                     Quat_Copy(pPose->aBones[i].q0, pModel->pBones[pModel->aBone2[i]].q0C);
-                    BitArray_Set(pPose->a0, pModel->aBone2[i]);
+                    BitArray_SetBit(pPose->a0, pModel->aBone2[i]);
                 }
             } else {
                 Quat_Copy(pPose->aBones[i].q0, pModel->pBones[i].q0C);
             }
         }
-        if (BitArray_Test(aPos, i)) {
+        if (BitArray_TestBit(aPos, i)) {
             if (pModel->bEE
                 && (i == CharModel_GetBoneIndex(pModel, 1) || i == CharModel_GetBoneIndex(pModel, 0x54))) {
                 Quat_Copy(pPose->aBones[i].v10, pModel->pBones[i].v1C);
@@ -1001,13 +1001,13 @@ void fn_800293CC(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pO
     int i;
     int nLast;
 
-    fn_8001EA54(pA->a20, pB->a20, aPos, 0x80);
-    fn_8001EA54(pA->a30, pB->a30, aRot, 0x80);
-    BitArray_ClearAll(aCur, 0x80);
-    BitArray_Set(aCur, nBone);
+    BitArray_MergeArrayWithAnd(pA->a20, pB->a20, aPos, 0x80);
+    BitArray_MergeArrayWithAnd(pA->a30, pB->a30, aRot, 0x80);
+    BitArray_ClearArray(aCur, 0x80);
+    BitArray_SetBit(aCur, nBone);
     nLast = nBone + nCount - 1;
-    BitArray_ClearAll(pOut->a0, 0x80);
-    BitArray_ClearAll(pOut->a10, 0x80);
+    BitArray_ClearArray(pOut->a0, 0x80);
+    BitArray_ClearArray(pOut->a10, 0x80);
     for (i = nBone; i <= nLast; i++) {
         if (BitArray_Intersects(aRot, aCur, 0x80)) {
             fn_8001FB00(pA->aBones[i].q0, pB->aBones[i].q0, pOut->aBones[i].q0, fT);

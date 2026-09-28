@@ -723,16 +723,16 @@ void  fn_80127B98(Skin* pSkin, s32* aParts, s32* aList);
 extern s32* lbl_802825A8;               // the new number of each mesh bit (fn_801271E0)
 
 // Bit n of a bit array of 32-bit words: test, set, clear.
-void  BitArray_SetAll(u32* aBits, u32 nBits);  // sets every bit of a bit array
-void  BitArray_ClearAll(u32* aBits, u32 nBits);  // clears a bit array
-u8    BitArray_Test(u32* aBits, u32 n);
-void  BitArray_Set(u32* aBits, u32 n);
-void  fn_8001EA54(u32* aA, u32* aB, u32* aOut, u32 nBits);  // the bits set in both
-void  BitArray_Clear(u32* aBits, u32 n);
+void  BitArray_FillArray(u32* aBits, u32 nBits);  // sets every bit of a bit array
+void  BitArray_ClearArray(u32* aBits, u32 nBits);  // clears a bit array
+u8    BitArray_TestBit(u32* aBits, u32 n);
+void  BitArray_SetBit(u32* aBits, u32 n);
+void  BitArray_MergeArrayWithAnd(u32* aA, u32* aB, u32* aOut, u32 nBits);  // the bits set in both
+void  BitArray_ClearBit(u32* aBits, u32 n);
 u8    BitArray_Intersects(u32* aA, u32* aB, u32 nBits);  // two bit arrays share a set bit
 
 // 4-vectors (the quaternion copy, Quat_Copy, is in character.h).
 void  Vec4_CopyPoint(f32* pSrc, f32* pDst);  // a point to a 4-vector with w = 1
-f32   fn_8001EEA4(f32* pA, f32* pB);      // dot product
+f32   Vec4_Dot(f32* pA, f32* pB);      // dot product
 
 #endif

@@ -166,8 +166,8 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
             nNewBit = nBitBase + nOldRows;
             pNewEnd = pEnd;
             pNext = pEnd + nNewRows;
-            uStep = BitArray_Test(pBits, nBit);
-            uNewStep = BitArray_Test(pBits, nNewBit);
+            uStep = BitArray_TestBit(pBits, nBit);
+            uNewStep = BitArray_TestBit(pBits, nNewBit);
             bFirst = 1;
             bStart = 1;
             if (pCur != pEnd) {
@@ -178,7 +178,7 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
                     // the point is dropped from this row
                     nNewBit++;
                     pNewEnd++;
-                    uNewStep = BitArray_Test(pBits, nNewBit);
+                    uNewStep = BitArray_TestBit(pBits, nNewBit);
                 } else {
                     fn_80120C2C(pVerts, pTriFlags, afNew, *pOld, *pOldStep, &bNewFlag, nSet, fAt);
                     while (pCur != pEnd && afPoint[nAxis] <= afNew[nAxis]) {
@@ -203,7 +203,7 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
                         nCount++;
                         nBit++;
                         if (pCur != pEnd) {
-                            uStep = BitArray_Test(pBits, nBit);
+                            uStep = BitArray_TestBit(pBits, nBit);
                             fn_80120C2C(pVerts, pTriFlags, afPoint, *pCur, uStep, &bFlag, nSet, fAt);
                         }
                     }
@@ -235,7 +235,7 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
                 nCount++;
                 nBit++;
                 if (pCur != pEnd) {
-                    uStep = BitArray_Test(pBits, nBit);
+                    uStep = BitArray_TestBit(pBits, nBit);
                     fn_80120C2C(pVerts, pTriFlags, afPoint, *pCur, uStep, &bFlag, nSet, fAt);
                 }
             }

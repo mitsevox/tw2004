@@ -42,7 +42,7 @@ HwsBurn* fn_801104AC(SkinDesc* pDesc) {
     }
     if (pBurn->n20 != 0) {
         pBurn->p28 = StaticMem_Alloc((pBurn->n20 + 31) / 32 * 4, 1, 16, "hwsBurn.c", 83);
-        BitArray_ClearAll(pBurn->p28, pBurn->n20);
+        BitArray_ClearArray(pBurn->p28, pBurn->n20);
         pBurn->a2C = StaticMem_Alloc(pBurn->n20 * 4, 1, 16, "hwsBurn.c", 87);
         pBurn->a30 = StaticMem_Alloc(pBurn->n20 * 4, 1, 16, "hwsBurn.c", 88);
     }
@@ -50,14 +50,14 @@ HwsBurn* fn_801104AC(SkinDesc* pDesc) {
         nBytes = (pBurn->n34 + 31) / 32 * 4;
         pBurn->p3C = StaticMem_Alloc(nBytes, 1, 16, "hwsBurn.c", 94);
         pBurn->p40 = StaticMem_Alloc(nBytes, 1, 16, "hwsBurn.c", 95);
-        BitArray_ClearAll(pBurn->p3C, pBurn->n34);
-        BitArray_ClearAll(pBurn->p40, pBurn->n34);
+        BitArray_ClearArray(pBurn->p3C, pBurn->n34);
+        BitArray_ClearArray(pBurn->p40, pBurn->n34);
         pBurn->a44 = StaticMem_Alloc(pBurn->n34 * 4, 1, 16, "hwsBurn.c", 100);
         pBurn->a48 = StaticMem_Alloc(pBurn->n34 * 4, 1, 16, "hwsBurn.c", 101);
     }
     if (pBurn->n4C != 0) {
         pBurn->p54 = StaticMem_Alloc((pBurn->n4C + 31) / 32 * 4, 1, 16, "hwsBurn.c", 107);
-        BitArray_ClearAll(pBurn->p54, pBurn->n4C);
+        BitArray_ClearArray(pBurn->p54, pBurn->n4C);
         pBurn->a58 = StaticMem_Alloc(pBurn->n4C * 4, 1, 16, "hwsBurn.c", 111);
         pBurn->a5C = StaticMem_Alloc(pBurn->n4C * 4, 1, 16, "hwsBurn.c", 112);
     }
@@ -66,7 +66,7 @@ HwsBurn* fn_801104AC(SkinDesc* pDesc) {
     }
     if (pBurn->n70 != 0) {
         pBurn->p78 = StaticMem_Alloc((pBurn->n70 + 31) / 32 * 4, 1, 16, "hwsBurn.c", 127);
-        BitArray_ClearAll(pBurn->p78, pBurn->n70);
+        BitArray_ClearArray(pBurn->p78, pBurn->n70);
         pBurn->a7C = StaticMem_Alloc(pBurn->n70 * 4, 1, 16, "hwsBurn.c", 131);
         pBurn->a80 = StaticMem_Alloc(pBurn->n70 * 4, 1, 16, "hwsBurn.c", 132);
     }
@@ -168,13 +168,13 @@ void fn_80110A38(HwsBurn* pBurn, int n) {
     int i;
     int j;
 
-    BitArray_Set(pBurn->p3C, n);
-    BitArray_Set(pBurn->p40, n);
+    BitArray_SetBit(pBurn->p3C, n);
+    BitArray_SetBit(pBurn->p40, n);
     args.pDesc = pBurn->pDesc;
     args.nEntry = n;
     pIter = fn_80110A38_Read(fn_80113910((u8*)&iterBuf, &args));  // fake match: through fn_80110A38_Read
     while (SkinIter_IsValid(pIter)) {
-        BitArray_Set(pBurn->p28, SkinIter_GetIndex(pIter));
+        BitArray_SetBit(pBurn->p28, SkinIter_GetIndex(pIter));
         SkinIter_Next(pIter);
     }
     fn_80113A7C(pIter);
@@ -189,7 +189,7 @@ void fn_80110A38(HwsBurn* pBurn, int n) {
             }
         }
         for (j = 0; j < nLast; j++) {
-            BitArray_Set(pBurn->p40, pEntry->n10 + j);
+            BitArray_SetBit(pBurn->p40, pEntry->n10 + j);
         }
     }
 
@@ -202,7 +202,7 @@ void fn_80110A38(HwsBurn* pBurn, int n) {
         }
     }
     for (i = 0; i < nCount; i++) {
-        BitArray_Set(pBurn->p54, pEntry->n0 + i);
+        BitArray_SetBit(pBurn->p54, pEntry->n0 + i);
     }
 }
 
@@ -301,7 +301,7 @@ s32 fn_80110F2C(HwsBurn* pBurn, s32 nAlign) {
     int n = 0;
 
     for (i = 0; i < nBits; i++) {
-        if (BitArray_Test(pBurn->p40, i)) {
+        if (BitArray_TestBit(pBurn->p40, i)) {
             pBurn->a44[n] = i;
             pBurn->a48[i] = n;
             n++;
@@ -338,7 +338,7 @@ SkinDesc44* fn_80110FB4(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
     for (i = 0; i < n; i++) {
         nEntry = pBurn->a44[i];
         pOut = fn_80110E98(pBase, pOffset, &pDesc->p44[nEntry], sizeof(SkinDesc44), 1);
-        if (!BitArray_Test(pBurn->p3C, nEntry)) {
+        if (!BitArray_TestBit(pBurn->p3C, nEntry)) {
             pOut->n8 = 0;
             pOut->n0 = 0;
             pOut->u24 &= ~2;
@@ -348,7 +348,7 @@ SkinDesc44* fn_80110FB4(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
         if (pOut->u24 & 2) {
             nMorphs = pOut->n14;
             for (j = 0; j < nMorphs; j++) {
-                if (!BitArray_Test(pBurn->p40, pOut->n10 + j)) {
+                if (!BitArray_TestBit(pBurn->p40, pOut->n10 + j)) {
                     break;
                 }
             }
@@ -378,7 +378,7 @@ s32 fn_80111124(HwsBurn* pBurn, s32 nAlign) {
     n = 0;
 
     for (i = 0; i < nBits; i++) {
-        if (BitArray_Test(pBurn->p28, i)) {
+        if (BitArray_TestBit(pBurn->p28, i)) {
             pBurn->a2C[n] = i;
             pBurn->a30[i] = n;
             n++;
@@ -460,7 +460,7 @@ s32 fn_80111424(HwsBurn* pBurn, s32 nAlign) {
     int n = 0;
 
     for (i = 0; i < nBits; i++) {
-        if (BitArray_Test(pBurn->p54, i)) {
+        if (BitArray_TestBit(pBurn->p54, i)) {
             pBurn->a58[n] = i;
             pBurn->a5C[i] = n;
             n++;
@@ -535,15 +535,15 @@ s32 fn_80111658(HwsBurn* pBurn, s32 nAlign) {
     int nBits = pBurn->n70;
     int n;
 
-    BitArray_ClearAll(pBurn->p78, pBurn->n70);
+    BitArray_ClearArray(pBurn->p78, pBurn->n70);
     for (i = 0; i < nEntries; i++) {
         if (pBurn->a64[i].n18 >= 0 && pBurn->a64[i].n18 < nBits) {
-            BitArray_Set(pBurn->p78, pBurn->a64[i].n18);
+            BitArray_SetBit(pBurn->p78, pBurn->a64[i].n18);
         }
     }
     n = 0;
     for (i = 0; i < nBits; i++) {
-        if (BitArray_Test(pBurn->p78, i)) {
+        if (BitArray_TestBit(pBurn->p78, i)) {
             pBurn->a7C[n] = i;
             pBurn->a80[i] = n;
             n++;
