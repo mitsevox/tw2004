@@ -45,9 +45,9 @@ void CalcAllAroundScore(int nGolfer, f32* pfValue);
 void CalcTotalDriving(int nGolfer, f32* pfValue);
 void CalcBallStriking(int nGolfer, f32* pfValue);
 void SplitWinnings(int nPlayer, s32 nTotal, s32 nFirstRow, s32 nCount);
-void GM_PgaTourSim_DistributeWinnings(int nPlayer, int nTotal, int n);
+void GM_PgaTourSim_DistributeWinnings(int nPlayer, int nPurse, int nFirstPrize);
 void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst);
-void PlayPGAAwardVideo(int nA, int nB);
+void PlayPGAAwardVideo(int nMovie, int nNumRandom);
 void PGATourSimulation_LoadPGSTFromStream(UStreamObject* pObject);
 
 char* GameModeDriverPGATour_GetInitialChampName(s32 i);               // a tournament's first champion
@@ -1553,9 +1553,9 @@ void CalcAllStats(int nPlayer) {
     CalcAllComplex2Rankings(nPlayer);
 }
 
-// The tour statistics. Each takes a golfer's season counts and puts the statistic in *pfValue;
-// the table at 0x80193F88 lists them in this order, one per statistic. A statistic with nothing
-// to divide by is 0 and returns 0.
+// The simple tour statistics. Each takes a golfer's season counts and puts the statistic in
+// *pfValue; lbl_80193F88 lists them in this order, one per statistic. A ratio with nothing to
+// divide by is 0 and returns 0; every other value returns 1 (CalcSimplePlayerStats does not look).
 
 u8 SafeDivide(u32 nCount, u32 nOutOf, f32* pfValue);
 u8 SafeDividePct(u32 nCount, u32 nOutOf, f32* pfValue);
@@ -1785,10 +1785,9 @@ void SplitWinnings(int nPlayer, s32 nTotal, s32 nFirstRow, s32 nCount) {
 
 // The tournament's prize money paid down the score order at its end
 // (GM_PgaTourSim_SimTournamentWinner): each of the first 70 score rows is worth
-// GM_Earnings_TournamentPayout(nTotal, n, row), nTotal the purse and n the first prize, and the
-// entrants tied on a place split the rows they fill (SplitWinnings). The cut entrants, who sort
-// last, get nothing.
-void GM_PgaTourSim_DistributeWinnings(int nPlayer, int nTotal, int n) {
+// GM_Earnings_TournamentPayout(nPurse, nFirstPrize, row), and the entrants tied on a place split
+// the rows they fill (SplitWinnings). The cut entrants, who sort last, get nothing.
+void GM_PgaTourSim_DistributeWinnings(int nPlayer, int nPurse, int nFirstPrize) {
     s32 nRow;
     s32 nRank = -1;
     s32 nPool = 0;
@@ -1811,8 +1810,12 @@ void GM_PgaTourSim_DistributeWinnings(int nPlayer, int nTotal, int n) {
             break;
         }
         if (nRow < 70) {
-            nPool += GM_Earnings_TournamentPayout(nTotal, n, nRow);
+            nPool += GM_Earnings_TournamentPayout(nPurse, nFirstPrize, nRow);
         }
+        // EA bug: after row 70 no new place starts, so an entrant below the 70th row who made the
+        // cut is counted into the last paid place even with a worse score, and takes a share of
+        // that place's prizes from the golfers who earned them. It happens when more than 70
+        // make the cut (ties at 70th all do, CalculateCutRow; the field is 100 to 127).
         nTied++;
     }
     SplitWinnings(nPlayer, nPool, nFirstRow, nTied);
@@ -1848,7 +1851,9 @@ s32 StatRankIncreasing(const void* pA, const void* pB) {
                 nRet = 1;
             }
         }
-        // EA bug: nRet is never set when the texts differ but the values are equal.
+        // EA bug: nRet is never set when the texts differ but the values are equal. It cannot
+        // happen here: every value's text comes from GM_PgaTourSim_GetStatValString, so equal
+        // values print the same.
     } else {
         nRet = strcmp(GM_PgaTourSim_GetNameFromGolferID(nPlayer, nGolferA),
                       GM_PgaTourSim_GetNameFromGolferID(nPlayer, nGolferB));
@@ -1874,7 +1879,8 @@ s32 StatRankDecreasing(const void* pA, const void* pB) {
         } else if (fA < fB) {
             nRet = 1;
         }
-        // EA bug: nRet is never set when the texts differ but the values are equal.
+        // EA bug: nRet is never set when the texts differ but the values are equal (it cannot
+        // happen here, as in StatRankIncreasing).
     } else {
         nRet = strcmp(GM_PgaTourSim_GetNameFromGolferID(nPlayer, nGolferA),
                       GM_PgaTourSim_GetNameFromGolferID(nPlayer, nGolferB));
@@ -1947,7 +1953,7 @@ s32 TournamentRankIncreasingForCutEntrants(const void* pA, const void* pB) {
 // Empty in this build. GM_PgaTourSim_CheckEndOfTournamentAward calls it each time the player wins
 // an award, with a movie number and a count (TW07's movieIndex and numRandom): TW07's name says it
 // plays the award's video.
-void PlayPGAAwardVideo(int nA, int nB) {
+void PlayPGAAwardVideo(int nMovie, int nNumRandom) {
 }
 
 // Sets gbStatsDirty: 1 makes the next statistic getter work every statistic out again
@@ -1971,14 +1977,16 @@ u8 (*gPgaSimpleStatCalcs[GM_PGA_STAT_SIMPLE_COUNT])(PgaStatCounts* pCounts, f32*
     CalcTotalEagles, CalcTotalBirdies, CalcConsecutiveCuts, CalcSeasonWinnings, CalcCareerWinnings,
     CalcRounds, CalcPlayerOfYearPoints,
 };
-// Per statistic: its ranking's sort comparison, StatRankDecreasing where higher is better, StatRankIncreasing
-// where lower is (GM_PgaTourSim_IsLeaderForStat compares the same way).
+// Per statistic: its ranking's sort comparison, StatRankDecreasing where higher is better,
+// StatRankIncreasing where lower is (GM_PgaTourSim_IsLeaderForStat compares the same way).
 s32 (*gPgaStatCompares[GM_PGA_STAT_COUNT])(const void* pA, const void* pB) = {
-    StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankIncreasing, StatRankIncreasing, StatRankDecreasing, StatRankDecreasing,
-    StatRankDecreasing, StatRankIncreasing, StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankDecreasing,
-    StatRankIncreasing, StatRankDecreasing, StatRankIncreasing, StatRankIncreasing, StatRankIncreasing, StatRankDecreasing, StatRankDecreasing,
-    StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankDecreasing,
-    StatRankIncreasing, StatRankIncreasing, StatRankIncreasing,
+    StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankIncreasing, StatRankIncreasing,
+    StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankIncreasing, StatRankDecreasing,
+    StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankIncreasing,
+    StatRankDecreasing, StatRankIncreasing, StatRankIncreasing, StatRankIncreasing, StatRankDecreasing,
+    StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankDecreasing,
+    StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankIncreasing, StatRankIncreasing,
+    StatRankIncreasing,
 };
 // Per statistic: its view (GM_PgaTourSim_GetStatView). The statistics screen's played column shows
 // the golfer's tournaments for 0 and rounds for 1.

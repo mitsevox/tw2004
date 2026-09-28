@@ -1,11 +1,15 @@
-// fe_stats.c (TW06's fe_stats.c): the front end's PGA TOUR statistics screen. It fills the
-// menus' text for the player's own line in each of the 29 categories and for the leader board of
-// the chosen category (gStatsActiveCategory), from the statistics PGATourSimulation.c keeps.
+// fe_stats.c (TW06's fe_stats.c, TW07's ui_core/frontend/FE_Stats.c): the front end's PGA TOUR
+// statistics screen, FE messages 521 to 526 (the UIStatsRankings_ functions). It fills the menus'
+// text for the player's own line in each of the 29 categories and for the leader board of the
+// chosen category (gStatsActiveCategory), from the statistics PGATourSimulation.c keeps. A
+// category is a screen row; gStatsCategoryStat maps it to the statistic behind it (the longest
+// putt and the Player of the Year points have no row).
 
 #include "game/frontend.h"
 #include "frontend/fe.h"
 #include "game/modes/pgatoursim.h"
 
+// Per category: the title on the screen.
 char* gStatsCategoryTitle[FE_STATS_NUM_CATEGORIES] = {
     "Season Money Leaders", "Career Money Leaders", "All-Around Ranking", "Total Rounds",
     "Scoring Average", "Total Driving", "Longest Drive", "Driving Distance", "Driving Accuracy",
@@ -15,10 +19,13 @@ char* gStatsCategoryTitle[FE_STATS_NUM_CATEGORIES] = {
     "Par 4 Birdie Leaders", "Par 5 Birdie Leaders", "Birdie Conversion", "Par Breakers",
     "Par 3 Performance", "Par 4 Performance", "Par 5 Performance",
 };
+// Per category: the statistic it shows (GM_Pga_StatTypes_t; -1 would mean none, which no category
+// has in this build).
 s32 gStatsCategoryStat[FE_STATS_NUM_CATEGORIES] = {
     24, 25, 28, 26, 14, 29, 19, 0, 1, 30, 2, 3, 4, 5, 6, 7, 23, 21, 8, 22, 9, 10, 11, 12, 13, 15,
     16, 17, 18,
 };
+// Per category: the units its value is printed with (PrintStatsWithUnits).
 StatsUnits gStatsCategoryUnits[FE_STATS_NUM_CATEGORIES] = {
     UNITS_MONEY, UNITS_MONEY, UNITS_NONE, UNITS_NONE, UNITS_NONE, UNITS_NONE, UNITS_YARDS,
     UNITS_YARDS, UNITS_PERCENT, UNITS_NONE, UNITS_PERCENT, UNITS_NONE, UNITS_NONE, UNITS_PERCENT,
@@ -27,6 +34,7 @@ StatsUnits gStatsCategoryUnits[FE_STATS_NUM_CATEGORIES] = {
     UNITS_NONE,
 };
 
+// The category the leader board shows (UIStatsRankings_SetActiveStat).
 s32 gStatsActiveCategory;
 
 // Prints a statistic's value text with its units into szOut: as it is, as money with thousands
