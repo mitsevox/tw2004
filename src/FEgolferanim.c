@@ -105,10 +105,10 @@ u8   FE_IsGolferInOtherSlot(int nGolfer, CrAPGolfer* pGolfer);
 void FE_vLoadNextCrAPAnim(u8 bNoBlend);
 Clip* FE_CrapGetIdleAnim(void);
 void FE_ZoomCrAPModel(u8 bZoom);
-void fn_8008EA44(u8 b);
-void fn_8008EBB4(void);
-void fn_8008EBE4(void);
-void fn_8008EC0C(f32* pA, f32* pB, f32* pOut);
+void FE_CRAPSetHandednessForScreen(u8 b);
+void FE_OpenGolferStream(void);
+void FE_CloseGolferStream(void);
+void FE_Vec4Sub(f32* pA, f32* pB, f32* pOut);
 void FE_CharMgrInit(void);
 
 void fn_80007254(void);
@@ -358,19 +358,19 @@ void FE_StreamFunc_IdleInterrupt(void) {
 }
 
 // The skin state's start: open the stream of the front-end character file of the golfer being
-// loaded (pB8; fn_80014DFC, fn_8008EBB4) and note his id as streamed (n14, n8C); n190 counts the
+// loaded (pB8; fn_80014DFC, FE_OpenGolferStream) and note his id as streamed (n14, n8C); n190 counts the
 // loads.
 void FE_StreamFunc_SkinInit(void) {
     fn_80014DFC(lbl_80281EE0->pB8->nC, lbl_80281EE0->pB8->n10);
-    fn_8008EBB4();
+    FE_OpenGolferStream();
     lbl_80281EE0->pB8->n14 = lbl_80281EE0->pB8->nC;
     lbl_80281EE0->n8C = lbl_80281EE0->pB8->nC;
     lbl_80281EE0->n190++;
 }
 
-// Close the golfer's stream (fn_8008EBE4).
+// Close the golfer's stream (FE_CloseGolferStream).
 void FE_StreamFunc_SkinClose(void) {
-    fn_8008EBE4();
+    FE_CloseGolferStream();
 }
 
 // Run the stream until it has nothing left to do, then finish the state; after an interrupt the
@@ -1078,9 +1078,10 @@ void FE_RenderGolfer(u8 bFull) {
 // Set the golfer shown up for the screen kind (n0; n1C notes the kind he was set up for): facing
 // front, and on kinds 0, 1, 2 and 4 his morph state reset, a club selected (5 or 3), his first clip
 // (Char_SetClip 0) played and the club switched to the one that clip holds (its u90 in
-// gClubBoneIds; 0 if none); kinds 1 and 4 take the profile's handedness (fn_8008EA44). Kind 3
-// (create-a-player) clears its queued animation and close-up state and starts his idle animation
-// (FE_vLoadNextCrAPAnim). The display then fades in from 0 (f14C).
+// gClubBoneIds; 0 if none); kinds 1 and 4 take the profile's handedness
+// (FE_CRAPSetHandednessForScreen). Kind 3 (create-a-player) clears its queued animation and
+// close-up state and starts his idle animation (FE_vLoadNextCrAPAnim). The display then fades in
+// from 0 (f14C).
 void FE_SetupCharState(void) {
     Clip* pClip;
     int i;
@@ -1120,7 +1121,7 @@ void FE_SetupCharState(void) {
     case 4:
         lbl_80281EE0->f19C = 0.0f;
         lbl_80281EE0->f1A0 = 0.0f;
-        fn_8008EA44(FE_GetCurrentProfile()->choices.n113);
+        FE_CRAPSetHandednessForScreen(FE_GetCurrentProfile()->choices.n113);
         CharacterState_ResetMorphState(lbl_80281EE0->pB4->pChar, 1);
         fn_800957B0(lbl_80281EE0->pB4->pChar, 1);
         Character_SelectClub(lbl_80281EE0->pB4->pChar, 3);
@@ -1156,9 +1157,9 @@ void FE_SetupCharState(void) {
         lbl_80281EE0->b1C8 = 0;
         lbl_80281EE0->n50 = 0;
         lbl_80281EE0->b1DC = 0;
-        fn_8008EAE0(-1);
-        fn_8008EAF8(-1);
-        fn_8008EA44(0);
+        FE_SetLastCrAPAsset(-1);
+        FE_SetLastCrAPCategory(-1);
+        FE_CRAPSetHandednessForScreen(0);
         lbl_80281EE0->f19C = 0.0f;
         lbl_80281EE0->f1A0 = 0.0f;
         FE_vLoadNextCrAPAnim(0);
@@ -1216,10 +1217,10 @@ void FE_CharPositionOverwrite(void) {
         pBallBone = &pModel->pBones[CharModel_GetBoneIndex(pModel, 0x54)];
     }
     if (lbl_80281EE0->pB4->pChar->u10 & 0x4000) {
-        fn_8008EC0C(pClubBone->v1C, pWaistBone->v1C, vClubPos);
+        FE_Vec4Sub(pClubBone->v1C, pWaistBone->v1C, vClubPos);
     }
     if (bBallExists) {
-        fn_8008EC0C(pBallBone->v1C, pWaistBone->v1C, vBallPos);
+        FE_Vec4Sub(pBallBone->v1C, pWaistBone->v1C, vBallPos);
     }
     // EA's code subtracts each value from itself, which zeroes it.
     if (lbl_80281EE0->pB4->pChar->u10 & 0x4000) {
@@ -1386,7 +1387,7 @@ void FE_SetProfileLeftHanded(int nProfile, s8 n) {
 // camera kind's idle clip (FE_CrapGetIdleAnim); n1B4 counts the idles, and after the fifth (not
 // zoomed) the clip is picked with club 2 instead of 0, the zoom is reset and on camera kinds 0 and
 // 2 he turns back to face front (b1C8 keeps the pad from turning him meanwhile). A clip with pD8
-// set takes the profile's handedness (fn_8008EA44; he is turned to face PI when he becomes
+// set takes the profile's handedness (FE_CRAPSetHandednessForScreen; he is turned to face PI when he becomes
 // left-handed), any other is played right-handed.
 void FE_vLoadNextCrAPAnim(u8 bNoBlend) {
     View* pView;
@@ -1433,12 +1434,12 @@ void FE_vLoadNextCrAPAnim(u8 bNoBlend) {
         if (!Character_IsLeftHanded(lbl_80281EE0->pB4->pChar) && FE_GetCurrentProfile()->choices.n113 != 0) {
             FE_SetCrapRotation(0, PI);
         }
-        fn_8008EA44(FE_GetCurrentProfile()->choices.n113);
+        FE_CRAPSetHandednessForScreen(FE_GetCurrentProfile()->choices.n113);
     } else {
         if (Character_IsLeftHanded(lbl_80281EE0->pB4->pChar)) {
             FE_SetCrapRotation(0, 0.0f);
         }
-        fn_8008EA44(0);
+        FE_CRAPSetHandednessForScreen(0);
     }
     lbl_80281EE0->sz10[0] = '\0';
     Character_PlayClip(lbl_80281EE0->pB4->pChar, pClip, !bNoBlend, 0.5f);
@@ -1622,12 +1623,12 @@ u8 FE_vTriggerCrAPAnimAndCamera(char* szAnim, char* szShot, u8 bNoBlend) {
                 != 0) {
                 FE_SetCrapRotation(0, PI);
             }
-            fn_8008EA44(FE_GetCurrentProfile()->choices.n113);
+            FE_CRAPSetHandednessForScreen(FE_GetCurrentProfile()->choices.n113);
         } else {
             if (Character_IsLeftHanded(lbl_80281EE0->pB4->pChar)) {
                 FE_SetCrapRotation(0, 0.0f);
             }
-            fn_8008EA44(0);
+            FE_CRAPSetHandednessForScreen(0);
         }
         Character_PlayClip(lbl_80281EE0->pB4->pChar, pClip, !bNoBlend, 0.5f);
         strcpy(lbl_80281EE0->sz10, szAnim);
@@ -1772,11 +1773,14 @@ void FE_QueueBallChange(char* sz) {
     strncpy(lbl_80281EE0->sz54, sz, sizeof(lbl_80281EE0->sz54));
 }
 
-int fn_8008E9A8(void) {
+int FE_GetCrapRenderState(void) {
     return lbl_80281EE0->n8;
 }
 
-void fn_8008E9B4(void) {
+// Blend the club screen's idle clip (clip state 8, looked up with the wedge in hand) in again from
+// its start; the golfer keeps his club (n1B8, FE_SetCrapClub). FE_CrAP_TurnOnAsset uses it when a
+// club asset goes on while the clubs are shown.
+void FE_RestartClubIdleAnim(void) {
     Clip* pClip;
 
     Character_SelectClub(lbl_80281EE0->pB4->pChar, 5);
@@ -1787,12 +1791,15 @@ void fn_8008E9B4(void) {
     Character_SelectClub(lbl_80281EE0->pB4->pChar, lbl_80281EE0->n1B8);
 }
 
-void fn_8008EA38(u8 b) {
+// Set b81, the flag for new textures on the golfer: a texture load's end and a new asset or logo
+// set it, switching a swap in clears it. Nothing reads it in this build.
+void FE_SetNewTexturesFlag(u8 b) {
     lbl_80281EE0->b81 = b;
 }
 
-// Golfers 7 and 29 only: pass b on to the character and rebuild its model.
-void fn_8008EA44(u8 b) {
+// Make the golfer shown left-handed (bLefty) or right-handed and rebuild his skeleton to match;
+// only the created golfers (7 and 29) change hands.
+void FE_CRAPSetHandednessForScreen(u8 b) {
     if (lbl_80281EE0->pB4 != NULL && lbl_80281EE0->pB4->pChar != NULL) {
         if (lbl_80281EE0->pB4->pChar->nC != 7) {
             // fake match: a one-case switch keeps the original's branch over a branch
@@ -1808,40 +1815,51 @@ void fn_8008EA44(u8 b) {
     }
 }
 
-u8 fn_8008EAB0(void) {
+u8 FE_GetClubStatesAllowed(void) {
     return lbl_80281EE0->b1D1;
 }
 
-void fn_8008EABC(u8 b) {
+// 0: the next Character_SetClubStatesForCharacter in the front end leaves the golfer's clubs as
+// they are and sets it back to 1; FE_CrAP_TurnOnAsset clears it when a club asset goes on, so the
+// new club skin is kept.
+void FE_SetClubStatesAllowed(u8 b) {
     lbl_80281EE0->b1D1 = b;
 }
 
-void fn_8008EAC8(u8 b) {
+// 1 once a texture swap has loaded and waits to be switched in
+// (Character_EndSwapTexturesCallbackFE); Character_ExecuteTextureSwapFE switches only then, and
+// clears it.
+void FE_SetTextureSwapDue(u8 b) {
     lbl_80281EE0->b1D2 = b;
 }
 
-u8 fn_8008EAD4(void) {
+u8 FE_IsTextureSwapDue(void) {
     return lbl_80281EE0->b1D2;
 }
 
-void fn_8008EAE0(int n) {
+// The slider asset last shown (its n0; -1: none): sApplySlider turns the golfer to the front when
+// another comes.
+void FE_SetLastCrAPAsset(int n) {
     lbl_80281EE0->n1D4 = n;
 }
 
-int fn_8008EAEC(void) {
+int FE_GetLastCrAPAsset(void) {
     return lbl_80281EE0->n1D4;
 }
 
-void fn_8008EAF8(int n) {
+// The part (TW07's category) of the asset last put on (-1: none): FE_CrAP_TurnOnAsset turns the
+// golfer to the front when the part changes.
+void FE_SetLastCrAPCategory(int n) {
     lbl_80281EE0->n1D8 = n;
 }
 
-int fn_8008EB04(void) {
+int FE_GetLastCrAPCategory(void) {
     return lbl_80281EE0->n1D8;
 }
 
-// The golfer shown is ready and b86, b88, lbl_80281F19, lbl_801D87C0.b0 and .b49 are all 0.
-u8 fn_8008EB10(void) {
+// Whether the menu golfer is updated and drawn this frame (gomainloop): the golfer shown is ready
+// (b18) and b86, b88, lbl_80281F19, lbl_801D87C0.b0 and .b49 are all 0.
+u8 FE_IsGolferRenderAllowed(void) {
     u8 bResult = 0;
 
     if (lbl_80281EE0->pB4->b18 && lbl_80281EE0->b86 == 0 && lbl_80281EE0->b88 == 0 && lbl_80281F19 == 0
@@ -1851,7 +1869,10 @@ u8 fn_8008EB10(void) {
     return bResult;
 }
 
-void fn_8008EB70(void) {
+// After an asset preview is undone (FE_CrAP_RestoreLastRemovedAsset): drop the queued animation,
+// start the golfer's next animation at once, cut in (FE_vLoadNextCrAPAnim), and stop delaying
+// texture swaps.
+void FE_ResetCrAPGolferFromPreview(void) {
     FE_QueueCrAPAnim(NULL, NULL, 0, 0);
     FE_vLoadNextCrAPAnim(0);
     FE_SetDelayTextureSwap(0, 0.0f);
@@ -1862,13 +1883,15 @@ void fn_8008EB70(void) {
 void UStream_Close();
 s32 Stream_OpenStreamFiles();
 
-void fn_8008EBB4(void) {
+// Open the stream of stream list 3, the front-end golfer file fn_80014DFC puts there, and keep it
+// in lbl_80280DF8->nStream.
+void FE_OpenGolferStream(void) {
     s32 t0;
     t0 = Stream_OpenStreamFiles(&lbl_80280DF8->aParams[3]);
     lbl_80280DF8->nStream = t0;
 }
 
-void fn_8008EBE4(void) {
+void FE_CloseGolferStream(void) {
     UStream_Close(lbl_80280DF8->nStream);
 }
 
@@ -1876,7 +1899,7 @@ void fn_8008EBE4(void) {
 
 // Four floats: pOut gets pA minus pB.
 #ifdef __MWERKS__
-asm void fn_8008EC0C(register f32* pA, register f32* pB, register f32* pOut) {
+asm void FE_Vec4Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 0, 0
@@ -1890,7 +1913,7 @@ asm void fn_8008EC0C(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_8008EC0C(f32* pA, f32* pB, f32* pOut) {
+void FE_Vec4Sub(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];

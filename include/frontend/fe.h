@@ -74,7 +74,7 @@ typedef struct FEScreen {
     u8  unk41[0x44 - 0x41];
     f32 fFade;                  // 0x44  the fade to black before a movie, 0 to 1
     u8  b48;                    // 0x48  cleared by fn_800905A8
-    u8  b49;                    // 0x49  FEgolferanim.c's fn_8008EB10 tests it
+    u8  b49;                    // 0x49  FEgolferanim.c's FE_IsGolferRenderAllowed tests it
     u8  unk4A[0x4C - 0x4A];
 } FEScreen;
 LAYOUT_ASSERT(FEScreen, 0x4C);
@@ -259,7 +259,7 @@ LAYOUT_ASSERT(FEGolferMachine, 0xC);
 // A Create-A-Player asset (0x118 bytes): a hat, a shirt, a colour... The 'CR_A' stream object is
 // the array of them all (FE_CrAP_LoadAssetsFromStream). Only what the cleaned code reads.
 typedef struct CrAPAsset {
-    s32  n0;                    // 0x000  part 18's assets pass it to fn_8008EAE0 (sApplySlider)
+    s32  n0;                    // 0x000  part 18's assets pass it to FE_SetLastCrAPAsset (sApplySlider)
     char szName[0x28 - 0x4];    // 0x004  "White", "Bright Red", "... backwards" ...
     s16  nPart;                 // 0x028  the part it is a choice for
     s16  nCategory;             // 0x02A  its category: where the category's name ("Hats",
@@ -498,17 +498,17 @@ void FE_SetCrapRenderState(int n);
 void FE_SetTempCrapRenderState(int n);
 u8   FE_SetDelayTextureSwap(u8 b, f32 f);
 void FE_QueueBallChange(char* sz);
-int  fn_8008E9A8(void);
-void fn_8008E9B4(void);
-void fn_8008EA38(u8 b);
-u8   fn_8008EAB0(void);
-u8   fn_8008EAD4(void);
-void fn_8008EABC(u8 b);
-void fn_8008EAE0(int n);
-int  fn_8008EAEC(void);
-void fn_8008EAF8(int n);
-int  fn_8008EB04(void);
-void fn_8008EB70(void);
+int  FE_GetCrapRenderState(void);
+void FE_RestartClubIdleAnim(void);
+void FE_SetNewTexturesFlag(u8 b);
+u8   FE_GetClubStatesAllowed(void);
+u8   FE_IsTextureSwapDue(void);
+void FE_SetClubStatesAllowed(u8 b);
+void FE_SetLastCrAPAsset(int n);
+int  FE_GetLastCrAPAsset(void);
+void FE_SetLastCrAPCategory(int n);
+int  FE_GetLastCrAPCategory(void);
+void FE_ResetCrAPGolferFromPreview(void);
 
 // ---- the logo editor (FE_LogoDesign.c) -------------------------------------------------------
 

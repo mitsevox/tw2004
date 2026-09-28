@@ -186,7 +186,7 @@ void  FE_StreamSetNextState(int nNext);           // FEgolferanim.c
 u8    FE_IsTextureSwapDone(void);                // FEgolferanim.c
 void  FE_SetTextureSwapState(s32 v);
 u8    FE_GetDelayTextureSwap(void);
-void  fn_8008EAC8(u8 v);
+void  FE_SetTextureSwapDue(u8 v);
 void  fn_800C937C(void);
 void  fn_800C9764(void);
 void  fn_800C9FE0(void);
@@ -1385,7 +1385,7 @@ void Character_BeginLoadTexturesCallbackFE(Character* pArg) {
     Character* pChar = (Character*)(void*)pArg;
     void* pModel = pChar->apDynTex[pChar->nCurDynTex];
 
-    fn_8008EAC8(0);
+    FE_SetTextureSwapDue(0);
     pChar->pDynTex = pModel;
     fn_8010BC88(&pChar->pBank);
     // port: EA passes an argument fn_8010BEC4 ignores
@@ -1399,13 +1399,13 @@ void Character_BeginLoadTexturesCallbackFE(Character* pArg) {
 
 // The front end's end callback of a texture load (the golfer that came in): passes the skins'
 // choices down to copy 0, puts the profile's logos on the model in use, and sets the menu's b81
-// (fn_8008EA38).
+// (FE_SetNewTexturesFlag).
 void Character_EndLoadTexturesCallbackFE(Character* pChar) {
     Character_CopySkinChoices2To1(pChar);
     Character_CopySkinChoices1To0(pChar);
     sApplyUserLogos(pChar, pChar->apDynTex[pChar->nCurDynTex], &FE_GetCurrentProfile()->choices);
     fn_8010BA2C(pChar->apDynTex[pChar->nCurDynTex]);
-    fn_8008EA38(1);
+    FE_SetNewTexturesFlag(1);
 }
 
 // The front end's begin callback of a texture swap (the golfer shown): copies the model in use to
@@ -1443,7 +1443,7 @@ void Character_BeginSwapTexturesCallbackFE(Character* pArg) {
     ((void (*)(void*))fn_8010BED4)(pModel);
 }
 
-// Once a swap is due (fn_8008EAD4, set by Character_EndSwapTexturesCallbackFE): switches the
+// Once a swap is due (FE_IsTextureSwapDue, set by Character_EndSwapTexturesCallbackFE): switches the
 // character to its other model, the one the swap loaded, passes the skins' choices down to copy 0
 // and puts the profile's logos and the skins on it.
 void Character_ExecuteTextureSwapFE(Character* pChar) {
@@ -1451,8 +1451,8 @@ void Character_ExecuteTextureSwapFE(Character* pChar) {
     int i;
     void* pModel;
 
-    if (fn_8008EAD4()) {
-        fn_8008EAC8(0);
+    if (FE_IsTextureSwapDue()) {
+        FE_SetTextureSwapDue(0);
         FE_SetTextureSwapState(0);
         pChar->nCurDynTex = 1 - pChar->nCurDynTex;
         pModel = pChar->apDynTex[pChar->nCurDynTex];
@@ -1468,11 +1468,11 @@ void Character_ExecuteTextureSwapFE(Character* pChar) {
 }
 
 // The front end's end callback of a texture swap: passes the skins' choices down to copy 1, flags
-// the swap due (fn_8008EAC8) and, unless the menu delays it (FE_GetDelayTextureSwap), swaps now.
+// the swap due (FE_SetTextureSwapDue) and, unless the menu delays it (FE_GetDelayTextureSwap), swaps now.
 void Character_EndSwapTexturesCallbackFE(Character* pChar) {
     Character_CopySkinChoices2To1(pChar);
     FE_SetTextureSwapState(2);
-    fn_8008EAC8(1);
+    FE_SetTextureSwapDue(1);
     if (FE_GetDelayTextureSwap() == 0) {
         Character_ExecuteTextureSwapFE(pChar);
     }
@@ -3247,7 +3247,7 @@ void Character_SwapTexPalettes(u8* pData, int nBytes) {
 // golfer's gGolferTable row found by its id nC (row 7 itself for golfer 7 while gSession.uFlags has
 // 0x4000), each class's part variant and its head, shaft and grip sets; then the clubs are mirrored
 // for a left-handed golfer. In the front end (game type 3) a call while the menu golfer's b1D1 is
-// clear only sets it (fn_8008EABC) and returns. nSlot is not used; nothing without a character or
+// clear only sets it (FE_SetClubStatesAllowed) and returns. nSlot is not used; nothing without a character or
 // its club set.
 void Character_SetClubStatesForCharacter(Character* pChar, int nSlot, SkinChoices* pChoices) {
     int nGolfer;
@@ -3255,8 +3255,8 @@ void Character_SetClubStatesForCharacter(Character* pChar, int nSlot, SkinChoice
     u64 uVariant;
 
     if (pChar == NULL || pChar->pClubSet == NULL) return;
-    if (gSession.nGameType == 3 && !fn_8008EAB0()) {
-        fn_8008EABC(1);
+    if (gSession.nGameType == 3 && !FE_GetClubStatesAllowed()) {
+        FE_SetClubStatesAllowed(1);
         return;
     }
     if (pChoices == NULL) {

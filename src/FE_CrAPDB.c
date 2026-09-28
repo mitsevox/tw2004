@@ -422,7 +422,7 @@ void sTurnOnLogo(s16 nPart, int b, int i) {
     s32 nSet;
     s32 nVariant;
 
-    fn_8008EA38(1);
+    FE_SetNewTexturesFlag(1);
     pSkin = lbl_80281EE0->pB4->pChar->pSkin;
     FE_SetDelayTextureSwap(0, 0.0f);
     SKA_PackName(&uSetId, lbl_801937C8[b]);
@@ -446,14 +446,14 @@ void sTurnOnLogo(s16 nPart, int b, int i) {
 }
 
 // Part 18 (the body sliders): show the slider asset on the menu golfer. The golfer turns to the
-// front when the asset's n0 differs from the last one shown (kept by fn_8008EAE0), then plays the
+// front when the asset's n0 differs from the last one shown (kept by FE_SetLastCrAPAsset), then plays the
 // asset's animation n112 with its camera shot n114 unless that animation already plays.
 void sApplySlider(CrAPAsset* pAsset) {
     FE_SetDelayTextureSwap(0, 0.0f);
-    if (pAsset->n0 != fn_8008EAEC()) {
+    if (pAsset->n0 != FE_GetLastCrAPAsset()) {
         FE_SetCrapRotation(1, 0.0f);
     }
-    fn_8008EAE0(pAsset->n0);
+    FE_SetLastCrAPAsset(pAsset->n0);
     if (FE_GetCurrentAnimName() == NULL
         || strcmp(FE_GetCurrentAnimName(), FE_CrAP_GetStringFromTable(pAsset->n112)) != 0) {
         if (FE_vTriggerCrAPAnimAndCamera(FE_CrAP_GetStringFromTable(pAsset->n112),
@@ -494,15 +494,15 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
         return;
     }
     nPart = pAsset->nPart;
-    fn_8008EA38(1);
+    FE_SetNewTexturesFlag(1);
     if (FE_CrAP_TryClubSwappingAsset(pAsset)) {
-        fn_8008EABC(0);
+        FE_SetClubStatesAllowed(0);
         Character_RequestClothesUpdateFE(lbl_80281EE0->pB4->n10);
         if (stricmp(FE_CrAP_GetStringFromTable(pAsset->n112), "gdlcrp07") == 0 ||
             stricmp(FE_CrAP_GetStringFromTable(pAsset->n112), "fdlcrp07") == 0) {
             fAngle = 4.0f;
             FE_SetCrapRenderState(0);
-        } else if (fn_8008E9A8() != 1) {
+        } else if (FE_GetCrapRenderState() != 1) {
             FE_SetTempCrapRenderState(1);
             if (stricmp(FE_CrAP_GetStringFromTable(pAsset->nCategory), "Fairway Woods") == 0) {
                 FE_SetTempCrapClub(1);
@@ -514,14 +514,14 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
                 FE_SetTempCrapClub(2);
             }
         } else {
-            fn_8008E9B4();
+            FE_RestartClubIdleAnim();
             bLoop = 1;
             nPlay = 0;
         }
         FE_CrAP_SaveClubSkinChoices();
         FE_CrAP_ClearEquippedAsset(pAsset);
     } else if (FE_CrAP_TryBallSwappingAsset(pAsset)) {
-        if (fn_8008E9A8() != 2) {
+        if (FE_GetCrapRenderState() != 2) {
             FE_SetTempCrapRenderState(2);
         } else {
             nPlay = 0;
@@ -536,7 +536,7 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
         FE_CrAP_ApplyAssetSets(pAsset, pSkin);
         Character_RequestClothesUpdateFE(lbl_80281EE0->pB4->n10);
         FE_CrAP_SaveBodySkinChoices();
-        if (fn_8008E9A8() != 0) {
+        if (FE_GetCrapRenderState() != 0) {
             FE_SetTempCrapRenderState(0);
         }
     }
@@ -552,10 +552,10 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
         } else {
             FE_SetAnimRepeatCount(1);
         }
-        if (nPart != fn_8008EB04()) {
+        if (nPart != FE_GetLastCrAPCategory()) {
             FE_SetCrapRotation(1, 0.0f);
         }
-        fn_8008EAF8(nPart);
+        FE_SetLastCrAPCategory(nPart);
     } else {
         FE_SetDelayTextureSwap(1, fAngle);
         FE_QueueCrAPAnim(FE_CrAP_GetStringFromTable(pAsset->n112), FE_CrAP_GetStringFromTable(pAsset->n114),
@@ -622,7 +622,7 @@ void FE_CrAP_RestoreLastRemovedAsset(void) {
             FE_CrAP_TurnOffAsset(pAsset);
         }
     }
-    fn_8008EB70();
+    FE_ResetCrAPGolferFromPreview();
     lbl_802816E8 = -1;
     lbl_802816EC = -1;
 }

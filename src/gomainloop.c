@@ -181,7 +181,7 @@ void FE_SetupCamera(void);
 void FE_vRenderGolferAllPhase1(void);
 void FE_vRenderGolferAllPhase2(void);
 void FE_vFreeUnusedCharacters(void);
-u8   fn_8008EB10(void);
+u8   FE_IsGolferRenderAllowed(void);
 u8   fn_8008F39C(void);
 void fn_8008F648(int n);
 void fn_8008FD60(int n);
@@ -1011,7 +1011,7 @@ void fn_8006D838(void) {
     FE_StreamUpdateState();
     if (ViewController_IsActive(0)) {
         fn_8006C8EC(0);
-        b = fn_8008EB10();
+        b = FE_IsGolferRenderAllowed();
         if (b) {
             FE_vUpdateGolferAll();
             FE_SetupCamera();
