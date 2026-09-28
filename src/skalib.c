@@ -27,40 +27,40 @@ void  AnimLib_FreeCopies(void);
 void  ClipBank_FreeAram(void);
 
 // This file's .bss (character.h), in reverse address order as the compiler lays it out.
-UStreamObject* lbl_801C6488[3];
-u32            lbl_801C647C[3];
-u32            lbl_801C6470[3];
-LibSlot        lbl_801C6068[3];
-AnimLib*       lbl_801C605C[3];
-ClipBank*      lbl_801C6050[3];
-SlotStats      lbl_801C6008[3];
-u8             lbl_801C5E2C[0x1DC];
-u8             lbl_801C5C50[0x1DC];
-u8             lbl_801BF9C0[0x6290];
-u8             lbl_801B9730[0x6290];
+UStreamObject* gClipBankFiles[3];
+u32            gClipBankAramSizes[3];
+u32            gClipBankAram[3];
+LibSlot        gLibSlots[3];
+AnimLib*       gBankLibs[3];
+ClipBank*      gClipBanks[3];
+SlotStats      gClipBankStats[3];
+u8             gSkaFrame2Space[0x1DC];
+u8             gSkaFrame1Space[0x1DC];
+u8             gSkaRangeSpace[0x6290];
+u8             gSkaKeySpace[0x6290];
 
 // This file's .sdata (character.h).
-s32 lbl_80281070 = 3;
-s32 lbl_80281074 = 6;
-u32 lbl_80281078 = 1;
+s32 gTrimMinLeafClips = 3;
+s32 gClipsPerLeaf = 6;
+u32 gCurLibSlot = 1;
 
 // This file's .sbss (character.h), in reverse address order as the compiler lays it out.
-f32            lbl_80281D1C;
+f32            gSlot0BankShare;
 u32            lbl_80281D18;
-char (*lbl_80281D14)[2][8][6][16];
-u32            lbl_80281D0C[2];
-u32            lbl_80281D04[2];
-s16*           lbl_80281D00;
-s16*           lbl_80281CFC;
-s16*           lbl_80281CF8;
-s32            lbl_80281CF4;
-s32            lbl_80281CF0;
-s32            lbl_80281CEC;
-s32            lbl_80281CE8;
-u8             lbl_80281CE4;
-UStreamObject* lbl_80281CE0;
-u32            lbl_80281CDC;
-u8             lbl_80281CD8;
+char (*gLastReactionClips)[2][8][6][16];
+u32            gLentBankAramSizes[2];
+u32            gLentBankAram[2];
+s16*           gBuildClubNode;
+s16*           gBuildStyleNode;
+s16*           gBuildGroupNode;
+s32            gWalkKey;
+s32            gWalkClub;
+s32            gWalkStyle;
+s32            gWalkGroup;
+u8             gSacReloading;
+UStreamObject* gClipBankRestoreFile;
+u32            gClipBankBudget;
+u8             gSlotsDoubleBuffered;
 
 // The clip with this name, or NULL.
 void* AnimLib_FindByName(AnimLib* pLib, const char* pName) {
@@ -83,38 +83,38 @@ void SKALIB_InitModule(void) {
     int i;
     s32 j;
 
-    lbl_801C605C[0] = NULL;
-    lbl_801C6050[0] = NULL;
-    lbl_801C605C[1] = NULL;
-    lbl_801C6050[1] = NULL;
-    lbl_801C605C[2] = NULL;
-    lbl_801C6050[2] = NULL;
+    gBankLibs[0] = NULL;
+    gClipBanks[0] = NULL;
+    gBankLibs[1] = NULL;
+    gClipBanks[1] = NULL;
+    gBankLibs[2] = NULL;
+    gClipBanks[2] = NULL;
     lbl_801D9908[0] = 0;
     for (i = 0; i < 3; i++) {
-        lbl_801C6068[i].n150      = 0;
-        lbl_801C6068[i].nOverlays = 0;
-        lbl_801C6068[i].pLib      = NULL;
-        lbl_801C6068[i].pCopy     = NULL;
+        gLibSlots[i].n150      = 0;
+        gLibSlots[i].nOverlays = 0;
+        gLibSlots[i].pLib      = NULL;
+        gLibSlots[i].pCopy     = NULL;
         for (j = 0; j < 10; j++) {
-            lbl_801C6068[i].overlays[j].bActive = 0;
-            lbl_801C6068[i].overlays[j].n10     = -1;
-            lbl_801C6068[i].overlays[j].n14     = -1;
-            lbl_801C6068[i].overlays[j].pCopy   = NULL;
-            lbl_801C6068[i].overlays[j].pWork   = NULL;
+            gLibSlots[i].overlays[j].bActive = 0;
+            gLibSlots[i].overlays[j].n10     = -1;
+            gLibSlots[i].overlays[j].n14     = -1;
+            gLibSlots[i].overlays[j].pCopy   = NULL;
+            gLibSlots[i].overlays[j].pWork   = NULL;
         }
     }
     if (gSession.nGameType == 3 || gSession.nGameType == 10) {
         lbl_80281D18 = 0;
     }
-    lbl_80281D14 = StaticMem_Alloc(4 * sizeof(*lbl_80281D14), 2, 0, "skalib.c", 508);   // four players
-    Mem_set(lbl_80281D14, 0, 4 * sizeof(*lbl_80281D14));
-    gSKAAram8BitFrame = lbl_801C5E2C;
+    gLastReactionClips = StaticMem_Alloc(4 * sizeof(*gLastReactionClips), 2, 0, "skalib.c", 508);   // four players
+    Mem_set(gLastReactionClips, 0, 4 * sizeof(*gLastReactionClips));
+    gSKAAram8BitFrame = gSkaFrame2Space;
     gSKAAram8BitFrame = (u8*)((((uptr)gSKAAram8BitFrame >> 5) + 1) << 5);
-    gSKAAram16BitFrame = lbl_801C5C50;
+    gSKAAram16BitFrame = gSkaFrame1Space;
     gSKAAram16BitFrame = (u8*)((((uptr)gSKAAram16BitFrame >> 5) + 1) << 5);
-    gSKAAramRanges = lbl_801BF9C0;
+    gSKAAramRanges = gSkaRangeSpace;
     gSKAAramRanges = (u8*)((((uptr)gSKAAramRanges >> 5) + 1) << 5);
-    gSKAAramKeys = lbl_801B9730;
+    gSKAAramKeys = gSkaKeySpace;
     gSKAAramKeys = (u8*)((((uptr)gSKAAramKeys >> 5) + 1) << 5);
 }
 
@@ -128,19 +128,19 @@ void SKALIB_CloseModule(void) {
     int i;
 
     AnimLib_FreeCopies();
-    StaticMem_Free(lbl_80281D14);
-    lbl_80281D14 = NULL;
+    StaticMem_Free(gLastReactionClips);
+    gLastReactionClips = NULL;
     for (i = 0; i < 3; i++) {
-        if (lbl_801C605C[i] != NULL) {
-            AnimLib_Free(lbl_801C605C[i]);
-            lbl_801C605C[i] = NULL;
+        if (gBankLibs[i] != NULL) {
+            AnimLib_Free(gBankLibs[i]);
+            gBankLibs[i] = NULL;
         }
-        if (lbl_801C6050[i] != NULL) {
-            if (lbl_801C6050[i]->pFile == lbl_80281CE0) {
-                lbl_80281CE0 = NULL;
+        if (gClipBanks[i] != NULL) {
+            if (gClipBanks[i]->pFile == gClipBankRestoreFile) {
+                gClipBankRestoreFile = NULL;
             }
-            ClipBank_Free(lbl_801C6050[i]);
-            lbl_801C6050[i] = NULL;
+            ClipBank_Free(gClipBanks[i]);
+            gClipBanks[i] = NULL;
         }
     }
     ClipBank_FreeAram();
@@ -192,7 +192,7 @@ void ClipBank_Free(ClipBank* pBank) {
 // A slot's clip bank (NULL past the three slots).
 ClipBank* ClipBank_Get(u32 nSlot) {
     if (nSlot >= 3) return NULL;
-    return lbl_801C6050[nSlot];
+    return gClipBanks[nSlot];
 }
 
 // The node at offset nOff of a library's tree, or NULL when there is no library or no node.
@@ -213,8 +213,8 @@ static inline s16* fn_80021F50_Get(AnimLib* pLib) {
 // Walks the clip trees of two libraries side by side (either may be NULL) and calls pfn at every
 // position either one has: level 0 with the two libraries' default leaves, 1 each group (its
 // default leaves), 2 each style (no leaves), 3 each club (its default leaves), 4 each key (its
-// leaves); nIndex is the group, style, club or key. The position is also kept in lbl_80281CE8
-// (group), lbl_80281CEC (style), lbl_80281CF0 (club) and lbl_80281CF4 (key), -1 for levels above
+// leaves); nIndex is the group, style, club or key. The position is also kept in gWalkGroup
+// (group), gWalkStyle (style), gWalkClub (club) and gWalkKey (key), -1 for levels above
 // it, for the callbacks. Stops at the first callback result above 0 and returns it; 0 when the walk
 // ends.
 int AnimLib_WalkPair(AnimLib* pA, AnimLib* pB, AnimLibWalkFn pfn, void* pCtx) {
@@ -232,19 +232,19 @@ int AnimLib_WalkPair(AnimLib* pA, AnimLib* pB, AnimLibWalkFn pfn, void* pCtx) {
     s16* pLeafA;
     s16* pLeafB;
 
-    lbl_80281CE8 = -1;
-    lbl_80281CEC = -1;
-    lbl_80281CF0 = -1;
-    lbl_80281CF4 = -1;
+    gWalkGroup = -1;
+    gWalkStyle = -1;
+    gWalkClub = -1;
+    gWalkKey = -1;
     pLeafB = fn_80021F50_Get(pB);
     pLeafA = fn_80021F50_Get(pA);
     nRet = pfn(pA, pB, pLeafA, pLeafB, pCtx, 0, 0);
     if (nRet > 0) return nRet;
     for (nGroup = 0; nGroup < 21; nGroup++) {
-        lbl_80281CE8 = nGroup;
-        lbl_80281CEC = -1;
-        lbl_80281CF0 = -1;
-        lbl_80281CF4 = -1;
+        gWalkGroup = nGroup;
+        gWalkStyle = -1;
+        gWalkClub = -1;
+        gWalkKey = -1;
         pGroupA = SKA_NODE(pA, pA->groups[nGroup]);
         pGroupB = SKA_NODE(pB, pB->groups[nGroup]);
         if (pGroupA == NULL && pGroupB == NULL) continue;
@@ -253,16 +253,16 @@ int AnimLib_WalkPair(AnimLib* pA, AnimLib* pB, AnimLibWalkFn pfn, void* pCtx) {
         nRet = pfn(pA, pB, pLeafA, pLeafB, pCtx, 1, nGroup);
         if (nRet > 0) return nRet;
         for (nStyle = 0; nStyle < 8; nStyle++) {
-            lbl_80281CEC = nStyle;
-            lbl_80281CF0 = -1;
+            gWalkStyle = nStyle;
+            gWalkClub = -1;
             pStyleA = fn_80021F50_Read(pA, pGroupA, 1 + nStyle);
             pStyleB = fn_80021F50_Read(pB, pGroupB, 1 + nStyle);
             if (pStyleA == NULL && pStyleB == NULL) continue;
             nRet = pfn(pA, pB, NULL, NULL, pCtx, 2, nStyle);
             if (nRet > 0) return nRet;
             for (nClub = 0; nClub < 6; nClub++) {
-                lbl_80281CF0 = nClub;
-                lbl_80281CF4 = -1;
+                gWalkClub = nClub;
+                gWalkKey = -1;
                 pClubA = fn_80021F50_Read(pA, pStyleA, nClub);
                 pClubB = fn_80021F50_Read(pB, pStyleB, nClub);
                 if (pClubA == NULL && pClubB == NULL) continue;
@@ -271,7 +271,7 @@ int AnimLib_WalkPair(AnimLib* pA, AnimLib* pB, AnimLibWalkFn pfn, void* pCtx) {
                 nRet = pfn(pA, pB, pLeafA, pLeafB, pCtx, 3, nClub);
                 if (nRet > 0) return nRet;
                 for (nKey = 0; nKey < 11; nKey++) {
-                    lbl_80281CF4 = nKey;
+                    gWalkKey = nKey;
                     pLeafA = fn_80021F50_Read(pA, pClubA, 2 + nKey);
                     pLeafB = fn_80021F50_Read(pB, pClubB, 2 + nKey);
                     nRet = pfn(pA, pB, pLeafA, pLeafB, pCtx, 4, nKey);
@@ -318,10 +318,10 @@ int AnimLib_MergeSizeCb(AnimLib* pLibA, AnimLib* pLib, AnimLeaf* pLeaf, AnimLeaf
     }
     if (pLeaf != NULL) {
         if (pOver != NULL) {
-            if (AnimStream_IsStreamed(lbl_80281CE8, lbl_80281CEC, lbl_80281CF0, lbl_80281CF4)) {
+            if (AnimStream_IsStreamed(gWalkGroup, gWalkStyle, gWalkClub, gWalkKey)) {
                 pOver->uMask |= 2;
                 pLeaf->uMask |= 2;
-            } else if (lbl_80281CE8 == 20) {
+            } else if (gWalkGroup == 20) {
                 pOver->uMask |= 2;
             } else {
                 if (!(pOver->uMask & 1)) {
@@ -334,7 +334,7 @@ int AnimLib_MergeSizeCb(AnimLib* pLibA, AnimLib* pLib, AnimLeaf* pLeaf, AnimLeaf
                     pLeaf->uMask |= 1;
                 }
             }
-        } else if (AnimStream_IsStreamed(lbl_80281CE8, lbl_80281CEC, lbl_80281CF0, lbl_80281CF4)) {
+        } else if (AnimStream_IsStreamed(gWalkGroup, gWalkStyle, gWalkClub, gWalkKey)) {
             pLeaf->uMask |= 2;
         } else {
             pLeaf->uMask &= ~2;
@@ -382,7 +382,7 @@ int AnimLib_MergeReleaseCb(AnimLib* pLibA, AnimLib* pLibB, AnimLeaf* pLeafA, Ani
 // more than one player): their libraries are then reloaded in turn and the bank memory is split
 // between them.
 u8 Skalib_IsDoubleBuffered(void) {
-    return lbl_80281CD8;
+    return gSlotsDoubleBuffered;
 }
 
 // Picks the slot whose libraries the next hole reloads (AnimLib_ReloadSlot), makes it the current
@@ -390,26 +390,26 @@ u8 Skalib_IsDoubleBuffered(void) {
 // it is slot 0 when that has overlays, else slot 1.
 u32 Skalib_NextSlot(void) {
     if (Skalib_IsDoubleBuffered()) {
-        lbl_80281078 = (lbl_80281078 == 0);
+        gCurLibSlot = (gCurLibSlot == 0);
     } else if (Skalib_HasOverlays(0)) {
-        lbl_80281078 = 0;
+        gCurLibSlot = 0;
     } else {
-        lbl_80281078 = 1;
+        gCurLibSlot = 1;
     }
-    return lbl_80281078;
+    return gCurLibSlot;
 }
 
 // The slot Skalib_NextSlot last picked (Skalib_SetBudgets starts it at random); streammanagerhole.c
 // streams that slot's sac file.
 u32 Skalib_CurSlot(void) {
-    return lbl_80281078;
+    return gCurLibSlot;
 }
 
 // Sets the round's clip bank limits: the clips a leaf may keep (all of them with one player, 10
 // with more) and each slot's bank budget (0xE6000 bytes, 920 KB). When slots 0 and 1 both have
 // overlays and there is more than one player they are double buffered, and the 920 KB is split
 // between them by the clip bytes (AnimLib.n140) of each slot's library and overlays: slot 0's share
-// goes into lbl_80281D1C, kept to 44..56%. The current slot starts at random.
+// goes into gSlot0BankShare, kept to 44..56%. The current slot starts at random.
 void Skalib_SetBudgets(void) {
     s32      aKeepSingle[4] = {100000, 10, 10, 10};
     s32      aKeepDouble[4] = {100000, 10, 10, 10};
@@ -425,22 +425,22 @@ void Skalib_SetBudgets(void) {
     aBytes[1] = 0xE6000;
     aBytes[2] = 0xE6000;
     aBytes[3] = 0xE6000;
-    lbl_80281CD8 = 0;
+    gSlotsDoubleBuffered = 0;
     if (!Skalib_HasOverlays(0) || !Skalib_HasOverlays(1)) {
-        lbl_80281074 = aKeepSingle[gSession.nNumPlayers - 1];
-        lbl_80281CDC = aBytes[0];
+        gClipsPerLeaf = aKeepSingle[gSession.nNumPlayers - 1];
+        gClipBankBudget = aBytes[0];
     } else {
         n = gSession.nNumPlayers;
         if (n > 1) {
-            lbl_80281CD8 = 1;
+            gSlotsDoubleBuffered = 1;
         }
-        lbl_80281074 = aKeepDouble[n - 1];
-        lbl_80281CDC = aBytes[n - 1];
+        gClipsPerLeaf = aKeepDouble[n - 1];
+        gClipBankBudget = aBytes[n - 1];
     }
-    lbl_80281078 = (Misc_RandFunc(1) & 1) ^ 1;
-    if (lbl_80281CD8) {
-        pSlot0 = &lbl_801C6068[0];
-        pSlot1 = &lbl_801C6068[1];
+    gCurLibSlot = (Misc_RandFunc(1) & 1) ^ 1;
+    if (gSlotsDoubleBuffered) {
+        pSlot0 = &gLibSlots[0];
+        pSlot1 = &gLibSlots[1];
         nSize0 = pSlot0->pLib->n140;
         nSize1 = pSlot1->pLib->n140;
         for (i = 0; pSlot0->nOverlays > i; i++) {
@@ -449,15 +449,15 @@ void Skalib_SetBudgets(void) {
         for (i = 0; pSlot1->nOverlays > i; i++) {
             nSize1 += pSlot1->overlays[i].pWork->n140;
         }
-        lbl_80281D1C = (f32)nSize0 / (f32)(nSize0 + nSize1);
-        lbl_80281D1C = (lbl_80281D1C < 0.44f) ? 0.44f : ((lbl_80281D1C > 0.56f) ? 0.56f : lbl_80281D1C);
+        gSlot0BankShare = (f32)nSize0 / (f32)(nSize0 + nSize1);
+        gSlot0BankShare = (gSlot0BankShare < 0.44f) ? 0.44f : ((gSlot0BankShare > 0.56f) ? 0.56f : gSlot0BankShare);
     }
 }
 
 f32 Skalib_Random(void);
 
 // Merge walk, trim pass (AnimLib_PlanBank, before the clips are matched): cuts each leaf down to
-// the round's per-leaf limit (lbl_80281074), keeping a run of that many clips from a random start
+// the round's per-leaf limit (gClipsPerLeaf), keeping a run of that many clips from a random start
 // (Skalib_Random); every clip cut loses a user (ClipRecord.n10), and with a context one nobody uses
 // any more comes off its clip count and byte total. A streamed position (fn_800C9828) keeps
 // everything; when pA's leaf is marked 2 (unused) none are kept. Clips cut from pB's leaf also come
@@ -471,12 +471,12 @@ int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
     int         i;
     ClipRecord* pRec;
 
-    if (AnimStream_IsStreamed(lbl_80281CE8, lbl_80281CEC, lbl_80281CF0, lbl_80281CF4)) {
+    if (AnimStream_IsStreamed(gWalkGroup, gWalkStyle, gWalkClub, gWalkKey)) {
         nKeep = 10000;
     } else if (pLeafA != NULL && (pLeafA->uMask & 2)) {
         nKeep = 0;
     } else {
-        nKeep = lbl_80281074;
+        nKeep = gClipsPerLeaf;
     }
     if (pLeafA != NULL && (nCountA = pLeafA->nCount) > nKeep) {
         nStart = (nCountA - nKeep) * Skalib_Random();
@@ -712,7 +712,7 @@ int AnimLib_MarkDropHighestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLe
     return 0;
 }
 
-// Merge walk: the largest clip count of any leaf still in play goes into lbl_80281074.
+// Merge walk: the largest clip count of any leaf still in play goes into gClipsPerLeaf.
 int AnimLib_MaxCountCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx,
                        int nLevel, int nIndex) {
     AnimLeaf* pLeaf;
@@ -727,15 +727,15 @@ int AnimLib_MaxCountCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLe
     }
     if (pLeaf != NULL && pLib != NULL) {
         if (pLeaf->uMask & 2) return 0;
-        if (pLeaf->nCount > lbl_80281074) {
-            lbl_80281074 = pLeaf->nCount;
+        if (pLeaf->nCount > gClipsPerLeaf) {
+            gClipsPerLeaf = pLeaf->nCount;
         }
     }
     return 0;
 }
 
 // Trim walk, drop pass (AnimLib_TrimToFit): takes the flagged clips (ClipRecord.n12 1) out of the
-// leaf (pA's, else pB's, when in use), while the leaf is longer than lbl_80281070; for pB's leaf
+// leaf (pA's, else pB's, when in use), while the leaf is longer than gTrimMinLeafClips; for pB's leaf
 // merged records are followed to the record they point to. Each clip taken out loses a user; one
 // nobody uses any more is dropped (pClip NULL, users -1) and comes off the context's byte total and
 // clip count. Returns 1 (stopping the walk) once the bytes fall under pCtx->nTarget, else 0.
@@ -761,7 +761,7 @@ int AnimLib_DropCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
         if (pLeaf->uMask & 2) return 0;
         pIdx = pLib->pIndex + pLeaf->nFirst;
         for (i = 0; i < pLeaf->nCount; i++) {
-            if (pLeaf->nCount <= lbl_80281070) return 0;
+            if (pLeaf->nCount <= gTrimMinLeafClips) return 0;
             p    = &pIdx[i];
             pRec = &pLib->pRecords[*p];
             if (pLeaf == pLeafB) {
@@ -802,7 +802,7 @@ void* AnimLib_ResolveRecord(AnimLib* pLib, int nRec, ClipRecord* pOut, u8 bLink)
 
 // Merge walk, build pass (AnimLib_MergeOverlay: pA the slot's library, pB the golfer's overlay):
 // writes the merged clip tree into pCtx->pLib (a node for each group, style and club, kept in
-// lbl_80281CF8, lbl_80281CFC and lbl_80281D00 while their children are written, and a leaf wherever
+// gBuildGroupNode, gBuildStyleNode and gBuildClubNode while their children are written, and a leaf wherever
 // either side has one) and fills each leaf's clips, each copied with its record into pCtx->pRecords
 // (AnimLib_ResolveRecord): from the one side that has a leaf, from the overlay alone when its leaf
 // replaces the library's (as AnimLib_MergeSizeCb marked them), or from both, the library's first.
@@ -840,49 +840,49 @@ int AnimLib_BuildCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB
         break;
     case 1:
         pLib->groups[nIndex] = (s16)pLib->nTreeSize;
-        SKA_ALLOC(pLib, lbl_80281CF8, 0x14);
+        SKA_ALLOC(pLib, gBuildGroupNode, 0x14);
         if (bAny) {
-            lbl_80281CF8[0] = pLib->nTreeSize;
+            gBuildGroupNode[0] = pLib->nTreeSize;
             SKA_ALLOC(pLib, pNew, 8);
         } else {
-            lbl_80281CF8[0] = -1;
+            gBuildGroupNode[0] = -1;
         }
         for (i = 0; i < 8; i++) {
-            lbl_80281CF8[1 + i] = -1;
+            gBuildGroupNode[1 + i] = -1;
         }
         break;
     case 2:
-        lbl_80281CF8[1 + nIndex] = pLib->nTreeSize;
-        SKA_ALLOC(pLib, lbl_80281CFC, 0xC);
+        gBuildGroupNode[1 + nIndex] = pLib->nTreeSize;
+        SKA_ALLOC(pLib, gBuildStyleNode, 0xC);
         for (i = 0; i < 6; i++) {
-            lbl_80281CFC[i] = -1;
+            gBuildStyleNode[i] = -1;
         }
         break;
     case 3:
-        lbl_80281CFC[nIndex] = pLib->nTreeSize;
-        SKA_ALLOC(pLib, lbl_80281D00, 0x20);
+        gBuildStyleNode[nIndex] = pLib->nTreeSize;
+        SKA_ALLOC(pLib, gBuildClubNode, 0x20);
         if (bAny) {
-            lbl_80281D00[1] = pLib->nTreeSize;
+            gBuildClubNode[1] = pLib->nTreeSize;
             SKA_ALLOC(pLib, pNew, 8);
         } else {
-            lbl_80281D00[1] = -1;
+            gBuildClubNode[1] = -1;
         }
         for (i = 0; i < 11; i++) {
-            lbl_80281D00[2 + i] = -1;
+            gBuildClubNode[2 + i] = -1;
         }
         break;
     case 4:
         if (bAny) {
-            lbl_80281D00[2 + nIndex] = pLib->nTreeSize;
+            gBuildClubNode[2 + nIndex] = pLib->nTreeSize;
             SKA_ALLOC(pLib, pNew, 8);
         } else {
-            lbl_80281D00[2 + nIndex] = -1;
+            gBuildClubNode[2 + nIndex] = -1;
         }
         break;
     }
     if (pNew == NULL) return 0;
-    bKeep = AnimStream_IsStreamed(lbl_80281CE8, lbl_80281CEC, lbl_80281CF0, lbl_80281CF4);
-    if (lbl_80281CE8 == 20) {
+    bKeep = AnimStream_IsStreamed(gWalkGroup, gWalkStyle, gWalkClub, gWalkKey);
+    if (gWalkGroup == 20) {
         pLeafB = NULL;
     }
     if (pLeafA != NULL && pLeafB == NULL) {
@@ -978,12 +978,12 @@ void* AnimLib_ResolveRecord(AnimLib* pLib, int nRec, ClipRecord* pOut, u8 bLink)
 
 // Whether a slot has overlay libraries.
 int Skalib_HasOverlays(int nSlot) {
-    return lbl_801C6068[nSlot].nOverlays > 0;
+    return gLibSlots[nSlot].nOverlays > 0;
 }
 
 // Cuts a library and its overlays down until their clips fit pCtx->nTarget: rounds of lowering
 // the per-leaf limit, marking the surplus clips to drop (highest n18 first, or at random), and
-// dropping the marked ones from leaves longer than lbl_80281070 (3 down to 1). First the overlays'
+// dropping the marked ones from leaves longer than gTrimMinLeafClips (3 down to 1). First the overlays'
 // clips are marked, then the library's. TRUE when the target was reached.
 u8 AnimLib_TrimToFit(MergeCtx* pCtx, AnimLib* pLib, LibOverlay* pOvs, int nOvs, u8 bBest) {
     int      nRet = 0;
@@ -991,14 +991,14 @@ u8 AnimLib_TrimToFit(MergeCtx* pCtx, AnimLib* pLib, LibOverlay* pOvs, int nOvs, 
     AnimLib* pOvLib;
 
     pCtx->nMaxUsers = 100000;
-    lbl_80281074    = 0;
+    gClipsPerLeaf    = 0;
     AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_MaxCountCb, pCtx);
     for (i = 0; i < nOvs; i++) {
         AnimLib_WalkPair(NULL, pOvs[i].pWork, (AnimLibWalkFn)AnimLib_MaxCountCb, pCtx);
     }
-    pCtx->nKeep = lbl_80281074;
-    for (lbl_80281070 = 3; lbl_80281070 >= 1; lbl_80281070--) {
-        while (pCtx->nKeep > lbl_80281070) {
+    pCtx->nKeep = gClipsPerLeaf;
+    for (gTrimMinLeafClips = 3; gTrimMinLeafClips >= 1; gTrimMinLeafClips--) {
+        while (pCtx->nKeep > gTrimMinLeafClips) {
             pCtx->nKeep--;
             for (i = 0; i < nOvs; i++) {
                 pOvLib = pOvs[i].pWork;
@@ -1021,9 +1021,9 @@ u8 AnimLib_TrimToFit(MergeCtx* pCtx, AnimLib* pLib, LibOverlay* pOvs, int nOvs, 
             }
         }
     }
-    pCtx->nKeep = lbl_80281074;
-    for (lbl_80281070 = 3; lbl_80281070 >= 1; lbl_80281070--) {
-        while (pCtx->nKeep > lbl_80281070) {
+    pCtx->nKeep = gClipsPerLeaf;
+    for (gTrimMinLeafClips = 3; gTrimMinLeafClips >= 1; gTrimMinLeafClips--) {
+        while (pCtx->nKeep > gTrimMinLeafClips) {
             pCtx->nKeep--;
             if (bBest) {
                 AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_MarkDropHighestCb, pCtx);
@@ -1052,18 +1052,18 @@ static f32 skalib_StrippedFn(f32 x) {
 // leaves the merge will not use are released (AnimLib_MergeSizeCb, AnimLib_MergeReleaseCb), and
 // each overlay clip is matched by name against the library's and earlier overlays' clips: a match
 // shares the first one's record (flag 2 when it is the library's, 0x10 an overlay's). Outside slot
-// 2, when the result is over the slot's budget (lbl_80281CDC, or its share of 920 KB when double
+// 2, when the result is over the slot's budget (gClipBankBudget, or its share of 920 KB when double
 // buffered), AnimLib_TrimToFit cuts it down with random picks; if that cannot fit, it starts again
 // from saved copies with the best-ranked picks, and if even that cannot fit the budget becomes what
 // is left (and slot 0's share is recomputed when both slots have overlays). What was spent goes
-// into lbl_801C6008. Allocates the bank (slots other than 2 keep one they already have), sets up
+// into gClipBankStats. Allocates the bank (slots other than 2 keep one they already have), sets up
 // its clip table and record area, and returns its size.
 u32 AnimLib_PlanBank(u32 nSlot) {
     // register note: the declaration order gives EA's spill slots (0xC8 pIndexCopy up to 0xEC
     // nHdr, in reverse declaration order) and EA's register colouring order.
     s32         nHdr;
     s32         nIndexSize;
-    LibSlot*    pSlot = &lbl_801C6068[nSlot];
+    LibSlot*    pSlot = &gLibSlots[nSlot];
     u32         nRet  = 0;
     u8          bBoth = 0;
     s32         nRecSize;
@@ -1100,7 +1100,7 @@ u32 AnimLib_PlanBank(u32 nSlot) {
     ClipBank*   pBank;
     int         n;
 
-    if (lbl_801C6068[0].nOverlays != 0 && lbl_801C6068[1].nOverlays != 0) {
+    if (gLibSlots[0].nOverlays != 0 && gLibSlots[1].nOverlays != 0) {
         bBoth = 1;
     }
     if (pSlot->nOverlays == 0) {
@@ -1225,17 +1225,17 @@ u32 AnimLib_PlanBank(u32 nSlot) {
     nRecSize   = ((nClipsAll >> 4) + 1) << 4;
     nTotal     = 0x20 + ctx.nBytes + nIndexSize + nRecSize;
     if (nSlot != 2) {
-        nBudget = lbl_80281CDC;
-        if (lbl_80281CD8) {
+        nBudget = gClipBankBudget;
+        if (gSlotsDoubleBuffered) {
             if (nSlot == 0) {
-                nBudget = 942080.0f * lbl_80281D1C;
+                nBudget = 942080.0f * gSlot0BankShare;
             } else {
-                nBudget = 942080.0f * (1.0f - lbl_80281D1C);
+                nBudget = 942080.0f * (1.0f - gSlot0BankShare);
             }
         }
-        lbl_801C6008[nSlot].nKeep     = lbl_80281074;
-        lbl_801C6008[nSlot].nTrimmed  = 0;
-        lbl_801C6008[nSlot].nBytes    = ctx.nBytes;
+        gClipBankStats[nSlot].nKeep     = gClipsPerLeaf;
+        gClipBankStats[nSlot].nTrimmed  = 0;
+        gClipBankStats[nSlot].nBytes    = ctx.nBytes;
         if (nTotal > nBudget) {
             ctx.pCount   = &nClips;
             nHdr         = 0x20 + nIndexSize + nRecSize;
@@ -1261,10 +1261,10 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                 Mem_cpy(apTree[i], pOvs[i].pWork->pTree, pOvs[i].nTree);
             }
             if (!AnimLib_TrimToFit(&ctx, pLib, pOvs, nOvs, 0)) {
-                lbl_801C6008[nSlot].nKeep    = lbl_80281074;
-                lbl_801C6008[nSlot].nTrimmed = 0;
+                gClipBankStats[nSlot].nKeep    = gClipsPerLeaf;
+                gClipBankStats[nSlot].nTrimmed = 0;
                 ctx.nTarget      = nBudget;
-                lbl_801C6008[nSlot].nBytes   = ctx.nBytes;
+                gClipBankStats[nSlot].nBytes   = ctx.nBytes;
                 nClips           = nClipsAll;
                 ctx.nBytes       = nBytesBefore;
                 nBytesBefore2    = ctx.nBytes;
@@ -1282,7 +1282,7 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                         nBudget = ctx.nBytes;
                     } else {
                         nBudget      = ctx.nBytes;
-                        lbl_80281D1C = nBudget / 942080.0f;
+                        gSlot0BankShare = nBudget / 942080.0f;
                     }
                 }
             }
@@ -1294,14 +1294,14 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                 StaticMem_Free(apIndex[i]);
                 StaticMem_Free(apTree[i]);
             }
-            lbl_801C6008[nSlot].nBytes    = ctx.nBytes - nHdr;
-            lbl_801C6008[nSlot].nKeep     = ctx.nKeep;
-            lbl_801C6008[nSlot].nTrimmed  = nBytesBefore2 - ctx.nBytes;
-            lbl_801C6008[nSlot].nMaxUsers = ctx.nMaxUsers;
+            gClipBankStats[nSlot].nBytes    = ctx.nBytes - nHdr;
+            gClipBankStats[nSlot].nKeep     = ctx.nKeep;
+            gClipBankStats[nSlot].nTrimmed  = nBytesBefore2 - ctx.nBytes;
+            gClipBankStats[nSlot].nMaxUsers = ctx.nMaxUsers;
         }
-        lbl_801C6008[nSlot].nBudget = nBudget;
-        lbl_801C6008[nSlot].n04     = 0;
-        pBank = lbl_801C6050[nSlot];
+        gClipBankStats[nSlot].nBudget = nBudget;
+        gClipBankStats[nSlot].n04     = 0;
+        pBank = gClipBanks[nSlot];
         if (pBank == NULL) {
             pBank = StaticMem_Alloc(nBudget, 2, 0x40, "skalib.c", 2159);
         }
@@ -1319,7 +1319,7 @@ u32 AnimLib_PlanBank(u32 nSlot) {
     }
     pBank->pRecords      = (u8*)pBank->ppClips + nIndexSize;
     pSlot->pEnd          = pBank->pRecords + nRecSize;
-    lbl_801C6050[nSlot]  = pBank;
+    gClipBanks[nSlot]  = pBank;
 done:
     return nRet;
 }
@@ -1327,9 +1327,9 @@ done:
 // The scratch area for slot n, uSize bytes: while only one of the first two slots has a bank,
 // it is carved out of that bank; otherwise it is the slot's own bank.
 static inline u8* Skalib_Scratch(int n, u32 uSize) {
-    if (lbl_801C6050[0] != NULL && lbl_801C6050[1] == NULL) return (u8*)lbl_801C6050[0] + n * uSize;
-    if (lbl_801C6050[0] == NULL && lbl_801C6050[1] != NULL) return (u8*)lbl_801C6050[1] + n * uSize;
-    return (u8*)lbl_801C6050[n];
+    if (gClipBanks[0] != NULL && gClipBanks[1] == NULL) return (u8*)gClipBanks[0] + n * uSize;
+    if (gClipBanks[0] == NULL && gClipBanks[1] != NULL) return (u8*)gClipBanks[1] + n * uSize;
+    return (u8*)gClipBanks[n];
 }
 
 // Lends clip bank memory to the memory card code as save file image n (0 or 1; MC_Gc fn_8009F02C in
@@ -1339,18 +1339,18 @@ static inline u8* Skalib_Scratch(int n, u32 uSize) {
 u8* Skalib_LendBankMemory(int n) {
     u32 uSize = fn_8009EF90();
     u8* p;
-    if (lbl_801C6050[0] != NULL && lbl_801C6050[1] == NULL) {
-        p = (u8*)lbl_801C6050[0] + n * uSize;
-    } else if (lbl_801C6050[0] == NULL && lbl_801C6050[1] != NULL) {
-        p = (u8*)lbl_801C6050[1] + n * uSize;
+    if (gClipBanks[0] != NULL && gClipBanks[1] == NULL) {
+        p = (u8*)gClipBanks[0] + n * uSize;
+    } else if (gClipBanks[0] == NULL && gClipBanks[1] != NULL) {
+        p = (u8*)gClipBanks[1] + n * uSize;
     } else {
-        p = (u8*)lbl_801C6050[n];
+        p = (u8*)gClipBanks[n];
     }
-    lbl_80281D0C[n] = uSize;
-    if (lbl_80281D04[n] == 0) {
-        lbl_80281D04[n] = GoARAM_Alloc(lbl_80281D0C[n]);
+    gLentBankAramSizes[n] = uSize;
+    if (gLentBankAram[n] == 0) {
+        gLentBankAram[n] = GoARAM_Alloc(gLentBankAramSizes[n]);
     }
-    GoARAM_WaitTransfer(GoARAM_CopyToAram(p, lbl_80281D04[n], lbl_80281D0C[n]));
+    GoARAM_WaitTransfer(GoARAM_CopyToAram(p, gLentBankAram[n], gLentBankAramSizes[n]));
     return p;
 }
 
@@ -1358,10 +1358,10 @@ u8* Skalib_LendBankMemory(int n) {
 // the image is parked in ARAM): the bank's clip data is copied back from ARAM and the ARAM freed.
 void Skalib_ReclaimBankMemory(int n) {
     u32 uSize = fn_8009EF90();
-    GoARAM_WaitTransfer(GoARAM_CopyFromAram(Skalib_Scratch(n, uSize), lbl_80281D04[n], lbl_80281D0C[n]));
-    if (lbl_80281D04[n] != 0) {
-        GoARAM_Free(lbl_80281D04[n]);
-        lbl_80281D04[n] = 0;
+    GoARAM_WaitTransfer(GoARAM_CopyFromAram(Skalib_Scratch(n, uSize), gLentBankAram[n], gLentBankAramSizes[n]));
+    if (gLentBankAram[n] != 0) {
+        GoARAM_Free(gLentBankAram[n]);
+        gLentBankAram[n] = 0;
     }
 }
 
@@ -1415,12 +1415,12 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
 
     if (nSlot < 3) {
         k        = nSlot;
-        pSlot    = &lbl_801C6068[k];
+        pSlot    = &gLibSlots[k];
         pLibFile = pSlot->pLib;
         pSrc     = pLibFile;
     } else {
         for (k = 0; k < 3; k++) {
-            pSlot = &lbl_801C6068[k];
+            pSlot = &gLibSlots[k];
             for (i = 0; i < pSlot->nOverlays; i++) {
                 pOv = &pSlot->overlays[i];
                 if (pOv->n10 == nSlot) {
@@ -1438,7 +1438,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
     if (pSrc != NULL && pSlot->nOverlays != 0) {
         u32 aPad[4] = {0, 0, 0, 0};
 
-        pBank = lbl_801C6050[k];
+        pBank = gClipBanks[k];
         pHdr  = (Clip*)pSlot->pEnd;
         for (i = 0; i < pSrc->nRecords; i++) {
             // register note: n50Al is a block local so that it numbers after n4CAl (EA spills
@@ -1556,7 +1556,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             SKA_PatchMemory(pHdr, uAramStart);
             pBank->uId += nCopied;
             pHdr = (Clip*)((u8*)pHdr + nCopied);
-            lbl_801C6008[k].n04 += nCopied;
+            gClipBankStats[k].n04 += nCopied;
             pSrc->pRecords[i].pClip = pBank->ppClips[pSlot->n150];
             pSrc->pRecords[i].n12 |= 8;
             pSlot->n150++;
@@ -1597,7 +1597,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
                 bFound = 0;
                 for (s = 0; s < 3; s++) {
                     if (bFound) break;
-                    pSlot = &lbl_801C6068[k];
+                    pSlot = &gLibSlots[k];
                     for (o = 0; o < pSlot->nOverlays; o++) {
                         if (pSlot->overlays[o].pChar == gPlayers[p].pChar) {
                             bFound = 1;
@@ -1614,7 +1614,7 @@ done:
 
 // Frees the working (swapped) copies of each slot's library and overlays once the sac files are
 // merged (Character_PostInit, Character_ReloadSacFiles), marking the overlays merged (stream id -1)
-// and restarting the slot's bank clip count; while lbl_80281CE4 is set (a reload between holes)
+// and restarting the slot's bank clip count; while gSacReloading is set (a reload between holes)
 // only the current slot's.
 void AnimLib_FreeWorkCopies(void) {
     LibSlot*    pSlot;
@@ -1623,8 +1623,8 @@ void AnimLib_FreeWorkCopies(void) {
     LibOverlay* pOv;
 
     for (i = 0; i < 3; i++) {
-        pSlot = &lbl_801C6068[i];
-        if (lbl_80281CE4 != 0 && i != lbl_80281078) continue;
+        pSlot = &gLibSlots[i];
+        if (gSacReloading != 0 && i != gCurLibSlot) continue;
         if (pSlot->nOverlays != 0) {
             for (k = 0; pSlot->nOverlays > k; k++) {
             }
@@ -1652,7 +1652,7 @@ void AnimLib_FreeCopies(void) {
     int         j;
 
     for (i = 0; i < 3; i++) {
-        pSlot = &lbl_801C6068[i];
+        pSlot = &gLibSlots[i];
         if (pSlot->nOverlays != 0) {
             for (j = 0; j < pSlot->nOverlays; j++) {
                 pOv = &pSlot->overlays[j];
@@ -1672,7 +1672,7 @@ void AnimLib_FreeCopies(void) {
 // player's save profile) to the overlay in slot nSlot: Character_PostInit for slots 0 and 1,
 // AnimLib_ReloadSlot for the slot it reloads.
 void AnimLib_ApplySlotCustomAnims(int nSlot) {
-    LibSlot*    pSlot = &lbl_801C6068[nSlot];
+    LibSlot*    pSlot = &gLibSlots[nSlot];
     LibOverlay* pOv;
     int         n     = pSlot->nOverlays;
     int         i;
@@ -1715,13 +1715,13 @@ void AnimLib_ReloadSlot(void) {
     Clip*       pClip;
     AnimLib*    pLib;
 
-    for (i = 0; i < lbl_801C6050[nSlot]->nClips; i++) {
-        pClip = lbl_801C6050[nSlot]->ppClips[i];
+    for (i = 0; i < gClipBanks[nSlot]->nClips; i++) {
+        pClip = gClipBanks[nSlot]->ppClips[i];
         if (pClip != NULL && (pClip->uFlags & 4)) {
             GoARAM_Free(pClip->uAram);
         }
     }
-    pSlot = &lbl_801C6068[nSlot];
+    pSlot = &gLibSlots[nSlot];
     if (pSlot->nOverlays != 0) {
         pSlot->pLib = StaticMem_Alloc(pSlot->nSize, 1, 0x40, "skalib.c", 3193);
         Mem_cpy(pSlot->pLib, pSlot->pCopy, pSlot->nSize);
@@ -1833,13 +1833,13 @@ u8 AnimLib_WasLastPlayed(int nPlayer, const char* pName, char** ppSlot, int nGro
     }
     if (nPlayer < 0 || nPlayer >= 4) return 0;
     // fake match: the slot's byte offset summed in one local, player and kind first, and added to
-    // the table's base: the same element as lbl_80281D14[nPlayer][nKind][nStyle][nClub], whose
+    // the table's base: the same element as gLastReactionClips[nPlayer][nKind][nStyle][nClub], whose
     // index form colours the sum and the base differently
-    nOff = nPlayer * sizeof(lbl_80281D14[0]) + nKind * sizeof(lbl_80281D14[0][0]);
-    nOff += nStyle * sizeof(lbl_80281D14[0][0][0]);
-    nOff += nClub * sizeof(lbl_80281D14[0][0][0][0]);
-    *ppSlot = (char*)lbl_80281D14 + nOff;
-    return strcmp(pName, (char*)lbl_80281D14 + nOff) == 0;
+    nOff = nPlayer * sizeof(gLastReactionClips[0]) + nKind * sizeof(gLastReactionClips[0][0]);
+    nOff += nStyle * sizeof(gLastReactionClips[0][0][0]);
+    nOff += nClub * sizeof(gLastReactionClips[0][0][0][0]);
+    *ppSlot = (char*)gLastReactionClips + nOff;
+    return strcmp(pName, (char*)gLastReactionClips + nOff) == 0;
 }
 
 int   AnimLib_RandomIndex(u32 uUsed, int nCount);
@@ -2156,16 +2156,16 @@ void AnimLib_OnLoaded(UStreamObject* pFile) {
     u32      nSlot = pFile->uId;
     AnimLib* pLib;
 
-    if (nSlot < 3 && lbl_801C605C[nSlot] == NULL) {
-        lbl_801C6068[nSlot].pCopy = StaticMem_Alloc(pFile->uSize, 2, 0x40, "skalib.c", 4520);
-        Mem_cpy(lbl_801C6068[nSlot].pCopy, pFile->pData, pFile->uSize);
-        lbl_801C6068[nSlot].nSize = pFile->uSize;
+    if (nSlot < 3 && gBankLibs[nSlot] == NULL) {
+        gLibSlots[nSlot].pCopy = StaticMem_Alloc(pFile->uSize, 2, 0x40, "skalib.c", 4520);
+        Mem_cpy(gLibSlots[nSlot].pCopy, pFile->pData, pFile->uSize);
+        gLibSlots[nSlot].nSize = pFile->uSize;
         pLib = AnimLib_Load(pFile->pData, ClipBank_Get(nSlot));
         pLib->pFile = pFile;
         if (pLib->pBank != NULL) {
-            lbl_801C605C[nSlot] = pLib;
+            gBankLibs[nSlot] = pLib;
         } else {
-            lbl_801C6068[nSlot].pLib = pLib;
+            gLibSlots[nSlot].pLib = pLib;
         }
         bFree = 0;
     }
@@ -2180,7 +2180,7 @@ void ClipBank_Stash(int nSlot);
 // (ClipBank_Stash) until a character needs it (ClipBank_Restore).
 void ClipBank_OnLoaded(UStreamObject* pFile) {
     u32 nSlot = pFile->uId;
-    lbl_801C6488[nSlot] = pFile;
+    gClipBankFiles[nSlot] = pFile;
     ClipBank_Stash(nSlot);
 }
 
@@ -2190,10 +2190,10 @@ void ClipBank_Install(UStreamObject* pFile) {
     u8  bFree = 1;
     u32 nSlot = pFile->uId;
 
-    if (nSlot < 3 && lbl_801C6050[nSlot] == NULL) {
-        lbl_801C6050[nSlot]        = ClipBank_Load(pFile->pData, 16);
+    if (nSlot < 3 && gClipBanks[nSlot] == NULL) {
+        gClipBanks[nSlot]        = ClipBank_Load(pFile->pData, 16);
         bFree                      = 0;
-        lbl_801C6050[nSlot]->pFile = pFile;
+        gClipBanks[nSlot]->pFile = pFile;
     }
     if (bFree) {
         StaticMem_Free(pFile);
@@ -2204,17 +2204,17 @@ void ClipBank_Install(UStreamObject* pFile) {
 // the bank lives in the restore buffer, and Character_Free lets it go so the next character brings
 // it back from ARAM (ClipBank_Restore).
 void ClipBank_Release(int nSlot) {
-    if (lbl_801C6050[nSlot] != NULL) {
-        if (lbl_801C6050[nSlot]->pFile != NULL) {
-            lbl_801C6050[nSlot]->pFile = NULL;
-            lbl_801C6050[nSlot]        = NULL;
-            lbl_801C6488[nSlot]        = NULL;
+    if (gClipBanks[nSlot] != NULL) {
+        if (gClipBanks[nSlot]->pFile != NULL) {
+            gClipBanks[nSlot]->pFile = NULL;
+            gClipBanks[nSlot]        = NULL;
+            gClipBankFiles[nSlot]        = NULL;
         } else {
-            lbl_801C6050[nSlot] = NULL;
+            gClipBanks[nSlot] = NULL;
         }
     }
-    if (lbl_801C6488[nSlot] != NULL) {
-        lbl_801C6488[nSlot] = NULL;
+    if (gClipBankFiles[nSlot] != NULL) {
+        gClipBankFiles[nSlot] = NULL;
     }
 }
 
@@ -2222,18 +2222,18 @@ void ClipBank_Release(int nSlot) {
 // allocated the first time, and frees it unless it is the restore buffer; for slot 0, when there is
 // no restore buffer yet, allocates it at the file's size. Nothing without a file.
 void ClipBank_Stash(int nSlot) {
-    if (lbl_801C6488[nSlot] != NULL) {
-        lbl_801C647C[nSlot] = ((lbl_801C6488[nSlot]->uSize + 0x80) / 32 + 1) * 32;
-        if (lbl_801C6470[nSlot] == 0) {
-            lbl_801C6470[nSlot] = GoARAM_Alloc(lbl_801C647C[nSlot]);
+    if (gClipBankFiles[nSlot] != NULL) {
+        gClipBankAramSizes[nSlot] = ((gClipBankFiles[nSlot]->uSize + 0x80) / 32 + 1) * 32;
+        if (gClipBankAram[nSlot] == 0) {
+            gClipBankAram[nSlot] = GoARAM_Alloc(gClipBankAramSizes[nSlot]);
         }
-        GoARAM_WaitTransfer(GoARAM_CopyToAram(lbl_801C6488[nSlot], lbl_801C6470[nSlot], lbl_801C647C[nSlot]));
-        if (lbl_801C6488[nSlot] != lbl_80281CE0) {
-            StaticMem_Free(lbl_801C6488[nSlot]);
+        GoARAM_WaitTransfer(GoARAM_CopyToAram(gClipBankFiles[nSlot], gClipBankAram[nSlot], gClipBankAramSizes[nSlot]));
+        if (gClipBankFiles[nSlot] != gClipBankRestoreFile) {
+            StaticMem_Free(gClipBankFiles[nSlot]);
         }
-        lbl_801C6488[nSlot] = NULL;
-        if (nSlot == 0 && lbl_80281CE0 == NULL) {
-            lbl_80281CE0 = StaticMem_Alloc(lbl_801C647C[nSlot], 2, 0x20, "skalib.c", 4671);
+        gClipBankFiles[nSlot] = NULL;
+        if (nSlot == 0 && gClipBankRestoreFile == NULL) {
+            gClipBankRestoreFile = StaticMem_Alloc(gClipBankAramSizes[nSlot], 2, 0x20, "skalib.c", 4671);
         }
     }
 }
@@ -2242,11 +2242,11 @@ void ClipBank_Stash(int nSlot) {
 // (ClipBank_Install), unless the file is already in memory. Character_CreateFromMem calls it in the
 // front end (game type 3).
 void ClipBank_Restore(int nSlot) {
-    if (lbl_801C6488[nSlot] == NULL) {
-        lbl_801C6488[nSlot] = lbl_80281CE0;
-        GoARAM_WaitTransfer(GoARAM_CopyFromAram(lbl_801C6488[nSlot], lbl_801C6470[nSlot], lbl_801C647C[nSlot]));
-        lbl_801C6488[nSlot]->pData = (u8*)lbl_801C6488[nSlot] + 0x80;
-        ClipBank_Install(lbl_801C6488[nSlot]);
+    if (gClipBankFiles[nSlot] == NULL) {
+        gClipBankFiles[nSlot] = gClipBankRestoreFile;
+        GoARAM_WaitTransfer(GoARAM_CopyFromAram(gClipBankFiles[nSlot], gClipBankAram[nSlot], gClipBankAramSizes[nSlot]));
+        gClipBankFiles[nSlot]->pData = (u8*)gClipBankFiles[nSlot] + 0x80;
+        ClipBank_Install(gClipBankFiles[nSlot]);
     }
 }
 
@@ -2254,14 +2254,14 @@ void ClipBank_Restore(int nSlot) {
 void ClipBank_FreeAram(void) {
     int i;
     for (i = 0; i < 3; i++) {
-        if (lbl_801C6470[i] != 0) {
-            GoARAM_Free(lbl_801C6470[i]);
-            lbl_801C6470[i] = 0;
+        if (gClipBankAram[i] != 0) {
+            GoARAM_Free(gClipBankAram[i]);
+            gClipBankAram[i] = 0;
         }
     }
-    if (lbl_80281CE0 != NULL) {
-        StaticMem_Free(lbl_80281CE0);
-        lbl_80281CE0 = NULL;
+    if (gClipBankRestoreFile != NULL) {
+        StaticMem_Free(gClipBankRestoreFile);
+        gClipBankRestoreFile = NULL;
     }
 }
 
@@ -2365,9 +2365,9 @@ AnimLib* AnimLib_GetCharOverlay(Character* pChar) {
     int nSlot;
 
     for (nSlot = 0; nSlot <= 1; nSlot++) {
-        for (i = 0; i < lbl_801C6068[nSlot].nOverlays; i++) {
-            if (lbl_801C6068[nSlot].overlays[i].pChar == pChar) {
-                return lbl_801C6068[nSlot].overlays[i].pWork;
+        for (i = 0; i < gLibSlots[nSlot].nOverlays; i++) {
+            if (gLibSlots[nSlot].overlays[i].pChar == pChar) {
+                return gLibSlots[nSlot].overlays[i].pWork;
             }
         }
     }
@@ -2377,5 +2377,5 @@ AnimLib* AnimLib_GetCharOverlay(Character* pChar) {
 // The own library (LibSlot.pLib, the one overlays merge over) of the character's animation slot;
 // NULL once the work copies are freed.
 AnimLib* AnimLib_GetCharSlotLib(Character* pChar) {
-    return lbl_801C6068[pChar->nSlot].pLib;
+    return gLibSlots[pChar->nSlot].pLib;
 }

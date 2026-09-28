@@ -990,42 +990,42 @@ LAYOUT_ASSERT(SlotStats, 0x18);
 typedef int (*AnimLibWalkFn)(AnimLib* pA, AnimLib* pB, void* pLeafA, void* pLeafB, void* pCtx, int nLevel,
                              int nIndex);
 
-extern u8          lbl_801B9730[0x6290];   // the staging buffers' space (see gSKAAram8BitFrame)
-extern u8          lbl_801BF9C0[0x6290];
-extern u8          lbl_801C5C50[0x1DC];
-extern u8          lbl_801C5E2C[0x1DC];
-extern SlotStats   lbl_801C6008[3];
-extern ClipBank*   lbl_801C6050[3];     // the clip bank of each slot
-extern AnimLib*    lbl_801C605C[3];     // the library of each slot, when its clips are in the bank
-extern LibSlot     lbl_801C6068[3];
-extern u32         lbl_801C6470[3];     // ARAM copy of each slot's bank file
-extern u32         lbl_801C647C[3];     // its size
-extern UStreamObject* lbl_801C6488[3];  // each slot's bank file, while it is in main memory
+extern u8          gSkaKeySpace[0x6290];   // the staging buffers' space (see gSKAAram8BitFrame)
+extern u8          gSkaRangeSpace[0x6290];
+extern u8          gSkaFrame1Space[0x1DC];
+extern u8          gSkaFrame2Space[0x1DC];
+extern SlotStats   gClipBankStats[3];
+extern ClipBank*   gClipBanks[3];     // the clip bank of each slot
+extern AnimLib*    gBankLibs[3];     // the library of each slot, when its clips are in the bank
+extern LibSlot     gLibSlots[3];
+extern u32         gClipBankAram[3];     // ARAM copy of each slot's bank file
+extern u32         gClipBankAramSizes[3];     // its size
+extern UStreamObject* gClipBankFiles[3];  // each slot's bank file, while it is in main memory
 extern u8          lbl_801D9908[0xC8];
-extern s32         lbl_80281070;        // leaves this short are left alone by the drop pass
-extern s32         lbl_80281074;        // clips a leaf may keep this round
-extern u32         lbl_80281078;        // the current slot
+extern s32         gTrimMinLeafClips;        // leaves this short are left alone by the drop pass
+extern s32         gClipsPerLeaf;        // clips a leaf may keep this round
+extern u32         gCurLibSlot;        // the current slot
 extern u8          gSKALeftHanded;        // ska_shared.c: SKA_SetLeftHanded sets it; clear: SKAUtil_EulerAnglesToQTs16 negates angles
 extern u8*         gSKAAram8BitFrame;        // staging buffers (32-aligned), see SKALIB_InitModule
 extern u8*         gSKAAram16BitFrame;
 extern u8*         gSKAAramRanges;
 extern u8*         gSKAAramKeys;
-extern u8          lbl_80281CD8;        // double buffering: libraries alternate between slots 0 and 1
-extern u32         lbl_80281CDC;        // bytes of clips a slot may keep
-extern UStreamObject* lbl_80281CE0;     // the buffer banks are brought back from ARAM into
-extern u8          lbl_80281CE4;
-extern s32         lbl_80281CE8;        // group, style, club and key being merged
-extern s32         lbl_80281CEC;
-extern s32         lbl_80281CF0;
-extern s32         lbl_80281CF4;
-extern s16*        lbl_80281CF8;        // the group, style and club node being built
-extern s16*        lbl_80281CFC;
-extern s16*        lbl_80281D00;
-extern u32         lbl_80281D04[2];     // ARAM copy of each scratch area
-extern u32         lbl_80281D0C[2];     // its size
-extern char (*lbl_80281D14)[2][8][6][16];   // the last clip name played: [player][reaction kind][style][club]
+extern u8          gSlotsDoubleBuffered;        // double buffering: libraries alternate between slots 0 and 1
+extern u32         gClipBankBudget;        // bytes of clips a slot may keep
+extern UStreamObject* gClipBankRestoreFile;     // the buffer banks are brought back from ARAM into
+extern u8          gSacReloading;
+extern s32         gWalkGroup;        // group, style, club and key being merged
+extern s32         gWalkStyle;
+extern s32         gWalkClub;
+extern s32         gWalkKey;
+extern s16*        gBuildGroupNode;        // the group, style and club node being built
+extern s16*        gBuildStyleNode;
+extern s16*        gBuildClubNode;
+extern u32         gLentBankAram[2];     // ARAM copy of each scratch area
+extern u32         gLentBankAramSizes[2];     // its size
+extern char (*gLastReactionClips)[2][8][6][16];   // the last clip name played: [player][reaction kind][style][club]
 extern u32         lbl_80281D18;
-extern f32         lbl_80281D1C;
+extern f32         gSlot0BankShare;
 
 // The clip choice (skalib.c, char.c).
 void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, u32* pFlags,

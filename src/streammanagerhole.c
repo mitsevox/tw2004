@@ -440,7 +440,7 @@ void fn_80014A64(void) {
     int nPlayer;
     int i;
 
-    lbl_80281CE4 = 0;
+    gSacReloading = 0;
     fn_800153BC();
     fn_80015334(lbl_80186C44, fn_80014E78, fn_80014E90);
     fn_80015334(lbl_80186C50, fn_80014E68, fn_80014E80);
@@ -489,7 +489,7 @@ void fn_80014C9C(void) {
     } else {
         fn_80015334(lbl_80186C80, fn_80014E78, fn_80014E90);
     }
-    pSlot = &lbl_801C6068[nSlot];
+    pSlot = &gLibSlots[nSlot];
     for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
         nModel = Character_GetGolferModelID(nPlayer);
         for (i = 0; i < pSlot->nOverlays; i++) {

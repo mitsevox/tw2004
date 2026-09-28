@@ -1703,11 +1703,11 @@ void Character_LoadSacFiles(void) {
 // Before each hole after the first, with more than one player: the animation slot's libraries are
 // rebuilt from their copies (AnimLib_ReloadSlot), its sac files are streamed in and merged
 // (fn_80014C9C, Character_LoadSacFromStream), and the current slot's work copies freed
-// (lbl_80281CE4 set). Then AnimStream_AssignSlots gives the first two players to play an animation
+// (gSacReloading set). Then AnimStream_AssignSlots gives the first two players to play an animation
 // stream slot each.
 void Character_ReloadSacFiles(void) {
     if (gSession.nNumPlayers > 1) {
-        lbl_80281CE4 = 1;
+        gSacReloading = 1;
         AnimLib_ReloadSlot();
         Character_RegisterSacStreamClient();
         fn_80014C9C();
@@ -1904,16 +1904,16 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
         if (pLib->pBank != NULL || (pLib->uFlags & 1)) {
             pChar->pLib = pLib;
         } else {
-            lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].pWork = pLib;
-            lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].pCopy =
+            gLibSlots[pChar->nSlot].overlays[gLibSlots[pChar->nSlot].nOverlays].pWork = pLib;
+            gLibSlots[pChar->nSlot].overlays[gLibSlots[pChar->nSlot].nOverlays].pCopy =
                 StaticMem_Alloc(nSize, 2, 0x40, "char.c", 0xE68);
-            Mem_cpy(lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].pCopy,
+            Mem_cpy(gLibSlots[pChar->nSlot].overlays[gLibSlots[pChar->nSlot].nOverlays].pCopy,
                     pData, nSize);
-            lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].nSize = nSize;
-            lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].pChar = pChar;
-            lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].n10 = nId + 3;
-            lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].bActive = bLook;
-            lbl_801C6068[pChar->nSlot].nOverlays++;
+            gLibSlots[pChar->nSlot].overlays[gLibSlots[pChar->nSlot].nOverlays].nSize = nSize;
+            gLibSlots[pChar->nSlot].overlays[gLibSlots[pChar->nSlot].nOverlays].pChar = pChar;
+            gLibSlots[pChar->nSlot].overlays[gLibSlots[pChar->nSlot].nOverlays].n10 = nId + 3;
+            gLibSlots[pChar->nSlot].overlays[gLibSlots[pChar->nSlot].nOverlays].bActive = bLook;
+            gLibSlots[pChar->nSlot].nOverlays++;
             pChar->pLib = StaticMem_Alloc(0x2800, 2, 0x40, "char.c", 0xE75);
         }
         pData += nSize;
