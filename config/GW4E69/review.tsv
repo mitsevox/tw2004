@@ -2960,3 +2960,33 @@ address	name	comment	by	date
 80089E98	GM_vIGMessage175_Empty	keep	orchestrator (stub-name standard)	2026-09-28
 8008A184	GM_vIGMessage183_Empty	keep	orchestrator (stub-name standard)	2026-09-28
 80089DA4	GM_vIGMessage195_Return0	keep	orchestrator (stub-name standard)	2026-09-28
+8007CBCC	GM_vSetTapinsOption	add	rp2 (replayed by orchestrator)	2026-09-28
+8007CC0C	GM_vGetOptionFlags1And2	add	rp2 (replayed by orchestrator)	2026-09-28
+8007CC90	GM_vGetCommentaryOption	add	rp2 (replayed by orchestrator)	2026-09-28
+8007CD1C	GM_vGetTapinsOption	add	rp2 (replayed by orchestrator)	2026-09-28
+8007CD58	GM_vGetStringWidth	rewrite	rp2 (replayed by orchestrator)	2026-09-28
+8007CD98	GM_vMCUserMemoryRequired	rewrite	rp2 (replayed by orchestrator)	2026-09-28
+8007CDF0	GM_vFEMessage325_Empty	add	rp2 (replayed by orchestrator)	2026-09-28
+8007CDF4	GM_vSelectFirstChallengeOfGroup	add	rp2 (replayed by orchestrator)	2026-09-28
+8007CE1C	GM_vFEMessage64_Empty	add	rp2 (replayed by orchestrator)	2026-09-28
+8007CE20	GM_vGetGolferModelID	add	rp2 (replayed by orchestrator)	2026-09-28
+8007CE58	GM_vSetLadderEventBonus	add	rp2 (replayed by orchestrator)	2026-09-28
+8007CE7C	GM_vFindGolferBio	rewrite	rp2 (replayed by orchestrator)	2026-09-28
+8007CF4C	GM_vGetBioTexts	rewrite	rp2 (replayed by orchestrator)	2026-09-28
+8007D028	GM_vGetBioLines	rewrite	rp2 (replayed by orchestrator)	2026-09-28
+8007D0E0	GM_vSaveGolferModel	rewrite	rp2 (replayed by orchestrator)	2026-09-28
+8007D160	GM_vGetProfileSecondName	rewrite	rp2 (replayed by orchestrator)	2026-09-28
+8007D1A4	GM_vSetProfileSecondName	rewrite	rp2 (replayed by orchestrator)	2026-09-28
+8007D25C	GM_vFEMessage287_Empty	add	rp2 (replayed by orchestrator)	2026-09-28
+8007D260	GM_vFEMessage299_Empty	add	rp2 (replayed by orchestrator)	2026-09-28
+8007D264	GM_vFEMessage302_Empty	add	rp2 (replayed by orchestrator)	2026-09-28
+8007D268	GM_vFEMessage292_Empty	add	rp2 (replayed by orchestrator)	2026-09-28
+8007D26C	GM_vFEMessage312_Empty	add	rp2 (replayed by orchestrator)	2026-09-28
+8007D270	GM_vSetAllGolfersPickable	add	rp2 (replayed by orchestrator)	2026-09-28
+8007D2A4	GM_vGetAllGolfersPickable	add	rp2 (replayed by orchestrator)	2026-09-28
+8007D2D0	GM_vFEMessage314_Empty	add	rp2 (replayed by orchestrator)	2026-09-28
+8007D2D4	GM_vHasProfileSecondName	rewrite	rp2 (replayed by orchestrator)	2026-09-28
+8007D380	GM_vGetProfileCash	add	rp2 (replayed by orchestrator)	2026-09-28
+8007D3B4	GM_vResetProfile	add	rp2 (replayed by orchestrator)	2026-09-28
+8007D3D8	GM_vGetNumLadderEventsWon	add	rp2 (replayed by orchestrator)	2026-09-28
+8007D408	GM_vFEMessage218_Empty	add	rp2 (replayed by orchestrator)	2026-09-28

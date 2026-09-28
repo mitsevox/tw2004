@@ -202,9 +202,9 @@ LAYOUT_ASSERT(FEProfile, 0x11708);
 extern FEProfile* lbl_80281ED4;
 
 // One golfer's bio in the 'BIO ' stream object, as the menus show it (FE_MessageTable.c
-// fn_8007CE7C, fn_8007CF4C, fn_8007D028).
+// GM_vFindGolferBio, GM_vGetBioTexts, GM_vGetBioLines).
 typedef struct FEBio {
-    s32  nId;                   // 0x000  the golfer it describes (fn_8007CE7C searches on it)
+    s32  nId;                   // 0x000  the golfer it describes (GM_vFindGolferBio searches on it)
     char sz4[0x20];             // 0x004  } texts the menus show
     char sz24[0x10];            // 0x024  }
     s32  a34[6];                // 0x034  numbers the menus show
