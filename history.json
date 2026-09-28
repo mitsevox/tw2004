@@ -44373,5 +44373,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "c3f1eff",
+"sha": "c3f1eff87e884fb93d8815946fed7aced085a8e9",
+"time": 1790561477,
+"subject": "port: notes keep their continuation indent: name.py and wraplong.py wrap them under the note's text; 51 flattened notes across 36 files rewrapped (tools-scratch port_reflow.py); docs/style.md says so",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
