@@ -145,7 +145,7 @@ typedef struct MsgString {
 // values, and where its answers go (an int or float, or a string to fill in).
 typedef void (*MsgHandler)(MsgArg* pArgs, MsgArg* pResult);
 
-void fn_8007BCA4(MsgArg* pArgs, MsgArg* pResult);  // FE_MessageTable.c: fn_80079AD4 (DiscCheck.c
+void GM_vSetupPlayers(MsgArg* pArgs, MsgArg* pResult);  // FE_MessageTable.c: fn_80079AD4 (DiscCheck.c
                                         // calls it directly, with no values)
 
 // Messages to a front-end handler (FrontEnd.pHandler) go through UISDoHint (UISScreen.c; its
@@ -193,7 +193,7 @@ typedef struct UIText {
 
 // The menu UI's commands go to one of these, by the session's game type (uiProcessInterface.c's
 // fn_8008F568): each runs the handler for message nMsg of its table.
-void fn_80079E6C(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // the menus (FE_MessageTable.c)
+void FE_RunGameMessage(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // the menus (FE_MessageTable.c)
 void IG_RunGameMessage(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // a round (GameUICommands.c)
 void fn_800B1D3C(int nCmd, MsgArg* pArgs, MsgArg* pResult);    // start-up (startUp.c)
 

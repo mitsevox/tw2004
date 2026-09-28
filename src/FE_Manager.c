@@ -264,7 +264,7 @@ void fn_8007739C(Replay* pReplay) {
 
 void fn_800773F8(void) {
     fn_80010284();
-    fn_80079EA8();
+    FE_InitGameMessages();
     fn_8007744C();
     FE_vInitFECharModule();
     fn_80079DAC();

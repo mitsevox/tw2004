@@ -502,7 +502,7 @@ typedef struct Session {
                                 //        0x8000 with it
     s32  nGameType;             // 0x004  4 gets a second view
     u8   bDemo;                 // 0x008  the game the menus start is the demo (set by
-                                //        FE_MessageTable.c fn_8007BCC4; DEMO_Start runs as the
+                                //        FE_MessageTable.c GM_vStartDemo; DEMO_Start runs as the
                                 //        menus fade out): no GameBreakers, hole contests, EASBio
                                 //        wins or end-of-game scorecard
     u8   unk9[3];

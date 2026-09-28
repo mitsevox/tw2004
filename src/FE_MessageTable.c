@@ -1,6 +1,6 @@
 // FE_MessageTable.c (our name): the menus' message table. The menu UI (uiProcessInterface.c) sends
-// its messages here while the front end runs (game type 3): fn_80079EA8 fills 612 of a table of
-// 770 slots with handlers and fn_80079E6C calls the one for a message's number with its arguments
+// its messages here while the front end runs (game type 3): FE_InitGameMessages fills 612 of a table of
+// 770 slots with handlers and FE_RunGameMessage calls the one for a message's number with its arguments
 // and results. The handlers read and set what the menus show: golfer names, the session's setup,
 // the save profile's stats and records, the Create-A-Player choices. TW06 has GetGolferName in
 // apt_fe_gamemessages.c. Rounds have their own table (IG_RunGameMessage).
@@ -258,32 +258,32 @@ s32  fn_80085070(void* pArg);
 s32  fn_800850AC(void* pArg);
 
 // This file's message handlers, in address order.
-void fn_8007BBA0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007BBD8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007BC10(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007BC48(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007BC74(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007BCA0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007BCC4(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007BD18(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007BD1C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007BD44(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007BD84(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007BDAC(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007BDFC(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007BEEC(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007BEF0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C118(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C12C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C17C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C190(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C1F8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C218(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C248(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C254(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C2A0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C330(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C370(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetMinPlayersForMode(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMessage4_GetMinPlayersForMode(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMessage6_GetMinPlayersForMode(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetGameMode(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetNumPlayers(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMessage8_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vStartDemo(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMessage10_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetCourse(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSelectSingleHole(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetHoleSet(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetGolferAttribute(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetGolferName(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMessage17_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vInitCustomRound(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetDemoSetupFlag(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetPlayerGolfer(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetNumPlayers(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetPlayerController(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerGolfer(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetGameMode(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMessage25_Returns1(MsgArg* pArgs, MsgArg* pResult);
+void GM_vHideCharacter(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetCharState(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetGolferLastName(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCGetUserName(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007C3C8(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007C440(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007C488(MsgArg* pArgs, MsgArg* pResult);
@@ -705,46 +705,51 @@ void fn_80084F3C(MsgArg* pArgs, MsgArg* pResult);
 void fn_80084F40(MsgArg* pArgs, MsgArg* pResult);
 void fn_80084F84(MsgArg* pArgs, MsgArg* pResult);
 
-// The handlers, by message number (fn_80079EA8 fills it).
+// The handlers, by message number (FE_InitGameMessages fills it).
 #define FE_NUM_MESSAGES 770
 MsgHandler gFEMessageHandlers[FE_NUM_MESSAGES];
 
-// Run message nMsg's handler.
-void fn_80079E6C(int nMsg, MsgArg* pArgs, MsgArg* pResult) {
+// Runs front-end message nMsg: the handler in gFEMessageHandlers[nMsg] gets the message's values
+// (pArgs) and its answer (pResult). uiProcessInterface.c sends the menu UI's messages here while
+// the front end runs (game type 3). The slot is not checked: slots without a handler are NULL.
+void FE_RunGameMessage(int nMsg, MsgArg* pArgs, MsgArg* pResult) {
     gFEMessageHandlers[nMsg](pArgs, pResult);
 }
 
-// Fill the table. Messages with no handler stay NULL.
-void fn_80079EA8(void) {
+// Fills gFEMessageHandlers, the front end's messages by number (called from FE_Manager.c's
+// fn_800773F8 as the front end starts): every slot NULL, then 612 handlers of this file and the
+// other front-end files (Create-A-Player, the logo editor, the PGA TOUR screens, the calendar, the
+// ladder, the trophy room...); the rest, message 1 among them, stay NULL.
+void FE_InitGameMessages(void) {
     memset(gFEMessageHandlers, 0, sizeof(gFEMessageHandlers));
     gFEMessageHandlers[1] = NULL;
-    gFEMessageHandlers[2] = fn_8007BBA0;
-    gFEMessageHandlers[3] = fn_8007BCA4;
-    gFEMessageHandlers[4] = fn_8007BBD8;
-    gFEMessageHandlers[5] = fn_8007BC48;
-    gFEMessageHandlers[6] = fn_8007BC10;
-    gFEMessageHandlers[7] = fn_8007BC74;
-    gFEMessageHandlers[8] = fn_8007BCA0;
-    gFEMessageHandlers[9] = fn_8007BCC4;
-    gFEMessageHandlers[10] = fn_8007BD18;
-    gFEMessageHandlers[12] = fn_8007BD1C;
-    gFEMessageHandlers[13] = fn_8007BD44;
-    gFEMessageHandlers[14] = fn_8007BD84;
-    gFEMessageHandlers[15] = fn_8007BDAC;
-    gFEMessageHandlers[16] = fn_8007BDFC;
-    gFEMessageHandlers[17] = fn_8007BEEC;
-    gFEMessageHandlers[18] = fn_8007BEF0;
-    gFEMessageHandlers[19] = fn_8007C118;
-    gFEMessageHandlers[20] = fn_8007C12C;
-    gFEMessageHandlers[21] = fn_8007C17C;
-    gFEMessageHandlers[22] = fn_8007C190;
-    gFEMessageHandlers[23] = fn_8007C1F8;
-    gFEMessageHandlers[24] = fn_8007C218;
-    gFEMessageHandlers[25] = fn_8007C248;
-    gFEMessageHandlers[26] = fn_8007C254;
-    gFEMessageHandlers[27] = fn_8007C2A0;
-    gFEMessageHandlers[28] = fn_8007C330;
-    gFEMessageHandlers[29] = fn_8007C370;
+    gFEMessageHandlers[2] = GM_vGetMinPlayersForMode;
+    gFEMessageHandlers[3] = GM_vSetupPlayers;
+    gFEMessageHandlers[4] = GM_vMessage4_GetMinPlayersForMode;
+    gFEMessageHandlers[5] = GM_vSetGameMode;
+    gFEMessageHandlers[6] = GM_vMessage6_GetMinPlayersForMode;
+    gFEMessageHandlers[7] = GM_vSetNumPlayers;
+    gFEMessageHandlers[8] = GM_vMessage8_Empty;
+    gFEMessageHandlers[9] = GM_vStartDemo;
+    gFEMessageHandlers[10] = GM_vMessage10_Empty;
+    gFEMessageHandlers[12] = GM_vSetCourse;
+    gFEMessageHandlers[13] = GM_vSelectSingleHole;
+    gFEMessageHandlers[14] = GM_vSetHoleSet;
+    gFEMessageHandlers[15] = GM_vGetGolferAttribute;
+    gFEMessageHandlers[16] = GM_vGetGolferName;
+    gFEMessageHandlers[17] = GM_vMessage17_Empty;
+    gFEMessageHandlers[18] = GM_vInitCustomRound;
+    gFEMessageHandlers[19] = GM_vGetDemoSetupFlag;
+    gFEMessageHandlers[20] = GM_vSetPlayerGolfer;
+    gFEMessageHandlers[21] = GM_vGetNumPlayers;
+    gFEMessageHandlers[22] = GM_vSetPlayerController;
+    gFEMessageHandlers[23] = GM_vGetPlayerGolfer;
+    gFEMessageHandlers[24] = GM_vGetGameMode;
+    gFEMessageHandlers[25] = GM_vMessage25_Returns1;
+    gFEMessageHandlers[26] = GM_vHideCharacter;
+    gFEMessageHandlers[27] = GM_vSetCharState;
+    gFEMessageHandlers[28] = GM_vGetGolferLastName;
+    gFEMessageHandlers[29] = GM_vMCGetUserName;
     gFEMessageHandlers[30] = fn_8007C440;
     gFEMessageHandlers[31] = fn_8007C488;
     gFEMessageHandlers[32] = fn_8007C48C;
@@ -1332,37 +1337,50 @@ void fn_80079EA8(void) {
     gFEMessageHandlers[769] = fn_80084F84;
 }
 
-void fn_8007BBA0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 2: the fewest players game mode pArgs[0] takes (GM_GetMinPlayersForMode).
+// Messages 4 and 6 run copies of it.
+void GM_vGetMinPlayersForMode(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_GetMinPlayersForMode((u8)pArgs[0].i);
 }
 
-void fn_8007BBD8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 4: a copy of GM_vGetMinPlayersForMode (message 2).
+void GM_vMessage4_GetMinPlayersForMode(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_GetMinPlayersForMode((u8)pArgs[0].i);
 }
 
-void fn_8007BC10(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 6: a copy of GM_vGetMinPlayersForMode (message 2).
+void GM_vMessage6_GetMinPlayersForMode(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_GetMinPlayersForMode((u8)pArgs[0].i);
 }
 
-void fn_8007BC48(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 5: game mode pArgs[0] (GM_SetModeType sets up its rules), then split screen as
+// that mode has it (GM_SetSplitScreenForMode).
+void GM_vSetGameMode(MsgArg* pArgs, MsgArg* pResult) {
     GM_SetModeType((u8)pArgs[0].i);
     GM_SetSplitScreenForMode();
 }
 
-void fn_8007BC74(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 7: pArgs[0] players (Session_SetNumPlayers), then split screen as the game mode
+// has it (GM_SetSplitScreenForMode).
+void GM_vSetNumPlayers(MsgArg* pArgs, MsgArg* pResult) {
     Session_SetNumPlayers((u8)pArgs[0].i);
     GM_SetSplitScreenForMode();
 }
 
-void fn_8007BCA0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 8: empty in this build.
+void GM_vMessage8_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007BCA4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 3: sets up the session's players for the game the menus start (fn_80079AD4: CPU
+// players, loaded profiles, golfers and bags). DiscCheck.c also calls it directly, with no values.
+void GM_vSetupPlayers(MsgArg* pArgs, MsgArg* pResult) {
     fn_80079AD4();
 }
 
-// Set up a game mode from the menus.
-void fn_8007BCC4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 9: the menus start the demo (gSession.bDemo) in game mode pArgs[0]:
+// lbl_801D7148.b11 set, the mode set up (GM_SetModeType), the fade to black started and the front
+// end's audio stopped (Gaud_ExitFE).
+void GM_vStartDemo(MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D7148.b11 = 1;
     GM_SetModeType((u8)pArgs[0].i);
     gSession.bDemo = 1;
@@ -1370,35 +1388,44 @@ void fn_8007BCC4(MsgArg* pArgs, MsgArg* pResult) {
     Gaud_ExitFE();
 }
 
-void fn_8007BD18(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 10: empty in this build.
+void GM_vMessage10_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007BD1C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 12: the round's course is pArgs[0] (GM_SetCurrentCourse).
+void GM_vSetCourse(MsgArg* pArgs, MsgArg* pResult) {
     GM_SetCurrentCourse((u8)pArgs[0].i);
 }
 
-void fn_8007BD44(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 13: the round is the one hole pArgs[0] (1..18): every hole unselected
+// (GM_SelectHoleSet(0)), then that one selected and made current (GM_SelectSingleHole).
+void GM_vSelectSingleHole(MsgArg* pArgs, MsgArg* pResult) {
     GM_SelectHoleSet(0);
     GM_SelectSingleHole((u8)pArgs[0].i - 1);
 }
 
-void fn_8007BD84(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 14: the round's holes by preset pArgs[0] (GM_SelectHoleSet: 1 all 18, 2 the
+// front nine, 3 the back nine, 4/5/6 the par 5s/4s/3s...).
+void GM_vSetHoleSet(MsgArg* pArgs, MsgArg* pResult) {
     GM_SelectHoleSet((u8)pArgs[0].i);
 }
 
-// A golfer's attribute.
-void fn_8007BDAC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 15: attribute pArgs[1] of golfer pArgs[0] (GolferRecord.attr; a created
+// golfer's from the current profile, fn_80077A80).
+void GM_vGetGolferAttribute(MsgArg* pArgs, MsgArg* pResult) {
     GolferRecord* pRecord = fn_80077A80(pArgs[0].i);
 
     pResult->i = pRecord->attr[pArgs[1].i];
 }
 
-void fn_8007BDFC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 16: golfer pArgs[0]'s full name (GetGolferName) into the string pArgs[1].
+void GM_vGetGolferName(MsgArg* pArgs, MsgArg* pResult) {
     GetGolferName(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }
 
-// A golfer's full name: "First "Nick" Last" when the golfer has a nickname ("NA" is none), else
-// "First Last". Golfer 18 never shows a nickname.
+// Golfer nGolfer's full name into szName: "First "Nick" Last" when the golfer's record has a
+// nickname (longer than one character and not "NA"), else "First Last". Golfer 18 never shows a
+// nickname. No buffer size (TW07's takes one).
 void GetGolferName(int nGolfer, char* szName) {
     int bNick;
     GolferRecord* pRecord;
@@ -1412,12 +1439,15 @@ void GetGolferName(int nGolfer, char* szName) {
     }
 }
 
-void fn_8007BEEC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 17: empty in this build.
+void GM_vMessage17_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// The custom round's hole list: four holes to start with, or, with both session flags 0x4000
-// and 0x8000 set, all 18 holes of course 0.
-void fn_8007BEF0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 18: a custom round (gpGame->b136) of four holes: course 8's hole 17, course 5's
+// hole 4, course 17's hole 2 and course 18's hole 9, the rest unselected. With both demo session
+// flags (0x4000 and 0x8000) set instead: commentary off (options.a0[4] 0) and all 18 slots course
+// 0's hole 18.
+void GM_vInitCustomRound(MsgArg* pArgs, MsgArg* pResult) {
     s32 i;
 
     gpGame->nHoleCourse[0] = 8;
@@ -1446,23 +1476,29 @@ void fn_8007BEF0(MsgArg* pArgs, MsgArg* pResult) {
     gpGame->b136 = 1;
 }
 
-void fn_8007C118(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 19: 1 when session flag 0x4000 (the demo set-up) is set.
+void GM_vGetDemoSetupFlag(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = (gSession.uFlags >> 14) & 1;
 }
 
-void fn_8007C12C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 20: player pArgs[0] plays golfer pArgs[1] (Session_SetGolfer). In Play Now
+// (game mode 5) it first sets lbl_80281ED4->b11703, which keeps fn_80079AD4 from giving player 0
+// the created golfer.
+void GM_vSetPlayerGolfer(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 5) {
         lbl_80281ED4->b11703 = 1;
     }
     Session_SetGolfer(pArgs[1].i, pArgs[0].i);
 }
 
-void fn_8007C17C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 21: the session's number of players.
+void GM_vGetNumPlayers(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gSession.nNumPlayers;
 }
 
-// A player's controller: -1 and 9 mean none (9); a real one is marked in use.
-void fn_8007C190(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 22: player pArgs[0] uses controller pArgs[1]. -1 and 9 give 9 (CONTROLLER_CPU);
+// a real controller is also marked in lbl_801D87C0.a2C.
+void GM_vSetPlayerController(MsgArg* pArgs, MsgArg* pResult) {
     s32 nController;
 
     nController = pArgs[1].i;
@@ -1474,19 +1510,25 @@ void fn_8007C190(MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D87C0.a2C[pArgs[1].i] = 1;
 }
 
-void fn_8007C1F8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 23: the golfer player pArgs[0] plays.
+void GM_vGetPlayerGolfer(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gSession.nGolfer[pArgs[0].i];
 }
 
-void fn_8007C218(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 24: the session's game mode (Game_GetMode).
+void GM_vGetGameMode(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = Game_GetMode();
 }
 
-void fn_8007C248(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 25: always answers 1 in this build.
+void GM_vMessage25_Returns1(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 1;
 }
 
-void fn_8007C254(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 26: hides the menu golfer (pArgs[0] nonzero) or shows him again
+// (gpCrAPState->bHidden). A change while the CrAP screen shows him (screen kind 3) calls
+// FE_OnGolferHiddenChanged.
+void GM_vHideCharacter(MsgArg* pArgs, MsgArg* pResult) {
     u8 bOld;
 
     bOld = gpCrAPState->bHidden;
@@ -1496,9 +1538,11 @@ void fn_8007C254(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// The CrAP screen's state: changing it to 0 or to 3 calls FE_vClearGolferCache;
-// FE_SetOffscreenBufferRender is told whether it is now 0.
-void fn_8007C2A0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 27: the menu screen showing the golfer is now pArgs[0]
+// (gpCrAPState->nScreenKind: 0 golfers in turn, 3 the CrAP screen, 4 none). Going to 0 from another
+// kind, or to 3 from another kind, clears the golfer cache (FE_vClearGolferCache); the golfer is
+// drawn through the offscreen buffer on kind 0 only (FE_SetOffscreenBufferRender).
+void GM_vSetCharState(MsgArg* pArgs, MsgArg* pResult) {
     s32 nOld;
 
     nOld = gpCrAPState->nScreenKind;
@@ -1516,12 +1560,15 @@ void fn_8007C2A0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_8007C330(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 28: golfer pArgs[0]'s last name into the string pResult (a created golfer's
+// from the current profile, fn_80077A80).
+void GM_vGetGolferLastName(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pResult->p)->pStr, fn_80077A80(pArgs[0].i)->szLast);
 }
 
-// One of the four names the card's state holds.
-void fn_8007C370(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 29: profile name pArgs[3] (0..3) of the save on the memory card in port
+// pArgs[1], slot pArgs[2] (MCCardState.aszName, from MC_GetMC) into the string pArgs[0].
+void GM_vMCGetUserName(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
 
     MC_GetMC(&state, pArgs[1].i, pArgs[2].i);

@@ -98,11 +98,11 @@ int fn_80110180(void) {
 }
 
 // DVDChangeDiskAsync's callback: the disc change has finished (in game type 3 the menus are told
-// through fn_8007BCA4). EA wrote it returning 0 (li r3, 0 before the blr) although the library's
+// through GM_vSetupPlayers). EA wrote it returning 0 (li r3, 0 before the blr) although the library's
 // callback type returns nothing; the callers cast it.
 int fn_80110234(s32 nResult, DVDCommandBlock* pBlock) {
     if (gSession.nGameType == 3) {
-        fn_8007BCA4(NULL, NULL);
+        GM_vSetupPlayers(NULL, NULL);
     }
     lbl_802824D0 = 1;
     return 0;

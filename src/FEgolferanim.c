@@ -1555,7 +1555,7 @@ void FE_SetCrapRotation(u8 bTarget, f32 fAngle) {
     }
 }
 
-// Empty in this build: the menu message FE_MessageTable.c fn_8007C254 calls it when it changes
+// Empty in this build: the menu message FE_MessageTable.c GM_vHideCharacter calls it when it changes
 // gpCrAPState->bHidden (the golfer is not drawn while it is set) while the CrAP screen kind
 // nScreenKind is 3.
 void FE_OnGolferHiddenChanged(void) {

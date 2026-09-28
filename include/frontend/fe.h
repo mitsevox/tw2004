@@ -469,7 +469,7 @@ void Gaud_StopMusic(void);                 // (0x800A75B4) FE_Manager.c calls it
 
 // ---- the menus' message table (FE_MessageTable.c) --------------------------------------------
 
-void fn_80079EA8(void);                 // fill the table
+void FE_InitGameMessages(void);                 // fill the table
 void fn_80084FF0(int n);                // sets lbl_80281FFC
 extern char* lbl_80191990[30];          // per course: a string the menus show (a replay's course
                                         // picks it)
