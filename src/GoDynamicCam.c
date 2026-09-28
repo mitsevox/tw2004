@@ -883,7 +883,7 @@ void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
         aTgtDir[1] = 0.0f;
         aTgtDir[2] = 0.0f;
     }
-    fAngle = fn_80009614(Vec3_Dot(aCurDir, aTgtDir));
+    fAngle = Math_Acos(Vec3_Dot(aCurDir, aTgtDir));
     fTurn = fAngle * fTurn;
     vec4flt_CrossProduct(aCurDir, aTgtDir, aAxis);
     if (aAxis[0] != 0.0f || aAxis[1] != 0.0f || aAxis[2] != 0.0f) {
@@ -1769,7 +1769,7 @@ void fn_8003D810(f32* pDir, f32* pA, f32* pB) {
     if (0.0f != vLevel[0] || 0.0f != vLevel[1] || 0.0f != vLevel[2]) {
         Vec_NormalizeTo(vLevel, vLevel);
     }
-    if (fabsf(fn_80009614(Vec3_Dot(vLevel, pDir))) > lbl_80281F78->f19C) {
+    if (fabsf(Math_Acos(Vec3_Dot(vLevel, pDir))) > lbl_80281F78->f19C) {
         vec4flt_CrossProduct(pDir, vLevel, vAxis);
         if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
             Vec_NormalizeTo(vAxis, vAxis);

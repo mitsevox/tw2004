@@ -160,7 +160,7 @@ void fn_8000A4E0(f32 (*pMtx)[4], f32* pA, f32* pB, f32* pC) {
 
     if (pMtx[2][2] != 0.0f) {
         fA = atan2f(pMtx[2][0], pMtx[2][2]);
-        fB = -fn_8000965C(pMtx[2][1]);
+        fB = -Math_Asin(pMtx[2][1]);
         if (pMtx[1][1] != 0.0f) {
             fC = atan2f(pMtx[0][1], pMtx[1][1]);
         } else if (pMtx[0][1] != 0.0f) {
@@ -188,7 +188,7 @@ void fn_8000A4E0(f32 (*pMtx)[4], f32* pA, f32* pB, f32* pC) {
             fA = -atan2f(pMtx[0][0], pMtx[0][0]);
         }
     } else {
-        fB = -fn_8000965C(pMtx[2][1]);
+        fB = -Math_Asin(pMtx[2][1]);
         if (pMtx[2][0] * Math_Cos(fB) > 0.0f) {
             fA = PI / 2.0f;
         } else {

@@ -332,7 +332,7 @@ void fn_80114540(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         Vec_NormalizeTo(vTo, vTo);
         Vec_NormalizeTo(vWas, vWas);
         vec4flt_CrossProduct(vTo, vWas, vAxis);
-        fAngle = fn_80009614(Vec3_Dot(vTo, vWas));
+        fAngle = Math_Acos(Vec3_Dot(vTo, vWas));
         if (fAngle > 0.00001f) {
             Vec_NormalizeTo(vAxis, vAxis);
             vAxis[0] *= fAngle;
@@ -482,7 +482,7 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
                                  (vWas[1] - vBone[1]) * (vWas[1] - vBone[1]) +
                                  (vWas[2] - vBone[2]) * (vWas[2] - vBone[2])) > 0.001f) {
                 vec4flt_CrossProduct(vWas, vBone, vAxis);
-                fAngle = fn_80009614(Vec3_Dot(vBone, vWas));
+                fAngle = Math_Acos(Vec3_Dot(vBone, vWas));
                 if (fabs(fAngle) > 0.01f) {
                     if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
                         Vec_NormalizeTo(vAxis, vAxis);

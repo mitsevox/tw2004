@@ -134,7 +134,7 @@ void RTClock_GetDateTimeString(char* szOut);   // "M/D/YYYY H:MM AM"
 void Vec3Copy(const f32* pSrc, f32* pDst);   // 0x80008304 (const: see code_800082F8.c)
 f32  Math_Sin(f32 fAngle);           // sin
 f32  Math_Cos(f32 fAngle);           // cos
-f32  fn_8000965C(f32 x);                // asin
+f32  Math_Asin(f32 x);                // asin
 double Math_Sqrt(double x);           // sqrt
 f32  Vec3_LengthSqClamped(f32* pVec);            // dot with itself (at most FLT_MAX)
 extern f32 __float_max[];               // FLT_MAX (MSL's)
@@ -164,11 +164,11 @@ void Quat_BuildFromVector(f32* pRot, f32* pOut); // a rotation vector (axis * an
 void Legacy_Quat_BuildFromYaw(f32 fAngle, f32* pOut); // the quaternion of a rotation by -fAngle about z
 void Legacy_Quat_BuildFromPitch(f32 fAngle, f32* pOut); // the quaternion of a rotation by -fAngle about y
 void Legacy_Quat_BuildFromRoll(f32 fAngle, f32* pOut); // the quaternion of a rotation by -fAngle about x
-void fn_80009710(f32* pQ);              // the identity quaternion (0, 0, 0, 1)
+void Quat_IdentifyForMul(f32* pQ);              // the identity quaternion (0, 0, 0, 1)
 f32  fn_80029B64(f32 x);                // square root (Skeleton.c); x itself when x <= 0
 void fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b
 f32  Vec3_Dot(f32* pA, f32* pB);     // dot product
-f32  fn_80009614(f32 x);                // arc cosine
+f32  Math_Acos(f32 x);                // arc cosine
 void Vec_Scale(f32 f, f32* pIn, f32* pOut);   // scale a vector (four floats)
 void fn_8000AE6C(f32* pA, f32* pB, f32 fScale, f32* pOut);   // out = a + fScale x b (four floats)
 double pow(double x, double y);         // 0x8015F824 (MSL)

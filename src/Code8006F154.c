@@ -40,9 +40,9 @@ void fn_8006F154(void) {
     fCos = (fX < -1.0f) ? -1.0f : (fX > 1.0f) ? 1.0f : fX;
     fSin = (fZ < -1.0f) ? -1.0f : (fZ > 1.0f) ? 1.0f : fZ;
     if (fSin > 0.0f) {
-        fAngle = fn_80009614(fCos);
+        fAngle = Math_Acos(fCos);
     } else {
-        fAngle = TWOPI - fn_80009614(fCos);
+        fAngle = TWOPI - Math_Acos(fCos);
     }
     fAngle += pSettings->f40;
     if (fAngle >= TWOPI) {

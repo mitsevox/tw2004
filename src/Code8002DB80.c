@@ -287,7 +287,7 @@ void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int b
     p->vTarget[1]    = 0.0f;
     p->vTarget[2]    = 0.0f;
     p->vTarget[3]    = 0.0f;
-    fn_80009710(p->vOrient);
+    Quat_IdentifyForMul(p->vOrient);
     p->nController = nController;
     p->bMulliganUsed = 0;
     if (gSession.nSplitScreen) {

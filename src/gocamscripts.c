@@ -822,7 +822,7 @@ void fn_8003FD54(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     // the dot product clamped to -1..1 (worked out again for each test)
     fDot = Vec3_Dot(vDir0, vDir1) < -1.0f ? -1.0f
          : (Vec3_Dot(vDir0, vDir1) > 1.0f ? 1.0f : Vec3_Dot(vDir0, vDir1));
-    fAngle = fn_80009614(fDot);
+    fAngle = Math_Acos(fDot);
     fAngle *= fT;
     vec4flt_CrossProduct(vDir0, vDir1, vAxis);
     if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
@@ -1457,7 +1457,7 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
             Vec_NormalizeTo(vDir, vDir);
         }
         // the dot product is taken up to three times, as a clamp macro would
-        fAngle = fn_80009614(Vec3_Dot(vCur, vDir) < -1.0f ? -1.0f
+        fAngle = Math_Acos(Vec3_Dot(vCur, vDir) < -1.0f ? -1.0f
                              : (Vec3_Dot(vCur, vDir) > 1.0f ? 1.0f : Vec3_Dot(vCur, vDir)))
                  / fDiv;
         vec4flt_CrossProduct(vCur, vDir, vAxis);
@@ -2067,7 +2067,7 @@ void CameraScript_KeepPointInView(int nPlayer, f32* pCam, f32* pOut, f32* pTarge
     } else if (fDot > 1.0f) {
         fDot = 1.0f;
     }
-    fAngle = fn_80009614(fDot);
+    fAngle = Math_Acos(fDot);
     if (fabsf(fAngle) > pScript->fDC) {
         fAngle -= pScript->fDC;
         vec4flt_CrossProduct(vOutDir, vTargetDir, vAxis);

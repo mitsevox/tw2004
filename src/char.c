@@ -936,9 +936,9 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     }
     fSq = fThigh * fThigh + fShin * fShin;
     fCos = (fSq - fReach * fReach) / fDen;
-    fAngleA = fn_80009614((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
+    fAngleA = Math_Acos((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
     fCos = (fSq - fLeg * fLeg) / fDen;
-    fAngleB = fn_80009614((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
+    fAngleB = Math_Acos((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
     fTurn = fAngleA - fAngleB;
     vec4flt_CrossProduct(vShin, vThigh, vNormal);
     fLen = fn_800BAFC0(vNormal, vNormal);
@@ -962,8 +962,8 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     }
 
     // the hip: turned by the change in the angle between the thigh and the hip-to-foot line
-    fTurn2 = fn_8000965C(fShin * Math_Sin(fAngleA) / fReach);
-    fTurn2 -= fn_8000965C(fShin * Math_Sin(fAngleB) / fLeg);
+    fTurn2 = Math_Asin(fShin * Math_Sin(fAngleA) / fReach);
+    fTurn2 -= Math_Asin(fShin * Math_Sin(fAngleB) / fLeg);
     if (fabsf(fTurn2) > 0.0001f) {
         Vec3_Scale(fTurn2, vNormal, vAxis);
         vAxis[3] = 0.0f;
@@ -992,7 +992,7 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     vAxis[0] *= 1.0f / fLen;
     vAxis[2] *= 1.0f / fLen;
     fCos = vSlope[1];
-    fTurn3 = fn_80009614((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
+    fTurn3 = Math_Acos((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
     fTurn3 *= fDrop;
     if (fabsf(fTurn3) > 0.0001f) {
         Vec3_Scale(fTurn3, vAxis, vAxis);

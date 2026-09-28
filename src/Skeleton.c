@@ -140,7 +140,7 @@ f32 fn_80026D18(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLink, int
             if (fCos > 1.0f || fCos < -1.0f) {
                 fAngle = 0.0f;
             } else {
-                fAngle = pLink->f4 * fn_80009614(fCos);
+                fAngle = pLink->f4 * Math_Acos(fCos);
             }
             if (fabsf(fAngle) > PI / 5000.0f) {
                 // the turn's axis in the bone's own frame, without its y and locked (n8) components
@@ -181,7 +181,7 @@ void fn_80026F90(Skeleton* pSkel, IKChain* pChain, u8 bAll) {
     for (i = 0; i < pChain->nLinks; i++) {
         if (bAll || pChain->pLinks[i].f4 > 0.0f) {
             int nBone = pChain->pLinks[i].nBone;
-            fn_80009710(pSkel->p20[nBone]);
+            Quat_IdentifyForMul(pSkel->p20[nBone]);
             BitArray_Clear(pSkel->a10, nBone);
         }
     }
@@ -630,7 +630,7 @@ f32 fn_800280E8(Character* pChar, f32* pTarget, int bNormals) {
     pSkel->f10CC = 0.025f;
     pSkel->f10D0 = 0.05f;
     pSkel->n10E4 = 0;
-    fn_80009710(pSkel->q10D4);
+    Quat_IdentifyForMul(pSkel->q10D4);
     fn_800273BC(pModel, pChain, pTarget, pChain->n18, fn_800275F4, pChain->f1C);
     SKEL_SetIKSolutionWeight(pSkel, 1.0f);
     pSkel->f1074 = 0.0f;
@@ -696,7 +696,7 @@ Skeleton* SKEL_CreateIKSkeleton(CharModel* pModel, CharModelDefs* pDefs) {
     pSkel->a1108[2] = CharModel_GetBoneIndexMapped(pModel, 0x11);
     pSkel->a1108[3] = CharModel_GetBoneIndexMapped(pModel, 0x12);
     SKEL_SetIKSolutionWeight(pSkel, 0.0f);
-    fn_80009710(pSkel->q10D4);
+    Quat_IdentifyForMul(pSkel->q10D4);
     pSkel->n10E4 = 0;
     return pSkel;
 }
@@ -752,7 +752,7 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int b) {
     pModel->pMatrices = StaticMem_Alloc(pModel->nBones * sizeof(f32[4][4]), 2, 64, "Skeleton.c", 1265);
     pModel->pPoses = StaticMem_Alloc(pModel->nBones * sizeof(BonePose), 2, 64, "Skeleton.c", 1266);
     for (i = 0; i < pModel->nBones; i++) {
-        fn_80009710(pModel->pBones[i].q0C);
+        Quat_IdentifyForMul(pModel->pBones[i].q0C);
     }
     BitArray_SetAll(pModel->a14, 0x80);
     BitArray_SetAll(pModel->a24, 0x80);
@@ -1023,7 +1023,7 @@ void fn_800293CC(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pO
 
 // Sets up: the identity rotation, then the dynamic chains.
 void SKEL_InitModule(void) {
-    fn_80009710(lbl_801C6498);
+    Quat_IdentifyForMul(lbl_801C6498);
     fn_80113E60();
 }
 

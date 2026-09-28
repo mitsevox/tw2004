@@ -155,7 +155,7 @@ void BreakLine_Render(int nView) {
                 if (vDir[0] != 0.0f || vDir[1] != 0.0f) {
                     Vec_NormalizeTo(vDir, vDir);
                 }
-                fAngle = fn_80009614(Vec3_Dot(vDir, vAxis));
+                fAngle = Math_Acos(Vec3_Dot(vDir, vAxis));
                 vec4flt_CrossProduct(vDir, vAxis, vCross);
                 fAngle = fAngle * (vCross[1] < 0.0f ? -1.0f : 1.0f);
                 fSin = Math_Sin(fAngle);
@@ -387,7 +387,7 @@ void fn_800C9038(int nView, f32* pLong, f32* pSide) {
         return;
     }
     fAlong = fDot * fAimDist;
-    fSide = fAimDist * Math_Sin(fn_80009614(fDot));
+    fSide = fAimDist * Math_Sin(Math_Acos(fDot));
     vec4flt_CrossProduct(vToHole, vToAim, vCross);
     fAlong = fAlong - fHoleDist;
     if (vCross[1] < 0.0f) {

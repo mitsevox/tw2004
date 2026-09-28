@@ -728,7 +728,7 @@ f32 fn_800D0960(int nPlayer) {
     } else if (fCos > 1.0f) {
         fCos = 1.0f;
     }
-    fAngle = fn_80009614(fCos);
+    fAngle = Math_Acos(fCos);
     if (vToView[2] * vToPin[0] - vToView[0] * vToPin[2] < 0.0f) {
         fAngle *= -1.0f;
     }

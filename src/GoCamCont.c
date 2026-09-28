@@ -612,7 +612,7 @@ void fn_80063F08(f32* pA, f32* pB, f32* pOut) {
         vB[1] = 0.0f;
         vB[2] = 0.0f;
     }
-    fAngle = fn_80009614(Vec3_Dot(vA, vB) < -1.0f  ? -1.0f
+    fAngle = Math_Acos(Vec3_Dot(vA, vB) < -1.0f  ? -1.0f
                          : Vec3_Dot(vA, vB) > 1.0f ? 1.0f
                                                       : Vec3_Dot(vA, vB));
     fAngle *= 0.2f;

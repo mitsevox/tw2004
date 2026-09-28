@@ -297,7 +297,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
             Vec_NormalizeTo(aDir, aDir);
             fDot = (Vec3_Dot(aUp, aDir) < -1.0f) ? -1.0f
                  : ((Vec3_Dot(aUp, aDir) > 1.0f) ? 1.0f : Vec3_Dot(aUp, aDir));
-            lbl_801F5B98[nObj].a0[5] = fn_80009614(fDot);
+            lbl_801F5B98[nObj].a0[5] = Math_Acos(fDot);
             if (fSpinY < 0.0f) {
                 lbl_801F5B98[nObj].a0[5] = -lbl_801F5B98[nObj].a0[5];
             }

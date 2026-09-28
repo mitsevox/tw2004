@@ -2909,7 +2909,7 @@ void GolfCamera_ClampLookAngle(f32* pFrom, f32* pTo, f32* pOut) {
         vFlatDir[1] = 0.0f;
         vFlatDir[2] = 0.0f;
     }
-    fAngle = fn_80009614((Vec3_Dot(vDir, vFlatDir) < -1.0f) ? -1.0f
+    fAngle = Math_Acos((Vec3_Dot(vDir, vFlatDir) < -1.0f) ? -1.0f
                          : ((Vec3_Dot(vDir, vFlatDir) > 1.0f) ? 1.0f : Vec3_Dot(vDir, vFlatDir)));
     bClamp = 0;
     if (v[1] > 0.0f && fAngle > fMaxUp) {

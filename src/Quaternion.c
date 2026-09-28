@@ -5,10 +5,11 @@
 #include "engine.h"
 
 f32 Quat_GetNorm(f32* pQ);
-void fn_8000972C(f32* pQ);
+void Quat_Clear(f32* pQ);
 
-// Spherical interpolation from a to b by fT, into b. b is flipped when the two are more than a
-// half turn apart, and a straight blend is used when they are almost the same.
+// Spherical interpolation between the unit quaternions a and b by fT (0 gives a, 1 gives b),
+// written over b. b is negated first when a . b < 0 (the shorter way round), and a straight blend
+// is used when 1 - a . b is at most 0.01 (the two almost the same).
 void Quat_Slerp(f32* pA, f32* pB, f32 fT) {
     f32 fX;
     f32 fY;
@@ -31,7 +32,7 @@ void Quat_Slerp(f32* pA, f32* pB, f32 fT) {
         fW = -fW;
     }
     if (1.0f - fCos > 0.01f) {
-        fAngle = fn_80009614(fCos);
+        fAngle = Math_Acos(fCos);
         fSin = Math_Sin(fAngle);
         fScaleA = Math_Sin((1.0f - fT) * fAngle) / fSin;
         fScaleB = Math_Sin(fT * fAngle) / fSin;
@@ -45,8 +46,8 @@ void Quat_Slerp(f32* pA, f32* pB, f32 fT) {
     pB[3] = fScaleA * pA[3] + fScaleB * fW;
 }
 
-// The unit quaternion of a rotation matrix, into pQ: from the trace when it is positive,
-// otherwise from the largest diagonal element.
+// The unit quaternion of a rotation matrix's 3x3 part, into pQ (the reverse of Quat_QuatToMatrix):
+// from the trace when it is positive, otherwise from the largest diagonal element.
 void Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ) {
     int anNext[3] = {1, 2, 0};
     f32 aQ[4];
@@ -100,8 +101,9 @@ static double Quaternion_StrippedFn(double x) {
     return g;
 }
 
-// The quaternion of three angles (each negated), into pOut. An angle of exactly 0 skips its sin
-// and cos.
+// The quaternion yaw x pitch x roll, into pOut: yaw turns about z, pitch about y and roll about x
+// (radians), each angle negated first as in Legacy_Quat_BuildFromYaw/Pitch/Roll. An angle of
+// exactly 0 skips its sin and cos; all three 0 give the identity.
 void Quat_EulerAngles(f32 fA, f32 fB, f32 fC, f32* pOut) {
     f32 fHalf;
     f32 fSinA;
@@ -204,7 +206,7 @@ void Quat_EulerAngles(f32 fA, f32 fB, f32 fC, f32* pOut) {
         pOut[2] = 0.0f;
         return;
     }
-    fn_80009710(pOut);
+    Quat_IdentifyForMul(pOut);
 }
 
 // The quaternion's squared length.
@@ -212,7 +214,8 @@ f32 Quat_GetNorm(f32* pQ) {
     return pQ[2] * pQ[2] + (pQ[1] * pQ[1] + (pQ[3] * pQ[3] + pQ[0] * pQ[0]));
 }
 
-// The inverse rotation, into pOut.
+// The inverse quaternion, into pOut: the conjugate divided by the squared length (Quat_GetNorm), so
+// it also works for a quaternion that is not unit length.
 void Quat_Invert(f32* pQ, f32* pOut) {
     f32 fScale;
 
@@ -231,7 +234,8 @@ void Quat_Conjugate(f32* pQ, f32* pOut) {
     pOut[2] = -pQ[2];
 }
 
-// The product a x b, into pOut.
+// The quaternion product a x b, into pOut. pOut must not be pA or pB: it is written while they are
+// still being read.
 void Quat_Multiply(f32* pA, f32* pB, f32* pOut) {
     pOut[3] = pA[3] * pB[3] - (pA[2] * pB[2] + (pA[0] * pB[0] + pA[1] * pB[1]));
     pOut[0] = pB[3] * pA[0] + (pA[3] * pB[0] + (pA[1] * pB[2] - pA[2] * pB[1]));
@@ -247,7 +251,8 @@ void Quat_Add(f32* pA, f32* pB, f32* pOut) {
     pOut[2] = pA[2] + pB[2];
 }
 
-// b turned by the inverse of the unit quaternion a (conj(a) x b x a), into pOut.
+// Turns the vector pB, held as a quaternion (x, y, z, w), by the inverse of the unit quaternion pA:
+// conj(a) x b x a, into pOut (pOut may be pB, but not pA).
 void Quat_RotateVector(f32* pA, f32* pB, f32* pOut) {
     f32 aTmp[4];
     f32 aConj[4];
@@ -257,7 +262,8 @@ void Quat_RotateVector(f32* pA, f32* pB, f32* pOut) {
     Quat_Multiply(aTmp, pA, pOut);
 }
 
-// The rotation matrix (3 rows of 4, no translation) of a unit quaternion.
+// The rotation matrix of a unit quaternion, into rows 0-2 of m (their fourth float set to 0); row 3
+// is left as it is.
 void Quat_QuatToMatrix(f32* pQ, f32 (*m)[4]) {
     f32 fWX;
     f32 fWY;
@@ -301,15 +307,16 @@ void Quat_QuatToMatrix(f32* pQ, f32 (*m)[4]) {
     m[0][3] = 0.0f;
 }
 
-// A rotation vector (axis * angle) as a quaternion, into pOut; the identity when the angle is
-// below 0.001.
+// The quaternion of a rotation vector pRot (axis times angle, radians), into pOut. Like
+// Quat_EulerAngles it turns by minus the angle: x, y, z are -axis * sin(angle / 2). The identity
+// when the angle is below 0.001.
 void Quat_BuildFromVector(f32* pRot, f32* pOut) {
     f32 fAngle;
     f32 fScale;
 
     fAngle = Math_Sqrt(Vec3_LengthSqClamped(pRot));
     if (fAngle < 0.001f) {
-        fn_80009710(pOut);
+        Quat_IdentifyForMul(pOut);
         return;
     }
     pOut[3] = Math_Cos(fAngle / 2.0f);
@@ -319,11 +326,11 @@ void Quat_BuildFromVector(f32* pRot, f32* pOut) {
     pOut[2] = pRot[2] * fScale;
 }
 
-// A rotation vector pAxis (axis * angle) whose length fAngle is passed in, as a quaternion into
-// pOut; the identity when fAngle is below 0.001.
+// Quat_BuildFromVector with the angle passed in: pAxis is still axis times angle (it is divided by
+// fAngle), and fAngle is its length. The identity when fAngle is below 0.001.
 void Quat_BuildFromVectorAndScale(f32* pAxis, f32* pOut, f32 fAngle) {
     if (fAngle < 0.001f) {
-        fn_80009710(pOut);
+        Quat_IdentifyForMul(pOut);
         return;
     }
     pOut[3] = Math_Cos(fAngle / 2.0f);
@@ -338,7 +345,7 @@ void Quat_BuildFromVectorAndScale(f32* pAxis, f32* pOut, f32 fAngle) {
 void Legacy_Quat_BuildFromYaw(f32 fAngle, f32* pOut) {
     f32 fHalf;
 
-    fn_8000972C(pOut);
+    Quat_Clear(pOut);
     fHalf = 0.5f * -fAngle;
     pOut[2] = Math_Sin(fHalf);
     pOut[3] = Math_Cos(fHalf);
@@ -348,7 +355,7 @@ void Legacy_Quat_BuildFromYaw(f32 fAngle, f32* pOut) {
 void Legacy_Quat_BuildFromPitch(f32 fAngle, f32* pOut) {
     f32 fHalf;
 
-    fn_8000972C(pOut);
+    Quat_Clear(pOut);
     fHalf = 0.5f * -fAngle;
     pOut[1] = Math_Sin(fHalf);
     pOut[3] = Math_Cos(fHalf);
@@ -358,14 +365,16 @@ void Legacy_Quat_BuildFromPitch(f32 fAngle, f32* pOut) {
 void Legacy_Quat_BuildFromRoll(f32 fAngle, f32* pOut) {
     f32 fHalf;
 
-    fn_8000972C(pOut);
+    Quat_Clear(pOut);
     fHalf = 0.5f * -fAngle;
     pOut[0] = Math_Sin(fHalf);
     pOut[3] = Math_Cos(fHalf);
 }
 
-// The three angles of a unit quaternion, into *pA, *pB and *pC (the middle one from an asin,
-// its sine clamped to -1..1).
+// The yaw (about z), pitch (about y) and roll (about x) of a unit quaternion, in radians, into
+// *pYaw, *pPitch and *pRoll. Yaw and roll come from atan of a ratio, not atan2, so they stay within
+// -pi/2..pi/2; pitch is the asin of a sine clamped to -1..1. They are the angles of q itself, so
+// they have the opposite sign of the angles Quat_EulerAngles takes.
 void Quat_ExtractEulerAngles(f32* pQ, f32* pA, f32* pB, f32* pC) {
     f32 fTanA;
     f32 fSinB;
@@ -378,28 +387,33 @@ void Quat_ExtractEulerAngles(f32* pQ, f32* pA, f32* pB, f32* pC) {
             (pQ[2] * pQ[2] + (pQ[3] * pQ[3] - pQ[0] * pQ[0] - pQ[1] * pQ[1]));
     fSinB = (fSinB < -1.0f) ? -1.0f : ((fSinB > 1.0f) ? 1.0f : fSinB);
     *pA = atan(fTanA);
-    *pB = fn_8000965C(fSinB);
+    *pB = Math_Asin(fSinB);
     *pC = atan(fTanC);
 }
 
+// Sine of fAngle (radians), through the double-precision sin().
 f32 Math_Sin(f32 fAngle) {
     return sin(fAngle);
 }
 
-f32 fn_80009614(f32 x) {
+// Arc cosine in radians (0..pi), through the double-precision acos().
+f32 Math_Acos(f32 x) {
     return acos(x);
 }
 
+// Cosine of fAngle (radians), through the double-precision cos().
 f32 Math_Cos(f32 fAngle) {
     return cos(fAngle);
 }
 
-f32 fn_8000965C(f32 x) {
+// Arc sine in radians (-pi/2..pi/2), through the double-precision asin().
+f32 Math_Asin(f32 x) {
     return asin(x);
 }
 
-// Square root: four Newton steps from the reciprocal-root estimate; 0 for 0, NaN for a negative
-// x or a NaN (the infinity at the end is never reached).
+// Square root of a double: four Newton steps from the reciprocal-root estimate (__frsqrte). 0 for
+// 0; NaN for a negative x, a NaN, and also +infinity (the estimate is 0 there). The TW_INFINITY at
+// the end is never reached.
 double Math_Sqrt(double x) {
     double g;
 
@@ -418,15 +432,17 @@ double Math_Sqrt(double x) {
     return TW_INFINITY;
 }
 
-// The identity rotation.
-void fn_80009710(f32* pQ) {
+// Sets pQ to the identity rotation (0, 0, 0, 1).
+void Quat_IdentifyForMul(f32* pQ) {
     pQ[3] = 1.0f;
     pQ[0] = 0.0f;
     pQ[1] = 0.0f;
     pQ[2] = 0.0f;
 }
 
-void fn_8000972C(f32* pQ) {
+// Sets all four floats of pQ to 0 (not a rotation: the Legacy_Quat_BuildFrom* functions then fill
+// in two of them).
+void Quat_Clear(f32* pQ) {
     pQ[3] = 0.0f;
     pQ[0] = 0.0f;
     pQ[1] = 0.0f;
