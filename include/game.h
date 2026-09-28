@@ -340,14 +340,14 @@ void fn_800DC9D4(int a);                // pause or resume a GameBreaker
 u8   fn_8003DCAC(void);                 // GoDynamicCam.c: the letterbox is up (predicted, or b19)
 
 // GameManager.c
-void fn_800DCAD8(void);
-void fn_800DCAFC(void);
-u8   fn_800DCB00(void);
-u8   fn_800DCB08(void);
-u8   fn_800DCB10(int nPlayer);          // the mode's pfn1F8 answer for the player
-u8   fn_800DCB3C(void);
-u8   fn_800DCB74(void);
-void fn_800DCB84(f32* pA, f32* pB, f32* pOut);   // out = a - b
+void GameEffects_SendMessage50(void);
+void GameEffects_ClearSingleStep(void);
+u8   GameEffects_IsSingleStepPending(void);
+u8   GameEffects_IsFixedTimeStepOn(void);
+u8   GM_IsPuttForLead(int nPlayer);          // the mode's pfn1F8 answer for the player
+u8   GameEffects_StartOfSlowMoFrame(void);
+u8   GameEffects_IsHalfTimeOn(void);
+void GameEffects_Vec3Sub(f32* pA, f32* pB, f32* pOut);   // out = a - b
 int  GM_GotoNextSelectedHole(void);
 void GM_EndOfGolferTurn(int nPlayer);
 void GM_BallHit(int nPlayer);

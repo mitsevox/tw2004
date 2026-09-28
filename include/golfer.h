@@ -562,7 +562,7 @@ typedef struct GameState {
     void (*pfn1EC)(void);       // 0x1EC
     void (*pfn1F0)(void);       // 0x1F0
     void (*pfnEndGame)(void);   // 0x1F4  game finished. TW06: EndGame
-    u8   (*pfn1F8)(int nPlayer); // 0x1F8  fn_800DCB10 returns its answer
+    u8   (*pfn1F8)(int nPlayer); // 0x1F8  GM_IsPuttForLead returns its answer
     u8   (*pfn1FC)(int nPlayer); // 0x1FC  asked before the special ball pick-up
     s32  (*pfn200)(int nPlayer); // 0x200  strokes behind the leader. TW06: GetCurrentLead
     s32  (*pfn204)(int nPlayer); // 0x204  the same if this putt drops. TW06: GetPotentialLead

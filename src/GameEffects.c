@@ -61,7 +61,7 @@ void GameEffects_ResetGameEffectSettings(void) {
         } else {
             EVENT_Trigger(lbl_80202898.nPlayer, 0x40, 0, -1);
         }
-        fn_800DCAD8();
+        GameEffects_SendMessage50();
     }
     lbl_80202898.bGameBreaker = 0;
     lbl_80202898.bSpinWindowDone = 0;
@@ -92,17 +92,17 @@ f32 fn_800DAF98(f32 fFrameTime) {
     f32 fBest = 10000.0f;
     int i;
     f32 d;
-    if (fn_800DCB08() && 0.0f != fFrameTime) {
+    if (GameEffects_IsFixedTimeStepOn() && 0.0f != fFrameTime) {
         fFrameTime = FRAME_TIME;
     }
     if (GOLFERSTATE_IsFrozen()) {
         fFrameTime = 0.0f;
     }
-    if (fn_800DCB00()) {
+    if (GameEffects_IsSingleStepPending()) {
         if (0.0f != fFrameTime) {
             fFrameTime = FRAME_TIME;
         }
-        fn_800DCAFC();
+        GameEffects_ClearSingleStep();
     }
     if (fn_800C6CCC()) {
         return 0.0f;
@@ -154,8 +154,8 @@ int GameEffects_BallUpdatesThisFrame(int nPlayer) {
     if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SIMULATE) {
         return 1;
     }
-    if (fn_800DCB74() && gSession.fFrameTime < FRAME_TIME) {
-        return fn_800DCB3C() != 0;
+    if (GameEffects_IsHalfTimeOn() && gSession.fFrameTime < FRAME_TIME) {
+        return GameEffects_StartOfSlowMoFrame() != 0;
     }
     if (Game_GetMode() == 26) {
         if (gSession.fFrameTime <= FRAME_TIME) {
@@ -304,7 +304,7 @@ int fn_800DB86C(int nPlayer) {
     } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e &&
                fn_800D8750(2, fDist, 0, gpSaveData[nPlayer].szName, nPlayer)) {
         bPossible = 1;
-    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e && fn_800DCB10(nPlayer)) {
+    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e && GM_IsPuttForLead(nPlayer)) {
         bPossible = 1;
     } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e && fn_800BCD24(nPlayer)) {
         bPossible = 1;
@@ -340,7 +340,7 @@ void fn_800DBA50(int nPlayer) {
         return;
     }
     if (!(gPlayers[nPlayer].uFlags & 8) && !Player_IsCPU(nPlayer) && lbl_80202898.bGameBreaker != 1) {
-        fn_800DCB84(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].ballBefore.vPos, v);
+        GameEffects_Vec3Sub(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].ballBefore.vPos, v);
         v[1] = 0.0f;
         fDist = Math_Sqrt(Vec3_LengthSqClamped(v));
         if (gPlayers[nPlayer].nClub == 25) {
@@ -355,7 +355,7 @@ void fn_800DBA50(int nPlayer) {
             return;
         }
         if (!gPlayers[nPlayer].b30D && Ter_GetTGD()) {
-            fn_800DCB84(gPlayers[nPlayer].ball.vStart, gPlayers[nPlayer].ballBefore.vPos, v2);
+            GameEffects_Vec3Sub(gPlayers[nPlayer].ball.vStart, gPlayers[nPlayer].ballBefore.vPos, v2);
             v2[1] = 0.0f;
             fDist = Math_Sqrt(Vec3_LengthSqClamped(v2));
             nLie = gPlayers[nPlayer].ball.nLie;
@@ -463,7 +463,7 @@ void fn_800DBFAC(void) {
         fHeight = 0.15f;
     }
     pGE = &lbl_80202898;       // fake match: steers the register choice (found by the permuter)
-    fn_800DCB84(gPlayers[pGE->nPlayer].ball.vPos, gPlayers[pGE->nPlayer].ballBefore.vPos, v);
+    GameEffects_Vec3Sub(gPlayers[pGE->nPlayer].ball.vPos, gPlayers[pGE->nPlayer].ballBefore.vPos, v);
     v[1] = 0.0f;
     fDist = Math_Sqrt(Vec3_LengthSqClamped(v));
     if (!Player_IsCPU(lbl_80202898.nPlayer)) {

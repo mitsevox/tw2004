@@ -252,11 +252,11 @@ void fn_800DAE44(void);
 f32  fn_800DAF98(f32 fFrameTime);
 void fn_800DBF34(void);
 void fn_800DC664(int nPlayer);
-void fn_800DCBA8(void);
-void fn_800DCBB8(void);
-void fn_800DCBBC(void);
-void fn_800DCC04(void);
-void fn_800DCC30(void);
+void GM_vInitModuleONCE(void);
+void GM_vCloseModuleONCE(void);
+void GM_InitModule_PreDataStream(void);
+void GM_InitModule_PostDataStream(void);
+void GM_DeInitModule(void);
 void GM_SetupDefaultProfile(void);
 void fn_800E5314(void);
 s32  fn_800FD6A4(int nPlayer);
@@ -409,7 +409,7 @@ void fn_8006C720(void) {
     fn_800563C4();
     fn_8005D2E4();
     GOLFERSTATE_OpenONCE();
-    fn_800DCBA8();
+    GM_vInitModuleONCE();
     fn_800A2064();
     fn_8010F6C8();
     EASBio_InitOnce();
@@ -417,7 +417,7 @@ void fn_8006C720(void) {
 }
 
 void fn_8006C770(void) {
-    fn_800DCBB8();
+    GM_vCloseModuleONCE();
     fn_8005D348();
     GOLFERSTATE_CloseONCE();
     fn_800763B8();
@@ -626,7 +626,7 @@ void GO_vInitIG(void) {
     fn_80014594();
     fn_80085120();
     fn_8005D3A8(1);
-    fn_800DCBBC();
+    GM_InitModule_PreDataStream();
     fn_80067608();
     CameraTuning_Init();
     fn_80062E00();
@@ -645,7 +645,7 @@ void GO_vInitIG(void) {
     UI_Obj_InitModule();
     ViewController_ResetAll();
     Players_SetupAll();
-    fn_800DCC04();
+    GM_InitModule_PostDataStream();
     Character_PostInit();
     if (!gSession.nSplitScreen) {
         GLW_vInitModule(1);
@@ -728,7 +728,7 @@ void fn_8006CDC4(void) {
     DynamicCam_DeInit();
     StaticCam_DeInit();
     fn_80097E98();
-    fn_800DCC30();
+    GM_DeInitModule();
     fn_8006F64C();
     fn_800306B8();
     fn_8010A4E8();
