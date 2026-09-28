@@ -65,7 +65,7 @@ typedef struct PgaPro {
     s32  nCareerWinnings;       // 0x64  before the game's first season (0x801176C0)
 } PgaPro;
 LAYOUT_ASSERT(PgaPro, 0x68);
-extern PgaPro lbl_8024B9CC[PGA_NUM_PROS];
+extern PgaPro gPgaPros[PGA_NUM_PROS];
 
 // An entrant of the tournament being played, in memory (0x50 bytes; GetEntrantNonMCPtr).
 // TW06: PgaTourSim_Entrant_NonMC_t, the same layout.
@@ -75,7 +75,7 @@ typedef struct PgaEntrant {
     s32  bInPlayoff;            // 0x4C  TW06: inPlayoff
 } PgaEntrant;
 LAYOUT_ASSERT(PgaEntrant, 0x50);
-extern PgaEntrant lbl_80224070[PGA_MAX_ENTRANTS];
+extern PgaEntrant gPgaEntrants[PGA_MAX_ENTRANTS];
 
 // The entrants in score order (0x400 bytes), rebuilt when the scores change.
 #define PGA_SCORE_CUT       0x7FFFFFFF          // a cut entrant's score in the sorts: the worst
@@ -85,7 +85,7 @@ typedef struct PgaScoreRanking {
     s32  aRank[PGA_MAX_ENTRANTS];       // 0x200  each entrant's place
 } PgaScoreRanking;
 LAYOUT_ASSERT(PgaScoreRanking, 0x400);
-extern PgaScoreRanking lbl_80223C70;
+extern PgaScoreRanking gPgaScoreRanking;
 
 // One golfer's value of a statistic, and as text (0x14 bytes).
 typedef struct PgaStatValue {
@@ -100,7 +100,7 @@ typedef struct PgaStatRanking {
     PgaStatValue aValue[PGA_NUM_GOLFERS];   // 0x578  each golfer's value
 } PgaStatRanking;
 LAYOUT_ASSERT(PgaStatRanking, 0x1324);
-extern PgaStatRanking lbl_80226870[GM_PGA_STAT_COUNT];
+extern PgaStatRanking gPgaStatRankings[GM_PGA_STAT_COUNT];
 
 // What the statistic sort comparisons read (they get only two golfer ids): the statistic being
 // ranked and the player whose profile holds the counts. nStat is -1 outside a sort.
@@ -108,18 +108,18 @@ typedef struct PgaStatSort {
     s32  nStat;                 // 0x0
     s32  nPlayer;               // 0x4
 } PgaStatSort;
-extern PgaStatSort lbl_80281840;
-extern int lbl_80281848;        // the same for the score sorts: the player
+extern PgaStatSort gPgaStatSort;
+extern int gPgaScoreSortPlayer;        // the same for the score sorts: the player
 // Per simple statistic: the Calc function that works it out from a golfer's counts.
-extern u8 (*lbl_80193F88[GM_PGA_STAT_SIMPLE_COUNT])(PgaStatCounts* pCounts, f32* pfValue);
+extern u8 (*gPgaSimpleStatCalcs[GM_PGA_STAT_SIMPLE_COUNT])(PgaStatCounts* pCounts, f32* pfValue);
 // Per statistic: its sort comparison, fn_8011BCFC (higher is better) or fn_8011BBD8 (lower).
-extern s32 (*lbl_80193FF8[GM_PGA_STAT_COUNT])(const void* pA, const void* pB);
-extern s32 lbl_80194074[GM_PGA_STAT_COUNT];     // per statistic: GM_PgaTourSim_GetStatView
-extern s32 lbl_801940F0[32];    // per statistic: the decimal places GM_PgaTourSim_GetStatValString prints
+extern s32 (*gPgaStatCompares[GM_PGA_STAT_COUNT])(const void* pA, const void* pB);
+extern s32 gPgaStatViews[GM_PGA_STAT_COUNT];     // per statistic: GM_PgaTourSim_GetStatView
+extern s32 gPgaStatDecimals[32];    // per statistic: the decimal places GM_PgaTourSim_GetStatValString prints
 extern u8  gbStatsDirty;        // the statistics need working out again
 extern u8  gbScoresDirty;       // the score ranking needs sorting again
-extern u8  lbl_80282500;
-extern s32 lbl_80282504;        // the player's playoff strokes (GM_PgaTourSim_SetUserEntrantHoleStrokes)
+extern u8  gbPgaUserQuit;
+extern s32 gPgaUserPlayoffScore;        // the player's playoff strokes (GM_PgaTourSim_SetUserEntrantHoleStrokes)
 
 // PGATourSimulation.c functions other files call. The TW06 name follows where the code matches it.
 void  fn_8011763C(void);                        // TW06: PGATourSimulation_OpenONCE
