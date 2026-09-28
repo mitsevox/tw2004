@@ -44325,5 +44325,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "cf52fa6",
+"sha": "cf52fa6521deeb82404d96888ccd0657043e7895",
+"time": 1790558496,
+"subject": "state: pre-compact checkpoint (round 5 done, round 6 plan and the round procedure)",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
