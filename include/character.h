@@ -309,7 +309,7 @@ typedef struct Clip {
     f32    v80[3];              // 0x80  a point Character_GetEndOfAnimationPosition puts through bone 0's matrix
     s16    n8C;                 // 0x8C  halfwords per frame, first stream
     s16    n8E;                 // 0x8E  bytes per frame, second stream
-    u64    u90;                 // 0x90  looked up in lbl_801B9638 (FEgolferanim.c fn_8008D058)
+    u64    u90;                 // 0x90  looked up in gClubBoneIds (FEgolferanim.c fn_8008D058)
     u8     unk98[8];
     char   name[0x20];          // 0xA0  (fn_8002091C swaps 0xA0 and 0xB0 as 16 bytes each, then words)
     void*  pC0;                 // 0xC0  where the clip was loaded: itself (fn_80020F60), or the start
@@ -520,26 +520,26 @@ typedef struct CharEntry44 {
 LAYOUT_ASSERT(CharEntry44, 0x30);
 
 // What Character_CreateFromMem hands the skeleton loader (SKEL_LoadFromMem) for a golfer's model (our name):
-// lbl_80280E10, or lbl_80280E18 in split screen; a table of 0x10-byte entries and their count.
+// gCharModelDefs, or gCharModelDefsSplit in split screen; a table of 0x10-byte entries and their count.
 typedef struct CharModelDefs {
     IKChainDef* pDefs;          // 0x0  (SKEL_CreateIKSkeleton builds a chain from each)
     s32   nDefs;                // 0x4
 } CharModelDefs;
 
-extern CharModelDefs lbl_80280E10;
-extern CharModelDefs lbl_80280E18;
-extern IKChainDef lbl_80186E80[2];   // lbl_80280E10's chains
-extern IKChainDef lbl_80186EA0[2];   // lbl_80280E18's chains
+extern CharModelDefs gCharModelDefs;
+extern CharModelDefs gCharModelDefsSplit;
+extern IKChainDef gIKChainDefs[2];   // gCharModelDefs's chains
+extern IKChainDef gIKChainDefsSplit[2];   // gCharModelDefsSplit's chains
 
 // Per club class, an offset (x, y, z) Character_SetupForShot places the golfer by (0x4C bytes: one more
 // float follows the six).
-extern f32 lbl_80187184[6][3];
+extern f32 gClubStanceOffsets[6][3];
 
 // The golfer's character object (0x1798 bytes or more); only the fields read so far. SKATime_SetTimeScale,
 // Anim_SetTime and SKATime_UnPause take the address of its animation player at 0x164, whose fields
 // from 0x168 on are named here directly.
 typedef struct Character {
-    s32   nIndex;               // 0x000  its entry in lbl_801B9624 (Character_Add)
+    s32   nIndex;               // 0x000  its entry in gCharacters (Character_Add)
     s32   nPlayer;              // 0x004  the player it belongs to (Player_SetGolfer); 1000 for the
                                 //        characters SkeletalObject_FindObject finds by id
     u32   uId;                  // 0x008  the id of the 'SKLO' object it was built from (SkeletalObject_StreamCallback);
@@ -576,7 +576,7 @@ typedef struct Character {
     s32   n5C;                  // 0x05C  } 0 without palettes
     void* pDynTex;              // 0x060  the one of apDynTex a texture load fills (the load callbacks)
     void* apDynTex[2];          // 0x064  } its dynamic texture sets (DynTex), taken from the pool
-    s8    aDynTexSlot[2];       // 0x06C  } lbl_801B95E8, and their entries there (-1 once given back)
+    s8    aDynTexSlot[2];       // 0x06C  } gCharDynTexPool, and their entries there (-1 once given back)
     u8    unk6E[2];
     s32   nDynTex;              // 0x070  how many of apDynTex it takes
     s32   nCurDynTex;           // 0x074  the one of apDynTex shown (the menu golfer loads the other one
@@ -702,19 +702,19 @@ extern ViewSlot gViewSlots[5];          // 0x80187124  per player
 
 // Club names as 64-bit ids ("IGdriver", [1] unset, "IGputter", "IGiron3", "IGiron7", "IGwedge"),
 // set by Legacy_Character_InitModule; FEgolferanim compares ids against them.
-extern u64 lbl_801B9638[6];
+extern u64 gClubBoneIds[6];
 
 extern f32 lbl_80189A30[4];             // (0, 0, 0, 0): where Character_GolferStreamCallbackFE places the menu's golfer
 
 // char.c: the club skins' part and set names, one per club kind (0 drivers, 1 fairway woods,
 // 2 putters, 3 and 4 the 3 and 7 irons, 5 wedges), for Character_SetClubStatesForCharacter
-extern char lbl_80186EC0[6][13];        // the parts: "Drivers" ...
-extern char lbl_80186F10[6][13];        // "fwd_shaft", "pwi_shaft" sets
-extern char lbl_80186F60[6][13];        // "Defaults", their variants
-extern char lbl_80186FB0[6][13];        // "EA_Driver" ... sets
-extern char lbl_80187000[6][13];        // "Defaults"
-extern char lbl_80187050[6][13];        // "fwd_grip", "pwi_grip" sets
-extern char lbl_801870A0[6][13];        // "Defaults"
+extern char gClubPartNames[6][13];        // the parts: "Drivers" ...
+extern char gClubShaftSetNames[6][13];        // "fwd_shaft", "pwi_shaft" sets
+extern char gClubShaftVariantNames[6][13];        // "Defaults", their variants
+extern char gClubHeadSetNames[6][13];        // "EA_Driver" ... sets
+extern char gClubHeadVariantNames[6][13];        // "Defaults"
+extern char gClubGripSetNames[6][13];        // "fwd_grip", "pwi_grip" sets
+extern char gClubGripVariantNames[6][13];        // "Defaults"
 
 void  Character_SetClubStatesForCharacter(Character* pChar, int nSlot, struct SkinChoices* pChoices);
 

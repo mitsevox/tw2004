@@ -378,9 +378,9 @@ void SKN_DrawBoneTri(Character* pChar, int nView) {
 void SKN_DrawBoneTris(int nView) {
     int i;
 
-    for (i = 0; i < lbl_80281CA8; i++) {
-        if (!Character_IsGolfer(lbl_801B9624[i]) && !(lbl_801B9624[i]->u10 & 0x41)) {
-            SKN_DrawBoneTri(lbl_801B9624[i], nView);
+    for (i = 0; i < gNumCharacters; i++) {
+        if (!Character_IsGolfer(gCharacters[i]) && !(gCharacters[i]->u10 & 0x41)) {
+            SKN_DrawBoneTri(gCharacters[i], nView);
         }
     }
 }

@@ -14,7 +14,7 @@
 
 // data order: these lead the unity's .data (0x80186CC8), ahead of char_tex_manager.c's
 // "_usrtextr", so they are defined before its #include.
-IKLinkDef lbl_80186CC8[7] = {
+IKLinkDef gIKRightArmLinksSplit[7] = {
     {1, 0.0f, -1, 0.0f, 0.0f},
     {3, 1.0f, -1, 0.0f, 0.0f},
     {7, 0.5f, -1, 0.0f, 0.0f},
@@ -23,7 +23,7 @@ IKLinkDef lbl_80186CC8[7] = {
     {82, 0.0f, -1, 0.0f, 0.0f},
     {83, 0.0f, -1, 0.0f, 0.0f},
 };
-IKLinkDef lbl_80186D54[10] = {
+IKLinkDef gIKRightArmLinks[10] = {
     {1, 0.0f, -1, 0.0f, 0.0f},
     {3, 1.0f, -1, 0.0f, 0.0f},
     {4, 0.5f, -1, 0.0f, 0.0f},
@@ -35,28 +35,28 @@ IKLinkDef lbl_80186D54[10] = {
     {82, 0.0f, -1, 0.0f, 0.0f},
     {83, 0.0f, -1, 0.0f, 0.0f},
 };
-IKLinkDef lbl_80186E1C[5] = {
+IKLinkDef gIKLeftArmLinks[5] = {
     {7, 0.0f, -1, 0.0f, 0.0f},
     {35, 0.25f, -1, 0.0f, 0.0f},
     {36, 0.5f, -1, 0.0f, 0.0f},
     {39, 0.0f, -1, 0.0f, 0.0f},
     {40, 0.0f, -1, 0.0f, 0.0f},
 };
-IKChainDef lbl_80186E80[2] = {
-    {lbl_80186D54, 10, 20, 0.01f},
-    {lbl_80186E1C, 5, 20, 0.01f},
+IKChainDef gIKChainDefs[2] = {
+    {gIKRightArmLinks, 10, 20, 0.01f},
+    {gIKLeftArmLinks, 5, 20, 0.01f},
 };
-IKChainDef lbl_80186EA0[2] = {
-    {lbl_80186CC8, 7, 10, 0.01f},
-    {lbl_80186E1C, 5, 20, 0.01f},
+IKChainDef gIKChainDefsSplit[2] = {
+    {gIKRightArmLinksSplit, 7, 10, 0.01f},
+    {gIKLeftArmLinks, 5, 20, 0.01f},
 };
-char lbl_80186EC0[6][13] = {"Drivers", "Fairwaywoods", "Putters", "3Irons", "7Irons", "Wedges"};
-char lbl_80186F10[6][13] = {"fwd_shaft", "fwd_shaft", "pwi_shaft", "pwi_shaft", "pwi_shaft", "pwi_shaft"};
-char lbl_80186F60[6][13] = {"Defaults", "Defaults", "Defaults", "Defaults", "Defaults", "Defaults"};
-char lbl_80186FB0[6][13] = {"EA_Driver", "EA_Fairway", "EA_Putter", "EA_3Iron", "EA_7Iron", "EA_Wedge"};
-char lbl_80187000[6][13] = {"Defaults", "Defaults", "Defaults", "Defaults", "Defaults", "Defaults"};
-char lbl_80187050[6][13] = {"fwd_grip", "fwd_grip", "pwi_grip", "pwi_grip", "pwi_grip", "pwi_grip"};
-char lbl_801870A0[6][13] = {"Defaults", "Defaults", "Defaults", "Defaults", "Defaults", "Defaults"};
+char gClubPartNames[6][13] = {"Drivers", "Fairwaywoods", "Putters", "3Irons", "7Irons", "Wedges"};
+char gClubShaftSetNames[6][13] = {"fwd_shaft", "fwd_shaft", "pwi_shaft", "pwi_shaft", "pwi_shaft", "pwi_shaft"};
+char gClubShaftVariantNames[6][13] = {"Defaults", "Defaults", "Defaults", "Defaults", "Defaults", "Defaults"};
+char gClubHeadSetNames[6][13] = {"EA_Driver", "EA_Fairway", "EA_Putter", "EA_3Iron", "EA_7Iron", "EA_Wedge"};
+char gClubHeadVariantNames[6][13] = {"Defaults", "Defaults", "Defaults", "Defaults", "Defaults", "Defaults"};
+char gClubGripSetNames[6][13] = {"fwd_grip", "fwd_grip", "pwi_grip", "pwi_grip", "pwi_grip", "pwi_grip"};
+char gClubGripVariantNames[6][13] = {"Defaults", "Defaults", "Defaults", "Defaults", "Defaults", "Defaults"};
 
 // char_tex_manager.c and char.c were one translation unit (a unity build: TW07 compiles both in
 // golf2_unity.cpp): the .data of both is one 8-aligned block from 0x801870F0 ("_usrtextr", then
@@ -215,19 +215,19 @@ void Character_SelectShotType(void* arg0, s32 arg1);
 // ---- end of sweep code ----
 
 // This file's .sbss (charstate.h), in reverse address order as the compiler lays it out.
-s32 lbl_80281CAC;
-s32 lbl_80281CA8;
+s32 gCharTexStreamedPlayer;
+s32 gNumCharacters;
 
-CharModelDefs lbl_80280E10 = { lbl_80186E80, 2 };
-CharModelDefs lbl_80280E18 = { lbl_80186EA0, 2 };
-s32 lbl_80280E20 = 3;
-CharSkinSet* lbl_80280E24[2] = { NULL, NULL };
+CharModelDefs gCharModelDefs = { gIKChainDefs, 2 };
+CharModelDefs gCharModelDefsSplit = { gIKChainDefsSplit, 2 };
+s32 gMaxBlendClips = 3;
+CharSkinSet* gClubSkinSets[2] = { NULL, NULL };
 
-u64 lbl_801B9638[6];
-Character* lbl_801B9624[5];
-CharPool lbl_801B95E8;
-f32 lbl_801B95D8[4];
-f32 lbl_801B95C8[4];
+u64 gClubBoneIds[6];
+Character* gCharacters[5];
+CharPool gCharDynTexPool;
+f32 gCharSupportingNormal[4];
+f32 gCharCoveringNormal[4];
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f, 2^30, 0.0f, -60000.0f and 3.0f (0x80282BC0), 1.0f and 3.0f before their first users
@@ -402,8 +402,8 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
         if ((pCourse = Ter_GetTGD()) != NULL) {
             LLMath_CopyVec(pPos, vPos);
             vPos[1] += 0.66f / 12.0f;
-            Ter_GetEnclosingGroundData(pCourse, vPos, &fSupportingHeight, &pSupportingSurface, lbl_801B95D8,
-                                       &fCoveringHeight, &pCoveringSurface, lbl_801B95C8);
+            Ter_GetEnclosingGroundData(pCourse, vPos, &fSupportingHeight, &pSupportingSurface, gCharSupportingNormal,
+                                       &fCoveringHeight, &pCoveringSurface, gCharCoveringNormal);
             if (!(fCoveringHeight < -60000.0f)) {
                 if (fSupportingHeight < -60000.0f || pSupportingSurface->nClass == 7 ||
                     pSupportingSurface->nClass == 0x13 || fCoveringHeight - fSupportingHeight < 0.05f ||
@@ -411,7 +411,7 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
                     if (pCoveringSurface->nClass == 0xC || pCoveringSurface->nClass == 0x12) {
                         return -65536.125f;
                     }
-                    *ppNormal = lbl_801B95C8;
+                    *ppNormal = gCharCoveringNormal;
                     return fCoveringHeight;
                 }
             } else if (fSupportingHeight < -60000.0f) {
@@ -420,7 +420,7 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
             if (pSupportingSurface->nClass == 0xC || pSupportingSurface->nClass == 0x12) {
                 return -65536.125f;
             }
-            *ppNormal = lbl_801B95D8;
+            *ppNormal = gCharSupportingNormal;
             return fSupportingHeight;
         none:
             return -65536.125f;
@@ -1359,14 +1359,14 @@ void Character_AddTextureLoadRequest(Character* pChar, void (*pfnBegin)(Characte
     DynTexJob* pJob = fn_8010B8EC();
 
     if (pJob != NULL) {
-        lbl_801B95E8.a[6].p = pChar;
+        gCharDynTexPool.a[6].p = pChar;
         pJob->pfnBegin = pfnBegin;
         pJob->pChar = pChar;
         pJob->pfnEnd = pfnEnd;
         pJob->ppBank = &pChar->pBank;
         fn_8010B930(pJob);
     } else {
-        lbl_801B95E8.a[6].p = NULL;
+        gCharDynTexPool.a[6].p = NULL;
     }
 }
 
@@ -1475,7 +1475,7 @@ void Character_EndSwapTexturesCallbackFE(Character* pChar) {
 // The in-game begin callback of a texture load: sets up the dynamic textures of the character's
 // model in use (fn_8010B098), dresses it (Character_SetClubsAndClothes) and hands its dynamic
 // textures the name codes the skins' newest choices need (SkinPart_QueueMissingTextures, given the
-// "Glove" part's id); the last marked player (lbl_80281CAC) is dressed again.
+// "Glove" part's id); the last marked player (gCharTexStreamedPlayer) is dressed again.
 void Character_BeginLoadTexturesCallbackIG(Character* pArg) {
     // fake match: a copy of the parameter through void* (a plain copy is merged into it)
     Character* pChar = (Character*)(void*)pArg;
@@ -1492,8 +1492,8 @@ void Character_BeginLoadTexturesCallbackIG(Character* pArg) {
     Character_CopySkinChoices3To2(pChar);
     SKA_PackName(&uGlove, "Glove");
     SkinPart_QueueMissingTextures(pChar->apSkins, pChar->nSkins, pModel, &uGlove, 1);
-    if (lbl_80281CAC >= 0) {
-        Character_SetClubsAndClothes(gPlayers[lbl_80281CAC].pChar, lbl_80281CAC);
+    if (gCharTexStreamedPlayer >= 0) {
+        Character_SetClubsAndClothes(gPlayers[gCharTexStreamedPlayer].pChar, gCharTexStreamedPlayer);
     }
     // port: EA passes an argument fn_8010BED4 ignores
     ((void (*)(void*))fn_8010BED4)(pModel);
@@ -1508,7 +1508,7 @@ void Character_EndLoadTexturesCallbackIG(Character* pChar) {
     sApplyUserLogos(pChar, pChar->apDynTex[pChar->nCurDynTex], pChar->pChoices);
     fn_8010BA2C(pChar->apDynTex[pChar->nCurDynTex]);
     pChar->bTexLoaded = 1;
-    lbl_801B95E8.a[6].p = NULL;
+    gCharDynTexPool.a[6].p = NULL;
 }
 
 // Fills the characters' dynamic texture pool: two entries (the game-type test gives two either
@@ -1518,22 +1518,22 @@ void CharacterTex_Init(void) {
     int i;
 
     if (gSession.nGameType == 10 || gSession.nGameType == 3) {
-        lbl_801B95E8.nEntries = 2;
+        gCharDynTexPool.nEntries = 2;
     } else {
-        lbl_801B95E8.nEntries = 2;
+        gCharDynTexPool.nEntries = 2;
     }
-    for (i = 0; i < lbl_801B95E8.nEntries; i++) {
-        lbl_801B95E8.a[i].p = fn_8010A520(0x46, 0x87000, 0, 0x870, 4);
-        lbl_801B95E8.a[i].bUsed = 0;
+    for (i = 0; i < gCharDynTexPool.nEntries; i++) {
+        gCharDynTexPool.a[i].p = fn_8010A520(0x46, 0x87000, 0, 0x870, 4);
+        gCharDynTexPool.a[i].bUsed = 0;
     }
 }
 
 // Free every pool entry's dynamic texture (fn_8010A668) and mark the entry free.
 void CharacterTex_Close(void) {
     int i;
-    for (i = 0; i < lbl_801B95E8.nEntries; i++) {
-        fn_8010A668(lbl_801B95E8.a[i].p);
-        lbl_801B95E8.a[i].bUsed = 0;
+    for (i = 0; i < gCharDynTexPool.nEntries; i++) {
+        fn_8010A668(gCharDynTexPool.a[i].p);
+        gCharDynTexPool.a[i].bUsed = 0;
     }
 }
 
@@ -1543,7 +1543,7 @@ void CharacterTex_ReleasePoolEntries(Character* pChar) {
     int i;
     for (i = 0; i < pChar->nDynTex; i++) {
         if (pChar->apDynTex[i] != NULL) {
-            lbl_801B95E8.a[pChar->aDynTexSlot[i]].bUsed = 0;
+            gCharDynTexPool.a[pChar->aDynTexSlot[i]].bUsed = 0;
             pChar->aDynTexSlot[i] = -1;
             pChar->apDynTex[i] = NULL;
         }
@@ -1556,12 +1556,12 @@ void CharacterTex_ReleasePoolEntries(Character* pChar) {
 void CharacterTex_TakePoolEntries(Character* pChar) {
     int i;
     int n = 0;
-    for (i = 0; i < lbl_801B95E8.nEntries; i++) {
-        if (lbl_801B95E8.a[i].bUsed == 0) {
+    for (i = 0; i < gCharDynTexPool.nEntries; i++) {
+        if (gCharDynTexPool.a[i].bUsed == 0) {
             pChar->aDynTexSlot[n] = i;
-            pChar->apDynTex[n] = lbl_801B95E8.a[i].p;
+            pChar->apDynTex[n] = gCharDynTexPool.a[i].p;
             n++;
-            lbl_801B95E8.a[i].bUsed = 1;
+            gCharDynTexPool.a[i].bUsed = 1;
             if (n == pChar->nDynTex) {
                 return;
             }
@@ -1582,14 +1582,14 @@ void CharacterTex_TextureLoader(void) {
     }
 }
 
-// Before a hole: no player marked (lbl_80281CAC -1); with more than two players only the player
+// Before a hole: no player marked (gCharTexStreamedPlayer -1); with more than two players only the player
 // with the honor keeps pool entries: every player's character gives its back, then that player's
 // takes them and its dynamic textures are loaded now (fn_8010BF68 runs the loader to the end).
 void CharacterTex_PreHoleInit(void) {
     Character* pChar;
     int i;
 
-    lbl_80281CAC = -1;
+    gCharTexStreamedPlayer = -1;
     if (gSession.nNumPlayers > 2) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
             fn_8001A484(gPlayers[i].pChar);
@@ -1623,7 +1623,7 @@ void CharacterTex_StartStreamingPlayers(int nPlayer) {
         pChar = gPlayers[nPlayer].pChar;
         for (i = 0; i < gSession.nNumPlayers; i++) {
             if (i != nPlayer && gPlayers[i].pChar->apDynTex[gPlayers[i].pChar->nCurDynTex] != NULL &&
-                gPlayers[i].pChar != lbl_801B95E8.a[6].p) {
+                gPlayers[i].pChar != gCharDynTexPool.a[6].p) {
                 fn_8001A484(gPlayers[i].pChar);
                 CharacterTex_ReleasePoolEntries(gPlayers[i].pChar);
                 gPlayers[i].pChar->bTexLoaded = 0;
@@ -1631,7 +1631,7 @@ void CharacterTex_StartStreamingPlayers(int nPlayer) {
             }
         }
         if (!pChar->bTexLoaded) {
-            pQueued = lbl_801B95E8.a[6].p;
+            pQueued = gCharDynTexPool.a[6].p;
             if (pChar != pQueued) {
                 fn_8010BF68();
                 if (pQueued != NULL) {
@@ -1651,7 +1651,7 @@ void CharacterTex_StartStreamingPlayers(int nPlayer) {
         i = GM_GetSecondHonors();
         if (i < gSession.nNumPlayers) {
             pChar = gPlayers[i].pChar;
-            if (!pChar->bTexLoaded && pChar != lbl_801B95E8.a[6].p) {
+            if (!pChar->bTexLoaded && pChar != gCharDynTexPool.a[6].p) {
                 fn_8010BF68();
                 CharacterTex_TakePoolEntries(pChar);
                 Character_AddTextureLoadRequest(pChar, Character_BeginLoadTexturesCallbackIG,
@@ -1765,7 +1765,7 @@ void Character_PostInit(void) {
 // flag for bit 0x400 of u10, a model flag and five model values), its skin, the p44 entries, its
 // model (SKEL_LoadFromMem; a golfer outside the front end gets the golfer model definitions), its
 // own animation library (kept when its clips are its own or in a bank, else queued as an overlay of
-// its slot), and its slider definitions. A golfer then gets club skin set nSet (lbl_80280E24), and
+// its slot), and its slider definitions. A golfer then gets club skin set nSet (gClubSkinSets), and
 // with bLook its look from pChoices. nId: the golfer id (nC). nUnused: not read. NULL when no
 // character could be made.
 // port: the object is little-endian on disc and BYTESWAP_SWAPDATA swaps each value as it reads it:
@@ -1855,9 +1855,9 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
     pData += 0xC;
     if (bGolfer && gSession.nGameType != 10 && gSession.nGameType != 3) {
         if (gSession.nSplitScreen) {
-            pDefs = &lbl_80280E18;
+            pDefs = &gCharModelDefsSplit;
         } else {
-            pDefs = &lbl_80280E10;
+            pDefs = &gCharModelDefs;
         }
     }
     bModel = nModel == 1;
@@ -1918,7 +1918,7 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
     pChar->p4C = pData;
     Character_SetPreferedPos(pChar);
     if (bGolfer) {
-        pChar->pClubSet = lbl_80280E24[nSet];
+        pChar->pClubSet = gClubSkinSets[nSet];
         pChar->nClubHeadBone = CharModel_GetBoneIndex(pChar->pModel, 0x53);
         pChar->f165C = 100.0f;
         pChar->f1660 = 200.0f;
@@ -2024,24 +2024,24 @@ CharSkinSet* Character_CreateClubSkinSet(u8* pData) {
     return pSet;
 }
 
-// Frees the club skin sets (lbl_80280E24): each one's skins and a9C blocks, then the set. pSet is
+// Frees the club skin sets (gClubSkinSets): each one's skins and a9C blocks, then the set. pSet is
 // not used: Legacy_Character_CloseModule passes the set it found, but both are freed here.
 void Character_FreeClubSkinSets(CharSkinSet* pSet) {
     int j;
     int i;
 
     for (i = 0; i < 2; i++) {
-        if (lbl_80280E24[i] != NULL) {
+        if (gClubSkinSets[i] != NULL) {
             for (j = 0; j < 6; j++) {
-                if (lbl_80280E24[i]->apSkins[j] != NULL) {
-                    fn_80037CD8(lbl_80280E24[i]->apSkins[j]);
+                if (gClubSkinSets[i]->apSkins[j] != NULL) {
+                    fn_80037CD8(gClubSkinSets[i]->apSkins[j]);
                 }
-                if (lbl_80280E24[i]->a9C[j] != NULL) {
-                    CharSkinRef_Free(lbl_80280E24[i]->a9C[j]);
+                if (gClubSkinSets[i]->a9C[j] != NULL) {
+                    CharSkinRef_Free(gClubSkinSets[i]->a9C[j]);
                 }
             }
-            StaticMem_Free(lbl_80280E24[i]);
-            lbl_80280E24[i] = NULL;
+            StaticMem_Free(gClubSkinSets[i]);
+            gClubSkinSets[i] = NULL;
         }
     }
 }
@@ -2154,24 +2154,24 @@ void Character_PreRenderAll(void) {
 
     fn_80035600();
     SKN_BeginFrame();
-    for (i = 0; i < lbl_80281CA8; i++) {
+    for (i = 0; i < gNumCharacters; i++) {
         iPlayer2Clip = fn_800636EC();
-        lbl_801B9624[i]->u10 &= ~0x1000;
-        if (lbl_801B9624[i]->u10 & 2) {
+        gCharacters[i]->u10 &= ~0x1000;
+        if (gCharacters[i]->u10 & 2) {
             if (ViewController_GetCurrentViewController()->bFlagOut) {
-                lbl_801B9624[i]->u10 |= 1;
+                gCharacters[i]->u10 |= 1;
             } else {
-                lbl_801B9624[i]->u10 &= ~1;
+                gCharacters[i]->u10 &= ~1;
             }
         }
-        bState = Character_GetClipResult(lbl_801B9624[i]) != 2;
-        bPreRender = bState || Character_GetShadowClipResult(lbl_801B9624[i]) != 2;
-        bPreRender = bPreRender && iPlayer2Clip != lbl_801B9624[i]->nPlayer;
-        bPreRender = bPreRender && !(lbl_801B9624[i]->u10 & 0x1041);
+        bState = Character_GetClipResult(gCharacters[i]) != 2;
+        bPreRender = bState || Character_GetShadowClipResult(gCharacters[i]) != 2;
+        bPreRender = bPreRender && iPlayer2Clip != gCharacters[i]->nPlayer;
+        bPreRender = bPreRender && !(gCharacters[i]->u10 & 0x1041);
         // fake match: the original turns bPreRender into 0/1 again (neg; or; srwi)
         bPreRender = bPreRender != 0;
-        if (bPreRender && lbl_801B9624[i]->n1698 == 0) {
-            SKN_PoseCharacter(lbl_801B9624[i], 0);
+        if (bPreRender && gCharacters[i]->n1698 == 0) {
+            SKN_PoseCharacter(gCharacters[i], 0);
         }
     }
 }
@@ -2183,14 +2183,14 @@ void Character_RenderAll(u32 uFlags) {
     int i;
     int iPlayer2Clip;
 
-    if (lbl_80281CA8 != 0) {
+    if (gNumCharacters != 0) {
         fn_80035604();
-        for (i = 0; i < lbl_80281CA8; i++) {
+        for (i = 0; i < gNumCharacters; i++) {
             iPlayer2Clip = fn_800636EC();
-            if (Character_GetClipResult(lbl_801B9624[i]) != 2 && iPlayer2Clip != lbl_801B9624[i]->nPlayer &&
-                !(lbl_801B9624[i]->u10 & 0x41) &&
-                (Character_IsGolfer(lbl_801B9624[i]) || (uFlags & 4) == 0)) {
-                SKN_DrawCharacter(lbl_801B9624[i], uFlags);
+            if (Character_GetClipResult(gCharacters[i]) != 2 && iPlayer2Clip != gCharacters[i]->nPlayer &&
+                !(gCharacters[i]->u10 & 0x41) &&
+                (Character_IsGolfer(gCharacters[i]) || (uFlags & 4) == 0)) {
+                SKN_DrawCharacter(gCharacters[i], uFlags);
             }
         }
     }
@@ -2201,8 +2201,8 @@ void Character_UpdateAll(f32 fTime) {
     int i;
 
     if (gSession.nGameType != 6 || !GUI_IsPauseMenuOpen()) {
-        for (i = 0; i < lbl_80281CA8; i++) {
-            Character_UpdateAnimation(lbl_801B9624[i], 0, fTime);
+        for (i = 0; i < gNumCharacters; i++) {
+            Character_UpdateAnimation(gCharacters[i], 0, fTime);
         }
     }
 }
@@ -2359,17 +2359,17 @@ void Character_Free(Character* pChar) {
 
 // Add a character to the table of characters (up to five); NULL when it is full.
 Character* Character_Add(Character* pChar) {
-    if (lbl_80281CA8 >= 5) {
+    if (gNumCharacters >= 5) {
         return NULL;
     }
-    lbl_801B9624[lbl_80281CA8] = pChar;
-    pChar->nIndex = lbl_80281CA8;
-    lbl_80281CA8++;
+    gCharacters[gNumCharacters] = pChar;
+    pChar->nIndex = gNumCharacters;
+    gNumCharacters++;
     return pChar;
 }
 
 // Starts the characters for a round (GO_vInitIG): the dynamic texture pool, IK on, blend trees of
-// up to six clips (four in split screen, lbl_80280E20), the animation stream, the skin parts (every
+// up to six clips (four in split screen, gMaxBlendClips), the animation stream, the skin parts (every
 // copy changed together) and the skin meshes of each view (SKN_InitTris).
 void Character_InitIG(void) {
     int n;
@@ -2380,7 +2380,7 @@ void Character_InitIG(void) {
     if (gSession.nSplitScreen) {
         n = 4;
     }
-    lbl_80280E20 = n;
+    gMaxBlendClips = n;
     fn_800C937C();
     SkinPart_Init();
     SkinPart_SetChangeAllCopies(1);
@@ -2404,12 +2404,12 @@ void Character_ExitHole(void) {
 }
 
 // Starts the characters for the front end (GO_vInitFE): the dynamic texture pool, IK off, blend
-// trees of up to three clips (lbl_80280E20), the skin parts (each copy changed on its own) and the
+// trees of up to three clips (gMaxBlendClips), the skin parts (each copy changed on its own) and the
 // skinned-vertex buffer (fn_80112C64).
 void Character_InitFE(void) {
     CharacterTex_Init();
     SKEL_EnableIK(0);
-    lbl_80280E20 = 3;
+    gMaxBlendClips = 3;
     SkinPart_Init();
     SkinPart_SetChangeAllCopies(0);
     SKN_InitModule(1800);
@@ -2430,7 +2430,7 @@ ViewSlot gViewSlots[5] = { 0 };
 // Starts the character module (fn_8006C7A8, when the front end or a round starts): the animation
 // libraries, the 'MAL ' banks and the skeleton module up, the blend tree pools made, no club skin
 // sets, the club names read as 64-bit ids, no characters in the front end's or the players' slots,
-// and no player marked (lbl_80281CAC).
+// and no player marked (gCharTexStreamedPlayer).
 // port: the names are read as big-endian 64-bit words from their strings (FEgolferanim compares
 //       them with ids read the same way)
 void Legacy_Character_InitModule(void) {
@@ -2441,20 +2441,20 @@ void Legacy_Character_InitModule(void) {
     SKEL_InitModule();
     fn_80071AD0();
     for (i = 0; i < 2; i++) {
-        lbl_80280E24[i] = NULL;
+        gClubSkinSets[i] = NULL;
     }
-    lbl_801B9638[0] = *(u64*)"IGdriver";
-    lbl_801B9638[2] = *(u64*)"IGputter";
-    lbl_801B9638[3] = *(u64*)"IGiron3";
-    lbl_801B9638[4] = *(u64*)"IGiron7";
-    lbl_801B9638[5] = *(u64*)"IGwedge";
+    gClubBoneIds[0] = *(u64*)"IGdriver";
+    gClubBoneIds[2] = *(u64*)"IGputter";
+    gClubBoneIds[3] = *(u64*)"IGiron3";
+    gClubBoneIds[4] = *(u64*)"IGiron7";
+    gClubBoneIds[5] = *(u64*)"IGwedge";
     for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
         lbl_80281EE8[i] = NULL;
     }
     for (i = 0; i < 5; i++) {
         gViewSlots[i].pChar = NULL;
     }
-    lbl_80281CAC = -1;
+    gCharTexStreamedPlayer = -1;
 }
 
 // Shuts the character module down (fn_8006C854): frees the club skin sets and every character made,
@@ -2464,16 +2464,16 @@ void Legacy_Character_CloseModule(void) {
     int i;
 
     for (i = 0; i < 2; i++) {
-        if (lbl_80280E24[i] != NULL) {
-            Character_FreeClubSkinSets(lbl_80280E24[i]);
+        if (gClubSkinSets[i] != NULL) {
+            Character_FreeClubSkinSets(gClubSkinSets[i]);
         }
-        lbl_80280E24[i] = NULL;
+        gClubSkinSets[i] = NULL;
     }
-    for (i = 0; i < lbl_80281CA8; i++) {
-        Character_Free(lbl_801B9624[i]);
-        lbl_801B9624[i] = NULL;
+    for (i = 0; i < gNumCharacters; i++) {
+        Character_Free(gCharacters[i]);
+        gCharacters[i] = NULL;
     }
-    lbl_80281CA8 = 0;
+    gNumCharacters = 0;
     Skalib_Shutdown();
     fn_8001F66C();
     SKEL_CloseModule();
@@ -2558,9 +2558,9 @@ void Character_InitNewClubAndShotType(int nPlayer) {
     }
 }
 
-s32 lbl_80187164[8] = { 8, 0, 6, 3, 2, 1, 10, 4 };
+s32 gShotKindClipKeys[8] = { 8, 0, 6, 3, 2, 1, 10, 4 };
 
-f32 lbl_80187184[6][3] = {
+f32 gClubStanceOffsets[6][3] = {
     { 0.058f, 0.0f, 0.025f },
     { 0.058f, 0.0f, 0.025f },
     { 0.045f, -0.024f, 0.05f },
@@ -2570,10 +2570,10 @@ f32 lbl_80187184[6][3] = {
 };
 
 // Sets the character's shot kind (the player's nShotKind) and the clip key it maps to
-// (lbl_80187164, through Character_SelectShotType). Nothing for NULL.
+// (gShotKindClipKeys, through Character_SelectShotType). Nothing for NULL.
 void Character_SelectGameShotType(Character* pChar, int nKind) {
     if (pChar != NULL) {
-        Character_SelectShotType(pChar, lbl_80187164[nKind]);
+        Character_SelectShotType(pChar, gShotKindClipKeys[nKind]);
         pChar->nShotKind = nKind;
     }
 }
@@ -2683,8 +2683,8 @@ void Character_SetupForShot(Character* pChar) {
             }
         }
         Character_UpdateClubAttachment(pChar, pSkel->pClip);
-        LLMath_Scale(-lbl_80187184[pChar->nClubClass][0], pChar->pModel->pMatrices[0][0], vOffsetX);
-        LLMath_Scale(-lbl_80187184[pChar->nClubClass][2], pChar->pModel->pMatrices[0][2], vOffsetZ);
+        LLMath_Scale(-gClubStanceOffsets[pChar->nClubClass][0], pChar->pModel->pMatrices[0][0], vOffsetX);
+        LLMath_Scale(-gClubStanceOffsets[pChar->nClubClass][2], pChar->pModel->pMatrices[0][2], vOffsetZ);
         if (pChar->pModel->bEE) {
             vOffsetZ[0] = -vOffsetZ[0];
             vOffsetZ[2] = -vOffsetZ[2];
@@ -2710,7 +2710,7 @@ void Character_SetupForShot(Character* pChar) {
         SKEL_TranslateIKChainY(pChar->pModel, &pChar->pModel->pSkel->pChains[1], fY);
         Char_Vec4Add(gPlayers[pChar->nPlayer].ball.vPos, vOffsetX, vPos);
         Char_Vec4Add(vPos, vOffsetZ, vPos);
-        vPos[1] += lbl_80187184[pChar->nClubClass][1];
+        vPos[1] += gClubStanceOffsets[pChar->nClubClass][1];
         fn_800280E8(pChar, vPos, bPlace);
         pChar->pModel->pSkel->n1130 = pChar->nClipKey;
         pChar->pModel->pSkel->n112C = pChar->nClubClass;
@@ -2729,16 +2729,16 @@ void Character_SetupForShot(Character* pChar) {
 }
 
 // The in-game 'CLB ' (club models) stream handler: unless a club skin set is loaded already
-// (lbl_80280E24[0]), makes one from the object (Character_CreateClubSkinSet), and in split screen a
-// second one for the second view (lbl_80280E24[1], else NULL). The object is freed either way.
+// (gClubSkinSets[0]), makes one from the object (Character_CreateClubSkinSet), and in split screen a
+// second one for the second view (gClubSkinSets[1], else NULL). The object is freed either way.
 void Character_ClubStreamCallbackIG(UStreamObject* pObject) {
-    if (lbl_80280E24[0] == NULL) {
+    if (gClubSkinSets[0] == NULL) {
         if (gSession.nSplitScreen) {
-            lbl_80280E24[0] = Character_CreateClubSkinSet(pObject->pData);
-            lbl_80280E24[1] = Character_CreateClubSkinSet(pObject->pData);
+            gClubSkinSets[0] = Character_CreateClubSkinSet(pObject->pData);
+            gClubSkinSets[1] = Character_CreateClubSkinSet(pObject->pData);
         } else {
-            lbl_80280E24[0] = Character_CreateClubSkinSet(pObject->pData);
-            lbl_80280E24[1] = NULL;
+            gClubSkinSets[0] = Character_CreateClubSkinSet(pObject->pData);
+            gClubSkinSets[1] = NULL;
         }
     }
     StaticMem_Free(pObject);
@@ -2746,9 +2746,9 @@ void Character_ClubStreamCallbackIG(UStreamObject* pObject) {
 
 // The front end's 'CLB ' stream handler: as Character_ClubStreamCallbackIG, with one set only.
 void Character_ClubStreamCallbackFE(UStreamObject* pObject) {
-    if (lbl_80280E24[0] == NULL) {
-        lbl_80280E24[0] = Character_CreateClubSkinSet(pObject->pData);
-        lbl_80280E24[1] = NULL;
+    if (gClubSkinSets[0] == NULL) {
+        gClubSkinSets[0] = Character_CreateClubSkinSet(pObject->pData);
+        gClubSkinSets[1] = NULL;
     }
     StaticMem_Free(pObject);
 }
@@ -2880,11 +2880,11 @@ void Character_UnregisterGolferStreamClient(void) {
 void SkeletalObject_RenderShadowsAll(void) {
     int i;
 
-    for (i = 0; i < lbl_80281CA8; i++) {
-        if (lbl_801B9624[i]->nPlayer == 1000 && lbl_801B9624[i]->n1658 != 2 &&
-            !(lbl_801B9624[i]->u10 & 0x41)) {
-            fn_800B28D4(lbl_801B9624[i], 1, 0);
-            fn_800B2FB0(lbl_801B9624[i], 1, 0);
+    for (i = 0; i < gNumCharacters; i++) {
+        if (gCharacters[i]->nPlayer == 1000 && gCharacters[i]->n1658 != 2 &&
+            !(gCharacters[i]->u10 & 0x41)) {
+            fn_800B28D4(gCharacters[i], 1, 0);
+            fn_800B2FB0(gCharacters[i], 1, 0);
         }
     }
 }
@@ -2893,9 +2893,9 @@ void SkeletalObject_RenderShadowsAll(void) {
 // this id, or NULL. Id 100 is the flag (GoDynObj, GoTerrain, GameTargets).
 Character* SkeletalObject_FindObject(int nId) {
     int i;
-    for (i = 0; i < lbl_80281CA8; i++) {
-        if (lbl_801B9624[i]->nPlayer == 1000 && lbl_801B9624[i]->uId == nId) {
-            return lbl_801B9624[i];
+    for (i = 0; i < gNumCharacters; i++) {
+        if (gCharacters[i]->nPlayer == 1000 && gCharacters[i]->uId == nId) {
+            return gCharacters[i];
         }
     }
     return NULL;
@@ -2904,9 +2904,9 @@ Character* SkeletalObject_FindObject(int nId) {
 // Run Character_ClipTest on every character with no player (the 'SKLO' ones).
 void SkeletalObject_ClipTestAll(void) {
     int i;
-    for (i = 0; i < lbl_80281CA8; i++) {
-        if (lbl_801B9624[i]->nPlayer == 1000) {
-            Character_ClipTest(lbl_801B9624[i], 1000);
+    for (i = 0; i < gNumCharacters; i++) {
+        if (gCharacters[i]->nPlayer == 1000) {
+            Character_ClipTest(gCharacters[i], 1000);
         }
     }
 }
@@ -3054,15 +3054,15 @@ void Character_ResetBlenders(Character* pChar) {
 // Wakes the player's golfer for its turn (stateFunc's PreShot, InitialFlyBy and PlaceBall): u10 bit
 // 0x40 cleared so it is drawn again (Character_Sleep set it), its body skin made the loaded one in
 // single view (fn_800955F0) and its textures streamed (CharacterTex_StartStreamingPlayers). In
-// single view, when it is not the golfer last prepared (lbl_80281CAC), it is also flagged to be
+// single view, when it is not the golfer last prepared (gCharTexStreamedPlayer), it is also flagged to be
 // dressed again (Character_RequestClothesUpdateIG).
 void Character_PrepareForRendering(int nPlayer) {
     gPlayers[nPlayer].pChar->u10 &= ~0x40;
     fn_800955F0(nPlayer);
     CharacterTex_StartStreamingPlayers(nPlayer);
-    if (!gSession.nSplitScreen && lbl_80281CAC != nPlayer) {
+    if (!gSession.nSplitScreen && gCharTexStreamedPlayer != nPlayer) {
         Character_RequestClothesUpdateIG(nPlayer);
-        lbl_80281CAC = nPlayer;
+        gCharTexStreamedPlayer = nPlayer;
     }
 }
 
@@ -3236,7 +3236,7 @@ void Character_SwapTexPalettes(u8* pData, int nBytes) {
 }
 
 // Dresses the character's six club skins (driver, fairway wood, putter, 3 and 7 irons, wedge: the
-// lbl_80186EC0 classes): from pChoices when given (SkinPart_ApplyClubChoices), else from the
+// gClubPartNames classes): from pChoices when given (SkinPart_ApplyClubChoices), else from the
 // golfer's gGolferTable row found by its id nC (row 7 itself for golfer 7 while gSession.uFlags has
 // 0x4000), each class's part variant and its head, shaft and grip sets; then the clubs are mirrored
 // for a left-handed golfer. In the front end (game type 3) a call while the menu golfer's b1D1 is
@@ -3258,76 +3258,76 @@ void Character_SetClubStatesForCharacter(Character* pChar, int nSlot, SkinChoice
             nGolfer = 7;
         }
         if (nGolfer >= 0) {
-            SKA_PackName(&uName, lbl_80186EC0[0]);
+            SKA_PackName(&uName, gClubPartNames[0]);
             SkinPart_ChooseClubPartVariant(pChar, 0, uName, gGolferTable[nGolfer].aClubs[0].uPart);
-            SKA_PackName(&uName, lbl_80186FB0[0]);
-            SKA_PackName(&uVariant, lbl_80187000[0]);
+            SKA_PackName(&uName, gClubHeadSetNames[0]);
+            SKA_PackName(&uVariant, gClubHeadVariantNames[0]);
             SkinPart_ChooseClubSet(pChar, 0, uName, uVariant, gGolferTable[nGolfer].aClubs[0].uModel);
-            SKA_PackName(&uName, lbl_80186F10[0]);
-            SKA_PackName(&uVariant, lbl_80186F60[0]);
+            SKA_PackName(&uName, gClubShaftSetNames[0]);
+            SKA_PackName(&uVariant, gClubShaftVariantNames[0]);
             SkinPart_ChooseClubSet(pChar, 0, uName, uVariant, gGolferTable[nGolfer].aClubs[0].uShaft);
-            SKA_PackName(&uName, lbl_80187050[0]);
-            SKA_PackName(&uVariant, lbl_801870A0[0]);
+            SKA_PackName(&uName, gClubGripSetNames[0]);
+            SKA_PackName(&uVariant, gClubGripVariantNames[0]);
             SkinPart_ChooseClubSet(pChar, 0, uName, uVariant, gGolferTable[nGolfer].aClubs[0].uGrip);
 
-            SKA_PackName(&uName, lbl_80186EC0[1]);
+            SKA_PackName(&uName, gClubPartNames[1]);
             SkinPart_ChooseClubPartVariant(pChar, 1, uName, gGolferTable[nGolfer].aClubs[1].uPart);
-            SKA_PackName(&uName, lbl_80186FB0[1]);
-            SKA_PackName(&uVariant, lbl_80187000[1]);
+            SKA_PackName(&uName, gClubHeadSetNames[1]);
+            SKA_PackName(&uVariant, gClubHeadVariantNames[1]);
             SkinPart_ChooseClubSet(pChar, 1, uName, uVariant, gGolferTable[nGolfer].aClubs[1].uModel);
-            SKA_PackName(&uName, lbl_80186F10[1]);
-            SKA_PackName(&uVariant, lbl_80186F60[1]);
+            SKA_PackName(&uName, gClubShaftSetNames[1]);
+            SKA_PackName(&uVariant, gClubShaftVariantNames[1]);
             SkinPart_ChooseClubSet(pChar, 1, uName, uVariant, gGolferTable[nGolfer].aClubs[1].uShaft);
-            SKA_PackName(&uName, lbl_80187050[1]);
-            SKA_PackName(&uVariant, lbl_801870A0[1]);
+            SKA_PackName(&uName, gClubGripSetNames[1]);
+            SKA_PackName(&uVariant, gClubGripVariantNames[1]);
             SkinPart_ChooseClubSet(pChar, 1, uName, uVariant, gGolferTable[nGolfer].aClubs[1].uGrip);
 
-            SKA_PackName(&uName, lbl_80186EC0[3]);
+            SKA_PackName(&uName, gClubPartNames[3]);
             SkinPart_ChooseClubPartVariant(pChar, 3, uName, gGolferTable[nGolfer].aIronPart[0]);
-            SKA_PackName(&uName, lbl_80186FB0[3]);
-            SKA_PackName(&uVariant, lbl_80187000[3]);
+            SKA_PackName(&uName, gClubHeadSetNames[3]);
+            SKA_PackName(&uVariant, gClubHeadVariantNames[3]);
             SkinPart_ChooseClubSet(pChar, 3, uName, uVariant, gGolferTable[nGolfer].uIronModel);
-            SKA_PackName(&uName, lbl_80186F10[3]);
-            SKA_PackName(&uVariant, lbl_80186F60[3]);
+            SKA_PackName(&uName, gClubShaftSetNames[3]);
+            SKA_PackName(&uVariant, gClubShaftVariantNames[3]);
             SkinPart_ChooseClubSet(pChar, 3, uName, uVariant, gGolferTable[nGolfer].uIronShaft);
-            SKA_PackName(&uName, lbl_80187050[3]);
-            SKA_PackName(&uVariant, lbl_801870A0[3]);
+            SKA_PackName(&uName, gClubGripSetNames[3]);
+            SKA_PackName(&uVariant, gClubGripVariantNames[3]);
             SkinPart_ChooseClubSet(pChar, 3, uName, uVariant, gGolferTable[nGolfer].uIronGrip);
 
-            SKA_PackName(&uName, lbl_80186EC0[4]);
+            SKA_PackName(&uName, gClubPartNames[4]);
             SkinPart_ChooseClubPartVariant(pChar, 4, uName, gGolferTable[nGolfer].aIronPart[1]);
-            SKA_PackName(&uName, lbl_80186FB0[4]);
-            SKA_PackName(&uVariant, lbl_80187000[4]);
+            SKA_PackName(&uName, gClubHeadSetNames[4]);
+            SKA_PackName(&uVariant, gClubHeadVariantNames[4]);
             SkinPart_ChooseClubSet(pChar, 4, uName, uVariant, gGolferTable[nGolfer].uIronModel);
-            SKA_PackName(&uName, lbl_80186F10[4]);
-            SKA_PackName(&uVariant, lbl_80186F60[4]);
+            SKA_PackName(&uName, gClubShaftSetNames[4]);
+            SKA_PackName(&uVariant, gClubShaftVariantNames[4]);
             SkinPart_ChooseClubSet(pChar, 4, uName, uVariant, gGolferTable[nGolfer].uIronShaft);
-            SKA_PackName(&uName, lbl_80187050[4]);
-            SKA_PackName(&uVariant, lbl_801870A0[4]);
+            SKA_PackName(&uName, gClubGripSetNames[4]);
+            SKA_PackName(&uVariant, gClubGripVariantNames[4]);
             SkinPart_ChooseClubSet(pChar, 4, uName, uVariant, gGolferTable[nGolfer].uIronGrip);
 
-            SKA_PackName(&uName, lbl_80186EC0[5]);
+            SKA_PackName(&uName, gClubPartNames[5]);
             SkinPart_ChooseClubPartVariant(pChar, 5, uName, gGolferTable[nGolfer].wedges.uPart);
-            SKA_PackName(&uName, lbl_80186FB0[5]);
-            SKA_PackName(&uVariant, lbl_80187000[5]);
+            SKA_PackName(&uName, gClubHeadSetNames[5]);
+            SKA_PackName(&uVariant, gClubHeadVariantNames[5]);
             SkinPart_ChooseClubSet(pChar, 5, uName, uVariant, gGolferTable[nGolfer].wedges.uModel);
-            SKA_PackName(&uName, lbl_80186F10[5]);
-            SKA_PackName(&uVariant, lbl_80186F60[5]);
+            SKA_PackName(&uName, gClubShaftSetNames[5]);
+            SKA_PackName(&uVariant, gClubShaftVariantNames[5]);
             SkinPart_ChooseClubSet(pChar, 5, uName, uVariant, gGolferTable[nGolfer].wedges.uShaft);
-            SKA_PackName(&uName, lbl_80187050[5]);
-            SKA_PackName(&uVariant, lbl_801870A0[5]);
+            SKA_PackName(&uName, gClubGripSetNames[5]);
+            SKA_PackName(&uVariant, gClubGripVariantNames[5]);
             SkinPart_ChooseClubSet(pChar, 5, uName, uVariant, gGolferTable[nGolfer].wedges.uGrip);
 
-            SKA_PackName(&uName, lbl_80186EC0[2]);
+            SKA_PackName(&uName, gClubPartNames[2]);
             SkinPart_ChooseClubPartVariant(pChar, 2, uName, gGolferTable[nGolfer].aClubs[2].uPart);
-            SKA_PackName(&uName, lbl_80186FB0[2]);
-            SKA_PackName(&uVariant, lbl_80187000[2]);
+            SKA_PackName(&uName, gClubHeadSetNames[2]);
+            SKA_PackName(&uVariant, gClubHeadVariantNames[2]);
             SkinPart_ChooseClubSet(pChar, 2, uName, uVariant, gGolferTable[nGolfer].aClubs[2].uModel);
-            SKA_PackName(&uName, lbl_80186F10[2]);
-            SKA_PackName(&uVariant, lbl_80186F60[2]);
+            SKA_PackName(&uName, gClubShaftSetNames[2]);
+            SKA_PackName(&uVariant, gClubShaftVariantNames[2]);
             SkinPart_ChooseClubSet(pChar, 2, uName, uVariant, gGolferTable[nGolfer].aClubs[2].uShaft);
-            SKA_PackName(&uName, lbl_80187050[2]);
-            SKA_PackName(&uVariant, lbl_801870A0[2]);
+            SKA_PackName(&uName, gClubGripSetNames[2]);
+            SKA_PackName(&uVariant, gClubGripVariantNames[2]);
             SkinPart_ChooseClubSet(pChar, 2, uName, uVariant, gGolferTable[nGolfer].aClubs[2].uGrip);
         }
     } else {

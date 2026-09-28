@@ -289,12 +289,12 @@ int fn_800723E8(SKABlendNode* pNode, SKABlendNode*** pppOldest) {
 }
 
 // pNew starts playing pClip from its start at weight fWeight. When the tree at pNode already has
-// lbl_80280E20 sources, it is emptied first and set up again as a blend node of its format.
+// gMaxBlendClips sources, it is emptied first and set up again as a blend node of its format.
 void fn_800724C0(SKABlendNode* pNode, SKABlendNode* pNew, void* pClip, f32 fWeight) {
     SKABlendNode** ppOldest = NULL;
 
     if (pNew == NULL) return;
-    if (fn_800723E8(pNode, &ppOldest) >= lbl_80280E20) {
+    if (fn_800723E8(pNode, &ppOldest) >= gMaxBlendClips) {
         fn_80071F58(&pNode, 0);
         fn_80071C28(&pNode, 1, pNode->nFormat, fn_80072ACC, 1);
         fn_800725BC(pNode, fn_80072ACC, 0.5f);

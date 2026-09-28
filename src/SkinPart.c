@@ -185,7 +185,7 @@ void SkinPart_ChooseBodySetByName(Character* pChar, char* pSet, char* pVariant, 
 }
 
 // Picks a variant of a part of one of the six club skins (nSkin 0..5: Drivers, Fairwaywoods,
-// Putters, 3Irons, 7Irons, Wedges; char.c lbl_80186EC0) by their name codes; a variant not found
+// Putters, 3Irons, 7Irons, Wedges; char.c gClubPartNames) by their name codes; a variant not found
 // becomes variant 0. Does nothing while the body's skin has no model.
 void SkinPart_ChooseClubPartVariant(Character* pChar, int nSkin, u64 uPart, u64 uVariant) {
     int nPart;

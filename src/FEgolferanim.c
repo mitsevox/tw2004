@@ -1014,7 +1014,7 @@ void fn_8008CE88(u8 bFull) {
 }
 
 // Set the golfer shown up for the screen kind (n0): his clip, the kind of clip it is (its place
-// in lbl_801B9638, 0 when it is not there) and his facing.
+// in gClubBoneIds, 0 when it is not there) and his facing.
 void fn_8008D058(void) {
     Clip* pClip;
     int i;
@@ -1036,7 +1036,7 @@ void fn_8008D058(void) {
         pClip = Char_SetClip(lbl_80281EE0->pB4->pChar, 0, 0, NULL);
         Character_PlayClip(lbl_80281EE0->pB4->pChar, pClip, 1, 0.0f);
         for (i = 0; i < 6; i++) {
-            if (pClip->u90 == lbl_801B9638[i]) {
+            if (pClip->u90 == gClubBoneIds[i]) {
                 break;
             }
         }
@@ -1061,7 +1061,7 @@ void fn_8008D058(void) {
         pClip = Char_SetClip(lbl_80281EE0->pB4->pChar, 0, 0, NULL);
         Character_PlayClip(lbl_80281EE0->pB4->pChar, pClip, 1, 0.0f);
         for (i = 0; i < 6; i++) {
-            if (pClip->u90 == lbl_801B9638[i]) {
+            if (pClip->u90 == gClubBoneIds[i]) {
                 break;
             }
         }
@@ -1107,7 +1107,7 @@ void fn_8008D058(void) {
         pClip = Char_SetClip(lbl_80281EE0->pB4->pChar, 0, 0, NULL);
         Character_PlayClip(lbl_80281EE0->pB4->pChar, pClip, 1, 0.0f);
         for (i = 0; i < 6; i++) {
-            if (pClip->u90 == lbl_801B9638[i]) {
+            if (pClip->u90 == gClubBoneIds[i]) {
                 break;
             }
         }

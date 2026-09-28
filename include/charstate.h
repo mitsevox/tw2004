@@ -579,7 +579,7 @@ typedef struct CharSkinRef {
 
 // What Character.pClubSet points at: the golfer's clubs, made from the 'CLB ' object
 // (Character_CreateClubSkinSet), one entry per club class: Drivers, Fairwaywoods, Putters, 3Irons, 7Irons,
-// Wedges (char.c lbl_80186EC0).
+// Wedges (char.c gClubPartNames).
 typedef struct CharSkinSet {
     s32  n0;                    // 0x00  cleared by Character_CreateClubSkinSet
     u8   unk4[4];
@@ -604,15 +604,15 @@ typedef struct CharPool {
 } CharPool;
 LAYOUT_ASSERT(CharPool, 0x3C);
 
-extern f32        lbl_801B95C8[4];      // } the two ground normals Character_GetTerrainHeightAndNormal
-extern f32        lbl_801B95D8[4];      // } reads (the pNormalHigh / pNormalLow of Ter_GetEnclosingGroundData)
-extern CharPool   lbl_801B95E8;
-extern Character* lbl_801B9624[5];     // the characters made so far (Character_Add)
-extern s32        lbl_80281CA8;         // how many
-extern s32        lbl_80281CAC;         // the player Character_PrepareForRendering last marked (-1 at start)
-extern s32        lbl_80187164[8];      // the clip key for each shot kind (Character_SelectGameShotType)
-extern s32        lbl_80280E20;         // set to 6 (4 in split screen) by Character_InitIG, 3 by Character_InitFE
-extern CharSkinSet* lbl_80280E24[2];   // what Character_CreateClubSkinSet makes of the 'CLB ' object: one, or one per
+extern f32        gCharCoveringNormal[4];      // } the two ground normals Character_GetTerrainHeightAndNormal
+extern f32        gCharSupportingNormal[4];      // } reads (the pNormalHigh / pNormalLow of Ter_GetEnclosingGroundData)
+extern CharPool   gCharDynTexPool;
+extern Character* gCharacters[5];     // the characters made so far (Character_Add)
+extern s32        gNumCharacters;         // how many
+extern s32        gCharTexStreamedPlayer;         // the player Character_PrepareForRendering last marked (-1 at start)
+extern s32        gShotKindClipKeys[8];      // the clip key for each shot kind (Character_SelectGameShotType)
+extern s32        gMaxBlendClips;         // set to 6 (4 in split screen) by Character_InitIG, 3 by Character_InitFE
+extern CharSkinSet* gClubSkinSets[2];   // what Character_CreateClubSkinSet makes of the 'CLB ' object: one, or one per
                                         // view in split screen (Character.pClubSet;
                                         // Character_FreeClubSkinSets frees them)
 
