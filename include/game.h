@@ -550,7 +550,7 @@ void GameModeBattle_Init(void);                 // mode 25 (GameModeBattle.c)
 void fn_800E81C4(void);                 // mode 19 (GameModeBestBall.c)
 void GameModeFourBall_Init(void);                 // mode 20 (GameModeFourBall.c)
 void GameModeMatch_Init(void);                 // mode 1 (GameModeMatch.c)
-void fn_800EACD8(void);                 // mode 5
+void PlayNow_Init(void);                 // mode 5
 void fn_800ED738(void);                 // mode 9
 void GameModeDriverRTE_Init(void);                 // mode 24
 void GameModeReplay_Init(void);                 // mode 10
@@ -583,12 +583,12 @@ s32  fn_800EAC7C(void);
 int  fn_800EAC94(int n);
 
 // GameMode5.c
-void fn_800EADD8(void);
-void fn_800EAE38(s32 a);
-void fn_800EAF7C(void);
-u8   GM5_IsChallengeRunning(void);
-int  fn_800EC558(void);
-void fn_800ECBE4(void);
+void PlayNow_DeInit(void);
+void PlayNow_SelectChallenge(s32 a);
+void PlayNow_StartChallenge(void);
+u8   PlayNow_IsChallengeRunning(void);
+int  PlayNow_GetMedal(void);
+void PlayNow_OnPause(void);
 u8   fn_800ED540(void);
 void fn_800ED548(void);
 void fn_800ED6E8(u8 v);

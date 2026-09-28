@@ -672,7 +672,7 @@ void GO_vInitIG(void) {
     TI_vStartCounter(1);
     if (gSession.nC == 3) {
         GM_SetModeType(5);
-        fn_800EAF7C();
+        PlayNow_StartChallenge();
         gSession.nC = 0;
     }
     GM_SetupDefaultProfile();

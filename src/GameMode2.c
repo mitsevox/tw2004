@@ -335,7 +335,7 @@ void GameModeSkins_EndGame(void) {
     int nProfile;
     u8 bFirst = 1;
     s32 bWon;
-    if (!GM5_IsChallengeRunning() || fn_801025F4()) {
+    if (!PlayNow_IsChallengeRunning() || fn_801025F4()) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (!Player_IsCPU(i)) {
                 nProfile = PLAYER(i)->nIndex;

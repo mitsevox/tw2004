@@ -42,13 +42,14 @@ void fn_800D9E14(void) {
 }
 
 // Whether this round has hole contests: several players, a round of every hole, no mulligans,
-// gSession.a8[0] clear, neither GameMode5 test (GM5_IsChallengeRunning, fn_800ED6F0) and game mode 0, 1 or 2.
+// gSession.a8[0] clear, neither GameMode5 test (PlayNow_IsChallengeRunning, fn_800ED6F0) and game
+// mode 0, 1 or 2.
 u8 fn_800D9E5C(void) {
     if (gpGame->nMulligans != 0) return 0;
     if (gSession.nNumPlayers == 1) return 0;
     if (!GM_FullRoundOfGolf()) return 0;
     if (gSession.a8[0] != 0) return 0;
-    if (GM5_IsChallengeRunning()) return 0;
+    if (PlayNow_IsChallengeRunning()) return 0;
     if (fn_800ED6F0()) return 0;
     if (Game_GetMode() == 0 || Game_GetMode() == 1 || Game_GetMode() == 2) {
         return 1;

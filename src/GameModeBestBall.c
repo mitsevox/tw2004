@@ -293,7 +293,7 @@ void fn_800E8A68(void) {
     int nProfile;
     int nOtherTeam;
     if (GM_FullRoundOfGolf()) {
-        switch (GM5_IsChallengeRunning()) {
+        switch (PlayNow_IsChallengeRunning()) {
         case 0:
             break;
         default:

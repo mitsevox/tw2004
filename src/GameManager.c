@@ -140,7 +140,7 @@ void GM_vCloseModuleONCE(void) {
 // challenge the game's data is cleared and the round goes to its first selected hole; then the
 // mode's pfn1EC hook, and the playoff hole list is marked to be built.
 void GM_InitModule_PreDataStream(void) {
-    if (GM5_IsChallengeRunning() == 0) {
+    if (PlayNow_IsChallengeRunning() == 0) {
         GM_ClearDataForNewGame();
         GM_InitializeCurrentHoleToFirstSelected();
     }
@@ -157,13 +157,13 @@ void GM_InitModule_PostDataStream(void) {
 
 // A round is torn down (gomainloop): the mode's Shutdown (pfnShutdown) and the HUD (GUI_DeInit),
 // then four frees that are empty in this build: the PGA TOUR one
-// (GameModeDriverPGATour_FreeStreamMemory), the GameMode5 one (fn_800EADD8), the earnings' stream
+// (GameModeDriverPGATour_FreeStreamMemory), the GameMode5 one (PlayNow_DeInit), the earnings' stream
 // memory (GM_Earnings_FreeStreamMemory) and the course data (fn_800D29E8).
 void GM_DeInitModule(void) {
     (*(s32 (**)(void*))((u8*)(gpGame) + 0x1CC))(gpGame);
     GUI_DeInit();
     GameModeDriverPGATour_FreeStreamMemory();
-    fn_800EADD8();
+    PlayNow_DeInit();
     GM_Earnings_FreeStreamMemory();
     fn_800D29E8();
 }
@@ -304,7 +304,7 @@ void GM_EndOfGolferTurn_GameFinished(int nPlayer) {
     }
     if (gSession.b12 == 0 && gSession.a8[0] == 0) {
         if (gpGame->b275) {
-            if (!gpGame->b274 || GM5_IsChallengeRunning()) {
+            if (!gpGame->b274 || PlayNow_IsChallengeRunning()) {
                 GUI_EndOfGameScorecard(1);
             } else {
                 GUI_EndOfGameScorecard(0);
@@ -325,7 +325,7 @@ void GM_HoleFinished_GameNotFinished(int nPlayer) {
     int nView;
     gpGame->pfn210(nPlayer);
     if (gpGame->b275 && !GUI_ScoreCardUp()) {
-        if (!gpGame->b274 || GM5_IsChallengeRunning()) {
+        if (!gpGame->b274 || PlayNow_IsChallengeRunning()) {
             GUI_BetweenHolesScorecard(1);
         } else {
             GUI_BetweenHolesScorecard(0);

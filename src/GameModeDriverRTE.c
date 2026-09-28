@@ -130,9 +130,9 @@ void GameModeDriverRTE_StartEvent(void) {
         if (gRTEs.aEvent[gRTESelectedEvent].nChallenge != 0) {
             gSession.nNumPlayers = 1;
             GM_SetModeType(5);
-            fn_800EC544(gRTEs.aChallenge, 111);
-            fn_800EAE38(gRTEs.aEvent[gRTESelectedEvent].nChallenge - 1);
-            fn_800EAF7C();
+            PlayNow_SetChallengeList(gRTEs.aChallenge, 111);
+            PlayNow_SelectChallenge(gRTEs.aEvent[gRTESelectedEvent].nChallenge - 1);
+            PlayNow_StartChallenge();
             gRTEChallengeShutdown = gpGame->pfnShutdown;
             gRTEChallengeEndGame = gpGame->pfnEndGame;
             gpGame->pfnShutdown = GameModeDriverRTE_Shutdown;
@@ -145,7 +145,7 @@ void GameModeDriverRTE_StartEvent(void) {
 // mode 5's challenge start, then its shutdown and end game are saved and replaced by
 // GameModeDriverRTE_Shutdown and GameModeDriverRTE_EndGame, as GameModeDriverRTE_StartEvent does.
 void GameModeDriverRTE_StartNextChallenge(void) {
-    fn_800EAF7C();
+    PlayNow_StartChallenge();
     gRTEChallengeShutdown = gpGame->pfnShutdown;
     gRTEChallengeEndGame = gpGame->pfnEndGame;
     gpGame->pfnShutdown = GameModeDriverRTE_Shutdown;
@@ -255,14 +255,14 @@ void GameModeDriverRTE_QueueWinMessages(void) {
 }
 
 // The event's end of game: mode 5's own end game first (called unchecked: it is saved by
-// GameModeDriverRTE_StartEvent), then with any medal (fn_800EC558 below 3) player 0 is paid the
+// GameModeDriverRTE_StartEvent), then with any medal (PlayNow_GetMedal below 3) player 0 is paid the
 // challenge's best-medal reward (GameModeDriverRTE_GetPurse's amount, whatever the medal), the
 // money message (queue 0, 0x6F) and GameModeDriverRTE_QueueWinMessages go up, and profile 0's award
 // for the event is marked won with today's date (GM_Earnings_GiveAwardToUser).
 void GameModeDriverRTE_EndGame(void) {
     s32 nReward;
     gRTEChallengeEndGame();
-    if (fn_800EC558() != 3) {
+    if (PlayNow_GetMedal() != 3) {
         nReward = gRTEs.aChallenge[gRTEs.aEvent[gRTESelectedEvent].nChallenge - 1].aMedal[0].nReward;
         GM_Earnings_AwardMoney(0, nReward, 0);
         GUI_QueueMessage(0, 0x6F, nReward, 0);

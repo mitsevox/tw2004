@@ -220,7 +220,7 @@ void GM_SetModeType(int nMode) {
         fn_800ED738();
         break;
     case 5:
-        fn_800EACD8();
+        PlayNow_Init();
         break;
     case 10:
         GameModeReplay_Init();

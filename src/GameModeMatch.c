@@ -291,7 +291,7 @@ void GameModeMatch_EndGame(void) {
     int nMoney;
     int nProfile;
     if (GM_FullRoundOfGolf()) {
-        switch (GM5_IsChallengeRunning()) {
+        switch (PlayNow_IsChallengeRunning()) {
         case 0:
             break;
         default:

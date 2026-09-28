@@ -8,7 +8,7 @@
 #include "game_types.h"
 #include "platform.h"
 
-// A medal of a challenge: the rule it is judged by (0 none; see fn_800EC558), the mark the rule
+// A medal of a challenge: the rule it is judged by (0 none; see PlayNow_GetMedal), the mark the rule
 // compares with, and the reward.
 typedef struct ChallengeMedal {
     s32 nRule;                  // 0x0
@@ -18,8 +18,8 @@ typedef struct ChallengeMedal {
 
 // One challenge (0x80 bytes); gChallengeList points to the list being played.
 typedef struct Challenge {
-    s32 n0;                     // 0x00  offset of a line in the challenge text block (fn_800ED280)
-    s32 n4;                     // 0x04  the same for a second line (fn_800ED2C8)
+    s32 n0;                     // 0x00  offset of a line in the challenge text block (PlayNow_GetGroupName)
+    s32 n4;                     // 0x04  the same for a second line (PlayNow_GetGroupDescription)
     s32 nGroup;                 // 0x08  challenges with the same group are played together
     s32 nMode;                  // 0x0C  the game mode it is played as (GM_SetModeType)
     s32 nCourse;                // 0x10
@@ -27,12 +27,12 @@ typedef struct Challenge {
     s32 nHole;                  // 0x18  1-based
     s32 nTeeSet;                // 0x1C  for every player
     s32 n20;                    // 0x20  1 + the value for gSession.nPinSet and the pins (0: none)
-    s32 nClubBits;              // 0x24  the bag, one bit per club (see fn_800EBEF0); 0 = the golfer's own.
+    s32 nClubBits;              // 0x24  the bag, one bit per club (see PlayNow_ApplyChallengeSetup); 0 = the golfer's own.
                                 //       Signed: the original tests it with cmpwi
     s32 nOpponents;             // 0x28  CPU players, 0..3
     s32 aOpponent[3];           // 0x2C  their golfers
     u8  unk38[0x3C - 0x38];
-    s32 nTargetKind;            // 0x3C  how the target is built (see fn_800ED028)
+    s32 nTargetKind;            // 0x3C  how the target is built (see PlayNow_GetChallengeTarget)
     s32 nTargetBase;            // 0x40
     s32 nHoleKind;              // 0x44  what the challenge hole adds
     s32 nHoleExtra;             // 0x48
@@ -53,7 +53,7 @@ typedef struct ChallengeSpot {
     f32 f8;                     // 0x8
 } ChallengeSpot;
 
-// A course object of type 10, handed to fn_800EADDC by the course loader (0x80048BDC): the spot
+// A course object of type 10, handed to PlayNow_LoadBallSpot by the course loader (0x80048BDC): the spot
 // where challenge nChallenge (1-based) places the ball.
 typedef struct ChallengeSpotRecord {
     u8  unk0[0x10];
@@ -67,6 +67,6 @@ extern Challenge* gChallengeList;         // the list being played: gNumChalleng
 extern s32        gNumChallenges;
 extern s32        gCurChallenge;         // the current one
 
-void fn_800EC544(Challenge* pList, s32 nCount);     // play from another list (mode 24's)
+void PlayNow_SetChallengeList(Challenge* pList, s32 nCount);     // play from another list (mode 24's)
 
 #endif

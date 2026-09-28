@@ -221,7 +221,7 @@ void GUI_UpdateAllUIData(void) {
 // Opens the pause menu, once (nothing while already paused): pending UI message 0x31 flagged
 // (fn_800E5714(4)), the controllers' rumble stopped, message 0x23 with 0, timer 1 stopped, the
 // pause flag GUI_IsPauseMenuOpen returns and gSession.nPaused set, a GameBreaker paused, EASBio's
-// play state 0, and in a GameMode5 challenge fn_800ECBE4.
+// play state 0, and in a GameMode5 challenge PlayNow_OnPause.
 void GUI_OpenPauseMenu(void) {
     if (gSession.nPaused == 0) {
         fn_800E5714(4);
@@ -234,8 +234,8 @@ void GUI_OpenPauseMenu(void) {
         gSession.nPaused = 1;
         fn_800DC9D4(1);
         EASBio_SetGamePlayState(0);
-        if (GM5_IsChallengeRunning()) {
-            fn_800ECBE4();
+        if (PlayNow_IsChallengeRunning()) {
+            PlayNow_OnPause();
         }
     }
 }

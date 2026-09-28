@@ -741,7 +741,7 @@ void GM_Earnings_CheckShotGoals(int nPlayer, Ball* pBall, u8 bPreview) {
     for (i = 0; i < NUM_SHOT_GOALS; i++) {
         if (!gEarningsTable.aShotGoal[i].bEnabled) continue;
         if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uModes, Game_GetMode())) continue;
-        if (GM5_IsChallengeRunning() && !fn_801025F4()
+        if (PlayNow_IsChallengeRunning() && !fn_801025F4()
             && !Earnings_TestBit(gEarningsTable.aShotGoal[i].uModes, 5)) continue;
         if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uPars, 0) && Course_GetCurHolePar() == 3) continue;
         if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uPars, 1) && Course_GetCurHolePar() == 4) continue;
@@ -888,7 +888,7 @@ void GM_Earnings_CheckPuttGoals(int nPlayer, u8 bPreview) {
     if (gSession.uFlags & 0x4000) return;
     if (Player_IsCPU(nPlayer)) return;
     if (!GM_Earnings_AwardShotBonusToUser(nPlayer)) return;
-    if (GM5_IsChallengeRunning() && !fn_801025F4()) return;
+    if (PlayNow_IsChallengeRunning() && !fn_801025F4()) return;
     if (Game_GetMulliganRule() != 0) return;
 
     for (i = Game_CurHoleIndex() + 1; i < 18; i++) {
@@ -903,7 +903,7 @@ void GM_Earnings_CheckPuttGoals(int nPlayer, u8 bPreview) {
     for (i = 0; i < NUM_PUTT_GOALS; i++) {
         if (!gEarningsTable.aPuttGoal[i].bEnabled) continue;
         if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uModes, Game_GetMode())) continue;
-        if (GM5_IsChallengeRunning() && !fn_801025F4()
+        if (PlayNow_IsChallengeRunning() && !fn_801025F4()
             && !Earnings_TestBit(gEarningsTable.aPuttGoal[i].uModes, 5)) continue;
         if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uPars, 0) && Course_GetCurHolePar() == 3) continue;
         if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uPars, 1) && Course_GetCurHolePar() == 4) continue;
@@ -1081,7 +1081,7 @@ void GM_Earnings_CheckHoleGoals(int nPlayer, u8 bPreview, u8 bRoundOver) {
         if (!gEarningsTable.aHoleGoal[i].bEachHole && !bRoundOver) continue;
         if (!gEarningsTable.aHoleGoal[i].bEnabled) continue;
         if (!Earnings_TestBit(gEarningsTable.aHoleGoal[i].uModes, Game_GetMode())) continue;
-        if (GM5_IsChallengeRunning() && !fn_801025F4()
+        if (PlayNow_IsChallengeRunning() && !fn_801025F4()
             && !Earnings_TestBit(gEarningsTable.aHoleGoal[i].uModes, 5)) continue;
         if (!gEarningsTable.aHoleGoal[i].b19 && bMore) continue;
         if (gEarningsTable.aHoleGoal[i].aToPar[0] != 0 &&
@@ -2271,7 +2271,7 @@ void GM_ClearGameBonusStats(int nPlayer) {
 }
 
 // Whether records of kind nKind count in this game: never in game modes 9 and 11 or with mulligans
-// on. Kinds 0..9 also need no challenge running (GM5_IsChallengeRunning): the round's kinds (0,
+// on. Kinds 0..9 also need no challenge running (PlayNow_IsChallengeRunning): the round's kinds (0,
 // 3..7) a full round (GM_FullRoundOfGolf) of stroke scoring (fn_8008AB40 0), the drive and the putt
 // (1, 2) nothing more, kind 8 a skill-zone mode, kind 9 game mode 22 (the long-drive contest). Any
 // other kind counts.
@@ -2280,34 +2280,34 @@ u8 HighScoreRecords_CheckRecordGameSetting(int nKind) {
     if (Game_GetMulliganRule() != 0) return 0;
     switch (nKind) {
     case 0:
-        if (GM5_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
+        if (PlayNow_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
         return 1;
     case 1:
-        if (GM5_IsChallengeRunning()) return 0;
+        if (PlayNow_IsChallengeRunning()) return 0;
         return 1;
     case 2:
-        if (GM5_IsChallengeRunning()) return 0;
+        if (PlayNow_IsChallengeRunning()) return 0;
         return 1;
     case 3:
-        if (GM5_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
+        if (PlayNow_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
         return 1;
     case 4:
-        if (GM5_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
+        if (PlayNow_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
         return 1;
     case 5:
-        if (GM5_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
+        if (PlayNow_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
         return 1;
     case 6:
-        if (GM5_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
+        if (PlayNow_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
         return 1;
     case 7:
-        if (GM5_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
+        if (PlayNow_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
         return 1;
     case 8:
-        if (GM5_IsChallengeRunning() || !GM_Currently_SkillZoneMode()) return 0;
+        if (PlayNow_IsChallengeRunning() || !GM_Currently_SkillZoneMode()) return 0;
         return 1;
     case 9:
-        if (GM5_IsChallengeRunning() || Game_GetMode() != 22) return 0;
+        if (PlayNow_IsChallengeRunning() || Game_GetMode() != 22) return 0;
         return 1;
     }
     return 1;
@@ -2436,7 +2436,7 @@ void GM_RecordIndividualHoleStats(int nPlayer) {
 
     gpGame->b16C[nPlayer][Game_CurHoleIndex()] = 1;
     if (gpGame->b27C) {
-        switch (GM5_IsChallengeRunning()) {    // fake match: as in GM_RecordIndividualRoundStats
+        switch (PlayNow_IsChallengeRunning()) {    // fake match: as in GM_RecordIndividualRoundStats
         case 0:
             break;
         default:
@@ -2514,7 +2514,7 @@ void GM_RecordIndividualRoundStats(int nPlayer) {
 
     if (gpGame->b27D) {
         // fake match: a plain "if (...) return" folds the branch over a branch
-        switch (GM5_IsChallengeRunning()) {
+        switch (PlayNow_IsChallengeRunning()) {
         case 0:
             break;
         default:
@@ -2569,7 +2569,7 @@ s32 Earnings_GetHoleAwardId(s32 i) {
 // tour statistics, 26 leading the par 3, 4 and 5 birdie statistics, 27 over 4.25 birdies a round,
 // 30 under par in every event played, 33 a scoring average under 68.17. The others at any time: 23
 // more than 18 holes in one (SaveProfile.nAC), 28 GameMode5's fn_800ED6F0 with the best medal
-// (fn_800EC558 0), 29 leading the career money list, 31 tour.n4E96 over 11, 32 a round under 59
+// (PlayNow_GetMedal 0), 29 leading the career money list, 31 tour.n4E96 over 11, 32 a round under 59
 // strokes, 34 more than 100 events (n4E94) with over 28% won, 35 n4E98 over 66, 36 n4E9A over 18,
 // 37 ten or more wins in a season, 38 more season winnings than Tiger Woods's $9,188,321 of 2000.
 u8 Earnings_IsTourAwardEarned(int nPlayer, int nAward) {
@@ -2637,7 +2637,7 @@ u8 Earnings_IsTourAwardEarned(int nPlayer, int nAward) {
         }
         return 0;
     case 28:
-        if (fn_800ED6F0() && fn_800EC558() == 0) return 1;
+        if (fn_800ED6F0() && PlayNow_GetMedal() == 0) return 1;
         return 0;
     case 29:
         return GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_CAREER_WINNINGS) != 0;

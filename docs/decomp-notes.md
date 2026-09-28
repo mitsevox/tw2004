@@ -344,7 +344,7 @@ They will be sorted into the sections below.
 - **[verified] Zeroing: a variable that already held a value gets its zero by `mr` from another zeroed
   register; a variable set for the first time gets its own `li r,0`.** So when the original has two `li`s
   and ours `li; mr`, give the second zero a fresh variable (a new loop counter), and the reverse for one
-  `li; mr` (Earnings HighScoreRecords_GetEndOfGameRecord, hwsBurn HwsBurn_BuildDesc, GameMode5 fn_800EAF7C, GameHoleContests
+  `li; mr` (Earnings HighScoreRecords_GetEndOfGameRecord, hwsBurn HwsBurn_BuildDesc, GameMode5 PlayNow_StartChallenge, GameHoleContests
   fn_800D9F34; `a = b = 0`, types and statement order make no difference). A search written as an
   inline helper hands its index back by `mr`; the same loop written in the caller gets `li` (UISEvent
   fn_80165D2C, fn_80165D90).
@@ -1222,11 +1222,11 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   and a `clrlwi` before the call gives that parameter's type. GameModeBattle `fn_800E7ABC`:
   `u8 fn(int a) { fn_800EA548(a); }` adds a `clrlwi`; `u8 fn(u8 bCheck)` is exact.
 - **[verified] A `u16` return stored into an `s16` costs an `extsh` at the caller; `s16` does not**
-  (GameMode5 `fn_800EC1E0`: `fn_800D2994` as `u16` drops 93.93 -> 92.96).
+  (GameMode5 `PlayNow_EndGame`: `fn_800D2994` as `u16` drops 93.93 -> 92.96).
 - **[verified] m2c turns a register holding half of a constant into an extra argument.** When the
   next call's argument register already holds `lis rN, 'PG'` for a later constant, m2c passes it
   on. `UStream_RegisterHandler('PGAc', fn, 'PG\0\0')` was really two arguments: GameMode23
-  `fn_800EDE7C`, GameMode24 `fn_800F0518`, GameMode5 `fn_800EAE74` all went exact once it was
+  `fn_800EDE7C`, GameMode24 `fn_800F0518`, GameMode5 `PlayNow_RegisterStreamClients` all went exact once it was
   dropped. Check each extra argument m2c shows against the callee's definition.
 - **[verified] An unexplained `mr r3, r4` before the first call** means an unused first
   parameter: the function takes something in r3 it never reads (`fn_80051124(Ball*, f32, f32*)`).
@@ -1320,7 +1320,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   `beq exit`) comes from structure the optimiser doesn't collapse:
   `switch (f()) { case 0: break; default: return; }` (fn_800E7828,
   GameModeBattle/BestBall/FourBall EndGame, a `Game_GetCourse() != 7` test), or
-  `if (x == 0) { return -1; } else { return y; }` with an explicit `else` (fn_800ECA34).
+  `if (x == 0) { return -1; } else { return y; }` with an explicit `else` (PlayNow_GetMedalMark).
   `if (fn() != 8) { switch (fn()) { case 9: break; default: return; } }` matched SW_vUIRender3D's
   gate exactly; `if`, `||`, `&&` and `goto` spellings all fold to a single `bne end`. A plain
   `if (x) return;` always collapses, and an `if (x == 0)` gives a single `bne`; an empty

@@ -417,7 +417,7 @@ void GameModeFourBall_EndGame(void) {
     int nMoney;
     int k;
     if (GM_FullRoundOfGolf()) {
-        switch (GM5_IsChallengeRunning()) {
+        switch (PlayNow_IsChallengeRunning()) {
         case 0:
             break;
         default:

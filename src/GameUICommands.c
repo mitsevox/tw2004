@@ -302,12 +302,12 @@ int   fn_800E5E54(void);
 f32   fn_800E6578(int nPlayer, u32 nStat);
 s32   fn_800E8114(int nPlayer);
 int   fn_800E8CA8(int nPlayer, u8 bCurrent);
-u8    fn_800ECA08(void);
-s32   fn_800ECA34(int k);
-int   fn_800ECC14(void);
-char* fn_800ED280(int nId);
-char* fn_800ED2C8(int nId);
-int   fn_800ED314(void);
+u8    PlayNow_IsSpeedGolf(void);
+s32   PlayNow_GetMedalMark(int k);
+int   PlayNow_GetScoreToTarget(void);
+char* PlayNow_GetGroupName(int nId);
+char* PlayNow_GetGroupDescription(int nId);
+int   PlayNow_GetHolesLeft(void);
 void  fn_800ED554(void);
 void  fn_800ED974(void);
 Pga80205F30* GameModeDriverPGATour_GetWinInfo(void);
@@ -848,7 +848,7 @@ void fn_8008666C(MsgArg* pArgs, MsgArg* pResult) {
     gReplayData.bF10 = 0;
     EVENT_Trigger(lbl_80282278, 2, NULL, 0);
     GM_RestartHole();
-    if (GM5_IsChallengeRunning()) {
+    if (PlayNow_IsChallengeRunning()) {
         fn_800ED554();
     }
     if (Game_GetMode() == 26 || Game_GetMode() == 22) {
@@ -1248,7 +1248,7 @@ void fn_80087658(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80087684(MsgArg* pArgs, MsgArg* pResult) {
-    if (GM5_IsChallengeRunning()) {
+    if (PlayNow_IsChallengeRunning()) {
         pResult->i = 1;
         return;
     }
@@ -1256,15 +1256,15 @@ void fn_80087684(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_800876CC(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800ECA08();
+    pResult->i = PlayNow_IsSpeedGolf();
 }
 
 void fn_80087700(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800ECA34(pArgs[0].i);
+    pResult->i = PlayNow_GetMedalMark(pArgs[0].i);
 }
 
 void fn_80087734(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800ECC14();
+    pResult->i = PlayNow_GetScoreToTarget();
 }
 
 // Show the tip fn_800E5E54 picks (14: none).
@@ -1615,7 +1615,7 @@ void fn_800882F4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80088324(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800ED314();
+    pResult->i = PlayNow_GetHolesLeft();
 }
 
 void fn_80088354(MsgArg* pArgs, MsgArg* pResult) {
@@ -1635,8 +1635,8 @@ void fn_8008835C(MsgArg* pArgs, MsgArg* pResult) {
                GameModeDriverRTE_GetDescription(GM_RealtimeMode_GetSelectedEvent(&nRound)));
         return;
     }
-    strcpy(((MsgString*)pArgs[0].p)->pStr, fn_800ED280(fn_800EAC7C()));
-    strcpy(((MsgString*)pArgs[1].p)->pStr, fn_800ED2C8(fn_800EAC7C()));
+    strcpy(((MsgString*)pArgs[0].p)->pStr, PlayNow_GetGroupName(fn_800EAC7C()));
+    strcpy(((MsgString*)pArgs[1].p)->pStr, PlayNow_GetGroupDescription(fn_800EAC7C()));
 }
 
 void fn_800883FC(MsgArg* pArgs, MsgArg* pResult) {
@@ -2466,7 +2466,7 @@ void fn_8008A0CC(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_8008A128(MsgArg* pArgs, MsgArg* pResult) {
     fn_800885F8(NULL, NULL);
-    if (!GM5_IsChallengeRunning()) {
+    if (!PlayNow_IsChallengeRunning()) {
         fn_8006F4E0();
     }
     fn_80110178(1);
@@ -2479,12 +2479,12 @@ void fn_8008A184(MsgArg* pArgs, MsgArg* pResult) {
 
 // A challenge's first line of text.
 void fn_8008A188(MsgArg* pArgs, MsgArg* pResult) {
-    strcpy(((MsgString*)pArgs[0].p)->pStr, fn_800ED280(pArgs[1].i));
+    strcpy(((MsgString*)pArgs[0].p)->pStr, PlayNow_GetGroupName(pArgs[1].i));
 }
 
 // Its second line.
 void fn_8008A1C8(MsgArg* pArgs, MsgArg* pResult) {
-    strcpy(((MsgString*)pArgs[0].p)->pStr, fn_800ED2C8(pArgs[1].i));
+    strcpy(((MsgString*)pArgs[0].p)->pStr, PlayNow_GetGroupDescription(pArgs[1].i));
 }
 
 void fn_8008A208(MsgArg* pArgs, MsgArg* pResult) {

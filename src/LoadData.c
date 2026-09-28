@@ -77,7 +77,7 @@ void fn_8000BAE0(void) {
 
     if (fn_800ED6F0()) {
         nFile = 2;
-    } else if (Game_GetMode() == 11 || Game_GetMode() == 5 || GM5_IsChallengeRunning()) {
+    } else if (Game_GetMode() == 11 || Game_GetMode() == 5 || PlayNow_IsChallengeRunning()) {
         nFile = 0;
     } else if (Game_GetMode() == 13 || Game_GetMode() == 14 || Game_GetMode() == 16 ||
                Game_GetMode() == 17) {

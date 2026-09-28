@@ -533,7 +533,8 @@ void STATEFUNC_SwingInit(int nPlayer) {
             CTIP_ShowCaddieTip(nPlayer);
         }
     }
-    if (gPlayers[nPlayer].bC2E == 0 && !Player_IsCPU(nPlayer) && GM5_IsChallengeRunning() && fn_800ED540()) {
+    if (gPlayers[nPlayer].bC2E == 0 && !Player_IsCPU(nPlayer) && PlayNow_IsChallengeRunning()
+        && fn_800ED540()) {
         if (GM_Currently_RealtimeMode()) {
             fn_800E502C(fn_800EAC7C());
         } else {

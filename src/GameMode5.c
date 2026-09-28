@@ -35,33 +35,36 @@ s32 gPlayNowSelectedChallenge;
 s32 gCurChallenge;
 s32 gPlayNowSavedWind;
 
-void fn_800EAE44(int nId);
-s32 fn_800EAE6C(void);
-void fn_800EAEB8(void);
-void fn_800EAEEC(UStreamObject* pObject);
+void PlayNow_SelectGroup(int nId);
+s32 PlayNow_GetNumGroups(void);
+void PlayNow_UnregisterStreamClients(void);
+void PlayNow_LoadPLYFromStream(UStreamObject* pObject);
 
-int   fn_800ED028(int i);
+int   PlayNow_GetChallengeTarget(int i);
 void  Character_PreHoleInit(void);
-void  fn_800EBEF0(void);
-void  fn_800EAD6C(void);
-void  fn_800EBD28(void);
-void  fn_800EC1E0(void);
+void  PlayNow_ApplyChallengeSetup(void);
+void  PlayNow_Shutdown(void);
+void  PlayNow_HoleStart(void);
+void  PlayNow_EndGame(void);
 void  fn_800ED604(int nPlayer);
-void  fn_800EAF18(UStreamObject* pObject);
-int   fn_800ECF9C(int i);
-void  fn_800EC170(int n);
-u8    fn_800EC4F0(int n);
-u8    fn_800EBD60(u8 bCheck);
+void  PlayNow_LoadPLYsFromStream(UStreamObject* pObject);
+int   PlayNow_GetGroupTarget(int i);
+void  PlayNow_QueueMedalMessage(int n);
+u8    PlayNow_HasAllMedals(int n);
+u8    PlayNow_GameFinished(u8 bCheck);
 int   fn_800ED508(int nGroup);
-u8 fn_800ECA08(void);
+u8 PlayNow_IsSpeedGolf(void);
 u8 fn_800ED5C8(int nPlayer, u8 bCheck);
 
-// Game mode 5 starts: its callbacks, gpGame->nC and n10 set to 1, and mode 5's own challenge list.
-void fn_800EACD8(void) {
-    gpGame->pfnInit = fn_800EACD8;
-    gpGame->pfnShutdown = fn_800EAD6C;
-    gpGame->pfn1E4 = fn_800EBD28;
-    gpGame->pfnEndGame = fn_800EC1E0;
+// Game mode 5 (the Play Now challenges) starts, from GM_SetModeType: its own shutdown, hole-start,
+// end-game, hole-finished and hole-over callbacks go in, gpGame nC and n10 become 1, no restart is
+// pending, and the challenge list goes back to the mode's own 83 (gPlayNowChallenges; mode 24 swaps
+// in its own with PlayNow_SetChallengeList).
+void PlayNow_Init(void) {
+    gpGame->pfnInit = PlayNow_Init;
+    gpGame->pfnShutdown = PlayNow_Shutdown;
+    gpGame->pfn1E4 = PlayNow_HoleStart;
+    gpGame->pfnEndGame = PlayNow_EndGame;
     gpGame->pfnHoleFinished = fn_800ED5C8;
     gpGame->pfn210 = fn_800ED604;
     gpGame->nC = 1;
@@ -71,8 +74,10 @@ void fn_800EACD8(void) {
     gNumChallenges = 83;
 }
 
-// The mode ends: its cleanup callback runs once, and the options it changed come back.
-void fn_800EAD6C(void) {
+// Mode 5's shutdown (pfnShutdown): the played mode's own shutdown runs once (then it is forgotten),
+// gpGame nC and n10 go back to 1, the options nC and wind that PlayNow_StartChallenge saved are put
+// back, and no challenge is running any more (PlayNow_IsChallengeRunning).
+void PlayNow_Shutdown(void) {
     if (gPlayNowModeShutdown) {
         gPlayNowModeShutdown();
         gPlayNowModeShutdown = NULL;
@@ -84,11 +89,15 @@ void fn_800EAD6C(void) {
     gPlayNowChallengeRunning = 0;
 }
 
-void fn_800EADD8(void) {
+// Mode 5's part of a round's teardown (GM_DeInitModule, after the mode's shutdown); empty in this
+// build.
+void PlayNow_DeInit(void) {
 }
 
-// A 'Cact' object of type 10 (from the 'Cact' handler at 0x80048BDC): one challenge's ball spot.
-void fn_800EADDC(void* pObj) {
+// A course object of type 10, from the 'Cact' handler (fn_80048BDC): the spot where challenge
+// nChallenge (1-based; 84 and up are ignored) places the ball is copied into gPlayNowBallSpots, and
+// the object is freed.
+void PlayNow_LoadBallSpot(void* pObj) {
     // port: the course object is big-endian and read in place through ChallengeSpotRecord; a
     //       little-endian port converts v[] (three floats) here
     ChallengeSpotRecord* d = *(ChallengeSpotRecord**)pObj;
@@ -101,40 +110,52 @@ void fn_800EADDC(void* pObj) {
     StaticMem_Free(pObj);
 }
 
-void fn_800EAE38(s32 p0) {
+// Selects challenge nChallenge (a 0-based index into gChallengeList) as the current one and as the
+// one a restart goes back to (PlayNow_Restart). The menu (FE_MessageTable.c), the ladder
+// (GameMode4_StartEvent) and the real-time events (GameModeDriverRTE_StartEvent) call it.
+void PlayNow_SelectChallenge(s32 p0) {
     gCurChallenge = p0;
     gPlayNowSelectedChallenge = p0;
 }
 
-void fn_800EAE44(int nId) {
+// Selects the first challenge of group nGroup (challenge 0 when no challenge has that group) as
+// current and as the restart point, as PlayNow_SelectChallenge does. A group is one entry of the
+// Play Now menu, played as one or more challenges in a row; the menu's FE message passes its
+// 1-based choice minus one.
+void PlayNow_SelectGroup(int nId) {
     int i = fn_800EAC94(nId);
     gCurChallenge = i;
     gPlayNowSelectedChallenge = i;
 }
 
-s32 fn_800EAE6C(void) {
+// The number of challenge groups the menu lists: 29, as many as SaveProfile.aMedal has entries.
+s32 PlayNow_GetNumGroups(void) {
     return 29;
 }
 
-void fn_800EAE74(void) {
-    Stream_RegisterLoadChunkCallback('PLY ', fn_800EAEEC);
-    Stream_RegisterLoadChunkCallback('PLYs', fn_800EAF18);
+void PlayNow_RegisterStreamClients(void) {
+    Stream_RegisterLoadChunkCallback('PLY ', PlayNow_LoadPLYFromStream);
+    Stream_RegisterLoadChunkCallback('PLYs', PlayNow_LoadPLYsFromStream);
 }
 
-void fn_800EAEB8(void) {
+void PlayNow_UnregisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('PLY ');
     Stream_UnregisterLoadChunkCallback('PLYs');
 }
 
-void fn_800EAEEC(UStreamObject* pObject) {
+// The 'PLY ' stream object (EA's DATA\PLAYNOW_GC.BIN): the 83 challenges, copied into
+// gPlayNowChallenges.
+void PlayNow_LoadPLYFromStream(UStreamObject* pObject) {
     // port: the 'PLY ' object is copied straight into the challenges (Challenge[83]); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
     //       (docs/format-byteorder.md)
     Stream_StreamLoadFixedSize(pObject, sizeof(gPlayNowChallenges), gPlayNowChallenges);
 }
 
-// The 'PLYs' object: the challenge text block is copied out.
-void fn_800EAF18(UStreamObject* pObject) {
+// The 'PLYs' stream object (EA's PLAYNOW.STR): the groups' names and descriptions, the text block
+// Challenge.n0 and n4 are offsets into, copied into a new 16-byte aligned block at gPlayNowText;
+// the stream's copy is freed. An empty object leaves gPlayNowText as it was.
+void PlayNow_LoadPLYsFromStream(UStreamObject* pObject) {
     void* pData;
     u32 nSize = fn_8000E81C(pObject, &pData);
     if (nSize) {
@@ -144,11 +165,26 @@ void fn_800EAF18(UStreamObject* pObject) {
     }
 }
 
-// A challenge starts: the options it changes are saved, the round is set up (mode, course, holes,
-// tee set, pins, the CPU opponents), and the holes before the challenge hole get scores so the
-// challenge starts from its target (see fn_800ED028); then the challenge's own callbacks go in,
-// the mode's own ones kept for fn_800EAD6C and the rest to call.
-void fn_800EAF7C(void) {
+// The current challenge (gCurChallenge) starts. The options nC and wind are saved
+// (gPlayNowSavedOptionC, gPlayNowSavedWind), the new-game data cleared, player 0's active profile
+// gets b70 set, and the challenge's game mode is set (GM_SetModeType fills that mode's callbacks);
+// the challenge now counts as running. Then its course, hole set and hole (1-based; a one-hole
+// challenge selects it alone; not set for the par-5/4/3 and type-7 hole sets), the holes before it
+// deselected, its tee set for everyone, its pin set (n20 - 1; n20 0 gives nPinSet -1 and pin set
+// 0), and player 0 plus up to three CPU opponents (one playing player 0's golfer in the same look
+// gets the next of four looks). The holes before the challenge hole get player 0's scores by
+// nTargetKind: 0 none; 1 a one-hole challenge carries nTargetBase as strokes, else pars nudged at
+// random to total nTargetBase; 2 pars nudged at random to nTargetBase over par (a one-hole
+// challenge carries it, counting one hole); 3/4/5 birdie/par/bogey on each; 7 with match scoring
+// (gpGame->n4 1) holes won at random until the margin is nTargetBase (negative: the opponent's),
+// with stroke scoring everyone on par and player 0 nudged to nTargetBase over. The challenge hole
+// starts at a score by nHoleKind: 0 none, 1 nHoleExtra, 2 par plus nHoleExtra, 3/4/5
+// birdie/par/bogey. Options nC becomes 3 when b4D is set, else 0; no mulligans; the challenge's
+// wind. The first challenge of its group starts the group totals (gPlayNowGroupStrokes, Par, Holes,
+// Time) and flags the group's intro (gPlayNowIntroPending); a later one adds to them. Last, the
+// played mode's shutdown, end game, hole start, game finished, hole finished and hole-over
+// callbacks are kept (gPlayNowMode*) and mode 5's go in their place.
+void PlayNow_StartChallenge(void) {
     int h;
     int nSum;
     int nSum0;
@@ -416,24 +452,31 @@ void fn_800EAF7C(void) {
     gPlayNowModeGameFinished = gpGame->pfnGameFinished;
     gPlayNowModeHoleFinished = gpGame->pfnHoleFinished;
     gPlayNowModeHoleOver = gpGame->pfn210;
-    gpGame->pfnShutdown = fn_800EAD6C;
-    gpGame->pfnEndGame = fn_800EC1E0;
-    gpGame->pfn1E4 = fn_800EBD28;
-    gpGame->pfnGameFinished = fn_800EBD60;
+    gpGame->pfnShutdown = PlayNow_Shutdown;
+    gpGame->pfnEndGame = PlayNow_EndGame;
+    gpGame->pfn1E4 = PlayNow_HoleStart;
+    gpGame->pfnGameFinished = PlayNow_GameFinished;
     gpGame->pfnHoleFinished = fn_800ED5C8;
     gpGame->pfn210 = fn_800ED604;
 }
 
-// Hole start (after fn_800EAF7C set the challenge up).
-void fn_800EBD28(void) {
+// Mode 5's hole start (pfn1E4, from GM_InitForHole): the between-holes scorecard is turned on
+// (b275), the played mode's own hole start runs, then the challenge's ball spot, bag and weather go
+// in (PlayNow_ApplyChallengeSetup).
+void PlayNow_HoleStart(void) {
     gpGame->b275 = 1;
     gPlayNowModeHoleStart();
-    fn_800EBEF0();
+    PlayNow_ApplyChallengeSetup();
 }
 
-// The round ends: the round's totals are added up; then the next challenge in the group starts
-// (unless only checking), or the group is over (1).
-u8 fn_800EBD60(u8 bCheck) {
+// Mode 5's game-over test (pfnGameFinished; bCheck 1 only asks). Never over while a restart is
+// pending. When the played mode says its game is over, the round's selected holes are added to the
+// group totals (strokes, par, hole count, time n290), the hole set goes back to 0, and if a later
+// challenge in the list has the same group, the game is not over: with bCheck that is all,
+// otherwise that challenge becomes current and starts (in a real-time event as mode 24 through
+// GameModeDriverRTE_StartNextChallenge, else as mode 5 through PlayNow_StartChallenge) and b134 is
+// set. 1 only after the group's last challenge. The totals are added even when bCheck only asks.
+u8 PlayNow_GameFinished(u8 bCheck) {
     int h;
     int nStrokes;
     int i;
@@ -463,7 +506,7 @@ u8 fn_800EBD60(u8 bCheck) {
                     GameModeDriverRTE_StartNextChallenge();
                 } else {
                     GM_SetModeType(5);
-                    fn_800EAF7C();
+                    PlayNow_StartChallenge();
                 }
                 gpGame->b134 = 1;
                 return 0;
@@ -474,9 +517,12 @@ u8 fn_800EBD60(u8 bCheck) {
     return 0;
 }
 
-// The challenge's setup: the ball placed at its spot, its bag (bit n of nClubBits gives the n-th club
-// of the list below; club 25 is always in), and fn_800ED6F8's value.
-void fn_800EBEF0(void) {
+// The current challenge's hole setup (PlayNow_HoleStart): with bPlaceBall, player 0's ball starts
+// at the challenge's spot (gPlayNowBallSpots), dropped to the ground; a nonzero nClubBits replaces
+// player 0's bag (uBagMask): bag bit 25 always, challenge bit 0 gives bag bit 0, bits 1..14 bag
+// bits 6..19, bit 15 bag bit 21 and bit 16 bag bit 23; with b4D the weather amount f54 is forced
+// (PlayNow_ForceWeather).
+void PlayNow_ApplyChallengeSetup(void) {
     f32 v[4];
     if (gChallengeList[gCurChallenge].bPlaceBall) {
         v[0] = gPlayNowBallSpots[gCurChallenge].f0;
@@ -553,16 +599,23 @@ s32 gPlayNowMedalMessages[3][3] = {
     {6, 7, 8},
 };
 
-// A message of kind n: one of three at random.
-void fn_800EC170(int n) {
+// Queues a message for medal nMedal (0 best .. 2): one of its three ids in gPlayNowMedalMessages,
+// picked at random, as GUI message kind 7.
+void PlayNow_QueueMedalMessage(int n) {
     s32 nMsg = gPlayNowMedalMessages[n][Misc_RandFunc(0) % 3];
     GUI_QueueMessage(7, nMsg, 0, 0);
 }
 
-// The challenge is over: a better medal than the profile's best is saved (with a stamp); the medal's
-// message; for a profile, the medal's reward, then two bonuses (0x1C, and 0xC once every challenge
-// has a medal).
-void fn_800EC1E0(void) {
+// Mode 5's end of game (pfnEndGame): the played mode's own end game runs first. Then, outside a
+// real-time event and a ladder event, when a medal is earned (PlayNow_GetMedal, not 3): it is saved
+// with today's date if it beats the profile's best for the group, and the medal's message is
+// queued; for an active profile the medal's reward goes through
+// GM_Earnings_ComputeTOURCardModifiers, its payout message (0x6F, 0x70, 0x71 by medal) is queued
+// when it is not 0, and it is paid. Then two trophy balls, each paid (message, money, and counted
+// in money.n8) only when newly given: 0x1C when the calendar flag is set and award 0x1C is earned
+// (a best medal, Earnings.c), and 0xC once the profile has a medal in every group
+// (PlayNow_HasAllMedals).
+void PlayNow_EndGame(void) {
     s32 aOut[18];               // the payout's breakdown, handed on as a CourseMoneyTracking
     int nReward;
     int nMedal;
@@ -570,7 +623,7 @@ void fn_800EC1E0(void) {
     int nMoney;
     gPlayNowModeEndGame();
     if (!GM_Currently_RealtimeMode()) {
-        nMedal = fn_800EC558();
+        nMedal = PlayNow_GetMedal();
         if (!fn_801025F4() && nMedal != 3) {
             if (nMedal < gpSaveData[gPlayers[0].nIndex].aMedal[fn_800EAC7C()]) {
                 gpSaveData[gPlayers[0].nIndex].aMedal[fn_800EAC7C()] = nMedal;
@@ -587,7 +640,7 @@ void fn_800EC1E0(void) {
                 nReward = gChallengeList[gCurChallenge].aMedal[2].nReward;
                 break;
             }
-            fn_800EC170(nMedal);
+            PlayNow_QueueMedalMessage(nMedal);
             nProfile = gPlayers[0].nIndex;
             if (gpSaveData[nProfile].bActive) {
                 nMoney = GM_Earnings_ComputeTOURCardModifiers(nReward, 0, (CourseMoneyTracking*)aOut);
@@ -611,7 +664,7 @@ void fn_800EC1E0(void) {
                     GM_Earnings_AwardMoney(0, gEarningsTable.nA24, 0);
                     gPlayers[0].money.n8 += gEarningsTable.nA24;
                 }
-                if (fn_800EC4F0(nProfile) && GM_Earnings_AwardTrophyBall(0, 0xC)) {
+                if (PlayNow_HasAllMedals(nProfile) && GM_Earnings_AwardTrophyBall(0, 0xC)) {
                     GUI_QueueMessage(2, 0xC, gEarningsTable.n9E4, nProfile);
                     GM_Earnings_AwardMoney(0, gEarningsTable.n9E4, 0);
                     gPlayers[0].money.n8 += gEarningsTable.n9E4;
@@ -621,9 +674,9 @@ void fn_800EC1E0(void) {
     }
 }
 
-// Whether profile n has done every challenge: it has a TOUR card (level 1 or more) and none of the
-// 29 best medals is 3 (none).
-u8 fn_800EC4F0(int n) {
+// Whether profile nProfile has a medal in every one of the 29 challenge groups (no aMedal is 3) and
+// a TOUR card (level 1 or more).
+u8 PlayNow_HasAllMedals(int n) {
     SaveProfile* p = &gpSaveData[n];
     int i;
     if (p->nTourCardLevel < 1) {
@@ -637,21 +690,30 @@ u8 fn_800EC4F0(int n) {
     return 1;
 }
 
-void fn_800EC544(Challenge* p0, s32 p1) {
+// Plays challenges from another list of nCount: mode 24 passes its 111 (gRTEs.aChallenge);
+// PlayNow_Init puts the mode's own 83 back.
+void PlayNow_SetChallengeList(Challenge* p0, s32 p1) {
     gChallengeList = p0;
     gNumChallenges = p1;
 }
 
 // Whether one of the mode's challenges is being played (set when it starts, cleared when it ends).
-u8 GM5_IsChallengeRunning(void) {
+u8 PlayNow_IsChallengeRunning(void) {
     return gPlayNowChallengeRunning;
 }
 
-// The medal earned (0 best, 3 none): for each medal its rule against the group's totals (strokes
-// plus a number, against par, birdie or par or bogey golf, the n290 total below a mark, a match
-// margin or strokes against player 1's, the best n274 with nD8 within the mark, nDD8) or against
-// this hole.
-int fn_800EC558(void) {
+// The medal the current challenge has earned: the first of 0 (best), 1, 2 whose rule
+// (aMedal[m].nRule; 0 never passes) holds against its mark, else 3 (none). With nScoring 0 the
+// group's totals so far are judged: 1 strokes plus nTargetBase at most the mark; 2 strokes over par
+// at most the mark; 3/4/5 birdie, par or bogey golf over the holes played; 6 the total time (n290)
+// under the mark; 7 in match scoring (gpGame->n4 1) a margin of holes won of at least the mark
+// (with the calendar flag a playoff gives 1 if player 0 has won more holes, else 2; without it a
+// playoff counts only for mark 0 and a lead), in stroke scoring player 1's strokes minus player 0's
+// at most the mark; 8 more skins than every opponent and at most the mark in playoff holes (nD8); 9
+// in a skill zone game at least the mark in points (nDD8). With nScoring 1 this hole alone: 1
+// strokes at most the mark, 2 over par at most the mark, 3/4/5 birdie, par or bogey or better, 6 as
+// above, 7 a playoff player 0 leads gives 2, else the margin, 9 as above.
+int PlayNow_GetMedal(void) {
     int m;
     int nRule;
     int nMark;
@@ -826,15 +888,16 @@ int fn_800EC558(void) {
     return 3;
 }
 
-// Whether the game mode is 8.
-u8 fn_800ECA08(void) {
+// Whether the game mode is 8, speed golf (a UI command asks).
+u8 PlayNow_IsSpeedGolf(void) {
     return Game_GetMode() == 8;
 }
 
-// The score for a medal over the current group, counted from the lowest (k 0 is aMedal[2]): the
-// group's last challenge's mark minus the whole group's target (0 for target kind 1, and kind 7 in
-// mode 0; -1 when the current challenge gives no such medal).
-s32 fn_800ECA34(int k) {
+// The mark for medal k as the UI shows it, counted from the lowest (k 0 is aMedal[2], 2 the best,
+// aMedal[0]): the group's last challenge's mark minus the group's target (PlayNow_GetGroupTarget;
+// taken as 0 for target kind 1, and for kind 7 in stroke play, mode 0). -1 when the current
+// challenge has no such medal (its rule 0); 0 for any other k.
+s32 PlayNow_GetMedalMark(int k) {
     int i;
     int nLast = gCurChallenge;
     int nTarget;
@@ -843,7 +906,7 @@ s32 fn_800ECA34(int k) {
             nLast = i;
         }
     }
-    nTarget = fn_800ECF9C(gCurChallenge);
+    nTarget = PlayNow_GetGroupTarget(gCurChallenge);
     if ((gChallengeList[gCurChallenge].nTargetKind == 7 && Game_GetMode() == 0) ||
         gChallengeList[gCurChallenge].nTargetKind == 1) {
         nTarget = 0;
@@ -872,15 +935,22 @@ s32 fn_800ECA34(int k) {
     }
 }
 
-void fn_800ECBE4(void) {
+// The pause menu opens during a challenge (GUI_OpenPauseMenu): in speed golf (mode 8), game message
+// 18 for player 0 (PlayNow_SendMessage18).
+void PlayNow_OnPause(void) {
     if (Game_GetMode() == 8) {
         fn_800ED710(0);
     }
 }
 
-// The number shown against the target: the match margin (mode 1), the n290 total (mode 8), nD8
-// (mode 2), nDD8, or the group's strokes so far minus its target so far.
-int fn_800ECC14(void) {
+// The number shown against the challenge's target. In match play (mode 1) the margin of holes won
+// (0 in a playoff); speed golf (8) the total time (n290) of the selected holes; skins (2) the
+// playoff holes (nD8); a skill zone game the points (nDD8). Otherwise the group's strokes so far
+// (not for target kind 1) plus this round's (in stroke play, mode 0, with target kind 7 the holes
+// before the current one, and the current one once the scorecard is up; else every selected hole,
+// or all 18 for kind 1), minus the group's targets up to this challenge
+// (PlayNow_GetChallengeTarget; 0 for kind 1).
+int PlayNow_GetScoreToTarget(void) {
     int nTarget;
     int nScore;
     int i;
@@ -912,7 +982,7 @@ int fn_800ECC14(void) {
     nTarget = 0;
     for (; i <= gCurChallenge; i++) {
         if (gChallengeList[i].nGroup == gChallengeList[gCurChallenge].nGroup) {
-            nTarget += fn_800ED028(i);
+            nTarget += PlayNow_GetChallengeTarget(i);
         }
     }
     k = 0;
@@ -939,23 +1009,25 @@ int fn_800ECC14(void) {
     return nScore - nTarget;
 }
 
-// The total of fn_800ED028 over the current challenge's group.
-int fn_800ECF9C(int iUnused) {
+// The total of PlayNow_GetChallengeTarget over every challenge in the current challenge's group.
+// The argument is not read (PlayNow_GetMedalMark passes the current index).
+int PlayNow_GetGroupTarget(int iUnused) {
     int n = 0;
     int i;
     for (i = 0; i < gNumChallenges; i++) {
         if (gChallengeList[i].nGroup == gChallengeList[gCurChallenge].nGroup) {
-            n += fn_800ED028(i);
+            n += PlayNow_GetChallengeTarget(i);
         }
     }
     return n;
 }
 
-// A challenge's target score (in mode 0 only): a fixed number (1); par for the holes before the
-// challenge hole plus a number (2); birdie (3), par (4) or bogey (5) on each of them; or the
-// opponent's strokes so far (7); then the challenge hole adds a number (1), par plus a number (2),
-// birdie (3), par (4) or bogey (5).
-int fn_800ED028(int i) {
+// Challenge i's target score, in stroke play (game mode 0) only, else 0. For the holes before the
+// challenge hole, by nTargetKind: 1 nTargetBase; 2 their par plus nTargetBase; 3/4/5 birdie, par or
+// bogey on each; 7 player 1's strokes on the selected holes played so far (the current one too once
+// the scorecard is up). The challenge hole adds, by nHoleKind: 1 nHoleExtra, 2 its par plus
+// nHoleExtra, 3/4/5 birdie, par or bogey.
+int PlayNow_GetChallengeTarget(int i) {
     int nTarget = 0;
     int nHole = gChallengeList[i].nHole - 1;
     int k;               // a loop counter, and in case 7 the current hole once it is over
@@ -1020,8 +1092,10 @@ int fn_800ED028(int i) {
     return nTarget;
 }
 
-// Challenge text lines (offsets into the text block).
-char* fn_800ED280(int nId) {
+// Group nGroup's name: the text at its first challenge's n0 in the 'PLYs' block. Always read from
+// the mode's own 83 challenges (gPlayNowChallenges), whichever list is being played; the menu and
+// the in-round screens show it (a real-time event shows GameModeDriverRTE_GetName instead).
+char* PlayNow_GetGroupName(int nId) {
     int i = fn_800EAC94(nId);
     // EA bug: fn_800EAC94 returns 0, never -1, for a group it does not find, so this test never
     // passes and an unknown id gets challenge 0's line.
@@ -1031,7 +1105,9 @@ char* fn_800ED280(int nId) {
     return gPlayNowText + gPlayNowChallenges[i].n0;
 }
 
-char* fn_800ED2C8(int nId) {
+// Group nGroup's description: the text at its first challenge's n4 in the 'PLYs' block, as
+// PlayNow_GetGroupName reads the name.
+char* PlayNow_GetGroupDescription(int nId) {
     int i = fn_800EAC94(nId);
     // EA bug: never -1, as above.
     if (i == -1) {
@@ -1040,9 +1116,12 @@ char* fn_800ED2C8(int nId) {
     return gPlayNowText + gPlayNowChallenges[i].n4;
 }
 
-// The holes left in the group: the rest of this round, plus each later challenge's holes (one, 18,
-// a nine, or the par 5s/4s/3s of its course).
-int fn_800ED314(void) {
+// The holes left in the challenge group: the selected holes after the current one, plus, when the
+// group has more than one challenge, the holes of each challenge after the current one (from the
+// current one itself once PlayNow_HoleFinished says the hole is over) by nType: one, 18, a nine, or
+// the par 5s, 4s or 3s of its course (type 7 none). 0 while the end-of-round screen is up
+// (fn_800E5110).
+int PlayNow_GetHolesLeft(void) {
     int h;
     int i;
     int n = 0;
@@ -1138,7 +1217,7 @@ void fn_800ED554(void) {
     if (GM_Currently_RealtimeMode()) {
         GameModeDriverRTE_StartEvent();
     } else {
-        fn_800EAF7C();
+        PlayNow_StartChallenge();
     }
     Character_PreHoleInit();
 }

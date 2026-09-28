@@ -105,8 +105,8 @@ void fn_800D29EC();
 void fn_800D2A30();
 void EarningsInfo_RegisterStreamClients();
 void EarningsInfo_UnRegisterStreamClients();
-void fn_800EAE74();
-void fn_800EAEB8();
+void PlayNow_RegisterStreamClients();
+void PlayNow_UnregisterStreamClients();
 void GameModeDriverPGATour_RegisterStreamClients();
 void GameModeDriverPGATour_UnregisterStreamClients();
 void GameModeDriverRTE_RegisterStreamClients();
@@ -351,7 +351,7 @@ void fn_80014864(void) {
     Session_RegisterRecordsHandler();
     UI_vEATraxRegisterStreamClients();
     fn_800D29EC();
-    fn_800EAE74();
+    PlayNow_RegisterStreamClients();
     EarningsInfo_RegisterStreamClients();
     GameMode4_RegisterStreamClients();
     fn_8011763C();
@@ -364,7 +364,7 @@ void fn_800148A8(void) {
     Session_UnregisterRecordsHandler();
     UI_vEATraxUnRegisterStreamClients();
     fn_800D2A30();
-    fn_800EAEB8();
+    PlayNow_UnregisterStreamClients();
     EarningsInfo_UnRegisterStreamClients();
     GameMode4_UnregisterStreamClients();
     fn_8011766C();

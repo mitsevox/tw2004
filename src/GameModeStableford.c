@@ -227,7 +227,7 @@ void GameModeStableford_EndGame(void) {
     int nProfile;
     u8 bFirst = 1;
     if (GM_FullRoundOfGolf()) {
-        switch (GM5_IsChallengeRunning()) {
+        switch (PlayNow_IsChallengeRunning()) {
         case 0:
             break;
         default:

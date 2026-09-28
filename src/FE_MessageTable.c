@@ -56,10 +56,10 @@ void fn_80126F84(s32 n);                // GameMode22.c: sets lbl_80195498.n4
 void fn_80126F94(s32 n);                // GameMode22.c: sets lbl_80195498.n0
 void GM_SetupCustomHoleSelection(void); // GameManager.c
 int  GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile);  // GameManager.c
-void fn_800EAE44(int nId);              // GameMode5.c
-s32  fn_800EAE6C(void);                 // GameMode5.c
-char* fn_800ED280(int nId);             // GameMode5.c
-char* fn_800ED2C8(int nId);             // GameMode5.c
+void PlayNow_SelectGroup(int nId);              // GameMode5.c
+s32  PlayNow_GetNumGroups(void);                 // GameMode5.c
+char* PlayNow_GetGroupName(int nId);             // GameMode5.c
+char* PlayNow_GetGroupDescription(int nId);             // GameMode5.c
 void fn_800ED650(int i, s32* pA, s32* pB, s32* pC);     // GameMode5.c
 int  GameMode4_GetNumEventsWon(void);                 // GameMode4.c
 void fn_80102308(s32 n);                // GameMode4.c
@@ -1900,7 +1900,7 @@ void fn_8007CDF0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007CDF4(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800EAE38(fn_800EAC94(pArgs[0].i));
+    PlayNow_SelectChallenge(fn_800EAC94(pArgs[0].i));
 }
 
 void fn_8007CE1C(MsgArg* pArgs, MsgArg* pResult) {
@@ -4935,7 +4935,7 @@ void fn_80083BFC(MsgArg* pArgs, MsgArg* pResult) {
                 Session_SetGolfer(0, 0);
             }
         }
-        fn_800EAF7C();
+        PlayNow_StartChallenge();
         fn_80110178(1);
     } else if (Game_GetMode() == 23) {
         GameModeDriverPGATour_PrepareForTeeOff();
@@ -5343,19 +5343,19 @@ void fn_800848E4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_800848E8(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800EAE6C();
+    pResult->i = PlayNow_GetNumGroups();
 }
 
 void fn_80084918(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800EAE44(pArgs[0].i - 1);
+    PlayNow_SelectGroup(pArgs[0].i - 1);
 }
 
 void fn_80084940(MsgArg* pArgs, MsgArg* pResult) {
-    strcpy(((MsgString*)pArgs[0].p)->pStr, fn_800ED280(pArgs[1].i - 1));
+    strcpy(((MsgString*)pArgs[0].p)->pStr, PlayNow_GetGroupName(pArgs[1].i - 1));
 }
 
 void fn_80084984(MsgArg* pArgs, MsgArg* pResult) {
-    strcpy(((MsgString*)pArgs[0].p)->pStr, fn_800ED2C8(pArgs[1].i - 1));
+    strcpy(((MsgString*)pArgs[0].p)->pStr, PlayNow_GetGroupDescription(pArgs[1].i - 1));
 }
 
 // A challenge group's best medal, the group counted from 1.

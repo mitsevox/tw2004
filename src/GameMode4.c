@@ -210,8 +210,8 @@ void GameMode4_StartEvent(void) {
         if (lbl_802124B8[nEvent].nChallenge != 0) {
             gSession.nNumPlayers = 1;
             GM_SetModeType(5);
-            fn_800EAE38(lbl_802124B8[nEvent].nChallenge - 1);
-            fn_800EAF7C();
+            PlayNow_SelectChallenge(lbl_802124B8[nEvent].nChallenge - 1);
+            PlayNow_StartChallenge();
             lbl_80282450 = gpGame->pfnShutdown;
             gpGame->pfnShutdown = GameMode4_Shutdown;
         } else {
