@@ -64,8 +64,8 @@ void ViewController_ResetAll(void);
 void ViewController_SetCurrentViewController(int nView);
 void ViewController_Delete(int nView);
 void ViewController_Update(int nView);
-void fn_8001A488(void);
-void fn_8001A920(void);
+void CharacterTex_TextureLoader(void);
+void Character_PostInit(void);
 void fn_8001B878(Character* pChar, int nPlayer);
 void fn_8001BA74(void);
 void fn_8001BBD8(int n);
@@ -646,7 +646,7 @@ void GO_vInitIG(void) {
     ViewController_ResetAll();
     Players_SetupAll();
     fn_800DCC04();
-    fn_8001A920();
+    Character_PostInit();
     if (!gSession.nSplitScreen) {
         GLW_vInitModule(1);
     } else {
@@ -1086,7 +1086,7 @@ void fn_8006D8E8(void) {
             fn_80095550();
         }
         if (gSession.nGameType == 6) {
-            fn_8001A488();
+            CharacterTex_TextureLoader();
         }
         if (gSession.nGameType == 1) {
             fn_800B1608();

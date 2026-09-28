@@ -256,7 +256,7 @@ s32   GameModeBattle_GetWinner(void);
 u8    GameModeBattle_ShowEndOfHole_ClubAddRemove_UI(void);
 int   GameModeBattle_NumRemovableClubsLeft(int nPlayer);
 u8    GameModeBattle_RemoveClub(int nPlayer, int nClub);
-void  fn_8001A870(void);
+void  Character_ReopenTextureFiles(void);
 void  fn_80062B84(int a);
 void  fn_8006F4E0(void);
 s32   fn_80084FB4(CardPos* pPos);
@@ -2417,7 +2417,7 @@ void fn_80089F6C(MsgArg* pArgs, MsgArg* pResult) {
         fn_80063CBC(pView, vZero);
         GOLFERSTATE_Set(GS_WAIT, 0);
         fn_801102AC();
-        fn_8001A870();
+        Character_ReopenTextureFiles();
         fn_8006F4B4();
         pView->script.nCamera = 0;
     }

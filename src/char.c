@@ -67,16 +67,17 @@ void  fn_80014BB4(void);
 void  fn_80014C9C(void);
 void  fn_80014DC0(void);
 void  Character_ExecuteTextureSwapFE(Character* pChar);
-void  fn_8001A288(void);
-void  fn_8001A33C(void);
-void  fn_8001A3B0(Character* pChar);
-void  fn_8001A4BC(void);
-void  fn_8001A58C(int nPlayer);
-void  fn_8001A75C(UStreamObject* pObject);
-void  fn_8001A798(void);
-void  fn_8001A7C8(void);
-Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, SkinChoices* pChoices);
-CharSkinSet* fn_8001B208(u8* pData);
+void  CharacterTex_Init(void);
+void  CharacterTex_Close(void);
+void  CharacterTex_ReleasePoolEntries(Character* pChar);
+void  CharacterTex_PreHoleInit(void);
+void  CharacterTex_StartStreamingPlayers(int nPlayer);
+void  Character_LoadSacFromStream(UStreamObject* pObject);
+void  Character_RegisterSacStreamClient(void);
+void  Character_UnregisterSacStreamClient(void);
+Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8 bLook,
+                                   SkinChoices* pChoices);
+CharSkinSet* Character_CreateClubSkinSet(u8* pData);
 Character* Character_Create(void);
 s32   fn_800962F8(Character* pChar);                            // CharAnim.c
 void  Character_SetSkin(Character* pChar, Skin* pSkin);
@@ -207,8 +208,8 @@ void  fn_80112CEC(void);
 // ---- sweep code (not yet cleaned up) ----
 void BitArray_SetAll(u32* aBits, u32 nBits);
 void BitArray_ClearAll(u32* aBits, u32 nBits);
-void fn_8001B1DC(Skin* pSkin, CharSkinRef* pRef, s32 n);
-void fn_8001B1E8(void* p);
+void CharSkinRef_Init(Skin* pSkin, CharSkinRef* pRef, s32 n);
+void CharSkinRef_Free(void* p);
 void fn_8001C650(void* arg0, s32 arg1);
 
 // ---- end of sweep code ----
@@ -1155,10 +1156,10 @@ Character* Character_Create(void) {
 }
 
 // The characters' set-up before a hole (and on a restart): with more than two players, the dynamic
-// textures go to the player with the honor (fn_8001A4BC).
+// textures go to the player with the honor (CharacterTex_PreHoleInit).
 void Character_PreHoleInit(void) {
     fn_80095554();
-    fn_8001A4BC();
+    CharacterTex_PreHoleInit();
 }
 
 // Poses the character at the moment of impact: the blend's time set to its event 2 (the ball hit;
@@ -1180,7 +1181,7 @@ void Character_AlignCharacterForShotImpact(Character* pChar) {
 // Frees the character's textures: gives back its dynamic texture pool entries, frees the texture
 // and palette tables Character_LoadTextures made, and closes its texture file.
 void Character_FreeTextures(Character* pChar) {
-    fn_8001A3B0(pChar);
+    CharacterTex_ReleasePoolEntries(pChar);
     if (pChar->pA8 != NULL) {
         StaticMem_Free(pChar->pA8);
     }
@@ -1505,8 +1506,10 @@ void Character_EndLoadTexturesCallbackIG(Character* pChar) {
     lbl_801B95E8.a[6].p = NULL;
 }
 
-// Fills the pool with dynamic textures (LLDynTex.c), all free. Every game type gets two.
-void fn_8001A288(void) {
+// Fills the characters' dynamic texture pool: two entries (the game-type test gives two either
+// way), each a dynamic texture (LLDynTex.c) for 0x46 textures with a 0x87000-byte pixel buffer, all
+// free. Called when a round or the front end starts.
+void CharacterTex_Init(void) {
     int i;
 
     if (gSession.nGameType == 10 || gSession.nGameType == 3) {
@@ -1521,7 +1524,7 @@ void fn_8001A288(void) {
 }
 
 // Free every pool entry's dynamic texture (fn_8010A668) and mark the entry free.
-void fn_8001A33C(void) {
+void CharacterTex_Close(void) {
     int i;
     for (i = 0; i < lbl_801B95E8.nEntries; i++) {
         fn_8010A668(lbl_801B95E8.a[i].p);
@@ -1529,8 +1532,9 @@ void fn_8001A33C(void) {
     }
 }
 
-// Give the character's pool entries back.
-void fn_8001A3B0(Character* pChar) {
+// Gives the character's dynamic texture pool entries back (a64 and a6C cleared) and marks its
+// textures not loaded (bE0).
+void CharacterTex_ReleasePoolEntries(Character* pChar) {
     int i;
     for (i = 0; i < pChar->n70; i++) {
         if (pChar->a64[i] != NULL) {
@@ -1542,8 +1546,9 @@ void fn_8001A3B0(Character* pChar) {
     pChar->bE0 = 0;
 }
 
-// Take n70 free pool entries for the character.
-void fn_8001A418(Character* pChar) {
+// Takes free dynamic texture pool entries for the character until it has n70 of them: a64 gets each
+// entry's dynamic texture, a6C its index. It takes fewer when the pool runs out.
+void CharacterTex_TakePoolEntries(Character* pChar) {
     int i;
     int n = 0;
     for (i = 0; i < lbl_801B95E8.nEntries; i++) {
@@ -1559,19 +1564,23 @@ void fn_8001A418(Character* pChar) {
     }
 }
 
-// Empty; fn_8001A4BC calls it with a player's character.
+// Empty in this build: the pool code calls it with each character just before the character gives
+// its pool entries back. Left unnamed: there is nothing in it to read a name from.
 void fn_8001A484(Character* pChar) {
 }
 
-void fn_8001A488(void) {
+// Runs one step of the dynamic texture loader (fn_8010BFE0) each frame from the main loop, with
+// more than two players (with two or fewer every character's textures are loaded at the start).
+void CharacterTex_TextureLoader(void) {
     if (gSession.nNumPlayers > 2) {
         fn_8010BFE0();
     }
 }
 
-// With more than two players, only the player with the honor keeps pool entries: every player's
-// character gives its back, then that player's takes them and queues its dynamic textures.
-void fn_8001A4BC(void) {
+// Before a hole: no player marked (lbl_80281CAC -1); with more than two players only the player
+// with the honor keeps pool entries: every player's character gives its back, then that player's
+// takes them and its dynamic textures are loaded now (fn_8010BF68 runs the loader to the end).
+void CharacterTex_PreHoleInit(void) {
     Character* pChar;
     int i;
 
@@ -1579,23 +1588,26 @@ void fn_8001A4BC(void) {
     if (gSession.nNumPlayers > 2) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
             fn_8001A484(gPlayers[i].pChar);
-            fn_8001A3B0(gPlayers[i].pChar);
+            CharacterTex_ReleasePoolEntries(gPlayers[i].pChar);
         }
         i = gpGame->pfnGetHonors(5);
         pChar = gPlayers[i].pChar;
-        fn_8001A418(pChar);
+        CharacterTex_TakePoolEntries(pChar);
         Character_AddTextureLoadRequest(pChar, Character_BeginLoadTexturesCallbackIG,
                                         Character_EndLoadTexturesCallbackIG);
         fn_8010BF68();
     }
 }
 
-// With more than two players, the pool entries go to player nPlayer and the next player
-// (GM_GetSecondHonors): every other character holding entries (except the one queued last) gives them
-// back and gets bit 0x40 of u10; nPlayer's character loses that bit, and unless it has its entries
-// already it takes them (the queued character giving its back first) and queues its dynamic
-// textures. The next player's character is then queued the same way.
-void fn_8001A58C(int nPlayer) {
+// With more than two players, the dynamic textures go to player nPlayer (up now) and the next to
+// play (GM_GetSecondHonors). nPlayer's character loses bit 0x40 of u10; after the display finishes
+// drawing (fn_80008380), every other character holding pool entries (except the one being loaded,
+// the pool's a[6].p) gives them back and gets bit 0x40 (not drawn). Unless nPlayer's textures are
+// loaded (bE0), it takes the entries (the character being loaded giving its back first) and its
+// textures are loaded now (fn_8010BF68); when it is the one being loaded, the loader is just run to
+// the end. The next player's character is then queued the same way, its textures left to
+// CharacterTex_TextureLoader.
+void CharacterTex_StartStreamingPlayers(int nPlayer) {
     int i;
     Character* pChar;
     Character* pQueued;
@@ -1608,7 +1620,7 @@ void fn_8001A58C(int nPlayer) {
             if (i != nPlayer && gPlayers[i].pChar->a64[gPlayers[i].pChar->n74] != NULL &&
                 gPlayers[i].pChar != lbl_801B95E8.a[6].p) {
                 fn_8001A484(gPlayers[i].pChar);
-                fn_8001A3B0(gPlayers[i].pChar);
+                CharacterTex_ReleasePoolEntries(gPlayers[i].pChar);
                 gPlayers[i].pChar->bE0 = 0;
                 gPlayers[i].pChar->u10 |= 0x40;
             }
@@ -1619,11 +1631,11 @@ void fn_8001A58C(int nPlayer) {
                 fn_8010BF68();
                 if (pQueued != NULL) {
                     fn_8001A484(pQueued);
-                    fn_8001A3B0(pQueued);
+                    CharacterTex_ReleasePoolEntries(pQueued);
                     pQueued->bE0 = 0;
                     pQueued->u10 |= 0x40;
                 }
-                fn_8001A418(pChar);
+                CharacterTex_TakePoolEntries(pChar);
                 Character_AddTextureLoadRequest(pChar, Character_BeginLoadTexturesCallbackIG,
                                                 Character_EndLoadTexturesCallbackIG);
                 fn_8010BF68();
@@ -1636,7 +1648,7 @@ void fn_8001A58C(int nPlayer) {
             pChar = gPlayers[i].pChar;
             if (!pChar->bE0 && pChar != lbl_801B95E8.a[6].p) {
                 fn_8010BF68();
-                fn_8001A418(pChar);
+                CharacterTex_TakePoolEntries(pChar);
                 Character_AddTextureLoadRequest(pChar, Character_BeginLoadTexturesCallbackIG,
                                                 Character_EndLoadTexturesCallbackIG);
             }
@@ -1644,44 +1656,51 @@ void fn_8001A58C(int nPlayer) {
     }
 }
 
-void fn_8001A73C(void) {
+// Runs the dynamic texture loader until nothing is left to load (fn_8010BF68). Called at the end of
+// each hole.
+void CharacterTex_WaitEndOfTextureLoader(void) {
     fn_8010BF68();
 }
 
 // The 'SAC ' handler: an animation library merged over the one of the slot the object's id names.
 // port: the overlay library is little-endian on disc and AnimLib_MergeOverlay swaps it
 //       (fn_80020BC8 > BYTESWAP_SWAPDATA): a little-endian port does not swap there.
-void fn_8001A75C(UStreamObject* pObject) {
+void Character_LoadSacFromStream(UStreamObject* pObject) {
     AnimLib_MergeOverlay(pObject->pData, pObject->uId);
     StaticMem_Free(pObject);
 }
 
-void fn_8001A798(void) {
-    Stream_RegisterLoadChunkCallback('SAC ', fn_8001A75C);
+void Character_RegisterSacStreamClient(void) {
+    Stream_RegisterLoadChunkCallback('SAC ', Character_LoadSacFromStream);
 }
 
-void fn_8001A7C8(void) {
+void Character_UnregisterSacStreamClient(void) {
     Stream_UnregisterLoadChunkCallback('SAC ');
 }
 
-// Handle the 'SAC ' overlays while fn_80014BB4 and fn_80014DC0 run.
-void fn_8001A7F0(void) {
-    fn_8001A798();
+// Loads the round's sac animation files, merging each as it arrives (Character_LoadSacFromStream):
+// fn_80014BB4 fills stream list 0 with the slots' malesac / femsac and every player's CharSac file,
+// fn_80014DC0 loads until done.
+void Character_LoadSacFiles(void) {
+    Character_RegisterSacStreamClient();
     fn_80014BB4();
     fn_80014DC0();
-    fn_8001A7C8();
+    Character_UnregisterSacStreamClient();
 }
 
-// With more than one player: reload the animation slot with 'SAC ' overlays handled, then free the
-// work copies.
-void fn_8001A81C(void) {
+// Before each hole after the first, with more than one player: the animation slot's libraries are
+// rebuilt from their copies (AnimLib_ReloadSlot), its sac files are streamed in and merged
+// (fn_80014C9C, Character_LoadSacFromStream), and the current slot's work copies freed
+// (lbl_80281CE4 set). Then fn_800C9FE0 gives the first two players to play an animation stream slot
+// each.
+void Character_ReloadSacFiles(void) {
     if (gSession.nNumPlayers > 1) {
         lbl_80281CE4 = 1;
         AnimLib_ReloadSlot();
-        fn_8001A798();
+        Character_RegisterSacStreamClient();
         fn_80014C9C();
         fn_80014DC0();
-        fn_8001A7C8();
+        Character_UnregisterSacStreamClient();
         AnimLib_FreeWorkCopies();
     }
     fn_800C9FE0();
@@ -1689,7 +1708,7 @@ void fn_8001A81C(void) {
 
 // Reopens every player's character texture file: closes them all, then opens
 // "data\CharStrm\CharTex\NNalltex.fxg" for each golfer (NN is its id + 1).
-void fn_8001A870(void) {
+void Character_ReopenTextureFiles(void) {
     int i;
     Character* pChar;
 
@@ -1703,10 +1722,13 @@ void fn_8001A870(void) {
     }
 }
 
-// With two players or fewer, every player's character takes its pool entries and queues its
-// dynamic textures (in split screen it is flagged for fn_8001D6D8 too); then the animation slots
-// take their overlays and the work copies are freed.
-void fn_8001A920(void) {
+// The characters' set-up late in a round's start (GO_vInitIG, after the players are set up): with
+// two players or fewer, every player's character takes its pool entries and its dynamic textures
+// are loaded now (fn_8010BF68; in split screen fn_8001D6D8 for its player too). Then the saved
+// choices of animation slots 0 and 1 are applied, the animation stream is set up (fn_800CA9DC,
+// fn_800CA7E0, fn_800CABA0, fn_800CB078), the sac files are loaded (Character_LoadSacFiles) and the
+// work copies freed.
+void Character_PostInit(void) {
     int i;
     Character* pChar;
 
@@ -1714,7 +1736,7 @@ void fn_8001A920(void) {
     if (gSession.nNumPlayers <= 2) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
             pChar = gPlayers[i].pChar;
-            fn_8001A418(pChar);
+            CharacterTex_TakePoolEntries(pChar);
             Character_AddTextureLoadRequest(pChar, Character_BeginLoadTexturesCallbackIG,
                                             Character_EndLoadTexturesCallbackIG);
             fn_8010BF68();
@@ -1728,18 +1750,23 @@ void fn_8001A920(void) {
     fn_800CA9DC(-1);
     fn_800CA7E0();
     fn_80025478();
-    fn_8001A7F0();
+    Character_LoadSacFiles();
     AnimLib_FreeWorkCopies();
     fn_800CABA0();
     fn_800CB078();
 }
 
-// Builds a character from its CHR object: a header (its animation slot and a few values), its
-// skin, the p44 entries, its model (SKEL_LoadFromMem), its own animation library, and its slider
-// definitions; then a golfer's club skins and, with bLook, its look from pChoices.
-// port: the object is little-endian on disc and BYTESWAP_SWAPDATA swaps each value as it reads it: a
-//       little-endian port does not swap there.
-Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, SkinChoices* pChoices) {
+// Builds a character from its 'CHR ' object at pData: a header (its animation slot, a skin value, a
+// flag for bit 0x400 of u10, a model flag and five model values), its skin, the p44 entries, its
+// model (SKEL_LoadFromMem; a golfer outside the front end gets the golfer model definitions), its
+// own animation library (kept when its clips are its own or in a bank, else queued as an overlay of
+// its slot), and its slider definitions. A golfer then gets club skin set nSet (lbl_80280E24), and
+// with bLook its look from pChoices. nId: the golfer id (nC). nUnused: not read. NULL when no
+// character could be made.
+// port: the object is little-endian on disc and BYTESWAP_SWAPDATA swaps each value as it reads it:
+// a little-endian port does not swap there.
+Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8 bLook,
+                                   SkinChoices* pChoices) {
     int nSize;
     int bLib;
     int nFlag400;
@@ -1915,20 +1942,22 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
     return pChar;
 }
 
-// ---- sweep code (not yet cleaned up) ----
-void fn_8001B1DC(Skin* pSkin, CharSkinRef* pRef, s32 n) {
+// Fills a club skin's record: n0 = n (its caller passes the record's size, 8) and the skin.
+void CharSkinRef_Init(Skin* pSkin, CharSkinRef* pRef, s32 n) {
     pRef->n0 = n;
     pRef->pSkin = pSkin;
 }
 
-void fn_8001B1E8(void* p) {
+void CharSkinRef_Free(void* p) {
     StaticMem_Free(p);
 }
 // ---- end of sweep code ----
 
-// Makes a club skin set from a 'CLB ' object: per entry its club class, that class's afC, the
-// entry's size and, 4 bytes on, its skin (fn_800377FC); a3C gets the class's club point.
-CharSkinSet* fn_8001B208(u8* pData) {
+// Makes a club skin set from a 'CLB ' object: per entry its club class, that class's afC (the club
+// head bone's height), the entry's size and, 4 bytes on, its skin (fn_800377FC) and a CharSkinRef
+// for it; a3C gets the class's fixed club point (one for drivers and fairway woods, one each for
+// putters, 3 irons, 7 irons and wedges). NULL when out of memory.
+CharSkinSet* Character_CreateClubSkinSet(u8* pData) {
     CharSkinSet* pSet;
     s32 nSize;
     s32 nClass;
@@ -1953,7 +1982,7 @@ CharSkinSet* fn_8001B208(u8* pData) {
         pData += 4;
         pSet->apSkins[nClass] = fn_800377FC(pData, 0);
         pSet->a9C[nClass] = StaticMem_Alloc(sizeof(CharSkinRef), 2, 0x40, "char.c", 0xF25);
-        fn_8001B1DC(pSet->apSkins[nClass], pSet->a9C[nClass], sizeof(CharSkinRef));
+        CharSkinRef_Init(pSet->apSkins[nClass], pSet->a9C[nClass], sizeof(CharSkinRef));
         if (nClass == 0 || nClass == 1) {
             pSet->a3C[nClass][0] = 0.065f;
             pSet->a3C[nClass][1] = 1.117f;
@@ -2004,7 +2033,7 @@ void fn_8001B58C(CharSkinSet* pSet) {
                     fn_80037CD8(lbl_80280E24[i]->apSkins[j]);
                 }
                 if (lbl_80280E24[i]->a9C[j] != NULL) {
-                    fn_8001B1E8(lbl_80280E24[i]->a9C[j]);
+                    CharSkinRef_Free(lbl_80280E24[i]->a9C[j]);
                 }
             }
             StaticMem_Free(lbl_80280E24[i]);
@@ -2324,7 +2353,7 @@ Character* fn_8001C21C(Character* pChar) {
 void fn_8001C254(void) {
     int n;
     fn_8009555C();
-    fn_8001A288();
+    CharacterTex_Init();
     SKEL_EnableIK(1);
     n = 6;
     if (gSession.nSplitScreen) {
@@ -2342,7 +2371,7 @@ void fn_8001C2B4(void) {
     SkinPart_Shutdown();
     fn_800C9764();
     fn_80095560();
-    fn_8001A33C();
+    CharacterTex_Close();
 }
 
 void fn_8001C2E4(void) {
@@ -2350,7 +2379,7 @@ void fn_8001C2E4(void) {
 }
 
 void fn_8001C304(void) {
-    fn_8001A288();
+    CharacterTex_Init();
     SKEL_EnableIK(0);
     lbl_80280E20 = 3;
     SkinPart_Init();
@@ -2360,7 +2389,7 @@ void fn_8001C304(void) {
 }
 
 void fn_8001C350(void) {
-    fn_8001A33C();
+    CharacterTex_Close();
     SkinPart_Shutdown();
     fn_80036464();
     fn_80112CEC();
@@ -2649,15 +2678,15 @@ void Character_SetupForShot(Character* pChar) {
     }
 }
 
-// The 'CLB ' handlers: what fn_8001B208 makes of the object is kept unless there already is one;
-// the first handler makes a second one for split screen.
+// The 'CLB ' handlers: what Character_CreateClubSkinSet makes of the object is kept unless there
+// already is one; the first handler makes a second one for split screen.
 void fn_8001CCF8(UStreamObject* pObject) {
     if (lbl_80280E24[0] == NULL) {
         if (gSession.nSplitScreen) {
-            lbl_80280E24[0] = fn_8001B208(pObject->pData);
-            lbl_80280E24[1] = fn_8001B208(pObject->pData);
+            lbl_80280E24[0] = Character_CreateClubSkinSet(pObject->pData);
+            lbl_80280E24[1] = Character_CreateClubSkinSet(pObject->pData);
         } else {
-            lbl_80280E24[0] = fn_8001B208(pObject->pData);
+            lbl_80280E24[0] = Character_CreateClubSkinSet(pObject->pData);
             lbl_80280E24[1] = NULL;
         }
     }
@@ -2666,7 +2695,7 @@ void fn_8001CCF8(UStreamObject* pObject) {
 
 void fn_8001CD80(UStreamObject* pObject) {
     if (lbl_80280E24[0] == NULL) {
-        lbl_80280E24[0] = fn_8001B208(pObject->pData);
+        lbl_80280E24[0] = Character_CreateClubSkinSet(pObject->pData);
         lbl_80280E24[1] = NULL;
     }
     StaticMem_Free(pObject);
@@ -2701,7 +2730,7 @@ void fn_8001CE5C(UStreamObject* pObject) {
         if (nGolferModel == uModel && gViewSlots[i].pChar == NULL) {
             fn_800106AC(i);
             nSet = gSession.nSplitScreen ? i : 0;
-            gViewSlots[i].pChar = fn_8001C21C(fn_8001A9F4(pObject->pData, 0, nSet, uModel,
+            gViewSlots[i].pChar = fn_8001C21C(Character_CreateFromMem(pObject->pData, 0, nSet, uModel,
                                                           fn_8001C584(i), &gpSaveData[i].choices));
             if (gViewSlots[i].pChar->pSkin != NULL && Character_IsGolfer(gViewSlots[i].pChar)) {
                 Character_SetClubsAndClothes(gViewSlots[i].pChar, i);
@@ -2747,7 +2776,7 @@ void fn_8001D020(UStreamObject* pObject) {
     Mem_cpy(pCopy, pObject, pObject->uSize + 0x80);
     StaticMem_Free(pObject);
     pCopy->pData = (u8*)pCopy + 0x80;
-    lbl_80281EE0->pB8->pChar = fn_8001A9F4(pCopy->pData, 0, 0, pCopy->uId, 0, NULL);
+    lbl_80281EE0->pB8->pChar = Character_CreateFromMem(pCopy->pData, 0, 0, pCopy->uId, 0, NULL);
     StaticMem_StopCount();
     StaticMem_GetCount();
     Character_LoadTextures(lbl_80281EE0->pB8->pChar, NULL, 0);
@@ -2774,7 +2803,7 @@ void fn_8001D020(UStreamObject* pObject) {
         if ((pChar->nC == 7 || pChar->nC == 29) && pChar->n70 == 1) {
             pChar->n70 = 2;
         }
-        fn_8001A418(pChar);
+        CharacterTex_TakePoolEntries(pChar);
     }
 }
 
@@ -2823,10 +2852,10 @@ void fn_8001D384(void) {
 
 // The 'SKLO' handler: a character built from the object with no player (1000), keyed by the
 // object's id.
-// port: the skeleton is little-endian on disc and fn_8001A9F4 swaps it (BYTESWAP_SWAPDATA): a
+// port: the skeleton is little-endian on disc and Character_CreateFromMem swaps it (BYTESWAP_SWAPDATA): a
 //       little-endian port does not swap there.
 void fn_8001D3EC(UStreamObject* pObject) {
-    Character* pChar = fn_8001C21C(fn_8001A9F4(pObject->pData, 0, 0, pObject->uId, 0, NULL));
+    Character* pChar = fn_8001C21C(Character_CreateFromMem(pObject->pData, 0, 0, pObject->uId, 0, NULL));
     pChar->nPlayer = 1000;
     pChar->uId     = pObject->uId;
     StaticMem_Free(pObject);
@@ -2949,7 +2978,7 @@ void fn_8001D7EC(Character* pChar) {
 void fn_8001D8DC(int nPlayer) {
     gPlayers[nPlayer].pChar->u10 &= ~0x40;
     fn_800955F0(nPlayer);
-    fn_8001A58C(nPlayer);
+    CharacterTex_StartStreamingPlayers(nPlayer);
     if (!gSession.nSplitScreen && lbl_80281CAC != nPlayer) {
         fn_8001D6D8(nPlayer);
         lbl_80281CAC = nPlayer;

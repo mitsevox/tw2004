@@ -322,7 +322,7 @@ typedef struct Skin {
     u32* p10D0;                 // 0x10D0  }
     u32  u10D4;                 // 0x10D4  bit 1 set by Character_CopySkinChoices1To0 and when the choices change; bit 2
                                 //         tested by fn_80037708
-    f32  f10D8;                 // 0x10D8  from the CHR object's header (fn_8001A9F4)
+    f32  f10D8;                 // 0x10D8  from the CHR object's header (Character_CreateFromMem)
     f32  f10DC;                 // 0x10DC  1 when loaded
     u8   unk10E0[4];
 } Skin;
@@ -561,28 +561,28 @@ typedef struct SkinTarget {
     TexBank* pBank;             // 0x4  passed on to fn_80112614: its materials' textures come from it
 } SkinTarget;
 
-// An 8-byte record fn_8001B208 makes for each skin of a CharSkinSet (fn_8001B1DC fills it;
+// An 8-byte record Character_CreateClubSkinSet makes for each skin of a CharSkinSet (CharSkinRef_Init fills it;
 // CharSkinRef is our name).
 typedef struct CharSkinRef {
     s32  n0;                    // 0x0  8
     Skin* pSkin;                // 0x4
 } CharSkinRef;
 
-// What Character.p16D8 points at: the golfer's clubs, made from the 'CLB ' object (fn_8001B208),
+// What Character.p16D8 points at: the golfer's clubs, made from the 'CLB ' object (Character_CreateClubSkinSet),
 // one entry per club class: Drivers, Fairwaywoods, Putters, 3Irons, 7Irons, Wedges (char.c
 // lbl_80186EC0).
 typedef struct CharSkinSet {
-    s32  n0;                    // 0x00  cleared by fn_8001B208
+    s32  n0;                    // 0x00  cleared by Character_CreateClubSkinSet
     u8   unk4[4];
     s32  nCount;                // 0x08  how many club classes the 'CLB ' object holds
     f32  afC[6];                // 0x0C  per club class: the club head bone's height (Character_SelectClub)
     Skin* apSkins[6];           // 0x24  per club class: its skin (SkinPart.c picks its parts and sets)
     f32  a3C[6][4];             // 0x3C  per club class: a point on the club, through bone 0x52's matrix
                                 //       (Character_UpdateTestPoints: aPoints[4])
-    CharSkinRef* a9C[6];        // 0x9C  freed with fn_8001B1E8 (fn_8001B58C)
+    CharSkinRef* a9C[6];        // 0x9C  freed with CharSkinRef_Free (fn_8001B58C)
 } CharSkinSet;
 
-// A pool of seven entries characters take (fn_8001A418) and give back (fn_8001A3B0).
+// A pool of seven entries characters take (CharacterTex_TakePoolEntries) and give back (CharacterTex_ReleasePoolEntries).
 typedef struct CharPoolEntry {
     void* p;                    // 0x0
     u8    bUsed;                // 0x4
@@ -603,7 +603,7 @@ extern s32        lbl_80281CA8;         // how many
 extern s32        lbl_80281CAC;         // the player fn_8001D8DC last marked (-1 at start)
 extern s32        lbl_80187164[8];      // the clip key for each shot kind (Character_SelectGameShotType)
 extern s32        lbl_80280E20;         // set to 6 (4 in split screen) by fn_8001C254, 3 by fn_8001C304
-extern CharSkinSet* lbl_80280E24[2];   // what fn_8001B208 makes of the 'CLB ' object: one, or one per
+extern CharSkinSet* lbl_80280E24[2];   // what Character_CreateClubSkinSet makes of the 'CLB ' object: one, or one per
                                         // view in split screen (Character.p16D8; fn_8001B58C frees them)
 
 void  fn_80037CD8(Skin* pSkin);         // Skin.c: frees a skin

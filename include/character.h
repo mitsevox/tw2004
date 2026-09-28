@@ -176,7 +176,7 @@ typedef struct CharModel {
     struct DynChain* pF8;       // 0x0F8  }
     struct DynChain* apFC[6];   // 0x0FC  }
     struct DynChain* ap114[6];  // 0x114  }
-    f32       f12C;             // 0x12C  } five floats of the CHR object's header (fn_8001A9F4)
+    f32       f12C;             // 0x12C  } five floats of the CHR object's header (Character_CreateFromMem)
     f32       f130;             // 0x130  }
     f32       f134;             // 0x134  }
     f32       f138;             // 0x138  }
@@ -506,7 +506,7 @@ LAYOUT_ASSERT(AnimPlayer, 0x138);
 
 void fn_80072D90(AnimPlayer* pPlayer);  // animblender.c: reset a player
 
-// An entry of Character.p44 (0x30 bytes), read from the CHR object by fn_8001A9F4.
+// An entry of Character.p44 (0x30 bytes), read from the CHR object by Character_CreateFromMem.
 typedef struct CharEntry44 {
     f32   v0[3];                // 0x00
     f32   fC;                   // 0x0C  1 when loaded
@@ -515,7 +515,7 @@ typedef struct CharEntry44 {
 } CharEntry44;
 LAYOUT_ASSERT(CharEntry44, 0x30);
 
-// What fn_8001A9F4 hands the skeleton loader (SKEL_LoadFromMem) for a golfer's model (our name):
+// What Character_CreateFromMem hands the skeleton loader (SKEL_LoadFromMem) for a golfer's model (our name):
 // lbl_80280E10, or lbl_80280E18 in split screen; a table of 0x10-byte entries and their count.
 typedef struct CharModelDefs {
     IKChainDef* pDefs;          // 0x0  (SKEL_CreateIKSkeleton builds a chain from each)
@@ -560,17 +560,17 @@ typedef struct Character {
                                 //        get an 'f' in front when it is 1
     CharModel* pModel;          // 0x038
     struct Skin* pSkin;         // 0x03C  its body's skin (Skin.c), the first of apSkins
-    s32   n40;                  // 0x040  how many entries p44 holds (fn_8001A9F4)
+    s32   n40;                  // 0x040  how many entries p44 holds (Character_CreateFromMem)
     struct CharEntry44* p44;    // 0x044  } freed with the character (fn_8001C0E0)
     s32   n48;                  // 0x048  a texture bank slot (LLTexGrp.c), freed with it when >= 0
-    u8*   p4C;                  // 0x04C  where its CHR object's data ends (fn_8001A9F4)
+    u8*   p4C;                  // 0x04C  where its CHR object's data ends (Character_CreateFromMem)
     TexBank* p50;               // 0x050  its texture bank, bank78 (Character_LoadTextures); LLDynTex.c is given
                                 //        this field's address (Character_BeginLoadTexturesCallbackFE)
     s32   hFile;                // 0x054  a file closed with it (Character_FreeTextures), -1 none
     s32   n58;                  // 0x058  } from its CHR object's texture header (Character_LoadTextures)
     s32   n5C;                  // 0x05C  } 0 without palettes
     void* p60;                  // 0x060  the entry of a64 Character_BeginLoadTexturesCallbackFE set up
-    void* a64[2];               // 0x064  } entries taken from lbl_801B95E8 (fn_8001A418), and their
+    void* a64[2];               // 0x064  } entries taken from lbl_801B95E8 (CharacterTex_TakePoolEntries), and their
     s8    a6C[2];               // 0x06C  } indices there (-1 once given back)
     u8    unk6E[2];
     s32   n70;                  // 0x070  how many of a64 it takes
@@ -584,8 +584,8 @@ typedef struct Character {
     void* pBC;                  // 0x0BC  } a byte per palette
     struct Skin* apSkins[7];    // 0x0C0  its skins: the body's, then its attachments' (fn_8001CE5C)
     s32   nSkins;               // 0x0DC
-    u8    bE0;                  // 0x0E0  cleared by fn_8001A3B0, set by Character_EndLoadTexturesCallbackIG
-    char  szE1[0x164 - 0xE1];   // 0x0E1  its texture file's name, hFile (fn_8001A870); the size is
+    u8    bE0;                  // 0x0E0  cleared by CharacterTex_ReleasePoolEntries, set by Character_EndLoadTexturesCallbackIG
+    char  szE1[0x164 - 0xE1];   // 0x0E1  its texture file's name, hFile (Character_ReopenTextureFiles); the size is
                                 //        unknown (up to the next known field)
     u8    anim[4];              // 0x164  the animation player (+0x14 is its playback rate)
     s32   uFlags;               // 0x168  bit 0x40: the backswing is being backed down; 0x200 / 0x400: the
@@ -665,7 +665,7 @@ typedef struct Character {
     f32   a179C[4];             // 0x179C  cleared by Character_PlaceFeetOnGround; Character_KeepClubOutOfGround acts only
                                 //         while a179C[1] is above 0.9
     void* p17AC;                // 0x17AC  its slider definitions (CharSlider_CreateDefinitionsFromMem,
-                                //         fn_8001A9F4); fn_8001DC64 applies them
+                                //         Character_CreateFromMem); fn_8001DC64 applies them
     void (*pfn17B0)(void);      // 0x17B0  called by Character_UpdateAnimation before the bones are
                                 //         transformed; cleared by Character_Create
     s8    n17B4;                // 0x17B4  cleared by Character_Create; Skin.c hands it to fn_800CE02C as

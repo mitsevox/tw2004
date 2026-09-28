@@ -38,7 +38,7 @@ void fn_80091E1C(void);
 void AI_TargetsClear(void);
 void fn_800918A4(void);
 s32  Aud_InitSession(u8 a, u8 b, u8 nListeners, int nUnused);
-void fn_8001A81C(void);
+void Character_ReloadSacFiles(void);
 void fn_8006F438(void);
 void Gaud_InitHole(void);
 void fn_80112D20(void);
@@ -49,7 +49,7 @@ void fn_8001C2E4(void);
 void fn_8006F568(void);
 void Luck_TightenOdds(void);
 void fn_8009554C(void);
-void fn_8001A73C(void);
+void CharacterTex_WaitEndOfTextureLoader(void);
 u8   fn_8009A1EC(void);
 void DEMO_Start(void);
 void fn_800070DC(void);                     // LLDisp_Gc.c
@@ -139,7 +139,7 @@ void fn_800083A4(void) {
             Aud_InitSession(Game_GetCourse() + 1, 1, gSession.nSplitScreen ? 2 : 1, 0);
             if (!GM_OnFirstSelectedHole()) {
                 fn_8000882C();
-                fn_8001A81C();
+                Character_ReloadSacFiles();
             }
             fn_8006F438();
             Gaud_InitHole();
@@ -176,7 +176,7 @@ void fn_800083A4(void) {
                 }
             }
             fn_8009554C();
-            fn_8001A73C();
+            CharacterTex_WaitEndOfTextureLoader();
             Aud_ExitSession(1);
             break;
         case 8:
