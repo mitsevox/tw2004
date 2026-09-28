@@ -44725,5 +44725,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "98ebd8d",
+"sha": "98ebd8d8c5baedd849d712a531ed517ecc21cc4a",
+"time": 1790612275,
+"subject": "GameModeStableford.c: EA bug label on EndGame's prize test (stroke play's fewer-is-better test on Stableford points pays the losing side)",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
