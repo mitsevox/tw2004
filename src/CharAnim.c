@@ -34,7 +34,7 @@ void  LLMath_CopyMat34(f32 (*pSrc)[4], f32 (*pDst)[4]);          // UMemPool.c: 
 void  Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ);                    // Quaternion.c: a rotation matrix's quaternion
 
 // .bss (character.h). Section note: owner by link order only. Nothing here uses it (only skalib.c's
-// Skalib_Init clears [0]); it lies between LLTime.c's .bss and GoShaderObject_Glows_Gc.c's, and of
+// SKALIB_InitModule clears [0]); it lies between LLTime.c's .bss and GoShaderObject_Glows_Gc.c's, and of
 // the units between them this is the one from skalib.c's source directory (TW06/TW07
 // golf/animation) and the one with a stripped function (below).
 u8 lbl_801D9908[0xC8];

@@ -2443,7 +2443,7 @@ ViewSlot gViewSlots[5] = { 0 };
 void Legacy_Character_InitModule(void) {
     int i;
 
-    Skalib_Init();
+    SKALIB_InitModule();
     MtaLib_InitModule();
     SKEL_InitModule();
     AnimBlender_InitModule();
@@ -2481,7 +2481,7 @@ void Legacy_Character_CloseModule(void) {
         gCharacters[i] = NULL;
     }
     gNumCharacters = 0;
-    Skalib_Shutdown();
+    SKALIB_CloseModule();
     MtaLib_CloseModule();
     SKEL_CloseModule();
     AnimBlender_CloseModule();

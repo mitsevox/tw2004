@@ -28,8 +28,8 @@ s32  fn_80125194(s32 a, s32 b);         // EA Sports Bio (0x80125194)
 s32  fn_801255C4(s32* pPos);            // EASportsBio.c
 s32  fn_801255F8(void);                 // EASportsBio.c: the EA Sports Bio file's size
 void fn_8012CCCC(int uHandle);          // EASBStorage.c
-u8*  Skalib_ScratchToAram(int n);       // skalib.c
-void Skalib_ScratchFromAram(int n);     // skalib.c
+u8*  Skalib_LendBankMemory(int n);       // skalib.c
+void Skalib_ReclaimBankMemory(int n);     // skalib.c
 
 void* lbl_802813D0 = lbl_801E7100;
 u8    lbl_802813D4 = 1;
@@ -1052,8 +1052,8 @@ void fn_8009EF98(void) {
         lbl_80281FC0 = MC_BUFFER_SIZE + 0x20;
         GoARAM_WaitTransfer(GoARAM_CopyToAram(lbl_80281FE8, lbl_80281FC4, lbl_80281FC0));
         if (gSession.nGameType == 6) {
-            Skalib_ScratchFromAram(0);
-            Skalib_ScratchFromAram(1);
+            Skalib_ReclaimBankMemory(0);
+            Skalib_ReclaimBankMemory(1);
         } else {
             StaticMem_Free(lbl_80281FE8);
             StaticMem_Free(lbl_80281FDC);
@@ -1072,8 +1072,8 @@ void fn_8009EF98(void) {
 void fn_8009F02C(void) {
     if (lbl_80281FE8 == NULL) {
         if (gSession.nGameType == 6) {
-            lbl_80281FE8 = lbl_80281FEC = lbl_80281FE4 = (SaveImage*)Skalib_ScratchToAram(0);
-            lbl_80281FDC = lbl_80281FE0 = lbl_80281FD8 = (SaveImage*)Skalib_ScratchToAram(1);
+            lbl_80281FE8 = lbl_80281FEC = lbl_80281FE4 = (SaveImage*)Skalib_LendBankMemory(0);
+            lbl_80281FDC = lbl_80281FE0 = lbl_80281FD8 = (SaveImage*)Skalib_LendBankMemory(1);
         } else {
             lbl_80281FE8 = lbl_80281FEC = lbl_80281FE4 =
                 StaticMem_Alloc(lbl_80281FC0, 1, 0x20, "MC_Gc.c", 2805);

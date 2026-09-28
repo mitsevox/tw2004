@@ -72,10 +72,13 @@ void* AnimLib_FindByName(AnimLib* pLib, const char* pName) {
     return NULL;
 }
 
-// Sets everything up: no libraries or banks, the last-played table allocated and cleared, and the
-// four 32-aligned staging buffers for clip data going to and from ARAM (overlay clips merged in,
-// frames and keys fetched back).
-void Skalib_Init(void) {
+// Starts the animation library module (Legacy_Character_InitModule): no library or clip bank in any
+// of the three slots, every slot's overlay list empty (entries inactive, stream ids -1, no copies),
+// lbl_801D9908[0] cleared, lbl_80281D18 cleared in game types 3 and 10, the last-played reaction
+// table (four players) allocated and cleared, and ska_shared.c's four ARAM staging buffers (a frame
+// of each of a clip's two frame streams, the tracks' ranges and the tracks' keys) pointed into this
+// file's .bss, each at the first 32-byte boundary after its array's start.
+void SKALIB_InitModule(void) {
     int i;
     s32 j;
 
@@ -116,8 +119,11 @@ void Skalib_Init(void) {
 
 void ClipBank_Free(ClipBank* pBank);
 
-// Frees every library and bank.
-void Skalib_Shutdown(void) {
+// Shuts the animation library module down (Legacy_Character_CloseModule): frees the slots' pristine
+// library copies (AnimLib_FreeCopies), the last-played reaction table, each slot's bank library and
+// clip bank (forgetting the restore buffer when a bank's file is that buffer, so it is not freed
+// twice), then the banks' ARAM copies and the restore buffer (ClipBank_FreeAram).
+void SKALIB_CloseModule(void) {
     int i;
 
     AnimLib_FreeCopies();
@@ -203,8 +209,13 @@ static inline s16* fn_80021F50_Get(AnimLib* pLib) {
     return (pLib != NULL && pLib->nDefault >= 0) ? (s16*)(pLib->pTree + pLib->nDefault) : NULL;
 }
 
-// Walks the clip trees of two libraries together (either may be NULL), telling pfn about every
-// group, style, club and key either one has. lbl_80281CE8..CF4 hold where the walk is.
+// Walks the clip trees of two libraries side by side (either may be NULL) and calls pfn at every
+// position either one has: level 0 with the two libraries' default leaves, 1 each group (its
+// default leaves), 2 each style (no leaves), 3 each club (its default leaves), 4 each key (its
+// leaves); nIndex is the group, style, club or key. The position is also kept in lbl_80281CE8
+// (group), lbl_80281CEC (style), lbl_80281CF0 (club) and lbl_80281CF4 (key), -1 for levels above
+// it, for the callbacks. Stops at the first callback result above 0 and returns it; 0 when the walk
+// ends.
 int AnimLib_WalkPair(AnimLib* pA, AnimLib* pB, AnimLibWalkFn pfn, void* pCtx) {
     int  nRet;
     int  nGroup;
@@ -271,8 +282,14 @@ int AnimLib_WalkPair(AnimLib* pA, AnimLib* pB, AnimLibWalkFn pfn, void* pCtx) {
     return 0;
 }
 
-// Merge walk, sizing pass: counts the tree bytes the merged library needs (a leaf, then the
-// node for this level) and decides for each leaf pair which side wins.
+// Merge walk, first pass (AnimLib_PlanBank: pLibA the slot's library, pLib an overlay, no context):
+// adds to the overlay's nTreeSize the bytes of the merged tree at this position (8 for a leaf when
+// either side has one, plus the level's node: 0x14 a group, 0xC a style, 0x20 a club) and marks the
+// leaves (AnimLeaf.uMask; 2 its clips go unused, 1 they are kept). Where both have a leaf: at a
+// streamed position (fn_800C9828) both are marked 2; in group 20 the overlay's is; otherwise, when
+// the overlay's leaf is not flagged 1, the library's clips come off the overlay's nClips, and the
+// library's leaf is marked 2 (replaced) unless either leaf is flagged 1, then 1 (both kept). A
+// library leaf alone is marked 1, or 2 at a streamed position. Always 0.
 int AnimLib_MergeSizeCb(AnimLib* pLibA, AnimLib* pLib, AnimLeaf* pLeaf, AnimLeaf* pOver, MergeCtx* pCtx,
                         int nLevel, int nIndex) {
     int bAny = 0;
@@ -326,8 +343,9 @@ int AnimLib_MergeSizeCb(AnimLib* pLibA, AnimLib* pLib, AnimLeaf* pLeaf, AnimLeaf
     return 0;
 }
 
-// Merge walk, release pass: every clip of a leaf marked 2 (replaced by the overlay's, or picked by
-// AnimStream_IsStreamed) loses a user; the ones nobody uses any more come off the totals.
+// Merge walk, release pass (AnimLib_PlanBank): each clip of a leaf marked 2 (unused by the merged
+// library: replaced, streamed, or an overlay's group 20) loses a user (ClipRecord.n10); a clip no
+// leaf uses any more comes off the context's clip count and byte total (its n14 bytes). Always 0.
 int AnimLib_MergeReleaseCb(AnimLib* pLibA, AnimLib* pLibB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx,
                            int nLevel, int nIndex) {
     ClipRecord* pRec;
@@ -359,11 +377,16 @@ int AnimLib_MergeReleaseCb(AnimLib* pLibA, AnimLib* pLibB, AnimLeaf* pLeafA, Ani
     return 0;
 }
 
+// Whether slots 0 and 1 are double buffered (Skalib_SetBudgets: both have overlays and there is
+// more than one player): their libraries are then reloaded in turn and the bank memory is split
+// between them.
 u8 Skalib_IsDoubleBuffered(void) {
     return lbl_80281CD8;
 }
 
-// The slot the next library loads into: with double buffering it flips between 0 and 1.
+// Picks the slot whose libraries the next hole reloads (AnimLib_ReloadSlot), makes it the current
+// slot (Skalib_CurSlot) and returns it: double buffered, it alternates between 0 and 1; otherwise
+// it is slot 0 when that has overlays, else slot 1.
 u32 Skalib_NextSlot(void) {
     if (Skalib_IsDoubleBuffered()) {
         lbl_80281078 = (lbl_80281078 == 0);
@@ -375,13 +398,17 @@ u32 Skalib_NextSlot(void) {
     return lbl_80281078;
 }
 
+// The slot Skalib_NextSlot last picked (Skalib_SetBudgets starts it at random); streammanagerhole.c
+// streams that slot's sac file.
 u32 Skalib_CurSlot(void) {
     return lbl_80281078;
 }
 
-// Sets the per-round limits: how many clips each leaf may keep (every clip with one player, at
-// most 10 with more) and the memory for them; with two players' libraries loaded (double
-// buffering), how the memory is split between the two slots, from their sizes, kept to 44-56%.
+// Sets the round's clip bank limits: the clips a leaf may keep (all of them with one player, 10
+// with more) and each slot's bank budget (0xE6000 bytes, 920 KB). When slots 0 and 1 both have
+// overlays and there is more than one player they are double buffered, and the 920 KB is split
+// between them by the clip bytes (AnimLib.n140) of each slot's library and overlays: slot 0's share
+// goes into lbl_80281D1C, kept to 44..56%. The current slot starts at random.
 void Skalib_SetBudgets(void) {
     s32      aKeepSingle[4] = {100000, 10, 10, 10};
     s32      aKeepDouble[4] = {100000, 10, 10, 10};
@@ -428,9 +455,12 @@ void Skalib_SetBudgets(void) {
 
 f32 Skalib_Random(void);
 
-// Merge walk, trim pass: cuts both leaves down to the clip limit (none when the library's leaf
-// is marked 2, all of them for the ones AnimStream_IsStreamed protects), keeping a run of clips at a random
-// start.
+// Merge walk, trim pass (AnimLib_PlanBank, before the clips are matched): cuts each leaf down to
+// the round's per-leaf limit (lbl_80281074), keeping a run of that many clips from a random start
+// (Skalib_Random); every clip cut loses a user (ClipRecord.n10), and with a context one nobody uses
+// any more comes off its clip count and byte total. A streamed position (fn_800C9828) keeps
+// everything; when pA's leaf is marked 2 (unused) none are kept. Clips cut from pB's leaf also come
+// off pB's nClips. Always 0.
 int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel,
                    int nIndex) {
     s32         nKeep;
@@ -494,6 +524,8 @@ int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
     return 0;
 }
 
+// A random fraction in [0, 1) (Misc_RandFuncf, stream 1): where AnimLib_TrimCb starts a leaf's kept
+// run.
 f32 Skalib_Random(void) {
     return Misc_RandFuncf(1);
 }
@@ -504,11 +536,14 @@ f32 Skalib_Random(void) {
     (!((pRec)->n12 & 2) && !((pRec)->n12 & 0x10) && !((pRec)->n12 & 1) && (pRec)->n10 > 0 && \
      (pRec)->n10 <= (pCtx)->nMaxUsers)
 
-// Merge walk, mark pass: marks nCount - nKeep clips of the leaf (1) for AnimLib_DropCb to drop,
-// picked at random (the next markable one from a random start, looking forward, then back; while
-// fn_80100294, names fn_80101E34 accepts are skipped but counted), then again through moved
-// records.
-int fn_80022EC8_MarkDropRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx,
+// Trim walk, mark pass (AnimLib_TrimToFit, first try): for the one leaf given (pA's, else pB's)
+// when it is in use (not marked 2) and holds more than pCtx->nKeep clips, flags that many surplus
+// clips (ClipRecord.n12 1) for AnimLib_DropCb, each picked at random: from a random start the first
+// markable clip forward, else backward (markable: not merged into another record (2, 0x10), not
+// flagged yet, used by 1 to nMaxUsers leaves). During a lesson (fn_80100294, game mode 11) a lesson
+// animation (fn_80101E34) is never flagged but still counts as a pick. The picks it could not make
+// are tried again through merged records, following each to the record it points to. Always 0.
+int AnimLib_MarkDropRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx,
                          int nLevel, int nIndex) {
     AnimLeaf*   pLeaf;
     AnimLib*    pLib;
@@ -598,9 +633,10 @@ int fn_80022EC8_MarkDropRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, Ani
     return 0;
 }
 
-// Merge walk, mark pass: marks nCount - nKeep clips of the leaf (1) for AnimLib_DropCb to drop,
-// highest n18 first, as fn_80022EC8_MarkDropRandomCb does at random.
-int fn_800231E8_MarkDropHighestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx,
+// Trim walk, mark pass (AnimLib_TrimToFit, retry): flags surplus clips for AnimLib_DropCb as
+// AnimLib_MarkDropRandomCb does, but each pick is the markable clip of the leaf with the highest
+// ClipRecord.n18 instead of a random one. Always 0.
+int AnimLib_MarkDropHighestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx,
                        int nLevel, int nIndex) {
     int         i;
     int         nMarked;
@@ -697,8 +733,11 @@ int AnimLib_MaxCountCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLe
     return 0;
 }
 
-// Merge walk, drop pass: takes the clips marked 1 out of leaves longer than lbl_80281070, freeing
-// the ones nobody uses any more; stops (returning 1) once the bytes in use fall under the target.
+// Trim walk, drop pass (AnimLib_TrimToFit): takes the flagged clips (ClipRecord.n12 1) out of the
+// leaf (pA's, else pB's, when in use), while the leaf is longer than lbl_80281070; for pB's leaf
+// merged records are followed to the record they point to. Each clip taken out loses a user; one
+// nobody uses any more is dropped (pClip NULL, users -1) and comes off the context's byte total and
+// clip count. Returns 1 (stopping the walk) once the bytes fall under pCtx->nTarget, else 0.
 int AnimLib_DropCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel,
                    int nIndex) {
     int         bDone = 0;
@@ -760,10 +799,14 @@ void* AnimLib_ResolveRecord(AnimLib* pLib, int nRec, ClipRecord* pOut, u8 bLink)
     (p) = (void*)((pLib)->pTree + (pLib)->nTreeSize); \
     (pLib)->nTreeSize += (nSize)
 
-// Merge walk, build pass: writes the merged tree into pCtx->pLib (a node for each group, style
-// and club, a leaf wherever either side has one) and copies the clips of each leaf: from the one
-// side that has it, from the overlay when its leaf replaces the library's, or from both (the
-// library's, then the overlay's). Group 20 takes only the library's.
+// Merge walk, build pass (AnimLib_MergeOverlay: pA the slot's library, pB the golfer's overlay):
+// writes the merged clip tree into pCtx->pLib (a node for each group, style and club, kept in
+// lbl_80281CF8, lbl_80281CFC and lbl_80281D00 while their children are written, and a leaf wherever
+// either side has one) and fills each leaf's clips, each copied with its record into pCtx->pRecords
+// (AnimLib_ResolveRecord): from the one side that has a leaf, from the overlay alone when its leaf
+// replaces the library's (as AnimLib_MergeSizeCb marked them), or from both, the library's first.
+// Group 20 takes only the library's. Copies taken from the library alone are flagged 2, as are the
+// library's in a combined leaf at a streamed position. Always 0.
 int AnimLib_BuildCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, BuildCtx* pCtx, int nLevel,
                     int nIndex) {
     AnimLib*    pLib    = pCtx->pLib;
@@ -959,9 +1002,9 @@ u8 AnimLib_TrimToFit(MergeCtx* pCtx, AnimLib* pLib, LibOverlay* pOvs, int nOvs, 
             for (i = 0; i < nOvs; i++) {
                 pOvLib = pOvs[i].pWork;
                 if (bBest) {
-                    AnimLib_WalkPair(NULL, pOvLib, (AnimLibWalkFn)fn_800231E8_MarkDropHighestCb, pCtx);
+                    AnimLib_WalkPair(NULL, pOvLib, (AnimLibWalkFn)AnimLib_MarkDropHighestCb, pCtx);
                 } else {
-                    AnimLib_WalkPair(NULL, pOvLib, (AnimLibWalkFn)fn_80022EC8_MarkDropRandomCb, pCtx);
+                    AnimLib_WalkPair(NULL, pOvLib, (AnimLibWalkFn)AnimLib_MarkDropRandomCb, pCtx);
                 }
             }
             nRet = AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_DropCb, pCtx);
@@ -982,9 +1025,9 @@ u8 AnimLib_TrimToFit(MergeCtx* pCtx, AnimLib* pLib, LibOverlay* pOvs, int nOvs, 
         while (pCtx->nKeep > lbl_80281070) {
             pCtx->nKeep--;
             if (bBest) {
-                AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)fn_800231E8_MarkDropHighestCb, pCtx);
+                AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_MarkDropHighestCb, pCtx);
             } else {
-                AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)fn_80022EC8_MarkDropRandomCb, pCtx);
+                AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_MarkDropRandomCb, pCtx);
             }
             nRet = AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_DropCb, pCtx);
             if (nRet != 0) {
@@ -1003,11 +1046,17 @@ static f32 skalib_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// Plans the clip bank for a slot: merges the slot's library with its overlays (clips with the
-// same name are shared, later copies pointing at the first), and, unless it is slot 2, trims
-// the result to the slot's budget (lbl_80281CDC, or its share of 920 KB when lbl_80281CD8 is
-// set): random picks first; if that cannot fit, the best-ranked picks from a fresh copy.
-// Allocates the bank (slots 0 and 1 reuse one they have) and returns its size.
+// Plans the clip bank of slot nSlot from its library and overlays (nothing, 0, for a slot without
+// overlays). Every leaf is trimmed to the per-leaf limit (AnimLib_TrimCb; not in slot 2), the
+// leaves the merge will not use are released (AnimLib_MergeSizeCb, AnimLib_MergeReleaseCb), and
+// each overlay clip is matched by name against the library's and earlier overlays' clips: a match
+// shares the first one's record (flag 2 when it is the library's, 0x10 an overlay's). Outside slot
+// 2, when the result is over the slot's budget (lbl_80281CDC, or its share of 920 KB when double
+// buffered), AnimLib_TrimToFit cuts it down with random picks; if that cannot fit, it starts again
+// from saved copies with the best-ranked picks, and if even that cannot fit the budget becomes what
+// is left (and slot 0's share is recomputed when both slots have overlays). What was spent goes
+// into lbl_801C6008. Allocates the bank (slots other than 2 keep one they already have), sets up
+// its clip table and record area, and returns its size.
 u32 AnimLib_PlanBank(u32 nSlot) {
     // register note: the declaration order gives EA's spill slots (0xC8 pIndexCopy up to 0xEC
     // nHdr, in reverse declaration order) and EA's register colouring order.
@@ -1282,8 +1331,11 @@ static inline u8* Skalib_Scratch(int n, u32 uSize) {
     return (u8*)lbl_801C6050[n];
 }
 
-// Copies slot n's scratch area to ARAM.
-u8* Skalib_ScratchToAram(int n) {
+// Lends clip bank memory to the memory card code as save file image n (0 or 1; MC_Gc fn_8009F02C in
+// game type 6): fn_8009EF90 bytes (the image size) at n times that size into the one bank when only
+// one of slots 0 and 1 has one, otherwise slot n's bank. Its clip data is first copied to ARAM
+// (allocated the first time) and comes back with Skalib_ReclaimBankMemory. Returns the memory.
+u8* Skalib_LendBankMemory(int n) {
     u32 uSize = fn_8009EF90();
     u8* p;
     if (lbl_801C6050[0] != NULL && lbl_801C6050[1] == NULL) {
@@ -1301,8 +1353,9 @@ u8* Skalib_ScratchToAram(int n) {
     return p;
 }
 
-// Brings slot n's scratch area back from ARAM and frees the ARAM.
-void Skalib_ScratchFromAram(int n) {
+// Takes back the clip bank memory lent as save file image n (MC_Gc fn_8009EF98, game type 6, once
+// the image is parked in ARAM): the bank's clip data is copied back from ARAM and the ARAM freed.
+void Skalib_ReclaimBankMemory(int n) {
     u32 uSize = fn_8009EF90();
     GoARAM_WaitTransfer(GoARAM_CopyFromAram(Skalib_Scratch(n, uSize), lbl_80281D04[n], lbl_80281D0C[n]));
     if (lbl_80281D04[n] != 0) {
@@ -1311,11 +1364,17 @@ void Skalib_ScratchFromAram(int n) {
     }
 }
 
-// Copies the clips in use of a library into its slot's clip bank (header, keys and curves in main
-// memory, the per-frame data streamed out to ARAM), when the slot has overlays: nSlot 0..2 is the
-// slot's own library, nSlot >= 3 a golfer's own overlay (the id it was loaded under). For a
-// golfer's overlay it then builds the merged library into the golfer's character object. Returns
-// 0x2800 for a golfer's overlay, else 0.
+// Copies the clips of a sac file (pData, the 'SAC ' object Character_LoadSacFromStream got) into
+// its slot's clip bank, when the slot has overlays. nSlot 0..2 is the slot's own library (malesac /
+// femsac); 3 and up the stream id of a golfer's overlay (LibOverlay.n10: golfer id + 3; -1 once
+// merged). Each clip still in use (users above 0, n18 not 0) is byte-swapped and its header and the
+// parts kept in main memory (tracks, the pE0 / pE8 data, its morph library, the tracks' two bit
+// arrays) copied to the end of the bank's records (LibSlot.pEnd); its frame streams, ranges and
+// keys go to ARAM through the staging buffers, each padded to 32 bytes. The copied bytes are added
+// to the bank (ClipBank.uId) and the slot's stats, and the record then points at the copy (flag 8).
+// For a golfer's overlay the merged library (AnimLib_BuildCb over the slot's library and the
+// overlay) is then built into the golfer's 0x2800-byte library block, with its records in the
+// character's pRecords (allocated the first time). Returns 0x2800 for a golfer's overlay, else 0.
 s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
     u8*         pClipSrc;
     LibSlot*    pSlot;
@@ -1552,8 +1611,10 @@ done:
     return nRet;
 }
 
-// Frees the working copies of every slot's libraries (only the current slot's while
-// lbl_80281CE4 is set).
+// Frees the working (swapped) copies of each slot's library and overlays once the sac files are
+// merged (Character_PostInit, Character_ReloadSacFiles), marking the overlays merged (stream id -1)
+// and restarting the slot's bank clip count; while lbl_80281CE4 is set (a reload between holes)
+// only the current slot's.
 void AnimLib_FreeWorkCopies(void) {
     LibSlot*    pSlot;
     int         k;

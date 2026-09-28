@@ -349,8 +349,8 @@ Clip* SKA_LoadFromMem(u8* pData, u32* iSize, u32 align);
 
 typedef struct SKABlendNode SKABlendNode;
 
-void Skalib_Init(void);                 // skalib.c
-void Skalib_Shutdown(void);             // skalib.c
+void SKALIB_InitModule(void);                 // skalib.c
+void SKALIB_CloseModule(void);             // skalib.c
 void MtaLib_InitModule(void);                 // mtalib.c
 void AnimBlender_InitModule(void);                 // animblender.c
 void AnimLib_Free(AnimLib* pLib);       // skalib.c
@@ -1006,7 +1006,7 @@ extern s32         lbl_80281070;        // leaves this short are left alone by t
 extern s32         lbl_80281074;        // clips a leaf may keep this round
 extern u32         lbl_80281078;        // the current slot
 extern u8          gSKALeftHanded;        // ska_shared.c: SKA_SetLeftHanded sets it; clear: SKAUtil_EulerAnglesToQTs16 negates angles
-extern u8*         gSKAAram8BitFrame;        // staging buffers (32-aligned), see Skalib_Init
+extern u8*         gSKAAram8BitFrame;        // staging buffers (32-aligned), see SKALIB_InitModule
 extern u8*         gSKAAram16BitFrame;
 extern u8*         gSKAAramRanges;
 extern u8*         gSKAAramKeys;

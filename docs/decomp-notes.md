@@ -902,7 +902,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] Unrolled loops: the guard tells you the counter's type and the bound's form.** CW
   unrolls counted loops and puts a guard in front. With an `int` counter and a constant bound the
   guard folds away; declared `s32` (a `long`) it stays as `li rX, 0; cmpwi rX, N; bge`
-  (skalib.c `AnimLib_BuildCb`, `Skalib_Init`). With a variable bound, `for (i = 0; i < p->n; i++)`
+  (skalib.c `AnimLib_BuildCb`, `SKALIB_InitModule`). With a variable bound, `for (i = 0; i < p->n; i++)`
   inside an `if` followed by more code gives `cmpw i, n; bge`, while the original's
   `cmpwi n, 0; ble` came from the bound held in a local or written `p->n > i`
   (`Skalib_SetBudgets`, `AnimLib_FreeWorkCopies`). Tested in isolation in
@@ -1199,7 +1199,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   original's `add r3; mr r30, r3` (skalib `ClipBank_Load`, 99.76 -> 100).
 - **[verified] Assign-then-fix each global in turn.** `a = x; a = align(a); b = y; b = align(b);`
   and `a = x; b = y; a = align(a); b = align(b);` schedule the same, but only the first gives the
-  original's temporary registers (skalib `Skalib_Init`, 98.54 -> 100).
+  original's temporary registers (skalib `SKALIB_InitModule`, 98.54 -> 100).
 - **[verified] A wrong prototype can hide the real call shape and still score in the 80s-90s.**
   Check each prototype against the real definition, then check r3/r4 are set or kept live
   before each `bl`: `fn_80039344(View*, f32)` was really `(int nView, f32)` (Swing
