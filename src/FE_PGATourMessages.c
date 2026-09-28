@@ -15,8 +15,8 @@
 
 
 // .sbss is laid out last-defined-first, so these are in reverse address order.
-s32 lbl_802824B4;                       // how many tournaments lbl_802824B0 holds
-s32* lbl_802824B0;                      // the tournaments on the schedule (fn_8010EA24)
+s32 gPgaScheduleCount;                       // how many tournaments gPgaScheduleEvents holds
+s32* gPgaScheduleEvents;                      // the tournaments on the schedule (fn_8010EA24)
 
 // One leaderboard row: the place ("CUT", "T3" for a tie, "3"), the name, the score, the round
 // scores and the money won (empty when none).
@@ -106,7 +106,7 @@ void fn_8010E890(MsgArg* pArgs, MsgArg* pResult) {
     char* szName = ((MsgString*)pArgs[2].p)->pStr;
     char* szCourses = ((MsgString*)pArgs[3].p)->pStr;
     char* szChamp = ((MsgString*)pArgs[4].p)->pStr;
-    s32 nEvent = lbl_802824B0[pArgs[0].i];
+    s32 nEvent = gPgaScheduleEvents[pArgs[0].i];
     u16 nStart = GameModeDriverPGATour_GetStartDate(nEvent);
     u16 nEnd = GameModeDriverPGATour_GetEndDate(nEvent);
     Tournament* pTournament;
@@ -144,15 +144,15 @@ void fn_8010EA24(MsgArg* pArgs, MsgArg* pResult) {
     s32 nCount = 0;
     s32 i;
 
-    if (lbl_802824B0 == NULL) {
-        lbl_802824B0 = StaticMem_Alloc(nEvents * 4, 1, 16, "FE_PGATourMessages.c", 263);
+    if (gPgaScheduleEvents == NULL) {
+        gPgaScheduleEvents = StaticMem_Alloc(nEvents * 4, 1, 16, "FE_PGATourMessages.c", 263);
     }
     for (i = 0; i < nEvents; i++) {
         if (GameModeDriverPGATour_GetStartDate(i)) {
-            lbl_802824B0[nCount++] = i;
+            gPgaScheduleEvents[nCount++] = i;
         }
     }
-    lbl_802824B4 = nCount;
+    gPgaScheduleCount = nCount;
     pResult->i = nCount;
 }
 
@@ -294,7 +294,7 @@ void fn_8010EEE4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // The 11 asset kinds fn_8010EF8C and fn_8010F1B4 pick from at random.
-s16 lbl_80193CFC[11] = { 0, 1, 2, 5, 6, 9, 10, 11, 13, 14, 15 };
+s16 gPgaSponsorChoices[11] = { 0, 1, 2, 5, 6, 9, 10, 11, 13, 14, 15 };
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -330,7 +330,7 @@ void fn_8010EF8C(MsgArg* pArgs, MsgArg* pResult) {
         n8 = GameModeDriverPGATour_GetSponsorshipBonusCash(i);
         if (!pProfile->a1054C[i].b && nProgress <= (s32)GM_GetGameProgress(pProfile)) {
         retry:
-            nKind = lbl_80193CFC[Misc_RandFunc(0) % 11];
+            nKind = gPgaSponsorChoices[Misc_RandFunc(0) % 11];
             for (j = 0; j < i; j++) {
                 if (pProfile->a1054C[j].n == nKind && pProfile->a1054C[j].b) {
                     // fake match: EA jumps straight back (a do-while adds a test)
@@ -384,7 +384,7 @@ void fn_8010F1B4(MsgArg* pArgs, MsgArg* pResult) {
     s32* p4 = (s32*)pArgs[1].p;
     s32* p8 = (s32*)pArgs[2].p;
 
-    fn_800588D4(lbl_80193CFC[Misc_RandFunc(0) % 11]);
+    fn_800588D4(gPgaSponsorChoices[Misc_RandFunc(0) % 11]);
     *pKind = fn_800588E8();
     *p4 = GameModeDriverPGATour_GetSponsorshipStartCash(0);
     *p8 = GameModeDriverPGATour_GetSponsorshipBonusCash(0);

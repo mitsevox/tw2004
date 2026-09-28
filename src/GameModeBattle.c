@@ -7,11 +7,11 @@
 #include "engine.h"
 #include "game/save.h"
 
-u32 lbl_8020315C[5];                        // the bags at the start of the round
-s32 lbl_80203148[5];                        // how many clubs each bag had then
-s32 lbl_801925B8[5] = {26, 26, 26, 26, 26}; // per player: the club taken from them this hole (26 = none)
-s32 lbl_80281650 = 5;                    // the winner of the last hole (5 = nobody)
-u8  lbl_802822E8;                    // a club is to be taken
+u32 gBattleStartBagMask[5];                        // the bags at the start of the round
+s32 gBattleStartClubCount[5];                        // how many clubs each bag had then
+s32 gBattleClubLostThisHole[5] = {26, 26, 26, 26, 26}; // per player: the club taken from them this hole (26 = none)
+s32 gBattleHoleWinner = 5;                    // the winner of the last hole (5 = nobody)
+u8  gBattleShowClubAddRemove;                    // a club is to be taken
 
 void GameModeBattle_Shutdown(void);
 void fn_800E7A9C(void);
@@ -70,30 +70,30 @@ u8 GameModeBattle_GameFinished(u8 bCheck) {
 // The player who holed out in fewer strokes wins the hole and may
 // take a club (not when that ends the game).
 void GameModeBattle_EndHole(void) {
-    lbl_802822E8 = 0;
-    lbl_80281650 = 5;
+    gBattleShowClubAddRemove = 0;
+    gBattleHoleWinner = 5;
     if (Player_IsHoled(0) &&
         gPlayers[0].nStrokes[Game_CurHoleIndex()] < gPlayers[1].nStrokes[Game_CurHoleIndex()]) {
         gPlayers[0].nModePoints[Game_CurHoleIndex()] = 1;
-        lbl_802822E8 = 1;
-        lbl_80281650 = 0;
+        gBattleShowClubAddRemove = 1;
+        gBattleHoleWinner = 0;
         gPlayers[0].nHolesWon++;
     }
     if (Player_IsHoled(1) &&
         gPlayers[1].nStrokes[Game_CurHoleIndex()] < gPlayers[0].nStrokes[Game_CurHoleIndex()]) {
         gPlayers[1].nModePoints[Game_CurHoleIndex()] = 1;
-        lbl_802822E8 = 1;
-        lbl_80281650 = 1;
+        gBattleShowClubAddRemove = 1;
+        gBattleHoleWinner = 1;
         gPlayers[1].nHolesWon++;
     }
     if (GameModeBattle_GameFinished(1)) {
-        lbl_802822E8 = 0;
+        gBattleShowClubAddRemove = 0;
     }
-    lbl_801925B8[0] = 26;
-    lbl_801925B8[1] = 26;
-    lbl_801925B8[2] = 26;
-    lbl_801925B8[3] = 26;
-    lbl_801925B8[4] = 26;
+    gBattleClubLostThisHole[0] = 26;
+    gBattleClubLostThisHole[1] = 26;
+    gBattleClubLostThisHole[2] = 26;
+    gBattleClubLostThisHole[3] = 26;
+    gBattleClubLostThisHole[4] = 26;
 }
 
 // Prize money for a human winner with a profile (no margin when the
@@ -172,7 +172,7 @@ u8 GameModeBattle_RemoveClub(int nPlayer, int nClub) {
         return 0;
     }
     bRemoved = Bag_RemoveClub(nPlayer, nClub);
-    lbl_801925B8[nPlayer] = nClub;
+    gBattleClubLostThisHole[nPlayer] = nClub;
     return bRemoved;
 }
 
@@ -183,20 +183,20 @@ void GameModeBattle_AddClub(int nPlayer, int nClub) {
 void GameModeBattle_SaveClubSetup(void) {
     int i;
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        *(u32*)((u8*)lbl_8020315C + i * sizeof(u32)) = PLAYER(i)->golfer.uBagMask;
-        *(s32*)((u8*)lbl_80203148 + i * sizeof(s32)) = Bag_CountClubs(i);
+        *(u32*)((u8*)gBattleStartBagMask + i * sizeof(u32)) = PLAYER(i)->golfer.uBagMask;
+        *(s32*)((u8*)gBattleStartClubCount + i * sizeof(s32)) = Bag_CountClubs(i);
     }
 }
 
 void GameModeBattle_RestoreClubSetup(void) {
     int i;
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        PLAYER(i)->golfer.uBagMask = *(u32*)((u8*)lbl_8020315C + i * sizeof(u32));
+        PLAYER(i)->golfer.uBagMask = *(u32*)((u8*)gBattleStartBagMask + i * sizeof(u32));
     }
 }
 
 s32 fn_800E8114(int nPlayer) {
-    return lbl_80203148[nPlayer];
+    return gBattleStartClubCount[nPlayer];
 }
 
 // A club the player started with and no longer has.
@@ -206,21 +206,21 @@ int GameModeBattle_CanAddClub(int nPlayer, int nClub) {
     if (Bag_HasClub(nPlayer, nClub)) {
         return 0;
     }
-    if (uBit & lbl_8020315C[nPlayer]) {
+    if (uBit & gBattleStartBagMask[nPlayer]) {
         bCan = 1;
     }
     return bCan;
 }
 
 s32 fn_800E81A0(int nPlayer) {
-    return lbl_801925B8[nPlayer];
+    return gBattleClubLostThisHole[nPlayer];
 }
 
 // Nonzero while a club is to be taken.
 u8 GameModeBattle_ShowEndOfHole_ClubAddRemove_UI(void) {
-    return lbl_802822E8;
+    return gBattleShowClubAddRemove;
 }
 
 s32 GameModeBattle_GetWinner(void) {
-    return lbl_80281650;
+    return gBattleHoleWinner;
 }
