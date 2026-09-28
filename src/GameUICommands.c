@@ -738,8 +738,8 @@ void GM_vGetCurrentGolferIndex(MsgArg* pArgs, MsgArg* pResult) {
 
 // Message 7: leave the round: in mode 9 the end of the game is set pending
 // (GUI_SetEndOfGamePending), in any other the fade to black starts (lbl_801D87C0.bFadeToBlack); in
-// the PGA TOUR (mode 23) fn_80117DE8(0, 1). The online branch (OnlineGolf_bIsOnlineGame, always 0
-// in this build) never runs.
+// the PGA TOUR (mode 23) GM_PgaTourSim_SetUserQuit(0, 1). The online branch
+// (OnlineGolf_bIsOnlineGame, always 0 in this build) never runs.
 void GM_vExitGame(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 9) {
         GUI_SetEndOfGamePending();
@@ -747,7 +747,7 @@ void GM_vExitGame(MsgArg* pArgs, MsgArg* pResult) {
         lbl_801D87C0.bFadeToBlack = 1;
     }
     if (Game_GetMode() == 23) {
-        fn_80117DE8(0, 1);
+        GM_PgaTourSim_SetUserQuit(0, 1);
     }
     if (OnlineGolf_bIsOnlineGame()) {
         fn_80062B84(6);
@@ -1155,7 +1155,7 @@ void GM_vLeaderboard_LastName(MsgArg* pArgs, MsgArg* pResult) {
     s32 nEntrant = GM_PgaTourSim_GetEntrantIDFromScoreRow(0, pArgs[0].i);
     s32 nGolfer = GM_PgaTourSim_GetGolferIDFromEntrantID(0, nEntrant);
 
-    strcpy(((MsgString*)pArgs[1].p)->pStr, fn_80118E30(0, nGolfer));
+    strcpy(((MsgString*)pArgs[1].p)->pStr, GM_PgaTourSim_GetNameFromGolferID(0, nGolfer));
 }
 
 // Message 44: the place of the golfer on leaderboard row pArgs[0].

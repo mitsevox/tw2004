@@ -224,7 +224,7 @@ void GameModeDriverPGATour_PrepareForTeeOff(void) {
         nFormat = gPgaData.aTournament[nEvent].nTourEvent - 1;
         gpGame->nE0 = gPgaData.aTourEvent[nFormat].nRounds;
         GameModeDriverPGATour_SetTournament(gPgaData.aTournament[nEvent].nTourEvent - 1);
-        fn_80117DE8(0, 0);
+        GM_PgaTourSim_SetUserQuit(0, 0);
         GM_PgaTourSim_SimRound(0, &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent],
                     gpSaveData[nPlayer].tour.nRound,
                     gPgaData.aTourEvent[nFormat].aFieldLowScore[GameModeDriverPGATour_GetCurrentBracket(0)],
@@ -257,8 +257,8 @@ static inline SeasonEvent* Tour_CurrentEvent(PlayerNumber_t nPlayer) {
 
 // pfnEndGame, when a tour round ends, for profile 0: the first round counts a tournament started
 // (tour.nEventsStarted); after the second round of a tournament of four or more rounds the cut is
-// made (fn_80117B58) and a player who missed it is marked cut; the player's total score goes into
-// the season record, and after the last round the tournament ends
+// made (GM_PgaTourSim_CutBadGolfers) and a player who missed it is marked cut; the player's total
+// score goes into the season record, and after the last round the tournament ends
 // (GameModeDriverPGATour_EndTournament). The round number moves on later
 // (GameModeDriverPGATour_CheckAdvanceTournament).
 void GameModeDriverPGATour_EndGame(void) {
@@ -268,7 +268,7 @@ void GameModeDriverPGATour_EndGame(void) {
     }
     if (GameModeDriverPGATour_GetRounds(gpSaveData[nPlayer].tour.nEvent) >= 4 &&
         gpSaveData[nPlayer].tour.nRound == 1) {
-        fn_80117B58(0);
+        GM_PgaTourSim_CutBadGolfers(0);
         if (GM_PgaTourSim_GetWasCutFromEntrantID(0, 0)) {
             Tour_CurrentEvent(nPlayer)->nUserRankType = 1;
         }
@@ -403,7 +403,7 @@ void GameModeDriverPGATour_AdvanceEvent(int nPlayer) {
     SeasonEvent* p = &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent];
     s32 nLeader = GM_PgaTourSim_GetEntrantIDFromScoreRow(nPlayer, 0);
     s32 nGolfer = GM_PgaTourSim_GetGolferIDFromEntrantID(nPlayer, nLeader);
-    strcpy(p->szChampName, fn_80118E30(nPlayer, nGolfer));
+    strcpy(p->szChampName, GM_PgaTourSim_GetNameFromGolferID(nPlayer, nGolfer));
     p->nChampScore = GM_PgaTourSim_GetRelativeScoreFromEntrantID(nPlayer, nLeader, 1);
     if (GM_PgaTourSim_IsEntrantUser(nPlayer, 0)) {
         if (GM_PgaTourSim_GetWasCutFromEntrantID(nPlayer, 0)) {
@@ -471,23 +471,23 @@ void GameModeDriverPGATour_CommitUserRoundStatCounts(s32 nPlayer) {
 }
 
 // After a tour round (PGA TOUR menus, PGATourMsg_CheckAdvanceTournament). If the player quit the
-// round (the tour simulation's user-quit flag, fn_80117DE0), every entrant goes back to the first tee with no
-// strokes, and on the first round the field is emptied: the round does not count. Otherwise the
-// round is committed (the player's statistics, the CPU entrants' statistics and every entrant's
-// round score), the hole scores reset and the round number moved on; a player who missed the cut
-// has the rest of the tournament simulated (SimCurrentTournament), and after the last round the
-// tournament ends (AdvanceEvent).
+// round (the tour simulation's user-quit flag, GM_PgaTourSim_DidUserQuit), every entrant goes back
+// to the first tee with no strokes, and on the first round the field is emptied: the round does not
+// count. Otherwise the round is committed (the player's statistics, the CPU entrants' statistics
+// and every entrant's round score), the hole scores reset and the round number moved on; a player
+// who missed the cut has the rest of the tournament simulated (SimCurrentTournament), and after the
+// last round the tournament ends (AdvanceEvent).
 void GameModeDriverPGATour_CheckAdvanceTournament(s32 nPlayer) {
-    if (fn_80117DE0()) {
-        fn_80117DF0(nPlayer);
+    if (GM_PgaTourSim_DidUserQuit()) {
+        GM_PgaTourSim_ResetHoleScores(nPlayer);
         if (gpSaveData[nPlayer].tour.nRound == 0) {
-            fn_80117AF8(nPlayer);
+            GM_PgaTourSim_ResetTournament(nPlayer);
         }
     } else {
         GameModeDriverPGATour_CommitUserRoundStatCounts(nPlayer);
         fn_8011A538(nPlayer);
-        fn_80117D80(nPlayer);
-        fn_80117DF0(nPlayer);
+        GM_PgaTourSim_CommitRoundScores(nPlayer);
+        GM_PgaTourSim_ResetHoleScores(nPlayer);
         gpSaveData[nPlayer].tour.nRound++;
         if (GM_PgaTourSim_GetWasCutFromEntrantID(nPlayer, 0)) {
             GameModeDriverPGATour_SimCurrentTournament(nPlayer, 0);
@@ -813,8 +813,8 @@ s32 GameModeDriverPGATour_GetRounds(s32 i) {
 }
 
 // Profile 0's tour moves to the next season: it starts at the season's first tournament held and
-// every golfer's season counts are cleared (fn_80117860); returns 1. After the tenth season (2013)
-// the tour is over: nSeason stays at 10, nEvent is set to 0 and it returns 0.
+// every golfer's season counts are cleared (GM_PgaTourSim_ClearSeason); returns 1. After the tenth
+// season (2013) the tour is over: nSeason stays at 10, nEvent is set to 0 and it returns 0.
 s32 GameModeDriverPGATour_AdvanceSeason(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
     gpSaveData[nPlayer].tour.nSeason++;
@@ -824,7 +824,7 @@ s32 GameModeDriverPGATour_AdvanceSeason(void) {
         return 0;
     }
     gpSaveData[nPlayer].tour.nEvent = GameModeDriverPGATour_GetEventOnOrAfter(0);
-    fn_80117860(&gpSaveData[nPlayer].tour);
+    GM_PgaTourSim_ClearSeason(&gpSaveData[nPlayer].tour);
     return 1;
 }
 
@@ -973,13 +973,13 @@ void GameModeDriverPGATour_GetPurseString(s32 i, char* pDst) {
 // The current tournament's leader into pDst: the golfer's name, or "Tied (%d players)" when several
 // share first place.
 void GameModeDriverPGATour_GetCurrentEventLeader(char* pDst) {
-    s32 n = fn_80118684(0);
+    s32 n = GM_PgaTourSim_GetNumFirstPlaceEntrants(0);
     if (n > 1) {
         sprintf(pDst, "Tied (%d players)", n);
     } else {
         s32 nLeader = GM_PgaTourSim_GetEntrantIDFromScoreRow(0, 0);
         s32 nGolfer = GM_PgaTourSim_GetGolferIDFromEntrantID(0, nLeader);
-        strcpy(pDst, fn_80118E30(0, nGolfer));
+        strcpy(pDst, GM_PgaTourSim_GetNameFromGolferID(0, nGolfer));
     }
 }
 

@@ -32,7 +32,7 @@ s32  fn_800A1164(s32 nPort, s32 nSlot, char* pName, s32 n);     // MC.c
 s32  MC_GetUser(s32 nPort, s32 nSlot, s32 n, char* szOut);     // MC.c: clears szOut first
 void fn_8007739C(Replay* pReplay);      // FE_Manager.c
 f32  GM_GetBonusProgress(SaveProfile* pProfile);    // GameManager.c
-void fn_801176C0(TourSeason* pTour);    // PGATourSimulation.c
+void GM_PgaTourSim_ClearAllSeasons(TourSeason* pTour);    // PGATourSimulation.c
 int  GameMode4_GetCurrentEventHoles(void);                 // GameMode4.c: the current ladder event's holes
 int  GameMode4_GetCurrentEvent(void);                 // GameMode4.c: the current ladder event
 s32  PlayNow_GetNumOpponents(int i);                // GameMode5.c: challenge i's opponent count
@@ -3210,7 +3210,7 @@ void fn_8007FA60(MsgArg* pArgs, MsgArg* pResult) {
             }
         }
     }
-    fn_801176C0(&gpSaveData[nSlot].tour);
+    GM_PgaTourSim_ClearAllSeasons(&gpSaveData[nSlot].tour);
 }
 
 void fn_8007FCC0(MsgArg* pArgs, MsgArg* pResult) {

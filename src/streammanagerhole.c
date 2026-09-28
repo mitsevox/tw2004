@@ -113,8 +113,8 @@ void GameModeDriverRTE_RegisterStreamClients();
 void GameModeDriverRTE_UnregisterStreamClients();
 void GameMode4_RegisterStreamClients();
 void GameMode4_UnregisterStreamClients();
-void fn_8011763C();
-void fn_8011766C();
+void PGATourSimulation_OpenONCE();
+void PGATourSimulation_CloseONCE();
 void fn_80014864(void);
 void fn_800148A8(void);
 void fn_800148EC(void);
@@ -354,7 +354,7 @@ void fn_80014864(void) {
     PlayNow_RegisterStreamClients();
     EarningsInfo_RegisterStreamClients();
     GameMode4_RegisterStreamClients();
-    fn_8011763C();
+    PGATourSimulation_OpenONCE();
     GameModeDriverPGATour_RegisterStreamClients();
     GameModeDriverRTE_RegisterStreamClients();
 }
@@ -367,7 +367,7 @@ void fn_800148A8(void) {
     PlayNow_UnregisterStreamClients();
     EarningsInfo_UnRegisterStreamClients();
     GameMode4_UnregisterStreamClients();
-    fn_8011766C();
+    PGATourSimulation_CloseONCE();
     GameModeDriverPGATour_UnregisterStreamClients();
     GameModeDriverRTE_UnregisterStreamClients();
 }

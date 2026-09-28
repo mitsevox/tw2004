@@ -39,7 +39,7 @@ typedef struct TourEvent {
     u8   unk38[8];
     s16  aFieldLowScore[10];    // 0x40  per bracket (GameModeDriverPGATour_GetCurrentBracket): the
                                 //       simulated field's lowest four-round score, over par
-                                //       (GM_PgaTourSim_SimRound's targets: fn_80118B0C)
+                                //       (GM_PgaTourSim_SimRound's targets: GM_PgaTourSim_DetermineTargetScores)
 } TourEvent;
 
 // A sponsorship offer (a 'PGAp' record). TW06: GM_PgaTour_SponsorshipSlot_t.

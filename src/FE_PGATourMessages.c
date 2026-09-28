@@ -46,7 +46,7 @@ void PGALeaderboard_FormatRow(char* szPlace, char* szName, char* szScore, char* 
     } else {
         sprintf(szPlace, "%d", GM_PgaTourSim_GetScoreRankFromEntrantID(nPlayer, nEntrant));
     }
-    sprintf(szName, "%s", fn_80118E30(nPlayer, nGolfer));
+    sprintf(szName, "%s", GM_PgaTourSim_GetNameFromGolferID(nPlayer, nGolfer));
     sprintf(szScore, "%d", GM_PgaTourSim_GetTotalScoreFromEntrantID(nPlayer, nEntrant, 1));
     szRounds[0] = '\0';
     for (i = 0; i < 4; i++) {
@@ -240,7 +240,7 @@ void PGASeasonWrapUp_GetLine(MsgArg* pArgs, MsgArg* pResult) {
         } else {
             nGolfer = GM_PgaTourSim_GetGolferIDFromStatRow(nPlayer, GM_PGA_STAT_PLAYER_OF_YEAR_POINTS, 0);
         }
-        strcpy(szOut, fn_80118E30(nPlayer, nGolfer));
+        strcpy(szOut, GM_PgaTourSim_GetNameFromGolferID(nPlayer, nGolfer));
         return;
     case 1:
         if (GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_SEASON_WINNINGS)) {
@@ -248,17 +248,17 @@ void PGASeasonWrapUp_GetLine(MsgArg* pArgs, MsgArg* pResult) {
         } else {
             nGolfer = GM_PgaTourSim_GetGolferIDFromStatRow(nPlayer, GM_PGA_STAT_SEASON_WINNINGS, 0);
         }
-        strcpy(szOut, fn_80118E30(nPlayer, nGolfer));
+        strcpy(szOut, GM_PgaTourSim_GetNameFromGolferID(nPlayer, nGolfer));
         return;
     case 2:
         nGolfer = GM_PgaTourSim_GetGolferIDFromStatRow(nPlayer, GM_PGA_STAT_SCORING, 0);
         if (nGolfer == PGA_USER_GOLFER && pStats->nEvents < 15) {
             nGolfer = GM_PgaTourSim_GetGolferIDFromStatRow(nPlayer, GM_PGA_STAT_SCORING, 1);
         }
-        strcpy(szOut, fn_80118E30(nPlayer, nGolfer));
+        strcpy(szOut, GM_PgaTourSim_GetNameFromGolferID(nPlayer, nGolfer));
         return;
     case 3:
-        strcpy(szOut, fn_80118E30(nPlayer, PGA_USER_GOLFER));
+        strcpy(szOut, GM_PgaTourSim_GetNameFromGolferID(nPlayer, PGA_USER_GOLFER));
         return;
     case 4:
         sprintf(szOut, "%d", pStats->nSeasonWins);
@@ -536,10 +536,10 @@ void PGATourMsg_SetScoresDirty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // FE message 749: whether the player quit the tour round (the tour simulation's user-quit flag,
-// fn_80117DE0).
+// GM_PgaTourSim_DidUserQuit).
 void PGATourMsg_DidUserQuit(MsgArg* pArgs, MsgArg* pResult) {
-    // port: EA passes an argument fn_80117DE0 ignores
-    pResult->i = ((u8 (*)(int))fn_80117DE0)(0);
+    // port: EA passes an argument GM_PgaTourSim_DidUserQuit ignores
+    pResult->i = ((u8 (*)(int))GM_PgaTourSim_DidUserQuit)(0);
 }
 
 // FE message 754: sponsorship slot pArgs[0] of the current profile: its sponsor into *pArgs[1] and

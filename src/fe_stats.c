@@ -108,7 +108,7 @@ void UIStatsRankings_GetIndStatsRow(MsgArg* pArgs, MsgArg* pResult) {
     }
     if (nStat != -1) {
         sprintf(szRank, "%d", GM_PgaTourSim_GetStatRankFromGolferID(nPlayer, nGolfer, nStat));
-        strcpy(szName, fn_80118E30(nPlayer, nGolfer));
+        strcpy(szName, GM_PgaTourSim_GetNameFromGolferID(nPlayer, nGolfer));
         if (lbl_80282508 == 1) {
             szPlayed[0] = '\0';
         } else if (GM_PgaTourSim_GetStatView(nStat) == 0) {

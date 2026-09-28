@@ -84,7 +84,7 @@ Objects delivered by UStream
 | `TCMS` | fn_801023A8 | GameMode4.c | none seen | bytes: text, copied |
 | `CR_A` | FE_CrAP_LoadAssetsFromStream | FE_CrAPDB.c | swapped: CrAPAssetsByteSwap > ByteSwap_Records | little-endian on disc |
 | `CR_S` | FE_CrAP_LoadStringsFromStream | FE_CrAPDB.c | none seen | asm |
-| `PGST` | fn_80117694 | sweep | none seen | asm |
+| `PGST` | PGATourSimulation_LoadPGSTFromStream | sweep | none seen | asm |
 | `gras` | fn_8011E584 | GoGrass.c | none seen | asm; GoGrass.c has a swapping function (fn_8011E4D8) the handler does not reach within four calls: probably swapped later (inferred) |
 | `EASI` | fn_80124B10 | sweep | none seen | asm |
 

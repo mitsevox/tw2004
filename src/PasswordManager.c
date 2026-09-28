@@ -381,7 +381,7 @@ void fn_80057438(SaveProfile* pProfile) {
     }
     pProfile->nGolferBallType = 0;
     pProfile->nGolferOutfit = -1;
-    fn_801176C0(&pProfile->tour);
+    GM_PgaTourSim_ClearAllSeasons(&pProfile->tour);
     BitArray_ClearArray(pProfile->a10548, 2);
     FE_CrAP_InitCrAPInfo(pProfile);
     if (lbl_80281DF0.bSigned) {
