@@ -229,7 +229,7 @@ void SkinPart_SetClubsLeftHanded(Character* pChar, u8 bOn) {
     int nVariant;
     int nOption;
     int nCopy;
-    u8 b;
+    u8 bAll;
 
     if (pChar == NULL || pChar->p16D8 == NULL || pChar->p16D8->apSkins == NULL) return;
     for (i = 0; i < 6; i++) {
@@ -237,9 +237,9 @@ void SkinPart_SetClubsLeftHanded(Character* pChar, u8 bOn) {
         for (j = 0; j < nSets; j++) {
             nVariant = SkinPart_FindSetVariantByName(pChar->p16D8->apSkins[i], j, "DefaultL");
             if (nVariant >= 0) {
-                b = SkinPart_GetChangeAllCopies();
+                bAll = SkinPart_GetChangeAllCopies();
                 nCopy = 3;
-                if (b) {
+                if (bAll) {
                     nCopy = 0;
                 }
                 nOption = SkinPart_GetSetOption(pChar->p16D8->apSkins[i], j, nCopy);
@@ -307,8 +307,9 @@ s32 SkinPart_GetNumPartOptions(Skin* pSkin, int nPart, int nVariant) {
 }
 
 // Picks a part's variant (-1, none, when out of range) in copy 3, or in all four copies when
-// SkinPart_GetChangeAllCopies, then also setting Skin.u10D4 bit 1 so SkinPart_UpdateMarks redoes the drawn
-// meshes. A chosen variant's links then set the options of the parts they name (fn_800CDF80).
+// SkinPart_GetChangeAllCopies, then also setting Skin.u10D4 bit 1 so SkinPart_UpdateMarks redoes
+// the drawn meshes. A chosen variant's links then set the options of the parts they name
+// (fn_800CDF80).
 void SkinPart_ChoosePartVariant(Skin* pSkin, int nPart, int nVariant) {
     SkinDesc* pDesc;
     int i;
@@ -720,8 +721,8 @@ void SkinPart_MarkPart(Skin* pSkin, int nPart) {
     nOption = SkinPart_GetPartOption(pSkin, nPart, 0);
     pDesc = pSkin->pModel->pDesc;
     if (nVariant < 0 || nOption < 0) return;
-    SkinPart_MarkOption(pSkin, nOption + pDesc->pVariants[nVariant
-                        + pDesc->pParts[nPart].nFirst].nFirstOption);
+    SkinPart_MarkOption(pSkin,
+                        nOption + pDesc->pVariants[nVariant + pDesc->pParts[nPart].nFirst].nFirstOption);
 }
 
 // Marks what every option of the skin needs (each SkinDesc.p5C entry), for SkinBurn fn_801272B4,

@@ -20,7 +20,7 @@ def split(line):
     `a && f(x, y)` breaks at the && and not inside f's arguments. Nothing inside a string or
     character literal counts."""
     base = len(line) - len(line.lstrip())
-    stack, cands, quote, i = [], [], None, 0
+    stack, cands, quote, i, square = [], [], None, 0, 0
     while i < len(line):
         c = line[i]
         if quote:
@@ -33,6 +33,10 @@ def split(line):
             quote = c
         elif line.startswith('//', i):
             break
+        elif c == '[':
+            square += 1
+        elif c == ']':
+            square = max(0, square - 1)
         elif c == '(':
             if base < i < LIMIT - 1 and line[i + 1:i + 2] not in (')', ''):
                 cands.append((len(stack) + 2, i, 'paren', None))
@@ -41,12 +45,12 @@ def split(line):
             if stack:
                 stack.pop()
         elif c == ',' and stack and i + 1 < LIMIT and line[i + 1:i + 2] == ' ':
-            cands.append((len(stack), i, 'comma', stack[-1]))
+            cands.append((len(stack) + 4 * square, i, 'comma', stack[-1]))
         elif c == ' ' and base < i < LIMIT:
             m = re.match(r' (&&|\|\||<<|>>|[-+*/%&|^]|==|!=|<=|>=|<|>|=) ', line[i:])
             if m:
                 # an assignment's = is the last resort: `a->b\n = f(...)` strands the target alone
-                rank = len(stack) + (3 if m.group(1) == '=' else 0)
+                rank = len(stack) + (3 if m.group(1) == '=' else 0) + 4 * square   # never inside [ ]
                 cands.append((rank, i, 'op', stack[-1] if stack else None))
         i += 1
 
