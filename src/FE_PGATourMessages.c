@@ -273,7 +273,7 @@ void fn_8010EBDC(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8010EEA8(void) {
     lbl_80223C48.bSeasonOver = 0;
     fn_800EFAD0();
-    fn_80117188();
+    ResetCalendarState();
     fn_80077808(0);
 }
 

@@ -607,7 +607,7 @@ u8   GM_Currently_RealtimeMode(void);                 // GameModeDriverRTE.c
 // CareerCalendar.nDriver: no career, the PGA TOUR season (GameModeDriverPGATour.c), the real-time
 // events (GameModeDriverRTE.c). The calendar shows one month as a grid of 35 day cells.
 typedef struct CareerCalendar {
-    u16  nToday;                // 0x00  the career's current day (fn_80117188)
+    u16  nToday;                // 0x00  the career's current day (ResetCalendarState)
     u16  nSelected;             // 0x02  the day the cursor is on
     s32  nMonth;                // 0x04  the month shown, 1..12
     u32  nYear;                 // 0x08  and its year
@@ -638,10 +638,10 @@ extern void (*lbl_80193EF4[3])(void);
 extern u8 (*lbl_80193F00[3])(void);
 
 // GameModeDriver.c
-void fn_80117188(void);
-void fn_80117348(void);
-u16  fn_801173F0(u32 nCell);            // the date in a grid cell
-s32  fn_80117510(u16 nDate);
+void ResetCalendarState(void);
+void UpdateCalendarState(void);
+u16  GetDateFromCellIndex(u32 nCell);            // the date in a grid cell
+s32  GetCellIndexFromDate(u16 nDate);
 
 // GameTargets.c: what the target games (modes 13..17) share
 extern f32 lbl_80211D38[40][4];         // the target list: lbl_80282360 points (w = 1)

@@ -22,9 +22,9 @@ void fn_8011DA44(int nKind, char* szTitle, char* szText);
 void fn_8011DC30(int nKind, char* szTitle, char* szText);
 
 void GetRankText(int nPlace, char* sz);
-void fn_80117264(u16 nDate, char* sz);
-u8   fn_801174B8(u32 nMonth, u32 nOther);
-u8   fn_801174E4(u32 nMonth, u32 nOther);
+void Calendar_GetEventNameLine(u16 nDate, char* sz);
+u8   IsAMonthAhead(u32 nMonth, u32 nOther);
+u8   IsAMonthBehind(u32 nMonth, u32 nOther);
 
 // ---- no career: nothing to show -------------------------------------------------------------
 
@@ -147,14 +147,14 @@ void  RealTime_Init(void);
 u8    RealTime_AtEarliest(void);
 u8    RealTime_AtLatest(void);
 s32   RealTime_FillCell(char* sz, u16 nDate, s32* pLook, s32* pButton);
-void  fn_80116F0C(int nLine, char* sz);
-void  fn_80116F80(u16 nDate, int n, char* sz);
-s32   fn_80116FA4(u16 nDate);
-void  fn_80117004(int nKind, char* szTitle, char* szText);
-u16   fn_801170EC(void);
-char* fn_8011710C(u16 nDate);
-void  fn_8011714C(void);
-u8    fn_80117180(void);
+void  RealTime_GetLine(int nLine, char* sz);
+void  RealTime_GetBottomLine(u16 nDate, int n, char* sz);
+s32   RealTime_GetPopupType(u16 nDate);
+void  RealTime_GetPopupRow(int nKind, char* szTitle, char* szText);
+u16   RealTime_GetCurrentDay(void);
+char* RealTime_GetEventName(u16 nDate);
+void  RealTime_Play(void);
+u8    RealTime_IsSimulationNecessary(void);
 
 // The calendar screen's tables, indexed by CareerCalendar.nDriver: no career, the PGA TOUR season,
 // the real-time events. (Defined here, before the strings below, to keep EA's data order.)
@@ -163,27 +163,27 @@ u8 (*lbl_80193E7C[3])(void) = { Online_AtLatest, PGATour_AtLatest, RealTime_AtLa
 s32 (*lbl_80193E88[3])(char* sz, u16 nDate, s32* pLook, s32* pButton) = {
     Online_FillCell, PGATour_FillCell, RealTime_FillCell
 };
-void (*lbl_80193E94[3])(int nLine, char* sz) = { Online_GetLine, PGATour_GetLine, fn_80116F0C };
+void (*lbl_80193E94[3])(int nLine, char* sz) = { Online_GetLine, PGATour_GetLine, RealTime_GetLine };
 void (*lbl_80193EA0[3])(u16 nDate, int n,
-                        char* sz) = { Online_GetBottomLine, PGATour_GetBottomLine, fn_80116F80 };
-s32 (*lbl_80193EAC[3])(u16 nDate) = { Online_GetPopupType, PGATour_GetPopupType, fn_80116FA4 };
+                        char* sz) = { Online_GetBottomLine, PGATour_GetBottomLine, RealTime_GetBottomLine };
+s32 (*lbl_80193EAC[3])(u16 nDate) = { Online_GetPopupType, PGATour_GetPopupType, RealTime_GetPopupType };
 void (*lbl_80193EB8[3])(int nKind, char* szTitle, char* szText) = {
-    Online_GetPopupRow, PGATour_GetPopupRow, fn_80117004
+    Online_GetPopupRow, PGATour_GetPopupRow, RealTime_GetPopupRow
 };
-u16 (*lbl_80193EC4[3])(void) = { Online_GetCurrentDay, PGATour_GetCurrentDay, fn_801170EC };
+u16 (*lbl_80193EC4[3])(void) = { Online_GetCurrentDay, PGATour_GetCurrentDay, RealTime_GetCurrentDay };
 void (*lbl_80193ED0[3])(void) = { Online_Init, PGATour_Init, RealTime_Init };
-char* (*lbl_80193EDC[3])(u16 nDate) = { Online_GetEventName, PGATour_GetEventName, fn_8011710C };
+char* (*lbl_80193EDC[3])(u16 nDate) = { Online_GetEventName, PGATour_GetEventName, RealTime_GetEventName };
 // port: the PGA TOUR and real-time drivers return their own event types through this void* entry
 void* (*lbl_80193EE8[3])(u16 nDate) = {
     Online_GetEventInfoByDate, (void* (*)(u16))fn_800EFC80, (void* (*)(u16))GM_RealtimeMode_GetEventInfoByDate
 };
-void (*lbl_80193EF4[3])(void) = { Online_Play, PGATour_Play, fn_8011714C };
-u8 (*lbl_80193F00[3])(void) = { Online_IsSimulationNecessary, PGATour_IsSimulationNecessary, fn_80117180 };
+void (*lbl_80193EF4[3])(void) = { Online_Play, PGATour_Play, RealTime_Play };
+u8 (*lbl_80193F00[3])(void) = { Online_IsSimulationNecessary, PGATour_IsSimulationNecessary, RealTime_IsSimulationNecessary };
 
 // The calendar grid.
 CareerCalendar lbl_80223C48;
 
-// The PGA TOUR calendar's header lines: line 1 today's tournament and round (fn_80117264), or
+// The PGA TOUR calendar's header lines: line 1 today's tournament and round (Calendar_GetEventNameLine), or
 // "Season Complete" once the season has no tournament left; line 2 empty. Other lines leave the
 // text as it is.
 void PGATour_GetLine(int nLine, char* sz) {
@@ -193,7 +193,7 @@ void PGATour_GetLine(int nLine, char* sz) {
             strcpy(sz, "Season Complete");
             return;
         }
-        fn_80117264(lbl_80223C48.nToday, sz);
+        Calendar_GetEventNameLine(lbl_80223C48.nToday, sz);
         return;
     case 2:
         sz[0] = 0;
@@ -383,7 +383,7 @@ void PGATour_GetPopupRow(int nKind, char* szTitle, char* szText) {
 
 // The PGA TOUR career's current day: the first day of player 1's current tournament plus the round
 // they are on. 0xFFFF once the season has no tournament left (fn_800EFD38 of none), which
-// fn_80117188 checks for.
+// ResetCalendarState checks for.
 u16 PGATour_GetCurrentDay(void) {
     s32 nRound;
     u16 nDate;
@@ -485,8 +485,10 @@ s32 RealTime_FillCell(char* sz, u16 nDate, s32* pLook, s32* pButton) {
     return -1;
 }
 
-// The calendar's text lines (lbl_80193E94): 1 "Today: <date and time>", 2 today's event.
-void fn_80116F0C(int nLine, char* sz) {
+// The real-time events calendar's header lines: line 1 "Today: " and the clock's date and time
+// (RTClock_GetDateTimeString), line 2 today's event (Calendar_GetEventNameLine). Other lines leave
+// the text as it is.
+void RealTime_GetLine(int nLine, char* sz) {
     char szDate[32];
 
     switch (nLine) {
@@ -495,18 +497,21 @@ void fn_80116F0C(int nLine, char* sz) {
         sprintf(sz, "Today: %s", szDate);
         return;
     case 2:
-        fn_80117264(lbl_80223C48.nToday, sz);
+        Calendar_GetEventNameLine(lbl_80223C48.nToday, sz);
         return;
     }
 }
 
-void fn_80116F80(u16 nDate, int n, char* sz) {
-    fn_80117264(nDate, sz);
+// The real-time events calendar's line under "Selected Day:": the date's event
+// (Calendar_GetEventNameLine). The line number is not used.
+void RealTime_GetBottomLine(u16 nDate, int n, char* sz) {
+    Calendar_GetEventNameLine(nDate, sz);
 }
 
-// The day-details panel for a day: 5 past, 4 or 5 today (5 when
-// GM_RealtimeMode_TodaysEventCompleted), 6 to come.
-s32 fn_80116FA4(u16 nDate) {
+// Which day-details popup the real-time events calendar shows for a date (the calendar screen keeps
+// it in lbl_80223C48.n1C for RealTime_GetPopupRow): 5 results for a past day; 4 today's event, or 5
+// once it is completed (fn_800F102C, always 0 in this build); 6 upcoming for a day to come.
+s32 RealTime_GetPopupType(u16 nDate) {
     if (nDate < lbl_80223C48.nToday) {
         return 5;
     }
@@ -516,8 +521,11 @@ s32 fn_80116FA4(u16 nDate) {
     return 6;
 }
 
-// The day-details panel: 1 the selected day's date, 2 empty, else the panel n1C names.
-void fn_80117004(int nKind, char* szTitle, char* szText) {
+// A row of the real-time events calendar's day-details popup (row 0, "Event:", is the calendar
+// screen's): row 1 "Date:" and the selected day, row 2 blank; the other rows come from the popup
+// lbl_80223C48.n1C names (4 today's event fn_8011D878, 5 results fn_8011DA44, 6 upcoming
+// fn_8011DC30).
+void RealTime_GetPopupRow(int nKind, char* szTitle, char* szText) {
     char szDate[12];
 
     switch (nKind) {
@@ -546,12 +554,13 @@ void fn_80117004(int nKind, char* szTitle, char* szText) {
     }
 }
 
-u16 fn_801170EC(void) {
+// The real-time events calendar's current day: today's date from the clock (CalDate_GetToday).
+u16 RealTime_GetCurrentDay(void) {
     return CalDate_GetToday();
 }
 
-// The name of the event on a day.
-char* fn_8011710C(u16 nDate) {
+// The name of the real-time event on a date, or "" when there is none that day.
+char* RealTime_GetEventName(u16 nDate) {
     s32 nId;
     s32 nRound;
 
@@ -561,23 +570,29 @@ char* fn_8011710C(u16 nDate) {
     return "";
 }
 
-// Start today's event by the clock's date (GM_RealtimeMode_SelectEventToday): golfer 30 in slot 0,
-// game mode 24.
-void fn_8011714C(void) {
+// The real-time events calendar's play button: player 0 plays the first created golfer (30), the
+// game mode becomes 24 (the real-time events), and today's event by the clock becomes the current
+// one (fn_800F0E3C).
+void RealTime_Play(void) {
     Session_SetGolfer(30, 0);
     GM_SetModeType(24);
     GM_RealtimeMode_SelectEventToday();
 }
 
-u8 fn_80117180(void) {
+// Whether events must be simulated before the real-time events calendar's selected day can be
+// played: never, 0.
+u8 RealTime_IsSimulationNecessary(void) {
     return 0;
 }
 
 // ---- the calendar -----------------------------------------------------------------------------
 
-// Opens the calendar on the career's current day (the season's last day once it is over), on the
-// month it falls in; a day past the 35 cells moves the view on a month (not from December).
-void fn_80117188(void) {
+// Opens the calendar on the driver's current day (lbl_80223C48.nToday; once the PGA TOUR season has
+// no tournament left, the last tournament's last day, with bSeasonOver set) and shows the month it
+// falls in; when that day's cell would lie past the grid's 35 cells the month after is shown
+// instead (not from December). Called when the calendar screen switches driver and when a new
+// season starts.
+void ResetCalendarState(void) {
     u16 nDate;
     s32 nMonth;
     s32 nDay;
@@ -593,16 +608,16 @@ void fn_80117188(void) {
     CalDate_GetMDY(&lbl_80223C48.nToday, &nMonth, &nDay, &nYear);
     lbl_80223C48.nMonth = nMonth;
     lbl_80223C48.nYear = nYear;
-    fn_80117348();
+    UpdateCalendarState();
     if ((u32)(lbl_80223C48.nFirstCell + nDay) > 35 && lbl_80223C48.nMonth != 12) {
         lbl_80223C48.nMonth++;
-        fn_80117348();
+        UpdateCalendarState();
     }
 }
 
 // A day's event as text: "No Event Scheduled", on the PGA TOUR "Active Event: <name>, Round <n>"
 // (the round of the event on nToday, not nDate), else "Event: <name>".
-void fn_80117264(u16 nDate, char* sz) {
+void Calendar_GetEventNameLine(u16 nDate, char* sz) {
     char* szName = lbl_80193EDC[lbl_80223C48.nDriver](nDate);
     s32 nId;
     s32 nRound;
@@ -619,8 +634,10 @@ void fn_80117264(u16 nDate, char* sz) {
     sprintf(sz, "Event: %s", szName);
 }
 
-// Lays out the month shown: where day 1 falls, where the month ends, and the month before's length.
-void fn_80117348(void) {
+// Lays the month shown (lbl_80223C48.nMonth and nYear) out on the 35-cell grid: the cell of its
+// first day (its day of the week, counted from 0), the cell after its last day, and the number of
+// days in the month before. Called whenever the month shown changes.
+void UpdateCalendarState(void) {
     int nDays;
     u16 nDate;
     s32 nMonth;
@@ -637,7 +654,7 @@ void fn_80117348(void) {
 
 // The date in a cell of the grid (cells before day 1 belong to the month before, those after the
 // last day to the month after).
-u16 fn_801173F0(u32 nCell) {
+u16 GetDateFromCellIndex(u32 nCell) {
     u16 nDate;
     s32 nMonth;
     s32 nYear;
@@ -661,7 +678,7 @@ u16 fn_801173F0(u32 nCell) {
 }
 
 // nOther is the month after nMonth (December to January included).
-u8 fn_801174B8(u32 nMonth, u32 nOther) {
+u8 IsAMonthAhead(u32 nMonth, u32 nOther) {
     int b = 0;
     if (nMonth + 1 == nOther || (nMonth == 12 && nOther == 1)) {
         b = 1;
@@ -670,7 +687,7 @@ u8 fn_801174B8(u32 nMonth, u32 nOther) {
 }
 
 // nOther is the month before nMonth (January to December included).
-u8 fn_801174E4(u32 nMonth, u32 nOther) {
+u8 IsAMonthBehind(u32 nMonth, u32 nOther) {
     int b = 0;
     if (nMonth - 1 == nOther || (nMonth == 1 && nOther == 12)) {
         b = 1;
@@ -679,7 +696,7 @@ u8 fn_801174E4(u32 nMonth, u32 nOther) {
 }
 
 // The grid cell a date falls in, or -1 when it is not shown.
-s32 fn_80117510(u16 nDate) {
+s32 GetCellIndexFromDate(u16 nDate) {
     u16 nCopy;
     s32 nMonth;
     s32 nDay;
@@ -693,10 +710,10 @@ s32 fn_80117510(u16 nDate) {
     if ((u32)lbl_80223C48.nMonth == nMonth) {
         return nDay + (s32)lbl_80223C48.nFirstCell - 1;
     }
-    if (fn_801174B8(lbl_80223C48.nMonth, nMonth) && nDay < 35 - lbl_80223C48.nEndCell) {
+    if (IsAMonthAhead(lbl_80223C48.nMonth, nMonth) && nDay < 35 - lbl_80223C48.nEndCell) {
         return nDay + (s32)lbl_80223C48.nEndCell - 1;
     }
-    if (fn_801174E4(lbl_80223C48.nMonth, nMonth) && nDay > nPrevShown) {
+    if (IsAMonthBehind(lbl_80223C48.nMonth, nMonth) && nDay > nPrevShown) {
         return (nDay - nPrevShown) - 1;
     }
     return -1;

@@ -17,7 +17,7 @@ void fn_80111F58(MsgArg* pArgs, MsgArg* pResult) {
     s32* pCell = (s32*)pArgs[3].p;
     s32* pLook = (s32*)pArgs[4].p;
     s32* pButton = (s32*)pArgs[5].p;
-    u16 nDate = fn_801173F0(pArgs[0].i);
+    u16 nDate = GetDateFromCellIndex(pArgs[0].i);
 
     sprintf(szDay, "%d", CalDate_GetDay(nDate));
     *pLook = 0;
@@ -40,7 +40,7 @@ void fn_8011206C(MsgArg* pArgs, MsgArg* pResult) {
     int nLine = pArgs[1].i;
     char* sz = ((MsgString*)pArgs[2].p)->pStr;
 
-    nDate = fn_801173F0(pArgs[0].i);
+    nDate = GetDateFromCellIndex(pArgs[0].i);
     CalDate_GetMDY(&nDate, &nMonth, &nDay, &nYear);
     switch (nLine) {
     case 1:
@@ -71,7 +71,7 @@ void fn_80112154(MsgArg* pArgs, MsgArg* pResult) {
             lbl_80223C48.nMonth--;
         }
     }
-    fn_80117348();
+    UpdateCalendarState();
 }
 
 // Show the month after (unless the driver keeps it).
@@ -84,11 +84,11 @@ void fn_801121D4(MsgArg* pArgs, MsgArg* pResult) {
             lbl_80223C48.nMonth++;
         }
     }
-    fn_80117348();
+    UpdateCalendarState();
 }
 
 void fn_80112254(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_80117510(lbl_80223C48.nToday);
+    pResult->i = GetCellIndexFromDate(lbl_80223C48.nToday);
 }
 
 // Switch the calendar to driver pArgs[0].
@@ -97,12 +97,12 @@ void fn_80112290(MsgArg* pArgs, MsgArg* pResult) {
 
     lbl_80223C48.nDriver = nDriver;
     lbl_80193ED0[nDriver]();
-    fn_80117188();
+    ResetCalendarState();
 }
 
 // Select grid cell pArgs[0]; gives the panel its day's details show (-1: no event).
 void fn_801122D8(MsgArg* pArgs, MsgArg* pResult) {
-    u16 nDate = fn_801173F0(pArgs[0].i);
+    u16 nDate = GetDateFromCellIndex(pArgs[0].i);
     s32 nPanel;
 
     lbl_80223C48.nSelected = nDate;
