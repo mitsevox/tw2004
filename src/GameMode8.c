@@ -1734,7 +1734,7 @@ u8 fn_800FDF60(void) {
 }
 
 void fn_800FDFC4(s32 p0, s32 p1, s32 p2) {
-    fn_800E53F0(21, p0, p1, p2);
+    GameMsg_Send3Ints(21, p0, p1, p2);
 }
 
 void fn_800FDFFC(s32 p0, s32 p1) {
@@ -1762,7 +1762,7 @@ void fn_800FE0D8(void) {
 }
 
 void fn_800FE100(s32 p0, s32 p1, s32 p2) {
-    fn_800E53F0(23, p0, p1, p2);
+    GameMsg_Send3Ints(23, p0, p1, p2);
 }
 
 void fn_800FE138(s32 p0, s32 p1) {

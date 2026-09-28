@@ -957,7 +957,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   variables. Fix: swap the declarations. Twelve 16-byte vectors in SW_vUIUpdateBlurBuffer matched once
   declared highest-address first.
 - **[verified] Taking a parameter's address puts it on the stack at the parameter's slot**;
-  copying it to a local first gives a different slot order (GUI_StartPostShotUI, fn_800E53F0).
+  copying it to a local first gives a different slot order (GUI_StartPostShotUI, GameMsg_Send3Ints).
 - **[verified] An initialiser placed after early exits is in an inner block.** A local array copied
   from `.rodata` only after the function's first checks means `if (ok) { u32 aPad[4] = {0}; ... }`,
   not a declaration at the top (`AnimLib_MergeOverlay`).

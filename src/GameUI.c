@@ -211,8 +211,8 @@ u8 GUI_UIVisible(int nPlayer) {
 // Refreshes every HUD readout (five updates; TW07 inlines the course, golfer, lie, shot and wind
 // ones here); the show functions call it before a HUD comes up.
 void GUI_UpdateAllUIData(void) {
-    fn_800E5450();
-    fn_800E542C();
+    GUI_UpdateUIData4();
+    GUI_UpdateUIData6();
     fn_80062C38();
     fn_80062C5C();
     fn_8006A8B0();
@@ -315,7 +315,7 @@ void GUI_PauseMenuClosed(void) {
 }
 
 // The pause flag: set by GUI_OpenPauseMenu, cleared when the menu closes (GUI_PauseMenuClosed,
-// GameMessages.c fn_800E5240) and by GUI_Init.
+// GameMessages.c GUI_OnControllerPresent) and by GUI_Init.
 u8 GUI_IsPauseMenuOpen(void) {
     return lbl_802822DF;
 }
@@ -350,7 +350,7 @@ void GUI_AdvancePostShotUI(int nPlayer) {
 void GUI_HideAllHelpTips(void) {
     GUI_ToggleMulligan(0);
     GUI_ToggleReplay(0);
-    fn_800E5474(0);
+    GUI_ToggleTapin(0);
 }
 
 // The UI reports a post-shot display showing in screen slot i (the player's in split screen, else
@@ -552,33 +552,33 @@ u8 GUI_CheckMessageQue(void) {
         bBusy = 1;
         lbl_802822A8--;
     } else if (lbl_8028229C != 0) {
-        fn_800E55B8(lbl_80202DEC[lbl_8028229C - 1].n0, lbl_80202DEC[lbl_8028229C - 1].n4,
+        GUI_ShowTourAwardMessage(lbl_80202DEC[lbl_8028229C - 1].n0, lbl_80202DEC[lbl_8028229C - 1].n4,
                     lbl_80202DEC[lbl_8028229C - 1].n8);
         bBusy = 1;
         lbl_8028229C--;
     } else if (lbl_80282298 != 0) {
-        fn_800E5580(lbl_80202D74[lbl_80282298 - 1].n0, lbl_80202D74[lbl_80282298 - 1].n4,
+        GUI_ShowMedalMessage(lbl_80202D74[lbl_80282298 - 1].n0, lbl_80202D74[lbl_80282298 - 1].n4,
                     lbl_80202D74[lbl_80282298 - 1].n8);
         bBusy = 1;
         lbl_80282298--;
     } else if (lbl_80282294 != 0) {
         // EA bug: n8 is taken one item past the newest (no - 1)
-        fn_800E5548(lbl_80202CFC[lbl_80282294 - 1].n0, lbl_80202CFC[lbl_80282294 - 1].n4,
+        GUI_ShowQueue8Message(lbl_80202CFC[lbl_80282294 - 1].n0, lbl_80202CFC[lbl_80282294 - 1].n4,
                     lbl_80202CFC[lbl_80282294].n8);
         bBusy = 1;
         lbl_80282294--;
     } else if (lbl_80282290 != 0) {
-        fn_800E5510(lbl_80202C84[lbl_80282290 - 1].n0, lbl_80202C84[lbl_80282290 - 1].n4,
+        GUI_ShowQueue9Message(lbl_80202C84[lbl_80282290 - 1].n0, lbl_80202C84[lbl_80282290 - 1].n4,
                     lbl_80202C84[lbl_80282290 - 1].n8);
         bBusy = 1;
         lbl_80282290--;
     } else if (lbl_8028228C != 0) {
-        fn_800E54D8(lbl_80202C0C[lbl_8028228C - 1].n0, lbl_80202C0C[lbl_8028228C - 1].n4,
+        GUI_ShowEventWonMessage(lbl_80202C0C[lbl_8028228C - 1].n0, lbl_80202C0C[lbl_8028228C - 1].n4,
                     lbl_80202C0C[lbl_8028228C - 1].n8);
         bBusy = 1;
         lbl_8028228C--;
     } else if (lbl_80282288 != 0) {
-        fn_800E54A0(lbl_80202B94[lbl_80282288 - 1].n0, lbl_80202B94[lbl_80282288 - 1].n4,
+        GUI_ShowLadderMessage(lbl_80202B94[lbl_80282288 - 1].n0, lbl_80202B94[lbl_80282288 - 1].n4,
                     lbl_80202B94[lbl_80282288 - 1].n8);
         bBusy = 1;
         lbl_80282288--;

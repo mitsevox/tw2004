@@ -291,12 +291,12 @@ void  GUI_OpenPauseMenu(void);
 void  GUI_SetEndOfGamePending(void);
 void  GUI_PostShotUIStart(int i);
 void  GUI_PostShotUIFinished(int i);
-void  fn_800E508C(void);
-void  fn_800E50FC(void);
-void  fn_800E53A4(u8 b);
-void  fn_800E53AC(void);
-void  fn_800E53C0(void);
-void  fn_800E53E8(u8 b);
+void  GUI_CaddieTipWindowIsOpen(void);
+void  GUI_CaddieTipWindowClosed(void);
+void  GUI_SetMessageQueHeld(u8 b);
+void  GUI_StartAwardUI(void);
+void  GUI_MuteForScoreCard(void);
+void  GUI_SetUnreadFlag(u8 b);
 void  fn_800E5DE4(int n);
 int   fn_800E5E54(void);
 f32   fn_800E6578(int nPlayer, u32 nStat);
@@ -1216,7 +1216,7 @@ void fn_80087548(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80087574(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800E5240(pArgs[0].i);
+    GUI_OnControllerPresent(pArgs[0].i);
     Lessons_RestartLesson();
 }
 
@@ -1421,12 +1421,12 @@ void fn_80087BE8(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80087C1C(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 1) {
-        fn_800E50FC();
+        GUI_CaddieTipWindowClosed();
         return;
     }
     GUI_ToggleUI(lbl_80282278, 0);
     fn_80062C80(gPlayers[lbl_80282278].nC58, 0);
-    fn_800E508C();
+    GUI_CaddieTipWindowIsOpen();
 }
 
 void fn_80087C7C(MsgArg* pArgs, MsgArg* pResult) {
@@ -2212,10 +2212,10 @@ void fn_800897F0(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80089A50(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i != 0) {
-        fn_800E53A4(1);
+        GUI_SetMessageQueHeld(1);
         return;
     }
-    fn_800E53A4(0);
+    GUI_SetMessageQueHeld(0);
 }
 
 // The card's free directory entries.
@@ -2312,11 +2312,11 @@ void fn_80089CCC(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80089D04(MsgArg* pArgs, MsgArg* pResult) {
     GUI_HideAllHelpTips();
-    fn_800E53AC();
+    GUI_StartAwardUI();
 }
 
 void fn_80089D28(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800E53C0();
+    GUI_MuteForScoreCard();
 }
 
 void fn_80089D48(MsgArg* pArgs, MsgArg* pResult) {
@@ -2739,10 +2739,10 @@ void fn_8008A914(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_8008A964(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 0) {
-        fn_800E53E8(0);
+        GUI_SetUnreadFlag(0);
         return;
     }
-    fn_800E53E8(1);
+    GUI_SetUnreadFlag(1);
 }
 
 // Whether a real-time event is being played.

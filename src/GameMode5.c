@@ -1132,7 +1132,7 @@ char* PlayNow_GetGroupDescription(int nGroup) {
 // group has more than one challenge, the holes of each challenge after the current one (from the
 // current one itself once PlayNow_HoleFinished says the hole is over) by nType: one, 18, a nine, or
 // the par 5s, 4s or 3s of its course (type 7 none). 0 while the end-of-round screen is up
-// (fn_800E5110).
+// (GUI_IsEndGameUiShowing).
 int PlayNow_GetHolesLeft(void) {
     int h;
     int i;
@@ -1186,7 +1186,7 @@ int PlayNow_GetHolesLeft(void) {
             }
         }
     }
-    if (fn_800E5110()) {
+    if (GUI_IsEndGameUiShowing()) {
         return 0;
     }
     // fake match: the binary calls GUI_ScoreCardUp and branches on its result, but both paths return

@@ -259,7 +259,7 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
                                                    * 60);
                 nAdded = gTimedShotSeconds;
                 GameMsg_Send5Ints(0x33, gTimedShotPoints, 0, 0, 0xC9, 1);
-                fn_800E53F0(0x34, gTimedShotSeconds * 60, 0, 0);
+                GameMsg_Send3Ints(0x34, gTimedShotSeconds * 60, 0, 0);
                 gTimedShotPoints = 0;
                 gTimedShotSeconds = 0;
                 if (gPlayers[nPlayer].nDBC > 1) {
@@ -357,7 +357,7 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
                                            * 60);
         nAdded = gTimedShotSeconds;
         if (!gSession.bReplay) {
-            fn_800E53F0(0x34, gTimedShotSeconds * 60, 0, 0);
+            GameMsg_Send3Ints(0x34, gTimedShotSeconds * 60, 0, 0);
         }
     }
     if (gTimedShotPoints != 0) {

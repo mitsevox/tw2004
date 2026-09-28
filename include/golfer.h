@@ -480,7 +480,7 @@ typedef struct Session {
                                 //        tests it
     u8   bReplay;               // 0x013  a saved replay is playing: no luck swap, no spin, instant launch
     s32  nPaused;               // 0x014  0 running, 1 paused (GameUI GUI_OpenPauseMenu), 2 paused until the last
-                                //        menu screen closes (fn_800E5240 then unpauses)
+                                //        menu screen closes (GUI_OnControllerPresent then unpauses)
     f32  fFrameTime;            // 0x018  seconds per frame
     f32  f1C;                   // 0x01C
     s32  n20;                   // 0x020

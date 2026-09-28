@@ -436,7 +436,7 @@ void GUI_BetweenHolesScorecard(u8 bHuman);            // opens the end-of-hole s
 void GUI_SetEndOfHolePending(void);
 void GUI_EndOfGameScorecard(u8 bHuman);            // opens the end-of-round screen, or defers it
 void GUI_SendButtonHeld(int nPlayer);
-void fn_800E5240(int i);                // GameMessages.c: clears slot i of lbl_80202B88
+void GUI_OnControllerPresent(int i);                // GameMessages.c: clears slot i of lbl_80202B88
 
 // The display state (GameUI.c's data; GameMessages.c and GameAnalysis.c use some of it). Twelve
 // queues of display items, each with its count; the pump shows the newest item of the first
@@ -505,24 +505,24 @@ extern u8  lbl_802822DC[3];
 extern u8  lbl_802822DF;
 
 // GameMessages.c
-void fn_800E4FFC(int a);
-void fn_800E502C(int a);
-void fn_800E505C(int a);
-u8   fn_800E5098(void);
-u8   fn_800E5110(void);
-void fn_800E5228(void);
-u8   fn_800E5344(void);
-u8   fn_800E53B8(void);
-void fn_800E53F0(int nMsg, int a, int b, int c);      // send a message with three ints
-void fn_800E542C(void);
-void fn_800E5450(void);
-void fn_800E5474(int a);
-void fn_800E54A0(int a, int b, int c);
-void fn_800E54D8(int a, int b, int c);
-void fn_800E5510(int a, int b, int c);
-void fn_800E5548(int a, int b, int c);
-void fn_800E5580(int a, int b, int c);
-void fn_800E55B8(int a, int b, int c);
+void GUI_ShowChallengeIntro(int a);
+void GUI_ShowRealtimeEventIntro(int a);
+void GUI_ShowHoleContestIntro(int a);
+u8   GUI_IsCaddieTipWindowOpen(void);
+u8   GUI_IsEndGameUiShowing(void);
+void GUI_DetectControllerPull(void);
+u8   GUI_AreTrophysOrRecordsQueued(void);
+u8   GUI_IsAwardUIAnimating(void);
+void GameMsg_Send3Ints(int nMsg, int a, int b, int c);      // send a message with three ints
+void GUI_UpdateUIData6(void);
+void GUI_UpdateUIData4(void);
+void GUI_ToggleTapin(int a);
+void GUI_ShowLadderMessage(int a, int b, int c);
+void GUI_ShowEventWonMessage(int a, int b, int c);
+void GUI_ShowQueue9Message(int a, int b, int c);
+void GUI_ShowQueue8Message(int a, int b, int c);
+void GUI_ShowMedalMessage(int a, int b, int c);
+void GUI_ShowTourAwardMessage(int a, int b, int c);
 void fn_800E55F0(int a, int b, int c);
 void fn_800E5628(int a, int b, int c);
 void fn_800E5660(int a, int b, int c);

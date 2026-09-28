@@ -310,7 +310,7 @@ void fn_8008F820(void) {
                     }
                 }
                 if (gSession.nGameType == 6) {
-                    fn_800E5240(k);
+                    GUI_OnControllerPresent(k);
                 }
                 if (gSession.nGameType == 6) {
                     uMask = Controller_GetButtonMask(0x20, 1);

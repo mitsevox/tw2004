@@ -587,7 +587,7 @@ void GM_PlayerTookShot(int nPlayer) {
 }
 
 // Takes a mulligan; 1 when taken. Refused when the mode has no mulligans, the golfer has conceded,
-// or the UI flag fn_800E53B8 reads is set; under the one-per-nine rule (2) a player who has used
+// or the UI flag GUI_IsAwardUIAnimating reads is set; under the one-per-nine rule (2) a player who has used
 // theirs is refused, else it is marked used (bMulliganUsed). Then the crowd and commentary stop,
 // the ball and player go back to before the shot (REPLAY_Restore), the mulligan flags (bC2E, bC2F)
 // are set, the mode is told (pfn254), a playing replay stops, the camera and the golfer's animation
@@ -601,7 +601,7 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_CONCEDED) {
         return 0;
     }
-    if (fn_800E53B8()) {
+    if (GUI_IsAwardUIAnimating()) {
         return 0;
     }
     if (Game_GetMulliganRule() == 2) {
@@ -809,13 +809,13 @@ void GM_FlyByMode_Init(void) {
 }
 
 // Every frame of a round (game type 6): the mode's pfn220; then queued UI messages are shown when
-// one is waiting or the pause menu is open with flag fn_800E5110 set, else, when the mode says so
+// one is waiting or the pause menu is open with flag GUI_IsEndGameUiShowing set, else, when the mode says so
 // (b27E) and no scorecard is up, the next golfer is set up once everyone waits
 // (GM_SetupGolfer_IfAllWaiting). The frame count is kept in n12C.
 void GM_Update(void) {
     if (gSession.nGameType == 6) {
         gpGame->pfn220();
-        if ((fn_800E5110() && GUI_IsPauseMenuOpen()) || GUI_GetUIMessageQued()) {
+        if ((GUI_IsEndGameUiShowing() && GUI_IsPauseMenuOpen()) || GUI_GetUIMessageQued()) {
             GUI_CheckMessageQue();
         } else if (gpGame->b27E && !GUI_ScoreCardUp()) {
             GM_SetupGolfer_IfAllWaiting();
@@ -1048,7 +1048,7 @@ void GM_CheckForShotChanges(int nPlayer) {
 // fading starts a fade to half black. While one holds, a human (fn_8002E8B4) on one screen may take
 // a mulligan (button 25; not in a saved replay or with uFlags bit 3) or watch the replay (button
 // 24, when one was recorded, the mode allows it, the hole was not conceded and the UI flag
-// fn_800E53B8 reads is clear), and button 0 moves the display on (in split screen too); for a CPU,
+// GUI_IsAwardUIAnimating reads is clear), and button 0 moves the display on (in split screen too); for a CPU,
 // button 0 on any pad does.
 void GM_DoPostShotInHoleUI(int nPlayer) {
     View* pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
@@ -1086,7 +1086,8 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
         }
         if (gReplayData.bF10
             && (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x18, 0)) &&
-            gpGame->b287 && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED && !fn_800E53B8() &&
+            gpGame->b287 && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED
+                    && !GUI_IsAwardUIAnimating() &&
             !(gPlayers[nPlayer].pChar->uCharFlags & 0x40)) {
             fn_80062D0C(nPlayer);
             REPLAY_Play(nPlayer);
@@ -1261,12 +1262,12 @@ void GM_SimulateBallMovement(int nPlayer) {
 
 // Every frame of a round (gomainloop): when the mode's pfn234 allows it (by default always; speed
 // golf only late in the countdown or while player 0's view is not fading) and player 0's view is
-// not fading, calls fn_800E5228, an empty function beside the pause requests of GameMessages.c: the
-// controller-pulled check is stubbed out in this build.
+// not fading, calls GUI_DetectControllerPull, an empty function beside the pause requests of
+// GameMessages.c: the controller-pulled check is stubbed out in this build.
 void GM_CheckControllerPulled(void) {
     if (gpGame->pfn234()) {
         if (!fn_80063C90(ViewController_GetCameraControl(gPlayers[0].nView[0]))) {
-            fn_800E5228();
+            GUI_DetectControllerPull();
         }
     }
 }

@@ -84,7 +84,8 @@ void fn_80067CD4(int nPlayer) {
         PlaceBall_RenderBallTarget(nPlayer);
         return;
     }
-    if ((s8)nState != GS_WAIT && !Player_IsCPU(nPlayer) && !GUI_IsPauseMenuOpen() && !fn_800E5098()
+    if ((s8)nState != GS_WAIT && !Player_IsCPU(nPlayer) && !GUI_IsPauseMenuOpen()
+        && !GUI_IsCaddieTipWindowOpen()
         && ((u8)(nState - GS_SHOT_SETUP) <= GS_ELEVATOR - GS_SHOT_SETUP || (s8)nState == GS_KNEE_CAM
             || (s8)nState == GS_SWING || (s8)nState == GS_GREEN_MORPH)
         && gPlayers[nPlayer].swing.nState == 0) {
@@ -93,8 +94,8 @@ void fn_80067CD4(int nPlayer) {
 }
 
 void fn_80012C84_SetFlags(int a);
-void fn_800E5118(int a, int b, int nPlayer);                       // GameMessages.c
-void fn_800E5178(int nPlayer, f32 a, f32 b, f32 c, f32 d);          // GameMessages.c
+void GUI_MoveTargetInfo(int a, int b, int nPlayer);                       // GameMessages.c
+void GUI_UpdateTargetInfo(int nPlayer, f32 a, f32 b, f32 c, f32 d);          // GameMessages.c
 
 // The aim marker at the target, each frame while a human lines up a shot: a sign turned to face
 // the camera, bigger the further the camera is, and its shadow; with f8 set it is drawn three
@@ -230,7 +231,7 @@ void TARGET_RenderBallTarget(int nPlayer) {
         fTilt = 3.0f * fRise;
         fStep = 36.0f * fRise;
     }
-    fn_800E5178(nPlayer, fDist, fTilt, fStep, fShare);
+    GUI_UpdateTargetInfo(nPlayer, fDist, fTilt, fStep, fShare);
 
     DS_vSetAlphaTestMode(0, 6, 0x7F);
     DS_vSetZBufferMode(3);
@@ -341,7 +342,7 @@ void TARGET_RenderBallTarget(int nPlayer) {
         fn_80062C80(gPlayers[nPlayer].nC58, bOnScreen);
         lbl_801D5BF0[nPlayer].b28 = bOnScreen;
     }
-    fn_800E5118(nX, nY, nPlayer);
+    GUI_MoveTargetInfo(nX, nY, nPlayer);
 }
 
 // The marker's settings for the coming shot: one set for putts and shot kind 2, another for

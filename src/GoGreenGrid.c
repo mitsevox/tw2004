@@ -438,7 +438,7 @@ void fn_8009C914(int nView) {
     if (GUI_IsPauseMenuOpen()) {
         return;
     }
-    if (fn_800E5098()) {
+    if (GUI_IsCaddieTipWindowOpen()) {
         return;
     }
     // fake match: the state ranges written as EA's compiled range checks.

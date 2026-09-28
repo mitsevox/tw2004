@@ -104,7 +104,7 @@ u8  gLessonBoostUsed;               // this try used a power boost (event 45): l
 u8  gLessonSpinUsed;                // this try used spin (event 46): lesson 11
 
 void  Gaud_ExitCrowdReactionSound(void);
-void  fn_800E5200(int a);
+void  GUI_ShowLessonText(int a);
 u8    Gaud_GetCommentStatus(void);
 
 void Lessons_LoadHole(void);
@@ -331,7 +331,7 @@ void Lessons_NextLesson(void) {
     case 12:
         gLessonLineRow = 0xB0;
         Lessons_ShowSwingHint(0, 0);
-        fn_800E5200(-1);
+        GUI_ShowLessonText(-1);
         Lessons_SetHintPhase(0);
         Lessons_PlayLine(0, 1);
         break;
@@ -456,7 +456,7 @@ char* Lessons_GetAnimName(void) {
 // 7, and fn_80047B6C / fn_80047BC0 are called with no ball.
 void Lessons_StartTry(void) {
     Lessons_ShowSwingHint(0, 0);
-    fn_800E5200(-1);
+    GUI_ShowLessonText(-1);
     Lessons_SetHintPhase(0);
     Lessons_PlaceBall();
     gPlayers[0].nController = gLessonController;
@@ -536,7 +536,7 @@ void Lessons_RestartLesson(void) {
         GUI_ToggleUI(0, 0);
         Lessons_ShowSwingHint(0, 0);
         Lessons_SetHintPhase(0);
-        fn_800E5200(-1);
+        GUI_ShowLessonText(-1);
     }
 }
 
@@ -615,7 +615,7 @@ void Lessons_Update(void) {
     case 3:
         Lessons_ShowSwingHint(0, 0);
         Lessons_SetHintPhase(0);
-        fn_800E5200(-1);
+        GUI_ShowLessonText(-1);
         Lessons_PlayLine(0, 1);
         gLessonStep = 4;
         gLessonFailedTries = 0;
@@ -625,7 +625,7 @@ void Lessons_Update(void) {
             Lessons_PlaceBall();
             GOLFERSTATE_Switch(GS_PRE_SHOT, 0);
             Lessons_ShowSwingHint(0, 0);
-            fn_800E5200(-1);
+            GUI_ShowLessonText(-1);
             Lessons_SetHintPhase(0);
             Lessons_PlayLine(1, 1);
             gLessonStep = 5;
@@ -636,7 +636,7 @@ void Lessons_Update(void) {
             if (gPlayers[0].swing.nState == 1 || gPlayers[0].swing.nState == 2) {
                 Lessons_HighlightHudItem(2, 0);
                 Lessons_ShowSwingHint(1, gLessonBackswingHint);
-                fn_800E5200(gLessonPanel);
+                GUI_ShowLessonText(gLessonPanel);
                 Lessons_SetHintPhase(1);
                 if (gLessonNum == 10) {
                     Lessons_HighlightHudItem(0, 1);
@@ -647,23 +647,23 @@ void Lessons_Update(void) {
                 if (gLessonNum == 11 && gPlayers[0].swing.nState == 5) {
                     if (gLessonSwingCommitted) {
                         Lessons_ShowSwingHint(1, gLessonBackswingHint);
-                        fn_800E5200(gLessonPanel);
+                        GUI_ShowLessonText(gLessonPanel);
                         Lessons_SetHintPhase(3);
                         Lessons_HighlightHudItem(2, 1);
                     } else {
                         Lessons_ShowSwingHint(0, 0);
-                        fn_800E5200(-1);
+                        GUI_ShowLessonText(-1);
                         Lessons_SetHintPhase(0);
                     }
                 } else {
                     Lessons_ShowSwingHint(1, gLessonDownswingHint);
-                    fn_800E5200(gLessonPanel);
+                    GUI_ShowLessonText(gLessonPanel);
                     Lessons_SetHintPhase(2);
                     Lessons_HighlightHudItem(2, 0);
                 }
             } else {
                 Lessons_ShowSwingHint(1, 0);
-                fn_800E5200(gLessonPanel);
+                GUI_ShowLessonText(gLessonPanel);
                 Lessons_HighlightHudItem(0, 0);
             }
         }
@@ -682,14 +682,14 @@ void Lessons_Update(void) {
                 }
                 if (gLessonShowBackswingHint) {
                     Lessons_ShowSwingHint(1, gLessonBackswingHint);
-                    fn_800E5200(gLessonPanel);
+                    GUI_ShowLessonText(gLessonPanel);
                     Lessons_SetHintPhase(1);
                     if (gLessonNum == 10) {
                         Lessons_HighlightHudItem(0, 1);
                     }
                 } else {
                     Lessons_ShowSwingHint(1, gLessonDownswingHint);
-                    fn_800E5200(gLessonPanel);
+                    GUI_ShowLessonText(gLessonPanel);
                     Lessons_SetHintPhase(2);
                     if (gLessonNum == 10) {
                         Lessons_HighlightHudItem(0, 0);
@@ -715,7 +715,7 @@ void Lessons_Update(void) {
                 gLessonHighlight = 4;
                 gLessonHintSwapTimer = 59;
                 Lessons_ShowSwingHint(1, gLessonBackswingHint);
-                fn_800E5200(gLessonPanel);
+                GUI_ShowLessonText(gLessonPanel);
                 Lessons_SetHintPhase(1);
                 gLessonTryHintsSet = 1;
                 gLessonShowBackswingHint = 1;
@@ -751,7 +751,7 @@ void Lessons_Update(void) {
                  ((gLessonNum == 5 && gPlayers[0].pChar->fBackswing > 0.45f) ||
                   (gLessonNum != 5 && gPlayers[0].pChar->fBackswing > 0.75f)))) {
                 Lessons_ShowSwingHint(1, gLessonDownswingHint);
-                fn_800E5200(gLessonPanel);
+                GUI_ShowLessonText(gLessonPanel);
                 Lessons_SetHintPhase(2);
                 gLessonSwingCommitted = 1;
                 if (gLessonNum == 10) {
@@ -765,21 +765,21 @@ void Lessons_Update(void) {
                     Lessons_HighlightHudItem(2, 1);
                     if (!gLessonSwingCommitted) {
                         Lessons_ShowSwingHint(0, 0);
-                        fn_800E5200(-1);
+                        GUI_ShowLessonText(-1);
                         Lessons_SetHintPhase(0);
                     } else {
                         Lessons_ShowSwingHint(1, gLessonBackswingHint);
-                        fn_800E5200(gLessonPanel);
+                        GUI_ShowLessonText(gLessonPanel);
                         Lessons_SetHintPhase(3);
                     }
                 } else {
                     Lessons_ShowSwingHint(0, 0);
-                    fn_800E5200(-1);
+                    GUI_ShowLessonText(-1);
                     Lessons_SetHintPhase(0);
                 }
             } else {
                 Lessons_ShowSwingHint(1, gLessonBackswingHint);
-                fn_800E5200(gLessonPanel);
+                GUI_ShowLessonText(gLessonPanel);
                 Lessons_SetHintPhase(1);
                 if (gLessonNum == 10) {
                     Lessons_HighlightHudItem(0, 1);

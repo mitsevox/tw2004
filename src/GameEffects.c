@@ -745,7 +745,7 @@ u8 GameEffects_SkipOtherCommentary(void) {
 // (GM_IsShotOverLimit), on the green of a par 5 in two when the GameBreaker was started for that
 // (reason 14, uFlags bit 0x4000), a trophy-ball award (Earnings_CheckShotAwards) or a record
 // (HighScoreRecords_GetEndOfShotRecord); after the shot, with neither of those two, also a big
-// message waiting to be shown (fn_800E5344).
+// message waiting to be shown (GUI_AreTrophysOrRecordsQueued).
 u8 GameEffects_ScriptedGBDidIt(Ball* pBall, int nPlayer, u8 bNext) {
     u8  bPar5In2;
     int nTrophyBall;
@@ -766,7 +766,7 @@ u8 GameEffects_ScriptedGBDidIt(Ball* pBall, int nPlayer, u8 bNext) {
     nRecordBall = HighScoreRecords_GetEndOfShotRecord(nPlayer, pBall, 0, bNext, 1);
     if (!bNext) {
         if (nRecordBall == 0 && nTrophyBall == 0) {
-            nRecordBall = fn_800E5344();
+            nRecordBall = GUI_AreTrophysOrRecordsQueued();
         }
         nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     } else {

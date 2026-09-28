@@ -258,7 +258,7 @@ void GM_InitModule_PreDataStream(void);
 void GM_InitModule_PostDataStream(void);
 void GM_DeInitModule(void);
 void GM_SetupDefaultProfile(void);
-void fn_800E5314(void);
+void GUI_ClearControllersPulled(void);
 s32  fn_800FD6A4(int nPlayer);
 void fn_801020BC(void);
 void FE_CrAP_InitModule(void);
@@ -676,7 +676,7 @@ void GO_vInitIG(void) {
         gSession.nC = 0;
     }
     GM_SetupDefaultProfile();
-    fn_800E5314();
+    GUI_ClearControllersPulled();
     Luck_InitIG();
     fn_8011407C();
     fn_80065B44();

@@ -484,8 +484,9 @@ void STATEFUNC_ShotSetupExit(int nPlayer) {
 
 // State 10 begins: the swing. The address animation (5) with the club and shot kind set on the
 // character; the swing reset unless the shot setup did it (unk630); camera 12; first-time tips for
-// a human (fn_800E505C 0/1/2 or CTIP_ShowCaddieTip, with gpGame+0x281); the caddie starts; on the tee the
-// tee goes in and every player's ball markers are set; the shot flags are cleared; event 7.
+// a human (GUI_ShowHoleContestIntro 0/1/2 or CTIP_ShowCaddieTip, with gpGame+0x281); the caddie
+// starts; on the tee the tee goes in and every player's ball markers are set; the shot flags are
+// cleared; event 7.
 void STATEFUNC_SwingInit(int nPlayer) {
     View* pV    = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
     int   nView;
@@ -519,15 +520,15 @@ void STATEFUNC_SwingInit(int nPlayer) {
     gPlayers[nPlayer].fC20 = 0.0f;
     if (gPlayers[nPlayer].bC2E == 0 && gpGame->b281 != 0 && !Player_IsCPU(nPlayer)) {
         if (fn_800DA264() && fn_800DA174()) {
-            fn_800E505C(0);
+            GUI_ShowHoleContestIntro(0);
             GUI_ToggleUI(nPlayer, 0);
             fn_80062C80(gPlayers[nPlayer].nC58, 0);
         } else if (fn_800DA264() && fn_800DA1D4()) {
-            fn_800E505C(1);
+            GUI_ShowHoleContestIntro(1);
             GUI_ToggleUI(nPlayer, 0);
             fn_80062C80(gPlayers[nPlayer].nC58, 0);
         } else if (fn_800DA264() && fn_800DA234()) {
-            fn_800E505C(2);
+            GUI_ShowHoleContestIntro(2);
             GUI_ToggleUI(nPlayer, 0);
             fn_80062C80(gPlayers[nPlayer].nC58, 0);
         } else {
@@ -537,9 +538,9 @@ void STATEFUNC_SwingInit(int nPlayer) {
     if (gPlayers[nPlayer].bC2E == 0 && !Player_IsCPU(nPlayer) && PlayNow_IsChallengeRunning()
         && PlayNow_IsIntroPending()) {
         if (GM_Currently_RealtimeMode()) {
-            fn_800E502C(fn_800EAC7C());
+            GUI_ShowRealtimeEventIntro(fn_800EAC7C());
         } else {
-            fn_800E4FFC(fn_800EAC7C());
+            GUI_ShowChallengeIntro(fn_800EAC7C());
         }
         GUI_ToggleUI(nPlayer, 0);
         fn_80062C80(gPlayers[nPlayer].nC58, 0);
@@ -578,7 +579,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
     int   nClub = gPlayers[nPlayer].nClub;
     u8    bSwung;
 
-    if (fn_800E5098()) return;
+    if (GUI_IsCaddieTipWindowOpen()) return;
     bSwung = SW_vUpdateSwing(nPlayer);
     gPlayers[nPlayer].fC20 += gSession.fFrameTime;
     if (Controller_AnyPadHasButtons(gPlayers[nPlayer].nController) || gPlayers[nPlayer].swing.nState != 0) {
@@ -1279,7 +1280,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
     if (gReplayData.bF10 != 0 && gpGame->b287 != 0) {
         if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x18, 0)) &&
             !(gPlayers[nPlayer].uFlags & 8) &&
-            (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED && !fn_800E53B8() &&
+            (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED && !GUI_IsAwardUIAnimating() &&
             !(gPlayers[nPlayer].pChar->uCharFlags & 0x40)) {
             if (gPlayers[nPlayer].ballBefore.nState != 0) {
                 gPlayers[nPlayer].ballBefore.nState = 1;
@@ -1477,7 +1478,7 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
             if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x18, 0))
                 && gpGame->b287 != 0 &&
                 !(gPlayers[nPlayer].uFlags & 8) && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED &&
-                !fn_800E53B8() &&
+                !GUI_IsAwardUIAnimating() &&
                 !(gPlayers[nPlayer].pChar->uCharFlags & 0x40)) {
                 lbl_80281E10 = 1;
                 fn_80062D0C(nPlayer);

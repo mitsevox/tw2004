@@ -1406,7 +1406,7 @@ u8 GM_GetNeedToBuildPlayoffHoleList(void) {
 }
 
 // Sends UI message 31 (no values): from GUI_Init at the start of a hole, and when the last
-// pause-menu screen closes (fn_800E5240).
+// pause-menu screen closes (GUI_OnControllerPresent).
 void GUI_SendMessage31(void) {
     fn_800E58B4(31);
 }

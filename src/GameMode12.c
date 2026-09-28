@@ -112,7 +112,7 @@ void GameMode12_BallLanded(int nPlayer) {
             fn_8006A8D4(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]), &x, &y);
             if (nMult > gPlayers[nPlayer].nDBC) {
                 gPlayers[nPlayer].nDBC = nMult;
-                fn_800E53F0(0x35, nMult, 512.0f * x, 448.0f * y);
+                GameMsg_Send3Ints(0x35, nMult, 512.0f * x, 448.0f * y);
             }
             if (nPoints != 0) {
                 gPlayers[nPlayer].aCD4[gPlayers[nPlayer].nCD0] = gGameMode12Surface;
@@ -129,7 +129,7 @@ void GameMode12_BallLanded(int nPlayer) {
                 if (gPlayers[nPlayer].nD24 > 100) {
                     gPlayers[nPlayer].nD24 = 100;
                 }
-                fn_800E53F0(0x34, nMeter, 512.0f * x, 448.0f * y);
+                GameMsg_Send3Ints(0x34, nMeter, 512.0f * x, 448.0f * y);
             }
         }
     }
