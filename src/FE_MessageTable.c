@@ -2264,7 +2264,7 @@ void GM_vFEMessage77_Empty(MsgArg* pArgs, MsgArg* pResult) {
 // five save profiles, loaded or not, or by a cheat code in lbl_80281DF4) or is a created golfer
 // (FIRST_CREATED_GOLFER on), 0 when it is locked, -1 when its gGolferTable record's bAvailable is
 // -1 (not in the game); always 1 while GM_vSetAllGolfersPickable's flag (gpFEProfile->b11702) is
-// set. pArgs[0] is not read. It also sets fe_movies.c's lbl_80281374 to 0 (answer not 0) or 0.2
+// set. pArgs[0] is not read. It also sets fe_movies.c's gFELockedGolferShade to 0 (answer not 0) or 0.2
 // (locked); no code reads that value. For a created golfer (30..33) the unlock tests read past
 // aGolferUnlocked[30]; the answer is already 1 then.
 void GM_vIsGolferUnlocked(MsgArg* pArgs, MsgArg* pResult) {
@@ -2289,9 +2289,9 @@ void GM_vIsGolferUnlocked(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = -1;
     }
     if (pResult->i != 0) {
-        lbl_80281374 = 0.0f;
+        gFELockedGolferShade = 0.0f;
     } else {
-        lbl_80281374 = 0.2f;
+        gFELockedGolferShade = 0.2f;
     }
 }
 
@@ -3772,7 +3772,7 @@ void GM_vMCCheckCard(MsgArg* pArgs, MsgArg* pResult) {
 // Front-end message 202: whether golfer pArgs[1] can be picked without any profile's unlocks: -1
 // when the golfer is not available at all (gGolferTable's bAvailable is -1), else 1 when he is a
 // created golfer, one of the 16 golfers of gStartUnlockedGolfers or unlocked by a cheat code (lbl_80281DF4),
-// 0 when locked. lbl_80281374 is set to 0.2 for a locked golfer, else 0. Message 78 makes the same
+// 0 when locked. gFELockedGolferShade is set to 0.2 for a locked golfer, else 0. Message 78 makes the same
 // test with the save profiles' unlocks instead of the list (and answers 1 for any golfer while
 // gpFEProfile->b11702 is set).
 void GM_vIsGolferUnlockedByDefault(MsgArg* pArgs, MsgArg* pResult) {
@@ -3795,9 +3795,9 @@ void GM_vIsGolferUnlockedByDefault(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = -1;
     }
     if (pResult->i != 0) {
-        lbl_80281374 = 0.0f;
+        gFELockedGolferShade = 0.0f;
     } else {
-        lbl_80281374 = 0.2f;
+        gFELockedGolferShade = 0.2f;
     }
 }
 
@@ -5053,11 +5053,11 @@ void GM_vSetEATraxTrack(MsgArg* pArgs, MsgArg* pResult) {
 
 // Front-end message 311: whether EA Trax track pArgs[1] is on in music row pArgs[0]
 // (gSession.options.rows), and the track's two lines of text: the strings pArgs[2] and pArgs[3] are
-// pointed at its sz0 and its song name (Trax.c's lbl_801F846C).
+// pointed at its sz0 and its song name (Trax.c's gEATraxSongs).
 void GM_vGetEATraxTrack(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gSession.options.rows[pArgs[0].i][pArgs[1].i];
-    ((MsgString*)pArgs[2].p)->pStr = lbl_801F846C[pArgs[1].i].sz0;
-    ((MsgString*)pArgs[3].p)->pStr = lbl_801F846C[pArgs[1].i].szSong;
+    ((MsgString*)pArgs[2].p)->pStr = gEATraxSongs[pArgs[1].i].sz0;
+    ((MsgString*)pArgs[3].p)->pStr = gEATraxSongs[pArgs[1].i].szSong;
 }
 
 // Front-end message 315: picks player slot pArgs[0] as the one whose saved custom round the menus

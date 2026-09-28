@@ -10,8 +10,8 @@
 
 // The file's globals: the UI Studio's colour multiply and add (UISGetColorMultipler,
 // UISGetColorAdditive), read again at each draw.
-UISColorVectorT* lbl_80281F34;
-UISColorVectorT* lbl_80281F30;
+UISColorVectorT* gpUITextColourAdd;
+UISColorVectorT* gpUITextColourMul;
 
 // UFont.c's text state setters.
 void UFont_SetFont(s32 nFont);
@@ -62,8 +62,8 @@ void fn_800922A8(UIText* pText) {
     uFlags = 0;
     szText = ((MsgString*)((u8*)pText + pText->nText))->pStr;
     t = *UITransform_GetCurrent();
-    lbl_80281F30 = UISGetColorMultipler();
-    lbl_80281F34 = UISGetColorAdditive();
+    gpUITextColourMul = UISGetColorMultipler();
+    gpUITextColourAdd = UISGetColorAdditive();
     t.m[3][0] = 512.0f * (t.m[3][0] / 512.0f);
     t.m[3][1] = 448.0f * (t.m[3][1] / 448.0f);
     LLMath_CopyVec(t.m[0], m[0]);
@@ -122,11 +122,11 @@ void fn_800922A8(UIText* pText) {
         fX += (vEndOut.x - fX) / 2.0f;
     }
     if (pText->nFlags & 0x10) {
-        aColor[0] = (u8)(lbl_80281F30->r * (pText->aShadowColor[0] + lbl_80281F34->r)) / 255.0f;
-        aColor[1] = (u8)(lbl_80281F30->g * (pText->aShadowColor[1] + lbl_80281F34->g)) / 255.0f;
-        aColor[2] = (u8)(lbl_80281F30->b * (pText->aShadowColor[2] + lbl_80281F34->b)) / 255.0f;
+        aColor[0] = (u8)(gpUITextColourMul->r * (pText->aShadowColor[0] + gpUITextColourAdd->r)) / 255.0f;
+        aColor[1] = (u8)(gpUITextColourMul->g * (pText->aShadowColor[1] + gpUITextColourAdd->g)) / 255.0f;
+        aColor[2] = (u8)(gpUITextColourMul->b * (pText->aShadowColor[2] + gpUITextColourAdd->b)) / 255.0f;
         aColor[3] = t.f5C +
-                    (u8)(lbl_80281F30->a * (pText->aShadowColor[3] + lbl_80281F34->a)) / 255.0f;
+                    (u8)(gpUITextColourMul->a * (pText->aShadowColor[3] + gpUITextColourAdd->a)) / 255.0f;
         if (aColor[3] < 0.0f) {
             aColor[3] = 0.0f;
         }
@@ -151,10 +151,10 @@ void fn_800922A8(UIText* pText) {
         fB = pText->aColor[2];
         fA = pText->aColor[3];
     }
-    aColor[0] = (u8)(lbl_80281F30->r * (fR + lbl_80281F34->r)) / 255.0f;
-    aColor[1] = (u8)(lbl_80281F30->g * (fG + lbl_80281F34->g)) / 255.0f;
-    aColor[2] = (u8)(lbl_80281F30->b * (fB + lbl_80281F34->b)) / 255.0f;
-    aColor[3] = (u8)(lbl_80281F30->a * (fA + lbl_80281F34->a)) / 512.0f + t.f5C;
+    aColor[0] = (u8)(gpUITextColourMul->r * (fR + gpUITextColourAdd->r)) / 255.0f;
+    aColor[1] = (u8)(gpUITextColourMul->g * (fG + gpUITextColourAdd->g)) / 255.0f;
+    aColor[2] = (u8)(gpUITextColourMul->b * (fB + gpUITextColourAdd->b)) / 255.0f;
+    aColor[3] = (u8)(gpUITextColourMul->a * (fA + gpUITextColourAdd->a)) / 512.0f + t.f5C;
     if (aColor[3] < 0.0f) {
         aColor[3] = 0.0f;
     }

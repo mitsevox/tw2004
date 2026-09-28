@@ -4,5 +4,5 @@
 
 void fn_80005580(void);
 void fn_80005580(void) {
-    *lbl_80281510 = 0;
+    *gpInterruptsOffDepth = 0;
 }

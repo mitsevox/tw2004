@@ -19,10 +19,10 @@ f32  fn_80092210(void);
 f32* UITransform_GetViewParams(void);                 // uiTransform.c
 void fn_800760D8(LLPict* pPict);        // LLVideo.c
 
-// The tint of the last draw (as fe_movies.c's lbl_80281F28/lbl_80281F2C); nothing here reads it.
+// The tint of the last draw (as fe_movies.c's gpUIPolyColourMul/gpUIPolyColourAdd); nothing here reads it.
 // .sbss: defined in reverse address order (CodeWarrior lays it out last-defined-first).
-f32* lbl_8028245C;
-f32* lbl_80282458;
+f32* gpUIArcColourAdd;
+f32* gpUIArcColourMul;
 
 // fake match: these two stand in for code the original linker stripped. The file's pool starts
 // with the u32 conversion's constant and then 1/511, before fn_80102AC8 uses 0.0f first; their
@@ -102,8 +102,8 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     pMtx = UITransform_GetCurrent();
     pColour = UITransform_GetCurrent();
     pAdd = UITransform_GetCurrent();
-    lbl_80282458 = &UISGetColorMultipler()->r;
-    lbl_8028245C = &UISGetColorAdditive()->r;
+    gpUIArcColourMul = &UISGetColorMultipler()->r;
+    gpUIArcColourAdd = &UISGetColorAdditive()->r;
     if (pArc->n2 != -1) {
         pEntry = gpFrontEnd->pFile->p8->apTables[pArc->n2]->apEntries[pArc->n0];
         pName = pEntry->szC;    // fake match: EA takes the name's address before the flag tests

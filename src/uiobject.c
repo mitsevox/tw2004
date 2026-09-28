@@ -12,20 +12,20 @@
 #include "golfer.h"
 
 #pragma explicit_zero_data on
-f32        lbl_8018EC10[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+f32        gUIObjLookAtTarget[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 #pragma explicit_zero_data reset
 
-UIObjSettings lbl_801F5B98[2];
-f32        lbl_801F5B78[8];
-LightGroup lbl_801F5B40;
+UIObjSettings gUIObjSettings[2];
+f32        gUIObjBoostRingSize[8];
+LightGroup gUIObjLights;
 
-UObject*   lbl_802820D0;
-CamLens*   lbl_802820CC;
-TexEntry*  lbl_802820C8;
-TexEntry*  lbl_802820C4;
-TexEntry*  lbl_802820C0;
-TexBank*   lbl_802820BC;
-f32        lbl_802820B8;
+UObject*   gpUIObjModel;
+CamLens*   gpUIObjLens;
+TexEntry*  gpUIObjBaseTexture;
+TexEntry*  gpUIObjBoostTexture;
+TexEntry*  gpUIObjRingTexture;
+TexBank*   gpUIObjTexBank;
+f32        gUIObjLightRed;
 
 void fn_80013E38(u8* p, s32 v);  // GoRenderCtx_Gc.c
 void UI_Obj_InitModule(void);
@@ -49,9 +49,9 @@ void fn_8006EADC(UObject* pObj);        // GoLighting.c: light the object
 void fn_8006ED70(void);                 // GoLighting.c
 void fn_80035294(void);                 // GoTerrain.c
 
-f32 lbl_80281470 = 0.05f;
-f32 lbl_80281474 = 0.476f;
-f32 lbl_80281478 = 0.19f;
+f32 gUIObjLightGreen = 0.05f;
+f32 gUIObjLightBlue = 0.476f;
+f32 gUIObjAlpha = 0.19f;
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x80284018), before the 1.35f UI_Obj_InitModule uses first; its body is unknown.
@@ -64,65 +64,65 @@ void UI_Obj_InitModule(void) {
     u64 uName;
     int i;
 
-    lbl_802820D0 = NULL;
-    lbl_801F5B98[0].a28[0] = 1.35f;
-    lbl_801F5B98[0].a28[1] = 0.74f;
-    lbl_801F5B98[0].a28[2] = 0.03f;
-    lbl_801F5B98[0].a28[3] = 0.0f;
+    gpUIObjModel = NULL;
+    gUIObjSettings[0].a28[0] = 1.35f;
+    gUIObjSettings[0].a28[1] = 0.74f;
+    gUIObjSettings[0].a28[2] = 0.03f;
+    gUIObjSettings[0].a28[3] = 0.0f;
     fn_800AE380();
-    lbl_802820CC = CA_spCreateCamera();
-    CA_vInitCamera(lbl_802820CC);
+    gpUIObjLens = CA_spCreateCamera();
+    CA_vInitCamera(gpUIObjLens);
     for (i = 0; i < 2; i++) {
-        lbl_801F5B98[i].a0[0] = -0.345f;
-        lbl_801F5B98[i].a0[1] = -0.23f;
-        lbl_801F5B98[i].a0[2] = -3.13f;
-        lbl_801F5B98[i].a0[3] = 0.0f;
-        lbl_801F5B98[i].a0[4] = 0.0f;
-        lbl_801F5B98[i].a0[5] = 0.0f;
-        lbl_801F5B98[i].a0[6] = 0.00168f;
-        lbl_801F5B98[i].a0[7] = 0.02f;
-        lbl_801F5B98[i].a0[8] = 0.02f;
-        lbl_801F5B98[i].a0[9] = 0.0f;
+        gUIObjSettings[i].a0[0] = -0.345f;
+        gUIObjSettings[i].a0[1] = -0.23f;
+        gUIObjSettings[i].a0[2] = -3.13f;
+        gUIObjSettings[i].a0[3] = 0.0f;
+        gUIObjSettings[i].a0[4] = 0.0f;
+        gUIObjSettings[i].a0[5] = 0.0f;
+        gUIObjSettings[i].a0[6] = 0.00168f;
+        gUIObjSettings[i].a0[7] = 0.02f;
+        gUIObjSettings[i].a0[8] = 0.02f;
+        gUIObjSettings[i].a0[9] = 0.0f;
     }
     uName = fn_8000BEE4("toball");
-    fn_800102DC(uName, &lbl_802820BC, &lbl_802820C8);
+    fn_800102DC(uName, &gpUIObjTexBank, &gpUIObjBaseTexture);
     uName = fn_8000BEE4("toball");
-    fn_800102DC(uName, &lbl_802820BC, &lbl_802820C4);
+    fn_800102DC(uName, &gpUIObjTexBank, &gpUIObjBoostTexture);
     uName = fn_8000BEE4("ring");
-    fn_800102DC(uName, &lbl_802820BC, &lbl_802820C0);
-    fn_8006E5A8(&lbl_801F5B40, 1);
-    lbl_801F5B40.apLight[0]->nType = 1;
-    lbl_801F5B40.apLight[0]->u.dir.f10 = 1.0f;
-    lbl_801F5B40.apLight[0]->u.dir.fC = 1.0f;
+    fn_800102DC(uName, &gpUIObjTexBank, &gpUIObjRingTexture);
+    fn_8006E5A8(&gUIObjLights, 1);
+    gUIObjLights.apLight[0]->nType = 1;
+    gUIObjLights.apLight[0]->u.dir.f10 = 1.0f;
+    gUIObjLights.apLight[0]->u.dir.fC = 1.0f;
 }
 
 // Free the object, the camera and the lights.
 void fn_800AE338(void) {
-    if (lbl_802820D0 != NULL) {
-        fn_80048860(lbl_802820D0);
+    if (gpUIObjModel != NULL) {
+        fn_80048860(gpUIObjModel);
     }
-    lbl_802820D0 = NULL;
-    CA_vReleaseCamera(lbl_802820CC);
-    fn_8006E62C(&lbl_801F5B40);
+    gpUIObjModel = NULL;
+    CA_vReleaseCamera(gpUIObjLens);
+    fn_8006E62C(&gUIObjLights);
 }
 
 // Make the object from its 'TEO ' model (id 10003), unless it is made already.
 // port: a 'TEO ' object's UStreamObject.uUnk4 holds its model (see rcmp_mad_codec.c FE_CrAPBall_MakeObjects).
 void fn_800AE380(void) {
-    if (lbl_802820D0 == NULL) {
-        lbl_802820D0 = fn_80048808((UObjModel*)fn_8000B70C('TEO ', 10003)->uUnk4);
+    if (gpUIObjModel == NULL) {
+        gpUIObjModel = fn_80048808((UObjModel*)fn_8000B70C('TEO ', 10003)->uUnk4);
     }
 }
 
 void fn_800AE3C4(int nPlayer) {    // nPlayer: unused (every caller, in Swing.c, passes one)
-    lbl_801F5B78[0] = lbl_801F5B98[0].a28[3];
-    lbl_801F5B78[1] = lbl_801F5B98[0].a28[3];
-    lbl_801F5B78[2] = lbl_801F5B98[0].a28[3];
-    lbl_801F5B78[3] = lbl_801F5B98[0].a28[3];
-    lbl_801F5B78[4] = lbl_801F5B98[0].a28[3];
-    lbl_801F5B78[5] = lbl_801F5B98[0].a28[3];
-    lbl_801F5B78[6] = lbl_801F5B98[0].a28[3];
-    lbl_801F5B78[7] = lbl_801F5B98[0].a28[3];
+    gUIObjBoostRingSize[0] = gUIObjSettings[0].a28[3];
+    gUIObjBoostRingSize[1] = gUIObjSettings[0].a28[3];
+    gUIObjBoostRingSize[2] = gUIObjSettings[0].a28[3];
+    gUIObjBoostRingSize[3] = gUIObjSettings[0].a28[3];
+    gUIObjBoostRingSize[4] = gUIObjSettings[0].a28[3];
+    gUIObjBoostRingSize[5] = gUIObjSettings[0].a28[3];
+    gUIObjBoostRingSize[6] = gUIObjSettings[0].a28[3];
+    gUIObjBoostRingSize[7] = gUIObjSettings[0].a28[3];
 }
 
 // Draw object nObj's screen: the power boost quads (the base, one grown by the boost level, and a
@@ -180,10 +180,10 @@ void UI_Obj_RenderBoostUI(int nObj) {
     } else {
         fY = (0.23f - 0.17f) * (GameEffects_GetLetterboxHeight() / 0.15f) + -0.23f;
     }
-    lbl_801F5B98[nObj].a0[1] = fY;
-    vPos[0] = lbl_801F5B98[nObj].a0[0];
-    vPos[1] = lbl_801F5B98[nObj].a0[1];
-    vPos[2] = lbl_801F5B98[nObj].a0[2];
+    gUIObjSettings[nObj].a0[1] = fY;
+    vPos[0] = gUIObjSettings[nObj].a0[0];
+    vPos[1] = gUIObjSettings[nObj].a0[1];
+    vPos[2] = gUIObjSettings[nObj].a0[2];
     vPos[3] = 1.0f;
     aRect[0][0] = 0.5f;
     aRect[0][1] = 0.5f;
@@ -212,10 +212,10 @@ void UI_Obj_RenderBoostUI(int nObj) {
 
     // the object's own lens
     pLens = Camera_GetCurrentLens();
-    CA_vInitCamera(lbl_802820CC);
-    CA_vSetLookAt(lbl_802820CC, aEye, lbl_8018EC10);
-    fn_80045470(lbl_802820CC, 0.00879646f);
-    fn_800AF0A8(lbl_802820CC);
+    CA_vInitCamera(gpUIObjLens);
+    CA_vSetLookAt(gpUIObjLens, aEye, gUIObjLookAtTarget);
+    fn_80045470(gpUIObjLens, 0.00879646f);
+    fn_800AF0A8(gpUIObjLens);
     RC_UpdateCurrentScreenMatrices();
     RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
     RenderState_SetViewport(RC_spGetCurrentRenderCtx());
@@ -229,12 +229,12 @@ void UI_Obj_RenderBoostUI(int nObj) {
     DS_vSetAlphaTestMode(1, 4, 1);
 
     // the base quad
-    RenderState_SetBankTexture(lbl_802820BC, lbl_802820C8);
+    RenderState_SetBankTexture(gpUIObjTexBank, gpUIObjBaseTexture);
     RenderState_Flush();
     for (i = 0; i < 4; i++) {
-        aXYZ[i][0] = aQuad[i][0] + lbl_801F5B98[nObj].a0[0];
-        aXYZ[i][1] = aQuad[i][1] + lbl_801F5B98[nObj].a0[1];
-        aXYZ[i][2] = aQuad[i][2] + lbl_801F5B98[nObj].a0[2];
+        aXYZ[i][0] = aQuad[i][0] + gUIObjSettings[nObj].a0[0];
+        aXYZ[i][1] = aQuad[i][1] + gUIObjSettings[nObj].a0[1];
+        aXYZ[i][2] = aQuad[i][2] + gUIObjSettings[nObj].a0[2];
         aXYZ[i][3] = 1.0f;
     }
     RenderView_SetColor(aBase);
@@ -242,12 +242,12 @@ void UI_Obj_RenderBoostUI(int nObj) {
 
     // the same, grown by the boost level, in the level's colour
     for (i = 0; i < 4; i++) {
-        aXYZ[i][0] = fBoost * aQuad[i][0] + lbl_801F5B98[nObj].a0[0];
-        aXYZ[i][1] = fBoost * aQuad[i][1] + lbl_801F5B98[nObj].a0[1];
-        aXYZ[i][2] = fBoost * aQuad[i][2] + lbl_801F5B98[nObj].a0[2];
+        aXYZ[i][0] = fBoost * aQuad[i][0] + gUIObjSettings[nObj].a0[0];
+        aXYZ[i][1] = fBoost * aQuad[i][1] + gUIObjSettings[nObj].a0[1];
+        aXYZ[i][2] = fBoost * aQuad[i][2] + gUIObjSettings[nObj].a0[2];
         aXYZ[i][3] = 1.0f;
     }
-    RenderState_SetBankTexture(lbl_802820BC, lbl_802820C4);
+    RenderState_SetBankTexture(gpUIObjTexBank, gpUIObjBoostTexture);
     DS_vSetAlphaTestMode(0, 6, 0x80);
     if (gPlayers[nPlayer].swing.nPowerBoost > 0) {
         Vec3Copy(gBoostLevelColours[gPlayers[nPlayer].swing.nPowerBoost - 1], aColour);
@@ -257,19 +257,19 @@ void UI_Obj_RenderBoostUI(int nObj) {
     RenderView_DrawPrimitive(0x98, aXYZ[0], NULL, aUV[0], 4);
 
     // a ring per level: each grows until it passes the largest size, fading out on the way
-    RenderState_SetBankTexture(lbl_802820BC, lbl_802820C0);
+    RenderState_SetBankTexture(gpUIObjTexBank, gpUIObjRingTexture);
     RenderState_Flush();
-    fMax = lbl_801F5B98[0].a28[0];
-    fFade = lbl_801F5B98[0].a28[1];
+    fMax = gUIObjSettings[0].a28[0];
+    fFade = gUIObjSettings[0].a28[1];
     for (i = 0; i < gPlayers[nPlayer].swing.nPowerBoost; i++) {
-        if (!(lbl_801F5B78[i] > fMax)) {
+        if (!(gUIObjBoostRingSize[i] > fMax)) {
             for (j = 0; j < 4; j++) {
-                aXYZ[j][0] = aQuad[j][0] * lbl_801F5B78[i] + lbl_801F5B98[nObj].a0[0];
-                aXYZ[j][1] = aQuad[j][1] * lbl_801F5B78[i] + lbl_801F5B98[nObj].a0[1];
-                aXYZ[j][2] = aQuad[j][2] * lbl_801F5B78[i] + lbl_801F5B98[nObj].a0[2];
+                aXYZ[j][0] = aQuad[j][0] * gUIObjBoostRingSize[i] + gUIObjSettings[nObj].a0[0];
+                aXYZ[j][1] = aQuad[j][1] * gUIObjBoostRingSize[i] + gUIObjSettings[nObj].a0[1];
+                aXYZ[j][2] = aQuad[j][2] * gUIObjBoostRingSize[i] + gUIObjSettings[nObj].a0[2];
                 aXYZ[j][3] = 1.0f;
             }
-            if (lbl_801F5B78[i] < fFade) {
+            if (gUIObjBoostRingSize[i] < fFade) {
                 aColour[0] = gBoostLevelColours[i][0];
                 aColour[1] = gBoostLevelColours[i][1];
                 aColour[2] = gBoostLevelColours[i][2];
@@ -278,11 +278,11 @@ void UI_Obj_RenderBoostUI(int nObj) {
                 aColour[0] = gBoostLevelColours[i][0];
                 aColour[1] = gBoostLevelColours[i][1];
                 aColour[2] = gBoostLevelColours[i][2];
-                aColour[3] = 1.0f - (lbl_801F5B78[i] - fFade) / (fMax - fFade);
+                aColour[3] = 1.0f - (gUIObjBoostRingSize[i] - fFade) / (fMax - fFade);
             }
             RenderView_SetColor(aColour);
             RenderView_DrawPrimitive(0x98, aXYZ[0], NULL, aUV[0], 4);
-            lbl_801F5B78[i] += lbl_801F5B98[0].a28[2];
+            gUIObjBoostRingSize[i] += gUIObjSettings[0].a28[2];
         }
     }
 
@@ -297,30 +297,30 @@ void UI_Obj_RenderBoostUI(int nObj) {
             LLMath_Normalize3(aDir, aDir);
             fDot = (Vec3_Dot(aUp, aDir) < -1.0f) ? -1.0f
                  : ((Vec3_Dot(aUp, aDir) > 1.0f) ? 1.0f : Vec3_Dot(aUp, aDir));
-            lbl_801F5B98[nObj].a0[5] = Math_Acos(fDot);
+            gUIObjSettings[nObj].a0[5] = Math_Acos(fDot);
             if (fSpinY < 0.0f) {
-                lbl_801F5B98[nObj].a0[5] = -lbl_801F5B98[nObj].a0[5];
+                gUIObjSettings[nObj].a0[5] = -gUIObjSettings[nObj].a0[5];
             }
             LLMath_IdentifyMat(mRot);
             LLMath_IdentifyMat(mRoll);
             LLMath_IdentifyMat(mTilt);
             LLMath_IdentifyMat(mScale);
-            mScale[0][0] = lbl_801F5B98[nObj].a0[6];
-            mScale[1][1] = lbl_801F5B98[nObj].a0[6];
-            mScale[2][2] = lbl_801F5B98[nObj].a0[6];
-            fSinRoll = Math_Sin(lbl_801F5B98[nObj].a0[9]);
-            fCosRoll = Math_Cos(lbl_801F5B98[nObj].a0[9]);
-            fSinTilt = Math_Sin(lbl_801F5B98[nObj].a0[5]);
-            fCosTilt = Math_Cos(lbl_801F5B98[nObj].a0[5]);
+            mScale[0][0] = gUIObjSettings[nObj].a0[6];
+            mScale[1][1] = gUIObjSettings[nObj].a0[6];
+            mScale[2][2] = gUIObjSettings[nObj].a0[6];
+            fSinRoll = Math_Sin(gUIObjSettings[nObj].a0[9]);
+            fCosRoll = Math_Cos(gUIObjSettings[nObj].a0[9]);
+            fSinTilt = Math_Sin(gUIObjSettings[nObj].a0[5]);
+            fCosTilt = Math_Cos(gUIObjSettings[nObj].a0[5]);
             if (fSpinX < 0.0f && fSpinY < 0.0f) {
-                lbl_801F5B98[nObj].a0[9] += (fabsf(fSpinX) > fabsf(fSpinY)) ? fabsf(fSpinX) : fabsf(fSpinY);
+                gUIObjSettings[nObj].a0[9] += (fabsf(fSpinX) > fabsf(fSpinY)) ? fabsf(fSpinX) : fabsf(fSpinY);
             } else {
-                lbl_801F5B98[nObj].a0[9] += (fabsf(fSpinX) > fabsf(fSpinY)) ? fabsf(fSpinX) : fabsf(fSpinY);
+                gUIObjSettings[nObj].a0[9] += (fabsf(fSpinX) > fabsf(fSpinY)) ? fabsf(fSpinX) : fabsf(fSpinY);
             }
-            if (lbl_801F5B98[nObj].a0[9] > 2.0f * PI) {
-                lbl_801F5B98[nObj].a0[9] = 0.0f;
-            } else if (lbl_801F5B98[nObj].a0[9] < 0.0f) {
-                lbl_801F5B98[nObj].a0[9] = 2.0f * PI;
+            if (gUIObjSettings[nObj].a0[9] > 2.0f * PI) {
+                gUIObjSettings[nObj].a0[9] = 0.0f;
+            } else if (gUIObjSettings[nObj].a0[9] < 0.0f) {
+                gUIObjSettings[nObj].a0[9] = 2.0f * PI;
             }
             mRoll[1][1] = fCosRoll;
             mRoll[1][2] = fSinRoll;
@@ -333,19 +333,19 @@ void UI_Obj_RenderBoostUI(int nObj) {
             LLMath_mat44fltMultiplyList33(mTilt, mRoll, mRot, 3);
 
             // draw it with the rotation, scale and position, then put its matrices back
-            LLMath_CopyMat44(lbl_802820D0->m0, mSave0);
-            LLMath_CopyMat44(lbl_802820D0->m40, mSave40);
-            LLMath_CopyMat44(lbl_802820D0->m80, mSave80);
-            LLMath_mat44fltMultiplyList33(mRot, lbl_802820D0->m0, lbl_802820D0->m0, 3);
-            LLMath_mat44fltMultiplyList33(mScale, lbl_802820D0->m40, lbl_802820D0->m40, 3);
-            fn_8000C5A4(lbl_802820D0->m0);
-            LLMath_CopyVec(vPos, lbl_802820D0->m80[3]);
-            lbl_802820D0->m80[3][3] = 1.0f;
+            LLMath_CopyMat44(gpUIObjModel->m0, mSave0);
+            LLMath_CopyMat44(gpUIObjModel->m40, mSave40);
+            LLMath_CopyMat44(gpUIObjModel->m80, mSave80);
+            LLMath_mat44fltMultiplyList33(mRot, gpUIObjModel->m0, gpUIObjModel->m0, 3);
+            LLMath_mat44fltMultiplyList33(mScale, gpUIObjModel->m40, gpUIObjModel->m40, 3);
+            fn_8000C5A4(gpUIObjModel->m0);
+            LLMath_CopyVec(vPos, gpUIObjModel->m80[3]);
+            gpUIObjModel->m80[3][3] = 1.0f;
             fn_800AEFE4();
             // EA bug: m0's copy goes back into m40 and m40's into m0
-            LLMath_CopyMat44(mSave0, lbl_802820D0->m40);
-            LLMath_CopyMat44(mSave40, lbl_802820D0->m0);
-            LLMath_CopyMat44(mSave80, lbl_802820D0->m80);
+            LLMath_CopyMat44(mSave0, gpUIObjModel->m40);
+            LLMath_CopyMat44(mSave40, gpUIObjModel->m0);
+            LLMath_CopyMat44(mSave80, gpUIObjModel->m80);
         }
     }
 
@@ -364,22 +364,22 @@ void UI_Obj_RenderBoostUI(int nObj) {
 
 // Draw the object: its light's colour, the renderer state, the view, then the model.
 void fn_800AEFE4(void) {
-    lbl_801F5B40.apLight[0]->u.dir.vColor[0] = lbl_802820B8;
-    lbl_801F5B40.apLight[0]->u.dir.vColor[1] = lbl_80281470;
-    lbl_801F5B40.apLight[0]->u.dir.vColor[2] = lbl_80281474;
-    lbl_801F5B40.apLight[0]->u.dir.vColor[3] = 0.0f;
-    LI_LoadLightGroup(&lbl_801F5B40);
-    fn_8006EADC(lbl_802820D0);
+    gUIObjLights.apLight[0]->u.dir.vColor[0] = gUIObjLightRed;
+    gUIObjLights.apLight[0]->u.dir.vColor[1] = gUIObjLightGreen;
+    gUIObjLights.apLight[0]->u.dir.vColor[2] = gUIObjLightBlue;
+    gUIObjLights.apLight[0]->u.dir.vColor[3] = 0.0f;
+    LI_LoadLightGroup(&gUIObjLights);
+    fn_8006EADC(gpUIObjModel);
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetConstantAlphaOn(1);
-    RenderState_SetConstantAlpha(255.0f * lbl_80281478);
+    RenderState_SetConstantAlpha(255.0f * gUIObjAlpha);
     RenderState_Flush();
-    RC_vSetCurrentRenderCtxTransformationMatrix(lbl_802820D0->m80);
+    RC_vSetCurrentRenderCtxTransformationMatrix(gpUIObjModel->m80);
     fn_80035294();
     RenderState_SetCameraMatrices();
     RenderState_SetClipMode(1);
     RenderState_Flush();
-    fn_800AF0D4(lbl_802820D0->pModel->apLod[0]);
+    fn_800AF0D4(gpUIObjModel->pModel->apLod[0]);
     fn_8006ED70();
 }
 

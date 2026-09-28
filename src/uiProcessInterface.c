@@ -160,7 +160,7 @@ static f32 uiProcessInterface_StrippedFn(f32 x) {
 // (UISDrawObjects) with alpha blending, no depth writes and an alpha test, in the UI's 512 x 448
 // coordinates (fn_80016B6C) and with word-wrapped text at 0.85 line spacing
 // (UI_SetTextLineSpacing), then put the render state back. In the menus it first clears
-// lbl_80281370 (fn_80091454). Then it steps gUIDelayedHint: n0 counts 0 to 2, one a frame, and past
+// gbUIFirstMenuDraw (fn_80091454). Then it steps gUIDelayedHint: n0 counts 0 to 2, one a frame, and past
 // 2 goes back to -1 while n4 is sent to the UI as hint 0x23 (the menus) or 0x24 (a round).
 void UI_DrawInterface(s32 nTicks) {
     s32 aArgs[1];
@@ -171,7 +171,7 @@ void UI_DrawInterface(s32 nTicks) {
         DS_vEnableZBufferUpdate(0);
         DS_vSetAlphaTestMode(1, 6, 1);
         RenderState_Flush();
-        if (lbl_80281370 && gSession.nGameType == 3) {
+        if (gbUIFirstMenuDraw && gSession.nGameType == 3) {
             fn_80091454();
         }
         RenderView_SetColor(NULL);
@@ -538,7 +538,7 @@ FrontEnd* UI_OpenInterface(char* szSet) {
 
 // Shut the UI pFE down. First the movie entries' pictures are freed (fn_80090B10); leaving start-up
 // with no nC plays the start-up movies and legal screen (fn_80091EE8); leaving the menus sets b0
-// and clears b1 of every lbl_801D8890 entry whose lbl_801D8ED0 word is set, clears lbl_80281370
+// and clears b1 of every gUITxf2BankState entry whose gUITxf2BankMarkOnExit word is set, clears gbUIFirstMenuDraw
 // (set, then cleared by fn_80091454), and brings the picture list back from ARAM and frees it
 // (UI_RestoreMenuPictures, UI_FreeMenuPictures). Then the studio is shut down, the fonts, picture
 // list, texture banks and UI file are freed, and the studio and the front end with them; gpFrontEnd
@@ -551,12 +551,12 @@ void UI_CloseInterface(FrontEnd* pFE) {
         fn_80091EE8();
     } else if (gSession.nGameType == 3) {
         for (i = 0; i < FE_NUM_801D8890; i++) {
-            if (lbl_801D8ED0[i] != 0) {
-                lbl_801D8890[i].b0 = 1;
-                lbl_801D8890[i].b1 = 0;
+            if (gUITxf2BankMarkOnExit[i] != 0) {
+                gUITxf2BankState[i].b0 = 1;
+                gUITxf2BankState[i].b1 = 0;
             }
         }
-        lbl_80281370 = 1;
+        gbUIFirstMenuDraw = 1;
         fn_80091454();
         UI_RestoreMenuPictures();
         UI_FreeMenuPictures();

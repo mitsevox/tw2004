@@ -25,7 +25,7 @@ typedef struct TraxState {
 } TraxState;
 LAYOUT_ASSERT(TraxState, 0x14);
 
-extern TraxState lbl_801F8458;
-extern TraxTrack lbl_801F846C[TRAX_NUM_TRACKS];
+extern TraxState gEATraxDisplay;
+extern TraxTrack gEATraxSongs[TRAX_NUM_TRACKS];
 
 #endif

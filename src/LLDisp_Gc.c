@@ -362,18 +362,18 @@ u8 fn_80007320(void) {
 
 // Leaves one level of fn_80007368: interrupts come back on when the last level is left.
 void fn_80007328(void) {
-    *lbl_80281510 -= 1;
-    if (*lbl_80281510 == 0) {
+    *gpInterruptsOffDepth -= 1;
+    if (*gpInterruptsOffDepth == 0) {
         OSEnableInterrupts();
     }
 }
 
 // Turns interrupts off, counting the levels so that calls can nest.
 void fn_80007368(void) {
-    if (*lbl_80281510 == 0) {
+    if (*gpInterruptsOffDepth == 0) {
         OSDisableInterrupts();
     }
-    *lbl_80281510 += 1;
+    *gpInterruptsOffDepth += 1;
 }
 
 // Resets the FIFO high-water mark (fn_800124CC raises it).

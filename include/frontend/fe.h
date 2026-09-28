@@ -52,7 +52,7 @@ extern FEState gFEState;
 
 // GM_vIsGolferUnlocked and GM_vIsGolferUnlockedByDefault set it to 0.2 for a locked golfer, else 0
 // (also for one that is not available).
-extern f32 lbl_80281374;        // .sdata 0x80281374 = 0.25f: past FE_MessageTable's .sdata, in a
+extern f32 gFELockedGolferShade;        // .sdata 0x80281374 = 0.25f: past FE_MessageTable's .sdata, in a
                                 // later file's (not placed yet)
 
 // The front end's screen state (gUIState, 0x4C bytes). Only what the cleaned code reads.
@@ -82,7 +82,7 @@ LAYOUT_ASSERT(FEScreen, 0x4C);
 
 extern FEScreen gUIState;
 
-// lbl_801D8858 (0x38 bytes), also used by the code at 0x8009170C. Only what the cleaned code reads.
+// gUILoadingScreen (0x38 bytes), also used by the code at 0x8009170C. Only what the cleaned code reads.
 typedef struct FE801D8858 {
     s32 n0;                     // 0x00  } fn_800918A4 sets them up
     f32 f4;                     // 0x04  }
@@ -100,7 +100,7 @@ typedef struct FE801D8858 {
 } FE801D8858;
 LAYOUT_ASSERT(FE801D8858, 0x38);
 
-extern FE801D8858 lbl_801D8858;
+extern FE801D8858 gUILoadingScreen;
 
 // A corner of a quad fe_movies.c fn_800912F4 turns into draw arrays (uiArc.c builds them too). Our
 // name: f8..f10 go out as a position, f0/f4 as texture coordinates, au14 as a colour.
@@ -138,9 +138,9 @@ void FE_InitGolferTextures(void);  // FEgolferanim.c (FE_Manager.c, uiProcessInt
 void fn_800914DC(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs);
 
 // Four floats each, set by fe_movies.c fn_80090D28: fn_80090B80 tints a vertex colour to
-// lbl_80281F28 * (colour + lbl_80281F2C).
-extern f32* lbl_80281F28;
-extern f32* lbl_80281F2C;
+// gpUIPolyColourMul * (colour + gpUIPolyColourAdd).
+extern f32* gpUIPolyColourMul;
+extern f32* gpUIPolyColourAdd;
 
 // gUIDelayedHint (0xC bytes), also read by uiProcessInterface.c. A menu message sets n4 and clears n0.
 typedef struct FE801D880C {
@@ -152,7 +152,7 @@ LAYOUT_ASSERT(FE801D880C, 0xC);
 
 extern FE801D880C gUIDelayedHint;
 
-// One of 200 entries (lbl_801D8890); uiProcessInterface.c sets them from lbl_801D8ED0.
+// One of 200 entries (gUITxf2BankState); uiProcessInterface.c sets them from gUITxf2BankMarkOnExit.
 typedef struct FE801D8890 {
     u8  b0;                     // 0x0
     u8  b1;                     // 0x1
@@ -162,10 +162,10 @@ typedef struct FE801D8890 {
 LAYOUT_ASSERT(FE801D8890, 0x8);
 
 #define FE_NUM_801D8890 200
-extern FE801D8890 lbl_801D8890[FE_NUM_801D8890];
-// One word per lbl_801D8890 entry: nonzero sets that entry's b0 (and clears its b1) when the front
+extern FE801D8890 gUITxf2BankState[FE_NUM_801D8890];
+// One word per gUITxf2BankState entry: nonzero sets that entry's b0 (and clears its b1) when the front
 // end is shut down in game type 3 (uiProcessInterface.c UI_CloseInterface).
-extern u32 lbl_801D8ED0[FE_NUM_801D8890];
+extern u32 gUITxf2BankMarkOnExit[FE_NUM_801D8890];
 
 // The profile being worked on in the menus (gpFEProfile points to it; 0x11708 bytes, allocated
 // and cleared by FE_InitManager).
@@ -448,10 +448,10 @@ u8   FE_IsMovieSkipPressed(struct Video* pVideo, int nArg);
 // fe_movies.c: the texture bank loaded from LoadData.c's 'txf2' copy (fn_80091778), its slot and its
 // first texture.
 struct TexEntry* fn_800922A0(struct TexBank* pBank);   // a bank's first texture
-extern int lbl_80281378;                // the bank's slot
-extern struct TexBank*  lbl_80281F20;
-extern struct TexEntry* lbl_80281F24;
-extern f32 lbl_801D8818[8][2];          // eight x, y points fn_8009170C sets, fn_80091BDC reads
+extern int gUILoadingBarBankSlot;                // the bank's slot
+extern struct TexBank*  gpUILoadingBarBank;
+extern struct TexEntry* gpUILoadingBarTexture;
+extern f32 gUILoadingBarTilePos[8][2];          // eight x, y points fn_8009170C sets, fn_80091BDC reads
 void FE_CrAP_TurnOnPart(s16 nPart, int b, int i);    // FE_CrAPDB.c
 int  FE_CrAP_GetNumEquippedItemsWithSponsor(s16 n);  // FE_CrAPDB.c: the profile's assets whose n2C is n
 s32  FE_CrAP_CollectSponsorshipItems(void);          // FE_CrAPDB.c: fill lbl_80282470; how many records
@@ -575,7 +575,7 @@ extern u8 lbl_80212B60[64 * 64];        // a logo's pixels laid out as a texture
 
 // ---- the front end's movies (fe_movies.c) -------------------------------------------------------
 
-extern u8 lbl_80281370;         // fn_80091454 clears it; the front end's shutdown in game type 3
+extern u8 gbUIFirstMenuDraw;         // fn_80091454 clears it; the front end's shutdown in game type 3
                                 // sets it (uiProcessInterface.c UI_CloseInterface)
 void fn_80090B10(void);
 void fn_80091454(void);

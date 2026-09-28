@@ -99,7 +99,7 @@ static f32 FE_Manager_StrippedFn(f32 x) {
 // Sets the front end's state up once, at start-up (gomainloop fn_8006C720): no player slot loaded
 // or CPU, no backup rows (aBackup -1), no profile backups (p658), no movie queued, the menus' start
 // mode (nMode) -1; b0F, b10 and b18 set, b11 and n1C cleared. Then the points fe_movies.c draws at
-// (fn_8009170C) and lbl_801D8858's picture.
+// (fn_8009170C) and gUILoadingScreen's picture.
 void FE_vOpenONCE(void) {
     int i;
     for (i = 0; i < 5; i++) {
@@ -117,7 +117,7 @@ void FE_vOpenONCE(void) {
     gFEState.nMovieFree = 0;
     gFEState.p658 = NULL;
     fn_8009170C();
-    lbl_801D8858.p30 = NULL;
+    gUILoadingScreen.p30 = NULL;
 }
 
 // Frees the golfers' bios (gpFEBios, the copy FE_CharBios_LoadBIOfromStream made), if there are
@@ -325,7 +325,7 @@ void FE_vCloseModule(void) {
 }
 
 // Allocates the profile the menus work on (gpFEProfile), cleared: slot 0, the slot's own profile
-// (not the working copy), n1 -1; clears every lbl_801D8890 entry and lbl_801D8858 (b18, its
+// (not the working copy), n1 -1; clears every gUITxf2BankState entry and gUILoadingScreen (b18, its
 // picture); keeps the hashes of the logo textures "__LogoSquare" and "__LogoRect".
 void FE_InitManager(void) {
     int i;
@@ -336,12 +336,12 @@ void FE_InitManager(void) {
     gpFEProfile->nSlot = 0;
     gpFEProfile->n1 = -1;
     for (i = 0; i < FE_NUM_801D8890; i++) {
-        lbl_801D8890[i].b0 = 0;
-        lbl_801D8890[i].n4 = 0;
-        lbl_801D8890[i].b1 = 0;
+        gUITxf2BankState[i].b0 = 0;
+        gUITxf2BankState[i].n4 = 0;
+        gUITxf2BankState[i].b1 = 0;
     }
-    lbl_801D8858.b18 = 0;
-    lbl_801D8858.p30 = NULL;
+    gUILoadingScreen.b18 = 0;
+    gUILoadingScreen.p30 = NULL;
     gpFEProfile->uSquareHash = fn_8000BEE4("__LogoSquare");
     gpFEProfile->uRectHash = fn_8000BEE4("__LogoRect");
     gpFEProfile->b11702 = 0;

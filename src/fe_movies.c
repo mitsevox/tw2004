@@ -10,15 +10,15 @@
 #include "frontend/uisvec.h"
 #include "unsorted/cull.h"
 
-u32 lbl_801D8ED0[FE_NUM_801D8890];
-FE801D8890 lbl_801D8890[FE_NUM_801D8890];
-FE801D8858 lbl_801D8858;
-f32 lbl_801D8818[8][2];
+u32 gUITxf2BankMarkOnExit[FE_NUM_801D8890];
+FE801D8890 gUITxf2BankState[FE_NUM_801D8890];
+FE801D8858 gUILoadingScreen;
+f32 gUILoadingBarTilePos[8][2];
 
-f32* lbl_80281F2C;
-f32* lbl_80281F28;
-struct TexEntry* lbl_80281F24;
-struct TexBank*  lbl_80281F20;
+f32* gpUIPolyColourAdd;
+f32* gpUIPolyColourMul;
+struct TexEntry* gpUILoadingBarTexture;
+struct TexBank*  gpUILoadingBarBank;
 
 void fn_80008380(void);
 void fn_80092250(f32* pA, f32* pB, f32* pOut);
@@ -50,9 +50,9 @@ f32 fn_80092210(void);
 void fn_80013E30();
 void fn_80092274(s32 p0);
 
-u8 lbl_80281370 = 1;
-f32 lbl_80281374 = 0.25f;
-int lbl_80281378 = -1;
+u8 gbUIFirstMenuDraw = 1;
+f32 gFELockedGolferShade = 0.25f;
+int gUILoadingBarBankSlot = -1;
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x80283B90), before the unsigned conversion constant fn_80090B80 uses first; its body is
@@ -61,20 +61,20 @@ static f32 fe_movies_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// Copy pSrc to pDst with its colour tinted by lbl_80281F28/lbl_80281F2C; without bTint the colour
+// Copy pSrc to pDst with its colour tinted by gpUIPolyColourMul/gpUIPolyColourAdd; without bTint the colour
 // is white and only the alpha is tinted.
 void fn_80090B80(FEVertex* pSrc, FEVertex* pDst, u8 bTint) {
     memcpy(pDst, pSrc, sizeof(FEVertex));
     if (bTint) {
-        pDst->au14[0] = lbl_80281F28[0] * (pSrc->au14[0] + lbl_80281F2C[0]);
-        pDst->au14[1] = lbl_80281F28[1] * (pSrc->au14[1] + lbl_80281F2C[1]);
-        pDst->au14[2] = lbl_80281F28[2] * (pSrc->au14[2] + lbl_80281F2C[2]);
-        pDst->au14[3] = lbl_80281F28[3] * (pSrc->au14[3] + lbl_80281F2C[3]);
+        pDst->au14[0] = gpUIPolyColourMul[0] * (pSrc->au14[0] + gpUIPolyColourAdd[0]);
+        pDst->au14[1] = gpUIPolyColourMul[1] * (pSrc->au14[1] + gpUIPolyColourAdd[1]);
+        pDst->au14[2] = gpUIPolyColourMul[2] * (pSrc->au14[2] + gpUIPolyColourAdd[2]);
+        pDst->au14[3] = gpUIPolyColourMul[3] * (pSrc->au14[3] + gpUIPolyColourAdd[3]);
     } else {
         pDst->au14[0] = 0xFF;
         pDst->au14[1] = 0xFF;
         pDst->au14[2] = 0xFF;
-        pDst->au14[3] = lbl_80281F28[3] * (pSrc->au14[3] + lbl_80281F2C[3]);
+        pDst->au14[3] = gpUIPolyColourMul[3] * (pSrc->au14[3] + gpUIPolyColourAdd[3]);
     }
 }
 
@@ -111,8 +111,8 @@ void fn_80090D28(FEQuad* pQuad) {
     pMtx = UITransform_GetCurrent();
     pColour = UITransform_GetCurrent();
     pAdd = UITransform_GetCurrent();
-    lbl_80281F28 = &UISGetColorMultipler()->r;
-    lbl_80281F2C = &UISGetColorAdditive()->r;
+    gpUIPolyColourMul = &UISGetColorMultipler()->r;
+    gpUIPolyColourAdd = &UISGetColorAdditive()->r;
     bTint = 1;
     if (pQuad->n2 != -1) {
         pEntry = gpFrontEnd->pFile->p8->apTables[pQuad->n2]->apEntries[pQuad->n0];
@@ -239,7 +239,7 @@ void fn_800913EC(s16 nTable, s16 nEntry) {
 }
 
 void fn_80091454(void) {
-    lbl_80281370 = 0;
+    gbUIFirstMenuDraw = 0;
 }
 
 // For UI file entry (nTable, nEntry) with flags 2 set and 1 clear: fn_80008380, then flag 0x10
@@ -346,71 +346,71 @@ static f32 fe_movies_StrippedFn2(f32 x) {
 
 // Eight points across the screen, an eighth apart, all at height 0.839 (fn_80091BDC draws at them).
 void fn_8009170C(void) {
-    lbl_801D8818[0][0] = 0.0f;
-    lbl_801D8818[0][1] = 0.839f;
-    lbl_801D8818[1][0] = 0.125f;
-    lbl_801D8818[1][1] = 0.839f;
-    lbl_801D8818[2][0] = 0.25f;
-    lbl_801D8818[2][1] = 0.839f;
-    lbl_801D8818[3][0] = 0.375f;
-    lbl_801D8818[3][1] = 0.839f;
-    lbl_801D8818[4][0] = 0.5f;
-    lbl_801D8818[4][1] = 0.839f;
-    lbl_801D8818[5][0] = 0.625f;
-    lbl_801D8818[5][1] = 0.839f;
-    lbl_801D8818[6][0] = 0.75f;
-    lbl_801D8818[6][1] = 0.839f;
-    lbl_801D8818[7][0] = 0.875f;
-    lbl_801D8818[7][1] = 0.839f;
+    gUILoadingBarTilePos[0][0] = 0.0f;
+    gUILoadingBarTilePos[0][1] = 0.839f;
+    gUILoadingBarTilePos[1][0] = 0.125f;
+    gUILoadingBarTilePos[1][1] = 0.839f;
+    gUILoadingBarTilePos[2][0] = 0.25f;
+    gUILoadingBarTilePos[2][1] = 0.839f;
+    gUILoadingBarTilePos[3][0] = 0.375f;
+    gUILoadingBarTilePos[3][1] = 0.839f;
+    gUILoadingBarTilePos[4][0] = 0.5f;
+    gUILoadingBarTilePos[4][1] = 0.839f;
+    gUILoadingBarTilePos[5][0] = 0.625f;
+    gUILoadingBarTilePos[5][1] = 0.839f;
+    gUILoadingBarTilePos[6][0] = 0.75f;
+    gUILoadingBarTilePos[6][1] = 0.839f;
+    gUILoadingBarTilePos[7][0] = 0.875f;
+    gUILoadingBarTilePos[7][1] = 0.839f;
 }
 
 // Load the texture bank from LoadData.c's 'txf2' copy, unless the session has flag 4.
 void fn_80091778(void) {
     if (gSession.uFlags & 4) return;
-    lbl_80281378 = fn_800107C0(lbl_80281C0C, NULL, 0);
-    lbl_80281F20 = fn_800106C4(lbl_80281378);
-    lbl_80281F24 = fn_800922A0(lbl_80281F20);
+    gUILoadingBarBankSlot = fn_800107C0(lbl_80281C0C, NULL, 0);
+    gpUILoadingBarBank = fn_800106C4(gUILoadingBarBankSlot);
+    gpUILoadingBarTexture = fn_800922A0(gpUILoadingBarBank);
 }
 
-// Decodes the picture in the 'load' object into lbl_801D8858.p30, unless one is there.
+// Decodes the picture in the 'load' object into gUILoadingScreen.p30, unless one is there.
 void fn_800917C8(void) {
-    if (lbl_801D8858.p30 == NULL) {
-        lbl_801D8858.p30 = fn_8002FD00(lbl_80281C04, lbl_801A25F0.uSize);
+    if (gUILoadingScreen.p30 == NULL) {
+        gUILoadingScreen.p30 = fn_8002FD00(lbl_80281C04, lbl_801A25F0.uSize);
     }
 }
 
 // Free the picture fn_800917C8 decoded, unless the session has flag 4.
 void fn_80091818(void) {
-    if (!(gSession.uFlags & 4) && lbl_801D8858.p30 != NULL) {
-        fn_8002FE70(lbl_801D8858.p30);
+    if (!(gSession.uFlags & 4) && gUILoadingScreen.p30 != NULL) {
+        fn_8002FE70(gUILoadingScreen.p30);
         fn_8002FEAC();
-        lbl_801D8858.p30 = NULL;
+        gUILoadingScreen.p30 = NULL;
     }
 }
 
 // Free the bank fn_80091778 loaded.
 void fn_80091870(void) {
     if (gSession.uFlags & 4) return;
-    fn_80010544(lbl_80281378);
+    fn_80010544(gUILoadingBarBankSlot);
 }
 
-// Set lbl_801D8858 up, unless the session has flag 4 or it is set up already (b18): the clock,
+// Set gUILoadingScreen up, unless the session has flag 4 or it is set up already (b18): the clock,
 // the number of players in game type 4 (else 0) and values from it, then the 'load' object's
 // picture (fn_800917C8).
 void fn_800918A4(void) {
-    if (!(gSession.uFlags & 4) && !lbl_801D8858.b18) {
-        lbl_801D8858.b18 = 1;
-        lbl_801D8858.n1C = -1;
-        lbl_801D8858.f10 = 0.0f;
-        lbl_801D8858.u20 = TI_sRead();
-        lbl_801D8858.n0 = 0;
+    if (!(gSession.uFlags & 4) && !gUILoadingScreen.b18) {
+        gUILoadingScreen.b18 = 1;
+        gUILoadingScreen.n1C = -1;
+        gUILoadingScreen.f10 = 0.0f;
+        gUILoadingScreen.u20 = TI_sRead();
+        gUILoadingScreen.n0 = 0;
         if (gSession.nGameType == 4) {
-            lbl_801D8858.n14 = gSession.nNumPlayers;
+            gUILoadingScreen.n14 = gSession.nNumPlayers;
         } else {
-            lbl_801D8858.n14 = 0;
+            gUILoadingScreen.n14 = 0;
         }
-        lbl_801D8858.fC = lbl_801D8858.f4 = (4.83f * lbl_801D8858.n14 + 3.1f) / 8.0f;
-        lbl_801D8858.f8 = 0.0f;
+        gUILoadingScreen.fC = gUILoadingScreen.f4 = (4.83f * gUILoadingScreen.n14 + 3.1f) / 8.0f;
+        gUILoadingScreen.f8 = 0.0f;
         fn_800917C8();
     }
 }
@@ -425,23 +425,23 @@ void fn_8009198C(int nMode) {
 
     if (gSession.uFlags & 4) return;
     if (nMode == 1) {
-        lbl_801D8858.b18 = 0;
+        gUILoadingScreen.b18 = 0;
     }
-    lbl_801D8858.u28 = TI_sRead();
-    fSecs = fn_8006E118(lbl_801D8858.u28, lbl_801D8858.u20);
-    lbl_801D8858.u20 = lbl_801D8858.u28;
-    lbl_801D8858.f10 += fabsf(fSecs);
-    if (nMode != 1 && lbl_801D8858.f10 <= lbl_801D8858.f4) {
-        if (lbl_801D8858.f10 > lbl_801D8858.f8) {
-            lbl_801D8858.f8 += 2.0f;
+    gUILoadingScreen.u28 = TI_sRead();
+    fSecs = fn_8006E118(gUILoadingScreen.u28, gUILoadingScreen.u20);
+    gUILoadingScreen.u20 = gUILoadingScreen.u28;
+    gUILoadingScreen.f10 += fabsf(fSecs);
+    if (nMode != 1 && gUILoadingScreen.f10 <= gUILoadingScreen.f4) {
+        if (gUILoadingScreen.f10 > gUILoadingScreen.f8) {
+            gUILoadingScreen.f8 += 2.0f;
         } else {
             return;
         }
     }
     fn_80006EDC();
-    fn_80092080(lbl_801D8858.p30, 1.0f);
-    if (lbl_801D8858.n1C >= 0) {
-        for (i = 0; i <= lbl_801D8858.n1C; i++) {
+    fn_80092080(gUILoadingScreen.p30, 1.0f);
+    if (gUILoadingScreen.n1C >= 0) {
+        for (i = 0; i <= gUILoadingScreen.n1C; i++) {
             if (i >= 8) break;
             fn_80091BDC(i);
         }
@@ -451,24 +451,24 @@ void fn_8009198C(int nMode) {
     fn_80007254();
     Gaud_Cycle();
     fn_80008380();
-    if (lbl_801D8858.f10 > lbl_801D8858.f4 || lbl_801D8858.n1C == -1) {
-        if (lbl_801D8858.f10 > lbl_801D8858.f4) {
-            lbl_801D8858.f4 += lbl_801D8858.fC;
+    if (gUILoadingScreen.f10 > gUILoadingScreen.f4 || gUILoadingScreen.n1C == -1) {
+        if (gUILoadingScreen.f10 > gUILoadingScreen.f4) {
+            gUILoadingScreen.f4 += gUILoadingScreen.fC;
         }
-        if (++lbl_801D8858.n1C >= 8) return;
-        fn_80091B98(lbl_801D8858.n1C);
+        if (++gUILoadingScreen.n1C >= 8) return;
+        fn_80091B98(gUILoadingScreen.n1C);
     }
     if (nMode == 1) {
-        if (lbl_801D8858.n1C < 0) {
-            lbl_801D8858.n1C = 0;
+        if (gUILoadingScreen.n1C < 0) {
+            gUILoadingScreen.n1C = 0;
         }
-        if (lbl_801D8858.n1C > 7) {
-            lbl_801D8858.n1C = 7;
+        if (gUILoadingScreen.n1C > 7) {
+            gUILoadingScreen.n1C = 7;
         }
-        for (i = lbl_801D8858.n1C + 1; i < 8; i++) {
+        for (i = gUILoadingScreen.n1C + 1; i < 8; i++) {
             fn_80091B98(i);
         }
-        lbl_801D8858.b18 = 0;
+        gUILoadingScreen.b18 = 0;
     }
 }
 
@@ -481,7 +481,7 @@ void fn_80091B98(s32 p0) {
     Gaud_Cycle();
 }
 
-// Draw tile nPoint of the texture bank fn_80091778 loaded at point nPoint of lbl_801D8818, an
+// Draw tile nPoint of the texture bank fn_80091778 loaded at point nPoint of gUILoadingBarTilePos, an
 // eighth of the screen wide: tiles 0-3 come from the top half of the texture, 4-7 from the bottom
 // (their u runs past 1 and wraps).
 void fn_80091BDC(int nPoint) {
@@ -495,7 +495,7 @@ void fn_80091BDC(int nPoint) {
     DS_vSetZBufferMode(7);
     RenderView_SetUseCurrentMatrices(0);
     DS_vEnableZBufferUpdate(0);
-    RenderState_SetBankTexture(lbl_80281F20, lbl_80281F24);
+    RenderState_SetBankTexture(gpUILoadingBarBank, gpUILoadingBarTexture);
     RenderState_SetDrawFlags(0x50);
     RenderState_Flush();
     afColour[0] = 0.5f;
@@ -504,8 +504,8 @@ void fn_80091BDC(int nPoint) {
     afColour[2] = 0.5f;
     afColour[3] = 0.5f;
     RenderView_SetColor(afColour);
-    RenderView_MakeQuad(afXY, NULL, lbl_801D8818[nPoint][0], lbl_801D8818[nPoint][1],
-                lbl_801D8818[nPoint][0] + 0.125f, lbl_801D8818[nPoint][1] + 0.142f);
+    RenderView_MakeQuad(afXY, NULL, gUILoadingBarTilePos[nPoint][0], gUILoadingBarTilePos[nPoint][1],
+                gUILoadingBarTilePos[nPoint][0] + 0.125f, gUILoadingBarTilePos[nPoint][1] + 0.142f);
     if (nPoint < 4) {
         afUV[0] = 0.25f * nPoint;
         afUV[1] = 0.0f;
@@ -649,12 +649,12 @@ void fn_80092080(LLPict* pPict, f32 fAlpha) {
     fn_80092274(nOld);
 }
 
-// Free the pixel data of every bank whose entry in lbl_801D8890 has a positive n4.
+// Free the pixel data of every bank whose entry in gUITxf2BankState has a positive n4.
 void fn_80092198(void) {
     int i;
 
     for (i = 0; i < FE_NUM_801D8890; i++) {
-        if (lbl_801D8890[i].n4 > 0) {
+        if (gUITxf2BankState[i].n4 > 0) {
             fn_80008380();
             fn_8000FFAC(lbl_801A26DC[i]);
         }
