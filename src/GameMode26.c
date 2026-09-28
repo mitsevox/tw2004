@@ -11,21 +11,21 @@
 #include "game.h"
 #include "game/modes/mode26.h"
 
-s32 lbl_80281760 = 10000;
-s32 lbl_80281764 = 5;
-s32 lbl_80281768 = 5;
-s32 lbl_8028176C = 120;
-s32 lbl_80281770 = 15;
-s32 lbl_80281774[2] = {0, 0};
-s32 lbl_8028177C[2] = {0, 0};
+s32 gGameMode26TargetScore = 10000;
+s32 gGameMode26Winner = 5;
+s32 gGameMode26LongestPlayer = 5;
+s32 gGameMode26WinnerCountdown = 120;
+s32 gGameMode26LengthCheckFrames = 15;
+s32 gGameMode26LastLength[2] = {0, 0};
+s32 gGameMode26LengthSoundOn[2] = {0, 0};
 
 // .sbss in reverse address order (CodeWarrior lays it out backwards)
-u8  lbl_802824A8[5];
-u8  lbl_802824A0[5];
-u8  lbl_80282498[5];
-f32 lbl_80282494;
-u8 lbl_80282491;                        // set when the session is split screen (fn_8010D3B8)
-u8  lbl_80282490;
+u8  gGameMode26Reached1200[5];
+u8  gGameMode26Reached800[5];
+u8  gGameMode26Reached400[5];
+f32 gGameMode26LongestLength;
+u8 gGameMode26SplitScreenShot;                        // set when the session is split screen (fn_8010D3B8)
+u8  gGameMode26IntroSaid;
 
 void fn_8010C714(void);
 void fn_8010C73C(void);
@@ -91,16 +91,16 @@ void fn_8010C4A0(void) {
     gpGame->nDC = 0;
     gpGame->n4 = 0;
     gSession.nSplitScreen = lbl_8028227C;
-    lbl_80282491 = 0;
-    lbl_80282494 = 0.0f;
-    lbl_80281768 = 5;
-    lbl_8028176C = 120;
-    lbl_80282490 = 0;
+    gGameMode26SplitScreenShot = 0;
+    gGameMode26LongestLength = 0.0f;
+    gGameMode26LongestPlayer = 5;
+    gGameMode26WinnerCountdown = 120;
+    gGameMode26IntroSaid = 0;
     Session_SetNumPlayers(2);
     for (i = 0; i < 5; i++) {
-        lbl_802824A8[i] = 0;
-        lbl_802824A0[i] = 0;
-        lbl_80282498[i] = 0;
+        gGameMode26Reached1200[i] = 0;
+        gGameMode26Reached800[i] = 0;
+        gGameMode26Reached400[i] = 0;
     }
 }
 
@@ -112,7 +112,7 @@ void fn_8010C718(void) {
     gSession.nTeeSet[0] = 0;
     gSession.nTeeSet[1] = 0;
     gSession.options.n20 = 0;
-    lbl_80281764 = 5;
+    gGameMode26Winner = 5;
 }
 
 void fn_8010C73C(void) {
@@ -129,31 +129,31 @@ void fn_8010C764(void) {
     s32 i;
     s32 nLength;
 
-    if (lbl_80281770-- <= 0) {
+    if (gGameMode26LengthCheckFrames-- <= 0) {
         for (i = 0; i <= 1; i++) {
             nLength = fn_800D0550(i);
             GameMsg_Send2Ints(0x4D, i, nLength);
-            if (nLength != 0 && nLength != *(s32*)((u8*)lbl_80281774 + i * sizeof(s32))) {
-                if (*(s32*)((u8*)lbl_8028177C + i * sizeof(s32)) == 0) {
+            if (nLength != 0 && nLength != *(s32*)((u8*)gGameMode26LastLength + i * sizeof(s32))) {
+                if (*(s32*)((u8*)gGameMode26LengthSoundOn + i * sizeof(s32)) == 0) {
                     // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
                     ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 1, 0, 1, (i != 0) ? 1 : -1);
-                    *(s32*)((u8*)lbl_8028177C + i * sizeof(s32)) = 1;
+                    *(s32*)((u8*)gGameMode26LengthSoundOn + i * sizeof(s32)) = 1;
                 }
-            } else if (*(s32*)((u8*)lbl_8028177C + i * sizeof(s32)) != 0) {
+            } else if (*(s32*)((u8*)gGameMode26LengthSoundOn + i * sizeof(s32)) != 0) {
                 // port: EA passes an argument Gaud_LongDriveUi_Stop ignores
                 ((void (*)(s32, int, int))Gaud_LongDriveUi_Stop)(0, 1, 0);
-                *(s32*)((u8*)lbl_8028177C + i * sizeof(s32)) = 0;
+                *(s32*)((u8*)gGameMode26LengthSoundOn + i * sizeof(s32)) = 0;
             }
-            *(s32*)((u8*)lbl_80281774 + i * sizeof(s32)) = nLength;
+            *(s32*)((u8*)gGameMode26LastLength + i * sizeof(s32)) = nLength;
         }
-        lbl_80281770 = 15;
+        gGameMode26LengthCheckFrames = 15;
     }
-    if (lbl_80281764 != 5) {
-        lbl_8028176C--;
+    if (gGameMode26Winner != 5) {
+        gGameMode26WinnerCountdown--;
     }
-    if (!lbl_80282490) {
+    if (!gGameMode26IntroSaid) {
         fn_8010D428(0, 0);
-        lbl_80282490 = 1;
+        gGameMode26IntroSaid = 1;
     }
 }
 
@@ -174,7 +174,7 @@ s32 fn_8010C8E0(int nPlayer) {
 u8 fn_8010C8E8(int nPlayer, u8 bCheck) {
     s32 bRet = 0;
 
-    if (fn_8010C934(bCheck) && lbl_8028176C < 0) {
+    if (fn_8010C934(bCheck) && gGameMode26WinnerCountdown < 0) {
         bRet = 1;
     }
     return bRet;
@@ -233,7 +233,7 @@ s32 fn_8010C9D4(int nLie) {
 
 // A shot is over: score it by where the ball ended up, keep the players' shot statistics, play
 // the tracks for new records and point totals, and say one of the collected messages. The first
-// player to lbl_80281760 points wins.
+// player to gGameMode26TargetScore points wins.
 void fn_8010CA2C(PlayerNumber_t nPlayer) {
     s32 nKind;
     Player* pPlayer = &gPlayers[nPlayer];
@@ -338,9 +338,9 @@ void fn_8010CA2C(PlayerNumber_t nPlayer) {
 
     // A scoring shot longer than the longest so far is the new longest.
     if (nPoints > 0) {
-        if (nLength > lbl_80282494) {
-            if (lbl_80282494 != 0.0f) {
-                if (nPlayer != lbl_80281768 && lbl_80281768 != 5) {
+        if (nLength > gGameMode26LongestLength) {
+            if (gGameMode26LongestLength != 0.0f) {
+                if (nPlayer != gGameMode26LongestPlayer && gGameMode26LongestPlayer != 5) {
                     ADD_MSG(0xB);
                     if (nPlayer == 0) {
                         ADD_MSG(5);
@@ -359,8 +359,8 @@ void fn_8010CA2C(PlayerNumber_t nPlayer) {
                 }
                 ADD_MSG(0xC);
             }
-            lbl_80281768 = nPlayer;
-            lbl_80282494 = nLength;
+            gGameMode26LongestPlayer = nPlayer;
+            gGameMode26LongestLength = nLength;
         } else if (nLength > 400) {
             ADD_MSG(0x22);
         }
@@ -379,20 +379,20 @@ void fn_8010CA2C(PlayerNumber_t nPlayer) {
 
     // A track the first time the score reaches 1200, 800 and 400 (EA also passes the player's
     // side, 1 or -1, which Gaud_LongDriveUi_Play ignores).
-    if (!lbl_802824A8[nPlayer] && gPlayers[nPlayer].nEBC >= 1200) {
+    if (!gGameMode26Reached1200[nPlayer] && gPlayers[nPlayer].nEBC >= 1200) {
         // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
         ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 0, 2, 0, (nPlayer != 0) ? 1 : -1);
-        lbl_802824A8[nPlayer] = 1;
+        gGameMode26Reached1200[nPlayer] = 1;
     }
-    if (!lbl_802824A0[nPlayer] && gPlayers[nPlayer].nEBC >= 800) {
+    if (!gGameMode26Reached800[nPlayer] && gPlayers[nPlayer].nEBC >= 800) {
         // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
         ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 0, 3, 0, (nPlayer != 0) ? 1 : -1);
-        lbl_802824A0[nPlayer] = 1;
+        gGameMode26Reached800[nPlayer] = 1;
     }
-    if (!lbl_80282498[nPlayer] && gPlayers[nPlayer].nEBC >= 400) {
+    if (!gGameMode26Reached400[nPlayer] && gPlayers[nPlayer].nEBC >= 400) {
         // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
         ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 0, 4, 0, (nPlayer != 0) ? 1 : -1);
-        lbl_80282498[nPlayer] = 1;
+        gGameMode26Reached400[nPlayer] = 1;
     }
 
     // The shot took the lead.
@@ -412,8 +412,8 @@ void fn_8010CA2C(PlayerNumber_t nPlayer) {
     }
 
     // The target score reached: the player wins, with one of four winning messages.
-    if (pPlayer->nEBC >= lbl_80281760) {
-        lbl_80281764 = nPlayer;
+    if (pPlayer->nEBC >= gGameMode26TargetScore) {
+        gGameMode26Winner = nPlayer;
         nMsgs = 0;
         nPick = Misc_RandFunc(1) % 3;
         if (nPick == 0) {
@@ -426,7 +426,7 @@ void fn_8010CA2C(PlayerNumber_t nPlayer) {
             fn_8010D428(4, 0);
         }
     }
-    if (nMsgs > 0 && lbl_80281764 == 5) {
+    if (nMsgs > 0 && gGameMode26Winner == 5) {
         fn_8010D428(aMsgs[Misc_RandFunc(1) % nMsgs], 0);
     }
 }
@@ -437,7 +437,7 @@ void fn_8010D230(void) {
 
 void fn_8010D250(void) {
     fn_8010D278();
-    lbl_80281764 = 5;
+    gGameMode26Winner = 5;
 }
 
 // Every player's mode values cleared (and message 0x42 sent for each).
@@ -469,15 +469,15 @@ void fn_8010D330(void) {
 }
 
 void fn_8010D334(s32 v) {
-    lbl_80281760 = v;
+    gGameMode26TargetScore = v;
 }
 
 // Whether somebody has won, and who (5 = nobody).
 u8 fn_8010D33C(s32* pnWinner) {
     if (pnWinner != NULL) {
-        *pnWinner = lbl_80281764;
+        *pnWinner = gGameMode26Winner;
     }
-    return lbl_80281764 != 5;
+    return gGameMode26Winner != 5;
 }
 
 u8 fn_8010D364(void) {
@@ -486,7 +486,7 @@ u8 fn_8010D364(void) {
 
 // The countdown is running: somebody has won and it has not run out.
 u8 fn_8010D390(void) {
-    if (lbl_80281764 != 5 && lbl_8028176C > 0) {
+    if (gGameMode26Winner != 5 && gGameMode26WinnerCountdown > 0) {
         return 1;
     }
     return 0;
@@ -494,7 +494,7 @@ u8 fn_8010D390(void) {
 
 void fn_8010D3B8(void) {
     if (gSession.nSplitScreen) {
-        lbl_80282491 = 1;
+        gGameMode26SplitScreenShot = 1;
     }
 }
 
