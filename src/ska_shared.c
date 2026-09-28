@@ -1,6 +1,13 @@
-// ska_shared.c (TW06's golf/animation/ska_shared.c): the skeletal animation code the golfer's
-// character shares: decoding clip frames (from memory or ARAM) into bone rotations (quaternions)
-// and blending them, and byte-swapping and laying out a clip read from disc.
+// ska_shared.c (TW06's golf/animation/ska_shared.c, beside ska.c and ska_util.c): EA's SKA
+// skeletal-animation clips, the code the golfer's character shares. A clip (Clip) holds one track
+// per bone, timed events, an optional BlendClip, and its frames as Euler angles in two streams (16
+// bits per angle, and 8 bits per angle off a base angle), plus packed positions for the tracks that
+// move. The loaders byte-swap a clip read from disc and point its fields at its blocks
+// (SKA_LoadFromMem; or SKA_SwapClip then SKA_PatchMemory, with the frame data in ARAM).
+// SKA_Update poses a skeleton from a clip at a time: it decodes the two keys around that time into
+// quaternions (SKAUtil_ExpandSingleFrameToDest) and blends them. EA's names come from 007
+// Everything or Nothing's SKA.cpp and SKA_Util.cpp (docs/reference-builds/007eon-ps2), TW07's
+// SKA_Base.c / SKA_Util.c / UBitArray.h and TW06's map; the rest are read from the code.
 
 #include "game_types.h"
 #include "core/goaram.h"
@@ -180,7 +187,8 @@ void SKA_Update(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32 
                 pChar->buffers[aSlot[i]].p18 = pChar->buffers[aSlot[i]].p14 + pClip->n5C * 16;
             }
             if (SKAUtil_ExpandSingleFrameToDest(pClip, aFrame[i], (f32*)pChar->buffers[aSlot[i]].p10,
-                            (f32*)pChar->buffers[aSlot[i]].p14, pChar->buffers[aSlot[i]].p18) == 0 &&
+                                                (f32*)pChar->buffers[aSlot[i]].p14,
+                                                pChar->buffers[aSlot[i]].p18) == 0 &&
                 aBits != NULL) {
                 BitArray_ClearArray(aBits, 0x80);
             }
@@ -266,8 +274,8 @@ u8 SKAUtil_ExpandSingleFrameToDest(Clip* pClip, int nFrame, f32* pPose2, f32* pP
     if (pClip->n36 != 0) {
         if (pClip->uFlags & 4) {
             // port: pE4 holds an ARAM address here
-            SKA_WaitAramRead(SKA_StartAramRead((uptr)pClip->pE4 + pClip->n8E * nFrame, gSKAAram8BitFrame,
-                                               pClip->n8E));
+            SKA_WaitAramRead(
+                SKA_StartAramRead((uptr)pClip->pE4 + pClip->n8E * nFrame, gSKAAram8BitFrame, pClip->n8E));
             pTransfer = NULL;
             pFrame2 = gSKAAram8BitFrame;
             if (pClip->n0A != 0) {
@@ -828,8 +836,6 @@ void SKAUtil_EulerAnglesToQTs8(u8* p, f32* pOut, s32 nBones, u32* pBits, u16* aB
     }
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 // Sets gSKALeftHanded, which makes the frame decoders (SKAUtil_EulerAnglesToQTs16 and
 // SKAUtil_EulerAnglesToQTs8) mirror the angles for a left-handed golfer. Character_UpdateAnimation
 // and Character_SetupForShot pass the model's bEE (Character_IsLeftHanded) before posing a clip.
@@ -857,5 +863,3 @@ f32 SKA_GetBlendClipFraction(Clip* pClip, f32 fTime) {
     }
     return 0.0f;
 }
-
-// ---- end of sweep code ----
