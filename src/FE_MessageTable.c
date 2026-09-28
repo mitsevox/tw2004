@@ -258,7 +258,7 @@ void TrophyRoom_GetAwardEarnedText(MsgArg* pArgs, MsgArg* pResult);
 
 // This file.
 void GetGolferName(int nGolfer, char* szName);
-void FE_GetRecordEntry(int n, MsgArg* pArgs, MsgArg* pResult);
+void FE_GetRecordEntry(int nKind, MsgArg* pArgs, MsgArg* pResult);
 s32  fn_80084FB4(void* pArg);
 s32  fn_80084FF8(void* pArg);
 s32  fn_80085034(void* pArg);
