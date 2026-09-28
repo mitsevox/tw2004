@@ -114,9 +114,9 @@ u8    Character_IsGolfer(Character* pChar);
 f32   fn_8001ED44(Character* pChar, int b);
 f32   fn_8001EE00(Character* pChar, int b);
 void  Character_KeepClubOutOfGround(Character* pChar);
-void  Character_IKLegsToGround(Character* pChar, u8 bLegA, u8 bLegB);
-void  Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, int nBoneA, int nBoneB,
-                              int nBoneC, int nBoneD, int nPoint, int b);
+void  Character_IKLegsToGround(Character* pChar, u8 bRightLeg, u8 bLeftLeg);
+void  Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, int nHip, int nKnee,
+                              int nAnkle, int nToe, int nAnklePoint, int nToePoint);
 void  fn_8001B644(Character* pChar);
 void  Character_SetupForShot(Character* pChar);
 void  fn_80021978(u8 v);                                        // ska_shared.c
@@ -328,7 +328,8 @@ void Character_InitBoneState(Character* pChar, SkelPose* pPose) {
     }
 }
 
-// Only the bit arrays of Character_InitBoneState (with a body skin): the last two set, the first two cleared.
+// Only the bit arrays of Character_InitBoneState (with a body skin): the last two set, the first
+// two cleared.
 void Character_InitBoneStateBits(Character* pChar, SkelPose* pPose) {
     if (pChar->pSkin != NULL) {
         BitArray_SetAll(pPose->a20, 0x80);
@@ -389,35 +390,36 @@ void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals) {
 // less than 0.05 apart, or it is less than 1 above the point.
 f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNormal) {
     f32 vPos[4];
-    f32 fLow;
-    f32 fHigh;
-    SurfaceType* pLowSurface;
-    SurfaceType* pHighSurface;
+    f32 fSupportingHeight;
+    f32 fCoveringHeight;
+    SurfaceType* pSupportingSurface;
+    SurfaceType* pCoveringSurface;
     CourseInfo* pCourse;
 
     if (pChar != NULL) {
         if ((pCourse = Ter_GetTGD()) != NULL) {
             Vec_Copy(pPos, vPos);
             vPos[1] += 0.66f / 12.0f;
-            Ter_GetEnclosingGroundData(pCourse, vPos, &fLow, &pLowSurface, lbl_801B95D8, &fHigh,
-                                       &pHighSurface, lbl_801B95C8);
-            if (!(fHigh < -60000.0f)) {
-                if (fLow < -60000.0f || pLowSurface->nClass == 7 || pLowSurface->nClass == 0x13 ||
-                    fHigh - fLow < 0.05f || fHigh < 1.0f + pPos[1]) {
-                    if (pHighSurface->nClass == 0xC || pHighSurface->nClass == 0x12) {
+            Ter_GetEnclosingGroundData(pCourse, vPos, &fSupportingHeight, &pSupportingSurface, lbl_801B95D8,
+                                       &fCoveringHeight, &pCoveringSurface, lbl_801B95C8);
+            if (!(fCoveringHeight < -60000.0f)) {
+                if (fSupportingHeight < -60000.0f || pSupportingSurface->nClass == 7 ||
+                    pSupportingSurface->nClass == 0x13 || fCoveringHeight - fSupportingHeight < 0.05f ||
+                    fCoveringHeight < 1.0f + pPos[1]) {
+                    if (pCoveringSurface->nClass == 0xC || pCoveringSurface->nClass == 0x12) {
                         return -65536.125f;
                     }
                     *ppNormal = lbl_801B95C8;
-                    return fHigh;
+                    return fCoveringHeight;
                 }
-            } else if (fLow < -60000.0f) {
-                goto none;      // fake match: the original puts this return after the low height
+            } else if (fSupportingHeight < -60000.0f) {
+                goto none;      // fake match: the original puts this return after the supporting height
             }
-            if (pLowSurface->nClass == 0xC || pLowSurface->nClass == 0x12) {
+            if (pSupportingSurface->nClass == 0xC || pSupportingSurface->nClass == 0x12) {
                 return -65536.125f;
             }
             *ppNormal = lbl_801B95D8;
-            return fLow;
+            return fSupportingHeight;
         none:
             return -65536.125f;
         }
@@ -433,39 +435,39 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
 // (IGdriver).
 void Character_UpdateTestPoints(Character* pChar) {
     f32 (*pClubMtx)[4];
-    f32 (*pMtx48)[4];
-    f32 (*pMtx3A)[4];
-    f32 (*pMtx47)[4];
-    f32 (*pMtx39)[4];
-    f32 fA;
-    f32 fB;
+    f32 (*pMtxLToe)[4];
+    f32 (*pMtxRToe)[4];
+    f32 (*pMtxLFoot)[4];
+    f32 (*pMtxRFoot)[4];
+    f32 fRight;
+    f32 fLeft;
 
     if (!Character_IsGolfer(pChar)) {
         return;
     }
     pClubMtx = Character_GetBoneMatrix(pChar, 0x52);
     if (pChar->pSkin->b1044) {
-        pMtx48 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x48);
-        pMtx3A = Character_GetBoneMatrixSwapIfLefty(pChar, 0x3A);
-        pMtx47 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x47);
-        pMtx39 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x39);
-        LLMath_mat44fltMultiply(pMtx3A, (Vec4*)pChar->pSkin->a1048[0], (Vec4*)pChar->aPoints[0]);
-        LLMath_mat44fltMultiply(pMtx48, (Vec4*)pChar->pSkin->a1048[1], (Vec4*)pChar->aPoints[1]);
-        LLMath_mat44fltMultiply(pMtx39, (Vec4*)pChar->pSkin->a1048[2], (Vec4*)pChar->aPoints[2]);
-        LLMath_mat44fltMultiply(pMtx47, (Vec4*)pChar->pSkin->a1048[3], (Vec4*)pChar->aPoints[3]);
+        pMtxLToe = Character_GetBoneMatrixSwapIfLefty(pChar, 0x48);
+        pMtxRToe = Character_GetBoneMatrixSwapIfLefty(pChar, 0x3A);
+        pMtxLFoot = Character_GetBoneMatrixSwapIfLefty(pChar, 0x47);
+        pMtxRFoot = Character_GetBoneMatrixSwapIfLefty(pChar, 0x39);
+        LLMath_mat44fltMultiply(pMtxRToe, (Vec4*)pChar->pSkin->a1048[0], (Vec4*)pChar->aPoints[0]);
+        LLMath_mat44fltMultiply(pMtxLToe, (Vec4*)pChar->pSkin->a1048[1], (Vec4*)pChar->aPoints[1]);
+        LLMath_mat44fltMultiply(pMtxRFoot, (Vec4*)pChar->pSkin->a1048[2], (Vec4*)pChar->aPoints[2]);
+        LLMath_mat44fltMultiply(pMtxLFoot, (Vec4*)pChar->pSkin->a1048[3], (Vec4*)pChar->aPoints[3]);
     } else {
-        fA = 0.8f * pChar->pModel->f10;
-        fB = 0.8f * pChar->pModel->fC;
-        pMtx48 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x48);
-        pMtx3A = Character_GetBoneMatrixSwapIfLefty(pChar, 0x3A);
-        pMtx47 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x47);
-        pMtx39 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x39);
-        fn_8000AE6C(pMtx3A[3], pMtx3A[1], pChar->pModel->f10, pChar->aPoints[0]);
-        fn_8000AE6C(pMtx48[3], pMtx48[1], pChar->pModel->fC, pChar->aPoints[1]);
-        fn_8000AE6C(pMtx39[3], pMtx3A[2], fA, pChar->aPoints[2]);
-        fn_8000AE6C(pMtx47[3], pMtx48[2], fB, pChar->aPoints[3]);
-        fn_8000AE6C(pChar->aPoints[0], pMtx3A[2], 0.25f * fA, pChar->aPoints[0]);
-        fn_8000AE6C(pChar->aPoints[1], pMtx48[2], 0.25f * fB, pChar->aPoints[1]);
+        fRight = 0.8f * pChar->pModel->f10;
+        fLeft = 0.8f * pChar->pModel->fC;
+        pMtxLToe = Character_GetBoneMatrixSwapIfLefty(pChar, 0x48);
+        pMtxRToe = Character_GetBoneMatrixSwapIfLefty(pChar, 0x3A);
+        pMtxLFoot = Character_GetBoneMatrixSwapIfLefty(pChar, 0x47);
+        pMtxRFoot = Character_GetBoneMatrixSwapIfLefty(pChar, 0x39);
+        fn_8000AE6C(pMtxRToe[3], pMtxRToe[1], pChar->pModel->f10, pChar->aPoints[0]);
+        fn_8000AE6C(pMtxLToe[3], pMtxLToe[1], pChar->pModel->fC, pChar->aPoints[1]);
+        fn_8000AE6C(pMtxRFoot[3], pMtxRToe[2], fRight, pChar->aPoints[2]);
+        fn_8000AE6C(pMtxLFoot[3], pMtxLToe[2], fLeft, pChar->aPoints[3]);
+        fn_8000AE6C(pChar->aPoints[0], pMtxRToe[2], 0.25f * fRight, pChar->aPoints[0]);
+        fn_8000AE6C(pChar->aPoints[1], pMtxLToe[2], 0.25f * fLeft, pChar->aPoints[1]);
     }
     if (pChar->p16D8 != NULL && pClubMtx != NULL) {
         LLMath_mat44fltMultiply(pClubMtx, (Vec4*)pChar->p16D8->a3C[pChar->nClubClass],
@@ -520,9 +522,9 @@ void Character_KeepClubOutOfGround(Character* pChar) {
 // any other character is above fn_8001ED44.
 void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     u32 auBits[4];
-    int bC860 = 0;
-    u8 bLegA = 0;
-    u8 bLegB = 0;
+    int bSetupForShot = 0;
+    u8 bRightLegIK = 0;
+    u8 bLeftLegIK = 0;
     int i;
 
     if (pChar == NULL) {
@@ -550,7 +552,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     pChar->f14 = 1073741824.0f;
     if (pChar->u10 & 4) {
         Character_SetupForShot(pChar);
-        bC860 = 1;
+        bSetupForShot = 1;
     }
     if (pChar->n20 == 8 && pChar->nAnim == 8) {
         SKATime_Idle(pChar, pChar->nPlayer, (AnimPlayer*)pChar->anim, &pChar->blend, fTime);
@@ -591,13 +593,13 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
                 BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x38)) ||
                 BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x39)) ||
                 BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x3A))) {
-                bLegA = 1;
+                bRightLegIK = 1;
             }
             if (BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x44)) ||
                 BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x46)) ||
                 BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x47)) ||
                 BitArray_Test(pChar->blend.pPose->a0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x48))) {
-                bLegB = 1;
+                bLeftLegIK = 1;
             }
         }
     }
@@ -616,12 +618,12 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     SKEL_TransformBones(pChar->pModel, auBits);
     if (Character_IsGolfer(pChar)) {
         Character_UpdateTestPoints(pChar);
-        Character_UpdateFeetTerrainInfo(pChar, bC860 || pChar->n20 != 5 || pChar->n26 == 1);
+        Character_UpdateFeetTerrainInfo(pChar, bSetupForShot || pChar->n20 != 5 || pChar->n26 == 1);
         if (pChar->n20 == 1 || pChar->n20 == 0 || pChar->n20 == 9 ||
             (pChar->n20 == 11 && !(pChar->u10 & 0x8000)) || pChar->n20 == 5 || pChar->n20 == 12) {
             Character_PlaceFeetOnGround(pChar);
         }
-        Character_IKLegsToGround(pChar, bLegA, bLegB);
+        Character_IKLegsToGround(pChar, bRightLegIK, bLeftLegIK);
     }
     if (Character_IsGolfer(pChar)) {
         if (pChar->pModel->pSkel != NULL) {
@@ -657,68 +659,68 @@ void Character_SetSkeleton(Character* pChar, CharModel* pModel) {
 
 // Gives the character its body's skin and poses the skeleton from it (Character_SetPreferedPos).
 // For a golfer it then keeps the four foot test points in the skin (TW07 has this part as
-// Character_SetTestPointsFeet): each toe bone's position moved by boneToToe and each ankle bone's
-// by boneToHeel (larger offsets for animation slot 0), taken into the frame of its bone (through
+// Character_SetTestPointsFeet): each toe bone's position moved by vBoneToToe and each ankle bone's
+// by vBoneToHeel (larger offsets for animation slot 0), taken into the frame of its bone (through
 // its inverted matrix) into Skin.a1048, and b1044 set.
 void Character_SetSkin(Character* pChar, Skin* pSkin) {
-    f32 m48[4][4];
-    f32 m3A[4][4];
-    f32 m47[4][4];
-    f32 m39[4][4];
-    Vec4 v48;
-    Vec4 v3A;
-    Vec4 v47;
-    Vec4 v39;
-    Vec4 vOffsetB;
-    Vec4 vOffsetA;
-    f32 (*pMtx48)[4];
-    f32 (*pMtx3A)[4];
-    f32 (*pMtx47)[4];
-    f32 (*pMtx39)[4];
+    f32 mLToeInv[4][4];
+    f32 mRToeInv[4][4];
+    f32 mLFootInv[4][4];
+    f32 mRFootInv[4][4];
+    Vec4 vLToe;
+    Vec4 vRToe;
+    Vec4 vLFoot;
+    Vec4 vRFoot;
+    Vec4 vBoneToHeel;
+    Vec4 vBoneToToe;
+    f32 (*pMtxLToe)[4];
+    f32 (*pMtxRToe)[4];
+    f32 (*pMtxLFoot)[4];
+    f32 (*pMtxRFoot)[4];
 
     if (pChar != NULL) {
         pChar->pSkin = pSkin;
         Character_SetPreferedPos(pChar);
         if (Character_IsGolfer(pChar)) {
-            pMtx48 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x48);
-            pMtx3A = Character_GetBoneMatrixSwapIfLefty(pChar, 0x3A);
-            pMtx47 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x47);
-            pMtx39 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x39);
-            mat44flt_Invert(pMtx48, m48);
-            mat44flt_Invert(pMtx3A, m3A);
-            mat44flt_Invert(pMtx47, m47);
-            mat44flt_Invert(pMtx39, m39);
+            pMtxLToe = Character_GetBoneMatrixSwapIfLefty(pChar, 0x48);
+            pMtxRToe = Character_GetBoneMatrixSwapIfLefty(pChar, 0x3A);
+            pMtxLFoot = Character_GetBoneMatrixSwapIfLefty(pChar, 0x47);
+            pMtxRFoot = Character_GetBoneMatrixSwapIfLefty(pChar, 0x39);
+            mat44flt_Invert(pMtxLToe, mLToeInv);
+            mat44flt_Invert(pMtxRToe, mRToeInv);
+            mat44flt_Invert(pMtxLFoot, mLFootInv);
+            mat44flt_Invert(pMtxRFoot, mRFootInv);
             if (pChar->nSlot == 0) {
-                vOffsetA.x = 0.0f;
-                vOffsetA.y = -0.031f;
-                vOffsetA.z = 0.0f;
-                vOffsetA.w = 1.0f;
-                vOffsetB.x = 0.0f;
-                vOffsetB.y = -0.11f;
-                vOffsetB.z = -0.06f;
-                vOffsetB.w = 1.0f;
+                vBoneToToe.x = 0.0f;
+                vBoneToToe.y = -0.031f;
+                vBoneToToe.z = 0.0f;
+                vBoneToToe.w = 1.0f;
+                vBoneToHeel.x = 0.0f;
+                vBoneToHeel.y = -0.11f;
+                vBoneToHeel.z = -0.06f;
+                vBoneToHeel.w = 1.0f;
             } else {
-                vOffsetA.x = 0.0f;
-                vOffsetA.y = -0.025f;
-                vOffsetA.z = 0.0f;
-                vOffsetA.w = 1.0f;
-                vOffsetB.x = 0.0f;
-                vOffsetB.y = -0.08f;
-                vOffsetB.z = -0.025f;
-                vOffsetB.w = 1.0f;
+                vBoneToToe.x = 0.0f;
+                vBoneToToe.y = -0.025f;
+                vBoneToToe.z = 0.0f;
+                vBoneToToe.w = 1.0f;
+                vBoneToHeel.x = 0.0f;
+                vBoneToHeel.y = -0.08f;
+                vBoneToHeel.z = -0.025f;
+                vBoneToHeel.w = 1.0f;
             }
-            Character_GetBonePosSwapIfLefty(pChar, 0x48, &v48.x);
-            Character_GetBonePosSwapIfLefty(pChar, 0x3A, &v3A.x);
-            Character_GetBonePosSwapIfLefty(pChar, 0x47, &v47.x);
-            Character_GetBonePosSwapIfLefty(pChar, 0x39, &v39.x);
-            Char_Vec3Add(&v48.x, &vOffsetA.x, &v48.x);
-            Char_Vec3Add(&v3A.x, &vOffsetA.x, &v3A.x);
-            Char_Vec3Add(&v47.x, &vOffsetB.x, &v47.x);
-            Char_Vec3Add(&v39.x, &vOffsetB.x, &v39.x);
-            LLMath_mat44fltMultiply(m3A, &v3A, (Vec4*)pChar->pSkin->a1048[0]);
-            LLMath_mat44fltMultiply(m48, &v48, (Vec4*)pChar->pSkin->a1048[1]);
-            LLMath_mat44fltMultiply(m39, &v39, (Vec4*)pChar->pSkin->a1048[2]);
-            LLMath_mat44fltMultiply(m47, &v47, (Vec4*)pChar->pSkin->a1048[3]);
+            Character_GetBonePosSwapIfLefty(pChar, 0x48, &vLToe.x);
+            Character_GetBonePosSwapIfLefty(pChar, 0x3A, &vRToe.x);
+            Character_GetBonePosSwapIfLefty(pChar, 0x47, &vLFoot.x);
+            Character_GetBonePosSwapIfLefty(pChar, 0x39, &vRFoot.x);
+            Char_Vec3Add(&vLToe.x, &vBoneToToe.x, &vLToe.x);
+            Char_Vec3Add(&vRToe.x, &vBoneToToe.x, &vRToe.x);
+            Char_Vec3Add(&vLFoot.x, &vBoneToHeel.x, &vLFoot.x);
+            Char_Vec3Add(&vRFoot.x, &vBoneToHeel.x, &vRFoot.x);
+            LLMath_mat44fltMultiply(mRToeInv, &vRToe, (Vec4*)pChar->pSkin->a1048[0]);
+            LLMath_mat44fltMultiply(mLToeInv, &vLToe, (Vec4*)pChar->pSkin->a1048[1]);
+            LLMath_mat44fltMultiply(mRFootInv, &vRFoot, (Vec4*)pChar->pSkin->a1048[2]);
+            LLMath_mat44fltMultiply(mLFootInv, &vLFoot, (Vec4*)pChar->pSkin->a1048[3]);
             pChar->pSkin->b1044 = 1;
         }
     }
@@ -754,12 +756,12 @@ void Character_PlaceFeetOnGround(Character* pChar) {
     f32* pPos;
     int i;
     f32 fH;
-    f32 fLow;
-    f32 fHigh;
-    SurfaceType* pSurfLow;
-    SurfaceType* pSurfHigh;
-    f32 vNormalLow[4];
-    f32 vNormalHigh[4];
+    f32 fSupportingHeight;
+    f32 fCoveringHeight;
+    SurfaceType* pSupportingSurface;
+    SurfaceType* pCoveringSurface;
+    f32 vSupportingNormal[4];
+    f32 vCoveringNormal[4];
 
     if (pChar == NULL) {
         return;
@@ -795,11 +797,11 @@ void Character_PlaceFeetOnGround(Character* pChar) {
         return;
     }
     pPos = fn_800187CC_Read(pChar->pModel->pBones[0].v1C);
-    Ter_GetEnclosingGroundData(pCourse, pPos, &fLow, &pSurfLow, vNormalLow, &fHigh, &pSurfHigh,
-                               vNormalHigh);
-    fH = fHigh;
-    if (fHigh < -60000.0f || fHigh > 1.0f + pPos[1]) {
-        fH = fLow;
+    Ter_GetEnclosingGroundData(pCourse, pPos, &fSupportingHeight, &pSupportingSurface, vSupportingNormal,
+                               &fCoveringHeight, &pCoveringSurface, vCoveringNormal);
+    fH = fCoveringHeight;
+    if (fCoveringHeight < -60000.0f || fCoveringHeight > 1.0f + pPos[1]) {
+        fH = fSupportingHeight;
         if (fH < -60000.0f) {
             fH = pPos[1];
         }
@@ -814,7 +816,7 @@ void Character_PlaceFeetOnGround(Character* pChar) {
 // Puts a golfer's legs on the ground by IK: with bRightLeg the right leg (hip 0x36, knee 0x38,
 // ankle 0x39, toe 0x3A), with bLeftLeg the left (0x44-0x48); the bones they move are then
 // transformed again.
-void Character_IKLegsToGround(Character* pChar, u8 bLegA, u8 bLegB) {
+void Character_IKLegsToGround(Character* pChar, u8 bRightLeg, u8 bLeftLeg) {
     CourseInfo* pCourse;
     u32 auBits[4];
 
@@ -829,7 +831,7 @@ void Character_IKLegsToGround(Character* pChar, u8 bLegA, u8 bLegB) {
     if (pCourse == NULL) {
         return;
     }
-    if (bLegA) {
+    if (bRightLeg) {
         Character_IKLegToGround(pChar, pCourse, 0, CharModel_GetBoneIndexMapped(pChar->pModel, 0x36),
                                 CharModel_GetBoneIndexMapped(pChar->pModel,
                                         0x38), CharModel_GetBoneIndexMapped(pChar->pModel, 0x39),
@@ -838,7 +840,7 @@ void Character_IKLegsToGround(Character* pChar, u8 bLegA, u8 bLegB) {
         BitArray_Set(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x36));
         BitArray_Set(auBits, CharModel_GetBoneIndexMapped(pChar->pModel, 0x39));
     }
-    if (bLegB) {
+    if (bLeftLeg) {
         Character_IKLegToGround(pChar, pCourse, 1, CharModel_GetBoneIndexMapped(pChar->pModel, 0x44),
                                 CharModel_GetBoneIndexMapped(pChar->pModel,
                                         0x46), CharModel_GetBoneIndexMapped(pChar->pModel, 0x47),
@@ -856,14 +858,14 @@ void Character_IKLegsToGround(Character* pChar, u8 bLegA, u8 bLegB) {
 // points) so its foot stands on the ground: the knee and hip are turned so the ankle reaches the
 // ground height under the ankle point, then the ankle is tilted towards the ground's slope, more
 // the deeper the foot sat.
-void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, int nBoneA, int nBoneB,
-                             int nBoneC, int nBoneD, int nPoint, int nOther) {
+void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, int nHip, int nKnee,
+                             int nAnkle, int nToe, int nAnklePoint, int nToePoint) {
     f32 vOld[4];
-    f32 vC[4];
+    f32 vAnkle[4];
     f32 vPoint[4];
-    f32 vD[4];
-    f32 vA[4];
-    f32 vB[4];
+    f32 vToe[4];
+    f32 vHip[4];
+    f32 vKnee[4];
     f32 vReach[4];
     f32 vLeg[4];
     f32 vThigh[4];
@@ -903,14 +905,14 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     Skeleton* pSkel;
     Bone* pBone;
 
-    Character_GetBonePos_FromIndex(pChar, nBoneC, vC);
-    Character_GetBonePos_FromIndex(pChar, nBoneA, vA);
-    Character_GetBonePos_FromIndex(pChar, nBoneB, vB);
-    Character_GetBonePos_FromIndex(pChar, nBoneD, vD);
-    Vec_Copy(pChar->aPoints[nPoint], vPoint);
+    Character_GetBonePos_FromIndex(pChar, nAnkle, vAnkle);
+    Character_GetBonePos_FromIndex(pChar, nHip, vHip);
+    Character_GetBonePos_FromIndex(pChar, nKnee, vKnee);
+    Character_GetBonePos_FromIndex(pChar, nToe, vToe);
+    Vec_Copy(pChar->aPoints[nAnklePoint], vPoint);
     // how far each test point sits below the ground (0.165 in, in feet)
-    fDropA = 0.165f / 12.0f + (pChar->afGroundHeight[nPoint] - vPoint[1]);
-    fDropB = 0.165f / 12.0f + (pChar->afGroundHeight[nOther] - pChar->aPoints[nOther][1]);
+    fDropA = 0.165f / 12.0f + (pChar->afGroundHeight[nAnklePoint] - vPoint[1]);
+    fDropB = 0.165f / 12.0f + (pChar->afGroundHeight[nToePoint] - pChar->aPoints[nToePoint][1]);
     if ((fDropA < 0.0f && fDropB < 0.0f) || fDropA > 1.0f) {
         return;
     }
@@ -918,7 +920,7 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     if (fDrop < 0.0f) {
         return;
     }
-    Char_Vec3Add(pChar->aGroundNormal[nPoint], pChar->aGroundNormal[nOther], vSlope);
+    Char_Vec3Add(pChar->aGroundNormal[nAnklePoint], pChar->aGroundNormal[nToePoint], vSlope);
     LLMath_Normalize3(vSlope, vSlope);
     if (fDrop > 0.33f / 12.0f) {
         fDrop = 1.0f;
@@ -930,14 +932,14 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
         fDropA = 0.0f;
     }
 
-    // the knee: the angle the thigh and shin must make for the hip to reach bone C raised by fDropA
-    Vec3Copy(vC, vOld);
-    vC[1] += fDropA;
-    Char_Vec3Sub(vA, vOld, vReach);
-    Char_Vec3Sub(vA, vC, vLeg);
-    Char_Vec3Sub(vB, vA, vThigh);
-    Char_Vec3Sub(vB, vOld, vShin);
-    Char_Vec3Sub(vOld, vD, vFoot);
+    // the knee: the angle the thigh and shin must make for the hip to reach the ankle raised by fDropA
+    Vec3Copy(vAnkle, vOld);
+    vAnkle[1] += fDropA;
+    Char_Vec3Sub(vHip, vOld, vReach);
+    Char_Vec3Sub(vHip, vAnkle, vLeg);
+    Char_Vec3Sub(vKnee, vHip, vThigh);
+    Char_Vec3Sub(vKnee, vOld, vShin);
+    Char_Vec3Sub(vOld, vToe, vFoot);
     fReach = (f32)Math_Sqrt(Vec3_LengthSqClamped(vReach));
     fLeg = (f32)Math_Sqrt(Vec3_LengthSqClamped(vLeg));
     fThigh = (f32)Math_Sqrt(Vec3_LengthSqClamped(vThigh));
@@ -970,10 +972,10 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     if (fabsf(fTurn) > 0.0001f) {
         Vec3_Scale(fTurn, vNormal, vAxis);
         Quat_BuildFromVector(vAxis, qTurn);
-        Quat_Invert(pChar->pModel->pPoses[nBoneB].q0, qA8);
+        Quat_Invert(pChar->pModel->pPoses[nKnee].q0, qA8);
         Quat_RotateVector(qA8, qTurn, q98);
-        Quat_Multiply(q98, pChar->pModel->pBones[nBoneB].q0C, qB8);
-        Quat_Copy(qB8, pChar->pModel->pBones[nBoneB].q0C);
+        Quat_Multiply(q98, pChar->pModel->pBones[nKnee].q0C, qB8);
+        Quat_Copy(qB8, pChar->pModel->pBones[nKnee].q0C);
     }
 
     // the hip: turned by the change in the angle between the thigh and the hip-to-foot line
@@ -983,19 +985,19 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
         Vec3_Scale(fTurn2, vNormal, vAxis);
         vAxis[3] = 0.0f;
         Quat_BuildFromVector(vAxis, qTurn);
-        Quat_Invert(pChar->pModel->pPoses[nBoneA].q0, qA8);
+        Quat_Invert(pChar->pModel->pPoses[nHip].q0, qA8);
         Quat_RotateVector(qA8, qTurn, q98);
-        Quat_Multiply(q98, pChar->pModel->pBones[nBoneA].q0C, qB8);
-        Quat_Copy(qB8, pChar->pModel->pBones[nBoneA].q0C);
+        Quat_Multiply(q98, pChar->pModel->pBones[nHip].q0C, qB8);
+        Quat_Copy(qB8, pChar->pModel->pBones[nHip].q0C);
     }
 
     // the ankle: tilted about the horizontal axis across the slope, by the slope's angle
-    pBone = &pChar->pModel->pBones[nBoneA];
+    pBone = &pChar->pModel->pBones[nHip];
     Quat_Multiply(pBone->q0C, pChar->pModel->pPoses[pBone->nParent].q0, q88);
-    Quat_Multiply(pChar->pModel->pBones[nBoneB - 1].q0C, q88, q58);
-    Quat_Multiply(pChar->pModel->pBones[nBoneB].q0C, q58, q68);
+    Quat_Multiply(pChar->pModel->pBones[nKnee - 1].q0C, q88, q58);
+    Quat_Multiply(pChar->pModel->pBones[nKnee].q0C, q58, q68);
     Quat_Invert(q68, q78);
-    Quat_Multiply(pChar->pModel->pPoses[nBoneC].q0, q78, q48);
+    Quat_Multiply(pChar->pModel->pPoses[nAnkle].q0, q78, q48);
     vAxis[0] = vSlope[2];
     vAxis[1] = 0.0f;
     vAxis[2] = -vSlope[0];
@@ -1017,7 +1019,7 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
         Quat_BuildFromVector(vAxis, qTurn);
         Quat_RotateVector(q28, qTurn, qB8);
         Quat_Multiply(qB8, q48, q18);
-        Quat_Copy(q18, pChar->pModel->pBones[nBoneC].q0C);
+        Quat_Copy(q18, pChar->pModel->pBones[nAnkle].q0C);
     }
 }
 
@@ -1056,8 +1058,8 @@ void Character_SetOrientationVec(Character* pChar, f32* pDir, f32 fAngle) {
     f32 fLen;
     f32 mtx[4][4];              // row 3 is left unset (mat44flt_ExtractEulerAngles reads rows 0..2)
     f32 fYaw;
-    f32 fB;
-    f32 fC;
+    f32 fPitch;
+    f32 fRoll;
 
     if (pChar != NULL) {
         fLen = Math_Sqrt(Vec3_LengthSqClamped(pDir));
@@ -1070,7 +1072,7 @@ void Character_SetOrientationVec(Character* pChar, f32* pDir, f32 fAngle) {
         mtx[1][3] = 0.0f;
         vec4flt_CrossProduct(mtx[0], mtx[1], mtx[2]);
         mtx[2][3] = 0.0f;
-        mat44flt_ExtractEulerAngles(mtx, &fYaw, &fB, &fC);
+        mat44flt_ExtractEulerAngles(mtx, &fYaw, &fPitch, &fRoll);
         Character_SetOrientation(pChar, fYaw + fAngle);
     }
 }
@@ -1347,15 +1349,15 @@ void Character_CopySkinChoices1To0(Character* pChar) {
 // Queues a dynamic texture load (LLDynTex.c) for the character, with the callbacks run as it begins
 // and as it ends (the Begin/End ...Callback functions). The pool's last entry points at the
 // character queued, or at nothing when no job is free.
-void Character_AddTextureLoadRequest(Character* pChar, void (*pfnA)(Character* pChar),
-                                     void (*pfnB)(Character* pChar)) {
+void Character_AddTextureLoadRequest(Character* pChar, void (*pfnBegin)(Character* pChar),
+                                     void (*pfnEnd)(Character* pChar)) {
     DynTexJob* pJob = fn_8010B8EC();
 
     if (pJob != NULL) {
         lbl_801B95E8.a[6].p = pChar;
-        pJob->pfnA = pfnA;
+        pJob->pfnA = pfnBegin;
         pJob->pChar = pChar;
-        pJob->pfnB = pfnB;
+        pJob->pfnB = pfnEnd;
         pJob->p0 = &pChar->p50;
         fn_8010B930(pJob);
     } else {
