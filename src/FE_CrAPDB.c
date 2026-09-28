@@ -1110,7 +1110,7 @@ s16 FE_CrAP_GetPartGMLockValByAssetNum(int nAsset) {
 
 // Value n (0..5) of a part's choice i under its list entry b: the asset's a4A[n]
 // (FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum), or -1 when there is no such choice.
-// The UI reads it through FE_CrAPMessages.c fn_80107828. What a4A holds is not known; it has six
+// The UI reads it through FE_CrAPMessages.c GM_vGetCrAPItemValue. What a4A holds is not known; it has six
 // entries, like the asset's six colours.
 int FE_CrAP_GetPartValue(s16 nPart, int b, int i, int n) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);

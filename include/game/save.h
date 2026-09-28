@@ -335,7 +335,7 @@ typedef struct SaveProfile {
     SkinChoices choices;        // 0x05500
     s8   nDateMonth;            // 0x0AF7C  } a date, set and read by menu messages packed as
     s8   nDateDay;              // 0x0AF7D  } fn_80078604 packs it (FE_CrAPMessages.c
-    s16  nDateYear;             // 0x0AF7E  } fn_80108178, fn_80108244)
+    s16  nDateYear;             // 0x0AF7E  } GM_vSetCrAPGolferInfo, GM_vGetCrAPGolferInfo)
     s32  aAF80[53];             // 0x0AF80  per slot: a Create-A-Player asset (FE_CrAPDB.c
                                 //          FE_CrAP_GetEquippedAsset), -1 for none; an asset's n2E is its slot
     // Four bit arrays with a bit per Create-A-Player asset (0x80057F18's loop over them all, which
