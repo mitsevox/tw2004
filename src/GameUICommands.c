@@ -2299,17 +2299,17 @@ void GM_vIGMessage140_Return2(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 2;
 }
 
-// The UI's command 141: writes pArgs[0] into *pArgs[1] and 0 into *pArgs[2] (the menus' fn_80082980
-// does the same).
+// The UI's command 141: writes pArgs[0] into *pArgs[1] and 0 into *pArgs[2] (the menus'
+// GM_vFEMessage288_ReturnArg does the same).
 void GM_vIGMessage141_ReturnArg(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[1].p = pArgs[0].i;
     *(s32*)pArgs[2].p = 0;
 }
 
-// The letter for number pArgs[0], 0 is "A", into pArgs[2] (command 142; the menus' fn_8008299C, run
+// The letter for number pArgs[0], 0 is "A", into pArgs[2] (command 142; the menus' GM_vFEGetLetter, run
 // with the same arguments).
 void GM_vGetLetter(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8008299C(pArgs, pResult);
+    GM_vFEGetLetter(pArgs, pResult);
 }
 
 // The card in port pArgs[0], slot pArgs[1]: into pArgs[2..6] whether its sectors are not 8 KB, and

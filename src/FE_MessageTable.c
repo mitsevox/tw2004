@@ -563,35 +563,35 @@ void GM_vBuildAttributeLevelUps(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetNumAttributeLevelUps(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetAttributeLevelUp(MsgArg* pArgs, MsgArg* pResult);
 void GM_vClearAttributeLevelUps(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082680(MsgArg* pArgs, MsgArg* pResult);
-void fn_800826C4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082708(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082758(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082790(MsgArg* pArgs, MsgArg* pResult);
-void fn_800827D0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082800(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008281C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082828(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082928(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008293C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082978(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008297C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082980(MsgArg* pArgs, MsgArg* pResult);
-void fn_800829D4(MsgArg* pArgs, MsgArg* pResult);
-void fn_800829E0(MsgArg* pArgs, MsgArg* pResult);
-void fn_800829EC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082A10(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082A44(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082A48(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082A4C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082A50(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082A94(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082C74(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082CA4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082CA8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082CDC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082D14(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082D3C(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage273_Return0(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCHasSLUS20572Save(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCNumEASaveGames(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCEASaveExists(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCGetEASaveName(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetMCRewardMoney(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage278_Return2And1(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage279_Return7(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCGetCardErrors(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEndGameLoop(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetCourseName(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage284_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage285_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage288_ReturnArg(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage290_Return2(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage291_Return4(MsgArg* pArgs, MsgArg* pResult);
+void GM_vBackupProfile(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage295_Return0(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage296_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage297_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage298_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCFreeFiles(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetSkillZoneOrLongDriveRecord(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEmptyProfileSlot(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage307_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetChallengeRewards(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEGetStringLength(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetEATraxTrack(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetEATraxTrack(MsgArg* pArgs, MsgArg* pResult);
 void fn_80082D98(MsgArg* pArgs, MsgArg* pResult);
 void fn_80082DA8(MsgArg* pArgs, MsgArg* pResult);
 void fn_80082E5C(MsgArg* pArgs, MsgArg* pResult);
@@ -1003,45 +1003,45 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[270] = GM_vGetNumAttributeLevelUps;
     gFEMessageHandlers[271] = GM_vGetAttributeLevelUp;
     gFEMessageHandlers[272] = GM_vClearAttributeLevelUps;
-    gFEMessageHandlers[273] = fn_80082680;
-    gFEMessageHandlers[274] = fn_80082708;
-    gFEMessageHandlers[275] = fn_80082758;
-    gFEMessageHandlers[276] = fn_80082790;
-    gFEMessageHandlers[277] = fn_800827D0;
-    gFEMessageHandlers[278] = fn_80082800;
-    gFEMessageHandlers[279] = fn_8008281C;
-    gFEMessageHandlers[280] = fn_80082828;
-    gFEMessageHandlers[281] = fn_80082928;
-    gFEMessageHandlers[282] = fn_8008293C;
+    gFEMessageHandlers[273] = GM_vFEMessage273_Return0;
+    gFEMessageHandlers[274] = GM_vMCNumEASaveGames;
+    gFEMessageHandlers[275] = GM_vMCEASaveExists;
+    gFEMessageHandlers[276] = GM_vMCGetEASaveName;
+    gFEMessageHandlers[277] = GM_vSetMCRewardMoney;
+    gFEMessageHandlers[278] = GM_vFEMessage278_Return2And1;
+    gFEMessageHandlers[279] = GM_vFEMessage279_Return7;
+    gFEMessageHandlers[280] = GM_vMCGetCardErrors;
+    gFEMessageHandlers[281] = GM_vEndGameLoop;
+    gFEMessageHandlers[282] = GM_vGetCourseName;
     gFEMessageHandlers[283] = GM_vHasProfileSecondName;
-    gFEMessageHandlers[284] = fn_80082978;
-    gFEMessageHandlers[285] = fn_8008297C;
+    gFEMessageHandlers[284] = GM_vFEMessage284_Empty;
+    gFEMessageHandlers[285] = GM_vFEMessage285_Empty;
     gFEMessageHandlers[286] = GM_vSetEditedGolferModelID;
     gFEMessageHandlers[287] = GM_vFEMessage287_Empty;
-    gFEMessageHandlers[288] = fn_80082980;
-    gFEMessageHandlers[289] = fn_8008299C;
-    gFEMessageHandlers[290] = fn_800829D4;
-    gFEMessageHandlers[291] = fn_800829E0;
+    gFEMessageHandlers[288] = GM_vFEMessage288_ReturnArg;
+    gFEMessageHandlers[289] = GM_vFEGetLetter;
+    gFEMessageHandlers[290] = GM_vFEMessage290_Return2;
+    gFEMessageHandlers[291] = GM_vFEMessage291_Return4;
     gFEMessageHandlers[292] = GM_vFEMessage292_Empty;
     gFEMessageHandlers[293] = GM_vGetBioLines;
-    gFEMessageHandlers[294] = fn_800829EC;
-    gFEMessageHandlers[295] = fn_80082A10;
-    gFEMessageHandlers[296] = fn_80082A44;
-    gFEMessageHandlers[297] = fn_80082A48;
-    gFEMessageHandlers[298] = fn_80082A4C;
+    gFEMessageHandlers[294] = GM_vBackupProfile;
+    gFEMessageHandlers[295] = GM_vFEMessage295_Return0;
+    gFEMessageHandlers[296] = GM_vFEMessage296_Empty;
+    gFEMessageHandlers[297] = GM_vFEMessage297_Empty;
+    gFEMessageHandlers[298] = GM_vFEMessage298_Empty;
     gFEMessageHandlers[299] = GM_vFEMessage299_Empty;
-    gFEMessageHandlers[300] = fn_80082A50;
+    gFEMessageHandlers[300] = GM_vMCFreeFiles;
     gFEMessageHandlers[301] = GM_vFEMessage301_Empty;
     gFEMessageHandlers[302] = GM_vFEMessage302_Empty;
     gFEMessageHandlers[303] = GM_vSetAllGolfersPickable;
-    gFEMessageHandlers[304] = fn_80082A94;
+    gFEMessageHandlers[304] = GM_vGetSkillZoneOrLongDriveRecord;
     gFEMessageHandlers[305] = GM_vFEMessage305_Empty;
-    gFEMessageHandlers[306] = fn_80082C74;
-    gFEMessageHandlers[307] = fn_80082CA4;
-    gFEMessageHandlers[308] = fn_80082CA8;
-    gFEMessageHandlers[309] = fn_80082CDC;
-    gFEMessageHandlers[310] = fn_80082D14;
-    gFEMessageHandlers[311] = fn_80082D3C;
+    gFEMessageHandlers[306] = GM_vEmptyProfileSlot;
+    gFEMessageHandlers[307] = GM_vFEMessage307_Empty;
+    gFEMessageHandlers[308] = GM_vGetChallengeRewards;
+    gFEMessageHandlers[309] = GM_vFEGetStringLength;
+    gFEMessageHandlers[310] = GM_vSetEATraxTrack;
+    gFEMessageHandlers[311] = GM_vGetEATraxTrack;
     gFEMessageHandlers[312] = GM_vFEMessage312_Empty;
     gFEMessageHandlers[313] = GM_vGetAllGolfersPickable;
     gFEMessageHandlers[314] = GM_vFEMessage314_Empty;
@@ -1257,7 +1257,7 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[622] = GM_vSaveLogo;
     gFEMessageHandlers[627] = fn_800842D0;
     gFEMessageHandlers[628] = fn_80084354;
-    gFEMessageHandlers[632] = fn_800826C4;
+    gFEMessageHandlers[632] = GM_vMCHasSLUS20572Save;
     gFEMessageHandlers[637] = TrophyRoom_GetIndexMod4;
     gFEMessageHandlers[638] = TrophyRoom_GetMedalDate;
     gFEMessageHandlers[640] = TrophyRoom_GetLadderAward;
@@ -4811,29 +4811,46 @@ void GM_vClearAttributeLevelUps(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->n10620 = 0;
 }
 
-void fn_80082680(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 273: whether MC.c's fn_800A218C finds its file on the card in port pArgs[0],
+// slot pArgs[1]. fn_800A218C always returns MC_ERR_NOFILE in this build (the stub twin of
+// fn_800A2194's search), so the answer is always 0.
+void GM_vFEMessage273_Return0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_800A218C(pArgs[0].i, pArgs[1].i) == 0;
 }
 
-void fn_800826C4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 632: 1 when the card in port pArgs[0], slot pArgs[1] holds a file whose name
+// contains "BASLUS-20572" (fn_800A2194: another PlayStation 2 product code than this game's own
+// save, MC_FILE_NAME "BASLUS-20757"), else 0 (also when the card cannot be read).
+void GM_vMCHasSLUS20572Save(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_800A2194(pArgs[0].i, pArgs[1].i) == 0;
 }
 
-void fn_80082708(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 274: how many of the EA titles in the 'eagm' list have a save on the card in
+// port pArgs[0], slot pArgs[1] (MC_NumEASaveGames: it marks them, and returns a card error instead
+// when the card cannot be read), and into *pArgs[2] how many titles the list holds
+// (MC_GetNumEATitles).
+void GM_vMCNumEASaveGames(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = MC_NumEASaveGames(pArgs[0].i, pArgs[1].i);
     *(s32*)pArgs[2].p = MC_GetNumEATitles();
 }
 
-void fn_80082758(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 275: whether EA title pArgs[0] of the 'eagm' list was found on the card by the
+// last GM_vMCNumEASaveGames (MC_EASaveExists).
+void GM_vMCEASaveExists(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = MC_EASaveExists(pArgs[0].i);
 }
 
-void fn_80082790(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 276: the name of EA title pArgs[0] of the 'eagm' list (MC_GetEASaveName),
+// copied into the string pArgs[1].
+void GM_vMCGetEASaveName(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[1].p)->pStr, MC_GetEASaveName(pArgs[0].i));
 }
 
-// Add a payout to player slot 0's money (when pArgs[1] is set); the front end keeps the amount.
-void fn_800827D0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 277: the money the memory card rewards (TW07: GM_vSetMCRewardMoney(money,
+// oldUserLoaded)). pArgs[0] is kept in lbl_801D7148.n1C, which a new profile gets on top of its
+// 25000 start; when pArgs[1] is set (a profile is already loaded) it is also added now to player
+// slot 0's money to spend (nCurrentCash).
+void GM_vSetMCRewardMoney(MsgArg* pArgs, MsgArg* pResult) {
     s32 nAmount;
 
     nAmount = pArgs[0].i;
@@ -4843,18 +4860,23 @@ void fn_800827D0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80082800(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 278: always writes 2 into *pArgs[0] and 1 into *pArgs[1] in this build (the
+// round's GM_vIGMessage139_Return2And1 does the same).
+void GM_vFEMessage278_Return2And1(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[0].p = 2;
     *(s32*)pArgs[1].p = 1;
 }
 
-void fn_8008281C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 279: always answers 7 in this build.
+void GM_vFEMessage279_Return7(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 7;
 }
 
-// The card in slot pArgs[0], pArgs[1]: whether its sectors are not 8 KB, and its error flags
-// (bad encoding, not a memory card, I/O error, broken).
-void fn_80082828(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 280: for the card in port pArgs[0], slot pArgs[1] (MC_GetMC), 1 or 0 into
+// *pArgs[2] when its sectors are not 8 KB, and into *pArgs[3..6] its flags: bad encoding
+// (MC_CARD_ENCODING), not a memory card (MC_CARD_WRONGDEVICE), I/O error (MC_CARD_IOERROR) and
+// broken (MC_CARD_BROKEN). The round's GM_vIG_MCGetCardErrors is the same.
+void GM_vMCGetCardErrors(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
 
     MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
@@ -4885,67 +4907,89 @@ void fn_80082828(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[6].p = 0;
 }
 
-void fn_80082928(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 281: ends the menus' main loop: gSession.nC 2, which gomainloop.c fn_8006D01C
+// checks each frame (the round's IG_vEndGameLoop is the same).
+void GM_vEndGameLoop(MsgArg* pArgs, MsgArg* pResult) {
     gSession.nC = 2;
 }
 
-void fn_8008293C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 282: course pArgs[0]'s name (lbl_80191990: "Pebble Beach", ...), copied into
+// the string pArgs[1].
+void GM_vGetCourseName(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[1].p)->pStr, lbl_80191990[pArgs[0].i]);
 }
 
-void fn_80082978(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 284: empty in this build.
+void GM_vFEMessage284_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8008297C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 285: empty in this build.
+void GM_vFEMessage285_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80082980(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 288: writes pArgs[0] back into *pArgs[1] and 0 into *pArgs[2] (the round's
+// GM_vIGMessage141_ReturnArg does the same).
+void GM_vFEMessage288_ReturnArg(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[1].p = pArgs[0].i;
     *(s32*)pArgs[2].p = 0;
 }
 
-// The letter for a number: 0 is "A".
-void fn_8008299C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 289: the letter for number pArgs[0] (0 is "A") into the string pArgs[2];
+// pArgs[1] is not used. The round's GM_vGetLetter runs it with its own arguments.
+void GM_vFEGetLetter(MsgArg* pArgs, MsgArg* pResult) {
     sprintf(((MsgString*)pArgs[2].p)->pStr, "%c", pArgs[0].i + 'A');
 }
 
-void fn_800829D4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 290: always answers 2 in this build.
+void GM_vFEMessage290_Return2(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 2;
 }
 
-void fn_800829E0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 291: always answers 4 in this build.
+void GM_vFEMessage291_Return4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 4;
 }
 
-void fn_800829EC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 294: copies player slot pArgs[0]'s profile into its backup row (FE_Manager.c
+// fn_80077968; lbl_801D7148.p658[aBackup[slot]]).
+void GM_vBackupProfile(MsgArg* pArgs, MsgArg* pResult) {
     fn_80077968(pArgs[0].i);
 }
 
-void fn_80082A10(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 295: always answers 0 and an empty string (into the string pArgs[0]) in this
+// build.
+void GM_vFEMessage295_Return0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
     strcpy(((MsgString*)pArgs[0].p)->pStr, "");
 }
 
-void fn_80082A44(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 296: empty in this build.
+void GM_vFEMessage296_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80082A48(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 297: empty in this build.
+void GM_vFEMessage297_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80082A4C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 298: empty in this build.
+void GM_vFEMessage298_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// The free directory entries on the card in slot pArgs[0], pArgs[1].
-void fn_80082A50(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 300: how many more files the card in port pArgs[0], slot pArgs[1] has room for
+// in its directory (MCCardState.nFreeFiles). The round's GM_vIG_MCFreeFiles is the same.
+void GM_vMCFreeFiles(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
 
     MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
     pResult->i = state.nFreeFiles;
 }
 
-// Record pArgs[2] of table pArgs[0] in the record list pArgs[1] (0, 1: recC; 16, 17, 13: recB):
-// its value, and its holder's name into the string pArgs[3].
-void fn_80082A94(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 304: place pArgs[2] (0 best .. 4) of a skill-zone or long-drive record table,
+// its value answered and its holder's name copied into the string pArgs[3]. pArgs[1] picks the
+// table: game mode 16, 17 or 13 the skill-zone records (gSession.recB[pArgs[0]][0..2], pArgs[0] the
+// hole), 0 or 1 the long-drive contest variant's records (recC[pArgs[0]][0..1], pArgs[0] the hole's
+// record index); anything else leaves the result alone.
+void GM_vGetSkillZoneOrLongDriveRecord(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[1].i) {
     case 13:
         pResult->i = gSession.recB[pArgs[0].i][2][pArgs[2].i].nValue;
@@ -4970,29 +5014,39 @@ void fn_80082A94(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Empty a player slot: no profile in it, none loaded.
-void fn_80082C74(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 306: empties player slot pArgs[0]: no profile in it (SaveProfile.bActive 0) and
+// none loaded (lbl_801D7148.aLoaded).
+void GM_vEmptyProfileSlot(MsgArg* pArgs, MsgArg* pResult) {
     gpSaveData[pArgs[0].i].bActive = 0;
     lbl_801D7148.aLoaded[pArgs[0].i] = 0;
 }
 
-void fn_80082CA4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 307: empty in this build.
+void GM_vFEMessage307_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80082CA8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 308: challenge pArgs[0]'s three medal rewards (PlayNow_GetRewards) into
+// *pArgs[1] (the lowest medal's), *pArgs[2] and *pArgs[3] (the best's).
+void GM_vGetChallengeRewards(MsgArg* pArgs, MsgArg* pResult) {
     PlayNow_GetRewards(pArgs[0].i, pArgs[1].p, pArgs[2].p, pArgs[3].p);
 }
 
-void fn_80082CDC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 309: the length of the string pArgs[0] (strlen). The round's
+// GM_vGetStringLength is the same.
+void GM_vFEGetStringLength(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = strlen(((MsgString*)pArgs[0].p)->pStr);
 }
 
-void fn_80082D14(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 310: switches EA Trax track pArgs[1] (0..18) on or off (pArgs[2]) in music row
+// pArgs[0] (gSession.options.rows; StartBackgroundMusic plays the row's tracks that are on).
+void GM_vSetEATraxTrack(MsgArg* pArgs, MsgArg* pResult) {
     gSession.options.rows[pArgs[0].i][pArgs[1].i] = pArgs[2].i;
 }
 
-// Music row pArgs[0]'s flag for track pArgs[1], and the track's two lines of text.
-void fn_80082D3C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 311: whether EA Trax track pArgs[1] is on in music row pArgs[0]
+// (gSession.options.rows), and the track's two lines of text: the strings pArgs[2] and pArgs[3] are
+// pointed at its sz0 and its song name (Trax.c's lbl_801F846C).
+void GM_vGetEATraxTrack(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gSession.options.rows[pArgs[0].i][pArgs[1].i];
     ((MsgString*)pArgs[2].p)->pStr = lbl_801F846C[pArgs[1].i].sz0;
     ((MsgString*)pArgs[3].p)->pStr = lbl_801F846C[pArgs[1].i].szSong;
