@@ -23,11 +23,11 @@ int  SKABlender_NumSKAsInBlender(SKABlendNode* pNode);
 f32  SKATime_CalcStep(AnimPlayer* pPlayer, f32 fT);
 
 // Defined here, last address first (CodeWarrior lays out .sbss in reverse).
-UMemPool* lbl_80281E98;
-UMemPool* lbl_80281E94;
-UMemPool* lbl_80281E90;
-UMemPool* lbl_80281E8C;
-UMemPool* lbl_80281E88;
+UMemPool* gSKAChannelPool;
+UMemPool* gSKABlenderPool;
+UMemPool* gSKABlendDataPool;
+UMemPool* gSkelPosePool;
+UMemPool* gMorphPosePool;
 
 // Creates the blend tree's pools, nNumEntries of each (10 in the front end, game types 10 and 3,
 // else 50): nodes by type (channels 0x34 bytes, blenders 0x2C, other nodes 0x20), then pose buffers
@@ -40,34 +40,34 @@ void AnimBlender_InitModule(void) {
     } else {
         nCount = 50;
     }
-    lbl_80281E98 = CreateMemPool(nCount, 0x34, 2, 16);
-    lbl_80281E94 = CreateMemPool(nCount, 0x2C, 2, 16);
-    lbl_80281E90 = CreateMemPool(nCount, 0x20, 2, 16);
-    lbl_80281E8C = CreateMemPool(nCount, sizeof(SkelPose), 2, 16);
-    lbl_80281E88 = CreateMemPool(nCount, 0x114C, 2, 16);
+    gSKAChannelPool = CreateMemPool(nCount, 0x34, 2, 16);
+    gSKABlenderPool = CreateMemPool(nCount, 0x2C, 2, 16);
+    gSKABlendDataPool = CreateMemPool(nCount, 0x20, 2, 16);
+    gSkelPosePool = CreateMemPool(nCount, sizeof(SkelPose), 2, 16);
+    gMorphPosePool = CreateMemPool(nCount, 0x114C, 2, 16);
 }
 
 // Destroy the pools AnimBlender_InitModule made.
 void AnimBlender_CloseModule(void) {
-    if (lbl_80281E98 != NULL) {
-        DeleteMemPool(lbl_80281E98);
-        lbl_80281E98 = NULL;
+    if (gSKAChannelPool != NULL) {
+        DeleteMemPool(gSKAChannelPool);
+        gSKAChannelPool = NULL;
     }
-    if (lbl_80281E94 != NULL) {
-        DeleteMemPool(lbl_80281E94);
-        lbl_80281E94 = NULL;
+    if (gSKABlenderPool != NULL) {
+        DeleteMemPool(gSKABlenderPool);
+        gSKABlenderPool = NULL;
     }
-    if (lbl_80281E90 != NULL) {
-        DeleteMemPool(lbl_80281E90);
-        lbl_80281E90 = NULL;
+    if (gSKABlendDataPool != NULL) {
+        DeleteMemPool(gSKABlendDataPool);
+        gSKABlendDataPool = NULL;
     }
-    if (lbl_80281E8C != NULL) {
-        DeleteMemPool(lbl_80281E8C);
-        lbl_80281E8C = NULL;
+    if (gSkelPosePool != NULL) {
+        DeleteMemPool(gSkelPosePool);
+        gSkelPosePool = NULL;
     }
-    if (lbl_80281E88 != NULL) {
-        DeleteMemPool(lbl_80281E88);
-        lbl_80281E88 = NULL;
+    if (gMorphPosePool != NULL) {
+        DeleteMemPool(gMorphPosePool);
+        gMorphPosePool = NULL;
     }
 }
 
@@ -85,13 +85,13 @@ void SKABlendData_Init(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn
     if (*ppNode == NULL) {
         switch (nType) {
         case 0:
-            *ppNode = AllocPoolMem(lbl_80281E98);
+            *ppNode = AllocPoolMem(gSKAChannelPool);
             break;
         case 1:
-            *ppNode = AllocPoolMem(lbl_80281E94);
+            *ppNode = AllocPoolMem(gSKABlenderPool);
             break;
         default:
-            *ppNode = AllocPoolMem(lbl_80281E90);
+            *ppNode = AllocPoolMem(gSKABlendDataPool);
             break;
         }
         if (*ppNode == NULL) return;
@@ -105,14 +105,14 @@ void SKABlendData_Init(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn
     (*ppNode)->fStart = (*ppNode)->fEnd = 0.0f;
     (*ppNode)->fWeight = 0.5f;
     if ((*ppNode)->nFormat == 0) {
-        (*ppNode)->pPose = AllocPoolMem(lbl_80281E8C);
+        (*ppNode)->pPose = AllocPoolMem(gSkelPosePool);
         if ((*ppNode)->pPose == NULL) return;
         BitArray_ClearArray((*ppNode)->pPose->a0, 128);
         BitArray_ClearArray((*ppNode)->pPose->a10, 128);
         BitArray_FillArray((*ppNode)->pPose->a20, 128);
         BitArray_FillArray((*ppNode)->pPose->a30, 128);
     } else if ((*ppNode)->nFormat == 1) {
-        (*ppNode)->pPose = AllocPoolMem(lbl_80281E88);
+        (*ppNode)->pPose = AllocPoolMem(gMorphPosePool);
         if ((*ppNode)->pPose == NULL) return;
         BitArray_ClearArray(((SkelPose1*)(*ppNode)->pPose)->pose.a0, 128);
         BitArray_ClearArray(((SkelPose1*)(*ppNode)->pPose)->pose.a10, 128);
@@ -147,11 +147,11 @@ void SKABlendData_Shutdown(SKABlendNode** ppNode, u8 bFreeSources) {
     if (*ppNode == NULL) return;
     if ((*ppNode)->nFormat == 0) {
         if ((*ppNode)->pPose != NULL) {
-            ReturnPoolMem(lbl_80281E8C, (*ppNode)->pPose);
+            ReturnPoolMem(gSkelPosePool, (*ppNode)->pPose);
         }
     } else if ((*ppNode)->nFormat == 1) {
         if ((*ppNode)->pPose != NULL) {
-            ReturnPoolMem(lbl_80281E88, (*ppNode)->pPose);
+            ReturnPoolMem(gMorphPosePool, (*ppNode)->pPose);
         }
     }
     (*ppNode)->pPose = NULL;
@@ -173,13 +173,13 @@ void SKABlendData_Shutdown(SKABlendNode** ppNode, u8 bFreeSources) {
     if ((*ppNode)->bPooled == 1) {
         switch ((*ppNode)->nType) {
         case 0:
-            ReturnPoolMem(lbl_80281E98, *ppNode);
+            ReturnPoolMem(gSKAChannelPool, *ppNode);
             break;
         case 1:
-            ReturnPoolMem(lbl_80281E94, *ppNode);
+            ReturnPoolMem(gSKABlenderPool, *ppNode);
             break;
         default:
-            ReturnPoolMem(lbl_80281E90, *ppNode);
+            ReturnPoolMem(gSKABlendDataPool, *ppNode);
             break;
         }
         *ppNode = NULL;

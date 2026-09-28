@@ -263,7 +263,7 @@ LAYOUT_ASSERT(DynChainSettings, 0xC0);
 // (lhip, lthitwst, lknee, lankl, ltoe), 0x52 IGdriver (the club bone, gripped), 0x53 clubhead,
 // 0x54 GBall1. The model loader (SKEL_LoadFromMem) copies bone 0x54's first 8 bytes into each bone
 // it adds as the bone's uId.
-extern char* lbl_80187278[90];
+extern char* gSkelBoneNames[90];
 // Skeleton.c: the names of the club models' bones ("IGDriver", "IGputter", "IGiron3", "IGiron7",
 // "IGwedge"); SKEL_GenerateBoneLookupTable gives a model bone with one of them bone id 0x52's index.
 extern char* gSkelClubBoneNames[5];
@@ -360,11 +360,11 @@ void AnimBlender_CloseModule(void);                 // animblender.c
 
 // animblender.c's pools (AnimBlender_InitModule creates them, AnimBlender_CloseModule destroys them): blend tree nodes by
 // type (0x34, 0x2C and 0x20 bytes), then pose buffers of format 0 (0x1040) and format 1 (0x114C).
-extern UMemPool* lbl_80281E98;
-extern UMemPool* lbl_80281E94;
-extern UMemPool* lbl_80281E90;
-extern UMemPool* lbl_80281E8C;
-extern UMemPool* lbl_80281E88;
+extern UMemPool* gSKAChannelPool;
+extern UMemPool* gSKABlenderPool;
+extern UMemPool* gSKABlendDataPool;
+extern UMemPool* gSkelPosePool;
+extern UMemPool* gMorphPosePool;
 // animblender.c: clear bit nBit in the three blocks of pNode's format 1 pose buffer, and its sources'.
 void SKABlender_ClearMorph(SKABlendNode* pNode, s32 nBit);
 void SKABlendData_Shutdown(struct SKABlendNode** ppNode, u8 bFreeSources);   // animblender.c: gives a blend

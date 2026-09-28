@@ -1,16 +1,16 @@
 // mtalib.c (EA's name, from its asserts; also in EA's 2002 source tree): animation helpers, and
-// the 'MAL ' banks loaded from the stream files (two slots, lbl_80281CB4): groups of items that the
+// the 'MAL ' banks loaded from the stream files (two slots, gMtaLibBanks): groups of items that the
 // animation code picks from at random.
 
 #include "charstate.h"
 
-static MalBank* lbl_80281CB4[2];
-static int lbl_80281CB0;                // bytes the banks have allocated
+static MalBank* gMtaLibBanks[2];
+static int gMtaLibBytes;                // bytes the banks have allocated
 static u8 lbl_801B9668[200];
 
 // The bone names by bone id (character.h): 0x15 "rwrst", 0x36-0x3A the right leg ("rhip" to "rtoe"),
 // 0x44-0x48 the left leg, 0x52 "IGdriver" (the club bone), 0x53 "clubhead".
-char* lbl_80187278[90] = {
+char* gSkelBoneNames[90] = {
     "", "root", "ctrgrav", "waist", "s1", "s2", "s3", "s4", "s5", "neck", "head", "tail1", "tail2",
     "tail3", "tail4", "skull", "rcolr", "rshld", "rbictwst", "relb", "r4rm", "rwrst", "rf1", "rf2",
     "rf3", "ri1", "ri2", "ri3", "rt1", "rt2", "rt3", "rslvBjnt", "rslvFjnt", "rslvHjnt", "rshlddef",
@@ -136,10 +136,10 @@ void MtaLib_Link(MtaLib* pLib) {
 
 // Starts with no banks: both slots empty, no bytes allocated, lbl_801B9668 an empty string.
 void MtaLib_InitModule(void) {
-    lbl_80281CB4[0] = NULL;
-    lbl_80281CB4[1] = NULL;
+    gMtaLibBanks[0] = NULL;
+    gMtaLibBanks[1] = NULL;
     lbl_801B9668[0] = 0;
-    lbl_80281CB0 = 0;
+    gMtaLibBytes = 0;
 }
 
 // Frees both banks and clears the byte count.
@@ -147,12 +147,12 @@ void MtaLib_CloseModule(void) {
     int i;
 
     for (i = 0; i < 2; i++) {
-        if (lbl_80281CB4[i] != NULL) {
-            MtaLib_FreeBank(lbl_80281CB4[i]);
-            lbl_80281CB4[i] = NULL;
+        if (gMtaLibBanks[i] != NULL) {
+            MtaLib_FreeBank(gMtaLibBanks[i]);
+            gMtaLibBanks[i] = NULL;
         }
     }
-    lbl_80281CB0 = 0;
+    gMtaLibBytes = 0;
 }
 
 // Frees a bank: the libraries of its three groups, each group's item array, then the bank.
@@ -175,7 +175,7 @@ void MtaLib_FreeBank(MalBank* pBank) {
 // EA bug: nBank is only range-checked; bank 0 is returned either way.
 MalBank* MtaLib_GetBank(int nBank) {
     if (nBank < 0 || nBank >= 2) return NULL;
-    return lbl_80281CB4[0];
+    return gMtaLibBanks[0];
 }
 
 // The libraries of the bank's group nGroup; *pnNum gets how many. n is not used.
@@ -219,7 +219,7 @@ MalBank* MtaLib_LoadBank(u8* pData) {
     MtaLib* pLib;
 
     pBank = StaticMem_Alloc(sizeof(MalBank), 2, 0x40, "mtalib.c", 474);
-    lbl_80281CB0 += sizeof(MalBank);
+    gMtaLibBytes += sizeof(MalBank);
     BYTESWAP_SWAPDATA(&pData, (u8*)&pBank->nNumGroups, 4, 4);
     if ((uptr)pData & 0xF) {
         pData = (u8*)(((uptr)pData & ~0xF) + 0x10);
@@ -239,7 +239,7 @@ MalBank* MtaLib_LoadBank(u8* pData) {
                 ByteSwap_Records(&pA, &pB, aHeader, 10, 1);
                 pLib = (MtaLib*)pData;
                 pGroup->apItem[j] = StaticMem_Alloc(pLib->nBytes, 2, 0x40, "mtalib.c", 501);
-                lbl_80281CB0 += pLib->nBytes;
+                gMtaLibBytes += pLib->nBytes;
                 nSize = pLib->nBytes;
                 pB = pA = pData;
                 ByteSwap_Records(&pA, &pB, aHeader, 10, 1);
@@ -259,8 +259,8 @@ void MtaLib_OnLoaded(UStreamObject* pObject) {
     u32 uSlot;
 
     uSlot = pObject->uId;
-    if (uSlot < 2 && lbl_80281CB4[uSlot] == NULL) {
-        lbl_80281CB4[uSlot] = MtaLib_LoadBank(pObject->pData);
+    if (uSlot < 2 && gMtaLibBanks[uSlot] == NULL) {
+        gMtaLibBanks[uSlot] = MtaLib_LoadBank(pObject->pData);
     }
     StaticMem_Free(pObject);
 }

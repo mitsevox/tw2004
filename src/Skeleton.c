@@ -800,7 +800,7 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int bLef
         pModel->pBones[i].v1C[1] = 0.0f;
         pModel->pBones[i].v1C[2] = 0.0f;
         pModel->pBones[i].v1C[3] = 1.0f;
-        pModel->pBones[i].uId = *(u64*)lbl_80187278[0x54];  // port: reads 8 bytes of the name
+        pModel->pBones[i].uId = *(u64*)gSkelBoneNames[0x54];  // port: reads 8 bytes of the name
     }
     pModel->nBones = nTotal;
     pModel->pMatrices = StaticMem_Alloc(pModel->nBones * sizeof(f32[4][4]), 2, 64, "Skeleton.c", 1265);
@@ -1137,7 +1137,7 @@ void SKEL_Free(CharModel* pModel) {
 }
 
 // Fills in aBone, each bone id's index in the model (0xFF: none; id 0 is bone 0): each model bone
-// from 1 is found by its name (the first 8 bytes of uId) in mtalib.c's bone names (lbl_80187278).
+// from 1 is found by its name (the first 8 bytes of uId) in mtalib.c's bone names (gSkelBoneNames).
 // The club bone (0x52) can go by other names: of the first 30 bones with no known name, the first
 // named in gSkelClubBoneNames becomes it.
 void SKEL_GenerateBoneLookupTable(CharModel* pModel) {
@@ -1156,7 +1156,7 @@ void SKEL_GenerateBoneLookupTable(CharModel* pModel) {
         strncpy(szName, (char*)&pModel->pBones[nId].uId, 8);
         szName[8] = '\0';
         for (j = 0; j < 0x59; j++) {
-            if (strcmp(szName, lbl_80187278[j]) == 0) {
+            if (strcmp(szName, gSkelBoneNames[j]) == 0) {
                 pModel->aBone[j] = nId;
                 break;
             }
