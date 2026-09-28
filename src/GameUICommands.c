@@ -310,8 +310,8 @@ int   GM_BestBallMode_GetTeamRelativeScore(int nPlayer, u8 bCurrent);
 u8    PlayNow_IsSpeedGolf(void);
 s32   PlayNow_GetMedalMark(int k);
 int   PlayNow_GetScoreToTarget(void);
-char* PlayNow_GetGroupName(int nId);
-char* PlayNow_GetGroupDescription(int nId);
+char* PlayNow_GetGroupName(int nGroup);
+char* PlayNow_GetGroupDescription(int nGroup);
 int   PlayNow_GetHolesLeft(void);
 void  PlayNow_Restart(void);
 void  GameModePractice_FinishHole(void);
@@ -2691,7 +2691,7 @@ void IG_vGetDiscDriveStatus(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Command 181: does what command 8 does (fn_80086300: the pause menu closes; the lesson restarts,
+// Command 181: does what command 8 does (GM_vClosePauseMenu: the pause menu closes; the lesson restarts,
 // or while fading to black the hole load request is dropped), then answers whether the current
 // hole's file is on the disc in the drive (fn_80110180 with fn_80110178's hole check on); if it is
 // not, the hole load request is dropped (fn_8006F4E0).
@@ -2705,7 +2705,7 @@ void IG_vCloseMenuCheckDisc(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Command 197: does what command 113 does (fn_800885F8: the sounds resume, the pause menu closes,
+// Command 197: does what command 113 does (GM_vPauseMenuClosed: the sounds resume, the pause menu closes,
 // the lesson restarts unless fading to black), drops the hole load request unless a Play Now
 // challenge is running (fn_8006F4E0), then answers whether the current hole's file is on the disc
 // in the drive (fn_80110180 with fn_80110178's hole check on).
@@ -3096,7 +3096,7 @@ s32 GM_GetNumHolesRemainingInRound(void) {
     return n;
 }
 
-// An online game's step when the game ends: the end-of-game command (fn_8008628C) calls it with (0,
+// An online game's step when the game ends: the end-of-game command (GM_vExitGame) calls it with (0,
 // 1) in an online game. Empty in this build, which has no online play.
 void OnlineGolf_OnEndOfGame(int a, int b) {
 }
