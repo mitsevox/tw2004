@@ -11,7 +11,7 @@ int  Input_ScaleStickAxis(int nValue, int nDeadZone, int nMax);
 int  Input_ScaleTrigger(int nValue, int nDeadZone, int nMax);
 void Input_ScaleAnalog(PadStatus* pStatus, PadAnalog* pAnalog);
 
-Controllers lbl_801A36A0;
+Controllers gControllers;
 
 // Starts the pad library and clears the four pads' state: D-pad emulation off, rumble switched on
 // and allowed on every pad. Returns 0. Called once, by the start-up list fn_80005520.
@@ -19,17 +19,17 @@ int Input_iInitModule(void) {
     int i;
 
     PADInit();
-    Mem_set(&lbl_801A36A0, 0, sizeof(Controllers));
-    lbl_801A36A0.nRead = 0;
-    lbl_801A36A0.nRead = 0;
-    lbl_801A36A0.nRead = 0;
-    lbl_801A36A0.bStickAsDpad = 0;
+    Mem_set(&gControllers, 0, sizeof(Controllers));
+    gControllers.nRead = 0;
+    gControllers.nRead = 0;
+    gControllers.nRead = 0;
+    gControllers.bStickAsDpad = 0;
     for (i = 0; i < 4; i++) {
-        lbl_801A36A0.aRumble[i].bOn = 1;
-        lbl_801A36A0.aRumble[i].bAllowed = 1;
-        lbl_801A36A0.auHeld[i] = 0;
+        gControllers.aRumble[i].bOn = 1;
+        gControllers.aRumble[i].bAllowed = 1;
+        gControllers.auHeld[i] = 0;
     }
-    lbl_801A36A0.nRead = 0;
+    gControllers.nRead = 0;
     return 0;
 }
 
@@ -63,7 +63,7 @@ u8 Input_bDoesPadExist(int nChan) {
 // bits when its main stick is pushed past a third of its travel. The UI turns it on in some game
 // types and in the pause menu (uiProcessInterface).
 void Input_vEmulateDPad(u8 bOn) {
-    lbl_801A36A0.bStickAsDpad = bOn;
+    gControllers.bStickAsDpad = bOn;
 }
 
 // Rumble on at full strength or off for pad nController (Input_vVibrateWave with 0xFF or 0).
@@ -79,15 +79,15 @@ void Input_vVibrateBuzz(int nController, int bOn) {
 // already running (Input_vUpdate stops it 60 frames later); 0x20 or less stops it. Does nothing
 // while the pad's rumble is switched off (Input_vSetVibrationStatus) or not allowed.
 void Input_vVibrateWave(int nController, int nStrength) {
-    if (lbl_801A36A0.aRumble[nController].bOn && lbl_801A36A0.aRumble[nController].bAllowed) {
+    if (gControllers.aRumble[nController].bOn && gControllers.aRumble[nController].bAllowed) {
         if (nStrength > 0x20) {
-            if (lbl_801A36A0.aRumble[nController].nFrames == 0) {
+            if (gControllers.aRumble[nController].nFrames == 0) {
                 PADControlMotor(nController, 1);
-                lbl_801A36A0.aRumble[nController].nFrames = 1;
+                gControllers.aRumble[nController].nFrames = 1;
             }
         } else {
             PADControlMotor(nController, 0);
-            lbl_801A36A0.aRumble[nController].nFrames = 0;
+            gControllers.aRumble[nController].nFrames = 0;
         }
     }
 }
@@ -101,10 +101,10 @@ void Input_vStopVibration(int nController) {
 // switching it off also stops the motor.
 void Input_vSetVibrationStatus(int nController, int bEnable) {
     if (bEnable) {
-        lbl_801A36A0.aRumble[nController].bOn = 1;
+        gControllers.aRumble[nController].bOn = 1;
     } else {
         Input_vStopVibration(nController);
-        lbl_801A36A0.aRumble[nController].bOn = 0;
+        gControllers.aRumble[nController].bOn = 0;
     }
 }
 
@@ -174,19 +174,19 @@ void Input_vUpdate(void) {
     u32 uLastHeld;
     PadAnalog* pAnalog;
 
-    PADRead(lbl_801A36A0.aStatus);
-    lbl_801A36A0.nRead = 0;
+    PADRead(gControllers.aStatus);
+    gControllers.nRead = 0;
     uReset = 0;
     for (i = 0; i < 4; i++) {
         uBit = 0x80000000 >> i;
-        switch (lbl_801A36A0.aStatus[i].nError) {
+        switch (gControllers.aStatus[i].nError) {
         case 0:
-            lbl_801A36A0.uConnected |= uBit;
-            lbl_801A36A0.nRead |= 1 << i;
+            gControllers.uConnected |= uBit;
+            gControllers.nRead |= 1 << i;
             break;
         case -1:
             uReset |= uBit;
-            lbl_801A36A0.nRead |= 1 << i;
+            gControllers.nRead |= 1 << i;
             break;
         case -2:        // not ready yet, or a transfer error: try again next frame
         case -3:
@@ -194,53 +194,53 @@ void Input_vUpdate(void) {
         }
     }
     if (uReset != 0) {
-        lbl_801A36A0.uConnected &= ~uReset;
+        gControllers.uConnected &= ~uReset;
         PADReset(uReset);
     }
 
     for (i = 0; i < 4; i++) {
-        if (!(lbl_801A36A0.nRead & (1 << i))) continue;
-        if (lbl_801A36A0.uConnected & (0x80000000 >> i)) {
-            Input_ScaleAnalog(&lbl_801A36A0.aStatus[i], &lbl_801A36A0.aAnalog[i]);
-            lbl_801A36A0.auButtons[i] = lbl_801A36A0.aStatus[i].uButtons;
-            if (lbl_801A36A0.bStickAsDpad) {
+        if (!(gControllers.nRead & (1 << i))) continue;
+        if (gControllers.uConnected & (0x80000000 >> i)) {
+            Input_ScaleAnalog(&gControllers.aStatus[i], &gControllers.aAnalog[i]);
+            gControllers.auButtons[i] = gControllers.aStatus[i].uButtons;
+            if (gControllers.bStickAsDpad) {
                 // D-pad bits: 1 left, 2 right, 4 down, 8 up
-                pAnalog = &lbl_801A36A0.aAnalog[i];
+                pAnalog = &gControllers.aAnalog[i];
                 if (pAnalog->nStickX > 0xAA) {
-                    lbl_801A36A0.auButtons[i] |= 2;
-                    lbl_801A36A0.auButtons[i] &= ~1;
+                    gControllers.auButtons[i] |= 2;
+                    gControllers.auButtons[i] &= ~1;
                 } else if (pAnalog->nStickX < 0x56) {
-                    lbl_801A36A0.auButtons[i] |= 1;
-                    lbl_801A36A0.auButtons[i] &= ~2;
+                    gControllers.auButtons[i] |= 1;
+                    gControllers.auButtons[i] &= ~2;
                 }
                 if (pAnalog->nStickY > 0xAA) {
-                    lbl_801A36A0.auButtons[i] |= 4;
-                    lbl_801A36A0.auButtons[i] &= ~8;
+                    gControllers.auButtons[i] |= 4;
+                    gControllers.auButtons[i] &= ~8;
                 } else if (pAnalog->nStickY < 0x56) {
-                    lbl_801A36A0.auButtons[i] |= 8;
-                    lbl_801A36A0.auButtons[i] &= ~4;
+                    gControllers.auButtons[i] |= 8;
+                    gControllers.auButtons[i] &= ~4;
                 }
             }
-            if (lbl_801A36A0.aRumble[i].nFrames > 0) {
-                lbl_801A36A0.aRumble[i].nFrames++;
-                if (lbl_801A36A0.aRumble[i].nFrames > 60) {
+            if (gControllers.aRumble[i].nFrames > 0) {
+                gControllers.aRumble[i].nFrames++;
+                if (gControllers.aRumble[i].nFrames > 60) {
                     Input_vStopVibration(i);
                 }
             }
-            uHeld = lbl_801A36A0.auButtons[i];
-            uLastHeld = lbl_801A36A0.auHeld[i];
-            lbl_801A36A0.auHeld[i] = uHeld;
+            uHeld = gControllers.auButtons[i];
+            uLastHeld = gControllers.auHeld[i];
+            gControllers.auHeld[i] = uHeld;
             // pressed this frame in the low half, held in the high half
-            lbl_801A36A0.auButtons[i] = (uHeld & ~uLastHeld) | (uHeld << 16);
+            gControllers.auButtons[i] = (uHeld & ~uLastHeld) | (uHeld << 16);
         } else {
-            lbl_801A36A0.aAnalog[i].nStickX = 0x80;
-            lbl_801A36A0.aAnalog[i].nStickY = 0x80;
-            lbl_801A36A0.aAnalog[i].nSubStickX = 0x80;
-            lbl_801A36A0.aAnalog[i].nSubStickY = 0x80;
-            lbl_801A36A0.aAnalog[i].nTriggerL = 0;
-            lbl_801A36A0.aAnalog[i].nTriggerR = 0;
-            lbl_801A36A0.auButtons[i] = 0;
-            lbl_801A36A0.auHeld[i] = 0;
+            gControllers.aAnalog[i].nStickX = 0x80;
+            gControllers.aAnalog[i].nStickY = 0x80;
+            gControllers.aAnalog[i].nSubStickX = 0x80;
+            gControllers.aAnalog[i].nSubStickY = 0x80;
+            gControllers.aAnalog[i].nTriggerL = 0;
+            gControllers.aAnalog[i].nTriggerR = 0;
+            gControllers.auButtons[i] = 0;
+            gControllers.auHeld[i] = 0;
         }
     }
 }
@@ -248,11 +248,11 @@ void Input_vUpdate(void) {
 // Pad nController's sticks and triggers (its PadAnalog, as bytes), as Input_vUpdate last rescaled
 // them.
 u8* Input_sGetStickInfo(int nController) {
-    return (u8*)&lbl_801A36A0.aAnalog[nController];
+    return (u8*)&gControllers.aAnalog[nController];
 }
 
 // A controller's buttons: the held ones in the high 16 bits, the ones pressed this frame in the low
 // 16 (see Controller_GetButtonMask).
 u32 Input_ReadControlPad(int nController) {
-    return lbl_801A36A0.auButtons[nController];
+    return gControllers.auButtons[nController];
 }
