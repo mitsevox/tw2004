@@ -115,10 +115,10 @@ void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
 void ViewController_Update(int nView);
 void RC_UpdateCurrentScreenMatrices(void);
-void fn_80035754(Character* pChar);
-void fn_80035810(Character* pChar);
-void fn_80035FBC(void);
-void fn_80035FDC(UObject* pObj);
+void SKN_DrawCharacterParts(Character* pChar);
+void SKN_DrawClubParts(Character* pChar);
+void LI_ResetLights(void);
+void LI_SetObjectLights(UObject* pObj);
 void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
 void fn_800364A0(void);
 void fn_800B9EB8(char* szBall);
@@ -126,8 +126,8 @@ void Character_ExecuteTextureSwapFE(Character* pChar);
 char* fn_800484E0(int i);
 void fn_80035600(void);
 void Character_UpdateAnimation(Character* pChar, int a, f32 f);
-void fn_80035B40(Character* pChar, int n);
-void fn_80035FFC(void);
+void SKN_PoseCharacter(Character* pChar, int n);
+void LF_LoadCurrentLights(void);
 void fn_80079974(void);
 void fn_800B9CF0(int n);
 void SkinPart_SetChangeAllCopies(u8 b);
@@ -833,7 +833,7 @@ void sFE_AdjustAndSetGolferPosition(void) {
         fn_80035600();
         Character_UpdateAnimation(lbl_80281EE0->pB4->pChar, 1, 1.0f / 60.0f);
         if (lbl_80281EE0->pB4->pChar->n1698 == 0) {
-            fn_80035B40(lbl_80281EE0->pB4->pChar, 0);
+            SKN_PoseCharacter(lbl_80281EE0->pB4->pChar, 0);
         }
         LF_vSetCurrentLightFogEnvironment(0);
         if (lbl_80281EE0->pB4->pChar->p44 != NULL) {
@@ -847,7 +847,7 @@ void sFE_AdjustAndSetGolferPosition(void) {
                 fn_80093854(pLight);
             }
         }
-        fn_80035FFC();
+        LF_LoadCurrentLights();
     }
     fn_80035308();
 }
@@ -976,7 +976,7 @@ void fn_8008CE88(u8 bFull) {
         return;
     }
     if (lbl_80281EE0->pB4->b18 && lbl_80281EE0->b86 == 0) {
-        fn_80035FDC(NULL);
+        LI_SetObjectLights(NULL);
         RC_vSetCurrentRenderCtxTransformationMatrix(lbl_80281EE0->mC0);
         RC_UpdateCurrentScreenMatrices();
         RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
@@ -998,11 +998,11 @@ void fn_8008CE88(u8 bFull) {
         }
         RenderState_Flush();
         if (lbl_80281EE0->n8 == 0) {
-            fn_80035754(lbl_80281EE0->pB4->pChar);
+            SKN_DrawCharacterParts(lbl_80281EE0->pB4->pChar);
         } else if (lbl_80281EE0->n8 == 1) {
-            fn_80035810(lbl_80281EE0->pB4->pChar);
+            SKN_DrawClubParts(lbl_80281EE0->pB4->pChar);
         }
-        fn_80035FBC();
+        LI_ResetLights();
         RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
         RenderState_SetViewport(RC_spGetCurrentRenderCtx());
         RenderState_Flush();

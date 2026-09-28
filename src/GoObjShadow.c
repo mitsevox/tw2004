@@ -9,9 +9,9 @@
 #include "terrain.h"
 
 // Skin.c
-void fn_80036054(void* pMesh, int n, s32* pDesc);
-void fn_800360A0(void* pMesh);
-void fn_800360D4(u8* pMesh);
+void SD_InitShaderObject(void* pMesh, int n, s32* pDesc);
+void SD_FreeShaderObject(void* pMesh);
+void SD_DrawShaderObject(u8* pMesh);
 
 // GoTerrainCollision.c
 f32 fn_8004D80C(CourseInfo* pCourse, f32* pPos);
@@ -34,7 +34,7 @@ void BS_vInit(void) {
     desc[0] = 4;
     desc[1] = 1;
     for (i = 0; i < NUM_SHADOW_MESHES; i++) {
-        fn_80036054(lbl_801D96B8[i], 0, desc);
+        SD_InitShaderObject(lbl_801D96B8[i], 0, desc);
     }
 }
 
@@ -100,8 +100,8 @@ void fn_80093DB8(Ball* pBall, int nPlayer) {
         desc.pPos = lbl_801D97B0;
         desc.pColour = lbl_801D97A0[0];
         desc.pUV = lbl_801D9780;
-        fn_80036100((ShaderObject*)lbl_801D96B8[nPlayer], &desc, 1);
-        fn_800360D4(lbl_801D96B8[nPlayer]);
+        SD_FillShaderObject((ShaderObject*)lbl_801D96B8[nPlayer], &desc, 1);
+        SD_DrawShaderObject(lbl_801D96B8[nPlayer]);
         DS_vEnableZBufferUpdate(1);
         DS_vSetAlphaTestMode(1, 6, 0x80);
         DS_vSetZBufferMode(3);
@@ -112,6 +112,6 @@ void fn_80093DB8(Ball* pBall, int nPlayer) {
 void BS_vClose(void) {
     int i;
     for (i = 0; i < NUM_SHADOW_MESHES; i++) {
-        fn_800360A0(lbl_801D96B8[i]);
+        SD_FreeShaderObject(lbl_801D96B8[i]);
     }
 }

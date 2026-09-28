@@ -111,9 +111,9 @@ void  fn_8005CCA8(int nPlayer);
 void  Vec_Sub(f32* pA, f32* pB, f32* pOut);      // 0x8005CBF4  a - b
 void  Vec_Add(f32* pA, f32* pB, f32* pOut);      // 0x8005CBD0  a + b
 void  SW_vUIBlurReset(int nPlayer);
-void  fn_800360A0(void* p);
+void  SD_FreeShaderObject(void* p);
 void  SW_vUIInit(int nPlayer);
-void  fn_80036054(void* p, int a, s32* pDesc);
+void  SD_InitShaderObject(void* p, int a, s32* pDesc);
 void  fn_8005A788(int nPlayer, int a);
 void  fn_800AE3C4(int nPlayer);
 u8*   Pad_State(int nPlayer, int nController);   // the pad's state: [1] main stick y, [3] C-stick y
@@ -128,7 +128,7 @@ void  SW_vCheckForSwingBoost(int nPlayer);
 void  SW_vUIAdjustClub(Character* pObj, SwingData* pSw, int nStickX);
 int   fn_8005CC5C(void);
 void  UI_Obj_RenderBoostUI(int nView);
-void  fn_800360D4(u8* pMesh);
+void  SD_DrawShaderObject(u8* pMesh);
 void  SW_vStateInitBackSwingFigit(int nPlayer);
 void  SW_vImpact(int nPlayer);
 f32   SW_vCalculateShotPower(int nPlayer);
@@ -245,8 +245,8 @@ void SW_vInitModule(void) {
     gpSwing->fPuttFullPower = 0.75f;
     desc[0] = 0x1A;
     desc[1] = 1;
-    fn_80036054(gpSwing->mesh[0], 0, desc);
-    fn_80036054(gpSwing->mesh[1], 0, desc);
+    SD_InitShaderObject(gpSwing->mesh[0], 0, desc);
+    SD_InitShaderObject(gpSwing->mesh[1], 0, desc);
     for (i = 0; i < gSession.nNumPlayers; i++) {
         SW_vUIInit(i);
         SW_vClearBoosts(i);
@@ -264,8 +264,8 @@ void SW_vInitModule(void) {
 
 void fn_80058DB4(void) {
     int i;
-    fn_800360A0(gpSwing->mesh[0]);
-    fn_800360A0(gpSwing->mesh[1]);
+    SD_FreeShaderObject(gpSwing->mesh[0]);
+    SD_FreeShaderObject(gpSwing->mesh[1]);
     for (i = 0; i < 2; i++) {
         StaticMem_Free(gpSwing->p94[i]);
         StaticMem_Free(gpSwing->p9C[i]);
@@ -1010,8 +1010,8 @@ void fn_8005A850(int nPlayer) {
             mesh.pPos     = gpSwing->p94[nView];
             mesh.pColour  = gpSwing->p9C[nView];
             mesh.pUV      = gpSwing->pA4[nView];
-            fn_80036100((ShaderObject*)gpSwing->mesh[nView], &mesh, 1);
-            fn_800360D4(gpSwing->mesh[nView]);
+            SD_FillShaderObject((ShaderObject*)gpSwing->mesh[nView], &mesh, 1);
+            SD_DrawShaderObject(gpSwing->mesh[nView]);
             DS_vSetAlphaTestMode(1, 6, 0x80);
             DS_vEnableZBufferUpdate(1);
             RenderState_Flush();

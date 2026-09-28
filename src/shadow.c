@@ -8,8 +8,8 @@
 #include "unsorted/cull.h"
 
 void  VM_vUpdateInternalViewportRectData(f32* pRect);
-void  fn_80036054(void* pMesh, int n, s32* pDesc);   // Skin.c: set up a mesh object
-void  fn_800360A0(void* pMesh);                      // Skin.c: free it
+void  SD_InitShaderObject(void* pMesh, int n, s32* pDesc);   // Skin.c: set up a mesh object
+void  SD_FreeShaderObject(void* pMesh);                      // Skin.c: free it
 void  fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
 void  fn_80016948(void);
 void  fn_800169AC(void);
@@ -23,7 +23,7 @@ void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, in
 void fn_80035294(void);                 // GoTerrain.c
 void RC_UpdateCurrentScreenMatrices(void);
 void fn_80035604(void);                 // GoTerrain.c
-void fn_800358E0(Character* pChar, u32 uFlags);
+void SKN_DrawCharacter(Character* pChar, u32 uFlags);
 u8   Character_IsGolfer(Character* pChar);
 void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
 void RC_vSetCurrentRenderCtx(void* pCamera);        // makes it the current render camera
@@ -38,7 +38,7 @@ void fn_800B2470(void);
 void fn_800B281C(void);
 void fn_800B3460(f32* pA, f32* pB, f32* pOut);
 void fn_800B3484(CamLens* pLens, f32 (*pMtx)[4]);
-void fn_800360D4(u8* pMesh);
+void SD_DrawShaderObject(u8* pMesh);
 
 Shadow lbl_801F5E20;
 
@@ -157,7 +157,7 @@ void fn_800B251C_ShadowInit(u8 bHigh) {
     aDesc[0] = 0x800;
     aDesc[1] = 0x200;
     for (i = 0; i < 2; i++) {
-        fn_80036054(p->aMesh[i], 0, aDesc);
+        SD_InitShaderObject(p->aMesh[i], 0, aDesc);
     }
 }
 
@@ -176,7 +176,7 @@ void fn_800B2734(void) {
     int i;
 
     for (i = 0; i < 2; i++) {
-        fn_800360A0(p->aMesh[i]);
+        SD_FreeShaderObject(p->aMesh[i]);
     }
     if (p->pFrameBuf != NULL) {
         FB_vReleaseFrameBuffer(p->pFrameBuf);
@@ -374,7 +374,7 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     fn_800760B0(1, 1, p->nWidth - 1, p->nHeight - 1);
     RenderState_Flush();
     ((void (*)(int))fn_80035604)(2);   // port: EA passes an argument fn_80035604 ignores
-    fn_800358E0(pChar, 2);
+    SKN_DrawCharacter(pChar, 2);
     fn_800B2470();
     fn_80016B54(0x200, 0x1C0, 1.0f, 1.0f);
     DS_vEnableZBufferUpdate(1);
@@ -441,8 +441,8 @@ void fn_800B2DB0(f32* pCentre, f32 (*pQuad)[4], f32 fHalfX, f32 fHalfZ) {
     desc.pPos = aPos[0];
     desc.pColour = (u8*)aColour;
     desc.pUV = aUV[0];
-    fn_80036100((ShaderObject*)p->aMesh[0], &desc, 1);
-    fn_800360D4(p->aMesh[0]);
+    SD_FillShaderObject((ShaderObject*)p->aMesh[0], &desc, 1);
+    SD_DrawShaderObject(p->aMesh[0]);
     DS_vSetAlphaTestMode(1, 6, 0x80);
     DS_vSetZBufferMode(6);
     DS_vEnableZBufferUpdate(1);
@@ -577,8 +577,8 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     desc.pPos = lbl_80282170;
     desc.pColour = lbl_8028216C;
     desc.pUV = lbl_80282168;
-    fn_80036100((ShaderObject*)p->aMesh[nView], &desc, 1);
-    fn_800360D4(p->aMesh[nView]);
+    SD_FillShaderObject((ShaderObject*)p->aMesh[nView], &desc, 1);
+    SD_DrawShaderObject(p->aMesh[nView]);
     DS_vSetZBufferMode(3);
     DS_vSetAlphaTestMode(1, 6, 0x80);
     RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 1, 1);

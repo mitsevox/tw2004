@@ -24,8 +24,8 @@ typedef struct Shadow {
     s32         nWidth;         // 0x454  } the texture's size in pixels (256 x 256)
     s32         nHeight;        // 0x458  }
     GxTexture   tex;            // 0x45C
-    u8          aMesh[2][0x28]; // 0x48C  a mesh object per view (Skin.c's fn_80036054 sets it up,
-                                //        fn_800360A0 frees it)
+    u8          aMesh[2][0x28]; // 0x48C  a mesh object per view (Skin.c's SD_InitShaderObject sets it up,
+                                //        SD_FreeShaderObject frees it)
     f32         f4DC;           // 0x4DC  } set up by fn_800B251C_ShadowInit
     f32         f4E0;           // 0x4E0  }
     s32         n4E4;           // 0x4E4  }

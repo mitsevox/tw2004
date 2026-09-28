@@ -34,19 +34,19 @@ HwsOverrideTable* fn_80112A10(SkinDesc* pDesc, s32 nMeshes);  // hwsOverride_Gc.
 void  fn_80112B18(HwsOverrideTable* pTable, int i, void* p);   // hwsOverride_Gc.c
 
 u8    Character_IsGolfer(Character* pChar);           // char.c
-void  fn_80035810(Character* pChar);
-void  fn_80035D10(Character* pChar, int nView);
-void  fn_80035F40(void* pCamera);
-void  fn_80036054(ShaderObject* pObj, int nRow, const void* pDesc);
-void  fn_800360A0(ShaderObject* pObj);
-void  fn_800360D4(ShaderObject* pObj);
-void  fn_8003612C(LightGroup* pGroup);
-void  fn_8003614C(Character* pChar, f32* pOut);
-int   fn_80035A9C(void);
-void  fn_80035FBC(void);
-void  fn_80035FDC(UObject* pObj);
-void  fn_80035FFC(void);
-void  fn_80036024(f32 f);
+void  SKN_DrawClubParts(Character* pChar);
+void  SKN_DrawBoneTri(Character* pChar, int nView);
+void  RC_ApplyViewport(void* pCamera);
+void  SD_InitShaderObject(ShaderObject* pObj, int nRow, const void* pDesc);
+void  SD_FreeShaderObject(ShaderObject* pObj);
+void  SD_DrawShaderObject(ShaderObject* pObj);
+void  LI_LoadLightGroup(LightGroup* pGroup);
+void  SKN_GetCharPosition(Character* pChar, f32* pOut);
+int   SKN_GetLightCourse(void);
+void  LI_ResetLights(void);
+void  LI_SetObjectLights(UObject* pObj);
+void  LF_LoadCurrentLights(void);
+void  LF_SetCurrentBrightness(f32 f);
 void  fn_80093824(void);                                     // goballfx.c
 f32   fn_8004B78C(CourseInfo* pCourse, f32* pPos);           // GoTerrainCollision.c: the ground's light
 // GoTerrain.c: calls row nRow's pfn8
@@ -72,8 +72,9 @@ s32 lbl_80281D78;
 s32 lbl_80281D74;
 void* lbl_80281D70;
 
-// Picks the "shadow" part of the character's skin and of its club's skin, for n17B4.
-void fn_80035640(Character* pChar) {
+// Draws the "shadow" part of the character's skin, then that of its club's skin (Character.p16D8,
+// its current club class), with the skins' override table n17B4.
+void SKN_DrawShadowParts(Character* pChar) {
     u64 uShadow;
     s32 nParts;
     int i;
@@ -101,8 +102,9 @@ void fn_80035640(Character* pChar) {
     }
 }
 
-// Picks every part but "shadow" of the character's skin, then of its club's skin (fn_80035810).
-void fn_80035754(Character* pChar) {
+// Draws every part but "shadow" of the character's skin (override table n17B4), then its club's
+// (SKN_DrawClubParts).
+void SKN_DrawCharacterParts(Character* pChar) {
     u64 uShadow;
     s32 nParts;
     int i;
@@ -117,11 +119,12 @@ void fn_80035754(Character* pChar) {
         }
     }
     SkinPart_EndDraw(pChar->pSkin);
-    fn_80035810(pChar);
+    SKN_DrawClubParts(pChar);
 }
 
-// Picks every part but "shadow" of the character's club skin.
-void fn_80035810(Character* pChar) {
+// Draws every part but "shadow" of the skin of the character's current club (Character.p16D8, per
+// club class), with override table n17B4; nothing without one.
+void SKN_DrawClubParts(Character* pChar) {
     u64 uShadow;
     Skin* pSkin;
     s32 nShadow;
@@ -145,15 +148,17 @@ void fn_80035810(Character* pChar) {
 }
 
 // fake match: stands in for a function the original linker stripped. The file's pool has 0.0f
-// (0x80283018) before the 0.5f fn_800358E0 uses first; its body is unknown.
+// (0x80283018) before the 0.5f SKN_DrawCharacter uses first; its body is unknown.
 static f32 Skin_StrippedFn(f32 x) {
     return (x < 0.0f) ? -x : x;
 }
 
-// Draws the character's skin: without flag 2, lit by the current course's light set (flag 4: set 3
-// instead, without the character's own light settings) and the ground's light under it; with flag
-// 2, only its "shadow" parts, through row 10 of lbl_80188E88.
-void fn_800358E0(Character* pChar, u32 uFlags) {
+// Draws the character's skin and its club's. uFlags bit 2: only their "shadow" parts, with shader
+// type 10's parameters set to 128 grey (shadow.c). Otherwise every other part, lit: bit 4 picks
+// light set 3; without it light set 0 with the character's lighting entry for this course
+// (Character.p44, SKN_GetLightCourse) and fn_80093824. The lights' brightness is 0.5 plus half the
+// ground's light under the character (fn_8004B78C). Clip mode 1 either way.
+void SKN_DrawCharacter(Character* pChar, u32 uFlags) {
     static f32 aRow10[4] = { 128.0f, 128.0f, 128.0f, 128.0f };
     f32 aRoot[3];
     f32 aData[4];
@@ -163,7 +168,7 @@ void fn_800358E0(Character* pChar, u32 uFlags) {
     u32 uShadow;
 
     if (pChar->p44 != NULL) {
-        pEntry = &pChar->p44[fn_80035A9C()];
+        pEntry = &pChar->p44[SKN_GetLightCourse()];
     } else {
         pEntry = NULL;
     }
@@ -182,13 +187,13 @@ void fn_800358E0(Character* pChar, u32 uFlags) {
         if (!uSet3) {
             fn_80093824();
         }
-        fn_8003614C(pChar, aRoot);
-        fn_80036024(0.5f * fn_8004B78C(Ter_GetTGD(), aRoot) + 0.5f);
-        fn_80035FFC();
+        SKN_GetCharPosition(pChar, aRoot);
+        LF_SetCurrentBrightness(0.5f * fn_8004B78C(Ter_GetTGD(), aRoot) + 0.5f);
+        LF_LoadCurrentLights();
         fn_80035308();
     }
     fn_800352E4();
-    fn_80035FDC(NULL);
+    LI_SetObjectLights(NULL);
     if (uShadow) {
         nMode = 2;
     } else if (pChar->n1654 != 1) {
@@ -211,7 +216,7 @@ void fn_800358E0(Character* pChar, u32 uFlags) {
         }
         RenderState_Flush();
         SD_SetShaderTypeParameters(10, aData);
-        fn_80035640(pChar);
+        SKN_DrawShadowParts(pChar);
     } else {
         switch (nMode) {
         case 2:
@@ -225,13 +230,15 @@ void fn_800358E0(Character* pChar, u32 uFlags) {
             break;
         }
         RenderState_Flush();
-        fn_80035754(pChar);
+        SKN_DrawCharacterParts(pChar);
     }
-    fn_80035FBC();
+    LI_ResetLights();
 }
 
-// The current course, except on course 7, where Game_GetCurHoleNum's value picks another.
-int fn_80035A9C(void) {
+// The course whose lighting entry (Character.p44) SKN_DrawCharacter lights a character with: the
+// current course, except on course 7 (the target games), where the hole (from 0) picks: 0 itself,
+// 1-7 courses 22, 23, 13, 9, 16, 20 and 8, 15-17 course 24, any other 13.
+int SKN_GetLightCourse(void) {
     int nCourse;
 
     nCourse = Game_GetCourse();
@@ -264,9 +271,11 @@ int fn_80035A9C(void) {
     return nCourse;
 }
 
-// Poses the character's skin and its club's skin on its model for view n17B4 (the club's from bone
-// 0x52 on). n: every caller passes 0; unused.
-void fn_80035B40(Character* pChar, int n) {
+// Poses the character's skin for this frame: blends its changed morph targets (single view or game
+// type 3 only), builds its matrices from the model's and points its drawn meshes at them (override
+// table n17B4); then the same for its current club's skin, from the grip bone (0x52) on. Sets n1698
+// to 1 (posed), except for player 1000. n: every caller passes 0; unused.
+void SKN_PoseCharacter(Character* pChar, int n) {
     Skin* pClub;
 
     if (gSession.nSplitScreen == 0 || gSession.nGameType == 3) {
@@ -290,30 +299,32 @@ void fn_80035B40(Character* pChar, int n) {
     }
 }
 
-// Sets up the triangles' mesh objects, one per view.
-void fn_80035C58(void) {
+// Sets up SKN_DrawBoneTri's mesh objects, one per view: shader row 0x13, room for 3 vertices and 1
+// draw.
+void SKN_InitTris(void) {
     DynRenderSize size;
     int i;
 
     size.nMaxVerts = 3;
     size.nMaxDraws = 1;
     for (i = 0; i < 2; i++) {
-        fn_80036054(&lbl_801D4E78.aMesh[i], 0x13, &size);
+        SD_InitShaderObject(&lbl_801D4E78.aMesh[i], 0x13, &size);
     }
 }
 
-// And frees them.
-void fn_80035CC0(void) {
+// Frees SKN_DrawBoneTri's mesh objects.
+void SKN_FreeTris(void) {
     int i;
 
     for (i = 0; i < 2; i++) {
-        fn_800360A0(&lbl_801D4E78.aMesh[i]);
+        SD_FreeShaderObject(&lbl_801D4E78.aMesh[i]);
     }
 }
 
-// Draws one grey triangle for view nView through the positions of the character's bones 1 and 7
-// (bone 7 twice), when its model has them.
-void fn_80035D10(Character* pChar, int nView) {
+// Draws a grey triangle for view nView (0 or 1) through the positions of bones 1 and 7 of the
+// character's model, bone 7 twice (so it covers no area); nothing when the model has fewer than 8
+// bones.
+void SKN_DrawBoneTri(Character* pChar, int nView) {
     f32* apPos[3];
     DynRenderFill fill;
     CharModel* pModel;
@@ -351,30 +362,31 @@ void fn_80035D10(Character* pChar, int nView) {
     RenderState_SetDrawFlags(0);
     RenderState_SetClipMode(0);
     RenderState_Flush();
-    fn_80036100(&lbl_801D4E78.aMesh[nView], &fill, 1);
-    fn_800360D4(&lbl_801D4E78.aMesh[nView]);
+    SD_FillShaderObject(&lbl_801D4E78.aMesh[nView], &fill, 1);
+    SD_DrawShaderObject(&lbl_801D4E78.aMesh[nView]);
 }
 
-// Runs fn_80035D10 for view nView on every character made so far, except those Character_IsGolfer picks
-// and those with flag 0x40 or 1.
-void fn_80035E98(int nView) {
+// SKN_DrawBoneTri for view nView on every character made so far that is not a golfer
+// (Character_IsGolfer) and has neither bit 0x40 nor bit 1 of u10 set.
+void SKN_DrawBoneTris(int nView) {
     int i;
 
     for (i = 0; i < lbl_80281CA8; i++) {
         if (!Character_IsGolfer(lbl_801B9624[i]) && !(lbl_801B9624[i]->u10 & 0x41)) {
-            fn_80035D10(lbl_801B9624[i], nView);
+            SKN_DrawBoneTri(lbl_801B9624[i], nView);
         }
     }
 }
 
 // ---- sweep code (tidied) ----
 
-void fn_80035F1C(void) {
-    fn_80035F40(RC_spGetCurrentRenderCtx());
+void RC_ApplyCurrentViewport(void) {
+    RC_ApplyViewport(RC_spGetCurrentRenderCtx());
 }
 
-// Hands the camera's screen rectangle on to fn_80016978.
-void fn_80035F40(void* pCamera) {
+// Hands the render context's viewport (left, top, width, height) to fn_80016978, which makes it the
+// current one.
+void RC_ApplyViewport(void* pCamera) {
     f32* pRect;
 
     pRect = RC_spGetRenderCtxViewport(pCamera);
@@ -382,53 +394,61 @@ void fn_80035F40(void* pCamera) {
                 VM_fGetViewportHeight(pRect));
 }
 
-void fn_80035FBC(void) {
+// Lighting off after a lit draw: colour channel 4 unlit with a grey ambient colour (fn_8006ED70).
+void LI_ResetLights(void) {
     fn_8006ED70();
 }
 
-void fn_80035FDC(UObject* pObj) {
+// Loads the lights for drawing pObj, in its space (NULL: in world space; fn_8006EADC).
+void LI_SetObjectLights(UObject* pObj) {
     fn_8006EADC(pObj);
 }
 
 // Loads the current light set's lights.
-void fn_80035FFC(void) {
-    fn_8003612C(&LF_spGetCurrentLightFogEnvironment()->group);
+void LF_LoadCurrentLights(void) {
+    LI_LoadLightGroup(&LF_spGetCurrentLightFogEnvironment()->group);
 }
 
-void fn_80036024(f32 f) {
+// Sets the current light set's brightness: the factor its lights' colours are scaled by
+// (LightGroup.v18[0], 1 by default).
+void LF_SetCurrentBrightness(f32 f) {
     LF_spGetCurrentLightFogEnvironment()->group.v18[0] = f;
 }
 
-// Sets up a shader object for row nRow of lbl_80188E88, handing its hooks pDesc.
-void fn_80036054(ShaderObject* pObj, int nRow, const void* pDesc) {
+// Sets up a shader object of row nRow of the shader table (lbl_80188E88): takes the row's hooks and
+// calls its init hook with pDesc (for row 0x13, a DynRenderSize).
+void SD_InitShaderObject(ShaderObject* pObj, int nRow, const void* pDesc) {
     pObj->nRow = nRow;
     pObj->pHooks = &lbl_80188E88[nRow].shader;
     pObj->pHooks->pfnInit(pObj, pDesc);
 }
 
-// Frees it, if its row has a free hook.
-void fn_800360A0(ShaderObject* pObj) {
+// Calls the object's free hook, when its row has one.
+void SD_FreeShaderObject(ShaderObject* pObj) {
     if (pObj->pHooks->pfnFree != NULL) {
         pObj->pHooks->pfnFree(pObj);
     }
 }
 
-// Draws it.
-void fn_800360D4(ShaderObject* pObj) {
+// Calls the object's draw hook.
+void SD_DrawShaderObject(ShaderObject* pObj) {
     pObj->pHooks->pfnDraw(pObj);
 }
 
-// Hands it pData and n through its row's fill hook.
-void fn_80036100(ShaderObject* pObj, const void* pData, int n) {
+// Hands the object what to draw through its row's fill hook; what pData and n are depends on the
+// row (row 0x13: a DynRenderFill and 1).
+void SD_FillShaderObject(ShaderObject* pObj, const void* pData, int n) {
     pObj->pHooks->pfnFill(pObj, pData, n);
 }
 
-void fn_8003612C(LightGroup* pGroup) {
+// Loads the group's lights (fn_8006E7A4): the directional light becomes the ambient colour, the
+// point lights fill the point slots.
+void LI_LoadLightGroup(LightGroup* pGroup) {
     fn_8006E7A4(pGroup);
 }
 
-// Copies the character's root bone position to pOut.
-void fn_8003614C(Character* pChar, f32* pOut) {
+// Copies the character's position (its root bone's, Bone.v1C) to pOut; nothing without a character.
+void SKN_GetCharPosition(Character* pChar, f32* pOut) {
     if (pChar != NULL) {
         LLMath_CopyVec(pChar->pModel->pBones[0].v1C, pOut);
     }

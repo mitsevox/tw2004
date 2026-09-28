@@ -14,9 +14,9 @@ s32 lbl_80281F8C;
 PsEmitter* lbl_80281F88;
 
 // Skin.c
-void fn_80036054(ShaderObject* pObj, int nRow, const void* pDesc);
-void fn_800360A0(ShaderObject* pObj);
-void fn_800360D4(ShaderObject* pObj);
+void SD_InitShaderObject(ShaderObject* pObj, int nRow, const void* pDesc);
+void SD_FreeShaderObject(ShaderObject* pObj);
+void SD_DrawShaderObject(ShaderObject* pObj);
 
 void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 f32  Ter_GetTimeInCycle(u32 n, f32 fPeriod);                   // GoTerrain.c
@@ -40,7 +40,7 @@ void fn_80098A98(void) {
         params.nCount = 128;
         create.bAlloc = 1;
         create.pParams = &params;
-        fn_80036054(&lbl_801DB888[i]->mesh, 9, &create);
+        SD_InitShaderObject(&lbl_801DB888[i]->mesh, 9, &create);
     }
 }
 
@@ -58,7 +58,7 @@ void fn_80098B5C(void) {
     }
     lbl_80281F88 = NULL;
     for (i = 0; i < 6; i++) {
-        fn_800360A0(&lbl_801DB888[i]->mesh);
+        SD_FreeShaderObject(&lbl_801DB888[i]->mesh);
         StaticMem_Free(lbl_801DB888[i]);
     }
 }
@@ -66,7 +66,7 @@ void fn_80098B5C(void) {
 void fn_80098BDC(PsEmitter* pEmitter) {
     pEmitter->b5C = 0;
     if (pEmitter->params.n54 < 0) {
-        fn_800360A0(&pEmitter->mesh);
+        SD_FreeShaderObject(&pEmitter->mesh);
         StaticMem_Free(pEmitter);
     }
 }
@@ -224,7 +224,7 @@ void fn_800990BC(PsEmitter* pEmitter, int n, f32 f10, f32 fAgeSpread) {
     msg.u.emit.nCount = n;
     msg.u.emit.f10 = f10;
     msg.u.emit.fAgeSpread = fAgeSpread;
-    fn_80036100(&pEmitter->mesh, &msg, 1);
+    SD_FillShaderObject(&pEmitter->mesh, &msg, 1);
     pEmitter->n50 += n;
 }
 
@@ -247,7 +247,7 @@ u32 fn_8009912C(PsEmitter* pEmitter, int n, f32 fStep, f32 fLiveStep) {
     msg.u.age.fCarried = fStep;
     msg.u.age.fStep = fLiveStep;
     msg.u.age.pnLive = &nLive;
-    fn_80036100(&pEmitter->mesh, &msg, 1);
+    SD_FillShaderObject(&pEmitter->mesh, &msg, 1);
     if (nLive == 0) {
         bEmpty = 1;
     }
@@ -447,7 +447,7 @@ PsEmitter* fn_80099758(ParticleParams* pParams) {
         pEmitter = StaticMem_Alloc(sizeof(PsEmitter), 2, 64, "UFstPart.c", 967);
         create.bAlloc = 1;
         create.pParams = pParams;
-        fn_80036054(&pEmitter->mesh, 9, &create);
+        SD_InitShaderObject(&pEmitter->mesh, 9, &create);
     } else {
         if (lbl_801DB888[lbl_80281F8C]->b5C != 0) {
             return NULL;
@@ -496,7 +496,7 @@ PsEmitter* fn_80099758(ParticleParams* pParams) {
     pEmitter->params.f38 = PI / 2 - pEmitter->params.f38;
     create.bAlloc = 0;
     create.pParams = pParams;
-    fn_80036054(&pEmitter->mesh, 9, &create);
+    SD_InitShaderObject(&pEmitter->mesh, 9, &create);
     return pEmitter;
 }
 
@@ -517,7 +517,7 @@ u32 fn_80099AE4(PsEmitter* pEmitter, Camera* pCamera) {
 
 void fn_80099B74(PsEmitter* pEmitter) {
     pEmitter->n58 = 0;
-    fn_800360D4(&pEmitter->mesh);
+    SD_DrawShaderObject(&pEmitter->mesh);
 }
 
 // Sort the emitters by their distance from pCamera's lens (fn_80099E34), then fn_80099B74 each

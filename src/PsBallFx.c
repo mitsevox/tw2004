@@ -8,9 +8,9 @@
 #include "camera.h"
 #include "terrain.h"
 
-void fn_80036054(ShaderObject* pObj, int nRow, const void* pDesc);  // Skin.c
-void fn_800360A0(ShaderObject* pObj);                               // Skin.c
-void fn_800360D4(ShaderObject* pObj);                               // Skin.c
+void SD_InitShaderObject(ShaderObject* pObj, int nRow, const void* pDesc);  // Skin.c
+void SD_FreeShaderObject(ShaderObject* pObj);                               // Skin.c
+void SD_DrawShaderObject(ShaderObject* pObj);                               // Skin.c
 void RC_UpdateCurrentScreenMatrices(void);
 void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer);   // below; Ball.c declares it too
 void fn_800A34C0(int nTrail, Ball* pBall, f32* pDir);     // below
@@ -282,7 +282,7 @@ void PsBallFx_InitModule(void) {
     // The loop over the one-entry arrays is EA's: it moves the file name and the two constants
     // into saved registers ahead of every call.
     for (j = 0; j < 1; j++) {
-        fn_80036054(&lbl_80281408->mesh[j], 0, &size);
+        SD_InitShaderObject(&lbl_80281408->mesh[j], 0, &size);
         lbl_80281408->ap2C[j] = StaticMem_Alloc(0x640, 2, 16, "PsBallFx.c", 1435);
         lbl_80281408->ap30[j] = StaticMem_Alloc(0x320, 2, 16, "PsBallFx.c", 1440);
         lbl_80281408->ap28[j] = StaticMem_Alloc(0x960, 2, 16, "PsBallFx.c", 1445);
@@ -307,7 +307,7 @@ void PsBallFx_InitModule(void) {
 }
 
 void fn_800A2E14(void) {
-    fn_800360A0(&lbl_80281408->mesh[0]);
+    SD_FreeShaderObject(&lbl_80281408->mesh[0]);
     StaticMem_Free(lbl_80281408->ap28[0]);
     StaticMem_Free(lbl_80281408->ap2C[0]);
     StaticMem_Free(lbl_80281408->ap30[0]);
@@ -653,8 +653,8 @@ void fn_800A3A84(void) {
         fill.pPos = lbl_80281408->ap28[0];
         fill.pColour = lbl_80281408->ap30[0];
         fill.pTexCoord = lbl_80281408->ap2C[0];
-        fn_80036100(&lbl_80281408->mesh[0], &fill, 1);
-        fn_800360D4(&lbl_80281408->mesh[0]);
+        SD_FillShaderObject(&lbl_80281408->mesh[0], &fill, 1);
+        SD_DrawShaderObject(&lbl_80281408->mesh[0]);
     }
     DS_vSetAlphaTestMode(1, 6, 0x80);
     RenderState_Flush();

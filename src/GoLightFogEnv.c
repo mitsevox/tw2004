@@ -8,7 +8,7 @@
 #include "camera.h"
 #include "ball.h"
 
-void fn_80035FFC(void);
+void LF_LoadCurrentLights(void);
 void fn_80093990(LightSet* pSet);
 void fn_800939CC(LightSet* pSet);
 f32  fn_80093A04(s32 nLight, CamLens* pLens);
@@ -31,7 +31,7 @@ void fn_80093524(void) {
         pSet++;
     }
     LF_vSetCurrentLightFogEnvironment(0);
-    fn_80035FFC();
+    LF_LoadCurrentLights();
     fn_80035308();
 }
 

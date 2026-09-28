@@ -271,8 +271,8 @@ void fn_800988CC(s32 p0);
 GlowQueue lbl_801D9A68[1];
 u8 lbl_801D9A40[0x28];
 GlowTable lbl_801D99D0;
-void fn_80036054();
-void fn_800360A0();
+void SD_InitShaderObject();
+void SD_FreeShaderObject();
 void ColGlow_InitModule(void);
 void ColGlow_CloseModule(void);
 
@@ -310,18 +310,18 @@ void fn_800988CC(s32 p0) {
 }
 
 void ColGlow_InitModule(void) {
-    fn_80036054(lbl_801D9A40, 11, 0);
+    SD_InitShaderObject(lbl_801D9A40, 11, 0);
     lbl_80281F80 = NULL;
 }
 
 void ColGlow_CloseModule(void) {
-    fn_800360A0(lbl_801D9A40);
+    SD_FreeShaderObject(lbl_801D9A40);
 }
 
 // ---- end of sweep code ----
 
 // Skin.c
-void fn_800360D4(u8* pMesh);
+void SD_DrawShaderObject(u8* pMesh);
 
 // Draws the queued glows through the glow mesh in two passes, with the lens's matrices, then puts
 // the camera's identity view matrix back.
@@ -345,15 +345,15 @@ void ColGlow_RenderAllGlowInCurrentList(void) {
         desc.pQueue = lbl_80281F80;
         desc.bFirst = 1;
         desc.pMtx = pMtx;
-        fn_80036100((ShaderObject*)lbl_801D9A40, &desc, 1);
-        fn_800360D4(lbl_801D9A40);
+        SD_FillShaderObject((ShaderObject*)lbl_801D9A40, &desc, 1);
+        SD_DrawShaderObject(lbl_801D9A40);
         DS_vSetZBufferMode(7);
         RenderState_Flush();
         desc.pQueue = lbl_80281F80;
         desc.bFirst = 0;
         desc.pMtx = pMtx;
-        fn_80036100((ShaderObject*)lbl_801D9A40, &desc, 1);
-        fn_800360D4(lbl_801D9A40);
+        SD_FillShaderObject((ShaderObject*)lbl_801D9A40, &desc, 1);
+        SD_DrawShaderObject(lbl_801D9A40);
         RC_vSetRenderCtxTransformationMatrix(pCamera, NULL);
         RenderState_SetViewport(RC_spGetCurrentRenderCtx());
         DS_vEnableZBufferUpdate(1);

@@ -13,9 +13,9 @@
 #include "greengrid.h"
 
 // Skin.c
-void fn_80036054(void* pMesh, int n, s32* pDesc);
-void fn_800360A0(void* pMesh);
-void fn_800360D4(u8* pMesh);
+void SD_InitShaderObject(void* pMesh, int n, s32* pDesc);
+void SD_FreeShaderObject(void* pMesh);
+void SD_DrawShaderObject(u8* pMesh);
 void fn_80035294(void);
 void RC_UpdateCurrentScreenMatrices(void);
 void fn_800354B4(u8* p, f32 v);         // sets the lens's far clip distance, fAC (fn_80014268 reads it)
@@ -53,7 +53,7 @@ void GR_vInit(void) {
     }
     desc[1] = 1;
     for (i = 0; i < nViews; i++) {
-        fn_80036054(lbl_802813C0->aMesh[i], 0x13, desc);
+        SD_InitShaderObject(lbl_802813C0->aMesh[i], 0x13, desc);
         lbl_802813C0->apVert[i] = StaticMem_Alloc(desc[0] * 12, 2, 16, "GoGreenGrid.c", 94);
         lbl_802813C0->apUV[i] = StaticMem_Alloc(desc[0] * 8, 2, 16, "GoGreenGrid.c", 99);
         lbl_802813C0->apColor[i] = StaticMem_Alloc(desc[0] * 4, 2, 16, "GoGreenGrid.c", 104);
@@ -91,7 +91,7 @@ void fn_8009B898(void) {
     int nViews = gSession.nSplitScreen ? 2 : 1;
     int i;
     for (i = 0; i < nViews; i++) {
-        fn_800360A0(lbl_802813C0->aMesh[i]);
+        SD_FreeShaderObject(lbl_802813C0->aMesh[i]);
         StaticMem_Free(lbl_802813C0->apVert[i]);
         StaticMem_Free(lbl_802813C0->apUV[i]);
         StaticMem_Free(lbl_802813C0->apColor[i]);
@@ -488,8 +488,8 @@ void fn_8009C914(int nView) {
     desc.pPos = lbl_802813C0->apVert[nView];
     desc.pColour = lbl_802813C0->apColor[nView];
     desc.pUV = lbl_802813C0->apUV[nView];
-    fn_80036100((ShaderObject*)lbl_802813C0->aMesh[nView], &desc, 1);
-    fn_800360D4(lbl_802813C0->aMesh[nView]);
+    SD_FillShaderObject((ShaderObject*)lbl_802813C0->aMesh[nView], &desc, 1);
+    SD_DrawShaderObject(lbl_802813C0->aMesh[nView]);
     DS_vSetAlphaTestMode(1, 6, 0x80);
     DS_vEnableZBufferUpdate(1);
     RenderState_Flush();

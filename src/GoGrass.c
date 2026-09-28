@@ -50,7 +50,7 @@ void RC_vSetCurrentRenderCtx(void* pCamera);   // makes it the current render ca
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
-void fn_80035F1C(void);
+void RC_ApplyCurrentViewport(void);
 void fn_80016948(void);
 s32  fn_8003505C(s32 n);           // sets a value, returns the old one
 void fn_80034AE4(void);
@@ -388,7 +388,7 @@ void fn_8011EC84(void) {
     RenderState_SetRenderSurface(1, 256, 256, 0, 1, 1);
     fn_800760B0(0, 0, 256, 256);
     fn_80016B54(256, 256, 1.0f, 1.0f);
-    fn_80035F1C();
+    RC_ApplyCurrentViewport();
     fn_80016948();
     RC_UpdateCurrentScreenMatrices();
     RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
@@ -414,7 +414,7 @@ void fn_8011EC84(void) {
     RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
     fn_800760B0(0, 0, 512, 448);
     fn_80016B54(512, 448, 1.0f, 1.0f);
-    fn_80035F1C();
+    RC_ApplyCurrentViewport();
     DS_vSetAlphaTestMode(1, 6, 128);
     DS_vEnableZBufferUpdate(1);
     DS_vSetZBufferMode(3);

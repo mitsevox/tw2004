@@ -953,7 +953,7 @@ void SkinPart_ShutdownSkin(void) {
 }
 
 // Empty. Skin.c calls it (passing the body skin and the view) after posing the skin for a view
-// (fn_80035B40).
+// (SKN_PoseCharacter).
 void SkinPart_UpdateSkin(void) {
 }
 

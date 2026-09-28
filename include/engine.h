@@ -743,8 +743,8 @@ typedef struct ParticleSystem {
 LAYOUT_ASSERT(ParticleSystem, 0xAC);
 
 // A shader object (our name; 0x28 bytes): a mesh a module fills and draws each frame through the
-// shader-object hooks of its row of lbl_80188E88 (Skin.c's fn_80036054 sets it up, fn_800360A0
-// frees it, fn_80036100 fills it, fn_800360D4 draws it).
+// shader-object hooks of its row of lbl_80188E88 (Skin.c's SD_InitShaderObject sets it up, SD_FreeShaderObject
+// frees it, SD_FillShaderObject fills it, SD_DrawShaderObject draws it).
 typedef struct ShaderObject ShaderObject;
 
 typedef struct ShaderObjectHooks {
@@ -762,7 +762,7 @@ struct ShaderObject {
 LAYOUT_ASSERT(ShaderObject, 0x28);
 
 // Skin.c: hands a shader object data through its fill hook.
-void fn_80036100(ShaderObject* pObj, const void* pData, int n);
+void SD_FillShaderObject(ShaderObject* pObj, const void* pData, int n);
 
 struct UObjMeshPart;
 struct UObjArraySet;
@@ -1332,7 +1332,7 @@ typedef struct Controllers {
 } Controllers;
 LAYOUT_ASSERT(Controllers, 0x84);
 
-// A mesh object's draw description (Skin.c's fn_80036100 loads it; Swing.c's club trail and
+// A mesh object's draw description (Skin.c's SD_FillShaderObject loads it; Swing.c's club trail and
 // shadow.c's golfer shadow build one): nPrims strips, each a run of nCount vertices from nFirst.
 typedef struct TrailDraw {
     s32  nPrims;                // 0x0

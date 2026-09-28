@@ -610,10 +610,10 @@ void  fn_80037CD8(Skin* pSkin);         // Skin.c: frees a skin
 s32   fn_80037708(Skin* pSkin);         // Skin.c: frees what loading it allocated
 s32   fn_800375AC(Skin* pSkin, u8 b);   // Skin.c: allocates it
 Skin* fn_800377FC(u8* pData, u8 b);     // Skin.c: makes a skin from its file
-// Skin.c's triangles (lbl_801D4E78, 0xF0 bytes; our name, layout from fn_80035D10): per view a
+// Skin.c's triangles (lbl_801D4E78, 0xF0 bytes; our name, layout from SKN_DrawBoneTri): per view a
 // mesh object and three vertices' positions, texture coordinates, colours and indexes.
 typedef struct SkinTris {
-    ShaderObject aMesh[2];      // 0x00  (fn_80035C58 sets them up with fn_80036054, fn_80035CC0 frees them)
+    ShaderObject aMesh[2];      // 0x00  (SKN_InitTris sets them up with SD_InitShaderObject, SKN_FreeTris frees them)
     f32  aPos[2][3][3];         // 0x50
     f32  aUV[2][3][2];          // 0x98
     u8   aColor[2][3][4];       // 0xC8

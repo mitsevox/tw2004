@@ -54,7 +54,7 @@ LAYOUT_ASSERT(GlowQueue, 0x1E10);
 extern GlowQueue lbl_801D9A68[1];
 extern GlowQueue* lbl_80281F80;
 
-// What ColGlow_RenderAllGlowInCurrentList hands the glow mesh (our name): Skin.c's fn_80036100 passes it on, fn_80098884
+// What ColGlow_RenderAllGlowInCurrentList hands the glow mesh (our name): Skin.c's SD_FillShaderObject passes it on, fn_80098884
 // copies it and fn_8009884C draws the queue with it.
 typedef struct GlowDrawDesc {
     GlowQueue* pQueue;          // 0x0

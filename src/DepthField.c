@@ -9,7 +9,7 @@
 
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
-void fn_80035F1C(void);
+void RC_ApplyCurrentViewport(void);
 
 void DF_vDrawBufferToScreen(int n);
 void fn_80045880(int n);
@@ -192,7 +192,7 @@ void DF_vDrawBufferToScreen(int n) {
     DS_vEnableZBufferUpdate(1);
     RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
     fn_80016B54(512, 448, 1.0f, 1.0f);
-    fn_80035F1C();
+    RC_ApplyCurrentViewport();
     DS_vSetAlphaTestMode(1, 6, 0x80);
     RenderState_SetConstantAlphaOn(0);
     RenderState_Flush();

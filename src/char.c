@@ -160,8 +160,8 @@ f32 (*Character_GetBoneMatrixSwapIfLefty(Character* pChar, int nBone))[4];
 f32 (*Character_GetBoneMatrix_FromIndex(Character* pChar, int nBone))[4];
 f32   Camera_GetLensFovScale(CamLens* pLens);
 void  SKEL_EnableIK(u8 bOn);
-void  fn_80035C58(void);
-void  fn_80035CC0(void);
+void  SKN_InitTris(void);
+void  SKN_FreeTris(void);
 void  fn_80036460(int n);
 void  fn_80036464(void);
 void  fn_80095554(void);
@@ -196,8 +196,8 @@ void  fn_8008F35C(void);                // uiLoadFile.c: bring the UI file's dat
 void  fn_801141F8(struct DynChain* pChain, CharModel* pModel);                         // DynChain.c
 void  fn_80035600(void);                // GoTerrain.c
 void  fn_80035604(void);                // GoTerrain.c
-void  fn_800358E0(Character* pChar, u32 uFlags);
-void  fn_80035B40(Character* pChar, int n);
+void  SKN_DrawCharacter(Character* pChar, u32 uFlags);
+void  SKN_PoseCharacter(Character* pChar, int n);
 void  fn_800364A0(void);                // Skin.c
 int   fn_800636EC(void);                // GoCamCont.c
 void  fn_8010BF68(void);
@@ -2142,7 +2142,7 @@ void Character_ClipTest(Character* pChar, int nPlayer) {
 // flagstick, GoDynObj.c) gets bit 1 (hidden) while the current view has the flag out. Then every
 // character whose body or shadow is in view (n1654 or n1658 not 2), that is not the player
 // fn_800636EC names, has none of bits 0x1000, 0x40 and 1 of u10 and is not posed yet (n1698 0) gets
-// its skins posed on its model (fn_80035B40).
+// its skins posed on its model (SKN_PoseCharacter).
 void Character_PreRenderAll(void) {
     int i;
     int iPlayer2Clip;
@@ -2168,12 +2168,12 @@ void Character_PreRenderAll(void) {
         // fake match: the original turns bPreRender into 0/1 again (neg; or; srwi)
         bPreRender = bPreRender != 0;
         if (bPreRender && lbl_801B9624[i]->n1698 == 0) {
-            fn_80035B40(lbl_801B9624[i], 0);
+            SKN_PoseCharacter(lbl_801B9624[i], 0);
         }
     }
 }
 
-// Draws every character (fn_800358E0 with uFlags) that is in view (n1654 not 2), is not the player
+// Draws every character (SKN_DrawCharacter with uFlags) that is in view (n1654 not 2), is not the player
 // fn_800636EC names, is neither hidden (bit 1 of u10) nor without its textures (bit 0x40), and,
 // when uFlags has bit 4, is a golfer. fn_80035604 first; nothing when no character is made.
 void Character_RenderAll(u32 uFlags) {
@@ -2187,7 +2187,7 @@ void Character_RenderAll(u32 uFlags) {
             if (fn_8001EE90(lbl_801B9624[i]) != 2 && iPlayer2Clip != lbl_801B9624[i]->nPlayer &&
                 !(lbl_801B9624[i]->u10 & 0x41) &&
                 (Character_IsGolfer(lbl_801B9624[i]) || (uFlags & 4) == 0)) {
-                fn_800358E0(lbl_801B9624[i], uFlags);
+                SKN_DrawCharacter(lbl_801B9624[i], uFlags);
             }
         }
     }
@@ -2367,7 +2367,7 @@ Character* Character_Add(Character* pChar) {
 
 // Starts the characters for a round (GO_vInitIG): the dynamic texture pool, IK on, blend trees of
 // up to six clips (four in split screen, lbl_80280E20), the animation stream, the skin parts (every
-// copy changed together) and the skin meshes of each view (fn_80035C58).
+// copy changed together) and the skin meshes of each view (SKN_InitTris).
 void Character_InitIG(void) {
     int n;
     fn_8009555C();
@@ -2381,13 +2381,13 @@ void Character_InitIG(void) {
     fn_800C937C();
     SkinPart_Init();
     SkinPart_SetChangeAllCopies(1);
-    fn_80035C58();
+    SKN_InitTris();
 }
 
 // Shuts down what Character_InitIG started: the skin meshes, the skin parts, the animation stream
 // and the dynamic texture pool.
 void Character_CloseIG(void) {
-    fn_80035CC0();
+    SKN_FreeTris();
     SkinPart_Shutdown();
     fn_800C9764();
     fn_80095560();

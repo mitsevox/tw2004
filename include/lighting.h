@@ -128,7 +128,7 @@ void fn_80093900(struct CourseLightBlock* pBlock);
 extern u8    lbl_80281F40;      // set by fn_80093AD4; BFX_vRender passes it on and clears it
 extern TexBank*  lbl_80281F44;  // the "marker" texture's bank (BFX_vInit)
 extern TexEntry* lbl_80281F48;  // and the texture
-extern u8    lbl_801D94B0[0x28];    // the marker's mesh object (Skin.c's fn_80036054 sets it up)
+extern u8    lbl_801D94B0[0x28];    // the marker's mesh object (Skin.c's SD_InitShaderObject sets it up)
 extern u8    lbl_80189CB0[6][4];    // each player's marker colour (the last two are 0)
 extern f32   lbl_801D94D8[5][8];    // per player: the marker's texture coordinates
 extern u8    lbl_801D9578[5][16];   // per player: its vertex colours

@@ -16,11 +16,11 @@ int  fn_80048AE8(UObject* pObj);
 f32  fn_8001414C(u8* p);
 f32  Math_Tan(f32 f);
 void fn_8004B78C(CourseInfo* pCourse, f32* pPos);  // the ground's light at pPos
-void fn_80036024(f32 f);
-void fn_80035FFC(void);
-void fn_80035FDC(UObject* pObj);
+void LF_SetCurrentBrightness(f32 f);
+void LF_LoadCurrentLights(void);
+void LI_SetObjectLights(UObject* pObj);
 void SD_SetShaderTypeParameters(int nRow, void* pData);
-void fn_80035FBC(void);
+void LI_ResetLights(void);
 
 // Sets the object up: the three matrices to identity, the model and flags; a model whose levels of
 // detail differ gets flag 4 and a level-of-detail scale from its size.
@@ -118,10 +118,10 @@ void fn_800488B4(UObject* pObj) {
     if (bLit) {
         if (gSession.nGameType != 3) {
             fn_8004B78C(Ter_GetTGD(), pObj->m80[3]);
-            fn_80036024(0.8f);
+            LF_SetCurrentBrightness(0.8f);
         }
-        fn_80035FFC();
-        fn_80035FDC(pObj);
+        LF_LoadCurrentLights();
+        LI_SetObjectLights(pObj);
     } else if (nFlags0 & 1) {
         if ((nFlags0 & 2) || (nFlags2 & 1) || (nFlags2 & 2)) {
             pMesh = fn_80048AC4(pMesh, *pN108);
@@ -147,7 +147,7 @@ void fn_800488B4(UObject* pObj) {
     RenderState_Flush();
     fn_80048A84(pMesh);
     if (bLit) {
-        fn_80035FBC();
+        LI_ResetLights();
     }
 }
 

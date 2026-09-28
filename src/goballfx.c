@@ -8,9 +8,9 @@
 #include "ball.h"
 
 // Skin.c
-void fn_80036054(void* pMesh, int n, s32* pDesc);
-void fn_800360A0(void* pMesh);
-void fn_800360D4(u8* pMesh);
+void SD_InitShaderObject(void* pMesh, int n, s32* pDesc);
+void SD_FreeShaderObject(void* pMesh);
+void SD_DrawShaderObject(u8* pMesh);
 
 // GoTerrainCollision.c
 f32 fn_8004D80C(CourseInfo* pCourse, f32* pPos);
@@ -33,7 +33,7 @@ void BFX_vInit(void) {
     fn_800102DC(fn_8000BEE4("marker"), &lbl_80281F44, &lbl_80281F48);
     desc[0] = 0x10;
     desc[1] = 4;
-    fn_80036054(lbl_801D94B0, 0, desc);
+    SD_InitShaderObject(lbl_801D94B0, 0, desc);
 }
 
 void fn_80093AD4(void) {
@@ -115,12 +115,12 @@ void BFX_vRender(Ball* pBall, int nPlayer) {
         desc.pPos = pPos;
         desc.pColour = lbl_801D9578[nPlayer];
         desc.pUV = lbl_801D94D8[nPlayer];
-        fn_80036100((ShaderObject*)lbl_801D94B0, &desc, lbl_80281F40);
-        fn_800360D4(lbl_801D94B0);
+        SD_FillShaderObject((ShaderObject*)lbl_801D94B0, &desc, lbl_80281F40);
+        SD_DrawShaderObject(lbl_801D94B0);
         lbl_80281F40 = 0;
     }
 }
 
 void fn_80093D14(void) {
-    fn_800360A0(lbl_801D94B0);
+    SD_FreeShaderObject(lbl_801D94B0);
 }

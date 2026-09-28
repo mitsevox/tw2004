@@ -32,7 +32,7 @@ void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_800169AC(void);                     // apply lbl_80280E08's viewport
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
-void fn_80035F40(void* pCamera);            // Skin.c
+void RC_ApplyViewport(void* pCamera);            // Skin.c
 
 // Allocates the screen-copy buffer lbl_80281D80 (game types 4..8 only; fn_800392D0 fills it) and
 // clears every effect.
@@ -599,7 +599,7 @@ void fn_800390CC(int nField, RenderCamera* pCamera) {
     DS_vSetAlphaTestMode(1, 6, 0x80);
     DS_vSetZBufferMode(3);
     fn_80016B54(512, 448, 1.0f, 1.0f);
-    fn_80035F40(pCamera);
+    RC_ApplyViewport(pCamera);
     RenderState_Flush();
 }
 

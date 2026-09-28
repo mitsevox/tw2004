@@ -9,9 +9,9 @@
 u8 lbl_8028222C;
 BreakLine* lbl_80282228;
 
-void fn_80036054(void* pMesh, int n, s32* pDesc);    // Skin.c: sets up a mesh object
-void fn_800360A0(void* pMesh);         // Skin.c: frees a mesh object
-void fn_800360D4(u8* pMesh);           // Skin.c
+void SD_InitShaderObject(void* pMesh, int n, s32* pDesc);    // Skin.c: sets up a mesh object
+void SD_FreeShaderObject(void* pMesh);         // Skin.c: frees a mesh object
+void SD_DrawShaderObject(u8* pMesh);           // Skin.c
 void fn_800C9310(f32* pA, f32* pB, f32* pOut);
 void fn_800C9334(f32* pA, f32* pB, f32* pOut);
 void fn_800C9358(f32* pA, f32* pB, f32* pOut);
@@ -57,9 +57,9 @@ void fn_800C8134(void) {
     lbl_80282228->anColor[3] = 0x33;
     desc[0] = gSession.nSplitScreen ? 450 : 900;
     desc[1] = 1;
-    fn_80036054(lbl_80282228->aMesh[0], 5, desc);
+    SD_InitShaderObject(lbl_80282228->aMesh[0], 5, desc);
     if (gSession.nSplitScreen) {
-        fn_80036054(lbl_80282228->aMesh[1], 5, desc);
+        SD_InitShaderObject(lbl_80282228->aMesh[1], 5, desc);
     }
     uHash = fn_8000BEE4("brkline");
     fn_800102DC(uHash, &lbl_80282228->pBank, &lbl_80282228->pTex);
@@ -74,9 +74,9 @@ void fn_800C8134(void) {
 }
 
 void fn_800C830C(void) {
-    fn_800360A0(lbl_80282228->aMesh[0]);
+    SD_FreeShaderObject(lbl_80282228->aMesh[0]);
     if (gSession.nSplitScreen) {
-        fn_800360A0(lbl_80282228->aMesh[1]);
+        SD_FreeShaderObject(lbl_80282228->aMesh[1]);
     }
     lbl_8028222C = 0;
 }
@@ -229,8 +229,8 @@ void BreakLine_Render(int nView) {
             desc.af18[3] = 1.0f / lbl_80282228->fAB18;
             nFrame = gSession.nFrameCount;
             SD_SetShaderTypeParameters(5, &nFrame);
-            fn_80036100((ShaderObject*)lbl_80282228->aMesh[nView], &desc, 1);
-            fn_800360D4(lbl_80282228->aMesh[nView]);
+            SD_FillShaderObject((ShaderObject*)lbl_80282228->aMesh[nView], &desc, 1);
+            SD_DrawShaderObject(lbl_80282228->aMesh[nView]);
         }
         DS_vSetAlphaTestMode(1, 6, 0x80);
         DS_vEnableZBufferUpdate(1);

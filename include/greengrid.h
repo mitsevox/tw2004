@@ -8,8 +8,8 @@
 #include "engine.h"
 
 typedef struct GreenGrid {
-    u8   aMesh[2][0x28];        // 0x000  a mesh object per view (Skin.c's fn_80036054 sets it up,
-                                //        fn_800360A0 frees it); the second only in split screen
+    u8   aMesh[2][0x28];        // 0x000  a mesh object per view (Skin.c's SD_InitShaderObject sets it up,
+                                //        SD_FreeShaderObject frees it); the second only in split screen
     f32* apVert[2];             // 0x050  vertex positions, three floats each
     f32* apUV[2];               // 0x058  texture coordinates, two floats each
     u8*  apColor[2];            // 0x060  vertex colours, four bytes each

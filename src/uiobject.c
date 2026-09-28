@@ -35,7 +35,7 @@ void fn_800AE3C4(void);
 void UI_Obj_RenderBoostUI(int nObj);
 void fn_800AF0A8(CamLens* pLens);
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
-void fn_80035F1C(void);
+void RC_ApplyCurrentViewport(void);
 void RC_UpdateCurrentScreenMatrices(void);
 void fn_8005C15C(int nPlayer, f32* pSpinY, f32* pSpinX);   // Swing.c: the spin asked for
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                          // identity
@@ -44,7 +44,7 @@ void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);          // copy a matrix
 void fn_8000C5A4(f32 (*pMtx)[4]);
 void fn_800AEFE4(void);
 void fn_800AF0D4(UObjMesh* pMesh);
-void fn_8003612C(LightGroup* pGroup);   // Skin.c: load the group's lights (fn_8006E7A4)
+void LI_LoadLightGroup(LightGroup* pGroup);   // Skin.c: load the group's lights (fn_8006E7A4)
 void fn_8006EADC(UObject* pObj);        // GoLighting.c: light the object
 void fn_8006ED70(void);                 // GoLighting.c
 void fn_80035294(void);                 // GoTerrain.c
@@ -197,7 +197,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
     // clear the depth under the object's corner of the screen
     RenderView_SetUseCurrentMatrices(0);
     RenderView_SetColor(aBlack);
-    fn_80035F1C();
+    RC_ApplyCurrentViewport();
     RenderState_SetDrawFlags(0);
     DS_vSetAlphaTestMode(0, 6, 0x80);
     DS_vSetZBufferMode(7);
@@ -368,7 +368,7 @@ void fn_800AEFE4(void) {
     lbl_801F5B40.apLight[0]->u.dir.vColor[1] = lbl_80281470;
     lbl_801F5B40.apLight[0]->u.dir.vColor[2] = lbl_80281474;
     lbl_801F5B40.apLight[0]->u.dir.vColor[3] = 0.0f;
-    fn_8003612C(&lbl_801F5B40);
+    LI_LoadLightGroup(&lbl_801F5B40);
     fn_8006EADC(lbl_802820D0);
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetConstantAlphaOn(1);

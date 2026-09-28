@@ -11,8 +11,8 @@
 #define BREAKLINE_VERTS  (BREAKLINE_POINTS * 2)
 
 typedef struct BreakLine {
-    u8   aMesh[2][0x28];        // 0x0000  a mesh object per view (Skin.c's fn_80036054 sets it up,
-                                //         fn_800360A0 frees it); the second only in split screen
+    u8   aMesh[2][0x28];        // 0x0000  a mesh object per view (Skin.c's SD_InitShaderObject sets it up,
+                                //         SD_FreeShaderObject frees it); the second only in split screen
     f32  aVert[2][BREAKLINE_VERTS][3];      // 0x0050  per view: the line's vertices, a pair per point
     f32  vPin[3];               // 0x54B0  the pin, from the course's pin set (fn_800C8134)
     u8   aColor[2][BREAKLINE_VERTS][4];     // 0x54BC  per view: the vertices' colours (anColor)

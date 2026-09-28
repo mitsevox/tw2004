@@ -99,8 +99,8 @@ void fn_800350B4(f32 f);
 void fn_800350D0(f32 f);
 void fn_800350EC(u8 r, u8 g, u8 b);
 void fn_800355E0(s32 nField);
-void fn_80035E98(int nView);
-void fn_80035F1C(void);
+void SKN_DrawBoneTris(int nView);
+void RC_ApplyCurrentViewport(void);
 void fn_80037F80(void);
 void fn_80038128(void);
 void fn_800382E0(void);
@@ -506,7 +506,7 @@ void fn_8006C8EC(int nView) {
     ViewController_SetCurrentViewController(nView);
     RC_vSetCurrentRenderCtx(ViewController_GetRenderContext(nView));
     fn_8006DC78();
-    fn_80035F1C();
+    RC_ApplyCurrentViewport();
     if (nView < 2 && !fn_800642B0() && gSession.nGameType == 6) {
         fn_8006DC4C(3);
         return;
@@ -904,7 +904,7 @@ void fn_8006D27C(void) {
         }
         fn_8006DEA8();
         Character_PreRenderAll();
-        fn_80035E98(nView);
+        SKN_DrawBoneTris(nView);
         if (!gSession.b11 && nView < 2) {
             for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
                 Character_ClipTest(gPlayers[nPlayer].pChar, nPlayer);
@@ -972,7 +972,7 @@ void fn_8006D27C(void) {
     }
     RC_vSetCurrentRenderCtx(lbl_80281E54);
     fn_8006DC78();
-    fn_80035F1C();
+    RC_ApplyCurrentViewport();
     fn_80038968();
     if (gSession.nSplitScreen && ViewController_IsActive(0) && ViewController_IsActive(1)) {
         fn_80038128();
@@ -1101,7 +1101,7 @@ void fn_8006D8E8(void) {
         fn_800718C4();
         fn_8006C968();
         fn_8006DC78();
-        fn_80035F1C();
+        RC_ApplyCurrentViewport();
         if (gSession.nGameType != 3) {
             lbl_80281E50 = 0;
         }
