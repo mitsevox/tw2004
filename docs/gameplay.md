@@ -835,7 +835,7 @@ At the strike, `STATEFUNC_SimulateInit` copies the launched ball into a second b
    read as roughly 0.7 ms of CPU; when `fn_8008AC40` is true it is exactly 2 ticks. So the
    prediction races ahead of the real ball;
 3. when the copy stops (state 0, 1 or 5), unless it is a gimme: event 0x3C
-   (`fn_80066DC4`) queues a front-end message and, **if the copy is holed (lie 12), cuts to
+   (`EVENT_BallPredictionDone`) queues a front-end message and, **if the copy is holed (lie 12), cuts to
    camera 11**; then `fn_8006B2C4(player, 1)` classifies the predicted outcome into
    `lbl_801D5F78[player]` (fields 0xC..0x14; the live result later fills 0x0..0x8);
 4. once per shot (`+0xC2C`), when the prediction's outcome class is 8 or 9 and the **real** ball

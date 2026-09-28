@@ -352,7 +352,7 @@ They will be sorted into the sections below.
   fails (GoDynObj fn_80046FDC 94 -> 100), `int` locals where `s32` fails (fn_8008052C 92 -> 100).
 - **[verified] Block-scoped locals per switch case** allocate differently from one function-level local
   (EventInfo fn_8011D280); case labels merged into `default` (`case 3: default:`) reshape the compare
-  tree or jump table (event EVENT_PlayerEmotionUpdated, fn_80067220), and extra empty cases make the tree test a value
+  tree or jump table (event EVENT_PlayerEmotionUpdated, NextShotType), and extra empty cases make the tree test a value
   first (Controller_Gc Input_vUpdate: `case -2: case -3: break;`).
 - **[verified] Return a local instead of an expression** so the register restores come before the last
   arithmetic (LLDynTex fn_8010B6AC 90 -> 100); round up through a local written back

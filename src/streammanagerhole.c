@@ -55,7 +55,7 @@ void fn_80039454();
 void fn_800394AC();
 void fn_80046130();
 void fn_80046174();
-void fn_800676B8();
+void SitDev_vRegisterStreamClients();
 void fn_800676E8();
 void fn_8008EC68();
 void fn_8008ED28();
@@ -226,7 +226,7 @@ void fn_80014594(void) {
     SkeletalObject_RegisterStreamClient();
     MC_RegisterStreamClients();
     fn_800A295C();
-    fn_800676B8();
+    SitDev_vRegisterStreamClients();
 }
 
 void fn_800145E0(void) {

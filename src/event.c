@@ -53,13 +53,13 @@ void GUI_QueueTip(int n);
 void GameMode26_NoteSplitScreenShot(int nPlayer);
 void AI_SimAbort(void);
 void AI_AimAtPin(int nPlayer);
-void fn_80067220(int nPlayer);
-void fn_8006752C(void);
-void fn_80067550(int nPlayer);
-void fn_80067554(int nPlayer);
-void fn_80067558(int nPlayer);
-void fn_8006755C(int nPlayer);
-int  fn_80067560(void);
+void NextShotType(int nPlayer);
+void GUI_ClubSelected(void);
+void EVENT_FirstBounceDefault(int nPlayer);
+void EVENT_FirstBounceController8(int nPlayer);
+void EVENT_BallStopDefault(int nPlayer);
+void EVENT_BallStopController8(int nPlayer);
+int  GameEffects_GetCurrentTriggerType(void);
 
 // At the start of a round (GO_vInitIG): zeroes the count of seconds EVENT_Idle (event 26) keeps.
 // TW07 has both EVENT_InitForGame and EVENT_ResetIdleSeconds here, the same size; the caller makes
@@ -183,7 +183,7 @@ void EVENT_BallBounce(int nPlayer, int nEvent, void* pData, int nArg) {
 // to the putter) to the first club Club_UsableForKind allows for the shot kind, the putter after 26
 // tries. The putter is kept only on the green or with the green within 1.5 yards toward the pin,
 // otherwise the old club comes back. Then the target is fitted to the club (not for a chip), the
-// power worked out again, the front end told (message 7 and fn_8006752C), the golfer re-set for the
+// power worked out again, the front end told (message 7 and GUI_ClubSelected), the golfer re-set for the
 // club, and the club remembered for the shot kind. Nothing when a lesson blocks it, in the
 // long-drive modes 22 and 26, or with the putter in hand.
 void EVENT_NextClub(int nPlayer, int nEvent, void* pData, int nArg) {
@@ -220,7 +220,7 @@ void EVENT_NextClub(int nPlayer, int nEvent, void* pData, int nArg) {
     }
     gPlayers[nPlayer].fPower = AI_PowerForTarget(nPlayer);
     fn_80062C38();
-    fn_8006752C();
+    GUI_ClubSelected();
     Character_InitNewClubAndShotType(nPlayer);
     gPlayers[nPlayer].nClubPerKind[gPlayers[nPlayer].nShotKind] = gPlayers[nPlayer].nClub;
     if (gSession.nSplitScreen) {
@@ -264,7 +264,7 @@ void EVENT_PrevClub(int nPlayer, int nEvent, void* pData, int nArg) {
     }
     gPlayers[nPlayer].fPower = AI_PowerForTarget(nPlayer);
     fn_80062C38();
-    fn_8006752C();
+    GUI_ClubSelected();
     Character_InitNewClubAndShotType(nPlayer);
     gPlayers[nPlayer].nClubPerKind[gPlayers[nPlayer].nShotKind] = gPlayers[nPlayer].nClub;
     if (gSession.nSplitScreen) {
@@ -272,12 +272,12 @@ void EVENT_PrevClub(int nPlayer, int nEvent, void* pData, int nArg) {
     }
 }
 
-// Event 15 (the shot-kind button): the next shot kind with its club (fn_80067220), and in split
+// Event 15 (the shot-kind button): the next shot kind with its club (NextShotType), and in split
 // screen the front end is sent message 0x14 with the player's nC58. Nothing when a lesson blocks it
 // or in the long-drive modes 22 and 26.
 void EVENT_NextShotType(int nPlayer, int nEvent, void* pData, int nArg) {
     if (Lessons_OnEvent(nPlayer, 15) || Game_GetMode() == 26 || Game_GetMode() == 22) return;
-    fn_80067220(nPlayer);
+    NextShotType(nPlayer);
     if (gSession.nSplitScreen) {
         fn_80062CB0(gPlayers[nPlayer].nC58, 1);
     }
@@ -390,9 +390,10 @@ void EVENT_TopOfArc(int nPlayer, int nEvent, void* pData, int nArg) {
 
 // Event 29 (Ball.c: the ball's first bounce), only for the real ball (nArg 1): commentary situation
 // event 28 unless a lesson blocks it, camera event 3 for the player's view, emotion event 2
-// (fn_8006ACF8), then fn_80067554 for a player on controller 8, fn_80067550 otherwise (both empty),
-// and the spin asked for with the stick (SW_vGetCurrentSpin) goes onto the ball (fn_80051C84),
-// saved to the replay first unless a replay is playing.
+// (fn_8006ACF8), then EVENT_FirstBounceController8 for a player on controller 8,
+// EVENT_FirstBounceDefault otherwise (both empty), and the spin asked for with the stick
+// (SW_vGetCurrentSpin) goes onto the ball (fn_80051C84), saved to the replay first unless a replay
+// is playing.
 void EVENT_FirstBounce(int nPlayer, int nEvent, void* pData, int nArg) {
     f32 fSpinY;
     f32 fSpinX;
@@ -406,9 +407,9 @@ void EVENT_FirstBounce(int nPlayer, int nEvent, void* pData, int nArg) {
         fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 3, nPlayer);
         fn_8006ACF8(nPlayer, 2);
         if (Player_IsController8(nPlayer)) {
-            fn_80067554(nPlayer);
+            EVENT_FirstBounceController8(nPlayer);
         } else {
-            fn_80067550(nPlayer);
+            EVENT_FirstBounceDefault(nPlayer);
         }
         SW_vGetCurrentSpin(nPlayer, &fSpinY, &fSpinX);
         if (!gSession.bReplay) {
@@ -438,7 +439,7 @@ void EVENT_LastBounceForSpinna(int nPlayer, int nEvent, void* pData, int nArg) {
 
 // Event 32 (Ball.c: the ball comes to rest), only for the real ball (nArg 1): Gaud_BallStopped,
 // commentary situation event 8 unless a lesson takes the event (a lesson judges the shot here),
-// then fn_8006755C for a player on controller 8, fn_80067558 otherwise (both empty).
+// then EVENT_BallStopController8 for a player on controller 8, EVENT_BallStopDefault otherwise (both empty).
 void EVENT_BallStop(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         Gaud_BallStopped(nPlayer);
@@ -446,9 +447,9 @@ void EVENT_BallStop(int nPlayer, int nEvent, void* pData, int nArg) {
             SitDev_QueueEvent(nPlayer, 2, 8);
         }
         if (Player_IsController8(nPlayer)) {
-            fn_8006755C(nPlayer);
+            EVENT_BallStopController8(nPlayer);
         } else {
-            fn_80067558(nPlayer);
+            EVENT_BallStopDefault(nPlayer);
         }
     }
 }
@@ -474,26 +475,26 @@ void EVENT_OutOfBounds(int nPlayer, int nEvent, void* pData, int nArg) {
     }
 }
 
-void fn_800670A8(int nPlayer, int nEvent, void* pData, int nArg);
+void Collision(int nPlayer, int nEvent, void* pData, int nArg);
 
-// Event 35 (Ball.c: the ball lands on the ground): fn_800670A8.
+// Event 35 (Ball.c: the ball lands on the ground): Collision.
 void EVENT_Collision(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_800670A8(nPlayer, nEvent, pData, nArg);
+    Collision(nPlayer, nEvent, pData, nArg);
 }
 
-// Event 36 (Ball.c: the ball hits a course object): fn_800670A8.
+// Event 36 (Ball.c: the ball hits a course object): Collision.
 void EVENT_CollisionObject(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_800670A8(nPlayer, nEvent, pData, nArg);
+    Collision(nPlayer, nEvent, pData, nArg);
 }
 
-// Event 37 (Ball.c: the ball hits a surface with flag 0x10, a tree): fn_800670A8.
+// Event 37 (Ball.c: the ball hits a surface with flag 0x10, a tree): Collision.
 void EVENT_CollisionTree(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_800670A8(nPlayer, nEvent, pData, nArg);
+    Collision(nPlayer, nEvent, pData, nArg);
 }
 
-// Event 38 (Ball.c: the ball hits surface 90, the flagstick): fn_800670A8.
+// Event 38 (Ball.c: the ball hits surface 90, the flagstick): Collision.
 void EVENT_CollisionPin(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_800670A8(nPlayer, nEvent, pData, nArg);
+    Collision(nPlayer, nEvent, pData, nArg);
 }
 
 // Event 73 (Ball.c: the look-ahead ball, Player.ballBefore, first lands): queues commentary
@@ -647,82 +648,111 @@ void EVENT_StartSuperZoomCam(int nPlayer, int nEvent, void* pData, int nArg) {
 void EVENT_EndSuperZoomCam(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
-void fn_80066D78(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 59 (the special swing is over: GoGolfCam.c with nArg 1 when the matrix or super-zoom camera
+// ends, stateFunc.c with 0 at the hit when neither ran): the ball effects of emitters 9 and 10 at
+// the ball when nArg is set (fn_800A2FFC), and with nArg 1 the special shot's audio ends
+// (Gaud_ExitSpecialShot).
+void EVENT_SpecialSwingEnded(int nPlayer, int nEvent, void* pData, int nArg) {
     fn_800A2FFC(nPlayer, nArg);
     if (nArg == 1) {
         Gaud_ExitSpecialShot(nPlayer);
     }
 }
 
-void fn_80066DC4(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 60 (GameManager.c: the look-ahead ball, Player.ballBefore, has been worked out): queues
+// commentary situation event 20, and when that ball ends in the cup, camera event 11 for the
+// player's view.
+void EVENT_BallPredictionDone(int nPlayer, int nEvent, void* pData, int nArg) {
     SitDev_QueueEvent(nPlayer, 2, 20);
     if (gPlayers[nPlayer].ballBefore.nLie == LIE_INCUP_e) {
         fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 11, nPlayer);
     }
 }
 
-void fn_80066E28(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 61 (GameEffects.c: a GameBreaker starts): its audio (Gaud_InitGameBreaker, kind 0), and for
+// any reason but 0 (fn_80067560) the caddie tip 15 + that reason (GUI_QueueTip).
+void EVENT_ScriptedGameBreakerStarted(int nPlayer, int nEvent, void* pData, int nArg) {
     Gaud_InitGameBreaker(nPlayer, 0);
-    if (fn_80067560()) {
-        GUI_QueueTip((u8)(fn_80067560() + 15));
+    if (GameEffects_GetCurrentTriggerType()) {
+        GUI_QueueTip((u8)(GameEffects_GetCurrentTriggerType() + 15));
     }
 }
 
-void fn_80066E6C(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 62 (GameEffects.c: a GameBreaker of type 0 ends): Gaud_ExitGameBreaker.
+void EVENT_ScriptedGameBreakerEnd(int nPlayer, int nEvent, void* pData, int nArg) {
     Gaud_ExitGameBreaker(nPlayer);
 }
 
-void fn_80066E90(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 63 (GameEffects.c: a GameBreaker of the predicted kind starts): its audio
+// (Gaud_InitGameBreaker, kind 1).
+void EVENT_PredictedGameBreakerStarted(int nPlayer, int nEvent, void* pData, int nArg) {
     Gaud_InitGameBreaker(nPlayer, 1);
 }
 
-void fn_80066EB8(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 64 (GameEffects.c: a GameBreaker of the predicted kind ends): Gaud_ExitGameBreaker.
+void EVENT_PredictedGameBreakerEnd(int nPlayer, int nEvent, void* pData, int nArg) {
     Gaud_ExitGameBreaker(nPlayer);
 }
 
-void fn_80066EDC(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 5 (GameManager.c, GameMode11.c: the round is over): counts a game played in the player's
+// stats (EASBio_IncrementGamesPlayed) unless the session is the demo (gSession.a8[0]), and queues
+// commentary situation event 13.
+void EVENT_EndGame(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!gSession.a8[0]) {
         EASBio_IncrementGamesPlayed(1);
     }
     SitDev_QueueEvent(nPlayer, 2, 13);
 }
 
-void fn_80066F30(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 65 (GameUI.c: the leaderboard is shown): queues commentary situation event 22.
+void EVENT_LeaderboardDisplay(int nPlayer, int nEvent, void* pData, int nArg) {
     SitDev_QueueEvent(nPlayer, 4, 22);
 }
 
-void fn_80066F58(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 66 (fe_craputils.c: a profile unlocks a golfer): queues commentary situation event 23.
+void EVENT_UnlockedNewCharacter(int nPlayer, int nEvent, void* pData, int nArg) {
     SitDev_QueueEvent(nPlayer, 8, 23);
 }
 
-void fn_80066F80(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 67 (fe_craputils.c: a profile unlocks a course): queues commentary situation event 24.
+void EVENT_UnlockedNewCourse(int nPlayer, int nEvent, void* pData, int nArg) {
     SitDev_QueueEvent(nPlayer, 8, 24);
 }
 
-void fn_80066FA8(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 68 (GameMode8.c: speed golf's start countdown is running): does nothing.
+void EVENT_SpeedgolfReady(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
-void fn_80066FAC(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 69 (GameMode8.c: speed golf's "go"): does nothing.
+void EVENT_SpeedgolfGo(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
-void fn_80066FB0(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 70 (GameUI.c: the scorecard is closed): does nothing.
+void EVENT_ScoreCardDone(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
-void fn_80066FB4(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 71: only calls fn_80035574 (bit 2 of a terrain block's flags) and drops the answer. Nothing
+// in this build fires the event.
+void EVENT_AnimationSkinReset(int nPlayer, int nEvent, void* pData, int nArg) {
     fn_80035574();
 }
 
-void fn_80066FD4(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 72 (CharAnim.c: a golfer's animation clip starts; nArg is its group): for group 5, queues
+// commentary situation event 32.
+void EVENT_NewAnimationPlayed(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 5) {
         SitDev_QueueEvent(nPlayer, 2, 32);
     }
 }
 
-void fn_80067004(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 74 (stateFunc.c: a hole flyover starts): queues commentary situation event 30.
+void EVENT_FlyByEvent(int nPlayer, int nEvent, void* pData, int nArg) {
     SitDev_QueueEvent(nPlayer, 9, 30);
 }
 
-void fn_8006702C(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 75 (SitDevMisc.c: 48 frames after the hit, the ball still in the air): queues commentary
+// situation event 31 unless a lesson blocks it.
+void EVENT_BallHitDelayed(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!Lessons_OnEvent(nPlayer, 75)) {
         SitDev_QueueEvent(nPlayer, 2, 31);
     }
@@ -730,7 +760,7 @@ void fn_8006702C(int nPlayer, int nEvent, void* pData, int nArg) {
 
 // The handlers, by event number.
 EventHandler lbl_80188628[76] = {
-    EVENT_BeginHole, EVENT_EndHole, EVENT_RestartHole, EVENT_BeginTurn, EVENT_EndTurn, fn_80066EDC, EVENT_ShotSetup,
+    EVENT_BeginHole, EVENT_EndHole, EVENT_RestartHole, EVENT_BeginTurn, EVENT_EndTurn, EVENT_EndGame, EVENT_ShotSetup,
     EVENT_PreSwing, EVENT_Delay, EVENT_PracticeSwing, EVENT_HitBall, EVENT_SwingDone, EVENT_BallBounce, EVENT_NextClub,
     EVENT_PrevClub, EVENT_NextShotType, EVENT_PrevStance, EVENT_NextStance, EVENT_RotateLeft, EVENT_RotateRight, EVENT_MoveTargetForward,
     EVENT_MoveTargetBack, EVENT_PlaceBallRotateLeft, EVENT_PlaceBallRotateRight, EVENT_PlaceBallMoveTargetForward, EVENT_PlaceBallMoveTargetBack, EVENT_Idle, EVENT_BallMoving,
@@ -738,18 +768,27 @@ EventHandler lbl_80188628[76] = {
     EVENT_Collision, EVENT_CollisionObject, EVENT_CollisionTree, EVENT_CollisionPin, EVENT_CollisionActor, EVENT_BreaklineDone, EVENT_BreaklinePassedCup,
     EVENT_PlayerEmotionUpdated, EVENT_SpinWindowFinished, EVENT_BeganBackswing, EVENT_TappaTappaTappa, EVENT_SpinnaSpinnaSpinna, EVENT_BeganDownSwing, EVENT_StartCameraZoom,
     EVENT_EndCameraZoom, EVENT_StartMatrixCam, EVENT_EndMatrixCam, EVENT_3ShotSwingStarted, EVENT_SlowMotionStart, EVENT_SlowMotionEnd, EVENT_FastMotionStart,
-    EVENT_FastMotionEnd, EVENT_StartSuperZoomCam, EVENT_EndSuperZoomCam, fn_80066D78, fn_80066DC4, fn_80066E28, fn_80066E6C,
-    fn_80066E90, fn_80066EB8, fn_80066F30, fn_80066F58, fn_80066F80, fn_80066FA8, fn_80066FAC,
-    fn_80066FB0, fn_80066FB4, fn_80066FD4, EVENT_EstimatedBallFirstBounce, fn_80067004, fn_8006702C,
+    EVENT_FastMotionEnd, EVENT_StartSuperZoomCam, EVENT_EndSuperZoomCam, EVENT_SpecialSwingEnded, EVENT_BallPredictionDone, EVENT_ScriptedGameBreakerStarted, EVENT_ScriptedGameBreakerEnd,
+    EVENT_PredictedGameBreakerStarted, EVENT_PredictedGameBreakerEnd, EVENT_LeaderboardDisplay, EVENT_UnlockedNewCharacter, EVENT_UnlockedNewCourse, EVENT_SpeedgolfReady, EVENT_SpeedgolfGo,
+    EVENT_ScoreCardDone, EVENT_AnimationSkinReset, EVENT_NewAnimationPlayed, EVENT_EstimatedBallFirstBounce, EVENT_FlyByEvent, EVENT_BallHitDelayed,
 };
 
+// Calls event nEvent's handler from the table above (0..75, not checked) with the player (0xFF from
+// the main loop and hole start: SitDev_QueueEvent takes it as player 0), pData (the ball, a
+// position, or NULL) and the last argument (for ball events 1 for the real ball, 0 for the AI's
+// simulated one; -1 when there is no value).
 void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int b) {
     lbl_80188628[nEvent](nPlayer, nEvent, pData, b);
 }
 
-// Events 35..38, the ball lands (35 ground, 36 an object, 37 a flagged surface, 38 surface 90):
-// nArg 1: the camera, sounds, effects and commentary; otherwise event 36 aborts the simulation.
-void fn_800670A8(int nPlayer, int nEvent, void* pData, int nArg) {
+// The landings, events 35..38 (EVENT_Collision the ground, EVENT_CollisionObject a course object,
+// EVENT_CollisionTree a tree, EVENT_CollisionPin the flagstick). For the real ball (nArg 1): camera
+// event 7 for the player's view, Gaud_BallBounce, the surface's collision effect (fn_800A3348),
+// emotion event 1; on an object that object's n1C (fn_80033704) and Player.b30C set; on the
+// flagstick Player.b30D set and Gaud_BallHitPole; commentary situation event 27 for a tree, 16 for
+// an object or a tree, 21 for the flagstick; then the game mode's landing hook (gpGame->pfn23C).
+// For the AI's simulated ball, hitting an object aborts the simulation (AI_SimAbort).
+void Collision(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 7, nPlayer);
         Gaud_BallBounce(nPlayer);
@@ -780,10 +819,16 @@ void fn_800670A8(int nPlayer, int nEvent, void* pData, int nArg) {
     }
 }
 
-// The next shot kind, with its club and aim.
+// The next shot kind for EVENT_NextShotType, with the club remembered for it (nClubPerKind): putt
+// to pitch; drive to punch; punch to pitch; pitch to a chip aimed at the pin on or near the green
+// (the green within 1.5 yards toward the pin), otherwise flop; flop to a putt with the putter aimed
+// at the pin on or near the green, otherwise out of sand a chip aimed at the pin, in sand a drive;
+// chip to a putt on the green, otherwise a drive; anything else to a drive. Then the target is set
+// up again with its move input (fA60) zeroed, fitted to the club, the power worked out, front-end
+// message 7 sent and the golfer re-set for the club and shot.
 // fake match: EA reads a few fields as gPlayers[nPlayer] beside pPlayer (the asm recomputes the
 // address there), so those stay in that form.
-void fn_80067220(int nPlayer) {
+void NextShotType(int nPlayer) {
     Player* pPlayer = &gPlayers[nPlayer];
 
     switch (pPlayer->nShotKind) {
@@ -865,24 +910,34 @@ void fn_80067220(int nPlayer) {
     Character_InitNewClubAndShotType(nPlayer);
 }
 
-void fn_8006752C(void) {
+// Tells the front end the player's club changed (front-end message 58). Called by EVENT_NextClub,
+// EVENT_PrevClub and TARGET_UpdateMomentums.
+void GUI_ClubSelected(void) {
     GameMsg_Send(58);
 }
 
-void fn_80067550(int nPlayer) {
+// Empty in this build. EVENT_FirstBounce calls it for a player not on controller 8
+// (EVENT_FirstBounceController8 otherwise).
+void EVENT_FirstBounceDefault(int nPlayer) {
 }
 
-void fn_80067554(int nPlayer) {
+// Empty in this build. EVENT_FirstBounce calls it for a player on controller 8
+// (Player_IsController8).
+void EVENT_FirstBounceController8(int nPlayer) {
 }
 
-void fn_80067558(int nPlayer) {
+// Empty in this build. EVENT_BallStop calls it for a player not on controller 8
+// (EVENT_BallStopController8 otherwise).
+void EVENT_BallStopDefault(int nPlayer) {
 }
 
-void fn_8006755C(int nPlayer) {
+// Empty in this build. EVENT_BallStop calls it for a player on controller 8 (Player_IsController8).
+void EVENT_BallStopController8(int nPlayer) {
 }
 
-// The lowest of bits 0..23 set in the effects' flags, 0 if none.
-int fn_80067560(void) {
+// The reason the running GameBreaker started: the lowest of bits 0..23 set in gGameEffects.uFlags
+// (GameEffects.c sets exactly one, 1 << reason), 0 if none.
+int GameEffects_GetCurrentTriggerType(void) {
     int i;
 
     for (i = 0; i < 24; i++) {
@@ -893,7 +948,10 @@ int fn_80067560(void) {
     return 0;
 }
 
-void fn_80067608(void) {
+// Round start (GO_vInitIG): clears the commentary scripts' state block (SitDevData: no line played,
+// no events queued), registers the loader for a hole's commentary zones (course chunk 5,
+// fn_800BB6DC) and stops watching any ball (fn_800BB0C8).
+void SitDev_vInitModule(void) {
     Mem_set(lbl_802811B8, 0, sizeof(SitDevData));
     lbl_802811B8->pE8 = NULL;
     lbl_802811B8->n13C = 0;
@@ -901,7 +959,9 @@ void fn_80067608(void) {
     fn_800BB0C8();
 }
 
-void fn_8006765C(void) {
+// Round end (fn_8006CDC4): frees the commentary scripts' buffers (SitDevData pD0 when set, pCC,
+// pD4) and forgets the loaded scripts (lbl_80282208).
+void SitDev_vCloseModule(void) {
     if (lbl_802811B8->pD0 != NULL) {
         StaticMem_Free(lbl_802811B8->pD0);
     }
@@ -910,11 +970,14 @@ void fn_8006765C(void) {
     lbl_80282208 = NULL;
 }
 
-void fn_800676AC(void) {
+// Before a hole loads (fn_8006F4F0): no commentary zones yet (the count fn_800BB6DC adds to).
+void SitDev_vInitBeforeHole(void) {
     lbl_80282210 = 0;
 }
 
-void fn_800676B8(void) {
+// Registers SitDev_LoadScripts as the loader of the hole stream's 'sscr' chunks (the commentary
+// scripts); streammanagerhole.c calls it.
+void SitDev_vRegisterStreamClients(void) {
     // port: SitDevFile.c defines the handler with the object's first word (the scripts) as its
     //       parameter; UStream calls it with the object. Same address on the GameCube.
     Stream_RegisterLoadChunkCallback('sscr', (void (*)(UStreamObject*))SitDev_LoadScripts);

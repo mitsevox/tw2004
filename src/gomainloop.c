@@ -150,8 +150,8 @@ int  fn_80063758(void);
 void StaticCam_Init(void);
 void StaticCam_DeInit(void);
 void EVENT_InitForGame(void);
-void fn_80067608(void);
-void fn_8006765C(void);
+void SitDev_vInitModule(void);
+void SitDev_vCloseModule(void);
 void TARGET_Init(void);
 void fn_80067CD4(int nPlayer);
 void SitDev_ProcessEventQueue(void);
@@ -627,7 +627,7 @@ void GO_vInitIG(void) {
     fn_80085120();
     fn_8005D3A8(1);
     GM_InitModule_PreDataStream();
-    fn_80067608();
+    SitDev_vInitModule();
     CameraTuning_Init();
     fn_80062E00();
     DynamicCam_Init();
@@ -696,7 +696,7 @@ void fn_8006CDC4(void) {
     if (TI_bCounterIsRunning(1)) {
         TI_sStopCounter(1);
     }
-    fn_8006765C();
+    SitDev_vCloseModule();
     fn_8006DCA4(0);
     Players_Reset();
     fn_8009B898();

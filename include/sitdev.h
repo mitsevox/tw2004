@@ -21,15 +21,15 @@ typedef struct SitDevEvent {
 typedef struct SitDevData {
     u16   aValue[SITDEV_NUM_VALUES];            // 0x000  set through SitDev_SetStateValue
     u32   aSetBits[SITDEV_NUM_VALUES / 32];     // 0x0C0  bit n: aValue[n] has been set
-    void* pCC;                                  // 0x0CC  SitDev_LoadScripts' argument; freed by fn_8006765C
-    void* pD0;                                  // 0x0D0  freed by fn_8006765C when set
+    void* pCC;                                  // 0x0CC  SitDev_LoadScripts' argument; freed by SitDev_vCloseModule
+    void* pD0;                                  // 0x0D0  freed by SitDev_vCloseModule when set
     u8*   pD4;                                  // 0x0D4  allocated by SitDev_LoadScripts, one byte per
-                                                //        SitDevScripts.n10; freed by fn_8006765C
+                                                //        SitDevScripts.n10; freed by SitDev_vCloseModule
     u8    abPlayed[14];                         // 0x0D8  per kind of action: one has played already
     u8    unkE6[2];
     struct SitDevEntry8* pE8;                   // 0x0E8  the last line played (fn_800BD580 kind 1)
     SitDevEvent aEvents[10];                    // 0x0EC  this frame's events, n13C of them
-    s32   n13C;                                 // 0x13C  cleared with the block by fn_80067608
+    s32   n13C;                                 // 0x13C  cleared with the block by SitDev_vInitModule
 } SitDevData;
 LAYOUT_ASSERT(SitDevData, 0x140);
 

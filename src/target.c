@@ -71,7 +71,7 @@ void TARGET_Init(void) {
 }
 
 f32  Camera_GetLensFovScale(CamLens* pLens);      // char.c: the lens's fB0
-void fn_8006752C(void);
+void GUI_ClubSelected(void);
 
 // Each frame: while the ball is being placed, the placement cursor; otherwise, for a human
 // lining up a shot (states 2..4, 8..10) before the swing starts, the aim marker.
@@ -516,7 +516,7 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
                 gPlayers[nPlayer].nClub = AI_ClubForShot(nPlayer, gPlayers[nPlayer].nShotKind, 1,
                                                          gPlayers[nPlayer].fDistance);
                 if (nClub != gPlayers[nPlayer].nClub) {
-                    fn_8006752C();
+                    GUI_ClubSelected();
                 }
             }
             gPlayers[nPlayer].fPower = AI_PowerForTarget(nPlayer);

@@ -44,7 +44,7 @@ void fn_8006F438(void) {
 void fn_8006F5FC(void);
 void fn_8006F4B4(void);
 void fn_8006F4E0(void);
-void fn_800676AC();
+void SitDev_vInitBeforeHole();
 void fn_8006A89C();
 void fn_8006F600(void);
 void fn_8002BC6C();
@@ -85,7 +85,7 @@ void fn_8006F4E0(void) {
 
 void fn_8006F4F0(void) {
     fn_8006F600();
-    fn_800676AC();
+    SitDev_vInitBeforeHole();
     fn_8006A89C();
 }
 
