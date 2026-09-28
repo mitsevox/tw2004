@@ -1,11 +1,21 @@
-// UMemPool.c (EA's name, from its asserts; also in EA's 2002 source tree): pools of fixed-size
-// nodes carved from one allocation (the file streamer keeps its object nodes in one), and before
-// them a block of math helpers: 4x4 matrices, paired-single vector operations, atan2f, fabsf and
-// the natural logarithm with its log2 lookup table.
+// UMemPool.c (EA's name, from the assert in UMemPool_Create; also in EA's 2002 source tree).
+// Despite the name, most of this unit is 4x4 matrix code: it reads as EA's UMatFlt.c and UMath.c
+// linked just before UMemPool.c (TW06 and TW07 keep them as neighbouring legacy/lib files, in that
+// order; TW07's UMatFlt.c has mat44flt_EulerAngles, mat44flt_ExtractEulerAngles, mat44flt_gaussj
+// and mat44flt_Invert in the order they have here), with no assert or data block to split on.
+// In address order:
+// - matrices (row vectors, translation in row 3): copies, Euler angles to and from a matrix,
+//   transposes, inverses and the projection matrices the render context builds;
+// - 4-float vector helpers (Vec_Copy, Vec_Swap, paired-single negate, scale, multiply and
+//   add-scaled), atan2f, fabsf, fabs and logf;
+// - the log2 lookup table (1024 entries) and its init and close (possibly UMath.c's module
+//   functions: TW07's UMath.c has four near-empty MF_v* init/close functions);
+// - the pools of fixed-size nodes carved from one allocation (the file streamer keeps its object
+//   nodes in one): UMemPool_Create, DeleteMemPool, AllocPoolMem, ReturnPoolMem.
 
 #include "engine.h"
 
-f32* lbl_80281BD8;                      // the log2 table: 1024 entries over the mantissa of [1, 2)
+f32* gLog2Table;   // log2(1 + i / 1024) for i = 0..1023: the log2 of a float's mantissa in [1, 2)
 
 int  mat44flt_gaussj(f32 (*pA)[4], f32 (*pB)[4]);
 void Vec_Swap(f32* pA, f32* pB);
@@ -33,30 +43,30 @@ void Mtx_CopyRotation(f32 (*pSrc)[4], f32 (*pDst)[4]) {
 // A rotation matrix from yaw (about y), pitch (about x) and roll (about z), in radians, into rows
 // 0-2 of pMtx (their fourth float set to 0; row 3 is left as it is). An angle of exactly 0 skips
 // its sin and cos.
-void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
-    f32 fSinA;
-    f32 fCosA;
-    f32 fSinB;
-    f32 fCosB;
-    f32 fSinC;
-    f32 fCosC;
-    f32 fSinCSinB;
-    f32 fSinBCosC;
+void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fYaw, f32 fPitch, f32 fRoll) {
+    f32 fSinYaw;
+    f32 fCosYaw;
+    f32 fSinPitch;
+    f32 fCosPitch;
+    f32 fSinRoll;
+    f32 fCosRoll;
+    f32 fSinRollSinPitch;
+    f32 fCosRollSinPitch;
 
-    if (fC == 0.0f) {
-        if (fB == 0.0f) {
+    if (fRoll == 0.0f) {
+        if (fPitch == 0.0f) {
             pMtx[1][1] = 1.0f;
             pMtx[2][1] = 0.0f;
             pMtx[1][2] = 0.0f;
             pMtx[1][0] = 0.0f;
             pMtx[0][1] = 0.0f;
-            if (fA != 0.0f) {
-                fSinA = Math_Sin(fA);
-                fCosA = Math_Cos(fA);
-                pMtx[2][2] = fCosA;
-                pMtx[0][0] = fCosA;
-                pMtx[2][0] = fSinA;
-                pMtx[0][2] = -fSinA;
+            if (fYaw != 0.0f) {
+                fSinYaw = Math_Sin(fYaw);
+                fCosYaw = Math_Cos(fYaw);
+                pMtx[2][2] = fCosYaw;
+                pMtx[0][0] = fCosYaw;
+                pMtx[2][0] = fSinYaw;
+                pMtx[0][2] = -fSinYaw;
             } else {
                 pMtx[2][2] = 1.0f;
                 pMtx[0][0] = 1.0f;
@@ -64,86 +74,86 @@ void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
                 pMtx[0][2] = 0.0f;
             }
         } else {
-            fSinB = Math_Sin(fB);
-            fCosB = Math_Cos(fB);
-            if (fA == 0.0f) {
+            fSinPitch = Math_Sin(fPitch);
+            fCosPitch = Math_Cos(fPitch);
+            if (fYaw == 0.0f) {
                 pMtx[0][0] = 1.0f;
                 pMtx[2][0] = 0.0f;
                 pMtx[1][0] = 0.0f;
                 pMtx[0][2] = 0.0f;
                 pMtx[0][1] = 0.0f;
-                pMtx[2][2] = fCosB;
-                pMtx[1][1] = fCosB;
-                pMtx[1][2] = fSinB;
-                pMtx[2][1] = -fSinB;
+                pMtx[2][2] = fCosPitch;
+                pMtx[1][1] = fCosPitch;
+                pMtx[1][2] = fSinPitch;
+                pMtx[2][1] = -fSinPitch;
             } else {
-                fSinA = Math_Sin(fA);
-                fCosA = Math_Cos(fA);
-                pMtx[0][0] = fCosA;
+                fSinYaw = Math_Sin(fYaw);
+                fCosYaw = Math_Cos(fYaw);
+                pMtx[0][0] = fCosYaw;
                 pMtx[0][1] = 0.0f;
-                pMtx[0][2] = -fSinA;
-                pMtx[1][1] = fCosB;
-                pMtx[2][1] = -fSinB;
-                pMtx[1][0] = fSinB * fSinA;
-                pMtx[1][2] = fSinB * fCosA;
-                pMtx[2][0] = fCosB * fSinA;
-                pMtx[2][2] = fCosB * fCosA;
+                pMtx[0][2] = -fSinYaw;
+                pMtx[1][1] = fCosPitch;
+                pMtx[2][1] = -fSinPitch;
+                pMtx[1][0] = fSinPitch * fSinYaw;
+                pMtx[1][2] = fSinPitch * fCosYaw;
+                pMtx[2][0] = fCosPitch * fSinYaw;
+                pMtx[2][2] = fCosPitch * fCosYaw;
             }
         }
     } else {
-        fSinC = Math_Sin(fC);
-        fCosC = Math_Cos(fC);
-        if (fB == 0.0f) {
-            if (fA == 0.0f) {
+        fSinRoll = Math_Sin(fRoll);
+        fCosRoll = Math_Cos(fRoll);
+        if (fPitch == 0.0f) {
+            if (fYaw == 0.0f) {
                 pMtx[2][2] = 1.0f;
                 pMtx[2][1] = 0.0f;
                 pMtx[2][0] = 0.0f;
                 pMtx[1][2] = 0.0f;
                 pMtx[0][2] = 0.0f;
-                pMtx[0][0] = fCosC;
-                pMtx[1][1] = fCosC;
-                pMtx[0][1] = fSinC;
-                pMtx[1][0] = -fSinC;
+                pMtx[0][0] = fCosRoll;
+                pMtx[1][1] = fCosRoll;
+                pMtx[0][1] = fSinRoll;
+                pMtx[1][0] = -fSinRoll;
             } else {
-                fSinA = Math_Sin(fA);
-                fCosA = Math_Cos(fA);
-                pMtx[2][0] = fSinA;
+                fSinYaw = Math_Sin(fYaw);
+                fCosYaw = Math_Cos(fYaw);
+                pMtx[2][0] = fSinYaw;
                 pMtx[2][1] = 0.0f;
-                pMtx[2][2] = fCosA;
-                pMtx[0][1] = fSinC;
-                pMtx[1][1] = fCosC;
-                pMtx[0][0] = fCosC * fCosA;
-                pMtx[0][2] = -(fCosC * fSinA);
-                pMtx[1][0] = -(fSinC * fCosA);
-                pMtx[1][2] = fSinC * fSinA;
+                pMtx[2][2] = fCosYaw;
+                pMtx[0][1] = fSinRoll;
+                pMtx[1][1] = fCosRoll;
+                pMtx[0][0] = fCosRoll * fCosYaw;
+                pMtx[0][2] = -(fCosRoll * fSinYaw);
+                pMtx[1][0] = -(fSinRoll * fCosYaw);
+                pMtx[1][2] = fSinRoll * fSinYaw;
             }
         } else {
-            fSinB = Math_Sin(fB);
-            fCosB = Math_Cos(fB);
-            if (fA == 0.0f) {
+            fSinPitch = Math_Sin(fPitch);
+            fCosPitch = Math_Cos(fPitch);
+            if (fYaw == 0.0f) {
                 pMtx[2][0] = 0.0f;
-                pMtx[2][1] = -fSinB;
-                pMtx[2][2] = fCosB;
-                pMtx[0][0] = fCosC;
-                pMtx[1][0] = -fSinC;
-                pMtx[0][1] = fSinC * fCosB;
-                pMtx[0][2] = fSinC * fSinB;
-                pMtx[1][1] = fCosC * fCosB;
-                pMtx[1][2] = fCosC * fSinB;
+                pMtx[2][1] = -fSinPitch;
+                pMtx[2][2] = fCosPitch;
+                pMtx[0][0] = fCosRoll;
+                pMtx[1][0] = -fSinRoll;
+                pMtx[0][1] = fSinRoll * fCosPitch;
+                pMtx[0][2] = fSinRoll * fSinPitch;
+                pMtx[1][1] = fCosRoll * fCosPitch;
+                pMtx[1][2] = fCosRoll * fSinPitch;
             } else {
-                fSinA = Math_Sin(fA);
-                fCosA = Math_Cos(fA);
-                pMtx[2][1] = -fSinB;
-                fSinCSinB = fSinC * fSinB;
-                fSinBCosC = fSinB * fCosC;
-                pMtx[0][0] = fCosC * fCosA + fSinCSinB * fSinA;
-                pMtx[0][1] = fSinC * fCosB;
-                pMtx[0][2] = fSinCSinB * fCosA - fCosC * fSinA;
-                pMtx[1][0] = fSinBCosC * fSinA - fSinC * fCosA;
-                pMtx[1][1] = fCosC * fCosB;
-                pMtx[1][2] = fSinC * fSinA + fSinBCosC * fCosA;
-                pMtx[2][0] = fCosB * fSinA;
-                pMtx[2][2] = fCosB * fCosA;
+                fSinYaw = Math_Sin(fYaw);
+                fCosYaw = Math_Cos(fYaw);
+                pMtx[2][1] = -fSinPitch;
+                fSinRollSinPitch = fSinRoll * fSinPitch;
+                fCosRollSinPitch = fSinPitch * fCosRoll;
+                pMtx[0][0] = fCosRoll * fCosYaw + fSinRollSinPitch * fSinYaw;
+                pMtx[0][1] = fSinRoll * fCosPitch;
+                pMtx[0][2] = fSinRollSinPitch * fCosYaw - fCosRoll * fSinYaw;
+                pMtx[1][0] = fCosRollSinPitch * fSinYaw - fSinRoll * fCosYaw;
+                pMtx[1][1] = fCosRoll * fCosPitch;
+                pMtx[1][2] = fSinRoll * fSinYaw + fCosRollSinPitch * fCosYaw;
+                pMtx[2][0] = fCosPitch * fSinYaw;
+                pMtx[2][2] = fCosPitch * fCosYaw;
             }
         }
     }
@@ -155,59 +165,59 @@ void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
 // The yaw, pitch and roll (radians) of a rotation matrix, the reverse of mat44flt_EulerAngles: yaw
 // is atan2(m[2][0], m[2][2]), pitch is -asin(m[2][1]) and roll is atan2(m[0][1], m[1][1]), with a
 // quarter turn chosen by sign where an atan2 would divide by zero.
-void mat44flt_ExtractEulerAngles(f32 (*pMtx)[4], f32* pA, f32* pB, f32* pC) {
-    f32 fA;
-    f32 fB;
-    f32 fC;
+void mat44flt_ExtractEulerAngles(f32 (*pMtx)[4], f32* pYaw, f32* pPitch, f32* pRoll) {
+    f32 fYaw;
+    f32 fPitch;
+    f32 fRoll;
 
     if (pMtx[2][2] != 0.0f) {
-        fA = atan2f(pMtx[2][0], pMtx[2][2]);
-        fB = -Math_Asin(pMtx[2][1]);
+        fYaw = atan2f(pMtx[2][0], pMtx[2][2]);
+        fPitch = -Math_Asin(pMtx[2][1]);
         if (pMtx[1][1] != 0.0f) {
-            fC = atan2f(pMtx[0][1], pMtx[1][1]);
+            fRoll = atan2f(pMtx[0][1], pMtx[1][1]);
         } else if (pMtx[0][1] != 0.0f) {
-            if (pMtx[0][1] * Math_Cos(fB) > 0.0f) {
-                fC = PI / 2.0f;
+            if (pMtx[0][1] * Math_Cos(fPitch) > 0.0f) {
+                fRoll = PI / 2.0f;
             } else {
-                fC = -PI / 2.0f;
+                fRoll = -PI / 2.0f;
             }
         }
     } else if (pMtx[2][0] == 0.0f) {
         if (pMtx[2][1] > 0.0f) {
-            fB = -PI / 2.0f;
+            fPitch = -PI / 2.0f;
         } else {
-            fB = PI / 2.0f;
+            fPitch = PI / 2.0f;
         }
-        fC = 0.0f;
+        fRoll = 0.0f;
         if (pMtx[0][0] == 0.0f) {
             if (pMtx[0][2] > 0.0f) {
-                fA = -PI / 2.0f;
+                fYaw = -PI / 2.0f;
             } else {
-                fA = PI / 2.0f;
+                fYaw = PI / 2.0f;
             }
         } else {
             // both arguments are m[0][0], as in the original
-            fA = -atan2f(pMtx[0][0], pMtx[0][0]);
+            fYaw = -atan2f(pMtx[0][0], pMtx[0][0]);
         }
     } else {
-        fB = -Math_Asin(pMtx[2][1]);
-        if (pMtx[2][0] * Math_Cos(fB) > 0.0f) {
-            fA = PI / 2.0f;
+        fPitch = -Math_Asin(pMtx[2][1]);
+        if (pMtx[2][0] * Math_Cos(fPitch) > 0.0f) {
+            fYaw = PI / 2.0f;
         } else {
-            fA = -PI / 2.0f;
+            fYaw = -PI / 2.0f;
         }
         if (pMtx[1][1] != 0.0f) {
-            fC = atan2f(pMtx[0][1], pMtx[1][1]);
-        } else if (pMtx[0][1] * Math_Cos(fB) > 0.0f) {
-            fC = PI / 2.0f;
+            fRoll = atan2f(pMtx[0][1], pMtx[1][1]);
+        } else if (pMtx[0][1] * Math_Cos(fPitch) > 0.0f) {
+            fRoll = PI / 2.0f;
         } else {
-            fC = -PI / 2.0f;
+            fRoll = -PI / 2.0f;
         }
     }
-    *pA = fA;
-    // EA bug: fC is never set when m[2][2] != 0 and m[0][1] and m[1][1] are both 0
-    *pC = fC;
-    *pB = fB;
+    *pYaw = fYaw;
+    // EA bug: fRoll is never set when m[2][2] != 0 and m[0][1] and m[1][1] are both 0
+    *pRoll = fRoll;
+    *pPitch = fPitch;
 }
 
 // Transposes the 3x3 part of a 4x4 matrix (pSrc and pDst may be the same matrix).
@@ -562,7 +572,7 @@ void fn_8000AE9C(void) {
     u32 i;
     f32 f;
 
-    pEntry = lbl_80281BD8;
+    pEntry = gLog2Table;
     i = 0;
     uMantissa = 0;
     do {
@@ -580,12 +590,12 @@ void fn_8000AF1C(void) {
 
 void fn_8000AF20(void) {
     fn_8000AF1C();
-    lbl_80281BD8 = fn_800951A0(0x400 * sizeof(f32), 16, 1);
+    gLog2Table = fn_800951A0(0x400 * sizeof(f32), 16, 1);
     fn_8000AE9C();
 }
 
 void fn_8000AF58(void) {
-    fn_8009527C(lbl_80281BD8);
+    fn_8009527C(gLog2Table);
 }
 
 f32 logf(f32 x) {

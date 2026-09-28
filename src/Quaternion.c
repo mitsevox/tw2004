@@ -1,6 +1,9 @@
-// Quaternion.c (our name): rotations as quaternions (x, y, z, w in f32[4]) for the skeleton,
-// animation and the cameras, and float math helpers (the ball uses those too). It may be the tail
-// of GoEntry.c: no assert or data block separates the two.
+// Quaternion.c (our name; EA's file is MathQuat.c, TW07's legacy/lib/MathQuat.c has the same
+// functions in the same order from Quat_Slerp to Quat_ExtractEulerAngles, with Quat_Add and
+// Quat_Multiply swapped): rotations as quaternions (x, y, z, w in f32[4]) for the skeleton,
+// animation and the cameras. After them come the float math wrappers (Math_Sin, Math_Acos,
+// Math_Cos, Math_Asin, Math_Sqrt; the ball uses them too), Quat_IdentifyForMul and Quat_Clear
+// (inlines in TW07) and Vec3_LengthSqClamped.
 
 #include "engine.h"
 
@@ -104,104 +107,104 @@ static double Quaternion_StrippedFn(double x) {
 // The quaternion yaw x pitch x roll, into pOut: yaw turns about z, pitch about y and roll about x
 // (radians), each angle negated first as in Legacy_Quat_BuildFromYaw/Pitch/Roll. An angle of
 // exactly 0 skips its sin and cos; all three 0 give the identity.
-void Quat_EulerAngles(f32 fA, f32 fB, f32 fC, f32* pOut) {
+void Quat_EulerAngles(f32 fYaw, f32 fPitch, f32 fRoll, f32* pOut) {
     f32 fHalf;
-    f32 fSinA;
-    f32 fCosA;
-    f32 fSinB;
-    f32 fCosB;
-    f32 fSinC;
-    f32 fCosC;
-    f32 fSS;
-    f32 fCC;
-    f32 fSC;
-    f32 fCS;
+    f32 fSinYaw;
+    f32 fCosYaw;
+    f32 fSinPitch;
+    f32 fCosPitch;
+    f32 fSinRoll;
+    f32 fCosRoll;
+    f32 fSinPitchSinYaw;
+    f32 fCosPitchCosYaw;
+    f32 fSinPitchCosYaw;
+    f32 fCosPitchSinYaw;
 
-    fA = -fA;
-    fB = -fB;
-    fC = -fC;
-    if (fA != 0.0f) {
-        if (fB != 0.0f) {
-            if (fC != 0.0f) {
-                fHalf = 0.5f * fA;
-                fSinA = Math_Sin(fHalf);
-                fCosA = Math_Cos(fHalf);
-                fHalf = 0.5f * fB;
-                fSinB = Math_Sin(fHalf);
-                fCosB = Math_Cos(fHalf);
-                fHalf = 0.5f * fC;
-                fSinC = Math_Sin(fHalf);
-                fCosC = Math_Cos(fHalf);
-                fSS = fSinB * fSinA;
-                fCS = fCosB * fSinA;
-                fSC = fSinB * fCosA;
-                fCC = fCosB * fCosA;
-                pOut[3] = fCosC * fCC + fSinC * fSS;
-                pOut[0] = fSinC * fCC - fCosC * fSS;
-                pOut[1] = fCosC * fSC + fSinC * fCS;
-                pOut[2] = fCosC * fCS - fSinC * fSC;
+    fYaw = -fYaw;
+    fPitch = -fPitch;
+    fRoll = -fRoll;
+    if (fYaw != 0.0f) {
+        if (fPitch != 0.0f) {
+            if (fRoll != 0.0f) {
+                fHalf = 0.5f * fYaw;
+                fSinYaw = Math_Sin(fHalf);
+                fCosYaw = Math_Cos(fHalf);
+                fHalf = 0.5f * fPitch;
+                fSinPitch = Math_Sin(fHalf);
+                fCosPitch = Math_Cos(fHalf);
+                fHalf = 0.5f * fRoll;
+                fSinRoll = Math_Sin(fHalf);
+                fCosRoll = Math_Cos(fHalf);
+                fSinPitchSinYaw = fSinPitch * fSinYaw;
+                fCosPitchSinYaw = fCosPitch * fSinYaw;
+                fSinPitchCosYaw = fSinPitch * fCosYaw;
+                fCosPitchCosYaw = fCosPitch * fCosYaw;
+                pOut[3] = fCosRoll * fCosPitchCosYaw + fSinRoll * fSinPitchSinYaw;
+                pOut[0] = fSinRoll * fCosPitchCosYaw - fCosRoll * fSinPitchSinYaw;
+                pOut[1] = fCosRoll * fSinPitchCosYaw + fSinRoll * fCosPitchSinYaw;
+                pOut[2] = fCosRoll * fCosPitchSinYaw - fSinRoll * fSinPitchCosYaw;
                 return;
             }
-            fHalf = 0.5f * fA;
-            fSinA = Math_Sin(fHalf);
-            fCosA = Math_Cos(fHalf);
-            fHalf = 0.5f * fB;
-            fSinB = Math_Sin(fHalf);
-            fCosB = Math_Cos(fHalf);
-            pOut[3] = fCosB * fCosA;
-            pOut[0] = -fSinB * fSinA;
-            pOut[1] = fSinB * fCosA;
-            pOut[2] = fCosB * fSinA;
+            fHalf = 0.5f * fYaw;
+            fSinYaw = Math_Sin(fHalf);
+            fCosYaw = Math_Cos(fHalf);
+            fHalf = 0.5f * fPitch;
+            fSinPitch = Math_Sin(fHalf);
+            fCosPitch = Math_Cos(fHalf);
+            pOut[3] = fCosPitch * fCosYaw;
+            pOut[0] = -fSinPitch * fSinYaw;
+            pOut[1] = fSinPitch * fCosYaw;
+            pOut[2] = fCosPitch * fSinYaw;
             return;
         }
-        if (fC != 0.0f) {
-            fHalf = 0.5f * fA;
-            fSinA = Math_Sin(fHalf);
-            fCosA = Math_Cos(fHalf);
-            fHalf = 0.5f * fC;
-            fSinC = Math_Sin(fHalf);
-            fCosC = Math_Cos(fHalf);
-            pOut[3] = fCosC * fCosA;
-            pOut[0] = fSinC * fCosA;
-            pOut[1] = fSinC * fSinA;
-            pOut[2] = fCosC * fSinA;
+        if (fRoll != 0.0f) {
+            fHalf = 0.5f * fYaw;
+            fSinYaw = Math_Sin(fHalf);
+            fCosYaw = Math_Cos(fHalf);
+            fHalf = 0.5f * fRoll;
+            fSinRoll = Math_Sin(fHalf);
+            fCosRoll = Math_Cos(fHalf);
+            pOut[3] = fCosRoll * fCosYaw;
+            pOut[0] = fSinRoll * fCosYaw;
+            pOut[1] = fSinRoll * fSinYaw;
+            pOut[2] = fCosRoll * fSinYaw;
             return;
         }
-        fHalf = 0.5f * fA;
-        fSinA = Math_Sin(fHalf);
+        fHalf = 0.5f * fYaw;
+        fSinYaw = Math_Sin(fHalf);
         pOut[3] = Math_Cos(fHalf);
         pOut[0] = 0.0f;
         pOut[1] = 0.0f;
-        pOut[2] = fSinA;
+        pOut[2] = fSinYaw;
         return;
     }
-    if (fB != 0.0f) {
-        if (fC != 0.0f) {
-            fHalf = 0.5f * fB;
-            fSinB = Math_Sin(fHalf);
-            fCosB = Math_Cos(fHalf);
-            fHalf = 0.5f * fC;
-            fSinC = Math_Sin(fHalf);
-            fCosC = Math_Cos(fHalf);
-            pOut[3] = fCosC * fCosB;
-            pOut[0] = fSinC * fCosB;
-            pOut[1] = fCosC * fSinB;
-            pOut[2] = -fSinC * fSinB;
+    if (fPitch != 0.0f) {
+        if (fRoll != 0.0f) {
+            fHalf = 0.5f * fPitch;
+            fSinPitch = Math_Sin(fHalf);
+            fCosPitch = Math_Cos(fHalf);
+            fHalf = 0.5f * fRoll;
+            fSinRoll = Math_Sin(fHalf);
+            fCosRoll = Math_Cos(fHalf);
+            pOut[3] = fCosRoll * fCosPitch;
+            pOut[0] = fSinRoll * fCosPitch;
+            pOut[1] = fCosRoll * fSinPitch;
+            pOut[2] = -fSinRoll * fSinPitch;
             return;
         }
-        fHalf = 0.5f * fB;
-        fSinB = Math_Sin(fHalf);
+        fHalf = 0.5f * fPitch;
+        fSinPitch = Math_Sin(fHalf);
         pOut[3] = Math_Cos(fHalf);
         pOut[0] = 0.0f;
-        pOut[1] = fSinB;
+        pOut[1] = fSinPitch;
         pOut[2] = 0.0f;
         return;
     }
-    if (fC != 0.0f) {
-        fHalf = 0.5f * fC;
-        fSinC = Math_Sin(fHalf);
+    if (fRoll != 0.0f) {
+        fHalf = 0.5f * fRoll;
+        fSinRoll = Math_Sin(fHalf);
         pOut[3] = Math_Cos(fHalf);
-        pOut[0] = fSinC;
+        pOut[0] = fSinRoll;
         pOut[1] = 0.0f;
         pOut[2] = 0.0f;
         return;
@@ -375,20 +378,20 @@ void Legacy_Quat_BuildFromRoll(f32 fAngle, f32* pOut) {
 // *pYaw, *pPitch and *pRoll. Yaw and roll come from atan of a ratio, not atan2, so they stay within
 // -pi/2..pi/2; pitch is the asin of a sine clamped to -1..1. They are the angles of q itself, so
 // they have the opposite sign of the angles Quat_EulerAngles takes.
-void Quat_ExtractEulerAngles(f32* pQ, f32* pA, f32* pB, f32* pC) {
-    f32 fTanA;
-    f32 fSinB;
-    f32 fTanC;
+void Quat_ExtractEulerAngles(f32* pQ, f32* pYaw, f32* pPitch, f32* pRoll) {
+    f32 fTanYaw;
+    f32 fSinPitch;
+    f32 fTanRoll;
 
-    fTanA = 2.0f * (pQ[0] * pQ[1] + pQ[3] * pQ[2]) /
-            (pQ[3] * pQ[3] + pQ[0] * pQ[0] - pQ[1] * pQ[1] - pQ[2] * pQ[2]);
-    fSinB = -2.0f * (pQ[0] * pQ[2] - pQ[3] * pQ[1]);
-    fTanC = 2.0f * (pQ[3] * pQ[0] + pQ[1] * pQ[2]) /
-            (pQ[2] * pQ[2] + (pQ[3] * pQ[3] - pQ[0] * pQ[0] - pQ[1] * pQ[1]));
-    fSinB = (fSinB < -1.0f) ? -1.0f : ((fSinB > 1.0f) ? 1.0f : fSinB);
-    *pA = atan(fTanA);
-    *pB = Math_Asin(fSinB);
-    *pC = atan(fTanC);
+    fTanYaw = 2.0f * (pQ[0] * pQ[1] + pQ[3] * pQ[2]) /
+              (pQ[3] * pQ[3] + pQ[0] * pQ[0] - pQ[1] * pQ[1] - pQ[2] * pQ[2]);
+    fSinPitch = -2.0f * (pQ[0] * pQ[2] - pQ[3] * pQ[1]);
+    fTanRoll = 2.0f * (pQ[3] * pQ[0] + pQ[1] * pQ[2]) /
+               (pQ[2] * pQ[2] + (pQ[3] * pQ[3] - pQ[0] * pQ[0] - pQ[1] * pQ[1]));
+    fSinPitch = (fSinPitch < -1.0f) ? -1.0f : ((fSinPitch > 1.0f) ? 1.0f : fSinPitch);
+    *pYaw = atan(fTanYaw);
+    *pPitch = Math_Asin(fSinPitch);
+    *pRoll = atan(fTanRoll);
 }
 
 // Sine of fAngle (radians), through the double-precision sin().

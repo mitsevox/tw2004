@@ -143,7 +143,7 @@ f32  atan2f(f32 y, f32 x);         // atan2f
 f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platform.h) rounded to a float
 f32  logf(f32 x);                // natural logarithm
 void mat44flt_ExtractEulerAngles(f32 (*pMtx)[4], f32* pA, f32* pB, f32* pC);   // a rotation matrix's three angles
-void fn_8000AF20(void);                 // make the log2 table (lbl_80281BD8)
+void fn_8000AF20(void);                 // make the log2 table (gLog2Table)
 void fn_8000AF58(void);                 // free the log2 table
 double acos(double x);                  // 0x8015F784 (MSL)
 double asin(double x);                  // 0x8015F7A4 (MSL)
