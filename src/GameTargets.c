@@ -13,13 +13,13 @@
 #include "game/earnings.h"
 
 // Score multipliers for GameModeSkillZoneBase_ScaleTargetPoints, one table per value of Game_GetCurHoleNum.
-f32 lbl_80192810[13] = {
+f32 gSkillZoneHole0TargetScale[13] = {
     1.0f, 1.0f, 1.3f, 1.1f, 1.0f, 1.1f, 1.2f, 1.3f, 1.3f, 1.4f, 1.4f, 1.3f, 1.0f,
 };
-f32 lbl_80192844[15] = {
+f32 gSkillZoneHole1TargetScale[15] = {
     1.0f, 1.0f, 1.2f, 1.1f, 1.3f, 1.1f, 1.4f, 1.2f, 1.1f, 1.0f, 1.0f, 1.0f, 1.2f, 1.4f, 1.3f,
 };
-f32 lbl_80192880[15] = {
+f32 gSkillZoneHole2TargetScale[15] = {
     1.1f, 1.1f, 1.0f, 1.0f, 1.0f, 1.1f, 1.2f, 1.3f, 1.0f, 1.3f, 1.4f, 1.4f, 1.3f, 1.0f, 1.0f,
 };
 
@@ -379,13 +379,13 @@ void GameModeSkillZoneBase_PostShotAwards2(int nPlayer) {
 // int. On any other hole n comes back unchanged.
 s32 GameModeSkillZoneBase_ScaleTargetPoints(s32 n, int i) {
     if (Game_GetCurHoleNum() == 0) {
-        return n * lbl_80192810[i];
+        return n * gSkillZoneHole0TargetScale[i];
     }
     if (Game_GetCurHoleNum() == 1) {
-        return n * lbl_80192844[i];
+        return n * gSkillZoneHole1TargetScale[i];
     }
     if (Game_GetCurHoleNum() == 2) {
-        return n * lbl_80192880[i];
+        return n * gSkillZoneHole2TargetScale[i];
     }
     return n;
 }

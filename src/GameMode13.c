@@ -11,11 +11,11 @@
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
-s32 lbl_802816A8 = 4;                    // the options saved while the game runs
-s32 lbl_802823BC;                    // the points of the last shot
-s32 lbl_802823B8;                    // the seconds added by the last shot
-s32 lbl_802823B4;                    // the points multiplier from bonuses
-s32 lbl_802823B0;
+s32 gTimedSavedOptionsC = 4;                    // the options saved while the game runs
+s32 gTimedShotPoints;                    // the points of the last shot
+s32 gTimedShotSeconds;                    // the seconds added by the last shot
+s32 gTimedBonusMultiplier;                    // the points multiplier from bonuses
+s32 gTimedSavedWind;
 
 void  Gaud_StartShotClock(void);
 
@@ -100,15 +100,15 @@ void GameModeSkillZoneTimed_Init(void) {
 
 // Puts back the two options StartGamePreData changed for the game: options.nC and the wind.
 void GameModeSkillZoneTimed_Shutdown(void) {
-    gSession.options.nC = lbl_802816A8;
-    gSession.options.nWind = lbl_802823B0;
+    gSession.options.nC = gTimedSavedOptionsC;
+    gSession.options.nWind = gTimedSavedWind;
 }
 
 // As a round starts (pfn1EC, GM_InitModule_PreDataStream): saves options.nC and the wind setting
 // (Shutdown puts them back) and sets them to 4 and 0, no wind.
 void GameModeSkillZoneTimed_StartGamePreData(void) {
-    lbl_802816A8 = gSession.options.nC;
-    lbl_802823B0 = gSession.options.nWind;
+    gTimedSavedOptionsC = gSession.options.nC;
+    gTimedSavedWind = gSession.options.nWind;
     gSession.options.nC = 4;
     gSession.options.nWind = 0;
 }
@@ -172,7 +172,7 @@ void GameModeSkillZoneTimed_EndGolferTurn(int nPlayer) {
 // time. A target hit before pays its points and seconds scaled by 0.75 per earlier hit; after 4
 // hits it pays nothing (Gaud_TargetClosedOut). A target surface past the drive line is a drive: a
 // new longest one (nDDC) pays as a surface, any other nothing. Those points are multiplied by nDBC,
-// the scale, the target factor (targets only) and the bonus multiplier (lbl_802823B4), then the
+// the scale, the target factor (targets only) and the bonus multiplier (gTimedBonusMultiplier), then the
 // earnings modifiers; a loss never takes the winnings (nDD8) below 0. Added seconds go to the HUD
 // clock as the player's new total (n290 plus seconds * 60 frames; n290 itself is set through
 // SetTimer, from the UI) and are summed in aDC4[4]; the ticking stops when the clock climbs past 10
@@ -195,10 +195,10 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
     s32 nHits;
     nMsg = -1;
     nSurface = gPlayers[nPlayer].ball.nSurface;
-    GameModeSkillZoneTimed_GetIDScore(nSurface, &lbl_802823BC, &lbl_802823B8, &nBalls);
+    GameModeSkillZoneTimed_GetIDScore(nSurface, &gTimedShotPoints, &gTimedShotSeconds, &nBalls);
     fScale = 1.0f;
     nAdded = 0;
-    bTime = lbl_802823B8 != 0;
+    bTime = gTimedShotSeconds != 0;
     fLength = fn_800D0550(nPlayer);
     if (nSurface >= 0x85 && nSurface <= 0x90 && !GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
         nTarget = GameModeSkillZoneBase_GetGreenIndexHit(nPlayer);
@@ -213,16 +213,16 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
         if (nHits == 0) {
             if (lbl_80282360 - 1 == GameModeSkillZoneBase_CountGreensHit(nPlayer)) {
                 fScale = 1.0f;
-                lbl_802823BC = GameModeSkillZoneBase_GetHitAllTargetsBonus();
-                lbl_802823BC = GM_Earnings_ComputeBonusModifiers(lbl_802823BC, nPlayer, 1, 1, 1, 0);
-                lbl_802823BC = GM_Earnings_ComputeTOURCardModifiers(lbl_802823BC, nPlayer, 0);
-                GM_Earnings_AwardMoney(nPlayer, lbl_802823BC, 0);
+                gTimedShotPoints = GameModeSkillZoneBase_GetHitAllTargetsBonus();
+                gTimedShotPoints = GM_Earnings_ComputeBonusModifiers(gTimedShotPoints, nPlayer, 1, 1, 1, 0);
+                gTimedShotPoints = GM_Earnings_ComputeTOURCardModifiers(gTimedShotPoints, nPlayer, 0);
+                GM_Earnings_AwardMoney(nPlayer, gTimedShotPoints, 0);
                 gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
-                lbl_802823B8 = 0;
-                gPlayers[nPlayer].nDD8 += lbl_802823BC;
-                GameMsg_Send5Ints(0x33, lbl_802823BC, 0, 0, 0xCA, 1);
-                lbl_802823BC = 0;
-                lbl_802823B8 = 0;
+                gTimedShotSeconds = 0;
+                gPlayers[nPlayer].nDD8 += gTimedShotPoints;
+                GameMsg_Send5Ints(0x33, gTimedShotPoints, 0, 0, 0xCA, 1);
+                gTimedShotPoints = 0;
+                gTimedShotSeconds = 0;
                 if ((s8)gPlayers[nPlayer].bE9E == 0) {
                     gPlayers[nPlayer].bE9E = 1;
                     if (!(Misc_RandFunc(0) & 1)) {
@@ -233,26 +233,26 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
                 }
             } else {
                 fScale = 1.0f;
-                lbl_802823BC += 100;
-                lbl_802823BC *= gPlayers[nPlayer].nDBC;
-                lbl_802823BC = GameModeSkillZoneBase_ScaleTargetPoints(lbl_802823BC, nTarget);
-                lbl_802823BC = GM_Earnings_ComputeBonusModifiers(lbl_802823BC, nPlayer, 1, 1, 1, 0);
-                lbl_802823BC = GM_Earnings_ComputeTOURCardModifiers(lbl_802823BC, nPlayer, 0);
-                GM_Earnings_AwardMoney(nPlayer, lbl_802823BC, 0);
+                gTimedShotPoints += 100;
+                gTimedShotPoints *= gPlayers[nPlayer].nDBC;
+                gTimedShotPoints = GameModeSkillZoneBase_ScaleTargetPoints(gTimedShotPoints, nTarget);
+                gTimedShotPoints = GM_Earnings_ComputeBonusModifiers(gTimedShotPoints, nPlayer, 1, 1, 1, 0);
+                gTimedShotPoints = GM_Earnings_ComputeTOURCardModifiers(gTimedShotPoints, nPlayer, 0);
+                GM_Earnings_AwardMoney(nPlayer, gTimedShotPoints, 0);
                 gPlayers[nPlayer].aCD4[gPlayers[nPlayer].nCD0] = nSurface;
                 gPlayers[nPlayer].nCD0++;
                 gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
-                gPlayers[nPlayer].nDD8 += lbl_802823BC;
-                lbl_802823B8 += 5;
-                gPlayers[nPlayer].aDC4[4] += lbl_802823B8 * 60;
+                gPlayers[nPlayer].nDD8 += gTimedShotPoints;
+                gTimedShotSeconds += 5;
+                gPlayers[nPlayer].aDC4[4] += gTimedShotSeconds * 60;
                 PlayNow_SendMessage18(nPlayer);
-                GameModeSkillZoneTimed_SetHudClock(gPlayers[nPlayer].n290[Game_CurHoleIndex()] + lbl_802823B8
+                GameModeSkillZoneTimed_SetHudClock(gPlayers[nPlayer].n290[Game_CurHoleIndex()] + gTimedShotSeconds
                                                    * 60);
-                nAdded = lbl_802823B8;
-                GameMsg_Send5Ints(0x33, lbl_802823BC, 0, 0, 0xC9, 1);
-                fn_800E53F0(0x34, lbl_802823B8 * 60, 0, 0);
-                lbl_802823BC = 0;
-                lbl_802823B8 = 0;
+                nAdded = gTimedShotSeconds;
+                GameMsg_Send5Ints(0x33, gTimedShotPoints, 0, 0, 0xC9, 1);
+                fn_800E53F0(0x34, gTimedShotSeconds * 60, 0, 0);
+                gTimedShotPoints = 0;
+                gTimedShotSeconds = 0;
                 if (gPlayers[nPlayer].nDBC > 1) {
                     nMsg = 0x31;
                 } else {
@@ -280,8 +280,8 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
         }
         if (gPlayers[nPlayer].nDE4[nTarget] > 3) {
             fScale = 0.0f;
-            lbl_802823BC = 0;
-            lbl_802823B8 = 0;
+            gTimedShotPoints = 0;
+            gTimedShotSeconds = 0;
             GameMsg_Send5Ints(0x33, 0, 0, 0, 0xC8, 1);
             Gaud_TargetClosedOut();
             nMsg = 2;
@@ -324,8 +324,8 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
             }
         } else {
             fScale = 0.0f;
-            lbl_802823BC = 0;
-            lbl_802823B8 = 0;
+            gTimedShotPoints = 0;
+            gTimedShotSeconds = 0;
             GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCB, 1);
             switch (Misc_RandFunc(0) & 3) {
             case 0:
@@ -340,23 +340,23 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
             }
         }
     }
-    if (lbl_802823B8 != 0) {
-        lbl_802823B8 = lbl_802823B8 * fScale;
-        gPlayers[nPlayer].aDC4[4] += lbl_802823B8 * 60;
+    if (gTimedShotSeconds != 0) {
+        gTimedShotSeconds = gTimedShotSeconds * fScale;
+        gPlayers[nPlayer].aDC4[4] += gTimedShotSeconds * 60;
         PlayNow_SendMessage18(nPlayer);
-        GameModeSkillZoneTimed_SetHudClock(gPlayers[nPlayer].n290[Game_CurHoleIndex()] + lbl_802823B8 * 60);
-        nAdded = lbl_802823B8;
+        GameModeSkillZoneTimed_SetHudClock(gPlayers[nPlayer].n290[Game_CurHoleIndex()] + gTimedShotSeconds * 60);
+        nAdded = gTimedShotSeconds;
         if (!gSession.bReplay) {
-            fn_800E53F0(0x34, lbl_802823B8 * 60, 0, 0);
+            fn_800E53F0(0x34, gTimedShotSeconds * 60, 0, 0);
         }
     }
-    if (lbl_802823BC != 0) {
-        if (lbl_802823BC > 0) {
-            lbl_802823BC = (f32)lbl_802823BC * gPlayers[nPlayer].nDBC;
-            lbl_802823BC = lbl_802823BC * fScale;
+    if (gTimedShotPoints != 0) {
+        if (gTimedShotPoints > 0) {
+            gTimedShotPoints = (f32)gTimedShotPoints * gPlayers[nPlayer].nDBC;
+            gTimedShotPoints = gTimedShotPoints * fScale;
             if (nSurface >= 0x85 && nSurface <= 0x90
                 && !GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
-                lbl_802823BC = GameModeSkillZoneBase_ScaleTargetPoints(lbl_802823BC, nTarget);
+                gTimedShotPoints = GameModeSkillZoneBase_ScaleTargetPoints(gTimedShotPoints, nTarget);
                 switch (gPlayers[nPlayer].nDBC) {
                 case 2:
                     nMsg = 0x32;
@@ -371,9 +371,9 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
                     break;
                 }
             }
-            lbl_802823BC = (f32)(lbl_802823BC * lbl_802823B4);
-            lbl_802823BC = GM_Earnings_ComputeBonusModifiers(lbl_802823BC, nPlayer, 1, 1, 1, 0);
-            lbl_802823BC = GM_Earnings_ComputeTOURCardModifiers(lbl_802823BC, nPlayer, 0);
+            gTimedShotPoints = (f32)(gTimedShotPoints * gTimedBonusMultiplier);
+            gTimedShotPoints = GM_Earnings_ComputeBonusModifiers(gTimedShotPoints, nPlayer, 1, 1, 1, 0);
+            gTimedShotPoints = GM_Earnings_ComputeTOURCardModifiers(gTimedShotPoints, nPlayer, 0);
         } else if (!(Misc_RandFunc(0) & 1)) {
             GameModeSkillZoneBase_StartComment(0);
         } else {
@@ -382,21 +382,21 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
         gPlayers[nPlayer].aCD4[gPlayers[nPlayer].nCD0] = nSurface;
         gPlayers[nPlayer].nCD0++;
         gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
-        if (lbl_802823BC + gPlayers[nPlayer].nDD8 < 0) {
+        if (gTimedShotPoints + gPlayers[nPlayer].nDD8 < 0) {
             GM_Earnings_AwardMoney(nPlayer, -gPlayers[nPlayer].nDD8, 0);
         } else {
-            GM_Earnings_AwardMoney(nPlayer, lbl_802823BC, 0);
+            GM_Earnings_AwardMoney(nPlayer, gTimedShotPoints, 0);
         }
-        gPlayers[nPlayer].nDD8 += lbl_802823BC;
+        gPlayers[nPlayer].nDD8 += gTimedShotPoints;
         if (gPlayers[nPlayer].nDD8 < 0) {
             gPlayers[nPlayer].nDD8 = 0;
         } else if (!gSession.bReplay) {
             if (GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
-                GameMsg_Send5Ints(0x33, lbl_802823BC, 0, 0, 0xD6, 1);
+                GameMsg_Send5Ints(0x33, gTimedShotPoints, 0, 0, 0xD6, 1);
             } else {
-                GameMsg_Send5Ints(0x33, lbl_802823BC, 0, 0, nSurface, 1);
+                GameMsg_Send5Ints(0x33, gTimedShotPoints, 0, 0, nSurface, 1);
             }
-            if (lbl_802823BC > 0 && nSurface < 0x85) {
+            if (gTimedShotPoints > 0 && nSurface < 0x85) {
                 Gaud_MoneyAward();
             }
         }
@@ -456,7 +456,7 @@ void GameModeSkillZoneTimed_GetIDScore(s32 nSurface, s32* pPoints, s32* pTime, s
 // Before each shot (pfnSetupNextGolfer): per-shot data cleared (ClearPerShotData) and stroke play's
 // golfer order (GameModeStroke_SetupNextGolfer); then for the golfer about to play (GS_PRE_SHOT) a
 // chance of a shot multiplier (SetupBonusBall), their time on the HUD clock and, before their first
-// shot, their target set up (SetCup_AlignGolfer). The bonus multiplier (lbl_802823B4) goes back to
+// shot, their target set up (SetCup_AlignGolfer). The bonus multiplier (gTimedBonusMultiplier) goes back to
 // 1.
 void GameModeSkillZoneTimed_SetupNextGolfer(void) {
     int i;
@@ -471,7 +471,7 @@ void GameModeSkillZoneTimed_SetupNextGolfer(void) {
             }
         }
     }
-    lbl_802823B4 = 1;
+    gTimedBonusMultiplier = 1;
 }
 
 // Hole start (pfn1E4): the targets sorted nearest the tee first (SortCupsByDistanceFromTee), then
@@ -524,16 +524,16 @@ u8 GameModeSkillZoneTimed_GameFinished(u8 bCheck) {
     return 1;
 }
 
-// The points the last shot earned (lbl_802823BC); a is not used
+// The points the last shot earned (gTimedShotPoints); a is not used
 // (GameModeSkillZoneBase_GetShotEarned passes the player).
 s32 GameModeSkillZoneTimed_GetShotEarned(s32 a) {
-    return lbl_802823BC;
+    return gTimedShotPoints;
 }
 
-// The seconds the last shot added (lbl_802823B8); a is not used
+// The seconds the last shot added (gTimedShotSeconds); a is not used
 // (GameModeSkillZoneBase_GetTimeEarned passes the player).
 s32 GameModeSkillZoneTimed_GetTimeEarned(s32 a) {
-    return lbl_802823B8;
+    return gTimedShotSeconds;
 }
 
 // Ten seconds left (a UI command, GameUICommands.c case 13): the clock starts ticking
@@ -600,12 +600,12 @@ u8 GameModeSkillZoneTimed_HoleFinished(int nPlayer, u8 bCheck) {
 }
 
 // The ball hit a bonus object (pfn268, with its id, Ball.n140): the bullseye ball effect plays and
-// the bonus multiplier (lbl_802823B4) goes up by 2 plus the object's index
+// the bonus multiplier (gTimedBonusMultiplier) goes up by 2 plus the object's index
 // (GameModeSkillZoneBase_GetBonusIndex), so by 2 to 6.
 void GameModeSkillZoneTimed_CollisionActor(int nPlayer, int nId) {
     s32 n = GameModeSkillZoneBase_GetBonusIndex(nId);
     fn_800A30E4(8, &gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
-    lbl_802823B4 += n + 2;
+    gTimedBonusMultiplier += n + 2;
 }
 
 // Which marker model target i shows for the player (pfn26C, GoDynObj.c): 1 once they have hit it 4
@@ -617,10 +617,10 @@ s32 GameModeSkillZoneTimed_GreenType(int nPlayer, int i) {
     return 0;
 }
 
-// The bonus multiplier (lbl_802823B4); a is not used (GameModeSkillZoneBase_GetDriveMultiplier
+// The bonus multiplier (gTimedBonusMultiplier); a is not used (GameModeSkillZoneBase_GetDriveMultiplier
 // passes the player).
 s32 GameModeSkillZoneTimed_GetDriveMultiplier(s32 a) {
-    return lbl_802823B4;
+    return gTimedBonusMultiplier;
 }
 
 // End of the game (pfnEndGame): the game counts as won in the bio (EASBio_SetCurrentGameWon) and
