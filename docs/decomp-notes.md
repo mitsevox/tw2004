@@ -762,7 +762,7 @@ Added 2026-09-27 (from the ledgers solved that night; each ledger has the full s
 - **[verified, fake-match class] A copy in the loop condition extends a parameter's life without a
   copy**: `for (i = 0; i < (pLib = (MtaLib*)(void*)pArg)->nRecords; i++)`, statements before the loop
   on pArg: pArg and pLib get one register, the copy vanishes, the entry block keeps EA's `li` first
-  (char fn_8001F110 2 -> 0).
+  (char MtaLib_SwapAndLink 2 -> 0).
 - **[verified, EA form] A float join set by if/else into a named block local**, then stored and
   clamped in place (`{ f32 f; if (c) f = E; else f = 0.0f; v[3] = f; } v[3] = v[3] < 0.0f ? ..`):
   gocamscripts fn_8003F2E0 8 -> 0 (store-to-load forwarding gives EA's `frsp`).

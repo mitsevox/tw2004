@@ -458,7 +458,7 @@ u8 Swing_UpdateBackswing(int nPlayer) {
             fFrac = 0.98f;
         }
         if (fAnimTime >= pSw->fTimeSwingStart + fFrac * (pSw->fTimeSwingTop - pSw->fTimeSwingStart)) {
-            Anim_SetRate(pObj->anim, 1.0f);
+            SKATime_SetTimeScale(pObj->anim, 1.0f);
             fn_80095744(pObj, 7);
             if (fn_800204A0(pObj->pBlend, pObj->v1638,
                             pObj->pBlend->pD8->f08 + (pObj->fAnimTime - pSw->fTimeSwingStart))) {
@@ -507,9 +507,9 @@ u8 Swing_UpdateBackswing(int nPlayer) {
                 fRange = 1.0f;
             }
         }
-        Anim_SetRate(pObj->anim, fRate * fRange);
+        SKATime_SetTimeScale(pObj->anim, fRate * fRange);
         if (fMag > 93.0f) {
-            Anim_SetRate(pObj->anim, fRange);
+            SKATime_SetTimeScale(pObj->anim, fRange);
         }
         if (fDelta > -0.05f && fDelta < 0.05f) {
             pSw->fFidgetPauseTime = pObj->fAnimTime;
@@ -541,7 +541,7 @@ u8 Swing_UpdateBackswing(int nPlayer) {
             }
         }
         SW_vSetSwingStrength(nPlayer);
-        Anim_SetRate(pObj->anim, 1.0f);
+        SKATime_SetTimeScale(pObj->anim, 1.0f);
         fn_80095744(pObj, 7);
         if (fn_800204A0(pObj->pBlend, pObj->v1638,
                         pObj->pBlend->pD8->f08 + (pObj->fAnimTime - pSw->fTimeSwingStart))) {
@@ -576,7 +576,7 @@ void SW_vStateInitBackSwingFigit(int nPlayer) {
     pSw->fFidgetTargetTime = pSw->fFidgetPauseTime;
     Anim_SetTime(pObj->anim, pSw->fFidgetTargetTime);
     Character_UpdateAnimation(pObj, 0, 0.0f);
-    Anim_SetRate(pObj->anim, 0.008f);
+    SKATime_SetTimeScale(pObj->anim, 0.008f);
     pObj->uFlags |= 0x40;
     pSw->fFidgetTimeElapsed = 0.0f;
     pSw->fFidgetWaitToIdle = 0.0f;
@@ -630,7 +630,7 @@ u8 SW_vStateBackSwingFigit(int nPlayer) {
         if (pSw->fFidgetWaitToIdle > 0.1f) {
             pSw->nState = 0;
             fn_80095744(pObj, 5);
-            Anim_SetRate(pObj->anim, 1.0f);
+            SKATime_SetTimeScale(pObj->anim, 1.0f);
             EVENT_Trigger(nPlayer, 9, 0, 0);
         }
     }

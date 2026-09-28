@@ -9,7 +9,7 @@
 #include "frontend/fe.h"
 #include "game/save.h"
 
-f32   fn_8001F02C(Clip* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
+f32   SKA_GetTagTime(Clip* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
 
 void  fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f);
 void  fn_80095FD0(Character* pChar, MtaLib* pLib, u8 bReset, int nGroup, SKABlendFn pfnBlend, int nC,
@@ -87,7 +87,7 @@ f32 fn_800958F8(Character* pChar, f32* aPrev, Clip* pClip, f32* aBlend, f32 fFro
             aBlend[0] = fn_800971B8(pChar);
         } else if (-70000.0f == fFrom) {
             aBlend[0] = pChar->v1638[1];
-            aBlend[2] = fn_8001F02C(pClip, 2);
+            aBlend[2] = SKA_GetTagTime(pClip, 2);
             fn_800732F4(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime);
         } else if (fFrom < 0.0f) {
             aBlend[0] = 0.0f;
@@ -721,7 +721,7 @@ skip:
 
 // Halfway between the blend's second clip's f0C and the time of the blend's event 2.
 f32 fn_800971B8(Character* pChar) {
-    f32 fTime  = fn_8001F02C(pChar->pBlend, 2);
+    f32 fTime  = SKA_GetTagTime(pChar->pBlend, 2);
     f32 fStart = pChar->pBlend->pD8->f0C;
     fTime = (fTime - fStart) / 2.0f + fStart;
     return fTime;

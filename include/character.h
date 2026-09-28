@@ -318,7 +318,7 @@ typedef struct Clip {
     u8*    pC8;                 // 0xC8  the same; fn_800206C8 lays out the streams from here
     f32    fCC;                 // 0xCC  how far along the swing is, 0..1 (Character.fBackswing copies it)
     u8*    pD0;                 // 0xD0  n1C ClipTracks
-    struct ClipEvent* pEvents;  // 0xD4  its timed events (fn_8001F02C finds one by its id)
+    struct ClipEvent* pEvents;  // 0xD4  its timed events (SKA_GetTagTime finds one by its id)
     struct BlendClip* pD8;      // 0xD8  fn_800204A0 samples it; set: FEgolferanim.c turns the
                                 //       golfer round for the clip
     u32    uAram;               // 0xDC  the first frame stream: its ARAM address with flag 4, else its
@@ -418,7 +418,7 @@ struct SKABlendNode {
             SKABlendNode* apChild[2];       // 0x24
         } blend;                            // nType 1
         struct {
-            void* pSrc;                     // 0x20  a Clip for nFormat 0 (fn_8001F02C)
+            void* pSrc;                     // 0x20  a Clip for nFormat 0 (SKA_GetTagTime)
             f32   fFrom;                    // 0x24
             f32   fTo;                      // 0x28
         } src;                              // nType 0
@@ -451,7 +451,7 @@ typedef struct BlendClip {
 } BlendClip;
 LAYOUT_ASSERT(BlendClip, 0x1F0);
 
-// One of a clip's timed events (Clip.pEvents; fn_8001F02C finds one by its id). Event 2's time is
+// One of a clip's timed events (Clip.pEvents; SKA_GetTagTime finds one by its id). Event 2's time is
 // the ball-hit time the swing measures (Character_SetupForShot starts the skeleton's clip at it).
 typedef struct ClipEvent {
     u32  uId;                   // 0x0
@@ -535,7 +535,7 @@ extern IKChainDef lbl_80186EA0[2];   // lbl_80280E18's chains
 // float follows the six).
 extern f32 lbl_80187184[6][3];
 
-// The golfer's character object (0x1798 bytes or more); only the fields read so far. Anim_SetRate,
+// The golfer's character object (0x1798 bytes or more); only the fields read so far. SKATime_SetTimeScale,
 // Anim_SetTime and SKATime_UnPause take the address of its animation player at 0x164, whose fields
 // from 0x168 on are named here directly.
 typedef struct Character {
@@ -811,8 +811,8 @@ int   Character_GetShadowClipResult(Character* pChar);    // n1658
 int   Character_GetClipResult(Character* pChar);
 int   CharModel_GetBoneIndex(CharModel* pModel, int nBone);    // a bone's index
 int   CharModel_GetBoneIndexMapped(CharModel* pModel, int nBone);
-f32   fn_8001F02C(struct Clip* pClip, u64 uEvent);   // an event's time (by its 64-bit id)
-void  Anim_SetRate(u8* pAnim, f32 fRate);           // 0x8001F084
+f32   SKA_GetTagTime(struct Clip* pClip, u64 uEvent);   // an event's time (by its 64-bit id)
+void  SKATime_SetTimeScale(u8* pAnim, f32 fRate);           // 0x8001F084
 // Plays a clip on the character: blended in from the current one, or (bNoBlend) from scratch.
 void  Character_PlayClip(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime);
 void  Quat_Copy(f32* pSrc, f32* pDst);            // copy a quaternion
@@ -1078,7 +1078,7 @@ typedef struct MalBank {
 } MalBank;
 LAYOUT_ASSERT(MalBank, 0x1C);
 
-// An animation library as fn_8001F110 byte-swaps and links it in place (MtaLib, MtaRecord and
+// An animation library as MtaLib_SwapAndLink byte-swaps and links it in place (MtaLib, MtaRecord and
 // MtaEntry are our names): a 0x34-byte header, its records, each record's entries, then each
 // entry's data (4-byte aligned). An entry is a track of one value per frame, a byte each: frame
 // byte b gives fLo + (fHi - fLo) * b / 256 (fn_8001F32C).
@@ -1115,7 +1115,7 @@ typedef struct MtaLib {
 } MtaLib;
 LAYOUT_ASSERT(MtaLib, 0x34);
 
-MtaLib* fn_8001F110(MtaLib* pLib, s32* pnSize);    // char.c: swap and link a library; *pnSize: its bytes
+MtaLib* MtaLib_SwapAndLink(MtaLib* pLib, s32* pnSize);    // char.c: swap and link a library; *pnSize: its bytes
 void    fn_8001F578(MtaLib* pLib);                  // mtalib.c: link a library already in our byte order
 
 MalBank* fn_8001F760(int nBank);

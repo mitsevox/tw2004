@@ -8,7 +8,7 @@
 #include "charstate.h"
 #include "golfer.h"
 
-f32  fn_8001F02C(Clip* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
+f32  SKA_GetTagTime(Clip* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
 void fn_8001F558(void* pItem);          // mtalib.c
 void fn_800977CC(void* p);
 void fn_800293CC(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pOut, f32 fT);   // Skeleton.c
@@ -576,7 +576,7 @@ f32 fn_80072CB8(SKABlendNode* pNode, u64 uEvent) {
             if (pChild->nType == 1) {
                 fTime = fn_80072CB8(pChild, uEvent);
             } else if (pChild->nType == 0 && pChild->nFormat == 0) {
-                fTime = fn_8001F02C(pChild->u.src.pSrc, uEvent);
+                fTime = SKA_GetTagTime(pChild->u.src.pSrc, uEvent);
             }
         }
         i++;

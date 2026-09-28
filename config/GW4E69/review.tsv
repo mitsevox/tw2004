@@ -800,3 +800,13 @@ address	name	comment	by	date
 8001EEE4	CharModel_GetBoneIndexMapped	rewrite	rg2 (replayed by orchestrator)	2026-09-28
 8001EF10	Char_Vec3Sub	keep	rg2 (replayed by orchestrator)	2026-09-28
 8001EF34	Vec3_Scale	keep	rg2 (replayed by orchestrator)	2026-09-28
+8001EF54	Char_Vec3Add	keep	rg2 (replayed by orchestrator)	2026-09-28
+8001EF78	vec4flt_CrossProduct	keep	rg2 (replayed by orchestrator)	2026-09-28
+8001EFB4	Char_Vec4Sub	keep	rg2 (replayed by orchestrator)	2026-09-28
+8001EFD8	Char_Vec4Add	keep	rg2 (replayed by orchestrator)	2026-09-28
+8001EFFC	Camera_GetLensFovScale	keep	rg2 (replayed by orchestrator)	2026-09-28
+8001F004	Camera_GetCurrentLens	keep	rg2 (replayed by orchestrator)	2026-09-28
+8001F02C	SKA_GetTagTime	rewrite	rg2 (replayed by orchestrator)	2026-09-28
+8001F084	SKATime_SetTimeScale	add	rg2 (replayed by orchestrator)	2026-09-28
+8001F08C	ByteSwap_Records	keep	rg2 (replayed by orchestrator)	2026-09-28
+8001F110	MtaLib_SwapAndLink	keep	rg2 (replayed by orchestrator)	2026-09-28

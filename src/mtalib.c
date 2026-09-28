@@ -98,7 +98,7 @@ void fn_8001F558(void* pItem) {
     StaticMem_Free(pItem);
 }
 
-// Links a library that is already in the machine's byte order (fn_8001F110 without the swap): the
+// Links a library that is already in the machine's byte order (MtaLib_SwapAndLink without the swap): the
 // records after the header, each record's entries after those, then each entry's data.
 void fn_8001F578(MtaLib* pLib) {
     int i;
@@ -235,7 +235,7 @@ MalBank* fn_8001F804(u8* pData) {
                 pB = pA = pData;
                 ByteSwap_Records(&pA, &pB, aHeader, 10, 1);
                 memcpy(pGroup->apItem[j], pData, nSize);
-                pGroup->apItem[j] = fn_8001F110(pGroup->apItem[j], &nSize);
+                pGroup->apItem[j] = MtaLib_SwapAndLink(pGroup->apItem[j], &nSize);
                 pData += nSize;
             }
         } else {

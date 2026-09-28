@@ -66,7 +66,7 @@ LLFont x2 (b11 lane; Codex fn_8001144C). /dev/null was deleted by a lane again (
 by the orchestrator with the owner's OK.
 
 **Running (BATTLE PLAN, 2026-09-27 02:17 UTC, agents/assign/2026-09-27-battle-plan.md):** one lane = one
-function, no permuter, refill from the queue. b1 char fn_8001F110, b2 uiProcessInterface fn_8008F820,
+function, no permuter, refill from the queue. b1 char MtaLib_SwapAndLink, b2 uiProcessInterface fn_8008F820,
 b3 hlaudtrackstm Stm_Tick, b4 UISApi fn_80169D90, b5 UISApi fn_80168CD8, b6 UISScreen fn_8016C6C4,
 b7 UISScreen fn_8016B188, b8 UISEvent fn_80165ACC. Codex: UIStudio fn_80166098. Gemini: out of usage.
 Merged just before: Codex SkinPart SkinPart_ApplySetsToMaterialEntry (fake, SkinPart linked) + skalib fn_80026844 (EA form):

@@ -132,7 +132,7 @@ int   Character_UpdateClubAttachment(Character* pChar, Clip* pClip);
 void  Quat_Invert(f32* pQ, f32* pOut);                          // Quaternion.c
 void  Quat_RotateVector(f32* pQ, f32* pIn, f32* pOut);                // Quaternion.c: a vector turned by pQ
 void  fn_800280E8(Character* pChar, f32* pPos, int bPlace);     // Skeleton.c
-void  fn_8001EFB4(f32* pA, f32* pB, f32* pOut);
+void  Char_Vec4Sub(f32* pA, f32* pB, f32* pOut);
 void  Character_BeginLoadTexturesCallbackIG(Character* pChar);
 void  Character_RequestClothesUpdateIG(int n);
 void  fn_8010B098(void* pModel);                                // LLDynTex.c
@@ -155,7 +155,7 @@ s32   SkinPart_ListAllTextures(Skin** apSkins, int nSkins, SkinListEntry** ppLis
 void  SkinPart_InitTextures(void);                                        // SkinPart.c: empty
 void  fn_800100B0(TexBank* pBank, TexEntry* p8, TexPalette* pC, void* p10, void* p14, int nNumTex,
                   int nNumPalettes);                            // LLTex.c
-void  fn_8001EFD8(f32* pA, f32* pB, f32* pOut);
+void  Char_Vec4Add(f32* pA, f32* pB, f32* pOut);
 f32 (*Character_GetBoneMatrixSwapIfLefty(Character* pChar, int nBone))[4];
 f32 (*Character_GetBoneMatrix_FromIndex(Character* pChar, int nBone))[4];
 f32   Camera_GetLensFovScale(CamLens* pLens);
@@ -1174,7 +1174,7 @@ void Character_AlignCharacterForShotImpact(Character* pChar) {
         pChar->u10 |= 8;
         pChar->u10 |= 4;
         pChar->pModel->pSkel->pClip = NULL;
-        pChar->fAnimTime = pChar->f180 + fn_8001F02C(pChar->pBlend, 2) - pChar->v1638[1];
+        pChar->fAnimTime = pChar->f180 + SKA_GetTagTime(pChar->pBlend, 2) - pChar->v1638[1];
         Character_UpdateAnimation(pChar, 0, 0.0f);
         pChar->pModel->pSkel->pClip = NULL;
     }
@@ -2117,7 +2117,7 @@ void Character_ClipTest(Character* pChar, int nPlayer) {
     pChar->n1654 = fn_80007D74(&sSphereInCamSpace, RC_spGetCurrentRenderCtx(), 0);
     sSphereInCamSpace.radius = 3.0f;
     pChar->n1658 = fn_80007D74(&sSphereInCamSpace, RC_spGetCurrentRenderCtx(), 0);
-    fn_8001EFB4(pMat[3], Camera_GetCurrentLens()->m4[3], vDir);
+    Char_Vec4Sub(pMat[3], Camera_GetCurrentLens()->m4[3], vDir);
     fDot = Vec3_Dot(Camera_GetCurrentLens()->m4[2], vDir);
     fDist = (f32)Math_Sqrt(Vec3_LengthSqClamped(vDir));
     if (fDist < pChar->f14) {
@@ -2236,7 +2236,7 @@ int Character_UpdateClubAttachment(Character* pChar, Clip* pClip) {
             Quat_Multiply(pChar->qGripFromRoot, qTurn, qGrip);
             Quat_Copy(qGrip, pChar->qGripFromRoot);
         }
-        fn_8001EFB4(pModel->pPoses[pChar->nGripBone].v10, pModel->pPoses[0].v10, vOffset);
+        Char_Vec4Sub(pModel->pPoses[pChar->nGripBone].v10, pModel->pPoses[0].v10, vOffset);
         vOffset[3] = 0.0f;
         Quat_RotateVector(qRoot, vOffset, pChar->vGripFromRoot);
         pChar->vGripFromRoot[3] = 0.0f;
@@ -2274,7 +2274,7 @@ void Character_PlayClip(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) 
         fn_80071F58(&pNode, 0);
         fn_80071C28(&pNode, 1, 0, fn_80072ACC, 0);
         fn_800725BC(pNode, fn_80072ACC, 0.5f);
-        Anim_SetRate((u8*)pAnim, 1.0f);
+        SKATime_SetTimeScale((u8*)pAnim, 1.0f);
         pAnim->n00 = 0;
         pAnim->uFlags = 0;
         pAnim->n08 = -1;
@@ -2655,7 +2655,7 @@ void Character_SetupForShot(Character* pChar) {
     if (pChar->p1798 != NULL && (u32)pChar->p1798->n2C == 6 && pChar->nClipKey == 0) {
         pChar->nClipKey = 4;
     }
-    fn_8001EFB4(pPlayer->vTarget, pBallPos, vDir);
+    Char_Vec4Sub(pPlayer->vTarget, pBallPos, vDir);
     vDir[1] = 0.0f;
     Character_SetOrientationVec(pChar, vDir, 0.0f);
     Quat_Copy(pModel->pBones[0].q0C, pModel->pPoses[0].q0);
@@ -2689,8 +2689,8 @@ void Character_SetupForShot(Character* pChar) {
             vOffsetZ[0] = -vOffsetZ[0];
             vOffsetZ[2] = -vOffsetZ[2];
         }
-        fn_8001EFD8(vOffsetX, pChar->pModel->pBones[0].v1C, pChar->pModel->pBones[0].v1C);
-        fn_8001EFD8(vOffsetZ, pChar->pModel->pBones[0].v1C, pChar->pModel->pBones[0].v1C);
+        Char_Vec4Add(vOffsetX, pChar->pModel->pBones[0].v1C, pChar->pModel->pBones[0].v1C);
+        Char_Vec4Add(vOffsetZ, pChar->pModel->pBones[0].v1C, pChar->pModel->pBones[0].v1C);
         Quat_Copy(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
         Vec4_CopyPoint(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
         fn_80027108(pSkel);
@@ -2708,8 +2708,8 @@ void Character_SetupForShot(Character* pChar) {
         fY = pChar->pModel->pBones[0].v1C[1] - fY;
         SKEL_TranslateIKChainY(pChar->pModel, &pChar->pModel->pSkel->pChains[0], fY);
         SKEL_TranslateIKChainY(pChar->pModel, &pChar->pModel->pSkel->pChains[1], fY);
-        fn_8001EFD8(gPlayers[pChar->nPlayer].ball.vPos, vOffsetX, vPos);
-        fn_8001EFD8(vPos, vOffsetZ, vPos);
+        Char_Vec4Add(gPlayers[pChar->nPlayer].ball.vPos, vOffsetX, vPos);
+        Char_Vec4Add(vPos, vOffsetZ, vPos);
         vPos[1] += lbl_80187184[pChar->nClubClass][1];
         fn_800280E8(pChar, vPos, bPlace);
         pChar->pModel->pSkel->n1130 = pChar->nClipKey;
@@ -3343,7 +3343,7 @@ void Character_ResetTimeScalesOnCombo(void) {
     int i;
     for (i = 0; i < gSession.nNumPlayers; i++) {
         if (fn_800FCC38(i)) {
-            Anim_SetRate(gPlayers[i].pChar->anim, 1.0f);
+            SKATime_SetTimeScale(gPlayers[i].pChar->anim, 1.0f);
         }
     }
 }
@@ -3638,7 +3638,7 @@ void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut) {
 
 // a - b into out (four floats)
 #ifdef __MWERKS__
-asm void fn_8001EFB4(register f32* pA, register f32* pB, register f32* pOut) {
+asm void Char_Vec4Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 0, 0
@@ -3652,7 +3652,7 @@ asm void fn_8001EFB4(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_8001EFB4(f32* pA, f32* pB, f32* pOut) {
+void Char_Vec4Sub(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];
@@ -3662,7 +3662,7 @@ void fn_8001EFB4(f32* pA, f32* pB, f32* pOut) {
 
 // b + a into out (four floats)
 #ifdef __MWERKS__
-asm void fn_8001EFD8(register f32* pA, register f32* pB, register f32* pOut) {
+asm void Char_Vec4Add(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 0, 0
@@ -3676,7 +3676,7 @@ asm void fn_8001EFD8(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_8001EFD8(f32* pA, f32* pB, f32* pOut) {
+void Char_Vec4Add(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pB[0] + pA[0];
     pOut[1] = pB[1] + pA[1];
     pOut[2] = pB[2] + pA[2];
@@ -3695,8 +3695,9 @@ CamLens* Camera_GetCurrentLens(void) {
     return Camera_GetLens(*lbl_80280DF0);
 }
 
-// The time of the blend's event uEvent, 0 when it has none.
-f32 fn_8001F02C(Clip* pBlend, u64 uEvent) {
+// The time into the clip of its SKA tag (timed event) uEvent, 0 when the clip has none. Tag 2 is
+// the ball-hit time the swing measures.
+f32 SKA_GetTagTime(Clip* pBlend, u64 uEvent) {
     int i;
 
     for (i = 0; i < pBlend->nEvents; i++) {
@@ -3709,9 +3710,11 @@ f32 fn_8001F02C(Clip* pBlend, u64 uEvent) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void Anim_SetRate(u8* p, f32 v);
+void SKATime_SetTimeScale(u8* p, f32 v);
 
-void Anim_SetRate(u8* p, f32 v) {
+// Sets an animation player's time scale (AnimPlayer.f14): 1 plays at normal speed, the swing's hold
+// at the top uses 0.008.
+void SKATime_SetTimeScale(u8* p, f32 v) {
     *(f32*)(p + 0x14) = v;
 }
 
@@ -3739,7 +3742,7 @@ void ByteSwap_Records(void** ppSrc, void** ppDst, SwapField* pFormat, int nField
 // Byte-swaps an animation library in place and links it: the header, the records after it, each
 // record's entries after those, then each entry's data (each start rounded up to 4 bytes).
 // *pnSize gets the library's size.
-MtaLib* fn_8001F110(MtaLib* pArg, s32* pnSize) {
+MtaLib* MtaLib_SwapAndLink(MtaLib* pArg, s32* pnSize) {
     MtaLib* pLib;
     SwapField aHeader[10] = {
         { 16, 1 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 2, 2 }, { 6, 1 },

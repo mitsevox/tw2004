@@ -513,7 +513,7 @@ void fn_80020B2C(void* pRecords, int nCount) {
 }
 
 // Byte-swaps the clip read from disc at p in place: header, events, BlendClip and tracks, then the
-// data blocks after them (fn_800206C8's layout, all in memory), its pF4 library (fn_8001F110) and
+// data blocks after them (fn_800206C8's layout, all in memory), its pF4 library (MtaLib_SwapAndLink) and
 // two bit arrays of 2 * n1C bits. It sets pD0, pC4/pC8 and the later blocks' pointers (uAram, pE4,
 // pEC, pF0, pF4, pF8, pFC), not pEvents, pD8, pE8 or pE0.
 void fn_80020BC8(u8* p) {
@@ -569,7 +569,7 @@ void fn_80020BC8(u8* p) {
     }
     if (pClip->n64 != 0) {
         pClip->pF4 = p;
-        fn_8001F110((MtaLib*)pClip->pF4, NULL);
+        MtaLib_SwapAndLink((MtaLib*)pClip->pF4, NULL);
         p += pClip->n64;
     } else {
         pClip->pF4 = NULL;
@@ -620,7 +620,7 @@ Clip* SKA_LoadFromMem(u8* pData, u32* iSize, u32 align) {
     fn_80020858(pSKA);
     if (pSKA->n64 != 0) {
         pSKA->pF4 = pData;
-        fn_8001F110((MtaLib*)pSKA->pF4, NULL);
+        MtaLib_SwapAndLink((MtaLib*)pSKA->pF4, NULL);
         pData += pSKA->n64;
     } else {
         pSKA->pF4 = NULL;
