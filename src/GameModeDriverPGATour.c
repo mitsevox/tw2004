@@ -301,7 +301,7 @@ u8 GameModeDriverPGATour_IsPuttForWin(s32 nPlayer) {
         return GameModeDriverPGATour_IsPuttForLead(nPlayer);
     }
     nRounds = GameModeDriverPGATour_GetRounds(gpSaveData[nPlayer].tour.nEvent);
-    return fn_8008AC00() == 1 && gpSaveData[nPlayer].tour.nRound + 1 >= nRounds &&
+    return GM_GetNumHolesRemainingInRound() == 1 && gpSaveData[nPlayer].tour.nRound + 1 >= nRounds &&
            GM_GetGolferRelativeCumulativeScore(nPlayer, 1) + 1 < fn_80119588(nPlayer, 1);
 }
 

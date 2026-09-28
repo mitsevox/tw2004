@@ -175,18 +175,18 @@ void GM_vGetLetter(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIG_MCGetCardErrors(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetCourseHoleName(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetMessageQueHeld(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089A8C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089AD0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089AD4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089B78(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089B8C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089BBC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089BD0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089BD4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089BE0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089C00(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089C20(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089C4C(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_MCFreeFiles(MsgArg* pArgs, MsgArg* pResult);
+void IG_vNoOp147(MsgArg* pArgs, MsgArg* pResult);
+void GM_vAllowConcede(MsgArg* pArgs, MsgArg* pResult);
+void IG_vEndGameLoop(MsgArg* pArgs, MsgArg* pResult);
+void IG_vHoleContest_GetWinnerShotKind(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_GetGameName(MsgArg* pArgs, MsgArg* pResult);
+void IG_vNoOp153(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsOnlineEvent(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_MCIsSaveCorrupt(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_MCDeleteSave(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetUITimeFactor(MsgArg* pArgs, MsgArg* pResult);
+void IG_vPlayCheerAndComment(MsgArg* pArgs, MsgArg* pResult);
 void fn_80089C84(MsgArg* pArgs, MsgArg* pResult);
 void fn_80089CAC(MsgArg* pArgs, MsgArg* pResult);
 void fn_80089CCC(MsgArg* pArgs, MsgArg* pResult);
@@ -240,16 +240,16 @@ void fn_8008AB04(MsgArg* pArgs, MsgArg* pResult);
 
 // This file's helpers.
 u8   IG_IsControllerInPlay(int nController);
-void fn_8008AC3C(int a, int b);
-u8   fn_8008AC40(void);
-void fn_8008AC48(int nPlayer, char* sz);
-void fn_8008AC4C(int nMsg, int a);
-void fn_8008AC78(int nMsg, int a);
-void fn_8008ACA4(int nMsg, int a);
-void fn_8008ACD0(int nMsg, int a);
-void fn_8008ACFC(int nMsg, int a);
-void fn_8008AD28(int nMsg, int a);
-void fn_8008AD54(int nMsg, int a);
+void OnlineGolf_OnEndOfGame(int a, int b);
+u8   OnlineGolf_bIsOnlineGame(void);
+void OnlineGolf_SendChatData(int nPlayer, char* sz);
+void Gaud_StartPlaylist14Comment(int nMsg, int a);
+void Gaud_StartPlaylist19Comment(int nMsg, int a);
+void Gaud_StartPlaylist17Comment(int nMsg, int a);
+void Gaud_StartPlaylist16Comment(int nMsg, int a);
+void Gaud_StartPlaylist15Comment(int nMsg, int a);
+void Gaud_StartPlaylist20Comment(int nMsg, int a);
+void Gaud_StartPlaylist18Comment(int nMsg, int a);
 
 // Other files' functions no header declares yet.
 f32   GM_GetGolferDistanceToPin(int nPlayer);                 // GameManager.c
@@ -514,19 +514,19 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[143] = GM_vIG_MCGetCardErrors;
     gIGMessageHandlers[144] = GM_vGetCourseHoleName;
     gIGMessageHandlers[145] = GM_vSetMessageQueHeld;
-    gIGMessageHandlers[146] = fn_80089A8C;
-    gIGMessageHandlers[147] = fn_80089AD0;
-    gIGMessageHandlers[148] = fn_80089AD4;
-    gIGMessageHandlers[149] = fn_80089B78;
-    gIGMessageHandlers[150] = fn_80089B8C;
-    gIGMessageHandlers[151] = fn_80089BBC;
+    gIGMessageHandlers[146] = GM_vIG_MCFreeFiles;
+    gIGMessageHandlers[147] = IG_vNoOp147;
+    gIGMessageHandlers[148] = GM_vAllowConcede;
+    gIGMessageHandlers[149] = IG_vEndGameLoop;
+    gIGMessageHandlers[150] = IG_vHoleContest_GetWinnerShotKind;
+    gIGMessageHandlers[151] = GM_vIG_GetGameName;
     gIGMessageHandlers[152] = GM_vGetPlayerShortName;
-    gIGMessageHandlers[153] = fn_80089BD0;
-    gIGMessageHandlers[154] = fn_80089BD4;
-    gIGMessageHandlers[155] = fn_80089BE0;
-    gIGMessageHandlers[156] = fn_80089C00;
-    gIGMessageHandlers[157] = fn_80089C20;
-    gIGMessageHandlers[158] = fn_80089C4C;
+    gIGMessageHandlers[153] = IG_vNoOp153;
+    gIGMessageHandlers[154] = GM_vIsOnlineEvent;
+    gIGMessageHandlers[155] = GM_vIG_MCIsSaveCorrupt;
+    gIGMessageHandlers[156] = GM_vIG_MCDeleteSave;
+    gIGMessageHandlers[157] = GM_vSetUITimeFactor;
+    gIGMessageHandlers[158] = IG_vPlayCheerAndComment;
     gIGMessageHandlers[159] = fn_80089C84;
     gIGMessageHandlers[160] = fn_80089CAC;
     gIGMessageHandlers[161] = fn_80089CCC;
@@ -738,8 +738,8 @@ void GM_vGetCurrentGolferIndex(MsgArg* pArgs, MsgArg* pResult) {
 
 // Message 7: leave the round: in mode 9 the end of the game is set pending
 // (GUI_SetEndOfGamePending), in any other the fade to black starts (lbl_801D87C0.bFadeToBlack); in
-// the PGA TOUR (mode 23) fn_80117DE8(0, 1). The online branch (fn_8008AC40, always 0 in this build)
-// never runs.
+// the PGA TOUR (mode 23) fn_80117DE8(0, 1). The online branch (OnlineGolf_bIsOnlineGame, always 0
+// in this build) never runs.
 void GM_vExitGame(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 9) {
         GUI_SetEndOfGamePending();
@@ -749,9 +749,9 @@ void GM_vExitGame(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 23) {
         fn_80117DE8(0, 1);
     }
-    if (fn_8008AC40()) {
+    if (OnlineGolf_bIsOnlineGame()) {
         fn_80062B84(6);
-        fn_8008AC3C(0, 1);
+        OnlineGolf_OnEndOfGame(0, 1);
     }
 }
 
@@ -860,9 +860,9 @@ void GM_vGetPlayerWindSpeed(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = Wind_Get(NULL);
 }
 
-// Message 22: the round's scoring method (fn_8008AB40: gpGame->n4).
+// Message 22: the round's scoring method (GM_GetScoringType: gpGame->n4).
 void GM_vGetScoringMethod(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_8008AB40();
+    pResult->i = GM_GetScoringType();
 }
 
 // Message 23: the time spent on the hole so far (GM_GetElapsedHoleTime).
@@ -1310,9 +1310,9 @@ void GM_vGetSlotUserName(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[1].p)->pStr, gpSaveData[nSlot].szName);
 }
 
-// Message 63: how many holes the round plays (fn_8008AB4C).
+// Message 63: how many holes the round plays (GM_GetNumHolesInRound).
 void GM_vGetNumHolesSelected(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_8008AB4C();
+    pResult->i = GM_GetNumHolesInRound();
 }
 
 // Message 64: whether gSession.bDemo is set (1 or 0): the demo is running.
@@ -1644,9 +1644,9 @@ void GM_vCurrentReplayValid(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // How many of the round's selected holes are left, the current one included (command 89;
-// fn_8008AC00).
+// GM_GetNumHolesRemainingInRound).
 void GM_vGetNumHolesRemaining(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_8008AC00();
+    pResult->i = GM_GetNumHolesRemainingInRound();
 }
 
 // Whether the player is in the zoom-to-aim camera.
@@ -2411,20 +2411,23 @@ void GM_vSetMessageQueHeld(MsgArg* pArgs, MsgArg* pResult) {
     GUI_SetMessageQueHeld(0);
 }
 
-// The card's free directory entries.
-void fn_80089A8C(MsgArg* pArgs, MsgArg* pResult) {
+// Command 146: the free directory entries (files) left on the memory card in port pArgs[0], slot
+// pArgs[1].
+void GM_vIG_MCFreeFiles(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState card;
 
     MC_GetMC(&card, pArgs[0].i, pArgs[1].i);
     pResult->i = card.nFreeFiles;
 }
 
-void fn_80089AD0(MsgArg* pArgs, MsgArg* pResult) {
+// Command 147: does nothing (empty in this build).
+void IG_vNoOp147(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Whether the player whose turn it is may still play: nothing holds him, the hole is not over for
-// him and his ball is not in the cup.
-void fn_80089AD4(MsgArg* pArgs, MsgArg* pResult) {
+// Command 148: whether the player whose turn it is may concede: 0 while his post-shot HUD is
+// animating, once the mode's pfnHoleFinished says his hole is over, or with his ball in the cup
+// (lie 12); else 1.
+void GM_vAllowConcede(MsgArg* pArgs, MsgArg* pResult) {
     if (GUI_IsPostShotUIAnimating(lbl_80282278)) {
         pResult->i = 0;
         return;
@@ -2440,46 +2443,61 @@ void fn_80089AD4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 1;
 }
 
-void fn_80089B78(MsgArg* pArgs, MsgArg* pResult) {
+// Command 149: ends the main loop: gSession.nC 2, which fn_8006D01C (gomainloop.c) checks each
+// frame.
+void IG_vEndGameLoop(MsgArg* pArgs, MsgArg* pResult) {
     gSession.nC = 2;
 }
 
-void fn_80089B8C(MsgArg* pArgs, MsgArg* pResult) {
+// Command 150: how close the hole contest winner's ball is (HoleContest_GetWinnerShotKind: 1 in the
+// cup, 2 within a foot of the pin, else 0).
+void IG_vHoleContest_GetWinnerShotKind(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = HoleContest_GetWinnerShotKind();
 }
 
-// The game's title.
-void fn_80089BBC(MsgArg* pArgs, MsgArg* pResult) {
+// Command 151: the game's title, "TIGER WOODS PGA TOUR(R) 2004", pointed to by the string argument
+// (as the front end's fn_80082DA8).
+void GM_vIG_GetGameName(MsgArg* pArgs, MsgArg* pResult) {
     ((MsgString*)pArgs[0].p)->pStr = "TIGER WOODS PGA TOUR\xAE 2004";
 }
 
-void fn_80089BD0(MsgArg* pArgs, MsgArg* pResult) {
+// Command 153: does nothing (empty in this build).
+void IG_vNoOp153(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80089BD4(MsgArg* pArgs, MsgArg* pResult) {
+// Command 154: whether the event is played online: always 0 in this build.
+void GM_vIsOnlineEvent(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_80089BE0(MsgArg* pArgs, MsgArg* pResult) {
+// Command 155: whether the save file on the card in port pArgs[0], slot pArgs[1] is bad data (the
+// front end's command fn_80082DBC).
+void GM_vIG_MCIsSaveCorrupt(MsgArg* pArgs, MsgArg* pResult) {
     fn_80082DBC(pArgs, pResult);
 }
 
-void fn_80089C00(MsgArg* pArgs, MsgArg* pResult) {
+// Command 156: deletes the game's save from the card in port pArgs[0], slot pArgs[1] (the front
+// end's command fn_80082E10): the result is MC_DeleteSaveGame's error, or 1 once it is gone.
+void GM_vIG_MCDeleteSave(MsgArg* pArgs, MsgArg* pResult) {
     fn_80082E10(pArgs, pResult);
 }
 
-void fn_80089C20(MsgArg* pArgs, MsgArg* pResult) {
+// Command 157: sets the UI's time factor gGameEffects.f54 to the float pArgs[0]; a negative one
+// becomes 1 (written back into pArgs[0] too). Nothing else in this build reads it.
+void GM_vSetUITimeFactor(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].f < 0.0f) {
         pArgs[0].f = 1.0f;
     }
     gGameEffects.f54 = pArgs[0].f;
 }
 
-void fn_80089C4C(MsgArg* pArgs, MsgArg* pResult) {
+// Command 158: a quick cheer from the crowd (Gaud_FireQuickCheer) and commentary line pArgs[0]
+// (16-bit) of playlist 14.
+void IG_vPlayCheerAndComment(MsgArg* pArgs, MsgArg* pResult) {
     int nMsg = pArgs[0].i;
 
     Gaud_FireQuickCheer();
-    fn_8008AC4C((u16)nMsg, 0);
+    Gaud_StartPlaylist14Comment((u16)nMsg, 0);
 }
 
 void fn_80089C84(MsgArg* pArgs, MsgArg* pResult) {
@@ -2517,7 +2535,7 @@ void fn_80089D48(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80089D68(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8008AC48(lbl_80282278, ((MsgString*)pArgs[0].p)->pStr);
+    OnlineGolf_SendChatData(lbl_80282278, ((MsgString*)pArgs[0].p)->pStr);
 }
 
 void fn_80089D98(MsgArg* pArgs, MsgArg* pResult) {
@@ -2841,25 +2859,25 @@ void fn_8008A690(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
     case 2:
-        fn_8008AC4C((u16)pArgs[1].i, 0);
+        Gaud_StartPlaylist14Comment((u16)pArgs[1].i, 0);
         return;
     case 6:
-        fn_8008AD54((u16)pArgs[1].i, 0);
+        Gaud_StartPlaylist18Comment((u16)pArgs[1].i, 0);
         return;
     case 7:
-        fn_8008AD28((u16)pArgs[1].i, 0);
+        Gaud_StartPlaylist20Comment((u16)pArgs[1].i, 0);
         return;
     case 8:
-        fn_8008ACFC((u16)pArgs[1].i, 0);
+        Gaud_StartPlaylist15Comment((u16)pArgs[1].i, 0);
         return;
     case 9:
-        fn_8008ACD0((u16)pArgs[1].i, 0);
+        Gaud_StartPlaylist16Comment((u16)pArgs[1].i, 0);
         return;
     case 10:
-        fn_8008ACA4((u16)pArgs[1].i, 0);
+        Gaud_StartPlaylist17Comment((u16)pArgs[1].i, 0);
         return;
     case 11:
-        fn_8008AC78((u16)pArgs[1].i, 0);
+        Gaud_StartPlaylist19Comment((u16)pArgs[1].i, 0);
         return;
     }
 }
@@ -2975,12 +2993,14 @@ void fn_8008AB04(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_PgaTourSim_GetWasCutFromEntrantID(pArgs[0].i, 0);
 }
 
-s32 fn_8008AB40(void) {
+// The round's scoring kind, gpGame->n4: 0 strokes, 1 holes won, 2 skins (the kinds HoleScore.c's
+// leads count by).
+s32 GM_GetScoringType(void) {
     return gpGame->n4;
 }
 
-// How many holes the round plays.
-s32 fn_8008AB4C(void) {
+// How many holes the round plays (the holes set in gpGame->bHoleSelected).
+s32 GM_GetNumHolesInRound(void) {
     s32 n = 0;
     int i;
 
@@ -2993,7 +3013,7 @@ s32 fn_8008AB4C(void) {
 }
 
 // How many of the round's holes are left from the current one on.
-s32 fn_8008AC00(void) {
+s32 GM_GetNumHolesRemainingInRound(void) {
     s32 n = 0;
     int i;
 
@@ -3005,40 +3025,61 @@ s32 fn_8008AC00(void) {
     return n;
 }
 
-void fn_8008AC3C(int a, int b) {
+// An online game's step when the game ends: the end-of-game command (fn_8008628C) calls it with (0,
+// 1) in an online game. Empty in this build, which has no online play.
+void OnlineGolf_OnEndOfGame(int a, int b) {
 }
 
-u8 fn_8008AC40(void) {
+// Whether this is an online game: always 0, the GameCube build has no online play. When set, its
+// callers skip the mid-hole flyby, keep the pad from advancing the post-shot HUD, fix the ball
+// simulation's time budget and stop the demo timer.
+u8 OnlineGolf_bIsOnlineGame(void) {
     return 0;
 }
 
-void fn_8008AC48(int nPlayer, char* sz) {
+// Sends chat text sz from player nPlayer to the online opponents. Empty in this build, which has no
+// online play.
+void OnlineGolf_SendChatData(int nPlayer, char* sz) {
 }
 
-void fn_8008AC4C(int nMsg, int a) {
+// Plays commentary line nMsg of playlist 14 (Gaud_StartComment; a goes on as its third argument).
+// The UI's commentary command uses it for kinds 1 and 2, and the cheer command for its line.
+void Gaud_StartPlaylist14Comment(int nMsg, int a) {
     Gaud_StartComment(14, nMsg, a);
 }
 
-void fn_8008AC78(int nMsg, int a) {
+// Plays commentary line nMsg of playlist 19 (Gaud_StartComment; a goes on as its third argument).
+// The UI's commentary command uses it for kind 11.
+void Gaud_StartPlaylist19Comment(int nMsg, int a) {
     Gaud_StartComment(19, nMsg, a);
 }
 
-void fn_8008ACA4(int nMsg, int a) {
+// Plays commentary line nMsg of playlist 17 (Gaud_StartComment; a goes on as its third argument).
+// The UI's commentary command uses it for kind 10.
+void Gaud_StartPlaylist17Comment(int nMsg, int a) {
     Gaud_StartComment(17, nMsg, a);
 }
 
-void fn_8008ACD0(int nMsg, int a) {
+// Plays commentary line nMsg of playlist 16 (Gaud_StartComment; a goes on as its third argument).
+// The UI's commentary command uses it for kind 9.
+void Gaud_StartPlaylist16Comment(int nMsg, int a) {
     Gaud_StartComment(16, nMsg, a);
 }
 
-void fn_8008ACFC(int nMsg, int a) {
+// Plays commentary line nMsg of playlist 15 (Gaud_StartComment; a goes on as its third argument).
+// The UI's commentary command uses it for kind 8.
+void Gaud_StartPlaylist15Comment(int nMsg, int a) {
     Gaud_StartComment(15, nMsg, a);
 }
 
-void fn_8008AD28(int nMsg, int a) {
+// Plays commentary line nMsg of playlist 20 (Gaud_StartComment; a goes on as its third argument).
+// The UI's commentary command uses it for kind 7.
+void Gaud_StartPlaylist20Comment(int nMsg, int a) {
     Gaud_StartComment(20, nMsg, a);
 }
 
-void fn_8008AD54(int nMsg, int a) {
+// Plays commentary line nMsg of playlist 18 (Gaud_StartComment; a goes on as its third argument).
+// The UI's commentary command uses it for kind 6.
+void Gaud_StartPlaylist18Comment(int nMsg, int a) {
     Gaud_StartComment(18, nMsg, a);
 }

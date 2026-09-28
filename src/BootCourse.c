@@ -1,14 +1,14 @@
 // BootCourse.c (our name): sets up a round on the next of four fixed course/hole/golfer set-ups
 // (DEMO_Start, called from GoEntry.c and uiProcessInterface.c; DEMO_Restore puts the session
-// back), and a 120-second timer that runs while fn_8008AC40 is false and raises a flag when it runs
-// out (fn_8009A180; GoEntry.c tests the flag with fn_8009A1EC). Its .bss starts on its own 8-byte
-// boundary (0x801DB8A0, shared by DEMO_Start and DEMO_Restore).
+// back), and a 120-second timer that runs while OnlineGolf_bIsOnlineGame is false and raises a flag
+// when it runs out (fn_8009A180; GoEntry.c tests the flag with fn_8009A1EC). Its .bss starts on its
+// own 8-byte boundary (0x801DB8A0, shared by DEMO_Start and DEMO_Restore).
 
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
 
-u8 fn_8008AC40(void);
+u8 OnlineGolf_bIsOnlineGame(void);
 
 // Per start (lbl_80281F90 cycles 0..3): the course, the hole, and the two players' golfers.
 const s32 lbl_80183A98[4] = {5, 17, 19, 15};
@@ -106,7 +106,7 @@ void fn_8009A16C(void) {
 }
 
 u8 fn_8009A180(void) {
-    if (fn_8008AC40()) {
+    if (OnlineGolf_bIsOnlineGame()) {
         return 0;
     }
     lbl_80281F98 += gSession.fFrameTime;

@@ -223,7 +223,7 @@ int  fn_800D1170(int nPlayer, u8 bOnlyFlagged);    // HoleScore.c
 int  fn_800D1250(int nPlayer);          // HoleScore.c
 int  fn_800D13F4(int nPlayer);          // HoleScore.c
 int  fn_800D1530(int nPlayer);          // HoleScore.c
-s32  fn_8008AB4C(void);                 // GameUICommands.c
+s32  GM_GetNumHolesInRound(void);                 // GameUICommands.c
 int  GM_GetGolferRelativeCurrentScore(int nPlayer, u8 bCurrent);        // GameRound.c
 s32  fn_800E81A0(int nPlayer);          // GameModeBattle.c
 s32  fn_800BCCCC(int nPlayer);          // SitDevFile.c: gpGame->pfnGetPotentialHoleResult
@@ -263,8 +263,8 @@ s32  Earnings_GetPuttAwardId(s32 i);                // gPuttAwards[i]
 s32  Earnings_GetHoleAwardId(s32 i);                // gHoleAwards[i]
 int  HighScoreRecords_GetEndOfShotRecord(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll);
 int  HighScoreRecords_GetEndOfHoleRecord(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll);   // the putt record check
-s32  fn_8008AB40(void);                 // GameUICommands.c
-s32  fn_8008AC00(void);                 // GameUICommands.c: the round's holes left, the current one included
+s32  GM_GetScoringType(void);                 // GameUICommands.c
+s32  GM_GetNumHolesRemainingInRound(void);                 // GameUICommands.c: the round's holes left, the current one included
 
 // GameHoleContests.c: the longest-drive, closest-to-the-pin and hole-in-one contests
 u8   HoleContest_IsLongestDriveHole(void);                 // the longest drive is played on this hole

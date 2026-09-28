@@ -34,7 +34,7 @@ u8 fn_800CF158(int nPlayer) {
     int nOther;
     int nBestStrokes;
 
-    nKind = fn_8008AB40();
+    nKind = GM_GetScoringType();
     if (gNumPlayersSetUp == 1) {
         return 0;
     }
@@ -140,11 +140,11 @@ u8 fn_800CF450(int nPlayer) {
     int nOther;
     int nBestStrokes;
 
-    nKind = fn_8008AB40();
+    nKind = GM_GetScoringType();
     if (gNumPlayersSetUp == 1) {
         return 0;
     }
-    nLeft = fn_8008AC00();
+    nLeft = GM_GetNumHolesRemainingInRound();
     if (nKind == 0) {
         if (nLeft != 1 && !fn_800BCD50()) {
             return 0;
@@ -370,8 +370,8 @@ u32 fn_800CFD58(int nPlayer) {
 
 // gpGame->pfn200 (TW06: GetCurrentLead).
 // The player's lead in the round so far (strokes, holes won or skins by the scoring kind
-// fn_8008AB40): kind 0, the best other total (GM_GetGolferRelativeCumulativeScore; cut players left out) less
-// the
+// GM_GetScoringType): kind 0, the best other total (GM_GetGolferRelativeCumulativeScore; cut
+// players left out) less the
 // player's; kinds 1 and 2, the player's holes won (skins) less the best of the others'.
 s32 fn_800CFE74(int nPlayer) {
     int anTotal[4];   // one per player set up; the frame has room for four
@@ -380,7 +380,7 @@ s32 fn_800CFE74(int nPlayer) {
     int nMine;
     int nBest;
 
-    nKind = fn_8008AB40();
+    nKind = GM_GetScoringType();
     if (gNumPlayersSetUp == 1) {
         return 0;
     }
@@ -423,12 +423,12 @@ s32 fn_800CFE74(int nPlayer) {
 }
 
 // The player's score against par for the round once the tap-in on this hole drops; 0 when
-// fn_8008AB40 is set.
+// GM_GetScoringType is set.
 int fn_800CFFE4(int nPlayer) {
     int nPar = 0;
     int nStrokes = 0;
     int i;
-    if (fn_8008AB40()) {
+    if (GM_GetScoringType()) {
         return 0;
     }
     for (i = 0; i < Game_CurHoleIndex(); i++) {
@@ -439,7 +439,7 @@ int fn_800CFFE4(int nPlayer) {
 }
 
 // gpGame->pfn204 (TW06: GetPotentialLead).
-// The player's lead (strokes, or holes or skins by the scoring kind fn_8008AB40) once this hole's
+// The player's lead (strokes, or holes or skins by the scoring kind GM_GetScoringType) once this hole's
 // ball drops, 0 when playing alone. Kind 0 (strokes): the best other round total, with a holed
 // ball's score on this hole, less the player's total with the tap-in; players who missed the cut
 // are left out. Kinds 1 and 2: the lead from fn_800BCCF8, moved by fn_800BCCCC's value: 3 no
@@ -454,7 +454,7 @@ s32 fn_800D0098(int nPlayer) {
     int nLead;
     int nHole;
 
-    nKind = fn_8008AB40();
+    nKind = GM_GetScoringType();
     if (gNumPlayersSetUp == 1) {
         return 0;
     }
@@ -538,7 +538,7 @@ s32 fn_800D030C(int nPlayer) {
     int nBest;
     int nOther;
 
-    fn_8008AB40();
+    GM_GetScoringType();
     if (gNumPlayersSetUp == 1) {
         return 3;
     }

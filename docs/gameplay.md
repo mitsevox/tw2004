@@ -832,7 +832,7 @@ At the strike, `STATEFUNC_SimulateInit` copies the launched ball into a second b
    identically;
 2. if not split screen, **runs the copy ahead** with `Ball_SetSimulating(1)`: tick after tick
    while the frame's time budget lasts. The budget is `0.83 - 1000 x elapsed`, stopping at 0.1,
-   read as roughly 0.7 ms of CPU; when `fn_8008AC40` is true it is exactly 2 ticks. So the
+   read as roughly 0.7 ms of CPU; when `OnlineGolf_bIsOnlineGame` is true it is exactly 2 ticks. So the
    prediction races ahead of the real ball;
 3. when the copy stops (state 0, 1 or 5), unless it is a gimme: event 0x3C
    (`EVENT_BallPredictionDone`) queues a front-end message and, **if the copy is holed (lie 12), cuts to

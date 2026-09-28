@@ -2273,7 +2273,7 @@ void GM_ClearGameBonusStats(int nPlayer) {
 
 // Whether records of kind nKind count in this game: never in game modes 9 and 11 or with mulligans
 // on. Kinds 0..9 also need no challenge running (PlayNow_IsChallengeRunning): the round's kinds (0,
-// 3..7) a full round (GM_FullRoundOfGolf) of stroke scoring (fn_8008AB40 0), the drive and the putt
+// 3..7) a full round (GM_FullRoundOfGolf) of stroke scoring (GM_GetScoringType 0), the drive and the putt
 // (1, 2) nothing more, kind 8 a skill-zone mode, kind 9 game mode 22 (the long-drive contest). Any
 // other kind counts.
 u8 HighScoreRecords_CheckRecordGameSetting(int nKind) {
@@ -2281,7 +2281,7 @@ u8 HighScoreRecords_CheckRecordGameSetting(int nKind) {
     if (Game_GetMulliganRule() != 0) return 0;
     switch (nKind) {
     case 0:
-        if (PlayNow_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
+        if (PlayNow_IsChallengeRunning() || !GM_FullRoundOfGolf() || GM_GetScoringType()) return 0;
         return 1;
     case 1:
         if (PlayNow_IsChallengeRunning()) return 0;
@@ -2290,19 +2290,19 @@ u8 HighScoreRecords_CheckRecordGameSetting(int nKind) {
         if (PlayNow_IsChallengeRunning()) return 0;
         return 1;
     case 3:
-        if (PlayNow_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
+        if (PlayNow_IsChallengeRunning() || !GM_FullRoundOfGolf() || GM_GetScoringType()) return 0;
         return 1;
     case 4:
-        if (PlayNow_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
+        if (PlayNow_IsChallengeRunning() || !GM_FullRoundOfGolf() || GM_GetScoringType()) return 0;
         return 1;
     case 5:
-        if (PlayNow_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
+        if (PlayNow_IsChallengeRunning() || !GM_FullRoundOfGolf() || GM_GetScoringType()) return 0;
         return 1;
     case 6:
-        if (PlayNow_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
+        if (PlayNow_IsChallengeRunning() || !GM_FullRoundOfGolf() || GM_GetScoringType()) return 0;
         return 1;
     case 7:
-        if (PlayNow_IsChallengeRunning() || !GM_FullRoundOfGolf() || fn_8008AB40()) return 0;
+        if (PlayNow_IsChallengeRunning() || !GM_FullRoundOfGolf() || GM_GetScoringType()) return 0;
         return 1;
     case 8:
         if (PlayNow_IsChallengeRunning() || !GM_Currently_SkillZoneMode()) return 0;

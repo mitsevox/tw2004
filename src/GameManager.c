@@ -33,7 +33,7 @@ void  GM_Earnings_PayShotGoals(int nPlayer);
 void  GM_RecordIndividualHoleStats(int nPlayer);
 void  GM_Earnings_PayHoledGoals(int nPlayer);
 void  GM_CheckBallForUIHints(int nPlayer);
-u8    fn_8008AC40(void);
+u8    OnlineGolf_bIsOnlineGame(void);
 void  GM_RecordBonusShotStats(int nPlayer);
 void  fn_800BB0A8(void);
 void  REPLAY_Restore(int nPlayer);
@@ -515,7 +515,7 @@ void GM_BumpBallForObstructions(int nPlayer) {
 // and the hole contests (longest drive message 10, closest to the pin 11). Without a penalty: holed
 // - the hole recorded, its payouts, the score message and the mode's pfn218; over the hole's stroke
 // limit - the ball is picked up (lie holed, bShotLimitExceeded, 10 strokes in a PGA TOUR event else
-// 11, putts 999), message 3, the mode's pfn218 and pfn21C; messages 0x11-0x13 when fn_8008AC40
+// 11, putts 999), message 3, the mode's pfn218 and pfn21C; messages 0x11-0x13 when OnlineGolf_bIsOnlineGame
 // (always 0) and bEE0 allow, 0x13 giving the other of players 0 and 1 the hole; otherwise the
 // yardage. A penalty goes to the mode's pfnBallOOB. Last, the per-shot flags are carried over
 // (GM_RecordBonusShotStats).
@@ -563,7 +563,7 @@ void GM_PlayerTookShot(int nPlayer) {
                 GUI_StartPostShotUI(3, nPlayer, 0.0f);
                 gpGame->pfn218(nPlayer);
                 gpGame->pfn21C(nPlayer);
-            } else if (fn_8008AC40() && gPlayers[nPlayer].bEE0) {
+            } else if (OnlineGolf_bIsOnlineGame() && gPlayers[nPlayer].bEE0) {
                 int n = gPlayers[nPlayer].nEE4;
                 if (n == 3) {
                     GUI_StartPostShotUI(0x13, nPlayer, n);
@@ -1020,7 +1020,7 @@ void GM_CheckForShotChanges(int nPlayer) {
                     ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), nPlayer);
         } else if (GM_bIsMidholeFlybyButtonPressed(nPlayer)) {
             if (gSession.options.bSkipCameras) return;
-            if (fn_8008AC40()) return;
+            if (OnlineGolf_bIsOnlineGame()) return;
             GOLFERSTATE_Push(GS_MID_HOLE_FLY_BY, nPlayer);
         }
     }
@@ -1099,15 +1099,15 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
             return;
         }
         if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0))
-            && !fn_8008AC40()) {
+            && !OnlineGolf_bIsOnlineGame()) {
             GUI_AdvancePostShotUI(nPlayer);
         }
     } else if (fn_8002E8B4(nPlayer)) {
-        if (!fn_8008AC40()
+        if (!OnlineGolf_bIsOnlineGame()
             && (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0))) {
             GUI_AdvancePostShotUI(nPlayer);
         }
-    } else if (Player_IsCPU(nPlayer) && !fn_8008AC40()
+    } else if (Player_IsCPU(nPlayer) && !OnlineGolf_bIsOnlineGame()
                && Controller_AnyPadHasButtons(Controller_GetButtonMask(0, 0))) {
         GUI_AdvancePostShotUI(nPlayer);
     }
@@ -1199,7 +1199,7 @@ void GM_SimulateBallMovement(int nPlayer) {
     }
     fMs = 1000.0f * fn_8006E118(TI_sReadCounter(0), t0);
     fBudget = 0.83f - fMs;
-    if (fn_8008AC40()) {
+    if (OnlineGolf_bIsOnlineGame()) {
         fBudget = 0.83f;
     }
     if (gSession.nSplitScreen == 0 && gSession.fFrameTime > 0.0f) {
@@ -1212,7 +1212,7 @@ void GM_SimulateBallMovement(int nPlayer) {
             fMs = 1000.0f * fn_8006E118(TI_sReadCounter(0), t0);
             nSteps++;
             fBudget -= fMs;
-            if (fn_8008AC40()) {
+            if (OnlineGolf_bIsOnlineGame()) {
                 if (nSteps < 2) {
                     fBudget = 0.83f;
                 } else {

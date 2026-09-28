@@ -445,7 +445,7 @@ void HoleContest_PayWinner(void) {
 }
 
 // How close the contest winner's ball is, while a contest is won this round: 1 in the cup
-// (bPlanReady clear), 2 within a foot of the pin, else 0 (FE message fn_80089B8C).
+// (bPlanReady clear), 2 within a foot of the pin, else 0 (FE message IG_vHoleContest_GetWinnerShotKind).
 s32 HoleContest_GetWinnerShotKind(void) {
     if (gHoleContestWon) {
         if (gPlayers[gHoleContestWinner].ball.nLie == LIE_INCUP_e &&

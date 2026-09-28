@@ -151,7 +151,7 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         SitDev_SetStateValue(pValues, 62, nRound + 1, pSetBits);
         SitDev_SetStateValue(pValues, 7, Course_GetCurHolePar(), pSetBits);
         SitDev_SetStateValue(pValues, 29, fn_800BCD50(), pSetBits);
-        SitDev_SetStateValue(pValues, 28, fn_8008AB4C(), pSetBits);
+        SitDev_SetStateValue(pValues, 28, GM_GetNumHolesInRound(), pSetBits);
         SitDev_SetStateValue(pValues, 31, fn_800D0AF4(), pSetBits);
         SitDev_SetStateValue(pValues, 65, Game_CurrentPinSet(), pSetBits);
         SitDev_SetStateValue(pValues, 85, 0, pSetBits);
