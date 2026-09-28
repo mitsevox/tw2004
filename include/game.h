@@ -597,8 +597,8 @@ void fn_800ED6F8(f32 x);
 void fn_800ED710(s32 a);
 
 void fn_800EDAE0(int nPlayer);          // GameMode9.c
-void fn_800EDE78(void);                 // GameModeDriverPGATour.c
-u8   fn_800EE470(void);                 // GameModeDriverPGATour.c
+void GameModeDriverPGATour_FreeStreamMemory(void);                 // GameModeDriverPGATour.c
+u8   GM_Currently_PgaTourMode(void);                 // GameModeDriverPGATour.c
 void GameModeDriverRTE_StartEvent(void);                 // GameModeDriverRTE.c
 void GameModeDriverRTE_StartNextChallenge(void);                 // GameModeDriverRTE.c
 u8   GM_Currently_RealtimeMode(void);                 // GameModeDriverRTE.c

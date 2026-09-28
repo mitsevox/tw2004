@@ -1140,7 +1140,7 @@ void fn_80087270(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_800872AC(MsgArg* pArgs, MsgArg* pResult) {
-    if (fn_800EE470()) {
+    if (GM_Currently_PgaTourMode()) {
         pResult->i = GM_PgaTourSim_GetNumEntrants(0);
         return;
     }

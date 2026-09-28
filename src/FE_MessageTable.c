@@ -44,7 +44,7 @@ int  GM_GetMinPlayersForMode(int nMode);            // GameRound.c
 void GM_SetSplitScreenForMode(void);                 // GameRound.c
 void GM_BuildRandom18(void);                 // GameRound.c: builds the random mixed round
 void fn_80101EE8(void);                 // GameMode11.c
-void fn_800EE2C8(void);                 // GameModeDriverPGATour.c
+void GameModeDriverPGATour_PrepareForTeeOff(void);                 // GameModeDriverPGATour.c
 u8*  fn_8010C718(void);                 // CharSliders.c
 void fn_801260C0(void);                 // GameMode22.c
 s32  Gba_GetState(void);                 // gbacable.c
@@ -4938,7 +4938,7 @@ void fn_80083BFC(MsgArg* pArgs, MsgArg* pResult) {
         fn_800EAF7C();
         fn_80110178(1);
     } else if (Game_GetMode() == 23) {
-        fn_800EE2C8();
+        GameModeDriverPGATour_PrepareForTeeOff();
     } else if (Game_GetMode() == 26) {
         fn_8010C718();
     } else if (Game_GetMode() == 22) {

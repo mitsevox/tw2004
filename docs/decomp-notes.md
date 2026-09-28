@@ -981,7 +981,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] Shift the parameter once.** `(s16)(n >> 1)` written at three uses scored 90.7;
   `n >>= 1;` then plain uses gave the original's `extsh` then `srawi`/`extsh.` (startUp `fn_800AFF9C`).
 - **[verified] A pointer local to a global struct**, `T* p = &gX; p->a++; ...`, can be what the
-  original did even though the address could be reused anyway (PGATour `fn_800EE2C8`, 80.5 -> 100
+  original did even though the address could be reused anyway (PGATour `GameModeDriverPGATour_PrepareForTeeOff`, 80.5 -> 100
   with its other locals).
 
 - **[verified] The right side of a comparison is evaluated first.** `f(0) < f(1)` calls `f(1)`
@@ -1034,7 +1034,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   `extern Profile* gpSaveData; gpSaveData[n].f` gives `addis base; add; lwz off`;
   `((Profile*)u8ptr)[n].f` gives `addis idx; addi; lwzx` (GameMode23 `GameModeDriverPGATour_GetUsersCurrentEventID` 83.75% -> 100).
 - **[verified] `a[x - 1]` folds the -1 into the displacement; `n = x - 1; a[n]` keeps a `subi`.**
-  Per function: GameMode23 `fn_800EE064` needs the local, its neighbour `fn_800EFA9C` does not.
+  Per function: GameMode23 `GameModeDriverPGATour_StartGamePreData` needs the local, its neighbour `fn_800EFA9C` does not.
 - **[verified] Pointer-to-index with `mulhwu` is a byte difference divided by `sizeof`.**
   `p - base` divides signed (`mulhw; srawi`); `((u8*)p - (u8*)base) / sizeof(T)` divides
   unsigned (`mulhwu; srwi.`), because `sizeof` is unsigned (GoTerrainCollision `fn_80050BEC`,
@@ -1457,7 +1457,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   `u8 lbl_80281648[2] = {0, 0};` lands in `.sdata` and links (AlternateShot).
 - **[verified] Base-last indexing of a big-struct global.** `gpSaveData[n].f` adds the base first;
   `((SaveProfile*)gpSaveData)[n].f`, an inline accessor returning `&gpSaveData[n]`, or a pointer local
-  all give the original's `addis idx; addi; lhzx/stwx base` (PGATour `fn_800EE478`, 92.08 -> 100).
+  all give the original's `addis idx; addi; lhzx/stwx base` (PGATour `GameModeDriverPGATour_EndGame`, 92.08 -> 100).
 
 - **[verified] objdiff scores a switch 100% even when its jump table points at the wrong case
   bodies**: it masks relocations. GameMode11 `fn_80100328` had case labels off by one and read

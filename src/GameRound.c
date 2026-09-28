@@ -520,10 +520,11 @@ int GM_GetGolferRelativeCurrentScore(int nPlayer, u8 bCurrent) {
 }
 
 // The score against par shown for a player: the PGA TOUR simulation's while a tour event runs
-// (fn_800EE470), n2D8 in a playoff (gpGame->bD4), else GM_GetGolferRelativeCurrentScore while the
-// event's round number (gpGame->nDC) is below its round count (nE0), and 0 after the last round.
+// (GM_Currently_PgaTourMode), n2D8 in a playoff (gpGame->bD4), else
+// GM_GetGolferRelativeCurrentScore while the event's round number (gpGame->nDC) is below its round
+// count (nE0), and 0 after the last round.
 int GM_GetGolferRelativeCumulativeScore(int nPlayer, u8 bCurrent) {
-    if (fn_800EE470()) {
+    if (GM_Currently_PgaTourMode()) {
         return GM_PgaTourSim_GetRelativeScoreFromEntrantID(nPlayer, 0, bCurrent);
     }
     if (gpGame->bD4) {

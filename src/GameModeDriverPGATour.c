@@ -17,9 +17,9 @@
 
 // PGA TOUR driver state; only this file uses it. The uninitialised ones are defined last address
 // first: the compiler lays out a file's .bss and .sbss last definition first.
-s32 gPgaSavedOptionsC = 4;      // the options' nC from before a tour round (fn_800EE02C puts it
+s32 gPgaSavedOptionsC = 4;      // the options' nC from before a tour round (GameModeDriverPGATour_Shutdown puts it
                                 //   back)
-s32 gPgaSavedOptions18 = 1;     // the options' n18 from before a tour round (fn_800EE0A0 keeps it;
+s32 gPgaSavedOptions18 = 1;     // the options' n18 from before a tour round (GameModeDriverPGATour_SetTournament keeps it;
                                 //   nothing puts it back)
 
 PgaData gPgaData;               // the tour data, from the 'PGA' stream objects
@@ -31,8 +31,8 @@ PgaStatCounts gPgaRoundStats;   // the current round's statistics (see pgatour.h
 s32 gPgaPlayoffHole;            // the playoff hole index: set to 16, each playoff moves it on
                                 //   (17, 15, 16, 17, ...; GameModeDriverPGATour_GoToPlayoff)
 u8  gbPgaTourRoundActive;       // 1 from a tour round's start until the mode shuts down
-                                //   (read through fn_800EE470)
-s32 gPgaSavedWind;              // the options' nWind from before a tour round (fn_800EE02C puts
+                                //   (read through GM_Currently_PgaTourMode)
+s32 gPgaSavedWind;              // the options' nWind from before a tour round (GameModeDriverPGATour_Shutdown puts
                                 //   it back)
 
 // Not in a C unit yet
@@ -42,9 +42,9 @@ void GameModeDriverPGATour_LoadPGAcFromStream(UStreamObject* pObject);
 void GameModeDriverPGATour_LoadPGAtFromStream(UStreamObject* pObject);
 void GameModeDriverPGATour_LoadPGApFromStream(UStreamObject* pObject);
 void GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream(UStreamObject* pObject);
-void fn_800EE02C(void);
-void fn_800EE064(void);
-void fn_800EE478(void);
+void GameModeDriverPGATour_Shutdown(void);
+void GameModeDriverPGATour_StartGamePreData(void);
+void GameModeDriverPGATour_EndGame(void);
 u8   GameModeDriverPGATour_IsPuttForLead(int nPlayer);
 u8   GameModeDriverPGATour_IsPuttForWin(s32 nPlayer);
 s32  GameModeDriverPGATour_GetCurrentLead(int nPlayer);
@@ -60,20 +60,22 @@ u8   GameModeDriverPGATour_GoToPlayoff(u8 bCheck);
 s32  GameModeDriverPGATour_GetEventOnOrAfter(s32 i);
 s32  GameModeDriverPGATour_GetNumEventsWon(void);
 
-// Stroke play's hole and honors rules, the tour's own round and
-// playoff handling; no mulligans, no split screen.
+// Game mode 23's setup (pfnInit, from GM_SetModeType): stroke play's golfer order, honors and
+// hole-finished rules with the tour's own hooks (round start and end, hole start and end, game over
+// and playoff, the lead and putt-for-lead / putt-for-win answers); no mulligans, gpGame nC and n10
+// 1, round 0 of 1 (nDC, nE0) and no split screen.
 void GameModeDriverPGATour_Init(void) {
     gpGame->pfnInit = GameModeDriverPGATour_Init;
-    gpGame->pfnShutdown = fn_800EE02C;
+    gpGame->pfnShutdown = GameModeDriverPGATour_Shutdown;
     gpGame->pfn1E4 = fn_800EF294;
     gpGame->pfnSetupNextGolfer = GameModeStroke_SetupNextGolfer;
     gpGame->pfnGetHonors = GameModeStroke_GetHonors;
     gpGame->pfnHoleFinished = GameModeStroke_HoleFinished;
     gpGame->pfnGameFinished = GameModeDriverPGATour_GameFinished;
     gpGame->pfnGoToPlayoff = GameModeDriverPGATour_GoToPlayoff;
-    gpGame->pfn1EC = fn_800EE064;
+    gpGame->pfn1EC = GameModeDriverPGATour_StartGamePreData;
     gpGame->pfnEndHole = GameModeDriverPGATour_EndHole;
-    gpGame->pfnEndGame = fn_800EE478;
+    gpGame->pfnEndGame = GameModeDriverPGATour_EndGame;
     gpGame->pfn1F8 = GameModeDriverPGATour_IsPuttForLead;
     // IsPuttForWin's player is an s32 (long): as an int its profile index compiles differently
     gpGame->pfn1FC = (u8 (*)(int))GameModeDriverPGATour_IsPuttForWin;
@@ -90,9 +92,14 @@ void GameModeDriverPGATour_Init(void) {
     gSession.nSplitScreen = 0;
 }
 
-void fn_800EDE78(void) {
+// Empty in this build. GM_DeInitModule calls it as a round is torn down, beside the Earnings stream
+// free (TW06 GM_Earnings_FreeStreamMemory).
+void GameModeDriverPGATour_FreeStreamMemory(void) {
 }
 
+// Registers the loaders of the tour's four stream objects: 'PGAc' the tournaments, 'PGAt' their
+// formats, 'PGAp' the 'PGAp' records and 'PGAn' the names. The hole stream manager (fn_80014864)
+// calls it.
 void GameModeDriverPGATour_RegisterStreamClients(void) {
     Stream_RegisterLoadChunkCallback('PGAc', GameModeDriverPGATour_LoadPGAcFromStream);
     Stream_RegisterLoadChunkCallback('PGAt', GameModeDriverPGATour_LoadPGAtFromStream);
@@ -100,6 +107,7 @@ void GameModeDriverPGATour_RegisterStreamClients(void) {
     Stream_RegisterLoadChunkCallback('PGAn', GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream);
 }
 
+// Unregisters the four 'PGA' loaders of RegisterStreamClients (hole stream manager, fn_800148A8).
 void GameModeDriverPGATour_UnregisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('PGAc');
     Stream_UnregisterLoadChunkCallback('PGAt');
@@ -107,6 +115,7 @@ void GameModeDriverPGATour_UnregisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('PGAn');
 }
 
+// The 'PGAc' loader: the season's 31 tournaments (gPgaData.aTournament).
 void GameModeDriverPGATour_LoadPGAcFromStream(UStreamObject* pObject) {
     // port: the 'PGAc' object is copied straight into gPgaData.aTournament (Tournament[31]); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
@@ -114,6 +123,7 @@ void GameModeDriverPGATour_LoadPGAcFromStream(UStreamObject* pObject) {
     Stream_StreamLoadFixedSize(pObject, sizeof(gPgaData.aTournament), gPgaData.aTournament);
 }
 
+// The 'PGAt' loader: the 31 tournament formats (gPgaData.aTourEvent: rounds, courses, pins, tees).
 void GameModeDriverPGATour_LoadPGAtFromStream(UStreamObject* pObject) {
     // port: the 'PGAt' object is copied straight into gPgaData.aTourEvent (TourEvent[31]); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
@@ -121,6 +131,7 @@ void GameModeDriverPGATour_LoadPGAtFromStream(UStreamObject* pObject) {
     Stream_StreamLoadFixedSize(pObject, sizeof(gPgaData.aTourEvent), gPgaData.aTourEvent);
 }
 
+// The 'PGAp' loader: 11 three-value records (gPgaData.aTriple).
 void GameModeDriverPGATour_LoadPGApFromStream(UStreamObject* pObject) {
     // port: the 'PGAp' object is copied straight into gPgaData.aTriple (PgaTriple[11]); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
@@ -128,8 +139,9 @@ void GameModeDriverPGATour_LoadPGApFromStream(UStreamObject* pObject) {
     Stream_StreamLoadFixedSize(pObject, sizeof(gPgaData.aTriple), gPgaData.aTriple);
 }
 
-// The 'PGAn' object: the names
-// block is copied out.
+// The 'PGAn' loader: the tournament names block (Tournament.nName are offsets into it) is copied
+// into a new 16-byte aligned block, gPgaData.pNames, and the stream object freed. An empty object
+// leaves pNames as it was.
 void GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream(UStreamObject* pObject) {
     void* pData;
     u32 nSize = fn_8000E81C(pObject, &pData);
@@ -140,9 +152,11 @@ void GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream(UStreamObject* 
     }
 }
 
-// The mode ends: gpGame's nC and n10 go back to 1 and the options nC and nWind come back;
-// n18, which fn_800EE0A0 replaced, is not put back.
-void fn_800EE02C(void) {
+// pfnShutdown, as the mode ends: gpGame's nC and n10 go back to 1, the options' nC and nWind that
+// PrepareForTeeOff replaced come back, and the tour-round flag (GM_Currently_PgaTourMode) is
+// cleared. options.n18, which SetTournament replaced (keeping the old value in lbl_80281674), is
+// not put back.
+void GameModeDriverPGATour_Shutdown(void) {
     gpGame->nC = 1;
     gpGame->n10 = 1;
     gSession.options.nC = gPgaSavedOptionsC;
@@ -150,16 +164,19 @@ void fn_800EE02C(void) {
     gbPgaTourRoundActive = 0;
 }
 
-// The current tournament's number of rounds goes into the game state.
-void fn_800EE064(void) {
+// pfn1EC, as a round starts (GM_InitModule_PreDataStream): the round count (gpGame->nE0) comes from
+// the current tournament's format.
+void GameModeDriverPGATour_StartGamePreData(void) {
     s32 nTourEvent = gPgaData.aTournament[gpSaveData->tour.nEvent].nTourEvent - 1;
     gpGame->nE0 = gPgaData.aTourEvent[nTourEvent].nRounds;
 }
 
-// The course of the tournament format i's current round: everyone plays its tee set, every hole its
-// pin position, and its GameOptions.n18 replaces the player's (kept in gPgaSavedOptions18).
-// The tee set is written back to the tournament unchanged; the original has that store.
-void fn_800EE0A0(s32 i) {
+// Sets up tournament format i (an index into gPgaData.aTourEvent) for the current round: all five
+// players play its tee set, the course is the round's course (round gpGame->nDC), every hole uses
+// the round's pin position (profile 0's tour.nRound), and the round's n8 replaces options.n18 (the
+// old value kept in lbl_80281674) and is applied (fn_80055C40). The tee set is written back to the
+// format unchanged; the original has that store.
+void GameModeDriverPGATour_SetTournament(s32 i) {
     PlayerNumber_t nPlayer = PLR_1_e;
     TourEvent* pEvent = &gPgaData.aTourEvent[i];
     PlayerNumber_t k;
@@ -180,10 +197,15 @@ void fn_800EE0A0(s32 i) {
     fn_80055C40(gSession.options.n18);
 }
 
-// A round of the current tournament starts: the options nC and nWind are kept (fn_800EE02C puts
-// them back) and set to 4 and calm, one player plays the round's course, and the round's field is
-// set up.
-void fn_800EE2C8(void) {
+// A round of the current tournament is about to start (front-end message fn_80083BFC). The options'
+// nC and nWind are saved (Shutdown puts them back) and set to 4 and calm, the tour-round flag
+// (GM_Currently_PgaTourMode) set, the playoff hole reset and the win info cleared. For a tournament
+// with a format: one player, the round number and count, the format's course set up
+// (SetTournament), the user-quit flag cleared, the round started for the field
+// (GM_PgaTourSim_SimRound, flags 5: the player in it, scores not kept yet) at the bracket's
+// strength, the round's statistics cleared and counted (a round, and a tournament on its first
+// round), and all 18 holes selected.
+void GameModeDriverPGATour_PrepareForTeeOff(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
     s32 nEvent = gpSaveData[nPlayer].tour.nEvent;
     PgaStatCounts* pRec = &gPgaRoundStats;
@@ -200,7 +222,7 @@ void fn_800EE2C8(void) {
         gpGame->nDC = gpSaveData[nPlayer].tour.nRound;
         nFormat = gPgaData.aTournament[nEvent].nTourEvent - 1;
         gpGame->nE0 = gPgaData.aTourEvent[nFormat].nRounds;
-        fn_800EE0A0(gPgaData.aTournament[nEvent].nTourEvent - 1);
+        GameModeDriverPGATour_SetTournament(gPgaData.aTournament[nEvent].nTourEvent - 1);
         fn_80117DE8(0, 0);
         GM_PgaTourSim_SimRound(0, &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent],
                     gpSaveData[nPlayer].tour.nRound, gPgaData.aTourEvent[nFormat].a40[fn_800EF0E0(0)], 5);
@@ -213,13 +235,15 @@ void fn_800EE2C8(void) {
     }
 }
 
-u8 fn_800EE470(void) {
+// 1 while a PGA TOUR round is being played: from GameModeDriverPGATour_PrepareForTeeOff until the
+// mode's Shutdown.
+u8 GM_Currently_PgaTourMode(void) {
     return gbPgaTourRoundActive;
 }
 
-// A profile, and its current tournament. fake match: fn_800EE478 reaches the profile through these
-// in two statements, where the original adds the profile's offset to gpSaveData last (indexed
-// load/store); gpSaveData[nPlayer] written out adds it first.
+// A profile, and its current tournament. fake match: GameModeDriverPGATour_EndGame reaches the
+// profile through these in two statements, where the original adds the profile's offset to
+// gpSaveData last (indexed load/store); gpSaveData[nPlayer] written out adds it first.
 static inline SaveProfile* Tour_Profile(PlayerNumber_t nPlayer) {
     return &gpSaveData[nPlayer];
 }
@@ -228,10 +252,12 @@ static inline SeasonEvent* Tour_CurrentEvent(PlayerNumber_t nPlayer) {
     return &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent];
 }
 
-// A round of the current tournament is over for profile 0: after the second round of a
-// tournament of four or more the cut is checked, the round's score is kept, and after the last
-// round the tournament ends.
-void fn_800EE478(void) {
+// pfnEndGame, when a tour round ends, for profile 0: the first round counts a tournament started
+// (tour.n4E94); after the second round of a tournament of four or more rounds the cut is made
+// (fn_80117B58) and a player who missed it is marked cut; the player's total score goes into the
+// season record, and after the last round the tournament ends (fn_800EEA3C). The round number moves
+// on later (fn_800EEF88).
+void GameModeDriverPGATour_EndGame(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
     if (gpSaveData[nPlayer].tour.nRound == 0) {
         Tour_Profile(nPlayer)->tour.n4E94++;
@@ -266,8 +292,8 @@ u8 GameModeDriverPGATour_IsPuttForLead(int nPlayer) {
     return bLead;
 }
 
-// In a playoff, a putt for the lead; otherwise on the
-// last hole of the last round, a putt that would put the player ahead.
+// Whether holing this putt wins the tournament: in a playoff, a putt for the lead (IsPuttForLead);
+// otherwise on the last hole of the last round, a putt that would put the player strictly ahead.
 u8 GameModeDriverPGATour_IsPuttForWin(s32 nPlayer) {
     s32 nRounds;
     if (gpGame->bD4) {
@@ -286,6 +312,8 @@ s32 GameModeDriverPGATour_GetCurrentLead(int nPlayer) {
     return fn_80119588(nPlayer, 1) - GM_GetGolferRelativeCumulativeScore(nPlayer, 0);
 }
 
+// GetCurrentLead as it would be if the ball dropped with one more stroke: strokes ahead of the best
+// other player, negative when behind (in a playoff, on this hole).
 s32 GameModeDriverPGATour_GetPotentialLead(int nPlayer) {
     if (gpGame->bD4) {
         return GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(nPlayer, Game_CurHoleIndex()) -

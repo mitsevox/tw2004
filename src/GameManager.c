@@ -156,12 +156,13 @@ void GM_InitModule_PostDataStream(void) {
 }
 
 // A round is torn down (gomainloop): the mode's Shutdown (pfnShutdown) and the HUD (GUI_DeInit),
-// then four frees that are empty in this build: the PGA TOUR one (fn_800EDE78), the GameMode5 one
-// (fn_800EADD8), the earnings' stream memory (fn_800D33F0) and the course data (fn_800D29E8).
+// then four frees that are empty in this build: the PGA TOUR one
+// (GameModeDriverPGATour_FreeStreamMemory), the GameMode5 one (fn_800EADD8), the earnings' stream
+// memory (fn_800D33F0) and the course data (fn_800D29E8).
 void GM_DeInitModule(void) {
     (*(s32 (**)(void*))((u8*)(gpGame) + 0x1CC))(gpGame);
     GUI_DeInit();
-    fn_800EDE78();
+    GameModeDriverPGATour_FreeStreamMemory();
     fn_800EADD8();
     fn_800D33F0();
     fn_800D29E8();
@@ -372,13 +373,13 @@ void GM_BallHit(int nPlayer) {
 }
 
 // One more stroke on this hole, and one more putt if it was the putter; during a PGA TOUR event
-// (fn_800EE470) the tour's scoreboard gets the new count.
+// (GM_Currently_PgaTourMode) the tour's scoreboard gets the new count.
 void GM_PlayerAddStroke(int nPlayer) {
     gPlayers[nPlayer].nStrokes[gpGame->nCurHole]++;
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
         gPlayers[nPlayer].nPutts[gpGame->nCurHole]++;
     }
-    if (fn_800EE470()) {
+    if (GM_Currently_PgaTourMode()) {
         GM_PgaTourSim_SetUserEntrantHoleStrokes(nPlayer, gPlayers[nPlayer].nStrokes[gpGame->nCurHole]);
     }
 }
@@ -415,14 +416,14 @@ u8 GM_CheckForBallOOB(int nPlayer) {
             if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
                 gPlayers[nPlayer].nPutts[gpGame->nCurHole]++;
             }
-            if (fn_800EE470()) {
+            if (GM_Currently_PgaTourMode()) {
                 GM_PgaTourSim_SetUserEntrantHoleStrokes(nPlayer, gPlayers[nPlayer].nStrokes[gpGame->nCurHole]);
             }
             if (Game_GetMode() == 8 || Game_GetMode() == 7) {
                 return 1;
             }
             if (gpGame->bStrokeLimit && gPlayers[nPlayer].nStrokes[gpGame->nCurHole] >= 10) {
-                if (fn_800EE470()) {
+                if (GM_Currently_PgaTourMode()) {
                     GM_PgaTourSim_SetUserEntrantHoleStrokes(nPlayer, 10);
                 }
                 return 0;
@@ -548,7 +549,7 @@ void GM_PlayerTookShot(int nPlayer) {
             if (GM_IsShotOverLimit(nPlayer, gPlayers[nPlayer].nStrokes[gpGame->nCurHole])) {
                 gPlayers[nPlayer].ball.nLie = LIE_INCUP_e;
                 gPlayers[nPlayer].bC2D = 1;
-                if (fn_800EE470()) {
+                if (GM_Currently_PgaTourMode()) {
                     gPlayers[nPlayer].nStrokes[gpGame->nCurHole] = 10;
                 } else {
                     gPlayers[nPlayer].nStrokes[gpGame->nCurHole] = 11;

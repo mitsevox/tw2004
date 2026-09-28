@@ -1255,7 +1255,7 @@ void fn_80079AD4(void) {
     if (fn_801025F4()) {
         lbl_801D7148.nMode = 4;
     }
-    if (fn_800EE470()) {
+    if (GM_Currently_PgaTourMode()) {
         lbl_801D7148.nMode = 23;
     }
     if (lbl_80281ED4->b0 && Game_GetMode() == 10) {
