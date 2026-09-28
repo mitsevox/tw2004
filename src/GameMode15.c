@@ -1,6 +1,11 @@
-// GameMode15.c (our name): game mode 15, HORSE on the targets. A leader lands on a target; the
-// others must land on the same target at least as close, or take a letter (nE88). Closer still
-// makes you the leader. Five letters and you are out; the last player in wins.
+// GameMode15.c (our name; TW07's GameMode_SkillZoneHorse.cpp): game mode 15, HORSE on the targets,
+// one hole, set up for two players. A shot landing in a target's ring (0 the bullseye .. 4) with
+// no leader makes its player the leader. The next player must land on the leader's target in the
+// same ring (a match: the lead stands) or a closer one (they take the lead); anything else takes a
+// letter (nE88) and ends the lead, so the next shot sets a new one. The lead also ends when play
+// comes back round to the leader. Five letters and you are out; the last player in wins. Each shot
+// on a target also pays its surface's points, which the players still in are paid at the end. Each
+// turn has a shot clock: running out forfeits the shot and, against a leader, takes a letter.
 
 #include "golfer.h"
 #include "ball.h"
@@ -10,14 +15,18 @@
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
-s32 gHorseSavedOptionsC = 4;                    // the options saved while the game runs
-s32 gHorseLeader;                    // the leader (5 = none)
-s32 gHorseLeaderRing;                    // the leader's rank (0 best .. 4)
-s8  gHorseLeaderTarget;                    // the leader's target
-s32 gHorseShotPoints;                    // the points of the last shot
-u8  gHorseShotClockOut;                    // set by GameModeSkillZoneHorse_ShotClockOut: the shot then scores nothing
-u8  gHorseLastShotExceeded;                    // a closer shot just took the lead (not set for the first leader)
-s32 gHorseSavedWind;
+// Mode 15's state; only this file uses it. The .sbss ones are defined last address first (the
+// compiler lays a file's .sbss out last definition first).
+s32 gHorseSavedOptionsC = 4;    // options.nC from before the game (StartGamePreData; Shutdown puts it back)
+s32 gHorseLeader;               // the player whose shot is to be matched (5 = no leader)
+s32 gHorseLeaderRing;           // the leader's ring (0 the bullseye .. 4), read only while there is one
+s8  gHorseLeaderTarget;         // the target the leader landed on
+s32 gHorseShotPoints;           // the last shot's surface points (GetIDScore)
+u8  gHorseShotClockOut;         // the shot clock ran out (ShotClockOut): the shot scores nothing
+u8  gHorseLastShotExceeded;     // the last shot took the lead with a closer ring (GetLastShotExceeded;
+                                //   not set for a first leader, cleared at HitBall)
+s32 gHorseSavedWind;            // options.nWind from before the game (StartGamePreData; Shutdown puts
+                                //   it back)
 
 void  Gaud_LetterForfeit(void);
 void  Gaud_LetterGained(void);
@@ -43,7 +52,7 @@ void  GameModeSkillZoneHorse_HitBall(int nPlayer);
 void  GameModeSkillZoneHorse_EndGame(void);
 void  GameModeSkillZoneHorse_GetIDScore(s32 nSurface, s32* pPoints);
 s32   GameModeSkillZoneHorse_GetLastShotExceeded(void);
-s32   GameModeSkillZoneHorse_GreenType(int a, int i);
+s32   GameModeSkillZoneHorse_GreenType(int nPlayer, int nTarget);
 
 // Game mode 15's setup (pfnInit, from GM_SetModeType): its hooks, nC and n10 2 (two players, as
 // GameModeBattle sets them), no wind, no gimmes, no mulligans, b28D set (the re-plan button picks
@@ -177,7 +186,7 @@ void GameModeSkillZoneHorse_EndGolferTurn(int nPlayer) {
 void GameModeSkillZoneHorse_CheckShotAwards(int nPlayer) {
     s32 nSurface;
     s8 nTarget;
-    s32 nRank;
+    s32 nRing;
     s32 nMsg;
     f32 fLength;
     s32 nMult;
@@ -194,12 +203,13 @@ void GameModeSkillZoneHorse_CheckShotAwards(int nPlayer) {
         GameModeSkillZoneHorse_GetIDScore(nSurface, &gHorseShotPoints);
         if (nSurface >= 0x85 && nSurface <= 0x90 && !GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
             nTarget = GameModeSkillZoneBase_GetGreenIndexHit(nPlayer);
-            nRank = GameModeSkillZoneBase_GetBullsEyeColor(nSurface);
+            nRing = GameModeSkillZoneBase_GetBullsEyeColor(nSurface);
             gPlayers[nPlayer].nDE4[nTarget]++;
             gPlayers[nPlayer].aDC4[3]++;
             if (gHorseShotPoints != 0) {
                 if (gHorseShotPoints > 0) {
-                    gHorseShotPoints = GM_Earnings_ComputeBonusModifiers(gHorseShotPoints, nPlayer, 1, 1, 1, 0);
+                    gHorseShotPoints = GM_Earnings_ComputeBonusModifiers(gHorseShotPoints,
+                                                                         nPlayer, 1, 1, 1, 0);
                     gHorseShotPoints = GM_Earnings_ComputeTOURCardModifiers(gHorseShotPoints, nPlayer, 0);
                 }
                 gPlayers[nPlayer].nDD8 += gHorseShotPoints;
@@ -215,9 +225,9 @@ void GameModeSkillZoneHorse_CheckShotAwards(int nPlayer) {
                 }
             }
             if (gHorseLeader != 5) {
-                if (nTarget == gHorseLeaderTarget && nRank == gHorseLeaderRing) {
+                if (nTarget == gHorseLeaderTarget && nRing == gHorseLeaderRing) {
                     GameMsg_Send5Ints(0x33, 0, 0, 0, nSurface, 1);
-                    if (nRank == 0) {
+                    if (nRing == 0) {
                         Gaud_BullsEye();
                         nMsg = 0x32;
                         pBall = &gPlayers[nPlayer].ball;
@@ -234,13 +244,13 @@ void GameModeSkillZoneHorse_CheckShotAwards(int nPlayer) {
                             fn_800A30E4(nMult + 7, &gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
                         }
                     }
-                } else if (nTarget == gHorseLeaderTarget && nRank < gHorseLeaderRing) {
+                } else if (nTarget == gHorseLeaderTarget && nRing < gHorseLeaderRing) {
                     gHorseLeader = nPlayer;
-                    gHorseLeaderRing = nRank;
+                    gHorseLeaderRing = nRing;
                     gHorseLeaderTarget = nTarget;
                     GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCF, 1);
                     gHorseLastShotExceeded = 1;
-                    if (nRank == 0) {
+                    if (nRing == 0) {
                         Gaud_BullsEye();
                         nMsg = 0x31;
                         pBall = &gPlayers[nPlayer].ball;
@@ -280,10 +290,10 @@ void GameModeSkillZoneHorse_CheckShotAwards(int nPlayer) {
                 }
             } else {
                 gHorseLeader = nPlayer;
-                gHorseLeaderRing = nRank;
+                gHorseLeaderRing = nRing;
                 gHorseLeaderTarget = nTarget;
                 GameMsg_Send5Ints(0x33, 0, 0, 0, nSurface, 1);
-                if (nRank == 0) {
+                if (nRing == 0) {
                     Gaud_BullsEye();
                     pBall = &gPlayers[nPlayer].ball;
                     fn_800A30E4(8, pBall, nPlayer, 0, 0.0f);
@@ -542,8 +552,8 @@ s32 GameModeSkillZoneHorse_GetLastShotExceeded(void) {
 
 // Which marker model target nTarget shows (pfn26C, GoDynObj.c): with a leader, 1 for every target
 // but the leader's; 0 for the leader's and for all when there is none. nPlayer is not used.
-s32 GameModeSkillZoneHorse_GreenType(int a, int i) {
-    if (gHorseLeader == 5 || i == gHorseLeaderTarget) {
+s32 GameModeSkillZoneHorse_GreenType(int nPlayer, int nTarget) {
+    if (gHorseLeader == 5 || nTarget == gHorseLeaderTarget) {
         return 0;
     }
     return 1;

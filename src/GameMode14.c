@@ -1,7 +1,12 @@
-// GameMode14.c (our name): game mode 14, a two-player target game. The targets are 40 spots on the
-// hole (the list in GameModeReplay.c). Landing on a target claims it for you, unless the other player
-// has one there that is at least as close. The first to hold 5 targets wins. Each target is worth
-// points by how close the claiming shot was.
+// GameMode14.c (our name; TW07's GameMode_SkillZoneCapture.cpp): game mode 14, the two-player
+// capture target game, one hole. The targets are up to 40 spots on the hole (the list in
+// GameModeReplay.c; the code the target modes share is GameTargets.c). A shot landing in a
+// target's ring (0 the bullseye .. 4) claims it when that ring is closer than the one it is held
+// with, whoever holds it; a target claimed with a bullseye is locked. Taking one from the other
+// player is a steal. The first to hold 5 targets wins and is paid their points: each held target's
+// ring points (500 for the bullseye down to 100), times the hole's target factor, with the
+// earnings modifiers; the loser gets nothing. Each turn has a shot clock, and running out forfeits
+// the shot.
 
 #include "golfer.h"
 #include "ball.h"
@@ -10,20 +15,23 @@
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
-// One target's claim: how close the claiming shot was (0 best .. 4, 5 = unclaimed) and who holds it
-// (5 = nobody).
+// One target's claim (TW07's captured ring and ring owner): the ring of the claiming shot (0 the
+// bullseye .. 4, 5 unclaimed) and who holds it (0 or 1, 5 nobody).
 typedef struct Claim {
-    s32 nRank;                  // 0x0
+    s32 nRing;                  // 0x0
     s32 nOwner;                 // 0x4
 } Claim;
-Claim gCaptureClaims[40];
 
-s32 gCaptureSavedOptionsC = 4;                    // the options saved while the game runs
-s32 gCaptureShotPoints;                    // the points of the last claim
-u8  gCaptureShotClockOut;                    // set by GameModeSkillZoneCapture_ShotClockOut: the shot then claims nothing
-s32 gCaptureFirstGolfer;                    // who starts: 0 or 1, at random
-s32 gCaptureSavedWind;
-s32 gCaptureRingPoints[6] = {500, 400, 300, 200, 100, 0};                  // points per rank
+// Mode 14's state; only this file uses it. The .sbss ones are defined last address first (the
+// compiler lays a file's .sbss out last definition first).
+Claim gCaptureClaims[40];       // per target of the target list (lbl_80211D38)
+s32 gCaptureSavedOptionsC = 4;  // options.nC from before the game (StartGamePreData; Shutdown puts it back)
+s32 gCaptureShotPoints;         // the points of the last claim (GetShotEarned)
+u8  gCaptureShotClockOut;       // the shot clock ran out (ShotClockOut): the shot claims nothing
+s32 gCaptureFirstGolfer;        // who plays first: player 0 or 1, at random (StartGamePreData)
+s32 gCaptureSavedWind;          // options.nWind from before the game (StartGamePreData; Shutdown puts
+                                //   it back)
+s32 gCaptureRingPoints[6] = {500, 400, 300, 200, 100, 0};  // a claim's points by its ring (5: none)
 
 void  GameModeSkillZoneCapture_Shutdown(void);
 void  GameModeSkillZoneCapture_StartGamePreData(void);
@@ -39,11 +47,11 @@ void  GameModeSkillZoneCapture_UpdateSwingUI(int nPlayer);
 u8    GameModeSkillZoneCapture_GameFinished(u8 bCheck);
 void  GameModeSkillZoneCapture_BallOOB(int nPlayer);
 u8    GameModeSkillZoneCapture_HoleFinished(int nPlayer, u8 bCheck);
-s32   GameModeSkillZoneCapture_GetMadeMoneyFromIndex(int n);
+s32   GameModeSkillZoneCapture_GetMadeMoneyFromIndex(int nTarget);
 void  GameModeSkillZoneCapture_ComputePlayerScore(void);
 void  GameModeSkillZoneCapture_HitBall(int nPlayer);
 void  GameModeSkillZoneCapture_EndGame(void);
-s32   GameModeSkillZoneCapture_GreenType(int a, int i);
+s32   GameModeSkillZoneCapture_GreenType(int nPlayer, int nTarget);
 
 // Game mode 14's setup (pfnInit, from GM_SetModeType): its hooks (the target-list ones from
 // GameTargets.c), nC and n10 2 (two players, as GameModeBattle sets them), no wind, no gimmes, no
@@ -175,10 +183,10 @@ void GameModeSkillZoneCapture_EndGolferTurn(int nPlayer) {
 void GameModeSkillZoneCapture_CheckShotAwards(int nPlayer) {
     s32 nSurface;
     int nTarget;
-    s32 nRank;
+    s32 nRing;
     s32 nMsg = -1;
     s32 nText;
-    s32 nKind = 0;
+    s32 nStolenLocked = 0;
     f32 fLength;
     s32 nMult;
     if (gCaptureShotClockOut) {
@@ -189,17 +197,17 @@ void GameModeSkillZoneCapture_CheckShotAwards(int nPlayer) {
         fLength = fn_800D0550(nPlayer);
         if (nSurface >= 0x85 && nSurface <= 0x90 && !GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
             nTarget = GameModeSkillZoneBase_GetGreenIndexHit(nPlayer);
-            nRank = GameModeSkillZoneBase_GetBullsEyeColor(nSurface);
-            if (gCaptureClaims[nTarget].nRank == 0) {
+            nRing = GameModeSkillZoneBase_GetBullsEyeColor(nSurface);
+            if (gCaptureClaims[nTarget].nRing == 0) {
                 GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCD, 1);
                 Gaud_TargetClosedOut();
                 nMsg = 2;
-            } else if (nRank >= gCaptureClaims[nTarget].nRank) {
+            } else if (nRing >= gCaptureClaims[nTarget].nRing) {
                 GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCC, 1);
                 nMsg = 0x10;
             } else {
                 nText = 0;
-                if (gCaptureClaims[nTarget].nRank == 5) {
+                if (gCaptureClaims[nTarget].nRing == 5) {
                     if (!(Misc_RandFunc(0) & 1)) {
                         nMsg = 0x1A;
                     } else {
@@ -209,7 +217,7 @@ void GameModeSkillZoneCapture_CheckShotAwards(int nPlayer) {
                     nMsg = 0x42;
                 } else {
                     nText = 0xD4;
-                    nKind = 1;
+                    nStolenLocked = 1;
                     gPlayers[nPlayer].nE94++;
                     if (!(Misc_RandFunc(0) & 1)) {
                         nMsg = 0xF;
@@ -217,9 +225,9 @@ void GameModeSkillZoneCapture_CheckShotAwards(int nPlayer) {
                         nMsg = 0x1B;
                     }
                 }
-                if (nRank == 0) {
+                if (nRing == 0) {
                     gPlayers[nPlayer].nDE0++;
-                    if (nKind == 0) {
+                    if (nStolenLocked == 0) {
                         nText = 0xD2;
                         if (!(Misc_RandFunc(0) & 1)) {
                             nMsg = 0x16;
@@ -234,16 +242,17 @@ void GameModeSkillZoneCapture_CheckShotAwards(int nPlayer) {
                             nMsg = 0x1C;
                         }
                     }
-                    nKind = 2;
+                    nStolenLocked = 2;
                 }
-                gCaptureClaims[nTarget].nRank = nRank;
+                gCaptureClaims[nTarget].nRing = nRing;
                 gCaptureClaims[nTarget].nOwner = nPlayer;
                 gPlayers[nPlayer].aCD4[gPlayers[nPlayer].nCD0] = nSurface;
                 gPlayers[nPlayer].nCD0++;
                 gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
                 gCaptureShotPoints = GameModeSkillZoneCapture_GetMadeMoneyFromIndex(nTarget);
                 gCaptureShotPoints = GameModeSkillZoneBase_ScaleTargetPoints(gCaptureShotPoints, nTarget);
-                gCaptureShotPoints = GM_Earnings_ComputeBonusModifiers(gCaptureShotPoints, nPlayer, 1, 1, 1, 0);
+                gCaptureShotPoints = GM_Earnings_ComputeBonusModifiers(gCaptureShotPoints,
+                                                                       nPlayer, 1, 1, 1, 0);
                 gCaptureShotPoints = GM_Earnings_ComputeTOURCardModifiers(gCaptureShotPoints, nPlayer, 0);
                 GameModeSkillZoneCapture_ComputePlayerScore();
                 if (nText != 0) {
@@ -251,10 +260,10 @@ void GameModeSkillZoneCapture_CheckShotAwards(int nPlayer) {
                 }
                 if (!gSession.bReplay) {
                     GameMsg_Send5Ints(0x33, gCaptureShotPoints, 0, 0, nSurface, 1);
-                    if (nKind == 0) {
+                    if (nStolenLocked == 0) {
                         GameMsg_Send5Ints(0x33, gCaptureShotPoints, 0, 0, 0xD3, 1);
                     }
-                    if (nRank == 0) {
+                    if (nRing == 0) {
                         Ball* pBall;
                         Gaud_BullsEye();
                         pBall = &gPlayers[nPlayer].ball;
@@ -341,7 +350,7 @@ void GameModeSkillZoneCapture_ClearPerHoleData(void) {
     int i;
     GameModeSkillZoneBase_ClearPerHoleData();
     for (i = 0; i < 40; i++) {
-        gCaptureClaims[i].nRank = 5;
+        gCaptureClaims[i].nRing = 5;
         gCaptureClaims[i].nOwner = 5;
     }
 }
@@ -376,6 +385,9 @@ u8 GameModeSkillZoneCapture_HoleFinished(int nPlayer, u8 bCheck) {
     return 0;
 }
 
+// fake match: GetTargettedRingOwner gets the aimed-at target through this identity inline
+// (GetTargettedCapturedRing calls GameModeSkillZoneBase_GetGreenTargetted directly); the direct call
+// there scores 99.2% (rm2, 2026-09-28). EA's real form is not known.
 static inline int CurrentTarget(int nPlayer) {
     return GameModeSkillZoneBase_GetGreenTargetted(nPlayer);
 }
@@ -395,7 +407,7 @@ s32 GameModeSkillZoneCapture_GetTargettedCapturedRing(int nPlayer) {
     if (gPlayers[nPlayer].nSurface < 0x85 || gPlayers[nPlayer].nSurface > 0x90) {
         return -1;
     }
-    return gCaptureClaims[GameModeSkillZoneBase_GetGreenTargetted(nPlayer)].nRank;
+    return gCaptureClaims[GameModeSkillZoneBase_GetGreenTargetted(nPlayer)].nRing;
 }
 
 // How many of the 40 targets the player holds (gCaptureClaims). 5 wins; GameEffects starts the
@@ -411,23 +423,23 @@ int GameModeSkillZoneCapture_GetTotalTargetsHit(int nPlayer) {
     return n;
 }
 
-// Who holds target i, for the HUD (UI command 17): 0 or 1, 5 nobody.
-s32 GameModeSkillZoneCapture_GetRingOwnerFromIndex(int i) {
-    return gCaptureClaims[i].nOwner;
+// Who holds target nTarget, for the HUD (UI command 17): 0 or 1, 5 nobody.
+s32 GameModeSkillZoneCapture_GetRingOwnerFromIndex(int nTarget) {
+    return gCaptureClaims[nTarget].nOwner;
 }
 
-// The ring target i was claimed with, for the HUD (UI command 18): 0 the bullseye .. 4, 5
+// The ring target nTarget was claimed with, for the HUD (UI command 18): 0 the bullseye .. 4, 5
 // unclaimed.
-s32 GameModeSkillZoneCapture_GetCapturedRingFromIndex(s32 p0) {
-    return gCaptureClaims[p0].nRank;
+s32 GameModeSkillZoneCapture_GetCapturedRingFromIndex(s32 nTarget) {
+    return gCaptureClaims[nTarget].nRing;
 }
 
 // A target's points by the ring it was claimed with (gCaptureRingPoints: 500 for the bullseye down
 // to 100 for ring 4); 0 when nobody holds it. Before the hole's target factor and the earnings
 // modifiers.
-s32 GameModeSkillZoneCapture_GetMadeMoneyFromIndex(int n) {
-    if (gCaptureClaims[n].nOwner != 5) {
-        return gCaptureRingPoints[gCaptureClaims[n].nRank];
+s32 GameModeSkillZoneCapture_GetMadeMoneyFromIndex(int nTarget) {
+    if (gCaptureClaims[nTarget].nOwner != 5) {
+        return gCaptureRingPoints[gCaptureClaims[nTarget].nRing];
     }
     return 0;
 }
@@ -453,7 +465,7 @@ void GameModeSkillZoneCapture_ComputePlayerScore(void) {
 }
 
 // The points of the last claim (gCaptureShotPoints), whoever nPlayer is.
-s32 GameModeSkillZoneCapture_GetShotEarned(s32 a) {
+s32 GameModeSkillZoneCapture_GetShotEarned(s32 nPlayer) {
     return gCaptureShotPoints;
 }
 
@@ -497,14 +509,14 @@ void GameModeSkillZoneCapture_EndGame(void) {
 
 // Which marker model target nTarget shows (pfn26C, GoDynObj.c): 1 once claimed with a bullseye
 // (locked), 2 player 0's, 3 player 1's, 0 free; nPlayer is not used.
-s32 GameModeSkillZoneCapture_GreenType(int a, int i) {
-    if (gCaptureClaims[i].nRank == 0) {
+s32 GameModeSkillZoneCapture_GreenType(int nPlayer, int nTarget) {
+    if (gCaptureClaims[nTarget].nRing == 0) {
         return 1;
     }
-    if (gCaptureClaims[i].nOwner == 0) {
+    if (gCaptureClaims[nTarget].nOwner == 0) {
         return 2;
     }
-    return gCaptureClaims[i].nOwner == 1 ? 3 : 0;
+    return gCaptureClaims[nTarget].nOwner == 1 ? 3 : 0;
 }
 
 // Sends front-end message nMsg with five int values.
@@ -515,6 +527,6 @@ void GameMsg_Send5Ints(int nMsg, s32 a, s32 b, s32 c, s32 d, s32 e) {
 // Sends UI message 55, the HUD shot clock, with a value: modes 14 and 15 pass 900 as a golfer's
 // turn starts and -1 (off) when the ball is hit. Its running out comes back as a UI command
 // (GameModeSkillZoneBase_ShotClockOut).
-void GameModeSkillZoneCapture_SetShotClock(s32 p0) {
-    GameMsg_SendInt(55, p0);
+void GameModeSkillZoneCapture_SetShotClock(s32 nClock) {
+    GameMsg_SendInt(55, nClock);
 }
