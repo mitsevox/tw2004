@@ -409,7 +409,7 @@ f32  GM_GetGameProgress(SaveProfile* pProfile);
 u8   GM_Earnings_GiveAwardToUser(int nPlayer, Award* pAward);
 
 // fe_craputils.c (TW06's FE_CrAP_ utilities)
-extern char lbl_80188138[];     // "NoLogoName": a user logo's name until one is given
+extern char gszNoLogoName[];     // "NoLogoName": a user logo's name until one is given
 void FE_CrAP_InitCrAPInfo(SaveProfile* pProfile);
 void UserInfo_UnlockGolfer(int nProfile, int nGolfer);        // unlock a golfer for the profile
 void UserInfo_SetUserFlag(SaveProfile* pProfile, int nBit, u8 bSet);    // set or clear bit nBit of a10548

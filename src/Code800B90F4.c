@@ -9,15 +9,15 @@
 #include "llpict.h"
 
 // Defined here, last address first (CodeWarrior lays out .sbss in reverse).
-UObject* lbl_802821E0;          // } and 10000
-UObject* lbl_802821DC;          // } 10030
-UObject* lbl_802821D8;          // } made from the 'TEO ' objects 10040,
-TexBank* lbl_802821D4;          // from the 'BALF' object
-void* lbl_802821D0;
-f32 lbl_802821CC;               // }
-f32 lbl_802821C8;               // } the held ball's offset in its bone (x, y); never set, so 0
-PictFile* (*lbl_802821C4)(void* pArg);   // reads the next MAD file
-void* lbl_802821C0;             // what the read function is given
+UObject* gpCrAPBallTeo10000;          // } and 10000
+UObject* gpCrAPBallTeo10030;          // } 10030
+UObject* gpCrAPBallTeo10040;          // } made from the 'TEO ' objects 10040,
+TexBank* gpCrAPBallLogoBank;          // from the 'BALF' object
+void* gpCrAPBallUnusedMem;
+f32 gfCrAPBallOffsetY;               // }
+f32 gfCrAPBallOffsetX;               // } the held ball's offset in its bone (x, y); never set, so 0
+PictFile* (*gpfnMadRead)(void* pArg);   // reads the next MAD file
+void* gpMadReadArg;             // what the read function is given
 
 void MAD_initdecode(u8* src, int motion, int quality);
 void MAD_decodemacroblock(u8* src_y, u8* src_cb, u8* src_cr, u8* dest_y, u8* dest_cb, u8* dest_cr, int width);
@@ -34,8 +34,8 @@ void MAD_RemoveFrameFromLists(MadDecoder* p, PictFrame* pFrame);
 // Sets the function (and the argument it is given) that MAD_ReadNextFile takes the movie's MAD
 // files from; LLPict_Gc.c's movie set-up passes it on (fn_8002FEB0).
 void MAD_SetReadCallback(PictFile* (*pfnRead)(void* pArg), void* pArg) {
-    lbl_802821C4 = pfnRead;
-    lbl_802821C0 = pArg;
+    gpfnMadRead = pfnRead;
+    gpMadReadArg = pArg;
 }
 
 // Allocates frame pFrame's pixels for an nWidth x nHeight picture: the Y plane and the quarter-size
@@ -229,7 +229,7 @@ void MAD_AddFrameToList(PictFrame** apList, PictFrame* pFrame) {
 // count (nEnd) is never set: see the EA bug inside.
 // port: the swaps assume a big-endian machine; a little-endian port reads the header as it is.
 PictFile* MAD_ReadNextFile(MadDecoder* p) {
-    PictFile* pFile = lbl_802821C4(lbl_802821C0);
+    PictFile* pFile = gpfnMadRead(gpMadReadArg);
 
     if (pFile == NULL) {
         return NULL;
@@ -324,13 +324,13 @@ u8 MAD_IsAtEnd(MadDecoder* p) {
 
 // ---- the 'TEO ' and 'BALF' stream handlers ----
 
-u8 lbl_802814E8 = 1;
+u8 gbCrAPBallLogoShown = 1;
 
-f32 lbl_802814EC = -2.0f;       // }  and z
-f32 lbl_802814F0 = 1.0f;        // } the ball's scale on each axis
-f32 lbl_802814F4 = 1.0f;        // }
-f32 lbl_802814F8 = 1.0f;        // }
-char lbl_802814FC[] = "logoea";
+f32 gfCrAPBallOffsetZ = -2.0f;       // }  and z
+f32 gfCrAPBallScaleX = 1.0f;        // } the ball's scale on each axis
+f32 gfCrAPBallScaleY = 1.0f;        // }
+f32 gfCrAPBallScaleZ = 1.0f;        // }
+char gszCrAPBallLogoTex[] = "logoea";
 
 void FE_CrAPBall_LoadBALF(UStreamObject* pObject);
 void FE_CrAPBall_LoadTEO(UStreamObject* arg0);
@@ -358,7 +358,7 @@ void FE_CrAPBall_UnRegisterStreamClients(void) {
 // The 'BALF' load handler: the object is a texture bank of ball logos, kept for
 // FE_CrAPBall_SetLogo; the stream object itself is freed.
 void FE_CrAPBall_LoadBALF(UStreamObject* pObject) {
-    lbl_802821D4 = fn_8000FB88(pObject, NULL, 0);
+    gpCrAPBallLogoBank = fn_8000FB88(pObject, NULL, 0);
     StaticMem_Free(pObject);
 }
 
@@ -393,38 +393,38 @@ void FE_CrAPBall_FreeTEO(void* arg0) {
 // Clears the menu ball's state when the front end starts (GO_vInitFE): no objects, no logo bank,
 // the logo layers shown.
 void FE_CrAPBall_Init(void) {
-    lbl_802821E0 = NULL;
-    lbl_802821DC = NULL;
-    lbl_802821D8 = NULL;
-    lbl_802821D4 = NULL;
-    lbl_802821D0 = NULL;
-    lbl_802814E8 = 1;
+    gpCrAPBallTeo10000 = NULL;
+    gpCrAPBallTeo10030 = NULL;
+    gpCrAPBallTeo10040 = NULL;
+    gpCrAPBallLogoBank = NULL;
+    gpCrAPBallUnusedMem = NULL;
+    gbCrAPBallLogoShown = 1;
 }
 
 // Frees the menu ball's three objects, its logo bank (its pixel and palette data, then the bank)
-// and lbl_802821D0 when set (nothing here sets it), and clears them. Called when the front end
+// and gpCrAPBallUnusedMem when set (nothing here sets it), and clears them. Called when the front end
 // closes.
 void FE_CrAPBall_Free(void) {
-    if (lbl_802821E0 != NULL) {
-        fn_80048860(lbl_802821E0);
+    if (gpCrAPBallTeo10000 != NULL) {
+        fn_80048860(gpCrAPBallTeo10000);
     }
-    lbl_802821E0 = NULL;
-    if (lbl_802821DC != NULL) {
-        fn_80048860(lbl_802821DC);
+    gpCrAPBallTeo10000 = NULL;
+    if (gpCrAPBallTeo10030 != NULL) {
+        fn_80048860(gpCrAPBallTeo10030);
     }
-    lbl_802821DC = NULL;
-    if (lbl_802821D8 != NULL) {
-        fn_80048860(lbl_802821D8);
+    gpCrAPBallTeo10030 = NULL;
+    if (gpCrAPBallTeo10040 != NULL) {
+        fn_80048860(gpCrAPBallTeo10040);
     }
-    lbl_802821D8 = NULL;
-    if (lbl_802821D4 != NULL) {
-        fn_8000FFAC(lbl_802821D4);
-        StaticMem_Free(lbl_802821D4);
-        lbl_802821D4 = NULL;
+    gpCrAPBallTeo10040 = NULL;
+    if (gpCrAPBallLogoBank != NULL) {
+        fn_8000FFAC(gpCrAPBallLogoBank);
+        StaticMem_Free(gpCrAPBallLogoBank);
+        gpCrAPBallLogoBank = NULL;
     }
-    if (lbl_802821D0 != NULL) {
-        StaticMem_Free(lbl_802821D0);
-        lbl_802821D0 = NULL;
+    if (gpCrAPBallUnusedMem != NULL) {
+        StaticMem_Free(gpCrAPBallUnusedMem);
+        gpCrAPBallUnusedMem = NULL;
     }
 }
 
@@ -433,22 +433,22 @@ void FE_CrAPBall_Free(void) {
 void FE_CrAPBall_MakeObjects(void) {
     UStreamObject* pObject;
 
-    if (lbl_802821E0 == NULL) {
+    if (gpCrAPBallTeo10000 == NULL) {
         pObject = fn_8000B70C('TEO ', 10000);
         if (pObject != NULL) {
-            lbl_802821E0 = fn_80048808((UObjModel*)pObject->uUnk4);
+            gpCrAPBallTeo10000 = fn_80048808((UObjModel*)pObject->uUnk4);
         }
     }
-    if (lbl_802821DC == NULL) {
+    if (gpCrAPBallTeo10030 == NULL) {
         pObject = fn_8000B70C('TEO ', 10030);
         if (pObject != NULL) {
-            lbl_802821DC = fn_80048808((UObjModel*)pObject->uUnk4);
+            gpCrAPBallTeo10030 = fn_80048808((UObjModel*)pObject->uUnk4);
         }
     }
-    if (lbl_802821D8 == NULL) {
+    if (gpCrAPBallTeo10040 == NULL) {
         pObject = fn_8000B70C('TEO ', 10040);
         if (pObject != NULL) {
-            lbl_802821D8 = fn_80048808((UObjModel*)pObject->uUnk4);
+            gpCrAPBallTeo10040 = fn_80048808((UObjModel*)pObject->uUnk4);
         }
     }
 }
@@ -479,24 +479,24 @@ void FE_CrAPBall_DrawObject(UObject* pObj, f32 (*mBone)[4], f32 (*mScale)[4], f3
 // Draws the ball in the Create-A-Player menu golfer's hand (bone 0x54) when he holds it, into the
 // 384 x 528 target when bTarget, else to the screen (512 x 448). Object 10000 is always drawn;
 // 10030 and 10040 only while a logo is on the ball (FE_CrAPBall_SetLogo). The ball sits at the
-// bone's offset (0, 0, -2) with scale 1 on each axis (lbl_802821C8, lbl_802821CC, lbl_802814EC;
-// lbl_802814F0..lbl_802814F8).
+// bone's offset (0, 0, -2) with scale 1 on each axis (gfCrAPBallOffsetX, gfCrAPBallOffsetY, gfCrAPBallOffsetZ;
+// gfCrAPBallScaleX..gfCrAPBallScaleZ).
 void FE_CrAPBall_Render(u8 bTarget) {
     f32 vPos[4];
     f32 mScale[4][4];
     f32 (*mBone)[4];
 
     if (Character_IsHoldingBall(gpCrAPState->pB4->pChar)) {
-        vPos[0] = lbl_802821C8;
-        vPos[1] = lbl_802821CC;
-        vPos[2] = lbl_802814EC;
+        vPos[0] = gfCrAPBallOffsetX;
+        vPos[1] = gfCrAPBallOffsetY;
+        vPos[2] = gfCrAPBallOffsetZ;
         vPos[3] = 1.0f;
         Character_GetBonePos(gpCrAPState->pB4->pChar, 0x54, vPos);
         mBone = Character_GetBoneMatrix(gpCrAPState->pB4->pChar, 0x54);
         LLMath_IdentifyMat(mScale);
-        mScale[0][0] = lbl_802814F0;
-        mScale[1][1] = lbl_802814F4;
-        mScale[2][2] = lbl_802814F8;
+        mScale[0][0] = gfCrAPBallScaleX;
+        mScale[1][1] = gfCrAPBallScaleY;
+        mScale[2][2] = gfCrAPBallScaleZ;
         if (bTarget) {
             RenderState_SetRenderSurface(1, 0x180, 0x210, 0, 1, 1);
         } else {
@@ -507,15 +507,15 @@ void FE_CrAPBall_Render(u8 bTarget) {
         DS_vSetAlphaTestMode(0, 6, 0x80);
         DS_vEnableZBufferUpdate(1);
         RenderState_Flush();
-        if (lbl_802821E0 != NULL) {
-            FE_CrAPBall_DrawObject(lbl_802821E0, mBone, mScale, vPos);
+        if (gpCrAPBallTeo10000 != NULL) {
+            FE_CrAPBall_DrawObject(gpCrAPBallTeo10000, mBone, mScale, vPos);
         }
-        if (lbl_802814E8) {
-            if (lbl_802821DC != NULL) {
-                FE_CrAPBall_DrawObject(lbl_802821DC, mBone, mScale, vPos);
+        if (gbCrAPBallLogoShown) {
+            if (gpCrAPBallTeo10030 != NULL) {
+                FE_CrAPBall_DrawObject(gpCrAPBallTeo10030, mBone, mScale, vPos);
             }
-            if (lbl_802821D8 != NULL) {
-                FE_CrAPBall_DrawObject(lbl_802821D8, mBone, mScale, vPos);
+            if (gpCrAPBallTeo10040 != NULL) {
+                FE_CrAPBall_DrawObject(gpCrAPBallTeo10040, mBone, mScale, vPos);
             }
         }
         RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
@@ -537,27 +537,27 @@ void FE_CrAPBall_SetLogo(char* szBall) {
     int       nLogo;
     int       i;
 
-    if (lbl_802821D4 == NULL) {
+    if (gpCrAPBallLogoBank == NULL) {
         return;
     }
     if (szBall == NULL) {
-        lbl_802814E8 = 0;
+        gbCrAPBallLogoShown = 0;
         return;
     }
     SKA_PackName(&uLogo, szBall);
-    SKA_PackName(&uSlot, lbl_802814FC);
+    SKA_PackName(&uSlot, gszCrAPBallLogoTex);
     fn_800102DC(uSlot, &pSlotBank, &pSlot);
     if (pSlotBank == NULL || pSlot == NULL) {
         return;
     }
-    nLogo = fn_8001005C(lbl_802821D4, uLogo);
+    nLogo = fn_8001005C(gpCrAPBallLogoBank, uLogo);
     if (nLogo == (int)0x80000000) {
         return;
     }
-    lbl_802814E8 = 1;
-    pLogo = &lbl_802821D4->p8[nLogo];
+    gbCrAPBallLogoShown = 1;
+    pLogo = &gpCrAPBallLogoBank->p8[nLogo];
     for (i = 0; i < pLogo->n41; i++) {
-        Mem_cpy(pSlotBank->p18 + pSlot->aMips[i].uPixels, lbl_802821D4->p18 + pLogo->aMips[i].uPixels,
+        Mem_cpy(pSlotBank->p18 + pSlot->aMips[i].uPixels, gpCrAPBallLogoBank->p18 + pLogo->aMips[i].uPixels,
                 pLogo->aMips[i].nC * 16);
     }
 }

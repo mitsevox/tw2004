@@ -8,7 +8,7 @@
 #include "charstate.h"
 #include "frontend/fe.h"
 
-char lbl_80188138[] = "NoLogoName";
+char gszNoLogoName[] = "NoLogoName";
 
 void UserInfo_InitCrAPItemBitArrays(SaveProfile* pProfile);
 void FE_CrAP_ResetSliders(SaveProfile* pProfile);
@@ -31,7 +31,7 @@ void FE_CrAP_InitCrAPInfo(SaveProfile* pProfile) {
     FE_CrAP_ResetSliders(pProfile);
     UserInfo_InitCrAPItemBitArrays(pProfile);
     for (i = 0; i < 5; i++) {
-        strcpy(pProfile->choices.aLogo[i].szName, lbl_80188138);
+        strcpy(pProfile->choices.aLogo[i].szName, gszNoLogoName);
     }
 }
 

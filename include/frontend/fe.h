@@ -549,10 +549,10 @@ typedef struct LogoEdit {
 } LogoEdit;
 LAYOUT_ASSERT(LogoEdit, 0xC);
 
-extern LogoEdit* lbl_802824B8;
-extern s16* lbl_802824BC;               // the palette: 256 colours, 1-bit alpha (the sign bit)
+extern LogoEdit* gpLogoEdit;
+extern s16* gpLogoClut;               // the palette: 256 colours, 1-bit alpha (the sign bit)
                                         // and 5-5-5 RGB; read signed (lha)
-extern u8 lbl_802824C0;                 // the palette has been copied from "__LogoSquare"
+extern u8 gbLogoClutLoaded;                 // the palette has been copied from "__LogoSquare"
 
 void FE_LogoDesign_SetCurrentLogoNumber(s32 n);                // pick the logo to edit (LogoEdit.n0)
 s32  FE_LogoDesign_GetCurrentLogoNumber(void);                 // which logo is edited

@@ -15,56 +15,56 @@ void FE_LogoDesign_UploadCustomLogo(void);
 void FE_LogoDesign_LoadClut(void);
 
 // Last address first: CodeWarrior lays out uninitialised globals in reverse order of definition.
-u8 lbl_802824C0;
-s16* lbl_802824BC;
-LogoEdit* lbl_802824B8;
+u8 gbLogoClutLoaded;
+s16* gpLogoClut;
+LogoEdit* gpLogoEdit;
 
 // Allocates the logo editor's palette (256 colours, cleared) once at start-up (gomainloop's set-up
 // beside GOLFERSTATE_OpenONCE); FE_LogoDesign_LoadClut fills it later.
 void FE_LogoDesign_OpenOnce(void) {
-    lbl_802824BC = StaticMem_Alloc(256 * sizeof(s16), 0, 0, "FE_LogoDesign.c", 47);
-    Mem_set(lbl_802824BC, 0, 256 * sizeof(s16));
-    lbl_802824C0 = 0;
+    gpLogoClut = StaticMem_Alloc(256 * sizeof(s16), 0, 0, "FE_LogoDesign.c", 47);
+    Mem_set(gpLogoClut, 0, 256 * sizeof(s16));
+    gbLogoClutLoaded = 0;
 }
 
 // Frees the palette FE_LogoDesign_OpenOnce allocated and marks it not loaded.
 void FE_LogoDesign_CloseOnce(void) {
-    StaticMem_Free(lbl_802824BC);
-    lbl_802824BC = NULL;
-    lbl_802824C0 = 0;
+    StaticMem_Free(gpLogoClut);
+    gpLogoClut = NULL;
+    gbLogoClutLoaded = 0;
 }
 
 // Starts the logo editor when the front end starts (GO_vInitFE): its state (LogoEdit) allocated and
 // cleared (logo 0, square, unchanged), and the palette copied from "__LogoSquare" if that has not
 // been done yet (FE_LogoDesign_LoadClut).
 void FE_LogoDesign_InitModule(void) {
-    lbl_802824B8 = StaticMem_Alloc(sizeof(LogoEdit), 2, 0, "FE_LogoDesign.c", 67);
-    Mem_set(lbl_802824B8, 0, sizeof(LogoEdit));
+    gpLogoEdit = StaticMem_Alloc(sizeof(LogoEdit), 2, 0, "FE_LogoDesign.c", 67);
+    Mem_set(gpLogoEdit, 0, sizeof(LogoEdit));
     FE_LogoDesign_LoadClut();
 }
 
 // Frees the logo editor's state (FE_LogoDesign_InitModule); the palette stays.
 void FE_LogoDesign_CloseModule(void) {
-    StaticMem_Free(lbl_802824B8);
-    lbl_802824B8 = NULL;
+    StaticMem_Free(gpLogoEdit);
+    gpLogoEdit = NULL;
 }
 
 // The logo editor works on the profile's user logo n (0..4) from now on; it is marked changed so
 // its texture is redrawn (GM_vSelectLogo).
 void FE_LogoDesign_SetCurrentLogoNumber(s32 n) {
-    lbl_802824B8->n0 = n;
-    lbl_802824B8->bDirty = 1;
+    gpLogoEdit->n0 = n;
+    gpLogoEdit->bDirty = 1;
 }
 
 s32 FE_LogoDesign_GetCurrentLogoNumber(void) {
-    return lbl_802824B8->n0;
+    return gpLogoEdit->n0;
 }
 
 // Sets the logo editor's shape (LOGO_SQUARE: 64 x 64, LOGO_RECT: 128 x 32) and marks the logo
 // changed. Only the editor's; the logo record keeps its own nShape.
 void FE_LogoDesign_SetCurrentLogoMode(s32 nShape) {
-    lbl_802824B8->nShape = nShape;
-    lbl_802824B8->bDirty = 1;
+    gpLogoEdit->nShape = nShape;
+    gpLogoEdit->bDirty = 1;
 }
 
 // Palette colour nColor as 0-255 components: the entry is 5-5-5 RGB (red in bits 10-14, green 5-9,
@@ -83,7 +83,7 @@ void FE_LogoDesign_GetClutEntry(int nColor, u32* pR, u32* pG, u32* pB, u32* pA) 
 // Marks the logo being edited changed, so FE_LogoDesign_UploadCustomLogo copies it into its texture
 // on the next frame.
 void FE_LogoDesign_RefreshLogo(void) {
-    lbl_802824B8->bDirty = 1;
+    gpLogoEdit->bDirty = 1;
 }
 
 // Fills the logo being edited with the pixels of the texture named pName (fn_8000BD80), taken out
@@ -96,7 +96,7 @@ void FE_LogoDesign_SetLogoToPremadeTexture(char* pName) {
     int nWidth;
     int nHeight;
     if (fn_8000BD80(pName, &pPixels)) {
-        if (lbl_802824B8->nShape == LOGO_SQUARE) {
+        if (gpLogoEdit->nShape == LOGO_SQUARE) {
             nWidth = 64;
             nHeight = 64;
         } else {
@@ -115,13 +115,13 @@ void FE_LogoDesign_SetPixel(int nX, int nY, int nColor) {
     pLogo = FE_LogoDesign_GetCurrentLogo()->aPixels;
     n = FE_LogoDesign_GetPixelIndex(nX, nY);
     pLogo[n] = nColor;
-    lbl_802824B8->bDirty = 1;
+    gpLogoEdit->bDirty = 1;
 }
 
 // Pixel (nX, nY)'s index in the logo's rows (LogoRecord.aPixels): nX + nY * 64 for a square logo,
 // nX + nY * 128 for a rectangular one; -1 when it is off the logo or the editor's shape is neither.
 int FE_LogoDesign_GetPixelIndex(int nX, int nY) {
-    s32 nShape = lbl_802824B8->nShape;
+    s32 nShape = gpLogoEdit->nShape;
     if (nShape == LOGO_SQUARE) {
         if (nX < 0 || nX >= 64 || nY < 0 || nY >= 64) {
             return -1;
@@ -149,9 +149,9 @@ void FE_LogoDesign_UploadCustomLogo(void) {
     u8* pPixels;
     int nWidth;
     int nHeight;
-    if (lbl_802824B8->bDirty) {
-        lbl_802824B8->bDirty = 0;
-        if (lbl_802824B8->nShape == LOGO_SQUARE) {
+    if (gpLogoEdit->bDirty) {
+        gpLogoEdit->bDirty = 0;
+        if (gpLogoEdit->nShape == LOGO_SQUARE) {
             pName = "__LogoSquare";
         } else {
             pName = "__LogoRect";
@@ -162,7 +162,7 @@ void FE_LogoDesign_UploadCustomLogo(void) {
         }
         if (pTex != NULL) {
             pPixels = pBank->p18 + pTex->aMips[0].uPixels;
-            if (lbl_802824B8->nShape == LOGO_SQUARE) {
+            if (gpLogoEdit->nShape == LOGO_SQUARE) {
                 nWidth = 64;
                 nHeight = 64;
             } else {
@@ -182,12 +182,12 @@ void FE_LogoDesign_LoadClut(void) {
     TexBank* pBank;
     TexEntry* pTex;
     s16* pPalette;
-    if (lbl_802824C0 == 0) {
+    if (gbLogoClutLoaded == 0) {
         fn_8000BDF8("__LogoSquare", &pBank, &pTex);
         if (pTex != NULL) {
             pPalette = FE_LogoDesign_GetClut();
             Mem_cpy(pPalette, pBank->p20 + pBank->pC[pTex->nPalette].uColors, pBank->n24);
-            lbl_802824C0 = 1;
+            gbLogoClutLoaded = 1;
         }
     }
 }
@@ -198,14 +198,14 @@ LogoRecord* FE_LogoDesign_GetCurrentLogo(void) {
     if (gpFEProfile->bEditingCopy) {
         return &gpFEProfile->logoCopy;
     }
-    return &FE_GetCurrentProfile()->choices.aLogo[lbl_802824B8->n0];
+    return &FE_GetCurrentProfile()->choices.aLogo[gpLogoEdit->n0];
 }
 
 // The logo palette (CLUT): 256 colours of 16 bits (see FE_LogoDesign_GetClutEntry).
 // char_tex_manager.c gives it to the golfer's five user logo textures
 // (CharacterTex_GetUserLogoPalette).
 s16* FE_LogoDesign_GetClut(void) {
-    return lbl_802824BC;
+    return gpLogoClut;
 }
 
 // Pixel (nX, nY) of the logo being edited: returns its palette colour index and gives that colour's
