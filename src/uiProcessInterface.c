@@ -322,7 +322,7 @@ void fn_8008F820(void) {
                     }
                 }
                 if (lbl_80189B38[k] > 10) {
-                    fn_800E4F88(k);
+                    GUI_SendButtonHeld(k);
                     lbl_80189B38[k] = 0;
                 }
             }

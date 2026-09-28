@@ -44,14 +44,15 @@ void StaticMem_Shutdown(void) {
     gStaticMemSpans = NULL;
 }
 
-// Empty in this build; main calls it first, before the start-up list fn_80005520. Left unnamed: an
-// empty body says nothing about what it was for.
-void fn_800097C4(void) {
+// Empty in this build: main calls it first, before the start-up list fn_80005520. What it did in
+// EA's build is not known; its place in StaticMemory.c and TW07's empty Mem_InitOnce (LLMem.c) give
+// the name.
+void StaticMem_InitOnce(void) {
 }
 
-// Empty in this build; called early in the start-up list fn_80005520, before StaticMem_Init. Left
-// unnamed: an empty body says nothing about what it was for.
-void fn_800097C8(void) {
+// Empty in this build: the start-up list fn_80005520 calls it second, before StaticMem_Init takes
+// the heap. What it did in EA's build is not known.
+void StaticMem_PreInit(void) {
 }
 
 // Takes the heap from the system heap at start-up: first a span table of 1028 entries, then the
@@ -96,9 +97,10 @@ void StaticMem_Reset(void) {
     gStaticMemCursor = 1;
 }
 
-// Empty in this build; runs last in the once-only set-up fn_8006C720 and in the per-mode shut-down
-// fn_8006C854. Left unnamed: an empty body says nothing about what it was for.
-void fn_80009918(void) {
+// Empty in this build: the last call of gomainloop's once-only set-up fn_8006C720 (which starts
+// with StaticMem_Reset) and of the per-mode shut-down fn_8006C854. What it did in EA's build is not
+// known.
+void StaticMem_Checkpoint(void) {
 }
 
 // The first free span of at least nSize bytes, searching up from the cursor to the top, then from

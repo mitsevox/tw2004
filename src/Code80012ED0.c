@@ -9,7 +9,7 @@
 #include "engine.h"
 #include "camera.h"
 
-void fn_80012FA0(void);
+void DS_vInitOnce(void);
 
 // A viewport's height, as a fraction of the frame buffer's (1: all of it).
 f32 VM_fGetViewportHeight(f32* pRect) {
@@ -69,7 +69,8 @@ void DS_vSetAlphaTestMode(int bEnable, int nCompare, int nRef) {
     gRenderState.uChanged |= 0x4;
 }
 
-// Empty; called once by the boot sequence fn_80005520, as some module's start-up step. Nothing in
-// it or its caller says which module, so it keeps its address name.
-void fn_80012FA0(void) {
+// Empty in this build: the start-up list fn_80005520 calls it once. It ends the file of the
+// display-state setters (DS_v...), whose per-mode start-up and shut-down are DS_vInitModule and
+// DS_vCloseModule; which module it served is not proven.
+void DS_vInitOnce(void) {
 }

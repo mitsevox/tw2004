@@ -549,7 +549,7 @@ typedef struct CrAPState {
     u8   b84;                   // 0x084
     u8   b85;                   // 0x085
     u8   b86;                   // 0x086  set by a menu message; a change while n0 is 3 calls
-                                //        fn_8008E354
+                                //        FE_OnGolferHiddenChanged
     u8   b87;                   // 0x087
     u8   b88;                   // 0x088
     u8   b89;                   // 0x089

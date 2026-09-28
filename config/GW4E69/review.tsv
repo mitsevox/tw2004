@@ -1097,3 +1097,14 @@ address	name	comment	by	date
 801117D0	HwsBurn_CopyMaterials	rewrite	ri4 (replayed by orchestrator)	2026-09-28
 80111850	HwsBurn_BuildDesc	rewrite	ri4 (replayed by orchestrator)	2026-09-28
 80111EB0	HwsBurn_Burn	rewrite	ri4 (replayed by orchestrator)	2026-09-28
+800097C4	StaticMem_InitOnce	rewrite	ri1 (replayed by orchestrator)	2026-09-28
+800097C8	StaticMem_PreInit	rewrite	ri1 (replayed by orchestrator)	2026-09-28
+80009918	StaticMem_Checkpoint	rewrite	ri1 (replayed by orchestrator)	2026-09-28
+8000AF1C	Math_PreInitLog2Table	rewrite	ri1 (replayed by orchestrator)	2026-09-28
+80012FA0	DS_vInitOnce	rewrite	ri1 (replayed by orchestrator)	2026-09-28
+8001A484	CharacterTex_PreReleasePoolEntries	rewrite	ri1 (replayed by orchestrator)	2026-09-28
+8008C938	FE_BeginRenderGolferPhase1	rewrite	ri1 (replayed by orchestrator)	2026-09-28
+8008E354	FE_OnGolferHiddenChanged	rewrite	ri1 (replayed by orchestrator)	2026-09-28
+800E3B04	GUI_SendMessage31	keep	ri1 (replayed by orchestrator)	2026-09-28
+800E4F88	GUI_SendButtonHeld	keep	ri1 (replayed by orchestrator)	2026-09-28
+80105644	FE_CrAP_GetPartValue	keep	ri1 (replayed by orchestrator)	2026-09-28

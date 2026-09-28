@@ -1575,9 +1575,10 @@ void CharacterTex_TakePoolEntries(Character* pChar) {
     }
 }
 
-// Empty in this build: the pool code calls it with each character just before the character gives
-// its pool entries back. Left unnamed: there is nothing in it to read a name from.
-void fn_8001A484(Character* pChar) {
+// Empty in this build: CharacterTex_PreHoleInit and CharacterTex_StartStreamingPlayers call it with
+// a character just before that character gives its dynamic-texture pool entries back
+// (CharacterTex_ReleasePoolEntries).
+void CharacterTex_PreReleasePoolEntries(Character* pChar) {
 }
 
 // Runs one step of the dynamic texture loader (fn_8010BFE0) each frame from the main loop, with
@@ -1598,7 +1599,7 @@ void CharacterTex_PreHoleInit(void) {
     gCharTexStreamedPlayer = -1;
     if (gSession.nNumPlayers > 2) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
-            fn_8001A484(gPlayers[i].pChar);
+            CharacterTex_PreReleasePoolEntries(gPlayers[i].pChar);
             CharacterTex_ReleasePoolEntries(gPlayers[i].pChar);
         }
         i = gpGame->pfnGetHonors(5);
@@ -1630,7 +1631,7 @@ void CharacterTex_StartStreamingPlayers(int nPlayer) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
             if (i != nPlayer && gPlayers[i].pChar->apDynTex[gPlayers[i].pChar->nCurDynTex] != NULL &&
                 gPlayers[i].pChar != gCharDynTexPool.a[6].p) {
-                fn_8001A484(gPlayers[i].pChar);
+                CharacterTex_PreReleasePoolEntries(gPlayers[i].pChar);
                 CharacterTex_ReleasePoolEntries(gPlayers[i].pChar);
                 gPlayers[i].pChar->bTexLoaded = 0;
                 gPlayers[i].pChar->u10 |= 0x40;
@@ -1641,7 +1642,7 @@ void CharacterTex_StartStreamingPlayers(int nPlayer) {
             if (pChar != pQueued) {
                 fn_8010BF68();
                 if (pQueued != NULL) {
-                    fn_8001A484(pQueued);
+                    CharacterTex_PreReleasePoolEntries(pQueued);
                     CharacterTex_ReleasePoolEntries(pQueued);
                     pQueued->bTexLoaded = 0;
                     pQueued->u10 |= 0x40;

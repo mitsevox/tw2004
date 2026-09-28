@@ -408,7 +408,7 @@ u8   GM_CheckForBallInHole(int nPlayer);
 u8   GM_RenderBallTarget(int nPlayer);          // placing the ball (state 22), or the mode says so
 u8   GM_Currently_SkillZoneMode(void);
 u8   GM_IsSpeedGolfMode(void);                 // modes 6, 7 and 8
-void fn_800E3B04(void);
+void GUI_SendMessage31(void);
 
 // GameUI.c
 void GUI_Init(void);
@@ -435,7 +435,7 @@ u8   GUI_ScoreCardUp(void);
 void GUI_BetweenHolesScorecard(u8 bHuman);            // opens the end-of-hole screen, or defers it
 void GUI_SetEndOfHolePending(void);
 void GUI_EndOfGameScorecard(u8 bHuman);            // opens the end-of-round screen, or defers it
-void fn_800E4F88(int nPlayer);
+void GUI_SendButtonHeld(int nPlayer);
 void fn_800E5240(int i);                // GameMessages.c: clears slot i of lbl_80202B88
 
 // The display state (GameUI.c's data; GameMessages.c and GameAnalysis.c use some of it). Twelve

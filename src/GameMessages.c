@@ -108,7 +108,7 @@ void fn_800E522C(int n) {
     lbl_80202B88[n] = 1;
 }
 
-// If slot i of lbl_80202B88 is set: clears it and, with no slot left set, calls fn_800E3B04,
+// If slot i of lbl_80202B88 is set: clears it and, with no slot left set, calls GUI_SendMessage31,
 // then sets nPaused to 0 if it was 2 (after the resume calls), else to 1.
 void fn_800E5240(int i) {
     int k;
@@ -123,7 +123,7 @@ void fn_800E5240(int i) {
                 return;
             }
         }
-        fn_800E3B04();
+        GUI_SendMessage31();
         if (gSession.nPaused == 2) {
             if (!TI_bCounterIsRunning(1)) {
                 TI_vStartCounter(1);

@@ -100,7 +100,7 @@ void FE_StreamWaitForState(int nState);
 void FE_StreamStopForClose(void);
 void FE_StreamPopState(void);
 void FE_StreamUpdateState(void);
-void fn_8008C938(void);
+void FE_BeginRenderGolferPhase1(void);
 void FE_ClearGolferFrame(void);
 void FE_DrawGolferTexture(void);
 void FE_DrawGolferAlphaMask(void);
@@ -920,7 +920,7 @@ void FE_vUpdateGolferAll(void) {
 void FE_vRenderGolferAllPhase1(void) {
     if (gpCrAPState->pB4->b18 && gpCrAPState->b86 == 0 && gpCrAPState->b88 == 0 && gFEOffscreenBufferRender != 0) {
         gpCrAPState->b18C = 1;
-        fn_8008C938();
+        FE_BeginRenderGolferPhase1();
         FE_ClearGolferFrame();
         FE_RenderGolfer(0);
         fn_800B9CF0(0);
@@ -945,9 +945,9 @@ void FE_vRenderGolferAllPhase2(void) {
     }
 }
 
-// Empty; FE_vRenderGolferAllPhase1 calls it first. Nothing says what it was for, so it keeps its
-// address name.
-void fn_8008C938(void) {
+// Empty in this build: FE_vRenderGolferAllPhase1 calls it first when it draws the menu golfer off
+// screen, before FE_ClearGolferFrame.
+void FE_BeginRenderGolferPhase1(void) {
 }
 
 // Clear the 512 x 448 frame to transparent black: a full-frame quad of (0, 0, 0, 0) with colour and
@@ -1546,9 +1546,9 @@ void FE_SetCrapRotation(u8 bTarget, f32 fAngle) {
     }
 }
 
-// Empty; a menu message (FE_MessageTable.c fn_8007C254) calls it when the golfer is hidden or shown
-// (b86) on screen kind 3. Nothing says what it was for, so it keeps its address name.
-void fn_8008E354(void) {
+// Empty in this build: the menu message FE_MessageTable.c fn_8007C254 calls it when it changes
+// gpCrAPState->b86 (the golfer is not drawn while it is set) while the CrAP screen kind n0 is 3.
+void FE_OnGolferHiddenChanged(void) {
 }
 
 // bOn: the menu golfer is drawn off screen, copied into the screen-copy texture

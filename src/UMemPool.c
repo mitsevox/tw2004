@@ -588,16 +588,15 @@ void Math_FillLog2Table(void) {
     } while (i < 0x400);
 }
 
-// Empty in this build; the log2 table's start-up calls it first. Left unnamed: an empty body says
-// nothing about what it was for (TW07's UMath.c keeps four empty module functions, MF_vInitOnce to
-// MF_vCloseModule).
-void fn_8000AF1C(void) {
+// Empty in this build: Math_InitLog2Table calls it first, before it takes and fills the table.
+// TW07's UMath.c keeps four empty module functions of this kind (MF_vInitOnce to MF_vCloseModule).
+void Math_PreInitLog2Table(void) {
 }
 
 // Makes the log2 table (gLog2Table) at start-up: 1024 floats from the system heap, filled by
 // Math_FillLog2Table. Nothing in this build reads the table.
 void Math_InitLog2Table(void) {
-    fn_8000AF1C();
+    Math_PreInitLog2Table();
     gLog2Table = fn_800951A0(0x400 * sizeof(f32), 16, 1);
     Math_FillLog2Table();
 }

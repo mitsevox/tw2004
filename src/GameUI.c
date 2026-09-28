@@ -72,7 +72,7 @@ u8  lbl_80282280;
 
 // Clears every display flag, queue count and pending message at the start of a hole
 // (GM_InitForHole) and when it restarts (GM_RestartHole); also clears GameMessages' lbl_80203138
-// flags (fn_800E5DA0) and sends UI message 31 (fn_800E3B04).
+// flags (fn_800E5DA0) and sends UI message 31 (GUI_SendMessage31).
 void GUI_Init(void) {
     lbl_802822DF = 0;
     lbl_802822DC[0] = 0;
@@ -113,7 +113,7 @@ void GUI_Init(void) {
     lbl_802822BC = 0;
     lbl_80282280 = 0;
     fn_800E5DA0();
-    fn_800E3B04();
+    GUI_SendMessage31();
 }
 
 u8    fn_8010D364(void);
@@ -671,7 +671,7 @@ void GUI_EndOfGameScorecard(u8 bHuman) {
 // Sends UI message 59 with a controller number: uiProcessInterface's input loop (fn_8008F820)
 // calls it in game type 6 when that controller has held button 0x20 of the button table for more
 // than 10 frames.
-void fn_800E4F88(int nPlayer) {
+void GUI_SendButtonHeld(int nPlayer) {
     GameMsg_SendInt(59, nPlayer);
 }
 

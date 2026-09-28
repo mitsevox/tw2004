@@ -282,7 +282,7 @@ typedef struct CrAPAsset {
     s16  n44;                   // 0x044  } its three colour ids (FE_CrAP_GetPartColor1..3;
     s16  n46;                   // 0x046  } TW06 color1..color3)
     s16  n48;                   // 0x048  }
-    s8   a4A[6];                // 0x04A  indexed by fn_80105644's last argument
+    s8   a4A[6];                // 0x04A  indexed by FE_CrAP_GetPartValue's last argument
     s8   aColorKind[6];         // 0x050  per colour: 0..2 take the skin option's colour of that
                                 //        kind (FE_CrAP_GetPartColorRGBA); -1 and others use aColor
     u8   unk56[2];
@@ -403,7 +403,7 @@ int  FE_CrAP_GetPartAttributeUpgrade2(s16 nPart, int b, int i);
 int  FE_CrAP_GetPartAttributeModifier2(s16 nPart, int b, int i);
 s8   FE_CrAP_GetPartGMLockID(s16 nPart, int b, int i);
 s16  FE_CrAP_GetPartGMLockVal(s16 nPart, int b, int i);
-int  fn_80105644(s16 nPart, int b, int i, int n);
+int  FE_CrAP_GetPartValue(s16 nPart, int b, int i, int n);
 void FE_CrAP_GetPartColorRGBA(s16 nPart, int b, int i, int n, u8* pColor);  // pColor: 4 bytes
 void FE_CrAP_GetPartVariantName(s16 nPart, int b, int i, char* pName);
 u8   FE_CrAP_IsItemEquipped(s16 nPart, int b, int i);

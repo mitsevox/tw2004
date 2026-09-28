@@ -34,7 +34,7 @@ void fn_80107828(MsgArg* pArgs, MsgArg* pResult) {
     if (i < 0 || i >= nChoices) {
         pResult->i = 0;
     } else {
-        pResult->i = fn_80105644(nPart, b, i, n);
+        pResult->i = FE_CrAP_GetPartValue(nPart, b, i, n);
     }
 }
 

@@ -21,7 +21,7 @@
 // Outside this file.
 void fn_800142A4(s8 n);                 // sets lbl_80281C98
 void fn_80057438(SaveProfile* pProfile);
-void fn_8008E354(void);                 // FEgolferanim.c
+void FE_OnGolferHiddenChanged(void);                 // FEgolferanim.c
 void fn_8008F80C(s32 p0, s32 p1);       // uiProcessInterface.c
 void FE_SetOffscreenBufferRender(s32 p0);               // FEgolferanim.c
 s32  MC_LoadUser(MCCardPosStr* pPos);   // MC.c
@@ -1492,7 +1492,7 @@ void fn_8007C254(MsgArg* pArgs, MsgArg* pResult) {
     bOld = gpCrAPState->b86;
     gpCrAPState->b86 = pArgs[0].i;
     if (bOld != gpCrAPState->b86 && gpCrAPState->n0 == 3) {
-        fn_8008E354();
+        FE_OnGolferHiddenChanged();
     }
 }
 

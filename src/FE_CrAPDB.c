@@ -1112,7 +1112,7 @@ s16 FE_CrAP_GetPartGMLockValByAssetNum(int nAsset) {
 // (FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum), or -1 when there is no such choice.
 // The UI reads it through FE_CrAPMessages.c fn_80107828. What a4A holds is not known; it has six
 // entries, like the asset's six colours.
-int fn_80105644(s16 nPart, int b, int i, int n) {
+int FE_CrAP_GetPartValue(s16 nPart, int b, int i, int n) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return -1;

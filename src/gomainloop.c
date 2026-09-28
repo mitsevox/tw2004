@@ -27,7 +27,7 @@ void fn_800081C4(void);
 void fn_80008380(void);
 void fn_800083A0(void);
 void StaticMem_Reset(void);
-void fn_80009918(void);
+void StaticMem_Checkpoint(void);
 void fn_8000F060(void);
 void fn_8000F0E8(void);
 void fn_800103C0(void);
@@ -413,7 +413,7 @@ void fn_8006C720(void) {
     fn_800A2064();
     fn_8010F6C8();
     EASBio_InitOnce();
-    fn_80009918();
+    StaticMem_Checkpoint();
 }
 
 void fn_8006C770(void) {
@@ -497,7 +497,7 @@ void fn_8006C854(void) {
     fn_800081C4();
     fn_8002F540();
     fn_800B5C3C();
-    fn_80009918();
+    StaticMem_Checkpoint();
 }
 
 // Makes view nView's camera the current render camera and applies it, then draws the full-screen
