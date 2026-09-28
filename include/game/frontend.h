@@ -198,7 +198,7 @@ void IG_RunGameMessage(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // a round 
 void fn_800B1D3C(int nCmd, MsgArg* pArgs, MsgArg* pResult);    // start-up (startUp.c)
 
 extern MsgHandler lbl_801F5DA8[30];     // start-up's handlers (fn_800B1D78 fills 0..22)
-void fn_80083D88(MsgArg* pArgs, MsgArg* pResult);  // FE_MessageTable.c; start-up's command 22 too
+void GM_vGetDiscChangeStatus(MsgArg* pArgs, MsgArg* pResult);  // FE_MessageTable.c; start-up's command 22 too
 
 // The round's handlers (GameUICommands.c): IG_InitGameMessages fills the table. Entries 0 and 119 stay
 // empty.

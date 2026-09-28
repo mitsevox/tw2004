@@ -198,8 +198,8 @@ void GameModeDriverPGATour_SetTournament(s32 i) {
     fn_80055C40(gSession.options.n18);
 }
 
-// A round of the current tournament is about to start (front-end message fn_80083BFC). The options'
-// nC and nWind are saved (Shutdown puts them back) and set to 4 and calm, the tour-round flag
+// A round of the current tournament is about to start (front-end message GM_vStartEventCheckDisc).
+// The options' nC and nWind are saved (Shutdown puts them back) and set to 4 and calm, the tour-round flag
 // (GM_Currently_PgaTourMode) set, the playoff hole reset and the win info cleared. For a tournament
 // with a format: one player, the round number and count, the format's course set up
 // (SetTournament), the user-quit flag cleared, the round started for the field

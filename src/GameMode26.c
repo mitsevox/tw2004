@@ -119,7 +119,7 @@ void GameMode26_Init(void) {
 void GameMode26_Shutdown(void) {
 }
 
-// Starts a mode-26 event: from the menus (FE_MessageTable.c fn_80083BFC, as GameMode22_StartEvent
+// Starts a mode-26 event: from the menus (FE_MessageTable.c GM_vStartEventCheckDisc, as GameMode22_StartEvent
 // for mode 22) and, with session flag 0x4000, from GoEntry.c as the front end starts again. Both
 // players on tee set 0, options.n20 off, and no winner (gGameMode26Winner 5).
 void GameMode26_StartEvent(void) {
@@ -517,7 +517,7 @@ void GameMode26_PreSwing(void) {
 }
 
 // The score that wins (gGameMode26TargetScore, 10000 until set), from the menu (FE_MessageTable.c
-// fn_80083BA4).
+// GM_vSetLongDriveTargetScore).
 void GameMode26_SetTargetScore(s32 nScore) {
     gGameMode26TargetScore = nScore;
 }

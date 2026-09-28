@@ -1160,7 +1160,7 @@ void Lessons_PauseMenuClosed(void) {
     gLessonPauseClosed = 1;
 }
 
-// The front end starts the lessons (fn_80083BFC): the round's setup (Lessons_StartGamePreData,
+// The front end starts the lessons (GM_vStartEventCheckDisc): the round's setup (Lessons_StartGamePreData,
 // which also puts golfer 1 in place of the golfer the front end just chose) with player 0 on the
 // first controller.
 void Lessons_StartFromMenu(void) {

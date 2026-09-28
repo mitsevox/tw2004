@@ -1654,5 +1654,5 @@ void fn_800B22D4(MsgArg* pArgs, MsgArg* pResult) {
 
 // Command 22.
 void fn_800B22F4(MsgArg* pArgs, MsgArg* pResult) {
-    fn_80083D88(pArgs, pResult);
+    GM_vGetDiscChangeStatus(pArgs, pResult);
 }

@@ -281,7 +281,7 @@ void GameMode22_Shutdown(void) {
 void GameMode22_Unused1F0(void) {
 }
 
-// Starts a long-drive event from the menus (FE_MessageTable.c fn_80083BFC, as
+// Starts a long-drive event from the menus (FE_MessageTable.c GM_vStartEventCheckDisc, as
 // GameModeDriverRTE_StartEvent does for mode 24): every player on tee set 0, options.n20 off, no
 // winner (nWinner 5, bDecided 0), no longest drive yet (fLongestDrive 0, nLongestDriver 5), and the
 // 120-frame winner countdown (nWinnerFrames) reset.

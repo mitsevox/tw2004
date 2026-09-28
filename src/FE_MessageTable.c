@@ -639,35 +639,35 @@ void GM_vFEMessage363_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vFEMessage364_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vFEMessage365_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vFEMessage366_Empty(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083930(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083934(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083964(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083970(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083974(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083A44(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083A48(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083A4C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083BA4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083BC8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083BFC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083E48(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083E70(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083E94(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083EB8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083EBC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083EE0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083F54(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083F60(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084008(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008410C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084158(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008415C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084160(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084190(MsgArg* pArgs, MsgArg* pResult);
-void fn_800841C0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084208(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008422C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084258(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage367_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetLeftHanded(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage369_Return0(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage370_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetThreeLevelsOneRaised(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage372_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage380_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMaskString(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetLongDriveTargetScore(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSwapDisc(MsgArg* pArgs, MsgArg* pResult);
+void GM_vStartEventCheckDisc(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGbaStartLink(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGbaTakeCash(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGbaSwapStats(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage595_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGbaCancelLink(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGbaGrantUnlocks(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage630_Return0(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGbaGetLinkState(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGbaReadCashAndStats(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGbaAddCashToMove(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage618_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage619_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGbaIsReadPending(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGbaGetGbaCash(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGbaIsLinkFailed(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGbaResumeLink(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioListProducts(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioListAccomplishments(MsgArg* pArgs, MsgArg* pResult);
 void fn_80084288(MsgArg* pArgs, MsgArg* pResult);
 void fn_800842AC(MsgArg* pArgs, MsgArg* pResult);
 void fn_800842D0(MsgArg* pArgs, MsgArg* pResult);
@@ -1098,19 +1098,19 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[364] = GM_vFEMessage364_Empty;
     gFEMessageHandlers[365] = GM_vFEMessage365_Empty;
     gFEMessageHandlers[366] = GM_vFEMessage366_Empty;
-    gFEMessageHandlers[367] = fn_80083930;
-    gFEMessageHandlers[368] = fn_80083934;
-    gFEMessageHandlers[369] = fn_80083964;
-    gFEMessageHandlers[370] = fn_80083970;
-    gFEMessageHandlers[371] = fn_80083974;
-    gFEMessageHandlers[372] = fn_80083A44;
+    gFEMessageHandlers[367] = GM_vFEMessage367_Empty;
+    gFEMessageHandlers[368] = GM_vSetLeftHanded;
+    gFEMessageHandlers[369] = GM_vFEMessage369_Return0;
+    gFEMessageHandlers[370] = GM_vFEMessage370_Empty;
+    gFEMessageHandlers[371] = GM_vGetThreeLevelsOneRaised;
+    gFEMessageHandlers[372] = GM_vFEMessage372_Empty;
     gFEMessageHandlers[374] = GM_vGetFairwaySpeedOption;
     gFEMessageHandlers[375] = GM_vSetFairwaySpeedOption;
-    gFEMessageHandlers[380] = fn_80083A48;
+    gFEMessageHandlers[380] = GM_vFEMessage380_Empty;
     gFEMessageHandlers[381] = GM_vGetNumCrAPItems;
     gFEMessageHandlers[382] = GM_vGetCrAPItemValue;
     gFEMessageHandlers[383] = GM_vGetCrAPItemColor;
-    gFEMessageHandlers[399] = fn_80083A4C;
+    gFEMessageHandlers[399] = GM_vMaskString;
     gFEMessageHandlers[404] = GM_vFEMessage404_Empty;
     gFEMessageHandlers[405] = GM_vFEMessage405_Empty;
     gFEMessageHandlers[406] = GM_vSetCRAPSlider;
@@ -1173,9 +1173,9 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[563] = PGASponsor_SignNext;
     gFEMessageHandlers[742] = PGATourMsg_SetStatsDirty;
     gFEMessageHandlers[743] = PGATourMsg_SetScoresDirty;
-    gFEMessageHandlers[472] = fn_80083BFC;
-    gFEMessageHandlers[465] = fn_80083BC8;
-    gFEMessageHandlers[473] = fn_80083D88;
+    gFEMessageHandlers[472] = GM_vStartEventCheckDisc;
+    gFEMessageHandlers[465] = GM_vSwapDisc;
+    gFEMessageHandlers[473] = GM_vGetDiscChangeStatus;
     gFEMessageHandlers[468] = Calendar_FillCell;
     gFEMessageHandlers[469] = Calendar_GetLine;
     gFEMessageHandlers[483] = Calendar_GetBottomLine;
@@ -1206,7 +1206,7 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[514] = GM_vSetLogoName;
     gFEMessageHandlers[583] = GM_vGetLogoPaletteEntry;
     gFEMessageHandlers[584] = GM_vGetLogoPixel;
-    gFEMessageHandlers[518] = fn_80083BA4;
+    gFEMessageHandlers[518] = GM_vSetLongDriveTargetScore;
     gFEMessageHandlers[536] = FE_GetNextRealtimeEventInfo;
     gFEMessageHandlers[544] = FE_GetDateTimeIfClockEarly;
     gFEMessageHandlers[543] = GM_vCRAPCreatingLogo;
@@ -1222,10 +1222,10 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[576] = LadderMenu_MoveCursor;
     gFEMessageHandlers[579] = LadderMenu_GetNodeEventN0;
     gFEMessageHandlers[580] = LadderMenu_GetFirstAndCursorNodePos;
-    gFEMessageHandlers[592] = fn_80083E48;
-    gFEMessageHandlers[593] = fn_80083E70;
-    gFEMessageHandlers[594] = fn_80083E94;
-    gFEMessageHandlers[595] = fn_80083EB8;
+    gFEMessageHandlers[592] = GM_vGbaStartLink;
+    gFEMessageHandlers[593] = GM_vGbaTakeCash;
+    gFEMessageHandlers[594] = GM_vGbaSwapStats;
+    gFEMessageHandlers[595] = GM_vFEMessage595_Empty;
     gFEMessageHandlers[596] = LadderMenu_GetAngleBetween;
     gFEMessageHandlers[599] = GM_vGetGreenGridOption;
     gFEMessageHandlers[600] = GM_vSetGreenGridOption;
@@ -1234,22 +1234,22 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[608] = GM_vGetProfileProgress;
     gFEMessageHandlers[609] = GM_vFEMessage609_Empty;
     gFEMessageHandlers[610] = GM_vIsBonusTrophyBallWon;
-    gFEMessageHandlers[611] = fn_80083EBC;
-    gFEMessageHandlers[612] = fn_80083F60;
-    gFEMessageHandlers[623] = fn_80084008;
-    gFEMessageHandlers[624] = fn_8008410C;
-    gFEMessageHandlers[630] = fn_80083F54;
-    gFEMessageHandlers[629] = fn_80083EE0;
-    gFEMessageHandlers[633] = fn_80084160;
-    gFEMessageHandlers[653] = fn_80084190;
-    gFEMessageHandlers[654] = fn_800841C0;
-    gFEMessageHandlers[748] = fn_80084208;
-    gFEMessageHandlers[618] = fn_80084158;
-    gFEMessageHandlers[619] = fn_8008415C;
+    gFEMessageHandlers[611] = GM_vGbaCancelLink;
+    gFEMessageHandlers[612] = GM_vGbaGetLinkState;
+    gFEMessageHandlers[623] = GM_vGbaReadCashAndStats;
+    gFEMessageHandlers[624] = GM_vGbaAddCashToMove;
+    gFEMessageHandlers[630] = GM_vFEMessage630_Return0;
+    gFEMessageHandlers[629] = GM_vGbaGrantUnlocks;
+    gFEMessageHandlers[633] = GM_vGbaIsReadPending;
+    gFEMessageHandlers[653] = GM_vGbaGetGbaCash;
+    gFEMessageHandlers[654] = GM_vGbaIsLinkFailed;
+    gFEMessageHandlers[748] = GM_vGbaResumeLink;
+    gFEMessageHandlers[618] = GM_vFEMessage618_Empty;
+    gFEMessageHandlers[619] = GM_vFEMessage619_Empty;
     gFEMessageHandlers[607] = TrophyRoom_CountEventsInMonth;
     gFEMessageHandlers[613] = TrophyRoom_GetPlaceholderText;
-    gFEMessageHandlers[614] = fn_8008422C;
-    gFEMessageHandlers[615] = fn_80084258;
+    gFEMessageHandlers[614] = GM_vEASBioListProducts;
+    gFEMessageHandlers[615] = GM_vEASBioListAccomplishments;
     gFEMessageHandlers[616] = fn_80084288;
     gFEMessageHandlers[617] = fn_800842AC;
     gFEMessageHandlers[620] = GM_vGetPar5EagleDate;
@@ -5476,23 +5476,29 @@ void GM_vFEMessage365_Empty(MsgArg* pArgs, MsgArg* pResult) {
 void GM_vFEMessage366_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083930(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 367: empty in this build.
+void GM_vFEMessage367_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083934(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 368: the working profile's created golfer is left-handed when pArgs[0] is set
+// (FE_SetProfileLeftHanded).
+void GM_vSetLeftHanded(MsgArg* pArgs, MsgArg* pResult) {
     FE_SetProfileLeftHanded(lbl_80281ED4->nSlot, pArgs[0].i);
 }
 
-void fn_80083964(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 369: answers 0.0 (as a float).
+void GM_vFEMessage369_Return0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->f = 0.0f;
 }
 
-void fn_80083970(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 370: empty in this build.
+void GM_vFEMessage370_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Three values out: 50, 50 and a level of 25..250 (pArgs[3] mod 10, plus one, times 25), the
-// level going to the one of the three pArgs[2] mod 3 picks.
-void fn_80083974(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 371: three values out through the words pArgs[4], pArgs[5] and pArgs[6] point
+// at: two are 50, and the one pArgs[2] % 3 picks (0, 1, 2) is a level of 25..250, (pArgs[3] % 10 +
+// 1) * 25. What the menus use the three for is not known.
+void GM_vGetThreeLevelsOneRaised(MsgArg* pArgs, MsgArg* pResult) {
     s32 nWhich;
     s32 nLevel;
 
@@ -5517,14 +5523,17 @@ void fn_80083974(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80083A44(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 372: empty in this build.
+void GM_vFEMessage372_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083A48(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 380: empty in this build.
+void GM_vFEMessage380_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Fill string pArgs[0] with pArgs[1] asterisks (a hidden entry).
-void fn_80083A4C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 399: the string pArgs[0] becomes pArgs[1] asterisks (a hidden entry: the menus
+// show a typed code as stars).
+void GM_vMaskString(MsgArg* pArgs, MsgArg* pResult) {
     char szStars[64] = "";
     int i;
     int nLen;
@@ -5537,21 +5546,29 @@ void fn_80083A4C(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[0].p)->pStr, szStars);
 }
 
-void fn_80083BA4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 518: the two-player long-drive race's (game mode 26) target score is pArgs[0]
+// (GameMode26_SetTargetScore; 10000 until set).
+void GM_vSetLongDriveTargetScore(MsgArg* pArgs, MsgArg* pResult) {
     GameMode26_SetTargetScore(pArgs[0].i);
 }
 
-void fn_80083BC8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 465: asks for the other disc (fn_801102AC: in the menus the menu golfer's
+// streaming stops and pauses and the disc change is started later by fn_80110390). Always answers
+// 0.
+void GM_vSwapDisc(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
     if (pResult->i == 0) {
         fn_801102AC();
     }
 }
 
-// Start the current game mode's event (modes 11, 5, 23, 26, 22, 24) and answer fn_80110180. In
-// modes 5 and 11 player 0 first gets golfer 0, or with profile 0 loaded the created golfer (not
-// when b11703 is set).
-void fn_80083BFC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 472: starts the current game mode's event: the lesson (mode 11), the Play Now
+// challenge (5), the PGA TOUR tee-off (23), the long-drive race (26), the long-drive contest (22)
+// or the real-time event (24). In modes 11 and 5 player 0 first gets golfer 0, or, with profile 0
+// loaded, the created golfer (FIRST_CREATED_GOLFER; not when the working profile's b11703 is set;
+// the slot's p658 row is cleared). Answers whether the course is on the disc in the drive
+// (fn_80110180, its hole-file check turned on while it runs).
+void GM_vStartEventCheckDisc(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 11) {
         if (Game_GetMode() == 5 || Game_GetMode() == 11) {
             if (gpSaveData[0].bActive) {
@@ -5591,9 +5608,12 @@ void fn_80083BFC(MsgArg* pArgs, MsgArg* pResult) {
     fn_80110178(0);
 }
 
-// The disc read's state for the menus (100: fn_80110450 says so), like GameUICommands.c's
-// IG_vGetDiscDriveStatus for the drive.
-void fn_80083D88(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 473: the state of the disc change the menus asked for (DVDGetCommandBlockStatus
+// of DiscCheck.c's command block, fn_801104A0), numbered as GameUICommands.c's
+// IG_vGetDiscDriveStatus numbers the drive's: motor stopped 0 (disc 2 in the drive) or 1 (disc 1),
+// wrong disc 2 (disc 2) or 3 (disc 1), busy 4, anything else 5; 100 once the disc change has
+// finished (fn_80110450).
+void GM_vGetDiscChangeStatus(MsgArg* pArgs, MsgArg* pResult) {
     switch (DVDGetCommandBlockStatus(fn_801104A0())) {
     case 7:
         if (fn_8011027C() != 0) {
@@ -5621,29 +5641,44 @@ void fn_80083D88(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80083E48(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 592: starts the Game Boy Advance link: the link code is set up (fn_80123FF8:
+// the disc's ID, the start tick, GBAInit) and the link state goes to 0, from which fn_801242D0
+// starts looking for a GBA.
+void GM_vGbaStartLink(MsgArg* pArgs, MsgArg* pResult) {
     fn_80123FF8();
     Gba_SetState(0);
 }
 
-void fn_80083E70(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 593: link state 6: fn_801242D0 then takes the cash from the Game Boy Advance
+// into the current profile, has the GBA save its cash and goes to state 7.
+void GM_vGbaTakeCash(MsgArg* pArgs, MsgArg* pResult) {
     Gba_SetState(6);
 }
 
-void fn_80083E94(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 594: link state 8: fn_801242D0 then swaps stats with the Game Boy Advance (the
+// best round, holes in one, longest drive and longest putt, the better of each kept in the current
+// profile), has it save them and goes to state 9.
+void GM_vGbaSwapStats(MsgArg* pArgs, MsgArg* pResult) {
     Gba_SetState(8);
 }
 
-void fn_80083EB8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 595: empty in this build.
+void GM_vFEMessage595_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083EBC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 611: puts the Game Boy Advance link in state 18 (0x12), the state a failed
+// command leaves it in: fn_801242D0 stops working the link and undoes what a pending request did to
+// the profile.
+void GM_vGbaCancelLink(MsgArg* pArgs, MsgArg* pResult) {
     Gba_SetState(18);
 }
 
-// The first time only (bit 1 of the working profile's a10548 not yet set): run fn_801240A8 and
-// fn_8012409C, set the bit and answer 1; else 0.
-void fn_80083EE0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 629: the Game Boy Advance link's unlocks, once per profile. When bit 1 of the
+// current profile's a10548 is still clear (the bit also unlocks the Create-A-Player items of lock
+// kind 2, FE_Manager.c fn_80078008): the last course (22) and rewards 0..17 are unlocked
+// (fn_801240A8), gbacable.c's lbl_80282518 is set (fn_8012409C), the bit is set and the answer is
+// 1. Else 0.
+void GM_vGbaGrantUnlocks(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
 
     if (!fn_80058304(pProfile, 1)) {
@@ -5656,13 +5691,16 @@ void fn_80083EE0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_80083F54(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 630: answers 0.
+void GM_vFEMessage630_Return0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// The Game Boy Advance link's state (Gba_GetState) as the menus number it; other states leave
-// the result as it was.
-void fn_80083F60(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 612: the Game Boy Advance link's state (Gba_GetState) as the menus number it: 0
+// looking for a GBA (state 1), 1 linked (5), 3 moving cash or stats (6, 8), 4 done moving them (7,
+// 9), 6 the GBA's context could not be read (3), 7 the contexts differ (16), 8 no GBA answered in
+// time (17), 9 a command failed (18). Other states leave the result as it was.
+void GM_vGbaGetLinkState(MsgArg* pArgs, MsgArg* pResult) {
     switch (Gba_GetState()) {
     case 1:
         pResult->i = 0;
@@ -5693,11 +5731,13 @@ void fn_80083F60(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Read five values over the Game Boy Advance link (gbacable.c) into the words pArgs[0..4] point
-// at: fn_80124174's after request 0x70, then fn_80124190's after requests 0xB0 with 0 to 3. It
-// stops once the link's state (Gba_GetState) is 18 or -1. Then, if fn_80124224 says so, a state
-// of 7 or 9 becomes 12 or 13.
-void fn_80084008(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 623: reads what the Game Boy Advance holds into the words pArgs[0..4] point at:
+// its cash (request 0x70, GbaChannel.u68), then its four stats (requests 0xB0 with 0..3: the best
+// round, holes in one, longest drive, longest putt; GbaChannel.n70). It stops once a command fails
+// (link state 18) or no link state is set (-1). Then gbacable.c's lbl_80282528 is cleared, and if
+// lbl_80282534 is set a link state of 7 becomes 12 (send the cash back) and 9 becomes 13 (copy the
+// stats into the profile) and lbl_80282534 is cleared; nothing in this build sets lbl_80282534.
+void GM_vGbaReadCashAndStats(MsgArg* pArgs, MsgArg* pResult) {
     u32 i;
 
     if (Gba_GetState() != 18 && Gba_GetState() != -1) {
@@ -5722,7 +5762,9 @@ void fn_80084008(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_8008410C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 624: adds the word pArgs[0] points at to the cash to move between the Game Boy
+// Advance and the profile (GbaChannel.n6C of the port in use) and answers the new amount.
+void GM_vGbaAddCashToMove(MsgArg* pArgs, MsgArg* pResult) {
     s32 n;
 
     n = *(s32*)pArgs[0].p;
@@ -5730,22 +5772,30 @@ void fn_8008410C(MsgArg* pArgs, MsgArg* pResult) {
     fn_80124138(pResult->i);
 }
 
-void fn_80084158(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 618: empty in this build.
+void GM_vFEMessage618_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8008415C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 619: empty in this build.
+void GM_vFEMessage619_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80084160(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 633: answers gbacable.c's flag lbl_80282528 (fn_801241CC).
+// GM_vGbaReadCashAndStats clears it after reading the Game Boy Advance, and nothing in this build
+// sets it, so the answer is always 0.
+void GM_vGbaIsReadPending(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_801241CC();
 }
 
-void fn_80084190(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 653: the cash the Game Boy Advance holds, as last read (GbaChannel.u68 of the
+// port in use).
+void GM_vGbaGetGbaCash(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_80124174();
 }
 
-// Whether gbacable.c's Gba_GetState answers 18.
-void fn_800841C0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 654: 1 when the Game Boy Advance link is in state 18 (0x12: a command failed,
+// or GM_vGbaCancelLink), else 0.
+void GM_vGbaIsLinkFailed(MsgArg* pArgs, MsgArg* pResult) {
     if (Gba_GetState() == 18) {
         pResult->i = 1;
         return;
@@ -5753,17 +5803,25 @@ void fn_800841C0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_80084208(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 748: puts the Game Boy Advance link back in state 5, linked: fn_801242D0 polls
+// the GBA and sends any pending request.
+void GM_vGbaResumeLink(MsgArg* pArgs, MsgArg* pResult) {
     Gba_SetState(5);
 }
 
 // ---- the EA Sports Bio screens (EASportsBio.c does the work) ----
 
-void fn_8008422C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 614: asks EASportsBio.c for the EA Sports Bio's list of games, from game
+// pArgs[0], with pArgs[1] as the game picked (fn_80125600); fn_80124C10 sends the list to the menus
+// on its next frame.
+void GM_vEASBioListProducts(MsgArg* pArgs, MsgArg* pResult) {
     fn_80125600(pArgs[0].i, pArgs[1].i);
 }
 
-void fn_80084258(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 615: asks EASportsBio.c for the accomplishments of the game
+// GM_vEASBioListProducts picked, from entry pArgs[0] (pArgs[1] is kept but not used), sorted by
+// time unless pArgs[2] is set (fn_80125648); fn_80124C10 sends them on its next frame.
+void GM_vEASBioListAccomplishments(MsgArg* pArgs, MsgArg* pResult) {
     fn_80125648(pArgs[0].i, pArgs[1].i, pArgs[2].i);
 }
 
