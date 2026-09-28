@@ -61,5 +61,5 @@ still missing, including the comment review those rounds skipped. No separate ba
 
 ## Pacing
 
-4 lanes at a time; batches of at most 30 functions; check usage before each round. Lanes hand in
+6 lanes at a time (owner, 2026-09-28; was 4); batches of at most 30 functions; check usage before each round. Lanes hand in
 batch files; the orchestrator replays them serially on main (lane branches conflict on callers).
