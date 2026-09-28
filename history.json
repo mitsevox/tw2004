@@ -44933,5 +44933,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "1e86bb9",
+"sha": "1e86bb93f11085cc54d449f2beff8ed4062949c0",
+"time": 1790635976,
+"subject": "FE_Manager.c, PasswordManager.c: rq2 hand edits (headers, globals' comments, EA bug labels for lock kinds 20 and 24; replayed); its lint rewraps in GameMode.c and FE_CrAPMessages.c",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
