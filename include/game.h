@@ -252,11 +252,11 @@ int  GM_Earnings_RateGolfer(int nPlayer);          // the player's earnings rati
 s32  GM_Earnings_ComputeBonusModifiers(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseMoneyTracking* pMoney);
 int  GM_Earnings_ComputeTOURCardModifiers(int nReward, int nPlayer, CourseMoneyTracking* pMoney);
 s32  Earnings_CheckShotAwards(int nPlayer, Ball* pBall, u8 b);   // one of GameEffects' GameBreaker checks
-s32  Earnings_CheckPuttAwards(int nPlayer, Ball* pBall, u8 b);   // the same through fn_800D4F14 (pBall unused)
+s32  Earnings_CheckPuttAwards(int nPlayer, Ball* pBall, u8 b);   // the same through GM_Earnings_CheckPuttGoals (pBall unused)
 u8   HighScoreRecords_CheckRecordGameSetting(int nKind);            // Earnings.c: whether records of a kind count now
-void fn_800D477C(int nPlayer, Ball* pBall, u8 b);   // Earnings.c: the shot's check
-void fn_800D4F14(int nPlayer, u8 b);                // the putt's
-void fn_800D588C(int nPlayer, u8 a, u8 bRoundOver); // the hole's
+void GM_Earnings_CheckShotGoals(int nPlayer, Ball* pBall, u8 b);   // Earnings.c: the shot's check
+void GM_Earnings_CheckPuttGoals(int nPlayer, u8 b);                // the putt's
+void GM_Earnings_CheckHoleGoals(int nPlayer, u8 a, u8 bRoundOver); // the hole's
 s32  Earnings_GetNumAwards(void);                 // gNumAwards: the entries in the three lists below
 s32  Earnings_GetShotAwardId(s32 i);                // gShotAwards[i]
 s32  Earnings_GetPuttAwardId(s32 i);                // gPuttAwards[i]

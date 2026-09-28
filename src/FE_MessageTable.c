@@ -39,7 +39,7 @@ s32  fn_800ED688(int i);                // GameMode5.c: challenge i's opponent c
 s32  fn_800ED69C(int i, int k);         // GameMode5.c: its opponent k
 u8   GM_UserHasEagledHole(int nSlot, int a, int b);      // GameRound.c
 int  GM_GetPar5EagleDate(int nSlot, int a, int b);      // GameRound.c
-int  fn_800D3D10(int nGolfer);          // Earnings.c: the golfer's rating
+int  GM_GetGolferMoneyRating(int nGolfer);          // Earnings.c: the golfer's rating
 int  GM_GetMinPlayersForMode(int nMode);            // GameRound.c
 void GM_SetSplitScreenForMode(void);                 // GameRound.c
 void GM_BuildRandom18(void);                 // GameRound.c: builds the random mixed round
@@ -3363,10 +3363,10 @@ void fn_80080208(MsgArg* pArgs, MsgArg* pResult) {
         return;
     case 0:
     case 1:
-        pResult->i = gEarningsTable.aStrokePrize[fn_800D3D10(pArgs[0].i)].nBase;
+        pResult->i = gEarningsTable.aStrokePrize[GM_GetGolferMoneyRating(pArgs[0].i)].nBase;
         return;
     case 2:
-        pResult->i = gEarningsTable.aSkins[fn_800D3D10(pArgs[0].i)].n10;
+        pResult->i = gEarningsTable.aSkins[GM_GetGolferMoneyRating(pArgs[0].i)].n10;
         return;
     case 3:
         return;
@@ -4602,27 +4602,27 @@ void fn_8008311C(MsgArg* pArgs, MsgArg* pResult) {
         nSum = 0;
         for (h = 0; h < 6; h++) {
             if (nHoles == 2 || nHoles == 1) {
-                nSum += gEarningsTable.aSkins[fn_800D3D10(nGolfer)].aValue[0];
+                nSum += gEarningsTable.aSkins[GM_GetGolferMoneyRating(nGolfer)].aValue[0];
             }
         }
         for (h = 6; h < 9; h++) {
             if (nHoles == 2 || nHoles == 1) {
-                nSum += gEarningsTable.aSkins[fn_800D3D10(nGolfer)].aValue[1];
+                nSum += gEarningsTable.aSkins[GM_GetGolferMoneyRating(nGolfer)].aValue[1];
             }
         }
         for (h = 9; h < 12; h++) {
             if (nHoles == 3 || nHoles == 1) {
-                nSum += gEarningsTable.aSkins[fn_800D3D10(nGolfer)].aValue[1];
+                nSum += gEarningsTable.aSkins[GM_GetGolferMoneyRating(nGolfer)].aValue[1];
             }
         }
         for (h = 12; h < 17; h++) {
             if (nHoles == 3 || nHoles == 1) {
-                nSum += gEarningsTable.aSkins[fn_800D3D10(nGolfer)].aValue[2];
+                nSum += gEarningsTable.aSkins[GM_GetGolferMoneyRating(nGolfer)].aValue[2];
             }
         }
         for (h = 17; h < 18; h++) {
             if (nHoles == 3 || nHoles == 1) {
-                nSum += gEarningsTable.aSkins[fn_800D3D10(nGolfer)].aValue[3];
+                nSum += gEarningsTable.aSkins[GM_GetGolferMoneyRating(nGolfer)].aValue[3];
             }
         }
         nMax = (nSum > nMax) ? nSum : nMax;

@@ -812,7 +812,7 @@ Added 2026-09-27 (from the ledgers solved that night; each ledger has the full s
   mask-first, `(u & 0xF800) >> 8`: fn_8010A930 93.5 -> 99.05; FO_spLoadFontFromStream +1.8).
 - **[verified] The backend's second CSE turns `li rX,0` into `mr rX,<zero reg>` only for frontend
   temps**: a function-level variable the frontend splits gets EA's `mr`, a block-level one keeps
-  `li` (Earnings fn_800D4F14, with the field store `a[nSlot] = s.aPuttGoal[i].nValue`: exact).
+  `li` (Earnings GM_Earnings_CheckPuttGoals, with the field store `a[nSlot] = s.aPuttGoal[i].nValue`: exact).
 - **[verified] Temp creation order**: temps of one expression are coloured in reverse creation
   order; writing one result into an existing local first and re-reading the array reorders them
   (BreakLine_Render's rotation: `fZ = fX*c + v[2]*s; v[0] = fX*-s + v[2]*c; v[2] = fZ;`, exact).

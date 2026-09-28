@@ -101,15 +101,15 @@ int   fn_800D0E74(int nPlayer);
 int   fn_800D0F04(int nPlayer, int nToPar);
 int   fn_800D1330(int nPlayer);
 int   fn_800D3208(void);                                // CourseData.c
-u8    fn_800D61E4(int nPlayer, u8 bCheck);
-u8    fn_800D68CC(int nPlayer, u8 bCheck);
-u8    fn_800D69B8(int nPlayer, u8 bCheck);
+u8    GM_Earnings_CheckEagleEveryPar5(int nPlayer, u8 bCheck);
+u8    GM_Earnings_CheckWinAllTournaments(int nPlayer, u8 bCheck);
+u8    GM_Earnings_CheckFirstTournamentWin(int nPlayer, u8 bCheck);
 s32   fn_80126FA0(void);                                // GameMode22.c
 s32   fn_80127098(s32 n);
 
 int   GM_Earnings_CheckUnlockCourses(int nProfile, u8 bMessage);
 int   GM_Earnings_CapRating(int nRating);
-u8    fn_800D4010(int nId);
+u8    GM_Earnings_IsTourAward(int nId);
 u8    Earnings_TestBit(u32 uMask, int nBit);
 f32   GM_Earnings_GetCourseModifier(void);
 u8    GM_Earnings_AwardShotBonusToUser(int nPlayer);
@@ -118,10 +118,11 @@ int   HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStrok
 s32   Earnings_GetAwardMessageId(s32 i);
 
 // Copies what the last goal check found into the second set of tables, which the payers read: the
-// working tables fn_800D477C, fn_800D4F14 and fn_800D588C fill (the money prizes after the
-// multipliers, with their message ids and breakdowns; the awards, with their values) and the two
-// counts (lbl_80282254 prizes, lbl_80282250 awards). fn_800D3DDC, fn_800D4030 and fn_800D439C call
-// it after each check, then pay from the copies.
+// working tables GM_Earnings_CheckShotGoals, GM_Earnings_CheckPuttGoals and
+// GM_Earnings_CheckHoleGoals fill (the money prizes after the multipliers, with their message ids
+// and breakdowns; the awards, with their values) and the two counts (lbl_80282254 prizes,
+// lbl_80282250 awards). GM_Earnings_PayShotGoals, GM_Earnings_PayHoledGoals and
+// GM_Earnings_PayRoundGoals call it after each check, then pay from the copies.
 void GM_Earnings_CopyGoalResults(void) {
     gPayNumPrizes = gNumPrizes;
     gPayNumAwards = gNumAwards;
@@ -433,8 +434,11 @@ int GM_Earnings_CapRating(int nRating) {
     return n;
 }
 
-// The earnings rating of golfer nGolfer of gGolferTable; the created golfers share one.
-int fn_800D3D10(int nGolfer) {
+// The earnings rating of golfer nGolfer (gGolferTable's nEarningsRating). The created golfers (from
+// FIRST_CREATED_GOLFER) get player 0's profile's ladder wins, at most 25, as a human does in
+// GM_Earnings_RateGolfer. The front end's message table reads prize rows with it. TW07:
+// GM_GetGolferMoneyRating.
+int GM_GetGolferMoneyRating(int nGolfer) {
     int nRating;
 
     nRating = GameMode4_GetNumEventsWon();
@@ -444,7 +448,10 @@ int fn_800D3D10(int nGolfer) {
     return gGolferTable[nGolfer].nEarningsRating;
 }
 
-// What a skin on hole nHole (0..17) is worth. TW06: GM_Earnings_GetSkinsHoleValue (by position).
+// What a skin is worth on round hole nHole (0..17) at earnings rating nRating (the Skins mode
+// passes the best among the players, GM_GetHighestRatedGolfer): holes 1..6, 7..12, 13..17 and the
+// 18th each have their own value in the rating's aSkins row. TW06: GM_Earnings_GetSkinsHoleValue
+// (by position).
 s32 GM_Earnings_GetSkinsHoleValue(int nRating, int nHole) {
     if (nHole < 6) return gEarningsTable.aSkins[nRating].aValue[0];
     if (nHole < 12) return gEarningsTable.aSkins[nRating].aValue[1];
@@ -452,12 +459,16 @@ s32 GM_Earnings_GetSkinsHoleValue(int nRating, int nHole) {
     return gEarningsTable.aSkins[nRating].aValue[3];
 }
 
-// After a shot that stayed in bounds (GM_PlayerTookShot), for a human player with a profile (not in
-// game mode 10): the shot is checked (HighScoreRecords_GetEndOfShotRecord, fn_800D477C) and what it
-// earned is paid out from the copies GM_Earnings_CopyGoalResults makes of the working tables, each with its
-// message: the gShotRecordResults entries of kind 2 or 4, the shot's bonuses with their breakdowns, and
-// the awards won with their money (booked as bonuses, money.n8).
-void fn_800D3DDC(int nPlayer) {
+// After a shot that stayed in bounds (GM_PlayerTookShot); nothing in game mode 10 or with
+// mulligans. The mode's pfn244 is told first; then, for a human player with an active profile, the
+// shot records are checked (fn_800D782C), with a message for each new best (kind 2 or 4 in
+// lbl_80200498, ids in lbl_80200510), and the shot goals (GM_Earnings_CheckShotGoals). What they
+// found is paid from the copies GM_Earnings_CopyGoalResults makes: each money prize with its
+// message and breakdown, and each award (trophy ball) the player now gets
+// (GM_Earnings_AwardTrophyBall) with its message (kind 6 for the PGA TOUR awards 23..38, else kind
+// 2 with the money; message numbers from fn_800D9E00) and its money, also booked as bonuses
+// (money.n8).
+void GM_Earnings_PayShotGoals(int nPlayer) {
     int nProfile;
     int i;
     int nKind;
@@ -475,7 +486,7 @@ void fn_800D3DDC(int nPlayer) {
             GUI_QueueMessage(1, gShotRecordKinds[i], nKind, nProfile);
         }
     }
-    fn_800D477C(nPlayer, &gPlayers[nPlayer].ball, 0);
+    GM_Earnings_CheckShotGoals(nPlayer, &gPlayers[nPlayer].ball, 0);
     GM_Earnings_CopyGoalResults();
     for (i = 0; i < gPayNumPrizes; i++) {
         if (gPayShotPrizes[i] != 0) {
@@ -485,7 +496,7 @@ void fn_800D3DDC(int nPlayer) {
     }
     for (i = 0; i < gPayNumAwards; i++) {
         if (GM_Earnings_AwardTrophyBall(nPlayer, gPayShotAwards[i])) {
-            if (fn_800D4010(gPayShotAwards[i])) {
+            if (GM_Earnings_IsTourAward(gPayShotAwards[i])) {
                 GUI_QueueMessage(6, Earnings_GetAwardMessageId(gPayShotAwards[i]), 0, nProfile);
             } else {
                 GUI_QueueMessage(2, Earnings_GetAwardMessageId(gPayShotAwards[i]), gPayShotAwardMoney[i],
@@ -497,8 +508,9 @@ void fn_800D3DDC(int nPlayer) {
     }
 }
 
-// Whether an id is one of 23..38.
-u8 fn_800D4010(int nId) {
+// Whether award nId is one of 23..38, the PGA TOUR and career awards (fn_800D9998 decides them).
+// The payers give these a message of their own kind (6), with no money in it.
+u8 GM_Earnings_IsTourAward(int nId) {
     int b;
 
     b = 0;
@@ -508,11 +520,13 @@ u8 fn_800D4010(int nId) {
     return b;
 }
 
-// After the ball is holed (GM_PlayerTookShot, when GM_CheckForBallInHole says so), for a human player with a
-// profile: the putt record check (HighScoreRecords_GetEndOfHoleRecord) with its messages, then two
-// rounds of payouts from the copies of the working tables as fn_800D3DDC pays them: the putt's
-// (fn_800D4F14), then the hole's (fn_800D588C; none in a playoff).
-void fn_800D4030(int nPlayer) {
+// After the ball is holed (GM_PlayerTookShot, when GM_CheckForBallInHole says so), for a human
+// player with an active profile; nothing in game mode 10 or with mulligans. The putt records are
+// checked (fn_800D7B1C), with a message for each new best (kind 2 or 4 in lbl_80200470, ids in
+// lbl_802004E8). Then two rounds of payouts, made as GM_Earnings_PayShotGoals makes them: the putt
+// goals' (GM_Earnings_CheckPuttGoals), then those of the hole goals checked after each hole
+// (GM_Earnings_CheckHoleGoals; none in a playoff, gpGame->bD4).
+void GM_Earnings_PayHoledGoals(int nPlayer) {
     int nProfile;
     int nKind;
     int i;
@@ -529,7 +543,7 @@ void fn_800D4030(int nPlayer) {
             GUI_QueueMessage(1, gPuttRecordKinds[i], nKind, nProfile);
         }
     }
-    fn_800D4F14(nPlayer, 0);
+    GM_Earnings_CheckPuttGoals(nPlayer, 0);
     GM_Earnings_CopyGoalResults();
     for (i = 0; i < gPayNumPrizes; i++) {
         if (gPayPuttPrizes[i] != 0) {
@@ -539,7 +553,7 @@ void fn_800D4030(int nPlayer) {
     }
     for (i = 0; i < gPayNumAwards; i++) {
         if (GM_Earnings_AwardTrophyBall(nPlayer, gPayPuttAwards[i])) {
-            if (fn_800D4010(gPayPuttAwards[i])) {
+            if (GM_Earnings_IsTourAward(gPayPuttAwards[i])) {
                 GUI_QueueMessage(6, Earnings_GetAwardMessageId(gPayPuttAwards[i]), 0, nProfile);
             } else {
                 GUI_QueueMessage(2, Earnings_GetAwardMessageId(gPayPuttAwards[i]), gPayPuttAwardMoney[i],
@@ -550,7 +564,7 @@ void fn_800D4030(int nPlayer) {
         }
     }
     if (!gpGame->bD4) {
-        fn_800D588C(nPlayer, 0, 0);
+        GM_Earnings_CheckHoleGoals(nPlayer, 0, 0);
     } else {
         gNumPrizes = 0;
         gNumAwards = 0;
@@ -564,7 +578,7 @@ void fn_800D4030(int nPlayer) {
     }
     for (i = 0; i < gPayNumAwards; i++) {
         if (GM_Earnings_AwardTrophyBall(nPlayer, gHoleAwards[i])) {
-            if (fn_800D4010(gPayHoleAwards[i])) {
+            if (GM_Earnings_IsTourAward(gPayHoleAwards[i])) {
                 GUI_QueueMessage(6, Earnings_GetAwardMessageId(gPayHoleAwards[i]), 0, nProfile);
             } else {
                 GUI_QueueMessage(2, Earnings_GetAwardMessageId(gPayHoleAwards[i]), gPayHoleAwardMoney[i],
@@ -576,13 +590,16 @@ void fn_800D4030(int nPlayer) {
     }
 }
 
-// At the end of the round (GameManager: after its last hole, and with bRoundOver when the game
-// ends), for a human player with a profile: what the hole goals earned is paid out from the copies
-// of the working tables, with its messages (as fn_800D3DDC does after a shot), and the TOUR card
-// level rises with the profile's completion score: level 2 from 7.5, 3 from 15, 4 from 30, 5 from
-// 60, 6 at 100. bRoundOver skips the round record check (HighScoreRecords_GetEndOfGameRecord) and
-// its messages.
-void fn_800D439C(int nPlayer, u8 bRoundOver) {
+// At the end of a round, for a human player with an active profile; nothing in speed golf
+// (GM_IsSpeedGolfMode) or with mulligans. GameManager calls it after the round's last hole outside
+// a playoff (bRoundOver 0) and, with gpGame->b273, when the game is over (bRoundOver 1). Without
+// bRoundOver the round records are checked first (fn_800D7DA0), with a message for each new best
+// (kind 2 or 4 in lbl_80200448, ids in lbl_802004C0). Then the hole goals
+// (GM_Earnings_CheckHoleGoals: with bRoundOver those kept for the end of the round) are paid as
+// GM_Earnings_PayShotGoals pays, and the TOUR card level rises with the profile's completion score
+// (GM_GetGameProgress): level 2 from 7.5, 3 from 15, 4 from 30, 5 from 60, 6 at 100, with message
+// 99 + level.
+void GM_Earnings_PayRoundGoals(int nPlayer, u8 bRoundOver) {
     int nProfile;
     int nLevel;
     int nKind;
@@ -604,7 +621,7 @@ void fn_800D439C(int nPlayer, u8 bRoundOver) {
             }
         }
     }
-    fn_800D588C(nPlayer, 0, bRoundOver);
+    GM_Earnings_CheckHoleGoals(nPlayer, 0, bRoundOver);
     GM_Earnings_CopyGoalResults();
     for (i = 0; i < gPayNumPrizes; i++) {
         if (gHolePrizes[i] != 0) {
@@ -614,7 +631,7 @@ void fn_800D439C(int nPlayer, u8 bRoundOver) {
     }
     for (i = 0; i < gPayNumAwards; i++) {
         if (GM_Earnings_AwardTrophyBall(nPlayer, gHoleAwards[i])) {
-            if (fn_800D4010(gPayHoleAwards[i])) {
+            if (GM_Earnings_IsTourAward(gPayHoleAwards[i])) {
                 GUI_QueueMessage(6, Earnings_GetAwardMessageId(gPayHoleAwards[i]), 0, nProfile);
             } else {
                 GUI_QueueMessage(2, Earnings_GetAwardMessageId(gPayHoleAwards[i]), gPayHoleAwardMoney[i],
@@ -642,7 +659,10 @@ void fn_800D439C(int nPlayer, u8 bRoundOver) {
     }
 }
 
-s32 fn_800D4694(u32 n) {
+// The bit of ShotGoal.uLies and PuttGoal.uLies for a surface class (SurfaceType.nClass; the goal
+// checkers pass fn_800D0BAC, the surface the shot left): class 1 bit 0, 2 (fairway) bit 1, 5
+// (rough) bit 2, 6 (sand) bit 3, 3 (green) bit 4; any other class bit 6.
+s32 Earnings_GetSurfaceClassBit(u32 n) {
     if (n == 1) return 0;
     if (n == 2) return 1;
     if (n == 5) return 2;
@@ -651,7 +671,10 @@ s32 fn_800D4694(u32 n) {
     return 6;
 }
 
-s32 fn_800D46E8(int n) {
+// The bit of ShotGoal.uBallLies for the ball's lie (Lie_t): 0 the tee; 1 fairway (fairway, tight
+// fairway, fringe); 2 rough (the three roughs, ice, snow, misc); 3 sand; 4 green; 5 in the cup; 6
+// anything else (cart path, water, out of bounds).
+s32 Earnings_GetLieBit(int n) {
     int r;
 
     if (n == 0) return 0;
@@ -666,12 +689,19 @@ s32 fn_800D46E8(int n) {
     return r;
 }
 
-// After a shot: check the shot goals and fill the working tables with what they give, awards
-// (gNumAwards of them) and money prizes (gNumPrizes), as fn_800D4F14 does for putts. With
-// pBall the check runs on that ball in place of the player's own. With bPreview the shot is not
-// counted yet (one stroke fewer), and no EA Sports Bio accomplishment is posted; without a ball
-// too, the tests on the ball are skipped.
-void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
+// Checks the shot goals (the prize table's aShotGoal) against the shot just played and fills the
+// working tables with what they give: awards (trophy balls, fn_800D76AC; lbl_80282250 of them, in
+// lbl_802002B8 with their values in lbl_80200240) and money prizes (lbl_80282254 of them:
+// lbl_80200330 as found, lbl_802003A8 after GM_Earnings_ComputeBonusModifiers and, with uMults bit
+// 3, GM_Earnings_ComputeTOURCardModifiers; message ids lbl_80200420, breakdowns lbl_801FFAE8). Of
+// goals with the same nonzero id only the one with the biggest nValue is kept. Nothing is found
+// with the session's debug flag 0x4000, for a player who cannot earn (fn_800D748C), in a lesson or
+// with mulligans; during a challenge that is not a ladder event only goals with mode bit 5 count.
+// With pBall the check runs on that ball in place of the player's own. With bPreview (a what-if
+// from HoleScore or fn_800D7660) the shot is not counted yet (one stroke fewer), the PGA TOUR
+// awards (23..38) are left out and no EA Sports Bio accomplishment is posted; with bPreview and no
+// ball the tests on the ball are skipped too.
+void GM_Earnings_CheckShotGoals(int nPlayer, Ball* pBall, u8 bPreview) {
     s32 aPrizeIds[10];
     s32 aAwardIds[10];
     Ball saved;
@@ -716,10 +746,11 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
         if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uPars, 0) && Course_GetCurHolePar() == 3) continue;
         if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uPars, 1) && Course_GetCurHolePar() == 4) continue;
         if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uPars, 2) && Course_GetCurHolePar() == 5) continue;
-        if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uLies, fn_800D4694(fn_800D0BAC(nPlayer)))) continue;
+        if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uLies,
+                              Earnings_GetSurfaceClassBit(fn_800D0BAC(nPlayer)))) continue;
         if (gEarningsTable.aShotGoal[i].f0C > fn_800D04AC(nPlayer)) continue;
         if (!bNoBall && !Earnings_TestBit(gEarningsTable.aShotGoal[i].uBallLies,
-                                     fn_800D46E8(gPlayers[nPlayer].ball.nLie))) continue;
+                                     Earnings_GetLieBit(gPlayers[nPlayer].ball.nLie))) continue;
         if (!bNoBall && gEarningsTable.aShotGoal[i].f14 > fn_800D0550(nPlayer)) continue;
         if (!bNoBall && gEarningsTable.aShotGoal[i].f18 &&
             gEarningsTable.aShotGoal[i].f18 < fn_800D0478(nPlayer)) continue;
@@ -833,12 +864,17 @@ u8 Earnings_TestBit(u32 uMask, int nBit) {
     return (uMask & (1 << nBit)) != 0;
 }
 
-// After a putt: check the putt goals and fill the working tables with what they give, awards
-// (gNumAwards of them) and money prizes (gNumPrizes). Of goals with the same id only the one
-// with the biggest nValue is kept. The holes still to come count 999 strokes and putts meanwhile
-// (and 0 afterwards). With bPreview the hole counts one more stroke and putt (the ball dropping
-// now), a few tests are skipped and no EA Sports Bio accomplishment is posted.
-void fn_800D4F14(int nPlayer, u8 bPreview) {
+// Checks the putt goals (aPuttGoal) when the ball drops: the score on the hole, the putts and the
+// last shot's tests. It fills the putt tables as GM_Earnings_CheckShotGoals fills the shot tables
+// (awards lbl_80200290 with their values in lbl_80200218; prizes lbl_80200308 as found,
+// lbl_80200380 after the multipliers, message ids lbl_802003F8), keeping of goals with the same
+// nonzero id only the biggest nValue. Nothing is found with the session's debug flag 0x4000, for a
+// player who cannot earn (fn_800D748C), during a challenge that is not a ladder event, or with
+// mulligans. While it runs the holes still to come count 999 strokes and putts (0 afterwards). With
+// bPreview (a what-if from HoleScore or fn_800D7684) the hole counts one more stroke and putt (the
+// ball dropping now), flag tests 2 and 5 are skipped, the PGA TOUR awards (23..38) are left out and
+// no EA Sports Bio accomplishment is posted.
+void GM_Earnings_CheckPuttGoals(int nPlayer, u8 bPreview) {
     s32 aPrizeIds[10];
     s32 aAwardIds[10];
     int i;
@@ -872,7 +908,8 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
         if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uPars, 0) && Course_GetCurHolePar() == 3) continue;
         if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uPars, 1) && Course_GetCurHolePar() == 4) continue;
         if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uPars, 2) && Course_GetCurHolePar() == 5) continue;
-        if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uLies, fn_800D4694(fn_800D0BAC(nPlayer)))) continue;
+        if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uLies,
+                              Earnings_GetSurfaceClassBit(fn_800D0BAC(nPlayer)))) continue;
         if (gEarningsTable.aPuttGoal[i].f0C > fn_800D04AC(nPlayer)) continue;
         if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uShotKinds, gPlayers[nPlayer].nShotKind)) continue;
         if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uClubs, gPlayers[nPlayer].nClub)) continue;
@@ -997,10 +1034,17 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
     }
 }
 
-// After a hole (bRoundOver: after the round), as fn_800D4F14 does for the putt goals: check the
-// hole goals against the round so far and fill the working tables (gHoleAwards awards,
-// gHolePrizeBases money prizes).
-void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
+// Checks the hole goals (aHoleGoal) against the round so far and fills the hole tables as
+// GM_Earnings_CheckPuttGoals does (awards lbl_80200268 with their values in lbl_802001F0; prizes
+// lbl_802002E0 as found, lbl_80200358 after the multipliers, message ids lbl_802003D0). Without
+// bRoundOver (after a hole) only the goals marked bEachHole count, and those without b19 only on
+// the 18th hole of a full round; with bRoundOver (the game over) only the others. Nothing is found
+// with the session's debug flag 0x4000, for a player who cannot earn (fn_800D748C) or with
+// mulligans. While it runs the holes still to come count 999 strokes and putts (0 afterwards). With
+// bPreview (a what-if from HoleScore) this hole counts one more stroke and putt, the whole-round
+// tests (GM_Earnings_CheckEagleEveryPar5 and the others) predict, the PGA TOUR awards (23..38) are
+// left out and no EA Sports Bio accomplishment is posted.
+void GM_Earnings_CheckHoleGoals(int nPlayer, u8 bPreview, u8 bRoundOver) {
     s32 aPrizeIds[10];
     s32 aAwardIds[10];
     int i;
@@ -1080,10 +1124,13 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
         if (gEarningsTable.aHoleGoal[i].nMaxStrokes != 0 &&
             gEarningsTable.aHoleGoal[i].nMaxStrokes < GM_GetPlayerRoundStrokes(nPlayer)) continue;
         if (gEarningsTable.aHoleGoal[i].nKind != 0) {
-            if (gEarningsTable.aHoleGoal[i].nKind == 1 && !fn_800D61E4(nPlayer, bPreview)) continue;
-            if (gEarningsTable.aHoleGoal[i].nKind == 2 && !fn_800D68CC(nPlayer, bPreview)) continue;
+            if (gEarningsTable.aHoleGoal[i].nKind == 1
+                && !GM_Earnings_CheckEagleEveryPar5(nPlayer, bPreview)) continue;
+            if (gEarningsTable.aHoleGoal[i].nKind == 2
+                && !GM_Earnings_CheckWinAllTournaments(nPlayer, bPreview)) continue;
             if (gEarningsTable.aHoleGoal[i].nKind == 3) continue;
-            if (gEarningsTable.aHoleGoal[i].nKind == 4 && !fn_800D69B8(nPlayer, bPreview)) continue;
+            if (gEarningsTable.aHoleGoal[i].nKind == 4
+                && !GM_Earnings_CheckFirstTournamentWin(nPlayer, bPreview)) continue;
             if (gEarningsTable.aHoleGoal[i].nKind == 5 && fn_800D0E74(nPlayer) != 0) continue;
             if (gEarningsTable.aHoleGoal[i].nKind == 6 && fn_800D2FB4(0)
                 <= GM_GetPlayerRoundStrokes(nPlayer)) continue;
@@ -1176,10 +1223,14 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
     }
 }
 
-// The par-5 eagle records (GM_ConvertCourseAndHoleToPar5EagleIndex's items, kind 0). Without
-// bCheck: whether the profile has eagled all 71. With it: whether this par 5 was played in eagle or
-// better with 70 held and this hole the one missing.
-u8 fn_800D61E4(int nPlayer, u8 bCheck) {
+// Whole-round test 1 of the hole goals (HoleGoal.nKind): the par-5 eagles
+// (GM_ConvertCourseAndHoleToPar5EagleIndex's items, the profile's kind-0 records). Without
+// bPreview: whether the profile has eagled every one of items 0..70. With it (predicting the hole
+// now being finished): whether this hole is a par 5 played in eagle or better, the profile holds 70
+// of items 0..70 and this hole's item is one it does not hold. The strokes are read at
+// Game_GetCurHoleNum (the hole's number on its course), and course 10 (items 27..30) is missing
+// from the table below. TW07: GM_Earnings_CheckEagleEveryPar5.
+u8 GM_Earnings_CheckEagleEveryPar5(int nPlayer, u8 bCheck) {
     int nProfile;
     u8 bAll;
     int i;
@@ -1365,9 +1416,10 @@ u8 fn_800D61E4(int nPlayer, u8 bCheck) {
     return 0;
 }
 
-// Without bCheck: whether the profile has won all 31 PGA TOUR tournaments. With it: whether this is
-// game mode 23 with 30 won and fn_800CF450 agrees.
-u8 fn_800D68CC(int nPlayer, u8 bCheck) {
+// Whole-round test 2 of the hole goals: without bPreview, whether the profile has won all 31 PGA
+// TOUR tournaments; with it, whether this is the PGA TOUR (game mode 23) with 30 won and holing
+// this ball would win (fn_800CF450). TW07: GM_Earnings_CheckWinAllTournaments.
+u8 GM_Earnings_CheckWinAllTournaments(int nPlayer, u8 bCheck) {
     SaveProfile* pProfile;
     int i;
     int n;
@@ -1396,9 +1448,10 @@ u8 fn_800D68CC(int nPlayer, u8 bCheck) {
     return 0;
 }
 
-// Without bCheck: whether the profile has won any PGA TOUR tournament. With it: whether this is
-// game mode 23 and fn_800CF450 agrees.
-u8 fn_800D69B8(int nPlayer, u8 bCheck) {
+// Whole-round test 4 of the hole goals: without bPreview, whether the profile has won any PGA TOUR
+// tournament; with it, whether this is the PGA TOUR (game mode 23) and holing this ball would win
+// (fn_800CF450). TW07: GM_Earnings_CheckFirstTournamentWin.
+u8 GM_Earnings_CheckFirstTournamentWin(int nPlayer, u8 bCheck) {
     SaveProfile* pProfile;
     int i;
     u8 bAny;
@@ -1420,10 +1473,14 @@ u8 fn_800D69B8(int nPlayer, u8 bCheck) {
     return 0;
 }
 
-// The points, rounded to $25, earn a bonus on top for the
-// course, the tees played and the hole's gpGame->nPinSet value (each flag switches one on).
-// Each part is rounded to $25 by itself; the total is at least 0.
-// TW06: GM_Earnings_ComputeBonusModifiers (by position).
+// Scales a money prize: nPoints rounded to $25, plus a bonus for each multiplier its flags switch
+// on: bCourse the course's (fn_800D6EEC), bTee the tees the player plays (gSession.nTeeSet 0..2
+// reads aMult[EARN_MULT_TEE + 2 - set], set 3 counts as x1), bHole the hole's pin set
+// (gpGame->nPinSet, aMult[EARN_MULT_PINSET + set]); the table's multipliers are percentages. Each
+// bonus (the base times the multiplier, less the base) is rounded to $25 by itself; the total is at
+// least 0 and rounded to $25 again. pMoney, when given, gets the breakdown: the total (n0 and n24),
+// the base, and the course, pin (n2C) and tee bonuses. 0 with mulligans. TW06:
+// GM_Earnings_ComputeBonusModifiers (by position); TW07 calls the flags course, tee and pin.
 s32 GM_Earnings_ComputeBonusModifiers(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole,
                                        CourseMoneyTracking* pMoney) {
     f32 fCourseBonus;           // fake match: whole dollars kept as floats and added as floats, as
@@ -1609,7 +1666,8 @@ int GM_Earnings_ComputeTOURCardModifiers(int nReward, int nPlayer, CourseMoneyTr
 }
 
 // Whether the player can earn goal bonuses: a human player with an active profile, with mulligans
-// off. The shot, putt and hole goal checks (fn_800D477C, fn_800D4F14, fn_800D588C) stop without it.
+// off. The shot, putt and hole goal checks (GM_Earnings_CheckShotGoals, GM_Earnings_CheckPuttGoals,
+// GM_Earnings_CheckHoleGoals) stop without it.
 u8 GM_Earnings_AwardShotBonusToUser(int nPlayer) {
     if (Player_IsCPU(nPlayer)) return 0;
     if (Game_GetMulliganRule() != 0) return 0;
@@ -1652,17 +1710,18 @@ u8 GM_Earnings_AwardTrophyBall(int nPlayer, int nAward) {
     return 0;
 }
 
-// Run the shot goal check (fn_800D477C) on pBall, bPreview passed on, and return how many awards it
-// listed (Earnings_GetNumAwards). HoleScore and GameEffects ask it whether a shot earns a trophy
-// ball.
+// Run the shot goal check (GM_Earnings_CheckShotGoals) on pBall, bPreview passed on, and return how
+// many awards it listed (Earnings_GetNumAwards). HoleScore and GameEffects ask it whether a shot
+// earns a trophy ball.
 s32 Earnings_CheckShotAwards(int nPlayer, Ball* pBall, u8 b) {
-    fn_800D477C(nPlayer, pBall, b);
+    GM_Earnings_CheckShotGoals(nPlayer, pBall, b);
     return Earnings_GetNumAwards();
 }
 
-// The same for the putt goals (fn_800D4F14), which read the player's own ball: pBall is not used.
+// The same for the putt goals (GM_Earnings_CheckPuttGoals), which read the player's own ball: pBall
+// is not used.
 s32 Earnings_CheckPuttAwards(int nPlayer, Ball* pBall, u8 b) {
-    fn_800D4F14(nPlayer, b);
+    GM_Earnings_CheckPuttGoals(nPlayer, b);
     return Earnings_GetNumAwards();
 }
 
@@ -1802,7 +1861,7 @@ int HighScoreRecords_GetEndOfHoleRecord(int nPlayer, Ball* pBall, int a, u8 bCou
     return gNumRecordHits;
 }
 
-// The end-of-round record checks (after the last hole, fn_800D439C). In game mode 22 (the
+// The end-of-round record checks (after the last hole, GM_Earnings_PayRoundGoals). In game mode 22 (the
 // long-drive contest) only record kind 9 (Player.nEBC); in the skill-zone modes only kind 8
 // (Player.nDD8). Otherwise, outside "Random 18": the round's strokes (kind 0), its greens in
 // regulation (3, fn_800D1170), fairways hit (5, fn_800D0FBC), birdies or better (7), eagles or

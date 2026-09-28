@@ -284,7 +284,7 @@ typedef struct SaveProfile {
     Award aAward[39];           // 0x0039C
     Replay aReplay[5];          // 0x00438  a Replay each, saved with awards 0, 6, 9, 3 and 13
     s32  nTourCardLevel;        // 0x05000  0..6: level 1 comes from the lessons (GameMode11), the rest
-                                //          from fn_800D439C; it scales payouts (GM_Earnings_ComputeTOURCardModifiers)
+                                //          from GM_Earnings_PayRoundGoals; it scales payouts (GM_Earnings_ComputeTOURCardModifiers)
     u8   a5004[71];             // 0x05004  per par-5 hole 0..70 (GM_ConvertCourseAndHoleToPar5EagleIndex): 1 once
                                 //          the profile has eagled it (Earnings.c); fn_800588F4's kind 0
     u8   unk504B;
@@ -364,7 +364,7 @@ void fn_80056B8C(void);
 void fn_80057364(int nSlot);    // sets up save profile nSlot
 void fn_80057ED0(SaveProfile* pProfile, const char* pName);     // PasswordManager.c: name it
 
-// GameManager.c: the profile's completion score (fn_800D439C raises the TOUR card level with it)
+// GameManager.c: the profile's completion score (GM_Earnings_PayRoundGoals raises the TOUR card level with it)
 f32  GM_GetGameProgress(SaveProfile* pProfile);
 
 // Earnings.c: the awards

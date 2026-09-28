@@ -342,14 +342,14 @@ u32 fn_800CFD58(int nPlayer) {
     u32 nId;
     int i;
 
-    fn_800D477C(nPlayer, NULL, 1);
+    GM_Earnings_CheckShotGoals(nPlayer, NULL, 1);
     for (i = 0; i < Earnings_GetNumAwards(); i++) {
         nId = Earnings_GetShotAwardId(i);
         if (nId <= 22) {
             uIds |= 1 << nId;
         }
     }
-    fn_800D4F14(nPlayer, 1);
+    GM_Earnings_CheckPuttGoals(nPlayer, 1);
     for (i = 0; i < Earnings_GetNumAwards(); i++) {
         nId = Earnings_GetPuttAwardId(i);
         if (nId <= 22) {
@@ -357,7 +357,7 @@ u32 fn_800CFD58(int nPlayer) {
         }
     }
     if (!gpGame->bD4) {
-        fn_800D588C(nPlayer, 1, 0);
+        GM_Earnings_CheckHoleGoals(nPlayer, 1, 0);
         for (i = 0; i < Earnings_GetNumAwards(); i++) {
             nId = Earnings_GetHoleAwardId(i);
             if (nId <= 22) {

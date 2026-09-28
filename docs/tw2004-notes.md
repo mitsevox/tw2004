@@ -359,7 +359,7 @@ The save profile (`gpSaveData`)
 | 0x338 | `aLadderAward[25]` | the ladder events' awards; the earnings rating counts the won ones |
 | 0x39C | `aAward[39]` | the other awards |
 | 0x438 | `aReplay[5]` | saved replays (0xF28 bytes each) |
-| 0x5000 | `nTourCardLevel` | 0..6: level 1 from the lessons, the rest from `fn_800D439C`; scales payouts |
+| 0x5000 | `nTourCardLevel` | 0..6: level 1 from the lessons, the rest from `GM_Earnings_PayRoundGoals`; scales payouts |
 | 0x5004, 0x504C | `a5004[71]`, `a504C[71]` | per marked hole (`fn_800588F4`), continued at 0x10578 / 0x1057C for holes 71..74 |
 | 0x516C | `aMedal[29]` | the best challenge medal per group (0 best, 3 none), and the day at 0x51E4 |
 | 0x5230 | `aSavedRound[3]` | three saved custom rounds, 0x70 bytes each (the profile setup at 0x80057C88 clears three) |

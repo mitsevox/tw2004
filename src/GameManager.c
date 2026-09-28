@@ -19,7 +19,7 @@
 void  GM_Earnings_FreeStreamMemory(void);
 void  GM_ClearHoleBonusStats(int nPlayer);
 u8    GM_IsRoundForcedOver(int nPlayer);
-void  fn_800D439C(int nPlayer, int a);
+void  GM_Earnings_PayRoundGoals(int nPlayer, int a);
 void  GM_RecordIndividualRoundStats(int nPlayer);
 void  GM_PgaTourSim_SetUserEntrantHoleStrokes(int nPlayer, int nStrokes);
 void  GM_GolferConcede_Hole(int nPlayer);
@@ -29,9 +29,9 @@ void  GM_HoleFinished_GameNotFinished(int nPlayer);
 u8    GM_CheckForAIConcede(int nPlayer);
 
 void  GM_RecordIndividualShotStats(int nPlayer);
-void  fn_800D3DDC(int nPlayer);
+void  GM_Earnings_PayShotGoals(int nPlayer);
 void  GM_RecordIndividualHoleStats(int nPlayer);
-void  fn_800D4030(int nPlayer);
+void  GM_Earnings_PayHoledGoals(int nPlayer);
 void  GM_CheckBallForUIHints(int nPlayer);
 u8    fn_8008AC40(void);
 void  GM_RecordBonusShotStats(int nPlayer);
@@ -260,16 +260,16 @@ void GM_EndOfGolferTurn(int nPlayer) {
 }
 
 // The hole is over: event 1 and the mode's EndHole. On the round's last hole, outside a playoff
-// (bD4), each player's round goals are paid out (fn_800D439C) and the round counted in the profile
-// (GM_RecordIndividualRoundStats). Then GM_EndOfGolferTurn_GameFinished when the mode says the game
-// is over (or GM_IsRoundForcedOver), else GM_HoleFinished_GameNotFinished.
+// (bD4), each player's round goals are paid out (GM_Earnings_PayRoundGoals) and the round counted
+// in the profile (GM_RecordIndividualRoundStats). Then GM_EndOfGolferTurn_GameFinished when the
+// mode says the game is over (or GM_IsRoundForcedOver), else GM_HoleFinished_GameNotFinished.
 void GM_EndOfGolferTurn_HoleFinished(int nPlayer) {
     int i;
     EVENT_Trigger(nPlayer, 1, 0, -1);
     gpGame->pfnEndHole();
     if (GM_CurrentlyOnLastHole() && !gpGame->bD4 && !GM_IsRoundForcedOver(nPlayer)) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
-            fn_800D439C(i, 0);
+            GM_Earnings_PayRoundGoals(i, 0);
             GM_RecordIndividualRoundStats(i);
         }
     }
@@ -282,10 +282,11 @@ void GM_EndOfGolferTurn_HoleFinished(int nPlayer) {
 
 // The game is over: event 5, the game marked finished (b28E), the won flag cleared before the
 // mode's EndGame decides it, and a win counted in EASBio outside the demo (gSession.a8[0]). With
-// b273 every player gets the end-of-round payout (fn_800D439C, bRoundOver 1). Outside the demo and
-// while the round is not already ending (gSession.b12), the end-of-game scorecard is shown when the
-// mode has scorecards (b275; bHuman 1 unless b274 is set outside a GameMode5 challenge), the golfer
-// waits and the view goes to camera mode 17; otherwise gSession.b12 is set, which ends the round.
+// b273 every player gets the end-of-round payout (GM_Earnings_PayRoundGoals, bRoundOver 1). Outside
+// the demo and while the round is not already ending (gSession.b12), the end-of-game scorecard is
+// shown when the mode has scorecards (b275; bHuman 1 unless b274 is set outside a GameMode5
+// challenge), the golfer waits and the view goes to camera mode 17; otherwise gSession.b12 is set,
+// which ends the round.
 void GM_EndOfGolferTurn_GameFinished(int nPlayer) {
     int i;
     int nView;
@@ -298,7 +299,7 @@ void GM_EndOfGolferTurn_GameFinished(int nPlayer) {
     }
     if (gpGame->b273) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
-            fn_800D439C(i, 1);
+            GM_Earnings_PayRoundGoals(i, 1);
         }
     }
     if (gSession.b12 == 0 && gSession.a8[0] == 0) {
@@ -527,7 +528,7 @@ void GM_PlayerTookShot(int nPlayer) {
     bOut = GM_CheckForBallOOB(nPlayer);
     if (!bOut) {
         GM_RecordIndividualShotStats(nPlayer);
-        fn_800D3DDC(nPlayer);
+        GM_Earnings_PayShotGoals(nPlayer);
     }
     fn_800DA48C(nPlayer);
     if (fn_800DA2AC()) {
@@ -542,7 +543,7 @@ void GM_PlayerTookShot(int nPlayer) {
     if (!bOut) {
         if (GM_CheckForBallInHole(nPlayer)) {
             GM_RecordIndividualHoleStats(nPlayer);
-            fn_800D4030(nPlayer);
+            GM_Earnings_PayHoledGoals(nPlayer);
             GM_CheckBallForUIHints(nPlayer);
             gpGame->pfn218(nPlayer);
         } else {
