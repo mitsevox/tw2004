@@ -11,10 +11,10 @@
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
-s32 lbl_80281698 = 4;                    // the options saved while the game runs
-s32 lbl_80282398;                    // the points of the last shot
-s32 lbl_80282394;                    // the points multiplier from bonuses
-s32 lbl_80282390;
+s32 gTargetSavedOptionsC = 4;                    // the options saved while the game runs
+s32 gTargetShotPoints;                    // the points of the last shot
+s32 gTargetBonusMultiplier;                    // the points multiplier from bonuses
+s32 gTargetSavedWind;
 
 void  fn_800F4D6C(void);
 void  fn_800F4D88(void);
@@ -85,13 +85,13 @@ void fn_800F4B40(void) {
 }
 
 void fn_800F4D6C(void) {
-    gSession.options.nC = lbl_80281698;
-    gSession.options.nWind = lbl_80282390;
+    gSession.options.nC = gTargetSavedOptionsC;
+    gSession.options.nWind = gTargetSavedWind;
 }
 
 void fn_800F4D88(void) {
-    lbl_80281698 = gSession.options.nC;
-    lbl_80282390 = gSession.options.nWind;
+    gTargetSavedOptionsC = gSession.options.nC;
+    gTargetSavedWind = gSession.options.nWind;
     gSession.options.nC = 4;
     gSession.options.nWind = 0;
 }
@@ -151,7 +151,7 @@ void fn_800F5014(int nPlayer) {
     nMsg = -1;
     nSurface = gPlayers[nPlayer].ball.nSurface;
     fLength = fn_800D0550(nPlayer);
-    fn_800F58B4(nSurface, &lbl_80282398);
+    fn_800F58B4(nSurface, &gTargetShotPoints);
     if (nSurface >= 0x85 && nSurface <= 0x90 && !GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
         nTarget = GameModeSkillZoneBase_GetGreenIndexHit(nPlayer);
         GameModeSkillZoneBase_GetBullsEyeColor(nSurface);
@@ -160,7 +160,7 @@ void fn_800F5014(int nPlayer) {
             gPlayers[nPlayer].nE8C = gPlayers[nPlayer].nE90;
         }
         if (gPlayers[nPlayer].nDE4[nTarget] > 3) {
-            lbl_80282398 = 0;
+            gTargetShotPoints = 0;
             GameMsg_Send5Ints(0x33, 0, 0, 0, 0xC8, 1);
             Gaud_TargetClosedOut();
             nMsg = 2;
@@ -168,14 +168,14 @@ void fn_800F5014(int nPlayer) {
             gPlayers[nPlayer].nDE4[nTarget]++;
             gPlayers[nPlayer].aDC4[3]++;
             if (lbl_80282360 == GameModeSkillZoneBase_CountGreensHit(nPlayer)) {
-                lbl_80282398 = GameModeSkillZoneBase_GetHitAllTargetsBonus();
-                lbl_80282398 = GM_Earnings_ComputeBonusModifiers(lbl_80282398, nPlayer, 1, 1, 1, 0);
-                lbl_80282398 = GM_Earnings_ComputeTOURCardModifiers(lbl_80282398, nPlayer, 0);
-                GM_Earnings_AwardMoney(nPlayer, lbl_80282398, 0);
+                gTargetShotPoints = GameModeSkillZoneBase_GetHitAllTargetsBonus();
+                gTargetShotPoints = GM_Earnings_ComputeBonusModifiers(gTargetShotPoints, nPlayer, 1, 1, 1, 0);
+                gTargetShotPoints = GM_Earnings_ComputeTOURCardModifiers(gTargetShotPoints, nPlayer, 0);
+                GM_Earnings_AwardMoney(nPlayer, gTargetShotPoints, 0);
                 gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
-                gPlayers[nPlayer].nDD8 += lbl_80282398;
-                GameMsg_Send5Ints(0x33, lbl_80282398, 0, 0, 0xCA, 1);
-                lbl_80282398 = 0;
+                gPlayers[nPlayer].nDD8 += gTargetShotPoints;
+                GameMsg_Send5Ints(0x33, gTargetShotPoints, 0, 0, 0xCA, 1);
+                gTargetShotPoints = 0;
                 if ((s8)gPlayers[nPlayer].bE9E == 0) {
                     gPlayers[nPlayer].bE9E = 1;
                     if (!(Misc_RandFunc(0) & 1)) {
@@ -255,7 +255,7 @@ void fn_800F5014(int nPlayer) {
                 }
             }
         } else {
-            lbl_80282398 = 0;
+            gTargetShotPoints = 0;
             if (nMsg == -1) {
                 GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCB, 1);
                 switch (Misc_RandFunc(0) & 3) {
@@ -272,32 +272,32 @@ void fn_800F5014(int nPlayer) {
             }
         }
     }
-    if (lbl_80282398 != 0) {
-        if (lbl_80282398 > 0) {
-            lbl_80282398 = (f32)lbl_80282398 * gPlayers[nPlayer].nDBC;
-            lbl_80282398 = (f32)(lbl_80282398 * lbl_80282394);
-            lbl_80282398 = GM_Earnings_ComputeBonusModifiers(lbl_80282398, nPlayer, 1, 1, 1, 0);
-            lbl_80282398 = GM_Earnings_ComputeTOURCardModifiers(lbl_80282398, nPlayer, 0);
+    if (gTargetShotPoints != 0) {
+        if (gTargetShotPoints > 0) {
+            gTargetShotPoints = (f32)gTargetShotPoints * gPlayers[nPlayer].nDBC;
+            gTargetShotPoints = (f32)(gTargetShotPoints * gTargetBonusMultiplier);
+            gTargetShotPoints = GM_Earnings_ComputeBonusModifiers(gTargetShotPoints, nPlayer, 1, 1, 1, 0);
+            gTargetShotPoints = GM_Earnings_ComputeTOURCardModifiers(gTargetShotPoints, nPlayer, 0);
         } else if (!(Misc_RandFunc(0) & 1)) {
             GameModeSkillZoneBase_StartComment(0);
         } else {
             GameModeSkillZoneBase_StartComment(0x4E);
         }
-        if (lbl_80282398 + gPlayers[nPlayer].nDD8 < 0) {
+        if (gTargetShotPoints + gPlayers[nPlayer].nDD8 < 0) {
             GM_Earnings_AwardMoney(nPlayer, -gPlayers[nPlayer].nDD8, 0);
         } else {
-            GM_Earnings_AwardMoney(nPlayer, lbl_80282398, 0);
+            GM_Earnings_AwardMoney(nPlayer, gTargetShotPoints, 0);
         }
-        gPlayers[nPlayer].nDD8 += lbl_80282398;
+        gPlayers[nPlayer].nDD8 += gTargetShotPoints;
         if (gPlayers[nPlayer].nDD8 < 0) {
             gPlayers[nPlayer].nDD8 = 0;
         } else if (!gSession.bReplay) {
             if (GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
-                GameMsg_Send5Ints(0x33, lbl_80282398, 0, 0, 0xD6, 1);
+                GameMsg_Send5Ints(0x33, gTargetShotPoints, 0, 0, 0xD6, 1);
             } else {
-                GameMsg_Send5Ints(0x33, lbl_80282398, 0, 0, nSurface, 1);
+                GameMsg_Send5Ints(0x33, gTargetShotPoints, 0, 0, nSurface, 1);
             }
-            if (lbl_80282398 > 0 && nSurface < 0x85) {
+            if (gTargetShotPoints > 0 && nSurface < 0x85) {
                 Gaud_MoneyAward();
             }
         }
@@ -323,7 +323,7 @@ void fn_800F56D4(void) {
             }
         }
     }
-    lbl_80282394 = 1;
+    gTargetBonusMultiplier = 1;
 }
 
 void fn_800F577C(void) {
@@ -383,11 +383,11 @@ void fn_800F58B4(s32 nSurface, s32* pPoints) {
 }
 
 s32 fn_800F59CC(s32 a) {
-    return lbl_80282398;
+    return gTargetShotPoints;
 }
 
 s32 fn_800F59D4(s32 a) {
-    return lbl_80282394;
+    return gTargetBonusMultiplier;
 }
 
 // A target's state for the HUD: 1 when it has paid out 4 times (closed).
@@ -402,7 +402,7 @@ s32 fn_800F59DC(int nPlayer, int i) {
 void fn_800F5A14(int nPlayer, int nId) {
     s32 n = GameModeSkillZoneBase_GetBonusIndex(nId);
     fn_800A30E4(8, &gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
-    lbl_80282394 += n + 2;
+    gTargetBonusMultiplier += n + 2;
 }
 
 void fn_800F5A88(void) {

@@ -6,7 +6,7 @@
 #include "game.h"
 #include "engine.h"
 
-u8 lbl_80282330;                     // the hole was ended early (fn_800ED974)
+u8 gPracticeHoleEndedEarly;                     // the hole was ended early (fn_800ED974)
 
 void fn_800ED890(void);
 void fn_800ED8B8(void);
@@ -48,7 +48,7 @@ void fn_800ED738(void) {
     gpGame->n10 = 1;
     gpGame->nDC = 0;
     GM_SetCurrentHole(0);
-    lbl_80282330 = 0;
+    gPracticeHoleEndedEarly = 0;
     gSession.nSplitScreen = 0;
 }
 
@@ -69,7 +69,7 @@ void fn_800ED8E0(void) {
 }
 
 u8 fn_800ED900(void) {
-    return lbl_80282330;
+    return gPracticeHoleEndedEarly;
 }
 
 // Hole finished: when ended early (fn_800ED974), or once every player has holed out.
@@ -88,12 +88,12 @@ u8 fn_800ED908(int nPlayer, u8 bCheck) {
 
 // End the hole early (a GameUICommands command, from the pause menu).
 void fn_800ED974(void) {
-    lbl_80282330 = 1;
+    gPracticeHoleEndedEarly = 1;
     GM_EndOfGolferTurn(0);
 }
 
 void fn_800ED9A0(void) {
-    lbl_80282330 = 0;
+    gPracticeHoleEndedEarly = 0;
 }
 
 // Game finished: no selected hole is left.

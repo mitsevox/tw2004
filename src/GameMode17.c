@@ -10,10 +10,10 @@
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
-s32 lbl_802816A0 = 4;                    // the options saved while the game runs
-s32 lbl_802823A8;                    // the points of the last shot
-s32 lbl_802823A4;                    // the extra balls of the last shot
-s32 lbl_802823A0;
+s32 gTargetToTargetSavedOptionsC = 4;                    // the options saved while the game runs
+s32 gTargetToTargetShotPoints;                    // the points of the last shot
+s32 gTargetToTargetShotBalls;                    // the extra balls of the last shot
+s32 gTargetToTargetSavedWind;
 
 void  fn_800F5CC8(void);
 void  fn_800F5CE4(void);
@@ -84,13 +84,13 @@ void fn_800F5AAC(void) {
 }
 
 void fn_800F5CC8(void) {
-    gSession.options.nC = lbl_802816A0;
-    gSession.options.nWind = lbl_802823A0;
+    gSession.options.nC = gTargetToTargetSavedOptionsC;
+    gSession.options.nWind = gTargetToTargetSavedWind;
 }
 
 void fn_800F5CE4(void) {
-    lbl_802816A0 = gSession.options.nC;
-    lbl_802823A0 = gSession.options.nWind;
+    gTargetToTargetSavedOptionsC = gSession.options.nC;
+    gTargetToTargetSavedWind = gSession.options.nWind;
     gSession.options.nC = 4;
     gSession.options.nWind = 0;
 }
@@ -149,7 +149,7 @@ void fn_800F5F58(int nPlayer) {
     bDone = 0;
     nSurface = gPlayers[nPlayer].ball.nSurface;
     fLength = fn_800D0550(nPlayer);
-    fn_800F68C4(nSurface, &lbl_802823A8, &lbl_802823A4);
+    fn_800F68C4(nSurface, &gTargetToTargetShotPoints, &gTargetToTargetShotBalls);
     if (nSurface >= 0x85 && nSurface <= 0x90 && !GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
         nTarget = GameModeSkillZoneBase_GetGreenIndexHit(nPlayer);
         GameModeSkillZoneBase_GetBullsEyeColor(nSurface);
@@ -165,16 +165,16 @@ void fn_800F5F58(int nPlayer) {
             gPlayers[nPlayer].nDE4[nTarget]++;
             gPlayers[nPlayer].aDC4[3]++;
             if (lbl_80282360 == GameModeSkillZoneBase_CountGreensHit(nPlayer)) {
-                lbl_802823A8 = GameModeSkillZoneBase_GetHitAllTargetsBonus();
-                lbl_802823A8 += gPlayers[nPlayer].nDC0 * 100;
-                lbl_802823A8 = GM_Earnings_ComputeBonusModifiers(lbl_802823A8, nPlayer, 1, 1, 1, 0);
-                lbl_802823A8 = GM_Earnings_ComputeTOURCardModifiers(lbl_802823A8, nPlayer, 0);
-                GM_Earnings_AwardMoney(nPlayer, lbl_802823A8, 0);
+                gTargetToTargetShotPoints = GameModeSkillZoneBase_GetHitAllTargetsBonus();
+                gTargetToTargetShotPoints += gPlayers[nPlayer].nDC0 * 100;
+                gTargetToTargetShotPoints = GM_Earnings_ComputeBonusModifiers(gTargetToTargetShotPoints, nPlayer, 1, 1, 1, 0);
+                gTargetToTargetShotPoints = GM_Earnings_ComputeTOURCardModifiers(gTargetToTargetShotPoints, nPlayer, 0);
+                GM_Earnings_AwardMoney(nPlayer, gTargetToTargetShotPoints, 0);
                 gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
                 bDone = 1;
-                gPlayers[nPlayer].nDD8 += lbl_802823A8;
-                GameMsg_Send5Ints(0x33, lbl_802823A8, 0, 0, 0xCA, 1);
-                lbl_802823A8 = 0;
+                gPlayers[nPlayer].nDD8 += gTargetToTargetShotPoints;
+                GameMsg_Send5Ints(0x33, gTargetToTargetShotPoints, 0, 0, 0xCA, 1);
+                gTargetToTargetShotPoints = 0;
                 if ((s8)gPlayers[nPlayer].bE9E == 0) {
                     gPlayers[nPlayer].bE9E = 1;
                     if (!(Misc_RandFunc(0) & 1)) {
@@ -215,7 +215,7 @@ void fn_800F5F58(int nPlayer) {
                     break;
                 default:
                     if (GameModeSkillZoneBase_CountGreensHit(nPlayer) <= lbl_80282360 / 4) {
-                        if (lbl_802823A4 == 1) {
+                        if (gTargetToTargetShotBalls == 1) {
                             if (Misc_RandFunc(0) & 1) {
                                 nMsg = 0x36;
                             } else {
@@ -286,9 +286,9 @@ void fn_800F5F58(int nPlayer) {
             }
         } else {
             GameMsg_Send5Ints(0x33, 0, 0, 0, 0xD0, 1);
-            lbl_802823A8 = 0;
+            gTargetToTargetShotPoints = 0;
             gPlayers[nPlayer].nE90 = 0;
-            lbl_802823A4 = 0;
+            gTargetToTargetShotBalls = 0;
             if (Misc_RandFunc(0) & 1) {
                 nMsg = 0xB;
             } else {
@@ -299,13 +299,13 @@ void fn_800F5F58(int nPlayer) {
         gPlayers[nPlayer].nE90 = 0;
     }
     if (nSurface >= 0x85 && nSurface <= 0x90 && GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
-        lbl_802823A8 = 0;
-        lbl_802823A4 = 0;
+        gTargetToTargetShotPoints = 0;
+        gTargetToTargetShotBalls = 0;
     }
-    if (lbl_802823A8 != 0) {
-        if (lbl_802823A8 > 0) {
-            lbl_802823A8 = GM_Earnings_ComputeBonusModifiers(lbl_802823A8, nPlayer, 1, 1, 1, 0);
-            lbl_802823A8 = GM_Earnings_ComputeTOURCardModifiers(lbl_802823A8, nPlayer, 0);
+    if (gTargetToTargetShotPoints != 0) {
+        if (gTargetToTargetShotPoints > 0) {
+            gTargetToTargetShotPoints = GM_Earnings_ComputeBonusModifiers(gTargetToTargetShotPoints, nPlayer, 1, 1, 1, 0);
+            gTargetToTargetShotPoints = GM_Earnings_ComputeTOURCardModifiers(gTargetToTargetShotPoints, nPlayer, 0);
         } else if (nMsg == -1) {
             if (!(Misc_RandFunc(0) & 1)) {
                 nMsg = 0;
@@ -313,28 +313,28 @@ void fn_800F5F58(int nPlayer) {
                 nMsg = 0x4E;
             }
         }
-        if (lbl_802823A8 + gPlayers[nPlayer].nDD8 < 0) {
+        if (gTargetToTargetShotPoints + gPlayers[nPlayer].nDD8 < 0) {
             GM_Earnings_AwardMoney(nPlayer, -gPlayers[nPlayer].nDD8, 0);
         } else {
-            GM_Earnings_AwardMoney(nPlayer, lbl_802823A8, 0);
+            GM_Earnings_AwardMoney(nPlayer, gTargetToTargetShotPoints, 0);
         }
-        gPlayers[nPlayer].nDD8 += lbl_802823A8;
+        gPlayers[nPlayer].nDD8 += gTargetToTargetShotPoints;
         if (gPlayers[nPlayer].nDD8 < 0) {
             gPlayers[nPlayer].nDD8 = 0;
         } else if (!gSession.bReplay) {
             if (GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
-                GameMsg_Send5Ints(0x33, lbl_802823A8, 0, 0, 0xD6, 1);
+                GameMsg_Send5Ints(0x33, gTargetToTargetShotPoints, 0, 0, 0xD6, 1);
             } else {
-                GameMsg_Send5Ints(0x33, lbl_802823A8, 0, 0, nSurface, 1);
+                GameMsg_Send5Ints(0x33, gTargetToTargetShotPoints, 0, 0, nSurface, 1);
             }
-            if (lbl_802823A8 > 0 && nSurface < 0x85) {
+            if (gTargetToTargetShotPoints > 0 && nSurface < 0x85) {
                 Gaud_MoneyAward();
             }
         }
     }
-    if (lbl_802823A4 != 0) {
-        gPlayers[nPlayer].nDC0 += lbl_802823A4;
-        gPlayers[nPlayer].aDC4[1] += lbl_802823A4;
+    if (gTargetToTargetShotBalls != 0) {
+        gPlayers[nPlayer].nDC0 += gTargetToTargetShotBalls;
+        gPlayers[nPlayer].aDC4[1] += gTargetToTargetShotBalls;
     }
     if (nMsg != -1) {
         GameModeSkillZoneBase_StartComment(nMsg);
@@ -430,7 +430,7 @@ u8 fn_800F69C8(int nPlayer) {
 }
 
 s32 fn_800F6A00(s32 a) {
-    return lbl_802823A8;
+    return gTargetToTargetShotPoints;
 }
 
 // A target's state for the HUD: 1 for every target but the next one.
@@ -439,7 +439,7 @@ s32 fn_800F6A08(int nPlayer, int i) {
 }
 
 s32 fn_800F6A34(s32 a) {
-    return lbl_802823A4;
+    return gTargetToTargetShotBalls;
 }
 
 void fn_800F6A3C(void) {
