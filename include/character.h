@@ -18,16 +18,16 @@ typedef struct IKLink {
     u8   b0;                    // 0x00  cleared by SKEL_CreateIKChain
     u8   nBone;                 // 0x01  the model's bone index (CharModel_GetBoneIndexMapped)
     u8   pad2[2];
-    f32  f4;                    // 0x04  only links above 0 are posed (fn_80026B4C, fn_80026F90)
+    f32  f4;                    // 0x04  only links above 0 are posed (SKEL_SetIKChainRotations, SKEL_ResetIKChain)
     s32  n8;                    // 0x08
     f32  fC;                    // 0x0C
     f32  f10;                   // 0x10
     s8   nPrev;                 // 0x14  the link before it in the chain, -1 for the first (every
-    u8   pad15[3];              //       access is a byte: fn_80026BF4, SKEL_CreateIKChain)
+    u8   pad15[3];              //       access is a byte: SKEL_TransformIKChain, SKEL_CreateIKChain)
     f32  q18[4];                // 0x18  its rotation (quaternion) from the link before it
     f32  v28[4];                // 0x28  its offset from the link before it
     f32  q38[4];                // 0x38  } q18 and v28 kept for a link whose b0 bit 1 is set:
-    f32  v48[4];                // 0x48  }   fn_80027478 poses it from these
+    f32  v48[4];                // 0x48  }   SKEL_TransformIKChainFromBones poses it from these
     f32  v58[3];                // 0x58  its rotation as a vector (axis * angle)
     u8   unk64[0x78 - 0x64];
 } IKLink;
@@ -38,7 +38,7 @@ typedef struct IKChain {
     s8   nLinks;                // 0x00
     u8   unk1[3];
     IKLink* pLinks;             // 0x04
-    f32  v8[4];                 // 0x08  its last link's position (fn_800271A0)
+    f32  v8[4];                 // 0x08  its last link's position (SKEL_InitIKChain)
     s32  n18;                   // 0x18
     f32  f1C;                   // 0x1C
 } IKChain;
@@ -120,18 +120,18 @@ typedef struct Skeleton {
     f32  fIKWeight;             // 0x1070  SKEL_SetIKSolutionWeight
     f32  f1074;                 // 0x1074  } set by SKEL_RelaxIK and SKEL_TransitionIK
     f32  f1078;                 // 0x1078  }
-    f32  q107C[4];              // 0x107C  a rotation (quaternion) fn_800279C0 turns the grip's by
+    f32  q107C[4];              // 0x107C  a rotation (quaternion) SKEL_PostTransformIKSkeleton turns the grip's by
     f32  v108C[4];              // 0x108C  an offset from the grip, turned by its rotation: the IK
-                                //         target of the second chain (fn_800279C0)
-    f32  f109C;                 // 0x109C  } 0.025 and 0.15 from fn_800280E8
+                                //         target of the second chain (SKEL_PostTransformIKSkeleton)
+    f32  f109C;                 // 0x109C  } 0.025 and 0.15 from SKEL_InitIKSkeleton
     f32  f10A0;                 // 0x10A0  }
     f32  v10A4[4];              // 0x10A4
     f32  v10B4[4];              // 0x10B4  v10A4 scaled by the IK weight
     f32  f10C4;                 // 0x10C4  the IK weight
-    f32  f10C8;                 // 0x10C8  } set up by fn_800280E8: the first link's offset height,
+    f32  f10C8;                 // 0x10C8  } set up by SKEL_InitIKSkeleton: the first link's offset height,
     f32  f10CC;                 // 0x10CC  }   0.025 and 0.05
     f32  f10D0;                 // 0x10D0  }
-    f32  q10D4[4];              // 0x10D4  a rotation (quaternion) given by fn_80027808
+    f32  q10D4[4];              // 0x10D4  a rotation (quaternion) given by SKEL_SetExtraRightShoulderRotation
     s32  n10E4;                 // 0x10E4  set to 4 as a swing starts
     f32  a10E8[2][4];           // 0x10E8  per leg, the last good bend axis (Character_IKLegToGround,
                                 //         legs 0 and 1)
@@ -267,7 +267,7 @@ extern char* lbl_80187278[90];
 // Skeleton.c: the names of the club models' bones ("IGDriver", "IGputter", "IGiron3", "IGiron7",
 // "IGwedge"); SKEL_GenerateBoneLookupTable gives a model bone with one of them bone id 0x52's index.
 extern char* gSkelClubBoneNames[5];
-extern struct Character* gSkelIKCharacter;   // Skeleton.c: the character fn_80027E8C moves with its root
+extern struct Character* gSkelIKCharacter;   // Skeleton.c: the character SKEL_AdjustHipPosition moves with its root
 extern u8 gSkelPantBones[6];      // Skeleton.c: the bone ids of the model's kind 2 dynamic chains
 extern u8 gSkelSleeveBones[6];      // Skeleton.c: the bone ids of its kind 3 dynamic chains
 
@@ -817,9 +817,9 @@ void  SKATime_SetTimeScale(u8* pAnim, f32 fRate);           // 0x8001F084
 void  Character_PlayClip(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime);
 void  Quat_Copy(f32* pSrc, f32* pDst);            // copy a quaternion
 void  SKEL_SetIKSolutionWeight(Skeleton* pSkel, f32 f);
-void  fn_80027108(Skeleton* pSkel);                                         // Skeleton.c
+void  SKEL_ResetIKSkeleton(Skeleton* pSkel);                                         // Skeleton.c
 void  SKEL_TranslateIKChainY(CharModel* pModel, IKChain* pChain, f32 f);   // Skeleton.c
-void  fn_80027808(CharModel* pModel, f32* pRot);
+void  SKEL_SetExtraRightShoulderRotation(CharModel* pModel, f32* pRot);
 void  SKEL_RelaxIK(Skeleton* pSkel);
 void  SKEL_TransitionIK(Skeleton* pSkel, u8 b, f32 f);
 void  fn_80028A3C(CharModel* pModel);

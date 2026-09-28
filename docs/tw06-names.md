@@ -161,12 +161,12 @@ Functions still unnamed or named from TW06:
 | `8000C594` | `Ter_GetTGD` | `Ter_TerrainGameDataMgr::GetTGD` | medium | PS2 calls(r0,8) |
 | `8001966C` | `Character_AlignCharacterForShotImpact` | `Character_AlignCharacterForShotImpact` | medium | PS2 nbr(r1,2) |
 | `8001FCF4` | `fn_8001FCF4` | `SKA_Update` | medium | PS2 nbr(r4,2) |
-| `80026BF4` | `fn_80026BF4` | `SKEL_TransformIKChain` | medium | Xbox calls(r0,1) |
-| `80026D18` | `fn_80026D18` | `SKEL_ItterateIKChain` | medium | Xbox anchor(1)+graph |
+| `80026BF4` | `SKEL_TransformIKChain` | `SKEL_TransformIKChain` | medium | Xbox calls(r0,1) |
+| `80026D18` | `SKEL_ItterateIKChain` | `SKEL_ItterateIKChain` | medium | Xbox anchor(1)+graph |
 | `80027964` | `fn_80027964` | `SKEL_TransitionIK` | medium | PS2 calls(r0,1) |
 | `80027E28` | `fn_80027E28` | `SKEL_TranslateIKChainY` | medium | PS2 calls(r0,1) |
-| `80027E8C` | `fn_80027E8C` | `SKEL_AdjustHipPosition` | medium | Xbox anchor(1)+graph |
-| `800280E8` | `fn_800280E8` | `SKEL_InitIKSkeleton` | medium | PS2 nbr(r3,2) |
+| `80027E8C` | `SKEL_AdjustHipPosition` | `SKEL_AdjustHipPosition` | medium | Xbox anchor(1)+graph |
+| `800280E8` | `SKEL_InitIKSkeleton` | `SKEL_InitIKSkeleton` | medium | PS2 nbr(r3,2) |
 | `80028564` | `fn_80028564` | `_HLBListAddChangeBuddy` | medium | PS2 nbr(r1,2) |
 | `80030254` | `fn_80030254` | `Ter_vInitModule` | medium | PS2 anchor(1)+graph |
 | `8003A7C8` | `fn_8003A7C8` | `DynamicCam_ChooseScript` | medium | PS2 calls(r0,1) |

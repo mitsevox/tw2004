@@ -121,8 +121,8 @@ void  Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, i
 void  Character_CalculateClipPoints(Character* pChar);
 void  Character_SetupForShot(Character* pChar);
 void  fn_80021978(u8 v);                                        // ska_shared.c
-void  fn_8002787C(CharModel* pModel);                           // Skeleton.c
-void  fn_800279C0(Character* pChar);                            // Skeleton.c
+void  SKEL_PreTransformIKSkeleton(CharModel* pModel);                           // Skeleton.c
+void  SKEL_PostTransformIKSkeleton(Character* pChar);                            // Skeleton.c
 void  SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform);   // Skeleton.c
 void  fn_80037C48(Skin* pSkin, SkelPose* pPose);                // Skin.c
 void  fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);                  // CharAnim.c
@@ -131,7 +131,7 @@ void  Quat_QuatToMatrix(f32* pQ, f32 (*m)[4]);                        // Quatern
 int   Character_UpdateClubAttachment(Character* pChar, Clip* pClip);
 void  Quat_Invert(f32* pQ, f32* pOut);                          // Quaternion.c
 void  Quat_RotateVector(f32* pQ, f32* pIn, f32* pOut);                // Quaternion.c: a vector turned by pQ
-void  fn_800280E8(Character* pChar, f32* pPos, int bPlace);     // Skeleton.c
+void  SKEL_InitIKSkeleton(Character* pChar, f32* pPos, int bPlace);     // Skeleton.c
 void  Char_Vec4Sub(f32* pA, f32* pB, f32* pOut);
 void  Character_BeginLoadTexturesCallbackIG(Character* pChar);
 void  Character_RequestClothesUpdateIG(int n);
@@ -580,7 +580,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
         }
     }
     if (pChar->pModel->pSkel != NULL) {
-        fn_8002787C(pChar->pModel);
+        SKEL_PreTransformIKSkeleton(pChar->pModel);
     }
     if (pChar->blend.pPose != NULL) {
         fn_8007260C(pChar, &pChar->blend, pChar->pModel, pChar->fAnimTime);
@@ -630,7 +630,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     }
     if (Character_IsGolfer(pChar)) {
         if (pChar->pModel->pSkel != NULL) {
-            fn_800279C0(pChar);
+            SKEL_PostTransformIKSkeleton(pChar);
         }
         Character_KeepClubOutOfGround(pChar);
     }
@@ -2668,7 +2668,7 @@ void Character_SetupForShot(Character* pChar) {
         CharModel_GetBoneIndex(pChar->pModel, 0x52);
         pClip = Char_SetClip(pChar, 0, pChar->nStyle, NULL);
         if (pClip->pD8 == NULL) {
-            fn_80027108(pSkel);
+            SKEL_ResetIKSkeleton(pSkel);
             SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 0.0f);
             pChar->pModel->pSkel->f1074 = 0.0f;
             return;
@@ -2693,7 +2693,7 @@ void Character_SetupForShot(Character* pChar) {
         Char_Vec4Add(vOffsetZ, pChar->pModel->pBones[0].v1C, pChar->pModel->pBones[0].v1C);
         Quat_Copy(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
         Vec4_CopyPoint(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
-        fn_80027108(pSkel);
+        SKEL_ResetIKSkeleton(pSkel);
         if (pChar->pClubSet != NULL) {
             pSkel->pose.aBones[pChar->nClubHeadBone].v10[1] = pChar->pClubSet->afC[pChar->nClubClass];
         }
@@ -2711,7 +2711,7 @@ void Character_SetupForShot(Character* pChar) {
         Char_Vec4Add(gPlayers[pChar->nPlayer].ball.vPos, vOffsetX, vPos);
         Char_Vec4Add(vPos, vOffsetZ, vPos);
         vPos[1] += gClubStanceOffsets[pChar->nClubClass][1];
-        fn_800280E8(pChar, vPos, bPlace);
+        SKEL_InitIKSkeleton(pChar, vPos, bPlace);
         pChar->pModel->pSkel->n1130 = pChar->nClipKey;
         pChar->pModel->pSkel->n112C = pChar->nClubClass;
         if (((pChar->n20 == 5 || pChar->nAnim == 5) && fn_8009637C(pChar)) || pChar->n20 == 7) {

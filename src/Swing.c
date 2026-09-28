@@ -1028,7 +1028,8 @@ static f32 Swing_StrippedFn2(f32 x) {
 
 // Twist the club with the stick: how far through the backswing (animation 6, eased in) or the
 // downswing (7, eased out) the animation is, times 0.75 and a smoothed copy of the stick's X,
-// becomes a Z rotation on the model (fn_80027808), negated when Character_IsLeftHanded().
+// becomes a Z rotation on the model (SKEL_SetExtraRightShoulderRotation), negated when
+// Character_IsLeftHanded().
 void SW_vUIAdjustClub(Character* pObj, SwingData* pSw, int nStickX) {
     f32 fAmount = 0.0f;
     f32 fDelta;
@@ -1061,7 +1062,7 @@ void SW_vUIAdjustClub(Character* pObj, SwingData* pSw, int nStickX) {
         fAmount = -fAmount;
     }
     Quat_EulerAngles(0.0f, 0.0f, fAmount, vRot);
-    fn_80027808(pObj->pModel, vRot);
+    SKEL_SetExtraRightShoulderRotation(pObj->pModel, vRot);
 }
 
 // ---- the hit -----------------------------------------------------------------------------------

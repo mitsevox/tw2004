@@ -318,7 +318,7 @@ They will be sorted into the sections below.
   code is a `goto` to a label after that code (char GetTerrainHeightAndNormal); a duplicated tail is
   written twice (`if (n < 30) { if (x) return 1; return t; } return t;`, fe_craputils fn_8005832C).
 - **[verified] `b = b != 0;`** before a test reproduces `clrlwi; neg; or; srwi.` (char Character_PreRenderAll).
-- **[verified] Two calls multiplied: the right-hand one runs first** (`f(a) * f(b)`; Skeleton fn_80026D18,
+- **[verified] Two calls multiplied: the right-hand one runs first** (`f(a) * f(b)`; Skeleton SKEL_ItterateIKChain,
   GoRenderCtx RenderState_SetViewport). `f = call(); f *= c;` puts the call result first in `fmuls`; `call() * c` puts
   the constant first (GoCamCont fn_80063F08, TexAnimManager fn_80076C20).
 - **[verified] A switch's compare tree shows its empty cases**: add `case 0: case 3: break;` to get it
