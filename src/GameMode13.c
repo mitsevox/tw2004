@@ -65,8 +65,8 @@ void GameModeSkillZoneTimed_Init(void) {
     gpGame->pfnEndGolferTurn = GameModeSkillZoneTimed_EndGolferTurn;
     gpGame->pfnCheckShotAwards = GameModeSkillZoneTimed_CheckShotAwards;
     gpGame->pfnLoadHole = GameModeSkillZoneTimed_LoadHole;
-    gpGame->pfn228 = GameModeSkillZoneTimed_UpdateSwingUI;
-    gpGame->pfn24C = GameModeSkillZoneTimed_InitialFlyByDone;
+    gpGame->pfnSwingUpdate = GameModeSkillZoneTimed_UpdateSwingUI;
+    gpGame->pfnInitialFlyByDone = GameModeSkillZoneTimed_InitialFlyByDone;
     gpGame->pfnRestartHole = GameModeSkillZoneTimed_RestartHole;
     gpGame->pfnStartGamePreData = GameModeSkillZoneTimed_StartGamePreData;
     gpGame->pfnBallOOB = GameModeSkillZoneTimed_BallOOB;
@@ -156,8 +156,8 @@ s32 GameModeSkillZoneTimed_GetHonors(int nPlayer) {
 
 // End of a golfer's turn (pfnEndGolferTurn): message 18 (PlayNow_SendMessage18); the ball goes back
 // on the player's tee (with in-flight replays on, gReplayData.bF10, the replay's saved ball is
-// copied back instead); the shots taken (nDC0) are counted, and aDC4[0] when the shot had a
-// multiplier.
+// copied back instead); the shots taken (nBalls) are counted, and aSkillZoneStats[0] when the shot
+// had a multiplier.
 void GameModeSkillZoneTimed_EndGolferTurn(int nPlayer) {
     PlayNow_SendMessage18(nPlayer);
     if (gReplayData.bF10) {
@@ -166,9 +166,9 @@ void GameModeSkillZoneTimed_EndGolferTurn(int nPlayer) {
         Physics_InitBall(&gPlayers[nPlayer].ball,
                     &gPlayers[nPlayer].ball.pCourse->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
     }
-    gPlayers[nPlayer].nDC0++;
+    gPlayers[nPlayer].nBalls++;
     if (gPlayers[nPlayer].nDBC > 1) {
-        gPlayers[nPlayer].aDC4[0]++;
+        gPlayers[nPlayer].aSkillZoneStats[0]++;
     }
 }
 
@@ -179,14 +179,15 @@ void GameModeSkillZoneTimed_EndGolferTurn(int nPlayer) {
 // adds its seconds plus 5; the last target not yet hit pays the all-targets prize instead, with no
 // time. A target hit before pays its points and seconds scaled by 0.75 per earlier hit; after 4
 // hits it pays nothing (Gaud_TargetClosedOut). A target surface past the drive line is a drive: a
-// new longest one (nDDC) pays as a surface, any other nothing. Those points are multiplied by nDBC,
-// the scale, the target factor (targets only) and the bonus multiplier (gTimedBonusMultiplier),
-// then the earnings modifiers; a loss never takes the winnings (nDD8) below 0. Added seconds go to
-// the HUD clock as the player's new total (n290 plus seconds * 60 frames; n290 itself is set
-// through SetTimer, from the UI) and are summed in aDC4[4]; the ticking stops when the clock climbs
-// past 10 seconds and starts when time added to an empty one is 10 seconds or less. If time ran
-// out in flight (bE9D), time earned saves the player, else comment 0x14. Target streaks (nE90,
-// best nE8C), bullseyes (nDE0) and target hits (aDC4[3]) are counted.
+// new longest one (nSkillZoneLongestDrive) pays as a surface, any other nothing. Those points are
+// multiplied by nDBC, the scale, the target factor (targets only) and the bonus multiplier
+// (gTimedBonusMultiplier), then the earnings modifiers; a loss never takes the winnings
+// (nSkillZonePoints) below 0. Added seconds go to the HUD clock as the player's new total (n290
+// plus seconds * 60 frames; n290 itself is set through SetTimer, from the UI) and are summed in
+// aSkillZoneStats[4]; the ticking stops when the clock climbs past 10 seconds and starts when time
+// added to an empty one is 10 seconds or less. If time ran out in flight (bE9D), time earned saves
+// the player, else comment 0x14. Target streaks (nHitStreak, best nBestHitStreak), bullseyes
+// (nBullseyes) and target hits (aSkillZoneStats[3]) are counted.
 void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
     s32 nBalls;
     s32 nSurface;
@@ -210,12 +211,12 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
     fLength = fn_800D0550(nPlayer);
     if (nSurface >= 0x85 && nSurface <= 0x90 && !GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
         nTarget = GameModeSkillZoneBase_GetGreenIndexHit(nPlayer);
-        gPlayers[nPlayer].nE90++;
-        if (gPlayers[nPlayer].nE90 > gPlayers[nPlayer].nE8C) {
-            gPlayers[nPlayer].nE8C = gPlayers[nPlayer].nE90;
+        gPlayers[nPlayer].nHitStreak++;
+        if (gPlayers[nPlayer].nHitStreak > gPlayers[nPlayer].nBestHitStreak) {
+            gPlayers[nPlayer].nBestHitStreak = gPlayers[nPlayer].nHitStreak;
         }
-        nHits = gPlayers[nPlayer].nDE4[nTarget];
-        for (j = 0; j < gPlayers[nPlayer].nDE4[nTarget]; j++) {
+        nHits = gPlayers[nPlayer].nTargetHits[nTarget];
+        for (j = 0; j < gPlayers[nPlayer].nTargetHits[nTarget]; j++) {
             fScale *= 0.75f;
         }
         if (nHits == 0) {
@@ -225,14 +226,14 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
                 gTimedShotPoints = GM_Earnings_ComputeBonusModifiers(gTimedShotPoints, nPlayer, 1, 1, 1, 0);
                 gTimedShotPoints = GM_Earnings_ComputeTOURCardModifiers(gTimedShotPoints, nPlayer, 0);
                 GM_Earnings_AwardMoney(nPlayer, gTimedShotPoints, 0);
-                gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
+                gPlayers[nPlayer].nHoleHits[Game_CurHoleIndex()]++;
                 gTimedShotSeconds = 0;
-                gPlayers[nPlayer].nDD8 += gTimedShotPoints;
+                gPlayers[nPlayer].nSkillZonePoints += gTimedShotPoints;
                 GameMsg_Send5Ints(0x33, gTimedShotPoints, 0, 0, 0xCA, 1);
                 gTimedShotPoints = 0;
                 gTimedShotSeconds = 0;
-                if ((s8)gPlayers[nPlayer].bE9E == 0) {
-                    gPlayers[nPlayer].bE9E = 1;
+                if ((s8)gPlayers[nPlayer].bAllTargetsHit == 0) {
+                    gPlayers[nPlayer].bAllTargetsHit = 1;
                     if (!(Misc_RandFunc(0) & 1)) {
                         nMsg = 0x2B;
                     } else {
@@ -247,12 +248,12 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
                 gTimedShotPoints = GM_Earnings_ComputeBonusModifiers(gTimedShotPoints, nPlayer, 1, 1, 1, 0);
                 gTimedShotPoints = GM_Earnings_ComputeTOURCardModifiers(gTimedShotPoints, nPlayer, 0);
                 GM_Earnings_AwardMoney(nPlayer, gTimedShotPoints, 0);
-                gPlayers[nPlayer].aCD4[gPlayers[nPlayer].nCD0] = nSurface;
-                gPlayers[nPlayer].nCD0++;
-                gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
-                gPlayers[nPlayer].nDD8 += gTimedShotPoints;
+                gPlayers[nPlayer].aShotSurfaces[gPlayers[nPlayer].nShotSurfaceCount] = nSurface;
+                gPlayers[nPlayer].nShotSurfaceCount++;
+                gPlayers[nPlayer].nHoleHits[Game_CurHoleIndex()]++;
+                gPlayers[nPlayer].nSkillZonePoints += gTimedShotPoints;
                 gTimedShotSeconds += 5;
-                gPlayers[nPlayer].aDC4[4] += gTimedShotSeconds * 60;
+                gPlayers[nPlayer].aSkillZoneStats[4] += gTimedShotSeconds * 60;
                 PlayNow_SendMessage18(nPlayer);
                 GameModeSkillZoneTimed_SetHudClock(gPlayers[nPlayer].n290[Game_CurHoleIndex()]
                                                    + gTimedShotSeconds
@@ -287,7 +288,7 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
                 break;
             }
         }
-        if (gPlayers[nPlayer].nDE4[nTarget] > 3) {
+        if (gPlayers[nPlayer].nTargetHits[nTarget] > 3) {
             fScale = 0.0f;
             gTimedShotPoints = 0;
             gTimedShotSeconds = 0;
@@ -295,10 +296,10 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
             Gaud_TargetClosedOut();
             nMsg = 2;
         } else {
-            gPlayers[nPlayer].nDE4[nTarget]++;
-            gPlayers[nPlayer].aDC4[3]++;
+            gPlayers[nPlayer].nTargetHits[nTarget]++;
+            gPlayers[nPlayer].aSkillZoneStats[3]++;
             if (nSurface == 0x85 || nSurface == 0x88 || nSurface == 0x8C) {
-                gPlayers[nPlayer].nDE0++;
+                gPlayers[nPlayer].nBullseyes++;
                 Gaud_BullsEye();
                 pBall = &gPlayers[nPlayer].ball;
                 fn_800A30E4(8, pBall, nPlayer, 0, 0.0f);
@@ -315,11 +316,11 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
             }
         }
     } else {
-        gPlayers[nPlayer].nE90 = 0;
+        gPlayers[nPlayer].nHitStreak = 0;
     }
     if (nSurface >= 0x85 && nSurface <= 0x90 && GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
-        if (fLength > gPlayers[nPlayer].nDDC) {
-            gPlayers[nPlayer].nDDC = fLength;
+        if (fLength > gPlayers[nPlayer].nSkillZoneLongestDrive) {
+            gPlayers[nPlayer].nSkillZoneLongestDrive = fLength;
             switch (Misc_RandFunc(0) & 3) {
             case 0:
                 nMsg = 0x31;
@@ -351,7 +352,7 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
     }
     if (gTimedShotSeconds != 0) {
         gTimedShotSeconds = gTimedShotSeconds * fScale;
-        gPlayers[nPlayer].aDC4[4] += gTimedShotSeconds * 60;
+        gPlayers[nPlayer].aSkillZoneStats[4] += gTimedShotSeconds * 60;
         PlayNow_SendMessage18(nPlayer);
         GameModeSkillZoneTimed_SetHudClock(gPlayers[nPlayer].n290[Game_CurHoleIndex()] + gTimedShotSeconds
                                            * 60);
@@ -389,17 +390,17 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
         } else {
             GameModeSkillZoneBase_StartComment(0x4E);
         }
-        gPlayers[nPlayer].aCD4[gPlayers[nPlayer].nCD0] = nSurface;
-        gPlayers[nPlayer].nCD0++;
-        gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
-        if (gTimedShotPoints + gPlayers[nPlayer].nDD8 < 0) {
-            GM_Earnings_AwardMoney(nPlayer, -gPlayers[nPlayer].nDD8, 0);
+        gPlayers[nPlayer].aShotSurfaces[gPlayers[nPlayer].nShotSurfaceCount] = nSurface;
+        gPlayers[nPlayer].nShotSurfaceCount++;
+        gPlayers[nPlayer].nHoleHits[Game_CurHoleIndex()]++;
+        if (gTimedShotPoints + gPlayers[nPlayer].nSkillZonePoints < 0) {
+            GM_Earnings_AwardMoney(nPlayer, -gPlayers[nPlayer].nSkillZonePoints, 0);
         } else {
             GM_Earnings_AwardMoney(nPlayer, gTimedShotPoints, 0);
         }
-        gPlayers[nPlayer].nDD8 += gTimedShotPoints;
-        if (gPlayers[nPlayer].nDD8 < 0) {
-            gPlayers[nPlayer].nDD8 = 0;
+        gPlayers[nPlayer].nSkillZonePoints += gTimedShotPoints;
+        if (gPlayers[nPlayer].nSkillZonePoints < 0) {
+            gPlayers[nPlayer].nSkillZonePoints = 0;
         } else if (!gSession.bReplay) {
             if (GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
                 GameMsg_Send5Ints(0x33, gTimedShotPoints, 0, 0, 0xD6, 1);
@@ -429,8 +430,9 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
             nMsg = 0x14;
         }
     }
-    if (fLength > gPlayers[nPlayer].nDDC && !GM_IsBallOOB(nPlayer, &gPlayers[nPlayer].ball)) {
-        gPlayers[nPlayer].nDDC = fLength;
+    if (fLength > gPlayers[nPlayer].nSkillZoneLongestDrive
+        && !GM_IsBallOOB(nPlayer, &gPlayers[nPlayer].ball)) {
+        gPlayers[nPlayer].nSkillZoneLongestDrive = fLength;
     }
     if (nMsg != -1) {
         GameModeSkillZoneBase_StartComment(nMsg);
@@ -476,7 +478,7 @@ void GameModeSkillZoneTimed_SetupNextGolfer(void) {
         if ((s8)GOLFERSTATE_GetCurrentState(i) == 1) {
             GameModeSkillZoneBase_SetupBonusBall(i);
             GameModeSkillZoneTimed_SetHudClock(PLAYER(i)->n290[Game_CurHoleIndex()]);
-            if (PLAYER(i)->nDC0 == 0) {
+            if (PLAYER(i)->nBalls == 0) {
                 GameModeSkillZoneBase_SetCup_AlignGolfer(i, (s8)PLAYER(i)->nTarget);
             }
         }
@@ -491,8 +493,8 @@ void GameModeSkillZoneTimed_LoadHole(void) {
     GameModeSkillZoneTimed_ClearPerHoleData();
 }
 
-// After the hole flyover (pfn24C): the HUD clock and all five players' time for the hole are set to
-// 90 seconds (5400 frames).
+// After the hole flyover (pfnInitialFlyByDone): the HUD clock and all five players' time for the
+// hole are set to 90 seconds (5400 frames).
 void GameModeSkillZoneTimed_InitialFlyByDone(int nPlayer) {
     int i;
     GameModeSkillZoneTimed_SetHudClock(5400);
@@ -521,7 +523,7 @@ void GameModeSkillZoneTimed_ClearPerHoleData(void) {
     }
 }
 
-// Every frame of the swing state (pfn228): once the swing has begun (SwingData.nState not
+// Every frame of the swing state (pfnSwingUpdate): once the swing has begun (SwingData.nState not
 // SW_IDLE_SWING), UI message 0x36 (no value) is sent.
 void GameModeSkillZoneTimed_UpdateSwingUI(int nPlayer) {
     if (gPlayers[nPlayer].swing.nState != 0) {
@@ -584,10 +586,10 @@ void GameModeSkillZoneTimed_BallOOB(int nPlayer) {
 }
 
 // A mulligan was taken (pfnMulligan): the shot's multiplier (nDBC) goes back to 1 and the target
-// streak (nE90) to 0.
+// streak (nHitStreak) to 0.
 void GameModeSkillZoneTimed_Mulligan(int nPlayer) {
     gPlayers[nPlayer].nDBC = 1;
-    gPlayers[nPlayer].nE90 = 0;
+    gPlayers[nPlayer].nHitStreak = 0;
 }
 
 // Sets the player's time left on the current hole (n290), in frames (pfnSetTimer, from a UI
@@ -620,7 +622,7 @@ void GameModeSkillZoneTimed_CollisionActor(int nPlayer, int nId) {
 // Which marker model target nTarget shows for the player (pfnGreenType, GoDynObj.c): 1 once they
 // have hit it 4 times (closed out, it pays no more), else 0.
 s32 GameModeSkillZoneTimed_GreenType(int nPlayer, int nTarget) {
-    if (gPlayers[nPlayer].nDE4[nTarget] > 3) {
+    if (gPlayers[nPlayer].nTargetHits[nTarget] > 3) {
         return 1;
     }
     return 0;

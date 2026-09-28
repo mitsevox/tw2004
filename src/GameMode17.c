@@ -1,8 +1,8 @@
 // GameMode17.c (our name; TW07's GameMode_SkillZoneTargetToTarget.cpp, whose methods it has in the
-// same order): game mode 17, target to target, one hole. Each player starts with 5 balls (nDC0) and
-// must hit the targets in order, nearest the tee first (nNextTarget; the target buttons keep the
-// aim on it); a hit on any other target pays nothing. The surface a ball lands on can pay points
-// and extra balls. Hitting every target wins the all-targets prize (the id 999 row) plus 100
+// same order): game mode 17, target to target, one hole. Each player starts with 5 balls (nBalls)
+// and must hit the targets in order, nearest the tee first (nNextTarget; the target buttons keep
+// the aim on it); a hit on any other target pays nothing. The surface a ball lands on can pay
+// points and extra balls. Hitting every target wins the all-targets prize (the id 999 row) plus 100
 // points per ball left. There are no shot multipliers. The hole ends when player 0 has hit every
 // target or nobody has a ball left. The shared target-game code is GameTargets.c.
 
@@ -58,7 +58,7 @@ void GameModeSkillZoneTargetToTarget_Init(void) {
     gpGame->pfnEndGolferTurn = GameModeSkillZoneTargetToTarget_EndGolferTurn;
     gpGame->pfnCheckShotAwards = GameModeSkillZoneTargetToTarget_CheckShotAwards;
     gpGame->pfnLoadHole = GameModeSkillZoneTargetToTarget_LoadHole;
-    gpGame->pfn228 = GameModeSkillZoneTargetToTarget_UpdateSwingUI;
+    gpGame->pfnSwingUpdate = GameModeSkillZoneTargetToTarget_UpdateSwingUI;
     gpGame->pfnRestartHole = GameModeSkillZoneTargetToTarget_RestartHole;
     gpGame->pfnStartGamePreData = GameModeSkillZoneTargetToTarget_StartGamePreData;
     gpGame->pfnBallOOB = GameModeSkillZoneTargetToTarget_BallOOB;
@@ -100,8 +100,8 @@ void GameModeSkillZoneTargetToTarget_Shutdown(void) {
     gSession.options.nWind = gTargetToTargetSavedWind;
 }
 
-// As a round starts (pfn1EC, GM_InitModule_PreDataStream): saves options.nWeather and the wind
-// setting (Shutdown puts them back) and sets them to 4 and 0, no wind.
+// As a round starts (pfnStartGamePreData, GM_InitModule_PreDataStream): saves options.nWeather and
+// the wind setting (Shutdown puts them back) and sets them to 4 and 0, no wind.
 void GameModeSkillZoneTargetToTarget_StartGamePreData(void) {
     gTargetToTargetSavedWeather = gSession.options.nWeather;
     gTargetToTargetSavedWind = gSession.options.nWind;
@@ -116,7 +116,7 @@ u8 GameModeSkillZoneTargetToTarget_GoToPlayoff(u8 bCheck) {
 
 // Who plays next (pfnGetHonors): player 0 while nobody has a stroke on the hole; after that the
 // next player in turn after the current golfer (lbl_80282278) who is not nPlayer and still has
-// balls (nDC0); 5 when there is none.
+// balls (nBalls); 5 when there is none.
 s32 GameModeSkillZoneTargetToTarget_GetHonors(int nPlayer) {
     int i;
     int nNext;
@@ -135,7 +135,7 @@ s32 GameModeSkillZoneTargetToTarget_GetHonors(int nPlayer) {
         if (nNext >= gNumPlayersSetUp) {
             nNext = 0;
         }
-        if (nNext != nPlayer && gPlayers[nNext].nDC0 != 0) {
+        if (nNext != nPlayer && gPlayers[nNext].nBalls != 0) {
             return nNext;
         }
     }
@@ -144,7 +144,7 @@ s32 GameModeSkillZoneTargetToTarget_GetHonors(int nPlayer) {
 
 // End of a golfer's turn (pfnEndGolferTurn): the ball goes back on the player's tee (with in-flight
 // replays on, gReplayData.bF10, the replay's saved ball is copied back instead) and one ball fewer
-// is left (nDC0).
+// is left (nBalls).
 void GameModeSkillZoneTargetToTarget_EndGolferTurn(int nPlayer) {
     if (gReplayData.bF10) {
         Mem_cpy(&gPlayers[nPlayer].ball, &gReplayData.player.ball, sizeof(Ball));
@@ -152,22 +152,23 @@ void GameModeSkillZoneTargetToTarget_EndGolferTurn(int nPlayer) {
         Physics_InitBall(&gPlayers[nPlayer].ball,
                     &gPlayers[nPlayer].ball.pCourse->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
     }
-    gPlayers[nPlayer].nDC0--;
+    gPlayers[nPlayer].nBalls--;
 }
 
-// Scores a shot once the ball stops (pfn244; BallOOB too). The landing surface's
+// Scores a shot once the ball stops (pfnCheckShotAwards; BallOOB too). The landing surface's
 // gEarningsTable.aMini row gives points and extra balls (GetIDScore). A target hit short of the
 // drive line (GameModeSkillZoneBase_IsLongDrive) counts only when it is the player's next target
-// (nNextTarget): the next target moves on (back to 0 after the last), the streak (nE90, best nE8C),
-// its hit count (nDE4) and aDC4[3] go up; while every target has been hit, the all-targets prize
-// plus 100 per ball left is paid instead of the points, with comment 0x2B or 0x2C the first time
-// (bE9E). The comment says how many targets are left (1 to 5), else how far along the player is; a
-// bullseye is counted (nDE0), plays the bullseye sound and ball effect and gets comment 0x1D. Any
-// other target pays nothing, no balls, ends the streak (message 0xD0, comment 0xB or 0xD). A target
-// surface past the drive line pays nothing. Points get the earnings modifiers (no multipliers in
-// this mode); a loss (comment 0 or 0x4E) never takes the winnings (nDD8) below 0, and the result
-// goes to the HUD (message 0x33) unless in a replay. Extra balls are added to nDC0 and counted in
-// aDC4[1].
+// (nNextTarget): the next target moves on (back to 0 after the last), the streak (nHitStreak, best
+// nBestHitStreak), its hit count (nTargetHits) and aSkillZoneStats[3] go up; while every target has
+// been hit, the all-targets prize plus 100 per ball left is paid instead of the points, with
+// comment 0x2B or 0x2C the first time (bAllTargetsHit). The comment says how many targets are left
+// (1 to 5), else how far along the player is; a bullseye is counted (nBullseyes), plays the
+// bullseye sound and ball effect and gets comment 0x1D. Any other target pays nothing, no balls,
+// ends the streak (message 0xD0, comment 0xB or 0xD). A target surface past the drive line pays
+// nothing. Points get the earnings modifiers (no multipliers in this mode); a loss (comment 0 or
+// 0x4E) never takes the winnings (nSkillZonePoints) below 0, and the result goes to the HUD
+// (message 0x33) unless in a replay. Extra balls are added to nBalls and counted in
+// aSkillZoneStats[1].
 void GameModeSkillZoneTargetToTarget_CheckShotAwards(int nPlayer) {
     s32 nSurface;
     s8 nTarget;
@@ -190,27 +191,27 @@ void GameModeSkillZoneTargetToTarget_CheckShotAwards(int nPlayer) {
             if (gPlayers[nPlayer].nNextTarget >= gSkillZoneNumCups) {
                 gPlayers[nPlayer].nNextTarget = 0;
             }
-            gPlayers[nPlayer].nE90++;
-            if (gPlayers[nPlayer].nE90 > gPlayers[nPlayer].nE8C) {
-                gPlayers[nPlayer].nE8C = gPlayers[nPlayer].nE90;
+            gPlayers[nPlayer].nHitStreak++;
+            if (gPlayers[nPlayer].nHitStreak > gPlayers[nPlayer].nBestHitStreak) {
+                gPlayers[nPlayer].nBestHitStreak = gPlayers[nPlayer].nHitStreak;
             }
-            gPlayers[nPlayer].nDE4[nTarget]++;
-            gPlayers[nPlayer].aDC4[3]++;
+            gPlayers[nPlayer].nTargetHits[nTarget]++;
+            gPlayers[nPlayer].aSkillZoneStats[3]++;
             if (gSkillZoneNumCups == GameModeSkillZoneBase_CountGreensHit(nPlayer)) {
                 gTargetToTargetShotPoints = GameModeSkillZoneBase_GetHitAllTargetsBonus();
-                gTargetToTargetShotPoints += gPlayers[nPlayer].nDC0 * 100;
+                gTargetToTargetShotPoints += gPlayers[nPlayer].nBalls * 100;
                 gTargetToTargetShotPoints = GM_Earnings_ComputeBonusModifiers(gTargetToTargetShotPoints,
                         nPlayer, 1, 1, 1, 0);
                 gTargetToTargetShotPoints = GM_Earnings_ComputeTOURCardModifiers(gTargetToTargetShotPoints,
                         nPlayer, 0);
                 GM_Earnings_AwardMoney(nPlayer, gTargetToTargetShotPoints, 0);
-                gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
+                gPlayers[nPlayer].nHoleHits[Game_CurHoleIndex()]++;
                 bDone = 1;
-                gPlayers[nPlayer].nDD8 += gTargetToTargetShotPoints;
+                gPlayers[nPlayer].nSkillZonePoints += gTargetToTargetShotPoints;
                 GameMsg_Send5Ints(0x33, gTargetToTargetShotPoints, 0, 0, 0xCA, 1);
                 gTargetToTargetShotPoints = 0;
-                if ((s8)gPlayers[nPlayer].bE9E == 0) {
-                    gPlayers[nPlayer].bE9E = 1;
+                if ((s8)gPlayers[nPlayer].bAllTargetsHit == 0) {
+                    gPlayers[nPlayer].bAllTargetsHit = 1;
                     if (!(Misc_RandFunc(0) & 1)) {
                         nMsg = 0x2B;
                     } else {
@@ -299,7 +300,7 @@ void GameModeSkillZoneTargetToTarget_CheckShotAwards(int nPlayer) {
                 }
             }
             if (nSurface == 0x85 || nSurface == 0x88 || nSurface == 0x8C) {
-                gPlayers[nPlayer].nDE0++;
+                gPlayers[nPlayer].nBullseyes++;
                 Gaud_BullsEye();
                 pBall = &gPlayers[nPlayer].ball;
                 fn_800A30E4(8, pBall, nPlayer, 0, 0.0f);
@@ -321,7 +322,7 @@ void GameModeSkillZoneTargetToTarget_CheckShotAwards(int nPlayer) {
         } else {
             GameMsg_Send5Ints(0x33, 0, 0, 0, 0xD0, 1);
             gTargetToTargetShotPoints = 0;
-            gPlayers[nPlayer].nE90 = 0;
+            gPlayers[nPlayer].nHitStreak = 0;
             gTargetToTargetShotBalls = 0;
             if (Misc_RandFunc(0) & 1) {
                 nMsg = 0xB;
@@ -330,7 +331,7 @@ void GameModeSkillZoneTargetToTarget_CheckShotAwards(int nPlayer) {
             }
         }
     } else {
-        gPlayers[nPlayer].nE90 = 0;
+        gPlayers[nPlayer].nHitStreak = 0;
     }
     if (nSurface >= 0x85 && nSurface <= 0x90 && GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
         gTargetToTargetShotPoints = 0;
@@ -349,14 +350,14 @@ void GameModeSkillZoneTargetToTarget_CheckShotAwards(int nPlayer) {
                 nMsg = 0x4E;
             }
         }
-        if (gTargetToTargetShotPoints + gPlayers[nPlayer].nDD8 < 0) {
-            GM_Earnings_AwardMoney(nPlayer, -gPlayers[nPlayer].nDD8, 0);
+        if (gTargetToTargetShotPoints + gPlayers[nPlayer].nSkillZonePoints < 0) {
+            GM_Earnings_AwardMoney(nPlayer, -gPlayers[nPlayer].nSkillZonePoints, 0);
         } else {
             GM_Earnings_AwardMoney(nPlayer, gTargetToTargetShotPoints, 0);
         }
-        gPlayers[nPlayer].nDD8 += gTargetToTargetShotPoints;
-        if (gPlayers[nPlayer].nDD8 < 0) {
-            gPlayers[nPlayer].nDD8 = 0;
+        gPlayers[nPlayer].nSkillZonePoints += gTargetToTargetShotPoints;
+        if (gPlayers[nPlayer].nSkillZonePoints < 0) {
+            gPlayers[nPlayer].nSkillZonePoints = 0;
         } else if (!gSession.bReplay) {
             if (GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
                 GameMsg_Send5Ints(0x33, gTargetToTargetShotPoints, 0, 0, 0xD6, 1);
@@ -369,8 +370,8 @@ void GameModeSkillZoneTargetToTarget_CheckShotAwards(int nPlayer) {
         }
     }
     if (gTargetToTargetShotBalls != 0) {
-        gPlayers[nPlayer].nDC0 += gTargetToTargetShotBalls;
-        gPlayers[nPlayer].aDC4[1] += gTargetToTargetShotBalls;
+        gPlayers[nPlayer].nBalls += gTargetToTargetShotBalls;
+        gPlayers[nPlayer].aSkillZoneStats[1] += gTargetToTargetShotBalls;
     }
     if (nMsg != -1) {
         GameModeSkillZoneBase_StartComment(nMsg);
@@ -395,32 +396,32 @@ void GameModeSkillZoneTargetToTarget_SetupNextGolfer(void) {
     }
 }
 
-// Hole start (pfn1E4): the targets sorted nearest the tee first (SortCupsByDistanceFromTee, so they
-// are played nearest first), then ClearPerHoleData.
+// Hole start (pfnLoadHole): the targets sorted nearest the tee first (SortCupsByDistanceFromTee, so
+// they are played nearest first), then ClearPerHoleData.
 void GameModeSkillZoneTargetToTarget_LoadHole(void) {
     GameModeSkillZoneBase_SortCupsByDistanceFromTee();
     GameModeSkillZoneTargetToTarget_ClearPerHoleData();
 }
 
-// The hole restarts (pfn224, GM_RestartHole): the per-hole data cleared with 5 balls each and
-// target 0 next again (ClearPerHoleData), and player 0's default aim.
+// The hole restarts (pfnRestartHole, GM_RestartHole): the per-hole data cleared with 5 balls each
+// and target 0 next again (ClearPerHoleData), and player 0's default aim.
 void GameModeSkillZoneTargetToTarget_RestartHole(void) {
     GameModeSkillZoneTargetToTarget_ClearPerHoleData();
     AI_DefaultTarget(0);
 }
 
 // The shared per-hole clear (GameModeSkillZoneBase_ClearPerHoleData), then all five players get 5
-// balls (nDC0) and target 0 as their next (nNextTarget).
+// balls (nBalls) and target 0 as their next (nNextTarget).
 void GameModeSkillZoneTargetToTarget_ClearPerHoleData(void) {
     int i;
     GameModeSkillZoneBase_ClearPerHoleData();
     for (i = 0; i < 5; i++) {
         gPlayers[i].nNextTarget = 0;
-        gPlayers[i].nDC0 = 5;
+        gPlayers[i].nBalls = 5;
     }
 }
 
-// Every frame of the swing state (pfn228): once the swing has begun (SwingData.nState not
+// Every frame of the swing state (pfnSwingUpdate): once the swing has begun (SwingData.nState not
 // SW_IDLE_SWING), UI message 0x36 (no value) is sent.
 void GameModeSkillZoneTargetToTarget_UpdateSwingUI(int nPlayer) {
     if (gPlayers[nPlayer].swing.nState != 0) {
@@ -433,20 +434,20 @@ u8 GameModeSkillZoneTargetToTarget_GameFinished(u8 bCheck) {
     return 1;
 }
 
-// The ball went out of bounds (pfn250): the shot is scored as usual (CheckShotAwards).
+// The ball went out of bounds (pfnBallOOB): the shot is scored as usual (CheckShotAwards).
 void GameModeSkillZoneTargetToTarget_BallOOB(int nPlayer) {
     GameModeSkillZoneTargetToTarget_CheckShotAwards(nPlayer);
 }
 
 // The hole (and so the game) is over once player 0 has hit every target, or once no player has a
-// ball left (nDC0); nPlayer and bCheck are not used.
+// ball left (nBalls); nPlayer and bCheck are not used.
 u8 GameModeSkillZoneTargetToTarget_HoleFinished(int nPlayer, u8 bCheck) {
     int i;
     if (gSkillZoneNumCups == GameModeSkillZoneBase_CountGreensHit(0)) {
         return 1;
     }
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (PLAYER(i)->nDC0 != 0) {
+        if (PLAYER(i)->nBalls != 0) {
             return 0;
         }
     }
@@ -467,15 +468,15 @@ void GameModeSkillZoneTargetToTarget_GetIDScore(s32 nSurface, s32* pPoints, s32*
     }
 }
 
-// The previous-target button (pfn264): the player stays aimed at their next target in order
-// (nNextTarget, SetCup); always returns 1.
+// The previous-target button (pfnPickPrevTarget): the player stays aimed at their next target in
+// order (nNextTarget, SetCup); always returns 1.
 u8 GameModeSkillZoneTargetToTarget_PickPrevTarget(int nPlayer) {
     GameModeSkillZoneBase_SetCup(nPlayer, gPlayers[nPlayer].nNextTarget);
     return 1;
 }
 
-// The next-target (re-plan) button (pfn258): the player stays aimed at their next target in order
-// (nNextTarget, SetCup); always returns 1.
+// The next-target (re-plan) button (pfnPickTarget): the player stays aimed at their next target in
+// order (nNextTarget, SetCup); always returns 1.
 u8 GameModeSkillZoneTargetToTarget_PickTarget(int nPlayer) {
     GameModeSkillZoneBase_SetCup(nPlayer, gPlayers[nPlayer].nNextTarget);
     return 1;
@@ -486,8 +487,8 @@ s32 GameModeSkillZoneTargetToTarget_GetShotEarned(s32 nPlayer) {
     return gTargetToTargetShotPoints;
 }
 
-// Which marker model target nTarget shows for the player (pfn26C, GoDynObj.c): 0 for their next
-// target in order (nNextTarget), 1 for every other.
+// Which marker model target nTarget shows for the player (pfnGreenType, GoDynObj.c): 0 for their
+// next target in order (nNextTarget), 1 for every other.
 s32 GameModeSkillZoneTargetToTarget_GreenType(int nPlayer, int nTarget) {
     return nTarget != gPlayers[nPlayer].nNextTarget;
 }

@@ -447,16 +447,16 @@ void GbaCommunication(s32 nChan, s32 nCmd, s32 nStat) {
         nWhich = nStat;
         switch (nStat) {
         case 0:
-            nStat = FE_GetCurrentProfile()->nA8;
+            nStat = FE_GetCurrentProfile()->nBestRound;
             break;
         case 1:
-            nStat = FE_GetCurrentProfile()->nAC;
+            nStat = FE_GetCurrentProfile()->nHolesInOne;
             break;
         case 2:
-            nStat = FE_GetCurrentProfile()->nA0;
+            nStat = FE_GetCurrentProfile()->nLongestDrive;
             break;
         case 3:
-            nStat = FE_GetCurrentProfile()->nA4;
+            nStat = FE_GetCurrentProfile()->nLongestPutt;
             break;
         default:
             nStat = 0;
@@ -947,15 +947,15 @@ void fn_801242D0(void) {
         if (fn_801241B4()) {
             fn_80123CBC(0xD0, 0);
             pProfile = FE_GetCurrentProfile();
-            pProfile->n6C -= fn_8012411C();
+            pProfile->nCurrentCash -= fn_8012411C();
             fn_80124154();
             fn_801241AC(0);
         } else if (fn_801241C4()) {
             pProfile = FE_GetCurrentProfile();
-            pProfile->nA8 = fn_80124280(0);
-            pProfile->nAC = fn_80124280(1);
-            pProfile->nA0 = fn_80124280(2);
-            pProfile->nA4 = fn_80124280(3);
+            pProfile->nBestRound = fn_80124280(0);
+            pProfile->nHolesInOne = fn_80124280(1);
+            pProfile->nLongestDrive = fn_80124280(2);
+            pProfile->nLongestPutt = fn_80124280(3);
             fn_801241BC(0);
         } else if (fn_801241E4()) {
             fn_80123CBC(0x71, 0);
@@ -969,23 +969,23 @@ void fn_801242D0(void) {
     } else if (Gba_GetState() == 0x12) {
         if (fn_80124204()) {
             pProfile = FE_GetCurrentProfile();
-            pProfile->n6C -= fn_8012411C();
+            pProfile->nCurrentCash -= fn_8012411C();
             fn_80124154();
             fn_801241FC(0);
         }
         if (fn_80124214()) {
             pProfile = FE_GetCurrentProfile();
-            pProfile->nA8 = fn_80124280(0);
-            pProfile->nAC = fn_80124280(1);
-            pProfile->nA0 = fn_80124280(2);
-            pProfile->nA4 = fn_80124280(3);
+            pProfile->nBestRound = fn_80124280(0);
+            pProfile->nHolesInOne = fn_80124280(1);
+            pProfile->nLongestDrive = fn_80124280(2);
+            pProfile->nLongestPutt = fn_80124280(3);
             fn_8012420C(0);
         }
     } else if (Gba_GetState() == 6) {
         fn_80123CBC(0x90, 0);
         if (Gba_GetState() != 0x12) {
             pProfile = FE_GetCurrentProfile();
-            pProfile->n6C += fn_8012411C();
+            pProfile->nCurrentCash += fn_8012411C();
             fn_80123CBC(0x71, 0);
             fn_80124138(0);
             Gba_SetState(7);
@@ -993,10 +993,10 @@ void fn_801242D0(void) {
     } else if (Gba_GetState() == 8) {
         bFailed = 0;
         pProfile = FE_GetCurrentProfile();
-        fn_80124238(0, pProfile->nA8);
-        fn_80124238(1, pProfile->nAC);
-        fn_80124238(2, pProfile->nA0);
-        fn_80124238(3, pProfile->nA4);
+        fn_80124238(0, pProfile->nBestRound);
+        fn_80124238(1, pProfile->nHolesInOne);
+        fn_80124238(2, pProfile->nLongestDrive);
+        fn_80124238(3, pProfile->nLongestPutt);
 
         // the best round: when ours is unset (<= 0), the GBA's if it is set (not 0 or 0xFF);
         // else the lower of the two
@@ -1008,10 +1008,10 @@ void fn_801242D0(void) {
         nGot = fn_80124190();
         if (nOld <= 0) {
             if (nGot != 0 && nGot != 0xFF) {
-                pProfile->nA8 = nGot;
+                pProfile->nBestRound = nGot;
             }
         } else if (nOld > nGot) {
-            pProfile->nA8 = nGot;
+            pProfile->nBestRound = nGot;
         }
 
         // the GBA's count is added
@@ -1019,7 +1019,7 @@ void fn_801242D0(void) {
         if (Gba_GetState() == 0x12) {
             bFailed = 1;
         }
-        pProfile->nAC += fn_80124190();
+        pProfile->nHolesInOne += fn_80124190();
 
         // the longest drive and the longest putt: the higher
         fn_80123CBC(0xB0, 2);
@@ -1027,14 +1027,14 @@ void fn_801242D0(void) {
             bFailed = 1;
         }
         if (fn_80124280(2) < fn_80124190()) {
-            pProfile->nA0 = fn_80124190();
+            pProfile->nLongestDrive = fn_80124190();
         }
         fn_80123CBC(0xB0, 3);
         if (Gba_GetState() == 0x12) {
             bFailed = 1;
         }
         if (fn_80124280(3) < fn_80124190()) {
-            pProfile->nA4 = fn_80124190();
+            pProfile->nLongestPutt = fn_80124190();
         }
         if (bFailed == 0) {
             fn_80123CBC(0xD3, 0);

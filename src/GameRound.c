@@ -165,34 +165,34 @@ void GM_SetModeType(int nMode) {
     gpGame->pfnEndGame = GM_DefaultNoOp;
     gpGame->pfnIsPuttForLead = fn_800CF158;
     gpGame->pfnIsPuttForWin = fn_800CF450;
-    gpGame->pfn200 = fn_800CFE74;
-    gpGame->pfn204 = fn_800D0098;
+    gpGame->pfnGetCurrentLead = fn_800CFE74;
+    gpGame->pfnGetPotentialLead = fn_800D0098;
     gpGame->pfnGetPotentialHoleResult = fn_800D030C;
-    gpGame->pfn210 = GM_DefaultNoOpPlayer;
-    gpGame->pfn214 = GM_DefaultNoOp;
-    gpGame->pfn218 = GM_DefaultNoOpPlayer;
-    gpGame->pfn21C = GM_DefaultNoOpPlayer;
-    gpGame->pfn220 = GM_DefaultNoOp;
+    gpGame->pfnEndTurnEndHoleNotGame = GM_DefaultNoOpPlayer;
+    gpGame->pfnScorecardClosed = GM_DefaultNoOp;
+    gpGame->pfnHoledOut = GM_DefaultNoOpPlayer;
+    gpGame->pfnShotOverLimit = GM_DefaultNoOpPlayer;
+    gpGame->pfnUpdate = GM_DefaultNoOp;
     gpGame->pfnRestartHole = GM_DefaultNoOp;
-    gpGame->pfn228 = GM_DefaultNoOpPlayer;
-    gpGame->pfn22C = GM_DefaultNoOpPlayer;
-    gpGame->pfn230 = GM_DefaultFalsePlayer;
+    gpGame->pfnSwingUpdate = GM_DefaultNoOpPlayer;
+    gpGame->pfnResetShot = GM_DefaultNoOpPlayer;
+    gpGame->pfnRenderBallTarget = GM_DefaultFalsePlayer;
     gpGame->pfnCheckControllerPulled = GM_DefaultTrue;
-    gpGame->pfn238 = GM_DefaultTruePlayer;
+    gpGame->pfnOKToShoot = GM_DefaultTruePlayer;
     gpGame->pfnBallCollision = GM_DefaultNoOpPlayer;
     gpGame->pfnTriggerSplash = GM_DefaultZeroPlayer;
     gpGame->pfnCheckShotAwards = GM_DefaultNoOpPlayer;
     gpGame->pfnEndGolferTurn = GM_DefaultNoOpPlayer;
-    gpGame->pfn24C = GM_DefaultNoOpPlayer;
+    gpGame->pfnInitialFlyByDone = GM_DefaultNoOpPlayer;
     gpGame->pfnBallOOB = GM_DefaultNoOpPlayer;
     gpGame->pfnMulligan = GM_DefaultNoOpPlayer;
     gpGame->pfnPickTarget = GM_DefaultFalsePlayer;
     gpGame->pfnSetTimer = GM_DefaultSetTimeLeft;
-    gpGame->pfn260 = GM_DefaultNoOpPlayer;
+    gpGame->pfnHitBall = GM_DefaultNoOpPlayer;
     gpGame->pfnPickPrevTarget = GM_DefaultFalsePlayer;
     gpGame->pfnCollisionActor = GM_DefaultBonusCollected;
     gpGame->pfnGreenType = GM_DefaultTargetState;
-    gpGame->pfn20C = GM_DefaultNoOpPlayer;
+    gpGame->pfnPreShotInit = GM_DefaultNoOpPlayer;
     lbl_80282278 = 0;
     switch (Game_GetMode()) {
     case 0:
@@ -289,8 +289,8 @@ void GM_ClearPlayerHoleData(int nPlayer, int nHole) {
     gPlayers[nPlayer].bGreenInReg[nHole] = 0;
     gPlayers[nPlayer].bFairwayHit[nHole] = 0;
     gpGame->b16C[nPlayer][nHole] = 0;
-    gPlayers[nPlayer].nD28[nHole] = 0;
-    gPlayers[nPlayer].nD70[nHole] = 0;
+    gPlayers[nPlayer].nHolePoints[nHole] = 0;
+    gPlayers[nPlayer].nHoleHits[nHole] = 0;
 }
 
 // A new round: every player's holes and round totals cleared, the pin for every hole set from
@@ -322,7 +322,7 @@ void GM_ClearDataForNewGame(void) {
         }
         GM_ClearGameBonusStats(i);
         if (gpSaveData[p->nIndex].bActive != 0) {
-            gpSaveData[p->nIndex].b70 = 0;
+            gpSaveData[p->nIndex].bChanged = 0;
         }
     }
     for (i = 0; i < 18; i++) {
@@ -1062,11 +1062,11 @@ u8 GM_CheckForBallInHole(int nPlayer) {
 }
 
 // Whether target.c draws the player's ball-placement target: while the golfer is placing the ball
-// (GS_PLACE_BALL), or when the mode's pfn230 says so.
+// (GS_PLACE_BALL), or when the mode's pfnRenderBallTarget says so.
 u8 GM_RenderBallTarget(int nPlayer) {
     s8  nState = GOLFERSTATE_GetCurrentState(nPlayer);
     int b = 0;
-    if (nState == GS_PLACE_BALL || gpGame->pfn230(nPlayer)) {
+    if (nState == GS_PLACE_BALL || gpGame->pfnRenderBallTarget(nPlayer)) {
         b = 1;
     }
     return b;

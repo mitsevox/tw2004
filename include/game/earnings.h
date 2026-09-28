@@ -140,7 +140,7 @@ typedef struct MiniPrize {
 // What unlocks a course (8 bytes): the money it takes, and the EA Sports Bio accomplishment
 // ("Unlocked A Course") posted with it.
 typedef struct CoursePrice {
-    s32  nPrice;                // 0x0  the profile's money (SaveProfile.n64) that unlocks it; 0 = not for sale
+    s32  nPrice;                // 0x0  the profile's money (SaveProfile.nTotalCash) that unlocks it; 0 = not for sale
     s32  nBio;                  // 0x4  aBio index, -1 none
 } CoursePrice;
 
@@ -215,7 +215,7 @@ u8   HighScoreRecords_LongDriveRecordExist(int i, int nValue, const char* szName
 // gpGame->nCurHoleNum pick (MC.c sets both to reach recB and recC, and passes nPlayer 5).
 // Earnings.c tests for 2 or 4, a new best.
 int  HighScoreRecords_CheckRecord(int nKind, int nValue, int bSave, const char* szName, int nPlayer);
-void GM_ClearShotBonusStats(int nPlayer);          // clear the player's flags b30C..bBunkerThisShot
+void GM_ClearShotBonusStats(int nPlayer);          // clear the player's flags bHitObject..bBunkerThisShot
 void GM_ClearHoleBonusStats(int nPlayer);          // clear the flags GM_RecordBonusShotStats sets (bBunkerThisHole..b312)
 void GM_ClearGameBonusStats(int nPlayer);          // clear the player's money breakdown for the round
 u8   Earnings_IsTourAwardEarned(int nPlayer, int nAward);

@@ -155,8 +155,8 @@ void SpeedGolf_Init(void) {
     gpGame->pfnEndHole = SpeedGolf_EndHole;
     gpGame->pfnEndGame = SpeedGolf_EndGame;
     gpGame->pfnLoadHole = SpeedGolf_LoadHole;
-    gpGame->pfn220 = SpeedGolf_Update;
-    gpGame->pfn230 = SpeedGolf_RenderBallTarget;
+    gpGame->pfnUpdate = SpeedGolf_Update;
+    gpGame->pfnRenderBallTarget = SpeedGolf_RenderBallTarget;
     gpGame->pfnCheckControllerPulled = SpeedGolf_CheckControllerPulled;
     gpGame->pfnSetTimer = SpeedGolf_SetHoleTime;
     gpGame->b271 = 0;
@@ -620,8 +620,8 @@ void SpeedGolf_CountdownUpdate(int nPlayer) {
 void SpeedGolf_CountdownExit(int nPlayer) {
 }
 
-// Mode 7's pfn228 (every frame of the swing state): counts nC54 down, and once it runs out with
-// nC3C bit 2 set (the frames after the countdown's "go"), clears bits 1 and 2.
+// Mode 7's pfnSwingUpdate (every frame of the swing state): counts nC54 down, and once it runs out
+// with nC3C bit 2 set (the frames after the countdown's "go"), clears bits 1 and 2.
 void SpeedGolfPoints_ClearStartFlags(int nPlayer) {
     gPlayers[nPlayer].nC54--;
     if (gPlayers[nPlayer].nC54 <= 0 && (gPlayers[nPlayer].nC3C & 4)) {
@@ -1436,14 +1436,14 @@ u8 SpeedGolf_IsStartXYHeld(int nPlayer) {
     return bDown;
 }
 
-// Every unpaused frame (SpeedGolf_Update, the pfn220 of modes 7 and 8). Mode 7, unless a player is
-// out or going out (nC3C bits 13, 14): a player who has holed out (bit 8) takes 5 points a second
-// (every 60 frames, nC5C) from one still playing, which can knock that one out (both to state 26);
-// the pace's idle count nCB8 goes up; a human who has not finished and can afford event 39 may
-// press button 0x25 (not while Start, X and Y are held, SpeedGolf_IsStartXYHeld) in state 24, or
-// with the ball off the tee, not holed and in bounds outside states 2, 3, 4, 8 and 10, to pay event
-// 39 and start the hole again from the tee (state 1). Mode 8: player 0 may do the same for free,
-// with only the tee, cup and out-of-bounds test. Last, gSpeedGolfCanSwitchToShot is set.
+// Every unpaused frame (SpeedGolf_Update, the pfnUpdate of modes 7 and 8). Mode 7, unless a player
+// is out or going out (nC3C bits 13, 14): a player who has holed out (bit 8) takes 5 points a
+// second (every 60 frames, nC5C) from one still playing, which can knock that one out (both to
+// state 26); the pace's idle count nCB8 goes up; a human who has not finished and can afford event
+// 39 may press button 0x25 (not while Start, X and Y are held, SpeedGolf_IsStartXYHeld) in state
+// 24, or with the ball off the tee, not holed and in bounds outside states 2, 3, 4, 8 and 10, to
+// pay event 39 and start the hole again from the tee (state 1). Mode 8: player 0 may do the same
+// for free, with only the tee, cup and out-of-bounds test. Last, gSpeedGolfCanSwitchToShot is set.
 void SpeedGolf_UpdatePlayers(void) {
     PlayerNumber_t i;
     PlayerNumber_t nOther;
@@ -1881,13 +1881,13 @@ s32 SpeedGolf_GetRoundScore(int nPlayer, s32* pSeconds, s32* pStrokes, s32* pSco
     return n;
 }
 
-// The pfn220 of modes 7 and 8 (every frame of a round): SpeedGolf_UpdatePlayers.
+// The pfnUpdate of modes 7 and 8 (every frame of a round): SpeedGolf_UpdatePlayers.
 void SpeedGolf_Update(void) {
     SpeedGolf_UpdatePlayers();
 }
 
-// The pfn230 of modes 6, 7 and 8 (GM_RenderBallTarget): the placement target is never drawn for the
-// mode's sake.
+// The pfnRenderBallTarget of modes 6, 7 and 8 (GM_RenderBallTarget): the placement target is never
+// drawn for the mode's sake.
 u8 SpeedGolf_RenderBallTarget(int nPlayer) {
     return 0;
 }

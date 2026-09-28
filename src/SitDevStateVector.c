@@ -380,7 +380,7 @@ u8 fn_800BCC48(void) {
 
 // The game mode's answers for the scripts (GameState's callbacks).
 s32 fn_800BCCA0(int nPlayer) {
-    return gpGame->pfn204(nPlayer);
+    return gpGame->pfnGetPotentialLead(nPlayer);
 }
 
 s32 fn_800BCCCC(int nPlayer) {
@@ -388,7 +388,7 @@ s32 fn_800BCCCC(int nPlayer) {
 }
 
 s32 fn_800BCCF8(int nPlayer) {
-    return gpGame->pfn200(nPlayer);
+    return gpGame->pfnGetCurrentLead(nPlayer);
 }
 
 u8 fn_800BCD24(int nPlayer) {

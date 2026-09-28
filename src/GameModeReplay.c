@@ -123,7 +123,7 @@ void GameModeReplay_SetupNextGolfer(void) {
     Mem_cpy(gPlayers[0].nStrokes, gReplayData.player.nStrokes, 0x1B8);
     // b30C up to the shot block at 0x354: the flags and the round's money. Sized as the distance
     // port: between the two fields the copy scores 96.4%
-    Mem_cpy(&gPlayers[0].b30C, &gReplayData.player.b30C, 0x48);
+    Mem_cpy(&gPlayers[0].bHitObject, &gReplayData.player.bHitObject, 0x48);
     // port: the shot block from nClub to nShotKind2 (0x354..0x3B0), copied whole
     Mem_cpy(&gPlayers[0].nClub, &gReplayData.player.nClub, 0x5C);
     Mem_cpy(&gPlayers[0].nShotKind2, &gReplayData.player.nShotKind2, 4);

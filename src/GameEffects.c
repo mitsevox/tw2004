@@ -229,9 +229,10 @@ void GameEffects_ScriptedGameBreakerTrigger(int nPlayer, int nReason) {
 // As a swing starts (STATEFUNC_SwingInit), the target games' scripted GameBreakers, on course 7
 // only, for any player (not in a replay or split screen, not with gSession.bDemo set, not while one
 // is up): mode 14 when the player holds 4 targets (GameModeSkillZoneCapture_GetTotalTargetsHit;
-// reason 17), mode 15 when every other player is out (nE88 5 or more; reason 22), mode 17 with 39 targets hit
-// (GameModeSkillZoneBase_CountGreensHit; reason 23), mode 16 with 39 hit and the aimed-at target
-// not yet hit (reason 23). It starts as GameEffects_ScriptedGameBreakerTrigger does (event 0x3D).
+// reason 17), mode 15 when every other player is out (nHorseLetters 5 or more; reason 22), mode 17
+// with 39 targets hit (GameModeSkillZoneBase_CountGreensHit; reason 23), mode 16 with 39 hit and
+// the aimed-at target not yet hit (reason 23). It starts as GameEffects_ScriptedGameBreakerTrigger
+// does (event 0x3D).
 void GameEffects_TargetGameBreakerTrigger(int nPlayer) {
     u8 bStart = 0;
     int nReason;
@@ -253,7 +254,7 @@ void GameEffects_TargetGameBreakerTrigger(int nPlayer) {
             } else if (Game_GetMode() == 15) {
                 n = 0;
                 for (i = 0; i < gNumPlayersSetUp; i++) {
-                    if (i != nPlayer && gPlayers[i].nE88 < 5) {
+                    if (i != nPlayer && gPlayers[i].nHorseLetters < 5) {
                         n++;
                     }
                 }
@@ -268,7 +269,7 @@ void GameEffects_TargetGameBreakerTrigger(int nPlayer) {
                 }
             } else if ((Game_GetMode() == 16 || Game_GetMode() == 16) &&
                        GameModeSkillZoneBase_CountGreensHit(nPlayer) == 39 &&
-                       gPlayers[nPlayer].nDE4[GE_CurrentTarget(nPlayer)] == 0) {
+                       gPlayers[nPlayer].nTargetHits[GE_CurrentTarget(nPlayer)] == 0) {
                 bStart = 1;
                 nReason = 23;
             }
@@ -360,9 +361,9 @@ int GameEffects_IsScriptedGameBreaker(int nPlayer) {
 // (player flag 8 clear), none up yet; never in the demo, a replay or split screen, with
 // gSession.bDemo set, or when the mode allows no GameBreakers (gpGame->bAllowGameBreakers clear).
 // The ball must still be at least 1 (club 25, the putter), 10 (a drive, nShotKind 1) or 5 (any
-// other shot) from the look-ahead ball across the ground, b30D clear and a course loaded. Half and
-// double time go off, and the player's view gets GameBreaker camera sequence 0xB (fn_8003BDBC) for
-// the shot's length to the look-ahead ball, by the ball's lie and the surface class where the
+// other shot) from the look-ahead ball across the ground, bHitPin clear and a course loaded. Half
+// and double time go off, and the player's view gets GameBreaker camera sequence 0xB (fn_8003BDBC)
+// for the shot's length to the look-ahead ball, by the ball's lie and the surface class where the
 // look-ahead ball lies. When the shot it picks tracks the golfer (kind 5, fn_8003DC78) on a shot
 // that is not a putt, the golfer is set to animation 14 unless he is in 9. Event 0x3F.
 void GameEffects_InFlightGameBreakerTrigger(int nPlayer) {
@@ -398,7 +399,7 @@ void GameEffects_InFlightGameBreakerTrigger(int nPlayer) {
         } else if (fDist < 5.0f) {
             return;
         }
-        if (!gPlayers[nPlayer].b30D && Ter_GetTGD()) {
+        if (!gPlayers[nPlayer].bHitPin && Ter_GetTGD()) {
             GameEffects_Vec3Sub(gPlayers[nPlayer].ball.vStart, gPlayers[nPlayer].ballBefore.vPos, v2);
             v2[1] = 0.0f;
             fDist = Math_Sqrt(Vec3_LengthSqClamped(v2));

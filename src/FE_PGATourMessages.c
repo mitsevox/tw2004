@@ -1,7 +1,7 @@
 // FE_PGATourMessages.c (EA's name, from its asserts): the PGA TOUR mode's front-end message
 // handlers (registered in FE_MessageTable.c): the tournament leaderboard, the season schedule, the
 // season wrap-up, starting the next season (PGADriver_ShowCalendar_AdvanceSeason, TW07's name), the
-// sponsorships (the profile's 11 sponsorship slots, SaveProfile.a1054C: a sponsor signed as the
+// sponsorships (the profile's 11 sponsorship slots, SaveProfile.aSponsor: a sponsor signed as the
 // profile progresses, paying its start cash once and its bonus cash for every worn item of its
 // brand), the trophy room's tournament wins and Player of the Month awards, and the details of a
 // tournament won. The file starts at PGALeaderboard_FormatRow; the slider blending before it is
@@ -329,7 +329,7 @@ void PGATourMsg_Get25(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // FE message 563: signs the current profile's next sponsorship: the first of the 11 sponsorship
-// slots (SaveProfile.a1054C) not yet signed whose required progress
+// slots (SaveProfile.aSponsor) not yet signed whose required progress
 // (GameModeDriverPGATour_GetSponsorshipProgress) the profile has reached (GM_GetGameProgress). Its
 // sponsor is drawn at random from gPgaSponsorChoices, again until no earlier signed slot has it,
 // and its start cash is paid into the profile's money (n6C). Then *pArgs[0] = 0, *pArgs[1] the
@@ -356,18 +356,18 @@ void PGASponsor_SignNext(MsgArg* pArgs, MsgArg* pResult) {
         nProgress = GameModeDriverPGATour_GetSponsorshipProgress(i);
         nStartCash = GameModeDriverPGATour_GetSponsorshipStartCash(i);
         nBonusCash = GameModeDriverPGATour_GetSponsorshipBonusCash(i);
-        if (!pProfile->a1054C[i].b && nProgress <= (s32)GM_GetGameProgress(pProfile)) {
+        if (!pProfile->aSponsor[i].bSigned && nProgress <= (s32)GM_GetGameProgress(pProfile)) {
         retry:
             nSponsor = gPgaSponsorChoices[Misc_RandFunc(0) % 11];
             for (j = 0; j < i; j++) {
-                if (pProfile->a1054C[j].n == nSponsor && pProfile->a1054C[j].b) {
+                if (pProfile->aSponsor[j].nSponsor == nSponsor && pProfile->aSponsor[j].bSigned) {
                     // fake match: EA jumps straight back (a do-while adds a test)
                     goto retry;
                 }
             }
-            pProfile->a1054C[i].n = nSponsor;
+            pProfile->aSponsor[i].nSponsor = nSponsor;
             bFound = 1;
-            pProfile->a1054C[i].b = 1;
+            pProfile->aSponsor[i].bSigned = 1;
             break;
         }
         i++;
@@ -376,8 +376,8 @@ void PGASponsor_SignNext(MsgArg* pArgs, MsgArg* pResult) {
         *pZero = 0;
         *pBonusCash = nBonusCash;
         *pStartCash = nStartCash;
-        *pSponsor = pProfile->a1054C[i].n;
-        pProfile->n6C += nStartCash;
+        *pSponsor = pProfile->aSponsor[i].nSponsor;
+        pProfile->nCurrentCash += nStartCash;
         pResult->i = 1;
         return;
     }
@@ -397,12 +397,12 @@ void PGASponsor_GetItemBonus(MsgArg* pArgs, MsgArg* pResult) {
     int nCount = 0;
     s32 nBonusCash = GameModeDriverPGATour_GetSponsorshipBonusCash(i);
 
-    if (pProfile->a1054C[i].b) {
-        nCount = FE_CrAP_GetNumEquippedItemsWithSponsor(pProfile->a1054C[i].n);
+    if (pProfile->aSponsor[i].bSigned) {
+        nCount = FE_CrAP_GetNumEquippedItemsWithSponsor(pProfile->aSponsor[i].nSponsor);
     }
     if (nCount) {
         *pPay = nCount * nBonusCash;
-        *pSponsor = pProfile->a1054C[i].n;
+        *pSponsor = pProfile->aSponsor[i].nSponsor;
         pResult->i = 1;
         return;
     }
@@ -552,8 +552,8 @@ void PGASponsor_GetSlot(MsgArg* pArgs, MsgArg* pResult) {
     s32* pBonusCash = (s32*)pArgs[2].p;
     s32* pZero = (s32*)pArgs[3].p;
 
-    if (pProfile->a1054C[i].b) {
-        *pSponsor = pProfile->a1054C[i].n;
+    if (pProfile->aSponsor[i].bSigned) {
+        *pSponsor = pProfile->aSponsor[i].nSponsor;
         *pBonusCash = GameModeDriverPGATour_GetSponsorshipBonusCash(i);
         *pZero = 0;
         return;

@@ -176,31 +176,31 @@ s32 GameModeSkillZoneBase_GetBullsEyeColor(s32 nSurface) {
     }
 }
 
-// Clears all five players' target-game state for a new hole: shots taken (nDC0), the counters aDC4,
-// the winnings (nDD8), the longest drive (nDDC), bullseyes (nDE0), nE88..nE98, the flags bE9D and
-// bE9E, and each target's hit count (nDE4); each player is aimed at target 0 (SetCup). Then
-// ClearPerShotData.
+// Clears all five players' target-game state for a new hole: shots taken (nBalls), the counters
+// aSkillZoneStats, the winnings (nSkillZonePoints), the longest drive (nSkillZoneLongestDrive),
+// bullseyes (nBullseyes), nHorseLetters..nE98, the flags bE9D and bAllTargetsHit, and each target's
+// hit count (nTargetHits); each player is aimed at target 0 (SetCup). Then ClearPerShotData.
 void GameModeSkillZoneBase_ClearPerHoleData(void) {
     int i;
     int j;
     for (i = 0; i < 5; i++) {
         Player* p = PLAYER(i);
-        p->nDC0 = 0;
+        p->nBalls = 0;
         for (j = 0; j < 5; j++) {
-            p->aDC4[j] = 0;
+            p->aSkillZoneStats[j] = 0;
         }
-        p->nDD8 = 0;
-        p->nDDC = 0;
-        p->nDE0 = 0;
-        p->nE88 = 0;
-        p->nE8C = 0;
-        p->nE90 = 0;
-        p->nE94 = 0;
+        p->nSkillZonePoints = 0;
+        p->nSkillZoneLongestDrive = 0;
+        p->nBullseyes = 0;
+        p->nHorseLetters = 0;
+        p->nBestHitStreak = 0;
+        p->nHitStreak = 0;
+        p->nSteals = 0;
         p->nE98 = 0;
         p->bE9D = 0;
-        p->bE9E = 0;
+        p->bAllTargetsHit = 0;
         for (j = 0; j < 40; j++) {
-            p->nDE4[j] = 0;
+            p->nTargetHits[j] = 0;
         }
         GameModeSkillZoneBase_SetCup(i, 0);
     }
@@ -208,27 +208,27 @@ void GameModeSkillZoneBase_ClearPerHoleData(void) {
 }
 
 // For each player in the game: the shot's multiplier back to 1 (nDBC), the list of surfaces the
-// shot scored on emptied (nCD0 and its 20 entries aCD4), and nDB8 cleared. Each target mode's
-// SetupNextGolfer calls it before every shot.
+// shot scored on emptied (nShotSurfaceCount and its 20 entries aShotSurfaces), and nShotPoints
+// cleared. Each target mode's SetupNextGolfer calls it before every shot.
 void GameModeSkillZoneBase_ClearPerShotData(void) {
     int i;
     int j;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        PLAYER(i)->nCD0 = 0;
+        PLAYER(i)->nShotSurfaceCount = 0;
         PLAYER(i)->nDBC = 1;
-        PLAYER(i)->nDB8 = 0;
+        PLAYER(i)->nShotPoints = 0;
         for (j = 0; j < 20; j++) {
-            PLAYER(i)->aCD4[j] = 0;
+            PLAYER(i)->aShotSurfaces[j] = 0;
         }
     }
 }
 
-// How many of the 40 target slots the player has hit at least once (Player.nDE4).
+// How many of the 40 target slots the player has hit at least once (Player.nTargetHits).
 s32 GameModeSkillZoneBase_CountGreensHit(int nPlayer) {
     int i;
     s32 n = 0;
     for (i = 0; i < 40; i++) {
-        if (gPlayers[nPlayer].nDE4[i] != 0) {
+        if (gPlayers[nPlayer].nTargetHits[i] != 0) {
             n++;
         }
     }
@@ -284,17 +284,17 @@ void GameModeSkillZoneBase_SetupBonusBall(int nPlayer) {
 }
 
 // Whether SetupBonusBall skips the multiplier roll for this shot: in mode 16 when 20 shots have
-// been taken (Player.nDC0), in mode 17 at 5, in the other modes before the first shot.
+// been taken (Player.nBalls), in mode 17 at 5, in the other modes before the first shot.
 u8 GameModeSkillZoneBase_FirstShot(int nPlayer) {
     if (Game_GetMode() == 0x10) {
-        if (gPlayers[nPlayer].nDC0 == 20) {
+        if (gPlayers[nPlayer].nBalls == 20) {
             return 1;
         }
     } else if (Game_GetMode() == 0x11) {
-        if (gPlayers[nPlayer].nDC0 == 5) {
+        if (gPlayers[nPlayer].nBalls == 5) {
             return 1;
         }
-    } else if (gPlayers[nPlayer].nDC0 == 0) {
+    } else if (gPlayers[nPlayer].nBalls == 0) {
         return 1;
     }
     return 0;

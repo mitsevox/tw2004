@@ -368,7 +368,7 @@ u32 fn_800CFD58(int nPlayer) {
     return uIds;
 }
 
-// gpGame->pfn200 (TW06: GetCurrentLead).
+// gpGame->pfnGetCurrentLead (TW06: GetCurrentLead).
 // The player's lead in the round so far (strokes, holes won or skins by the scoring kind
 // GM_GetScoringType): kind 0, the best other total (GM_GetGolferRelativeCumulativeScore; cut
 // players left out) less the
@@ -438,7 +438,7 @@ int fn_800CFFE4(int nPlayer) {
     return (nStrokes - nPar) + gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 - Course_GetCurHolePar();
 }
 
-// gpGame->pfn204 (TW06: GetPotentialLead).
+// gpGame->pfnGetPotentialLead (TW06: GetPotentialLead).
 // The player's lead (strokes, or holes or skins by the scoring kind GM_GetScoringType) once this hole's
 // ball drops, 0 when playing alone. Kind 0 (strokes): the best other round total, with a holed
 // ball's score on this hole, less the player's total with the tap-in; players who missed the cut

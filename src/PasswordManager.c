@@ -176,23 +176,23 @@ void fn_80056B8C(void) {
     }
     lbl_80281DF4->aRewardUnlocked[0] = 1;
 
-    lbl_80281DF4->n64 = 0;
-    lbl_80281DF4->n6C = 0;
-    lbl_80281DF4->n74 = 0;
-    lbl_80281DF4->n78 = 0;
-    lbl_80281DF4->n7C = 0;
-    lbl_80281DF4->n80 = 0;
-    lbl_80281DF4->n84 = 0;
-    lbl_80281DF4->n88 = 0;
-    lbl_80281DF4->n8C = 0;
-    lbl_80281DF4->n90 = 0;
-    lbl_80281DF4->n94 = 0;
-    lbl_80281DF4->n98 = 0;
-    lbl_80281DF4->n9C = 0;
-    lbl_80281DF4->nA0 = 0;
-    lbl_80281DF4->nA4 = 0;
-    lbl_80281DF4->nA8 = 0;
-    lbl_80281DF4->b70 = 0;
+    lbl_80281DF4->nTotalCash = 0;
+    lbl_80281DF4->nCurrentCash = 0;
+    lbl_80281DF4->nStrokeRounds = 0;
+    lbl_80281DF4->nStrokeRoundStrokes = 0;
+    lbl_80281DF4->nRounds = 0;
+    lbl_80281DF4->nPuttHoles = 0;
+    lbl_80281DF4->nPutts = 0;
+    lbl_80281DF4->nDrives = 0;
+    lbl_80281DF4->nDriveDistance = 0;
+    lbl_80281DF4->nFairways = 0;
+    lbl_80281DF4->nFairwaysHit = 0;
+    lbl_80281DF4->nHoles = 0;
+    lbl_80281DF4->nGreensHit = 0;
+    lbl_80281DF4->nLongestDrive = 0;
+    lbl_80281DF4->nLongestPutt = 0;
+    lbl_80281DF4->nBestRound = 0;
+    lbl_80281DF4->bChanged = 0;
     for (i = 0; i < 25; i++) {
         lbl_80281DF4->aLadderAward[i].bWon = 0;
     }
@@ -217,13 +217,13 @@ void fn_80056B8C(void) {
     }
     lbl_80281DF4->n5168 = 3;
 
-    lbl_80281DF4->nAC = 0;
-    lbl_80281DF4->nB0 = 0;
-    lbl_80281DF4->nB4 = 0;
-    lbl_80281DF4->nB8 = 0;
-    lbl_80281DF4->nBC = 0;
-    lbl_80281DF4->nC0 = 0;
-    lbl_80281DF4->nC4 = 0;
+    lbl_80281DF4->nHolesInOne = 0;
+    lbl_80281DF4->nAlbatrosses = 0;
+    lbl_80281DF4->nEagles = 0;
+    lbl_80281DF4->nBirdies = 0;
+    lbl_80281DF4->nPars = 0;
+    lbl_80281DF4->nBogeys = 0;
+    lbl_80281DF4->nDoubleBogeys = 0;
     for (i = 0; i < 39; i++) {
         lbl_80281DF4->aAward[i].bWon = 0;
     }
@@ -275,8 +275,8 @@ void fn_80057438(SaveProfile* pProfile) {
         pProfile->aGolferUnlocked[i] = 0;
     }
     for (i = 0; i < 11; i++) {
-        pProfile->a1054C[i].b = 0;
-        pProfile->a1054C[i].n = 0;
+        pProfile->aSponsor[i].bSigned = 0;
+        pProfile->aSponsor[i].nSponsor = 0;
     }
     for (i = 0; i < 16; i++) {
         pProfile->aGolferUnlocked[lbl_801894E8[i]] = 1;
@@ -296,32 +296,32 @@ void fn_80057438(SaveProfile* pProfile) {
     }
     pProfile->aRewardUnlocked[0] = 1;
 
-    pProfile->n64 = 0;
+    pProfile->nTotalCash = 0;
     pProfile->n68 = 0;
     if (PasswordManager_IsPasswordEntered(0)) {
-        pProfile->n6C = 1000000000;
+        pProfile->nCurrentCash = 1000000000;
     } else {
-        pProfile->n6C = lbl_801D7148.n1C + 25000;
-        if (lbl_80281DF0.b) {
-            pProfile->n6C += GameModeDriverPGATour_GetSponsorshipStartCash(0);
+        pProfile->nCurrentCash = lbl_801D7148.n1C + 25000;
+        if (lbl_80281DF0.bSigned) {
+            pProfile->nCurrentCash += GameModeDriverPGATour_GetSponsorshipStartCash(0);
         }
     }
 
-    pProfile->n74 = 0;
-    pProfile->n78 = 0;
-    pProfile->n7C = 0;
-    pProfile->n80 = 0;
-    pProfile->n84 = 0;
-    pProfile->n88 = 0;
-    pProfile->n8C = 0;
-    pProfile->n90 = 0;
-    pProfile->n94 = 0;
-    pProfile->n98 = 0;
-    pProfile->n9C = 0;
-    pProfile->nA0 = 0;
-    pProfile->nA4 = 0;
-    pProfile->nA8 = 0;
-    pProfile->b70 = 0;
+    pProfile->nStrokeRounds = 0;
+    pProfile->nStrokeRoundStrokes = 0;
+    pProfile->nRounds = 0;
+    pProfile->nPuttHoles = 0;
+    pProfile->nPutts = 0;
+    pProfile->nDrives = 0;
+    pProfile->nDriveDistance = 0;
+    pProfile->nFairways = 0;
+    pProfile->nFairwaysHit = 0;
+    pProfile->nHoles = 0;
+    pProfile->nGreensHit = 0;
+    pProfile->nLongestDrive = 0;
+    pProfile->nLongestPutt = 0;
+    pProfile->nBestRound = 0;
+    pProfile->bChanged = 0;
     for (i = 0; i < 25; i++) {
         pProfile->aLadderAward[i].bWon = 0;
     }
@@ -347,13 +347,13 @@ void fn_80057438(SaveProfile* pProfile) {
     }
     pProfile->n5168 = 3;
 
-    pProfile->nAC = 0;
-    pProfile->nB0 = 0;
-    pProfile->nB4 = 0;
-    pProfile->nB8 = 0;
-    pProfile->nBC = 0;
-    pProfile->nC0 = 0;
-    pProfile->nC4 = 0;
+    pProfile->nHolesInOne = 0;
+    pProfile->nAlbatrosses = 0;
+    pProfile->nEagles = 0;
+    pProfile->nBirdies = 0;
+    pProfile->nPars = 0;
+    pProfile->nBogeys = 0;
+    pProfile->nDoubleBogeys = 0;
     for (i = 0; i < 39; i++) {
         pProfile->aAward[i].bWon = 0;
     }
@@ -384,9 +384,9 @@ void fn_80057438(SaveProfile* pProfile) {
     fn_801176C0(&pProfile->tour);
     BitArray_ClearArray(pProfile->a10548, 2);
     FE_CrAP_InitCrAPInfo(pProfile);
-    if (lbl_80281DF0.b) {
-        pProfile->a1054C[0].b = 1;
-        pProfile->a1054C[0].n = lbl_80281DF0.n;
+    if (lbl_80281DF0.bSigned) {
+        pProfile->aSponsor[0].bSigned = 1;
+        pProfile->aSponsor[0].nSponsor = lbl_80281DF0.nSponsor;
     }
 }
 

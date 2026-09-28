@@ -158,15 +158,16 @@ void EVENT_PracticeSwing(int nPlayer, int nEvent, void* pData, int nArg) {
 
 // Event 10 (Ball.c: the ball is struck), only for the real ball (nArg 1; 0 is the AI's simulated
 // ball): in the demo (session flag 0x4000) of mode 26 the demo's timer restarts (fn_8009A16C); then
-// the mode's ball-hit hook (gpGame->pfn260), the lessons (their crowd sound), the swing effect at
-// the ball (fn_800A31E0), SitDev starts watching the ball (fn_800BB1A8), commentary situation event
-// 5, and GameMode26's split-screen flag (GameMode26_NoteSplitScreenShot, which ignores the player).
+// the mode's ball-hit hook (gpGame->pfnHitBall), the lessons (their crowd sound), the swing effect
+// at the ball (fn_800A31E0), SitDev starts watching the ball (fn_800BB1A8), commentary situation
+// event 5, and GameMode26's split-screen flag (GameMode26_NoteSplitScreenShot, which ignores the
+// player).
 void EVENT_HitBall(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         if (Game_GetMode() == 26 && (gSession.uFlags & 0x4000)) {
             fn_8009A16C();
         }
-        gpGame->pfn260(nPlayer);
+        gpGame->pfnHitBall(nPlayer);
         Lessons_OnEvent(nPlayer, 10);
         fn_800A31E0(pData, nPlayer);
         fn_800BB1A8(&gPlayers[nPlayer].ball);
@@ -849,16 +850,16 @@ EventHandler gEventHandlers[76] = {
 // the main loop and hole start: SitDev_QueueEvent takes it as player 0), pData (the ball, a
 // position, or NULL) and the last argument (for ball events 1 for the real ball, 0 for the AI's
 // simulated one; -1 when there is no value).
-void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int b) {
-    gEventHandlers[nEvent](nPlayer, nEvent, pData, b);
+void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int nArg) {
+    gEventHandlers[nEvent](nPlayer, nEvent, pData, nArg);
 }
 
 // The landings, events 35..38 (EVENT_Collision the ground, EVENT_CollisionObject a course object,
 // EVENT_CollisionTree a tree, EVENT_CollisionPin the flagstick). For the real ball (nArg 1): camera
 // event 7 for the player's view, Gaud_BallBounce, the surface's collision effect (fn_800A3348),
-// emotion event 1; on an object that object's n1C (fn_80033704) and Player.b30C set; on the
-// flagstick Player.b30D set and Gaud_BallHitPole; commentary situation event 27 for a tree, 16 for
-// an object or a tree, 21 for the flagstick; then the game mode's landing hook
+// emotion event 1; on an object that object's n1C (fn_80033704) and Player.bHitObject set; on the
+// flagstick Player.bHitPin set and Gaud_BallHitPole; commentary situation event 27 for a tree, 16
+// for an object or a tree, 21 for the flagstick; then the game mode's landing hook
 // (gpGame->pfnBallCollision). For the AI's simulated ball, hitting an object aborts the simulation
 // (AI_SimAbort).
 void Collision(int nPlayer, int nEvent, void* pData, int nArg) {
@@ -872,11 +873,11 @@ void Collision(int nPlayer, int nEvent, void* pData, int nArg) {
                         gPlayers[nPlayer].ball.pHitObject->nObjList);
         }
         if (nEvent == 38) {
-            gPlayers[nPlayer].b30D = 1;
+            gPlayers[nPlayer].bHitPin = 1;
             Gaud_BallHitPole(nPlayer);
         }
         if (nEvent == 36) {
-            gPlayers[nPlayer].b30C = 1;
+            gPlayers[nPlayer].bHitObject = 1;
         }
         if (nEvent == 37) {
             SitDev_QueueEvent(nPlayer, 2, 27);

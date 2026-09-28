@@ -425,7 +425,7 @@ void fn_8010840C(MsgArg* pArgs, MsgArg* pResult) {
     s32 nPrice = pArgs[3].i;
     int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
 
-    pProfile->n6C -= nPrice;
+    pProfile->nCurrentCash -= nPrice;
     BitArray_SetBit(pProfile->aB1CC, nAsset);
     FE_CrAP_TurnOnPart(nPart, b, i);
     fn_8007873C(pProfile);
@@ -1118,7 +1118,7 @@ void fn_80109DE0(MsgArg* pArgs, MsgArg* pResult) {
     int i = pArgs[2].i;
     int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
 
-    pProfile->n6C += (s32)(0.25f * FE_CrAP_GetPartRetailPrice(nPart, b, i));
+    pProfile->nCurrentCash += (s32)(0.25f * FE_CrAP_GetPartRetailPrice(nPart, b, i));
     BitArray_ClearBit(pProfile->aB1CC, nAsset);
 }
 

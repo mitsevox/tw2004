@@ -238,8 +238,8 @@ void GameMode22_Init(void) {
     gpGame->pfnGoToPlayoff = (u8 (*)(u8))GameMode22_GoToPlayoff;
     gpGame->pfnEndGolferTurn = GameMode22_EndGolferTurn;
     gpGame->pfnEndGame = GameMode22_EndGame;
-    gpGame->pfn220 = GameMode22_UpdateFrame;
-    gpGame->pfn20C = GameMode22_StartSwing;
+    gpGame->pfnUpdate = GameMode22_UpdateFrame;
+    gpGame->pfnPreShotInit = GameMode22_StartSwing;
     gpGame->pfnCheckShotAwards = GameMode22_ScoreShot;
     gpGame->pfnLoadHole = GameMode22_HoleStart;
     gpGame->pfnRestartHole = GameMode22_RestartHole;
@@ -315,11 +315,12 @@ void GameMode22_EndGame(void) {
     GM_Earnings_AwardMoney(nPlayer, 5000, NULL);
 }
 
-// Each frame (pfn220). Once after the setup: intro message 89 with 1 (variant 0) or 2 (variant 1)
-// and the drives-left text (GameMode22_ShowDrivesLeft). Every 16 frames: the current player's shot
-// length (fn_800D0550) sent as message 0x4D; while it is nonzero and still changing, a long-drive
-// UI sound plays (script 0, track 1; started once), and it stops once the length stops changing.
-// After a winner is decided (nWinner not 5), the winner countdown nWinnerFrames runs down.
+// Each frame (pfnUpdate). Once after the setup: intro message 89 with 1 (variant 0) or 2 (variant
+// 1) and the drives-left text (GameMode22_ShowDrivesLeft). Every 16 frames: the current player's
+// shot length (fn_800D0550) sent as message 0x4D; while it is nonzero and still changing, a
+// long-drive UI sound plays (script 0, track 1; started once), and it stops once the length stops
+// changing. After a winner is decided (nWinner not 5), the winner countdown nWinnerFrames runs
+// down.
 void GameMode22_UpdateFrame(void) {
     s32 nLength;
 
@@ -357,8 +358,8 @@ void GameMode22_UpdateFrame(void) {
     }
 }
 
-// As a swing begins (pfn20C): GameMode22_PreSwing (empty), the drives-left text, and message 0x42
-// for scoreboard slot 0 with nPlayer's score (nEBC).
+// As a swing begins (pfnPreShotInit): GameMode22_PreSwing (empty), the drives-left text, and
+// message 0x42 for scoreboard slot 0 with nPlayer's score (nEBC).
 void GameMode22_StartSwing(int nPlayer) {
     GameMode22_PreSwing();
     GameMode22_ShowDrivesLeft(nPlayer);

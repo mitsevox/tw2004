@@ -3,11 +3,11 @@
 // shot scores them times how many times it has now landed there this shot (up to 5 times; once for
 // a surface that costs points), times the shot's multiplier (the best one landed on so far this
 // shot); the row's bonus-meter points fill a meter (0..100, emptied each hole). At the end of the
-// shot its points go to the hole (nD28); when the hole ends they are scaled by the score against
-// par (32 for a hole in one down to 0 beyond 3 over), and after a full round each human player
-// with an active profile is paid the round's total as money. The HUD reads the points, the meter,
-// the multiplier and the list of surfaces scored. The honors, hole-finished and game-finished
-// callbacks are stroke play's (mode 0, GameModeStroke).
+// shot its points go to the hole (nHolePoints); when the hole ends they are scaled by the score
+// against par (32 for a hole in one down to 0 beyond 3 over), and after a full round each human
+// player with an active profile is paid the round's total as money. The HUD reads the points, the
+// meter, the multiplier and the list of surfaces scored. The honors, hole-finished and
+// game-finished callbacks are stroke play's (mode 0, GameModeStroke).
 
 #include "golfer.h"
 #include "game.h"
@@ -51,7 +51,7 @@ void GameMode12_Init(void) {
     gpGame->pfnLoadHole = GameMode12_LoadHole;
     gpGame->pfnSetupNextGolfer = GameMode12_SetupNextGolfer;
     gpGame->pfnCheckShotAwards = GameMode12_AddShotPoints;
-    gpGame->pfn228 = GameMode12_ShotSetupUpdate;
+    gpGame->pfnSwingUpdate = GameMode12_ShotSetupUpdate;
     gpGame->b271 = 0;
     gpGame->b281 = 0;
     gpGame->bStrokeLimit = 0;
@@ -90,10 +90,10 @@ static inline u8 SurfaceUsedUp(s32* pPoints, s32 nHits) {
 // shot (it has points: up to 5 times, once for one that costs points; a surface with no points
 // never scores) its row of the prize table counts, each part with a message at the ball's place on
 // screen: a multiplier higher than the shot's becomes the shot's (message 0x35); the points times
-// the number of times the surface has now scored this shot are added to the shot's points (nDB8)
-// times the multiplier, the surface to the shot's list and one scoring landing to the hole's count
-// (nD70; message 0x33, not in a replay); the bonus-meter points fill the meter (nD24, at most 100;
-// message 0x34).
+// the number of times the surface has now scored this shot are added to the shot's points
+// (nShotPoints) times the multiplier, the surface to the shot's list and one scoring landing to the
+// hole's count (nHoleHits; message 0x33, not in a replay); the bonus-meter points fill the meter
+// (nD24, at most 100; message 0x34).
 void GameMode12_BallLanded(int nPlayer) {
     s32 nHits;
     s32 nScore;
@@ -115,11 +115,11 @@ void GameMode12_BallLanded(int nPlayer) {
                 GameMsg_Send3Ints(0x35, nMult, 512.0f * x, 448.0f * y);
             }
             if (nPoints != 0) {
-                gPlayers[nPlayer].aCD4[gPlayers[nPlayer].nCD0] = gGameMode12Surface;
-                gPlayers[nPlayer].nCD0++;
-                gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
+                gPlayers[nPlayer].aShotSurfaces[gPlayers[nPlayer].nShotSurfaceCount] = gGameMode12Surface;
+                gPlayers[nPlayer].nShotSurfaceCount++;
+                gPlayers[nPlayer].nHoleHits[Game_CurHoleIndex()]++;
                 nScore = nPoints * (nHits + 1);
-                gPlayers[nPlayer].nDB8 += nScore * gPlayers[nPlayer].nDBC;
+                gPlayers[nPlayer].nShotPoints += nScore * gPlayers[nPlayer].nDBC;
                 if (!gSession.bReplay) {
                     GameMsg_Send5Ints(0x33, nScore, 512.0f * x, 448.0f * y, gGameMode12Surface, nHits + 1);
                 }
@@ -165,8 +165,8 @@ void GameMode12_GetSurfacePrize(s32 nSurface, s32* pPoints, s32* pMeter, s32* pM
 s32 GameMode12_CountSurfaceHits(int nPlayer, s32 nSurface) {
     s32 n = 0;
     int i;
-    for (i = 0; i < gPlayers[nPlayer].nCD0; i++) {
-        if (nSurface == gPlayers[nPlayer].aCD4[i]) {
+    for (i = 0; i < gPlayers[nPlayer].nShotSurfaceCount; i++) {
+        if (nSurface == gPlayers[nPlayer].aShotSurfaces[i]) {
             n++;
         }
     }
@@ -232,8 +232,8 @@ void GameMode12_EndHole(void) {
                 break;
             }
         }
-        PLAYER(i)->nD28[Game_CurHoleIndex()] = fMult * PLAYER(i)->nD28[Game_CurHoleIndex()];
-        GUI_QueueMessage(0, 0x73, PLAYER(i)->nD28[Game_CurHoleIndex()], PLAYER(i)->nIndex);
+        PLAYER(i)->nHolePoints[Game_CurHoleIndex()] = fMult * PLAYER(i)->nHolePoints[Game_CurHoleIndex()];
+        GUI_QueueMessage(0, 0x73, PLAYER(i)->nHolePoints[Game_CurHoleIndex()], PLAYER(i)->nIndex);
     }
 }
 
@@ -249,7 +249,7 @@ void GameMode12_EndGame(void) {
             nMoney = 0;
             if (!Player_IsCPU(i)) {
                 for (h = 0; h < 18; h++) {
-                    nMoney += PLAYER(i)->nD28[h];
+                    nMoney += PLAYER(i)->nHolePoints[h];
                 }
             }
             if (gpSaveData[PLAYER(i)->nIndex].bActive) {
@@ -278,11 +278,11 @@ void GameMode12_SetupNextGolfer(void) {
     int i;
     int j;
     for (i = 0; i < 5; i++) {
-        PLAYER(i)->nCD0 = 0;
+        PLAYER(i)->nShotSurfaceCount = 0;
         PLAYER(i)->nDBC = 1;
-        PLAYER(i)->nDB8 = 0;
+        PLAYER(i)->nShotPoints = 0;
         for (j = 0; j < 20; j++) {
-            PLAYER(i)->aCD4[j] = 0;
+            PLAYER(i)->aShotSurfaces[j] = 0;
         }
     }
     GameModeStroke_SetupNextGolfer();
@@ -299,7 +299,7 @@ s32 GameMode12_GetBonusMeter(int nPlayer) {
 
 // The player's points on this hole.
 s32 GameMode12_GetHolePoints(int nPlayer) {
-    return gPlayers[nPlayer].nD28[Game_CurHoleIndex()];
+    return gPlayers[nPlayer].nHolePoints[Game_CurHoleIndex()];
 }
 
 // The player's points for the round.
@@ -307,7 +307,7 @@ s32 GameMode12_GetRoundPoints(int nPlayer) {
     s32 n = 0;
     int h;
     for (h = 0; h < 18; h++) {
-        n += gPlayers[nPlayer].nD28[h];
+        n += gPlayers[nPlayer].nHolePoints[h];
     }
     return n;
 }
@@ -315,7 +315,7 @@ s32 GameMode12_GetRoundPoints(int nPlayer) {
 // End of a shot (pfnCheckShotAwards, from GM_Earnings_PayShotGoals): the shot's points go to the
 // hole.
 void GameMode12_AddShotPoints(int nPlayer) {
-    gPlayers[nPlayer].nD28[Game_CurHoleIndex()] += gPlayers[nPlayer].nDB8;
+    gPlayers[nPlayer].nHolePoints[Game_CurHoleIndex()] += gPlayers[nPlayer].nShotPoints;
 }
 
 // The length of the list GameMode12_ListScoredSurfaces made (the HUD passes a player it does not
@@ -350,8 +350,8 @@ void GameMode12_ListScoredSurfaces(int nPlayer) {
     }
 }
 
-// Every frame over the ball (pfn228): once the swing has started (swing state not idle), front-end
-// message 0x36 is sent.
+// Every frame over the ball (pfnSwingUpdate): once the swing has started (swing state not idle),
+// front-end message 0x36 is sent.
 void GameMode12_ShotSetupUpdate(int nPlayer) {
     if (gPlayers[nPlayer].swing.nState != 0) {
         GameMsg_Send(0x36);

@@ -7,13 +7,13 @@
 // This file's .sbss (game/save.h), in reverse address order as the compiler lays it out.
 SaveProfile*  gpSaveData;
 SaveProfile*  lbl_80281DF4;
-SaveLockEntry lbl_80281DF0;
+SponsorSlot   lbl_80281DF0;
 
 void fn_800563C4(void) {
     int i;
 
-    lbl_80281DF0.b = 0;
-    lbl_80281DF0.n = 0;
+    lbl_80281DF0.bSigned = 0;
+    lbl_80281DF0.nSponsor = 0;
     gpSaveData = StaticMem_Alloc(5 * sizeof(SaveProfile), 0, 32, "user.c", 97);
     lbl_80281DF4 = StaticMem_Alloc(sizeof(SaveProfile), 0, 32, "user.c", 98);
     for (i = 0; i < 5; i++) {

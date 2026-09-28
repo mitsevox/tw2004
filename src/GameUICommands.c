@@ -901,7 +901,7 @@ void GM_vGetGolferUserMoney(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = 0;
         return;
     }
-    pResult->i = gpSaveData[gPlayers[pArgs[0].i].nIndex].n6C;
+    pResult->i = gpSaveData[gPlayers[pArgs[0].i].nIndex].nCurrentCash;
 }
 
 // Message 27: whether the post-shot camera is done with player pArgs[0] (1; always for players 5
@@ -981,7 +981,7 @@ void GM_vGetSpeedGolfTotalTimeScore(MsgArg* pArgs, MsgArg* pResult) {
 void GM_vGetModeValue(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[1].i) {
     case 0:
-        pResult->i = gPlayers[pArgs[0].i].nDD8;
+        pResult->i = gPlayers[pArgs[0].i].nSkillZonePoints;
         return;
     case 1:
         pResult->i = GameMode12_GetHolePoints(pArgs[0].i);
@@ -996,28 +996,28 @@ void GM_vGetModeValue(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = GameMode12_GetBonusMeter(pArgs[0].i);
         return;
     case 5:
-        pResult->i = gPlayers[pArgs[0].i].nDD8;
+        pResult->i = gPlayers[pArgs[0].i].nSkillZonePoints;
         return;
     case 6:
-        pResult->i = gPlayers[pArgs[0].i].aDC4[4];
+        pResult->i = gPlayers[pArgs[0].i].aSkillZoneStats[4];
         return;
     case 7:
-        pResult->i = gPlayers[pArgs[0].i].aDC4[0];
+        pResult->i = gPlayers[pArgs[0].i].aSkillZoneStats[0];
         return;
     case 8:
-        pResult->i = gPlayers[pArgs[0].i].nDC0;
+        pResult->i = gPlayers[pArgs[0].i].nBalls;
         return;
     case 9:
         pResult->i = GameModeSkillZoneBase_CountGreensHit(pArgs[0].i);
         return;
     case 10:
-        pResult->i = gPlayers[pArgs[0].i].nDDC;
+        pResult->i = gPlayers[pArgs[0].i].nSkillZoneLongestDrive;
         return;
     case 11:
-        pResult->i = gPlayers[pArgs[0].i].aDC4[3];
+        pResult->i = gPlayers[pArgs[0].i].aSkillZoneStats[3];
         return;
     case 12:
-        pResult->i = gPlayers[pArgs[0].i].nDE0;
+        pResult->i = gPlayers[pArgs[0].i].nBullseyes;
         return;
     case 13:
         GameModeSkillZoneTimed_TenSecWarning();
@@ -1042,22 +1042,22 @@ void GM_vGetModeValue(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = GameModeSkillZoneCapture_GetMadeMoneyFromIndex(pArgs[0].i);
         return;
     case 20:
-        pResult->i = gPlayers[pArgs[0].i].nE88;
+        pResult->i = gPlayers[pArgs[0].i].nHorseLetters;
         return;
     case 21:
         pResult->i = GameModeSkillZoneHorse_GetCurrentLeaderRing();
         return;
     case 22:
-        pResult->i = gPlayers[pArgs[0].i].nE8C;
+        pResult->i = gPlayers[pArgs[0].i].nBestHitStreak;
         return;
     case 23:
-        pResult->i = gPlayers[pArgs[0].i].nE94;
+        pResult->i = gPlayers[pArgs[0].i].nSteals;
         return;
     case 24:
-        pResult->i = gPlayers[pArgs[0].i].aDC4[1];
+        pResult->i = gPlayers[pArgs[0].i].aSkillZoneStats[1];
         return;
     case 25:
-        pResult->i = gPlayers[pArgs[0].i].aDC4[1] + 5;
+        pResult->i = gPlayers[pArgs[0].i].aSkillZoneStats[1] + 5;
         return;
     case 26:
         pResult->i = GameModeSkillZoneHorse_GetLastShotExceeded();
@@ -1893,12 +1893,12 @@ void GM_vGetTargetShotInfo(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // A player's number for the target modes, picked by pArgs[1] (command 118): 0 his scoring shots on
-// the current hole (Player.nD70, counted by modes 12, 13, 14 and 17). Another pArgs[1] leaves
+// the current hole (Player.nHoleHits, counted by modes 12, 13, 14 and 17). Another pArgs[1] leaves
 // *pResult alone.
 void GM_vGetTargetHoleStat(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[1].i) {
     case 0:
-        pResult->i = gPlayers[pArgs[0].i].nD70[Game_CurHoleIndex()];
+        pResult->i = gPlayers[pArgs[0].i].nHoleHits[Game_CurHoleIndex()];
         return;
     }
 }
@@ -2083,7 +2083,8 @@ void GM_vGetWrapupData(MsgArg* pArgs, MsgArg* pResult) {
             return;
         }
         // fake match: the (int) keeps CW from reusing the first gPlayers index, as the original does
-        pResult->i = gpSaveData[gPlayers[pArgs[0].i].nIndex].n6C - gPlayers[(int)pArgs[0].i].money.n24;
+        pResult->i = gpSaveData[gPlayers[pArgs[0].i].nIndex].nCurrentCash
+                - gPlayers[(int)pArgs[0].i].money.n24;
         return;
     case 100:
         pResult->i = (s32)GM_Earnings_GetCourseModifier() - 1;

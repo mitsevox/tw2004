@@ -314,12 +314,12 @@ void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst) {
     PgaStatCounts* pStats = &gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER];
 
     if (bFirst && GameModeDriverPGATour_GetEventInfo(gpSaveData[nPlayer].tour.nEvent)->bIsAMajor != 0) {
-        pTour->n4E9A++;
+        pTour->nMajorWins++;
     }
     if (bUser && bFirst) {
-        pTour->n4E96++;
+        pTour->nWinStreak++;
     } else if (bUser && !bFirst) {
-        pTour->n4E96 = 0;
+        pTour->nWinStreak = 0;
     }
 
     nAhead = 0;

@@ -141,9 +141,9 @@ void Lessons_Init(void) {
     gpGame->pfnHoleFinished = Lessons_HoleFinished;
     gpGame->pfnGameFinished = Lessons_GameFinished;
     gpGame->pfnLoadHole = Lessons_LoadHole;
-    gpGame->pfn220 = Lessons_Update;
+    gpGame->pfnUpdate = Lessons_Update;
     gpGame->pfnRestartHole = Lessons_RestartHole;
-    gpGame->pfn22C = Lessons_AfterReplan;
+    gpGame->pfnResetShot = Lessons_AfterReplan;
     gpGame->pfnStartGamePreData = Lessons_StartGamePreData;
     gpGame->pfnEndGame = Lessons_EndGame;
     gpGame->bShowYardage = 0;
@@ -483,9 +483,9 @@ void Lessons_StartTry(void) {
     fn_80047BC0(NULL, 0);
 }
 
-// After a re-plan (pfn22C): player 0's target is picked again (the default one for a putt, else the
-// AI's choice) and the shot prepared, keeping the club and shot kind the lesson set; the putt line,
-// the golfer's aim and animation 5 are set up again. nPlayer is unused.
+// After a re-plan (pfnResetShot): player 0's target is picked again (the default one for a putt,
+// else the AI's choice) and the shot prepared, keeping the club and shot kind the lesson set; the
+// putt line, the golfer's aim and animation 5 are set up again. nPlayer is unused.
 void Lessons_AfterReplan(int nPlayer) {
     s32 nShotKind = gPlayers[0].nShotKind;
     s32 nClub = gPlayers[0].nClub;
@@ -562,7 +562,7 @@ static inline int Hint(void) {
     return nHint;
 }
 
-// Every frame (pfn220): runs the lesson's steps (gLessonStep). 2 starts the lessons (lesson 1,
+// Every frame (pfnUpdate): runs the lesson's steps (gLessonStep). 2 starts the lessons (lesson 1,
 // Lessons_NextLesson, Lessons_PlaceBall); 3 plays the lesson's opening line (no failed tries yet);
 // 4 waits out the flyover and sets up the demonstration; 5 shows the swing hints while the CPU
 // demonstrates; 6 starts a try (Lessons_StartTry) and 7 shows the hints during it (the backswing

@@ -319,12 +319,13 @@ void GM_EndOfGolferTurn_GameFinished(int nPlayer) {
     gSession.bEndLoop = 1;
 }
 
-// The hole is over and the game goes on: the mode's pfn210 hook, the between-holes scorecard when
-// the mode has scorecards (b275) and none is up (bHuman as in GM_EndOfGolferTurn_GameFinished), the
-// golfer waits, the view goes to camera mode 17 and the HUD's toggles are hidden.
+// The hole is over and the game goes on: the mode's pfnEndTurnEndHoleNotGame hook, the
+// between-holes scorecard when the mode has scorecards (b275) and none is up (bHuman as in
+// GM_EndOfGolferTurn_GameFinished), the golfer waits, the view goes to camera mode 17 and the HUD's
+// toggles are hidden.
 void GM_HoleFinished_GameNotFinished(int nPlayer) {
     int nView;
-    gpGame->pfn210(nPlayer);
+    gpGame->pfnEndTurnEndHoleNotGame(nPlayer);
     if (gpGame->b275 && !GUI_ScoreCardUp()) {
         if (!gpGame->b274 || PlayNow_IsChallengeRunning()) {
             GUI_BetweenHolesScorecard(1);
@@ -513,12 +514,12 @@ void GM_BumpBallForObstructions(int nPlayer) {
 // screen with a replay recorded and allowed, the replay prompt (GUI_ToggleReplay); the stroke, the
 // penalty check (GM_CheckForBallOOB), the shot statistics and earnings when there was no penalty,
 // and the hole contests (longest drive message 10, closest to the pin 11). Without a penalty: holed
-// - the hole recorded, its payouts, the score message and the mode's pfn218; over the hole's stroke
-// limit - the ball is picked up (lie holed, bShotLimitExceeded, 10 strokes in a PGA TOUR event else
-// 11, putts 999), message 3, the mode's pfn218 and pfn21C; messages 0x11-0x13 when OnlineGolf_bIsOnlineGame
-// (always 0) and bEE0 allow, 0x13 giving the other of players 0 and 1 the hole; otherwise the
-// yardage. A penalty goes to the mode's pfnBallOOB. Last, the per-shot flags are carried over
-// (GM_RecordBonusShotStats).
+// - the hole recorded, its payouts, the score message and the mode's pfnHoledOut; over the hole's
+// stroke limit - the ball is picked up (lie holed, bShotLimitExceeded, 10 strokes in a PGA TOUR
+// event else 11, putts 999), message 3, the mode's pfnHoledOut and pfnShotOverLimit; messages
+// 0x11-0x13 when OnlineGolf_bIsOnlineGame (always 0) and bEE0 allow, 0x13 giving the other of
+// players 0 and 1 the hole; otherwise the yardage. A penalty goes to the mode's pfnBallOOB. Last,
+// the per-shot flags are carried over (GM_RecordBonusShotStats).
 void GM_PlayerTookShot(int nPlayer) {
     u8   bOut;
     if (GM_CanPlayerTakeMulligan(nPlayer) && !(gPlayers[nPlayer].uFlags & 8)) {
@@ -548,7 +549,7 @@ void GM_PlayerTookShot(int nPlayer) {
             GM_RecordIndividualHoleStats(nPlayer);
             GM_Earnings_PayHoledGoals(nPlayer);
             GM_CheckBallForUIHints(nPlayer);
-            gpGame->pfn218(nPlayer);
+            gpGame->pfnHoledOut(nPlayer);
         } else {
             if (GM_IsShotOverLimit(nPlayer, gPlayers[nPlayer].nStrokes[gpGame->nCurHole])) {
                 gPlayers[nPlayer].ball.nLie = LIE_INCUP_e;
@@ -561,8 +562,8 @@ void GM_PlayerTookShot(int nPlayer) {
                 gPlayers[nPlayer].nPutts[gpGame->nCurHole] = 999;
                 GM_RecordIndividualHoleStats(nPlayer);
                 GUI_StartPostShotUI(3, nPlayer, 0.0f);
-                gpGame->pfn218(nPlayer);
-                gpGame->pfn21C(nPlayer);
+                gpGame->pfnHoledOut(nPlayer);
+                gpGame->pfnShotOverLimit(nPlayer);
             } else if (OnlineGolf_bIsOnlineGame() && gPlayers[nPlayer].bEE0) {
                 int n = gPlayers[nPlayer].nEE4;
                 if (n == 3) {
@@ -812,13 +813,13 @@ void GM_FlyByMode_Init(void) {
     ViewController_SetActivePlayerNumber(gPlayers[n].nView[0], n);
 }
 
-// Every frame of a round (game type 6): the mode's pfn220; then queued UI messages are shown when
-// one is waiting or the pause menu is open with flag GUI_IsEndGameUiShowing set, else, when the mode says so
-// (b27E) and no scorecard is up, the next golfer is set up once everyone waits
+// Every frame of a round (game type 6): the mode's pfnUpdate; then queued UI messages are shown
+// when one is waiting or the pause menu is open with flag GUI_IsEndGameUiShowing set, else, when
+// the mode says so (b27E) and no scorecard is up, the next golfer is set up once everyone waits
 // (GM_SetupGolfer_IfAllWaiting). The frame count is kept in n12C.
 void GM_Update(void) {
     if (gSession.nGameType == 6) {
-        gpGame->pfn220();
+        gpGame->pfnUpdate();
         if ((GUI_IsEndGameUiShowing() && GUI_IsPauseMenuOpen()) || GUI_GetUIMessageQued()) {
             GUI_CheckMessageQue();
         } else if (gpGame->b27E && !GUI_ScoreCardUp()) {

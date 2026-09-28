@@ -252,11 +252,11 @@ void GUI_SetEndOfGamePending(void) {
 // a GameBreaker resumed, sound unpaused, EASBio's play state 1. Then the save images are parked
 // (fn_8009EF98) and message 0x23 with 1 goes out in a replay outside modes 10 and 11. After the
 // end-of-round screen gSession.bEndLoop = 1 ends the round. After the end-of-hole screen: event
-// 0x46 and the mode's pfn214, then in mode 12 every player's scores for the hole cleared and a hole
-// load asked for (fn_8006F4B4), the same load in a playoff (bInPlayoff) or with b134, otherwise
-// GM_GotoNextSelectedHole; every ball's lie goes back to 0. The game's sounds come back on after
-// either screen (and, with the music, in the skill-zone modes unless the round is ending);
-// commentary stops after either screen, and whenever options byte 4 is 0.
+// 0x46 and the mode's pfnScorecardClosed, then in mode 12 every player's scores for the hole
+// cleared and a hole load asked for (fn_8006F4B4), the same load in a playoff (bInPlayoff) or with
+// b134, otherwise GM_GotoNextSelectedHole; every ball's lie goes back to 0. The game's sounds come
+// back on after either screen (and, with the music, in the skill-zone modes unless the round is
+// ending); commentary stops after either screen, and whenever options byte 4 is 0.
 void GUI_PauseMenuClosed(void) {
     int i;
     int j;
@@ -291,7 +291,7 @@ void GUI_PauseMenuClosed(void) {
         if (lbl_80282281) {
             Gaud_OnScoreCard(0, 0);
             EVENT_Trigger(0, 0x46, 0, -1);
-            gpGame->pfn214();
+            gpGame->pfnScorecardClosed();
             if (Game_GetMode() == 12) {
                 for (i = 0; i < 5; i++) {
                     GM_ClearPlayerHoleData(i, Game_CurHoleIndex());

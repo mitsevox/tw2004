@@ -40,7 +40,7 @@ void GameModePractice_Init(void) {
     gpGame->pfnEndGame = GameModePractice_EndGame;
     gpGame->pfnLoadHole = GameModePractice_LoadHole;
     gpGame->pfnRestartHole = GameModePractice_RestartHole;
-    gpGame->pfn210 = GameModePractice_EndTurnEndHoleNotGame;
+    gpGame->pfnEndTurnEndHoleNotGame = GameModePractice_EndTurnEndHoleNotGame;
     gpGame->bStrokeLimit = 0;
     gpGame->b275 = 0;
     gpGame->bGimmesAllowed = 0;
@@ -61,15 +61,15 @@ void GameModePractice_Init(void) {
     gSession.nSplitScreen = 0;
 }
 
-// Hole start (pfn1E4): player 0 goes to placing the ball with the camera faded in (InitCamera) and
-// the HUD is hidden.
+// Hole start (pfnLoadHole): player 0 goes to placing the ball with the camera faded in (InitCamera)
+// and the HUD is hidden.
 void GameModePractice_LoadHole(void) {
     GameModePractice_InitCamera();
     GUI_ShowToggleFullScreenUI(0);
 }
 
-// The hole restarts (pfn224, GM_RestartHole): as at the hole start, player 0 goes to placing the
-// ball (InitCamera) and the HUD is hidden.
+// The hole restarts (pfnRestartHole, GM_RestartHole): as at the hole start, player 0 goes to
+// placing the ball (InitCamera) and the HUD is hidden.
 void GameModePractice_RestartHole(void) {
     GameModePractice_InitCamera();
     GUI_ShowToggleFullScreenUI(0);
@@ -130,10 +130,10 @@ void GameModePractice_EndGame(void) {
     GUI_EndOfGameScorecard(0);
 }
 
-// The hole is over and the game is not (pfn210): after an early end (IsHoleEndedEarly) the
-// end-of-hole screen is marked up without showing (GUI_SetEndOfHolePending) and the pause menu
-// closed, which moves on to the next hole; otherwise the end-of-hole scorecard. The ended-early
-// flag is cleared.
+// The hole is over and the game is not (pfnEndTurnEndHoleNotGame): after an early end
+// (IsHoleEndedEarly) the end-of-hole screen is marked up without showing (GUI_SetEndOfHolePending)
+// and the pause menu closed, which moves on to the next hole; otherwise the end-of-hole scorecard.
+// The ended-early flag is cleared.
 void GameModePractice_EndTurnEndHoleNotGame(int nPlayer) {
     if (GameModePractice_IsHoleEndedEarly()) {
         GUI_SetEndOfHolePending();

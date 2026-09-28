@@ -184,7 +184,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
     fn_80062F1C(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]));
     nView = gPlayers[nPlayer].nView[0];
     CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 0x19, nPlayer, nView);
-    gpGame->pfn20C(nPlayer);
+    gpGame->pfnPreShotInit(nPlayer);
     fn_80062B64(nPlayer);
     fn_80062B60(nPlayer);
     GM_MovePlayerToBall(nPlayer);
@@ -266,7 +266,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
 
     pV    = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
     pSlot = &lbl_80281DA0->aA[nPlayer];
-    if (pV->nCurCamera != 11 && pV->nCurCamera != 0 && gpGame->pfn238(nPlayer)) {
+    if (pV->nCurCamera != 11 && pV->nCurCamera != 0 && gpGame->pfnOKToShoot(nPlayer)) {
         GOLFERSTATE_Switch(GS_SHOT_SETUP, nPlayer);
         return;
     }
@@ -602,7 +602,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
             }
         }
     }
-    gpGame->pfn228(nPlayer);
+    gpGame->pfnSwingUpdate(nPlayer);
     if (bSwung) {
         View* pV;
         GM_BallHit(nPlayer);
@@ -654,7 +654,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
         } else {
             TARGET_ResetMomentums(nPlayer);
         }
-        gpGame->pfn22C(nPlayer);
+        gpGame->pfnResetShot(nPlayer);
     } else {
         if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(5, 0)) &&
             gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
@@ -1158,7 +1158,7 @@ void STATEFUNC_GreenMorphUpdate(int nPlayer) {
                 fn_80062CB0(gPlayers[nPlayer].nC58, 1);
             }
         }
-        gpGame->pfn22C(nPlayer);
+        gpGame->pfnResetShot(nPlayer);
     } else {
         GM_CheckForShotChanges(nPlayer);
     }
@@ -1845,7 +1845,7 @@ void STATEFUNC_InitialFlyByExit(int nPlayer) {
         LLMath_CopyVec(pSrc->script.v40, pDst->script.v40);
         pDst->script.f90     = pSrc->script.f90;
     }
-    gpGame->pfn24C(nPlayer);
+    gpGame->pfnInitialFlyByDone(nPlayer);
 }
 
 // State 21: each of the player's views saves its camera and takes camera 10.

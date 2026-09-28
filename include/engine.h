@@ -1427,8 +1427,9 @@ void fn_80045494(u8 bOn, int nPlayer);
 void fn_80045558(u8 bOn, int nPlayer);
 u8   fn_8004560C(void);
 typedef void (*EventHandler)(int nPlayer, int nEvent, void* pData, int nArg);   // event.c's table
-void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int b);   // through the event table at
-                                        // gEventHandlers; pData: the ball, a position, or NULL
+// Through the event table gEventHandlers. pData: the ball, a position, or NULL; nArg goes to the
+// handler (the landings: 1 the real ball, else the AI's simulated one; most callers pass -1).
+void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int nArg);
 void TARGET_SetupTarget(int nPlayer);
 u8   TARGET_UpdateMomentums(int nPlayer);
 void PlaceBall_Set(int nPlayer, f32* pPos);

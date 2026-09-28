@@ -7,8 +7,8 @@
 
 // Game mode 7, two-player speed golf on event points, starts: speed golf's shared callbacks
 // (GameMode8.c) with mode 7's own hole and game end (SpeedGolfPoints_*), the every-frame update
-// (SpeedGolf_Update) and SpeedGolfPoints_ClearStartFlags each frame of the swing (pfn228); the
-// golfer states go in through SpeedGolf_StartGamePreData. No stroke limit, gimmes or mulligans;
+// (SpeedGolf_Update) and SpeedGolfPoints_ClearStartFlags each frame of the swing (pfnSwingUpdate);
+// the golfer states go in through SpeedGolf_StartGamePreData. No stroke limit, gimmes or mulligans;
 // b271, b273, b277, b279, b27E to b283, b285, b286, b288, n290 and n294 0; gpGame n10 and nC 2, n4
 // 0 (points, not holes won, in SpeedGolf_EndGame), nDC 0; split screen from lbl_8028227C; two
 // players; the event log starts again.
@@ -24,9 +24,9 @@ void SpeedGolfPoints_Init(void) {
     gpGame->pfnEndHole = SpeedGolfPoints_EndHole;
     gpGame->pfnEndGame = SpeedGolf_EndGame;
     gpGame->pfnLoadHole = SpeedGolf_LoadHole;
-    gpGame->pfn220 = SpeedGolf_Update;
-    gpGame->pfn228 = SpeedGolfPoints_ClearStartFlags;
-    gpGame->pfn230 = SpeedGolf_RenderBallTarget;
+    gpGame->pfnUpdate = SpeedGolf_Update;
+    gpGame->pfnSwingUpdate = SpeedGolfPoints_ClearStartFlags;
+    gpGame->pfnRenderBallTarget = SpeedGolf_RenderBallTarget;
     gpGame->pfnCheckControllerPulled = SpeedGolf_CheckControllerPulled;
     gpGame->pfnSetTimer = SpeedGolf_SetHoleTime;
     gpGame->b271 = 0;
@@ -57,14 +57,14 @@ void SpeedGolfPoints_Init(void) {
     Session_SetNumPlayers(2);
 }
 
-// The hole-start hook (pfn1E4) of modes 6, 7 and 8: SpeedGolf_StartHole.
+// The hole-start hook (pfnLoadHole) of modes 6, 7 and 8: SpeedGolf_StartHole.
 void SpeedGolf_LoadHole(void) {
     SpeedGolf_StartHole();
 }
 
-// As a round starts (pfn1EC of modes 7 and 8; mode 6 calls SpeedGolf_SetGolferStates alone): the
-// first hole's run tips are switched on (gSpeedGolfFirstHoleTips) and speed golf's golfer states go
-// in.
+// As a round starts (pfnStartGamePreData of modes 7 and 8; mode 6 calls SpeedGolf_SetGolferStates
+// alone): the first hole's run tips are switched on (gSpeedGolfFirstHoleTips) and speed golf's
+// golfer states go in.
 void SpeedGolf_StartGamePreData(void) {
     gSpeedGolfFirstHoleTips = 1;
     SpeedGolf_SetGolferStates();

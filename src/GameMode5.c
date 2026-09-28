@@ -31,7 +31,7 @@ void (*gPlayNowModeEndGame)(void);                              // pfnEndGame
 void (*gPlayNowModeHoleStart)(void);                            // pfnLoadHole
 u8  (*gPlayNowModeGameFinished)(u8 bCheck);                     // pfnGameFinished
 u8 (*gPlayNowModeHoleFinished)(int nPlayer, u8 bCheck);         // pfnHoleFinished
-void (*gPlayNowModeHoleOver)(int nPlayer);                      // pfn210
+void (*gPlayNowModeHoleOver)(int nPlayer);                      // pfnEndTurnEndHoleNotGame
 u8 gPlayNowIntroPending;                // the group's intro message is still to be shown
 char* gPlayNowText;                     // the 'PLYs' text block (group names and descriptions)
 // The group's totals over the challenges played so far (PlayNow_GetMedal judges them).
@@ -77,7 +77,7 @@ void PlayNow_Init(void) {
     gpGame->pfnLoadHole = PlayNow_HoleStart;
     gpGame->pfnEndGame = PlayNow_EndGame;
     gpGame->pfnHoleFinished = PlayNow_HoleFinished;
-    gpGame->pfn210 = PlayNow_HoleOver;
+    gpGame->pfnEndTurnEndHoleNotGame = PlayNow_HoleOver;
     gpGame->nC = 1;
     gpGame->n10 = 1;
     gPlayNowRestarting = 0;
@@ -178,14 +178,14 @@ void PlayNow_LoadPLYsFromStream(UStreamObject* pObject) {
 
 // The current challenge (gCurChallenge) starts. The options nWeather and wind are saved
 // (gPlayNowSavedOptionC, gPlayNowSavedWind), the new-game data cleared, player 0's active profile
-// gets b70 set, and the challenge's game mode is set (GM_SetModeType fills that mode's callbacks);
-// the challenge now counts as running. Then its course, hole set and hole (1-based; a one-hole
-// challenge selects it alone; not set for the par-5/4/3 and type-7 hole sets), the holes before it
-// deselected, its tee set for everyone, its pin set (n20 - 1; n20 0 gives nPinSet -1 and pin set
-// 0), and player 0 plus up to three CPU opponents (one playing player 0's golfer in the same look
-// gets the next of four looks). The holes before the challenge hole get player 0's scores by
-// nTargetKind: 0 none; 1 a one-hole challenge carries nTargetBase as strokes, else pars nudged at
-// random to total nTargetBase; 2 pars nudged at random to nTargetBase over par (a one-hole
+// gets bChanged set, and the challenge's game mode is set (GM_SetModeType fills that mode's
+// callbacks); the challenge now counts as running. Then its course, hole set and hole (1-based; a
+// one-hole challenge selects it alone; not set for the par-5/4/3 and type-7 hole sets), the holes
+// before it deselected, its tee set for everyone, its pin set (n20 - 1; n20 0 gives nPinSet -1 and
+// pin set 0), and player 0 plus up to three CPU opponents (one playing player 0's golfer in the
+// same look gets the next of four looks). The holes before the challenge hole get player 0's scores
+// by nTargetKind: 0 none; 1 a one-hole challenge carries nTargetBase as strokes, else pars nudged
+// at random to total nTargetBase; 2 pars nudged at random to nTargetBase over par (a one-hole
 // challenge carries it, counting one hole); 3/4/5 birdie/par/bogey on each; 7 with match scoring
 // (gpGame->n4 1) holes won at random until the margin is nTargetBase (negative: the opponent's),
 // with stroke scoring everyone on par and player 0 nudged to nTargetBase over. The challenge hole
@@ -209,7 +209,7 @@ void PlayNow_StartChallenge(void) {
     gPlayNowSavedWind = gSession.options.nWind;
     GM_ClearDataForNewGame();
     if (gpSaveData[gPlayers[0].nIndex].bActive) {
-        gpSaveData[gPlayers[0].nIndex].b70 = 1;
+        gpSaveData[gPlayers[0].nIndex].bChanged = 1;
     }
     GM_SetModeType(gChallengeList[gCurChallenge].nMode);
     gPlayNowChallengeRunning = 1;
@@ -462,13 +462,13 @@ void PlayNow_StartChallenge(void) {
     gPlayNowModeHoleStart = gpGame->pfnLoadHole;
     gPlayNowModeGameFinished = gpGame->pfnGameFinished;
     gPlayNowModeHoleFinished = gpGame->pfnHoleFinished;
-    gPlayNowModeHoleOver = gpGame->pfn210;
+    gPlayNowModeHoleOver = gpGame->pfnEndTurnEndHoleNotGame;
     gpGame->pfnShutdown = PlayNow_Shutdown;
     gpGame->pfnEndGame = PlayNow_EndGame;
     gpGame->pfnLoadHole = PlayNow_HoleStart;
     gpGame->pfnGameFinished = PlayNow_GameFinished;
     gpGame->pfnHoleFinished = PlayNow_HoleFinished;
-    gpGame->pfn210 = PlayNow_HoleOver;
+    gpGame->pfnEndTurnEndHoleNotGame = PlayNow_HoleOver;
 }
 
 // Mode 5's hole start (pfnLoadHole, from GM_InitForHole): the between-holes scorecard is turned on
@@ -721,9 +721,10 @@ u8 PlayNow_IsChallengeRunning(void) {
 // (with the calendar flag a playoff gives 1 if player 0 has won more holes, else 2; without it a
 // playoff counts only for mark 0 and a lead), in stroke scoring player 1's strokes minus player 0's
 // at most the mark; 8 more skins than every opponent and at most the mark in playoff holes
-// (nPlayoffHoles); 9 in a skill zone game at least the mark in points (nDD8). With nScoring 1 this
-// hole alone: 1 strokes at most the mark, 2 over par at most the mark, 3/4/5 birdie, par or bogey
-// or better, 6 as above, 7 a playoff player 0 leads gives 2, else the margin, 9 as above.
+// (nPlayoffHoles); 9 in a skill zone game at least the mark in points (nSkillZonePoints). With
+// nScoring 1 this hole alone: 1 strokes at most the mark, 2 over par at most the mark, 3/4/5
+// birdie, par or bogey or better, 6 as above, 7 a playoff player 0 leads gives 2, else the margin,
+// 9 as above.
 int PlayNow_GetMedal(void) {
     int m;
     int nRule;
@@ -837,7 +838,7 @@ int PlayNow_GetMedal(void) {
                 }
                 break;
             case 9:
-                if (GM_Currently_SkillZoneMode() && gPlayers[0].nDD8 >= nMark) {
+                if (GM_Currently_SkillZoneMode() && gPlayers[0].nSkillZonePoints >= nMark) {
                     return m;
                 }
                 break;
@@ -888,7 +889,7 @@ int PlayNow_GetMedal(void) {
                 }
                 break;
             case 9:
-                if (GM_Currently_SkillZoneMode() && gPlayers[0].nDD8 >= nMark) {
+                if (GM_Currently_SkillZoneMode() && gPlayers[0].nSkillZonePoints >= nMark) {
                     return m;
                 }
                 break;
@@ -956,10 +957,10 @@ void PlayNow_OnPause(void) {
 
 // The number shown against the challenge's target. In match play (mode 1) the margin of holes won
 // (0 in a playoff); speed golf (8) the total time (n290) of the selected holes; skins (2) the
-// playoff holes (nPlayoffHoles); a skill zone game the points (nDD8). Otherwise the group's strokes
-// so far (not for target kind 1) plus this round's (in stroke play, mode 0, with target kind 7 the
-// holes before the current one, and the current one once the scorecard is up; else every selected
-// hole, or all 18 for kind 1), minus the group's targets up to this challenge
+// playoff holes (nPlayoffHoles); a skill zone game the points (nSkillZonePoints). Otherwise the
+// group's strokes so far (not for target kind 1) plus this round's (in stroke play, mode 0, with
+// target kind 7 the holes before the current one, and the current one once the scorecard is up;
+// else every selected hole, or all 18 for kind 1), minus the group's targets up to this challenge
 // (PlayNow_GetChallengeTarget; 0 for kind 1).
 int PlayNow_GetScoreToTarget(void) {
     int nTarget;
@@ -987,7 +988,7 @@ int PlayNow_GetScoreToTarget(void) {
         return gpGame->nPlayoffHoles;
     }
     if (GM_Currently_SkillZoneMode()) {
-        return gPlayers[0].nDD8;
+        return gPlayers[0].nSkillZonePoints;
     }
     i = 0;
     nTarget = 0;
@@ -1251,9 +1252,9 @@ u8 PlayNow_HoleFinished(int nPlayer, u8 bCheck) {
     return gPlayNowModeHoleFinished(nPlayer, bCheck);
 }
 
-// Mode 5's hook for a hole that is over while the game goes on (pfn210): after a restart the
-// end-of-hole screen is flagged pending (GUI_SetEndOfHolePending) and the restart flag and b275
-// (the between-holes scorecard) are cleared; otherwise the played mode's own hook runs.
+// Mode 5's hook for a hole that is over while the game goes on (pfnEndTurnEndHoleNotGame): after a
+// restart the end-of-hole screen is flagged pending (GUI_SetEndOfHolePending) and the restart flag
+// and b275 (the between-holes scorecard) are cleared; otherwise the played mode's own hook runs.
 void PlayNow_HoleOver(int nPlayer) {
     if (gPlayNowRestarting) {
         GUI_SetEndOfHolePending();

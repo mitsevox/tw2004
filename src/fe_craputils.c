@@ -262,12 +262,12 @@ u8 fn_800587A8(SaveProfile* pProfile, int nKind, char* pName) {
 }
 
 void fn_800588D4(s16 n) {
-    lbl_80281DF0.b = 1;
-    lbl_80281DF0.n = n;
+    lbl_80281DF0.bSigned = 1;
+    lbl_80281DF0.nSponsor = n;
 }
 
 int fn_800588E8(void) {
-    return lbl_80281DF0.n;
+    return lbl_80281DF0.nSponsor;
 }
 
 // Par-5 eagle record i (GM_ConvertCourseAndHoleToPar5EagleIndex): kind 0 whether the hole is

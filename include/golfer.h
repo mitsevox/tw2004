@@ -279,8 +279,10 @@ typedef struct Player {
     u8   bGreenInReg[18];       // 0x2F6  per hole: a green in regulation (on it in
                                 //        par - 2 strokes or fewer). TW06: gir
     s32  n308;                  // 0x308
-    u8   b30C;                  // 0x30C  the start of the block GameModeReplay restores from a replay
-    u8   b30D;                  // 0x30D  tested with the course check by GameEffects
+    u8   bHitObject;            // 0x30C  the shot hit a course object (event 36, Collision);
+                                //        the start of the block GameModeReplay restores from a
+                                //        replay
+    u8   bHitPin;               // 0x30D  the shot hit the flagstick (event 38, Collision)
     u8   b30E;                  // 0x30E  a replaced ball must be dropped (GM_ReplaceOOBBall)
     u8   bBunkerThisShot;       // 0x30F  the ball touched a bunker (surface class 6, PsBallFx.c)
     u8   bBunkerThisHole;       // 0x310  set from bBunkerThisShot after a shot
@@ -295,7 +297,8 @@ typedef struct Player {
     s32  nClubPerKind[8];       // 0x358  the club Shot_Prepare would pick for each shot kind. TW06: preferredClub
     f32  fAim;                  // 0x378  aim angle, radians. TW06: direction
     f32  fPower;                // 0x37C  0..1 (up to 1.5). TW06: strength
-    s32  nShotKind;             // 0x380  0 putt, 2/3 approach, 5..7 recovery. TW06: type (ShotType_t)
+    s32  nShotKind;             // 0x380  SHOT_TYPE_ (physics.h): 0 putt, 1 drive, 2 chip, 3 pitch,
+                                //        4 punch, 5 flop. TW06: type (ShotType_t)
     s32  nTrajectory;           // 0x384  from Shot_Trajectory: 0 low, 1 normal, 2 high. TW06 has a float stance here
     f32  vLaunchA[4];           // 0x388  launch parameter blocks handed to Physics_ShotImpact. TW06: clubDirection (the face)
     f32  vLaunchB[4];           // 0x398  TW06: strokeDirection (the swing path, which carries the shape)
@@ -366,29 +369,37 @@ typedef struct Player {
     f32  vCBC[3];               // 0xCBC  a vector (the run's velocity?): the first-person camera's step is
                                 //        three times the length of its x and z
     u8   unkCC8[0xCD0 - 0xCC8];
-    s32  nCD0;                  // 0xCD0  cleared per game (GameModeSkillZoneBase_ClearPerShotData)
-    s32  aCD4[20];              // 0xCD4
+    // Mode 12 and the target games (modes 13..17, GameTargets.c): cleared per shot
+    // (GameModeSkillZoneBase_ClearPerShotData) or per hole (ClearPerHoleData).
+    s32  nShotSurfaceCount;     // 0xCD0  the surfaces this shot scored on, in aShotSurfaces
+    s32  aShotSurfaces[20];     // 0xCD4  (mode 12 counts a surface's repeats)
     s32  nD24;                  // 0xD24  mode 12: a bonus meter, 0..100
-    s32  nD28[18];              // 0xD28  per hole
-    s32  nD70[18];              // 0xD70  per hole
-    s32  nDB8;                  // 0xDB8
+    s32  nHolePoints[18];       // 0xD28  mode 12: the points per hole (the shots' nShotPoints)
+    s32  nHoleHits[18];         // 0xD70  scoring landings per hole (modes 12..17)
+    s32  nShotPoints;           // 0xDB8  mode 12: this shot's points (points x hits x multiplier)
     s32  nDBC;                  // 0xDBC  the shot's multiplier in the target games (1, 2, 3 or 5)
-    s32  nDC0;                  // 0xDC0
-    s32  aDC4[5];               // 0xDC4
-    s32  nDD8;                  // 0xDD8  a count a challenge medal can ask for (GameMode5)
-    s32  nDDC;                  // 0xDDC
-    s32  nDE0;                  // 0xDE0
-    s32  nDE4[40];              // 0xDE4  per target (GameModeSkillZoneBase_GetGreenTargetted), 0 = not yet hit
+    s32  nBalls;                // 0xDC0  shots taken (modes 13..16; the game stops at 20), or balls
+                                //        left (mode 17: 5 to start, plus the extra balls earned)
+    s32  aSkillZoneStats[5];    // 0xDC4  [0] shots with a multiplier, [1] extra balls earned
+                                //        (mode 17), [3] target hits, [4] time added in frames
+                                //        (mode 13); [2] unused. The UI messages read them
+    s32  nSkillZonePoints;      // 0xDD8  the points (money) the game has paid; a challenge medal
+                                //        can ask for so many (GameMode5)
+    s32  nSkillZoneLongestDrive;    // 0xDDC  the longest shot that counts as a long drive
+                                //        (GameModeSkillZoneBase_IsLongDrive)
+    s32  nBullseyes;            // 0xDE0  hits on a target's centre (surfaces 0x85, 0x88, 0x8C)
+    s32  nTargetHits[40];       // 0xDE4  hits per target (GameModeSkillZoneBase_GetGreenIndexHit)
     s8   nTarget;               // 0xE84  the current target (set in GameTargets.c)
     u8   unkE85[3];
-    s32  nE88;                  // 0xE88  below 5: still in (mode 15)
-    s32  nE8C;                  // 0xE8C
-    s32  nE90;                  // 0xE90
-    s32  nE94;                  // 0xE94
+    s32  nHorseLetters;         // 0xE88  mode 15 (HORSE): a letter per miss; out at 5
+    s32  nBestHitStreak;        // 0xE8C  the longest run of target hits
+    s32  nHitStreak;            // 0xE90  the current run (a miss ends it)
+    s32  nSteals;               // 0xE94  mode 14: hits on a target another player held
     s32  nE98;                  // 0xE98  shots in a row without a multiplier
     s8   nNextTarget;           // 0xE9C  the next target to hit, in order (GameMode17)
     s8   bE9D;                  // 0xE9D
-    u8   bE9E;                  // 0xE9E
+    u8   bAllTargetsHit;        // 0xE9E  the hit-every-target prize was paid (its commentary
+                                //        plays once)
     u8   unkE9F;
     s32  nEA0;                  // 0xEA0  } values of the modes' own the menus ask for
     s32  nEA4;                  // 0xEA4  } (GameUICommands.c IG_vGetLongDriveStat)
@@ -608,23 +619,37 @@ typedef struct GameState {
                                 //        (GM_IsPuttForLead). TW07: IsPuttForLead
     u8   (*pfnIsPuttForWin)(int nPlayer);   // 0x1FC  holing this ball wins; asked before the
                                 //        special ball pick-up. TW07: IsPuttForWin
-    s32  (*pfn200)(int nPlayer); // 0x200  strokes behind the leader. TW06: GetCurrentLead
-    s32  (*pfn204)(int nPlayer); // 0x204  the same if this putt drops. TW06: GetPotentialLead
+    s32  (*pfnGetCurrentLead)(int nPlayer); // 0x200  strokes behind the leader. TW06:
+                                //        GetCurrentLead
+    s32  (*pfnGetPotentialLead)(int nPlayer);   // 0x204  the same if this putt drops. TW06:
+                                //        GetPotentialLead
     s32  (*pfnGetPotentialHoleResult)(int nPlayer); // 0x208  how the hole ends if this ball
                                 //        drops. TW07: GetPotentialHoleResult
-    void (*pfn20C)(int nPlayer); // 0x20C  called as a swing begins (state 1)
-    void (*pfn210)(int nPlayer); // 0x210  the hole is over, the game is not
-    void (*pfn214)(void);       // 0x214
-    void (*pfn218)(int nPlayer); // 0x218
-    void (*pfn21C)(int nPlayer); // 0x21C
-    void (*pfn220)(void);       // 0x220  every frame in game type 6
+    void (*pfnPreShotInit)(int nPlayer);    // 0x20C  the pre-shot state starts
+                                //        (STATEFUNC_PreShotInit). TW07: PreShotInit
+    void (*pfnEndTurnEndHoleNotGame)(int nPlayer);  // 0x210  the hole is over, the game is not
+                                //        (GM_HoleFinished_GameNotFinished). TW07:
+                                //        EndTurnEndHoleNotGame
+    void (*pfnScorecardClosed)(void);   // 0x214  the end-of-hole scorecard was closed
+                                //        (GUI_PauseMenuClosed). TW07: ScorecardClosed
+    void (*pfnHoledOut)(int nPlayer);   // 0x218  the ball was holed, or picked up at the stroke
+                                //        limit (GM_PlayerTookShot); no mode sets it (our name)
+    void (*pfnShotOverLimit)(int nPlayer);  // 0x21C  the stroke limit was reached
+                                //        (GM_PlayerTookShot). TW07: ShotOverLimit
+    void (*pfnUpdate)(void);    // 0x220  every frame of a round (GM_Update, game type 6; our name)
     void (*pfnRestartHole)(void);   // 0x224  the hole restarts (GM_RestartHole). TW07: RestartHole
-    void (*pfn228)(int nPlayer); // 0x228  called every frame of the shot setup (state 10)
-    void (*pfn22C)(int nPlayer); // 0x22C  called after a re-plan in swing state 9
-    u8   (*pfn230)(int nPlayer); // 0x230
+    void (*pfnSwingUpdate)(int nPlayer);    // 0x228  every frame of the swing state
+                                //        (STATEFUNC_SwingUpdate; our name)
+    void (*pfnResetShot)(int nPlayer);  // 0x22C  after a re-plan (STATEFUNC_SwingUpdate,
+                                //        STATEFUNC_GreenMorphUpdate). TW07: ResetShot
+    u8   (*pfnRenderBallTarget)(int nPlayer);   // 0x230  nonzero: the ball target is drawn as in
+                                //        the place-ball state (target.c, GameRound.c). TW07:
+                                //        RenderBallTarget
     u8   (*pfnCheckControllerPulled)(void);    // 0x234  GM_CheckControllerPulled asks it.
                                 //        TW06 / TW07: CheckControllerPulled
-    u8   (*pfn238)(int nPlayer); // 0x238  nonzero: skip addressing the ball (swing state 1)
+    u8   (*pfnOKToShoot)(int nPlayer);  // 0x238  nonzero (the default): the pre-shot state may
+                                //        go on to the shot setup (STATEFUNC_PreShotUpdate). TW07:
+                                //        OKToShoot
     void (*pfnBallCollision)(int nPlayer);  // 0x23C  the ball hit something (event.c, ball events
                                 //        35..38). TW07: BallCollision
     s32  (*pfnTriggerSplash)(int nPlayer);  // 0x240  the ball touched a surface: returns a hit
@@ -632,13 +657,14 @@ typedef struct GameState {
     void (*pfnCheckShotAwards)(int nPlayer);    // 0x244  a shot is over, in bounds
                                 //        (GM_Earnings_PayShotGoals). TW07: CheckShotAwards
     void (*pfnEndGolferTurn)(int nPlayer); // 0x248  end of a golfer's turn. TW06: EndGolferTurn
-    void (*pfn24C)(int nPlayer); // 0x24C  called when a swing leaves state 20
+    void (*pfnInitialFlyByDone)(int nPlayer);   // 0x24C  the hole's opening flyover ended
+                                //        (STATEFUNC_InitialFlyByExit). TW07: InitialFlyByDone
     void (*pfnBallOOB)(int nPlayer);    // 0x250  the ball went out of bounds. TW07: BallOOB
     void (*pfnMulligan)(int nPlayer);   // 0x254  a mulligan was taken. TW07: Mulligan
     u8   (*pfnPickTarget)(int nPlayer); // 0x258  the re-plan button: the target modes pick the next
                                 //        target; nonzero lets the re-plan run. TW07: PickTarget
     void (*pfnSetTimer)(int nPlayer, int nTime);    // 0x25C  set the time left. TW07: SetTimer
-    void (*pfn260)(int nPlayer); // 0x260
+    void (*pfnHitBall)(int nPlayer);    // 0x260  the ball was hit (EVENT_HitBall). TW07: HitBall
     u8   (*pfnPickPrevTarget)(int nPlayer); // 0x264  "aim at the pin?" for a re-plan; the target
                                 //        modes pick the previous target. TW07: PickPrevTarget
     void (*pfnCollisionActor)(int nPlayer, int nId);    // 0x268  the ball hit a world object nId

@@ -588,7 +588,7 @@ u8 fn_80078008(s32 nAsset, SaveProfile* pProfile) {
             bLocked = 0;
         }
         for (i = 0; i < 11; i++) {
-            if (pProfile->a1054C[i].b && pProfile->a1054C[i].n == n) {
+            if (pProfile->aSponsor[i].bSigned && pProfile->aSponsor[i].nSponsor == n) {
                 bLocked = 0;
             }
         }
@@ -596,7 +596,7 @@ u8 fn_80078008(s32 nAsset, SaveProfile* pProfile) {
     case 11:
         bLocked = 1;
         for (i = 0; i < 11; i++) {
-            if (pProfile->a1054C[i].b) {
+            if (pProfile->aSponsor[i].bSigned) {
                 nCount++;
             }
         }

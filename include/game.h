@@ -201,8 +201,8 @@ f32  fn_800D0550(int nPlayer);          // the shot's length
 int  Hole_ScoreAfterTapIn(int nPlayer); // HoleScore.c
 u8   fn_800CF158(int nPlayer);          // gpGame->pfnIsPuttForLead: holing this ball takes the lead
 u8   fn_800CF450(int nPlayer);          // gpGame->pfnIsPuttForWin: holing this ball wins
-s32  fn_800CFE74(int nPlayer);          // gpGame->pfn200: the lead so far
-s32  fn_800D0098(int nPlayer);          // gpGame->pfn204: the lead if this ball drops
+s32  fn_800CFE74(int nPlayer);          // gpGame->pfnGetCurrentLead: the lead so far
+s32  fn_800D0098(int nPlayer);          // gpGame->pfnGetPotentialLead: the lead if this ball drops
 s32  fn_800D030C(int nPlayer);          // gpGame->pfnGetPotentialHoleResult: how the hole ends if it drops
 int  fn_800D0620(int nPlayer, u8 bCurrent, u8 bOnlyFlagged);   // holes under par so far
 int  fn_800D06FC(int nPlayer, u8 bCurrent, u8 bOnlyFlagged);   // two under par or better so far
@@ -227,7 +227,7 @@ s32  GM_GetNumHolesInRound(void);                 // GameUICommands.c
 int  GM_GetGolferRelativeCurrentScore(int nPlayer, u8 bCurrent);        // GameRound.c
 s32  GameModeBattle_GetClubLostOnLastHole(int nPlayer);          // GameModeBattle.c
 s32  fn_800BCCCC(int nPlayer);          // SitDevFile.c: gpGame->pfnGetPotentialHoleResult
-s32  fn_800BCCF8(int nPlayer);          // SitDevFile.c: gpGame->pfn200's answer (TW06: GetCurrentLead)
+s32  fn_800BCCF8(int nPlayer);          // SitDevFile.c: gpGame->pfnGetCurrentLead's answer
 u8   fn_800BCD50(void);                 // SitDevFile.c: gpGame->bInPlayoff
 void CalDate_GetMDY(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
 void CalDate_SetMDY(u16* pDate, s32 nMonth, s32 nDay, u32 nYear);    // make a date

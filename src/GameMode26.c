@@ -72,9 +72,9 @@ void GameMode26_Init(void) {
     gpGame->pfnGoToPlayoff = GameMode26_GoToPlayoff;
     gpGame->pfnEndGolferTurn = GameMode26_EndGolferTurn;
     gpGame->pfnEndGame = GameMode26_EndGame;
-    gpGame->pfn220 = GameMode26_UpdateFrame;
-    gpGame->pfn20C = GameMode26_StartSwing;
-    // port: its parameter is PlayerNumber_t, pfn244's int
+    gpGame->pfnUpdate = GameMode26_UpdateFrame;
+    gpGame->pfnPreShotInit = GameMode26_StartSwing;
+    // port: its parameter is PlayerNumber_t, pfnCheckShotAwards's int
     gpGame->pfnCheckShotAwards = (void (*)(int))GameMode26_ScoreShot;
     gpGame->pfnLoadHole = GameMode26_HoleStart;
     gpGame->pfnRestartHole = GameMode26_RestartHole;
@@ -139,7 +139,7 @@ void GameMode26_EndGame(void) {
     EASBio_SetCurrentGameWon(1);
 }
 
-// Each frame (pfn220). Every 16 frames, for both players: the shot length (fn_800D0550) sent as
+// Each frame (pfnUpdate). Every 16 frames, for both players: the shot length (fn_800D0550) sent as
 // message 0x4D with the player; while it is nonzero and still changing a long-drive UI sound plays
 // (script 0, track 1; started once per player; EA also passes a loop flag and the player's side,
 // which Gaud_LongDriveUi_Play ignores), and it stops once the length stops changing. Once somebody
@@ -177,7 +177,7 @@ void GameMode26_UpdateFrame(void) {
     }
 }
 
-// As a swing begins (pfn20C): GameMode26_PreSwing (empty). nPlayer is not read.
+// As a swing begins (pfnPreShotInit): GameMode26_PreSwing (empty). nPlayer is not read.
 void GameMode26_StartSwing(int nPlayer) {
     GameMode26_PreSwing();
 }
@@ -210,7 +210,8 @@ u8 GameMode26_GameFinished(u8 bCheck) {
     return GameMode26_GetWinner(NULL);
 }
 
-// The ball went out of bounds (pfn250): the drive is scored like any other (GameMode26_ScoreShot).
+// The ball went out of bounds (pfnBallOOB): the drive is scored like any other
+// (GameMode26_ScoreShot).
 void GameMode26_BallOutOfBounds(int nPlayer) {
     GameMode26_ScoreShot(nPlayer);
 }
@@ -259,9 +260,9 @@ s32 GameMode26_GetLieGroup(int nLie) {
         nMsgs++;                            \
     }
 
-// A drive is over (pfn244; GameMode26_BallOutOfBounds for one out of bounds); nothing once somebody
-// has won. Scored as in GameMode22_ScoreShot: surface 0x9B kind 1, the length plus 20%; surface
-// 0x2F or 0x68 kind 4, -100 (with a sound); bLowIQPenalty set kind 5, -100; else by
+// A drive is over (pfnCheckShotAwards; GameMode26_BallOutOfBounds for one out of bounds); nothing
+// once somebody has won. Scored as in GameMode22_ScoreShot: surface 0x9B kind 1, the length plus
+// 20%; surface 0x2F or 0x68 kind 4, -100 (with a sound); bLowIQPenalty set kind 5, -100; else by
 // GameMode26_GetLieGroup: the tee or the rough kind 2, 0 points; the fairway, green or cup kind 0,
 // the length; sand kind 3, -50. Kinds 0 and 1 are fair drives: counted (nEA4), their total (nEC4)
 // and average (nEC0) kept, and 400 or more earns 100 more; every drive counts (nEA0) and each kind
@@ -468,12 +469,13 @@ void GameMode26_ScoreShot(PlayerNumber_t nPlayer) {
     }
 }
 
-// The hole starts (pfn1E4): every player's contest values cleared (GameMode26_ClearPlayerStats).
+// The hole starts (pfnLoadHole): every player's contest values cleared
+// (GameMode26_ClearPlayerStats).
 void GameMode26_HoleStart(void) {
     GameMode26_ClearPlayerStats();
 }
 
-// The hole restarts (pfn224): every player's contest values cleared, and no winner
+// The hole restarts (pfnRestartHole): every player's contest values cleared, and no winner
 // (gGameMode26Winner 5).
 void GameMode26_RestartHole(void) {
     GameMode26_ClearPlayerStats();

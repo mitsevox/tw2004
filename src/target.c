@@ -892,8 +892,8 @@ f32 lbl_801887EC[4] = { 0.4f, 0.4f, 0.4f, 0.5f };
 // Each frame while the ball is being placed (not while paused): the bobbing marker ball and its
 // shadow at the placement point, the marker kept inside the camera's view, and below it the
 // distances to the tee and the hole, in another colour when the spot is out of bounds or not a
-// valid drop. When the mode's pfn230 says so, only the marker is drawn, and only with nC3C's
-// bit 0 set.
+// valid drop. When the mode's pfnRenderBallTarget says so, only the marker is drawn, and only with
+// nC3C's bit 0 set.
 void PlaceBall_RenderBallTarget(int nPlayer) {
     char  szText[128];          // size unknown
     f32   aMarker[4][4];
@@ -968,7 +968,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     if (gSession.nPaused != 0) {
         return;
     }
-    if (gpGame->pfn230(nPlayer)) {
+    if (gpGame->pfnRenderBallTarget(nPlayer)) {
         if (!(gPlayers[nPlayer].nC3C & 1) || gSession.nPaused != 0) {
             return;
         }

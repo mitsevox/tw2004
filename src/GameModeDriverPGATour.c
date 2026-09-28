@@ -77,8 +77,8 @@ void GameModeDriverPGATour_Init(void) {
     gpGame->pfnIsPuttForLead = GameModeDriverPGATour_IsPuttForLead;
     // IsPuttForWin's player is an s32 (long): as an int its profile index compiles differently
     gpGame->pfnIsPuttForWin = (u8 (*)(int))GameModeDriverPGATour_IsPuttForWin;
-    gpGame->pfn200 = GameModeDriverPGATour_GetCurrentLead;
-    gpGame->pfn204 = GameModeDriverPGATour_GetPotentialLead;
+    gpGame->pfnGetCurrentLead = GameModeDriverPGATour_GetCurrentLead;
+    gpGame->pfnGetPotentialLead = GameModeDriverPGATour_GetPotentialLead;
     gpGame->pfnGetPotentialHoleResult = GameModeDriverPGATour_GetPotentialHoleResult;
     gpGame->b274 = 0;
     gpGame->n4 = 0;
@@ -253,15 +253,15 @@ static inline SeasonEvent* Tour_CurrentEvent(PlayerNumber_t nPlayer) {
 }
 
 // pfnEndGame, when a tour round ends, for profile 0: the first round counts a tournament started
-// (tour.n4E94); after the second round of a tournament of four or more rounds the cut is made
-// (fn_80117B58) and a player who missed it is marked cut; the player's total score goes into the
-// season record, and after the last round the tournament ends
+// (tour.nEventsStarted); after the second round of a tournament of four or more rounds the cut is
+// made (fn_80117B58) and a player who missed it is marked cut; the player's total score goes into
+// the season record, and after the last round the tournament ends
 // (GameModeDriverPGATour_EndTournament). The round number moves on later
 // (GameModeDriverPGATour_CheckAdvanceTournament).
 void GameModeDriverPGATour_EndGame(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
     if (gpSaveData[nPlayer].tour.nRound == 0) {
-        Tour_Profile(nPlayer)->tour.n4E94++;
+        Tour_Profile(nPlayer)->tour.nEventsStarted++;
     }
     if (GameModeDriverPGATour_GetRounds(gpSaveData[nPlayer].tour.nEvent) >= 4 &&
         gpSaveData[nPlayer].tour.nRound == 1) {
@@ -553,9 +553,9 @@ void GameModeDriverPGATour_PostHoleLoadInit(void) {
 // pfnEndHole. Outside a playoff, the hole just finished goes into the player's round statistics
 // (lbl_80205ED8): strokes, putts (more than 10 count as 0), bunkers and saves, fairways and greens
 // hit, the result against par, per par 3, 4 and 5, drives and the longest drive and putt. After the
-// 18th hole a round at or under par extends the profile's run of such rounds (tour.n4E98), any
-// other ends it. Then the player's hole on the leaderboard moves on (fn_801198F8). The u16 casts on
-// the sums are in the original (a clrlwi before each add).
+// 18th hole a round at or under par extends the profile's run of such rounds
+// (tour.nParRoundStreak), any other ends it. Then the player's hole on the leaderboard moves on
+// (fn_801198F8). The u16 casts on the sums are in the original (a clrlwi before each add).
 void GameModeDriverPGATour_EndHole(void) {
     PlayerNumber_t nPlayer;
     PgaStatCounts* pRound;
@@ -653,9 +653,9 @@ void GameModeDriverPGATour_EndHole(void) {
     if (nHole == 17) {
         n = GM_PgaTourSim_GetRoundScoreFromEntrantID(0, 0, gpSaveData[nPlayer].tour.nRound);
         if (n <= fn_800D2FB4(gSession.nTeeSet[0])) {
-            gpSaveData[nPlayer].tour.n4E98++;
+            gpSaveData[nPlayer].tour.nParRoundStreak++;
         } else {
-            gpSaveData[nPlayer].tour.n4E98 = 0;
+            gpSaveData[nPlayer].tour.nParRoundStreak = 0;
         }
     }
     fn_801198F8(0, nHole + 1);

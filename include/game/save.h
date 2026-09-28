@@ -35,7 +35,8 @@ typedef struct SeasonEvent {
 
 // One golfer's season counts, from which each tour statistic is worked out (0x58 bytes). The
 // profile keeps one per tour golfer (PGATourSimulation.c simulates the pros'); the player's round
-// is counted in gPgaRoundStats and added to the player's own (GameModeDriverPGATour GameModeDriverPGATour_CommitUserRoundStatCounts).
+// is counted in gPgaRoundStats and added to the player's own
+// (GameModeDriverPGATour_CommitUserRoundStatCounts).
 // TW06: GM_Pga_StatCounts, which has three more counts (water saves, water hits, long putts)
 // between nNonGIRPars and nEagles.
 typedef struct PgaStatCounts {
@@ -113,13 +114,16 @@ typedef struct TourSeason {
     SeasonEvent aEvent[31];     // 0x000C
     PgaStatCounts aStats[PGA_NUM_GOLFERS];      // 0x0468  per golfer id
     PgaField field;             // 0x4090
-    u16  n4E94;                 // 0x4E94  counts the tournaments started
-    u16  n4E96;                 // 0x4E96  a run of the player's tournament wins (GM_PgaTourSim_CheckEndOfTournamentAward);
-                                //         reset to 0 when the player finishes elsewhere
-    u16  n4E98;                 // 0x4E98  a run of tour rounds, counted on each 18th hole
-                                //         (GameModeDriverPGATour_EndHole); reset to 0 when the run breaks
-    u16  n4E9A;                 // 0x4E9A  wins of the tournaments whose Tournament.bIsAMajor is set
+    u16  nEventsStarted;        // 0x4E94  tournaments started (counted in a first round,
+                                //         GameModeDriverPGATour_EndGame)
+    u16  nWinStreak;            // 0x4E96  tournaments won in a row: +1 for a win, 0 when the
+                                //         player plays one and does not win
                                 //         (GM_PgaTourSim_CheckEndOfTournamentAward)
+    u16  nParRoundStreak;       // 0x4E98  rounds in a row at or under the course's par, counted
+                                //         on each 18th hole (GameModeDriverPGATour_EndHole); 0
+                                //         after a round over par
+    u16  nMajorWins;            // 0x4E9A  majors won (Tournament.bIsAMajor;
+                                //         GM_PgaTourSim_CheckEndOfTournamentAward)
 } TourSeason;
 LAYOUT_ASSERT(TourSeason, 0x4E9C);
 
@@ -138,7 +142,7 @@ typedef struct SavedRound {
 #define NUM_SAVED_ROUNDS 3      // the setup's loop count
 
 // A PGA TOUR tournament won, in a save profile (8 bytes): filled in when the player finishes first
-// (GameModeDriverPGATour GameModeDriverPGATour_EndTournament).
+// (GameModeDriverPGATour_EndTournament).
 typedef struct TourWin {
     Award award;                // 0x0  won, and the day (GM_Earnings_GiveAwardToUser)
     u16  nScore;                // 0x4  the player's score (GM_PgaTourSim_GetTotalScoreFromEntrantID, as SeasonEvent.nUserScore)
@@ -146,15 +150,20 @@ typedef struct TourWin {
                                 //      PGATourWins_GetDetails reads it unsigned)
 } TourWin;
 
-// One entry of SaveProfile.a1054C: a switch and a value (our name). lbl_80281DF0 is one more,
-// outside the profiles: user.c clears it and the code at 0x80057D64 copies it into a new profile's
-// first entry.
-typedef struct SaveLockEntry {
-    u8   b;                     // 0x0
+// A sponsorship slot in a save profile (our name; the slots' terms are the tour table's
+// PgaSponsorship, TW06 GM_PgaTour_SponsorshipSlot_t). Slot i is signed once the game progress
+// reaches its level (FE_PGATourMessages.c fn_8010EF8C), with a sponsor picked at random; each worn
+// Create-A-Player asset of that sponsor then pays the slot's bonus cash
+// (FE_CrAP_CollectSponsorshipItems). lbl_80281DF0 is one more, outside the profiles: the sponsor
+// a new profile starts with (user.c clears it; the profile setup at 0x80057D64 copies it into
+// slot 0).
+typedef struct SponsorSlot {
+    u8   bSigned;               // 0x0  the slot is signed
     u8   unk1;
-    s16  n;                     // 0x2
-} SaveLockEntry;
-LAYOUT_ASSERT(SaveLockEntry, 4);
+    s16  nSponsor;              // 0x2  the sponsor: a Create-A-Player asset's n2C (one of
+                                //      lbl_80193CFC's 11)
+} SponsorSlot;
+LAYOUT_ASSERT(SponsorSlot, 4);
 
 // A logo's shape: 64 x 64 (drawn into the texture "__LogoSquare") or 128 x 32 ("__LogoRect").
 #define LOGO_SQUARE 0
@@ -242,43 +251,51 @@ typedef struct SaveProfile {
     u8   aCourseUnlocked[23];   // 0x0003A  per course
     u8   aRewardUnlocked[0x64 - 0x51];  // 0x00051  per reward (fn_80058428 sets); the
                                 //          "THEKITCHENSINK" code (0x80056568) sets the first 18
-    s32  n64;                   // 0x00064  money: every payout is added (GM_Earnings_AwardMoney); a course unlocks
-                                //          when it reaches the course's price (GM_Earnings_CheckUnlockCourses)
+    s32  nTotalCash;            // 0x00064  all the money ever won: every payout is added
+                                //          (GM_Earnings_AwardMoney), nothing taken off; a course
+                                //          unlocks when it reaches the course's price
+                                //          (GM_Earnings_CheckUnlockCourses)
     s32  n68;                   // 0x00068  cleared by the profile setup (fn_80057438)
-    s32  n6C;                  // 0x0006C  money: every payout is added here too (GM_Earnings_AwardMoney)
-    u8   b70;                   // 0x00070  set when an award is won, a round is counted or a challenge
-                                //          starts; cleared when a round is set up (GameRound.c)
+    s32  nCurrentCash;          // 0x0006C  the money to spend: every payout and a sponsorship's
+                                //          start cash are added, the menus set it (the pro shop)
+    u8   bChanged;              // 0x00070  set when a statistic, an award or money changes or a
+                                //          challenge starts; cleared when a round is set up
+                                //          (GameRound.c)
     u8   unk71[3];
-    s32  n74;                   // 0x00074  stroke-play rounds counted
-    s32  n78;                   // 0x00078  their strokes
-    s32  n7C;                   // 0x0007C  full rounds counted
-    s32  n80;                  // 0x00080  holes whose putts are counted (fewer than 10; GM_RecordIndividualHoleStats)
-    s32  n84;                   // 0x00084  their putts
-    s32  n88;                  // 0x00088  drives counted (the tee shot of a par 4 or 5 off class-1
-                                //          ground; GM_RecordIndividualShotStats)
-    s32  n8C;                   // 0x0008C  their distance together
-    s32  n90;                   // 0x00090  } par 4 and 5 holes counted (GM_RecordIndividualHoleStats), and those where
-    s32  n94;                   // 0x00094  } the player's bFairwayHit was set
-    s32  n98;                   // 0x00098  } every hole counted, and those where the player's bGreenInReg
-    s32  n9C;                   // 0x0009C  } was set
-    s32  nA0;                   // 0x000A0  the longest of those drives
-    s32  nA4;                   // 0x000A4  the longest putt, in feet (GM_RecordIndividualShotStats)
-    s32  nA8;                   // 0x000A8  the best stroke-play round (0: none yet)
-    s32  nAC;                   // 0x000AC  } read by menu messages (FE_MessageTable.c)
-    s32  nB0;                   // 0x000B0  }
-    s32  nB4;                   // 0x000B4  }
-    s32  nB8;                   // 0x000B8  }
-    s32  nBC;                   // 0x000BC  }
-    s32  nC0;                   // 0x000C0  }
-    s32  nC4;                   // 0x000C4  }
+    // The profile's statistics (GM_RecordIndividualShotStats / HoleStats / RoundStats), shown by
+    // the menus (FE_MessageTable.c); counted only with mulligans off.
+    s32  nStrokeRounds;         // 0x00074  stroke-play rounds counted
+    s32  nStrokeRoundStrokes;   // 0x00078  their strokes
+    s32  nRounds;               // 0x0007C  full rounds counted
+    s32  nPuttHoles;            // 0x00080  holes whose putts are counted (fewer than 10)
+    s32  nPutts;                // 0x00084  their putts
+    s32  nDrives;               // 0x00088  drives counted (the tee shot of a par 4 or 5 off class-1
+                                //          ground)
+    s32  nDriveDistance;        // 0x0008C  their yards together
+    s32  nFairways;             // 0x00090  par 4 and 5 holes counted
+    s32  nFairwaysHit;          // 0x00094  those where the player's bFairwayHit was set
+    s32  nHoles;                // 0x00098  every hole counted
+    s32  nGreensHit;            // 0x0009C  those where the player's bGreenInReg was set
+    s32  nLongestDrive;         // 0x000A0  the longest of those drives, in yards
+    s32  nLongestPutt;          // 0x000A4  the longest putt holed, in feet
+    s32  nBestRound;            // 0x000A8  the best stroke-play round (0: none yet)
+    s32  nHolesInOne;           // 0x000AC  holes by their score: a hole in one
+    s32  nAlbatrosses;          // 0x000B0  3 under par
+    s32  nEagles;               // 0x000B4  2 under
+    s32  nBirdies;              // 0x000B8  1 under
+    s32  nPars;                 // 0x000BC
+    s32  nBogeys;               // 0x000C0  1 over
+    s32  nDoubleBogeys;         // 0x000C4  2 or more over
     TourWin aC8[31];           // 0x000C8  one per PGA TOUR tournament
     Award a1C0[16];            // 0x001C0  the won ones count for GM_GetBonusProgress. 0..11: Player
                                 //          of the Month, per month (the tour's month money leader,
                                 //          n44; FE_PGATourMessages.c TrophyRoom_GetPlayerOfMonthStatus); 12..15: the
-                                //          four trophies (both awarded by PGATourSimulation
-                                //          GM_PgaTourSim_CheckEndOfTournamentAward; GameMode22 TrophyRoom_GetTourTrophy reads their days)
-    Award a200[3];              // 0x00200  the player's career winnings first, in the top 5 and in the
-                                //          top 25 of the tour (PGATourSimulation GM_PgaTourSim_CheckEndOfTournamentAward)
+                                //          four trophies (both awarded by
+                                //          GM_PgaTourSim_CheckEndOfTournamentAward;
+                                //          TrophyRoom_GetTourTrophy reads their days)
+    Award a200[3];              // 0x00200  the player's career winnings first, in the top 5 and in
+                                //          the top 25 of the tour
+                                //          (GM_PgaTourSim_CheckEndOfTournamentAward)
     Award aRTEAward[75];        // 0x0020C  per real-time event id. TW06: rteEventAwardInfo
     Award aLadderAward[25];     // 0x00338  per ladder event (GameMode4.c); fn_800584DC's earnings
                                 //          rating counts the won ones
@@ -329,12 +346,15 @@ typedef struct SaveProfile {
     u32  aB344[94];             // 0x0B344
     u32  aB4BC[94];             // 0x0B4BC
     TourSeason tour;            // 0x0B634
-    u8   a104D0[118];           // 0x104D0  per real-time event (GM_RealtimeMode_GetStartDate's ids); GameMode22 TrophyRoom_CountEventsInMonth
-                                //          counts the nonzero ones in a month
+    u8   a104D0[118];           // 0x104D0  per real-time event, by the ids of
+                                //          GM_RealtimeMode_GetStartDate (0..117):
+                                //          TrophyRoom_CountEventsInMonth counts the nonzero ones
+                                //          in a month; no C code here writes it
     u8   unk10546[0x10548 - 0x10546];
     u32  a10548[1];             // 0x10548  a bit array: FE_CrAPMessages.c's fn_80108E4C tests bit n; fn_80058304 tests one (bit 1 for FE_Manager)
-    SaveLockEntry a1054C[11];   // 0x1054C  cleared by the profile setup; fn_80078008's lock kinds
-                                //          10 and 11 read them
+    SponsorSlot aSponsor[11];   // 0x1054C  the sponsorship slots; cleared by the profile setup;
+                                //          fn_80078008's lock kinds 10 (a sponsor signed) and 11
+                                //          (so many slots signed) read them
     u8   a10578[4];             // 0x10578  par-5 holes 71..74, as a5004: eagled (fn_800588F4's kind 0)
     s32  a1057C[4];             // 0x1057C  and their eagle dates, as a504C (kind 1)
     u8   unk1058C[0x10600 - 0x1058C];
@@ -353,7 +373,7 @@ LAYOUT_ASSERT(SaveRecords, 0x4C2C);
 
 extern SaveProfile* gpSaveData;
 extern SaveProfile* lbl_80281DF4;       // unlocks that hold for every profile (the cheat codes set them)
-extern SaveLockEntry lbl_80281DF0;
+extern SponsorSlot lbl_80281DF0;        // a new profile's first sponsor (see SponsorSlot)
 extern u32 lbl_801D5948[8];             // a bit array the code at 0x80056480 keeps; fn_80078008's lock
                                         // kind 6 tests bits 1..5 of it
 extern u32 lbl_801D5908[16];            // a bit array the cheat codes of lbl_80188024 set (fn_800564AC)
@@ -389,8 +409,8 @@ int  fn_800584DC(int nProfile);                     // how many ladder events th
 void fn_80058560(SaveProfile* pProfile, int nKind, char* pName);  // add pName to list nKind
 void fn_80058624(SaveProfile* pProfile, int nKind, char* pName);  // take pName out of list nKind
 u8   fn_800587A8(SaveProfile* pProfile, int nKind, char* pName);  // pName is in list nKind (0..2)
-void fn_800588D4(s16 n);            // set lbl_80281DF0 (switched on, value n)
-int  fn_800588E8(void);             // lbl_80281DF0's value (callers take it without extsh)
+void fn_800588D4(s16 n);            // sign lbl_80281DF0 with sponsor n
+int  fn_800588E8(void);             // lbl_80281DF0's sponsor (callers take it without extsh)
 
 // 0x800588F4: par-5 eagle record i: kind 0 whether that hole is eagled (a5004/a10578), kind 1 the
 // eagle's date (a504C/a1057C); -1 for another kind.
