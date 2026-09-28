@@ -2196,3 +2196,4 @@ address	name	comment	by	date
 8006765C	SitDev_vCloseModule	add	rm5 (replayed by orchestrator)	2026-09-28
 800676AC	SitDev_vInitBeforeHole	add	rm5 (replayed by orchestrator)	2026-09-28
 800676B8	SitDev_vRegisterStreamClients	add	rm5 (replayed by orchestrator)	2026-09-28
+800676E8	SitDev_vUnregisterStreamClients	add	rm5 (replayed by orchestrator)	2026-09-28

@@ -983,6 +983,8 @@ void SitDev_vRegisterStreamClients(void) {
     Stream_RegisterLoadChunkCallback('sscr', (void (*)(UStreamObject*))SitDev_LoadScripts);
 }
 
-void fn_800676E8(void) {
+// Unregisters the loader of the hole stream's 'sscr' chunks that SitDev_vRegisterStreamClients set
+// up; streammanagerhole.c calls it.
+void SitDev_vUnregisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('sscr');
 }
