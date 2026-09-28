@@ -610,7 +610,7 @@ void  fn_80037CD8(Skin* pSkin);         // Skin.c: frees a skin
 s32   fn_80037708(Skin* pSkin);         // Skin.c: frees what loading it allocated
 s32   fn_800375AC(Skin* pSkin, u8 b);   // Skin.c: allocates it
 Skin* fn_800377FC(u8* pData, u8 b);     // Skin.c: makes a skin from its file
-// Skin.c's triangles (lbl_801D4E78, 0xF0 bytes; our name, layout from SKN_DrawBoneTri): per view a
+// Skin.c's triangles (gSkinBoneTris, 0xF0 bytes; our name, layout from SKN_DrawBoneTri): per view a
 // mesh object and three vertices' positions, texture coordinates, colours and indexes.
 typedef struct SkinTris {
     ShaderObject aMesh[2];      // 0x00  (SKN_InitTris sets them up with SD_InitShaderObject, SKN_FreeTris frees them)
@@ -621,11 +621,11 @@ typedef struct SkinTris {
     u8   unkEC[4];
 } SkinTris;
 LAYOUT_ASSERT(SkinTris, 0xF0);
-extern SkinTris lbl_801D4E78;
+extern SkinTris gSkinBoneTris;
 
-extern void* lbl_80281D70;              // } Skin.c; fn_80036464 frees lbl_80281D70 and clears all
-extern s32   lbl_80281D74;              // } three
-extern s32   lbl_80281D78;              // }
+extern void* gSkinFrameBuf;              // } Skin.c; fn_80036464 frees gSkinFrameBuf and clears all
+extern s32   gSkinFrameBufUsed;              // } three
+extern s32   gSkinFrameBufSize;              // }
 
 // SkinPart.c, as FE_CrAPDB.c uses it: find a part (or set) by id, a variant by id or name, and
 // pick a part's (or set's) variant.

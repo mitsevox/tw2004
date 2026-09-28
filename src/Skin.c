@@ -67,10 +67,10 @@ void  fn_80037574(BonePose* pBones, s32 nBones);
 void  fn_80037D5C(SkinDesc* pDesc);
 
 // .bss and .sbss, each in reverse address order (CodeWarrior lays them out last-defined-first)
-SkinTris lbl_801D4E78;
-s32 lbl_80281D78;
-s32 lbl_80281D74;
-void* lbl_80281D70;
+SkinTris gSkinBoneTris;
+s32 gSkinFrameBufSize;
+s32 gSkinFrameBufUsed;
+void* gSkinFrameBuf;
 
 // Draws the "shadow" part of the character's skin, then that of its club's skin (Character.p16D8,
 // its current club class), with the skins' override table n17B4.
@@ -308,7 +308,7 @@ void SKN_InitTris(void) {
     size.nMaxVerts = 3;
     size.nMaxDraws = 1;
     for (i = 0; i < 2; i++) {
-        SD_InitShaderObject(&lbl_801D4E78.aMesh[i], 0x13, &size);
+        SD_InitShaderObject(&gSkinBoneTris.aMesh[i], 0x13, &size);
     }
 }
 
@@ -317,7 +317,7 @@ void SKN_FreeTris(void) {
     int i;
 
     for (i = 0; i < 2; i++) {
-        SD_FreeShaderObject(&lbl_801D4E78.aMesh[i]);
+        SD_FreeShaderObject(&gSkinBoneTris.aMesh[i]);
     }
 }
 
@@ -341,29 +341,29 @@ void SKN_DrawBoneTri(Character* pChar, int nView) {
     apPos[1] = pModel->pMatrices[7][3];
     apPos[2] = pModel->pMatrices[7][3];
     for (i = 0; i < 3; i++) {
-        lbl_801D4E78.aPos[nView][i][0] = apPos[i][0];
-        lbl_801D4E78.aPos[nView][i][1] = apPos[i][1];
-        lbl_801D4E78.aPos[nView][i][2] = apPos[i][2];
-        lbl_801D4E78.aUV[nView][i][0] = 0.0f;
-        lbl_801D4E78.aUV[nView][i][1] = 0.0f;
-        lbl_801D4E78.aColor[nView][i][0] = 0x80;
-        lbl_801D4E78.aColor[nView][i][1] = 0x80;
-        lbl_801D4E78.aColor[nView][i][2] = 0x80;
-        lbl_801D4E78.aColor[nView][i][3] = 0x80;
-        lbl_801D4E78.aIndex[nView][i] = i;
+        gSkinBoneTris.aPos[nView][i][0] = apPos[i][0];
+        gSkinBoneTris.aPos[nView][i][1] = apPos[i][1];
+        gSkinBoneTris.aPos[nView][i][2] = apPos[i][2];
+        gSkinBoneTris.aUV[nView][i][0] = 0.0f;
+        gSkinBoneTris.aUV[nView][i][1] = 0.0f;
+        gSkinBoneTris.aColor[nView][i][0] = 0x80;
+        gSkinBoneTris.aColor[nView][i][1] = 0x80;
+        gSkinBoneTris.aColor[nView][i][2] = 0x80;
+        gSkinBoneTris.aColor[nView][i][3] = 0x80;
+        gSkinBoneTris.aIndex[nView][i] = i;
     }
     fill.nCount = 3;
     fill.nVerts = 3;
     fill.pDraws = NULL;
-    fill.pIndices = lbl_801D4E78.aIndex[nView];
-    fill.pPos = lbl_801D4E78.aPos[nView];
-    fill.pColour = lbl_801D4E78.aColor[nView];
-    fill.pTexCoord = lbl_801D4E78.aUV[nView];
+    fill.pIndices = gSkinBoneTris.aIndex[nView];
+    fill.pPos = gSkinBoneTris.aPos[nView];
+    fill.pColour = gSkinBoneTris.aColor[nView];
+    fill.pTexCoord = gSkinBoneTris.aUV[nView];
     RenderState_SetDrawFlags(0);
     RenderState_SetClipMode(0);
     RenderState_Flush();
-    SD_FillShaderObject(&lbl_801D4E78.aMesh[nView], &fill, 1);
-    SD_DrawShaderObject(&lbl_801D4E78.aMesh[nView]);
+    SD_FillShaderObject(&gSkinBoneTris.aMesh[nView], &fill, 1);
+    SD_DrawShaderObject(&gSkinBoneTris.aMesh[nView]);
 }
 
 // SKN_DrawBoneTri for view nView on every character made so far that is not a golfer
@@ -529,16 +529,16 @@ void fn_80036460(int n) {
 }
 
 void fn_80036464(void) {
-    if (lbl_80281D70 != NULL) {
-        StaticMem_Free(lbl_80281D70);
+    if (gSkinFrameBuf != NULL) {
+        StaticMem_Free(gSkinFrameBuf);
     }
-    lbl_80281D70 = NULL;
-    lbl_80281D78 = 0;
-    lbl_80281D74 = 0;
+    gSkinFrameBuf = NULL;
+    gSkinFrameBufSize = 0;
+    gSkinFrameBufUsed = 0;
 }
 
 void fn_800364A0(void) {
-    lbl_80281D74 = 0;
+    gSkinFrameBufUsed = 0;
 }
 
 // Turns a model's offsets into pointers and byte-swaps its tables, once (bit 31 of u30). A model
