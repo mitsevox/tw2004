@@ -500,3 +500,47 @@ value is used through r3 (EA wrote return ...: same bytes); FE_Manager.c fn_8007
 Style questions for the owner: stub handlers named for their slot (GM_vCrAPMessage404_Empty,
 GM_vMessage25_Returns1, GM_vCommand133_Returns7, IG_vNoOp147): consistent across lanes? PGATourSimulation.c
 explicit_zero_data moved file-wide (was around one global): fake-match inventory item.
+
+## Round 16 (rp1-rp6) leftovers
+FE_MessageTable.c is DONE (464/464 reviewed; header rewritten by the orchestrator). Name clashes
+between lanes settled on replay (scratch r16_clashes.py): GM_vSaveGolferModel stays on message 69
+(TW07's is 0xE4 bytes and also sets the session golfer); message 286 = GM_vSetEditedGolferModelID;
+GM_vBackupProfileClaimRow (260) / GM_vBackupProfile (294); GM_vGetNumLadderEventsWon (74, player 0) /
+GM_vGetProfileNumLadderEventsWon (174); GM_vIsCourseUnlockedOnAnyProfile (79) / GM_vIsCourseUnlocked
+(207). EA bugs: register updated (8 open items from this round, GM_vMaskString's label extended).
+Header lane done (rp1): ladder.h, mode26.h, earnings.h, challenge.h, rte.h, camera.h CamScript fade
+fields, fe.h CrAP / sale / logo-copy fields, pgatoursim.h, save.h, GameState.nScoringType /
+bCustomRound / bRandom18 / bDream18 / nRegionalRound, HoleData.nRating, MC.c's three MemoryRequired
+functions now return s32 (same bytes), stale comments.
+Still open (headers): golfer.h PlayerProfile.n0 = shirt (nShirt; Character_SetClubsAndClothes
+"shirt<n0>", TW07 shirtsAvailable[4]); GameOptions n14 (only messages 231/243), n18 green speed, n1C
+rough, n20 fairway speed, a24 [0] caddie tips [1] putting tip [2] break line [7] swing trail, a0[2]
+(no mixer), a7[0] vibration, rows[4][19] = a flag per EA Trax track per music row; fe.h FEScreen.n38
+= controllers plugged in, a2C = controller given to a player; FEProfile.b11702 = every golfer counts
+as unlocked, b0 = trophy-ball replay (records mode 27), n3 / n4 = save slot / custom round being
+edited, n11704 = the last EA Sports Bio error; FEState.n1C = memory card reward money, b0F = TW07's
+firstTime (intro movie, no loading screen), b11 = demo, b18 = TOUR card withheld; FEMovie.nBio is
+never written; lbl_80281374 comment ("not placed yet": it is fe_movies.c's 0.25f, only written);
+camera.h CrAPState.b83 = dims the menu golfer; save.h SavedRound.n0 = in use, SaveProfile.n54C2's
+"-> PlayerProfile.unk2" is stale (now n2, the glove variant), aAward = trophy balls (0..22 game
+progress, 23..38 bonus); FE_CrAP_GetCategoryInfo pB1CC / pB344 params (pOwned / pNew: definition
+edit); fe.h fn_80077B18 prototype nGolfer vs definition n; long lines already there: camera.h 37,
+golfer.h 23, game.h 14. ~400 prototype / definition mismatches: ro1's protodiff.py.
+Globals (other files): lbl_801D7148 = the front end's state (FEState), lbl_80281ED4 = the profile
+being worked on (FEProfile*), lbl_80191990 = course names, lbl_801894E8 = the 16 golfer ids unlocked
+by default (FE_Manager.c), lbl_80281DF4 = cheat-code unlocks, lbl_80281FFC = gMCCurrentFileType,
+lbl_8018C7D8 = the MC action-function table.
+Names for other files: MC.c fn_800A2630 / fn_800A26A0 / fn_800A2668 = TW07 MC_IsOptionsDataCorrupt /
+MC_IsUserDataCorrupt / MC_IsReplayDataCorrupt, fn_800A09EC = MC_GetNumReplay, fn_800A270C =
+MC_MemoryRequiredForUser, fn_800A218C (always MC_ERR_NOFILE), fn_800A2194 (searches the card for
+"BASLUS-20572", a PS2 product code not ours: which game is unknown); Code8002DB80.c
+Player_IsHoledNotState23 (holed out, not conceded: rename); FE_MessageTable.c's local prototypes
+`u8* GameMode26_StartEvent` / SetTargetScore tagged "// CharSliders.c" (GameMode26.c, void: use
+mode26.h); GameUICommands.c ~1540 comment names MC_SetCurrentFileType twice; locals GameModeReplay.c
+nF12 / nF14 (nWeather / nWeatherAmount), stateFunc.c nCamera (nFade).
+Least-sure names this round: GM_v*ProfileSecondName, GM_vLookUpEarningsRange, GM_vQueueMovieKind2,
+GM_vSet/GetTapinsOption, GM_vGetStringWidth, GM_vSet/GetSwingAidOption (position only; the code's
+option is the swing trail), GM_vSet/GetOnOffOption3-6, GM_vSet/GetOptionN14, GM_vGetTourCardWithheld,
+GM_vBonusTrophyBallsWon (TW07 has GM_vTrackingTigerBallsWon there), GM_vFEMessage151_Return30Or60,
+GM_vMCHasSLUS20572Save, GM_vGet/SetFEStateB10, GM_vGbaIsReadPending (always 0),
+GM_vGetThreeLevelsOneRaised, GM_vEASBioIsNotWrongFile.
