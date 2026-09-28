@@ -44149,5 +44149,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "237c2c6",
+"sha": "237c2c616447d0f47ed5ec549c6227a31b820fe8",
+"time": 1790554392,
+"subject": "hotnames.py: --todo (a file's unreviewed functions in address order) and --log (config/GW4E69/readability_progress.tsv, one row per round); baseline row",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
