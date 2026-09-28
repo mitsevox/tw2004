@@ -17,9 +17,8 @@
 
 // PGA TOUR driver state; only this file uses it. The uninitialised ones are defined last address
 // first: the compiler lays out a file's .bss and .sbss last definition first.
-s32 gPgaSavedOptionsC = 4;      // the options' nC from before a tour round (GameModeDriverPGATour_Shutdown puts it
-                                //   back)
-s32 gPgaSavedOptions18 = 1;     // the options' n18 from before a tour round (GameModeDriverPGATour_SetTournament keeps it;
+s32 gPgaSavedOptionsC = 4;      // the options' nC from before a tour round (Shutdown puts it back)
+s32 gPgaSavedOptions18 = 1;     // the options' n18 from before a tour round (SetTournament keeps it;
                                 //   nothing puts it back)
 
 PgaData gPgaData;               // the tour data, from the 'PGA' stream objects
@@ -32,8 +31,7 @@ s32 gPgaPlayoffHole;            // the playoff hole index: set to 16, each playo
                                 //   (17, 15, 16, 17, ...; GameModeDriverPGATour_GoToPlayoff)
 u8  gbPgaTourRoundActive;       // 1 from a tour round's start until the mode shuts down
                                 //   (read through GM_Currently_PgaTourMode)
-s32 gPgaSavedWind;              // the options' nWind from before a tour round (GameModeDriverPGATour_Shutdown puts
-                                //   it back)
+s32 gPgaSavedWind;              // the options' nWind from before a tour round (Shutdown puts it back)
 
 // Not in a C unit yet
 void fn_800907AC(s32 nMoney, char* pDst);               // money as text
@@ -52,7 +50,7 @@ s32  GameModeDriverPGATour_GetPotentialLead(int nPlayer);
 s32  GameModeDriverPGATour_GetPotentialHoleResult(int nPlayer);
 void GameModeDriverPGATour_EndTournament(int nPlayer);
 s32  GameModeDriverPGATour_GetCurrentBracket(int nPlayer);
-void GameModeDriverPGATour_SimCurrentTournament(int nPlayer, u8 bQuick);
+void GameModeDriverPGATour_SimCurrentTournament(int nPlayer, u8 bSimUser);
 void GameModeDriverPGATour_PostHoleLoadInit(void);
 void GameModeDriverPGATour_EndHole(void);
 u8   GameModeDriverPGATour_GameFinished(u8 bCheck);
@@ -225,7 +223,8 @@ void GameModeDriverPGATour_PrepareForTeeOff(void) {
         GameModeDriverPGATour_SetTournament(gPgaData.aTournament[nEvent].nTourEvent - 1);
         fn_80117DE8(0, 0);
         GM_PgaTourSim_SimRound(0, &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent],
-                    gpSaveData[nPlayer].tour.nRound, gPgaData.aTourEvent[nFormat].a40[GameModeDriverPGATour_GetCurrentBracket(0)], 5);
+                    gpSaveData[nPlayer].tour.nRound,
+                    gPgaData.aTourEvent[nFormat].a40[GameModeDriverPGATour_GetCurrentBracket(0)], 5);
         Mem_set(pRec, 0, sizeof(*pRec));
         pRec->nRounds++;
         if (gpSaveData[nPlayer].tour.nRound == 0) {
@@ -505,36 +504,37 @@ void GameModeDriverPGATour_AwardMoney(int a, s32 n) {
     gPgaWinInfo.n8 = n;
 }
 
-// The player's bracket, 0..9: tournaments won (fn_800F02A8) x 10 / 31, at most 9. It picks the
-// prize column (Tournament.aPrize) and the field's strength (TourEvent.a40). Profile 0's wins;
-// nPlayer is not read.
+// The player's bracket, 0..9: tournaments won (GameModeDriverPGATour_GetNumEventsWon) x 10 / 31, at
+// most 9. It picks the prize column (Tournament.aPrize) and the field's strength (TourEvent.a40).
+// Profile 0's wins; nPlayer is not read.
 s32 GameModeDriverPGATour_GetCurrentBracket(int nPlayer) {
     s32 n = GameModeDriverPGATour_GetNumEventsWon() * 10 / 31;
     return n > 9 ? 9 : n;
 }
 
 // The rounds of the current tournament not played yet are simulated: each round's course is set and
-// the round simulated for the field (GM_PgaTourSim_SimRound, flags 3 when bQuick is set: the
-// player's rounds simulated too, else 0), then the playoff and the winner are settled. fn_800EF9D0
-// uses it to skip ahead, CheckAdvanceTournament after the player misses the cut.
-void GameModeDriverPGATour_SimCurrentTournament(int nPlayer, u8 bQuick) {
+// the round simulated for the field (GM_PgaTourSim_SimRound, flags 3 when bSimUser is set: the
+// player's rounds simulated too, else 0), then the playoff and the winner are settled.
+// GameModeDriverPGATour_SkipToEvent uses it to skip ahead, CheckAdvanceTournament after the player
+// misses the cut.
+void GameModeDriverPGATour_SimCurrentTournament(int nPlayer, u8 bSimUser) {
     s32 nRounds = GameModeDriverPGATour_GetRounds(gpSaveData[nPlayer].tour.nEvent);
-    Tournament* p = GameModeDriverPGATour_GetEventInfo(gpSaveData[nPlayer].tour.nEvent);
-    s32 k;
+    Tournament* pEventInfo = GameModeDriverPGATour_GetEventInfo(gpSaveData[nPlayer].tour.nEvent);
+    s32 uFlags;
     s32 nTourEvent;
     while (gpSaveData[nPlayer].tour.nRound < nRounds) {
-        if (p->nTourEvent) {
-            GM_SetCurrentCourse(
-                gPgaData.aTourEvent[p->nTourEvent - 1].aRound[gpSaveData[nPlayer].tour.nRound].nCourse);
-            k = 0;
+        if (pEventInfo->nTourEvent) {
+            GM_SetCurrentCourse(gPgaData.aTourEvent[pEventInfo->nTourEvent - 1]
+                                    .aRound[gpSaveData[nPlayer].tour.nRound].nCourse);
+            uFlags = 0;
             nTourEvent = gPgaData.aTournament[gpSaveData[nPlayer].tour.nEvent].nTourEvent - 1;
-            if (bQuick) {
-                k = 3;
+            if (bSimUser) {
+                uFlags = 3;
             }
             GM_PgaTourSim_SimRound(nPlayer, &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent],
                         gpSaveData[nPlayer].tour.nRound,
-                        gPgaData.aTourEvent[nTourEvent].a40[GameModeDriverPGATour_GetCurrentBracket(
-                                nPlayer)], k);
+                        gPgaData.aTourEvent[nTourEvent].a40[GameModeDriverPGATour_GetCurrentBracket(nPlayer)],
+                        uFlags);
         }
         gpSaveData[nPlayer].tour.nRound++;
     }

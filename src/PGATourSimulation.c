@@ -44,7 +44,7 @@ void fn_80117694(UStreamObject* pObject);
 
 char* GameModeDriverPGATour_GetInitialChampName(s32 i);               // a tournament's first champion
 s32  GameModeDriverPGATour_GetInitialChampScore(s32 i);                // and the champion's score
-s32  GameModeDriverPGATour_GetCurrentBracket(int nPlayer);          // GameModeDriverPGATour.c: the player's bracket
+s32  GameModeDriverPGATour_GetCurrentBracket(int nPlayer);             // the player's bracket, 0..9
 
 PgaStatSort lbl_80281840 = { -1, 0 };
 #pragma explicit_zero_data on
