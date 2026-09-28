@@ -91,14 +91,14 @@ void TrophyRoom_GetPlayerOfMonthStatus(MsgArg* pArgs, MsgArg* pResult);
 void TrophyRoom_GetRTEAwardStatus(MsgArg* pArgs, MsgArg* pResult);
 void Gba_Init(void);
 void Gba_SetState(s32 v);
-s32  fn_8012411C(void);
-void fn_80124138(s32 n);
-s32  fn_80124174(void);
-s32  fn_80124190(void);
-s32  fn_801241CC(void);
-void fn_801241D4(s32 v);
-void fn_8012421C(s32 v);
-s32  fn_80124224(void);
+s32  Gba_GetCashToMove(void);
+void Gba_SetCashToMove(s32 n);
+s32  Gba_GetCashOnGba(void);
+s32  Gba_GetGbaStat(void);
+s32  Gba_IsReadPending(void);
+void Gba_SetReadPending(s32 v);
+void Gba_SetUndoTransfer(s32 v);
+s32  Gba_IsUndoTransfer(void);
 void Gba_StepPorts(s32 a, s32 b);
 
 // The other files' message handlers in the table (the Create-A-Player screens, the logo editor,
@@ -5650,20 +5650,20 @@ void GM_vGetDiscChangeStatus(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 592: starts the Game Boy Advance link: the link code is set up (Gba_Init:
-// the disc's ID, the start tick, GBAInit) and the link state goes to 0, from which fn_801242D0
+// the disc's ID, the start tick, GBAInit) and the link state goes to 0, from which Gba_UpdateLinkState
 // starts looking for a GBA.
 void GM_vGbaStartLink(MsgArg* pArgs, MsgArg* pResult) {
     Gba_Init();
     Gba_SetState(0);
 }
 
-// Front-end message 593: link state 6: fn_801242D0 then takes the cash from the Game Boy Advance
+// Front-end message 593: link state 6: Gba_UpdateLinkState then takes the cash from the Game Boy Advance
 // into the current profile, has the GBA save its cash and goes to state 7.
 void GM_vGbaTakeCash(MsgArg* pArgs, MsgArg* pResult) {
     Gba_SetState(6);
 }
 
-// Front-end message 594: link state 8: fn_801242D0 then swaps stats with the Game Boy Advance (the
+// Front-end message 594: link state 8: Gba_UpdateLinkState then swaps stats with the Game Boy Advance (the
 // best round, holes in one, longest drive and longest putt, the better of each kept in the current
 // profile), has it save them and goes to state 9.
 void GM_vGbaSwapStats(MsgArg* pArgs, MsgArg* pResult) {
@@ -5675,7 +5675,7 @@ void GM_vFEMessage595_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 611: puts the Game Boy Advance link in state 18 (0x12), the state a failed
-// command leaves it in: fn_801242D0 stops working the link and undoes what a pending request did to
+// command leaves it in: Gba_UpdateLinkState stops working the link and undoes what a pending request did to
 // the profile.
 void GM_vGbaCancelLink(MsgArg* pArgs, MsgArg* pResult) {
     Gba_SetState(18);
@@ -5751,22 +5751,22 @@ void GM_vGbaReadCashAndStats(MsgArg* pArgs, MsgArg* pResult) {
     if (Gba_GetState() != 18 && Gba_GetState() != -1) {
         Gba_StepPorts(0x70, 0);
         if (Gba_GetState() != 18 && Gba_GetState() != -1) {
-            *(s32*)pArgs[0].p = fn_80124174();
+            *(s32*)pArgs[0].p = Gba_GetCashOnGba();
             for (i = 0; i < 4; i++) {
                 Gba_StepPorts(0xB0, i);
                 if (Gba_GetState() == 18 || Gba_GetState() == -1) break;
-                *(s32*)pArgs[1 + i].p = fn_80124190();
+                *(s32*)pArgs[1 + i].p = Gba_GetGbaStat();
             }
         }
     }
-    fn_801241D4(0);
-    if (fn_80124224()) {
+    Gba_SetReadPending(0);
+    if (Gba_IsUndoTransfer()) {
         if (Gba_GetState() == 7) {
             Gba_SetState(12);
         } else if (Gba_GetState() == 9) {
             Gba_SetState(13);
         }
-        fn_8012421C(0);
+        Gba_SetUndoTransfer(0);
     }
 }
 
@@ -5776,8 +5776,8 @@ void GM_vGbaAddCashToMove(MsgArg* pArgs, MsgArg* pResult) {
     s32 n;
 
     n = *(s32*)pArgs[0].p;
-    pResult->i = n + fn_8012411C();
-    fn_80124138(pResult->i);
+    pResult->i = n + Gba_GetCashToMove();
+    Gba_SetCashToMove(pResult->i);
 }
 
 // Front-end message 618: empty in this build.
@@ -5788,17 +5788,17 @@ void GM_vFEMessage618_Empty(MsgArg* pArgs, MsgArg* pResult) {
 void GM_vFEMessage619_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Front-end message 633: answers gbacable.c's flag gGbaReadPending (fn_801241CC).
+// Front-end message 633: answers gbacable.c's flag gGbaReadPending (Gba_IsReadPending).
 // GM_vGbaReadCashAndStats clears it after reading the Game Boy Advance, and nothing in this build
 // sets it, so the answer is always 0.
 void GM_vGbaIsReadPending(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_801241CC();
+    pResult->i = Gba_IsReadPending();
 }
 
 // Front-end message 653: the cash the Game Boy Advance holds, as last read (GbaChannel.u68 of the
 // port in use).
 void GM_vGbaGetGbaCash(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_80124174();
+    pResult->i = Gba_GetCashOnGba();
 }
 
 // Front-end message 654: 1 when the Game Boy Advance link is in state 18 (0x12: a command failed,
@@ -5811,7 +5811,7 @@ void GM_vGbaIsLinkFailed(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// Front-end message 748: puts the Game Boy Advance link back in state 5, linked: fn_801242D0 polls
+// Front-end message 748: puts the Game Boy Advance link back in state 5, linked: Gba_UpdateLinkState polls
 // the GBA and sends any pending request.
 void GM_vGbaResumeLink(MsgArg* pArgs, MsgArg* pResult) {
     Gba_SetState(5);

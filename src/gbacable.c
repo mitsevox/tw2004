@@ -748,25 +748,25 @@ void Gba_SetState(s32 v);
 s32 Gba_GetState(void);
 void Gba_MarkUnlocksGranted(void);
 void Gba_UnlockProfileRewards(void);
-void fn_801241AC(s32 v);
-s32 fn_801241B4(void);
-void fn_801241BC(s32 v);
-s32 fn_801241C4(void);
-s32 fn_801241CC(void);
-void fn_801241D4(s32 v);
-void fn_801241DC(s32 v);
-s32 fn_801241E4(void);
-void fn_801241EC(s32 v);
-s32 fn_801241F4(void);
-void fn_801241FC(s32 v);
-s32 fn_80124204(void);
-void fn_8012420C(s32 v);
-s32 fn_80124214(void);
-void fn_8012421C(s32 v);
-s32 fn_80124224(void);
-void fn_8012422C(void);
-void fn_80124238(s32 arg0, s32 arg1);
-s32 fn_80124280(s32 arg0);
+void Gba_SetSendCashPending(s32 v);
+s32 Gba_IsSendCashPending(void);
+void Gba_SetRestoreStatsPending(s32 v);
+s32 Gba_IsRestoreStatsPending(void);
+s32 Gba_IsReadPending(void);
+void Gba_SetReadPending(s32 v);
+void Gba_SetSaveCashPending(s32 v);
+s32 Gba_IsSaveCashPending(void);
+void Gba_SetSaveStatsPending(s32 v);
+s32 Gba_IsSaveStatsPending(void);
+void Gba_SetCashUnsaved(s32 v);
+s32 Gba_IsCashUnsaved(void);
+void Gba_SetStatsUnsaved(s32 v);
+s32 Gba_IsStatsUnsaved(void);
+void Gba_SetUndoTransfer(s32 v);
+s32 Gba_IsUndoTransfer(void);
+void Gba_ClearPortInUse(void);
+void Gba_SaveProfileStat(s32 arg0, s32 arg1);
+s32 Gba_GetSavedProfileStat(s32 arg0);
 
 // Sets the link code up (GM_vGbaStartLink): keeps the disc's ID (gGbaDiscID) and the start tick
 // (gGbaInitTick), unlinks every port and makes its key (Gba_InitChannels), and starts the GBA
@@ -781,7 +781,7 @@ void Gba_Init(void) {
 // One poll of the link with no request: reads the pads (Gba_ReadPads) and steps the ports
 // (Gba_StepPorts(0, 0)). It also watches the reset button: while it is held gGbaResetPressed is
 // set, and the first poll after it is let go resets the console (OSResetSystem(0, 1, 0)). Called by
-// fn_801242D0 and, inside wait loops, gomainloop.c's fn_8006C63C.
+// Gba_UpdateLinkState and, inside wait loops, gomainloop.c's fn_8006C63C.
 void Gba_PollLink(void) {
     Gba_ReadPads();
     Gba_StepPorts(0, 0);
@@ -794,7 +794,7 @@ void Gba_PollLink(void) {
     }
 }
 
-// Sets the GBA link state (gGbaLinkState), which fn_801242D0 runs once a frame and the menus read
+// Sets the GBA link state (gGbaLinkState), which Gba_UpdateLinkState runs once a frame and the menus read
 // (GM_vGbaGetLinkState): -1 never started; 0 start (GM_vGbaStartLink); 1 looking for a GBA; 2 a GBA
 // answered; 3 its context could not be read; 4 linked; 5 linked, idle; 6 take its cash, then 7; 8
 // swap stats, then 9; 0xC-0xF raise a pending request; 0x10 the contexts differ; 0x11 no GBA
@@ -842,95 +842,128 @@ void Gba_UnlockProfileRewards(void) {
     gGbaRewardsUnlocked = 1;
 }
 
-s32 fn_8012411C(void) {
+// The cash to move between the GBA and the profile: n6C of the port in use. With no port in use
+// (gGbaPortInUse -1) it indexes gGbaChannels[-1]: the bytes before the array (TibExt.c's card
+// state, its file name at 0x38).
+s32 Gba_GetCashToMove(void) {
     return gGbaChannels[gGbaPortInUse].n6C;
 }
 
-void fn_80124138(s32 n) {
+// Sets the cash to move (n6C of the port in use). With no port in use (gGbaPortInUse -1) it indexes
+// gGbaChannels[-1]: it writes into TibExt.c's card state (its file name at 0x38).
+void Gba_SetCashToMove(s32 n) {
     gGbaChannels[gGbaPortInUse].n6C = n;
 }
 
-void fn_80124154(void) {
+// Zeroes the cash to move (n6C of the port in use). With no port in use (gGbaPortInUse -1) it
+// indexes gGbaChannels[-1]: it writes into TibExt.c's card state.
+void Gba_ClearCashToMove(void) {
     gGbaChannels[gGbaPortInUse].n6C = 0;
 }
 
-s32 fn_80124174(void) {
+// The cash the GBA holds, as last read (u68 of the port in use, request 0x70 or 0x90). With no port
+// in use (gGbaPortInUse -1) it indexes gGbaChannels[-1]: TibExt.c's card state.
+s32 Gba_GetCashOnGba(void) {
     return gGbaChannels[gGbaPortInUse].u68;
 }
 
-s32 fn_80124190(void) {
+// The GBA's value of the stat last sent (n70 of the port in use, request 0xB0). With no port in use
+// (gGbaPortInUse -1) it indexes gGbaChannels[-1]: TibExt.c's card state.
+s32 Gba_GetGbaStat(void) {
     return gGbaChannels[gGbaPortInUse].n70;
 }
 
-void fn_801241AC(s32 v) {
+// Raises (1, link state 0xC) or clears the request that Gba_UpdateLinkState's state 5 sends: the
+// cash to move goes to the GBA (0xD0) and off the profile.
+void Gba_SetSendCashPending(s32 v) {
     gGbaSendCashPending = v;
 }
 
-s32 fn_801241B4(void) {
+s32 Gba_IsSendCashPending(void) {
     return gGbaSendCashPending;
 }
 
-void fn_801241BC(s32 v) {
+// Raises (1, link state 0xD) or clears the request that Gba_UpdateLinkState's state 5 carries out:
+// the four stats saved before the last swap (Gba_SaveProfileStat) are copied back into the profile.
+void Gba_SetRestoreStatsPending(s32 v) {
     gGbaRestoreStatsPending = v;
 }
 
-s32 fn_801241C4(void) {
+s32 Gba_IsRestoreStatsPending(void) {
     return gGbaRestoreStatsPending;
 }
 
-s32 fn_801241CC(void) {
+// gGbaReadPending, which the menus ask for (GM_vGbaIsReadPending). Only ever 0: nothing sets it
+// non-zero in this build.
+s32 Gba_IsReadPending(void) {
     return gGbaReadPending;
 }
 
-void fn_801241D4(s32 v) {
+// Sets gGbaReadPending; the only call (GM_vGbaReadCashAndStats) clears it.
+void Gba_SetReadPending(s32 v) {
     gGbaReadPending = v;
 }
 
-void fn_801241DC(s32 v) {
+// Raises (1, link state 0xE) or clears the request that Gba_UpdateLinkState's state 5 sends: the
+// GBA saves its cash (0x71).
+void Gba_SetSaveCashPending(s32 v) {
     gGbaSaveCashPending = v;
 }
 
-s32 fn_801241E4(void) {
+s32 Gba_IsSaveCashPending(void) {
     return gGbaSaveCashPending;
 }
 
-void fn_801241EC(s32 v) {
+// Raises (1, link state 0xF) or clears the request that Gba_UpdateLinkState's state 5 sends: the
+// GBA saves its stats (0xD3).
+void Gba_SetSaveStatsPending(s32 v) {
     gGbaSaveStatsPending = v;
 }
 
-s32 fn_801241F4(void) {
+s32 Gba_IsSaveStatsPending(void) {
     return gGbaSaveStatsPending;
 }
 
-void fn_801241FC(s32 v) {
+// Sets gGbaCashUnsaved: while it is set, link state 0x12 takes the cash to move back off the
+// profile. Every call clears it, so that undo never runs in this build.
+void Gba_SetCashUnsaved(s32 v) {
     gGbaCashUnsaved = v;
 }
 
-s32 fn_80124204(void) {
+s32 Gba_IsCashUnsaved(void) {
     return gGbaCashUnsaved;
 }
 
-void fn_8012420C(s32 v) {
+// Sets gGbaStatsUnsaved: while it is set, link state 0x12 copies the stats saved before the swap
+// back into the profile. Every call clears it, so that undo never runs in this build.
+void Gba_SetStatsUnsaved(s32 v) {
     gGbaStatsUnsaved = v;
 }
 
-s32 fn_80124214(void) {
+s32 Gba_IsStatsUnsaved(void) {
     return gGbaStatsUnsaved;
 }
 
-void fn_8012421C(s32 v) {
+// Sets gGbaUndoTransfer: while it is set, GM_vGbaReadCashAndStats turns link state 7 into 0xC (send
+// the cash back) and 9 into 0xD (restore the stats). The only call clears it.
+void Gba_SetUndoTransfer(s32 v) {
     gGbaUndoTransfer = v;
 }
 
-s32 fn_80124224(void) {
+// gGbaUndoTransfer (GM_vGbaReadCashAndStats); only ever 0 in this build.
+s32 Gba_IsUndoTransfer(void) {
     return gGbaUndoTransfer;
 }
 
-void fn_8012422C(void) {
+// No port in use (gGbaPortInUse -1): every port may be searched for a GBA again. Link state 0 calls
+// it.
+void Gba_ClearPortInUse(void) {
     gGbaPortInUse = -1;
 }
 
-void fn_80124238(s32 arg0, s32 arg1) {
+// Keeps nValue as the profile's stat nStat (0 best round, 1 holes in one, 2 longest drive, 3
+// longest putt) as it was before a stat swap with the GBA; other numbers are ignored.
+void Gba_SaveProfileStat(s32 arg0, s32 arg1) {
     switch (arg0) {
     case 0:
         gGbaSavedBestRound = arg1;
@@ -947,7 +980,9 @@ void fn_80124238(s32 arg0, s32 arg1) {
     }
 }
 
-s32 fn_80124280(s32 arg0) {
+// The profile's stat nStat (0 best round, 1 holes in one, 2 longest drive, 3 longest putt) as
+// Gba_SaveProfileStat kept it; 0 for other numbers.
+s32 Gba_GetSavedProfileStat(s32 arg0) {
     switch (arg0) {
     case 0:
         return gGbaSavedBestRound;
@@ -964,14 +999,21 @@ s32 fn_80124280(s32 arg0) {
 
 // ---- end of sweep code ----
 
-// Runs the link for the front end once a frame, by the state Gba_SetState sets. 0 starts it (15
-// frames' grace, the port free); 1 polls until a GBA links, giving up (0x11) after 4 seconds; 2, 4,
-// 5, 7 and 9 poll the linked GBA (4 clears the amount and goes to 5), and in 5 a pending request is
-// sent (cash to the GBA, the stats copied into the profile, the save-cash and save-stats requests);
-// 0x12 (a failed command) undoes what the pending request did to the profile; 6 takes cash from the
-// GBA and has it save its cash (7); 8 swaps stats with it (below) and, when none failed, asks it to
-// save them (9). 0xC to 0xF raise a request and go back to 5.
-void fn_801242D0(void) {
+// The GBA link's state machine, run once a frame (gomainloop.c's fn_8006D838) by the state
+// Gba_SetState sets. 0 frees the port in use, waits 15 frames and goes to 1; 1 polls (Gba_PollLink)
+// and gives up (0x11) after 4 s; 2, 7 and 9 poll; 4 (just linked) polls, zeroes the cash to move
+// and goes to 5; 5 polls and carries out one pending request: cash to the GBA (0xD0, taken off the
+// profile), the stats saved before a swap copied back into the profile, or the save-cash /
+// save-stats requests (0x71 / 0xD3). 6 takes the cash to move (the menus set it,
+// GM_vGbaAddCashToMove) from the GBA (0x90) into the profile, has the GBA save its cash (0x71) and
+// goes to 7. 8 keeps a copy of the profile's four stats and swaps each with the GBA (0xB0), keeping
+// for the best round the lower one that is set (0 and 0xFF from the GBA mean unset only while the
+// profile has none), adding the GBA's holes in one, and keeping the longer drive and putt; when no
+// command failed it has the GBA save them (0xD3) and goes to 9. 0x12 undoes what gGbaCashUnsaved
+// and gGbaStatsUnsaved mark (neither is set in this build). 0xC-0xF raise the send-cash,
+// restore-stats, save-cash and save-stats requests and go back to 5; only 0xC and 0xD are ever set
+// (GM_vGbaReadCashAndStats), and only while gGbaUndoTransfer is set, which it never is.
+void Gba_UpdateLinkState(void) {
     SaveProfile* pProfile;
     s32 bFailed;
     s32 nOld;
@@ -979,7 +1021,7 @@ void fn_801242D0(void) {
 
     if (Gba_GetState() == 0) {
         gGbaSearchStartTick = OSGetTick();
-        fn_8012422C();
+        Gba_ClearPortInUse();
         gGbaSearchDelayFrames = 15;
         Gba_SetState(1);
     } else if (Gba_GetState() == 1) {
@@ -995,63 +1037,63 @@ void fn_801242D0(void) {
         Gba_PollLink();
     } else if (Gba_GetState() == 4) {
         Gba_PollLink();
-        fn_80124138(0);
+        Gba_SetCashToMove(0);
         Gba_SetState(5);
     } else if (Gba_GetState() == 5) {
         Gba_PollLink();
-        if (fn_801241B4()) {
+        if (Gba_IsSendCashPending()) {
             Gba_StepPorts(0xD0, 0);
             pProfile = FE_GetCurrentProfile();
-            pProfile->nCurrentCash -= fn_8012411C();
-            fn_80124154();
-            fn_801241AC(0);
-        } else if (fn_801241C4()) {
+            pProfile->nCurrentCash -= Gba_GetCashToMove();
+            Gba_ClearCashToMove();
+            Gba_SetSendCashPending(0);
+        } else if (Gba_IsRestoreStatsPending()) {
             pProfile = FE_GetCurrentProfile();
-            pProfile->nBestRound = fn_80124280(0);
-            pProfile->nHolesInOne = fn_80124280(1);
-            pProfile->nLongestDrive = fn_80124280(2);
-            pProfile->nLongestPutt = fn_80124280(3);
-            fn_801241BC(0);
-        } else if (fn_801241E4()) {
+            pProfile->nBestRound = Gba_GetSavedProfileStat(0);
+            pProfile->nHolesInOne = Gba_GetSavedProfileStat(1);
+            pProfile->nLongestDrive = Gba_GetSavedProfileStat(2);
+            pProfile->nLongestPutt = Gba_GetSavedProfileStat(3);
+            Gba_SetRestoreStatsPending(0);
+        } else if (Gba_IsSaveCashPending()) {
             Gba_StepPorts(0x71, 0);
-            fn_801241FC(0);
-            fn_801241DC(0);
-        } else if (fn_801241F4()) {
+            Gba_SetCashUnsaved(0);
+            Gba_SetSaveCashPending(0);
+        } else if (Gba_IsSaveStatsPending()) {
             Gba_StepPorts(0xD3, 0);
-            fn_8012420C(0);
-            fn_801241EC(0);
+            Gba_SetStatsUnsaved(0);
+            Gba_SetSaveStatsPending(0);
         }
     } else if (Gba_GetState() == 0x12) {
-        if (fn_80124204()) {
+        if (Gba_IsCashUnsaved()) {
             pProfile = FE_GetCurrentProfile();
-            pProfile->nCurrentCash -= fn_8012411C();
-            fn_80124154();
-            fn_801241FC(0);
+            pProfile->nCurrentCash -= Gba_GetCashToMove();
+            Gba_ClearCashToMove();
+            Gba_SetCashUnsaved(0);
         }
-        if (fn_80124214()) {
+        if (Gba_IsStatsUnsaved()) {
             pProfile = FE_GetCurrentProfile();
-            pProfile->nBestRound = fn_80124280(0);
-            pProfile->nHolesInOne = fn_80124280(1);
-            pProfile->nLongestDrive = fn_80124280(2);
-            pProfile->nLongestPutt = fn_80124280(3);
-            fn_8012420C(0);
+            pProfile->nBestRound = Gba_GetSavedProfileStat(0);
+            pProfile->nHolesInOne = Gba_GetSavedProfileStat(1);
+            pProfile->nLongestDrive = Gba_GetSavedProfileStat(2);
+            pProfile->nLongestPutt = Gba_GetSavedProfileStat(3);
+            Gba_SetStatsUnsaved(0);
         }
     } else if (Gba_GetState() == 6) {
         Gba_StepPorts(0x90, 0);
         if (Gba_GetState() != 0x12) {
             pProfile = FE_GetCurrentProfile();
-            pProfile->nCurrentCash += fn_8012411C();
+            pProfile->nCurrentCash += Gba_GetCashToMove();
             Gba_StepPorts(0x71, 0);
-            fn_80124138(0);
+            Gba_SetCashToMove(0);
             Gba_SetState(7);
         }
     } else if (Gba_GetState() == 8) {
         bFailed = 0;
         pProfile = FE_GetCurrentProfile();
-        fn_80124238(0, pProfile->nBestRound);
-        fn_80124238(1, pProfile->nHolesInOne);
-        fn_80124238(2, pProfile->nLongestDrive);
-        fn_80124238(3, pProfile->nLongestPutt);
+        Gba_SaveProfileStat(0, pProfile->nBestRound);
+        Gba_SaveProfileStat(1, pProfile->nHolesInOne);
+        Gba_SaveProfileStat(2, pProfile->nLongestDrive);
+        Gba_SaveProfileStat(3, pProfile->nLongestPutt);
 
         // the best round: when ours is unset (<= 0), the GBA's if it is set (not 0 or 0xFF);
         // else the lower of the two
@@ -1059,8 +1101,8 @@ void fn_801242D0(void) {
         if (Gba_GetState() == 0x12) {
             bFailed = 1;
         }
-        nOld = fn_80124280(0);
-        nGot = fn_80124190();
+        nOld = Gba_GetSavedProfileStat(0);
+        nGot = Gba_GetGbaStat();
         if (nOld <= 0) {
             if (nGot != 0 && nGot != 0xFF) {
                 pProfile->nBestRound = nGot;
@@ -1074,22 +1116,22 @@ void fn_801242D0(void) {
         if (Gba_GetState() == 0x12) {
             bFailed = 1;
         }
-        pProfile->nHolesInOne += fn_80124190();
+        pProfile->nHolesInOne += Gba_GetGbaStat();
 
         // the longest drive and the longest putt: the higher
         Gba_StepPorts(0xB0, 2);
         if (Gba_GetState() == 0x12) {
             bFailed = 1;
         }
-        if (fn_80124280(2) < fn_80124190()) {
-            pProfile->nLongestDrive = fn_80124190();
+        if (Gba_GetSavedProfileStat(2) < Gba_GetGbaStat()) {
+            pProfile->nLongestDrive = Gba_GetGbaStat();
         }
         Gba_StepPorts(0xB0, 3);
         if (Gba_GetState() == 0x12) {
             bFailed = 1;
         }
-        if (fn_80124280(3) < fn_80124190()) {
-            pProfile->nLongestPutt = fn_80124190();
+        if (Gba_GetSavedProfileStat(3) < Gba_GetGbaStat()) {
+            pProfile->nLongestPutt = Gba_GetGbaStat();
         }
         if (bFailed == 0) {
             Gba_StepPorts(0xD3, 0);
@@ -1100,16 +1142,16 @@ void fn_801242D0(void) {
     } else if (Gba_GetState() == 9) {
         Gba_PollLink();
     } else if (Gba_GetState() == 0xC) {
-        fn_801241AC(1);
+        Gba_SetSendCashPending(1);
         Gba_SetState(5);
     } else if (Gba_GetState() == 0xD) {
-        fn_801241BC(1);
+        Gba_SetRestoreStatsPending(1);
         Gba_SetState(5);
     } else if (Gba_GetState() == 0xE) {
-        fn_801241DC(1);
+        Gba_SetSaveCashPending(1);
         Gba_SetState(5);
     } else if (Gba_GetState() == 0xF) {
-        fn_801241EC(1);
+        Gba_SetSaveStatsPending(1);
         Gba_SetState(5);
     } else {
         // the state is read once more with nothing done (an empty test in the original)

@@ -54,8 +54,8 @@ extern const u32 gGbaPadResetBits[GBA_NUM_CHANNELS];   // each port's PADReset b
 // keeps at 0x800000F8). A GBA command waits 100 ms for the GBA.
 #define GBA_TICKS_PER_MS  (*(u32*)0x800000F8 / 4 / 1000)
 #define GBA_TIMEOUT_TICKS (GBA_TICKS_PER_MS * 100)
-extern s32 gGbaPortInUse;        // the port being worked on (-1: none, fn_8012422C)
-extern u32 gGbaSearchDelayFrames;        // frames left before the link is first polled (fn_801242D0)
-extern u32 gGbaSearchStartTick;        // the tick the link was started at (fn_801242D0)
+extern s32 gGbaPortInUse;        // the port being worked on (-1: none, Gba_ClearPortInUse)
+extern u32 gGbaSearchDelayFrames;        // frames left before the link is first polled (Gba_UpdateLinkState)
+extern u32 gGbaSearchStartTick;        // the tick the link was started at (Gba_UpdateLinkState)
 
 #endif

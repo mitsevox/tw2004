@@ -279,7 +279,7 @@ void fn_8011E6E8(void);
 void fn_8011E974(void);
 void Gba_PollLink(void);
 s32  Gba_GetState(void);
-void fn_801242D0(void);
+void Gba_UpdateLinkState(void);
 void EASBio_InitOnce(void);
 void fn_80124B54(void);
 void fn_801250C0(void);
@@ -1034,7 +1034,7 @@ void fn_8006D838(void) {
     FE_movieFade();
     fn_8006DE28();
     fn_8006DDA8();
-    fn_801242D0();
+    Gba_UpdateLinkState();
 }
 
 // The main loop, until fn_8006D01C says stop. Each frame's time is taken from watch 1
