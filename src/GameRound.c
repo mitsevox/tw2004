@@ -217,7 +217,7 @@ void GM_SetModeType(int nMode) {
         SpeedGolf_Init();
         break;
     case 9:
-        fn_800ED738();
+        GameModePractice_Init();
         break;
     case 5:
         PlayNow_Init();

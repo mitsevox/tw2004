@@ -551,7 +551,7 @@ void fn_800E81C4(void);                 // mode 19 (GameModeBestBall.c)
 void GameModeFourBall_Init(void);                 // mode 20 (GameModeFourBall.c)
 void GameModeMatch_Init(void);                 // mode 1 (GameModeMatch.c)
 void PlayNow_Init(void);                 // mode 5
-void fn_800ED738(void);                 // mode 9
+void GameModePractice_Init(void);                 // mode 9
 void GameModeDriverRTE_Init(void);                 // mode 24
 void GameModeReplay_Init(void);                 // mode 10
 void GameModeSkillZoneCapture_Init(void);                 // mode 14
@@ -596,7 +596,7 @@ u8   PlayNow_GetCalendarFlag(void);
 void PlayNow_ForceWeather(f32 x);
 void PlayNow_SendMessage18(s32 a);
 
-void fn_800EDAE0(int nPlayer);          // GameMode9.c
+void GameModePractice_ReadPlaceBallSticks(int nPlayer);          // GameMode9.c
 void GameModeDriverPGATour_FreeStreamMemory(void);                 // GameModeDriverPGATour.c
 u8   GM_Currently_PgaTourMode(void);                 // GameModeDriverPGATour.c
 void GameModeDriverRTE_StartEvent(void);                 // GameModeDriverRTE.c

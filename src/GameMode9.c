@@ -6,32 +6,36 @@
 #include "game.h"
 #include "engine.h"
 
-u8 gPracticeHoleEndedEarly;                     // the hole was ended early (fn_800ED974)
+u8 gPracticeHoleEndedEarly;                     // the hole was ended early (GameModePractice_FinishHole)
 
-void fn_800ED890(void);
-void fn_800ED8B8(void);
-void fn_800ED8E0(void);
-u8   fn_800ED900(void);
-u8   fn_800ED908(int nPlayer, u8 bCheck);
-u8   fn_800ED9AC(u8 bCheck);
-void fn_800ED9A0(void);
-void fn_800EDA08(void);
-void fn_800EDA34(int nPlayer);
-void fn_800EDA74(void);
+void GameModePractice_LoadHole(void);
+void GameModePractice_RestartHole(void);
+void GameModePractice_SetupNextGolfer(void);
+u8   GameModePractice_IsHoleEndedEarly(void);
+u8   GameModePractice_HoleFinished(int nPlayer, u8 bCheck);
+u8   GameModePractice_GameFinished(u8 bCheck);
+void GameModePractice_ClearHoleEndedEarly(void);
+void GameModePractice_EndGame(void);
+void GameModePractice_EndTurnEndHoleNotGame(int nPlayer);
+void GameModePractice_InitCamera(void);
 
-// Mode 9 starts on the round's first hole: any number of mulligans, no gimmes, no stroke limit
-// and no fly-by.
-void fn_800ED738(void) {
-    gpGame->pfnInit = fn_800ED738;
-    gpGame->pfnSetupNextGolfer = fn_800ED8E0;
+// Game mode 9's (practice) setup (pfnInit, from GM_SetModeType): its hooks (stroke play's GetHonors
+// and fn_800FFDB0 as GoToPlayoff), any number of mulligans (nMulligans 1), no gimmes, no stroke
+// limit, no GameBreakers (b285), no scorecards from the game manager (b275; EndGame and
+// EndTurnEndHoleNotGame show their own), nothing counted in the profile's statistics (b27C, b27D),
+// no flyover at the hole start (b27F) but the mid-hole flyover button on (b280), one view, the
+// current hole 0 and the hole not ended early.
+void GameModePractice_Init(void) {
+    gpGame->pfnInit = GameModePractice_Init;
+    gpGame->pfnSetupNextGolfer = GameModePractice_SetupNextGolfer;
     gpGame->pfnGetHonors = GameModeStroke_GetHonors;
-    gpGame->pfnHoleFinished = fn_800ED908;
-    gpGame->pfnGameFinished = fn_800ED9AC;
+    gpGame->pfnHoleFinished = GameModePractice_HoleFinished;
+    gpGame->pfnGameFinished = GameModePractice_GameFinished;
     gpGame->pfnGoToPlayoff = fn_800FFDB0;
-    gpGame->pfnEndGame = fn_800EDA08;
-    gpGame->pfn1E4 = fn_800ED890;
-    gpGame->pfn224 = fn_800ED8B8;
-    gpGame->pfn210 = fn_800EDA34;
+    gpGame->pfnEndGame = GameModePractice_EndGame;
+    gpGame->pfn1E4 = GameModePractice_LoadHole;
+    gpGame->pfn224 = GameModePractice_RestartHole;
+    gpGame->pfn210 = GameModePractice_EndTurnEndHoleNotGame;
     gpGame->bStrokeLimit = 0;
     gpGame->b275 = 0;
     gpGame->bGimmesAllowed = 0;
@@ -52,30 +56,35 @@ void fn_800ED738(void) {
     gSession.nSplitScreen = 0;
 }
 
-// Hole start: the ball is placed, the HUD hides.
-void fn_800ED890(void) {
-    fn_800EDA74();
+// Hole start (pfn1E4): player 0 goes to placing the ball with the camera faded in (InitCamera) and
+// the HUD is hidden.
+void GameModePractice_LoadHole(void) {
+    GameModePractice_InitCamera();
     GUI_ShowToggleFullScreenUI(0);
 }
 
-// Hole restart: the same.
-void fn_800ED8B8(void) {
-    fn_800EDA74();
+// The hole restarts (pfn224, GM_RestartHole): as at the hole start, player 0 goes to placing the
+// ball (InitCamera) and the HUD is hidden.
+void GameModePractice_RestartHole(void) {
+    GameModePractice_InitCamera();
     GUI_ShowToggleFullScreenUI(0);
 }
 
-void fn_800ED8E0(void) {
-    fn_800EDA74();
+// Before each shot (pfnSetupNextGolfer): player 0 goes to placing the ball again (InitCamera), so
+// every shot is played from where the player puts the ball.
+void GameModePractice_SetupNextGolfer(void) {
+    GameModePractice_InitCamera();
 }
 
-u8 fn_800ED900(void) {
+u8 GameModePractice_IsHoleEndedEarly(void) {
     return gPracticeHoleEndedEarly;
 }
 
-// Hole finished: when ended early (fn_800ED974), or once every player has holed out.
-u8 fn_800ED908(int nPlayer, u8 bCheck) {
+// The hole is over when the player ended it early (FinishHole) or once every player has holed out;
+// nPlayer and bCheck are not used.
+u8 GameModePractice_HoleFinished(int nPlayer, u8 bCheck) {
     int i;
-    if (fn_800ED900()) {
+    if (GameModePractice_IsHoleEndedEarly()) {
         return 1;
     }
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -86,18 +95,20 @@ u8 fn_800ED908(int nPlayer, u8 bCheck) {
     return 1;
 }
 
-// End the hole early (a GameUICommands command, from the pause menu).
-void fn_800ED974(void) {
+// The player ends the hole early (a UI command, fn_800880AC): the ended-early flag is set
+// (HoleFinished then says the hole is over) and player 0's turn ends (GM_EndOfGolferTurn).
+void GameModePractice_FinishHole(void) {
     gPracticeHoleEndedEarly = 1;
     GM_EndOfGolferTurn(0);
 }
 
-void fn_800ED9A0(void) {
+void GameModePractice_ClearHoleEndedEarly(void) {
     gPracticeHoleEndedEarly = 0;
 }
 
-// Game finished: no selected hole is left.
-u8 fn_800ED9AC(u8 bCheck) {
+// The game is over when no hole after the current one is among the chosen holes
+// (gpGame->bHoleSelected); bCheck is not used.
+u8 GameModePractice_GameFinished(u8 bCheck) {
     int h;
     for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
         if (gpGame->bHoleSelected[h]) {
@@ -107,32 +118,42 @@ u8 fn_800ED9AC(u8 bCheck) {
     return 1;
 }
 
-// Game over: counted as won (EASBio), then the end-of-round screen.
-void fn_800EDA08(void) {
+// End of the game (pfnEndGame): the game counts as won in the bio (EASBio_SetCurrentGameWon), then
+// the end-of-game scorecard (GUI_EndOfGameScorecard).
+void GameModePractice_EndGame(void) {
     EASBio_SetCurrentGameWon(1);
     GUI_EndOfGameScorecard(0);
 }
 
-// The hole is over: if ended early, unpause and move on (GUI_PauseMenuClosed); else the end-of-hole screen.
-void fn_800EDA34(int nPlayer) {
-    if (fn_800ED900()) {
+// The hole is over and the game is not (pfn210): after an early end (IsHoleEndedEarly) the
+// end-of-hole screen is marked up without showing (GUI_SetEndOfHolePending) and the pause menu
+// closed, which moves on to the next hole; otherwise the end-of-hole scorecard. The ended-early
+// flag is cleared.
+void GameModePractice_EndTurnEndHoleNotGame(int nPlayer) {
+    if (GameModePractice_IsHoleEndedEarly()) {
         GUI_SetEndOfHolePending();
         GUI_PauseMenuClosed();
     } else {
         GUI_BetweenHolesScorecard(0);
     }
-    fn_800ED9A0();
+    GameModePractice_ClearHoleEndedEarly();
 }
 
-// The player goes to "place ball", and the camera moves.
-void fn_800EDA74(void) {
+// Player 0's golfer state is set to placing the ball (GS_PLACE_BALL) and their view's camera fades
+// in (CameraController_FadeIn, time 0.5, fade colour {0, 0, 0, 0.5}). LoadHole, RestartHole and
+// SetupNextGolfer call it.
+void GameModePractice_InitCamera(void) {
     f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     GOLFERSTATE_Set(GS_PLACE_BALL, 0);
     CameraController_FadeIn(ViewController_GetCameraControl(gPlayers[0].nView[0]), 0.5f, v);
 }
 
-// The pad's sticks (beyond the 96..160 dead zone) scaled to -1..1 into the player's fA7C..fA84.
-void fn_800EDAE0(int nPlayer) {
+// The pad's sticks while the ball is being placed (STATEFUNC_PlaceBallUpdate, in every mode): stick
+// bytes 3, 2 and 0 (Input_sGetStickInfo), beyond a 96..160 dead zone and scaled to about -1..1, go
+// into fA84, fA80 and fA7C (the last negated), which PlaceBall_UpdateMomentums uses to move the
+// cursor and turn its heading. Inside the dead zone a value is left as it was
+// (PlaceBall_UpdateMomentums eases it back to 0).
+void GameModePractice_ReadPlaceBallSticks(int nPlayer) {
     u8* pPad = Input_sGetStickInfo(gPlayers[nPlayer].nController);
     if (pPad) {
         if (pPad[3] < 96.0f) {

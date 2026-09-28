@@ -309,7 +309,7 @@ char* PlayNow_GetGroupName(int nId);
 char* PlayNow_GetGroupDescription(int nId);
 int   PlayNow_GetHolesLeft(void);
 void  PlayNow_Restart(void);
-void  fn_800ED974(void);
+void  GameModePractice_FinishHole(void);
 PgaTour_WinInfo* GameModeDriverPGATour_GetWinInfo(void);
 s32   GameModeDriverPGATour_DisplayEndOfHoleMessage(char* pDst);
 s32   GM_RealtimeMode_GetSelectedEvent(s32* pRound);
@@ -1541,7 +1541,7 @@ void fn_8008805C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_800880AC(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800ED974();
+    GameModePractice_FinishHole();
 }
 
 void fn_800880CC(MsgArg* pArgs, MsgArg* pResult) {

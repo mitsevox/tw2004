@@ -315,7 +315,7 @@ typedef struct Player {
     f32  fA64;                 // 0xA64  a distance, set when a swing state 16 begins
     s32  nSurface;              // 0xA68  surface type under the target, -1 none, 16 water. TW06: targetedSurfaceID
     f32  vPlacement[4];         // 0xA6C  where the ball may be placed (swing state 22)
-    f32  fA7C;                  // 0xA7C  pad stick x, -1..1 (GameMode9 fn_800EDAE0)
+    f32  fA7C;                  // 0xA7C  pad stick x, -1..1 (GameMode9 GameModePractice_ReadPlaceBallSticks)
     f32  fA80;                  // 0xA80
     f32  fA84;                  // 0xA84
     f32  fA88;                  // 0xA88  an angle (speed golf: the run's heading)

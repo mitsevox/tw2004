@@ -2036,3 +2036,16 @@ address	name	comment	by	date
 800F6A08	GameModeSkillZoneTargetToTarget_GreenType	rewrite	rm3 (replayed by orchestrator)	2026-09-28
 800F6A34	GameModeSkillZoneTargetToTarget_GetExtraBallsEarned	add	rm3 (replayed by orchestrator)	2026-09-28
 800F6A3C	GameModeSkillZoneTargetToTarget_EndGame	add	rm3 (replayed by orchestrator)	2026-09-28
+800ED738	GameModePractice_Init	rewrite	rm3 (replayed by orchestrator)	2026-09-28
+800ED890	GameModePractice_LoadHole	rewrite	rm3 (replayed by orchestrator)	2026-09-28
+800ED8B8	GameModePractice_RestartHole	rewrite	rm3 (replayed by orchestrator)	2026-09-28
+800ED8E0	GameModePractice_SetupNextGolfer	add	rm3 (replayed by orchestrator)	2026-09-28
+800ED900	GameModePractice_IsHoleEndedEarly	none	rm3 (replayed by orchestrator)	2026-09-28
+800ED908	GameModePractice_HoleFinished	rewrite	rm3 (replayed by orchestrator)	2026-09-28
+800ED974	GameModePractice_FinishHole	rewrite	rm3 (replayed by orchestrator)	2026-09-28
+800ED9A0	GameModePractice_ClearHoleEndedEarly	none	rm3 (replayed by orchestrator)	2026-09-28
+800ED9AC	GameModePractice_GameFinished	rewrite	rm3 (replayed by orchestrator)	2026-09-28
+800EDA08	GameModePractice_EndGame	rewrite	rm3 (replayed by orchestrator)	2026-09-28
+800EDA34	GameModePractice_EndTurnEndHoleNotGame	rewrite	rm3 (replayed by orchestrator)	2026-09-28
+800EDA74	GameModePractice_InitCamera	rewrite	rm3 (replayed by orchestrator)	2026-09-28
+800EDAE0	GameModePractice_ReadPlaceBallSticks	rewrite	rm3 (replayed by orchestrator)	2026-09-28

@@ -1998,7 +1998,7 @@ void STATEFUNC_PlaceBallUpdate(int nPlayer) {
             }
         }
     } else {
-        fn_800EDAE0(nPlayer);
+        GameModePractice_ReadPlaceBallSticks(nPlayer);
         if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1A, 1)) {
             EVENT_Trigger(nPlayer, 0x16, 0, -1);
         } else {
