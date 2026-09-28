@@ -136,7 +136,7 @@ void LI_ResetLights(void);
 void LI_SetObjectLights(UObject* pObj);
 void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
 void SKN_BeginFrame(void);
-void fn_800B9EB8(char* szBall);
+void FE_CrAPBall_SetLogo(char* szBall);
 void Character_ExecuteTextureSwapFE(Character* pChar);
 char* fn_800484E0(int i);
 void fn_80035600(void);
@@ -144,7 +144,7 @@ void Character_UpdateAnimation(Character* pChar, int a, f32 f);
 void SKN_PoseCharacter(Character* pChar, int n);
 void LF_LoadCurrentLights(void);
 void FE_CrAP_EquipDefaults(void);
-void fn_800B9CF0(int n);
+void FE_CrAPBall_Render(int n);
 void SkinPart_SetChangeAllCopies(u8 b);
 void fn_8010B098(void* p);
 void fn_8010B9BC(void);
@@ -667,9 +667,9 @@ void FE_vUpdateGolferAll(void) {
                 if ((gpCrAPState->nRenderState == 2 && gpCrAPState->nTempRenderState != 1)
                     || gpCrAPState->nTempRenderState == 2) {
                     if (fn_800484F4(gpCrAPState->szQueuedBall) >= 0) {
-                        fn_800B9EB8(gpCrAPState->szQueuedBall);
+                        FE_CrAPBall_SetLogo(gpCrAPState->szQueuedBall);
                     } else {
-                        fn_800B9EB8(NULL);
+                        FE_CrAPBall_SetLogo(NULL);
                     }
                     FE_SetCrapRotation(0, 0.0f);
                     FE_ResetCrAPZoom();
@@ -880,12 +880,12 @@ void FE_vUpdateGolferAll(void) {
         fn_80008380();
         if (gpCrAPState->pB4->nGolferId == 7 || gpCrAPState->pB4->nGolferId == 29) {
             if (FE_GetCurrentProfile()->nGolferOutfit >= 0) {
-                fn_800B9EB8(fn_800484E0(FE_GetCurrentProfile()->nGolferOutfit));
+                FE_CrAPBall_SetLogo(fn_800484E0(FE_GetCurrentProfile()->nGolferOutfit));
             } else {
-                fn_800B9EB8(NULL);
+                FE_CrAPBall_SetLogo(NULL);
             }
         } else {
-            fn_800B9EB8(fn_800484E0(gGolferTable[gpCrAPState->pB4->nGolferId].nOutfit));
+            FE_CrAPBall_SetLogo(fn_800484E0(gGolferTable[gpCrAPState->pB4->nGolferId].nOutfit));
         }
         gpCrAPState->b87 = 0;
         Character_ExecuteTextureSwapFE(pChar);
@@ -929,7 +929,7 @@ void FE_vRenderGolferAllPhase1(void) {
         FE_BeginRenderGolferPhase1();
         FE_ClearGolferFrame();
         FE_RenderGolfer(0);
-        fn_800B9CF0(0);
+        FE_CrAPBall_Render(0);
         FE_DrawGolferAlphaMask();
         FE_CopyGolferToTexture();
         FE_ClearGolferFrame();
@@ -947,7 +947,7 @@ void FE_vRenderGolferAllPhase2(void) {
         }
         gpCrAPState->b18C = 0;
         FE_RenderGolfer(0);
-        fn_800B9CF0(0);
+        FE_CrAPBall_Render(0);
     }
 }
 
@@ -1791,7 +1791,7 @@ u8 FE_SetDelayTextureSwap(u8 bDelay, f32 fTime) {
     return bOld;
 }
 
-// Queue ball texture szTex (NULL: none) for the ball screen: it goes on the ball (fn_800B9EB8, or
+// Queue ball texture szTex (NULL: none) for the ball screen: it goes on the ball (FE_CrAPBall_SetLogo, or
 // none when the ball list lacks it) when the queued animation starts with the ball shown.
 void FE_QueueBallChange(char* szTex) {
     if (szTex == NULL) {

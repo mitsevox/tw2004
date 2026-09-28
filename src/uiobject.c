@@ -107,7 +107,7 @@ void fn_800AE338(void) {
 }
 
 // Make the object from its 'TEO ' model (id 10003), unless it is made already.
-// port: a 'TEO ' object's UStreamObject.uUnk4 holds its model (see rcmp_mad_codec.c fn_800B9B48).
+// port: a 'TEO ' object's UStreamObject.uUnk4 holds its model (see rcmp_mad_codec.c FE_CrAPBall_MakeObjects).
 void fn_800AE380(void) {
     if (lbl_802820D0 == NULL) {
         lbl_802820D0 = fn_80048808((UObjModel*)fn_8000B70C('TEO ', 10003)->uUnk4);

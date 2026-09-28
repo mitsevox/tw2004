@@ -31,7 +31,7 @@ typedef struct PictFile {
     u8   aData[4];              // 0x18  the coded picture (any length)
 } PictFile;
 
-// A decoded frame of the MAD codec (rcmp_mad_codec.c, fn_800B94CC): the same three planes.
+// A decoded frame of the MAD codec (rcmp_mad_codec.c, MAD_GetNextFrame): the same three planes.
 typedef struct PictFrame {
     s32  nWidth;                // 0x00
     s32  nHeight;               // 0x04
@@ -48,7 +48,7 @@ typedef struct MadDecoder {
     s16  nWidth;                // 0x0C
     s16  nHeight;               // 0x0E
     PictFrame* pLast;           // 0x10  the last key or 'MADm' frame, the next one's reference
-    u8   nEnd;                  // 0x14  fn_800B9930 tests it for 2
+    u8   nEnd;                  // 0x14  MAD_IsAtEnd tests it for 2
     s32  nFiles;                // 0x18  files read
     PictFrame* pFrames;         // 0x1C  the six frames' memory
     PictFrame* apUsed[6];       // 0x20

@@ -69,8 +69,8 @@ Objects delivered by UStream
 | `eagm` | fn_800A1D4C | MC.c | none seen | asm |
 | `sfxd` | fn_800A29B4 | asm | none seen | asm |
 | `LEGL` | fn_800B166C | startUp.c | none seen | asm |
-| `TEO ` | fn_800B99FC | sweep | none seen | asm (a second `TEO ` handler) |
-| `BALF` | fn_800B99BC | sweep | none seen | asm |
+| `TEO ` | FE_CrAPBall_LoadTEO | sweep | none seen | asm (a second `TEO ` handler) |
+| `BALF` | FE_CrAPBall_LoadBALF | sweep | none seen | asm |
 | `TRAX`, `TRXT` | fn_800BA118, fn_800BA15C | sweep | none seen | asm |
 | `CRI `, `CMPS` | fn_800D2A64, fn_800D2A90 | sweep | none seen | asm |
 | `ERN ` | EarningsInfo_LoadERNFromStream | Earnings.c | none seen | yes: copied over the prize table `lbl_80200538` (`EarningsTable`, include/game/earnings.h); a `port:` note in the handler marks where a port converts it |

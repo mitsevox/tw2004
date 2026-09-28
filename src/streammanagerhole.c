@@ -81,8 +81,8 @@ void FE_CharBios_RegisterStreamClients();
 void FE_Manager_RegisterStreamClients();
 void FE_CharBios_UnRegisterStreamClients();
 void FE_lite_vRegisterStreamClients();
-void fn_800B9944();
-void fn_800B9988();
+void FE_CrAPBall_RegisterStreamClients();
+void FE_CrAPBall_UnRegisterStreamClients();
 void UI_vEATraxRegisterStreamClients();
 void UI_vEATraxUnRegisterStreamClients();
 void FE_CrAP_RegisterStreamClients();
@@ -261,7 +261,7 @@ void fn_80014668(void) {
     UI_RegisterStreamClients();
     fn_800394F0();
     FE_lite_vRegisterStreamClients();
-    fn_800B9944();
+    FE_CrAPBall_RegisterStreamClients();
     Character_RegisterGolferStreamClientFE();
     MC_RegisterStreamClients();
     FE_CharBios_RegisterStreamClients();
@@ -280,7 +280,7 @@ void fn_800146C4(void) {
     UI_UnregisterStreamClients();
     fn_80039520();
     fn_8000BA14();
-    fn_800B9988();
+    FE_CrAPBall_UnRegisterStreamClients();
     Character_UnregisterGolferStreamClient();
     FE_CharBios_UnRegisterStreamClients();
     FE_CrAP_UnRegisterStreamClients();

@@ -7,8 +7,8 @@
 void fn_8002F898(u8* pSrc, u8* pDst, int nWidth, int nHeight);   // copies one plane
 void fn_8002FB98(LLPict* pPict);
 void fn_8002F56C(u8* pPlane, void* pWork, int nWidth, int nHeight);  // reorders one plane through pWork
-PictFrame* fn_800B94CC(void* pDecoder, int n);                  // the decoder's next frame, or NULL
-void fn_800B9808(void* pDecoder, PictFrame* pFrame);            // gives a frame back
+PictFrame* MAD_GetNextFrame(void* pDecoder, int n);                  // the decoder's next frame, or NULL
+void MAD_ReleaseFrame(void* pDecoder, PictFrame* pFrame);            // gives a frame back
 
 void* lbl_80281D58;
 void** lbl_802810C0 = &lbl_80281D58;
@@ -19,9 +19,9 @@ void fn_80056204();
 void fn_80056208();
 void fn_8002F4FC(void);
 void fn_8002F540(void);
-void fn_800B90F4();
-void fn_800B91B8();
-s32 fn_800B920C();
+void MAD_SetReadCallback();
+void MAD_InitDecoder();
+s32 MAD_CloseDecoder();
 
 void fn_8002F4FC(void) {
     void* t1;
@@ -121,8 +121,8 @@ void fn_8002FEB0(LLPict* pPict, PictStream* pStream, void* (*pfnRead)(void* pArg
     pPict->pPixels = NULL;
     pStream->pDecoder = StaticMem_Alloc(80, 1, 32, "LLPict_Gc.c", 278);
     pStream->pFrame = NULL;
-    fn_800B90F4(pfnRead, pArg);
-    fn_800B91B8(pStream->pDecoder);
+    MAD_SetReadCallback(pfnRead, pArg);
+    MAD_InitDecoder(pStream->pDecoder);
 }
 
 // ---- end of sweep code ----
@@ -133,9 +133,9 @@ void fn_8002FF38(LLPict* pPict, PictStream* pStream) {
         StaticMem_Free(pPict->pPixels);
     }
     if (pStream->pFrame != NULL) {
-        fn_800B9808(pStream->pDecoder, pStream->pFrame);
+        MAD_ReleaseFrame(pStream->pDecoder, pStream->pFrame);
     }
-    fn_800B920C(pStream->pDecoder);
+    MAD_CloseDecoder(pStream->pDecoder);
     StaticMem_Free(pStream->pDecoder);
 }
 
@@ -158,10 +158,10 @@ void fn_8002FF98(LLPict* pPict, PictStream* pStream) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-u8 fn_800B9930(u8* p0);
+u8 MAD_IsAtEnd(u8* p0);
 
 u8 fn_8003001C(LLPict* pPict, PictStream* pStream) {
-    return fn_800B9930(pStream->pDecoder);
+    return MAD_IsAtEnd(pStream->pDecoder);
 }
 
 // ---- end of sweep code ----
@@ -169,9 +169,9 @@ u8 fn_8003001C(LLPict* pPict, PictStream* pStream) {
 // Takes the decoder's next frame, giving back the one held; 1 when there is one.
 u8 fn_80030040(LLPict* pPict, PictStream* pStream) {
     if (pStream->pFrame != NULL) {
-        fn_800B9808(pStream->pDecoder, pStream->pFrame);
+        MAD_ReleaseFrame(pStream->pDecoder, pStream->pFrame);
     }
-    pStream->pFrame = fn_800B94CC(pStream->pDecoder, 0);
+    pStream->pFrame = MAD_GetNextFrame(pStream->pDecoder, 0);
     return pStream->pFrame != NULL;
 }
 

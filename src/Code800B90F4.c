@@ -21,37 +21,44 @@ void* lbl_802821C0;             // what the read function is given
 
 void MAD_initdecode(u8* src, int motion, int quality);
 void MAD_decodemacroblock(u8* src_y, u8* src_cb, u8* src_cr, u8* dest_y, u8* dest_cb, u8* dest_cr, int width);
-u32 fn_800B94B0(PictFile* pFile);
-void fn_800B95FC(PictFile* pFile);
-void fn_800B9624(PictFrame** apList, PictFrame* pFrame);
-PictFile* fn_800B965C(MadDecoder* p);
-PictFrame* fn_800B9700(MadDecoder* p);
-PictFrame* fn_800B9760(PictFrame** apList);
-PictFrame* fn_800B97A8(MadDecoder* p);
-void fn_800B9808(MadDecoder* p, PictFrame* pFrame);
-void fn_800B9864(MadDecoder* p, PictFrame* pFrame);
+u32 MAD_GetFileKind(PictFile* pFile);
+void MAD_FreeFile(PictFile* pFile);
+void MAD_AddFrameToList(PictFrame** apList, PictFrame* pFrame);
+PictFile* MAD_ReadNextFile(MadDecoder* p);
+PictFrame* MAD_TakeReferenceFrame(MadDecoder* p);
+PictFrame* MAD_TakeFrameFromList(PictFrame** apList);
+PictFrame* MAD_TakeOutputFrame(MadDecoder* p);
+void MAD_ReleaseFrame(MadDecoder* p, PictFrame* pFrame);
+void MAD_RemoveFrameFromLists(MadDecoder* p, PictFrame* pFrame);
 
-// The read function the decoder takes its MAD files from.
-void fn_800B90F4(PictFile* (*pfnRead)(void* pArg), void* pArg) {
+// Sets the function (and the argument it is given) that MAD_ReadNextFile takes the movie's MAD
+// files from; LLPict_Gc.c's movie set-up passes it on (fn_8002FEB0).
+void MAD_SetReadCallback(PictFile* (*pfnRead)(void* pArg), void* pArg) {
     lbl_802821C4 = pfnRead;
     lbl_802821C0 = pArg;
 }
 
-void fn_800B9100(PictFrame* pFrame, int nWidth, int nHeight) {
+// Allocates frame pFrame's pixels for an nWidth x nHeight picture: the Y plane and the quarter-size
+// U and V planes after it (3/2 bytes a pixel), with no references yet.
+void MAD_AllocFrame(PictFrame* pFrame, int nWidth, int nHeight) {
     pFrame->nRefs = 0;
     pFrame->pPixels = StaticMem_Alloc((u32)(nHeight * nWidth * 3) >> 1, 1, 32, "rcmp_mad_codec.c", 79);
     pFrame->nWidth = nWidth;
     pFrame->nHeight = nHeight;
 }
 
-void fn_800B9178(PictFrame* pFrame) {
+// Frees frame pFrame's pixels, when it has any (the frame itself belongs to the decoder's block of
+// six).
+void MAD_FreeFrame(PictFrame* pFrame) {
     if (pFrame->pPixels != NULL) {
         StaticMem_Free(pFrame->pPixels);
         pFrame->pPixels = NULL;
     }
 }
 
-int fn_800B91B8(MadDecoder* p) {
+// Resets decoder p for a new movie: the frames are allocated with the first file (bFirst), no files
+// read, no reference frame, both frame lists empty. Always returns 1.
+int MAD_InitDecoder(MadDecoder* p) {
     int i;
 
     p->bFirst = 1;
@@ -66,15 +73,17 @@ int fn_800B91B8(MadDecoder* p) {
     return 1;
 }
 
-void fn_800B920C(MadDecoder* p) {
+// Frees decoder p's frames: the pixels of every frame in its free and used lists, then the block of
+// six frames (the decoder itself is freed by its owner, LLPict_Gc.c).
+void MAD_CloseDecoder(MadDecoder* p) {
     int i;
 
     for (i = 0; i < 6; i++) {
         if (p->apFree[i] != NULL) {
-            fn_800B9178(p->apFree[i]);
+            MAD_FreeFrame(p->apFree[i]);
         }
         if (p->apUsed[i] != NULL) {
-            fn_800B9178(p->apUsed[i]);
+            MAD_FreeFrame(p->apUsed[i]);
         }
     }
     if (p->pFrames != NULL) {
@@ -82,9 +91,12 @@ void fn_800B920C(MadDecoder* p) {
     }
 }
 
-// Decode pFile into a new frame. A 'MADk' or 'MADm' frame becomes the next reference; the frame is
-// NULL when there is no free one, no reference or an unknown kind.
-PictFrame* fn_800B928C(MadDecoder* p, PictFile* pFile) {
+// Decodes MAD file pFile into a frame taken from the free list. A 'MADk' key frame drops the old
+// reference frame and is coded on its own; 'MADm' and 'MADe' frames are coded against the reference
+// (pLast). A 'MADk' or 'MADm' frame becomes the new reference (the old one is released); a 'MADe'
+// frame is only handed out. NULL when there is no free frame, no reference for a coded frame, or
+// the kind is unknown.
+PictFrame* MAD_DecodeFrame(MadDecoder* p, PictFile* pFile) {
     PictFrame* pFrame;
     u8* pRefY;
     u8* pRefU;
@@ -96,12 +108,12 @@ PictFrame* fn_800B928C(MadDecoder* p, PictFile* pFile) {
     int y;
     int x;
 
-    if (fn_800B94B0(pFile) == 'MADk') {
+    if (MAD_GetFileKind(pFile) == 'MADk') {
         if (p->pLast != NULL) {
-            fn_800B9808(p, p->pLast);
+            MAD_ReleaseFrame(p, p->pLast);
             p->pLast = NULL;
         }
-        pFrame = fn_800B9700(p);
+        pFrame = MAD_TakeReferenceFrame(p);
         if (pFrame == NULL) {
             return NULL;
         }
@@ -116,10 +128,10 @@ PictFrame* fn_800B928C(MadDecoder* p, PictFile* pFile) {
         } else {
             return NULL;
         }
-        if (fn_800B94B0(pFile) == 'MADm') {
-            pFrame = fn_800B9700(p);
-        } else if (fn_800B94B0(pFile) == 'MADe') {
-            pFrame = fn_800B97A8(p);
+        if (MAD_GetFileKind(pFile) == 'MADm') {
+            pFrame = MAD_TakeReferenceFrame(p);
+        } else if (MAD_GetFileKind(pFile) == 'MADe') {
+            pFrame = MAD_TakeOutputFrame(p);
         } else {
             return NULL;
         }
@@ -139,34 +151,37 @@ PictFrame* fn_800B928C(MadDecoder* p, PictFile* pFile) {
                                  &pU[xc + y * p->nWidth / 4], &pV[xc + y * p->nWidth / 4], p->nWidth);
         }
     }
-    if (fn_800B94B0(pFile) == 'MADm') {
+    if (MAD_GetFileKind(pFile) == 'MADm') {
         if (p->pLast != NULL) {
-            fn_800B9808(p, p->pLast);
+            MAD_ReleaseFrame(p, p->pLast);
         }
         p->pLast = pFrame;
-    } else if (fn_800B94B0(pFile) == 'MADk') {
+    } else if (MAD_GetFileKind(pFile) == 'MADk') {
         p->pLast = pFrame;
     }
     return pFrame;
 }
 
 // The file's kind ('MADk', 'MADm' or 'MADe'); no file counts as a key frame.
-u32 fn_800B94B0(PictFile* pFile) {
+u32 MAD_GetFileKind(PictFile* pFile) {
     if (pFile != NULL) {
         return pFile->uMagic;
     }
     return 'MADk';
 }
 
-// The next frame: decoded from pFile, or from the next file read when pFile is NULL. The first
-// call allocates the six frames.
-PictFrame* fn_800B94CC(MadDecoder* p, PictFile* pFile) {
+// The movie's next frame: decoded from pFile, or from the next file read when pFile is NULL (NULL
+// when there is none). The first call takes the frame rate (16.16 frames a second; fFrameTime =
+// 1000 / (rate / 65535) milliseconds) and the picture size from the file and allocates the six
+// frames. The file is freed after. The frame comes with its references (MAD_ReleaseFrame gives one
+// back).
+PictFrame* MAD_GetNextFrame(MadDecoder* p, PictFile* pFile) {
     PictFrame* pFrame;
     PictFrame* pOut;
     int i;
 
     if (pFile == NULL) {
-        pFile = fn_800B965C(p);
+        pFile = MAD_ReadNextFile(p);
         if (pFile == NULL) {
             return NULL;
         }
@@ -179,25 +194,26 @@ PictFrame* fn_800B94CC(MadDecoder* p, PictFile* pFile) {
         pFrame = StaticMem_Alloc(6 * sizeof(PictFrame), 1, 32, "rcmp_mad_codec.c", 473);
         p->pFrames = pFrame;
         for (i = 0; i < 6; i++) {
-            fn_800B9100(pFrame, p->nWidth, p->nHeight);
-            fn_800B9624(p->apFree, pFrame);
+            MAD_AllocFrame(pFrame, p->nWidth, p->nHeight);
+            MAD_AddFrameToList(p->apFree, pFrame);
             pFrame++;
         }
         p->bFirst = 0;
     }
-    pOut = fn_800B928C(p, pFile);
-    fn_800B95FC(pFile);
+    pOut = MAD_DecodeFrame(p, pFile);
+    MAD_FreeFile(pFile);
     return pOut;
 }
 
-void fn_800B95FC(PictFile* pFile) {
+void MAD_FreeFile(PictFile* pFile) {
     if (pFile != NULL) {
         StaticMem_Free(pFile);
     }
 }
 
-// Put pFrame in the first empty slot of a list.
-void fn_800B9624(PictFrame** apList, PictFrame* pFrame) {
+// Puts pFrame in the first empty slot of a six-slot frame list (the decoder's apFree or apUsed);
+// nothing when the list is full.
+void MAD_AddFrameToList(PictFrame** apList, PictFrame* pFrame) {
     int i;
 
     for (i = 0; i < 6; i++) {
@@ -208,9 +224,11 @@ void fn_800B9624(PictFrame** apList, PictFrame* pFrame) {
     }
 }
 
-// The next MAD file from the read function, its header swapped to big-endian.
+// The next MAD file from the read function (MAD_SetReadCallback), NULL when there is none; its rate
+// (uC), width and height are swapped to big-endian and the decoder's file count goes up. The end
+// count (nEnd) is never set: see the EA bug inside.
 // port: the swaps assume a big-endian machine; a little-endian port reads the header as it is.
-PictFile* fn_800B965C(MadDecoder* p) {
+PictFile* MAD_ReadNextFile(MadDecoder* p) {
     PictFile* pFile = lbl_802821C4(lbl_802821C0);
 
     if (pFile == NULL) {
@@ -232,20 +250,22 @@ PictFile* fn_800B965C(MadDecoder* p) {
     return pFile;
 }
 
-// A free frame, handed out with 2 references.
-PictFrame* fn_800B9700(MadDecoder* p) {
-    PictFrame* pFrame = fn_800B9760(p->apFree);
+// A free frame moved to the used list with 2 references: one for whoever the frame is handed to,
+// one for its time as the reference frame (MAD_DecodeFrame, for 'MADk' and 'MADm'). NULL when none
+// is free.
+PictFrame* MAD_TakeReferenceFrame(MadDecoder* p) {
+    PictFrame* pFrame = MAD_TakeFrameFromList(p->apFree);
 
     if (pFrame == NULL) {
         return NULL;
     }
-    fn_800B9624(p->apUsed, pFrame);
+    MAD_AddFrameToList(p->apUsed, pFrame);
     pFrame->nRefs = 2;
     return pFrame;
 }
 
-// Take the first frame out of a list.
-PictFrame* fn_800B9760(PictFrame** apList) {
+// Takes the first frame out of a six-slot frame list; NULL when the list is empty.
+PictFrame* MAD_TakeFrameFromList(PictFrame** apList) {
     PictFrame* pFrame;
     int i;
 
@@ -259,29 +279,31 @@ PictFrame* fn_800B9760(PictFrame** apList) {
     return NULL;
 }
 
-// A free frame, handed out with 1 reference.
-PictFrame* fn_800B97A8(MadDecoder* p) {
-    PictFrame* pFrame = fn_800B9760(p->apFree);
+// A free frame moved to the used list with 1 reference, for a 'MADe' frame that is handed out and
+// never becomes the reference (MAD_DecodeFrame). NULL when none is free.
+PictFrame* MAD_TakeOutputFrame(MadDecoder* p) {
+    PictFrame* pFrame = MAD_TakeFrameFromList(p->apFree);
 
     if (pFrame == NULL) {
         return NULL;
     }
-    fn_800B9624(p->apUsed, pFrame);
+    MAD_AddFrameToList(p->apUsed, pFrame);
     pFrame->nRefs = 1;
     return pFrame;
 }
 
-// Drop a reference to pFrame; at none it goes back to the free list.
-void fn_800B9808(MadDecoder* p, PictFrame* pFrame) {
+// Gives back one reference to pFrame; at none left it goes back to the free list. The picture code
+// gives back the frame it showed (LLPict_Gc.c), MAD_DecodeFrame the old reference.
+void MAD_ReleaseFrame(MadDecoder* p, PictFrame* pFrame) {
     pFrame->nRefs--;
     if (pFrame->nRefs == 0) {
-        fn_800B9864(p, pFrame);
-        fn_800B9624(p->apFree, pFrame);
+        MAD_RemoveFrameFromLists(p, pFrame);
+        MAD_AddFrameToList(p->apFree, pFrame);
     }
 }
 
 // Take pFrame out of both lists.
-void fn_800B9864(MadDecoder* p, PictFrame* pFrame) {
+void MAD_RemoveFrameFromLists(MadDecoder* p, PictFrame* pFrame) {
     int i;
 
     for (i = 0; i < 6; i++) {
@@ -294,7 +316,9 @@ void fn_800B9864(MadDecoder* p, PictFrame* pFrame) {
     }
 }
 
-u8 fn_800B9930(MadDecoder* p) {
+// 1 once the decoder's end count (nEnd) reaches 2. It never does: nEnd is never set
+// (MAD_ReadNextFile's EA bug), so this always answers 0.
+u8 MAD_IsAtEnd(MadDecoder* p) {
     return p->nEnd == 2;
 }
 
@@ -308,8 +332,8 @@ f32 lbl_802814F4 = 1.0f;        // }
 f32 lbl_802814F8 = 1.0f;        // }
 char lbl_802814FC[] = "logoea";
 
-void fn_800B99BC(UStreamObject* pObject);
-void fn_800B99FC(UStreamObject* arg0);
+void FE_CrAPBall_LoadBALF(UStreamObject* pObject);
+void FE_CrAPBall_LoadTEO(UStreamObject* arg0);
 void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 void fn_8000C5A4(f32 (*pMtx)[4]);
@@ -319,35 +343,44 @@ void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
 
-void fn_800B9944(void) {
-    Stream_RegisterLoadChunkCallback('TEO ', fn_800B99FC);
-    Stream_RegisterLoadChunkCallback('BALF', fn_800B99BC);
+// Registers the stream handlers for the ball the Create-A-Player menu golfer holds: 'TEO ' objects
+// (its models, FE_CrAPBall_LoadTEO) and the 'BALF' texture bank (its logos, FE_CrAPBall_LoadBALF).
+void FE_CrAPBall_RegisterStreamClients(void) {
+    Stream_RegisterLoadChunkCallback('TEO ', FE_CrAPBall_LoadTEO);
+    Stream_RegisterLoadChunkCallback('BALF', FE_CrAPBall_LoadBALF);
 }
 
-void fn_800B9988(void) {
+void FE_CrAPBall_UnRegisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('TEO ');
     Stream_UnregisterLoadChunkCallback('BALF');
 }
 
-// A 'BALF' object is a texture bank.
-void fn_800B99BC(UStreamObject* pObject) {
+// The 'BALF' load handler: the object is a texture bank of ball logos, kept for
+// FE_CrAPBall_SetLogo; the stream object itself is freed.
+void FE_CrAPBall_LoadBALF(UStreamObject* pObject) {
     lbl_802821D4 = fn_8000FB88(pObject, NULL, 0);
     StaticMem_Free(pObject);
 }
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_800B9A50(void* arg0);
+void FE_CrAPBall_FreeTEO(void* arg0);
 
-void fn_800B99FC(UStreamObject* arg0) {
+// The 'TEO ' load handler: unless an object of the same type and id is listed already, the object's
+// model is built from its data (fn_80045D80) and kept in the object (word 4), with
+// FE_CrAPBall_FreeTEO as its free function (word 8), and the object is listed (fn_8000B4B8) for
+// FE_CrAPBall_MakeObjects to find.
+void FE_CrAPBall_LoadTEO(UStreamObject* arg0) {
     if (fn_8000B508(arg0) == 0) {
         (*(UObjModel**)((u8*)(arg0) + 4)) = fn_80045D80(arg0->pData);
-        (*(void (**)(void*))((u8*)(arg0) + 8)) = fn_800B9A50;
+        (*(void (**)(void*))((u8*)(arg0) + 8)) = FE_CrAPBall_FreeTEO;
         fn_8000B4B8(arg0);
     }
 }
 
-void fn_800B9A50(void* arg0) {
+// Frees the model FE_CrAPBall_LoadTEO built for a 'TEO ' object (arg0: the object): its root
+// (fn_800075CC), then the model.
+void FE_CrAPBall_FreeTEO(void* arg0) {
     void* temp_r31;
 
     temp_r31 = (*(void**)((u8*)(arg0) + 4));
@@ -357,7 +390,9 @@ void fn_800B9A50(void* arg0) {
 
 // ---- end of sweep code ----
 
-void fn_800B9A88(void) {
+// Clears the menu ball's state when the front end starts (GO_vInitFE): no objects, no logo bank,
+// the logo layers shown.
+void FE_CrAPBall_Init(void) {
     lbl_802821E0 = NULL;
     lbl_802821DC = NULL;
     lbl_802821D8 = NULL;
@@ -366,7 +401,10 @@ void fn_800B9A88(void) {
     lbl_802814E8 = 1;
 }
 
-void fn_800B9AAC(void) {
+// Frees the menu ball's three objects, its logo bank (its pixel and palette data, then the bank)
+// and lbl_802821D0 when set (nothing here sets it), and clears them. Called when the front end
+// closes.
+void FE_CrAPBall_Free(void) {
     if (lbl_802821E0 != NULL) {
         fn_80048860(lbl_802821E0);
     }
@@ -391,8 +429,8 @@ void fn_800B9AAC(void) {
 }
 
 // The three objects, made from their 'TEO ' models once those have streamed in.
-// port: a 'TEO ' object's UStreamObject.uUnk4 holds its model (fn_800B99FC stores it there).
-void fn_800B9B48(void) {
+// port: a 'TEO ' object's UStreamObject.uUnk4 holds its model (FE_CrAPBall_LoadTEO stores it there).
+void FE_CrAPBall_MakeObjects(void) {
     UStreamObject* pObject;
 
     if (lbl_802821E0 == NULL) {
@@ -417,7 +455,7 @@ void fn_800B9B48(void) {
 
 // Draw pObj turned by mBone and scaled by mScale, at pPos in the create-a-player view; its
 // matrices are put back after.
-void fn_800B9BF4(UObject* pObj, f32 (*mBone)[4], f32 (*mScale)[4], f32* pPos) {
+void FE_CrAPBall_DrawObject(UObject* pObj, f32 (*mBone)[4], f32 (*mScale)[4], f32* pPos) {
     f32 m0[4][4];
     f32 m40[4][4];
     f32 m80[4][4];
@@ -438,9 +476,12 @@ void fn_800B9BF4(UObject* pObj, f32 (*mBone)[4], f32 (*mScale)[4], f32* pPos) {
     LLMath_CopyMat44(m80, pObj->m80);
 }
 
-// Draw the ball in the create-a-player golfer's hand (bone 0x54), when he holds it: to the
-// 384x528 target when bTarget, else to the screen.
-void fn_800B9CF0(u8 bTarget) {
+// Draws the ball in the Create-A-Player menu golfer's hand (bone 0x54) when he holds it, into the
+// 384 x 528 target when bTarget, else to the screen (512 x 448). Object 10000 is always drawn;
+// 10030 and 10040 only while a logo is on the ball (FE_CrAPBall_SetLogo). The ball sits at the
+// bone's offset (0, 0, -2) with scale 1 on each axis (lbl_802821C8, lbl_802821CC, lbl_802814EC;
+// lbl_802814F0..lbl_802814F8).
+void FE_CrAPBall_Render(u8 bTarget) {
     f32 vPos[4];
     f32 mScale[4][4];
     f32 (*mBone)[4];
@@ -467,14 +508,14 @@ void fn_800B9CF0(u8 bTarget) {
         DS_vEnableZBufferUpdate(1);
         RenderState_Flush();
         if (lbl_802821E0 != NULL) {
-            fn_800B9BF4(lbl_802821E0, mBone, mScale, vPos);
+            FE_CrAPBall_DrawObject(lbl_802821E0, mBone, mScale, vPos);
         }
         if (lbl_802814E8) {
             if (lbl_802821DC != NULL) {
-                fn_800B9BF4(lbl_802821DC, mBone, mScale, vPos);
+                FE_CrAPBall_DrawObject(lbl_802821DC, mBone, mScale, vPos);
             }
             if (lbl_802821D8 != NULL) {
-                fn_800B9BF4(lbl_802821D8, mBone, mScale, vPos);
+                FE_CrAPBall_DrawObject(lbl_802821D8, mBone, mScale, vPos);
             }
         }
         RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
@@ -484,9 +525,10 @@ void fn_800B9CF0(u8 bTarget) {
     }
 }
 
-// Put the logo szBall on the held ball: its texture's levels are copied over the "logoea"
-// texture. NULL hides the logo layers instead.
-void fn_800B9EB8(char* szBall) {
+// Puts ball logo szBall on the menu golfer's ball: that texture of the 'BALF' bank has each of its
+// levels copied over the texture "logoea" and the logo layers are shown. NULL hides the logo layers
+// instead. Nothing without the bank, without a "logoea" texture, or when the bank has no such logo.
+void FE_CrAPBall_SetLogo(char* szBall) {
     u64       uLogo;
     u64       uSlot;
     TexBank*  pSlotBank;
