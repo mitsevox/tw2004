@@ -10,15 +10,15 @@
 #include "frontend/fe.h"
 #include "core/gba.h"
 
-s32  fn_80122AF0(s32 nChan);
-s32  fn_80122BCC(s32 nChan);
+s32  Gba_ReadHandshakeCode(s32 nChan);
+s32  Gba_SendGameCode(s32 nChan);
 s32  GbaReadOnline(s32 nChan, u32* pWord);
 s32  GbaWriteOnline(s32 nChan, u32* pCmd);
 void GbaCommunication(s32 nChan, s32 nCmd, s32 nStat);
 void GbaSetport(s32 nChan);
-void fn_80123C2C(s32 nChan);
-void fn_80123CBC(s32 a, s32 b);
-void fn_80123E34(void);
+void Gba_SendContextDiffer(s32 nChan);
+void Gba_StepPorts(s32 a, s32 b);
+void Gba_ReadPads(void);
 s32  GbaReadContext(s32 nChan);
 void GbaOpen(s32 nChan);
 void Gba_SetState(s32 v);
@@ -53,8 +53,10 @@ s32 gGbaSendCashPending;
 s32 gGbaRewardsUnlocked;
 s32 gGbaUnlocksGranted;
 
-// The check byte of a port's key: a CRC-style sum over its two bytes, with the polynomial 0xCD.
-u32 fn_801228E0(u32 uValue) {
+// The check byte of the two bytes in the low 16 bits of uValue: a CRC-8 with the polynomial 0xCD
+// (0x1CD with its top bit), the low byte first, each byte from its top bit, then eight zero bits.
+// It guards the port keys (Gba_InitChannels) and the GBA's pad words (Gba_ReadPads).
+u32 Gba_CalcCheckByte(u32 uValue) {
     u32 uSum = 0;
     u32 uBit;
     int i;
@@ -93,9 +95,11 @@ u32 fn_801228E0(u32 uValue) {
     return uSum & 0xFF;
 }
 
-// Every port starts unlinked, with its key: 0x40 + the port, then 0xDF for an odd port and 0x8F
-// for ports 2 and 3, then the check byte of those two.
-void fn_801229F8(void) {
+// Unlinks every port (step 0) and makes its key (uKey): 0x40 + the port in the top byte, then 0xDF
+// for ports 1 and 3, then 0x8F for ports 2 and 3, then the check byte of those two
+// (Gba_CalcCheckByte). Also clears n4C, n50 and the new-pad-word flag n64, marks the probe result
+// u5C as SI_ERROR_UNKNOWN (0x40), and sets link state 0x12 once per port. Called by Gba_Init.
+void Gba_InitChannels(void) {
     int i;
 
     for (i = 0; i < GBA_NUM_CHANNELS; i++) {
@@ -108,13 +112,16 @@ void fn_801229F8(void) {
         gGbaChannels[i].uKey = (i + 0x40) << 24;
         gGbaChannels[i].uKey |= (i % 2 ? 0xDF : 0) << 16;
         gGbaChannels[i].uKey |= (i / 2 ? 0x8F : 0) << 8;
-        gGbaChannels[i].uKey |= fn_801228E0(((gGbaChannels[i].uKey >> 16) & 0xFF) |
+        gGbaChannels[i].uKey |= Gba_CalcCheckByte(((gGbaChannels[i].uKey >> 16) & 0xFF) |
                                             (gGbaChannels[i].uKey & 0xFF00));
     }
 }
 
-// Waits (up to 100 ms) for the GBA to offer its handshake word, and reads it into n4C.
-s32 fn_80122AF0(s32 nChan) {
+// The first step of the handshake (GbaReadContext): waits up to 100 ms for the GBA's status to be
+// exactly 0x28 (GBA_JSTAT_PSF1 | GBA_JSTAT_SEND: a word waiting), then reads that word, the code
+// the GBA answers with, into n4C. 1: read; 0: a status call or the read failed, or the wait ran
+// out.
+s32 Gba_ReadHandshakeCode(s32 nChan) {
     u32 uWord;
     u32 uStart = OSGetTick();
 
@@ -136,9 +143,11 @@ s32 fn_80122AF0(s32 nChan) {
     return 1;
 }
 
-// Waits for the GBA to take a word, sends it the disc's game code, then waits for its answer
-// status (0x30).
-s32 fn_80122BCC(s32 nChan) {
+// The second step of the handshake (GbaReadContext): waits up to 100 ms for the GBA's status to be
+// exactly 0x20 (GBA_JSTAT_PSF1), sends it the first word of the disc's ID (gGbaDiscID: its game
+// code), then waits up to 100 ms for the status 0x30 (GBA_JSTAT_PSF1 | GBA_JSTAT_PSF0). 1: done; 0:
+// a call failed or a wait ran out.
+s32 Gba_SendGameCode(s32 nChan) {
     u32 uStart = OSGetTick();
 
     for (;;) {
@@ -169,7 +178,11 @@ s32 fn_80122BCC(s32 nChan) {
     }
 }
 
-// Sends the GBA one word once it can take one ("GbaWriteOnline").
+// Sends a GBA that is online one word, *pCmd ("GbaWriteOnline"). It waits up to 100 ms for the GBA
+// to have taken the last word (GBA_JSTAT_RECV clear) while both general flags hold (0x30:
+// GBA_JSTAT_PSF1 | GBA_JSTAT_PSF0, the GBA program is running the link), writes the word and checks
+// the flags again. 1: sent; 0: a call failed, the flags dropped or the wait ran out (each reported
+// with OSReport).
 s32 GbaWriteOnline(s32 nChan, u32* pCmd) {
     u32 uStart = OSGetTick();
 
@@ -201,7 +214,10 @@ s32 GbaWriteOnline(s32 nChan, u32* pCmd) {
     return 1;
 }
 
-// Reads one word from the GBA once it has one ("GbaReadOnline").
+// Reads one word from a GBA that is online into *pWord ("GbaReadOnline"). It waits up to 100 ms for
+// the GBA to have a word waiting (GBA_JSTAT_SEND) while both general flags hold (0x30:
+// GBA_JSTAT_PSF1 | GBA_JSTAT_PSF0), reads it and checks the flags again. 1: read; 0: a call failed,
+// the flags dropped or the wait ran out (each reported with OSReport).
 s32 GbaReadOnline(s32 nChan, u32* pWord) {
     u32 uStart = OSGetTick();
 
@@ -233,22 +249,24 @@ s32 GbaReadOnline(s32 nChan, u32* pWord) {
     return 1;
 }
 
-// The handshake: the GBA answers with the disc's game code or 0x42545745, is sent the game code,
-// asked for its context and read it in eight words ("GbaReadContext").
+// The handshake with a GBA that answered ("GbaReadContext"): the GBA must offer the disc's game
+// code or the four letters BTWE (0x42545745) (Gba_ReadHandshakeCode); it is sent the game code
+// (Gba_SendGameCode) and the context request (0x60000000, FROMGC_REQUEST_CONTEXT), and its
+// 0x20-byte context is read in eight words into got. 1: read; 0: a step failed.
 s32 GbaReadContext(s32 nChan) {
     u32* pWord;
     u32 uCmd;
     GbaChannel* pCh;
     u32 i;
 
-    if (fn_80122AF0(nChan) == 0) {
+    if (Gba_ReadHandshakeCode(nChan) == 0) {
         return 0;
     }
     pCh = &gGbaChannels[nChan];
     if (memcmp(&pCh->n4C, gGbaDiscID, 4) != 0 && gGbaChannels[nChan].n4C != 0x42545745) {
         return 0;
     }
-    if (fn_80122BCC(nChan) == 0) {
+    if (Gba_SendGameCode(nChan) == 0) {
         return 0;
     }
     uCmd = 0x60000000;
@@ -267,9 +285,13 @@ s32 GbaReadContext(s32 nChan) {
     return 1;
 }
 
-// Opens the link on a port from the GBA's context: a GBA with none gets a new one (sent in state 3,
-// GbaSetport); one whose context is ours is sent a new tick and is linked once it echoes it; any
-// other is sent its own tick back and the port goes to state 4 (the contexts differ).
+// Opens the link on a port from the context the GBA sent (got) ("GbaOpen"); got's tick is first
+// replaced with ours. With got.b0 clear: a GBA with no context (got.b3 0) gets a new one (the port,
+// gGbaInitTick, got's b2 and nC, a fresh tick) and the port goes to step 3 (GbaSetport sends it); a
+// GBA whose context equals ours, with the tick we sent or last used, is sent a new tick and is
+// linked once it echoes it (step 2, link state 4); any other is sent its own tick back and the port
+// goes to step 4 (Gba_SendContextDiffer). With got.b0 set nothing happens and the port stays in
+// step 1.
 void GbaOpen(s32 nChan) {
     GbaChannel* pCh;
     u32* pSentTick;
@@ -333,7 +355,10 @@ void GbaOpen(s32 nChan) {
     }
 }
 
-void fn_8012332C(s32 nChan) {
+// Port step 1 (a GBA answered): resets the GBA (GBAReset); when that works, runs the handshake
+// (GbaReadContext) and opens the link (GbaOpen), or sets link state 3 when the context could not be
+// read. A failed reset or handshake leaves the port in step 1, tried again on the next poll.
+void Gba_ResetAndOpen(s32 nChan) {
     if (GBAReset(nChan, &gGbaChannels[nChan].uStatus) == 0) {
         if (GbaReadContext(nChan)) {
             GbaOpen(nChan);
@@ -343,10 +368,16 @@ void fn_8012332C(s32 nChan) {
     }
 }
 
-// Talks to a linked GBA ("GbaCommunication"): reads its d-pad word (u58), sends it every port's key,
-// then runs one request: 0x70 reads the cash the GBA holds, 0x90 also moves n6C of it to the
-// GameCube, 0xD0 sends n6C of cash to the GBA, 0xB0 sends stat nStat (0-3), 0x71 and 0xD3 ask the
-// GBA to save its cash and stats, and 0xD1 reads its unlock mask. Any failed command unlinks the port.
+// Port step 2 (linked), once a poll ("GbaCommunication"): asks for the GBA's pad word (0x10000000,
+// FROMGC_REQUEST_PADDATA; the answer 0x20xxxxxx goes into u58 with n64 set), sends it every port's
+// key (uKey, "POSITION DATA"), then runs request nCmd, each answer a 24-bit value under a reply
+// byte: 0x70 reads the cash on the GBA into u68; 0x90 does that and, if there is some, asks the GBA
+// to hand over n6C of it (FROMGC_REQUEST_CASHXFER), n6C becoming the amount it confirms; 0xD0 sends
+// n6C of cash to the GBA (FROMGC_REQUEST_CASH2GBA), n6C becoming the amount it confirms; 0xB0 sends
+// the current profile's stat nStat (0 best round, 1 holes in one, 2 longest drive, 3 longest putt,
+// else 0) and puts the GBA's value of it in n70; 0x71 and 0xD3 ask the GBA to save its cash and its
+// stats; 0xD1 reads its unlock mask into n74 (nothing sends 0xD1 in this build); 0 sends nothing
+// more. A failed command unlinks the port (step 0) and sets link state 0x12.
 void GbaCommunication(s32 nChan, s32 nCmd, s32 nStat) {
     u32 uCmd = 0x10000000;
     u32 uWord;
@@ -535,8 +566,9 @@ void GbaCommunication(s32 nChan, s32 nCmd, s32 nStat) {
     }
 }
 
-// Sends the GBA the "set port" command and our context in eight words, then reads its context
-// back: the port is linked ("GbaSetport").
+// Port step 3 ("GbaSetport"): sends the GBA the set-port command (0x30000000, FROMGC_SETPORT) and
+// our new context (sent) in eight words, then reads its context back into got; the port is linked
+// (step 2, link state 4). A failed command unlinks it (step 0, link state 0x12).
 void GbaSetport(s32 nChan) {
     u32 uCmd = 0x30000000;
     u32 i;
@@ -569,8 +601,10 @@ void GbaSetport(s32 nChan) {
     Gba_SetState(4);
 }
 
-// Sends the port the "context differs" command and unlinks it.
-void fn_80123C2C(s32 nChan) {
+// Port step 4: tells the GBA its context is not ours (0x50000000, FROMGC_CONTEXT_DIFFER) and
+// unlinks the port (step 0) with link state 0x10, whether the command went through or not. Its
+// error text says "GbaSetport", copied from there.
+void Gba_SendContextDiffer(s32 nChan) {
     u32 uCmd = 0x50000000;
 
     if (GbaWriteOnline(nChan, &uCmd) == 0) {
@@ -583,11 +617,13 @@ void fn_80123C2C(s32 nChan) {
     }
 }
 
-// Moves every port's link on by one step. A port without a GBA (SIProbe type 0x40000), or other
-// than the port already being worked on, is unlinked. An unlinked port waits up to 800 ms for the
-// GBA to answer, then the port is opened (fn_8012332C), run (GbaCommunication), given our context
-// (GbaSetport) or told the contexts differ (fn_80123C2C).
-void fn_80123CBC(s32 a, s32 b) {
+// Moves each port's link on one step (GbaChannel.n0); a and b are the request a linked port runs
+// (GbaCommunication's nCmd and nStat; 0: none). A port whose last probe (u5C, Gba_ReadPads) found
+// no GBA (SI_GBA, 0x40000), or any port but gGbaPortInUse while that is set, is unlinked. Steps: 0
+// waits up to 800 ms (keeping the sound and the disc-error screen going) for the GBA to answer a
+// status call, then goes to step 1 with link state 2 and makes the port gGbaPortInUse; 1
+// Gba_ResetAndOpen; 2 GbaCommunication; 3 GbaSetport; 4 Gba_SendContextDiffer.
+void Gba_StepPorts(s32 a, s32 b) {
     GbaChannel* pCh;
     s32 nChan = 0;
     u32 uStart;
@@ -616,7 +652,7 @@ void fn_80123CBC(s32 a, s32 b) {
                 }
                 break;
             case 1:
-                fn_8012332C(nChan);
+                Gba_ResetAndOpen(nChan);
                 break;
             case 2:
                 GbaCommunication(nChan, a, b);
@@ -625,7 +661,7 @@ void fn_80123CBC(s32 a, s32 b) {
                 GbaSetport(nChan);
                 break;
             case 4:
-                fn_80123C2C(nChan);
+                Gba_SendContextDiffer(nChan);
                 break;
             default:
                 OSPanic("gbacable.c", 903, "Unkonwn status.\n");
@@ -641,10 +677,14 @@ static inline u32* fn_80123E34_Read(GbaChannel* pCh) {
     return &pCh->u5C;
 }
 
-// Reads the pads. A linked GBA's d-pad (u58, when new and its check byte holds) replaces its port's
-// buttons. An unlinked port is probed for what is plugged in (waiting up to 800 ms for a GBA while
-// no port is being worked on); ports whose probe gave 8 or 0x40 are reset.
-void fn_80123E34(void) {
+// Reads the pads into gGbaPads (nothing else reads them). On a linked port, a new pad word from the
+// GBA (u58, n64 set) whose check byte holds replaces the port's buttons with the GBA's d-pad (bits
+// 20-23: right, left, up, down, as the pad's right, left, up and down bits). A port in step 0 with
+// no GBA transfer running (GBAGetProcessStatus not GBA_BUSY) is probed (SIProbe into u5C): with no
+// port in use the probe is repeated for up to 800 ms until it finds a GBA (SI_GBA), else ports
+// other than the one in use are probed once. Unlinked ports whose last probe gave
+// SI_ERROR_NO_RESPONSE (8) or SI_ERROR_UNKNOWN (0x40) are reset (PADReset).
+void Gba_ReadPads(void) {
     int nChan;
     u32 uReset = 0;
     GbaChannel* pCh;
@@ -664,7 +704,7 @@ void fn_80123E34(void) {
         pMask = &gGbaPadResetBits[nChan];
         if (pCh->n0 == 2) {
             if (pCh->n64 != 0) {
-                if ((u8)pCh->u58 == fn_801228E0(((pCh->u58 >> 16) & 0xFF) | (pCh->u58 & 0xFF00))) {
+                if ((u8)pCh->u58 == Gba_CalcCheckByte(((pCh->u58 >> 16) & 0xFF) | (pCh->u58 & 0xFF00))) {
                     uKey = pCh->u58;
                     pPad->uButtons = (((uKey >> 23) & 1) ? 4 : 0) |
                                      ((((uKey >> 22) & 1) ? 8 : 0) |
@@ -699,15 +739,15 @@ void fn_80123E34(void) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_801229F8();
-void fn_80123FF8(void);
+void Gba_InitChannels();
+void Gba_Init(void);
 s32 OSGetResetButtonState();
 s32 OSResetSystem(s32, s32, s32);
-void fn_8012402C(void);
+void Gba_PollLink(void);
 void Gba_SetState(s32 v);
 s32 Gba_GetState(void);
-void fn_8012409C(void);
-void fn_801240A8(void);
+void Gba_MarkUnlocksGranted(void);
+void Gba_UnlockProfileRewards(void);
 void fn_801241AC(s32 v);
 s32 fn_801241B4(void);
 void fn_801241BC(s32 v);
@@ -728,16 +768,23 @@ void fn_8012422C(void);
 void fn_80124238(s32 arg0, s32 arg1);
 s32 fn_80124280(s32 arg0);
 
-void fn_80123FF8(void) {
+// Sets the link code up (GM_vGbaStartLink): keeps the disc's ID (gGbaDiscID) and the start tick
+// (gGbaInitTick), unlinks every port and makes its key (Gba_InitChannels), and starts the GBA
+// library (GBAInit).
+void Gba_Init(void) {
     gGbaDiscID = DVDGetCurrentDiskID();
     gGbaInitTick = OSGetTick();
-    fn_801229F8();
+    Gba_InitChannels();
     GBAInit();
 }
 
-void fn_8012402C(void) {
-    fn_80123E34();
-    fn_80123CBC(0, 0);
+// One poll of the link with no request: reads the pads (Gba_ReadPads) and steps the ports
+// (Gba_StepPorts(0, 0)). It also watches the reset button: while it is held gGbaResetPressed is
+// set, and the first poll after it is let go resets the console (OSResetSystem(0, 1, 0)). Called by
+// fn_801242D0 and, inside wait loops, gomainloop.c's fn_8006C63C.
+void Gba_PollLink(void) {
+    Gba_ReadPads();
+    Gba_StepPorts(0, 0);
     if (OSGetResetButtonState() != 0) {
         gGbaResetPressed = 1;
         return;
@@ -747,7 +794,11 @@ void fn_8012402C(void) {
     }
 }
 
-// Sets the GBA link state (the link code uses 3, 4 and 0x12; -1 at start).
+// Sets the GBA link state (gGbaLinkState), which fn_801242D0 runs once a frame and the menus read
+// (GM_vGbaGetLinkState): -1 never started; 0 start (GM_vGbaStartLink); 1 looking for a GBA; 2 a GBA
+// answered; 3 its context could not be read; 4 linked; 5 linked, idle; 6 take its cash, then 7; 8
+// swap stats, then 9; 0xC-0xF raise a pending request; 0x10 the contexts differ; 0x11 no GBA
+// answered in 4 s; 0x12 a command failed, or the menus cancelled.
 void Gba_SetState(s32 v) {
     gGbaLinkState = v;
 }
@@ -757,11 +808,15 @@ s32 Gba_GetState(void) {
     return gGbaLinkState;
 }
 
-void fn_8012409C(void) {
+// Sets gGbaUnlocksGranted (GM_vGbaGrantUnlocks); nothing in this build reads it.
+void Gba_MarkUnlocksGranted(void) {
     gGbaUnlocksGranted = 1;
 }
 
-void fn_801240A8(void) {
+// The Game Boy Advance link's unlocks in the current profile: the last course (aCourseUnlocked[22])
+// and rewards 0-17. Sets gGbaRewardsUnlocked, which nothing reads. GM_vGbaGrantUnlocks calls it
+// once per profile.
+void Gba_UnlockProfileRewards(void) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
 
     // the last course and the first 18 rewards
@@ -929,7 +984,7 @@ void fn_801242D0(void) {
         Gba_SetState(1);
     } else if (Gba_GetState() == 1) {
         if (gGbaSearchDelayFrames == 0) {
-            fn_8012402C();
+            Gba_PollLink();
         } else {
             gGbaSearchDelayFrames--;
         }
@@ -937,15 +992,15 @@ void fn_801242D0(void) {
             Gba_SetState(0x11);
         }
     } else if (Gba_GetState() == 2) {
-        fn_8012402C();
+        Gba_PollLink();
     } else if (Gba_GetState() == 4) {
-        fn_8012402C();
+        Gba_PollLink();
         fn_80124138(0);
         Gba_SetState(5);
     } else if (Gba_GetState() == 5) {
-        fn_8012402C();
+        Gba_PollLink();
         if (fn_801241B4()) {
-            fn_80123CBC(0xD0, 0);
+            Gba_StepPorts(0xD0, 0);
             pProfile = FE_GetCurrentProfile();
             pProfile->nCurrentCash -= fn_8012411C();
             fn_80124154();
@@ -958,11 +1013,11 @@ void fn_801242D0(void) {
             pProfile->nLongestPutt = fn_80124280(3);
             fn_801241BC(0);
         } else if (fn_801241E4()) {
-            fn_80123CBC(0x71, 0);
+            Gba_StepPorts(0x71, 0);
             fn_801241FC(0);
             fn_801241DC(0);
         } else if (fn_801241F4()) {
-            fn_80123CBC(0xD3, 0);
+            Gba_StepPorts(0xD3, 0);
             fn_8012420C(0);
             fn_801241EC(0);
         }
@@ -982,11 +1037,11 @@ void fn_801242D0(void) {
             fn_8012420C(0);
         }
     } else if (Gba_GetState() == 6) {
-        fn_80123CBC(0x90, 0);
+        Gba_StepPorts(0x90, 0);
         if (Gba_GetState() != 0x12) {
             pProfile = FE_GetCurrentProfile();
             pProfile->nCurrentCash += fn_8012411C();
-            fn_80123CBC(0x71, 0);
+            Gba_StepPorts(0x71, 0);
             fn_80124138(0);
             Gba_SetState(7);
         }
@@ -1000,7 +1055,7 @@ void fn_801242D0(void) {
 
         // the best round: when ours is unset (<= 0), the GBA's if it is set (not 0 or 0xFF);
         // else the lower of the two
-        fn_80123CBC(0xB0, 0);
+        Gba_StepPorts(0xB0, 0);
         if (Gba_GetState() == 0x12) {
             bFailed = 1;
         }
@@ -1015,21 +1070,21 @@ void fn_801242D0(void) {
         }
 
         // the GBA's count is added
-        fn_80123CBC(0xB0, 1);
+        Gba_StepPorts(0xB0, 1);
         if (Gba_GetState() == 0x12) {
             bFailed = 1;
         }
         pProfile->nHolesInOne += fn_80124190();
 
         // the longest drive and the longest putt: the higher
-        fn_80123CBC(0xB0, 2);
+        Gba_StepPorts(0xB0, 2);
         if (Gba_GetState() == 0x12) {
             bFailed = 1;
         }
         if (fn_80124280(2) < fn_80124190()) {
             pProfile->nLongestDrive = fn_80124190();
         }
-        fn_80123CBC(0xB0, 3);
+        Gba_StepPorts(0xB0, 3);
         if (Gba_GetState() == 0x12) {
             bFailed = 1;
         }
@@ -1037,13 +1092,13 @@ void fn_801242D0(void) {
             pProfile->nLongestPutt = fn_80124190();
         }
         if (bFailed == 0) {
-            fn_80123CBC(0xD3, 0);
+            Gba_StepPorts(0xD3, 0);
             Gba_SetState(9);
         }
     } else if (Gba_GetState() == 7) {
-        fn_8012402C();
+        Gba_PollLink();
     } else if (Gba_GetState() == 9) {
-        fn_8012402C();
+        Gba_PollLink();
     } else if (Gba_GetState() == 0xC) {
         fn_801241AC(1);
         Gba_SetState(5);

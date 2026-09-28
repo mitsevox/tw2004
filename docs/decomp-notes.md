@@ -428,7 +428,7 @@ They will be sorted into the sections below.
 
 - **[verified] A pointer local one callee-saved register too low: assign it from a one-line static
   inline that returns the address** (`static inline Player* F(int n) { return &gPlayers[fn(n)]; }`):
-  BreakLine_Reset 19 diffs -> 0, gbacable fn_80123E34 22 -> 11 (then a declaration swap -> 0), Skin
+  BreakLine_Reset 19 diffs -> 0, gbacable Gba_ReadPads 22 -> 11 (then a declaration swap -> 0), Skin
   SKN_SwapDesc 16 -> 7. The same for a value: `eLayout` read through `static inline u16 ReadU16(u16* p,
   int i)` moved r27 -> r31 (ShaderObjectsData fn_80074628 exact). Mark each `// fake match:`.
 - **[verified] `a[i] = a[i] + base` with value and offset in each other's registers:** three statements

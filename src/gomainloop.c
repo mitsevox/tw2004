@@ -277,7 +277,7 @@ void fn_8011E170(void);
 void fn_8011E3B0(void);
 void fn_8011E6E8(void);
 void fn_8011E974(void);
-void fn_8012402C(void);
+void Gba_PollLink(void);
 s32  Gba_GetState(void);
 void fn_801242D0(void);
 void EASBio_InitOnce(void);
@@ -370,11 +370,11 @@ f32 fn_8006C630(void) {
 }
 
 // Run inside wait loops (memory card, AnimStream): the sound (Gaud_Cycle), the GBA cable
-// (fn_8012402C, unless Gba_GetState is -1, 0x11 or 0x12) and the reset button (latched).
+// (Gba_PollLink, unless Gba_GetState is -1, 0x11 or 0x12) and the reset button (latched).
 void fn_8006C63C(void) {
     Gaud_Cycle();
     if (Gba_GetState() != -1 && Gba_GetState() != 0x12 && Gba_GetState() != 0x11) {
-        fn_8012402C();
+        Gba_PollLink();
     }
     if (!lbl_80281B8E) {
         lbl_80281B8E = OSGetResetButtonState();

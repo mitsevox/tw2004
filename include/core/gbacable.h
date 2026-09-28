@@ -32,7 +32,7 @@ typedef struct GbaChannel {
     u32  u48;                   // 0x48  the tick of the context in use
     s32  n4C;                   // 0x4C  the word the GBA answers the handshake with
     s32  n50;                   // 0x50
-    u32  uKey;                  // 0x54  0x40 + port, two port bits and their check byte (fn_801228E0)
+    u32  uKey;                  // 0x54  0x40 + port, two port bits and their check byte (Gba_CalcCheckByte)
     u32  u58;                   // 0x58  from the GBA: four d-pad bits (20-23) and a check byte
     u32  u5C;                   // 0x5C  what SIProbe finds on the port (0x40000: a GBA); 0x40 at start
     u8   unk60[0x64 - 0x60];
@@ -46,8 +46,8 @@ LAYOUT_ASSERT(GbaChannel, 0x78);
 
 extern GbaChannel gGbaChannels[GBA_NUM_CHANNELS];
 extern DVDDiskID* gGbaDiscID;  // the disc's ID: its game code goes to the GBA in the handshake
-extern u32 gGbaInitTick;        // the tick the link code started at (fn_80123FF8)
-extern PadStatus gGbaPads[GBA_NUM_CHANNELS];   // the pads as fn_80123E34 reads them
+extern u32 gGbaInitTick;        // the tick the link code started at (Gba_Init)
+extern PadStatus gGbaPads[GBA_NUM_CHANNELS];   // the pads as Gba_ReadPads reads them
 extern const u32 gGbaPadResetBits[GBA_NUM_CHANNELS];   // each port's PADReset bit (0x80000000 >> port)
 
 // Time-base ticks in a millisecond (the time base runs at a quarter of the bus clock, which the OS

@@ -62,8 +62,8 @@ void GameModeDriverPGATour_PrepareForTeeOff(void);                 // GameModeDr
 u8*  GameMode26_StartEvent(void);                 // CharSliders.c
 void GameMode22_StartEvent(void);                 // GameMode22.c
 s32  Gba_GetState(void);                 // gbacable.c
-void fn_8012409C(void);                 // gbacable.c
-void fn_801240A8(void);                 // gbacable.c
+void Gba_MarkUnlocksGranted(void);                 // gbacable.c
+void Gba_UnlockProfileRewards(void);                 // gbacable.c
 s32  fn_801255C4(s32* pPos);            // EASportsBio.c
 u8   PasswordManager_TestPassword(char* szCode);  // PasswordManager.c
 void GameMode22_SetNumDrives(s32 n);                // GameMode22.c: sets gGameMode22.nDrives
@@ -89,7 +89,7 @@ void Gaud_PlayUISound(int n);
 void TrophyRoom_GetTourWinStatus(MsgArg* pArgs, MsgArg* pResult);
 void TrophyRoom_GetPlayerOfMonthStatus(MsgArg* pArgs, MsgArg* pResult);
 void TrophyRoom_GetRTEAwardStatus(MsgArg* pArgs, MsgArg* pResult);
-void fn_80123FF8(void);
+void Gba_Init(void);
 void Gba_SetState(s32 v);
 s32  fn_8012411C(void);
 void fn_80124138(s32 n);
@@ -99,7 +99,7 @@ s32  fn_801241CC(void);
 void fn_801241D4(s32 v);
 void fn_8012421C(s32 v);
 s32  fn_80124224(void);
-void fn_80123CBC(s32 a, s32 b);
+void Gba_StepPorts(s32 a, s32 b);
 
 // The other files' message handlers in the table (the Create-A-Player screens, the logo editor,
 // the PGA TOUR screens, the stats screen, the EA Sports Bio...).
@@ -5649,11 +5649,11 @@ void GM_vGetDiscChangeStatus(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Front-end message 592: starts the Game Boy Advance link: the link code is set up (fn_80123FF8:
+// Front-end message 592: starts the Game Boy Advance link: the link code is set up (Gba_Init:
 // the disc's ID, the start tick, GBAInit) and the link state goes to 0, from which fn_801242D0
 // starts looking for a GBA.
 void GM_vGbaStartLink(MsgArg* pArgs, MsgArg* pResult) {
-    fn_80123FF8();
+    Gba_Init();
     Gba_SetState(0);
 }
 
@@ -5684,14 +5684,14 @@ void GM_vGbaCancelLink(MsgArg* pArgs, MsgArg* pResult) {
 // Front-end message 629: the Game Boy Advance link's unlocks, once per profile. When bit 1 of the
 // current profile's a10548 is still clear (the bit also unlocks the Create-A-Player items of lock
 // kind 2, FE_Manager.c fn_80078008): the last course (22) and rewards 0..17 are unlocked
-// (fn_801240A8), gbacable.c's gGbaUnlocksGranted is set (fn_8012409C), the bit is set and the answer is
-// 1. Else 0.
+// (Gba_UnlockProfileRewards), gbacable.c's gGbaUnlocksGranted is set (Gba_MarkUnlocksGranted), the
+// bit is set and the answer is 1. Else 0.
 void GM_vGbaGrantUnlocks(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
 
     if (!fn_80058304(pProfile, 1)) {
-        fn_801240A8();
-        fn_8012409C();
+        Gba_UnlockProfileRewards();
+        Gba_MarkUnlocksGranted();
         fn_800582C4(pProfile, 1, 1);
         pResult->i = 1;
         return;
@@ -5749,11 +5749,11 @@ void GM_vGbaReadCashAndStats(MsgArg* pArgs, MsgArg* pResult) {
     u32 i;
 
     if (Gba_GetState() != 18 && Gba_GetState() != -1) {
-        fn_80123CBC(0x70, 0);
+        Gba_StepPorts(0x70, 0);
         if (Gba_GetState() != 18 && Gba_GetState() != -1) {
             *(s32*)pArgs[0].p = fn_80124174();
             for (i = 0; i < 4; i++) {
-                fn_80123CBC(0xB0, i);
+                Gba_StepPorts(0xB0, i);
                 if (Gba_GetState() == 18 || Gba_GetState() == -1) break;
                 *(s32*)pArgs[1 + i].p = fn_80124190();
             }
