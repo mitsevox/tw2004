@@ -356,7 +356,7 @@ typedef struct Player {
     f32  vCBC[3];               // 0xCBC  a vector (the run's velocity?): the first-person camera's step is
                                 //        three times the length of its x and z
     u8   unkCC8[0xCD0 - 0xCC8];
-    s32  nCD0;                  // 0xCD0  cleared per game (fn_800F2030)
+    s32  nCD0;                  // 0xCD0  cleared per game (GameModeSkillZoneBase_ClearPerShotData)
     s32  aCD4[20];              // 0xCD4
     s32  nD24;                  // 0xD24  mode 12: a bonus meter, 0..100
     s32  nD28[18];              // 0xD28  per hole
@@ -368,7 +368,7 @@ typedef struct Player {
     s32  nDD8;                  // 0xDD8  a count a challenge medal can ask for (GameMode5)
     s32  nDDC;                  // 0xDDC
     s32  nDE0;                  // 0xDE0
-    s32  nDE4[40];              // 0xDE4  per target (fn_800F1D34), 0 = not yet hit
+    s32  nDE4[40];              // 0xDE4  per target (GameModeSkillZoneBase_GetGreenTargetted), 0 = not yet hit
     s8   nTarget;               // 0xE84  the current target (set in GameTargets.c)
     u8   unkE85[3];
     s32  nE88;                  // 0xE88  below 5: still in (mode 15)

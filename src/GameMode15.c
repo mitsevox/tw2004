@@ -169,9 +169,9 @@ void fn_800F3EBC(int nPlayer) {
         nSurface = gPlayers[nPlayer].ball.nSurface;
         fLength = fn_800D0550(nPlayer);
         fn_800F49E8(nSurface, &lbl_80282380);
-        if (nSurface >= 0x85 && nSurface <= 0x90 && !fn_800F2788(nPlayer, fLength)) {
-            nTarget = fn_800F1C74(nPlayer);
-            nRank = fn_800F1E58(nSurface);
+        if (nSurface >= 0x85 && nSurface <= 0x90 && !GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
+            nTarget = GameModeSkillZoneBase_GetGreenIndexHit(nPlayer);
+            nRank = GameModeSkillZoneBase_GetBullsEyeColor(nSurface);
             gPlayers[nPlayer].nDE4[nTarget]++;
             gPlayers[nPlayer].aDC4[3]++;
             if (lbl_80282380 != 0) {
@@ -275,7 +275,7 @@ void fn_800F3EBC(int nPlayer) {
                         fn_800A30E4(nMult + 7, &gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
                     }
                 }
-                switch (fn_800F1E58(nSurface)) {
+                switch (GameModeSkillZoneBase_GetBullsEyeColor(nSurface)) {
                 case 0:
                     nMsg = 0x1D;
                     break;
@@ -329,7 +329,7 @@ void fn_800F3EBC(int nPlayer) {
         }
     }
     if (nMsg != -1) {
-        fn_800F263C(nMsg);
+        GameModeSkillZoneBase_StartComment(nMsg);
     }
 }
 
@@ -339,7 +339,7 @@ void fn_800F3EBC(int nPlayer) {
 void fn_800F4584(void) {
     int i;
     lbl_8028237D = 0;
-    fn_800F2030();
+    GameModeSkillZoneBase_ClearPerShotData();
     GameModeStroke_SetupNextGolfer();
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if ((s8)GOLFERSTATE_GetCurrentState(i) == 1) {
@@ -347,23 +347,23 @@ void fn_800F4584(void) {
             if (lbl_8028238C == i) {
                 lbl_8028238C = 5;
                 if (!(Misc_RandFunc(0) & 1)) {
-                    fn_800F2958(0x23, 0);
+                    GameModeSkillZoneBase_PlayComment(0x23, 0);
                 } else {
-                    fn_800F2958(0x24, 0);
+                    GameModeSkillZoneBase_PlayComment(0x24, 0);
                 }
             }
             if (lbl_8028238C != 5 || PLAYER(i)->nDC0 == 0) {
                 if (lbl_8028238C != 5) {
                     PLAYER(i)->nTarget = lbl_80282384;
                 }
-                fn_800F1B60(i, (s8)PLAYER(i)->nTarget);
+                GameModeSkillZoneBase_SetCup_AlignGolfer(i, (s8)PLAYER(i)->nTarget);
             }
         }
     }
 }
 
 void fn_800F4698(void) {
-    fn_800F19D4();
+    GameModeSkillZoneBase_SortCupsByDistanceFromTee();
     fn_800F46E4();
 }
 
@@ -373,7 +373,7 @@ void fn_800F46BC(void) {
 }
 
 void fn_800F46E4(void) {
-    fn_800F1EE4();
+    GameModeSkillZoneBase_ClearPerHoleData();
     lbl_8028238C = 5;
     lbl_80282388 = 5;
     lbl_80282384 = 0;
@@ -409,18 +409,18 @@ s32 fn_800F4784(int nPlayer, u8 bCheck) {
 // Previous / next target: only without a leader; with one, the leader's target stays.
 u8 fn_800F47D8(int nPlayer) {
     if (lbl_8028238C == 5) {
-        fn_800F1BD8(nPlayer);
+        GameModeSkillZoneBase_PickPrevTarget(nPlayer);
     } else {
-        fn_800F1ABC(nPlayer, (s8)gPlayers[nPlayer].nTarget);
+        GameModeSkillZoneBase_SetCup(nPlayer, (s8)gPlayers[nPlayer].nTarget);
     }
     return 1;
 }
 
 u8 fn_800F4828(int nPlayer) {
     if (lbl_8028238C == 5) {
-        fn_800F1C34(nPlayer);
+        GameModeSkillZoneBase_PickTarget(nPlayer);
     } else {
-        fn_800F1ABC(nPlayer, (s8)gPlayers[nPlayer].nTarget);
+        GameModeSkillZoneBase_SetCup(nPlayer, (s8)gPlayers[nPlayer].nTarget);
     }
     return 1;
 }
@@ -439,8 +439,8 @@ void fn_800F4894(int nPlayer) {
 }
 
 // The current golfer goes to state 12 and lbl_8028237D is set, so the shot scores nothing and
-// shows text 0xD1 (through GameTargets fn_800F1E1C, from a UI command). With a leader, a letter
-// goes to player 1 if the leader is player 0, else to player 0.
+// shows text 0xD1 (through GameTargets GameModeSkillZoneBase_ShotClockOut, from a UI command). With
+// a leader, a letter goes to player 1 if the leader is player 0, else to player 0.
 void fn_800F48C4(void) {
     GOLFERSTATE_Switch(12, lbl_80282278);   // GS_SIMULATE
     GUI_HideAllToggleUI();

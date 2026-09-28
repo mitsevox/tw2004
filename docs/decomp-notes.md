@@ -1054,8 +1054,8 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   (`C:\dev\scratch\tw\ptr_sweep.py`), 10 became exact. Exception: pointers that are indexed
   (`pViews[k]`) or passed as pointers stay pointers. Likewise `lwzu` / `stbu` / `lbz 0(rN)` on a
   player field means EA repeated `gPlayers[n].field`; a local `Player* p` or `s8* pField` gives
-  `lwz 0xOFF(rN)` instead, and the add comes out in a different place (GameMode10 fn_800F1ABC,
-  fn_800F1B60, fn_800F21B4).
+  `lwz 0xOFF(rN)` instead, and the add comes out in a different place (GameMode10 GameModeSkillZoneBase_SetCup,
+  GameModeSkillZoneBase_SetCup_AlignGolfer, GameModeSkillZoneBase_SetupBonusBall).
 - **[verified] One function can use both.** When the original keeps `&gPlayers[n]` in one saved
   register for the first statements and computes the player offset afresh after the calls, the
   source used a `Player* p` for the first part and `gPlayers[n].field` at the end (GameMode8

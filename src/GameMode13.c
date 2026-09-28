@@ -60,8 +60,8 @@ void fn_800F6A60(void) {
     gpGame->pfn1EC = fn_800F6CE0;
     gpGame->pfn250 = fn_800F7ED8;
     gpGame->pfn254 = fn_800F7EF8;
-    gpGame->pfn264 = fn_800F1BD8;
-    gpGame->pfn258 = fn_800F1C34;
+    gpGame->pfn264 = GameModeSkillZoneBase_PickPrevTarget;
+    gpGame->pfn258 = GameModeSkillZoneBase_PickTarget;
     gpGame->pfn25C = fn_800F7F1C;
     gpGame->pfn268 = fn_800F7FF4;
     gpGame->pfn26C = fn_800F8068;
@@ -174,8 +174,8 @@ void fn_800F6ED4(int nPlayer) {
     nAdded = 0;
     bTime = lbl_802823B8 != 0;
     fLength = fn_800D0550(nPlayer);
-    if (nSurface >= 0x85 && nSurface <= 0x90 && !fn_800F2788(nPlayer, fLength)) {
-        nTarget = fn_800F1C74(nPlayer);
+    if (nSurface >= 0x85 && nSurface <= 0x90 && !GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
+        nTarget = GameModeSkillZoneBase_GetGreenIndexHit(nPlayer);
         gPlayers[nPlayer].nE90++;
         if (gPlayers[nPlayer].nE90 > gPlayers[nPlayer].nE8C) {
             gPlayers[nPlayer].nE8C = gPlayers[nPlayer].nE90;
@@ -185,9 +185,9 @@ void fn_800F6ED4(int nPlayer) {
             fScale *= 0.75f;
         }
         if (nHits == 0) {
-            if (lbl_80282360 - 1 == fn_800F20C0(nPlayer)) {
+            if (lbl_80282360 - 1 == GameModeSkillZoneBase_CountGreensHit(nPlayer)) {
                 fScale = 1.0f;
-                lbl_802823BC = fn_800F2578();
+                lbl_802823BC = GameModeSkillZoneBase_GetHitAllTargetsBonus();
                 lbl_802823BC = GM_Earnings_ComputeBonusModifiers(lbl_802823BC, nPlayer, 1, 1, 1, 0);
                 lbl_802823BC = GM_Earnings_ComputeTOURCardModifiers(lbl_802823BC, nPlayer, 0);
                 GM_Earnings_AwardMoney(nPlayer, lbl_802823BC, 0);
@@ -209,7 +209,7 @@ void fn_800F6ED4(int nPlayer) {
                 fScale = 1.0f;
                 lbl_802823BC += 100;
                 lbl_802823BC *= gPlayers[nPlayer].nDBC;
-                lbl_802823BC = fn_800F266C(lbl_802823BC, nTarget);
+                lbl_802823BC = GameModeSkillZoneBase_ScaleTargetPoints(lbl_802823BC, nTarget);
                 lbl_802823BC = GM_Earnings_ComputeBonusModifiers(lbl_802823BC, nPlayer, 1, 1, 1, 0);
                 lbl_802823BC = GM_Earnings_ComputeTOURCardModifiers(lbl_802823BC, nPlayer, 0);
                 GM_Earnings_AwardMoney(nPlayer, lbl_802823BC, 0);
@@ -233,7 +233,7 @@ void fn_800F6ED4(int nPlayer) {
                 }
             }
         } else {
-            switch (fn_800F1E58(nSurface)) {
+            switch (GameModeSkillZoneBase_GetBullsEyeColor(nSurface)) {
             case 0:
                 nMsg = 0x1D;
                 break;
@@ -281,7 +281,7 @@ void fn_800F6ED4(int nPlayer) {
     } else {
         gPlayers[nPlayer].nE90 = 0;
     }
-    if (nSurface >= 0x85 && nSurface <= 0x90 && fn_800F2788(nPlayer, fLength)) {
+    if (nSurface >= 0x85 && nSurface <= 0x90 && GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
         if (fLength > gPlayers[nPlayer].nDDC) {
             gPlayers[nPlayer].nDDC = fLength;
             switch (Misc_RandFunc(0) & 3) {
@@ -327,8 +327,9 @@ void fn_800F6ED4(int nPlayer) {
         if (lbl_802823BC > 0) {
             lbl_802823BC = (f32)lbl_802823BC * gPlayers[nPlayer].nDBC;
             lbl_802823BC = lbl_802823BC * fScale;
-            if (nSurface >= 0x85 && nSurface <= 0x90 && !fn_800F2788(nPlayer, fLength)) {
-                lbl_802823BC = fn_800F266C(lbl_802823BC, nTarget);
+            if (nSurface >= 0x85 && nSurface <= 0x90
+                && !GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
+                lbl_802823BC = GameModeSkillZoneBase_ScaleTargetPoints(lbl_802823BC, nTarget);
                 switch (gPlayers[nPlayer].nDBC) {
                 case 2:
                     nMsg = 0x32;
@@ -347,9 +348,9 @@ void fn_800F6ED4(int nPlayer) {
             lbl_802823BC = GM_Earnings_ComputeBonusModifiers(lbl_802823BC, nPlayer, 1, 1, 1, 0);
             lbl_802823BC = GM_Earnings_ComputeTOURCardModifiers(lbl_802823BC, nPlayer, 0);
         } else if (!(Misc_RandFunc(0) & 1)) {
-            fn_800F263C(0);
+            GameModeSkillZoneBase_StartComment(0);
         } else {
-            fn_800F263C(0x4E);
+            GameModeSkillZoneBase_StartComment(0x4E);
         }
         gPlayers[nPlayer].aCD4[gPlayers[nPlayer].nCD0] = nSurface;
         gPlayers[nPlayer].nCD0++;
@@ -363,7 +364,7 @@ void fn_800F6ED4(int nPlayer) {
         if (gPlayers[nPlayer].nDD8 < 0) {
             gPlayers[nPlayer].nDD8 = 0;
         } else if (!gSession.bReplay) {
-            if (fn_800F2788(nPlayer, fLength)) {
+            if (GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
                 GameMsg_Send5Ints(0x33, lbl_802823BC, 0, 0, 0xD6, 1);
             } else {
                 GameMsg_Send5Ints(0x33, lbl_802823BC, 0, 0, nSurface, 1);
@@ -395,7 +396,7 @@ void fn_800F6ED4(int nPlayer) {
         gPlayers[nPlayer].nDDC = fLength;
     }
     if (nMsg != -1) {
-        fn_800F263C(nMsg);
+        GameModeSkillZoneBase_StartComment(nMsg);
     }
     if (gPlayers[nPlayer].n290[Game_CurHoleIndex()] + (nAddedFrames = nAdded * 60) > 600 &&
         gPlayers[nPlayer].n290[Game_CurHoleIndex()] <= 600) {
@@ -404,8 +405,8 @@ void fn_800F6ED4(int nPlayer) {
     if (gPlayers[nPlayer].n290[Game_CurHoleIndex()] <= 0 && nAddedFrames <= 600 && nAdded > 0) {
         Gaud_StartShotClock();
     }
-    fn_800F2664(nPlayer);
-    fn_800F2668(nPlayer);
+    GameModeSkillZoneBase_PostShotAwards1(nPlayer);
+    GameModeSkillZoneBase_PostShotAwards2(nPlayer);
 }
 
 // The points, seconds and balls for landing on a surface.
@@ -427,14 +428,14 @@ void fn_800F7A4C(s32 nSurface, s32* pPoints, s32* pTime, s32* pBalls) {
 // aims at their target; the bonus multiplier goes back to 1.
 void fn_800F7B44(void) {
     int i;
-    fn_800F2030();
+    GameModeSkillZoneBase_ClearPerShotData();
     GameModeStroke_SetupNextGolfer();
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if ((s8)GOLFERSTATE_GetCurrentState(i) == 1) {
-            fn_800F21B4(i);
+            GameModeSkillZoneBase_SetupBonusBall(i);
             fn_800F80D4(PLAYER(i)->n290[Game_CurHoleIndex()]);
             if (PLAYER(i)->nDC0 == 0) {
-                fn_800F1B60(i, (s8)PLAYER(i)->nTarget);
+                GameModeSkillZoneBase_SetCup_AlignGolfer(i, (s8)PLAYER(i)->nTarget);
             }
         }
     }
@@ -442,7 +443,7 @@ void fn_800F7B44(void) {
 }
 
 void fn_800F7C00(void) {
-    fn_800F19D4();
+    GameModeSkillZoneBase_SortCupsByDistanceFromTee();
     fn_800F7CD4();
 }
 
@@ -464,7 +465,7 @@ void fn_800F7CA0(void) {
 
 void fn_800F7CD4(void) {
     int i;
-    fn_800F1EE4();
+    GameModeSkillZoneBase_ClearPerHoleData();
     for (i = 0; i < 5; i++) {
         PLAYER(i)->n290[Game_CurHoleIndex()] = 5400;
     }
@@ -491,10 +492,10 @@ s32 fn_800F7D9C(s32 a) {
 void fn_800F7DA4(void) {
     Gaud_StartShotClock();
     if (!(Misc_RandFunc(0) & 1)) {
-        fn_800F263C(0x15);
+        GameModeSkillZoneBase_StartComment(0x15);
         return;
     }
-    fn_800F263C(0x25);
+    GameModeSkillZoneBase_StartComment(0x25);
 }
 
 // The time ran out: a shot not yet taken ends the player's game; one in flight finishes first.
@@ -510,7 +511,7 @@ void fn_800F7DE8(void) {
         fn_800F80D4(0);
         PlayNow_SendMessage18(lbl_80282278);
         GOLFERSTATE_Switch(13, lbl_80282278);
-        fn_800F263C(0x14);
+        GameModeSkillZoneBase_StartComment(0x14);
         return;
     }
     gPlayers[lbl_80282278].bE9D = 1;
@@ -543,7 +544,7 @@ u8 fn_800F7F70(int nPlayer, u8 bCheck) {
 
 // A bonus was collected: the multiplier goes up.
 void fn_800F7FF4(int nPlayer, int nId) {
-    s32 n = fn_800F2810(nId);
+    s32 n = GameModeSkillZoneBase_GetBonusIndex(nId);
     fn_800A30E4(8, &gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
     lbl_802823B4 += n + 2;
 }

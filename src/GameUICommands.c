@@ -314,12 +314,12 @@ Pga80205F30* GameModeDriverPGATour_GetWinInfo(void);
 s32   GameModeDriverPGATour_DisplayEndOfHoleMessage(char* pDst);
 s32   GM_RealtimeMode_GetSelectedEvent(s32* pRound);
 int   fn_800F1960(void);
-void  fn_800F1DF0(void);
-void  fn_800F1E1C(void);
-s32   fn_800F2408(s32 nPlayer);
-s32   fn_800F2494(s32 nPlayer);
-s32   fn_800F24D8(s32 nPlayer);
-s32   fn_800F2534(s32 nPlayer);
+void  GameModeSkillZoneBase_TimerOut(void);
+void  GameModeSkillZoneBase_ShotClockOut(void);
+s32   GameModeSkillZoneBase_GetShotEarned(s32 nPlayer);
+s32   GameModeSkillZoneBase_GetTimeEarned(s32 nPlayer);
+s32   GameModeSkillZoneBase_GetDriveMultiplier(s32 nPlayer);
+s32   GameModeSkillZoneBase_GetExtraBallsEarned(s32 nPlayer);
 s32   fn_800F3490(int nPlayer);
 s32   fn_800F34F0(int nPlayer);
 s32   fn_800F363C(int i);
@@ -959,7 +959,7 @@ void fn_800869A4(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = gPlayers[pArgs[0].i].nDC0;
         return;
     case 9:
-        pResult->i = fn_800F20C0(pArgs[0].i);
+        pResult->i = GameModeSkillZoneBase_CountGreensHit(pArgs[0].i);
         return;
     case 10:
         pResult->i = gPlayers[pArgs[0].i].nDDC;
@@ -1586,7 +1586,7 @@ void fn_800881E8(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80088208(MsgArg* pArgs, MsgArg* pResult) {
     if (GM_Currently_SkillZoneMode()) {
-        fn_800F1DF0();
+        GameModeSkillZoneBase_TimerOut();
         return;
     }
     fn_800FDADC();
@@ -1724,16 +1724,16 @@ void fn_80088660(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = GameMode12_GetScoredSurfaceHits(pArgs[0].i, pArgs[1].i);
         return;
     case 4:
-        pResult->i = fn_800F2408(pArgs[0].i);
+        pResult->i = GameModeSkillZoneBase_GetShotEarned(pArgs[0].i);
         return;
     case 5:
-        pResult->i = fn_800F2494(pArgs[0].i);
+        pResult->i = GameModeSkillZoneBase_GetTimeEarned(pArgs[0].i);
         return;
     case 6:
-        pResult->i = fn_800F2534(pArgs[0].i);
+        pResult->i = GameModeSkillZoneBase_GetExtraBallsEarned(pArgs[0].i);
         return;
     case 7:
-        pResult->i = fn_800F24D8(pArgs[0].i);
+        pResult->i = GameModeSkillZoneBase_GetDriveMultiplier(pArgs[0].i);
         return;
     }
 }
@@ -1764,7 +1764,7 @@ void fn_800887C4(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80088804(MsgArg* pArgs, MsgArg* pResult) {
     if (GM_Currently_SkillZoneMode()) {
-        fn_800F1E1C();
+        GameModeSkillZoneBase_ShotClockOut();
     }
 }
 

@@ -61,8 +61,8 @@ void fn_800F2984(void) {
     gpGame->pfn224 = fn_800F3330;
     gpGame->pfn1EC = fn_800F2BD8;
     gpGame->pfn250 = fn_800F3418;
-    gpGame->pfn264 = fn_800F1BD8;
-    gpGame->pfn258 = fn_800F1C34;
+    gpGame->pfn264 = GameModeSkillZoneBase_PickPrevTarget;
+    gpGame->pfn258 = GameModeSkillZoneBase_PickTarget;
     gpGame->pfn260 = fn_800F3800;
     gpGame->pfnEndGame = fn_800F3860;
     gpGame->pfn26C = fn_800F392C;
@@ -167,9 +167,9 @@ void fn_800F2E08(int nPlayer) {
     } else {
         nSurface = gPlayers[nPlayer].ball.nSurface;
         fLength = fn_800D0550(nPlayer);
-        if (nSurface >= 0x85 && nSurface <= 0x90 && !fn_800F2788(nPlayer, fLength)) {
-            nTarget = fn_800F1C74(nPlayer);
-            nRank = fn_800F1E58(nSurface);
+        if (nSurface >= 0x85 && nSurface <= 0x90 && !GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
+            nTarget = GameModeSkillZoneBase_GetGreenIndexHit(nPlayer);
+            nRank = GameModeSkillZoneBase_GetBullsEyeColor(nSurface);
             if (lbl_80211FB8[nTarget].nRank == 0) {
                 GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCD, 1);
                 Gaud_TargetClosedOut();
@@ -222,7 +222,7 @@ void fn_800F2E08(int nPlayer) {
                 gPlayers[nPlayer].nCD0++;
                 gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
                 lbl_80282374 = fn_800F3668(nTarget);
-                lbl_80282374 = fn_800F266C(lbl_80282374, nTarget);
+                lbl_80282374 = GameModeSkillZoneBase_ScaleTargetPoints(lbl_80282374, nTarget);
                 lbl_80282374 = GM_Earnings_ComputeBonusModifiers(lbl_80282374, nPlayer, 1, 1, 1, 0);
                 lbl_80282374 = GM_Earnings_ComputeTOURCardModifiers(lbl_80282374, nPlayer, 0);
                 fn_800F36A4();
@@ -255,19 +255,20 @@ void fn_800F2E08(int nPlayer) {
         }
     }
     if (nMsg != -1) {
-        fn_800F263C(nMsg);
+        GameModeSkillZoneBase_StartComment(nMsg);
     }
 }
 
-// Next golfer: lbl_80282370 and the players' per-shot state (fn_800F2030) clear, and a golfer
-// ready to play (state 1) gets fn_800F39CC(900). A player 3 or more targets behind gets a comment.
+// Next golfer: lbl_80282370 and the players' per-shot state
+// (GameModeSkillZoneBase_ClearPerShotData) clear, and a golfer ready to play (state 1) gets
+// fn_800F39CC(900). A player 3 or more targets behind gets a comment.
 void fn_800F31E0(void) {
     int i;
     s32 n0;
     s32 n1;
     s32 nMsg = -1;
     lbl_80282370 = 0;
-    fn_800F2030();
+    GameModeSkillZoneBase_ClearPerShotData();
     GameModeStroke_SetupNextGolfer();
     n0 = fn_800F354C(0);
     n1 = fn_800F354C(1);
@@ -275,7 +276,7 @@ void fn_800F31E0(void) {
         if ((s8)GOLFERSTATE_GetCurrentState(i) == 1) {
             fn_800F39CC(900);
             if (PLAYER(i)->nDC0 == 0) {
-                fn_800F1B60(i, (s8)PLAYER(i)->nTarget);
+                GameModeSkillZoneBase_SetCup_AlignGolfer(i, (s8)PLAYER(i)->nTarget);
             }
             if (i == 0 && n1 >= n0 + 3) {
                 if (!(Misc_RandFunc(0) & 1)) {
@@ -293,12 +294,12 @@ void fn_800F31E0(void) {
         }
     }
     if (nMsg != -1) {
-        fn_800F2958((u16)nMsg, 0);
+        GameModeSkillZoneBase_PlayComment((u16)nMsg, 0);
     }
 }
 
 void fn_800F330C(void) {
-    fn_800F19D4();
+    GameModeSkillZoneBase_SortCupsByDistanceFromTee();
     fn_800F3358();
 }
 
@@ -310,7 +311,7 @@ void fn_800F3330(void) {
 // Every target unclaimed.
 void fn_800F3358(void) {
     int i;
-    fn_800F1EE4();
+    GameModeSkillZoneBase_ClearPerHoleData();
     for (i = 0; i < 40; i++) {
         lbl_80211FB8[i].nRank = 5;
         lbl_80211FB8[i].nOwner = 5;
@@ -343,7 +344,7 @@ u8 fn_800F3438(int nPlayer, u8 bCheck) {
 }
 
 static inline int CurrentTarget(int nPlayer) {
-    return fn_800F1D34(nPlayer);
+    return GameModeSkillZoneBase_GetGreenTargetted(nPlayer);
 }
 
 // Who holds the target the player is aiming at (-1: not aiming at one).
@@ -358,7 +359,7 @@ s32 fn_800F34F0(int nPlayer) {
     if (gPlayers[nPlayer].nSurface < 0x85 || gPlayers[nPlayer].nSurface > 0x90) {
         return -1;
     }
-    return lbl_80211FB8[fn_800F1D34(nPlayer)].nRank;
+    return lbl_80211FB8[GameModeSkillZoneBase_GetGreenTargetted(nPlayer)].nRank;
 }
 
 // How many targets the player holds.
@@ -399,7 +400,7 @@ void fn_800F36A4(void) {
     for (i = 0; i < 40; i++) {
         if (lbl_80211FB8[i].nOwner != 5) {
             n = fn_800F3668(i);
-            n = fn_800F266C(n, i);
+            n = GameModeSkillZoneBase_ScaleTargetPoints(n, i);
             n = GM_Earnings_ComputeBonusModifiers(n, lbl_80211FB8[i].nOwner, 1, 1, 1, 0);
             n = GM_Earnings_ComputeTOURCardModifiers(n, lbl_80211FB8[i].nOwner, 0);
             gPlayers[lbl_80211FB8[i].nOwner].nDD8 += n;
@@ -417,7 +418,7 @@ void fn_800F3800(int nPlayer) {
 }
 
 // The current golfer goes to state 12 and lbl_80282370 is set, so the shot claims nothing and
-// shows text 0xD1 (through fn_800F1E1C, from a UI command).
+// shows text 0xD1 (through GameModeSkillZoneBase_ShotClockOut, from a UI command).
 void fn_800F3828(void) {
     GOLFERSTATE_Switch(12, lbl_80282278);   // GS_SIMULATE
     GUI_HideAllToggleUI();
@@ -441,7 +442,7 @@ void fn_800F3860(void) {
         }
     }
     if (nMsg != -1) {
-        fn_800F2958((u16)nMsg, 0);
+        GameModeSkillZoneBase_PlayComment((u16)nMsg, 0);
     }
 }
 

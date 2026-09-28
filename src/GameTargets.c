@@ -2,8 +2,9 @@
 // and aimed at, each player's targets hit and shot multiplier, the prize, the per-tee distance
 // check, and dispatchers into each mode's own file. Split from GameModeReplay.c (mode 10) because
 // the two halves each have their own copy of the int-to-float constant; the bytes cannot prove the
-// exact split point, which is somewhere from fn_800F19D4 to fn_800F266C (the functions between use
-// no float constants). fn_800F19D4 is the first function the target modes call.
+// exact split point, which is somewhere from GameModeSkillZoneBase_SortCupsByDistanceFromTee to
+// GameModeSkillZoneBase_ScaleTargetPoints (the functions between use no float constants).
+// GameModeSkillZoneBase_SortCupsByDistanceFromTee is the first function the target modes call.
 
 #include "golfer.h"
 #include "ball.h"
@@ -11,7 +12,7 @@
 #include "engine.h"
 #include "game/earnings.h"
 
-// Score multipliers for fn_800F266C, one table per value of Game_GetCurHoleNum.
+// Score multipliers for GameModeSkillZoneBase_ScaleTargetPoints, one table per value of Game_GetCurHoleNum.
 f32 lbl_80192810[13] = {
     1.0f, 1.0f, 1.3f, 1.1f, 1.0f, 1.1f, 1.2f, 1.3f, 1.3f, 1.4f, 1.4f, 1.3f, 1.0f,
 };
@@ -24,10 +25,12 @@ f32 lbl_80192880[15] = {
 
 void  Gaud_MultiplierBonus(void);
 
-u8   fn_800F2358(int nPlayer);
+u8   GameModeSkillZoneBase_FirstShot(int nPlayer);
 
-// Sort the targets by distance from the tee, nearest first.
-void fn_800F19D4(void) {
+// Sorts the target list (lbl_80211D38, lbl_80282360 points) by distance from player 0's tee (the
+// tee of gSession.nTeeSet[0]), nearest first, by swapping pairs. Each target mode's hole start
+// calls it, so target 0 is the nearest.
+void GameModeSkillZoneBase_SortCupsByDistanceFromTee(void) {
     f32 tmp[4];
     int i;
     int j;
@@ -44,8 +47,10 @@ void fn_800F19D4(void) {
     }
 }
 
-// Aim the player at target n (wrapping round): the pin moves there.
-void fn_800F1ABC(int nPlayer, s8 n) {
+// Aims player nPlayer at target n, taken modulo the target count (one past the last is target 0):
+// Player.nTarget is set, the hole's pin (Ter_GetTGD()->pin) moves to the target, and so does the
+// flag model (skeletal object 100) when there is one.
+void GameModeSkillZoneBase_SetCup(int nPlayer, s8 n) {
     Character* pChar;
     gPlayers[nPlayer].nTarget = n % lbl_80282360;
     LLMath_CopyVec(lbl_80211D38[gPlayers[nPlayer].nTarget], (f32*)Ter_GetTGD()->pin);
@@ -55,8 +60,11 @@ void fn_800F1ABC(int nPlayer, s8 n) {
     }
 }
 
-void fn_800F1B60(int nPlayer, s8 n) {
-    fn_800F1ABC(nPlayer, n);
+// SetCup, then the golfer is set up for the new target: the default aim (AI_DefaultTarget), a fresh
+// shot (Shot_Prepare), the stance turned to the target, the golfer's animation 5 and UI message 7
+// (fn_80062C38). The target modes' SetupNextGolfer calls it before a player's first shot.
+void GameModeSkillZoneBase_SetCup_AlignGolfer(int nPlayer, s8 n) {
+    GameModeSkillZoneBase_SetCup(nPlayer, n);
     AI_DefaultTarget(nPlayer);
     Shot_Prepare(nPlayer, 1);
     Character_AlignShotWithTarget(nPlayer, 1, 1);
@@ -65,24 +73,29 @@ void fn_800F1B60(int nPlayer, s8 n) {
     fn_80062C38();
 }
 
-// Previous target.
-u8 fn_800F1BD8(int nPlayer) {
+// Aims the player at the previous target (the last one after target 0) with SetCup; always returns
+// 1. Modes 13, 14 and 16 install it as gpGame->pfn264 (button 6 while setting up a shot); mode 15
+// calls it from its own.
+u8 GameModeSkillZoneBase_PickPrevTarget(int nPlayer) {
     if (gPlayers[nPlayer].nTarget == 0) {
-        fn_800F1ABC(nPlayer, lbl_80282360 - 1);
+        GameModeSkillZoneBase_SetCup(nPlayer, lbl_80282360 - 1);
     } else {
-        fn_800F1ABC(nPlayer, gPlayers[nPlayer].nTarget - 1);
+        GameModeSkillZoneBase_SetCup(nPlayer, gPlayers[nPlayer].nTarget - 1);
     }
     return 1;
 }
 
-// Next target.
-u8 fn_800F1C34(int nPlayer) {
-    fn_800F1ABC(nPlayer, gPlayers[nPlayer].nTarget + 1);
+// Aims the player at the next target (wrapping to 0 after the last) with SetCup; always returns 1.
+// Modes 13, 14 and 16 install it as gpGame->pfn258, so the re-plan button (47) picks the next
+// target; mode 15 calls it from its own.
+u8 GameModeSkillZoneBase_PickTarget(int nPlayer) {
+    GameModeSkillZoneBase_SetCup(nPlayer, gPlayers[nPlayer].nTarget + 1);
     return 1;
 }
 
-// The target nearest the ball.
-s8 fn_800F1C74(int nPlayer) {
+// The target nearest the player's ball (its index in the sorted list): which target a shot landed
+// on. Every target mode's shot scoring calls it.
+s8 GameModeSkillZoneBase_GetGreenIndexHit(int nPlayer) {
     f32* pBall = gPlayers[nPlayer].ball.vPos;
     s8 i;
     s8 nBest = 0;
@@ -97,8 +110,9 @@ s8 fn_800F1C74(int nPlayer) {
     return nBest;
 }
 
-// The target nearest the player's aim point.
-int fn_800F1D34(int nPlayer) {
+// The target nearest the player's aim point (Player.vTarget), i.e. the one being played at. The
+// target HUD (GameEffects.c) and mode 14 use it.
+int GameModeSkillZoneBase_GetGreenTargetted(int nPlayer) {
     f32* pTarget = gPlayers[nPlayer].vTarget;
     int i;
     int nBest = 0;
@@ -113,13 +127,17 @@ int fn_800F1D34(int nPlayer) {
     return nBest;
 }
 
-void fn_800F1DF0(void) {
+// The HUD clock ran out (UI command fn_80088208, in a target mode): mode 13's
+// GameModeSkillZoneTimed_TimerOut; the other target modes have no timer.
+void GameModeSkillZoneBase_TimerOut(void) {
     if (Game_GetMode() == 0xD) {
         fn_800F7DE8();
     }
 }
 
-void fn_800F1E1C(void) {
+// The shot clock ran out (UI command fn_80088804, in a target mode): modes 14 and 15 forfeit the
+// shot (fn_800F3828, fn_800F48C4); the other target modes do nothing.
+void GameModeSkillZoneBase_ShotClockOut(void) {
     if (Game_GetMode() == 0xE) {
         fn_800F3828();
     }
@@ -128,7 +146,10 @@ void fn_800F1E1C(void) {
     }
 }
 
-s32 fn_800F1E58(s32 n) {
+// Which ring of a target a landing surface is, 0 being the bullseye: surfaces 0x85..0x87 are rings
+// 0..2, 0x88..0x8B rings 0..3 and 0x8C..0x90 rings 0..4; any other surface gives 5. The target
+// modes pick their ring comments by it.
+s32 GameModeSkillZoneBase_GetBullsEyeColor(s32 n) {
     switch (n) {
     case 0x85: return 0;
     case 0x86: return 1;
@@ -146,8 +167,11 @@ s32 fn_800F1E58(s32 n) {
     }
 }
 
-// Every player's target-game state is cleared and aimed at the first target.
-void fn_800F1EE4(void) {
+// Clears all five players' target-game state for a new hole: shots taken (nDC0), the counters aDC4,
+// the winnings (nDD8), the longest drive (nDDC), bullseyes (nDE0), nE88..nE98, the flags bE9D and
+// bE9E, and each target's hit count (nDE4); each player is aimed at target 0 (SetCup). Then
+// ClearPerShotData.
+void GameModeSkillZoneBase_ClearPerHoleData(void) {
     int i;
     int j;
     for (i = 0; i < 5; i++) {
@@ -169,12 +193,15 @@ void fn_800F1EE4(void) {
         for (j = 0; j < 40; j++) {
             p->nDE4[j] = 0;
         }
-        fn_800F1ABC(i, 0);
+        GameModeSkillZoneBase_SetCup(i, 0);
     }
-    fn_800F2030();
+    GameModeSkillZoneBase_ClearPerShotData();
 }
 
-void fn_800F2030(void) {
+// For each player in the game: the shot's multiplier back to 1 (nDBC), the list of surfaces the
+// shot scored on emptied (nCD0 and its 20 entries aCD4), and nDB8 cleared. Each target mode's
+// SetupNextGolfer calls it before every shot.
+void GameModeSkillZoneBase_ClearPerShotData(void) {
     int i;
     int j;
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -187,8 +214,8 @@ void fn_800F2030(void) {
     }
 }
 
-// How many targets the player has hit.
-s32 fn_800F20C0(int nPlayer) {
+// How many of the 40 target slots the player has hit at least once (Player.nDE4).
+s32 GameModeSkillZoneBase_CountGreensHit(int nPlayer) {
     int i;
     s32 n = 0;
     for (i = 0; i < 40; i++) {
@@ -199,12 +226,15 @@ s32 fn_800F20C0(int nPlayer) {
     return n;
 }
 
-// After a shot, maybe a multiplier for the next one: x5, x3 or x2, more often after 10 shots
-// without one.
-void fn_800F21B4(int nPlayer) {
+// Before a shot (SetupNextGolfer of modes 13 and 16): unless FirstShot says to skip it, a random
+// multiplier for the shot (nDBC, which ClearPerShotData set to 1): x5 on a roll of 0..5, x3 on
+// 6..10, x2 on 11..20, the roll taken from 0..99, or from 0..19 (so a multiplier is certain) once
+// 10 shots in a row had none (nE98, the count this keeps). A multiplier plays Gaud_MultiplierBonus
+// and comment 0x3A, 0x3B or 0x3D.
+void GameModeSkillZoneBase_SetupBonusBall(int nPlayer) {
     s32 nMsg = -1;
     s32 r;
-    if (!fn_800F2358(nPlayer)) {
+    if (!GameModeSkillZoneBase_FirstShot(nPlayer)) {
         if (gPlayers[nPlayer].nE98 >= 10) {
             r = Misc_RandFunc(0) % 20;
         } else {
@@ -240,13 +270,13 @@ void fn_800F21B4(int nPlayer) {
         }
     }
     if (nMsg != -1) {
-        fn_800F2958((u16)nMsg, 0);
+        GameModeSkillZoneBase_PlayComment((u16)nMsg, 0);
     }
 }
 
-// No multiplier roll for this shot: in mode 16 at 20 shots taken, in mode 17 at 5, in the other
-// modes before the first shot.
-u8 fn_800F2358(int nPlayer) {
+// Whether SetupBonusBall skips the multiplier roll for this shot: in mode 16 when 20 shots have
+// been taken (Player.nDC0), in mode 17 at 5, in the other modes before the first shot.
+u8 GameModeSkillZoneBase_FirstShot(int nPlayer) {
     if (Game_GetMode() == 0x10) {
         if (gPlayers[nPlayer].nDC0 == 20) {
             return 1;
@@ -261,7 +291,9 @@ u8 fn_800F2358(int nPlayer) {
     return 0;
 }
 
-s32 fn_800F2408(s32 arg0) {
+// The points the last shot earned, for the HUD (UI command fn_80088660, case 4): the getter of mode
+// 13, 14, 16 or 17 (which ignore the player), else 0.
+s32 GameModeSkillZoneBase_GetShotEarned(s32 arg0) {
     if (Game_GetMode() == 0xD) {
         return fn_800F7D94(arg0);
     }
@@ -277,14 +309,18 @@ s32 fn_800F2408(s32 arg0) {
     return 0;
 }
 
-s32 fn_800F2494(s32 arg0) {
+// The seconds the last shot added, for the HUD (UI command fn_80088660, case 5): mode 13's only,
+// else 0.
+s32 GameModeSkillZoneBase_GetTimeEarned(s32 arg0) {
     if (Game_GetMode() == 0xD) {
         return fn_800F7D9C(arg0);
     }
     return 0;
 }
 
-s32 fn_800F24D8(s32 arg0) {
+// The bonus multiplier for the HUD (UI command fn_80088660, case 7): mode 13's or mode 16's, else
+// 0.
+s32 GameModeSkillZoneBase_GetDriveMultiplier(s32 arg0) {
     if (Game_GetMode() == 0xD) {
         return fn_800F80A0(arg0);
     }
@@ -294,15 +330,18 @@ s32 fn_800F24D8(s32 arg0) {
     return 0;
 }
 
-s32 fn_800F2534(s32 arg0) {
+// The balls the last shot earned, for the HUD (UI command fn_80088660, case 6): mode 17's only,
+// else 0.
+s32 GameModeSkillZoneBase_GetExtraBallsEarned(s32 arg0) {
     if (Game_GetMode() == 0x11) {
         return fn_800F6A34(arg0);
     }
     return 0;
 }
 
-// The target game's prize (from the prize row with id 999).
-s32 fn_800F2578(void) {
+// The prize for hitting every target: the gEarningsTable.aMini row with id 999, its mode 13 column
+// (n4), mode 16's (n8) or mode 17's (nC); 0 in other modes or without such a row.
+s32 GameModeSkillZoneBase_GetHitAllTargetsBonus(void) {
     int i;
     for (i = 0; i < 20; i++) {
         if (gEarningsTable.aMini[i].nId == 999) {
@@ -320,18 +359,25 @@ s32 fn_800F2578(void) {
     return 0;
 }
 
-void fn_800F263C(s32 nMsg) {
-    fn_800F2958((nMsg & 0xFFFF), 1);
+// Plays target-game commentary line nMsg (GameModeSkillZoneBase_PlayComment, last argument 1).
+void GameModeSkillZoneBase_StartComment(s32 nMsg) {
+    GameModeSkillZoneBase_PlayComment((nMsg & 0xFFFF), 1);
 }
 
-void fn_800F2664(int nPlayer) {
+// Empty in this build. The shot scoring of modes 13, 16 and 17 calls it last, with the player,
+// before GameModeSkillZoneBase_PostShotAwards2.
+void GameModeSkillZoneBase_PostShotAwards1(int nPlayer) {
 }
 
-void fn_800F2668(int nPlayer) {
+// Empty in this build. The shot scoring of modes 13, 16 and 17 calls it last, with the player,
+// after GameModeSkillZoneBase_PostShotAwards1.
+void GameModeSkillZoneBase_PostShotAwards2(int nPlayer) {
 }
 
-// Scale n by table entry i; which table depends on Game_GetCurHoleNum (0..2).
-s32 fn_800F266C(s32 n, int i) {
+// Scales points n by target i's factor on the current hole (Game_GetCurHoleNum 0, 1 or 2: 13, 15
+// and 15 factors from 1.0 to 1.4, per target in the sorted list); the product is truncated to an
+// int. On any other hole n comes back unchanged.
+s32 GameModeSkillZoneBase_ScaleTargetPoints(s32 n, int i) {
     if (Game_GetCurHoleNum() == 0) {
         return n * lbl_80192810[i];
     }
@@ -344,8 +390,10 @@ s32 fn_800F266C(s32 n, int i) {
     return n;
 }
 
-// Is f far enough for the player's tee set (0: 313, 1: 300, 2 and 3: 293)?
-u8 fn_800F2788(int nPlayer, f32 f) {
+// Whether a shot of length f (fn_800D0550) reaches the drive line of the player's tee set: 313 from
+// tee set 0, 300 from 1, 293 from 2 and 3; never from another. The target modes count a target hit
+// only short of it; modes 13, 16 and 17 score a target surface reached that far as a drive.
+u8 GameModeSkillZoneBase_IsLongDrive(int nPlayer, f32 f) {
     switch (gSession.nTeeSet[nPlayer]) {
     case 0:
         if (f >= 313.0f) {
@@ -367,7 +415,10 @@ u8 fn_800F2788(int nPlayer, f32 f) {
     return 0;
 }
 
-s32 fn_800F2810(s32 n) {
+// The index 0..4 of a bonus object the ball hit (the id the pfn268 hook gets, Ball.n140) on the
+// current hole: hole 0's objects 0xD7, 0xD5, 0xD4, 0xD6, 0xD8, hole 1's 0x3B..0x3F, hole 2's
+// 24..28; 4 for anything else. Modes 13 and 16 raise their multiplier by the index plus 2.
+s32 GameModeSkillZoneBase_GetBonusIndex(s32 n) {
     if (Game_GetCurHoleNum() == 0) {
         switch (n) {
         case 0xD7: return 0;
@@ -396,6 +447,8 @@ s32 fn_800F2810(s32 n) {
     return 4;
 }
 
-void fn_800F2958(s32 nMsg, s32 a) {
+// Plays commentary line nMsg from playlist 7, the target games' lines (Gaud_StartComment, with a
+// passed on: StartComment passes 1, SetupBonusBall and modes 14 and 15 pass 0).
+void GameModeSkillZoneBase_PlayComment(s32 nMsg, s32 a) {
     Gaud_StartComment(7, nMsg, a);
 }

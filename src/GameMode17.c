@@ -150,9 +150,9 @@ void fn_800F5F58(int nPlayer) {
     nSurface = gPlayers[nPlayer].ball.nSurface;
     fLength = fn_800D0550(nPlayer);
     fn_800F68C4(nSurface, &lbl_802823A8, &lbl_802823A4);
-    if (nSurface >= 0x85 && nSurface <= 0x90 && !fn_800F2788(nPlayer, fLength)) {
-        nTarget = fn_800F1C74(nPlayer);
-        fn_800F1E58(nSurface);
+    if (nSurface >= 0x85 && nSurface <= 0x90 && !GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
+        nTarget = GameModeSkillZoneBase_GetGreenIndexHit(nPlayer);
+        GameModeSkillZoneBase_GetBullsEyeColor(nSurface);
         if (nTarget == gPlayers[nPlayer].nNextTarget) {
             gPlayers[nPlayer].nNextTarget++;
             if (gPlayers[nPlayer].nNextTarget >= lbl_80282360) {
@@ -164,8 +164,8 @@ void fn_800F5F58(int nPlayer) {
             }
             gPlayers[nPlayer].nDE4[nTarget]++;
             gPlayers[nPlayer].aDC4[3]++;
-            if (lbl_80282360 == fn_800F20C0(nPlayer)) {
-                lbl_802823A8 = fn_800F2578();
+            if (lbl_80282360 == GameModeSkillZoneBase_CountGreensHit(nPlayer)) {
+                lbl_802823A8 = GameModeSkillZoneBase_GetHitAllTargetsBonus();
                 lbl_802823A8 += gPlayers[nPlayer].nDC0 * 100;
                 lbl_802823A8 = GM_Earnings_ComputeBonusModifiers(lbl_802823A8, nPlayer, 1, 1, 1, 0);
                 lbl_802823A8 = GM_Earnings_ComputeTOURCardModifiers(lbl_802823A8, nPlayer, 0);
@@ -185,7 +185,7 @@ void fn_800F5F58(int nPlayer) {
                 }
             }
             if (nMsg == -1) {
-                switch (lbl_80282360 - fn_800F20C0(nPlayer)) {
+                switch (lbl_80282360 - GameModeSkillZoneBase_CountGreensHit(nPlayer)) {
                 case 1:
                     if (Misc_RandFunc(0) & 1) {
                         nMsg = 0x26;
@@ -214,7 +214,7 @@ void fn_800F5F58(int nPlayer) {
                     nMsg = 0x2A;
                     break;
                 default:
-                    if (fn_800F20C0(nPlayer) <= lbl_80282360 / 4) {
+                    if (GameModeSkillZoneBase_CountGreensHit(nPlayer) <= lbl_80282360 / 4) {
                         if (lbl_802823A4 == 1) {
                             if (Misc_RandFunc(0) & 1) {
                                 nMsg = 0x36;
@@ -298,7 +298,7 @@ void fn_800F5F58(int nPlayer) {
     } else {
         gPlayers[nPlayer].nE90 = 0;
     }
-    if (nSurface >= 0x85 && nSurface <= 0x90 && fn_800F2788(nPlayer, fLength)) {
+    if (nSurface >= 0x85 && nSurface <= 0x90 && GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
         lbl_802823A8 = 0;
         lbl_802823A4 = 0;
     }
@@ -322,7 +322,7 @@ void fn_800F5F58(int nPlayer) {
         if (gPlayers[nPlayer].nDD8 < 0) {
             gPlayers[nPlayer].nDD8 = 0;
         } else if (!gSession.bReplay) {
-            if (fn_800F2788(nPlayer, fLength)) {
+            if (GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
                 GameMsg_Send5Ints(0x33, lbl_802823A8, 0, 0, 0xD6, 1);
             } else {
                 GameMsg_Send5Ints(0x33, lbl_802823A8, 0, 0, nSurface, 1);
@@ -337,28 +337,28 @@ void fn_800F5F58(int nPlayer) {
         gPlayers[nPlayer].aDC4[1] += lbl_802823A4;
     }
     if (nMsg != -1) {
-        fn_800F263C(nMsg);
+        GameModeSkillZoneBase_StartComment(nMsg);
     }
-    fn_800F2664(nPlayer);
-    fn_800F2668(nPlayer);
+    GameModeSkillZoneBase_PostShotAwards1(nPlayer);
+    GameModeSkillZoneBase_PostShotAwards2(nPlayer);
 }
 
 // Next turn: each player in pre-shot who is not aiming at their next target is turned to it.
 void fn_800F66A0(void) {
     int i;
-    fn_800F2030();
+    GameModeSkillZoneBase_ClearPerShotData();
     GameModeStroke_SetupNextGolfer();
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if ((s8)GOLFERSTATE_GetCurrentState(i) == 1) {
             if (PLAYER(i)->nTarget != PLAYER(i)->nNextTarget) {
-                fn_800F1B60(i, PLAYER(i)->nNextTarget);
+                GameModeSkillZoneBase_SetCup_AlignGolfer(i, PLAYER(i)->nNextTarget);
             }
         }
     }
 }
 
 void fn_800F673C(void) {
-    fn_800F19D4();
+    GameModeSkillZoneBase_SortCupsByDistanceFromTee();
     fn_800F6788();
 }
 
@@ -370,7 +370,7 @@ void fn_800F6760(void) {
 // 5 balls each, starting at the first target.
 void fn_800F6788(void) {
     int i;
-    fn_800F1EE4();
+    GameModeSkillZoneBase_ClearPerHoleData();
     for (i = 0; i < 5; i++) {
         gPlayers[i].nNextTarget = 0;
         gPlayers[i].nDC0 = 5;
@@ -394,7 +394,7 @@ void fn_800F6828(int nPlayer) {
 // The game is over when player 0 has hit every target, or nobody has a ball left.
 u8 fn_800F6848(int nPlayer, u8 bCheck) {
     int i;
-    if (lbl_80282360 == fn_800F20C0(0)) {
+    if (lbl_80282360 == GameModeSkillZoneBase_CountGreensHit(0)) {
         return 1;
     }
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -420,12 +420,12 @@ void fn_800F68C4(s32 nSurface, s32* pPoints, s32* pBalls) {
 
 // Previous / next target: the aim stays on the next target in order.
 u8 fn_800F6990(int nPlayer) {
-    fn_800F1ABC(nPlayer, gPlayers[nPlayer].nNextTarget);
+    GameModeSkillZoneBase_SetCup(nPlayer, gPlayers[nPlayer].nNextTarget);
     return 1;
 }
 
 u8 fn_800F69C8(int nPlayer) {
-    fn_800F1ABC(nPlayer, gPlayers[nPlayer].nNextTarget);
+    GameModeSkillZoneBase_SetCup(nPlayer, gPlayers[nPlayer].nNextTarget);
     return 1;
 }
 

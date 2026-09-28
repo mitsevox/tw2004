@@ -170,10 +170,10 @@ int GameEffects_BallUpdatesThisFrame(int nPlayer) {
     return 0.5f + gSession.fFrameTime / FRAME_TIME;
 }
 
-// The target nearest the player's aim point (an inline in EA's source; calling fn_800F1D34
-// directly does not match).
+// The target nearest the player's aim point (an inline in EA's source; calling
+// GameModeSkillZoneBase_GetGreenTargetted directly does not match).
 static inline int GE_CurrentTarget(int nPlayer) {
-    return fn_800F1D34(nPlayer);
+    return GameModeSkillZoneBase_GetGreenTargetted(nPlayer);
 }
 
 // TW06: GameEffects_ScriptedGameBreakerTrigger (by position; the same player and reason arguments).
@@ -233,11 +233,12 @@ void fn_800DB4E8(int nPlayer) {
                     nReason = 22;
                 }
             } else if (Game_GetMode() == 17) {
-                if (fn_800F20C0(nPlayer) == 39) {
+                if (GameModeSkillZoneBase_CountGreensHit(nPlayer) == 39) {
                     bStart = 1;
                     nReason = 23;
                 }
-            } else if ((Game_GetMode() == 16 || Game_GetMode() == 16) && fn_800F20C0(nPlayer) == 39 &&
+            } else if ((Game_GetMode() == 16 || Game_GetMode() == 16)
+                       && GameModeSkillZoneBase_CountGreensHit(nPlayer) == 39 &&
                        gPlayers[nPlayer].nDE4[GE_CurrentTarget(nPlayer)] == 0) {
                 bStart = 1;
                 nReason = 23;

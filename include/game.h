@@ -646,27 +646,27 @@ s32  GetCellIndexFromDate(u16 nDate);
 // GameTargets.c: what the target games (modes 13..17) share
 extern f32 lbl_80211D38[40][4];         // the target list: lbl_80282360 points (w = 1)
 extern s8  lbl_80282360;                // the number of targets (GameModeReplay.c)
-void fn_800F19D4(void);                 // sort the targets by distance from the tee
-void fn_800F1ABC(int nPlayer, s8 n);
-void fn_800F1B60(int nPlayer, s8 n);
-u8   fn_800F1BD8(int nPlayer);          // previous target
-u8   fn_800F1C34(int nPlayer);          // next target
-s8   fn_800F1C74(int nPlayer);          // the target nearest the ball
-int  fn_800F1D34(int nPlayer);          // the target nearest the player's aim point
-s32  fn_800F1E58(s32 n);
-void fn_800F1EE4(void);                 // every player's target-game state cleared
-void fn_800F2030(void);
-s32  fn_800F20C0(int nPlayer);          // how many targets the player has hit
-void fn_800F21B4(int nPlayer);          // after a shot, maybe a multiplier for the next one
-s32  fn_800F2578(void);                 // the target game's prize
-void fn_800F263C(s32 nMsg);
-void fn_800F2664(int nPlayer);
-void fn_800F2668(int nPlayer);
-s32  fn_800F266C(s32 n, int i);         // scale n by table entry i
-u8   fn_800F2788(int nPlayer, f32 f);   // whether f is far enough for the player's tees
-s32  fn_800F2810(s32 n);
-void fn_800F2958(s32 nMsg, s32 a);
-// The modes' own getters behind the dispatchers fn_800F2408..fn_800F2534, which pass their
+void GameModeSkillZoneBase_SortCupsByDistanceFromTee(void);                 // sort the targets by distance from the tee
+void GameModeSkillZoneBase_SetCup(int nPlayer, s8 n);
+void GameModeSkillZoneBase_SetCup_AlignGolfer(int nPlayer, s8 n);
+u8   GameModeSkillZoneBase_PickPrevTarget(int nPlayer);          // previous target
+u8   GameModeSkillZoneBase_PickTarget(int nPlayer);          // next target
+s8   GameModeSkillZoneBase_GetGreenIndexHit(int nPlayer);          // the target nearest the ball
+int  GameModeSkillZoneBase_GetGreenTargetted(int nPlayer);          // the target nearest the player's aim point
+s32  GameModeSkillZoneBase_GetBullsEyeColor(s32 n);
+void GameModeSkillZoneBase_ClearPerHoleData(void);                 // every player's target-game state cleared
+void GameModeSkillZoneBase_ClearPerShotData(void);
+s32  GameModeSkillZoneBase_CountGreensHit(int nPlayer);          // how many targets the player has hit
+void GameModeSkillZoneBase_SetupBonusBall(int nPlayer);          // after a shot, maybe a multiplier for the next one
+s32  GameModeSkillZoneBase_GetHitAllTargetsBonus(void);                 // the target game's prize
+void GameModeSkillZoneBase_StartComment(s32 nMsg);
+void GameModeSkillZoneBase_PostShotAwards1(int nPlayer);
+void GameModeSkillZoneBase_PostShotAwards2(int nPlayer);
+s32  GameModeSkillZoneBase_ScaleTargetPoints(s32 n, int i);         // scale n by table entry i
+u8   GameModeSkillZoneBase_IsLongDrive(int nPlayer, f32 f);   // whether f is far enough for the player's tees
+s32  GameModeSkillZoneBase_GetBonusIndex(s32 n);
+void GameModeSkillZoneBase_PlayComment(s32 nMsg, s32 a);
+// The modes' own getters behind the dispatchers GameModeSkillZoneBase_GetShotEarned..GameModeSkillZoneBase_GetExtraBallsEarned, which pass their
 // argument on; the getters ignore it (not fn_800F354C: it is called directly, per player).
 int  fn_800F354C(int nPlayer);          // GameMode14.c
 s32  fn_800F37F8(s32 a);                // GameMode14.c
