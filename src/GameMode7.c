@@ -9,9 +9,9 @@
 // (GameMode8.c) with mode 7's own hole and game end (SpeedGolfPoints_*), the every-frame update
 // (SpeedGolf_Update) and SpeedGolfPoints_ClearStartFlags each frame of the swing (pfnSwingUpdate);
 // the golfer states go in through SpeedGolf_StartGamePreData. No stroke limit, gimmes or mulligans;
-// b271, b273, b277, b279, b27E to b283, b285, b286, b288, n290 and n294 0; gpGame n10 and nC 2, n4
-// 0 (points, not holes won, in SpeedGolf_EndGame), nDC 0; split screen from lbl_8028227C; two
-// players; the event log starts again.
+// b271, b273, b277, b279, b27E to b283, b285, b286, b288, n290 and n294 0; gpGame n10 and nC 2,
+// nScoringType 0 (points, not holes won, in SpeedGolf_EndGame), nDC 0; split screen from
+// lbl_8028227C; two players; the event log starts again.
 void SpeedGolfPoints_Init(void) {
     gpGame->pfnInit = SpeedGolfPoints_Init;
     gpGame->pfnShutdown = SpeedGolf_Shutdown;
@@ -50,7 +50,7 @@ void SpeedGolfPoints_Init(void) {
     gpGame->n10 = 2;
     gpGame->nC = 2;
     gpGame->nDC = 0;
-    gpGame->n4 = 0;
+    gpGame->nScoringType = 0;
     gSpeedGolfUnused = 0;
     gSession.nSplitScreen = lbl_8028227C;
     gSpeedGolfEventLogCount = 0;

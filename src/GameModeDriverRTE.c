@@ -49,7 +49,7 @@ void GameModeDriverRTE_Init(void) {
     gpGame->pfnGoToPlayoff = GameModeMatch_GoToPlayoff;
     gpGame->pfnEndHole = GameModeMatch_EndHole;
     gpGame->pfnEndGame = GameModeDriverRTE_EndGame;
-    gpGame->n4 = 1;
+    gpGame->nScoringType = 1;
     gpGame->nMulligans = 0;
     gpGame->nC = 1;
     gpGame->n10 = 1;
@@ -416,9 +416,9 @@ u16 GM_RealtimeMode_GetStartDate(s32 i) {
     return p->aDate[GameModeDriverRTE_GetYearIndex()];
 }
 
-// Event i's icon (RTEvent.n14), shown in its day cell on the calendar (FE_Calendar.c).
+// Event i's icon (RTEvent.nIcon), shown in its day cell on the calendar (FE_Calendar.c).
 s32 GameModeDriverRTE_UI_GetEventIconIndexOnCal(s32 i) {
-    return GameModeDriverRTE_GetCalData(i)->n14;
+    return GameModeDriverRTE_GetCalData(i)->nIcon;
 }
 
 // Always 0 in this build, so the calendar shows today's event with the not-yet-played panel (4) and
@@ -464,13 +464,13 @@ s32 GameModeDriverRTE_GetNextEvent(void) {
     return nNext;
 }
 
-// The icon (RTEvent.n14) of the first event whose award id is nId, 0 if none; the trophy room shows
-// it for the award (FE_CalendarPopups.c, GameMode22.c).
+// The icon (RTEvent.nIcon) of the first event whose award id is nId, 0 if none; the trophy room
+// shows it for the award (FE_CalendarPopups.c, GameMode22.c).
 s32 GM_RealtimeMode_GetIconIDByTrophyGroup(s32 nId) {
     s32 i;
     for (i = 0; i < 118; i++) {
         if (nId == gRTEs.aEvent[i].nId) {
-            return gRTEs.aEvent[i].n14;
+            return gRTEs.aEvent[i].nIcon;
         }
     }
     return 0;

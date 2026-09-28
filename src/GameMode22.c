@@ -263,7 +263,7 @@ void GameMode22_Init(void) {
     gpGame->n10 = 2;
     gpGame->nC = 4;
     gpGame->nDC = 0;
-    gpGame->n4 = 0;
+    gpGame->nScoringType = 0;
     gSession.nSplitScreen = lbl_8028227C;
     for (i = 0; i < 5; i++) {
         gGameMode22Reached1200[i] = 0;

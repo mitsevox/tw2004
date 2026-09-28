@@ -141,8 +141,8 @@ void  SpeedGolf_StartComment(s32 nLine, s32 a);
 // 6 and 7 (GameMode6.c, GameMode7.c) apart from this setup, the hole's end (SpeedGolf_HoleFinished,
 // SpeedGolf_EndHole) and the game's end (SpeedGolf_GameFinished). No stroke limit, gimmes or
 // mulligans, the mode flags b271..b288 and n290 / n294 (no post-shot reactions) 0; gpGame n10, nC
-// and n4 1 (n4 1: holes won, not mode 7's points, in SpeedGolf_EndHole and SpeedGolf_EndGame), nDC
-// 0; split screen from lbl_8028227C; one player.
+// and nScoringType 1 (nScoringType 1: holes won, not mode 7's points, in SpeedGolf_EndHole and
+// SpeedGolf_EndGame), nDC 0; split screen from lbl_8028227C; one player.
 void SpeedGolf_Init(void) {
     gpGame->pfnInit = SpeedGolf_Init;
     gpGame->pfnShutdown = SpeedGolf_Shutdown;
@@ -178,7 +178,7 @@ void SpeedGolf_Init(void) {
     gpGame->n10 = 1;
     gpGame->nC = 1;
     gpGame->nDC = 0;
-    gpGame->n4 = 1;
+    gpGame->nScoringType = 1;
     gSession.nSplitScreen = lbl_8028227C;
     Session_SetNumPlayers(1);
 }
@@ -432,16 +432,16 @@ u8 SpeedGolf_GoToPlayoff(u8 bCheck) {
     return 0;
 }
 
-// Mode 8's pfnEndHole. With gpGame->n4 0 each player's time score for the hole
-// (SpeedGolf_GetHoleTimeScore) is worked out and thrown away; with n4 1 (what mode 8 sets) each of
-// players 0 and 1 who holed out wins the hole (nModePoints 1, nHolesWon + 1).
+// Mode 8's pfnEndHole. With gpGame->nScoringType 0 each player's time score for the hole
+// (SpeedGolf_GetHoleTimeScore) is worked out and thrown away; with nScoringType 1 (what mode 8
+// sets) each of players 0 and 1 who holed out wins the hole (nModePoints 1, nHolesWon + 1).
 void SpeedGolf_EndHole(void) {
-    if (gpGame->n4 == 0) {
+    if (gpGame->nScoringType == 0) {
         SpeedGolf_GetHoleTimeScore(0, Game_CurHoleIndex());
         if (gNumPlayersSetUp > 1) {
             SpeedGolf_GetHoleTimeScore(1, Game_CurHoleIndex());
         }
-    } else if (gpGame->n4 == 1) {
+    } else if (gpGame->nScoringType == 1) {
         if (Player_IsHoled(0)) {
             gPlayers[0].nModePoints[Game_CurHoleIndex()] = 1;
             gPlayers[0].nHolesWon++;
@@ -460,12 +460,12 @@ void SpeedGolfPoints_EndHole(void) {
     gPlayers[1].nSGHoleScore[Game_CurHoleIndex()] = gPlayers[1].nSGPoints;
 }
 
-// The pfnEndGame of modes 7 and 8. Only with gpGame->n4 0 (mode 7): each player's time total
-// (SpeedGolf_GetTotalTimeScore) is worked out and thrown away, and the EASB bio records a game won:
-// always with two players, alone only with points (nSGPoints) above 0. Mode 8 (n4 1) does nothing
-// here; its prize is paid by SpeedGolf_GetWinner.
+// The pfnEndGame of modes 7 and 8. Only with gpGame->nScoringType 0 (mode 7): each player's time
+// total (SpeedGolf_GetTotalTimeScore) is worked out and thrown away, and the EASB bio records a
+// game won: always with two players, alone only with points (nSGPoints) above 0. Mode 8
+// (nScoringType 1) does nothing here; its prize is paid by SpeedGolf_GetWinner.
 void SpeedGolf_EndGame(void) {
-    if (gpGame->n4 == 0) {
+    if (gpGame->nScoringType == 0) {
         SpeedGolf_GetTotalTimeScore(0);
         if (gNumPlayersSetUp > 1) {
             SpeedGolf_GetTotalTimeScore(1);

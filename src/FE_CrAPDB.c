@@ -151,7 +151,7 @@ void FE_CrAP_InitModule(void) {
     lbl_80282460->pStrings = NULL;
     lbl_80282460->nAssets = 0;
     lbl_80282460->uStringsSize = 0;
-    lbl_80282460->n4 = 0;
+    lbl_80282460->nGender = 0;
     lbl_80282460->b14 = 1;
     lbl_80282480 = StaticMem_Alloc(CRAP_NUM_PARTS * sizeof(s32), 2, 0, "FE_CrAPDB.c", 219);
     lbl_8028247C = StaticMem_Alloc(CRAP_NUM_PARTS * 64 * sizeof(s32), 2, 0, "FE_CrAPDB.c", 220);
@@ -248,19 +248,19 @@ u8 FE_CrAP_GetTriggerAnims(void) {
 // Set the gender of the golfer being created, which picks the assets offered, and clear the cached
 // list tables (FE_CrAP_ResetLastCategoryTables).
 void FE_CrAP_SetCurrentGender(s8 n) {
-    lbl_80282460->n4 = n;
+    lbl_80282460->nGender = n;
     FE_CrAP_ResetLastCategoryTables();
 }
 
 // The gender of the golfer being created (FE_CrAP_SetCurrentGender), which picks the assets offered
 // (FE_IsValidCurrentGender).
 s8 FE_CrAP_GetCurrentGender(void) {
-    return lbl_80282460->n4;
+    return lbl_80282460->nGender;
 }
 
 // An asset's gender, as FE_IsValidCurrentGender tests it (2: suits either).
 s8 FE_CrAP_GetAssetGender(int nAsset) {
-    return lbl_80282460->pAssets[nAsset].n40;
+    return lbl_80282460->pAssets[nAsset].nGender;
 }
 
 // Empty the profile's slot of the asset.
@@ -379,10 +379,11 @@ void FE_CrAP_TurnOffPart(s16 nPart, int b, int i) {
 }
 
 // The player may pick the asset: it was not locked when last checked (aAssetLocked) and the profile
-// owns it (aB1CC: set for the level 0 assets, cleared when one is sold).
+// owns it (aAssetOwned: set for the level 0 assets, cleared when one is sold).
 u8 FE_CrAP_IsAssetAvailableForUser(int nAsset) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
-    if (!BitArray_TestBit(pProfile->aAssetLocked, nAsset) && BitArray_TestBit(pProfile->aB1CC, nAsset)) {
+    if (!BitArray_TestBit(pProfile->aAssetLocked, nAsset)
+        && BitArray_TestBit(pProfile->aAssetOwned, nAsset)) {
         return 1;
     }
     return 0;
@@ -651,7 +652,7 @@ int FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(s16 nPart, int b) {
     nWanted = FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(nPart, b);
     for (nAsset = nFirst; nAsset < lbl_80282460->nAssets; nAsset++) {
         if (nPart == lbl_80282460->pAssets[nAsset].nPart
-            && FE_IsValidCurrentGender(lbl_80282460->pAssets[nAsset].n40) &&
+            && FE_IsValidCurrentGender(lbl_80282460->pAssets[nAsset].nGender) &&
             FE_IsMatchingSubCategory(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted)) {
             nCount++;
         }
@@ -670,12 +671,12 @@ int FE_CrAP_GetNumberOfSubcategoryIndicesForCategory(s16 nPart) {
 
     for (i = 0; i < lbl_80282460->nAssets; i++) {
         if (nPart == lbl_80282460->pAssets[i].nPart
-            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].n40)) {
+            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].nGender)) {
             // a category is counted at its last asset
             bLater = 0;
             for (j = i + 1; j < lbl_80282460->nAssets; j++) {
                 if (nPart == lbl_80282460->pAssets[j].nPart
-                    && FE_IsValidCurrentGender(lbl_80282460->pAssets[j].n40) &&
+                    && FE_IsValidCurrentGender(lbl_80282460->pAssets[j].nGender) &&
                     lbl_80282460->pAssets[j].nCategory == lbl_80282460->pAssets[i].nCategory) {
                     bLater = 1;
                     break;
@@ -714,7 +715,7 @@ int FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(s16 nPart, int n) {
     }
     for (i = nFirst; i < lbl_80282460->nAssets; i++) {
         if (nPart == lbl_80282460->pAssets[i].nPart
-            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].n40)) {
+            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].nGender)) {
             bKnown = 0;
             for (j = 0; j < nFound; j++) {
                 if (aCategories[j] == lbl_80282460->pAssets[i].nCategory) {
@@ -751,7 +752,7 @@ int FE_CrAP_GetSubCategoryIndexForCategoryAndSubcategoryID(s16 nPart, int nCateg
     nFirst = FE_CrAP_GetFirstCategoryAssetID(nPart);
     for (i = nFirst; i < lbl_80282460->nAssets; i++) {
         if (nPart == lbl_80282460->pAssets[i].nPart
-            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].n40)) {
+            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].nGender)) {
             bKnown = 0;
             for (j = 0; j < nFound; j++) {
                 if (aCategories[j] == lbl_80282460->pAssets[i].nCategory) {
@@ -818,7 +819,7 @@ CrAPAsset* FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(s16 nPart,
     n = 0;
     for (nAsset = nFirst; nAsset < lbl_80282460->nAssets; nAsset++) {
         if (nPart == lbl_80282460->pAssets[nAsset].nPart &&
-            FE_IsValidCurrentGender(lbl_80282460->pAssets[nAsset].n40) &&
+            FE_IsValidCurrentGender(lbl_80282460->pAssets[nAsset].nGender) &&
             FE_IsMatchingSubCategory(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted)) {
             if (n == i) {
                 return &lbl_80282460->pAssets[nAsset];
@@ -854,7 +855,7 @@ int FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(s16 nPart, i
     n = 0;
     for (nAsset = nFirst; nAsset < lbl_80282460->nAssets; nAsset++) {
         if (nPart == lbl_80282460->pAssets[nAsset].nPart
-            && FE_IsValidCurrentGender(lbl_80282460->pAssets[nAsset].n40) &&
+            && FE_IsValidCurrentGender(lbl_80282460->pAssets[nAsset].nGender) &&
             FE_IsMatchingSubCategory(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted)) {
             if (n == i) {
                 return nAsset;
@@ -1003,14 +1004,14 @@ s32 FE_CrAP_GetPartSalePrice(s16 nPart, int b, int i) {
     return pAsset->n34;
 }
 
-// The level of choice i under entry b of a part's list (n38; -1: no such choice); the assets of
+// The level of choice i under entry b of a part's list (nLevel; -1: no such choice); the assets of
 // level 0 are owned from the start.
 s32 FE_CrAP_GetPartLevel(s16 nPart, int b, int i) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
         return -1;
     }
-    return pAsset->n38;
+    return pAsset->nLevel;
 }
 
 // The first attribute choice i under entry b of a part's list raises (-1: none;
@@ -1254,14 +1255,14 @@ s32 FE_CrAP_GetNumEntriesInCrAPDB(void) {
     return lbl_80282460->nAssets;
 }
 
-// An asset's level (n38, as FE_CrAP_GetPartLevel); fe_craputils makes the assets of level 0
+// An asset's level (nLevel, as FE_CrAP_GetPartLevel); fe_craputils makes the assets of level 0
 // available from the start.
 s32 FE_CrAP_GetPartLevelFromAssetIndex(int nAsset) {
     CrAPAsset* pAsset = &lbl_80282460->pAssets[nAsset];
     if (pAsset == NULL) {
         return -1;
     }
-    return pAsset->n38;
+    return pAsset->nLevel;
 }
 
 // The database is allocated (FE_CrAP_InitModule has run); its assets may still be on their way.
@@ -1281,12 +1282,12 @@ int FE_CrAP_GetNumberUniqueGeometries(s16 nPart, int b) {
     nWanted = FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(nPart, b);
     for (i = 0; i < lbl_80282460->nAssets; i++) {
         if (nPart == lbl_80282460->pAssets[i].nPart
-            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].n40) &&
+            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].nGender) &&
             FE_IsMatchingSubCategory(nPart, lbl_80282460->pAssets[i].nCategory, nWanted)) {
             bEarlier = 0;
             for (j = i - 1; j >= 0; j--) {
                 if (nPart == lbl_80282460->pAssets[j].nPart
-                    && FE_IsValidCurrentGender(lbl_80282460->pAssets[j].n40) &&
+                    && FE_IsValidCurrentGender(lbl_80282460->pAssets[j].nGender) &&
                     lbl_80282460->pAssets[j].nCategory == lbl_80282460->pAssets[i].nCategory &&
                     lbl_80282460->pAssets[j].aColor[0][0] == lbl_80282460->pAssets[i].aColor[0][0] &&
                     lbl_80282460->pAssets[j].aColor[0][1] == lbl_80282460->pAssets[i].aColor[0][1] &&
@@ -1314,8 +1315,8 @@ void CrAPAssetsByteSwap(void) {
         pSrc = (u8*)&lbl_80282460->pAssets[i];
         pDst = (u8*)&lbl_80282460->pAssets[i];
         ByteSwap_Records((void**)&pSrc, (void**)&pDst, lbl_80193228, 20, 1);
-        pSrc = (u8*)&lbl_80282460->pAssets[i].n110;
-        pDst = (u8*)&lbl_80282460->pAssets[i].n110;
+        pSrc = (u8*)&lbl_80282460->pAssets[i].nUnlockText;
+        pDst = (u8*)&lbl_80282460->pAssets[i].nUnlockText;
         BYTESWAP_SWAPDATA(&pSrc, pDst, sizeof(s16), sizeof(s16));
         pSrc = (u8*)&lbl_80282460->pAssets[i].n112;
         pDst = (u8*)&lbl_80282460->pAssets[i].n112;
@@ -1373,7 +1374,7 @@ void FE_CrAP_GetCategorySubcategoryAndEntryNumFromAssetID(int nAsset, s16* pnPar
     *pnEntry = FE_CrAP_GetSubCategoryIndexForCategoryAndSubcategoryID(*pnPart, lbl_80282460->pAssets[nAsset].nCategory);
     for (i = nFirst; i < nAsset; i++) {
         if (*pnPart == lbl_80282460->pAssets[i].nPart
-            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].n40)) {
+            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].nGender)) {
             if (FE_IsMatchingSubCategory(*pnPart, lbl_80282460->pAssets[i].nCategory,
                             lbl_80282460->pAssets[nAsset].nCategory)) {
                 nCount++;
@@ -1396,7 +1397,7 @@ void FE_CrAP_GetEntryNumFromAssetIDCategorySubcategory(int nAsset, s16 nPart, in
 
     for (i = nFirst; i < nAsset; i++) {
         if (nPart == lbl_80282460->pAssets[i].nPart
-            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].n40) &&
+            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].nGender) &&
             FE_IsMatchingSubCategory(nPart, lbl_80282460->pAssets[i].nCategory, nWanted)) {
             nCount++;
         }
@@ -1407,7 +1408,7 @@ void FE_CrAP_GetEntryNumFromAssetIDCategorySubcategory(int nAsset, s16 nPart, in
 // An asset of gender n is offered for the golfer being created: n is the current gender
 // (FE_CrAP_SetCurrentGender) or 2, either.
 u8 FE_IsValidCurrentGender(s8 n) {
-    if (n == lbl_80282460->n4 || n == 2) {
+    if (n == lbl_80282460->nGender || n == 2) {
         return 1;
     }
     return 0;
@@ -1473,7 +1474,7 @@ u8 FE_CrAP_IsItemEquipped(s16 nPart, int b, int i) {
     for (nAsset = nFirst; nAsset < lbl_80282460->nAssets; nAsset++) {
         if (nPart == lbl_80282460->pAssets[nAsset].nPart &&
             FE_IsMatchingSubCategory(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted) &&
-            FE_IsValidCurrentGender(lbl_80282460->pAssets[nAsset].n40)) {
+            FE_IsValidCurrentGender(lbl_80282460->pAssets[nAsset].nGender)) {
             n++;
             if (n == i) {
                 return FE_CrAP_IsAssetEquipped(FE_CrAP_GetAssetFromAssetIndex(nAsset));
@@ -1517,8 +1518,8 @@ char* FE_CrAP_GetStringFromTable(int nCategory) {
 }
 
 // Copy how choice i under entry b of a part's list is unlocked into pDst: "Game Boy Advance Link
-// Required" for lock kind 2, otherwise its unlock text from 'CR_S' (n110; pDst is left as it is
-// when it has none). 0 when the names are not loaded, pDst is NULL or there is no such choice.
+// Required" for lock kind 2, otherwise its unlock text from 'CR_S' (nUnlockText; pDst is left as it
+// is when it has none). 0 when the names are not loaded, pDst is NULL or there is no such choice.
 u8 FE_CrAP_GetUnlockMessageFrom(s16 nPart, int b, int i, char* pDst) {
     int nAsset;
     int nWanted = FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(nPart, b);
@@ -1534,7 +1535,7 @@ u8 FE_CrAP_GetUnlockMessageFrom(s16 nPart, int b, int i, char* pDst) {
     n = 0;
     for (nAsset = 0; nAsset < lbl_80282460->nAssets; nAsset++) {
         if (nPart == lbl_80282460->pAssets[nAsset].nPart &&
-            FE_IsValidCurrentGender(lbl_80282460->pAssets[nAsset].n40) &&
+            FE_IsValidCurrentGender(lbl_80282460->pAssets[nAsset].nGender) &&
             FE_IsMatchingSubCategory(nPart, lbl_80282460->pAssets[nAsset].nCategory, nWanted)) {
             if (n == i) {
                 CrAPDB* pDB = lbl_80282460;
@@ -1543,8 +1544,8 @@ u8 FE_CrAP_GetUnlockMessageFrom(s16 nPart, int b, int i, char* pDst) {
                     strcpy(pDst, "Game Boy\xAE Advance Link Required");
                     return 1;
                 }
-                if (pAsset->n110 != -1) {
-                    strcpy(pDst, pDB->pStrings + pAsset->n110);
+                if (pAsset->nUnlockText != -1) {
+                    strcpy(pDst, pDB->pStrings + pAsset->nUnlockText);
                 }
                 return 1;
             }
@@ -1775,7 +1776,7 @@ s32 FE_CrAP_GetNumItemsWithLockModeAndLockVal(s32 nKind, s32 nLock) {
 
     for (i = 0; i < lbl_80282460->nAssets; i++) {
         if (nKind == lbl_80282460->pAssets[i].nLockKind && nLock == lbl_80282460->pAssets[i].nLock &&
-            FE_IsValidCurrentGender(lbl_80282460->pAssets[i].n40)) {
+            FE_IsValidCurrentGender(lbl_80282460->pAssets[i].nGender)) {
             nCount++;
         }
     }
@@ -1791,7 +1792,7 @@ s32 FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(s32 nKind, s32 nLock, char* szF
 
     for (i = 0; i < lbl_80282460->nAssets; i++) {
         if (nKind == lbl_80282460->pAssets[i].nLockKind && nLock == lbl_80282460->pAssets[i].nLock &&
-            FE_IsValidCurrentGender(lbl_80282460->pAssets[i].n40)) {
+            FE_IsValidCurrentGender(lbl_80282460->pAssets[i].nGender)) {
             nCount++;
             switch (nCount) {
             case 1:
@@ -1854,8 +1855,8 @@ s32 FE_CrAP_CollectSponsorshipItems(void) {
         if (pProfile->aSponsor[i].bSigned) {
             for (j = 0; j < nAssets; j++) {
                 if (pProfile->aSponsor[i].nSponsor == lbl_80282460->pAssets[pBase[j]].n2C) {
-                    lbl_80282470[lbl_8028246C].n0 = pProfile->aSponsor[i].nSponsor;
-                    lbl_80282470[lbl_8028246C].n4 = GameModeDriverPGATour_GetSponsorshipBonusCash(i);
+                    lbl_80282470[lbl_8028246C].nSponsor = pProfile->aSponsor[i].nSponsor;
+                    lbl_80282470[lbl_8028246C].nBonusCash = GameModeDriverPGATour_GetSponsorshipBonusCash(i);
                     strcpy(lbl_80282470[lbl_8028246C].sz8, lbl_80282460->pAssets[pBase[j]].szName);
                     lbl_8028246C++;
                 }
@@ -1868,8 +1869,8 @@ s32 FE_CrAP_CollectSponsorshipItems(void) {
 // Copy sponsorship record n (FE_CrAP_CollectSponsorshipItems): its sponsor, its bonus and the
 // asset's name.
 void FE_CrAP_GetSponsorshipItemInfo(int n, s16* pN0, s32* pN4, char* pDst) {
-    *pN0 = lbl_80282470[n].n0;
-    *pN4 = lbl_80282470[n].n4;
+    *pN0 = lbl_80282470[n].nSponsor;
+    *pN4 = lbl_80282470[n].nBonusCash;
     strcpy(pDst, lbl_80282470[n].sz8);
 }
 
@@ -1879,7 +1880,8 @@ void FE_CrAP_GetSponsorName(s16 n, char* pDst) {
 }
 
 // Count a part's assets offered for the current gender: the locked ones (fn_80078008), the owned
-// ones (aB1CC), those with their aB344 bit set (TW07 counts new ones here) and all of them.
+// ones (aAssetOwned), those with their aAssetNew bit set (TW07 counts new ones here) and all of
+// them.
 void FE_CrAP_GetCategoryInfo(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s32* pAll) {
     int i;
     SaveProfile* pProfile = FE_GetCurrentProfile();
@@ -1890,11 +1892,11 @@ void FE_CrAP_GetCategoryInfo(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s3
     *pAll = 0;
     for (i = 0; i < lbl_80282460->nAssets; i++) {
         if (nPart == lbl_80282460->pAssets[i].nPart
-            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].n40)) {
-            if (BitArray_TestBit(pProfile->aB1CC, i)) {
+            && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].nGender)) {
+            if (BitArray_TestBit(pProfile->aAssetOwned, i)) {
                 *pB1CC += 1;
             }
-            if (BitArray_TestBit(pProfile->aB344, i)) {
+            if (BitArray_TestBit(pProfile->aAssetNew, i)) {
                 *pB344 += 1;
             }
             if (fn_80078008(i, pProfile)) {
@@ -1923,10 +1925,10 @@ s16 FE_CrAP_GetCategoryFromAssetID(int nAsset) {
     return lbl_80282460->pAssets[nAsset].nPart;
 }
 
-// An asset's level (its n38, as FE_CrAP_GetPartLevelFromAssetIndex returns it); level 0 assets are
-// owned from the start. No range check on nAsset.
+// An asset's level (its nLevel, as FE_CrAP_GetPartLevelFromAssetIndex returns it); level 0 assets
+// are owned from the start. No range check on nAsset.
 int FE_CrAP_GetLevelFromAssetID(int nAsset) {
-    return lbl_80282460->pAssets[nAsset].n38;
+    return lbl_80282460->pAssets[nAsset].nLevel;
 }
 
 // Copy the name of an asset's category into pDst.

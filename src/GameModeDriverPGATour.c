@@ -81,7 +81,7 @@ void GameModeDriverPGATour_Init(void) {
     gpGame->pfnGetPotentialLead = GameModeDriverPGATour_GetPotentialLead;
     gpGame->pfnGetPotentialHoleResult = GameModeDriverPGATour_GetPotentialHoleResult;
     gpGame->b274 = 0;
-    gpGame->n4 = 0;
+    gpGame->nScoringType = 0;
     gpGame->nMulligans = 0;
     gpGame->nC = 1;
     gpGame->n10 = 1;
@@ -468,7 +468,7 @@ void GameModeDriverPGATour_CommitUserRoundStatCounts(s32 nPlayer) {
     pTotal->nPar4Strokes += pRound->nPar4Strokes;
     pTotal->nPar5Strokes += pRound->nPar5Strokes;
     pTotal->nSeasonWinnings += pRound->nSeasonWinnings;
-    pTotal->n44 += pRound->n44;
+    pTotal->nMonthWinnings += pRound->nMonthWinnings;
     pTotal->nSeasonWins += pRound->nSeasonWins;
     pTotal->nPlayerOfYearPoints += pRound->nPlayerOfYearPoints;
     pTotal->nCareerWinnings += pRound->nCareerWinnings;

@@ -56,7 +56,7 @@ void GameMode12_Init(void) {
     gpGame->b281 = 0;
     gpGame->bStrokeLimit = 0;
     gpGame->b288 = 0;
-    gpGame->n4 = 0;
+    gpGame->nScoringType = 0;
     gpGame->nMulligans = 1;
     gpGame->nC = 4;
     gpGame->n10 = 1;

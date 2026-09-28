@@ -351,8 +351,8 @@ void GM_PgaTourSim_SimTournamentWinner(int nPlayer) {
 // season, [13] leading the Player of the Year points, [14] leading the season's winnings, [15]
 // leading the scoring average with 15 tournaments or more. When a month ends (the next tournament
 // ends in another month, or the season is over), no pro ahead of the player's winnings for the
-// month (n44) wins that month's award a1C0[month - 1], and every golfer's month winnings start
-// again.
+// month (nMonthWinnings) wins that month's award a1C0[month - 1], and every golfer's month winnings
+// start again.
 void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst) {
     int i;
     s32 nAhead;
@@ -425,7 +425,7 @@ void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst) {
         || CalDate_GetMonth(GameModeDriverPGATour_GetEndDate(nNext))
                != CalDate_GetMonth(GameModeDriverPGATour_GetEndDate(gpSaveData[nPlayer].tour.nEvent))) {
         for (i = 0; i < PGA_NUM_PROS; i++) {
-            if (pStats->n44 < gpSaveData[nPlayer].tour.aStats[i].n44) {
+            if (pStats->nMonthWinnings < gpSaveData[nPlayer].tour.aStats[i].nMonthWinnings) {
                 break;
             }
         }
@@ -437,7 +437,7 @@ void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst) {
             PlayPGAAwardVideo(14, 6);
         }
         for (i = 0; i < PGA_NUM_GOLFERS; i++) {
-            gpSaveData[nPlayer].tour.aStats[i].n44 = 0;
+            gpSaveData[nPlayer].tour.aStats[i].nMonthWinnings = 0;
         }
     }
 }
@@ -542,13 +542,13 @@ s32 HistoricalScoreRankCompareIncreasing(const void* pA, const void* pB) {
     if (nGolfer == PGA_USER_GOLFER) {
         fA = 10000.0f;
     } else {
-        fA = gPgaPros[nGolfer].f50;
+        fA = gPgaPros[nGolfer].fHistoricalRank;
     }
     nGolfer = GM_PgaTourSim_GetGolferIDFromEntrantID(0, nEntrantB);
     if (nGolfer == PGA_USER_GOLFER) {
         fB = 10000.0f;
     } else {
-        fB = gPgaPros[nGolfer].f50;
+        fB = gPgaPros[nGolfer].fHistoricalRank;
     }
     if (fA < fB) {
         return -1;
@@ -915,10 +915,10 @@ s32 GM_PgaTourSim_GetCurrentHoleFromEntrantID(int nPlayer, int nEntrant) {
     return GetEntrantNonMCPtr(nEntrant)->nCurrentHole;
 }
 
-// The entrant's prize money from the tournament (PgaEntrantMC n18, set when the purse is split,
-// SplitWinnings).
+// The entrant's prize money from the tournament (PgaEntrantMC.nWinnings, set when the purse is
+// split, SplitWinnings).
 s32 GM_PgaTourSim_GetLeaderboardWinningsFromEntrantID(int nPlayer, int nEntrant) {
-    return GetEntrantMCPtr(nPlayer, nEntrant)->n18;
+    return GetEntrantMCPtr(nPlayer, nEntrant)->nWinnings;
 }
 
 // The cut row: the first score row placed below 70th (the top 70 and ties play on); if there is
@@ -1760,8 +1760,8 @@ void CalcBallStriking(int nGolfer, f32* pfValue) {
 
 // Pays one place's prize money: nTotal (the prizes of the score rows the place fills, added up) is
 // split evenly among the nCount entrants from score row nFirstRow, the share cut to a whole number.
-// Each share becomes the entrant's leader board winnings (PgaEntrantMC n18) and is added to the
-// golfer's month, season and career winnings; the player's share is also paid into the profile
+// Each share becomes the entrant's leader board winnings (PgaEntrantMC.nWinnings) and is added to
+// the golfer's month, season and career winnings; the player's share is also paid into the profile
 // (GameModeDriverPGATour_AwardMoney). nCount 0 pays nothing.
 void SplitWinnings(int nPlayer, s32 nTotal, s32 nFirstRow, s32 nCount) {
     int i;
@@ -1773,10 +1773,13 @@ void SplitWinnings(int nPlayer, s32 nTotal, s32 nFirstRow, s32 nCount) {
     nShare = (f32)nTotal / (f32)nCount;
     for (i = 0; i < nCount; i++) {
         int nEntrant = gPgaScoreRanking.aEntrant[nFirstRow + i];
-        GetEntrantMCPtr(nPlayer, nEntrant)->n18 = nShare;
-        gpSaveData[nPlayer].tour.aStats[GM_PgaTourSim_GetGolferIDFromEntrantID(nPlayer, nEntrant)].n44 += nShare;
-        gpSaveData[nPlayer].tour.aStats[GM_PgaTourSim_GetGolferIDFromEntrantID(nPlayer, nEntrant)].nSeasonWinnings += nShare;
-        gpSaveData[nPlayer].tour.aStats[GM_PgaTourSim_GetGolferIDFromEntrantID(nPlayer, nEntrant)].nCareerWinnings += nShare;
+        GetEntrantMCPtr(nPlayer, nEntrant)->nWinnings = nShare;
+        gpSaveData[nPlayer].tour.aStats[GM_PgaTourSim_GetGolferIDFromEntrantID(nPlayer, nEntrant)]
+            .nMonthWinnings += nShare;
+        gpSaveData[nPlayer].tour.aStats[GM_PgaTourSim_GetGolferIDFromEntrantID(nPlayer, nEntrant)]
+            .nSeasonWinnings += nShare;
+        gpSaveData[nPlayer].tour.aStats[GM_PgaTourSim_GetGolferIDFromEntrantID(nPlayer, nEntrant)]
+            .nCareerWinnings += nShare;
         if (GM_PgaTourSim_IsEntrantUser(nPlayer, nEntrant)) {
             GameModeDriverPGATour_AwardMoney(nPlayer, nShare);
         }

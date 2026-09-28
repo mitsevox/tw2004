@@ -349,7 +349,7 @@ void GM_vGetNumCrAPSubcategories(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 453: set one of the created golfer's details, chosen by pArgs[0]: 0 the profile's
-// name (the string pArgs[1]); 1 its gender (choices.n5A7A, also made the database's current
+// name (the string pArgs[1]); 1 its gender (choices.nGender, also made the database's current
 // gender); 2 its date, pArgs[2] packed as month * 10000 + day * 1000000 + year (see fn_80078604); 3
 // left-handed (choices.bLeftHanded). Values come in pArgs[2].
 void GM_vSetCrAPGolferInfo(MsgArg* pArgs, MsgArg* pResult) {
@@ -363,8 +363,8 @@ void GM_vSetCrAPGolferInfo(MsgArg* pArgs, MsgArg* pResult) {
         fn_80057ED0(pProfile, ((MsgString*)pArgs[1].p)->pStr);
         break;
     case 1:
-        pProfile->choices.n5A7A = pArgs[2].i;
-        FE_CrAP_SetCurrentGender(pProfile->choices.n5A7A);
+        pProfile->choices.nGender = pArgs[2].i;
+        FE_CrAP_SetCurrentGender(pProfile->choices.nGender);
         break;
     case 2:
         fn_80078620(pArgs[2].i, &nMonth, &nDay, &nYear);
@@ -388,7 +388,7 @@ void GM_vGetCrAPGolferInfo(MsgArg* pArgs, MsgArg* pResult) {
         strcpy(((MsgString*)pArgs[1].p)->pStr, pProfile->szName);
         break;
     case 1:
-        *(s32*)pArgs[2].p = (s8)pProfile->choices.n5A7A;
+        *(s32*)pArgs[2].p = (s8)pProfile->choices.nGender;
         break;
     case 2:
         *(s32*)pArgs[2].p = fn_80078604(pProfile->nDateMonth, pProfile->nDateDay, pProfile->nDateYear);
@@ -423,16 +423,18 @@ void GM_vIsCrAPItemLocked(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 461: the profile owns choice pArgs[2] under entry pArgs[1] of part pArgs[0]: its bit
-// in aB1CC, set when it is bought (GM_vPurchaseCrAPItem) and from the start for level 0 assets.
+// in aAssetOwned, set when it is bought (GM_vPurchaseCrAPItem) and from the start for level 0
+// assets.
 void GM_vIsCrAPItemOwned(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(pArgs[0].i, pArgs[1].i, pArgs[2].i);
-    pResult->i = BitArray_TestBit(pProfile->aB1CC, nAsset);
+    pResult->i = BitArray_TestBit(pProfile->aAssetOwned, nAsset);
 }
 
 // Menu message 462: buy choice pArgs[2] under entry pArgs[1] of part pArgs[0] for pArgs[3]: the
-// price comes off the profile's money (no check that it is there), the asset's owned bit (aB1CC) is
-// set, the created golfer puts it on and its equipment tiers are worked out again (fn_8007873C).
+// price comes off the profile's money (no check that it is there), the asset's owned bit
+// (aAssetOwned) is set, the created golfer puts it on and its equipment tiers are worked out again
+// (fn_8007873C).
 void GM_vPurchaseCrAPItem(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s16 nPart = pArgs[0].i;
@@ -442,7 +444,7 @@ void GM_vPurchaseCrAPItem(MsgArg* pArgs, MsgArg* pResult) {
     int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, nEntry, nChoice);
 
     pProfile->nCurrentCash -= nPrice;
-    BitArray_SetBit(pProfile->aB1CC, nAsset);
+    BitArray_SetBit(pProfile->aAssetOwned, nAsset);
     FE_CrAP_TurnOnPart(nPart, nEntry, nChoice);
     fn_8007873C(pProfile);
 }
@@ -485,12 +487,12 @@ void GM_vGetCrAPSaleItems(MsgArg* pArgs, MsgArg* pResult) {
     int nSale = fn_80077BDC(pArgs[0].i);
     s8 nGender = FE_CrAP_GetCurrentGender();
 
-    *(s32*)pArgs[1].p = lbl_80281ED4->aKind[nGender][nSale];
-    *(s32*)pArgs[2].p = lbl_80281ED4->aChoice[nGender][nSale][0];
-    *(s32*)pArgs[3].p = lbl_80281ED4->aChoice[nGender][nSale][1];
-    *(s32*)pArgs[4].p = lbl_80281ED4->aChoice[nGender][nSale][2];
-    *(s32*)pArgs[5].p = lbl_80281ED4->aChoice[nGender][nSale][3];
-    *(s32*)pArgs[6].p = lbl_80281ED4->aChoice[nGender][nSale][4];
+    *(s32*)pArgs[1].p = lbl_80281ED4->aSalePart[nGender][nSale];
+    *(s32*)pArgs[2].p = lbl_80281ED4->aSaleChoice[nGender][nSale][0];
+    *(s32*)pArgs[3].p = lbl_80281ED4->aSaleChoice[nGender][nSale][1];
+    *(s32*)pArgs[4].p = lbl_80281ED4->aSaleChoice[nGender][nSale][2];
+    *(s32*)pArgs[5].p = lbl_80281ED4->aSaleChoice[nGender][nSale][3];
+    *(s32*)pArgs[6].p = lbl_80281ED4->aSaleChoice[nGender][nSale][4];
 }
 
 // Menu message 476: the list entries (EA's subcategories) of the five sale items
@@ -499,11 +501,11 @@ void GM_vGetCrAPSaleSubcategories(MsgArg* pArgs, MsgArg* pResult) {
     int nSale = fn_80077BDC(pArgs[0].i);
     s8 nGender = FE_CrAP_GetCurrentGender();
 
-    *(s32*)pArgs[1].p = lbl_80281ED4->aPart[nGender][nSale][0];
-    *(s32*)pArgs[2].p = lbl_80281ED4->aPart[nGender][nSale][1];
-    *(s32*)pArgs[3].p = lbl_80281ED4->aPart[nGender][nSale][2];
-    *(s32*)pArgs[4].p = lbl_80281ED4->aPart[nGender][nSale][3];
-    *(s32*)pArgs[5].p = lbl_80281ED4->aPart[nGender][nSale][4];
+    *(s32*)pArgs[1].p = lbl_80281ED4->aSaleEntry[nGender][nSale][0];
+    *(s32*)pArgs[2].p = lbl_80281ED4->aSaleEntry[nGender][nSale][1];
+    *(s32*)pArgs[3].p = lbl_80281ED4->aSaleEntry[nGender][nSale][2];
+    *(s32*)pArgs[4].p = lbl_80281ED4->aSaleEntry[nGender][nSale][3];
+    *(s32*)pArgs[5].p = lbl_80281ED4->aSaleEntry[nGender][nSale][4];
 }
 
 // Menu message 477: choice pArgs[2] under entry pArgs[1] of part pArgs[0] is one of the day's sale
@@ -539,15 +541,15 @@ void GM_vIsCrAPItemOnSale(MsgArg* pArgs, MsgArg* pResult) {
         return;
     }
     nSale = fn_80077BDC(nSaleCategory);
-    if (lbl_80281ED4->aKind[nGender][nSale] != nPart) {
+    if (lbl_80281ED4->aSalePart[nGender][nSale] != nPart) {
         pResult->i = 0;
         return;
     }
     for (j = 0; j < 5; j++) {
         if (nAsset
             == FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(
-                    lbl_80281ED4->aKind[nGender][nSale], lbl_80281ED4->aPart[nGender][nSale][j],
-                    lbl_80281ED4->aChoice[nGender][nSale][j])) {
+                    lbl_80281ED4->aSalePart[nGender][nSale], lbl_80281ED4->aSaleEntry[nGender][nSale][j],
+                    lbl_80281ED4->aSaleChoice[nGender][nSale][j])) {
             pResult->i = 1;
             return;
         }
@@ -599,8 +601,8 @@ void GM_vSetLogoPixel(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 498: check every asset's lock again (fn_80078680). Each asset that was locked before
-// and is not now, and is offered for the current gender, gets its new bit (aB344) set; the result
-// is how many there are.
+// and is not now, and is offered for the current gender, gets its new bit (aAssetNew) set; the
+// result is how many there are.
 void GM_vCheckCrAPUnlocks(MsgArg* pArgs, MsgArg* pResult) {
     u32 aWasLocked[94];                 // the size is unknown (the frame allows up to 97 words)
     int nUnlocked = 0;
@@ -621,7 +623,7 @@ void GM_vCheckCrAPUnlocks(MsgArg* pArgs, MsgArg* pResult) {
         if (!BitArray_TestBit(pProfile->aAssetLocked, i) && BitArray_TestBit(aWasLocked, i)) {
             if (FE_IsValidCurrentGender(FE_CrAP_GetAssetGender(i))) {
                 nUnlocked++;
-                BitArray_SetBit(pProfile->aB344, i);
+                BitArray_SetBit(pProfile->aAssetNew, i);
             }
         }
     }
@@ -629,34 +631,34 @@ void GM_vCheckCrAPUnlocks(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 499: choice pArgs[2] under entry pArgs[1] of part pArgs[0] is newly unlocked (its
-// aB344 bit, set by GM_vCheckCrAPUnlocks).
+// aAssetNew bit, set by GM_vCheckCrAPUnlocks).
 void GM_vIsCrAPItemNew(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(pArgs[0].i, pArgs[1].i, pArgs[2].i);
-    pResult->i = BitArray_TestBit(pProfile->aB344, nAsset);
+    pResult->i = BitArray_TestBit(pProfile->aAssetNew, nAsset);
 }
 
 // Menu message 500: when choice pArgs[2] under entry pArgs[1] of part pArgs[0] is newly unlocked
-// (aB344), set its aB4BC bit too; GM_vClearMarkedNewCrAPItems later clears both.
+// (aAssetNew), set its aAssetMarkedNew bit too; GM_vClearMarkedNewCrAPItems later clears both.
 void GM_vMarkNewCrAPItem(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(pArgs[0].i, pArgs[1].i, pArgs[2].i);
-    if (BitArray_TestBit(pProfile->aB344, nAsset)) {
-        BitArray_SetBit(pProfile->aB4BC, nAsset);
+    if (BitArray_TestBit(pProfile->aAssetNew, nAsset)) {
+        BitArray_SetBit(pProfile->aAssetMarkedNew, nAsset);
     }
 }
 
-// Menu message 501: every asset marked by GM_vMarkNewCrAPItem (both its aB344 and aB4BC bits set)
-// stops being new: both bits are cleared.
+// Menu message 501: every asset marked by GM_vMarkNewCrAPItem (both its aAssetNew and
+// aAssetMarkedNew bits set) stops being new: both bits are cleared.
 void GM_vClearMarkedNewCrAPItems(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 nAssets = FE_CrAP_GetNumEntriesInCrAPDB();
     u32 i;
 
     for (i = 0; i < nAssets; i++) {
-        if (BitArray_TestBit(pProfile->aB344, i) && BitArray_TestBit(pProfile->aB4BC, i)) {
-            BitArray_ClearBit(pProfile->aB344, i);
-            BitArray_ClearBit(pProfile->aB4BC, i);
+        if (BitArray_TestBit(pProfile->aAssetNew, i) && BitArray_TestBit(pProfile->aAssetMarkedNew, i)) {
+            BitArray_ClearBit(pProfile->aAssetNew, i);
+            BitArray_ClearBit(pProfile->aAssetMarkedNew, i);
         }
     }
 }
@@ -729,7 +731,7 @@ void GM_vGetProfileFlag(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = BitArray_TestBit(pProfile->a10548, pArgs[0].i);
 }
 
-// Menu message 507: five lines naming the newly unlocked assets (aB344, offered for the current
+// Menu message 507: five lines naming the newly unlocked assets (aAssetNew, offered for the current
 // gender) into the strings pArgs[0..4]. With five or fewer, their names; with more, the names of
 // the list entries they belong to, the fifth line "And more..." when there are more than five
 // entries. Unused lines are " ".
@@ -750,7 +752,7 @@ void GM_vGetNewCrAPItemsText(MsgArg* pArgs, MsgArg* pResult) {
         strcpy(aCategories[i], " ");
     }
     for (i = 0; i < nAssets; i++) {
-        if (BitArray_TestBit(pProfile->aB344, i) && FE_IsValidCurrentGender(FE_CrAP_GetAssetGender(i))) {
+        if (BitArray_TestBit(pProfile->aAssetNew, i) && FE_IsValidCurrentGender(FE_CrAP_GetAssetGender(i))) {
             FE_CrAP_GetSubcategoryNameFromAssetID(i, szCategory);
             if (nCategories < 5) {
                 bFound = 0;
@@ -820,11 +822,11 @@ void GM_vGetRandom1To99(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 513: the name of the logo being edited into the string pArgs[1]; the result is its
-// b1020 (1 once it has been kept by GM_vSaveLogo).
+// bSaved (1 once it has been kept by GM_vSaveLogo).
 void GM_vGetLogoName(MsgArg* pArgs, MsgArg* pResult) {
     LogoRecord* pLogo = fn_8010FB70();
     strcpy(((MsgString*)pArgs[1].p)->pStr, pLogo->szName);
-    pResult->i = pLogo->b1020;
+    pResult->i = pLogo->bSaved;
 }
 
 // Menu message 514: name the logo being edited after the string pArgs[1].
@@ -832,23 +834,23 @@ void GM_vSetLogoName(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(fn_8010FB70()->szName, ((MsgString*)pArgs[1].p)->pStr);
 }
 
-// Menu message 621: the profile's logo pArgs[0] (0..4) has been made and kept (its b1020;
+// Menu message 621: the profile's logo pArgs[0] (0..4) has been made and kept (its bSaved;
 // GM_vSaveLogo sets it).
 void GM_vIsProfileLogoMade(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
-    pResult->i = pProfile->choices.aLogo[pArgs[0].i].b1020;
+    pResult->i = pProfile->choices.aLogo[pArgs[0].i].bSaved;
 }
 
-// Menu message 622: keep the logo just edited: the menus' copy (FEProfile.logo106E0) is marked made
-// (b1020) and copied over the profile's logo the editor works on (fn_8010F7D8), and the editor goes
-// back to working on the profile's logo (b10640 cleared).
+// Menu message 622: keep the logo just edited: the menus' copy (FEProfile.logoCopy) is marked made
+// (bSaved) and copied over the profile's logo the editor works on (fn_8010F7D8), and the editor
+// goes back to working on the profile's logo (bEditingCopy cleared).
 void GM_vSaveLogo(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 nLogo = fn_8010F7D8();
 
-    lbl_80281ED4->logo106E0.b1020 = 1;
-    Mem_cpy(&pProfile->choices.aLogo[nLogo], &lbl_80281ED4->logo106E0, sizeof(LogoRecord));
-    lbl_80281ED4->b10640 = 0;
+    lbl_80281ED4->logoCopy.bSaved = 1;
+    Mem_cpy(&pProfile->choices.aLogo[nLogo], &lbl_80281ED4->logoCopy, sizeof(LogoRecord));
+    lbl_80281ED4->bEditingCopy = 0;
 }
 
 // Menu message 515: golfer pArgs[0]'s equipment tier for attribute pArgs[1] (a created golfer's
@@ -922,10 +924,10 @@ void GM_vGetUseProfileCopy(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 543: start (pArgs[0] nonzero) or stop creating the profile's logo the editor works
-// on (fn_8010F7D8). Starting copies that logo into the menus' copy (FEProfile.logo106E0), or for a
-// logo not made yet (b1020 clear) makes a blank one there: every pixel palette colour 0x1C, square,
-// named "MyLogo <n>" with n counted from 1. The editor then works on the copy (b10640 set) until
-// GM_vSaveLogo keeps it; stopping goes back to the profile's logo and drops the copy.
+// on (fn_8010F7D8). Starting copies that logo into the menus' copy (FEProfile.logoCopy), or for a
+// logo not made yet (bSaved clear) makes a blank one there: every pixel palette colour 0x1C,
+// square, named "MyLogo <n>" with n counted from 1. The editor then works on the copy (bEditingCopy
+// set) until GM_vSaveLogo keeps it; stopping goes back to the profile's logo and drops the copy.
 void GM_vCRAPCreatingLogo(MsgArg* pArgs, MsgArg* pResult) {
     char szName[32];                    // TW07's logoName is char[32] too
     SaveProfile* pProfile = FE_GetCurrentProfile();
@@ -933,19 +935,19 @@ void GM_vCRAPCreatingLogo(MsgArg* pArgs, MsgArg* pResult) {
     s32 nLogo = fn_8010F7D8();
 
     if (bStart == 0) {
-        lbl_80281ED4->b10640 = 0;
+        lbl_80281ED4->bEditingCopy = 0;
         return;
     }
-    if (pProfile->choices.aLogo[nLogo].b1020) {
-        Mem_cpy(&lbl_80281ED4->logo106E0, &pProfile->choices.aLogo[nLogo], sizeof(LogoRecord));
+    if (pProfile->choices.aLogo[nLogo].bSaved) {
+        Mem_cpy(&lbl_80281ED4->logoCopy, &pProfile->choices.aLogo[nLogo], sizeof(LogoRecord));
     } else {
         sprintf(szName, "MyLogo %d", nLogo + 1);
-        strcpy(lbl_80281ED4->logo106E0.szName, szName);
-        lbl_80281ED4->logo106E0.b1020 = 0;
-        lbl_80281ED4->logo106E0.nShape = 0;
-        memset(lbl_80281ED4->logo106E0.aPixels, 0x1C, sizeof(lbl_80281ED4->logo106E0.aPixels));
+        strcpy(lbl_80281ED4->logoCopy.szName, szName);
+        lbl_80281ED4->logoCopy.bSaved = 0;
+        lbl_80281ED4->logoCopy.nShape = 0;
+        memset(lbl_80281ED4->logoCopy.aPixels, 0x1C, sizeof(lbl_80281ED4->logoCopy.aPixels));
     }
-    lbl_80281ED4->b10640 = 1;
+    lbl_80281ED4->bEditingCopy = 1;
 }
 
 // Menu message 583: the same as GM_vGetLogoPaletteColor (message 491): logo palette colour pArgs[0]
@@ -1189,7 +1191,7 @@ void GM_vFEMessage566_Empty(MsgArg* pArgs, MsgArg* pResult) {
 
 // Menu message 711: sell choice pArgs[2] under entry pArgs[1] of part pArgs[0] back: a quarter of
 // its full price (not its sale price) goes into the profile's money and it is no longer owned
-// (aB1CC). It is not taken off the golfer, and nothing checks that it was owned.
+// (aAssetOwned). It is not taken off the golfer, and nothing checks that it was owned.
 void GM_vSellCrAPItem(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s16 nPart = pArgs[0].i;
@@ -1198,18 +1200,18 @@ void GM_vSellCrAPItem(MsgArg* pArgs, MsgArg* pResult) {
     int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, nEntry, nChoice);
 
     pProfile->nCurrentCash += (s32)(0.25f * FE_CrAP_GetPartRetailPrice(nPart, nEntry, nChoice));
-    BitArray_ClearBit(pProfile->aB1CC, nAsset);
+    BitArray_ClearBit(pProfile->aAssetOwned, nAsset);
 }
 
 // Menu message 712: count part pArgs[0]'s assets offered for the current gender
-// (FE_CrAP_GetCategoryInfo): all of them into *pArgs[1], the owned ones (aB1CC) into *pArgs[2], the
-// locked ones into *pArgs[3], the new ones (aB344) into *pArgs[4].
+// (FE_CrAP_GetCategoryInfo): all of them into *pArgs[1], the owned ones (aAssetOwned) into
+// *pArgs[2], the locked ones into *pArgs[3], the new ones (aAssetNew) into *pArgs[4].
 void GM_vGetCrAPCategoryCounts(MsgArg* pArgs, MsgArg* pResult) {
     FE_CrAP_GetCategoryInfo(pArgs[0].i, pArgs[3].p, pArgs[2].p, pArgs[4].p, pArgs[1].p);
 }
 
 // Menu message 713: how many of the day's five sale items in sale category pArgs[0] (-1, -2, -3;
-// see GM_vGetCrAPSaleItems) the profile owns (aB1CC), into *pArgs[1].
+// see GM_vGetCrAPSaleItems) the profile owns (aAssetOwned), into *pArgs[1].
 void GM_vGetNumCrAPSaleItemsOwned(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     int i;
@@ -1221,9 +1223,9 @@ void GM_vGetNumCrAPSaleItemsOwned(MsgArg* pArgs, MsgArg* pResult) {
     *pnBought = 0;
     for (i = 0; i < 5; i++) {
         nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(
-                lbl_80281ED4->aKind[nGender][nSale], lbl_80281ED4->aPart[nGender][nSale][i],
-                lbl_80281ED4->aChoice[nGender][nSale][i]);
-        if (BitArray_TestBit(pProfile->aB1CC, nAsset)) {
+                lbl_80281ED4->aSalePart[nGender][nSale], lbl_80281ED4->aSaleEntry[nGender][nSale][i],
+                lbl_80281ED4->aSaleChoice[nGender][nSale][i]);
+        if (BitArray_TestBit(pProfile->aAssetOwned, nAsset)) {
             (*pnBought)++;
         }
     }

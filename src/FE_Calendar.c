@@ -495,7 +495,7 @@ u8 RealTime_AtLatest(void) {
 }
 
 // The real-time events calendar's day cell: never any text (color and state are left as they are);
-// returns the event's calendar icon (GameModeDriverRTE_UI_GetEventIconIndexOnCal, its n14), or -1
+// returns the event's calendar icon (GameModeDriverRTE_UI_GetEventIconIndexOnCal, its nIcon), or -1
 // on a day without an event. The event's GameModeDriverRTE_GetCalData is fetched and not used.
 s32 RealTime_FillCell(char* sz, u16 nDate, s32* pCellColor, s32* pCellState) {
     s32 nId;

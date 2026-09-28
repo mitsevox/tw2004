@@ -379,7 +379,7 @@ void STATEFUNC_PreShotExit(int nPlayer) {
     View* pView   = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
     int   nCamera;
     Mem_cpy(&gPlayers[nPlayer].ball, &gPlayers[nPlayer].ballBefore, sizeof(Ball));
-    nCamera = pView->script.nCamera;
+    nCamera = pView->script.nFade;
     if (nCamera == 1 || nCamera == 3 || nCamera == 4) {
         CameraController_FadeIn(pView, 0.25f, (f32*)&vOffset);
     }
@@ -1347,7 +1347,7 @@ void STATEFUNC_InTheHoleUpdate(int nPlayer) {
             return;
         }
         GolfCamera_SetPostShowPostShotAnimations(pV, GM_ShowPostShotAnimation(nPlayer));
-        if (gpGame->n294 != 0 && pV->script.nCamera != 1 && pV->script.nCamera != 4) {
+        if (gpGame->n294 != 0 && pV->script.nFade != 1 && pV->script.nFade != 4) {
             if (!(gPlayers[nPlayer].uFlags & 8) || fn_8006AA9C(nPlayer) == 2) {
                 if (fn_80095780(gPlayers[nPlayer].pChar) != 9 && fn_80095798(gPlayers[nPlayer].pChar) != 9 &&
                     GolfCamera_ShowPostShotAnimations(pV)) {
@@ -1358,7 +1358,7 @@ void STATEFUNC_InTheHoleUpdate(int nPlayer) {
             }
         }
     }
-    if (fn_800C7170(pV) && pV->nCurCamera != 0x10 && pV->script.nCamera != 1 && pV->script.nCamera != 4) {
+    if (fn_800C7170(pV) && pV->nCurCamera != 0x10 && pV->script.nFade != 1 && pV->script.nFade != 4) {
         gPlayers[nPlayer].uFlags |= 2;
         GOLFERSTATE_Switch(GS_FADE_TO_REMOVE_BALL, nPlayer);
         return;
@@ -1381,7 +1381,7 @@ void STATEFUNC_ConcededInit(int nPlayer) {
     View* pV      = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
     fn_800C7178(pV, nPlayer);
     CameraController_SetCameraMode(pV, 0x19, nPlayer, gPlayers[nPlayer].nView[0]);
-    if (pV->script.nCamera == 1 || pV->script.nCamera == 3 || pV->script.nCamera == 4) {
+    if (pV->script.nFade == 1 || pV->script.nFade == 3 || pV->script.nFade == 4) {
         CameraController_FadeIn(pV, 0.25f, (f32*)&vOffset);
     }
 }
@@ -1590,9 +1590,9 @@ void STATEFUNC_TapInUpdate(int nPlayer) {
         CameraController_SetCameraMode(pV, 0xC, nPlayer, gPlayers[nPlayer].nView[0]);
         CameraController_FadeIn(pV, 0.75f, (f32*)&vOffset);
     }
-    if (pV->script.nCamera == 1) return;
-    if (pV->script.nCamera == 4) return;
-    if (pV->script.nCamera == 3) return;
+    if (pV->script.nFade == 1) return;
+    if (pV->script.nFade == 4) return;
+    if (pV->script.nFade == 3) return;
     if (fn_80048574(pChar, 2)) {
         if (!fn_80062BB0(pChar, 2)) return;
         fn_80062B98(pChar, 2);
@@ -1741,7 +1741,7 @@ void STATEFUNC_RemoveBallExit(int nPlayer) {
     pV      = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
     vOffset = lbl_80183690;
     Mem_cpy(&gPlayers[nPlayer].ballBefore, &gPlayers[nPlayer].ball, sizeof(Ball));
-    if (pV->script.nCamera == 3) {
+    if (pV->script.nFade == 3) {
         CameraController_FadeIn(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 0.75f,
                                 (f32*)&vOffset);
     }
@@ -1840,10 +1840,10 @@ void STATEFUNC_InitialFlyByExit(int nPlayer) {
     for (i = 0; i < gNumPlayersSetUp; i++) {
         pDst = ViewController_GetCameraControl(gPlayers[i].nView[0]);
         ViewController_TurnOnViewController(gPlayers[i].nView[0], 1);
-        pDst->script.nCamera = pSrc->script.nCamera;
-        pDst->script.f94     = pSrc->script.f94;
-        LLMath_CopyVec(pSrc->script.v40, pDst->script.v40);
-        pDst->script.f90     = pSrc->script.f90;
+        pDst->script.nFade       = pSrc->script.nFade;
+        pDst->script.fFadeLength = pSrc->script.fFadeLength;
+        LLMath_CopyVec(pSrc->script.vFadeColor, pDst->script.vFadeColor);
+        pDst->script.fFadeTime   = pSrc->script.fFadeTime;
     }
     gpGame->pfnInitialFlyByDone(nPlayer);
 }

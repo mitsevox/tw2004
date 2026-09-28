@@ -40,7 +40,7 @@ void GameModeAlternateShot_Init(void) {
     gpGame->pfnEndHole = GameModeAlternateShot_EndHole;
     gpGame->pfnEndGame = GameModeAlternateShot_EndGame;
     gpGame->bGimmesAllowed = 0;
-    gpGame->n4 = 1;
+    gpGame->nScoringType = 1;
     gpGame->nMulligans = 0;
     gpGame->nC = 4;
     gpGame->n10 = 4;

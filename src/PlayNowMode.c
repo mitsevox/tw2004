@@ -114,9 +114,9 @@ void PlayNow_LoadBallSpot(void* pObj) {
     ChallengeSpotRecord* pRecord = *(ChallengeSpotRecord**)pObj;
     int i = pRecord->nChallenge - 1;
     if (i < 83) {
-        gPlayNowBallSpots[i].f0 = pRecord->v[0];
-        gPlayNowBallSpots[i].f4 = pRecord->v[1];
-        gPlayNowBallSpots[i].f8 = pRecord->v[2];
+        gPlayNowBallSpots[i].fX = pRecord->v[0];
+        gPlayNowBallSpots[i].fY = pRecord->v[1];
+        gPlayNowBallSpots[i].fZ = pRecord->v[2];
     }
     StaticMem_Free(pObj);
 }
@@ -164,8 +164,8 @@ void PlayNow_LoadPLYFromStream(UStreamObject* pObject) {
 }
 
 // The 'PLYs' stream object (EA's PLAYNOW.STR): the groups' names and descriptions, the text block
-// Challenge.n0 and n4 are offsets into, copied into a new 16-byte aligned block at gPlayNowText;
-// the stream's copy is freed. An empty object leaves gPlayNowText as it was.
+// Challenge.nGroupName and nGroupDesc are offsets into, copied into a new 16-byte aligned block at
+// gPlayNowText; the stream's copy is freed. An empty object leaves gPlayNowText as it was.
 void PlayNow_LoadPLYsFromStream(UStreamObject* pObject) {
     void* pData;
     u32 nSize = fn_8000E81C(pObject, &pData);
@@ -181,20 +181,20 @@ void PlayNow_LoadPLYsFromStream(UStreamObject* pObject) {
 // gets bChanged set, and the challenge's game mode is set (GM_SetModeType fills that mode's
 // callbacks); the challenge now counts as running. Then its course, hole set and hole (1-based; a
 // one-hole challenge selects it alone; not set for the par-5/4/3 and type-7 hole sets), the holes
-// before it deselected, its tee set for everyone, its pin set (n20 - 1; n20 0 gives nPinSet -1 and
-// pin set 0), and player 0 plus up to three CPU opponents (one playing player 0's golfer in the
+// before it deselected, its tee set for everyone, its pin set (nPins - 1; nPins 0 gives nPinSet -1
+// and pin set 0), and player 0 plus up to three CPU opponents (one playing player 0's golfer in the
 // same look gets the next of four looks). The holes before the challenge hole get player 0's scores
 // by nTargetKind: 0 none; 1 a one-hole challenge carries nTargetBase as strokes, else pars nudged
 // at random to total nTargetBase; 2 pars nudged at random to nTargetBase over par (a one-hole
 // challenge carries it, counting one hole); 3/4/5 birdie/par/bogey on each; 7 with match scoring
-// (gpGame->n4 1) holes won at random until the margin is nTargetBase (negative: the opponent's),
-// with stroke scoring everyone on par and player 0 nudged to nTargetBase over. The challenge hole
-// starts at a score by nHoleKind: 0 none, 1 nHoleExtra, 2 par plus nHoleExtra, 3/4/5
-// birdie/par/bogey. Options nC becomes 3 when b4D is set, else 0; no mulligans; the challenge's
-// wind. The first challenge of its group starts the group totals (gPlayNowGroupStrokes, Par, Holes,
-// Time) and flags the group's intro (gPlayNowIntroPending); a later one adds to them. Last, the
-// played mode's shutdown, end game, hole start, game finished, hole finished and hole-over
-// callbacks are kept (gPlayNowMode*) and mode 5's go in their place.
+// (gpGame->nScoringType 1) holes won at random until the margin is nTargetBase (negative: the
+// opponent's), with stroke scoring everyone on par and player 0 nudged to nTargetBase over. The
+// challenge hole starts at a score by nHoleKind: 0 none, 1 nHoleExtra, 2 par plus nHoleExtra, 3/4/5
+// birdie/par/bogey. Options nWeather becomes 3 when bForceWeather is set, else 0; no mulligans; the
+// challenge's wind. The first challenge of its group starts the group totals (gPlayNowGroupStrokes,
+// Par, Holes, Time) and flags the group's intro (gPlayNowIntroPending); a later one adds to them.
+// Last, the played mode's shutdown, end game, hole start, game finished, hole finished and
+// hole-over callbacks are kept (gPlayNowMode*) and mode 5's go in their place.
 void PlayNow_StartChallenge(void) {
     int h;
     int nSum;
@@ -226,8 +226,8 @@ void PlayNow_StartChallenge(void) {
         gpGame->bHoleSelected[h] = 0;
     }
     gSession.nTeeSet[0] = gChallengeList[gCurChallenge].nTeeSet;
-    if (gChallengeList[gCurChallenge].n20) {
-        gSession.nPinSet = gChallengeList[gCurChallenge].n20 - 1;
+    if (gChallengeList[gCurChallenge].nPins) {
+        gSession.nPinSet = gChallengeList[gCurChallenge].nPins - 1;
         for (h = 0; h < 18; h++) {
             gpGame->nPinSet[h] = gSession.nPinSet;
         }
@@ -367,7 +367,7 @@ void PlayNow_StartChallenge(void) {
         }
         break;
     case 7:
-        if (gpGame->n4 == 1) {
+        if (gpGame->nScoringType == 1) {
             nDiff = gChallengeList[gCurChallenge].nTargetBase;
             while (nDiff != 0) {
                 h = Misc_RandFunc(0) % (Game_CurHoleIndex() + 1);
@@ -384,7 +384,7 @@ void PlayNow_StartChallenge(void) {
                 }
             }
         }
-        if (gpGame->n4 == 0) {
+        if (gpGame->nScoringType == 0) {
             nSum0 = 0;
             for (h = 0; h < Game_CurHoleIndex(); h++) {
                 gPlayers[0].nStrokes[h] = Course_GetHolePar(h);
@@ -433,7 +433,7 @@ void PlayNow_StartChallenge(void) {
         gPlayers[0].nStrokes[Game_CurHoleIndex()] = Course_GetCurHolePar() + 1;
         break;
     }
-    if (gChallengeList[gCurChallenge].b4D) {
+    if (gChallengeList[gCurChallenge].bForceWeather) {
         gSession.options.nWeather = 3;
     } else {
         gSession.options.nWeather = 0;
@@ -531,14 +531,14 @@ u8 PlayNow_GameFinished(u8 bCheck) {
 // The current challenge's hole setup (PlayNow_HoleStart): with bPlaceBall, player 0's ball starts
 // at the challenge's spot (gPlayNowBallSpots), dropped to the ground; a nonzero nClubBits replaces
 // player 0's bag (uBagMask): bag bit 25 always, challenge bit 0 gives bag bit 0, bits 1..14 bag
-// bits 6..19, bit 15 bag bit 21 and bit 16 bag bit 23; with b4D the weather amount f54 is forced
-// (PlayNow_ForceWeather).
+// bits 6..19, bit 15 bag bit 21 and bit 16 bag bit 23; with bForceWeather the weather amount
+// fWeatherAmount is forced (PlayNow_ForceWeather).
 void PlayNow_ApplyChallengeSetup(void) {
     f32 v[4];
     if (gChallengeList[gCurChallenge].bPlaceBall) {
-        v[0] = gPlayNowBallSpots[gCurChallenge].f0;
-        v[1] = gPlayNowBallSpots[gCurChallenge].f4;
-        v[2] = gPlayNowBallSpots[gCurChallenge].f8;
+        v[0] = gPlayNowBallSpots[gCurChallenge].fX;
+        v[1] = gPlayNowBallSpots[gCurChallenge].fY;
+        v[2] = gPlayNowBallSpots[gCurChallenge].fZ;
         v[3] = 1.0f;
         Physics_InitBall(&gPlayers[0].ball, v, 0);
         Physics_DropBall(&gPlayers[0].ball, v);
@@ -598,8 +598,8 @@ void PlayNow_ApplyChallengeSetup(void) {
             gPlayers[0].golfer.uBagMask |= 0x800000;
         }
     }
-    if (gChallengeList[gCurChallenge].b4D) {
-        PlayNow_ForceWeather(gChallengeList[gCurChallenge].f54);
+    if (gChallengeList[gCurChallenge].bForceWeather) {
+        PlayNow_ForceWeather(gChallengeList[gCurChallenge].fWeatherAmount);
     }
 }
 
@@ -717,10 +717,10 @@ u8 PlayNow_IsChallengeRunning(void) {
 // (aMedal[m].nRule; 0 never passes) holds against its mark, else 3 (none). With nScoring 0 the
 // group's totals so far are judged: 1 strokes plus nTargetBase at most the mark; 2 strokes over par
 // at most the mark; 3/4/5 birdie, par or bogey golf over the holes played; 6 the total time (n290)
-// under the mark; 7 in match scoring (gpGame->n4 1) a margin of holes won of at least the mark
-// (with the calendar flag a playoff gives 1 if player 0 has won more holes, else 2; without it a
-// playoff counts only for mark 0 and a lead), in stroke scoring player 1's strokes minus player 0's
-// at most the mark; 8 more skins than every opponent and at most the mark in playoff holes
+// under the mark; 7 in match scoring (gpGame->nScoringType 1) a margin of holes won of at least the
+// mark (with the calendar flag a playoff gives 1 if player 0 has won more holes, else 2; without it
+// a playoff counts only for mark 0 and a lead), in stroke scoring player 1's strokes minus player
+// 0's at most the mark; 8 more skins than every opponent and at most the mark in playoff holes
 // (nPlayoffHoles); 9 in a skill zone game at least the mark in points (nSkillZonePoints). With
 // nScoring 1 this hole alone: 1 strokes at most the mark, 2 over par at most the mark, 3/4/5
 // birdie, par or bogey or better, 6 as above, 7 a playoff player 0 leads gives 2, else the margin,
@@ -790,7 +790,7 @@ int PlayNow_GetMedal(void) {
                 }
                 break;
             case 7:
-                if (gpGame->n4 == 1) {
+                if (gpGame->nScoringType == 1) {
                     if (PlayNow_GetCalendarFlag()) {
                         if (gpGame->bInPlayoff) {
                             nPlayoff = 2;
@@ -810,7 +810,7 @@ int PlayNow_GetMedal(void) {
                         return m;
                     }
                 }
-                if (gpGame->n4 == 0) {
+                if (gpGame->nScoringType == 0) {
                     if (gSession.nNumPlayers > 1) {
                         nSum = 0;
                         for (i = 0; i < 18; i++) {
@@ -1104,10 +1104,10 @@ int PlayNow_GetChallengeTarget(int i) {
     return nTarget;
 }
 
-// Group nGroup's name: the text at its first challenge's n0 in the 'PLYs' block. The first
-// challenge is looked up in the list being played (PlayNow_GetGroupFirstChallenge), but its n0 is
-// read from the mode's own 83 (gPlayNowChallenges); the menu and the in-round screens show it (a
-// real-time event shows GameModeDriverRTE_GetName instead).
+// Group nGroup's name: the text at its first challenge's nGroupName in the 'PLYs' block. The first
+// challenge is looked up in the list being played (PlayNow_GetGroupFirstChallenge), but its
+// nGroupName is read from the mode's own 83 (gPlayNowChallenges); the menu and the in-round screens
+// show it (a real-time event shows GameModeDriverRTE_GetName instead).
 char* PlayNow_GetGroupName(int nGroup) {
     int i = PlayNow_GetGroupFirstChallenge(nGroup);
     // EA bug: PlayNow_GetGroupFirstChallenge returns 0, never -1, for a group it does not find, so
@@ -1115,10 +1115,10 @@ char* PlayNow_GetGroupName(int nGroup) {
     if (i == -1) {
         return 0;
     }
-    return gPlayNowText + gPlayNowChallenges[i].n0;
+    return gPlayNowText + gPlayNowChallenges[i].nGroupName;
 }
 
-// Group nGroup's description: the text at its first challenge's n4 in the 'PLYs' block, as
+// Group nGroup's description: the text at its first challenge's nGroupDesc in the 'PLYs' block, as
 // PlayNow_GetGroupName reads the name.
 char* PlayNow_GetGroupDescription(int nGroup) {
     int i = PlayNow_GetGroupFirstChallenge(nGroup);
@@ -1126,7 +1126,7 @@ char* PlayNow_GetGroupDescription(int nGroup) {
     if (i == -1) {
         return 0;
     }
-    return gPlayNowText + gPlayNowChallenges[i].n4;
+    return gPlayNowText + gPlayNowChallenges[i].nGroupDesc;
 }
 
 // The holes left in the challenge group: the selected holes after the current one, plus, when the
@@ -1305,8 +1305,8 @@ u8 PlayNow_GetCalendarFlag(void) {
 
 // Forces the next weather pick (fn_8006F650, at the start of a hole) to its effect bit 1 at amount
 // fAmount (kept to 0.1..1 when applied), the effect the game option nWeather 3 picks with a random
-// amount. A challenge with b4D passes its f54 (PlayNow_ApplyChallengeSetup); a replay passes its
-// saved amount (GameModeReplay.c).
+// amount. A challenge with bForceWeather passes its fWeatherAmount (PlayNow_ApplyChallengeSetup); a
+// replay passes its saved amount (GameModeReplay.c).
 void PlayNow_ForceWeather(f32 fAmount) {
     lbl_802811F0->b1C = 1;
     lbl_802811F0->f18 = fAmount;

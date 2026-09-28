@@ -97,7 +97,7 @@ void GameModeSkillZoneHorse_Init(void) {
     gpGame->bNoWind = 1;
     gpGame->bBumpObstructions = 0;
     gpGame->b28D = 1;
-    gpGame->n4 = 0;
+    gpGame->nScoringType = 0;
     gpGame->nMulligans = 0;
     gpGame->n10 = 2;
     gpGame->nC = 2;

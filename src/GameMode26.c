@@ -100,7 +100,7 @@ void GameMode26_Init(void) {
     gpGame->n10 = 2;
     gpGame->nC = 2;
     gpGame->nDC = 0;
-    gpGame->n4 = 0;
+    gpGame->nScoringType = 0;
     gSession.nSplitScreen = lbl_8028227C;
     gGameMode26SplitScreenShot = 0;
     gGameMode26LongestLength = 0.0f;

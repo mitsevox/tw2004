@@ -46,7 +46,7 @@ void GameModeReplay_Init(void) {
     gpGame->b27F = 0;
     gpGame->b280 = 0;
     gpGame->b281 = 0;
-    gpGame->n4 = 0;
+    gpGame->nScoringType = 0;
     gpGame->nMulligans = 0;
     gpGame->nC = 1;
     gpGame->n10 = 1;
@@ -79,8 +79,8 @@ static inline s8 Replay_SetPinSet(void) {
 
 // Mode 10's round start (pfnStartGamePreData): every hole's pin set and the session's from the
 // replay; the saved course with the saved hole as the only one selected; one player; the replay
-// flag (gSession.bReplay) set; the saved weather option (nF12), with its amount (nF14 / 100) forced
-// for option 3; player 0's tee set.
+// flag (gSession.bReplay) set; the saved weather option (nWeather), with its amount
+// (nWeatherAmount / 100) forced for option 3; player 0's tee set.
 void GameModeReplay_StartGamePreData(void) {
     int i;
     for (i = 0; i < 18; i++) {
@@ -93,9 +93,9 @@ void GameModeReplay_StartGamePreData(void) {
     gSession.bReplay = 1;
     // fake match: a no-op cast of &gSession; written plainly the address is scheduled
     // differently (96.9%)
-    ((Session*)&gSession)->options.nWeather = gReplayData.nF12;
-    if (gReplayData.nF12 == 3) {
-        PlayNow_ForceWeather(gReplayData.nF14 / 100.0f);
+    ((Session*)&gSession)->options.nWeather = gReplayData.nWeather;
+    if (gReplayData.nWeather == 3) {
+        PlayNow_ForceWeather(gReplayData.nWeatherAmount / 100.0f);
     }
     gSession.nTeeSet[0] = gReplayData.nTeeSet;
     Replay_SetPinSet();
@@ -119,10 +119,11 @@ void GameModeReplay_SetupNextGolfer(void) {
 
     Mem_cpy(&gPlayers[0].golfer, &gReplayData.player.golfer, sizeof(gPlayers[0].golfer));
     Mem_cpy(gPlayers[0].attrMod, gReplayData.player.attrMod, 0xC);
-    // port: the score block from nStrokes to b30C (0x154..0x30C), copied whole
+    // port: the score block from nStrokes to bHitObject (0x154..0x30C), copied whole
     Mem_cpy(gPlayers[0].nStrokes, gReplayData.player.nStrokes, 0x1B8);
-    // b30C up to the shot block at 0x354: the flags and the round's money. Sized as the distance
-    // port: between the two fields the copy scores 96.4%
+    // bHitObject up to the shot block at 0x354: the flags and the round's money.
+    // port: 0x48 bytes copied whole; sized as the distance between the two fields the copy
+    //       scores 96.4%
     Mem_cpy(&gPlayers[0].bHitObject, &gReplayData.player.bHitObject, 0x48);
     // port: the shot block from nClub to nShotKind2 (0x354..0x3B0), copied whole
     Mem_cpy(&gPlayers[0].nClub, &gReplayData.player.nClub, 0x5C);
@@ -153,8 +154,8 @@ void GameModeReplay_SetupNextGolfer(void) {
     nSeed = gReplayData.nSeed;
     nWindDir = gReplayData.nWindDir;
     nWindSpeed = gReplayData.nWindSpeed;
-    nF12 = gReplayData.nF12;
-    nF14 = gReplayData.nF14;
+    nF12 = gReplayData.nWeather;
+    nF14 = gReplayData.nWeatherAmount;
     REPLAY_Save(0);
     gSession.bReplay = 1;
     gReplayData.fF08 = fF08;
@@ -163,17 +164,17 @@ void GameModeReplay_SetupNextGolfer(void) {
     gReplayData.nSeed = nSeed;
     gReplayData.nWindDir = nWindDir;
     gReplayData.nWindSpeed = nWindSpeed;
-    gReplayData.nF12 = nF12;
-    gReplayData.nF14 = nF14;
+    gReplayData.nWeather = nF12;
+    gReplayData.nWeatherAmount = nF14;
     Misc_SetSeedFunc(0, nSeed);
     GOLFERSTATE_Switch(1, 0);
 }
 
-// For a replay whose weather option (nF12) is 1, 2 or 3, forces its saved weather amount (nF14 /
-// 100) again (PlayNow_ForceWeather).
+// For a replay whose weather option (nWeather) is 1, 2 or 3, forces its saved weather amount
+// (nWeatherAmount / 100) again (PlayNow_ForceWeather).
 void GameModeReplay_RestoreWeather(void) {
-    if (gReplayData.nF12 == 1 || gReplayData.nF12 == 2 || gReplayData.nF12 == 3) {
-        PlayNow_ForceWeather(gReplayData.nF14 / 100.0f);
+    if (gReplayData.nWeather == 1 || gReplayData.nWeather == 2 || gReplayData.nWeather == 3) {
+        PlayNow_ForceWeather(gReplayData.nWeatherAmount / 100.0f);
     }
 }
 

@@ -27,8 +27,8 @@ void GameModeFourBall_EndHole(void);
 void GameModeFourBall_EndGame(void);
 
 // Game mode 20's setup (GM_SetModeType): this file's callbacks; CPU players may concede
-// (bAIConcedes), n4 1, no mulligans, nC and n10 4 as in the other team modes, nDC 0 and split
-// screen off. Unlike GameModeBestBall_Init it does not reset the current hole.
+// (bAIConcedes), nScoringType 1, no mulligans, nC and n10 4 as in the other team modes, nDC 0 and
+// split screen off. Unlike GameModeBestBall_Init it does not reset the current hole.
 void GameModeFourBall_Init(void) {
     gpGame->pfnInit = GameModeFourBall_Init;
     gpGame->pfnSetupNextGolfer = GameModeFourBall_SetupNextGolfer;
@@ -39,7 +39,7 @@ void GameModeFourBall_Init(void) {
     gpGame->pfnEndHole = GameModeFourBall_EndHole;
     gpGame->pfnEndGame = GameModeFourBall_EndGame;
     gpGame->bAIConcedes = 1;
-    gpGame->n4 = 1;
+    gpGame->nScoringType = 1;
     gpGame->nMulligans = 0;
     gpGame->nC = 4;
     gpGame->n10 = 4;

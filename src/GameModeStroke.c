@@ -21,7 +21,7 @@ void GameModeStroke_Init(void) {
     gpGame->pfnGameFinished = GameModeStroke_GameFinished;
     gpGame->pfnGoToPlayoff = GameModeStroke_GoToPlayoff;
     gpGame->pfnEndGame = GameModeStroke_EndGame;
-    gpGame->n4 = 0;
+    gpGame->nScoringType = 0;
     gpGame->nMulligans = 2;
     gpGame->nC = 4;
     gpGame->n10 = 1;

@@ -11,14 +11,13 @@
 
 #define NUM_EARNINGS_RATINGS 26  // GM_Earnings_CapRating caps a rating at 25
 
-// Beating a CPU golfer of one rating in stroke play (GM_Earnings_GetStrokeWinnings; TW06: GM_Earnings_GetStrokeWinnings
-// (by position)).
+// Beating a CPU golfer of one rating in stroke play (GM_Earnings_GetStrokeWinnings).
 typedef struct StrokePrize {
     s32  nBase;                 // 0x0  the prize for a win
     s32  nPerStroke;            // 0x4  and for each stroke of the margin, up to 5
 } StrokePrize;
 
-// A skin's value at one rating (GM_Earnings_GetSkinsHoleValue; TW06: GM_Earnings_GetSkinsHoleValue (by position)).
+// A skin's value at one rating (GM_Earnings_GetSkinsHoleValue).
 typedef struct SkinsValue {
     s32  aValue[4];             // 0x00  holes 1..6, 7..12, 13..17, 18
     s32  n10;                   // 0x10
@@ -40,15 +39,16 @@ typedef struct BioAccomplishment {
 
 #define NUM_BIO_ACCOMPLISHMENTS 49  // 0xA54..0x181C: GM_Earnings_CheckShotGoals's shot goals start at 0x1860
 
-// A shot goal (0x34 bytes, GM_Earnings_CheckShotGoals): what a shot must show when it stops to earn an award, or
-// a money prize (award 0x27). Laid out as PuttGoal, with more ball tests.
+// A shot goal (0x34 bytes, GM_Earnings_CheckShotGoals): what a shot must show when it stops to earn
+// an award, or a money prize (award 0x27). Laid out as PuttGoal, with more ball tests.
 typedef struct ShotGoal {
     s32  nId;                   // 0x00  goals with the same nonzero id compete: the biggest nValue is kept
     u32  uModes;                // 0x04  the game modes it counts in, a bit per mode
     u8   unk08;                 // 0x08
     u8   uPars;                 // 0x09  the hole's pars it counts on: bit 0 par 3, 1 par 4, 2 par 5
     u8   uShotKinds;            // 0x0A  a bit per Player.nShotKind
-    u8   uLies;                 // 0x0B  a bit per Earnings_GetSurfaceClassBit class of the ground the shot left
+    u8   uLies;                 // 0x0B  a bit per Earnings_GetSurfaceClassBit class of the ground
+                                //        the shot left
     f32  f0C;                   // 0x0C  the most fn_800D04AC may return
     u8   uBallLies;             // 0x10  a bit per Earnings_GetLieBit class of the ball's lie
     f32  f14;                   // 0x14  the least fn_800D0550 (the shot's length) may return
@@ -59,7 +59,8 @@ typedef struct ShotGoal {
     u8   unk23;                 // 0x23
     s32  nValue;                // 0x24  the prize (award 0x27), else what ranks goals with the same id
     u8   unk28;                 // 0x28
-    s8   nAward;                // 0x29  the award it gives (GM_Earnings_AwardThisTrophyBallToUser), 0x27 a money prize
+    s8   nAward;                // 0x29  the award it gives (GM_Earnings_AwardThisTrophyBallToUser),
+                                //        0x27 a money prize
     s8   n2A;                   // 0x2A  kept with a money prize (gShotPrizeMsgs)
     u8   unk2B;                 // 0x2B
     u8   bEnabled;              // 0x2C
@@ -69,23 +70,26 @@ typedef struct ShotGoal {
 
 #define NUM_SHOT_GOALS 15
 
-// A putt goal (0x24 bytes, GM_Earnings_CheckPuttGoals): what a hole must show when the putt drops to earn an
-// award, or a money prize (award 0x27).
+// A putt goal (0x24 bytes, GM_Earnings_CheckPuttGoals): what a hole must show when the putt drops
+// to earn an award, or a money prize (award 0x27).
 typedef struct PuttGoal {
     s32  nId;                   // 0x00  goals with the same nonzero id compete: the biggest nValue is kept
     u32  uModes;                // 0x04  the game modes it counts in, a bit per mode
     u8   unk08;                 // 0x08
     u8   uPars;                 // 0x09  the hole's pars it counts on: bit 0 par 3, 1 par 4, 2 par 5
     u8   uShotKinds;            // 0x0A  a bit per Player.nShotKind
-    u8   uLies;                 // 0x0B  a bit per Earnings_GetSurfaceClassBit class of the ground the shot left
+    u8   uLies;                 // 0x0B  a bit per Earnings_GetSurfaceClassBit class of the ground
+                                //        the shot left
     f32  f0C;                   // 0x0C  the most fn_800D04AC may return
     u32  uClubs;                // 0x10  a bit per Player.nClub
     u8   uFlags;                // 0x14  more tests, a bit each (GM_Earnings_CheckPuttGoals)
     s8   nMaxPutts;             // 0x15  the most putts on the hole, 0 any
     s8   nScore;                // 0x16  the score on the hole it takes (GM_Earnings_CheckPuttGoals), 0 any
-    u8   uMults;                // 0x17  the multipliers a prize takes: bit 0 course, 1 tee, 2 pin set, 3 TOUR card
+    u8   uMults;                // 0x17  the multipliers a prize takes: bit 0 course, 1 tee, 2 pin set,
+                                //        3 TOUR card
     s32  nValue;                // 0x18  the prize (award 0x27), else what ranks goals with the same id
-    s8   nAward;                // 0x1C  the award it gives (GM_Earnings_AwardThisTrophyBallToUser), 0x27 a money prize
+    s8   nAward;                // 0x1C  the award it gives (GM_Earnings_AwardThisTrophyBallToUser),
+                                //        0x27 a money prize
     s8   n1D;                   // 0x1D  kept with a money prize (gPuttPrizeMsgs)
     u8   unk1E;                 // 0x1E
     u8   bEnabled;              // 0x1F
@@ -94,8 +98,8 @@ typedef struct PuttGoal {
 
 #define NUM_PUTT_GOALS 18
 
-// A hole goal (0x2C bytes, GM_Earnings_CheckHoleGoals): what the round must show when a hole is finished to earn
-// an award, or a money prize (award 0x27). The counts are minimums, 0 for any.
+// A hole goal (0x2C bytes, GM_Earnings_CheckHoleGoals): what the round must show when a hole is
+// finished to earn an award, or a money prize (award 0x27). The counts are minimums, 0 for any.
 typedef struct HoleGoal {
     s32  nId;                   // 0x00  goals with the same nonzero id compete: the biggest nValue is kept
     u32  uModes;                // 0x04  the game modes it counts in, a bit per mode
@@ -111,12 +115,15 @@ typedef struct HoleGoal {
     u8   b19;                   // 0x19  counts on every hole; clear, only at the end (the full round's 18th
                                 //       hole, or after the round)
     u8   unk1A;                 // 0x1A
-    s8   nKind;                 // 0x1B  a whole-round test: 1 GM_Earnings_CheckEagleEveryPar5, 2 GM_Earnings_CheckWinAllTournaments, 3 never,
-                                //       4 GM_Earnings_CheckFirstTournamentWin, 5 no hole over par, 6 under the course's par
+    s8   nKind;                 // 0x1B  a whole-round test: 1 GM_Earnings_CheckEagleEveryPar5,
+                                //       2 GM_Earnings_CheckWinAllTournaments, 3 never,
+                                //       4 GM_Earnings_CheckFirstTournamentWin, 5 no hole over par,
+                                //       6 under the course's par
     u8   uMults;                // 0x1C  the multipliers a prize takes (as PuttGoal.uMults)
     u8   unk1D[3];              // 0x1D
     s32  nValue;                // 0x20  the prize (award 0x27), else what ranks goals with the same id
-    s8   nAward;                // 0x24  the award it gives (GM_Earnings_AwardThisTrophyBallToUser), 0x27 a money prize
+    s8   nAward;                // 0x24  the award it gives (GM_Earnings_AwardThisTrophyBallToUser),
+                                //        0x27 a money prize
     s8   n25;                   // 0x25  kept with a money prize (gHolePrizeMsgs)
     u8   unk26;                 // 0x26
     u8   bEnabled;              // 0x27
@@ -140,15 +147,18 @@ typedef struct MiniPrize {
 // What unlocks a course (8 bytes): the money it takes, and the EA Sports Bio accomplishment
 // ("Unlocked A Course") posted with it.
 typedef struct CoursePrice {
-    s32  nPrice;                // 0x0  the profile's money (SaveProfile.nTotalCash) that unlocks it; 0 = not for sale
+    s32  nPrice;                // 0x0  the profile's money (SaveProfile.nTotalCash) that unlocks it;
+                                //      0 = not for sale
     s32  nBio;                  // 0x4  aBio index, -1 none
 } CoursePrice;
 
-#define NUM_COURSE_PRICES 24    // the 'ERN ' data has 24 rows (0x114..0x1D4): GM_Earnings_CheckUnlockCourses reads 0..20, 21 and 23
+// The 'ERN ' data has 24 rows (0x114..0x1D4): GM_Earnings_CheckUnlockCourses reads 0..20, 21 and 23.
+#define NUM_COURSE_PRICES 24
 
 // The payout multipliers are one table of 29 (EarningsTable.aMult; GameUICommands.c's GM_vGetWrapupData
 // indexes it across the groups). Where each group starts:
-#define EARN_MULT_COURSE 0      // 16: the course multiplier (x1..x4) per course, in GM_Earnings_GetCourseModifier's order
+#define EARN_MULT_COURSE 0      // 16: the course multiplier (x1..x4) per course, in the order of
+                                //     GM_Earnings_GetCourseModifier
 #define EARN_MULT_TEE    16     // 3: the tee percentage, as [2 - nTeeSet] (tee set 3 pays as 1)
 #define EARN_MULT_PINSET 19     // 4: the percentage for the hole's pin set (gpGame->nPinSet) 0..3
 #define EARN_MULT_TOUR   23     // 6: the TOUR card percentage per level 1..6 (level 0 pays as 1)
@@ -189,25 +199,30 @@ typedef struct EarningsTable {
 LAYOUT_ASSERT(EarningsTable, 0x22F0);
 
 extern EarningsTable gEarningsTable;
-extern s32 gUnlockedCourses[10];    // the courses GM_Earnings_CheckUnlockCourses unlocked, for their messages
-extern s32 gRoundRecordResults[10];    // a working table: GM_Earnings_PayRoundGoals messages the entries of kind 2 or 4
-extern s32 gRoundRecordKinds[10];    // with these ids
-extern s32 gPuttRecordKinds[10];    // the putt record ids (2)
-extern s32 gPuttRecordResults[10];    // the putt record results (HighScoreRecords_GetEndOfHoleRecord)
-extern s32 gShotRecordResults[10];    // a working table: GM_Earnings_PayShotGoals messages the entries of kind 2 or 4
-extern s32 gShotRecordKinds[10];    // with these ids
-extern s32 gNumRecordHits;        // their count
-extern s32 gShotPrizeBases[10];    // the money prizes GM_Earnings_CheckShotGoals finds, before the multipliers
-extern s32 gPuttPrizeBases[10];    // the money prizes GM_Earnings_CheckPuttGoals finds, before the multipliers
-extern s32 gHolePrizeBases[10];    // and those GM_Earnings_CheckHoleGoals finds
+extern s32 gUnlockedCourses[10];     // courses GM_Earnings_CheckUnlockCourses unlocked, for messages
+// What the last record check listed (gNumRecordHits entries): per entry the place
+// HighScoreRecords_CheckRecord gave (1..4; 2 or 4 a new best: the payers message only those) and
+// the record kind.
+extern s32 gRoundRecordResults[10];  // the end-of-round check's places (HighScoreRecords_GetEndOfGameRecord)
+extern s32 gRoundRecordKinds[10];    // its kinds (0 and 3..9)
+extern s32 gPuttRecordKinds[10];     // the end-of-hole check's kinds (always 2)
+extern s32 gPuttRecordResults[10];   // its places (HighScoreRecords_GetEndOfHoleRecord)
+extern s32 gShotRecordResults[10];   // the end-of-shot check's places (HighScoreRecords_GetEndOfShotRecord)
+extern s32 gShotRecordKinds[10];     // its kinds (always 1, the shot's length)
+extern s32 gNumRecordHits;           // how many entries the last check listed
+extern s32 gShotPrizeBases[10];      // GM_Earnings_CheckShotGoals's money prizes, before the multipliers
+extern s32 gPuttPrizeBases[10];      // GM_Earnings_CheckPuttGoals's
+extern s32 gHolePrizeBases[10];      // GM_Earnings_CheckHoleGoals's
 
 // Earnings.c
-int  GM_Earnings_GetLadderWinnings(int nWinner, int nLoser, int nMargin, s32* pPrize);   // a ladder event's winnings
-int  GM_GetHighestRatedGolfer(void);                 // the best rating among the players
-s32  GM_Earnings_GetSkinsHoleValue(int nRating, int nHole);   // a skin's value
-u8   GM_Earnings_AwardTrophyBall(int nPlayer, int nAward);  // give an award if the player does not have it yet
-// Whether nValue and szName are already among the top five of a record (i the kind, k the table:
-// course k's records, recB[k], recC[k]). MC.c tests the u8 result.
+// A ladder event's winnings.
+int  GM_Earnings_GetLadderWinnings(int nWinner, int nLoser, int nMargin, s32* pPrize);
+int  GM_GetHighestRatedGolfer(void);                         // the best rating among the players
+s32  GM_Earnings_GetSkinsHoleValue(int nRating, int nHole);  // a skin's value
+u8   GM_Earnings_AwardTrophyBall(int nPlayer, int nAward);   // gives the award unless the player has it
+// Whether nValue and szName are already among the top five of a record: kind i of course k's
+// records, or table i of recB[k] / recC[k] (HighScoreRecords_GetSkillZoneRecordType and
+// Earnings_GetLongDriveRecordType give the table). MC.c tests the u8 result.
 u8   HighScoreRecords_RecordExist(int i, int nValue, const char* szName, int k);
 u8   HighScoreRecords_SkillZoneRecordExist(int i, int nValue, const char* szName, int k);
 u8   HighScoreRecords_LongDriveRecordExist(int i, int nValue, const char* szName, int k);
@@ -215,9 +230,9 @@ u8   HighScoreRecords_LongDriveRecordExist(int i, int nValue, const char* szName
 // gpGame->nCurHoleNum pick (MC.c sets both to reach recB and recC, and passes nPlayer 5).
 // Earnings.c tests for 2 or 4, a new best.
 int  HighScoreRecords_CheckRecord(int nKind, int nValue, int bSave, const char* szName, int nPlayer);
-void GM_ClearShotBonusStats(int nPlayer);          // clear the player's flags bHitObject..bBunkerThisShot
-void GM_ClearHoleBonusStats(int nPlayer);          // clear the flags GM_RecordBonusShotStats sets (bBunkerThisHole..b312)
-void GM_ClearGameBonusStats(int nPlayer);          // clear the player's money breakdown for the round
+void GM_ClearShotBonusStats(int nPlayer);  // clear the player's flags bHitObject..bBunkerThisShot
+void GM_ClearHoleBonusStats(int nPlayer);  // clear GM_RecordBonusShotStats's flags (bBunkerThisHole..b312)
+void GM_ClearGameBonusStats(int nPlayer);  // clear the player's money breakdown for the round
 u8   Earnings_IsTourAwardEarned(int nPlayer, int nAward);
 
 #endif

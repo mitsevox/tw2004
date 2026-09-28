@@ -207,7 +207,7 @@ typedef struct CamScript {
     f32  v0[4];                 // 0x00  camera 4 puts the ball here
     f32  v10[4];                // 0x10  and the pin here
     f32  a20[8];                // 0x20  cleared with the rest by fn_80062E40
-    f32  v40[4];                // 0x40  the move's vector (CameraController_FadeIn, CameraController_FadeOut, fn_80063CBC)
+    f32  vFadeColor[4];         // 0x40  the screen fade's colour, its alpha [3] the most it reaches
     f32  v50[4];                // 0x50  the ball-flight camera: where the shot should land (the aim, at
                                 //       the club's full distance)
     f32  v60[4];                // 0x60  CamScript_RunScript: how far the camera moved this frame (0 when
@@ -217,8 +217,8 @@ typedef struct CamScript {
     f32  f84;                   // 0x84  fCamTime before this frame's step (CamScript_RunScript)
     f32  f88;                   // 0x88  a second clock, stepped with fCamTime
     f32  f8C;                   // 0x8C  how long the next shot lasts (its f48; fn_8006351C)
-    f32  f90;                   // 0x90  } the move's time so far and its length: CameraController_FadeIn sets
-    f32  f94;                   // 0x94  } 0 and its time
+    f32  fFadeTime;             // 0x90  the fade's time so far (stepped by the frame time)
+    f32  fFadeLength;           // 0x94  and its length
     f32  f98;                   // 0x98
     f32  f9C;                   // 0x9C  CamScript_GetLookAtPoint hands it to CameraScript_CalculateShoulderShake (f98 at its end)
     f32  fA0;                   // 0xA0
@@ -229,7 +229,9 @@ typedef struct CamScript {
     CamShot* pB4;               // 0xB4  where SwitchCrAPCamera records the current camera
     CamShot* pB8;               // 0xB8  the shot before (GolfCamera_CutToGolferDoneAnimatingCam)
     s32  nBC;                   // 0xBC  the next shot's kind (its bAB; fn_8006351C)
-    s32  nCamera;               // 0xC0  the move's kind (1..5; fn_8003F2E0 switches on it)
+    s32  nFade;                 // 0xC0  the screen fade (fn_8003F2E0): 0 none, 1 fading up to vFadeColor
+                                //       (CameraController_FadeOut), 2 fading away (FadeIn), 3 held
+                                //       (fn_80063CBC), 4 kept after 1 ends, 5 after 2 ends (then 0)
     s32  nC4;                   // 0xC4  the shot kind asked for
     s32  nC8;                   // 0xC8  the shot kind last started
     u8   bCC;                   // 0xCC
@@ -707,11 +709,11 @@ u8     fn_800453C8(int nPlayer, CamShot* pShot);
 
 // pCam and pSub are the view's camera position and where it looks (CameraController_GetCameraOrigin, CameraController_GetCameraLookPoint).
 void     CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b,
-                     f32 fFrameTime);
+                     f32 fTime);
 void     CamScript_RunFEScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, int a,
-                     f32 fFrameTime);
+                     f32 fTime);
 void     CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b,
-                     f32 fFrameTime);
+                     f32 fTime);
 void     fn_8003F2E0(CamScript* pScript, f32 fTime);
 void     CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPlayer, CamScript* pScript,
                                        u8 bView1);
@@ -728,10 +730,10 @@ f32      fn_80044EA8(int nPlayer, CamScript* pScript);   // how far the ball's f
 u8       fn_800451A8(CamScript* pScript, CamShot* pShot, int nPlayer);
 void     CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer);
 u8       CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam);
-// Keep pNew above the ground (by fClearance); the out values are optional (NULL): two flags and a
-// float.
-u8       CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, u8 a, u8* pb1, f32* pf, u8* pb2,
-                                   f32 fClearance);
+// Keep pNew above the ground (by fClearance); the out values are optional (NULL): pbFound any
+// ground under pNew, pfGround the ground height used, pbRaised pNew was raised.
+u8       CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, u8 bCheckPath, u8* pbFound,
+                                   f32* pfGround, u8* pbRaised, f32 fClearance);
 u8       CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, CamScript* pScript);
 void     fn_80045470(CamLens* pLens, f32 fFov);   // sets the lens's field of view
 u8       fn_8004562C(CamShot* pShot);             // the shot's bAC is 0, 13..15 or 23
@@ -743,10 +745,10 @@ void     CA_vUpdateInternalFieldOfViewData(CamLens* pLens);
 
 // Both write a point into pOut: fn_800C7D14 goes fDist along the direction from pA to pB (its y
 // cleared unless bKeepY, normalised unless bRaw), then fSide across the flattened direction;
-// fn_800C7E50 swings around pC from pA towards pB at share fT (n: 0 the short way round, 1 angle
+// fn_800C7E50 swings around pC from pA towards pB at share fT (nDir: 0 the short way round, 1 angle
 // decreasing, else increasing).
 void   fn_800C7D14(f32* pA, f32* pB, u8 bKeepY, u8 bRaw, f32* pOut, f32 fDist, f32 fSide);
-void   fn_800C7E50(f32* pA, f32* pB, f32* pC, int n, f32* pOut, f32 fT);
+void   fn_800C7E50(f32* pA, f32* pB, f32* pC, int nDir, f32* pOut, f32 fT);
 // The splined camera (CamScript_SplineCameras): the camera position on the spline through pPos0..3,
 // the look angles on the one through pLook0..3 (each unwrapped to within half a turn of the one
 // before), and the field of view between fFov1 and fFov2, at share fT between the middle two.
@@ -830,11 +832,11 @@ void   fn_80062F1C(View* pView);
 void   fn_80063920(int nView, f32* pBounds);    // the view's camera is inside an object's bounds
 void   CameraController_FadeIn(View* pView, f32 fTime, f32* pVec);
 void   CameraController_FadeOut(View* pView, f32 fTime, f32* pVec);
-u8     fn_80063C50(View* pView);
-u8     fn_80063C7C(View* pView);
-u8     fn_80063C90(View* pView);        // script.nCamera 1, 2 or 4: a colour fade running or held
-void   fn_80063CBC(View* pView, f32* pVec);   // script.nCamera 3, the vector into script.v40
-void   fn_80063CF0(View* pView, int nCamera, int nPlayer);
+u8     fn_80063C50(View* pView);             // script.nFade 3, 4 or 5: a colour fade held or ending
+u8     fn_80063C7C(View* pView);             // script.nFade 4: kept after fading up
+u8     fn_80063C90(View* pView);             // script.nFade 1, 2 or 4: a colour fade running or held
+void   fn_80063CBC(View* pView, f32* pVec);  // script.nFade 3: hold the colour pVec over the view
+void   fn_80063CF0(View* pView, int nKind, int nPlayer);
 void   fn_800642D0_ReapplyCurrentShot(View* pView, int nPlayer);
 u8     fn_800642B0(void);               // fn_800C6CB0's answer (gomainloop tests it)
 void   fn_80063F08(f32* pA, f32* pB, f32* pOut);   // the green zoom-to-aim camera: View.v20 as pA and pOut
@@ -874,7 +876,7 @@ void   fn_800C6DFC(void);
 void   fn_800C6E14(void);
 void   fn_800C6E2C(void);
 u8     fn_800C6E88(View* pView, int nPlayer);
-u8     fn_800C6F7C(View* pView, int nPlayer, f32 f);
+u8     fn_800C6F7C(View* pView, int nPlayer, f32 fLeft);
 void   fn_800C7080(View* pView);
 void   fn_800C70F8(View* pView, int a);
 u8     fn_800C7100(View* pView);

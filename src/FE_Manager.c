@@ -281,7 +281,7 @@ void fn_8007744C(void) {
     lbl_80281ED4 = StaticMem_Alloc(sizeof(FEProfile), 2, 16, "FE_Manager.c", 1035);
     Mem_set(lbl_80281ED4, 0, sizeof(FEProfile));
     lbl_80281ED4->bCopy = 0;
-    lbl_80281ED4->b10640 = 0;
+    lbl_80281ED4->bEditingCopy = 0;
     lbl_80281ED4->nSlot = 0;
     lbl_80281ED4->n1 = -1;
     for (i = 0; i < FE_NUM_801D8890; i++) {
@@ -492,20 +492,20 @@ void fn_80077C1C(int a, int b) {
     fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
     nSeed = fn_80078604(nMonth, nDay, nYear);
     for (j = 0; j < 5; j++) {
-        lbl_80281ED4->aPart[b][nCategory][j] = -1;
-        lbl_80281ED4->aChoice[b][nCategory][j] = -1;
+        lbl_80281ED4->aSaleEntry[b][nCategory][j] = -1;
+        lbl_80281ED4->aSaleChoice[b][nCategory][j] = -1;
     }
     lbl_80281ED4->nDateSeed = nSeed;
     if (lbl_80281ED4->nDateSeed == 0) {
         lbl_80281ED4->nDateSeed = 3081979;          // 8/3/1979, packed as fn_80078604 does
     }
     Misc_SetSeedFunc(0, lbl_80281ED4->nDateSeed);
-    lbl_80281ED4->aKind[b][nCategory] = aKinds[Misc_RandFunc(0) % nKinds];
+    lbl_80281ED4->aSalePart[b][nCategory] = aKinds[Misc_RandFunc(0) % nKinds];
     nB = b;
     for (i = 0; i < nCount; i++) {
         FE_CrAP_SetCurrentGender(FE_CrAP_GetAssetGender(i));
         nKind = FE_CrAP_GetCategoryFromAssetID(i);
-        if (nKind == lbl_80281ED4->aKind[b][nCategory] &&
+        if (nKind == lbl_80281ED4->aSalePart[b][nCategory] &&
             (FE_CrAP_GetAssetGender(i) == nB || FE_CrAP_GetAssetGender(i) == 2) &&
             !fn_80078008(i, pProfile) && FE_CrAP_GetLevelFromAssetID(i) > 0) {
             aFound[nFound] = i;
@@ -518,11 +518,11 @@ void fn_80077C1C(int a, int b) {
     retry:
         FE_CrAP_GetCategorySubcategoryAndEntryNumFromAssetID(aFound[Misc_RandFunc(0) % nFound], &nKind,
                 &nPart, &nChoice);
-        lbl_80281ED4->aPart[b][nCategory][j] = nPart;
-        lbl_80281ED4->aChoice[b][nCategory][j] = nChoice;
+        lbl_80281ED4->aSaleEntry[b][nCategory][j] = nPart;
+        lbl_80281ED4->aSaleChoice[b][nCategory][j] = nChoice;
         for (i = 0; i < j; i++) {
-            if (lbl_80281ED4->aPart[b][nCategory][j] == lbl_80281ED4->aPart[b][nCategory][i] &&
-                lbl_80281ED4->aChoice[b][nCategory][j] == lbl_80281ED4->aChoice[b][nCategory][i]) {
+            if (lbl_80281ED4->aSaleEntry[b][nCategory][j] == lbl_80281ED4->aSaleEntry[b][nCategory][i] &&
+                lbl_80281ED4->aSaleChoice[b][nCategory][j] == lbl_80281ED4->aSaleChoice[b][nCategory][i]) {
                 goto retry;                         // fake match: a do-while scores 98.3
             }
         }
@@ -551,7 +551,7 @@ u8 fn_80078008(s32 nAsset, SaveProfile* pProfile) {
     }
     switch (nKind) {
     case 0:
-        bLocked = BitArray_TestBit(pProfile->aB1CC, n) == 0;
+        bLocked = BitArray_TestBit(pProfile->aAssetOwned, n) == 0;
         break;
     case 2:
         bLocked = !fn_80058304(pProfile, 1);
@@ -1214,8 +1214,8 @@ void fn_80079974(void) {
     }
 }
 
-// Set up the session's players for a game started from the menus. In game modes 5 and 11 player 1
-// plays the created golfer when slot 1 holds a profile (unless b11703), else golfer 0. Each player
+// Set up the session's players for a game started from the menus. In game modes 5 and 11 player 0
+// plays the created golfer when slot 0 holds a profile (unless b11703), else golfer 0. Each player
 // slot is a CPU player, a loaded profile (a created golfer brings its own bag), a CPU controller or
 // a table golfer with its bag (its save slot still marked active); slots past the players have no
 // profile. Then it records nMode (the menus read it back): the game mode, or 4, 23, 27 or 28.

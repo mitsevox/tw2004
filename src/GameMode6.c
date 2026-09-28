@@ -12,8 +12,8 @@
 // SpeedGolf_SetGolferStates, so the first-hole run tips stay off), and there is no every-frame
 // update (pfnUpdate keeps its default), so no restart from the tee. No gimmes or mulligans; the
 // stroke limit and b271, b273, b277, b27E, b282, b283 keep GM_SetModeType's 1, and b279, b27F,
-// b280, b281, b285, b286, b288, n290 and n294 are 0; gpGame n10 and nC 2, n4 1 (holes won, as mode
-// 8), nDC 0; split screen from lbl_8028227C; two players; the event log starts again.
+// b280, b281, b285, b286, b288, n290 and n294 are 0; gpGame n10 and nC 2, nScoringType 1 (holes
+// won, as mode 8), nDC 0; split screen from lbl_8028227C; two players; the event log starts again.
 void SpeedGolfMatch_Init(void) {
     gpGame->pfnInit = SpeedGolfMatch_Init;
     gpGame->pfnShutdown = SpeedGolf_Shutdown;
@@ -43,7 +43,7 @@ void SpeedGolfMatch_Init(void) {
     gpGame->n10 = 2;
     gpGame->nC = 2;
     gpGame->nDC = 0;
-    gpGame->n4 = 1;
+    gpGame->nScoringType = 1;
     gSession.nSplitScreen = lbl_8028227C;
     Session_SetNumPlayers(2);
     gSpeedGolfUnused = 0;

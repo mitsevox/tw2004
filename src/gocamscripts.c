@@ -99,13 +99,13 @@ void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, 
     Ter_GetTGD();  // the result is not used
     if (!b && !CameraScript_SnapToScript(pScript, pScript->pShot)
         && (gSession.nPaused != 0 || (0.0f == gSession.fFrameTime && 0.0f == fTime))) {
-        if (pScript->nCamera != 0) {
+        if (pScript->nFade != 0) {
             fn_8003F2E0(pScript, fTime);
         }
         return;
     }
     if (CameraScript_DontUpdateCameraDuringSlowMo(pScript, nPlayer)) {
-        if (pScript->nCamera != 0) {
+        if (pScript->nFade != 0) {
             fn_8003F2E0(pScript, fTime);
         }
         return;
@@ -221,7 +221,7 @@ void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, 
         }
     }
     CamScript_SmoothTerrainHeight(pScript, pCam, 1, nPlayer, -1.0f);
-    if (pScript->nCamera != 0) {
+    if (pScript->nFade != 0) {
         fn_8003F2E0(pScript, fTime);
     }
     if (CameraScript_SnapToScript(pScript, pScript->pShot)) {
@@ -235,7 +235,7 @@ void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, 
     fStep = CamScript_AccelerateTime(pScript, fTime);
     pScript->f84 = pScript->fCamTime;
     pScript->fCamTime += fStep;
-    pScript->f90 += fStep;
+    pScript->fFadeTime += fStep;
     pScript->f88 += fStep;
     pScript->f9C = pScript->f98;
     pScript->f98 += fStep;
@@ -340,7 +340,7 @@ void CamScript_RunFEScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript
     CameraScript_SnapToScript(pScript, pScript->pShot);   // its answer is not used
     pScript->f84 = pScript->fCamTime;
     pScript->fCamTime += fTime;
-    pScript->f90 += fTime;
+    pScript->fFadeTime += fTime;
     pScript->f88 += fTime;
     pScript->f9C = pScript->f98;
     pScript->f98 += fTime;
@@ -383,7 +383,7 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScr
     LLMath_CopyVec(lbl_80281F78->v17C, vMoveTo);
     if (!b && !CameraScript_SnapToScript(pScript, pScript->pShot)
         && (gSession.nPaused != 0 || (0.0f == gSession.fFrameTime && 0.0f == fTime))) {
-        if (pScript->nCamera != 0) {
+        if (pScript->nFade != 0) {
             fn_8003F2E0(pScript, fTime);
         }
         return;
@@ -396,7 +396,7 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScr
         }
         StaticCam_GetFlybyInformation(pScript, pScript->pShot->nA4, pCam, pSub, &fFov, nPlayer, fn_800C7A9C(pPath, fShare));
         fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), fFov);
-        if (pScript->nCamera != 0) {
+        if (pScript->nFade != 0) {
             fn_8003F2E0(pScript, fTime);
         }
         if (fShare >= 1.0f) {
@@ -404,10 +404,10 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScr
                 pScript->pShot = pScript->pNextShot;
                 pScript->pNextShot = pScript->pNextShot->p40;
                 pScript->fCamTime = 0.0f;
-                pScript->nCamera = 2;
-                LLMath_CopyVec(vMoveTo, pScript->v40);
-                pScript->f90 = 0.0f;
-                pScript->f94 = fMoveTime;
+                pScript->nFade = 2;
+                LLMath_CopyVec(vMoveTo, pScript->vFadeColor);
+                pScript->fFadeTime = 0.0f;
+                pScript->fFadeLength = fMoveTime;
                 pScript->fA0 = 0.0f;
                 pScript->fA4 = 0.0f;
                 return;
@@ -418,7 +418,7 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScr
         }
         pScript->f84 = pScript->fCamTime;
         pScript->fCamTime += fTime;
-        pScript->f90 += fTime;
+        pScript->fFadeTime += fTime;
         pScript->f8C = pPath->fLength;
         return;
     }
@@ -435,7 +435,7 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScr
     } else {
         CamScript_SplineCameras(nPlayer, pCam, pSub, pScript, vPrev, fTime);
     }
-    if (pScript->nCamera != 0) {
+    if (pScript->nFade != 0) {
         fn_8003F2E0(pScript, fTime);
     }
     if (CameraScript_SnapToScript(pScript, pScript->pShot)) {
@@ -449,7 +449,7 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScr
     fStep = CamScript_AccelerateTime(pScript, fTime);
     pScript->f84 = pScript->fCamTime;
     pScript->fCamTime += fStep;
-    pScript->f90 += fStep;
+    pScript->fFadeTime += fStep;
     if (0.0f != fStep) {
         pScript->bCC = 0;
     }
@@ -568,44 +568,46 @@ f32 fn_8003F194(CamShot* pShot, f32 fA, f32 fB, f32 fTime) {
     return (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff)) / fTime;
 }
 
-// The script's screen fade (nCamera, set by CameraController_FadeIn and its kin): hands
-// fn_80038010 the colour v40 with its alpha [3] rising (1), falling (2), held (3) or kept from the
-// view's current colour (4), within 0..v40[3]. Once the fade's time f90 passes its length f94, 1
-// turns into 4 and 2 into 5; 4 and 5 end (0) on the next frame that has time in it.
+// The script's screen fade (nFade, set by CameraController_FadeIn and its kin): hands
+// fn_80038010 the colour vFadeColor with its alpha [3] rising (1), falling (2), held (3) or kept
+// from the view's current colour (4), within 0..vFadeColor[3]. Once the fade's time fFadeTime
+// passes its length fFadeLength, 1 turns into 4 and 2 into 5; 4 and 5 end (0) on the next frame
+// that has time in it.
 void fn_8003F2E0(CamScript* pScript, f32 fTime) {
     f32 v[4];
 
-    Vec3Copy(pScript->v40, v);
-    switch (pScript->nCamera) {
+    Vec3Copy(pScript->vFadeColor, v);
+    switch (pScript->nFade) {
     case 1:
-        v[3] = pScript->v40[3] * (pScript->f90 / pScript->f94);
-        v[3] = v[3] < 0.0f ? 0.0f : (v[3] > pScript->v40[3] ? pScript->v40[3] : v[3]);
+        v[3] = pScript->vFadeColor[3] * (pScript->fFadeTime / pScript->fFadeLength);
+        v[3] = v[3] < 0.0f ? 0.0f : (v[3] > pScript->vFadeColor[3] ? pScript->vFadeColor[3] : v[3]);
         fn_80038010(1, ViewController_GetCurrentViewControllerID(), v);
         break;
     case 2:
         {
             f32 f;
 
-            if (pScript->f94 > 0.0f) {
-                f = pScript->v40[3] - pScript->v40[3] * (pScript->f90 / pScript->f94);
+            if (pScript->fFadeLength > 0.0f) {
+                f = pScript->vFadeColor[3] - pScript->vFadeColor[3]
+                        * (pScript->fFadeTime / pScript->fFadeLength);
             } else {
                 f = 0.0f;
             }
             v[3] = f;
         }
-        v[3] = v[3] < 0.0f ? 0.0f : (v[3] > pScript->v40[3] ? pScript->v40[3] : v[3]);
+        v[3] = v[3] < 0.0f ? 0.0f : (v[3] > pScript->vFadeColor[3] ? pScript->vFadeColor[3] : v[3]);
         fn_80038010(1, ViewController_GetCurrentViewControllerID(), v);
         break;
     case 3:
-        v[3] = pScript->v40[3];
-        v[3] = v[3] < 0.0f ? 0.0f : (v[3] > pScript->v40[3] ? pScript->v40[3] : v[3]);
+        v[3] = pScript->vFadeColor[3];
+        v[3] = v[3] < 0.0f ? 0.0f : (v[3] > pScript->vFadeColor[3] ? pScript->vFadeColor[3] : v[3]);
         fn_80038010(1, ViewController_GetCurrentViewControllerID(), v);
         break;
     case 4:
         fn_800386F0(ViewController_GetCurrentViewControllerID(), v);
         {
             f32 f = v[3];
-            v[3] = f < 0.0f ? 0.0f : (f > pScript->v40[3] ? pScript->v40[3] : f);
+            v[3] = f < 0.0f ? 0.0f : (f > pScript->vFadeColor[3] ? pScript->vFadeColor[3] : f);
         }
         fn_80038010(1, ViewController_GetCurrentViewControllerID(), v);
         break;
@@ -613,12 +615,12 @@ void fn_8003F2E0(CamScript* pScript, f32 fTime) {
         break;
     }
     if (fTime > 0.0f) {
-        if (pScript->nCamera == 4 || pScript->nCamera == 5) {
-            pScript->nCamera = 0;
-        } else if (pScript->nCamera == 2 && pScript->f90 > pScript->f94) {
-            pScript->nCamera = 5;
-        } else if (pScript->nCamera == 1 && pScript->f90 > pScript->f94) {
-            pScript->nCamera = 4;
+        if (pScript->nFade == 4 || pScript->nFade == 5) {
+            pScript->nFade = 0;
+        } else if (pScript->nFade == 2 && pScript->fFadeTime > pScript->fFadeLength) {
+            pScript->nFade = 5;
+        } else if (pScript->nFade == 1 && pScript->fFadeTime > pScript->fFadeLength) {
+            pScript->nFade = 4;
         }
     }
 }

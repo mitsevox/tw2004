@@ -72,10 +72,12 @@ typedef struct PgaStatCounts {
     u16  nPar5Strokes;          // 0x3C  TW06: nPar5Strokes
     u8   unk3E[2];
     u32  nSeasonWinnings;       // 0x40  TW06: seasonWinnings
-    u32  n44;                   // 0x44  winnings this month: the leader at a month's end gets that
-                                //       month's award, then every golfer's is cleared (GM_PgaTourSim_CheckEndOfTournamentAward)
+    u32  nMonthWinnings;        // 0x44  the leader at a month's end gets that month's award, then
+                                //       every golfer's is cleared
+                                //       (GM_PgaTourSim_CheckEndOfTournamentAward)
     u16  nSeasonWins;           // 0x48  (0x80117E98; a new season clears 0x00-0x4A, 0x80117860)
-    u8   nPlayerOfYearPoints;   // 0x4A  1 a win, 3 more where GameModeDriverPGATour_GetEventInfo's nC is set. TW06: playerOfYearPoints
+    u8   nPlayerOfYearPoints;   // 0x4A  1 a win, 3 more where GameModeDriverPGATour_GetEventInfo's
+                                //       nC is set. TW06: playerOfYearPoints
     u8   unk4B;
     u16  nConsecutiveCuts;      // 0x4C  TW06: nConsecutiveCuts
     u8   unk4E[2];
@@ -92,7 +94,7 @@ typedef struct PgaEntrantMC {
     s16  nTargetScore;          // 0x02  the four-round total the simulation aims at (0x80119E28)
     s32  aRoundStrokes[4];      // 0x04  per round (0x80117CB8)
     s32  bWasCut;               // 0x14  set with the golfer's consecutive-cuts count cleared (0x80117C50)
-    s32  n18;                   // 0x18
+    s32  nWinnings;             // 0x18  its share of the purse (SplitWinnings)
 } PgaEntrantMC;
 LAYOUT_ASSERT(PgaEntrantMC, 0x1C);
 
@@ -145,7 +147,8 @@ typedef struct SavedRound {
 // (GameModeDriverPGATour_EndTournament).
 typedef struct TourWin {
     Award award;                // 0x0  won, and the day (GM_Earnings_GiveAwardToUser)
-    u16  nScore;                // 0x4  the player's score (GM_PgaTourSim_GetTotalScoreFromEntrantID, as SeasonEvent.nUserScore)
+    u16  nScore;                // 0x4  the player's score (GM_PgaTourSim_GetTotalScoreFromEntrantID,
+                                //      as SeasonEvent.nUserScore)
     u16  n6;                    // 0x6  the tournament's aPrize[bracket][1] (thousands of dollars:
                                 //      PGATourWins_GetDetails reads it unsigned)
 } TourWin;
@@ -174,7 +177,7 @@ LAYOUT_ASSERT(SponsorSlot, 4);
 typedef struct LogoRecord {
     u8   aPixels[0x1000];       // 0x0000  64 x 64 or 128 x 32 colour indexes
     char szName[0x20];          // 0x1000
-    u8   b1020;                 // 0x1020
+    u8   bSaved;                // 0x1020  kept by GM_vSaveLogo (clear: not made yet)
     u8   nShape;                // 0x1021  LOGO_SQUARE or LOGO_RECT
 } LogoRecord;
 LAYOUT_ASSERT(LogoRecord, 0x1022);
@@ -208,13 +211,15 @@ typedef struct SkinChoices {
     SkinChoice aSets[116];      // 0x254  the body's, per set
     SkinChoice aSkinParts[6][10];   // 0x5F4  the six skins' of CharSkinSet
     SkinChoice aSkinSets[6][10];    // 0x7D4
-    u8   a9B4[26];              // 0x9B4  the 26 sliders (CharSlider_UpdateCharacterBasedOnSliderValues; a menu message reads slider n
-                                //        signed); set to 50 each when FE_CrAP_InitCrAPInfo clears
+    u8   a9B4[26];              // 0x9B4  the 26 sliders (CharSlider_UpdateCharacterBasedOnSliderValues;
+                                //        a menu message reads slider n signed); set to 50 each when
+                                //        FE_CrAP_InitCrAPInfo clears
                                 //        the profile's 0x5500..0xB634 (fn_80058208)
     u8   unk9CE[2];
     LogoRecord aLogo[5];        // 0x9D0  the user logos ("_usrtextr0".."_usrtextr4")
-    u8   n5A7A;                 // 0x5A7A  (the profile's 0xAF7A) set by a menu message, which passes
-                                //         it to FE_CrAP_SetCurrentGender (s8); read back signed
+    u8   nGender;               // 0x5A7A  (the profile's 0xAF7A) the created golfer's gender
+                                //         (GM_vSetCrAPGolferInfo, which makes it the database's
+                                //         current one); read back signed
     u8   unk5A7B;
 } SkinChoices;
 LAYOUT_ASSERT(SkinChoices, 0x5A7C);
@@ -232,8 +237,9 @@ typedef struct Replay {
     f32    fF0C;                // 0xF0C
     u8     bF10;                // 0xF10  in-flight replays are on (GameMode.c)
     u8     unkF11;
-    s16    nF12;                // 0xF12  1..3: PlayNow_ForceWeather is set from nF14
-    s16    nF14;                // 0xF14  hundredths
+    s16    nWeather;            // 0xF12  the weather option (option 2, changing, saved as 3 or 4)
+    s16    nWeatherAmount;      // 0xF14  the weather amount x 100; forced (PlayNow_ForceWeather)
+                                //        for options 1..3 (GameModeReplay.c)
     s16    nWindDir;            // 0xF16
     s16    nWindSpeed;          // 0xF18
     s16    nF1A;                // 0xF1A  -> fn_80055C40
@@ -245,7 +251,8 @@ LAYOUT_ASSERT(Replay, 0xF28);
 
 // One save profile (0x10600 bytes).
 typedef struct SaveProfile {
-    u8   bActive;               // 0x00000  1: the slot holds a profile; payouts are scaled and awards given only then
+    u8   bActive;               // 0x00000  1: the slot holds a profile; payouts are scaled and
+                                //          awards given only then
     char szName[0x1C - 0x1];    // 0x00001  the profile's name, compared with the record holders'
     u8   aGolferUnlocked[30];   // 0x0001C  per golfer (fn_80058278 sets, fn_8005832C tests)
     u8   aCourseUnlocked[23];   // 0x0003A  per course
@@ -289,8 +296,9 @@ typedef struct SaveProfile {
     TourWin aC8[31];           // 0x000C8  one per PGA TOUR tournament
     Award a1C0[16];            // 0x001C0  the won ones count for GM_GetBonusProgress. 0..11: Player
                                 //          of the Month, per month (the tour's month money leader,
-                                //          n44; FE_PGATourMessages.c TrophyRoom_GetPlayerOfMonthStatus); 12..15: the
-                                //          four trophies (both awarded by
+                                //          nMonthWinnings; FE_PGATourMessages.c
+                                //          TrophyRoom_GetPlayerOfMonthStatus); 12..15: the four
+                                //          trophies (both awarded by
                                 //          GM_PgaTourSim_CheckEndOfTournamentAward;
                                 //          TrophyRoom_GetTourTrophy reads their days)
     Award a200[3];              // 0x00200  the player's career winnings first, in the top 5 and in
@@ -302,9 +310,11 @@ typedef struct SaveProfile {
     Award aAward[39];           // 0x0039C
     Replay aReplay[5];          // 0x00438  a Replay each, saved with awards 0, 6, 9, 3 and 13
     s32  nTourCardLevel;        // 0x05000  0..6: level 1 comes from the lessons (GameMode11), the rest
-                                //          from GM_Earnings_PayRoundGoals; it scales payouts (GM_Earnings_ComputeTOURCardModifiers)
-    u8   a5004[71];             // 0x05004  per par-5 hole 0..70 (GM_ConvertCourseAndHoleToPar5EagleIndex): 1 once
-                                //          the profile has eagled it (Earnings.c); fn_800588F4's kind 0
+                                //          from GM_Earnings_PayRoundGoals; it scales payouts
+                                //          (GM_Earnings_ComputeTOURCardModifiers)
+    u8   a5004[71];             // 0x05004  per par-5 hole 0..70 (GM_ConvertCourseAndHoleToPar5EagleIndex):
+                                //          1 once the profile has eagled it (Earnings.c);
+                                //          fn_800588F4's kind 0
     u8   unk504B;
     s32  a504C[71];             // 0x0504C  the same holes: the date of that eagle (packed by fn_80078604);
                                 //          fn_800588F4's kind 1
@@ -326,13 +336,14 @@ typedef struct SaveProfile {
     s8   n54C2;                 // 0x054C2  -> PlayerProfile.unk2
     u8   unk54C3[5];
     u64  aGolferNames[6];       // 0x054C8  -> PlayerProfile.aNames
-    s8   nGolferOutfit;         // 0x054F8  -> PlayerProfile.nOutfit; FE_CrAP_TryBallSwappingAsset stores a ball's
-                                //          index there (fn_800484F4, -1: none)
+    s8   nGolferOutfit;         // 0x054F8  -> PlayerProfile.nOutfit; FE_CrAP_TryBallSwappingAsset
+                                //          stores a ball's index there (fn_800484F4, -1: none)
     u8   nGolferBallType;       // 0x054F9  -> PlayerProfile.nBallType
     u8   unk54FA[0x5500 - 0x54FA];
-    // The created golfer's look: the body's parts and sets (FE_CrAP_SaveBodySkinChoices), its six other skins'
-    // (FE_CrAP_SaveClubSkinChoices), its sliders and its logos. char.c hands it to the character (Character_SetClubsAndClothes
-    // passes FE_GetCurrentProfile() + 0x5500 as a SkinChoices*).
+    // The created golfer's look: the body's parts and sets (FE_CrAP_SaveBodySkinChoices), its six
+    // other skins' (FE_CrAP_SaveClubSkinChoices), its sliders and its logos. char.c hands it to the
+    // character (Character_SetClubsAndClothes passes FE_GetCurrentProfile() + 0x5500 as a
+    // SkinChoices*).
     SkinChoices choices;        // 0x05500
     s8   nDateMonth;            // 0x0AF7C  } a date, set and read by menu messages packed as
     s8   nDateDay;              // 0x0AF7D  } fn_80078604 packs it (FE_CrAPMessages.c
@@ -340,19 +351,23 @@ typedef struct SaveProfile {
     s32  aAF80[53];             // 0x0AF80  per slot: a Create-A-Player asset (FE_CrAPDB.c
                                 //          FE_CrAP_GetEquippedAsset), -1 for none; an asset's n2E is its slot
     // Four bit arrays with a bit per Create-A-Player asset (0x80057F18's loop over them all, which
-    // also clears aB344 and aB4BC; BitArray_TestBit tests a bit).
+    // also clears aAssetNew and aAssetMarkedNew; BitArray_TestBit tests a bit).
     u32  aAssetLocked[94];      // 0x0B054  the asset was locked (fn_80078008) when last checked
-    u32  aB1CC[94];             // 0x0B1CC  set where FE_CrAP_GetPartLevelFromAssetIndex gives 0; an asset of lock kind 0
-                                //          stays locked until the bit its FE_CrAP_GetPartGMLockValByAssetNum names is set
-    u32  aB344[94];             // 0x0B344
-    u32  aB4BC[94];             // 0x0B4BC
+    u32  aAssetOwned[94];       // 0x0B1CC  owned: set for the level-0 assets and when bought
+                                //          (GM_vPurchaseCrAPItem), cleared when sold; an asset of
+                                //          lock kind 0 stays locked until the bit its
+                                //          FE_CrAP_GetPartGMLockValByAssetNum names is set
+    u32  aAssetNew[94];         // 0x0B344  unlocked since it was last seen (GM_vCheckCrAPUnlocks)
+    u32  aAssetMarkedNew[94];   // 0x0B4BC  a new one the menus marked (GM_vMarkNewCrAPItem);
+                                //          GM_vClearMarkedNewCrAPItems clears both bits
     TourSeason tour;            // 0x0B634
     u8   a104D0[118];           // 0x104D0  per real-time event, by the ids of
                                 //          GM_RealtimeMode_GetStartDate (0..117):
                                 //          TrophyRoom_CountEventsInMonth counts the nonzero ones
                                 //          in a month; no C code here writes it
     u8   unk10546[0x10548 - 0x10546];
-    u32  a10548[1];             // 0x10548  a bit array: FE_CrAPMessages.c's GM_vGetProfileFlag tests bit n; fn_80058304 tests one (bit 1 for FE_Manager)
+    u32  a10548[1];             // 0x10548  a bit array: FE_CrAPMessages.c's GM_vGetProfileFlag tests
+                                //          bit n; fn_80058304 tests one (bit 1 for FE_Manager)
     SponsorSlot aSponsor[11];   // 0x1054C  the sponsorship slots; cleared by the profile setup;
                                 //          fn_80078008's lock kinds 10 (a sponsor signed) and 11
                                 //          (so many slots signed) read them
@@ -390,7 +405,8 @@ void fn_80057ED0(SaveProfile* pProfile, const char* pName);     // PasswordManag
 f32  GM_GetGameProgress(SaveProfile* pProfile);
 
 // Earnings.c: the awards
-u8   GM_Earnings_GiveAwardToUser(int nPlayer, Award* pAward);   // mark an award won today; 1 if it was not won before
+// Mark an award won today; 1 if it was not won before.
+u8   GM_Earnings_GiveAwardToUser(int nPlayer, Award* pAward);
 
 // fe_craputils.c (TW06's FE_CrAP_ utilities)
 extern char lbl_80188138[];     // "NoLogoName": a user logo's name until one is given

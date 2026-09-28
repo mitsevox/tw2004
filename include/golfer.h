@@ -569,7 +569,8 @@ LAYOUT_ASSERT(Session, 0x5BD0);
 // turned this into the GameModeDriver class). Only what our files use is named.
 typedef struct GameState {
     s32  nMode;                 // 0x000
-    s32  n4;                    // 0x004
+    s32  nScoringType;          // 0x004  0 strokes, 1 holes won (match play), 2 skins, 3 Stableford
+                                //        (set by each mode's init; GM_GetScoringType)
     s32  nMulligans;            // 0x008  0 none, 1 any number, 2 one per player per nine (GM_PlayerTakeMulligan)
     s32  nC;                    // 0x00C  4 in the team modes
     s32  n10;                   // 0x010  4 in the team modes
@@ -593,11 +594,12 @@ typedef struct GameState {
                                 //        speed golf measures the ball's distance to it
     u8   b134;                  // 0x134  cleared at the start of a hole
     u8   b135;                  // 0x135  set by GM_SetNeedToBuildPlayoffHoleList
-    u8   b136;                  // 0x136  the holes are not one course's 1..18 (four kinds, 0x136..0x139):
-                                //        this one a custom round (nSaveSlot, nSaveCourse)
-    u8   b137;                  // 0x137  "Random 18" (course 23, GM_BuildRandom18)
-    u8   b138;                  // 0x138  "Dream 18" (course 22, GM_BuildDream18)
-    u8   b139;                  // 0x139  a regional round, 1..6 = courses 24..29 (GM_BuildRegionalRound)
+    // The holes are not one course's 1..18 when any of these four is set (GM_SetCurrentCourse):
+    u8   bCustomRound;          // 0x136  a custom round (nSaveSlot, nSaveCourse)
+    u8   bRandom18;             // 0x137  "Random 18" (course 23, GM_BuildRandom18)
+    u8   bDream18;              // 0x138  "Dream 18" (course 22, GM_BuildDream18)
+    u8   nRegionalRound;        // 0x139  a regional round, 1..6 = courses 24..29
+                                //        (GM_BuildRegionalRound); 0 none
     u8   unk13A[2];
     s32  nSaveSlot;             // 0x13C  the save slot (0x10600 bytes each) of a custom round
     s32  nSaveCourse;           // 0x140  the custom round in it (0x70 bytes each)

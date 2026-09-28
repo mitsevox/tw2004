@@ -42,7 +42,7 @@ void GameModeSkins_Init(void) {
     gpGame->pfnEndGame = GameModeSkins_EndGame;
     gpGame->b274 = 0;
     gpGame->bAIConcedes = 1;
-    gpGame->n4 = 2;
+    gpGame->nScoringType = 2;
     gpGame->nMulligans = 0;
     gpGame->nC = 4;
     gpGame->n10 = 2;

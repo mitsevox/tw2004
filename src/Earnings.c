@@ -1778,7 +1778,7 @@ int HighScoreRecords_GetEndOfShotRecord(int nPlayer, Ball* pBall, int a, u8 bCou
     if (Player_IsCPU(nPlayer)) return 0;
     if (Game_GetMode() == 12 || GM_Currently_SkillZoneMode() || Game_GetMode() == 22 || Game_GetMode()
         == 26) return 0;
-    if (gpGame->b137) return 0;
+    if (gpGame->bRandom18) return 0;
     if (Game_GetMulliganRule() != 0) return 0;
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return 0;
@@ -1834,7 +1834,7 @@ int HighScoreRecords_GetEndOfHoleRecord(int nPlayer, Ball* pBall, int a, u8 bCou
     if (Player_IsCPU(nPlayer)) return 0;
     if (Game_GetMode() == 12 || GM_Currently_SkillZoneMode() || Game_GetMode() == 22 || Game_GetMode()
         == 26) return 0;
-    if (gpGame->b137) return 0;
+    if (gpGame->bRandom18) return 0;
     if (Game_GetMulliganRule() != 0) return 0;
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return 0;
@@ -1917,7 +1917,7 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
         }
         return gNumRecordHits;
     }
-    if (gpGame->b137) return 0;
+    if (gpGame->bRandom18) return 0;
     if (bCountStroke) {
         gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]++;
     }
@@ -1994,12 +1994,12 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
 
 // Whether nValue and szName are already among the top five of course k's record kind i
 // (MC_MergeRecords asks before merging a memory card's records in). Never for a round whose holes
-// are not one course's 1..18 (gpGame->b136).
+// are not one course's 1..18 (gpGame->bCustomRound).
 u8 HighScoreRecords_RecordExist(int i, int nValue, const char* szName, int k) {
     RecordEntry* pRec;
     int j;
 
-    if (gpGame->b136) return 0;
+    if (gpGame->bCustomRound) return 0;
     for (j = 0; j < 5; j++) {
         pRec = &gSession.aCourseRecord[k].aRecord[i][j];
         if (pRec->nValue == nValue && strcmp(pRec->szName, szName) == 0) {
@@ -2099,10 +2099,11 @@ s32 Earnings_GetLongDriveRecordType(s32 n) {
 // game mode (recB, by Game_GetCurHoleNum), kind 9 and up to the long-drive table (recC). Returns 1
 // for a place in the course's (or recB's, recC's) top five, 2 for its best, 3 and 4 the same for
 // recA (tested last, so it wins); 0 for none, and always 0 for a round whose holes are not one
-// course's 1..18 (gpGame->b136). With bSave the entry is written in (the ones below move down) and
-// the player's profile is flagged as changed (bChanged); nPlayer 5 (MC.c) is no player. EA passes
-// szName to sprintf as the format. The callers pass bSave unmasked and this function tests its low
-// byte (the (u8) casts): EA's definition took a u8 (TW07: bool setrecord) behind an int prototype.
+// course's 1..18 (gpGame->bCustomRound). With bSave the entry is written in (the ones below move
+// down) and the player's profile is flagged as changed (bChanged); nPlayer 5 (MC.c) is no player.
+// EA passes szName to sprintf as the format. The callers pass bSave unmasked and this function
+// tests its low byte (the (u8) casts): EA's definition took a u8 (TW07: bool setrecord) behind an
+// int prototype.
 int HighScoreRecords_CheckRecord(int nKind, int nValue, int bSave, const char* szName, int nPlayer) {
     int nResult;
     int nPos;
@@ -2115,7 +2116,7 @@ int HighScoreRecords_CheckRecord(int nKind, int nValue, int bSave, const char* s
     PlayerNumber_t nProfile;
 
     nResult = 0;
-    if (gpGame->b136) return 0;
+    if (gpGame->bCustomRound) return 0;
     if (nKind < 8) {
         pLast = &gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][4];
         if (HighScoreRecords_IsEqualOrBetter(nKind, nValue, pLast->nValue)) {
@@ -2511,9 +2512,9 @@ void GM_RecordIndividualHoleStats(int nPlayer) {
 
 // At the end of the round (its last hole, outside a playoff; GM_EndOfGolferTurn_HoleFinished), when
 // gpGame->b27D allows it, no challenge runs and mulligans are off: a full round is counted in the
-// profile (nRounds), and in stroke play (gpGame->n4 0) also in nStrokeRounds, with its strokes
-// added to nStrokeRoundStrokes and kept as the best round (nBestRound) when lower. The profile is
-// flagged as changed (bChanged).
+// profile (nRounds), and in stroke play (gpGame->nScoringType 0) also in nStrokeRounds, with its
+// strokes added to nStrokeRoundStrokes and kept as the best round (nBestRound) when lower. The
+// profile is flagged as changed (bChanged).
 void GM_RecordIndividualRoundStats(int nPlayer) {
     PlayerNumber_t nProfile;
     int nStrokes;
@@ -2531,7 +2532,7 @@ void GM_RecordIndividualRoundStats(int nPlayer) {
             if (gpSaveData[nProfile].bActive) {
                 if (GM_FullRoundOfGolf()) {
                     gpSaveData[nProfile].nRounds++;
-                    if (gpGame->n4 == 0) {
+                    if (gpGame->nScoringType == 0) {
                         nStrokes = GM_GetPlayerRoundStrokes(nPlayer);
                         gpSaveData[nProfile].nStrokeRounds++;
                         gpSaveData[nProfile].nStrokeRoundStrokes += nStrokes;

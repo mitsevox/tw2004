@@ -144,7 +144,7 @@ extern Unk80188900 lbl_80188900[NUM_COURSE_DATA][5];   // (above)
 // One hole of the course table (0x38 bytes).
 typedef struct HoleData {
     s32  nPar;                  // 0x00
-    s32  n04;                   // 0x04
+    s32  nRating;               // 0x04  the hole's rating (UI message 35, GM_vGetHoleRating)
     s32  n08;                   // 0x08  per tee set (fn_800D2B80): tee 3
     s32  n0C;                   // 0x0C  tee 2
     s32  n10;                   // 0x10  tee 1

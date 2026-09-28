@@ -57,7 +57,8 @@ typedef struct PgaPro {
     u8   unk28[4];
     f32  fSandSavePct;          // 0x2C  sand saves, percent
     u8   unk30[0x50 - 0x30];
-    f32  f50;                  // 0x50  sorts the entrants, lowest first (HistoricalScoreRankCompareIncreasing)
+    f32  fHistoricalRank;       // 0x50  lowest first gets the best target score
+                                //       (HistoricalScoreRankCompareIncreasing)
     u8   unk54[4];
     f32  fPar3Avg;              // 0x58  scoring average on par 3s (GM_PgaTourSim_SimEntrantScoresOnHole)
     f32  fPar4Avg;              // 0x5C  on par 4s
@@ -109,24 +110,26 @@ typedef struct PgaStatSort {
     s32  nPlayer;               // 0x4
 } PgaStatSort;
 extern PgaStatSort gPgaStatSort;
-extern int gPgaScoreSortPlayer;        // the same for the score sorts: the player
+extern int gPgaScoreSortPlayer;   // the same for the score sorts: the player
 // Per simple statistic: the Calc function that works it out from a golfer's counts.
 extern u8 (*gPgaSimpleStatCalcs[GM_PGA_STAT_SIMPLE_COUNT])(PgaStatCounts* pCounts, f32* pfValue);
 // Per statistic: its sort comparison, StatRankDecreasing (higher is better) or StatRankIncreasing (lower).
 extern s32 (*gPgaStatCompares[GM_PGA_STAT_COUNT])(const void* pA, const void* pB);
-extern s32 gPgaStatViews[GM_PGA_STAT_COUNT];     // per statistic: GM_PgaTourSim_GetStatView
-extern s32 gPgaStatDecimals[32];    // per statistic: the decimal places GM_PgaTourSim_GetStatValString prints
-extern u8  gbStatsDirty;        // the statistics need working out again
-extern u8  gbScoresDirty;       // the score ranking needs sorting again
+// Per statistic: GM_PgaTourSim_GetStatView
+extern s32 gPgaStatViews[GM_PGA_STAT_COUNT];
+extern s32 gPgaStatDecimals[32];  // per statistic: the decimal places GM_PgaTourSim_GetStatValString prints
+extern u8  gbStatsDirty;          // the statistics need working out again
+extern u8  gbScoresDirty;         // the score ranking needs sorting again
 extern u8  gbPgaUserQuit;
-extern s32 gPgaUserPlayoffScore;        // the player's playoff strokes (GM_PgaTourSim_SetUserEntrantHoleStrokes)
+extern s32 gPgaUserPlayoffScore;  // the player's playoff strokes (GM_PgaTourSim_SetUserEntrantHoleStrokes)
 
-// PGATourSimulation.c functions other files call. The TW06 name follows where the code matches it.
-void  PGATourSimulation_OpenONCE(void);                        // TW06: PGATourSimulation_OpenONCE
-void  PGATourSimulation_CloseONCE(void);                        // TW06: PGATourSimulation_CloseONCE
+// PGATourSimulation.c functions other files call (EA's names, from TW07's PGATourSimulation.c,
+// where the code matches).
+void  PGATourSimulation_OpenONCE(void);
+void  PGATourSimulation_CloseONCE(void);
 void  GM_PgaTourSim_ClearAllSeasons(TourSeason* pTour);
 void  GM_PgaTourSim_ClearSeason(TourSeason* pTour);
-void  GM_PgaTourSim_SimRound(int nPlayer, SeasonEvent* pEvent, int nRound, int n, int uFlags);   // TW06: GM_PgaTourSim_SimRound
+void  GM_PgaTourSim_SimRound(int nPlayer, SeasonEvent* pEvent, int nRound, int n, int uFlags);
 void  GM_PgaTourSim_ResetTournament(int nPlayer);
 void  GM_PgaTourSim_CutBadGolfers(int nPlayer);
 void  GM_PgaTourSim_CutEntrant(int nPlayer, int nEntrant);
@@ -137,38 +140,41 @@ void  GM_PgaTourSim_ResetHoleScores(int nPlayer);
 void  GM_PgaTourSim_SimTournamentWinner(int nPlayer);
 s32   GM_PgaTourSim_GetNumEntrants(int nPlayer);
 s32   GM_PgaTourSim_GetNumFirstPlaceEntrants(int nPlayer);
-char* GM_PgaTourSim_GetNameFromGolferID(int nPlayer, int nGolfer);    // TW06: GM_PgaTourSim_GetNameFromGolferID
-u8    GM_PgaTourSim_IsEntrantUser(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_IsEntrantUser
-s32   GM_PgaTourSim_GetScoreRankFromEntrantID(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_GetScoreRankFromEntrantID
-s32   GM_PgaTourSim_GetGolferIDFromEntrantID(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_GetGolferIDFromEntrantID
+char* GM_PgaTourSim_GetNameFromGolferID(int nPlayer, int nGolfer);
+u8    GM_PgaTourSim_IsEntrantUser(int nPlayer, int nEntrant);
+s32   GM_PgaTourSim_GetScoreRankFromEntrantID(int nPlayer, int nEntrant);
+s32   GM_PgaTourSim_GetGolferIDFromEntrantID(int nPlayer, int nEntrant);
 s32   GM_PgaTourSim_GetTotalScoreFromEntrantID(int nPlayer, int nEntrant, u8 b);
-int   GM_PgaTourSim_GetRelativeScoreFromEntrantID(int nPlayer, int nEntrant, u8 b);  // the entrant's score to par so far
+// The entrant's score to par so far
+int   GM_PgaTourSim_GetRelativeScoreFromEntrantID(int nPlayer, int nEntrant, u8 b);
 s32   GM_PgaTourSim_GetBestOpponentRelativeScore(int nPlayer, u8 b);
 s32   GM_PgaTourSim_GetRoundScoreFromEntrantID(int nPlayer, int nEntrant, int nRound);
-u8    GM_PgaTourSim_GetWasCutFromEntrantID(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_GetWasCutFromEntrantID
-s32   GM_PgaTourSim_GetEntrantIDFromScoreRow(int nPlayer, int nRow);       // TW06: GM_PgaTourSim_GetEntrantIDFromScoreRow
-u8    GM_PgaTourSim_IsEntrantTied(int nPlayer, int nEntrant);   // another entrant holds the same place (a tie)
-void  GM_PgaTourSim_SetUserEntrantHoleStrokes(int nPlayer, int nStrokes);   // TW06: GM_PgaTourSim_SetUserEntrantHoleStrokes
+u8    GM_PgaTourSim_GetWasCutFromEntrantID(int nPlayer, int nEntrant);
+s32   GM_PgaTourSim_GetEntrantIDFromScoreRow(int nPlayer, int nRow);
+// Another entrant holds the same place (a tie)
+u8    GM_PgaTourSim_IsEntrantTied(int nPlayer, int nEntrant);
+void  GM_PgaTourSim_SetUserEntrantHoleStrokes(int nPlayer, int nStrokes);
 void  GM_PgaTourSim_AdvancePlayer(int nPlayer, int nHole);
 void  GM_PgaTourSim_AdvanceField(int nPlayer);
-s32   GM_PgaTourSim_GetCurrentHoleFromEntrantID(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_GetCurrentHoleFromEntrantID
+s32   GM_PgaTourSim_GetCurrentHoleFromEntrantID(int nPlayer, int nEntrant);
 s32   GM_PgaTourSim_GetLeaderboardWinningsFromEntrantID(int nPlayer, int nEntrant);
 void  GM_PgaTourSim_SimStats(int nPlayer);
 void  GM_PgaTourSim_InitPlayoff(int nPlayer);
-s32   GM_PgaTourSim_GetNumPlayoffEntrants(int nPlayer);                 // TW06: GM_PgaTourSim_GetNumPlayoffEntrants
-u8    GM_PgaTourSim_EntrantIsInPlayoff(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_EntrantIsInPlayoff
+s32   GM_PgaTourSim_GetNumPlayoffEntrants(int nPlayer);
+u8    GM_PgaTourSim_EntrantIsInPlayoff(int nPlayer, int nEntrant);
 void  GM_PgaTourSim_UpdatePlayoffs(int nPlayer, int nHole);
 s32   GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(int nPlayer, int nHole);
-void  GM_PgaTourSim_SetStatsDirty(u8 bDirty);                   // TW06: GM_PgaTourSim_SetStatsDirty
-void  GM_PgaTourSim_SetScoresDirty(u8 bDirty);                   // TW06: GM_PgaTourSim_SetScoresDirty
+void  GM_PgaTourSim_SetStatsDirty(u8 bDirty);
+void  GM_PgaTourSim_SetScoresDirty(u8 bDirty);
 void  GM_PgaTourSim_GetStatValString(GM_Pga_StatTypes_t nStat, f32 fValue, char* szOut);
 s32   GM_PgaTourSim_GetStatRankFromGolferID(int nPlayer, int nGolfer, GM_Pga_StatTypes_t nStat);
 f32   GM_PgaTourSim_GetStatValueFromGolferID(int nPlayer, int nGolfer, GM_Pga_StatTypes_t nStat);
-u8    GM_PgaTourSim_IsLeaderForStat(int nPlayer, int nGolfer, GM_Pga_StatTypes_t nStat);  // no golfer beats its value
+// No golfer beats its value
+u8    GM_PgaTourSim_IsLeaderForStat(int nPlayer, int nGolfer, GM_Pga_StatTypes_t nStat);
 s32   GM_PgaTourSim_GetGolferIDFromStatRow(int nPlayer, GM_Pga_StatTypes_t nStat, int nRow);
 s32   GM_PgaTourSim_GetStatView(GM_Pga_StatTypes_t nStat);
-s32   GM_PgaTourSim_GetNEventsFromGolferID(int nPlayer, int nGolfer);    // the golfer's tournaments this season
-s32   GM_PgaTourSim_GetNRoundsFromGolferID(int nPlayer, int nGolfer);    // the golfer's rounds this season
+s32   GM_PgaTourSim_GetNEventsFromGolferID(int nPlayer, int nGolfer);  // the golfer's tournaments this season
+s32   GM_PgaTourSim_GetNRoundsFromGolferID(int nPlayer, int nGolfer);  // the golfer's rounds this season
 
 // ---- fe_stats.c: the tour statistics screen ----
 

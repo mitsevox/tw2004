@@ -112,10 +112,10 @@ void GM_SetModeType(int nMode) {
     gpGame->nMode = nMode;
     gpGame->bInPlayoff = 0;
     gpGame->nPlayoffHoles = 0;
-    gpGame->b136 = 0;
-    gpGame->b137 = 0;
-    gpGame->b138 = 0;
-    gpGame->b139 = 0;
+    gpGame->bCustomRound = 0;
+    gpGame->bRandom18 = 0;
+    gpGame->bDream18 = 0;
+    gpGame->nRegionalRound = 0;
     gpGame->nSaveSlot = 5;
     gpGame->nSaveCourse = 0;
     gpGame->bShowYardage = 1;
@@ -415,39 +415,40 @@ void GM_InitializeCurrentHoleToFirstSelected(void) {
 void GM_SetCurrentHole(int nHole) {
     gpGame->nCurHole = nHole;
     gpGame->nCurHoleNum = gpGame->nHoleNum[nHole];
-    if (gpGame->b136 || gpGame->b137 || gpGame->b139 || gpGame->b138) {
+    if (gpGame->bCustomRound || gpGame->bRandom18 || gpGame->nRegionalRound || gpGame->bDream18) {
         gpGame->nCurCourse = gpGame->nHoleCourse[nHole];
     }
 }
 
-// Sets the round's course. 23 builds "Random 18" (GM_BuildRandom18, flag b137), 22 "Dream 18"
-// (GM_BuildDream18, b138) and 24..29 a regional round (GM_BuildRegionalRound, b139 = 1..6); 22 and
-// 24..29 then take the current hole's course from the built round. Any other value is one course
-// played as its holes 1..18; while a custom round is set up (b136) only the current course changes.
+// Sets the round's course. 23 builds "Random 18" (GM_BuildRandom18, flag bRandom18), 22 "Dream 18"
+// (GM_BuildDream18, bDream18) and 24..29 a regional round (GM_BuildRegionalRound, nRegionalRound =
+// 1..6); 22 and 24..29 then take the current hole's course from the built round. Any other value is
+// one course played as its holes 1..18; while a custom round is set up (bCustomRound) only the
+// current course changes.
 void GM_SetCurrentCourse(int nCourse) {
     int i;
     if (nCourse == 23) {
         GM_BuildRandom18();
-        gpGame->b137 = 1;
+        gpGame->bRandom18 = 1;
         return;
     }
-    gpGame->b137 = 0;
+    gpGame->bRandom18 = 0;
     if (nCourse == 22) {
-        gpGame->b138 = 1;
+        gpGame->bDream18 = 1;
         GM_BuildDream18();
         gpGame->nCurCourse = gpGame->nHoleCourse[gpGame->nCurHole];
         return;
     }
-    gpGame->b138 = 0;
+    gpGame->bDream18 = 0;
     if (nCourse >= 24 && nCourse < 30) {
-        gpGame->b139 = nCourse - 23;
+        gpGame->nRegionalRound = nCourse - 23;
         GM_BuildRegionalRound(nCourse);
         gpGame->nCurCourse = gpGame->nHoleCourse[gpGame->nCurHole];
     } else {
-        gpGame->b139 = 0;
+        gpGame->nRegionalRound = 0;
         gpGame->nCurCourse = nCourse;
     }
-    if (!gpGame->b136 && !gpGame->b137 && !gpGame->b138 && !gpGame->b139) {
+    if (!gpGame->bCustomRound && !gpGame->bRandom18 && !gpGame->bDream18 && !gpGame->nRegionalRound) {
         for (i = 0; i < 18; i++) {
             gpGame->nHoleCourse[i] = nCourse;
         }
@@ -809,7 +810,7 @@ void GM_ClearMulliganCounters(void) {
 // The fewest players game mode nMode takes, for the front end (FE_MessageTable messages 2, 4 and
 // 6): 1 for stroke play (0), 4, 5, 9, Stableford (18), 23 and 24; 2 for match play (1), skins (2)
 // and 26; 4 for the team modes 19-21 (best ball, four-ball, alternate shot); speed golf (6-8) 1 or
-// 2 by gpGame->n4; 0 for any other mode.
+// 2 by gpGame->nScoringType; 0 for any other mode.
 int GM_GetMinPlayersForMode(int nMode) {
     switch (nMode) {
     case 0:
@@ -825,7 +826,7 @@ int GM_GetMinPlayersForMode(int nMode) {
     case 6:
     case 7:
     case 8:
-        return gpGame->n4 == 0 ? 1 : 2;
+        return gpGame->nScoringType == 0 ? 1 : 2;
     case 9:
         return 1;
     case 18:

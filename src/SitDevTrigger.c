@@ -151,13 +151,14 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
 }
 
 // Whether an action is held back: at situations 21 and 22 in modes with odd holes (gpGame's
-// b136..b139), or while PlayNow_IsChallengeRunning is set (at 22 only for a ball off the tee); for
-// events 20 and 31 while the GameBreaker is up (not at situation 2); and commentary (kinds 1 and 2) during a
-// replay, in modes 6..8, where GM_Currently_SkillZoneMode says so, and in mode 11.
+// bCustomRound, bRandom18, bDream18 or nRegionalRound), or while PlayNow_IsChallengeRunning is set
+// (at 22 only for a ball off the tee); for events 20 and 31 while the GameBreaker is up (not at
+// situation 2); and commentary (kinds 1 and 2) during a replay, in modes 6..8, where
+// GM_Currently_SkillZoneMode says so, and in mode 11.
 u8 fn_800BD3F8(SitDevAction* pAction, int nSit, int nPlayer, u8 nEvent) {
     int nMode = Game_GetMode();
     if (nSit == 22 || nSit == 21) {
-        if (gpGame->b136 || gpGame->b137 || gpGame->b138 || gpGame->b139) return 1;
+        if (gpGame->bCustomRound || gpGame->bRandom18 || gpGame->bDream18 || gpGame->nRegionalRound) return 1;
         if (PlayNow_IsChallengeRunning()) {
             if (nSit == 21) return 1;
             if (nSit == 22 && gPlayers[nPlayer].ball.nLie != 0) return 1;

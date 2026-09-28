@@ -35,7 +35,7 @@ void GameModeStableford_Init(void) {
     gpGame->pfnEndHole = GameModeStableford_EndHole;
     gpGame->pfnEndGame = GameModeStableford_EndGame;
     gpGame->bAIConcedes = 1;
-    gpGame->n4 = 3;
+    gpGame->nScoringType = 3;
     gpGame->nMulligans = 2;
     gpGame->nC = 4;
     gpGame->n10 = 1;

@@ -76,7 +76,7 @@ void GameMode4_Init(void) {
     gpGame->pfnGoToPlayoff = GameModeMatch_GoToPlayoff;
     gpGame->pfnEndHole = GameModeMatch_EndHole;
     gpGame->pfnEndGame = GameMode4_EndGame;
-    gpGame->n4 = 1;
+    gpGame->nScoringType = 1;
     gpGame->nMulligans = 0;
     gpGame->nC = 1;
     gpGame->n10 = 1;

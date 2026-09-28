@@ -32,7 +32,7 @@ void fn_800573E4(void);
 void fn_80091EE4(void);
 void fn_8007734C(void);
 void Gaud_StartFEMusic(int a);
-u8*  GameMode26_StartEvent(void);                     // CharSliders.c
+void GameMode26_StartEvent(void);                     // GameMode26.c
 void fn_80091D84(void);
 void fn_80091E1C(void);
 void AI_TargetsClear(void);

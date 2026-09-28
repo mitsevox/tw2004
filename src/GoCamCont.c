@@ -42,10 +42,10 @@ void fn_80062E40(View* pView) {
     pView->nCurCamera = 25;
     pView->script.fCamTime = 0.0f;
     pView->script.f98 = 0.0f;
-    pView->script.f90 = 0.0f;
+    pView->script.fFadeTime = 0.0f;
     pView->script.pShot = NULL;
     pView->script.pNextShot = NULL;
-    pView->script.nCamera = 0;
+    pView->script.nFade = 0;
     pView->script.bCC = 0;
     pView->script.bCF = 0;
     pView->script.bE8 = 0;
@@ -170,14 +170,14 @@ void CameraController_Idle(View* pView, int nPlayer) {
         GolfCamera_ProcessShutterCamera(pView, nPlayer);
         break;
     case 25:
-        nMove = pView->script.nCamera;
+        nMove = pView->script.nFade;
         if (gSession.nPaused == 0) {
             fn_8003F2E0(&pView->script, FRAME_TIME);   // port: one NTSC frame a call, not gSession.fFrameTime
             // A colour fade held in state 4 (after fading up) stays on instead of ending.
-            if (nMove == 4 && pView->script.nCamera == 0) {
-                pView->script.nCamera = 4;
+            if (nMove == 4 && pView->script.nFade == 0) {
+                pView->script.nFade = 4;
             }
-            pView->script.f90 += FRAME_TIME;
+            pView->script.fFadeTime += FRAME_TIME;
         }
         break;
     }
@@ -491,42 +491,42 @@ void fn_80063920(int nView, f32* pBounds) {
 // Colour fade state 2 (fn_8003F2E0): the colour pVec over the view, its alpha falling from pVec[3]
 // to 0 over fTime.
 void CameraController_FadeIn(View* pView, f32 fTime, f32* pVec) {
-    pView->script.nCamera = 2;
-    LLMath_CopyVec(pVec, pView->script.v40);
-    pView->script.f90 = 0.0f;
-    pView->script.f94 = fTime;
+    pView->script.nFade = 2;
+    LLMath_CopyVec(pVec, pView->script.vFadeColor);
+    pView->script.fFadeTime = 0.0f;
+    pView->script.fFadeLength = fTime;
 }
 
 // Colour fade state 1 (fn_8003F2E0): the colour pVec over the view, its alpha rising from 0 to
 // pVec[3] over fTime.
 void CameraController_FadeOut(View* pView, f32 fTime, f32* pVec) {
-    pView->script.nCamera = 1;
-    LLMath_CopyVec(pVec, pView->script.v40);
-    pView->script.f90 = 0.0f;
-    pView->script.f94 = fTime;
+    pView->script.nFade = 1;
+    LLMath_CopyVec(pVec, pView->script.vFadeColor);
+    pView->script.fFadeTime = 0.0f;
+    pView->script.fFadeLength = fTime;
 }
 
 u8 fn_80063C50(View* pView) {
-    if (pView->script.nCamera == 5 || pView->script.nCamera == 4 || pView->script.nCamera == 3) {
+    if (pView->script.nFade == 5 || pView->script.nFade == 4 || pView->script.nFade == 3) {
         return 1;
     }
     return 0;
 }
 
 u8 fn_80063C7C(View* pView) {
-    return pView->script.nCamera == 4;
+    return pView->script.nFade == 4;
 }
 
 u8 fn_80063C90(View* pView) {
-    if (pView->script.nCamera == 2 || pView->script.nCamera == 1 || pView->script.nCamera == 4) {
+    if (pView->script.nFade == 2 || pView->script.nFade == 1 || pView->script.nFade == 4) {
         return 1;
     }
     return 0;
 }
 
 void fn_80063CBC(View* pView, f32* pVec) {
-    pView->script.nCamera = 3;
-    LLMath_CopyVec(pVec, pView->script.v40);
+    pView->script.nFade = 3;
+    LLMath_CopyVec(pVec, pView->script.vFadeColor);
 }
 
 // Asks for shot kind nKind on the player's view. With club 25 only kinds 0, 5, 8, 11 and 23 are

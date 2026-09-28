@@ -86,7 +86,7 @@ void SitDev_QueueEvent(int nPlayer, int a, u8 nEvent) {
         return;
     }
     if (nEvent == 30) {
-        if (gpGame->b136 || gpGame->b137 || gpGame->b138 || gpGame->b139) {
+        if (gpGame->bCustomRound || gpGame->bRandom18 || gpGame->bDream18 || gpGame->nRegionalRound) {
             return;
         }
     }

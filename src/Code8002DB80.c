@@ -363,6 +363,9 @@ u8 Player_IsHoled(int nPlayer) {
     return gPlayers[nPlayer].ball.nLie == LIE_INCUP_e;
 }
 
+// The player's ball is in the cup and the golfer's state is not GS_CONCEDED: holed out, not a
+// conceded putt.
+// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 u8 Player_IsHoledNotState23(int nPlayer) {
     int bResult = 0;
     if (gPlayers[nPlayer].ball.nLie == LIE_INCUP_e &&
@@ -371,8 +374,6 @@ u8 Player_IsHoledNotState23(int nPlayer) {
     }
     return bResult;
 }
-
-// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
 // ---- small accessors ------------------------------------------------------------------------
 

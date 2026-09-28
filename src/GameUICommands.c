@@ -278,7 +278,7 @@ void  Gaud_RestartMusic(void);
 u8    fn_800C6E44(View* pView);
 u8    fn_800C708C(View* pView);
 void  fn_800C9038(int nView, f32* pLong, f32* pSide);    // GoBreakLine.c
-s32   fn_800D2B4C(int nPlayer);
+s32   fn_800D2B4C(int nHole);
 s32   fn_800D2D40(int nTeeSet);
 s32   fn_800D2DA0(int nTeeSet);
 s32   fn_800D2E00(int nTeeSet);
@@ -706,14 +706,15 @@ void GM_vGetPlayerHolePoints(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Message 4: the round's course (Game_GetCourse); -1 when any of gpGame->b137..b139 is set (TW07
-// tests compilation and random courses here), -2 for a custom course (b136).
+// Message 4: the round's course (Game_GetCourse); -1 when any of gpGame->bRandom18, bDream18 or
+// nRegionalRound is set (TW07 tests compilation and random courses here), -2 for a custom course
+// (bCustomRound).
 void GM_vGetCourseIndex(MsgArg* pArgs, MsgArg* pResult) {
-    if (gpGame->b137 != 0 || gpGame->b138 != 0 || gpGame->b139 != 0) {
+    if (gpGame->bRandom18 != 0 || gpGame->bDream18 != 0 || gpGame->nRegionalRound != 0) {
         pResult->i = -1;
         return;
     }
-    if (gpGame->b136 != 0) {
+    if (gpGame->bCustomRound != 0) {
         pResult->i = -2;
         return;
     }
@@ -860,7 +861,7 @@ void GM_vGetPlayerWindSpeed(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = Wind_Get(NULL);
 }
 
-// Message 22: the round's scoring method (GM_GetScoringType: gpGame->n4).
+// Message 22: the round's scoring method (GM_GetScoringType: gpGame->nScoringType).
 void GM_vGetScoringMethod(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_GetScoringType();
 }
@@ -1077,7 +1078,7 @@ void GM_vGetLiePercentage(MsgArg* pArgs, MsgArg* pResult) {
                   gSurfaceTypes[gPlayers[pArgs[0].i].ball.nSurface].f00);
 }
 
-// Message 35: hole pArgs[0]'s rating (fn_800D2B4C: the course table's n04 for that hole).
+// Message 35: hole pArgs[0]'s rating (fn_800D2B4C: the course table's nRating for that hole).
 void GM_vGetHoleRating(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_800D2B4C(pArgs[0].i);
 }
@@ -1254,19 +1255,19 @@ static inline PgaEntrantMC* Tour_EntrantMC(PlayerNumber_t nPlayer, int nEntrant)
     return &gpSaveData[nPlayer].tour.field.aEntrant[nEntrant];
 }
 
-// Message 56: the winnings (PgaEntrantMC.n18, profile 0) of the PGA TOUR entrant on leaderboard row
-// pArgs[0].
+// Message 56: the winnings (PgaEntrantMC.nWinnings, profile 0) of the PGA TOUR entrant on
+// leaderboard row pArgs[0].
 void GM_vLeaderboard_Winnings(MsgArg* pArgs, MsgArg* pResult) {
     PlayerNumber_t nPlayer = PLR_1_e;
 
-    pResult->i = Tour_EntrantMC(nPlayer, GM_PgaTourSim_GetEntrantIDFromScoreRow(0, pArgs[0].i))->n18;
+    pResult->i = Tour_EntrantMC(nPlayer, GM_PgaTourSim_GetEntrantIDFromScoreRow(0, pArgs[0].i))->nWinnings;
 }
 
 // Message 57: the winnings of the player (entrant 0) in save profile pArgs[0].
 void GM_vLeaderboard_PlayerWinnings(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = &gpSaveData[pArgs[0].i];
 
-    pResult->i = pProfile->tour.field.aEntrant[0].n18;
+    pResult->i = pProfile->tour.field.aEntrant[0].nWinnings;
 }
 
 // Message 58: in lesson mode, the lesson stops waiting and goes on (Lessons_StopWaiting).
@@ -2350,7 +2351,7 @@ void GM_vIG_MCGetCardErrors(MsgArg* pArgs, MsgArg* pResult) {
 // course 7 (the skills course) and for hole indexes 15 and up. With the demo set-up
 // (gSession.uFlags 0x4000) a custom round shows the course's name instead.
 void GM_vGetCourseHoleName(MsgArg* pArgs, MsgArg* pResult) {
-    if ((gSession.uFlags & 0x4000) && gpGame->b136 != 0) {
+    if ((gSession.uFlags & 0x4000) && gpGame->bCustomRound != 0) {
         if (gpGame->nCurCourse == 7 || Game_CurHoleIndex() >= 15) {
             strcpy(((MsgString*)pArgs[1].p)->pStr, "Sherwood CC");
             return;
@@ -2358,22 +2359,22 @@ void GM_vGetCourseHoleName(MsgArg* pArgs, MsgArg* pResult) {
         strcpy(((MsgString*)pArgs[1].p)->pStr, lbl_80191990[gpGame->nCurCourse]);
         return;
     }
-    if (gpGame->b136 != 0) {
+    if (gpGame->bCustomRound != 0) {
         strcpy(((MsgString*)pArgs[1].p)->pStr,
                gpSaveData[gpGame->nSaveSlot].aSavedRound[gpGame->nSaveCourse].szName);
         return;
     }
-    if (gpGame->b137 != 0) {
+    if (gpGame->bRandom18 != 0) {
         strcpy(((MsgString*)pArgs[1].p)->pStr, "Random 18");
         return;
     }
-    if (gpGame->b138 != 0) {
+    if (gpGame->bDream18 != 0) {
         strcpy(((MsgString*)pArgs[1].p)->pStr, "Dream 18");
         return;
     }
-    if (gpGame->b139 != 0) {
+    if (gpGame->nRegionalRound != 0) {
         // the regions follow the courses: region 1 is 24
-        switch (gpGame->b139 + 23) {
+        switch (gpGame->nRegionalRound + 23) {
         case 24:
             strcpy(((MsgString*)pArgs[1].p)->pStr, "US Northwest");
             return;
@@ -2660,7 +2661,7 @@ void IG_vSwapDiscReloadHole(MsgArg* pArgs, MsgArg* pResult) {
         fn_801102AC();
         Character_ReopenTextureFiles();
         fn_8006F4B4();
-        pView->script.nCamera = 0;
+        pView->script.nFade = 0;
     }
 }
 
@@ -3068,10 +3069,10 @@ void IG_vLeaderboard_PlayerWasCut(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_PgaTourSim_GetWasCutFromEntrantID(pArgs[0].i, 0);
 }
 
-// The round's scoring kind, gpGame->n4: 0 strokes, 1 holes won, 2 skins (the kinds HoleScore.c's
-// leads count by).
+// The round's scoring kind, gpGame->nScoringType: 0 strokes, 1 holes won, 2 skins (the kinds
+// HoleScore.c's leads count by).
 s32 GM_GetScoringType(void) {
-    return gpGame->n4;
+    return gpGame->nScoringType;
 }
 
 // How many holes the round plays (the holes set in gpGame->bHoleSelected).

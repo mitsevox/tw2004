@@ -71,15 +71,15 @@ void REPLAY_Save(int nPlayer) {
     gReplayData.nWindDir = fn_80055F78();
     gReplayData.nWindSpeed = fn_80055F80();
     nMode = gSession.options.nWeather;
-    gReplayData.nF12 = nMode;
+    gReplayData.nWeather = nMode;
     if (nMode == 2) {
         if (fn_80035574()) {
-            gReplayData.nF12 = 3;
+            gReplayData.nWeather = 3;
         } else {
-            gReplayData.nF12 = 4;
+            gReplayData.nWeather = 4;
         }
     }
-    gReplayData.nF14 = 100.0f * fn_8006C630();
+    gReplayData.nWeatherAmount = 100.0f * fn_8006C630();
     gReplayData.nF1A = fn_80055CA4();
     gReplayData.nF1C = fn_80055CC8();
     gReplayData.nF1E = fn_80055D34();

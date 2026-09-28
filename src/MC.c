@@ -22,28 +22,28 @@ s32 MC_SaveOptions(MCCardPos* pPos);
 s32 MC_LoadOptions(MCCardPos* pPos);
 int fn_800A1758(MCCardPos* pPos);
 s32 fn_800A2630(MCCardPos* pPos);
-void MC_MemoryRequiredForOptions(MCCardPos* pPos);
+s32 MC_MemoryRequiredForOptions(MCCardPos* pPos);
 s32 MC_SaveUser(MCCardPos* pPos);
 s32 MC_LoadUser(MCCardPosStr* pPos);
 s32 MC_GetNumUser(MCCardPos* pPos);
 s32 fn_800A26A0(MCCardPos* pPos);
-void fn_800A270C(MCCardPos* pPos);
+s32 fn_800A270C(MCCardPos* pPos);
 s32 MC_SaveReplay(MCCardPos* pPos);
 s32 MC_LoadReplay(MCCardPos* pPos);
 s32 fn_800A09EC(MCCardPos* pPos);
 s32 fn_800A2668(MCCardPos* pPos);
-void fn_800A2740(MCCardPos* pPos);
+s32 fn_800A2740(MCCardPos* pPos);
 s32 fn_8012555C(s32* pArgs);            // EASportsBio.c
 s32 fn_801255C4(s32* pArgs);            // EASportsBio.c
 
 u32 lbl_8018C7C8[4] = {0x98, 0xA0, 0, 0xB0};
 
 // port: the table calls every entry as an MCOp; the entries cast here have other types in their
-//       definitions (void results, int, MCCardPosStr*, s32*), which a port gives one signature.
+//       definitions (int, MCCardPosStr*, s32*), which a port gives one signature.
 MCOpSet lbl_8018C7D8[4] = {
-    {{MC_SaveOptions, MC_LoadOptions, (MCOp)fn_800A1758, fn_800A2630, (MCOp)MC_MemoryRequiredForOptions}},
-    {{MC_SaveUser, (MCOp)MC_LoadUser, MC_GetNumUser, fn_800A26A0, (MCOp)fn_800A270C}},
-    {{MC_SaveReplay, MC_LoadReplay, fn_800A09EC, fn_800A2668, (MCOp)fn_800A2740}},
+    {{MC_SaveOptions, MC_LoadOptions, (MCOp)fn_800A1758, fn_800A2630, MC_MemoryRequiredForOptions}},
+    {{MC_SaveUser, (MCOp)MC_LoadUser, MC_GetNumUser, fn_800A26A0, fn_800A270C}},
+    {{MC_SaveReplay, MC_LoadReplay, fn_800A09EC, fn_800A2668, fn_800A2740}},
     {{(MCOp)fn_801251EC, NULL, (MCOp)fn_80125118, (MCOp)fn_8012555C, (MCOp)fn_801255C4}},
 };
 
@@ -1315,18 +1315,19 @@ s32 fn_800A26A0(MCCardPos* pPos) {
     return fn_8009EE28(pPos->nPort, pPos->nSlot) == MC_ERR_BADDATA;
 }
 
-// Ask MC_BlocksNeededForSave for the space save kinds 0, 1 and 2 need (its last argument); the result is not
-// kept.
-void MC_MemoryRequiredForOptions(MCCardPos* pPos) {
-    MC_BlocksNeededForSave(pPos->nPort, pPos->nSlot, 0, 0);
+// Op 4 of this file's lbl_8018C7D8, one per save kind: the blocks save kind 0 (options), 1 (user)
+// or 2 (replay) needs on the card (MC_BlocksNeededForSave's last argument); fn_80084FB4 hands it to
+// startUp.c.
+s32 MC_MemoryRequiredForOptions(MCCardPos* pPos) {
+    return MC_BlocksNeededForSave(pPos->nPort, pPos->nSlot, 0, 0);
 }
 
-void fn_800A270C(MCCardPos* pPos) {
-    MC_BlocksNeededForSave(pPos->nPort, pPos->nSlot, 0, 1);
+s32 fn_800A270C(MCCardPos* pPos) {
+    return MC_BlocksNeededForSave(pPos->nPort, pPos->nSlot, 0, 1);
 }
 
-void fn_800A2740(MCCardPos* pPos) {
-    MC_BlocksNeededForSave(pPos->nPort, pPos->nSlot, 0, 2);
+s32 fn_800A2740(MCCardPos* pPos) {
+    return MC_BlocksNeededForSave(pPos->nPort, pPos->nSlot, 0, 2);
 }
 
 void MC_ConvertWideCharToChar(const u16* szSrc, char* szDst, s32 nMax) {

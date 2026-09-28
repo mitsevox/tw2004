@@ -25,8 +25,8 @@ u8   GameModeBestBall_GoToPlayoff(u8 bCheck);
 void GameModeBestBall_EndHole(void);
 void GameModeBestBall_EndGame(void);
 
-// Game mode 19's setup (GM_SetModeType): its callbacks; n4 0, one mulligan per player per nine
-// (nMulligans 2), nC and n10 4 as in the other team modes, nDC 0, the current hole back to 0
+// Game mode 19's setup (GM_SetModeType): its callbacks; nScoringType 0, one mulligan per player per
+// nine (nMulligans 2), nC and n10 4 as in the other team modes, nDC 0, the current hole back to 0
 // (GM_SetCurrentHole) and split screen off.
 void GameModeBestBall_Init(void) {
     gpGame->pfnInit = GameModeBestBall_Init;
@@ -37,7 +37,7 @@ void GameModeBestBall_Init(void) {
     gpGame->pfnGoToPlayoff = GameModeBestBall_GoToPlayoff;
     gpGame->pfnEndHole = GameModeBestBall_EndHole;
     gpGame->pfnEndGame = GameModeBestBall_EndGame;
-    gpGame->n4 = 0;
+    gpGame->nScoringType = 0;
     gpGame->nMulligans = 2;
     gpGame->nC = 4;
     gpGame->n10 = 4;

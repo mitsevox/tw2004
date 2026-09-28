@@ -51,7 +51,7 @@ void GameModePractice_Init(void) {
     gpGame->bAllowGameBreakers = 0;
     gpGame->n290 = 0;
     gpGame->n294 = 0;
-    gpGame->n4 = 0;
+    gpGame->nScoringType = 0;
     gpGame->nMulligans = 1;
     gpGame->nC = 1;
     gpGame->n10 = 1;

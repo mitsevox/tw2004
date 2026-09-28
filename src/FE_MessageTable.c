@@ -1453,10 +1453,10 @@ void GetGolferName(int nGolfer, char* szName) {
 void GM_vFEMessage17_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Front-end message 18: a custom round (gpGame->b136) of four holes: course 8's hole 17, course 5's
-// hole 4, course 17's hole 2 and course 18's hole 9, the rest unselected. With both demo session
-// flags (0x4000 and 0x8000) set instead: commentary off (options.a0[4] 0) and all 18 slots course
-// 0's hole 18.
+// Front-end message 18: a custom round (gpGame->bCustomRound) of four holes: course 8's hole 17,
+// course 5's hole 4, course 17's hole 2 and course 18's hole 9, the rest unselected. With both demo
+// session flags (0x4000 and 0x8000) set instead: commentary off (options.a0[4] 0) and all 18 slots
+// course 0's hole 18.
 void GM_vInitCustomRound(MsgArg* pArgs, MsgArg* pResult) {
     s32 i;
 
@@ -1483,7 +1483,7 @@ void GM_vInitCustomRound(MsgArg* pArgs, MsgArg* pResult) {
             gpGame->bHoleSelected[i] = 1;
         }
     }
-    gpGame->b136 = 1;
+    gpGame->bCustomRound = 1;
 }
 
 // Front-end message 19: 1 when session flag 0x4000 (the demo set-up) is set.
@@ -3250,9 +3250,9 @@ void GM_vGetProfileRecordsHeld(MsgArg* pArgs, MsgArg* pResult) {
 
 // Front-end message 608: save profile pArgs[0]'s progress, into the values pArgs[1..7] point at:
 // [1] ladder events won (aLadderAward), [2] PGA TOUR tournaments won (aC8), [3] the bonus progress
-// (an f32, GM_GetBonusProgress), [4] the Create-A-Player unlock bits set (aB1CC, bits 0..2999), [6]
-// real-time events won (aRTEAward) and [7] sponsorship slots signed (aSponsor). pArgs[5] is not
-// used.
+// (an f32, GM_GetBonusProgress), [4] the Create-A-Player unlock bits set (aAssetOwned, bits
+// 0..2999), [6] real-time events won (aRTEAward) and [7] sponsorship slots signed (aSponsor).
+// pArgs[5] is not used.
 void GM_vGetProfileProgress(MsgArg* pArgs, MsgArg* pResult) {
     int  nProfile = pArgs[0].i;
     s32* pnLadder = pArgs[1].p;
@@ -3283,7 +3283,7 @@ void GM_vGetProfileProgress(MsgArg* pArgs, MsgArg* pResult) {
 
     n = 0;
     for (i = 0; i < 3000; i++) {
-        if (BitArray_TestBit(gpSaveData[nProfile].aB1CC, i)) {
+        if (BitArray_TestBit(gpSaveData[nProfile].aAssetOwned, i)) {
             n++;
         }
     }
@@ -4514,15 +4514,15 @@ void GM_vGetOptionLevel2(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Front-end message 255: whether the round is a custom round (pArgs[0] nonzero; gpGame->b136), the
-// one saved as custom round pArgs[2] (gpGame->nSaveCourse) of save slot pArgs[1]
-// (gpGame->nSaveSlot). For a custom round its 18 holes are copied in (GM_SetupCustomHoleSelection)
-// and the current hole set to the first selected one.
+// Front-end message 255: whether the round is a custom round (pArgs[0] nonzero;
+// gpGame->bCustomRound), the one saved as custom round pArgs[2] (gpGame->nSaveCourse) of save slot
+// pArgs[1] (gpGame->nSaveSlot). For a custom round its 18 holes are copied in
+// (GM_SetupCustomHoleSelection) and the current hole set to the first selected one.
 void GM_vSelectCustomRound(MsgArg* pArgs, MsgArg* pResult) {
-    gpGame->b136 = pArgs[0].i;
+    gpGame->bCustomRound = pArgs[0].i;
     gpGame->nSaveSlot = pArgs[1].i;
     gpGame->nSaveCourse = pArgs[2].i;
-    if (gpGame->b136 != 0) {
+    if (gpGame->bCustomRound != 0) {
         GM_SetupCustomHoleSelection();
         GM_InitializeCurrentHoleToFirstSelected();
     }
@@ -6117,13 +6117,13 @@ void GM_vPlayNowGetGroupMedal(MsgArg* pArgs, MsgArg* pResult) {
 
 // Front-end message 684: the round's course is pArgs[0] (GM_SetCurrentCourse and its first selected
 // hole), or 10000 for the random mixed round (built by GM_BuildRandom18 only the first time in a
-// row; gpGame->b137 remembers it). Answers which disc the course is on: whether it is on the disc
-// in the drive (fn_80110180), inverted when disc 2 is in the drive (fn_8011027C), so 1 for disc 1
-// and 0 for disc 2.
+// row; gpGame->bRandom18 remembers it). Answers which disc the course is on: whether it is on the
+// disc in the drive (fn_80110180), inverted when disc 2 is in the drive (fn_8011027C), so 1 for
+// disc 1 and 0 for disc 2.
 void GM_vSetCourseFindDisc(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 10000) {
-        if (gpGame->b137 == 0) {
-            gpGame->b137 = 1;
+        if (gpGame->bRandom18 == 0) {
+            gpGame->bRandom18 = 1;
             GM_BuildRandom18();
         }
         pResult->i = fn_80110180();
@@ -6137,7 +6137,7 @@ void GM_vSetCourseFindDisc(MsgArg* pArgs, MsgArg* pResult) {
         if (fn_8011027C() != 0) {
             pResult->i = pResult->i == 0;
         }
-        gpGame->b137 = 0;
+        gpGame->bRandom18 = 0;
     }
 }
 

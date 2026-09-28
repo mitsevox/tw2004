@@ -207,7 +207,8 @@ extern u8    lbl_8018F640[0x858];   // } DOL's own data (split before startUp.c'
 
 // ---- the memory-card status table -------------------------------------------------------------
 
-// A card port and slot (core/memcard.h), as the save-kind functions (MC_CallActionFnMemoryRequired) take them.
+// A card port and slot (core/memcard.h), as the save-kind functions (MC_CallActionFnMemoryRequired)
+// take them.
 // 12 bytes: the size fn_800B09C8's stack frame proves; the last word is never read there.
 typedef struct CardPos {
     s32  nPort;                 // 0x0

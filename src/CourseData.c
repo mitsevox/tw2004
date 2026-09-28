@@ -63,7 +63,7 @@ int Course_GetCurHolePar(void) {
 }
 
 s32 fn_800D2B4C(int nHole) {
-    return lbl_801FA2F4[gpGame->nHoleCourse[nHole]].aHoles[gpGame->nHoleNum[nHole]].n04;
+    return lbl_801FA2F4[gpGame->nHoleCourse[nHole]].aHoles[gpGame->nHoleNum[nHole]].nRating;
 }
 
 // A hole's value for tee set nTee (0..3), 0 for any other.

@@ -33,7 +33,7 @@ void FE_CrAP_InitCrAPInfo(SaveProfile* pProfile) {
 }
 
 // Refreshes the four asset bit arrays from the Create-A-Player database (when it is loaded), then
-// clears the logos' b1020 and empties the asset slots.
+// clears the logos' bSaved and empties the asset slots.
 void fn_80057FBC(SaveProfile* pProfile) {
     s8 nOffered;
     s32 nAssets;
@@ -44,12 +44,12 @@ void fn_80057FBC(SaveProfile* pProfile) {
         nAssets = FE_CrAP_GetNumEntriesInCrAPDB();
         for (i = 0; i < nAssets; i++) {
             if (FE_CrAP_GetPartLevelFromAssetIndex(i) == 0) {
-                BitArray_SetBit(pProfile->aB1CC, i);
+                BitArray_SetBit(pProfile->aAssetOwned, i);
             } else {
-                BitArray_ClearBit(pProfile->aB1CC, i);
+                BitArray_ClearBit(pProfile->aAssetOwned, i);
             }
-            BitArray_ClearBit(pProfile->aB344, i);
-            BitArray_ClearBit(pProfile->aB4BC, i);
+            BitArray_ClearBit(pProfile->aAssetNew, i);
+            BitArray_ClearBit(pProfile->aAssetMarkedNew, i);
             FE_CrAP_SetCurrentGender(FE_CrAP_GetAssetGender(i));
             if (fn_80078008(i, pProfile)) {
                 BitArray_SetBit(pProfile->aAssetLocked, i);
@@ -59,7 +59,7 @@ void fn_80057FBC(SaveProfile* pProfile) {
         }
         FE_CrAP_SetCurrentGender(nOffered);
         for (i = 0; i < 5; i++) {
-            pProfile->choices.aLogo[i].b1020 = 0;
+            pProfile->choices.aLogo[i].bSaved = 0;
         }
         for (i = 0; i < 53; i++) {
             pProfile->aAF80[i] = -1;

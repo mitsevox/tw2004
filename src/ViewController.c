@@ -253,7 +253,7 @@ f32* CameraController_GetCameraViewOffset(View* pView) {
 u8 CameraController_IsFlybyDone(View* pView) {
     if (pView->script.pShot == NULL) return 1;
     if (pView->script.pShot->bAD) return 1;
-    if (pView->script.pShot->p40 == NULL && pView->script.nCamera != 1) return 1;
+    if (pView->script.pShot->p40 == NULL && pView->script.nFade != 1) return 1;
     return 0;
 }
 

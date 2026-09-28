@@ -14,7 +14,7 @@ typedef struct RTEvent {
     s32 bOff;                   // 0x08  nonzero: not playable
     s32 nChallenge;             // 0x0C  1-based, in aChallenge
     s32 nId;                    // 0x10  the event's id (its award in the save profile)
-    s32 n14;                    // 0x14
+    s32 nIcon;                  // 0x14  its icon on the calendar and in the trophy room
     u8  unk18[4];
     u16 aDate[10];              // 0x1C  the start date per season (from 2003; 0 = not held). TW06: startDate
 } RTEvent;
@@ -37,7 +37,8 @@ RTEvent* GM_RealtimeMode_GetEventInfoByDate(u16 nDate);
 char* GameModeDriverRTE_GetName(s32 i);
 char* GameModeDriverRTE_GetDescription(s32 i);
 s32  GameModeDriverRTE_UI_GetEventIconIndexOnCal(s32 i);
-u8   GM_RealtimeMode_TodaysEventCompleted(void);                 // always 0 (the calendar's cell look for today)
+// Always 0: the calendar shows today's event as not yet played.
+u8   GM_RealtimeMode_TodaysEventCompleted(void);
 
 // GameModeDriverRTE.c, as the calendar's event details (FE_CalendarPopups.c) use it
 s32  GameModeDriverRTE_GetPurse(s32 i);

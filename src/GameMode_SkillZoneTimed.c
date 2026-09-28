@@ -94,7 +94,7 @@ void GameModeSkillZoneTimed_Init(void) {
     gpGame->bNoWind = 1;
     gpGame->bBumpObstructions = 0;
     gpGame->b28D = 1;
-    gpGame->n4 = 0;
+    gpGame->nScoringType = 0;
     gpGame->nMulligans = 1;
     gpGame->n10 = 1;
     gpGame->nC = 1;

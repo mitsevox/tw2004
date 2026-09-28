@@ -31,7 +31,7 @@ void GameModeMatch_Init(void) {
     gpGame->pfnEndHole = GameModeMatch_EndHole;
     gpGame->pfnEndGame = GameModeMatch_EndGame;
     gpGame->bAIConcedes = 1;
-    gpGame->n4 = 1;
+    gpGame->nScoringType = 1;
     gpGame->nMulligans = 0;
     gpGame->nC = 2;
     gpGame->n10 = 2;

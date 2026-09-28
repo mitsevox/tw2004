@@ -130,9 +130,9 @@ void GolfCamera_InitShotSetupCamera(View* pView, int nPlayer) {
             nA = 5;
         }
         CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, nA, f1, f2, nB, f3);
-        if (pView->script.nCamera != 0) {
-            pView->script.f90 = 0.0f;
-            pView->script.nCamera = 2;
+        if (pView->script.nFade != 0) {
+            pView->script.fFadeTime = 0.0f;
+            pView->script.nFade = 2;
         }
     }
 }
@@ -731,7 +731,7 @@ void GolfCamera_ProcessPlaceBallCamera(View* pView, int nPlayer) {
         nPinSet = Game_CurrentPinSet();
         if (gSession.nPaused == 0) {
             fn_8003F2E0(&pView->script, gSession.fFrameTime);
-            pView->script.f90 += gSession.fFrameTime;
+            pView->script.fFadeTime += gSession.fFrameTime;
         }
         if (gSession.fFrameTime != 0.0f) {
             fSin = Math_Sin(20.0f * PI / 180.0f);    // not DEG(20.0f): see fn_800BF658
@@ -883,7 +883,7 @@ void fn_800BF658(View* pView, int nPlayer) {
         Game_CurrentPinSet();
         if (gSession.nPaused == 0) {
             fn_8003F2E0(&pView->script, gSession.fFrameTime);
-            pView->script.f90 += gSession.fFrameTime;
+            pView->script.fFadeTime += gSession.fFrameTime;
         }
         if (gSession.fFrameTime != 0.0f) {
             // 20 degrees, written out: DEG(20.0f) rounds one bit lower than the original's constant
@@ -1207,7 +1207,7 @@ void fn_800C0414(View* pView, int nPlayer) {
         }
         pCam[1] = lbl_80281F78->f4C + gPlayers[nPlayer].ballBefore.vPos[1];
         fn_8003F2E0(&pView->script, gSession.fFrameTime);
-        pView->script.f90 += gSession.fFrameTime;
+        pView->script.fFadeTime += gSession.fFrameTime;
         pView->script.fCamTime += gSession.fFrameTime;
         CamScript_KeepAboveGround(nPlayer, pCam, vOld, 1, NULL, NULL, NULL, lbl_80281F78->f168);
     }
@@ -1297,8 +1297,8 @@ void fn_800C0880(View* pView, int nPlayer) {
 
 // Camera 10: run the fly-by script; when the next shot is the last of its group (no successor, or
 // one with another nA4), no colour fade is running and less than
-// lbl_80281F78->f178 of this shot is left, start a colour fade (script.nCamera 1) to the tuning's
-// v17C over the time left (f94).
+// lbl_80281F78->f178 of this shot is left, start a colour fade (script.nFade 1) to the tuning's
+// v17C over the time left (fFadeLength).
 void GolfCamera_ProcessFlyByCamera(View* pView, int nPlayer) {
     f32 v[4];
     void* pCam;
@@ -1312,11 +1312,11 @@ void GolfCamera_ProcessFlyByCamera(View* pView, int nPlayer) {
     if (pView->script.pNextShot != NULL
         && (pView->script.pNextShot->p40 == NULL
             || pView->script.pNextShot->nA4 != pView->script.pNextShot->p40->nA4)
-        && pView->script.nCamera == 0 && pView->script.f8C - pView->script.fCamTime < fLead) {
-        pView->script.nCamera = 1;
-        LLMath_CopyVec(v, pView->script.v40);
-        pView->script.f90 = 0.0f;
-        pView->script.f94 = pView->script.f8C - pView->script.fCamTime;
+        && pView->script.nFade == 0 && pView->script.f8C - pView->script.fCamTime < fLead) {
+        pView->script.nFade = 1;
+        LLMath_CopyVec(v, pView->script.vFadeColor);
+        pView->script.fFadeTime = 0.0f;
+        pView->script.fFadeLength = pView->script.f8C - pView->script.fCamTime;
     }
 }
 
@@ -1350,9 +1350,9 @@ void GolfCamera_InitPreShotCamera(View* pView, int nPlayer) {
     }
     if (pShot != NULL) {
         CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, nA, f1, f2, nB, f3);
-        if (pView->script.nCamera != 0) {
-            pView->script.f90 = 0.0f;
-            pView->script.nCamera = 2;
+        if (pView->script.nFade != 0) {
+            pView->script.fFadeTime = 0.0f;
+            pView->script.nFade = 2;
         }
         pView->script.n110 = 0;
         pView->script.n114 = 0;
@@ -1383,9 +1383,9 @@ void GolfCamera_ProcessPreShotCamera(View* pView, int nPlayer) {
     if (pView->script.nC4 != pView->script.nC8) {
         if (pView->script.nC4 == 0x17) {
             pView->script.n110 = 1;
-            if (pView->script.nCamera != 0) {
-                pView->script.f90 = 0.0f;
-                pView->script.nCamera = 2;
+            if (pView->script.nFade != 0) {
+                pView->script.fFadeTime = 0.0f;
+                pView->script.nFade = 2;
             }
         }
         if (pView->script.n110 < 1 && fn_80062C28(gPlayers[nPlayer].pChar) < 1.0f) {
@@ -1566,9 +1566,9 @@ void GolfCamera_InitSwingCamera(View* pView, int nPlayer) {
             pView->script.pNextShot = NULL;
         }
         pView->script.n110 = 0;
-        if (pView->script.nCamera == 4) {
-            pView->script.nCamera = 2;
-            pView->script.f90 = 0.0f;
+        if (pView->script.nFade == 4) {
+            pView->script.nFade = 2;
+            pView->script.fFadeTime = 0.0f;
         }
     }
 }
@@ -1737,7 +1737,7 @@ void GolfCamera_ProcessHeartBeatCamera(View* pView, int nPlayer) {
     f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     if (gSession.nPaused == 0) {
         if (lbl_80282220->b5A) {
-            if (pView->script.nCamera == 5) {
+            if (pView->script.nFade == 5) {
                 if (pView->script.n110 >= lbl_80281F78->nBeats * lbl_80281F78->nBeatFrames) {
                     lbl_80282220->b5A = 0;
                 } else if ((pView->script.n110 + 1) % lbl_80281F78->nBeatFrames == 0) {
@@ -1764,8 +1764,8 @@ void GolfCamera_ProcessHeartBeatCamera(View* pView, int nPlayer) {
                 CameraController_FadeIn(pView, lbl_80281F78->fC4, v);
                 pView->script.n110++;
                 pView->script.f108 = 0.0f;
-            } else if (pView->script.nCamera == 0 || pView->script.nCamera == 4
-                       || pView->script.nCamera == 3) {
+            } else if (pView->script.nFade == 0 || pView->script.nFade == 4
+                       || pView->script.nFade == 3) {
                 pView->script.f108 += FRAME_TIME;
                 fn_80063CBC(pView, v);
             }
@@ -1950,8 +1950,8 @@ void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
     }
     pView->script.nC4 = 0;
     pView->script.nC8 = 9;
-    if (pView->script.nCamera != 0 && pView->script.nCamera != 2) {
-        pView->script.nCamera = 0;
+    if (pView->script.nFade != 0 && pView->script.nFade != 2) {
+        pView->script.nFade = 0;
     }
 }
 
@@ -2117,9 +2117,9 @@ void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
             }
         }
     }
-    if (pView->script.nCamera == 4) {
-        pView->script.nCamera = 2;
-        pView->script.f90 = 0.0f;
+    if (pView->script.nFade == 4) {
+        pView->script.nFade = 2;
+        pView->script.fFadeTime = 0.0f;
     }
     CamScript_RunScript(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, fTime);
     if (fn_800C6D28() && gSession.nPaused == 0) {
@@ -2317,7 +2317,7 @@ void fn_800C3478(View* pView, int nPlayer) {
 // Camera 17: only the colour fade (fn_8003F2E0) steps on, one fixed frame (FRAME_TIME) at a time.
 void fn_800C34F8(View* pView, int nPlayer) {
     fn_8003F2E0(&pView->script, FRAME_TIME);
-    pView->script.f90 += FRAME_TIME;
+    pView->script.fFadeTime += FRAME_TIME;
 }
 
 // Camera 18, the tutorial wait: the flagstick back in, and two hand-made "TUTORIAL WAIT" shots in the

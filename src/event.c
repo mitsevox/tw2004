@@ -346,14 +346,14 @@ void EVENT_MoveTargetBack(int nPlayer, int nEvent, void* pData, int nArg) {
     }
 }
 
-// Event 23 (placing the ball): the placement cursor's turn input (fMomentumX) ramps toward -1
-// (fn_80069BEC).
+// Event 23 (placing the ball): the placement cursor's sideways move input (fMomentumX, not the
+// turn despite the event's name) ramps toward -1 (fn_80069BEC).
 void EVENT_PlaceBallRotateRight(int nPlayer, int nEvent, void* pData, int nArg) {
     fn_80069BEC(nPlayer);
 }
 
-// Event 22 (placing the ball): the placement cursor's turn input (fMomentumX) ramps toward +1
-// (fn_80069B74).
+// Event 22 (placing the ball): the placement cursor's sideways move input (fMomentumX, not the
+// turn despite the event's name) ramps toward +1 (fn_80069B74).
 void EVENT_PlaceBallRotateLeft(int nPlayer, int nEvent, void* pData, int nArg) {
     fn_80069B74(nPlayer);
 }

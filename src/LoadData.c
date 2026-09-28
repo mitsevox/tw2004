@@ -82,9 +82,9 @@ void fn_8000BAE0(void) {
     } else if (Game_GetMode() == 13 || Game_GetMode() == 14 || Game_GetMode() == 16 ||
                Game_GetMode() == 17) {
         nFile = 0;
-    } else if (gpGame->b137 || gpGame->b136 || gpGame->b139) {
+    } else if (gpGame->bRandom18 || gpGame->bCustomRound || gpGame->nRegionalRound) {
         nFile = 0;
-    } else if (gpGame->b138) {
+    } else if (gpGame->bDream18) {
         nFile = 21;
     } else {
         switch (Game_GetCourse()) {
