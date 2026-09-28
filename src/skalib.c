@@ -104,14 +104,14 @@ void Skalib_Init(void) {
     }
     lbl_80281D14 = StaticMem_Alloc(4 * sizeof(*lbl_80281D14), 2, 0, "skalib.c", 508);   // four players
     Mem_set(lbl_80281D14, 0, 4 * sizeof(*lbl_80281D14));
-    lbl_80281CC4 = lbl_801C5E2C;
-    lbl_80281CC4 = (u8*)((((uptr)lbl_80281CC4 >> 5) + 1) << 5);
-    lbl_80281CC8 = lbl_801C5C50;
-    lbl_80281CC8 = (u8*)((((uptr)lbl_80281CC8 >> 5) + 1) << 5);
-    lbl_80281CCC = lbl_801BF9C0;
-    lbl_80281CCC = (u8*)((((uptr)lbl_80281CCC >> 5) + 1) << 5);
-    lbl_80281CD0 = lbl_801B9730;
-    lbl_80281CD0 = (u8*)((((uptr)lbl_80281CD0 >> 5) + 1) << 5);
+    gSKAAram8BitFrame = lbl_801C5E2C;
+    gSKAAram8BitFrame = (u8*)((((uptr)gSKAAram8BitFrame >> 5) + 1) << 5);
+    gSKAAram16BitFrame = lbl_801C5C50;
+    gSKAAram16BitFrame = (u8*)((((uptr)gSKAAram16BitFrame >> 5) + 1) << 5);
+    gSKAAramRanges = lbl_801BF9C0;
+    gSKAAramRanges = (u8*)((((uptr)gSKAAramRanges >> 5) + 1) << 5);
+    gSKAAramKeys = lbl_801B9730;
+    gSKAAramKeys = (u8*)((((uptr)gSKAAramKeys >> 5) + 1) << 5);
 }
 
 void ClipBank_Free(ClipBank* pBank);
@@ -1464,16 +1464,16 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             uAramStart = uAram;
             if (pHdr->n38 != 0) {
                 for (f = 0; f < pHdr->nFrames; f++) {
-                    Mem_cpy(lbl_80281CC8, pSrc1, pHdr->n8C * 2);
-                    GoARAM_WaitTransfer(GoARAM_CopyToAram(lbl_80281CC8, uAram, nStride1));
+                    Mem_cpy(gSKAAram16BitFrame, pSrc1, pHdr->n8C * 2);
+                    GoARAM_WaitTransfer(GoARAM_CopyToAram(gSKAAram16BitFrame, uAram, nStride1));
                     uAram += nStride1;
                     pSrc1 += pHdr->n8C * 2;
                 }
             }
             if (pHdr->n04 != 0) {
                 for (f = 0; f < pHdr->nFrames; f++) {
-                    Mem_cpy(lbl_80281CC4, pSrc2, pHdr->n8E);
-                    GoARAM_WaitTransfer(GoARAM_CopyToAram(lbl_80281CC4, uAram, nStride2));
+                    Mem_cpy(gSKAAram8BitFrame, pSrc2, pHdr->n8E);
+                    GoARAM_WaitTransfer(GoARAM_CopyToAram(gSKAAram8BitFrame, uAram, nStride2));
                     uAram += nStride2;
                     pSrc2 += pHdr->n8E;
                 }
@@ -1483,14 +1483,14 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             pHdr->n8C = (s32)nStride1 / 2;
             pHdr->n8E = nStride2;
             if (n50 != 0) {
-                Mem_cpy(lbl_80281CCC, ((Clip*)pClipSrc)->pEC, pHdr->n50);
-                GoARAM_WaitTransfer(GoARAM_CopyToAram(lbl_80281CCC, uAram, n50Al));
+                Mem_cpy(gSKAAramRanges, ((Clip*)pClipSrc)->pEC, pHdr->n50);
+                GoARAM_WaitTransfer(GoARAM_CopyToAram(gSKAAramRanges, uAram, n50Al));
                 uAram += n50Al;
             }
             pHdr->n50 = n50Al;
             if (n4C != 0) {
-                Mem_cpy(lbl_80281CD0, ((Clip*)pClipSrc)->pF0, pHdr->n4C);
-                GoARAM_WaitTransfer(GoARAM_CopyToAram(lbl_80281CD0, uAram, n4CAl));
+                Mem_cpy(gSKAAramKeys, ((Clip*)pClipSrc)->pF0, pHdr->n4C);
+                GoARAM_WaitTransfer(GoARAM_CopyToAram(gSKAAramKeys, uAram, n4CAl));
             }
             pHdr->n4C = n4CAl;
             SKA_PatchMemory(pHdr, uAramStart);

@@ -990,7 +990,7 @@ LAYOUT_ASSERT(SlotStats, 0x18);
 typedef int (*AnimLibWalkFn)(AnimLib* pA, AnimLib* pB, void* pLeafA, void* pLeafB, void* pCtx, int nLevel,
                              int nIndex);
 
-extern u8          lbl_801B9730[0x6290];   // the staging buffers' space (see lbl_80281CC4)
+extern u8          lbl_801B9730[0x6290];   // the staging buffers' space (see gSKAAram8BitFrame)
 extern u8          lbl_801BF9C0[0x6290];
 extern u8          lbl_801C5C50[0x1DC];
 extern u8          lbl_801C5E2C[0x1DC];
@@ -1005,11 +1005,11 @@ extern u8          lbl_801D9908[0xC8];
 extern s32         lbl_80281070;        // leaves this short are left alone by the drop pass
 extern s32         lbl_80281074;        // clips a leaf may keep this round
 extern u32         lbl_80281078;        // the current slot
-extern u8          lbl_80281CC0;        // ska_shared.c: SKA_SetLeftHanded sets it; clear: SKAUtil_EulerAnglesToQTs16 negates angles
-extern u8*         lbl_80281CC4;        // staging buffers (32-aligned), see Skalib_Init
-extern u8*         lbl_80281CC8;
-extern u8*         lbl_80281CCC;
-extern u8*         lbl_80281CD0;
+extern u8          gSKALeftHanded;        // ska_shared.c: SKA_SetLeftHanded sets it; clear: SKAUtil_EulerAnglesToQTs16 negates angles
+extern u8*         gSKAAram8BitFrame;        // staging buffers (32-aligned), see Skalib_Init
+extern u8*         gSKAAram16BitFrame;
+extern u8*         gSKAAramRanges;
+extern u8*         gSKAAramKeys;
 extern u8          lbl_80281CD8;        // double buffering: libraries alternate between slots 0 and 1
 extern u32         lbl_80281CDC;        // bytes of clips a slot may keep
 extern UStreamObject* lbl_80281CE0;     // the buffer banks are brought back from ARAM into

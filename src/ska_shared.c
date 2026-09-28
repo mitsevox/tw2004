@@ -55,11 +55,11 @@ u8 SKAUtil_ExpandSingleFrameToDest(Clip* pClip, int nFrame, f32* pPose2, f32* pP
 f32 SKA_GetBlendClipFraction(Clip* pClip, f32 fTime);
 
 // This file's .sbss (character.h), in reverse address order as the compiler lays it out.
-u8* lbl_80281CD0;
-u8* lbl_80281CCC;
-u8* lbl_80281CC8;
-u8* lbl_80281CC4;
-u8  lbl_80281CC0;
+u8* gSKAAramKeys;
+u8* gSKAAramRanges;
+u8* gSKAAram16BitFrame;
+u8* gSKAAram8BitFrame;
+u8  gSKALeftHanded;
 
 // Poses pPose from pClip at fTime (seconds). The keys before and after fTime (f10 apart; n0E is the
 // last) are decoded by SKAUtil_ExpandSingleFrameToDest into two of the character's four key-frame
@@ -200,10 +200,10 @@ void SKA_Update(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32 
     // keys kept in ARAM: fetch the tracks' ranges and keys, and point the tracks at them
     if (pClip->n4C != 0 && (pClip->uFlags & 4)) {
         // port: pEC and pF0 hold ARAM addresses here
-        SKA_WaitAramRead(SKA_StartAramRead((uptr)pClip->pEC, lbl_80281CCC, pClip->n50));
-        pRange = lbl_80281CCC;
-        SKA_WaitAramRead(SKA_StartAramRead((uptr)pClip->pF0, lbl_80281CD0, pClip->n4C));
-        pKeys = lbl_80281CD0;
+        SKA_WaitAramRead(SKA_StartAramRead((uptr)pClip->pEC, gSKAAramRanges, pClip->n50));
+        pRange = gSKAAramRanges;
+        SKA_WaitAramRead(SKA_StartAramRead((uptr)pClip->pF0, gSKAAramKeys, pClip->n4C));
+        pKeys = gSKAAramKeys;
         for (j = 0; j < pClip->n1C; j++) {
             pTrack = &((ClipTrack*)pClip->pD0)[j];
             if (pTrack->uFlags & 0x10) {
@@ -266,12 +266,12 @@ u8 SKAUtil_ExpandSingleFrameToDest(Clip* pClip, int nFrame, f32* pPose2, f32* pP
     if (pClip->n36 != 0) {
         if (pClip->uFlags & 4) {
             // port: pE4 holds an ARAM address here
-            SKA_WaitAramRead(SKA_StartAramRead((uptr)pClip->pE4 + pClip->n8E * nFrame, lbl_80281CC4,
+            SKA_WaitAramRead(SKA_StartAramRead((uptr)pClip->pE4 + pClip->n8E * nFrame, gSKAAram8BitFrame,
                                                pClip->n8E));
             pTransfer = NULL;
-            pFrame2 = lbl_80281CC4;
+            pFrame2 = gSKAAram8BitFrame;
             if (pClip->n0A != 0) {
-                pTransfer = SKA_StartAramRead(pClip->uAram + pClip->n8C * nFrame * 2, lbl_80281CC8,
+                pTransfer = SKA_StartAramRead(pClip->uAram + pClip->n8C * nFrame * 2, gSKAAram16BitFrame,
                                               pClip->n8C * 2);
             }
         } else {
@@ -283,12 +283,12 @@ u8 SKAUtil_ExpandSingleFrameToDest(Clip* pClip, int nFrame, f32* pPose2, f32* pP
         if (pClip->uFlags & 4) {
             nSize = pClip->n8C * 2;
             if (pTransfer == NULL) {
-                pTransfer = SKA_StartAramRead(pClip->uAram + pClip->n8C * nFrame * 2, lbl_80281CC8, nSize);
+                pTransfer = SKA_StartAramRead(pClip->uAram + pClip->n8C * nFrame * 2, gSKAAram16BitFrame, nSize);
             }
             SKA_WaitAramRead(pTransfer);
-            pFrame1 = (u16*)lbl_80281CC8;
+            pFrame1 = (u16*)gSKAAram16BitFrame;
             if (pClip->pF0 != NULL) {
-                Mem_cpy(pExtra, lbl_80281CC8 + pClip->n2A, pClip->n28);
+                Mem_cpy(pExtra, gSKAAram16BitFrame + pClip->n2A, pClip->n28);
             }
         } else {
             // port: uAram holds a RAM address here
@@ -722,7 +722,7 @@ void SKAUtil_EulerAnglesRPY(f32* pOut, f32 fX, f32 fY, f32 fZ) {
 // Decodes nBones bone rotations stored as u16 angles (0x10000 to a turn) from p into pOut's
 // quaternions (4 floats each). Two bits per bone in the axis mask pBits give its kind: one angle
 // about z (1), about x (2) or about y (3), or three angles (0). The angle passed on is negated for
-// a lone x angle always, for a lone z or y angle while lbl_80281CC0 (the left-handed flag) is
+// a lone x angle always, for a lone z or y angle while gSKALeftHanded (the left-handed flag) is
 // clear, and for the second and third of three while it is set.
 void SKAUtil_EulerAnglesToQTs16(u16* p, f32* pOut, s32 nBones, u32* pBits) {
     int nBit;   // fake match: 2 * i kept in its own counter for the second bit (the first is (u32)i * 2)
@@ -739,7 +739,7 @@ void SKAUtil_EulerAnglesToQTs16(u16* p, f32* pOut, s32 nBones, u32* pBits) {
         }
         switch (uKind) {
         case 1:
-            if (lbl_80281CC0) {
+            if (gSKALeftHanded) {
                 Legacy_Quat_BuildFromYaw(TWOPI * p[0] / 65536.0f, pOut);
             } else {
                 Legacy_Quat_BuildFromYaw(-(TWOPI * p[0]) / 65536.0f, pOut);
@@ -747,7 +747,7 @@ void SKAUtil_EulerAnglesToQTs16(u16* p, f32* pOut, s32 nBones, u32* pBits) {
             p += 1;
             break;
         case 3:
-            if (lbl_80281CC0) {
+            if (gSKALeftHanded) {
                 Legacy_Quat_BuildFromPitch(TWOPI * p[0] / 65536.0f, pOut);
             } else {
                 Legacy_Quat_BuildFromPitch(-(TWOPI * p[0]) / 65536.0f, pOut);
@@ -760,7 +760,7 @@ void SKAUtil_EulerAnglesToQTs16(u16* p, f32* pOut, s32 nBones, u32* pBits) {
             break;
         case 0:
         default:
-            if (lbl_80281CC0) {
+            if (gSKALeftHanded) {
                 SKAUtil_EulerAnglesRPY(pOut, TWOPI * p[2] / 65536.0f, -(TWOPI * p[1]) / 65536.0f,
                             -(TWOPI * p[0]) / 65536.0f);
             } else {
@@ -790,7 +790,7 @@ void SKAUtil_EulerAnglesToQTs8(u8* p, f32* pOut, s32 nBones, u32* pBits, u16* aB
         }
         switch (uKind) {
         case 1:
-            if (lbl_80281CC0) {
+            if (gSKALeftHanded) {
                 Legacy_Quat_BuildFromYaw(TWOPI * aBase[0] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f, pOut);
             } else {
                 Legacy_Quat_BuildFromYaw(-(TWOPI * aBase[0] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f), pOut);
@@ -798,7 +798,7 @@ void SKAUtil_EulerAnglesToQTs8(u8* p, f32* pOut, s32 nBones, u32* pBits, u16* aB
             p += 1;
             break;
         case 3:
-            if (lbl_80281CC0) {
+            if (gSKALeftHanded) {
                 Legacy_Quat_BuildFromPitch(TWOPI * aBase[1] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f, pOut);
             } else {
                 Legacy_Quat_BuildFromPitch(-(TWOPI * aBase[1] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f), pOut);
@@ -811,7 +811,7 @@ void SKAUtil_EulerAnglesToQTs8(u8* p, f32* pOut, s32 nBones, u32* pBits, u16* aB
             break;
         case 0:
         default:
-            if (lbl_80281CC0) {
+            if (gSKALeftHanded) {
                 SKAUtil_EulerAnglesRPY(pOut, TWOPI * aBase[2] / 65536.0f - TWOPI * ((u32)(u16)p[2] << 4)
                                        / 65536.0f,
                             -(TWOPI * aBase[1] / 65536.0f - TWOPI * ((u32)(u16)p[1] << 4) / 65536.0f),
@@ -830,11 +830,11 @@ void SKAUtil_EulerAnglesToQTs8(u8* p, f32* pOut, s32 nBones, u32* pBits, u16* aB
 
 // ---- sweep code (not yet cleaned up) ----
 
-// Sets lbl_80281CC0, which makes the frame decoders (SKAUtil_EulerAnglesToQTs16 and
+// Sets gSKALeftHanded, which makes the frame decoders (SKAUtil_EulerAnglesToQTs16 and
 // SKAUtil_EulerAnglesToQTs8) mirror the angles for a left-handed golfer. Character_UpdateAnimation
 // and Character_SetupForShot pass the model's bEE (Character_IsLeftHanded) before posing a clip.
 void SKA_SetLeftHanded(u8 v) {
-    lbl_80281CC0 = v;
+    gSKALeftHanded = v;
 }
 
 // Each bit of aOut is set where aA or aB has it (bit arrays of nBits bits).
