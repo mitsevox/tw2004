@@ -162,8 +162,8 @@ f32   Camera_GetLensFovScale(CamLens* pLens);
 void  SKEL_EnableIK(u8 bOn);
 void  SKN_InitTris(void);
 void  SKN_FreeTris(void);
-void  fn_80036460(int n);
-void  fn_80036464(void);
+void  SKN_InitModule(int n);
+void  SKN_CloseModule(void);
 void  fn_80095554(void);
 void  fn_8009555C(void);
 void  fn_80095560(void);
@@ -198,7 +198,7 @@ void  fn_80035600(void);                // GoTerrain.c
 void  fn_80035604(void);                // GoTerrain.c
 void  SKN_DrawCharacter(Character* pChar, u32 uFlags);
 void  SKN_PoseCharacter(Character* pChar, int n);
-void  fn_800364A0(void);                // Skin.c
+void  SKN_BeginFrame(void);                // Skin.c
 int   fn_800636EC(void);                // GoCamCont.c
 void  fn_8010BF68(void);
 void  fn_8010BFE0(void);
@@ -1822,11 +1822,11 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
     if (nSize == 0) {
         pChar->pSkin = NULL;
     } else {
-        pChar->pSkin = fn_800377FC(pData, bLook);
+        pChar->pSkin = SKN_Create(pData, bLook);
         pChar->pSkin->f10D8 = fSkin;
         pChar->pSkin->f10DC = 1.0f;
         if (gSession.nGameType != 10 && gSession.nGameType != 3 && Character_IsGolfer(pChar)) {
-            fn_80037708(pChar->pSkin);
+            SKN_FreeRenderData(pChar->pSkin);
         }
     }
     pData += nSize;
@@ -1938,7 +1938,7 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
         SkinPart_BurnBodySkin(pChar);
     }
     if (gSession.nSplitScreen && Character_IsGolfer(pChar)) {
-        fn_800375AC(pChar->pSkin, 0);
+        SKN_AllocRenderData(pChar->pSkin, 0);
         Character_SetPreferedPos(pChar);
     }
     return pChar;
@@ -1955,7 +1955,7 @@ void CharSkinRef_Free(void* p) {
 }
 
 // Makes a club skin set from a 'CLB ' object: per entry its club class, that class's afC (the club
-// head bone's height), the entry's size and, 4 bytes on, its skin (fn_800377FC) and a CharSkinRef
+// head bone's height), the entry's size and, 4 bytes on, its skin (SKN_Create) and a CharSkinRef
 // for it; a3C gets the class's fixed club point (one for drivers and fairway woods, one each for
 // putters, 3 irons, 7 irons and wedges). NULL when out of memory.
 CharSkinSet* Character_CreateClubSkinSet(u8* pData) {
@@ -1981,7 +1981,7 @@ CharSkinSet* Character_CreateClubSkinSet(u8* pData) {
         BYTESWAP_SWAPDATA(&pData, (u8*)&pSet->afC[nClass], 4, 4);
         BYTESWAP_SWAPDATA(&pData, (u8*)&nSize, 4, 4);
         pData += 4;
-        pSet->apSkins[nClass] = fn_800377FC(pData, 0);
+        pSet->apSkins[nClass] = SKN_Create(pData, 0);
         pSet->a9C[nClass] = StaticMem_Alloc(sizeof(CharSkinRef), 2, 0x40, "char.c", 0xF25);
         CharSkinRef_Init(pSet->apSkins[nClass], pSet->a9C[nClass], sizeof(CharSkinRef));
         if (nClass == 0 || nClass == 1) {
@@ -2150,7 +2150,7 @@ void Character_PreRenderAll(void) {
     int bState;
 
     fn_80035600();
-    fn_800364A0();
+    SKN_BeginFrame();
     for (i = 0; i < lbl_80281CA8; i++) {
         iPlayer2Clip = fn_800636EC();
         lbl_801B9624[i]->u10 &= ~0x1000;
@@ -2409,16 +2409,16 @@ void Character_InitFE(void) {
     lbl_80280E20 = 3;
     SkinPart_Init();
     SkinPart_SetChangeAllCopies(0);
-    fn_80036460(1800);
+    SKN_InitModule(1800);
     fn_80112C64(1);
 }
 
 // Shuts down what Character_InitFE started: the dynamic texture pool and the skin parts go, and
-// fn_80036464 and fn_80112CEC free their buffers.
+// SKN_CloseModule and fn_80112CEC free their buffers.
 void Character_CloseFE(void) {
     CharacterTex_Close();
     SkinPart_Shutdown();
-    fn_80036464();
+    SKN_CloseModule();
     fn_80112CEC();
 }
 

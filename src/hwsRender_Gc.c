@@ -10,7 +10,7 @@
 #include "core/startup.h"
 #include "unsorted/cull.h"
 
-void fn_80036460(int n);                // Skin.c
+void SKN_InitModule(int n);                // Skin.c
 void fn_80037DD8(void);   // GoPostFx.c
 void fn_8011EB80(void);
 void fn_80112B34(void);                 // hwsOverride_Gc.c
@@ -81,7 +81,7 @@ void fn_80112C64(int bSplit) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80112CEC(void);
-s32 fn_80036464();
+s32 SKN_CloseModule();
 s32 fn_80037F80();
 s32 fn_8011EBF8();
 void fn_80112DA0(void);
@@ -106,10 +106,10 @@ void fn_80112D20(void) {
     }
     fn_80037DD8();
     if (gSession.nSplitScreen) {
-        fn_80036460(3600);
+        SKN_InitModule(3600);
         return;
     }
-    fn_80036460(1800);
+    SKN_InitModule(1800);
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -120,7 +120,7 @@ void fn_80112DA0(void) {
         fn_8011EBF8();
     }
     fn_80037F80();
-    fn_80036464();
+    SKN_CloseModule();
 }
 
 // ---- end of sweep code ----

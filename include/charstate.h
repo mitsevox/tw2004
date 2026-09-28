@@ -62,7 +62,7 @@ typedef struct SkinDesc14 {
 } SkinDesc14;
 LAYOUT_ASSERT(SkinDesc14, 0x30);
 
-// A SkinDesc14 as version 8 descriptions with n04 == 0 store it (our name): fn_800368FC moves
+// A SkinDesc14 as version 8 descriptions with n04 == 0 store it (our name): SKN_SwapDesc moves
 // u14 to SkinDesc14.u10 and narrows n10 and n18 into n14 and n16.
 typedef struct SkinDesc14Old {
     u64  uId;                   // 0x00
@@ -227,7 +227,7 @@ LAYOUT_ASSERT(SkinModel44, 0x10);
 
 // An entry of SkinModel.p54, one per bit of Skin.p10CC; SkinBurn.c moves them (fn_801272B4).
 typedef struct SkinModel54 {
-    s16  nBones;                // 0x00  entries used in aBones and afWeights (fn_8003662C)
+    s16  nBones;                // 0x00  entries used in aBones and afWeights (SKN_BuildMatrices)
     s16  aBones[3];             // 0x02  matrices of Skin.p108C its matrix is blended from
     f32  afWeights[3];          // 0x08  and their weights
 } SkinModel54;
@@ -235,14 +235,14 @@ LAYOUT_ASSERT(SkinModel54, 0x14);
 
 // What Skin.pModel points at; only what SkinPart.c and SkinBurn.c read.
 typedef struct SkinModel {
-    s32  n00;                   // 0x00  4: the file carries a SkinDesc at pDesc (fn_800377FC)
+    s32  n00;                   // 0x00  4: the file carries a SkinDesc at pDesc (SKN_Create)
     s32  n04;                   // 0x04
     s32  n08;                   // 0x08  its size with all its arrays once burnt (fn_801276E4)
     s32  n0C;                   // 0x0C  entries in p3C
     u8   unk10[4];
     s32  n14;                   // 0x14  how many matrices Skin.p108C holds (Character_SetPreferedPos); also
                                 //       the 0x20-byte entries in p34
-    s16  n18;                   // 0x18  } -1 in a model fn_800364AC makes up
+    s16  n18;                   // 0x18  } -1 in a model SKN_FixupModel makes up
     s16  n1A;                   // 0x1A  }
     s16  n1C;                   // 0x1C  }
     s16  n1E;                   // 0x1E  }
@@ -250,8 +250,8 @@ typedef struct SkinModel {
     s32  n24;                   // 0x24  }
     s32  n28;                   // 0x28  }
     s32  n2C;                   // 0x2C  }
-    u32  u30;                   // 0x30  0x40000002 both set: already byte-swapped (fn_800377FC);
-                                //       0x80000000: offsets made pointers (fn_800364AC)
+    u32  u30;                   // 0x30  0x40000002 both set: already byte-swapped (SKN_Create);
+                                //       0x80000000: offsets made pointers (SKN_FixupModel)
     BonePose* p34;              // 0x34  n14 of them; handed to the character's model (fn_80029A74)
     void* p38;                  // 0x38  one 0x50-byte block
     void* p3C;                  // 0x3C  n0C 0x50-byte blocks
@@ -310,7 +310,7 @@ typedef struct Skin {
                                 //         matrix (Character_SetSkin: bones 0x3A, 0x48, 0x39, 0x47)
     f32  (*p1088)[4][4];        // 0x1088  } matrices Character_SetPreferedPos hands the model (SKEL_SetDefaultWorld2BoneMatrices,
     f32  (*p108C)[4][4];        // 0x108C  } fn_80029A7C)
-    struct HwsMemBlock* p1090;  // 0x1090  freed by fn_80037708
+    struct HwsMemBlock* p1090;  // 0x1090  freed by SKN_FreeRenderData
     u8   unk1094[0x1098 - 0x1094];
     struct HwsMemBlock* a1098[2];   // 0x1098  indexed like a10A0 (fn_8011CB5C)
     struct HwsOverrideTable* a10A0[2];  // 0x10A0  indexed by SkinPart_BeginDraw's argument; Skin.c sets [0]
@@ -321,12 +321,12 @@ typedef struct Skin {
     u32* p10CC;                 // 0x10CC  } bit arrays
     u32* p10D0;                 // 0x10D0  }
     u32  u10D4;                 // 0x10D4  bit 1 set by Character_CopySkinChoices1To0 and when the choices change; bit 2
-                                //         tested by fn_80037708
+                                //         tested by SKN_FreeRenderData
     f32  f10D8;                 // 0x10D8  from the CHR object's header (Character_CreateFromMem)
     f32  f10DC;                 // 0x10DC  1 when loaded
     u8   unk10E0[4];
 } Skin;
-LAYOUT_ASSERT(Skin, 0x10E4);    // fn_800377FC allocates and clears one
+LAYOUT_ASSERT(Skin, 0x10E4);    // SKN_Create allocates and clears one
 
 // hwsOverride_Gc.c (our names): a block of memory handed out in pieces (fn_80112938), sized for
 // a SkinDesc's meshes of flag 0x100000 (fn_80112848).
@@ -607,9 +607,9 @@ extern CharSkinSet* lbl_80280E24[2];   // what Character_CreateClubSkinSet makes
                                         // view in split screen (Character.p16D8; Character_FreeClubSkinSets frees them)
 
 void  fn_80037CD8(Skin* pSkin);         // Skin.c: frees a skin
-s32   fn_80037708(Skin* pSkin);         // Skin.c: frees what loading it allocated
-s32   fn_800375AC(Skin* pSkin, u8 b);   // Skin.c: allocates it
-Skin* fn_800377FC(u8* pData, u8 b);     // Skin.c: makes a skin from its file
+s32   SKN_FreeRenderData(Skin* pSkin);         // Skin.c: frees what loading it allocated
+s32   SKN_AllocRenderData(Skin* pSkin, u8 b);   // Skin.c: allocates it
+Skin* SKN_Create(u8* pData, u8 b);     // Skin.c: makes a skin from its file
 // Skin.c's triangles (gSkinBoneTris, 0xF0 bytes; our name, layout from SKN_DrawBoneTri): per view a
 // mesh object and three vertices' positions, texture coordinates, colours and indexes.
 typedef struct SkinTris {
@@ -623,7 +623,7 @@ typedef struct SkinTris {
 LAYOUT_ASSERT(SkinTris, 0xF0);
 extern SkinTris gSkinBoneTris;
 
-extern void* gSkinFrameBuf;              // } Skin.c; fn_80036464 frees gSkinFrameBuf and clears all
+extern void* gSkinFrameBuf;              // } Skin.c; SKN_CloseModule frees gSkinFrameBuf and clears all
 extern s32   gSkinFrameBufUsed;              // } three
 extern s32   gSkinFrameBufSize;              // }
 

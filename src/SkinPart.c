@@ -640,7 +640,7 @@ s32 SkinPart_GetMaxPartOptionSize(SkinDesc* pDesc, int nPart) {
 
 // The bytes the skin's chosen options can need at most: each part's SkinPart_GetMaxPartOptionSize
 // added up, but no more than all of SkinDesc.p34's meshes with flags 0x300000 together. Skin.c
-// (fn_800375AC) calls it and ignores the result.
+// (SKN_AllocRenderData) calls it and ignores the result.
 s32 SkinPart_GetMaxOptionsSize(Skin* pSkin) {
     SkinDesc* pDesc;
     s32 nBytes;
@@ -944,11 +944,11 @@ void SkinPart_EndDraw(Skin* pSkin) {
     }
 }
 
-// Empty. Skin.c calls it (passing the skin) as it sets up a loaded skin (fn_800375AC, when asked).
+// Empty. Skin.c calls it (passing the skin) as it sets up a loaded skin (SKN_AllocRenderData, when asked).
 void SkinPart_InitSkin(void) {
 }
 
-// Empty. Skin.c calls it (passing the skin) as it frees what a loaded skin allocated (fn_80037708).
+// Empty. Skin.c calls it (passing the skin) as it frees what a loaded skin allocated (SKN_FreeRenderData).
 void SkinPart_ShutdownSkin(void) {
 }
 

@@ -114,5 +114,5 @@ Other byte-order facts
 - `stwbrx` (a byte-reversed store) appears at 0x80056248 and 0x8005638C (the picture decoder after
   Ball.c) and 0x800B96C8 (rcmp_mad_codec.c): those write little-endian data (asm, not looked into).
 - Other callers of the swap routines, not reached from a handler above: AnimStream.c (fn_800CB8F0),
-  Skeleton.c (fn_80028564), Skin*.c (fn_80036278 ..), CharSliders.c
+  Skeleton.c (fn_80028564), Skin*.c (SKN_SwapMeshEntries ..), CharSliders.c
   (CharSlider_CreateDefinitionsFromMem), GoGrass.c (fn_8011E4D8).

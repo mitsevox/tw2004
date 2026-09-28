@@ -53,17 +53,17 @@ f32   fn_8004B78C(CourseInfo* pCourse, f32* pPos);           // GoTerrainCollisi
 void  SD_SetShaderTypeParameters(int nRow, void* pData);
 void  fn_8011CB5C(Skin* pSkin, int nView);                   // SkinMorph.c
 void  SkinPart_UpdateSkin(void);                                     // SkinPart.c
-void  fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int nView);
-void  fn_80036790(Skin* pSkin, int n);
+void  SKN_BuildMatrices(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int nView);
+void  SKN_SetMeshMatrices(Skin* pSkin, int n);
 void  fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits);          // Skeleton.c
-void  fn_80036278(SkinModel44* pEntries, s32 nEntries);
-void  fn_80036344(SkinModel44* pEntries, s32 nEntries);
-void  fn_800363B4(SkinModel54* pEntries, s32 nEntries);
-void  fn_800364AC(SkinModel* pModel);
-void  fn_8003682C(SkinModel* pModel);
-void  fn_80036894(SkinDesc* pDesc);
-void  fn_800368FC(SkinDesc* pDesc);
-void  fn_80037574(BonePose* pBones, s32 nBones);
+void  SKN_SwapMeshEntries(SkinModel44* pEntries, s32 nEntries);
+void  SKN_SwapMeshEntryLists(SkinModel44* pEntries, s32 nEntries);
+void  SKN_SwapMatrixBlends(SkinModel54* pEntries, s32 nEntries);
+void  SKN_FixupModel(SkinModel* pModel);
+void  SKN_SwapModelHeader(SkinModel* pModel);
+void  SKN_SwapDescHeader(SkinDesc* pDesc);
+void  SKN_SwapDesc(SkinDesc* pDesc);
+void  SKN_SwapBonePoses(BonePose* pBones, s32 nBones);
 void  fn_80037D5C(SkinDesc* pDesc);
 
 // .bss and .sbss, each in reverse address order (CodeWarrior lays them out last-defined-first)
@@ -281,16 +281,16 @@ void SKN_PoseCharacter(Character* pChar, int n) {
     if (gSession.nSplitScreen == 0 || gSession.nGameType == 3) {
         fn_8011CB5C(pChar->pSkin, pChar->n17B4);
     }
-    fn_8003662C(pChar->pSkin, pChar->pModel, 0, 0, pChar->n17B4);
-    fn_80036790(pChar->pSkin, pChar->n17B4);
+    SKN_BuildMatrices(pChar->pSkin, pChar->pModel, 0, 0, pChar->n17B4);
+    SKN_SetMeshMatrices(pChar->pSkin, pChar->n17B4);
     // port: EA passes arguments SkinPart_UpdateSkin ignores
     ((void (*)(Skin*, int))SkinPart_UpdateSkin)(pChar->pSkin, pChar->n17B4);
     if (pChar->p16D8 != NULL) {
         pClub = pChar->p16D8->apSkins[pChar->nClubClass];
         if (pClub != NULL) {
-            fn_8003662C(pClub, pChar->pModel, CharModel_GetBoneIndex(pChar->pModel, 0x52) - 0x52, 0x52,
+            SKN_BuildMatrices(pClub, pChar->pModel, CharModel_GetBoneIndex(pChar->pModel, 0x52) - 0x52, 0x52,
                         pChar->n17B4);
-            fn_80036790(pClub, pChar->n17B4);
+            SKN_SetMeshMatrices(pClub, pChar->n17B4);
         }
     }
     pChar->n1698 = 1;
@@ -454,10 +454,11 @@ void SKN_GetCharPosition(Character* pChar, f32* pOut) {
     }
 }
 
-// Blends two format 1 poses into pOut, fWeight of the way from pA to pB: in each of the three
-// blocks, each of the 20 channels either sets; pOut's bits become the union of both, and pA's and
-// pB's bits are cleared.
-void fn_80036180(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fWeight) {
+// Blends two format 1 poses' morph weights into pOut, fWeight of the way from pA to pB (an
+// animation blend node): in each of the three blocks, each of the 20 morphs set in either pose is
+// blended and set in pOut (one set in only one pose blends with the other's value as it stands);
+// then both inputs' bits are cleared.
+void SKN_BlendMorphWeights(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fWeight) {
     u32 aBits[4];   // only 20 bits are used; the size is not known
     int i;
     int j;
@@ -481,8 +482,8 @@ void fn_80036180(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fWeight) {
     }
 }
 
-// Byte-swaps nEntries SkinModel44 entries.
-void fn_80036278(SkinModel44* pEntries, s32 nEntries) {
+// Byte-swaps nEntries SkinModel44 entries (the meshes the model draws), in place.
+void SKN_SwapMeshEntries(SkinModel44* pEntries, s32 nEntries) {
     SwapField aFormat[5] = { { 4, 4 }, { 4, 4 }, { 2, 2 }, { 2, 2 }, { 4, 2 } };
     void* pSrc;
     void* pDst;
@@ -496,8 +497,9 @@ void fn_80036278(SkinModel44* pEntries, s32 nEntries) {
     }
 }
 
-// Byte-swaps each SkinModel44 entry's p4 array.
-void fn_80036344(SkinModel44* pEntries, s32 nEntries) {
+// Byte-swaps each of nEntries SkinModel44 entries' p4 array (n8 words), in place; p4 must already
+// be a pointer.
+void SKN_SwapMeshEntryLists(SkinModel44* pEntries, s32 nEntries) {
     u8* pData;
     u8* pSrc;
     int i;
@@ -510,8 +512,8 @@ void fn_80036344(SkinModel44* pEntries, s32 nEntries) {
     }
 }
 
-// Byte-swaps nEntries SkinModel54 entries.
-void fn_800363B4(SkinModel54* pEntries, s32 nEntries) {
+// Byte-swaps nEntries SkinModel54 entries (the blended matrices' recipes), in place.
+void SKN_SwapMatrixBlends(SkinModel54* pEntries, s32 nEntries) {
     SwapField aFormat[3] = { { 2, 2 }, { 6, 2 }, { 12, 4 } };
     void* pSrc;
     void* pDst;
@@ -525,10 +527,12 @@ void fn_800363B4(SkinModel54* pEntries, s32 nEntries) {
     }
 }
 
-void fn_80036460(int n) {
+// Empty in this build: gSkinFrameBuf is never allocated. n: 1800, or 3600 in split screen.
+void SKN_InitModule(int n) {
 }
 
-void fn_80036464(void) {
+// Frees gSkinFrameBuf, when set, and clears it and its two counts.
+void SKN_CloseModule(void) {
     if (gSkinFrameBuf != NULL) {
         StaticMem_Free(gSkinFrameBuf);
     }
@@ -537,13 +541,15 @@ void fn_80036464(void) {
     gSkinFrameBufUsed = 0;
 }
 
-void fn_800364A0(void) {
+// Clears gSkinFrameBufUsed; called each frame before the characters are posed.
+void SKN_BeginFrame(void) {
     gSkinFrameBufUsed = 0;
 }
 
-// Turns a model's offsets into pointers and byte-swaps its tables, once (bit 31 of u30). A model
-// that is not version 4 is cleared to an empty one.
-void fn_800364AC(SkinModel* pModel) {
+// Makes a model copied from its file usable, once (bit 31 of u30 marks it done): its offsets become
+// pointers, its mesh entries and matrix blends are byte-swapped. A model that is not version 4
+// (n00) is cleared to an empty version 4 one instead.
+void SKN_FixupModel(SkinModel* pModel) {
     int i;
 
     if (pModel->u30 & 0x80000000) {
@@ -577,24 +583,26 @@ void fn_800364AC(SkinModel* pModel) {
     if (pModel->p54 != NULL) {
         pModel->p54 = (SkinModel54*)((u8*)pModel + (uptr)pModel->p54);
     }
-    fn_80036278(pModel->p44, pModel->n40);
-    fn_800363B4(pModel->p54, pModel->n50);
+    SKN_SwapMeshEntries(pModel->p44, pModel->n40);
+    SKN_SwapMatrixBlends(pModel->p54, pModel->n50);
     for (i = 0; i < pModel->n40; i++) {
         if (pModel->p44[i].p4 != NULL) {
             pModel->p44[i].p4 = (s32*)((u8*)pModel + (uptr)pModel->p44[i].p4);
         }
         // EA bug: swaps every entry's array once per entry, and reaches entries whose p4 is
         // still an offset; right only for a single entry.
-        fn_80036344(pModel->p44, pModel->n40);
+        SKN_SwapMeshEntryLists(pModel->p44, pModel->n40);
     }
     pModel->u30 = pModel->u30 | 0x80000000;
 }
 
-// Builds the skin's matrices (p108C): those of the model's bones come from the character model's
-// p768 (from bone nFirst on, nSkip further along there); each one after that whose bit is set in
-// p10CC is a weighted sum of up to three of them (SkinModel.p54). nView: both callers pass the
-// character's n17B4; unused.
-void fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int nView) {
+// Builds the skin's matrices (p108C) for this frame; nothing without its render data (bit 2 of
+// u10D4). The first SkinModel.n14, one per bone, are the character model's skinning matrices
+// (p768), from nFirst on, each taken nSkip further along there (not copied when p108C is p768).
+// Each later one whose bit is set in p10CC (SkinPart_UpdateMarks: those the chosen meshes use) is a
+// weighted sum of up to three others (SkinModel.p54). nView: both callers pass the character's
+// n17B4; unused.
+void SKN_BuildMatrices(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int nView) {
     int j;
     SkinModel54* pEntry;
     s32 nMatrices;
@@ -635,8 +643,10 @@ void fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int 
     }
 }
 
-// Hands table n (Skin.a10A0) every p44 entry whose bit is set in p10D0, with the matrices.
-void fn_80036790(Skin* pSkin, int n) {
+// Points the override (in table n, Skin.a10A0[n]) of each mesh the skin draws (bit set in p10D0;
+// the mesh is SkinModel44.n0) at the skin's matrices, p108C; nothing without the table or render
+// data.
+void SKN_SetMeshMatrices(Skin* pSkin, int n) {
     int i;
     s32 nEntries;
     HwsOverrideTable* pTable;
@@ -652,8 +662,8 @@ void fn_80036790(Skin* pSkin, int n) {
     }
 }
 
-// Byte-swaps a model's header.
-void fn_8003682C(SkinModel* pModel) {
+// Byte-swaps a model file's header (the 0x140-byte SkinModel), in place.
+void SKN_SwapModelHeader(SkinModel* pModel) {
     SwapField aFormat[26] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 2, 2 },
                               { 2, 2 }, { 2, 2 }, { 2, 2 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
                               { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
@@ -665,8 +675,8 @@ void fn_8003682C(SkinModel* pModel) {
     ByteSwap_Records(&pSrc, &pDst, aFormat, 26, 1);
 }
 
-// Byte-swaps a skin description's header.
-void fn_80036894(SkinDesc* pDesc) {
+// Byte-swaps a skin description's header (the 0x120-byte SkinDesc), in place.
+void SKN_SwapDescHeader(SkinDesc* pDesc) {
     SwapField aFormat[48] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
                               { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
                               { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
@@ -686,10 +696,11 @@ static inline SkinMesh* fn_800368FC_Read(SkinDesc* pDesc, int j) {
     return &pDesc->p34[j];
 }
 
-// Byte-swaps a skin description read from its little-endian file, in place, and turns its mesh
-// bit offsets into pointers. Version 8 descriptions with n04 == 0 have the old p14 layout
-// (SkinDesc14Old) and are converted to the new one.
-void fn_800368FC(SkinDesc* pDesc) {
+// Byte-swaps a skin description's arrays (its header is SKN_SwapDescHeader's), in place, and turns
+// the offsets of its p28 entries' data and its meshes' bit data into pointers. Version 8
+// descriptions with n04 0 have the old p14 layout (SkinDesc14Old) and are converted to the new one
+// (n04 becomes 1).
+void SKN_SwapDesc(SkinDesc* pDesc) {
     SwapField aDesc14[10] = { { 8, -8 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 2, 2 }, { 2, 2 }, { 4, 4 },
                               { 4, 4 }, { 8, 4 }, { 8, 4 } };
     SwapField aOld14[9] = { { 8, -8 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
@@ -944,16 +955,19 @@ void fn_800368FC(SkinDesc* pDesc) {
 }
 
 // Byte-swaps the model's bone poses.
-void fn_80037574(BonePose* pBones, s32 nBones) {
+void SKN_SwapBonePoses(BonePose* pBones, s32 nBones) {
     u8* pSrc;
 
     pSrc = (u8*)pBones;
     BYTESWAP_SWAPDATA(&pSrc, (u8*)pBones, nBones * sizeof(BonePose), 4);
 }
 
-// Allocates what a skin needs once loaded (bit 2 of u10D4; 0 if it already was): the matrices,
-// the two bit arrays and, with a description, its morph memory. b: also calls SkinPart_InitSkin.
-s32 fn_800375AC(Skin* pSkin, u8 b) {
+// Gives a skin what posing and drawing it needs (bit 2 of u10D4 marks a skin that has it); 0 when
+// it already had it, else 1: its matrices (p108C, SkinModel.n50 of them) and the p10CC and p10D0
+// bit arrays, cleared; with a description, its morph memory (a1098[0]) and mesh override table
+// (a10A0[0]), and u10D4 bit 1 (choices changed). Every morph target is marked changed. b: also
+// calls fn_800CE164 (empty in this build).
+s32 SKN_AllocRenderData(Skin* pSkin, u8 b) {
     SkinModel* pModel;
     SkinDesc* pDesc;
     s32 nSize;
@@ -985,8 +999,10 @@ s32 fn_800375AC(Skin* pSkin, u8 b) {
     return 1;
 }
 
-// Frees what a loaded skin allocated (bit 2 of u10D4); 0 when it was not loaded.
-s32 fn_80037708(Skin* pSkin) {
+// Frees what SKN_AllocRenderData gave the skin, after waiting for the GPU to finish drawing; 0 when
+// it had none, else 1. With a description, also p1090 and the description's own mesh bit data
+// (fn_80037D5C).
+s32 SKN_FreeRenderData(Skin* pSkin) {
     SkinModel* pModel;
 
     if (!(pSkin->u10D4 & 2)) {
@@ -1022,10 +1038,13 @@ s32 fn_80037708(Skin* pSkin) {
 
 // ---- end of sweep code ----
 
-// Makes a skin from its file: copies the model (and its description) into memory of its own,
-// byte-swapping the file first if that has not been done, and starts the pose at the model's.
-// b picks the allocation mode (1 instead of 2).
-Skin* fn_800377FC(u8* pData, u8 b) {
+// Makes a skin from its file (pData: a SkinModel; version 4 carries a SkinDesc at pDesc's offset).
+// The file's headers are byte-swapped in place the first time (u30 flags 0x40000002 mark it). The
+// model and its description are copied into memory of their own (b: at the high end of the heap,
+// allocation mode 1 instead of 2) and made usable; the pose starts at the model's bone poses; the
+// skin gets its part choices, morph state and render data (SKN_AllocRenderData). SkinPart's
+// change-all-copies is on meanwhile.
+Skin* SKN_Create(u8* pData, u8 b) {
     SkinModel* pModel;
     Skin* pSkin;
     SkinDesc* pDesc;
@@ -1042,7 +1061,7 @@ Skin* fn_800377FC(u8* pData, u8 b) {
     memset(pSkin, 0, sizeof(Skin));
     pModel = (SkinModel*)pData;     // the file's model, then the copy
     if ((pModel->u30 & 0x40000002) != 0x40000002) {
-        fn_8003682C((SkinModel*)pData);
+        SKN_SwapModelHeader((SkinModel*)pData);
         bSwap = 1;
         ((SkinModel*)pData)->u30 = ((SkinModel*)pData)->u30 | 0x40000000 | 2;
     } else {
@@ -1054,7 +1073,7 @@ Skin* fn_800377FC(u8* pData, u8 b) {
             pDesc = (SkinDesc*)((u8*)pModel + (uptr)pDesc);
         }
         if (bSwap) {
-            fn_80036894(pDesc);
+            SKN_SwapDescHeader(pDesc);
         }
         nDescSize = (pDesc != NULL) ? pDesc->n08 : 0;
         nSize = pModel->n08 - nDescSize;
@@ -1069,7 +1088,7 @@ Skin* fn_800377FC(u8* pData, u8 b) {
     }
     memcpy(pSkin->pModel, pModel, nSize);
     pModel = pSkin->pModel;
-    fn_800364AC(pModel);
+    SKN_FixupModel(pModel);
     pModel->n08 = nSize;
     if (nDescSize != 0) {
         if (b) {
@@ -1079,14 +1098,14 @@ Skin* fn_800377FC(u8* pData, u8 b) {
         }
         memcpy(pModel->pDesc, pDesc, nDescSize);
         SkinPart_FixupDesc(pModel->pDesc);
-        fn_800368FC(pModel->pDesc);
+        SKN_SwapDesc(pModel->pDesc);
     } else {
         pModel->pDesc = NULL;
     }
     pDesc = pModel->pDesc;
     pSkin->b1044 = 0;
     pBones = pModel->p34;
-    fn_80037574(pBones, pModel->n14);
+    SKN_SwapBonePoses(pBones, pModel->n14);
     BitArray_SetAll(pSkin->pose.a0, 0x80);
     BitArray_SetAll(pSkin->pose.a10, 0x80);
     BitArray_SetAll(pSkin->pose.a20, 0x80);
@@ -1102,6 +1121,6 @@ Skin* fn_800377FC(u8* pData, u8 b) {
     SkinPart_AllocChoices(pSkin);
     fn_8011C9B0(pSkin);
     SkinPart_SetChangeAllCopies(bOld);
-    fn_800375AC(pSkin, 0);
+    SKN_AllocRenderData(pSkin, 0);
     return pSkin;
 }

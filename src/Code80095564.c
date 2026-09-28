@@ -12,7 +12,7 @@ void fn_80095564(void) {
 
     if (gSession.nSplitScreen == 0) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
-            fn_80037708(gPlayers[i].pChar->pSkin);
+            SKN_FreeRenderData(gPlayers[i].pChar->pSkin);
             fn_80029A7C(gPlayers[i].pChar->pModel, NULL, 0);
         }
     }
@@ -36,12 +36,12 @@ void fn_800955F0(int nPlayer) {
         if (i != gSession.nNumPlayers) {
             for (i = 0; i < gSession.nNumPlayers; i++) {
                 if (i != nPlayer) {
-                    fn_80037708(gPlayers[i].pChar->pSkin);
+                    SKN_FreeRenderData(gPlayers[i].pChar->pSkin);
                     // EA: clears nPlayer's model, not player i's (it is set again below)
                     fn_80029A7C(gPlayers[nPlayer].pChar->pModel, NULL, 0);
                 }
             }
-            fn_800375AC(gPlayers[nPlayer].pChar->pSkin, 1);
+            SKN_AllocRenderData(gPlayers[nPlayer].pChar->pSkin, 1);
             gPlayers[nPlayer].pChar->u10 &= ~0x2000;
             fn_80029A7C(gPlayers[nPlayer].pChar->pModel, gPlayers[nPlayer].pChar->pSkin->p108C,
                         gPlayers[nPlayer].pChar->pSkin->pModel->n14);

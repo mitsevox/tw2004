@@ -547,7 +547,7 @@ void fn_80072ACC(SKABlendNode* pNode, CharModel* pModel, f32 fTime) {
             fn_800293CC(1, pModel->nBones - 1, pNode->u.blend.apChild[0]->pPose,
                         pNode->u.blend.apChild[1]->pPose, pNode->pPose, fWeight);
         } else if (pNode->nFormat == 1) {
-            fn_80036180((SkelPose1*)pNode->u.blend.apChild[0]->pPose,
+            SKN_BlendMorphWeights((SkelPose1*)pNode->u.blend.apChild[0]->pPose,
                         (SkelPose1*)pNode->u.blend.apChild[1]->pPose, (SkelPose1*)pNode->pPose, fWeight);
         }
     } else if (nPlaying != -1) {

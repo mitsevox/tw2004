@@ -120,7 +120,7 @@ void SKN_DrawClubParts(Character* pChar);
 void LI_ResetLights(void);
 void LI_SetObjectLights(UObject* pObj);
 void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
-void fn_800364A0(void);
+void SKN_BeginFrame(void);
 void fn_800B9EB8(char* szBall);
 void Character_ExecuteTextureSwapFE(Character* pChar);
 char* fn_800484E0(int i);
@@ -558,7 +558,7 @@ void sFE_AdjustAndSetGolferPosition(void) {
     fBlend = 1.0f;
     pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
     fn_8008F24C();
-    fn_800364A0();
+    SKN_BeginFrame();
     for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
         if (lbl_80281EE0->aGolfer[i].b19 || lbl_80281EE0->b8A) {
             lbl_80281EE0->aGolfer[i].b18 = 0;

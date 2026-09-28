@@ -73,7 +73,7 @@ void fn_80037C48(Skin* pSkin, SkelPose* pPose) {
 void fn_80037CD8(Skin* pSkin) {
     SkinModel* pModel;
 
-    fn_80037708(pSkin);
+    SKN_FreeRenderData(pSkin);
     fn_8011CD84(pSkin);
     SkinPart_FreeChoices(pSkin);
     pModel = pSkin->pModel;
