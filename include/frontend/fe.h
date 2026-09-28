@@ -50,7 +50,7 @@ LAYOUT_ASSERT(FEState, 0x660);
 
 extern FEState lbl_801D7148;
 
-// fn_8007D428 and fn_80080388 set it to 0.2 for a locked golfer, else 0 (also for one that is not
+// GM_vIsGolferUnlocked and fn_80080388 set it to 0.2 for a locked golfer, else 0 (also for one that is not
 // available).
 extern f32 lbl_80281374;        // .sdata 0x80281374 = 0.25f: past FE_MessageTable's .sdata, in a
                                 // later file's (not placed yet)
@@ -69,7 +69,7 @@ typedef struct FEScreen {
     u8  a2C[4];                 // 0x2C  read and cleared by menu messages
     u8  a30[4];                 // 0x30  set to 1 by fn_800905A8; fn_8008F80C sets one
     s32 n34;                    // 0x34  cleared by fn_800905A8
-    s32 n38;                    // 0x38  a menu message reads it (fn_8007DAD4)
+    s32 n38;                    // 0x38  a menu message reads it (GM_vGetNumControllersPluggedIn)
     s32 n3C;                    // 0x3C  the UI file table holding the movie entries (fn_8008FE88)
     u8  b40;                    // 0x40  cleared by fn_800905A8
     u8  unk41[0x44 - 0x41];

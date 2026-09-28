@@ -155,7 +155,7 @@ typedef struct CoursePrice {
 #define EARN_NUM_MULTS   29
 
 // A row of the first table (12 bytes): a range of values and what it maps to. A menu message
-// (fn_8007D708) looks a value up: the first row with n0 - 1 <= value <= n4 gives n8.
+// (GM_vLookUpEarningsRange) looks a value up: the first row with n0 - 1 <= value <= n4 gives n8.
 typedef struct EarningsRange {
     s32  n0;                    // 0x0
     s32  n4;                    // 0x4

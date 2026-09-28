@@ -352,36 +352,36 @@ void GM_vGetProfileCash(MsgArg* pArgs, MsgArg* pResult);
 void GM_vResetProfile(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetNumLadderEventsWon(MsgArg* pArgs, MsgArg* pResult);
 void GM_vFEMessage218_Empty(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D40C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D410(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D414(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D418(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D41C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D420(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D424(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D428(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D598(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D6D8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D6DC(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D6E0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D708(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D76C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D7A0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D7E4(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D810(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D924(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D938(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D964(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D968(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D9D0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007D9E4(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DA6C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DAB0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DAD0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DAD4(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DAE8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DB04(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DB28(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage217_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage216_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage222_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage301_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage75_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage76_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage77_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsGolferUnlocked(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsCourseUnlockedOnAnyProfile(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage80_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage322_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetCreatedGolferIndexOr0(MsgArg* pArgs, MsgArg* pResult);
+void GM_vLookUpEarningsRange(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetProfileCash(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetCreatedGolferAttribute(MsgArg* pArgs, MsgArg* pResult);
+void GM_vQueueMovieKind2(MsgArg* pArgs, MsgArg* pResult);
+void GM_vCharStream(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetSplitScreen(MsgArg* pArgs, MsgArg* pResult);
+void GM_vAddHoleToRound(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage89_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetCurrentProfileSlot(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetCurrentProfileSlot(MsgArg* pArgs, MsgArg* pResult);
+void GM_vNextActiveProfileSlot(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetProfileName(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsProfileActive(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage94_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetNumControllersPluggedIn(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsControllerAssigned(MsgArg* pArgs, MsgArg* pResult);
+void GM_vClearControllerAssigned(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage98_Empty(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007DB2C(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007DB30(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007DB34(MsgArg* pArgs, MsgArg* pResult);
@@ -805,29 +805,29 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[72] = GM_vGetProfileCash;
     gFEMessageHandlers[73] = GM_vResetProfile;
     gFEMessageHandlers[74] = GM_vGetNumLadderEventsWon;
-    gFEMessageHandlers[75] = fn_8007D41C;
-    gFEMessageHandlers[76] = fn_8007D420;
-    gFEMessageHandlers[77] = fn_8007D424;
-    gFEMessageHandlers[78] = fn_8007D428;
-    gFEMessageHandlers[79] = fn_8007D598;
-    gFEMessageHandlers[80] = fn_8007D6D8;
-    gFEMessageHandlers[81] = fn_8007D6E0;
-    gFEMessageHandlers[82] = fn_8007D708;
-    gFEMessageHandlers[83] = fn_8007D76C;
-    gFEMessageHandlers[84] = fn_8007D7A0;
-    gFEMessageHandlers[85] = fn_8007D7E4;
-    gFEMessageHandlers[86] = fn_8007D810;
-    gFEMessageHandlers[87] = fn_8007D924;
-    gFEMessageHandlers[88] = fn_8007D938;
-    gFEMessageHandlers[89] = fn_8007D964;
-    gFEMessageHandlers[90] = fn_8007D968;
-    gFEMessageHandlers[91] = fn_8007D9D0;
-    gFEMessageHandlers[92] = fn_8007DA6C;
-    gFEMessageHandlers[94] = fn_8007DAD0;
-    gFEMessageHandlers[95] = fn_8007DAD4;
-    gFEMessageHandlers[96] = fn_8007DAE8;
-    gFEMessageHandlers[97] = fn_8007DB04;
-    gFEMessageHandlers[98] = fn_8007DB28;
+    gFEMessageHandlers[75] = GM_vFEMessage75_Empty;
+    gFEMessageHandlers[76] = GM_vFEMessage76_Empty;
+    gFEMessageHandlers[77] = GM_vFEMessage77_Empty;
+    gFEMessageHandlers[78] = GM_vIsGolferUnlocked;
+    gFEMessageHandlers[79] = GM_vIsCourseUnlockedOnAnyProfile;
+    gFEMessageHandlers[80] = GM_vFEMessage80_Empty;
+    gFEMessageHandlers[81] = GM_vGetCreatedGolferIndexOr0;
+    gFEMessageHandlers[82] = GM_vLookUpEarningsRange;
+    gFEMessageHandlers[83] = GM_vSetProfileCash;
+    gFEMessageHandlers[84] = GM_vSetCreatedGolferAttribute;
+    gFEMessageHandlers[85] = GM_vQueueMovieKind2;
+    gFEMessageHandlers[86] = GM_vCharStream;
+    gFEMessageHandlers[87] = GM_vSetSplitScreen;
+    gFEMessageHandlers[88] = GM_vAddHoleToRound;
+    gFEMessageHandlers[89] = GM_vFEMessage89_Empty;
+    gFEMessageHandlers[90] = GM_vSetCurrentProfileSlot;
+    gFEMessageHandlers[91] = GM_vGetCurrentProfileSlot;
+    gFEMessageHandlers[92] = GM_vGetProfileName;
+    gFEMessageHandlers[94] = GM_vFEMessage94_Empty;
+    gFEMessageHandlers[95] = GM_vGetNumControllersPluggedIn;
+    gFEMessageHandlers[96] = GM_vIsControllerAssigned;
+    gFEMessageHandlers[97] = GM_vClearControllerAssigned;
+    gFEMessageHandlers[98] = GM_vFEMessage98_Empty;
     gFEMessageHandlers[99] = fn_8007DB2C;
     gFEMessageHandlers[100] = fn_8007DB30;
     gFEMessageHandlers[101] = fn_8007DB34;
@@ -939,20 +939,20 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[208] = fn_80080654;
     gFEMessageHandlers[209] = fn_800807D0;
     gFEMessageHandlers[151] = fn_8007E904;
-    gFEMessageHandlers[93] = fn_8007DAB0;
+    gFEMessageHandlers[93] = GM_vIsProfileActive;
     gFEMessageHandlers[210] = fn_800807DC;
     gFEMessageHandlers[211] = fn_80080828;
     gFEMessageHandlers[212] = fn_80080878;
     gFEMessageHandlers[213] = fn_800809F8;
     gFEMessageHandlers[214] = fn_80080AA0;
     gFEMessageHandlers[215] = fn_80080AD0;
-    gFEMessageHandlers[216] = fn_8007D410;
-    gFEMessageHandlers[217] = fn_8007D40C;
+    gFEMessageHandlers[216] = GM_vFEMessage216_Empty;
+    gFEMessageHandlers[217] = GM_vFEMessage217_Empty;
     gFEMessageHandlers[218] = GM_vFEMessage218_Empty;
     gFEMessageHandlers[219] = fn_80080AE8;
     gFEMessageHandlers[220] = fn_80080BB8;
     gFEMessageHandlers[221] = fn_80080C2C;
-    gFEMessageHandlers[222] = fn_8007D414;
+    gFEMessageHandlers[222] = GM_vFEMessage222_Empty;
     gFEMessageHandlers[223] = fn_80080C60;
     gFEMessageHandlers[224] = fn_80080C74;
     gFEMessageHandlers[225] = fn_80080C84;
@@ -1031,7 +1031,7 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[298] = fn_80082A4C;
     gFEMessageHandlers[299] = GM_vFEMessage299_Empty;
     gFEMessageHandlers[300] = fn_80082A50;
-    gFEMessageHandlers[301] = fn_8007D418;
+    gFEMessageHandlers[301] = GM_vFEMessage301_Empty;
     gFEMessageHandlers[302] = GM_vFEMessage302_Empty;
     gFEMessageHandlers[303] = GM_vSetAllGolfersPickable;
     gFEMessageHandlers[304] = fn_80082A94;
@@ -1052,7 +1052,7 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[319] = fn_80082E5C;
     gFEMessageHandlers[320] = fn_80082F68;
     gFEMessageHandlers[321] = fn_80083068;
-    gFEMessageHandlers[322] = fn_8007D6DC;
+    gFEMessageHandlers[322] = GM_vFEMessage322_Empty;
     gFEMessageHandlers[323] = fn_8008311C;
     gFEMessageHandlers[324] = fn_80083354;
     gFEMessageHandlers[325] = GM_vFEMessage325_Empty;
@@ -1213,7 +1213,7 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[587] = GM_vSetLogoShape;
     gFEMessageHandlers[588] = GM_vGetLogoShape;
     gFEMessageHandlers[598] = GM_vFEMessage598_Empty;
-    gFEMessageHandlers[565] = fn_8007D9E4;
+    gFEMessageHandlers[565] = GM_vNextActiveProfileSlot;
     gFEMessageHandlers[567] = GM_vMCGetUserNames;
     gFEMessageHandlers[568] = FE_Sqrt;
     gFEMessageHandlers[569] = LadderMenu_SetNodePos;
@@ -2224,31 +2224,42 @@ void GM_vGetNumLadderEventsWon(MsgArg* pArgs, MsgArg* pResult) {
 void GM_vFEMessage218_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D40C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 217: empty in this build.
+void GM_vFEMessage217_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D410(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 216: empty in this build.
+void GM_vFEMessage216_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D414(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 222: empty in this build.
+void GM_vFEMessage222_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D418(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 301: empty in this build.
+void GM_vFEMessage301_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D41C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 75: empty in this build.
+void GM_vFEMessage75_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D420(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 76: empty in this build.
+void GM_vFEMessage76_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D424(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 77: empty in this build.
+void GM_vFEMessage77_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Whether golfer pArgs[1] can be picked: 1 when it is unlocked (by any profile or a cheat code, or
-// it is a created golfer), 0 when it is locked, -1 when it is not available at all; always 1
-// while lbl_80281ED4->b11702 is set.
-void fn_8007D428(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 78: whether golfer pArgs[1] can be picked: 1 when it is unlocked (in any of the
+// five save profiles, loaded or not, or by a cheat code in lbl_80281DF4) or is a created golfer
+// (FIRST_CREATED_GOLFER on), 0 when it is locked, -1 when its gGolferTable record's bAvailable is
+// -1 (not in the game); always 1 while GM_vSetAllGolfersPickable's flag (lbl_80281ED4->b11702) is
+// set. pArgs[0] is not read. It also sets fe_movies.c's lbl_80281374 to 0 (answer not 0) or 0.2
+// (locked); no code reads that value. For a created golfer (30..33) the unlock tests read past
+// aGolferUnlocked[30]; the answer is already 1 then.
+void GM_vIsGolferUnlocked(MsgArg* pArgs, MsgArg* pResult) {
     int i;
 
     if (lbl_80281ED4->b11702 != 0) {
@@ -2276,9 +2287,11 @@ void fn_8007D428(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Whether course pArgs[1] can be picked: 1 when a loaded profile or a cheat code has unlocked it
-// (course 23 always), else 0.
-void fn_8007D598(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 79: whether course pArgs[1] can be picked: 1 when a loaded save profile
+// (bActive) or a cheat code (lbl_80281DF4) has unlocked it, and always for course 23, else 0.
+// pArgs[0] is not read. For course 23 the tests read aCourseUnlocked[23], one past its 23 entries;
+// the answer is already 1 then.
+void GM_vIsCourseUnlockedOnAnyProfile(MsgArg* pArgs, MsgArg* pResult) {
     int i;
 
     pResult->i = 0;
@@ -2295,13 +2308,17 @@ void fn_8007D598(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_8007D6D8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 80: empty in this build.
+void GM_vFEMessage80_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D6DC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 322: empty in this build.
+void GM_vFEMessage322_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007D6E0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 81: the golfer number of created golfer pArgs[0] (pArgs[0] + 30,
+// FIRST_CREATED_GOLFER) when pArgs[1] is 0; golfer 0 when pArgs[1] is not 0.
+void GM_vGetCreatedGolferIndexOr0(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[1].i != 0) {
         pResult->i = 0;
     } else {
@@ -2309,8 +2326,10 @@ void fn_8007D6E0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Look a value up in the prize table's ranges (-1: in none).
-void fn_8007D708(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 82: looks value pArgs[0] up in the earnings table's ranges
+// (gEarningsTable.aRange, loaded from the 'ERN ' stream): the first row with n0 - 1 <= value <= n4
+// answers its n8; -1 when no row holds it. What the ranges stand for is not known.
+void GM_vLookUpEarningsRange(MsgArg* pArgs, MsgArg* pResult) {
     int i;
     int n;
     int nValue;
@@ -2326,15 +2345,18 @@ void fn_8007D708(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = n;
 }
 
-void fn_8007D76C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 83: sets the current profile's money to spend (nCurrentCash) to pArgs[1].
+// pArgs[0] is not read.
+void GM_vSetProfileCash(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile;
 
     pProfile = FE_GetCurrentProfile();
     pProfile->nCurrentCash = pArgs[1].i;
 }
 
-// Set an attribute of the created golfer being worked on.
-void fn_8007D7A0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 84: sets attribute pArgs[1] (GolferRecord.attr) of the current profile's
+// created golfer to pArgs[2]. pArgs[0] is not read.
+void GM_vSetCreatedGolferAttribute(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile;
     int nAttr;
 
@@ -2343,7 +2365,11 @@ void fn_8007D7A0(MsgArg* pArgs, MsgArg* pResult) {
     pProfile->createdGolfer.attr[nAttr] = pArgs[2].i;
 }
 
-void fn_8007D7E4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 85: queues a movie of kind 2 (fn_800770FC) and stops the music
+// (Gaud_StopMusic). FE_movieFade plays only kinds 1 (the credits) and 3 (a bio), so kind 2 gives
+// the fade to black, the golfers put away and set up again and the menu music restarted, with no
+// movie.
+void GM_vQueueMovieKind2(MsgArg* pArgs, MsgArg* pResult) {
     FEMovie* pMovie;
 
     pMovie = fn_800770FC();
@@ -2351,9 +2377,13 @@ void fn_8007D7E4(MsgArg* pArgs, MsgArg* pResult) {
     Gaud_StopMusic();
 }
 
-// Show golfer pArgs[0] (FE_setupStreaming), then give the profile's player (unless it is player 0) the
-// first n0 (0..3) that no player up to and including it with the same golfer model has.
-void fn_8007D810(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 86: shows golfer pArgs[0] (FE_setupStreaming, with pArgs[1] and pArgs[2] as its
+// other two golfers), then picks a shirt for the player of the profile slot being worked on
+// (lbl_80281ED4->nSlot), unless it is slot 0: of the four shirts (PlayerProfile.n0, 0..3;
+// Character_SetClubsAndClothes dresses "shirt<n>"), the first that no player 0..nSlot (itself
+// included) whose golfer has the same model wears. Then Session_SetupProfiles. Nothing changes when
+// all four are taken.
+void GM_vCharStream(MsgArg* pArgs, MsgArg* pResult) {
     u8 abFree[4] = {1, 1, 1, 1};
     int i;
     u32 n;
@@ -2378,20 +2408,27 @@ void fn_8007D810(MsgArg* pArgs, MsgArg* pResult) {
     Session_SetupProfiles();
 }
 
-void fn_8007D924(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 87: the split-screen setting (gSession.nSplitScreen: 0 one view, else split, 2
+// side by side).
+void GM_vSetSplitScreen(MsgArg* pArgs, MsgArg* pResult) {
     gSession.nSplitScreen = pArgs[0].i;
 }
 
-void fn_8007D938(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 88: adds hole pArgs[0] (1..18) to the round's selected holes and moves to the
+// round's first hole (GM_SelectSingleHole); unlike GM_vSelectSingleHole, the holes already selected
+// stay.
+void GM_vAddHoleToRound(MsgArg* pArgs, MsgArg* pResult) {
     GM_SelectSingleHole((u8)pArgs[0].i - 1);
 }
 
-void fn_8007D964(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 89: empty in this build.
+void GM_vFEMessage89_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Work on slot pArgs[0]'s profile; the golfer shown, if it is golfer 7 or 29, takes that
-// profile's look.
-void fn_8007D968(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 90: the menus now work on profile slot pArgs[0] (lbl_80281ED4->nSlot,
+// FE_GetCurrentProfile's slot). When the golfer shown is golfer 7 or 29, the models that wear a
+// created golfer's look, it takes that profile's look (Character_ApplyCrAPSettings).
+void GM_vSetCurrentProfileSlot(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->nSlot = pArgs[0].i;
     if (gpCrAPState->pB4->pChar != NULL &&
         (gpCrAPState->pB4->pChar->nGolferId == 7 || gpCrAPState->pB4->pChar->nGolferId == 29)) {
@@ -2399,12 +2436,15 @@ void fn_8007D968(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_8007D9D0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 91: the profile slot the menus work on (lbl_80281ED4->nSlot).
+void GM_vGetCurrentProfileSlot(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80281ED4->nSlot;
 }
 
-// Move on to the next slot with a loaded profile: its number, or -1 past the last player.
-void fn_8007D9E4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 565: moves the menus on to the next profile slot holding a loaded profile
+// (bActive) and answers it; -1 when that runs past slot 3 or past the number of players.
+// lbl_80281ED4->nSlot keeps the advanced value either way.
+void GM_vNextActiveProfileSlot(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->nSlot++;
     while (lbl_80281ED4->nSlot < 4 && gpSaveData[lbl_80281ED4->nSlot].bActive == 0) {
         lbl_80281ED4->nSlot++;
@@ -2416,27 +2456,35 @@ void fn_8007D9E4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80281ED4->nSlot;
 }
 
-// Slot pArgs[0]'s profile name.
-void fn_8007DA6C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 92: slot pArgs[0]'s profile name (szName) into the string pArgs[1].
+void GM_vGetProfileName(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[1].p)->pStr, gpSaveData[pArgs[0].i].szName);
 }
 
-void fn_8007DAB0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 93: whether slot pArgs[0] holds a profile (bActive).
+void GM_vIsProfileActive(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].bActive;
 }
 
-void fn_8007DAD0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 94: empty in this build.
+void GM_vFEMessage94_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007DAD4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 95: how many controllers are plugged in (lbl_801D87C0.n38, counted every menu
+// update by uiProcessInterface.c).
+void GM_vGetNumControllersPluggedIn(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_801D87C0.n38;
 }
 
-void fn_8007DAE8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 96: whether controller pArgs[0] has been given to a player (lbl_801D87C0.a2C,
+// set by GM_vSetPlayerController, cleared by GM_vClearControllerAssigned and when the menus start).
+void GM_vIsControllerAssigned(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_801D87C0.a2C[pArgs[0].i];
 }
 
-void fn_8007DB04(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 97: clears the mark that controller pArgs[0] (0..3; others are ignored) has
+// been given to a player (lbl_801D87C0.a2C).
+void GM_vClearControllerAssigned(MsgArg* pArgs, MsgArg* pResult) {
     s32 n;
 
     n = pArgs[0].i;
@@ -2445,7 +2493,8 @@ void fn_8007DB04(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_8007DB28(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 98: empty in this build.
+void GM_vFEMessage98_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007DB2C(MsgArg* pArgs, MsgArg* pResult) {
@@ -2554,7 +2603,7 @@ void fn_8007DF0C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Step the profile's player's n0 on (0..3, wrapping) to the next one that no player up to and
-// including it with the same golfer model has (fn_8007D810), stopping if it comes round to where
+// including it with the same golfer model has (GM_vCharStream), stopping if it comes round to where
 // it started; then Character_RequestClothesUpdateFE for the golfer shown.
 void fn_8007DF30(MsgArg* pArgs, MsgArg* pResult) {
     u8 abFree[4] = {1, 1, 1, 1};
@@ -3553,7 +3602,7 @@ void fn_80080358(MsgArg* pArgs, MsgArg* pResult) {
     MC_Disconnect();
 }
 
-// Like fn_8007D428 (without its b11702 override), with the golfers of lbl_801894E8 unlocked
+// Like GM_vIsGolferUnlocked (without its b11702 override), with the golfers of lbl_801894E8 unlocked
 // instead of the profiles' unlocks.
 void fn_80080388(MsgArg* pArgs, MsgArg* pResult) {
     int i;

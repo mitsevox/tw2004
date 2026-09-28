@@ -243,7 +243,7 @@ void FE_CharMgrClose(void) {
     gpCrAPState = NULL;
 }
 
-// Show golfer nGolfer (TW07's midModel; the menus' message fn_8007D810): the loader is interrupted
+// Show golfer nGolfer (TW07's midModel; the menus' message GM_vCharStream): the loader is interrupted
 // and sent back to idle; if the shown slot's pNext or pPrev holds him, that becomes the shown slot,
 // else the shown slot gets his id to load. Golfers 7 and 29 (as nGolfer, nOtherA or nOtherB) set
 // b90: every slot's character is freed before the next load (FE_StreamManageCRaPMemory). On screen
