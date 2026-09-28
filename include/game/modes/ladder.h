@@ -40,15 +40,15 @@ extern LadderMap gLadderMap;
 extern s32 gLadderNodeEvents[NUM_LADDER_EVENTS];     // the event at each node
 extern char* gLadderRegionNames[7];   // each region's name
 extern char* gLadderHoleSetNames[4];   // each hole-selection preset's name ("All", "Front 9", ...)
-extern char* gLadderStageNames[6];   // what fn_80121C44 picks: "1/4", "2/4", "3/4", "Dominated", "World"
+extern char* gLadderStageNames[6];   // what LadderMap_GetEventStage picks: "1/4", "2/4", "3/4", "Dominated", "World"
 
 // LadderMap.c
-int  fn_80121A38(int nNode);                    // the node's state: -1 not shown, 0 open, 1 won, 2 locked
-int  fn_80121C08(int nNode);                    // the node's region
-int  fn_80121C44(int nEvent);
-void fn_80121C80(int nDir, u8* abCandidate);    // marks the nodes in that direction
-int  fn_80121E1C(u8* abCandidate);              // the marked node nearest the cursor's
-int  fn_80122018(void);                         // the first playable event's node
-void fn_80122070(u8* abCandidate);              // unmarks the nodes not shown
+int  LadderMap_GetNodeState(int nNode);                    // the node's state: -1 not shown, 0 open, 1 won, 2 locked
+int  LadderMap_GetNodeRegion(int nNode);                    // the node's region
+int  LadderMap_GetEventStage(int nEvent);
+void LadderMap_MarkNodesInDirection(int nDir, u8* abCandidate);    // marks the nodes in that direction
+int  LadderMap_FindNearestMarkedNode(u8* abCandidate);              // the marked node nearest the cursor's
+int  LadderMap_GetFirstPlayableNode(void);                         // the first playable event's node
+void LadderMap_UnmarkHiddenNodes(u8* abCandidate);              // unmarks the nodes not shown
 
 #endif

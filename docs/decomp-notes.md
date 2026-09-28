@@ -159,11 +159,11 @@ They will be sorted into the sections below.
 - **[verified] A `u8` result that the caller stores without `clrlwi` means the callee returns `int`/`s32`.**
   CodeWarrior masks a `u8` return at the call site. The reverse also holds: an `int` local returned from a
   `u8` function gives `clrlwi r3` at the return (`u8 b` there gives `mr r3`). FE_MessageTable fn_800846D4
-  (91.25 -> 100 with an `s32` callee), GameMode4Menu fn_801218BC (92.5 -> 100 with `int b`),
+  (91.25 -> 100 with an `s32` callee), GameMode4Menu LadderMap_IsRegionFinalNode (92.5 -> 100 with `int b`),
   GameModeDriver IsAMonthAhead and 5 others.
 - **[verified] Front-end `MsgArg` handlers read every argument into locals before the first store.**
-  GameMode4Menu fn_80121430: `p->fX = pArgs[1].f` -> `f32 fX = pArgs[1].f; ...; p->fX = fX;`, 49.4 -> 100
-  (fn_80121458 79.9 -> 100, fn_80121770 67.1 -> 100).
+  GameMode4Menu LadderMenu_SetNodePos: `p->fX = pArgs[1].f` -> `f32 fX = pArgs[1].f; ...; p->fX = fX;`, 49.4 -> 100
+  (LadderMenu_GetNodePos 79.9 -> 100, LadderMenu_GetFirstAndCursorNodePos 67.1 -> 100).
 - **[verified] Operands that are both calls are evaluated right to left.** `fn(5) + fn(4)` calls `fn(4)`
   first; for arguments, `f(g(), h())` calls `h()` first. To call in source order, use a temporary.
   CourseData fn_800D2F00, sweep_800D3208 (99.87 -> 100).

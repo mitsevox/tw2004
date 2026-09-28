@@ -6,7 +6,7 @@
 #include "frontend/fe.h"
 #include "game/modes/ladder.h"
 
-int fn_80121B8C(int nNode);
+int LadderMap_IsNodeShown(int nNode);
 
 char* gLadderRegionNames[7] = {
     "US Northwest", "US Southwest", "US East", "Europe", "Pacific", "Southern Hemisphere", "World",
@@ -20,8 +20,10 @@ char* gLadderHoleSetNames[4] = { "None", "All", "Front 9", "Back 9" };
 
 char* gLadderStageNames[6] = { "1/4", "2/4", "3/4", "Dominated", "World", NULL };
 
-// Nodes 18 to 23 stand alone.
-u8 fn_801218BC(int nNode) {
+// Nodes 18 to 23 hold the regions' fourth events (events 3, 7, 11, 15, 19 and 23, the "Dominated"
+// stage), one a region; LadderMap_IsNodeShown shows one once its region's first three events are
+// won.
+u8 LadderMap_IsRegionFinalNode(int nNode) {
     int b = 0;
 
     if (nNode >= 18 && nNode < 24) {
@@ -30,20 +32,23 @@ u8 fn_801218BC(int nNode) {
     return b;
 }
 
-// Node 24 is the final.
-u8 fn_801218DC(int nNode) {
+// Node 24 holds event 24, the ladder's final (the "World" stage), shown once every other event is
+// won.
+u8 LadderMap_IsWorldFinalNode(int nNode) {
     return nNode == 24;
 }
 
-u8 fn_801218EC(int nRegion) {
+// Region 6 ("World") holds only the final, node 24.
+u8 LadderMap_IsWorldRegion(int nRegion) {
     return nRegion == 6;
 }
 
-// Has the player won every event of the region?
-u8 fn_801218FC(int nRegion) {
+// Whether the current profile has won the region: the events of its three nodes nRegion * 3 to
+// nRegion * 3 + 2 (its fourth event does not count), or event 24 for the World region (6).
+u8 LadderMap_HasWonRegion(int nRegion) {
     int nProfile = fn_80077B08();
 
-    if (fn_801218EC(nRegion)) {
+    if (LadderMap_IsWorldRegion(nRegion)) {
         return GameMode4_HasWonEvent(nProfile, 24);
     }
     return GameMode4_HasWonEvent(nProfile, gLadderNodeEvents[nRegion * 3]) &&
@@ -51,8 +56,9 @@ u8 fn_801218FC(int nRegion) {
            GameMode4_HasWonEvent(nProfile, gLadderNodeEvents[nRegion * 3 + 2]);
 }
 
-// Has the player won every event but the final?
-u8 fn_801219CC(void) {
+// Whether the current profile has won events 0 to 23, every event but the final (24); the final's
+// node is shown once it has.
+u8 LadderMap_HasWonAllButFinal(void) {
     int nProfile;
     int i;
     u8 bWon = 1;
@@ -66,18 +72,20 @@ u8 fn_801219CC(void) {
     return bWon;
 }
 
-// A node's state: -1 not shown, 0 open, 1 won, 2 locked.
-int fn_80121A38(int nNode) {
+// A node's state on the map: -1 not shown (LadderMap_IsNodeShown), 1 its event won, 0 open (every
+// event it needs is won), 2 locked, for the current profile. The final, the region finals and the
+// other nodes have a branch each, but the three do the same.
+int LadderMap_GetNodeState(int nNode) {
     int nProfile;
     int nEvent = gLadderNodeEvents[nNode];
 
     nProfile = fn_80077B08();
-    if (!fn_80121B8C(nNode)) return -1;
-    if (fn_801218DC(nNode)) {
+    if (!LadderMap_IsNodeShown(nNode)) return -1;
+    if (LadderMap_IsWorldFinalNode(nNode)) {
         if (GameMode4_HasWonEvent(nProfile, nEvent)) return 1;
         return GameMode4_IsEventOpen(nProfile, nEvent) ? 0 : 2;
     }
-    if (fn_801218BC(nNode)) {
+    if (LadderMap_IsRegionFinalNode(nNode)) {
         if (GameMode4_HasWonEvent(nProfile, nEvent)) return 1;
         return GameMode4_IsEventOpen(nProfile, nEvent) ? 0 : 2;
     }
@@ -85,37 +93,44 @@ int fn_80121A38(int nNode) {
     return GameMode4_IsEventOpen(nProfile, nEvent) ? 0 : 2;
 }
 
-// Is the node shown? The final once every other event is won, the single nodes once their region
-// is won, the regions' own nodes until it is.
-int fn_80121B8C(int nNode) {
-    u8 bRegionWon = fn_801218FC(fn_80121C08(nNode));
+// Whether a node is on the map: the final (24) once events 0 to 23 are won; a region final (18 to
+// 23) once its region is won (LadderMap_HasWonRegion); a region's first three nodes only until
+// then, when its final takes their place.
+int LadderMap_IsNodeShown(int nNode) {
+    u8 bRegionWon = LadderMap_HasWonRegion(LadderMap_GetNodeRegion(nNode));
 
-    if (fn_801218DC(nNode)) {
-        return fn_801219CC();
+    if (LadderMap_IsWorldFinalNode(nNode)) {
+        return LadderMap_HasWonAllButFinal();
     }
-    if (fn_801218BC(nNode)) {
+    if (LadderMap_IsRegionFinalNode(nNode)) {
         return bRegionWon;
     }
     return !bRegionWon;
 }
 
-// A node's region: three nodes each up to node 17, then one each.
-int fn_80121C08(int nNode) {
+// A node's region (gLadderRegionNames): nodes 0 to 17 three a region, 18 to 23 one each (the region
+// finals), 24 the World (6); 0 for any node above 24.
+int LadderMap_GetNodeRegion(int nNode) {
     if (nNode < 18) {
         return nNode / 3;
     }
     return nNode <= 24 ? nNode - 18 : 0;
 }
 
-int fn_80121C44(int nEvent) {
+// An event's stage within its region, the index of its gLadderStageNames text: nEvent % 4 below 24
+// (0 "1/4", 1 "2/4", 2 "3/4", 3 "Dominated"), 4 ("World") for event 24, 0 above. It takes an event,
+// not a node.
+int LadderMap_GetEventStage(int nEvent) {
     if (nEvent < 24) {
         return nEvent % 4;
     }
     return nEvent == 24 ? 4 : 0;
 }
 
-// Marks the nodes that lie in the direction from the cursor's node.
-void fn_80121C80(int nDir, u8* abCandidate) {
+// Sets abCandidate[i] for each node that lies in direction nDir from the cursor's node (0 up, 1
+// down, 2 left, 3 right; y grows downwards), within 45 degrees either side, and clears it for the
+// others. The cursor's own entry is left as it was, and so is every entry for any other nDir.
+void LadderMap_MarkNodesInDirection(int nDir, u8* abCandidate) {
     f32 fDX;
     f32 fDY;
     f32 fX = gLadderMap.aNode[gLadderMap.nNode].fX;
@@ -161,8 +176,9 @@ void fn_80121C80(int nDir, u8* abCandidate) {
     }
 }
 
-// The marked node nearest the cursor's node, -1 for none.
-int fn_80121E1C(u8* abCandidate) {
+// The node marked in abCandidate that lies nearest the cursor's node in a straight line, -1 when
+// none is marked.
+int LadderMap_FindNearestMarkedNode(u8* abCandidate) {
     f32 fX = gLadderMap.aNode[gLadderMap.nNode].fX;
     f32 fY = gLadderMap.aNode[gLadderMap.nNode].fY;
     f32 fBest = 3.4028235e38f;
@@ -188,8 +204,8 @@ int fn_80121E1C(u8* abCandidate) {
     return nBest;
 }
 
-// The event is open to the player and not won yet.
-u8 fn_80121F0C(int nEvent) {
+// Whether the current profile may play the event: not won yet, and every event it needs is won.
+u8 LadderMap_IsEventPlayable(int nEvent) {
     int b;
     int nProfile = fn_80077B08();
 
@@ -200,8 +216,8 @@ u8 fn_80121F0C(int nEvent) {
     return b;
 }
 
-// The event's node, -1 for none.
-int fn_80121F7C(int nEvent) {
+// The node that holds the event (its index in gLadderNodeEvents), -1 for none.
+int LadderMap_GetEventNode(int nEvent) {
     int i;
 
     for (i = 0; i < NUM_LADDER_EVENTS; i++) {
@@ -210,24 +226,26 @@ int fn_80121F7C(int nEvent) {
     return -1;
 }
 
-// The node of the first event the player can play, else the final's.
-int fn_80122018(void) {
+// The node of the lowest-numbered event the current profile may play (LadderMap_IsEventPlayable),
+// else the final's node (event 24).
+int LadderMap_GetFirstPlayableNode(void) {
     int i;
 
     for (i = 0; i < NUM_LADDER_EVENTS; i++) {
-        if (fn_80121F0C(i)) {
-            return fn_80121F7C(i);
+        if (LadderMap_IsEventPlayable(i)) {
+            return LadderMap_GetEventNode(i);
         }
     }
-    return fn_80121F7C(24);
+    return LadderMap_GetEventNode(24);
 }
 
-// Unmarks the nodes that are not shown.
-void fn_80122070(u8* abCandidate) {
+// Clears abCandidate for every node that is not on the map (LadderMap_IsNodeShown), so the cursor
+// never lands on one.
+void LadderMap_UnmarkHiddenNodes(u8* abCandidate) {
     int i;
 
     for (i = 0; i < NUM_LADDER_EVENTS; i++) {
-        if (!fn_80121B8C(i)) {
+        if (!LadderMap_IsNodeShown(i)) {
             abCandidate[i] = 0;
         }
     }
