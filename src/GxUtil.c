@@ -26,9 +26,9 @@ void fn_8002A024(u8 bOn, f32 x0, f32 y0, f32 x1, f32 y1) {
     if (bOn) {
         GXSetAlphaUpdate(1);
         GXSetColorUpdate(0);
-        RenderState_SetDepthWrite(0);
-        RenderState_SetAlphaTest(0, 6, 0x80);
-        RenderState_SetDepthFunc(7);
+        DS_vEnableZBufferUpdate(0);
+        DS_vSetAlphaTestMode(0, 6, 0x80);
+        DS_vSetZBufferMode(7);
         RenderState_SetDrawFlags(0);
         RenderView_MakeQuad(xy, NULL, x0, y0, x1, y1);
         colour[0] = 0.0f;
@@ -39,9 +39,9 @@ void fn_8002A024(u8 bOn, f32 x0, f32 y0, f32 x1, f32 y1) {
         RenderView_SetUseCurrentMatrices(0);
         RenderState_Flush();
         RenderView_DrawPrimitive(0xA1, xy, 0, NULL, 2);
-        RenderState_SetDepthWrite(1);
-        RenderState_SetAlphaTest(1, 6, 0x80);
-        RenderState_SetDepthFunc(3);
+        DS_vEnableZBufferUpdate(1);
+        DS_vSetAlphaTestMode(1, 6, 0x80);
+        DS_vSetZBufferMode(3);
         GXSetColorUpdate(1);
         RenderState_Flush();
     } else {
@@ -56,7 +56,7 @@ void fn_8002A164(int nMode) {
     GXCopyTex(fn_8002A624(), 0);
     GXPixModeSync();
     fn_8002A608(&lbl_801C64A8);
-    RenderState_SetAlphaTest(1, 4, 0);
+    DS_vSetAlphaTestMode(1, 4, 0);
     RenderState_Flush();
     GXSetNumTevStages(1);
     if (nMode == 0) {
@@ -79,7 +79,7 @@ void fn_8002A164(int nMode) {
 // The end of fn_8002A164's drawing.
 void fn_8002A2FC(void) {
     GXSetAlphaUpdate(0);
-    RenderState_SetAlphaTest(1, 6, 0x80);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
     RenderState_Flush();
     lbl_80281D28 = 0;
     GXSetTevColorIn(1, 15, 0, 12, 15);

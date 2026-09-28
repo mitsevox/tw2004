@@ -22,7 +22,7 @@ BufferPoolBlock* lbl_80281D98;      // the block holding the display list
 // display list that hands GX the renderer's state, after setting that state's b4 to 1.
 void fn_80045D18(void) {
     lbl_80281D98 = fn_80045E80();
-    RenderState_SetDepthWrite(1);
+    DS_vEnableZBufferUpdate(1);
     fn_80045E60(lbl_80281D98);
     fn_80045E40(lbl_80281D98);
     fn_80045E3C(0);
@@ -91,7 +91,7 @@ void fn_80045F14(BufferPoolBlock* pBlock) {
 }
 
 BufferPoolBlock* fn_80045F18(void) {
-    return fn_800154F4();
+    return BufferPool_GetFreeBlock();
 }
 
 // Frees the block: a zero size marks it unused.

@@ -53,9 +53,9 @@ void fn_80093DB8(Ball* pBall, int nPlayer) {
     fGround = fn_8004D80C(Ter_GetTGD(), pBall->vPos);
     if (-65536.125f != fGround) {
         fn_8005CC64(lbl_80281F50, lbl_80281F54);
-        RenderState_SetDepthWrite(0);
-        RenderState_SetAlphaTest(0, 6, 0x80);
-        RenderState_SetDepthFunc(3);
+        DS_vEnableZBufferUpdate(0);
+        DS_vSetAlphaTestMode(0, 6, 0x80);
+        DS_vSetZBufferMode(3);
         RenderState_SetBlendFactors(4, 5);
         RenderState_SetCameraMatrices();
         RenderState_SetDrawFlags(0x70);
@@ -102,9 +102,9 @@ void fn_80093DB8(Ball* pBall, int nPlayer) {
         desc.pUV = lbl_801D9780;
         fn_80036100((ShaderObject*)lbl_801D96B8[nPlayer], &desc, 1);
         fn_800360D4(lbl_801D96B8[nPlayer]);
-        RenderState_SetDepthWrite(1);
-        RenderState_SetAlphaTest(1, 6, 0x80);
-        RenderState_SetDepthFunc(3);
+        DS_vEnableZBufferUpdate(1);
+        DS_vSetAlphaTestMode(1, 6, 0x80);
+        DS_vSetZBufferMode(3);
         RenderState_Flush();
     }
 }

@@ -146,7 +146,7 @@ void DF_vDrawBufferToScreen(int n) {
     aColour[1] = lbl_801D5110[n].aColour[1];
     aColour[2] = lbl_801D5110[n].aColour[2];
     aColour[3] = lbl_801D5110[n].f4 * lbl_801D5110[n].f14;
-    pRect = ((RenderCamera*)Camera_GetCurrent())->pRect;
+    pRect = ((RenderCamera*)RC_spGetCurrentRenderCtx())->pRect;
     fX0 = pRect[0];
     fY0 = pRect[1];
     fX1 = fX0 + pRect[2];
@@ -154,10 +154,10 @@ void DF_vDrawBufferToScreen(int n) {
     fn_8002A608(&lbl_801D5198);
     RenderView_SetUseCurrentMatrices(0);
     RenderState_SetDrawFlags(0x50);
-    RenderState_SetDepthWrite(0);
+    DS_vEnableZBufferUpdate(0);
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetConstantAlphaOn(1);
-    RenderState_SetAlphaTest(0, 6, 0x80);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
     for (i = 0; i < 5; i++) {
         RenderView_MakeQuad(aXY, aUV, 0.0f, 0.0f, 1.0f, 1.0f);
         bOdd = i % 2;
@@ -189,11 +189,11 @@ void DF_vDrawBufferToScreen(int n) {
         RenderState_Flush();
         RenderView_DrawPrimitive(0xA1, aXY, NULL, aUV, 2);
     }
-    RenderState_SetDepthWrite(1);
+    DS_vEnableZBufferUpdate(1);
     RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80035F1C();
-    RenderState_SetAlphaTest(1, 6, 0x80);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
     RenderState_SetConstantAlphaOn(0);
     RenderState_Flush();
 }

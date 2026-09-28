@@ -232,9 +232,9 @@ void TARGET_RenderBallTarget(int nPlayer) {
     }
     fn_800E5178(nPlayer, fDist, fTilt, fStep, fShare);
 
-    RenderState_SetAlphaTest(0, 6, 0x7F);
-    RenderState_SetDepthFunc(3);
-    RenderState_SetDepthWrite(0);
+    DS_vSetAlphaTestMode(0, 6, 0x7F);
+    DS_vSetZBufferMode(3);
+    DS_vEnableZBufferUpdate(0);
     RenderState_SetBlendFactors(4, 5);
     fn_8005CC64(lbl_80281E3C, lbl_80281E40);
     RenderState_SetDrawFlags(0x50);
@@ -327,9 +327,9 @@ void TARGET_RenderBallTarget(int nPlayer) {
         RenderState_Flush();
         RenderView_DrawPrimitive(0x98, aShadow[0], NULL, aUV, 4);
     }
-    RenderState_SetAlphaTest(1, 6, 0x80);
-    RenderState_SetDepthFunc(3);
-    RenderState_SetDepthWrite(1);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vSetZBufferMode(3);
+    DS_vEnableZBufferUpdate(1);
     RenderState_Flush();
 
     nX = 512.0f * fX;
@@ -1003,12 +1003,12 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     if (vCross[1] < 0.0f) {
         fSin = -fSin;
     }
-    RenderState_SetAlphaTest(0, 6, 0x7F);
-    RenderState_SetDepthFunc(3);
+    DS_vSetAlphaTestMode(0, 6, 0x7F);
+    DS_vSetZBufferMode(3);
     RenderState_SetBlendFactors(4, 5);
     fn_8005CC64(lbl_80281E3C, lbl_80281E40);
     RenderState_SetDrawFlags(0x50);
-    RenderState_SetDepthWrite(0);
+    DS_vEnableZBufferUpdate(0);
     RenderState_Flush();
     RenderView_SetUseCurrentMatrices(1);
     for (i = 0; i < 4; i++) {
@@ -1088,9 +1088,9 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     fn_8005CC64(lbl_80281E34, lbl_80281E38);
     RenderState_Flush();
     RenderView_DrawPrimitive(0x98, aShadow[0], NULL, aUV, 4);
-    RenderState_SetAlphaTest(1, 6, 0x80);
-    RenderState_SetDepthFunc(3);
-    RenderState_SetDepthWrite(1);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vSetZBufferMode(3);
+    DS_vEnableZBufferUpdate(1);
     RenderView_SetColor(lbl_801887CC);
     RenderState_Flush();
 
@@ -1186,10 +1186,10 @@ void fn_8006A8B0(void) {
 
 // A point given as fractions of the camera's view (0..1) into the view's screen rectangle.
 void fn_8006A8D4(void* pCamera, f32* pX, f32* pY) {
-    f32* pRect = fn_80012EF0(pCamera);
+    f32* pRect = RC_spGetRenderCtxViewport(pCamera);
 
-    *pX = fn_80012EE8(pRect) + *pX * fn_80012ED8(pRect);
-    *pY = fn_80012EE0(pRect) + *pY * fn_80012ED0(pRect);
+    *pX = VM_fGetViewportLeft(pRect) + *pX * VM_fGetViewportWidth(pRect);
+    *pY = VM_fGetViewportTop(pRect) + *pY * VM_fGetViewportHeight(pRect);
 }
 
 // a - b into out (three floats)

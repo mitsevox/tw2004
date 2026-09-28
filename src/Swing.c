@@ -989,11 +989,11 @@ void fn_8005A850(int nPlayer) {
             }
             RenderState_SetClipMode(0);
             RenderState_SetCameraMatrices();
-            RenderState_SetViewport(Camera_GetCurrent());
+            RenderState_SetViewport(RC_spGetCurrentRenderCtx());
             RenderState_SetDrawFlags(0x50);
             RenderState_SetBlendFactors(4, 5);
-            RenderState_SetAlphaTest(0, 6, 0x80);
-            RenderState_SetDepthWrite(0);
+            DS_vSetAlphaTestMode(0, 6, 0x80);
+            DS_vEnableZBufferUpdate(0);
             if (pObj->nAnim == 6) {
                 fn_8005CC64(gpSwing->pBank, gpSwing->pClubBack);
             } else if (pObj->nAnim == 7) {
@@ -1012,8 +1012,8 @@ void fn_8005A850(int nPlayer) {
             mesh.pUV      = gpSwing->pA4[nView];
             fn_80036100((ShaderObject*)gpSwing->mesh[nView], &mesh, 1);
             fn_800360D4(gpSwing->mesh[nView]);
-            RenderState_SetAlphaTest(1, 6, 0x80);
-            RenderState_SetDepthWrite(1);
+            DS_vSetAlphaTestMode(1, 6, 0x80);
+            DS_vEnableZBufferUpdate(1);
             RenderState_Flush();
         }
     }

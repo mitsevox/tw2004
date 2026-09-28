@@ -199,14 +199,14 @@ void UI_Obj_RenderBoostUI(int nObj) {
     RenderView_SetColor(aBlack);
     fn_80035F1C();
     RenderState_SetDrawFlags(0);
-    RenderState_SetAlphaTest(0, 6, 0x80);
-    RenderState_SetDepthFunc(7);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetZBufferMode(7);
     RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 2, 1);
     RenderState_Flush();
     GXSetZMode(1, 7, 1);
     RenderView_DrawPrimitive(0xA1, aRect[0], NULL, NULL, 2);
-    RenderState_SetAlphaTest(1, 6, 0x80);
-    RenderState_SetDepthFunc(3);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vSetZBufferMode(3);
     RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
     RenderState_Flush();
 
@@ -217,16 +217,16 @@ void UI_Obj_RenderBoostUI(int nObj) {
     fn_80045470(lbl_802820CC, 0.00879646f);
     fn_800AF0A8(lbl_802820CC);
     RC_UpdateCurrentScreenMatrices();
-    RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
-    RenderState_SetViewport(Camera_GetCurrent());
+    RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
+    RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderState_SetCameraMatrices();
 
     fBoost = (f32)gPlayers[nPlayer].swing.nPowerBoost / 8.0f;
     RenderState_SetDrawFlags(0x50);
-    RenderState_SetDepthWrite(1);
+    DS_vEnableZBufferUpdate(1);
     RenderView_SetUseCurrentMatrices(1);
     RenderState_SetBlendFactors(4, 5);
-    RenderState_SetAlphaTest(1, 4, 1);
+    DS_vSetAlphaTestMode(1, 4, 1);
 
     // the base quad
     fn_8005CC64(lbl_802820BC, lbl_802820C8);
@@ -248,7 +248,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
         aXYZ[i][3] = 1.0f;
     }
     fn_8005CC64(lbl_802820BC, lbl_802820C4);
-    RenderState_SetAlphaTest(0, 6, 0x80);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
     if (gPlayers[nPlayer].swing.nPowerBoost > 0) {
         Vec3Copy(lbl_8018830C[gPlayers[nPlayer].swing.nPowerBoost - 1], aColour);
     }
@@ -354,11 +354,11 @@ void UI_Obj_RenderBoostUI(int nObj) {
     fn_800AF0A8(pLens);
     RenderState_SetCameraMatrices();
     RC_UpdateCurrentScreenMatrices();
-    RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
+    RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
     RenderState_SetConstantAlphaOn(0);
     RenderState_SetBlendFactors(4, 5);
-    RenderState_SetAlphaTest(1, 6, 0x80);
-    RenderState_SetDepthFunc(3);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vSetZBufferMode(3);
     RenderState_Flush();
 }
 

@@ -642,7 +642,7 @@ void fn_80074DA8(ShaderVtxArrays* pArrays, int eType, MorphAnim* pAnim, ShaderCm
         GXInvalidateVtxCache();
     }
     if (pCmds->uFlags & 1) {
-        fn_8001618C(1);
+        RenderState_SetConstantAlphaActive(1);
     }
     if (eType == 1 || eType == 3) {
         fn_80074A24(NULL, NULL, 0, &bFirst);
@@ -712,7 +712,7 @@ void fn_80074DA8(ShaderVtxArrays* pArrays, int eType, MorphAnim* pAnim, ShaderCm
     if (eType == 2 || eType == 3) {
         fn_80097474(pAnim);
     }
-    fn_8001618C(0);
+    RenderState_SetConstantAlphaActive(0);
 }
 
 void fn_8007524C(void) {

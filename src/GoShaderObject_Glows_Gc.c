@@ -214,7 +214,7 @@ void fn_800985FC(GlowQueue* pQueue, f32 (*pMtx)[4], int bOnTop) {
     int i;
     Vec4 v;
 
-    Camera_GetCurrent();
+    RC_spGetCurrentRenderCtx();
     GXSetClipMode(0);
     GXSetChanCtrl(4, 0, 0, 1, 0, 0, 2);
     GXSetNumTevStages(1);
@@ -327,27 +327,27 @@ void fn_800360D4(u8* pMesh);
 // the camera's identity view matrix back.
 void ColGlow_RenderAllGlowInCurrentList(void) {
     GlowDrawDesc desc;
-    void* pCamera = Camera_GetCurrent();
+    void* pCamera = RC_spGetCurrentRenderCtx();
     CamLens* pLens = Camera_GetLens(pCamera);
     f32 (*pMtx)[4];
     if (lbl_80281F80 != NULL && lbl_80281F80->nCount > 0) {
         pMtx = pLens->m44;
         // port: the lens's 0x04..0x44 block is used as a matrix here (CamLens has v4 there)
         RC_vSetRenderCtxTransformationMatrix(pCamera, pLens->m4);
-        RenderState_SetViewport(Camera_GetCurrent());
+        RenderState_SetViewport(RC_spGetCurrentRenderCtx());
         RenderState_SetCameraMatrices();
         RenderState_SetBlendFactors(4, 1);
-        RenderState_SetAlphaTest(0, 6, 0x80);
-        RenderState_SetDepthWrite(0);
+        DS_vSetAlphaTestMode(0, 6, 0x80);
+        DS_vEnableZBufferUpdate(0);
         RenderState_SetDrawFlags(0x40);
-        RenderState_SetDepthFunc(3);
+        DS_vSetZBufferMode(3);
         RenderState_Flush();
         desc.pQueue = lbl_80281F80;
         desc.bFirst = 1;
         desc.pMtx = pMtx;
         fn_80036100((ShaderObject*)lbl_801D9A40, &desc, 1);
         fn_800360D4(lbl_801D9A40);
-        RenderState_SetDepthFunc(7);
+        DS_vSetZBufferMode(7);
         RenderState_Flush();
         desc.pQueue = lbl_80281F80;
         desc.bFirst = 0;
@@ -355,10 +355,10 @@ void ColGlow_RenderAllGlowInCurrentList(void) {
         fn_80036100((ShaderObject*)lbl_801D9A40, &desc, 1);
         fn_800360D4(lbl_801D9A40);
         RC_vSetRenderCtxTransformationMatrix(pCamera, NULL);
-        RenderState_SetViewport(Camera_GetCurrent());
-        RenderState_SetDepthWrite(1);
-        RenderState_SetDepthFunc(3);
-        RenderState_SetAlphaTest(1, 6, 0x80);
+        RenderState_SetViewport(RC_spGetCurrentRenderCtx());
+        DS_vEnableZBufferUpdate(1);
+        DS_vSetZBufferMode(3);
+        DS_vSetAlphaTestMode(1, 6, 0x80);
         RenderState_SetBlendFactors(4, 5);
         RenderState_Flush();
     }

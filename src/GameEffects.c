@@ -527,9 +527,9 @@ void fn_800DC290(f32 fHeight) {
     f32 xy[8];
     f32 uv[8];
     RenderView_SetUseCurrentMatrices(0);
-    RenderState_SetDepthWrite(0);
-    RenderState_SetDepthFunc(7);
-    RenderState_SetAlphaTest(0, 6, 0x80);
+    DS_vEnableZBufferUpdate(0);
+    DS_vSetZBufferMode(7);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
     RenderState_SetDrawFlags(0);
     RenderState_Flush();
     colour[0] = 0.0f;
@@ -542,9 +542,9 @@ void fn_800DC290(f32 fHeight) {
     RenderView_MakeQuad(xy, uv, 0.0f, 1.0f - fHeight, 1.0f, 1.0f);
     RenderView_SetColor(colour);
     RenderView_DrawPrimitive(0xA1, xy, 0, uv, 2);
-    RenderState_SetDepthWrite(1);
-    RenderState_SetAlphaTest(1, 6, 0x80);
-    RenderState_SetDepthFunc(3);
+    DS_vEnableZBufferUpdate(1);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vSetZBufferMode(3);
     RenderState_Flush();
 }
 

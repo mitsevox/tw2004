@@ -20,14 +20,15 @@ BufferPool* lbl_80280E00 = &lbl_801A4900;
 // ---- sweep code (not yet cleaned up) ----
 
 void Mtx_Identity(f32 (*m)[4]);          // identity matrix
-void fn_80015620(void);
-void fn_80016124(s32 p0, s32 p1, s32 p2, s32 p3);
-void fn_80016158(u8 nAlpha);
+void DS_vCloseModule(void);
+void RenderState_SetTexCoordGen(s32 p0, s32 p1, s32 p2, s32 p3);
+void RenderState_SetKColorAlpha(u8 nAlpha);
 
 // ---- end of sweep code ----
 
-// Free every block of the pool.
-void fn_80015470(void) {
+// Marks all 20 blocks of the display-list pool (lbl_80280E00) free and restarts its search and its
+// count.
+void BufferPool_FreeAll(void) {
     BufferPoolBlock* pBlock;
     s32 i;
 
@@ -40,8 +41,11 @@ void fn_80015470(void) {
     }
 }
 
-// Move the pool's nNext past the blocks in use and return the first free block.
-BufferPoolBlock* fn_800154F4(void) {
+// The first free block of the display-list pool, searching from nNext (which moves past the blocks
+// in use); counts the hand-out in n4. The block is not marked used here: UObject3D.c records a
+// display list into it and stores its size in u1000. There is no end check: with all 20 blocks in
+// use it walks past the pool.
+BufferPoolBlock* BufferPool_GetFreeBlock(void) {
     BufferPoolBlock* pBlock;
 
     pBlock = &lbl_80280E00->aBlocks[lbl_80280E00->nNext];
@@ -56,8 +60,11 @@ BufferPoolBlock* fn_800154F4(void) {
     return pBlock;
 }
 
-// Reset the renderer's state and free the buffer pool.
-void fn_80015540(void) {
+// Display-state start-up (gomainloop's fn_8006C7A8): sets lbl_801B8980 to its defaults (depth test
+// GX_LEQUAL with writes on, alpha test off, blending source alpha over inverse source alpha, draw
+// flags 0x70, fog range 100..2048 in white, identity matrices, no texture), marks no group changed,
+// selects GX position matrix 0 and frees the display-list pool.
+void DS_vInitModule(void) {
     RenderState* const p = &lbl_801B8980;
 
     // fake match: m74, u110 and uFlags through the global, the rest through p (only this mix gives
@@ -85,19 +92,22 @@ void fn_80015540(void) {
     lbl_801B8980.u110 = 0;
     lbl_801B8980.uFlags = 0;
     GXSetCurrentMtx(0);
-    fn_80015470();
+    BufferPool_FreeAll();
 }
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80015620(void) {
+// Display-state shutdown (gomainloop's fn_8006C854): nothing to do on this machine.
+void DS_vCloseModule(void) {
 }
 
 // ---- end of sweep code ----
 
-// Hand GX every group of the renderer's state that changed (u110), then the texture of the next
-// draw (uFlags). While fn_8002A164's screen copy is drawn with, it takes TEV stage 0 and the
-// draw's stages start at 1.
+// Hands GX every group of lbl_801B8980 whose bit is set in u110 (depth, blending, constant alpha,
+// alpha test, draw flags, clip mode, fog, matrices, scissor, viewport, render surface), then the
+// texture or movie picture of the next draw (uFlags), and clears both. While the screen copy of
+// GxUtil.c is on (fn_8002A3A4), TEV stage 0 blends the copied screen (fn_8002A3AC) and the draw's
+// own stages start at 1. UObject3D.c also records a call into a display list.
 void RenderState_Apply(void) {
     f32 mNormal[3][4];
     Camera* pCamera;
@@ -121,11 +131,11 @@ void RenderState_Apply(void) {
             GXSetBlendMode(lbl_801B8980.n18, lbl_801B8980.n10, lbl_801B8980.n14, 0);
         }
         if (lbl_801B8980.u110 & 0x80) {
-            fn_8001618C(lbl_801B8980.b1D);
+            RenderState_SetConstantAlphaActive(lbl_801B8980.b1D);
             if (lbl_801B8980.b1D != 0) {
-                fn_80016158(lbl_801B8980.b1C);
+                RenderState_SetKColorAlpha(lbl_801B8980.b1C);
             } else {
-                fn_80016158(0xFF);
+                RenderState_SetKColorAlpha(0xFF);
             }
         }
         // alpha test: off, or compare n8 against the reference bC with the depth test after texturing
@@ -179,7 +189,7 @@ void RenderState_Apply(void) {
                      lbl_801B8980.f2C, lbl_801B8980.fB4, lbl_801B8980.fB8, lbl_801B8980.c30);
         }
         if (lbl_801B8980.u110 & 0x100) {
-            pCamera = Camera_GetCurrent();
+            pCamera = RC_spGetCurrentRenderCtx();
             GXLoadPosMtxImm(lbl_801B8980.m34, 0);
             PSMTXInvXpose(lbl_801B8980.m34, mNormal);
             GXLoadNrmMtxImm(mNormal, 0);
@@ -255,8 +265,8 @@ void RenderState_Apply(void) {
             GXLoadTexObj(&lbl_801B8980.pPict10C->aTex[2], 1);
             GXLoadTexObj(&lbl_801B8980.pPict10C->aTex[1], 2);
             GXSetNumTexGens(nStage + 2);
-            fn_80016124(0, 1, 4, 60);
-            fn_80016124(1, 1, 4, 60);
+            RenderState_SetTexCoordGen(0, 1, 4, 60);
+            RenderState_SetTexCoordGen(1, 1, 4, 60);
             GXSetNumTevStages(nStage + 4);
             GXSetTevOrder(nStage, 1, 2, 0xFF);
             GXSetTevColorIn(nStage, 15, 8, 14, 2);
@@ -299,19 +309,23 @@ void RenderState_Apply(void) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80016124(s32 p0, s32 p1, s32 p2, s32 p3) {
+// The SDK's GXSetTexCoordGen out of line: texture coordinate nCoord from source nSrc through
+// function nFunc and matrix nMtx, not normalised, with the identity post-transform matrix (125).
+void RenderState_SetTexCoordGen(s32 p0, s32 p1, s32 p2, s32 p3) {
     GXSetTexCoordGen2(p0, p1, p2, p3, 0, 125);
 }
 
-// The camera the renderer is drawing with.
-void* Camera_GetCurrent(void) {
+// The current render context: the render camera being drawn with, as RC_vSetCurrentRenderCtx set
+// it.
+void* RC_spGetCurrentRenderCtx(void) {
     return *lbl_80280DF0;
 }
 
 // ---- end of sweep code ----
 
-// Set the alpha of TEV constant colour 0.
-void fn_80016158(u8 nAlpha) {
+// Loads TEV constant colour 0 with the alpha nAlpha (RenderState_Apply: the constant alpha b1C
+// while it is on, else 0xFF).
+void RenderState_SetKColorAlpha(u8 nAlpha) {
     GXColor colour;
 
     // EA bug: only the alpha is set; r, g and b are whatever was on the stack
@@ -321,7 +335,10 @@ void fn_80016158(u8 nAlpha) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8001618C(u8 v) {
+// Sets the flag byte *lbl_80280DC8 (LLTex.c) that the TEV setups read: nonzero while the constant
+// alpha is in use, so untextured stages take their alpha from TEV constant colour 0 instead of the
+// vertex colour.
+void RenderState_SetConstantAlphaActive(u8 v) {
     *(u8*)(lbl_80280DC8 + 0x0) = v;
 }
 

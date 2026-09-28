@@ -139,7 +139,7 @@ void fn_80090D28(FEQuad* pQuad) {
     } else {
         RenderState_SetDrawFlags(0x40);
     }
-    RenderState_SetViewport(Camera_GetCurrent());
+    RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     vScale[0] = (1.0f / 511.0f) * pColour->w40.a[0];
     vScale[1] = (1.0f / 511.0f) * pColour->w40.a[1];
     vScale[2] = (1.0f / 511.0f) * pColour->w40.a[2];
@@ -195,8 +195,8 @@ void fn_80090D28(FEQuad* pQuad) {
         aOut[i].y *= fProj;
         aOut[i].z = fZ;
     }
-    RenderState_SetDepthWrite(0);
-    RenderState_SetDepthFunc(7);
+    DS_vEnableZBufferUpdate(0);
+    DS_vSetZBufferMode(7);
     RenderState_Flush();
     if (aColour[0][3] != 0.0f || aColour[1][3] != 0.0f || aColour[2][3] != 0.0f
         || aColour[3][3] != 0.0f) {
@@ -492,10 +492,10 @@ void fn_80091BDC(int nPoint) {
 
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
     RenderState_SetBlendFactors(4, 5);
-    RenderState_SetAlphaTest(0, 6, 0x80);
-    RenderState_SetDepthFunc(7);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetZBufferMode(7);
     RenderView_SetUseCurrentMatrices(0);
-    RenderState_SetDepthWrite(0);
+    DS_vEnableZBufferUpdate(0);
     fn_8005CC64(lbl_80281F20, lbl_80281F24);
     RenderState_SetDrawFlags(0x50);
     RenderState_Flush();
@@ -631,13 +631,13 @@ void fn_80092080(LLPict* pPict, f32 fAlpha) {
     fn_800760D8(pPict);
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetDrawFlags(0x50);
-    RenderState_SetAlphaTest(0, 6, 0x80);
-    RenderState_SetDepthFunc(7);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetZBufferMode(7);
     nOld = fn_800171B0();
     FB_vSetFrameBuffer(&frameBuf, 0.0f, 0.0f, 512.0f, 448.0f, 1.0f, 1.0f);
     // port: the render slot is typed s32 but holds a pointer
     fn_80092274((s32)&frameBuf);
-    RenderState_SetViewport(Camera_GetCurrent());
+    RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderState_Flush();
     afColour[0] = 0.5f;
     afColour[1] = 0.5f;

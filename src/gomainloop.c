@@ -55,8 +55,8 @@ void fn_80014864(void);
 void fn_800148A8(void);
 void fn_800148EC(void);
 void fn_80014A64(void);
-void fn_80015540(void);
-void fn_80015620(void);
+void DS_vInitModule(void);
+void DS_vCloseModule(void);
 void fn_80016198(void);
 void fn_800162A0(void);
 void fn_800162A4(int nField);
@@ -441,7 +441,7 @@ void fn_8006C7A8(void) {
     fn_8006DC44();
     fn_80016198();
     FO_vInitModule();
-    fn_80015540();
+    DS_vInitModule();
     FB_vInitModule();
     fn_8007185C();
     VM_vInitModule();
@@ -485,7 +485,7 @@ void fn_8006C854(void) {
     fn_80013718();
     VM_vCloseModule();
     FB_vCloseModule();
-    fn_80015620();
+    DS_vCloseModule();
     FO_vCloseModule();
     fn_800162A0();
     fn_8006DC48();
@@ -520,7 +520,7 @@ void fn_8006C968(void) {
     f32 fRG = 100.0f;
     f32 fB = 128.0f;
 
-    RenderState_SetDepthWrite(1);
+    DS_vEnableZBufferUpdate(1);
     RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
     fn_800350D0(46.875f);
     fn_800350B4(560.25f);

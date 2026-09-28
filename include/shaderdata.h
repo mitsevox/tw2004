@@ -23,7 +23,7 @@ typedef struct ShaderCmds {
     u8   unk2[2];
     u32  nWords;                // 0x4  the commands' length in u16s
     u16  nFrame;                // 0x8  which ShaderVtxArrays.apPos the list draws
-    u16  uFlags;                // 0xA  bit 0: fn_8001618C(1) while the list is built
+    u16  uFlags;                // 0xA  bit 0: RenderState_SetConstantAlphaActive(1) while the list is built
     u16* pCmds;                 // 0xC  the commands; the finished list is copied over them
 } ShaderCmds;
 

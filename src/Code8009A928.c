@@ -48,9 +48,9 @@ void GLW_vUpdateGlows(s32 nView) {
 // identity (RC_vSetRenderCtxTransformationMatrix with NULL). nView: gomainloop passes the view; unused here.
 void GLW_vRenderGlows(int nView) {
     fn_8009B57C();
-    Camera_GetCurrent();
+    RC_spGetCurrentRenderCtx();
     ColGlow_RenderAllGlowInCurrentList();
-    RC_vSetRenderCtxTransformationMatrix(Camera_GetCurrent(), NULL);
+    RC_vSetRenderCtxTransformationMatrix(RC_spGetCurrentRenderCtx(), NULL);
 }
 
 // Makes queue n the one glows are queued on.

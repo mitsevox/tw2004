@@ -9,23 +9,28 @@
 
 void fn_80012FA0(void);
 
-f32 fn_80012ED0(f32* pRect) {
+// A viewport's height, as a fraction of the frame buffer's (1: all of it).
+f32 VM_fGetViewportHeight(f32* pRect) {
     return pRect[3];
 }
 
-f32 fn_80012ED8(f32* pRect) {
+// A viewport's width, as a fraction of the frame buffer's (1: all of it).
+f32 VM_fGetViewportWidth(f32* pRect) {
     return pRect[2];
 }
 
-f32 fn_80012EE0(f32* pRect) {
+// A viewport's top edge, as a fraction of the frame buffer's height (0: the top).
+f32 VM_fGetViewportTop(f32* pRect) {
     return pRect[1];
 }
 
-f32 fn_80012EE8(f32* pRect) {
+// A viewport's left edge, as a fraction of the frame buffer's width (0: the left).
+f32 VM_fGetViewportLeft(f32* pRect) {
     return pRect[0];
 }
 
-f32* fn_80012EF0(void* pCamera) {
+// The viewport (screen rectangle) a render context draws into.
+f32* RC_spGetRenderCtxViewport(void* pCamera) {
     return ((RenderCamera*)pCamera)->pRect;
 }
 
@@ -36,19 +41,23 @@ void RenderState_Flush(void) {
 
 // Sets the depth compare function (GX_ALWAYS turns the depth test off), applied with the next
 // RenderState_Apply.
-void RenderState_SetDepthFunc(int a) {
+void DS_vSetZBufferMode(int a) {
     lbl_801B8980.n0 = a;
     lbl_801B8980.u110 |= 0x1;
 }
 
 // Turns depth-buffer writes on or off, applied with the next RenderState_Apply.
-void RenderState_SetDepthWrite(int a) {
+void DS_vEnableZBufferUpdate(int a) {
     lbl_801B8980.b4 = a;
     lbl_801B8980.u110 |= 0x2;
 }
 
-// DepthField.c passes (0 or 1, 6, 0x80). c becomes c * 2 + 1, kept to a byte.
-void RenderState_SetAlphaTest(int a, int b, int c) {
+// Sets the alpha test of the next draws: bEnable 0 turns it off; otherwise a pixel is drawn when
+// its alpha passes the compare function nCompare (GX_NEVER..GX_ALWAYS) against nRef. nRef is on a
+// 0..0x80 scale (callers pass 0x80 for opaque) and is stored as nRef * 2 + 1, kept to 0..255.
+// Applied with the next RenderState_Apply, which also moves the depth test after texturing while
+// the alpha test is on.
+void DS_vSetAlphaTestMode(int a, int b, int c) {
     int n;
 
     n = c * 2 + 1;
@@ -58,5 +67,7 @@ void RenderState_SetAlphaTest(int a, int b, int c) {
     lbl_801B8980.u110 |= 0x4;
 }
 
+// Empty; called once by the boot sequence fn_80005520, as some module's start-up step. Nothing in
+// it or its caller says which module, so it keeps its address name.
 void fn_80012FA0(void) {
 }

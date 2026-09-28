@@ -2023,13 +2023,13 @@ void fn_8001B878(Character* pChar, int nPlayer) {
     }
     Vec3Copy(pChar->v1668, &vPos.x);
     vPos.w = 1.0f;
-    Mtx_MultVec4(((Camera*)Camera_GetCurrent())->viewMtx, &vPos, &vPos);
+    Mtx_MultVec4(((Camera*)RC_spGetCurrentRenderCtx())->viewMtx, &vPos, &vPos);
     Vec3Copy(&vPos.x, &sphere.x);
     sphere.radius = pChar->f1674;
     fDepth = sphere.z;
-    pChar->n1654 = fn_80007D74(&sphere, Camera_GetCurrent(), 0);
+    pChar->n1654 = fn_80007D74(&sphere, RC_spGetCurrentRenderCtx(), 0);
     sphere.radius = 3.0f;
-    pChar->n1658 = fn_80007D74(&sphere, Camera_GetCurrent(), 0);
+    pChar->n1658 = fn_80007D74(&sphere, RC_spGetCurrentRenderCtx(), 0);
     fn_8001EFB4(pMtx[3], Camera_GetCurrentLens()->m4[3], vDir);
     fDist = Vec3_Dot(Camera_GetCurrentLens()->m4[2], vDir);
     fLen = (f32)Math_Sqrt(Vec3_LengthSqClamped(vDir));

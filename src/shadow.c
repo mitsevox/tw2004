@@ -213,7 +213,7 @@ void fn_800B281C(void) {
     fn_800169AC();
     RenderView_SetUseCurrentMatrices(0);
     RenderState_SetDrawFlags(0);
-    RenderState_SetAlphaTest(0, 6, 0x80);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
     RenderState_Flush();
     aColour[0] = 0.0f;
     aColour[1] = 0.0f;
@@ -264,7 +264,7 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     int         j;
     int         k;
 
-    pOldCamera = Camera_GetCurrent();
+    pOldCamera = RC_spGetCurrentRenderCtx();
     RC_vSetCurrentRenderCtx(p->pCamera);
     fMinX = 1000000.0f;
     fMaxX = -1000000.0f;
@@ -361,14 +361,14 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     fn_800BADF8(aView, aLight, aMtx, 4);
     fn_800B3484(Camera_GetCurrentLens(), aMtx);
     RC_UpdateCurrentScreenMatrices();
-    RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
+    RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
     RenderState_SetRenderSurface(0, p->nWidth, p->nHeight, 0, 4, 1);
-    RenderState_SetViewport(Camera_GetCurrent());
+    RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderState_SetCameraMatrices();
     RenderState_SetDrawFlags(0);
-    RenderState_SetDepthWrite(0);
-    RenderState_SetAlphaTest(0, 6, 0x80);
-    RenderState_SetDepthFunc(7);
+    DS_vEnableZBufferUpdate(0);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetZBufferMode(7);
     fn_800760B0(0, 0, p->nWidth, p->nHeight);
     fn_800B281C();
     fn_800760B0(1, 1, p->nWidth - 1, p->nHeight - 1);
@@ -377,13 +377,13 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     fn_800358E0(pChar, 2);
     fn_800B2470();
     fn_80016B54(0x200, 0x1C0, 1.0f, 1.0f);
-    RenderState_SetDepthWrite(1);
-    RenderState_SetAlphaTest(1, 6, 0x80);
-    RenderState_SetDepthFunc(3);
+    DS_vEnableZBufferUpdate(1);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vSetZBufferMode(3);
     RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
     fn_800760B0(0, 0, 0x200, 0x1C0);
     RC_vSetCurrentRenderCtx(pOldCamera);
-    RenderState_SetViewport(Camera_GetCurrent());
+    RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderState_Flush();
 }
 
@@ -424,14 +424,14 @@ void fn_800B2DB0(f32* pCentre, f32 (*pQuad)[4], f32 fHalfX, f32 fHalfZ) {
     }
     RC_vSetCurrentRenderCtxTransformationMatrix(lbl_80281EE0->mC0);
     RC_UpdateCurrentScreenMatrices();
-    RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
+    RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
     RenderState_SetDrawFlags(0x70);
     fn_8002A608(&p->tex);
     RenderState_SetCameraMatrices();
     RenderState_SetClipMode(0);
-    RenderState_SetAlphaTest(0, 6, 0x80);
-    RenderState_SetDepthFunc(7);
-    RenderState_SetDepthWrite(0);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetZBufferMode(7);
+    DS_vEnableZBufferUpdate(0);
     RenderState_SetBlendFactors(4, 5);
     RenderState_Flush();
     desc.n0 = 4;
@@ -443,9 +443,9 @@ void fn_800B2DB0(f32* pCentre, f32 (*pQuad)[4], f32 fHalfX, f32 fHalfZ) {
     desc.pUV = aUV[0];
     fn_80036100((ShaderObject*)p->aMesh[0], &desc, 1);
     fn_800360D4(p->aMesh[0]);
-    RenderState_SetAlphaTest(1, 6, 0x80);
-    RenderState_SetDepthFunc(6);
-    RenderState_SetDepthWrite(1);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vSetZBufferMode(6);
+    DS_vEnableZBufferUpdate(1);
 }
 
 // Draw the golfer's shadow texture onto the ground: a square 2*f424 by 2*f428 around v414. When
@@ -519,13 +519,13 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     nList = fn_800CB950(pCourse, aQuad[0], aQuad[1], aQuad[2], aQuad[3], aList, 0x200, 0x60);
     RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
     fn_80035294();
-    RenderState_SetViewport(Camera_GetCurrent());
+    RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderState_SetDrawFlags(0x70);
     RenderState_SetCameraMatrices();
     RenderState_SetClipMode(0);
-    RenderState_SetDepthFunc(3);
+    DS_vSetZBufferMode(3);
     RenderState_SetBlendFactors(4, 5);
-    RenderState_SetAlphaTest(0, 6, 0x80);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
     RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
     fn_8002A608(&p->tex);
     RenderState_Flush();
@@ -579,8 +579,8 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     desc.pUV = lbl_80282168;
     fn_80036100((ShaderObject*)p->aMesh[nView], &desc, 1);
     fn_800360D4(p->aMesh[nView]);
-    RenderState_SetDepthFunc(3);
-    RenderState_SetAlphaTest(1, 6, 0x80);
+    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
     RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 1, 1);
     RenderState_Flush();
 }

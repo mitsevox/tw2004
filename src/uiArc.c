@@ -123,7 +123,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     } else {
         RenderState_SetDrawFlags(0x40);
     }
-    RenderState_SetViewport(Camera_GetCurrent());
+    RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     fInnerX = fInnerY = 0.0f;
     vScale[0] = (1.0f / 511.0f) * pColour->w40.a[0];
     vScale[1] = (1.0f / 511.0f) * pColour->w40.a[1];
@@ -300,7 +300,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
             aOut[j].y *= fProj;
             aOut[j].z = fZ;
         }
-        RenderState_SetDepthFunc(7);
+        DS_vSetZBufferMode(7);
         RenderState_Flush();
         if (aColour[0][3] != 0.0f || aColour[1][3] != 0.0f || aColour[2][3] != 0.0f
             || aColour[3][3] != 0.0f) {

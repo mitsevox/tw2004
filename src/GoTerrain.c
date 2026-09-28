@@ -255,9 +255,9 @@ void fn_80030818(void) {
 
 void fn_8003084C(void) {
     RenderState_SetConstantAlphaOn(0);
-    RenderState_SetAlphaTest(1, 6, 128);
-    RenderState_SetDepthFunc(3);
-    RenderState_SetDepthWrite(1);
+    DS_vSetAlphaTestMode(1, 6, 128);
+    DS_vSetZBufferMode(3);
+    DS_vEnableZBufferUpdate(1);
     RenderState_Flush();
 }
 
@@ -273,13 +273,13 @@ void fn_80030894(void) {
     RenderState_SetCameraMatrices();
     RenderState_SetCameraMatrices();
     RenderState_SetBlendFactors(4, 5);
-    RenderState_SetAlphaTest(1, 6, 1);
-    RenderState_SetDepthFunc(3);
+    DS_vSetAlphaTestMode(1, 6, 1);
+    DS_vSetZBufferMode(3);
     LF_vSetCurrentLightFogEnvironment(2);
     fn_80035308();
     fn_800352E4();
     RenderState_SetDrawFlags(0x70);
-    RenderState_SetViewport(Camera_GetCurrent());
+    RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderState_Flush();
     for (i = 0; i < 4; i++) {
         // fake match: the original's 1591.2 is one bit above the literal 1591.2f, as a folded float
@@ -367,7 +367,7 @@ void fn_80030A40(void* pHoleData, int nView) {
     fn_80032518(2);
     fn_80032954();
     RenderState_SetBlendFactors(4, 5);
-    RenderState_SetAlphaTest(1, 6, 0x80);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
     RenderState_SetDrawFlags(0x70);
     RenderState_Flush();
 }
@@ -386,7 +386,7 @@ void fn_80030CC8(void* pHoleData) {
     s32 eClipMethod;
     s32 nFirstObject = 0;
     u32 uPinBit = 1 << Game_CurrentPinSet();
-    void* pCamera = Camera_GetCurrent();
+    void* pCamera = RC_spGetCurrentRenderCtx();
     s32 uFlags;
     f32 fRadius;
     f32 fDist;
@@ -634,7 +634,7 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
                 eClipMethod = 2;
             } else {
                 pView = ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext);
-                eClipMethod = fn_80007B2C(pLOD0, Camera_GetCurrent(), Math_Sqrt(fDistanceSquared),
+                eClipMethod = fn_80007B2C(pLOD0, RC_spGetCurrentRenderCtx(), Math_Sqrt(fDistanceSquared),
                                           lbl_801D3CB0.fCameraMinHalfFieldOfViewTan, pView->f54);
             }
             if (eClipMethod != 3) {
@@ -1021,7 +1021,7 @@ void fn_80032518(int nRenderPass) {
         }
         RenderState_Flush();
         RenderState_SetDrawFlags(0x70);
-        RenderState_SetAlphaTest(0, 6, 1);
+        DS_vSetAlphaTestMode(0, 6, 1);
         for (nList = 0; nList <= 2; nList++) {
             if (nRenderPass != 2) {
                 if (nList == 0) {
@@ -1057,7 +1057,7 @@ void fn_80032518(int nRenderPass) {
         fn_80032F88(lbl_801D3CB0.pDeferredItemsList, lbl_801D3CB0.iDeferredItems,
                     lbl_801D3CB0.eTerrainFilterMin, lbl_801D3CB0.eTerrainFilterMag);
         lbl_801D3CB0.iDeferredItems = 0;
-        RenderState_SetAlphaTest(1, 6, 1);
+        DS_vSetAlphaTestMode(1, 6, 1);
         RenderState_Flush();
         Ter_SetZWrite(1);
         RenderState_Flush();
@@ -1068,7 +1068,7 @@ void fn_80032518(int nRenderPass) {
 // the setting in lbl_802810CC (fn_80033308 compares against it).
 void Ter_SetZWrite(int n) {
     if (lbl_801D3CB0.boManageZUpdate) {
-        RenderState_SetDepthWrite(n);
+        DS_vEnableZBufferUpdate(n);
         lbl_802810CC = n;
     }
 }
@@ -1130,7 +1130,7 @@ void fn_80032770(void) {
                 }
             }
         }
-        RenderState_SetAlphaTest(1, 6, 1);
+        DS_vSetAlphaTestMode(1, 6, 1);
         RenderState_Flush();
         Ter_SetZWrite(1);
         RenderState_Flush();
@@ -1144,7 +1144,7 @@ void fn_80032954(void) {
         fn_80032F88(lbl_801D3CB0.pTranslucentObjectList, lbl_801D3CB0.iTranslucentObjects,
                     lbl_801D3CB0.eObjectFilterMin, lbl_801D3CB0.eObjectFilterMag);
     }
-    RenderState_SetAlphaTest(1, 6, 128);
+    DS_vSetAlphaTestMode(1, 6, 128);
     RenderState_Flush();
 }
 
@@ -1196,7 +1196,7 @@ void fn_80032AEC(void) {
     Ter_SetZWrite(1);
     RenderState_SetConstantAlphaOn(0);
     fn_8003084C();
-    RenderState_SetAlphaTest(1, 6, 128);
+    DS_vSetAlphaTestMode(1, 6, 128);
     RenderState_Flush();
 }
 
@@ -1258,7 +1258,7 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
     uFlags2 = Ter_GetMeshFlags(pGround, 2);
     pMesh = Ter_GetMeshChild(pGround, 0);
     if ((n20 & uPinBit) && !(n20 & uOtherPins)) {
-        RenderState_SetAlphaTest(1, 6, 1);
+        DS_vSetAlphaTestMode(1, 6, 1);
         RenderState_Flush();
         bPinSet = 1;
     }
@@ -1294,10 +1294,10 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
             mRaise[3][1] = 0.005f;
             RC_vSetCurrentRenderCtxTransformationMatrix(mRaise);
             RenderState_SetCameraMatrices();
-            RenderState_SetDepthWrite(0);
+            DS_vEnableZBufferUpdate(0);
             RenderState_Flush();
             fn_80035514((u8*)pMesh);
-            RenderState_SetDepthWrite(1);
+            DS_vEnableZBufferUpdate(1);
             RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
             RenderState_SetCameraMatrices();
             RenderState_Flush();
@@ -1305,7 +1305,7 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
         Ter_GetMeshNext(pMesh);
     }
     if (bPinSet) {
-        RenderState_SetAlphaTest(0, 6, 1);
+        DS_vSetAlphaTestMode(0, 6, 1);
         RenderState_Flush();
     }
 }
@@ -1448,14 +1448,14 @@ u8 fn_80033308(Ter_ObjectDrawData* pDraw, u8 bForce) {
     }
     if (fAlpha != lbl_802810C8 || (s8)bZWrite != lbl_802810CC || bForce) {
         if (1.0f == fAlpha) {
-            RenderState_SetAlphaTest(1, 6, nRef);
+            DS_vSetAlphaTestMode(1, 6, nRef);
             fn_80035170(0x40, ((uFlags & 0x40) ? 0x40 : 0)
                                   | (((uFlags & 0x10) ? 0x10 : 0) | ((uFlags & 0x20) ? 0x20 : 0)));
             Ter_SetZWrite(bZWrite);
             RenderState_SetConstantAlphaOn(0);
             RenderState_SetBlendFactors(4, 5);
         } else {
-            RenderState_SetAlphaTest(1, 6, fAlpha * nRef);
+            DS_vSetAlphaTestMode(1, 6, fAlpha * nRef);
             Ter_SetZWrite(1);
             RenderState_SetConstantAlphaOn(1);
             RenderState_SetConstantAlpha(255.0f * (0.5f * fAlpha));
@@ -1833,7 +1833,8 @@ void fn_80033F94(void* pHoleData, u32 nList) {
                 uFlags = Ter_GetMeshFlags(pMesh, 2);
                 if (!gSession.nSplitScreen || !(uFlags & 8)) {
                     pView = ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext);
-                    nClip = fn_80007B2C(pMesh, Camera_GetCurrent(), 0.0f, lbl_801D3CB0.fCameraMinHalfFieldOfViewTan,
+                    nClip = fn_80007B2C(pMesh, RC_spGetCurrentRenderCtx(), 0.0f,
+                                        lbl_801D3CB0.fCameraMinHalfFieldOfViewTan,
                                         pView->f54);
                     if (nClip != 3) {
                         // fake match: uFlags is reused for bUseFog (fog unless flag 0x20); a new local
@@ -2119,7 +2120,7 @@ void fn_80034AE4(void) {
     RenderState_SetCameraMatrices();
     RenderState_SetCameraMatrices();
     RenderState_SetBlendFactors(4, 5);
-    RenderState_SetAlphaTest(1, 6, 1);
+    DS_vSetAlphaTestMode(1, 6, 1);
     RenderState_SetDrawFlags(0x70);
     RenderState_Flush();
     lbl_801D3CB0.xCameraReferencePos[0] = pLens->m4[3][0];
@@ -2188,7 +2189,7 @@ void fn_80034CAC(int nRenderPass) {
             }
         }
     }
-    RenderState_SetAlphaTest(1, 6, 1);
+    DS_vSetAlphaTestMode(1, 6, 1);
     RenderState_Flush();
     Ter_SetZWrite(1);
     RenderState_Flush();
@@ -2226,7 +2227,7 @@ void fn_80034DE4(void) {
             }
         }
     }
-    RenderState_SetAlphaTest(1, 6, 1);
+    DS_vSetAlphaTestMode(1, 6, 1);
     RenderState_Flush();
     Ter_SetZWrite(1);
     RenderState_Flush();
@@ -2247,7 +2248,7 @@ void fn_80034F28(void* pUnused) {
     s32 nClip;
 
     // pUnused: the one caller, fn_80034AE4, passes the hole data, which this function does not read
-    pCamera = Camera_GetCurrent();
+    pCamera = RC_spGetCurrentRenderCtx();
     lbl_801D3CB0.iNumGrassPatches = 0;
     pGrass = lbl_801D3CB0.xpGrassPatchList;
     for (i = 0; i < lbl_801D3CB0.iTotalPatches; i++) {
@@ -2362,7 +2363,7 @@ void RC_vSetCurrentRenderCtxTransformationMatrix(f32 (*pMtx)[4]) {
 }
 
 f32* fn_8003526C(void) {
-    return fn_80012EF0(*(void**)lbl_80280DF0);
+    return RC_spGetRenderCtxViewport(*(void**)lbl_80280DF0);
 }
 
 void fn_80035294(void) {
@@ -2420,7 +2421,7 @@ void fn_800355E0(s32 arg0);
 void fn_80035600(void);
 
 void fn_8003541C(void) {
-    Camera_GetCurrent();
+    RC_spGetCurrentRenderCtx();
     fn_8006F154();
 }
 

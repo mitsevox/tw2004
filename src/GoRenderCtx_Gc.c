@@ -87,7 +87,7 @@ void fn_800137D0(Camera* pCamera) {
 }
 
 // Draws a rectangle over the whole screen in pColour (r, g, b, a; NULL: the default grey), depth
-// test off. uFlags bit 0: keep RenderState_SetDepthWrite's setting; bit 1: pass 1 instead of 2 to the first
+// test off. uFlags bit 0: keep DS_vEnableZBufferUpdate's setting; bit 1: pass 1 instead of 2 to the first
 // RenderState_SetRenderSurface (colour and alpha written instead of neither).
 void fn_80013808(f32* pColour, u32 uFlags) {
     f32 aXY[8];
@@ -95,24 +95,24 @@ void fn_80013808(f32* pColour, u32 uFlags) {
     RenderView_SetUseCurrentMatrices(0);
     RenderState_SetDrawFlags(0);
     if (!(uFlags & 1)) {
-        RenderState_SetDepthWrite(0);
+        DS_vEnableZBufferUpdate(0);
     }
     if (!(uFlags & 2)) {
         RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 2, 1);
     } else {
         RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 1, 1);
     }
-    RenderState_SetAlphaTest(0, 6, 0x80);
-    RenderState_SetDepthFunc(7);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetZBufferMode(7);
     RenderState_Flush();
     RenderView_MakeQuad(aXY, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
     aXY[2] = 0.0f;
     aXY[6] = 0.0f;
     RenderView_SetColor(pColour);
     RenderView_DrawPrimitive(0xA1, aXY, NULL, NULL, 2);
-    RenderState_SetAlphaTest(0, 6, 0x80);
-    RenderState_SetDepthFunc(3);
-    RenderState_SetDepthWrite(1);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetZBufferMode(3);
+    DS_vEnableZBufferUpdate(1);
     RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
     RenderState_Flush();
 }
@@ -136,11 +136,11 @@ void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
     pCamera->f228 = 1.0f / pCamera->f224;
     fn_8001415C(pBuf);
     fn_8001416C(pBuf);
-    pCamera->f1E0 = pCamera->f228 * (fn_80012ED8(pRect) * fn_8001416C(pBuf) * 0.5f);
+    pCamera->f1E0 = pCamera->f228 * (VM_fGetViewportWidth(pRect) * fn_8001416C(pBuf) * 0.5f);
     pCamera->n22C = 0;
     pCamera->f230 = -(logf(pCamera->f1E0 * (1.0f / 554.256f)) * 1.442695f);
-    pCamera->f1E4 = fn_80012EE8(pRect) + fn_80012ED8(pRect) * 0.5f;
-    pCamera->f1E8 = 1.0f - (fn_80012EE0(pRect) + fn_80012ED0(pRect) * 0.5f);
+    pCamera->f1E4 = VM_fGetViewportLeft(pRect) + VM_fGetViewportWidth(pRect) * 0.5f;
+    pCamera->f1E8 = 1.0f - (VM_fGetViewportTop(pRect) + VM_fGetViewportHeight(pRect) * 0.5f);
     pCamera->unk1F4 = pCamera->f1E0 * (fn_80014270((u8*)pLens) / 554.256f);
     pCamera->unk1F8 = fn_80014268((u8*)pLens);
     pCamera->f1FC = pCamera->f224 * fn_80014154((u8*)pRect) * fn_8001418C((u8*)pBuf);
@@ -202,7 +202,7 @@ void RC_vUpdateRenderCtxTransformationMatrices(void* pCamera) {
 void fn_80013D58(Camera* pCamera) {
 }
 
-// Makes pCamera the current render camera (the one Camera_GetCurrent returns).
+// Makes pCamera the current render camera (the one RC_spGetCurrentRenderCtx returns).
 void RC_vSetCurrentRenderCtx(s32 v) {
     *(s32*)(lbl_80280DF0 + 0x0) = v;
 }
@@ -267,19 +267,19 @@ void RenderState_SetViewport(void* pCamera) {
     f32* pRect;
     GoFrameBuf* pBuf;
 
-    pRect = fn_80012EF0(pCamera);
+    pRect = RC_spGetRenderCtxViewport(pCamera);
     pBuf = fn_80013E40(pCamera);
-    lbl_801B8980.fCC = fn_80014174(pBuf) + fn_80012EE8(pRect) * fn_8001416C(pBuf);
-    lbl_801B8980.fD0 = fn_80014164(pBuf) + fn_80012EE0(pRect) * fn_8001415C(pBuf);
-    lbl_801B8980.fD4 = fn_80012ED8(pRect) * fn_8001416C(pBuf);
-    lbl_801B8980.fD8 = fn_80012ED0(pRect) * fn_8001415C(pBuf);
+    lbl_801B8980.fCC = fn_80014174(pBuf) + VM_fGetViewportLeft(pRect) * fn_8001416C(pBuf);
+    lbl_801B8980.fD0 = fn_80014164(pBuf) + VM_fGetViewportTop(pRect) * fn_8001415C(pBuf);
+    lbl_801B8980.fD4 = VM_fGetViewportWidth(pRect) * fn_8001416C(pBuf);
+    lbl_801B8980.fD8 = VM_fGetViewportHeight(pRect) * fn_8001415C(pBuf);
     lbl_801B8980.fDC = 0.0f;
     lbl_801B8980.fE0 = 1.0f;
     lbl_801B8980.u110 |= 0x800;
-    lbl_801B8980.nBC = fn_80012EE8(pRect) * 512.0f;
-    lbl_801B8980.nC0 = (int)((fn_80012EE8(pRect) + fn_80012ED8(pRect)) * 512.0f) - 1;
-    lbl_801B8980.nC4 = fn_80012EE0(pRect) * 448.0f;
-    lbl_801B8980.nC8 = (int)((fn_80012EE0(pRect) + fn_80012ED0(pRect)) * 448.0f) - 1;
+    lbl_801B8980.nBC = VM_fGetViewportLeft(pRect) * 512.0f;
+    lbl_801B8980.nC0 = (int)((VM_fGetViewportLeft(pRect) + VM_fGetViewportWidth(pRect)) * 512.0f) - 1;
+    lbl_801B8980.nC4 = VM_fGetViewportTop(pRect) * 448.0f;
+    lbl_801B8980.nC8 = (int)((VM_fGetViewportTop(pRect) + VM_fGetViewportHeight(pRect)) * 448.0f) - 1;
     lbl_801B8980.u110 |= 0x200;
 }
 

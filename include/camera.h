@@ -601,10 +601,10 @@ extern struct Character* lbl_80281EE8[CRAP_NUM_GOLFERS];   // per golfer slot: t
 // A render camera (our name); only what the cleaned code reads.
 typedef struct RenderCamera {
     u8   unk0[0x14];
-    f32* pRect;                 // 0x14  its screen rectangle: left, top, width, height (fn_80012EF0)
+    f32* pRect;                 // 0x14  its screen rectangle: left, top, width, height (RC_spGetRenderCtxViewport)
 } RenderCamera;
 
-// Points at the slot holding the current render camera (lbl_80281C90): Camera_GetCurrent reads it,
+// Points at the slot holding the current render camera (lbl_80281C90): RC_spGetCurrentRenderCtx reads it,
 // RC_vSetCurrentRenderCtx sets it.
 extern void** lbl_80280DF0;
 
@@ -626,12 +626,12 @@ void   fn_800170C4(int nView, u8 b);    // sets ViewController.b274
 f32*   CameraController_GetPosition(View* pView);        // the camera's position (v0)
 f32*   CameraController_GetTarget(View* pView);        // where it looks (v10), or a script shot's angles
 u8     fn_800172C4(View* pView);        // 0: the script's shot aims by angles (fn_80016E90)
-f32*   fn_80012EF0(void* pCamera);      // a render camera's screen rectangle
-f32    fn_80012ED0(f32* pRect);         // the rectangle's [3]: its height
-f32    fn_80012ED8(f32* pRect);         // [2]: its width
-f32    fn_80012EE0(f32* pRect);         // [1]: its top
-f32    fn_80012EE8(f32* pRect);         // [0]: its left
-void*  Camera_GetCurrent(void);               // the current render camera
+f32*   RC_spGetRenderCtxViewport(void* pCamera);      // a render camera's screen rectangle
+f32    VM_fGetViewportHeight(f32* pRect);         // the rectangle's [3]: its height
+f32    VM_fGetViewportWidth(f32* pRect);         // [2]: its width
+f32    VM_fGetViewportTop(f32* pRect);         // [1]: its top
+f32    VM_fGetViewportLeft(f32* pRect);         // [0]: its left
+void*  RC_spGetCurrentRenderCtx(void);               // the current render camera
 void   RC_vUpdateRenderCtxTransformationMatrices(void* pCamera);
 void   RenderState_SetViewport(void* pCamera);
 void   RenderState_SetCameraMatrices(void);

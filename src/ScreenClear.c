@@ -65,8 +65,8 @@ void fn_800BA74C(u8 bFade) {
         RenderState_SetBlendFactors(4, 5);
         RenderView_SetUseCurrentMatrices(0);
         RenderState_SetDrawFlags(64);
-        RenderState_SetAlphaTest(0, 6, 0x80);
-        RenderState_SetDepthFunc(7);
+        DS_vSetAlphaTestMode(0, 6, 0x80);
+        DS_vSetZBufferMode(7);
         RenderState_Flush();
         RenderView_DrawPrimitive(0xA1, xy, 0, NULL, 2);
         fn_80013400();
@@ -81,8 +81,8 @@ void fn_800BA74C(u8 bFade) {
             fn_80007260();
         }
     }
-    RenderState_SetAlphaTest(0, 6, 0x80);
-    RenderState_SetDepthFunc(3);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetZBufferMode(3);
     RenderState_Flush();
     fn_800083A0();
     fn_80008380();

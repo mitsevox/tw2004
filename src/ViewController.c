@@ -83,7 +83,7 @@ void fn_80016E3C(int nView) {
 
     pCtrl = ViewController_Get(nView);
     CA_vReleaseCamera(Camera_GetLens(pCtrl->pCamera));
-    VM_vReleaseViewport(fn_80012EF0(pCtrl->pCamera));
+    VM_vReleaseViewport(RC_spGetRenderCtxViewport(pCtrl->pCamera));
     RC_vReleaseRenderCtx(pCtrl->pCamera);
     pCtrl->b274 = 0;
 }
@@ -146,7 +146,7 @@ void fn_800170F4(int nView) {
     f32* pRect;
 
     pCtrl = ViewController_Get(nView);
-    pRect = fn_80012EF0(ViewController_GetCamera(nView));
+    pRect = RC_spGetRenderCtxViewport(ViewController_GetCamera(nView));
     pCtrl->f284 = pRect[0];
     pCtrl->f280 = pRect[1];
     pCtrl->f27C = pRect[2];
@@ -157,7 +157,8 @@ void fn_80017158(int nView) {
     ViewController* pCtrl;
 
     pCtrl = ViewController_Get(nView);
-    fn_800171D8(fn_80012EF0(ViewController_GetCamera(nView)), pCtrl->f284, pCtrl->f280, pCtrl->f27C,
+    fn_800171D8(RC_spGetRenderCtxViewport(ViewController_GetCamera(nView)), pCtrl->f284, pCtrl->f280,
+                pCtrl->f27C,
                 pCtrl->f278);
 }
 

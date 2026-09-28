@@ -1769,7 +1769,8 @@ void STATEFUNC_InitialFlyByInit(int nPlayer) {
                             (f32*)&vOffset);
     GolfCamera_SetCameraMatrixMode(0);
     fn_800170F4(gPlayers[nPlayer].nView[0]);
-    fn_800171D8(fn_80012EF0(ViewController_GetCamera(gPlayers[nPlayer].nView[0])), 0.0f, 0.0f, 1.0f, 1.0f);
+    fn_800171D8(RC_spGetRenderCtxViewport(ViewController_GetCamera(gPlayers[nPlayer].nView[0])), 0.0f, 0.0f,
+                1.0f, 1.0f);
     for (i = 0; i < gNumPlayersSetUp; i++) {
         for (k = 0; k < 2; k++) {
             if (gPlayers[i].nView[k] != gPlayers[nPlayer].nView[0]) {

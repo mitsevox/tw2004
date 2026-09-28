@@ -161,7 +161,7 @@ void fn_800922A8(UIText* pText) {
     if (aColor[3] > 0.5f) {
         aColor[3] = 0.5f;
     }
-    RenderState_SetViewport(Camera_GetCurrent());
+    RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     fn_8006A9AC(aColor);
     fn_80012CB4_SetWordWrapBox(fX, fY, fW, fH);
     if (pText->nFlags & 1) {

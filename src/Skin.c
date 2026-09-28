@@ -370,15 +370,16 @@ void fn_80035E98(int nView) {
 // ---- sweep code (tidied) ----
 
 void fn_80035F1C(void) {
-    fn_80035F40(Camera_GetCurrent());
+    fn_80035F40(RC_spGetCurrentRenderCtx());
 }
 
 // Hands the camera's screen rectangle on to fn_80016978.
 void fn_80035F40(void* pCamera) {
     f32* pRect;
 
-    pRect = fn_80012EF0(pCamera);
-    fn_80016978(fn_80012EE8(pRect), fn_80012EE0(pRect), fn_80012ED8(pRect), fn_80012ED0(pRect));
+    pRect = RC_spGetRenderCtxViewport(pCamera);
+    fn_80016978(VM_fGetViewportLeft(pRect), VM_fGetViewportTop(pRect), VM_fGetViewportWidth(pRect),
+                VM_fGetViewportHeight(pRect));
 }
 
 void fn_80035FBC(void) {

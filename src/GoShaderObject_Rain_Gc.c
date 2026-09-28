@@ -158,19 +158,19 @@ void fn_800B4FA4(RainObject* pRain) {
     int nAlpha;
     RainPoint* pPoint;
 
-    pCamera = Camera_GetCurrent();
+    pCamera = RC_spGetCurrentRenderCtx();
     pData = &pRain->data;
     nBuf = lbl_802814B8->n0;
     nHalf = lbl_802814B8->n4;
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetDrawFlags(0x40);
-    RenderState_SetAlphaTest(0, 7, 0);
-    RenderState_SetDepthFunc(3);
+    DS_vSetAlphaTestMode(0, 7, 0);
+    DS_vSetZBufferMode(3);
     fn_8005CC64(NULL, NULL);
     RenderState_Flush();
     Mtx_Copy(pCamera->viewMtx, mView);
     mView[3][0] = mView[3][1] = mView[3][2] = 0.0f;
-    Mtx_Copy(((Camera*)Camera_GetCurrent())->m15C, mPos);
+    Mtx_Copy(((Camera*)RC_spGetCurrentRenderCtx())->m15C, mPos);
     fn_800B58FC(mPos[0], mPos[0]);
     fn_800B58FC(mPos[2], mPos[2]);
     for (i = 0; i < 3; i++) {
@@ -198,7 +198,7 @@ void fn_800B4FA4(RainObject* pRain) {
     RenderState_SetDrawFlags(0x50);
     fn_8005CC64(lbl_802814B8->pBank, lbl_802814B8->pTex);
     RenderState_Flush();
-    Mtx_Copy(((Camera*)Camera_GetCurrent())->m15C, mPos);
+    Mtx_Copy(((Camera*)RC_spGetCurrentRenderCtx())->m15C, mPos);
     fn_800B58FC(mPos[0], mPos[0]);
     fn_800B58FC(mPos[2], mPos[2]);
     GXLoadPosMtxImm(mPos, 0);
@@ -249,7 +249,7 @@ void fn_800B52D4(RainObject* pRain, f32* pTime) {
     f32 fFade;
     f32 fSize;
 
-    pCamera = Camera_GetCurrent();
+    pCamera = RC_spGetCurrentRenderCtx();
     pLens = Camera_GetCurrentLens();
     pData = &pRain->data;
     nBuf = lbl_802814B8->n0;

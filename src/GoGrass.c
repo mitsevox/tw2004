@@ -380,26 +380,26 @@ void fn_8011EC84(void) {
     s32 nOld;
     void* pCamera;
 
-    pCamera = Camera_GetCurrent();
+    pCamera = RC_spGetCurrentRenderCtx();
     RC_vSetCurrentRenderCtx(lbl_80281900->pCamera);
-    RenderState_SetDepthWrite(0);
-    RenderState_SetDepthFunc(7);
-    RenderState_SetAlphaTest(0, 6, 128);
+    DS_vEnableZBufferUpdate(0);
+    DS_vSetZBufferMode(7);
+    DS_vSetAlphaTestMode(0, 6, 128);
     RenderState_SetRenderSurface(1, 256, 256, 0, 1, 1);
     fn_800760B0(0, 0, 256, 256);
     fn_80016B54(256, 256, 1.0f, 1.0f);
     fn_80035F1C();
     fn_80016948();
     RC_UpdateCurrentScreenMatrices();
-    RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
-    RenderState_SetViewport(Camera_GetCurrent());
+    RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
+    RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderState_SetCameraMatrices();
     RenderState_Flush();
     RenderView_SetUseCurrentMatrices(0);
     RenderState_SetDrawFlags(0);
     RenderView_SetColor(lbl_801945B8);
-    RenderState_SetDepthWrite(0);
-    RenderState_SetAlphaTest(0, 6, 128);
+    DS_vEnableZBufferUpdate(0);
+    DS_vSetAlphaTestMode(0, 6, 128);
     RenderState_Flush();
     RenderView_DrawPrimitive(161, lbl_801945C8, 0, lbl_801945C8, 2);
     nOld = fn_8003505C(0);
@@ -407,17 +407,17 @@ void fn_8011EC84(void) {
     fn_8003505C(nOld);
     fn_8011EC2C();
     RC_vSetCurrentRenderCtx(pCamera);
-    RenderState_SetViewport(Camera_GetCurrent());
+    RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RC_UpdateCurrentScreenMatrices();
-    RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
+    RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
     RenderState_SetCameraMatrices();
     RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
     fn_800760B0(0, 0, 512, 448);
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80035F1C();
-    RenderState_SetAlphaTest(1, 6, 128);
-    RenderState_SetDepthWrite(1);
-    RenderState_SetDepthFunc(3);
+    DS_vSetAlphaTestMode(1, 6, 128);
+    DS_vEnableZBufferUpdate(1);
+    DS_vSetZBufferMode(3);
     RenderState_Flush();
 }
 
@@ -425,8 +425,8 @@ void fn_8011EE4C(void) {
     RenderView_SetUseCurrentMatrices(0);
     RenderState_SetDrawFlags(16);
     RenderView_SetColor(lbl_801945E8);
-    RenderState_SetDepthWrite(0);
-    RenderState_SetAlphaTest(0, 6, 128);
+    DS_vEnableZBufferUpdate(0);
+    DS_vSetAlphaTestMode(0, 6, 128);
     GXLoadTexObj(&lbl_8026038C, 0);
     GXSetNumTexGens(1);
     GXSetTevOrder(0, 0, 0, 4);
@@ -435,22 +435,22 @@ void fn_8011EE4C(void) {
     GXSetTevColorOp(0, 0, 0, 1, 1, 0);
     GXSetTevAlphaIn(0, 7, 4, 5, 7);
     GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
-    RenderState_SetDepthFunc(7);
+    DS_vSetZBufferMode(7);
     RenderState_Flush();
     RenderView_DrawPrimitive(161, lbl_801945F8, 0, lbl_80194618, 2);
-    RenderState_SetDepthFunc(3);
-    RenderState_SetDepthWrite(1);
-    RenderState_SetAlphaTest(1, 6, 128);
+    DS_vSetZBufferMode(3);
+    DS_vEnableZBufferUpdate(1);
+    DS_vSetAlphaTestMode(1, 6, 128);
     RenderState_Flush();
 }
 
 void fn_8011EF88(void) {
     RC_UpdateCurrentScreenMatrices();
-    RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
+    RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
     RenderState_SetClipMode(0);
     RenderState_SetCameraMatrices();
-    RenderState_SetAlphaTest(0, 6, 128);
-    RenderState_SetDepthWrite(0);
+    DS_vSetAlphaTestMode(0, 6, 128);
+    DS_vEnableZBufferUpdate(0);
     RenderState_SetDrawFlags(80);
     RenderState_Flush();
     GrassRender_vBuildAndUploadOneTimeData();
@@ -516,8 +516,8 @@ void GrassRender_vBuildAndUploadOneTimeData(void) {
 }
 
 void fn_8011F374(void) {
-    RenderState_SetAlphaTest(1, 6, 128);
-    RenderState_SetDepthWrite(1);
+    DS_vSetAlphaTestMode(1, 6, 128);
+    DS_vEnableZBufferUpdate(1);
     RenderState_Flush();
 }
 
@@ -721,7 +721,7 @@ void fn_8011F7F8(void) {
             pSphere->x = 1.25f + ((f32)lbl_80281900->n14 + fCellX);
             pSphere->y = 0.5f * (lbl_80281900->f3B8 + (pTile->f4 + pTile->f8));
             pSphere->z = 1.25f + (2.5f * (f32)nZ + (f32)lbl_80281900->n16);
-            nCull = fn_80007CE8((RenderObj*)&lbl_80260360, Camera_GetCurrent(),
+            nCull = fn_80007CE8((RenderObj*)&lbl_80260360, RC_spGetCurrentRenderCtx(),
                                 0, ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext)->f54);
             if (nCull == 2) {
                 continue;

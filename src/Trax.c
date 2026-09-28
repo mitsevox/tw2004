@@ -92,10 +92,10 @@ void fn_800BA1A4(void) {
             pTex = fn_800922A0(pBank);
         }
         RenderState_SetBlendFactors(4, 5);
-        RenderState_SetAlphaTest(0, 6, 0x80);
-        RenderState_SetDepthFunc(7);
+        DS_vSetAlphaTestMode(0, 6, 0x80);
+        DS_vSetZBufferMode(7);
         RenderView_SetUseCurrentMatrices(0);
-        RenderState_SetDepthWrite(0);
+        DS_vEnableZBufferUpdate(0);
         if (fn_800BA080()) {
             fn_8005CC64(pBank, pTex);
             RenderState_SetDrawFlags(0x50);

@@ -304,8 +304,8 @@ void fn_800467B4(void) {
 // Draws every object (message 3), and with GM_Currently_SkillZoneMode the targets' 'TEO ' models.
 void fn_80046828(int nView) {
     RenderState_SetBlendFactors(4, 5);
-    RenderState_SetAlphaTest(1, 6, 0x80);
-    RenderState_SetDepthFunc(3);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vSetZBufferMode(3);
     LF_vSetCurrentLightFogEnvironment(1);
     fn_80035308();
     fn_800352E4();
@@ -391,8 +391,8 @@ void fn_80046B8C(int nView) {
     u8 aState[8];
 
     RenderState_SetBlendFactors(4, 5);
-    RenderState_SetAlphaTest(1, 6, 0x80);
-    RenderState_SetDepthFunc(3);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vSetZBufferMode(3);
     LF_vSetCurrentLightFogEnvironment(1);
     fn_80035308();
     fn_800352E4();
@@ -527,8 +527,8 @@ void fn_800470B0(s32 nView) {
     int i;
     int nModel;
 
-    RenderState_SetAlphaTest(0, 6, 0x80);
-    RenderState_SetDepthWrite(0);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vEnableZBufferUpdate(0);
     RenderState_Flush();
     for (i = 0; i < fn_800F1960(); i++) {
         fn_800F196C(i, vPos);
@@ -553,8 +553,8 @@ void fn_800470B0(s32 nView) {
             fn_80048894(lbl_80281DA0->apTeo10020[nModel]);
         }
     }
-    RenderState_SetAlphaTest(1, 6, 0x80);
-    RenderState_SetDepthWrite(1);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vEnableZBufferUpdate(1);
     RenderState_Flush();
 }
 
@@ -766,7 +766,7 @@ f32 fn_8004787C(int nPlayer) {
     CamLens* pLens;
     f32 fRadius;
 
-    pCamera = Camera_GetCurrent();
+    pCamera = RC_spGetCurrentRenderCtx();
     pLens = Camera_GetLens(pCamera);
     fRadius = lbl_80281DA0->pTeo10000->pModel->apLod[0]->pInfo->f64 * lbl_80281128;
     Vec_Copy(gPlayers[nPlayer].ball.vPos, &vPos.x);

@@ -110,7 +110,7 @@ void fn_800488B4(UObject* pObj) {
     // Found by an anonymous decomp.me user: https://decomp.me/scratch/SOh7Q
     pN108 = &pObj->n108;
     fFov = Math_Tan(0.5f * fTemp);
-    nClip = fn_80007B2C(pMesh, Camera_GetCurrent(), 0.0f, fFov, 1.0f);
+    nClip = fn_80007B2C(pMesh, RC_spGetCurrentRenderCtx(), 0.0f, fFov, 1.0f);
     if (nClip == 3) return;
     nFlags0 = fn_80048AD4(pMesh, 0);
     nFlags2 = fn_80048AD4(pMesh, 2);

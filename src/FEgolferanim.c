@@ -885,20 +885,20 @@ void fn_8008C93C(void) {
     f32 xy[8] = { 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
     f32 colour[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-    RenderState_SetAlphaTest(0, 6, 0x80);
-    RenderState_SetDepthFunc(7);
-    RenderState_SetDepthWrite(1);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetZBufferMode(7);
+    DS_vEnableZBufferUpdate(1);
     RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 1, 1);
-    RenderState_SetViewport(Camera_GetCurrent());
+    RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderView_SetUseCurrentMatrices(0);
     RenderView_SetColor(colour);
     RenderState_SetDrawFlags(0);
     RenderState_Flush();
     RenderView_DrawPrimitive(0xA1, xy, 0, NULL, 2);
-    RenderState_SetDepthFunc(3);
-    RenderState_SetDepthWrite(1);
+    DS_vSetZBufferMode(3);
+    DS_vEnableZBufferUpdate(1);
     RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
-    RenderState_SetViewport(Camera_GetCurrent());
+    RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderState_Flush();
 }
 
@@ -908,12 +908,12 @@ void fn_8008CA88(void) {
     f32 colour[4] = { 0.5f, 0.5f, 0.5f, 0.5f };
     f32 uv[8] = { 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
 
-    RenderState_SetAlphaTest(0, 6, 0x80);
-    RenderState_SetDepthFunc(7);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetZBufferMode(7);
     RenderState_SetConstantAlphaOn(0);
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
-    RenderState_SetViewport(Camera_GetCurrent());
+    RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderState_SetDrawFlags(0x50);
     RenderView_SetUseCurrentMatrices(0);
     colour[3] = lbl_80281EE0->f14C;
@@ -934,26 +934,26 @@ void fn_8008CC30(void) {
     f32 colour1[4] = { 0.0f, 0.0f, 0.0f, 0.5f };
     f32 colour2[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-    RenderState_SetAlphaTest(0, 6, 0x80);
-    RenderState_SetDepthFunc(7);
-    RenderState_SetDepthWrite(0);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetZBufferMode(7);
+    DS_vEnableZBufferUpdate(0);
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetConstantAlphaOn(0);
     RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 4, 1);
-    RenderState_SetViewport(Camera_GetCurrent());
+    RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderView_SetUseCurrentMatrices(0);
     RenderView_SetColor(colour1);
     RenderState_SetDrawFlags(0);
     RenderState_Flush();
     RenderView_DrawPrimitive(0xA1, xy1, 0, NULL, 2);
     RenderView_SetColor(colour2);
-    RenderState_SetDepthFunc(3);
+    DS_vSetZBufferMode(3);
     RenderState_Flush();
     RenderView_DrawPrimitive(0xA1, xy2, 0, NULL, 2);
-    RenderState_SetDepthFunc(3);
-    RenderState_SetDepthWrite(1);
+    DS_vSetZBufferMode(3);
+    DS_vEnableZBufferUpdate(1);
     RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
-    RenderState_SetViewport(Camera_GetCurrent());
+    RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderState_Flush();
 }
 
@@ -977,19 +977,19 @@ void fn_8008CE88(u8 bFull) {
         fn_80035FDC(NULL);
         RC_vSetCurrentRenderCtxTransformationMatrix(lbl_80281EE0->mC0);
         RC_UpdateCurrentScreenMatrices();
-        RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
+        RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
         RenderState_SetCameraMatrices();
         RenderState_SetClipMode(1);
-        RenderState_SetAlphaTest(1, 6, 1);
+        DS_vSetAlphaTestMode(1, 6, 1);
         if (bFull) {
             RenderState_SetRenderSurface(1, 384, 528, 0, 1, 1);
         } else {
             RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 1, 1);
         }
-        RenderState_SetViewport(Camera_GetCurrent());
+        RenderState_SetViewport(RC_spGetCurrentRenderCtx());
         RenderState_Flush();
-        RenderState_SetDepthWrite(1);
-        RenderState_SetDepthFunc(3);
+        DS_vEnableZBufferUpdate(1);
+        DS_vSetZBufferMode(3);
         RenderState_Flush();
         if (lbl_80281EE0->n0 == 3) {
             fn_800760B0(0, 0, 512, 448.0f * lbl_80281348);
@@ -1002,7 +1002,7 @@ void fn_8008CE88(u8 bFull) {
         }
         fn_80035FBC();
         RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
-        RenderState_SetViewport(Camera_GetCurrent());
+        RenderState_SetViewport(RC_spGetCurrentRenderCtx());
         RenderState_Flush();
     }
     if (lbl_80281EE0->pB4->b18 && lbl_80281EE0->b86 == 0) {

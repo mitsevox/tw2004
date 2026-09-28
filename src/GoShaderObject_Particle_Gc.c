@@ -269,9 +269,9 @@ void fn_800949D0(SD_SShaderObject_Static* pObject) {
     nLive = pSys->anLive[nBuf];
     nStart = pSys->anStart[nBuf];
     if (nLive != 0) {
-        RenderState_SetAlphaTest(0, 6, 0x80);
-        RenderState_SetDepthFunc(3);
-        RenderState_SetDepthWrite(0);
+        DS_vSetAlphaTestMode(0, 6, 0x80);
+        DS_vSetZBufferMode(3);
+        DS_vEnableZBufferUpdate(0);
         RenderState_SetDrawFlags(0x70);
         fn_8005CC64(pSys->pBank, pSys->pTex);
         if (pSys->u18 & 0x80) {
@@ -283,7 +283,7 @@ void fn_800949D0(SD_SShaderObject_Static* pObject) {
         }
         RenderState_SetClipMode(0);
         RenderState_Flush();
-        pCamera = Camera_GetCurrent();
+        pCamera = RC_spGetCurrentRenderCtx();
         GXClearVtxDesc();
         GXSetVtxDesc(9, 1);                     // position, colour, texture coordinates: direct
         GXSetVtxDesc(11, 1);
@@ -305,8 +305,8 @@ void fn_800949D0(SD_SShaderObject_Static* pObject) {
             pAges = (f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst;
             fn_80094534(pCamera->viewMtx, &pSys->shape, pVerts, pAges, nLive - n);
         }
-        RenderState_SetDepthWrite(1);
-        RenderState_SetAlphaTest(1, 6, 0x80);
+        DS_vEnableZBufferUpdate(1);
+        DS_vSetAlphaTestMode(1, 6, 0x80);
         RenderState_Flush();
     }
 }

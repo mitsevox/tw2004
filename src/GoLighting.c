@@ -251,7 +251,7 @@ void fn_8006E7A4(LightGroup* pGroup) {
 // channel 4, then each point light, turned into pObj's space and through the camera's view,
 // placed 999999 times as far out with x and z negated, and lit on channel 0.
 void fn_8006EADC(UObject* pObj) {
-    Camera* pCamera = Camera_GetCurrent();
+    Camera* pCamera = RC_spGetCurrentRenderCtx();
     GXColor colour;
     f32 vPos[4];
     f32 mInv[4][4];

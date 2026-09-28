@@ -88,18 +88,18 @@ int fn_80049820(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
         // flag 0x200: not while the flagstick is out
         if (pObj->obj.pModel != NULL &&(!(pObj->uFlags & 0x200) || !fn_80016CF4()->bFlagOut)) {
             if (pObj->uFlags & 0x400) {
-                RenderState_SetDepthWrite(0);
+                DS_vEnableZBufferUpdate(0);
             }
             if (pObj->uFlags & 0x800) {
-                RenderState_SetAlphaTest(0, 6, 0x80);
+                DS_vSetAlphaTestMode(0, 6, 0x80);
             }
             fn_80048894(&pObj->obj);
             if (pObj->uFlags & 0x400) {
-                RenderState_SetDepthWrite(1);
+                DS_vEnableZBufferUpdate(1);
                 RenderState_Flush();
             }
             if (pObj->uFlags & 0x800) {
-                RenderState_SetAlphaTest(1, 6, 0x80);
+                DS_vSetAlphaTestMode(1, 6, 0x80);
             }
             if ((pObj->uFlags & 0x400) || (pObj->uFlags & 0x800)) {
                 RenderState_Flush();

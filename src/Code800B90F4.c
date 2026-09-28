@@ -461,10 +461,10 @@ void fn_800B9CF0(u8 bTarget) {
         } else {
             RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 1, 1);
         }
-        RenderState_SetViewport(Camera_GetCurrent());
+        RenderState_SetViewport(RC_spGetCurrentRenderCtx());
         RenderState_SetBlendFactors(4, 5);
-        RenderState_SetAlphaTest(0, 6, 0x80);
-        RenderState_SetDepthWrite(1);
+        DS_vSetAlphaTestMode(0, 6, 0x80);
+        DS_vEnableZBufferUpdate(1);
         RenderState_Flush();
         if (lbl_802821E0 != NULL) {
             fn_800B9BF4(lbl_802821E0, mBone, mScale, vPos);
@@ -479,7 +479,7 @@ void fn_800B9CF0(u8 bTarget) {
         }
         RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
         RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
-        RenderState_SetViewport(Camera_GetCurrent());
+        RenderState_SetViewport(RC_spGetCurrentRenderCtx());
         RenderState_Flush();
     }
 }

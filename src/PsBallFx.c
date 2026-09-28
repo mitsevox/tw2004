@@ -615,13 +615,13 @@ void fn_800A3A84(void) {
     }
     RenderState_SetDrawFlags(0x70);
     RC_UpdateCurrentScreenMatrices();
-    RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
-    RenderState_SetViewport(Camera_GetCurrent());
+    RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
+    RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RC_vSetCurrentRenderCtxTransformationMatrix(0);
     RenderState_SetCameraMatrices();
     RenderState_SetClipMode(0);
-    RenderState_SetAlphaTest(0, 6, 0x80);
-    RenderState_SetDepthFunc(3);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetZBufferMode(3);
     RenderState_SetBlendFactors(1, 1);
     RenderState_Flush();
     if (lbl_80281408->an44[0] > 2) {
@@ -653,7 +653,7 @@ void fn_800A3A84(void) {
         fn_80036100(&lbl_80281408->mesh[0], &fill, 1);
         fn_800360D4(&lbl_80281408->mesh[0]);
     }
-    RenderState_SetAlphaTest(1, 6, 0x80);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
     RenderState_Flush();
 }
 

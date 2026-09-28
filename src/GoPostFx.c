@@ -129,11 +129,11 @@ void fn_80038128(void) {
     f32 aColour[8][4];
 
     RenderView_SetUseCurrentMatrices(0);
-    RenderState_SetDepthWrite(0);
-    RenderState_SetDepthFunc(7);
+    DS_vEnableZBufferUpdate(0);
+    DS_vSetZBufferMode(7);
     RenderState_SetDrawFlags(0x40);
     RenderState_SetBlendFactors(4, 5);
-    RenderState_SetAlphaTest(0, 6, 0x80);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
     RenderState_Flush();
 
     aXY[0][0] = 0.495f;
@@ -203,9 +203,9 @@ void fn_80038128(void) {
     aColour[7][3] = 0.0f;
 
     RenderView_DrawPrimitive(0x98, aXY[0], aColour[0], NULL, 8);
-    RenderState_SetDepthWrite(1);
-    RenderState_SetDepthFunc(3);
-    RenderState_SetAlphaTest(1, 6, 0x80);
+    DS_vEnableZBufferUpdate(1);
+    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
     RenderState_Flush();
 }
 
@@ -260,24 +260,24 @@ void fn_80038438(void) {
     f32 fW;
 
     RenderView_SetUseCurrentMatrices(0);
-    RenderState_SetDepthWrite(0);
+    DS_vEnableZBufferUpdate(0);
     RenderState_SetDrawFlags(0x40);
-    RenderState_SetDepthFunc(7);
+    DS_vSetZBufferMode(7);
     RenderState_SetBlendFactors(4, 5);
-    RenderState_SetAlphaTest(0, 6, 0x80);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
     RenderState_Flush();
-    pRect = fn_80012EF0(Camera_GetCurrent());
+    pRect = RC_spGetRenderCtxViewport(RC_spGetCurrentRenderCtx());
     fX = pRect[0];
     fY = pRect[1];
     fW = pRect[2];
     fH = pRect[3];
     for (i = 0; i < 4; i++) {
         if (lbl_801D50C0[i].b0 && fn_800170A0(i)) {
-            pViewRect = fn_80012EF0(ViewController_GetCamera(i));
+            pViewRect = RC_spGetRenderCtxViewport(ViewController_GetCamera(i));
             fn_800171D8(pRect, pViewRect[0], pViewRect[1], pViewRect[2], pViewRect[3]);
             RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
-            RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
-            RenderState_SetViewport(Camera_GetCurrent());
+            RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
+            RenderState_SetViewport(RC_spGetCurrentRenderCtx());
             RenderState_SetCameraMatrices();
             RenderState_Flush();
             RenderView_MakeQuad(aXY, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
@@ -288,12 +288,12 @@ void fn_80038438(void) {
     }
     fn_800171D8(pRect, fX, fY, fW, fH);
     RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
-    RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
-    RenderState_SetViewport(Camera_GetCurrent());
+    RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
+    RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderState_SetCameraMatrices();
-    RenderState_SetDepthWrite(1);
-    RenderState_SetDepthFunc(3);
-    RenderState_SetAlphaTest(1, 6, 0x80);
+    DS_vEnableZBufferUpdate(1);
+    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
     RenderState_Flush();
 }
 
@@ -304,18 +304,18 @@ void fn_80038624(f32* pColour) {
 
     RenderView_SetUseCurrentMatrices(0);
     fn_80016948();
-    RenderState_SetDepthWrite(0);
-    RenderState_SetDepthFunc(7);
+    DS_vEnableZBufferUpdate(0);
+    DS_vSetZBufferMode(7);
     RenderState_SetDrawFlags(0x40);
     RenderState_SetBlendFactors(4, 5);
-    RenderState_SetAlphaTest(0, 6, 0x80);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
     RenderState_Flush();
     RenderView_MakeQuad(aXY, aUV, 0.0f, 0.0f, 1.0f, 1.0f);
     RenderView_SetColor(pColour);
     RenderView_DrawPrimitive(0xA1, aXY, NULL, NULL, 2);
-    RenderState_SetDepthWrite(1);
-    RenderState_SetDepthFunc(3);
-    RenderState_SetAlphaTest(1, 6, 0x80);
+    DS_vEnableZBufferUpdate(1);
+    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
     RenderState_Flush();
 }
 
@@ -343,13 +343,13 @@ void fn_80038724(int nField, int nView, f32 fAlpha, f32 fShake) {
     fY = pRect[1];
     fRight = pRect[0] + pRect[2];
     fBottom = pRect[1] + pRect[3];
-    RenderState_SetDepthWrite(0);
+    DS_vEnableZBufferUpdate(0);
     RenderState_SetDrawFlags(0x50);
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetConstantAlphaOn(1);
     RenderState_SetConstantAlpha(255.0f * fAlpha);
-    RenderState_SetAlphaTest(0, 1, 0x80);
-    RenderState_SetDepthFunc(7);
+    DS_vSetAlphaTestMode(0, 1, 0x80);
+    DS_vSetZBufferMode(7);
     fn_8002A608(nField ? &lbl_801D4FB0[0] : &lbl_801D4FB0[1]);
     RenderView_MakeQuad(aXY, NULL, fX, fY, fRight, fBottom);
     aUV[0] = aXY[0];
@@ -371,9 +371,9 @@ void fn_80038724(int nField, int nView, f32 fAlpha, f32 fShake) {
     RenderState_Flush();
     GXSetTevAlphaIn(1, 7, 7, 7, 0);
     RenderView_DrawPrimitive(0xA1, aXY, NULL, aUV, 2);
-    RenderState_SetDepthWrite(1);
-    RenderState_SetAlphaTest(1, 6, 0x80);
-    RenderState_SetDepthFunc(3);
+    DS_vEnableZBufferUpdate(1);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vSetZBufferMode(3);
     RenderState_SetConstantAlphaOn(0);
     RenderState_Flush();
 }
@@ -384,7 +384,7 @@ void fn_80038968(void) {
 
     for (i = 0; i < 4; i++) {
         if (lbl_801D5090[i].b0) {
-            fn_80038A2C(lbl_80281B88 & 1, Camera_GetCurrent());
+            fn_80038A2C(lbl_80281B88 & 1, RC_spGetCurrentRenderCtx());
             return;
         }
     }
@@ -441,15 +441,15 @@ void fn_80038A90(f32* pColour, f32 fCX, f32 fCY, u8 bCopy, int nView, int nField
     fY1 = fY0 + pRect[3];
     fCX = fCX * pRect[2] + pRect[0];
     fCY = fCY * pRect[3] + pRect[1];
-    RenderState_SetDepthWrite(0);
+    DS_vEnableZBufferUpdate(0);
     if (bCopy) {
         RenderState_SetDrawFlags(0x50);
     } else {
         RenderState_SetDrawFlags(0x40);
     }
     RenderState_SetBlendFactors(4, 5);
-    RenderState_SetAlphaTest(0, 1, 0x80);
-    RenderState_SetDepthFunc(7);
+    DS_vSetAlphaTestMode(0, 1, 0x80);
+    DS_vSetZBufferMode(7);
     fn_8002A608(&lbl_801D4F80);
     RenderView_SetUseCurrentMatrices(0);
     RenderState_Flush();
@@ -502,9 +502,9 @@ void fn_80038A90(f32* pColour, f32 fCX, f32 fCY, u8 bCopy, int nView, int nField
     aColour[17][2] = pColour[2];
     aColour[17][3] = fAlpha;
     RenderView_DrawPrimitive(0xA0, aXY[0], aColour[0], aUV[0], 18);
-    RenderState_SetDepthWrite(1);
-    RenderState_SetAlphaTest(1, 6, 0x80);
-    RenderState_SetDepthFunc(3);
+    DS_vEnableZBufferUpdate(1);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vSetZBufferMode(3);
     RenderState_Flush();
 }
 
@@ -572,10 +572,10 @@ void fn_800390CC(int nField, RenderCamera* pCamera) {
     fY = pRect[1];
     fRight = pRect[0] + pRect[2];
     fBottom = pRect[1] + pRect[3];
-    RenderState_SetDepthWrite(0);
+    DS_vEnableZBufferUpdate(0);
     RenderState_SetDrawFlags(0x10);
-    RenderState_SetAlphaTest(0, 1, 0x80);
-    RenderState_SetDepthFunc(7);
+    DS_vSetAlphaTestMode(0, 1, 0x80);
+    DS_vSetZBufferMode(7);
     fn_8002A608(nField ? &lbl_801D4FB0[1] : &lbl_801D4FB0[0]);
     RenderState_SetRenderSurface(1, 256, 224, 0, 1, 1);
     fn_80016B54(256, 128, 1.0f, 1.0f);
@@ -595,9 +595,9 @@ void fn_800390CC(int nField, RenderCamera* pCamera) {
     RenderState_Flush();
     RenderView_DrawPrimitive(0xA1, aXY, NULL, aUV, 2);
     RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
-    RenderState_SetDepthWrite(1);
-    RenderState_SetAlphaTest(1, 6, 0x80);
-    RenderState_SetDepthFunc(3);
+    DS_vEnableZBufferUpdate(1);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vSetZBufferMode(3);
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80035F40(pCamera);
     RenderState_Flush();
@@ -637,16 +637,16 @@ void fn_80039358(int nView) {
         RenderView_SetUseCurrentMatrices(0);
         RenderState_SetDrawFlags(0x40);
         RenderState_SetBlendFactors(4, 5);
-        RenderState_SetDepthWrite(0);
-        RenderState_SetDepthFunc(7);
-        RenderState_SetAlphaTest(0, 6, 0x80);
+        DS_vEnableZBufferUpdate(0);
+        DS_vSetZBufferMode(7);
+        DS_vSetAlphaTestMode(0, 6, 0x80);
         RenderView_SetColor(aColour);
         RenderState_Flush();
         RenderView_MakeQuad(aXY, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
         RenderView_DrawPrimitive(0xA1, aXY, NULL, NULL, 2);
-        RenderState_SetDepthWrite(1);
-        RenderState_SetDepthFunc(3);
-        RenderState_SetAlphaTest(1, 6, 0x80);
+        DS_vEnableZBufferUpdate(1);
+        DS_vSetZBufferMode(3);
+        DS_vSetAlphaTestMode(1, 6, 0x80);
         RenderState_Flush();
     }
 }

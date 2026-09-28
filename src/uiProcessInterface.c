@@ -145,8 +145,8 @@ void fn_8008F648(s32 nTicks) {
     if (lbl_80281F1A) {
         RenderView_SetUseCurrentMatrices(0);
         RenderState_SetBlendFactors(4, 5);
-        RenderState_SetDepthWrite(0);
-        RenderState_SetAlphaTest(1, 6, 1);
+        DS_vEnableZBufferUpdate(0);
+        DS_vSetAlphaTestMode(1, 6, 1);
         RenderState_Flush();
         if (lbl_80281370 && gSession.nGameType == 3) {
             fn_80091454();
@@ -162,9 +162,9 @@ void fn_8008F648(s32 nTicks) {
         fn_800908D4(1.0f);
         fn_80012C54_SetWordWrap(0);
         fn_80016B6C(1.0f, 1.0f);
-        RenderState_SetDepthWrite(1);
-        RenderState_SetAlphaTest(1, 6, 0x80);
-        RenderState_SetDepthFunc(3);
+        DS_vEnableZBufferUpdate(1);
+        DS_vSetAlphaTestMode(1, 6, 0x80);
+        DS_vSetZBufferMode(3);
         RenderState_Flush();
         if (lbl_801D880C.n0 <= 2 && lbl_801D880C.n0 >= 0) {
             lbl_801D880C.n0++;

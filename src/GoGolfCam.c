@@ -1682,11 +1682,11 @@ void fn_800C16C4(View* pView, int nPlayer) {
 void fn_800C1790(View* pView, int nPlayer) {
     int nView = gPlayers[nPlayer].nView[0];
     if (lbl_80282220->b56) {
-        fn_800171D8(fn_80012EF0(ViewController_GetCamera(nView)), 0.0f, 0.0f, 1.0f, 1.0f);
+        fn_800171D8(RC_spGetRenderCtxViewport(ViewController_GetCamera(nView)), 0.0f, 0.0f, 1.0f, 1.0f);
         RC_UpdateCurrentScreenMatrices();
         RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
-        RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
-        RenderState_SetViewport(Camera_GetCurrent());
+        RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
+        RenderState_SetViewport(RC_spGetCurrentRenderCtx());
         RenderState_SetCameraMatrices();
         RenderState_Flush();
         lbl_80282220->b56 = 0;
@@ -1984,7 +1984,7 @@ void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
     nB = 0x19;
     pShot = NULL;
     f3 = 0.0f;
-    fn_80012EF0(ViewController_GetCamera(gPlayers[nPlayer].nView[0]));
+    RC_spGetRenderCtxViewport(ViewController_GetCamera(gPlayers[nPlayer].nView[0]));
     Vec3Copy(pCam, vOld);
     fn_800638B8(pView, nPlayer);
     if (fn_800C6D28()) {
@@ -2849,7 +2849,7 @@ void GolfCamera_ComputeSteepSlopeCamVectors(View* pView, int nPlayer) {
         fn_800B5918(vCam, pView->v0);
         fn_800B5918(vTarget, pView->v10);
         RC_UpdateCurrentScreenMatrices();
-        RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
+        RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
         bHit = Ter_CheckForGroundCollision(pBall->pCourse, vCam, vTarget, vHit, vNormal, &pSurface, &pObj);
         fn_800636B4(nPlayer);
         if (bHit || bClear) {

@@ -21,12 +21,12 @@ void fn_8009A844(void* pCamera, u8* pIn, u8* pOut) {
     f32 f4;
     f32 fBufHeight;
 
-    pRect = fn_80012EF0(pCamera);
-    fLeft = fn_80012EE8(pRect);
-    fWidth = fn_80012ED8(pRect);
+    pRect = RC_spGetRenderCtxViewport(pCamera);
+    fLeft = VM_fGetViewportLeft(pRect);
+    fWidth = VM_fGetViewportWidth(pRect);
     pDst[0] = pSrc[0] * fWidth + fLeft;
-    fTop = fn_80012EE0(pRect);
-    fHeight = fn_80012ED0(pRect);
+    fTop = VM_fGetViewportTop(pRect);
+    fHeight = VM_fGetViewportHeight(pRect);
     pDst[1] = pSrc[1] * fHeight + fTop;
     pBuf = fn_80013E40(pCamera);
     f0 = fn_80014174(pBuf);

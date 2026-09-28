@@ -71,7 +71,7 @@ u8 fn_800B36F4(View* pView, int nPlayer, f32 fFrameTime) {
     f32* pRect;
     ComicPanel* pPanel = &lbl_80282178->aPanel[lbl_80282178->nPanel];
 
-    pRect = fn_80012EF0(ViewController_GetCamera(gPlayers[nPlayer].nView[0]));
+    pRect = RC_spGetRenderCtxViewport(ViewController_GetCamera(gPlayers[nPlayer].nView[0]));
     if (gSession.nPaused != 0) {
         lbl_80282178->n8 = -2;
     }
@@ -254,8 +254,8 @@ void fn_800B3F4C(f32* pRect, f32 fTop, f32 fLeft, f32 fWidth, f32 fHeight) {
     fn_800171D8(pRect, fLeft, fTop, fWidth, fHeight);
     RC_UpdateCurrentScreenMatrices();
     RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
-    RC_vUpdateRenderCtxTransformationMatrices(Camera_GetCurrent());
-    RenderState_SetViewport(Camera_GetCurrent());
+    RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
+    RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderState_SetCameraMatrices();
     RenderState_Flush();
 }

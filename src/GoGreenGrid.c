@@ -450,8 +450,8 @@ void fn_8009C914(int nView) {
     GR_BuildGridRenderData(nView);
     RenderState_SetCameraMatrices();
     RenderState_SetBlendFactors(4, 5);
-    RenderState_SetAlphaTest(0, 6, 0x80);
-    RenderState_SetDepthWrite(0);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vEnableZBufferUpdate(0);
     fn_8005CC64(lbl_80281FAC, lbl_80281FA8);
     if (lbl_802813C0->b104) {
         RenderState_SetDrawFlags(0x70);
@@ -481,8 +481,8 @@ void fn_8009C914(int nView) {
     desc.pUV = lbl_802813C0->apUV[nView];
     fn_80036100((ShaderObject*)lbl_802813C0->aMesh[nView], &desc, 1);
     fn_800360D4(lbl_802813C0->aMesh[nView]);
-    RenderState_SetAlphaTest(1, 6, 0x80);
-    RenderState_SetDepthWrite(1);
+    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vEnableZBufferUpdate(1);
     RenderState_Flush();
 }
 

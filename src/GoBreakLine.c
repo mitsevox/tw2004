@@ -126,8 +126,8 @@ void BreakLine_Render(int nView) {
         Vec_Distance(lbl_80282228->vPin, gPlayers[nPlayer].vTarget);
         RenderState_SetCameraMatrices();
         RenderState_SetBlendFactors(4, 5);
-        RenderState_SetAlphaTest(0, 6, 0x80);
-        RenderState_SetDepthWrite(0);
+        DS_vSetAlphaTestMode(0, 6, 0x80);
+        DS_vEnableZBufferUpdate(0);
         fn_8005CC64(lbl_80282228->pBank, lbl_80282228->pTex);
         RenderState_SetDrawFlags(0x70);
         RenderState_SetClipMode(0);
@@ -232,8 +232,8 @@ void BreakLine_Render(int nView) {
             fn_80036100((ShaderObject*)lbl_80282228->aMesh[nView], &desc, 1);
             fn_800360D4(lbl_80282228->aMesh[nView]);
         }
-        RenderState_SetAlphaTest(1, 6, 0x80);
-        RenderState_SetDepthWrite(1);
+        DS_vSetAlphaTestMode(1, 6, 0x80);
+        DS_vEnableZBufferUpdate(1);
         RenderState_Flush();
     }
 }

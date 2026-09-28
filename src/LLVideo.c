@@ -217,7 +217,7 @@ void fn_800755F0(int nFlags) {
         }
         fn_800162A8();
         fn_80006EDC();
-        fn_800137D0(Camera_GetCurrent());
+        fn_800137D0(RC_spGetCurrentRenderCtx());
         // the original tests bBit0 here although both branches make the same call
         if (bBit0) {
             fn_800760B0(0, 0, 512, 448);
@@ -227,8 +227,8 @@ void fn_800755F0(int nFlags) {
         RenderState_SetBlendFactors(4, 5);
         RenderView_SetUseCurrentMatrices(0);
         RenderState_SetDrawFlags(0x40);
-        RenderState_SetAlphaTest(0, 6, 0x80);
-        RenderState_SetDepthFunc(7);
+        DS_vSetAlphaTestMode(0, 6, 0x80);
+        DS_vSetZBufferMode(7);
         RenderState_Flush();
         RenderView_DrawPrimitive(0xA1, xy, 0, NULL, 2);
         fn_80013400();
@@ -388,9 +388,9 @@ void fn_80075C88(void) {
     fn_80008380();
     RenderState_SetRenderSurface(0, 512, 448, 0, 8, 1);
     RenderState_SetDrawFlags(0x10);
-    RenderState_SetDepthWrite(0);
-    RenderState_SetAlphaTest(0, 6, 0x80);
-    RenderState_SetDepthFunc(7);
+    DS_vEnableZBufferUpdate(0);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetZBufferMode(7);
     fn_800760B0(0, 0, 512, 448);
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
@@ -407,9 +407,9 @@ void fn_80075D58(void) {
     fn_80006EDC();
     fn_80012B2C(1.0f, 1.0f);
     FO_vSetCurrentAddMode(lbl_80281200->n20);
-    RenderState_SetDepthWrite(1);
-    RenderState_SetAlphaTest(0, 6, 0x80);
-    RenderState_SetDepthFunc(3);
+    DS_vEnableZBufferUpdate(1);
+    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetZBufferMode(3);
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
     RenderState_Flush();
