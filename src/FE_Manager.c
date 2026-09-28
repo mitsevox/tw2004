@@ -1119,7 +1119,7 @@ void fn_80079664(SaveProfile* pProfile) {
     FE_CrAP_TurnOnPart(0xC, 6, 0);
     FE_CrAP_TurnOnPart(0xC, 7, 0);
     FE_CrAP_TurnOnPart(0xC, 0, 0);
-    fn_8008E6D4(0);
+    FE_SetCrapClub(0);
     FE_CrAP_RandomizePart(pProfile, 1, 0);
     FE_CrAP_RandomizePart(pProfile, 2, 0);
     FE_CrAP_RandomizePart(pProfile, 7, 0);

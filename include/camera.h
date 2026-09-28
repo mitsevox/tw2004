@@ -533,7 +533,7 @@ typedef struct CrAPState {
     s32  n4;                    // 0x004  the CrAP camera's kind (GolfCamera_SwitchCrAPCamera)
     s32  n8;                    // 0x008
     s32  nC;                    // 0x00C
-    char sz10[0x10];            // 0x010  the animation fn_8008E468 started
+    char sz10[0x10];            // 0x010  the animation FE_vTriggerCrAPAnimAndCamera started
     char sz20[0x10];            // 0x020
     char sz30[0x20];            // 0x030
     s32  n50;                   // 0x050

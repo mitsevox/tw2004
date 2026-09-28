@@ -23,7 +23,7 @@ void fn_800142A4(s8 n);                 // sets lbl_80281C98
 void fn_80057438(SaveProfile* pProfile);
 void fn_8008E354(void);                 // FEgolferanim.c
 void fn_8008F80C(s32 p0, s32 p1);       // uiProcessInterface.c
-void fn_8008E358(s32 p0);               // FEgolferanim.c
+void FE_SetOffscreenBufferRender(s32 p0);               // FEgolferanim.c
 s32  MC_LoadUser(MCCardPosStr* pPos);   // MC.c
 s32  MC_LoadReplay(MCCardPos* pPos);      // MC.c: load a replay from the card
 void MC_ConnectCard(s32 nPort, s32 nSlot); // MC_Gc.c
@@ -1496,8 +1496,8 @@ void fn_8007C254(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// The CrAP screen's state: changing it to 0 or to 3 calls FE_vClearGolferCache; fn_8008E358 is told
-// whether it is now 0.
+// The CrAP screen's state: changing it to 0 or to 3 calls FE_vClearGolferCache;
+// FE_SetOffscreenBufferRender is told whether it is now 0.
 void fn_8007C2A0(MsgArg* pArgs, MsgArg* pResult) {
     s32 nOld;
 
@@ -1510,9 +1510,9 @@ void fn_8007C2A0(MsgArg* pArgs, MsgArg* pResult) {
         FE_vClearGolferCache();
     }
     if (lbl_80281EE0->n0 == 0) {
-        fn_8008E358(1);
+        FE_SetOffscreenBufferRender(1);
     } else {
-        fn_8008E358(0);
+        FE_SetOffscreenBufferRender(0);
     }
 }
 

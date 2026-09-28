@@ -856,15 +856,15 @@ void fn_80109430(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80109434(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8008E364(pArgs[0].i);
+    FE_SetCrAPCameraIdleState(pArgs[0].i);
 }
 
 void fn_80109458(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = (u8)fn_8008E420();
+    pResult->i = (u8)FE_HasGolferCharacter();
 }
 
 void fn_8010948C(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = (u8)fn_8008E44C();
+    pResult->i = (u8)FE_IsGolferReady();
 }
 
 void fn_801094C0(MsgArg* pArgs, MsgArg* pResult) {
@@ -940,10 +940,10 @@ void fn_80109738(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80109760(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8008E824();
+    FE_RestartCrAPAnim();
 }
 
-// fn_8008E860 for part 12's entry n: 1 for entries 0..4, 2 for entry 6, else 0.
+// FE_SetCrapRenderState for part 12's entry n: 1 for entries 0..4, 2 for entry 6, else 0.
 void fn_80109780(MsgArg* pArgs, MsgArg* pResult) {
     s32 nPart = pArgs[0].i;
     s32 n = pArgs[1].i;
@@ -955,39 +955,39 @@ void fn_80109780(MsgArg* pArgs, MsgArg* pResult) {
         case 2:
         case 3:
         case 4:
-            fn_8008E860(1);
+            FE_SetCrapRenderState(1);
             break;
         case 6:
-            fn_8008E860(2);
+            FE_SetCrapRenderState(2);
             break;
         default:
-            fn_8008E860(0);
+            FE_SetCrapRenderState(0);
             break;
         }
     } else {
-        fn_8008E860(0);
+        FE_SetCrapRenderState(0);
     }
 }
 
 void fn_801097FC(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 0:
-        fn_8008E6D4(0);
+        FE_SetCrapClub(0);
         return;
     case 1:
-        fn_8008E6D4(1);
+        FE_SetCrapClub(1);
         return;
     case 2:
-        fn_8008E6D4(4);
+        FE_SetCrapClub(4);
         return;
     case 3:
-        fn_8008E6D4(5);
+        FE_SetCrapClub(5);
         return;
     case 4:
-        fn_8008E6D4(2);
+        FE_SetCrapClub(2);
         return;
     default:
-        fn_8008E6D4(0);
+        FE_SetCrapClub(0);
         return;
     }
 }
@@ -1088,7 +1088,7 @@ void fn_80109CBC(MsgArg* pArgs, MsgArg* pResult) {
     View* pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
     Gaud_PlayUISound((Misc_RandFunc(0) & 7) + 11);
     FE_ResetCrAPZoom();
-    fn_8008E364(0);
+    FE_SetCrAPCameraIdleState(0);
     GolfCamera_SwitchCrAPCamera(pView, "Crap Idle", lbl_80281EE0->n4, 0, 0, 0);
     FE_CrAP_SetTriggerAnims(0);
     fn_80079664(pProfile);
@@ -1100,7 +1100,7 @@ void fn_80109D5C(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     View* pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
     FE_ResetCrAPZoom();
-    fn_8008E364(1);
+    FE_SetCrAPCameraIdleState(1);
     GolfCamera_SwitchCrAPCamera(pView, "Crap Face", lbl_80281EE0->n4, 0, 0, 0);
     FE_CrAP_SetTriggerAnims(0);
     fn_80078E34(pProfile);
@@ -1198,7 +1198,7 @@ void fn_80109FB4(MsgArg* pArgs, MsgArg* pResult) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_8010A208(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8008E724(NULL, NULL, 0, 0);
+    FE_QueueCrAPAnim(NULL, NULL, 0, 0);
 }
 
 // ---- end of sweep code ----

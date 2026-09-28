@@ -183,9 +183,9 @@ void  sApplyUserLogos(void* pChar, void* pModel, SkinChoices* pChoices);   // ch
 void  fn_8010BA2C(void* p);
 void  FE_StreamInterruptState(void);               // FEgolferanim.c
 void  FE_StreamSetNextState(int nNext);           // FEgolferanim.c
-u8    fn_8008E924(void);                // FEgolferanim.c
-void  fn_8008E918(s32 v);
-u8    fn_8008E938(void);
+u8    FE_IsTextureSwapDone(void);                // FEgolferanim.c
+void  FE_SetTextureSwapState(s32 v);
+u8    FE_GetDelayTextureSwap(void);
 void  fn_8008EAC8(u8 v);
 void  fn_800C937C(void);
 void  fn_800C9764(void);
@@ -1420,7 +1420,7 @@ void Character_BeginSwapTexturesCallbackFE(Character* pArg) {
     Character* pChar = (Character*)(void*)pArg;
     void* pModel;
 
-    fn_8008E918(1);
+    FE_SetTextureSwapState(1);
     pModel = pChar->apDynTex[1 - pChar->nCurDynTex];
     fn_8010A6A8(pChar->apDynTex[pChar->nCurDynTex], pModel);
     pChar->pDynTex = pModel;
@@ -1453,7 +1453,7 @@ void Character_ExecuteTextureSwapFE(Character* pChar) {
 
     if (fn_8008EAD4()) {
         fn_8008EAC8(0);
-        fn_8008E918(0);
+        FE_SetTextureSwapState(0);
         pChar->nCurDynTex = 1 - pChar->nCurDynTex;
         pModel = pChar->apDynTex[pChar->nCurDynTex];
         Character_CopySkinChoices1To0(pChar);
@@ -1468,12 +1468,12 @@ void Character_ExecuteTextureSwapFE(Character* pChar) {
 }
 
 // The front end's end callback of a texture swap: passes the skins' choices down to copy 1, flags
-// the swap due (fn_8008EAC8) and, unless the menu delays it (fn_8008E938), swaps now.
+// the swap due (fn_8008EAC8) and, unless the menu delays it (FE_GetDelayTextureSwap), swaps now.
 void Character_EndSwapTexturesCallbackFE(Character* pChar) {
     Character_CopySkinChoices2To1(pChar);
-    fn_8008E918(2);
+    FE_SetTextureSwapState(2);
     fn_8008EAC8(1);
-    if (fn_8008E938() == 0) {
+    if (FE_GetDelayTextureSwap() == 0) {
         Character_ExecuteTextureSwapFE(pChar);
     }
 }
@@ -2978,7 +2978,7 @@ void Character_RequestClothesUpdateFE(int n) {
 
 // Each frame in the create-a-player mode (game type 3): for every flag
 // Character_RequestClothesUpdateFE set, once the shown golfer (lbl_80281EE0->pB4) is ready (b18),
-// the menu golfer's state machine is not in state 4 and nothing holds it (fn_8008E924), the flag is
+// the menu golfer's state machine is not in state 4 and nothing holds it (FE_IsTextureSwapDone), the flag is
 // cleared and the running state aborted for state 4, which dresses the shown golfer again and swaps
 // its textures (FE_StreamFunc_SwapTexturesInit).
 void Character_UpdateClothesFE(void) {
@@ -2986,7 +2986,7 @@ void Character_UpdateClothesFE(void) {
 
     for (i = 0; i < 5; i++) {
         if (gSession.aD2D[i] && lbl_80281EE0->pB4 != NULL && lbl_80281EE0->pB4->b18 &&
-            FE_StreamGetCurrentState() != 4 && fn_8008E924()) {
+            FE_StreamGetCurrentState() != 4 && FE_IsTextureSwapDone()) {
             gSession.aD2D[i] = 0;
             FE_StreamInterruptState();
             FE_StreamSetNextState(4);

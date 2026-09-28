@@ -354,7 +354,7 @@ void FE_CrAP_TurnOffAsset(CrAPAsset* pAsset) {
         pSkin = lbl_80281EE0->pB4->pChar->pSkin;
         FE_CrAP_RemoveAssetParts(pBase, pSkin);
         FE_CrAP_RemoveAssetSets(pBase, pSkin);
-        fn_8008E944(0, 0.0f);
+        FE_SetDelayTextureSwap(0, 0.0f);
         Character_RequestClothesUpdateFE(lbl_80281EE0->pB4->n10);
         FE_CrAP_SaveBodySkinChoices();
         FE_CrAP_ClearEquippedAsset(pBase);
@@ -400,11 +400,11 @@ void sTurnOnAnimation(CrAPAsset* pAsset, int b) {
         fn_80058624(pProfile, b, szName);
     } else {
         fn_80058560(pProfile, b, szName);
-        if (fn_8008E6BC() == NULL || strcmp(fn_8008E6BC(), szName) != 0) {
-            fn_8008E724(szName, FE_CrAP_GetStringFromTable(pAsset->n114), 1, 0);
+        if (FE_GetCurrentAnimName() == NULL || strcmp(FE_GetCurrentAnimName(), szName) != 0) {
+            FE_QueueCrAPAnim(szName, FE_CrAP_GetStringFromTable(pAsset->n114), 1, 0);
         }
     }
-    fn_8008E944(0, 0.0f);
+    FE_SetDelayTextureSwap(0, 0.0f);
 }
 
 // Part 17 (logos and tattoos): give logo place b (lbl_801937C8: the shirt, hat and glove logos, the
@@ -424,7 +424,7 @@ void sTurnOnLogo(s16 nPart, int b, int i) {
 
     fn_8008EA38(1);
     pSkin = lbl_80281EE0->pB4->pChar->pSkin;
-    fn_8008E944(0, 0.0f);
+    FE_SetDelayTextureSwap(0, 0.0f);
     SKA_PackName(&uSetId, lbl_801937C8[b]);
     nSet = SkinPart_FindSet(pSkin, uSetId);
     SkinPart_ChooseSet(pSkin, nSet, i, 0);
@@ -449,18 +449,20 @@ void sTurnOnLogo(s16 nPart, int b, int i) {
 // front when the asset's n0 differs from the last one shown (kept by fn_8008EAE0), then plays the
 // asset's animation n112 with its camera shot n114 unless that animation already plays.
 void sApplySlider(CrAPAsset* pAsset) {
-    fn_8008E944(0, 0.0f);
+    FE_SetDelayTextureSwap(0, 0.0f);
     if (pAsset->n0 != fn_8008EAEC()) {
         FE_SetCrapRotation(1, 0.0f);
     }
     fn_8008EAE0(pAsset->n0);
-    if (fn_8008E6BC() == NULL || strcmp(fn_8008E6BC(), FE_CrAP_GetStringFromTable(pAsset->n112)) != 0) {
-        if (fn_8008E468(FE_CrAP_GetStringFromTable(pAsset->n112), FE_CrAP_GetStringFromTable(pAsset->n114),
+    if (FE_GetCurrentAnimName() == NULL
+        || strcmp(FE_GetCurrentAnimName(), FE_CrAP_GetStringFromTable(pAsset->n112)) != 0) {
+        if (FE_vTriggerCrAPAnimAndCamera(FE_CrAP_GetStringFromTable(pAsset->n112),
+                                         FE_CrAP_GetStringFromTable(pAsset->n114),
                         1)) {
-            fn_8008E818(1);
+            FE_SetAnimRepeatCount(1);
         }
     } else {
-        fn_8008E818(1);
+        FE_SetAnimRepeatCount(1);
     }
 }
 
@@ -499,17 +501,17 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
         if (stricmp(FE_CrAP_GetStringFromTable(pAsset->n112), "gdlcrp07") == 0 ||
             stricmp(FE_CrAP_GetStringFromTable(pAsset->n112), "fdlcrp07") == 0) {
             fAngle = 4.0f;
-            fn_8008E860(0);
+            FE_SetCrapRenderState(0);
         } else if (fn_8008E9A8() != 1) {
-            fn_8008E8D0(1);
+            FE_SetTempCrapRenderState(1);
             if (stricmp(FE_CrAP_GetStringFromTable(pAsset->nCategory), "Fairway Woods") == 0) {
-                fn_8008E718(1);
+                FE_SetTempCrapClub(1);
             } else if (stricmp(FE_CrAP_GetStringFromTable(pAsset->nCategory), "Iron Sets") == 0) {
-                fn_8008E718(3);
+                FE_SetTempCrapClub(3);
             } else if (stricmp(FE_CrAP_GetStringFromTable(pAsset->nCategory), "Wedge Sets") == 0) {
-                fn_8008E718(5);
+                FE_SetTempCrapClub(5);
             } else if (stricmp(FE_CrAP_GetStringFromTable(pAsset->nCategory), "Putters") == 0) {
-                fn_8008E718(2);
+                FE_SetTempCrapClub(2);
             }
         } else {
             fn_8008E9B4();
@@ -520,7 +522,7 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
         FE_CrAP_ClearEquippedAsset(pAsset);
     } else if (FE_CrAP_TryBallSwappingAsset(pAsset)) {
         if (fn_8008E9A8() != 2) {
-            fn_8008E8D0(2);
+            FE_SetTempCrapRenderState(2);
         } else {
             nPlay = 0;
         }
@@ -535,26 +537,28 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
         Character_RequestClothesUpdateFE(lbl_80281EE0->pB4->n10);
         FE_CrAP_SaveBodySkinChoices();
         if (fn_8008E9A8() != 0) {
-            fn_8008E8D0(0);
+            FE_SetTempCrapRenderState(0);
         }
     }
     if (strcmp(FE_CrAP_GetStringFromTable(pAsset->n112), "") == 0
         || strcmp(FE_CrAP_GetStringFromTable(pAsset->n112), "0") == 0 ||
         !FE_CrAP_IsFadeOutCategory(nPart)) {
-        fn_8008E944(0, 0.0f);
-        if (fn_8008E6BC() == NULL || strcmp(fn_8008E6BC(), FE_CrAP_GetStringFromTable(pAsset->n112)) != 0) {
-            fn_8008E468(FE_CrAP_GetStringFromTable(pAsset->n112), FE_CrAP_GetStringFromTable(pAsset->n114),
+        FE_SetDelayTextureSwap(0, 0.0f);
+        if (FE_GetCurrentAnimName() == NULL
+            || strcmp(FE_GetCurrentAnimName(), FE_CrAP_GetStringFromTable(pAsset->n112)) != 0) {
+            FE_vTriggerCrAPAnimAndCamera(FE_CrAP_GetStringFromTable(pAsset->n112),
+                                         FE_CrAP_GetStringFromTable(pAsset->n114),
                         1);
         } else {
-            fn_8008E818(1);
+            FE_SetAnimRepeatCount(1);
         }
         if (nPart != fn_8008EB04()) {
             FE_SetCrapRotation(1, 0.0f);
         }
         fn_8008EAF8(nPart);
     } else {
-        fn_8008E944(1, fAngle);
-        fn_8008E724(FE_CrAP_GetStringFromTable(pAsset->n112), FE_CrAP_GetStringFromTable(pAsset->n114),
+        FE_SetDelayTextureSwap(1, fAngle);
+        FE_QueueCrAPAnim(FE_CrAP_GetStringFromTable(pAsset->n112), FE_CrAP_GetStringFromTable(pAsset->n114),
                     nPlay, bLoop);
     }
     FE_CrAP_EquipAsset(pAsset);
@@ -581,7 +585,7 @@ void FE_CrAP_TurnOnPart(s16 nPart, int b, int i) {
     if (pAsset == NULL && nPart != 17) {
         return;
     }
-    fn_8008E818(0);
+    FE_SetAnimRepeatCount(0);
     if (nPart == 13) {
         lbl_802816EC = nAsset;
         lbl_802816E8 = -1;
@@ -624,7 +628,7 @@ void FE_CrAP_RestoreLastRemovedAsset(void) {
 }
 
 // The parts whose new asset FE_CrAP_TurnOnAsset shows under its animation with the texture swap
-// delayed (fn_8008E944): headwear, shirts, pants and shorts (0..2), shoes and eyewear (7, 8), part
+// delayed (FE_SetDelayTextureSwap): headwear, shirts, pants and shorts (0..2), shoes and eyewear (7, 8), part
 // 12, watches and jewelry, miscellaneous (19, 20). TW07's version also takes the asset.
 u8 FE_CrAP_IsFadeOutCategory(int nPart) {
     if ((u32)nPart <= 2 || (u32)(nPart - 7) <= 1 || nPart == 12 || nPart == 19 || nPart == 20) {
@@ -1621,7 +1625,7 @@ int FE_CrAP_GetClubSkinsForAsset(CrAPAsset* pAsset, Skin** apSkins) {
 }
 
 // A part 12 asset of the category "balls": pass its ball's name (its first set variant) to
-// fn_8008E960 and store the ball's index (fn_800484F4) in the profile's nGolferOutfit; 1 when done.
+// FE_QueueBallChange and store the ball's index (fn_800484F4) in the profile's nGolferOutfit; 1 when done.
 // 0 for any other asset, or when there is no menu golfer with club skins.
 u8 FE_CrAP_TryBallSwappingAsset(CrAPAsset* pAsset) {
     char szName[16];                    // the size is unknown (the frame allows up to 20)
@@ -1638,7 +1642,7 @@ u8 FE_CrAP_TryBallSwappingAsset(CrAPAsset* pAsset) {
     }
     if (stricmp(szCategory, "balls") == 0) {
         fn_800CB8F0(&pAsset->aSetVariant[0], szName);
-        fn_8008E960(szName);
+        FE_QueueBallChange(szName);
         nBall = fn_800484F4(szName);
         FE_GetCurrentProfile()->nGolferOutfit = nBall;
         return 1;

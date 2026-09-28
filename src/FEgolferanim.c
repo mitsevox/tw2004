@@ -69,7 +69,7 @@ GxTexture lbl_801D8744[2];      // lbl_80281BA4's two buffers
 GxTexture lbl_801D8714;         // the screen copy (fn_8002A624's pixels)
 FEGolferMachine lbl_801D8708;
 
-s32 lbl_80281330 = 1;           // draw the golfer into the menu's texture (fn_8008E358)
+s32 lbl_80281330 = 1;           // draw the golfer into the menu's texture (FE_SetOffscreenBufferRender)
 f32 lbl_80281334 = 0.17f;       // with b83: the most f14C may be
 f32 lbl_80281338 = 0.1f;        // with b83: f140, f144 and f148
 u8  lbl_8028133C = 1;
@@ -659,7 +659,7 @@ void FE_vUpdateGolferAll(void) {
                     FE_SetCrapRotation(0, 0.0f);
                     FE_ResetCrAPZoom();
                     lbl_80281EE0->n1C0 = 2;
-                    fn_8008E468(lbl_80281EE0->sz20, lbl_80281EE0->sz30, 0);
+                    FE_vTriggerCrAPAnimAndCamera(lbl_80281EE0->sz20, lbl_80281EE0->sz30, 0);
                     if (lbl_80281EE0->b80) {
                         lbl_80281EE0->n8 = lbl_80281EE0->nC;
                         GolfCamera_SwitchCrAPCamera(pView, NULL, 4, 0, 0, 0);
@@ -672,7 +672,7 @@ void FE_vUpdateGolferAll(void) {
                     FE_SetCrapRotation(0, 0.0f);
                     FE_ResetCrAPZoom();
                     lbl_80281EE0->n1C0 = 2;
-                    fn_8008E468(lbl_80281EE0->sz20, lbl_80281EE0->sz30, 0);
+                    FE_vTriggerCrAPAnimAndCamera(lbl_80281EE0->sz20, lbl_80281EE0->sz30, 0);
                     if (lbl_80281EE0->b80) {
                         lbl_80281EE0->n8 = lbl_80281EE0->nC;
                         if (lbl_80281EE0->n8 == 1) {
@@ -1537,19 +1537,27 @@ void FE_SetCrapRotation(u8 bTarget, f32 fAngle) {
 void fn_8008E354(void) {
 }
 
-void fn_8008E358(u8 b) {
+// bOn: the menu golfer is drawn off screen, copied into the screen-copy texture
+// (FE_vRenderGolferAllPhase1) and that is drawn faded by f14C (FE_vRenderGolferAllPhase2); 0 draws
+// him straight into the frame. The CrAP screen-state message turns it on for screen kind 0 only.
+void FE_SetOffscreenBufferRender(u8 b) {
     lbl_80281330 = b;
 }
 
-void fn_8008E364(int n) {
+// Set the CrAP camera's idle state (n4: 0 the "Crap Idle" shot, 1 the "Crap Face" shot, as the menu
+// messages pass it). On a change the idle clip for the new state (FE_CrapGetIdleAnim) becomes the
+// queued animation, due now with no fade at its end and the texture-swap delay off
+// (FE_QueueCrAPAnim, FE_SetDelayTextureSwap), unless a queued animation is still waiting to start,
+// whose name it then takes; the queued camera shot is dropped either way.
+void FE_SetCrAPCameraIdleState(int n) {
     Clip* pClip;
 
     if (n != lbl_80281EE0->n4) {
         pClip = FE_CrapGetIdleAnim();
         if (pClip != NULL) {
             if (lbl_80281EE0->n1C0 != 1 && lbl_80281EE0->n1C0 != 0) {
-                fn_8008E724(pClip->name, NULL, 0, 0);
-                fn_8008E944(0, 0.0f);
+                FE_QueueCrAPAnim(pClip->name, NULL, 0, 0);
+                FE_SetDelayTextureSwap(0, 0.0f);
                 lbl_80281EE0->n1C4 = 2;
             } else {
                 strncpy(lbl_80281EE0->sz20, pClip->name, sizeof(lbl_80281EE0->sz20));
@@ -1561,20 +1569,28 @@ void fn_8008E364(int n) {
     lbl_80281EE0->n4 = n;
 }
 
-int fn_8008E420(void) {
+int FE_HasGolferCharacter(void) {
     if (lbl_80281EE0->pB4 != NULL && lbl_80281EE0->pB4->pChar != NULL) {
         return 1;
     }
     return 0;
 }
 
-int fn_8008E44C(void) {
+// Whether the golfer shown is loaded and ready to show (CrAPGolfer.b18, set once his textures are
+// in).
+int FE_IsGolferReady(void) {
     return lbl_80281EE0->pB4->b18 != 0;
 }
 
-// Play the animation szAnim on the golfer (for golfer 29, with its first letter changed to 'f'
-// if he has no such animation) and point the camera with szShot.
-u8 fn_8008E468(char* szAnim, char* szShot, u8 bNoBlend) {
+// Play animation szAnim on the golfer shown and switch the CrAP camera to shot szShot, both blended
+// in when bBlend (else cut). The camera takes the club (render state 1) or ball (2) screen's shot
+// kind 3 or 4, else the idle state's (n4) with the zoom (b1DC). Golfer 29, the female created
+// golfer, falls back to the 'f' version of an animation he lacks. A clip with pD8 set plays with
+// the profile's handedness (choices.n113; a right-hander is turned round to PI for a left-handed
+// profile), any other right-handed. Returns 1 when the animation started (its name is kept in
+// sz10); 0 when asset animations are off (FE_CrAP_GetTriggerAnims: the camera does not switch
+// either), or without a character, szAnim or such a clip.
+u8 FE_vTriggerCrAPAnimAndCamera(char* szAnim, char* szShot, u8 bNoBlend) {
     char szName[0x20];
     View* pView;
     Clip* pClip;
@@ -1621,25 +1637,37 @@ u8 fn_8008E468(char* szAnim, char* szShot, u8 bNoBlend) {
     return 0;
 }
 
-// The animation fn_8008E468 started, or NULL.
-char* fn_8008E6BC(void) {
+// The name of the animation FE_vTriggerCrAPAnimAndCamera last started (sz10), or NULL once the idle
+// animation has taken over (FE_vLoadNextCrAPAnim).
+char* FE_GetCurrentAnimName(void) {
     if (lbl_80281EE0->sz10[0] == '\0') {
         return NULL;
     }
     return lbl_80281EE0->sz10;
 }
 
-void fn_8008E6D4(int n) {
+// Give the golfer shown club nClub to hold (n1B8, a gClubPartNames class: 0 driver, 1 fairway wood,
+// 2 putter, 3 3-iron, 4 7-iron, 5 wedge) and drop any temporary club (FE_SetTempCrapClub).
+void FE_SetCrapClub(int n) {
     lbl_80281EE0->n1B8 = n;
     lbl_80281EE0->n1BC = -1;
     Character_SelectClub(lbl_80281EE0->pB4->pChar, lbl_80281EE0->n1B8);
 }
 
-void fn_8008E718(int n) {
+// The club (a gClubPartNames class) the golfer holds while the queued animation plays (n1BC; -1:
+// his own, FE_SetCrapClub's); he gets his own back when it ends. FE_CrAP_TurnOnAsset sets it for
+// fairway woods, irons, wedges and putters.
+void FE_SetTempCrapClub(int n) {
     lbl_80281EE0->n1BC = n;
 }
 
-void fn_8008E724(char* szAnim, char* szShot, s8 n, u8 bLoop) {
+// Queue animation szAnim with camera shot szShot (NULL: the idle state's) for the golfer on the
+// CrAP screen (screen kind 3), run by FE_vUpdateGolferAll. With bWaitForEnd it waits until the
+// current animation is within 0.6 s of its end, else it starts now: the golfer fades out over 0.5
+// s, the animation plays (FE_vTriggerCrAPAnimAndCamera), and with bFade he fades out at its end and
+// back in (0: he stays in full view). The pad cannot turn him until it has played. szAnim NULL
+// drops the queued animation.
+void FE_QueueCrAPAnim(char* szAnim, char* szShot, s8 n, u8 bLoop) {
     if (szAnim == NULL) {
         lbl_80281EE0->sz20[0] = '\0';
         lbl_80281EE0->n1C0 = 4;
@@ -1662,17 +1690,26 @@ void fn_8008E724(char* szAnim, char* szShot, s8 n, u8 bLoop) {
     lbl_80281EE0->n1D0 = n;
 }
 
-void fn_8008E818(int n) {
+// How many more times the golfer's current animation plays before the idle one comes back (n50;
+// FE_vLoadNextCrAPAnim counts it down).
+void FE_SetAnimRepeatCount(int n) {
     lbl_80281EE0->n50 = n;
 }
 
-void fn_8008E824(void) {
+// Start the golfer's next animation at once, cut in (FE_vLoadNextCrAPAnim: the idle one, or the
+// current one again while repeats are left), then drop the repeats left (FE_SetAnimRepeatCount) and
+// the queued animation.
+void FE_RestartCrAPAnim(void) {
     FE_vLoadNextCrAPAnim(0);
     lbl_80281EE0->n50 = 0;
     lbl_80281EE0->n1C0 = 4;
 }
 
-void fn_8008E860(int n) {
+// Set what the CrAP screen shows (n8: 0 the golfer, 1 his clubs, 2 the ball) and drop a temporary
+// state (FE_SetTempCrapRenderState). On a change the zoom is reset (FE_ResetCrAPZoom) and the next
+// animation starts with its camera (FE_vLoadNextCrAPAnim). Nothing while asset animations are off
+// (FE_CrAP_GetTriggerAnims).
+void FE_SetCrapRenderState(int n) {
     int nOld;
 
     if (FE_CrAP_GetTriggerAnims()) {
@@ -1687,26 +1724,37 @@ void fn_8008E860(int n) {
     }
 }
 
-void fn_8008E8D0(int n) {
+// Show render state n (as FE_SetCrapRenderState) for the queued animation only: it takes over when
+// that animation starts, and the screen goes back to the golfer (0) when it ends. Nothing while
+// asset animations are off (FE_CrAP_GetTriggerAnims).
+void FE_SetTempCrapRenderState(int n) {
     if (FE_CrAP_GetTriggerAnims()) {
         lbl_80281EE0->nC = n;
         lbl_80281EE0->b80 = 1;
     }
 }
 
-void fn_8008E918(int n) {
+// How far the golfer's texture swap has got (n74): 1 the new textures are loading, 2 they are
+// loaded and wait to be switched in, 0 done (char.c's front-end swap callbacks set it).
+void FE_SetTextureSwapState(int n) {
     lbl_80281EE0->n74 = n;
 }
 
-u8 fn_8008E924(void) {
+u8 FE_IsTextureSwapDone(void) {
     return lbl_80281EE0->n74 == 0;
 }
 
-u8 fn_8008E938(void) {
+// Whether a texture swap waits for the queued animation instead of being switched in at once
+// (FE_SetDelayTextureSwap).
+u8 FE_GetDelayTextureSwap(void) {
     return lbl_80281EE0->b78;
 }
 
-u8 fn_8008E944(u8 b, f32 f) {
+// bDelay: a texture swap that has loaded is not switched in at once
+// (Character_EndSwapTexturesCallbackFE) but by the queued animation, fTime seconds into it (0: as
+// it starts). Returns the old setting. FE_CrAP_TurnOnAsset delays the swap for the parts that fade
+// out (FE_CrAP_IsFadeOutCategory).
+u8 FE_SetDelayTextureSwap(u8 b, f32 f) {
     u8 bOld = lbl_80281EE0->b78;
 
     lbl_80281EE0->b78 = b;
@@ -1714,7 +1762,9 @@ u8 fn_8008E944(u8 b, f32 f) {
     return bOld;
 }
 
-void fn_8008E960(char* sz) {
+// Queue ball texture szTex (NULL: none) for the ball screen: it goes on the ball (fn_800B9EB8, or
+// none when the ball list lacks it) when the queued animation starts with the ball shown.
+void FE_QueueBallChange(char* sz) {
     if (sz == NULL) {
         lbl_80281EE0->sz54[0] = '\0';
         return;
@@ -1802,9 +1852,9 @@ u8 fn_8008EB10(void) {
 }
 
 void fn_8008EB70(void) {
-    fn_8008E724(NULL, NULL, 0, 0);
+    FE_QueueCrAPAnim(NULL, NULL, 0, 0);
     FE_vLoadNextCrAPAnim(0);
-    fn_8008E944(0, 0.0f);
+    FE_SetDelayTextureSwap(0, 0.0f);
 }
 
 // ---- sweep code (not yet cleaned up) ----
