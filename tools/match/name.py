@@ -7,7 +7,8 @@ batch.tsv, tab-separated, one function per line (# lines skipped):
         T3 read from the code (docs/style.md "Names"); codes as in config/GW4E69/name_sources.tsv
         (E1 EA text, E2 TW06/TW07 name, E3 wrapper, E4 named data, E5 named neighbours, E6 the code);
   evidence: what in the code or the reference shows it; purpose: one line, what the function does;
-  comment (optional): KEEP (read, the existing comment is right: logged as reviewed), or the function's whole comment, written for a reader of the code (what it
+  comment (optional): KEEP (read, the existing comment is right: logged as reviewed), NONE (read,
+        a short function whose name says it all: logged as reviewed, needs no comment), or the function's whole comment, written for a reader of the code (what it
         does in the game, units, what 0/NULL mean; read from the code, never contradicting it).
         It goes above the definition, wrapped at 100 columns, REPLACING an existing // comment:
         rewrite a comment that is wrong, stale or vague. Keep every `fake match:`, `port:` and
@@ -137,7 +138,7 @@ def add_comments(rows):
     (fake match:, port:, EA bug:; the text after it may be corrected). Only the first definition in
     a file is commented (an #else plain-C copy keeps its own note). Returns (added, replaced, errors)."""
     added, replaced, errors = 0, 0, []
-    want = {new: com for _, _, new, *rest in rows for com in [rest[-1]] if com and com != 'KEEP'}
+    want = {new: com for _, _, new, *rest in rows for com in [rest[-1]] if com and com not in ('KEEP', 'NONE')}
     if not want:
         return 0, 0, []
     found = set()
@@ -248,7 +249,7 @@ def main():
                     '# (keep: read and right; rewrite; add; none: needs none), who, date.\n'
                     'address\tname\tcomment\tby\tdate\n')
         for a, cur, new, *_rest, com in rows:
-            act = 'keep' if com == 'KEEP' else ('none' if not com else ('rewrite' if new in rewritten else 'add'))
+            act = 'keep' if com == 'KEEP' else 'none' if com == 'NONE' else ('none' if not com else ('rewrite' if new in rewritten else 'add'))
             f.write('\t'.join([a, new, act, by, today]) + '\n')
     after = coverage()
     lint = run([PY, 'tools/match/lint.py', '--diff', 'HEAD']).stdout
