@@ -53,9 +53,9 @@ void  SkinPart_CopyChoices(Skin* pSkin, int nFrom, int nTo);
 void  SkinPart_SetChangeAllCopies(u8 b);
 void  SkinPart_InitChangeAllCopies(void);
 
-s32   lbl_80191748[11] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1};
-char* lbl_80281540[2] = {"Glove", NULL};     // the parts SkinPart_BurnBodySkin lists
-u8    lbl_80282238;             // set: a choice goes to all four copies
+s32   gBurnKeptMorphs[11] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1};
+char* gBurnAllVariantParts[2] = {"Glove", NULL};     // the parts SkinPart_BurnBodySkin lists
+u8    gSkinChangeAllCopies;             // set: a choice goes to all four copies
 
 // Copies a golfer's look between the body's skin and pChoices: while pChoices holds no choice yet
 // (every nVariant -1) the skin's copy 0 goes into it; otherwise its choices go into all four copies
@@ -118,9 +118,9 @@ void SkinPart_ApplyClubChoices(Character* pChar, SkinChoices* pChoices) {
 }
 
 // Burns the body's skin down to its current look (SkinBurn fn_80127B98): each part keeps only its
-// chosen variant and option, except the parts named in lbl_80281540 (the glove), which keep every
+// chosen variant and option, except the parts named in gBurnAllVariantParts (the glove), which keep every
 // variant so the glove can still come off and go back on (stateFunc.c); morph targets 0-9
-// (lbl_80191748) are kept. char.c calls it once a look is applied.
+// (gBurnKeptMorphs) are kept. char.c calls it once a look is applied.
 void SkinPart_BurnBodySkin(Character* pChar) {
     s32 aParts[2];
     char** ppName;
@@ -129,14 +129,14 @@ void SkinPart_BurnBodySkin(Character* pChar) {
 
     if (pChar == NULL || pChar->pSkin == NULL) return;
     n = 0;
-    for (ppName = lbl_80281540; *ppName != NULL; ppName++) {
+    for (ppName = gBurnAllVariantParts; *ppName != NULL; ppName++) {
         nPart = SkinPart_FindPartByName(pChar->pSkin, *ppName);
         if (nPart >= 0) {
             aParts[n++] = nPart;
         }
     }
     aParts[n] = -1;
-    fn_80127B98(pChar->pSkin, aParts, lbl_80191748);
+    fn_80127B98(pChar->pSkin, aParts, gBurnKeptMorphs);
 }
 
 void SkinPart_ChooseBodyPartVariant(Character* pChar, int nPart, int nVariant) {
@@ -1342,13 +1342,13 @@ void SkinPart_CopyChoices(Skin* pSkin, int nFrom, int nTo) {
 // into copy 3, the newest, from which char.c passes it down copy by copy (3 to 2 to 1 to 0) as the
 // textures load.
 void SkinPart_SetChangeAllCopies(u8 b) {
-    lbl_80282238 = b;
+    gSkinChangeAllCopies = b;
 }
 
 // Whether a new choice goes into all four copies of a skin's choices (see
 // SkinPart_SetChangeAllCopies).
 u8 SkinPart_GetChangeAllCopies(void) {
-    return lbl_80282238;
+    return gSkinChangeAllCopies;
 }
 
 // Turns SkinPart_SetChangeAllCopies on, the default (SkinPart_Init).

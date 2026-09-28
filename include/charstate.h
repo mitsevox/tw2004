@@ -315,7 +315,7 @@ typedef struct Skin {
     struct HwsMemBlock* a1098[2];   // 0x1098  indexed like a10A0 (fn_8011CB5C)
     struct HwsOverrideTable* a10A0[2];  // 0x10A0  indexed by SkinPart_BeginDraw's argument; Skin.c sets [0]
     SkinChoice* aParts[4];      // 0x10A8  a choice per part, four copies (SkinPart_CopyChoices copies one
-                                //         over another); [3] is set while lbl_80282238 is clear
+                                //         over another); [3] is set while gSkinChangeAllCopies is clear
     SkinChoice* aSets[4];       // 0x10B8  the same per SkinDesc.p74 set
     SkinMorphState* pMorph;     // 0x10C8
     u32* p10CC;                 // 0x10CC  } bit arrays
