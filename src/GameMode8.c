@@ -1733,14 +1733,14 @@ s32 SpeedGolfPoints_GetNamesAndPoints(char* szName1, s32* pPoints1, char* szName
     int nHole = Game_CurHoleIndex();
     int nProfile;
     nProfile = gPlayers[0].nIndex;
-    if (!lbl_801D7148.aLoaded[nProfile]) {
+    if (!gFEState.aLoaded[nProfile]) {
         sprintf(sz, "User %d", nProfile + 1);
         strcpy(szName1, sz);
     } else {
         strcpy(szName1, gpSaveData[nProfile].szName);
     }
     nProfile = gPlayers[1].nIndex;
-    if (!lbl_801D7148.aLoaded[nProfile]) {
+    if (!gFEState.aLoaded[nProfile]) {
         sprintf(sz, "User %d", nProfile + 1);
         strcpy(szName2, sz);
     } else {

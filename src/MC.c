@@ -60,7 +60,7 @@ u8 MC_LoadInitialUser(void) {
     gCurGolferRecord.bAvailable = 0;
     for (i = 0; i < MC_NUM_PORTS; i++) {
         if (MC_LoadLastUser(i, 0, 0) == 0) {
-            lbl_801D7148.aLoaded[0] = 1;
+            gFEState.aLoaded[0] = 1;
             return 1;
         }
     }

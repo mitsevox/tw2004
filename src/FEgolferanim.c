@@ -413,7 +413,7 @@ void FE_StreamFunc_TexturesInit(void) {
     if (nGolfer == 7 || nGolfer == 29) {
         fn_80079974();
     }
-    Character_SetClubsAndClothes(gpCrAPState->pB8->pChar, lbl_80281ED4->nSlot);
+    Character_SetClubsAndClothes(gpCrAPState->pB8->pChar, gpFEProfile->nSlot);
     SkinPart_SetChangeAllCopies(0);
     fn_8010B098(gpCrAPState->pB8->pChar->apDynTex[gpCrAPState->pB8->pChar->nCurDynTex]);
     Character_AddTextureLoadRequest(gpCrAPState->pB8->pChar, Character_BeginLoadTexturesCallbackFE,
@@ -450,7 +450,7 @@ void FE_StreamFunc_TexturesInterrupt(void) {
 // current profile's slot and his textures loaded again with the front end's swap callbacks (into
 // his other texture set, then switched).
 void FE_StreamFunc_SwapTexturesInit(void) {
-    Character_SetClubsAndClothes(gpCrAPState->pB4->pChar, lbl_80281ED4->nSlot);
+    Character_SetClubsAndClothes(gpCrAPState->pB4->pChar, gpFEProfile->nSlot);
     Character_AddTextureLoadRequest(gpCrAPState->pB4->pChar, Character_BeginSwapTexturesCallbackFE,
                                     Character_EndSwapTexturesCallbackFE);
 }
@@ -870,7 +870,7 @@ void FE_vUpdateGolferAll(void) {
         gpCrAPState->pB4->pChar->pfnPreBones = FE_CharPositionOverwrite;
     }
     // Another golfer or profile slot than last drawn: give him his ball and textures.
-    if ((gFELastDrawnGolfer != gpCrAPState->pB4->nGolferId || gFELastDrawnSlot != lbl_80281ED4->nSlot
+    if ((gFELastDrawnGolfer != gpCrAPState->pB4->nGolferId || gFELastDrawnSlot != gpFEProfile->nSlot
          || gpCrAPState->b87)
         && gpCrAPState->pB4->bLoaded && gpCrAPState->bHidden == 0) {
         pChar = gpCrAPState->pB4->pChar;
@@ -1091,7 +1091,7 @@ void FE_RenderGolfer(u8 bFull) {
     }
     if (gpCrAPState->pB4->bLoaded && gpCrAPState->bHidden == 0) {
         gFELastDrawnGolfer = gpCrAPState->pB4->nGolferId;
-        gFELastDrawnSlot = lbl_80281ED4->nSlot;
+        gFELastDrawnSlot = gpFEProfile->nSlot;
     }
 }
 

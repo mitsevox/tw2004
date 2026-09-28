@@ -390,11 +390,11 @@ LAYOUT_ASSERT(SaveRecords, 0x4C2C);
 extern SaveProfile* gpSaveData;
 extern SaveProfile* lbl_80281DF4;       // unlocks that hold for every profile (the cheat codes set them)
 extern SponsorSlot lbl_80281DF0;        // a new profile's first sponsor (see SponsorSlot)
-extern u32 lbl_801D5948[8];             // a bit array the code at 0x80056480 keeps; fn_80078008's lock
+extern u32 gPasswordEnteredBits[8];             // a bit array the code at 0x80056480 keeps; fn_80078008's lock
                                         // kind 6 tests bits 1..5 of it
-extern u32 lbl_801D5908[16];            // a bit array the cheat codes of lbl_80188024 set (fn_800564AC)
-extern s32 lbl_80189528[14];            // the golfers GM_GetGameProgress counts as unlockable
-extern s32 lbl_801894D0[6];             // the courses GM_GetGameProgress counts as unlockable
+extern u32 gSponsorPasswordBits[16];            // a bit array the cheat codes of gSponsorPasswords set (fn_800564AC)
+extern s32 gStartLockedGolfers[14];            // the golfers GM_GetGameProgress counts as unlockable
+extern s32 gStartLockedCourses[6];             // the courses GM_GetGameProgress counts as unlockable
 
 // The password manager (0x80056480-0x80057F18; TW06's passwordmanager.cpp)
 void fn_80056B8C(void);

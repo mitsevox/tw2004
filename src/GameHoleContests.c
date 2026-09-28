@@ -304,7 +304,7 @@ void HoleContest_RankResults(void) {
                     }
                 } else {
                     nIndex = gPlayers[nBest].nIndex;
-                    if (lbl_801D7148.aLoaded[nIndex] == 0) {
+                    if (gFEState.aLoaded[nIndex] == 0) {
                         sprintf(szName, "User %d", nBest + 1);
                         strcpy(gHoleContestPlaceName[nRank], szName);
                     } else {
@@ -329,7 +329,7 @@ void HoleContest_RankResults(void) {
                     }
                 } else {
                     nIndex = gPlayers[(u32)i].nIndex;
-                    if (lbl_801D7148.aLoaded[nIndex] == 0) {
+                    if (gFEState.aLoaded[nIndex] == 0) {
                         sprintf(szName, "User %d", i + 1);
                         strcpy(gHoleContestPlaceName[nRank], szName);
                     } else {
@@ -362,7 +362,7 @@ void HoleContest_RankResults(void) {
                     }
                 } else {
                     nIndex = gPlayers[nBest].nIndex;
-                    if (lbl_801D7148.aLoaded[nIndex] == 0) {
+                    if (gFEState.aLoaded[nIndex] == 0) {
                         sprintf(szName, "User %d", nBest + 1);
                         strcpy(gHoleContestPlaceName[nRank], szName);
                     } else {
@@ -387,7 +387,7 @@ void HoleContest_RankResults(void) {
                     }
                 } else {
                     nIndex = gPlayers[(u32)i].nIndex;
-                    if (lbl_801D7148.aLoaded[nIndex] == 0) {
+                    if (gFEState.aLoaded[nIndex] == 0) {
                         sprintf(szName, "User %d", i + 1);
                         strcpy(gHoleContestPlaceName[nRank], szName);
                     } else {

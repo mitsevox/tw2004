@@ -104,10 +104,10 @@ void fn_800083A4(void) {
             break;
         case 3:
             fn_80091EE4();
-            if (lbl_801D7148.b0F) {
+            if (gFEState.b0F) {
                 fn_8007734C();
             }
-            Gaud_StartFEMusic(lbl_801D7148.b0F);
+            Gaud_StartFEMusic(gFEState.b0F);
             fn_8009005C("frontend");
             fn_8006D8E8();
             if (gSession.nC == 0 && gSession.nGameType != 13) {

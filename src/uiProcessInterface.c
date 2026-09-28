@@ -274,7 +274,7 @@ void fn_8008F820(void) {
     }
     if (lbl_801D87C0.n38 > 0 && gSession.nGameType == 3 &&
         ((Game_GetMode() != 7 && Game_GetMode() != 0x1A) || lbl_801D87C0.n38 >= 2 ||
-         lbl_801D7148.aCPU[0] || lbl_801D7148.aCPU[1])) {
+         gFEState.aCPU[0] || gFEState.aCPU[1])) {
         if (lbl_80281368 != -1) {
             gpCrAPState->bHidden = lbl_80281368;
             lbl_80281368 = -1;
@@ -283,7 +283,7 @@ void fn_8008F820(void) {
         UISProcessHint(lbl_80281F1C->pHandler, 0x2D, 1, aArgs);
         lbl_801D87C0.b40 = 0;
     }
-    if (((Game_GetMode() == 7 && !lbl_801D7148.aCPU[0] && !lbl_801D7148.aCPU[1]) ||
+    if (((Game_GetMode() == 7 && !gFEState.aCPU[0] && !gFEState.aCPU[1]) ||
          Game_GetMode() == 0x1A) &&
         lbl_801D87C0.n38 < 2 && gSession.nGameType == 3) {
         if (lbl_80281368 == -1) {

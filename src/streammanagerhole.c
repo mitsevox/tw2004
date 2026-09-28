@@ -293,21 +293,21 @@ void fn_800146C4(void) {
 
 // Stream list 1 (the front end's files), with the loading screen unless the front end's b0F is set.
 void fn_80014718(void) {
-    if (lbl_801D7148.b0F == 0) {
+    if (gFEState.b0F == 0) {
         fn_80091778();
         fn_800918A4();
     }
     fn_80015134();
     do {
-        if (lbl_801D7148.b0F == 0) {
+        if (gFEState.b0F == 0) {
             fn_8009198C(0);
         }
     } while (UStream_Update() != 0);
-    if (lbl_801D7148.b0F == 0) {
+    if (gFEState.b0F == 0) {
         fn_8009198C(1);
     }
     fn_8001510C();
-    if (lbl_801D7148.b0F == 0) {
+    if (gFEState.b0F == 0) {
         fn_80091818();
     }
 }

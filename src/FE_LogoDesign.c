@@ -173,8 +173,8 @@ void fn_8010FAF4(void) {
 // The logo being edited: the menus' own copy while bEditingCopy is set, else the profile's user
 // logo that LogoEdit.n0 names.
 LogoRecord* fn_8010FB70(void) {
-    if (lbl_80281ED4->bEditingCopy) {
-        return &lbl_80281ED4->logoCopy;
+    if (gpFEProfile->bEditingCopy) {
+        return &gpFEProfile->logoCopy;
     }
     return &FE_GetCurrentProfile()->choices.aLogo[lbl_802824B8->n0];
 }

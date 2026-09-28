@@ -1,6 +1,6 @@
 // PasswordManager.c (TW06's golf/earnings/passwordmanager.cpp; our spelling): the cheat codes
 // typed in the options menu (PasswordManager_TestPassword) and the unlocks they set, which hold for
-// every profile (lbl_80281DF4, and the bit arrays lbl_801D5948 and lbl_801D5908); and the setup of
+// every profile (lbl_80281DF4, and the bit arrays gPasswordEnteredBits and gSponsorPasswordBits); and the setup of
 // a new save profile.
 
 #include "game/save.h"
@@ -9,26 +9,26 @@
 #include "game/modes/pgatour.h"
 #include "game/modes/pgatoursim.h"
 
-u32 lbl_801D5948[8];
-u32 lbl_801D5908[16];
+u32 gPasswordEnteredBits[8];
+u32 gSponsorPasswordBits[16];
 
 void fn_80057438(SaveProfile* pProfile);
 void fn_80057DA4(SaveProfile* pProfile);
 
-// The codes that set a bit of lbl_801D5908, one each (some bits have two codes).
-char* lbl_80188024[16] = {
+// The codes that set a bit of gSponsorPasswordBits, one each (some bits have two codes).
+char* gSponsorPasswords[16] = {
     "91treSTR", "cgTR78qw", "CL45etUB", "lsfkajfd", "lsfkajfd", "FDGH597i", "YJHk342B", "Uit45TW6",
     "lsfkajfd", "kjnMR3qv", "R453DrTe", "BRi3498Z", "CXCbr883", "cDsa2fgY", "CXCbr883", "TS345329",
 };
 
-// Bit n of lbl_801D5948: the cheat that sets it has been entered.
+// Bit n of gPasswordEnteredBits: the cheat that sets it has been entered.
 u8 PasswordManager_IsPasswordEntered(int n) {
-    return BitArray_TestBit(lbl_801D5948, n);
+    return BitArray_TestBit(gPasswordEnteredBits, n);
 }
 
-// Bit n of lbl_801D5908.
+// Bit n of gSponsorPasswordBits.
 u8 fn_800564AC(int n) {
-    return BitArray_TestBit(lbl_801D5908, n);
+    return BitArray_TestBit(gSponsorPasswordBits, n);
 }
 
 // Tests a typed code; if it is a cheat, sets what it unlocks and returns 1.
@@ -50,7 +50,7 @@ u8 PasswordManager_TestPassword(char* szCode) {
             lbl_80281DF4->aRewardUnlocked[i] = 1;
         }
         lbl_80281DF4->nTourCardLevel = 1;
-        lbl_801D7148.b18 = 0;
+        gFEState.b18 = 0;
         return 1;
     }
     if (strcmp(szCode, "ALLTHETRACKS") == 0) {
@@ -128,21 +128,21 @@ u8 PasswordManager_TestPassword(char* szCode) {
         return 1;
     }
     if (stricmp(szCode, "SHERWOOD TARGET") == 0) {
-        BitArray_SetBit(lbl_801D5948, 6);
+        BitArray_SetBit(gPasswordEnteredBits, 6);
         return 1;
     }
     // This code does nothing: the test is made and its result is not used.
     if (strcmp(szCode, "ALLOFITSFREE") == 0) {
     }
     for (i = 0; i < 16; i++) {
-        if (strcmp(szCode, lbl_80188024[i]) == 0) {
-            BitArray_SetBit(lbl_801D5908, i);
+        if (strcmp(szCode, gSponsorPasswords[i]) == 0) {
+            BitArray_SetBit(gSponsorPasswordBits, i);
             return 1;
         }
     }
     for (i = 0; i < 5; i++) {
         if (strcmp(szCode, aszCode[i]) == 0) {
-            BitArray_SetBit(lbl_801D5948, aBit[i]);
+            BitArray_SetBit(gPasswordEnteredBits, aBit[i]);
             return 1;
         }
     }
@@ -155,11 +155,11 @@ void fn_80056B8C(void) {
     int i;
 
     fn_80057438(lbl_80281DF4);
-    BitArray_ClearArray(lbl_801D5948, 7);
-    BitArray_ClearArray(lbl_801D5908, 16);
+    BitArray_ClearArray(gPasswordEnteredBits, 7);
+    BitArray_ClearArray(gSponsorPasswordBits, 16);
     lbl_80281DF4->bActive = 0;
     for (i = 0; i < 16; i++) {
-        lbl_80281DF4->aGolferUnlocked[lbl_801894E8[i]] = 1;
+        lbl_80281DF4->aGolferUnlocked[gStartUnlockedGolfers[i]] = 1;
     }
     for (i = 0; i < 21; i++) {
         lbl_80281DF4->aCourseUnlocked[i] = 1;
@@ -167,7 +167,7 @@ void fn_80056B8C(void) {
     lbl_80281DF4->aCourseUnlocked[21] = 1;
     lbl_80281DF4->aCourseUnlocked[22] = 1;
     for (i = 0; i < 6; i++) {
-        lbl_80281DF4->aCourseUnlocked[lbl_801894D0[i]] = 0;
+        lbl_80281DF4->aCourseUnlocked[gStartLockedCourses[i]] = 0;
     }
     lbl_80281DF4->aCourseUnlocked[21] = 1;
     lbl_80281DF4->aCourseUnlocked[22] = 1;
@@ -238,7 +238,7 @@ void fn_80056B8C(void) {
 void fn_80057364(int nSlot) {
     char szName[16];
 
-    lbl_801D7148.aLoaded[nSlot] = 0;
+    gFEState.aLoaded[nSlot] = 0;
     fn_80057438(&gpSaveData[nSlot]);
     sprintf(szName, "USER%d", nSlot + 1);
     strcpy(gpSaveData[nSlot].szName, szName);
@@ -248,10 +248,10 @@ void fn_80057364(int nSlot) {
 void fn_800573E4(void) {
     SaveProfile* pProfile = gpSaveData;
 
-    if (lbl_801D7148.aLoaded[0] == 0) {
+    if (gFEState.aLoaded[0] == 0) {
         strcpy(pProfile->szName, "Dummy");
         pProfile->bActive = 1;
-        lbl_801D7148.aLoaded[0] = 1;
+        gFEState.aLoaded[0] = 1;
     }
 }
 
@@ -265,7 +265,7 @@ void fn_80057438(SaveProfile* pProfile) {
     memset(pProfile, 0, sizeof(SaveProfile));
     pProfile->bActive = 0;
     if (gSession.nGameType == 3) {
-        sprintf(pProfile->szName, "User %d", lbl_80281ED4->nSlot + 1);
+        sprintf(pProfile->szName, "User %d", gpFEProfile->nSlot + 1);
     } else {
         strcpy(pProfile->szName, "NoName");
     }
@@ -279,7 +279,7 @@ void fn_80057438(SaveProfile* pProfile) {
         pProfile->aSponsor[i].nSponsor = 0;
     }
     for (i = 0; i < 16; i++) {
-        pProfile->aGolferUnlocked[lbl_801894E8[i]] = 1;
+        pProfile->aGolferUnlocked[gStartUnlockedGolfers[i]] = 1;
     }
     for (i = 0; i < 21; i++) {
         pProfile->aCourseUnlocked[i] = 1;
@@ -287,7 +287,7 @@ void fn_80057438(SaveProfile* pProfile) {
     pProfile->aCourseUnlocked[21] = 1;
     pProfile->aCourseUnlocked[22] = 1;
     for (i = 0; i < 6; i++) {
-        pProfile->aCourseUnlocked[lbl_801894D0[i]] = 0;
+        pProfile->aCourseUnlocked[gStartLockedCourses[i]] = 0;
     }
     pProfile->aCourseUnlocked[21] = 1;
     pProfile->aCourseUnlocked[22] = 1;
@@ -301,7 +301,7 @@ void fn_80057438(SaveProfile* pProfile) {
     if (PasswordManager_IsPasswordEntered(0)) {
         pProfile->nCurrentCash = 1000000000;
     } else {
-        pProfile->nCurrentCash = lbl_801D7148.n1C + 25000;
+        pProfile->nCurrentCash = gFEState.n1C + 25000;
         if (lbl_80281DF0.bSigned) {
             pProfile->nCurrentCash += GameModeDriverPGATour_GetSponsorshipStartCash(0);
         }

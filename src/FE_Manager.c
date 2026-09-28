@@ -34,7 +34,7 @@ void fn_8009170C(void);
 
 // This file, in address order.
 void fn_80076E48(void);
-void fn_80076EEC(void);                 // frees lbl_80281EC8
+void fn_80076EEC(void);                 // frees gpFEBios
 void fn_80076F20(void);
 void fn_80076F24(void);
 void fn_80076F54(void);
@@ -65,15 +65,15 @@ void fn_80079DAC(void);
 u8   fn_80079E44(int nAttr);            // a hidden attribute: ATTR_AGGRESSION, ATTR_IQ, ATTR_SPEED
 
 // This file's globals (fe.h), each section in reverse address order as the compiler lays it out.
-FEState lbl_801D7148;
-FEProfile* lbl_80281ED4;
-u32 lbl_80281ED0;
-u32 lbl_80281ECC;
-FEBio* lbl_80281EC8;
+FEState gFEState;
+FEProfile* gpFEProfile;
+u32 gFEBackupAramAddr;
+u32 gFEBackupSize;
+FEBio* gpFEBios;
 
-s32 lbl_801894D0[6] = {3, 9, 12, 17, 18, 4};
-s32 lbl_801894E8[16] = {0, 18, 21, 3, 5, 7, 11, 23, 10, 13, 14, 28, 22, 24, 4, 12};
-s32 lbl_80189528[14] = {9, 16, 6, 26, 29, 2, 8, 15, 17, 19, 20, 25, 27, 1};
+s32 gStartLockedCourses[6] = {3, 9, 12, 17, 18, 4};
+s32 gStartUnlockedGolfers[16] = {0, 18, 21, 3, 5, 7, 11, 23, 10, 13, 14, 28, 22, 24, 4, 12};
+s32 gStartLockedGolfers[14] = {9, 16, 6, 26, 29, 2, 8, 15, 17, 19, 20, 25, 27, 1};
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x80283AC0), before the 0.0f and 0.05f FE_movieFade uses first; its body is unknown.
@@ -85,28 +85,28 @@ static f32 FE_Manager_StrippedFn(f32 x) {
 void fn_80076E48(void) {
     int i;
     for (i = 0; i < 5; i++) {
-        lbl_801D7148.aLoaded[i] = 0;
-        lbl_801D7148.aCPU[i] = 0;
-        lbl_801D7148.aBackup[i] = -1;
+        gFEState.aLoaded[i] = 0;
+        gFEState.aCPU[i] = 0;
+        gFEState.aBackup[i] = -1;
     }
-    lbl_801D7148.b0F = 1;
-    lbl_801D7148.b10 = 1;
-    lbl_801D7148.nMode = -1;
-    lbl_801D7148.b11 = 0;
-    lbl_801D7148.b18 = 1;
-    lbl_801D7148.n1C = 0;
-    lbl_801D7148.nMovieNext = 0;
-    lbl_801D7148.nMovieFree = 0;
-    lbl_801D7148.p658 = NULL;
+    gFEState.b0F = 1;
+    gFEState.b10 = 1;
+    gFEState.nMode = -1;
+    gFEState.b11 = 0;
+    gFEState.b18 = 1;
+    gFEState.n1C = 0;
+    gFEState.nMovieNext = 0;
+    gFEState.nMovieFree = 0;
+    gFEState.p658 = NULL;
     fn_8009170C();
     lbl_801D8858.p30 = NULL;
 }
 
 // Free the copy of the 'BIO ' stream object's data.
 void fn_80076EEC(void) {
-    if (lbl_80281EC8 != NULL) {
-        StaticMem_Free(lbl_80281EC8);
-        lbl_80281EC8 = NULL;
+    if (gpFEBios != NULL) {
+        StaticMem_Free(gpFEBios);
+        gpFEBios = NULL;
     }
 }
 
@@ -126,8 +126,8 @@ void fn_80076F58(void) {
 
 // The 'BIO ' stream object's handler: keep a copy of its data.
 void fn_80076F80(UStreamObject* pObject) {
-    lbl_80281EC8 = StaticMem_Alloc(pObject->uSize, 2, 32, "FE_Manager.c", 285);
-    Mem_cpy(lbl_80281EC8, pObject->pData, pObject->uSize);
+    gpFEBios = StaticMem_Alloc(pObject->uSize, 2, 32, "FE_Manager.c", 285);
+    Mem_cpy(gpFEBios, pObject->pData, pObject->uSize);
     StaticMem_Free(pObject);
 }
 
@@ -166,16 +166,16 @@ void fn_800770D4(char* pName, char* pPath) {
 
 // Add a movie to the queue; the caller fills it in.
 FEMovie* fn_800770FC(void) {
-    FEMovie* pMovie = &lbl_801D7148.aMovies[lbl_801D7148.nMovieFree++];
-    if (lbl_801D7148.nMovieFree % FE_NUM_MOVIES == 0) {
-        lbl_801D7148.nMovieFree = 0;
+    FEMovie* pMovie = &gFEState.aMovies[gFEState.nMovieFree++];
+    if (gFEState.nMovieFree % FE_NUM_MOVIES == 0) {
+        gFEState.nMovieFree = 0;
     }
     return pMovie;
 }
 
 // The queue is empty.
 u8 fn_80077148(void) {
-    return lbl_801D7148.nMovieFree == lbl_801D7148.nMovieNext;
+    return gFEState.nMovieFree == gFEState.nMovieNext;
 }
 
 // Once a frame: while a movie is queued, fade the screen to black; once it is black, play the
@@ -192,7 +192,7 @@ void FE_movieFade(void) {
         vColor[3] = lbl_801D87C0.fFade;
         fn_80037FB4(1, vColor);
         lbl_801D87C0.fFade += 0.05f;
-        pMovie = &lbl_801D7148.aMovies[lbl_801D7148.nMovieNext];
+        pMovie = &gFEState.aMovies[gFEState.nMovieNext];
         if (lbl_801D87C0.fFade >= 1.0f) {
             Gaud_StopMusic();
             fn_800772E0();
@@ -212,9 +212,9 @@ void FE_movieFade(void) {
             fn_8007731C();
             Gaud_StartFEMusic(0);
             lbl_801D87C0.fFade = 0.0f;
-            lbl_801D7148.nMovieNext++;
-            if (lbl_801D7148.nMovieNext % FE_NUM_MOVIES == 0) {
-                lbl_801D7148.nMovieNext = 0;
+            gFEState.nMovieNext++;
+            if (gFEState.nMovieNext % FE_NUM_MOVIES == 0) {
+                gFEState.nMovieNext = 0;
             }
         }
     }
@@ -278,12 +278,12 @@ void fn_80077428(void) {
 // Set up the profile being worked on, cleared, and the logo textures' hashes.
 void fn_8007744C(void) {
     int i;
-    lbl_80281ED4 = StaticMem_Alloc(sizeof(FEProfile), 2, 16, "FE_Manager.c", 1035);
-    Mem_set(lbl_80281ED4, 0, sizeof(FEProfile));
-    lbl_80281ED4->bCopy = 0;
-    lbl_80281ED4->bEditingCopy = 0;
-    lbl_80281ED4->nSlot = 0;
-    lbl_80281ED4->n1 = -1;
+    gpFEProfile = StaticMem_Alloc(sizeof(FEProfile), 2, 16, "FE_Manager.c", 1035);
+    Mem_set(gpFEProfile, 0, sizeof(FEProfile));
+    gpFEProfile->bCopy = 0;
+    gpFEProfile->bEditingCopy = 0;
+    gpFEProfile->nSlot = 0;
+    gpFEProfile->n1 = -1;
     for (i = 0; i < FE_NUM_801D8890; i++) {
         lbl_801D8890[i].b0 = 0;
         lbl_801D8890[i].n4 = 0;
@@ -291,11 +291,11 @@ void fn_8007744C(void) {
     }
     lbl_801D8858.b18 = 0;
     lbl_801D8858.p30 = NULL;
-    lbl_80281ED4->uSquareHash = fn_8000BEE4("__LogoSquare");
-    lbl_80281ED4->uRectHash = fn_8000BEE4("__LogoRect");
-    lbl_80281ED4->b11702 = 0;
-    lbl_80281ED4->b11703 = 0;
-    lbl_80281ED4->n11704 = 0;
+    gpFEProfile->uSquareHash = fn_8000BEE4("__LogoSquare");
+    gpFEProfile->uRectHash = fn_8000BEE4("__LogoRect");
+    gpFEProfile->b11702 = 0;
+    gpFEProfile->b11703 = 0;
+    gpFEProfile->n11704 = 0;
 }
 
 // Every player on a created golfer gets its slot's saved record in the golfer table, but keeps
@@ -325,7 +325,7 @@ void fn_800775BC_LoadCreatedFromSave(void) {
     }
     fn_80076EEC();
     fn_80076F20();
-    StaticMem_Free(lbl_80281ED4);
+    StaticMem_Free(gpFEProfile);
 }
 
 // Back up every slot's profile, where one is loaded.
@@ -333,7 +333,7 @@ void fn_80077780(void) {
     int i;
     for (i = 0; i < 4; i++) {
         if (gpSaveData[i].bActive) {
-            Mem_cpy(&lbl_801D7148.p658[i], &gpSaveData[i], sizeof(SaveProfile));
+            Mem_cpy(&gFEState.p658[i], &gpSaveData[i], sizeof(SaveProfile));
         }
     }
 }
@@ -343,40 +343,40 @@ void fn_80077780(void) {
 void fn_80077808(int nSlot) {
     int nFree = -1;
     int i;
-    if (lbl_801D7148.aBackup[nSlot] == -1) {
+    if (gFEState.aBackup[nSlot] == -1) {
         for (i = 0; i < 4; i++) {
-            if (!lbl_801D7148.p658[i].bActive) {
+            if (!gFEState.p658[i].bActive) {
                 nFree = i;
                 break;
             }
         }
         if (nFree == -1) {
-            Mem_cpy(&lbl_801D7148.p658[nSlot], &gpSaveData[nSlot], sizeof(SaveProfile));
-            lbl_801D7148.aBackup[nSlot] = nSlot;
+            Mem_cpy(&gFEState.p658[nSlot], &gpSaveData[nSlot], sizeof(SaveProfile));
+            gFEState.aBackup[nSlot] = nSlot;
         } else if (nSlot == nFree) {
-            Mem_cpy(&lbl_801D7148.p658[nSlot], &gpSaveData[nSlot], sizeof(SaveProfile));
-            lbl_801D7148.aBackup[nSlot] = nSlot;
+            Mem_cpy(&gFEState.p658[nSlot], &gpSaveData[nSlot], sizeof(SaveProfile));
+            gFEState.aBackup[nSlot] = nSlot;
         } else {
             fn_800779BC(nFree, nSlot);
-            Mem_cpy(&lbl_801D7148.p658[nSlot], &gpSaveData[nSlot], sizeof(SaveProfile));
-            lbl_801D7148.aBackup[nSlot] = nSlot;
+            Mem_cpy(&gFEState.p658[nSlot], &gpSaveData[nSlot], sizeof(SaveProfile));
+            gFEState.aBackup[nSlot] = nSlot;
         }
     } else {
-        Mem_cpy(&lbl_801D7148.p658[lbl_801D7148.aBackup[nSlot]], &gpSaveData[nSlot], sizeof(SaveProfile));
+        Mem_cpy(&gFEState.p658[gFEState.aBackup[nSlot]], &gpSaveData[nSlot], sizeof(SaveProfile));
     }
 }
 
 // Back up one slot's profile into its backup row.
 void fn_80077968(int nSlot) {
-    Mem_cpy(&lbl_801D7148.p658[lbl_801D7148.aBackup[nSlot]], &gpSaveData[nSlot], sizeof(SaveProfile));
+    Mem_cpy(&gFEState.p658[gFEState.aBackup[nSlot]], &gpSaveData[nSlot], sizeof(SaveProfile));
 }
 
 // Swap two backup rows.
 void fn_800779BC(int a, int b) {
     SaveProfile* pTemp = StaticMem_Alloc(sizeof(SaveProfile), 1, 32, "FE_Manager.c", 1194);
-    Mem_cpy(pTemp, &lbl_801D7148.p658[b], sizeof(SaveProfile));
-    Mem_cpy(&lbl_801D7148.p658[b], &lbl_801D7148.p658[a], sizeof(SaveProfile));
-    Mem_cpy(&lbl_801D7148.p658[a], pTemp, sizeof(SaveProfile));
+    Mem_cpy(pTemp, &gFEState.p658[b], sizeof(SaveProfile));
+    Mem_cpy(&gFEState.p658[b], &gFEState.p658[a], sizeof(SaveProfile));
+    Mem_cpy(&gFEState.p658[a], pTemp, sizeof(SaveProfile));
     StaticMem_Free(pTemp);
 }
 
@@ -394,14 +394,14 @@ GolferRecord* fn_80077A80(int nGolfer) {
 // The profile the front end is working on: its working copy while bCopy is set, else the slot's own
 // save profile.
 SaveProfile* FE_GetCurrentProfile(void) {
-    if (lbl_80281ED4->bCopy) {
-        return &lbl_80281ED4->profile;
+    if (gpFEProfile->bCopy) {
+        return &gpFEProfile->profile;
     }
-    return &gpSaveData[lbl_80281ED4->nSlot];
+    return &gpSaveData[gpFEProfile->nSlot];
 }
 
 int fn_80077B08(void) {
-    return lbl_80281ED4->nSlot;
+    return gpFEProfile->nSlot;
 }
 
 // A yes/no list over 0..28 (Golfer.c asks it); what it marks is not known yet.
@@ -492,20 +492,20 @@ void fn_80077C1C(int a, int b) {
     fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
     nSeed = fn_80078604(nMonth, nDay, nYear);
     for (j = 0; j < 5; j++) {
-        lbl_80281ED4->aSaleEntry[b][nCategory][j] = -1;
-        lbl_80281ED4->aSaleChoice[b][nCategory][j] = -1;
+        gpFEProfile->aSaleEntry[b][nCategory][j] = -1;
+        gpFEProfile->aSaleChoice[b][nCategory][j] = -1;
     }
-    lbl_80281ED4->nDateSeed = nSeed;
-    if (lbl_80281ED4->nDateSeed == 0) {
-        lbl_80281ED4->nDateSeed = 3081979;          // 8/3/1979, packed as fn_80078604 does
+    gpFEProfile->nDateSeed = nSeed;
+    if (gpFEProfile->nDateSeed == 0) {
+        gpFEProfile->nDateSeed = 3081979;          // 8/3/1979, packed as fn_80078604 does
     }
-    Misc_SetSeedFunc(0, lbl_80281ED4->nDateSeed);
-    lbl_80281ED4->aSalePart[b][nCategory] = aKinds[Misc_RandFunc(0) % nKinds];
+    Misc_SetSeedFunc(0, gpFEProfile->nDateSeed);
+    gpFEProfile->aSalePart[b][nCategory] = aKinds[Misc_RandFunc(0) % nKinds];
     nB = b;
     for (i = 0; i < nCount; i++) {
         FE_CrAP_SetCurrentGender(FE_CrAP_GetAssetGender(i));
         nKind = FE_CrAP_GetCategoryFromAssetID(i);
-        if (nKind == lbl_80281ED4->aSalePart[b][nCategory] &&
+        if (nKind == gpFEProfile->aSalePart[b][nCategory] &&
             (FE_CrAP_GetAssetGender(i) == nB || FE_CrAP_GetAssetGender(i) == 2) &&
             !fn_80078008(i, pProfile) && FE_CrAP_GetLevelFromAssetID(i) > 0) {
             aFound[nFound] = i;
@@ -518,11 +518,11 @@ void fn_80077C1C(int a, int b) {
     retry:
         FE_CrAP_GetCategorySubcategoryAndEntryNumFromAssetID(aFound[Misc_RandFunc(0) % nFound], &nKind,
                 &nPart, &nChoice);
-        lbl_80281ED4->aSaleEntry[b][nCategory][j] = nPart;
-        lbl_80281ED4->aSaleChoice[b][nCategory][j] = nChoice;
+        gpFEProfile->aSaleEntry[b][nCategory][j] = nPart;
+        gpFEProfile->aSaleChoice[b][nCategory][j] = nChoice;
         for (i = 0; i < j; i++) {
-            if (lbl_80281ED4->aSaleEntry[b][nCategory][j] == lbl_80281ED4->aSaleEntry[b][nCategory][i] &&
-                lbl_80281ED4->aSaleChoice[b][nCategory][j] == lbl_80281ED4->aSaleChoice[b][nCategory][i]) {
+            if (gpFEProfile->aSaleEntry[b][nCategory][j] == gpFEProfile->aSaleEntry[b][nCategory][i] &&
+                gpFEProfile->aSaleChoice[b][nCategory][j] == gpFEProfile->aSaleChoice[b][nCategory][i]) {
                 goto retry;                         // fake match: a do-while scores 98.3
             }
         }
@@ -563,7 +563,7 @@ u8 fn_80078008(s32 nAsset, SaveProfile* pProfile) {
         bLocked = 0;
         break;
     case 6:
-        bLocked = BitArray_TestBit(lbl_801D5948, aBits[n]) == 0;
+        bLocked = BitArray_TestBit(gPasswordEnteredBits, aBits[n]) == 0;
         break;
     case 7:
         bLocked = !pProfile->aC8[n].award.bWon;
@@ -1190,7 +1190,7 @@ int fn_800797E0(SaveProfile* pProfile, s16 nPart, int b, int nChance) {
 void fn_80079974(void) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     int i;
-    if (lbl_80281ED4->bCopy) {
+    if (gpFEProfile->bCopy) {
         FE_CrAP_SetTriggerAnims(0);
         FE_CrAP_RandomizePart(pProfile, 9, 0);
         FE_CrAP_TurnOnPart(3, 0, 0);
@@ -1223,8 +1223,8 @@ void fn_80079AD4(void) {
     int i;
     if (Game_GetMode() == 5 || Game_GetMode() == 11) {
         if (gpSaveData[0].bActive) {
-            lbl_801D7148.aBackup[0] = 0;
-            if (!lbl_80281ED4->b11703) {
+            gFEState.aBackup[0] = 0;
+            if (!gpFEProfile->b11703) {
                 Session_SetGolfer(FIRST_CREATED_GOLFER, 0);
             }
         } else {
@@ -1232,18 +1232,18 @@ void fn_80079AD4(void) {
         }
     }
     for (i = 0; i < 5; i++) {
-        if (lbl_801D7148.aCPU[i]) {
+        if (gFEState.aCPU[i]) {
             gSession.nController[i] = CONTROLLER_CPU;
             gSession.uBag[i] = 0;
             gpSaveData[i].bActive = 0;
-        } else if (lbl_801D7148.aLoaded[i]) {
+        } else if (gFEState.aLoaded[i]) {
             gpSaveData[i].bActive = 1;
             if (gSession.nGolfer[i] >= FIRST_CREATED_GOLFER) {
                 gSession.uBag[i] = gpSaveData[i].createdGolfer.uBagMask;
             }
         } else if (gSession.nController[i] == CONTROLLER_CPU) {
             gpSaveData[i].bActive = 0;
-        } else if (!lbl_801D7148.aLoaded[i]) {
+        } else if (!gFEState.aLoaded[i]) {
             gpSaveData[i].bActive = 1;
             gSession.uBag[i] = gGolferTable[gSession.nGolfer[i]].uBagMask;
         }
@@ -1251,20 +1251,20 @@ void fn_80079AD4(void) {
             gpSaveData[i].bActive = 0;
         }
     }
-    lbl_801D7148.nMode = Game_GetMode();
+    gFEState.nMode = Game_GetMode();
     if (GameMode4_IsEventRunning()) {
-        lbl_801D7148.nMode = 4;
+        gFEState.nMode = 4;
     }
     if (GM_Currently_PgaTourMode()) {
-        lbl_801D7148.nMode = 23;
+        gFEState.nMode = 23;
     }
-    if (lbl_80281ED4->b0 && Game_GetMode() == 10) {
-        lbl_801D7148.nMode = 27;
+    if (gpFEProfile->b0 && Game_GetMode() == 10) {
+        gFEState.nMode = 27;
     }
-    if (lbl_801D7148.nMode == 11 && gpSaveData[lbl_80281ED4->nSlot].nTourCardLevel > 0) {
-        lbl_801D7148.nMode = 28;
+    if (gFEState.nMode == 11 && gpSaveData[gpFEProfile->nSlot].nTourCardLevel > 0) {
+        gFEState.nMode = 28;
     }
-    lbl_801D7148.b11 = 0;
+    gFEState.b11 = 0;
     lbl_801D87C0.bFadeToBlack = 1;
     gSession.bDemo = 0;
     Gaud_ExitFE();
@@ -1275,27 +1275,27 @@ void fn_80079AD4(void) {
 
 // Move the backups out to ARAM, freeing the main memory they used.
 void fn_80079D30(void) {
-    if (lbl_801D7148.p658 != NULL) {
-        lbl_80281ECC = FE_BACKUP_SIZE;
-        if (lbl_80281ED0 == 0) {
-            lbl_80281ED0 = GoARAM_Alloc(FE_BACKUP_SIZE);
+    if (gFEState.p658 != NULL) {
+        gFEBackupSize = FE_BACKUP_SIZE;
+        if (gFEBackupAramAddr == 0) {
+            gFEBackupAramAddr = GoARAM_Alloc(FE_BACKUP_SIZE);
         }
-        GoARAM_WaitTransfer(GoARAM_CopyToAram(lbl_801D7148.p658, lbl_80281ED0, lbl_80281ECC));
-        StaticMem_Free(lbl_801D7148.p658);
-        lbl_801D7148.p658 = NULL;
+        GoARAM_WaitTransfer(GoARAM_CopyToAram(gFEState.p658, gFEBackupAramAddr, gFEBackupSize));
+        StaticMem_Free(gFEState.p658);
+        gFEState.p658 = NULL;
     }
 }
 
 // Bring the backups back from ARAM (empty ones if there were none).
 void fn_80079DAC(void) {
-    if (lbl_801D7148.p658 == NULL) {
-        lbl_80281ECC = FE_BACKUP_SIZE;
-        lbl_801D7148.p658 = StaticMem_Alloc(lbl_80281ECC, 2, 32, "FE_Manager.c", 2778);
-        memset(lbl_801D7148.p658, 0, lbl_80281ECC);
-        if (lbl_80281ED0 != 0) {
-            GoARAM_WaitTransfer(GoARAM_CopyFromAram(lbl_801D7148.p658, lbl_80281ED0, lbl_80281ECC));
-            GoARAM_Free(lbl_80281ED0);
-            lbl_80281ED0 = 0;
+    if (gFEState.p658 == NULL) {
+        gFEBackupSize = FE_BACKUP_SIZE;
+        gFEState.p658 = StaticMem_Alloc(gFEBackupSize, 2, 32, "FE_Manager.c", 2778);
+        memset(gFEState.p658, 0, gFEBackupSize);
+        if (gFEBackupAramAddr != 0) {
+            GoARAM_WaitTransfer(GoARAM_CopyFromAram(gFEState.p658, gFEBackupAramAddr, gFEBackupSize));
+            GoARAM_Free(gFEBackupAramAddr);
+            gFEBackupAramAddr = 0;
         }
     }
 }

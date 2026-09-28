@@ -24,7 +24,7 @@ LAYOUT_ASSERT(FEMovie, 0x108);
 #define FE_MOVIE_BIO     3      // "bios/bio<nn>"
 #define FE_NUM_MOVIES    6      // the length of the movie queue
 
-// The front end's state (lbl_801D7148, 0x660 bytes). Only what the cleaned code reads.
+// The front end's state (gFEState, 0x660 bytes). Only what the cleaned code reads.
 typedef struct FEState {
     u8  aLoaded[5];             // 0x000  per player slot: a profile is loaded (its name is shown)
     u8  aCPU[5];                // 0x005  per player slot: a CPU player (fn_80079AD4 gives it
@@ -48,7 +48,7 @@ typedef struct FEState {
 } FEState;
 LAYOUT_ASSERT(FEState, 0x660);
 
-extern FEState lbl_801D7148;
+extern FEState gFEState;
 
 // GM_vIsGolferUnlocked and GM_vIsGolferUnlockedByDefault set it to 0.2 for a locked golfer, else 0
 // (also for one that is not available).
@@ -167,7 +167,7 @@ extern FE801D8890 lbl_801D8890[FE_NUM_801D8890];
 // end is shut down in game type 3 (uiProcessInterface.c fn_80090400).
 extern u32 lbl_801D8ED0[FE_NUM_801D8890];
 
-// The profile being worked on in the menus (lbl_80281ED4 points to it; 0x11708 bytes, allocated
+// The profile being worked on in the menus (gpFEProfile points to it; 0x11708 bytes, allocated
 // and cleared by fn_8007744C).
 typedef struct FEProfile {
     u8  b0;                     // 0x00000  with game mode 10, the menus start in mode 27
@@ -203,7 +203,7 @@ typedef struct FEProfile {
 } FEProfile;
 LAYOUT_ASSERT(FEProfile, 0x11708);
 
-extern FEProfile* lbl_80281ED4;
+extern FEProfile* gpFEProfile;
 
 // One golfer's bio in the 'BIO ' stream object, as the menus show it (FE_MessageTable.c
 // GM_vFindGolferBio, GM_vGetBioTexts, GM_vGetBioLines).
@@ -220,15 +220,15 @@ typedef struct FEBio {
 } FEBio;
 LAYOUT_ASSERT(FEBio, 0x1F8);
 
-extern s32 lbl_801894E8[16];            // golfer ids GM_vIsGolferUnlockedByDefault counts as unlocked
+extern s32 gStartUnlockedGolfers[16];            // golfer ids GM_vIsGolferUnlockedByDefault counts as unlocked
 
 #define FE_NUM_BIOS 29
-extern FEBio* lbl_80281EC8;             // a copy of the 'BIO ' stream object's data (fn_80076F80)
+extern FEBio* gpFEBios;             // a copy of the 'BIO ' stream object's data (fn_80076F80)
 
 // The profile backups (FEState.p658) can be moved out to ARAM (fn_80079D30) and back (fn_80079DAC).
 #define FE_BACKUP_SIZE 0x41820          // the four slots' backups (4 x 0x10600) and 0x20 more
-extern u32 lbl_80281ECC;                // their size
-extern u32 lbl_80281ED0;                // their ARAM address while they are there (0: not there)
+extern u32 gFEBackupSize;                // their size
+extern u32 gFEBackupAramAddr;                // their ARAM address while they are there (0: not there)
 
 // ---- the golfers animated on menu screens (FEgolferanim.c) -----------------------------------
 

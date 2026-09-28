@@ -1782,7 +1782,7 @@ int HighScoreRecords_GetEndOfShotRecord(int nPlayer, Ball* pBall, int a, u8 bCou
     if (Game_GetMulliganRule() != 0) return 0;
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return 0;
-    if (lbl_801D7148.aLoaded[nProfile] == 0) {
+    if (gFEState.aLoaded[nProfile] == 0) {
         sprintf(szName, "User %d", nProfile + 1);
     } else {
         strcpy(szName, gpSaveData[nProfile].szName);
@@ -1838,7 +1838,7 @@ int HighScoreRecords_GetEndOfHoleRecord(int nPlayer, Ball* pBall, int a, u8 bCou
     if (Game_GetMulliganRule() != 0) return 0;
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return 0;
-    if (lbl_801D7148.aLoaded[nProfile] == 0) {
+    if (gFEState.aLoaded[nProfile] == 0) {
         sprintf(szName, "User %d", nProfile + 1);
     } else {
         strcpy(szName, gpSaveData[nProfile].szName);
@@ -1889,7 +1889,7 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
     if (Game_GetMulliganRule() != 0) return 0;
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return 0;
-    if (lbl_801D7148.aLoaded[nProfile] == 0) {
+    if (gFEState.aLoaded[nProfile] == 0) {
         sprintf(szName, "User %d", nProfile + 1);
     } else {
         strcpy(szName, gpSaveData[nProfile].szName);

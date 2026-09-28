@@ -1225,7 +1225,7 @@ void GM_vGetGolfersUserName(MsgArg* pArgs, MsgArg* pResult) {
     int nSlot = gPlayers[pArgs[0].i].nIndex;
     char szName[32];
 
-    if (lbl_801D7148.aLoaded[nSlot] == 0) {
+    if (gFEState.aLoaded[nSlot] == 0) {
         sprintf(szName, "User %d", nSlot + 1);
         strcpy(((MsgString*)pArgs[1].p)->pStr, szName);
         return;
@@ -1304,7 +1304,7 @@ void GM_vGetSlotUserName(MsgArg* pArgs, MsgArg* pResult) {
     int nSlot = pArgs[0].i;
     char szName[32];
 
-    if (lbl_801D7148.aLoaded[nSlot] == 0) {
+    if (gFEState.aLoaded[nSlot] == 0) {
         sprintf(szName, "User %d", nSlot + 1);
         strcpy(((MsgString*)pArgs[1].p)->pStr, szName);
         return;

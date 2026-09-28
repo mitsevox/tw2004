@@ -272,7 +272,7 @@ void RealtimePopup_GetRow_EventResults(int nRow, char* szTitle, char* szText) {
     u8 bComplete;
 
     GameModeDriverRTE_GetEventByDate(CalendarState.nSelected, &nId, &nRound);
-    bComplete = GameModeDriverRTE_IsEventComplete(lbl_80281ED4->nSlot, nId);
+    bComplete = GameModeDriverRTE_IsEventComplete(gpFEProfile->nSlot, nId);
     nRewards = FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(0x11, GM_RealtimeMode_GetTrophyID(nId),
                                                             szReward1, szReward2, szReward3);
     fn_800907AC(GameModeDriverRTE_GetPurse(nId), szMoney);
@@ -403,7 +403,7 @@ void FE_GetNextRealtimeEventInfo(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(szDate, "Start Date");
     CalDate_ToString(nDate, szDate);
     bNear = 0;
-    if (nDate - CalDate_GetToday() < 2 && lbl_801D7148.aLoaded[0]) {
+    if (nDate - CalDate_GetToday() < 2 && gFEState.aLoaded[0]) {
         bNear = 1;
     }
     // fake match: worked out as an int and kept as a u8 (one clrlwi for the test and the result);

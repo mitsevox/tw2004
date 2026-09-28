@@ -402,7 +402,7 @@ void GM_vGetCrAPGolferInfo(MsgArg* pArgs, MsgArg* pResult) {
 // Menu message 457: from now on the menus work on their own copy of the profile (pArgs[0] 1) or on
 // the player slot's saved profile (0); FEProfile.bCopy, read by FE_GetCurrentProfile.
 void GM_vSetUseProfileCopy(MsgArg* pArgs, MsgArg* pResult) {
-    lbl_80281ED4->bCopy = pArgs[0].i;
+    gpFEProfile->bCopy = pArgs[0].i;
 }
 
 // Menu message 460: choice pArgs[2] under entry pArgs[1] of part pArgs[0] is still locked for the
@@ -487,12 +487,12 @@ void GM_vGetCrAPSaleItems(MsgArg* pArgs, MsgArg* pResult) {
     int nSale = fn_80077BDC(pArgs[0].i);
     s8 nGender = FE_CrAP_GetCurrentGender();
 
-    *(s32*)pArgs[1].p = lbl_80281ED4->aSalePart[nGender][nSale];
-    *(s32*)pArgs[2].p = lbl_80281ED4->aSaleChoice[nGender][nSale][0];
-    *(s32*)pArgs[3].p = lbl_80281ED4->aSaleChoice[nGender][nSale][1];
-    *(s32*)pArgs[4].p = lbl_80281ED4->aSaleChoice[nGender][nSale][2];
-    *(s32*)pArgs[5].p = lbl_80281ED4->aSaleChoice[nGender][nSale][3];
-    *(s32*)pArgs[6].p = lbl_80281ED4->aSaleChoice[nGender][nSale][4];
+    *(s32*)pArgs[1].p = gpFEProfile->aSalePart[nGender][nSale];
+    *(s32*)pArgs[2].p = gpFEProfile->aSaleChoice[nGender][nSale][0];
+    *(s32*)pArgs[3].p = gpFEProfile->aSaleChoice[nGender][nSale][1];
+    *(s32*)pArgs[4].p = gpFEProfile->aSaleChoice[nGender][nSale][2];
+    *(s32*)pArgs[5].p = gpFEProfile->aSaleChoice[nGender][nSale][3];
+    *(s32*)pArgs[6].p = gpFEProfile->aSaleChoice[nGender][nSale][4];
 }
 
 // Menu message 476: the list entries (EA's subcategories) of the five sale items
@@ -501,11 +501,11 @@ void GM_vGetCrAPSaleSubcategories(MsgArg* pArgs, MsgArg* pResult) {
     int nSale = fn_80077BDC(pArgs[0].i);
     s8 nGender = FE_CrAP_GetCurrentGender();
 
-    *(s32*)pArgs[1].p = lbl_80281ED4->aSaleEntry[nGender][nSale][0];
-    *(s32*)pArgs[2].p = lbl_80281ED4->aSaleEntry[nGender][nSale][1];
-    *(s32*)pArgs[3].p = lbl_80281ED4->aSaleEntry[nGender][nSale][2];
-    *(s32*)pArgs[4].p = lbl_80281ED4->aSaleEntry[nGender][nSale][3];
-    *(s32*)pArgs[5].p = lbl_80281ED4->aSaleEntry[nGender][nSale][4];
+    *(s32*)pArgs[1].p = gpFEProfile->aSaleEntry[nGender][nSale][0];
+    *(s32*)pArgs[2].p = gpFEProfile->aSaleEntry[nGender][nSale][1];
+    *(s32*)pArgs[3].p = gpFEProfile->aSaleEntry[nGender][nSale][2];
+    *(s32*)pArgs[4].p = gpFEProfile->aSaleEntry[nGender][nSale][3];
+    *(s32*)pArgs[5].p = gpFEProfile->aSaleEntry[nGender][nSale][4];
 }
 
 // Menu message 477: choice pArgs[2] under entry pArgs[1] of part pArgs[0] is one of the day's sale
@@ -541,15 +541,15 @@ void GM_vIsCrAPItemOnSale(MsgArg* pArgs, MsgArg* pResult) {
         return;
     }
     nSale = fn_80077BDC(nSaleCategory);
-    if (lbl_80281ED4->aSalePart[nGender][nSale] != nPart) {
+    if (gpFEProfile->aSalePart[nGender][nSale] != nPart) {
         pResult->i = 0;
         return;
     }
     for (j = 0; j < 5; j++) {
         if (nAsset
             == FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(
-                    lbl_80281ED4->aSalePart[nGender][nSale], lbl_80281ED4->aSaleEntry[nGender][nSale][j],
-                    lbl_80281ED4->aSaleChoice[nGender][nSale][j])) {
+                    gpFEProfile->aSalePart[nGender][nSale], gpFEProfile->aSaleEntry[nGender][nSale][j],
+                    gpFEProfile->aSaleChoice[nGender][nSale][j])) {
             pResult->i = 1;
             return;
         }
@@ -848,9 +848,9 @@ void GM_vSaveLogo(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 nLogo = fn_8010F7D8();
 
-    lbl_80281ED4->logoCopy.bSaved = 1;
-    Mem_cpy(&pProfile->choices.aLogo[nLogo], &lbl_80281ED4->logoCopy, sizeof(LogoRecord));
-    lbl_80281ED4->bEditingCopy = 0;
+    gpFEProfile->logoCopy.bSaved = 1;
+    Mem_cpy(&pProfile->choices.aLogo[nLogo], &gpFEProfile->logoCopy, sizeof(LogoRecord));
+    gpFEProfile->bEditingCopy = 0;
 }
 
 // Menu message 515: golfer pArgs[0]'s equipment tier for attribute pArgs[1] (a created golfer's
@@ -920,7 +920,7 @@ void GM_vFEMessage539_Empty(MsgArg* pArgs, MsgArg* pResult) {
 // Menu message 542: 1 while the menus work on their own copy of the profile, 0 while on the player
 // slot's saved one (FEProfile.bCopy; GM_vSetUseProfileCopy sets it).
 void GM_vGetUseProfileCopy(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = lbl_80281ED4->bCopy;
+    pResult->i = gpFEProfile->bCopy;
 }
 
 // Menu message 543: start (pArgs[0] nonzero) or stop creating the profile's logo the editor works
@@ -935,19 +935,19 @@ void GM_vCRAPCreatingLogo(MsgArg* pArgs, MsgArg* pResult) {
     s32 nLogo = fn_8010F7D8();
 
     if (bStart == 0) {
-        lbl_80281ED4->bEditingCopy = 0;
+        gpFEProfile->bEditingCopy = 0;
         return;
     }
     if (pProfile->choices.aLogo[nLogo].bSaved) {
-        Mem_cpy(&lbl_80281ED4->logoCopy, &pProfile->choices.aLogo[nLogo], sizeof(LogoRecord));
+        Mem_cpy(&gpFEProfile->logoCopy, &pProfile->choices.aLogo[nLogo], sizeof(LogoRecord));
     } else {
         sprintf(szName, "MyLogo %d", nLogo + 1);
-        strcpy(lbl_80281ED4->logoCopy.szName, szName);
-        lbl_80281ED4->logoCopy.bSaved = 0;
-        lbl_80281ED4->logoCopy.nShape = 0;
-        memset(lbl_80281ED4->logoCopy.aPixels, 0x1C, sizeof(lbl_80281ED4->logoCopy.aPixels));
+        strcpy(gpFEProfile->logoCopy.szName, szName);
+        gpFEProfile->logoCopy.bSaved = 0;
+        gpFEProfile->logoCopy.nShape = 0;
+        memset(gpFEProfile->logoCopy.aPixels, 0x1C, sizeof(gpFEProfile->logoCopy.aPixels));
     }
-    lbl_80281ED4->bEditingCopy = 1;
+    gpFEProfile->bEditingCopy = 1;
 }
 
 // Menu message 583: the same as GM_vGetLogoPaletteColor (message 491): logo palette colour pArgs[0]
@@ -1223,8 +1223,8 @@ void GM_vGetNumCrAPSaleItemsOwned(MsgArg* pArgs, MsgArg* pResult) {
     *pnBought = 0;
     for (i = 0; i < 5; i++) {
         nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(
-                lbl_80281ED4->aSalePart[nGender][nSale], lbl_80281ED4->aSaleEntry[nGender][nSale][i],
-                lbl_80281ED4->aSaleChoice[nGender][nSale][i]);
+                gpFEProfile->aSalePart[nGender][nSale], gpFEProfile->aSaleEntry[nGender][nSale][i],
+                gpFEProfile->aSaleChoice[nGender][nSale][i]);
         if (BitArray_TestBit(pProfile->aAssetOwned, nAsset)) {
             (*pnBought)++;
         }
