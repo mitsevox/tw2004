@@ -34,6 +34,11 @@ with `TW_MAIN`, `TW_WORKTREES`, `TW_SCRATCH`, `TW_PERMUTER`.
    and a CHECKPOINT time. Reuse a finished lane's worktree for the next assignment.
 3. Record it in `state.md` (lane, units, checkpoint).
 
+Every fact in a prompt comes from the repo or a reference build (owner, 2026-09-28): describe a file
+by its own header comment, EA's text or a related build's file name, and cite it. Where nothing
+says what a file does, the prompt says "purpose unknown: read it from the code". Never fill a gap
+from memory (the "Road to the Emerald" gloss for RTE was invented; RTE is TW07's real-time events).
+
 Give each lane its own files (units). Shared headers: add, never change what others use; a change
 that touches many lanes' files (a prototype's parameter order, a struct layout) is scheduled for one
 lane while the others avoid those call sites. Rotate unit lists between rounds (fresh eyes).
