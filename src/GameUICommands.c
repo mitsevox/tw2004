@@ -1589,9 +1589,9 @@ void GM_vIG_MCfreeMem(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // How many replays the save on the card in port pArgs[0], slot pArgs[1] holds, 0 on an error
-// (command 83): the menus' own command fn_8007E9BC, run with the same arguments.
+// (command 83): the menus' own command GM_vMCGetNumReplays, run with the same arguments.
 void GM_vIG_MCGetNumReplays(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8007E9BC(pArgs, pResult);
+    GM_vMCGetNumReplays(pArgs, pResult);
 }
 
 // Asks for pArgs[0] to be handed back to the UI a little later (command 84): uiProcessInterface.c

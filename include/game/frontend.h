@@ -207,7 +207,7 @@ extern MsgHandler gIGMessageHandlers[UI_NUM_ROUND_COMMANDS];
 
 // Menu handlers (FE_MessageTable.c) that the round's table also runs, or that round handlers
 // pass on to.
-void fn_8007E9BC(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCGetNumReplays(MsgArg* pArgs, MsgArg* pResult);
 void fn_8008299C(MsgArg* pArgs, MsgArg* pResult);
 void fn_80082DBC(MsgArg* pArgs, MsgArg* pResult);
 void fn_80082E10(MsgArg* pArgs, MsgArg* pResult);
