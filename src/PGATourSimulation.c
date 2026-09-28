@@ -289,7 +289,7 @@ void GM_PgaTourSim_SimTournamentWinner(int nPlayer) {
     gpSaveData[nPlayer].tour.aStats[pWinner->nGolfer].nSeasonWins++;
     gpSaveData[nPlayer].tour.aStats[pWinner->nGolfer].nCareerWins++;
     gpSaveData[nPlayer].tour.aStats[pWinner->nGolfer].nPlayerOfYearPoints++;
-    if (fn_800EFA70(gpSaveData[nPlayer].tour.nEvent)->nC != 0) {
+    if (GameModeDriverPGATour_GetEventInfo(gpSaveData[nPlayer].tour.nEvent)->nC != 0) {
         gpSaveData[nPlayer].tour.aStats[pWinner->nGolfer].nPlayerOfYearPoints += 3;
     }
     nFirstPrize = GameModeDriverPGATour_ComputePurseForBracket(gpSaveData[nPlayer].tour.nEvent,
@@ -313,7 +313,7 @@ void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst) {
     TourSeason* pTour = &gpSaveData[nPlayer].tour;
     PgaStatCounts* pStats = &gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER];
 
-    if (bFirst && fn_800EFA70(gpSaveData[nPlayer].tour.nEvent)->nC != 0) {
+    if (bFirst && GameModeDriverPGATour_GetEventInfo(gpSaveData[nPlayer].tour.nEvent)->nC != 0) {
         pTour->n4E9A++;
     }
     if (bUser && bFirst) {
@@ -697,7 +697,7 @@ int GM_PgaTourSim_GetRelativeScoreFromEntrantID(int nPlayer, int nEntrant, u8 b)
     if (nEvent == -1) {
         nEvent = GameModeDriverPGATour_GetFinalEventOfSeason();
     }
-    GameModeDriverPGATour_GetCourses(fn_800EFA70(nEvent), aCourses);
+    GameModeDriverPGATour_GetCourses(GameModeDriverPGATour_GetEventInfo(nEvent), aCourses);
     GetEntrantNonMCPtr(nEntrant);
     nScore = GM_PgaTourSim_GetTotalScoreFromEntrantID(nPlayer, nEntrant, b);
     if (gSession.nGameType == 3 && gpSaveData[nPlayer].tour.nRound == 0) {

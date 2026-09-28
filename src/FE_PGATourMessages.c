@@ -107,7 +107,7 @@ void fn_8010E890(MsgArg* pArgs, MsgArg* pResult) {
     char* szCourses = ((MsgString*)pArgs[3].p)->pStr;
     char* szChamp = ((MsgString*)pArgs[4].p)->pStr;
     s32 nEvent = lbl_802824B0[pArgs[0].i];
-    u16 nStart = fn_800EFD38(nEvent);
+    u16 nStart = GameModeDriverPGATour_GetStartDate(nEvent);
     u16 nEnd = GameModeDriverPGATour_GetEndDate(nEvent);
     Tournament* pTournament;
     s32 nCourses;
@@ -117,7 +117,7 @@ void fn_8010E890(MsgArg* pArgs, MsgArg* pResult) {
     CalDate_ToStringMD(nStart, szStart);
     CalDate_ToStringMD(nEnd, szEnd);
     sprintf(szDates, "%s\nthru\n%s", szStart, szEnd);
-    pTournament = fn_800EFA70(nEvent);
+    pTournament = GameModeDriverPGATour_GetEventInfo(nEvent);
     sprintf(szName, "%s", GameModeDriverPGATour_GetName(nEvent));
     nCourses = GameModeDriverPGATour_GetCourses(pTournament, aCourses);
     szCourses[0] = '\0';
@@ -148,7 +148,7 @@ void fn_8010EA24(MsgArg* pArgs, MsgArg* pResult) {
         lbl_802824B0 = StaticMem_Alloc(nEvents * 4, 1, 16, "FE_PGATourMessages.c", 263);
     }
     for (i = 0; i < nEvents; i++) {
-        if (fn_800EFD38(i)) {
+        if (GameModeDriverPGATour_GetStartDate(i)) {
             lbl_802824B0[nCount++] = i;
         }
     }
@@ -206,7 +206,7 @@ void fn_8010EBDC(MsgArg* pArgs, MsgArg* pResult) {
     sprintf(szOut, "", nLine);
     switch (nLine) {
     case -1:
-        sprintf(szOut, "%d Season Wrap-up", fn_800EFBAC());
+        sprintf(szOut, "%d Season Wrap-up", GameModeDriverPGATour_GetCurrentSeasonYear());
         return;
     case 0:
         if (GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_PLAYER_OF_YEAR_POINTS)) {
@@ -241,7 +241,8 @@ void fn_8010EBDC(MsgArg* pArgs, MsgArg* pResult) {
         nCount = 0;
         pEvent = gpSaveData[nPlayer].tour.aEvent;
         for (i = 0; i < 31; i++) {
-            if (pEvent[i].nUserRankType == 2 && pEvent[i].nUserRank == 1 && fn_800EFA70(i)->nC != 0) {
+            if (pEvent[i].nUserRankType == 2 && pEvent[i].nUserRank == 1
+                && GameModeDriverPGATour_GetEventInfo(i)->nC != 0) {
                 nCount++;
             }
         }
@@ -272,7 +273,7 @@ void fn_8010EBDC(MsgArg* pArgs, MsgArg* pResult) {
 // Start the next season.
 void fn_8010EEA8(void) {
     CalendarState.bSeasonOver = 0;
-    fn_800EFAD0();
+    GameModeDriverPGATour_AdvanceSeason();
     ResetCalendarState();
     fn_80077808(0);
 }
@@ -418,8 +419,8 @@ void fn_8010F2CC(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- end of sweep code ----
 
-// A tournament the player of slot pArgs[1] may have won: its name, fn_800EFE3C, and the day it
-// was won. Gives whether it was.
+// A tournament the player of slot pArgs[1] may have won: its name,
+// GameModeDriverPGATour_GetTextureID, and the day it was won. Gives whether it was.
 void fn_8010F2FC(MsgArg* pArgs, MsgArg* pResult) {
     int nPlayer = pArgs[1].i;
     s32 nEvent = pArgs[2].i;
@@ -429,7 +430,7 @@ void fn_8010F2FC(MsgArg* pArgs, MsgArg* pResult) {
     u8 bWon;
 
     strcpy(szName, GameModeDriverPGATour_GetName(nEvent));
-    *pOut = fn_800EFE3C(nEvent);
+    *pOut = GameModeDriverPGATour_GetTextureID(nEvent);
     bWon = gpSaveData[nPlayer].aC8[nEvent].award.bWon;
     if (bWon) {
         CalDate_ToString(gpSaveData[nPlayer].aC8[nEvent].award.nDate, szDate);

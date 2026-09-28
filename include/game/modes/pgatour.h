@@ -70,14 +70,14 @@ typedef struct Pga80205F30 {
 u8   GameModeDriverPGATour_GetEventByDate(u16 nDate, s32* pId, s32* pRound);
 s32  GameModeDriverPGATour_GetSelectedEvent(s32* pRound);
 s32  GameModeDriverPGATour_GetFinalEventOfSeason(void);
-void fn_800EF9D0(s32 nEvent);
-Tournament* fn_800EFA70(s32 i);
-Tournament* fn_800EFC80(u16 nDate);
+void GameModeDriverPGATour_SkipToEvent(s32 nEvent);
+Tournament* GameModeDriverPGATour_GetEventInfo(s32 i);
+Tournament* GM_PgaTourMode_GetEventInfoByDate(u16 nDate);
 s32  GameModeDriverPGATour_GetRounds(s32 i);
-u16  fn_800EFD38(s32 i);                // the tournament's start date
+u16  GameModeDriverPGATour_GetStartDate(s32 i);                // the tournament's start date
 u16  GameModeDriverPGATour_GetEndDate(s32 i);
 char* GameModeDriverPGATour_GetName(s32 i);
-s32  fn_800EFE3C(s32 i);
+s32  GameModeDriverPGATour_GetTextureID(s32 i);
 int  fn_800F009C(void);                 // the leader's score in the current tournament
 int  fn_800F018C(s32 nEvent);           // the player's own score in it (nEvent is not used)
 
@@ -103,8 +103,8 @@ s32  fn_800F0304(s32 i);                // aTriple[i].n8
 // GameModeDriverPGATour.c, as the PGA TOUR menus (FE_PGATourMessages.c) use it
 void fn_800EEF88(s32 nPlayer);
 s32  fn_800EF834(void);                 // the number of tournaments (31)
-s32  fn_800EFAD0(void);                 // the next season: 0 after the tenth
-s32  fn_800EFBAC(void);                 // the current season's year
+s32  GameModeDriverPGATour_AdvanceSeason(void);                 // the next season: 0 after the tenth
+s32  GameModeDriverPGATour_GetCurrentSeasonYear(void);                 // the current season's year
 s32  GameModeDriverPGATour_GetCurrentEventID(void);
 s32  fn_800F02D4(s32 i);                // aTriple[i].n0
 s32  fn_800F02EC(s32 i);                // aTriple[i].n4

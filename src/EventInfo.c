@@ -49,7 +49,7 @@ void fn_8011D280(int nLine, char* szLabel, char* szValue) {
         break;
     case 5:
         strcpy(szLabel, "Course:");
-        GameModeDriverPGATour_GetCourses(fn_800EFA70(nId), aCourses);
+        GameModeDriverPGATour_GetCourses(GameModeDriverPGATour_GetEventInfo(nId), aCourses);
         nRounds = GameModeDriverPGATour_GetRounds(nId);
         if (nRound >= 0 && nRound < nRounds) {
             strcpy(szValue, lbl_80191990[aCourses[nRound]]);
@@ -169,7 +169,7 @@ void fn_8011D658(int nLine, char* szLabel, char* szValue) {
         break;
     case 8:
         strcpy(szLabel, "Course:");
-        pTournament = fn_800EFA70(nId);
+        pTournament = GameModeDriverPGATour_GetEventInfo(nId);
         nRounds = GameModeDriverPGATour_GetRounds(nId);
         GameModeDriverPGATour_GetCourses(pTournament, aCourses);
         if (nRound >= 0 && nRound < nRounds) {

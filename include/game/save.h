@@ -74,7 +74,7 @@ typedef struct PgaStatCounts {
     u32  n44;                   // 0x44  winnings this month: the leader at a month's end gets that
                                 //       month's award, then every golfer's is cleared (GM_PgaTourSim_CheckEndOfTournamentAward)
     u16  nSeasonWins;           // 0x48  (0x80117E98; a new season clears 0x00-0x4A, 0x80117860)
-    u8   nPlayerOfYearPoints;   // 0x4A  1 a win, 3 more where fn_800EFA70's nC is set. TW06: playerOfYearPoints
+    u8   nPlayerOfYearPoints;   // 0x4A  1 a win, 3 more where GameModeDriverPGATour_GetEventInfo's nC is set. TW06: playerOfYearPoints
     u8   unk4B;
     u16  nConsecutiveCuts;      // 0x4C  TW06: nConsecutiveCuts
     u8   unk4E[2];

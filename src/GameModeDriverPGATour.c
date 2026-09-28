@@ -295,7 +295,7 @@ Pga80205F30* fn_800EE8B8(void) {
 // tournaments marked nC, one of four random ones, or for tournaments 9 and 8 their own.
 void fn_800EE8C4(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
-    Tournament* p = fn_800EFA70(gpSaveData[nPlayer].tour.nEvent);
+    Tournament* p = GameModeDriverPGATour_GetEventInfo(gpSaveData[nPlayer].tour.nEvent);
     int i;
     int nWins;
     if (lbl_80205F30.b0 == 1) {
@@ -326,7 +326,7 @@ void fn_800EE8C4(void) {
 // aPrize[bracket][1]) and its message queued, and the prize money is paid.
 void fn_800EEA3C(int nPlayer) {
     s32 nBracket = fn_800EF0E0(nPlayer);
-    Tournament* p = fn_800EFA70(gpSaveData[nPlayer].tour.nEvent);
+    Tournament* p = GameModeDriverPGATour_GetEventInfo(gpSaveData[nPlayer].tour.nEvent);
     s32 nMoney;
     GM_PgaTourSim_SimTournamentWinner(nPlayer);
     if (GM_PgaTourSim_GetScoreRankFromEntrantID(nPlayer, 0) == 1) {
@@ -453,10 +453,11 @@ s32 fn_800EF0E0(int nPlayer) {
 }
 
 // The rounds of the current tournament not played yet are played out for the player: each round's
-// course is loaded and the round simulated (k 3 when bQuick is set). fn_800EF9D0 skips ahead with it.
+// course is loaded and the round simulated (k 3 when bQuick is set).
+// GameModeDriverPGATour_SkipToEvent skips ahead with it.
 void fn_800EF130(int nPlayer, u8 bQuick) {
     s32 nRounds = GameModeDriverPGATour_GetRounds(gpSaveData[nPlayer].tour.nEvent);
-    Tournament* p = fn_800EFA70(gpSaveData[nPlayer].tour.nEvent);
+    Tournament* p = GameModeDriverPGATour_GetEventInfo(gpSaveData[nPlayer].tour.nEvent);
     s32 k;
     s32 nTourEvent;
     while (gpSaveData[nPlayer].tour.nRound < nRounds) {
@@ -682,7 +683,8 @@ s32 GameModeDriverPGATour_GetSelectedEvent(s32* pRound) {
     return gpSaveData[nPlayer].tour.nEvent;
 }
 
-// The tournament after the current one.
+// The first tournament held in profile 0's season after its current one, or -1 when the season has
+// none left.
 s32 GameModeDriverPGATour_GetNextEvent(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
     return GameModeDriverPGATour_GetEventOnOrAfter(gpSaveData[nPlayer].tour.nEvent + 1);
@@ -699,9 +701,11 @@ s32 GameModeDriverPGATour_GetFinalEventOfSeason(void) {
     return nLast;
 }
 
-// Skips ahead to tournament nEvent: a tournament under way is abandoned, the ones before are
-// played out.
-void fn_800EF9D0(s32 nEvent) {
+// The season skips ahead to tournament nEvent (the calendar's PGATour_Play, when the player picks a
+// later day): a tournament profile 0 has started (round > 0) is abandoned, the player cut from it,
+// and every tournament before nEvent has its remaining rounds simulated for the field and ends
+// (champion and profile 0's result recorded, the season moving on).
+void GameModeDriverPGATour_SkipToEvent(s32 nEvent) {
     PlayerNumber_t nPlayer = PLR_1_e;
     if (nEvent != gpSaveData[nPlayer].tour.nEvent && gpSaveData[nPlayer].tour.nRound > 0) {
         GM_PgaTourSim_CutEntrant(0, 0);
@@ -712,8 +716,8 @@ void fn_800EF9D0(s32 nEvent) {
     }
 }
 
-// Tournament i (0..30), or none.
-Tournament* fn_800EFA70(s32 i) {
+// Tournament i's data (gPgaData.aTournament[i]), or NULL for -1 or i past the last (31).
+Tournament* GameModeDriverPGATour_GetEventInfo(s32 i) {
     if (i != -1 && i < 31) {
         return &gPgaData.aTournament[i];
     }
@@ -728,8 +732,10 @@ s32 GameModeDriverPGATour_GetRounds(s32 i) {
     return 1;
 }
 
-// The next season: 0 after the tenth, else 1 and the season starts at its first tournament.
-s32 fn_800EFAD0(void) {
+// Profile 0's tour moves to the next season: it starts at the season's first tournament held and
+// every golfer's season counts are cleared (fn_80117860); returns 1. After the tenth season (2013)
+// the tour is over: nSeason stays at 10, nEvent is set to 0 and it returns 0.
+s32 GameModeDriverPGATour_AdvanceSeason(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
     gpSaveData[nPlayer].tour.nSeason++;
     if (gpSaveData[nPlayer].tour.nSeason >= 10) {
@@ -748,18 +754,19 @@ s32 GameModeDriverPGATour_GetCurrentSeason(void) {
     return gpSaveData[nPlayer].tour.nSeason;
 }
 
-s32 fn_800EFBAC(void) {
+// The current season's year: 2004 for season 0.
+s32 GameModeDriverPGATour_GetCurrentSeasonYear(void) {
     return GameModeDriverPGATour_GetCurrentSeason() + 2004;
 }
 
-// The first tournament from i on that is held this
-// season, or -1.
+// The first tournament from i on that is held in profile 0's season (it has a start date for that
+// season), or -1 when none is left.
 s32 GameModeDriverPGATour_GetEventOnOrAfter(s32 i) {
     PlayerNumber_t nPlayer = PLR_1_e;
     s32 nEvent;
     u8 bFound = 0;
     while (!bFound) {
-        Tournament* p = fn_800EFA70(i);
+        Tournament* p = GameModeDriverPGATour_GetEventInfo(i);
         if (p != NULL) {
             if (p->aStartDate[gpSaveData[nPlayer].tour.nSeason] != 0) {
                 nEvent = i;
@@ -774,40 +781,44 @@ s32 GameModeDriverPGATour_GetEventOnOrAfter(s32 i) {
     return nEvent;
 }
 
-// The tournament being played on a date.
-Tournament* fn_800EFC80(u16 nDate) {
+// The tournament played on a date (any day of its rounds, in the date's own season), or NULL. The
+// PGA TOUR entry of the calendar's gCalendarGetEventInfoByDate table.
+Tournament* GM_PgaTourMode_GetEventInfoByDate(u16 nDate) {
     s32 nId;
     s32 nRound;
     if (GameModeDriverPGATour_GetEventByDate(nDate, &nId, &nRound)) {
-        return fn_800EFA70(nId);
+        return GameModeDriverPGATour_GetEventInfo(nId);
     }
     return 0;
 }
 
 // Tournament i's total purse in bracket k, in dollars.
 s32 GameModeDriverPGATour_ComputePurseForBracket(s32 i, s32 k) {
-    Tournament* p = fn_800EFA70(i);
+    Tournament* p = GameModeDriverPGATour_GetEventInfo(i);
     return p->aPrize[k][0] * 1000;
 }
 
 // Tournament i's first prize (the winner's share) in bracket k, in dollars.
 s32 GameModeDriverPGATour_ComputeFirstPrizeForBracket(s32 i, s32 k) {
-    Tournament* p = fn_800EFA70(i);
+    Tournament* p = GameModeDriverPGATour_GetEventInfo(i);
     return p->aPrize[k][1] * 1000;
 }
 
-u16 fn_800EFD38(s32 i) {
-    Tournament* p = fn_800EFA70(i);
+// Tournament i's first day in the current season, 0 when it is not held this season, or 0xFFFF for
+// -1 or i past the last.
+u16 GameModeDriverPGATour_GetStartDate(s32 i) {
+    Tournament* p = GameModeDriverPGATour_GetEventInfo(i);
     if (p == NULL) {
         return 0xFFFF;
     }
     return p->aStartDate[GameModeDriverPGATour_GetCurrentSeason()];
 }
 
-// The last day of tournament i this season.
+// Tournament i's last day in the current season (its start date plus its rounds less one), or
+// 0xFFFF for -1 or i past the last.
 u16 GameModeDriverPGATour_GetEndDate(s32 i) {
     u16 nDate;
-    Tournament* p = fn_800EFA70(i);
+    Tournament* p = GameModeDriverPGATour_GetEventInfo(i);
     if (p == NULL) {
         return 0xFFFF;
     }
@@ -816,18 +827,21 @@ u16 GameModeDriverPGATour_GetEndDate(s32 i) {
     return nDate;
 }
 
+// Tournament i's name, in the names block of the 'PGAn' object.
 char* GameModeDriverPGATour_GetName(s32 i) {
     return gPgaData.pNames + gPgaData.aTournament[i].nName;
 }
 
-// Profile 0's current tournament.
+// Profile 0's current tournament: -1 once the season's last one is over.
 s32 GameModeDriverPGATour_GetCurrentEventID(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
     return gpSaveData[nPlayer].tour.nEvent;
 }
 
-s32 fn_800EFE3C(s32 i) {
-    return fn_800EFA70(i)->n10;
+// Tournament i's icon (Tournament.n10): drawn in the calendar on its last day (PGATour_FillCell)
+// and with a won tournament in the PGA TOUR menus. No range check: i must be a tournament.
+s32 GameModeDriverPGATour_GetTextureID(s32 i) {
+    return GameModeDriverPGATour_GetEventInfo(i)->n10;
 }
 
 char* GameModeDriverPGATour_GetInitialChampName(s32 i) {

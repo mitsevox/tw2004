@@ -194,7 +194,8 @@ char* (*gCalendarGetEventName[3])(u16 nDate) = {
 };
 // port: the PGA TOUR and real-time drivers return their own event types through this void* entry
 void* (*gCalendarGetEventInfoByDate[3])(u16 nDate) = {
-    Online_GetEventInfoByDate, (void* (*)(u16))fn_800EFC80, (void* (*)(u16))GM_RealtimeMode_GetEventInfoByDate
+    Online_GetEventInfoByDate, (void* (*)(u16))GM_PgaTourMode_GetEventInfoByDate, (
+            void* (*)(u16))GM_RealtimeMode_GetEventInfoByDate
 };
 void (*gCalendarPlay[3])(void) = { Online_Play, PGATour_Play, RealTime_Play };
 u8 (*gCalendarIsSimulationNecessary[3])(void) = {
@@ -268,8 +269,8 @@ void GetRankText(int nRank, char* sz) {
 // the text becomes the player's place in it (GetRankText of
 // GM_PgaTourSim_GetScoreRankFromEntrantID). *pCellColor: 4 the current tournament, 5 a past
 // tournament the profile won, 2 other past days (today too once the season is over), 3 days to
-// come. Returns the tournament's calendar icon (fn_800EFE3C, its n10) on its last day, else -1. A
-// day without a tournament gets empty text, *pCellState 0 and -1.
+// come. Returns the tournament's calendar icon (GameModeDriverPGATour_GetTextureID, its n10) on its
+// last day, else -1. A day without a tournament gets empty text, *pCellState 0 and -1.
 s32 PGATour_FillCell(char* sz, u16 nDate, s32* pCellColor, s32* pCellState) {
     s32 nId;
     s32 nRound;
@@ -280,7 +281,7 @@ s32 PGATour_FillCell(char* sz, u16 nDate, s32* pCellColor, s32* pCellState) {
     GameModeDriverPGATour_GetSelectedEvent(&nSelRound);
     if (GameModeDriverPGATour_GetEventByDate(nDate, &nId, &nRound)) {
         bSelected = nId == GameModeDriverPGATour_GetSelectedEvent(&nRound2);
-        fn_800EFA70(nId);
+        GameModeDriverPGATour_GetEventInfo(nId);
         if (nDate == CalendarState.nToday) {
             if (CalendarState.bSeasonOver) {
                 strcpy(sz, "");
@@ -315,7 +316,7 @@ s32 PGATour_FillCell(char* sz, u16 nDate, s32* pCellColor, s32* pCellState) {
             *pCellColor = 3;
         }
         if (nRound == GameModeDriverPGATour_GetRounds(nId) - 1) {
-            return fn_800EFE3C(nId);
+            return GameModeDriverPGATour_GetTextureID(nId);
         }
         return -1;
     }
@@ -340,8 +341,8 @@ s32 PGATour_GetPopupType(u16 nDate) {
 
     GameModeDriverPGATour_GetEventByDate(CalendarState.nToday, &nTodayId, &nTodayRound);
     GameModeDriverPGATour_GetEventByDate(nDate, &nId, &nRound);
-    nTodayStart = fn_800EFD38(nTodayId);
-    nStart = fn_800EFD38(nId);
+    nTodayStart = GameModeDriverPGATour_GetStartDate(nTodayId);
+    nStart = GameModeDriverPGATour_GetStartDate(nId);
     if (fn_800F0428(0) == -1) {
         return 1;
     }
@@ -377,7 +378,7 @@ void PGATour_GetPopupRow(int nRow, char* szTitle, char* szText) {
         return;
     case 2:
         GameModeDriverPGATour_GetEventByDate(CalendarState.nSelected, &nId, &nRound);
-        nStart = fn_800EFD38(nId);
+        nStart = GameModeDriverPGATour_GetStartDate(nId);
         nEnd = GameModeDriverPGATour_GetEndDate(nId);
         CalDate_ToString(nStart, szStart);
         CalDate_ToString(nEnd, szEnd);
@@ -404,13 +405,13 @@ void PGATour_GetPopupRow(int nRow, char* szTitle, char* szText) {
 }
 
 // The PGA TOUR career's current day: the first day of player 1's current tournament plus the round
-// they are on. 0xFFFF once the season has no tournament left (fn_800EFD38 of none), which
-// ResetCalendarState checks for.
+// they are on. 0xFFFF once the season has no tournament left (GameModeDriverPGATour_GetStartDate of
+// none), which ResetCalendarState checks for.
 u16 PGATour_GetCurrentDay(void) {
     s32 nRound;
     u16 nDate;
 
-    nDate = fn_800EFD38(GameModeDriverPGATour_GetSelectedEvent(&nRound));
+    nDate = GameModeDriverPGATour_GetStartDate(GameModeDriverPGATour_GetSelectedEvent(&nRound));
     CalDate_AddDays(&nDate, nRound);
     return nDate;
 }
@@ -428,7 +429,7 @@ char* PGATour_GetEventName(u16 nDate) {
 
 // The PGA TOUR calendar's play button: player 0 plays the first created golfer (30), the game mode
 // becomes 23 (the PGA TOUR season), and the season skips ahead to the selected day's tournament
-// (fn_800EF9D0: the tournaments before it are played out).
+// (GameModeDriverPGATour_SkipToEvent: the tournaments before it are played out).
 void PGATour_Play(void) {
     s32 nId;
     s32 nRound;
@@ -436,7 +437,7 @@ void PGATour_Play(void) {
     Session_SetGolfer(30, 0);
     GM_SetModeType(23);
     GameModeDriverPGATour_GetEventByDate(CalendarState.nSelected, &nId, &nRound);
-    fn_800EF9D0(nId);
+    GameModeDriverPGATour_SkipToEvent(nId);
 }
 
 // Whether tournaments must be simulated before the PGA TOUR calendar's selected day can be played:
