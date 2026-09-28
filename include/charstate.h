@@ -113,7 +113,7 @@ typedef struct SkinDesc44 {
     s32  nC;                    // 0x0C  its SkinDesc.p28 entry
     s32  n10;                   // 0x10  the p44 entries of its morph targets start here
     s32  n14;                   // 0x14  its morph targets
-    s32  n18;                   // 0x18  the first one's number (fn_8011C850: n14 + n18 needed)
+    s32  n18;                   // 0x18  the first one's number (SkinMorph_GetNumTargets: n14 + n18 needed)
     u8   unk1C[0x24 - 0x1C];
     u32  u24;                   // 0x24  bit 1: has morph targets
     s32  n28;                   // 0x28  its first entry in SkinDesc.pA4
@@ -180,7 +180,7 @@ typedef struct SkinDesc {
     s32  n30;                   // 0x030  entries in p34
     SkinMesh* p34;              // 0x034
     s32  n38;                   // 0x038  entries in p3C
-    s32* p3C;                   // 0x03C  SkinDesc.p34 entries, -1 none (fn_8011C8B0)
+    s32* p3C;                   // 0x03C  SkinDesc.p34 entries, -1 none (SkinMorph_EntryNeedsBlend)
     s32  n40;                   // 0x040  entries in p44; an HwsBurn keeps a bit per entry
                                 //        (fn_801104AC)
     SkinDesc44* p44;            // 0x044
@@ -269,10 +269,10 @@ LAYOUT_ASSERT(SkinModel, 0x140);  // fn_801276E4 copies it whole
 // What Skin.pMorph points at (SkinMorph.c; our name): the weights of the skin's morph targets.
 typedef struct SkinMorphState {
     s32  nMorphs;               // 0x0
-    f32* afWeights;             // 0x4  one per morph target (fn_8011CADC)
+    f32* afWeights;             // 0x4  one per morph target (SkinMorph_SetTargetWeight)
     u32* aChanged[2];           // 0x8  bit arrays of nMorphs bits, indexed like Skin.a10A0:
-                                //      fn_8011CADC sets a changed target's bit in both,
-                                //      fn_8011CE58 sets every bit, fn_8011CB5C clears one
+                                //      SkinMorph_SetTargetWeight sets a changed target's bit in both,
+                                //      SkinMorph_UpdateAllTargets sets every bit, SkinMorph_Update clears one
 } SkinMorphState;
 
 // SkinMorph.c's work area (lbl_80281880; our name): blends a mesh's morph targets into one of two
@@ -284,19 +284,19 @@ typedef struct SkinMorphVert {
 LAYOUT_ASSERT(SkinMorphVert, 0x20);
 
 typedef struct SkinMorphWork {
-    SkinMorphVert aVerts[0x800];    // 0x00000  the mesh being blended (fn_8011C068 unpacks it)
+    SkinMorphVert aVerts[0x800];    // 0x00000  the mesh being blended (SkinMorph_UnpackVerts unpacks it)
     u8   unk10000[0x18];
-    u16  n10018;               // 0x10018  vertices in the mesh being blended (fn_8011C49C)
+    u16  n10018;               // 0x10018  vertices in the mesh being blended (SkinMorph_LoadMesh)
     u8   pad1001A[0x10020 - 0x1001A];
-    void* p10020;               // 0x10020  } the two buffers; fn_8011C46C swaps them
+    void* p10020;               // 0x10020  } the two buffers; SkinMorph_SwapTargets swaps them
     void* p10024;               // 0x10024  }
-    SkinMesh* apTargets[64];    // 0x10028  the target meshes fn_8011C5B4 picks
+    SkinMesh* apTargets[64];    // 0x10028  the target meshes SkinMorph_PickTargets picks
     f32  afTargets[64];         // 0x10128  and their weights
     SkinDesc* pDesc;            // 0x10228
-    s32  nMorphs;               // 0x1022C  } SkinMorphState's (fn_8011C58C)
+    s32  nMorphs;               // 0x1022C  } SkinMorphState's (SkinMorph_SetWorkWeights)
     f32* afWeights;             // 0x10230  }
-    struct HwsMemBlock* pBlock;         // 0x10234  (fn_8011C5A8)
-    struct HwsOverrideTable* pTable;    // 0x10238  (fn_8011C59C)
+    struct HwsMemBlock* pBlock;         // 0x10234  (SkinMorph_SetWorkMemBlock)
+    struct HwsOverrideTable* pTable;    // 0x10238  (SkinMorph_SetWorkOverrideTable)
 } SkinMorphWork;
 
 extern SkinMorphWork* lbl_80281880;
@@ -315,7 +315,7 @@ typedef struct Skin {
     f32  (*p108C)[4][4];        // 0x108C  } SKEL_SetSkinningMatrices)
     struct HwsMemBlock* p1090;  // 0x1090  freed by SKN_FreeRenderData
     u8   unk1094[0x1098 - 0x1094];
-    struct HwsMemBlock* a1098[2];   // 0x1098  indexed like a10A0 (fn_8011CB5C)
+    struct HwsMemBlock* a1098[2];   // 0x1098  indexed like a10A0 (SkinMorph_Update)
     struct HwsOverrideTable* a10A0[2];  // 0x10A0  indexed by SkinPart_BeginDraw's argument; Skin.c sets [0]
     SkinChoice* aParts[4];      // 0x10A8  a choice per part, four copies: a new choice goes to [3]
                                 //         (to all four while SkinPart_GetChangeAllCopies), a texture
@@ -466,7 +466,7 @@ typedef struct CharSliderDefs {
     CharSliderDef* pDefs;       // 0x04
     CharSliderValue* pValues;   // 0x08
     s32  nMorphs;               // 0x0C
-    u64* aMorphIds;             // 0x10  the skin's morph targets, in fn_8011CADC's order
+    u64* aMorphIds;             // 0x10  the skin's morph targets, in SkinMorph_SetTargetWeight's order
 } CharSliderDefs;
 
 // The byte-swap layouts CharSlider_CreateDefinitionsFromMem reads the definitions with.
@@ -519,7 +519,7 @@ typedef struct HwsBurn {
     s32* aVariant;              // 0x0C  per part: its variant, -1 all (fn_801109FC)
     s32* aOption;               // 0x10  per part: its option, -1 all (fn_80110A0C)
     u8   unk14[4];
-    s32  n18;                   // 0x18  fn_8011C850(pDesc)
+    s32  n18;                   // 0x18  SkinMorph_GetNumTargets(pDesc)
     s32* a1C;                   // 0x1C  n18 flags (fn_80110A24)
     s32  n20;                   // 0x20  pDesc->n2C
     s32  n24;                   // 0x24  the bits of p28 set (fn_80111124)
@@ -694,11 +694,11 @@ void  SkinPart_EndDraw(Skin* pSkin);
 void  SkinPart_ShutdownSkin(void);
 
 // SkinMorph.c: the morph targets a skin description needs.
-s32   fn_8011C850(SkinDesc* pDesc);
-void  fn_8011CADC(Skin* pSkin, int nMorph, f32 fWeight);
-void  fn_8011CC40(Skin* pSkin, HwsMemBlock** ppBlock, HwsOverrideTable** ppTable);
-void  fn_8011CD84(Skin* pSkin);
-void  fn_8011CD3C(Skin* pSkin, HwsMemBlock* pBlock, HwsOverrideTable* pTable);
+s32   SkinMorph_GetNumTargets(SkinDesc* pDesc);
+void  SkinMorph_SetTargetWeight(Skin* pSkin, int nMorph, f32 fWeight);
+void  SkinMorph_CreateBlended(Skin* pSkin, HwsMemBlock** ppBlock, HwsOverrideTable** ppTable);
+void  SkinMorph_Destroy(Skin* pSkin);
+void  SkinMorph_FreeBlended(Skin* pSkin, HwsMemBlock* pBlock, HwsOverrideTable* pTable);
 
 // hwsOverride_Gc.c: a mesh table and a memory block for a skin description's morphed meshes.
 HwsMemBlock* fn_801128EC(SkinDesc* pDesc, s32 nSize);

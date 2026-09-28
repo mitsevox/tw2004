@@ -320,7 +320,7 @@ void fn_80127B98(Skin* pSkin, s32* aParts, s32* aList) {
         fn_80110A0C(pBurn, i, SkinPart_GetPartOption(pSkin, i, 0));
     }
 
-    nCount = fn_8011C850(pSkin->pModel->pDesc);
+    nCount = SkinMorph_GetNumTargets(pSkin->pModel->pDesc);
     for (i = 0; i < nCount; i++) {
         for (j = 0; aList[j] >= 0; j++) {
             if (i == aList[j]) break;
@@ -328,11 +328,11 @@ void fn_80127B98(Skin* pSkin, s32* aParts, s32* aList) {
         if (aList[j] < 0) {
             fn_80110A24(pBurn, i);
         } else {
-            fn_8011CADC(pSkin, i, 0.0f);
+            SkinMorph_SetTargetWeight(pSkin, i, 0.0f);
         }
     }
 
-    fn_8011CC40(pSkin, &pBlock, &pTable);
+    SkinMorph_CreateBlended(pSkin, &pBlock, &pTable);
     fn_80110A1C(pBurn, pTable);
     pDesc = fn_80111EB0(pBurn);
     pOld = pSkin->pModel->pDesc;
@@ -340,7 +340,7 @@ void fn_80127B98(Skin* pSkin, s32* aParts, s32* aList) {
     StaticMem_Free(pOld);
     fn_80127B10(pSkin, pBurn);
     fn_801108B0(pBurn);
-    fn_8011CD3C(pSkin, pBlock, pTable);
+    SkinMorph_FreeBlended(pSkin, pBlock, pTable);
     if (pSkin->a10A0[0] != NULL) {
         pSkin->a10A0[0]->pDesc = pDesc;
     }

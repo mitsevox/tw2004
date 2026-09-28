@@ -277,7 +277,7 @@ They will be sorted into the sections below.
 - **[verified] A parameter reused as the running pointer** is the parameter itself, not a new local (char
   Character_SwapTexEntries 95.3 -> 100).
 - **[verified] Copy a `u16` field to a `u32` local before shifting** it into a pointer offset: plain `slwi`
-  instead of `clrlslwi` (SkinMorph fn_8011C4D4 95 -> 100).
+  instead of `clrlslwi` (SkinMorph SkinMorph_StoreMesh 95 -> 100).
 - **[verified] `!(a ^ b)`** gives the original's `xor.` where `a == b` gives `cmpw` (u8 field vs int
   parameter; Glows fn_800985FC).
 - **[verified] The order of a for-loop's increments sets the order of the `addi`s** (hlaudmovie

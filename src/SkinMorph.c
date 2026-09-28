@@ -8,9 +8,9 @@
 SkinMorphWork lbl_80250080;
 SkinMorphWork* lbl_80281880 = &lbl_80250080;
 
-// Unpacks nVerts vertices into the work area: positions (four s16 each) and normals (four s8
-// each) to 16.16 fixed point.
-void fn_8011C068(SkinMorphWork* pWork, s16* pPos, s8* pNrm, u32 nVerts) {
+// Unpacks nVerts vertices into the work area in 16.16 fixed point: positions (four s16 each: x, y,
+// z and the vertex's matrix bit, SkinMeshBit.nBit) and normals (four s8 each).
+void SkinMorph_UnpackVerts(SkinMorphWork* pWork, s16* pPos, s8* pNrm, u32 nVerts) {
     SkinMorphVert* pVert = pWork->aVerts;
     u32 i;
 
@@ -29,10 +29,11 @@ void fn_8011C068(SkinMorphWork* pWork, s16* pPos, s8* pNrm, u32 nVerts) {
     }
 }
 
-s32  fn_8011CDE8(Skin* pSkin);
+s32  SkinMorph_GetBlendSize(Skin* pSkin);
 
-// Packs the work area's nVerts vertices back: positions as four s16 each, normals as four s8.
-void fn_8011C1FC(SkinMorphWork* pWork, s16* pPos, s8* pNrm, u32 nVerts) {
+// Packs the work area's nVerts vertices back out of 16.16 fixed point, in the layout
+// SkinMorph_UnpackVerts reads: positions as four s16 each, normals as four s8 each.
+void SkinMorph_PackVerts(SkinMorphWork* pWork, s16* pPos, s8* pNrm, u32 nVerts) {
     SkinMorphVert* pVert = pWork->aVerts;
     u32 i;
 
@@ -51,9 +52,11 @@ void fn_8011C1FC(SkinMorphWork* pWork, s16* pPos, s8* pNrm, u32 nVerts) {
     }
 }
 
-// Adds a morph target to the vertices it moves: nVerts position offsets (four s16 each), normal
-// offsets (four s8 each) and vertex numbers (s16), each offset times fScale.
-void fn_8011C27C(SkinMorphWork* pWork, void* pTarget, u32 nVerts, f32 fScale) {
+// Adds a morph target to the work area's vertices. pTarget holds nVerts position offsets (four s16
+// each), then nVerts normal offsets (four s8 each), then the numbers of the nVerts vertices they
+// move (s16 each). Each offset's x, y and z are added times fScale (the weight in 16.16 fixed
+// point: 65536 is 1.0); the fourth value (the matrix bit) is left alone.
+void SkinMorph_AddTarget(SkinMorphWork* pWork, void* pTarget, u32 nVerts, f32 fScale) {
     s16* pPos = pTarget;
     uptr uNrmSize = nVerts * 4;
     s8* pNrm = (s8*)(pPos + nVerts * 4);
@@ -77,46 +80,52 @@ void fn_8011C27C(SkinMorphWork* pWork, void* pTarget, u32 nVerts, f32 fScale) {
     }
 }
 
-// Swaps the work area's two buffers.
-void fn_8011C46C(SkinMorphWork* pWork) {
+// Swaps the work area's current target (p10020, the one SkinMorph_AddCurrentTarget adds) and next
+// target (p10024, the one SkinMorph_SetNextTarget sets).
+void SkinMorph_SwapTargets(SkinMorphWork* pWork) {
     void* p = pWork->p10020;
 
     pWork->p10020 = pWork->p10024;
     pWork->p10024 = p;
 }
 
-// Points the second buffer at a target mesh's vertices; gives its vertex count.
-s32 fn_8011C484(SkinMorphWork* pWork, SkinMesh* pMesh) {
+// Makes a target mesh's data (its pBits) the work area's next target; gives how many vertices it
+// moves (its n8).
+s32 SkinMorph_SetNextTarget(SkinMorphWork* pWork, SkinMesh* pMesh) {
     s32 nVerts = pMesh->n8;
 
     pWork->p10024 = pMesh->pBits;
     return nVerts;
 }
 
-// Unpacks a mesh's vertices (and the bytes after them) into the work area.
-void fn_8011C49C(SkinMorphWork* pWork, SkinMesh* pMesh) {
+// Unpacks a morphed mesh into the work area (SkinMorph_UnpackVerts): its n8 vertices (SkinMeshBit,
+// 8 bytes each) and the normals stored after them.
+void SkinMorph_LoadMesh(SkinMorphWork* pWork, SkinMesh* pMesh) {
     s32 nVerts = pMesh->n8;
     SkinMeshBit* aVerts = pMesh->pBits;
 
     pWork->n10018 = nVerts;
-    fn_8011C068(pWork, (s16*)aVerts, (s8*)(aVerts + nVerts), nVerts);
+    SkinMorph_UnpackVerts(pWork, (s16*)aVerts, (s8*)(aVerts + nVerts), nVerts);
 }
 
-// Packs the work area's vertices back into pDst.
-void fn_8011C4D4(SkinMorphWork* pWork, u8* pDst) {
+// Packs the work area's vertices (SkinMorph_PackVerts) into pDst: n10018 vertices of 8 bytes, then
+// their normals.
+void SkinMorph_StoreMesh(SkinMorphWork* pWork, u8* pDst) {
     u32 nVerts = pWork->n10018;
 
-    fn_8011C1FC(pWork, (s16*)pDst, (s8*)(pDst + (nVerts << 3)), nVerts);  // 8 bytes a vertex
+    SkinMorph_PackVerts(pWork, (s16*)pDst, (s8*)(pDst + (nVerts << 3)), nVerts);  // 8 bytes a vertex
 }
 
-// Adds nVerts vertices of the target in the first buffer, scaled by fWeight, to the work area
-// (in 16.16 fixed point: the scale is fWeight * 65536, rounded).
-void fn_8011C504(SkinMorphWork* pWork, s32 nVerts, f32 fWeight) {
-    fn_8011C27C(pWork, pWork->p10020, nVerts, (s32)(65536.0f * fWeight + 0.5f));
+// Adds the work area's current target (p10020), which moves nVerts vertices, at weight fWeight:
+// SkinMorph_AddTarget's scale is fWeight in 16.16 fixed point, rounded to a whole number (fWeight *
+// 65536 + 0.5).
+void SkinMorph_AddCurrentTarget(SkinMorphWork* pWork, s32 nVerts, f32 fWeight) {
+    SkinMorph_AddTarget(pWork, pWork->p10020, nVerts, (s32)(65536.0f * fWeight + 0.5f));
 }
 
-// Clears the work area's skin and gives it.
-SkinMorphWork* fn_8011C564(void) {
+// The morph work area (there is one, lbl_80281880), with its description and weights cleared: the
+// caller sets them, the override table and the memory block before blending.
+SkinMorphWork* SkinMorph_GetWork(void) {
     SkinMorphWork* pWork = lbl_80281880;
 
     pWork->pDesc = NULL;
@@ -125,26 +134,27 @@ SkinMorphWork* fn_8011C564(void) {
     return pWork;
 }
 
-void fn_8011C580(SkinMorphWork* pWork, SkinDesc* pDesc) {
+void SkinMorph_SetWorkDesc(SkinMorphWork* pWork, SkinDesc* pDesc) {
     pWork->pDesc = pDesc;
 }
 
-void fn_8011C58C(SkinMorphWork* pWork, f32* afWeights, s32 nMorphs) {
+void SkinMorph_SetWorkWeights(SkinMorphWork* pWork, f32* afWeights, s32 nMorphs) {
     pWork->afWeights = afWeights;
     pWork->nMorphs = nMorphs;
 }
 
-void fn_8011C59C(SkinMorphWork* pWork, HwsOverrideTable* pTable) {
+void SkinMorph_SetWorkOverrideTable(SkinMorphWork* pWork, HwsOverrideTable* pTable) {
     pWork->pTable = pTable;
 }
 
-void fn_8011C5A8(SkinMorphWork* pWork, HwsMemBlock* pBlock) {
+void SkinMorph_SetWorkMemBlock(SkinMorphWork* pWork, HwsMemBlock* pBlock) {
     pWork->pBlock = pBlock;
 }
 
-// Picks the meshes to blend for vertex set nSet of p44 entry pEntry: each morph target with a
-// weight other than 0 that has that set. Gives how many (in apTargets and afTargets).
-s32 fn_8011C5B4(SkinMorphWork* pWork, SkinDesc44* pEntry, int nSet) {
+// Picks the target meshes to add to morphed mesh nSet of entry pEntry (SkinDesc.p44): of each of
+// the entry's morph targets (weights from its n18 on, at most as many as the work area has) with a
+// weight other than 0, its mesh nSet, if it has one. Fills apTargets and afTargets; gives how many.
+s32 SkinMorph_PickTargets(SkinMorphWork* pWork, SkinDesc44* pEntry, int nSet) {
     s32 i;
     s32 nPicked = 0;
     s32 nFirst;
@@ -183,10 +193,12 @@ s32 fn_8011C5B4(SkinMorphWork* pWork, SkinDesc44* pEntry, int nSet) {
     return nPicked;
 }
 
-// Blends the morph targets of p44 entry n into its meshes' overrides: each mesh with flags
-// 0x100000 and 0x10 gets its own vertices plus every picked target times its weight, or a plain
-// copy when no target is picked.
-void fn_8011C68C(SkinMorphWork* pWork, int n) {
+// Blends the morph targets of entry n (SkinDesc.p44; one with morph targets, u24 & 2) into its
+// morphed meshes. Each of its meshes with flags 0x100000 and 0x10 gets its override memory (the
+// work area's table and block; kept from before) filled with its own vertices plus every picked
+// target (SkinMorph_PickTargets) times its weight, or a plain copy of them when no target has a
+// weight.
+void SkinMorph_BlendEntry(SkinMorphWork* pWork, int n) {
     SkinDesc* pDesc = pWork->pDesc;
     SkinIterArgs args;
     u8 aBuf[0x20];      // the iterator's buffer; its size is not known
@@ -214,24 +226,24 @@ void fn_8011C68C(SkinMorphWork* pWork, int n) {
     while (SkinIter_IsValid(pIter)) {
         pMesh = SkinIter_GetMesh(pIter);
         if ((pMesh->uFlags & 0x100010) == 0x100010) {
-            nPicked = fn_8011C5B4(pWork, pEntry, nSet);
+            nPicked = SkinMorph_PickTargets(pWork, pEntry, nSet);
             nSet++;
             pDst = fn_80112A80(pWork->pBlock, pWork->pTable, SkinIter_GetIndex(pIter), 1);
             if (pDst != NULL) {
                 if (nPicked == 0) {
                     memcpy(pDst, pMesh->pBits, pMesh->nSize);
                 } else {
-                    fn_8011C49C(pWork, pMesh);
-                    nVerts = fn_8011C484(pWork, pWork->apTargets[0]);
+                    SkinMorph_LoadMesh(pWork, pMesh);
+                    nVerts = SkinMorph_SetNextTarget(pWork, pWork->apTargets[0]);
                     for (i = 1; i < nPicked; i++) {
-                        fn_8011C46C(pWork);
-                        nNext = fn_8011C484(pWork, pWork->apTargets[i]);
-                        fn_8011C504(pWork, nVerts, pWork->afTargets[i - 1]);
+                        SkinMorph_SwapTargets(pWork);
+                        nNext = SkinMorph_SetNextTarget(pWork, pWork->apTargets[i]);
+                        SkinMorph_AddCurrentTarget(pWork, nVerts, pWork->afTargets[i - 1]);
                         nVerts = nNext;
                     }
-                    fn_8011C46C(pWork);
-                    fn_8011C504(pWork, nVerts, pWork->afTargets[i - 1]);
-                    fn_8011C4D4(pWork, pDst);
+                    SkinMorph_SwapTargets(pWork);
+                    SkinMorph_AddCurrentTarget(pWork, nVerts, pWork->afTargets[i - 1]);
+                    SkinMorph_StoreMesh(pWork, pDst);
                 }
             }
         }
@@ -239,13 +251,13 @@ void fn_8011C68C(SkinMorphWork* pWork, int n) {
     }
 }
 
-// Every caller passes the work area; it is unused.
-void fn_8011C84C(SkinMorphWork* pWork) {
+// Does nothing: called with the work area when a blend is done (pWork is unused).
+void SkinMorph_EndWork(SkinMorphWork* pWork) {
 }
 
-// The morph targets a skin description needs: the highest n14 + n18 of its p44 entries that have
-// morph targets.
-s32 fn_8011C850(SkinDesc* pDesc) {
+// How many morph target weights a skin description uses: the highest n18 + n14 (its first target's
+// number plus its count) of its SkinDesc.p44 entries that have morph targets and meshes; 0: none.
+s32 SkinMorph_GetNumTargets(SkinDesc* pDesc) {
     SkinDesc44* pEntry;
     s32 nMax;
     s32 i;
@@ -260,8 +272,9 @@ s32 fn_8011C850(SkinDesc* pDesc) {
     return nMax;
 }
 
-// Whether a morph target of p44 entry n that changed for view nView has a mesh to draw.
-u8 fn_8011C8B0(Skin* pSkin, int nView, int n) {
+// Whether entry n (SkinDesc.p44) needs blending for view nView: it has morph targets, and one that
+// changed since that view last blended moves at least one vertex.
+u8 SkinMorph_EntryNeedsBlend(Skin* pSkin, int nView, int n) {
     SkinDesc* pDesc;
     SkinDesc44* pEntry;
     SkinMorphState* pMorph;
@@ -297,8 +310,9 @@ u8 fn_8011C8B0(Skin* pSkin, int nView, int n) {
     return 0;
 }
 
-// Makes the skin's morph state: every weight 0, nothing changed.
-void fn_8011C9B0(Skin* pSkin) {
+// Gives the skin its morph state (Skin.pMorph) when its description has morph targets: every weight
+// 0 and no target changed. SKN_Create calls it.
+void SkinMorph_Create(Skin* pSkin) {
     SkinMorphState* pMorph;
     s32 nMorphs;
     s32 nBytes;
@@ -306,7 +320,7 @@ void fn_8011C9B0(Skin* pSkin) {
     if (pSkin->pModel->pDesc == NULL) {
         return;
     }
-    nMorphs = fn_8011C850(pSkin->pModel->pDesc);
+    nMorphs = SkinMorph_GetNumTargets(pSkin->pModel->pDesc);
     if (nMorphs == 0) {
         return;
     }
@@ -323,8 +337,9 @@ void fn_8011C9B0(Skin* pSkin) {
     pSkin->pMorph = pMorph;
 }
 
-// Sets the weight of morph target nMorph and marks it changed.
-void fn_8011CADC(Skin* pSkin, int nMorph, f32 fWeight) {
+// Sets a morph target's weight. A new value marks the target changed for both views, so
+// SkinMorph_Update blends it again; out of range, or no morph state: nothing.
+void SkinMorph_SetTargetWeight(Skin* pSkin, int nMorph, f32 fWeight) {
     SkinMorphState* pMorph = pSkin->pMorph;
 
     if (pMorph == NULL || nMorph < 0 || nMorph >= pMorph->nMorphs) {
@@ -337,8 +352,10 @@ void fn_8011CADC(Skin* pSkin, int nMorph, f32 fWeight) {
     }
 }
 
-// Blends the morph targets that changed for view nView into the skin's meshes.
-void fn_8011CB5C(Skin* pSkin, int nView) {
+// Blends the morph targets that changed for view nView into the skin's morphed meshes (that view's
+// override table and memory block, Skin.a10A0 and a1098), then clears the view's changed bits.
+// SKN_PoseCharacter calls it each frame.
+void SkinMorph_Update(Skin* pSkin, int nView) {
     SkinMorphWork* pWork;
     s32 i;
     s32 nEntries;
@@ -346,24 +363,26 @@ void fn_8011CB5C(Skin* pSkin, int nView) {
     if (pSkin->pMorph == NULL) {
         return;
     }
-    pWork = fn_8011C564();
-    fn_8011C580(pWork, pSkin->pModel->pDesc);
-    fn_8011C58C(pWork, pSkin->pMorph->afWeights, pSkin->pMorph->nMorphs);
-    fn_8011C59C(pWork, pSkin->a10A0[nView]);
-    fn_8011C5A8(pWork, pSkin->a1098[nView]);
+    pWork = SkinMorph_GetWork();
+    SkinMorph_SetWorkDesc(pWork, pSkin->pModel->pDesc);
+    SkinMorph_SetWorkWeights(pWork, pSkin->pMorph->afWeights, pSkin->pMorph->nMorphs);
+    SkinMorph_SetWorkOverrideTable(pWork, pSkin->a10A0[nView]);
+    SkinMorph_SetWorkMemBlock(pWork, pSkin->a1098[nView]);
     nEntries = pSkin->pModel->pDesc->n40;
     for (i = 0; i < nEntries; i++) {
-        if (fn_8011C8B0(pSkin, nView, i)) {
-            fn_8011C68C(pWork, i);
+        if (SkinMorph_EntryNeedsBlend(pSkin, nView, i)) {
+            SkinMorph_BlendEntry(pWork, i);
         }
     }
-    fn_8011C84C(pWork);
+    SkinMorph_EndWork(pWork);
     BitArray_ClearArray(pSkin->pMorph->aChanged[nView], pSkin->pMorph->nMorphs);
 }
 
-// Makes a mesh table and a memory block for the skin's morphed meshes and blends every morph
-// target into them; gives both (NULL without a morph state or such meshes).
-void fn_8011CC40(Skin* pSkin, HwsMemBlock** ppBlock, HwsOverrideTable** ppTable) {
+// Blends every morph target, at its current weight, into a new override table and memory block for
+// the skin's morphed meshes (StaticMem mode 1), and gives both: NULL and NULL without a morph state
+// or morphed meshes. SkinBurn.c (fn_80127B98) burns them into the skin; SkinMorph_FreeBlended frees
+// them.
+void SkinMorph_CreateBlended(Skin* pSkin, HwsMemBlock** ppBlock, HwsOverrideTable** ppTable) {
     HwsMemBlock* pBlock;
     HwsOverrideTable* pTable;
     SkinMorphWork* pWork;
@@ -372,7 +391,7 @@ void fn_8011CC40(Skin* pSkin, HwsMemBlock** ppBlock, HwsOverrideTable** ppTable)
     s32 nEntries;
     s32 nSize;
 
-    nSize = fn_8011CDE8(pSkin);
+    nSize = SkinMorph_GetBlendSize(pSkin);
     *ppBlock = NULL;
     *ppTable = NULL;
     if (pSkin->pMorph == NULL || nSize == 0) {
@@ -381,22 +400,22 @@ void fn_8011CC40(Skin* pSkin, HwsMemBlock** ppBlock, HwsOverrideTable** ppTable)
     pTable = fn_80112A34(pSkin->pModel->pDesc, 0);
     pBlock = fn_801128EC(pSkin->pModel->pDesc, nSize);
     pDesc = pSkin->pModel->pDesc;
-    pWork = fn_8011C564();
-    fn_8011C580(pWork, pDesc);
-    fn_8011C58C(pWork, pSkin->pMorph->afWeights, pSkin->pMorph->nMorphs);
-    fn_8011C59C(pWork, pTable);
-    fn_8011C5A8(pWork, pBlock);
+    pWork = SkinMorph_GetWork();
+    SkinMorph_SetWorkDesc(pWork, pDesc);
+    SkinMorph_SetWorkWeights(pWork, pSkin->pMorph->afWeights, pSkin->pMorph->nMorphs);
+    SkinMorph_SetWorkOverrideTable(pWork, pTable);
+    SkinMorph_SetWorkMemBlock(pWork, pBlock);
     nEntries = pDesc->n40;
     for (i = 0; i < nEntries; i++) {
-        fn_8011C68C(pWork, i);
+        SkinMorph_BlendEntry(pWork, i);
     }
-    fn_8011C84C(pWork);
+    SkinMorph_EndWork(pWork);
     *ppBlock = pBlock;
     *ppTable = pTable;
 }
 
-// Frees the block and table fn_8011CC40 made (SkinBurn.c calls it); pSkin is unused.
-void fn_8011CD3C(Skin* pSkin, HwsMemBlock* pBlock, HwsOverrideTable* pTable) {
+// Frees the memory block and override table SkinMorph_CreateBlended made; pSkin is unused.
+void SkinMorph_FreeBlended(Skin* pSkin, HwsMemBlock* pBlock, HwsOverrideTable* pTable) {
     if (pBlock != NULL) {
         fn_80112910(pBlock);
     }
@@ -405,8 +424,8 @@ void fn_8011CD3C(Skin* pSkin, HwsMemBlock* pBlock, HwsOverrideTable* pTable) {
     }
 }
 
-// Frees the skin's morph state (Skin.c calls it).
-void fn_8011CD84(Skin* pSkin) {
+// Frees the skin's morph state and its arrays, if it has one.
+void SkinMorph_Destroy(Skin* pSkin) {
     if (pSkin->pMorph != NULL) {
         StaticMem_Free(pSkin->pMorph->afWeights);
         StaticMem_Free(pSkin->pMorph->aChanged[0]);
@@ -416,8 +435,9 @@ void fn_8011CD84(Skin* pSkin) {
     }
 }
 
-// The bytes of the skin's meshes that have both flags 0x100000 and 0x10.
-s32 fn_8011CDE8(Skin* pSkin) {
+// The bytes the skin's morphed meshes take (those with flags 0x100000 and 0x10): the size of a
+// memory block for their blended copies. 0 without a skin or description.
+s32 SkinMorph_GetBlendSize(Skin* pSkin) {
     SkinDesc* pDesc;
     SkinMesh* pMesh;
     s32 nSize;
@@ -436,8 +456,9 @@ s32 fn_8011CDE8(Skin* pSkin) {
     return nSize;
 }
 
-// Marks every morph target changed.
-void fn_8011CE58(Skin* pSkin) {
+// Marks every morph target changed for both views, so each view's next SkinMorph_Update blends them
+// all.
+void SkinMorph_UpdateAllTargets(Skin* pSkin) {
     if (pSkin == NULL || pSkin->pMorph == NULL) {
         return;
     }

@@ -40,10 +40,10 @@ s32   SkinPart_GetMaxOptionsSize(Skin* pSkin);           // SkinPart.c
 void  SkinPart_UpdateMarks(Skin* pSkin);                 // SkinPart.c
 void  SkinPart_InitSkin(void);                           // SkinPart.c: empty
 void  SkinPart_UpdateSkin(void);                         // SkinPart.c: empty
-void  fn_8011C9B0(Skin* pSkin);                          // SkinMorph.c
-void  fn_8011CB5C(Skin* pSkin, int nView);               // SkinMorph.c
-s32   fn_8011CDE8(Skin* pSkin);                          // SkinMorph.c
-void  fn_8011CE58(Skin* pSkin);                          // SkinMorph.c
+void  SkinMorph_Create(Skin* pSkin);                          // SkinMorph.c
+void  SkinMorph_Update(Skin* pSkin, int nView);               // SkinMorph.c
+s32   SkinMorph_GetBlendSize(Skin* pSkin);                          // SkinMorph.c
+void  SkinMorph_UpdateAllTargets(Skin* pSkin);                          // SkinMorph.c
 void  BitArray_CopyArray(u32* pSrc, u32* pDst, u32 nBits);      // Skeleton.c
 u8    Character_IsGolfer(Character* pChar);              // char.c
 void  fn_80037D5C(SkinDesc* pDesc);                      // Code80037AB8.c
@@ -286,7 +286,7 @@ void SKN_PoseCharacter(Character* pChar, int n) {
     Skin* pClub;
 
     if (gSession.nSplitScreen == 0 || gSession.nGameType == 3) {
-        fn_8011CB5C(pChar->pSkin, pChar->nView);
+        SkinMorph_Update(pChar->pSkin, pChar->nView);
     }
     SKN_BuildMatrices(pChar->pSkin, pChar->pModel, 0, 0, pChar->nView);
     SKN_SetMeshMatrices(pChar->pSkin, pChar->nView);
@@ -991,7 +991,7 @@ s32 SKN_AllocRenderData(Skin* pSkin, u8 b) {
     BitArray_ClearArray(pSkin->aMeshBits, pModel->n40);
     if (pDesc != NULL) {
         SkinPart_GetMaxOptionsSize(pSkin);
-        nSize = fn_8011CDE8(pSkin);
+        nSize = SkinMorph_GetBlendSize(pSkin);
         if (nSize != 0) {
             pSkin->a1098[0] = fn_801128C8(pModel->pDesc, nSize);
         }
@@ -1002,7 +1002,7 @@ s32 SKN_AllocRenderData(Skin* pSkin, u8 b) {
             ((void (*)(Skin*))SkinPart_InitSkin)(pSkin);
         }
     }
-    fn_8011CE58(pSkin);
+    SkinMorph_UpdateAllTargets(pSkin);
     pSkin->uFlags = pSkin->uFlags | 2;
     return 1;
 }
@@ -1128,7 +1128,7 @@ Skin* SKN_Create(u8* pData, u8 b) {
         fn_801127A0(pDesc);
     }
     SkinPart_AllocChoices(pSkin);
-    fn_8011C9B0(pSkin);
+    SkinMorph_Create(pSkin);
     SkinPart_SetChangeAllCopies(bOld);
     SKN_AllocRenderData(pSkin, 0);
     return pSkin;

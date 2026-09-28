@@ -423,7 +423,7 @@ void fn_8010E35C(CharSliderDefs* pDefs, Skin* pSkin, SKABlendNode* pNode) {
                                           pMorph->fFrom, pMorph->fTo);
                     for (m = 0; m < pDefs->nMorphs; m++) {
                         if (pMorph->uId == pDefs->aMorphIds[m]) {
-                            fn_8011CADC(pSkin, m, fWeight);
+                            SkinMorph_SetTargetWeight(pSkin, m, fWeight);
                             if (m < 20) {
                                 fn_800736D8(pNode, m);
                             }

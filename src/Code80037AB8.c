@@ -61,7 +61,7 @@ void fn_80037C48(Skin* pSkin, SkelPose* pPose) {
         pBlock = &((SkelPose1*)pPose)->aBlocks[0];
         for (i = 5; i < 20; i++) {
             if (BitArray_TestBit(pBlock->aBits, i)) {
-                fn_8011CADC(pSkin, i - 5, pBlock->af8[i]);
+                SkinMorph_SetTargetWeight(pSkin, i - 5, pBlock->af8[i]);
             }
         }
         BitArray_ClearArray(pBlock->aBits, 20);
@@ -74,7 +74,7 @@ void fn_80037CD8(Skin* pSkin) {
     SkinModel* pModel;
 
     SKN_FreeRenderData(pSkin);
-    fn_8011CD84(pSkin);
+    SkinMorph_Destroy(pSkin);
     SkinPart_FreeChoices(pSkin);
     pModel = pSkin->pModel;
     if (pModel != NULL) {

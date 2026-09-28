@@ -21,7 +21,7 @@ HwsBurn* fn_801104AC(SkinDesc* pDesc) {
     memset(pBurn, 0, sizeof(HwsBurn));
     pBurn->pDesc = pDesc;
     pBurn->nParts = pDesc->nParts;
-    pBurn->n18 = fn_8011C850(pDesc);
+    pBurn->n18 = SkinMorph_GetNumTargets(pDesc);
     pBurn->n20 = pDesc->n2C;
     pBurn->n34 = pDesc->n40;
     pBurn->n4C = pDesc->n38;
