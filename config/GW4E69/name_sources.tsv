@@ -3606,3 +3606,24 @@ address	name	previous_name	tier	codes	evidence	purpose	proposed_by	reviewed_by	d
 80083860	GM_vSetSavedRoundInUse	fn_80083860	T3	E4	slot 343; sets gpSaveData[pArgs[0]].aSavedRound[pArgs[1]].n0 = pArgs[2], the flag fn_800807DC reads as the round being in use and fn_800809F8 clears	front-end message 343: mark a saved custom round in use	rp5 (replayed by orchestrator)		2026-09-28
 80083890	GM_vFEMessage344_Return150	fn_80083890	T3	E6	slot 344; answers the constant 150; named by its slot (naming.md rule 5)	front-end message 344: always 150	rp5 (replayed by orchestrator)		2026-09-28
 8008389C	GM_vFEMessage345_Empty	fn_8008389C	T3	E6	slot 345; empty body; named by its slot (naming.md rule 5)	front-end message 345: empty	rp5 (replayed by orchestrator)		2026-09-28
+800838A0	GM_vFEMessage346_Empty	fn_800838A0	T3	E6	slot 346; empty body; named by its slot (naming.md rule 5)	front-end message 346: empty	rp5 (replayed by orchestrator)		2026-09-28
+800838A4	GM_vFEMessage347_Empty	fn_800838A4	T3	E6	slot 347; empty body; named by its slot (naming.md rule 5)	front-end message 347: empty	rp5 (replayed by orchestrator)		2026-09-28
+800838A8	GM_vFEMessage348_Empty	fn_800838A8	T3	E6	slot 348; empty body; named by its slot (naming.md rule 5)	front-end message 348: empty	rp5 (replayed by orchestrator)		2026-09-28
+800838AC	GM_vFEMessage349_Empty	fn_800838AC	T3	E6	slot 349; empty body; named by its slot (naming.md rule 5)	front-end message 349: empty	rp5 (replayed by orchestrator)		2026-09-28
+800838B0	GM_vFEMessage350_Empty	fn_800838B0	T3	E6	slot 350; empty body; named by its slot (naming.md rule 5)	front-end message 350: empty	rp5 (replayed by orchestrator)		2026-09-28
+800838B4	GM_vFEMessage351_Empty	fn_800838B4	T3	E6	slot 351; empty body; named by its slot (naming.md rule 5)	front-end message 351: empty	rp5 (replayed by orchestrator)		2026-09-28
+800838B8	GM_vFEMessage352_Empty	fn_800838B8	T3	E6	slot 352; empty body; named by its slot (naming.md rule 5)	front-end message 352: empty	rp5 (replayed by orchestrator)		2026-09-28
+800838BC	GM_vFEMessage353_Empty	fn_800838BC	T3	E6	slot 353; empty body; named by its slot (naming.md rule 5)	front-end message 353: empty	rp5 (replayed by orchestrator)		2026-09-28
+800838C0	GM_vFEMessage354_Empty	fn_800838C0	T3	E6	slot 354; empty body; named by its slot (naming.md rule 5)	front-end message 354: empty	rp5 (replayed by orchestrator)		2026-09-28
+800838C4	GM_vCompareStrings	fn_800838C4	T3	E6	slot 355; answers strcmp of the string arguments pArgs[0] and pArgs[1]	front-end message 355: compare two strings	rp5 (replayed by orchestrator)		2026-09-28
+80083904	GM_vFEMessage356_Empty	fn_80083904	T3	E6	slot 356; empty body; named by its slot (naming.md rule 5)	front-end message 356: empty	rp5 (replayed by orchestrator)		2026-09-28
+80083908	GM_vFEMessage357_Empty	fn_80083908	T3	E6	slot 357; empty body; named by its slot (naming.md rule 5)	front-end message 357: empty	rp5 (replayed by orchestrator)		2026-09-28
+8008390C	GM_vFEMessage358_Empty	fn_8008390C	T3	E6	slot 358; empty body; named by its slot (naming.md rule 5)	front-end message 358: empty	rp5 (replayed by orchestrator)		2026-09-28
+80083910	GM_vFEMessage359_Empty	fn_80083910	T3	E6	slot 359; empty body; named by its slot (naming.md rule 5)	front-end message 359: empty	rp5 (replayed by orchestrator)		2026-09-28
+80083914	GM_vFEMessage360_Empty	fn_80083914	T3	E6	slot 360; empty body; named by its slot (naming.md rule 5)	front-end message 360: empty	rp5 (replayed by orchestrator)		2026-09-28
+80083918	GM_vFEMessage361_Empty	fn_80083918	T3	E6	slot 361; empty body; named by its slot (naming.md rule 5)	front-end message 361: empty	rp5 (replayed by orchestrator)		2026-09-28
+8008391C	GM_vFEMessage362_Empty	fn_8008391C	T3	E6	slot 362; empty body; named by its slot (naming.md rule 5)	front-end message 362: empty	rp5 (replayed by orchestrator)		2026-09-28
+80083920	GM_vFEMessage363_Empty	fn_80083920	T3	E6	slot 363; empty body; named by its slot (naming.md rule 5)	front-end message 363: empty	rp5 (replayed by orchestrator)		2026-09-28
+80083924	GM_vFEMessage364_Empty	fn_80083924	T3	E6	slot 364; empty body; named by its slot (naming.md rule 5)	front-end message 364: empty	rp5 (replayed by orchestrator)		2026-09-28
+80083928	GM_vFEMessage365_Empty	fn_80083928	T3	E6	slot 365; empty body; named by its slot (naming.md rule 5)	front-end message 365: empty	rp5 (replayed by orchestrator)		2026-09-28
+8008392C	GM_vFEMessage366_Empty	fn_8008392C	T3	E6	slot 366; empty body; named by its slot (naming.md rule 5)	front-end message 366: empty	rp5 (replayed by orchestrator)		2026-09-28

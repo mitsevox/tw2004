@@ -618,27 +618,27 @@ void GM_vClearSavedRound(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetSavedRoundInUse(MsgArg* pArgs, MsgArg* pResult);
 void GM_vFEMessage344_Return150(MsgArg* pArgs, MsgArg* pResult);
 void GM_vFEMessage345_Empty(MsgArg* pArgs, MsgArg* pResult);
-void fn_800838A0(MsgArg* pArgs, MsgArg* pResult);
-void fn_800838A4(MsgArg* pArgs, MsgArg* pResult);
-void fn_800838A8(MsgArg* pArgs, MsgArg* pResult);
-void fn_800838AC(MsgArg* pArgs, MsgArg* pResult);
-void fn_800838B0(MsgArg* pArgs, MsgArg* pResult);
-void fn_800838B4(MsgArg* pArgs, MsgArg* pResult);
-void fn_800838B8(MsgArg* pArgs, MsgArg* pResult);
-void fn_800838BC(MsgArg* pArgs, MsgArg* pResult);
-void fn_800838C0(MsgArg* pArgs, MsgArg* pResult);
-void fn_800838C4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083904(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083908(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008390C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083910(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083914(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083918(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008391C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083920(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083924(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083928(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008392C(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage346_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage347_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage348_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage349_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage350_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage351_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage352_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage353_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage354_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vCompareStrings(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage356_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage357_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage358_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage359_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage360_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage361_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage362_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage363_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage364_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage365_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage366_Empty(MsgArg* pArgs, MsgArg* pResult);
 void fn_80083930(MsgArg* pArgs, MsgArg* pResult);
 void fn_80083934(MsgArg* pArgs, MsgArg* pResult);
 void fn_80083964(MsgArg* pArgs, MsgArg* pResult);
@@ -1077,27 +1077,27 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[343] = GM_vSetSavedRoundInUse;
     gFEMessageHandlers[344] = GM_vFEMessage344_Return150;
     gFEMessageHandlers[345] = GM_vFEMessage345_Empty;
-    gFEMessageHandlers[346] = fn_800838A0;
-    gFEMessageHandlers[347] = fn_800838A4;
-    gFEMessageHandlers[348] = fn_800838A8;
-    gFEMessageHandlers[349] = fn_800838AC;
-    gFEMessageHandlers[350] = fn_800838B0;
-    gFEMessageHandlers[351] = fn_800838B4;
-    gFEMessageHandlers[352] = fn_800838B8;
-    gFEMessageHandlers[353] = fn_800838BC;
-    gFEMessageHandlers[354] = fn_800838C0;
-    gFEMessageHandlers[355] = fn_800838C4;
-    gFEMessageHandlers[356] = fn_80083904;
-    gFEMessageHandlers[357] = fn_80083908;
-    gFEMessageHandlers[358] = fn_8008390C;
-    gFEMessageHandlers[359] = fn_80083910;
-    gFEMessageHandlers[360] = fn_80083914;
-    gFEMessageHandlers[361] = fn_80083918;
-    gFEMessageHandlers[362] = fn_8008391C;
-    gFEMessageHandlers[363] = fn_80083920;
-    gFEMessageHandlers[364] = fn_80083924;
-    gFEMessageHandlers[365] = fn_80083928;
-    gFEMessageHandlers[366] = fn_8008392C;
+    gFEMessageHandlers[346] = GM_vFEMessage346_Empty;
+    gFEMessageHandlers[347] = GM_vFEMessage347_Empty;
+    gFEMessageHandlers[348] = GM_vFEMessage348_Empty;
+    gFEMessageHandlers[349] = GM_vFEMessage349_Empty;
+    gFEMessageHandlers[350] = GM_vFEMessage350_Empty;
+    gFEMessageHandlers[351] = GM_vFEMessage351_Empty;
+    gFEMessageHandlers[352] = GM_vFEMessage352_Empty;
+    gFEMessageHandlers[353] = GM_vFEMessage353_Empty;
+    gFEMessageHandlers[354] = GM_vFEMessage354_Empty;
+    gFEMessageHandlers[355] = GM_vCompareStrings;
+    gFEMessageHandlers[356] = GM_vFEMessage356_Empty;
+    gFEMessageHandlers[357] = GM_vFEMessage357_Empty;
+    gFEMessageHandlers[358] = GM_vFEMessage358_Empty;
+    gFEMessageHandlers[359] = GM_vFEMessage359_Empty;
+    gFEMessageHandlers[360] = GM_vFEMessage360_Empty;
+    gFEMessageHandlers[361] = GM_vFEMessage361_Empty;
+    gFEMessageHandlers[362] = GM_vFEMessage362_Empty;
+    gFEMessageHandlers[363] = GM_vFEMessage363_Empty;
+    gFEMessageHandlers[364] = GM_vFEMessage364_Empty;
+    gFEMessageHandlers[365] = GM_vFEMessage365_Empty;
+    gFEMessageHandlers[366] = GM_vFEMessage366_Empty;
     gFEMessageHandlers[367] = fn_80083930;
     gFEMessageHandlers[368] = fn_80083934;
     gFEMessageHandlers[369] = fn_80083964;
@@ -5390,68 +5390,90 @@ void GM_vFEMessage344_Return150(MsgArg* pArgs, MsgArg* pResult) {
 void GM_vFEMessage345_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800838A0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 346: empty in this build.
+void GM_vFEMessage346_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800838A4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 347: empty in this build.
+void GM_vFEMessage347_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800838A8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 348: empty in this build.
+void GM_vFEMessage348_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800838AC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 349: empty in this build.
+void GM_vFEMessage349_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800838B0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 350: empty in this build.
+void GM_vFEMessage350_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800838B4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 351: empty in this build.
+void GM_vFEMessage351_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800838B8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 352: empty in this build.
+void GM_vFEMessage352_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800838BC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 353: empty in this build.
+void GM_vFEMessage353_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800838C0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 354: empty in this build.
+void GM_vFEMessage354_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800838C4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 355: compares the strings pArgs[0] and pArgs[1] (strcmp: 0 when equal, below 0
+// when the first sorts first, above 0 when it sorts after).
+void GM_vCompareStrings(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = strcmp(((MsgString*)pArgs[0].p)->pStr, ((MsgString*)pArgs[1].p)->pStr);
 }
 
-void fn_80083904(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 356: empty in this build.
+void GM_vFEMessage356_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083908(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 357: empty in this build.
+void GM_vFEMessage357_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8008390C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 358: empty in this build.
+void GM_vFEMessage358_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083910(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 359: empty in this build.
+void GM_vFEMessage359_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083914(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 360: empty in this build.
+void GM_vFEMessage360_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083918(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 361: empty in this build.
+void GM_vFEMessage361_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8008391C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 362: empty in this build.
+void GM_vFEMessage362_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083920(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 363: empty in this build.
+void GM_vFEMessage363_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083924(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 364: empty in this build.
+void GM_vFEMessage364_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80083928(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 365: empty in this build.
+void GM_vFEMessage365_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8008392C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 366: empty in this build.
+void GM_vFEMessage366_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80083930(MsgArg* pArgs, MsgArg* pResult) {
