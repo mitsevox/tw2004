@@ -1,5 +1,12 @@
-// GameMessages.c (our name): the game's messages to the front end (the HUD and menu screens):
-// each sends a message id plus up to eight int-or-float values, and the display queues' handlers.
+// GameMessages.c (our name; probably EA's gameui_istudio.c, which TW06 has beside gameui.c in
+// golf/gamemode): the in-game UI's side of EA UI Studio, after GameUI.c. Every message the game
+// sends the front end (the HUD and menu screens) goes out here, as a message number with up to
+// eight int, float or string values handed to UISProcessHint (GameMsg_Send and its siblings).
+// Around the senders: the HUD pieces those messages drive (the target info box, the caddie tip
+// window that holds the swing, tips, the long-drive panel, the lessons' text), the handler
+// GUI_CheckMessageQue gives each display queue's item to, the messages held for the UI's next
+// update (GameMsg_SetPending), and the flags the UI's commands set (award display, scorecard,
+// controllers pulled). A file of its own: its 0.0f is pooled apart from GameUI.c's.
 
 #include "golfer.h"
 #include "game.h"
@@ -10,44 +17,44 @@
 void  UISProcessHint(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
 void  GUI_CaddieTipWindowIsOpen(void);
 void  GUI_CaddieTipWindowClosed(void);
-void  GUI_ShowLessonText(int n);
-void  GUI_SetControllerPulled(int n);
-void  GUI_SetMessageQueHeld(u8 b);
+void  GUI_ShowLessonText(int nText);
+void  GUI_SetControllerPulled(int nController);
+void  GUI_SetMessageQueHeld(u8 bHeld);
 void  GUI_StartAwardUI(void);
 void  GUI_MuteForScoreCard(void);
 void  GUI_SetUnreadFlag(u8 b);
 void  GameMsg_ClearPending(void);
-void  GameMsg_TogglePending(int n);
+void  GameMsg_TogglePending(int nBits);
 void  GameMsg_SendPendingMenus(void);
 void  GameMsg_OnSend(int nMsg);
 u8    GUI_GetFadeToBlack(void);
 
 // GameMessages.c's data, defined last address first (CodeWarrior lays each section out in reverse).
-u8  gGameMsgPending;           // pending-message flags, each sent once
-s32 gGameMsgPendingValue;           // the value sent with some of them
-u8  gTipShown[14];       // the tips already shown (game.h)
+u8  gGameMsgPending;        // messages held for the UI's next update (GameMsg_SetPending's bits)
+s32 gGameMsgPendingValue;   // the one value sent with pending bits 1, 0x10 and 0x20
+u8  gTipShown[14];          // per statistic tip: already shown this hole (GUI_QueueTip, GameAnalysis)
 
 // Opens the intro popup of a Play Now challenge in the caddie tip window: message 48 with the
 // challenge's group (fn_800EAC7C). STATEFUNC_SwingInit calls it at a human's first swing while the
 // intro is pending; the swing is held until the UI closes the window (GUI_IsCaddieTipWindowOpen).
-void GUI_ShowChallengeIntro(int n) {
-    GameMsg_SendInt(48, n);
+void GUI_ShowChallengeIntro(int nGroup) {
+    GameMsg_SendInt(48, nGroup);
     lbl_802822BE = 1;
 }
 
 // The same intro for a real-time event (mode 24): message 97 with the challenge's group, in the
 // caddie tip window, holding the swing.
-void GUI_ShowRealtimeEventIntro(int n) {
-    GameMsg_SendInt(97, n);
+void GUI_ShowRealtimeEventIntro(int nGroup) {
+    GameMsg_SendInt(97, nGroup);
     lbl_802822BE = 1;
 }
 
-// Opens a hole contest's intro in the caddie tip window (message 57): n 0 the longest drive, 1
-// closest to the pin, 2 the hole-in-one prize. STATEFUNC_SwingInit calls it at a human's tee shot
+// Opens a hole contest's intro in the caddie tip window (message 57): nContest 0 the longest drive,
+// 1 closest to the pin, 2 the hole-in-one prize. STATEFUNC_SwingInit calls it at a human's tee shot
 // on a contest hole, in place of a caddie tip; the swing is held until the UI closes the window
 // (GUI_IsCaddieTipWindowOpen).
-void GUI_ShowHoleContestIntro(int n) {
-    GameMsg_SendInt(57, n);
+void GUI_ShowHoleContestIntro(int nContest) {
+    GameMsg_SendInt(57, nContest);
     lbl_802822BE = 1;
 }
 
@@ -89,7 +96,7 @@ u8 GUI_IsEndGameUiShowing(void) {
 // Places the target info box (message 0x18): x and y on a 512 x 416 screen (TARGET_RenderBallTarget
 // keeps y at most 285) and the HUD view it belongs to: 0 on one screen, 2 for player 0 and 3 for
 // player 1 in split screen.
-void GUI_MoveTargetInfo(int a, int b, int nPlayer) {
+void GUI_MoveTargetInfo(int nX, int nY, int nPlayer) {
     int nView;
     if (gSession.nSplitScreen) {
         if (nPlayer == 0) {
@@ -100,7 +107,7 @@ void GUI_MoveTargetInfo(int a, int b, int nPlayer) {
     } else {
         nView = 0;
     }
-    GameMsg_Send3Ints(0x18, a, b, nView);
+    GameMsg_Send3Ints(0x18, nX, nY, nView);
 }
 
 // The target info box's readouts (message 0x19, four floats and an int): the shot's distance, the
@@ -108,7 +115,7 @@ void GUI_MoveTargetInfo(int a, int b, int nPlayer) {
 // rise, 0 within 0.015), the share of the club's range (1..100), and the view: 0 on one screen, 0
 // for player 0 and 1 for player 1 in split screen (not GUI_MoveTargetInfo's 2 and 3). TW07 takes
 // the four readouts first and the player last.
-void GUI_UpdateTargetInfo(int nPlayer, f32 a, f32 b, f32 c, f32 d) {
+void GUI_UpdateTargetInfo(int nPlayer, f32 fYardage, f32 fElevFeet, f32 fElevInches, f32 fPowerPercent) {
     int nView;
     if (gSession.nSplitScreen) {
         if (nPlayer == 0) {
@@ -119,13 +126,13 @@ void GUI_UpdateTargetInfo(int nPlayer, f32 a, f32 b, f32 c, f32 d) {
     } else {
         nView = 0;
     }
-    GameMsg_Send5(0x19, 0xF, &a, &b, &c, &d, &nView);
+    GameMsg_Send5(0x19, 0xF, &fYardage, &fElevFeet, &fElevInches, &fPowerPercent, &nView);
 }
 
 // The lessons' text on the HUD (mode 11): message 60 with the text's index (GameMode11's
 // lbl_802823F4: the lesson's number less one, or a variant it picks), -1 to hide it.
-void GUI_ShowLessonText(int n) {
-    GameMsg_SendInt(60, n);
+void GUI_ShowLessonText(int nText) {
+    GameMsg_SendInt(60, nText);
 }
 
 // Empty in this build: GM_CheckControllerPulled calls it every frame of a round. Nothing else marks
@@ -134,29 +141,29 @@ void GUI_ShowLessonText(int n) {
 void GUI_DetectControllerPull(void) {
 }
 
-// Marks controller n as pulled out (lbl_80202B88: nine slots, 0..3 used), for
+// Marks controller nController as pulled out (lbl_80202B88: nine slots, 0..3 used), for
 // GUI_OnControllerPresent to clear when it is back.
-void GUI_SetControllerPulled(int n) {
-    lbl_80202B88[n] = 1;
+void GUI_SetControllerPulled(int nController) {
+    lbl_80202B88[nController] = 1;
 }
 
-// Controller i is plugged in: uiProcessInterface's input loop calls it every frame for each
-// controller present in game type 6, and menu command 61 too. If the controller was marked pulled,
+// Controller nController is plugged in: uiProcessInterface's input loop calls it every frame for
+// each controller present in game type 6, and menu command 61 too. If it was marked pulled,
 // the mark is cleared; while another is still marked nothing more happens. With none left the
 // controller message goes (GUI_SendMessage31) and the pause ends: gSession.nPaused 2 (paused for
 // the controllers) is lifted - timer 1 restarted, the pause-menu flag cleared, a GameBreaker
 // resumed, the save images parked (fn_8009EF98) - and any other value becomes 1, the pause menu's
 // pause. In this build nothing marks a controller pulled (GUI_DetectControllerPull is empty).
-void GUI_OnControllerPresent(int i) {
-    int k;
+void GUI_OnControllerPresent(int nController) {
+    int i;
     u8* p;
-    if (lbl_80202B88[i]) {
-        if (i >= 0) {
-            lbl_80202B88[i] = 0;
+    if (lbl_80202B88[nController]) {
+        if (nController >= 0) {
+            lbl_80202B88[nController] = 0;
         }
-        for (k = 0, p = lbl_80202B88; k < 9; k++, p++) {
+        for (i = 0, p = lbl_80202B88; i < 9; i++, p++) {
             if (*p) {
-                GUI_SetControllerPulled(k);
+                GUI_SetControllerPulled(i);
                 return;
             }
         }
@@ -190,7 +197,7 @@ void GUI_ClearControllersPulled(void) {
 
 // Whether a trophy or record message waits for the HUD: a trophy ball award (display queue 2) or a
 // PGA TOUR award (queue 6), or a record in queue 1 (kind below 10; 10 and 11 are the hole contests'
-// results). GameEffects' fn_800DC818 reads it.
+// results). GameEffects' GameEffects_ScriptedGBDidIt reads it.
 u8 GUI_AreTrophysOrRecordsQueued(void) {
     int i;
     if (lbl_802822B0 > 0 || lbl_8028229C > 0) {
@@ -206,10 +213,10 @@ u8 GUI_AreTrophysOrRecordsQueued(void) {
     return 0;
 }
 
-// Set by the UI (menu command 145, b 0 or 1): while set, GUI_CheckMessageQue shows nothing and
+// Set by the UI (menu command 145, bHeld 0 or 1): while set, GUI_CheckMessageQue shows nothing and
 // reports the HUD busy. GUI_Init clears it.
-void GUI_SetMessageQueHeld(u8 b) {
-    lbl_802822BC = b;
+void GUI_SetMessageQueHeld(u8 bHeld) {
+    lbl_802822BC = bHeld;
 }
 
 // The UI reports an award display starting (menu command 162, after it hides the HUD prompts):
@@ -239,8 +246,8 @@ void GUI_SetUnreadFlag(u8 b) {
 }
 
 // Sends front-end message nMsg with three int values.
-void GameMsg_Send3Ints(int nMsg, int a, int b, int c) {
-    GameMsg_Send3(nMsg, 0, &a, &b, &c);
+void GameMsg_Send3Ints(int nMsg, int nA, int nB, int nC) {
+    GameMsg_Send3(nMsg, 0, &nA, &nB, &nC);
 }
 
 // One of the five HUD readout refreshes GUI_UpdateAllUIData sends before a HUD comes up: message 6,
@@ -256,10 +263,10 @@ void GUI_UpdateUIData4(void) {
     GameMsg_Send(4);
 }
 
-// Shows or hides the HUD's tap-in prompt (message 47 with n as a byte); GUI_HideAllHelpTips hides
-// it with the mulligan and replay prompts.
-void GUI_ToggleTapin(int n) {
-    GameMsg_SendInt(47, (n & 0xFF));
+// Shows or hides the HUD's tap-in prompt (message 47 with bShow as a byte); GUI_HideAllHelpTips
+// hides it with the mulligan and replay prompts.
+void GUI_ToggleTapin(int bShow) {
+    GameMsg_SendInt(47, (bShow & 0xFF));
 }
 
 // Shows an item of display queue 11 (GUI_CheckMessageQue): message 96 with its three values.
@@ -341,20 +348,20 @@ void GameMsg_ClearPending(void) {
 
 // Flags messages to send on the UI's next update (GameMsg_SendPending): bit 1 a conceded hole, 2 a
 // restarted hole, 4 the pause menu opened, 8 it closed, 0x10 the zoom camera left, 0x20 a tip.
-void GameMsg_SetPending(int n) {
-    gGameMsgPending = (gGameMsgPending | n);
+void GameMsg_SetPending(int nBits) {
+    gGameMsgPending = (gGameMsgPending | nBits);
 }
 
 // The value sent with pending messages 1 (the conceding player), 0x10 (the player) and 0x20 (the
 // tip). There is one slot: two set before the next update both go with the last value.
-void GameMsg_SetPendingValue(int n) {
-    gGameMsgPendingValue = n;
+void GameMsg_SetPendingValue(int nValue) {
+    gGameMsgPendingValue = nValue;
 }
 
-// Flips pending bits n (an exclusive or); the senders call it with a bit they have just sent, which
-// clears it.
-void GameMsg_TogglePending(int n) {
-    gGameMsgPending = (gGameMsgPending ^ n);
+// Flips pending bits nBits (an exclusive or); the senders call it with a bit they have just sent,
+// which clears it.
+void GameMsg_TogglePending(int nBits) {
+    gGameMsgPending = (gGameMsgPending ^ nBits);
 }
 
 // GameMsg_SendPending's counterpart in the menus (game type 3; fn_80090628 picks one): pending bit
@@ -542,31 +549,32 @@ u8 GUI_IsFadingToBlack(void) {
 }
 
 // The long-drive contests' score panel (modes 22 and 26): message 0x42 with eight values in this
-// order: a the player, b the score, c the shot's length, d its kind, e 0, the float f (0.0 from
-// every caller), g 0, h the points the shot scored.
-void GUI_UpdateLongDriveScore(int a, int b, int c, int d, int e, int g, int h, f32 f) {
+// order: the player, the score, the shot's length, its kind, nValue5 (0 from every caller), the
+// float fValue6 (0.0), nValue7 (0), and the points the shot scored.
+void GUI_UpdateLongDriveScore(int nPlayer, int nScore, int nLength, int nKind, int nValue5, int nValue7,
+                              int nPoints, f32 fValue6) {
     MsgArg args[8];
     GameMsg_OnSend(0x42);
     Mem_set(args, 0, sizeof(args));
-    args[0].i = a;
-    args[1].i = b;
-    args[2].i = c;
-    args[3].i = d;
-    args[4].i = e;
-    args[5].f = f;
-    args[6].i = g;
-    args[7].i = h;
+    args[0].i = nPlayer;
+    args[1].i = nScore;
+    args[2].i = nLength;
+    args[3].i = nKind;
+    args[4].i = nValue5;
+    args[5].f = fValue6;
+    args[6].i = nValue7;
+    args[7].i = nPoints;
     UISProcessHint(lbl_80281F1C->pHandler, 0x42, 8, args);
 }
 
 // Mode 22's scoring variant for the UI (message 89), once when the mode asks: 1 for variant 0, 2
 // for variant 1 (a shot scores only what it adds to the player's best).
-void GUI_SendLongDriveVariant(int n) {
-    GameMsg_SendInt(89, n);
+void GUI_SendLongDriveVariant(int nVariant) {
+    GameMsg_SendInt(89, nVariant);
 }
 
-// Mode 22's text for the UI (message 90 with a string): fn_80127034 sends the number n4 less the
-// current player's nEA0.
+// Mode 22's text for the UI (message 90 with a string): GameMode22_ShowDrivesLeft sends the number
+// n4 less the current player's nEA0.
 void GUI_SendLongDriveText(char* pStr) {
     GameMsg_SendString(90, pStr);
 }
@@ -596,16 +604,16 @@ void GUI_ClearShownTips(void) {
     gTipShown[13] = 0;
 }
 
-// Flags tip n to be shown on the UI's next update (pending bit 0x20: message 0x21 with n). Below 15
-// a statistic tip (fn_800E5E54's pick, through the menu's tip command): dropped during a playoff
-// (gpGame->bD4), else marked shown (tip 12 excepted) so it is not picked again this hole. 15 and
-// up, a GameBreaker's tip (event.c: 15 plus the lowest effect bit set): always flagged.
-void GUI_QueueTip(int n) {
-    if (!gpGame->bD4 || n >= 15) {
-        if (n < 15 && n != 12) {
-            gTipShown[n] = 1;
+// Flags tip nTip to be shown on the UI's next update (pending bit 0x20: message 0x21 with nTip).
+// Below 15 a statistic tip (fn_800E5E54's pick, through the menu's tip command): dropped during a
+// playoff (gpGame->bD4), else marked shown (tip 12 excepted) so it is not picked again this hole. 15
+// and up, a GameBreaker's tip (event.c: 15 plus the lowest effect bit set): always flagged.
+void GUI_QueueTip(int nTip) {
+    if (!gpGame->bD4 || nTip >= 15) {
+        if (nTip < 15 && nTip != 12) {
+            gTipShown[nTip] = 1;
         }
         GameMsg_SetPending(0x20);
-        GameMsg_SetPendingValue(n);
+        GameMsg_SetPendingValue(nTip);
     }
 }
