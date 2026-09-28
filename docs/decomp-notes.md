@@ -258,12 +258,12 @@ They will be sorted into the sections below.
 - **[verified] `li r3/r4` missing before a call is not a missing argument**: CW reuses a still-live
   argument register (char Character_SetClubsAndClothes).
 - **[verified] Two null tests that each go straight to the exit are two `return`s, not `||`** (`beq end;
-  lwz; cmplwi; beq end`; animblender fn_80071F58 98.8 -> 100).
+  lwz; cmplwi; beq end`; animblender SKABlendData_Shutdown 98.8 -> 100).
 - **[verified] Keep a call result in a named local when it is an index, a compare operand or an argument
   inside an iterator loop.** It sets the `mulli`/`add` order (GoDynObj fn_80045FC8, also for `Rand % n`
   in GoStaticCam fn_80064F7C) and the `cmplw` operand order (char Character_GolferStreamCallbackIG; swapping the operands does
   not help), and it matches inside iterator loops (hwsBurn fn_80110C88). A `u8` flag argument computed
-  before intervening float tests also goes in a local first (animblender fn_80072ACC 65.6 -> 98.2).
+  before intervening float tests also goes in a local first (animblender SKABlender_BlendLinear 65.6 -> 98.2).
 - **[verified] A `switch` inside a loop lays out its case bodies in source order**, not case-value order
   (GoStaticCam fn_800659F4).
 - **[verified] `(uptr)` casts give the same code as `(u32)` for address arithmetic**: use them, they are

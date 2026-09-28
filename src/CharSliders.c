@@ -425,7 +425,7 @@ void fn_8010E35C(CharSliderDefs* pDefs, Skin* pSkin, SKABlendNode* pNode) {
                         if (pMorph->uId == pDefs->aMorphIds[m]) {
                             SkinMorph_SetTargetWeight(pSkin, m, fWeight);
                             if (m < 20) {
-                                fn_800736D8(pNode, m);
+                                SKABlender_ClearMorph(pNode, m);
                             }
                         }
                     }

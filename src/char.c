@@ -589,7 +589,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
         SKEL_PreTransformIKSkeleton(pChar->pModel);
     }
     if (pChar->blend.pPose != NULL) {
-        fn_8007260C(pChar, &pChar->blend, pChar->pModel, pChar->fAnimTime);
+        SKABlender_Update(pChar, &pChar->blend, pChar->pModel, pChar->fAnimTime);
         if (Character_IsGolfer(pChar) && pChar->pClubSet != NULL) {
             // fake match: aBones[nClubHeadBone].v10[1] written as a flat float index (0x40 / 4 + 8 per
             // bone + 5), which gives the original's indexed store; the pose is all 4-byte words
@@ -613,7 +613,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
         }
     }
     if (!gSession.b11 && Character_IsGolfer(pChar) && pChar->node3E0.pPose != NULL) {
-        fn_8007260C(pChar, &pChar->node3E0, pChar->pModel, pChar->anim29C.fTime);
+        SKABlender_Update(pChar, &pChar->node3E0, pChar->pModel, pChar->anim29C.fTime);
         fn_80037C48(pChar->pSkin, pChar->node3E0.pPose);
     }
     if (pChar->uFlags & 2) {
@@ -1105,11 +1105,11 @@ Character* Character_Create(void) {
         pChar->buffers[i].pBuf = StaticMem_Alloc(0x890, 2, 0x40, "char.c", 0x8AF);
     }
     pNode = &pChar->blend;
-    fn_80072D90((AnimPlayer*)pChar->anim);
-    fn_80071C28(&pNode, 1, 0, fn_80072ACC, 1);
+    SKATime_Init((AnimPlayer*)pChar->anim);
+    SKABlendData_Init(&pNode, 1, 0, SKABlender_BlendLinear, 1);
     pNode = &pChar->node3E0;
-    fn_80072D90(&pChar->anim29C);
-    fn_80071C28(&pNode, 1, 1, fn_80072ACC, 1);
+    SKATime_Init(&pChar->anim29C);
+    SKABlendData_Init(&pNode, 1, 1, SKABlender_BlendLinear, 1);
     pChar->pLib = NULL;
     pChar->n3D4 = 0;
     pChar->p44 = NULL;
@@ -2277,19 +2277,19 @@ void Character_PlayClip(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) 
     }
     pChar->p178C = NULL;
     if (bNoBlend) {
-        fn_80071F58(&pNode, 0);
-        fn_80071C28(&pNode, 1, 0, fn_80072ACC, 0);
-        fn_800725BC(pNode, fn_80072ACC, 0.5f);
+        SKABlendData_Shutdown(&pNode, 0);
+        SKABlendData_Init(&pNode, 1, 0, SKABlender_BlendLinear, 0);
+        SKABlender_SetBlender(pNode, SKABlender_BlendLinear, 0.5f);
         SKATime_SetTimeScale((u8*)pAnim, 1.0f);
         pAnim->n00 = 0;
         pAnim->uFlags = 0;
         pAnim->n08 = -1;
         pAnim->fTime = 0.0f;
     }
-    fn_80071C28(&pNew, 0, 0, fn_80072ACC, 1);
-    fn_800724C0(&pChar->blend, pNew, pClip, 1.0f);
+    SKABlendData_Init(&pNew, 0, 0, SKABlender_BlendLinear, 1);
+    SKAChannel_SetChannel(&pChar->blend, pNew, pClip, 1.0f);
     if (!bNoBlend) {
-        fn_800732F4(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime + fTime);
+        SKABlender_ClampT1(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime + fTime);
         aBlend[5] = 0.0f;
         aBlend[0] = 0.0f;
         fLen = pClip->f18;
@@ -2300,9 +2300,9 @@ void Character_PlayClip(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) 
         }
         aBlend[3] = pAnim->fTime + aBlend[5];
         aBlend[4] = aBlend[3] + (aBlend[1] - aBlend[0]);
-        fn_800720C8(pChar, pNew, &pNode, aBlend, fn_80072ACC, 1);
+        SKABlender_AddBlenderData(pChar, pNew, &pNode, aBlend, SKABlender_BlendLinear, 1);
     } else {
-        fn_800720C8(pChar, pNew, &pNode, NULL, fn_80072ACC, 0);
+        SKABlender_AddBlenderData(pChar, pNew, &pNode, NULL, SKABlender_BlendLinear, 0);
         aBlend[3] = 0.0f;
     }
     pAnim->fStart = pNode->fStart;
@@ -2330,9 +2330,9 @@ void Character_Free(Character* pChar) {
             fn_80010544(pChar->n48);
         }
         pNode = &pChar->blend;
-        fn_80071F58(&pNode, 0);
+        SKABlendData_Shutdown(&pNode, 0);
         pNode = &pChar->node3E0;  // a node without the root's nGroup
-        fn_80071F58(&pNode, 0);
+        SKABlendData_Shutdown(&pNode, 0);
         if (pChar->pSkin != NULL) {
             fn_80037CD8(pChar->pSkin);
         }
@@ -2445,7 +2445,7 @@ void Legacy_Character_InitModule(void) {
     Skalib_Init();
     fn_8001F64C();
     SKEL_InitModule();
-    fn_80071AD0();
+    AnimBlender_InitModule();
     for (i = 0; i < 2; i++) {
         gClubSkinSets[i] = NULL;
     }
@@ -2483,7 +2483,7 @@ void Legacy_Character_CloseModule(void) {
     Skalib_Shutdown();
     fn_8001F66C();
     SKEL_CloseModule();
-    fn_80071B94();
+    AnimBlender_CloseModule();
 }
 
 // Frees the front end's golfer characters (gFEGolferChars, one per CrAP golfer slot) and clears the
@@ -3034,20 +3034,20 @@ void Character_Sleep(Character* pChar) {
 }
 
 // Resets the character's animation blending: each of its two blend trees (blend, node3E0) is given
-// back and rebuilt as one empty node mixing its children with fn_80072ACC at weight 0.5 (pose
+// back and rebuilt as one empty node mixing its children with SKABlender_BlendLinear at weight 0.5 (pose
 // format 0 for the first, 1 for the second), both animation players are set back to animation 0 at
 // time 0, and the animation state (n2C, n30, nAnim, n20, n18, u28) is cleared.
 void Character_ResetBlenders(Character* pChar) {
     SKABlendNode* pNode;
 
     pNode = &pChar->blend;
-    fn_80071F58(&pNode, 0);
-    fn_80071C28(&pNode, 1, 0, fn_80072ACC, 0);
-    fn_800725BC(pNode, fn_80072ACC, 0.5f);
+    SKABlendData_Shutdown(&pNode, 0);
+    SKABlendData_Init(&pNode, 1, 0, SKABlender_BlendLinear, 0);
+    SKABlender_SetBlender(pNode, SKABlender_BlendLinear, 0.5f);
     pNode = &pChar->node3E0;
-    fn_80071F58(&pNode, 0);
-    fn_80071C28(&pNode, 1, 1, fn_80072ACC, 1);
-    fn_800725BC(pNode, fn_80072ACC, 0.5f);
+    SKABlendData_Shutdown(&pNode, 0);
+    SKABlendData_Init(&pNode, 1, 1, SKABlender_BlendLinear, 1);
+    SKABlender_SetBlender(pNode, SKABlender_BlendLinear, 0.5f);
     CharacterState_SetTransition(&pChar->anim29C, 0, 0.0f);
     pChar->n2C = 0;
     pChar->n30 = 0;

@@ -59,9 +59,9 @@ void CharacterState_ResetMorphState(Character* pChar, u8 bReset) {
     CharacterState_SetTransition(&pChar->anim29C, 0, 0.0f);
     if (bReset) {
         pNode = &pChar->node3E0;
-        fn_80071F58(&pNode, 0);
-        fn_80071C28(&pNode, 1, 1, fn_80072ACC, 1);
-        fn_800725BC(pNode, fn_80072ACC, 0.5f);
+        SKABlendData_Shutdown(&pNode, 0);
+        SKABlendData_Init(&pNode, 1, 1, SKABlender_BlendLinear, 1);
+        SKABlender_SetBlender(pNode, SKABlender_BlendLinear, 0.5f);
     }
     if (gSession.nGameType == 3 && pChar->pSliderDefs != NULL) {
         CharSlider_UpdateCharacterBasedOnSliderValues(pChar->pSliderDefs, pChar->pModel, pChar->pSkin, 26,
@@ -82,7 +82,7 @@ void CharacterState_SetTransition(AnimPlayer* pTime, s32 nState, f32 fTime) {
 // clip, [2] its event 2 (ball hit) time (fFrom -70000 only, else [1]), [3] and [4] the start and
 // end on the player's clock, [5] fOffset. fFrom and fTo may be markers: -40000 and -50000 take the
 // clip's pD8 last and first key times, -90000 (fFrom) CharacterState_GetLastSKAStateID, -70000
-// (fFrom) v1638[1], first cutting the body's tree off at its time (fn_800732F4); other negatives
+// (fFrom) v1638[1], first cutting the body's tree off at its time (SKABlender_ClampT1); other negatives
 // take 0 and the clip's length (f18). fStart -10000 starts the window at the tree's end. With
 // aPrev, the window starts with the previous one and is scaled so its span up to event 2 matches
 // the previous one's. The result is the window's length on the clock.
@@ -99,7 +99,7 @@ f32 SKABlend_CalculateBlendInfo(Character* pChar, f32* aPrev, Clip* pClip, f32* 
         } else if (-70000.0f == fFrom) {
             aBlend[0] = pChar->v1638[1];
             aBlend[2] = SKA_GetTagTime(pClip, 2);
-            fn_800732F4(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime);
+            SKABlender_ClampT1(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime);
         } else if (fFrom < 0.0f) {
             aBlend[0] = 0.0f;
         }
@@ -122,7 +122,7 @@ f32 SKABlend_CalculateBlendInfo(Character* pChar, f32* aPrev, Clip* pClip, f32* 
         aBlend[2] = aBlend[1];
     }
     if (-10000.0f == fStart) {
-        aBlend[3] = fOffset + fn_80072938(&pChar->blend);
+        aBlend[3] = fOffset + SKABlender_GetEndTime(&pChar->blend);
     } else {
         aBlend[3] = fStart + fOffset;
     }
@@ -210,8 +210,8 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
     }
     if (bReset) {
         pChar->fAnimTime = 0.0f;
-        fn_80071F58(&pNode, 0);
-        fn_80071C28(&pNode, 1, pNode->nFormat, pfnBlend, nC);
+        SKABlendData_Shutdown(&pNode, 0);
+        SKABlendData_Init(&pNode, 1, pNode->nFormat, pfnBlend, nC);
         fn_801141F8(pChar->pModel->pF0, pChar->pModel);
         fn_801141F8(pChar->pModel->pF4, pChar->pModel);
         fn_801141F8(pChar->pModel->pF8, pChar->pModel);
@@ -223,9 +223,9 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
     fDelay = fOffset + (pChar->fAnimEnd - pChar->fAnimTime);
     Character_InitSKATags(pChar, pClip, aBlend[3] - aBlend[0]);
     pNew = NULL;
-    fn_80071C28(&pNew, 0, pNode->nFormat, pfnBlend, nC);
-    fn_800724C0(&pChar->blend, pNew, pClip, 1.0f);
-    fn_800720C8(pChar, pNew, &pNode, aBlend, pfnBlend, nC);
+    SKABlendData_Init(&pNew, 0, pNode->nFormat, pfnBlend, nC);
+    SKAChannel_SetChannel(&pChar->blend, pNew, pClip, 1.0f);
+    SKABlender_AddBlenderData(pChar, pNew, &pNode, aBlend, pfnBlend, nC);
     ((AnimPlayer*)pChar->anim)->n00 = 0;
     pChar->n16C = 1;
     pChar->f180 = pNode->fStart;
@@ -265,8 +265,8 @@ void CharacterState_AddMorphBlendData(Character* pChar, MtaLib* pLib, u8 bReset,
     pChar->anim29C.uFlags = 0;
     if (bReset) {
         pChar->anim29C.fTime = 0.0f;
-        fn_80071F58(&pNode, 0);
-        fn_80071C28(&pNode, 1, pNode->nFormat, pfnBlend, nC);
+        SKABlendData_Shutdown(&pNode, 0);
+        SKABlendData_Init(&pNode, 1, pNode->nFormat, pfnBlend, nC);
     }
     if (-20000.0f == fStart) {
         fStart = pChar->anim29C.fTime;
@@ -278,14 +278,14 @@ void CharacterState_AddMorphBlendData(Character* pChar, MtaLib* pLib, u8 bReset,
         fTo = pLib->f1C;
     }
     pNew = NULL;
-    fn_80071C28(&pNew, 0, pNode->nFormat, pfnBlend, nC);
-    fn_800724C0(&pChar->node3E0, pNew, pLib, 1.0f);
+    SKABlendData_Init(&pNew, 0, pNode->nFormat, pfnBlend, nC);
+    SKAChannel_SetChannel(&pChar->node3E0, pNew, pLib, 1.0f);
     aBlend[3] = fStart;
     aBlend[5] = fOffset;
     aBlend[0] = fFrom;
     aBlend[1] = fTo;
     aBlend[4] = fStart + (fTo - fFrom);
-    fn_800720C8(pChar, pNew, &pNode, aBlend, pfnBlend, nC);
+    SKABlender_AddBlenderData(pChar, pNew, &pNode, aBlend, pfnBlend, nC);
     pChar->anim29C.n00 = 0;
     pChar->anim29C.n08 = 1;
     pChar->anim29C.fStart = pNode->fStart;
@@ -311,14 +311,15 @@ void CharacterState_AddMorphBlendData(Character* pChar, MtaLib* pLib, u8 bReset,
 
 // Play a body clip's own morph library pLib (Clip.pF4) on the morph player, to its end, in morph
 // state 4; state 5 follows at the end (0.95 earlier while the body is in state 5). Without bReset
-// the morph tree is first cut off at fOffset past the player's time (fn_800732F4) so the library
+// the morph tree is first cut off at fOffset past the player's time (SKABlender_ClampT1) so the library
 // blends in; with it the tree starts over.
 void CharacterState_PlayClipMorphs(Character* pChar, void* pLib, u8 bReset, f32 fOffset) {
     if (pLib == NULL) return;
     if (!bReset) {
-        fn_800732F4(&pChar->node3E0, &pChar->anim29C, pChar->anim29C.fTime + fOffset);
+        SKABlender_ClampT1(&pChar->node3E0, &pChar->anim29C, pChar->anim29C.fTime + fOffset);
     }
-    CharacterState_AddMorphBlendData(pChar, pLib, bReset, 0, fn_80072ACC, 1, 5, -20000.0f, -30000.0f,
+    CharacterState_AddMorphBlendData(pChar, pLib, bReset, 0, SKABlender_BlendLinear, 1, 5, -20000.0f,
+                                     -30000.0f,
                                      -10000.0f, 0.0f, -10000.0f);
     pChar->n2C = 4;
     pChar->n30 = 4;
@@ -443,7 +444,8 @@ void CharacterState_SetTapInState(Character* pChar) {
     } else {
         Character_SetEmotion(pChar, 2);
     }
-    CharacterState_AddSKABlendData(pChar, 1, 9, fn_80072ACC, 1, 8, -10000.0f, -30000.0f, -10000.0f, 0.0f,
+    CharacterState_AddSKABlendData(pChar, 1, 9, SKABlender_BlendLinear, 1, 8, -10000.0f, -30000.0f,
+                                   -10000.0f, 0.0f,
                                    -10000.0f);
 }
 
@@ -484,11 +486,13 @@ void CharacterState_UpdateSKAState(Character* pChar) {
                    gPlayers[pChar->nPlayer].nClub <= 5 && Misc_RandFunc(1) % 100 < 10 && pChar->nSlot == 0) {
             nGroup = 16;
         }
-        CharacterState_AddSKABlendData(pChar, 1, nGroup, fn_80072ACC, 1, 2, -10000.0f, -30000.0f, -10000.0f,
+        CharacterState_AddSKABlendData(pChar, 1, nGroup, SKABlender_BlendLinear, 1, 2, -10000.0f, -30000.0f,
+                                       -10000.0f,
                                        0.0f, -10000.0f);
         break;
     case 10:
-        CharacterState_AddSKABlendData(pChar, 1, 14, fn_80072ACC, 1, 0, -10000.0f, -30000.0f, -10000.0f, 0.0f,
+        CharacterState_AddSKABlendData(pChar, 1, 14, SKABlender_BlendLinear, 1, 0, -10000.0f, -30000.0f,
+                                       -10000.0f, 0.0f,
                                        -10000.0f);
         Character_PlaceFeetOnGround(pChar);
         break;
@@ -496,17 +500,18 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         switch (pChar->n20) {
         case 4:
         case 1:
-            Anim_SetTime(pChar->anim, -10000.0f);
+            SKATime_SetTime(pChar->anim, -10000.0f);
             CharacterState_SetTransition((AnimPlayer*)pChar->anim, 0, -10000.0f);
             break;
         case 3:
-            Anim_SetTime(pChar->anim, -30000.0f);
+            SKATime_SetTime(pChar->anim, -30000.0f);
             CharacterState_SetTransition((AnimPlayer*)pChar->anim, 0, -10000.0f);
             break;
         default:
-            CharacterState_AddSKABlendData(pChar, 1, 1, fn_80072ACC, 1, 0, -10000.0f, -30000.0f, -10000.0f,
+            CharacterState_AddSKABlendData(pChar, 1, 1, SKABlender_BlendLinear, 1, 0, -10000.0f, -30000.0f,
+                                           -10000.0f,
                                            0.0f, -10000.0f);
-            Anim_SetTime(pChar->anim, -10000.0f);
+            SKATime_SetTime(pChar->anim, -10000.0f);
             break;
         }
         break;
@@ -515,7 +520,8 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         if (pChar->n20 != 2) {
             bReset = 1;
         }
-        CharacterState_AddSKABlendData(pChar, bReset, 8, fn_80072ACC, 1, 5, -10000.0f, -30000.0f, -10000.0f,
+        CharacterState_AddSKABlendData(pChar, bReset, 8, SKABlender_BlendLinear, 1, 5, -10000.0f, -30000.0f,
+                                       -10000.0f,
                                        0.0f, -10000.0f);
         break;
     case 4:
@@ -523,7 +529,8 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         if (pChar->n20 != 5) {
             bReset = 1;
         }
-        CharacterState_AddSKABlendData(pChar, bReset, 7, fn_80072ACC, 1, 2, -20000.0f, -30000.0f, -10000.0f,
+        CharacterState_AddSKABlendData(pChar, bReset, 7, SKABlender_BlendLinear, 1, 2, -20000.0f, -30000.0f,
+                                       -10000.0f,
                                        0.0f, -10000.0f);
         break;
     case 5:
@@ -533,11 +540,11 @@ void CharacterState_UpdateSKAState(Character* pChar) {
             pChar->u10 &= ~0x80;
             switch (pChar->n20) {
             case 6:
-                fn_800732F4(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime);
+                SKABlender_ClampT1(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime);
                 fOffset = 0.35f;
                 break;
             case 5:
-                fn_800732F4(&pChar->blend, (AnimPlayer*)pChar->anim, 0.25f + pChar->fAnimTime);
+                SKABlender_ClampT1(&pChar->blend, (AnimPlayer*)pChar->anim, 0.25f + pChar->fAnimTime);
                 fOffset = 0.0f;
                 break;
             default:
@@ -548,7 +555,7 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         } else {
             switch (pChar->n20) {
             case 6:
-                fn_800732F4(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime);
+                SKABlender_ClampT1(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime);
                 fOffset = 0.35f;
                 break;
             case 1:
@@ -563,7 +570,8 @@ void CharacterState_UpdateSKAState(Character* pChar) {
             }
             nGroup = CharacterState_UpdateFidgetState(pChar);
         }
-        CharacterState_AddSKABlendData(pChar, bReset, nGroup, fn_80072ACC, 1, 5, -20000.0f, -30000.0f,
+        CharacterState_AddSKABlendData(pChar, bReset, nGroup, SKABlender_BlendLinear, 1, 5, -20000.0f,
+                                       -30000.0f,
                                        -10000.0f, fOffset, -10000.0f);
         bEnableIK = CharacterState_IsNotFidgeting(pChar);
         bTransitionIK = 1;
@@ -573,13 +581,14 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         bReset = 0;
         switch (pChar->n20) {
         case 5:
-            fn_800732F4(&pChar->blend, (AnimPlayer*)pChar->anim, 0.25f + pChar->fAnimTime);
+            SKABlender_ClampT1(&pChar->blend, (AnimPlayer*)pChar->anim, 0.25f + pChar->fAnimTime);
             break;
         default:
             bReset = 1;
             break;
         }
-        CharacterState_AddSKABlendData(pChar, bReset, 0, fn_80072ACC, 1, 0, -20000.0f, -50000.0f, -40000.0f,
+        CharacterState_AddSKABlendData(pChar, bReset, 0, SKABlender_BlendLinear, 1, 0, -20000.0f, -50000.0f,
+                                       -40000.0f,
                                        0.0f, -10000.0f);
         bEnableIK = 1;
         bTransitionIK = 1;
@@ -602,8 +611,9 @@ void CharacterState_UpdateSKAState(Character* pChar) {
             break;
         }
         pChar->uFlags &= ~0x40;
-        fn_800732F4(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime);
-        CharacterState_AddSKABlendData(pChar, bReset, 0, fn_80072ACC, 1, 8, -20000.0f, -70000.0f, -10000.0f,
+        SKABlender_ClampT1(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime);
+        CharacterState_AddSKABlendData(pChar, bReset, 0, SKABlender_BlendLinear, 1, 8, -20000.0f, -70000.0f,
+                                       -10000.0f,
                                        fLag, -10000.0f);
         bEnableIK = 1;
         break;
@@ -623,7 +633,8 @@ void CharacterState_UpdateSKAState(Character* pChar) {
             bReset = 1;
             break;
         }
-        CharacterState_AddSKABlendData(pChar, bReset, 11, fn_80072ACC, 1, 8, -20000.0f, -30000.0f, -10000.0f,
+        CharacterState_AddSKABlendData(pChar, bReset, 11, SKABlender_BlendLinear, 1, 8, -20000.0f, -30000.0f,
+                                       -10000.0f,
                                        0.0f, -10000.0f);
         pChar->nClipKey = nOldClipKey;
         bEnableIK = 0;
@@ -668,11 +679,13 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         }
         pChar->uFlags &= ~0x40;
         if (bFromOtherState || pChar->nClubClass != 2) {
-            CharacterState_AddSKABlendData(pChar, 1, 5, fn_80072ACC, 1, 0, -20000.0f, -30000.0f, -10000.0f,
+            CharacterState_AddSKABlendData(pChar, 1, 5, SKABlender_BlendLinear, 1, 0, -20000.0f, -30000.0f,
+                                           -10000.0f,
                                            0.0f, -10000.0f);
         } else {
-            fn_800732F4(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime);
-            CharacterState_AddSKABlendData(pChar, bFromOtherState, nGroup, fn_80072ACC, 1, 0, -20000.0f,
+            SKABlender_ClampT1(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime);
+            CharacterState_AddSKABlendData(pChar, bFromOtherState, nGroup, SKABlender_BlendLinear, 1, 0,
+                                           -20000.0f,
                                            -30000.0f, -10000.0f, 0.5f, -10000.0f);
             bTransitionIK = 1;
             fIKTransitionTime = 0.1f;
@@ -685,7 +698,8 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         break;
     case 12:
         CharacterState_UpdateGameEmotionState(pChar);
-        CharacterState_AddSKABlendData(pChar, 1, 6, fn_80072ACC, 1, 0, -10000.0f, -30000.0f, -10000.0f, 0.0f,
+        CharacterState_AddSKABlendData(pChar, 1, 6, SKABlender_BlendLinear, 1, 0, -10000.0f, -30000.0f,
+                                       -10000.0f, 0.0f,
                                        -10000.0f);
         break;
     }
@@ -733,8 +747,9 @@ void CharacterState_UpdateMorphState(Character* pChar) {
             goto skip;  // fake match: past the n30 update to the shared clear (a copy here: 90.3%)
         }
         pLib = Character_GetRandomMtaLib(pChar, 1, -1);
-        fn_800732F4(&pChar->node3E0, &pChar->anim29C, 0.5f + pChar->anim29C.fTime);
-        CharacterState_AddMorphBlendData(pChar, pLib, 0, 1, fn_80072ACC, 1, 2, -20000.0f, -30000.0f,
+        SKABlender_ClampT1(&pChar->node3E0, &pChar->anim29C, 0.5f + pChar->anim29C.fTime);
+        CharacterState_AddMorphBlendData(pChar, pLib, 0, 1, SKABlender_BlendLinear, 1, 2, -20000.0f,
+                                         -30000.0f,
                                          -10000.0f, 0.0f, -10000.0f);
         pChar->anim29C.f10 -= 0.5f;
         break;
@@ -742,9 +757,10 @@ void CharacterState_UpdateMorphState(Character* pChar) {
         if (pChar->n30 == 4 || (pChar->n20 != 6 && pChar->n20 != 7)) {
             goto skip;  // fake match: as in case 2
         }
-        fn_800732F4(&pChar->node3E0, &pChar->anim29C, 0.5f + pChar->anim29C.fTime);
+        SKABlender_ClampT1(&pChar->node3E0, &pChar->anim29C, 0.5f + pChar->anim29C.fTime);
         pLib = Character_GetRandomMtaLib(pChar, 2, -1);
-        CharacterState_AddMorphBlendData(pChar, pLib, 0, 2, fn_80072ACC, 1, 3, -20000.0f, -30000.0f,
+        CharacterState_AddMorphBlendData(pChar, pLib, 0, 2, SKABlender_BlendLinear, 1, 3, -20000.0f,
+                                         -30000.0f,
                                          -10000.0f, 0.0f, -10000.0f);
         pChar->anim29C.f10 -= 0.5f;
         break;
@@ -752,9 +768,10 @@ void CharacterState_UpdateMorphState(Character* pChar) {
         if (pChar->n30 == 4 || (pChar->n20 != 6 && pChar->n20 != 7)) {
             goto skip;  // fake match: as in case 2
         }
-        fn_800732F4(&pChar->node3E0, &pChar->anim29C, 0.5f + pChar->anim29C.fTime);
+        SKABlender_ClampT1(&pChar->node3E0, &pChar->anim29C, 0.5f + pChar->anim29C.fTime);
         pLib = Character_GetRandomMtaLib(pChar, 0, -1);
-        CharacterState_AddMorphBlendData(pChar, pLib, 0, 0, fn_80072ACC, 1, 1, -20000.0f, -30000.0f,
+        CharacterState_AddMorphBlendData(pChar, pLib, 0, 0, SKABlender_BlendLinear, 1, 1, -20000.0f,
+                                         -30000.0f,
                                          -10000.0f, 0.0f, -10000.0f);
         pChar->anim29C.f10 -= 0.5f;
         break;

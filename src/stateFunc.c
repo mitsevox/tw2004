@@ -699,10 +699,10 @@ void STATEFUNC_ReplaySwingInit(int nPlayer) {
     } else {
         if (GolfCamera_IsSlowMoSwingCamActive() || GolfCamera_Choose3ScreenCam(pV, nPlayer) ||
             GolfCamera_ChooseHeartBeatCam(pV, nPlayer) || GolfCamera_ChooseShutterCam(pV, nPlayer)) {
-            CharacterState_AddSKABlendData(gPlayers[nPlayer].pChar, 1, 0, fn_80072ACC, 1, 8,
+            CharacterState_AddSKABlendData(gPlayers[nPlayer].pChar, 1, 0, SKABlender_BlendLinear, 1, 8,
                                            -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
         } else {
-            CharacterState_AddSKABlendData(gPlayers[nPlayer].pChar, 1, 0, fn_80072ACC, 1, 8,
+            CharacterState_AddSKABlendData(gPlayers[nPlayer].pChar, 1, 0, SKABlender_BlendLinear, 1, 8,
                                            -20000.0f, -90000.0f, -10000.0f, 0.0f, -10000.0f);
         }
         SKEL_SetIKSolutionWeight(gPlayers[nPlayer].pChar->pModel->pSkel, 1.0f);
@@ -755,10 +755,10 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
                 bSpecial = fn_800C5FE4(pV, nPlayer);
             }
             if (bSpecial) {
-                CharacterState_AddSKABlendData(gPlayers[nPlayer].pChar, 1, 0x12, fn_80072ACC, 1, 8,
+                CharacterState_AddSKABlendData(gPlayers[nPlayer].pChar, 1, 0x12, SKABlender_BlendLinear, 1, 8,
                                                -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
             } else {
-                CharacterState_AddSKABlendData(gPlayers[nPlayer].pChar, 1, 0, fn_80072ACC, 1, 8,
+                CharacterState_AddSKABlendData(gPlayers[nPlayer].pChar, 1, 0, SKABlender_BlendLinear, 1, 8,
                                                -20000.0f, -90000.0f, -10000.0f, 0.0f, -10000.0f);
             }
             fn_800957D8(gPlayers[nPlayer].pChar);
@@ -1360,7 +1360,7 @@ void STATEFUNC_InTheHoleUpdate(int nPlayer) {
         return;
     }
     if (fn_80095780(gPlayers[nPlayer].pChar) == 9 && pV->nCurCamera != 0x10 && Game_GetMode() != 11 &&
-        !fn_800734A0(&gPlayers[nPlayer].pChar->blend)) {
+        !SKABlender_IsNotSingleSKA(&gPlayers[nPlayer].pChar->blend)) {
         CameraController_SetCameraMode(pV, 0x10, nPlayer, gPlayers[nPlayer].nView[0]);
     }
     if (fn_80095780(gPlayers[nPlayer].pChar) == 9) {
@@ -1429,7 +1429,7 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
     }
     vOffset = lbl_80183620;
     if (fn_80095780(gPlayers[nPlayer].pChar) == 9 && pV->nCurCamera != 0xF && Game_GetMode() != 11 &&
-        !fn_800734A0(&gPlayers[nPlayer].pChar->blend)) {
+        !SKABlender_IsNotSingleSKA(&gPlayers[nPlayer].pChar->blend)) {
         CameraController_SetCameraMode(pV, 0xF, nPlayer, gPlayers[nPlayer].nView[0]);
     }
     if ((fn_80062C1C(gPlayers[nPlayer].pChar) != 0 || fn_80062C10(gPlayers[nPlayer].pChar) != 0) &&

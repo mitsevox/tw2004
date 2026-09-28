@@ -574,7 +574,7 @@ void SW_vStateInitBackSwingFigit(int nPlayer) {
     Character* pObj = p->pChar;
     SwingData* pSw  = &p->swing;
     pSw->fFidgetTargetTime = pSw->fFidgetPauseTime;
-    Anim_SetTime(pObj->anim, pSw->fFidgetTargetTime);
+    SKATime_SetTime(pObj->anim, pSw->fFidgetTargetTime);
     Character_UpdateAnimation(pObj, 0, 0.0f);
     SKATime_SetTimeScale(pObj->anim, 0.008f);
     pObj->uFlags |= 0x40;
