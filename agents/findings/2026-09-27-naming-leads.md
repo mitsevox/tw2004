@@ -236,3 +236,27 @@ Golfer header pass (with Round 6/7's lists):
 - Pairing TSV: 8008EAB0..8008EB04 shifted by two. Unnamed on purpose: FE lbl_80189A40/60/80,
   lbl_80281338, lbl_80281348; mtalib lbl_801B9668.
 - Tools: tools/agents/merge_lane.sh (3-way merge of a lane's hand edits) replaces taking whole files.
+
+## Round 9 (ri1-ri4, golfer area) leftovers
+Golfer header pass (add to Rounds 6-8):
+- character.h: Character.v1638 is 6 floats (SKA_SampleBlendClip writes 0x1638-0x164F; f1644 = v1638[3],
+  unk1648 = [4]/[5]). Clip: "first/second frame stream" = 16-bit / 8-bit angle streams, pE0 the 8-bit
+  stream's base angles (u16 x3 per bone), pE8 fixed rotations (16-bit, n60 bones), uFlags 0x2 has a
+  BlendClip. CharBuffer comment "the code at 0x8001FE50" = SKA_Update. ClipRecord.n12 1 = flagged to
+  drop (not "keep"), 4 linked, 8 copied; n14 byte size; n18 unknown (drop order). LibOverlay.n10 the sac
+  stream id (model id + 3, -1 once merged), n14 model id. LibSlot.n150 clips copied; AnimLib.n140 clip
+  bytes, n12C built size; ClipBank.uId a byte counter in a planned bank; AnimLeaf.uMask 2 = unused by
+  the merged library. AnimStreamClips.b8 bRead, AnimStreamPlayer.nId nSlot, AnimStream.p0 pReadBuf,
+  p4 pReadClips, n1CC8 nReadPlayer. Extern comments misaligned after the skalib global renames.
+- engine.h SKA_UnpackName comment (SKA_PackName's output needs SKA_UnpackSwappedName).
+- charstate.h SkinDesc.n2C = meshes in p34 (not "bits an HwsBurn keeps"); n30 = one past the last mesh
+  flagged 0x100000 after a burn; SkinDesc44.n8 vs HwsBurn_MarkEntry to check. game.h Session.uFlags
+  0x4000 also forces clear weather (fn_8006F650) and turns caddie tips off.
+- Prototypes: skalib.c local SKA_SwapClip(void*) vs (u8*), SKA_PatchMemory void vs Clip*;
+  Code8006F438.c AnimStream_WaitForRead s32 vs void.
+Other:
+- Possible EA bugs, unlabelled: AnimStream_AssignSlots (no break), AnimStream_StartRead (hang on a
+  failed start; streaming is off in this build). HwsBurn_CopySetOptions round-up may be an unlabelled
+  fake match. SwingTips.c is EA's CaddieTips.c (file rename = misfiled-units item).
+- Unnamed data: lbl_80281D18 (skalib, written only). Game type 6 still unexplained.
+- Golfer area left: Swing (65), CharSliders (12), then the golfer HEADER pass (Rounds 6-9 lists).
