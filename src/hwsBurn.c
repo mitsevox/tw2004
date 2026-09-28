@@ -1,6 +1,11 @@
-// hwsBurn.c (EA's name, from its asserts): "burns" a skin description into one block: an HwsBurn
-// (HwsBurn_Create) records which parts, variants and options are chosen and which bits of the
-// description they use, and HwsBurn_BuildDesc copies what they use into one new block.
+// hwsBurn.c (EA's name, from its asserts; TW06 and TW2005 keep it in
+// Lo-Rendering/Shader/Hardware): the renderer's side of burning a golfer's skin (SkinBurn.c's
+// SkinBurn_BurnSkin drives it). A burn (HwsBurn_Create) is told which variant and option each part
+// keeps, which morph targets to drop and which blended meshes replace the description's;
+// HwsBurn_Burn then marks everything those choices use (the Mark steps) and HwsBurn_BuildDesc
+// copies only that into one new skin description in a single block, every table renumbered, so the
+// chosen look is baked into fixed render data. No EA function names survive in any reference build
+// (TW06 names only the type, HWBurnStateT), so the HwsBurn_ names are ours.
 
 #include "engine.h"
 #include "charstate.h"
