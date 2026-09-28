@@ -103,11 +103,11 @@ void  fn_800B28D4(Character* pChar, int a, int b);
 void  fn_800B2FB0(Character* pChar, int a, int b);
 void  LLMath_mat44fltMultiply(f32 mtx[4][4], Vec4* src, Vec4* dst);    // VecMath.c: a point through a matrix
 void  Character_GetBonePos(Character* pChar, int nBone, f32* pPos);
-void  fn_8001CCF8(UStreamObject* pObject);
-void  fn_8001CD80(UStreamObject* pObject);
-void  fn_8001CE5C(UStreamObject* pObject);
-void  fn_8001D020(UStreamObject* pObject);
-void  fn_8001D3EC(UStreamObject* pObject);
+void  Character_ClubStreamCallbackIG(UStreamObject* pObject);
+void  Character_ClubStreamCallbackFE(UStreamObject* pObject);
+void  Character_GolferStreamCallbackIG(UStreamObject* pObject);
+void  Character_GolferStreamCallbackFE(UStreamObject* pObject);
+void  SkeletalObject_StreamCallback(UStreamObject* pObject);
 void  fn_8001D7EC(Character* pChar);
 void  fn_800BBADC(int nValue);         // SitDevFile.c
 void  Character_GetBonePos_FromIndex(Character* pChar, int nBone, f32* pPos);
@@ -134,7 +134,7 @@ void  Quat_RotateVector(f32* pQ, f32* pIn, f32* pOut);                // Quatern
 void  fn_800280E8(Character* pChar, f32* pPos, int bPlace);     // Skeleton.c
 void  fn_8001EFB4(f32* pA, f32* pB, f32* pOut);
 void  Character_BeginLoadTexturesCallbackIG(Character* pChar);
-void  fn_8001D6D8(int n);
+void  Character_RequestClothesUpdateIG(int n);
 void  fn_8010B098(void* pModel);                                // LLDynTex.c
 void  fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f);            // CharAnim.c
 void  Quat_ExtractEulerAngles(f32* pQ, f32* pA, f32* pB, f32* pC);          // Quaternion.c: a rotation as angles
@@ -210,7 +210,7 @@ void BitArray_SetAll(u32* aBits, u32 nBits);
 void BitArray_ClearAll(u32* aBits, u32 nBits);
 void CharSkinRef_Init(Skin* pSkin, CharSkinRef* pRef, s32 n);
 void CharSkinRef_Free(void* p);
-void fn_8001C650(void* arg0, s32 arg1);
+void Character_SelectShotType(void* arg0, s32 arg1);
 
 // ---- end of sweep code ----
 
@@ -1729,10 +1729,10 @@ void Character_ReopenTextureFiles(void) {
 
 // The characters' set-up late in a round's start (GO_vInitIG, after the players are set up): with
 // two players or fewer, every player's character takes its pool entries and its dynamic textures
-// are loaded now (fn_8010BF68; in split screen fn_8001D6D8 for its player too). Then the saved
-// choices of animation slots 0 and 1 are applied, the animation stream is set up (fn_800CA9DC,
-// fn_800CA7E0, fn_800CABA0, fn_800CB078), the sac files are loaded (Character_LoadSacFiles) and the
-// work copies freed.
+// are loaded now (fn_8010BF68; in split screen Character_RequestClothesUpdateIG for its player
+// too). Then the saved choices of animation slots 0 and 1 are applied, the animation stream is set
+// up (fn_800CA9DC, fn_800CA7E0, fn_800CABA0, fn_800CB078), the sac files are loaded
+// (Character_LoadSacFiles) and the work copies freed.
 void Character_PostInit(void) {
     int i;
     Character* pChar;
@@ -1746,7 +1746,7 @@ void Character_PostInit(void) {
                                             Character_EndLoadTexturesCallbackIG);
             fn_8010BF68();
             if (gSession.nSplitScreen) {
-                fn_8001D6D8(i);
+                Character_RequestClothesUpdateIG(i);
             }
         }
     }
@@ -2506,7 +2506,10 @@ int Character_IsCrAPGolfer(int nPlayer) {
     return b;
 }
 
-// Set the club class, and put the club head bone at the class's height.
+// With a club set, sets the character's club class (0 the drivers, 1 the fairway woods, 2 the
+// putter, 3 irons 1-5, 4 irons 6-9, 5 the wedges; Character_SelectGameClub maps the clubs) and
+// moves the club head bone (0x53) to the club's length for that class (the set's afC, the bone's y
+// offset). Nothing without a model or club set, or for a slot outside 0-2.
 void Character_SelectClub(Character* pChar, int n) {
     int nBone;
 
@@ -2520,8 +2523,10 @@ void Character_SelectClub(Character* pChar, int n) {
     }
 }
 
-// ---- sweep code (not yet cleaned up) ----
-void fn_8001C650(void* arg0, s32 arg1) {
+// Sets the key the character's clips are looked up by (nClipKey, Char_SetClip) to nShotType. With
+// p1798's mode (n2C) 6 and nShotType 0 it first stores 4, which the next line overwrites at once:
+// the key always ends as nShotType (Character_SetupForShot's same test keeps its 4).
+void Character_SelectShotType(void* arg0, s32 arg1) {
     void* temp_r5;
 
     temp_r5 = (*(void**)((u8*)(arg0) + 0x1798));
@@ -2532,9 +2537,11 @@ void fn_8001C650(void* arg0, s32 arg1) {
 }
 // ---- end of sweep code ----
 
-// The player's golfer takes the player's shot kind and club; when either changed, it goes back
-// to animation 5.
-void fn_8001C680(int nPlayer) {
+// The player's golfer takes the player's shot kind and club (Character_SelectGameShotType,
+// Character_SelectGameClub). When either changed, its animation restarts: nAnim 0, u10 bit 0x80
+// set, animation 5 asked for (fn_80095744), and a full set-up for the shot requested
+// (Character_AlignShotWithTarget with both flags).
+void Character_InitNewClubAndShotType(int nPlayer) {
     Player* pPlayer = &gPlayers[nPlayer];
     Character* pChar = pPlayer->pChar;
     int nKind = pChar->nShotKind;
@@ -2562,14 +2569,19 @@ f32 lbl_80187184[6][3] = {
     { 0.045f, -0.0f, 0.075f },
 };
 
-// Set the character's shot kind and the clip key that goes with it.
+// Sets the character's shot kind (the player's nShotKind) and the clip key it maps to
+// (lbl_80187164, through Character_SelectShotType). Nothing for NULL.
 void Character_SelectGameShotType(Character* pChar, int nKind) {
     if (pChar != NULL) {
-        fn_8001C650(pChar, lbl_80187164[nKind]);
+        Character_SelectShotType(pChar, lbl_80187164[nKind]);
         pChar->nShotKind = nKind;
     }
 }
 
+// Sets the character's club (Player.nClub, CLUB_DRIVER1_e to CLUB_PUTTER_e) and, through
+// Character_SelectClub, its club class: 0 the drivers, 1 the fairway woods, 3 irons 1-5, 4 irons
+// 6-9, 5 the wedges, 2 the putter. The club also goes to the situation device's state
+// (fn_800BBADC). Nothing for NULL.
 void Character_SelectGameClub(Character* pChar, int nClub) {
     // per club: what Character_SelectClub gets
     int aKind[26] = {0, 0, 0, 0, 0, 0, 1, 1, 1, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 2};
@@ -2587,7 +2599,10 @@ void Character_SetEmotion(Character* pChar, int nStyle) {
     pChar->nStyle = nStyle;
 }
 
-// Flags on the player's character: bit 4 always, bit 8 set or cleared by b, bit 0x200 set by a.
+// Asks for the player's golfer to be set up for its shot on its next animation update (u10 bit 4:
+// Character_UpdateAnimation runs Character_SetupForShot): at its ball, facing the target. bInitIK
+// (bit 8, set or cleared) has it also take its stance and leg IK; bResetPos (bit 0x200, only set)
+// has the ground under its feet sampled again.
 void Character_AlignShotWithTarget(int nPlayer, u8 a, u8 b) {
     Character* pChar = gPlayers[nPlayer].pChar;
     pChar->u10 |= 4;
@@ -2713,9 +2728,10 @@ void Character_SetupForShot(Character* pChar) {
     }
 }
 
-// The 'CLB ' handlers: what Character_CreateClubSkinSet makes of the object is kept unless there
-// already is one; the first handler makes a second one for split screen.
-void fn_8001CCF8(UStreamObject* pObject) {
+// The in-game 'CLB ' (club models) stream handler: unless a club skin set is loaded already
+// (lbl_80280E24[0]), makes one from the object (Character_CreateClubSkinSet), and in split screen a
+// second one for the second view (lbl_80280E24[1], else NULL). The object is freed either way.
+void Character_ClubStreamCallbackIG(UStreamObject* pObject) {
     if (lbl_80280E24[0] == NULL) {
         if (gSession.nSplitScreen) {
             lbl_80280E24[0] = Character_CreateClubSkinSet(pObject->pData);
@@ -2728,7 +2744,8 @@ void fn_8001CCF8(UStreamObject* pObject) {
     StaticMem_Free(pObject);
 }
 
-void fn_8001CD80(UStreamObject* pObject) {
+// The front end's 'CLB ' stream handler: as Character_ClubStreamCallbackIG, with one set only.
+void Character_ClubStreamCallbackFE(UStreamObject* pObject) {
     if (lbl_80280E24[0] == NULL) {
         lbl_80280E24[0] = Character_CreateClubSkinSet(pObject->pData);
         lbl_80280E24[1] = NULL;
@@ -2736,23 +2753,26 @@ void fn_8001CD80(UStreamObject* pObject) {
     StaticMem_Free(pObject);
 }
 
-// The 'CLB ' stream objects: two handlers for the same type.
-void fn_8001CDD4(void) {
-    Stream_RegisterLoadChunkCallback('CLB ', fn_8001CCF8);
+// Registers Character_ClubStreamCallbackIG for 'CLB ' objects (streammanagerhole's in-game list).
+void Character_RegisterClubStreamClientIG(void) {
+    Stream_RegisterLoadChunkCallback('CLB ', Character_ClubStreamCallbackIG);
 }
 
-void fn_8001CE04(void) {
-    Stream_RegisterLoadChunkCallback('CLB ', fn_8001CD80);
+void Character_RegisterClubStreamClientFE(void) {
+    Stream_RegisterLoadChunkCallback('CLB ', Character_ClubStreamCallbackFE);
 }
 
-void fn_8001CE34(void) {
+void Character_UnregisterClubStreamClient(void) {
     Stream_UnregisterLoadChunkCallback('CLB ');
 }
 
-// A 'CHR ' object: a character for every player whose golfer has this model and who has none yet
-// (in split screen with the player's own set), dressed from the player's profile, with its body
-// skin and the club skin set's six skins put on the model.
-void fn_8001CE5C(UStreamObject* pObject) {
+// The in-game 'CHR ' (golfer model) stream handler: for every player whose golfer has this model
+// (the object's id) and who has no character yet, makes one (Character_CreateFromMem, with texture
+// set i in split screen, else 0, and the player's saved look), texture lookups kept to the player's
+// group meanwhile (fn_800106AC, fn_800106B8). A golfer with a body skin is dressed
+// (Character_SetClubsAndClothes), its seven skins (the body, then the club set's six) listed and
+// their textures loaded. The object is freed.
+void Character_GolferStreamCallbackIG(UStreamObject* pObject) {
     u32 uModel = pObject->uId;
     int i;
     int nSet;
@@ -2789,18 +2809,20 @@ void fn_8001CE5C(UStreamObject* pObject) {
     StaticMem_Free(pObject);
 }
 
-// The 'CHR ' stream objects: two handlers for the same type.
-void fn_8001CFF0(void) {
-    Stream_RegisterLoadChunkCallback('CHR ', fn_8001CE5C);
+// Registers Character_GolferStreamCallbackIG for 'CHR ' objects (streammanagerhole's in-game list).
+void Character_RegisterGolferStreamClientIG(void) {
+    Stream_RegisterLoadChunkCallback('CHR ', Character_GolferStreamCallbackIG);
 }
 
-// A 'CHR ' object for the golfer the menu is loading (lbl_80281EE0->pB8): the UI file is parked in
-// ARAM and its buffer takes a copy of the object (header and data), from which the character is
-// made while the static heap counts what it takes. The character is placed at the origin facing
-// f19C, dressed as the profile's created golfer for golfers 7 and 29, set to club class 5 and its
-// first clip. When it is still the golfer the menu wants, its body and club skins go on the model
-// (created golfers with one pool entry take two) and it takes its pool entries.
-void fn_8001D020(UStreamObject* pObject) {
+// The front end's 'CHR ' stream handler, for the golfer the create-a-player menu is loading
+// (lbl_80281EE0->pB8): the UI file is parked in ARAM so its buffer can take a copy of the object
+// (header and data), and the object is freed; the character is made from the copy (the static heap
+// counting what it takes) and its textures loaded, then the UI file is brought back. The character
+// is placed at lbl_80189A30 facing f19C, given the profile's created-golfer look for golfers 7 and
+// 29 (fn_8001DC64), set to club class 5 (the wedges) and its first clip. When it is still the
+// golfer the menu wants (pB8->nC is n8C), its body and six club skins are listed on it (created
+// golfers with one texture pool entry get two) and it takes its pool entries.
+void Character_GolferStreamCallbackFE(UStreamObject* pObject) {
     UStreamObject* pCopy;
     Character* pChar;
     Clip* pClip;
@@ -2843,17 +2865,19 @@ void fn_8001D020(UStreamObject* pObject) {
     }
 }
 
-void fn_8001D238(void) {
-    Stream_RegisterLoadChunkCallback('CHR ', fn_8001D020);
+void Character_RegisterGolferStreamClientFE(void) {
+    Stream_RegisterLoadChunkCallback('CHR ', Character_GolferStreamCallbackFE);
 }
 
-void fn_8001D268(void) {
+void Character_UnregisterGolferStreamClient(void) {
     Stream_UnregisterLoadChunkCallback('CHR ');
 }
 
-// Runs fn_800B28D4 and fn_800B2FB0 on each character found by id (nPlayer 1000) whose n1658 is not
-// 2 and that has neither bit 0x01 nor 0x40 of u10 set.
-void fn_8001D290(void) {
+// Draws the shadow of every skeletal object (a character with no player, nPlayer 1000, from a
+// 'SKLO' object, such as the flag) that is not hidden (u10 bits 0x01 and 0x40) and whose shadow is
+// in view (n1658 not 2): into the shadow texture (fn_800B28D4) and onto the ground (fn_800B2FB0).
+// gomainloop calls it in single view only.
+void SkeletalObject_RenderShadowsAll(void) {
     int i;
 
     for (i = 0; i < lbl_80281CA8; i++) {
@@ -2865,8 +2889,9 @@ void fn_8001D290(void) {
     }
 }
 
-// The character built from the 'SKLO' object with this id (fn_8001D3EC), or NULL.
-Character* fn_8001D324(int nId) {
+// The skeletal object (a character with no player, nPlayer 1000) built from the 'SKLO' object with
+// this id, or NULL. Id 100 is the flag (GoDynObj, GoTerrain, GameTargets).
+Character* SkeletalObject_FindObject(int nId) {
     int i;
     for (i = 0; i < lbl_80281CA8; i++) {
         if (lbl_801B9624[i]->nPlayer == 1000 && lbl_801B9624[i]->uId == nId) {
@@ -2877,7 +2902,7 @@ Character* fn_8001D324(int nId) {
 }
 
 // Run Character_ClipTest on every character with no player (the 'SKLO' ones).
-void fn_8001D384(void) {
+void SkeletalObject_ClipTestAll(void) {
     int i;
     for (i = 0; i < lbl_80281CA8; i++) {
         if (lbl_801B9624[i]->nPlayer == 1000) {
@@ -2890,7 +2915,7 @@ void fn_8001D384(void) {
 // object's id.
 // port: the skeleton is little-endian on disc and Character_CreateFromMem swaps it
 //       (BYTESWAP_SWAPDATA): a little-endian port does not swap there.
-void fn_8001D3EC(UStreamObject* pObject) {
+void SkeletalObject_StreamCallback(UStreamObject* pObject) {
     Character* pChar =
         Character_Add(Character_CreateFromMem(pObject->pData, 0, 0, pObject->uId, 0, NULL));
     pChar->nPlayer = 1000;
@@ -2898,11 +2923,11 @@ void fn_8001D3EC(UStreamObject* pObject) {
     StaticMem_Free(pObject);
 }
 
-void fn_8001D44C(void) {
-    Stream_RegisterLoadChunkCallback('SKLO', fn_8001D3EC);
+void SkeletalObject_RegisterStreamClient(void) {
+    Stream_RegisterLoadChunkCallback('SKLO', SkeletalObject_StreamCallback);
 }
 
-void fn_8001D47C(void) {
+void SkeletalObject_UnregisterStreamClient(void) {
     Stream_UnregisterLoadChunkCallback('SKLO');
 }
 
@@ -2938,13 +2963,18 @@ void Character_SetClubsAndClothes(Character* pChar, int nSlot) {
     SkinPart_ChooseBodySetByName(pChar, "glove", szName, NULL);
 }
 
-void fn_8001D624(int n) {
+// Asks for the create-a-player menu's golfer to be dressed again (gSession.aD2D[n];
+// Character_UpdateClothesFE does it). FE_CrAPDB calls it when an asset or logo is turned on or off.
+void Character_RequestClothesUpdateFE(int n) {
     gSession.aD2D[n] = 1;
 }
 
-// Each index set by fn_8001D624 is taken once the CrAP camera's golfer runs its script, the front
-// end is not in state 4 and fn_8008E924 agrees: the front end is aborted into state 4.
-void fn_8001D63C(void) {
+// Each frame in the create-a-player mode (game type 3): for every flag
+// Character_RequestClothesUpdateFE set, once the shown golfer (lbl_80281EE0->pB4) is ready (b18),
+// the menu golfer's state machine is not in state 4 and nothing holds it (fn_8008E924), the flag is
+// cleared and the running state aborted for state 4, which dresses the shown golfer again and swaps
+// its textures (fn_8008B61C).
+void Character_UpdateClothesFE(void) {
     int i;
 
     for (i = 0; i < 5; i++) {
@@ -2957,13 +2987,18 @@ void fn_8001D63C(void) {
     }
 }
 
-void fn_8001D6D8(int n) {
+// Asks for player n's golfer to be dressed again (gSession.aD28[n]; Character_UpdateClothesIG does
+// it).
+void Character_RequestClothesUpdateIG(int n) {
     gSession.aD28[n] = 1;
 }
 
-// Every player flagged by fn_8001D6D8 has its character dressed again (Character_SetClubsAndClothes) and its
-// skins put on its model in use; the flag is cleared.
-void fn_8001D6F0(void) {
+// Each frame in game (gomainloop, outside game types 1 and 3): every player
+// Character_RequestClothesUpdateIG flagged has its golfer dressed again once the GPU is idle
+// (fn_80008380, Character_SetClubsAndClothes), its skin choices copied from set 1 to set 0
+// (Character_CopySkinChoices1To0) and its skins' materials set up again for its current dynamic
+// texture (SkinPart_SetupMaterials); the flag is cleared.
+void Character_UpdateClothesIG(void) {
     int j;
     Character* pChar;
     int i;
@@ -2982,7 +3017,10 @@ void fn_8001D6F0(void) {
     }
 }
 
-void fn_8001D7A4(Character* pChar) {
+// Puts a golfer to sleep at the end of its turn (GM_EndOfGolferTurn): its animation blending reset
+// (fn_8001D7EC), the shot set-up requests (u10 bits 4, 8 and 0x200) dropped, and bit 0x40 set, so
+// neither it nor its shadow is drawn until fn_8001D8DC wakes it.
+void Character_Sleep(Character* pChar) {
     fn_8001D7EC(pChar);
     pChar->u10 = pChar->u10 & ~0x20C;
     pChar->u10 = pChar->u10 | 0x40;
@@ -3017,7 +3055,7 @@ void fn_8001D8DC(int nPlayer) {
     fn_800955F0(nPlayer);
     CharacterTex_StartStreamingPlayers(nPlayer);
     if (!gSession.nSplitScreen && lbl_80281CAC != nPlayer) {
-        fn_8001D6D8(nPlayer);
+        Character_RequestClothesUpdateIG(nPlayer);
         lbl_80281CAC = nPlayer;
     }
 }

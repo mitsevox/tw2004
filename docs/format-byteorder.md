@@ -43,9 +43,9 @@ Objects delivered by UStream
 | `txf ` | fn_80010180 | asm | none seen | asm; `TXG ` texture groups, [formats/txg-textures.md](formats/txg-textures.md) |
 | `sfn ` | fn_800125BC | sweep | none seen | asm |
 | `SAC ` | Character_LoadSacFromStream | char.c (sweep block) | swapped: AnimLib_MergeOverlay > fn_80020BC8 > fn_80076158 | little-endian on disc; `port:` notes at the handler and at the swap in AnimLib_MergeOverlay (a little-endian port does not swap) |
-| `CLB ` (2) | fn_8001CCF8, fn_8001CD80 | char.c (asm) | swapped: Character_CreateClubSkinSet > fn_80076158 | little-endian on disc |
-| `CHR ` (2) | fn_8001CE5C, fn_8001D020 | char.c (asm) | swapped: Character_LoadTextures > fn_80076158 | little-endian on disc |
-| `SKLO` | fn_8001D3EC | char.c (sweep block) | swapped: Character_CreateFromMem > fn_80076158 | little-endian on disc; a `port:` note at the handler |
+| `CLB ` (2) | Character_ClubStreamCallbackIG, Character_ClubStreamCallbackFE | char.c (asm) | swapped: Character_CreateClubSkinSet > fn_80076158 | little-endian on disc |
+| `CHR ` (2) | Character_GolferStreamCallbackIG, Character_GolferStreamCallbackFE | char.c (asm) | swapped: Character_LoadTextures > fn_80076158 | little-endian on disc |
+| `SKLO` | SkeletalObject_StreamCallback | char.c (sweep block) | swapped: Character_CreateFromMem > fn_80076158 | little-endian on disc; a `port:` note at the handler |
 | `MAL ` | fn_8001FA3C | sweep | swapped: fn_8001F804 > ByteSwap_Records | little-endian on disc |
 | `SAL ` | AnimLib_OnLoaded | skalib.c | swapped: AnimLib_Load > ByteSwap_Records | little-endian on disc; swapped by field tables (`SwapField`); yes: `AnimLib`, `ClipRecord` and `Clip` are then read in place, their offsets turned into 32-bit pointers. `port:` notes at every swap call (header, clip numbers, index, records, tree nodes): a little-endian port does not swap there |
 | `BNK ` | ClipBank_OnLoaded | skalib.c | swapped later | the handler only stashes the file; `ClipBank_Install` > `ClipBank_Load` swaps it (`ClipBank_SwapHeader`, fn_80020BC8 per clip); yes: `ClipBank` is used in place, its clip offsets turned into 32-bit pointers. `port:` notes at the swap calls |

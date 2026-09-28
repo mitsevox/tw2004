@@ -77,10 +77,10 @@ void Character_CloseFE(void);
 void Legacy_Character_InitModule(void);
 void Legacy_Character_CloseModule(void);
 void Character_FreeFEGolfers(void);
-void fn_8001D290(void);
-void fn_8001D384(void);
-void fn_8001D63C(void);
-void fn_8001D6F0(void);
+void SkeletalObject_RenderShadowsAll(void);
+void SkeletalObject_ClipTestAll(void);
+void Character_UpdateClothesFE(void);
+void Character_UpdateClothesIG(void);
 void fn_8001E7DC(void);
 void fn_80029FC8(void);
 void fn_8002A020(void);
@@ -898,7 +898,7 @@ void fn_8006D27C(void) {
         for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
             Character_ClipTest(gPlayers[nPlayer].pChar, nPlayer);
         }
-        fn_8001D384();
+        SkeletalObject_ClipTestAll();
         if (nView < 2) {
             fn_8005A478(ViewController_GetActivePlayerNumber(nView));
         }
@@ -928,7 +928,7 @@ void fn_8006D27C(void) {
                 }
             }
             if (!gSession.nSplitScreen) {
-                fn_8001D290();
+                SkeletalObject_RenderShadowsAll();
             }
         }
         fn_8006DF28();
@@ -1124,9 +1124,9 @@ void fn_8006D8E8(void) {
         fn_80006FE8();
         if (gSession.nGameType != 1) {
             if (gSession.nGameType != 3) {
-                fn_8001D6F0();
+                Character_UpdateClothesIG();
             } else {
-                fn_8001D63C();
+                Character_UpdateClothesFE();
                 fn_8008DC10();
                 fn_8010FA00();
             }

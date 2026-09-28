@@ -1180,7 +1180,7 @@ void fn_8008D6CC(void) {
 }
 
 void fn_8008D8CC(void) {
-    fn_8001D238();
+    Character_RegisterGolferStreamClientFE();
     fn_8008AD80();
     fn_8008D8F4();
 }

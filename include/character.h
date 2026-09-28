@@ -541,9 +541,9 @@ extern f32 lbl_80187184[6][3];
 typedef struct Character {
     s32   nIndex;               // 0x000  its entry in lbl_801B9624 (Character_Add)
     s32   nPlayer;              // 0x004  the player it belongs to (Player_SetGolfer); 1000 for the
-                                //        characters fn_8001D324 finds by id
-    u32   uId;                  // 0x008  the id of the 'SKLO' object it was built from (fn_8001D3EC);
-                                //        fn_8001D324 finds it by this
+                                //        characters SkeletalObject_FindObject finds by id
+    u32   uId;                  // 0x008  the id of the 'SKLO' object it was built from (SkeletalObject_StreamCallback);
+                                //        SkeletalObject_FindObject finds it by this
     s32   nC;                   // 0x00C  the golfer's id (FEgolferanim.c: 7 and 29 are special)
     u32   u10;                 // 0x010  bit 0x40 tested by the game manager and the swing; bit 0x8000
                                 //        cleared by CharacterState_AddSKABlendData
@@ -588,7 +588,7 @@ typedef struct Character {
     s32   nPalettes;            // 0x0B4  how many palettes pPalettes holds
     void* pB8;                  // 0x0B8  } 64 bytes per texture
     void* pBC;                  // 0x0BC  } a byte per palette
-    struct Skin* apSkins[7];    // 0x0C0  its skins: the body's, then its attachments' (fn_8001CE5C)
+    struct Skin* apSkins[7];    // 0x0C0  its skins: the body's, then its attachments' (Character_GolferStreamCallbackIG)
     s32   nSkins;               // 0x0DC
     u8    bTexLoaded;           // 0x0E0  its textures are in: set by Character_EndLoadTexturesCallbackIG,
                                 //        cleared by CharacterTex_ReleasePoolEntries
@@ -599,7 +599,7 @@ typedef struct Character {
     s32   uFlags;               // 0x168  bit 0x40: the backswing is being backed down; 0x200 / 0x400: the
                                 //        clip lookup fell back (Char_SetClip). Signed: the original tests
                                 //        it with cmpwi
-    s32   n16C;                 // 0x16C  set to -1 by fn_8001D020
+    s32   n16C;                 // 0x16C  set to -1 by Character_GolferStreamCallbackFE
     s32   n170;                 // 0x170  } the state queued for when fAnimTime reaches f174
     f32   f174;                 // 0x174  }   (CharacterState_UpdateSKAState; fn_800958EC sets both)
     u8    unk178[0x17C - 0x178];
@@ -675,7 +675,7 @@ typedef struct Character {
     Clip* p1790;                // 0x1790  cleared by fn_80062BFC; CharacterState_AddSKABlendData plays it for
                                 //         groups 5, 6 and 10
     void* p1794;                // 0x1794  cleared by fn_80062BE8; the same for group 9
-    Clip* p1798;                // 0x1798  cleared by Character_Create; with n2C 6, fn_8001C650 and
+    Clip* p1798;                // 0x1798  cleared by Character_Create; with n2C 6, Character_SelectShotType and
                                 //         Character_SetupForShot set nClipKey to 4 when it is 0
     f32   vAvgGroundNormal[4];  // 0x179C  the average ground normal under the four foot points
                                 //         (Character_PlaceFeetOnGround); Character_KeepClubOutOfGround
@@ -704,7 +704,7 @@ extern ViewSlot gViewSlots[5];          // 0x80187124  per player
 // set by Legacy_Character_InitModule; FEgolferanim compares ids against them.
 extern u64 lbl_801B9638[6];
 
-extern f32 lbl_80189A30[4];             // (0, 0, 0, 0): where fn_8001D020 places the menu's golfer
+extern f32 lbl_80189A30[4];             // (0, 0, 0, 0): where Character_GolferStreamCallbackFE places the menu's golfer
 
 // char.c: the club skins' part and set names, one per club kind (0 drivers, 1 fairway woods,
 // 2 putters, 3 and 4 the 3 and 7 irons, 5 wedges), for Character_SetClubStatesForCharacter
@@ -788,7 +788,7 @@ void  Character_InitBoneStateBits(Character* pChar, SkelPose* pPose);   // only 
 void  Character_SetSkeleton(Character* pChar, CharModel* pModel);
 void  Character_Free(Character* pChar);    // frees the character
 void  Character_SelectClub(Character* pChar, int n);
-void  fn_8001D238(void);
+void  Character_RegisterGolferStreamClientFE(void);
 void  Character_SetClubsAndClothes(Character* pChar, int nSlot);   // dresses the character (its skins and clubs)
 void  fn_8001DC64(Character* pChar, struct SkinChoices* pChoices);  // applies a look (char.c)
 void  fn_8001EE98(Character* pChar, u8 b);    // sets the model's bEE
@@ -797,9 +797,9 @@ int   Character_GetGolferModelID(int nPlayer);          // the model id of the p
 void  Character_SelectGameShotType(Character* pChar, int nKind);
 void  Character_SelectGameClub(Character* pChar, int nClub);
 void  Character_SetEmotion(Character* pChar, int nStyle);   // the animation style (nStyle)
-Character* fn_8001D324(int nId);        // the character with this id (100: the flag, by its clips), or NULL
-void  fn_8001D624(int n);               // set gSession.aD2D[n]
-void  fn_8001D7A4(Character* pChar);
+Character* SkeletalObject_FindObject(int nId);        // the character with this id (100: the flag, by its clips), or NULL
+void  Character_RequestClothesUpdateFE(int n);               // set gSession.aD2D[n]
+void  Character_Sleep(Character* pChar);
 void  fn_8001DA04(Character* pChar, f32* pPos, f32* pAngles);   // hand point, bone 0x15's angles
 void  fn_8001DB04(Character* pChar, f32* pOut);    // the clip's point v80 placed by bone 0
 void  fn_8001DB98(Character* pChar);    // empty the character's four data buffers

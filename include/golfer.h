@@ -482,8 +482,8 @@ typedef struct Session {
     s32  nTeeSet[5];            // 0x058
     u32  uBag[5];               // 0x06C  per player, 0 = the record's own
     u8   unk80[0xD28 - 0x80];
-    u8   aD28[5];               // 0xD28  per index, set by fn_8001D6D8
-    u8   aD2D[5];               // 0xD2D  per index, set by fn_8001D624
+    u8   aD28[5];               // 0xD28  per index, set by Character_RequestClothesUpdateIG
+    u8   aD2D[5];               // 0xD2D  per index, set by Character_RequestClothesUpdateFE
     u8   unkD32[0xD38 - 0xD32];
     PlayerProfile aProfile[5];  // 0x0D38
     GameOptions options;        // 0x0E78

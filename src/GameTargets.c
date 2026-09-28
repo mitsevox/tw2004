@@ -49,7 +49,7 @@ void fn_800F1ABC(int nPlayer, s8 n) {
     Character* pChar;
     gPlayers[nPlayer].nTarget = n % lbl_80282360;
     LLMath_CopyVec(lbl_80211D38[gPlayers[nPlayer].nTarget], (f32*)Ter_GetTGD()->pin);
-    pChar = fn_8001D324(100);
+    pChar = SkeletalObject_FindObject(100);
     if (pChar != NULL) {
         Character_SetPosition(pChar, lbl_80211D38[gPlayers[nPlayer].nTarget], 1);
     }

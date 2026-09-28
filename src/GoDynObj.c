@@ -220,7 +220,7 @@ void DynObj_InitForHole(void) {
             }
         }
     }
-    pFlag = fn_8001D324(100);
+    pFlag = SkeletalObject_FindObject(100);
     if (pFlag != NULL) {
         Character_SetPosition(pFlag, &Ter_GetTGD()->pin[Game_CurrentPinSet()].x, 1);
         if (Game_GetMode() != 6 && Game_GetMode() != 7 && Game_GetMode() != 8) {

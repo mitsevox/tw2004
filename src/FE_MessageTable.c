@@ -2392,7 +2392,7 @@ void fn_8007DF0C(MsgArg* pArgs, MsgArg* pResult) {
 
 // Step the profile's player's n0 on (0..3, wrapping) to the next one that no player up to and
 // including it with the same golfer model has (fn_8007D810), stopping if it comes round to where
-// it started; then fn_8001D624 for the golfer shown.
+// it started; then Character_RequestClothesUpdateFE for the golfer shown.
 void fn_8007DF30(MsgArg* pArgs, MsgArg* pResult) {
     u8 abFree[4] = {1, 1, 1, 1};
     int i;
@@ -2419,7 +2419,7 @@ void fn_8007DF30(MsgArg* pArgs, MsgArg* pResult) {
         }
         if (gSession.aProfile[lbl_80281ED4->nSlot].n0 == nStart) break;
     }
-    fn_8001D624(lbl_80281EE0->pB4->n10);
+    Character_RequestClothesUpdateFE(lbl_80281EE0->pB4->n10);
 }
 
 void fn_8007E0BC(MsgArg* pArgs, MsgArg* pResult) {

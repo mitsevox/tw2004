@@ -188,7 +188,7 @@ void GM_EndOfGolferTurn(int nPlayer) {
     u8 bWait;
     Caddie_Stop();
     gpGame->pfnEndGolferTurn(nPlayer);
-    fn_8001D7A4(gPlayers[nPlayer].pChar);
+    Character_Sleep(gPlayers[nPlayer].pChar);
     EVENT_Trigger(nPlayer, 4, 0, -1);
     GUI_HideAllHelpTips();
     if (gpGame->pfnHoleFinished(nPlayer, 0) || fn_800E0A90(nPlayer)) {

@@ -43,12 +43,12 @@ void Skalib_Register();
 void Skalib_Unregister();
 void fn_80010284();
 void fn_800102B4();
-void fn_8001CDD4();
-void fn_8001CE34();
-void fn_8001CFF0();
-void fn_8001D268();
-void fn_8001D44C();
-void fn_8001D47C();
+void Character_RegisterClubStreamClientIG();
+void Character_UnregisterClubStreamClient();
+void Character_RegisterGolferStreamClientIG();
+void Character_UnregisterGolferStreamClient();
+void SkeletalObject_RegisterStreamClient();
+void SkeletalObject_UnregisterStreamClient();
 void fn_8001FAA8();
 void fn_8001FAD8();
 void fn_80039454();
@@ -73,8 +73,8 @@ void fn_8001529C(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)
 void fn_8001462C(void);
 void fn_8000B9E4();
 void fn_8000BA14();
-void fn_8001CE04();
-void fn_8001D238();
+void Character_RegisterClubStreamClientFE();
+void Character_RegisterGolferStreamClientFE();
 void fn_800394F0();
 void fn_80039520();
 void fn_80076F24();
@@ -219,11 +219,11 @@ void fn_80014594(void) {
     fn_80039454();
     fn_8008EC68();
     fn_80046130();
-    fn_8001CDD4();
+    Character_RegisterClubStreamClientIG();
     Skalib_Register();
     fn_8001FAA8();
-    fn_8001CFF0();
-    fn_8001D44C();
+    Character_RegisterGolferStreamClientIG();
+    SkeletalObject_RegisterStreamClient();
     MC_RegisterStreamClients();
     fn_800A295C();
     fn_800676B8();
@@ -234,11 +234,11 @@ void fn_800145E0(void) {
     fn_800394AC();
     fn_8008ED28();
     fn_80046174();
-    fn_8001CE34();
+    Character_UnregisterClubStreamClient();
     Skalib_Unregister();
     fn_8001FAD8();
-    fn_8001D268();
-    fn_8001D47C();
+    Character_UnregisterGolferStreamClient();
+    SkeletalObject_UnregisterStreamClient();
     MC_UnRegisterStreamClients();
     fn_800A298C();
     fn_800676E8();
@@ -255,14 +255,14 @@ void fn_8001462C(void) {
 
 void fn_80014668(void) {
     fn_80010284();
-    fn_8001CE04();
+    Character_RegisterClubStreamClientFE();
     Skalib_Register();
     fn_8001FAA8();
     fn_8008EC68();
     fn_800394F0();
     fn_8008D9AC();
     fn_800B9944();
-    fn_8001D238();
+    Character_RegisterGolferStreamClientFE();
     MC_RegisterStreamClients();
     fn_80076F24();
     fn_80076F54();
@@ -274,14 +274,14 @@ void fn_80014668(void) {
 
 void fn_800146C4(void) {
     fn_800102B4();
-    fn_8001CE34();
+    Character_UnregisterClubStreamClient();
     Skalib_Unregister();
     fn_8001FAD8();
     fn_8008ED28();
     fn_80039520();
     fn_8000BA14();
     fn_800B9988();
-    fn_8001D268();
+    Character_UnregisterGolferStreamClient();
     fn_80076F58();
     FE_CrAP_UnRegisterStreamClients();
     fn_80124A70();

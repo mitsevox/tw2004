@@ -2062,7 +2062,7 @@ u8 fn_800347B4(UStreamObject* pObject) {
 void fn_800348DC(void) {
     f32 vWind[3];
     f32 fSpeed = Wind_Get(vWind);
-    Character* pFlag = fn_8001D324(100);
+    Character* pFlag = SkeletalObject_FindObject(100);
 
     if (pFlag != NULL) {
         const char* aClips[3] = {"flagcalm", "flagbrzy", "flagwind"};

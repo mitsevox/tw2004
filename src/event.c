@@ -12,7 +12,7 @@ SitDevData lbl_801D5AB0;
 SitDevData* lbl_802811B8 = &lbl_801D5AB0;
 u32 lbl_80281E20;              // seconds counted by event 26
 
-void fn_8001C680(int nPlayer);
+void Character_InitNewClubAndShotType(int nPlayer);
 void fn_80033704(u16 nPatch, u16 nObject);
 void fn_8003349C(f32 fPercentage, f32 fDuration, f32 fDelay);
 void fn_80051C84(Ball* pBall, f32 fX, f32 fY);
@@ -186,7 +186,7 @@ void fn_80065E9C(int nPlayer, int nEvent, void* pData, int nArg) {
     gPlayers[nPlayer].fPower = AI_PowerForTarget(nPlayer);
     fn_80062C38();
     fn_8006752C();
-    fn_8001C680(nPlayer);
+    Character_InitNewClubAndShotType(nPlayer);
     gPlayers[nPlayer].nClubPerKind[gPlayers[nPlayer].nShotKind] = gPlayers[nPlayer].nClub;
     if (gSession.nSplitScreen) {
         fn_80062CB0(gPlayers[nPlayer].nC58, 1);
@@ -229,7 +229,7 @@ void fn_80066058(int nPlayer, int nEvent, void* pData, int nArg) {
     gPlayers[nPlayer].fPower = AI_PowerForTarget(nPlayer);
     fn_80062C38();
     fn_8006752C();
-    fn_8001C680(nPlayer);
+    Character_InitNewClubAndShotType(nPlayer);
     gPlayers[nPlayer].nClubPerKind[gPlayers[nPlayer].nShotKind] = gPlayers[nPlayer].nClub;
     if (gSession.nSplitScreen) {
         fn_80062CB0(gPlayers[nPlayer].nC58, 1);
@@ -748,7 +748,7 @@ void fn_80067220(int nPlayer) {
     LLMath_CopyVec(pPlayer->vTarget, pPlayer->vTarget2);
     gPlayers[nPlayer].fPower = AI_PowerForTarget(nPlayer);
     fn_80062C38();
-    fn_8001C680(nPlayer);
+    Character_InitNewClubAndShotType(nPlayer);
 }
 
 void fn_8006752C(void) {
