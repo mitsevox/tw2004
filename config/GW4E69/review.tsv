@@ -1361,3 +1361,15 @@ address	name	comment	by	date
 8005AEE0	SW_vImpact	rewrite	rj1 (replayed by orchestrator)	2026-09-28
 8005B154	SW_vSetSwingStrength	rewrite	rj1 (replayed by orchestrator)	2026-09-28
 8005B250	SW_vCalculateShotPower	rewrite	rj1 (replayed by orchestrator)	2026-09-28
+8010D454	CharSlider_Free	rewrite	rj1 (replayed by orchestrator)	2026-09-28
+8010D5BC	CharSlider_CreateDefinitionsFromMem	rewrite	rj1 (replayed by orchestrator)	2026-09-28
+8010DC94	CharSlider_GetSliderIndex	rewrite	rj1 (replayed by orchestrator)	2026-09-28
+8010DCE8	CharSlider_ResetGameSettings	rewrite	rj1 (replayed by orchestrator)	2026-09-28
+8010DD4C	CharSlider_SetInitialVirtualValues	rewrite	rj1 (replayed by orchestrator)	2026-09-28
+8010DE04	CharSlider_ClampVirtualValues	keep	rj1 (replayed by orchestrator)	2026-09-28
+8010DE60	CharSlider_NormalizePairs	rewrite	rj1 (replayed by orchestrator)	2026-09-28
+8010DF8C	CharSlider_PropogateEffects	rewrite	rj1 (replayed by orchestrator)	2026-09-28
+8010E194	CharSlider_CalculateActualModAmount	rewrite	rj1 (replayed by orchestrator)	2026-09-28
+8010E224	CharSlider_SetBoneModifiers	rewrite	rj1 (replayed by orchestrator)	2026-09-28
+8010E35C	CharSlider_SetMorphTargets	rewrite	rj1 (replayed by orchestrator)	2026-09-28
+8010E4DC	CharSlider_UpdateCharacterBasedOnSliderValues	rewrite	rj1 (replayed by orchestrator)	2026-09-28

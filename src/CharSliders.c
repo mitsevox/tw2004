@@ -20,7 +20,8 @@ SwapField lbl_80193C30[10] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
                                { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };   // CharSliderDef
 SwapField lbl_80281788[1] = { { 8, 8 } };                                   // a morph target id (u64)
 
-// Free slider definitions made by CharSlider_CreateDefinitionsFromMem.
+// Free a slider-definition set made by CharSlider_CreateDefinitionsFromMem, with every table it
+// owns (Character_Free); NULL is ignored.
 void CharSlider_Free(CharSliderDefs* pDefs) {
     int i;
     int j;
@@ -59,8 +60,11 @@ void CharSlider_Free(CharSliderDefs* pDefs) {
     }
 }
 
-// Reads the slider definitions at *ppData (a count of sliders and of morph targets, then each
-// table in turn, byte-swapped by its layout); NULL when there are no sliders.
+// Read a character's slider definitions from its file data at *ppData (Character_CreateFromMem):
+// the slider and morph target counts, then the sliders, each one's links, limits, bone ranges and
+// their bones, morph ranges and their morph targets, and the morph target ids, each byte-swapped by
+// its layout into memory from StaticMem_Alloc; *ppData is left after them. NULL when there are no
+// sliders.
 CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
     void* pDst;
     s32 nSliders;
@@ -185,7 +189,7 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
     return pDefs;
 }
 
-// The index of the slider whose id is nId, or -1.
+// The index of the slider whose id is nId, or -1 (also for NULL pDefs).
 int CharSlider_GetSliderIndex(CharSliderDefs* pDefs, s32 nId) {
     int i;
 
@@ -200,7 +204,7 @@ int CharSlider_GetSliderIndex(CharSliderDefs* pDefs, s32 nId) {
     return -1;
 }
 
-// Every slider back to the range 0..1 at 0.
+// Every slider back to its defaults: range 0..1, value 0, not fixed. NULL is ignored.
 void CharSlider_ResetGameSettings(CharSliderDefs* pDefs) {
     int i;
 
@@ -214,7 +218,8 @@ void CharSlider_ResetGameSettings(CharSliderDefs* pDefs) {
     }
 }
 
-// Set the sliders with ids 0..nSliders-1 from percentages.
+// Set the sliders with ids 0..nSliders-1 from aValues, signed percentages (value = aValues[id] /
+// 100); an id no slider has is skipped.
 void CharSlider_SetInitialVirtualValues(CharSliderDefs* pDefs, int nSliders, u8* aValues) {
     int i;
     int n;
@@ -243,7 +248,10 @@ void CharSlider_ClampVirtualValues(CharSliderDefs* pDefs) {
     }
 }
 
-// Cut each pair of sliders that share a length back to it.
+// Limit paired sliders: each limit of a slider that is not fixed names a partner slider; when the
+// partner is not fixed either and the two values, taken as a 2-D vector, are longer than the
+// limit's fLength, both are scaled down to that length, so two sliders of a pair cannot both be
+// near full. NULL is ignored.
 void CharSlider_NormalizePairs(CharSliderDefs* pDefs) {
     int i;
     int j;
@@ -279,8 +287,11 @@ void CharSlider_NormalizePairs(CharSliderDefs* pDefs) {
     }
 }
 
-// Let each slider move the ranges of the sliders it links to, keeping their values at the same
-// place in their ranges.
+// Let each slider move the ranges of the sliders it links to. While a slider's value is inside a
+// link's fFrom..fTo span (either way round), its place in the span (reversed when fFrom > fTo)
+// times the span's length is added to the linked slider's low end (link flag 1) or high end (flag
+// 2), clamped to 0..1, and the linked slider's value is moved to keep its place in its new range.
+// NULL is ignored.
 void CharSlider_PropogateEffects(CharSliderDefs* pDefs) {
     int i;
     int j;
@@ -344,8 +355,11 @@ void CharSlider_PropogateEffects(CharSliderDefs* pDefs) {
     }
 }
 
-// fX's place between fFrom and fTo (0..1, either way round), as a blend of fA to fB.
-f32 fn_8010E194(f32 fFrom, f32 fTo, f32 fX, f32 fA, f32 fB) {
+// fX's place between fFrom and fTo (0..1, clamped) as a blend from fA to fB; 0 when fFrom equals
+// fTo. Gives a slider bone's scale or a morph target's weight for a slider value.
+// EA bug: when fTo < fFrom the place is measured from fFrom instead of fTo, so any fX between them
+// comes out 1 (fB); both callers only pass fFrom < fTo.
+f32 CharSlider_CalculateActualModAmount(f32 fFrom, f32 fTo, f32 fX, f32 fA, f32 fB) {
     f32 fT;
 
     if (fFrom == fTo) {
@@ -361,8 +375,11 @@ f32 fn_8010E194(f32 fFrom, f32 fTo, f32 fX, f32 fA, f32 fB) {
     return fT * (fB - fA) + fA;
 }
 
-// Scale the model's bones by the sliders.
-void fn_8010E224(CharSliderDefs* pDefs, CharModel* pModel) {
+// Scale the model's bones by the sliders: for each bone range a slider's value is in (fStart up to,
+// not including, fEnd), each of the range's bones, found by name id, is scaled on its axes (uAxes)
+// by the value's place in the range blended from the bone's fFrom to fTo
+// (CharSlider_CalculateActualModAmount, SKEL_ScaleBone). NULL either way does nothing.
+void CharSlider_SetBoneModifiers(CharSliderDefs* pDefs, CharModel* pModel) {
     int i;
     int j;
     int k;
@@ -384,7 +401,7 @@ void fn_8010E224(CharSliderDefs* pDefs, CharModel* pModel) {
             if (pRange->fStart <= pValue->fValue && pRange->fEnd > pValue->fValue) {
                 for (k = 0; k < pRange->nItems; k++) {
                     pBone = &pRange->items.pBones[k];
-                    fScale = fn_8010E194(pRange->fStart, pRange->fEnd, pValue->fValue,
+                    fScale = CharSlider_CalculateActualModAmount(pRange->fStart, pRange->fEnd, pValue->fValue,
                                          pBone->fFrom, pBone->fTo);
                     nBone = SKEL_GetBoneIDFromNameID(pModel, pBone->uId);
                     if (nBone >= 0) {
@@ -396,8 +413,13 @@ void fn_8010E224(CharSliderDefs* pDefs, CharModel* pModel) {
     }
 }
 
-// Weight the skin's morph targets by the sliders (and mark the first 20 in the blend node).
-void fn_8010E35C(CharSliderDefs* pDefs, Skin* pSkin, SKABlendNode* pNode) {
+// Weight the skin's morph targets by the sliders: for each morph range a slider's value is in
+// (fStart up to, not including, fEnd), each of the range's morph targets gets the value's place in
+// the range blended from its fFrom to fTo (CharSlider_CalculateActualModAmount) as its weight
+// (SkinMorph_SetTargetWeight, by its index in aMorphIds); the first 20 are also unmarked in the
+// blend node (SKABlender_ClearMorph) so the animation no longer sets them. NULL pDefs or pSkin does
+// nothing.
+void CharSlider_SetMorphTargets(CharSliderDefs* pDefs, Skin* pSkin, SKABlendNode* pNode) {
     int i;
     int j;
     int k;
@@ -419,7 +441,8 @@ void fn_8010E35C(CharSliderDefs* pDefs, Skin* pSkin, SKABlendNode* pNode) {
             if (pRange->fStart <= pValue->fValue && pRange->fEnd > pValue->fValue) {
                 for (k = 0; k < pRange->nItems; k++) {
                     pMorph = &pRange->items.pMorphs[k];
-                    fWeight = fn_8010E194(pRange->fStart, pRange->fEnd, pValue->fValue,
+                    fWeight = CharSlider_CalculateActualModAmount(pRange->fStart, pRange->fEnd,
+                            pValue->fValue,
                                           pMorph->fFrom, pMorph->fTo);
                     for (m = 0; m < pDefs->nMorphs; m++) {
                         if (pMorph->uId == pDefs->aMorphIds[m]) {
@@ -435,7 +458,10 @@ void fn_8010E35C(CharSliderDefs* pDefs, Skin* pSkin, SKABlendNode* pNode) {
     }
 }
 
-// Apply nSliders slider values (percentages) to a character's model and skin.
+// Apply nSliders slider values (signed percentages, the created golfer's body and face settings) to
+// a character's model and skin: bone scales reset, sliders reset, set from aValues, paired sliders
+// limited, links applied, values clamped, then the bones scaled and the morph targets weighted.
+// Nothing unless pDefs, pModel, pSkin and aValues are all set.
 void CharSlider_UpdateCharacterBasedOnSliderValues(CharSliderDefs* pDefs, CharModel* pModel, Skin* pSkin, int nSliders, u8* aValues,
                  SKABlendNode* pNode) {
     if (pModel == NULL || pSkin == NULL || aValues == NULL || pDefs == NULL) {
@@ -447,6 +473,6 @@ void CharSlider_UpdateCharacterBasedOnSliderValues(CharSliderDefs* pDefs, CharMo
     CharSlider_NormalizePairs(pDefs);
     CharSlider_PropogateEffects(pDefs);
     CharSlider_ClampVirtualValues(pDefs);
-    fn_8010E224(pDefs, pModel);
-    fn_8010E35C(pDefs, pSkin, pNode);
+    CharSlider_SetBoneModifiers(pDefs, pModel);
+    CharSlider_SetMorphTargets(pDefs, pSkin, pNode);
 }
