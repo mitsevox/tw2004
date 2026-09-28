@@ -162,7 +162,7 @@ u8 Player_NotInSand(int nPlayer) {
 // The kind of shot the CPU plays from here for a given distance: putt on the green or
 // very close, chip or pitch when a wedge in the bag reaches, otherwise a full swing.
 int AI_ShotKindForDistance(int nPlayer, f32 fDist) {
-    int nOverride = fn_80100744();
+    int nOverride = Lessons_GetShotKind();
     switch (nOverride) {
     case 8: {
         int     nKind = SHOT_TYPE_DRIVE_e;
@@ -224,7 +224,7 @@ int AI_ClubForShot(int nPlayer, int nKind, u8 bUnderOnly, f32 fDist) {
     if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000) && gPlayers[nPlayer].ball.nLie == 0) {
         return 2;
     }
-    nClub = fn_801006F0(nPlayer);
+    nClub = Lessons_GetClub(nPlayer);
     if (nClub != CLUB_MAX_e) {
         return nClub;
     }
@@ -327,7 +327,7 @@ void fn_8002D544_StraightDir(int nPlayer, f32* pOut) {
 // is 0.02 either way for a slight curve and 0.04 for a big one, then the vector is normalised.
 void fn_8002D560_ShapeDir(int nPlayer, f32* pOut) {
     Player* p = &gPlayers[nPlayer];
-    int     nShape = fn_8010069C(nPlayer);
+    int     nShape = Lessons_GetShape(nPlayer);
     if (nShape != 7) {
         p->nShotShape = nShape;
     }

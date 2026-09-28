@@ -421,7 +421,7 @@ void fn_8008FE88(FrontEnd* pFE) {
 int fn_8008FFF0(const char* szName) {
     if (gSession.nGameType == 1) return 0;
     if (szName[0] == 't' && szName[1] == 'u') {
-        if (fn_80100294()) return 1;
+        if (Lessons_IsRunning()) return 1;
         return -1;
     }
     return 0;

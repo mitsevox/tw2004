@@ -175,7 +175,7 @@ static f32 stateFunc_StrippedFn(f32 x) {
 // when the game asks (gpGame+0x276, and it ends any replay); the glove comes off for a putt;
 // both views attached; the ball teed up on the tee and kept as it lies; fA64 stored; events 0x2A
 // and 3; GUI_ToggleUI(n, 1) for a CPU outside game type 8; and if GM_DoPreshotAnimation says so,
-// the pre-shot animation - 10 with a low-IQ penalty away from the tee (unless fn_80100294()),
+// the pre-shot animation - 10 with a low-IQ penalty away from the tee (unless Lessons_IsRunning()),
 // else 1 - and camera 11.
 void STATEFUNC_PreShotInit(int nPlayer) {
     Ball* pBall;
@@ -237,7 +237,8 @@ void STATEFUNC_PreShotInit(int nPlayer) {
     }
     if (GM_DoPreshotAnimation(nPlayer) != 0) {
         SKATime_UnPause(gPlayers[nPlayer].pChar->anim);
-        if (gPlayers[nPlayer].bLowIQPenalty != 0 && gPlayers[nPlayer].ball.nLie != 0 && !fn_80100294()) {
+        if (gPlayers[nPlayer].bLowIQPenalty != 0 && gPlayers[nPlayer].ball.nLie != 0
+            && !Lessons_IsRunning()) {
             fn_80095744(gPlayers[nPlayer].pChar, 10);
         } else {
             fn_80095744(gPlayers[nPlayer].pChar, 1);
@@ -322,7 +323,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
     }
     if (!Player_IsCPU(nPlayer)) {
         if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0))
-            && !fn_80100294()) {
+            && !Lessons_IsRunning()) {
             fn_800C70F8(pV, 1);
             if (!fn_80063C90(pV)) {
                 CameraController_FadeOut(pV, 0.25f, (f32*)&vOffset);
@@ -333,7 +334,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
         if (gPlayers[nPlayer].ball.nState == 0 && !bInHand) {
             AI_RehearseShot(nPlayer, NULL, 0, CPU_TOLERANCE);
         }
-        if (!fn_80100294() && Controller_AnyPadHasButtons(Controller_GetButtonMask(0, 0))) {
+        if (!Lessons_IsRunning() && Controller_AnyPadHasButtons(Controller_GetButtonMask(0, 0))) {
             fn_800C70F8(pV, 1);
             if (!fn_80063C90(pV)) {
                 CameraController_FadeOut(pV, 0.25f, (f32*)&vOffset);
@@ -1210,7 +1211,7 @@ void STATEFUNC_SimulateInit(int nPlayer) {
 // Before that a ball that has come to rest sets the latch (a tap-in, flag 8, becomes LIE_INCUP_e).
 // The swing phase keeps running (the spin window); buttons 22/23 (any pad for a CPU) drive
 // fn_80045558/fn_80045494. A live human outside split screen (and not while
-// GUI_IsPausedOrPostShotUIAnimating or fn_80100294): button 24 with a replay recorded (and the game
+// GUI_IsPausedOrPostShotUIAnimating or Lessons_IsRunning): button 24 with a replay recorded (and the game
 // allowing it) replays the shot (REPLAY_Play, state 11); button 25 with the mulligan allowed takes
 // the shot back.
 void STATEFUNC_SimulateUpdate(int nPlayer) {
@@ -1274,7 +1275,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
     if (Player_IsCPU(nPlayer)) return;
     if (gSession.nSplitScreen != 0) return;
     if (GUI_IsPausedOrPostShotUIAnimating(nPlayer)) return;
-    if (fn_80100294()) return;
+    if (Lessons_IsRunning()) return;
     if (gReplayData.bF10 != 0 && gpGame->b287 != 0) {
         if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x18, 0)) &&
             !(gPlayers[nPlayer].uFlags & 8) &&
@@ -1811,7 +1812,7 @@ void STATEFUNC_InitialFlyByUpdate(int nPlayer) {
         } else if (CameraController_IsFlybyDone(
                        ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]))) {
             bDone = 1;
-        } else if (!fn_80100294()) {
+        } else if (!Lessons_IsRunning()) {
             if (Controller_AnyPadHasButtons(Controller_GetButtonMask(0, 0)) || fn_80062B90()) {
                 if (fn_80062B88(nPlayer)) {
                     bDone = 1;
@@ -1874,14 +1875,14 @@ void STATEFUNC_MidHoleFlyByInit(int nPlayer) {
 }
 
 // State 21 (a camera flyover): over when the option skips cameras, the camera finishes, or a
-// button is pressed (any pad for a CPU's shot). While fn_80100294() it waits
+// button is pressed (any pad for a CPU's shot). While Lessons_IsRunning() it waits
 // for the camera unless cameras are skipped.
 void STATEFUNC_MidHoleFlyByUpdate(int nPlayer) {
     u8  bDone = 0;
     u32 uMask;
     if (gSession.options.bSkipCameras) {
         bDone = 1;
-    } else if (fn_80100294()) {
+    } else if (Lessons_IsRunning()) {
         return;
     }
     if (CameraController_IsFlybyDone(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]))) {

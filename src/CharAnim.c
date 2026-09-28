@@ -30,7 +30,7 @@ void  Character_PlaceFeetOnGround(Character* pChar);        // char.c
 int   Character_UpdateClubAttachment(Character* pChar, Clip* pClip);           // char.c
 void  Character_InitSKATags(Character* pChar, Clip* pBlend, f32 fStart);   // char.c
 void  fn_801141F8(struct DynChain* pChain, CharModel* pModel);   // DynChain.c
-char* fn_801008A8(void);                                    // GameMode11.c
+char* Lessons_GetAnimName(void);                                    // GameMode11.c
 void  LLMath_CopyMat34(f32 (*pSrc)[4], f32 (*pDst)[4]);          // UMemPool.c: copies three rows
 void  Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ);                    // Quaternion.c: a rotation matrix's quaternion
 
@@ -174,8 +174,8 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
             pClip = pChar->pTapInClip;
         } else {
             pName = NULL;
-            if (fn_80100294() && nGroup == 1) {
-                pName = fn_801008A8();
+            if (Lessons_IsRunning() && nGroup == 1) {
+                pName = Lessons_GetAnimName();
             }
             pClip = Char_SetClip(pChar, nGroup, pChar->nStyle, pName);
             if (nGroup == 5 || nGroup == 10 || nGroup == 6) {

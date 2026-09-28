@@ -344,8 +344,8 @@ s32   fn_800FF604(int nPlayer);   // GameMode12.c defines it without the (unused
 s32   fn_800FF60C(int nPlayer, int i);
 s32   fn_800FF620(int nPlayer, int i);
 void  fn_800FF634(int nPlayer);
-void  fn_801002C0(void);
-void  fn_80100B38(void);
+void  Lessons_StopWaiting(void);
+void  Lessons_RestartLesson(void);
 void  fn_80101CFC(void);
 void  fn_80101D24(void);
 s32   fn_80126FA0(void);
@@ -738,7 +738,7 @@ void fn_8008628C(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80086300(MsgArg* pArgs, MsgArg* pResult) {
     GUI_PauseMenuClosed();
     if (lbl_801D87C0.b0 == 0) {
-        fn_80100B38();
+        Lessons_RestartLesson();
         return;
     }
     fn_8006F4E0();
@@ -1198,7 +1198,7 @@ void fn_800874C8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_800874F0(MsgArg* pArgs, MsgArg* pResult) {
-    fn_801002C0();
+    Lessons_StopWaiting();
 }
 
 // Call the mode's pfn25C with a player and a time (modes 6, 7, 8 and 13 store it for the hole).
@@ -1217,7 +1217,7 @@ void fn_80087548(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80087574(MsgArg* pArgs, MsgArg* pResult) {
     fn_800E5240(pArgs[0].i);
-    fn_80100B38();
+    Lessons_RestartLesson();
 }
 
 // The name of a save profile slot, or "User <n>" when none is loaded.
@@ -1696,7 +1696,7 @@ void fn_800885F8(MsgArg* pArgs, MsgArg* pResult) {
     Gaud_Pause(0);
     GUI_PauseMenuClosed();
     if (lbl_801D87C0.b0 == 0) {
-        fn_80100B38();
+        Lessons_RestartLesson();
     }
 }
 

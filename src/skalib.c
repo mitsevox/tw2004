@@ -549,7 +549,7 @@ f32 Skalib_Random(void) {
 // when it is in use (not marked 2) and holds more than pCtx->nKeep clips, flags that many surplus
 // clips (ClipRecord.uFlags 1) for AnimLib_DropCb, each picked at random: from a random start the
 // first markable clip forward, else backward (markable: not merged into another record (2, 0x10),
-// not flagged yet, used by 1 to nMaxUsers leaves). During a lesson (fn_80100294, game mode 11) a
+// not flagged yet, used by 1 to nMaxUsers leaves). During a lesson (Lessons_IsRunning, game mode 11) a
 // lesson animation (fn_80101E34) is never flagged but still counts as a pick. The picks it could
 // not make are tried again through merged records, following each to the record it points to.
 // Always 0.
@@ -596,7 +596,7 @@ int AnimLib_MarkDropRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLea
                 }
                 continue;
             found:
-                if (fn_80100294()) {
+                if (Lessons_IsRunning()) {
                     if (!fn_80101E34(pRec->name)) {
                         pRec->uFlags |= 1;
                     }
@@ -630,7 +630,7 @@ int AnimLib_MarkDropRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLea
                 }
                 continue;
             found2:
-                if (fn_80100294()) {
+                if (Lessons_IsRunning()) {
                     if (!fn_80101E34(pRec->name)) {
                         pRec->uFlags |= 1;
                     }
@@ -682,7 +682,7 @@ int AnimLib_MarkDropHighestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLe
                     }
                 }
                 if (pBest != NULL) {
-                    if (fn_80100294()) {
+                    if (Lessons_IsRunning()) {
                         if (!fn_80101E34(pBest->name)) {
                             pBest->uFlags |= 1;
                         }
@@ -707,7 +707,7 @@ int AnimLib_MarkDropHighestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLe
                     }
                 }
                 if (pBest != NULL) {
-                    if (fn_80100294()) {
+                    if (Lessons_IsRunning()) {
                         if (!fn_80101E34(pBest->name)) {
                             pBest->uFlags |= 1;
                         }

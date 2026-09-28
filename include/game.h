@@ -566,7 +566,7 @@ void fn_800F986C(void);                 // mode 8
 void GameModeStableford_Init(void);                 // mode 18 (GameModeStableford.c)
 void fn_800FEAFC(void);                 // mode 12 (GameMode12.c)
 void GameModeStroke_Init(void);                 // mode 0 (GameModeStroke.c)
-void fn_800FFF34(void);                 // mode 11 (GameMode11.c)
+void Lessons_Init(void);                 // mode 11 (GameMode11.c)
 void GameMode4_Init(void);                 // mode 4 (GameMode4.c)
 
 int  fn_800E8C24(int nPlayer, int nHole);   // GameModeBestBall.c
@@ -743,9 +743,9 @@ static inline void AddIfScore(s32* aList, int* pnCount, int nPlayer, int nHole, 
 
 // GameMode11.c: the lessons
 extern s32 gLessonNum;                // the current lesson, 1..12
-u8   fn_80100294(void);                 // in a lesson (mode 11)
-int  fn_8010069C(int nPlayer); // the lesson's shape in mode 11, else 7 (none); nPlayer unused
-u8   fn_80100AF8(void);                 // lesson 5 of mode 11
+u8   Lessons_IsRunning(void);                 // in a lesson (mode 11)
+int  Lessons_GetShape(int nPlayer); // the lesson's shape in mode 11, else 7 (none); nPlayer unused
+u8   Lessons_IsShortBackswingLesson(void);                 // lesson 5 of mode 11
 u8   fn_80100C00(void);
 u8   fn_80101738(void);
 u8   fn_80101AA8(int nPlayer, int nEvent);  // an event (event.c's numbers) in a lesson; nonzero blocks it

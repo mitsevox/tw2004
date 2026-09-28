@@ -496,7 +496,7 @@ u8 SW_vStateBackSwing(int nPlayer) {
     if (Controller_IsCPU(nController) || Game_GetMode() == 10) {
         f32 fFrac;
         AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
-        if (fn_80100AF8()) {
+        if (Lessons_IsShortBackswingLesson()) {
             fFrac = 0.65f;
         } else {
             fFrac = 0.98f;

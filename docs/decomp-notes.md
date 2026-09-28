@@ -1209,7 +1209,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   calls (`SW_vAdjustVibrationFromAttribute` 99.5% -> 100 with `double`). The real `fabsf` is 0x8000AD9C, which
   calls it and rounds with `frsp`.
 - **[verified] A callee that ignores r3, called while r3 still holds the caller's first
-  parameter, takes that parameter.** `fn_8010069C()` -> `(nPlayer)` (Golfer
+  parameter, takes that parameter.** `Lessons_GetShape()` -> `(nPlayer)` (Golfer
   `AI_FaceVector` 99.72% -> 100). Likewise a callee starting `clrlwi. r0, r3, 24` has a `u8`
   first parameter, and its callers pass a `u8` without `clrlwi` (Swing `fn_80045494/5558`).
 - **[verified] `fn(15, (u8)a, b)` and `fn(15, a & 0xFF, b)` differ for an int parameter `a`.**
@@ -1254,7 +1254,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   `return A && B && C;` (`fn_800EE6A0`, 99.44 -> 100; no order of the flag form matched).
 
 - **[verified] `return !(x == -1);` and `return x != -1;` end in a different instruction order**
-  (GameMode11 `fn_80100798`, 93.9% -> 100).
+  (GameMode11 `Lessons_PlayLine`, 93.9% -> 100).
 - **[verified] A two-value choice `h = (n == 2) ? 6 : 7` compiles branch-free (`subi/nor/srawi`);**
   the original's `li 7; bne; li 6` is `h = 7; if (n == 2) h = 6;` (GameMode11 `fn_80100C08`).
 - **[verified] A boolean chain assigned to an `int` keeps the original's register order where
@@ -1460,7 +1460,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   all give the original's `addis idx; addi; lhzx/stwx base` (PGATour `GameModeDriverPGATour_EndGame`, 92.08 -> 100).
 
 - **[verified] objdiff scores a switch 100% even when its jump table points at the wrong case
-  bodies**: it masks relocations. GameMode11 `fn_80100328` had case labels off by one and read
+  bodies**: it masks relocations. GameMode11 `Lessons_NextLesson` had case labels off by one and read
   100%; only the linked DOL (`doldiff.py`) showed it. A function with a `switch` in a unit that is
   not linked yet is not proven: linking is the real check.
 - **[verified] An object's `.data` is 8-aligned**, so a `.data` range in `splits.txt` must start on

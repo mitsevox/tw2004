@@ -20,7 +20,7 @@ typedef struct Lesson {
     s32 nShape;                 // 0x18  7 = any
 } Lesson;
 
-// Each lesson's animation (index 0 unused), picked by fn_801008A8: gLessonTryAnims from step 6 on
+// Each lesson's animation (index 0 unused), picked by Lessons_GetAnimName: gLessonTryAnims from step 6 on
 // (the player's tries), gLessonDemoAnims before it (the demonstration). Only lesson 6 differs.
 char* gLessonTryAnims[12] = {
     "tdlpre01", "tdlpre04", "gdlpre03", "gdlpre53", "g3lpre02", "g3lpre01",
@@ -96,40 +96,44 @@ void  Gaud_ExitCrowdReactionSound(void);
 void  fn_800E5200(int a);
 u8    Gaud_GetCommentStatus(void);
 
-void fn_801000E8(void);
-void fn_80100108(void);
-void fn_80100128(void);
-void fn_80100160(void);
-void fn_80100230(void);
-void fn_80100308(void);
-void fn_80100508(void);
-int  fn_80100798(int nList, int nCount);
+void Lessons_LoadHole(void);
+void Lessons_RestartHole(void);
+void Lessons_Reset(void);
+void Lessons_StartGamePreData(void);
+void Lessons_Shutdown(void);
+void Lessons_StopWaitingForLine(void);
+void Lessons_PlaceBall(void);
+int  Lessons_PlayLine(int nList, int nCount);
 void fn_80101F18(int nPlayer);
 void fn_80101F40(u8 a, int b);
 void fn_80101FC0(int a, int b);
-void fn_80100A3C(int nPlayer);
+void Lessons_AfterReplan(int nPlayer);
 void fn_80100C08(void);
 u8   fn_80101C9C(int nPlayer, u8 bCheck);
 u8   fn_80101CC4(u8 bCheck);
 void fn_80101CD8(void);
 void fn_8010179C(void);
-void fn_801008F8(void);
+void Lessons_StartTry(void);
 void fn_80101F70(void);
 void fn_80101F94(int a, int b);
 
-// Mode 11 starts: its callbacks, the yardage, stroke-limit, gimme and other round flags off, n290,
-// nC, n10 and b276 set to 1, a fixed random seed. The player's options that the lessons override
-// are saved first.
-void fn_800FFF34(void) {
-    gpGame->pfnInit = fn_800FFF34;
-    gpGame->pfnShutdown = fn_80100230;
+// Mode 11 starts (pfnInit): its callbacks; the yardage, the stroke limit, gimmes, the flyovers
+// (b27F, b280), setup tips, the re-plan button, the flight-camera toggles and in-flight replays
+// off, with b275, b27B..b27D, b285 and b28A; n290, nC, n10 and b276 (re-plan as the swing begins)
+// set to 1; the ball's random rolls off (fn_80055C1C: lies and bounces come out as in a
+// simulation). The options the lessons change are saved and set: commentary level 4, the putting
+// grid off, power boost and spin on. Random stream 0 is seeded with 69, so the lessons play the
+// same each time.
+void Lessons_Init(void) {
+    gpGame->pfnInit = Lessons_Init;
+    gpGame->pfnShutdown = Lessons_Shutdown;
     gpGame->pfnHoleFinished = fn_80101C9C;
     gpGame->pfnGameFinished = fn_80101CC4;
-    gpGame->pfn1E4 = fn_801000E8;
+    gpGame->pfn1E4 = Lessons_LoadHole;
     gpGame->pfn220 = fn_80100C08;
-    gpGame->pfn224 = fn_80100108;
-    gpGame->pfn22C = fn_80100A3C;
-    gpGame->pfn1EC = fn_80100160;
+    gpGame->pfn224 = Lessons_RestartHole;
+    gpGame->pfn22C = Lessons_AfterReplan;
+    gpGame->pfn1EC = Lessons_StartGamePreData;
     gpGame->pfnEndGame = fn_80101CD8;
     gpGame->bShowYardage = 0;
     gpGame->bStrokeLimit = 0;
@@ -162,27 +166,30 @@ void fn_800FFF34(void) {
     Misc_SetSeedFunc(0, 69);
 }
 
-// Hole start.
-void fn_801000E8(void) {
-    fn_80100128();
+// Hole start (pfn1E4): the lessons start over (Lessons_Reset).
+void Lessons_LoadHole(void) {
+    Lessons_Reset();
 }
 
-// The hole restarts.
-void fn_80100108(void) {
-    fn_80100128();
+// The hole restarts (pfn224): the lessons start over (Lessons_Reset).
+void Lessons_RestartHole(void) {
+    Lessons_Reset();
 }
 
-// Back to the first lesson.
-void fn_80100128(void) {
+// Back to the start: lesson 1 at step 2 (where the lessons begin), its row of lines, and the
+// flyover mode reset (GM_FlyByMode_Init).
+void Lessons_Reset(void) {
     gLessonStep = 2;
     gLessonNum = 1;
     gLessonLineRow = 0;
     GM_FlyByMode_Init();
 }
 
-// Round setup: course 10, hole 14 only, one CPU-controlled player (golfer 1), no mulligans, and
-// the options' nC and wind saved and replaced.
-void fn_80100160(void) {
+// Before the round (pfn1EC; also Lessons_StartFromMenu): course 10 with only hole 14, tee set 0 and
+// pin 0; the options' nC saved and set to 4 and the wind saved and set to calm (0); one player,
+// golfer 1, played by the CPU (who demonstrates each lesson); no mulligans; the continue / stop
+// answers cleared.
+void Lessons_StartGamePreData(void) {
     GM_SetCurrentCourse(10);
     GM_SelectHoleSet(0);
     gpGame->bHoleSelected[13] = 1;
@@ -203,8 +210,9 @@ void fn_80100160(void) {
     gLessonQuitChosen = 0;
 }
 
-// The mode ends: the saved options go back.
-void fn_80100230(void) {
+// The mode ends (pfnShutdown): the options it changed go back (nC, wind, commentary level, putting
+// grid, power boost, spin) and the ball's random rolls come back on.
+void Lessons_Shutdown(void) {
     Session* pSession;
     gSession.options.nC = gLessonSavedOptionC;
     gSession.options.nWind = gLessonSavedWind;
@@ -218,29 +226,38 @@ void fn_80100230(void) {
 }
 
 // Is a lesson running (mode 11)?
-u8 fn_80100294(void) {
+u8 Lessons_IsRunning(void) {
     return Game_GetMode() == 11;
 }
 
-void fn_801002C0(void) {
-    if (fn_80100294()) {
+// The front end ends the current wait (UI command fn_800874F0), in mode 11 only: a step waiting for
+// the coach's line goes on to gLessonNextStep (the line plays on); so does a wait flagged in
+// gLessonSkipPending, which nothing sets.
+void Lessons_StopWaiting(void) {
+    if (Lessons_IsRunning()) {
         if (gLessonSkipPending) {
             gLessonSkipPending = 0;
             gLessonStep = gLessonNextStep;
         }
-        fn_80100308();
+        Lessons_StopWaitingForLine();
     }
 }
 
-void fn_80100308(void) {
+// If the step is waiting for the coach's line to end (step 1), it waits no more: on to
+// gLessonNextStep.
+void Lessons_StopWaitingForLine(void) {
     if (gLessonWaitingForLine) {
         gLessonWaitingForLine = 0;
         gLessonStep = gLessonNextStep;
     }
 }
 
-// On to the next lesson: its row of messages and the two values fn_80101F40 later sends.
-void fn_80100328(void) {
+// On to the next lesson (gLessonNum + 1): its row of lines in gLessonLines (the rows are not in
+// lesson order), the values its backswing and downswing hints show (5 and 2; 4 and 3 in lesson 8, 6
+// and 1 in lesson 9), the putting grid option on from lesson 7 and off again from lesson 10,
+// gLessonSwingCommitted set for lesson 11, and gLessonPanel = the lesson - 1. After the last lesson
+// (12) the hints are hidden and the closing line plays.
+void Lessons_NextLesson(void) {
     switch (++gLessonNum) {
     case 1:
         gLessonLineRow = 0x00;
@@ -305,15 +322,17 @@ void fn_80100328(void) {
         fn_80101F40(0, 0);
         fn_800E5200(-1);
         fn_80101F18(0);
-        fn_80100798(0, 1);
+        Lessons_PlayLine(0, 1);
         break;
     }
     gLessonPanel = gLessonNum - 1;
 }
 
-// Puts player 0's ball where the lesson starts (the tee when the lesson has no spot) and hands the
-// player to the CPU for the demonstration.
-void fn_80100508(void) {
+// Puts player 0's ball where the lesson starts (the tee when the lesson has no spot; a spot's
+// height comes from the ground) and drops it; clears the player's attribute modifiers 0, 2, 3, 5..8
+// and 11 and idles the swing; and hands the player to the CPU for the demonstration, keeping a
+// human's controller in gLessonController.
+void Lessons_PlaceBall(void) {
     int n = gLessonNum - 1;
     f32 fHeight;
     CourseInfo* pCourse;
@@ -351,7 +370,7 @@ void fn_80100508(void) {
 }
 
 // The shape the lesson sets, 7 (any) outside mode 11.
-int fn_8010069C(int nPlayer) {
+int Lessons_GetShape(int nPlayer) {
     int n = gLessonNum - 1;
     if (Game_GetMode() != 11) {
         return 7;
@@ -360,7 +379,7 @@ int fn_8010069C(int nPlayer) {
 }
 
 // The club the lesson sets, 26 (any) outside mode 11.
-int fn_801006F0(int nPlayer) {
+int Lessons_GetClub(int nPlayer) {
     int n = gLessonNum - 1;
     if (Game_GetMode() != 11) {
         return 26;
@@ -369,7 +388,7 @@ int fn_801006F0(int nPlayer) {
 }
 
 // The shot kind the lesson sets, 8 (any) outside mode 11.
-int fn_80100744(void) {
+int Lessons_GetShotKind(void) {
     int n = gLessonNum - 1;
     if (Game_GetMode() != 11) {
         return 8;
@@ -377,9 +396,12 @@ int fn_80100744(void) {
     return gLessons[n].nShotKind;
 }
 
-// Plays the next message of one of the lesson's lists (fn_80101FC0), skipping empty entries;
-// nonzero if there was one.
-int fn_80100798(int nList, int nCount) {
+// Plays one of the coach's lines for the lesson: list nList of its row, nCount entries long (0 the
+// opening line, 1 before the demonstration, 2 after it, 3..7 a missed shot, 8..10 a fault, 11..12 a
+// short shot, 13..14 several faults), the one gLessonFailedTries picks or the next one that is not
+// empty. Nonzero if a line played. In lesson 7 the missed-shot line also picks the panel shown (12,
+// 11 or 6).
+int Lessons_PlayLine(int nList, int nCount) {
     s16* pList = &gLessonLines[gLessonLineRow] + nList;
     u32 i = gLessonFailedTries % nCount;
     int n = 0;
@@ -402,8 +424,10 @@ int fn_80100798(int nList, int nCount) {
     return !(pList[i] == -1);
 }
 
-// The lesson's animation, the demonstration's before step 6 (none outside lessons 1..11).
-char* fn_801008A8(void) {
+// The name of the golfer's animation for the lesson (CharAnim.c uses it for clip group 1): from
+// gLessonTryAnims from step 6 on (the player's tries), from gLessonDemoAnims before (the
+// demonstration); NULL outside lessons 1..11.
+char* Lessons_GetAnimName(void) {
     if (gLessonNum > 0 && gLessonNum < 12) {
         if (gLessonStep >= 6) {
             return gLessonTryAnims[gLessonNum];
@@ -413,13 +437,17 @@ char* fn_801008A8(void) {
     return 0;
 }
 
-// The player's try starts: the ball back at the lesson's spot, the golfer back to pre-shot with
-// player 0's controller, step 7 (the player's try; the demonstration is steps 2..5).
-void fn_801008F8(void) {
+// The player's try starts: the hints hidden, the ball back at the lesson's spot
+// (Lessons_PlaceBall), player 0 given back its controller and sent to pre-shot, and fn_800957D8 on
+// the golfer after a failed try (steps 8..11). In lesson 7 (the putt) the default target is aimed
+// at, the shot prepared, the putt line reset, the golfer lined up and the swing reset (and
+// animation 1 played, unless after a failed try). The boost and spin flags clear, the step becomes
+// 7, and fn_80047B6C / fn_80047BC0 are called with no ball.
+void Lessons_StartTry(void) {
     fn_80101F40(0, 0);
     fn_800E5200(-1);
     fn_80101F18(0);
-    fn_80100508();
+    Lessons_PlaceBall();
     gPlayers[0].nController = gLessonController;
     GOLFERSTATE_Switch(GS_PRE_SHOT, 0);
     if (gLessonStep == 8 || gLessonStep == 9 || gLessonStep == 10 || gLessonStep == 11) {
@@ -444,8 +472,10 @@ void fn_801008F8(void) {
     fn_80047BC0(NULL, 0);
 }
 
-// After a re-plan: the target chosen again, keeping the player's club and shot kind.
-void fn_80100A3C(int nPlayer) {
+// After a re-plan (pfn22C): player 0's target is picked again (the default one for a putt, else the
+// AI's choice) and the shot prepared, keeping the club and shot kind the lesson set; the putt line,
+// the golfer's aim and animation 5 are set up again. nPlayer is unused.
+void Lessons_AfterReplan(int nPlayer) {
     s32 nShotKind = gPlayers[0].nShotKind;
     s32 nClub = gPlayers[0].nClub;
     if (nShotKind == 0) {
@@ -464,16 +494,22 @@ void fn_80100A3C(int nPlayer) {
     fn_80062C38();
 }
 
-u8 fn_80100AF8(void) {
-    if (fn_80100294() && gLessonNum == 5) {
+// Lesson 5 is running: its swing is a short one, so the CPU's demonstration stops its backswing at
+// 65% of the way to the top instead of 98% (Swing.c).
+u8 Lessons_IsShortBackswingLesson(void) {
+    if (Lessons_IsRunning() && gLessonNum == 5) {
         return 1;
     }
     return 0;
 }
 
-// Back to the lesson's start (lesson 1 if none), unless the lessons are over.
-void fn_80100B38(void) {
-    if (!fn_80100294() || gLessonNum == 12) {
+// Starts the current lesson over from its demonstration (lesson 1 if none), from the pause menu or
+// the front end's commands, unless the lessons are over, the game is paused or the continue / stop
+// question is up (step 17): the coach stops, step 4 (the demonstration set up again after the
+// flyover), no failed tries, the turn ended, the HUD off (fn_80062C80, GUI_ToggleUI) and the hints
+// hidden.
+void Lessons_RestartLesson(void) {
+    if (!Lessons_IsRunning() || gLessonNum == 12) {
         return;
     }
     if (gSession.nPaused == 0 && gLessonStep != 17) {
@@ -550,26 +586,26 @@ void fn_80100C08(void) {
     case 2:
         Gaud_InitCrowdReactionSound(2, 1);
         gLessonNum = 0;
-        fn_80100328();
-        fn_80100508();
+        Lessons_NextLesson();
+        Lessons_PlaceBall();
         gLessonStep = 3;
         break;
     case 3:
         fn_80101F40(0, 0);
         fn_80101F18(0);
         fn_800E5200(-1);
-        fn_80100798(0, 1);
+        Lessons_PlayLine(0, 1);
         gLessonStep = 4;
         gLessonFailedTries = 0;
         break;
     case 4:
         if ((s8)GOLFERSTATE_GetCurrentState(0) != 20) {
-            fn_80100508();
+            Lessons_PlaceBall();
             GOLFERSTATE_Switch(GS_PRE_SHOT, 0);
             fn_80101F40(0, 0);
             fn_800E5200(-1);
             fn_80101F18(0);
-            fn_80100798(1, 1);
+            Lessons_PlayLine(1, 1);
             gLessonStep = 5;
         }
         break;
@@ -611,7 +647,7 @@ void fn_80100C08(void) {
         }
         break;
     case 6:
-        fn_801008F8();
+        Lessons_StartTry();
         gLessonTryHintsSet = 0;
         gLessonSwingCommitted = 0;
         // falls through
@@ -737,8 +773,8 @@ void fn_80100C08(void) {
         } else if (gLessonNum == 9) {
             fn_80101F94(4, 1);
         }
-        fn_801008F8();
-        fn_80100798(3, 5);
+        Lessons_StartTry();
+        Lessons_PlayLine(3, 5);
         break;
     case 9:
         if (gLessonNum == 10) {
@@ -748,8 +784,8 @@ void fn_80100C08(void) {
         } else if (gLessonNum == 9) {
             fn_80101F94(4, 1);
         }
-        fn_801008F8();
-        fn_80100798(11, 2);
+        Lessons_StartTry();
+        Lessons_PlayLine(11, 2);
         break;
     case 10:
         if (gLessonNum == 10) {
@@ -759,8 +795,8 @@ void fn_80100C08(void) {
         } else if (gLessonNum == 9) {
             fn_80101F94(4, 1);
         }
-        fn_801008F8();
-        fn_80100798(8, 3);
+        Lessons_StartTry();
+        Lessons_PlayLine(8, 3);
         break;
     case 11:
         if (gLessonNum == 10) {
@@ -770,14 +806,14 @@ void fn_80100C08(void) {
         } else if (gLessonNum == 9) {
             fn_80101F94(4, 1);
         }
-        fn_801008F8();
-        fn_80100798(13, 2);
+        Lessons_StartTry();
+        Lessons_PlayLine(13, 2);
         break;
     case 12:
         if (gLessonNum == 10) {
             fn_80101F94(2, 1);
         }
-        fn_80100328();
+        Lessons_NextLesson();
         if (gLessonNum == 12) {
             gLessonStep = 19;
         } else if (gLessonNum == 8) {
@@ -860,7 +896,7 @@ void fn_8010179C(void) {
     int nLie;
     if (gLessonStep == 5) {
         Gaud_InitCrowdReactionSound(1, 1);
-        fn_80100798(2, 1);
+        Lessons_PlayLine(2, 1);
         gLessonStep = 16;
         return;
     }
@@ -963,7 +999,7 @@ void fn_8010179C(void) {
 // An event (event.c's numbers) during a lesson; nonzero blocks it. Event 10 changes the music, 32
 // and 34 end the shot (it is judged), 45 and 46 are what lessons 10 and 11 wait for.
 u8 fn_80101AA8(int nPlayer, int nEvent) {
-    if (!fn_80100294()) {
+    if (!Lessons_IsRunning()) {
         return 0;
     }
     if (nEvent == 10) {
@@ -982,7 +1018,7 @@ u8 fn_80101AA8(int nPlayer, int nEvent) {
     }
     if (nEvent == 28 && gLessonStep == 5 &&
         (gLessonNum == 1 || gLessonNum == 10 || gLessonNum == 8 || gLessonNum == 9)) {
-        fn_80100798(2, 1);
+        Lessons_PlayLine(2, 1);
         gLessonStep = 16;
         return 1;
     }
@@ -1080,9 +1116,9 @@ void fn_80101EDC(void) {
     gLessonPauseClosed = 1;
 }
 
-// Round setup (fn_80100160), then player 0 is handed to the first controller.
+// Round setup (Lessons_StartGamePreData), then player 0 is handed to the first controller.
 void fn_80101EE8(void) {
-    fn_80100160();
+    Lessons_StartGamePreData();
     gPlayers[0].nController = 0;
 }
 

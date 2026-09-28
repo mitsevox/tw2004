@@ -731,8 +731,8 @@ int  Golfer_FindById(int nId);          // the gGolferTable row with that nModel
 void fn_8002EBA4(u8* pObj, u8 nValue);  // set byte 7 of the options (a7[0]) and apply it (Golfer.c)
 int  Course_GetCurHolePar(void);
 s32  fn_800D2C68(int nTee);             // CourseData.c: the current hole's value for tee set nTee
-int  fn_80100744(void);                 // shot kind override, 8 = none
-int  fn_801006F0(int nPlayer);          // club override, 26 = none
+int  Lessons_GetShotKind(void);                 // shot kind override, 8 = none
+int  Lessons_GetClub(int nPlayer);          // club override, 26 = none
 int  Game_GetCurHoleNum(void);
 u8   fn_80101DF4(void);
 f32  SW_GetSpinScale(int nSpin);         // how much spin SPIN allows: 0.15 at 0 .. 1.0 at 110 (Swing.c)

@@ -226,7 +226,7 @@ void GM_SetModeType(int nMode) {
         GameModeReplay_Init();
         break;
     case 11:
-        fn_800FFF34();
+        Lessons_Init();
         break;
     case 12:
         fn_800FEAFC();

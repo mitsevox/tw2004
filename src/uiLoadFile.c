@@ -224,7 +224,7 @@ void fn_8008F194(u32* pTable) {
 // a lesson.
 u8 fn_8008F204(int nKind) {
     if (nKind == 0 || nKind == 1) return 1;
-    if (nKind == 3) return fn_80100294();
+    if (nKind == 3) return Lessons_IsRunning();
     return 1;
 }
 

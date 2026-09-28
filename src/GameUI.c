@@ -262,7 +262,7 @@ void GUI_PauseMenuClosed(void) {
     int j;
     if (gSession.nPaused != 0) {
         fn_800E5714(8);
-        if (fn_80100294()) {
+        if (Lessons_IsRunning()) {
             fn_80101EDC();
         }
         if (!fn_800E5C84()) {

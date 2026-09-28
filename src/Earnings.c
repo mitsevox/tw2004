@@ -720,7 +720,7 @@ void GM_Earnings_CheckShotGoals(int nPlayer, Ball* pBall, u8 bPreview) {
     if (gSession.uFlags & 0x4000) return;
     if (Player_IsCPU(nPlayer)) return;
     if (!GM_Earnings_AwardShotBonusToUser(nPlayer)) return;
-    if (fn_80100294()) return;
+    if (Lessons_IsRunning()) return;
     if (Game_GetMulliganRule() != 0) return;
 
     if (pBall != NULL) {
