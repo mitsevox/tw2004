@@ -2610,3 +2610,12 @@ address	name	comment	by	date
 800FFD54	GameModeStroke_GameFinished	rewrite	rn6 (replayed by orchestrator)	2026-09-28
 800FFDB0	GameModeStroke_GoToPlayoff	rewrite	rn6 (replayed by orchestrator)	2026-09-28
 800FFDB8	GameModeStroke_EndGame	rewrite	rn6 (replayed by orchestrator)	2026-09-28
+800FE1B4	GameModeStableford_Init	rewrite	rn6 (replayed by orchestrator)	2026-09-28
+800FE2B4	GameModeStableford_PlayerDoneHole	keep	rn6 (replayed by orchestrator)	2026-09-28
+800FE344	GameModeStableford_SetupNextGolfer	rewrite	rn6 (replayed by orchestrator)	2026-09-28
+800FE3FC	GameModeStableford_GetHonors	rewrite	rn6 (replayed by orchestrator)	2026-09-28
+800FE7EC	GameModeStableford_HoleFinished	keep	rn6 (replayed by orchestrator)	2026-09-28
+800FE844	GameModeStableford_GameFinished	rewrite	rn6 (replayed by orchestrator)	2026-09-28
+800FE8A0	GameModeStableford_GoToPlayoff	rewrite	rn6 (replayed by orchestrator)	2026-09-28
+800FE8A8	GameModeStableford_EndHole	keep	rn6 (replayed by orchestrator)	2026-09-28
+800FE980	GameModeStableford_EndGame	rewrite	rn6 (replayed by orchestrator)	2026-09-28

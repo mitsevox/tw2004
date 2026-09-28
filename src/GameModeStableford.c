@@ -16,18 +16,20 @@ void GameModeStableford_SetupNextGolfer(void);
 s32  GameModeStableford_GetHonors(int nPlayer);
 u8   GameModeStableford_HoleFinished(int nPlayer, u8 bCheck);
 u8   GameModeStableford_GameFinished(u8 bCheck);
-u8   fn_800FE8A0(u8 bCheck);
+u8   GameModeStableford_GoToPlayoff(u8 bCheck);
 void GameModeStableford_EndHole(void);
 void GameModeStableford_EndGame(void);
 
-// One mulligan per player per round; the CPU may concede.
+// Game mode 18's setup: installs Stableford's callbacks (GameModeStableford_GoToPlayoff: no
+// playoff), lets a CPU concede a hole, one mulligan per player per nine (nMulligans 2), the current
+// hole set to hole index 0 (GM_SetCurrentHole) and one view.
 void GameModeStableford_Init(void) {
     gpGame->pfnInit = GameModeStableford_Init;
     gpGame->pfnSetupNextGolfer = GameModeStableford_SetupNextGolfer;
     gpGame->pfnGetHonors = GameModeStableford_GetHonors;
     gpGame->pfnHoleFinished = GameModeStableford_HoleFinished;
     gpGame->pfnGameFinished = GameModeStableford_GameFinished;
-    gpGame->pfnGoToPlayoff = fn_800FE8A0;
+    gpGame->pfnGoToPlayoff = GameModeStableford_GoToPlayoff;
     gpGame->pfnEndHole = GameModeStableford_EndHole;
     gpGame->pfnEndGame = GameModeStableford_EndGame;
     gpGame->bAIConcedes = 1;
@@ -50,8 +52,9 @@ u8 GameModeStableford_PlayerDoneHole(int nPlayer) {
     return 1;
 }
 
-// In split screen everyone plays at once; otherwise the
-// player with the honor gets ready and the others wait.
+// pfnSetupNextGolfer: with nSplitScreen 1 every player gets ready at once (GS_PRE_SHOT); otherwise
+// the next player (the mode's pfnGetHonors, kept in lbl_80282278) gets ready and the others wait
+// (GS_WAIT).
 void GameModeStableford_SetupNextGolfer(void) {
     int i;
     if (gSession.nSplitScreen == 1) {
@@ -70,9 +73,10 @@ void GameModeStableford_SetupNextGolfer(void) {
     }
 }
 
-// Who plays next after nPlayer (5 = nobody). On the tee the
-// honor goes by the scores on the holes played so far (the latest hole first, ties by the hole
-// before); otherwise to the player farthest from the pin, off the green first.
+// Who plays next after nPlayer (5 = nobody). On the tee the honor goes by the strokes on the holes
+// played so far (the latest hole first, ties by the hole before); otherwise to the player farthest
+// from the pin, off the green first. A player done with the hole
+// (GameModeStableford_PlayerDoneHole) never plays.
 s32 GameModeStableford_GetHonors(int nPlayer) {
     s32 aOrder[4] = {0, 1, 2, 3};
     s32 aSorted[4];
@@ -176,7 +180,7 @@ u8 GameModeStableford_HoleFinished(int nPlayer, u8 bCheck) {
     return 1;
 }
 
-// Over when no selected hole is left.
+// Whether the round is over: no selected hole is left after the current one.
 u8 GameModeStableford_GameFinished(u8 bCheck) {
     int h;
     for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
@@ -187,8 +191,8 @@ u8 GameModeStableford_GameFinished(u8 bCheck) {
     return 1;
 }
 
-// No playoff (the pfnGoToPlayoff slot).
-u8 fn_800FE8A0(u8 bCheck) {
+// pfnGoToPlayoff: Stableford has no playoff, always 0. Nothing in this build calls the slot.
+u8 GameModeStableford_GoToPlayoff(u8 bCheck) {
     return 0;
 }
 
@@ -211,9 +215,13 @@ void GameModeStableford_EndHole(void) {
     }
 }
 
-// TW06's EndGame is empty. Each human with a profile whose round total (GM_GetPlayerRoundScore: in this
-// mode the Stableford points) is below a CPU player's wins money: the prize for the best earnings
-// rating among those CPU players, its base plus its per-stroke prize for up to 5 of margin.
+// pfnEndGame, stroke play's prize code (GameModeStroke_EndGame) with GM_GetPlayerRoundScore, which
+// in this mode is the round's Stableford points: after a full round that is not a Play Now
+// challenge, each human with an active profile whose points are below one or more CPU golfers' wins
+// the prize of the best-rated of them (GM_Earnings_RateGolfer), its base prize plus its per-stroke
+// prize for the margin, up to 5 (gEarningsTable.aStrokePrize). So fewer points than a CPU golfer is
+// paid, though a higher Stableford total is the better one. The first such human has a game counted
+// as won (EASBio_IncrementGamesWon); a nonzero base prize is announced (GUI message 0x75).
 void GameModeStableford_EndGame(void) {
     int i;
     int j;
