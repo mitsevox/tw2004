@@ -7,7 +7,7 @@
 #include "engine.h"
 #include "game/save.h"
 
-u8 lbl_80281648[2] = {0, 0};                // per team: 1 when the second partner (1 or 3) hits next
+u8 gAltShotTeamHonors[2] = {0, 0};                // per team: 1 when the second partner (1 or 3) hits next
 
 u8  GameModeAlternateShot_TeamDone(int nTeam);
 int GameModeAlternateShot_GetPartner(int nPlayer);
@@ -87,7 +87,7 @@ int GameModeAlternateShot_GetPartner(int nPlayer) {
 // Whether it is this player's turn to hit the team's ball.
 u8 GameModeAlternateShot_PlayerHasTeamHonors(int nPlayer) {
     int bSecond = (nPlayer == 1 || nPlayer == 3) ? 1 : 0;
-    return bSecond == lbl_80281648[GetGamePlayerTeam(nPlayer)];
+    return bSecond == gAltShotTeamHonors[GetGamePlayerTeam(nPlayer)];
 }
 
 // A player's team.
@@ -246,7 +246,7 @@ void GameModeAlternateShot_EndGolferTurn(int nPlayer) {
     gPlayers[nPartner].ball.nPlayer = nPartner;
     gPlayers[nPartner].nStrokes[Game_CurHoleIndex()] = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     nTeam = GetGamePlayerTeam(nPlayer);
-    lbl_80281648[nTeam] = 1 - lbl_80281648[nTeam];
+    gAltShotTeamHonors[nTeam] = 1 - gAltShotTeamHonors[nTeam];
 }
 
 // Whether the hole is over (bCheck is not used): both teams holed out; or one team holed out and
@@ -398,7 +398,7 @@ void GameModeAlternateShot_EndHole(void) {
         gPlayers[2].nModePoints[nHole] = 1;
         gPlayers[2].nHolesWon++;
     }
-    lbl_80281648[0] = lbl_80281648[1] = 1 - (nHole & 1);
+    gAltShotTeamHonors[0] = gAltShotTeamHonors[1] = 1 - (nHole & 1);
 }
 
 // The match's end, for a full round outside a mode 5 challenge: the team with more holes won (team

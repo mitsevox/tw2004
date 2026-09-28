@@ -9,13 +9,13 @@
 #include "game/modes/rte.h"
 
 // This file's globals, defined last address first (an object's .bss is laid out in reverse).
-s32 lbl_80281680 = 4;                       // gSession.options.nC saved while an event runs
-void (*lbl_8028235C)(void);                 // mode 5's pfnShutdown, called from ours (GameModeDriverRTE_Shutdown)
-void (*lbl_80282358)(void);                 // mode 5's pfnEndGame, called from ours (GameModeDriverRTE_EndGame)
-s32 lbl_80282354;                           // the event's round
-s32 lbl_80282350;                           // the event (gRTEs.aEvent index)
-u8  lbl_8028234C;                           // 1 while an event runs
-s32 lbl_80282348;                           // gSession.options.nWind saved while an event runs
+s32 gRTESavedOptionC = 4;                       // gSession.options.nC saved while an event runs
+void (*gRTEChallengeShutdown)(void);                 // mode 5's pfnShutdown, called from ours (GameModeDriverRTE_Shutdown)
+void (*gRTEChallengeEndGame)(void);                 // mode 5's pfnEndGame, called from ours (GameModeDriverRTE_EndGame)
+s32 gRTESelectedDay;                           // the event's round
+s32 gRTESelectedEvent;                           // the event (gRTEs.aEvent index)
+u8  gRTEEventRunning;                           // 1 while an event runs
+s32 gRTESavedWind;                           // gSession.options.nWind saved while an event runs
 RTEData gRTEs;
 
 void GameModeDriverRTE_UnregisterStreamClients(void);
@@ -102,14 +102,14 @@ void GameModeDriverRTE_Locale_LoadRTEnFromStream(UStreamObject* pObject) {
 // GameModeDriverRTE_StartEvent changed put back, and the event is no longer running
 // (GM_Currently_RealtimeMode).
 void GameModeDriverRTE_Shutdown(void) {
-    if (lbl_8028235C) {
-        lbl_8028235C();
+    if (gRTEChallengeShutdown) {
+        gRTEChallengeShutdown();
     }
     gpGame->nC = 1;
     gpGame->n10 = 1;
-    gSession.options.nC = lbl_80281680;
-    gSession.options.nWind = lbl_80282348;
-    lbl_8028234C = 0;
+    gSession.options.nC = gRTESavedOptionC;
+    gSession.options.nWind = gRTESavedWind;
+    gRTEEventRunning = 0;
 }
 
 // Starts the selected event (GM_RealtimeMode_SelectEvent): the options nC and wind are saved and
@@ -119,20 +119,20 @@ void GameModeDriverRTE_Shutdown(void) {
 // saved and replaced by GameModeDriverRTE_Shutdown and GameModeDriverRTE_EndGame. Called from the
 // menu (FE_MessageTable.c) and on a restart (GameMode5).
 void GameModeDriverRTE_StartEvent(void) {
-    lbl_80281680 = gSession.options.nC;
-    lbl_80282348 = gSession.options.nWind;
+    gRTESavedOptionC = gSession.options.nC;
+    gRTESavedWind = gSession.options.nWind;
     gSession.options.nC = 4;
     gSession.options.nWind = 0;
-    lbl_8028234C = 1;
-    if (gRTEs.aEvent[lbl_80282350].bOff == 0) {
-        if (gRTEs.aEvent[lbl_80282350].nChallenge != 0) {
+    gRTEEventRunning = 1;
+    if (gRTEs.aEvent[gRTESelectedEvent].bOff == 0) {
+        if (gRTEs.aEvent[gRTESelectedEvent].nChallenge != 0) {
             gSession.nNumPlayers = 1;
             GM_SetModeType(5);
             fn_800EC544(gRTEs.aChallenge, 111);
-            fn_800EAE38(gRTEs.aEvent[lbl_80282350].nChallenge - 1);
+            fn_800EAE38(gRTEs.aEvent[gRTESelectedEvent].nChallenge - 1);
             fn_800EAF7C();
-            lbl_8028235C = gpGame->pfnShutdown;
-            lbl_80282358 = gpGame->pfnEndGame;
+            gRTEChallengeShutdown = gpGame->pfnShutdown;
+            gRTEChallengeEndGame = gpGame->pfnEndGame;
             gpGame->pfnShutdown = GameModeDriverRTE_Shutdown;
             gpGame->pfnEndGame = GameModeDriverRTE_EndGame;
         }
@@ -144,8 +144,8 @@ void GameModeDriverRTE_StartEvent(void) {
 // GameModeDriverRTE_Shutdown and GameModeDriverRTE_EndGame, as GameModeDriverRTE_StartEvent does.
 void GameModeDriverRTE_StartNextChallenge(void) {
     fn_800EAF7C();
-    lbl_8028235C = gpGame->pfnShutdown;
-    lbl_80282358 = gpGame->pfnEndGame;
+    gRTEChallengeShutdown = gpGame->pfnShutdown;
+    gRTEChallengeEndGame = gpGame->pfnEndGame;
     gpGame->pfnShutdown = GameModeDriverRTE_Shutdown;
     gpGame->pfnEndGame = GameModeDriverRTE_EndGame;
 }
@@ -153,7 +153,7 @@ void GameModeDriverRTE_StartNextChallenge(void) {
 // 1 while a real-time event is being played (from GameModeDriverRTE_StartEvent to
 // GameModeDriverRTE_Shutdown).
 u8 GM_Currently_RealtimeMode(void) {
-    return lbl_8028234C;
+    return gRTEEventRunning;
 }
 
 // How many of the 75 real-time event awards profile 0 has won (SaveProfile.aRTEAward); 0 before the
@@ -183,7 +183,7 @@ void GameModeDriverRTE_QueueWinMessages(void) {
         bFirst = 1;
     }
     bSaid = 1;
-    switch (lbl_80282350) {
+    switch (gRTESelectedEvent) {
     case 0x0:
         GUI_QueueMessage(10, 0xD, 0, 0);
         break;
@@ -259,13 +259,13 @@ void GameModeDriverRTE_QueueWinMessages(void) {
 // for the event is marked won with today's date (fn_800D7770).
 void GameModeDriverRTE_EndGame(void) {
     s32 nReward;
-    lbl_80282358();
+    gRTEChallengeEndGame();
     if (fn_800EC558() != 3) {
-        nReward = gRTEs.aChallenge[gRTEs.aEvent[lbl_80282350].nChallenge - 1].aMedal[0].nReward;
+        nReward = gRTEs.aChallenge[gRTEs.aEvent[gRTESelectedEvent].nChallenge - 1].aMedal[0].nReward;
         GM_Earnings_AwardMoney(0, nReward, 0);
         GUI_QueueMessage(0, 0x6F, nReward, 0);
         GameModeDriverRTE_QueueWinMessages();
-        fn_800D7770(0, &gpSaveData->aRTEAward[gRTEs.aEvent[lbl_80282350].nId]);
+        fn_800D7770(0, &gpSaveData->aRTEAward[gRTEs.aEvent[gRTESelectedEvent].nId]);
     }
 }
 
@@ -333,14 +333,14 @@ s32 GameModeDriverRTE_GetEventDays(s32 i) {
 // The selected event (an index into gRTEs.aEvent, set by GM_RealtimeMode_SelectEvent); its day goes
 // in *pRound.
 s32 GM_RealtimeMode_GetSelectedEvent(s32* pRound) {
-    *pRound = lbl_80282354;
-    return lbl_80282350;
+    *pRound = gRTESelectedDay;
+    return gRTESelectedEvent;
 }
 
 // Event nId, on its day nRound, becomes the selected one (GameModeDriverRTE_StartEvent plays it).
 void GM_RealtimeMode_SelectEvent(s32 nId, s32 nRound) {
-    lbl_80282354 = nRound;
-    lbl_80282350 = nId;
+    gRTESelectedDay = nRound;
+    gRTESelectedEvent = nId;
 }
 
 // Today's event (by the clock) becomes the selected one; 1 if there is one, else 0 and the
