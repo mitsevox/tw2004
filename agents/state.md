@@ -20,9 +20,18 @@ matching-era records removed (in history at 6839245), docs/README.md index.
 Owner 2026-09-28: the readability plan is APPROVED; continue it. The matched-data scoring lane is ON
 HOLD (decomp.dev already shows 100%; objdiff's local "matched data" 79.95% is per-symbol scoring).
 Progress log: config/GW4E69/readability_progress.tsv (`hotnames.py --units --log` after every round);
-per-file work lists: `hotnames.py --unit X --todo`. Round 4 landed (473 reviewed, 12 files through). Round 5 running (~00:55 UTC): re1 finishes UMemPool,
-ViewController, Controller_Gc; re2 core header pass (engine.h/camera.h/cull.h + gomainloop prototype);
-re3 char.c first 40; re4 SkinPart.c first 40.
+per-file work lists: `hotnames.py --unit X --todo`. CHECKPOINT (2026-09-28 ~01:30 UTC, pre-compact; owner usage 68%): round 5 landed and logged (588
+functions reviewed = 8.9%, 15 files through the pass; core area DONE incl. its headers). Nothing
+running. NEXT: round 6 (golfer area), 4 lanes: char.c from 0x8001A288 (120 to go), SkinPart.c from
+0x800CDAFC SkinPart_FindPart (42 to go), then CharAnim / Skin / Skeleton / FEgolferanim; the golfer
+area's header pass (leads: naming-leads.md "Round 5") runs as its own lane and is merged LAST.
+Round procedure (orchestrator): new_agent.py <lane>; prompt = plan-readability.md + brief.md +
+roles/naming.md, files + `hotnames.py --unit X --todo` cap ~40, deliver batch files + hand-edit list,
+never git reset; on return: replay batches with name.py in order (`--by "<lane> (replayed by
+orchestrator)"`), rename.py for globals, then hand edits by `git checkout agent/<lane> -- <files>` +
+`rename.py name_sources.tsv --refs-only` + read `git diff HEAD` for anything reverted (re-run the header
+lane's saved scripts if its renames got undone), build + lint, commit, push; after the round
+`hotnames.py --units --log`, commit the log row, append leads to naming-leads.md, report numbers.
 PHASE: readability. Plan and feedback loop: agents/plan-readability.md (one complete pass per file,
 areas in order, measure with `hotnames.py --units`: named / commented / reviewed / done).
 Matching-era audit rules and tooling retired 2026-09-27 (tag audit-baseline-1 kept as history).
