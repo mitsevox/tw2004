@@ -29,9 +29,13 @@ Steps, in order; the first failure stops it and puts every touched file back:
      the batch changed.
 A row whose new_name equals current_name is comment-only: column 8 is added (tier, codes and
 evidence still say where the comment comes from), nothing is renamed and no name_sources row is
-written. Use it for functions that already have a name.
+written. Use it for functions that already have a name; a fn_XXXXXXXX placeholder is refused:
+every function read gets a name (an empty or stripped one after where it is called and what for).
 Needs a clean tree under src/, include/, config/ and docs/ (commit or stash first)."""
 import datetime, pathlib, re, subprocess, sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import hotnames                                              # noqa: E402  (find_defs)
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 PY = sys.executable
@@ -69,7 +73,10 @@ def load(path):
         if not re.fullmatch(r'[0-9A-Fa-f]{8}', addr):
             errors.append(f'line {n}: address {addr!r} is not 8 hex digits')
         ea_own = tier in ('T1', 'T2') and 'E2' in codes     # EA's own name, spelled as EA did
-        if cur == new:
+        if cur == new and re.fullmatch(r'fn_[0-9A-Fa-f]{8}', cur):
+            errors.append(f'line {n}: {cur} keeps its placeholder name: every function read gets a name '
+                          '(an empty or stripped one is named from where it is called and what for)')
+        elif cur == new:
             pass                                            # comment-only row: the name is not new
         elif not NAME.match(new) and not (ea_own and re.fullmatch(r'[A-Za-z_]\w*', new)):
             errors.append(f'line {n}: {new!r} is not EA style System_Verb (Mem_set, RenderState_SetDepthFunc);'
@@ -157,7 +164,8 @@ def add_comments(rows):
     a file is commented (an #else plain-C copy keeps its own note). Returns (added, replaced, errors)."""
     added, replaced, errors = 0, 0, []
     want = {new: com for _, _, new, *rest in rows for com in [rest[-1]] if com and com not in ('KEEP', 'NONE')}
-    if not want:
+    none = {new for _, _, new, *rest in rows if rest[-1] == 'NONE'}
+    if not want and not none:
         return 0, 0, []
     found = set()
     for p in (ROOT / 'src').rglob('*.c'):
@@ -165,17 +173,19 @@ def add_comments(rows):
         eol = '\r\n' if '\r\n' in raw else '\n'
         lines = raw.split(eol)
         defs = []
-        for i, l in enumerate(lines):
-            m = re.match(r'^(?:asm |static |inline )*[A-Za-z_][^;=(]*?\b([A-Za-z_]\w*)\s*\([^;]*$', l)
-            if not m or m.group(1) not in want or m.group(1) in found:
+        for i, name, k in hotnames.find_defs(lines):
+            if name in none:
+                j = k + 1
+                while j < len(lines) and not lines[j].startswith('}'):
+                    j += 1
+                if j - k - 1 > 3:
+                    errors.append(f'{name}: NONE, but its body is {j - k - 1} lines: every function over '
+                                  '3 lines gets a comment (write one, or KEEP the one it has)')
                 continue
-            j = i + 1
-            while j < len(lines) and '{' not in lines[j - 1] and not lines[j - 1].rstrip().endswith(';'):
-                j += 1
-            if lines[j - 1].rstrip().endswith(';'):
-                continue                                    # a prototype, not the definition
-            found.add(m.group(1))
-            defs.append((i, m.group(1)))
+            if name not in want or name in found:
+                continue
+            found.add(name)
+            defs.append((i, name))
         for i, name in reversed(defs):
             top = i
             while top > 0 and lines[top - 1].startswith('#if'):

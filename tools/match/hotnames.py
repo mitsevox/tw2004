@@ -57,23 +57,41 @@ def call_sites(path):
 DEF = re.compile(r'^(?:asm |static |inline )*[A-Za-z_][^;=(]*?\b([A-Za-z_]\w*)\s*\([^;]*\{\s*$')
 
 
+# The first line of a definition or prototype at column 0: a signature split over several lines, and
+# a function returning a pointer to an array (`f32 (*Fn(Character* pChar))[4] {`), count too.
+DEF_START = re.compile(r'^(?:asm |static |inline )*[A-Za-z_][\w \t*]*?(?:\(\s*\*\s*)?\b([A-Za-z_]\w*)\s*\(')
+
+
+def find_defs(lines):
+    """[(first line, name, line with the opening brace)] for each function definition in lines."""
+    out = []
+    for i, l in enumerate(lines):
+        m = DEF_START.match(l)
+        if not m or m.group(1) in ('if', 'while', 'for', 'switch', 'return', 'sizeof'):
+            continue
+        j = i
+        while j < len(lines) and j < i + 8 and '{' not in lines[j] and ';' not in lines[j]:
+            j += 1
+        if j < len(lines) and '{' in lines[j] and ';' not in lines[j].split('{')[0]:
+            out.append((i, m.group(1), j))
+    return out
+
+
 def comment_state(path):
-    """name -> (body lines, has a comment above) for each function defined in a source file."""
+    """name -> (body lines, has a comment above) for each function defined in a source file. With
+    an asm version and an #else plain-C copy, the comment above either one counts."""
     lines = path.read_bytes().decode('utf-8', 'surrogateescape').split('\n')
     out = {}
-    for i, l in enumerate(lines):
-        m = DEF.match(l)
-        if not m or m.group(1) in ('if', 'while', 'for', 'switch'):
-            continue
-        j = i + 1
+    for i, name, k in find_defs(lines):
+        j = k + 1
         while j < len(lines) and not lines[j].startswith('}'):
             j += 1
         t = i
         while t > 0 and lines[t - 1].startswith('#if'):
             t -= 1
         has = t > 0 and lines[t - 1].lstrip().startswith(('//', '/*', '*'))
-        name = m.group(1)
-        out[name] = (j - i - 1, has or out.get(name, (0, False))[1])
+        prev = out.get(name, (0, False))
+        out[name] = (max(j - k - 1, prev[0]), has or prev[1])
     return out
 
 
@@ -87,7 +105,8 @@ def reviewed_names():
     names = set()
     for l in (ROOT / 'config/GW4E69/symbols.txt').read_text(encoding='utf-8').splitlines():
         m = re.match(r'^(\S+) = \.text:0x([0-9A-Fa-f]+);', l)
-        if m and m.group(2).upper() in addrs:
+        # a function still called fn_XXXXXXXX is not through the pass, whatever review.tsv says
+        if m and m.group(2).upper() in addrs and not PLACEHOLDER.match(m.group(1)):
             names.add(m.group(1))
     return names
 
