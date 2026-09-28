@@ -264,9 +264,9 @@ numbers). The structs (`GolferRecord`, `Player`, `AITarget`, `Session`, `GameSta
 the file. Roughly 80 functions in the range are still untouched.
 
 `src/Swing.c` (`0x800589F8`-`0x80062E40`, named by its assert string) is the human swing,
-linked NonMatching. Seven functions written: `Swing_ApplyForgiveness`, `Swing_ComputePower`,
-`Swing_ApplyPowerBoost`, `Swing_ApplySpin`, `Swing_SpinScale`, `Swing_TeeSweetSpot`,
-`Swing_MisHitRumble`. All compile to the original's instruction count; five are within 1% and
+linked NonMatching. Seven functions written: `SW_vAdjustMishitFromAttribute`, `Swing_ComputePower`,
+`SW_fPowerBoostAdjustment`, `SW_vCalculateSpinFactor`, `SW_GetSpinScale`, `SW_fPowerAdjustForDraw`,
+`SW_vAdjustVibrationFromAttribute`. All compile to the original's instruction count; five are within 1% and
 two sit at 84% because CodeWarrior common-subexpressions the player address differently from
 our `gPlayers[nPlayer]` spelling. The shared structs moved to `include/golfer.h`, with the
 swing meter's per-player state as `SwingData` at player+0x3D4.

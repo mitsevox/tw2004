@@ -17,8 +17,8 @@ void fn_80033704(u16 nPatch, u16 nObject);
 void fn_8003349C(f32 fPercentage, f32 fDuration, f32 fDelay);
 void fn_80051C84(Ball* pBall, f32 fX, f32 fY);
 void SW_vSetDisplayBoostUI(int nPlayer, int a);
-void fn_8005C15C(int nPlayer, f32* pSpinY, f32* pSpinX);
-void fn_8005C298(int nPlayer);
+void SW_vGetCurrentSpin(int nPlayer, f32* pSpinY, f32* pSpinX);
+void SW_vCloseSpinWindow(int nPlayer);
 void fn_800690C0(int nPlayer);
 void fn_80069104(int nPlayer);
 void fn_80069148(int nPlayer);
@@ -343,7 +343,7 @@ void fn_80066664(int nPlayer, int nEvent, void* pData, int nArg) {
         } else {
             fn_80067550(nPlayer);
         }
-        fn_8005C15C(nPlayer, &fSpinY, &fSpinX);
+        SW_vGetCurrentSpin(nPlayer, &fSpinY, &fSpinX);
         if (!gSession.bReplay) {
             REPLAY_SaveSpin(nPlayer, fSpinX, fSpinY);
         }
@@ -360,7 +360,7 @@ void fn_8006676C(int nPlayer, int nEvent, void* pData, int nArg) {
 void fn_800667C0(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 31, nPlayer);
-        fn_8005C298(nPlayer);
+        SW_vCloseSpinWindow(nPlayer);
         SW_vSetDisplayBoostUI(nPlayer, 0);
     }
 }

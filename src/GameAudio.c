@@ -1120,7 +1120,7 @@ void Gaud_SwingBallHit(u8 nPlayer) {
     }
     Aud_EmiSet3DPos(nIdSwing, pPlayer->ball.vPos, NULL, 0);
     Aud_EmiSetTrackVarRange(nIdSwing, 1, lbl_80183AD8[pPlayer->nClub]);
-    if ((nMode == 22 || nMode == 26) && fn_8005C280(nPlayer) > 1.0f) {
+    if ((nMode == 22 || nMode == 26) && SW_vGetNonPowerAttributeAffectedShotPower(nPlayer) > 1.0f) {
         Aud_EmiSetTrackVariation(nIdSwing, 1, 5);
     } else {
         Aud_EmiSetTrackVariation(nIdSwing, 1, lbl_80183AF4[pPlayer->ball.nLie]);

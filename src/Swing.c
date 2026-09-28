@@ -103,9 +103,9 @@ enum {
 
 extern f32           __float_max[];              // FLT_MAX
 
-void  Swing_FaceVector(int nPlayer, f32* pOut);
-f32   fn_8005BA94_MishitAngle(int nPlayer);
-void  fn_8005B8C8_ShapeVector(int nPlayer, f32* pOut);
+void  SW_vGetClubDirection(int nPlayer, f32* pOut);
+f32   SW_vCalculateMishitAngle(int nPlayer);
+void  SW_vGetStrokeDirection(int nPlayer, f32* pOut);
 f32   fn_8005CC84(f32 fTan);                     // atanf
 void  fn_8005CCA8(int nPlayer);
 void  Vec_Sub(f32* pA, f32* pB, f32* pOut);      // 0x8005CBF4  a - b
@@ -132,13 +132,13 @@ void  SD_DrawShaderObject(u8* pMesh);
 void  SW_vStateInitBackSwingFigit(int nPlayer);
 void  SW_vImpact(int nPlayer);
 f32   SW_vCalculateShotPower(int nPlayer);
-f32   Swing_CurveAngle(s32* pClub, f32 fBackAngle);
-f32   Swing_TeeSweetSpot(int nPlayer, f32 fPower);
-f32   Swing_ApplyPowerBoost(int nPlayer, f32 fPower);
-void  Swing_SpinInput(int nPlayer);
-void  Swing_ApplySpin(int nPlayer);
-void  Swing_ApplyForgiveness(int nPlayer);
-void  Swing_MisHitRumble(int nPlayer);
+f32   SW_fCalculateSliceAmount(s32* pClub, f32 fBackAngle);
+f32   SW_fPowerAdjustForDraw(int nPlayer, f32 fPower);
+f32   SW_fPowerBoostAdjustment(int nPlayer, f32 fPower);
+void  SW_vUpdateSpinControl(int nPlayer);
+void  SW_vCalculateSpinFactor(int nPlayer);
+void  SW_vAdjustMishitFromAttribute(int nPlayer);
+void  SW_vAdjustVibrationFromAttribute(int nPlayer);
 f32   fn_8005CC18(f32* pV);
 u8    SW_vStateIdleSwing(int nPlayer);
 u8    SW_vStateBackSwing(int nPlayer);
@@ -714,7 +714,7 @@ u8 SW_vStateDownSwing(int nPlayer) {
             gPlayers[nPlayer].swing.bCanSpin = 1;
         }
         if (fn_8002E898_IsPad(nController) && gSession.bReplay == 0) {
-            Swing_MisHitRumble(nPlayer);
+            SW_vAdjustVibrationFromAttribute(nPlayer);
         }
         if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
             EVENT_Trigger(nPlayer, 0x2B, 0, 0);
@@ -763,7 +763,7 @@ u8 SW_vStateThroughSwing(int nPlayer) {
 
 // Swing state 5, after the ball is struck; always returns false. For a human outside a replay: the
 // sticks are read (the values unused), the mis-hit rumble counts down (SW_UpdateVibration) and spin
-// can be put on the ball (Swing_SpinInput, Swing_ApplySpin).
+// can be put on the ball (SW_vUpdateSpinControl, SW_vCalculateSpinFactor).
 u8 SW_vStatePostSwing(int nPlayer) {
     int nController = gPlayers[nPlayer].nController;
     u8* pPad;
@@ -774,8 +774,8 @@ u8 SW_vStatePostSwing(int nPlayer) {
     SW_vGetStickX(nPlayer, pPad);
     SW_vGetStickY(nPlayer, pPad);
     SW_UpdateVibration(nPlayer);
-    Swing_SpinInput(nPlayer);
-    Swing_ApplySpin(nPlayer);
+    SW_vUpdateSpinControl(nPlayer);
+    SW_vCalculateSpinFactor(nPlayer);
     return 0;
 }
 
@@ -1149,21 +1149,21 @@ void SW_vImpact(int nPlayer) {
     nTrajectory = p->nTrajectory;
     nKind       = p->nShotKind;
     pBall       = &p->ball;
-    Swing_FaceVector(nPlayer, gPlayers[nPlayer].vLaunchA);
+    SW_vGetClubDirection(nPlayer, gPlayers[nPlayer].vLaunchA);
     if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
         gPlayers[nPlayer].swing.fMishitAngle = 0.0f;
     } else {
-        gPlayers[nPlayer].swing.fMishitAngle = fn_8005BA94_MishitAngle(nPlayer);
+        gPlayers[nPlayer].swing.fMishitAngle = SW_vCalculateMishitAngle(nPlayer);
     }
     gPlayers[nPlayer].swing.fShotPower = SW_vCalculateShotPower(nPlayer);
-    Swing_ApplyForgiveness(nPlayer);
+    SW_vAdjustMishitFromAttribute(nPlayer);
     if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e && gPlayers[nPlayer].fDistance < 2.0f) {
         gPlayers[nPlayer].vLaunchA[0] = 0.0f;
         gPlayers[nPlayer].vLaunchA[1] = 0.0f;
         gPlayers[nPlayer].vLaunchA[2] = 1.0f;
         gPlayers[nPlayer].vLaunchA[3] = 0.0f;
     }
-    fn_8005B8C8_ShapeVector(nPlayer, gPlayers[nPlayer].vLaunchB);
+    SW_vGetStrokeDirection(nPlayer, gPlayers[nPlayer].vLaunchB);
     gPlayers[nPlayer].swing.fHookSlice = gPlayers[nPlayer].vLaunchA[0];
     if (Player_IsController8(nPlayer)) {
         fn_8005CCA8(nPlayer);
@@ -1252,7 +1252,7 @@ f32 SW_vCalculateShotPower(int nPlayer) {
     // 94.2%; one Player* local: 84.9%)
     pPower = &PLAYER(nPlayer)->fPower;
     fError = fabs(gPlayers[nPlayer].swing.fMishitAngle);
-    gPlayers[nPlayer].swing.fNonPowerShotPower = Swing_ApplyPowerBoost(nPlayer, fPower) - fError;
+    gPlayers[nPlayer].swing.fNonPowerShotPower = SW_fPowerBoostAdjustment(nPlayer, fPower) - fError;
     nKind = gPlayers[nPlayer].nShotKind;
     switch (nKind) {
     case SHOT_TYPE_PUTT_e: {
@@ -1276,7 +1276,7 @@ f32 SW_vCalculateShotPower(int nPlayer) {
         } else {
             f = *pPower;
         }
-        fPower = Swing_ApplyPowerBoost(nPlayer, f);
+        fPower = SW_fPowerBoostAdjustment(nPlayer, f);
         Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_APPROACH, ATTR_TOTAL);
         if (fPower < 0.1f) {
             fPower = 0.1f;
@@ -1286,7 +1286,7 @@ f32 SW_vCalculateShotPower(int nPlayer) {
     case 5:
     case 6:
     case 7:
-        fPower     = Swing_ApplyPowerBoost(nPlayer, *pPower);
+        fPower     = SW_fPowerBoostAdjustment(nPlayer, *pPower);
         nRowScale  = ROW_RECOVERY_PWR + 1;
         nRowThresh = ROW_RECOVERY_PWR;
         nAttr      = GOLFER_GET_ATTRIBUTE_S8(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL);
@@ -1305,8 +1305,8 @@ f32 SW_vCalculateShotPower(int nPlayer) {
         }
         fPower = *pPower;
         fPower *= AI_PowerScale(nPlayer);
-        fPower = Swing_ApplyPowerBoost(nPlayer, fPower);
-        fPower = Swing_TeeSweetSpot(nPlayer, fPower);
+        fPower = SW_fPowerBoostAdjustment(nPlayer, fPower);
+        fPower = SW_fPowerAdjustForDraw(nPlayer, fPower);
         break;
     }
     TABLE_PAIR(nRowThresh, nRowScale, nAttr, fThresh, fScale);
@@ -1330,11 +1330,15 @@ f32 SW_vGetShotPower(int nPlayer) {
     return gPlayers[nPlayer].swing.fShotPower;
 }
 
-// The first launch block: the human's clubface from the stick. A CPU or a perfect shot gets a
-// square face. On a full shot the backswing's sideways angle (kept in fControllerSliceAngle for the tee
-// bonus) becomes a face angle through Swing_CurveAngle; on a putt the face is a plain
-// proportion of the stick's sideways offset. Session flags 0x4000 + 0x8000 force it square.
-void Swing_FaceVector(int nPlayer, f32* pOut) {
+// The clubface direction at impact (Player.vLaunchA, TW06 clubDirection), a unit vector in pOut: x
+// sideways, z along the aim line. Square (0, 0, 1) for a CPU, a perfect shot, a stick that ended
+// level with its calibrated centre, or with session flags 0x4000 and 0x8000 both set. On a full
+// shot the stick's angle at the top of the backswing (atan of its sideways over its vertical offset
+// from the calibrated centre) is kept in fControllerSliceAngle and turned into a face angle a by
+// SW_fCalculateSliceAmount: (-sin a, 0, cos a). On a putt fControllerSliceAngle is 0 and the
+// sideways part is the stick's sideways offset times how far toward that edge it went times
+// gPuttXScale (0.03).
+void SW_vGetClubDirection(int nPlayer, f32* pOut) {
     f32     fTopY, fTopX, fCentreX, fDY;
     f32     fAngle, fSin, fCos, fK;
 
@@ -1359,7 +1363,7 @@ void Swing_FaceVector(int nPlayer, f32* pOut) {
     } else if (gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e) {
         fAngle = fn_8005CC84((fTopX - fCentreX) / fDY);
         gPlayers[nPlayer].swing.fControllerSliceAngle = fAngle;
-        fAngle = Swing_CurveAngle(&gPlayers[nPlayer].nClub, fAngle);
+        fAngle = SW_fCalculateSliceAmount(&gPlayers[nPlayer].nClub, fAngle);
         fSin   = Math_Sin(fAngle);
         fCos   = Math_Cos(fAngle);
         pOut[0] = -fSin;
@@ -1387,8 +1391,10 @@ void Swing_FaceVector(int nPlayer, f32* pOut) {
     LLMath_Normalize(pOut, pOut);
 }
 
-// The second launch block: a CPU's (or a perfect shot's) shape vector; square for a human.
-void fn_8005B8C8_ShapeVector(int nPlayer, f32* pOut) {
+// The swing path direction at impact (Player.vLaunchB, TW06 strokeDirection), which carries the
+// shot's shape: for a CPU or a perfect shot the planned shape's direction (fn_8002D560_ShapeDir),
+// for a human straight, (0, 0, 1).
+void SW_vGetStrokeDirection(int nPlayer, f32* pOut) {
     if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
         fn_8002D560_ShapeDir(nPlayer, pOut);
     } else {
@@ -1401,10 +1407,12 @@ void fn_8005B8C8_ShapeVector(int nPlayer, f32* pOut) {
 
 // ---- the clubface -------------------------------------------------------------------------------
 
-// How far the face turns for a backswing angled fBackAngle off vertical: the angle as a fraction
-// of a quarter turn goes through a three-piece curve (knots at gpSwing 0xB8..0xC4), scaled by
-// the club's shaping range (fCurveMin..fCurveMax by gClubCurve/26) and a quarter turn.
-f32 Swing_CurveAngle(s32* pClub, f32 fBackAngle) {
+// How far the clubface turns, in radians and signed like fBackAngle, for a stick angle fBackAngle
+// (radians off vertical at the top of the backswing). The angle as a fraction of a quarter turn
+// goes through a three-piece linear curve, (0, 0) to (fKnot1X, fKnot1Y) to (fKnot2X, fKnot2Y) to
+// (1, 1) (gpSwing), then is scaled by a quarter turn and by the club's shaping range,
+// fCurveMin..fCurveMax by gClubCurve[club] / 26. pClub points at Player.nClub.
+f32 SW_fCalculateSliceAmount(s32* pClub, f32 fBackAngle) {
     f32 fOut;
     f32 fT;
     f32 fRange;
@@ -1434,11 +1442,14 @@ f32 Swing_CurveAngle(s32* pClub, f32 fBackAngle) {
 
 // ---- the meter's miss ----------------------------------------------------------------------------
 
-// The swing's miss: the back vector (x centre - top, z top - centre) and the through vector (x
-// impact - centre, z centre - impact), both normalised; the angle of (0, 0, 1) plus through - back,
-// clamped to gpSwing->fMaxError. Both x samples first get a random +-15 (of a +-128 stick), and the
-// x differences are scaled by gSwingXScale (0.2; 0.03 on a putt).
-f32 fn_8005BA94_MishitAngle(int nPlayer) {
+// The swing's miss in radians, added to the aim; SW_vImpact asks only for a human's shot that is
+// not perfect. Back is (centre - top, 0, top - centre) from the stick's calibrated centre and its
+// position at the top of the backswing, through is (through - centre, 0, centre - through) from its
+// downswing sample, each normalised; the miss is the angle (atan x/z) of (0, 0, 1) + through -
+// back, clamped to +-gpSwing->fMaxError, so a straight back-and-through gives about 0. Both x
+// samples first get a random +-15 (the stick reads 0..255), and the x differences are scaled by
+// gSwingXScale (0.03 on a putt, 0.2 otherwise).
+f32 SW_vCalculateMishitAngle(int nPlayer) {
     f32 fTopX;
     f32 fTopY;
     f32 fImpactX;
@@ -1491,9 +1502,11 @@ f32 fn_8005BA94_MishitAngle(int nPlayer) {
     return fAngle;
 }
 
-// Lie 0 with club 0 (a driver off the tee): up to +0.1 power when the backswing's sideways angle
-// is negative and its size falls between the curve's two knots, most at their midpoint.
-f32 Swing_TeeSweetSpot(int nPlayer, f32 fPower) {
+// fPower plus the draw bonus: a driver (club 0) off the tee (lie 0) swung with a draw (a negative
+// fControllerSliceAngle) gains up to gpSwing->fTeeBonus (0.1), the most when the stick's angle as a
+// fraction of a quarter turn sits midway between the curve's knots fKnot1X (0.4) and fKnot2X (0.6),
+// nothing at or outside them. Any other shot gets fPower back unchanged.
+f32 SW_fPowerAdjustForDraw(int nPlayer, f32 fPower) {
     Player* p = &gPlayers[nPlayer];
     f32     fT, fHalf;
     if (p->ball.nLie == 0 && p->nClub == 0 && p->swing.fControllerSliceAngle < 0.0f) {
@@ -1511,10 +1524,11 @@ f32 Swing_TeeSweetSpot(int nPlayer, f32 fPower) {
 
 // ---- the power boost input --------------------------------------------------------------------
 
-// Every backswing frame for a human with the boost option on: while a boost button (mask 0x1F)
-// is held with the stick more than 93 from centre, the boost level rises one a frame to 8 (event
-// 0x2D). fPowerBoostDieTime (1/12 s, set when the backswing changes direction) counts down; when
-// it runs out the level and the turn angles are cleared.
+// Every backswing frame, for a human with the power boost option on: while the boost button
+// (Controller_GetButtonMask(0x1F)) is held with the stick more than 93 from centre, the boost level
+// (nPowerBoost) rises one a frame up to 8, sending event 0x2D at each step. A running
+// fPowerBoostDieTime (1/12 s once the backswing backs down) counts down; when it runs out the level
+// and the turn angles are cleared and the boost display is reset (fn_800AE3C4).
 void SW_vCheckForSwingBoost(int nPlayer) {
     u32  uButtons;
     int  nX, nY;
@@ -1543,7 +1557,9 @@ void SW_vCheckForSwingBoost(int nPlayer) {
     }
 }
 
-// No power boost, no spin boost, no back-down timer; the boost display flag back on (SW_vSetDisplayBoostUI).
+// Clears the power boost level, the spin amount and the boost back-down timer, shows the boost
+// display again (SW_vSetDisplayBoostUI) and resets it (fn_800AE3C4). Called when a shot is set up
+// and when the swing starts.
 void SW_vClearBoosts(int nPlayer) {
     gPlayers[nPlayer].swing.nPowerBoost = 0;
     gPlayers[nPlayer].swing.nSpinBoost = 0;
@@ -1552,9 +1568,10 @@ void SW_vClearBoosts(int nPlayer) {
     fn_800AE3C4(nPlayer);
 }
 
-// Add the power boost: the pressed level's step times a per-point scale from POWER BOOST
-// (0.005 at 0, 0.010 at 100). Base value only - equipment counts, modifiers do not.
-f32 Swing_ApplyPowerBoost(int nPlayer, f32 fPower) {
+// fPower plus the power boost: the step of the level pressed (gBoostSteps: 1, 2, 4 ... 20 for
+// levels 1..8) times a scale from the POWER BOOST attribute's base value (0.005 at 0, 0.01 at 100,
+// 0.011 at 110; per-player modifiers do not count). Level 0 adds nothing.
+f32 SW_fPowerBoostAdjustment(int nPlayer, f32 fPower) {
     int nAttr  = Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_POWER_BOOST, ATTR_BASE);
     int nLevel = gPlayers[nPlayer].swing.nPowerBoost;
     s8  nBoost = nAttr;
@@ -1567,8 +1584,10 @@ f32 Swing_ApplyPowerBoost(int nPlayer, f32 fPower) {
     return fPower;
 }
 
-// The spin stick's result (a replay reads it back from the recording first).
-void fn_8005C15C(int nPlayer, f32* pSpinY, f32* pSpinX) {
+// The spin asked for: fSideSpin into the first pointer, fForwardSpin into the second (EA's fpSide,
+// fpForward). In a replay both are first read back from the recording into the swing data
+// (REPLAY_GetSpin).
+void SW_vGetCurrentSpin(int nPlayer, f32* pSpinY, f32* pSpinX) {
     if (gSession.bReplay) {
         REPLAY_GetSpin(nPlayer, &gPlayers[nPlayer].swing.fForwardSpin, &gPlayers[nPlayer].swing.fSideSpin);
     }
@@ -1576,31 +1595,37 @@ void fn_8005C15C(int nPlayer, f32* pSpinY, f32* pSpinX) {
     *pSpinY = gPlayers[nPlayer].swing.fSideSpin;
 }
 
-// The backswing's sideways angle as a fraction of a quarter turn, mirrored by Character_IsLeftHanded.
-f32 fn_8005C1EC(int nPlayer) {
+// The stick's sideways angle at the top of the backswing (fControllerSliceAngle) as a fraction of a
+// quarter turn, -1..1, sign flipped for a right-handed golfer so it reads the same for either hand.
+// Read by the situation scripts (SitDev) and the lessons (mode 11).
+f32 SW_vGetHookSlice(int nPlayer) {
     if (Character_IsLeftHanded(gPlayers[nPlayer].pChar)) {
         return gPlayers[nPlayer].swing.fControllerSliceAngle / 1.5707964f;
     }
     return -(gPlayers[nPlayer].swing.fControllerSliceAngle / 1.5707964f);
 }
 
-f32 fn_8005C268(int nPlayer) {
+f32 SW_vGetMishitAngle(int nPlayer) {
     return gPlayers[nPlayer].swing.fMishitAngle;
 }
 
-f32 fn_8005C280(int nPlayer) {
+f32 SW_vGetNonPowerAttributeAffectedShotPower(int nPlayer) {
     return gPlayers[nPlayer].swing.fNonPowerShotPower;
 }
 
-void fn_8005C298(int nPlayer) {
+// Ends the spin input for this shot (bCanSpin = 0): SW_vUpdateSpinControl takes no more stick.
+// Called from the event code (fn_800667C0).
+void SW_vCloseSpinWindow(int nPlayer) {
     gPlayers[nPlayer].swing.bCanSpin = 0;
 }
 
-// Spin, added after the ball is away: with the spin option on and the spin button (mask
-// 0x20) held after a real shot, the amount grows by one a frame up to 20 - a third of a second
-// for full spin - and the direction is the stick, whenever it is outside the 96..160 dead zone
-// (the first press starts it at straight back, 255).
-void Swing_SpinInput(int nPlayer) {
+// Spin input, every frame after impact (Swing_UpdateAfterImpact), for a human with the spin option
+// on while the spin button (Controller_GetButtonMask(0x20)) is held and the window is open
+// (bCanSpin): sends event 0x2E, grows the amount (nSpinBoost) one a frame up to 20 (a third of a
+// second for full spin), and takes the stick as the direction (nSpinCtrlX/Y) whenever either axis
+// is outside 96..160. The direction starts at x 128, y 255 (full y deflection) until the stick
+// leaves the dead zone.
+void SW_vUpdateSpinControl(int nPlayer) {
     u32     uButtons;
     int     nX, nY;
     if (Player_IsCPU(nPlayer)) return;
@@ -1624,13 +1649,15 @@ void Swing_SpinInput(int nPlayer) {
     }
 }
 // How much spin the SPIN attribute allows: 0.15 at 0, 0.6 at 100, 1.0 at 110.
-f32 Swing_SpinScale(int nSpin) {
+f32 SW_GetSpinScale(int nSpin) {
     return TABLE_AT(ROW_SPIN, (s8)nSpin);
 }
 
-// Turn the spin input into the shot's spin: stick deflection (-1..1) times the amount asked
-// for (0..20, over 20) times the SPIN scale (0.15 at 0, 0.6 at 100, 1.0 at 110).
-void Swing_ApplySpin(int nPlayer) {
+// Turns the spin input into the shot's spin: each stick axis (-1..1 from centre) times the amount
+// asked for (nSpinBoost / 20) times the SPIN scale (SW_GetSpinScale: 0.15 at 0, 0.6 at 100, 1.0 at
+// 110) gives fSideSpin (x) and fForwardSpin (y, sign flipped). No input gives no spin; a replay
+// keeps the recorded spin.
+void SW_vCalculateSpinFactor(int nPlayer) {
     SwingData* pSw = &gPlayers[nPlayer].swing;
     f32        fInv = 1.0f / 128.0f;
     int        nSpin;
@@ -1648,16 +1675,19 @@ void Swing_ApplySpin(int nPlayer) {
         pSw->fSideSpin = fX * (f32)pSw->nSpinBoost / 20.0f;
         pSw->fForwardSpin = fY * (f32)pSw->nSpinBoost / 20.0f;
     }
-    fScale = Swing_SpinScale(nSpin);
+    fScale = SW_GetSpinScale(nSpin);
     pSw->fSideSpin *= fScale;
     pSw->fForwardSpin *= fScale;
     pSw->fForwardSpin *= -1.0f;
 }
 
-// Shrink a human's swing error by the governing attribute: below a threshold the error is
-// multiplied by a scale (at 100, misses under ~0.42 become 82% smaller). CPU players skip this.
-// Putts under 2 units lose their error entirely.
-void Swing_ApplyForgiveness(int nPlayer) {
+// Shrinks a human's miss (fMishitAngle) by the governing attribute: when the miss is smaller than
+// the attribute's threshold it is multiplied by its scale (at 100, a drive's misses under 0.415
+// become 82% smaller). RECOVERY in sand, high rough and rough (lies 3, 4, 6..8) and for shot kinds
+// 5..7, PUTTING on a putt, APPROACH on a chip or pitch, otherwise DRIVING ACCURACY for clubs 0..8
+// and BALL STRIKING (three rows by club) for the rest. A putt from under 2 units loses its miss
+// entirely. CPU and perfect shots are left alone.
+void SW_vAdjustMishitFromAttribute(int nPlayer) {
     if (Player_IsCPU(nPlayer)) return;
     if (gPlayers[nPlayer].bPerfect) return;
     {
@@ -1739,8 +1769,11 @@ void Swing_ApplyForgiveness(int nPlayer) {
     }
 }
 
-// Rumble the pad on a mis-hit: frames = (135 at attribute 0 .. 35 at 100) x |error|, max 30.
-void Swing_MisHitRumble(int nPlayer) {
+// Rumbles the pad for a miss: nVibrateCount = |fMishitAngle| times a rate from the shot's attribute
+// (135 frames per radian at 0, 35 at 100, 30 at 110; PUTTING on a putt, APPROACH on a chip or
+// pitch, RECOVERY for shot kinds 5..7, BALL STRIKING otherwise), at most 30; any at all starts the
+// buzz and the wave (0xFF) and sets bVibrating. Called from the downswing (SW_vStateDownSwing).
+void SW_vAdjustVibrationFromAttribute(int nPlayer) {
     int nPad = gPlayers[nPlayer].nController;
     int nAttr;
     f32 fScale;

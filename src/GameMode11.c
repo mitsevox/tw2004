@@ -702,7 +702,7 @@ void fn_80100C08(void) {
                     fn_80101F94(2, 0);
                 }
             } else if (gPlayers[0].swing.nState == 5 || gPlayers[0].swing.nState == 4) {
-                lbl_80282400 = fn_8005C1EC(0);
+                lbl_80282400 = SW_vGetHookSlice(0);
                 if (lbl_802823FC == 11) {
                     fn_80101F94(2, 1);
                     if (!lbl_802823E5) {

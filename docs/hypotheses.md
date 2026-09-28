@@ -145,7 +145,7 @@ sites are mapped in [`formats/game-data.md`](formats/game-data.md). What that ma
   with its tooltip (lies and bounces). SPEED is read only by skin/animation code.
 - `CharSliders.c` turned out to be the create-a-golfer *face* slider loader, not attributes.
 - **Human and CPU are different mechanisms, not different numbers.** A human's stick error is
-  *reduced* by the governing attribute (`Swing_ApplyForgiveness`: a threshold and a scale from
+  *reduced* by the governing attribute (`SW_vAdjustMishitFromAttribute`: a threshold and a scale from
   a table, e.g. at PUTTING 100 a miss under 0.436 shrinks to an eighth; at 0, no help). A CPU's
   perfect aim is *worsened* by `(100 - skill)` (`AI_ApplyError`); nothing reads an attribute on
   the CPU's swing. AGGRESSION and IQ are used only in target choice. LUCK, SPEED and POWER BOOST
@@ -159,7 +159,7 @@ shot type and (driving, recovery) reduce the distance lost to it; POWER BOOST do
 ceiling; SPIN scales the spin; POWER sets club reach (shared with the CPU). Two non-attribute
 assists found on the way: putts over 75% on the meter count as full power, and a driver off the
 tee gets up to +10% when the backswing is angled 36..54 degrees off vertical (the same
-angle that shapes the shot - `Swing_FaceVector`).
+angle that shapes the shot - `SW_vGetClubDirection`).
 
 **Update (LUCK):** read all three readers. LUCK is the odds of a lucky event (above, hypothesis
 3), the chance of the good rough lie over the bad one (50% at 0, ~70% at 100), the chance of
@@ -205,7 +205,7 @@ CPU or on an attribute.
 cup radius, 0.054 m or 2.125 in, or from what writes the "holed" state).
 
 **Partial result (2026-09-22):** two assists exist *before* the roll, none found yet *during* it.
-(1) `Swing_ApplyForgiveness` zeroes the stroke error for any putt under 2 units, before reading
+(1) `SW_vAdjustMishitFromAttribute` zeroes the stroke error for any putt under 2 units, before reading
 the attribute; (2) above that, PUTTING shrinks a stroke error under 0.436 (at 100) to an eighth.
 The CPU gets the mirror image: no error on putts under 1.5 units, angle error halved under 5.
 The physics-side question (a pull toward the cup, capture radius) is still open.
@@ -345,7 +345,7 @@ a fixed amount, adds less as the level rises, decays over time, or needs faster 
 levels. Also the timing window (is there one?) and how the level shown on the ball maps to the
 level used.
 
-**Leads already known:** `Swing_ApplyPowerBoost` (in C) applies the *result*: levels 1..8 add
+**Leads already known:** `SW_fPowerBoostAdjustment` (in C) applies the *result*: levels 1..8 add
 steps 1 2 4 6 9 12 16 20, times 0.005 to 0.011 by the POWER BOOST attribute. So the *effect* of
 the levels already grows faster than linearly. The open part is the *input* side, which turns
 presses into a level.

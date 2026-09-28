@@ -37,7 +37,7 @@ void fn_800AF0A8(CamLens* pLens);
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void RC_ApplyCurrentViewport(void);
 void RC_UpdateCurrentScreenMatrices(void);
-void fn_8005C15C(int nPlayer, f32* pSpinY, f32* pSpinX);   // Swing.c: the spin asked for
+void SW_vGetCurrentSpin(int nPlayer, f32* pSpinY, f32* pSpinX);   // Swing.c: the spin asked for
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                          // identity
 void LLMath_mat44fltMultiplyList33(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
 void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);          // copy a matrix
@@ -288,7 +288,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
 
     // the model: tilted toward the spin asked for, rolling faster the more is asked
     if (gPlayers[nPlayer].swing.nSpinBoost > 0) {
-        fn_8005C15C(nPlayer, &fSpinY, &fSpinX);
+        SW_vGetCurrentSpin(nPlayer, &fSpinY, &fSpinX);
         if (fSpinY != 0.0f || fSpinX != 0.0f) {
             aDir[0] = fSpinX;
             aDir[1] = fSpinY;

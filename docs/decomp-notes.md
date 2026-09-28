@@ -1206,7 +1206,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   `STATEFUNC_GreenMorphExit` 94.8% -> 100); `GM_BumpBallForObstructions(void)` really takes
   `nPlayer` (`STATEFUNC_ShowYardageExit` 88.8% -> 100). The routine at 0x8000AE94 is
   `double fabs(double)` (it was first taken for `fabsf`): an `f32` declaration changes Swing's
-  calls (`Swing_MisHitRumble` 99.5% -> 100 with `double`). The real `fabsf` is 0x8000AD9C, which
+  calls (`SW_vAdjustVibrationFromAttribute` 99.5% -> 100 with `double`). The real `fabsf` is 0x8000AD9C, which
   calls it and rounds with `frsp`.
 - **[verified] A callee that ignores r3, called while r3 still holds the caller's first
   parameter, takes that parameter.** `fn_8010069C()` -> `(nPlayer)` (Golfer

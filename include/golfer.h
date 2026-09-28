@@ -725,8 +725,8 @@ int  fn_80100744(void);                 // shot kind override, 8 = none
 int  fn_801006F0(int nPlayer);          // club override, 26 = none
 int  Game_GetCurHoleNum(void);
 u8   fn_80101DF4(void);
-f32  Swing_SpinScale(int nSpin);         // how much spin SPIN allows: 0.15 at 0 .. 1.0 at 110 (Swing.c)
-f32  fn_8005C280(int nPlayer);          // the swing's fNonPowerShotPower (Swing.c)
+f32  SW_GetSpinScale(int nSpin);         // how much spin SPIN allows: 0.15 at 0 .. 1.0 at 110 (Swing.c)
+f32  SW_vGetNonPowerAttributeAffectedShotPower(int nPlayer);          // the swing's fNonPowerShotPower (Swing.c)
 void SW_KillVibration(int nPlayer);      // stops the pad rumble (Swing.c)
 void SW_vClearBoosts(int nPlayer);  // Swing.c
 
@@ -776,8 +776,8 @@ void Luck_TakePerfectShot(int nPlayer);
 void Caddie_ApplyTip(int nPlayer);
 int  Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode);
 u8   fn_8002E8E4(int nController);  // Golfer.c
-f32  fn_8005C1EC(int nPlayer);          // Swing.c
-f32  fn_8005C268(int nPlayer);          // Swing.c
+f32  SW_vGetHookSlice(int nPlayer);          // Swing.c
+f32  SW_vGetMishitAngle(int nPlayer);          // Swing.c
 int  fn_8005CB48(int nPlayer);          // Swing.c
 int  fn_8005CB60(int nPlayer);          // Swing.c
 u8   Player_IsHoledNotState23(int nPlayer);

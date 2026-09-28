@@ -3575,7 +3575,7 @@ void GolfCamera_ChooseSpecialSwing(View* pView, int nPlayer) {
         pView->n260 = 0;
         return;
     }
-    fPower = fn_8005C280(nPlayer);
+    fPower = SW_vGetNonPowerAttributeAffectedShotPower(nPlayer);
     bShortClub = gPlayers[nPlayer].nClub <= 8;
     if (gSession.nSplitScreen) {
         bSwingCam = 0;

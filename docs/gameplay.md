@@ -20,7 +20,7 @@ The pieces
 | `AI_ChooseTarget(i)` | `0x8002C2DC` | picks where the CPU aims |
 | `AI_ApplyError(i)` | `0x8002B59C` | perturbs the CPU's aim and distance by its attributes |
 | `AI_PlanShot(i, target)` | `0x8002BDEC` | turns a target into club / power |
-| `Swing_ApplyForgiveness(i)` | `0x8005C5EC` | shrinks a human's swing error by attribute |
+| `SW_vAdjustMishitFromAttribute(i)` | `0x8005C5EC` | shrinks a human's swing error by attribute |
 | `Swing_ComputePower(i)` | `0x8005B250` | final power for either kind of player |
 | `Rand_Next(stream)` / `Rand_Float(stream)` | `0x8000B130` / `0x8000B428` | EA's RNG (below) |
 | `gPlayers` | `0x801C66E8` | 5 x 0xEF8 player structs |
@@ -125,7 +125,7 @@ frame in the bottom 16; `Controller_GetButtonMask(action, bHeld)` picks the half
 action 0x1F = Z, not held. Corrected 2026-09-22: this paragraph used to say "held, one level per
 frame".) It is only called in phase 1, so **taps before the backswing or while holding at the
 top do not count**; all eight have to land while the club is going back. Backing the stick down
-for 1/12 s clears it. `Swing_ApplyPowerBoost` turns the level into power through the POWER BOOST
+for 1/12 s clears it. `SW_fPowerBoostAdjustment` turns the level into power through the POWER BOOST
 attribute.
 
 **At the top (2).** The animation waggles +-0.0076 either side of the top while the stick is
@@ -141,7 +141,7 @@ Then `Swing_Launch`, the mis-hit rumble on a pad, the putt sound.
 **After impact (5).** With the spin option on and the spin button held after a real shot, the
 spin amount grows by one a frame up to 20 (a third of a second for full spin) and its
 direction is the stick whenever it leaves the dead zone; the first press starts at straight
-back (255). `Swing_ApplySpin` then scales it by the SPIN attribute every frame.
+back (255). `SW_vCalculateSpinFactor` then scales it by the SPIN attribute every frame.
 
 **Replays.** At every human launch (`0x8006BF60`, read) the game draws a fresh RNG seed,
 reseeds with it and snapshots the player, profile and a block of globals into the replay
@@ -166,7 +166,7 @@ is left. A CPU or a perfect shot never gets here: `Swing_Launch` stores an error
 At launch the ball's direction is the aim plus the angle of the clubface vector (spin input)
 plus this error.
 
-Human swing: forgiveness (`Swing_ApplyForgiveness`)
+Human swing: forgiveness (`SW_vAdjustMishitFromAttribute`)
 ----------------------------------------------------
 
 Returns at once for a CPU player. For a human, the raw swing error `e` (from the stick, at
@@ -201,12 +201,12 @@ there. Result clamped to 0.05..1.5.
 
 Two more things in the same function: **a putt meter over 75% is treated as 100%**
 (`gpSwing->fPuttFullPower`), and a **driver from the tee gets up to +10% power**
-(`Swing_TeeSweetSpot`) when the *backswing's sideways angle* is between 0.4 and 0.6 of a
+(`SW_fPowerAdjustForDraw`) when the *backswing's sideways angle* is between 0.4 and 0.6 of a
 quarter turn - **36 to 54 degrees off vertical, peaking at 45** - on the side that reads
 negative. We first took the value for a tempo; it is the angle the face code below stores.
 Both are tuning values set in `Swing_Init`, not attributes.
 
-Human swing: draw and fade (`Swing_FaceVector`, `Swing_CurveAngle`, in C)
+Human swing: draw and fade (`SW_vGetClubDirection`, `SW_fCalculateSliceAmount`, in C)
 --------------------------------------------------------------------------
 
 The shot's curve comes from the same three stick samples. On a full shot the angle of the
@@ -231,14 +231,14 @@ spin are skipped - which is how a replay reproduces the shot exactly.
 Human swing: power boost, spin, rumble
 --------------------------------------
 
-- **Power boost** (`Swing_ApplyPowerBoost`): `power += scale * step[level]`, steps 1 2 4 6 9 12
+- **Power boost** (`SW_fPowerBoostAdjustment`): `power += scale * step[level]`, steps 1 2 4 6 9 12
   16 20 for levels 1..8, `scale` = table row 24 by POWER BOOST: 0.005 at 0, 0.010 at 100, 0.011
   at 110. So a full boost is +10% at POWER BOOST 0 and +20% at 100. It reads the *base* value
   (record plus equipment); the per-player modifiers do not count here.
-- **Spin** (`Swing_ApplySpin`): stick deflection (-1..1) x (amount asked for / 20) x row 26 by
+- **Spin** (`SW_vCalculateSpinFactor`): stick deflection (-1..1) x (amount asked for / 20) x row 26 by
   SPIN: 0.15 at 0, 0.6 at 100, 1.0 at 110. Linear in the attribute: SPIN 0 gives a quarter of
   SPIN 100, and 110 gives two thirds more than 100.
-- **Rumble** (`Swing_MisHitRumble`): frames = row 25 (135 at attribute 0, 35 at 100, 30 at
+- **Rumble** (`SW_vAdjustVibrationFromAttribute`): frames = row 25 (135 at attribute 0, 35 at 100, 30 at
   110) x |error|, capped at 30, then the pad rumbles. A weak golfer's mistakes shake the pad
   about four times longer than a pro's.
 
