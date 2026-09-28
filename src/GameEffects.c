@@ -13,7 +13,8 @@ u8    fn_800B4AE0(void);
 void  fn_800DBFAC(void);
 void  fn_800DC18C(void);
 void  fn_800DC290(f32 fHeight);
-int   HighScoreRecords_CheckRecord(int a, int b, int c, char* szName, int nPlayer);   // szName: a profile's name
+// szName: a profile's name
+int   HighScoreRecords_CheckRecord(int a, int b, int c, char* szName, int nPlayer);
 u8    fn_800BCD24(int nPlayer);
 
 GameEffects lbl_80202898;   // the effects state (game.h; GameManager, GoGolfCam and others read it)

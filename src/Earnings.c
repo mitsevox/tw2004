@@ -1,8 +1,11 @@
-// Earnings.c (EA's name, from the TW2003 source tree: Golf/GameMode/Earnings.c): the money and
-// goals kept in the save profiles. It loads the prize table (stream 'ERN '), rounds payouts to $25,
-// pays the tournament and match prizes, scales a payout by the bonus, course, tee, pin and TOUR
-// card multipliers, checks the goals that unlock things, and keeps the saved replays. The
-// GM_Earnings_ functions of TW06 come in the same order.
+// Earnings.c (EA's name, from the TW2003 source tree: Golf/GameMode/Earnings.c): the money,
+// awards, records and statistics kept in the save profiles. It loads the prize table (stream
+// 'ERN ', gEarningsTable), rounds payouts to $25, pays the tournament and match prizes, scales a
+// payout by the course, tee, pin set and TOUR card multipliers, checks the shot, putt and hole
+// goals that pay prizes and give awards (trophy balls, some with the shot's saved replay), offers
+// a player's results to the high-score records (TW07 moved those checks to HighScoreRecords.cpp)
+// and adds each shot, hole and round to the profile's statistics. The GM_Earnings_ functions of
+// TW06 and TW07 come in the same order.
 
 #include "golfer.h"
 #include "game.h"
@@ -16,13 +19,18 @@
 
 // .bss, reverse address order (the ones not declared here are in game/earnings.h)
 EarningsTable gEarningsTable;
+// What the end-of-shot, end-of-hole and end-of-round record checks listed (gNumRecordHits of
+// them): the record kind and the place HighScoreRecords_CheckRecord gave it (1..4).
 s32 gShotRecordKinds[10];
 s32 gPuttRecordKinds[10];
 s32 gRoundRecordKinds[10];
 s32 gShotRecordResults[10];
 s32 gPuttRecordResults[10];
 s32 gRoundRecordResults[10];
-// The working tables and their saved copies, ten entries each.
+// The working lists the shot, putt and hole goal checks fill, ten entries each: per money prize
+// (gNumPrizes) its message, its payout after the multipliers and its base before them; per award
+// (gNumAwards) its id and the money paid with it. Then the gPay copies fn_800D3244 makes of them,
+// which the payouts read.
 s32 gShotPrizeMsgs[10];
 s32 gPuttPrizeMsgs[10];
 s32 gHolePrizeMsgs[10];
@@ -50,9 +58,9 @@ s32 gPayHoleAwards[10];
 s32 gPayShotAwardMoney[10];
 s32 gPayPuttAwardMoney[10];
 s32 gPayHoleAwardMoney[10];
-CourseMoneyTracking gPayPrizeBreakdowns[10];     // the breakdown of each gPayShotPrizes payout
-s32 gUnlockedCourses[10];
-CourseMoneyTracking gPrizeBreakdowns[10];
+CourseMoneyTracking gPayPrizeBreakdowns[10];     // the breakdown of each gPay...Prizes payout
+s32 gUnlockedCourses[10];       // the courses fn_800D3A20 unlocked, for their messages
+CourseMoneyTracking gPrizeBreakdowns[10];        // the breakdown of each prize the goal checks list
 
 // .sbss, reverse address order (gNumRecordHits is in game/earnings.h)
 s32 gNumRecordHits;
@@ -61,6 +69,7 @@ s32 gNumAwards;
 s32 gPayNumPrizes;
 s32 gPayNumAwards;
 
+// Per award 0..38, its message index (Earnings_GetAwardMessageId).
 s32 gAwardMessageIds[39] = {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
     12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 0,
@@ -68,6 +77,7 @@ s32 gAwardMessageIds[39] = {
     9, 17, 2,
 };
 
+// Per finishing place 1..70, its share of a tournament's purse (GM_Earnings_TournamentPayout).
 f32 gTournamentPayoutShares[70] = {
     0.18f, 0.108f, 0.068f, 0.048f, 0.04f, 0.036f, 0.0335f, 0.031f, 0.029f, 0.027f,
     0.025f, 0.023f, 0.021f, 0.019f, 0.018f, 0.017f, 0.016f, 0.015f, 0.014f, 0.013f,
@@ -1651,9 +1661,10 @@ u8 GM_Earnings_GiveAwardToUser(int nPlayer, Award* pAward) {
     return 1;
 }
 
-// The record checks after a shot share this start: nothing in some modes and states, or for a
-// CPU player or one without a profile; the record holder's name is the profile's, or "User <n>"
-// when the front end has no profile loaded in that slot.
+// The three record checks below (TW07's HighScoreRecords::GetEndOfShotRecord, GetEndOfHoleRecord,
+// GetEndOfGameRecord) share this start: nothing in some modes and states, or for a CPU player or
+// one without a profile; the record holder's name is the profile's, or "User <n>" when the front
+// end has no profile loaded in that slot.
 
 // The end-of-shot record check: a shot on a par 4 or 5 that left class-1 ground and stayed in
 // bounds is offered to record kind 1, its length in yards, while
