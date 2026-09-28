@@ -343,7 +343,8 @@ void fn_800EEA3C(int nPlayer) {
     GM_PgaTourSim_SimTournamentWinner(nPlayer);
     if (GM_PgaTourSim_GetScoreRankFromEntrantID(nPlayer, 0) == 1) {
         fn_800EE8C4();
-        if (fn_800D7770(nPlayer, &gpSaveData[nPlayer].aC8[gpSaveData[nPlayer].tour.nEvent].award)) {
+        if (GM_Earnings_GiveAwardToUser(nPlayer,
+                                        &gpSaveData[nPlayer].aC8[gpSaveData[nPlayer].tour.nEvent].award)) {
             gpSaveData[nPlayer].aC8[gpSaveData[nPlayer].tour.nEvent].nScore = GM_PgaTourSim_GetTotalScoreFromEntrantID(nPlayer, 0, 1);
             gpSaveData[nPlayer].aC8[gpSaveData[nPlayer].tour.nEvent].n6 = p->aPrize[nBracket][1];
         }

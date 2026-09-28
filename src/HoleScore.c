@@ -231,32 +231,32 @@ u8 fn_800CF450(int nPlayer) {
     return 0;
 }
 
-// For a human player: whether Player.ballBefore passes the fn_800D782C check or, when that ball
-// is in the cup, the fn_800D7B1C putt check.
+// For a human player: whether Player.ballBefore passes the HighScoreRecords_GetEndOfShotRecord
+// check or, when that ball is in the cup, the HighScoreRecords_GetEndOfHoleRecord putt check.
 u8 fn_800CF77C(int nPlayer) {
     if (Player_IsCPU(nPlayer)) {
         return 0;
     }
-    if (fn_800D782C(nPlayer, &gPlayers[nPlayer].ballBefore, 0, 1, 1) != 0) {
+    if (HighScoreRecords_GetEndOfShotRecord(nPlayer, &gPlayers[nPlayer].ballBefore, 0, 1, 1) != 0) {
         return 1;
     }
     if (gPlayers[nPlayer].ballBefore.nLie == LIE_INCUP_e &&
-        fn_800D7B1C(nPlayer, &gPlayers[nPlayer].ballBefore, 0, 1, 1) != 0) {
+        HighScoreRecords_GetEndOfHoleRecord(nPlayer, &gPlayers[nPlayer].ballBefore, 0, 1, 1) != 0) {
         return 1;
     }
     return 0;
 }
 
-// As fn_800CF77C, with the checks fn_800D7660 and fn_800D7684.
+// As fn_800CF77C, with the checks Earnings_CheckShotAwards and Earnings_CheckPuttAwards.
 u8 fn_800CF848(int nPlayer) {
     if (Player_IsCPU(nPlayer)) {
         return 0;
     }
-    if (fn_800D7660(nPlayer, &gPlayers[nPlayer].ballBefore, 1) != 0) {
+    if (Earnings_CheckShotAwards(nPlayer, &gPlayers[nPlayer].ballBefore, 1) != 0) {
         return 1;
     }
     if (gPlayers[nPlayer].ballBefore.nLie == LIE_INCUP_e &&
-        fn_800D7684(nPlayer, &gPlayers[nPlayer].ballBefore, 1) != 0) {
+        Earnings_CheckPuttAwards(nPlayer, &gPlayers[nPlayer].ballBefore, 1) != 0) {
         return 1;
     }
     return 0;

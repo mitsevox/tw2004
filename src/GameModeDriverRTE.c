@@ -258,7 +258,7 @@ void GameModeDriverRTE_QueueWinMessages(void) {
 // GameModeDriverRTE_StartEvent), then with any medal (fn_800EC558 below 3) player 0 is paid the
 // challenge's best-medal reward (GameModeDriverRTE_GetPurse's amount, whatever the medal), the
 // money message (queue 0, 0x6F) and GameModeDriverRTE_QueueWinMessages go up, and profile 0's award
-// for the event is marked won with today's date (fn_800D7770).
+// for the event is marked won with today's date (GM_Earnings_GiveAwardToUser).
 void GameModeDriverRTE_EndGame(void) {
     s32 nReward;
     gRTEChallengeEndGame();
@@ -267,7 +267,7 @@ void GameModeDriverRTE_EndGame(void) {
         GM_Earnings_AwardMoney(0, nReward, 0);
         GUI_QueueMessage(0, 0x6F, nReward, 0);
         GameModeDriverRTE_QueueWinMessages();
-        fn_800D7770(0, &gpSaveData->aRTEAward[gRTEs.aEvent[gRTESelectedEvent].nId]);
+        GM_Earnings_GiveAwardToUser(0, &gpSaveData->aRTEAward[gRTEs.aEvent[gRTESelectedEvent].nId]);
     }
 }
 

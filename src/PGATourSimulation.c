@@ -329,18 +329,18 @@ void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst) {
         }
     }
     if (nAhead == 0) {
-        if (fn_800D7770(nPlayer, &gpSaveData[nPlayer].a200[0])) {
+        if (GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a200[0])) {
             fn_8011C054(1, 1);
         }
-        fn_800D7770(nPlayer, &gpSaveData[nPlayer].a200[1]);
-        fn_800D7770(nPlayer, &gpSaveData[nPlayer].a200[2]);
+        GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a200[1]);
+        GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a200[2]);
     } else if (nAhead <= 4) {
-        if (fn_800D7770(nPlayer, &gpSaveData[nPlayer].a200[1])) {
+        if (GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a200[1])) {
             fn_8011C054(3, 1);
         }
-        fn_800D7770(nPlayer, &gpSaveData[nPlayer].a200[2]);
+        GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a200[2]);
     } else if (nAhead <= 24) {
-        if (fn_800D7770(nPlayer, &gpSaveData[nPlayer].a200[2])) {
+        if (GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a200[2])) {
             fn_8011C054(4, 1);
         }
     }
@@ -349,15 +349,15 @@ void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst) {
     if (nNext == -1) {
         if (gpSaveData[nPlayer].tour.nSeason == 0
             && pStats->nSeasonWins > 1
-            && fn_800D7770(nPlayer, &gpSaveData[nPlayer].a1C0[12])) {
+            && GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a1C0[12])) {
             fn_8011C054(12, 2);
         }
         if (GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_PLAYER_OF_YEAR_POINTS)
-            && fn_800D7770(nPlayer, &gpSaveData[nPlayer].a1C0[13])) {
+            && GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a1C0[13])) {
             fn_8011C054(11, 1);
         }
         if (GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_SEASON_WINNINGS)
-            && fn_800D7770(nPlayer, &gpSaveData[nPlayer].a1C0[14])) {
+            && GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a1C0[14])) {
             if ((Misc_RandFunc(0) & 1) == 0) {
                 fn_8011C054(5, 1);
             } else {
@@ -366,7 +366,7 @@ void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst) {
         }
         if (pStats->nEvents >= 15
             && GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_SCORING)
-            && fn_800D7770(nPlayer, &gpSaveData[nPlayer].a1C0[15])) {
+            && GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a1C0[15])) {
             fn_8011C054(6, 2);
         }
     }
@@ -380,7 +380,9 @@ void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst) {
             }
         }
         if (i == PGA_NUM_PROS
-            && fn_800D7770(nPlayer, &gpSaveData[nPlayer].a1C0[CalDate_GetMonth(GameModeDriverPGATour_GetEndDate(
+            && GM_Earnings_GiveAwardToUser(nPlayer,
+                                           &gpSaveData[nPlayer].a1C0[CalDate_GetMonth(
+                                                   GameModeDriverPGATour_GetEndDate(
                                         gpSaveData[nPlayer].tour.nEvent)) - 1])) {
             fn_8011C054(14, 6);
         }

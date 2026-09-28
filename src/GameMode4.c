@@ -314,9 +314,9 @@ void GameMode4_WinEvent(void) {
     if (gpSaveData[nProfile].bActive) {
         nEvent = fn_801021FC();
         fn_801027A4();
-        // EA bug: the profile number goes in as the player number, so fn_800D7770 checks
+        // EA bug: the profile number goes in as the player number, so GM_Earnings_GiveAwardToUser checks
         // gPlayers[nProfile] (player 0 only while player 0 plays profile 0).
-        fn_800D7770(nProfile, &gpSaveData[nProfile].aLadderAward[nEvent]);
+        GM_Earnings_GiveAwardToUser(nProfile, &gpSaveData[nProfile].aLadderAward[nEvent]);
         if (lbl_80282448 != 34 && !fn_8005832C(nProfile, lbl_80282448)) {
             fn_80058278(nProfile, lbl_80282448);
             GUI_QueueMessage(4, lbl_80282448, 0, nProfile);

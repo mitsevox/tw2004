@@ -140,7 +140,7 @@ typedef struct SavedRound {
 // A PGA TOUR tournament won, in a save profile (8 bytes): filled in when the player finishes first
 // (GameModeDriverPGATour fn_800EEA3C).
 typedef struct TourWin {
-    Award award;                // 0x0  won, and the day (fn_800D7770)
+    Award award;                // 0x0  won, and the day (GM_Earnings_GiveAwardToUser)
     u16  nScore;                // 0x4  the player's score (GM_PgaTourSim_GetTotalScoreFromEntrantID, as SeasonEvent.nUserScore)
     u16  n6;                    // 0x6  the tournament's aPrize[bracket][1] (thousands of dollars:
                                 //      fn_8010F440 reads it unsigned)
@@ -368,7 +368,7 @@ void fn_80057ED0(SaveProfile* pProfile, const char* pName);     // PasswordManag
 f32  GM_GetGameProgress(SaveProfile* pProfile);
 
 // Earnings.c: the awards
-u8   fn_800D7770(int nPlayer, Award* pAward);   // mark an award won today; 1 if it was not won before
+u8   GM_Earnings_GiveAwardToUser(int nPlayer, Award* pAward);   // mark an award won today; 1 if it was not won before
 
 // fe_craputils.c (TW06's FE_CrAP_ utilities)
 extern char lbl_80188138[];     // "NoLogoName": a user logo's name until one is given

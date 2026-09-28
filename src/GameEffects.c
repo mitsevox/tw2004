@@ -676,8 +676,8 @@ u8 fn_800DC784(void) {
 
 // TW06: GameEffects_ScriptedGBDidIt (by position). Whether the shot earned its GameBreaker:
 // holed within the stroke limit, on the green of a par 5 in two (with uFlags bit 0x4000), or one of
-// two record checks (fn_800D7660, fn_800D782C: a drive record; without bNext and with neither, a
-// big message waiting, fn_800E5344).
+// two record checks (Earnings_CheckShotAwards, HighScoreRecords_GetEndOfShotRecord: a drive record;
+// without bNext and with neither, a big message waiting, fn_800E5344).
 u8 fn_800DC818(Ball* pBall, int nPlayer, u8 bNext) {
     u8  bEagle;
     int a;
@@ -694,8 +694,8 @@ u8 fn_800DC818(Ball* pBall, int nPlayer, u8 bNext) {
     } else {
         bEagle = 1;
     }
-    a = fn_800D7660(nPlayer, pBall, bNext);
-    b = fn_800D782C(nPlayer, pBall, 0, bNext, 1);
+    a = Earnings_CheckShotAwards(nPlayer, pBall, bNext);
+    b = HighScoreRecords_GetEndOfShotRecord(nPlayer, pBall, 0, bNext, 1);
     if (!bNext) {
         if (b == 0 && a == 0) {
             b = fn_800E5344();

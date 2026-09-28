@@ -448,7 +448,7 @@ typedef struct PlayerProfile {
 LAYOUT_ASSERT(PlayerProfile, 0x40);
 
 // A course's records (the 'rcrd' stream block, Session_OnRecordsLoaded; 0x320 bytes per course).
-// Like the all-time records (recA): 8 kinds, the top 5 of each (fn_800D8458 reads them).
+// Like the all-time records (recA): 8 kinds, the top 5 of each (HighScoreRecords_RecordExist reads them).
 // GameEffects compares kind 0's best with a player's strokes + 1, and kind 2's with three times
 // Player.fA64.
 typedef struct CourseRecord {

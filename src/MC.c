@@ -96,7 +96,8 @@ void MC_MergeRecords(SaveRecords* pRecords) {
         GM_SetCurrentCourse(i);
         for (j = 0; j < 8; j++) {
             for (k = 0; k < 5; k++) {
-                if (!fn_800D8458(j, pRecords->aCourseRecord[(u32)i].aRecord[(u32)j][k].nValue,
+                if (!HighScoreRecords_RecordExist(j,
+                                                  pRecords->aCourseRecord[(u32)i].aRecord[(u32)j][k].nValue,
                                  pRecords->aCourseRecord[(u32)i].aRecord[(u32)j][k].szName, i)) {
                     fn_800D8750(j, pRecords->aCourseRecord[(u32)i].aRecord[(u32)j][k].nValue, 1,
                                 pRecords->aCourseRecord[(u32)i].aRecord[(u32)j][k].szName, 5);
@@ -116,7 +117,8 @@ void MC_MergeRecords(SaveRecords* pRecords) {
         for (j2 = 0; j2 < 3; j2++) {
             pRow = (SaveRecords*)((RecordEntry*)pHole + (u32)j2 * 5);
             for (k2 = 0; k2 < 5; k2++, pRow = (SaveRecords*)((RecordEntry*)pRow + 1)) {
-                if (!fn_800D853C(j2, pRow->recB[0][0][0].nValue, pRow->recB[0][0][0].szName,
+                if (!HighScoreRecords_SkillZoneRecordExist(j2, pRow->recB[0][0][0].nValue,
+                                                           pRow->recB[0][0][0].szName,
                                  nHole)) {
                     fn_800D8750(j2, pRow->recB[0][0][0].nValue, 1, pRow->recB[0][0][0].szName, 5);
                 }
@@ -130,7 +132,8 @@ void MC_MergeRecords(SaveRecords* pRecords) {
         for (j3 = 0; j3 < 2; j3++) {
             pRow3 = (SaveRecords*)((RecordEntry*)pHole3 + (u32)j3 * 5);
             for (k3 = 0; k3 < 5; k3++, pRow3 = (SaveRecords*)((RecordEntry*)pRow3 + 1)) {
-                if (!fn_800D85DC(j3, pRow3->recC[0][0][0].nValue, pRow3->recC[0][0][0].szName,
+                if (!HighScoreRecords_LongDriveRecordExist(j3, pRow3->recC[0][0][0].nValue,
+                                                           pRow3->recC[0][0][0].szName,
                                  nHole3)) {
                     fn_800D8750(j3, pRow3->recC[0][0][0].nValue, 1, pRow3->recC[0][0][0].szName,
                                 5);

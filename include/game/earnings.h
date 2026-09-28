@@ -59,7 +59,7 @@ typedef struct ShotGoal {
     u8   unk23;                 // 0x23
     s32  nValue;                // 0x24  the prize (award 0x27), else what ranks goals with the same id
     u8   unk28;                 // 0x28
-    s8   nAward;                // 0x29  the award it gives (fn_800D76AC), 0x27 a money prize
+    s8   nAward;                // 0x29  the award it gives (GM_Earnings_AwardThisTrophyBallToUser), 0x27 a money prize
     s8   n2A;                   // 0x2A  kept with a money prize (lbl_80200420)
     u8   unk2B;                 // 0x2B
     u8   bEnabled;              // 0x2C
@@ -85,7 +85,7 @@ typedef struct PuttGoal {
     s8   nScore;                // 0x16  the score on the hole it takes (fn_800D4F14), 0 any
     u8   uMults;                // 0x17  the multipliers a prize takes: bit 0 course, 1 tee, 2 pin set, 3 TOUR card
     s32  nValue;                // 0x18  the prize (award 0x27), else what ranks goals with the same id
-    s8   nAward;                // 0x1C  the award it gives (fn_800D76AC), 0x27 a money prize
+    s8   nAward;                // 0x1C  the award it gives (GM_Earnings_AwardThisTrophyBallToUser), 0x27 a money prize
     s8   n1D;                   // 0x1D  kept with a money prize (lbl_802003F8)
     u8   unk1E;                 // 0x1E
     u8   bEnabled;              // 0x1F
@@ -116,7 +116,7 @@ typedef struct HoleGoal {
     u8   uMults;                // 0x1C  the multipliers a prize takes (as PuttGoal.uMults)
     u8   unk1D[3];              // 0x1D
     s32  nValue;                // 0x20  the prize (award 0x27), else what ranks goals with the same id
-    s8   nAward;                // 0x24  the award it gives (fn_800D76AC), 0x27 a money prize
+    s8   nAward;                // 0x24  the award it gives (GM_Earnings_AwardThisTrophyBallToUser), 0x27 a money prize
     s8   n25;                   // 0x25  kept with a money prize (lbl_802003D0)
     u8   unk26;                 // 0x26
     u8   bEnabled;              // 0x27
@@ -148,7 +148,7 @@ typedef struct CoursePrice {
 
 // The payout multipliers are one table of 29 (EarningsTable.aMult; GameUICommands.c's fn_80088CF0
 // indexes it across the groups). Where each group starts:
-#define EARN_MULT_COURSE 0      // 16: the course multiplier (x1..x4) per course, in fn_800D6EEC's order
+#define EARN_MULT_COURSE 0      // 16: the course multiplier (x1..x4) per course, in GM_Earnings_GetCourseModifier's order
 #define EARN_MULT_TEE    16     // 3: the tee percentage, as [2 - nTeeSet] (tee set 3 pays as 1)
 #define EARN_MULT_PINSET 19     // 4: the percentage for the hole's pin set (gpGame->nPinSet) 0..3
 #define EARN_MULT_TOUR   23     // 6: the TOUR card percentage per level 1..6 (level 0 pays as 1)
@@ -193,7 +193,7 @@ extern s32 lbl_801FFD68[10];    // the courses fn_800D3A20 unlocked, for their m
 extern s32 lbl_80200448[10];    // a working table: fn_800D439C messages the entries of kind 2 or 4
 extern s32 lbl_802004C0[10];    // with these ids
 extern s32 lbl_802004E8[10];    // the putt record ids (2)
-extern s32 lbl_80200470[10];    // the putt record results (fn_800D7B1C)
+extern s32 lbl_80200470[10];    // the putt record results (HighScoreRecords_GetEndOfHoleRecord)
 extern s32 lbl_80200498[10];    // a working table: fn_800D3DDC messages the entries of kind 2 or 4
 extern s32 lbl_80200510[10];    // with these ids
 extern s32 lbl_80282258;        // their count
@@ -208,9 +208,9 @@ s32  GM_Earnings_GetSkinsHoleValue(int nRating, int nHole);   // a skin's value
 u8   GM_Earnings_AwardTrophyBall(int nPlayer, int nAward);  // give an award if the player does not have it yet
 // Whether nValue and szName are already among the top five of a record (i the kind, k the table:
 // course k's records, recB[k], recC[k]). MC.c tests the u8 result.
-u8   fn_800D8458(int i, int nValue, const char* szName, int k);
-u8   fn_800D853C(int i, int nValue, const char* szName, int k);
-u8   fn_800D85DC(int i, int nValue, const char* szName, int k);
+u8   HighScoreRecords_RecordExist(int i, int nValue, const char* szName, int k);
+u8   HighScoreRecords_SkillZoneRecordExist(int i, int nValue, const char* szName, int k);
+u8   HighScoreRecords_LongDriveRecordExist(int i, int nValue, const char* szName, int k);
 // Offer nValue and szName to record kind nKind of the table that the game mode and
 // gpGame->nCurHoleNum pick (MC.c sets both to reach recB and recC, and passes nPlayer 5).
 // Earnings.c tests for 2 or 4, a new best.

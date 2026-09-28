@@ -101,10 +101,10 @@ int   fn_800D3A20(int nProfile, u8 bMessage);
 int   fn_800D3CF8(int nRating);
 u8    fn_800D4010(int nId);
 u8    Earnings_TestBit(u32 uMask, int nBit);
-f32   fn_800D6EEC(void);
-u8    fn_800D748C(int nPlayer);
-u8    fn_800D76AC(int nPlayer, int nAward);
-int   fn_800D7DA0(int nPlayer, int bSave, u8 bCountStroke, u8 bAll);
+f32   GM_Earnings_GetCourseModifier(void);
+u8    GM_Earnings_AwardShotBonusToUser(int nPlayer);
+u8    GM_Earnings_AwardThisTrophyBallToUser(int nPlayer, int nAward);
+int   HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke, u8 bAll);
 s32   fn_800D9E00(s32 i);
 
 // Copy the working tables and their two counts into the second set, which the payouts then read.
@@ -414,10 +414,10 @@ s32 GM_Earnings_GetSkinsHoleValue(int nRating, int nHole) {
 }
 
 // After a shot that stayed in bounds (GM_PlayerTookShot), for a human player with a profile (not in
-// game mode 10): the shot is checked (fn_800D782C, fn_800D477C) and what it earned is paid out from
-// the copies fn_800D3244 makes of the working tables, each with its message: the lbl_80200498
-// entries of kind 2 or 4, the shot's bonuses with their breakdowns, and the awards won with their
-// money (booked as bonuses, money.n8).
+// game mode 10): the shot is checked (HighScoreRecords_GetEndOfShotRecord, fn_800D477C) and what it
+// earned is paid out from the copies fn_800D3244 makes of the working tables, each with its
+// message: the lbl_80200498 entries of kind 2 or 4, the shot's bonuses with their breakdowns, and
+// the awards won with their money (booked as bonuses, money.n8).
 void fn_800D3DDC(int nPlayer) {
     int nProfile;
     int i;
@@ -429,7 +429,7 @@ void fn_800D3DDC(int nPlayer) {
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return;
     if (Player_IsCPU(nPlayer)) return;
-    fn_800D782C(nPlayer, &gPlayers[nPlayer].ball, 1, 0, 0);
+    HighScoreRecords_GetEndOfShotRecord(nPlayer, &gPlayers[nPlayer].ball, 1, 0, 0);
     for (i = 0; i < lbl_80282258; i++) {
         nKind = lbl_80200498[i];
         if (nKind == 2 || nKind == 4) {
@@ -469,9 +469,9 @@ u8 fn_800D4010(int nId) {
 }
 
 // After the ball is holed (GM_PlayerTookShot, when GM_CheckForBallInHole says so), for a human player with a
-// profile: the putt record check (fn_800D7B1C) with its messages, then two rounds of payouts from
-// the copies of the working tables as fn_800D3DDC pays them: the putt's (fn_800D4F14), then the
-// hole's (fn_800D588C; none in a playoff).
+// profile: the putt record check (HighScoreRecords_GetEndOfHoleRecord) with its messages, then two
+// rounds of payouts from the copies of the working tables as fn_800D3DDC pays them: the putt's
+// (fn_800D4F14), then the hole's (fn_800D588C; none in a playoff).
 void fn_800D4030(int nPlayer) {
     int nProfile;
     int nKind;
@@ -482,7 +482,7 @@ void fn_800D4030(int nPlayer) {
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return;
     if (Player_IsCPU(nPlayer)) return;
-    fn_800D7B1C(nPlayer, &gPlayers[nPlayer].ball, 1, 0, 0);
+    HighScoreRecords_GetEndOfHoleRecord(nPlayer, &gPlayers[nPlayer].ball, 1, 0, 0);
     for (i = 0; i < lbl_80282258; i++) {
         nKind = lbl_80200470[i];
         if (nKind == 2 || nKind == 4) {
@@ -538,7 +538,8 @@ void fn_800D4030(int nPlayer) {
 // ends), for a human player with a profile: what the hole goals earned is paid out from the copies
 // of the working tables, with its messages (as fn_800D3DDC does after a shot), and the TOUR card
 // level rises with the profile's completion score: level 2 from 7.5, 3 from 15, 4 from 30, 5 from
-// 60, 6 at 100. bRoundOver skips the round record check (fn_800D7DA0) and its messages.
+// 60, 6 at 100. bRoundOver skips the round record check (HighScoreRecords_GetEndOfGameRecord) and
+// its messages.
 void fn_800D439C(int nPlayer, u8 bRoundOver) {
     int nProfile;
     int nLevel;
@@ -553,7 +554,7 @@ void fn_800D439C(int nPlayer, u8 bRoundOver) {
     if (gpSaveData[nProfile].bActive == 0) return;
     if (Player_IsCPU(nPlayer)) return;
     if (!bRoundOver) {
-        fn_800D7DA0(nPlayer, 1, 0, 0);
+        HighScoreRecords_GetEndOfGameRecord(nPlayer, 1, 0, 0);
         for (i = 0; i < lbl_80282258; i++) {
             nKind = lbl_80200448[i];
             if (nKind == 2 || nKind == 4) {
@@ -645,7 +646,7 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
     lbl_80282250 = 0;
     if (gSession.uFlags & 0x4000) return;
     if (Player_IsCPU(nPlayer)) return;
-    if (!fn_800D748C(nPlayer)) return;
+    if (!GM_Earnings_AwardShotBonusToUser(nPlayer)) return;
     if (fn_80100294()) return;
     if (Game_GetMulliganRule() != 0) return;
 
@@ -711,7 +712,7 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
             int nSlot;  // fake match: shadows the function-level nSlot (register order; TW07 keeps
                         // one function-level index per table, this one awaits its own name)
 
-            if (!fn_800D76AC(nPlayer, lbl_80200538.aShotGoal[i].nAward)) continue;
+            if (!GM_Earnings_AwardThisTrophyBallToUser(nPlayer, lbl_80200538.aShotGoal[i].nAward)) continue;
             bReplace = 0;
             bLost = 0;
             nSlot = lbl_80282250;
@@ -806,7 +807,7 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
     lbl_80282250 = 0;
     if (gSession.uFlags & 0x4000) return;
     if (Player_IsCPU(nPlayer)) return;
-    if (!fn_800D748C(nPlayer)) return;
+    if (!GM_Earnings_AwardShotBonusToUser(nPlayer)) return;
     if (GM5_IsChallengeRunning() && !fn_801025F4()) return;
     if (Game_GetMulliganRule() != 0) return;
 
@@ -872,7 +873,7 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
         if (lbl_80200538.aPuttGoal[i].nAward != 39) {
             int nSlot;
 
-            if (!fn_800D76AC(nPlayer, lbl_80200538.aPuttGoal[i].nAward)) continue;
+            if (!GM_Earnings_AwardThisTrophyBallToUser(nPlayer, lbl_80200538.aPuttGoal[i].nAward)) continue;
             bReplace = 0;
             bLost = 0;
             nSlot = lbl_80282250;
@@ -969,7 +970,7 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
     lbl_80282254 = 0;
     lbl_80282250 = 0;
     if (gSession.uFlags & 0x4000) return;
-    if (!fn_800D748C(nPlayer)) return;
+    if (!GM_Earnings_AwardShotBonusToUser(nPlayer)) return;
     if (Game_GetMulliganRule() != 0) return;
 
     for (i = Game_CurHoleIndex() + 1; i < 18; i++) {
@@ -1050,7 +1051,7 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
         if (lbl_80200538.aHoleGoal[i].nAward != 39) {
             int nSlot;
 
-            if (!fn_800D76AC(nPlayer, lbl_80200538.aHoleGoal[i].nAward)) continue;
+            if (!GM_Earnings_AwardThisTrophyBallToUser(nPlayer, lbl_80200538.aHoleGoal[i].nAward)) continue;
             bReplace = 0;
             bLost = 0;
             nSlot = lbl_80282250;
@@ -1391,7 +1392,7 @@ s32 GM_Earnings_ComputeBonusModifiers(s32 nPoints, int nPlayer, u8 bCourse, u8 b
     if (Game_GetMulliganRule() != 0) return 0;
     fTee = 1.0f;
     fHole = fTee;
-    fCourse = fn_800D6EEC();
+    fCourse = GM_Earnings_GetCourseModifier();
     switch (gSession.nTeeSet[nPlayer]) {
     case 0:
         fTee = (f32)lbl_80200538.aMult[EARN_MULT_TEE +2] / 100.0f;
@@ -1455,9 +1456,11 @@ s32 GM_Earnings_ComputeBonusModifiers(s32 nPoints, int nPlayer, u8 bCourse, u8 b
     return nTotal;
 }
 
-// The current course's payout multiplier (1 for a course the table does not list); course 7 has
-// three, one per Game_GetCurHoleNum value.
-f32 fn_800D6EEC(void) {
+// The current course's payout multiplier from the prize table (EARN_MULT_COURSE), a whole number
+// (x1..x4); 1 for a course the table does not list. Course 7 has three, picked by
+// Game_GetCurHoleNum (0..2). GM_Earnings_ComputeBonusModifiers and a menu message (GameUICommands.c
+// fn_80088CF0) read it.
+f32 GM_Earnings_GetCourseModifier(void) {
     f32 fMult;
 
     fMult = 1.0f;
@@ -1516,9 +1519,10 @@ f32 fn_800D6EEC(void) {
     return fMult;
 }
 
-// The TOUR card level raises the payout; the extra
-// goes in the breakdown. Nothing is paid when Game_GetMulliganRule says so.
-// TW06: GM_Earnings_ComputeTOURCardModifiers (by position).
+// nReward scaled by the TOUR card percentage of the player's profile level (EARN_MULT_TOUR: levels
+// 0 and 1 take the first; no active profile pays x1), rounded to $25. With pMoney the total goes in
+// its n0 and n24 and the extra in nTourCard. 0 with mulligans on (Game_GetMulliganRule). TW06:
+// GM_Earnings_ComputeTOURCardModifiers (by position).
 int GM_Earnings_ComputeTOURCardModifiers(int nReward, int nPlayer, CourseMoneyTracking* pMoney) {
     f32 fMult;
     s32 nTotal;
@@ -1558,24 +1562,29 @@ int GM_Earnings_ComputeTOURCardModifiers(int nReward, int nPlayer, CourseMoneyTr
     return nTotal;
 }
 
-// Whether a human player's profile can earn awards.
-u8 fn_800D748C(int nPlayer) {
+// Whether the player can earn goal bonuses: a human player with an active profile, with mulligans
+// off. The shot, putt and hole goal checks (fn_800D477C, fn_800D4F14, fn_800D588C) stop without it.
+u8 GM_Earnings_AwardShotBonusToUser(int nPlayer) {
     if (Player_IsCPU(nPlayer)) return 0;
     if (Game_GetMulliganRule() != 0) return 0;
     if (gpSaveData[gPlayers[nPlayer].nIndex].bActive != 1) return 0;
     return 1;
 }
 
-// Give a player award nAward if they do not have it yet. Five awards also keep the shot's replay.
+// Give the player award nAward (a trophy ball) if they can still win it
+// (GM_Earnings_AwardThisTrophyBallToUser): it is marked won with today's date and the profile
+// flagged as changed (b70). Awards 0, 6, 9, 3 and 13 also keep the shot's replay (gReplayData, when
+// one was recorded: bF10) in the profile's aReplay slots 0..4. Returns 1 when it was given; 0 with
+// mulligans on or without an active profile.
 u8 GM_Earnings_AwardTrophyBall(int nPlayer, int nAward) {
     PlayerNumber_t nProfile;
     int nSlot;
 
     if (Game_GetMulliganRule() != 0) return 0;
-    if (fn_800D76AC(nPlayer, nAward)) {
+    if (GM_Earnings_AwardThisTrophyBallToUser(nPlayer, nAward)) {
         nProfile = gPlayers[nPlayer].nIndex;
         if (gpSaveData[nProfile].bActive != 1) return 0;
-        fn_800D7770(nPlayer, &gpSaveData[nProfile].aAward[nAward]);
+        GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nProfile].aAward[nAward]);
         gpSaveData[nProfile].b70 = 1;
         nSlot = 5;
         if (nAward == 0) {
@@ -1597,18 +1606,23 @@ u8 GM_Earnings_AwardTrophyBall(int nPlayer, int nAward) {
     return 0;
 }
 
-s32 fn_800D7660(int nPlayer, Ball* pBall, u8 b) {
+// Run the shot goal check (fn_800D477C) on pBall, bPreview passed on, and return how many awards it
+// listed (Earnings_GetNumAwards). HoleScore and GameEffects ask it whether a shot earns a trophy
+// ball.
+s32 Earnings_CheckShotAwards(int nPlayer, Ball* pBall, u8 b) {
     fn_800D477C(nPlayer, pBall, b);
     return fn_800D9954();
 }
 
-s32 fn_800D7684(int nPlayer, Ball* pBall, u8 b) {
+// The same for the putt goals (fn_800D4F14), which read the player's own ball: pBall is not used.
+s32 Earnings_CheckPuttAwards(int nPlayer, Ball* pBall, u8 b) {
     fn_800D4F14(nPlayer, b);
     return fn_800D9954();
 }
 
-// Whether a human player can still win award nAward (0..38).
-u8 fn_800D76AC(int nPlayer, int nAward) {
+// Whether the player can still win award nAward (0..38): a human player with an active profile who
+// has not won it; never with mulligans on, nor for 39 (the goal tables' mark for a money prize).
+u8 GM_Earnings_AwardThisTrophyBallToUser(int nPlayer, int nAward) {
     if (Game_GetMulliganRule() != 0) return 0;
     if (nAward == 39) return 0;
     if (Player_IsCPU(nPlayer)) return 0;
@@ -1616,8 +1630,9 @@ u8 fn_800D76AC(int nPlayer, int nAward) {
     return gpSaveData[gPlayers[nPlayer].nIndex].aAward[nAward].bWon != 1;
 }
 
-// Mark an award won, with today's date; 1 if it was not won before.
-u8 fn_800D7770(int nPlayer, Award* pAward) {
+// Mark pAward won with today's date (CalDate_GetToday). Returns 1 when it was not won before; 0,
+// with nothing changed, for a CPU player, a player without an active profile or with mulligans on.
+u8 GM_Earnings_GiveAwardToUser(int nPlayer, Award* pAward) {
     if (Game_GetMulliganRule() != 0) return 0;
     if (Player_IsCPU(nPlayer)) return 0;
     if (gpSaveData[gPlayers[nPlayer].nIndex].bActive != 1) return 0;
@@ -1631,11 +1646,16 @@ u8 fn_800D7770(int nPlayer, Award* pAward) {
 // CPU player or one without a profile; the record holder's name is the profile's, or "User <n>"
 // when the front end has no profile loaded in that slot.
 
-// Whether a shot on a par 4 or 5 from class-1 ground, in bounds, sets a record (kind 1) of its
-// distance. With bAll only a new best (fn_800D8750 gives 2 or 4) counts, else any place; a hit
-// goes into lbl_80200498/lbl_80200510. bCountStroke counts the shot on the hole while it is
-// checked. Returns how many hit.
-int fn_800D782C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll) {
+// The end-of-shot record check: a shot on a par 4 or 5 that left class-1 ground and stayed in
+// bounds is offered to record kind 1, its length in yards, while
+// HighScoreRecords_CheckRecordGameSetting(1) allows it. a (TW07: setrecord) writes a place in. With
+// bAll (TW07: firstPlaceOnly) only a new best (HighScoreRecords_CheckRecord gives 2 or 4) is
+// listed, else any place; a hit goes into lbl_80200498 (the result) and lbl_80200510 (kind 1).
+// bCountStroke (TW07: predicted) counts the shot on the hole while it checks. Returns how many were
+// listed (lbl_80282258): 0 in game modes 12, 22 and 26 and the skill-zone modes, in "Random 18",
+// with mulligans on, with gSession.uFlags 0x4000, for a CPU player or one without a profile, or for
+// a ball off the course (no pCourse).
+int HighScoreRecords_GetEndOfShotRecord(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll) {
     char szName[32];
     int nProfile;
     f32 fDist;
@@ -1687,9 +1707,12 @@ int fn_800D782C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll) {
     return lbl_80282258;
 }
 
-// The same for a putt (the putter, club 25): record kind 2, its distance in feet; a hit goes into
-// lbl_80200470/lbl_802004E8.
-int fn_800D7B1C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll) {
+// The end-of-hole record check, made when the ball drops: a putt (the putter, club 25) is offered
+// to record kind 2, its length in feet (3 x the yards from where it was struck), while
+// HighScoreRecords_CheckRecordGameSetting(2) allows it. Parameters, exclusions and result as
+// HighScoreRecords_GetEndOfShotRecord (without its par, ground and bounds tests); a hit goes into
+// lbl_80200470 and lbl_802004E8 (kind 2).
+int HighScoreRecords_GetEndOfHoleRecord(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll) {
     char szName[32];
     int nProfile;
     f32 fDist;
@@ -1731,12 +1754,16 @@ int fn_800D7B1C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll) {
     return lbl_80282258;
 }
 
-// After a hole, the round records as fn_800D782C checks the drive: mode 22's (kind 9), the
-// GM_Currently_SkillZoneMode rounds' (kind 8), or the score (0), fn_800D1170's (3) and fn_800D0FBC's (5)
-// counts,
-// the holes under par (7) and at two under or better (6) and the putts (4). bCountStroke counts
-// the hole one stroke more meanwhile; the results go to lbl_80200448/lbl_802004C0 as there.
-int fn_800D7DA0(int nPlayer, int bSave, u8 bCountStroke, u8 bAll) {
+// The end-of-round record checks (after the last hole, fn_800D439C). In game mode 22 (the
+// long-drive contest) only record kind 9 (Player.nEBC); in the skill-zone modes only kind 8
+// (Player.nDD8). Otherwise, outside "Random 18": the round's strokes (kind 0), its greens in
+// regulation (3, fn_800D1170), fairways hit (5, fn_800D0FBC), birdies or better (7), eagles or
+// better (6) and putts (4). Each kind only while HighScoreRecords_CheckRecordGameSetting allows it.
+// bSave writes a place in; with bAll only a new best (2 or 4) is listed, else any place; a hit goes
+// into lbl_80200448 (the result) and lbl_802004C0 (the kind). bCountStroke counts the hole one
+// stroke more while it checks. Returns how many were listed (lbl_80282258): 0 in game mode 12, with
+// mulligans on, with gSession.uFlags 0x4000, for a CPU player or one without a profile.
+int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke, u8 bAll) {
     char szName[32];
     int nProfile;
     int nResult;
@@ -1854,9 +1881,10 @@ int fn_800D7DA0(int nPlayer, int bSave, u8 bCountStroke, u8 bAll) {
     return lbl_80282258;
 }
 
-// Whether nValue and szName are among the top five of course k's record i. Never on a round whose
-// holes are not one course's 1..18.
-u8 fn_800D8458(int i, int nValue, const char* szName, int k) {
+// Whether nValue and szName are already among the top five of course k's record kind i
+// (MC_MergeRecords asks before merging a memory card's records in). Never for a round whose holes
+// are not one course's 1..18 (gpGame->b136).
+u8 HighScoreRecords_RecordExist(int i, int nValue, const char* szName, int k) {
     RecordEntry* pRec;
     int j;
 
@@ -1877,8 +1905,9 @@ u8 fn_800D8458(int i, int nValue, const char* szName, int k) {
     return 0;
 }
 
-// Whether nValue and szName are among the top five of recB[k][i].
-u8 fn_800D853C(int i, int nValue, const char* szName, int k) {
+// The same for the skill-zone records: type i of recB[k] (the indexes HighScoreRecords_CheckRecord
+// gives kind 8).
+u8 HighScoreRecords_SkillZoneRecordExist(int i, int nValue, const char* szName, int k) {
     RecordEntry* pRec;
     int j;
 
@@ -1891,8 +1920,9 @@ u8 fn_800D853C(int i, int nValue, const char* szName, int k) {
     return 0;
 }
 
-// The same for recC[k][i].
-u8 fn_800D85DC(int i, int nValue, const char* szName, int k) {
+// The same for the long-drive contest's records: type i of recC[k] (the indexes
+// HighScoreRecords_CheckRecord gives kind 9).
+u8 HighScoreRecords_LongDriveRecordExist(int i, int nValue, const char* szName, int k) {
     RecordEntry* pRec;
     int j;
 
@@ -1905,9 +1935,9 @@ u8 fn_800D85DC(int i, int nValue, const char* szName, int k) {
     return 0;
 }
 
-// Whether nValue equals or beats record kind nKind's nRecord: kinds 0 and 4 go low, the others
-// (1..3, 5..9) high.
-u8 fn_800D867C(int nKind, int nValue, int nRecord) {
+// Whether nValue equals or beats nRecord for record kind nKind: kinds 0 (the round's strokes) and 4
+// (its putts) go low, the others (1..3, 5..9) high; 0 for any other kind.
+u8 HighScoreRecords_IsEqualOrBetter(int nKind, int nValue, int nRecord) {
     switch (nKind) {
     case 0:
     case 4:
@@ -1925,7 +1955,9 @@ u8 fn_800D867C(int nKind, int nValue, int nRecord) {
     return 0;
 }
 
-s32 fn_800D86DC(s32 n) {
+// The skill-zone record table (recB's second index) of game mode n: 16 gives 0, 17 1, 13 2; any
+// other mode 3 (none).
+s32 HighScoreRecords_GetSkillZoneRecordType(s32 n) {
     switch (n) {
     case 16:
         return 0;
@@ -1970,12 +2002,12 @@ int fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlaye
     if (gpGame->b136) return 0;
     if (nKind < 8) {
         pLast = &gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][4];
-        if (fn_800D867C(nKind, nValue, pLast->nValue)) {
+        if (HighScoreRecords_IsEqualOrBetter(nKind, nValue, pLast->nValue)) {
             nResult = 1;
             nPos = 4;
             for (j = 3; j >= 0; j--) {
                 pRec = &gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][j];
-                if (fn_800D867C(nKind, nValue, pRec->nValue)) {
+                if (HighScoreRecords_IsEqualOrBetter(nKind, nValue, pRec->nValue)) {
                     nPos = j;
                 }
             }
@@ -1995,12 +2027,12 @@ int fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlaye
             }
         }
         pLast = &gSession.recA[nKind][4];
-        if (fn_800D867C(nKind, nValue, pLast->nValue)) {
+        if (HighScoreRecords_IsEqualOrBetter(nKind, nValue, pLast->nValue)) {
             nResult = 3;
             nPos = 4;
             for (j = 3; j >= 0; j--) {
                 pRec = &gSession.recA[nKind][j];
-                if (fn_800D867C(nKind, nValue, pRec->nValue)) {
+                if (HighScoreRecords_IsEqualOrBetter(nKind, nValue, pRec->nValue)) {
                     nPos = j;
                 }
             }
@@ -2020,15 +2052,15 @@ int fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlaye
             }
         }
     } else if (nKind == 8) {
-        n = fn_800D86DC(Game_GetMode());
+        n = HighScoreRecords_GetSkillZoneRecordType(Game_GetMode());
         if (n != 3) {
             pLast = &gSession.recB[Game_GetCurHoleNum()][n][4];
-            if (fn_800D867C(nKind, nValue, pLast->nValue)) {
+            if (HighScoreRecords_IsEqualOrBetter(nKind, nValue, pLast->nValue)) {
                 nResult = 1;
                 nPos = 4;
                 for (j = 3; j >= 0; j--) {
                     pRec = &gSession.recB[Game_GetCurHoleNum()][n][j];
-                    if (fn_800D867C(nKind, nValue, pRec->nValue)) {
+                    if (HighScoreRecords_IsEqualOrBetter(nKind, nValue, pRec->nValue)) {
                         nPos = j;
                     }
                 }
@@ -2052,12 +2084,12 @@ int fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlaye
         n = fn_800D8720(fn_80126FA0());
         if (n != 2) {
             pLast = &gSession.recC[fn_80127098(Game_GetCurHoleNum())][n][4];
-            if (fn_800D867C(nKind, nValue, pLast->nValue)) {
+            if (HighScoreRecords_IsEqualOrBetter(nKind, nValue, pLast->nValue)) {
                 nResult = 1;
                 nPos = 4;
                 for (j = 3; j >= 0; j--) {
                     pRec = &gSession.recC[fn_80127098(Game_GetCurHoleNum())][n][j];
-                    if (fn_800D867C(nKind, nValue, pRec->nValue)) {
+                    if (HighScoreRecords_IsEqualOrBetter(nKind, nValue, pRec->nValue)) {
                         nPos = j;
                     }
                 }

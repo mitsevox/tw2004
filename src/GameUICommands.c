@@ -279,7 +279,7 @@ s32   fn_800D2DA0(int nTeeSet);
 s32   fn_800D2E00(int nTeeSet);
 s32   fn_800D2E60(void);
 s32   fn_800D2EB0(void);
-f32   fn_800D6EEC(void);
+f32   GM_Earnings_GetCourseModifier(void);
 char* fn_800DAD1C(int nPlayer);
 s32   fn_800DAD30(int nPlayer);
 u8    fn_800DAD44(void);
@@ -1913,7 +1913,7 @@ void fn_80088CF0(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = gpSaveData[gPlayers[pArgs[0].i].nIndex].n6C - gPlayers[(int)pArgs[0].i].money.n24;
         return;
     case 100:
-        pResult->i = (s32)fn_800D6EEC() - 1;
+        pResult->i = (s32)GM_Earnings_GetCourseModifier() - 1;
         return;
     case 102:
         switch (gSession.nTeeSet[pArgs[0].i]) {

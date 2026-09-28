@@ -344,7 +344,7 @@ They will be sorted into the sections below.
 - **[verified] Zeroing: a variable that already held a value gets its zero by `mr` from another zeroed
   register; a variable set for the first time gets its own `li r,0`.** So when the original has two `li`s
   and ours `li; mr`, give the second zero a fresh variable (a new loop counter), and the reverse for one
-  `li; mr` (Earnings fn_800D7DA0, hwsBurn HwsBurn_BuildDesc, GameMode5 fn_800EAF7C, GameHoleContests
+  `li; mr` (Earnings HighScoreRecords_GetEndOfGameRecord, hwsBurn HwsBurn_BuildDesc, GameMode5 fn_800EAF7C, GameHoleContests
   fn_800D9F34; `a = b = 0`, types and statement order make no difference). A search written as an
   inline helper hands its index back by `mr`; the same loop written in the caller gets `li` (UISEvent
   fn_80165D2C, fn_80165D90).
