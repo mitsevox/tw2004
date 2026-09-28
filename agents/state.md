@@ -17,6 +17,8 @@ file). Pipeline: `tools/match/name.py` (all or nothing); playbook `agents/roles/
 one area each, 15-25 functions per batch, fresh agent per batch. Comments go in the same pass.
 Cleanup done before it: 18 stale remote branches deleted (gemini/round4 and 2 young pc-results left),
 matching-era records removed (in history at 6839245), docs/README.md index.
+Owner 2026-09-28: the readability plan is APPROVED; continue it. The matched-data scoring lane is ON
+HOLD (decomp.dev already shows 100%; objdiff's local "matched data" 79.95% is per-symbol scoring).
 PHASE: readability. Plan and feedback loop: agents/plan-readability.md (one complete pass per file,
 areas in order, measure with `hotnames.py --units`: named / commented / reviewed / done).
 Matching-era audit rules and tooling retired 2026-09-27 (tag audit-baseline-1 kept as history).
