@@ -319,7 +319,7 @@ typedef struct GameEffects {
 } GameEffects;
 LAYOUT_ASSERT(GameEffects, 0x58);
 
-extern GameEffects lbl_80202898;        // 0x80202898
+extern GameEffects gGameEffects;        // 0x80202898
 
 int  GameEffects_IsScriptedGameBreaker(int nPlayer);          // the putt about to be played is a big one (GameEffects.c)
 u8   GameEffects_ScriptedGBDidIt(Ball* pBall, int nPlayer, u8 bNext);

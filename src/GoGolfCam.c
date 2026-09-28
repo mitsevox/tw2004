@@ -4047,7 +4047,7 @@ f32 fn_800C741C(Character* pChar, u64 uEvent) {
 // A predicted game breaker is on.
 u8 fn_800C7450(void) {
     int bOn = 0;
-    if (lbl_80202898.bGameBreaker && lbl_80202898.nGBType == 1) {
+    if (gGameEffects.bGameBreaker && gGameEffects.nGBType == 1) {
         bOn = 1;
     }
     return bOn;

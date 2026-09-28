@@ -52,8 +52,8 @@ void fn_8012409C(void);                 // gbacable.c
 void fn_801240A8(void);                 // gbacable.c
 s32  fn_801255C4(s32* pPos);            // EASportsBio.c
 u8   PasswordManager_TestPassword(char* szCode);  // PasswordManager.c
-void GameMode22_SetNumDrives(s32 n);                // GameMode22.c: sets lbl_80195498.n4
-void GameMode22_SetVariant(s32 n);                // GameMode22.c: sets lbl_80195498.n0
+void GameMode22_SetNumDrives(s32 n);                // GameMode22.c: sets gGameMode22.n4
+void GameMode22_SetVariant(s32 n);                // GameMode22.c: sets gGameMode22.n0
 void GM_SetupCustomHoleSelection(void); // GameManager.c
 int  GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile);  // GameManager.c
 void PlayNow_SelectGroup(int nId);              // GameMode5.c

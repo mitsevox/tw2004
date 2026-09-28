@@ -1911,7 +1911,7 @@ u8 fn_8003DC78(CamShot* pShot) {
 u8 fn_8003DCAC(void) {
     int bResult = 0;
 
-    if (lbl_80202898.bGameBreaker && (lbl_80202898.nGBType != 0 || lbl_80202898.b19 == 1)) {
+    if (gGameEffects.bGameBreaker && (gGameEffects.nGBType != 0 || gGameEffects.b19 == 1)) {
         bResult = 1;
     }
     return bResult;

@@ -2911,40 +2911,40 @@ void fn_80045470(CamLens* pLens, f32 fFov) {
 // The quarter-speed slow motion (GameEffects.b11) on or off, with its sound events (0x35 on,
 // 0x36 off); every second of its frames moves the ball.
 void fn_80045494(u8 bOn, int nPlayer) {
-    lbl_80202898.n2C = 2;
+    gGameEffects.n2C = 2;
     if (bOn) {
-        if (!lbl_80202898.b11) {
+        if (!gGameEffects.b11) {
             EVENT_Trigger(nPlayer, 0x35, gPlayers[nPlayer].vBall, -1);
-            lbl_80202898.b11 = bOn;
-            lbl_80202898.n28 = 0;
+            gGameEffects.b11 = bOn;
+            gGameEffects.n28 = 0;
         }
-    } else if (lbl_80202898.b11) {
+    } else if (gGameEffects.b11) {
         EVENT_Trigger(nPlayer, 0x36, gPlayers[nPlayer].vBall, -1);
-        lbl_80202898.b11 = bOn;
+        gGameEffects.b11 = bOn;
     }
 }
 
 // The half-speed slow motion (GameEffects.b10) on or off, with its sound events (0x37 on, 0x38 off).
 void fn_80045558(u8 bOn, int nPlayer) {
     if (bOn) {
-        if (!lbl_80202898.b10) {
+        if (!gGameEffects.b10) {
             EVENT_Trigger(nPlayer, 0x37, gPlayers[nPlayer].vBall, -1);
-            lbl_80202898.b10 = bOn;
+            gGameEffects.b10 = bOn;
         }
-    } else if (lbl_80202898.b10) {
+    } else if (gGameEffects.b10) {
         EVENT_Trigger(nPlayer, 0x38, gPlayers[nPlayer].vBall, -1);
-        lbl_80202898.b10 = bOn;
+        gGameEffects.b10 = bOn;
     }
 }
 
 // ---- sweep code (not yet cleaned up) ----
 
 u8 fn_8004560C(void) {
-    return lbl_80202898.bGameBreaker;
+    return gGameEffects.bGameBreaker;
 }
 
 u8 fn_8004561C(void) {
-    return lbl_80202898.b10;
+    return gGameEffects.b10;
 }
 
 u8 fn_8004562C(CamShot* pShot) {

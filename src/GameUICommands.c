@@ -2279,7 +2279,7 @@ void fn_80089C20(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].f < 0.0f) {
         pArgs[0].f = 1.0f;
     }
-    lbl_80202898.f54 = pArgs[0].f;
+    gGameEffects.f54 = pArgs[0].f;
 }
 
 void fn_80089C4C(MsgArg* pArgs, MsgArg* pResult) {

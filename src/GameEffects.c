@@ -17,21 +17,21 @@ void  GameEffects_DrawLetterBoxes(f32 fHeight);
 int   HighScoreRecords_CheckRecord(int a, int b, int c, char* szName, int nPlayer);
 u8    fn_800BCD24(int nPlayer);
 
-GameEffects lbl_80202898;   // the effects state (game.h; GameManager, GoGolfCam and others read it)
+GameEffects gGameEffects;   // the effects state (game.h; GameManager, GoGolfCam and others read it)
 
 // Starts a scripted GameBreaker for player nWho, for reason nWhy (a bit in uFlags).
 #define GB_START(nWho, nWhy)                                                                \
-    if (!lbl_80202898.bGameBreaker || lbl_80202898.bClosing || lbl_80202898.nGBType != 0) { \
-        lbl_80202898.bClosing = 0;                                                          \
-        lbl_80202898.bGameBreaker = 1;                                                      \
-        lbl_80202898.fGBTime = 0.0f;                                                        \
-        lbl_80202898.f24 = 0.0f;                                                            \
-        lbl_80202898.b19 = 0;                                                               \
-        lbl_80202898.nGBType = 0;                                                           \
-        lbl_80202898.nPlayer = (nWho);                                                      \
-        lbl_80202898.bPaused = 0;                                                           \
-        lbl_80202898.uFlags = 1 << (nWhy);                                                  \
-        lbl_80202898.nHeartbeats = 0;                                                       \
+    if (!gGameEffects.bGameBreaker || gGameEffects.bClosing || gGameEffects.nGBType != 0) { \
+        gGameEffects.bClosing = 0;                                                          \
+        gGameEffects.bGameBreaker = 1;                                                      \
+        gGameEffects.fGBTime = 0.0f;                                                        \
+        gGameEffects.f24 = 0.0f;                                                            \
+        gGameEffects.b19 = 0;                                                               \
+        gGameEffects.nGBType = 0;                                                           \
+        gGameEffects.nPlayer = (nWho);                                                      \
+        gGameEffects.bPaused = 0;                                                           \
+        gGameEffects.uFlags = 1 << (nWhy);                                                  \
+        gGameEffects.nHeartbeats = 0;                                                       \
         EVENT_Trigger((nWho), 0x3D, 0, -1);                                                 \
     }
 
@@ -39,17 +39,17 @@ GameEffects lbl_80202898;   // the effects state (game.h; GameManager, GoGolfCam
 // the timed double speed (b9) off, the half-time frame count n28 cleared, no GameBreaker, not
 // paused, no rumble or heartbeats, and f54 (a menu command sets it, GameUICommands.c) back to 1.
 void GameEffects_InitGameEffectSettings(void) {
-    lbl_80202898.b10 = 0;
-    lbl_80202898.b11 = 0;
-    lbl_80202898.bSlowMo = 0;
-    lbl_80202898.b9 = 0;
-    lbl_80202898.n28 = 0;
-    lbl_80202898.bGameBreaker = 0;
-    lbl_80202898.b19 = 0;
-    lbl_80202898.bPaused = 0;
-    lbl_80202898.bRumble = 0;
-    lbl_80202898.nHeartbeats = 0;
-    lbl_80202898.f54 = 1.0f;
+    gGameEffects.b10 = 0;
+    gGameEffects.b11 = 0;
+    gGameEffects.bSlowMo = 0;
+    gGameEffects.b9 = 0;
+    gGameEffects.n28 = 0;
+    gGameEffects.bGameBreaker = 0;
+    gGameEffects.b19 = 0;
+    gGameEffects.bPaused = 0;
+    gGameEffects.bRumble = 0;
+    gGameEffects.nHeartbeats = 0;
+    gGameEffects.f54 = 1.0f;
 }
 
 // Every effect off (at each hole's start and restart, the scorecards, and the swing and shot
@@ -60,20 +60,20 @@ void GameEffects_InitGameEffectSettings(void) {
 void GameEffects_ResetGameEffectSettings(void) {
     int i;
     GameEffects_ResetGameEffectTimeSettings();
-    lbl_80202898.bPaused = 0;
-    lbl_80202898.bRumble = 0;
-    if (lbl_80202898.bGameBreaker) {
-        if (lbl_80202898.nGBType == 0) {
-            EVENT_Trigger(lbl_80202898.nPlayer, 0x3E, 0, -1);
+    gGameEffects.bPaused = 0;
+    gGameEffects.bRumble = 0;
+    if (gGameEffects.bGameBreaker) {
+        if (gGameEffects.nGBType == 0) {
+            EVENT_Trigger(gGameEffects.nPlayer, 0x3E, 0, -1);
         } else {
-            EVENT_Trigger(lbl_80202898.nPlayer, 0x40, 0, -1);
+            EVENT_Trigger(gGameEffects.nPlayer, 0x40, 0, -1);
         }
         GameEffects_SendMessage50();
     }
-    lbl_80202898.bGameBreaker = 0;
-    lbl_80202898.bSpinWindowDone = 0;
-    lbl_80202898.b19 = 0;
-    lbl_80202898.b4A = 0;
+    gGameEffects.bGameBreaker = 0;
+    gGameEffects.bSpinWindowDone = 0;
+    gGameEffects.b19 = 0;
+    gGameEffects.b4A = 0;
     for (i = 0; i < gSession.nNumPlayers; i++) {
         if (fn_8002E898_IsPad(gSession.nController[i])) {
             Input_vStopVibration(gSession.nController[i]);
@@ -85,12 +85,12 @@ void GameEffects_ResetGameEffectSettings(void) {
 // the half-time frame count n28. Returns the effects state (its callers,
 // GameEffects_ResetGameEffectSettings and STATEFUNC_ReplaySwingInit, ignore it).
 GameEffects* GameEffects_ResetGameEffectTimeSettings(void) {
-    lbl_80202898.b10 = 0;
-    lbl_80202898.b11 = 0;
-    lbl_80202898.bSlowMo = 0;
-    lbl_80202898.b9 = 0;
-    lbl_80202898.n28 = 0;
-    return &lbl_80202898;
+    gGameEffects.b10 = 0;
+    gGameEffects.b11 = 0;
+    gGameEffects.bSlowMo = 0;
+    gGameEffects.b9 = 0;
+    gGameEffects.n28 = 0;
+    return &gGameEffects;
 }
 
 // The game's time step for a frame that took fFrameTime seconds (the main loop asks once a frame,
@@ -134,23 +134,23 @@ f32 GameEffects_AdjustTimeRate(f32 fFrameTime) {
         if (!fn_800B4AE0()) {
             fTicks *= 0.75f;
         }
-    } else if (lbl_80202898.b9) {
+    } else if (gGameEffects.b9) {
         fTicks *= 2.0f;
-        lbl_80202898.fC -= fFrameTime;
-        if (lbl_80202898.fC < 0.0f) {
-            lbl_80202898.b9 = 0;
+        gGameEffects.fC -= fFrameTime;
+        if (gGameEffects.fC < 0.0f) {
+            gGameEffects.b9 = 0;
         }
     } else {
-        if (lbl_80202898.b10) {
+        if (gGameEffects.b10) {
             fTicks *= 2.0f;
         }
-        if (lbl_80202898.b11) {
+        if (gGameEffects.b11) {
             fTicks *= 0.5f;
-            lbl_80202898.n28++;
+            gGameEffects.n28++;
         }
     }
-    if (lbl_80202898.bSlowMo) {
-        return FRAME_TIME * fTicks * lbl_80202898.fSlowMo;
+    if (gGameEffects.bSlowMo) {
+        return FRAME_TIME * fTicks * gGameEffects.fSlowMo;
     }
     return FRAME_TIME * fTicks;
 }
@@ -202,7 +202,7 @@ void GameEffects_ScriptedGameBreakerTrigger(int nPlayer, int nReason) {
         gSession.nSplitScreen || gSession.a8[0] || !gpGame->b285) {
         return;
     }
-    if (lbl_80202898.bGameBreaker != 1 && !Player_IsCPU(nPlayer)) {
+    if (gGameEffects.bGameBreaker != 1 && !Player_IsCPU(nPlayer)) {
         if (nReason == 12) {
             if (GM_GetPlayerRoundStrokes(nPlayer) + 1
                 >= gSession.aCourseRecord[Game_GetCourse()].aRecord[0][0].nValue) {
@@ -234,7 +234,7 @@ void GameEffects_TargetGameBreakerTrigger(int nPlayer) {
         default:
             return;
         }
-        if (lbl_80202898.bGameBreaker != 1) {
+        if (gGameEffects.bGameBreaker != 1) {
             if (Game_GetMode() == 14) {
                 if (fn_800F354C(nPlayer) == 4) {
                     bStart = 1;
@@ -279,9 +279,9 @@ void GameEffects_ScriptedGameBreakerBallHitTrigger(int nPlayer) {
     int nLie;
     f32 fDist;
     View* pView;
-    if ((!(gSession.uFlags & 0x4000) || !(gSession.uFlags & 0x8000)) && lbl_80202898.bGameBreaker) {
+    if ((!(gSession.uFlags & 0x4000) || !(gSession.uFlags & 0x8000)) && gGameEffects.bGameBreaker) {
         if (Game_GetCourse() == 7) {
-            lbl_80202898.b19 = 1;
+            gGameEffects.b19 = 1;
             return;
         }
         nLie = gPlayers[nPlayer].ball.nLie;
@@ -292,9 +292,9 @@ void GameEffects_ScriptedGameBreakerBallHitTrigger(int nPlayer) {
         fn_80045558(0, nPlayer);
         pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
         pView->p74 = fn_8003BDBC(nPlayer, nLie, 3, 0xC, 1, fDist);
-        lbl_80202898.b19 = 1;
-        if (lbl_80202898.f24 > 0.8f) {
-            lbl_80202898.f24 = 0.8f;
+        gGameEffects.b19 = 1;
+        if (gGameEffects.f24 > 0.8f) {
+            gGameEffects.f24 = 0.8f;
         }
     }
 }
@@ -373,7 +373,7 @@ void GameEffects_InFlightGameBreakerTrigger(int nPlayer) {
         gSession.nSplitScreen || gSession.a8[0] || !gpGame->b285) {
         return;
     }
-    if (!(gPlayers[nPlayer].uFlags & 8) && !Player_IsCPU(nPlayer) && lbl_80202898.bGameBreaker != 1) {
+    if (!(gPlayers[nPlayer].uFlags & 8) && !Player_IsCPU(nPlayer) && gGameEffects.bGameBreaker != 1) {
         GameEffects_Vec3Sub(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].ballBefore.vPos, v);
         v[1] = 0.0f;
         fDist = Math_Sqrt(Vec3_LengthSqClamped(v));
@@ -398,14 +398,14 @@ void GameEffects_InFlightGameBreakerTrigger(int nPlayer) {
             } else {
                 nClass = 10;
             }
-            lbl_80202898.bClosing = 0;
-            lbl_80202898.bGameBreaker = 1;
-            lbl_80202898.fGBTime = 0.0f;
-            lbl_80202898.f24 = 0.0f;
-            lbl_80202898.nGBType = 1;
-            lbl_80202898.nPlayer = nPlayer;
-            lbl_80202898.bPaused = 0;
-            lbl_80202898.nHeartbeats = 0;
+            gGameEffects.bClosing = 0;
+            gGameEffects.bGameBreaker = 1;
+            gGameEffects.fGBTime = 0.0f;
+            gGameEffects.f24 = 0.0f;
+            gGameEffects.nGBType = 1;
+            gGameEffects.nPlayer = nPlayer;
+            gGameEffects.bPaused = 0;
+            gGameEffects.nHeartbeats = 0;
             fn_80045494(0, nPlayer);
             fn_80045558(0, nPlayer);
             pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
@@ -438,36 +438,36 @@ void GameEffects_InFlightGameBreakerTrigger(int nPlayer) {
 // crowd reaction n4F (b4E cleared); u48's slot is freed either way. nPlayer is not read: the
 // GameBreaker's own player is used.
 void GameEffects_EndGameBreaker(int nPlayer) {
-    if (lbl_80202898.bGameBreaker) {
-        lbl_80202898.bClosing = 1;
-        if (lbl_80202898.fGBTime > 0.8f) {
-            lbl_80202898.fGBTime = 0.8f;
+    if (gGameEffects.bGameBreaker) {
+        gGameEffects.bClosing = 1;
+        if (gGameEffects.fGBTime > 0.8f) {
+            gGameEffects.fGBTime = 0.8f;
         }
-        switch (lbl_80202898.nGBType) {
+        switch (gGameEffects.nGBType) {
         case 1:
-            EVENT_Trigger(lbl_80202898.nPlayer, 0x40, 0, -1);
-            if (lbl_80202898.b4A) {
-                fn_800BD83C(lbl_80202898.u4C, 0);
-                lbl_80202898.b4A = 0;
+            EVENT_Trigger(gGameEffects.nPlayer, 0x40, 0, -1);
+            if (gGameEffects.b4A) {
+                fn_800BD83C(gGameEffects.u4C, 0);
+                gGameEffects.b4A = 0;
             }
             Gaud_InitCrowdReactionSound(3, 1);
             return;
         case 0:
-            EVENT_Trigger(lbl_80202898.nPlayer, 0x3E, 0, -1);
-            if (GameEffects_ScriptedGBDidIt(&gPlayers[lbl_80202898.nPlayer].ball, lbl_80202898.nPlayer, 0)) {
-                if (lbl_80202898.b4A) {
-                    fn_800BD83C(lbl_80202898.u4C, 0);
-                    lbl_80202898.b4A = 0;
+            EVENT_Trigger(gGameEffects.nPlayer, 0x3E, 0, -1);
+            if (GameEffects_ScriptedGBDidIt(&gPlayers[gGameEffects.nPlayer].ball, gGameEffects.nPlayer, 0)) {
+                if (gGameEffects.b4A) {
+                    fn_800BD83C(gGameEffects.u4C, 0);
+                    gGameEffects.b4A = 0;
                 }
                 Gaud_InitCrowdReactionSound(3, 1);
             } else {
-                if (lbl_80202898.b47) {
-                    fn_800BD83C(lbl_80202898.u48, 0);
+                if (gGameEffects.b47) {
+                    fn_800BD83C(gGameEffects.u48, 0);
                 }
-                Gaud_InitCrowdReactionSound(lbl_80202898.n4F, 1);
-                lbl_80202898.b4E = 0;
+                Gaud_InitCrowdReactionSound(gGameEffects.n4F, 1);
+                gGameEffects.b4E = 0;
             }
-            lbl_80202898.b47 = 0;
+            gGameEffects.b47 = 0;
             break;
         }
     }
@@ -477,8 +477,8 @@ void GameEffects_EndGameBreaker(int nPlayer) {
 // GameBreaker is paused: its letterbox and timing, by its type (GameEffects_RenderPredictedGB or
 // GameEffects_RenderScriptedGB).
 void GameEffects_RenderGameBreakerEffects(void) {
-    if (lbl_80202898.bGameBreaker && gSession.nPaused == 0 && !lbl_80202898.bPaused) {
-        switch (lbl_80202898.nGBType) {
+    if (gGameEffects.bGameBreaker && gSession.nPaused == 0 && !gGameEffects.bPaused) {
+        switch (gGameEffects.nGBType) {
         case 1:
             GameEffects_RenderPredictedGB();
             return;
@@ -498,23 +498,23 @@ void GameEffects_RenderPredictedGB(void) {
     f32 fDist;
     f32 v[3];
     GameEffects* pGE;
-    if (lbl_80202898.fGBTime < 0.8f) {
-        fHeight = 0.15f * (lbl_80202898.fGBTime / 0.8f);
+    if (gGameEffects.fGBTime < 0.8f) {
+        fHeight = 0.15f * (gGameEffects.fGBTime / 0.8f);
     } else {
         fHeight = 0.15f;
     }
-    pGE = &lbl_80202898;       // fake match: steers the register choice (found by the permuter)
+    pGE = &gGameEffects;       // fake match: steers the register choice (found by the permuter)
     GameEffects_Vec3Sub(gPlayers[pGE->nPlayer].ball.vPos, gPlayers[pGE->nPlayer].ballBefore.vPos, v);
     v[1] = 0.0f;
     fDist = Math_Sqrt(Vec3_LengthSqClamped(v));
-    if (!Player_IsCPU(lbl_80202898.nPlayer)) {
-        if (gPlayers[lbl_80202898.nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
-            if (fDist < 2.0f && !lbl_80202898.bClosing) {
-                fn_80045494(1, lbl_80202898.nPlayer);
+    if (!Player_IsCPU(gGameEffects.nPlayer)) {
+        if (gPlayers[gGameEffects.nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
+            if (fDist < 2.0f && !gGameEffects.bClosing) {
+                fn_80045494(1, gGameEffects.nPlayer);
             } else {
                 fn_80045494(0, pGE->nPlayer);
             }
-        } else if (fDist < 4.0f && !lbl_80202898.bClosing) {
+        } else if (fDist < 4.0f && !gGameEffects.bClosing) {
             fn_80045494(1, pGE->nPlayer);
         } else {
             fn_80045494(0, pGE->nPlayer);
@@ -523,14 +523,14 @@ void GameEffects_RenderPredictedGB(void) {
         fn_80045494(0, pGE->nPlayer);
     }
     GameEffects_DrawLetterBoxes(fHeight);
-    if (lbl_80202898.bClosing) {
-        lbl_80202898.fGBTime -= gSession.fFrameTime;
-        if (lbl_80202898.fGBTime < 0.0f) {
-            lbl_80202898.bGameBreaker = 0;
+    if (gGameEffects.bClosing) {
+        gGameEffects.fGBTime -= gSession.fFrameTime;
+        if (gGameEffects.fGBTime < 0.0f) {
+            gGameEffects.bGameBreaker = 0;
             fn_80045494(0, pGE->nPlayer);
         }
     } else {
-        lbl_80202898.fGBTime += gSession.fFrameTime;
+        gGameEffects.fGBTime += gSession.fFrameTime;
     }
 }
 
@@ -540,25 +540,25 @@ void GameEffects_RenderPredictedGB(void) {
 // the GameBreaker is over.
 void GameEffects_RenderScriptedGB(void) {
     f32 fHeight;
-    if (lbl_80202898.b19) {
-        lbl_80202898.f24 -= gSession.fFrameTime;
+    if (gGameEffects.b19) {
+        gGameEffects.f24 -= gSession.fFrameTime;
     } else {
-        lbl_80202898.f24 += gSession.fFrameTime;
+        gGameEffects.f24 += gSession.fFrameTime;
     }
-    if (lbl_80202898.b19) {
-        if (lbl_80202898.fGBTime < 0.8f) {
-            fHeight = 0.15f * (lbl_80202898.fGBTime / 0.8f);
+    if (gGameEffects.b19) {
+        if (gGameEffects.fGBTime < 0.8f) {
+            fHeight = 0.15f * (gGameEffects.fGBTime / 0.8f);
         } else {
             fHeight = 0.15f;
         }
         GameEffects_DrawLetterBoxes(fHeight);
-        if (lbl_80202898.bClosing) {
-            lbl_80202898.fGBTime -= gSession.fFrameTime;
-            if (lbl_80202898.fGBTime < 0.0f) {
-                lbl_80202898.bGameBreaker = 0;
+        if (gGameEffects.bClosing) {
+            gGameEffects.fGBTime -= gSession.fFrameTime;
+            if (gGameEffects.fGBTime < 0.0f) {
+                gGameEffects.bGameBreaker = 0;
             }
         } else {
-            lbl_80202898.fGBTime += gSession.fFrameTime;
+            gGameEffects.fGBTime += gSession.fFrameTime;
         }
     }
 }
@@ -595,24 +595,24 @@ void GameEffects_DrawLetterBoxes(f32 fHeight) {
 // 0.349 radians (20 degrees) over the letterbox's first 0.8 s, for either type; 0 when none is up
 // or the game or the GameBreaker is paused.
 f32 GameEffects_FieldOfViewChange(void) {
-    if (!lbl_80202898.bGameBreaker) {
+    if (!gGameEffects.bGameBreaker) {
         return 0.0f;
     }
     if (gSession.nPaused != 0) {
         return 0.0f;
     }
-    if (lbl_80202898.bPaused) {
+    if (gGameEffects.bPaused) {
         return 0.0f;
     }
-    if (lbl_80202898.nGBType == 1) {
-        if (lbl_80202898.fGBTime < 0.8f) {
-            return 0.34906587f * (lbl_80202898.fGBTime / 0.8f);
+    if (gGameEffects.nGBType == 1) {
+        if (gGameEffects.fGBTime < 0.8f) {
+            return 0.34906587f * (gGameEffects.fGBTime / 0.8f);
         }
         return 0.34906587f;
     }
-    if (lbl_80202898.nGBType == 0) {
-        if (lbl_80202898.fGBTime < 0.8f) {
-            return 0.34906587f * (lbl_80202898.fGBTime / 0.8f);
+    if (gGameEffects.nGBType == 0) {
+        if (gGameEffects.fGBTime < 0.8f) {
+            return 0.34906587f * (gGameEffects.fGBTime / 0.8f);
         }
         return 0.34906587f;
     }
@@ -631,7 +631,7 @@ u8 GameEffects_SimulateBall(int nPlayer) {
     if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
         return 1;
     }
-    return lbl_80202898.bSpinWindowDone;
+    return gGameEffects.bSpinWindowDone;
 }
 
 // The spin window is over (event.c, fn_80066BE8): the look-ahead ball restarts as a copy of the
@@ -643,13 +643,13 @@ void GameEffects_SpinWindowDone(int nPlayer) {
         Mem_cpy(&p->ballBefore, &p->ball, sizeof(Ball));
         p->ballBefore.nPlayer = -1;
     }
-    lbl_80202898.bSpinWindowDone = 1;
+    gGameEffects.bSpinWindowDone = 1;
 }
 
 // Whether super slow motion is on (the swing camera asks, GolfCamera_ProcessSwingCamera); nPlayer
 // is not read.
 u8 GameEffects_IsSlowDownSwingOn(int nPlayer) {
-    return lbl_80202898.bSlowMo;
+    return gGameEffects.bSlowMo;
 }
 
 // Super slow motion on at rate fRate (GameEffects_AdjustTimeRate multiplies the time step by it:
@@ -658,22 +658,22 @@ u8 GameEffects_IsSlowDownSwingOn(int nPlayer) {
 // had. The heartbeat and shutter cameras and the swing replay use it.
 void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate) {
     if (bOn) {
-        if (!lbl_80202898.bSlowMo) {
+        if (!gGameEffects.bSlowMo) {
             if (fRate < 1.0f) {
                 EVENT_Trigger(nPlayer, 0x35, gPlayers[nPlayer].vBall, -1);
             } else {
                 EVENT_Trigger(nPlayer, 0x37, gPlayers[nPlayer].vBall, -1);
             }
-            lbl_80202898.bSlowMo = bOn;
+            gGameEffects.bSlowMo = bOn;
         }
-        lbl_80202898.fSlowMo = fRate;
-        lbl_80202898.b11 = 0;
-        lbl_80202898.b10 = 0;
+        gGameEffects.fSlowMo = fRate;
+        gGameEffects.b11 = 0;
+        gGameEffects.b10 = 0;
         return;
     }
-    if (lbl_80202898.bSlowMo) {
-        lbl_80202898.bSlowMo = bOn;
-        if (lbl_80202898.fSlowMo < 1.0f) {
+    if (gGameEffects.bSlowMo) {
+        gGameEffects.bSlowMo = bOn;
+        if (gGameEffects.fSlowMo < 1.0f) {
             EVENT_Trigger(nPlayer, 0x36, gPlayers[nPlayer].vBall, -1);
             return;
         }
@@ -685,9 +685,9 @@ void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate) {
 // the player's pad).
 void GameEffects_UpdateGameEffects(int nPlayer) {
     int nController = gPlayers[nPlayer].nController;
-    if (lbl_80202898.bRumble) {
-        if (++lbl_80202898.nRumbleFrames == 5) {
-            lbl_80202898.bRumble = 0;
+    if (gGameEffects.bRumble) {
+        if (++gGameEffects.nRumbleFrames == 5) {
+            gGameEffects.bRumble = 0;
             if (fn_8002E898_IsPad(nController)) {
                 Input_vVibrateWave(nController, 0);
             }
@@ -700,15 +700,15 @@ void GameEffects_UpdateGameEffects(int nPlayer) {
 // most 40 beats; a new GameBreaker starts the count again.
 void GameEffects_VibrateControllerForHeartbeat(int nPlayer) {
     int nController;
-    if (lbl_80202898.nHeartbeats < 40) {
-        lbl_80202898.nHeartbeats++;
+    if (gGameEffects.nHeartbeats < 40) {
+        gGameEffects.nHeartbeats++;
         nController = gPlayers[nPlayer].nController;
-        if (!lbl_80202898.bRumble) {
+        if (!gGameEffects.bRumble) {
             if (fn_8002E898_IsPad(nController)) {
                 Input_vVibrateWave(nController, 0xFF);
             }
-            lbl_80202898.bRumble = 1;
-            lbl_80202898.nRumbleFrames = 0;
+            gGameEffects.bRumble = 1;
+            gGameEffects.nRumbleFrames = 0;
         }
     }
 }
@@ -717,16 +717,16 @@ void GameEffects_VibrateControllerForHeartbeat(int nPlayer) {
 // one is up; a scripted one once its letterbox is fully open (0.8 s), and while it closes only if
 // the shot did it (GameEffects_ScriptedGBDidIt).
 u8 GameEffects_SkipOtherCommentary(void) {
-    if (!lbl_80202898.bGameBreaker) {
+    if (!gGameEffects.bGameBreaker) {
         return 0;
     }
-    if (lbl_80202898.nGBType == 1) {
+    if (gGameEffects.nGBType == 1) {
         return 1;
     }
-    if (lbl_80202898.bClosing) {
-        return GameEffects_ScriptedGBDidIt(&gPlayers[lbl_80202898.nPlayer].ball, lbl_80202898.nPlayer, 0);
+    if (gGameEffects.bClosing) {
+        return GameEffects_ScriptedGBDidIt(&gPlayers[gGameEffects.nPlayer].ball, gGameEffects.nPlayer, 0);
     }
-    return lbl_80202898.fGBTime >= 0.8f;
+    return gGameEffects.fGBTime >= 0.8f;
 }
 
 // Whether the shot earned its scripted GameBreaker, for pBall where it ended (bNext 0) or where it
@@ -740,7 +740,7 @@ u8 GameEffects_ScriptedGBDidIt(Ball* pBall, int nPlayer, u8 bNext) {
     int a;
     int b;
     int nStrokes;
-    if (pBall->nLie != LIE_GREEN_e || !(lbl_80202898.uFlags & 0x4000)) {
+    if (pBall->nLie != LIE_GREEN_e || !(gGameEffects.uFlags & 0x4000)) {
         bEagle = 0;
     } else if (Course_GetCurHolePar() != 5) {
         bEagle = 0;
@@ -771,22 +771,22 @@ u8 GameEffects_ScriptedGBDidIt(Ball* pBall, int nPlayer, u8 bNext) {
 // bPaused toggles, with the end event as it pauses (0x3E scripted, 0x40 predicted) and the start
 // event as it resumes (0x3D, 0x3F). The argument is not read (TW07's is bool pauseOn).
 void GameEffects_Pause(int a) {
-    if (lbl_80202898.bGameBreaker) {
-        if (lbl_80202898.bPaused) {
-            lbl_80202898.bPaused = 0;
-            if (lbl_80202898.nGBType == 0) {
-                EVENT_Trigger(lbl_80202898.nPlayer, 0x3D, 0, -1);
+    if (gGameEffects.bGameBreaker) {
+        if (gGameEffects.bPaused) {
+            gGameEffects.bPaused = 0;
+            if (gGameEffects.nGBType == 0) {
+                EVENT_Trigger(gGameEffects.nPlayer, 0x3D, 0, -1);
                 return;
             }
-            EVENT_Trigger(lbl_80202898.nPlayer, 0x3F, 0, -1);
+            EVENT_Trigger(gGameEffects.nPlayer, 0x3F, 0, -1);
             return;
         }
-        lbl_80202898.bPaused = 1;
-        if (lbl_80202898.nGBType == 0) {
-            EVENT_Trigger(lbl_80202898.nPlayer, 0x3E, 0, -1);
+        gGameEffects.bPaused = 1;
+        if (gGameEffects.nGBType == 0) {
+            EVENT_Trigger(gGameEffects.nPlayer, 0x3E, 0, -1);
             return;
         }
-        EVENT_Trigger(lbl_80202898.nPlayer, 0x40, 0, -1);
+        EVENT_Trigger(gGameEffects.nPlayer, 0x40, 0, -1);
     }
 }
 
@@ -794,9 +794,9 @@ void GameEffects_Pause(int a) {
 // over its first 0.8 s (and shrinking as it closes). The boost meter rises with it
 // (UI_Obj_RenderBoostUI).
 f32 GameEffects_GetLetterboxHeight(void) {
-    if (lbl_80202898.bGameBreaker) {
-        if (lbl_80202898.fGBTime < 0.8f) {
-            return 0.15f * (lbl_80202898.fGBTime / 0.8f);
+    if (gGameEffects.bGameBreaker) {
+        if (gGameEffects.fGBTime < 0.8f) {
+            return 0.15f * (gGameEffects.fGBTime / 0.8f);
         }
         return 0.15f;
     }

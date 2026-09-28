@@ -163,7 +163,7 @@ u8 fn_800BD3F8(SitDevAction* pAction, int nSit, int nPlayer, u8 nEvent) {
             if (nSit == 22 && gPlayers[nPlayer].ball.nLie != 0) return 1;
         }
     }
-    if (lbl_80202898.bGameBreaker && (nEvent == 20 || nEvent == 31) && nSit != 2) return 1;
+    if (gGameEffects.bGameBreaker && (nEvent == 20 || nEvent == 31) && nSit != 2) return 1;
     if (pAction->nKind != 1 && pAction->nKind != 2) return 0;
     if (gSession.bReplay || (u32)(nMode - 6) <= 2 || GM_Currently_SkillZoneMode()) return 1;
     if (!PlayNow_IsChallengeRunning() && nMode != 11) return 0;
@@ -241,23 +241,23 @@ void fn_800BD74C(void) {
 // Hand GameEffects a commentary line to play later (u48; GameEffects_EndGameBreaker plays it as the
 // GameBreaker ends), unless one is waiting already; not in mode 11.
 void fn_800BD77C(int nSound) {
-    if (Game_GetMode() != 11 && !lbl_80202898.b47) {
-        lbl_80202898.u48 = nSound;
-        lbl_80202898.b47 = 1;
+    if (Game_GetMode() != 11 && !gGameEffects.b47) {
+        gGameEffects.u48 = nSound;
+        gGameEffects.b47 = 1;
     }
 }
 
 // Hand GameEffects a music to play later (n4F; GameEffects_EndGameBreaker plays it as the GameBreaker ends).
 void fn_800BD7D0(u8 nMusic) {
-    lbl_80202898.b4E = 1;
-    lbl_80202898.n4F = nMusic;
+    gGameEffects.b4E = 1;
+    gGameEffects.n4F = nMusic;
 }
 
 // The same as fn_800BD77C with GameEffects' second slot (u4C).
 void fn_800BD7E8(u16 uSound) {
-    if (Game_GetMode() != 11 && !lbl_80202898.b4A) {
-        lbl_80202898.u4C = uSound;
-        lbl_80202898.b4A = 1;
+    if (Game_GetMode() != 11 && !gGameEffects.b4A) {
+        gGameEffects.u4C = uSound;
+        gGameEffects.b4A = 1;
     }
 }
 

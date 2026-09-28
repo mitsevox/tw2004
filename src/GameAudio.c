@@ -1022,8 +1022,8 @@ void Gaud_UpdtSwing(u8 nPlayer) {
         } else {
             Aud_EmiSetTrackStep(nId, 0, 1, 1);
         }
-        if (lbl_80202898.bSlowMo) {
-            pView->fC = gSession.fFrameTime / lbl_80202898.fSlowMo;
+        if (gGameEffects.bSlowMo) {
+            pView->fC = gSession.fFrameTime / gGameEffects.fSlowMo;
         } else {
             pView->fC = gSession.fFrameTime;
         }

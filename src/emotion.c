@@ -639,5 +639,5 @@ void fn_8006BE80(f32* pA, f32* pB, f32* pOut) {
 
 // A scripted GameBreaker is on screen.
 u8 fn_8006BEA4(void) {
-    return lbl_80202898.bGameBreaker && lbl_80202898.nGBType == 0;
+    return gGameEffects.bGameBreaker && gGameEffects.nGBType == 0;
 }

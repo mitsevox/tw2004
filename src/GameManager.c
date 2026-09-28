@@ -89,16 +89,16 @@ u8 GM_IsPuttForLead(int nPlayer) {
 // Whether the ball moves on this frame of the half-time slow motion: yes on every n2C-th frame of
 // it (the count n28), and on every frame when n2C is 0. GameEffects_BallUpdatesThisFrame asks it.
 u8 GameEffects_StartOfSlowMoFrame(void) {
-    if (lbl_80202898.n2C == 0) {
+    if (gGameEffects.n2C == 0) {
         return 1;
     }
-    return (lbl_80202898.n28 % lbl_80202898.n2C) == 0;
+    return (gGameEffects.n28 % gGameEffects.n2C) == 0;
 }
 
 // Whether half-time slow motion is on (GameEffects.b11: the time step is halved and the slow frames
 // are counted). Nothing in this build turns it on.
 u8 GameEffects_IsHalfTimeOn(void) {
-    return lbl_80202898.b11;
+    return gGameEffects.b11;
 }
 
 // Three floats: pOut gets pA minus pB. GameEffects' own copy of the helper (GameRound.c has

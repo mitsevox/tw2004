@@ -6,7 +6,7 @@
 #include "game_types.h"
 #include "platform.h"
 
-// Game mode 22's state (lbl_80195498, 0x1C bytes in .data).
+// Game mode 22's state (gGameMode22, 0x1C bytes in .data).
 typedef struct GameMode22State {
     s32 n0;                     // 0x0  GameMode22_GetVariant returns it
     s32 n4;                     // 0x4  set by GameMode22_SetNumDrives
@@ -19,16 +19,16 @@ typedef struct GameMode22State {
 } GameMode22State;
 LAYOUT_ASSERT(GameMode22State, 0x1C);
 
-extern GameMode22State lbl_80195498;
-extern s32 lbl_802819A0;        // frames to the next shot-length check (GameMode22_UpdateFrame), from 15
-extern s32 lbl_80282580;        // set: GameMode22_UpdateFrame shows the mode's messages once
-extern s32 lbl_80282584;        // the shot length at the last check
-extern s32 lbl_80282588;        // the track GameMode22_UpdateFrame starts is playing
-extern u8 lbl_8028258C[5];     // } per player, cleared by the mode's setup (GameMode22_Init)
-extern u8 lbl_80282594[5];     // }
-extern u8 lbl_8028259C[5];     // }
-extern char* lbl_8019543C[4];  // the trophies' titles ("Rookie of the Year", "Player of the Year", ...)
+extern GameMode22State gGameMode22;
+extern s32 gGameMode22LengthCheckFrames;        // frames to the next shot-length check (GameMode22_UpdateFrame), from 15
+extern s32 gGameMode22ShowIntro;        // set: GameMode22_UpdateFrame shows the mode's messages once
+extern s32 gGameMode22LastLength;        // the shot length at the last check
+extern s32 gGameMode22LengthSoundOn;        // the track GameMode22_UpdateFrame starts is playing
+extern u8 gGameMode22Reached400[5];     // } per player, cleared by the mode's setup (GameMode22_Init)
+extern u8 gGameMode22Reached800[5];     // }
+extern u8 gGameMode22Reached1200[5];     // }
+extern char* gTourTrophyTitles[4];  // the trophies' titles ("Rookie of the Year", "Player of the Year", ...)
 // The text GameMode22_ShowDrivesLeft prints (starts as "D"; 0xE zero bytes follow it, so likely 16 bytes).
-extern char lbl_80195488[];
+extern char gGameMode22DrivesLeftText[];
 
 #endif

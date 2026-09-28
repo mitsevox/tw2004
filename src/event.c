@@ -772,7 +772,7 @@ int fn_80067560(void) {
     int i;
 
     for (i = 0; i < 24; i++) {
-        if (lbl_80202898.uFlags & (1 << i)) {
+        if (gGameEffects.uFlags & (1 << i)) {
             return i;
         }
     }

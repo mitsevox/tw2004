@@ -44,7 +44,7 @@ u8   GameMode22_IsShowingWinner(void);
 void GameMode22_ShowDrivesLeft(int nPlayer);
 s32 GameMode22_GetHoleRecordIndex(s32 arg0);
 
-char* lbl_8019543C[4] = {
+char* gTourTrophyTitles[4] = {
     "Rookie of the Year",
     "Player of the Year",
     "PGA Tour\xAE Money Leader",
@@ -60,7 +60,7 @@ void TrophyRoom_GetTourTrophy(MsgArg* pArgs, MsgArg* pResult) {
     char* szDate = ((MsgString*)pArgs[2].p)->pStr;
 
     pResult->i = FE_GetCurrentProfile()->a1C0[nTrophy + 12].bWon;
-    strcpy(szName, lbl_8019543C[nTrophy]);
+    strcpy(szName, gTourTrophyTitles[nTrophy]);
     if (pResult->i) {
         CalDate_ToString(FE_GetCurrentProfile()->a1C0[nTrophy + 12].nDate, szDate);
         return;
@@ -77,7 +77,7 @@ void TrophyRoom_GetTourTrophyText(MsgArg* pArgs, MsgArg* pResult) {
 
     switch (nColumn) {
     case 0:
-        strcpy(szOut, lbl_8019543C[nTrophy]);
+        strcpy(szOut, gTourTrophyTitles[nTrophy]);
         break;
     case 1:
         strcpy(szOut, "some year");
@@ -199,17 +199,17 @@ void TrophyRoom_GetAwardEarnedText(MsgArg* pArgs, MsgArg* pResult) {
     szOut[0] = '\0';
 }
 
-char lbl_80195488[16] = "D";
-GameMode22State lbl_80195498 = {0, 5, 5, 0, {0, 0, 0}, 0.0f, 5, 120};
-s32 lbl_802819A0 = 15;
+char gGameMode22DrivesLeftText[16] = "D";
+GameMode22State gGameMode22 = {0, 5, 5, 0, {0, 0, 0}, 0.0f, 5, 120};
+s32 gGameMode22LengthCheckFrames = 15;
 
 // Defined here, last address first (CodeWarrior lays out .bss in reverse).
-u8 lbl_8028259C[5];
-u8 lbl_80282594[5];
-u8 lbl_8028258C[5];
-s32 lbl_80282588;
-s32 lbl_80282584;
-s32 lbl_80282580;
+u8 gGameMode22Reached1200[5];
+u8 gGameMode22Reached800[5];
+u8 gGameMode22Reached400[5];
+s32 gGameMode22LengthSoundOn;
+s32 gGameMode22LastLength;
+s32 gGameMode22ShowIntro;
 
 // Game mode 22's setup (GM_SetModeType): its callbacks; no gimmes, mulligans, stroke limit,
 // GameBreakers (b285), yardage or bumped obstructions; split screen as chosen (lbl_8028227C); the
@@ -260,11 +260,11 @@ void GameMode22_Init(void) {
     gpGame->n4 = 0;
     gSession.nSplitScreen = lbl_8028227C;
     for (i = 0; i < 5; i++) {
-        lbl_8028259C[i] = 0;
-        lbl_80282594[i] = 0;
-        lbl_8028258C[i] = 0;
+        gGameMode22Reached1200[i] = 0;
+        gGameMode22Reached800[i] = 0;
+        gGameMode22Reached400[i] = 0;
     }
-    lbl_80282580 = 1;
+    gGameMode22ShowIntro = 1;
 }
 
 // The mode's pfnShutdown: empty.
@@ -287,11 +287,11 @@ void GameMode22_StartEvent(void) {
         gSession.nTeeSet[i++] = 0;
     }
     gSession.options.n20 = 0;
-    lbl_80195498.n8 = 5;
-    lbl_80195498.bC = 0;
-    lbl_80195498.f10 = 0.0f;
-    lbl_80195498.n14 = 5;
-    lbl_80195498.n18 = 120;
+    gGameMode22.n8 = 5;
+    gGameMode22.bC = 0;
+    gGameMode22.f10 = 0.0f;
+    gGameMode22.n14 = 5;
+    gGameMode22.n18 = 120;
 }
 
 // The mode's pfnSetupNextGolfer: stroke play's (GameModeStroke_SetupNextGolfer).
@@ -315,8 +315,8 @@ void GameMode22_EndGame(void) {
 void GameMode22_UpdateFrame(void) {
     s32 nLength;
 
-    if (lbl_80282580 != 0) {
-        switch (lbl_80195498.n0) {
+    if (gGameMode22ShowIntro != 0) {
+        switch (gGameMode22.n0) {
         case 0:
             fn_800E5D40(1);
             break;
@@ -325,27 +325,27 @@ void GameMode22_UpdateFrame(void) {
             break;
         }
         GameMode22_ShowDrivesLeft(lbl_80282278);
-        lbl_80282580 = 0;
+        gGameMode22ShowIntro = 0;
     }
-    if (lbl_802819A0-- <= 0) {
+    if (gGameMode22LengthCheckFrames-- <= 0) {
         nLength = fn_800D0550(lbl_80282278);
         GameMsg_Send2Ints(0x4D, 0, nLength);
-        if (nLength != 0 && nLength != lbl_80282584) {
-            if (lbl_80282588 == 0) {
+        if (nLength != 0 && nLength != gGameMode22LastLength) {
+            if (gGameMode22LengthSoundOn == 0) {
                 // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
                 ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 1, 0, 1, 0);
-                lbl_80282588 = 1;
+                gGameMode22LengthSoundOn = 1;
             }
-        } else if (lbl_80282588 != 0) {
+        } else if (gGameMode22LengthSoundOn != 0) {
             // port: EA passes an argument Gaud_LongDriveUi_Stop ignores
             ((void (*)(s32, int, int))Gaud_LongDriveUi_Stop)(0, 1, 0);
-            lbl_80282588 = 0;
+            gGameMode22LengthSoundOn = 0;
         }
-        lbl_80282584 = nLength;
-        lbl_802819A0 = 15;
+        gGameMode22LastLength = nLength;
+        gGameMode22LengthCheckFrames = 15;
     }
-    if (lbl_80195498.n8 != 5) {
-        lbl_80195498.n18--;
+    if (gGameMode22.n8 != 5) {
+        gGameMode22.n18--;
     }
 }
 
@@ -395,7 +395,7 @@ s32 GameMode22_GetHonors(int nPlayer) {
 u8 GameMode22_HoleFinished(int nPlayer, int n) {
     s32 bRet = 0;
 
-    if (GameMode22_GameFinished(n) && lbl_80195498.n18 < 0) {
+    if (GameMode22_GameFinished(n) && gGameMode22.n18 < 0) {
         bRet = 1;
     }
     return bRet;
@@ -437,7 +437,7 @@ void GameMode22_DecideWinner(void) {
     s32 nBest = -0x7FFFFFFF - 1;
     u8 bTie = 0;
 
-    nMin = lbl_80195498.n4;
+    nMin = gGameMode22.n4;
     nFirst = gPlayers[0].nEA0;
     n = gSession.nNumPlayers;
     for (i = 0; i < n; i++) {
@@ -467,12 +467,12 @@ void GameMode22_DecideWinner(void) {
     // port: reads pPlayer uninitialised when there are no players (the value is discarded);
     //       truncates the pointer to 32 bits; a port leaves this line out.
     nWinner = (s32)((u64)(s64)nWinner | ((u64)(u32)pPlayer << 32));
-    lbl_80195498.n8 = nWinner;
-    lbl_80195498.bC = 1;
+    gGameMode22.n8 = nWinner;
+    gGameMode22.bC = 1;
     if (bTie) {
-        lbl_80195498.n8 = 5;
-        lbl_80195498.bC = 0;
-        if (lbl_80195498.n0 == 1) {
+        gGameMode22.n8 = 5;
+        gGameMode22.bC = 0;
+        if (gGameMode22.n0 == 1) {
             for (i = 0; i < n; i++) {
                 PLAYER(i)->nEBC = 0;
             }
@@ -630,9 +630,9 @@ void GameMode22_ScoreShot(int nPlayer) {
 
     // A scoring shot longer than the longest so far (f10, by n14) is the new longest.
     if (nPoints > 0) {
-        if (nLength > lbl_80195498.f10) {
-            if (lbl_80195498.f10 != 0.0f) {
-                if (nPlayer != lbl_80195498.n14 && lbl_80195498.n14 != 5) {
+        if (nLength > gGameMode22.f10) {
+            if (gGameMode22.f10 != 0.0f) {
+                if (nPlayer != gGameMode22.n14 && gGameMode22.n14 != 5) {
                     GameMsg_Send2Ints(0x4C, nLength, nPlayer);
                     ADD_MSG(0xB);
                     if (nPlayer == 0) {
@@ -652,8 +652,8 @@ void GameMode22_ScoreShot(int nPlayer) {
                 }
                 ADD_MSG(0xC);
             }
-            lbl_80195498.n14 = nPlayer;
-            lbl_80195498.f10 = nLength;
+            gGameMode22.n14 = nPlayer;
+            gGameMode22.f10 = nLength;
         } else if (nLength > 400) {
             ADD_MSG(0x22);
         }
@@ -666,7 +666,7 @@ void GameMode22_ScoreShot(int nPlayer) {
     }
 
     // With n0 1 a shot only scores what it adds to the player's best.
-    if (lbl_80195498.n0 == 1) {
+    if (gGameMode22.n0 == 1) {
         nPoints = 0;
         if (bCounts && pPlayer->nEBC < nLength) {
             nPoints = nLength - pPlayer->nEBC;
@@ -680,20 +680,20 @@ void GameMode22_ScoreShot(int nPlayer) {
     fn_800E5CA4(0, gPlayers[nPlayer].nEBC, nLength, nKind, 0, 0, nPoints, 0.0f);
 
     // A track the first time the score reaches 1200, 800 and 400.
-    if (!lbl_8028259C[nPlayer] && gPlayers[nPlayer].nEBC >= 1200) {
+    if (!gGameMode22Reached1200[nPlayer] && gPlayers[nPlayer].nEBC >= 1200) {
         // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
         ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 0, 2, 0, 0);
-        lbl_8028259C[nPlayer] = 1;
+        gGameMode22Reached1200[nPlayer] = 1;
     }
-    if (!lbl_80282594[nPlayer] && gPlayers[nPlayer].nEBC >= 800) {
+    if (!gGameMode22Reached800[nPlayer] && gPlayers[nPlayer].nEBC >= 800) {
         // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
         ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 0, 3, 0, 0);
-        lbl_80282594[nPlayer] = 1;
+        gGameMode22Reached800[nPlayer] = 1;
     }
-    if (!lbl_8028258C[nPlayer] && gPlayers[nPlayer].nEBC >= 400) {
+    if (!gGameMode22Reached400[nPlayer] && gPlayers[nPlayer].nEBC >= 400) {
         // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
         ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 0, 4, 0, 0);
-        lbl_8028258C[nPlayer] = 1;
+        gGameMode22Reached400[nPlayer] = 1;
     }
 
     // The player's longest counted shot, and where the ball lay.
@@ -708,23 +708,23 @@ void GameMode22_ScoreShot(int nPlayer) {
     }
 
     GameMode22_DecideWinner();
-    if (lbl_80195498.n8 != 5) {
+    if (gGameMode22.n8 != 5) {
         nMsgs = 0;
         if (nPlayer > 1) {
-            if (nPlayer == lbl_80195498.n8) {
+            if (nPlayer == gGameMode22.n8) {
                 fn_8010D428(2, 0);
             } else {
                 fn_8010D428(1, 0);
             }
-        } else if (lbl_80195498.n8 == 0) {
+        } else if (gGameMode22.n8 == 0) {
             fn_8010D428(3, 0);
-        } else if (lbl_80195498.n8 == 1) {
+        } else if (gGameMode22.n8 == 1) {
             fn_8010D428(4, 0);
         } else {
             fn_8010D428(1, 0);
         }
     }
-    if (nMsgs > 0 && lbl_80195498.n8 == 5) {
+    if (nMsgs > 0 && gGameMode22.n8 == 5) {
         fn_8010D428(aMsgs[Misc_RandFunc(1) % nMsgs], 0);
     }
 }
@@ -737,8 +737,8 @@ void GameMode22_HoleStart(void) {
 // The hole restarts (pfn224): every player's contest values cleared, and no winner (n8 5, bC 0).
 void GameMode22_RestartHole(void) {
     GameMode22_ClearPlayerStats();
-    lbl_80195498.n8 = 5;
-    lbl_80195498.bC = 0;
+    gGameMode22.n8 = 5;
+    gGameMode22.bC = 0;
 }
 
 // Every player's contest values cleared: drives, fair drives, longest drive, score (nEBC), average,
@@ -777,27 +777,27 @@ void GameMode22_PreSwing(void) {
 // How many drives each player gets (n4), from the menu (FE_MessageTable.c fn_80084AA8: 5, 10 or
 // 15).
 void GameMode22_SetNumDrives(s32 p0) {
-    lbl_80195498.n4 = p0;
+    gGameMode22.n4 = p0;
 }
 
 // The contest's variant (n0), from the menu (FE_MessageTable.c fn_80084AA8): 0 every drive's points
 // add up, 1 only the best fair drive counts.
 void GameMode22_SetVariant(s32 n) {
-    lbl_80195498.n0 = n;
+    gGameMode22.n0 = n;
 }
 
 // The contest's variant (n0): 0 the drives' points add up, 1 the best drive. The long-drive records
 // are kept per variant (Earnings.c, GameUICommands.c).
 s32 GameMode22_GetVariant(void) {
-    return lbl_80195498.n0;
+    return gGameMode22.n0;
 }
 
 // Whether a winner is decided (bC); the winner (n8, 5 none) into *pn8 when pn8 is not NULL.
 u8 GameMode22_GetWinner(s32* pn8) {
     if (pn8 != NULL) {
-        *pn8 = lbl_80195498.n8;
+        *pn8 = gGameMode22.n8;
     }
-    return lbl_80195498.bC;
+    return gGameMode22.bC;
 }
 
 // Whether game mode 22 is being played (GUI_IsPostShotUIAnimating asks).
@@ -810,7 +810,7 @@ s32 GameMode22_IsActive(void) {
 // Whether a winner is decided and the 120-frame winner countdown (n18) is still running; the
 // post-shot UI keeps animating meanwhile (GUI_IsPostShotUIAnimating).
 u8 GameMode22_IsShowingWinner(void) {
-    if (lbl_80195498.n8 != 5 && lbl_80195498.n18 > 0) {
+    if (gGameMode22.n8 != 5 && gGameMode22.n18 > 0) {
         return 1;
     }
     return 0;
@@ -819,8 +819,8 @@ u8 GameMode22_IsShowingWinner(void) {
 // The current player's drives left (n4 less his nEA0), as text in message 90 (fn_800E5D68). nPlayer
 // is not read: every caller passes one.
 void GameMode22_ShowDrivesLeft(int nPlayer) {
-    sprintf(lbl_80195488, "%d", lbl_80195498.n4 - gPlayers[lbl_80282278].nEA0);
-    fn_800E5D68(lbl_80195488);
+    sprintf(gGameMode22DrivesLeftText, "%d", gGameMode22.n4 - gPlayers[lbl_80282278].nEA0);
+    fn_800E5D68(gGameMode22DrivesLeftText);
 }
 
 // The long-drive record slot (Session.recC's first index) of hole number nHole: holes 6, 7, 5, 3
