@@ -1,17 +1,20 @@
-// GameModeBattle.c (TW06's GameModeBattle): game mode 25, two-player match play where the winner of
-// a hole takes a club from the loser's bag. Three clubs can never be taken; a player left with one
-// club that can be taken loses as soon as the other wins a hole.
+// GameModeBattle.c (TW06's and TW07's GameModeBattle): game mode 25, two-player match play for
+// clubs. The winner of a hole may take a club out of the other's bag, or put back one of their own
+// they have lost (GameModeBattle_CanAddClub); the bags are restored when the mode shuts down. The
+// 5-iron, the sand wedge and the putter can never be taken; a player left with one club or fewer
+// that can be taken loses as soon as the other wins a hole.
 
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
 #include "game/save.h"
 
-u32 gBattleStartBagMask[5];                        // the bags at the start of the round
-s32 gBattleStartClubCount[5];                        // how many clubs each bag had then
-s32 gBattleClubLostThisHole[5] = {26, 26, 26, 26, 26}; // per player: the club taken from them this hole (26 = none)
-s32 gBattleHoleWinner = 5;                    // the winner of the last hole (5 = nobody)
-u8  gBattleShowClubAddRemove;                    // a club is to be taken
+u32 gBattleStartBagMask[5];             // per player: the bag (golfer.uBagMask) at the round's start
+s32 gBattleStartClubCount[5];           // per player: how many clubs that bag held
+s32 gBattleClubLostThisHole[5] = {26, 26, 26, 26, 26}; // per player: the club taken after the
+                                                       // last hole (26 = none)
+s32 gBattleHoleWinner = 5;              // the player who won the last hole (5 = nobody)
+u8  gBattleShowClubAddRemove;           // the end of the hole offers the winner a club
 
 void GameModeBattle_Shutdown(void);
 void GameModeBattle_StartGamePostData(void);

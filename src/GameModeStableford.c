@@ -1,14 +1,16 @@
 // GameModeStableford.c (TW06's GameModeStableford): game mode 18, modified Stableford. Each hole
-// scores points by strokes against par from gStablefordPointTable (albatross 8, eagle 5, birdie 2, par 0,
-// bogey -1, double bogey or worse -3; the points go in nModePoints). A player who can no longer
-// beat double bogey is done with the hole.
+// scores points by strokes against par from gStablefordPointTable (albatross or better 8, eagle 5,
+// birdie 2, par 0, bogey -1, double bogey or worse -3; the points go in nModePoints). A player who
+// can no longer beat double bogey is done with the hole and is scored a double bogey. The prize
+// code is stroke play's (see GameModeStableford_EndGame).
 
 #include "golfer.h"
 #include "game.h"
 #include "game/save.h"
 #include "game/earnings.h"
 
-// The points for 3 under par .. 2 or more over. TW06: GameModeStableford::stablefordPointTable.
+// The points for 3 or more under par .. 2 or more over (GameModeStableford_EndHole clamps).
+// TW06: GameModeStableford::stablefordPointTable.
 s8  gStablefordPointTable[6] = {8, 5, 2, 0, -1, -3};
 
 u8   GameModeStableford_PlayerDoneHole(int nPlayer);

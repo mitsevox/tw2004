@@ -1,6 +1,10 @@
-// CalendarScreen.c (our name): the front end's career calendar screen. Its callbacks, registered
-// in the front end's message table, fill the month grid and the day-details panel through the
-// career calendar's driver tables (GameModeDriver.c, CareerCalendar CalendarState).
+// CalendarScreen.c (our name): the front end's career calendar screen. Its message handlers,
+// registered in the front end's message table (FE_MessageTable.c), fill the month grid, the lines
+// around it and the day-details popup, move between months and play the selected day, each through
+// the current career driver's entry in the calendar tables (gCalendar*, indexed by
+// CalendarState.nDriver: GameModeDriver.c, which is EA's FE_Calendar.c in TW07). Its last messages
+// are not the calendar's: a square root (FE_Sqrt), whether the "SHERWOOD TARGET" code was entered,
+// and GameMode5's Play Now calendar flag.
 
 #include "engine.h"
 #include "game.h"
@@ -16,16 +20,16 @@ u8 PasswordManager_IsPasswordEntered(int n);                  // PasswordManager
 void Calendar_FillCell(MsgArg* pArgs, MsgArg* pResult) {
     char* szDay = ((MsgString*)pArgs[1].p)->pStr;
     char* szText = ((MsgString*)pArgs[2].p)->pStr;
-    s32* pCell = (s32*)pArgs[3].p;
-    s32* pLook = (s32*)pArgs[4].p;
-    s32* pButton = (s32*)pArgs[5].p;
+    s32* pIcon = (s32*)pArgs[3].p;
+    s32* pCellColor = (s32*)pArgs[4].p;
+    s32* pCellState = (s32*)pArgs[5].p;
     u16 nDate = GetDateFromCellIndex(pArgs[0].i);
 
     sprintf(szDay, "%d", CalDate_GetDay(nDate));
-    *pLook = 0;
-    *pCell = gCalendarFillCell[CalendarState.nDriver](szText, nDate, pLook, pButton);
+    *pCellColor = 0;
+    *pIcon = gCalendarFillCell[CalendarState.nDriver](szText, nDate, pCellColor, pCellState);
     if (CalendarState.nMonth != CalDate_GetMonth(nDate)) {
-        *pLook = 1;
+        *pCellColor = 1;
     }
 }
 

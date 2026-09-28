@@ -1,7 +1,11 @@
-// FE_PGATourMessages.c (EA's name, from its asserts): the PGA TOUR mode's menu message handlers:
-// the tournament leaderboard, the season schedule, the season wrap-up, the lock entries
-// (SaveProfile.a1054C) and the player's wins. The file starts at PGALeaderboard_FormatRow; the slider
-// blending before it is CharSliders.c's.
+// FE_PGATourMessages.c (EA's name, from its asserts): the PGA TOUR mode's front-end message
+// handlers (registered in FE_MessageTable.c): the tournament leaderboard, the season schedule, the
+// season wrap-up, starting the next season (PGADriver_ShowCalendar_AdvanceSeason, TW07's name), the
+// sponsorships (the profile's 11 sponsorship slots, SaveProfile.a1054C: a sponsor signed as the
+// profile progresses, paying its start cash once and its bonus cash for every worn item of its
+// brand), the trophy room's tournament wins and Player of the Month awards, and the details of a
+// tournament won. The file starts at PGALeaderboard_FormatRow; the slider blending before it is
+// CharSliders.c's.
 
 #include "golfer.h"
 #include "game.h"
@@ -15,8 +19,9 @@
 
 
 // .sbss is laid out last-defined-first, so these are in reverse address order.
-s32 gPgaScheduleCount;                       // how many tournaments gPgaScheduleEvents holds
-s32* gPgaScheduleEvents;                      // the tournaments on the schedule (PGASchedule_Build)
+s32 gPgaScheduleCount;                  // how many tournaments gPgaScheduleEvents holds
+s32* gPgaScheduleEvents;                // the tournaments held this season, in order
+                                        // (PGASchedule_Build; static memory, never freed)
 
 // Fills one leaderboard row of the current profile's tournament (fn_80077B08's slot) for entrant
 // nEntrant: szPlace "CUT" when the entrant missed the cut, "T3" when another entrant holds the same
@@ -24,8 +29,8 @@ s32* gPgaScheduleEvents;                      // the tournaments on the schedule
 // (GM_PgaTourSim_GetTotalScoreFromEntrantID with flag 1); szRounds the round scores so far
 // separated by spaces (a round scored 0 is left out); szMoney "$" and the money won as text
 // (fn_800907AC), empty when none.
-void PGALeaderboard_FormatRow(char* szPlace, char* szName, char* szScore, char* szRounds, char* szMoney,
-                 int nEntrant) {
+void PGALeaderboard_FormatRow(char* szPlace, char* szName, char* szScore, char* szRounds,
+                              char* szMoney, int nEntrant) {
     int i;
     s32 nRoundScore;
     char szAmount[128];                 // sizes unknown
@@ -289,8 +294,6 @@ void PGASeasonWrapUp_GetLine(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 // FE message 553: starts the next PGA TOUR season (GameModeDriverPGATour_AdvanceSeason; its result,
 // 0 after the tenth season, is not checked), resets the calendar to it and backs up profile slot 0
 // (fn_80077808). Defined with no parameters though the message table calls it with two.
@@ -300,8 +303,6 @@ void PGADriver_ShowCalendar_AdvanceSeason(void) {
     ResetCalendarState();
     fn_80077808(0);
 }
-
-// ---- end of sweep code ----
 
 // FE message 559: placeholder texts for n = pArgs[0]: "S n", "I n" and "$ n00,000" into
 // pArgs[1..3], and n itself into *pArgs[4].
@@ -317,18 +318,15 @@ void PGATourMsg_GetTestText(MsgArg* pArgs, MsgArg* pResult) {
     *pOut = n;
 }
 
-// The 11 asset kinds PGASponsor_SignNext and PGASponsor_PickStartingSponsor pick from at random.
+// The 11 sponsors (indexes of FE_CrAP_GetSponsorName's brands) PGASponsor_SignNext and
+// PGASponsor_PickStartingSponsor draw from at random.
 s16 gPgaSponsorChoices[11] = { 0, 1, 2, 5, 6, 9, 10, 11, 13, 14, 15 };
-
-// ---- sweep code (not yet cleaned up) ----
 
 // FE message 560: always gives 25. What the menus count with it is not known; its message number
 // follows the placeholder texts' (PGATourMsg_GetTestText, 559).
 void PGATourMsg_Get25(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 25;
 }
-
-// ---- end of sweep code ----
 
 // FE message 563: signs the current profile's next sponsorship: the first of the 11 sponsorship
 // slots (SaveProfile.a1054C) not yet signed whose required progress
@@ -338,17 +336,17 @@ void PGATourMsg_Get25(MsgArg* pArgs, MsgArg* pResult) {
 // sponsor, *pArgs[2] its bonus cash, *pArgs[3] its start cash, and it gives 1; 0 when there is none
 // to sign.
 void PGASponsor_SignNext(MsgArg* pArgs, MsgArg* pResult) {
-    s32 n8;
-    s32 n4;
+    s32 nBonusCash;
+    s32 nStartCash;
     int i;
     SaveProfile* pProfile = FE_GetCurrentProfile();
-    s32* p0 = (s32*)pArgs[0].p;
-    s32* pKind = (s32*)pArgs[1].p;
-    s32* p8 = (s32*)pArgs[2].p;
-    s32* p4 = (s32*)pArgs[3].p;
+    s32* pZero = (s32*)pArgs[0].p;
+    s32* pSponsor = (s32*)pArgs[1].p;
+    s32* pBonusCash = (s32*)pArgs[2].p;
+    s32* pStartCash = (s32*)pArgs[3].p;
     u8 bFound;
     s32 nProgress;
-    s16 nKind;
+    s16 nSponsor;
     int j;
 
     i = 0;
@@ -356,18 +354,18 @@ void PGASponsor_SignNext(MsgArg* pArgs, MsgArg* pResult) {
 
     do {
         nProgress = GameModeDriverPGATour_GetSponsorshipProgress(i);
-        n4 = GameModeDriverPGATour_GetSponsorshipStartCash(i);
-        n8 = GameModeDriverPGATour_GetSponsorshipBonusCash(i);
+        nStartCash = GameModeDriverPGATour_GetSponsorshipStartCash(i);
+        nBonusCash = GameModeDriverPGATour_GetSponsorshipBonusCash(i);
         if (!pProfile->a1054C[i].b && nProgress <= (s32)GM_GetGameProgress(pProfile)) {
         retry:
-            nKind = gPgaSponsorChoices[Misc_RandFunc(0) % 11];
+            nSponsor = gPgaSponsorChoices[Misc_RandFunc(0) % 11];
             for (j = 0; j < i; j++) {
-                if (pProfile->a1054C[j].n == nKind && pProfile->a1054C[j].b) {
+                if (pProfile->a1054C[j].n == nSponsor && pProfile->a1054C[j].b) {
                     // fake match: EA jumps straight back (a do-while adds a test)
                     goto retry;
                 }
             }
-            pProfile->a1054C[i].n = nKind;
+            pProfile->a1054C[i].n = nSponsor;
             bFound = 1;
             pProfile->a1054C[i].b = 1;
             break;
@@ -375,11 +373,11 @@ void PGASponsor_SignNext(MsgArg* pArgs, MsgArg* pResult) {
         i++;
     } while (i < 11);
     if (bFound) {
-        *p0 = 0;
-        *p8 = n8;
-        *p4 = n4;
-        *pKind = pProfile->a1054C[i].n;
-        pProfile->n6C += n4;
+        *pZero = 0;
+        *pBonusCash = nBonusCash;
+        *pStartCash = nStartCash;
+        *pSponsor = pProfile->a1054C[i].n;
+        pProfile->n6C += nStartCash;
         pResult->i = 1;
         return;
     }
@@ -394,17 +392,17 @@ void PGASponsor_SignNext(MsgArg* pArgs, MsgArg* pResult) {
 void PGASponsor_GetItemBonus(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 i = pArgs[0].i;
-    s32* pValue = (s32*)pArgs[1].p;
-    s32* pKind = (s32*)pArgs[2].p;
+    s32* pPay = (s32*)pArgs[1].p;
+    s32* pSponsor = (s32*)pArgs[2].p;
     int nCount = 0;
-    s32 n8 = GameModeDriverPGATour_GetSponsorshipBonusCash(i);
+    s32 nBonusCash = GameModeDriverPGATour_GetSponsorshipBonusCash(i);
 
     if (pProfile->a1054C[i].b) {
         nCount = FE_CrAP_GetNumEquippedItemsWithSponsor(pProfile->a1054C[i].n);
     }
     if (nCount) {
-        *pValue = nCount * n8;
-        *pKind = pProfile->a1054C[i].n;
+        *pPay = nCount * nBonusCash;
+        *pSponsor = pProfile->a1054C[i].n;
         pResult->i = 1;
         return;
     }
@@ -416,17 +414,15 @@ void PGASponsor_GetItemBonus(MsgArg* pArgs, MsgArg* pResult) {
 // and its start cash paid, PasswordManager.c). Gives the sponsor in *pArgs[0], and sponsorship slot
 // 0's start cash in *pArgs[1] and bonus cash in *pArgs[2].
 void PGASponsor_PickStartingSponsor(MsgArg* pArgs, MsgArg* pResult) {
-    s32* pKind = (s32*)pArgs[0].p;
-    s32* p4 = (s32*)pArgs[1].p;
-    s32* p8 = (s32*)pArgs[2].p;
+    s32* pSponsor = (s32*)pArgs[0].p;
+    s32* pStartCash = (s32*)pArgs[1].p;
+    s32* pBonusCash = (s32*)pArgs[2].p;
 
     fn_800588D4(gPgaSponsorChoices[Misc_RandFunc(0) % 11]);
-    *pKind = fn_800588E8();
-    *p4 = GameModeDriverPGATour_GetSponsorshipStartCash(0);
-    *p8 = GameModeDriverPGATour_GetSponsorshipBonusCash(0);
+    *pSponsor = fn_800588E8();
+    *pStartCash = GameModeDriverPGATour_GetSponsorshipStartCash(0);
+    *pBonusCash = GameModeDriverPGATour_GetSponsorshipBonusCash(0);
 }
-
-// ---- sweep code (not yet cleaned up) ----
 
 // FE message 698: fills the sponsorship item records (FE_CrAP_CollectSponsorshipItems: one per worn
 // item of a signed sponsor) and gives how many there are.
@@ -434,31 +430,25 @@ void PGASponsor_CollectItems(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = FE_CrAP_CollectSponsorshipItems();
 }
 
-// ---- end of sweep code ----
-
 // FE message 699: sponsorship item record pArgs[0] (of PGASponsor_CollectItems' list): its sponsor
 // into *pArgs[1], its bonus cash into *pArgs[2] and the item's name into the text pArgs[3].
 void PGASponsor_GetItem(MsgArg* pArgs, MsgArg* pResult) {
-    s16 n0;
+    s16 nSponsor;
     char* szName = ((MsgString*)pArgs[3].p)->pStr;
-    s32* pN4 = (s32*)pArgs[2].p;
+    s32* pBonusCash = (s32*)pArgs[2].p;
     int n = pArgs[0].i;
-    s32* pN0 = (s32*)pArgs[1].p;
+    s32* pSponsor = (s32*)pArgs[1].p;
 
-    n0 = 0;
-    FE_CrAP_GetSponsorshipItemInfo(n, &n0, pN4, szName);
-    *pN0 = n0;
+    nSponsor = 0;
+    FE_CrAP_GetSponsorshipItemInfo(n, &nSponsor, pBonusCash, szName);
+    *pSponsor = nSponsor;
 }
-
-// ---- sweep code (not yet cleaned up) ----
 
 // FE message 700: sponsor pArgs[0]'s brand name ("adidas", "Callaway Golf"...;
 // FE_CrAP_GetSponsorName) into the text pArgs[1].
 void PGASponsor_GetName(MsgArg* pArgs, MsgArg* pResult) {
     FE_CrAP_GetSponsorName(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }
-
-// ---- end of sweep code ----
 
 // Trophy room, kind 0 of fn_80084B88's award messages: tournament pArgs[2] of profile slot
 // pArgs[1]: its name into the text pArgs[4], its icon (GameModeDriverPGATour_GetTextureID) into
@@ -533,8 +523,6 @@ void PGATourMsg_CheckAdvanceTournament(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 // FE message 742: marks the tour statistics as needing an update (fn_8011C058(1); TW06:
 // GM_PgaTourSim_SetStatsDirty).
 void PGATourMsg_SetStatsDirty(MsgArg* pArgs, MsgArg* pResult) {
@@ -554,45 +542,43 @@ void PGATourMsg_DidUserQuit(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = ((u8 (*)(int))fn_80117DE0)(0);
 }
 
-// ---- end of sweep code ----
-
 // FE message 754: sponsorship slot pArgs[0] of the current profile: its sponsor into *pArgs[1] and
 // its bonus cash into *pArgs[2], or -1 and 0 when the slot is not signed; *pArgs[3] is always set
 // to 0.
 void PGASponsor_GetSlot(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 i = pArgs[0].i;
-    s32* pKind = (s32*)pArgs[1].p;
-    s32* p8 = (s32*)pArgs[2].p;
-    s32* p3 = (s32*)pArgs[3].p;
+    s32* pSponsor = (s32*)pArgs[1].p;
+    s32* pBonusCash = (s32*)pArgs[2].p;
+    s32* pZero = (s32*)pArgs[3].p;
 
     if (pProfile->a1054C[i].b) {
-        *pKind = pProfile->a1054C[i].n;
-        *p8 = GameModeDriverPGATour_GetSponsorshipBonusCash(i);
-        *p3 = 0;
+        *pSponsor = pProfile->a1054C[i].n;
+        *pBonusCash = GameModeDriverPGATour_GetSponsorshipBonusCash(i);
+        *pZero = 0;
         return;
     }
-    *pKind = -1;
-    *p8 = 0;
-    *p3 = 0;
+    *pSponsor = -1;
+    *pBonusCash = 0;
+    *pZero = 0;
 }
 
 // FE message 755: the bonus cash of every worn item of a signed sponsor added up (the records of
 // FE_CrAP_CollectSponsorshipItems, which it fills first).
 void PGASponsor_GetTotalItemBonus(MsgArg* pArgs, MsgArg* pResult) {
-    char sz[0x34];                      // a CrAPRecord's name (0x24); size unknown, the frame fits 0x34
-    s32 n4;
-    s16 n0;
+    char szName[0x34];                  // a CrAPRecord's name (0x24); size unknown, the frame fits 0x34
+    s32 nBonusCash;
+    s16 nSponsor;
     s32 nRecords = FE_CrAP_CollectSponsorshipItems();
     int i;
     s32 nTotal;
 
-    n0 = 0;
+    nSponsor = 0;
     nTotal = 0;
-    n4 = 0;
+    nBonusCash = 0;
     for (i = 0; i < nRecords; i++) {
-        FE_CrAP_GetSponsorshipItemInfo(i, &n0, &n4, sz);
-        nTotal += n4;
+        FE_CrAP_GetSponsorshipItemInfo(i, &nSponsor, &nBonusCash, szName);
+        nTotal += nBonusCash;
     }
     pResult->i = nTotal;
 }
