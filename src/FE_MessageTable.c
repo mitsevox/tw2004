@@ -284,36 +284,36 @@ void GM_vHideCharacter(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetCharState(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetGolferLastName(MsgArg* pArgs, MsgArg* pResult);
 void GM_vMCGetUserName(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C3C8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C440(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C488(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C48C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C4B8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C4D8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C4F8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C594(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C5F0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C634(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C698(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C6E4(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C748(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C784(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C790(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C79C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C7AC(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C7B0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C7EC(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C81C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C864(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C8AC(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C8F0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C94C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C950(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C988(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C9A4(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007C9F8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007CA4C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007CACC(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCGetUserNames(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCIsCardPresent(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMessage31_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetControllerInputEnabled(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCConnect(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCDisconnect(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCLoadUser(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCSaveUser(MsgArg* pArgs, MsgArg* pResult);
+void GM_vPlayMenuSound(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetWeatherOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCFormatCard(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetTeeSet(MsgArg* pArgs, MsgArg* pResult);
+void GM_vProfileHasCreatedGolfer(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetFirstCreatedGolfer(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMessage43_Returns1(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetCreatedGolferIndex(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMessage45_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsGolferAvailable(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsControllerPluggedIn(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCIsCardFormatted(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCIsWrongDevice(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCGetFreeBlocks(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCOptionsMemoryRequired(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMessage326_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCIsMultitapPluggedIn(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCfunction(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCSaveOptions(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCLoadOptions(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetOptionFlags1And2(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetCommentaryOption(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007CBCC(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007CC0C(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007CC90(MsgArg* pArgs, MsgArg* pResult);
@@ -750,34 +750,34 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[27] = GM_vSetCharState;
     gFEMessageHandlers[28] = GM_vGetGolferLastName;
     gFEMessageHandlers[29] = GM_vMCGetUserName;
-    gFEMessageHandlers[30] = fn_8007C440;
-    gFEMessageHandlers[31] = fn_8007C488;
-    gFEMessageHandlers[32] = fn_8007C48C;
-    gFEMessageHandlers[33] = fn_8007C4B8;
-    gFEMessageHandlers[34] = fn_8007C4D8;
-    gFEMessageHandlers[35] = fn_8007C4F8;
-    gFEMessageHandlers[36] = fn_8007C594;
-    gFEMessageHandlers[37] = fn_8007C5F0;
-    gFEMessageHandlers[38] = fn_8007C634;
-    gFEMessageHandlers[39] = fn_8007C784;
-    gFEMessageHandlers[40] = fn_8007C698;
-    gFEMessageHandlers[41] = fn_8007C6E4;
-    gFEMessageHandlers[42] = fn_8007C748;
-    gFEMessageHandlers[43] = fn_8007C790;
-    gFEMessageHandlers[44] = fn_8007C79C;
-    gFEMessageHandlers[45] = fn_8007C7AC;
+    gFEMessageHandlers[30] = GM_vMCIsCardPresent;
+    gFEMessageHandlers[31] = GM_vMessage31_Empty;
+    gFEMessageHandlers[32] = GM_vSetControllerInputEnabled;
+    gFEMessageHandlers[33] = GM_vMCConnect;
+    gFEMessageHandlers[34] = GM_vMCDisconnect;
+    gFEMessageHandlers[35] = GM_vMCLoadUser;
+    gFEMessageHandlers[36] = GM_vMCSaveUser;
+    gFEMessageHandlers[37] = GM_vPlayMenuSound;
+    gFEMessageHandlers[38] = GM_vSetWeatherOption;
+    gFEMessageHandlers[39] = GM_vGetFirstCreatedGolfer;
+    gFEMessageHandlers[40] = GM_vMCFormatCard;
+    gFEMessageHandlers[41] = GM_vSetTeeSet;
+    gFEMessageHandlers[42] = GM_vProfileHasCreatedGolfer;
+    gFEMessageHandlers[43] = GM_vMessage43_Returns1;
+    gFEMessageHandlers[44] = GM_vGetCreatedGolferIndex;
+    gFEMessageHandlers[45] = GM_vMessage45_Empty;
     gFEMessageHandlers[46] = LadderMenu_StartEvent;
-    gFEMessageHandlers[47] = fn_8007C7B0;
-    gFEMessageHandlers[48] = fn_8007C7EC;
-    gFEMessageHandlers[49] = fn_8007C81C;
-    gFEMessageHandlers[50] = fn_8007C8AC;
-    gFEMessageHandlers[51] = fn_8007C8F0;
-    gFEMessageHandlers[52] = fn_8007C950;
-    gFEMessageHandlers[53] = fn_8007C988;
-    gFEMessageHandlers[54] = fn_8007C9A4;
-    gFEMessageHandlers[537] = fn_8007C9F8;
-    gFEMessageHandlers[55] = fn_8007CA4C;
-    gFEMessageHandlers[56] = fn_8007CACC;
+    gFEMessageHandlers[47] = GM_vIsGolferAvailable;
+    gFEMessageHandlers[48] = GM_vIsControllerPluggedIn;
+    gFEMessageHandlers[49] = GM_vMCIsCardFormatted;
+    gFEMessageHandlers[50] = GM_vMCGetFreeBlocks;
+    gFEMessageHandlers[51] = GM_vMCOptionsMemoryRequired;
+    gFEMessageHandlers[52] = GM_vMCIsMultitapPluggedIn;
+    gFEMessageHandlers[53] = GM_vMCfunction;
+    gFEMessageHandlers[54] = GM_vMCSaveOptions;
+    gFEMessageHandlers[537] = GM_vMCLoadOptions;
+    gFEMessageHandlers[55] = GM_vSetOptionFlags1And2;
+    gFEMessageHandlers[56] = GM_vSetCommentaryOption;
     gFEMessageHandlers[57] = fn_8007CBCC;
     gFEMessageHandlers[58] = fn_8007CC0C;
     gFEMessageHandlers[59] = fn_8007CC90;
@@ -1047,7 +1047,7 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[323] = fn_8008311C;
     gFEMessageHandlers[324] = fn_80083354;
     gFEMessageHandlers[325] = fn_8007CDF0;
-    gFEMessageHandlers[326] = fn_8007C94C;
+    gFEMessageHandlers[326] = GM_vMessage326_Empty;
     gFEMessageHandlers[327] = fn_80083358;
     gFEMessageHandlers[328] = fn_800833C4;
     gFEMessageHandlers[329] = fn_800833D0;
@@ -1204,7 +1204,7 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[588] = GM_vGetLogoShape;
     gFEMessageHandlers[598] = GM_vCrAPMessage598_Empty;
     gFEMessageHandlers[565] = fn_8007D9E4;
-    gFEMessageHandlers[567] = fn_8007C3C8;
+    gFEMessageHandlers[567] = GM_vMCGetUserNames;
     gFEMessageHandlers[568] = FE_Sqrt;
     gFEMessageHandlers[569] = LadderMenu_SetNodePos;
     gFEMessageHandlers[573] = LadderMenu_GetNodePos;
@@ -1285,7 +1285,7 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[688] = fn_800846D4;
     gFEMessageHandlers[689] = GM_vRandomizeCrAPGolfer;
     gFEMessageHandlers[690] = GM_vRandomizeCrAPOutfit;
-    gFEMessageHandlers[686] = fn_8007C864;
+    gFEMessageHandlers[686] = GM_vMCIsWrongDevice;
     gFEMessageHandlers[691] = LadderMenu_GetNodeState;
     gFEMessageHandlers[692] = fn_80084AA8;
     gFEMessageHandlers[693] = Calendar_IsSherwoodTargetEntered;
@@ -1575,8 +1575,9 @@ void GM_vMCGetUserName(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[0].p)->pStr, state.aszName[pArgs[3].i]);
 }
 
-// All four of them.
-void fn_8007C3C8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 567: the four profile names of the save on the memory card in port pArgs[0],
+// slot pArgs[1] (MCCardState.aszName, from MC_GetMC) into the strings pArgs[2] to pArgs[5].
+void GM_vMCGetUserNames(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
 
     MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
@@ -1586,32 +1587,43 @@ void fn_8007C3C8(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[5].p)->pStr, state.aszName[3]);
 }
 
-// The card's state: a flag of it, or its free space.
-void fn_8007C440(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 30: 1 when a memory card is in port pArgs[0], slot pArgs[1] (MC_CARD_PRESENT in
+// its MCCardState, from MC_GetMC).
+void GM_vMCIsCardPresent(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
 
     MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
     pResult->i = (state.uFlags & MC_CARD_PRESENT) >> 1;
 }
 
-void fn_8007C488(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 31: empty in this build.
+void GM_vMessage31_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007C48C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 32: whether controller pArgs[0]'s buttons reach the menu UI (pArgs[1] nonzero:
+// yes), through lbl_801D87C0.a30 (fn_8008F80C), which uiProcessInterface.c's fn_8008F820 tests.
+void GM_vSetControllerInputEnabled(MsgArg* pArgs, MsgArg* pResult) {
     fn_8008F80C(pArgs[0].i, (u8)pArgs[1].i);
 }
 
-void fn_8007C4B8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 33: starts the memory card screens' work (MC_Connect: both ports reset and
+// looked at once).
+void GM_vMCConnect(MsgArg* pArgs, MsgArg* pResult) {
     MC_Connect();
 }
 
-void fn_8007C4D8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 34: ends the memory card work (MC_Disconnect, empty on the GameCube).
+void GM_vMCDisconnect(MsgArg* pArgs, MsgArg* pResult) {
     MC_Disconnect();
 }
 
-// MC_LoadUser with a card, a profile slot and a string, then the slot's profile is marked loaded
-// (the test never fails: the result is 1 or an error, never 0).
-void fn_8007C4F8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 35: loads the profile named by the string pArgs[3] from the save on the memory
+// card in port pArgs[0], slot pArgs[1] into profile slot pArgs[2] (MC_LoadUser). Answers 1, or
+// MC_LoadUser's error. Then the slot's profile is backed up (fn_80077808) and marked loaded
+// (lbl_801D7148.aLoaded).
+// EA bug: the answer is never 0, so the backup and the loaded mark also happen when the load
+// failed.
+void GM_vMCLoadUser(MsgArg* pArgs, MsgArg* pResult) {
     MCCardPosStr pos;
     s32 nError;
     s32 n;
@@ -1632,7 +1644,9 @@ void fn_8007C4F8(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_8007C594(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 36: saves profile slot pArgs[2] to the memory card in port pArgs[0], slot
+// pArgs[1] (MC_SaveUser). Answers 1, or MC_SaveUser's error.
+void GM_vMCSaveUser(MsgArg* pArgs, MsgArg* pResult) {
     MCCardPos pos;
     s32 nError;
     s32 n;
@@ -1648,7 +1662,9 @@ void fn_8007C594(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = n;
 }
 
-void fn_8007C5F0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 37: plays menu sound pArgs[0] (Gaud_PlayUISound); sound 11 stands for a random
+// one of sounds 11 to 18.
+void GM_vPlayMenuSound(MsgArg* pArgs, MsgArg* pResult) {
     int n;
 
     n = pArgs[0].i;
@@ -1659,7 +1675,10 @@ void fn_8007C5F0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_8007C634(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 38: the weather option (options.nWeather) from the menu's choice pArgs[0]: 1
+// gives 2 (a pick kept for several holes), 2 gives 3, 3 gives 0 (clear); other values change
+// nothing.
+void GM_vSetWeatherOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         gSession.options.nWeather = 2;
@@ -1673,7 +1692,9 @@ void fn_8007C634(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_8007C698(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 40: formats the memory card in port pArgs[0], slot pArgs[1] (MC_FormatCard).
+// Answers 1, or MC_FormatCard's error.
+void GM_vMCFormatCard(MsgArg* pArgs, MsgArg* pResult) {
     s32 nError;
     s32 n;
 
@@ -1685,8 +1706,10 @@ void fn_8007C698(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = n;
 }
 
-// Every player's tee set: 1, 2 or 3 picks tee set 2, 1 or 0.
-void fn_8007C6E4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 41: every player's tee set (all five gSession.nTeeSet) from the menu's choice
+// pArgs[1]: 1 gives tee set 2, 2 gives 1, 3 gives 0; other values change nothing. pArgs[0] is not
+// read.
+void GM_vSetTeeSet(MsgArg* pArgs, MsgArg* pResult) {
     int i;
 
     for (i = 0; i < 5; i++) {
@@ -1704,7 +1727,9 @@ void fn_8007C6E4(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_8007C748(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 42: 1 when save profile pArgs[0] holds a created golfer
+// (createdGolfer.bAvailable).
+void GM_vProfileHasCreatedGolfer(MsgArg* pArgs, MsgArg* pResult) {
     if ((s8)gpSaveData[pArgs[0].i].createdGolfer.bAvailable != 0) {
         pResult->i = 1;
         return;
@@ -1712,26 +1737,36 @@ void fn_8007C748(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_8007C784(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 39: 30, the golfer number of the first created golfer (FIRST_CREATED_GOLFER;
+// 0..29 are the table golfers).
+void GM_vGetFirstCreatedGolfer(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 30;
 }
 
-void fn_8007C790(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 43: always answers 1 in this build.
+void GM_vMessage43_Returns1(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 1;
 }
 
-void fn_8007C79C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 44: the golfer number of created golfer pArgs[0]: pArgs[0] + 30
+// (FIRST_CREATED_GOLFER).
+void GM_vGetCreatedGolferIndex(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = pArgs[0].i + 30;
 }
 
-void fn_8007C7AC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 45: empty in this build.
+void GM_vMessage45_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007C7B0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 47: golfer pArgs[0]'s bAvailable (a created golfer's from the current profile,
+// fn_80077A80).
+void GM_vIsGolferAvailable(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = (s8)fn_80077A80(pArgs[0].i)->bAvailable;
 }
 
-void fn_8007C7EC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 48: whether controller pArgs[0] is plugged in (lbl_801D87C0.a1); 9
+// (CONTROLLER_CPU) always answers 1.
+void GM_vIsControllerPluggedIn(MsgArg* pArgs, MsgArg* pResult) {
     s32 n;
 
     n = pArgs[0].i;
@@ -1742,29 +1777,37 @@ void fn_8007C7EC(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_801D87C0.a1[n];
 }
 
-void fn_8007C81C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 49: 1 when the memory card in port pArgs[0], slot pArgs[1] is formatted
+// (MC_CARD_FORMATTED, flag 8, in its MCCardState).
+void GM_vMCIsCardFormatted(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
 
     MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
     pResult->i = (state.uFlags & 8) >> 3;
 }
 
-void fn_8007C864(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 686: 1 when the device in port pArgs[0], slot pArgs[1] is not a memory card
+// (MC_CARD_WRONGDEVICE in its MCCardState).
+void GM_vMCIsWrongDevice(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
 
     MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
     pResult->i = (state.uFlags & MC_CARD_WRONGDEVICE) >> 4;
 }
 
-void fn_8007C8AC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 50: the free space on the memory card in port pArgs[0], slot pArgs[1], in
+// blocks (MCCardState.nFreeBlocks).
+void GM_vMCGetFreeBlocks(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
 
     MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
     pResult->i = state.nFreeBlocks;
 }
 
-// The game save's size on the card.
-void fn_8007C8F0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 51: the space the options save needs on the memory card in port pArgs[0], slot
+// pArgs[1]: file type 0, the options (fn_80084FF0), and its memory-required operation (fn_80084FB4,
+// which runs MC_MemoryRequiredForOptions), between MC_ConnectCard and MC_Disconnect.
+void GM_vMCOptionsMemoryRequired(MsgArg* pArgs, MsgArg* pResult) {
     MCCardPos pos;
 
     pos.nPort = pArgs[0].i;
@@ -1775,19 +1818,26 @@ void fn_8007C8F0(MsgArg* pArgs, MsgArg* pResult) {
     MC_Disconnect();
 }
 
-void fn_8007C94C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 326: empty in this build.
+void GM_vMessage326_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007C950(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 52: whether port pArgs[0] has a multitap (MC_IsMultitapPluggedIn).
+void GM_vMCIsMultitapPluggedIn(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = MC_IsMultitapPluggedIn(pArgs[0].i);
 }
 
-void fn_8007C988(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 53: asks for pArgs[0] to be handed back to the menu UI a little later:
+// uiProcessInterface.c counts three UI updates (lbl_801D880C.n0) and then sends it as hint 0x23.
+// The menus' twin of GM_vIG_MCfunction.
+void GM_vMCfunction(MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D880C.n4 = pArgs[0].i;
     lbl_801D880C.n0 = 0;
 }
 
-void fn_8007C9A4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 54: saves the options and records to the memory card in port pArgs[0], slot
+// pArgs[1] (MC_SaveOptions). Answers 1, or MC_SaveOptions' error.
+void GM_vMCSaveOptions(MsgArg* pArgs, MsgArg* pResult) {
     MCCardPos pos;
     s32 nError;
     s32 n;
@@ -1802,7 +1852,9 @@ void fn_8007C9A4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = n;
 }
 
-void fn_8007C9F8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 537: loads the options and records from the memory card in port pArgs[0], slot
+// pArgs[1] (MC_LoadOptions). Answers 1, or MC_LoadOptions' error.
+void GM_vMCLoadOptions(MsgArg* pArgs, MsgArg* pResult) {
     MCCardPos pos;
     s32 nError;
     s32 n;
@@ -1817,8 +1869,10 @@ void fn_8007C9F8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = n;
 }
 
-// The on/off options: the menus send and read 1 for on and 2 for off.
-void fn_8007CA4C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 55: two on/off options, options.a7[1] from pArgs[0] and a7[2] from pArgs[1]:
+// the menus send 1 for on and 2 for off; other values change nothing. fn_8007CC0C reads them back;
+// no other code reads them.
+void GM_vSetOptionFlags1And2(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         gSession.options.a7[1] = 1;
@@ -1837,8 +1891,9 @@ void fn_8007CA4C(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Option a0[4]: the menus' choices 1..6 are the values 5, 0, 1, 2, 3, 4; it is passed on times 0.2.
-void fn_8007CACC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 56: the commentary volume (options.a0[4], 0..5) from the menu's choice
+// pArgs[0]: 1 gives 5, 2..6 give 0..4; the mixer gets 0.2 times the level (Gaud_SetCommentLevel).
+void GM_vSetCommentaryOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         gSession.options.a0[4] = 5;

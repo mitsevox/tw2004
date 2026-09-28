@@ -245,7 +245,7 @@ They will be sorted into the sections below.
 - **[verified] A `const` source pointer lets CW hoist an unrolled copy loop's loads above its stores**;
   drop the `const` when the original alternates load/store (DynamicRenderingBuffer fn_800705F0 83 -> 100).
 - **[verified] Test one flag bit as `(u & bit) >> n`, not `(u >> n) & 1`** (same `extrwi`, different
-  epilogue order; FE_MessageTable fn_8007C440 99.3 -> 100).
+  epilogue order; FE_MessageTable GM_vMCIsCardPresent 99.3 -> 100).
 - **[verified] A call made in every branch of an if-chain is one call after it**, with the arguments
   picked per branch (Code8006F154 fn_8006F154 91.3 -> 98.75). `(f32)sqrt(...)` must be cast before
   multiplying by a float constant, or the multiply is done in double.

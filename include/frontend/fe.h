@@ -60,7 +60,7 @@ typedef struct FEScreen {
     u8  bFadeToBlack;           // 0x00  the fade to black runs (set when the round or the menus
                                 //       are left; uiProcessInterface.c draws it and clears it)
     u8  a1[4];                  // 0x01  per controller: plugged in (fn_8008F820); read by a menu
-                                //       message (fn_8007C7EC: 1 for index 9)
+                                //       message (GM_vIsControllerPluggedIn: 1 for index 9)
     u8  unk5[3];
     u32 a8[4];                  // 0x08  per controller: the buttons held last frame (fn_8008F820)
     u32 a18[4];                 // 0x18  per controller: frames the same buttons have been held,

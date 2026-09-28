@@ -1595,7 +1595,7 @@ void GM_vIG_MCGetNumReplays(MsgArg* pArgs, MsgArg* pResult) {
 
 // Asks for pArgs[0] to be handed back to the UI a little later (command 84): uiProcessInterface.c
 // counts three UI updates (lbl_801D880C.n0), then sends it to the UI as hint 0x24 in a round (0x23
-// in the menus). The menus' fn_8007C988 does the same.
+// in the menus). The menus' GM_vMCfunction does the same.
 void GM_vIG_MCfunction(MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D880C.n4 = pArgs[0].i;
     lbl_801D880C.n0 = 0;

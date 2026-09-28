@@ -28,7 +28,7 @@ typedef struct MCCardState {
     u32  aReplayUsed[1];        // 0x08  a bit per replay saved on the card (MC_RefreshMCReplayInfo; FE_MessageTable
                                 //       fn_8007EA14 tests one)
     u32  aNameUsed[1];          // 0x0C  a bit per aszName entry that holds a profile's name (MC_RefreshMCUserInfo)
-    char aszName[4][0x1D];      // 0x10  four names the menus show (FE_MessageTable fn_8007C3C8)
+    char aszName[4][0x1D];      // 0x10  four names the menus show (FE_MessageTable GM_vMCGetUserNames)
     s32  nFreeFiles;           // 0x84  free directory entries (CARDFreeBlocks)
     s32  nSectorSize;           // 0x88  CARDProbeEx
     s32  nXferStart;            // 0x8C  CARDGetXferredBytes when an operation starts (fn_8009CB9C)
