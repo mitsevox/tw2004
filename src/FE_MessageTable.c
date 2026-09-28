@@ -542,27 +542,27 @@ void GM_vGetOnOffOption4(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetOnOffOption5(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetOnOffOption6(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetSwingAidOption(MsgArg* pArgs, MsgArg* pResult);
-void fn_800818F8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081934(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081970(MsgArg* pArgs, MsgArg* pResult);
-void fn_800819FC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081A54(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081B04(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081B50(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081BD4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081BF4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081C18(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081CA4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081CF8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081CFC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081D50(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081DB8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081F98(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081FA8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081FBC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082608(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082620(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008266C(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPowerBoostOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetSpinControlOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetOptionLevel2(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSelectCustomRound(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsBackupProfileUnused(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetBackupProfileName(MsgArg* pArgs, MsgArg* pResult);
+void GM_vLoadBackupProfile(MsgArg* pArgs, MsgArg* pResult);
+void GM_vBackupAllProfiles(MsgArg* pArgs, MsgArg* pResult);
+void GM_vBackupProfileClaimRow(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetRoughOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetRoughOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage263_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetCreatedGolferBallAndGlove(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetCreatedGolferBallAndGlove(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetCreatedGolferAttributeLevels(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetFEProfileN1(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetFEProfileN1(MsgArg* pArgs, MsgArg* pResult);
+void GM_vBuildAttributeLevelUps(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetNumAttributeLevelUps(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetAttributeLevelUp(MsgArg* pArgs, MsgArg* pResult);
+void GM_vClearAttributeLevelUps(MsgArg* pArgs, MsgArg* pResult);
 void fn_80082680(MsgArg* pArgs, MsgArg* pResult);
 void fn_800826C4(MsgArg* pArgs, MsgArg* pResult);
 void fn_80082708(MsgArg* pArgs, MsgArg* pResult);
@@ -982,27 +982,27 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[249] = GM_vGetOnOffOption5;
     gFEMessageHandlers[250] = GM_vGetOnOffOption6;
     gFEMessageHandlers[251] = GM_vGetSwingAidOption;
-    gFEMessageHandlers[252] = fn_800818F8;
-    gFEMessageHandlers[253] = fn_80081934;
-    gFEMessageHandlers[254] = fn_80081970;
-    gFEMessageHandlers[255] = fn_800819FC;
-    gFEMessageHandlers[256] = fn_80081A54;
-    gFEMessageHandlers[257] = fn_80081B04;
-    gFEMessageHandlers[258] = fn_80081B50;
-    gFEMessageHandlers[259] = fn_80081BD4;
-    gFEMessageHandlers[260] = fn_80081BF4;
-    gFEMessageHandlers[261] = fn_80081C18;
-    gFEMessageHandlers[262] = fn_80081CA4;
-    gFEMessageHandlers[263] = fn_80081CF8;
-    gFEMessageHandlers[264] = fn_80081CFC;
-    gFEMessageHandlers[265] = fn_80081D50;
-    gFEMessageHandlers[266] = fn_80081DB8;
-    gFEMessageHandlers[267] = fn_80081F98;
-    gFEMessageHandlers[268] = fn_80081FA8;
-    gFEMessageHandlers[269] = fn_80081FBC;
-    gFEMessageHandlers[270] = fn_80082608;
-    gFEMessageHandlers[271] = fn_80082620;
-    gFEMessageHandlers[272] = fn_8008266C;
+    gFEMessageHandlers[252] = GM_vGetPowerBoostOption;
+    gFEMessageHandlers[253] = GM_vGetSpinControlOption;
+    gFEMessageHandlers[254] = GM_vGetOptionLevel2;
+    gFEMessageHandlers[255] = GM_vSelectCustomRound;
+    gFEMessageHandlers[256] = GM_vIsBackupProfileUnused;
+    gFEMessageHandlers[257] = GM_vGetBackupProfileName;
+    gFEMessageHandlers[258] = GM_vLoadBackupProfile;
+    gFEMessageHandlers[259] = GM_vBackupAllProfiles;
+    gFEMessageHandlers[260] = GM_vBackupProfileClaimRow;
+    gFEMessageHandlers[261] = GM_vSetRoughOption;
+    gFEMessageHandlers[262] = GM_vGetRoughOption;
+    gFEMessageHandlers[263] = GM_vFEMessage263_Empty;
+    gFEMessageHandlers[264] = GM_vSetCreatedGolferBallAndGlove;
+    gFEMessageHandlers[265] = GM_vGetCreatedGolferBallAndGlove;
+    gFEMessageHandlers[266] = GM_vGetCreatedGolferAttributeLevels;
+    gFEMessageHandlers[267] = GM_vSetFEProfileN1;
+    gFEMessageHandlers[268] = GM_vGetFEProfileN1;
+    gFEMessageHandlers[269] = GM_vBuildAttributeLevelUps;
+    gFEMessageHandlers[270] = GM_vGetNumAttributeLevelUps;
+    gFEMessageHandlers[271] = GM_vGetAttributeLevelUp;
+    gFEMessageHandlers[272] = GM_vClearAttributeLevelUps;
     gFEMessageHandlers[273] = fn_80082680;
     gFEMessageHandlers[274] = fn_80082708;
     gFEMessageHandlers[275] = fn_80082758;
@@ -4462,7 +4462,9 @@ void GM_vGetSwingAidOption(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_800818F8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 252: the power boost option (options.bBoostEnabled) as the menu's choice: 1 on,
+// 2 off (another value leaves pResult alone). GM_vSetPowerBoostOption sets it.
+void GM_vGetPowerBoostOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (gSession.options.bBoostEnabled) {
     case 1:
         pResult->i = 1;
@@ -4473,7 +4475,9 @@ void fn_800818F8(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80081934(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 253: the spin control option (options.bSpinEnabled) as the menu's choice: 1 on,
+// 2 off (another value leaves pResult alone). GM_vSetSpinControlOption sets it.
+void GM_vGetSpinControlOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (gSession.options.bSpinEnabled) {
     case 1:
         pResult->i = 1;
@@ -4484,8 +4488,9 @@ void fn_80081934(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Option a0[2] as the menus' choice (1..6).
-void fn_80081970(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 254: level option a0[2] as the menu's choice: level 5 answers 1, levels 0..4
+// answer 2..6 (another value leaves pResult alone). GM_vSetOptionLevel2 sets it.
+void GM_vGetOptionLevel2(MsgArg* pArgs, MsgArg* pResult) {
     switch ((s8)gSession.options.a0[2]) {
     case 5:
         pResult->i = 1;
@@ -4508,8 +4513,11 @@ void fn_80081970(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Pick the saved custom round the holes come from.
-void fn_800819FC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 255: whether the round is a custom round (pArgs[0] nonzero; gpGame->b136), the
+// one saved as custom round pArgs[2] (gpGame->nSaveCourse) of save slot pArgs[1]
+// (gpGame->nSaveSlot). For a custom round its 18 holes are copied in (GM_SetupCustomHoleSelection)
+// and the current hole set to the first selected one.
+void GM_vSelectCustomRound(MsgArg* pArgs, MsgArg* pResult) {
     gpGame->b136 = pArgs[0].i;
     gpGame->nSaveSlot = pArgs[1].i;
     gpGame->nSaveCourse = pArgs[2].i;
@@ -4519,8 +4527,9 @@ void fn_800819FC(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Whether backup row pArgs[0] holds a profile no player slot is using.
-void fn_80081A54(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 256: whether backup row pArgs[0] (lbl_801D7148.p658) holds a profile (bActive)
+// that none of player slots 0..3 is using as its backup (aBackup); 0 when one is.
+void GM_vIsBackupProfileUnused(MsgArg* pArgs, MsgArg* pResult) {
     u8 bUsed = 0;
     int i;
 
@@ -4536,14 +4545,17 @@ void fn_80081A54(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_801D7148.p658[pArgs[0].i].bActive;
 }
 
-// The name in backup row pArgs[0]'s profile.
-void fn_80081B04(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 257: the name of the profile in backup row pArgs[0] (lbl_801D7148.p658) into
+// the string pArgs[1].
+void GM_vGetBackupProfileName(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[1].p)->pStr, lbl_801D7148.p658[pArgs[0].i].szName);
 }
 
-// Load slot pArgs[1] from backup row pArgs[0] (the rows are swapped first when they differ), and
-// mark the slot loaded.
-void fn_80081B50(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 258: player slot pArgs[1] takes the profile in backup row pArgs[0]: the slot is
+// marked loaded (lbl_801D7148.aLoaded), the two rows pArgs[0] and pArgs[1] are swapped when they
+// differ (fn_800779BC) so the profile sits in the slot's own row, that row is copied into the
+// slot's profile (gpSaveData) and becomes the slot's backup row (aBackup).
+void GM_vLoadBackupProfile(MsgArg* pArgs, MsgArg* pResult) {
     s32 nRow = pArgs[0].i;
     s32 nSlot = pArgs[1].i;
 
@@ -4555,16 +4567,22 @@ void fn_80081B50(MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D7148.aBackup[nSlot] = nSlot;
 }
 
-void fn_80081BD4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 259: backs up every player slot's profile that is active into the slot's own
+// backup row (fn_80077780).
+void GM_vBackupAllProfiles(MsgArg* pArgs, MsgArg* pResult) {
     fn_80077780();
 }
 
-void fn_80081BF4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 260: backs up player slot pArgs[0]'s profile (fn_80077808: into its backup row,
+// giving the slot one first when it has none).
+void GM_vBackupProfileClaimRow(MsgArg* pArgs, MsgArg* pResult) {
     fn_80077808(pArgs[0].i);
 }
 
-// Option n1C: menu choices 1-3 are the values 0-2, applied at once.
-void fn_80081C18(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 261: the rough option (options.n1C) from the menu's choice pArgs[0]: 1, 2, 3
+// give 0, 1, 2 (another choice keeps the old value), then applied at once (fn_80055CD0 sets
+// gRoughSetting, which the ball's roll reads). Message 262 reads it back.
+void GM_vSetRoughOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         gSession.options.n1C = 0;
@@ -4579,8 +4597,9 @@ void fn_80081C18(MsgArg* pArgs, MsgArg* pResult) {
     fn_80055CD0(gSession.options.n1C);
 }
 
-// Option n1C as the menus' choice (1..3).
-void fn_80081CA4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 262: the rough option (options.n1C) as the menu's choice: 0, 1, 2 answer 1, 2,
+// 3 (another value leaves pResult alone). GM_vSetRoughOption sets it.
+void GM_vGetRoughOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (gSession.options.n1C) {
     case 0:
         pResult->i = 1;
@@ -4594,11 +4613,14 @@ void fn_80081CA4(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80081CF8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 263: empty in this build.
+void GM_vFEMessage263_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Slot pArgs[0]'s created golfer: set its ball type (pArgs[4]) and n54C2 (pArgs[5]); -1 keeps one.
-void fn_80081CFC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 264: save slot pArgs[0]'s created golfer's ball type (nGolferBallType) from
+// pArgs[4] and its glove variant (n54C2, which the session's PlayerProfile.n2 gets) from pArgs[5];
+// a value below 0 keeps the old one. pArgs[1..3] are not read. Message 265 reads them back.
+void GM_vSetCreatedGolferBallAndGlove(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[4].i >= 0) {
         gpSaveData[pArgs[0].i].nGolferBallType = pArgs[4].i;
     }
@@ -4607,8 +4629,10 @@ void fn_80081CFC(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// The same two, read back (read signed); pArgs[1..3] are cleared.
-void fn_80081D50(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 265: save slot pArgs[0]'s created golfer's ball type (nGolferBallType) and
+// glove variant (n54C2), read signed, into the words pArgs[4] and pArgs[5] point at; the words
+// pArgs[1..3] point at get 0. GM_vSetCreatedGolferBallAndGlove sets them.
+void GM_vGetCreatedGolferBallAndGlove(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[1].p = 0;
     *(s32*)pArgs[2].p = 0;
     *(s32*)pArgs[3].p = 0;
@@ -4616,10 +4640,12 @@ void fn_80081D50(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[5].p = (s8)gpSaveData[pArgs[0].i].n54C2;
 }
 
-// Slot pArgs[0]'s created golfer: a level 1..4 per attribute group (below 50, 50, 75, 100) into
-// the words pArgs[1..5] point at: power (4 once the tour card is at level 6), ball striking and
-// approach together, putting, spin and recovery.
-void fn_80081DB8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 266: save slot pArgs[0]'s created golfer's level (1..4) in each attribute
+// group, into the words pArgs[1..5] point at: 1 below 50, 2 from 50, 3 from 75, 4 from 100. Groups:
+// power (4 only once the profile's tour card is at level 6, whatever the attribute), ball striking
+// and approach (the lower of the two decides), putting, spin, recovery. Message 269 lists the
+// levels newly reached.
+void GM_vGetCreatedGolferAttributeLevels(MsgArg* pArgs, MsgArg* pResult) {
     s8 nPower = gpSaveData[pArgs[0].i].createdGolfer.attr[ATTR_POWER];
     s8 nStriking = gpSaveData[pArgs[0].i].createdGolfer.attr[ATTR_BALL_STRIKING];
     s8 nApproach = gpSaveData[pArgs[0].i].createdGolfer.attr[ATTR_APPROACH];
@@ -4640,20 +4666,26 @@ void fn_80081DB8(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[5].p = (nRecovery >= 100) ? 4 : (nRecovery >= 75) ? 3 : (nRecovery >= 50) ? 2 : 1;
 }
 
-void fn_80081F98(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 267: sets byte n1 of the menus' working profile (lbl_80281ED4) to pArgs[0] (-1
+// when the working profile is set up, FE_Manager.c); only message 268 reads it.
+void GM_vSetFEProfileN1(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->n1 = pArgs[0].i;
 }
 
-void fn_80081FA8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 268: byte n1 of the menus' working profile (lbl_80281ED4), read signed
+// (GM_vSetFEProfileN1 sets it).
+void GM_vGetFEProfileN1(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80281ED4->n1;
 }
 
-// Build the list of pairs fn_80082620 reads back, n10620 of them: slot pArgs[0]'s created golfer's
-// saved attributes against six values (pArgs[1..6]). Where the saved attribute has reached 50, 75
-// or 100 and the value passed for it is still under that mark, the pair (group, 2, 3 or 4 by mark)
-// is added. Groups: 1 power (50 and 75 only), 2 ball striking and approach (both reached, either
-// value under), 3 putting, 4 spin, 5 recovery.
-void fn_80081FBC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 269: lists the attribute levels save slot pArgs[0]'s created golfer has reached
+// that the six values pArgs[1..6] (floats: power, ball striking, approach, putting, spin, recovery)
+// have not, as pairs (group, level) in lbl_80281ED4->a10621, counted in n10620. A level is 2, 3 or
+// 4 for a saved attribute of 50, 75 or 100 whose value passed is under that mark. Groups as in
+// message 266: 1 power (levels 2 and 3 only), 2 ball striking and approach (both reached, either
+// value under), 3 putting, 4 spin, 5 recovery. Messages 270 and 271 read the list back, 272 empties
+// it.
+void GM_vBuildAttributeLevelUps(MsgArg* pArgs, MsgArg* pResult) {
     int n = 0;
     int i;
     f32 fPower = pArgs[1].f;
@@ -4760,17 +4792,22 @@ void fn_80081FBC(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80082608(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 270: how many pairs GM_vBuildAttributeLevelUps listed (lbl_80281ED4->n10620).
+void GM_vGetNumAttributeLevelUps(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80281ED4->n10620;
 }
 
-// The two values of pair pArgs[0] into the words pArgs[1] and pArgs[2] point at.
-void fn_80082620(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 271: pair pArgs[0] of the list GM_vBuildAttributeLevelUps made: the attribute
+// group into the word pArgs[1] points at, the level reached into the word pArgs[2] points at (-1
+// and -1 past the list's end).
+void GM_vGetAttributeLevelUp(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[1].p = lbl_80281ED4->a10621[pArgs[0].i][0];
     *(s32*)pArgs[2].p = lbl_80281ED4->a10621[pArgs[0].i][1];
 }
 
-void fn_8008266C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 272: empties the list GM_vBuildAttributeLevelUps made (its count,
+// lbl_80281ED4->n10620, set to 0; the pairs stay).
+void GM_vClearAttributeLevelUps(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->n10620 = 0;
 }
 
