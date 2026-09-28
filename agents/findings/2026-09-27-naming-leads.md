@@ -544,3 +544,56 @@ option is the swing trail), GM_vSet/GetOnOffOption3-6, GM_vSet/GetOptionN14, GM_
 GM_vBonusTrophyBallsWon (TW07 has GM_vTrackingTigerBallsWon there), GM_vFEMessage151_Return30Or60,
 GM_vMCHasSLUS20572Save, GM_vGet/SetFEStateB10, GM_vGbaIsReadPending (always 0),
 GM_vGetThreeLevelsOneRaised, GM_vEASBioIsNotWrongFile.
+
+## Round 17 (rq1-rq6) leftovers
+The front-end area is DONE (FE_Manager, PasswordManager, uiProcessInterface, uiLoadFile, uiTransform,
+fe_movies, Code80090940, uiText, uiArc, uiobject, Trax, fe_craputils, FE_LogoDesign, LogoTexture,
+Code800B90F4, gbacable). Replay notes: rq1's field scripts matched lbl_801D7148 / lbl_801D87C0 /
+lbl_80281ED4, which rq2 / rq3 renamed (gFEState / gUIState / gpFEProfile) the same round: the
+orchestrator re-applied them through the new names (scratch r17_fieldfix.py). Next time a header lane
+renames fields of a struct whose global another lane renames, run the header scripts on the new names.
+EA file names proven (for the owner; not renamed yet): fe_movies.c = EA's uiProcessPolygon.c (TW07's
+file holds UI_InitLoadingBar / UI_DrawLoadingScreenAndProgressBar; TW06 lists uiprocesspolygon.c
+among the iStudio runtime files; link order uiProcessInterface < uiProcessPolygon < uiText);
+Trax.c = uiEATrax.c (TW2003's string "uiEATrax.c" right after "crcmp_mad_codec.c"; TW07 order);
+uiobject.c = uiObject.c (TW07 order). Misfiled-unit evidence: LogoTexture.c is FE_LogoDesign.c's tail
+(code starts at its end, no data of its own, TW07's FE_LogoDesign.c ends with pixel helpers), and so
+probably is unsorted/sweep_8010FF5C.c; Code800B90F4.c is two units: 0x800B90F4..0x800B9944 carries
+EA's only "rcmp_mad_codec.c" string (so our rcmp_mad_codec.c, the block decoder and IDCT, may be TW06's
+maddec.c / madidct.c), then the Create-A-Player ball from 0x800B9944 (an .sbss gap at 0x802821BC);
+PasswordManager.c's SaveProfile_* tail has no TW07 PasswordManager counterpart (maybe user.c's unit);
+Code80090940.c: no evidence either way.
+Still open (headers): fe.h FE_DateToInt / FE_IntToDate prototypes (a, b, c) / (n, pA, pB, pC) vs the
+definitions (nMonth, nDay, nYear) / (nDate, pMonth, pDay, pYear); fe.h extern comment columns after
+the renames (gStartUnlockedGolfers, gpFEBios, gFEBackupSize, gFEBackupAramAddr); fe.h LogoEdit.n0 =
+nLogo (0..4); fe.h FE801D8858 = the loading bar's timing (n0 set never read, f4 next tile time, f8 next
+redraw, fC seconds per tile, f10 elapsed, b18 running, n1C last tile) and its "0x8009170C" comment is
+wrong; FE801D8890 per 'txf2' bank (n4 > 0: pixels freed before a movie); FEQuad n2 table (-1 none),
+n0 entry, nA ignored; fe.h section heading "the front end's movies (fe_movies.c)" stale; fe.h
+FE801D880C = the delayed hint (n0 frame counter, n4 hint value); FEScreen is the UI's input and fade
+state (a28 last frame's a1, a30 per-controller input enabled, b40 blocks buttons, b49 hides the menu
+golfer): the type name misleads; FEProfile.a1C0 (lock kinds 25 / 26) unnamed; FEState.b10 unnamed;
+save.h gPasswordEnteredBits comment says "the code at 0x80056480" (PasswordManager_IsPasswordEntered);
+save.h SkinChoices n0 / a1 / n81 / a82 / n102 / sz103 = the custom animation lists; save.h a10548 =
+the UserInfo flag bits; engine.h UFontContext.fB4 = line spacing; uistudio.h UISMessageFncT n1..n5 =
+group, screen, param count, params, return (Madden's UISCallbackMessageFnc); UISPluginFncT = Madden's
+_BlankProcess(pObjData, ProcessID, nParam, pParam, pReturn); game/frontend.h FrontEnd.pC = the picture
+list ('GRPS' / 'MPCS'), UIFileEntry / UIMovieData are picture entries, not movie entries; trax.h
+TraxTrack sz0 / szSong / sz100 = the three lines shown; core/gbacable.h GbaChannel n0 port steps,
+uStatus = JSTAT byte, u5C SI error values, n74 never read; gGbaSearchStartTick comment; the GBA
+prototypes FE_MessageTable.c and gomainloop.c declare locally belong in core/gbacable.h;
+OSGetResetButtonState / OSResetSystem declared locally in gbacable.c (OSResetSystem as s32 there,
+void in extern/). Prototype mismatches: gomainloop.c UI_DrawInterface(int) / UI_UpdateInterface(int)
+vs (s32 nTicks) / (u32 uEvent); uiProcessInterface.c UIText_SetFontDrawQueued / UI_EATraxFreeLogo
+declared s32, defined void; LLPict_Gc.c MAD_InitDecoder (int), MAD_CloseDecoder (void), MAD_IsAtEnd
+(MadDecoder*), MAD_GetNextFrame / MAD_ReleaseFrame (void*); FEgolferanim.c FE_CrAPBall_Render(int) vs
+(u8 bTarget); Code8002DB80.c Input_vSetVibrationStatus (int nPad, u8) vs (int nController, int
+bEnable); the MAD_ / FE_CrAPBall_ prototypes belong in llpict.h / fe.h. ~370 others: protodiff.py.
+Globals (other files): lbl_80281DF4 (user.c) = cheat-code unlocks for every profile;
+gInterruptsOffDepth / gpInterruptsOffDepth are defined in Trax.c's data but used by LLDisp_Gc.c.
+Least-sure names this round: FE_CloseManager (TW07 splits it in two), FE_CrAP_RandomizeFace (also hats),
+FE_CrAP_EquipDefaults (order and size only), FE_PlayRTEMovie / FE_PlayLadderMovie,
+UserInfo_InitCrAPItemBitArrays, FE_LogoDesign_UploadCustomLogo (0x8010FA00; the pairing row said
+0x8010FAF4), UserInfo_*CourseSlot21/22, UI_OpenInterface / UI_vInitModule (TW07 bodies differ),
+gUIState / UI_BlankProcess1-6, gbUIFirstMenuDraw, gUITxf2Bank*, UIText_SetFontAlignPoint,
+Gba_ReadHandshakeCode, the GBA "UndoTransfer" / "Unsaved" flags (never raised).

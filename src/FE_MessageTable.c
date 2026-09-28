@@ -99,7 +99,7 @@ s32  Gba_IsReadPending(void);
 void Gba_SetReadPending(s32 v);
 void Gba_SetUndoTransfer(s32 v);
 s32  Gba_IsUndoTransfer(void);
-void Gba_StepPorts(s32 a, s32 b);
+void Gba_StepPorts(s32 nCmd, s32 nArg);
 
 // The other files' message handlers in the table (the Create-A-Player screens, the logo editor,
 // the PGA TOUR screens, the stats screen, the EA Sports Bio...).
@@ -5661,8 +5661,9 @@ void GM_vGbaStartLink(MsgArg* pArgs, MsgArg* pResult) {
     Gba_SetState(0);
 }
 
-// Front-end message 593: link state 6: Gba_UpdateLinkState then takes the cash from the Game Boy Advance
-// into the current profile, has the GBA save its cash and goes to state 7.
+// Front-end message 593: link state 6: Gba_UpdateLinkState then takes the amount message 624 set
+// (Gba_GetCashToMove, request 0x90) from the Game Boy Advance into the current profile, has the GBA
+// save its cash and goes to state 7.
 void GM_vGbaTakeCash(MsgArg* pArgs, MsgArg* pResult) {
     Gba_SetState(6);
 }
@@ -5679,8 +5680,8 @@ void GM_vFEMessage595_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 611: puts the Game Boy Advance link in state 18 (0x12), the state a failed
-// command leaves it in: Gba_UpdateLinkState stops working the link and undoes what a pending request did to
-// the profile.
+// command leaves it in: Gba_UpdateLinkState stops working the link. Its undo of a pending request
+// never runs in this build (gGbaCashUnsaved and gGbaStatsUnsaved are only ever set to 0).
 void GM_vGbaCancelLink(MsgArg* pArgs, MsgArg* pResult) {
     Gba_SetState(18);
 }

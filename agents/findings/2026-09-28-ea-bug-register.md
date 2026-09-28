@@ -17,6 +17,9 @@ own files in its pass; the rest come here.
 | PGATourSimulation.c CalcParBreakers | nBirdies already includes eagles and the formula adds nEagles again | round 15 (ro3) |
 | FE_MessageTable.c GM_vMCLoadUser (menu message 35) | answers 1 or an error, never 0: the slot is backed up and marked loaded when the load failed | round 15 (ro5) |
 | FE_MessageTable.c GM_vMaskString (menu message 399) | the terminator goes one past the stars; for 63 stars it writes szStars[64], past the buffer (64 or more: the loop does) | round 16 (rp6, label extended) |
+| FE_Manager.c FE_CrAP_IsItemLocked, kind 20 | counts groups with aMedal != 0, but 0 is the best medal and 3 none: a new profile (all 3) unlocks every kind-20 item with n <= 29, and winning best medals lowers the count (message 175 tests != 3) | round 17 (rq2) |
+| FE_Manager.c FE_CrAP_IsItemLocked, kind 24 | the loop `i = 23; i < 16` never runs: only n <= 0 unlocks (label made exact) | round 17 (rq2) |
+| Code800B90F4.c MAD_ReadNextFile | the end-of-movie test repeats the NULL test above it, so nEnd is never set: MAD_IsAtEnd always answers 0 and LLVideo.c stops a movie only when it is starved | round 17 (rq5) |
 
 ## Open: behaviour proven possible, needs data or intent to settle
 | Where | What | What settles it |
@@ -44,12 +47,17 @@ own files in its pass; the rest come here.
 | GameModeFourBall.c EndGame | adds nMoney to money.n14 where GameModeMatch adds nPrize | intent only |
 | FE_MessageTable.c GM_vFindGolferBio | no matching bio reads entry 29, one past FE_NUM_BIOS | whether the menus ask for a golfer without a bio |
 | FE_MessageTable.c GM_vSetProfileSecondName | an empty string makes the space-trim loop test szName[9], which can cut the name | whether a profile name can have a space as its 10th byte |
-| FE_MessageTable.c GM_vQueueMovie (message 327) | never stores pArgs[0] as FEMovie.nBio (nothing writes it): every bio movie plays bios/bio01 | whether the disc has bio02 and up; what the menus send in pArgs[0] |
 | FE_MessageTable.c GM_vSetCustomRoundName (message 212) | copies pArgs[3] characters with no bound: 20 or more overwrite n15 and the hole list | the longest name the menus pass |
 | FE_MessageTable.c GM_vSetRandomCustomRoundHole (message 228) | `% 0` with no course from its list unlocked; loops forever with only course 0 unlocked and all its holes in the round | whether course 0 is always unlocked; the state the menus call it in |
 | FE_MessageTable.c GM_vTestPassword | copies pArgs[1] characters into a 0x20-byte buffer | the longest code the menus pass |
-| FE_MessageTable.c GM_vGbaAddCashToMove (message 624) | lbl_80260E18[lbl_80281984] with the index -1 when no port is linked | whether the menus send 624 with nothing linked |
-| FE_Manager.c lock check, kind 20 | counts aMedal[i] != 0, so groups with no medal (3) count and best medals (0) do not; message 175 tests != 3 | the unlock data: what kind 20 is meant to unlock |
+| FE_MessageTable.c GM_vQueueMovie (message 327) | proven: nothing writes FEMovie.nBio (fn_800770FC's three callers store only nKind; the state is .bss), so FE_movieFade always plays bios/bio01 (rq4) | whether the menus send pArgs[0] != 0 (the disc's UI script); whether the disc has bio02 and up |
+| gbacable.c Gba_*CashToMove / GM_vGbaAddCashToMove (message 624) | gGbaPortInUse is -1 from GM_vGbaStartLink until a GBA answers; the five getters and setters then index gGbaChannels[-1], which is TibExt.c's card record: Gba_SetCashToMove writes into its szFileName; link states 6 and 8 and message 623 read it (rq6) | the disc's UI script: messages 593 / 594 / 623 / 624 with nothing linked |
+| gbacable.c Gba_UpdateLinkState state 6 | with 0 cash on the GBA, request 0x90 leaves n6C as asked and the profile still gets += n6C | the GBA game's side of request 0x90 |
+| gbacable.c Gba_UpdateLinkState state 8 | best round: a set profile value is overwritten by the GBA's 0; holes in one: the GBA's count is added again on every swap | the GBA game's data |
+| Code80090940.c UI_FreeMarkedEntryPictures | clears an entry's whole u0 (kind 2 too), so a picture element cannot decode its picture again in one UI session | UI data with a picture element loaded twice in a session |
+| uiArc.c UIArc_Draw | stops at the first segment whose four corners are all transparent (later visible segments skipped) | intent only |
+| uiProcessInterface.c UI_GetMoneyString | -123 prints as "-,123" | whether the UI scripts pass negative money |
+| uiTransform.c UITransform_HandleOp / uiLoadFile.c UI_StreamLoadTextures | no check against the stack's 8 levels / the 5 texture slots | the UI file's data |
 
 ## Dropped (checked: harmless or not a bug)
 AnimStream_AssignSlots / StartRead (streaming is never on: AnimStream_Init clears bOn);
