@@ -154,3 +154,25 @@ Golfer area header pass (char.c / SkinPart.c lanes, include/ not edited):
 - FEgolferanim.c: 8008E918 likely TW07 FE_SetTextureSwapState, 8008E944 FE_SetDelayTextureSwap.
 - char.c file header is stale ("Not all of it matches yet"): for the lane that finishes char.c.
 Continue: char.c from 0x8001A288 (120 to go); SkinPart.c from 0x800CDAFC SkinPart_FindPart (42 to go).
+
+## Round 6 (rf1-rf4, golfer area) leftovers
+- char.c: continue from 0x8001C5B4 Character_SelectClub (80 to go). fn_8001EE00 / fn_8001ED44 are TW07's
+  inline Character_ComputeMaxVisableShadowDistance / Character_ComputeMaxVisableDistance. fn_8001A484 is
+  empty (unnamed on purpose). char.c:184 local prototype SkinPart_CopyChoices(.., int a, int b) -> nFrom/nTo.
+  The char.c file header ("Not all of it matches yet") is for the lane that finishes char.c.
+- character.h, still offset names: n1654/n1658 (Character_ClipTest result for the body / 3-unit shadow
+  sphere, 2 = out of view), n1698 (1 once posed, Skin.c SKN_PoseCharacter), f165C/f1660 (max draw
+  distance shadow / body), v1668/f1674 (bounding sphere centre/radius), n1784 (which half of the foot
+  points to update), u10 bits (0x1 hidden, 0x2 flagstick, 0x40 dyn textures given back, 0x1000 cleared
+  each frame by Character_PreRenderAll, 0x4000 club hangs from the root), p17AC typed void* but is a
+  CharSliderDefs*, Character.p44 = per-course lighting (SKN_GetLightCourse, read as LightParams); the
+  rest listed in rf4's report (nC, f14, n18.., p178C-p1798). CharModel fC/f10 = left/right foot length.
+- charstate.h: SkinListEntry p8/nC -> pRecolor/nRecolorMode; SkinDesc8C a08 = f32[3][3] colour matrix,
+  n2C its mode; SkinTarget is really a DynTex (SkinPart_SetupMaterials could take DynTex*); CharPool
+  a[6] used past the 2 live entries; CharPoolEntry.p is a DynTex*; lbl_80280E20 = most clips a blend
+  tree holds (animblender.c fn_800724C0). Skin p1088/p108C/p1090/a1098/a10A0/f10D8/f10DC unnamed.
+- Unused-argument hooks: SkinPart_DrawPart (callers pass the view), SkinPart_InitSkin / ShutdownSkin /
+  UpdateSkin / InitTextures are (void) but called with arguments (casts + port: notes in Skin.c/char.c).
+- hwsRender_Gc.c declares `s32 SKN_CloseModule();` vs `void SKN_CloseModule(void)`. Code80016198.c
+  fn_80016978's comment says corners, RC_ApplyViewport passes left, top, width, height.
+- Tool: name.py drops the `port:` continuation indent ("//       ") when it rewraps a comment.

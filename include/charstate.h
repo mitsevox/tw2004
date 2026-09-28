@@ -51,7 +51,7 @@ LAYOUT_ASSERT(SkinDescB8, 0x10);
 // An entry of SkinDesc.p14, copied and patched by SkinPart_ApplySetsToMaterialEntry.
 typedef struct SkinDesc14 {
     u64  uId;                   // 0x00
-    u32  u08;                   // 0x08  bit 2: take a20 from SkinDesc.pB8; bit 1: not listed (SkinPart_ListOptionTextures)
+    u32  u08;                   // 0x08  bit 2: take a20 from SkinDesc.pB8; bit 1: not texture-listed
     u32  u0C;                   // 0x0C
     u32  u10;                   // 0x10
     s16  n14;                   // 0x14
