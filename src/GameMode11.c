@@ -1104,14 +1104,14 @@ void Lessons_EndGame(void) {
     EASBio_IncrementGamesWon(1);
 }
 
-// The player chose to stop after lesson 7 (UI command fn_800881A8): step 17 goes on to quitting.
+// The player chose to stop after lesson 7 (UI command GM_vLessonsQuit): step 17 goes on to quitting.
 // The crowd sound ends.
 void Lessons_ChooseQuit(void) {
     gLessonQuitChosen = 1;
     Gaud_ExitCrowdReactionSound();
 }
 
-// The player chose to go on after lesson 7 (UI command fn_800881C8): step 17 goes on to lesson 8.
+// The player chose to go on after lesson 7 (UI command GM_vLessonsContinue): step 17 goes on to lesson 8.
 // The crowd sound ends.
 void Lessons_ChooseContinue(void) {
     gLessonContinueChosen = 1;

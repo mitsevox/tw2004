@@ -134,7 +134,7 @@ int GameModeSkillZoneBase_GetGreenTargetted(int nPlayer) {
     return nBest;
 }
 
-// The HUD clock ran out (UI command fn_80088208, in a target mode): mode 13's
+// The HUD clock ran out (UI command GM_vTimerOut, in a target mode): mode 13's
 // GameModeSkillZoneTimed_TimerOut; the other target modes have no timer.
 void GameModeSkillZoneBase_TimerOut(void) {
     if (Game_GetMode() == 0xD) {

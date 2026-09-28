@@ -99,36 +99,36 @@ void GM_vIsPlayNowChallenge(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIsPlayNowSpeedGolf(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetPlayNowMedalMark(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetPlayNowScoreToTarget(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087764(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087790(MsgArg* pArgs, MsgArg* pResult);
-void fn_800877CC(MsgArg* pArgs, MsgArg* pResult);
-void fn_800879B4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087BE8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087C1C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087C7C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087CBC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087D14(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087D34(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087D54(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087D8C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087DD4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087E1C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087E60(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087E80(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087E9C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087ED8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087F48(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087FAC(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008802C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008805C(MsgArg* pArgs, MsgArg* pResult);
-void fn_800880AC(MsgArg* pArgs, MsgArg* pResult);
-void fn_800880CC(MsgArg* pArgs, MsgArg* pResult);
-void fn_800880D0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80088160(MsgArg* pArgs, MsgArg* pResult);
-void fn_800881A8(MsgArg* pArgs, MsgArg* pResult);
-void fn_800881C8(MsgArg* pArgs, MsgArg* pResult);
-void fn_800881E8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80088208(MsgArg* pArgs, MsgArg* pResult);
+void GM_vShowAnalysisTip(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetTipStat(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vConcede_Hole(MsgArg* pArgs, MsgArg* pResult);
+void GM_vReportCaddieTipWindow(MsgArg* pArgs, MsgArg* pResult);
+void GM_vDisableCaddieTips(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_MCMemforReplay(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_MCConnect(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_MCDisconnect(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_Multitap(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_MCExists(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_MCFormatted(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_MCfreeMem(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_MCGetNumReplays(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_MCfunction(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_MCFormat(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_SaveReplay(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_ReplaceReplay(MsgArg* pArgs, MsgArg* pResult);
+void GM_vCurrentReplayValid(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetNumHolesRemaining(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerUIZoomedIn(MsgArg* pArgs, MsgArg* pResult);
+void GM_vPracticeNextHole(MsgArg* pArgs, MsgArg* pResult);
+void GM_vCommand92_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerShotSetup(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerBackSwing(MsgArg* pArgs, MsgArg* pResult);
+void GM_vLessonsQuit(MsgArg* pArgs, MsgArg* pResult);
+void GM_vLessonsContinue(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetGolferController(MsgArg* pArgs, MsgArg* pResult);
+void GM_vTimerOut(MsgArg* pArgs, MsgArg* pResult);
 void fn_8008823C(MsgArg* pArgs, MsgArg* pResult);
 void fn_8008828C(MsgArg* pArgs, MsgArg* pResult);
 void fn_800882C0(MsgArg* pArgs, MsgArg* pResult);
@@ -438,35 +438,35 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[66] = GM_vIsPlayNowSpeedGolf;
     gIGMessageHandlers[67] = GM_vGetPlayNowMedalMark;
     gIGMessageHandlers[68] = GM_vGetPlayNowScoreToTarget;
-    gIGMessageHandlers[69] = fn_80087764;
-    gIGMessageHandlers[70] = fn_80087790;
-    gIGMessageHandlers[71] = fn_800877CC;
-    gIGMessageHandlers[72] = fn_800879B4;
-    gIGMessageHandlers[73] = fn_80087BE8;
-    gIGMessageHandlers[74] = fn_80087C1C;
-    gIGMessageHandlers[75] = fn_80087C7C;
-    gIGMessageHandlers[76] = fn_80087CBC;
-    gIGMessageHandlers[77] = fn_80087D14;
-    gIGMessageHandlers[78] = fn_80087D34;
-    gIGMessageHandlers[79] = fn_80087D54;
-    gIGMessageHandlers[80] = fn_80087D8C;
-    gIGMessageHandlers[81] = fn_80087DD4;
-    gIGMessageHandlers[82] = fn_80087E1C;
-    gIGMessageHandlers[83] = fn_80087E60;
-    gIGMessageHandlers[84] = fn_80087E80;
-    gIGMessageHandlers[85] = fn_80087E9C;
-    gIGMessageHandlers[86] = fn_80087ED8;
-    gIGMessageHandlers[87] = fn_80087F48;
-    gIGMessageHandlers[88] = fn_80087FAC;
-    gIGMessageHandlers[89] = fn_8008802C;
-    gIGMessageHandlers[90] = fn_8008805C;
-    gIGMessageHandlers[91] = fn_800880AC;
-    gIGMessageHandlers[92] = fn_800880CC;
-    gIGMessageHandlers[93] = fn_800880D0;
-    gIGMessageHandlers[94] = fn_800881A8;
-    gIGMessageHandlers[95] = fn_800881C8;
-    gIGMessageHandlers[96] = fn_800881E8;
-    gIGMessageHandlers[97] = fn_80088208;
+    gIGMessageHandlers[69] = GM_vShowAnalysisTip;
+    gIGMessageHandlers[70] = GM_vGetTipStat;
+    gIGMessageHandlers[71] = GM_vGetOption;
+    gIGMessageHandlers[72] = GM_vSetOption;
+    gIGMessageHandlers[73] = GM_vConcede_Hole;
+    gIGMessageHandlers[74] = GM_vReportCaddieTipWindow;
+    gIGMessageHandlers[75] = GM_vDisableCaddieTips;
+    gIGMessageHandlers[76] = GM_vIG_MCMemforReplay;
+    gIGMessageHandlers[77] = GM_vIG_MCConnect;
+    gIGMessageHandlers[78] = GM_vIG_MCDisconnect;
+    gIGMessageHandlers[79] = GM_vIG_Multitap;
+    gIGMessageHandlers[80] = GM_vIG_MCExists;
+    gIGMessageHandlers[81] = GM_vIG_MCFormatted;
+    gIGMessageHandlers[82] = GM_vIG_MCfreeMem;
+    gIGMessageHandlers[83] = GM_vIG_MCGetNumReplays;
+    gIGMessageHandlers[84] = GM_vIG_MCfunction;
+    gIGMessageHandlers[85] = GM_vIG_MCFormat;
+    gIGMessageHandlers[86] = GM_vIG_SaveReplay;
+    gIGMessageHandlers[87] = GM_vIG_ReplaceReplay;
+    gIGMessageHandlers[88] = GM_vCurrentReplayValid;
+    gIGMessageHandlers[89] = GM_vGetNumHolesRemaining;
+    gIGMessageHandlers[90] = GM_vGetPlayerUIZoomedIn;
+    gIGMessageHandlers[91] = GM_vPracticeNextHole;
+    gIGMessageHandlers[92] = GM_vCommand92_Empty;
+    gIGMessageHandlers[93] = GM_vGetPlayerShotSetup;
+    gIGMessageHandlers[94] = GM_vLessonsQuit;
+    gIGMessageHandlers[95] = GM_vLessonsContinue;
+    gIGMessageHandlers[96] = GM_vGetGolferController;
+    gIGMessageHandlers[97] = GM_vTimerOut;
     gIGMessageHandlers[98] = fn_8008823C;
     gIGMessageHandlers[99] = fn_8008828C;
     gIGMessageHandlers[100] = fn_800882C0;
@@ -533,7 +533,7 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[162] = fn_80089D04;
     gIGMessageHandlers[163] = fn_80089D28;
     gIGMessageHandlers[164] = fn_800834A8;
-    gIGMessageHandlers[165] = fn_80088160;
+    gIGMessageHandlers[165] = GM_vGetPlayerBackSwing;
     gIGMessageHandlers[166] = fn_80089D48;
     gIGMessageHandlers[167] = fn_80089D68;
     gIGMessageHandlers[168] = fn_80089D98;
@@ -1348,8 +1348,9 @@ void GM_vGetPlayNowScoreToTarget(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = PlayNow_GetScoreToTarget();
 }
 
-// Show the tip GameAnalysis_PickTip picks (14: none).
-void fn_80087764(MsgArg* pArgs, MsgArg* pResult) {
+// Queues the statistic tip GameAnalysis_PickTip picks for the HUD (command 69); nothing when it
+// picks none (14).
+void GM_vShowAnalysisTip(MsgArg* pArgs, MsgArg* pResult) {
     int nTip = GameAnalysis_PickTip();
 
     if (nTip != 14) {
@@ -1357,12 +1358,18 @@ void fn_80087764(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80087790(MsgArg* pArgs, MsgArg* pResult) {
+// Player pArgs[0]'s statistic pArgs[1] for the tips, as a float (command 70):
+// GameAnalysis_GetTipStat's fairways, greens in regulation, putts, pars, birdies and the like.
+void GM_vGetTipStat(MsgArg* pArgs, MsgArg* pResult) {
     pResult->f = GameAnalysis_GetTipStat(pArgs[0].i, pArgs[1].i);
 }
 
-// One of the game options, picked by pArgs[0].
-void fn_800877CC(MsgArg* pArgs, MsgArg* pResult) {
+// One game option for the in-round menu, picked by pArgs[0] (command 71): 0 vibration
+// (options.a7[0], which fn_8002EBA4 sets), 1 gimmes, 2 the effects level, 3 the commentary level in
+// the menu's count (levels 0..4 answer 2..6, level 5 answers 1), 4 options.a7[1], 5 a24[6], 6
+// a24[4], 7 the music level, 8 a24[1]. The on/off options answer 0 or 1; another pArgs[0] leaves
+// *pResult alone.
+void GM_vGetOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 0:
         if (gSession.options.a7[0] != 0) {
@@ -1437,8 +1444,12 @@ void fn_800877CC(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Set one of the game options: pArgs[0] picks it, pArgs[1] is the value.
-void fn_800879B4(MsgArg* pArgs, MsgArg* pResult) {
+// Sets one game option from the in-round menu: pArgs[0] picks it, pArgs[1] is the value (command
+// 72). 0 vibration (fn_8002EBA4: on for all four controllers or off), 1 gimmes, 2 the effects level
+// (and the mixer, 0.2 x level), 3 the commentary level from the menu's 1..6 (1 is level 5, 2..6 are
+// levels 0..4; the mixer is set even for another value), 4 options.a7[1], 5 the music level (stored
+// only: the music volume is not set here). Past 4 the numbering is not GM_vGetOption's.
+void GM_vSetOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 0:
         if (pArgs[1].i != 0) {
@@ -1494,13 +1505,17 @@ void fn_800879B4(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// The player whose turn it is concedes the hole.
-void fn_80087BE8(MsgArg* pArgs, MsgArg* pResult) {
+// The player whose turn it is concedes the hole (command 73); the replay flag (gSession.bReplay) is
+// cleared first.
+void GM_vConcede_Hole(MsgArg* pArgs, MsgArg* pResult) {
     gSession.bReplay = 0;
     GM_GolferConcede_Hole(lbl_80282278);
 }
 
-void fn_80087C1C(MsgArg* pArgs, MsgArg* pResult) {
+// The UI reports the caddie tip window (command 74): pArgs[0] 1 closed (GUI_CaddieTipWindowClosed:
+// the HUD comes back on the next check); anything else open: the player up's HUD and target info
+// are hidden (fn_80062C80, message 0x1E with 0) and the swing is held (GUI_CaddieTipWindowIsOpen).
+void GM_vReportCaddieTipWindow(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 1) {
         GUI_CaddieTipWindowClosed();
         return;
@@ -1510,14 +1525,19 @@ void fn_80087C1C(MsgArg* pArgs, MsgArg* pResult) {
     GUI_CaddieTipWindowIsOpen();
 }
 
-void fn_80087C7C(MsgArg* pArgs, MsgArg* pResult) {
+// Turns the full caddie tips off for the player whose turn it is (command 75): sets his save
+// profile's b522F, when the profile is in use, and CTIP_ShowCaddieTip then shows only short tips.
+void GM_vDisableCaddieTips(MsgArg* pArgs, MsgArg* pResult) {
     if (gpSaveData[gPlayers[lbl_80282278].nIndex].bActive != 0) {
         gpSaveData[gPlayers[lbl_80282278].nIndex].b522F = 1;
     }
 }
 
-// The space save kind 2 (fn_80084FF0(2)) still needs on the card in port pArgs[0], slot pArgs[1].
-void fn_80087CBC(MsgArg* pArgs, MsgArg* pResult) {
+// The space a replay save still needs on the card in port pArgs[0], slot pArgs[1] (command 76): the
+// card is looked at, the replay file type's card operations are picked (fn_80084FF0(2); TW07's
+// MC_SetCurrentFileType) and their memory-required one asked (fn_80084FB4; TW07's
+// MC_CallActionFnMemoryRequired).
+void GM_vIG_MCMemforReplay(MsgArg* pArgs, MsgArg* pResult) {
     CardPos pos;
 
     pos.nPort = pArgs[0].i;
@@ -1528,56 +1548,67 @@ void fn_80087CBC(MsgArg* pArgs, MsgArg* pResult) {
     MC_Disconnect();
 }
 
-void fn_80087D14(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIG_MCConnect(MsgArg* pArgs, MsgArg* pResult) {
     MC_Connect();
 }
 
-void fn_80087D34(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIG_MCDisconnect(MsgArg* pArgs, MsgArg* pResult) {
     MC_Disconnect();
 }
 
-void fn_80087D54(MsgArg* pArgs, MsgArg* pResult) {
+// Whether a multitap is plugged into port pArgs[0] (command 79).
+void GM_vIG_Multitap(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = MC_IsMultitapPluggedIn(pArgs[0].i);
 }
 
-// Whether there is a card in the port and slot.
-void fn_80087D8C(MsgArg* pArgs, MsgArg* pResult) {
+// Whether a card is in port pArgs[0], slot pArgs[1], by its noted state (MC_GetMC; command 80).
+void GM_vIG_MCExists(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState card;
 
     MC_GetMC(&card, pArgs[0].i, pArgs[1].i);
     pResult->i = (card.uFlags & MC_CARD_PRESENT) != 0;
 }
 
-void fn_80087DD4(MsgArg* pArgs, MsgArg* pResult) {
+// Whether the card in port pArgs[0], slot pArgs[1] is formatted (flag 0x08, MC_CARD_FORMATTED;
+// command 81).
+void GM_vIG_MCFormatted(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState card;
 
     MC_GetMC(&card, pArgs[0].i, pArgs[1].i);
     pResult->i = (card.uFlags & 0x08) != 0;
 }
 
-// The card's free blocks.
-void fn_80087E1C(MsgArg* pArgs, MsgArg* pResult) {
+// The free space on the card in port pArgs[0], slot pArgs[1], in whole sectors (command 82).
+void GM_vIG_MCfreeMem(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState card;
 
     MC_GetMC(&card, pArgs[0].i, pArgs[1].i);
     pResult->i = card.nFreeBlocks;
 }
 
-void fn_80087E60(MsgArg* pArgs, MsgArg* pResult) {
+// How many replays the save on the card in port pArgs[0], slot pArgs[1] holds, 0 on an error
+// (command 83): the menus' own command fn_8007E9BC, run with the same arguments.
+void GM_vIG_MCGetNumReplays(MsgArg* pArgs, MsgArg* pResult) {
     fn_8007E9BC(pArgs, pResult);
 }
 
-// Leave a request for the menu UI's update.
-void fn_80087E80(MsgArg* pArgs, MsgArg* pResult) {
+// Asks for pArgs[0] to be handed back to the UI a little later (command 84): uiProcessInterface.c
+// counts three UI updates (lbl_801D880C.n0), then sends it to the UI as hint 0x24 in a round (0x23
+// in the menus). The menus' fn_8007C988 does the same.
+void GM_vIG_MCfunction(MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D880C.n4 = pArgs[0].i;
     lbl_801D880C.n0 = 0;
 }
 
-void fn_80087E9C(MsgArg* pArgs, MsgArg* pResult) {
+// Formats the card in port pArgs[0], slot pArgs[1] (command 85); MC_FormatCard's result.
+void GM_vIG_MCFormat(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = MC_FormatCard(pArgs[0].i, pArgs[1].i);
 }
 
-void fn_80087ED8(MsgArg* pArgs, MsgArg* pResult) {
+// Saves the replay in memory (gReplayData) to the card in port pArgs[0], slot pArgs[1] as replay
+// pArgs[2] (-1: the first free one) (command 86); MC_SaveReplay's result. The spin input of the
+// player up is switched off first (swing.bCanSpin).
+void GM_vIG_SaveReplay(MsgArg* pArgs, MsgArg* pResult) {
     MCCardPos pos;
     s32 nPlayer;
 
@@ -1591,15 +1622,19 @@ void fn_80087ED8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = MC_SaveReplay(&pos);
 }
 
-void fn_80087F48(MsgArg* pArgs, MsgArg* pResult) {
+// Saves the replay in memory over replay pArgs[2] of the save on the card in port pArgs[0], slot
+// pArgs[1] (command 87; fn_800A0610's result). The spin input of the player up is switched off
+// first (swing.bCanSpin).
+void GM_vIG_ReplaceReplay(MsgArg* pArgs, MsgArg* pResult) {
     if (lbl_80282278 < 5) {
         gPlayers[lbl_80282278].swing.bCanSpin = 0;
     }
     pResult->i = fn_800A0610(pArgs[0].i, pArgs[1].i, pArgs[2].i);
 }
 
-// Whether the saved replay is on this hole of this course.
-void fn_80087FAC(MsgArg* pArgs, MsgArg* pResult) {
+// Whether the replay in memory (gReplayData, with bF10 set) is of the current hole of the current
+// course (command 88).
+void GM_vCurrentReplayValid(MsgArg* pArgs, MsgArg* pResult) {
     if (gReplayData.bF10 != 0 && gReplayData.nHole == Game_GetCurHoleNum() &&
         gReplayData.nCourse == Game_GetCourse()) {
         pResult->i = 1;
@@ -1608,12 +1643,14 @@ void fn_80087FAC(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_8008802C(MsgArg* pArgs, MsgArg* pResult) {
+// How many of the round's selected holes are left, the current one included (command 89;
+// fn_8008AC00).
+void GM_vGetNumHolesRemaining(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_8008AC00();
 }
 
 // Whether the player is in the zoom-to-aim camera.
-void fn_8008805C(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vGetPlayerUIZoomedIn(MsgArg* pArgs, MsgArg* pResult) {
     if ((s8)GOLFERSTATE_GetCurrentState(pArgs[0].i) == GS_ZOOM) {
         pResult->i = 1;
         return;
@@ -1621,15 +1658,19 @@ void fn_8008805C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_800880AC(MsgArg* pArgs, MsgArg* pResult) {
+// Practice mode: the player ends the hole early and goes on (command 91;
+// GameModePractice_FinishHole).
+void GM_vPracticeNextHole(MsgArg* pArgs, MsgArg* pResult) {
     GameModePractice_FinishHole();
 }
 
-void fn_800880CC(MsgArg* pArgs, MsgArg* pResult) {
+// Empty in this build: the UI's command 92, between GM_vPracticeNextHole and
+// GM_vGetPlayerShotSetup.
+void GM_vCommand92_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Whether the player is lining up a shot (states 2 to 4, 8 or 10) and has not started the swing.
-void fn_800880D0(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vGetPlayerShotSetup(MsgArg* pArgs, MsgArg* pResult) {
     int nState = (s8)GOLFERSTATE_GetCurrentState(pArgs[0].i);
 
     // fake match: states 2 to 4 tested as one unsigned compare
@@ -1642,8 +1683,9 @@ void fn_800880D0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// Whether the player's swing is in states 1 to 3.
-void fn_80088160(MsgArg* pArgs, MsgArg* pResult) {
+// Whether player pArgs[0]'s swing is under way: back swing, back fidget or down swing (swing.nState
+// SW_BACK_SWING .. SW_DOWN_SWING) (command 165).
+void GM_vGetPlayerBackSwing(MsgArg* pArgs, MsgArg* pResult) {
     if (gPlayers[pArgs[0].i].swing.nState == 2 || gPlayers[pArgs[0].i].swing.nState == 3 ||
         gPlayers[pArgs[0].i].swing.nState == 1) {
         pResult->i = 1;
@@ -1652,20 +1694,24 @@ void fn_80088160(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_800881A8(MsgArg* pArgs, MsgArg* pResult) {
+// The lessons: the player chose to stop after lesson 7 (command 94; Lessons_ChooseQuit).
+void GM_vLessonsQuit(MsgArg* pArgs, MsgArg* pResult) {
     Lessons_ChooseQuit();
 }
 
-void fn_800881C8(MsgArg* pArgs, MsgArg* pResult) {
+// The lessons: the player chose to go on to lesson 8 (command 95; Lessons_ChooseContinue).
+void GM_vLessonsContinue(MsgArg* pArgs, MsgArg* pResult) {
     Lessons_ChooseContinue();
 }
 
 // Who controls the player (CONTROLLER_CPU for the AI).
-void fn_800881E8(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vGetGolferController(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gPlayers[pArgs[0].i].nController;
 }
 
-void fn_80088208(MsgArg* pArgs, MsgArg* pResult) {
+// The HUD clock ran out (command 97): a target mode's timer (GameModeSkillZoneBase_TimerOut), else
+// speed golf's (SpeedGolf_TimerOut).
+void GM_vTimerOut(MsgArg* pArgs, MsgArg* pResult) {
     if (GM_Currently_SkillZoneMode()) {
         GameModeSkillZoneBase_TimerOut();
         return;
@@ -1761,7 +1807,7 @@ void fn_80088570(MsgArg* pArgs, MsgArg* pResult) {
     MC_Disconnect();
 }
 
-// The same as fn_80087CBC.
+// The same as GM_vIG_MCMemforReplay.
 void fn_800885A0(MsgArg* pArgs, MsgArg* pResult) {
     CardPos pos;
 

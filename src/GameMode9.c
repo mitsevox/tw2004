@@ -100,7 +100,7 @@ u8 GameModePractice_HoleFinished(int nPlayer, u8 bCheck) {
     return 1;
 }
 
-// The player ends the hole early (a UI command, fn_800880AC): the ended-early flag is set
+// The player ends the hole early (a UI command, GM_vPracticeNextHole): the ended-early flag is set
 // (HoleFinished then says the hole is over) and player 0's turn ends (GM_EndOfGolferTurn).
 void GameModePractice_FinishHole(void) {
     gPracticeHoleEndedEarly = 1;
