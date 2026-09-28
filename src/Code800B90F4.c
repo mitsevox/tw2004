@@ -1,5 +1,13 @@
-// Code800B90F4.c (our name): own unit, its .sbss starts on the 8-aligned address after
-// rcmp_mad_codec.c's padding at 0x802821BC..0x802821C0 and ends padded at 0x802821E4..0x802821E8
+// Code800B90F4.c (our name): two pieces of code that sit between rcmp_mad_codec.c and Trax.c.
+// - 0x800B90F4..0x800B9944, MAD_: the MAD movie decoder's frame handling (MadDecoder, llpict.h):
+//   reading the movie's files, six frames handed out with references, and decoding each file into
+//   one (the block decoder, MAD_decodemacroblock, is in rcmp_mad_codec.c). Its two allocations are
+//   tagged with EA's file name "rcmp_mad_codec.c".
+// - 0x800B9944.., FE_CrAPBall_: the ball the Create-A-Player menu golfer holds: its 'TEO ' models
+//   and 'BALF' logo bank as they stream in, the logo put on it, and its drawing in his hand
+//   (FEgolferanim.c calls it). GoDynObj.c does the same for the ball in play.
+// The unit's .sbss starts on the 8-aligned address after rcmp_mad_codec.c's padding at
+// 0x802821BC..0x802821C0 and ends padded at 0x802821E4..0x802821E8.
 
 #include "engine.h"
 #include "dynobj.h"
@@ -9,14 +17,14 @@
 #include "llpict.h"
 
 // Defined here, last address first (CodeWarrior lays out .sbss in reverse).
-UObject* gpCrAPBallTeo10000;          // } and 10000
-UObject* gpCrAPBallTeo10030;          // } 10030
-UObject* gpCrAPBallTeo10040;          // } made from the 'TEO ' objects 10040,
-TexBank* gpCrAPBallLogoBank;          // from the 'BALF' object
-void* gpCrAPBallUnusedMem;
-f32 gfCrAPBallOffsetY;               // }
-f32 gfCrAPBallOffsetX;               // } the held ball's offset in its bone (x, y); never set, so 0
-PictFile* (*gpfnMadRead)(void* pArg);   // reads the next MAD file
+UObject* gpCrAPBallTeo10000;    // the menu ball's objects, made from the 'TEO ' objects 10000
+UObject* gpCrAPBallTeo10030;    // (always drawn), 10030 and 10040 (drawn only while a logo is on
+UObject* gpCrAPBallTeo10040;    // the ball) by FE_CrAPBall_MakeObjects
+TexBank* gpCrAPBallLogoBank;    // the 'BALF' texture bank of ball logos (FE_CrAPBall_LoadBALF)
+void* gpCrAPBallUnusedMem;      // freed by FE_CrAPBall_Free when set; nothing here sets it
+f32 gfCrAPBallOffsetY;          // } the held ball's offset in bone 0x54 (x, y); never set, so 0
+f32 gfCrAPBallOffsetX;          // }
+PictFile* (*gpfnMadRead)(void* pArg);   // reads the movie's next MAD file (MAD_SetReadCallback)
 void* gpMadReadArg;             // what the read function is given
 
 void MAD_initdecode(u8* src, int motion, int quality);
@@ -235,7 +243,8 @@ PictFile* MAD_ReadNextFile(MadDecoder* p) {
         return NULL;
     }
     p->nFiles++;
-    // EA's test repeats the one above, so this is never reached
+    // EA bug: this test repeats the one above, so the end count is never set: nEnd stays 0,
+    // MAD_IsAtEnd never answers 1, and LLVideo.c stops a movie only once it is starved (bStarved)
     if (pFile == NULL) {
         if (p->nEnd == 0) {
             p->nEnd = 1;
@@ -324,16 +333,16 @@ u8 MAD_IsAtEnd(MadDecoder* p) {
 
 // ---- the 'TEO ' and 'BALF' stream handlers ----
 
-u8 gbCrAPBallLogoShown = 1;
+u8 gbCrAPBallLogoShown = 1;     // a logo is on the ball: objects 10030 and 10040 are drawn
 
-f32 gfCrAPBallOffsetZ = -2.0f;       // }  and z
-f32 gfCrAPBallScaleX = 1.0f;        // } the ball's scale on each axis
-f32 gfCrAPBallScaleY = 1.0f;        // }
-f32 gfCrAPBallScaleZ = 1.0f;        // }
-char gszCrAPBallLogoTex[] = "logoea";
+f32 gfCrAPBallOffsetZ = -2.0f;  // the held ball's offset in bone 0x54 (z; x and y above)
+f32 gfCrAPBallScaleX = 1.0f;    // }
+f32 gfCrAPBallScaleY = 1.0f;    // } the ball's scale on each axis
+f32 gfCrAPBallScaleZ = 1.0f;    // }
+char gszCrAPBallLogoTex[] = "logoea";   // the texture FE_CrAPBall_SetLogo copies a ball logo over
 
 void FE_CrAPBall_LoadBALF(UStreamObject* pObject);
-void FE_CrAPBall_LoadTEO(UStreamObject* arg0);
+void FE_CrAPBall_LoadTEO(UStreamObject* pObject);
 void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 void fn_8000C5A4(f32 (*pMtx)[4]);
@@ -370,22 +379,22 @@ void FE_CrAPBall_FreeTEO(void* arg0);
 // model is built from its data (fn_80045D80) and kept in the object (word 4), with
 // FE_CrAPBall_FreeTEO as its free function (word 8), and the object is listed (fn_8000B4B8) for
 // FE_CrAPBall_MakeObjects to find.
-void FE_CrAPBall_LoadTEO(UStreamObject* arg0) {
-    if (fn_8000B508(arg0) == 0) {
-        (*(UObjModel**)((u8*)(arg0) + 4)) = fn_80045D80(arg0->pData);
-        (*(void (**)(void*))((u8*)(arg0) + 8)) = FE_CrAPBall_FreeTEO;
-        fn_8000B4B8(arg0);
+void FE_CrAPBall_LoadTEO(UStreamObject* pObject) {
+    if (fn_8000B508(pObject) == 0) {
+        (*(UObjModel**)((u8*)(pObject) + 4)) = fn_80045D80(pObject->pData);
+        (*(void (**)(void*))((u8*)(pObject) + 8)) = FE_CrAPBall_FreeTEO;
+        fn_8000B4B8(pObject);
     }
 }
 
-// Frees the model FE_CrAPBall_LoadTEO built for a 'TEO ' object (arg0: the object): its root
+// Frees the model FE_CrAPBall_LoadTEO built for a 'TEO ' object (pObject: the object): its root
 // (fn_800075CC), then the model.
-void FE_CrAPBall_FreeTEO(void* arg0) {
-    void* temp_r31;
+void FE_CrAPBall_FreeTEO(void* pObject) {
+    void* pModel;
 
-    temp_r31 = (*(void**)((u8*)(arg0) + 4));
-    fn_800075CC(*(UObjModelRoot**)((u8*)(temp_r31) + 0x10));
-    StaticMem_Free(temp_r31);
+    pModel = (*(void**)((u8*)(pObject) + 4));
+    fn_800075CC(*(UObjModelRoot**)((u8*)(pModel) + 0x10));
+    StaticMem_Free(pModel);
 }
 
 // ---- end of sweep code ----
@@ -479,8 +488,8 @@ void FE_CrAPBall_DrawObject(UObject* pObj, f32 (*mBone)[4], f32 (*mScale)[4], f3
 // Draws the ball in the Create-A-Player menu golfer's hand (bone 0x54) when he holds it, into the
 // 384 x 528 target when bTarget, else to the screen (512 x 448). Object 10000 is always drawn;
 // 10030 and 10040 only while a logo is on the ball (FE_CrAPBall_SetLogo). The ball sits at the
-// bone's offset (0, 0, -2) with scale 1 on each axis (gfCrAPBallOffsetX, gfCrAPBallOffsetY, gfCrAPBallOffsetZ;
-// gfCrAPBallScaleX..gfCrAPBallScaleZ).
+// bone's offset (0, 0, -2) with scale 1 on each axis (gfCrAPBallOffsetX, gfCrAPBallOffsetY,
+// gfCrAPBallOffsetZ; gfCrAPBallScaleX..gfCrAPBallScaleZ).
 void FE_CrAPBall_Render(u8 bTarget) {
     f32 vPos[4];
     f32 mScale[4][4];

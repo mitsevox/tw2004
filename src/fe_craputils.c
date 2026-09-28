@@ -1,6 +1,10 @@
-// fe_craputils.c (TW06's golf/ui core/frontend/fe_craputils.c): the Create-A-Player (CrAP) data in
-// a save profile. FE_CrAP_InitCrAPInfo resets it; the rest unlock golfers, courses and rewards,
-// count the ladder events won, and keep the created golfer's name lists.
+// fe_craputils.c (TW06's golf/ui core/frontend/fe_craputils.c; TW07's FE_CrAPUtils.c): a save
+// profile's Create-A-Player (CrAP) data and its unlocks. FE_CrAP_InitCrAPInfo resets the created
+// golfer (choices, sliders, asset bits, logos); the FE_CrAP_*CustomAnimation functions keep its
+// custom animation lists. The UserInfo_ functions unlock and test golfers, courses and rewards,
+// keep the profile's flag bits and par-5 eagle records and count its ladder wins: TW07 has them
+// as methods of its profile class, UserInfo (UserInfo.cpp), under these names. The starting
+// sponsor of a new profile (FE_SetStartingSponsor) is kept here too.
 
 #include "golfer.h"
 #include "engine.h"
@@ -8,7 +12,7 @@
 #include "charstate.h"
 #include "frontend/fe.h"
 
-char gszNoLogoName[] = "NoLogoName";
+char gszNoLogoName[] = "NoLogoName";  // a user logo's name until the player names it
 
 void UserInfo_InitCrAPItemBitArrays(SaveProfile* pProfile);
 void FE_CrAP_ResetSliders(SaveProfile* pProfile);
@@ -37,7 +41,7 @@ void FE_CrAP_InitCrAPInfo(SaveProfile* pProfile) {
 
 // Only while the Create-A-Player database is loaded: for every asset, aAssetOwned is set for a
 // level-0 asset (FE_CrAP_GetPartLevelFromAssetIndex) and cleared otherwise, aAssetNew and
-// aAssetMarkedNew are cleared, and aAssetLocked is set as fn_80078008 answers with the asset's own
+// aAssetMarkedNew are cleared, and aAssetLocked is set as FE_CrAP_IsItemLocked answers with the asset's own
 // gender made current (the current gender is put back after). Then the five user logos' bSaved are
 // cleared and the 53 asset slots (aAF80) emptied (-1).
 void UserInfo_InitCrAPItemBitArrays(SaveProfile* pProfile) {
@@ -305,7 +309,7 @@ int FE_GetStartingSponsor(void) {
 }
 
 // Par-5 eagle record i (GM_ConvertCourseAndHoleToPar5EagleIndex, 0..74) of the profile: kind 0
-// whether the hole has been eagled, kind 1 the date of that eagle (packed by fn_80078604); -1 for
+// whether the hole has been eagled, kind 1 the date of that eagle (packed by FE_DateToInt); -1 for
 // another kind. Records 0..70 are kept in a5004/a504C, 71..74 in a10578/a1057C.
 int UserInfo_GetPar5EagleStat(SaveProfile* pProfile, int nKind, int i) {
     u8 bFirst = i < 71;

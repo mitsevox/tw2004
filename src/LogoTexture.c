@@ -1,7 +1,10 @@
-// LogoTexture.c (our name): the tail of FE_LogoDesign.c (the logo editor), kept as its own unit
-// until its one function is exact. FE_LogoDesign.c is linked and calls it, and the function after
-// it (fn_8010FF5C) copies into FE_LogoDesign.c's lbl_80212B60; it folds back into
-// FE_LogoDesign.c once exact.
+// LogoTexture.c (our name): the tail of FE_LogoDesign.c (the logo editor), a unit of its own in
+// splits.txt; it is exact and can fold back into FE_LogoDesign.c. Its code starts where
+// FE_LogoDesign.c's ends (0x8010FC3C), it has no data of its own, FE_LogoDesign.c calls it twice,
+// and the only other caller is the function right after it (fn_8010FF5C, unsorted/sweep_8010FF5C.c:
+// a user logo laid out as a texture in lbl_80212B60, for char_tex_manager.c). TW07's FE_LogoDesign.c
+// also ends, after FE_LogoDesign_GetPixelColor, with helpers that work on a logo's pixels
+// (FE_LogoDesign_FixLogoEdge, FE_LogoDesign_FixEdgeInTempData).
 
 #include "engine.h"
 #include "gx.h"

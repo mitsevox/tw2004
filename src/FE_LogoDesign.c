@@ -1,10 +1,13 @@
-// FE_LogoDesign.c (EA's name, from its asserts): the logo editor. A logo is a 64 x 64 or 128 x 32
-// grid of colour indexes into a 256-colour palette; the palette comes from the texture
-// "__LogoSquare", and the logo is copied into the texture "__LogoSquare" or "__LogoRect" to be drawn.
+// FE_LogoDesign.c (EA's name, from its allocations; TW07 keeps the file and these functions in the
+// same order): the Create-A-Player logo editor, where the player draws the five user logos of a
+// save profile. A logo is a 64 x 64 or 128 x 32 grid of colour indexes into a 256-colour palette
+// (the CLUT, copied from the texture "__LogoSquare"); the menus set and read its pixels through
+// FE_CrAPMessages.c, and FE_LogoDesign_UploadCustomLogo copies it into the texture "__LogoSquare"
+// or "__LogoRect" to be drawn. Its last function, the copy between the logo's rows and the texture
+// layout, is kept as the unit LogoTexture.c.
 
 #include "engine.h"
 #include "frontend/fe.h"
-
 
 void FE_LogoDesign_OpenOnce(void);
 void FE_LogoDesign_CloseOnce(void);
@@ -15,9 +18,9 @@ void FE_LogoDesign_UploadCustomLogo(void);
 void FE_LogoDesign_LoadClut(void);
 
 // Last address first: CodeWarrior lays out uninitialised globals in reverse order of definition.
-u8 gbLogoClutLoaded;
-s16* gpLogoClut;
-LogoEdit* gpLogoEdit;
+u8 gbLogoClutLoaded;            // the palette has been copied from "__LogoSquare"
+s16* gpLogoClut;                // the palette: 256 entries, 5-5-5 RGB with the top bit as alpha
+LogoEdit* gpLogoEdit;           // the editor's state while the front end runs
 
 // Allocates the logo editor's palette (256 colours, cleared) once at start-up (gomainloop's set-up
 // beside GOLFERSTATE_OpenONCE); FE_LogoDesign_LoadClut fills it later.
