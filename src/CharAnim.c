@@ -1,6 +1,9 @@
-// CharAnim.c (our name; TW06's char_state.c, its functions CharacterState_*): the golfer's
-// animation state - the blend data added for each clip group, the idle and emotion updates, and
-// the queued state changes played out on the second animation player (Character.anim29C).
+// CharAnim.c (our name; EA's char_State.c in TW06 and TW07, golf/animation; its functions are
+// CharacterState_*): the golfer's animation states. Each body state (Character.nAnim) plays a
+// clip group on the first animation player (CharacterState_UpdateSKAState,
+// CharacterState_AddSKABlendData: the swing, the idle and its fidgets, the reactions, the tap-in);
+// the second player (Character.anim29C) plays morph libraries (MtaLib, each track a morph weight)
+// the same way, from a clip's own library or at random from a 'MAL ' bank while the golfer swings.
 
 #include "golfer.h"
 #include "game.h"
@@ -11,11 +14,11 @@
 
 f32   SKA_GetTagTime(Clip* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
 
-void  CharacterState_SetTransition(AnimPlayer* pAnim, s32 n, f32 f);
+void  CharacterState_SetTransition(AnimPlayer* pTime, s32 nState, f32 fTime);
 void  CharacterState_AddMorphBlendData(Character* pChar, MtaLib* pLib, u8 bReset, int nGroup,
-                                       SKABlendFn pfnBlend, int nC,
-                  int nAnim, f32 fStart, f32 fFrom, f32 fTo, f32 fOffset, f32 fTime);
-void  CharacterState_PlayClipMorphs(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);
+                                       SKABlendFn pfnBlend, int nC, int nTransitionState, f32 fStart,
+                                       f32 fFrom, f32 fTo, f32 fOffset, f32 fTransitionTime);
+void  CharacterState_PlayClipMorphs(Character* pChar, void* pLib, u8 bReset, f32 fOffset);
 s8    GET_AMBIENT_FIDGET_COUNT(void);
 s32   CharacterState_ResetFidgetState(Character* pChar);
 s32   GET_IDLE_FIDGET_COUNT(void);
@@ -70,9 +73,9 @@ void CharacterState_ResetMorphState(Character* pChar, u8 bReset) {
 // Queue the player's transition: state nState starts once the player's time reaches fTime ((0,
 // 0.0): none). CharacterState_UpdateSKAState (the body) and CharacterState_UpdateMorphState (the
 // morph player) make the change.
-void CharacterState_SetTransition(AnimPlayer* pAnim, s32 n, f32 f) {
-    pAnim->nC  = n;
-    pAnim->f10 = f;
+void CharacterState_SetTransition(AnimPlayer* pTime, s32 nState, f32 fTime) {
+    pTime->nC  = nState;
+    pTime->f10 = fTime;
 }
 
 // Work out a clip's blend window aBlend (EA's TSKABlendInfo): [0] and [1] its start and end in the
@@ -84,8 +87,7 @@ void CharacterState_SetTransition(AnimPlayer* pAnim, s32 n, f32 f) {
 // aPrev, the window starts with the previous one and is scaled so its span up to event 2 matches
 // the previous one's. The result is the window's length on the clock.
 f32 SKABlend_CalculateBlendInfo(Character* pChar, f32* aPrev, Clip* pClip, f32* aBlend, f32 fFrom, f32 fTo,
-                                f32 fStart,
-                f32 fOffset) {
+                                f32 fStart, f32 fOffset) {
     aBlend[2] = -1.0f;
     if (pClip->pD8 != NULL) {
         if (-40000.0f == fFrom) {
@@ -144,10 +146,11 @@ f32 SKABlend_CalculateBlendInfo(Character* pChar, f32* aPrev, Clip* pClip, f32* 
 // tree's end, -30000 its start) plus a negative fOffset. A clip with its own morph library (pF4)
 // starts that too (CharacterState_PlayClipMorphs).
 void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKABlendFn pfnBlend, int nC,
-                                    int nAnim, f32 fStart, f32 fFrom, f32 fTo, f32 fOffset, f32 fTime) {
+                                    int nTransitionState, f32 fStart, f32 fFrom, f32 fTo, f32 fOffset,
+                                    f32 fTransitionTime) {
     SKABlendNode* pNode;
     SKABlendNode* pNew;
-    f32 aBlend[18];             // only [0]-[5] are used; EA's frame has room for 18 (true size unknown)
+    f32 aBlend[18];            // only [0]-[5] are used; EA's frame has room for 18 (true size unknown)
     f32 m[4][4];
     f32 vNormal[4];
     Clip* pClip;
@@ -227,17 +230,17 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
     pChar->n16C = 1;
     pChar->f180 = pNode->fStart;
     pChar->fAnimEnd = pNode->fEnd;
-    if (-20000.0f == fTime) {
-        fTime = pChar->fAnimTime;
-    } else if (-10000.0f == fTime) {
-        fTime = pNode->fEnd;
-    } else if (-30000.0f == fTime) {
-        fTime = pNode->fStart;
+    if (-20000.0f == fTransitionTime) {
+        fTransitionTime = pChar->fAnimTime;
+    } else if (-10000.0f == fTransitionTime) {
+        fTransitionTime = pNode->fEnd;
+    } else if (-30000.0f == fTransitionTime) {
+        fTransitionTime = pNode->fStart;
     }
     if (fOffset < 0.0f) {
-        fTime += fOffset;
+        fTransitionTime += fOffset;
     }
-    CharacterState_SetTransition((AnimPlayer*)pChar->anim, nAnim, fTime);
+    CharacterState_SetTransition((AnimPlayer*)pChar->anim, nTransitionState, fTransitionTime);
     pChar->p178C = NULL;
     if (pClip != NULL && pClip->pF4 != NULL) {
         CharacterState_PlayClipMorphs(pChar, pClip->pF4, bReset, fDelay);
@@ -252,8 +255,8 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
 // golfer's slider values are applied again. nGroup is not used; every caller passes it
 // (CharacterState_UpdateMorphState: the MAL group pLib came from).
 void CharacterState_AddMorphBlendData(Character* pChar, MtaLib* pLib, u8 bReset, int nGroup,
-                                      SKABlendFn pfnBlend, int nC,
-                 int nAnim, f32 fStart, f32 fFrom, f32 fTo, f32 fOffset, f32 fTime) {
+                                      SKABlendFn pfnBlend, int nC, int nTransitionState, f32 fStart,
+                                      f32 fFrom, f32 fTo, f32 fOffset, f32 fTransitionTime) {
     SKABlendNode* pNode = &pChar->node3E0;
     SKABlendNode* pNew = NULL;
     f32 aBlend[6];
@@ -287,17 +290,17 @@ void CharacterState_AddMorphBlendData(Character* pChar, MtaLib* pLib, u8 bReset,
     pChar->anim29C.n08 = 1;
     pChar->anim29C.fStart = pNode->fStart;
     pChar->anim29C.fEnd = pNode->fEnd;
-    if (-20000.0f == fTime) {
-        fTime = pChar->anim29C.fTime;
-    } else if (-10000.0f == fTime) {
-        fTime = pNode->fEnd;
-    } else if (-30000.0f == fTime) {
-        fTime = pNode->fStart;
+    if (-20000.0f == fTransitionTime) {
+        fTransitionTime = pChar->anim29C.fTime;
+    } else if (-10000.0f == fTransitionTime) {
+        fTransitionTime = pNode->fEnd;
+    } else if (-30000.0f == fTransitionTime) {
+        fTransitionTime = pNode->fStart;
     }
     if (fOffset < 0.0f) {
-        fTime += fOffset;
+        fTransitionTime += fOffset;
     }
-    CharacterState_SetTransition(&pChar->anim29C, nAnim, fTime);
+    CharacterState_SetTransition(&pChar->anim29C, nTransitionState, fTransitionTime);
     pChar->p178C = pLib;
     if (gSession.nGameType == 3 && pChar->pSliderDefs != NULL) {
         CharSlider_UpdateCharacterBasedOnSliderValues(pChar->pSliderDefs, pChar->pModel, pChar->pSkin, 26,
@@ -310,12 +313,12 @@ void CharacterState_AddMorphBlendData(Character* pChar, MtaLib* pLib, u8 bReset,
 // state 4; state 5 follows at the end (0.95 earlier while the body is in state 5). Without bReset
 // the morph tree is first cut off at fOffset past the player's time (fn_800732F4) so the library
 // blends in; with it the tree starts over.
-void CharacterState_PlayClipMorphs(Character* pChar, void* pClip, u8 bKeep, f32 fOffset) {
-    if (pClip == NULL) return;
-    if (!bKeep) {
+void CharacterState_PlayClipMorphs(Character* pChar, void* pLib, u8 bReset, f32 fOffset) {
+    if (pLib == NULL) return;
+    if (!bReset) {
         fn_800732F4(&pChar->node3E0, &pChar->anim29C, pChar->anim29C.fTime + fOffset);
     }
-    CharacterState_AddMorphBlendData(pChar, pClip, bKeep, 0, fn_80072ACC, 1, 5, -20000.0f, -30000.0f,
+    CharacterState_AddMorphBlendData(pChar, pLib, bReset, 0, fn_80072ACC, 1, 5, -20000.0f, -30000.0f,
                                      -10000.0f, 0.0f, -10000.0f);
     pChar->n2C = 4;
     pChar->n30 = 4;
@@ -417,10 +420,10 @@ s32 GET_IDLE_FIDGET_COUNT(void) {
 // picked with, Character_SetEmotion) from his player's reaction type (emotion.c, 0..9) through a
 // table, and return the type.
 int CharacterState_UpdateGameEmotionState(Character* pChar) {
-    int aStyle[10] = {5, 6, 7, 2, 1, 0, 3, 4, 5, 2};
-    int nResult    = fn_8006AA9C(pChar->nPlayer);
-    Character_SetEmotion(pChar, aStyle[nResult]);
-    return nResult;
+    int aEmotion[10] = {5, 6, 7, 2, 1, 0, 3, 4, 5, 2};
+    int nType = fn_8006AA9C(pChar->nPlayer);
+    Character_SetEmotion(pChar, aEmotion[nType]);
+    return nType;
 }
 
 // TW06: CharacterState_SetTapInState. Animation 11, the gimme tap-in: the style is the score the
@@ -454,14 +457,14 @@ void CharacterState_SetTapInState(Character* pChar) {
 // group 11 (clip key 6 on the tee, else 0). Then the skeleton's IK is turned on or off (blended
 // over fIKTransitionTime where the state asks) and the target becomes the current state.
 void CharacterState_UpdateSKAState(Character* pChar) {
-    f32 fIK = 0.25f;
-    u8 bNoIK = 0;
-    u8 bTransition = 0;
+    f32 fIKTransitionTime = 0.25f;
+    u8 bEnableIK = 0;
+    u8 bTransitionIK = 0;
     u8 bReset;
-    int nSaved;
-    u8 bOther;
+    int nOldClipKey;
+    u8 bFromOtherState;
     int nGroup;
-    int nResult;
+    int nType;
     int i;
     f32 fOffset;
     f32 fLag;
@@ -562,8 +565,8 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         }
         CharacterState_AddSKABlendData(pChar, bReset, nGroup, fn_80072ACC, 1, 5, -20000.0f, -30000.0f,
                                        -10000.0f, fOffset, -10000.0f);
-        bNoIK = CharacterState_IsNotFidgeting(pChar);
-        bTransition = 1;
+        bEnableIK = CharacterState_IsNotFidgeting(pChar);
+        bTransitionIK = 1;
         pChar->f174 -= 1.0f;
         break;
     case 6:
@@ -578,8 +581,8 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         }
         CharacterState_AddSKABlendData(pChar, bReset, 0, fn_80072ACC, 1, 0, -20000.0f, -50000.0f, -40000.0f,
                                        0.0f, -10000.0f);
-        bNoIK = 1;
-        bTransition = 1;
+        bEnableIK = 1;
+        bTransitionIK = 1;
         CharacterState_SetTransition(&pChar->anim29C, 0, 0.0f);
         if (gSession.nGameType == 6) {
             pChar->n30 = 0;
@@ -602,10 +605,10 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         fn_800732F4(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime);
         CharacterState_AddSKABlendData(pChar, bReset, 0, fn_80072ACC, 1, 8, -20000.0f, -70000.0f, -10000.0f,
                                        fLag, -10000.0f);
-        bNoIK = 1;
+        bEnableIK = 1;
         break;
     case 14:
-        nSaved = pChar->nClipKey;
+        nOldClipKey = pChar->nClipKey;
         if (gPlayers[pChar->nPlayer].ball.nLie == 0) {
             pChar->nClipKey = 6;
         } else {
@@ -622,8 +625,8 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         }
         CharacterState_AddSKABlendData(pChar, bReset, 11, fn_80072ACC, 1, 8, -20000.0f, -30000.0f, -10000.0f,
                                        0.0f, -10000.0f);
-        pChar->nClipKey = nSaved;
-        bNoIK = 0;
+        pChar->nClipKey = nOldClipKey;
+        bEnableIK = 0;
         break;
     case 8:
         pChar->uFlags &= ~1;
@@ -632,8 +635,8 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         pChar->f19C = pChar->fAnimTime;
         CharacterState_SetTransition((AnimPlayer*)pChar->anim, 0, -10000.0f);
         if (pChar->nClubClass == 2) {
-            bTransition = 1;
-            fIK = 0.5f;
+            bTransitionIK = 1;
+            fIKTransitionTime = 0.5f;
         }
         for (i = 0; i < 5; i++) {
             if (gPlayers[i].pChar == pChar) {
@@ -643,9 +646,9 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         }
         break;
     case 9:
-        bOther = 0;
-        nResult = CharacterState_UpdateGameEmotionState(pChar);
-        switch (nResult) {
+        bFromOtherState = 0;
+        nType = CharacterState_UpdateGameEmotionState(pChar);
+        switch (nType) {
         case 8:
         case 9:
             nGroup = 10;
@@ -660,25 +663,25 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         case 14:
             break;
         default:
-            bOther = 1;
+            bFromOtherState = 1;
             break;
         }
         pChar->uFlags &= ~0x40;
-        if (bOther || pChar->nClubClass != 2) {
+        if (bFromOtherState || pChar->nClubClass != 2) {
             CharacterState_AddSKABlendData(pChar, 1, 5, fn_80072ACC, 1, 0, -20000.0f, -30000.0f, -10000.0f,
                                            0.0f, -10000.0f);
         } else {
             fn_800732F4(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime);
-            CharacterState_AddSKABlendData(pChar, bOther, nGroup, fn_80072ACC, 1, 0, -20000.0f, -30000.0f,
-                                           -10000.0f, 0.5f, -10000.0f);
-            bTransition = 1;
-            fIK = 0.1f;
+            CharacterState_AddSKABlendData(pChar, bFromOtherState, nGroup, fn_80072ACC, 1, 0, -20000.0f,
+                                           -30000.0f, -10000.0f, 0.5f, -10000.0f);
+            bTransitionIK = 1;
+            fIKTransitionTime = 0.1f;
             pChar->fAnimTime += 0.0001f;
         }
         break;
     case 11:
         CharacterState_SetTapInState(pChar);
-        bTransition = 1;
+        bTransitionIK = 1;
         break;
     case 12:
         CharacterState_UpdateGameEmotionState(pChar);
@@ -686,9 +689,9 @@ void CharacterState_UpdateSKAState(Character* pChar) {
                                        -10000.0f);
         break;
     }
-    if (bTransition) {
-        SKEL_TransitionIK(pChar->pModel->pSkel, !bNoIK, fIK);
-    } else if (bNoIK) {
+    if (bTransitionIK) {
+        SKEL_TransitionIK(pChar->pModel->pSkel, !bEnableIK, fIKTransitionTime);
+    } else if (bEnableIK) {
         SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 1.0f);
     } else {
         SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 0.0f);

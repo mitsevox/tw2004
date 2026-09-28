@@ -957,9 +957,8 @@ void fn_8005A850(int nPlayer) {
         }
     }
     {
-        if ((pObj->nAnim == 6 || pObj->nAnim == 7) && Character_GetClipResult(pObj) != 2
-            && pSw->nNumInBlurQueue >= 2 &&
-            gSession.options.a24[7] != 0) {
+        if ((pObj->nAnim == 6 || pObj->nAnim == 7) && Character_GetClipResult(pObj) != 2 &&
+            pSw->nNumInBlurQueue >= 2 && gSession.options.a24[7] != 0) {
             LLMath_CopyVec(pObj->pModel->pMatrices[nGrip][3], vGrip);
             nBlue = 255.0f * pSw->fBlueColor;
             nRed = 255.0f * pSw->fRedColor;

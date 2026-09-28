@@ -11,7 +11,8 @@
 f32  SKA_GetTagTime(Clip* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
 void fn_8001F558(void* pItem);          // mtalib.c
 void fn_800977CC(void* p);
-void SKEL_BlendPoses(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pOut, f32 fT);   // Skeleton.c
+// Skeleton.c
+void SKEL_BlendPoses(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pOut, f32 fT);
 
 int  fn_800723E8(SKABlendNode* pNode, SKABlendNode*** pppOldest);
 int  fn_8007286C(SKABlendNode* pNode, f32 fTime);

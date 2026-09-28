@@ -54,10 +54,14 @@ void FE_StreamFunc_SwapTexturesInterrupt(void);
 // golfer already loaded.
 FEGolferState lbl_80189AA0[FE_NUM_GOLFER_STATES] = {
     { NULL, NULL, NULL, NULL, 0 },
-    { FE_StreamFunc_IdleInit, FE_StreamFunc_IdleUpdate, FE_StreamFunc_IdleClose, FE_StreamFunc_IdleInterrupt, 2 },
-    { FE_StreamFunc_SkinInit, FE_StreamFunc_SkinUpdate, FE_StreamFunc_SkinClose, FE_StreamFunc_SkinInterrupt, 3 },
-    { FE_StreamFunc_TexturesInit, FE_StreamFunc_TexturesUpdate, FE_StreamFunc_TexturesClose, FE_StreamFunc_TexturesInterrupt, 1 },
-    { FE_StreamFunc_SwapTexturesInit, FE_StreamFunc_SwapTexturesUpdate, FE_StreamFunc_SwapTexturesClose, FE_StreamFunc_SwapTexturesInterrupt, 1 },
+    { FE_StreamFunc_IdleInit, FE_StreamFunc_IdleUpdate,
+      FE_StreamFunc_IdleClose, FE_StreamFunc_IdleInterrupt, 2 },
+    { FE_StreamFunc_SkinInit, FE_StreamFunc_SkinUpdate,
+      FE_StreamFunc_SkinClose, FE_StreamFunc_SkinInterrupt, 3 },
+    { FE_StreamFunc_TexturesInit, FE_StreamFunc_TexturesUpdate,
+      FE_StreamFunc_TexturesClose, FE_StreamFunc_TexturesInterrupt, 1 },
+    { FE_StreamFunc_SwapTexturesInit, FE_StreamFunc_SwapTexturesUpdate,
+      FE_StreamFunc_SwapTexturesClose, FE_StreamFunc_SwapTexturesInterrupt, 1 },
 };
 
 // .bss and .sbss are defined in reverse address order: CodeWarrior lays them out last-defined-first.
@@ -231,18 +235,18 @@ void FE_CharMgrClose(void) {
 // else the shown slot gets his id to load. Golfers 7 and 29 (as nGolfer, nOtherA or nOtherB) set
 // b90: every slot's character is freed before the next load (FE_StreamManageCRaPMemory). On screen
 // kind 3 his animation starts again (fn_8008DD50).
-void FE_setupStreaming(int nGolfer, int a, int b) {
+void FE_setupStreaming(int nGolfer, int nOtherA, int nOtherB) {
     FE_StreamInterruptState();
     FE_StreamSetNextState(1);
     if (nGolfer == 7 || nGolfer == 29) {
-        a = -1;
-        b = -1;
+        nOtherA = -1;
+        nOtherB = -1;
         lbl_80281EE0->b90 = 1;
     }
-    if (b == 7 || b == 29) {
+    if (nOtherB == 7 || nOtherB == 29) {
         lbl_80281EE0->b90 = 1;
     }
-    if (a == 7 || a == 29) {
+    if (nOtherA == 7 || nOtherA == 29) {
         lbl_80281EE0->b90 = 1;
     }
     if (lbl_80281EE0->pB4->nC != nGolfer) {
@@ -268,18 +272,18 @@ void FE_setupStreaming(int nGolfer, int a, int b) {
 // Before golfer 7 or 29 loads (b90): flag every slot that still holds a character to be freed (b19)
 // and return 0 until none does, then clear b90. Returns 1 when loading may go on.
 u8 FE_StreamManageCRaPMemory(void) {
-    u8 bReady;
+    u8 bAllFree;
     int i;
 
     if (lbl_80281EE0->b90) {
-        bReady = 1;
+        bAllFree = 1;
         for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
             if (lbl_80281EE0->aGolfer[i].pChar != NULL) {
                 lbl_80281EE0->aGolfer[i].b19 = 1;
-                bReady = 0;
+                bAllFree = 0;
             }
         }
-        if (bReady) {
+        if (bAllFree) {
             lbl_80281EE0->b90 = 0;
             return 1;
         }
@@ -464,7 +468,8 @@ void FE_StreamFunc_SwapTexturesInterrupt(void) {
 void FE_StreamInterruptState(void) {
     lbl_801D8708.bAbort = 1;
     // port: EA passes an argument the abort handlers (FE_StreamFunc_IdleInterrupt,
-    //       FE_StreamFunc_SkinInterrupt, FE_StreamFunc_TexturesInterrupt, FE_StreamFunc_SwapTexturesInterrupt) ignore
+    //       FE_StreamFunc_SkinInterrupt, FE_StreamFunc_TexturesInterrupt,
+    //       FE_StreamFunc_SwapTexturesInterrupt) ignore
     ((void (*)(int))lbl_80189AA0[lbl_801D8708.nState].pfnAbort)(0);
 }
 

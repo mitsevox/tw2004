@@ -1,8 +1,11 @@
 // char.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): the character object
 // (character.h): the golfers and the other skinned characters ('SKLO', player 1000). Building one
 // from its 'CHR ' object, its animation, bones, ground placement and leg IK, the set-up for a
-// shot, its streamed textures and clothes, and the stream handlers that make them. Not all of it
-// matches yet; the code in the two marked sweep blocks is matched but not yet cleaned up.
+// shot, clipping and drawing every character, its clubs, clothes and streamed textures, and the
+// stream handlers that make them; TW07 keeps the same file (golf/animation/char.c). At the end, the
+// small helpers EA's headers define (bit arrays as in TW07's UBitArray.h, the bone getters of
+// char.h, paired-single vector sums) and the animation library byte-swap (MtaLib_SwapAndLink).
+// char_tex_manager.c is compiled inside it (#include below).
 
 #include "game.h"
 #include "charstate.h"
@@ -14,6 +17,10 @@
 
 // data order: these lead the unity's .data (0x80186CC8), ahead of char_tex_manager.c's
 // "_usrtextr", so they are defined before its #include.
+// The golfer's IK chains (bone ids as in mtalib.c's names): the spine and right arm down to the
+// club head (root, waist, s4, rshld, rwrst, IGdriver, clubhead; gIKRightArmLinks adds s1, rcolr
+// and r4rm) and the left arm (s4, lcolr, lshld, l4rm, lwrst). The short right arm is split
+// screen's (gIKChainDefsSplit).
 IKLinkDef gIKRightArmLinksSplit[7] = {
     {1, 0.0f, -1, 0.0f, 0.0f},
     {3, 1.0f, -1, 0.0f, 0.0f},
@@ -50,8 +57,11 @@ IKChainDef gIKChainDefsSplit[2] = {
     {gIKRightArmLinksSplit, 7, 10, 0.01f},
     {gIKLeftArmLinks, 5, 20, 0.01f},
 };
+// Per club class, the names Character_SetClubStatesForCharacter dresses the clubs by: the part, then
+// the head, shaft and grip sets, each with its variant.
 char gClubPartNames[6][13] = {"Drivers", "Fairwaywoods", "Putters", "3Irons", "7Irons", "Wedges"};
-char gClubShaftSetNames[6][13] = {"fwd_shaft", "fwd_shaft", "pwi_shaft", "pwi_shaft", "pwi_shaft", "pwi_shaft"};
+char gClubShaftSetNames[6][13] = {"fwd_shaft", "fwd_shaft", "pwi_shaft", "pwi_shaft", "pwi_shaft",
+                                  "pwi_shaft"};
 char gClubShaftVariantNames[6][13] = {"Defaults", "Defaults", "Defaults", "Defaults", "Defaults", "Defaults"};
 char gClubHeadSetNames[6][13] = {"EA_Driver", "EA_Fairway", "EA_Putter", "EA_3Iron", "EA_7Iron", "EA_Wedge"};
 char gClubHeadVariantNames[6][13] = {"Defaults", "Defaults", "Defaults", "Defaults", "Defaults", "Defaults"};
@@ -112,8 +122,8 @@ void  Character_ResetBlenders(Character* pChar);
 void  fn_800BBADC(int nValue);         // SitDevFile.c
 void  Character_GetBonePos_FromIndex(Character* pChar, int nBone, f32* pPos);
 u8    Character_IsGolfer(Character* pChar);
-f32   Character_ComputeMaxVisableDistance(Character* pChar, int b);
-f32   Character_ComputeMaxVisableShadowDistance(Character* pChar, int b);
+f32   Character_ComputeMaxVisableDistance(Character* pChar, int bSplitScreen);
+f32   Character_ComputeMaxVisableShadowDistance(Character* pChar, int bSplitScreen);
 void  Character_KeepClubOutOfGround(Character* pChar);
 void  Character_IKLegsToGround(Character* pChar, u8 bRightLeg, u8 bLeftLeg);
 void  Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, int nHip, int nKnee,
@@ -125,7 +135,7 @@ void  SKEL_PreTransformIKSkeleton(CharModel* pModel);                           
 void  SKEL_PostTransformIKSkeleton(Character* pChar);                            // Skeleton.c
 void  SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform);   // Skeleton.c
 void  fn_80037C48(Skin* pSkin, SkelPose* pPose);                // Skin.c
-void  CharacterState_PlayClipMorphs(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);                  // CharAnim.c
+void  CharacterState_PlayClipMorphs(Character* pChar, void* pLib, u8 bReset, f32 fOffset);   // CharAnim.c
 void  CharacterState_UpdateMorphState(Character* pChar);                            // CharAnim.c
 void  Quat_QuatToMatrix(f32* pQ, f32 (*m)[4]);                        // Quaternion.c: a rotation matrix
 int   Character_UpdateClubAttachment(Character* pChar, Clip* pClip);
@@ -136,7 +146,7 @@ void  Char_Vec4Sub(f32* pA, f32* pB, f32* pOut);
 void  Character_BeginLoadTexturesCallbackIG(Character* pChar);
 void  Character_RequestClothesUpdateIG(int n);
 void  fn_8010B098(void* pModel);                                // LLDynTex.c
-void  CharacterState_SetTransition(AnimPlayer* pAnim, s32 n, f32 f);            // CharAnim.c
+void  CharacterState_SetTransition(AnimPlayer* pTime, s32 nState, f32 fTime);   // CharAnim.c
 void  Quat_ExtractEulerAngles(f32* pQ, f32* pA, f32* pB, f32* pC);          // Quaternion.c: a rotation as angles
 void  SKEL_InitHalfJoints(CharModel* pModel, SkelPose* pPose);          // Skeleton.c
 void  mat44flt_Invert(f32 (*pSrc)[4], f32 (*pDst)[4]);              // UMemPool.c
@@ -182,7 +192,7 @@ void  fn_800C9764(void);
 void  fn_800C9FE0(void);
 void  SkinPart_Init(void);
 void  SkinPart_Shutdown(void);
-void  SkinPart_CopyChoices(Skin* pSkin, int a, int b);
+void  SkinPart_CopyChoices(Skin* pSkin, int nFrom, int nTo);
 s32   SkinPart_GetNumSets(Skin* pSkin);         // SkinPart.c: how many choices aSets[3] holds
 void  SkinPart_SetChangeAllCopies(u8 b);
 u8    fn_800FCC38(int nPlayer);
@@ -204,30 +214,25 @@ void  fn_8010BF68(void);
 void  fn_8010BFE0(void);
 void  fn_80112C64(int n);
 void  fn_80112CEC(void);
-
-// ---- sweep code (not yet cleaned up) ----
-void BitArray_FillArray(u32* aBits, u32 nBits);
-void BitArray_ClearArray(u32* aBits, u32 nBits);
-void CharSkinRef_Init(Skin* pSkin, CharSkinRef* pRef, s32 n);
-void CharSkinRef_Free(void* p);
-void Character_SelectShotType(void* arg0, s32 arg1);
-
-// ---- end of sweep code ----
+void  CharSkinRef_Init(Skin* pSkin, CharSkinRef* pRef, s32 n);
+void  CharSkinRef_Free(void* p);
+void  Character_SelectShotType(Character* pChar, int nShotType);
 
 // This file's .sbss (charstate.h), in reverse address order as the compiler lays it out.
+// the player whose textures Character_PrepareForRendering streamed last; -1 none
 s32 gCharTexStreamedPlayer;
-s32 gNumCharacters;
+s32 gNumCharacters;             // how many characters gCharacters holds
 
-CharModelDefs gCharModelDefs = { gIKChainDefs, 2 };
-CharModelDefs gCharModelDefsSplit = { gIKChainDefsSplit, 2 };
-s32 gMaxBlendClips = 3;
-CharSkinSet* gClubSkinSets[2] = { NULL, NULL };
+CharModelDefs gCharModelDefs = { gIKChainDefs, 2 };             // a golfer's IK chains
+CharModelDefs gCharModelDefsSplit = { gIKChainDefsSplit, 2 };   // the same in split screen
+s32 gMaxBlendClips = 3;         // the most clips a blend node mixes (6, 4 in split screen, in game)
+CharSkinSet* gClubSkinSets[2] = { NULL, NULL };  // the clubs: one set, or one per view in split screen
 
-u64 gClubBoneIds[6];
-Character* gCharacters[5];
-CharPool gCharDynTexPool;
-f32 gCharSupportingNormal[4];
-f32 gCharCoveringNormal[4];
+u64 gClubBoneIds[6];            // the club bones' packed names ("IGdriver", -, "IGputter", ...)
+Character* gCharacters[5];      // every character made (Character_Add)
+CharPool gCharDynTexPool;       // the characters' dynamic textures (CharacterTex_TakePoolEntries)
+f32 gCharSupportingNormal[4];   // } the ground normals below and above a foot's test point
+f32 gCharCoveringNormal[4];     // } (Character_GetTerrainHeightAndNormal)
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f, 2^30, 0.0f, -60000.0f and 3.0f (0x80282BC0), 1.0f and 3.0f before their first users
@@ -402,8 +407,9 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
         if ((pCourse = Ter_GetTGD()) != NULL) {
             LLMath_CopyVec(pPos, vPos);
             vPos[1] += 0.66f / 12.0f;
-            Ter_GetEnclosingGroundData(pCourse, vPos, &fSupportingHeight, &pSupportingSurface, gCharSupportingNormal,
-                                       &fCoveringHeight, &pCoveringSurface, gCharCoveringNormal);
+            Ter_GetEnclosingGroundData(pCourse, vPos, &fSupportingHeight, &pSupportingSurface,
+                                       gCharSupportingNormal, &fCoveringHeight, &pCoveringSurface,
+                                       gCharCoveringNormal);
             if (!(fCoveringHeight < -60000.0f)) {
                 if (fSupportingHeight < -60000.0f || pSupportingSurface->nClass == 7 ||
                     pSupportingSurface->nClass == 0x13 || fCoveringHeight - fSupportingHeight < 0.05f ||
@@ -2510,32 +2516,29 @@ int Character_IsCrAPGolfer(int nPlayer) {
 // putter, 3 irons 1-5, 4 irons 6-9, 5 the wedges; Character_SelectGameClub maps the clubs) and
 // moves the club head bone (0x53) to the club's length for that class (the set's afC, the bone's y
 // offset). Nothing without a model or club set, or for a slot outside 0-2.
-void Character_SelectClub(Character* pChar, int n) {
-    int nBone;
+void Character_SelectClub(Character* pChar, int nClass) {
+    int nClubHeadBone;
 
     if (pChar == NULL || pChar->pModel == NULL || pChar->nSlot < 0 || pChar->nSlot >= 3) {
         return;
     }
-    nBone = CharModel_GetBoneIndex(pChar->pModel, 0x53);
+    nClubHeadBone = CharModel_GetBoneIndex(pChar->pModel, 0x53);
     if (pChar->pClubSet != NULL) {
-        pChar->nClubClass = n;
-        pChar->pModel->pBones[nBone].v1C[1] = pChar->pClubSet->afC[pChar->nClubClass];
+        pChar->nClubClass = nClass;
+        pChar->pModel->pBones[nClubHeadBone].v1C[1] = pChar->pClubSet->afC[pChar->nClubClass];
     }
 }
 
 // Sets the key the character's clips are looked up by (nClipKey, Char_SetClip) to nShotType. With
 // p1798's mode (n2C) 6 and nShotType 0 it first stores 4, which the next line overwrites at once:
 // the key always ends as nShotType (Character_SetupForShot's same test keeps its 4).
-void Character_SelectShotType(void* arg0, s32 arg1) {
-    void* temp_r5;
-
-    temp_r5 = (*(void**)((u8*)(arg0) + 0x1798));
-    if ((temp_r5 != NULL) && ((u32) (*(u32*)((u8*)(temp_r5) + 0x2C)) == 6U) && (arg1 == 0)) {
-        (*(s32*)((u8*)(arg0) + 0x16D4)) = 4;
+void Character_SelectShotType(Character* pChar, int nShotType) {
+    // fake match: n2C is compared unsigned here
+    if (pChar->p1798 != NULL && (u32)pChar->p1798->n2C == 6 && nShotType == 0) {
+        pChar->nClipKey = 4;
     }
-    (*(s32*)((u8*)(arg0) + 0x16D4)) = arg1;
+    pChar->nClipKey = nShotType;
 }
-// ---- end of sweep code ----
 
 // The player's golfer takes the player's shot kind and club (Character_SelectGameShotType,
 // Character_SelectGameClub). When either changed, its animation restarts: nAnim 0, u10 bit 0x80
@@ -2544,13 +2547,13 @@ void Character_SelectShotType(void* arg0, s32 arg1) {
 void Character_InitNewClubAndShotType(int nPlayer) {
     Player* pPlayer = &gPlayers[nPlayer];
     Character* pChar = pPlayer->pChar;
-    int nKind = pChar->nShotKind;
-    int nClub;
+    int nPrevShotKind = pChar->nShotKind;
+    int nPrevClub;
 
     Character_SelectGameShotType(pChar, pPlayer->nShotKind);
-    nClub = pChar->nClub;
+    nPrevClub = pChar->nClub;
     Character_SelectGameClub(pChar, pPlayer->nClub);
-    if (nClub != pPlayer->nClub || nKind != pPlayer->nShotKind) {
+    if (nPrevClub != pPlayer->nClub || nPrevShotKind != pPlayer->nShotKind) {
         pChar->nAnim = 0;
         pChar->u10 |= 0x80;
         fn_80095744(pChar, 5);
@@ -2558,8 +2561,11 @@ void Character_InitNewClubAndShotType(int nPlayer) {
     }
 }
 
+// Per shot kind, the clip key Character_SelectGameShotType sets with it.
 s32 gShotKindClipKeys[8] = { 8, 0, 6, 3, 2, 1, 10, 4 };
 
+// Per club class, where the golfer stands from the ball (Character_SetupForShot): x back along
+// its root's x axis, y up, z back along its z axis (that offset turned round for a left-hander).
 f32 gClubStanceOffsets[6][3] = {
     { 0.058f, 0.0f, 0.025f },
     { 0.058f, 0.0f, 0.025f },
@@ -2584,12 +2590,12 @@ void Character_SelectGameShotType(Character* pChar, int nKind) {
 // (fn_800BBADC). Nothing for NULL.
 void Character_SelectGameClub(Character* pChar, int nClub) {
     // per club: what Character_SelectClub gets
-    int aKind[26] = {0, 0, 0, 0, 0, 0, 1, 1, 1, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 2};
+    int aClass[26] = {0, 0, 0, 0, 0, 0, 1, 1, 1, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 2};
 
     if (pChar != NULL) {
         fn_800BBADC(nClub);
         pChar->nClub = nClub;
-        Character_SelectClub(pChar, aKind[nClub]);
+        Character_SelectClub(pChar, aClass[nClub]);
     }
 }
 
@@ -2603,15 +2609,15 @@ void Character_SetEmotion(Character* pChar, int nStyle) {
 // Character_UpdateAnimation runs Character_SetupForShot): at its ball, facing the target. bInitIK
 // (bit 8, set or cleared) has it also take its stance and leg IK; bResetPos (bit 0x200, only set)
 // has the ground under its feet sampled again.
-void Character_AlignShotWithTarget(int nPlayer, u8 a, u8 b) {
+void Character_AlignShotWithTarget(int nPlayer, u8 bResetPos, u8 bInitIK) {
     Character* pChar = gPlayers[nPlayer].pChar;
     pChar->u10 |= 4;
-    if (b) {
+    if (bInitIK) {
         pChar->u10 |= 8;
     } else {
         pChar->u10 &= ~8;
     }
-    if (a) {
+    if (bResetPos) {
         pChar->u10 |= 0x200;
     }
 }
@@ -2632,8 +2638,8 @@ void Character_SetupForShot(Character* pChar) {
     f32 vOffsetX[4];
     f32 vOffsetZ[4];
     f32 vPos[4];
-    int bStance;
-    int bPlace;
+    int bInitIK;
+    int bResetPos;
     int bClipTime;
     CharModel* pModel;
     f32* pBallPos;
@@ -2645,8 +2651,8 @@ void Character_SetupForShot(Character* pChar) {
 
     pPlayer = &gPlayers[pChar->nPlayer];
     pModel = pChar->pModel;
-    bPlace = pChar->u10 & 0x200;
-    bStance = pChar->u10 & 8;
+    bResetPos = pChar->u10 & 0x200;
+    bInitIK = pChar->u10 & 8;
     bClipTime = pChar->u10 & 0x10000;
     pBallPos = fn_8001C860_Get(pChar->nPlayer);
     Character_SetPosition(pChar, pBallPos, 0);
@@ -2662,7 +2668,7 @@ void Character_SetupForShot(Character* pChar) {
     Quat_Copy(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
     Quat_QuatToMatrix(pModel->pPoses[0].q0, pModel->pMatrices[0]);
     Vec4_CopyPoint(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
-    if (bStance && (pSkel = pChar->pModel->pSkel) != NULL) {
+    if (bInitIK && (pSkel = pChar->pModel->pSkel) != NULL) {
         pOldClip = pChar->pCurClip;
         CharModel_GetBoneIndex(pChar->pModel, 1);      // the results are not used
         CharModel_GetBoneIndex(pChar->pModel, 0x52);
@@ -2699,7 +2705,7 @@ void Character_SetupForShot(Character* pChar) {
         }
         SKEL_UpdateState(pChar->pModel, &pSkel->pose, 1);
         Character_UpdateTestPoints(pChar);
-        if (bPlace) {
+        if (bResetPos) {
             pChar->n1784 = -1;
             Character_UpdateFeetTerrainInfo(pChar, 1);
         }
@@ -2711,11 +2717,11 @@ void Character_SetupForShot(Character* pChar) {
         Char_Vec4Add(gPlayers[pChar->nPlayer].ball.vPos, vOffsetX, vPos);
         Char_Vec4Add(vPos, vOffsetZ, vPos);
         vPos[1] += gClubStanceOffsets[pChar->nClubClass][1];
-        SKEL_InitIKSkeleton(pChar, vPos, bPlace);
+        SKEL_InitIKSkeleton(pChar, vPos, bResetPos);
         pChar->pModel->pSkel->n1130 = pChar->nClipKey;
         pChar->pModel->pSkel->n112C = pChar->nClubClass;
-        if (((pChar->n20 == 5 || pChar->nAnim == 5) && CharacterState_IsNotFidgeting(pChar)) || pChar->n20
-            == 7) {
+        if (((pChar->n20 == 5 || pChar->nAnim == 5) && CharacterState_IsNotFidgeting(pChar)) ||
+            pChar->n20 == 7) {
             SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 1.0f);
         } else {
             SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 0.0f);
@@ -2820,9 +2826,9 @@ void Character_RegisterGolferStreamClientIG(void) {
 // (header and data), and the object is freed; the character is made from the copy (the static heap
 // counting what it takes) and its textures loaded, then the UI file is brought back. The character
 // is placed at lbl_80189A30 facing f19C, given the profile's created-golfer look for golfers 7 and
-// 29 (Character_ApplyCrAPSettings), set to club class 5 (the wedges) and its first clip. When it is still the
-// golfer the menu wants (pB8->nC is n8C), its body and six club skins are listed on it (created
-// golfers with one texture pool entry get two) and it takes its pool entries.
+// 29 (Character_ApplyCrAPSettings), set to club class 5 (the wedges) and its first clip. When it
+// is still the golfer the menu wants (pB8->nC is n8C), its body and six club skins are listed on
+// it (created golfers with one texture pool entry get two) and it takes its pool entries.
 void Character_GolferStreamCallbackFE(UStreamObject* pObject) {
     UStreamObject* pCopy;
     Character* pChar;
@@ -3019,8 +3025,8 @@ void Character_UpdateClothesIG(void) {
 }
 
 // Puts a golfer to sleep at the end of its turn (GM_EndOfGolferTurn): its animation blending reset
-// (Character_ResetBlenders), the shot set-up requests (u10 bits 4, 8 and 0x200) dropped, and bit 0x40 set, so
-// neither it nor its shadow is drawn until Character_PrepareForRendering wakes it.
+// (Character_ResetBlenders), the shot set-up requests (u10 bits 4, 8 and 0x200) dropped, and bit
+// 0x40 set, so neither it nor its shadow is drawn until Character_PrepareForRendering wakes it.
 void Character_Sleep(Character* pChar) {
     Character_ResetBlenders(pChar);
     pChar->u10 = pChar->u10 & ~0x20C;
@@ -3441,11 +3447,14 @@ u8 Character_IsGolfer(Character* pChar) {
     return 0;
 }
 
+// A bone's matrix by bone id; for a left-handed golfer the bone of the other side
+// (CharModel_GetBoneIndexMapped).
 f32 (*Character_GetBoneMatrixSwapIfLefty(Character* pChar, int nBone))[4] {
     return Character_GetBoneMatrix_FromIndex(pChar, CharModel_GetBoneIndexMapped(pChar->pModel, nBone));
 }
 
-// Bone n's matrix (bone 1's without an animation slot); NULL without a character.
+// The matrix of the bone at index nBone of the model; a character that is not a golfer
+// (Character_IsGolfer) gives index 1's instead. NULL without a character.
 f32 (*Character_GetBoneMatrix_FromIndex(Character* pChar, int nBone))[4] {
     int n = nBone;
     if (pChar == NULL) {
@@ -3466,8 +3475,8 @@ f32 (*Character_GetBoneMatrix(Character* pChar, int nBone))[4] {
 // non-golfer) over the lens's field-of-view scale, so farther when zoomed in, and half that when
 // bSplitScreen. Past it Character_ClipTest marks the body out of view, and
 // Character_UpdateAnimation stops animating a character that is not a golfer.
-f32 Character_ComputeMaxVisableDistance(Character* pChar, int b) {
-    if (b != 0) {
+f32 Character_ComputeMaxVisableDistance(Character* pChar, int bSplitScreen) {
+    if (bSplitScreen != 0) {
         return pChar->f1660 * (0.5f / Camera_GetLensFovScale(Camera_GetCurrentLens()));
     }
     return pChar->f1660 * (1.0f / Camera_GetLensFovScale(Camera_GetCurrentLens()));
@@ -3488,8 +3497,8 @@ u8 Character_IsLeftHanded(Character* pChar) {
 // How far along the camera's view the character's shadow is still drawn: f165C (100, or 50 for a
 // non-golfer) over the lens's field-of-view scale, and half that when bSplitScreen. Past it
 // Character_ClipTest marks the shadow out of view.
-f32 Character_ComputeMaxVisableShadowDistance(Character* pChar, int b) {
-    if (b != 0) {
+f32 Character_ComputeMaxVisableShadowDistance(Character* pChar, int bSplitScreen) {
+    if (bSplitScreen != 0) {
         return pChar->f165C * (0.5f / Camera_GetLensFovScale(Camera_GetCurrentLens()));
     }
     return pChar->f165C * (1.0f / Camera_GetLensFovScale(Camera_GetCurrentLens()));
@@ -3511,8 +3520,8 @@ int Character_GetClipResult(Character* pChar) {
 
 // Makes the golfer left-handed (bLeftHanded 1) or right-handed; the callers set the skeleton again
 // after it (Character_SetSkeleton).
-void Character_SetLeftHanded(Character* pChar, u8 b) {
-    pChar->pModel->bEE = b;
+void Character_SetLeftHanded(Character* pChar, u8 bLeftHanded) {
+    pChar->pModel->bEE = bLeftHanded;
 }
 
 // The dot product of two 4-vectors.
@@ -3709,17 +3718,11 @@ f32 SKA_GetTagTime(Clip* pBlend, u64 uEvent) {
     return 0.0f;
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
-void SKATime_SetTimeScale(u8* p, f32 v);
-
 // Sets an animation player's time scale (AnimPlayer.f14): 1 plays at normal speed, the swing's hold
 // at the top uses 0.008.
-void SKATime_SetTimeScale(u8* p, f32 v) {
-    *(f32*)(p + 0x14) = v;
+void SKATime_SetTimeScale(u8* pAnim, f32 fRate) {
+    ((AnimPlayer*)pAnim)->f14 = fRate;
 }
-
-// ---- end of sweep code ----
 
 // Byte-swaps nCount records laid out as pFormat's nFields fields from *ppSrc to *ppDst; both
 // pointers are left after the last record.
