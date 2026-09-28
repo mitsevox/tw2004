@@ -244,7 +244,7 @@ void GM_SetModeType(int nMode) {
         GameModeSkillZoneTarget_Init();
         break;
     case 17:
-        fn_800F5AAC();
+        GameModeSkillZoneTargetToTarget_Init();
         break;
     case 18:
         GameModeStableford_Init();

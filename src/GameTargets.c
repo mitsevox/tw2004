@@ -312,7 +312,7 @@ s32 GameModeSkillZoneBase_GetShotEarned(s32 nPlayer) {
         return GameModeSkillZoneTarget_GetShotEarned(nPlayer);
     }
     if (Game_GetMode() == 0x11) {
-        return fn_800F6A00(nPlayer);
+        return GameModeSkillZoneTargetToTarget_GetShotEarned(nPlayer);
     }
     return 0;
 }
@@ -342,7 +342,7 @@ s32 GameModeSkillZoneBase_GetDriveMultiplier(s32 nPlayer) {
 // else 0.
 s32 GameModeSkillZoneBase_GetExtraBallsEarned(s32 nPlayer) {
     if (Game_GetMode() == 0x11) {
-        return fn_800F6A34(nPlayer);
+        return GameModeSkillZoneTargetToTarget_GetExtraBallsEarned(nPlayer);
     }
     return 0;
 }

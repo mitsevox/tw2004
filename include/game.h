@@ -557,7 +557,7 @@ void GameModeReplay_Init(void);                 // mode 10
 void GameModeSkillZoneCapture_Init(void);                 // mode 14
 void GameModeSkillZoneHorse_Init(void);                 // mode 15
 void GameModeSkillZoneTarget_Init(void);                 // mode 16
-void fn_800F5AAC(void);                 // mode 17
+void GameModeSkillZoneTargetToTarget_Init(void);                 // mode 17
 void GameModeSkillZoneTimed_Init(void);                 // mode 13
 void GameModeSkins_Init(void);                 // mode 2
 void fn_800F944C(void);                 // mode 6
@@ -672,8 +672,8 @@ int  GameModeSkillZoneCapture_GetTotalTargetsHit(int nPlayer);          // GameM
 s32  GameModeSkillZoneCapture_GetShotEarned(s32 a);                // GameMode14.c
 s32  GameModeSkillZoneTarget_GetShotEarned(s32 a);                // GameMode16.c
 s32  GameModeSkillZoneTarget_GetDriveMultiplier(s32 a);                // GameMode16.c
-s32  fn_800F6A00(s32 a);                // GameMode17.c
-s32  fn_800F6A34(s32 a);                // GameMode17.c
+s32  GameModeSkillZoneTargetToTarget_GetShotEarned(s32 a);                // GameMode17.c
+s32  GameModeSkillZoneTargetToTarget_GetExtraBallsEarned(s32 a);                // GameMode17.c
 s32  GameModeSkillZoneTimed_GetShotEarned(s32 a);                // GameMode13.c
 s32  GameModeSkillZoneTimed_GetTimeEarned(s32 a);                // GameMode13.c
 s32  GameModeSkillZoneTimed_GetDriveMultiplier(s32 a);                // GameMode13.c
