@@ -1,7 +1,15 @@
-// GameMode8.c (our name): speed golf. Each hole scores the time taken (n290, in seconds) plus 3
-// per stroke (SpeedGolf_SetHoleTime, the scorecard and the prize). The golfer runs to the ball between shots
-// (custom golfer states 12 and 24..26 replace the normal ones). Mode 8 is solo; mode 7
-// (GameMode7.c) is two players trading event points, mode 6 (GameMode6.c) two at match play.
+// GameMode8.c (our name): speed golf, the code of game modes 6, 7 and 8 (GM_IsSpeedGolfMode). EA's
+// own words: TW06's events SpeedgolfReady / SpeedgolfGo (0x44 / 0x45 here) and TW07's UI calls
+// GM_vGetSpeedGolfHoleScore, GM_vGetSpeedGolfWinner and GM_vTimerOut. After each shot the golfer
+// runs to the ball as the ball-placement cursor (PlaceBall_UpdateMomentums), faster with a button:
+// speed golf's golfer states replace the ball flight (12, and 24), and add a countdown before each
+// hole (25) and the end of a player's hole (26). Mode 8 (SpeedGolf_Init) is solo against the clock:
+// a hole scores its seconds (Player.n290) plus 3 a stroke, and a full round under the course's
+// limits wins a prize (SpeedGolf_GetWinner). Mode 6 (GameMode6.c) is two players at match play: the
+// first to hole out wins the hole (SpeedGolfMatch_*). Mode 7 (GameMode7.c) is two players who start
+// with 3000 points each and trade points on 42 events (SpeedGolfPoints_*,
+// SpeedGolf_TradeEventPoints): one who holes out drains the other's points and plays the hole again
+// from the tee until the other finishes, and one whose points run out loses.
 
 #include "golfer.h"
 #include "game.h"
@@ -12,19 +20,33 @@
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState and the (u8) on GOLFERSTATE_Set's player (see game.h).
 
-// Three values per course, largest first (750, 675 and 600 for the first course).
+// A course's limits for mode 8's prize (SpeedGolf_GetWinner): a round's seconds plus 3 a stroke
+// under nLimit5000 wins 5000, under nLimit2500 2500, under nLimit1000 1000.
 typedef struct SGCourse {
-    s32 n0;                     // 0x0
-    s32 n4;                     // 0x4
-    s32 n8;                     // 0x8
+    s32 nLimit1000;             // 0x0
+    s32 nLimit2500;             // 0x4
+    s32 nLimit5000;             // 0x8
 } SGCourse;
 
-// The events of the two-player game: flags set on the player and points won from the other player.
+// One of mode 7's events: the flag it sets on the player and the points it moves from the other.
 typedef struct SGEvent {
     u64 uFlags;                 // 0x0  or'd into the player's uC48
-    s32 nPoints;                // 0x8
+    s32 nPoints;                // 0x8  negative for a penalty
     u8  unkC[4];
 } SGEvent;
+// Mode 7's 42 events (SpeedGolf_TradeEventPoints): event n sets bit n of the player's uC48. 0 the
+// hole's first shot to fly; 1 the longer first drive (par 4 or 5); 2 holed out while the other still
+// plays; 3 first on the green; 4 out of bounds; 5 a lateral hazard; 6 sand; 7 nearer the pin on the
+// green; 8 to 11 par, birdie, eagle, albatross; 12 a hole in one on a par 3, 13 on a par 4 or 5, 14
+// a second one on the hole; 17 to 19 a long holed putt or shot and 20 a long shot stopping by the
+// pin (never given: SpeedGolf_GroundDistance is always 0); 21 and 22 on the green in and under
+// regulation; 23 par or better after sand or a hazard; 24 and 25 the replay's drive beats the
+// other's or one's own; 26 and 27 the replay's ball on the green nearer the pin than the other's or
+// one's own; 28 the replay reaches the green; 29 the replay holed while the other plays; 30 to 32
+// out of bounds, hazard and sand on the replay; 33 three holes won in a row, 34 more; 35 a win after
+// three or more losses; 37 fewer strokes than the other on the hole; 38 the replay's first shot; 39
+// back to the tee (button 0x25); 40 lost (points ran out) and 41 won that way. 15, 16 and 36 are
+// not given in this build.
 SGEvent gSpeedGolfEvents[42] = {
     {(u64)1 << 0, 50}, {(u64)1 << 1, 100}, {(u64)1 << 2, 150},
     {(u64)1 << 3, 150}, {(u64)1 << 4, -50}, {(u64)1 << 5, -75},
@@ -41,13 +63,15 @@ SGEvent gSpeedGolfEvents[42] = {
     {(u64)1 << 36, 500}, {(u64)1 << 37, 100}, {(u64)1 << 38, 50},
     {(u64)1 << 39, -50}, {(u64)1 << 40, 0}, {(u64)1 << 41, 0},
 };
-// Per event, a sound (0xFFFF = none).
+// Per event, its commentary line in playlist 4 (0xFFFF none; SpeedGolf_PlayEventComment plays those
+// of events 0 to 36 only).
 u16 gSpeedGolfEventComments[44] = {
     0x0000, 0x0001, 0x0010, 0x0009, 0x000A, 0x0018, 0x0003, 0x0002, 0x001E, 0x0004, 0x001D,
     0x0019, 0x000E, 0x0011, 0x000E, 0x000C, 0x000F, 0x001A, 0x000B, 0x0013, 0x001B, 0x0005,
     0x0012, 0x000C, 0x0006, 0x001C, 0x000D, 0x0014, 0x0015, 0x0020, 0x0017, 0x0018, 0x0003,
     0x0021, 0x0007, 0x0008, 0x001F, 0xFFFF, 0x0016, 0x0024, 0x0022, 0x0023, 0x0025, 0x0026,
 };
+// Per course (gpGame->nCurCourse), mode 8's prize limits (SpeedGolf_GetPrizeScores).
 SGCourse gSpeedGolfPrizeScores[21] = {
     {750, 675, 600}, {800, 725, 650}, {725, 650, 575}, {800, 725, 650}, {750, 675, 600},
     {800, 725, 650}, {725, 650, 575}, {750, 675, 600}, {750, 675, 600}, {750, 675, 600},
@@ -55,17 +79,21 @@ SGCourse gSpeedGolfPrizeScores[21] = {
     {750, 675, 600}, {750, 675, 600}, {750, 675, 600}, {750, 675, 600}, {750, 675, 600},
     {750, 675, 600},
 };
-s32 gSpeedGolfUnused;
-s32 gSpeedGolfEventLogCount;
-s32 gSpeedGolfHoleWinEvents;
-u8  gSpeedGolfSecondHoleTip;
+s32 gSpeedGolfUnused;           // zeroed by modes 6 and 7's setup, read nowhere
+s32 gSpeedGolfEventLogCount;    // the next gSpeedGolfEventLog entry (0..99; the UI reads those below)
+s32 gSpeedGolfHoleWinEvents;    // how many times event 37 was given; read nowhere
+u8  gSpeedGolfSecondHoleTip;    // the round's second hole: run tip 3 (nC3C bit 23)
+// The round's first hole: run tips 1 and 2 (nC3C bits 21 and 22); set by modes 7 and 8's round
+// setup (GameMode7.c), passed on to gSpeedGolfSecondHoleTip when the hole ends.
 u8  gSpeedGolfFirstHoleTips;
+// Set every unpaused frame (SpeedGolf_UpdatePlayers); the first mode 7 player to go back to the
+// shot state (1) in a frame clears it, and the other waits for the next frame (nC3C bit 20).
 u8  gSpeedGolfCanSwitchToShot;
 u8    Gaud_GetCommentStatus(void);
 void  SpeedGolf_Vec4Sub(f32* pA, f32* pB, f32* pOut);
-// The run's pace (fCB4): a button press adds gSpeedGolfPaceBoost; it falls by gSpeedGolfPaceDecay a frame, or
-// gSpeedGolfPaceIdleDecay once the button has not been pressed for gSpeedGolfPaceIdleTime seconds; it stays within
-// gSpeedGolfPaceMin..gSpeedGolfPaceMax.
+// The run's pace (fCB4): a button press adds gSpeedGolfPaceBoost; it falls by gSpeedGolfPaceDecay
+// a frame, or gSpeedGolfPaceIdleDecay once the button has not been pressed for
+// gSpeedGolfPaceIdleTime seconds; it stays within gSpeedGolfPaceMin..gSpeedGolfPaceMax.
 f32 gSpeedGolfPaceBoost = 0.13f;
 f32 gSpeedGolfPaceDecay = 0.012f;
 f32 gSpeedGolfPaceMin = 0.65f;
@@ -73,12 +101,13 @@ f32 gSpeedGolfPaceMax = 1.85f;
 f32 gSpeedGolfPaceIdleDecay = 0.065f;
 f32 gSpeedGolfPaceIdleTime = 0.25f;
 
+// The last 100 events given (SpeedGolf_TradeEventPoints), for the UI's event list.
 SGLog gSpeedGolfEventLog[100];
 // fake match: a one-entry array, so the compiler loads it where SpeedGolf_RunUpdate compares with it
 // instead of folding in its own 1.0f (the original has this constant first in the file's .sdata2)
 const f32 lbl_80284708[1] = {1.0f};
 
-void  SpeedGolf_ShowEvent(s32 p0, s32 p1, s32 p2);
+void  SpeedGolf_ShowEvent(s32 nSlot, s32 nEvent, s32 nPoints);
 void  SpeedGolf_ResetRunDelay(int nPlayer);
 
 u8    SpeedGolf_HoleFinished(int nPlayer, u8 bCheck);
@@ -98,15 +127,15 @@ void  SpeedGolf_UpdatePlayers(void);
 void  SpeedGolf_HoleOverInit(int nPlayer);
 void  SpeedGolf_HoleOverUpdate(int nPlayer);
 void  SpeedGolf_HoleOverExit(int nPlayer);
-void  SpeedGolf_ShowPoints(s32 p0, s32 p1, s32 p2);
-void  SpeedGolf_SendMessage19(s32 p0, s32 p1);
+void  SpeedGolf_ShowPoints(s32 nSlot, s32 nPoints, s32 bReset);
+void  SpeedGolf_SendMessage19(s32 nSlot, s32 n);
 void  SpeedGolf_ShowReady(void);
-void  SpeedGolf_ShowStopBallPrompt(s32 p0, s32 p1);
-void  SpeedGolf_ShowRunTip(s32 p0, s32 p1);
-void  SpeedGolf_ShowBallDirection(s32 p0, s32 p1);
+void  SpeedGolf_ShowStopBallPrompt(s32 nSlot, s32 bShow);
+void  SpeedGolf_ShowRunTip(s32 nSlot, s32 nTip);
+void  SpeedGolf_ShowBallDirection(s32 nSlot, s32 nDir);
 void  SpeedGolf_ShowGo(void);
-void  SpeedGolf_ShowPointsGain(s32 p0, s32 p1);
-void  SpeedGolf_StartComment(s32 p0, s32 p1);
+void  SpeedGolf_ShowPointsGain(s32 nSlot, s32 nPoints);
+void  SpeedGolf_StartComment(s32 nLine, s32 a);
 
 // Game mode 8, solo speed golf, starts (GM_SetModeType): its callbacks go in, all shared with modes
 // 6 and 7 (GameMode6.c, GameMode7.c) apart from this setup, the hole's end (SpeedGolf_HoleFinished,
@@ -1340,10 +1369,10 @@ void SpeedGolf_RunUpdate(int nPlayer) {
         // the distance to the view's camera lens position, if that is nearer; the second square
         // root is written twice, as a MIN() macro would expand
         SpeedGolf_Vec4Sub(pBall->vPos,
-                    Camera_GetLens(
-                            ViewController_GetIndexedViewController(
-                                    gPlayers[nPlayer].nView[0])->pCamera)->m4[3],
-                    vDir);
+                          Camera_GetLens(
+                                  ViewController_GetIndexedViewController(
+                                          gPlayers[nPlayer].nView[0])->pCamera)->m4[3],
+                          vDir);
         fDist = (fToPlace <= (f32)Math_Sqrt(vDir[0] * vDir[0] + vDir[2] * vDir[2]))
 
                     ? fToPlace
@@ -1748,10 +1777,10 @@ void SpeedGolf_TimerOut(void) {
 // The current course's three score limits for mode 8's prize (gSpeedGolfPrizeScores; 750, 675 and
 // 600 on the first course): under the third wins 5000, under the second 2500, under the first 1000
 // (SpeedGolf_GetWinner). A UI command shows them.
-void SpeedGolf_GetPrizeScores(s32* p0, s32* p1, s32* p2) {
-    *p0 = gSpeedGolfPrizeScores[gpGame->nCurCourse].n0;
-    *p1 = gSpeedGolfPrizeScores[gpGame->nCurCourse].n4;
-    *p2 = gSpeedGolfPrizeScores[gpGame->nCurCourse].n8;
+void SpeedGolf_GetPrizeScores(s32* pLimit1000, s32* pLimit2500, s32* pLimit5000) {
+    *pLimit1000 = gSpeedGolfPrizeScores[gpGame->nCurCourse].nLimit1000;
+    *pLimit2500 = gSpeedGolfPrizeScores[gpGame->nCurCourse].nLimit2500;
+    *pLimit5000 = gSpeedGolfPrizeScores[gpGame->nCurCourse].nLimit5000;
 }
 
 // A hole on the solo scorecard: its seconds plus 3 per stroke.
@@ -1766,9 +1795,9 @@ static inline s32 SG_Score(s32 nSeconds, s32 nStrokes) {
 // 1000. Two players: whoever is ahead of 3000 points (by player 0's points) takes the margin, 4500
 // from 3000 up. Returns the winner (-1 for none) and the money in *pMoney.
 s32 SpeedGolf_GetWinner(s32* pMoney) {
-    s32 n0;
-    s32 n4;
-    s32 n8;
+    s32 nLimit1000;
+    s32 nLimit2500;
+    s32 nLimit5000;
     int nHole;
     int n;
     int nWinner;
@@ -1787,12 +1816,12 @@ s32 SpeedGolf_GetWinner(s32* pMoney) {
         }
         n += SG_Score(gPlayers[0].n290[Game_CurHoleIndex()], gPlayers[0].nStrokes[Game_CurHoleIndex()]);
         nWinner = 0;
-        SpeedGolf_GetPrizeScores(&n0, &n4, &n8);
-        if (n < n8) {
+        SpeedGolf_GetPrizeScores(&nLimit1000, &nLimit2500, &nLimit5000);
+        if (n < nLimit5000) {
             n = 5000;
-        } else if (n < n4) {
+        } else if (n < nLimit2500) {
             n = 2500;
-        } else if (n < n0) {
+        } else if (n < nLimit1000) {
             n = 1000;
         } else {
             n = 0;
@@ -1874,14 +1903,14 @@ u8 SpeedGolf_CheckControllerPulled(void) {
 
 // Game message 21: a player's points on the HUD, with the player's HUD slot (Player.nC58), the
 // points (nC44) and 1 as a hole starts or ends, 0 for a change.
-void SpeedGolf_ShowPoints(s32 p0, s32 p1, s32 p2) {
-    GameMsg_Send3Ints(21, p0, p1, p2);
+void SpeedGolf_ShowPoints(s32 nSlot, s32 nPoints, s32 bReset) {
+    GameMsg_Send3Ints(21, nSlot, nPoints, bReset);
 }
 
 // Game message 19 with a HUD slot (Player.nC58) and a byte: sent with 1 as the countdown starts
 // (SpeedGolf_CountdownInit), after the player's panel is shown.
-void SpeedGolf_SendMessage19(s32 p0, s32 p1) {
-    GameMsg_Send2Ints(19, p0, (p1 & 0xFF));
+void SpeedGolf_SendMessage19(s32 nSlot, s32 n) {
+    GameMsg_Send2Ints(19, nSlot, (n & 0xFF));
 }
 
 // Game message 16 with 1: the countdown's "ready" as a hole starts (SpeedGolf_CountdownInit;
@@ -1892,21 +1921,21 @@ void SpeedGolf_ShowReady(void) {
 
 // Game message 44: the prompt to stop the ball (button 0x23) for a HUD slot (Player.nC58): 1 shows
 // it while the runner is within 5 of a moving ball, 0 hides it.
-void SpeedGolf_ShowStopBallPrompt(s32 p0, s32 p1) {
-    GameMsg_Send2Ints(44, p0, p1);
+void SpeedGolf_ShowStopBallPrompt(s32 nSlot, s32 bShow) {
+    GameMsg_Send2Ints(44, nSlot, bShow);
 }
 
 // Game message 41: the run's tip for a HUD slot (Player.nC58): 0 none, 1 after 179 frames without
 // the stick, 2 and 3 the extra tips of the round's first and second hole
 // (SpeedGolf_UpdateHumanRun).
-void SpeedGolf_ShowRunTip(s32 p0, s32 p1) {
-    GameMsg_Send2Ints(41, p0, p1);
+void SpeedGolf_ShowRunTip(s32 nSlot, s32 nTip) {
+    GameMsg_Send2Ints(41, nSlot, nTip);
 }
 
 // Game message 37: where the ball is from the runner's heading, for a HUD slot (Player.nC58): 0
 // ahead, 1 and 3 to either side, 2 behind (SpeedGolf_RunUpdate); 0 also when the run is not on.
-void SpeedGolf_ShowBallDirection(s32 p0, s32 p1) {
-    GameMsg_Send2Ints(37, p0, p1);
+void SpeedGolf_ShowBallDirection(s32 nSlot, s32 nDir) {
+    GameMsg_Send2Ints(37, nSlot, nDir);
 }
 
 // Game message 16 with 2: "go" as the countdown ends (SpeedGolf_CountdownUpdate, with event 0x45,
@@ -1917,20 +1946,20 @@ void SpeedGolf_ShowGo(void) {
 
 // Game message 23: an event's popup for a HUD slot (Player.nC58), with the event (0..41) and its
 // points (SpeedGolf_TradeEventPoints).
-void SpeedGolf_ShowEvent(s32 p0, s32 p1, s32 p2) {
-    GameMsg_Send3Ints(23, p0, p1, p2);
+void SpeedGolf_ShowEvent(s32 nSlot, s32 nEvent, s32 nPoints) {
+    GameMsg_Send3Ints(23, nSlot, nEvent, nPoints);
 }
 
 // Game message 22: points gained, for a HUD slot (Player.nC58): the 5 a second a holed player takes
 // from the one still playing (SpeedGolf_UpdatePlayers).
-void SpeedGolf_ShowPointsGain(s32 p0, s32 p1) {
-    GameMsg_Send2Ints(22, p0, p1);
+void SpeedGolf_ShowPointsGain(s32 nSlot, s32 nPoints) {
+    GameMsg_Send2Ints(22, nSlot, nPoints);
 }
 
 // Plays a line of commentary playlist 4 (speed golf's) through Gaud_StartComment: the line and
 // Gaud_StartComment's third argument are passed on as given.
-void SpeedGolf_StartComment(s32 p0, s32 p1) {
-    Gaud_StartComment(4, p0, p1);
+void SpeedGolf_StartComment(s32 nLine, s32 a) {
+    Gaud_StartComment(4, nLine, a);
 }
 
 // Four floats of pA less pB into pOut.
