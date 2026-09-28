@@ -71,7 +71,7 @@ Night: GoGreenGrid linked; Golfer.c split into its 4 original files (ai_brain.c,
 Code8002BBB0.c, Code8002C984.c, Golfer.c = the Luck part), all linked; gPlayers/gCurGolferRecord/gGolferTable
 defined in Code8002DB80.c, gSession/gszEmpty in Code8002EE1C.c. Golfer.c header fixed; the club-name table 0x80187650 linked (Code8002EE1C.c). Codex/Gemini: agents/assign/2026-09-26-codex-gemini-velocity.md. ENDGAME checkpoint 1 (2026-09-26 ~21:00 CDT) merged: Golfer AI_ChooseTarget exact (Codex,
 labelled fakes), startUp exact (Gemini, labelled pragma) and linked; GoStaticCam, Rain, SunFlr, Code8002EE1C,
-GameModeBestBall linked; exact also char fn_80017DDC, SkinPart fn_800CE52C, UISScreen fn_8016B4D4, UISApi
+GameModeBestBall linked; exact also char Character_KeepClubOutOfGround, SkinPart fn_800CE52C, UISScreen fn_8016B4D4, UISApi
 fn_80169308, LLFont fn_8001208C, GoGreenGrid GR_BuildGridRenderData. Exact but not linked: Golfer (46/46; its data
 proves it was 4 original files: A ai_brain AI_SetShotModifiers..AI_ApplyError, B AI_TargetsInit..AI_ChooseTarget,
 C Club_UsableForKind..Shot_FitTargetToClub, D Luck_*; ranges in the g-hoist report, see journal), GoGreenGrid (link

@@ -79,8 +79,8 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
 CharSkinSet* fn_8001B208(u8* pData);
 Character* fn_8001942C(void);
 s32   fn_800962F8(Character* pChar);                            // CharAnim.c
-void  fn_800184E4(Character* pChar, Skin* pSkin);
-void  fn_80018710(Character* pChar);
+void  Character_SetSkin(Character* pChar, Skin* pSkin);
+void  Character_SetPreferedPos(Character* pChar);
 void  ClipBank_Restore(int nSlot);                  // skalib.c
 ClipBank* ClipBank_Get(u32 nSlot);                  // skalib.c
 AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank);  // skalib.c
@@ -113,8 +113,8 @@ void  Character_GetBonePos_FromIndex(Character* pChar, int nBone, f32* pPos);
 u8    Character_IsGolfer(Character* pChar);
 f32   fn_8001ED44(Character* pChar, int b);
 f32   fn_8001EE00(Character* pChar, int b);
-void  fn_80017DDC(Character* pChar);
-void  fn_8001899C(Character* pChar, u8 bLegA, u8 bLegB);
+void  Character_KeepClubOutOfGround(Character* pChar);
+void  Character_IKLegsToGround(Character* pChar, u8 bLegA, u8 bLegB);
 void  Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, int nBoneA, int nBoneB,
                               int nBoneC, int nBoneD, int nPoint, int b);
 void  fn_8001B644(Character* pChar);
@@ -168,7 +168,7 @@ void  fn_8009555C(void);
 void  fn_80095560(void);
 void  fn_80095564(void);
 void  fn_800955F0(int nPlayer);
-void  fn_8001744C(void* pChar, void* pModel, SkinChoices* pChoices);   // char_tex_manager.c
+void  sApplyUserLogos(void* pChar, void* pModel, SkinChoices* pChoices);   // char_tex_manager.c
 void  fn_8010BA2C(void* p);
 void  fn_8008B704(void);               // FEgolferanim.c
 void  fn_8008B754(int nNext);           // FEgolferanim.c
@@ -239,8 +239,9 @@ static void char_StrippedFn(void) {
     Math_Sin(3.0f);
 }
 
-// Clear the character's animation events: none set, all at time 2^30 (never).
-void fn_80017508(Character* pChar) {
+// Clears the character's SKA tags (its animation events, Character.events): none set, each at time
+// 2^30 (never).
+void Character_ResetSKATags(Character* pChar) {
     s32 i;
 
     for (i = 0; i < 18; i++) {
@@ -249,13 +250,14 @@ void fn_80017508(Character* pChar) {
     }
 }
 
-// Sets the character's animation events from the blend's, fStart later. Events 5..14 are only
-// taken when their time is past 0.
-void fn_800175B0(Character* pChar, Clip* pBlend, f32 fStart) {
+// Sets the character's SKA tags (animation events) for clip pBlend started at time fStart: all
+// reset, then each of the clip's events set at fStart plus its time in the clip. Tags 5..14 are
+// only taken when their time is past 0.
+void Character_InitSKATags(Character* pChar, Clip* pBlend, f32 fStart) {
     u32 uId;
     int i;
 
-    fn_80017508(pChar);
+    Character_ResetSKATags(pChar);
     if (pBlend->pEvents != NULL) {
         for (i = 0; i < pBlend->nEvents; i++) {
             uId = pBlend->pEvents[i].uId;
@@ -267,8 +269,10 @@ void fn_800175B0(Character* pChar, Clip* pBlend, f32 fStart) {
     }
 }
 
-// A random item of group nGroup of the 'MAL ' bank of the character's slot, or NULL without one.
-void* fn_80017678(Character* pChar, int nGroup, int n) {
+// A random animation library (MtaLib) of group nGroup of the 'MAL ' bank of the character's slot
+// (CharAnim.c plays it on the second animation player), or NULL when there is no bank or the group
+// is empty.
+void* Character_GetRandomMtaLib(Character* pChar, int nGroup, int n) {
     void* pItem = NULL;
     int nNum = 0;
     MalBank* pBank;
@@ -308,7 +312,7 @@ void* Char_SetClip(Character* pChar, int nGroup, int nStyle, const char* pName) 
 
 // Fill a blend node's pose from the character's body skin (none: the pose is left alone): the
 // first two bit arrays cleared, the next two set, and every bone's rotation and position copied.
-void fn_800177A0(Character* pChar, SkelPose* pPose) {
+void Character_InitBoneState(Character* pChar, SkelPose* pPose) {
     int i;
     Skin* pSkin = pChar->pSkin;
 
@@ -324,8 +328,8 @@ void fn_800177A0(Character* pChar, SkelPose* pPose) {
     }
 }
 
-// Only the bit arrays of fn_800177A0 (with a body skin): the last two set, the first two cleared.
-void fn_80017864(Character* pChar, SkelPose* pPose) {
+// Only the bit arrays of Character_InitBoneState (with a body skin): the last two set, the first two cleared.
+void Character_InitBoneStateBits(Character* pChar, SkelPose* pPose) {
     if (pChar->pSkin != NULL) {
         BitArray_SetAll(pPose->a20, 0x80);
         BitArray_SetAll(pPose->a30, 0x80);
@@ -334,9 +338,10 @@ void fn_80017864(Character* pChar, SkelPose* pPose) {
     }
 }
 
-// The ground height (and with bNormals its normal; straight up without ground) under points 0-3.
-// n1784 would pick a half of them per call (points 0 and 2, or 1 and 3), but it is set to -1
-// first, so every call does all four.
+// Reads the ground height under the four foot test points (0 right toe, 1 left toe, 2 right ankle,
+// 3 left ankle) into afGroundHeight, where there is ground, and with bNormals the ground's normal
+// into aGroundNormal (straight up where there is none). n1784 would pick half of the points per
+// call (0 and 2, or 1 and 3), but it is set to -1 first, so every call does all four.
 void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals) {
     f32* pNormal;
     f32 fHeight;
@@ -377,10 +382,11 @@ void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals) {
     }
 }
 
-// The ground height at pPos (looked for from 0.055 above it), with *ppNormal pointed at that
-// ground's normal; -65536.125 for none, and for surface classes 0xC and 0x12. Of the two heights
-// around the point the high one is taken when it is the only one, or the low one is on class 7 or
-// 0x13, or the two are less than 0.05 apart, or it is below 1 over the point.
+// The ground height at pPos (searched from 0.055 above it), with *ppNormal pointed at that ground's
+// normal (a static copy); -65536.125 for none, and for surface classes 0xC and 0x12. Of the
+// supporting ground (just below the point) and the covering ground (just above it), the covering
+// one is taken when it is the only one, or the supporting one is on class 7 or 0x13, or the two are
+// less than 0.05 apart, or it is less than 1 above the point.
 f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNormal) {
     f32 vPos[4];
     f32 fLow;
@@ -420,9 +426,11 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
     return -65536.125f;
 }
 
-// Moves a golfer's test points with its bones: points 0-3 from the skin's leg points through the
-// leg bones' matrices (or, without them, set out along the bones' axes by the model's fC and f10),
-// point 4 from the club class's club point through bone 0x52's matrix.
+// Moves a golfer's five test points with its bones (left and right swapped for a left-hander): 0-3
+// the right toe, left toe, right ankle and left ankle (bones 0x3A, 0x48, 0x39, 0x47), from the
+// points Character_SetSkin kept in the skin, or before that set out along the bones' axes by the
+// model's leg sizes (f10 right, fC left); 4 the club class's club point through the club bone 0x52
+// (IGdriver).
 void Character_UpdateTestPoints(Character* pChar) {
     f32 (*pClubMtx)[4];
     f32 (*pMtx48)[4];
@@ -465,10 +473,11 @@ void Character_UpdateTestPoints(Character* pChar) {
     }
 }
 
-// Keeps the club out of the ground: when point 4 is below the terrain and bone 0x52's y axis
-// points into the slope, that axis is shortened by how far the point is under, measured against
-// the club class's head height (not below 3/4 of it).
-void fn_80017DDC(Character* pChar) {
+// Keeps the club out of the ground: on fairly level ground (the feet's average ground normal a179C
+// has y above 0.9), when the club point (test point 4) is below the terrain and the club bone
+// 0x52's y axis points into the slope, that axis is shortened by how far the point is under,
+// measured against the club class's head height (not below 3/4 of it).
+void Character_KeepClubOutOfGround(Character* pChar) {
     f32 vNormal[4];
     f32 (*pMtx)[4];
     CourseInfo* pCourse;
@@ -612,13 +621,13 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
             (pChar->n20 == 11 && !(pChar->u10 & 0x8000)) || pChar->n20 == 5 || pChar->n20 == 12) {
             Character_PlaceFeetOnGround(pChar);
         }
-        fn_8001899C(pChar, bLegA, bLegB);
+        Character_IKLegsToGround(pChar, bLegA, bLegB);
     }
     if (Character_IsGolfer(pChar)) {
         if (pChar->pModel->pSkel != NULL) {
             fn_800279C0(pChar);
         }
-        fn_80017DDC(pChar);
+        Character_KeepClubOutOfGround(pChar);
     }
     pChar->n1698 = 0;
     fn_8001B644(pChar);
@@ -635,9 +644,9 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     }
 }
 
-// Give the character its model and look up the bones the swing needs: the club head (0x53), the
-// grip (0x52) and bone 0x15.
-void fn_80018484(Character* pChar, CharModel* pModel) {
+// Gives the character its skeleton (model) and looks up the bones the swing needs: the club head
+// (0x53), the club bone (0x52, IGdriver: the trail's grip end) and the right wrist (0x15).
+void Character_SetSkeleton(Character* pChar, CharModel* pModel) {
     if (pChar != NULL) {
         pChar->pModel        = pModel;
         pChar->nClubHeadBone = CharModel_GetBoneIndex(pChar->pModel, 0x53);
@@ -646,10 +655,12 @@ void fn_80018484(Character* pChar, CharModel* pModel) {
     }
 }
 
-// Gives the character its body's skin and poses the model from it; for a golfer, the skin also
-// keeps four points of the legs (bones 0x3A, 0x48, 0x39, 0x47, each moved by a small offset that
-// depends on the animation slot) in the frame of their bone (through mat44flt_Invert's matrix).
-void fn_800184E4(Character* pChar, Skin* pSkin) {
+// Gives the character its body's skin and poses the skeleton from it (Character_SetPreferedPos).
+// For a golfer it then keeps the four foot test points in the skin (TW07 has this part as
+// Character_SetTestPointsFeet): each toe bone's position moved by boneToToe and each ankle bone's
+// by boneToHeel (larger offsets for animation slot 0), taken into the frame of its bone (through
+// its inverted matrix) into Skin.a1048, and b1044 set.
+void Character_SetSkin(Character* pChar, Skin* pSkin) {
     f32 m48[4][4];
     f32 m3A[4][4];
     f32 m47[4][4];
@@ -667,7 +678,7 @@ void fn_800184E4(Character* pChar, Skin* pSkin) {
 
     if (pChar != NULL) {
         pChar->pSkin = pSkin;
-        fn_80018710(pChar);
+        Character_SetPreferedPos(pChar);
         if (Character_IsGolfer(pChar)) {
             pMtx48 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x48);
             pMtx3A = Character_GetBoneMatrixSwapIfLefty(pChar, 0x3A);
@@ -713,9 +724,10 @@ void fn_800184E4(Character* pChar, Skin* pSkin) {
     }
 }
 
-// Poses the character's model from its body's skin: the skin's pose (SKEL_UpdateState,
-// fn_80029968) and, when the skin has a model, the skin's matrices.
-void fn_80018710(Character* pChar) {
+// Poses the character's skeleton in its body skin's rest pose (SKEL_UpdateState, fn_80029968) and,
+// when the skin has a model, hands the skeleton the skin's matrices. Needs a character, a skin and
+// a model.
+void Character_SetPreferedPos(Character* pChar) {
     if (pChar != NULL && pChar->pSkin != NULL && pChar->pModel != NULL) {
         SKEL_UpdateState(pChar->pModel, &pChar->pSkin->pose, 1);
         fn_80029968(pChar->pModel, &pChar->pSkin->pose);
@@ -799,9 +811,10 @@ void Character_PlaceFeetOnGround(Character* pChar) {
     pChar->pModel->pBones[0].v1C[1] = fY;
 }
 
-// Puts a golfer's legs on the ground by IK: with bLegA the leg of bones 0x36-0x3A (point 2),
-// with bLegB the leg of bones 0x44-0x48 (point 3); the bones they move are then transformed again.
-void fn_8001899C(Character* pChar, u8 bLegA, u8 bLegB) {
+// Puts a golfer's legs on the ground by IK: with bRightLeg the right leg (hip 0x36, knee 0x38,
+// ankle 0x39, toe 0x3A), with bLeftLeg the left (0x44-0x48); the bones they move are then
+// transformed again.
+void Character_IKLegsToGround(Character* pChar, u8 bLegA, u8 bLegB) {
     CourseInfo* pCourse;
     u32 auBits[4];
 
@@ -1133,7 +1146,7 @@ Character* fn_8001942C(void) {
     }
     pChar->n74 = 0;
     pChar->bE0 = 0;
-    fn_80017508(pChar);
+    Character_ResetSKATags(pChar);
     pChar->p1798 = NULL;
     return pChar;
 }
@@ -1360,7 +1373,7 @@ void fn_80019DE8(Character* pArg) {
 void fn_80019E80(Character* pChar) {
     fn_80019C84(pChar);
     fn_80019CEC(pChar);
-    fn_8001744C(pChar, pChar->a64[pChar->n74], &FE_GetCurrentProfile()->choices);
+    sApplyUserLogos(pChar, pChar->a64[pChar->n74], &FE_GetCurrentProfile()->choices);
     fn_8010BA2C(pChar->a64[pChar->n74]);
     fn_8008EA38(1);
 }
@@ -1410,7 +1423,7 @@ void Character_ExecuteTextureSwapFE(Character* pChar) {
         pChar->n74 = 1 - pChar->n74;
         pModel = pChar->a64[pChar->n74];
         fn_80019CEC(pChar);
-        fn_8001744C(pChar, pModel, &pProfile->choices);
+        sApplyUserLogos(pChar, pModel, &pProfile->choices);
         fn_8010BA2C(pModel);
         fn_80008380();
         for (i = 0; i < pChar->nSkins; i++) {
@@ -1458,7 +1471,7 @@ void fn_8001A14C(Character* pArg) {
 void fn_8001A20C(Character* pChar) {
     fn_80019C84(pChar);
     fn_80019CEC(pChar);
-    fn_8001744C(pChar, pChar->a64[pChar->n74], pChar->pChoices);
+    sApplyUserLogos(pChar, pChar->a64[pChar->n74], pChar->pChoices);
     fn_8010BA2C(pChar->a64[pChar->n74]);
     pChar->bE0 = 1;
     lbl_801B95E8.a[6].p = NULL;
@@ -1787,9 +1800,9 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
     if (bLook && pChoices != NULL) {
         bModel = (u8)pChoices->n113;
     }
-    fn_80018484(pChar, SKEL_LoadFromMem(pData, 1, pDefs, bModel));
+    Character_SetSkeleton(pChar, SKEL_LoadFromMem(pData, 1, pDefs, bModel));
     if (pChar->pSkin != NULL) {
-        fn_800184E4(pChar, pChar->pSkin);
+        Character_SetSkin(pChar, pChar->pSkin);
     }
     pChar->pModel->f12C = f12C;
     pChar->pModel->f130 = f130;
@@ -1839,7 +1852,7 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
 
     pChar->p17AC = CharSlider_CreateDefinitionsFromMem(&pData);
     pChar->p4C = pData;
-    fn_80018710(pChar);
+    Character_SetPreferedPos(pChar);
     if (bGolfer) {
         pChar->p16D8 = lbl_80280E24[nSet];
         pChar->nClubHeadBone = CharModel_GetBoneIndex(pChar->pModel, 0x53);
@@ -1865,7 +1878,7 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
     }
     if (gSession.nSplitScreen && Character_IsGolfer(pChar)) {
         fn_800375AC(pChar->pSkin, 0);
-        fn_80018710(pChar);
+        Character_SetPreferedPos(pChar);
     }
     return pChar;
 }
@@ -2209,7 +2222,7 @@ void Character_PlayClip(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) 
     }
     pAnim->fStart = pNode->fStart;
     pAnim->fEnd = pNode->fEnd;
-    fn_800175B0(pChar, pClip, aBlend[3]);
+    Character_InitSKATags(pChar, pClip, aBlend[3]);
     if (pClip != NULL && pClip->pF4 != NULL) {
         fn_8009622C(pChar, pClip->pF4, bNoBlend, fTime);
     }
@@ -3003,7 +3016,7 @@ void fn_8001DC64(Character* pChar, SkinChoices* pChoices) {
             fn_8001EE98(pChar, 1);
         }
     }
-    fn_80018484(pChar, pChar->pModel);
+    Character_SetSkeleton(pChar, pChar->pModel);
 }
 
 // Byte-swaps nBytes of 0x50-byte texture entries in place, once (bit 0x40 of b47 marks it done):

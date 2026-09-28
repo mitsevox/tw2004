@@ -1654,7 +1654,7 @@ void fn_8008EA44(u8 b) {
             }
         }
         fn_8001EE98(lbl_80281EE0->pB4->pChar, b);
-        fn_80018484(lbl_80281EE0->pB4->pChar, lbl_80281EE0->pB4->pChar->pModel);
+        Character_SetSkeleton(lbl_80281EE0->pB4->pChar, lbl_80281EE0->pB4->pChar->pModel);
     }
 }
 

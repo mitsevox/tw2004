@@ -71,7 +71,7 @@ typedef struct BonePose {
 LAYOUT_ASSERT(BonePose, 0x20);
 
 // A blend node's pose buffer (SKABlendNode.pPose; our name): bit arrays over the 128 bones
-// (fn_800177A0 clears the first two with BitArray_ClearAll and the next two with BitArray_SetAll), then a pose
+// (Character_InitBoneState clears the first two with BitArray_ClearAll and the next two with BitArray_SetAll), then a pose
 // per bone. Format 0 is exactly this (0x1040 bytes); format 1 has 0x10C bytes more.
 typedef struct SkelPose {
     u32      a0[4];             // 0x000  bones the pose sets (BitArray_Test tests them)
@@ -662,7 +662,7 @@ typedef struct Character {
     void* p1794;                // 0x1794  cleared by fn_80062BE8; the same for group 9
     Clip* p1798;                // 0x1798  cleared by fn_8001942C; with n2C 6, fn_8001C650 and
                                 //         Character_SetupForShot set n16D4 to 4 when it is 0
-    f32   a179C[4];             // 0x179C  cleared by Character_PlaceFeetOnGround; fn_80017DDC acts only
+    f32   a179C[4];             // 0x179C  cleared by Character_PlaceFeetOnGround; Character_KeepClubOutOfGround acts only
                                 //         while a179C[1] is above 0.9
     void* p17AC;                // 0x17AC  its slider definitions (CharSlider_CreateDefinitionsFromMem,
                                 //         fn_8001A9F4); fn_8001DC64 applies them
@@ -672,7 +672,7 @@ typedef struct Character {
                                 //         the a10A0 index
     u8    unk17B5[0x17B8 - 0x17B5];
     struct SkinChoices* pChoices;   // 0x17B8  its look (Character_SetClubsAndClothes dresses it from this); fn_8001A20C
-                                    //         puts its logos on the model (fn_8001744C)
+                                    //         puts its logos on the model (sApplyUserLogos)
 } Character;
 
 // The players' characters (gViewSlots, 0x80187124): Player_SetGolfer takes the player's from here.
@@ -766,9 +766,9 @@ extern AnimStream* lbl_80282230;
 u8    fn_800C9828(int nGroup, int nStyle, int nClub, int nKey);   // the clips are streamed
 void  fn_800CA9DC(int nSlot);
 
-void  fn_800177A0(Character* pChar, SkelPose* pPose);   // a blend node's pose from the body skin
-void  fn_80017864(Character* pChar, SkelPose* pPose);   // only its bit arrays
-void  fn_80018484(Character* pChar, CharModel* pModel);
+void  Character_InitBoneState(Character* pChar, SkelPose* pPose);   // a blend node's pose from the body skin
+void  Character_InitBoneStateBits(Character* pChar, SkelPose* pPose);   // only its bit arrays
+void  Character_SetSkeleton(Character* pChar, CharModel* pModel);
 void  fn_8001C0E0(Character* pChar);    // frees the character
 void  Character_SelectClub(Character* pChar, int n);
 void  fn_8001D238(void);
@@ -1014,7 +1014,7 @@ extern f32         lbl_80281D1C;
 void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, u32* pFlags,
                    const char* pName);
 void* Char_SetClip(Character* pChar, int nGroup, int nStyle, const char* pName);
-void* fn_80017678(Character* pChar, int nGroup, int n);   // char.c: a random item of its 'MAL ' bank
+void* Character_GetRandomMtaLib(Character* pChar, int nGroup, int n);   // char.c: a random item of its 'MAL ' bank
 
 // char.c: turning the character, and its dynamic textures (the menu golfer, FEgolferanim.c).
 void  Character_SetOrientation(Character* pChar, f32 fAngle);void  Character_AddTextureLoadRequest(Character* pChar, void (*pfnA)(Character* pChar), void (*pfnB)(Character* pChar));

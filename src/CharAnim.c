@@ -23,7 +23,7 @@ f32   fn_800971B8(Character* pChar);
 u8    Character_IsGolfer(Character* pChar);                        // char.c
 void  Character_PlaceFeetOnGround(Character* pChar);        // char.c
 int   fn_8001BD18(Character* pChar, Clip* pClip);           // char.c
-void  fn_800175B0(Character* pChar, Clip* pBlend, f32 fStart);   // char.c
+void  Character_InitSKATags(Character* pChar, Clip* pBlend, f32 fStart);   // char.c
 void  fn_801141F8(struct DynChain* pChain, CharModel* pModel);   // DynChain.c
 char* fn_801008A8(void);                                    // GameMode11.c
 void  Mtx_CopyRotation(f32 (*pSrc)[4], f32 (*pDst)[4]);          // UMemPool.c: copies three rows
@@ -206,7 +206,7 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
     }
     fn_800958F8(pChar, NULL, pClip, aBlend, fFrom, fTo, fStart, fOffset);
     fDelay = fOffset + (pChar->fAnimEnd - pChar->fAnimTime);
-    fn_800175B0(pChar, pClip, aBlend[3] - aBlend[0]);
+    Character_InitSKATags(pChar, pClip, aBlend[3] - aBlend[0]);
     pNew = NULL;
     fn_80071C28(&pNew, 0, pNode->nFormat, pfnBlend, nC);
     fn_800724C0(&pChar->blend, pNew, pClip, 1.0f);
@@ -690,7 +690,7 @@ void fn_80096F0C(Character* pChar) {
         if (pChar->n30 == 4 || (pChar->n20 != 6 && pChar->n20 != 7)) {
             goto skip;  // fake match: past the n30 update to the shared clear (a copy here: 90.3%)
         }
-        pLib = fn_80017678(pChar, 1, -1);
+        pLib = Character_GetRandomMtaLib(pChar, 1, -1);
         fn_800732F4(&pChar->node3E0, &pChar->anim29C, 0.5f + pChar->anim29C.fTime);
         fn_80095FD0(pChar, pLib, 0, 1, fn_80072ACC, 1, 2, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
         pChar->anim29C.f10 -= 0.5f;
@@ -700,7 +700,7 @@ void fn_80096F0C(Character* pChar) {
             goto skip;  // fake match: as in case 2
         }
         fn_800732F4(&pChar->node3E0, &pChar->anim29C, 0.5f + pChar->anim29C.fTime);
-        pLib = fn_80017678(pChar, 2, -1);
+        pLib = Character_GetRandomMtaLib(pChar, 2, -1);
         fn_80095FD0(pChar, pLib, 0, 2, fn_80072ACC, 1, 3, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
         pChar->anim29C.f10 -= 0.5f;
         break;
@@ -709,7 +709,7 @@ void fn_80096F0C(Character* pChar) {
             goto skip;  // fake match: as in case 2
         }
         fn_800732F4(&pChar->node3E0, &pChar->anim29C, 0.5f + pChar->anim29C.fTime);
-        pLib = fn_80017678(pChar, 0, -1);
+        pLib = Character_GetRandomMtaLib(pChar, 0, -1);
         fn_80095FD0(pChar, pLib, 0, 0, fn_80072ACC, 1, 1, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
         pChar->anim29C.f10 -= 0.5f;
         break;

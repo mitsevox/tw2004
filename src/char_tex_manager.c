@@ -16,8 +16,10 @@ int sGetUserTextureIdx(u64 uHash) {
     return atoi(szName + strlen("_usrtextr"));
 }
 
-// The pixels of the user logo a texture stands for, or NULL.
-u8* fn_80017398(u64 uHash, SkinChoices* pChoices) {
+// The pixels of the created golfer's logo n (0..4 of pChoices) for a texture named "_usrtextr<n>",
+// laid out as a texture by fn_8010FF5C (64x64 for a square logo, else 128x32, in one shared
+// buffer); NULL for any other texture.
+u8* sGetUserLogoTexturePtr(u64 uHash, SkinChoices* pChoices) {
     int nLogo;
     int nWidth;
     int nHeight;
@@ -34,8 +36,9 @@ u8* fn_80017398(u64 uHash, SkinChoices* pChoices) {
     return fn_8010FF5C(pChoices->aLogo[nLogo].aPixels, nWidth, nHeight);
 }
 
-// The palette for a user logo texture, or NULL.
-s16* fn_80017410(u64 uHash, SkinChoices* pChoices) {
+// The palette for a texture named "_usrtextr<n>" (n 0..4): the logo palette every user logo shares
+// (fn_8010FBC4); NULL for any other texture.
+s16* CharacterTex_GetUserLogoPalette(u64 uHash, SkinChoices* pChoices) {
     int nLogo;
 
     nLogo = sGetUserTextureIdx(uHash);
@@ -43,8 +46,10 @@ s16* fn_80017410(u64 uHash, SkinChoices* pChoices) {
     return fn_8010FBC4();
 }
 
-// Puts the profile's logos into every user logo texture of the model.
-void fn_8001744C(void* pChar, void* pModel, SkinChoices* pChoices) {
+// Puts the created golfer's logos into the model's dynamic textures: every texture named
+// "_usrtextr<n>" gets logo n's pixels and the logo palette. Does nothing without pChoices or
+// pModel.
+void sApplyUserLogos(void* pChar, void* pModel, SkinChoices* pChoices) {
     int nNumTex;
     int i;
     u64 uHash;
@@ -55,10 +60,10 @@ void fn_8001744C(void* pChar, void* pModel, SkinChoices* pChoices) {
         nNumTex = fn_8010AD10(pModel);
         for (i = 0; i < nNumTex; i++) {
             uHash = fn_8010AD18(pModel, i);
-            pPixels = fn_80017398(uHash, pChoices);
+            pPixels = sGetUserLogoTexturePtr(uHash, pChoices);
             if (pPixels != NULL) {
                 fn_8010B1D4(pModel, i, pPixels, NULL, -1);
-                pPalette = fn_80017410(uHash, pChoices);
+                pPalette = CharacterTex_GetUserLogoPalette(uHash, pChoices);
                 if (pPalette != NULL) {
                     // port: EA passes two arguments fn_8010B2A8 ignores
                     ((void (*)(DynTex*, int, s16*, void*, s32))fn_8010B2A8)(pModel, i, pPalette, NULL, -1);

@@ -240,7 +240,7 @@ typedef struct SkinModel {
     s32  n08;                   // 0x08  its size with all its arrays once burnt (fn_801276E4)
     s32  n0C;                   // 0x0C  entries in p3C
     u8   unk10[4];
-    s32  n14;                   // 0x14  how many matrices Skin.p108C holds (fn_80018710); also
+    s32  n14;                   // 0x14  how many matrices Skin.p108C holds (Character_SetPreferedPos); also
                                 //       the 0x20-byte entries in p34
     s16  n18;                   // 0x18  } -1 in a model fn_800364AC makes up
     s16  n1A;                   // 0x1A  }
@@ -303,12 +303,12 @@ extern SkinMorphWork* lbl_80281880;
 // A skin (Skin.c): a character's body or one of its attachments; only what the code reads.
 typedef struct Skin {
     SkinModel* pModel;          // 0x0000
-    SkelPose pose;              // 0x0004  (fn_80018710 hands it to SKEL_UpdateState)
-    u8   b1044;                 // 0x1044  set once fn_800184E4 has filled a1048
+    SkelPose pose;              // 0x0004  (Character_SetPreferedPos hands it to SKEL_UpdateState)
+    u8   b1044;                 // 0x1044  set once Character_SetSkin has filled a1048
     u8   pad1045[3];
     f32  a1048[4][4];           // 0x1048  four leg points, each through mat44flt_Invert of its bone's
-                                //         matrix (fn_800184E4: bones 0x3A, 0x48, 0x39, 0x47)
-    f32  (*p1088)[4][4];        // 0x1088  } matrices fn_80018710 hands the model (SKEL_SetDefaultWorld2BoneMatrices,
+                                //         matrix (Character_SetSkin: bones 0x3A, 0x48, 0x39, 0x47)
+    f32  (*p1088)[4][4];        // 0x1088  } matrices Character_SetPreferedPos hands the model (SKEL_SetDefaultWorld2BoneMatrices,
     f32  (*p108C)[4][4];        // 0x108C  } fn_80029A7C)
     struct HwsMemBlock* p1090;  // 0x1090  freed by fn_80037708
     u8   unk1094[0x1098 - 0x1094];

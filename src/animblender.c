@@ -210,9 +210,9 @@ void fn_800720C8(Character* pChar, SKABlendNode* pNew, SKABlendNode** ppNode, f3
             }
             if (pChar != NULL && pNew->nType == 0) {
                 if (pNew->nFormat == 0) {
-                    fn_800177A0(pChar, pNew->pPose);
+                    Character_InitBoneState(pChar, pNew->pPose);
                 } else if (pNew->nFormat == 1) {
-                    fn_80017864(pChar, &((SkelPose1*)pNew->pPose)->pose);
+                    Character_InitBoneStateBits(pChar, &((SkelPose1*)pNew->pPose)->pose);
                     for (j = 0; j < 3; j++) {
                         memset(&((SkelPose1*)pNew->pPose)->aBlocks[j], 0, sizeof(SkelPoseBlock));
                         BitArray_SetAll(((SkelPose1*)pNew->pPose)->aBlocks[j].aBits, 20);
