@@ -732,7 +732,7 @@ typedef struct AnimStreamGroup {
 } AnimStreamGroup;
 LAYOUT_ASSERT(AnimStreamGroup, 8);
 
-extern AnimStreamGroup lbl_80191490[2];
+extern AnimStreamGroup gAnimStreamGroups[2];
 
 // A buffer the stream reads clips into.
 typedef struct AnimStreamBuf {
@@ -757,7 +757,7 @@ typedef struct AnimStreamPlayer {
 } AnimStreamPlayer;
 LAYOUT_ASSERT(AnimStreamPlayer, 0x484);
 
-// The stream's state (lbl_80282230, allocated by AnimStream_Init).
+// The stream's state (gpAnimStream, allocated by AnimStream_Init).
 typedef struct AnimStream {
     AnimStreamBuf*   p0;        // 0x0000  the buffer the current read fills (a clip, AnimStream_EndRead)
     AnimStreamClips* p4;        // 0x0004  the clips it is for
@@ -778,7 +778,7 @@ typedef struct AnimStream {
 } AnimStream;
 LAYOUT_ASSERT(AnimStream, 0x1CD0);
 
-extern AnimStream* lbl_80282230;
+extern AnimStream* gpAnimStream;
 
 u8    AnimStream_IsStreamed(int nGroup, int nStyle, int nClub, int nKey);   // the clips are streamed
 void  AnimStream_SizeSlotClips(int nSlot);

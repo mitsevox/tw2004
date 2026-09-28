@@ -23,12 +23,12 @@ void AnimStream_GetFilePath(u8 bGlobal, int bFemale, int nPlayer, char* szPath);
 int AnimStream_FindSlotPlayer(int nId);
 u8 AnimStream_CanReplaceClip(int nPlayer, Clip* pClip);
 
-char lbl_80281530[8] = "";              // the folder the stream files' paths start from
+char gAnimStreamRoot[8] = "";              // the folder the stream files' paths start from
 
 // This file's .sbss (character.h).
-AnimStream* lbl_80282230;
+AnimStream* gpAnimStream;
 
-AnimStreamGroup lbl_80191490[2] = {
+AnimStreamGroup gAnimStreamGroups[2] = {
     { 1, 0 },
     { 5, 1 },
 };
@@ -43,53 +43,53 @@ void AnimStream_Init(void) {
     int k;
     int m;
 
-    lbl_80282230 = StaticMem_Alloc(sizeof(AnimStream), 2, 0, "AnimStream.c", 158);
-    lbl_80282230->p0 = NULL;
-    lbl_80282230->p4 = NULL;
-    lbl_80282230->pRead = NULL;
-    lbl_80282230->nBytes = sizeof(AnimStream);
-    lbl_80282230->nState = 0;
+    gpAnimStream = StaticMem_Alloc(sizeof(AnimStream), 2, 0, "AnimStream.c", 158);
+    gpAnimStream->p0 = NULL;
+    gpAnimStream->p4 = NULL;
+    gpAnimStream->pRead = NULL;
+    gpAnimStream->nBytes = sizeof(AnimStream);
+    gpAnimStream->nState = 0;
     for (i = 0; i < 2; i++) {
         for (j = 0; j < 2; j++) {
             for (k = 0; k < 8; k++) {
                 for (m = 0; m < 6; m++) {
-                    lbl_80282230->bufs[i][j][k][m].pData = NULL;
-                    lbl_80282230->bufs[i][j][k][m].nSize = -1;
+                    gpAnimStream->bufs[i][j][k][m].pData = NULL;
+                    gpAnimStream->bufs[i][j][k][m].nSize = -1;
                 }
             }
         }
     }
     for (nPlayer = 0; nPlayer < 5; nPlayer++) {
-        lbl_80282230->players[nPlayer].nId = -1;
+        gpAnimStream->players[nPlayer].nId = -1;
         for (j = 0; j < 2; j++) {
             for (k = 0; k < 8; k++) {
                 for (m = 0; m < 6; m++) {
-                    lbl_80282230->players[nPlayer].clips[j][k][m].nNext = -1;
-                    lbl_80282230->players[nPlayer].clips[j][k][m].nMaxSize = -1;
-                    lbl_80282230->players[nPlayer].clips[j][k][m].b8 = 0;
+                    gpAnimStream->players[nPlayer].clips[j][k][m].nNext = -1;
+                    gpAnimStream->players[nPlayer].clips[j][k][m].nMaxSize = -1;
+                    gpAnimStream->players[nPlayer].clips[j][k][m].b8 = 0;
                 }
             }
         }
     }
-    lbl_80282230->bOn = 1;
+    gpAnimStream->bOn = 1;
     for (i = 0; i < 5; i++) {
         if (gSession.nController[i] == 8) {
-            lbl_80282230->bOn = 0;
+            gpAnimStream->bOn = 0;
         }
     }
     if (Game_GetMode() == 11) {
-        lbl_80282230->bOn = 0;
+        gpAnimStream->bOn = 0;
     }
     if (gSession.nSplitScreen == 1) {
-        lbl_80282230->bOn = 0;
+        gpAnimStream->bOn = 0;
     }
     if (gSession.nNumPlayers > 2) {
-        lbl_80282230->bOn = 0;
+        gpAnimStream->bOn = 0;
     }
     if (gSession.nNumPlayers > 1) {
-        lbl_80282230->bOn = 0;
+        gpAnimStream->bOn = 0;
     }
-    lbl_80282230->bOn = 0;
+    gpAnimStream->bOn = 0;
 }
 
 // Frees the stream: the read buffer, every clip buffer, then the state itself.
@@ -99,22 +99,22 @@ void AnimStream_Close(void) {
     int k;
     int m;
 
-    if (lbl_80282230->pRead != NULL) {
-        StaticMem_Free(lbl_80282230->pRead);
+    if (gpAnimStream->pRead != NULL) {
+        StaticMem_Free(gpAnimStream->pRead);
     }
     for (i = 0; i < 2; i++) {
         for (j = 0; j < 2; j++) {
             for (k = 0; k < 8; k++) {
                 for (m = 0; m < 6; m++) {
-                    if (lbl_80282230->bufs[i][j][k][m].pData != NULL) {
-                        StaticMem_Free(lbl_80282230->bufs[i][j][k][m].pData);
+                    if (gpAnimStream->bufs[i][j][k][m].pData != NULL) {
+                        StaticMem_Free(gpAnimStream->bufs[i][j][k][m].pData);
                     }
                 }
             }
         }
     }
-    StaticMem_Free(lbl_80282230);
-    lbl_80282230 = NULL;
+    StaticMem_Free(gpAnimStream);
+    gpAnimStream = NULL;
 }
 
 // Whether the clips of a group, style and club class are streamed: only with streaming on, only
@@ -122,14 +122,14 @@ void AnimStream_Close(void) {
 u8 AnimStream_IsStreamed(int nGroup, int nStyle, int nClub, int nKey) {
     int i;
 
-    if (lbl_80282230 == NULL) return 0;
-    if (lbl_80282230->bOn == 0) return 0;
+    if (gpAnimStream == NULL) return 0;
+    if (gpAnimStream->bOn == 0) return 0;
     if (nStyle < 0 || nClub < 0) return 0;
     if (nKey >= 0) return 0;
     if (nGroup == 5 && nClub != 2 && nStyle != 7) return 0;
     if (nGroup == 1) return 1;
     for (i = 0; i < 2; i++) {
-        if (nGroup == lbl_80191490[i].nGroup) return 1;
+        if (nGroup == gAnimStreamGroups[i].nGroup) return 1;
     }
     return 0;
 }
@@ -138,8 +138,8 @@ u8 AnimStream_IsStreamed(int nGroup, int nStyle, int nClub, int nKey) {
 int AnimStream_GetGroupIndex(int nGroup) {
     int i;
     for (i = 0; i < 2; i++) {
-        if (nGroup == lbl_80191490[i].nGroup) {
-            return lbl_80191490[i].nIndex;
+        if (nGroup == gAnimStreamGroups[i].nGroup) {
+            return gAnimStreamGroups[i].nIndex;
         }
     }
     return -1;
@@ -149,8 +149,8 @@ int AnimStream_GetGroupIndex(int nGroup) {
 int AnimStream_GetGroup(int nIndex) {
     int i;
     for (i = 0; i < 2; i++) {
-        if (nIndex == lbl_80191490[i].nIndex) {
-            return lbl_80191490[i].nGroup;
+        if (nIndex == gAnimStreamGroups[i].nIndex) {
+            return gAnimStreamGroups[i].nGroup;
         }
     }
     return -1;
@@ -171,31 +171,31 @@ void AnimStream_Update(void) {
     int nFirst;
 
     if (gSession.nGameType != 6) return;
-    if (lbl_80282230 == NULL) return;
-    if (lbl_80282230->bOn == 0) return;
-    if (lbl_80282230->nState == 2) {
+    if (gpAnimStream == NULL) return;
+    if (gpAnimStream->bOn == 0) return;
+    if (gpAnimStream->nState == 2) {
         AnimStream_EndRead(0);
     }
-    if (lbl_80282230->p0 != NULL) return;
+    if (gpAnimStream->p0 != NULL) return;
     nFirst = GM_GetHonors();
     if (nFirst == 5) return;
-    if ((nStart = lbl_80282230->players[nFirst].nId) < 0) {
+    if ((nStart = gpAnimStream->players[nFirst].nId) < 0) {
         nStart = 0;
     }
     nStart++;
     nStart %= 2;
     for (nSlot = nStart; nSlot < 2; nSlot++) {
         nPlayer = AnimStream_FindSlotPlayer(nSlot);
-        if (nPlayer < 0 || lbl_80282230->p0 != NULL) break;
+        if (nPlayer < 0 || gpAnimStream->p0 != NULL) break;
         for (i = 0; i < 2; i++) {
             for (nStyle = 0; nStyle < 8; nStyle++) {
                 for (nClub = 0; nClub < 6; nClub++) {
-                    if (lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 == 1) {
-                        lbl_80282230->p0 = &lbl_80282230->bufs[nSlot][i][nStyle][nClub];
-                        lbl_80282230->p4 = &lbl_80282230->players[nPlayer].clips[i][nStyle][nClub];
+                    if (gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].b8 == 1) {
+                        gpAnimStream->p0 = &gpAnimStream->bufs[nSlot][i][nStyle][nClub];
+                        gpAnimStream->p4 = &gpAnimStream->players[nPlayer].clips[i][nStyle][nClub];
                         if (AnimStream_StartRead(nSlot, nPlayer, i, nStyle, nClub) == 0) {
-                            lbl_80282230->p0 = NULL;
-                            lbl_80282230->p4 = NULL;
+                            gpAnimStream->p0 = NULL;
+                            gpAnimStream->p4 = NULL;
                             continue;
                         }
                         return;
@@ -204,20 +204,20 @@ void AnimStream_Update(void) {
             }
         }
     }
-    if (lbl_80282230->p0 != NULL) return;
+    if (gpAnimStream->p0 != NULL) return;
     for (nSlot = 0; nSlot < nStart; nSlot++) {
         nPlayer = AnimStream_FindSlotPlayer(nSlot);
         if (nPlayer < 0) return;
-        if (lbl_80282230->p0 != NULL) return;
+        if (gpAnimStream->p0 != NULL) return;
         for (i = 0; i < 2; i++) {
             for (nStyle = 0; nStyle < 8; nStyle++) {
                 for (nClub = 0; nClub < 6; nClub++) {
-                    if (lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 == 1) {
-                        lbl_80282230->p0 = &lbl_80282230->bufs[nSlot][i][nStyle][nClub];
-                        lbl_80282230->p4 = &lbl_80282230->players[nPlayer].clips[i][nStyle][nClub];
+                    if (gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].b8 == 1) {
+                        gpAnimStream->p0 = &gpAnimStream->bufs[nSlot][i][nStyle][nClub];
+                        gpAnimStream->p4 = &gpAnimStream->players[nPlayer].clips[i][nStyle][nClub];
                         if (AnimStream_StartRead(nSlot, nPlayer, i, nStyle, nClub) == 0) {
-                            lbl_80282230->p0 = NULL;
-                            lbl_80282230->p4 = NULL;
+                            gpAnimStream->p0 = NULL;
+                            gpAnimStream->p4 = NULL;
                             continue;
                         }
                         return;
@@ -232,11 +232,11 @@ void AnimStream_Update(void) {
 // ends it with AnimStream_EndRead(1), so its clip is stored even if the golfer is playing the old
 // one. Called on the way out of a hole.
 void AnimStream_WaitForRead(void) {
-    if (gSession.nGameType != 6 || lbl_80282230 == NULL || lbl_80282230->bOn == 0) return;
-    while (lbl_80282230->nState == 1) {
+    if (gSession.nGameType != 6 || gpAnimStream == NULL || gpAnimStream->bOn == 0) return;
+    while (gpAnimStream->nState == 1) {
         fn_8006C63C();
     }
-    if (lbl_80282230->nState == 2) {
+    if (gpAnimStream->nState == 2) {
         AnimStream_EndRead(1);
     }
 }
@@ -263,28 +263,28 @@ u8 AnimStream_StartRead(int nSlot, int nPlayer, int nIndex, int nStyle, int nClu
     pLib = gPlayers[nPlayer].pChar->pLib;
     AnimLib_Find(pLib, AnimStream_GetGroup(nIndex), nStyle, nClub, 0, &nCount, &uFlags, NULL, &nFirst);
     if (nCount < 2) return 0;
-    lbl_80282230->players[nPlayer].clips[nIndex][nStyle][nClub].nNext++;
-    if (lbl_80282230->players[nPlayer].clips[nIndex][nStyle][nClub].nNext >= nCount) {
-        lbl_80282230->players[nPlayer].clips[nIndex][nStyle][nClub].nNext = 0;
+    gpAnimStream->players[nPlayer].clips[nIndex][nStyle][nClub].nNext++;
+    if (gpAnimStream->players[nPlayer].clips[nIndex][nStyle][nClub].nNext >= nCount) {
+        gpAnimStream->players[nPlayer].clips[nIndex][nStyle][nClub].nNext = 0;
     }
     pChar = gPlayers[nPlayer].pChar;
-    nFirst += lbl_80282230->players[nPlayer].clips[nIndex][nStyle][nClub].nNext;
+    nFirst += gpAnimStream->players[nPlayer].clips[nIndex][nStyle][nClub].nNext;
     pRec = &pChar->pRecords[nFirst];
     AnimStream_GetFilePath((pRec->n12 >> 1) & 1, pChar->nSlot, nPlayer, szPath);
     uOffset = pRec->n20;
-    lbl_80282230->hFile = fn_800060E0(szPath);
-    lbl_80282230->nState = 1;
-    lbl_80282230->n1CC8 = nPlayer;
-    uFileSize = fn_800065B0(lbl_80282230->hFile);
-    if (uFileSize < uOffset + lbl_80282230->p0->nSize) {
+    gpAnimStream->hFile = fn_800060E0(szPath);
+    gpAnimStream->nState = 1;
+    gpAnimStream->n1CC8 = nPlayer;
+    uFileSize = fn_800065B0(gpAnimStream->hFile);
+    if (uFileSize < uOffset + gpAnimStream->p0->nSize) {
         uLen = uFileSize - uOffset;
         uLen -= uLen & 0x7FF;
     } else {
-        uLen = lbl_80282230->p0->nSize;
+        uLen = gpAnimStream->p0->nSize;
     }
-    if (fn_80006444(lbl_80282230->hFile, lbl_80282230->pRead, uLen, uOffset, AnimStream_OnReadDone) < 0) {
-        fn_8000633C(lbl_80282230->hFile);
-        lbl_80282230->hFile = -1;
+    if (fn_80006444(gpAnimStream->hFile, gpAnimStream->pRead, uLen, uOffset, AnimStream_OnReadDone) < 0) {
+        fn_8000633C(gpAnimStream->hFile);
+        gpAnimStream->hFile = -1;
         return 0;
     }
     return 1;
@@ -293,8 +293,8 @@ u8 AnimStream_StartRead(int nSlot, int nPlayer, int nIndex, int nStyle, int nClu
 // AnimStream_StartRead's completion callback: the read is done (nState 2) and got nBytes bytes.
 // nError is not looked at.
 void AnimStream_OnReadDone(int nBytes, int nError) {
-    lbl_80282230->nState  = 2;
-    lbl_80282230->nResult = nBytes;
+    gpAnimStream->nState  = 2;
+    gpAnimStream->nResult = nBytes;
 }
 
 // Ends the current read: closes the file and, when bForce is set or the clip in the set's buffer is
@@ -302,19 +302,19 @@ void AnimStream_OnReadDone(int nBytes, int nError) {
 // prepares it (SKA_LoadFromMem), clears the set's read mark (b8) and goes idle (nState 0).
 // Otherwise the read stays done (nState 2) and a later call stores it.
 void AnimStream_EndRead(u8 bForce) {
-    if (lbl_80282230->hFile >= 0) {
-        fn_8000633C(lbl_80282230->hFile);
-        lbl_80282230->hFile = -1;
+    if (gpAnimStream->hFile >= 0) {
+        fn_8000633C(gpAnimStream->hFile);
+        gpAnimStream->hFile = -1;
     }
-    if (bForce || AnimStream_CanReplaceClip(lbl_80282230->n1CC8, lbl_80282230->p0->pData)) {
-        if (lbl_80282230->nResult > 0) {
-            Mem_cpy(lbl_80282230->p0->pData, lbl_80282230->pRead, lbl_80282230->nResult);
-            SKA_LoadFromMem(lbl_80282230->p0->pData, NULL, 16);
+    if (bForce || AnimStream_CanReplaceClip(gpAnimStream->n1CC8, gpAnimStream->p0->pData)) {
+        if (gpAnimStream->nResult > 0) {
+            Mem_cpy(gpAnimStream->p0->pData, gpAnimStream->pRead, gpAnimStream->nResult);
+            SKA_LoadFromMem(gpAnimStream->p0->pData, NULL, 16);
         }
-        lbl_80282230->p4->b8 = 0;
-        lbl_80282230->p4 = NULL;
-        lbl_80282230->nState = 0;
-        lbl_80282230->p0 = NULL;
+        gpAnimStream->p4->b8 = 0;
+        gpAnimStream->p4 = NULL;
+        gpAnimStream->nState = 0;
+        gpAnimStream->p0 = NULL;
     }
 }
 
@@ -332,33 +332,33 @@ void AnimStream_AssignSlots(void) {
     int i;
     int nOther;
 
-    if (lbl_80282230 == NULL) {
+    if (gpAnimStream == NULL) {
         return;
     }
-    if (lbl_80282230->bOn == 0) {
+    if (gpAnimStream->bOn == 0) {
         return;
     }
-    if (lbl_80282230->nState == 2) {
+    if (gpAnimStream->nState == 2) {
         AnimStream_EndRead(1);
     }
-    while (lbl_80282230->nState == 1) {
+    while (gpAnimStream->nState == 1) {
         fn_8006C63C();
     }
-    if (lbl_80282230->nState == 2) {
+    if (gpAnimStream->nState == 2) {
         AnimStream_EndRead(0);
     }
     if (gSession.nNumPlayers > 2) {
         nFirst = GM_GetHonors();
         nSecond = GM_GetSecondHonors();
         if (nFirst != 5) {
-            if (lbl_80282230->players[nFirst].nId < 0) {
+            if (gpAnimStream->players[nFirst].nId < 0) {
                 for (i = 0; i < 2; i++) {
                     nOther = AnimStream_FindSlotPlayer(i);
                     if (nOther != nSecond) {
                         AnimStream_MarkPlayerClips(nFirst, 1);
-                        lbl_80282230->players[nFirst].nId = i;
+                        gpAnimStream->players[nFirst].nId = i;
                         if (nOther >= 0) {
-                            lbl_80282230->players[nOther].nId = -1;
+                            gpAnimStream->players[nOther].nId = -1;
                             AnimStream_MarkPlayerClips(nOther, 1);
                         }
                     }
@@ -367,14 +367,14 @@ void AnimStream_AssignSlots(void) {
             AnimStream_ReadPlayerClips(nFirst);
         }
         if (nSecond != 5) {
-            if (lbl_80282230->players[nSecond].nId < 0) {
+            if (gpAnimStream->players[nSecond].nId < 0) {
                 for (i = 0; i < 2; i++) {
                     nOther = AnimStream_FindSlotPlayer(i);
                     if (nOther != nSecond && nOther != nFirst) {
                         AnimStream_MarkPlayerClips(nSecond, 1);
-                        lbl_80282230->players[nSecond].nId = i;
+                        gpAnimStream->players[nSecond].nId = i;
                         if (nOther >= 0) {
-                            lbl_80282230->players[nOther].nId = -1;
+                            gpAnimStream->players[nOther].nId = -1;
                             AnimStream_MarkPlayerClips(nOther, 1);
                         }
                     }
@@ -398,8 +398,8 @@ void AnimStream_MarkPlayerClips(int nPlayer, u8 b) {
         for (nStyle = 0; nStyle < 8; nStyle++) {
             for (nClub = 0; nClub < 6; nClub++) {
                 if (AnimStream_IsStreamed(nGroup, nStyle, nClub, -1) &&
-                    lbl_80282230->bufs[0][i][nStyle][nClub].nSize > 0) {
-                    lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 = b;
+                    gpAnimStream->bufs[0][i][nStyle][nClub].nSize > 0) {
+                    gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].b8 = b;
                 }
             }
         }
@@ -412,7 +412,7 @@ void AnimStream_MarkPlayerClips(int nPlayer, u8 b) {
 void AnimStream_MarkClips(int nPlayer, int a, int nGroup, int nClub, int nStyle) {
     int nIndex = AnimStream_GetGroupIndex(nGroup);
     if (nIndex >= 0) {
-        lbl_80282230->players[nPlayer].clips[nIndex][nStyle][nClub].b8 = 1;
+        gpAnimStream->players[nPlayer].clips[nIndex][nStyle][nClub].b8 = 1;
     }
 }
 
@@ -435,16 +435,16 @@ void AnimStream_SizePlayerClips(int nPlayer, AnimLib* pOverlay, AnimLib* pLib) {
     AnimClubNode* pClub;
     ClipRecord* pRec;
 
-    if (lbl_80282230->bOn == 0) return;
+    if (gpAnimStream->bOn == 0) return;
     for (i = 0; i < 2; i++) {
         for (nStyle = 0; nStyle < 8; nStyle++) {
             for (nClub = 0; nClub < 6; nClub++) {
-                lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize = 0;
+                gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].nMaxSize = 0;
             }
         }
     }
     for (i = 0; i < 2; i++) {
-        nGroup = lbl_80191490[i].nGroup;
+        nGroup = gAnimStreamGroups[i].nGroup;
         nNode = pOverlay->groups[nGroup];
         if (nNode < 0) {
             AnimStream_SizeLibClips(nPlayer, pLib, i, i, 0, 7, 0, 5);
@@ -474,11 +474,11 @@ void AnimStream_SizePlayerClips(int nPlayer, AnimLib* pOverlay, AnimLib* pLib) {
                         pRec = &pOverlay->pRecords[*pIndex];
                         pRec->n12 |= 4;
                         nSize = pRec->n18;
-                        if (pRec->n18 > lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize) {
+                        if (pRec->n18 > gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].nMaxSize) {
                             if (nSize % 0x800 != 0) {
                                 nSize += 0x800 - nSize % 0x800;
                             }
-                            lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize = nSize;
+                            gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].nMaxSize = nSize;
                         }
                         pIndex++;
                     }
@@ -508,9 +508,9 @@ void AnimStream_SizeLibClips(int nPlayer, AnimLib* pLib, int nFirst, int nLast, 
     AnimClubNode* pClub;
     ClipRecord* pRec;
 
-    if (lbl_80282230->bOn == 0) return;
+    if (gpAnimStream->bOn == 0) return;
     for (i = nFirst; i <= nLast; i++) {
-        nGroup = lbl_80191490[i].nGroup;
+        nGroup = gAnimStreamGroups[i].nGroup;
         nNode = pLib->groups[nGroup];
         if (nNode < 0) continue;
         pGroup = (s16*)(pLib->pTree + nNode);
@@ -528,11 +528,11 @@ void AnimStream_SizeLibClips(int nPlayer, AnimLib* pLib, int nFirst, int nLast, 
                     pRec = &pLib->pRecords[*pIndex];
                     pRec->n12 |= 4;
                     nSize = pRec->n18;
-                    if (pRec->n18 > lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize) {
+                    if (pRec->n18 > gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].nMaxSize) {
                         if (nSize % 0x800 != 0) {
                             nSize += 0x800 - nSize % 0x800;
                         }
-                        lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize = nSize;
+                        gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].nMaxSize = nSize;
                     }
                     pIndex++;
                 }
@@ -554,18 +554,18 @@ void AnimStream_AllocBuffers(void) {
     int nClip;
     int j;
 
-    if (lbl_80282230->bOn == 0) return;
+    if (gpAnimStream->bOn == 0) return;
     for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
-        lbl_80282230->aPlayerBytes[nPlayer] = 0;
+        gpAnimStream->aPlayerBytes[nPlayer] = 0;
     }
     for (i = 0; i < 2; i++) {
         for (nStyle = 0; nStyle < 8; nStyle++) {
             for (nClub = 0; nClub < 6; nClub++) {
                 nSize = 0;
                 for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
-                    lbl_80282230->aPlayerBytes[nPlayer] +=
-                        lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize;
-                    nClip = lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize;
+                    gpAnimStream->aPlayerBytes[nPlayer] +=
+                        gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].nMaxSize;
+                    nClip = gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].nMaxSize;
                     if (nClip > nMax) {
                         nMax = nClip;
                     }
@@ -575,19 +575,19 @@ void AnimStream_AllocBuffers(void) {
                 }
                 if (nSize > 0) {
                     for (j = 0; j < 2; j++) {
-                        lbl_80282230->bufs[j][i][nStyle][nClub].pData =
+                        gpAnimStream->bufs[j][i][nStyle][nClub].pData =
                             StaticMem_Alloc(nSize, 2, 64, "AnimStream.c", 1005);
-                        lbl_80282230->bufs[j][i][nStyle][nClub].nSize = nSize;
-                        lbl_80282230->nBytes += nSize;
+                        gpAnimStream->bufs[j][i][nStyle][nClub].nSize = nSize;
+                        gpAnimStream->nBytes += nSize;
                     }
                 }
             }
         }
     }
     if (nMax > 0) {
-        lbl_80282230->pRead = StaticMem_Alloc(nMax, 2, 64, "AnimStream.c", 1018);
-        lbl_80282230->nReadSize = nMax;
-        lbl_80282230->nBytes += nMax;
+        gpAnimStream->pRead = StaticMem_Alloc(nMax, 2, 64, "AnimStream.c", 1018);
+        gpAnimStream->nReadSize = nMax;
+        gpAnimStream->nBytes += nMax;
     }
 }
 
@@ -596,7 +596,7 @@ void AnimStream_AllocBuffers(void) {
 void AnimStream_SizeSlotClips(int nSlot) {
     int i;
 
-    if (lbl_80282230->bOn == 0) return;
+    if (gpAnimStream->bOn == 0) return;
     for (i = 0; i < gSession.nNumPlayers; i++) {
         if (nSlot == -1 || nSlot == gPlayers[i].pChar->nSlot) {
             AnimStream_SizePlayerClips(i, fn_80026AC0(gPlayers[i].pChar), fn_80026B34(gPlayers[i].pChar));
@@ -617,14 +617,14 @@ void* AnimStream_GetClip(int nPlayer, int nGroup, int nStyle, int nClub) {
     int nUseStyle = nStyle;
 
     nIndex = AnimStream_GetGroupIndex(nGroup);
-    if (lbl_80282230->players[nPlayer].nId == -1) {
+    if (gpAnimStream->players[nPlayer].nId == -1) {
         if (nPlayer < 2) {
             for (i = nPlayer; i < 2; i++) {
                 nOther = AnimStream_FindSlotPlayer(i);
                 if (nOther != nPlayer) {
-                    lbl_80282230->players[nPlayer].nId = i;
+                    gpAnimStream->players[nPlayer].nId = i;
                     // EA bug: when no player has slot i, nOther is -1 and this writes before players[0]
-                    lbl_80282230->players[nOther].nId = -1;
+                    gpAnimStream->players[nOther].nId = -1;
                     break;
                 }
             }
@@ -632,12 +632,12 @@ void* AnimStream_GetClip(int nPlayer, int nGroup, int nStyle, int nClub) {
             return NULL;
         }
     }
-    pData = lbl_80282230->bufs[lbl_80282230->players[nPlayer].nId][nIndex][nStyle][nClub].pData;
+    pData = gpAnimStream->bufs[gpAnimStream->players[nPlayer].nId][nIndex][nStyle][nClub].pData;
     if (pData == NULL) {
-        pData = lbl_80282230->bufs[lbl_80282230->players[nPlayer].nId][nIndex][0][nClub].pData;
+        pData = gpAnimStream->bufs[gpAnimStream->players[nPlayer].nId][nIndex][0][nClub].pData;
         nUseStyle = 0;
     }
-    AnimStream_MarkClips(nPlayer, lbl_80282230->players[nPlayer].nId, nGroup, nClub, nUseStyle);
+    AnimStream_MarkClips(nPlayer, gpAnimStream->players[nPlayer].nId, nGroup, nClub, nUseStyle);
     Character_ClearKeyFrameBuffers(gPlayers[nPlayer].pChar);
     return pData;
 }
@@ -652,18 +652,18 @@ void AnimStream_RandomizeClips(void) {
     s32 nCount;
     u32 uFlags;
 
-    if (lbl_80282230->bOn != 0) {
+    if (gpAnimStream->bOn != 0) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
             pChar = gPlayers[i].pChar;
             for (nIndex = 0; nIndex < 2; nIndex++) {
                 for (nStyle = 0; nStyle < 8; nStyle++) {
                     for (nClub = 0; nClub < 6; nClub++) {
-                        if (lbl_80282230->players[i].clips[nIndex][nStyle][nClub].nMaxSize > 0) {
+                        if (gpAnimStream->players[i].clips[nIndex][nStyle][nClub].nMaxSize > 0) {
                             AnimLib_Find(pChar->pLib, AnimStream_GetGroup(nIndex), nStyle, nClub, 0, &nCount,
                                          &uFlags,
                                          NULL, NULL);
                             if (nCount > 0) {
-                                lbl_80282230->players[i].clips[nIndex][nStyle][nClub].nNext =
+                                gpAnimStream->players[i].clips[nIndex][nStyle][nClub].nNext =
                                     Misc_RandFunc(1) % nCount;
                             }
                         }
@@ -693,69 +693,69 @@ void AnimStream_ReadPlayerClips(int nPlayer) {
     char szPath[256];
 
     uFlags = 0;
-    if (lbl_80282230->bOn == 0) return;
+    if (gpAnimStream->bOn == 0) return;
     pChar = gPlayers[nPlayer].pChar;
     nAnimSlot = pChar->nSlot;
     pRecords = pChar->pRecords;
-    nSlot = lbl_80282230->players[nPlayer].nId;
+    nSlot = gpAnimStream->players[nPlayer].nId;
     pLib = pChar->pLib;
     AnimStream_GetFilePath(0, pChar->nSlot, nPlayer, szPath);
-    lbl_80282230->hFile = fn_800060E0(szPath);
-    uFileSize = fn_800065B0(lbl_80282230->hFile);
+    gpAnimStream->hFile = fn_800060E0(szPath);
+    uFileSize = fn_800065B0(gpAnimStream->hFile);
     for (i = 0; i < 2; i++) {
         for (nStyle = 0; nStyle < 8; nStyle++) {
             for (nClub = 0; nClub < 6; nClub++) {
-                if (lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize > 0 &&
-                    lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 != 0) {
+                if (gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].nMaxSize > 0 &&
+                    gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].b8 != 0) {
                     AnimLib_Find(pLib, AnimStream_GetGroup(i), nStyle, nClub, 0, &nCount, &uFlags, NULL,
                                  &nFirst);
                     if (nCount > 0) {
-                        nFirst += lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nNext;
+                        nFirst += gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].nNext;
                         if (!(pRecords[nFirst].n12 & 2)) {
-                            AnimStream_ReadNow(lbl_80282230->hFile, uFileSize,
-                                        lbl_80282230->bufs[nSlot][i][nStyle][nClub].pData,
-                                        lbl_80282230->bufs[nSlot][i][nStyle][nClub].nSize,
+                            AnimStream_ReadNow(gpAnimStream->hFile, uFileSize,
+                                        gpAnimStream->bufs[nSlot][i][nStyle][nClub].pData,
+                                        gpAnimStream->bufs[nSlot][i][nStyle][nClub].nSize,
                                         pRecords[nFirst].n20);
-                            lbl_80282230->bufs[nSlot][i][nStyle][nClub].pData =
-                                SKA_LoadFromMem(lbl_80282230->bufs[nSlot][i][nStyle][nClub].pData, NULL, 16);
-                            lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 = 0;
+                            gpAnimStream->bufs[nSlot][i][nStyle][nClub].pData =
+                                SKA_LoadFromMem(gpAnimStream->bufs[nSlot][i][nStyle][nClub].pData, NULL, 16);
+                            gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].b8 = 0;
                         }
                     }
                 }
             }
         }
     }
-    fn_8000633C(lbl_80282230->hFile);
-    lbl_80282230->hFile = -1;
+    fn_8000633C(gpAnimStream->hFile);
+    gpAnimStream->hFile = -1;
 
     AnimStream_GetFilePath(1, nAnimSlot, 0, szPath);
-    lbl_80282230->hFile = fn_800060E0(szPath);
-    uFileSize = fn_800065B0(lbl_80282230->hFile);
+    gpAnimStream->hFile = fn_800060E0(szPath);
+    uFileSize = fn_800065B0(gpAnimStream->hFile);
     for (i = 0; i < 2; i++) {
         for (nStyle = 0; nStyle < 8; nStyle++) {
             for (nClub = 0; nClub < 6; nClub++) {
-                if (lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize > 0 &&
-                    lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 != 0) {
+                if (gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].nMaxSize > 0 &&
+                    gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].b8 != 0) {
                     AnimLib_Find(pLib, AnimStream_GetGroup(i), nStyle, nClub, 0, &nCount, &uFlags, NULL,
                                  &nFirst);
                     if (nCount > 0) {
-                        nFirst += lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nNext;
+                        nFirst += gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].nNext;
                         if (pRecords[nFirst].n12 & 2) {
-                            AnimStream_ReadNow(lbl_80282230->hFile, uFileSize,
-                                        lbl_80282230->bufs[nSlot][i][nStyle][nClub].pData,
-                                        lbl_80282230->bufs[nSlot][i][nStyle][nClub].nSize,
+                            AnimStream_ReadNow(gpAnimStream->hFile, uFileSize,
+                                        gpAnimStream->bufs[nSlot][i][nStyle][nClub].pData,
+                                        gpAnimStream->bufs[nSlot][i][nStyle][nClub].nSize,
                                         pRecords[nFirst].n20);
-                            lbl_80282230->bufs[nSlot][i][nStyle][nClub].pData =
-                                SKA_LoadFromMem(lbl_80282230->bufs[nSlot][i][nStyle][nClub].pData, NULL, 16);
-                            lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 = 0;
+                            gpAnimStream->bufs[nSlot][i][nStyle][nClub].pData =
+                                SKA_LoadFromMem(gpAnimStream->bufs[nSlot][i][nStyle][nClub].pData, NULL, 16);
+                            gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].b8 = 0;
                         }
                     }
                 }
             }
         }
     }
-    fn_8000633C(lbl_80282230->hFile);
-    lbl_80282230->hFile = -1;
+    fn_8000633C(gpAnimStream->hFile);
+    gpAnimStream->hFile = -1;
 }
 
 // With streaming on, gives the first two players a slot each and reads the current clip of each
@@ -776,40 +776,40 @@ void AnimStream_ReadFirstClips(void) {
     char szPath[256];
 
     uFlags = 0;
-    if (lbl_80282230->bOn == 0) return;
+    if (gpAnimStream->bOn == 0) return;
     for (nPlayer = 0; nPlayer < gSession.nNumPlayers && nPlayer < 2; nPlayer++) {
-        lbl_80282230->players[nPlayer].nId = nPlayer;
+        gpAnimStream->players[nPlayer].nId = nPlayer;
         pChar = gPlayers[nPlayer].pChar;
         pLib = pChar->pLib;
         pRecords = pChar->pRecords;
         AnimStream_GetFilePath(0, pChar->nSlot, nPlayer, szPath);
-        lbl_80282230->hFile = fn_800060E0(szPath);
-        uFileSize = fn_800065B0(lbl_80282230->hFile);
+        gpAnimStream->hFile = fn_800060E0(szPath);
+        uFileSize = fn_800065B0(gpAnimStream->hFile);
         for (i = 0; i < 2; i++) {
             for (nStyle = 0; nStyle < 8; nStyle++) {
                 for (nClub = 0; nClub < 6; nClub++) {
-                    if (lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize > 0) {
+                    if (gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].nMaxSize > 0) {
                         AnimLib_Find(pLib, AnimStream_GetGroup(i), nStyle, nClub, 0, &nCount, &uFlags, NULL,
                                      &nFirst);
                         if (nCount > 0) {
-                            nFirst += lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nNext;
+                            nFirst += gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].nNext;
                             if (!(pRecords[nFirst].n12 & 2)) {
-                                AnimStream_ReadNow(lbl_80282230->hFile, uFileSize,
-                                            lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData,
-                                            lbl_80282230->bufs[nPlayer][i][nStyle][nClub].nSize,
+                                AnimStream_ReadNow(gpAnimStream->hFile, uFileSize,
+                                            gpAnimStream->bufs[nPlayer][i][nStyle][nClub].pData,
+                                            gpAnimStream->bufs[nPlayer][i][nStyle][nClub].nSize,
                                             pRecords[nFirst].n20);
-                                lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData =
-                                    SKA_LoadFromMem(lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData,
+                                gpAnimStream->bufs[nPlayer][i][nStyle][nClub].pData =
+                                    SKA_LoadFromMem(gpAnimStream->bufs[nPlayer][i][nStyle][nClub].pData,
                                                     NULL, 16);
-                                lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 = 0;
+                                gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].b8 = 0;
                             }
                         }
                     }
                 }
             }
         }
-        fn_8000633C(lbl_80282230->hFile);
-        lbl_80282230->hFile = -1;
+        fn_8000633C(gpAnimStream->hFile);
+        gpAnimStream->hFile = -1;
     }
     AnimStream_ReadSharedClips(0);
     AnimStream_ReadSharedClips(1);
@@ -833,10 +833,10 @@ void AnimStream_ReadSharedClips(int nSlot) {
     u32 uFileSize;
 
     uFlags = 0;
-    if (lbl_80282230->bOn == 0) return;
+    if (gpAnimStream->bOn == 0) return;
     AnimStream_GetFilePath(1, nSlot, 0, szPath);
-    lbl_80282230->hFile = fn_800060E0(szPath);
-    uFileSize = fn_800065B0(lbl_80282230->hFile);
+    gpAnimStream->hFile = fn_800060E0(szPath);
+    uFileSize = fn_800065B0(gpAnimStream->hFile);
     for (nPlayer = 0; nPlayer < gSession.nNumPlayers && nPlayer < 2; nPlayer++) {
         pChar = gPlayers[nPlayer].pChar;
         if (nSlot != pChar->nSlot) continue;
@@ -845,21 +845,21 @@ void AnimStream_ReadSharedClips(int nSlot) {
         for (i = 0; i < 2; i++) {
             for (nStyle = 0; nStyle < 8; nStyle++) {
                 for (nClub = 0; nClub < 6; nClub++) {
-                    if (lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nMaxSize > 0) {
+                    if (gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].nMaxSize > 0) {
                         AnimLib_Find(pLib, AnimStream_GetGroup(i), nStyle, nClub, 0, &nCount, &uFlags, NULL,
                                      &nFirst);
                         if (nCount > 0) {
-                            nFirst += lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].nNext;
+                            nFirst += gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].nNext;
                             pRec = &pRecords[nFirst];
                             if (pRec->n12 & 2) {
-                                AnimStream_ReadNow(lbl_80282230->hFile, uFileSize,
-                                            lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData,
-                                            lbl_80282230->bufs[nPlayer][i][nStyle][nClub].nSize,
+                                AnimStream_ReadNow(gpAnimStream->hFile, uFileSize,
+                                            gpAnimStream->bufs[nPlayer][i][nStyle][nClub].pData,
+                                            gpAnimStream->bufs[nPlayer][i][nStyle][nClub].nSize,
                                             pRec->n20);
-                                lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData =
-                                    SKA_LoadFromMem(lbl_80282230->bufs[nPlayer][i][nStyle][nClub].pData,
+                                gpAnimStream->bufs[nPlayer][i][nStyle][nClub].pData =
+                                    SKA_LoadFromMem(gpAnimStream->bufs[nPlayer][i][nStyle][nClub].pData,
                                                     NULL, 16);
-                                lbl_80282230->players[nPlayer].clips[i][nStyle][nClub].b8 = 0;
+                                gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].b8 = 0;
                             }
                         }
                     }
@@ -867,8 +867,8 @@ void AnimStream_ReadSharedClips(int nSlot) {
             }
         }
     }
-    fn_8000633C(lbl_80282230->hFile);
-    lbl_80282230->hFile = -1;
+    fn_8000633C(gpAnimStream->hFile);
+    gpAnimStream->hFile = -1;
 }
 
 // Reads from a file and waits for it. A read past the end of the file is cut to what is left,
@@ -878,25 +878,25 @@ void AnimStream_ReadNow(int hFile, u32 uFileSize, void* pDst, u32 uLen, u32 uOff
         uLen = uFileSize - uOffset;
         uLen -= uLen & 0x7FF;
     }
-    lbl_80282230->bReadDone = 0;
+    gpAnimStream->bReadDone = 0;
     fn_80006444(hFile, pDst, uLen, uOffset, AnimStream_OnReadNowDone);
     do {
         fn_8006C63C();
-    } while (lbl_80282230->bReadDone == 0);
+    } while (gpAnimStream->bReadDone == 0);
 }
 
 // AnimStream_ReadNow's completion callback: sets bReadDone and keeps the byte count. nError is not
 // looked at.
 void AnimStream_OnReadNowDone(int nBytes, int nError) {
-    lbl_80282230->bReadDone = 1;
-    lbl_80282230->nResult   = nBytes;
+    gpAnimStream->bReadDone = 1;
+    gpAnimStream->nResult   = nBytes;
 }
 
 // The player holding stream slot nId (0 or 1), -1 for none.
 int AnimStream_FindSlotPlayer(int nId) {
     int i;
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        if (lbl_80282230->players[i].nId == nId) {
+        if (gpAnimStream->players[i].nId == nId) {
             return i;
         }
     }
@@ -918,17 +918,17 @@ u8 AnimStream_CanReplaceClip(int nPlayer, Clip* pClip) {
 void AnimStream_GetFilePath(u8 bGlobal, int bFemale, int nPlayer, char* szPath) {
     if (bGlobal) {
         if (bFemale == 0) {
-            sprintf(szPath, "%sdata\\CharStrm\\AnimGlob\\male.sac", lbl_80281530);
+            sprintf(szPath, "%sdata\\CharStrm\\AnimGlob\\male.sac", gAnimStreamRoot);
             return;
         }
-        sprintf(szPath, "%sdata\\CharStrm\\AnimGlob\\female.sac", lbl_80281530);
+        sprintf(szPath, "%sdata\\CharStrm\\AnimGlob\\female.sac", gAnimStreamRoot);
         return;
     }
-    sprintf(szPath, "%sdata\\CharStrm\\AnimChar\\%02dchr.sac", lbl_80281530,
+    sprintf(szPath, "%sdata\\CharStrm\\AnimChar\\%02dchr.sac", gAnimStreamRoot,
             Character_GetGolferModelID(nPlayer) + 1);
 }
 
-s32 lbl_80191520[128] = {
+s32 gSKANameCodes[128] = {
     0,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1,  -1, 2,  -1, -1,
@@ -939,7 +939,7 @@ s32 lbl_80191520[128] = {
     28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, -1, -1, -1, -1, -1,
 };
 
-char lbl_80191720[40] = "\0+-0123456789abcdefghijklmnopqrstuvwxyz_";
+char gSKANameChars[40] = "\0+-0123456789abcdefghijklmnopqrstuvwxyz_";
 
 // Packs up to 12 characters of pName into a base-40 code (a shorter name is padded with code 0),
 // stored with its bytes reversed (SKA_UnpackSwappedName reads it back). Upper and lower case
@@ -958,7 +958,7 @@ int SKA_PackName(u64* pId, const char* pName) {
             c = *pName;
             bValid = 0;
             // EA bug: char is signed, so a character above 127 is negative and reads before the table
-            if (c < 128 && lbl_80191520[c] != -1) {
+            if (c < 128 && gSKANameCodes[c] != -1) {
                 bValid = 1;
             }
             if (!bValid) {
@@ -967,7 +967,7 @@ int SKA_PackName(u64* pId, const char* pName) {
             }
             pName++;
             *pId *= 40;
-            *pId += lbl_80191520[c];
+            *pId += gSKANameCodes[c];
         } else {
             *pId *= 40;
         }
@@ -991,7 +991,7 @@ void SKA_UnpackName(u64* pId, char* szName) {
 
     szName[12] = '\0';
     for (i = 11; i >= 0; i--) {
-        szName[i] = lbl_80191720[uId % 40];
+        szName[i] = gSKANameChars[uId % 40];
         uId /= 40;
     }
 }
