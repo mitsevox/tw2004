@@ -229,7 +229,7 @@ void GM_SetModeType(int nMode) {
         Lessons_Init();
         break;
     case 12:
-        fn_800FEAFC();
+        GameMode12_Init();
         break;
     case 13:
         fn_800F6A60();

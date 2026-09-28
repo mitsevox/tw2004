@@ -564,7 +564,7 @@ void fn_800F944C(void);                 // mode 6
 void fn_800F9610(void);                 // mode 7
 void fn_800F986C(void);                 // mode 8
 void GameModeStableford_Init(void);                 // mode 18 (GameModeStableford.c)
-void fn_800FEAFC(void);                 // mode 12 (GameMode12.c)
+void GameMode12_Init(void);                 // mode 12 (GameMode12.c)
 void GameModeStroke_Init(void);                 // mode 0 (GameModeStroke.c)
 void Lessons_Init(void);                 // mode 11 (GameMode11.c)
 void GameMode4_Init(void);                 // mode 4 (GameMode4.c)

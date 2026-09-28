@@ -12,38 +12,41 @@
 
 s32 gGameMode12Surface;                    // the surface the ball last landed on (-1: none)
 
-// The surfaces a player has scored on, for the HUD (fn_800FF634): gGameMode12NumScored entries.
+// The surfaces a player has scored on, for the HUD (GameMode12_ListScoredSurfaces):
+// gGameMode12NumScored entries.
 s32 gGameMode12NumScored;
 s32 gGameMode12ScoredSurfaces[20];                // the surface
 s32 gGameMode12ScoredHits[20];                // how many times
 
-u8   fn_800FEC78(u8 bCheck);
-void fn_800FEF00(s32 nSurface, s32* pPoints, s32* pMeter, s32* pMult);
-s32  fn_800FEFF8(int nPlayer, s32 nSurface);
-void fn_800FEC80(int nPlayer);
-s32  fn_800FF038(int nPlayer);
-void fn_800FF114(void);
-void fn_800FF288(void);
-void fn_800FF3D4(void);
-void fn_800FF3F8(void);
-void fn_800FF5B4(int nPlayer);
-void fn_800FF6C0(int nPlayer);
+u8   GameMode12_GoToPlayoff(u8 bCheck);
+void GameMode12_GetSurfacePrize(s32 nSurface, s32* pPoints, s32* pMeter, s32* pMult);
+s32  GameMode12_CountSurfaceHits(int nPlayer, s32 nSurface);
+void GameMode12_BallLanded(int nPlayer);
+s32  GameMode12_BallHitSurface(int nPlayer);
+void GameMode12_EndHole(void);
+void GameMode12_EndGame(void);
+void GameMode12_LoadHole(void);
+void GameMode12_SetupNextGolfer(void);
+void GameMode12_AddShotPoints(int nPlayer);
+void GameMode12_ShotSetupUpdate(int nPlayer);
 
-// Mode 12 starts: stroke play with mode 0's turn order, any number of mulligans.
-void fn_800FEAFC(void) {
-    gpGame->pfnInit = fn_800FEAFC;
+// Mode 12 starts (pfnInit): its callbacks (the honors, hole-finished and game-finished ones are
+// stroke play's, GameModeStroke), round flags b271, b281, b288 and the stroke limit off, any number
+// of mulligans, hole 1, no surface hit yet, no split screen, and the options' nC 0.
+void GameMode12_Init(void) {
+    gpGame->pfnInit = GameMode12_Init;
     gpGame->pfnGetHonors = GameModeStroke_GetHonors;
     gpGame->pfnHoleFinished = GameModeStroke_HoleFinished;
     gpGame->pfnGameFinished = GameModeStroke_GameFinished;
-    gpGame->pfnGoToPlayoff = fn_800FEC78;
-    gpGame->pfnEndGame = fn_800FF288;
-    gpGame->pfn23C = fn_800FEC80;
-    gpGame->pfn240 = fn_800FF038;
-    gpGame->pfnEndHole = fn_800FF114;
-    gpGame->pfn1E4 = fn_800FF3D4;
-    gpGame->pfnSetupNextGolfer = fn_800FF3F8;
-    gpGame->pfn244 = fn_800FF5B4;
-    gpGame->pfn228 = fn_800FF6C0;
+    gpGame->pfnGoToPlayoff = GameMode12_GoToPlayoff;
+    gpGame->pfnEndGame = GameMode12_EndGame;
+    gpGame->pfn23C = GameMode12_BallLanded;
+    gpGame->pfn240 = GameMode12_BallHitSurface;
+    gpGame->pfnEndHole = GameMode12_EndHole;
+    gpGame->pfn1E4 = GameMode12_LoadHole;
+    gpGame->pfnSetupNextGolfer = GameMode12_SetupNextGolfer;
+    gpGame->pfn244 = GameMode12_AddShotPoints;
+    gpGame->pfn228 = GameMode12_ShotSetupUpdate;
     gpGame->b271 = 0;
     gpGame->b281 = 0;
     gpGame->bStrokeLimit = 0;
@@ -59,7 +62,8 @@ void fn_800FEAFC(void) {
     gSession.options.nC = 0;
 }
 
-u8 fn_800FEC78(u8 bCheck) {
+// Never a playoff (pfnGoToPlayoff): always 0.
+u8 GameMode12_GoToPlayoff(u8 bCheck) {
     return 0;
 }
 
@@ -76,10 +80,15 @@ static inline u8 SurfaceUsedUp(s32* pPoints, s32 nHits) {
     return bUsed;
 }
 
-// The ball landed on a surface that still scores: a higher multiplier is taken, the points are
-// added (more for each earlier time on the same surface), the bonus meter fills; each shows a
-// message at the ball's place on screen.
-void fn_800FEC80(int nPlayer) {
+// The ball has landed (pfn23C) on gGameMode12Surface. If that surface still scores this shot (it
+// has points: up to 5 times, once for one that costs points; a surface with no points never scores)
+// its row of the prize table counts, each part with a message at the ball's place on screen: a
+// multiplier higher than the shot's becomes the shot's (message 0x35); the points times the number
+// of times the surface has now scored this shot are added to the shot's points (nDB8) times the
+// multiplier, the surface to the shot's list and one scoring landing to the hole's count (nD70;
+// message 0x33, not in a replay); the bonus-meter points fill the meter (nD24, at most 100; message
+// 0x34).
+void GameMode12_BallLanded(int nPlayer) {
     s32 nHits;
     s32 nScore;
     s32 nPoints;
@@ -88,8 +97,8 @@ void fn_800FEC80(int nPlayer) {
     f32 x;
     f32 y;
     if (gGameMode12Surface >= 0) {
-        fn_800FEF00(gGameMode12Surface, &nPoints, &nMeter, &nMult);
-        nHits = fn_800FEFF8(nPlayer, gGameMode12Surface);
+        GameMode12_GetSurfacePrize(gGameMode12Surface, &nPoints, &nMeter, &nMult);
+        nHits = GameMode12_CountSurfaceHits(nPlayer, gGameMode12Surface);
         if (!SurfaceUsedUp(&nPoints, nHits)) {
             fn_8006434C(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]),
                         gPlayers[nPlayer].ball.vPrev,
@@ -131,7 +140,7 @@ static f32 GameMode12_StrippedFn(f32 x) {
 
 // A surface's row in the prize table: its points, bonus-meter points and shot multiplier (all 0
 // when it has none).
-void fn_800FEF00(s32 nSurface, s32* pPoints, s32* pMeter, s32* pMult) {
+void GameMode12_GetSurfacePrize(s32 nSurface, s32* pPoints, s32* pMeter, s32* pMult) {
     int i;
     *pPoints = 0;
     *pMeter = 0;
@@ -145,8 +154,9 @@ void fn_800FEF00(s32 nSurface, s32* pPoints, s32* pMeter, s32* pMult) {
     }
 }
 
-// How many times the player has scored on the surface nSurface.
-s32 fn_800FEFF8(int nPlayer, s32 nSurface) {
+// How many times the player has scored on the surface nSurface this shot (the list
+// GameMode12_SetupNextGolfer empties each turn).
+s32 GameMode12_CountSurfaceHits(int nPlayer, s32 nSurface) {
     s32 n = 0;
     int i;
     for (i = 0; i < gPlayers[nPlayer].nCD0; i++) {
@@ -157,9 +167,10 @@ s32 fn_800FEFF8(int nPlayer, s32 nSurface) {
     return n;
 }
 
-// Where the ball landed (gGameMode12Surface). A surface with points scores up to 5 times, one that costs
-// points once. Always returns 0.
-s32 fn_800FF038(int nPlayer) {
+// The ball has touched a surface (pfn240, from the ball effects): its index in gSurfaceTypes is
+// kept for GameMode12_BallLanded (-1 for none). Returns the extra hit effect to play, which is
+// always 0 (none); it still looks the surface up as if a scoring surface had one.
+s32 GameMode12_BallHitSurface(int nPlayer) {
     SurfaceType* pSurface;
     s32 nHits;
     s32 nPoints;
@@ -169,8 +180,8 @@ s32 fn_800FF038(int nPlayer) {
     gGameMode12Surface = -1;
     if (pSurface) {
         gGameMode12Surface = pSurface - gSurfaceTypes;
-        nHits = fn_800FEFF8(nPlayer, gGameMode12Surface);
-        fn_800FEF00(gGameMode12Surface, &nPoints, &nMeter, &nMult);
+        nHits = GameMode12_CountSurfaceHits(nPlayer, gGameMode12Surface);
+        GameMode12_GetSurfacePrize(gGameMode12Surface, &nPoints, &nMeter, &nMult);
         if (!SurfaceUsedUp(&nPoints, nHits) && nPoints != 0) {
             return 0;
         }
@@ -178,9 +189,10 @@ s32 fn_800FF038(int nPlayer) {
     return 0;
 }
 
-// Hole finished: each player's points for the hole are multiplied by the score: 32 for a hole in
-// one, then 16 for 3 under par down to 0.33 for 3 over, nothing worse than that.
-void fn_800FF114(void) {
+// Hole finished (pfnEndHole): each player's points for the hole are multiplied by the score: 32 for
+// a hole in one, else 16 for 3 under par, 8, 4, 2 for par, 0.66, 0.5, 0.33 for 3 over and 0 for
+// anything worse; the result is queued as message 0x73 for the player's profile.
+void GameMode12_EndHole(void) {
     int i;
     f32 fMult;
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -219,8 +231,10 @@ void fn_800FF114(void) {
     }
 }
 
-// Game finished: each human with a profile is paid the round's points.
-void fn_800FF288(void) {
+// Game finished (pfnEndGame), after a full round only: each human player's points for the round are
+// paid as money (GM_Earnings_AwardMoney, with message 0x6A when not 0) when the player's profile is
+// active; a CPU's profile is paid 0.
+void GameMode12_EndGame(void) {
     int i;
     int h;
     s32 nMoney;
@@ -242,8 +256,8 @@ void fn_800FF288(void) {
     }
 }
 
-// Hole start: the bonus meters empty.
-void fn_800FF3D4(void) {
+// Hole start (pfn1E4): every player's bonus meter (nD24) empties.
+void GameMode12_LoadHole(void) {
     int i;
     i = 0;
     while (i < 5) {
@@ -251,8 +265,10 @@ void fn_800FF3D4(void) {
     }
 }
 
-// Next turn: every player's surfaces scored, shot points and multiplier reset.
-void fn_800FF3F8(void) {
+// Next turn (pfnSetupNextGolfer): every player's list of surfaces scored this shot is emptied, the
+// shot's points go to 0 and its multiplier to 1; then stroke play picks who plays
+// (GameModeStroke_SetupNextGolfer).
+void GameMode12_SetupNextGolfer(void) {
     int i;
     int j;
     for (i = 0; i < 5; i++) {
@@ -266,21 +282,22 @@ void fn_800FF3F8(void) {
     GameModeStroke_SetupNextGolfer();
 }
 
-s32 fn_800FF49C(int nPlayer) {
+s32 GameMode12_GetShotMultiplier(int nPlayer) {
     return gPlayers[nPlayer].nDBC;
 }
 
-s32 fn_800FF4B4(int nPlayer) {
+// The player's bonus meter, 0..100.
+s32 GameMode12_GetBonusMeter(int nPlayer) {
     return gPlayers[nPlayer].nD24;
 }
 
 // The player's points on this hole.
-s32 fn_800FF4CC(int nPlayer) {
+s32 GameMode12_GetHolePoints(int nPlayer) {
     return gPlayers[nPlayer].nD28[Game_CurHoleIndex()];
 }
 
 // The player's points for the round.
-s32 fn_800FF514(int nPlayer) {
+s32 GameMode12_GetRoundPoints(int nPlayer) {
     s32 n = 0;
     int h;
     for (h = 0; h < 18; h++) {
@@ -289,30 +306,35 @@ s32 fn_800FF514(int nPlayer) {
     return n;
 }
 
-// End of a turn: the shot's points go to the hole.
-void fn_800FF5B4(int nPlayer) {
+// End of a shot (pfn244, from GM_Earnings_PayShotGoals): the shot's points go to the hole.
+void GameMode12_AddShotPoints(int nPlayer) {
     gPlayers[nPlayer].nD28[Game_CurHoleIndex()] += gPlayers[nPlayer].nDB8;
 }
 
-s32 fn_800FF604(void) {
+// The length of the list GameMode12_ListScoredSurfaces made (the HUD passes a player it does not
+// take).
+s32 GameMode12_GetNumScoredSurfaces(void) {
     return gGameMode12NumScored;
 }
 
-s32 fn_800FF60C(int nPlayer, int i) {
+// Entry i of that list: a prize-table surface id. nPlayer is unused.
+s32 GameMode12_GetScoredSurface(int nPlayer, int i) {
     return gGameMode12ScoredSurfaces[i];
 }
 
-s32 fn_800FF620(int nPlayer, int i) {
+// How many times entry i of that list scored. nPlayer is unused.
+s32 GameMode12_GetScoredSurfaceHits(int nPlayer, int i) {
     return gGameMode12ScoredHits[i];
 }
 
-// The HUD's list of the surfaces the player has scored on, and how many times.
-void fn_800FF634(int nPlayer) {
+// The HUD's list of the surfaces the player has scored on this shot, in prize-table order, and how
+// many times each (gGameMode12ScoredSurfaces, gGameMode12ScoredHits, gGameMode12NumScored).
+void GameMode12_ListScoredSurfaces(int nPlayer) {
     int i;
     s32 n;
     gGameMode12NumScored = 0;
     for (i = 0; i < 20; i++) {
-        n = fn_800FEFF8(nPlayer, gEarningsTable.aMini[i].nId);
+        n = GameMode12_CountSurfaceHits(nPlayer, gEarningsTable.aMini[i].nId);
         if (n != 0) {
             gGameMode12ScoredSurfaces[gGameMode12NumScored] = gEarningsTable.aMini[i].nId;
             gGameMode12ScoredHits[gGameMode12NumScored] = n;
@@ -321,7 +343,9 @@ void fn_800FF634(int nPlayer) {
     }
 }
 
-void fn_800FF6C0(int nPlayer) {
+// Every frame over the ball (pfn228): once the swing has started (swing state not idle), front-end
+// message 0x36 is sent.
+void GameMode12_ShotSetupUpdate(int nPlayer) {
     if (gPlayers[nPlayer].swing.nState != 0) {
         fn_800E58B4(0x36);
     }

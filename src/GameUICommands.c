@@ -336,14 +336,14 @@ void  fn_800FDADC(void);
 void  fn_800FDC0C(s32* p0, s32* p1, s32* p2);
 s32   fn_800FDC5C(s32* pMoney);
 s32   fn_800FDE58(char* szName, s32* pSeconds, s32* pStrokes, s32* pScore);
-s32   fn_800FF49C(int nPlayer);
-s32   fn_800FF4B4(int nPlayer);
-s32   fn_800FF4CC(int nPlayer);
-s32   fn_800FF514(int nPlayer);
-s32   fn_800FF604(int nPlayer);   // GameMode12.c defines it without the (unused) player
-s32   fn_800FF60C(int nPlayer, int i);
-s32   fn_800FF620(int nPlayer, int i);
-void  fn_800FF634(int nPlayer);
+s32   GameMode12_GetShotMultiplier(int nPlayer);
+s32   GameMode12_GetBonusMeter(int nPlayer);
+s32   GameMode12_GetHolePoints(int nPlayer);
+s32   GameMode12_GetRoundPoints(int nPlayer);
+s32   GameMode12_GetNumScoredSurfaces(int nPlayer);   // GameMode12.c defines it without the (unused) player
+s32   GameMode12_GetScoredSurface(int nPlayer, int i);
+s32   GameMode12_GetScoredSurfaceHits(int nPlayer, int i);
+void  GameMode12_ListScoredSurfaces(int nPlayer);
 void  Lessons_StopWaiting(void);
 void  Lessons_RestartLesson(void);
 void  Lessons_ChooseQuit(void);
@@ -935,16 +935,16 @@ void fn_800869A4(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = gPlayers[pArgs[0].i].nDD8;
         return;
     case 1:
-        pResult->i = fn_800FF4CC(pArgs[0].i);
+        pResult->i = GameMode12_GetHolePoints(pArgs[0].i);
         return;
     case 2:
-        pResult->i = fn_800FF514(pArgs[0].i);
+        pResult->i = GameMode12_GetRoundPoints(pArgs[0].i);
         return;
     case 3:
-        pResult->i = fn_800FF49C(pArgs[0].i);
+        pResult->i = GameMode12_GetShotMultiplier(pArgs[0].i);
         return;
     case 4:
-        pResult->i = fn_800FF4B4(pArgs[0].i);
+        pResult->i = GameMode12_GetBonusMeter(pArgs[0].i);
         return;
     case 5:
         pResult->i = gPlayers[pArgs[0].i].nDD8;
@@ -1712,16 +1712,16 @@ void fn_80088654(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80088660(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[2].i) {
     case 0:
-        fn_800FF634(pArgs[0].i);
+        GameMode12_ListScoredSurfaces(pArgs[0].i);
         return;
     case 1:
-        pResult->i = fn_800FF604(pArgs[0].i);
+        pResult->i = GameMode12_GetNumScoredSurfaces(pArgs[0].i);
         return;
     case 2:
-        pResult->i = fn_800FF60C(pArgs[0].i, pArgs[1].i);
+        pResult->i = GameMode12_GetScoredSurface(pArgs[0].i, pArgs[1].i);
         return;
     case 3:
-        pResult->i = fn_800FF620(pArgs[0].i, pArgs[1].i);
+        pResult->i = GameMode12_GetScoredSurfaceHits(pArgs[0].i, pArgs[1].i);
         return;
     case 4:
         pResult->i = fn_800F2408(pArgs[0].i);
