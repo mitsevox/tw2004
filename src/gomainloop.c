@@ -149,7 +149,7 @@ void fn_80062E20(void);
 int  fn_80063758(void);
 void StaticCam_Init(void);
 void StaticCam_DeInit(void);
-void fn_80065B44(void);
+void EVENT_InitForGame(void);
 void fn_80067608(void);
 void fn_8006765C(void);
 void TARGET_Init(void);
@@ -679,7 +679,7 @@ void GO_vInitIG(void) {
     GUI_ClearControllersPulled();
     Luck_InitIG();
     fn_8011407C();
-    fn_80065B44();
+    EVENT_InitForGame();
 }
 
 // Shuts a round down.

@@ -542,7 +542,7 @@ u8 GameMode26_IsShowingWinner(void) {
     return 0;
 }
 
-// Called by event.c's handler of event 10 (fn_80065DB8, nArg 1) in every mode: in split screen it
+// Called by event.c's handler of event 10 (EVENT_HitBall, nArg 1) in every mode: in split screen it
 // sets gGameMode26SplitScreenShot, which nothing in the binary reads. nPlayer is not read.
 void GameMode26_NoteSplitScreenShot(int nPlayer) {
     if (gSession.nSplitScreen) {

@@ -61,33 +61,45 @@ void fn_80067558(int nPlayer);
 void fn_8006755C(int nPlayer);
 int  fn_80067560(void);
 
-void fn_80065B44(void) {
+// At the start of a round (GO_vInitIG): zeroes the count of seconds EVENT_Idle (event 26) keeps.
+// TW07 has both EVENT_InitForGame and EVENT_ResetIdleSeconds here, the same size; the caller makes
+// this one InitForGame.
+void EVENT_InitForGame(void) {
     lbl_80281E20 = 0;
 }
 
-void fn_80065B50(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 41 (GoBreakLine.c: the putt's break line passed the cup): queues situation event 26 for the
+// commentary scripts (SitDev_QueueEvent) unless a lesson blocks it.
+void EVENT_BreaklinePassedCup(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!Lessons_OnEvent(nPlayer, 41)) {
         SitDev_QueueEvent(nPlayer, 2, 26);
     }
 }
 
-void fn_80065B98(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 40 (GoBreakLine.c: the putt's break line is drawn to its end): does nothing in this build.
+void EVENT_BreaklineDone(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
-void fn_80065B9C(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 0 (GM_InitForHole: a hole begins): queues situation event 1 for the commentary scripts
+// unless a lesson blocks it.
+void EVENT_BeginHole(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!Lessons_OnEvent(nPlayer, 0)) {
         SitDev_QueueEvent(nPlayer, 2, 1);
     }
 }
 
-void fn_80065BE4(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 1 (a hole is over): queues situation event 12 for the commentary scripts unless a lesson
+// blocks it, then always Gaud_EndHole.
+void EVENT_EndHole(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!Lessons_OnEvent(nPlayer, 1)) {
         SitDev_QueueEvent(nPlayer, 2, 12);
     }
     Gaud_EndHole();
 }
 
-void fn_80065C30(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 2 (GameUICommands.c: the hole is restarted): clears the swing boosts of all five players
+// (SW_vClearBoosts).
+void EVENT_RestartHole(int nPlayer, int nEvent, void* pData, int nArg) {
     int i = 0;
 
     do {
@@ -96,39 +108,54 @@ void fn_80065C30(int nPlayer, int nEvent, void* pData, int nArg) {
     } while (i < 5);
 }
 
-void fn_80065C6C(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 3 (a player's turn begins): queues situation event 2 for the commentary scripts unless a
+// lesson blocks it, then always hands out the animation stream slots (AnimStream_AssignSlots).
+void EVENT_BeginTurn(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!Lessons_OnEvent(nPlayer, 3)) {
         SitDev_QueueEvent(nPlayer, 2, 2);
     }
     AnimStream_AssignSlots();
 }
 
-void fn_80065CB8(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 4 (a player's turn is over): only tells the lessons (their answer is not used).
+void EVENT_EndTurn(int nPlayer, int nEvent, void* pData, int nArg) {
     Lessons_OnEvent(nPlayer, 4);
 }
 
-void fn_80065CDC(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 6 (the shot is set up): queues situation event 3 for the commentary scripts unless a lesson
+// blocks it.
+void EVENT_ShotSetup(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!Lessons_OnEvent(nPlayer, 6)) {
         SitDev_QueueEvent(nPlayer, 7, 3);
     }
 }
 
-void fn_80065D24(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 7 (just before the swing): queues situation event 25 for the commentary scripts unless a
+// lesson blocks it.
+void EVENT_PreSwing(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!Lessons_OnEvent(nPlayer, 7)) {
         SitDev_QueueEvent(nPlayer, 2, 25);
     }
 }
 
-void fn_80065D6C(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 8: does nothing (nothing in this build fires it).
+void EVENT_Delay(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
-void fn_80065D70(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 9 (Swing.c: a practice swing): queues situation event 4 for the commentary scripts unless a
+// lesson blocks it. It asks the lessons with 21 (EVENT_MoveTargetBack's number), not its own 9.
+void EVENT_PracticeSwing(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!Lessons_OnEvent(nPlayer, 21)) {
         SitDev_QueueEvent(nPlayer, 2, 4);
     }
 }
 
-void fn_80065DB8(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 10 (Ball.c: the ball is struck), only for the real ball (nArg 1; 0 is the AI's simulated
+// ball): in the demo (session flag 0x4000) of mode 26 the demo's timer restarts (fn_8009A16C); then
+// the mode's ball-hit hook (gpGame->pfn260), the lessons (their crowd sound), the swing effect at
+// the ball (fn_800A31E0), SitDev starts watching the ball (fn_800BB1A8), commentary situation event
+// 5, and GameMode26's split-screen flag (fn_8010D3B8, which takes no argument).
+void EVENT_HitBall(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         if (Game_GetMode() == 26 && (gSession.uFlags & 0x4000)) {
             fn_8009A16C();
@@ -142,16 +169,24 @@ void fn_80065DB8(int nPlayer, int nEvent, void* pData, int nArg) {
     }
 }
 
-void fn_80065E70(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 11 (CharAnim.c: the swing animation is over): queues situation event 6 for the commentary
+// scripts.
+void EVENT_SwingDone(int nPlayer, int nEvent, void* pData, int nArg) {
     SitDev_QueueEvent(nPlayer, 2, 6);
 }
 
-void fn_80065E98(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 12: does nothing (nothing in this build fires it).
+void EVENT_BallBounce(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
-// Event 13: the next club down (from the longest, round to the putter) that suits the shot kind.
-// The putter is kept only on the green or when the green starts within 1.5 yards toward the pin.
-void fn_80065E9C(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 13 (the club-change button): steps nClub down one at a time (toward the driver, then round
+// to the putter) to the first club Club_UsableForKind allows for the shot kind, the putter after 26
+// tries. The putter is kept only on the green or with the green within 1.5 yards toward the pin,
+// otherwise the old club comes back. Then the target is fitted to the club (not for a chip), the
+// power worked out again, the front end told (message 7 and fn_8006752C), the golfer re-set for the
+// club, and the club remembered for the shot kind. Nothing when a lesson blocks it, in the
+// long-drive modes 22 and 26, or with the putter in hand.
+void EVENT_NextClub(int nPlayer, int nEvent, void* pData, int nArg) {
     int nOldClub;
     int nTries;
     u8 bOk;
@@ -193,8 +228,9 @@ void fn_80065E9C(int nPlayer, int nEvent, void* pData, int nArg) {
     }
 }
 
-// Event 14: the same, a club up.
-void fn_80066058(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 14: as EVENT_NextClub, but nClub steps up (toward the putter, then round to the driver). It
+// asks the lessons with 13 (EVENT_NextClub's number), not its own 14; the lessons block both alike.
+void EVENT_PrevClub(int nPlayer, int nEvent, void* pData, int nArg) {
     int nOldClub;
     int nTries;
     u8 bOk;
@@ -236,8 +272,10 @@ void fn_80066058(int nPlayer, int nEvent, void* pData, int nArg) {
     }
 }
 
-// Event 15: the next shot kind (fn_80067220).
-void fn_80066214(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 15 (the shot-kind button): the next shot kind with its club (fn_80067220), and in split
+// screen the front end is sent message 0x14 with the player's nC58. Nothing when a lesson blocks it
+// or in the long-drive modes 22 and 26.
+void EVENT_NextShotType(int nPlayer, int nEvent, void* pData, int nArg) {
     if (Lessons_OnEvent(nPlayer, 15) || Game_GetMode() == 26 || Game_GetMode() == 22) return;
     fn_80067220(nPlayer);
     if (gSession.nSplitScreen) {
@@ -245,8 +283,10 @@ void fn_80066214(int nPlayer, int nEvent, void* pData, int nArg) {
     }
 }
 
-// Events 16 and 17: a higher or lower trajectory.
-void fn_800662A0(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 16: raises the trajectory (nTrajectory, up to 2, high) and works out the power for the
+// target again; front-end message 7 is sent even at the top. Nothing when a lesson blocks it. TW06
+// and TW07 call this setting the stance; nothing in this build fires the event.
+void EVENT_PrevStance(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!Lessons_OnEvent(nPlayer, 16)) {
         if (gPlayers[nPlayer].nTrajectory != 2) {
             gPlayers[nPlayer].nTrajectory++;
@@ -256,7 +296,9 @@ void fn_800662A0(int nPlayer, int nEvent, void* pData, int nArg) {
     }
 }
 
-void fn_80066324(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 17: as EVENT_PrevStance, the trajectory one lower (down to 0, low). Nothing in this build
+// fires the event.
+void EVENT_NextStance(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!Lessons_OnEvent(nPlayer, 17)) {
         if (gPlayers[nPlayer].nTrajectory != 0) {
             gPlayers[nPlayer].nTrajectory--;
@@ -266,50 +308,67 @@ void fn_80066324(int nPlayer, int nEvent, void* pData, int nArg) {
     }
 }
 
-void fn_800663A8(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 19 (aiming): the aim point's turn input ramps toward +1 (fn_80069104) and the green grid of
+// the player's view is laid out again; nothing when a lesson blocks it.
+void EVENT_RotateRight(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!Lessons_OnEvent(nPlayer, 19)) {
         fn_80069104(nPlayer);
         fn_8009B970(gPlayers[nPlayer].nView[0]);
     }
 }
 
-void fn_80066400(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 18 (aiming): the aim point's turn input ramps toward -1 (fn_800690C0) and the green grid of
+// the player's view is laid out again; nothing when a lesson blocks it.
+void EVENT_RotateLeft(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!Lessons_OnEvent(nPlayer, 18)) {
         fn_800690C0(nPlayer);
         fn_8009B970(gPlayers[nPlayer].nView[0]);
     }
 }
 
-void fn_80066458(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 20 (aiming): the aim point's move input ramps toward +1 (fn_80069148); nothing when a
+// lesson blocks it.
+void EVENT_MoveTargetForward(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!Lessons_OnEvent(nPlayer, 20)) {
         fn_80069148(nPlayer);
     }
 }
 
-void fn_80066498(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 21 (aiming): the aim point's move input ramps toward -1 (fn_800691B0); nothing when a
+// lesson blocks it.
+void EVENT_MoveTargetBack(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!Lessons_OnEvent(nPlayer, 21)) {
         fn_800691B0(nPlayer);
     }
 }
 
-void fn_800664D8(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 23 (placing the ball): the placement cursor's turn input (fA80) ramps toward -1
+// (fn_80069BEC).
+void EVENT_PlaceBallRotateRight(int nPlayer, int nEvent, void* pData, int nArg) {
     fn_80069BEC(nPlayer);
 }
 
-void fn_800664F8(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 22 (placing the ball): the placement cursor's turn input (fA80) ramps toward +1
+// (fn_80069B74).
+void EVENT_PlaceBallRotateLeft(int nPlayer, int nEvent, void* pData, int nArg) {
     fn_80069B74(nPlayer);
 }
 
-void fn_80066518(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 24 (placing the ball): the placement cursor's move input (fA84) ramps toward +1
+// (fn_80069A84).
+void EVENT_PlaceBallMoveTargetForward(int nPlayer, int nEvent, void* pData, int nArg) {
     fn_80069A84(nPlayer);
 }
 
-void fn_80066538(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 25 (placing the ball): the placement cursor's move input (fA84) ramps toward -1
+// (fn_80069AFC).
+void EVENT_PlaceBallMoveTargetBack(int nPlayer, int nEvent, void* pData, int nArg) {
     fn_80069AFC(nPlayer);
 }
 
-// Event 26, once a second: every 60th second one call, every other 10th second another.
-void fn_80066558(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 26 (the main loop, once a second of game time, for player 0xFF): counts the second, then
+// queues commentary situation event 19 on every 60th second and 18 on every other 10th.
+void EVENT_Idle(int nPlayer, int nEvent, void* pData, int nArg) {
     lbl_80281E20++;
     if (lbl_80281E20 % 60 == 0) {
         SitDev_QueueEvent(nPlayer, 5, 19);
@@ -318,7 +377,10 @@ void fn_80066558(int nPlayer, int nEvent, void* pData, int nArg) {
     }
 }
 
-void fn_800665D4(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 28 (Ball.c: the ball tops its arc), only for the real ball (nArg 1) and unless a lesson
+// blocks it: camera event 1 for the player's view (fn_80063CF0), emotion event 3 (fn_8006ACF8), and
+// fn_80095744 with 13 on the golfer's character, which that function ignores.
+void EVENT_TopOfArc(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1 && !Lessons_OnEvent(nPlayer, 28)) {
         fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 1, nPlayer);
         fn_8006ACF8(nPlayer, 3);
@@ -616,12 +678,12 @@ void fn_8006702C(int nPlayer, int nEvent, void* pData, int nArg) {
 
 // The handlers, by event number.
 EventHandler lbl_80188628[76] = {
-    fn_80065B9C, fn_80065BE4, fn_80065C30, fn_80065C6C, fn_80065CB8, fn_80066EDC, fn_80065CDC,
-    fn_80065D24, fn_80065D6C, fn_80065D70, fn_80065DB8, fn_80065E70, fn_80065E98, fn_80065E9C,
-    fn_80066058, fn_80066214, fn_800662A0, fn_80066324, fn_80066400, fn_800663A8, fn_80066458,
-    fn_80066498, fn_800664F8, fn_800664D8, fn_80066518, fn_80066538, fn_80066558, fn_80066BB8,
-    fn_800665D4, fn_80066664, fn_8006676C, fn_800667C0, fn_80066828, fn_800668A8, fn_80066920,
-    fn_80066994, fn_800669B4, fn_800669D4, fn_800669F4, fn_80066A3C, fn_80065B98, fn_80065B50,
+    EVENT_BeginHole, EVENT_EndHole, EVENT_RestartHole, EVENT_BeginTurn, EVENT_EndTurn, fn_80066EDC, EVENT_ShotSetup,
+    EVENT_PreSwing, EVENT_Delay, EVENT_PracticeSwing, EVENT_HitBall, EVENT_SwingDone, EVENT_BallBounce, EVENT_NextClub,
+    EVENT_PrevClub, EVENT_NextShotType, EVENT_PrevStance, EVENT_NextStance, EVENT_RotateLeft, EVENT_RotateRight, EVENT_MoveTargetForward,
+    EVENT_MoveTargetBack, EVENT_PlaceBallRotateLeft, EVENT_PlaceBallRotateRight, EVENT_PlaceBallMoveTargetForward, EVENT_PlaceBallMoveTargetBack, EVENT_Idle, fn_80066BB8,
+    EVENT_TopOfArc, fn_80066664, fn_8006676C, fn_800667C0, fn_80066828, fn_800668A8, fn_80066920,
+    fn_80066994, fn_800669B4, fn_800669D4, fn_800669F4, fn_80066A3C, EVENT_BreaklineDone, EVENT_BreaklinePassedCup,
     fn_80066A9C, fn_80066BE8, fn_80066C08, fn_80066C6C, fn_80066C2C, fn_80066CAC, fn_80066D0C,
     fn_80066D30, fn_80066D54, fn_80066D58, fn_80066D5C, fn_80066D60, fn_80066D64, fn_80066D68,
     fn_80066D6C, fn_80066D70, fn_80066D74, fn_80066D78, fn_80066DC4, fn_80066E28, fn_80066E6C,
