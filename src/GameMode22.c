@@ -102,7 +102,7 @@ void fn_80125AA4(MsgArg* pArgs, MsgArg* pResult) {
     nMonth = pArgs[0].i + 1;
     pProfile = FE_GetCurrentProfile();
     for (i = 0; i < 118; i++) {
-        nDate = fn_800F0FBC(i);
+        nDate = GM_RealtimeMode_GetStartDate(i);
         CalDate_GetMDY(&nDate, &nEventMonth, &nDay, &nDay);
         if (nEventMonth == nMonth && pProfile->a104D0[i]) {
             nCount++;
@@ -169,13 +169,14 @@ void fn_80125D08(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = pProfile->aLadderAward[nEvent].bWon;
 }
 
-// Message handler (FE_MessageTable.c): fn_800F1154 of a won real-time event, else -1.
+// Message handler (FE_MessageTable.c): GM_RealtimeMode_GetIconIDByTrophyGroup of a won real-time
+// event, else -1.
 void fn_80125D78(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 nEvent = pArgs[0].i;
 
     if (pProfile->aRTEAward[nEvent].bWon) {
-        pResult->i = fn_800F1154(nEvent);
+        pResult->i = GM_RealtimeMode_GetIconIDByTrophyGroup(nEvent);
         return;
     }
     pResult->i = -1;

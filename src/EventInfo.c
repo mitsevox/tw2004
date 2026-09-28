@@ -197,8 +197,9 @@ void fn_8011D878(int nLine, char* szLabel, char* szValue) {
     int nRewards;
 
     GameModeDriverRTE_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
-    nRewards = FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(0x11, fn_800F120C(nId), szReward1, szReward2, szReward3);
-    fn_800907AC(fn_800F0F30(nId), szMoney);
+    nRewards = FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(0x11, GM_RealtimeMode_GetTrophyID(nId),
+                                                            szReward1, szReward2, szReward3);
+    fn_800907AC(GameModeDriverRTE_GetPurse(nId), szMoney);
     sprintf(szPurse, "$%s", szMoney);
     switch (nLine) {
     case 3:
@@ -240,8 +241,8 @@ void fn_8011D878(int nLine, char* szLabel, char* szValue) {
     }
 }
 
-// A real-time event (day panel 5: an earlier day's, or today's when fn_800F102C): whether the
-// player completed it, then the purse and rewards.
+// A real-time event (day panel 5: an earlier day's, or today's when
+// GM_RealtimeMode_TodaysEventCompleted): whether the player completed it, then the purse and rewards.
 void fn_8011DA44(int nLine, char* szLabel, char* szValue) {
     char szReward1[36];
     char szReward2[36];
@@ -255,8 +256,9 @@ void fn_8011DA44(int nLine, char* szLabel, char* szValue) {
 
     GameModeDriverRTE_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
     bComplete = GameModeDriverRTE_IsEventComplete(lbl_80281ED4->nSlot, nId);
-    nRewards = FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(0x11, fn_800F120C(nId), szReward1, szReward2, szReward3);
-    fn_800907AC(fn_800F0F30(nId), szMoney);
+    nRewards = FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(0x11, GM_RealtimeMode_GetTrophyID(nId),
+                                                            szReward1, szReward2, szReward3);
+    fn_800907AC(GameModeDriverRTE_GetPurse(nId), szMoney);
     sprintf(szPurse, "$%s", szMoney);
     switch (nLine) {
     case 3:
@@ -315,8 +317,9 @@ void fn_8011DC30(int nLine, char* szLabel, char* szValue) {
     int nRewards;
 
     GameModeDriverRTE_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
-    nRewards = FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(0x11, fn_800F120C(nId), szReward1, szReward2, szReward3);
-    fn_800907AC(fn_800F0F30(nId), szMoney);
+    nRewards = FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(0x11, GM_RealtimeMode_GetTrophyID(nId),
+                                                            szReward1, szReward2, szReward3);
+    fn_800907AC(GameModeDriverRTE_GetPurse(nId), szMoney);
     sprintf(szPurse, "$%s", szMoney);
     switch (nLine) {
     case 3:
@@ -374,7 +377,7 @@ void fn_8011DDFC(MsgArg* pArgs, MsgArg* pResult) {
         return;
     }
     GameModeDriverRTE_GetCalData(nEvent);
-    nDate = fn_800F0FBC(nEvent);
+    nDate = GM_RealtimeMode_GetStartDate(nEvent);
     strcpy(szName, GameModeDriverRTE_GetName(nEvent));
     strcpy(szStatus, "Status (?)");
     strcpy(szDate, "Start Date");
@@ -415,8 +418,8 @@ void fn_8011DEF0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// A real-time event's award: its name and prize (fn_800F11A0, fn_800F1154) and the day the player
-// won it. Gives whether it is won.
+// A real-time event's award: its name and prize (GM_RealtimeMode_GetNameByTrophyGroup,
+// GM_RealtimeMode_GetIconIDByTrophyGroup) and the day the player won it. Gives whether it is won.
 void fn_8011DF90(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 nId = pArgs[2].i;
@@ -424,8 +427,8 @@ void fn_8011DF90(MsgArg* pArgs, MsgArg* pResult) {
     s32* pPrize = (s32*)pArgs[5].p;
     u8 bWon;
 
-    fn_800F11A0(nId, ((MsgString*)pArgs[4].p)->pStr);
-    *pPrize = fn_800F1154(nId);
+    GM_RealtimeMode_GetNameByTrophyGroup(nId, ((MsgString*)pArgs[4].p)->pStr);
+    *pPrize = GM_RealtimeMode_GetIconIDByTrophyGroup(nId);
     bWon = pProfile->aRTEAward[nId].bWon;
     if (bWon) {
         CalDate_ToString(pProfile->aRTEAward[nId].nDate, szDate);

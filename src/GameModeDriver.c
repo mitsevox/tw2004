@@ -150,7 +150,7 @@ void (*lbl_80193ED0[3])(void) = { fn_80116548, fn_801165AC, fn_80116DD4 };
 char* (*lbl_80193EDC[3])(u16 nDate) = { fn_80116598, fn_80116CE8, fn_8011710C };
 // port: the PGA TOUR and real-time drivers return their own event types through this void* entry
 void* (*lbl_80193EE8[3])(u16 nDate) = {
-    fn_80116540, (void* (*)(u16))fn_800EFC80, (void* (*)(u16))fn_800F0EB4
+    fn_80116540, (void* (*)(u16))fn_800EFC80, (void* (*)(u16))GM_RealtimeMode_GetEventInfoByDate
 };
 void (*lbl_80193EF4[3])(void) = { fn_801165A0, fn_80116D28, fn_8011714C };
 u8 (*lbl_80193F00[3])(void) = { fn_801165A4, fn_80116D78, fn_80117180 };
@@ -421,7 +421,7 @@ u8 fn_80116E3C(void) {
     return b;
 }
 
-// A day's cell: no button text; the event's n14 (fn_800F1008), or -1.
+// A day's cell: no button text; the event's n14 (GameModeDriverRTE_UI_GetEventIconIndexOnCal), or -1.
 s32 fn_80116EA4(char* sz, u16 nDate, s32* pLook, s32* pButton) {
     s32 nId;
     s32 nRound;
@@ -429,7 +429,7 @@ s32 fn_80116EA4(char* sz, u16 nDate, s32* pLook, s32* pButton) {
     if (GameModeDriverRTE_GetEventByDate(nDate, &nId, &nRound)) {
         GameModeDriverRTE_GetCalData(nId);
         sz[0] = 0;
-        return fn_800F1008(nId);
+        return GameModeDriverRTE_UI_GetEventIconIndexOnCal(nId);
     }
     sz[0] = 0;
     return -1;
@@ -454,13 +454,14 @@ void fn_80116F80(u16 nDate, int n, char* sz) {
     fn_80117264(nDate, sz);
 }
 
-// The day-details panel for a day: 5 past, 4 or 5 today (5 when fn_800F102C), 6 to come.
+// The day-details panel for a day: 5 past, 4 or 5 today (5 when
+// GM_RealtimeMode_TodaysEventCompleted), 6 to come.
 s32 fn_80116FA4(u16 nDate) {
     if (nDate < lbl_80223C48.nToday) {
         return 5;
     }
     if (nDate == lbl_80223C48.nToday) {
-        return (fn_800F102C() != 0) + 4;
+        return (GM_RealtimeMode_TodaysEventCompleted() != 0) + 4;
     }
     return 6;
 }
@@ -510,11 +511,12 @@ char* fn_8011710C(u16 nDate) {
     return "";
 }
 
-// Start today's event by the clock's date (fn_800F0E3C): golfer 30 in slot 0, game mode 24.
+// Start today's event by the clock's date (GM_RealtimeMode_SelectEventToday): golfer 30 in slot 0,
+// game mode 24.
 void fn_8011714C(void) {
     Session_SetGolfer(30, 0);
     GM_SetModeType(24);
-    fn_800F0E3C();
+    GM_RealtimeMode_SelectEventToday();
 }
 
 u8 fn_80117180(void) {

@@ -31,21 +31,21 @@ extern RTEData gRTEs;
 
 // GameModeDriverRTE.c, as the career calendar (GameModeDriver.c) uses it
 u8   GameModeDriverRTE_GetEventByDate(u16 nDate, s32* pId, s32* pRound);
-s32  fn_800F0E3C(void);
+s32  GM_RealtimeMode_SelectEventToday(void);
 RTEvent* GameModeDriverRTE_GetCalData(s32 i);
-RTEvent* fn_800F0EB4(u16 nDate);
+RTEvent* GM_RealtimeMode_GetEventInfoByDate(u16 nDate);
 char* GameModeDriverRTE_GetName(s32 i);
 char* GameModeDriverRTE_GetDescription(s32 i);
-s32  fn_800F1008(s32 i);
-u8   fn_800F102C(void);                 // always 0 (the calendar's cell look for today)
+s32  GameModeDriverRTE_UI_GetEventIconIndexOnCal(s32 i);
+u8   GM_RealtimeMode_TodaysEventCompleted(void);                 // always 0 (the calendar's cell look for today)
 
 // GameModeDriverRTE.c, as the calendar's event details (EventInfo.c) use it
-s32  fn_800F0F30(s32 i);
-u16  fn_800F0FBC(s32 i);
+s32  GameModeDriverRTE_GetPurse(s32 i);
+u16  GM_RealtimeMode_GetStartDate(s32 i);
 s32  GameModeDriverRTE_GetNextEvent(void);
-s32  fn_800F1154(s32 nId);
-void fn_800F11A0(s32 nId, char* pDst);
-s32  fn_800F120C(s32 i);
+s32  GM_RealtimeMode_GetIconIDByTrophyGroup(s32 nId);
+void GM_RealtimeMode_GetNameByTrophyGroup(s32 nId, char* pDst);
+s32  GM_RealtimeMode_GetTrophyID(s32 i);
 u8   GameModeDriverRTE_IsEventComplete(s32 nProfile, s32 i);
 
 #endif

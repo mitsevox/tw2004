@@ -312,7 +312,7 @@ void  fn_800ED554(void);
 void  fn_800ED974(void);
 Pga80205F30* fn_800EE8B8(void);
 s32   fn_800F031C(char* pDst);
-s32   fn_800F0E20(s32* pRound);
+s32   GM_RealtimeMode_GetSelectedEvent(s32* pRound);
 int   fn_800F1960(void);
 void  fn_800F1DF0(void);
 void  fn_800F1E1C(void);
@@ -1629,8 +1629,10 @@ void fn_8008835C(MsgArg* pArgs, MsgArg* pResult) {
     s32 nRound;
 
     if (GM_Currently_RealtimeMode()) {
-        strcpy(((MsgString*)pArgs[0].p)->pStr, GameModeDriverRTE_GetName(fn_800F0E20(&nRound)));
-        strcpy(((MsgString*)pArgs[1].p)->pStr, GameModeDriverRTE_GetDescription(fn_800F0E20(&nRound)));
+        strcpy(((MsgString*)pArgs[0].p)->pStr,
+               GameModeDriverRTE_GetName(GM_RealtimeMode_GetSelectedEvent(&nRound)));
+        strcpy(((MsgString*)pArgs[1].p)->pStr,
+               GameModeDriverRTE_GetDescription(GM_RealtimeMode_GetSelectedEvent(&nRound)));
         return;
     }
     strcpy(((MsgString*)pArgs[0].p)->pStr, fn_800ED280(fn_800EAC7C()));

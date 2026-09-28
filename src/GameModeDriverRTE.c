@@ -22,15 +22,15 @@ void GameModeDriverRTE_UnregisterStreamClients(void);
 void GameModeDriverRTE_Locale_LoadRTEcFromStream(UStreamObject* pObject);
 void GameModeDriverRTE_LoadRTEsFromStream(UStreamObject* pObject);
 s32 GameModeDriverRTE_GetEventDays(s32 i);
-s32 fn_800F0E20(s32* pRound);
-void fn_800F0E30(s32 nId, s32 nRound);
+s32 GM_RealtimeMode_GetSelectedEvent(s32* pRound);
+void GM_RealtimeMode_SelectEvent(s32 nId, s32 nRound);
 
 void  GameModeDriverRTE_Locale_LoadRTEnFromStream(UStreamObject* pObject);
 void  GameModeDriverRTE_Shutdown(void);
 void  GameModeDriverRTE_EndGame(void);
 s32   GM_RealtimeMode_GetNEventsWon(void);
 u8    GameModeDriverRTE_GetEventByDateMDY(s32 nMonth, s32 nDay, s32 nYear, s32* pId, s32* pRound);
-s32   fn_800F0F54(void);
+s32   GameModeDriverRTE_GetYearIndex(void);
 
 // Game mode 24 (real-time events; TW06 GM_Realtime_mode) starts, from GameRound's mode switch:
 // match play's golfer order, honors, hole, game-over and playoff rules (GameModeMatch) with this
@@ -330,20 +330,22 @@ s32 GameModeDriverRTE_GetEventDays(s32 i) {
     return 1;
 }
 
-// The current event, and its day.
-s32 fn_800F0E20(s32* pRound) {
+// The selected event (an index into gRTEs.aEvent, set by GM_RealtimeMode_SelectEvent); its day goes
+// in *pRound.
+s32 GM_RealtimeMode_GetSelectedEvent(s32* pRound) {
     *pRound = lbl_80282354;
     return lbl_80282350;
 }
 
-// Event nId, on its day nRound, becomes the current one.
-void fn_800F0E30(s32 nId, s32 nRound) {
+// Event nId, on its day nRound, becomes the selected one (GameModeDriverRTE_StartEvent plays it).
+void GM_RealtimeMode_SelectEvent(s32 nId, s32 nRound) {
     lbl_80282354 = nRound;
     lbl_80282350 = nId;
 }
 
-// Today's event becomes the current one.
-s32 fn_800F0E3C(void) {
+// Today's event (by the clock) becomes the selected one; 1 if there is one, else 0 and the
+// selection stays as it was.
+s32 GM_RealtimeMode_SelectEventToday(void) {
     s32 nMonth;
     s32 nDay;
     s32 nYear;
@@ -351,7 +353,7 @@ s32 fn_800F0E3C(void) {
     s32 nRound;
     GameModeDriverRTE_GetCurrentDate(&nMonth, &nDay, &nYear);
     if (GameModeDriverRTE_GetEventByDateMDY(nMonth, nDay, nYear, &nId, &nRound)) {
-        fn_800F0E30(nId, nRound);
+        GM_RealtimeMode_SelectEvent(nId, nRound);
         return 1;
     }
     return 0;
@@ -361,7 +363,9 @@ RTEvent* GameModeDriverRTE_GetCalData(s32 i) {
     return &gRTEs.aEvent[i];
 }
 
-RTEvent* fn_800F0EB4(u16 nDate) {
+// The calendar entry of the event held on day number nDate, or NULL when none; the real-time
+// driver's entry in the calendar's per-driver table (GameModeDriver.c).
+RTEvent* GM_RealtimeMode_GetEventInfoByDate(u16 nDate) {
     s32 nId;
     s32 nRound;
     if (GameModeDriverRTE_GetEventByDate(nDate, &nId, &nRound)) {
@@ -378,13 +382,15 @@ char* GameModeDriverRTE_GetDescription(s32 i) {
     return gRTEs.pNames + gRTEs.aEvent[i].nDesc;
 }
 
-// The reward for event i.
-s32 fn_800F0F30(s32 i) {
+// Event i's purse: the best-medal reward of its challenge (Challenge.aMedal[0].nReward), which
+// GameModeDriverRTE_EndGame pays for any medal.
+s32 GameModeDriverRTE_GetPurse(s32 i) {
     return gRTEs.aChallenge[gRTEs.aEvent[i].nChallenge - 1].aMedal[0].nReward;
 }
 
-// This year's season (0..9 from 2003), or 0.
-s32 fn_800F0F54(void) {
+// The clock's year as an index into RTEvent.aDate: 0 for 2003 up to 9 for 2012, and 0 for any year
+// outside that range.
+s32 GameModeDriverRTE_GetYearIndex(void) {
     s32 nYear;
     s32 n;
     s32 bOk;
@@ -398,23 +404,29 @@ s32 fn_800F0F54(void) {
     return bOk ? nSeason : 0;
 }
 
-u16 fn_800F0FBC(s32 i) {
+// Event i's start date (day number) in the clock's year (GameModeDriverRTE_GetYearIndex), 0 when it
+// is not held that year; 0xFFFF for no entry, which GameModeDriverRTE_GetCalData never gives.
+u16 GM_RealtimeMode_GetStartDate(s32 i) {
     RTEvent* p = GameModeDriverRTE_GetCalData(i);
     if (p == NULL) {
         return 0xFFFF;
     }
-    return p->aDate[fn_800F0F54()];
+    return p->aDate[GameModeDriverRTE_GetYearIndex()];
 }
 
-s32 fn_800F1008(s32 i) {
+// Event i's icon (RTEvent.n14), shown in its day cell on the calendar (GameModeDriver.c).
+s32 GameModeDriverRTE_UI_GetEventIconIndexOnCal(s32 i) {
     return GameModeDriverRTE_GetCalData(i)->n14;
 }
 
-u8 fn_800F102C(void) {
+// Always 0 in this build, so the calendar shows today's event with the not-yet-played panel (4) and
+// never the completed one (5).
+u8 GM_RealtimeMode_TodaysEventCompleted(void) {
     return 0;
 }
 
-// The next event from today (-1 if none this season).
+// The index of the event starting soonest from today (today included) in the clock's year, by the
+// entries' start dates; -1 when none is left or the year is outside 2003..2012.
 s32 GameModeDriverRTE_GetNextEvent(void) {
     s32 nNext;
     s32 nMonth;
@@ -450,8 +462,9 @@ s32 GameModeDriverRTE_GetNextEvent(void) {
     return nNext;
 }
 
-// An event's n14, by its id (0 if none).
-s32 fn_800F1154(s32 nId) {
+// The icon (RTEvent.n14) of the first event whose award id is nId, 0 if none; the trophy room shows
+// it for the award (EventInfo.c, GameMode22.c).
+s32 GM_RealtimeMode_GetIconIDByTrophyGroup(s32 nId) {
     s32 i;
     for (i = 0; i < 118; i++) {
         if (nId == gRTEs.aEvent[i].nId) {
@@ -461,8 +474,9 @@ s32 fn_800F1154(s32 nId) {
     return 0;
 }
 
-// An event's name, by its id.
-void fn_800F11A0(s32 nId, char* pDst) {
+// Copies into pDst the name of the event whose award id is nId (of every such event, so the last
+// one wins); pDst is left alone when there is none.
+void GM_RealtimeMode_GetNameByTrophyGroup(s32 nId, char* pDst) {
     s32 i;
     for (i = 0; i < 118; i++) {
         if (nId == gRTEs.aEvent[i].nId) {
@@ -471,11 +485,13 @@ void fn_800F11A0(s32 nId, char* pDst) {
     }
 }
 
-s32 fn_800F120C(s32 i) {
+// Event i's award id: its slot in SaveProfile.aRTEAward, and the unlock value (lock mode 0x11) of
+// the items winning it gives (EventInfo.c).
+s32 GM_RealtimeMode_GetTrophyID(s32 i) {
     return gRTEs.aEvent[i].nId;
 }
 
-// Whether a profile has done event i.
+// Whether profile nProfile has won event i's award (the day panel's COMPLETE / INCOMPLETE status).
 u8 GameModeDriverRTE_IsEventComplete(s32 nProfile, s32 i) {
     SaveProfile* p = &gpSaveData[nProfile];
     return p->aRTEAward[gRTEs.aEvent[i].nId].bWon;
