@@ -42,7 +42,7 @@ s8 gSavedCrAPHidden = -1;      // gpCrAPState->bHidden put aside while hint 0x34
 void UI_SetControllerEnabled(s32 n, s32 b);
 void UIText_SetFontDrawQueued(void);         // uiText.c
 void UITransform_Shutdown(void);
-void fn_800BA038(void);         // Trax.c
+void UI_EATraxFreeLogo(void);         // Trax.c
 void UI_CloseInterface(FrontEnd* pFE);
 void UI_vCloseModule(void);
 void UI_ResolveFileEntries(FrontEnd* pFE);
@@ -52,7 +52,7 @@ void GameMsg_SendPending(void);         // GameMessages.c
 void GameMsg_ClearPending(void);         // GameMessages.c
 void UIText_SetFontDrawAtOnce(void);         // uiText.c
 void UI_ResetLoadedFiles(void);         // uiLoadFile.c
-void fn_800B9FF0(void);
+void UI_EATraxReset(void);
 void fn_80037FB4(u8 a, f32* pColor);    // a full-screen colour (GoPostFx.c)
 void DEMO_Start(void);                 // BootCourse.c
 void FE_PlayPGATourMovie(void);         // FE_Manager.c
@@ -573,7 +573,7 @@ void UI_CloseInterface(FrontEnd* pFE) {
 
 // Start the UI module (GO_vInitFE, GO_vInitIG, start-up's gomainloop fn_8006CEFC): the font add
 // mode set to 1 (UIText_SetFontDrawAtOnce), nothing loaded (UI_ResetLoadedFiles), the controller
-// state cleared with all four controllers enabled, the EA Trax display reset (fn_800B9FF0) and the
+// state cleared with all four controllers enabled, the EA Trax display reset (UI_EATraxReset) and the
 // pending UI messages dropped (GameMsg_ClearPending).
 void UI_vInitModule(void) {
     s32 i;
@@ -590,7 +590,7 @@ void UI_vInitModule(void) {
         gUIState.a30[i] = 1;
     }
     gUIState.b48 = 0;
-    fn_800B9FF0();
+    UI_EATraxReset();
     GameMsg_ClearPending();
 }
 
@@ -607,14 +607,14 @@ void UI_SendPendingMessages(void) {
 
 // End the UI module (gomainloop's shut-down steps for the menus, a round and start-up): shut the UI
 // down if it is still open (UI_CloseInterface), free the transform stack (UITransform_Shutdown),
-// set the font add mode back to 0 (UIText_SetFontDrawQueued) and free the EA Trax logo (fn_800BA038).
+// set the font add mode back to 0 (UIText_SetFontDrawQueued) and free the EA Trax logo (UI_EATraxFreeLogo).
 void UI_vCloseModule(void) {
     if (gpFrontEnd != NULL) {
         UI_CloseInterface(gpFrontEnd);
     }
     UITransform_Shutdown();
     UIText_SetFontDrawQueued();
-    fn_800BA038();
+    UI_EATraxFreeLogo();
 }
 
 // The fade to black when the UI is left (while gUIState.bFadeToBlack is set): draw it, 0.05 darker

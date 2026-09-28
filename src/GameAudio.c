@@ -52,7 +52,7 @@ void Gaud_ExitSlowMo(u8 nPlayer);
 void Gaud_ExitWindSound(void);
 void Gaud_ExitTreeSound(void);
 void Gaud_ExitRainSound(void);
-void fn_800BA734(int n, s8 nTrack);
+void UI_EATraxShowSong(int n, s8 nTrack);
 
 void Aud_Pause(u8 b, u8 b2);
 void Aud_SetSubmixAttn(u8 nCurve, f32 fVolume);
@@ -1845,7 +1845,7 @@ void Gaud_StartMusic(u8 a, u16 b) {
     if (lbl_8028203C == 1) {
         Aud_EmiSetTrackStream(lbl_80281418, 0, a, b, 2);
         Aud_EmiSetTrackStatus(lbl_80281418, 0, 1);
-        fn_800BA734(1, b);
+        UI_EATraxShowSong(1, b);
     }
 }
 

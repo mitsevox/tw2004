@@ -29,11 +29,11 @@ f32        gUIObjLightRed;
 
 void fn_80013E38(u8* p, s32 v);  // GoRenderCtx_Gc.c
 void UI_Obj_InitModule(void);
-void fn_800AE338(void);
-void fn_800AE380(void);
-void fn_800AE3C4(int nPlayer);
+void UI_Obj_CloseModule(void);
+void UI_Obj_InitForRender(void);
+void UI_Obj_ResetBoostRings(int nPlayer);
 void UI_Obj_RenderBoostUI(int nObj);
-void fn_800AF0A8(CamLens* pLens);
+void UI_Obj_SetCurrentRenderCtxLens(CamLens* pLens);
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void RC_ApplyCurrentViewport(void);
 void RC_UpdateCurrentScreenMatrices(void);
@@ -42,8 +42,8 @@ void LLMath_IdentifyMat(f32 (*pMtx)[4]);                          // identity
 void LLMath_mat44fltMultiplyList33(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
 void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);          // copy a matrix
 void fn_8000C5A4(f32 (*pMtx)[4]);
-void fn_800AEFE4(void);
-void fn_800AF0D4(UObjMesh* pMesh);
+void UI_Obj_DrawSpinModel(void);
+void UI_Obj_DrawMesh(UObjMesh* pMesh);
 void LI_LoadLightGroup(LightGroup* pGroup);   // Skin.c: load the group's lights (fn_8006E7A4)
 void fn_8006EADC(UObject* pObj);        // GoLighting.c: light the object
 void fn_8006ED70(void);                 // GoLighting.c
@@ -59,7 +59,10 @@ static f32 uiobject_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// Set up the objects: their settings, lens, textures and one directional light.
+// Set the power-boost and spin display up (drawn by UI_Obj_RenderBoostUI for Swing.c): both views'
+// settings (position, scale, tilt and roll; object 0 also the rings' sizes), the spin model
+// (UI_Obj_InitForRender), the display's own camera, the "toball" and "ring" textures and one
+// directional light. GO_vInitIG calls it as a round is set up.
 void UI_Obj_InitModule(void) {
     u64 uName;
     int i;
@@ -69,7 +72,7 @@ void UI_Obj_InitModule(void) {
     gUIObjSettings[0].a28[1] = 0.74f;
     gUIObjSettings[0].a28[2] = 0.03f;
     gUIObjSettings[0].a28[3] = 0.0f;
-    fn_800AE380();
+    UI_Obj_InitForRender();
     gpUIObjLens = CA_spCreateCamera();
     CA_vInitCamera(gpUIObjLens);
     for (i = 0; i < 2; i++) {
@@ -96,8 +99,9 @@ void UI_Obj_InitModule(void) {
     gUIObjLights.apLight[0]->u.dir.fC = 1.0f;
 }
 
-// Free the object, the camera and the lights.
-void fn_800AE338(void) {
+// Free the spin model, the display's camera and its light (gomainloop.c fn_8006CDC4, as a round
+// shuts down).
+void UI_Obj_CloseModule(void) {
     if (gpUIObjModel != NULL) {
         fn_80048860(gpUIObjModel);
     }
@@ -106,15 +110,18 @@ void fn_800AE338(void) {
     fn_8006E62C(&gUIObjLights);
 }
 
-// Make the object from its 'TEO ' model (id 10003), unless it is made already.
-// port: a 'TEO ' object's UStreamObject.uUnk4 holds its model (see rcmp_mad_codec.c FE_CrAPBall_MakeObjects).
-void fn_800AE380(void) {
+// Make the spin display's model from its 'TEO ' model object (id 10003), unless it is made already.
+// port: a 'TEO ' object's UStreamObject.uUnk4 holds its model (see rcmp_mad_codec.c fn_800B9B48).
+void UI_Obj_InitForRender(void) {
     if (gpUIObjModel == NULL) {
         gpUIObjModel = fn_80048808((UObjModel*)fn_8000B70C('TEO ', 10003)->uUnk4);
     }
 }
 
-void fn_800AE3C4(int nPlayer) {    // nPlayer: unused (every caller, in Swing.c, passes one)
+// Put all eight boost rings (gUIObjBoostRingSize) back to their start size (object 0's a28[3]) so
+// they grow afresh; Swing.c calls it on a boost, when the boosts are cleared and when a swing is
+// set up. nPlayer is unused.
+void UI_Obj_ResetBoostRings(int nPlayer) {    // nPlayer: unused (every caller, in Swing.c, passes one)
     gUIObjBoostRingSize[0] = gUIObjSettings[0].a28[3];
     gUIObjBoostRingSize[1] = gUIObjSettings[0].a28[3];
     gUIObjBoostRingSize[2] = gUIObjSettings[0].a28[3];
@@ -125,9 +132,12 @@ void fn_800AE3C4(int nPlayer) {    // nPlayer: unused (every caller, in Swing.c,
     gUIObjBoostRingSize[7] = gUIObjSettings[0].a28[3];
 }
 
-// Draw object nObj's screen: the power boost quads (the base, one grown by the boost level, and a
-// ring per level that grows and fades), then the ball-like model tilted toward the spin asked
-// for and rolling with it. The object's own lens is used, and the view put back afterwards.
+// Draw the power-boost and spin display of view nObj (Swing.c SW_vUIRender2D calls it): the depth
+// under its corner of the screen is cleared; then, through the display's own camera, the base quad,
+// the same quad grown by the player's power-boost level in that level's colour, and a ring per
+// level that grows every frame and fades out between its fade size and its largest. With spin asked
+// for (nSpinBoost), the spin model is drawn tilted toward the spin and rolling faster the more is
+// asked. The display rises with the GameBreaker letterbox. The view is put back afterwards.
 void UI_Obj_RenderBoostUI(int nObj) {
     f32 mRoll[4][4];
     f32 mTilt[4][4];
@@ -215,7 +225,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
     CA_vInitCamera(gpUIObjLens);
     CA_vSetLookAt(gpUIObjLens, aEye, gUIObjLookAtTarget);
     fn_80045470(gpUIObjLens, 0.00879646f);
-    fn_800AF0A8(gpUIObjLens);
+    UI_Obj_SetCurrentRenderCtxLens(gpUIObjLens);
     RC_UpdateCurrentScreenMatrices();
     RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
     RenderState_SetViewport(RC_spGetCurrentRenderCtx());
@@ -341,7 +351,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
             fn_8000C5A4(gpUIObjModel->m0);
             LLMath_CopyVec(vPos, gpUIObjModel->m80[3]);
             gpUIObjModel->m80[3][3] = 1.0f;
-            fn_800AEFE4();
+            UI_Obj_DrawSpinModel();
             // EA bug: m0's copy goes back into m40 and m40's into m0
             LLMath_CopyMat44(mSave0, gpUIObjModel->m40);
             LLMath_CopyMat44(mSave40, gpUIObjModel->m0);
@@ -351,7 +361,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
 
     // the view as it was
     RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
-    fn_800AF0A8(pLens);
+    UI_Obj_SetCurrentRenderCtxLens(pLens);
     RenderState_SetCameraMatrices();
     RC_UpdateCurrentScreenMatrices();
     RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
@@ -362,8 +372,10 @@ void UI_Obj_RenderBoostUI(int nObj) {
     RenderState_Flush();
 }
 
-// Draw the object: its light's colour, the renderer state, the view, then the model.
-void fn_800AEFE4(void) {
+// Draw the spin display's model: its light in the display's colour (gUIObjLightRed,
+// gUIObjLightGreen, gUIObjLightBlue), constant alpha 255 times gUIObjAlpha, the model's own matrix
+// (m80) as the transform, then the mesh of its first level of detail (UI_Obj_DrawMesh).
+void UI_Obj_DrawSpinModel(void) {
     gUIObjLights.apLight[0]->u.dir.vColor[0] = gUIObjLightRed;
     gUIObjLights.apLight[0]->u.dir.vColor[1] = gUIObjLightGreen;
     gUIObjLights.apLight[0]->u.dir.vColor[2] = gUIObjLightBlue;
@@ -379,18 +391,18 @@ void fn_800AEFE4(void) {
     RenderState_SetCameraMatrices();
     RenderState_SetClipMode(1);
     RenderState_Flush();
-    fn_800AF0D4(gpUIObjModel->pModel->apLod[0]);
+    UI_Obj_DrawMesh(gpUIObjModel->pModel->apLod[0]);
     fn_8006ED70();
 }
 
-// Make pLens the render context's lens.
-void fn_800AF0A8(CamLens* pLens) {
+// Make pLens the current render context's lens (GoRenderCtx_Gc.c fn_80013E38).
+void UI_Obj_SetCurrentRenderCtxLens(CamLens* pLens) {
     // port: fn_80013E38 (GoRenderCtx_Gc.c, still sweep code) takes the lens as an s32
     fn_80013E38((u8*)*lbl_80280DF0, (s32)pLens);
 }
 
 // Draw the mesh's current part, if it is used (UObject.c's fn_80048A84 again).
-void fn_800AF0D4(UObjMesh* pMesh) {
+void UI_Obj_DrawMesh(UObjMesh* pMesh) {
     if (pMesh->a1C[pMesh->n28] != 0) {
         fn_800082CC(&pMesh->p18[pMesh->n28]);
     }

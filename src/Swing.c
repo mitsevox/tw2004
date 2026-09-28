@@ -120,7 +120,7 @@ void  SD_FreeShaderObject(void* p);
 void  SW_vUIInit(int nPlayer);
 void  SD_InitShaderObject(void* p, int a, s32* pDesc);
 void  SW_vSetDisplayBoostUI(int nPlayer, int bDisplay);
-void  fn_800AE3C4(int nPlayer);
+void  UI_Obj_ResetBoostRings(int nPlayer);
 u8*   SW_vGetStickInfo(int nPlayer, int nController);   // [0]/[1] C stick x/y, [2]/[3] main stick
 int   SW_vGetStickX(int nPlayer, u8* pPad);             // main or C stick by nStickUsed
 int   SW_vGetStickY(int nPlayer, u8* pPad);
@@ -366,7 +366,7 @@ void SW_vInitSwing(int nPlayer) {
     gPlayers[nPlayer].swing.fCurrentTurnAngle = 0.0f;
     gPlayers[nPlayer].swing.f10 = 0.0f;
     gPlayers[nPlayer].swing.f14 = 0.0f;
-    fn_800AE3C4(nPlayer);
+    UI_Obj_ResetBoostRings(nPlayer);
 }
 
 // Start the backswing: state 1, character animation 6 (the backswing) asked for and the animation
@@ -1546,7 +1546,7 @@ f32 SW_fPowerAdjustForDraw(int nPlayer, f32 fPower) {
 // (Controller_GetButtonMask(0x1F)) is held with the stick more than 93 from centre, the boost level
 // (nPowerBoost) rises one a frame up to 8, sending event 0x2D at each step. A running
 // fPowerBoostDieTime (1/12 s once the backswing backs down) counts down; when it runs out the level
-// and the turn angles are cleared and the boost display is reset (fn_800AE3C4).
+// and the turn angles are cleared and the boost display is reset (UI_Obj_ResetBoostRings).
 void SW_vCheckForSwingBoost(int nPlayer) {
     u32  uButtons;
     int  nX, nY;
@@ -1570,20 +1570,20 @@ void SW_vCheckForSwingBoost(int nPlayer) {
             gPlayers[nPlayer].swing.nPowerBoost = 0;
             gPlayers[nPlayer].swing.fTargetTurnAngle = 0.0f;
             gPlayers[nPlayer].swing.fCurrentTurnAngle = 0.0f;
-            fn_800AE3C4(nPlayer);
+            UI_Obj_ResetBoostRings(nPlayer);
         }
     }
 }
 
 // Clears the power boost level, the spin amount and the boost back-down timer, shows the boost
-// display again (SW_vSetDisplayBoostUI) and resets it (fn_800AE3C4). Called when a shot is set up
+// display again (SW_vSetDisplayBoostUI) and resets it (UI_Obj_ResetBoostRings). Called when a shot is set up
 // and when the swing starts.
 void SW_vClearBoosts(int nPlayer) {
     gPlayers[nPlayer].swing.nPowerBoost = 0;
     gPlayers[nPlayer].swing.nSpinBoost = 0;
     gPlayers[nPlayer].swing.fPowerBoostDieTime   = 0.0f;
     SW_vSetDisplayBoostUI(nPlayer, 1);
-    fn_800AE3C4(nPlayer);
+    UI_Obj_ResetBoostRings(nPlayer);
 }
 
 // fPower plus the power boost: the step of the level pressed (gBoostSteps: 1, 2, 4 ... 20 for

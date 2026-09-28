@@ -71,7 +71,7 @@ Objects delivered by UStream
 | `LEGL` | fn_800B166C | startUp.c | none seen | asm |
 | `TEO ` | FE_CrAPBall_LoadTEO | sweep | none seen | asm (a second `TEO ` handler) |
 | `BALF` | FE_CrAPBall_LoadBALF | sweep | none seen | asm |
-| `TRAX`, `TRXT` | fn_800BA118, fn_800BA15C | sweep | none seen | asm |
+| `TRAX`, `TRXT` | UI_vEATraxLoadfromStream, UI_vEATraxLoadLogoFromStream | sweep | none seen | asm |
 | `CRI `, `CMPS` | fn_800D2A64, fn_800D2A90 | sweep | none seen | asm |
 | `ERN ` | EarningsInfo_LoadERNFromStream | Earnings.c | none seen | yes: copied over the prize table `lbl_80200538` (`EarningsTable`, include/game/earnings.h); a `port:` note in the handler marks where a port converts it |
 | `PLY ` | PlayNow_LoadPLYFromStream | PlayNowMode.c | none seen | yes: copied over `gPlayNowChallenges` (`Challenge[83]`, include/game/modes/challenge.h); `port:` note in the handler |

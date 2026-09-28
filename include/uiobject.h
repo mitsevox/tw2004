@@ -16,7 +16,7 @@ typedef struct UIObjSettings {
                                 //       0..2 pi
     f32  a28[4];                // 0x28  object 0: the rings' largest size, the size they start
                                 //       fading at, their growth per frame; [3] also fills
-                                //       gUIObjBoostRingSize (fn_800AE3C4)
+                                //       gUIObjBoostRingSize (UI_Obj_ResetBoostRings)
 } UIObjSettings;
 LAYOUT_ASSERT(UIObjSettings, 0x38);
 
@@ -29,10 +29,10 @@ extern f32        gUIObjBoostRingSize[8];
 extern UObject*   gpUIObjModel; // made from the 'TEO ' object 10003
 extern CamLens*   gpUIObjLens; // the objects' lens (CA_spCreateCamera)
 extern LightGroup gUIObjLights; // their lights
-extern f32        gUIObjLightRed; // } the light's colour (red, green, blue: fn_800AEFE4)
+extern f32        gUIObjLightRed; // } the light's colour (red, green, blue: UI_Obj_DrawSpinModel)
 extern f32        gUIObjLightGreen; // }   0.05
 extern f32        gUIObjLightBlue; // }   0.476
-extern f32        gUIObjAlpha; // 0.19: fn_800AEFE4 hands 255 times it to RenderState_SetConstantAlpha
+extern f32        gUIObjAlpha; // 0.19: UI_Obj_DrawSpinModel hands 255 times it to RenderState_SetConstantAlpha
 extern f32        gBoostLevelColours[8][4];   // the rings' colours, one per power boost level
 extern f32        gUIObjLookAtTarget[4];      // the lens's second point (CA_vSetLookAt)
 

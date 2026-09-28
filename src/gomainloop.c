@@ -222,7 +222,7 @@ void Gaud_Monitor(void);
 void Gaud_InitFE(void);
 void Gaud_ExitFE(void);
 void Aud_InitSession(int a, int b, u8 c, int d);
-void fn_800AE338(void);
+void UI_Obj_CloseModule(void);
 void fn_800B1608(void);
 void fn_800B1D78(void);
 void fn_800B2724(void);
@@ -238,7 +238,7 @@ void fn_800B6560(void);
 void FE_CrAPBall_Init(void);
 void FE_CrAPBall_Free(void);
 void FE_CrAPBall_MakeObjects(void);
-void fn_800BA1A4(void);
+void UI_EATraxDraw(void);
 void fn_800BA940(void);
 void fn_800BAA4C(void);
 void fn_800BAA50(int nPlayer);
@@ -709,7 +709,7 @@ void fn_8006CDC4(void) {
         ViewController_Delete(0);
         ViewController_Delete(2);
     }
-    fn_800AE338();
+    UI_Obj_CloseModule();
     fn_80098B5C();
     fn_800A2958();
     fn_80055D6C();
@@ -987,7 +987,7 @@ void fn_8006D27C(void) {
     UI_ExitFade();
     fn_800382E0();
     UI_UpdateInterface(1);
-    fn_800BA1A4();
+    UI_EATraxDraw();
     fn_8006DDA8();
 }
 
@@ -1027,7 +1027,7 @@ void fn_8006D838(void) {
         }
     }
     UFont_DrawQueue();
-    fn_800BA1A4();
+    UI_EATraxDraw();
     UI_ExitFade();
     UI_UpdateInterface(1);
     fn_800382E0();
