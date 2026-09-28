@@ -95,3 +95,33 @@ More comments to re-check: GameAudio.c fn_8006BEA4 prototype says GoGolfCam.c (i
 event.c calls fn_800A6448 / fn_800A644C (u8 nPlayer) but they are void(void); MC.c above
 fn_800A2630 ("Three callbacks of a table in .data") is MC.c's own lbl_8018C7D8 IsDataCorrupt
 column; E1CE8 / E22E4 / E234C and save.h a5004 could say par-5 eagle records.
+
+## Round 4 (rd1-rd4, core area) leftovers
+Header pass for the core area (include/ was off limits to file lanes):
+- engine.h RenderState: struct comment "GoTerrain.c's setters write one group each" is stale; fields
+  can be named: n0 depth compare, b4 depth writes, n8/bC/bD alpha compare/ref/enable, n10/n14 blend
+  source/destination, n18 blend mode, u110 changed groups. DS_vSetZBufferMode / DS_vEnableZBufferUpdate
+  / DS_vSetAlphaTestMode prototypes still have a, b, c; RenderState_SetConstantAlphaActive has v.
+- engine.h:352: lbl_80280DC8 is defined in LLTex.c, not streammanagerhole.c. engine.h 352/537/1452
+  now past 110 columns. engine.h:22-27 alignment; line 22 "the StaticMem_Alloc mode TibExtMemAlloc
+  uses". engine.h:1450 LLMath_Normalize3 "three floats, w kept"; :176 "three-float squared distance".
+- engine.h:162 Quat_EulerAngles and :145 mat44flt_ExtractEulerAngles params -> yaw/pitch/roll
+  (yaw about z, pitch about y, roll about x). cull.h:72 LLMath_mat44fltMultiply params mtx/src/dst.
+- camera.h ViewController: b274 -> bActive (TW07 IsActive / TurnOnViewController); prototypes of
+  ViewController_TurnOnViewController and VM_vSetViewportRect: parameter names as the definitions.
+  RenderCamera is TW07's RC_SRenderCtx (pRect = the viewport). camera.h:29-30 fB4/fB8: a view width
+  and height (Mtx_OrthoScale).
+Code:
+- gomainloop.c:64 declares ViewController_SetCurrentViewController(void) and calls it with no
+  argument inside fn_8006C8EC(int nView) (TW07 GO_vSetGenericViewStates(iViewID)): it relies on nView
+  still being in r3. The prototype must match the definition (int nView) if the match allows.
+- GoRenderCtx_Gc.c:17 "matrix builders, not decompiled yet, f1..f5": stale.
+- mat44flt_ExtractEulerAngles: -atan2f(m[0][0], m[0][0]) in the locked-pitch case: probable EA bug.
+- TW07 LLMath_PS3.h names for Vec_Copy, Vec_Scale, Vec_Add, Vec_Sub, Vec3_Add, Vec3_Sub, Vec3_Dot,
+  fn_8000AE6C (AddScale), Mtx_Copy, Mtx_Identity, vec4flt_CrossProduct: LLMath_Scale, Add, Subtract3,
+  DotProduct3, AddScale, CopyMat44, IdentifyMat, CrossProduct3W0 (check each).
+- Camera_GetCurrentLens (8001F004) = RC_spGetCurrentRenderCtxCamera; fn_80013E40 =
+  RC_spGetRenderCtxFrameBuffer; RenderState_SetBlendFactors / SetDrawFlags may be
+  DS_vSetAlphaBlendingFunction / PR_vSetCurrentUsage.
+- hotnames comment_state misses a comment above a two-line asm signature with an #else C copy
+  (LLMath_mat44fltMultiplyList / List33 are commented).
