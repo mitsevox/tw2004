@@ -64,7 +64,7 @@ Objects delivered by UStream
 | `sscr` | SitDev_LoadScripts | SitDevFile.c | swapped: fn_800BB52C > ByteSwap_Records | little-endian on disc |
 | `BIO ` | FE_CharBios_LoadBIOfromStream | FE_Manager.c | none seen | asm |
 | `LITE` | FE_lite_vStreamCallback | FEgolferanim.c | swapped: ByteSwap_Records | little-endian on disc |
-| `DATS`, `TXFS`, `FONS`, `GRPS`, `MPCS` | fn_8008ED80, fn_8008EE1C, fn_8008EFFC, fn_8008EEB8 (two tags) | uiLoadFile.c | none seen | asm |
+| `DATS`, `TXFS`, `FONS`, `GRPS`, `MPCS` | UI_StreamLoadFile, UI_StreamLoadTextures, UI_StreamLoadFonts, UI_StreamLoadPictures (two tags) | uiLoadFile.c | none seen | asm |
 | `MCI `, `MCB ` | fn_8009EB30, fn_8009EB38 | MC_Gc.c | none seen | the handlers only keep the object |
 | `eagm` | fn_800A1D4C | MC.c | none seen | asm |
 | `sfxd` | fn_800A29B4 | asm | none seen | asm |

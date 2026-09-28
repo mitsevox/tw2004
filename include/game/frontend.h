@@ -71,9 +71,9 @@ typedef struct UINamedList {
 typedef struct FrontEnd {
     UIFile* pFile;              // 0x0
     void* pHandler;             // 0x4  where GameMessages.c sends its messages (UISProcessHint)
-    struct UILoaded* p8;        // 0x8  the texture banks fn_8008F0FC frees (UI_CloseInterface)
-    UINamedList* pC;            // 0xC  a block uiLoadFile.c frees (fn_8008F24C)
-    u32*  p10;                  // 0x10  the fonts table fn_8008F194 frees (UI_CloseInterface)
+    struct UILoaded* p8;        // 0x8  the texture banks UI_FreeTextureBanks frees (UI_CloseInterface)
+    UINamedList* pC;            // 0xC  a block uiLoadFile.c frees (UI_FreeMenuPictures)
+    u32*  p10;                  // 0x10  the fonts table UI_FreeFonts frees (UI_CloseInterface)
     UIColorTable* p14;          // 0x14  the colours UIText.n8 picks from (uiText.c), NULL: none
     f32   f18;                  // 0x18  set to 1 when a round starts (gomainloop fn_8006DC20)
 } FrontEnd;
@@ -92,32 +92,32 @@ extern s32 gUIButtonHeldFrames[8];     // per controller (0..3): frames Controll
 extern s8 gSavedCrAPHidden;         // CrAPState.bHidden put aside while UI_ReadControllers's lone-player UI is up (-1: none)
 
 // What uiLoadFile.c's stream handlers loaded (gUITextureBanks): up to five objects, freed together
-// by fn_8008F0FC.
+// by UI_FreeTextureBanks.
 #define UI_NUM_LOADED 5
 typedef struct UILoaded {
     s32   nCount;               // 0x0  how many ap4 holds
-    void* ap4[UI_NUM_LOADED];   // 0x4  from fn_8000FB88 (fn_8008EE1C)
+    void* ap4[UI_NUM_LOADED];   // 0x4  from fn_8000FB88 (UI_StreamLoadTextures)
 } UILoaded;
 LAYOUT_ASSERT(UILoaded, 0x18);
 
 extern UILoaded gUITextureBanks;
 
 // uiLoadFile.c: what the front end's shutdown (uiProcessInterface.c UI_CloseInterface) frees.
-void fn_8008F0C8(void* p);              // free p unless it is NULL
-void fn_8008F0FC(UILoaded* pLoaded);    // free the texture banks the 'TXFS' handler kept
-void fn_8008F164(void* p);              // free p unless it is NULL
-void fn_8008F194(u32* pTable);          // free the fonts' slots and the 'FONS' data
-void fn_8008F24C(void);
-void fn_8008F294(void);
+void UI_FreeFileData(void* p);              // free p unless it is NULL
+void UI_FreeTextureBanks(UILoaded* pLoaded);    // free the texture banks the 'TXFS' handler kept
+void UI_FreePictureList(void* p);              // free p unless it is NULL
+void UI_FreeFonts(u32* pTable);          // free the fonts' slots and the 'FONS' data
+void UI_FreeMenuPictures(void);
+void UI_RestoreMenuPictures(void);
 // uiLoadFile.c: what the front end's start (uiProcessInterface.c UI_OpenInterface) takes. EA passes
-// the UI set's name to each; only fn_8008EC60 uses it.
-void fn_8008EC60(char* szSet);
-void* fn_8008F0C0(char* szUnused);          // the UI file's data
-UILoaded* fn_8008F0F0(char* szUnused);      // the texture banks
-UINamedList* fn_8008F15C(char* szUnused);   // the 'GRPS'/'MPCS' data
-u32* fn_8008F18C(char* szUnused);           // the 'FONS' data
+// the UI set's name to each; only UI_SetInterfaceName uses it.
+void UI_SetInterfaceName(char* szSet);
+void* UI_GetFileData(char* szUnused);          // the UI file's data
+UILoaded* UI_GetTextureBanks(char* szUnused);      // the texture banks
+UINamedList* UI_GetPictureList(char* szUnused);   // the 'GRPS'/'MPCS' data
+u32* UI_GetFonts(char* szUnused);           // the 'FONS' data
 
-// One font in the 'FONS' object (uiLoadFile.c fn_8008EFFC): the font's data starts at 0x20; once
+// One font in the 'FONS' object (uiLoadFile.c UI_StreamLoadFonts): the font's data starts at 0x20; once
 // it is loaded into a font slot, its first word holds the slot.
 typedef struct UIFont {
     u8  unk0[0x20];

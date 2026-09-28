@@ -42,7 +42,7 @@ void GameMsg_SendPendingMenus(void);         // GameMessages.c
 void GameMsg_SendPending(void);         // GameMessages.c
 void GameMsg_ClearPending(void);         // GameMessages.c
 void fn_80092BA0(void);         // uiText.c
-void fn_8008EC30(void);         // uiLoadFile.c
+void UI_ResetLoadedFiles(void);         // uiLoadFile.c
 void fn_800B9FF0(void);
 void fn_80037FB4(u8 a, f32* pColor);    // a full-screen colour (GoPostFx.c)
 void DEMO_Start(void);                 // BootCourse.c
@@ -468,13 +468,13 @@ FrontEnd* UI_OpenInterface(char* szSet) {
     gbUICloseRequested = 0;
     gbUIRunning = 1;
     gbUIClosed = 0;
-    fn_8008EC60(szSet);
+    UI_SetInterfaceName(szSet);
     gpFrontEnd = StaticMem_Alloc(sizeof(FrontEnd), 2, 16, "uiProcessInterface.c", 904);
     gpFrontEnd->f18 = 0.0f;
-    gpFrontEnd->pFile = fn_8008F0C0(szSet);
-    gpFrontEnd->p8 = fn_8008F0F0(szSet);
-    gpFrontEnd->pC = fn_8008F15C(szSet);
-    gpFrontEnd->p10 = fn_8008F18C(szSet);
+    gpFrontEnd->pFile = UI_GetFileData(szSet);
+    gpFrontEnd->p8 = UI_GetTextureBanks(szSet);
+    gpFrontEnd->pC = UI_GetPictureList(szSet);
+    gpFrontEnd->p10 = UI_GetFonts(szSet);
     UITransform_Init();
     gUIState.a2C[0] = 0;
     gUIState.a2C[1] = 0;
@@ -529,8 +529,9 @@ FrontEnd* UI_OpenInterface(char* szSet) {
 // with no nC plays the start-up movies and legal screen (fn_80091EE8); leaving the menus sets b0
 // and clears b1 of every lbl_801D8890 entry whose lbl_801D8ED0 word is set, clears lbl_80281370
 // (set, then cleared by fn_80091454), and brings the picture list back from ARAM and frees it
-// (fn_8008F294, fn_8008F24C). Then the studio is shut down, the fonts, picture list, texture banks
-// and UI file are freed, and the studio and the front end with them; gpFrontEnd is NULL after.
+// (UI_RestoreMenuPictures, UI_FreeMenuPictures). Then the studio is shut down, the fonts, picture
+// list, texture banks and UI file are freed, and the studio and the front end with them; gpFrontEnd
+// is NULL after.
 void UI_CloseInterface(FrontEnd* pFE) {
     int i;
 
@@ -546,28 +547,28 @@ void UI_CloseInterface(FrontEnd* pFE) {
         }
         lbl_80281370 = 1;
         fn_80091454();
-        fn_8008F294();
-        fn_8008F24C();
+        UI_RestoreMenuPictures();
+        UI_FreeMenuPictures();
     }
     UISShutdown(gpFrontEnd->pHandler);
-    fn_8008F194(pFE->p10);
-    fn_8008F164(pFE->pC);
-    fn_8008F0FC(pFE->p8);
-    fn_8008F0C8(pFE->pFile);
+    UI_FreeFonts(pFE->p10);
+    UI_FreePictureList(pFE->pC);
+    UI_FreeTextureBanks(pFE->p8);
+    UI_FreeFileData(pFE->pFile);
     StaticMem_Free(gpFrontEnd->pHandler);
     StaticMem_Free(gpFrontEnd);
     gpFrontEnd = NULL;
 }
 
 // Start the UI module (GO_vInitFE, GO_vInitIG, start-up's gomainloop fn_8006CEFC): the font add
-// mode set to 1 (fn_80092BA0), nothing loaded (fn_8008EC30), the controller state cleared with all
+// mode set to 1 (fn_80092BA0), nothing loaded (UI_ResetLoadedFiles), the controller state cleared with all
 // four controllers enabled, the EA Trax display reset (fn_800B9FF0) and the pending UI messages
 // dropped (GameMsg_ClearPending).
 void UI_vInitModule(void) {
     s32 i;
 
     fn_80092BA0();
-    fn_8008EC30();
+    UI_ResetLoadedFiles();
     gUIState.n34 = 0;
     gUIState.n38 = 0;
     gUIState.b49 = 0;
@@ -685,7 +686,7 @@ void UI_ReportUISError(s32 nLevel, const char* szFile, s32 nLine, const char* sz
 void UI_ScreenDrawDebug(u16 uGroup, u16 uScreen, s32 n) {
 }
 
-// Resolve the open UI file's entries again (UI_ResolveFileEntries on gpFrontEnd), once fn_8008F294
+// Resolve the open UI file's entries again (UI_ResolveFileEntries on gpFrontEnd), once UI_RestoreMenuPictures
 // has brought the picture list back from ARAM.
 void UI_RefreshFileEntries(void) {
     UI_ResolveFileEntries(gpFrontEnd);

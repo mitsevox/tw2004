@@ -19,7 +19,7 @@ UIFileEntry* fn_80090940(int nEntry) {
     UIFileEntry* pEntry;
     UIMovieData* pData;
 
-    fn_8008F294();
+    UI_RestoreMenuPictures();
     pEntry = gpFrontEnd->pFile->p8->apTables[gUIState.n3C]->apEntries[nEntry];
     pData = pEntry->p4;
     pEntry->p8 = (u8*)fn_8002FD00(pData->aData, pData->uSize);

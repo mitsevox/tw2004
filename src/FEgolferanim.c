@@ -619,7 +619,7 @@ void FE_vUpdateGolferAll(void) {
 
     fBlend = 1.0f;
     pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
-    fn_8008F24C();
+    UI_FreeMenuPictures();
     SKN_BeginFrame();
     for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
         if (gpCrAPState->aGolfer[i].bFree || gpCrAPState->bClearCache) {

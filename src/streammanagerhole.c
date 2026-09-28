@@ -57,8 +57,8 @@ void fn_80046130();
 void fn_80046174();
 void SitDev_vRegisterStreamClients();
 void SitDev_vUnregisterStreamClients();
-void fn_8008EC68();
-void fn_8008ED28();
+void UI_RegisterStreamClients();
+void UI_UnregisterStreamClients();
 void MC_RegisterStreamClients();
 void MC_UnRegisterStreamClients();
 void fn_800A295C();
@@ -217,7 +217,7 @@ void fn_80014590(void) {
 void fn_80014594(void) {
     fn_80010284();
     fn_80039454();
-    fn_8008EC68();
+    UI_RegisterStreamClients();
     fn_80046130();
     Character_RegisterClubStreamClientIG();
     Skalib_Register();
@@ -232,7 +232,7 @@ void fn_80014594(void) {
 void fn_800145E0(void) {
     fn_800102B4();
     fn_800394AC();
-    fn_8008ED28();
+    UI_UnregisterStreamClients();
     fn_80046174();
     Character_UnregisterClubStreamClient();
     Skalib_Unregister();
@@ -258,7 +258,7 @@ void fn_80014668(void) {
     Character_RegisterClubStreamClientFE();
     Skalib_Register();
     MtaLib_Register();
-    fn_8008EC68();
+    UI_RegisterStreamClients();
     fn_800394F0();
     FE_lite_vRegisterStreamClients();
     fn_800B9944();
@@ -277,7 +277,7 @@ void fn_800146C4(void) {
     Character_UnregisterClubStreamClient();
     Skalib_Unregister();
     MtaLib_Unregister();
-    fn_8008ED28();
+    UI_UnregisterStreamClients();
     fn_80039520();
     fn_8000BA14();
     fn_800B9988();
@@ -324,7 +324,7 @@ void fn_800147A4(void) {
 
 void fn_800147D4(void) {
     fn_80010284();
-    fn_8008EC68();
+    UI_RegisterStreamClients();
     MC_RegisterStreamClients();
     fn_800B160C();
     fn_80014864();
@@ -332,7 +332,7 @@ void fn_800147D4(void) {
 
 void fn_80014804(void) {
     fn_800102B4();
-    fn_8008ED28();
+    UI_UnregisterStreamClients();
     MC_UnRegisterStreamClients();
     fn_800B1644();
     fn_800148A8();

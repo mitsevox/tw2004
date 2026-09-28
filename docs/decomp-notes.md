@@ -432,7 +432,7 @@ They will be sorted into the sections below.
   SKN_SwapDesc 16 -> 7. The same for a value: `eLayout` read through `static inline u16 ReadU16(u16* p,
   int i)` moved r27 -> r31 (ShaderObjectsData fn_80074628 exact). Mark each `// fake match:`.
 - **[verified] `a[i] = a[i] + base` with value and offset in each other's registers:** three statements
-  through a local, `x = a[i]; x += base; a[i] = x;` (uiLoadFile fn_8008EFC0 97.67 -> 100, fn_8008EFFC).
+  through a local, `x = a[i]; x += base; a[i] = x;` (uiLoadFile UI_RelocatePictureList 97.67 -> 100, UI_StreamLoadFonts).
 - **[verified] A one-line float product in the wrong multiply order:** one multiply per statement with
   `*=` (PlaceBall_UpdateMomentums exact).
 - **[verified] How the calls before a loop are written can change how the loop unrolls:** TARGET_Init

@@ -200,9 +200,9 @@ void  fn_8010A668(void* p);
 void  fn_80008380(void);
 void  fn_800106AC(int n);               // LLTexGrp.c
 void  fn_800106B8(u8 b);                // LLTexGrp.c
-void  fn_8008F310(void);                // uiLoadFile.c: park the UI file's data in ARAM
-void* fn_8008F354(void);                // uiLoadFile.c: the UI file's buffer
-void  fn_8008F35C(void);                // uiLoadFile.c: bring the UI file's data back
+void  UI_ParkFileInAram(void);                // uiLoadFile.c: park the UI file's data in ARAM
+void* UI_GetFileBuffer(void);                // uiLoadFile.c: the UI file's buffer
+void  UI_RestoreFileFromAram(void);                // uiLoadFile.c: bring the UI file's data back
 void  fn_801141F8(struct DynChain* pChain, CharModel* pModel);                         // DynChain.c
 void  fn_80035600(void);                // GoTerrain.c
 void  fn_80035604(void);                // GoTerrain.c
@@ -2843,8 +2843,8 @@ void Character_GolferStreamCallbackFE(UStreamObject* pObject) {
 
     StaticMem_ResetCount();
     StaticMem_StartCount();
-    fn_8008F310();
-    pCopy = fn_8008F354();
+    UI_ParkFileInAram();
+    pCopy = UI_GetFileBuffer();
     Mem_cpy(pCopy, pObject, pObject->uSize + 0x80);
     StaticMem_Free(pObject);
     pCopy->pData = (u8*)pCopy + 0x80;
@@ -2852,7 +2852,7 @@ void Character_GolferStreamCallbackFE(UStreamObject* pObject) {
     StaticMem_StopCount();
     StaticMem_GetCount();
     Character_LoadTextures(gpCrAPState->pB8->pChar, NULL, 0);
-    fn_8008F35C();
+    UI_RestoreFileFromAram();
     gpCrAPState->pB8->pChar->nPlays = -1;
     Character_SetPosition(gpCrAPState->pB8->pChar, gFEGolferPos, 1);
     Character_SetOrientation(gpCrAPState->pB8->pChar, gpCrAPState->fFacing);
