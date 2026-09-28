@@ -44981,5 +44981,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "015ef76",
+"sha": "015ef764351f3d483c69e173e05f57c9d5d6bc54",
+"time": 1790637586,
+"subject": "fe_movies.c, Code80090940.c, uiText.c, uiArc.c, uiobject.c, Trax.c: rq4 hand edits (headers naming EA's uiProcessPolygon.c / uiObject.c / uiEATrax.c, globals' comments, parameters; replayed); Code80090940.c's references refreshed",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
