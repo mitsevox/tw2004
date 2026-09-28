@@ -79,7 +79,7 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
                                    SkinChoices* pChoices);
 CharSkinSet* Character_CreateClubSkinSet(u8* pData);
 Character* Character_Create(void);
-s32   fn_800962F8(Character* pChar);                            // CharAnim.c
+s32   CharacterState_ResetFidgetState(Character* pChar);                            // CharAnim.c
 void  Character_SetSkin(Character* pChar, Skin* pSkin);
 void  Character_SetPreferedPos(Character* pChar);
 void  ClipBank_Restore(int nSlot);                  // skalib.c
@@ -125,8 +125,8 @@ void  SKEL_PreTransformIKSkeleton(CharModel* pModel);                           
 void  SKEL_PostTransformIKSkeleton(Character* pChar);                            // Skeleton.c
 void  SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform);   // Skeleton.c
 void  fn_80037C48(Skin* pSkin, SkelPose* pPose);                // Skin.c
-void  fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);                  // CharAnim.c
-void  fn_80096F0C(Character* pChar);                            // CharAnim.c
+void  CharacterState_PlayClipMorphs(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);                  // CharAnim.c
+void  CharacterState_UpdateMorphState(Character* pChar);                            // CharAnim.c
 void  Quat_QuatToMatrix(f32* pQ, f32 (*m)[4]);                        // Quaternion.c: a rotation matrix
 int   Character_UpdateClubAttachment(Character* pChar, Clip* pClip);
 void  Quat_Invert(f32* pQ, f32* pOut);                          // Quaternion.c
@@ -136,7 +136,7 @@ void  Char_Vec4Sub(f32* pA, f32* pB, f32* pOut);
 void  Character_BeginLoadTexturesCallbackIG(Character* pChar);
 void  Character_RequestClothesUpdateIG(int n);
 void  fn_8010B098(void* pModel);                                // LLDynTex.c
-void  fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f);            // CharAnim.c
+void  CharacterState_SetTransition(AnimPlayer* pAnim, s32 n, f32 f);            // CharAnim.c
 void  Quat_ExtractEulerAngles(f32* pQ, f32* pA, f32* pB, f32* pC);          // Quaternion.c: a rotation as angles
 void  SKEL_InitHalfJoints(CharModel* pModel, SkelPose* pPose);          // Skeleton.c
 void  mat44flt_Invert(f32 (*pSrc)[4], f32 (*pDst)[4]);              // UMemPool.c
@@ -565,7 +565,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
         if (pChar->uFlags & 0x1000) {
             pChar->uFlags &= ~0x1000;
             if (pChar->pCurClip != NULL && pChar->pCurClip->pF4 != NULL) {
-                fn_8009622C(pChar, pChar->pCurClip->pF4, 0, 0.5f);
+                CharacterState_PlayClipMorphs(pChar, pChar->pCurClip->pF4, 0, 0.5f);
             }
         }
     }
@@ -576,7 +576,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     if (Character_IsGolfer(pChar)) {
         CharacterState_UpdateSKAState(pChar);
         if (!gSession.b11) {
-            fn_80096F0C(pChar);
+            CharacterState_UpdateMorphState(pChar);
         }
     }
     if (pChar->pModel->pSkel != NULL) {
@@ -1136,7 +1136,7 @@ Character* Character_Create(void) {
     pChar->n1784 = -1;
     pChar->nView = 0;
     pChar->pRecords = NULL;
-    fn_800962F8(pChar);
+    CharacterState_ResetFidgetState(pChar);
     pChar->n16DC = 0;
     pChar->f165C = pChar->f1660 = 1073741824.0f;
     pChar->pCurClip = NULL;
@@ -2252,7 +2252,7 @@ int Character_UpdateClubAttachment(Character* pChar, Clip* pClip) {
 // (Character_UpdateClubAttachment). With bNoBlend the blend tree and the animation player start
 // over; otherwise the clip is blended in over its first f18 seconds from the current time plus
 // fTime. Its SKA tags then start at the blend's start, and the clip's pF4 animation plays too
-// (fn_8009622C).
+// (CharacterState_PlayClipMorphs).
 void Character_PlayClip(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) {
     f32 aBlend[6];
     SKABlendNode* pNode;
@@ -2303,7 +2303,7 @@ void Character_PlayClip(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) 
     pAnim->fEnd = pNode->fEnd;
     Character_InitSKATags(pChar, pClip, aBlend[3]);
     if (pClip != NULL && pClip->pF4 != NULL) {
-        fn_8009622C(pChar, pClip->pF4, bNoBlend, fTime);
+        CharacterState_PlayClipMorphs(pChar, pClip->pF4, bNoBlend, fTime);
     }
     pChar->pCurClip = pClip;
     fn_801141F8(pChar->pModel->pF0, pChar->pModel);
@@ -2714,7 +2714,8 @@ void Character_SetupForShot(Character* pChar) {
         SKEL_InitIKSkeleton(pChar, vPos, bPlace);
         pChar->pModel->pSkel->n1130 = pChar->nClipKey;
         pChar->pModel->pSkel->n112C = pChar->nClubClass;
-        if (((pChar->n20 == 5 || pChar->nAnim == 5) && fn_8009637C(pChar)) || pChar->n20 == 7) {
+        if (((pChar->n20 == 5 || pChar->nAnim == 5) && CharacterState_IsNotFidgeting(pChar)) || pChar->n20
+            == 7) {
             SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 1.0f);
         } else {
             SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 0.0f);
@@ -3041,10 +3042,10 @@ void Character_ResetBlenders(Character* pChar) {
     fn_80071F58(&pNode, 0);
     fn_80071C28(&pNode, 1, 1, fn_80072ACC, 1);
     fn_800725BC(pNode, fn_80072ACC, 0.5f);
-    fn_800958EC(&pChar->anim29C, 0, 0.0f);
+    CharacterState_SetTransition(&pChar->anim29C, 0, 0.0f);
     pChar->n2C = 0;
     pChar->n30 = 0;
-    fn_800958EC((AnimPlayer*)pChar->anim, 0, 0.0f);
+    CharacterState_SetTransition((AnimPlayer*)pChar->anim, 0, 0.0f);
     pChar->nAnim = 0;
     pChar->n20 = 0;
     pChar->n18 = 0;

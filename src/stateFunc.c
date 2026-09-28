@@ -209,7 +209,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
     GameEffects_ResetGameEffectSettings();
     fn_800D8D10(nPlayer);
     TARGET_ResetMomentums(nPlayer);
-    fn_800957FC(gPlayers[nPlayer].pChar, 1);
+    CharacterState_ResetMorphState(gPlayers[nPlayer].pChar, 1);
     Emotion_UpdatePlayerEmotion(nPlayer);
     if (gPlayers[nPlayer].pChar->n2C == 0) {
         fn_800957B0(gPlayers[nPlayer].pChar, 1);
@@ -414,7 +414,7 @@ void STATEFUNC_ShotSetupInit(int nPlayer) {
     }
     if (gPlayers[nPlayer].pChar->n2C == 4 ||
         gPlayers[nPlayer].pChar->n2C == 5) {
-        fn_800957FC(gPlayers[nPlayer].pChar, 1);
+        CharacterState_ResetMorphState(gPlayers[nPlayer].pChar, 1);
         fn_800957B0(gPlayers[nPlayer].pChar, 1);
     }
     Physics_InitShotData(pBall);

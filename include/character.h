@@ -394,7 +394,7 @@ void fn_800725BC(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 fWeight);
 f32  fn_80072938(SKABlendNode* pNode);  // animblender.c: the latest end time under pNode
 // animblender.c: pNew plays pClip (a Clip, or an MtaLib from a MAL bank for a format 1 node).
 void fn_800724C0(SKABlendNode* pNode, SKABlendNode* pNew, void* pClip, f32 fWeight);
-// animblender.c: blend pNew into *ppNode over the window pBlend (six floats, fn_800958F8).
+// animblender.c: blend pNew into *ppNode over the window pBlend (six floats, SKABlend_CalculateBlendInfo).
 void fn_800720C8(struct Character* pChar, SKABlendNode* pNew, SKABlendNode** ppNode, f32* pBlend,
                  SKABlendFn pfnBlend, int b);
 
@@ -488,7 +488,7 @@ typedef struct AnimPlayer {
     s32   n00;                  // 0x00  } reset to 0 and -1 by Character_PlayClip
     s32   uFlags;               // 0x04  fn_8007325C sets bit 2, SKATime_UnPause clears bits 1 and 2
     s32   n08;                  // 0x08  }
-    s32   nC;                   // 0x0C  } set together by fn_800958EC
+    s32   nC;                   // 0x0C  } set together by CharacterState_SetTransition
     f32   f10;                  // 0x10  }
     f32   f14;                  // 0x14  1 after fn_80072D90; fn_800737B4 scales its time step by it
     f32   fTime;                // 0x18
@@ -557,7 +557,7 @@ typedef struct Character {
     s8    n25;                  // 0x025  }
     s8    n26;                  // 0x026  set while that update's clip plays
     u8    unk27;
-    s32   u28;                  // 0x028  bit 0: a state change is waiting (fn_80096F0C)
+    s32   u28;                  // 0x028  bit 0: a state change is waiting (CharacterState_UpdateMorphState)
     s32   n2C;                  // 0x02C  tested for 0 (PreShotInit) and for 4 or 5 (ShotSetupInit)
     s32   n30;                  // 0x030
     s32   nSlot;                // 0x034  the animation slot it uses (skalib); the CrAP camera's shot names
@@ -601,7 +601,7 @@ typedef struct Character {
                                 //        it with cmpwi
     s32   n16C;                 // 0x16C  set to -1 by Character_GolferStreamCallbackFE
     s32   n170;                 // 0x170  } the state queued for when fAnimTime reaches f174
-    f32   f174;                 // 0x174  }   (CharacterState_UpdateSKAState; fn_800958EC sets both)
+    f32   f174;                 // 0x174  }   (CharacterState_UpdateSKAState; CharacterState_SetTransition sets both)
     u8    unk178[0x17C - 0x178];
     f32   fAnimTime;            // 0x17C
     f32   f180;                 // 0x180  Character_AlignCharacterForShotImpact: fAnimTime = f180 + the blend's time - v1638[1]
@@ -670,7 +670,7 @@ typedef struct Character {
     f32   afGroundHeight[4];    // 0x1774  }
     s32   n1784;                // 0x1784  set to -1 by Character_SetPosition
     Clip* pCurClip;             // 0x1788  the clip Char_SetClip picked
-    struct MtaLib* p178C;       // 0x178C  the MAL library the second player plays (fn_80095FD0);
+    struct MtaLib* p178C;       // 0x178C  the MAL library the second player plays (CharacterState_AddMorphBlendData);
                                 //         cleared by Character_PlayClip
     Clip* p1790;                // 0x1790  cleared by fn_80062BFC; CharacterState_AddSKABlendData plays it for
                                 //         groups 5, 6 and 10
@@ -835,7 +835,7 @@ void  SKEL_SetDefaultWorld2BoneMatrices(CharModel* pModel, f32 (*pMatrices)[4][4
 void  SKEL_UpdateSkinningMatrix(CharModel* pModel, f32 (*pMtx)[4], int nBone);
 void  SKEL_UpdateAllSkinningMatrices(CharModel* pModel);
 int   fn_80048574(Character* pChar, u64 uEvent);    // the character's animation has event uEvent
-u8    fn_8009637C(Character* pChar);    // CharAnim.c: n26 is not 1 (both callers mask the result)
+u8    CharacterState_IsNotFidgeting(Character* pChar);    // CharAnim.c: n26 is not 1 (both callers mask the result)
 void  fn_80072ACC(SKABlendNode* pNode, CharModel* pModel, f32 fTime);
 f32   fn_80072CB8(SKABlendNode* pNode, u64 uEvent); // an event's time in a blend tree
 void  SKATime_Update(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT);    // advance a player
@@ -848,7 +848,7 @@ int   fn_80095780(Character* pChar);    // n20 (-1 for NULL); fn_80095798 reads 
 int   fn_80095798(Character* pChar);
 void  fn_800957B0(Character* pChar, int a);
 void  fn_800957D8(Character* pChar);
-void  fn_800957FC(Character* pChar, u8 bReset);   // CharAnim.c: reset the second player's state
+void  CharacterState_ResetMorphState(Character* pChar, u8 bReset);   // CharAnim.c: reset the second player's state
 void  CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKABlendFn pfnBlend, int nC,
                                      int nAnim, f32 fStart, f32 fFrom, f32 fTo, f32 fOffset, f32 fTime);
 void  CharacterState_SetTapInState(Character* pChar);
@@ -1108,7 +1108,7 @@ typedef struct MtaLib {
     u8     unk00[0x14];
     s32    nBytes;              // 0x14  the library's size (fn_8001F804 allocates it)
     u8     unk18[4];
-    f32    f1C;                 // 0x1C  its end time (fn_80095FD0 plays it up to this)
+    f32    f1C;                 // 0x1C  its end time (CharacterState_AddMorphBlendData plays it up to this)
     s32    nRecords;            // 0x20
     u8     unk24[0x30 - 0x24];
     MtaRecord* pRecords;        // 0x30

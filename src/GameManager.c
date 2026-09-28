@@ -555,7 +555,7 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     }
     fn_800C70F8(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 1);
     fn_800957D8(gPlayers[nPlayer].pChar);
-    fn_800957FC(gPlayers[nPlayer].pChar, 1);
+    CharacterState_ResetMorphState(gPlayers[nPlayer].pChar, 1);
     GOLFERSTATE_Switch(GS_SWING, nPlayer);
     GUI_ToggleUI(nPlayer, 1);
     ViewController_GetIndexedViewController(gPlayers[nPlayer].nView[0])->bFlagOut = 1;
@@ -769,7 +769,7 @@ void GM_RestartHole(void) {
         fn_800C6C8C();
         for (i = 0; i < gSession.nNumPlayers; i++) {
             fn_800957D8(PLAYER(i)->pChar);
-            fn_800957FC(PLAYER(i)->pChar, 1);
+            CharacterState_ResetMorphState(PLAYER(i)->pChar, 1);
         }
         fn_800E5714(2);
     }

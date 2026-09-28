@@ -1030,7 +1030,7 @@ void fn_8008D058(void) {
     case 0:
         lbl_80281EE0->f19C = 0.0f;
         lbl_80281EE0->f1A0 = 0.0f;
-        fn_800957FC(lbl_80281EE0->pB4->pChar, 1);
+        CharacterState_ResetMorphState(lbl_80281EE0->pB4->pChar, 1);
         fn_800957B0(lbl_80281EE0->pB4->pChar, 1);
         Character_SelectClub(lbl_80281EE0->pB4->pChar, 5);
         pClip = Char_SetClip(lbl_80281EE0->pB4->pChar, 0, 0, NULL);
@@ -1055,7 +1055,7 @@ void fn_8008D058(void) {
         lbl_80281EE0->f19C = 0.0f;
         lbl_80281EE0->f1A0 = 0.0f;
         fn_8008EA44(FE_GetCurrentProfile()->choices.n113);
-        fn_800957FC(lbl_80281EE0->pB4->pChar, 1);
+        CharacterState_ResetMorphState(lbl_80281EE0->pB4->pChar, 1);
         fn_800957B0(lbl_80281EE0->pB4->pChar, 1);
         Character_SelectClub(lbl_80281EE0->pB4->pChar, 3);
         pClip = Char_SetClip(lbl_80281EE0->pB4->pChar, 0, 0, NULL);
@@ -1101,7 +1101,7 @@ void fn_8008D058(void) {
     case 2:
         lbl_80281EE0->f19C = 0.0f;
         lbl_80281EE0->f1A0 = 0.0f;
-        fn_800957FC(lbl_80281EE0->pB4->pChar, 1);
+        CharacterState_ResetMorphState(lbl_80281EE0->pB4->pChar, 1);
         fn_800957B0(lbl_80281EE0->pB4->pChar, 1);
         Character_SelectClub(lbl_80281EE0->pB4->pChar, 3);
         pClip = Char_SetClip(lbl_80281EE0->pB4->pChar, 0, 0, NULL);
