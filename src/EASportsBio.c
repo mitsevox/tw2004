@@ -52,9 +52,9 @@ void EASBio_InitOnce(void) {
     lbl_80261040.pCallbacks = SFIO_spGetCallbacks();
     lbl_80261040.uHeapID = 0;
     lbl_80261040.uGamesPlayedTypeLanguage = 'en';
-    fn_8000A0AC(0);
+    StaticMem_SetMode(0);
     fn_8012D394(&lbl_80261040);
-    fn_8000A0AC(2);
+    StaticMem_SetMode(2);
     lbl_80281988->bNewAccomplishment = 0;
     lbl_80281988->bBioLoaded = 0;
     fn_8012DAB8(2);

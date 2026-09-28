@@ -2694,16 +2694,16 @@ void fn_8001D020(UStreamObject* pObject) {
     Character* pChar;
     Clip* pClip;
 
-    fn_8000A0BC();
-    fn_8000A0C8();
+    StaticMem_ResetCount();
+    StaticMem_StartCount();
     fn_8008F310();
     pCopy = fn_8008F354();
     Mem_cpy(pCopy, pObject, pObject->uSize + 0x80);
     StaticMem_Free(pObject);
     pCopy->pData = (u8*)pCopy + 0x80;
     lbl_80281EE0->pB8->pChar = fn_8001A9F4(pCopy->pData, 0, 0, pCopy->uId, 0, NULL);
-    fn_8000A0D4();
-    fn_8000A0E0();
+    StaticMem_StopCount();
+    StaticMem_GetCount();
     fn_80019798(lbl_80281EE0->pB8->pChar, NULL, 0);
     fn_8008F35C();
     lbl_80281EE0->pB8->pChar->n16C = -1;

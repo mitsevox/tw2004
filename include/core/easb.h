@@ -166,7 +166,7 @@ extern EASBState* lbl_802825B8;
 
 // TibExt.c: the library's memory and clock glue.
 // The library's allocator (TW06's signatures). The heap id is not used: the game's current heap
-// (fn_8000A0B4) is.
+// (StaticMem_GetMode) is.
 void* TibExtMemAlloc(u32 uHeapID, u32 uSize, u32 uAlign);
 void TibExtMemFree(u32 uHeapID, void* p, u32 uSize, u32 uAlign);
 u32 TibExtCurrentTimeGet(void);     // the real-time clock, in seconds since 1970

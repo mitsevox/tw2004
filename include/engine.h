@@ -19,12 +19,12 @@ int   fn_80005BC8(const void* pA, const void* pB, u32 uLen);   // memcmp
 // Allocates (StaticMemory.c): nMode picks the system heap or a part of the static heap (see there).
 void* StaticMem_Alloc(int nSize, int nMode, int nAlign, const char* pFile, int nLine);
 void  StaticMem_Free(void* p);             // free
-void  fn_8000A0AC(s32 v);               // } a value TibExtMemAlloc passes on as StaticMem_Alloc's nMode
-s32   fn_8000A0B4(void);                // } (EASportsBio.c sets 0 while the Bio starts, then 2)
-void  fn_8000A0BC(void);                // start a new count of the bytes taken
-void  fn_8000A0C8(void);                // } counting on / off
-void  fn_8000A0D4(void);                // }
-s32   fn_8000A0E0(void);                // the bytes taken since fn_8000A0BC
+void  StaticMem_SetMode(s32 v);               // } a value TibExtMemAlloc passes on as StaticMem_Alloc's nMode
+s32   StaticMem_GetMode(void);                // } (EASportsBio.c sets 0 while the Bio starts, then 2)
+void  StaticMem_ResetCount(void);                // start a new count of the bytes taken
+void  StaticMem_StartCount(void);                // } counting on / off
+void  StaticMem_StopCount(void);                // }
+s32   StaticMem_GetCount(void);                // the bytes taken since StaticMem_ResetCount
 // The main-memory heap (GoShaderObject_Particle_Gc.c): fn_80095108 makes it from the arena.
 // fn_800951A0 returns a block aligned to nAlign (0: 16) that remembers the heap block and its
 // own padding just before and after it (every caller passes 1 as n, which it does not read).

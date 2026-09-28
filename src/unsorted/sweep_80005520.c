@@ -8,7 +8,7 @@ void fn_80005580();
 void fn_80005EC0();
 void fn_800071BC();
 void fn_800097C8();
-void fn_800097CC();
+void StaticMem_Init();
 void fn_8000AF20();
 void fn_8000B984();
 void fn_80012FA0();
@@ -30,7 +30,7 @@ void fn_80005520(void) {
     GoARAM_Init();
     fn_8000AF20();
     fn_8000B984();
-    fn_800097CC();
+    StaticMem_Init();
     fn_80005EC0();
     fn_80012FA0();
     UStream_AllocBuffers();

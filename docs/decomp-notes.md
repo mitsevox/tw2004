@@ -168,7 +168,7 @@ They will be sorted into the sections below.
   first; for arguments, `f(g(), h())` calls `h()` first. To call in source order, use a temporary.
   CourseData fn_800D2F00, sweep_800D3208 (99.87 -> 100).
 - **[verified] `x = f(); if (x == NULL) { while (x == NULL) {...} }` gives CodeWarrior's "test the result,
-  then jump to the loop test" shape** (`cmplwi r3,0; bne end; b test`). StaticMemory fn_800097CC 96.15 ->
+  then jump to the loop test" shape** (`cmplwi r3,0; bne end; b test`). StaticMemory StaticMem_Init 96.15 ->
   100 (mark it `// fake match` if the outer `if` is redundant in the source).
 - **[verified] A count-down fill `n = count; i = 0; while (n-- > 0) a[i++] = v;` gives
   `cmpwi n,0; ble; srwi. n,3; mtctr ... andi. 7`.** A `for (i = 0; i < n; i++)` gives `cmpwi n,8; subi`

@@ -6,7 +6,7 @@ void UStream_FreeBuffers();
 void fn_800055D4();
 void fn_800060DC();
 void fn_8000724C();
-void fn_8000977C();
+void StaticMem_Shutdown();
 void fn_8000AF58();
 void fn_80013030();
 void fn_80014590();
@@ -20,7 +20,7 @@ void fn_80005590(void) {
     UStream_FreeBuffers();
     fn_800060DC();
     fn_80013030();
-    fn_8000977C();
+    StaticMem_Shutdown();
     fn_8000AF58();
     GoARAM_Shutdown();
     fn_800B5C34();

@@ -36,7 +36,7 @@ TibExtCard lbl_80260D88;
 TibExtCard* lbl_80281970 = &lbl_80260D88;
 
 void* TibExtMemAlloc(u32 uHeapID, u32 uSize, u32 uAlign) {
-    return StaticMem_Alloc(uSize, fn_8000A0B4(), uAlign, "TibExt.c", 42);
+    return StaticMem_Alloc(uSize, StaticMem_GetMode(), uAlign, "TibExt.c", 42);
 }
 
 void TibExtMemFree(u32 uHeapID, void* p, u32 uSize, u32 uAlign) {

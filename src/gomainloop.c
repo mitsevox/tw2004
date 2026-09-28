@@ -26,7 +26,7 @@ void fn_800080D4(void);
 void fn_800081C4(void);
 void fn_80008380(void);
 void fn_800083A0(void);
-void fn_8000989C(void);
+void StaticMem_Reset(void);
 void fn_80009918(void);
 void fn_8000F060(void);
 void fn_8000F0E8(void);
@@ -401,7 +401,7 @@ void fn_8006C6F0(void) {
 }
 
 void fn_8006C720(void) {
-    fn_8000989C();
+    StaticMem_Reset();
     fn_8002E258();
     fn_80076E48();
     fn_800763B4();
@@ -431,7 +431,7 @@ void fn_8006C7A8(void) {
     u32 uSeed;
 
     REPLAY_Init();
-    fn_8000989C();
+    StaticMem_Reset();
     fn_800B5C38();
     fn_800080D4();
     fn_8000B46C();
