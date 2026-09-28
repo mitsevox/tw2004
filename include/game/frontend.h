@@ -145,7 +145,7 @@ typedef struct MsgString {
 // values, and where its answers go (an int or float, or a string to fill in).
 typedef void (*MsgHandler)(MsgArg* pArgs, MsgArg* pResult);
 
-void GM_vSetupPlayers(MsgArg* pArgs, MsgArg* pResult);  // FE_MessageTable.c: fn_80079AD4 (DiscCheck.c
+void GM_vSetupPlayers(MsgArg* pArgs, MsgArg* pResult);  // FE_MessageTable.c: FE_vExitUI (DiscCheck.c
                                         // calls it directly, with no values)
 
 // Messages to a front-end handler (FrontEnd.pHandler) go through UISDoHint (UISScreen.c; its

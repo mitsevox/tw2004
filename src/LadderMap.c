@@ -48,7 +48,7 @@ u8 LadderMap_IsWorldRegion(int nRegion) {
 // Whether the current profile has won the region: the events of its three nodes nRegion * 3 to
 // nRegion * 3 + 2 (its fourth event does not count), or event 24 for the World region (6).
 u8 LadderMap_HasWonRegion(int nRegion) {
-    int nProfile = fn_80077B08();
+    int nProfile = FE_GetCurrUserID();
 
     if (LadderMap_IsWorldRegion(nRegion)) {
         return GameMode4_HasWonEvent(nProfile, 24);
@@ -65,7 +65,7 @@ u8 LadderMap_HasWonAllButFinal(void) {
     int i;
     u8 bWon = 1;
 
-    nProfile = fn_80077B08();
+    nProfile = FE_GetCurrUserID();
     for (i = 0; i < 24; i++) {
         if (!GameMode4_HasWonEvent(nProfile, i)) {
             bWon = 0;
@@ -81,7 +81,7 @@ int LadderMap_GetNodeState(int nNode) {
     int nProfile;
     int nEvent = gLadderNodeEvents[nNode];
 
-    nProfile = fn_80077B08();
+    nProfile = FE_GetCurrUserID();
     if (!LadderMap_IsNodeShown(nNode)) return -1;
     if (LadderMap_IsWorldFinalNode(nNode)) {
         if (GameMode4_HasWonEvent(nProfile, nEvent)) return 1;
@@ -209,7 +209,7 @@ int LadderMap_FindNearestMarkedNode(u8* abCandidate) {
 // Whether the current profile may play the event: not won yet, and every event it needs is won.
 u8 LadderMap_IsEventPlayable(int nEvent) {
     int b;
-    int nProfile = fn_80077B08();
+    int nProfile = FE_GetCurrUserID();
 
     b = 0;
     if (!GameMode4_HasWonEvent(nProfile, nEvent) && GameMode4_IsEventOpen(nProfile, nEvent)) {

@@ -932,7 +932,7 @@ void FE_CrAP_LoadStringsFromStream(UStreamObject* pObject) {
 // With the assets loaded: index the parts and pick the day's random assets.
 void FE_CrAP_PostAssetsLoad(void) {
     FE_CrAP_SetupFirstAssetIDs();
-    fn_80077B78();
+    FE_SetupSaleInfo();
 }
 
 // The name of choice i under entry b of a part's list, as the part picker shows it (NULL: no such
@@ -1073,7 +1073,7 @@ int FE_CrAP_GetPartAttributeModifier2ByAssetID(int nAsset) {
 
 // How choice i under entry b of a part's list is unlocked: its lock kind (2: a Game Boy Advance
 // link, 12: an EA Sports Bio level, 17: an event's reward; 28: it shares another asset's attributes
-// instead), -1 when there is no such choice. fn_80078008 tests the kinds.
+// instead), -1 when there is no such choice. FE_CrAP_IsItemLocked tests the kinds.
 s8 FE_CrAP_GetPartGMLockID(s16 nPart, int b, int i) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
@@ -1879,7 +1879,7 @@ void FE_CrAP_GetSponsorName(s16 n, char* pDst) {
     strcpy(pDst, lbl_801935C8[n]);
 }
 
-// Count a part's assets offered for the current gender: the locked ones (fn_80078008), the owned
+// Count a part's assets offered for the current gender: the locked ones (FE_CrAP_IsItemLocked), the owned
 // ones (aAssetOwned), those with their aAssetNew bit set (TW07 counts new ones here) and all of
 // them.
 void FE_CrAP_GetCategoryInfo(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s32* pAll) {
@@ -1899,7 +1899,7 @@ void FE_CrAP_GetCategoryInfo(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s3
             if (BitArray_TestBit(pProfile->aAssetNew, i)) {
                 *pB344 += 1;
             }
-            if (fn_80078008(i, pProfile)) {
+            if (FE_CrAP_IsItemLocked(i, pProfile)) {
                 *pLocked += 1;
             }
             *pAll += 1;

@@ -74,7 +74,7 @@ void Session_Init(void) {
 
 // Fill each player's profile from their golfer: a created golfer's from the save, the two
 // default golfers' from a fixed name, a pro's ball type from their SPIN rating (0 for the golfers
-// fn_80077B18 picks).
+// FE_bIsLicensedGolfer picks).
 void Session_SetupProfiles(void) {
     Session* pSession = &gSession;
     int      i, j;
@@ -100,7 +100,7 @@ void Session_SetupProfiles(void) {
             SKA_PackName(&gSession.aProfile[i].aNames[0], lbl_80187650[2]);
             gSession.aProfile[i].n2        = 0;
             gSession.aProfile[i].nBallType = 0;
-        } else if (fn_80077B18(nGolfer)) {
+        } else if (FE_bIsLicensedGolfer(nGolfer)) {
             gSession.aProfile[i].n2        = 0;
             gSession.aProfile[i].nBallType = 0;
         } else {

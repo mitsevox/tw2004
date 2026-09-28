@@ -192,8 +192,8 @@ Functions still unnamed or named from TW06:
 | `80073108` | `fn_80073108` | `SKATime_Idle` | medium | PS2 anchor(1)+graph |
 | `80076400` | `fn_80076400` | `CA_spCreateCamera` | medium | PS2 nbr(r1,2) |
 | `800768E0` | `fn_800768E0` | `CA_vUpdateInternalFieldOfViewData` | medium | PS2 nbr(r2,2) |
-| `80077A80` | `fn_80077A80` | `FE_spGetGolfer` | medium | PS2 calls(r0,1) |
-| `80078A2C` | `fn_80078A2C` | `FE_CrAP_RandomizeCategoryWithUndesirableTest` | medium | Xbox nbr(r1,2) |
+| `80077A80` | `FE_spGetGolfer` | `FE_spGetGolfer` | medium | PS2 calls(r0,1) |
+| `80078A2C` | `FE_CrAP_RandomizeCategoryWithUndesirableTest` | `FE_CrAP_RandomizeCategoryWithUndesirableTest` | medium | Xbox nbr(r1,2) |
 | `80091EE8` | `fn_80091EE8` | `FE_movieFade` | medium | PS2 nbr(r0,2) |
 | `800954A4` | `fn_800954A4` | `TI_sReadCounter` | medium | PS2 calls(r0,1) |
 | `80096530` | `fn_80096530` | `CharacterState_UpdateGameEmotionState` | medium | PS2 calls(r0,1) |

@@ -54,15 +54,15 @@ void FE_vInitModule(void);
 void FE_vCloseModule(void);
 void FE_InitManager(void);
 void FE_CloseManager(void);
-void fn_80077C1C(int a, int b);
+void FE_CrAP_UpdateSaleInfo(int a, int b);
 u8   FE_CrAP_IsAssetUndesirable(s16 nPart, CrAPAsset* pAsset);
 u8   FE_CrAP_IsCrazyHairColor(CrAPAsset* pAsset);
 u8   FE_CrAP_IsCrazyHat(CrAPAsset* pAsset);
 u8   FE_CrAP_IsCrazyFaceHairColor(CrAPAsset* pAsset);
-void fn_80079974(void);
-void fn_80079D30(void);
-void fn_80079DAC(void);
-u8   fn_80079E44(int nAttr);            // a hidden attribute: ATTR_AGGRESSION, ATTR_IQ, ATTR_SPEED
+void FE_CrAP_EquipDefaults(void);
+void FE_MoveBackupsToARAM(void);
+void FE_RestoreBackupsFromARAM(void);
+u8   FE_IsHiddenAttribute(int nAttr);            // a hidden attribute: ATTR_AGGRESSION, ATTR_IQ, ATTR_SPEED
 
 // This file's globals (fe.h), each section in reverse address order as the compiler lays it out.
 FEState gFEState;
@@ -292,21 +292,21 @@ void FE_PlayTrophyBallHighlight(Replay* pReplay) {
 
 // Starts the front end (GO_vInitFE): the 'txf ' texture-group stream client (fn_80010284), the
 // menus' message table, the manager (FE_InitManager), the menu golfers' module, and the profile
-// backups back from ARAM (fn_80079DAC).
+// backups back from ARAM (FE_RestoreBackupsFromARAM).
 void FE_vInitModule(void) {
     fn_80010284();
     FE_InitGameMessages();
     FE_InitManager();
     FE_vInitFECharModule();
-    fn_80079DAC();
+    FE_RestoreBackupsFromARAM();
 }
 
 // Shuts the front end down (gomainloop fn_8006CB2C): the manager (FE_CloseManager: the created
 // golfers into the golfer table, the bios and the menus' profile freed), then the profile backups
-// out to ARAM (fn_80079D30).
+// out to ARAM (FE_MoveBackupsToARAM).
 void FE_vCloseModule(void) {
     FE_CloseManager();
-    fn_80079D30();
+    FE_MoveBackupsToARAM();
 }
 
 // Allocates the profile the menus work on (gpFEProfile), cleared: slot 0, the slot's own profile
@@ -336,7 +336,7 @@ void FE_InitManager(void) {
 
 // Closes the manager (FE_vCloseModule). First every player on a created golfer gets its save slot's
 // created golfer (gpSaveData[i].createdGolfer) copied over its golfer-table entry, keeping the
-// table's hidden attributes (fn_80079E44: aggression, IQ, speed) in both attribute blocks; TW07 has
+// table's hidden attributes (FE_IsHiddenAttribute: aggression, IQ, speed) in both attribute blocks; TW07 has
 // this part as FE_TransferUserStatsToGolferStats. Then the bios (FE_CharBios_FreeStreamMemory) and
 // the menus' profile (gpFEProfile) are freed.
 void FE_CloseManager(void) {
@@ -355,7 +355,7 @@ void FE_CloseManager(void) {
             }
             Mem_cpy(&gGolferTable[gSession.nGolfer[i]], &gpSaveData[i].createdGolfer, sizeof(GolferRecord));
             for (j = 0; j < NUM_ATTRS; j++) {
-                if (fn_80079E44(j)) {
+                if (FE_IsHiddenAttribute(j)) {
                     gGolferTable[gSession.nGolfer[i]].attr[j] = aAttr[j];
                     gGolferTable[gSession.nGolfer[i]].attrAlt[j] = aAttrAlt[j];
                 }
@@ -424,8 +424,9 @@ void FE_SwapBackupRows(int a, int b) {
     StaticMem_Free(pTemp);
 }
 
-// A golfer's record: a table golfer, or the profile's created golfer.
-GolferRecord* fn_80077A80(int nGolfer) {
+// Golfer nGolfer's record: its golfer-table entry, or for a created golfer (FIRST_CREATED_GOLFER
+// and up) the created golfer of the profile the menus work on (FE_GetCurrentProfile).
+GolferRecord* FE_spGetGolfer(int nGolfer) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     if (nGolfer < FIRST_CREATED_GOLFER) {
         return &gGolferTable[nGolfer];
@@ -444,12 +445,16 @@ SaveProfile* FE_GetCurrentProfile(void) {
     return &gpSaveData[gpFEProfile->nSlot];
 }
 
-int fn_80077B08(void) {
+// The player slot whose profile the menus work on (gpFEProfile->nSlot, the slot
+// FE_GetCurrentProfile reads when not on the working copy).
+int FE_GetCurrUserID(void) {
     return gpFEProfile->nSlot;
 }
 
-// A yes/no list over 0..28 (Golfer.c asks it); what it marks is not known yet.
-u8 fn_80077B18(int n) {
+// Whether golfer nGolfer is one of the 16 licensed golfers (ids 0, 1, 3, 4, 5, 7, 10, 11, 13, 14,
+// 18, 21, 22, 23, 24 and 28). Session_SetupProfiles gives them ball type 0 and the other golfers a
+// ball picked from their spin.
+u8 FE_bIsLicensedGolfer(int n) {
     if (n == 0 || n == 1 || n == 3 || n == 4 || n == 5 || n == 7 || n == 10 || n == 11 || n == 13 ||
         n == 14 || n == 18 || n == 21 || n == 22 || n == 23 || n == 24 || n == 28) {
         return 1;
@@ -457,17 +462,21 @@ u8 fn_80077B18(int n) {
     return 0;
 }
 
-void fn_80077B78(void) {
-    fn_80077C1C(-1, 0);
-    fn_80077C1C(-1, 1);
-    fn_80077C1C(-2, 0);
-    fn_80077C1C(-2, 1);
-    fn_80077C1C(-3, 0);
-    fn_80077C1C(-3, 1);
+// Picks today's sale items (FE_CrAP_UpdateSaleInfo) for the three sale categories (-1 clothes, -2
+// accessories, -3 clubs and balls) and both genders; run once the Create-A-Player assets are loaded
+// (FE_CrAP_PostAssetsLoad).
+void FE_SetupSaleInfo(void) {
+    FE_CrAP_UpdateSaleInfo(-1, 0);
+    FE_CrAP_UpdateSaleInfo(-1, 1);
+    FE_CrAP_UpdateSaleInfo(-2, 0);
+    FE_CrAP_UpdateSaleInfo(-2, 1);
+    FE_CrAP_UpdateSaleInfo(-3, 0);
+    FE_CrAP_UpdateSaleInfo(-3, 1);
 }
 
-// -1, -2, -3 to 0, 1, 2; anything else to 0.
-int fn_80077BDC(int n) {
+// A sale category (-1, -2 or -3) as the index 0, 1 or 2 of FEProfile's sale arrays; anything else
+// 0.
+int FE_GetSaleIDFromSaleCategory(int n) {
     switch (n) {
     case -1:
         return 0;
@@ -480,10 +489,14 @@ int fn_80077BDC(int n) {
     }
 }
 
-// For b and category a (-1, -2 or -3), seeded by today's date: one of the category's asset kinds
-// at random, then up to five different random assets of that kind that fit b (FE_CrAP_GetAssetGender gives
-// b or 2) and pass fn_80078008. Then the random stream is seeded from the clock again.
-void fn_80077C1C(int a, int b) {
+// Picks today's sale items for gender b and sale category a (-1 clothes: parts 0, 1, 2, 7; -2
+// accessories: 8, 19, 20; -3 clubs and balls: 12; anything else: nothing), seeded by today's date
+// (FE_DateToInt; 3081979 if that is 0): one of the category's parts at random, then up to five
+// different assets of that part for gender b (or either, gender 2) that are unlocked for the
+// current profile (FE_CrAP_IsItemLocked) and have a level above 0. They go in gpFEProfile's
+// aSalePart, aSaleEntry and aSaleChoice (-1: none). The random stream is then seeded from the clock
+// again (gSession.nSeed).
+void FE_CrAP_UpdateSaleInfo(int a, int b) {
     int aFound[3000];
     int aKinds[88];         // fake match: 4 are used; 88 gives the original's stack frame
     s32 nMonth;
@@ -511,7 +524,7 @@ void fn_80077C1C(int a, int b) {
     nKind = 0;
     nPart = 0;
     nChoice = 0;
-    nCategory = fn_80077BDC(a);
+    nCategory = FE_GetSaleIDFromSaleCategory(a);
     switch (a) {
     case -1:
         aKinds[0] = 0;
@@ -534,14 +547,14 @@ void fn_80077C1C(int a, int b) {
         return;
     }
     fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
-    nSeed = fn_80078604(nMonth, nDay, nYear);
+    nSeed = FE_DateToInt(nMonth, nDay, nYear);
     for (j = 0; j < 5; j++) {
         gpFEProfile->aSaleEntry[b][nCategory][j] = -1;
         gpFEProfile->aSaleChoice[b][nCategory][j] = -1;
     }
     gpFEProfile->nDateSeed = nSeed;
     if (gpFEProfile->nDateSeed == 0) {
-        gpFEProfile->nDateSeed = 3081979;          // 8/3/1979, packed as fn_80078604 does
+        gpFEProfile->nDateSeed = 3081979;          // 8/3/1979, packed as FE_DateToInt does
     }
     Misc_SetSeedFunc(0, gpFEProfile->nDateSeed);
     gpFEProfile->aSalePart[b][nCategory] = aKinds[Misc_RandFunc(0) % nKinds];
@@ -551,7 +564,7 @@ void fn_80077C1C(int a, int b) {
         nKind = FE_CrAP_GetCategoryFromAssetID(i);
         if (nKind == gpFEProfile->aSalePart[b][nCategory] &&
             (FE_CrAP_GetAssetGender(i) == nB || FE_CrAP_GetAssetGender(i) == 2) &&
-            !fn_80078008(i, pProfile) && FE_CrAP_GetLevelFromAssetID(i) > 0) {
+            !FE_CrAP_IsItemLocked(i, pProfile) && FE_CrAP_GetLevelFromAssetID(i) > 0) {
             aFound[nFound] = i;
             nFound++;
         }
@@ -575,10 +588,19 @@ void fn_80077C1C(int a, int b) {
     Misc_SetSeedFunc(0, gSession.nSeed);
 }
 
-// Whether a Create-A-Player asset is still locked for the profile (never in the session's 0x4000
-// mode, nor while PasswordManager_IsPasswordEntered(0) holds). The asset names a lock kind (FE_CrAP_GetPartGMLockIDByAssetNum) and a number
-// for it (FE_CrAP_GetPartGMLockValByAssetNum): a bit, an award, a tournament won, a count of them to reach, a season...
-u8 fn_80078008(s32 nAsset, SaveProfile* pProfile) {
+// Whether Create-A-Player asset nAsset is still locked for profile pProfile: never with bit 0x4000
+// of the session's flags or cheat bit 0 (PasswordManager_IsPasswordEntered(0)). The asset gives a
+// lock kind (FE_CrAP_GetPartGMLockIDByAssetNum) and a value n (FE_CrAP_GetPartGMLockValByAssetNum).
+// Unlocked by kind: 0 bit n of aAssetOwned (bought); 2 bit 1 of a10548 (fn_80058304); 6 cheat bit n
+// + 1 (codes "A".."E"); 7 award aC8[n] won; 8 n of those 31 won; 9 PGA TOUR season n reached; 10
+// sponsor n's code entered (fn_800564AC) or sponsor n signed; 11 n sponsors signed; 12 an EA Sports
+// Bio of level n or more; 14 ladder award n; 15 n of the 25; 16 game progress n
+// (GM_GetGameProgress); 17 real-time event award n; 18 n of the 75; 19 the best medal (0) in
+// challenge group n; 20 n challenge groups counted (EA bug there); 21 award n; 22 n of the first 23
+// awards; 23 award 23 + n (a bonus trophy ball); 24 n bonus trophy balls, but the count never runs
+// (EA bug there); 25 a1C0[12 + n]; 26 n of a1C0[12..15]; 27 TOUR card level n. Kinds 3 and 13 are
+// always locked; -1, 4, 28 and the rest never.
+u8 FE_CrAP_IsItemLocked(s32 nAsset, SaveProfile* pProfile) {
     int aBits[5] = {1, 2, 3, 4, 5};
     int nCount = 0;
     s8 nKind;
@@ -765,15 +787,16 @@ u8 fn_80078008(s32 nAsset, SaveProfile* pProfile) {
     return bLocked;
 }
 
-// Pack three numbers into one, b * 1000000 + a * 10000 + c; fn_80078620 unpacks it.
-int fn_80078604(int a, int b, int c) {
+// Packs a date into one number: day * 1000000 + month * 10000 + year (FE_IntToDate unpacks it).
+int FE_DateToInt(int a, int b, int c) {
     int n = c;
     n += a * 10000;
     n += b * 1000000;
     return n;
 }
 
-void fn_80078620(int n, int* pA, int* pB, int* pC) {
+// Unpacks a date FE_DateToInt packed into its month (*pA), day (*pB) and year (*pC).
+void FE_IntToDate(int n, int* pA, int* pB, int* pC) {
     *pB = n / 1000000;
     n -= *pB * 1000000;
     *pA = n / 10000;
@@ -781,8 +804,10 @@ void fn_80078620(int n, int* pA, int* pB, int* pC) {
     *pC = n;
 }
 
-// Note which Create-A-Player assets are locked for the profile (fn_80078008), one bit each.
-void fn_80078680(SaveProfile* pProfile) {
+// Notes which Create-A-Player assets are locked for pProfile, one bit each in aAssetLocked
+// (FE_CrAP_IsItemLocked, each tested with its own gender made current); nothing before the asset
+// database is loaded (menu message GM_vCheckCrAPUnlocks).
+void FE_CrAP_SetupLockedAssets(SaveProfile* pProfile) {
     int i;
     int nCount;
     s8 nSaved;
@@ -791,7 +816,7 @@ void fn_80078680(SaveProfile* pProfile) {
         nCount = FE_CrAP_GetNumEntriesInCrAPDB();
         for (i = 0; i < nCount; i++) {
             FE_CrAP_SetCurrentGender(FE_CrAP_GetAssetGender(i));
-            if (fn_80078008(i, pProfile)) {
+            if (FE_CrAP_IsItemLocked(i, pProfile)) {
                 BitArray_SetBit(pProfile->aAssetLocked, i);
             } else {
                 BitArray_ClearBit(pProfile->aAssetLocked, i);
@@ -806,7 +831,7 @@ void fn_80078680(SaveProfile* pProfile) {
 // pProfile's created golfer's equipment tiers, from the equipment in the 53 slots of the profile
 // being worked on (FE_CrAP_GetEquippedAsset reads that profile, not pProfile; every caller passes
 // it): each slot can raise up to two attributes' tiers.
-void fn_8007873C(SaveProfile* pProfile) {
+void FE_CrAP_UpdateUserAttributeMods(SaveProfile* pProfile) {
     s32 i;
     int nAsset;
     s16 nSlot;
@@ -887,9 +912,10 @@ u8 FE_CrAP_IsAssetUndesirable(s16 nPart, CrAPAsset* pAsset) {
     return 0;
 }
 
-// Put a random choice on part nPart: an undesirable one (see FE_CrAP_IsAssetUndesirable) with a
-// chance of 100 - nChance percent, else a desirable one; only choices FE_CrAP_IsAssetAvailableForUser allows.
-void fn_80078A2C(s16 nPart, int nChance) {
+// Puts a random choice on part nPart: a desirable one (not FE_CrAP_IsAssetUndesirable) nChance
+// percent of the time, else an undesirable one; only choices FE_CrAP_IsAssetAvailableForUser
+// allows, and nothing changes when none fits.
+void FE_CrAP_RandomizeCategoryWithUndesirableTest(s16 nPart, int nChance) {
     int aChoices[250];
     u32 bDesirable = (int)(Misc_RandFunc(0) % 100) < nChance;
     int nFound = 0;
@@ -993,11 +1019,16 @@ u8 FE_CrAP_IsCrazyFaceHairColor(CrAPAsset* pAsset) {
     return 0;
 }
 
-// A random created golfer: random parts 10, 9 and 16; hair (part 3) with a 10% chance of corn
-// rows, an afro or a mohawk; parts 4 to 6 on a random choice now and then; part 14 a bright colour
-// one time in five, and part 15 usually the same choice; a hat (part 0) 40% of the time, a crazy
-// one one time in five; and a few more parts by chance.
-void fn_80078E34(SaveProfile* pProfile) {
+// A random look for the created golfer (menu message GM_vRandomizeCrAPLookInFaceShot, and
+// FE_CrAP_RandomizeAll): random parts 10, 9 and 16; hair (part 3) with a 10% chance of corn rows,
+// an afro or a mohawk; parts 4, 5 and 6 on a random choice 20%, 10% and 10% of the time, else their
+// first; part 14 a crazy colour (FE_CrAP_IsCrazyHairColor) one time in five, and part 15 the same
+// choice 90% of the time, else its own pick; a hat (part 0) 40% of the time, a crazy one
+// (FE_CrAP_IsCrazyHat) one time in five, else part 0's first choice. Slots 5..8 and 11..14 are
+// emptied, then parts 19 and 20 are put on 30% of the time each; 20% of the time part 19 gets a
+// choice drawn from the count of its subcategory 3 but turned on in subcategory 0; and part 8 5% of
+// the time (else slot 13 emptied).
+void FE_CrAP_RandomizeFace(SaveProfile* pProfile) {
     char szDebug[256];
     u8 bPicking;
     u8 bChance;
@@ -1006,9 +1037,9 @@ void fn_80078E34(SaveProfile* pProfile) {
     int nPick;
     int nPrev;
     CrAPAsset* pAsset;
-    FE_CrAP_RandomizePart(pProfile, 10, 0);
-    FE_CrAP_RandomizePart(pProfile, 9, 0);
-    FE_CrAP_RandomizePart(pProfile, 16, 0);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 10, 0);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 9, 0);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 16, 0);
 
     bChance = Misc_RandFunc(0) % 100 < 10;
     bPicking = 1;
@@ -1134,10 +1165,10 @@ void fn_80078E34(SaveProfile* pProfile) {
     FE_CrAP_UnequipSlot(13);
     FE_CrAP_UnequipSlot(14);
     if (Misc_RandFunc(0) % 100 < 30) {
-        FE_CrAP_RandomizePart(pProfile, 19, 0);
+        FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 19, 0);
     }
     if (Misc_RandFunc(0) % 100 < 30) {
-        FE_CrAP_RandomizePart(pProfile, 20, 0);
+        FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 20, 0);
     }
     bChance = Misc_RandFunc(0) % 100 < 20;
     if (bChance) {
@@ -1155,7 +1186,10 @@ void fn_80078E34(SaveProfile* pProfile) {
     }
 }
 
-void fn_80079664(SaveProfile* pProfile) {
+// A whole random created golfer (menu message GM_vRandomizeCrAPGolferInIdleShot): every subcategory
+// of part 12 (clubs and balls) but 4 at its first choice, FE_SetCrapClub(0), random parts 1, 2 and
+// 7, then part 7 again in subcategory 1 or 2, and a random look (FE_CrAP_RandomizeFace).
+void FE_CrAP_RandomizeAll(SaveProfile* pProfile) {
     FE_CrAP_TurnOnPart(0xC, 1, 0);
     FE_CrAP_TurnOnPart(0xC, 2, 0);
     FE_CrAP_TurnOnPart(0xC, 3, 0);
@@ -1164,16 +1198,16 @@ void fn_80079664(SaveProfile* pProfile) {
     FE_CrAP_TurnOnPart(0xC, 7, 0);
     FE_CrAP_TurnOnPart(0xC, 0, 0);
     FE_SetCrapClub(0);
-    FE_CrAP_RandomizePart(pProfile, 1, 0);
-    FE_CrAP_RandomizePart(pProfile, 2, 0);
-    FE_CrAP_RandomizePart(pProfile, 7, 0);
-    fn_800797E0(pProfile, 7, (Misc_RandFunc(0) & 1) + 1, 0);
-    fn_80078E34(pProfile);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 1, 0);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 2, 0);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 7, 0);
+    FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem(pProfile, 7, (Misc_RandFunc(0) & 1) + 1, 0);
+    FE_CrAP_RandomizeFace(pProfile);
 }
 
-// Part nPart at a random b (FE_CrAP_GetNumberOfSubcategoryIndicesForCategory counts them), then at a random choice (fn_800797E0), which
-// is returned (FE_CrAPMessages.c GM_vRandomizeCrAPBody uses it).
-int FE_CrAP_RandomizePart(SaveProfile* pProfile, s16 nPart, int nChance) {
+// Part nPart at a random subcategory (FE_CrAP_GetNumberOfSubcategoryIndicesForCategory; 0 when it
+// has none), then a random choice in it (fn_800797E0 with the same nChance), which is returned.
+int FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(SaveProfile* pProfile, s16 nPart, int nChance) {
     int nCount = FE_CrAP_GetNumberOfSubcategoryIndicesForCategory(nPart);
     int nPick;
     if (nCount > 0) {
@@ -1181,14 +1215,14 @@ int FE_CrAP_RandomizePart(SaveProfile* pProfile, s16 nPart, int nChance) {
     } else {
         nPick = 0;
     }
-    return fn_800797E0(pProfile, nPart, nPick, nChance);
+    return FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem(pProfile, nPart, nPick, nChance);
 }
 
-// Part nPart, b at a random choice, which is returned (-1: nothing was picked). With a chance of
-// nChance percent the part is left alone, except in the session's 0x4000 mode (which also skips
-// the intro movie), where it gets its first choice. Outside that mode only choices
-// FE_CrAP_IsAssetAvailableForUser allows are drawn (none: the first choice).
-int fn_800797E0(SaveProfile* pProfile, s16 nPart, int b, int nChance) {
+// Part nPart, subcategory b at a random choice, which is returned (-1: nothing was picked). With a
+// chance of nChance percent the part is left alone, except with bit 0x4000 of the session's flags
+// (which also skips the intro movie), where it gets its first choice. Outside that mode only
+// choices FE_CrAP_IsAssetAvailableForUser allows are drawn (at most 250; none: the first choice).
+int FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem(SaveProfile* pProfile, s16 nPart, int b, int nChance) {
     int aChoices[250];
     int nFound = 0;
     int nCount;
@@ -1230,13 +1264,17 @@ int fn_800797E0(SaveProfile* pProfile, s16 nPart, int b, int nChance) {
     return -1;
 }
 
-// With a working copy of the profile: a random part 9, and a fixed set of parts turned on.
-void fn_80079974(void) {
+// Only while the menus work on their working copy (bCopy): with the Create-A-Player trigger
+// animations off, a random part 9, then the first choice of parts 3 (hair), 14, 15, 16 and of every
+// subcategory of part 12 (clubs and balls), choices 0..7 of part 13's subcategories 0 and 1 and the
+// first of its subcategory 2. Called when the menu golfer is golfer 7 or 29 and its textures are
+// set up (FEgolferanim.c FE_StreamFunc_TexturesInit).
+void FE_CrAP_EquipDefaults(void) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     int i;
     if (gpFEProfile->bCopy) {
         FE_CrAP_SetTriggerAnims(0);
-        FE_CrAP_RandomizePart(pProfile, 9, 0);
+        FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 9, 0);
         FE_CrAP_TurnOnPart(3, 0, 0);
         FE_CrAP_TurnOnPart(0xE, 0, 0);
         FE_CrAP_TurnOnPart(0xF, 0, 0);
@@ -1258,12 +1296,16 @@ void fn_80079974(void) {
     }
 }
 
-// Set up the session's players for a game started from the menus. In game modes 5 and 11 player 0
-// plays the created golfer when slot 0 holds a profile (unless b11703), else golfer 0. Each player
-// slot is a CPU player, a loaded profile (a created golfer brings its own bag), a CPU controller or
-// a table golfer with its bag (its save slot still marked active); slots past the players have no
-// profile. Then it records nMode (the menus read it back): the game mode, or 4, 23, 27 or 28.
-void fn_80079AD4(void) {
+// Leaves the menus for a game (menu message GM_vSetupPlayers). In game modes 5 and 11, when slot 0
+// holds a profile its backup row becomes row 0 and player 0 plays the created golfer (unless
+// gpFEProfile->b11703 is set); else player 0 plays golfer 0. Each player slot is a CPU player (no
+// profile, no bag), a loaded profile (a created golfer brings its own bag), a CPU controller (no
+// profile) or a table golfer with its bag (its save slot still marked active); slots past the
+// players have no profile. Then the menus' return mode (gFEState.nMode): the game mode, or 4 (a
+// ladder event), 23 (PGA TOUR), 27 (mode 10 with gpFEProfile->b0 set) or 28 (lessons with a TOUR
+// card). Last: b11 cleared, the fade to black started, the demo off, and the front end's audio and
+// ladder closed (Gaud_ExitFE, GameMode4_ExitFE).
+void FE_vExitUI(void) {
     int i;
     if (Game_GetMode() == 5 || Game_GetMode() == 11) {
         if (gpSaveData[0].bActive) {
@@ -1317,8 +1359,9 @@ void fn_80079AD4(void) {
 
 // ---- the profile backups in ARAM ---------------------------------------------------------------
 
-// Move the backups out to ARAM, freeing the main memory they used.
-void fn_80079D30(void) {
+// Moves the profile backups (gFEState.p658) out to ARAM (allocated once, kept in gFEBackupAramAddr)
+// and frees their main memory; nothing when they are not in main memory (FE_vCloseModule).
+void FE_MoveBackupsToARAM(void) {
     if (gFEState.p658 != NULL) {
         gFEBackupSize = FE_BACKUP_SIZE;
         if (gFEBackupAramAddr == 0) {
@@ -1330,8 +1373,10 @@ void fn_80079D30(void) {
     }
 }
 
-// Bring the backups back from ARAM (empty ones if there were none).
-void fn_80079DAC(void) {
+// Gives the profile backups (gFEState.p658) main memory again, cleared, and copies them back from
+// ARAM if they were there, freeing the ARAM (FE_vInitModule). Nothing when they are already in main
+// memory.
+void FE_RestoreBackupsFromARAM(void) {
     if (gFEState.p658 == NULL) {
         gFEBackupSize = FE_BACKUP_SIZE;
         gFEState.p658 = StaticMem_Alloc(gFEBackupSize, 2, 32, "FE_Manager.c", 2778);
@@ -1344,8 +1389,9 @@ void fn_80079DAC(void) {
     }
 }
 
-// Whether an attribute is one of the hidden ones.
-u8 fn_80079E44(int nAttr) {
+// Whether attribute nAttr is one of the hidden ones (ATTR_AGGRESSION, ATTR_IQ, ATTR_SPEED), which
+// FE_CloseManager keeps from the golfer table when it copies a created golfer in.
+u8 FE_IsHiddenAttribute(int nAttr) {
     int bHidden = 0;
     if (nAttr == ATTR_AGGRESSION || nAttr == ATTR_IQ || nAttr == ATTR_SPEED) {
         bHidden = 1;

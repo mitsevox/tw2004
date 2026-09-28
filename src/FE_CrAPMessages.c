@@ -291,7 +291,7 @@ void GM_vGetCrAPItemPriceAndLock(MsgArg* pArgs, MsgArg* pResult) {
 // Menu message 413: pick choice pArgs[2] under entry pArgs[1] of part pArgs[0] on the created
 // golfer: a worn asset that can come off (FE_CrAP_IsAssetEquipped, FE_CrAP_IsAssetRemovable) is
 // taken off, anything else is put on (part 17's logos are only put on), then the golfer's equipment
-// tiers are worked out again (fn_8007873C).
+// tiers are worked out again (FE_CrAP_UpdateUserAttributeMods).
 void GM_vCRAPTryOnItem(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s16 nPart = pArgs[0].i;
@@ -311,7 +311,7 @@ void GM_vCRAPTryOnItem(MsgArg* pArgs, MsgArg* pResult) {
         } else {
             FE_CrAP_TurnOnPart(nPart, nEntry, nChoice);
         }
-        fn_8007873C(pProfile);
+        FE_CrAP_UpdateUserAttributeMods(pProfile);
     }
 }
 
@@ -350,7 +350,7 @@ void GM_vGetNumCrAPSubcategories(MsgArg* pArgs, MsgArg* pResult) {
 
 // Menu message 453: set one of the created golfer's details, chosen by pArgs[0]: 0 the profile's
 // name (the string pArgs[1]); 1 its gender (choices.nGender, also made the database's current
-// gender); 2 its date, pArgs[2] packed as month * 10000 + day * 1000000 + year (see fn_80078604); 3
+// gender); 2 its date, pArgs[2] packed as month * 10000 + day * 1000000 + year (see FE_DateToInt); 3
 // left-handed (choices.bLeftHanded). Values come in pArgs[2].
 void GM_vSetCrAPGolferInfo(MsgArg* pArgs, MsgArg* pResult) {
     int nMonth;
@@ -367,7 +367,7 @@ void GM_vSetCrAPGolferInfo(MsgArg* pArgs, MsgArg* pResult) {
         FE_CrAP_SetCurrentGender(pProfile->choices.nGender);
         break;
     case 2:
-        fn_80078620(pArgs[2].i, &nMonth, &nDay, &nYear);
+        FE_IntToDate(pArgs[2].i, &nMonth, &nDay, &nYear);
         pProfile->nDateDay = nDay;
         pProfile->nDateMonth = nMonth;
         pProfile->nDateYear = nYear;
@@ -391,7 +391,7 @@ void GM_vGetCrAPGolferInfo(MsgArg* pArgs, MsgArg* pResult) {
         *(s32*)pArgs[2].p = (s8)pProfile->choices.nGender;
         break;
     case 2:
-        *(s32*)pArgs[2].p = fn_80078604(pProfile->nDateMonth, pProfile->nDateDay, pProfile->nDateYear);
+        *(s32*)pArgs[2].p = FE_DateToInt(pProfile->nDateMonth, pProfile->nDateDay, pProfile->nDateYear);
         break;
     case 3:
         *(s32*)pArgs[2].p = pProfile->choices.bLeftHanded;
@@ -406,7 +406,7 @@ void GM_vSetUseProfileCopy(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 460: choice pArgs[2] under entry pArgs[1] of part pArgs[0] is still locked for the
-// profile (fn_80078008); never in the session's 0x4000 mode.
+// profile (FE_CrAP_IsItemLocked); never in the session's 0x4000 mode.
 void GM_vIsCrAPItemLocked(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s16 nPart = pArgs[0].i;
@@ -416,7 +416,7 @@ void GM_vIsCrAPItemLocked(MsgArg* pArgs, MsgArg* pResult) {
     if (gSession.uFlags & 0x4000) {
         pResult->i = 0;
     } else {
-        pResult->i = fn_80078008(
+        pResult->i = FE_CrAP_IsItemLocked(
                 FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(nPart, nEntry, nChoice),
                 pProfile);
     }
@@ -434,7 +434,7 @@ void GM_vIsCrAPItemOwned(MsgArg* pArgs, MsgArg* pResult) {
 // Menu message 462: buy choice pArgs[2] under entry pArgs[1] of part pArgs[0] for pArgs[3]: the
 // price comes off the profile's money (no check that it is there), the asset's owned bit
 // (aAssetOwned) is set, the created golfer puts it on and its equipment tiers are worked out again
-// (fn_8007873C).
+// (FE_CrAP_UpdateUserAttributeMods).
 void GM_vPurchaseCrAPItem(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s16 nPart = pArgs[0].i;
@@ -446,7 +446,7 @@ void GM_vPurchaseCrAPItem(MsgArg* pArgs, MsgArg* pResult) {
     pProfile->nCurrentCash -= nPrice;
     BitArray_SetBit(pProfile->aAssetOwned, nAsset);
     FE_CrAP_TurnOnPart(nPart, nEntry, nChoice);
-    fn_8007873C(pProfile);
+    FE_CrAP_UpdateUserAttributeMods(pProfile);
 }
 
 // Menu message 470: 1 when one of the profile's asset slots holds an asset of part pArgs[0]
@@ -480,11 +480,11 @@ void GM_vIsCrAPItemEquipped(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 475: the day's sale items in sale category pArgs[0] (-1 clothes, -2 accessories, -3
-// clubs and balls; see fn_80077C1C) for the current gender: the part they are of into *pArgs[1],
+// clubs and balls; see FE_CrAP_UpdateSaleInfo) for the current gender: the part they are of into *pArgs[1],
 // their five choice numbers into *pArgs[2..6] (-1: none). GM_vGetCrAPSaleSubcategories gives their
 // entries.
 void GM_vGetCrAPSaleItems(MsgArg* pArgs, MsgArg* pResult) {
-    int nSale = fn_80077BDC(pArgs[0].i);
+    int nSale = FE_GetSaleIDFromSaleCategory(pArgs[0].i);
     s8 nGender = FE_CrAP_GetCurrentGender();
 
     *(s32*)pArgs[1].p = gpFEProfile->aSalePart[nGender][nSale];
@@ -498,7 +498,7 @@ void GM_vGetCrAPSaleItems(MsgArg* pArgs, MsgArg* pResult) {
 // Menu message 476: the list entries (EA's subcategories) of the five sale items
 // GM_vGetCrAPSaleItems gives for sale category pArgs[0], into *pArgs[1..5] (-1: none).
 void GM_vGetCrAPSaleSubcategories(MsgArg* pArgs, MsgArg* pResult) {
-    int nSale = fn_80077BDC(pArgs[0].i);
+    int nSale = FE_GetSaleIDFromSaleCategory(pArgs[0].i);
     s8 nGender = FE_CrAP_GetCurrentGender();
 
     *(s32*)pArgs[1].p = gpFEProfile->aSaleEntry[nGender][nSale][0];
@@ -540,7 +540,7 @@ void GM_vIsCrAPItemOnSale(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = 0;
         return;
     }
-    nSale = fn_80077BDC(nSaleCategory);
+    nSale = FE_GetSaleIDFromSaleCategory(nSaleCategory);
     if (gpFEProfile->aSalePart[nGender][nSale] != nPart) {
         pResult->i = 0;
         return;
@@ -600,8 +600,8 @@ void GM_vSetLogoPixel(MsgArg* pArgs, MsgArg* pResult) {
     fn_8010F90C(pArgs[0].i, pArgs[1].i, pArgs[2].i);
 }
 
-// Menu message 498: check every asset's lock again (fn_80078680). Each asset that was locked before
-// and is not now, and is offered for the current gender, gets its new bit (aAssetNew) set; the
+// Menu message 498: check every asset's lock again (FE_CrAP_SetupLockedAssets). Each asset that was
+// locked before and is not now, and is offered for the current gender, gets its new bit (aAssetNew) set; the
 // result is how many there are.
 void GM_vCheckCrAPUnlocks(MsgArg* pArgs, MsgArg* pResult) {
     u32 aWasLocked[94];                 // the size is unknown (the frame allows up to 97 words)
@@ -618,7 +618,7 @@ void GM_vCheckCrAPUnlocks(MsgArg* pArgs, MsgArg* pResult) {
             BitArray_ClearBit(aWasLocked, i);
         }
     }
-    fn_80078680(pProfile);
+    FE_CrAP_SetupLockedAssets(pProfile);
     for (i = 0; i < nAssets; i++) {
         if (!BitArray_TestBit(pProfile->aAssetLocked, i) && BitArray_TestBit(aWasLocked, i)) {
             if (FE_IsValidCurrentGender(FE_CrAP_GetAssetGender(i))) {
@@ -854,9 +854,9 @@ void GM_vSaveLogo(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 515: golfer pArgs[0]'s equipment tier for attribute pArgs[1] (a created golfer's
-// comes from what it wears, fn_8007873C).
+// comes from what it wears, FE_CrAP_UpdateUserAttributeMods).
 void GM_vGetGolferAttributeTier(MsgArg* pArgs, MsgArg* pResult) {
-    GolferRecord* pRecord = fn_80077A80(pArgs[0].i);
+    GolferRecord* pRecord = FE_spGetGolfer(pArgs[0].i);
     pResult->i = pRecord->tier[pArgs[1].i];
 }
 
@@ -1065,12 +1065,13 @@ void GM_vFEMessage598_Empty(MsgArg* pArgs, MsgArg* pResult) {
 
 // Menu message 689: dress and shape the created golfer at random. The assets in slots 2, 5..8 and
 // 11..14 come off and parts 4, 5 and 6 go to their first choice. Then each part gets a random owned
-// choice (FE_CrAP_RandomizePart), except that it is left alone with the chance given: headwear (0)
-// and part 4 80%, parts 5 and 6 90%, eyewear (8), watches and jewelry (19) and miscellaneous (20)
-// 70%; hair (3), parts 15 and 16, shirts (1), pants (2), shoes (7) and part 14 always change. Part
-// 15 then takes part 14's choice 95% of the time, part 9 is one of choices 0..2 (75%), 6 (10%), 4
-// (10%) or 8 (5%), part 10 a desirable choice 95% of the time (fn_80078A2C), the shoes come from
-// entry 1 or 2, and the equipment tiers are worked out again (fn_8007873C).
+// choice (FE_CrAP_RandomizeCrAPCategoryInOneSubcategory), except that it is left alone with the
+// chance given: headwear (0) and part 4 80%, parts 5 and 6 90%, eyewear (8), watches and jewelry
+// (19) and miscellaneous (20) 70%; hair (3), parts 15 and 16, shirts (1), pants (2), shoes (7) and
+// part 14 always change. Part 15 then takes part 14's choice 95% of the time, part 9 is one of
+// choices 0..2 (75%), 6 (10%), 4 (10%) or 8 (5%), part 10 a desirable choice 95% of the time
+// (FE_CrAP_RandomizeCategoryWithUndesirableTest), the shoes come from entry 1 or 2, and the
+// equipment tiers are worked out again (FE_CrAP_UpdateUserAttributeMods).
 void GM_vRandomizeCrAPGolfer(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     int nRoll = Misc_RandFunc(0) % 100;
@@ -1090,24 +1091,24 @@ void GM_vRandomizeCrAPGolfer(MsgArg* pArgs, MsgArg* pResult) {
     FE_CrAP_TurnOnPart(5, 0, 0);
     FE_CrAP_TurnOnPart(6, 0, 0);
     FE_CrAP_TurnOnPart(4, 0, 0);
-    FE_CrAP_RandomizePart(pProfile, 0, 80);
-    FE_CrAP_RandomizePart(pProfile, 3, 0);
-    FE_CrAP_RandomizePart(pProfile, 4, 80);
-    FE_CrAP_RandomizePart(pProfile, 15, 0);
-    FE_CrAP_RandomizePart(pProfile, 5, 90);
-    FE_CrAP_RandomizePart(pProfile, 6, 90);
-    FE_CrAP_RandomizePart(pProfile, 1, 0);
-    FE_CrAP_RandomizePart(pProfile, 2, 0);
-    FE_CrAP_RandomizePart(pProfile, 7, 0);
-    FE_CrAP_RandomizePart(pProfile, 16, 0);
-    FE_CrAP_RandomizePart(pProfile, 19, 70);
-    FE_CrAP_RandomizePart(pProfile, 20, 70);
-    FE_CrAP_RandomizePart(pProfile, 8, 70);
-    nChoice = FE_CrAP_RandomizePart(pProfile, 14, 0);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 0, 80);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 3, 0);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 4, 80);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 15, 0);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 5, 90);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 6, 90);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 1, 0);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 2, 0);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 7, 0);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 16, 0);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 19, 70);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 20, 70);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 8, 70);
+    nChoice = FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 14, 0);
     if (Misc_RandFunc(0) % 100 < 95) {
         FE_CrAP_TurnOnPart(15, 0, nChoice);
     } else {
-        FE_CrAP_RandomizePart(pProfile, 15, 0);
+        FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 15, 0);
     }
     if (nRoll < 75) {
         FE_CrAP_TurnOnPart(9, 0, Misc_RandFunc(0) % 3);
@@ -1121,16 +1122,16 @@ void GM_vRandomizeCrAPGolfer(MsgArg* pArgs, MsgArg* pResult) {
         Misc_RandFunc(0);                   // drawn, not used
         FE_CrAP_TurnOnPart(9, 0, 8);
     }
-    fn_80078A2C(10, 95);
-    fn_800797E0(pProfile, 7, (Misc_RandFunc(0) & 1) + 1, 0);
-    fn_8007873C(pProfile);
+    FE_CrAP_RandomizeCategoryWithUndesirableTest(10, 95);
+    FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem(pProfile, 7, (Misc_RandFunc(0) & 1) + 1, 0);
+    FE_CrAP_UpdateUserAttributeMods(pProfile);
 }
 
 // Menu message 690: dress the created golfer at random: the assets in slots 2, 5..8 and 11..14 come
-// off, then random owned choices go on (FE_CrAP_RandomizePart) for shirts (1), pants (2) and shoes
-// (7), and with a chance of 20% for headwear (0) and 30% each for watches and jewelry (19),
-// miscellaneous (20) and eyewear (8); the shoes come from entry 1 or 2, and the equipment tiers are
-// worked out again (fn_8007873C).
+// off, then random owned choices go on (FE_CrAP_RandomizeCrAPCategoryInOneSubcategory) for shirts
+// (1), pants (2) and shoes (7), and with a chance of 20% for headwear (0) and 30% each for watches
+// and jewelry (19), miscellaneous (20) and eyewear (8); the shoes come from entry 1 or 2, and the
+// equipment tiers are worked out again (FE_CrAP_UpdateUserAttributeMods).
 void GM_vRandomizeCrAPOutfit(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     FE_CrAP_SetTriggerAnims(0);
@@ -1143,22 +1144,22 @@ void GM_vRandomizeCrAPOutfit(MsgArg* pArgs, MsgArg* pResult) {
     FE_CrAP_UnequipSlot(12);
     FE_CrAP_UnequipSlot(13);
     FE_CrAP_UnequipSlot(14);
-    FE_CrAP_RandomizePart(pProfile, 0, 80);
-    FE_CrAP_RandomizePart(pProfile, 1, 0);
-    FE_CrAP_RandomizePart(pProfile, 2, 0);
-    FE_CrAP_RandomizePart(pProfile, 7, 0);
-    FE_CrAP_RandomizePart(pProfile, 19, 70);
-    FE_CrAP_RandomizePart(pProfile, 20, 70);
-    FE_CrAP_RandomizePart(pProfile, 8, 70);
-    fn_800797E0(pProfile, 7, (Misc_RandFunc(0) & 1) + 1, 0);
-    fn_8007873C(pProfile);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 0, 80);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 1, 0);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 2, 0);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 7, 0);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 19, 70);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 20, 70);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 8, 70);
+    FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem(pProfile, 7, (Misc_RandFunc(0) & 1) + 1, 0);
+    FE_CrAP_UpdateUserAttributeMods(pProfile);
 }
 
 // Menu message 547: play one of UI sounds 11..18 at random, put the Create-A-Player camera back to
 // the "Crap Idle" shot (zoom reset, idle state 0), turn the menu golfer's animation calls off and
-// make a random created golfer (fn_80079664: part 12's entries 0..3 and 5..7 at their first choice,
-// a driver in hand, a random shirt, pants and shoes, then a random look, fn_80078E34), then work
-// out its equipment tiers again (fn_8007873C).
+// make a random created golfer (FE_CrAP_RandomizeAll: part 12's entries 0..3 and 5..7 at their first choice,
+// a driver in hand, a random shirt, pants and shoes, then a random look, FE_CrAP_RandomizeFace), then work
+// out its equipment tiers again (FE_CrAP_UpdateUserAttributeMods).
 void GM_vRandomizeCrAPGolferInIdleShot(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     View* pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
@@ -1167,13 +1168,13 @@ void GM_vRandomizeCrAPGolferInIdleShot(MsgArg* pArgs, MsgArg* pResult) {
     FE_SetCrAPCameraIdleState(0);
     GolfCamera_SwitchCrAPCamera(pView, "Crap Idle", gpCrAPState->nCamIdleState, 0, 0, 0);
     FE_CrAP_SetTriggerAnims(0);
-    fn_80079664(pProfile);
-    fn_8007873C(pProfile);
+    FE_CrAP_RandomizeAll(pProfile);
+    FE_CrAP_UpdateUserAttributeMods(pProfile);
 }
 
 // Menu message 554: put the Create-A-Player camera on the "Crap Face" shot (zoom reset, idle state
 // 1), turn the menu golfer's animation calls off and give the created golfer a random look
-// (fn_80078E34: face, hair and its colours, a hat now and then, a few accessories). The equipment
+// (FE_CrAP_RandomizeFace: face, hair and its colours, a hat now and then, a few accessories). The equipment
 // tiers are not worked out again.
 void GM_vRandomizeCrAPLookInFaceShot(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
@@ -1182,7 +1183,7 @@ void GM_vRandomizeCrAPLookInFaceShot(MsgArg* pArgs, MsgArg* pResult) {
     FE_SetCrAPCameraIdleState(1);
     GolfCamera_SwitchCrAPCamera(pView, "Crap Face", gpCrAPState->nCamIdleState, 0, 0, 0);
     FE_CrAP_SetTriggerAnims(0);
-    fn_80078E34(pProfile);
+    FE_CrAP_RandomizeFace(pProfile);
 }
 
 // Menu message 566: does nothing in this build.
@@ -1216,7 +1217,7 @@ void GM_vGetNumCrAPSaleItemsOwned(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     int i;
     s32* pnBought = pArgs[1].p;
-    int nSale = fn_80077BDC(pArgs[0].i);
+    int nSale = FE_GetSaleIDFromSaleCategory(pArgs[0].i);
     s8 nGender = FE_CrAP_GetCurrentGender();
     int nAsset;
 
@@ -1232,11 +1233,11 @@ void GM_vGetNumCrAPSaleItemsOwned(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 714: give the created golfer a random body, hair and face, clothes left alone. Parts
-// 4, 5, 6 and 22 go to their first choice, then random owned choices go on (FE_CrAP_RandomizePart):
-// always for hair (3) and parts 11, 14, 15, 16 and 21, and for parts 4 and 22 (left alone 80% of
-// the time) and 5 and 6 (left alone 90%). Part 15 takes part 14's choice 95% of the time, part 9 is
-// one of choices 0..2 (75%), 6 (10%), 4 (10%) or 8 (5%), and part 10 gets a desirable choice 95% of
-// the time (fn_80078A2C). The equipment tiers are not worked out again.
+// 4, 5, 6 and 22 go to their first choice, then random owned choices go on
+// (FE_CrAP_RandomizeCrAPCategoryInOneSubcategory): always for hair (3) and parts 11, 14, 15, 16 and
+// 21, and for parts 4 and 22 (left alone 80% of the time) and 5 and 6 (left alone 90%). Part 15
+// takes part 14's choice 95% of the time, part 9 is one of choices 0..2 (75%), 6 (10%), 4 (10%) or
+// 8 (5%), and part 10 gets a desirable choice 95% of the time (FE_CrAP_RandomizeCategoryWithUndesirableTest). The equipment tiers are not worked out again.
 void GM_vRandomizeCrAPBody(MsgArg* pArgs, MsgArg* pResult) {
     int nRoll = Misc_RandFunc(0) % 100;
     int nChoice;
@@ -1249,20 +1250,20 @@ void GM_vRandomizeCrAPBody(MsgArg* pArgs, MsgArg* pResult) {
     FE_CrAP_TurnOnPart(6, 0, 0);
     FE_CrAP_TurnOnPart(4, 0, 0);
     FE_CrAP_TurnOnPart(22, 0, 0);
-    FE_CrAP_RandomizePart(pProfile, 3, 0);
-    FE_CrAP_RandomizePart(pProfile, 4, 80);
-    FE_CrAP_RandomizePart(pProfile, 15, 0);
-    FE_CrAP_RandomizePart(pProfile, 5, 90);
-    FE_CrAP_RandomizePart(pProfile, 6, 90);
-    FE_CrAP_RandomizePart(pProfile, 16, 0);
-    FE_CrAP_RandomizePart(pProfile, 22, 80);
-    FE_CrAP_RandomizePart(pProfile, 21, 0);
-    FE_CrAP_RandomizePart(pProfile, 11, 0);
-    nChoice = FE_CrAP_RandomizePart(pProfile, 14, 0);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 3, 0);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 4, 80);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 15, 0);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 5, 90);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 6, 90);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 16, 0);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 22, 80);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 21, 0);
+    FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 11, 0);
+    nChoice = FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 14, 0);
     if (Misc_RandFunc(0) % 100 < 95) {
         FE_CrAP_TurnOnPart(15, 0, nChoice);
     } else {
-        FE_CrAP_RandomizePart(pProfile, 15, 0);
+        FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 15, 0);
     }
     if (nRoll < 75) {
         FE_CrAP_TurnOnPart(9, 0, Misc_RandFunc(0) % 3);
@@ -1276,7 +1277,7 @@ void GM_vRandomizeCrAPBody(MsgArg* pArgs, MsgArg* pResult) {
         Misc_RandFunc(0);                   // drawn, not used
         FE_CrAP_TurnOnPart(9, 0, 8);
     }
-    fn_80078A2C(10, 95);
+    FE_CrAP_RandomizeCategoryWithUndesirableTest(10, 95);
 }
 
 // Menu message 725: drop the menu golfer's queued animation (FE_QueueCrAPAnim with no animation).

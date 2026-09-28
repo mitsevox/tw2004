@@ -27,14 +27,14 @@ LAYOUT_ASSERT(FEMovie, 0x108);
 // The front end's state (gFEState, 0x660 bytes). Only what the cleaned code reads.
 typedef struct FEState {
     u8  aLoaded[5];             // 0x000  per player slot: a profile is loaded (its name is shown)
-    u8  aCPU[5];                // 0x005  per player slot: a CPU player (fn_80079AD4 gives it
+    u8  aCPU[5];                // 0x005  per player slot: a CPU player (FE_vExitUI gives it
                                 //        CONTROLLER_CPU and no profile)
     s8  aBackup[5];             // 0x00A  per player slot: its row in p658 (-1: none)
     u8  b0F;                    // 0x00F  set by FE_vOpenONCE
     u8  b10;                    // 0x010  set by FE_vOpenONCE
-    u8  b11;                    // 0x011  cleared by fn_80079AD4
+    u8  b11;                    // 0x011  cleared by FE_vExitUI
     u8  unk12[2];
-    s32 nMode;                  // 0x014  the game mode the menus start in (fn_80079AD4): the
+    s32 nMode;                  // 0x014  the game mode the menus start in (FE_vExitUI): the
                                 //        session's, or 4, 23, 27 or 28
     u8  b18;                    // 0x018  set by FE_vOpenONCE; cleared by the "THEKITCHENSINK" cheat code
     u8  unk19[3];
@@ -43,7 +43,7 @@ typedef struct FEState {
     s32 nMovieFree;             // 0x024  } one is added (equal when it is empty)
     FEMovie aMovies[FE_NUM_MOVIES];     // 0x028
     SaveProfile* p658;          // 0x658  backup copies of the profiles; moved to ARAM and freed
-                                //        by fn_80079D30
+                                //        by FE_MoveBackupsToARAM
     u8  unk65C[0x660 - 0x65C];
 } FEState;
 LAYOUT_ASSERT(FEState, 0x660);
@@ -185,7 +185,7 @@ typedef struct FEProfile {
     u8  bCopy;                  // 0x1063F  the working copy is the profile, not the slot's own
     u8  bEditingCopy;           // 0x10640  the logo editor works on logoCopy (GM_vCRAPCreatingLogo)
     u8  unk10641[3];
-    // The day's sale items (fn_80077C1C, seeded from today's date), per gender and sale category
+    // The day's sale items (FE_CrAP_UpdateSaleInfo, seeded from today's date), per gender and sale category
     // (-1 clothes, -2 accessories, -3 clubs and balls): a part picked at random, then up to five of
     // its assets as list entry and choice (-1: none; GM_vGetCrAPSaleItems, GM_vIsCrAPItemOnSale).
     s32 nDateSeed;              // 0x10644  the seed (today's date, packed)
@@ -225,7 +225,7 @@ extern s32 gStartUnlockedGolfers[16];            // golfer ids GM_vIsGolferUnloc
 #define FE_NUM_BIOS 29
 extern FEBio* gpFEBios;             // a copy of the 'BIO ' stream object's data (FE_CharBios_LoadBIOfromStream)
 
-// The profile backups (FEState.p658) can be moved out to ARAM (fn_80079D30) and back (fn_80079DAC).
+// The profile backups (FEState.p658) can be moved out to ARAM (FE_MoveBackupsToARAM) and back (FE_RestoreBackupsFromARAM).
 #define FE_BACKUP_SIZE 0x41820          // the four slots' backups (4 x 0x10600) and 0x20 more
 extern u32 gFEBackupSize;                // their size
 extern u32 gFEBackupAramAddr;                // their ARAM address while they are there (0: not there)
@@ -285,7 +285,7 @@ typedef struct CrAPAsset {
                                 //        database's nGender or 2 (FE_CrAP_GetAssetGender,
                                 //        FE_IsValidCurrentGender)
     s8   nLockKind;             // 0x041  } how it is unlocked and the number that goes with it
-    s16  nLock;                 // 0x042  } (fn_80078008)
+    s16  nLock;                 // 0x042  } (FE_CrAP_IsItemLocked)
     s16  n44;                   // 0x044  } its three colour ids (FE_CrAP_GetPartColor1..3;
     s16  n46;                   // 0x046  } TW06 color1..color3)
     s16  n48;                   // 0x048  }
@@ -467,29 +467,29 @@ void FE_SendHint7Args(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, 
 void FE_SendHint10Args(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, s32 nG, s32 nH, s32 nI,
                  s32 nJ);
 SaveProfile* FE_GetCurrentProfile(void);         // the profile being worked on
-u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);  // the asset is locked (FE_Manager.c)
-int  fn_80078604(int a, int b, int c);  // a date (month, day, year from fn_8011E020) packed
-int  fn_80077B08(void);                 // its player slot
+u8   FE_CrAP_IsItemLocked(s32 nAsset, SaveProfile* pProfile);  // the asset is locked (FE_Manager.c)
+int  FE_DateToInt(int a, int b, int c);  // a date (month, day, year from fn_8011E020) packed
+int  FE_GetCurrUserID(void);                 // its player slot
 u8   FE_movieIsQueueEmpty(void);
-int  fn_80077BDC(int n);                // -1, -2, -3 to 0, 1, 2; anything else to 0
-void fn_80078680(SaveProfile* pProfile);    // note which assets are locked (aAssetLocked)
-void fn_8007873C(SaveProfile* pProfile);
-void fn_80078A2C(s16 nPart, int nChance);
-void fn_80078E34(SaveProfile* pProfile);
-void fn_80079664(SaveProfile* pProfile);
-int  FE_CrAP_RandomizePart(SaveProfile* pProfile, s16 nPart, int nChance);    // a random b and choice of
-                                        // part nPart; returns the choice (fn_800797E0)
-int  fn_800797E0(SaveProfile* pProfile, s16 nPart, int b, int nChance);
-u8   fn_80077B18(int nGolfer);          // a yes/no list over golfers 0..28 (Golfer.c asks it)
-void fn_80077B78(void);                 // pick the day's random assets (fn_80077C1C)
+int  FE_GetSaleIDFromSaleCategory(int n);                // -1, -2, -3 to 0, 1, 2; anything else to 0
+void FE_CrAP_SetupLockedAssets(SaveProfile* pProfile);    // note which assets are locked (aAssetLocked)
+void FE_CrAP_UpdateUserAttributeMods(SaveProfile* pProfile);
+void FE_CrAP_RandomizeCategoryWithUndesirableTest(s16 nPart, int nChance);
+void FE_CrAP_RandomizeFace(SaveProfile* pProfile);
+void FE_CrAP_RandomizeAll(SaveProfile* pProfile);
+int  FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(SaveProfile* pProfile, s16 nPart, int nChance);    // a random b and choice of
+                                        // part nPart; returns the choice (FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem)
+int  FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem(SaveProfile* pProfile, s16 nPart, int b, int nChance);
+u8   FE_bIsLicensedGolfer(int nGolfer);          // a yes/no list over golfers 0..28 (Golfer.c asks it)
+void FE_SetupSaleInfo(void);                 // pick the day's random assets (FE_CrAP_UpdateSaleInfo)
 FEMovie* FE_movieGetFreeEntry(void);             // the next free place in the movie queue
 void FE_BackupAllProfiles(void);
 void FE_BackupProfileClaimRow(int nSlot);
 void FE_BackupProfile(int nSlot);
 void FE_SwapBackupRows(int a, int b);         // swap backup rows a and b (p658)
-GolferRecord* fn_80077A80(int nGolfer); // a golfer's record (created golfers: the profile's)
-void fn_80078620(int n, int* pA, int* pB, int* pC);     // unpack n = b * 1000000 + a * 10000 + c
-void fn_80079AD4(void);
+GolferRecord* FE_spGetGolfer(int nGolfer); // a golfer's record (created golfers: the profile's)
+void FE_IntToDate(int n, int* pA, int* pB, int* pC);     // unpack n = b * 1000000 + a * 10000 + c
+void FE_vExitUI(void);
 void Gaud_StopMusic(void);                 // (0x800A75B4) FE_Manager.c calls it after queueing a movie
 
 // ---- the menus' message table (FE_MessageTable.c) --------------------------------------------

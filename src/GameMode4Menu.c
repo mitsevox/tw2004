@@ -36,7 +36,7 @@ void LadderMenu_GetNodePos(MsgArg* pArgs, MsgArg* pResult) {
 // The opponent's name as the ladder map shows it: the golfer's nickname in quotes when there is one
 // (not "NA", two letters or more), else the last name. Golfer 18 always goes by the last name.
 void LadderMenu_GetOpponentName(int nGolfer, char* szOut) {
-    GolferRecord* pRecord = fn_80077A80(nGolfer);
+    GolferRecord* pRecord = FE_spGetGolfer(nGolfer);
     int bNick = strcmp(pRecord->szNick, "NA") != 0 && strlen(pRecord->szNick) > 1 && nGolfer != 18;
 
     if (bNick) {
@@ -131,7 +131,7 @@ void LadderMenu_GetFirstAndCursorNodePos(MsgArg* pArgs, MsgArg* pResult) {
 // profile may play it (otherwise the current event stays as it was), player 0 plays the created
 // golfer, and GameMode4_StartEvent sets the session up.
 void LadderMenu_StartEvent(MsgArg* pArgs, MsgArg* pResult) {
-    GameMode4_SelectEvent(fn_80077B08(), gLadderMap.nEvent);
+    GameMode4_SelectEvent(FE_GetCurrUserID(), gLadderMap.nEvent);
     gSession.nGolfer[0] = FIRST_CREATED_GOLFER;
     GameMode4_StartEvent();
 }

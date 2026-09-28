@@ -23,7 +23,7 @@ s32 gPgaScheduleCount;                  // how many tournaments gPgaScheduleEven
 s32* gPgaScheduleEvents;                // the tournaments held this season, in order
                                         // (PGASchedule_Build; static memory, never freed)
 
-// Fills one leaderboard row of the current profile's tournament (fn_80077B08's slot) for entrant
+// Fills one leaderboard row of the current profile's tournament (FE_GetCurrUserID's slot) for entrant
 // nEntrant: szPlace "CUT" when the entrant missed the cut, "T3" when another entrant holds the same
 // place (GM_PgaTourSim_IsEntrantTied), else "3"; szName the golfer's name; szScore the total score
 // (GM_PgaTourSim_GetTotalScoreFromEntrantID with flag 1); szRounds the round scores so far
@@ -35,7 +35,7 @@ void PGALeaderboard_FormatRow(char* szPlace, char* szName, char* szScore, char* 
     s32 nRoundScore;
     char szAmount[128];                 // sizes unknown
     char szRound[4];
-    int nPlayer = fn_80077B08();
+    int nPlayer = FE_GetCurrUserID();
     s32 nGolfer = GM_PgaTourSim_GetGolferIDFromEntrantID(nPlayer, nEntrant);
     s32 nMoney;
 
@@ -80,7 +80,7 @@ void PGALeaderboard_GetRow(MsgArg* pArgs, MsgArg* pResult) {
     char* szRounds = ((MsgString*)pArgs[4].p)->pStr;
     char* szMoney = ((MsgString*)pArgs[5].p)->pStr;
     u8 bShow = 0;
-    int nPlayer = fn_80077B08();
+    int nPlayer = FE_GetCurrUserID();
     s32 nEntrant;
 
     if (nRow == -1) {
@@ -106,7 +106,7 @@ void PGALeaderboard_GetRow(MsgArg* pArgs, MsgArg* pResult) {
 // FE message 459: how many entrants the current profile's tournament field has (the leaderboard's
 // rows).
 void PGALeaderboard_GetNumRows(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = GM_PgaTourSim_GetNumEntrants(fn_80077B08());
+    pResult->i = GM_PgaTourSim_GetNumEntrants(FE_GetCurrUserID());
 }
 
 // FE message 466: schedule row pArgs[0] (an index into gPgaScheduleEvents, PGASchedule_Build) into
@@ -182,7 +182,7 @@ void PGASchedule_Build(MsgArg* pArgs, MsgArg* pResult) {
 void PGATourMsg_GetLastEventLine(MsgArg* pArgs, MsgArg* pResult) {
     int nLine = pArgs[0].i;
     char* szOut = ((MsgString*)pArgs[1].p)->pStr;
-    int nPlayer = fn_80077B08();
+    int nPlayer = FE_GetCurrUserID();
     s32 nEvent;
 
     switch (nLine) {
@@ -222,7 +222,7 @@ void PGATourMsg_IsSeasonOver(MsgArg* pArgs, MsgArg* pResult) {
 void PGASeasonWrapUp_GetLine(MsgArg* pArgs, MsgArg* pResult) {
     int nLine = pArgs[0].i;
     char* szOut = ((MsgString*)pArgs[1].p)->pStr;
-    int nPlayer = fn_80077B08();
+    int nPlayer = FE_GetCurrUserID();
     PgaStatCounts* pStats = &gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER];
     s32 nGolfer;
     int i;

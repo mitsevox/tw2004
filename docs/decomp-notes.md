@@ -974,7 +974,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 
 - **[verified] A three-term sum is reordered by the compiler.** `return c + a*10000 + b*1000000;` adds
   the products first in every term order; `int n = c; n += a * 10000; n += b * 1000000; return n;`
-  matched (FE_Manager `fn_80078604`).
+  matched (FE_Manager `FE_DateToInt`).
 - **[verified] Call results as arguments.** `f(g(), p->x, p->y)` loads the other arguments first and
   keeps them in saved registers; `t = g(); f(t, p->x, p->y);` calls first (FE_LogoDesign
   `fn_8010FAF4`, 76.2 -> 100).

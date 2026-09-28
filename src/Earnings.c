@@ -2500,7 +2500,7 @@ void GM_RecordIndividualHoleStats(int nPlayer) {
                 gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] <= 3) {
                 nMarked = GM_ConvertCourseAndHoleToPar5EagleIndex(gpGame->nCurCourse, Game_GetCurHoleNum());
                 fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
-                nDate = fn_80078604(nMonth, nDay, nYear);
+                nDate = FE_DateToInt(nMonth, nDay, nYear);
                 if (nMarked != -1) {
                     fn_8005897C(&gpSaveData[nProfile], 0, nMarked, 1);
                     fn_8005897C(&gpSaveData[nProfile], 1, nMarked, nDate);

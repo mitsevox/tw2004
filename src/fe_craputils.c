@@ -51,7 +51,7 @@ void fn_80057FBC(SaveProfile* pProfile) {
             BitArray_ClearBit(pProfile->aAssetNew, i);
             BitArray_ClearBit(pProfile->aAssetMarkedNew, i);
             FE_CrAP_SetCurrentGender(FE_CrAP_GetAssetGender(i));
-            if (fn_80078008(i, pProfile)) {
+            if (FE_CrAP_IsItemLocked(i, pProfile)) {
                 BitArray_SetBit(pProfile->aAssetLocked, i);
             } else {
                 BitArray_ClearBit(pProfile->aAssetLocked, i);

@@ -143,7 +143,7 @@ void fn_80035600(void);
 void Character_UpdateAnimation(Character* pChar, int a, f32 f);
 void SKN_PoseCharacter(Character* pChar, int n);
 void LF_LoadCurrentLights(void);
-void fn_80079974(void);
+void FE_CrAP_EquipDefaults(void);
 void fn_800B9CF0(int n);
 void SkinPart_SetChangeAllCopies(u8 b);
 void fn_8010B098(void* p);
@@ -402,7 +402,7 @@ void FE_StreamFunc_SkinInterrupt(void) {
 }
 
 // The texture state's start, for the golfer just streamed in (pB8): profiles set up, his clubs and
-// clothes set for the current profile's slot (golfers 7 and 29 first get fn_80079974's parts), his
+// clothes set for the current profile's slot (golfers 7 and 29 first get FE_CrAP_EquipDefaults's parts), his
 // dynamic textures emptied and a texture load requested (the front end's load callbacks).
 void FE_StreamFunc_TexturesInit(void) {
     int nGolfer;
@@ -411,7 +411,7 @@ void FE_StreamFunc_TexturesInit(void) {
     SkinPart_SetChangeAllCopies(1);
     nGolfer = gpCrAPState->pB8->pChar->nGolferId;
     if (nGolfer == 7 || nGolfer == 29) {
-        fn_80079974();
+        FE_CrAP_EquipDefaults();
     }
     Character_SetClubsAndClothes(gpCrAPState->pB8->pChar, gpFEProfile->nSlot);
     SkinPart_SetChangeAllCopies(0);

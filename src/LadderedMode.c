@@ -415,7 +415,7 @@ int GameMode4_GetEventTourStop(int nEvent) {
     return gLadderEvents[nEvent].nTourStop;
 }
 
-// Empty in this build; called last when a game started from the menus is set up (fn_80079AD4,
+// Empty in this build; called last when a game started from the menus is set up (FE_vExitUI,
 // FE_Manager.c), right after Gaud_ExitFE.
 void GameMode4_ExitFE(void) {
 }

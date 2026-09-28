@@ -70,7 +70,7 @@ void UIStatsRankings_GetRow(MsgArg* pArgs, MsgArg* pResult) {
     char* szRank = ((MsgString*)pArgs[3].p)->pStr;
     GM_Pga_StatTypes_t nStat = gStatsCategoryStat[nCategory];
     StatsUnits eUnits = gStatsCategoryUnits[nCategory];
-    int nPlayer = fn_80077B08();
+    int nPlayer = FE_GetCurrUserID();
     char szStat[32];
 
     strcpy(szTitle, gStatsCategoryTitle[nCategory]);
@@ -116,7 +116,7 @@ void UIStatsRankings_GetIndStatsRow(MsgArg* pArgs, MsgArg* pResult) {
     char* szValue = ((MsgString*)pArgs[4].p)->pStr;
     char szStat[16];
 
-    nPlayer = fn_80077B08();
+    nPlayer = FE_GetCurrUserID();
     nStat = gStatsCategoryStat[gStatsActiveCategory];
     if (nGolfer == -1) {
         nGolfer = PGA_USER_GOLFER;

@@ -316,7 +316,7 @@ typedef struct SaveProfile {
                                 //          1 once the profile has eagled it (Earnings.c);
                                 //          fn_800588F4's kind 0
     u8   unk504B;
-    s32  a504C[71];             // 0x0504C  the same holes: the date of that eagle (packed by fn_80078604);
+    s32  a504C[71];             // 0x0504C  the same holes: the date of that eagle (packed by FE_DateToInt);
                                 //          fn_800588F4's kind 1
     s32  n5168;                 // 0x05168  set to 3 with the medals by the profile setup
     s32  aMedal[29];           // 0x0516C  the best medal per challenge group (0 best, 3 none)
@@ -328,7 +328,7 @@ typedef struct SaveProfile {
                                 //          GM_vDisableCaddieTips): CTIP_ShowCaddieTip only shows
                                 //          short tips
     SavedRound aSavedRound[NUM_SAVED_ROUNDS];   // 0x05230
-    GolferRecord createdGolfer; // 0x05380  the created golfer's record (fn_80077A80: golfers
+    GolferRecord createdGolfer; // 0x05380  the created golfer's record (FE_spGetGolfer: golfers
                                 //          from FIRST_CREATED_GOLFER on are read here)
     u8   unk54C0[0x54C2 - 0x54C0];
     // The created golfer kept in this slot (golfer FIRST_CREATED_GOLFER + the slot), copied into
@@ -346,13 +346,13 @@ typedef struct SaveProfile {
     // SkinChoices*).
     SkinChoices choices;        // 0x05500
     s8   nDateMonth;            // 0x0AF7C  } a date, set and read by menu messages packed as
-    s8   nDateDay;              // 0x0AF7D  } fn_80078604 packs it (FE_CrAPMessages.c
+    s8   nDateDay;              // 0x0AF7D  } FE_DateToInt packs it (FE_CrAPMessages.c
     s16  nDateYear;             // 0x0AF7E  } GM_vSetCrAPGolferInfo, GM_vGetCrAPGolferInfo)
     s32  aAF80[53];             // 0x0AF80  per slot: a Create-A-Player asset (FE_CrAPDB.c
                                 //          FE_CrAP_GetEquippedAsset), -1 for none; an asset's n2E is its slot
     // Four bit arrays with a bit per Create-A-Player asset (0x80057F18's loop over them all, which
     // also clears aAssetNew and aAssetMarkedNew; BitArray_TestBit tests a bit).
-    u32  aAssetLocked[94];      // 0x0B054  the asset was locked (fn_80078008) when last checked
+    u32  aAssetLocked[94];      // 0x0B054  the asset was locked (FE_CrAP_IsItemLocked) when last checked
     u32  aAssetOwned[94];       // 0x0B1CC  owned: set for the level-0 assets and when bought
                                 //          (GM_vPurchaseCrAPItem), cleared when sold; an asset of
                                 //          lock kind 0 stays locked until the bit its
@@ -369,7 +369,7 @@ typedef struct SaveProfile {
     u32  a10548[1];             // 0x10548  a bit array: FE_CrAPMessages.c's GM_vGetProfileFlag tests
                                 //          bit n; fn_80058304 tests one (bit 1 for FE_Manager)
     SponsorSlot aSponsor[11];   // 0x1054C  the sponsorship slots; cleared by the profile setup;
-                                //          fn_80078008's lock kinds 10 (a sponsor signed) and 11
+                                //          FE_CrAP_IsItemLocked's lock kinds 10 (a sponsor signed) and 11
                                 //          (so many slots signed) read them
     u8   a10578[4];             // 0x10578  par-5 holes 71..74, as a5004: eagled (fn_800588F4's kind 0)
     s32  a1057C[4];             // 0x1057C  and their eagle dates, as a504C (kind 1)
@@ -390,7 +390,7 @@ LAYOUT_ASSERT(SaveRecords, 0x4C2C);
 extern SaveProfile* gpSaveData;
 extern SaveProfile* lbl_80281DF4;       // unlocks that hold for every profile (the cheat codes set them)
 extern SponsorSlot lbl_80281DF0;        // a new profile's first sponsor (see SponsorSlot)
-extern u32 gPasswordEnteredBits[8];             // a bit array the code at 0x80056480 keeps; fn_80078008's lock
+extern u32 gPasswordEnteredBits[8];             // a bit array the code at 0x80056480 keeps; FE_CrAP_IsItemLocked's lock
                                         // kind 6 tests bits 1..5 of it
 extern u32 gSponsorPasswordBits[16];            // a bit array the cheat codes of gSponsorPasswords set (fn_800564AC)
 extern s32 gStartLockedGolfers[14];            // the golfers GM_GetGameProgress counts as unlockable

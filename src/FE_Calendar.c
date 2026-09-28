@@ -302,7 +302,7 @@ s32 PGATour_FillCell(char* sz, u16 nDate, s32* pCellColor, s32* pCellState) {
             strcpy(sz, "");
         }
         if (nDate == CalendarState.nToday - 1 && bSelected) {
-            GetRankText(GM_PgaTourSim_GetScoreRankFromEntrantID(fn_80077B08(), 0), sz);
+            GetRankText(GM_PgaTourSim_GetScoreRankFromEntrantID(FE_GetCurrUserID(), 0), sz);
         }
         if (bSelected) {
             *pCellColor = 4;
