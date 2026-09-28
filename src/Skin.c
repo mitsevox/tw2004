@@ -79,8 +79,8 @@ s32 gSkinFrameBufSize;          // only ever cleared (by SKN_CloseModule)
 s32 gSkinFrameBufUsed;          // cleared every frame before the characters are posed
 void* gSkinFrameBuf;
 
-// Draws the "shadow" part of the character's skin, then that of its club's skin (Character.p16D8,
-// its current club class), with the skins' override table n17B4.
+// Draws the "shadow" part of the character's skin, then that of its club's skin (Character.pClubSet,
+// its current club class), with the skins' override table nView.
 void SKN_DrawShadowParts(Character* pChar) {
     u64 uShadow;
     s32 nParts;
@@ -88,28 +88,28 @@ void SKN_DrawShadowParts(Character* pChar) {
     Skin* pSkin;
 
     SKA_PackName(&uShadow, "shadow");
-    SkinPart_BeginDraw(pChar->pSkin, pChar->n17B4);
+    SkinPart_BeginDraw(pChar->pSkin, pChar->nView);
     nParts = SkinPart_GetNumParts(pChar->pSkin);
     for (i = 0; i < nParts; i++) {
         if (SkinPart_GetPartId(pChar->pSkin, i) == uShadow) {
             // port: EA passes an argument SkinPart_DrawPart ignores
-            ((void (*)(Skin*, int, int))SkinPart_DrawPart)(pChar->pSkin, i, pChar->n17B4);
+            ((void (*)(Skin*, int, int))SkinPart_DrawPart)(pChar->pSkin, i, pChar->nView);
         }
     }
     SkinPart_EndDraw(pChar->pSkin);
-    if (pChar->p16D8 != NULL) {
-        pSkin = pChar->p16D8->apSkins[pChar->nClubClass];
+    if (pChar->pClubSet != NULL) {
+        pSkin = pChar->pClubSet->apSkins[pChar->nClubClass];
         if (pSkin != NULL) {
-            SkinPart_BeginDraw(pSkin, pChar->n17B4);
+            SkinPart_BeginDraw(pSkin, pChar->nView);
             // port: EA passes an argument SkinPart_DrawPart ignores
             ((void (*)(Skin*, int, int))SkinPart_DrawPart)(pSkin, SkinPart_FindPart(pSkin, uShadow),
-                                                     pChar->n17B4);
+                                                     pChar->nView);
             SkinPart_EndDraw(pSkin);
         }
     }
 }
 
-// Draws every part but "shadow" of the character's skin (override table n17B4), then its club's
+// Draws every part but "shadow" of the character's skin (override table nView), then its club's
 // (SKN_DrawClubParts).
 void SKN_DrawCharacterParts(Character* pChar) {
     u64 uShadow;
@@ -117,20 +117,20 @@ void SKN_DrawCharacterParts(Character* pChar) {
     int i;
 
     SKA_PackName(&uShadow, "shadow");
-    SkinPart_BeginDraw(pChar->pSkin, pChar->n17B4);
+    SkinPart_BeginDraw(pChar->pSkin, pChar->nView);
     nParts = SkinPart_GetNumParts(pChar->pSkin);
     for (i = 0; i < nParts; i++) {
         if (SkinPart_GetPartId(pChar->pSkin, i) != uShadow) {
             // port: EA passes an argument SkinPart_DrawPart ignores
-            ((void (*)(Skin*, int, int))SkinPart_DrawPart)(pChar->pSkin, i, pChar->n17B4);
+            ((void (*)(Skin*, int, int))SkinPart_DrawPart)(pChar->pSkin, i, pChar->nView);
         }
     }
     SkinPart_EndDraw(pChar->pSkin);
     SKN_DrawClubParts(pChar);
 }
 
-// Draws every part but "shadow" of the skin of the character's current club (Character.p16D8, per
-// club class), with override table n17B4; nothing without one.
+// Draws every part but "shadow" of the skin of the character's current club (Character.pClubSet, per
+// club class), with override table nView; nothing without one.
 void SKN_DrawClubParts(Character* pChar) {
     u64 uShadow;
     Skin* pSkin;
@@ -138,15 +138,15 @@ void SKN_DrawClubParts(Character* pChar) {
     int i;
 
     SKA_PackName(&uShadow, "shadow");
-    if (pChar->p16D8 != NULL) {
-        pSkin = pChar->p16D8->apSkins[pChar->nClubClass];
+    if (pChar->pClubSet != NULL) {
+        pSkin = pChar->pClubSet->apSkins[pChar->nClubClass];
         if (pSkin != NULL) {
-            SkinPart_BeginDraw(pSkin, pChar->n17B4);
+            SkinPart_BeginDraw(pSkin, pChar->nView);
             nShadow = SkinPart_FindPartByName(pSkin, "shadow");
             for (i = 0; i < SkinPart_GetNumParts(pSkin); i++) {
                 if (i != nShadow) {
                     // port: EA passes an argument SkinPart_DrawPart ignores
-                    ((void (*)(Skin*, int, int))SkinPart_DrawPart)(pSkin, i, pChar->n17B4);
+                    ((void (*)(Skin*, int, int))SkinPart_DrawPart)(pSkin, i, pChar->nView);
                 }
             }
             SkinPart_EndDraw(pSkin);
@@ -280,24 +280,24 @@ int SKN_GetLightCourse(void) {
 
 // Poses the character's skin for this frame: blends its changed morph targets (single view or game
 // type 3 only), builds its matrices from the model's and points its drawn meshes at them (override
-// table n17B4); then the same for its current club's skin, from the grip bone (0x52) on. Sets n1698
+// table nView); then the same for its current club's skin, from the grip bone (0x52) on. Sets n1698
 // to 1 (posed), except for player 1000. n: every caller passes 0; unused.
 void SKN_PoseCharacter(Character* pChar, int n) {
     Skin* pClub;
 
     if (gSession.nSplitScreen == 0 || gSession.nGameType == 3) {
-        fn_8011CB5C(pChar->pSkin, pChar->n17B4);
+        fn_8011CB5C(pChar->pSkin, pChar->nView);
     }
-    SKN_BuildMatrices(pChar->pSkin, pChar->pModel, 0, 0, pChar->n17B4);
-    SKN_SetMeshMatrices(pChar->pSkin, pChar->n17B4);
+    SKN_BuildMatrices(pChar->pSkin, pChar->pModel, 0, 0, pChar->nView);
+    SKN_SetMeshMatrices(pChar->pSkin, pChar->nView);
     // port: EA passes arguments SkinPart_UpdateSkin ignores
-    ((void (*)(Skin*, int))SkinPart_UpdateSkin)(pChar->pSkin, pChar->n17B4);
-    if (pChar->p16D8 != NULL) {
-        pClub = pChar->p16D8->apSkins[pChar->nClubClass];
+    ((void (*)(Skin*, int))SkinPart_UpdateSkin)(pChar->pSkin, pChar->nView);
+    if (pChar->pClubSet != NULL) {
+        pClub = pChar->pClubSet->apSkins[pChar->nClubClass];
         if (pClub != NULL) {
             SKN_BuildMatrices(pClub, pChar->pModel, CharModel_GetBoneIndex(pChar->pModel, 0x52) - 0x52, 0x52,
-                        pChar->n17B4);
-            SKN_SetMeshMatrices(pClub, pChar->n17B4);
+                        pChar->nView);
+            SKN_SetMeshMatrices(pClub, pChar->nView);
         }
     }
     pChar->n1698 = 1;
@@ -604,11 +604,11 @@ void SKN_FixupModel(SkinModel* pModel) {
 }
 
 // Builds the skin's matrices (p108C) for this frame; nothing without its render data (bit 2 of
-// u10D4). The first SkinModel.n14, one per bone, are the character model's skinning matrices
+// uFlags). The first SkinModel.n14, one per bone, are the character model's skinning matrices
 // (p768), from nFirst on, each taken nSkip further along there (not copied when p108C is p768).
-// Each later one whose bit is set in p10CC (SkinPart_UpdateMarks: those the chosen meshes use) is a
+// Each later one whose bit is set in aMtxBits (SkinPart_UpdateMarks: those the chosen meshes use) is a
 // weighted sum of up to three others (SkinModel.p54). nView: both callers pass the character's
-// n17B4; unused.
+// nView; unused.
 void SKN_BuildMatrices(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int nView) {
     int j;
     SkinModel54* pEntry;
@@ -625,7 +625,7 @@ void SKN_BuildMatrices(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst
         return;
     }
     nMatrices = pSkin->pModel->n50;
-    if (!(pSkin->u10D4 & 2)) {
+    if (!(pSkin->uFlags & 2)) {
         return;
     }
     SkinPart_UpdateMarks(pSkin);
@@ -635,7 +635,7 @@ void SKN_BuildMatrices(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst
     }
     aMtx = pSkin->p108C;
     for (i = pSkin->pModel->n14; i < nMatrices; i++) {
-        if (BitArray_Test(pSkin->p10CC, i)) {
+        if (BitArray_Test(pSkin->aMtxBits, i)) {
             pEntry = &pSkin->pModel->p54[i];
             nBones = pEntry->nBones;
             memset(aMtx[i], 0, sizeof(aMtx[i]));
@@ -650,7 +650,7 @@ void SKN_BuildMatrices(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst
     }
 }
 
-// Points the override (in table n, Skin.a10A0[n]) of each mesh the skin draws (bit set in p10D0;
+// Points the override (in table n, Skin.a10A0[n]) of each mesh the skin draws (bit set in aMeshBits;
 // the mesh is SkinModel44.n0) at the skin's matrices, p108C; nothing without the table or render
 // data.
 void SKN_SetMeshMatrices(Skin* pSkin, int n) {
@@ -658,11 +658,11 @@ void SKN_SetMeshMatrices(Skin* pSkin, int n) {
     s32 nEntries;
     HwsOverrideTable* pTable;
 
-    if (pSkin->a10A0[n] != NULL && (pSkin->u10D4 & 2)) {
+    if (pSkin->a10A0[n] != NULL && (pSkin->uFlags & 2)) {
         pTable = pSkin->a10A0[n];
         nEntries = pSkin->pModel->n40;
         for (i = 0; i < nEntries; i++) {
-            if (BitArray_Test(pSkin->p10D0, i)) {
+            if (BitArray_Test(pSkin->aMeshBits, i)) {
                 fn_80112B18(pTable, pSkin->pModel->p44[i].n0, pSkin->p108C);
             }
         }
@@ -969,26 +969,26 @@ void SKN_SwapBonePoses(BonePose* pBones, s32 nBones) {
     BYTESWAP_SWAPDATA(&pSrc, (u8*)pBones, nBones * sizeof(BonePose), 4);
 }
 
-// Gives a skin what posing and drawing it needs (bit 2 of u10D4 marks a skin that has it); 0 when
-// it already had it, else 1: its matrices (p108C, SkinModel.n50 of them) and the p10CC and p10D0
+// Gives a skin what posing and drawing it needs (bit 2 of uFlags marks a skin that has it); 0 when
+// it already had it, else 1: its matrices (p108C, SkinModel.n50 of them) and the aMtxBits and aMeshBits
 // bit arrays, cleared; with a description, its morph memory (a1098[0]) and mesh override table
-// (a10A0[0]), and u10D4 bit 1 (choices changed). Every morph target is marked changed. b: also
+// (a10A0[0]), and uFlags bit 1 (choices changed). Every morph target is marked changed. b: also
 // calls SkinPart_InitSkin (empty in this build).
 s32 SKN_AllocRenderData(Skin* pSkin, u8 b) {
     SkinModel* pModel;
     SkinDesc* pDesc;
     s32 nSize;
 
-    if (pSkin->u10D4 & 2) {
+    if (pSkin->uFlags & 2) {
         return 0;
     }
     pModel = pSkin->pModel;
     pDesc = pModel->pDesc;
     pSkin->p108C = StaticMem_Alloc(pModel->n50 * sizeof(*pSkin->p108C), 2, 0x80, "Skin.c", 0x500);
-    pSkin->p10CC = StaticMem_Alloc((pModel->n50 + 31) / 32 * 4, 2, 0, "Skin.c", 0x50C);
-    pSkin->p10D0 = StaticMem_Alloc((pModel->n40 + 31) / 32 * 4, 2, 0, "Skin.c", 0x50D);
-    BitArray_ClearAll(pSkin->p10CC, pModel->n50);
-    BitArray_ClearAll(pSkin->p10D0, pModel->n40);
+    pSkin->aMtxBits = StaticMem_Alloc((pModel->n50 + 31) / 32 * 4, 2, 0, "Skin.c", 0x50C);
+    pSkin->aMeshBits = StaticMem_Alloc((pModel->n40 + 31) / 32 * 4, 2, 0, "Skin.c", 0x50D);
+    BitArray_ClearAll(pSkin->aMtxBits, pModel->n50);
+    BitArray_ClearAll(pSkin->aMeshBits, pModel->n40);
     if (pDesc != NULL) {
         SkinPart_GetMaxOptionsSize(pSkin);
         nSize = fn_8011CDE8(pSkin);
@@ -996,14 +996,14 @@ s32 SKN_AllocRenderData(Skin* pSkin, u8 b) {
             pSkin->a1098[0] = fn_801128C8(pModel->pDesc, nSize);
         }
         pSkin->a10A0[0] = fn_80112A10(pModel->pDesc, 0);
-        pSkin->u10D4 = 1;
+        pSkin->uFlags = 1;
         if (b) {
             // port: EA passes an argument SkinPart_InitSkin ignores
             ((void (*)(Skin*))SkinPart_InitSkin)(pSkin);
         }
     }
     fn_8011CE58(pSkin);
-    pSkin->u10D4 = pSkin->u10D4 | 2;
+    pSkin->uFlags = pSkin->uFlags | 2;
     return 1;
 }
 
@@ -1013,7 +1013,7 @@ s32 SKN_AllocRenderData(Skin* pSkin, u8 b) {
 s32 SKN_FreeRenderData(Skin* pSkin) {
     SkinModel* pModel;
 
-    if (!(pSkin->u10D4 & 2)) {
+    if (!(pSkin->uFlags & 2)) {
         return 0;
     }
     fn_80008380();
@@ -1033,15 +1033,15 @@ s32 SKN_FreeRenderData(Skin* pSkin) {
         StaticMem_Free(pSkin->p108C);
     }
     pSkin->p108C = NULL;
-    if (pSkin->p10CC != NULL) {
-        StaticMem_Free(pSkin->p10CC);
+    if (pSkin->aMtxBits != NULL) {
+        StaticMem_Free(pSkin->aMtxBits);
     }
-    pSkin->p10CC = NULL;
-    if (pSkin->p10D0 != NULL) {
-        StaticMem_Free(pSkin->p10D0);
+    pSkin->aMtxBits = NULL;
+    if (pSkin->aMeshBits != NULL) {
+        StaticMem_Free(pSkin->aMeshBits);
     }
-    pSkin->p10D0 = NULL;
-    pSkin->u10D4 = pSkin->u10D4 & ~2;
+    pSkin->aMeshBits = NULL;
+    pSkin->uFlags = pSkin->uFlags & ~2;
     return 1;
 }
 
@@ -1112,7 +1112,7 @@ Skin* SKN_Create(u8* pData, u8 b) {
         pModel->pDesc = NULL;
     }
     pDesc = pModel->pDesc;
-    pSkin->b1044 = 0;
+    pSkin->bFootPoints = 0;
     pBones = pModel->p34;
     SKN_SwapBonePoses(pBones, pModel->n14);
     BitArray_SetAll(pSkin->pose.a0, 0x80);

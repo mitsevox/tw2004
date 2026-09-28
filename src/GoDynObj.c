@@ -1082,7 +1082,7 @@ int fn_800484F4(const char* szName) {
 }
 
 int fn_80048574(Character* pChar, u64 uEvent) {
-    return pChar->events[uEvent].bSet;
+    return pChar->aTags[uEvent].bSet;
 }
 
 // Sets the level of detail the object is drawn with.

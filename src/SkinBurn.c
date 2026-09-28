@@ -80,7 +80,7 @@ void fn_80127218(Skin* pSkin, s32 n) {
     SkinMesh* pMesh;
 
     args.pDesc = pSkin->pModel->pDesc;
-    args.n = n;
+    args.nEntry = n;
     pIter = fn_80113B34(aBuf, &args);
     while (SkinIter_IsValid(pIter)) {
         pMesh = SkinIter_GetMesh(pIter);
@@ -92,7 +92,7 @@ void fn_80127218(Skin* pSkin, s32 n) {
     fn_80113BAC(pIter);
 }
 
-// Drops the bits (Skin.p10CC) no option uses: keeps the first n14 and those SkinPart_MarkAllOptions marks,
+// Drops the bits (Skin.aMtxBits) no option uses: keeps the first n14 and those SkinPart_MarkAllOptions marks,
 // renumbers them 0, 1, 2... (lbl_802825A8 holds the new number of each old one) and packs their
 // SkinModel.p54 entries to the front.
 void fn_801272B4(Skin* pSkin) {
@@ -135,10 +135,10 @@ void fn_801272B4(Skin* pSkin) {
     }
 
     // Mark the bits the options use, in aBits instead of the skin's own array.
-    pSaved = pSkin->p10CC;
-    pSkin->p10CC = aBits;
+    pSaved = pSkin->aMtxBits;
+    pSkin->aMtxBits = aBits;
     SkinPart_MarkAllOptions(pSkin);
-    pSkin->p10CC = pSaved;
+    pSkin->aMtxBits = pSaved;
 
     pOld = aOld;
     pNew = aNew;

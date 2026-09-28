@@ -8,6 +8,8 @@ static MalBank* lbl_80281CB4[2];
 static int lbl_80281CB0;                // bytes the banks have allocated
 static u8 lbl_801B9668[200];
 
+// The bone names by bone id (character.h): 0x15 "rwrst", 0x36-0x3A the right leg ("rhip" to "rtoe"),
+// 0x44-0x48 the left leg, 0x52 "IGdriver" (the club bone), 0x53 "clubhead".
 char* lbl_80187278[90] = {
     "", "root", "ctrgrav", "waist", "s1", "s2", "s3", "s4", "s5", "neck", "head", "tail1", "tail2",
     "tail3", "tail4", "skull", "rcolr", "rshld", "rbictwst", "relb", "r4rm", "rwrst", "rf1", "rf2",

@@ -137,7 +137,7 @@ typedef struct Skeleton {
                                 //         legs 0 and 1)
     u8   a1108[4];              // 0x1108  the indexes of bones 0x24, 0x25, 0x11 and 0x12 (SKEL_CreateIKSkeleton)
     u8   unk110C[0x112C - 0x110C];
-    s32  n112C;                 // 0x112C  } the character's club class and n16D4 (Character_SetupForShot)
+    s32  n112C;                 // 0x112C  } the character's club class and nClipKey (Character_SetupForShot)
     s32  n1130;                 // 0x1130  }
 } Skeleton;
 
@@ -160,7 +160,7 @@ typedef struct CharModel {
     f32     (*pMatrices)[4][4]; // 0x008  one per bone (CharModel_GetBoneIndex gives a bone's index); row 3 is its
                                 //        position
     f32       fC;               // 0x00C  } lengths Character_UpdateTestPoints sets points 0-3 out by
-    f32       f10;              // 0x010  } along the leg bones' axes when the skin has no a1048
+    f32       f10;              // 0x010  } along the leg bones' axes when the skin has no aFootPoints
     u32       a14[4];           // 0x014  } bits per bone: SKEL_TransformBones turns a bone set in a14
     u32       a24[4];           // 0x024  }   and moves one set in a24, then sets them all again
     BonePose* pPoses;           // 0x034  one per bone; freed with the model
@@ -257,8 +257,12 @@ typedef struct DynChainSettings {
 } DynChainSettings;
 LAYOUT_ASSERT(DynChainSettings, 0xC0);
 
-// Skeleton.c: a short string per bone id (the first is empty); the model loader (SKEL_LoadFromMem)
-// copies bone 0x54's first 8 bytes into each bone it adds as the bone's uId.
+// mtalib.c (Skeleton.c reads it): EA's bone names, by bone id (the first is empty);
+// SKEL_GenerateBoneLookupTable finds the model's bones by them. The ids the golfer code uses: 0x15
+// rwrst (the right wrist), 0x36 rhip, 0x38 rknee, 0x39 rankl, 0x3A rtoe, 0x44-0x48 the left leg's
+// (lhip, lthitwst, lknee, lankl, ltoe), 0x52 IGdriver (the club bone, gripped), 0x53 clubhead,
+// 0x54 GBall1. The model loader (SKEL_LoadFromMem) copies bone 0x54's first 8 bytes into each bone
+// it adds as the bone's uId.
 extern char* lbl_80187278[90];
 // Skeleton.c: the names of the club models' bones ("IGDriver", "IGputter", "IGiron3", "IGiron7",
 // "IGwedge"); SKEL_GenerateBoneLookupTable gives a model bone with one of them bone id 0x52's index.
@@ -564,29 +568,33 @@ typedef struct Character {
     struct CharEntry44* p44;    // 0x044  } freed with the character (Character_Free)
     s32   n48;                  // 0x048  a texture bank slot (LLTexGrp.c), freed with it when >= 0
     u8*   p4C;                  // 0x04C  where its CHR object's data ends (Character_CreateFromMem)
-    TexBank* p50;               // 0x050  its texture bank, bank78 (Character_LoadTextures); LLDynTex.c is given
-                                //        this field's address (Character_BeginLoadTexturesCallbackFE)
+    TexBank* pBank;             // 0x050  its texture bank, bank78 (Character_LoadTextures); LLDynTex.c
+                                //        is given this field's address (DynTexJob.ppBank)
     s32   hFile;                // 0x054  a file closed with it (Character_FreeTextures), -1 none
-    s32   n58;                  // 0x058  } from its CHR object's texture header (Character_LoadTextures)
+    s32   nTexFileBase;         // 0x058  } from its CHR object's texture header (Character_LoadTextures):
+                                //        where its textures start in the texture file (LLDynTex.c)
     s32   n5C;                  // 0x05C  } 0 without palettes
-    void* p60;                  // 0x060  the entry of a64 Character_BeginLoadTexturesCallbackFE set up
-    void* a64[2];               // 0x064  } entries taken from lbl_801B95E8 (CharacterTex_TakePoolEntries), and their
-    s8    a6C[2];               // 0x06C  } indices there (-1 once given back)
+    void* pDynTex;              // 0x060  the one of apDynTex a texture load fills (the load callbacks)
+    void* apDynTex[2];          // 0x064  } its dynamic texture sets (DynTex), taken from the pool
+    s8    aDynTexSlot[2];       // 0x06C  } lbl_801B95E8, and their entries there (-1 once given back)
     u8    unk6E[2];
-    s32   n70;                  // 0x070  how many of a64 it takes
-    s32   n74;                  // 0x074  the one of a64 Character_EndLoadTexturesCallbackFE uses
+    s32   nDynTex;              // 0x070  how many of apDynTex it takes
+    s32   nCurDynTex;           // 0x074  the one of apDynTex shown (the menu golfer loads the other one
+                                //        and Character_ExecuteTextureSwapFE switches)
     TexBank bank78;             // 0x078  its textures (Character_LoadTextures)
-    TexEntry* pA8;              // 0x0A8  } bank78's tables, freed by Character_FreeTextures
-    s32   nAC;                  // 0x0AC  how many textures pA8 holds
-    TexPalette* pB0;            // 0x0B0  }
-    s32   nB4;                  // 0x0B4  how many palettes pB0 holds
+    TexEntry* pTexEntries;      // 0x0A8  } bank78's tables, freed by Character_FreeTextures
+    s32   nTexEntries;          // 0x0AC  how many textures pTexEntries holds
+    TexPalette* pPalettes;      // 0x0B0  }
+    s32   nPalettes;            // 0x0B4  how many palettes pPalettes holds
     void* pB8;                  // 0x0B8  } 64 bytes per texture
     void* pBC;                  // 0x0BC  } a byte per palette
     struct Skin* apSkins[7];    // 0x0C0  its skins: the body's, then its attachments' (fn_8001CE5C)
     s32   nSkins;               // 0x0DC
-    u8    bE0;                  // 0x0E0  cleared by CharacterTex_ReleasePoolEntries, set by Character_EndLoadTexturesCallbackIG
-    char  szE1[0x164 - 0xE1];   // 0x0E1  its texture file's name, hFile (Character_ReopenTextureFiles); the size is
-                                //        unknown (up to the next known field)
+    u8    bTexLoaded;           // 0x0E0  its textures are in: set by Character_EndLoadTexturesCallbackIG,
+                                //        cleared by CharacterTex_ReleasePoolEntries
+    char  szTexFile[0x164 - 0xE1];  // 0x0E1  its texture file's name, opened into hFile
+                                //        (Character_LoadTextures); the size is unknown (up to the
+                                //        next known field)
     u8    anim[4];              // 0x164  the animation player (+0x14 is its playback rate)
     s32   uFlags;               // 0x168  bit 0x40: the backswing is being backed down; 0x200 / 0x400: the
                                 //        clip lookup fell back (Char_SetClip). Signed: the original tests
@@ -610,10 +618,13 @@ typedef struct Character {
     SKABlendNode blend;         // 0x40C  the root of its blend tree
     s32   nGroup;               // 0x438  the clip group CharacterState_AddSKABlendData last added
     CharBuffer buffers[4];      // 0x43C
-    struct { u32 bSet; f32 fTime; u8 unk8[8]; } events[18];   // 0x4AC  animation events, by 64-bit id
+    struct { u32 bSet; f32 fTime; u8 unk8[8]; } aTags[18];    // 0x4AC  EA's SKA tags (TW07
+                                //         Character_InitSKATags): the clip's timed events, by id
+                                //         (whether set, and the time it comes)
     s32   n5CC;                 // 0x5CC
     u8    unk5D0[0x1614 - 0x5D0];
-    char  sz1614[16];           // 0x1614  a name the situation scripts test (fn_800BB7AC)
+    char  szLastClip[16];       // 0x1614  the name of the clip CharacterState_AddSKABlendData played
+                                //         last; the situation scripts test it (fn_800BB7AC)
     Clip* pBlend;               // 0x1624
     f32   fBackswing;           // 0x1628  how far along the backswing is, 0..1 (pBlend's fCC, copied every
                                 //         frame of the backswing; the swing's power is its square root)
@@ -638,18 +649,22 @@ typedef struct Character {
     s32   nClubClass;           // 0x169C  the club class for clip lookups (Char_SetClip; 1 looks up as 0)
     s32   nClubHeadBone;        // 0x16A0  bone 0x53's index: the club head (the swing trail's end)
     s32   nGripBone;            // 0x16A4  bone 0x52's index: the grip (the trail's other end)
-    s32   n16A8;                // 0x16A8  CharModel_GetBoneIndexMapped's answer for bone 0x15
-    f32   q16AC[4];             // 0x16AC  } the grip bone's rotation and offset from the root while
-    f32   v16BC[4];             // 0x16BC  } flag 0x4000 holds it (Character_UpdateClubAttachment)
+    s32   nWristBone;           // 0x16A8  bone 0x15's index, the right wrist (CharModel_GetBoneIndexMapped):
+                                //         the grip bone's parent (Character_UpdateClubAttachment restores it after flag 0x4000)
+    f32   qGripFromRoot[4];     // 0x16AC  } the grip bone's rotation and offset from the root while
+    f32   vGripFromRoot[4];     // 0x16BC  } flag 0x4000 holds it (Character_UpdateClubAttachment)
     s32   nClub;                // 0x16CC  the club (Character_SelectGameClub)
     s32   nShotKind;            // 0x16D0  the player's shot kind (Character_SelectGameShotType)
-    s32   n16D4;              // 0x16D4  the key for clip lookups (Char_SetClip)
-    struct CharSkinSet* p16D8;  // 0x16D8  its clubs: six club skins, one per club class (SkinPart.c)
+    s32   nClipKey;             // 0x16D4  the key for clip lookups (Char_SetClip)
+    struct CharSkinSet* pClubSet; // 0x16D8  its clubs: six club skins, one per club class (SkinPart.c)
     s32   n16DC;                // 0x16DC  twice the players set up so far, in split screen 2
                                 //         (Player_SetGolfer)
     s32   nStyle;               // 0x16E0  the animation style (Character_SetEmotion); at -1
                                 //         CharacterState_AddSKABlendData does nothing
-    f32   aPoints[5][4];        // 0x16E4  points Character_PlaceFeetOnGround sets the heights of; the
+    f32   aTestPoints[5][4];    // 0x16E4  EA's test points (Character_UpdateTestPoints): 0 the right toe,
+                                //         1 the left toe, 2 the right ankle, 3 the left ankle (bones
+                                //         0x3A, 0x48, 0x39, 0x47, swapped for a left-hander), 4 the club
+                                //         point; Character_PlaceFeetOnGround sets their heights, the
                                 //         skeleton code (0x80027FF8) moves them in x and z
     f32   aGroundNormal[4][4];  // 0x1734  } the ground under points 0-3 (Character_UpdateFeetTerrainInfo)
     f32   afGroundHeight[4];    // 0x1774  }
@@ -661,15 +676,17 @@ typedef struct Character {
                                 //         groups 5, 6 and 10
     void* p1794;                // 0x1794  cleared by fn_80062BE8; the same for group 9
     Clip* p1798;                // 0x1798  cleared by Character_Create; with n2C 6, fn_8001C650 and
-                                //         Character_SetupForShot set n16D4 to 4 when it is 0
-    f32   a179C[4];             // 0x179C  cleared by Character_PlaceFeetOnGround; Character_KeepClubOutOfGround acts only
-                                //         while a179C[1] is above 0.9
-    void* p17AC;                // 0x17AC  its slider definitions (CharSlider_CreateDefinitionsFromMem,
+                                //         Character_SetupForShot set nClipKey to 4 when it is 0
+    f32   vAvgGroundNormal[4];  // 0x179C  the average ground normal under the four foot points
+                                //         (Character_PlaceFeetOnGround); Character_KeepClubOutOfGround
+                                //         acts only while its y is above 0.9
+    void* pSliderDefs;          // 0x17AC  its slider definitions (CharSlider_CreateDefinitionsFromMem,
                                 //         Character_CreateFromMem); fn_8001DC64 applies them
-    void (*pfn17B0)(void);      // 0x17B0  called by Character_UpdateAnimation before the bones are
+    void (*pfnPreBones)(void);  // 0x17B0  called by Character_UpdateAnimation before the bones are
                                 //         transformed; cleared by Character_Create
-    s8    n17B4;                // 0x17B4  cleared by Character_Create; Skin.c hands it to SkinPart_BeginDraw as
-                                //         the a10A0 index
+    s8    nView;                // 0x17B4  the view Skin.c poses the skins for and picks their parts in
+                                //         (the Skin.a10A0 index, SkinPart_BeginDraw); cleared by
+                                //         Character_Create
     u8    unk17B5[0x17B8 - 0x17B5];
     struct SkinChoices* pChoices;   // 0x17B8  its look (Character_SetClubsAndClothes dresses it from this); Character_EndLoadTexturesCallbackIG
                                     //         puts its logos on the model (sApplyUserLogos)
@@ -1017,7 +1034,9 @@ void* Char_SetClip(Character* pChar, int nGroup, int nStyle, const char* pName);
 void* Character_GetRandomMtaLib(Character* pChar, int nGroup, int n);   // char.c: a random item of its 'MAL ' bank
 
 // char.c: turning the character, and its dynamic textures (the menu golfer, FEgolferanim.c).
-void  Character_SetOrientation(Character* pChar, f32 fAngle);void  Character_AddTextureLoadRequest(Character* pChar, void (*pfnA)(Character* pChar), void (*pfnB)(Character* pChar));
+void  Character_SetOrientation(Character* pChar, f32 fAngle);
+void  Character_AddTextureLoadRequest(Character* pChar, void (*pfnBegin)(Character* pChar),
+                                      void (*pfnEnd)(Character* pChar));
 void  Character_BeginLoadTexturesCallbackFE(Character* pChar);
 void  Character_EndLoadTexturesCallbackFE(Character* pChar);
 void  Character_BeginSwapTexturesCallbackFE(Character* pChar);

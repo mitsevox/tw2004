@@ -379,7 +379,7 @@ void fn_8008B4C0(void) {
     }
     Character_SetClubsAndClothes(lbl_80281EE0->pB8->pChar, lbl_80281ED4->nSlot);
     SkinPart_SetChangeAllCopies(0);
-    fn_8010B098(lbl_80281EE0->pB8->pChar->a64[lbl_80281EE0->pB8->pChar->n74]);
+    fn_8010B098(lbl_80281EE0->pB8->pChar->apDynTex[lbl_80281EE0->pB8->pChar->nCurDynTex]);
     Character_AddTextureLoadRequest(lbl_80281EE0->pB8->pChar, Character_BeginLoadTexturesCallbackFE,
                                     Character_EndLoadTexturesCallbackFE);
 }
@@ -803,7 +803,7 @@ void sFE_AdjustAndSetGolferPosition(void) {
         return;
     }
     if (lbl_80281EE0->pB4->pChar != NULL) {
-        lbl_80281EE0->pB4->pChar->pfn17B0 = fn_8008D6CC;
+        lbl_80281EE0->pB4->pChar->pfnPreBones = fn_8008D6CC;
     }
     // Another golfer or profile slot than last drawn: give him his ball and textures.
     if ((lbl_80281340 != lbl_80281EE0->pB4->nC || lbl_80281344 != lbl_80281ED4->nSlot || lbl_80281EE0->b87)
@@ -825,9 +825,9 @@ void sFE_AdjustAndSetGolferPosition(void) {
         lbl_80281EE0->b87 = 0;
         Character_ExecuteTextureSwapFE(pChar);
         for (i = 0; i < pChar->nSkins; i++) {
-            SkinPart_SetupMaterials(pChar->apSkins[i], pChar->a64[pChar->n74]);
+            SkinPart_SetupMaterials(pChar->apSkins[i], pChar->apDynTex[pChar->nCurDynTex]);
         }
-        fn_8010BC64(pChar->a64[pChar->n74]);
+        fn_8010BC64(pChar->apDynTex[pChar->nCurDynTex]);
     }
     if (lbl_80281EE0->pB4->b18 && lbl_80281EE0->b86 == 0) {
         fn_80035600();

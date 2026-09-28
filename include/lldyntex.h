@@ -11,13 +11,15 @@
 
 struct Character;
 
-// A job for the dynamic textures (0x14 bytes, ten in DynTexState): char.c's Character_AddTextureLoadRequest fills one
-// with a character and two of its functions.
+// A job for the dynamic textures (0x14 bytes, ten in DynTexState): char.c's
+// Character_AddTextureLoadRequest fills one with a character and the callbacks run as the load
+// begins and as it ends.
 typedef struct DynTexJob {
-    void* p0;                   // 0x00  the address of the character's p50
-    void (*pfnA)(struct Character* pChar);   // 0x04
+    void* ppBank;               // 0x00  the address of the character's pBank
+    void (*pfnBegin)(struct Character* pChar);  // 0x04  run as the job starts
     struct Character* pChar;    // 0x08
-    void (*pfnB)(struct Character* pChar);   // 0x0C
+    void (*pfnEnd)(struct Character* pChar);    // 0x0C  run when its textures are in (or it has
+                                                //       no texture file)
     u8    bUsed;                // 0x10  set by fn_8010B930; fn_8010B8EC takes a job without it
     u8    pad11[3];
 } DynTexJob;
@@ -37,7 +39,7 @@ LAYOUT_ASSERT(DynTexUse, 0x10);
 typedef struct DynTexState {
     u8*   p0;                   // 0x000  the read buffer (fn_8010A448's nSize bytes)
     u8*   p4;                   // 0x004  where fn_8010BFE0 copies the next piece read
-    struct TexBank** p8;        // 0x008  set by fn_8010BC88 (char.c gives it &Character.p50)
+    struct TexBank** p8;        // 0x008  set by fn_8010BC88 (char.c gives it &Character.pBank)
     DynTexUse aUses[150];       // 0x00C  n96C of them (fn_8010BCFC)
     s32   n96C;                 // 0x96C
     s32   n970;                 // 0x970  cleared by fn_8010BED4

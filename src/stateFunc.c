@@ -2060,13 +2060,13 @@ u8 fn_80062B90(void) {
 
 // Clear an animation event's bSet flag.
 int fn_80062B98(Character* pChar, u64 uEvent) {
-    pChar->events[(int)uEvent].bSet = 0;
+    pChar->aTags[(int)uEvent].bSet = 0;
     return 0;
 }
 
 // An animation event has been reached: it is set and the animation time is past it.
 int fn_80062BB0(Character* pChar, u64 uEvent) {
-    if (pChar->events[(int)uEvent].bSet != 0 && pChar->fAnimTime >= pChar->events[(int)uEvent].fTime) {
+    if (pChar->aTags[(int)uEvent].bSet != 0 && pChar->fAnimTime >= pChar->aTags[(int)uEvent].fTime) {
         return 1;
     }
     return 0;

@@ -179,8 +179,9 @@ typedef struct SkinChoice {
 LAYOUT_ASSERT(SkinChoice, 8);
 
 // A golfer's look as kept outside the skins: SaveProfile.choices from 0x5500 (the created golfer),
-// or what Character.pChoices points at. SkinPart_ApplyBodyChoices fills it from the body's skin or the skin from
-// it; SkinPart_ApplyClubChoices gives the other six skins theirs; char_tex_manager.c puts its logos on the model.
+// or what Character.pChoices points at. SkinPart_ApplyBodyChoices fills it from the body's skin
+// or the skin from it; SkinPart_ApplyClubChoices gives the other six skins theirs;
+// char_tex_manager.c puts its logos on the model.
 typedef struct SkinChoices {
     // Three name lists of the created golfer (fe_craputils.c fn_80058560 adds, fn_80058624 removes,
     // fn_800587A8 looks up): lists 0 and 1 hold up to 8 names with a count, list 2 one name (its

@@ -108,21 +108,21 @@ void SkinPart_ApplyBodyChoices(Character* pChar, SkinChoices* pChoices) {
     }
 }
 
-// Gives the six club skins (p16D8, one per club class) their choices from pChoices, in all four
+// Gives the six club skins (pClubSet, one per club class) their choices from pChoices, in all four
 // copies.
 void SkinPart_ApplyClubChoices(Character* pChar, SkinChoices* pChoices) {
     int i;
     int j;
 
-    if (pChar == NULL || pChoices == NULL || pChar->p16D8 == NULL) return;
+    if (pChar == NULL || pChoices == NULL || pChar->pClubSet == NULL) return;
     for (i = 0; i < 6; i++) {
         for (j = 0; j < 4; j++) {
             // fake match: the (u32) on j (0-3, so the same index) keeps the array start and the offset
             // apart, as EA's code does (docs/decomp-notes.md, the (u32) index cast)
-            Mem_cpy(pChar->p16D8->apSkins[i]->aParts[(u32)j], pChoices->aSkinParts[i],
-                    SkinPart_GetNumParts(pChar->p16D8->apSkins[i]) * sizeof(SkinChoice));
-            Mem_cpy(pChar->p16D8->apSkins[i]->aSets[(u32)j], pChoices->aSkinSets[i],
-                    SkinPart_GetNumSets(pChar->p16D8->apSkins[i]) * sizeof(SkinChoice));
+            Mem_cpy(pChar->pClubSet->apSkins[i]->aParts[(u32)j], pChoices->aSkinParts[i],
+                    SkinPart_GetNumParts(pChar->pClubSet->apSkins[i]) * sizeof(SkinChoice));
+            Mem_cpy(pChar->pClubSet->apSkins[i]->aSets[(u32)j], pChoices->aSkinSets[i],
+                    SkinPart_GetNumSets(pChar->pClubSet->apSkins[i]) * sizeof(SkinChoice));
         }
     }
 }
@@ -192,11 +192,12 @@ void SkinPart_ChooseClubPartVariant(Character* pChar, int nSkin, u64 uPart, u64 
     int nVariant;
     Skin* pSkin;
 
-    if (pChar == NULL || pChar->p16D8 == NULL || pChar->p16D8->apSkins == NULL || nSkin < 0 || nSkin >= 6) {
+    if (pChar == NULL || pChar->pClubSet == NULL || pChar->pClubSet->apSkins == NULL || nSkin < 0 || nSkin
+        >= 6) {
         return;
     }
     if (pChar->pSkin->pModel != NULL) {
-        pSkin = pChar->p16D8->apSkins[nSkin];
+        pSkin = pChar->pClubSet->apSkins[nSkin];
         nPart = SkinPart_FindPart(pSkin, uPart);
         nVariant = SkinPart_FindPartVariant(pSkin, nPart, uVariant);
         if (nVariant < 0) {
@@ -215,11 +216,12 @@ void SkinPart_ChooseClubSet(Character* pChar, int nSkin, u64 uSet, u64 uVariant,
     Skin* pSkin;
     int nOption;
 
-    if (pChar == NULL || pChar->p16D8 == NULL || pChar->p16D8->apSkins == NULL || nSkin < 0 || nSkin >= 6) {
+    if (pChar == NULL || pChar->pClubSet == NULL || pChar->pClubSet->apSkins == NULL || nSkin < 0 || nSkin
+        >= 6) {
         return;
     }
     if (pChar->pSkin->pModel != NULL) {
-        pSkin = pChar->p16D8->apSkins[nSkin];
+        pSkin = pChar->pClubSet->apSkins[nSkin];
         nSet = SkinPart_FindSet(pSkin, uSet);
         nVariant = SkinPart_FindSetVariant(pSkin, nSet, uVariant);
         nOption = SkinPart_FindSetOption(pSkin, nSet, nVariant, uOption);
@@ -242,22 +244,22 @@ void SkinPart_SetClubsLeftHanded(Character* pChar, u8 bOn) {
     int nCopy;
     u8 bAll;
 
-    if (pChar == NULL || pChar->p16D8 == NULL || pChar->p16D8->apSkins == NULL) return;
+    if (pChar == NULL || pChar->pClubSet == NULL || pChar->pClubSet->apSkins == NULL) return;
     for (i = 0; i < 6; i++) {
-        nSets = SkinPart_GetNumSets(pChar->p16D8->apSkins[i]);
+        nSets = SkinPart_GetNumSets(pChar->pClubSet->apSkins[i]);
         for (j = 0; j < nSets; j++) {
-            nVariant = SkinPart_FindSetVariantByName(pChar->p16D8->apSkins[i], j, "DefaultL");
+            nVariant = SkinPart_FindSetVariantByName(pChar->pClubSet->apSkins[i], j, "DefaultL");
             if (nVariant >= 0) {
                 bAll = SkinPart_GetChangeAllCopies();
                 nCopy = 3;
                 if (bAll) {
                     nCopy = 0;
                 }
-                nOption = SkinPart_GetSetOption(pChar->p16D8->apSkins[i], j, nCopy);
+                nOption = SkinPart_GetSetOption(pChar->pClubSet->apSkins[i], j, nCopy);
                 if (bOn) {
-                    SkinPart_ChooseSet(pChar->p16D8->apSkins[i], j, nVariant, nOption);
+                    SkinPart_ChooseSet(pChar->pClubSet->apSkins[i], j, nVariant, nOption);
                 } else {
-                    SkinPart_ChooseSet(pChar->p16D8->apSkins[i], j, 0, nOption);
+                    SkinPart_ChooseSet(pChar->pClubSet->apSkins[i], j, 0, nOption);
                 }
             }
         }
@@ -319,7 +321,7 @@ s32 SkinPart_GetNumPartOptions(Skin* pSkin, int nPart, int nVariant) {
 }
 
 // Picks a part's variant (-1, none, when out of range) in copy 3, or in all four copies when
-// SkinPart_GetChangeAllCopies, then also setting Skin.u10D4 bit 1 so SkinPart_UpdateMarks redoes
+// SkinPart_GetChangeAllCopies, then also setting Skin.uFlags bit 1 so SkinPart_UpdateMarks redoes
 // the drawn meshes. A chosen variant's links then set the options of the parts they name
 // (SkinPart_ApplyVariantLink).
 void SkinPart_ChoosePartVariant(Skin* pSkin, int nPart, int nVariant) {
@@ -339,7 +341,7 @@ void SkinPart_ChoosePartVariant(Skin* pSkin, int nPart, int nVariant) {
                 for (i = 0; i != 4; i++) {
                     pSkin->aParts[i][nPart].nVariant = nVariant;
                 }
-                pSkin->u10D4 |= 1;
+                pSkin->uFlags |= 1;
             } else {
                 pSkin->aParts[3][nPart].nVariant = nVariant;
             }
@@ -354,7 +356,7 @@ void SkinPart_ChoosePartVariant(Skin* pSkin, int nPart, int nVariant) {
 }
 
 // Picks a part's option (0 when any of the part's variants has fewer than nOption options) in copy
-// 3, or in all four copies when SkinPart_GetChangeAllCopies, then also setting Skin.u10D4 bit 1
+// 3, or in all four copies when SkinPart_GetChangeAllCopies, then also setting Skin.uFlags bit 1
 // (see SkinPart_ChoosePartVariant). Does nothing for a part out of range.
 void SkinPart_ChoosePartOption(Skin* pSkin, int nPart, int nOption) {
     SkinDesc* pDesc;
@@ -373,7 +375,7 @@ void SkinPart_ChoosePartOption(Skin* pSkin, int nPart, int nOption) {
             for (i = 0; i != 4; i++) {
                 pSkin->aParts[i][nPart].nOption = nOption;
             }
-            pSkin->u10D4 |= 1;
+            pSkin->uFlags |= 1;
             return;
         }
         pSkin->aParts[3][nPart].nOption = nOption;
@@ -461,7 +463,7 @@ s32 SkinPart_GetNumSetOptions(Skin* pSkin, int nSet, int nVariant) {
 
 // Picks a set's variant (0 when out of range) and option (-1, none, when out of range) in copy 3,
 // or in all four copies when SkinPart_GetChangeAllCopies. Unlike the parts' choosers it leaves
-// Skin.u10D4 alone.
+// Skin.uFlags alone.
 void SkinPart_ChooseSet(Skin* pSkin, int nSet, int nVariant, int nOption) {
     int i;
 
@@ -490,7 +492,7 @@ s32 SkinPart_GetSetVariant(Skin* pSkin, int nSet, int nCopy) {
     return pSkin->aSets[nCopy][nSet].nVariant;
 }
 
-// The texture scale-and-offset a set's variant picks (SkinDesc7C.n10):
+// The texture scale-and-offset a set's variant picks (SkinDesc7C.nUVIndex):
 // SkinPart_ApplySetsToMaterialEntry gives a patched p14 entry that entry of its SkinDesc.pB8 run.
 // -1 when the set or the variant is out of range.
 s32 SkinPart_GetSetVariantUVIndex(Skin* pSkin, int nSet, int nVariant) {
@@ -500,7 +502,7 @@ s32 SkinPart_GetSetVariantUVIndex(Skin* pSkin, int nSet, int nVariant) {
     if (pSkin->pModel->pDesc == NULL || nSet < 0 || nSet >= SkinPart_GetNumSets(pSkin)) return -1;
     if (nVariant < 0 || nVariant >= (pSet = &(pDesc = pSkin->pModel->pDesc)->p74[nSet])->n08) return -1;
     nVariant += pSet->n10;
-    return pDesc->p7C[nVariant].n10;
+    return pDesc->p7C[nVariant].nUVIndex;
 }
 
 // A set's chosen option in copy nCopy (copy 0 is the one drawn); -1 none or a set out of range.
@@ -612,7 +614,7 @@ s32 SkinPart_GetOptionSize(SkinDesc* pDesc, int n) {
     s32 nBytes;
 
     args.pDesc = pDesc;
-    args.n = n;
+    args.nEntry = n;
     pIter = fn_80113B34(aBuf, &args);
     nBytes = 0;
     for (; SkinIter_IsValid(pIter); SkinIter_Next(pIter)) {
@@ -676,12 +678,12 @@ s32 SkinPart_GetMaxOptionsSize(Skin* pSkin) {
     return nBytes;
 }
 
-// The p10D0 bit for the mesh iterator's index n: n itself (pSkin is unused).
+// The aMeshBits bit for the mesh iterator's index n: n itself (pSkin is unused).
 s32 SkinPart_GetMeshBit(Skin* pSkin, s32 n) {
     return n;
 }
 
-// Marks in p10CC the matrices the mesh uses (its n8 SkinMeshBit entries; a bit per SkinModel.p54
+// Marks in aMtxBits the matrices the mesh uses (its n8 SkinMeshBit entries; a bit per SkinModel.p54
 // blended matrix, which Skin.c computes only when marked).
 void SkinPart_MarkMeshMatrices(Skin* pSkin, SkinMesh* pMesh) {
     SkinMeshBit* pBit;
@@ -689,14 +691,14 @@ void SkinPart_MarkMeshMatrices(Skin* pSkin, SkinMesh* pMesh) {
 
     pBit = pMesh->pBits;
     for (i = 0; i < pMesh->n8; i++) {
-        BitArray_Set(pSkin->p10CC, pBit->nBit);
+        BitArray_Set(pSkin->aMtxBits, pBit->nBit);
         pBit++;
     }
 }
 
-// Marks what option n (a SkinDesc.p5C entry) needs: its meshes with flags 0x300000 in p10D0 (what
-// Skin.c draws; skipped while the skin has no p10D0) and, for its meshes with flags 1 and 0x10,
-// their matrices in p10CC. Nothing for n out of range.
+// Marks what option n (a SkinDesc.p5C entry) needs: its meshes with flags 0x300000 in aMeshBits (what
+// Skin.c draws; skipped while the skin has no aMeshBits) and, for its meshes with flags 1 and 0x10,
+// their matrices in aMtxBits. Nothing for n out of range.
 void SkinPart_MarkOption(Skin* pSkin, int n) {
     u8 aBuf[0x38];              // the iterator's work space; its real size is not known
     SkinIterArgs args;
@@ -706,14 +708,14 @@ void SkinPart_MarkOption(Skin* pSkin, int n) {
 
     pDesc = pSkin->pModel->pDesc;
     if (n < 0 || n >= pDesc->n58) return;
-    args.n = n;
+    args.nEntry = n;
     args.pDesc = pDesc;
     for (pIter = fn_80113B34(aBuf, &args); SkinIter_IsValid(pIter); SkinIter_Next(pIter)) {
         pMesh = SkinIter_GetMesh(pIter);
         if ((pMesh->uFlags & 0x300000) == 0x300000) {
             n = SkinPart_GetMeshBit(pSkin, SkinIter_GetIndex(pIter));
-            if (pSkin->p10D0 != NULL) {
-                BitArray_Set(pSkin->p10D0, n);
+            if (pSkin->aMeshBits != NULL) {
+                BitArray_Set(pSkin->aMeshBits, n);
             }
         }
         if ((pMesh->uFlags & 1) && (pMesh->uFlags & 0x10)) {
@@ -752,17 +754,17 @@ void SkinPart_MarkAllOptions(Skin* pSkin) {
     }
 }
 
-// Once the choices changed (Skin.u10D4 bit 1, which it clears): clears both bit arrays and marks
+// Once the choices changed (Skin.uFlags bit 1, which it clears): clears both bit arrays and marks
 // again what each part's chosen option in copy 0 needs (SkinPart_MarkPart). Skin.c calls it before
 // it computes the skin's matrices.
 void SkinPart_UpdateMarks(Skin* pSkin) {
     int i;
 
-    if (pSkin->u10D4 & 1) {
-        pSkin->u10D4 &= ~1;
-        BitArray_ClearAll(pSkin->p10CC, pSkin->pModel->n50);
-        if (pSkin->p10D0 != NULL) {
-            BitArray_ClearAll(pSkin->p10D0, pSkin->pModel->n40);
+    if (pSkin->uFlags & 1) {
+        pSkin->uFlags &= ~1;
+        BitArray_ClearAll(pSkin->aMtxBits, pSkin->pModel->n50);
+        if (pSkin->aMeshBits != NULL) {
+            BitArray_ClearAll(pSkin->aMeshBits, pSkin->pModel->n40);
         }
         for (i = 0; i < SkinPart_GetNumParts(pSkin); i++) {
             SkinPart_MarkPart(pSkin, i);
@@ -917,11 +919,11 @@ void SkinPart_ApplyVariantLink(Skin* pSkin, int nPart, int nVariant, int nLink) 
 }
 
 // Starts drawing the skin's parts for view nView (Skin.c: then SkinPart_DrawPart for each part and
-// SkinPart_EndDraw): once the skin is loaded (u10D4 & 2) and has a description, flushes the render
+// SkinPart_EndDraw): once the skin is loaded (uFlags & 2) and has a description, flushes the render
 // state with clipping on and the camera's matrices, resets the skin renderer (hwsRender_Gc.c) and
 // hands it the description and the view's mesh overrides (a10A0[nView]).
 void SkinPart_BeginDraw(Skin* pSkin, int nView) {
-    if (pSkin->pModel->pDesc != NULL && (pSkin->u10D4 & 2)) {
+    if (pSkin->pModel->pDesc != NULL && (pSkin->uFlags & 2)) {
         RenderState_SetClipMode(1);
         RenderState_SetCameraMatrices();
         RenderState_Flush();
@@ -939,7 +941,7 @@ void SkinPart_DrawPart(Skin* pSkin, int nPart) {
     s32 nVariant;
     s32 nOption;
 
-    if (pSkin->u10D4 & 2) {
+    if (pSkin->uFlags & 2) {
         nVariant = SkinPart_GetPartVariant(pSkin, nPart, 0);
         nOption = SkinPart_GetPartOption(pSkin, nPart, 0);
         if (nVariant != -1) {
@@ -950,7 +952,7 @@ void SkinPart_DrawPart(Skin* pSkin, int nPart) {
 
 // Ends drawing a loaded skin's parts (SkinPart_BeginDraw): hwsRender_Gc.c's end step (fn_8011389C).
 void SkinPart_EndDraw(Skin* pSkin) {
-    if (pSkin->pModel->pDesc != NULL && (pSkin->u10D4 & 2)) {
+    if (pSkin->pModel->pDesc != NULL && (pSkin->uFlags & 2)) {
         fn_8011389C();
     }
 }

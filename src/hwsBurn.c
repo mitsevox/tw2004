@@ -171,7 +171,7 @@ void fn_80110A38(HwsBurn* pBurn, int n) {
     BitArray_Set(pBurn->p3C, n);
     BitArray_Set(pBurn->p40, n);
     args.pDesc = pBurn->pDesc;
-    args.n = n;
+    args.nEntry = n;
     pIter = fn_80110A38_Read(fn_80113910((u8*)&iterBuf, &args));  // fake match: through fn_80110A38_Read
     while (SkinIter_IsValid(pIter)) {
         BitArray_Set(pBurn->p28, SkinIter_GetIndex(pIter));
@@ -214,7 +214,7 @@ void fn_80110C88(HwsBurn* pBurn, int n) {
     int nMesh;
 
     args.pDesc = pBurn->pDesc;
-    args.n = n;
+    args.nEntry = n;
     for (pIter = fn_80113A9C(aBuf, &args); SkinIter_IsValid(pIter); SkinIter_Next(pIter)) {
         nMesh = SkinIter_GetIndex(pIter);
         fn_80110A38(pBurn, nMesh);
@@ -678,7 +678,7 @@ SkinDesc* fn_80111850(HwsBurn* pBurn) {
         if ((pEntry->u24 & 2) && pEntry->n14 == 0) {
             pEntry->u24 &= ~2;
             args.pDesc = pOut;
-            args.n = i;
+            args.nEntry = i;
             pIter = fn_80113910((u8*)&iterBuf, &args);
             while (SkinIter_IsValid(pIter)) {
                 pMesh = SkinIter_GetMesh(pIter);

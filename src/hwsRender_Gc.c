@@ -488,7 +488,7 @@ SkinIter* fn_80113910(u8* pBuf, SkinIterArgs* pArgs) {
 
     fn_80113E54(&pIter->iter, lbl_802817E8);
     pIter->pDesc = pArgs->pDesc;
-    pIter->pEntry = &pIter->pDesc->p44[pArgs->n];
+    pIter->pEntry = &pIter->pDesc->p44[pArgs->nEntry];
     if (pIter->pEntry->nC >= 0) {
         p28 = &pIter->pDesc->p28[pIter->pEntry->nC];
         nCount = 0;
@@ -520,7 +520,7 @@ SkinIter* fn_80113A9C(u8* pBuf, SkinIterArgs* pArgs) {
     fn_80113E54((SkinIter*)pBuf, lbl_802817EC);
     pIter = (SkinDescIter*)pBuf;
     pIter->pDesc = pArgs->pDesc;
-    pIter->pEntry = &pArgs->pDesc->p5C[pArgs->n];
+    pIter->pEntry = &pArgs->pDesc->p5C[pArgs->nEntry];
     pIter->pSub = NULL;
     pIter->n18 = -1;
     SkinIter_Next(&pIter->iter);
@@ -542,7 +542,7 @@ SkinIter* fn_80113B34(u8* pBuf, SkinIterArgs* pArgs) {
     fn_80113E54((SkinIter*)pBuf, lbl_802817F0);
     pIter = (SkinDescIter*)pBuf;
     pIter->pDesc = pArgs->pDesc;
-    pIter->pEntry = &pArgs->pDesc->p5C[pArgs->n];
+    pIter->pEntry = &pArgs->pDesc->p5C[pArgs->nEntry];
     pIter->pSub = NULL;
     pIter->n18 = -1;
     SkinIter_Next(&pIter->iter);
@@ -611,8 +611,8 @@ void fn_80113D28(SkinIter* pIter) {
             break;
         }
         args.pDesc = p->pDesc;
-        args.n = p->pDesc->p6C[p->pEntry->n4 + p->n18];
-        if (args.n >= 0) {
+        args.nEntry = p->pDesc->p6C[p->pEntry->n4 + p->n18];
+        if (args.nEntry >= 0) {
             p->pSub = fn_80113910((u8*)&p->sub, &args);
             if (!SkinIter_IsValid(p->pSub)) {
                 fn_80113A7C(p->pSub);

@@ -57,8 +57,8 @@ void fn_800957FC(Character* pChar, u8 bReset) {
         fn_80071C28(&pNode, 1, 1, fn_80072ACC, 1);
         fn_800725BC(pNode, fn_80072ACC, 0.5f);
     }
-    if (gSession.nGameType == 3 && pChar->p17AC != NULL) {
-        CharSlider_UpdateCharacterBasedOnSliderValues(pChar->p17AC, pChar->pModel, pChar->pSkin, 26,
+    if (gSession.nGameType == 3 && pChar->pSliderDefs != NULL) {
+        CharSlider_UpdateCharacterBasedOnSliderValues(pChar->pSliderDefs, pChar->pModel, pChar->pSkin, 26,
                                                       FE_GetCurrentProfile()->choices.a9B4,
                     &pChar->node3E0);
     }
@@ -170,10 +170,10 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
         }
         if (strcmp(pClip->name, "gplptt12") == 0 && (pCourse = Ter_GetTGD()) != NULL &&
             Ter_GetSupportingGroundNormal(pCourse, pChar->pModel->pMatrices[0][3], vNormal)) {
-            LLMath_CopyVec(pChar->a179C, m[1]);
-            vec4flt_CrossProduct(pChar->pModel->pMatrices[0][0], pChar->a179C, m[2]);
+            LLMath_CopyVec(pChar->vAvgGroundNormal, m[1]);
+            vec4flt_CrossProduct(pChar->pModel->pMatrices[0][0], pChar->vAvgGroundNormal, m[2]);
             LLMath_Normalize3(m[2], m[2]);
-            vec4flt_CrossProduct(pChar->a179C, m[2], m[0]);
+            vec4flt_CrossProduct(pChar->vAvgGroundNormal, m[2], m[0]);
             m[0][3] = 0.0f;
             m[1][3] = 0.0f;
             m[2][3] = 0.0f;
@@ -182,7 +182,7 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
             Quat_BuildFromMatrix(m, pChar->pModel->pBones->q0C);
             pChar->u10 |= 0x8000;
         }
-        strcpy(pChar->sz1614, pClip->name);
+        strcpy(pChar->szLastClip, pClip->name);
         EVENT_Trigger(pChar->nPlayer, 0x48, NULL, nGroup);
         if (pClip->pD8 != NULL) {
             pChar->pBlend = pClip;
@@ -285,8 +285,8 @@ void fn_80095FD0(Character* pChar, MtaLib* pLib, u8 bReset, int nGroup, SKABlend
     }
     fn_800958EC(&pChar->anim29C, nAnim, fTime);
     pChar->p178C = pLib;
-    if (gSession.nGameType == 3 && pChar->p17AC != NULL) {
-        CharSlider_UpdateCharacterBasedOnSliderValues(pChar->p17AC, pChar->pModel, pChar->pSkin, 26,
+    if (gSession.nGameType == 3 && pChar->pSliderDefs != NULL) {
+        CharSlider_UpdateCharacterBasedOnSliderValues(pChar->pSliderDefs, pChar->pModel, pChar->pSkin, 26,
                                                       FE_GetCurrentProfile()->choices.a9B4,
                     &pChar->node3E0);
     }
@@ -356,7 +356,7 @@ s32 CharacterState_UpdateFidgetState(Character* pChar) {
                     if (nClub == 1) {
                         nClub = 0;
                     }
-                    AnimLib_Find(pChar->pLib, 4, pChar->nStyle, nClub, pChar->n16D4, &nCount, &uFlags,
+                    AnimLib_Find(pChar->pLib, 4, pChar->nStyle, nClub, pChar->nClipKey, &nCount, &uFlags,
                                  NULL, NULL);
                     if (!(uFlags & 1)) {
                         pChar->n26 = 1;
@@ -570,11 +570,11 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         bNoIK = 1;
         break;
     case 14:
-        nSaved = pChar->n16D4;
+        nSaved = pChar->nClipKey;
         if (gPlayers[pChar->nPlayer].ball.nLie == 0) {
-            pChar->n16D4 = 6;
+            pChar->nClipKey = 6;
         } else {
-            pChar->n16D4 = 0;
+            pChar->nClipKey = 0;
         }
         // EA's code resets the blend tree either way
         switch (pChar->n20) {
@@ -587,7 +587,7 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         }
         CharacterState_AddSKABlendData(pChar, bReset, 11, fn_80072ACC, 1, 8, -20000.0f, -30000.0f, -10000.0f,
                                        0.0f, -10000.0f);
-        pChar->n16D4 = nSaved;
+        pChar->nClipKey = nSaved;
         bNoIK = 0;
         break;
     case 8:

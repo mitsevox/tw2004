@@ -326,7 +326,7 @@ void fn_800725BC(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 fWeight) {
 // Pose the tree at pNode at fTime: take its times from its children, free a flagged child that has
 // ended, pose each source at its clip time (fFrom to fTo in proportion, kept in f2C) and each blend
 // node the same way, then blend with pfnBlend. Between two format 0 sources, when only the earlier
-// one's clip has flag 0x10, its grip bone takes the character's held grip (q16AC, v16BC).
+// one's clip has flag 0x10, its grip bone takes the character's held grip (qGripFromRoot, vGripFromRoot).
 void fn_8007260C(Character* pChar, SKABlendNode* pNode, CharModel* pModel, f32 fTime) {
     int nPlaying;
     s32 i;
@@ -362,8 +362,8 @@ void fn_8007260C(Character* pChar, SKABlendNode* pNode, CharModel* pModel, f32 f
                     }
                     if ((pClipFirst->uFlags & 0x10) && !(pClipOther->uFlags & 0x10)) {
                         pPose = pFirst->pPose;
-                        LLMath_CopyVec(pChar->q16AC, pPose->aBones[pChar->nGripBone].q0);
-                        LLMath_CopyVec(pChar->v16BC, pPose->aBones[pChar->nGripBone].v10);
+                        LLMath_CopyVec(pChar->qGripFromRoot, pPose->aBones[pChar->nGripBone].q0);
+                        LLMath_CopyVec(pChar->vGripFromRoot, pPose->aBones[pChar->nGripBone].v10);
                     }
                 }
             }

@@ -512,8 +512,8 @@ void fn_800279C0(Character* pChar) {
     BitArray_ClearAll(aBits, 0x80);
     BitArray_Set(aBits, CharModel_GetBoneIndexMapped(pModel, 0x23));
     SKEL_TransformBones(pModel, aBits);
-    LLMath_mat44fltMultiply(pModel->pMatrices[nGrip], (Vec4*)pChar->p16D8->a3C[pChar->nClubClass],
-                (Vec4*)pChar->aPoints[4]);
+    LLMath_mat44fltMultiply(pModel->pMatrices[nGrip], (Vec4*)pChar->pClubSet->a3C[pChar->nClubClass],
+                (Vec4*)pChar->aTestPoints[4]);
     fn_80026F90(pModel->pSkel, pChain, 0);
 }
 
@@ -588,8 +588,8 @@ f32 fn_80027E8C(CharModel* pModel, IKChain* pChain, f32* pTarget, int bNormals) 
         pModel->pBones[0].v1C[0] += fDx;
         pModel->pBones[0].v1C[2] += fDz;
         for (i = 0; i < 5; i++) {
-            lbl_80281D20->aPoints[i][0] += fDx;
-            lbl_80281D20->aPoints[i][2] += fDz;
+            lbl_80281D20->aTestPoints[i][0] += fDx;
+            lbl_80281D20->aTestPoints[i][2] += fDz;
         }
         if (bNormals) {
             Character_UpdateFeetTerrainInfo(lbl_80281D20, 1);

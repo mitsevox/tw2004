@@ -322,7 +322,7 @@ void FE_CrAP_SaveClubSkinChoices(void) {
     int i;
 
     for (i = 0; i < 6; i++) {
-        pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[i];
+        pSkin = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[i];
         Mem_cpy(pProfile->choices.aSkinParts[i], pSkin->aParts[3], SkinPart_GetNumParts(pSkin)
                 * sizeof(SkinChoice));
         Mem_cpy(pProfile->choices.aSkinSets[i], pSkin->aSets[3], SkinPart_GetNumSets(pSkin)
@@ -1153,28 +1153,28 @@ void FE_CrAP_GetPartColorRGBA(s16 nPart, int b, int i, int n, u8* pColor) {
     }
     szCategory = FE_CrAP_GetStringFromTable(pAsset->nCategory);
     if (stricmp(szCategory, "drivers") == 0) {
-        pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[0];
+        pSkin = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[0];
     } else if (stricmp(szCategory, "Fairway Woods") == 0) {
-        pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[1];
+        pSkin = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[1];
     } else if (stricmp(szCategory, "Iron Sets") == 0) {
-        pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[3];
+        pSkin = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[3];
     } else if (stricmp(szCategory, "Wedge Sets") == 0) {
-        pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[5];
+        pSkin = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[5];
     } else if (stricmp(szCategory, "Putters") == 0) {
-        pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[2];
+        pSkin = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[2];
     } else if (stricmp(szCategory, "shafts") == 0) {
         fn_800CB8F0(&pAsset->aSet[0], szSet);
         if (stricmp(szSet, "fwd_shaft") == 0) {
-            pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[0];
+            pSkin = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[0];
         } else {
-            pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[3];
+            pSkin = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[3];
         }
     } else if (stricmp(szCategory, "grips") == 0) {
         fn_800CB8F0(&pAsset->aSet[0], szSet);
         if (stricmp(szSet, "fwd_grip") == 0) {
-            pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[0];
+            pSkin = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[0];
         } else {
-            pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[3];
+            pSkin = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[3];
         }
     } else {
         pSkin = lbl_80281EE0->pB4->pChar->pSkin;
@@ -1559,7 +1559,7 @@ u8 FE_CrAP_TryClubSwappingAsset(CrAPAsset* pAsset) {
     int i;
 
     if (lbl_80281EE0->pB4 == NULL || lbl_80281EE0->pB4->pChar == NULL ||
-        lbl_80281EE0->pB4->pChar->p16D8 == NULL) {
+        lbl_80281EE0->pB4->pChar->pClubSet == NULL) {
         return 0;
     }
     nSkins = FE_CrAP_GetClubSkinsForAsset(pAsset, apSkins);
@@ -1570,8 +1570,8 @@ u8 FE_CrAP_TryClubSwappingAsset(CrAPAsset* pAsset) {
         // EA bug: the inner loop reuses i, so every club skin gets the asset once, whatever nSkins
         // is, and apSkins is never read
         for (i = 0; i < 6; i++) {
-            FE_CrAP_ApplyAssetParts(pAsset, lbl_80281EE0->pB4->pChar->p16D8->apSkins[i]);
-            FE_CrAP_ApplyAssetSetsToClubSkin(pAsset, lbl_80281EE0->pB4->pChar->p16D8->apSkins[i]);
+            FE_CrAP_ApplyAssetParts(pAsset, lbl_80281EE0->pB4->pChar->pClubSet->apSkins[i]);
+            FE_CrAP_ApplyAssetSetsToClubSkin(pAsset, lbl_80281EE0->pB4->pChar->pClubSet->apSkins[i]);
         }
     }
     return 1;
@@ -1584,37 +1584,37 @@ int FE_CrAP_GetClubSkinsForAsset(CrAPAsset* pAsset, Skin** apSkins) {
     char* szCategory = FE_CrAP_GetStringFromTable(pAsset->nCategory);
 
     if (lbl_80281EE0->pB4 == NULL || lbl_80281EE0->pB4->pChar == NULL ||
-        lbl_80281EE0->pB4->pChar->p16D8 == NULL || apSkins == NULL) {
+        lbl_80281EE0->pB4->pChar->pClubSet == NULL || apSkins == NULL) {
         return 0;
     }
     if (stricmp(szCategory, "shafts") == 0 || stricmp(szCategory, "grips") == 0) {
-        apSkins[0] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[0];
-        apSkins[1] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[1];
-        apSkins[2] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[2];
-        apSkins[3] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[3];
-        apSkins[4] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[4];
-        apSkins[5] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[5];
+        apSkins[0] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[0];
+        apSkins[1] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[1];
+        apSkins[2] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[2];
+        apSkins[3] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[3];
+        apSkins[4] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[4];
+        apSkins[5] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[5];
         return 6;
     }
     if (stricmp(szCategory, "drivers") == 0) {
-        apSkins[0] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[0];
+        apSkins[0] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[0];
         return 1;
     }
     if (stricmp(szCategory, "Fairway Woods") == 0) {
-        apSkins[0] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[1];
+        apSkins[0] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[1];
         return 1;
     }
     if (stricmp(szCategory, "Iron Sets") == 0) {
-        apSkins[0] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[3];
-        apSkins[1] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[4];
+        apSkins[0] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[3];
+        apSkins[1] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[4];
         return 2;
     }
     if (stricmp(szCategory, "Wedge Sets") == 0) {
-        apSkins[0] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[5];
+        apSkins[0] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[5];
         return 1;
     }
     if (stricmp(szCategory, "Putters") == 0) {
-        apSkins[0] = lbl_80281EE0->pB4->pChar->p16D8->apSkins[2];
+        apSkins[0] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[2];
         return 1;
     }
     return 0;
@@ -1633,7 +1633,7 @@ u8 FE_CrAP_TryBallSwappingAsset(CrAPAsset* pAsset) {
     }
     szCategory = FE_CrAP_GetStringFromTable(pAsset->nCategory);
     if (lbl_80281EE0->pB4 == NULL || lbl_80281EE0->pB4->pChar == NULL ||
-        lbl_80281EE0->pB4->pChar->p16D8 == NULL) {
+        lbl_80281EE0->pB4->pChar->pClubSet == NULL) {
         return 0;
     }
     if (stricmp(szCategory, "balls") == 0) {
@@ -1677,7 +1677,7 @@ void FE_CrAP_ApplyAssetSets(CrAPAsset* pAsset, Skin* pSkin) {
             SkinPart_ChooseSet(pSkin, nSet, nVariant, nOption);
             if (SkinPart_GetChangeAllCopies() && nOption >= 0) {
                 SkinPart_DropSetVariantTextures(pSkin, nSet, nVariant, nOption,
-                            lbl_80281EE0->pB4->pChar->a64[lbl_80281EE0->pB4->pChar->n74]);
+                            lbl_80281EE0->pB4->pChar->apDynTex[lbl_80281EE0->pB4->pChar->nCurDynTex]);
             }
         }
     }
@@ -1704,7 +1704,7 @@ void FE_CrAP_ApplyAssetSetsToClubSkin(CrAPAsset* pAsset, Skin* pSkin) {
             SkinPart_ChooseSet(pSkin, nSet, nVariant, nOption);
             if (SkinPart_GetChangeAllCopies() && nOption >= 0) {
                 SkinPart_DropSetVariantTextures(pSkin, nSet, nVariant, nOption,
-                            lbl_80281EE0->pB4->pChar->a64[lbl_80281EE0->pB4->pChar->n74]);
+                            lbl_80281EE0->pB4->pChar->apDynTex[lbl_80281EE0->pB4->pChar->nCurDynTex]);
             }
         }
     }

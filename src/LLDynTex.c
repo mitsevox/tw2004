@@ -583,8 +583,8 @@ void fn_8010B7C0(void) {
     lbl_80282488->nA84 = 0;
     for (i = 0; i < 10; i++) {
         lbl_80282488->aJobs[i].bUsed = 0;
-        lbl_80282488->aJobs[i].pfnA = NULL;
-        lbl_80282488->aJobs[i].pfnB = NULL;
+        lbl_80282488->aJobs[i].pfnBegin = NULL;
+        lbl_80282488->aJobs[i].pfnEnd = NULL;
         lbl_80282488->apQueue[i] = NULL;
     }
 }
@@ -783,8 +783,8 @@ void fn_8010BFA0(int nBytes, int nError) {
     }
 }
 
-// The Character whose p50 ppBank points at (char.c hands LLDynTex.c &Character.p50; the fields
-// after it, up to p60, are read through it).
+// The Character whose pBank ppBank points at (char.c hands LLDynTex.c &Character.pBank; the fields
+// after it, up to pDynTex, are read through it).
 // port: EA likely had these five fields in a struct of their own inside Character
 #define DYNTEX_CHAR(ppBank) ((Character*)((u8*)(ppBank) - 0x50))
 
@@ -811,9 +811,9 @@ u8 fn_8010BFE0(void) {
     if (lbl_80282488->n980 == 0) {
         if (lbl_80282488->nA84 != 0) {
             lbl_80282488->pA88 = fn_8010B960();
-            lbl_80282488->pA88->pfnA(lbl_80282488->pA88->pChar);
+            lbl_80282488->pA88->pfnBegin(lbl_80282488->pA88->pChar);
             if (DYNTEX_CHAR(lbl_80282488->p8)->hFile < 0) {
-                lbl_80282488->pA88->pfnB(lbl_80282488->pA88->pChar);
+                lbl_80282488->pA88->pfnEnd(lbl_80282488->pA88->pChar);
                 lbl_80282488->n980 = 0;
                 lbl_80282488->pA88->bUsed = 0;
                 return 0;
@@ -826,7 +826,7 @@ u8 fn_8010BFE0(void) {
     bReady = lbl_80282488->b974 != 0;
     fn_80007328();
     if (bReady) {
-        pTex = DYNTEX_CHAR(lbl_80282488->pA88->p0)->p60;
+        pTex = DYNTEX_CHAR(lbl_80282488->pA88->ppBank)->pDynTex;
         // Copy what the last read brought.
         if (lbl_80282488->n978 != 0) {
             Mem_cpy(lbl_80282488->p4, lbl_80282488->p0 + lbl_80282488->nA94, lbl_80282488->nA90);
@@ -851,7 +851,7 @@ u8 fn_8010BFE0(void) {
                 }
                 if (lbl_80282488->n970 == lbl_80282488->n96C) {
                     // All done.
-                    lbl_80282488->pA88->pfnB(lbl_80282488->pA88->pChar);
+                    lbl_80282488->pA88->pfnEnd(lbl_80282488->pA88->pChar);
                     lbl_80282488->pA88->bUsed = 0;
                     lbl_80282488->n980 = 0;
                     return 0;
@@ -864,16 +864,17 @@ u8 fn_8010BFE0(void) {
                     pPal = &(*lbl_80282488->p8)->pC[pEntry->nPalette];
                 }
                 lbl_80282488->aUses[lbl_80282488->n970].nC =
-                    fn_8010B338(DYNTEX_CHAR(lbl_80282488->pA88->p0)->p60, (DynTexObj*)pEntry,
+                    fn_8010B338(DYNTEX_CHAR(lbl_80282488->pA88->ppBank)->pDynTex, (DynTexObj*)pEntry,
                                 (DynTexPalette*)pPal, NULL, NULL,
                                 lbl_80282488->aUses[lbl_80282488->n970].p4,
                                 lbl_80282488->aUses[lbl_80282488->n970].n8);
                 pObj = &pTex->p4->p8[lbl_80282488->aUses[lbl_80282488->n970].nC];
                 lbl_80282488->p4 = pTex->p18 + pObj->aBlocks[0].nOffset;
-                lbl_80282488->u98C = DYNTEX_CHAR(lbl_80282488->p8)->n58 + pEntry->aMips[0].uPixels;
+                lbl_80282488->u98C = DYNTEX_CHAR(lbl_80282488->p8)->nTexFileBase + pEntry->aMips[0].uPixels;
                 lbl_80282488->u98C &= ~0x7FF;
                 lbl_80282488->nA94 =
-                    DYNTEX_CHAR(lbl_80282488->p8)->n58 + pEntry->aMips[0].uPixels - lbl_80282488->u98C;
+                    DYNTEX_CHAR(lbl_80282488->p8)->nTexFileBase + pEntry->aMips[0].uPixels
+                            - lbl_80282488->u98C;
                 lbl_80282488->n988 = fn_8010B5F8((DynTexObj*)pEntry) << 4;
                 if (pPal != NULL) {
                     lbl_80282488->n988 += fn_8010B664((DynTexPalette*)pPal) << 4;

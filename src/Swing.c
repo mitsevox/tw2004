@@ -1717,7 +1717,7 @@ int fn_8005CB60(int nPlayer) {
 
 // An animation event's time.
 f32 fn_8005CB78(Character* pChar, u64 uEvent) {
-    return pChar->events[(int)uEvent].fTime;
+    return pChar->aTags[(int)uEvent].fTime;
 }
 
 void fn_8005CB88(Character* pObj, f32 f) {

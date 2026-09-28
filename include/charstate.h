@@ -78,7 +78,7 @@ LAYOUT_ASSERT(SkinDesc14Old, 0x30);
 
 typedef struct SkinMeshBit {
     u8   unk0[6];
-    s16  nBit;                  // 0x6  a bit of Skin.p10CC
+    s16  nBit;                  // 0x6  a bit of Skin.aMtxBits
 } SkinMeshBit;
 LAYOUT_ASSERT(SkinMeshBit, 8);
 
@@ -141,7 +141,8 @@ typedef struct SkinDesc7C {
     u64  uId;                   // 0x00  its name code
     s32  n08;                   // 0x08  entries in SkinDesc.p8C from n0C
     s32  n0C;                   // 0x0C
-    s32  n10;                   // 0x10  given by SkinPart_GetSetVariantUVIndex
+    s32  nUVIndex;              // 0x10  the entry of a SkinDesc14's SkinDesc.pB8 run (texture scale and
+                                //       offset) this variant picks (SkinPart_GetSetVariantUVIndex)
     u8   unk14[4];
 } SkinDesc7C;
 LAYOUT_ASSERT(SkinDesc7C, 0x18);
@@ -225,7 +226,7 @@ typedef struct SkinModel44 {
 } SkinModel44;
 LAYOUT_ASSERT(SkinModel44, 0x10);
 
-// An entry of SkinModel.p54, one per bit of Skin.p10CC; SkinBurn.c moves them (fn_801272B4).
+// An entry of SkinModel.p54, one per bit of Skin.aMtxBits; SkinBurn.c moves them (fn_801272B4).
 typedef struct SkinModel54 {
     s16  nBones;                // 0x00  entries used in aBones and afWeights (SKN_BuildMatrices)
     s16  aBones[3];             // 0x02  matrices of Skin.p108C its matrix is blended from
@@ -255,11 +256,11 @@ typedef struct SkinModel {
     BonePose* p34;              // 0x34  n14 of them; handed to the character's model (fn_80029A74)
     void* p38;                  // 0x38  one 0x50-byte block
     void* p3C;                  // 0x3C  n0C 0x50-byte blocks
-    s32  n40;                   // 0x40  bits in Skin.p10D0; also the entries in p44
+    s32  n40;                   // 0x40  bits in Skin.aMeshBits; also the entries in p44
     SkinModel44* p44;           // 0x44
     SkinDesc* pDesc;            // 0x48
     u8   unk4C[4];
-    s32  n50;                   // 0x50  bits in Skin.p10CC; also the entries in p54
+    s32  n50;                   // 0x50  bits in Skin.aMtxBits; also the entries in p54
     SkinModel54* p54;           // 0x54  one per bit
     u8   unk58[0x140 - 0x58];
 } SkinModel;
@@ -304,24 +305,32 @@ extern SkinMorphWork* lbl_80281880;
 typedef struct Skin {
     SkinModel* pModel;          // 0x0000
     SkelPose pose;              // 0x0004  (Character_SetPreferedPos hands it to SKEL_UpdateState)
-    u8   b1044;                 // 0x1044  set once Character_SetSkin has filled a1048
+    u8   bFootPoints;           // 0x1044  set once Character_SetSkin has filled aFootPoints
     u8   pad1045[3];
-    f32  a1048[4][4];           // 0x1048  four leg points, each through mat44flt_Invert of its bone's
-                                //         matrix (Character_SetSkin: bones 0x3A, 0x48, 0x39, 0x47)
+    f32  aFootPoints[4][4];     // 0x1048  the four foot test points (Character.aTestPoints 0-3: right
+                                //         toe, left toe, right ankle, left ankle), each in its bone's
+                                //         frame: through mat44flt_Invert of the bone's matrix
+                                //         (Character_SetSkin: bones 0x3A, 0x48, 0x39, 0x47)
     f32  (*p1088)[4][4];        // 0x1088  } matrices Character_SetPreferedPos hands the model (SKEL_SetDefaultWorld2BoneMatrices,
     f32  (*p108C)[4][4];        // 0x108C  } fn_80029A7C)
     struct HwsMemBlock* p1090;  // 0x1090  freed by SKN_FreeRenderData
     u8   unk1094[0x1098 - 0x1094];
     struct HwsMemBlock* a1098[2];   // 0x1098  indexed like a10A0 (fn_8011CB5C)
     struct HwsOverrideTable* a10A0[2];  // 0x10A0  indexed by SkinPart_BeginDraw's argument; Skin.c sets [0]
-    SkinChoice* aParts[4];      // 0x10A8  a choice per part, four copies (SkinPart_CopyChoices copies one
-                                //         over another); [3] is set while gSkinChangeAllCopies is clear
+    SkinChoice* aParts[4];      // 0x10A8  a choice per part, four copies: a new choice goes to [3]
+                                //         (to all four while SkinPart_GetChangeAllCopies), a texture
+                                //         load passes it down to [2], [1] and [0] (SkinPart_CopyChoices);
+                                //         [0] is the one drawn
     SkinChoice* aSets[4];       // 0x10B8  the same per SkinDesc.p74 set
     SkinMorphState* pMorph;     // 0x10C8
-    u32* p10CC;                 // 0x10CC  } bit arrays
-    u32* p10D0;                 // 0x10D0  }
-    u32  u10D4;                 // 0x10D4  bit 1 set by Character_CopySkinChoices1To0 and when the choices change; bit 2
-                                //         tested by SKN_FreeRenderData
+    u32* aMtxBits;              // 0x10CC  a bit per SkinModel.p54 blended matrix: the ones Skin.c
+                                //         computes (SkinPart_MarkMeshMatrices)
+    u32* aMeshBits;             // 0x10D0  a bit per SkinModel.p44 entry: the ones Skin.c draws
+                                //         (SkinPart_MarkOption)
+    u32  uFlags;                // 0x10D4  1: the choices changed (Character_CopySkinChoices1To0 and
+                                //         the choosers set it; SkinPart_UpdateMarks redoes the bits and
+                                //         clears it); 2: loaded (SKN_AllocRenderData sets it, SKN_FreeRenderData
+                                //         clears it)
     f32  f10D8;                 // 0x10D8  from the CHR object's header (Character_CreateFromMem)
     f32  f10DC;                 // 0x10DC  1 when loaded
     u8   unk10E0[4];
@@ -383,7 +392,7 @@ LAYOUT_ASSERT(HwsRenderState, 0x64);
 extern HwsRenderState lbl_80223BB0;
 extern f32 lbl_80223C14[3][4];      // the texture matrix fn_80112DD8 loads for a textured pass
 
-// A character's body sliders (Character.p17AC, made by CharSlider_CreateDefinitionsFromMem; our
+// A character's body sliders (Character.pSliderDefs, made by CharSlider_CreateDefinitionsFromMem; our
 // names). CharSlider_UpdateCharacterBasedOnSliderValues sets each slider's value, lets the sliders push on each other, then moves
 // the model's bones and the skin's morph targets by them.
 
@@ -540,11 +549,11 @@ typedef struct HwsBurn {
 } HwsBurn;
 LAYOUT_ASSERT(HwsBurn, 0x84);
 
-// What fn_80113B34 walks: a description and a SkinDesc.p5C entry (or, from SkinPart_GetOptionSize, a
-// SkinVariant.nC index).
+// What the mesh iterators start from: a description and an entry of it, a SkinDesc.p5C entry (an
+// option; fn_80113B34, fn_80113A9C) or a SkinDesc.p44 entry (fn_80113910).
 typedef struct SkinIterArgs {
     SkinDesc* pDesc;            // 0x0
-    s32  n;                     // 0x4
+    s32  nEntry;                // 0x4
 } SkinIterArgs;
 
 // An entry of the lists SkinPart_ListChosenTextures and SkinPart_ListAllTextures build: each name code once.
@@ -568,9 +577,9 @@ typedef struct CharSkinRef {
     Skin* pSkin;                // 0x4
 } CharSkinRef;
 
-// What Character.p16D8 points at: the golfer's clubs, made from the 'CLB ' object (Character_CreateClubSkinSet),
-// one entry per club class: Drivers, Fairwaywoods, Putters, 3Irons, 7Irons, Wedges (char.c
-// lbl_80186EC0).
+// What Character.pClubSet points at: the golfer's clubs, made from the 'CLB ' object
+// (Character_CreateClubSkinSet), one entry per club class: Drivers, Fairwaywoods, Putters, 3Irons, 7Irons,
+// Wedges (char.c lbl_80186EC0).
 typedef struct CharSkinSet {
     s32  n0;                    // 0x00  cleared by Character_CreateClubSkinSet
     u8   unk4[4];
@@ -578,7 +587,7 @@ typedef struct CharSkinSet {
     f32  afC[6];                // 0x0C  per club class: the club head bone's height (Character_SelectClub)
     Skin* apSkins[6];           // 0x24  per club class: its skin (SkinPart.c picks its parts and sets)
     f32  a3C[6][4];             // 0x3C  per club class: a point on the club, through bone 0x52's matrix
-                                //       (Character_UpdateTestPoints: aPoints[4])
+                                //       (Character_UpdateTestPoints: aTestPoints[4])
     CharSkinRef* a9C[6];        // 0x9C  freed with CharSkinRef_Free (Character_FreeClubSkinSets)
 } CharSkinSet;
 
@@ -604,7 +613,8 @@ extern s32        lbl_80281CAC;         // the player fn_8001D8DC last marked (-
 extern s32        lbl_80187164[8];      // the clip key for each shot kind (Character_SelectGameShotType)
 extern s32        lbl_80280E20;         // set to 6 (4 in split screen) by Character_InitIG, 3 by Character_InitFE
 extern CharSkinSet* lbl_80280E24[2];   // what Character_CreateClubSkinSet makes of the 'CLB ' object: one, or one per
-                                        // view in split screen (Character.p16D8; Character_FreeClubSkinSets frees them)
+                                        // view in split screen (Character.pClubSet;
+                                        // Character_FreeClubSkinSets frees them)
 
 void  fn_80037CD8(Skin* pSkin);         // Skin.c: frees a skin
 s32   SKN_FreeRenderData(Skin* pSkin);         // Skin.c: frees what loading it allocated
@@ -642,7 +652,7 @@ s32   SkinPart_FindSetVariantByName(Skin* pSkin, int nSet, const char* pName);
 s32   SkinPart_FindSetOption(Skin* pSkin, int nSet, int nVariant, u64 uId);
 void  CharSlider_UpdateCharacterBasedOnSliderValues(CharSliderDefs* pDefs, CharModel* pModel, Skin* pSkin, int nSliders, u8* aValues,
                   struct SKABlendNode* pNode);
-                                        // applies slider values (Character.p17AC's definitions)
+                                        // applies slider values (the definitions at Character.pSliderDefs)
 void  CharSlider_Free(CharSliderDefs* pDefs);   // CharSliders.c: frees slider definitions
 void  SkinPart_SetupMaterials(Skin* pSkin, SkinTarget* pTarget);
 void  SkinPart_ApplyBodyChoices(Character* pChar, SkinChoices* pChoices);

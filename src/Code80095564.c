@@ -19,17 +19,17 @@ void fn_80095564(void) {
 }
 
 // With a single view, makes nPlayer's golfer the only one whose body skin is loaded (flag 2 of its
-// u10D4): if any golfer is the wrong way, the others' skins are freed and nPlayer's is loaded and
+// uFlags): if any golfer is the wrong way, the others' skins are freed and nPlayer's is loaded and
 // its matrices given to the model.
 void fn_800955F0(int nPlayer) {
     int i;
 
     if (gSession.nSplitScreen == 0) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
-            if (i == nPlayer && !(gPlayers[i].pChar->pSkin->u10D4 & 2)) {
+            if (i == nPlayer && !(gPlayers[i].pChar->pSkin->uFlags & 2)) {
                 break;
             }
-            if (i != nPlayer && (gPlayers[i].pChar->pSkin->u10D4 & 2)) {
+            if (i != nPlayer && (gPlayers[i].pChar->pSkin->uFlags & 2)) {
                 break;
             }
         }

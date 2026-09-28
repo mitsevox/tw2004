@@ -29,7 +29,7 @@ u8 fn_800BB7AC(SitDevEntry* pEntry, SitDevData* pData, int nPlayer) {
         for (nBit = 0; nBit < 32; nBit++, nValue++) {
             if (pEntry->auTests[nWord] & (1 << nBit)) {
                 if (nValue == 86) {
-                    bTrue = strcmp(gPlayers[nPlayer].pChar->sz1614,
+                    bTrue = strcmp(gPlayers[nPlayer].pChar->szLastClip,
                                    (char*)lbl_80282208->p20 + pEntry->aArg[nTest++] * 16) == 0;
                 } else {
                     bTrue = fn_800BB8A8(pEntry, nTest++, pData, nValue);

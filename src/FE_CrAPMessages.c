@@ -86,7 +86,8 @@ void fn_8010799C(MsgArg* pArgs, MsgArg* pResult) {
     if (pChar == NULL) {
         return;
     }
-    CharSlider_UpdateCharacterBasedOnSliderValues(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, pChoices->a9B4,
+    CharSlider_UpdateCharacterBasedOnSliderValues(pChar->pSliderDefs, pChar->pModel, pChar->pSkin, 26,
+                                                  pChoices->a9B4,
                 &pChar->node3E0);
     FE_CrAP_TurnOnPart(18, 0, n);
 }

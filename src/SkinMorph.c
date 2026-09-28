@@ -208,7 +208,7 @@ void fn_8011C68C(SkinMorphWork* pWork, int n) {
         return;
     }
     args.pDesc = pDesc;
-    args.n = n;
+    args.nEntry = n;
     pIter = fn_80113910(aBuf, &args);
     nSet = 0;
     while (SkinIter_IsValid(pIter)) {

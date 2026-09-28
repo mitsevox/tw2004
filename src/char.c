@@ -240,14 +240,14 @@ static void char_StrippedFn(void) {
     Math_Sin(3.0f);
 }
 
-// Clears the character's SKA tags (its animation events, Character.events): none set, each at time
+// Clears the character's SKA tags (its animation events, Character.aTags): none set, each at time
 // 2^30 (never).
 void Character_ResetSKATags(Character* pChar) {
     s32 i;
 
     for (i = 0; i < 18; i++) {
-        pChar->events[i].bSet = 0;
-        pChar->events[i].fTime = 1073741824.0f;
+        pChar->aTags[i].bSet = 0;
+        pChar->aTags[i].fTime = 1073741824.0f;
     }
 }
 
@@ -263,8 +263,8 @@ void Character_InitSKATags(Character* pChar, Clip* pBlend, f32 fStart) {
         for (i = 0; i < pBlend->nEvents; i++) {
             uId = pBlend->pEvents[i].uId;
             if (uId < 5 || uId > 14 || pBlend->pEvents[i].fTime > 0.0f) {
-                pChar->events[uId].bSet = 1;
-                pChar->events[uId].fTime = fStart + pBlend->pEvents[i].fTime;
+                pChar->aTags[uId].bSet = 1;
+                pChar->aTags[uId].fTime = fStart + pBlend->pEvents[i].fTime;
             }
         }
     }
@@ -287,7 +287,7 @@ void* Character_GetRandomMtaLib(Character* pChar, int nGroup, int n) {
 }
 
 // Pick the character's clip for an animation group and style from its animation library, keyed
-// also by the character's club class (class 1 looks up as 0) and n16D4. The lookup's fallback flags
+// also by the character's club class (class 1 looks up as 0) and nClipKey. The lookup's fallback flags
 // go to bits 0x200 / 0x400 of uFlags; the clip is kept in pCurClip.
 void* Char_SetClip(Character* pChar, int nGroup, int nStyle, const char* pName) {
     u32   uFlags = 0;
@@ -296,7 +296,7 @@ void* Char_SetClip(Character* pChar, int nGroup, int nStyle, const char* pName) 
     if (nClub == 1) {
         nClub = 0;
     }
-    pClip = AnimLib_Pick(pChar->nPlayer, pChar->pLib, nGroup, nStyle, nClub, pChar->n16D4, &uFlags, pName);
+    pClip = AnimLib_Pick(pChar->nPlayer, pChar->pLib, nGroup, nStyle, nClub, pChar->nClipKey, &uFlags, pName);
     if (uFlags & 1) {
         pChar->uFlags |= 0x200;
     } else {
@@ -362,7 +362,8 @@ void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals) {
             nStep = 2;
         }
         for (i = 0; i <= nLast; i += nStep) {
-            fHeight = Character_GetTerrainHeightAndNormal(pChar, pChar->aPoints[i + pChar->n1784], &pNormal);
+            fHeight = Character_GetTerrainHeightAndNormal(pChar, pChar->aTestPoints[i + pChar->n1784],
+                                                          &pNormal);
             if (!(fHeight < -60000.0f)) {
                 pChar->afGroundHeight[i + pChar->n1784] = fHeight;
             }
@@ -447,15 +448,15 @@ void Character_UpdateTestPoints(Character* pChar) {
         return;
     }
     pClubMtx = Character_GetBoneMatrix(pChar, 0x52);
-    if (pChar->pSkin->b1044) {
+    if (pChar->pSkin->bFootPoints) {
         pMtxLToe = Character_GetBoneMatrixSwapIfLefty(pChar, 0x48);
         pMtxRToe = Character_GetBoneMatrixSwapIfLefty(pChar, 0x3A);
         pMtxLFoot = Character_GetBoneMatrixSwapIfLefty(pChar, 0x47);
         pMtxRFoot = Character_GetBoneMatrixSwapIfLefty(pChar, 0x39);
-        LLMath_mat44fltMultiply(pMtxRToe, (Vec4*)pChar->pSkin->a1048[0], (Vec4*)pChar->aPoints[0]);
-        LLMath_mat44fltMultiply(pMtxLToe, (Vec4*)pChar->pSkin->a1048[1], (Vec4*)pChar->aPoints[1]);
-        LLMath_mat44fltMultiply(pMtxRFoot, (Vec4*)pChar->pSkin->a1048[2], (Vec4*)pChar->aPoints[2]);
-        LLMath_mat44fltMultiply(pMtxLFoot, (Vec4*)pChar->pSkin->a1048[3], (Vec4*)pChar->aPoints[3]);
+        LLMath_mat44fltMultiply(pMtxRToe, (Vec4*)pChar->pSkin->aFootPoints[0], (Vec4*)pChar->aTestPoints[0]);
+        LLMath_mat44fltMultiply(pMtxLToe, (Vec4*)pChar->pSkin->aFootPoints[1], (Vec4*)pChar->aTestPoints[1]);
+        LLMath_mat44fltMultiply(pMtxRFoot, (Vec4*)pChar->pSkin->aFootPoints[2], (Vec4*)pChar->aTestPoints[2]);
+        LLMath_mat44fltMultiply(pMtxLFoot, (Vec4*)pChar->pSkin->aFootPoints[3], (Vec4*)pChar->aTestPoints[3]);
     } else {
         fRight = 0.8f * pChar->pModel->f10;
         fLeft = 0.8f * pChar->pModel->fC;
@@ -463,20 +464,20 @@ void Character_UpdateTestPoints(Character* pChar) {
         pMtxRToe = Character_GetBoneMatrixSwapIfLefty(pChar, 0x3A);
         pMtxLFoot = Character_GetBoneMatrixSwapIfLefty(pChar, 0x47);
         pMtxRFoot = Character_GetBoneMatrixSwapIfLefty(pChar, 0x39);
-        LLMath_AddScale(pMtxRToe[3], pMtxRToe[1], pChar->pModel->f10, pChar->aPoints[0]);
-        LLMath_AddScale(pMtxLToe[3], pMtxLToe[1], pChar->pModel->fC, pChar->aPoints[1]);
-        LLMath_AddScale(pMtxRFoot[3], pMtxRToe[2], fRight, pChar->aPoints[2]);
-        LLMath_AddScale(pMtxLFoot[3], pMtxLToe[2], fLeft, pChar->aPoints[3]);
-        LLMath_AddScale(pChar->aPoints[0], pMtxRToe[2], 0.25f * fRight, pChar->aPoints[0]);
-        LLMath_AddScale(pChar->aPoints[1], pMtxLToe[2], 0.25f * fLeft, pChar->aPoints[1]);
+        LLMath_AddScale(pMtxRToe[3], pMtxRToe[1], pChar->pModel->f10, pChar->aTestPoints[0]);
+        LLMath_AddScale(pMtxLToe[3], pMtxLToe[1], pChar->pModel->fC, pChar->aTestPoints[1]);
+        LLMath_AddScale(pMtxRFoot[3], pMtxRToe[2], fRight, pChar->aTestPoints[2]);
+        LLMath_AddScale(pMtxLFoot[3], pMtxLToe[2], fLeft, pChar->aTestPoints[3]);
+        LLMath_AddScale(pChar->aTestPoints[0], pMtxRToe[2], 0.25f * fRight, pChar->aTestPoints[0]);
+        LLMath_AddScale(pChar->aTestPoints[1], pMtxLToe[2], 0.25f * fLeft, pChar->aTestPoints[1]);
     }
-    if (pChar->p16D8 != NULL && pClubMtx != NULL) {
-        LLMath_mat44fltMultiply(pClubMtx, (Vec4*)pChar->p16D8->a3C[pChar->nClubClass],
-                                (Vec4*)pChar->aPoints[4]);
+    if (pChar->pClubSet != NULL && pClubMtx != NULL) {
+        LLMath_mat44fltMultiply(pClubMtx, (Vec4*)pChar->pClubSet->a3C[pChar->nClubClass],
+                                (Vec4*)pChar->aTestPoints[4]);
     }
 }
 
-// Keeps the club out of the ground: on fairly level ground (the feet's average ground normal a179C
+// Keeps the club out of the ground: on fairly level ground (the feet's average ground normal vAvgGroundNormal
 // has y above 0.9), when the club point (test point 4) is below the terrain and the club bone
 // 0x52's y axis points into the slope, that axis is shortened by how far the point is under,
 // measured against the club class's head height (not below 3/4 of it).
@@ -490,14 +491,14 @@ void Character_KeepClubOutOfGround(Character* pChar) {
     f32 fLength;
     f32 fHead;
 
-    if (pChar->p16D8 != NULL && pChar->a179C[1] > 0.9f) {
+    if (pChar->pClubSet != NULL && pChar->vAvgGroundNormal[1] > 0.9f) {
         pMtx = Character_GetBoneMatrix(pChar, 0x52);
         if (pMtx != NULL && (pCourse = Ter_GetTGD()) != NULL) {
-            fHeight = fn_8004D650(pCourse, pChar->aPoints[4], vNormal);
+            fHeight = fn_8004D650(pCourse, pChar->aTestPoints[4], vNormal);
             // the else's return is the dead second `b` after the fUnder return; !(<) keeps the
             // NaN case of `fHeight < -60000.0f`
             if (!(fHeight < -60000.0f)) {
-                fUnder = fHeight - pChar->aPoints[4][1];
+                fUnder = fHeight - pChar->aTestPoints[4][1];
                 if (fUnder < 0.0f) {
                     return;
                 }
@@ -506,7 +507,7 @@ void Character_KeepClubOutOfGround(Character* pChar) {
             }
             fDot = -fn_8001EEA4(pMtx[1], vNormal);
             if (fDot > 0.707f) {
-                fHead = pChar->p16D8->afC[pChar->nClubClass];
+                fHead = pChar->pClubSet->afC[pChar->nClubClass];
                 fLength = (fHead - fUnder * vNormal[1] / fDot) / fHead;
                 if (fLength > 0.75f) {
                     Vec3_Scale(fLength, pMtx[1], pMtx[1]);
@@ -583,10 +584,11 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     }
     if (pChar->blend.pPose != NULL) {
         fn_8007260C(pChar, &pChar->blend, pChar->pModel, pChar->fAnimTime);
-        if (Character_IsGolfer(pChar) && pChar->p16D8 != NULL) {
+        if (Character_IsGolfer(pChar) && pChar->pClubSet != NULL) {
             // fake match: aBones[nClubHeadBone].v10[1] written as a flat float index (0x40 / 4 + 8 per
             // bone + 5), which gives the original's indexed store; the pose is all 4-byte words
-            ((f32*)pChar->blend.pPose)[pChar->nClubHeadBone * 8 + 21] = pChar->p16D8->afC[pChar->nClubClass];
+            ((f32*)pChar->blend.pPose)[pChar->nClubHeadBone * 8 + 21]
+                    = pChar->pClubSet->afC[pChar->nClubClass];
         }
         SKEL_UpdateState(pChar->pModel, pChar->blend.pPose, 0);
         if (Character_IsGolfer(pChar)) {
@@ -612,8 +614,8 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
         pChar->uFlags |= 1;
         return;
     }
-    if (pChar->pfn17B0 != NULL) {
-        pChar->pfn17B0();
+    if (pChar->pfnPreBones != NULL) {
+        pChar->pfnPreBones();
     }
     BitArray_SetAll(auBits, 0x80);
     SKEL_TransformBones(pChar->pModel, auBits);
@@ -654,7 +656,7 @@ void Character_SetSkeleton(Character* pChar, CharModel* pModel) {
         pChar->pModel        = pModel;
         pChar->nClubHeadBone = CharModel_GetBoneIndex(pChar->pModel, 0x53);
         pChar->nGripBone     = CharModel_GetBoneIndex(pChar->pModel, 0x52);
-        pChar->n16A8         = CharModel_GetBoneIndexMapped(pChar->pModel, 0x15);
+        pChar->nWristBone    = CharModel_GetBoneIndexMapped(pChar->pModel, 0x15);
     }
 }
 
@@ -662,7 +664,7 @@ void Character_SetSkeleton(Character* pChar, CharModel* pModel) {
 // For a golfer it then keeps the four foot test points in the skin (TW07 has this part as
 // Character_SetTestPointsFeet): each toe bone's position moved by vBoneToToe and each ankle bone's
 // by vBoneToHeel (larger offsets for animation slot 0), taken into the frame of its bone (through
-// its inverted matrix) into Skin.a1048, and b1044 set.
+// its inverted matrix) into Skin.aFootPoints, and bFootPoints set.
 void Character_SetSkin(Character* pChar, Skin* pSkin) {
     f32 mLToeInv[4][4];
     f32 mRToeInv[4][4];
@@ -718,11 +720,11 @@ void Character_SetSkin(Character* pChar, Skin* pSkin) {
             Char_Vec3Add(&vRToe.x, &vBoneToToe.x, &vRToe.x);
             Char_Vec3Add(&vLFoot.x, &vBoneToHeel.x, &vLFoot.x);
             Char_Vec3Add(&vRFoot.x, &vBoneToHeel.x, &vRFoot.x);
-            LLMath_mat44fltMultiply(mRToeInv, &vRToe, (Vec4*)pChar->pSkin->a1048[0]);
-            LLMath_mat44fltMultiply(mLToeInv, &vLToe, (Vec4*)pChar->pSkin->a1048[1]);
-            LLMath_mat44fltMultiply(mRFootInv, &vRFoot, (Vec4*)pChar->pSkin->a1048[2]);
-            LLMath_mat44fltMultiply(mLFootInv, &vLFoot, (Vec4*)pChar->pSkin->a1048[3]);
-            pChar->pSkin->b1044 = 1;
+            LLMath_mat44fltMultiply(mRToeInv, &vRToe, (Vec4*)pChar->pSkin->aFootPoints[0]);
+            LLMath_mat44fltMultiply(mLToeInv, &vLToe, (Vec4*)pChar->pSkin->aFootPoints[1]);
+            LLMath_mat44fltMultiply(mRFootInv, &vRFoot, (Vec4*)pChar->pSkin->aFootPoints[2]);
+            LLMath_mat44fltMultiply(mLFootInv, &vLFoot, (Vec4*)pChar->pSkin->aFootPoints[3]);
+            pChar->pSkin->bFootPoints = 1;
         }
     }
 }
@@ -747,7 +749,7 @@ void Character_SetPreferedPos(Character* pChar) {
 static inline f32* fn_800187CC_Read(f32* p) { return p; }
 
 // A golfer is dropped to 0.01 below the lowest of its four ground heights (the test points move
-// with it) and a179C set to the average ground normal; any other character stands on the ground
+// with it) and vAvgGroundNormal set to the average ground normal; any other character stands on the ground
 // under its root bone (the ground below it, if the one found is more than 1 above).
 void Character_PlaceFeetOnGround(Character* pChar) {
     CourseInfo* pCourse;
@@ -773,28 +775,28 @@ void Character_PlaceFeetOnGround(Character* pChar) {
     }
     fLowest = 1073741824.0f;
     if (Character_IsGolfer(pChar)) {
-        pChar->a179C[0] = 0.0f;
-        pChar->a179C[1] = 0.0f;
-        pChar->a179C[2] = 0.0f;
-        pChar->a179C[3] = 0.0f;
+        pChar->vAvgGroundNormal[0] = 0.0f;
+        pChar->vAvgGroundNormal[1] = 0.0f;
+        pChar->vAvgGroundNormal[2] = 0.0f;
+        pChar->vAvgGroundNormal[3] = 0.0f;
         for (i = 0; i < 4; i++) {
-            Char_Vec3Add(pChar->aGroundNormal[i], pChar->a179C, pChar->a179C);
+            Char_Vec3Add(pChar->aGroundNormal[i], pChar->vAvgGroundNormal, pChar->vAvgGroundNormal);
             if (pChar->afGroundHeight[i] < fLowest) {
                 fLowest = pChar->afGroundHeight[i];
             }
         }
-        LLMath_Normalize3(pChar->a179C, pChar->a179C);
+        LLMath_Normalize3(pChar->vAvgGroundNormal, pChar->vAvgGroundNormal);
         if (fLowest < -60000.0f) {
             return;
         }
         fY = fLowest - 0.01f;
         fDelta = fY - pChar->pModel->pBones[0].v1C[1];
         pChar->pModel->pBones[0].v1C[1] = fY;
-        pChar->aPoints[0][1] += fDelta;
-        pChar->aPoints[1][1] += fDelta;
-        pChar->aPoints[2][1] += fDelta;
-        pChar->aPoints[3][1] += fDelta;
-        pChar->aPoints[4][1] += fDelta;
+        pChar->aTestPoints[0][1] += fDelta;
+        pChar->aTestPoints[1][1] += fDelta;
+        pChar->aTestPoints[2][1] += fDelta;
+        pChar->aTestPoints[3][1] += fDelta;
+        pChar->aTestPoints[4][1] += fDelta;
         return;
     }
     pPos = fn_800187CC_Read(pChar->pModel->pBones[0].v1C);
@@ -910,10 +912,10 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     Character_GetBonePos_FromIndex(pChar, nHip, vHip);
     Character_GetBonePos_FromIndex(pChar, nKnee, vKnee);
     Character_GetBonePos_FromIndex(pChar, nToe, vToe);
-    LLMath_CopyVec(pChar->aPoints[nAnklePoint], vPoint);
+    LLMath_CopyVec(pChar->aTestPoints[nAnklePoint], vPoint);
     // how far each test point sits below the ground (0.165 in, in feet)
     fDropA = 0.165f / 12.0f + (pChar->afGroundHeight[nAnklePoint] - vPoint[1]);
-    fDropB = 0.165f / 12.0f + (pChar->afGroundHeight[nToePoint] - pChar->aPoints[nToePoint][1]);
+    fDropB = 0.165f / 12.0f + (pChar->afGroundHeight[nToePoint] - pChar->aTestPoints[nToePoint][1]);
     if ((fDropA < 0.0f && fDropB < 0.0f) || fDropA > 1.0f) {
         return;
     }
@@ -1087,7 +1089,7 @@ Character* Character_Create(void) {
 
     pNode = NULL;
     pChar = StaticMem_Alloc(sizeof(Character), 2, 0x40, "char.c", 0x8A4);
-    pChar->pfn17B0 = NULL;
+    pChar->pfnPreBones = NULL;
     for (i = 0; i < 4; i++) {
         pChar->buffers[i].n00 = -1;
         pChar->buffers[i].p04 = NULL;
@@ -1117,9 +1119,9 @@ Character* Character_Create(void) {
     pChar->n1654 = 2;
     pChar->n1658 = 2;
     pChar->n1698 = 0;
-    pChar->p16D8 = NULL;
+    pChar->pClubSet = NULL;
     pChar->nClubClass = 0;
-    pChar->n16D4 = 0;
+    pChar->nClipKey = 0;
     pChar->nSlot = 0;
     pChar->n48 = -1;
     pChar->f1664 = 1.0f;
@@ -1132,24 +1134,24 @@ Character* Character_Create(void) {
     pChar->n5CC = -1;
     pChar->p1790 = NULL;
     pChar->n1784 = -1;
-    pChar->n17B4 = 0;
+    pChar->nView = 0;
     pChar->pRecords = NULL;
     fn_800962F8(pChar);
     pChar->n16DC = 0;
     pChar->f165C = pChar->f1660 = 1073741824.0f;
     pChar->pCurClip = NULL;
     pChar->p178C = NULL;
-    pChar->a6C[0] = -1;
-    pChar->a64[0] = NULL;
-    pChar->a6C[1] = -1;
-    pChar->a64[1] = NULL;
+    pChar->aDynTexSlot[0] = -1;
+    pChar->apDynTex[0] = NULL;
+    pChar->aDynTexSlot[1] = -1;
+    pChar->apDynTex[1] = NULL;
     if (gSession.nGameType == 10 || gSession.nGameType == 3) {
-        pChar->n70 = 2;
+        pChar->nDynTex = 2;
     } else {
-        pChar->n70 = 1;
+        pChar->nDynTex = 1;
     }
-    pChar->n74 = 0;
-    pChar->bE0 = 0;
+    pChar->nCurDynTex = 0;
+    pChar->bTexLoaded = 0;
     Character_ResetSKATags(pChar);
     pChar->p1798 = NULL;
     return pChar;
@@ -1182,11 +1184,11 @@ void Character_AlignCharacterForShotImpact(Character* pChar) {
 // and palette tables Character_LoadTextures made, and closes its texture file.
 void Character_FreeTextures(Character* pChar) {
     CharacterTex_ReleasePoolEntries(pChar);
-    if (pChar->pA8 != NULL) {
-        StaticMem_Free(pChar->pA8);
+    if (pChar->pTexEntries != NULL) {
+        StaticMem_Free(pChar->pTexEntries);
     }
-    if (pChar->pB0 != NULL) {
-        StaticMem_Free(pChar->pB0);
+    if (pChar->pPalettes != NULL) {
+        StaticMem_Free(pChar->pPalettes);
     }
     if (pChar->pB8 != NULL) {
         StaticMem_Free(pChar->pB8);
@@ -1227,7 +1229,7 @@ void Character_LoadTextures(Character* pChar, Skin** apSkins, int nSkins) {
     pData = pChar->p4C;
     BYTESWAP_SWAPDATA(&pData, (u8*)&nTexBytes, 4, 4);
     BYTESWAP_SWAPDATA(&pData, (u8*)&nPalBytes, 4, 4);
-    BYTESWAP_SWAPDATA(&pData, (u8*)&pChar->n58, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&pChar->nTexFileBase, 4, 4);
     BYTESWAP_SWAPDATA(&pData, (u8*)&pChar->n5C, 4, 4);
     if (nTexBytes != 0) {
         pTexData = (TexEntry*)pData;
@@ -1246,14 +1248,14 @@ void Character_LoadTextures(Character* pChar, Skin** apSkins, int nSkins) {
     nTex = nTexBytes / (int)sizeof(TexEntry);
     nPal = nPalBytes / (int)sizeof(TexPalette);
     if (bAll) {
-        pChar->nAC = nTex;
-        pChar->nB4 = nPal;
+        pChar->nTexEntries = nTex;
+        pChar->nPalettes = nPal;
     } else {
-        pChar->nAC = SkinPart_ListAllTextures(apSkins, nSkins, &pList);
+        pChar->nTexEntries = SkinPart_ListAllTextures(apSkins, nSkins, &pList);
         nExtra = 0;
-        pChar->nB4 = pChar->nAC;
-        nPalBytes = pChar->nB4 * sizeof(TexPalette);
-        for (i = 0; i < pChar->nAC; i++) {
+        pChar->nPalettes = pChar->nTexEntries;
+        nPalBytes = pChar->nPalettes * sizeof(TexPalette);
+        for (i = 0; i < pChar->nTexEntries; i++) {
             for (j = 0; j < nTex; j++) {
                 if (pList[i].uId == pTexData[j].u0 && (pTexData[j].b47 & 1)) {
                     nExtra++;
@@ -1261,41 +1263,41 @@ void Character_LoadTextures(Character* pChar, Skin** apSkins, int nSkins) {
                 }
             }
         }
-        pChar->nAC += nExtra;
+        pChar->nTexEntries += nExtra;
     }
-    pChar->pA8 = NULL;
+    pChar->pTexEntries = NULL;
     pChar->pB8 = NULL;
-    pChar->pB0 = NULL;
+    pChar->pPalettes = NULL;
     pChar->pBC = NULL;
-    if (pChar->nAC != 0) {
-        pChar->pA8 = StaticMem_Alloc(pChar->nAC * sizeof(TexEntry), 2, 0x10, "char.c", 0x9A9);
-        pChar->pB8 = StaticMem_Alloc(pChar->nAC * 64, 2, 0x10, "char.c", 0x9AE);
+    if (pChar->nTexEntries != 0) {
+        pChar->pTexEntries = StaticMem_Alloc(pChar->nTexEntries * sizeof(TexEntry), 2, 0x10, "char.c", 0x9A9);
+        pChar->pB8 = StaticMem_Alloc(pChar->nTexEntries * 64, 2, 0x10, "char.c", 0x9AE);
     }
-    if (pChar->nB4 != 0) {
-        pChar->pB0 = StaticMem_Alloc(nPalBytes, 2, 0x10, "char.c", 0x9B8);
+    if (pChar->nPalettes != 0) {
+        pChar->pPalettes = StaticMem_Alloc(nPalBytes, 2, 0x10, "char.c", 0x9B8);
         pChar->pBC = StaticMem_Alloc(nPal, 2, 0x10, "char.c", 0x9BD);
     }
     if (bAll) {
-        if (pChar->nAC != 0) {
-            Mem_cpy(pChar->pA8, pTexData, nTexBytes);
+        if (pChar->nTexEntries != 0) {
+            Mem_cpy(pChar->pTexEntries, pTexData, nTexBytes);
         }
-        if (pChar->nB4 != 0) {
-            Mem_cpy(pChar->pB0, pPalData, nPalBytes);
+        if (pChar->nPalettes != 0) {
+            Mem_cpy(pChar->pPalettes, pPalData, nPalBytes);
         }
     } else {
-        nNames = pChar->nAC - nExtra;
+        nNames = pChar->nTexEntries - nExtra;
         for (k = nOut = 0; k < nNames; k++) {
             bFound = 0;
             for (m = 0; m < nTex; m++) {
                 if (pList[k].uId == pTexData[m].u0) {
-                    Mem_cpy(&pChar->pA8[nOut], &pTexData[m], sizeof(TexEntry));
+                    Mem_cpy(&pChar->pTexEntries[nOut], &pTexData[m], sizeof(TexEntry));
                     if (pTexData[m].nPalette != -1) {
-                        Mem_cpy(&pChar->pB0[k], &pPalData[pTexData[m].nPalette], sizeof(TexPalette));
-                        pChar->pA8[nOut].nPalette = k;
+                        Mem_cpy(&pChar->pPalettes[k], &pPalData[pTexData[m].nPalette], sizeof(TexPalette));
+                        pChar->pTexEntries[nOut].nPalette = k;
                     }
                     nOut++;
                     if (pTexData[m].b47 & 1) {
-                        Mem_cpy(&pChar->pA8[nOut], &pTexData[m + 1], sizeof(TexEntry));
+                        Mem_cpy(&pChar->pTexEntries[nOut], &pTexData[m + 1], sizeof(TexEntry));
                         nOut++;
                     }
                     bFound = 1;
@@ -1303,8 +1305,8 @@ void Character_LoadTextures(Character* pChar, Skin** apSkins, int nSkins) {
                 }
             }
             if (!bFound) {
-                pChar->pA8[nOut].u0 = 0;
-                pChar->pA8[nOut].nPalette = -1;
+                pChar->pTexEntries[nOut].u0 = 0;
+                pChar->pTexEntries[nOut].nPalette = -1;
                 nOut++;
             }
         }
@@ -1312,13 +1314,14 @@ void Character_LoadTextures(Character* pChar, Skin** apSkins, int nSkins) {
     if (pList != NULL) {
         StaticMem_Free(pList);
     }
-    fn_800100B0(&pChar->bank78, pChar->pA8, pChar->pB0, pChar->pB8, pChar->pBC, pChar->nAC, pChar->nB4);
-    pChar->p50 = &pChar->bank78;
+    fn_800100B0(&pChar->bank78, pChar->pTexEntries, pChar->pPalettes, pChar->pB8, pChar->pBC,
+                pChar->nTexEntries, pChar->nPalettes);
+    pChar->pBank = &pChar->bank78;
     // port: EA passes arguments SkinPart_InitTextures (empty) ignores
     ((void (*)(Skin*, TexBank*, int, int))SkinPart_InitTextures)(pChar->pSkin, &pChar->bank78, 0xBF600,
             0xCDA);
-    sprintf(pChar->szE1, "%sdata\\CharStrm\\CharTex\\%02dalltex.fxg", "", pChar->nC + 1);
-    pChar->hFile = fn_800060E0(pChar->szE1);
+    sprintf(pChar->szTexFile, "%sdata\\CharStrm\\CharTex\\%02dalltex.fxg", "", pChar->nC + 1);
+    pChar->hFile = fn_800060E0(pChar->szTexFile);
 }
 
 // Copies every skin's newest choices (copy 3, see SkinPart_SetChangeAllCopies) down to copy 2, as a
@@ -1339,12 +1342,12 @@ void Character_CopySkinChoices2To1(Character* pChar) {
 }
 
 // Copies every skin's choices from copy 1 down to copy 0, the one shown, and flags each skin's
-// choices changed (bit 0x1 of u10D4).
+// choices changed (bit 0x1 of uFlags).
 void Character_CopySkinChoices1To0(Character* pChar) {
     int i;
     for (i = 0; i < pChar->nSkins; i++) {
         SkinPart_CopyChoices(pChar->apSkins[i], 1, 0);
-        pChar->apSkins[i]->u10D4 |= 1;
+        pChar->apSkins[i]->uFlags |= 1;
     }
 }
 
@@ -1357,10 +1360,10 @@ void Character_AddTextureLoadRequest(Character* pChar, void (*pfnBegin)(Characte
 
     if (pJob != NULL) {
         lbl_801B95E8.a[6].p = pChar;
-        pJob->pfnA = pfnBegin;
+        pJob->pfnBegin = pfnBegin;
         pJob->pChar = pChar;
-        pJob->pfnB = pfnEnd;
-        pJob->p0 = &pChar->p50;
+        pJob->pfnEnd = pfnEnd;
+        pJob->ppBank = &pChar->pBank;
         fn_8010B930(pJob);
     } else {
         lbl_801B95E8.a[6].p = NULL;
@@ -1374,11 +1377,11 @@ void Character_AddTextureLoadRequest(Character* pChar, void (*pfnBegin)(Characte
 void Character_BeginLoadTexturesCallbackFE(Character* pArg) {
     // fake match: a copy of the parameter through void* (a plain copy is merged into it)
     Character* pChar = (Character*)(void*)pArg;
-    void* pModel = pChar->a64[pChar->n74];
+    void* pModel = pChar->apDynTex[pChar->nCurDynTex];
 
     fn_8008EAC8(0);
-    pChar->p60 = pModel;
-    fn_8010BC88(&pChar->p50);
+    pChar->pDynTex = pModel;
+    fn_8010BC88(&pChar->pBank);
     // port: EA passes an argument fn_8010BEC4 ignores
     ((void (*)(void*))fn_8010BEC4)(pModel);
     Character_CopySkinChoices3To2(pChar);
@@ -1394,8 +1397,8 @@ void Character_BeginLoadTexturesCallbackFE(Character* pArg) {
 void Character_EndLoadTexturesCallbackFE(Character* pChar) {
     Character_CopySkinChoices2To1(pChar);
     Character_CopySkinChoices1To0(pChar);
-    sApplyUserLogos(pChar, pChar->a64[pChar->n74], &FE_GetCurrentProfile()->choices);
-    fn_8010BA2C(pChar->a64[pChar->n74]);
+    sApplyUserLogos(pChar, pChar->apDynTex[pChar->nCurDynTex], &FE_GetCurrentProfile()->choices);
+    fn_8010BA2C(pChar->apDynTex[pChar->nCurDynTex]);
     fn_8008EA38(1);
 }
 
@@ -1412,10 +1415,10 @@ void Character_BeginSwapTexturesCallbackFE(Character* pArg) {
     void* pModel;
 
     fn_8008E918(1);
-    pModel = pChar->a64[1 - pChar->n74];
-    fn_8010A6A8(pChar->a64[pChar->n74], pModel);
-    pChar->p60 = pModel;
-    fn_8010BC88(&pChar->p50);
+    pModel = pChar->apDynTex[1 - pChar->nCurDynTex];
+    fn_8010A6A8(pChar->apDynTex[pChar->nCurDynTex], pModel);
+    pChar->pDynTex = pModel;
+    fn_8010BC88(&pChar->pBank);
     // port: EA passes an argument fn_8010BEC4 ignores
     ((void (*)(void*))fn_8010BEC4)(pModel);
     for (i = 0; i < pChar->nSkins; i++) {
@@ -1445,8 +1448,8 @@ void Character_ExecuteTextureSwapFE(Character* pChar) {
     if (fn_8008EAD4()) {
         fn_8008EAC8(0);
         fn_8008E918(0);
-        pChar->n74 = 1 - pChar->n74;
-        pModel = pChar->a64[pChar->n74];
+        pChar->nCurDynTex = 1 - pChar->nCurDynTex;
+        pModel = pChar->apDynTex[pChar->nCurDynTex];
         Character_CopySkinChoices1To0(pChar);
         sApplyUserLogos(pChar, pModel, &pProfile->choices);
         fn_8010BA2C(pModel);
@@ -1479,9 +1482,9 @@ void Character_BeginLoadTexturesCallbackIG(Character* pArg) {
     u64 uGlove;
     void* pModel;
 
-    pModel = pChar->a64[pChar->n74];
-    pChar->p60 = pModel;
-    fn_8010BC88(&pChar->p50);
+    pModel = pChar->apDynTex[pChar->nCurDynTex];
+    pChar->pDynTex = pModel;
+    fn_8010BC88(&pChar->pBank);
     fn_8010B098(pModel);
     // port: EA passes an argument fn_8010BEC4 ignores
     ((void (*)(void*))fn_8010BEC4)(pModel);
@@ -1497,14 +1500,14 @@ void Character_BeginLoadTexturesCallbackIG(Character* pArg) {
 }
 
 // The in-game end callback of a texture load: passes the skins' choices down to copy 0, puts the
-// created golfer's logos on the model in use, marks the character's textures loaded (bE0) and
+// created golfer's logos on the model in use, marks the character's textures loaded (bTexLoaded) and
 // clears the pool's queued character.
 void Character_EndLoadTexturesCallbackIG(Character* pChar) {
     Character_CopySkinChoices2To1(pChar);
     Character_CopySkinChoices1To0(pChar);
-    sApplyUserLogos(pChar, pChar->a64[pChar->n74], pChar->pChoices);
-    fn_8010BA2C(pChar->a64[pChar->n74]);
-    pChar->bE0 = 1;
+    sApplyUserLogos(pChar, pChar->apDynTex[pChar->nCurDynTex], pChar->pChoices);
+    fn_8010BA2C(pChar->apDynTex[pChar->nCurDynTex]);
+    pChar->bTexLoaded = 1;
     lbl_801B95E8.a[6].p = NULL;
 }
 
@@ -1535,31 +1538,31 @@ void CharacterTex_Close(void) {
 }
 
 // Gives the character's dynamic texture pool entries back (a64 and a6C cleared) and marks its
-// textures not loaded (bE0).
+// textures not loaded (bTexLoaded).
 void CharacterTex_ReleasePoolEntries(Character* pChar) {
     int i;
-    for (i = 0; i < pChar->n70; i++) {
-        if (pChar->a64[i] != NULL) {
-            lbl_801B95E8.a[pChar->a6C[i]].bUsed = 0;
-            pChar->a6C[i] = -1;
-            pChar->a64[i] = NULL;
+    for (i = 0; i < pChar->nDynTex; i++) {
+        if (pChar->apDynTex[i] != NULL) {
+            lbl_801B95E8.a[pChar->aDynTexSlot[i]].bUsed = 0;
+            pChar->aDynTexSlot[i] = -1;
+            pChar->apDynTex[i] = NULL;
         }
     }
-    pChar->bE0 = 0;
+    pChar->bTexLoaded = 0;
 }
 
-// Takes free dynamic texture pool entries for the character until it has n70 of them: a64 gets each
+// Takes free dynamic texture pool entries for the character until it has nDynTex of them: a64 gets each
 // entry's dynamic texture, a6C its index. It takes fewer when the pool runs out.
 void CharacterTex_TakePoolEntries(Character* pChar) {
     int i;
     int n = 0;
     for (i = 0; i < lbl_801B95E8.nEntries; i++) {
         if (lbl_801B95E8.a[i].bUsed == 0) {
-            pChar->a6C[n] = i;
-            pChar->a64[n] = lbl_801B95E8.a[i].p;
+            pChar->aDynTexSlot[n] = i;
+            pChar->apDynTex[n] = lbl_801B95E8.a[i].p;
             n++;
             lbl_801B95E8.a[i].bUsed = 1;
-            if (n == pChar->n70) {
+            if (n == pChar->nDynTex) {
                 return;
             }
         }
@@ -1605,7 +1608,7 @@ void CharacterTex_PreHoleInit(void) {
 // play (GM_GetSecondHonors). nPlayer's character loses bit 0x40 of u10; after the display finishes
 // drawing (fn_80008380), every other character holding pool entries (except the one being loaded,
 // the pool's a[6].p) gives them back and gets bit 0x40 (not drawn). Unless nPlayer's textures are
-// loaded (bE0), it takes the entries (the character being loaded giving its back first) and its
+// loaded (bTexLoaded), it takes the entries (the character being loaded giving its back first) and its
 // textures are loaded now (fn_8010BF68); when it is the one being loaded, the loader is just run to
 // the end. The next player's character is then queued the same way, its textures left to
 // CharacterTex_TextureLoader.
@@ -1619,22 +1622,22 @@ void CharacterTex_StartStreamingPlayers(int nPlayer) {
         fn_80008380();
         pChar = gPlayers[nPlayer].pChar;
         for (i = 0; i < gSession.nNumPlayers; i++) {
-            if (i != nPlayer && gPlayers[i].pChar->a64[gPlayers[i].pChar->n74] != NULL &&
+            if (i != nPlayer && gPlayers[i].pChar->apDynTex[gPlayers[i].pChar->nCurDynTex] != NULL &&
                 gPlayers[i].pChar != lbl_801B95E8.a[6].p) {
                 fn_8001A484(gPlayers[i].pChar);
                 CharacterTex_ReleasePoolEntries(gPlayers[i].pChar);
-                gPlayers[i].pChar->bE0 = 0;
+                gPlayers[i].pChar->bTexLoaded = 0;
                 gPlayers[i].pChar->u10 |= 0x40;
             }
         }
-        if (!pChar->bE0) {
+        if (!pChar->bTexLoaded) {
             pQueued = lbl_801B95E8.a[6].p;
             if (pChar != pQueued) {
                 fn_8010BF68();
                 if (pQueued != NULL) {
                     fn_8001A484(pQueued);
                     CharacterTex_ReleasePoolEntries(pQueued);
-                    pQueued->bE0 = 0;
+                    pQueued->bTexLoaded = 0;
                     pQueued->u10 |= 0x40;
                 }
                 CharacterTex_TakePoolEntries(pChar);
@@ -1648,7 +1651,7 @@ void CharacterTex_StartStreamingPlayers(int nPlayer) {
         i = GM_GetSecondHonors();
         if (i < gSession.nNumPlayers) {
             pChar = gPlayers[i].pChar;
-            if (!pChar->bE0 && pChar != lbl_801B95E8.a[6].p) {
+            if (!pChar->bTexLoaded && pChar != lbl_801B95E8.a[6].p) {
                 fn_8010BF68();
                 CharacterTex_TakePoolEntries(pChar);
                 Character_AddTextureLoadRequest(pChar, Character_BeginLoadTexturesCallbackIG,
@@ -1719,8 +1722,8 @@ void Character_ReopenTextureFiles(void) {
     }
     for (i = 0; i < gSession.nNumPlayers; i++) {
         pChar = gPlayers[i].pChar;
-        sprintf(pChar->szE1, "%sdata\\CharStrm\\CharTex\\%02dalltex.fxg", "", pChar->nC + 1);
-        pChar->hFile = fn_800060E0(pChar->szE1);
+        sprintf(pChar->szTexFile, "%sdata\\CharStrm\\CharTex\\%02dalltex.fxg", "", pChar->nC + 1);
+        pChar->hFile = fn_800060E0(pChar->szTexFile);
     }
 }
 
@@ -1911,11 +1914,11 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
         pChar->pLib = NULL;
     }
 
-    pChar->p17AC = CharSlider_CreateDefinitionsFromMem(&pData);
+    pChar->pSliderDefs = CharSlider_CreateDefinitionsFromMem(&pData);
     pChar->p4C = pData;
     Character_SetPreferedPos(pChar);
     if (bGolfer) {
-        pChar->p16D8 = lbl_80280E24[nSet];
+        pChar->pClubSet = lbl_80280E24[nSet];
         pChar->nClubHeadBone = CharModel_GetBoneIndex(pChar->pModel, 0x53);
         pChar->f165C = 100.0f;
         pChar->f1660 = 200.0f;
@@ -1924,9 +1927,9 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
         pChar->f165C = 50.0f;
         pChar->f1660 = 100.0f;
     }
-    if (pChar->p16D8 != NULL) {
+    if (pChar->pClubSet != NULL) {
         for (i = 0; i < 6; i++) {
-            pSkin = pChar->p16D8->apSkins[i];
+            pSkin = pChar->pClubSet->apSkins[i];
             if (pSkin != NULL) {
                 fn_80037AB8(pSkin, pChar->pModel, CharModel_GetBoneIndex(pChar->pModel, 0x52) - 0x52, 0x52);
             }
@@ -2205,9 +2208,9 @@ void Character_UpdateAll(f32 fTime) {
 }
 
 // Hangs the club from the hand or from the root, as the clip says. With clip flag 0x10 the club
-// bone (nGripBone, bone 0x52) goes back to its parent, the right wrist (n16A8); otherwise it is
+// bone (nGripBone, bone 0x52) goes back to its parent, the right wrist (nWristBone); otherwise it is
 // parented to the root (bit 0x4000 of u10) and its rotation and offset from the root are kept in
-// q16AC and v16BC (for a left-hander turned half round and mirrored in z). Returns 1 when the
+// qGripFromRoot and vGripFromRoot (for a left-hander turned half round and mirrored in z). Returns 1 when the
 // attachment changed, 0 when it already was that way.
 int Character_UpdateClubAttachment(Character* pChar, Clip* pClip) {
     CharModel* pModel;
@@ -2219,7 +2222,7 @@ int Character_UpdateClubAttachment(Character* pChar, Clip* pClip) {
     if (pClip->uFlags & 0x10) {
         if (pChar->u10 & 0x4000) {
             pChar->u10 &= ~0x4000;
-            pChar->pModel->pBones[pChar->nGripBone].nParent = pChar->n16A8;
+            pChar->pModel->pBones[pChar->nGripBone].nParent = pChar->nWristBone;
             return 1;
         }
     } else if (!(pChar->u10 & 0x4000)) {
@@ -2227,18 +2230,18 @@ int Character_UpdateClubAttachment(Character* pChar, Clip* pClip) {
         pChar->u10 |= 0x4000;
         pChar->pModel->pBones[pChar->nGripBone].nParent = 0;
         Quat_Invert(pModel->pPoses[0].q0, qRoot);
-        Quat_Multiply(pModel->pPoses[pChar->nGripBone].q0, qRoot, pChar->q16AC);
+        Quat_Multiply(pModel->pPoses[pChar->nGripBone].q0, qRoot, pChar->qGripFromRoot);
         if (Character_IsLeftHanded(pChar)) {
             Legacy_Quat_BuildFromPitch(PI, qTurn);
-            Quat_Multiply(pChar->q16AC, qTurn, qGrip);
-            Quat_Copy(qGrip, pChar->q16AC);
+            Quat_Multiply(pChar->qGripFromRoot, qTurn, qGrip);
+            Quat_Copy(qGrip, pChar->qGripFromRoot);
         }
         fn_8001EFB4(pModel->pPoses[pChar->nGripBone].v10, pModel->pPoses[0].v10, vOffset);
         vOffset[3] = 0.0f;
-        Quat_RotateVector(qRoot, vOffset, pChar->v16BC);
-        pChar->v16BC[3] = 0.0f;
+        Quat_RotateVector(qRoot, vOffset, pChar->vGripFromRoot);
+        pChar->vGripFromRoot[3] = 0.0f;
         if (Character_IsLeftHanded(pChar)) {
-            pChar->v16BC[2] = -pChar->v16BC[2];
+            pChar->vGripFromRoot[2] = -pChar->vGripFromRoot[2];
         }
         return 1;
     }
@@ -2344,8 +2347,8 @@ void Character_Free(Character* pChar) {
         if (Character_IsGolfer(pChar)) {
             Character_FreeTextures(pChar);
         }
-        if (pChar->p17AC != NULL) {
-            CharSlider_Free(pChar->p17AC);
+        if (pChar->pSliderDefs != NULL) {
+            CharSlider_Free(pChar->pSliderDefs);
         }
         StaticMem_Free(pChar);
         if (gSession.nGameType == 3) {
@@ -2511,9 +2514,9 @@ void Character_SelectClub(Character* pChar, int n) {
         return;
     }
     nBone = CharModel_GetBoneIndex(pChar->pModel, 0x53);
-    if (pChar->p16D8 != NULL) {
+    if (pChar->pClubSet != NULL) {
         pChar->nClubClass = n;
-        pChar->pModel->pBones[nBone].v1C[1] = pChar->p16D8->afC[pChar->nClubClass];
+        pChar->pModel->pBones[nBone].v1C[1] = pChar->pClubSet->afC[pChar->nClubClass];
     }
 }
 
@@ -2634,8 +2637,8 @@ void Character_SetupForShot(Character* pChar) {
     Character_SetPosition(pChar, pBallPos, 0);
     pChar->u10 &= ~(0x10000 | 0x200 | 8 | 4);
     // fake match: n2C is compared unsigned here
-    if (pChar->p1798 != NULL && (u32)pChar->p1798->n2C == 6 && pChar->n16D4 == 0) {
-        pChar->n16D4 = 4;
+    if (pChar->p1798 != NULL && (u32)pChar->p1798->n2C == 6 && pChar->nClipKey == 0) {
+        pChar->nClipKey = 4;
     }
     fn_8001EFB4(pPlayer->vTarget, pBallPos, vDir);
     vDir[1] = 0.0f;
@@ -2676,8 +2679,8 @@ void Character_SetupForShot(Character* pChar) {
         Quat_Copy(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
         Vec4_CopyPoint(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
         fn_80027108(pSkel);
-        if (pChar->p16D8 != NULL) {
-            pSkel->pose.aBones[pChar->nClubHeadBone].v10[1] = pChar->p16D8->afC[pChar->nClubClass];
+        if (pChar->pClubSet != NULL) {
+            pSkel->pose.aBones[pChar->nClubHeadBone].v10[1] = pChar->pClubSet->afC[pChar->nClubClass];
         }
         SKEL_UpdateState(pChar->pModel, &pSkel->pose, 1);
         Character_UpdateTestPoints(pChar);
@@ -2694,7 +2697,7 @@ void Character_SetupForShot(Character* pChar) {
         fn_8001EFD8(vPos, vOffsetZ, vPos);
         vPos[1] += lbl_80187184[pChar->nClubClass][1];
         fn_800280E8(pChar, vPos, bPlace);
-        pChar->pModel->pSkel->n1130 = pChar->n16D4;
+        pChar->pModel->pSkel->n1130 = pChar->nClipKey;
         pChar->pModel->pSkel->n112C = pChar->nClubClass;
         if (((pChar->n20 == 5 || pChar->nAnim == 5) && fn_8009637C(pChar)) || pChar->n20 == 7) {
             SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 1.0f);
@@ -2771,12 +2774,12 @@ void fn_8001CE5C(UStreamObject* pObject) {
             if (gViewSlots[i].pChar->pSkin != NULL && Character_IsGolfer(gViewSlots[i].pChar)) {
                 pChar = gViewSlots[i].pChar;
                 pChar->apSkins[0] = pChar->pSkin;
-                pChar->apSkins[1] = pChar->p16D8->apSkins[0];
-                pChar->apSkins[2] = pChar->p16D8->apSkins[1];
-                pChar->apSkins[3] = pChar->p16D8->apSkins[2];
-                pChar->apSkins[4] = pChar->p16D8->apSkins[3];
-                pChar->apSkins[5] = pChar->p16D8->apSkins[4];
-                pChar->apSkins[6] = pChar->p16D8->apSkins[5];
+                pChar->apSkins[1] = pChar->pClubSet->apSkins[0];
+                pChar->apSkins[2] = pChar->pClubSet->apSkins[1];
+                pChar->apSkins[3] = pChar->pClubSet->apSkins[2];
+                pChar->apSkins[4] = pChar->pClubSet->apSkins[3];
+                pChar->apSkins[5] = pChar->pClubSet->apSkins[4];
+                pChar->apSkins[6] = pChar->pClubSet->apSkins[5];
                 pChar->nSkins = 7;
                 Character_LoadTextures(pChar, pChar->apSkins, pChar->nSkins);
             }
@@ -2827,14 +2830,14 @@ void fn_8001D020(UStreamObject* pObject) {
         pChar = lbl_80281EE0->pB8->pChar;
         pChar->nSkins = 7;
         pChar->apSkins[0] = pChar->pSkin;
-        pChar->apSkins[1] = pChar->p16D8->apSkins[0];
-        pChar->apSkins[2] = pChar->p16D8->apSkins[1];
-        pChar->apSkins[3] = pChar->p16D8->apSkins[2];
-        pChar->apSkins[4] = pChar->p16D8->apSkins[3];
-        pChar->apSkins[5] = pChar->p16D8->apSkins[4];
-        pChar->apSkins[6] = pChar->p16D8->apSkins[5];
-        if ((pChar->nC == 7 || pChar->nC == 29) && pChar->n70 == 1) {
-            pChar->n70 = 2;
+        pChar->apSkins[1] = pChar->pClubSet->apSkins[0];
+        pChar->apSkins[2] = pChar->pClubSet->apSkins[1];
+        pChar->apSkins[3] = pChar->pClubSet->apSkins[2];
+        pChar->apSkins[4] = pChar->pClubSet->apSkins[3];
+        pChar->apSkins[5] = pChar->pClubSet->apSkins[4];
+        pChar->apSkins[6] = pChar->pClubSet->apSkins[5];
+        if ((pChar->nC == 7 || pChar->nC == 29) && pChar->nDynTex == 1) {
+            pChar->nDynTex = 2;
         }
         CharacterTex_TakePoolEntries(pChar);
     }
@@ -2972,7 +2975,7 @@ void fn_8001D6F0(void) {
             Character_SetClubsAndClothes(pChar, i);
             Character_CopySkinChoices1To0(pChar);
             for (j = 0; j < pChar->nSkins; j++) {
-                SkinPart_SetupMaterials(pChar->apSkins[j], pChar->a64[pChar->n74]);
+                SkinPart_SetupMaterials(pChar->apSkins[j], pChar->apDynTex[pChar->nCurDynTex]);
             }
             gSession.aD28[i] = 0;
         }
@@ -3102,7 +3105,8 @@ u8 fn_8001DBF4(Character* pChar) {
 // model's bEE.
 void fn_8001DC64(Character* pChar, SkinChoices* pChoices) {
     SkinPart_ApplyBodyChoices(pChar, pChoices);
-    CharSlider_UpdateCharacterBasedOnSliderValues(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, pChoices->a9B4,
+    CharSlider_UpdateCharacterBasedOnSliderValues(pChar->pSliderDefs, pChar->pModel, pChar->pSkin, 26,
+                                                  pChoices->a9B4,
                 &pChar->node3E0);
     if (gSession.nGameType != 3 || lbl_80281EE0->n0 == 1 || lbl_80281EE0->n0 == 4) {
         if (pChoices->n113 == 0) {
@@ -3181,7 +3185,7 @@ void Character_SetClubStatesForCharacter(Character* pChar, int nSlot, SkinChoice
     u64 uName;
     u64 uVariant;
 
-    if (pChar == NULL || pChar->p16D8 == NULL) return;
+    if (pChar == NULL || pChar->pClubSet == NULL) return;
     if (gSession.nGameType == 3 && !fn_8008EAB0()) {
         fn_8008EABC(1);
         return;
