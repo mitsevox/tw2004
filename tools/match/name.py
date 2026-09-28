@@ -105,7 +105,20 @@ def update_markdown(rows):
             continue
         p = ROOT / f
         s = p.read_text(encoding='utf-8')
-        t, k = rx.subn(lambda m: names[m.group(1)], s)
+        if f == 'docs/tw06-names.md':
+            # a record of TW06's names: only the "Now" column (the 2nd) follows our renames
+            k = 0
+            out = []
+            for line in s.split('\n'):
+                c = line.split('|')
+                if len(c) > 3 and c[2].strip().startswith('`'):
+                    c[2], j = rx.subn(lambda m: names[m.group(1)], c[2])
+                    k += j
+                    line = '|'.join(c)
+                out.append(line)
+            t = '\n'.join(out)
+        else:
+            t, k = rx.subn(lambda m: names[m.group(1)], s)
         if k:
             p.write_text(t, encoding='utf-8')
             n += k
