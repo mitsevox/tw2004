@@ -126,7 +126,7 @@ field_A08 is 9 (both still to be named). It is flatter than block A (Goosen 71 a
     fn_800589F8  (6)   PUTTING STRIKING APPROACH RECOVERY SPIN POWER, mode 0   (user.c region)
     Swing.c: fn_8005B250 PUTT APPR RECOV DRVACC; fn_8005C01C BOOST; fn_8005C4B4 SPIN;
              fn_8005C5EC RECOV PUTT APPR DRVACC STRIKING x4; fn_8005C960 PUTT APPR RECOV STRIKING
-    fn_80086C78, fn_80086E5C  RECOVERY                   (FE_Manager.c region)
+    GM_vGetLiePercentage, GM_vGetLieModifier  RECOVERY                   (FE_Manager.c region)
     FE_GolferAttributes       the nine visible ones      (the attribute screen)
     CTIP_CheckPenaltyLieTrigger  RECOVERY x2;  SpeedGolf_UpdateCpuRun, SpeedGolf_RunUpdate  SPEED   (SkinPart.c region: animation?)
 

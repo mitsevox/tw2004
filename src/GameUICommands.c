@@ -44,31 +44,31 @@ void GM_vGetClubDistance(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetPlayerCurrentLie(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetPlayerCurrentLieAngle(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetPlayerWindDirection(MsgArg* pArgs, MsgArg* pResult);
-void fn_800865A0(MsgArg* pArgs, MsgArg* pResult);
-void fn_800865E0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086610(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086640(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008666C(MsgArg* pArgs, MsgArg* pResult);
-void fn_800866E8(MsgArg* pArgs, MsgArg* pResult);
-void fn_800866EC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086738(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008685C(MsgArg* pArgs, MsgArg* pResult);
-void fn_800868E8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086900(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086920(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086940(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086970(MsgArg* pArgs, MsgArg* pResult);
-void fn_800869A4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086C78(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086D24(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086D58(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086DDC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086DFC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086E2C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086E5C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086F0C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086FB4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087038(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerWindSpeed(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetScoringMethod(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetElapsedTimeSeconds(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetNumberMatchWins(MsgArg* pArgs, MsgArg* pResult);
+void GM_vRestartCurHole(MsgArg* pArgs, MsgArg* pResult);
+void GM_vNoOp(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetGolferUserMoney(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsPostShotCameraDone(MsgArg* pArgs, MsgArg* pResult);
+void GM_vScorecardGetPar(MsgArg* pArgs, MsgArg* pResult);
+void GM_vHoleSelected(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetMatchWins(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetSkinWins(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetGameModeType(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetSpeedGolfTotalTimeScore(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetModeValue(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetLiePercentage(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetHoleRating(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetTeeYardage(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerTee(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetCurrentSkinAmount(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetCurrentSkinNum(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetLieModifier(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetRelativeScore(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetRoundScore(MsgArg* pArgs, MsgArg* pResult);
+void GM_vLeaderboard_LastName(MsgArg* pArgs, MsgArg* pResult);
 void fn_8008709C(MsgArg* pArgs, MsgArg* pResult);
 void fn_800870E4(MsgArg* pArgs, MsgArg* pResult);
 void fn_80087130(MsgArg* pArgs, MsgArg* pResult);
@@ -385,29 +385,29 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[18] = GM_vGetPlayerCurrentLie;
     gIGMessageHandlers[19] = GM_vGetPlayerCurrentLieAngle;
     gIGMessageHandlers[20] = GM_vGetPlayerWindDirection;
-    gIGMessageHandlers[21] = fn_800865A0;
-    gIGMessageHandlers[22] = fn_800865E0;
-    gIGMessageHandlers[23] = fn_80086610;
-    gIGMessageHandlers[24] = fn_80086640;
-    gIGMessageHandlers[25] = fn_8008666C;
-    gIGMessageHandlers[26] = fn_800866EC;
-    gIGMessageHandlers[27] = fn_80086738;
-    gIGMessageHandlers[28] = fn_8008685C;
-    gIGMessageHandlers[29] = fn_800868E8;
-    gIGMessageHandlers[30] = fn_80086900;
-    gIGMessageHandlers[31] = fn_80086920;
-    gIGMessageHandlers[32] = fn_80086940;
-    gIGMessageHandlers[33] = fn_80086970;
-    gIGMessageHandlers[34] = fn_80086C78;
-    gIGMessageHandlers[35] = fn_80086D24;
-    gIGMessageHandlers[36] = fn_80086D58;
-    gIGMessageHandlers[37] = fn_80086DDC;
-    gIGMessageHandlers[38] = fn_80086DFC;
-    gIGMessageHandlers[39] = fn_80086E2C;
-    gIGMessageHandlers[40] = fn_80086E5C;
-    gIGMessageHandlers[41] = fn_80086F0C;
-    gIGMessageHandlers[42] = fn_80086FB4;
-    gIGMessageHandlers[43] = fn_80087038;
+    gIGMessageHandlers[21] = GM_vGetPlayerWindSpeed;
+    gIGMessageHandlers[22] = GM_vGetScoringMethod;
+    gIGMessageHandlers[23] = GM_vGetElapsedTimeSeconds;
+    gIGMessageHandlers[24] = GM_vGetNumberMatchWins;
+    gIGMessageHandlers[25] = GM_vRestartCurHole;
+    gIGMessageHandlers[26] = GM_vGetGolferUserMoney;
+    gIGMessageHandlers[27] = GM_vIsPostShotCameraDone;
+    gIGMessageHandlers[28] = GM_vScorecardGetPar;
+    gIGMessageHandlers[29] = GM_vHoleSelected;
+    gIGMessageHandlers[30] = GM_vGetMatchWins;
+    gIGMessageHandlers[31] = GM_vGetSkinWins;
+    gIGMessageHandlers[32] = GM_vGetGameModeType;
+    gIGMessageHandlers[33] = GM_vGetSpeedGolfTotalTimeScore;
+    gIGMessageHandlers[34] = GM_vGetLiePercentage;
+    gIGMessageHandlers[35] = GM_vGetHoleRating;
+    gIGMessageHandlers[36] = GM_vGetTeeYardage;
+    gIGMessageHandlers[37] = GM_vGetPlayerTee;
+    gIGMessageHandlers[38] = GM_vGetCurrentSkinAmount;
+    gIGMessageHandlers[39] = GM_vGetCurrentSkinNum;
+    gIGMessageHandlers[40] = GM_vGetLieModifier;
+    gIGMessageHandlers[41] = GM_vGetRelativeScore;
+    gIGMessageHandlers[42] = GM_vGetRoundScore;
+    gIGMessageHandlers[43] = GM_vLeaderboard_LastName;
     gIGMessageHandlers[44] = fn_8008709C;
     gIGMessageHandlers[45] = fn_800870E4;
     gIGMessageHandlers[46] = fn_80087130;
@@ -480,7 +480,7 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[113] = fn_800885F8;
     gIGMessageHandlers[114] = fn_80088634;
     gIGMessageHandlers[115] = fn_80088654;
-    gIGMessageHandlers[116] = fn_800869A4;
+    gIGMessageHandlers[116] = GM_vGetModeValue;
     gIGMessageHandlers[117] = fn_80088660;
     gIGMessageHandlers[118] = fn_80088730;
     gIGMessageHandlers[120] = fn_800887C4;
@@ -494,7 +494,7 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[128] = fn_80089324;
     gIGMessageHandlers[129] = fn_80089414;
     gIGMessageHandlers[130] = fn_800894B4;
-    gIGMessageHandlers[131] = fn_800866E8;
+    gIGMessageHandlers[131] = GM_vNoOp;
     gIGMessageHandlers[132] = fn_800894E8;
     gIGMessageHandlers[133] = fn_80089584;
     gIGMessageHandlers[134] = fn_80089590;
@@ -850,26 +850,30 @@ void GM_vGetPlayerWindDirection(MsgArg* pArgs, MsgArg* pResult) {
     pResult->f = 8.0f * (fAngle / TWOPI);
 }
 
-// The wind's speed.
-void fn_800865A0(MsgArg* pArgs, MsgArg* pResult) {
+// Message 21: the wind's speed (Wind_Get).
+void GM_vGetPlayerWindSpeed(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = Wind_Get(NULL);
 }
 
-void fn_800865E0(MsgArg* pArgs, MsgArg* pResult) {
+// Message 22: the round's scoring method (fn_8008AB40: gpGame->n4).
+void GM_vGetScoringMethod(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_8008AB40();
 }
 
-void fn_80086610(MsgArg* pArgs, MsgArg* pResult) {
+// Message 23: the time spent on the hole so far (GM_GetElapsedHoleTime).
+void GM_vGetElapsedTimeSeconds(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_GetElapsedHoleTime();
 }
 
-// The mode's points for a player on a hole.
-void fn_80086640(MsgArg* pArgs, MsgArg* pResult) {
+// Message 24: player pArgs[0]'s mode points on hole pArgs[1] (nModePoints; in match play 1 = hole
+// won).
+void GM_vGetNumberMatchWins(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gPlayers[pArgs[0].i].nModePoints[pArgs[1].i];
 }
 
-// Restart the hole.
-void fn_8008666C(MsgArg* pArgs, MsgArg* pResult) {
+// Message 25: restart the hole: replay off, event 2 for the player up, GM_RestartHole; a PlayNow
+// challenge restarts too, and the long-drive modes (22, 26) restart their music.
+void GM_vRestartCurHole(MsgArg* pArgs, MsgArg* pResult) {
     gSession.bReplay = 0;
     gReplayData.bF10 = 0;
     EVENT_Trigger(lbl_80282278, 2, NULL, 0);
@@ -882,11 +886,12 @@ void fn_8008666C(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_800866E8(MsgArg* pArgs, MsgArg* pResult) {
+// Message 131: empty in this build.
+void GM_vNoOp(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// The money in the player's save profile (0 without one).
-void fn_800866EC(MsgArg* pArgs, MsgArg* pResult) {
+// Message 26: the money in player pArgs[0]'s save profile (n6C), 0 when the profile is not active.
+void GM_vGetGolferUserMoney(MsgArg* pArgs, MsgArg* pResult) {
     if (gpSaveData[gPlayers[pArgs[0].i].nIndex].bActive != 1) {
         pResult->i = 0;
         return;
@@ -894,7 +899,11 @@ void fn_800866EC(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[gPlayers[pArgs[0].i].nIndex].n6C;
 }
 
-void fn_80086738(MsgArg* pArgs, MsgArg* pResult) {
+// Message 27: whether the post-shot camera is done with player pArgs[0] (1; always for players 5
+// and up): 1 when he is not in a reaction animation (nCurState not 9, 11 or 12), or when the
+// camera's script has ended (fn_800C6E44) and either it is not tracking him (fn_800C708C) or his
+// animation is paused or has less than the camera tuning's f170 left.
+void GM_vIsPostShotCameraDone(MsgArg* pArgs, MsgArg* pResult) {
     u8 bView6E44;
     u8 bView708C;
     u8 bCharFlag;               // the golfer's uFlags bit 1
@@ -918,8 +927,9 @@ void fn_80086738(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// A hole's par; "hole" 18 is the front nine, 19 the back nine, 20 the round.
-void fn_8008685C(MsgArg* pArgs, MsgArg* pResult) {
+// Message 28: hole pArgs[0]'s par; "hole" 18 is the front nine, 19 the back nine, 20 the round
+// (from the tee set of player pArgs[1]).
+void GM_vScorecardGetPar(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 18) {
         pResult->i = fn_800D2E60();
     } else if (pArgs[0].i == 19) {
@@ -931,31 +941,38 @@ void fn_8008685C(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Whether the round plays a hole.
-void fn_800868E8(MsgArg* pArgs, MsgArg* pResult) {
+// Message 29: whether the round plays hole pArgs[0] (gpGame->bHoleSelected).
+void GM_vHoleSelected(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpGame->bHoleSelected[pArgs[0].i];
 }
 
-// The holes a player has won (match play).
-void fn_80086900(MsgArg* pArgs, MsgArg* pResult) {
+// Message 30: the holes player pArgs[0] has won (match play).
+void GM_vGetMatchWins(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gPlayers[pArgs[0].i].nHolesWon;
 }
 
-void fn_80086920(MsgArg* pArgs, MsgArg* pResult) {
+// Message 31: the skins player pArgs[0] has won (Player.n274, TW06 skinwins).
+void GM_vGetSkinWins(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gPlayers[pArgs[0].i].n274;
 }
 
-// The game mode.
-void fn_80086940(MsgArg* pArgs, MsgArg* pResult) {
+// Message 32: the game mode (Game_GetMode).
+void GM_vGetGameModeType(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = Game_GetMode();
 }
 
-void fn_80086970(MsgArg* pArgs, MsgArg* pResult) {
+// Message 33: player pArgs[0]'s speed-golf time score summed over all 18 holes
+// (SpeedGolf_GetTotalTimeScore).
+void GM_vGetSpeedGolfTotalTimeScore(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = SpeedGolf_GetTotalTimeScore(pArgs[0].i);
 }
 
-// A value of the modes' own for a player, picked by pArgs[1].
-void fn_800869A4(MsgArg* pArgs, MsgArg* pResult) {
+// Message 116: one of the special modes' values for player pArgs[0], picked by pArgs[1]: 1..4
+// GameMode12's hole points, round points, shot multiplier and bonus meter; 9 and 13..19, 21, 26 the
+// target games' (13 also sounds the ten-second warning and answers 0); 27 fn_800F1960; the rest
+// Player fields (nDD8, aDC4, nDC0, nDDC, nDE0, nE88, nE8C, nE94; 25 is aDC4[1] + 5). Any other
+// pArgs[1] leaves the answer as it was.
+void GM_vGetModeValue(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[1].i) {
     case 0:
         pResult->i = gPlayers[pArgs[0].i].nDD8;
@@ -1045,20 +1062,23 @@ void fn_800869A4(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// The ball's lie as a percentage: the surface's share of speed kept, plus RECOVERY's part.
-void fn_80086C78(MsgArg* pArgs, MsgArg* pResult) {
+// Message 34: the lie of player pArgs[0]'s ball as a percentage: the surface's share of speed kept
+// (f00) plus ball.f70 times RECOVERY / 100, times 100.
+void GM_vGetLiePercentage(MsgArg* pArgs, MsgArg* pResult) {
     pResult->f = 100.0f *
                  (0.01f * (gPlayers[pArgs[0].i].ball.f70 *
                            (s8)Golfer_GetAttribute(&gPlayers[pArgs[0].i], ATTR_RECOVERY, ATTR_TOTAL)) +
                   gSurfaceTypes[gPlayers[pArgs[0].i].ball.nSurface].f00);
 }
 
-void fn_80086D24(MsgArg* pArgs, MsgArg* pResult) {
+// Message 35: hole pArgs[0]'s rating (fn_800D2B4C: the course table's n04 for that hole).
+void GM_vGetHoleRating(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_800D2B4C(pArgs[0].i);
 }
 
-// A hole's length from a tee set; "hole" 18 is the front nine, 19 the back nine, 20 the round.
-void fn_80086D58(MsgArg* pArgs, MsgArg* pResult) {
+// Message 36: hole pArgs[0]'s length from tee set pArgs[1]; "hole" 18 is the front nine, 19 the
+// back nine, 20 the round.
+void GM_vGetTeeYardage(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 18) {
         pResult->i = fn_800D2DA0(pArgs[1].i);
     } else if (pArgs[0].i == 19) {
@@ -1070,27 +1090,32 @@ void fn_80086D58(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// The tee set a player plays from.
-void fn_80086DDC(MsgArg* pArgs, MsgArg* pResult) {
+// Message 37: the tee set player pArgs[0] plays from (gSession.nTeeSet).
+void GM_vGetPlayerTee(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gSession.nTeeSet[pArgs[0].i];
 }
 
-void fn_80086DFC(MsgArg* pArgs, MsgArg* pResult) {
+// Message 38: the value of the skin on this hole (GameModeSkins_CurrentHoleValue).
+void GM_vGetCurrentSkinAmount(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GameModeSkins_CurrentHoleValue();
 }
 
-void fn_80086E2C(MsgArg* pArgs, MsgArg* pResult) {
+// Message 39: how many skins are at stake on this hole (GameModeSkins_CurrentHoleNumberSkins).
+void GM_vGetCurrentSkinNum(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GameModeSkins_CurrentHoleNumberSkins();
 }
 
-// How much the lie can vary: the surface's range, less RECOVERY.
-void fn_80086E5C(MsgArg* pArgs, MsgArg* pResult) {
+// Message 40: how much the lie of player pArgs[0]'s ball can vary: the surface's range (f04) times
+// (100 - RECOVERY).
+void GM_vGetLieModifier(MsgArg* pArgs, MsgArg* pResult) {
     pResult->f = gSurfaceTypes[gPlayers[pArgs[0].i].ball.nSurface].f04 *
                  (100.0f - (s8)Golfer_GetAttribute(&gPlayers[pArgs[0].i], ATTR_RECOVERY, ATTR_TOTAL));
 }
 
-// A player's score for the round, as the mode counts it.
-void fn_80086F0C(MsgArg* pArgs, MsgArg* pResult) {
+// Message 41: player pArgs[0]'s score, as the mode counts it: in Stableford (18)
+// GM_GetPlayerRoundScore, in the PGA TOUR (23) the entrant's score to par, best ball (19) the
+// team's, else his cumulative score to par.
+void GM_vGetRelativeScore(MsgArg* pArgs, MsgArg* pResult) {
     switch (Game_GetMode()) {
     case 18:
         pResult->i = GM_GetPlayerRoundScore(pArgs[0].i);
@@ -1107,8 +1132,9 @@ void fn_80086F0C(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// A player's score in one round of the tournament (PGA TOUR mode: from the simulation).
-void fn_80086FB4(MsgArg* pArgs, MsgArg* pResult) {
+// Message 42: player pArgs[0]'s score in round pArgs[1] of the event (the PGA TOUR, mode 23: from
+// the simulation; else Player.nRoundScore).
+void GM_vGetRoundScore(MsgArg* pArgs, MsgArg* pResult) {
     switch (Game_GetMode()) {
     case 23:
         pResult->i = GM_PgaTourSim_GetRoundScoreFromEntrantID(pArgs[0].i, 0, pArgs[1].i);
@@ -1117,8 +1143,9 @@ void fn_80086FB4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gPlayers[pArgs[0].i].nRoundScore[pArgs[1].i];
 }
 
-// The PGA TOUR leaderboard: the name of the golfer on row pArgs[0].
-void fn_80087038(MsgArg* pArgs, MsgArg* pResult) {
+// Message 43: the PGA TOUR leaderboard: the name of the golfer on row pArgs[0], into the string
+// pArgs[1].
+void GM_vLeaderboard_LastName(MsgArg* pArgs, MsgArg* pResult) {
     s32 nEntrant = GM_PgaTourSim_GetEntrantIDFromScoreRow(0, pArgs[0].i);
     s32 nGolfer = GM_PgaTourSim_GetGolferIDFromEntrantID(0, nEntrant);
 
