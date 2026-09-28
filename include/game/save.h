@@ -351,7 +351,7 @@ typedef struct SaveProfile {
                                 //          TrophyRoom_CountEventsInMonth counts the nonzero ones
                                 //          in a month; no C code here writes it
     u8   unk10546[0x10548 - 0x10546];
-    u32  a10548[1];             // 0x10548  a bit array: FE_CrAPMessages.c's fn_80108E4C tests bit n; fn_80058304 tests one (bit 1 for FE_Manager)
+    u32  a10548[1];             // 0x10548  a bit array: FE_CrAPMessages.c's GM_vGetProfileFlag tests bit n; fn_80058304 tests one (bit 1 for FE_Manager)
     SponsorSlot aSponsor[11];   // 0x1054C  the sponsorship slots; cleared by the profile setup;
                                 //          fn_80078008's lock kinds 10 (a sponsor signed) and 11
                                 //          (so many slots signed) read them

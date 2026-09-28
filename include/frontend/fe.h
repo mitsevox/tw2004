@@ -192,7 +192,7 @@ typedef struct FEProfile {
     u8  unk106CC[0x106D0 - 0x106CC];
     u64 uSquareHash;            // 0x106D0  the hash of "__LogoSquare" (the square logo's texture)
     u64 uRectHash;              // 0x106D8  the hash of "__LogoRect"
-    LogoRecord logo106E0;       // 0x106E0  copied into the profile's logo fn_8010F7D8 (fn_80109294)
+    LogoRecord logo106E0;       // 0x106E0  copied into the profile's logo fn_8010F7D8 (GM_vSaveLogo)
     u8  b11702;                 // 0x11702
     u8  b11703;                 // 0x11703
     s32 n11704;                 // 0x11704

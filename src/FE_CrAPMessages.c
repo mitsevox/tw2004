@@ -595,14 +595,18 @@ void GM_vSetLogoEditorShape(MsgArg* pArgs, MsgArg* pResult) {
     fn_8010F7E4(LOGO_RECT);
 }
 
-void fn_80108904(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 491: logo palette colour pArgs[0] (0..255) as red, green, blue and alpha into
+// *pArgs[1..4], 0..255 each (alpha 0 or 255).
+void GM_vGetLogoPaletteColor(MsgArg* pArgs, MsgArg* pResult) {
     fn_8010F7FC(pArgs[0].i, pArgs[1].p, pArgs[2].p, pArgs[3].p, pArgs[4].p);
 }
 
 // ---- end of sweep code ----
 
-// Load the logo from the texture named pArgs[0].
-void fn_8010893C(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 492: fill the logo being edited with the pixels of the texture named by the string
+// pArgs[0] (copied into a 32-byte buffer first; fn_8010F890), at the editor's shape's size; nothing
+// when there is no such texture.
+void GM_vLoadLogoFromTexture(MsgArg* pArgs, MsgArg* pResult) {
     char szName[32] = "";
 
     strcpy(szName, ((MsgString*)pArgs[0].p)->pStr);
@@ -611,19 +615,24 @@ void fn_8010893C(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_801089BC(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 493: mark the logo being edited changed, so it is copied into its texture on the
+// next frame.
+void GM_vMarkLogoChanged(MsgArg* pArgs, MsgArg* pResult) {
     fn_8010F880();
 }
 
-void fn_801089DC(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 494: set pixel pArgs[0], pArgs[1] (x, y) of the logo being edited to palette colour
+// pArgs[2]. A pixel off the logo writes the byte before it (fn_8010F90C's EA bug).
+void GM_vSetLogoPixel(MsgArg* pArgs, MsgArg* pResult) {
     fn_8010F90C(pArgs[0].i, pArgs[1].i, pArgs[2].i);
 }
 
 // ---- end of sweep code ----
 
-// Check the assets' locks again; count the assets that were locked and are now unlocked and
-// offered, and set their aB344 bits.
-void fn_80108A0C(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 498: check every asset's lock again (fn_80078680). Each asset that was locked before
+// and is not now, and is offered for the current gender, gets its new bit (aB344) set; the result
+// is how many there are.
+void GM_vCheckCrAPUnlocks(MsgArg* pArgs, MsgArg* pResult) {
     u32 aWasLocked[94];                 // the size is unknown (the frame allows up to 97 words)
     int nUnlocked = 0;
     SaveProfile* pProfile = FE_GetCurrentProfile();
@@ -652,13 +661,17 @@ void fn_80108A0C(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80108B10(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 499: choice pArgs[2] under entry pArgs[1] of part pArgs[0] is newly unlocked (its
+// aB344 bit, set by GM_vCheckCrAPUnlocks).
+void GM_vIsCrAPItemNew(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(pArgs[0].i, pArgs[1].i, pArgs[2].i);
     pResult->i = BitArray_TestBit(pProfile->aB344, nAsset);
 }
 
-void fn_80108B84(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 500: when choice pArgs[2] under entry pArgs[1] of part pArgs[0] is newly unlocked
+// (aB344), set its aB4BC bit too; GM_vClearMarkedNewCrAPItems later clears both.
+void GM_vMarkNewCrAPItem(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     int nAsset = FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(pArgs[0].i, pArgs[1].i, pArgs[2].i);
     if (BitArray_TestBit(pProfile->aB344, nAsset)) {
@@ -668,8 +681,9 @@ void fn_80108B84(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- end of sweep code ----
 
-// Clear every asset's aB344 and aB4BC bits where both are set.
-void fn_80108C00(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 501: every asset marked by GM_vMarkNewCrAPItem (both its aB344 and aB4BC bits set)
+// stops being new: both bits are cleared.
+void GM_vClearMarkedNewCrAPItems(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 nAssets = FE_CrAP_GetNumEntriesInCrAPDB();
     u32 i;
@@ -682,8 +696,9 @@ void fn_80108C00(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Whether a controller in any of the four ports holds button bit 24 (held).
-void fn_80108CA8(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 502: 1 when a controller in any of the four ports holds the A button (PAD_BUTTON_A
+// in the held half of Input_ReadControlPad), else 0.
+void GM_vIsAnyPadHoldingA(MsgArg* pArgs, MsgArg* pResult) {
     int i;
 
     for (i = 0; i < 4; i++) {
@@ -695,9 +710,11 @@ void fn_80108CA8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// Four buttons of controller pArgs[0] (bits 19, 18, 16 and 17 of what it holds), when one is
-// plugged in.
-void fn_80108D1C(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 557: the D-pad directions controller pArgs[0] holds (the held half of
+// Input_ReadControlPad; the stick counts too while gControllers.bStickAsDpad is set): up, down,
+// left and right into *pArgs[1..4], 1 or 0 each. Nothing is written when there is no controller in
+// that port.
+void GM_vGetDPadHeld(MsgArg* pArgs, MsgArg* pResult) {
     int nChan = pArgs[0].i;
     s32* pA = pArgs[1].p;
     s32* pB = pArgs[2].p;
@@ -728,8 +745,8 @@ void fn_80108D1C(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Set or clear bit pArgs[0] of the profile's a10548.
-void fn_80108DF4(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 503: set (pArgs[1] nonzero) or clear bit pArgs[0] of the profile's a10548 flags.
+void GM_vSetProfileFlag(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 bSet = pArgs[1].i;
     s32 nBit = pArgs[0].i;
@@ -743,16 +760,19 @@ void fn_80108DF4(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80108E4C(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 504: bit pArgs[0] of the profile's a10548 flags (GM_vSetProfileFlag sets them).
+void GM_vGetProfileFlag(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     pResult->i = BitArray_TestBit(pProfile->a10548, pArgs[0].i);
 }
 
 // ---- end of sweep code ----
 
-// The newly unlocked assets (aB344) for the five strings pArgs[0..4]: their names when there are
-// at most five, else their categories (the fifth line "And more..." when there are more than five).
-void fn_80108E9C(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 507: five lines naming the newly unlocked assets (aB344, offered for the current
+// gender) into the strings pArgs[0..4]. With five or fewer, their names; with more, the names of
+// the list entries they belong to, the fifth line "And more..." when there are more than five
+// entries. Unused lines are " ".
+void GM_vGetNewCrAPItemsText(MsgArg* pArgs, MsgArg* pResult) {
     char aNames[5][64];
     char aCategories[5][64];
     char szCategory[64];
@@ -811,8 +831,8 @@ void fn_80108E9C(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Today's date: month, day and year.
-void fn_801090B4(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 509: today's date from the console clock: month, day and year into *pArgs[0..2].
+void GM_vGetTodaysDate(MsgArg* pArgs, MsgArg* pResult) {
     s32 nMonth;
     s32 nDay;
     s32 nYear;
@@ -827,8 +847,9 @@ void fn_801090B4(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[2].p = nYear;
 }
 
-// A random whole number 1..99, as a float.
-void fn_80109120(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 512: a random whole number from 1 to 99 (a 0 is drawn again), handed back as a
+// float.
+void GM_vGetRandom1To99(MsgArg* pArgs, MsgArg* pResult) {
     u32 n = 0;
 
     while (n == 0) {
@@ -837,26 +858,30 @@ void fn_80109120(MsgArg* pArgs, MsgArg* pResult) {
     pResult->f = n;
 }
 
-// The logo's name.
-void fn_801091B8(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 513: the name of the logo being edited into the string pArgs[1]; the result is its
+// b1020 (1 once it has been kept by GM_vSaveLogo).
+void GM_vGetLogoName(MsgArg* pArgs, MsgArg* pResult) {
     LogoRecord* pLogo = fn_8010FB70();
     strcpy(((MsgString*)pArgs[1].p)->pStr, pLogo->szName);
     pResult->i = pLogo->b1020;
 }
 
-// Name the logo.
-void fn_8010920C(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 514: name the logo being edited after the string pArgs[1].
+void GM_vSetLogoName(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(fn_8010FB70()->szName, ((MsgString*)pArgs[1].p)->pStr);
 }
 
-// The profile's logo n's b1020.
-void fn_80109248(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 621: the profile's logo pArgs[0] (0..4) has been made and kept (its b1020;
+// GM_vSaveLogo sets it).
+void GM_vIsProfileLogoMade(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     pResult->i = pProfile->choices.aLogo[pArgs[0].i].b1020;
 }
 
-// Keep the edited logo: copy it into the profile's logo fn_8010F7D8.
-void fn_80109294(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 622: keep the logo just edited: the menus' copy (FEProfile.logo106E0) is marked made
+// (b1020) and copied over the profile's logo the editor works on (fn_8010F7D8), and the editor goes
+// back to working on the profile's logo (b10640 cleared).
+void GM_vSaveLogo(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 nLogo = fn_8010F7D8();
 
@@ -865,24 +890,31 @@ void fn_80109294(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->b10640 = 0;
 }
 
-// Golfer pArgs[0]'s equipment tier for attribute pArgs[1].
-void fn_80109304(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 515: golfer pArgs[0]'s equipment tier for attribute pArgs[1] (a created golfer's
+// comes from what it wears, fn_8007873C).
+void GM_vGetGolferAttributeTier(MsgArg* pArgs, MsgArg* pResult) {
     GolferRecord* pRecord = fn_80077A80(pArgs[0].i);
     pResult->i = pRecord->tier[pArgs[1].i];
 }
 
-void fn_80109354(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 527: the name of entry pArgs[1] of part pArgs[0]'s list into the string pArgs[2]
+// (for entry 0 the part's "All ..." entry when it has one).
+void GM_vGetCrAPSubcategoryName(MsgArg* pArgs, MsgArg* pResult) {
     FE_CrAP_GetSubCategoryNameForCategoryAndSubcategoryIndex(pArgs[0].i, pArgs[1].i, ((MsgString*)pArgs[2].p)->pStr);
 }
 
-void fn_80109388(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 528: the name of colour id pArgs[0] (an offset into the 'CR_S' names, as
+// GM_vGetCrAPItemInfo gives them) into the string pArgs[1]; "" for "NONE".
+void GM_vGetCrAPColorName(MsgArg* pArgs, MsgArg* pResult) {
     FE_CrAP_GetColorNameFromID(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }
 
 // ---- end of sweep code ----
 
-// A part's choice i: its unlock text (FE_CrAP_GetUnlockMessageFrom), when there is such a choice.
-void fn_801093B4(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 529: how choice pArgs[2] under entry pArgs[1] of part pArgs[0] is unlocked, into the
+// string pArgs[3] (FE_CrAP_GetUnlockMessageFrom); the string is left alone when there is no such
+// choice.
+void GM_vGetCrAPItemUnlockText(MsgArg* pArgs, MsgArg* pResult) {
     s16 nPart = pArgs[0].i;
     int b = pArgs[1].i;
     int nChoices = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(nPart, b);
@@ -896,29 +928,39 @@ void fn_801093B4(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80109430(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 534: does nothing in this build.
+void GM_vCrAPMessage534_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80109434(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 535: the Create-A-Player camera's idle state (FE_SetCrAPCameraIdleState): 0 the
+// "Crap Idle" shot, 1 the "Crap Face" shot.
+void GM_vSetCrAPCameraIdleState(MsgArg* pArgs, MsgArg* pResult) {
     FE_SetCrAPCameraIdleState(pArgs[0].i);
 }
 
-void fn_80109458(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 538: 1 when the menu golfer's character has been made (FE_HasGolferCharacter), else
+// 0.
+void GM_vHasMenuGolfer(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = (u8)FE_HasGolferCharacter();
 }
 
-void fn_8010948C(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 562: 1 when the menu golfer is loaded and ready to show (FE_IsGolferReady), else 0.
+void GM_vIsMenuGolferReady(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = (u8)FE_IsGolferReady();
 }
 
-void fn_801094C0(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 687: 1 when the menu golfer loader is idle (FE_StreamGetCurrentState is 1), else 0.
+void GM_vIsGolferLoaderIdle(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = FE_StreamGetCurrentState() == 1;
 }
 
-void fn_801094FC(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 539: does nothing in this build.
+void GM_vCrAPMessage539_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80109500(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 542: 1 while the menus work on their own copy of the profile, 0 while on the player
+// slot's saved one (FEProfile.bCopy; GM_vSetUseProfileCopy sets it).
+void GM_vGetUseProfileCopy(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80281ED4->bCopy;
 }
 
