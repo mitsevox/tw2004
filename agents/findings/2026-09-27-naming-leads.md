@@ -294,3 +294,44 @@ functions serve GameEffects.c; GM_Vec4Sub / GM_Vec3Sub at GameRound.c's start. R
 Unlabelled possible EA bugs: GameModeDriverRTE_EndGame calls mode 5's end game unchecked;
 GM_ShowPostShotAnimation reads pSurf->nClass after a NULL test. GameManager hook calls through raw
 offsets pass gpGame to (void) hooks: check EA form vs fake match. GetRankText EA bug labelled.
+
+## Round 11 (rk1-rk6) leftovers
+Golfer header items still open (rk1's "left" list, each verified by rk1 against FEgolferanim.c / the
+skin code, ready to apply): camera.h CrAPState n4 nCamIdleState, n8 nRenderState, nC / b80
+nTempRenderState / bTempRenderState, sz10 szCurAnim, sz20 / sz30 szQueuedAnim / szQueuedShot, n50
+nAnimRepeats, sz54 szQueuedBall, n74 nTexSwapState, b78 / f7C bDelayTexSwap / fTexSwapDelay, b81
+bNewTextures, b86 bHidden, b8A bClearCache, f14C fAlpha, f19C / f1A0 fFacing / fTargetFacing, n1B4
+nIdleCount, n1B8 / n1BC nClub / nTempClub, n1C0 nQueuedState, n1C4 / b1C8 nUnlockState / bPadLocked,
+f1CC fFadeOutTime, n1D0 bFadeAtEnd, b1D1 bClubStatesAllowed, b1D2 bTexSwapDue, n1D4 / n1D8 nLastAsset /
+nLastCategory, b1DC bZoom. charstate.h SkinListEntry p8 / nC pRecolor / nRecolorMode; SkinDesc8C a08
+f32[3][3] colour matrix, n2C its mode; SkinDesc n2C mesh count of p34, n30 one past the last 0x100000
+mesh; SkinDesc44.u24 "bit 1" = 0x2; SkinMeshBit.unk0 x/y/z s16; SkinMorphWork p10020 / p10024 current /
+next target, n10018 vertex count; Skin p1088 world-to-bone, p108C skinning matrices, a1098 / a10A0
+per-view memory blocks / override tables, p1090 freed only, f10D8 / f10DC written only. CharPool a[6].p
+holds a Character* (layout question for the owner). fn_800AE3C4 (void) vs callers passing nPlayer;
+hwsRender_Gc.c SKN_CloseModule s32 vs void; event.c locals fSpinY / fSpinX = side / forward;
+FE_SetProfileLeftHanded(int nProfile, s8) breaks the match (sign-extension): leave (int, int).
+Round flow header lane: pgatour.h Tournament.aPrize [0] purse, [1] first prize (comment backwards;
+PGATourSimulation.c:295's locals swapped too), nC isAMajor, nTourEvent TW06 tournament, n10 icon /
+texture id, TourEvent.a40 low score per bracket, PgaTriple = sponsorship offer (n0 progress, n4
+nStartCash, n8 nBonusCash), Pga80205F30 = PgaTour_WinInfo (b0 placed, n4 position, n8 winnings),
+AwardMoney prototype (nPlayer, nCash); save.h n4E98 rounds at or under par in a row, n4E94 tournaments
+started, a1054C sponsorship slots, line 38 comment repeats itself, UserInfo stats (rk5's list: n88
+drives ... nAC-nC4 hole results); golfer.h GameState bD4 in a playoff, nD8 playoff hole count, hooks
+pfn1E4 PostHoleLoadInit / pfn1EC StartGamePreData / pfn208 GetPotentialHoleResult, Player n2DC drive
+distance, n2E0 longest putt, b2E4 fairway hit, b2F6 green in regulation, b310 bunker this hole;
+options.nC is the weather choice (fn_8006F650: 0/4 bit 0, 1 random, 2 changing, 3 bit 1, 5/6 none);
+earnings.h record-kind comments and misaligned externs, HoleGoal / uLies lines past 110; game.h
+record-check params (setrecord, firstPlaceOnly / bPreview), GM_Earnings_TournamentPayout (purse,
+firstPrize, place), game.h:254 Earnings_CheckShotAwards comment; challenge.h n0 / n4 group name /
+description, b4D sets options.nC 3, externs misaligned; game.h PlayNow_ prototypes' old param names;
+GameManager.c's local GM_Earnings_PayRoundGoals(int, int) vs (int, u8 bRoundOver); fe.h FE_CrAP n4
+~130 columns.
+Other: mode 5 = Play Now challenges (docs/journal.md's "Tiger Challenge" guess wrong; src/README mode
+table); GameMode5.c file rename to EA's PlayNowMode.c = misfiled-units item. Pairing TSV A rows 800D8D5C /
+800D8DB4 one function off. Possible EA bugs, unlabelled: GetCourses aTourEvent[-1]; SetTournament never
+restores options.n18; PlayNow_LoadBallSpot index -1; PlayNow_GameFinished adds totals when only asked;
+Earnings goal checks index gpSaveData by player number; possible double hole-goal payout on the last
+hole. docs/decomp-notes.md "Earnings fn_800D6A70" stale. Tools: wraplong splits casts `(\n void* (*)(u16))`
+and does not wrap trailing field comments; name.py writes column-8 comments after renaming, so a comment
+must already use the batch's new names.
