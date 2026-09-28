@@ -511,7 +511,7 @@ typedef struct GolfCamState {
 } GolfCamState;
 
 // The golfer shown on the menu screens (FEgolferanim.c): the create-a-player (CrAP) screen's
-// state at lbl_80281EE0 (0x1E0 bytes, allocated by fn_8008AD80). The golfers are kept in a ring
+// state at lbl_80281EE0 (0x1E0 bytes, allocated by FE_CharMgrInit). The golfers are kept in a ring
 // of CRAP_NUM_GOLFERS slots (the code is written for more than one; the game uses one).
 #define CRAP_NUM_GOLFERS 1
 

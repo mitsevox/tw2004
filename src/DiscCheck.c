@@ -122,7 +122,7 @@ void fn_801102AC(void) {
     s32 nStatus;
 
     if (gSession.nGameType == 3) {
-        fn_8008B760();
+        FE_StreamStopAllStreaming();
         fn_8008B978(1);
         lbl_802824D8 = 1;
         return;

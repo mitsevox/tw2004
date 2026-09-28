@@ -232,7 +232,7 @@ typedef struct FEGolferState {
     void (*pfnEnter)(void);     // 0x00
     void (*pfnUpdate)(void);    // 0x04  every frame
     void (*pfnExit)(void);      // 0x08
-    void (*pfnAbort)(void);     // 0x0C  fn_8008B704
+    void (*pfnAbort)(void);     // 0x0C  FE_StreamInterruptState
     s32  nNext;                 // 0x10  the state that follows it
 } FEGolferState;
 LAYOUT_ASSERT(FEGolferState, 0x14);
@@ -245,7 +245,7 @@ typedef struct FEGolferMachine {
     s32 nState;                 // 0x4  the running state (0: stopped)
     u8  bDone;                  // 0x8  the state is finished: go to nNext
     u8  bEnter;                 // 0x9  the state's pfnEnter is still to run
-    u8  bAbort;                 // 0xA  set by fn_8008B704
+    u8  bAbort;                 // 0xA  set by FE_StreamInterruptState
     u8  bPaused;                // 0xB
 } FEGolferMachine;
 LAYOUT_ASSERT(FEGolferMachine, 0xC);
@@ -477,8 +477,8 @@ extern s32 lbl_80281FFC;                // set by fn_80084FF0: the lbl_8018C7D8 
 
 // ---- the golfers animated on menu screens (FEgolferanim.c) ------------------------------------
 
-void fn_8008B044(int nGolfer, int a, int b);    // show golfer nGolfer
-void fn_8008B760(void);
+void FE_setupStreaming(int nGolfer, int a, int b);    // show golfer nGolfer
+void FE_StreamStopAllStreaming(void);
 u8   fn_8008B978(u8 bPaused);           // pause the menus' state machine (or not); the old setting
 int  fn_8008B990(void);
 void fn_8008DAEC(void);

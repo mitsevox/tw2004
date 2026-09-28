@@ -175,7 +175,7 @@ void fn_80076E48(void);
 void fn_800773F8(void);
 void fn_80077428(void);
 void fn_80085120(void);
-void fn_8008B00C(void);
+void FE_CharMgrClose(void);
 void fn_8008B864(void);
 void fn_8008B9A0(void);
 void fn_8008C844(void);
@@ -575,7 +575,7 @@ void fn_8006CB2C(void) {
     fn_8006DCA4(1);
     RC_vReleaseRenderCtx(lbl_80281E54);
     fn_8010F794();
-    fn_8008B00C();
+    FE_CharMgrClose();
     fn_80077428();
     VM_vReleaseViewport(lbl_80281E58);
     FB_vReleaseFrameBuffer(lbl_80281E5C);

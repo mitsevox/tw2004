@@ -15,8 +15,8 @@
 // Outside this file.
 void fn_80037FB4(u8 a, f32* pColor);    // a full-screen colour (GoPostFx.c)
 void fn_80010284(void);
-void fn_8008B704(void);
-void fn_8008B754(int a);
+void FE_StreamInterruptState(void);
+void FE_StreamSetNextState(int a);
 void fn_8008B7D0(int a);
 void fn_8008D8CC(void);
 void fn_8008DBE8(void);
@@ -222,8 +222,8 @@ void FE_movieFade(void) {
 
 // Before a movie.
 void fn_800772E0(void) {
-    fn_8008B754(1);
-    fn_8008B704();
+    FE_StreamSetNextState(1);
+    FE_StreamInterruptState();
     fn_8008B7D0(1);
     fn_8008DAEC();
     fn_8008DBE8();

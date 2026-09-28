@@ -240,7 +240,7 @@ They will be sorted into the sections below.
 - **[verified] A local `int` copy of an `s32` parameter survives as its own register** (an s32 copy is
   merged away). MC_Gc's CARD waits: `int nChan = nPort;`, 8 functions 73-99 -> 100. Mark it fake match.
 - **[verified] When every caller masks a result with `clrlwi`, declare the callee `u8`** even if its body
-  shows no mask (UStream_Update: callers FEgolferanim fn_8008B450 97.0 -> 100). The callee's own score
+  shows no mask (UStream_Update: callers FEgolferanim FE_StreamFunc_SkinUpdate 97.0 -> 100). The callee's own score
   does not decide it; the callers do.
 - **[verified] A `const` source pointer lets CW hoist an unrolled copy loop's loads above its stores**;
   drop the `const` when the original alternates load/store (DynamicRenderingBuffer fn_800705F0 83 -> 100).

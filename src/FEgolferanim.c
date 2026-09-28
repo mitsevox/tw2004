@@ -33,31 +33,31 @@ f32 lbl_80189A40[2][4] = { { 0.5f, 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 0.0f, 1.0f 
 f32 lbl_80189A60[2][4] = { { 0.5f, 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 0.0f, 1.0f } };
 f32 lbl_80189A80[2][4] = { { 0.5f, 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 0.0f, 1.0f } };
 
-void fn_8008B204(void);
-void fn_8008B20C(void);
-void fn_8008B208(void);
-void fn_8008B3C8(void);
-void fn_8008B3CC(void);
-void fn_8008B450(void);
-void fn_8008B430(void);
-void fn_8008B4A0(void);
-void fn_8008B4C0(void);
-void fn_8008B574(void);
-void fn_8008B570(void);
-void fn_8008B5FC(void);
-void fn_8008B61C(void);
-void fn_8008B694(void);
-void fn_8008B674(void);
-void fn_8008B6E4(void);
+void FE_StreamFunc_IdleInit(void);
+void FE_StreamFunc_IdleUpdate(void);
+void FE_StreamFunc_IdleClose(void);
+void FE_StreamFunc_IdleInterrupt(void);
+void FE_StreamFunc_SkinInit(void);
+void FE_StreamFunc_SkinUpdate(void);
+void FE_StreamFunc_SkinClose(void);
+void FE_StreamFunc_SkinInterrupt(void);
+void FE_StreamFunc_TexturesInit(void);
+void FE_StreamFunc_TexturesUpdate(void);
+void FE_StreamFunc_TexturesClose(void);
+void FE_StreamFunc_TexturesInterrupt(void);
+void FE_StreamFunc_SwapTexturesInit(void);
+void FE_StreamFunc_SwapTexturesUpdate(void);
+void FE_StreamFunc_SwapTexturesClose(void);
+void FE_StreamFunc_SwapTexturesInterrupt(void);
 
 // The loader's states: 1 wait for a golfer to load, 2 stream him in, 3 set him up, 4 set up the
 // golfer already loaded.
 FEGolferState lbl_80189AA0[FE_NUM_GOLFER_STATES] = {
     { NULL, NULL, NULL, NULL, 0 },
-    { fn_8008B204, fn_8008B20C, fn_8008B208, fn_8008B3C8, 2 },
-    { fn_8008B3CC, fn_8008B450, fn_8008B430, fn_8008B4A0, 3 },
-    { fn_8008B4C0, fn_8008B574, fn_8008B570, fn_8008B5FC, 1 },
-    { fn_8008B61C, fn_8008B694, fn_8008B674, fn_8008B6E4, 1 },
+    { FE_StreamFunc_IdleInit, FE_StreamFunc_IdleUpdate, FE_StreamFunc_IdleClose, FE_StreamFunc_IdleInterrupt, 2 },
+    { FE_StreamFunc_SkinInit, FE_StreamFunc_SkinUpdate, FE_StreamFunc_SkinClose, FE_StreamFunc_SkinInterrupt, 3 },
+    { FE_StreamFunc_TexturesInit, FE_StreamFunc_TexturesUpdate, FE_StreamFunc_TexturesClose, FE_StreamFunc_TexturesInterrupt, 1 },
+    { FE_StreamFunc_SwapTexturesInit, FE_StreamFunc_SwapTexturesUpdate, FE_StreamFunc_SwapTexturesClose, FE_StreamFunc_SwapTexturesInterrupt, 1 },
 };
 
 // .bss and .sbss are defined in reverse address order: CodeWarrior lays them out last-defined-first.
@@ -77,10 +77,10 @@ Character* lbl_80281EE8[CRAP_NUM_GOLFERS];
 CourseLights* lbl_80281EE4;     // the lights of the golfer display ('LITE' stream object)
 CrAPState* lbl_80281EE0;
 
-void fn_8008B00C(void);
-void fn_8008B704(void);
-void fn_8008B754(int nNext);
-void fn_8008B790(void);
+void FE_CharMgrClose(void);
+void FE_StreamInterruptState(void);
+void FE_StreamSetNextState(int nNext);
+void FE_StreamInitStateMgr(void);
 void fn_8008B7D0(int nState);
 void fn_8008B820(void);
 void fn_8008B850(void);
@@ -105,7 +105,7 @@ void fn_8008EA44(u8 b);
 void fn_8008EBB4(void);
 void fn_8008EBE4(void);
 void fn_8008EC0C(f32* pA, f32* pB, f32* pOut);
-void fn_8008AD80(void);
+void FE_CharMgrInit(void);
 
 void fn_80007254(void);
 void fn_80008380(void);
@@ -137,14 +137,16 @@ u8   fn_8010BFE0(void);
 void UStream_Stop(void);
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
-// 1.0, before the 0.5 and 0.0 fn_8008AD80 uses first; its body is unknown, this one only
+// 1.0, before the 0.5 and 0.0 FE_CharMgrInit uses first; its body is unknown, this one only
 // reproduces the order.
 static void FEgolferanim_StrippedFn(f32* pValue) {
     *pValue += 1.0f;
 }
 
-// Make the golfer display's state and start the loader.
-void fn_8008AD80(void) {
+// Allocate and set up the menu golfer's state (lbl_80281EE0): every golfer slot empty and given the
+// next golfer of lbl_801899E0 (a random row), slot 0 shown and loading first; then the loader's
+// state machine starts in its idle state.
+void FE_CharMgrInit(void) {
     int i;
     int nPrev;
     int nNext;
@@ -211,12 +213,12 @@ void fn_8008AD80(void) {
     gPlayers[0].pChar = lbl_80281EE0->pB4->pChar;
     lbl_80281EE0->pB8 = &lbl_80281EE0->aGolfer[0];
     lbl_80281EE0->n190 = 0;
-    fn_8008B790();
+    FE_StreamInitStateMgr();
     lbl_80281EE0->n74 = 0;
 }
 
-// Stop the loader and free the state.
-void fn_8008B00C(void) {
+// Stop the loader (fn_8008B820), free every golfer slot's character, and free the state.
+void FE_CharMgrClose(void) {
     fn_8008B820();
     fn_8008DBE8();
     fn_8008DC10();
@@ -224,11 +226,14 @@ void fn_8008B00C(void) {
     lbl_80281EE0 = NULL;
 }
 
-// Show golfer nGolfer: the one shown, the next or the previous one if one of them is him, else
-// load him into the shown slot. Golfers 7 and 29 (with a or b) set b90.
-void fn_8008B044(int nGolfer, int a, int b) {
-    fn_8008B704();
-    fn_8008B754(1);
+// Show golfer nGolfer (TW07's midModel; the menus' message fn_8007D810): the loader is interrupted
+// and sent back to idle; if the shown slot's pNext or pPrev holds him, that becomes the shown slot,
+// else the shown slot gets his id to load. Golfers 7 and 29 (as nGolfer, nOtherA or nOtherB) set
+// b90: every slot's character is freed before the next load (FE_StreamManageCRaPMemory). On screen
+// kind 3 his animation starts again (fn_8008DD50).
+void FE_setupStreaming(int nGolfer, int a, int b) {
+    FE_StreamInterruptState();
+    FE_StreamSetNextState(1);
     if (nGolfer == 7 || nGolfer == 29) {
         a = -1;
         b = -1;
@@ -260,8 +265,9 @@ void fn_8008B044(int nGolfer, int a, int b) {
     }
 }
 
-// With b90 set, wait until no golfer slot holds a character.
-u8 fn_8008B1AC(void) {
+// Before golfer 7 or 29 loads (b90): flag every slot that still holds a character to be freed (b19)
+// and return 0 until none does, then clear b90. Returns 1 when loading may go on.
+u8 FE_StreamManageCRaPMemory(void) {
     u8 bReady;
     int i;
 
@@ -282,14 +288,20 @@ u8 fn_8008B1AC(void) {
     return 1;
 }
 
-void fn_8008B204(void) {
+void FE_StreamFunc_IdleInit(void) {
 }
 
-void fn_8008B208(void) {
+void FE_StreamFunc_IdleClose(void) {
 }
 
-// State 1: pick the next golfer to load, the shown one first, then its neighbours.
-void fn_8008B20C(void) {
+// The idle state's update: pick the next golfer to load, the shown one first, then its pNext and
+// pPrev, skipping one already loaded (b18) or with no id. The pick becomes pB8 (nBC says which); a
+// slot that still holds a character is flagged to be freed first (b19), and once the memory is free
+// (FE_StreamManageCRaPMemory) the state finishes, on to the skin state. A golfer another slot
+// already has is not loaded again (for the shown one, fn_8008DAEC stops the loader). Nothing
+// happens while the loader is being stopped (b8A) or slot 0 waits to be freed; an interrupt
+// finishes the state at once.
+void FE_StreamFunc_IdleUpdate(void) {
     CrAPGolfer* pGolfer;
 
     if (lbl_801D8708.bAbort) {
@@ -310,7 +322,7 @@ void fn_8008B20C(void) {
             lbl_80281EE0->pB8->b19 = 1;
             return;
         }
-        if (fn_8008B1AC()) {
+        if (FE_StreamManageCRaPMemory()) {
             fn_8008B850();
         }
     } else if (pGolfer->pNext->b18 == 0 && pGolfer->pNext->nC != -1) {
@@ -321,7 +333,7 @@ void fn_8008B20C(void) {
             lbl_80281EE0->pB8->b19 = 1;
             return;
         }
-        if (fn_8008B1AC()) {
+        if (FE_StreamManageCRaPMemory()) {
             fn_8008B850();
         }
     } else if (pGolfer->pPrev->b18 == 0 && pGolfer->pPrev->nC != -1) {
@@ -332,17 +344,19 @@ void fn_8008B20C(void) {
             lbl_80281EE0->pB8->b19 = 1;
             return;
         }
-        if (fn_8008B1AC()) {
+        if (FE_StreamManageCRaPMemory()) {
             fn_8008B850();
         }
     }
 }
 
-void fn_8008B3C8(void) {
+void FE_StreamFunc_IdleInterrupt(void) {
 }
 
-// State 2: open the golfer's stream.
-void fn_8008B3CC(void) {
+// The skin state's start: open the stream of the front-end character file of the golfer being
+// loaded (pB8; fn_80014DFC, fn_8008EBB4) and note his id as streamed (n14, n8C); n190 counts the
+// loads.
+void FE_StreamFunc_SkinInit(void) {
     fn_80014DFC(lbl_80281EE0->pB8->nC, lbl_80281EE0->pB8->n10);
     fn_8008EBB4();
     lbl_80281EE0->pB8->n14 = lbl_80281EE0->pB8->nC;
@@ -350,11 +364,14 @@ void fn_8008B3CC(void) {
     lbl_80281EE0->n190++;
 }
 
-void fn_8008B430(void) {
+// Close the golfer's stream (fn_8008EBE4).
+void FE_StreamFunc_SkinClose(void) {
     fn_8008EBE4();
 }
 
-void fn_8008B450(void) {
+// Run the stream until it has nothing left to do, then finish the state; after an interrupt the
+// golfer is marked not loaded (b18).
+void FE_StreamFunc_SkinUpdate(void) {
     if (!UStream_Update()) {
         if (lbl_801D8708.bAbort) {
             lbl_80281EE0->pB8->b18 = 0;
@@ -363,12 +380,14 @@ void fn_8008B450(void) {
     }
 }
 
-void fn_8008B4A0(void) {
+void FE_StreamFunc_SkinInterrupt(void) {
     UStream_Stop();
 }
 
-// State 3: set up the golfer that came in.
-void fn_8008B4C0(void) {
+// The texture state's start, for the golfer just streamed in (pB8): profiles set up, his clubs and
+// clothes set for the current profile's slot (golfers 7 and 29 first get fn_80079974's parts), his
+// dynamic textures emptied and a texture load requested (the front end's load callbacks).
+void FE_StreamFunc_TexturesInit(void) {
     int nGolfer;
 
     Session_SetupProfiles();
@@ -384,10 +403,13 @@ void fn_8008B4C0(void) {
                                     Character_EndLoadTexturesCallbackFE);
 }
 
-void fn_8008B570(void) {
+void FE_StreamFunc_TexturesClose(void) {
 }
 
-void fn_8008B574(void) {
+// Wait for the texture load (fn_8010BFE0); then the golfer is loaded (b18, and the display draws
+// him afresh: lbl_80281340 and lbl_80281344 reset), or after an interrupt not, and the state
+// finishes.
+void FE_StreamFunc_TexturesUpdate(void) {
     if (!fn_8010BFE0()) {
         if (lbl_801D8708.bAbort) {
             lbl_80281EE0->pB8->b18 = 0;
@@ -402,22 +424,28 @@ void fn_8008B574(void) {
     }
 }
 
-void fn_8008B5FC(void) {
+// Drop the texture jobs (fn_8010B9BC).
+void FE_StreamFunc_TexturesInterrupt(void) {
     fn_8010B9BC();
 }
 
-// State 4: set up the golfer shown.
-void fn_8008B61C(void) {
+// The texture-swap state's start, for the golfer shown (pB4): his clubs and clothes set for the
+// current profile's slot and his textures loaded again with the front end's swap callbacks (into
+// his other texture set, then switched).
+void FE_StreamFunc_SwapTexturesInit(void) {
     Character_SetClubsAndClothes(lbl_80281EE0->pB4->pChar, lbl_80281ED4->nSlot);
     Character_AddTextureLoadRequest(lbl_80281EE0->pB4->pChar, Character_BeginSwapTexturesCallbackFE,
                                     Character_EndSwapTexturesCallbackFE);
 }
 
-void fn_8008B674(void) {
+// Clear the texture loader's list of textures in use (fn_8010BEC4).
+void FE_StreamFunc_SwapTexturesClose(void) {
     fn_8010BEC4();
 }
 
-void fn_8008B694(void) {
+// Wait for the texture load (fn_8010BFE0), then finish the state; after an interrupt the shown
+// golfer is marked not loaded (b18).
+void FE_StreamFunc_SwapTexturesUpdate(void) {
     if (!fn_8010BFE0()) {
         if (lbl_801D8708.bAbort) {
             lbl_80281EE0->pB4->b18 = 0;
@@ -426,30 +454,33 @@ void fn_8008B694(void) {
     }
 }
 
-void fn_8008B6E4(void) {
+// Drop the texture jobs (fn_8010B9BC).
+void FE_StreamFunc_SwapTexturesInterrupt(void) {
     fn_8010B9BC();
 }
 
-// Abort the running state.
-void fn_8008B704(void) {
+// Interrupt the loader's running state: bAbort is set and the state's abort handler called; its
+// update then finishes it early.
+void FE_StreamInterruptState(void) {
     lbl_801D8708.bAbort = 1;
-    // port: EA passes an argument the abort handlers (fn_8008B3C8, fn_8008B4A0, fn_8008B5FC,
-    //       fn_8008B6E4) ignore
+    // port: EA passes an argument the abort handlers (FE_StreamFunc_IdleInterrupt,
+    //       FE_StreamFunc_SkinInterrupt, FE_StreamFunc_TexturesInterrupt, FE_StreamFunc_SwapTexturesInterrupt) ignore
     ((void (*)(int))lbl_80189AA0[lbl_801D8708.nState].pfnAbort)(0);
 }
 
-void fn_8008B754(int nNext) {
+void FE_StreamSetNextState(int nNext) {
     lbl_801D8708.nNext = nNext;
 }
 
-void fn_8008B760(void) {
-    fn_8008B754(1);
-    fn_8008B704();
+// Interrupt the loader and run it until it is back in its idle state (1).
+void FE_StreamStopAllStreaming(void) {
+    FE_StreamSetNextState(1);
+    FE_StreamInterruptState();
     fn_8008B7D0(1);
 }
 
-// Start in state 1.
-void fn_8008B790(void) {
+// Start the loader's state machine in its idle state (1), not paused.
+void FE_StreamInitStateMgr(void) {
     lbl_801D8708.nState = 1;
     lbl_801D8708.nNext = lbl_80189AA0[lbl_801D8708.nState].nNext;
     lbl_801D8708.bDone = 0;
@@ -467,8 +498,8 @@ void fn_8008B7D0(int nState) {
 }
 
 void fn_8008B820(void) {
-    fn_8008B754(1);
-    fn_8008B704();
+    FE_StreamSetNextState(1);
+    FE_StreamInterruptState();
     fn_8008B7D0(1);
 }
 
@@ -1181,7 +1212,7 @@ void fn_8008D6CC(void) {
 
 void fn_8008D8CC(void) {
     Character_RegisterGolferStreamClientFE();
-    fn_8008AD80();
+    FE_CharMgrInit();
     fn_8008D8F4();
 }
 
@@ -1228,8 +1259,8 @@ void fn_8008D9DC(UStreamObject* pObject) {
 // Stop loading, and show the next golfer of lbl_801899E0 (screen 0) or none (screen 4).
 void fn_8008DAEC(void) {
     lbl_80281EE0->b8A = 1;
-    fn_8008B704();
-    fn_8008B754(1);
+    FE_StreamInterruptState();
+    FE_StreamSetNextState(1);
     lbl_80281EE0->n190 = 0;
     lbl_80281EE0->pB4->b18 = 0;
     if (lbl_80281EE0->n0 == 0) {

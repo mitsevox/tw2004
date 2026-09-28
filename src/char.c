@@ -171,8 +171,8 @@ void  fn_80095564(void);
 void  fn_800955F0(int nPlayer);
 void  sApplyUserLogos(void* pChar, void* pModel, SkinChoices* pChoices);   // char_tex_manager.c
 void  fn_8010BA2C(void* p);
-void  fn_8008B704(void);               // FEgolferanim.c
-void  fn_8008B754(int nNext);           // FEgolferanim.c
+void  FE_StreamInterruptState(void);               // FEgolferanim.c
+void  FE_StreamSetNextState(int nNext);           // FEgolferanim.c
 u8    fn_8008E924(void);                // FEgolferanim.c
 void  fn_8008E918(s32 v);
 u8    fn_8008E938(void);
@@ -2974,7 +2974,7 @@ void Character_RequestClothesUpdateFE(int n) {
 // Character_RequestClothesUpdateFE set, once the shown golfer (lbl_80281EE0->pB4) is ready (b18),
 // the menu golfer's state machine is not in state 4 and nothing holds it (fn_8008E924), the flag is
 // cleared and the running state aborted for state 4, which dresses the shown golfer again and swaps
-// its textures (fn_8008B61C).
+// its textures (FE_StreamFunc_SwapTexturesInit).
 void Character_UpdateClothesFE(void) {
     int i;
 
@@ -2982,8 +2982,8 @@ void Character_UpdateClothesFE(void) {
         if (gSession.aD2D[i] && lbl_80281EE0->pB4 != NULL && lbl_80281EE0->pB4->b18 &&
             fn_8008B990() != 4 && fn_8008E924()) {
             gSession.aD2D[i] = 0;
-            fn_8008B704();
-            fn_8008B754(4);
+            FE_StreamInterruptState();
+            FE_StreamSetNextState(4);
         }
     }
 }

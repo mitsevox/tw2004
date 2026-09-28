@@ -111,7 +111,7 @@ void fn_800083A4(void) {
             fn_8009005C("frontend");
             fn_8006D8E8();
             if (gSession.nC == 0 && gSession.nGameType != 13) {
-                fn_8008B760();
+                FE_StreamStopAllStreaming();
                 if (gSession.uFlags & 0x4000) {
                     fn_8010C718();
                 }

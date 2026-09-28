@@ -2188,7 +2188,7 @@ void fn_8007D7E4(MsgArg* pArgs, MsgArg* pResult) {
     Gaud_StopMusic();
 }
 
-// Show golfer pArgs[0] (fn_8008B044), then give the profile's player (unless it is player 0) the
+// Show golfer pArgs[0] (FE_setupStreaming), then give the profile's player (unless it is player 0) the
 // first n0 (0..3) that no player up to and including it with the same golfer model has.
 void fn_8007D810(MsgArg* pArgs, MsgArg* pResult) {
     u8 abFree[4] = {1, 1, 1, 1};
@@ -2198,7 +2198,7 @@ void fn_8007D810(MsgArg* pArgs, MsgArg* pResult) {
     GolferRecord* pOther;
 
     FE_GetCurrentProfile();
-    fn_8008B044(pArgs[0].i, pArgs[1].i, pArgs[2].i);
+    FE_setupStreaming(pArgs[0].i, pArgs[1].i, pArgs[2].i);
     for (i = 0; i <= lbl_80281ED4->nSlot; i++) {
         pMine = fn_80077A80(gSession.nGolfer[lbl_80281ED4->nSlot]);
         pOther = fn_80077A80(gSession.nGolfer[i]);
