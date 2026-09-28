@@ -1,7 +1,14 @@
-// SkinPart.c (EA's name, from its asserts): the parts of a character's skins, such as the glove,
-// and their variants and options ("GloveOn", "GloveOff"), plus a second kind of choice, the sets.
-// Each skin keeps four copies of its choices (Skin.aParts, Skin.aSets); a golfer's choices are also
-// kept outside the skins (SkinChoices). The types are in charstate.h.
+// SkinPart.c (EA's name, from its asserts; TW07 has no such file): the choosable pieces of the
+// golfer's skinned body and club skins. A skin's parts (such as the glove) each have variants
+// ("GloveOn", "GloveOff") and options; its sets (a club's shaft or grip, a logo) swap the texture
+// names of their first variant for the chosen variant's and recolour them with the chosen option.
+// Everything is found by name code (SKA_PackName). Each skin keeps four copies of its choices
+// (Skin.aParts, Skin.aSets): a new choice goes into copy 3, or into all four at once
+// (SkinPart_SetChangeAllCopies), and char.c moves it down copy by copy as the textures load; copy 2
+// is what the texture lists are built from (SkinPart_DropUnusedTextures,
+// SkinPart_QueueMissingTextures), copy 0 what is drawn (SkinPart_DrawPart) and burnt
+// (SkinPart_BurnBodySkin). A golfer's choices are also kept outside the skins (SkinChoices, the
+// save). The types are in charstate.h.
 
 #include "charstate.h"
 #include "terrain.h"
@@ -10,7 +17,7 @@
 
 void  fn_80112614(SkinDesc14* pEntry, SkinDesc18* pMaterial, TexBank* pBank);
 void  fn_80113774(int nPart, int nVariant, int nOption);
-void  fn_8011387C(int n);
+void  fn_8011387C(void);
 void  fn_8011389C(void);
 void  fn_801138CC(SkinDesc* pDesc);
 void  fn_801138D8(void* p);
@@ -40,7 +47,7 @@ void  SkinPart_MarkPart(Skin* pSkin, int nPart);
 s32   SkinPart_FindSetOptionByName(Skin* pSkin, int nSet, int nVariant, const char* pName);
 s32   SkinPart_GetNumVariantLinks(Skin* pSkin, int nPart, int nVariant);
 void  SkinPart_ApplyVariantLink(Skin* pSkin, int nPart, int nVariant, int nLink);
-void  SkinPart_AddToTexList(u64 uId, SkinListEntry* aList, s32* pnList, u8* p, s32 n);
+void  SkinPart_AddToTexList(u64 uId, SkinListEntry* aList, s32* pnList, u8* pRecolor, s32 nMode);
 void  SkinPart_ListOptionTextures(Skin* pSkin, int n, SkinListEntry* aList, s32* pnList, int nCopy);
 s32   SkinPart_ListChosenTextures(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, int nIds,
                                   int nCopy);
@@ -53,9 +60,12 @@ void  SkinPart_CopyChoices(Skin* pSkin, int nFrom, int nTo);
 void  SkinPart_SetChangeAllCopies(u8 b);
 void  SkinPart_InitChangeAllCopies(void);
 
+// The morph targets SkinPart_BurnBodySkin keeps (at weight 0); -1 ends the list.
 s32   gBurnKeptMorphs[11] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1};
-char* gBurnAllVariantParts[2] = {"Glove", NULL};     // the parts SkinPart_BurnBodySkin lists
-u8    gSkinChangeAllCopies;             // set: a choice goes to all four copies
+// The parts SkinPart_BurnBodySkin keeps every variant of, by name; NULL ends the list.
+char* gBurnAllVariantParts[2] = {"Glove", NULL};
+u8    gSkinChangeAllCopies;     // set: a new choice goes into all four copies of a skin's choices,
+                                // clear: into copy 3 only (SkinPart_SetChangeAllCopies)
 
 // Copies a golfer's look between the body's skin and pChoices: while pChoices holds no choice yet
 // (every nVariant -1) the skin's copy 0 goes into it; otherwise its choices go into all four copies
@@ -118,9 +128,9 @@ void SkinPart_ApplyClubChoices(Character* pChar, SkinChoices* pChoices) {
 }
 
 // Burns the body's skin down to its current look (SkinBurn fn_80127B98): each part keeps only its
-// chosen variant and option, except the parts named in gBurnAllVariantParts (the glove), which keep every
-// variant so the glove can still come off and go back on (stateFunc.c); morph targets 0-9
-// (gBurnKeptMorphs) are kept. char.c calls it once a look is applied.
+// chosen variant and option, except the parts named in gBurnAllVariantParts (the glove), which
+// keep every variant so the glove can still come off and go back on (stateFunc.c); morph targets
+// 0-9 (gBurnKeptMorphs) are kept. char.c calls it once a look is applied.
 void SkinPart_BurnBodySkin(Character* pChar) {
     s32 aParts[2];
     char** ppName;
@@ -910,14 +920,15 @@ void SkinPart_ApplyVariantLink(Skin* pSkin, int nPart, int nVariant, int nLink) 
 // SkinPart_EndDraw): once the skin is loaded (u10D4 & 2) and has a description, flushes the render
 // state with clipping on and the camera's matrices, resets the skin renderer (hwsRender_Gc.c) and
 // hands it the description and the view's mesh overrides (a10A0[nView]).
-void SkinPart_BeginDraw(Skin* pSkin, int n) {
+void SkinPart_BeginDraw(Skin* pSkin, int nView) {
     if (pSkin->pModel->pDesc != NULL && (pSkin->u10D4 & 2)) {
         RenderState_SetClipMode(1);
         RenderState_SetCameraMatrices();
         RenderState_Flush();
-        fn_8011387C(0x400);
+        // port: EA passes an argument fn_8011387C ignores
+        ((void (*)(int))fn_8011387C)(0x400);
         fn_801138CC(pSkin->pModel->pDesc);
-        fn_801138D8(pSkin->a10A0[n]);
+        fn_801138D8(pSkin->a10A0[nView]);
     }
 }
 
@@ -980,7 +991,7 @@ void SkinPart_SetupMaterials(Skin* pSkin, SkinTarget* pTarget) {
 // fake match: keep the set loop's counter as an inlined local so its register follows the
 // pointer-induction temporary; the loop body and all writes are unchanged.
 static inline void fn_800CE224_Loop(Skin* pSkin, SkinDesc14* pEntry, SkinDesc* pDesc, int nCopy,
-                                    int* pj, SkinDesc74** ppSet, s32* pbChanged, s32* pnB8,
+                                    int* pj, SkinDesc74** ppSet, s32* pbChanged, s32* pnUV,
                                     int* pnVariant) {
     int i;
     int k;
@@ -988,8 +999,8 @@ static inline void fn_800CE224_Loop(Skin* pSkin, SkinDesc14* pEntry, SkinDesc* p
     s32 nOption;
     s32 n;
 
-    // fake match: the repeated nB8 zero and parallel k counter keep EA's induction zero loads.
-    for (i = (*pnB8 = 0), k = 0; i < pDesc->n70; k++, i++) {
+    // fake match: the repeated nUV zero and parallel k counter keep EA's induction zero loads.
+    for (i = (*pnUV = 0), k = 0; i < pDesc->n70; k++, i++) {
         (*ppSet) = &pDesc->p74[k];
         for ((*pj) = 0; (*pj) < (*ppSet)->n0C; (*pj)++) {
             if (pEntry->uId == pDesc->p84[(*ppSet)->n14 + (*pj)]) {
@@ -997,7 +1008,7 @@ static inline void fn_800CE224_Loop(Skin* pSkin, SkinDesc14* pEntry, SkinDesc* p
                 nOption = SkinPart_GetSetOption(pSkin, i, nCopy);
                 n = SkinPart_GetSetVariantUVIndex(pSkin, i, (*pnVariant));
                 if (n >= 0) {
-                    (*pnB8) = n;
+                    (*pnUV) = n;
                 }
                 if ((*pnVariant) >= 0 && (*pnVariant) < SkinPart_GetNumSetVariants(pSkin, i)) {
                     pVariant = &pDesc->p7C[(*ppSet)->n10 + (*pnVariant)];
@@ -1029,21 +1040,21 @@ s32 SkinPart_ApplySetsToMaterialEntry(Skin* pSkin, SkinDesc14* pEntry, u8** ppOu
     int nVariant;
     SkinDesc74* pSet;
     s32 bChanged;
-    s32 nB8;
+    s32 nUV;
     SkinDescB8* pB8;
 
     bChanged = 0;
     if (pSkin == NULL || pSkin->pModel == NULL || (pDesc = pSkin->pModel->pDesc) == NULL || pEntry == NULL) {
         return 0;
     }
-    nB8 = 0;
-    fn_800CE224_Loop(pSkin, pEntry, pDesc, nCopy, &j, &pSet, &bChanged, &nB8, &nVariant);
+    nUV = 0;
+    fn_800CE224_Loop(pSkin, pEntry, pDesc, nCopy, &j, &pSet, &bChanged, &nUV, &nVariant);
     if (pEntry->u08 & 2) {
         if (pEntry->n16 > 0) {
-            if (nB8 < 0 || nB8 >= pEntry->n16) {
-                nB8 = 0;
+            if (nUV < 0 || nUV >= pEntry->n16) {
+                nUV = 0;
             }
-            pB8 = &pDesc->pB8[pEntry->n1C + nB8];
+            pB8 = &pDesc->pB8[pEntry->n1C + nUV];
             pEntry->a20 = *pB8;
         }
     }
@@ -1059,32 +1070,32 @@ s32 SkinPart_ApplySetsToMaterialEntry(Skin* pSkin, SkinDesc14* pEntry, u8** ppOu
     return bChanged;
 }
 
-// Adds a texture name code to a texture list, with the recolouring (p, n: a set option's
-// SkinDesc8C.a08 and n2C) it is to be loaded with, unless the list has that name already.
-void SkinPart_AddToTexList(u64 uId, SkinListEntry* aList, s32* pnList, u8* p, s32 n) {
+// Adds a texture name code to a texture list, with the recolouring (a set option's SkinDesc8C.a08
+// and n2C) it is to be loaded with, unless the list has that name already.
+void SkinPart_AddToTexList(u64 uId, SkinListEntry* aList, s32* pnList, u8* pRecolor, s32 nMode) {
     int i;
 
     for (i = 0; i < *pnList; i++) {
         if (aList[i].uId == uId) return;
     }
     aList[*pnList].uId = uId;
-    aList[*pnList].p8 = p;
-    aList[*pnList].nC = n;
+    aList[*pnList].p8 = pRecolor;
+    aList[*pnList].nC = nMode;
     (*pnList)++;
 }
 
-// fake match: SkinPart_ListOptionTextures's inner loop as an inline, everything it writes passed by
-// pointer; its pIndex parameter is a frontend variable, numbered after the hoisted p5C offset (EA's register
-// order). Same statements, same order.
+// fake match: SkinPart_ListOptionTextures's inner loop as an inline, everything it writes passed
+// by pointer; its pIndex parameter is a frontend variable, numbered after the hoisted p5C offset
+// (EA's register order). Same statements, same order.
 static inline void fn_800CE52C_Loop(Skin* pSkin, SkinDesc* pDesc, s32* pIndex, s32 nIndices,
                                     SkinListEntry* aList, s32* pnList, int nCopy, SkinDesc14* pEntry,
-                                    u8** pp, s32* pnOut, int* pj) {
+                                    u8** ppRecolor, s32* pnMode, int* pj) {
     for (*pj = 0; *pj < nIndices; (*pj)++) {
         if (!(pDesc->p14[*pIndex].u08 & 1)) {
             Mem_cpy(pEntry, &pDesc->p14[*pIndex], sizeof(SkinDesc14));
-            *pp = NULL;
-            SkinPart_ApplySetsToMaterialEntry(pSkin, pEntry, pp, pnOut, nCopy);
-            SkinPart_AddToTexList(pEntry->uId, aList, pnList, *pp, *pnOut);
+            *ppRecolor = NULL;
+            SkinPart_ApplySetsToMaterialEntry(pSkin, pEntry, ppRecolor, pnMode, nCopy);
+            SkinPart_AddToTexList(pEntry->uId, aList, pnList, *ppRecolor, *pnMode);
         }
         pIndex++;
     }
@@ -1096,8 +1107,8 @@ static inline void fn_800CE52C_Loop(Skin* pSkin, SkinDesc* pDesc, s32* pIndex, s
 // recolouring.
 void SkinPart_ListOptionTextures(Skin* pSkin, int n, SkinListEntry* aList, s32* pnList, int nCopy) {
     SkinDesc14 entry;
-    u8* p;
-    s32 nOut;
+    u8* pRecolor;
+    s32 nMode;
     SkinDesc44* p44;
     s32 nFirst;
     int i;
@@ -1115,7 +1126,7 @@ void SkinPart_ListOptionTextures(Skin* pSkin, int n, SkinListEntry* aList, s32* 
             if (p44->n8 != 0) {
                 nIndices = pDesc->p28[p44->nC].n0;
                 fn_800CE52C_Loop(pSkin, pDesc, &pDesc->p20[p44->n4], nIndices, aList, pnList, nCopy,
-                                 &entry, &p, &nOut, &j);
+                                 &entry, &pRecolor, &nMode, &j);
             }
         }
     }
@@ -1166,16 +1177,15 @@ s32 SkinPart_ListChosenTextures(Skin** apSkins, int nSkins, SkinListEntry** ppLi
                 if (bAll == 1) {
                     for (v = 0; v < SkinPart_GetNumPartVariants(pSkin, j); v++) {
                         for (m = 0; m < SkinPart_GetNumPartOptions(pSkin, j, v); m++) {
-                            SkinPart_ListOptionTextures(pSkin, m
-                                                        + pDesc->pVariants[v
-                                                                + pDesc->pParts[j].nFirst].nFirstOption,
-                                        *ppList, &nList, nCopy);
+                            SkinPart_ListOptionTextures(
+                                pSkin, m + pDesc->pVariants[v + pDesc->pParts[j].nFirst].nFirstOption,
+                                *ppList, &nList, nCopy);
                         }
                     }
                 } else if (nVariant >= 0 && nOption >= 0) {
-                    SkinPart_ListOptionTextures(pSkin,
-                                nOption + pDesc->pVariants[nVariant + pDesc->pParts[j].nFirst].nFirstOption,
-                                *ppList, &nList, nCopy);
+                    SkinPart_ListOptionTextures(
+                        pSkin, nOption + pDesc->pVariants[nVariant + pDesc->pParts[j].nFirst].nFirstOption,
+                        *ppList, &nList, nCopy);
                 }
             }
         }
@@ -1284,7 +1294,7 @@ void SkinPart_DropUnusedTextures(Skin** apSkins, int nSkins, DynTex* pTex) {
 // glove can come off and go back on.
 void SkinPart_QueueMissingTextures(Skin** apSkins, int nSkins, DynTex* pTex, u64* aIds, int nIds) {
     SkinListEntry* pList;
-    s32 nC;
+    s32 nMode;
     int i;
     int nList;
     u64 uId;
@@ -1298,8 +1308,8 @@ void SkinPart_QueueMissingTextures(Skin** apSkins, int nSkins, DynTex* pTex, u64
     for (i = 0; i < nList; i++) {
         uId = SkinPart_TexListGetId(i, pList, nList);
         if (uId != 0 && fn_8001005C(pBank, uId) == -0x80000000) {
-            nC = SkinPart_TexListGetRecolorMode(i, pList, nList);
-            fn_8010BCFC(uId, SkinPart_TexListGetRecolor(i, pList, nList), nC);
+            nMode = SkinPart_TexListGetRecolorMode(i, pList, nList);
+            fn_8010BCFC(uId, SkinPart_TexListGetRecolor(i, pList, nList), nMode);
         }
     }
     if (pList != NULL) {

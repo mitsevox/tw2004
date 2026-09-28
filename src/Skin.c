@@ -1,6 +1,13 @@
-// Skin.c (EA's name, from its asserts; also in EA's 2002 source tree): a character's skinned
-// model: making a skin from its file (byte-swapped, offsets to pointers), its bone matrices and
-// morph weights, and drawing it (all its parts but "shadow", or only those).
+// Skin.c (EA's name, from its asserts; Golf\Animation\Skin.c in EA's 2002 source tree, and
+// golf/animation/Skin.c in TW07, whose SKN_ prefix the names here take): a character's skinned
+// model. SKN_Create makes a skin from its file (headers byte-swapped once in the file, the model
+// and description copied, byte-swapped and their offsets made pointers); SKN_AllocRenderData and
+// SKN_FreeRenderData give and take back what posing and drawing it needs (single view keeps only
+// the viewed golfer's body skin loaded). Each frame SKN_PoseCharacter builds the skin's matrices
+// from the character model's and SKN_DrawCharacter lights and draws its parts (all but "shadow",
+// or with flag 2 only those, for the shadow pass). Also here: small render wrappers other modules
+// use (RC_ viewport, LI_ / LF_ lights, SD_ shader objects) and the animation blend of morph
+// weights (SKN_BlendMorphWeights).
 
 #include "game_types.h"
 #include "engine.h"
@@ -14,26 +21,33 @@
 #include "terrain.h"
 #include "game.h"
 
-void  fn_80008380(void);
-void  fn_80016978(f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight);
-void  fn_8006E7A4(LightGroup* pGroup);         // GoLighting.c: load the group's lights
-void  fn_8006EADC(UObject* pObj);              // GoLighting.c: light the object
-void  fn_8006ED70(void);                       // GoLighting.c
-void  fn_801127A0(void* pDesc);                // hwsMaterial_Gc.c
-void  SkinPart_SetChangeAllCopies(u8 b);                       // SkinPart.c
-void  SkinPart_FixupDesc(SkinDesc* pDesc);            // SkinPart.c: offsets to pointers
-void  SkinPart_AllocChoices(Skin* pSkin);                // SkinPart.c
-s32   SkinPart_GetMaxOptionsSize(Skin* pSkin);                // SkinPart.c
-void  SkinPart_InitSkin(void);                       // SkinPart.c
-void  SkinPart_UpdateMarks(Skin* pSkin);                // SkinPart.c
-void  fn_8011C9B0(Skin* pSkin);                // SkinMorph.c
-s32   fn_8011CDE8(Skin* pSkin);                // SkinMorph.c
-void  fn_8011CE58(Skin* pSkin);                // SkinMorph.c
+void  fn_80008380(void);                                  // wait for the GPU (fn_800070DC)
+void  fn_80016978(f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight);   // Code80016198.c: the viewport
+void  fn_8006E7A4(LightGroup* pGroup);                   // GoLighting.c: load the group's lights
+void  fn_8006EADC(UObject* pObj);                        // GoLighting.c: light the object
+void  fn_8006ED70(void);                                 // GoLighting.c: lighting off
+void  fn_80093824(void);                                 // GoLightFogEnv.c
+f32   fn_8004B78C(CourseInfo* pCourse, f32* pPos);       // GoTerrainCollision.c: the ground's light
+void  SD_SetShaderTypeParameters(int nRow, void* pData); // GoTerrain.c: calls row nRow's pfn8
+void  fn_801127A0(void* pDesc);                          // hwsMaterial_Gc.c
 HwsMemBlock* fn_801128C8(SkinDesc* pDesc, s32 nSize);         // hwsOverride_Gc.c
 HwsOverrideTable* fn_80112A10(SkinDesc* pDesc, s32 nMeshes);  // hwsOverride_Gc.c
-void  fn_80112B18(HwsOverrideTable* pTable, int i, void* p);   // hwsOverride_Gc.c
+void  fn_80112B18(HwsOverrideTable* pTable, int i, void* p);  // hwsOverride_Gc.c
+void  SkinPart_SetChangeAllCopies(u8 b);                 // SkinPart.c
+void  SkinPart_FixupDesc(SkinDesc* pDesc);               // SkinPart.c: offsets to pointers
+void  SkinPart_AllocChoices(Skin* pSkin);                // SkinPart.c
+s32   SkinPart_GetMaxOptionsSize(Skin* pSkin);           // SkinPart.c
+void  SkinPart_UpdateMarks(Skin* pSkin);                 // SkinPart.c
+void  SkinPart_InitSkin(void);                           // SkinPart.c: empty
+void  SkinPart_UpdateSkin(void);                         // SkinPart.c: empty
+void  fn_8011C9B0(Skin* pSkin);                          // SkinMorph.c
+void  fn_8011CB5C(Skin* pSkin, int nView);               // SkinMorph.c
+s32   fn_8011CDE8(Skin* pSkin);                          // SkinMorph.c
+void  fn_8011CE58(Skin* pSkin);                          // SkinMorph.c
+void  fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits);      // Skeleton.c
+u8    Character_IsGolfer(Character* pChar);              // char.c
+void  fn_80037D5C(SkinDesc* pDesc);                      // Code80037AB8.c
 
-u8    Character_IsGolfer(Character* pChar);           // char.c
 void  SKN_DrawClubParts(Character* pChar);
 void  SKN_DrawBoneTri(Character* pChar, int nView);
 void  RC_ApplyViewport(void* pCamera);
@@ -47,15 +61,8 @@ void  LI_ResetLights(void);
 void  LI_SetObjectLights(UObject* pObj);
 void  LF_LoadCurrentLights(void);
 void  LF_SetCurrentBrightness(f32 f);
-void  fn_80093824(void);                                     // goballfx.c
-f32   fn_8004B78C(CourseInfo* pCourse, f32* pPos);           // GoTerrainCollision.c: the ground's light
-// GoTerrain.c: calls row nRow's pfn8
-void  SD_SetShaderTypeParameters(int nRow, void* pData);
-void  fn_8011CB5C(Skin* pSkin, int nView);                   // SkinMorph.c
-void  SkinPart_UpdateSkin(void);                                     // SkinPart.c
 void  SKN_BuildMatrices(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int nView);
 void  SKN_SetMeshMatrices(Skin* pSkin, int n);
-void  fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits);          // Skeleton.c
 void  SKN_SwapMeshEntries(SkinModel44* pEntries, s32 nEntries);
 void  SKN_SwapMeshEntryLists(SkinModel44* pEntries, s32 nEntries);
 void  SKN_SwapMatrixBlends(SkinModel54* pEntries, s32 nEntries);
@@ -64,12 +71,12 @@ void  SKN_SwapModelHeader(SkinModel* pModel);
 void  SKN_SwapDescHeader(SkinDesc* pDesc);
 void  SKN_SwapDesc(SkinDesc* pDesc);
 void  SKN_SwapBonePoses(BonePose* pBones, s32 nBones);
-void  fn_80037D5C(SkinDesc* pDesc);
 
 // .bss and .sbss, each in reverse address order (CodeWarrior lays them out last-defined-first)
-SkinTris gSkinBoneTris;
-s32 gSkinFrameBufSize;
-s32 gSkinFrameBufUsed;
+SkinTris gSkinBoneTris;         // SKN_DrawBoneTri's triangle and mesh object, per view
+// A buffer SKN_CloseModule frees; nothing in this build allocates it (SKN_InitModule is empty).
+s32 gSkinFrameBufSize;          // only ever cleared (by SKN_CloseModule)
+s32 gSkinFrameBufUsed;          // cleared every frame before the characters are posed
 void* gSkinFrameBuf;
 
 // Draws the "shadow" part of the character's skin, then that of its club's skin (Character.p16D8,
@@ -159,9 +166,9 @@ static f32 Skin_StrippedFn(f32 x) {
 // (Character.p44, SKN_GetLightCourse) and fn_80093824. The lights' brightness is 0.5 plus half the
 // ground's light under the character (fn_8004B78C). Clip mode 1 either way.
 void SKN_DrawCharacter(Character* pChar, u32 uFlags) {
-    static f32 aRow10[4] = { 128.0f, 128.0f, 128.0f, 128.0f };
-    f32 aRoot[3];
-    f32 aData[4];
+    static f32 aShadowParams[4] = { 128.0f, 128.0f, 128.0f, 128.0f };
+    f32 vPos[3];
+    f32 aParams[4];
     CharEntry44* pEntry;
     u32 uSet3;
     int nMode;
@@ -187,8 +194,8 @@ void SKN_DrawCharacter(Character* pChar, u32 uFlags) {
         if (!uSet3) {
             fn_80093824();
         }
-        SKN_GetCharPosition(pChar, aRoot);
-        LF_SetCurrentBrightness(0.5f * fn_8004B78C(Ter_GetTGD(), aRoot) + 0.5f);
+        SKN_GetCharPosition(pChar, vPos);
+        LF_SetCurrentBrightness(0.5f * fn_8004B78C(Ter_GetTGD(), vPos) + 0.5f);
         LF_LoadCurrentLights();
         fn_80035308();
     }
@@ -202,7 +209,7 @@ void SKN_DrawCharacter(Character* pChar, u32 uFlags) {
         nMode = 2;
     }
     if (uShadow) {
-        LLMath_CopyVec(aRow10, aData);
+        LLMath_CopyVec(aShadowParams, aParams);
         switch (nMode) {
         case 2:
             RenderState_SetClipMode(1);
@@ -215,7 +222,7 @@ void SKN_DrawCharacter(Character* pChar, u32 uFlags) {
             break;
         }
         RenderState_Flush();
-        SD_SetShaderTypeParameters(10, aData);
+        SD_SetShaderTypeParameters(10, aParams);
         SKN_DrawShadowParts(pChar);
     } else {
         switch (nMode) {
@@ -966,7 +973,7 @@ void SKN_SwapBonePoses(BonePose* pBones, s32 nBones) {
 // it already had it, else 1: its matrices (p108C, SkinModel.n50 of them) and the p10CC and p10D0
 // bit arrays, cleared; with a description, its morph memory (a1098[0]) and mesh override table
 // (a10A0[0]), and u10D4 bit 1 (choices changed). Every morph target is marked changed. b: also
-// calls fn_800CE164 (empty in this build).
+// calls SkinPart_InitSkin (empty in this build).
 s32 SKN_AllocRenderData(Skin* pSkin, u8 b) {
     SkinModel* pModel;
     SkinDesc* pDesc;
@@ -991,7 +998,8 @@ s32 SKN_AllocRenderData(Skin* pSkin, u8 b) {
         pSkin->a10A0[0] = fn_80112A10(pModel->pDesc, 0);
         pSkin->u10D4 = 1;
         if (b) {
-            ((void (*)(Skin*))SkinPart_InitSkin)(pSkin);  // port: EA passes an argument SkinPart_InitSkin ignores
+            // port: EA passes an argument SkinPart_InitSkin ignores
+            ((void (*)(Skin*))SkinPart_InitSkin)(pSkin);
         }
     }
     fn_8011CE58(pSkin);
@@ -1019,7 +1027,8 @@ s32 SKN_FreeRenderData(Skin* pSkin) {
         pSkin->a10A0[0] = NULL;
         fn_80037D5C(pSkin->pModel->pDesc);
     }
-    ((void (*)(Skin*))SkinPart_ShutdownSkin)(pSkin);  // port: EA passes an argument SkinPart_ShutdownSkin ignores
+    // port: EA passes an argument SkinPart_ShutdownSkin ignores
+    ((void (*)(Skin*))SkinPart_ShutdownSkin)(pSkin);
     if (pSkin->p108C != NULL) {
         StaticMem_Free(pSkin->p108C);
     }
