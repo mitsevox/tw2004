@@ -1165,11 +1165,11 @@ void GM_vLeaderboard_Position(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_PgaTourSim_GetScoreRankFromEntrantID(0, nEntrant);
 }
 
-// Message 45: whether the golfer on leaderboard row pArgs[0] shares his place (fn_80119808).
+// Message 45: whether the golfer on leaderboard row pArgs[0] shares his place (GM_PgaTourSim_IsEntrantTied).
 void GM_vLeaderboard_Tied(MsgArg* pArgs, MsgArg* pResult) {
     s32 nEntrant = GM_PgaTourSim_GetEntrantIDFromScoreRow(0, pArgs[0].i);
 
-    pResult->i = fn_80119808(0, nEntrant);
+    pResult->i = GM_PgaTourSim_IsEntrantTied(0, nEntrant);
 }
 
 // Message 46: the score to par of the golfer on leaderboard row pArgs[0]
@@ -1197,9 +1197,10 @@ void GM_vLeaderboard_PlayerPosition(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_PgaTourSim_GetScoreRankFromEntrantID(0, 0);
 }
 
-// Message 50: whether the player (entrant 0) shares his place on the leaderboard (fn_80119808).
+// Message 50: whether the player (entrant 0) shares his place on the leaderboard
+// (GM_PgaTourSim_IsEntrantTied).
 void GM_vLeaderboard_PlayerTied(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_80119808(0, 0);
+    pResult->i = GM_PgaTourSim_IsEntrantTied(0, 0);
 }
 
 // Message 51: how many entrants the PGA TOUR leaderboard has; 0 outside the PGA TOUR.

@@ -25,7 +25,7 @@ s32* gPgaScheduleEvents;                // the tournaments held this season, in 
 
 // Fills one leaderboard row of the current profile's tournament (fn_80077B08's slot) for entrant
 // nEntrant: szPlace "CUT" when the entrant missed the cut, "T3" when another entrant holds the same
-// place (fn_80119808), else "3"; szName the golfer's name; szScore the total score
+// place (GM_PgaTourSim_IsEntrantTied), else "3"; szName the golfer's name; szScore the total score
 // (GM_PgaTourSim_GetTotalScoreFromEntrantID with flag 1); szRounds the round scores so far
 // separated by spaces (a round scored 0 is left out); szMoney "$" and the money won as text
 // (fn_800907AC), empty when none.
@@ -41,7 +41,7 @@ void PGALeaderboard_FormatRow(char* szPlace, char* szName, char* szScore, char* 
 
     if (GM_PgaTourSim_GetWasCutFromEntrantID(nPlayer, nEntrant)) {
         sprintf(szPlace, "CUT");
-    } else if (fn_80119808(nPlayer, nEntrant)) {
+    } else if (GM_PgaTourSim_IsEntrantTied(nPlayer, nEntrant)) {
         sprintf(szPlace, "T%d", GM_PgaTourSim_GetScoreRankFromEntrantID(nPlayer, nEntrant));
     } else {
         sprintf(szPlace, "%d", GM_PgaTourSim_GetScoreRankFromEntrantID(nPlayer, nEntrant));

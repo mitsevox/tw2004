@@ -289,8 +289,10 @@ u8 GameModeDriverPGATour_IsPuttForLead(int nPlayer) {
                GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(nPlayer, Game_CurHoleIndex());
     }
     bLead = 0;
-    if (GM_GetGolferRelativeCumulativeScore(nPlayer, 0) >= fn_80119588(nPlayer, 1) &&
-        GM_GetGolferRelativeCumulativeScore(nPlayer, 1) + 1 < fn_80119588(nPlayer, 1)) {
+    if (GM_GetGolferRelativeCumulativeScore(nPlayer, 0)
+        >= GM_PgaTourSim_GetBestOpponentRelativeScore(nPlayer, 1) &&
+        GM_GetGolferRelativeCumulativeScore(nPlayer, 1) + 1
+                < GM_PgaTourSim_GetBestOpponentRelativeScore(nPlayer, 1)) {
         bLead = 1;
     }
     return bLead;
@@ -305,7 +307,8 @@ u8 GameModeDriverPGATour_IsPuttForWin(s32 nPlayer) {
     }
     nRounds = GameModeDriverPGATour_GetRounds(gpSaveData[nPlayer].tour.nEvent);
     return GM_GetNumHolesRemainingInRound() == 1 && gpSaveData[nPlayer].tour.nRound + 1 >= nRounds &&
-           GM_GetGolferRelativeCumulativeScore(nPlayer, 1) + 1 < fn_80119588(nPlayer, 1);
+           GM_GetGolferRelativeCumulativeScore(nPlayer, 1) + 1
+                   < GM_PgaTourSim_GetBestOpponentRelativeScore(nPlayer, 1);
 }
 
 // Strokes ahead of the best other player, negative when behind (in a playoff, on this hole).
@@ -313,7 +316,8 @@ s32 GameModeDriverPGATour_GetCurrentLead(int nPlayer) {
     if (gpGame->bInPlayoff) {
         return GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(nPlayer, Game_CurHoleIndex()) - gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     }
-    return fn_80119588(nPlayer, 1) - GM_GetGolferRelativeCumulativeScore(nPlayer, 0);
+    return GM_PgaTourSim_GetBestOpponentRelativeScore(nPlayer, 1)
+            - GM_GetGolferRelativeCumulativeScore(nPlayer, 0);
 }
 
 // GetCurrentLead as it would be if the ball dropped with one more stroke: strokes ahead of the best
@@ -323,7 +327,8 @@ s32 GameModeDriverPGATour_GetPotentialLead(int nPlayer) {
         return GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(nPlayer, Game_CurHoleIndex()) -
                (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1);
     }
-    return fn_80119588(nPlayer, 1) - (GM_GetGolferRelativeCumulativeScore(nPlayer, 1) + 1);
+    return GM_PgaTourSim_GetBestOpponentRelativeScore(nPlayer, 1)
+            - (GM_GetGolferRelativeCumulativeScore(nPlayer, 1) + 1);
 }
 
 // pfnGetPotentialHoleResult: how the hole would end for the player if the ball dropped now. The
@@ -485,7 +490,7 @@ void GameModeDriverPGATour_CheckAdvanceTournament(s32 nPlayer) {
         }
     } else {
         GameModeDriverPGATour_CommitUserRoundStatCounts(nPlayer);
-        fn_8011A538(nPlayer);
+        GM_PgaTourSim_SimStats(nPlayer);
         GM_PgaTourSim_CommitRoundScores(nPlayer);
         GM_PgaTourSim_ResetHoleScores(nPlayer);
         gpSaveData[nPlayer].tour.nRound++;
@@ -558,7 +563,7 @@ void GameModeDriverPGATour_PostHoleLoadInit(void) {
 // hit, the result against par, per par 3, 4 and 5, drives and the longest drive and putt. After the
 // 18th hole a round at or under par extends the profile's run of such rounds
 // (tour.nParRoundStreak), any other ends it. Then the player's hole on the leaderboard moves on
-// (fn_801198F8). The u16 casts on the sums are in the original (a clrlwi before each add).
+// (GM_PgaTourSim_AdvancePlayer). The u16 casts on the sums are in the original (a clrlwi before each add).
 void GameModeDriverPGATour_EndHole(void) {
     PlayerNumber_t nPlayer;
     PgaStatCounts* pRound;
@@ -661,7 +666,7 @@ void GameModeDriverPGATour_EndHole(void) {
             gpSaveData[nPlayer].tour.nParRoundStreak = 0;
         }
     }
-    fn_801198F8(0, nHole + 1);
+    GM_PgaTourSim_AdvancePlayer(0, nHole + 1);
 }
 
 // pfnGameFinished: whether play is over. In a playoff, the playoff standings take the hole just

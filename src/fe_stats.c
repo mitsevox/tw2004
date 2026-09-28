@@ -112,9 +112,9 @@ void UIStatsRankings_GetIndStatsRow(MsgArg* pArgs, MsgArg* pResult) {
         if (lbl_80282508 == 1) {
             szPlayed[0] = '\0';
         } else if (GM_PgaTourSim_GetStatView(nStat) == 0) {
-            sprintf(szPlayed, "%d", fn_8011903C(nPlayer, nGolfer));
+            sprintf(szPlayed, "%d", GM_PgaTourSim_GetNEventsFromGolferID(nPlayer, nGolfer));
         } else {
-            sprintf(szPlayed, "%d", fn_80119064(nPlayer, nGolfer));
+            sprintf(szPlayed, "%d", GM_PgaTourSim_GetNRoundsFromGolferID(nPlayer, nGolfer));
         }
         GM_PgaTourSim_GetStatValString(nStat, GM_PgaTourSim_GetStatValueFromGolferID(nPlayer, nGolfer, nStat),
                                        szStat);

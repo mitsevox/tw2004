@@ -49,7 +49,7 @@ typedef enum GM_Pga_StatTypes_t {
 // A tour pro (0x68 bytes): the 'PGST' stream object's data.
 typedef struct PgaPro {
     char szName[0x18];          // 0x00  (GM_PgaTourSim_GetNameFromGolferID)
-    // The pro's season form, which the simulated holes follow (fn_8011A074):
+    // The pro's season form, which the simulated holes follow (GM_PgaTourSim_SimEntrantStatsOnHole):
     f32  fDriveAvg;             // 0x18  driving distance (a drive: this plus 30 x a normal random number)
     f32  fFairwayPct;           // 0x1C  fairways hit, percent
     f32  fGIRPct;               // 0x20  greens in regulation, percent
@@ -143,17 +143,17 @@ s32   GM_PgaTourSim_GetScoreRankFromEntrantID(int nPlayer, int nEntrant);   // T
 s32   GM_PgaTourSim_GetGolferIDFromEntrantID(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_GetGolferIDFromEntrantID
 s32   GM_PgaTourSim_GetTotalScoreFromEntrantID(int nPlayer, int nEntrant, u8 b);
 int   GM_PgaTourSim_GetRelativeScoreFromEntrantID(int nPlayer, int nEntrant, u8 b);  // the entrant's score to par so far
-s32   fn_80119588(int nPlayer, u8 b);
+s32   GM_PgaTourSim_GetBestOpponentRelativeScore(int nPlayer, u8 b);
 s32   GM_PgaTourSim_GetRoundScoreFromEntrantID(int nPlayer, int nEntrant, int nRound);
 u8    GM_PgaTourSim_GetWasCutFromEntrantID(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_GetWasCutFromEntrantID
 s32   GM_PgaTourSim_GetEntrantIDFromScoreRow(int nPlayer, int nRow);       // TW06: GM_PgaTourSim_GetEntrantIDFromScoreRow
-u8    fn_80119808(int nPlayer, int nEntrant);   // another entrant holds the same place (a tie)
+u8    GM_PgaTourSim_IsEntrantTied(int nPlayer, int nEntrant);   // another entrant holds the same place (a tie)
 void  GM_PgaTourSim_SetUserEntrantHoleStrokes(int nPlayer, int nStrokes);   // TW06: GM_PgaTourSim_SetUserEntrantHoleStrokes
-void  fn_801198F8(int nPlayer, int nHole);
+void  GM_PgaTourSim_AdvancePlayer(int nPlayer, int nHole);
 void  GM_PgaTourSim_AdvanceField(int nPlayer);
 s32   GM_PgaTourSim_GetCurrentHoleFromEntrantID(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_GetCurrentHoleFromEntrantID
 s32   GM_PgaTourSim_GetLeaderboardWinningsFromEntrantID(int nPlayer, int nEntrant);
-void  fn_8011A538(int nPlayer);
+void  GM_PgaTourSim_SimStats(int nPlayer);
 void  GM_PgaTourSim_InitPlayoff(int nPlayer);
 s32   GM_PgaTourSim_GetNumPlayoffEntrants(int nPlayer);                 // TW06: GM_PgaTourSim_GetNumPlayoffEntrants
 u8    GM_PgaTourSim_EntrantIsInPlayoff(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_EntrantIsInPlayoff
@@ -167,8 +167,8 @@ f32   GM_PgaTourSim_GetStatValueFromGolferID(int nPlayer, int nGolfer, GM_Pga_St
 u8    GM_PgaTourSim_IsLeaderForStat(int nPlayer, int nGolfer, GM_Pga_StatTypes_t nStat);  // no golfer beats its value
 s32   GM_PgaTourSim_GetGolferIDFromStatRow(int nPlayer, GM_Pga_StatTypes_t nStat, int nRow);
 s32   GM_PgaTourSim_GetStatView(GM_Pga_StatTypes_t nStat);
-s32   fn_8011903C(int nPlayer, int nGolfer);    // the golfer's tournaments this season
-s32   fn_80119064(int nPlayer, int nGolfer);    // the golfer's rounds this season
+s32   GM_PgaTourSim_GetNEventsFromGolferID(int nPlayer, int nGolfer);    // the golfer's tournaments this season
+s32   GM_PgaTourSim_GetNRoundsFromGolferID(int nPlayer, int nGolfer);    // the golfer's rounds this season
 
 // ---- fe_stats.c: the tour statistics screen ----
 
