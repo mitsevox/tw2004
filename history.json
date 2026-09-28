@@ -44437,5 +44437,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "0100a1c",
+"sha": "0100a1cbbe8365e2c32c6ca018516f5d230a9600",
+"time": 1790595908,
+"subject": "naming role: no function is skipped (every one gets a name and a comment; empty ones are named from their callers), NONE only on 3 lines or fewer; the matching-era 'skip rather than guess' rule removed",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
