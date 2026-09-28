@@ -201,7 +201,7 @@ void GM_InitForHole(void) {
     gpGame->pfn1E4();
     GameEffects_ResetGameEffectSettings();
     GUI_Init();
-    fn_800DA36C();
+    HoleContest_InitForHole();
     if (gpGame->b27F) {
         GM_FlyByMode_Init();
     }
@@ -530,13 +530,13 @@ void GM_PlayerTookShot(int nPlayer) {
         GM_RecordIndividualShotStats(nPlayer);
         GM_Earnings_PayShotGoals(nPlayer);
     }
-    fn_800DA48C(nPlayer);
-    if (fn_800DA2AC()) {
-        fn_800DAD54();
-        if (fn_800DA174()) {
+    HoleContest_PlayerTookShot(nPlayer);
+    if (HoleContest_IsReadyToDecide()) {
+        HoleContest_PayWinner();
+        if (HoleContest_IsLongestDriveHole()) {
             GUI_QueueMessage(1, 10, 0, 0);
         }
-        if (fn_800DA1D4()) {
+        if (HoleContest_IsClosestToPinHole()) {
             GUI_QueueMessage(1, 11, 0, 0);
         }
     }

@@ -20,31 +20,33 @@ char gHoleContestPlaceName[5][14];       // by place: the name shown with the re
 s32  gHoleContestEverWon;
 s32  gHoleContestWinner;              // the contest's winner, 5 = nobody
 u8   gHoleContestDecided;              // the contest on this hole is decided
-u8   gHoleContestWon;              // a contest has a winner (fn_800DA6D0), or the hole in one was made
+u8   gHoleContestWon;              // a contest has a winner (HoleContest_RankResults), or the hole in one was made
 
 u8   fn_800D304C(int nHole);    // a flag of the hole's course data (byte 0x35): the drive can count
 u8   fn_800D0D54(int nPlayer);  // the ball lies on a fairway, the green or in the cup
 
-u8   fn_800D9E5C(void);
-void fn_800D9F34(void);
-void fn_800DA6D0(void);
+u8   HoleContest_RoundHasContests(void);
+void HoleContest_DrawHoles(void);
+void HoleContest_RankResults(void);
 
-// A new round: no contest holes until they are drawn.
-void fn_800D9E14(void) {
+// A new round of hole contests (HoleContest_InitForHole on the round's first hole): no contest
+// holes and nothing won yet; when the round has contests (HoleContest_RoundHasContests) the holes
+// are drawn (HoleContest_DrawHoles).
+void HoleContest_NewRound(void) {
     gHoleContestLongestDriveHole = -1;
     gHoleContestClosestToPinHole = -1;
     gHoleContestHoleInOneHole = -1;
     gHoleContestWon = 0;
     gHoleContestDecided = 0;
-    if (fn_800D9E5C()) {
-        fn_800D9F34();
+    if (HoleContest_RoundHasContests()) {
+        HoleContest_DrawHoles();
     }
 }
 
-// Whether this round has hole contests: several players, a round of every hole, no mulligans,
-// gSession.a8[0] clear, neither GameMode5 test (PlayNow_IsChallengeRunning, PlayNow_GetCalendarFlag) and game
-// mode 0, 1 or 2.
-u8 fn_800D9E5C(void) {
+// Whether this round has hole contests: no mulligans, more than one player, a full round of golf,
+// gSession.a8[0] clear, no Play Now challenge running (PlayNow_IsChallengeRunning) or calendar flag
+// (PlayNow_GetCalendarFlag), and game mode 0 (stroke play), 1 (match play) or 2 (skins).
+u8 HoleContest_RoundHasContests(void) {
     if (gpGame->nMulligans != 0) return 0;
     if (gSession.nNumPlayers == 1) return 0;
     if (!GM_FullRoundOfGolf()) return 0;
@@ -57,8 +59,11 @@ u8 fn_800D9E5C(void) {
     return 0;
 }
 
-// Draws the contest holes at random among the round's 18.
-void fn_800D9F34(void) {
+// Draws the contest holes at random among the round's 18 (Misc_RandFunc until one fits): the
+// longest drive on a par 4 or 5 whose course data allows it (fn_800D304C, byte 0x35); closest to
+// the pin on a par 3; and one round in five (20 in 100) the hole-in-one prize on another par 3. A
+// contest with no hole that fits gets -1.
+void HoleContest_DrawHoles(void) {
     u8 bFound;
     int i;
 
@@ -110,39 +115,45 @@ void fn_800D9F34(void) {
     }
 }
 
-// The longest drive is played on this hole. On the round's last hole of a GameMode5 challenge the
-// contest is always on.
-u8 fn_800DA174(void) {
+// Whether the current hole is the longest-drive hole. While the calendar flag is set
+// (PlayNow_GetCalendarFlag) the 18th hole (index 17) always is, outside a playoff (gpGame->bD4
+// clear).
+u8 HoleContest_IsLongestDriveHole(void) {
     if (PlayNow_GetCalendarFlag() && Game_CurHoleIndex() == 17 && gpGame->bD4 == 0) {
         return 1;
     }
     return gHoleContestLongestDriveHole == Game_CurHoleIndex();
 }
 
-// Closest to the pin is played on this hole (always on the 17th of a GameMode5 challenge).
-u8 fn_800DA1D4(void) {
+// Whether the current hole is the closest-to-the-pin hole. While the calendar flag is set
+// (PlayNow_GetCalendarFlag) the 17th hole (index 16) always is, outside a playoff (gpGame->bD4
+// clear).
+u8 HoleContest_IsClosestToPinHole(void) {
     if (PlayNow_GetCalendarFlag() && Game_CurHoleIndex() == 16 && gpGame->bD4 == 0) {
         return 1;
     }
     return gHoleContestClosestToPinHole == Game_CurHoleIndex();
 }
 
-// The hole-in-one prize is on this hole.
-u8 fn_800DA234(void) {
+// Whether the hole-in-one prize ($100,000) is on the current hole.
+u8 HoleContest_IsHoleInOneHole(void) {
     return Game_CurHoleIndex() == gHoleContestHoleInOneHole;
 }
 
-// The player whose turn it is has not played a stroke on this hole yet: they are on the tee.
-u8 fn_800DA264(void) {
+// Whether the player whose turn it is (lbl_80282278) has not played a stroke on the current hole
+// yet, so is on the tee (STATEFUNC_SwingInit shows a contest's intro only then).
+u8 HoleContest_IsCurrentPlayerOnTee(void) {
     return gPlayers[lbl_80282278].nStrokes[Game_CurHoleIndex()] == 0;
 }
 
-// The contest on this hole is ready to be decided: every player has played their tee shot.
-u8 fn_800DA2AC(void) {
+// Whether the contest on the current hole can be decided: a longest-drive or closest-to-the-pin
+// hole, not decided yet (gHoleContestDecided), and every player has played his tee shot.
+// GM_PlayerTookShot then pays the winner (HoleContest_PayWinner) and shows the result.
+u8 HoleContest_IsReadyToDecide(void) {
     int i;
     u8 bDone;
 
-    if (!fn_800DA174() && !fn_800DA1D4()) return 0;
+    if (!HoleContest_IsLongestDriveHole() && !HoleContest_IsClosestToPinHole()) return 0;
     if (gHoleContestDecided) return 0;
     bDone = 1;
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -154,15 +165,16 @@ u8 fn_800DA2AC(void) {
 }
 
 // fake match: stands in for a function the original linker stripped. The file's pool has 1.0
-// first, before fn_800DA36C's -1.0 (fn_800DADC0, its only user, comes last); its body is unknown,
-// this one only reproduces the order.
+// first, before HoleContest_InitForHole's -1.0 (HoleContest_GetWinnerShotKind, its only user, comes
+// last); its body is unknown, this one only reproduces the order.
 static f32 GameHoleContests_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// Clears every player's contest result and the result table (winner: nobody); on the round's first
-// hole (GM_OnFirstSelectedHole) also draws the contest holes again (fn_800D9E14).
-void fn_800DA36C(void) {
+// A new hole (GM_InitForHole): every player's contest result cleared (-1.0), the result table
+// emptied, not decided and no winner (5); on the round's first hole (GM_OnFirstSelectedHole) also a
+// new round of contests (HoleContest_NewRound).
+void HoleContest_InitForHole(void) {
     int i;
     int n;
     int j;
@@ -179,25 +191,29 @@ void fn_800DA36C(void) {
     gHoleContestDecided = 0;
     gHoleContestWinner = 5;
     if (GM_OnFirstSelectedHole()) {
-        fn_800D9E14();
+        HoleContest_NewRound();
     }
 }
 
-// After a player's shot: a tee shot on a contest hole enters the contest (the drive's length when it
-// stays on the fairway or green; the distance from the pin in feet, or 0 holed, when it finds the
-// green), and a hole in one on the prize hole wins $100,000. A mulligan's shot does not count.
-void fn_800DA48C(int nPlayer) {
+// After a player's shot (GM_PlayerTookShot). On the longest-drive hole a first stroke that
+// fn_800D0D54 accepts (from fairway-class ground to the fairway, the green or the cup) records its
+// length (fn_800D0550); on the closest-to-the-pin hole a first stroke onto the green records its
+// distance from the pin in feet (3 x fn_800D0478), holed 0; both then re-rank
+// (HoleContest_RankResults). On the hole-in-one prize hole a holed first stroke wins $100,000
+// (message 0x74 for an active profile) and marks a contest won. A mulligan's shot (bC2F) does not
+// count.
+void HoleContest_PlayerTookShot(int nPlayer) {
     CourseMoneyTracking money;
     s32 nIndex;
 
-    if (fn_800DA174()) {
+    if (HoleContest_IsLongestDriveHole()) {
         if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 && fn_800D0D54(nPlayer) &&
             gPlayers[nPlayer].bC2F == 0) {
             gHoleContestPlayerResult[nPlayer] = fn_800D0550(nPlayer);
         }
-        fn_800DA6D0();
+        HoleContest_RankResults();
     }
-    if (fn_800DA1D4()) {
+    if (HoleContest_IsClosestToPinHole()) {
         if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 && gPlayers[nPlayer].ball.nLie == 9 &&
             gPlayers[nPlayer].bC2F == 0) {
             gHoleContestPlayerResult[nPlayer] = 3.0f * fn_800D0478(nPlayer);
@@ -206,9 +222,9 @@ void fn_800DA48C(int nPlayer) {
             gPlayers[nPlayer].ball.nLie == LIE_INCUP_e && gPlayers[nPlayer].bC2F == 0) {
             gHoleContestPlayerResult[nPlayer] = 0.0f;
         }
-        fn_800DA6D0();
+        HoleContest_RankResults();
     }
-    if (fn_800DA234()) {
+    if (HoleContest_IsHoleInOneHole()) {
         if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 && GM_CheckForBallInHole(nPlayer) &&
             gPlayers[nPlayer].bC2F == 0) {
             gHoleContestWon = 1;
@@ -226,13 +242,15 @@ void fn_800DA48C(int nPlayer) {
     }
 }
 
-// Ranks the players on the contest hole and fills in the result table: the longest drives first
-// (or the shots closest to the pin), then the players with no result (distance -1). Each is named by
-// a CPU golfer's nickname ("NA": none, then the last name) or the player's profile name ("User n"
-// while no profile is loaded). The first is the winner. Not on the hole-in-one prize hole.
+// Ranks the players on the contest hole into the result table (gHoleContestPlaceName,
+// gHoleContestPlaceDistance): the longest drives first (or the shots closest to the pin), then the
+// players with no result (distance -1). Each is named by a CPU golfer's nickname (the last name
+// when the nickname is "NA") or the player's profile name ("User n" while no profile is loaded).
+// The first place is the winner (gHoleContestWinner) and marks a contest won. Nothing on the
+// hole-in-one prize hole.
 // fake match: the (u32) casts on the player index; with a signed index the compiler walks one
 // pointer instead of keeping the array start and the offset apart (see GoTerrain fn_80032518).
-void fn_800DA6D0(void) {
+void HoleContest_RankResults(void) {
     s32 aRank[5];               // per player: the place in the table, -1 not placed yet
     char szName[32];            // the stack frame gives 32 bytes; the real size is not known
     int nRank;
@@ -242,7 +260,7 @@ void fn_800DA6D0(void) {
     int j;
     s32 nIndex;
 
-    if (fn_800DA234()) return;
+    if (HoleContest_IsHoleInOneHole()) return;
     gHoleContestWinner = 5;
     nRank = 0;
     aRank[0] = -1;
@@ -254,7 +272,7 @@ void fn_800DA6D0(void) {
         strcpy(gHoleContestPlaceName[j], "");
         gHoleContestPlaceDistance[j] = 0;
     }
-    if (fn_800DA174()) {
+    if (HoleContest_IsLongestDriveHole()) {
         for (j = 0; j < gNumPlayersSetUp; j++) {
             fBest = 0.0f;
             nBest = 5;
@@ -311,7 +329,7 @@ void fn_800DA6D0(void) {
             }
         }
     }
-    if (fn_800DA1D4()) {
+    if (HoleContest_IsClosestToPinHole()) {
         for (j = 0; j < gNumPlayersSetUp; j++) {
             fBest = 9999.0f;
             nBest = 5;
@@ -373,24 +391,33 @@ void fn_800DA6D0(void) {
     }
 }
 
-char* fn_800DAD1C(int nPlayer) {
+// The name at place nPlace (0-based) of the contest's result table, for the UI's record list
+// (GameUICommands.c fn_8008886C, record kind 3).
+char* HoleContest_GetPlaceName(int nPlayer) {
     return gHoleContestPlaceName[nPlayer];
 }
 
-s32 fn_800DAD30(int nPlayer) {
+// The result at place nPlace (0-based) of the contest's result table: the drive's length or the
+// distance from the pin in feet, -1 none (GameUICommands.c fn_80088AD4, record kind 3).
+s32 HoleContest_GetPlaceDistance(int nPlayer) {
     return gHoleContestPlaceDistance[nPlayer];
 }
 
-u8 fn_800DAD44(void) {
+// Whether a hole contest was won this round (a winner ranked, or the hole in one made); FE message
+// fn_80089590 case 0 asks.
+u8 HoleContest_IsWonThisRound(void) {
     return gHoleContestWon;
 }
 
-s32 fn_800DAD4C(void) {
+// Whether a hole contest has been won since the game started: gHoleContestEverWon is set with
+// gHoleContestWon and never cleared (FE message fn_80089590 case 1).
+s32 HoleContest_WasEverWon(void) {
     return gHoleContestEverWon;
 }
 
-// Pays the contest's winner.
-void fn_800DAD54(void) {
+// Decides the contest on the current hole (GM_PlayerTookShot, once HoleContest_IsReadyToDecide):
+// marked decided, and its winner, if any while a contest is won this round, is paid $2,500.
+void HoleContest_PayWinner(void) {
     CourseMoneyTracking money;
 
     gHoleContestDecided = 1;
@@ -403,8 +430,9 @@ void fn_800DAD54(void) {
     GM_Earnings_AwardMoney(gHoleContestWinner, 2500, &money);
 }
 
-// The winner's ball: 1 holed, 2 within a foot of the pin, else 0.
-s32 fn_800DADC0(void) {
+// How close the contest winner's ball is, while a contest is won this round: 1 in the cup
+// (bPlanReady clear), 2 within a foot of the pin, else 0 (FE message fn_80089B8C).
+s32 HoleContest_GetWinnerShotKind(void) {
     if (gHoleContestWon) {
         if (gPlayers[gHoleContestWinner].ball.nLie == LIE_INCUP_e && gPlayers[gHoleContestWinner].bPlanReady == 0) {
             return 1;

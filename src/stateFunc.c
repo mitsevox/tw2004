@@ -519,15 +519,15 @@ void STATEFUNC_SwingInit(int nPlayer) {
     fn_8006ACF8(nPlayer, 5);
     gPlayers[nPlayer].fC20 = 0.0f;
     if (gPlayers[nPlayer].bC2E == 0 && gpGame->b281 != 0 && !Player_IsCPU(nPlayer)) {
-        if (fn_800DA264() && fn_800DA174()) {
+        if (HoleContest_IsCurrentPlayerOnTee() && HoleContest_IsLongestDriveHole()) {
             GUI_ShowHoleContestIntro(0);
             GUI_ToggleUI(nPlayer, 0);
             fn_80062C80(gPlayers[nPlayer].nC58, 0);
-        } else if (fn_800DA264() && fn_800DA1D4()) {
+        } else if (HoleContest_IsCurrentPlayerOnTee() && HoleContest_IsClosestToPinHole()) {
             GUI_ShowHoleContestIntro(1);
             GUI_ToggleUI(nPlayer, 0);
             fn_80062C80(gPlayers[nPlayer].nC58, 0);
-        } else if (fn_800DA264() && fn_800DA234()) {
+        } else if (HoleContest_IsCurrentPlayerOnTee() && HoleContest_IsHoleInOneHole()) {
             GUI_ShowHoleContestIntro(2);
             GUI_ToggleUI(nPlayer, 0);
             fn_80062C80(gPlayers[nPlayer].nC58, 0);

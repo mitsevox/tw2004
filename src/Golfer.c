@@ -60,10 +60,10 @@ void Luck_TightenOdds(void) {
 // Rolls whether this shot is the perfect (lucky) one, stored in Player.bPerfect when the shot is
 // planned. Always for a CPU in game mode 11 (Lessons_IsLucky); never for a CPU or in split screen. The
 // chance is 1 in the player's odds (gLuckOdds, 12 to 9), halved in game mode 4 when player 0 is 5
-// or more holes down to player 1, or else when the hole-in-one prize is on this hole (fn_800DA234);
-// for players 0-3 then cut by LUCK/2 percent (LUCK clamped to 0..110, odds at least 1 in 1). Only
-// off the green and never on a putt, and only on a par 3, for a pitch, or from the fairway (lies 1
-// and 2) within 250 yards of the pin.
+// or more holes down to player 1, or else when the hole-in-one prize is on this hole
+// (HoleContest_IsHoleInOneHole); for players 0-3 then cut by LUCK/2 percent (LUCK clamped to
+// 0..110, odds at least 1 in 1). Only off the green and never on a putt, and only on a par 3, for a
+// pitch, or from the fairway (lies 1 and 2) within 250 yards of the pin.
 u8 Golfer_IsLucky(int nPlayer) {
     u8      bLucky = 0;
     u32     uOdds;
@@ -77,7 +77,7 @@ u8 Golfer_IsLucky(int nPlayer) {
     uOdds = gLuckOdds[nPlayer];
     if (Game_GetMode() == 4 && gPlayers[1].nHolesWon - gPlayers[0].nHolesWon > 4) {
         uOdds >>= 1;
-    } else if (fn_800DA234()) {
+    } else if (HoleContest_IsHoleInOneHole()) {
         uOdds >>= 1;
     }
     if (nPlayer >= 0 && nPlayer <= 3) {

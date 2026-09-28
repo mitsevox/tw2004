@@ -172,7 +172,7 @@ They will be sorted into the sections below.
   100 (mark it `// fake match` if the outer `if` is redundant in the source).
 - **[verified] A count-down fill `n = count; i = 0; while (n-- > 0) a[i++] = v;` gives
   `cmpwi n,0; ble; srwi. n,3; mtctr ... andi. 7`.** A `for (i = 0; i < n; i++)` gives `cmpwi n,8; subi`
-  (49%); plain `while (n--)` gives `beq`. GameHoleContests fn_800DA36C.
+  (49%); plain `while (n--)` gives `beq`. GameHoleContests HoleContest_InitForHole.
 - **[verified] A loop over a global table with a dead `li r7,0; cmpwi r7,13; bge` before the unrolled body
   wants an `s32` counter.** Glows fn_80098740: `int i` 77.4, `s32 i` 100.
 - **[verified] Take a pointer to the array element before the first store when a loop both reads fields
@@ -345,7 +345,7 @@ They will be sorted into the sections below.
   register; a variable set for the first time gets its own `li r,0`.** So when the original has two `li`s
   and ours `li; mr`, give the second zero a fresh variable (a new loop counter), and the reverse for one
   `li; mr` (Earnings HighScoreRecords_GetEndOfGameRecord, hwsBurn HwsBurn_BuildDesc, GameMode5 PlayNow_StartChallenge, GameHoleContests
-  fn_800D9F34; `a = b = 0`, types and statement order make no difference). A search written as an
+  HoleContest_DrawHoles; `a = b = 0`, types and statement order make no difference). A search written as an
   inline helper hands its index back by `mr`; the same loop written in the caller gets `li` (UISEvent
   fn_80165D2C, fn_80165D90).
 - **[verified] `int` and `s32` allocate differently, in both directions**: an `s32` parameter where `int`
@@ -400,7 +400,7 @@ They will be sorted into the sections below.
 ### New from the link waves (2026-09-24 afternoon)
 
 - **[verified] A global read twice with no store in between** (once for a test, again for a call): write
-  the second read as `*(volatile T*)&gGlobal` at that one use (GameHoleContests fn_800DADC0 95.3 -> 100).
+  the second read as `*(volatile T*)&gGlobal` at that one use (GameHoleContests HoleContest_GetWinnerShotKind 95.3 -> 100).
 - **[verified] Constants and a string address loaded into saved registers at entry, before any call:**
   EA's body sits in a loop, even `for (j = 0; j < 1; j++)` over one-entry arrays (PsBallFx_InitModule
   43 -> 100).

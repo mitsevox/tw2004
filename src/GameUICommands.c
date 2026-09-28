@@ -280,11 +280,11 @@ s32   fn_800D2E00(int nTeeSet);
 s32   fn_800D2E60(void);
 s32   fn_800D2EB0(void);
 f32   GM_Earnings_GetCourseModifier(void);
-char* fn_800DAD1C(int nPlayer);
-s32   fn_800DAD30(int nPlayer);
-u8    fn_800DAD44(void);
-s32   fn_800DAD4C(void);
-s32   fn_800DADC0(void);
+char* HoleContest_GetPlaceName(int nPlayer);
+s32   HoleContest_GetPlaceDistance(int nPlayer);
+u8    HoleContest_IsWonThisRound(void);
+s32   HoleContest_WasEverWon(void);
+s32   HoleContest_GetWinnerShotKind(void);
 int   GM_GetNextSelectedHole(void);
 int   GM_GetPlayerRoundScoreThroughHole(int nPlayer, int nHoles);
 void  GUI_OpenPauseMenu(void);
@@ -1780,7 +1780,7 @@ void fn_80088834(MsgArg* pArgs, MsgArg* pResult) {
 // else the mode's records or the course's; pArgs[2] is the place.
 void fn_8008886C(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 3) {
-        sprintf(((MsgString*)pArgs[3].p)->pStr, "%s", fn_800DAD1C(pArgs[2].i));
+        sprintf(((MsgString*)pArgs[3].p)->pStr, "%s", HoleContest_GetPlaceName(pArgs[2].i));
         return;
     }
     if (pArgs[0].i == 0) {
@@ -1816,7 +1816,7 @@ void fn_8008886C(MsgArg* pArgs, MsgArg* pResult) {
 // The same records' values.
 void fn_80088AD4(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 3) {
-        pResult->i = fn_800DAD30(pArgs[2].i);
+        pResult->i = HoleContest_GetPlaceDistance(pArgs[2].i);
         return;
     }
     if (pArgs[0].i == 0) {
@@ -2071,14 +2071,14 @@ void fn_80089584(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80089590(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 0:
-        if (fn_800DAD44()) {
+        if (HoleContest_IsWonThisRound()) {
             pResult->i = 1;
             return;
         }
         pResult->i = 0;
         return;
     case 1:
-        pResult->i = fn_800DAD4C();
+        pResult->i = HoleContest_WasEverWon();
         return;
     }
 }
@@ -2252,7 +2252,7 @@ void fn_80089B78(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80089B8C(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800DADC0();
+    pResult->i = HoleContest_GetWinnerShotKind();
 }
 
 // The game's title.

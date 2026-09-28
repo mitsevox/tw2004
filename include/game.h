@@ -267,14 +267,14 @@ s32  fn_8008AB40(void);                 // GameUICommands.c
 s32  fn_8008AC00(void);                 // GameUICommands.c: the round's holes left, the current one included
 
 // GameHoleContests.c: the longest-drive, closest-to-the-pin and hole-in-one contests
-u8   fn_800DA174(void);                 // the longest drive is played on this hole
-u8   fn_800DA1D4(void);                 // closest to the pin is played on this hole
-u8   fn_800DA234(void);                 // the hole-in-one prize is on this hole
-u8   fn_800DA264(void);                 // the player whose turn it is is on the tee
-u8   fn_800DA2AC(void);                 // every player has teed off on the contest hole
-void fn_800DA36C(void);
-void fn_800DA48C(int nPlayer);
-void fn_800DAD54(void);                 // pay the contest's winner
+u8   HoleContest_IsLongestDriveHole(void);                 // the longest drive is played on this hole
+u8   HoleContest_IsClosestToPinHole(void);                 // closest to the pin is played on this hole
+u8   HoleContest_IsHoleInOneHole(void);                 // the hole-in-one prize is on this hole
+u8   HoleContest_IsCurrentPlayerOnTee(void);                 // the player whose turn it is is on the tee
+u8   HoleContest_IsReadyToDecide(void);                 // every player has teed off on the contest hole
+void HoleContest_InitForHole(void);
+void HoleContest_PlayerTookShot(int nPlayer);
+void HoleContest_PayWinner(void);                 // pay the contest's winner
 
 // GameEffects.c: slow motion, the GameBreaker (letterbox), the heartbeat rumble. The effects
 // state (0x58 bytes):
