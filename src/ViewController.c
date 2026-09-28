@@ -32,12 +32,12 @@ s32  RC_GetCurrentFrameBuffer(void);
 f32* fn_800172B4(View* pView);
 f32* fn_800172BC(View* pView);
 
-// Only clears each of the four view controllers' active flag (b274).
+// Only clears each of the four view controllers' active flag (bActive).
 void ViewController_ResetAll(void) {
     int i;
 
     for (i = 0; i < 4; i++) {
-        gViewControllers[i].b274 = 0;
+        gViewControllers[i].bActive = 0;
     }
 }
 
@@ -78,7 +78,7 @@ void ViewController_Init(int nView, f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight
         RC_spCreateRenderCtx(pLens, (GoFrameBuf*)RC_GetCurrentFrameBuffer(), pViewport);
     fn_80062E40(&pViewController->view);
     pViewController->nPlayer = 5;
-    pViewController->b274 = 1;
+    pViewController->bActive = 1;
     fn_80038010(0, nView, NULL);
     fn_80038054(0, nView, 0.0f, 0.0f);
 }
@@ -97,7 +97,7 @@ void ViewController_Delete(int nView) {
     CA_vReleaseCamera(Camera_GetLens(pViewController->pCamera));
     VM_vReleaseViewport(RC_spGetRenderCtxViewport(pViewController->pCamera));
     RC_vReleaseRenderCtx(pViewController->pCamera);
-    pViewController->b274 = 0;
+    pViewController->bActive = 0;
 }
 
 // Runs view nView's camera controller for its player and aims the render context's lens from it:
@@ -156,12 +156,12 @@ int ViewController_GetActivePlayerNumber(int nView) {
 }
 
 u8 ViewController_IsActive(int nView) {
-    return ViewController_GetDataPtr(nView)->b274;
+    return ViewController_GetDataPtr(nView)->bActive;
 }
 
 // Turns view nView on or off (bActive, the flag ViewController_IsActive returns).
 void ViewController_TurnOnViewController(int nView, u8 bActive) {
-    ViewController_GetDataPtr(nView)->b274 = bActive;
+    ViewController_GetDataPtr(nView)->bActive = bActive;
 }
 
 // Saves the rectangle of view nView's viewport, which the initial fly-by changes

@@ -340,8 +340,8 @@ void fn_8011EB04(void) {
     f32 fZ;
 
     Camera_GetCurrentLens();
-    fX = 0.5f * lbl_80281900->pLens->fB4 + lbl_80281900->fMinX;
-    fZ = 0.5f * lbl_80281900->pLens->fB8 + lbl_80281900->fMinZ;
+    fX = 0.5f * lbl_80281900->pLens->fFlatWidth + lbl_80281900->fMinX;
+    fZ = 0.5f * lbl_80281900->pLens->fFlatHeight + lbl_80281900->fMinZ;
     aEye[0] = fX;
     aEye[1] = lbl_80281900->f3B0;
     aEye[2] = fZ;
@@ -483,14 +483,14 @@ void GrassRender_vBuildAndUploadOneTimeData(void) {
     GXSetTevColorOp(2, 0, 0, 0, 1, 0);
     GXSetTevAlphaIn(2, 7, 4, 5, 7);
     GXSetTevAlphaOp(2, 0, 0, 1, 1, 0);
-    fX = lbl_80281900->pLens->m4[3][0] - 0.5f * lbl_80281900->pLens->fB4;
-    fZ = lbl_80281900->pLens->m4[3][2] - 0.5f * lbl_80281900->pLens->fB8;
-    lbl_80281900->af108[0][0] = 1.0f + fX / lbl_80281900->pLens->fB4;
-    lbl_80281900->af108[0][1] = 1.0f + fZ / lbl_80281900->pLens->fB8;
+    fX = lbl_80281900->pLens->m4[3][0] - 0.5f * lbl_80281900->pLens->fFlatWidth;
+    fZ = lbl_80281900->pLens->m4[3][2] - 0.5f * lbl_80281900->pLens->fFlatHeight;
+    lbl_80281900->af108[0][0] = 1.0f + fX / lbl_80281900->pLens->fFlatWidth;
+    lbl_80281900->af108[0][1] = 1.0f + fZ / lbl_80281900->pLens->fFlatHeight;
     lbl_80281900->af108[0][2] = 1.0f;
     lbl_80281900->af108[0][3] = 1.0f;
-    lbl_80281900->af108[1][0] = -1.0f / lbl_80281900->pLens->fB4;
-    lbl_80281900->af108[1][1] = -1.0f / lbl_80281900->pLens->fB8;
+    lbl_80281900->af108[1][0] = -1.0f / lbl_80281900->pLens->fFlatWidth;
+    lbl_80281900->af108[1][1] = -1.0f / lbl_80281900->pLens->fFlatHeight;
     lbl_80281900->af108[1][2] = 0.0f;
     lbl_80281900->af108[1][3] = 0.0f;
     lbl_80281900->af148[0][0] = 0.0f;

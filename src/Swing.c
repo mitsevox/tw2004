@@ -1806,8 +1806,8 @@ int fn_8005CC5C(void) {
 }
 
 void fn_8005CC64(TexBank* pBank, TexEntry* pTex) {
-    gRenderState.p100 = pBank;
-    gRenderState.p104 = pTex;
+    gRenderState.pTexBank = pBank;
+    gRenderState.pTexEntry = pTex;
     gRenderState.uFlags |= 1;
 }
 

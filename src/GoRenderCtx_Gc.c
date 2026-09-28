@@ -177,7 +177,7 @@ void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
         Mtx_Perspective(pCamera->m5C, pCamera->f228, 1.0f / fn_8001413C((u8*)pRect), f,
                     pCamera->unk1F4, pCamera->unk1F8);
     } else {
-        Mtx_OrthoScale(mFlat, pLens->fB4, pLens->fB8);
+        Mtx_OrthoScale(mFlat, pLens->fFlatWidth, pLens->fFlatHeight);
         f = pRect[2] * (1.0f / fn_80014134((u8*)pRect)) / pRect[3];
         Mtx_PerspectiveDepthOverNear(mProj, 1.0f / fn_8001413C((u8*)pRect), f, pCamera->unk1F4, pCamera->unk1F8);
         LLMath_mat44fltMultiplyList(mProj, mFlat, pCamera->m5C, 4);
@@ -257,8 +257,8 @@ void fn_80013E48(Camera* pCamera) {
 
 // Hands the camera's two values fn_80008360 and fn_80008368 to the renderer.
 void fn_80013EA0(Camera* pCamera) {
-    gRenderState.fB4 = fn_80008360(pCamera);
-    gRenderState.fB8 = fn_80008368(pCamera);
+    gRenderState.fNearZ = fn_80008360(pCamera);
+    gRenderState.fFarZ = fn_80008368(pCamera);
 }
 
 // Hands the renderer the camera's screen rectangle: in frame buffer units (bit 0x800), and in
@@ -269,37 +269,37 @@ void RenderState_SetViewport(void* pCamera) {
 
     pRect = RC_spGetRenderCtxViewport(pCamera);
     pBuf = fn_80013E40(pCamera);
-    gRenderState.fCC = fn_80014174(pBuf) + VM_fGetViewportLeft(pRect) * fn_8001416C(pBuf);
-    gRenderState.fD0 = fn_80014164(pBuf) + VM_fGetViewportTop(pRect) * fn_8001415C(pBuf);
-    gRenderState.fD4 = VM_fGetViewportWidth(pRect) * fn_8001416C(pBuf);
-    gRenderState.fD8 = VM_fGetViewportHeight(pRect) * fn_8001415C(pBuf);
-    gRenderState.fDC = 0.0f;
-    gRenderState.fE0 = 1.0f;
-    gRenderState.u110 |= 0x800;
-    gRenderState.nBC = VM_fGetViewportLeft(pRect) * 512.0f;
-    gRenderState.nC0 = (int)((VM_fGetViewportLeft(pRect) + VM_fGetViewportWidth(pRect)) * 512.0f) - 1;
-    gRenderState.nC4 = VM_fGetViewportTop(pRect) * 448.0f;
-    gRenderState.nC8 = (int)((VM_fGetViewportTop(pRect) + VM_fGetViewportHeight(pRect)) * 448.0f) - 1;
-    gRenderState.u110 |= 0x200;
+    gRenderState.fViewportLeft = fn_80014174(pBuf) + VM_fGetViewportLeft(pRect) * fn_8001416C(pBuf);
+    gRenderState.fViewportTop = fn_80014164(pBuf) + VM_fGetViewportTop(pRect) * fn_8001415C(pBuf);
+    gRenderState.fViewportWidth = VM_fGetViewportWidth(pRect) * fn_8001416C(pBuf);
+    gRenderState.fViewportHeight = VM_fGetViewportHeight(pRect) * fn_8001415C(pBuf);
+    gRenderState.fViewportNear = 0.0f;
+    gRenderState.fViewportFar = 1.0f;
+    gRenderState.uChanged |= 0x800;
+    gRenderState.nScissorLeft = VM_fGetViewportLeft(pRect) * 512.0f;
+    gRenderState.nScissorRight = (int)((VM_fGetViewportLeft(pRect) + VM_fGetViewportWidth(pRect)) * 512.0f) - 1;
+    gRenderState.nScissorTop = VM_fGetViewportTop(pRect) * 448.0f;
+    gRenderState.nScissorBottom = (int)((VM_fGetViewportTop(pRect) + VM_fGetViewportHeight(pRect)) * 448.0f) - 1;
+    gRenderState.uChanged |= 0x200;
 }
 
 // Selects render surface a (GoRenderSurface.c) with the next RenderState_Apply: its width, height
 // and field, and in b the channels drawing writes (1 both, 2 neither, 4 alpha only, 8 colour only).
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c) {
-    gRenderState.nE4 = a;
-    gRenderState.nE8 = nWidth;
-    gRenderState.nEC = nHeight;
-    gRenderState.nF0 = nField;
+    gRenderState.nSurface = a;
+    gRenderState.nSurfaceWidth = nWidth;
+    gRenderState.nSurfaceHeight = nHeight;
+    gRenderState.nSurfaceField = nField;
     gRenderState.nF4 = b;
     gRenderState.nF8 = c;
-    gRenderState.u110 |= 0x1000;
+    gRenderState.uChanged |= 0x1000;
 }
 
 // Sets the draw flags (bit 0x10 textured, 0x40 blended); RenderState_Apply sets up the TEV stages
 // and blending from them.
 void RenderState_SetDrawFlags(int a) {
-    gRenderState.u20 = a;
-    gRenderState.u110 |= 0x20;
+    gRenderState.uDrawFlags = a;
+    gRenderState.uChanged |= 0x20;
 }
 
 f32 fn_80014134(u8* p) {

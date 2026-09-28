@@ -2300,18 +2300,18 @@ f32 Math_Floor(f32 x) {
 // stages take the draw's alpha from RenderState_SetConstantAlpha's value (times the texture's)
 // instead of the vertex colour's.
 void RenderState_SetConstantAlphaOn(u8 b) {
-    gRenderState.b1D = b;
-    gRenderState.u110 |= 0x80;
+    gRenderState.bConstantAlpha = b;
+    gRenderState.uChanged |= 0x80;
 }
 
 void fn_800350B4(f32 f) {
-    gRenderState.f2C = f;
-    gRenderState.u110 |= 0x8;
+    gRenderState.fFogEnd = f;
+    gRenderState.uChanged |= 0x8;
 }
 
 void fn_800350D0(f32 f) {
-    gRenderState.f28 = f;
-    gRenderState.u110 |= 0x8;
+    gRenderState.fFogStart = f;
+    gRenderState.uChanged |= 0x8;
 }
 
 void fn_800350EC(u8 r, u8 g, u8 b) {
@@ -2319,32 +2319,32 @@ void fn_800350EC(u8 r, u8 g, u8 b) {
     gRenderState.c30.g = g;
     gRenderState.c30.b = b;
     gRenderState.c30.a = 0x80;
-    gRenderState.u110 |= 0x8;
+    gRenderState.uChanged |= 0x8;
 }
 
 // Sets the blend source and destination factors, applied with the next RenderState_Apply.
 void RenderState_SetBlendFactors(int a, int b) {
-    gRenderState.n10 = a;
-    gRenderState.n14 = b;
-    gRenderState.u110 |= 0x10;
+    gRenderState.nBlendSrc = a;
+    gRenderState.nBlendDst = b;
+    gRenderState.uChanged |= 0x10;
 }
 
 // Sets the GX clip mode, applied with the next RenderState_Apply.
 void RenderState_SetClipMode(int a) {
-    gRenderState.nFC = a;
-    gRenderState.u110 |= 0x400;
+    gRenderState.nClipMode = a;
+    gRenderState.uChanged |= 0x400;
 }
 
 // The constant alpha, 0..255, used while RenderState_SetConstantAlphaOn is on.
 void RenderState_SetConstantAlpha(u8 b) {
-    gRenderState.b1C = b;
-    gRenderState.u110 |= 0x80;
+    gRenderState.nConstantAlpha = b;
+    gRenderState.uChanged |= 0x80;
 }
 
 void fn_80035170(u32 uClear, u32 uSet) {
-    gRenderState.u20 &= ~uClear;
-    gRenderState.u20 |= uSet;
-    gRenderState.u110 |= 0x20;
+    gRenderState.uDrawFlags &= ~uClear;
+    gRenderState.uDrawFlags |= uSet;
+    gRenderState.uChanged |= 0x20;
 }
 
 // Hands pData to shader type nRow's SetParameters hook (ModuleHooks.pfn8 of lbl_80188E88; row 17 is

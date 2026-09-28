@@ -61,7 +61,7 @@ void fn_80016198(void);
 void fn_800162A0(void);
 void fn_800162A4(int nField);
 void ViewController_ResetAll(void);
-void ViewController_SetCurrentViewController(void);
+void ViewController_SetCurrentViewController(int nView);
 void ViewController_Delete(int nView);
 void ViewController_Update(int nView);
 void fn_8001A488(void);
@@ -503,7 +503,7 @@ void fn_8006C854(void) {
 // Makes view nView's camera the current render camera and applies it, then draws the full-screen
 // quad (fn_8006DC4C) with flags 3 in a round for views 0 and 1 while fn_800642B0 is 0, else 1.
 void fn_8006C8EC(int nView) {
-    ViewController_SetCurrentViewController();
+    ViewController_SetCurrentViewController(nView);
     RC_vSetCurrentRenderCtx(ViewController_GetRenderContext(nView));
     fn_8006DC78();
     fn_80035F1C();

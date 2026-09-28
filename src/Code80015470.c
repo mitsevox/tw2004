@@ -73,29 +73,29 @@ BufferPoolBlock* BufferPool_GetFreeBlock(void) {
 void DS_vInitModule(void) {
     RenderState* const p = &gRenderState;
 
-    // fake match: m74, u110 and uFlags through the global, the rest through p (only this mix gives
-    // the original's base registers)
-    p->n0 = 3;
-    p->b4 = 1;
-    p->n8 = 6;
-    p->bC = 100;
-    p->bD = 0;
-    p->n10 = 4;
-    p->n14 = 5;
-    p->n18 = 1;
-    p->b1C = 0xFF;
-    p->b1D = 0;
-    p->u20 = 0x70;
-    p->nFC = 0;
-    p->n24 = 2;
-    p->f28 = 100.0f;
-    p->f2C = 2048.0f;
+    // fake match: mProjection, uChanged and uFlags through the global, the rest through p (only
+    // this mix gives the original's base registers)
+    p->nDepthCompare = 3;
+    p->bDepthWrite = 1;
+    p->nAlphaCompare = 6;
+    p->nAlphaRef = 100;
+    p->bAlphaTest = 0;
+    p->nBlendSrc = 4;
+    p->nBlendDst = 5;
+    p->nBlendMode = 1;
+    p->nConstantAlpha = 0xFF;
+    p->bConstantAlpha = 0;
+    p->uDrawFlags = 0x70;
+    p->nClipMode = 0;
+    p->nFogType = 2;
+    p->fFogStart = 100.0f;
+    p->fFogEnd = 2048.0f;
     *(u32*)&p->c30 = 0xFFFFFFFF; // port: all four GXColor bytes 0xFF, stored as one word
-    Mtx_Identity(p->m34);
-    Mtx_Identity(gRenderState.m74);
-    p->p100 = NULL;
-    p->p104 = NULL;
-    gRenderState.u110 = 0;
+    Mtx_Identity(p->mView);
+    Mtx_Identity(gRenderState.mProjection);
+    p->pTexBank = NULL;
+    p->pTexEntry = NULL;
+    gRenderState.uChanged = 0;
     gRenderState.uFlags = 0;
     GXSetCurrentMtx(0);
     BufferPool_FreeAll();
@@ -105,7 +105,7 @@ void DS_vInitModule(void) {
 void DS_vCloseModule(void) {
 }
 
-// Hands GX every group of gRenderState whose bit is set in u110 (depth, blending, constant alpha,
+// Hands GX every group of gRenderState whose bit is set in uChanged (depth, blending, constant alpha,
 // alpha test, draw flags, clip mode, fog, matrices, scissor, viewport, render surface), then the
 // texture or movie picture of the next draw (uFlags), and clears both. While the screen copy of
 // GxUtil.c is on (fn_8002A3A4), TEV stage 0 blends the copied screen (fn_8002A3AC) and the draw's
@@ -121,38 +121,39 @@ void RenderState_Apply(void) {
     static const GXColor cK2 = {0xFF, 0x00, 0xFF, 0x00};
 
     nStage = 0;
-    if (gRenderState.u110 != 0) {
+    if (gRenderState.uChanged != 0) {
         // depth: compare unless the test always passes (GX_ALWAYS)
-        if ((gRenderState.u110 & 0x1) || (gRenderState.u110 & 0x2)) {
-            GXSetZMode(gRenderState.n0 != 7, gRenderState.n0, gRenderState.b4);
+        if ((gRenderState.uChanged & 0x1) || (gRenderState.uChanged & 0x2)) {
+            GXSetZMode(gRenderState.nDepthCompare != 7, gRenderState.nDepthCompare,
+                       gRenderState.bDepthWrite);
         }
-        if (gRenderState.u110 & 0x10) {
-            if (gRenderState.n10 == 1) {
-                gRenderState.n18 = 3;
+        if (gRenderState.uChanged & 0x10) {
+            if (gRenderState.nBlendSrc == 1) {
+                gRenderState.nBlendMode = 3;
             }
-            GXSetBlendMode(gRenderState.n18, gRenderState.n10, gRenderState.n14, 0);
+            GXSetBlendMode(gRenderState.nBlendMode, gRenderState.nBlendSrc, gRenderState.nBlendDst, 0);
         }
-        if (gRenderState.u110 & 0x80) {
-            RenderState_SetConstantAlphaActive(gRenderState.b1D);
-            if (gRenderState.b1D != 0) {
-                RenderState_SetKColorAlpha(gRenderState.b1C);
+        if (gRenderState.uChanged & 0x80) {
+            RenderState_SetConstantAlphaActive(gRenderState.bConstantAlpha);
+            if (gRenderState.bConstantAlpha != 0) {
+                RenderState_SetKColorAlpha(gRenderState.nConstantAlpha);
             } else {
                 RenderState_SetKColorAlpha(0xFF);
             }
         }
-        // alpha test: off, or compare n8 against the reference bC with the depth test after texturing
-        if (gRenderState.u110 & 0x4) {
-            if (gRenderState.bD == 0) {
+        // alpha test: off, or compare against nAlphaRef with the depth test after texturing
+        if (gRenderState.uChanged & 0x4) {
+            if (gRenderState.bAlphaTest == 0) {
                 GXSetZCompLoc(1);
                 GXSetAlphaCompare(7, 0, 0, 7, 0);
             } else {
                 GXSetZCompLoc(0);
-                GXSetAlphaCompare(gRenderState.n8, gRenderState.bC, 0, 7, 0);
+                GXSetAlphaCompare(gRenderState.nAlphaCompare, gRenderState.nAlphaRef, 0, 7, 0);
             }
         }
-        if (gRenderState.u110 & 0x20) {
+        if (gRenderState.uChanged & 0x20) {
             // untextured: one stage of the vertex colour
-            if (!(gRenderState.u20 & 0x10)) {
+            if (!(gRenderState.uDrawFlags & 0x10)) {
                 if (fn_8002A3A4()) {
                     GXSetNumTexGens(1);
                     GXSetNumTevStages(2);
@@ -172,53 +173,56 @@ void RenderState_Apply(void) {
                     GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
                 }
             }
-            gRenderState.u110 |= 0x8;
-            if (!(gRenderState.u20 & 0x40)) {
-                gRenderState.n18 = 0;
-                GXSetBlendMode(0, gRenderState.n10, gRenderState.n14, 0);
-            } else if (gRenderState.n18 == 0 ||
-                       (gRenderState.n18 == 3 && gRenderState.n10 != 1)) {
-                gRenderState.n18 = 1;
-                GXSetBlendMode(1, gRenderState.n10, gRenderState.n14, 0);
+            gRenderState.uChanged |= 0x8;
+            if (!(gRenderState.uDrawFlags & 0x40)) {
+                gRenderState.nBlendMode = 0;
+                GXSetBlendMode(0, gRenderState.nBlendSrc, gRenderState.nBlendDst, 0);
+            } else if (gRenderState.nBlendMode == 0 ||
+                       (gRenderState.nBlendMode == 3 && gRenderState.nBlendSrc != 1)) {
+                gRenderState.nBlendMode = 1;
+                GXSetBlendMode(1, gRenderState.nBlendSrc, gRenderState.nBlendDst, 0);
             }
         }
-        if (gRenderState.u110 & 0x400) {
-            GXSetClipMode(gRenderState.nFC);
+        if (gRenderState.uChanged & 0x400) {
+            GXSetClipMode(gRenderState.nClipMode);
         }
-        if (gRenderState.u110 & 0x8) {
+        if (gRenderState.uChanged & 0x8) {
             // fog only while bit 0x20 is set
-            GXSetFog((gRenderState.u20 & 0x20) ? gRenderState.n24 : 0, gRenderState.f28,
-                     gRenderState.f2C, gRenderState.fB4, gRenderState.fB8, gRenderState.c30);
+            GXSetFog((gRenderState.uDrawFlags & 0x20) ? gRenderState.nFogType : 0,
+                     gRenderState.fFogStart, gRenderState.fFogEnd, gRenderState.fNearZ,
+                     gRenderState.fFarZ, gRenderState.c30);
         }
-        if (gRenderState.u110 & 0x100) {
+        if (gRenderState.uChanged & 0x100) {
             pCamera = RC_spGetCurrentRenderCtx();
-            GXLoadPosMtxImm(gRenderState.m34, 0);
-            PSMTXInvXpose(gRenderState.m34, mNormal);
+            GXLoadPosMtxImm(gRenderState.mView, 0);
+            PSMTXInvXpose(gRenderState.mView, mNormal);
             GXLoadNrmMtxImm(mNormal, 0);
             if (fn_80008378(pCamera->unk10) == 0) {
-                GXSetProjection(gRenderState.m74, 0);
+                GXSetProjection(gRenderState.mProjection, 0);
             } else {
-                GXSetProjection(gRenderState.m74, 1);
+                GXSetProjection(gRenderState.mProjection, 1);
             }
         }
-        if (gRenderState.u110 & 0x200) {
-            GXSetScissor(gRenderState.nBC, gRenderState.nC4, gRenderState.nC0 - gRenderState.nBC + 1,
-                         gRenderState.nC8 - gRenderState.nC4 + 1);
+        if (gRenderState.uChanged & 0x200) {
+            GXSetScissor(gRenderState.nScissorLeft, gRenderState.nScissorTop,
+                         gRenderState.nScissorRight - gRenderState.nScissorLeft + 1,
+                         gRenderState.nScissorBottom - gRenderState.nScissorTop + 1);
         }
-        if (gRenderState.u110 & 0x800) {
-            GXSetViewport(gRenderState.fCC, gRenderState.fD0, gRenderState.fD4, gRenderState.fD8,
-                          gRenderState.fDC, gRenderState.fE0);
+        if (gRenderState.uChanged & 0x800) {
+            GXSetViewport(gRenderState.fViewportLeft, gRenderState.fViewportTop,
+                          gRenderState.fViewportWidth, gRenderState.fViewportHeight,
+                          gRenderState.fViewportNear, gRenderState.fViewportFar);
         }
-        if (gRenderState.u110 & 0x1000) {
-            fn_8002F38C(gRenderState.nE4, gRenderState.nE8, gRenderState.nEC, gRenderState.nF0,
-                        gRenderState.nF4, gRenderState.nF8);
+        if (gRenderState.uChanged & 0x1000) {
+            fn_8002F38C(gRenderState.nSurface, gRenderState.nSurfaceWidth, gRenderState.nSurfaceHeight,
+                        gRenderState.nSurfaceField, gRenderState.nF4, gRenderState.nF8);
         }
-        gRenderState.u110 = 0;
+        gRenderState.uChanged = 0;
     }
 
     if (gRenderState.uFlags != 0) {
-        if ((gRenderState.uFlags & 0x1) && (gRenderState.u20 & 0x10)) {
-            fn_8000F0EC(gRenderState.p100, gRenderState.p104);
+        if ((gRenderState.uFlags & 0x1) && (gRenderState.uDrawFlags & 0x10)) {
+            fn_8000F0EC(gRenderState.pTexBank, gRenderState.pTexEntry);
         }
         if (gRenderState.uFlags & 0x2) {
             if (fn_8002A3A4()) {
@@ -321,8 +325,8 @@ void* RC_spGetCurrentRenderCtx(void) {
     return *lbl_80280DF0;
 }
 
-// Loads TEV constant colour 0 with the alpha nAlpha (RenderState_Apply: the constant alpha b1C
-// while it is on, else 0xFF).
+// Loads TEV constant colour 0 with the alpha nAlpha (RenderState_Apply: nConstantAlpha
+// while bConstantAlpha is on, else 0xFF).
 void RenderState_SetKColorAlpha(u8 nAlpha) {
     GXColor colour;
 

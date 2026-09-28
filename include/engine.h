@@ -12,19 +12,19 @@
 
 // ---- memory and strings ----------------------------------------------------------------------
 
-void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen);    // returns pDst
-void* Mem_move(void* pDst, const void* pSrc, u32 uLen); // a copy the ranges may overlap in
-void* Mem_set(void* pDst, int nValue, u32 uLen);      // memset; returns pDst
-int   Mem_compare(const void* pA, const void* pB, u32 uLen);   // memcmp
+void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen);          // memcpy; returns pDst
+void* Mem_move(void* pDst, const void* pSrc, u32 uLen);         // memmove: the ranges may overlap
+void* Mem_set(void* pDst, int nValue, u32 uLen);                // memset; returns pDst
+int   Mem_compare(const void* pA, const void* pB, u32 uLen);    // memcmp
 // Allocates (StaticMemory.c): nMode picks the system heap or a part of the static heap (see there).
 void* StaticMem_Alloc(int nSize, int nMode, int nAlign, const char* pFile, int nLine);
-void  StaticMem_Free(void* p);             // free
-void  StaticMem_SetMode(s32 v);               // } a value TibExtMemAlloc passes on as StaticMem_Alloc's nMode
-s32   StaticMem_GetMode(void);                // } (EASportsBio.c sets 0 while the Bio starts, then 2)
-void  StaticMem_ResetCount(void);                // start a new count of the bytes taken
-void  StaticMem_StartCount(void);                // } counting on / off
+void  StaticMem_Free(void* p);                  // free
+void  StaticMem_SetMode(s32 n);                 // } the StaticMem_Alloc mode TibExtMemAlloc uses
+s32   StaticMem_GetMode(void);                  // } (EASportsBio.c: 0 while the Bio starts, then 2)
+void  StaticMem_ResetCount(void);               // start a new count of the bytes taken
+void  StaticMem_StartCount(void);               // } counting on / off
 void  StaticMem_StopCount(void);                // }
-s32   StaticMem_GetCount(void);                // the bytes taken since StaticMem_ResetCount
+s32   StaticMem_GetCount(void);                 // the bytes taken since StaticMem_ResetCount
 // The main-memory heap (GoShaderObject_Particle_Gc.c): fn_80095108 makes it from the arena.
 // fn_800951A0 returns a block aligned to nAlign (0: 16) that remembers the heap block and its
 // own padding just before and after it (every caller passes 1 as n, which it does not read).
@@ -142,7 +142,8 @@ void Vec_Copy(const f32* pSrc, f32* pDst);   // 0x8000AD10 (const: see Vec3Copy)
 f32  atan2f(f32 y, f32 x);         // atan2f
 f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platform.h) rounded to a float
 f32  logf(f32 x);                // natural logarithm
-void mat44flt_ExtractEulerAngles(f32 (*pMtx)[4], f32* pA, f32* pB, f32* pC);   // a rotation matrix's three angles
+// A rotation matrix's yaw (about z), pitch (about y) and roll (about x), radians (UMemPool.c).
+void mat44flt_ExtractEulerAngles(f32 (*pMtx)[4], f32* pYaw, f32* pPitch, f32* pRoll);
 void fn_8000AF20(void);                 // make the log2 table (gLog2Table)
 void fn_8000AF58(void);                 // free the log2 table
 double acos(double x);                  // 0x8015F784 (MSL)
@@ -159,7 +160,8 @@ void Misc_CloseModule(void);                 // drop the kept normal value (Misc
 f32  Misc_RandFuncf(int nStream);           // 0x8000B428  [0, 1)
 void Quat_Slerp(f32* pA, f32* pB, f32 fT);   // quaternion slerp from a to b by fT, into b
 void Quat_Multiply(f32* pA, f32* pB, f32* pOut); // quaternion product a x b (Quaternion.c)
-void Quat_EulerAngles(f32 fA, f32 fB, f32 fC, f32* pOut);   // the quaternion of three (negated) angles
+// The quaternion yaw x pitch x roll (about z, y and x; radians, each negated first).
+void Quat_EulerAngles(f32 fYaw, f32 fPitch, f32 fRoll, f32* pOut);
 void Quat_BuildFromVector(f32* pRot, f32* pOut); // a rotation vector (axis * angle) as a quaternion
 void Legacy_Quat_BuildFromYaw(f32 fAngle, f32* pOut); // the quaternion of a rotation by -fAngle about z
 void Legacy_Quat_BuildFromPitch(f32 fAngle, f32* pOut); // the quaternion of a rotation by -fAngle about y
@@ -173,7 +175,7 @@ void Vec_Scale(f32 f, f32* pIn, f32* pOut);   // scale a vector (four floats)
 void fn_8000AE6C(f32* pA, f32* pB, f32 fScale, f32* pOut);   // out = a + fScale x b (four floats)
 double pow(double x, double y);         // 0x8015F824 (MSL)
 f32  powf(f32 x, f32 y);                // 0x8002C8D0 (Golfer.c): pow rounded to a float
-f32  LLMath_SquareDistanceBetween3(f32* pA, f32* pB);     // squared distance
+f32  LLMath_SquareDistanceBetween3(f32* pA, f32* pB);   // three-float squared distance
 void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
 
 // ---- textures --------------------------------------------------------------------------------
@@ -349,11 +351,11 @@ extern struct UStreamObject* lbl_80281C0C;   // LoadData.c: a copy of the 'txf2'
 void fn_80014544(int n);                // add loading file n to stream list 2 (sprintf'd name)
 void fn_800147A4(void);                 // streammanagerhole.c
 void fn_80014DFC(s32 nChar, s32 nUnused);   // streammanagerhole.c: stream list 3 = one FEChars file
-// streammanagerhole.c: a flag byte RenderState_SetConstantAlphaActive sets; while it is set, the shader objects' untextured
-// stage takes its alpha from the constant colour, not the vertex colour
-// (GoShaderObjectCommon_ShaderObjectsData_Gc.c fn_800740F4).
+// LLTex.c: points at a flag byte RenderState_SetConstantAlphaActive (Code80015470.c) sets; while
+// it is set, the shader objects' untextured stage takes its alpha from the constant colour, not
+// the vertex colour (GoShaderObjectCommon_ShaderObjectsData_Gc.c fn_800740F4).
 extern u8* lbl_80280DC8;
-void RenderState_SetConstantAlphaActive(u8 v);
+void RenderState_SetConstantAlphaActive(u8 bActive);
 
 // The texture bank list (LLTexGrp.c): the banks loaded from 'txf ' stream objects, searched by
 // fn_800102DC.
@@ -477,56 +479,66 @@ typedef struct DispSync {
     s8   bBreak;                // 0x13  the GPU reached a break point (fn_80006EC8, GX's callback)
 } DispSync;
 
-// The renderer's state (gRenderState, 0x118 bytes); only what the game code writes.
-// GoTerrain.c's setters write one group of fields each and set that group's bit in u110.
+// The renderer's state (gRenderState, 0x118 bytes; TW07's LLDisSt display state): only what the
+// game code writes. Each setter (the DS_v... and RenderState_Set... functions) writes one group of
+// fields and sets that group's bit in uChanged; RenderState_Apply hands the changed groups to GX.
+// The defaults are DS_vInitModule's. Enumerated values are GX's (GXCompare, GXBlendFactor,
+// GXBlendMode, GXFogType).
 typedef struct RenderState {
-    s32  n0;                    // 0x000  3 at reset (DS_vInitModule)
-    u8   b4;                    // 0x004  1 at reset
+    s32  nDepthCompare;         // 0x000  depth compare function (7, GX_ALWAYS, turns the test
+                                //        off); 3 (GX_LEQUAL) at reset; bit 0x1
+    u8   bDepthWrite;           // 0x004  depth-buffer writes on; 1 at reset; bit 0x2
     u8   unk5[0x8 - 0x5];
-    s32  n8;                    // 0x008  6 at reset
-    u8   bC;                    // 0x00C  100 at reset
-    u8   bD;                    // 0x00D  0 at reset
+    s32  nAlphaCompare;         // 0x008  } the alpha test (DS_vSetAlphaTestMode): compare
+    u8   nAlphaRef;             // 0x00C  } function, reference 0..255, on; 6 (GX_GEQUAL), 100
+    u8   bAlphaTest;            // 0x00D  } and 0 (off) at reset; bit 0x4
     u8   unkE[0x10 - 0xE];
-    s32  n10;                   // 0x010  } set together, bit 0x10
-    s32  n14;                   // 0x014  }
-    s32  n18;                   // 0x018  1 at reset
-    u8   b1C;                   // 0x01C  bit 0x80
-    u8   b1D;                   // 0x01D  bit 0x80
+    s32  nBlendSrc;             // 0x010  } blend source and destination factors; 4 and 5 (source
+    s32  nBlendDst;             // 0x014  } alpha over inverse source alpha) at reset; bit 0x10
+    s32  nBlendMode;            // 0x018  blend mode (0 none, 1 blend, 3 subtract): 1 at reset,
+                                //        then chosen by RenderState_Apply from uDrawFlags and
+                                //        nBlendSrc
+    u8   nConstantAlpha;        // 0x01C  } the constant alpha 0..255, used while bConstantAlpha
+    u8   bConstantAlpha;        // 0x01D  } is on; bit 0x80
     u8   unk1E[0x20 - 0x1E];
-    u32  u20;                   // 0x020  bits cleared and set by fn_80035170, bit 0x20
-    s32  n24;                   // 0x024  2 at reset
-    f32  f28;                   // 0x028  } bit 0x8, with c30. fn_80035398 sets all three from
-    f32  f2C;                   // 0x02C  } lbl_802811E0
-    GXColor c30;                // 0x030  the fog colour (RenderState_Apply): three bytes given, the
-                                //        fourth always 0x80; all 0xFF at reset
-    f32  m34[4][4];             // 0x034  } set to identity at reset
-    f32  m74[4][4];             // 0x074  }
-    f32  fB4;                   // 0x0B4  } a render camera's fn_80008360 and fn_80008368
-    f32  fB8;                   // 0x0B8  } (GoRenderCtx_Gc.c fn_80013EA0)
-    s32  nBC;                   // 0x0BC  } the scissor rectangle in screen pixels, both ends
-    s32  nC0;                   // 0x0C0  } inclusive: left, right, top, bottom; bit 0x200
-    s32  nC4;                   // 0x0C4  } (RenderState_SetViewport; LLVideo.c fn_800760B0 takes
-    s32  nC8;                   // 0x0C8  } left, top, right, bottom)
-    f32  fCC;                   // 0x0CC  } a render camera's screen rectangle in frame buffer units:
-    f32  fD0;                   // 0x0D0  } left, top, width, height, then 0 and 1; bit 0x800
-    f32  fD4;                   // 0x0D4  } (GoRenderCtx_Gc.c RenderState_SetViewport)
-    f32  fD8;                   // 0x0D8  }
-    f32  fDC;                   // 0x0DC  }
-    f32  fE0;                   // 0x0E0  }
-    s32  nE4;                   // 0x0E4  } RenderState_SetRenderSurface's six arguments, bit 0x1000
-    s32  nE8;                   // 0x0E8  }
-    s32  nEC;                   // 0x0EC  }
-    s32  nF0;                   // 0x0F0  }
+    u32  uDrawFlags;            // 0x020  bit 0x10 textured, 0x20 fog on, 0x40 blended; 0x70 at
+                                //        reset; bit 0x20 (RenderState_SetDrawFlags, fn_80035170)
+    s32  nFogType;              // 0x024  } the fog: type (2, GX_FOG_LIN, at reset), start and end
+    f32  fFogStart;             // 0x028  } distances (100 and 2048 at reset; fn_80035398 makes
+    f32  fFogEnd;               // 0x02C  } them and c30 from lbl_802811E0); bit 0x8, with c30,
+                                //          fNearZ and fFarZ
+    GXColor c30;                // 0x030  the fog colour: three bytes given, the fourth always
+                                //        0x80; all 0xFF at reset
+    f32  mView[4][4];           // 0x034  } GX position matrix 0 and the projection: the current
+    f32  mProjection[4][4];     // 0x074  } render context's m15C (rows 0 and 2 negated) and m9C
+                                //          (RenderState_SetCameraMatrices); identity at reset;
+                                //          bit 0x100
+    f32  fNearZ;                // 0x0B4  } a render camera's near and far distances, the fog's
+    f32  fFarZ;                 // 0x0B8  } nearz and farz (GoRenderCtx_Gc.c fn_80013EA0)
+    s32  nScissorLeft;          // 0x0BC  } the scissor rectangle in 512 x 448 screen pixels, both
+    s32  nScissorRight;         // 0x0C0  } ends inclusive; bit 0x200 (RenderState_SetViewport;
+    s32  nScissorTop;           // 0x0C4  } LLVideo.c fn_800760B0 takes left, top, right,
+    s32  nScissorBottom;        // 0x0C8  } bottom)
+    f32  fViewportLeft;         // 0x0CC  } a render camera's screen rectangle in frame buffer
+    f32  fViewportTop;          // 0x0D0  } units, then the depth range 0 to 1; bit 0x800
+    f32  fViewportWidth;        // 0x0D4  } (GoRenderCtx_Gc.c RenderState_SetViewport)
+    f32  fViewportHeight;       // 0x0D8  }
+    f32  fViewportNear;         // 0x0DC  }
+    f32  fViewportFar;          // 0x0E0  }
+    s32  nSurface;              // 0x0E4  } RenderState_SetRenderSurface's six arguments, handed
+    s32  nSurfaceWidth;         // 0x0E8  } to fn_8002F38C: the render surface (GoRenderSurface.c),
+    s32  nSurfaceHeight;        // 0x0EC  } its width, height and field, the channels drawing
+    s32  nSurfaceField;         // 0x0F0  } writes, and one more value; bit 0x1000
     s32  nF4;                   // 0x0F4  }
     s32  nF8;                   // 0x0F8  }
-    s32  nFC;                   // 0x0FC  bit 0x400
-    TexBank*  p100;             // 0x100  } the texture of the next draw (fn_8005CC64: the swing
-    TexEntry* p104;             // 0x104  } trail's, the logo editor's)
+    s32  nClipMode;             // 0x0FC  GX clip mode; 0 at reset; bit 0x400
+    TexBank*  pTexBank;         // 0x100  } the texture of the next draw (fn_8005CC64: the swing
+    TexEntry* pTexEntry;        // 0x104  } trail's, the logo editor's)
     struct GxTexture* pTex108;  // 0x108  or this texture (fn_8002A608)
     struct LLPict* pPict10C;    // 0x10C  or this picture (LLVideo.c fn_800760D8: a movie's)
-    u32  u110;                  // 0x110  which of the groups above changed
-    u32  uFlags;                // 0x114  bit 1: p100/p104 are set; bit 2: pTex108 is; bit 4:
-                                //        pPict10C is
+    u32  uChanged;              // 0x110  which groups changed (the bits above)
+    u32  uFlags;                // 0x114  bit 1: pTexBank/pTexEntry are set; bit 2: pTex108 is;
+                                //        bit 4: pPict10C is
 } RenderState;
 LAYOUT_ASSERT(RenderState, 0x118);
 
@@ -534,7 +546,8 @@ extern RenderState gRenderState;
 void RenderState_Apply(void);                 // hand GX the groups of gRenderState that changed
 
 // A pool of 20 blocks of 0x1000 bytes (our names; gBufferPool, 0x14080 bytes, reached through
-// the pointer gpBufferPool). BufferPool_FreeAll frees them all; BufferPool_GetFreeBlock moves nNext past the used ones.
+// the pointer gpBufferPool). BufferPool_FreeAll frees them all; BufferPool_GetFreeBlock moves
+// nNext past the used ones.
 typedef struct BufferPoolBlock {
     u8   unk0[0x1000];
     u32  u1000;                 // 0x1000  nonzero: in use (UObject3D.c: the size of the display
@@ -748,7 +761,8 @@ struct ShaderObject {
 };
 LAYOUT_ASSERT(ShaderObject, 0x28);
 
-void fn_80036100(ShaderObject* pObj, const void* pData, int n);    // Skin.c: hands it data through its fill hook
+// Skin.c: hands a shader object data through its fill hook.
+void fn_80036100(ShaderObject* pObj, const void* pData, int n);
 
 struct UObjMeshPart;
 struct UObjArraySet;
@@ -1055,7 +1069,8 @@ LAYOUT_ASSERT(UStreamObject, 0x34);
 
 int  Stream_RegisterLoadChunkCallback(int nType, void (*pfnHandler)(UStreamObject*));
 int  Stream_UnregisterLoadChunkCallback(int nType);
-u32  Stream_StreamLoadFixedSize(UStreamObject* pObject, u32 uMax, void* pDst);   // copy the data out, free the object
+// Copies the object's data out and frees the object.
+u32  Stream_StreamLoadFixedSize(UStreamObject* pObject, u32 uMax, void* pDst);
 u32  fn_8000E81C(UStreamObject* pObject, void** ppData);          // the data and its size
 
 // The list of kept stream objects (ObjList.c). Objects are added at the head or the tail
@@ -1344,9 +1359,9 @@ typedef struct TrailMeshDescEx {
 
 int  fn_80012FA4(void);                 // controller init
 void RenderState_Flush(void);
-void DS_vSetZBufferMode(int a);
-void DS_vEnableZBufferUpdate(int a);
-void DS_vSetAlphaTestMode(int a, int b, int c);
+void DS_vSetZBufferMode(int nCompare);          // depth compare function (Code80012ED0.c)
+void DS_vEnableZBufferUpdate(int bEnable);      // depth-buffer writes on or off
+void DS_vSetAlphaTestMode(int bEnable, int nCompare, int nRef);   // nRef on a 0..0x80 scale
 void fn_80013030(void);
 u32  fn_80013050(int nChan);            // the pad's device type (SIProbe)
 u8   fn_80013070(int nChan);            // a controller the game takes is plugged in
@@ -1401,7 +1416,8 @@ typedef struct FadeNode {
 
 extern FadeNode* lbl_80281FA0;
 
-void Character_AlignShotWithTarget(int nPlayer, u8 a, u8 b);  // char.c: sets bits of the player's character's u10
+// char.c: sets bits of the player's character's u10.
+void Character_AlignShotWithTarget(int nPlayer, u8 a, u8 b);
 void fn_8001D8DC(int nPlayer);
 void Vec3_Scale(f32 f, f32* pIn, f32* pOut);   // scale a vector (paired singles)
 
@@ -1446,11 +1462,12 @@ void Gaud_StopComment(void);
 void Gaud_SetSfxLevel(f32 f);                // } the options menu passes them 0.2 x options.a0[0], a0[4]
 void Gaud_SetCommentLevel(f32 f);                // } and a0[1] (FE_MessageTable.c, GameUICommands.c)
 void Gaud_SetMusicLevel(f32 f);                // }
-void LLMath_Normalize(f32* pSrc, f32* pDst);
-void LLMath_Normalize3(f32* pSrc, f32* pDst);   // normalise
+void LLMath_Normalize(f32* pSrc, f32* pDst);    // VecMath.c: normalise four floats
+void LLMath_Normalize3(f32* pSrc, f32* pDst);   // normalise three floats (pDst[3] not written)
 void fn_800B5918(const f32* pSrc, f32* pDst);   // GoShaderObject_Rain_Gc.c: copy three floats
-f32  LLMath_NormalizeReturnLength3(f32* pSrc, f32* pDst);   // VecMath.c: normalises pSrc into pDst, gives its length
-f32  LLMath_DistanceBetween3(f32* pA, f32* pB);
+// Normalises three floats and returns the length (0: a near-zero vector, copied as it is).
+f32  LLMath_NormalizeReturnLength3(f32* pSrc, f32* pDst);
+f32  LLMath_DistanceBetween3(f32* pA, f32* pB);  // three-float distance
 void fn_800BD83C(int nSound, int a);      // SitDevFile.c: Gaud_StartComment(0, nSound, a)
 void BreakLine_Reset(int nView);
 // The EA Sports Bio, game side (EASportsBio.c; TW06's names)

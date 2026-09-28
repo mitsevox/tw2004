@@ -18,16 +18,24 @@ typedef struct CamLens {
                                 //       zoom-to-aim camera copies m4[0] to View.v20
     f32  m44[4][4];             // 0x44  world to camera space (hlaudemitter.c Aud_EmiSet3DPos moves a
                                 //       sound's position with it)
-    f32  m84[2][4];             // 0x84  [1] the scale Camera_SetCameraPositionAndTargetWithOffsetAndScale puts on the world around a point,
-                                //       [0] its inverse; ViewController.c CA_vSetDefaultScalingVectors sets all to 1.0
+    f32  m84[2][4];             // 0x84  [1] the scale that
+                                //       Camera_SetCameraPositionAndTargetWithOffsetAndScale puts
+                                //       on the world around a point, [0] its inverse;
+                                //       ViewController.c CA_vSetDefaultScalingVectors sets all
+                                //       to 1.0
     f32  fFov;                  // 0xA4  the field of view (GoGolfCam.c sets DEG(60.0f) or DEG(30.0f))
     f32  fA8;                   // 0xA8  the near clip distance (RC_vUpdateRenderCtxScreenMatricesAndInfo
                                 //       builds the projection from it); CA_vInitCamera starts it at 0.1
     f32  fAC;                   // 0xAC  the far clip distance; CA_vInitCamera starts it at 4096
                                 //       (GoTerrain.c fn_800354B4 sets it)
-    f32  fB0;                   // 0xB0  Camera_GetLensFovScale; the zoom-to-aim camera divides its distance by it
-    f32  fB4;                  // 0xB4  a flat camera's view width (guess)
-    f32  fB8;                   // 0xB8  its view height (guess)
+    f32  fB0;                   // 0xB0  Camera_GetLensFovScale; the zoom-to-aim camera divides its
+                                //       distance by it
+    f32  fFlatWidth;            // 0xB4  } a flat camera's view width and height in world units:
+    f32  fFlatHeight;           // 0xB8  } RC_vUpdateRenderCtxScreenMatricesAndInfo builds its
+                                //       projection with Mtx_OrthoScale from them, LLObj_Gc.c
+                                //       culls against them; 20 x 20 from CA_vInitCamera
+                                //       (fn_80076948 sets them; GoGrass.c's top-down grass camera
+                                //       sets 20 x 20 too)
 } CamLens;
 
 f32 CA_fGetCameraFieldOfView(CamLens* pLens);        // GoRenderCtx_Gc.c: the lens's field of view
@@ -293,14 +301,16 @@ typedef struct ViewController {
     void*    pCamera;           // 0x000  the render camera (ViewController_GetRenderContext)
     View     view;              // 0x004  (ViewController_GetCameraControl)
     s32      nPlayer;           // 0x270  set by ViewController_SetActivePlayerNumber
-    u8       b274;              // 0x274  the view is set up (ViewController_Init) and not yet shut down
-    u8       bFlagOut;          // 0x275  the flagstick is out (set while every player on this view is on the
-                                //        green, the fringe or holed): no pin collisions
+    u8       bActive;           // 0x274  the view is in use (TW07's ViewController_IsActive): set by
+                                //        ViewController_Init, cleared by ViewController_Delete,
+                                //        either by ViewController_TurnOnViewController
+    u8       bFlagOut;          // 0x275  the flagstick is out (set while every player on this view
+                                //        is on the green, the fringe or holed): no pin collisions
     u8       unk276[2];
-    f32      f278;              // 0x278  } the render camera's screen rectangle, saved by ViewController_SaveViewportRect in
-    f32      f27C;              // 0x27C  } reverse order (f284 is its first value) and put back by
-    f32      f280;              // 0x280  } ViewController_RestoreViewportRect
-    f32      f284;              // 0x284  }
+    f32      f278;              // 0x278  } the render camera's screen rectangle, saved by
+    f32      f27C;              // 0x27C  } ViewController_SaveViewportRect in reverse order (f284
+    f32      f280;              // 0x280  } is its first value) and put back by
+    f32      f284;              // 0x284  } ViewController_RestoreViewportRect
 } ViewController;
 LAYOUT_ASSERT(ViewController, 0x288);
 
@@ -598,10 +608,12 @@ extern struct Character* lbl_80281EE8[CRAP_NUM_GOLFERS];   // per golfer slot: t
 
 // ---- the views ------------------------------------------------------------------------------
 
-// A render camera (our name); only what the cleaned code reads.
+// A render camera: TW07's render context RC_SRenderCtx (GoRenderCtx.h); only what the cleaned
+// code reads here (the fuller layout is Camera in unsorted/cull.h).
 typedef struct RenderCamera {
     u8   unk0[0x14];
-    f32* pRect;                 // 0x14  its screen rectangle: left, top, width, height (RC_spGetRenderCtxViewport)
+    f32* pRect;                 // 0x14  its viewport (TW07 VM_SViewport): left, top, width, height,
+                                //       fractions of the frame buffer (RC_spGetRenderCtxViewport)
 } RenderCamera;
 
 // Points at the slot holding the current render camera (lbl_80281C90): RC_spGetCurrentRenderCtx reads it,
@@ -622,7 +634,7 @@ View*  ViewController_GetCameraControl(int nView);
 void   ViewController_SetActivePlayerNumber(int nView, int nPlayer);   // the player the view follows
 int    ViewController_GetActivePlayerNumber(int nView);          // the player the view follows (as set above)
 u8     ViewController_IsActive(int nView);          // the view is in use
-void   ViewController_TurnOnViewController(int nView, u8 b);    // sets ViewController.b274
+void   ViewController_TurnOnViewController(int nView, u8 bActive);   // sets ViewController.bActive
 f32*   CameraController_GetPosition(View* pView);        // the camera's position (v0)
 f32*   CameraController_GetTarget(View* pView);        // where it looks (v10), or a script shot's angles
 u8     fn_800172C4(View* pView);        // 0: the script's shot aims by angles (ViewController_Update)
@@ -636,7 +648,8 @@ void   RC_vUpdateRenderCtxTransformationMatrices(void* pCamera);
 void   RenderState_SetViewport(void* pCamera);
 void   RenderState_SetCameraMatrices(void);
 int    ViewController_GetCurrentViewControllerID(void);
-void   VM_vSetViewportRect(f32* pRect, f32 x, f32 y, f32 w, f32 h);   // set a screen rectangle (fractions)
+// Sets a viewport's rectangle (fractions of the frame buffer).
+void   VM_vSetViewportRect(f32* pViewport, f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight);
 // A world position on screen (0..1 across and down; pZ, if not NULL, gets a third value). Returns
 // 1 when the point is in front of the camera (clip w below 0), else 0.
 u8     fn_8006434C(void* pCamera, f32* pPos, f32* pX, f32* pY, f32* pZ);
@@ -788,8 +801,8 @@ void   fn_800C3EDC(View* pView, int nPlayer);                       // 24
 void   CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int nView);
 void   fn_80062F1C(View* pView);
 void   fn_80063920(int nView, f32* pBounds);    // the view's camera is inside an object's bounds
-void   CameraController_FadeIn(View* pView, f32 f, f32* pVec);
-void   CameraController_FadeOut(View* pView, f32 f, f32* pVec);
+void   CameraController_FadeIn(View* pView, f32 fTime, f32* pVec);
+void   CameraController_FadeOut(View* pView, f32 fTime, f32* pVec);
 u8     fn_80063C50(View* pView);
 u8     fn_80063C7C(View* pView);
 u8     fn_80063C90(View* pView);        // script.nCamera 1, 2 or 4: a colour fade running or held
