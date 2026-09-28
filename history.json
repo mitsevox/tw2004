@@ -44453,5 +44453,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "34af1b8",
+"sha": "34af1b89b1d8f140583f8a1228a260d1eac5ce6d",
+"time": 1790596630,
+"subject": "SwingTips.c / hwsBurn.c: ri4's hand edits (file headers: EA's CaddieTips.c; TW07 locals; port: notes on their own line), merged 3-way",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
