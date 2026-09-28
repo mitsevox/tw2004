@@ -10,15 +10,15 @@
 #include "golfer.h"
 
 // The byte-swap layouts of the records CharSlider_CreateDefinitionsFromMem reads.
-SwapField lbl_80193B70[5] = { { 8, -8 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };   // CharSliderBone
-SwapField lbl_80193B98[4] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };   // CharSliderRange of bones
-SwapField lbl_80193BB8[3] = { { 8, 8 }, { 4, 4 }, { 4, 4 } };             // CharSliderMorph
-SwapField lbl_80193BD0[4] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };   // CharSliderRange of morph targets
-SwapField lbl_80193BF0[6] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };  // CharSliderLink
-SwapField lbl_80193C20[2] = { { 4, 4 }, { 4, 4 } };                         // CharSliderLimit
-SwapField lbl_80193C30[10] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+SwapField gCharSliderBoneSwap[5] = { { 8, -8 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };   // CharSliderBone
+SwapField gCharSliderBoneRangeSwap[4] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };   // CharSliderRange of bones
+SwapField gCharSliderMorphSwap[3] = { { 8, 8 }, { 4, 4 }, { 4, 4 } };             // CharSliderMorph
+SwapField gCharSliderMorphRangeSwap[4] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };   // CharSliderRange of morph targets
+SwapField gCharSliderLinkSwap[6] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };  // CharSliderLink
+SwapField gCharSliderLimitSwap[2] = { { 4, 4 }, { 4, 4 } };                         // CharSliderLimit
+SwapField gCharSliderDefSwap[10] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
                                { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };   // CharSliderDef
-SwapField lbl_80281788[1] = { { 8, 8 } };                                   // a morph target id (u64)
+SwapField gCharSliderMorphIdSwap[1] = { { 8, 8 } };                                   // a morph target id (u64)
 
 // Free a slider-definition set made by CharSlider_CreateDefinitionsFromMem, with every table it
 // owns (Character_Free); NULL is ignored.
@@ -100,7 +100,7 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
     // The sliders; the pointers read with them are not valid yet.
     for (i = 0; i < pDefs->nSliders; i++) {
         pDst = &pDefs->pDefs[i];
-        ByteSwap_Records((void**)ppData, &pDst, lbl_80193C30, 10, 1);
+        ByteSwap_Records((void**)ppData, &pDst, gCharSliderDefSwap, 10, 1);
         pDefs->pDefs[i].pBoneRanges = NULL;
         pDefs->pDefs[i].pMorphRanges = NULL;
         pDefs->pDefs[i].pLinks = NULL;
@@ -112,7 +112,7 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
                                                  "CharSliders.c", 1039);
             for (j = 0; j < pDefs->pDefs[i].nLinks; j++) {
                 pDst = &pDefs->pDefs[i].pLinks[j];
-                ByteSwap_Records((void**)ppData, &pDst, lbl_80193BF0, 6, 1);
+                ByteSwap_Records((void**)ppData, &pDst, gCharSliderLinkSwap, 6, 1);
             }
         }
     }
@@ -122,7 +122,7 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
                                                   "CharSliders.c", 1053);
             for (nLimit = 0; nLimit < pDefs->pDefs[i].nLimits; nLimit++) {
                 pDst = &pDefs->pDefs[i].pLimits[nLimit];
-                ByteSwap_Records((void**)ppData, &pDst, lbl_80193C20, 2, 1);
+                ByteSwap_Records((void**)ppData, &pDst, gCharSliderLimitSwap, 2, 1);
             }
         }
     }
@@ -135,7 +135,7 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
                                                       2, 0, "CharSliders.c", 1067);
             for (nBoneRange = 0; nBoneRange < pDefs->pDefs[i].nBoneRanges; nBoneRange++) {
                 pDst = &pDefs->pDefs[i].pBoneRanges[nBoneRange];
-                ByteSwap_Records((void**)ppData, &pDst, lbl_80193B98, 4, 1);
+                ByteSwap_Records((void**)ppData, &pDst, gCharSliderBoneRangeSwap, 4, 1);
                 pDefs->pDefs[i].pBoneRanges[nBoneRange].items.pBones = NULL;
             }
         }
@@ -148,7 +148,7 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
                                 "CharSliders.c", 1084);
                 for (nBone = 0; nBone < pDefs->pDefs[i].pBoneRanges[j].nItems; nBone++) {
                     pDst = &pDefs->pDefs[i].pBoneRanges[j].items.pBones[nBone];
-                    ByteSwap_Records((void**)ppData, &pDst, lbl_80193B70, 5, 1);
+                    ByteSwap_Records((void**)ppData, &pDst, gCharSliderBoneSwap, 5, 1);
                 }
             }
         }
@@ -162,7 +162,7 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
                                                        2, 0, "CharSliders.c", 1100);
             for (nMorphRange = 0; nMorphRange < pDefs->pDefs[i].nMorphRanges; nMorphRange++) {
                 pDst = &pDefs->pDefs[i].pMorphRanges[nMorphRange];
-                ByteSwap_Records((void**)ppData, &pDst, lbl_80193BD0, 4, 1);
+                ByteSwap_Records((void**)ppData, &pDst, gCharSliderMorphRangeSwap, 4, 1);
                 pDefs->pDefs[i].pMorphRanges[nMorphRange].items.pMorphs = NULL;
             }
         }
@@ -175,7 +175,7 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
                                 "CharSliders.c", 1117);
                 for (k = 0; k < pDefs->pDefs[i].pMorphRanges[j].nItems; k++) {
                     pDst = &pDefs->pDefs[i].pMorphRanges[j].items.pMorphs[k];
-                    ByteSwap_Records((void**)ppData, &pDst, lbl_80193BB8, 3, 1);
+                    ByteSwap_Records((void**)ppData, &pDst, gCharSliderMorphSwap, 3, 1);
                 }
             }
         }
@@ -184,7 +184,7 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
     // The morph targets' ids.
     for (i = 0; i < pDefs->nMorphs; i++) {
         pDst = &pDefs->aMorphIds[i];
-        ByteSwap_Records((void**)ppData, &pDst, lbl_80281788, 1, 1);
+        ByteSwap_Records((void**)ppData, &pDst, gCharSliderMorphIdSwap, 1, 1);
     }
     return pDefs;
 }
