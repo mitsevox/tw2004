@@ -2738,3 +2738,10 @@ address	name	comment	by	date
 8011C054	PlayPGAAwardVideo	rewrite	ro3 (replayed by orchestrator)	2026-09-28
 8011C058	GM_PgaTourSim_SetStatsDirty	add	ro3 (replayed by orchestrator)	2026-09-28
 8011C060	GM_PgaTourSim_SetScoresDirty	add	ro3 (replayed by orchestrator)	2026-09-28
+8011CEB0	PrintStatsWithUnits	rewrite	ro3 (replayed by orchestrator)	2026-09-28
+8011CF64	UIStatsRankings_GetRow	rewrite	ro3 (replayed by orchestrator)	2026-09-28
+8011D05C	UIStatsRankings_GetProfileName	add	ro3 (replayed by orchestrator)	2026-09-28
+8011D09C	UIStatsRankings_SetActiveStat	rewrite	ro3 (replayed by orchestrator)	2026-09-28
+8011D0A8	UIStatsRankings_GetIndStatsRow	rewrite	ro3 (replayed by orchestrator)	2026-09-28
+8011D268	UIStatsRankings_GetIndStatsNumRows	rewrite	ro3 (replayed by orchestrator)	2026-09-28
+8011D274	UIStatsRankings_GetNumRows	rewrite	ro3 (replayed by orchestrator)	2026-09-28

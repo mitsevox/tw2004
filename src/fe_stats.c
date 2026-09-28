@@ -29,7 +29,8 @@ StatsUnits lbl_80194484[FE_STATS_NUM_CATEGORIES] = {
 
 s32 lbl_80282508;
 
-// Prints a statistic's value text with its units: "$1,234,567", "301.2 yds", "65.2%".
+// Prints a statistic's value text with its units into szOut: as it is, as money with thousands
+// commas ("$1,234,567", fn_800907AC), with " yds", or with "%".
 void PrintStatsWithUnits(const char* szValue, StatsUnits eUnits, char* szOut) {
     char szMoney[128];
 
@@ -50,8 +51,10 @@ void PrintStatsWithUnits(const char* szValue, StatsUnits eUnits, char* szOut) {
     }
 }
 
-// The player's line in a category: its title, the player's value and the player's place. A
-// category with no statistic behind it shows "TODO".
+// FE message 521: the player's line in a category of the statistics screen (arguments: the
+// category, then the title, value and place strings to fill): the category's title, the player's
+// value with its units and the player's place in the statistic. A category with no statistic behind
+// it (-1) would show "TODO"; every category has one in this build.
 void UIStatsRankings_GetRow(MsgArg* pArgs, MsgArg* pResult) {
     int nCategory = pArgs[0].i;
     char* szTitle = ((MsgString*)pArgs[1].p)->pStr;
@@ -74,20 +77,26 @@ void UIStatsRankings_GetRow(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_8011D05C(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 522: copies the name of the profile being worked on (FE_GetCurrentProfile) into the
+// string argument, for the statistics screen.
+void UIStatsRankings_GetProfileName(MsgArg* pArgs, MsgArg* pResult) {
     char* szOut = ((MsgString*)pArgs[0].p)->pStr;
 
     strcpy(szOut, FE_GetCurrentProfile()->szName);
 }
 
-// Picks the category the leader board shows.
+// FE message 523: picks the category (a row of the statistics screen, not a statistic number) that
+// the leader board shows.
 void UIStatsRankings_SetActiveStat(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80282508 = pArgs[0].i;
 }
 
-// A leader board line of the chosen category: place, golfer, tournaments played (rounds for the
-// statistics counted per round, nothing for career money) and value, percentages without the
-// sign. Row -1 is the player's own line.
+// FE message 524: a line of the chosen category's leader board (arguments: the row, -1 for the
+// player's own line, then the place, name, played and value strings to fill): the golfer's place,
+// name, how much the golfer played (tournaments or rounds as GM_PgaTourSim_GetStatView says: 0
+// tournaments, else rounds; blank for career money) and value with its units, percentages without
+// the sign. A category with no statistic (-1) would show "TODO" in every column; every category has
+// one in this build.
 void UIStatsRankings_GetIndStatsRow(MsgArg* pArgs, MsgArg* pResult) {
     StatsUnits eUnits;
     GM_Pga_StatTypes_t nStat;
@@ -131,12 +140,14 @@ void UIStatsRankings_GetIndStatsRow(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// The leader board has a line for every tour golfer.
-void fn_8011D268(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 525: the leader board has a line for every tour golfer and the player
+// (PGA_NUM_GOLFERS).
+void UIStatsRankings_GetIndStatsNumRows(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = PGA_NUM_GOLFERS;
 }
 
-// The screen has a line for every category.
-void fn_8011D274(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 526: the statistics screen has a line for every category (FE_STATS_NUM_CATEGORIES,
+// 29).
+void UIStatsRankings_GetNumRows(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = FE_STATS_NUM_CATEGORIES;
 }
