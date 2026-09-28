@@ -61,20 +61,20 @@ void GameEffects_SendMessage50(void) {
     fn_800E58B4(50);
 }
 
-// Empty in this build. The time-rate code (fn_800DAF98) calls it after it has used a pending
+// Empty in this build. The time-rate code (GameEffects_AdjustTimeRate) calls it after it has used a pending
 // one-frame fixed step (GameEffects_IsSingleStepPending), so it would clear that request.
 void GameEffects_ClearSingleStep(void) {
 }
 
-// Always 0 in this build. When true, the time-rate code (fn_800DAF98) makes this frame exactly one
-// 60 Hz tick (FRAME_TIME, unless the frame time is 0) and clears the request
+// Always 0 in this build. When true, the time-rate code (GameEffects_AdjustTimeRate) makes this
+// frame exactly one 60 Hz tick (FRAME_TIME, unless the frame time is 0) and clears the request
 // (GameEffects_ClearSingleStep).
 u8 GameEffects_IsSingleStepPending(void) {
     return 0;
 }
 
-// Always 0 in this build. When true, the time-rate code (fn_800DAF98) counts every frame with a
-// nonzero frame time as exactly one 60 Hz tick (FRAME_TIME).
+// Always 0 in this build. When true, the time-rate code (GameEffects_AdjustTimeRate) counts every
+// frame with a nonzero frame time as exactly one 60 Hz tick (FRAME_TIME).
 u8 GameEffects_IsFixedTimeStepOn(void) {
     return 0;
 }

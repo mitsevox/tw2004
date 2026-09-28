@@ -562,7 +562,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
     gPlayers[nPlayer].bPlanReady = 0;
     gPlayers[nPlayer].uFlags     = 0;
     EVENT_Trigger(nPlayer, 7, 0, -1);
-    fn_800DB4E8(nPlayer);
+    GameEffects_TargetGameBreakerTrigger(nPlayer);
     fn_80062B68(nPlayer);
 }
 
@@ -720,7 +720,7 @@ void STATEFUNC_ReplaySwingInit(int nPlayer) {
     if (gSession.bReplay != 0) {
         GameEffects_ResetGameEffectSettings();
     } else {
-        fn_800DAF74();
+        GameEffects_ResetGameEffectTimeSettings();
     }
     GameEffects_SetSuperSlowMo(1, nPlayer, GolfCamera_ReplaySwingSpeed(pV));
     gPlayers[nPlayer].ball.nState = 0;
@@ -1199,7 +1199,7 @@ void STATEFUNC_SimulateInit(int nPlayer) {
         CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 0xE, nPlayer, nView);
     }
     fn_8006ACF8(nPlayer, 0);
-    fn_800DB714(nPlayer);
+    GameEffects_ScriptedGameBreakerBallHitTrigger(nPlayer);
     gPlayers[nPlayer].bRehearsalDone = 0;
     SW_UpdateVibration(nPlayer);
     fn_80062DC0(pV);
@@ -1226,7 +1226,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
     if (fn_80062DD4(pV) && fn_80062DCC(pV) > 0.5f) {
         GM_PlayerTookShot(nPlayer);
         REPLAY_Stop();
-        fn_800DBDA8(nPlayer);
+        GameEffects_EndGameBreaker(nPlayer);
         if (gPlayers[nPlayer].ball.nLie == LIE_INCUP_e) {
             GOLFERSTATE_Switch(GS_IN_THE_HOLE, nPlayer);
         } else {
@@ -1871,7 +1871,7 @@ void STATEFUNC_MidHoleFlyByInit(int nPlayer) {
     GolfCamera_SetCameraMatrixMode(0);
     GUI_ToggleUI(nPlayer, 0);
     fn_80045824(nPlayer);
-    fn_800DC9D4(1);
+    GameEffects_Pause(1);
 }
 
 // State 21 (a camera flyover): over when the option skips cameras, the camera finishes, or a
@@ -1925,7 +1925,7 @@ void STATEFUNC_MidHoleFlyByExit(int nPlayer) {
         }
     }
     GUI_ToggleUI(nPlayer, 1);
-    fn_800DC9D4(0);
+    GameEffects_Pause(0);
 }
 
 // State 22: placing the ball (a drop). vBall is put on the ground: the upper of the

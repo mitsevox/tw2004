@@ -48,7 +48,7 @@ void Gaud_InitCamZoom(u8 nPlayer);
 void Gaud_ExitCamZoom(u8 nPlayer);
 void Gaud_ExitSpecialShot(u8 nPlayer);
 void AnimStream_AssignSlots(void);
-void fn_800DC498(int nPlayer);
+void GameEffects_SpinWindowDone(int nPlayer);
 void fn_800E5DE4(int n);
 void fn_8010D3B8(int nPlayer);
 void AI_SimAbort(void);
@@ -475,7 +475,7 @@ void fn_80066BB8(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 void fn_80066BE8(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_800DC498(nPlayer);
+    GameEffects_SpinWindowDone(nPlayer);
 }
 
 void fn_80066C08(int nPlayer, int nEvent, void* pData, int nArg) {

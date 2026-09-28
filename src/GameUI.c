@@ -232,7 +232,7 @@ void GUI_OpenPauseMenu(void) {
         }
         lbl_802822DF = 1;
         gSession.nPaused = 1;
-        fn_800DC9D4(1);
+        GameEffects_Pause(1);
         EASBio_SetGamePlayState(0);
         if (PlayNow_IsChallengeRunning()) {
             PlayNow_OnPause();
@@ -271,7 +271,7 @@ void GUI_PauseMenuClosed(void) {
             }
             lbl_802822DF = 0;
             gSession.nPaused = 0;
-            fn_800DC9D4(0);
+            GameEffects_Pause(0);
             Gaud_Pause(0);
             EASBio_SetGamePlayState(1);
         }

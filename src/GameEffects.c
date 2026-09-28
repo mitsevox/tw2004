@@ -10,9 +10,9 @@
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
 u8    fn_800B4AE0(void);
-void  fn_800DBFAC(void);
-void  fn_800DC18C(void);
-void  fn_800DC290(f32 fHeight);
+void  GameEffects_RenderPredictedGB(void);
+void  GameEffects_RenderScriptedGB(void);
+void  GameEffects_DrawLetterBoxes(f32 fHeight);
 // szName: a profile's name
 int   HighScoreRecords_CheckRecord(int a, int b, int c, char* szName, int nPlayer);
 u8    fn_800BCD24(int nPlayer);
@@ -35,8 +35,10 @@ GameEffects lbl_80202898;   // the effects state (game.h; GameManager, GoGolfCam
         EVENT_Trigger((nWho), 0x3D, 0, -1);                                                 \
     }
 
-// TW06: GameEffects_InitGameEffectSettings (by position and size).
-void fn_800DAE44(void) {
+// Once, as the game starts (GO_vInitIG): double time (b10), half time (b11), super slow motion and
+// the timed double speed (b9) off, the half-time frame count n28 cleared, no GameBreaker, not
+// paused, no rumble or heartbeats, and f54 (a menu command sets it, GameUICommands.c) back to 1.
+void GameEffects_InitGameEffectSettings(void) {
     lbl_80202898.b10 = 0;
     lbl_80202898.b11 = 0;
     lbl_80202898.bSlowMo = 0;
@@ -50,10 +52,14 @@ void fn_800DAE44(void) {
     lbl_80202898.f54 = 1.0f;
 }
 
-// Every effect off: a GameBreaker still up is closed (its end events), the rumble stopped.
+// Every effect off (at each hole's start and restart, the scorecards, and the swing and shot
+// states' inits): the time effects (GameEffects_ResetGameEffectTimeSettings), pause and rumble. A
+// GameBreaker still up ends at once, with its end event (0x3E scripted, 0x40 predicted) and UI
+// message 50; the spin window and the waiting commentary line u4C are cleared, and every player's
+// pad stops vibrating.
 void GameEffects_ResetGameEffectSettings(void) {
     int i;
-    fn_800DAF74();
+    GameEffects_ResetGameEffectTimeSettings();
     lbl_80202898.bPaused = 0;
     lbl_80202898.bRumble = 0;
     if (lbl_80202898.bGameBreaker) {
@@ -75,8 +81,10 @@ void GameEffects_ResetGameEffectSettings(void) {
     }
 }
 
-// TW06: GameEffects_ResetGameEffectTimeSettings (by position and size).
-GameEffects* fn_800DAF74(void) {
+// The time effects off: double time, half time, super slow motion, the timed double speed (b9) and
+// the half-time frame count n28. Returns the effects state (its callers,
+// GameEffects_ResetGameEffectSettings and STATEFUNC_ReplaySwingInit, ignore it).
+GameEffects* GameEffects_ResetGameEffectTimeSettings(void) {
     lbl_80202898.b10 = 0;
     lbl_80202898.b11 = 0;
     lbl_80202898.bSlowMo = 0;
@@ -85,10 +93,15 @@ GameEffects* fn_800DAF74(void) {
     return &lbl_80202898;
 }
 
-// TW06: GameEffects_AdjustTimeRate (by position). The game's time step for a frame that took
-// fFrameTime: rounded to whole 60 Hz ticks (at most 3; a longer frame counts as 1), then scaled
-// by the effects.
-f32 fn_800DAF98(f32 fFrameTime) {
+// The game's time step for a frame that took fFrameTime seconds (the main loop asks once a frame,
+// fn_8006D8E8). FRAME_TIME when the fixed step is on or a single step is pending (the request is
+// used up), 0 while the golfer state is frozen, and 0 outright when fn_800C6CCC says so. Otherwise
+// the frame is rounded to whole 60 Hz ticks (0 to 3; a longer frame counts as 1), then scaled: to
+// 3/4 while the golf cameras' b56 is set (fn_800C6CB0) and the golfer has not passed animation tag
+// 2 (fn_800B4AE0); else doubled while the timed double speed runs (b9, until fC counts down below
+// 0); else doubled with double time and halved with half time (counting n28). Super slow motion
+// then multiplies it by fSlowMo.
+f32 GameEffects_AdjustTimeRate(f32 fFrameTime) {
     f32 fTicks = 1.0f;
     f32 fBest = 10000.0f;
     int i;
@@ -142,9 +155,11 @@ f32 fn_800DAF98(f32 fFrameTime) {
     return FRAME_TIME * fTicks;
 }
 
-// How many physics steps the ball takes this frame: one per FRAME_TIME of frame time (rounded;
-// twice that in mode 26), none when the frame time is 0, one outside the ball's flight. With the
-// slow-down on and a frame shorter than FRAME_TIME, it moves only on every n2C-th frame.
+// How many physics steps the ball takes this frame: 1 in game type 3 or while the camera's script
+// matrix mode is on, 0 when the frame time is 0, 1 outside the ball's flight (golfer state not
+// GS_SIMULATE). With half time on and a frame shorter than FRAME_TIME, 1 only on every n2C-th frame
+// (GameEffects_StartOfSlowMoFrame), else 0. Otherwise one step per FRAME_TIME of frame time,
+// rounded, at least 1 (twice that, at least 2, in mode 26).
 int GameEffects_BallUpdatesThisFrame(int nPlayer) {
     if (gSession.nGameType == 3 || GolfCamera_IsScriptMatrixModeOn()) {
         return 1;
@@ -176,12 +191,13 @@ static inline int GE_CurrentTarget(int nPlayer) {
     return GameModeSkillZoneBase_GetGreenTargetted(nPlayer);
 }
 
-// TW06: GameEffects_ScriptedGameBreakerTrigger (by position; the same player and reason arguments).
-// A scripted GameBreaker for reason nReason: reason 12 only while the round can still beat the
-// course record, reason 15 only when three times fA64 (the ball's distance from the pin, in feet)
-// beats record kind 2 (the longest putt), any other reason always. Only for a human, one view, not
-// in a replay, and only when gpGame->b285 is set.
-void fn_800DB30C(int nPlayer, int nReason) {
+// A scripted GameBreaker starts for nPlayer, for reason nReason (SitDev's actions fire it; the
+// reason is kept as bit 1 << nReason in uFlags), with event 0x3D. Reason 12 only while the round
+// can still beat the course record (record kind 0), reason 15 only when 3 * Player.fA64 beats
+// record kind 2's best, any other reason always. Never in the demo, a replay or split screen, with
+// gSession.a8[0] set, when the mode allows no GameBreakers (gpGame->b285 clear), for a CPU player,
+// or while one is up.
+void GameEffects_ScriptedGameBreakerTrigger(int nPlayer, int nReason) {
     if (((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) || gSession.bReplay ||
         gSession.nSplitScreen || gSession.a8[0] || !gpGame->b285) {
         return;
@@ -200,10 +216,13 @@ void fn_800DB30C(int nPlayer, int nReason) {
     }
 }
 
-// Scripted GameBreakers for the target games on course 7, for any player (not in a replay or split
-// screen): mode 14 when fn_800F354C gives 4 (reason 17), mode 15 when every other player is out
-// (22), mode 17 with 39 targets hit and mode 16 with 39 hit and the aimed-at target not yet (23).
-void fn_800DB4E8(int nPlayer) {
+// As a swing starts (STATEFUNC_SwingInit), the target games' scripted GameBreakers, on course 7
+// only, for any player (not in a replay or split screen, not with gSession.a8[0] set, not while one
+// is up): mode 14 when the player holds 4 targets (fn_800F354C; reason 17), mode 15 when every
+// other player is out (nE88 5 or more; reason 22), mode 17 with 39 targets hit (fn_800F20C0; reason
+// 23), mode 16 with 39 hit and the aimed-at target not yet hit (reason 23). It starts as
+// GameEffects_ScriptedGameBreakerTrigger does (event 0x3D).
+void GameEffects_TargetGameBreakerTrigger(int nPlayer) {
     u8 bStart = 0;
     int nReason;
     int i;
@@ -250,8 +269,13 @@ void fn_800DB4E8(int nPlayer) {
     }
 }
 
-// The GameBreaker camera: none on course 7; otherwise a camera at the shot's full distance.
-void fn_800DB714(int nPlayer) {
+// As the ball is hit (STATEFUNC_SimulateInit), for a GameBreaker that is up (not in the demo): half
+// and double time off, and the player's view gets GameBreaker camera sequence 0xC (fn_8003BDBC,
+// from the lie the ball is hit from) for the shot's full distance (AI_MaxDistance times the lie's
+// power times the swing's power). b19 is set, which starts the letterbox
+// (GameEffects_RenderScriptedGB), and f24 is held to 0.8 at most. On course 7 there is no camera,
+// only b19.
+void GameEffects_ScriptedGameBreakerBallHitTrigger(int nPlayer) {
     int nLie;
     f32 fDist;
     View* pView;
@@ -275,12 +299,14 @@ void fn_800DB714(int nPlayer) {
     }
 }
 
-// No TW06 name settled (by position it falls among ScriptedGameBreakerBallHitTrigger and
-// IsScriptedGameBreaker). Whether the putt about to be played is a big one: on the green, and
-// putting for two under par or better, or its length makes record kind 2's list, or the mode's
-// pfn1F8 or fn_800BCD24 says so, or a birdie putt when fn_800D0620 gives 11, or an eagle putt when
-// fn_800D089C gives 1 (by the score after a tap-in).
-int fn_800DB86C(int nPlayer) {
+// Whether the putt about to be played earns a scripted GameBreaker (emotion.c asks, fn_8006B0B8).
+// Needs a course loaded, a mode that allows GameBreakers (gpGame->b285), ground under the aim point
+// and the ball on the green; then any of: a putt that would score an eagle or better, a distance to
+// the pin (fn_800D0478) that makes record kind 2's list (HighScoreRecords_CheckRecord), a putt for
+// the lead (GM_IsPuttForLead) or for the win (fn_800BCD24, the mode's pfn1FC), a birdie putt when
+// fn_800D0620 gives 11, or an eagle putt when fn_800D089C gives 1 (birdie and eagle by
+// Hole_ScoreAfterTapIn).
+int GameEffects_IsScriptedGameBreaker(int nPlayer) {
     int bPossible = 0;
     int nPar;
     int nStrokes;
@@ -320,10 +346,16 @@ int fn_800DB86C(int nPlayer) {
     return bPossible;
 }
 
-// TW06: GameEffects_InFlightGameBreakerTrigger (by position). A predicted GameBreaker starts, for
-// a human's ball still at least 1 (the putter), 10 (a drive) or 5 (otherwise) from the look-ahead
-// ball, with its own camera; a golfer who is not putting may get animation 14.
-void fn_800DBA50(int nPlayer) {
+// A predicted GameBreaker starts while the ball flies (SitDev's actions fire it), for a human
+// (player flag 8 clear), none up yet; never in the demo, a replay or split screen, with
+// gSession.a8[0] set, or when the mode allows no GameBreakers (gpGame->b285 clear). The ball must
+// still be at least 1 (club 25, the putter), 10 (a drive, nShotKind 1) or 5 (any other shot) from
+// the look-ahead ball across the ground, b30D clear and a course loaded. Half and double time go
+// off, and the player's view gets GameBreaker camera sequence 0xB (fn_8003BDBC) for the shot's
+// length to the look-ahead ball, by the ball's lie and the surface class where the look-ahead ball
+// lies. When the shot it picks tracks the golfer (kind 5, fn_8003DC78) on a shot that is not a
+// putt, the golfer is set to animation 14 unless he is in 9. Event 0x3F.
+void GameEffects_InFlightGameBreakerTrigger(int nPlayer) {
     int nClass;
     int nLie;
     View* pView;
@@ -399,9 +431,13 @@ void fn_800DBA50(int nPlayer) {
     }
 }
 
-// TW06: GameEffects_EndGameBreaker (by position). The letterbox starts closing, with the end event;
-// music 3 plays (a predicted one, or a scripted one that did it), or the old music comes back.
-void fn_800DBDA8(int nPlayer) {
+// Ends a GameBreaker as the shot finishes (STATEFUNC_SimulateUpdate): the letterbox starts closing
+// (fGBTime held to 0.8 at most). A predicted one: end event 0x40, the waiting commentary line u4C
+// (if any) plays, and crowd reaction 3. A scripted one: end event 0x3E; if the shot did it
+// (GameEffects_ScriptedGBDidIt), line u4C and crowd reaction 3, else the other waiting line u48 and
+// crowd reaction n4F (b4E cleared); u48's slot is freed either way. nPlayer is not read: the
+// GameBreaker's own player is used.
+void GameEffects_EndGameBreaker(int nPlayer) {
     if (lbl_80202898.bGameBreaker) {
         lbl_80202898.bClosing = 1;
         if (lbl_80202898.fGBTime > 0.8f) {
@@ -418,7 +454,7 @@ void fn_800DBDA8(int nPlayer) {
             return;
         case 0:
             EVENT_Trigger(lbl_80202898.nPlayer, 0x3E, 0, -1);
-            if (fn_800DC818(&gPlayers[lbl_80202898.nPlayer].ball, lbl_80202898.nPlayer, 0)) {
+            if (GameEffects_ScriptedGBDidIt(&gPlayers[lbl_80202898.nPlayer].ball, lbl_80202898.nPlayer, 0)) {
                 if (lbl_80202898.b4A) {
                     fn_800BD83C(lbl_80202898.u4C, 0);
                     lbl_80202898.b4A = 0;
@@ -437,24 +473,27 @@ void fn_800DBDA8(int nPlayer) {
     }
 }
 
-// TW06: GameEffects_RenderGameBreakerEffects (by position).
-void fn_800DBF34(void) {
+// Each frame (the main loop, fn_8006D27C), while a GameBreaker is up and neither the game nor the
+// GameBreaker is paused: its letterbox and timing, by its type (GameEffects_RenderPredictedGB or
+// GameEffects_RenderScriptedGB).
+void GameEffects_RenderGameBreakerEffects(void) {
     if (lbl_80202898.bGameBreaker && gSession.nPaused == 0 && !lbl_80202898.bPaused) {
         switch (lbl_80202898.nGBType) {
         case 1:
-            fn_800DBFAC();
+            GameEffects_RenderPredictedGB();
             return;
         case 0:
-            fn_800DC18C();
+            GameEffects_RenderScriptedGB();
             break;
         }
     }
 }
 
-// TW06: GameEffects_RenderPredictedGB (by position). Each frame of a predicted GameBreaker: the
-// letterbox, and for a human the slow-down while the ball is within 2 (a putt) or 4 of the
-// look-ahead ball and the letterbox is not closing.
-void fn_800DBFAC(void) {
+// Each frame of a predicted GameBreaker: half time on for a human while the ball is within 2 (a
+// putt) or 4 (any other shot) of the look-ahead ball across the ground and the letterbox is not
+// closing, off otherwise; the letterbox drawn (growing to 0.15 of the screen over the first 0.8 s);
+// fGBTime advanced, or run down while closing until the GameBreaker is over (half time off).
+void GameEffects_RenderPredictedGB(void) {
     f32 fHeight;
     f32 fDist;
     f32 v[3];
@@ -483,7 +522,7 @@ void fn_800DBFAC(void) {
     } else {
         fn_80045494(0, pGE->nPlayer);
     }
-    fn_800DC290(fHeight);
+    GameEffects_DrawLetterBoxes(fHeight);
     if (lbl_80202898.bClosing) {
         lbl_80202898.fGBTime -= gSession.fFrameTime;
         if (lbl_80202898.fGBTime < 0.0f) {
@@ -495,9 +534,11 @@ void fn_800DBFAC(void) {
     }
 }
 
-// TW06: GameEffects_RenderScriptedGB (by position). The letterbox opens (or closes) at the
-// game's pace; once closed the GameBreaker is over.
-void fn_800DC18C(void) {
+// Each frame of a scripted GameBreaker: f24 counts up until b19 is set (the ball is hit,
+// GameEffects_ScriptedGameBreakerBallHitTrigger), then down. From b19 on the letterbox is drawn
+// (growing to 0.15 of the screen over 0.8 s) and fGBTime advances, or runs down while closing until
+// the GameBreaker is over.
+void GameEffects_RenderScriptedGB(void) {
     f32 fHeight;
     if (lbl_80202898.b19) {
         lbl_80202898.f24 -= gSession.fFrameTime;
@@ -510,7 +551,7 @@ void fn_800DC18C(void) {
         } else {
             fHeight = 0.15f;
         }
-        fn_800DC290(fHeight);
+        GameEffects_DrawLetterBoxes(fHeight);
         if (lbl_80202898.bClosing) {
             lbl_80202898.fGBTime -= gSession.fFrameTime;
             if (lbl_80202898.fGBTime < 0.0f) {
@@ -522,9 +563,9 @@ void fn_800DC18C(void) {
     }
 }
 
-// TW06: GameEffects_DrawLetterBoxes (by position). Two half-transparent black bars of fHeight
-// (a fraction of the screen), at the top and bottom.
-void fn_800DC290(f32 fHeight) {
+// The letterbox: two half-transparent black bars fHeight high (a fraction of the screen) at the top
+// and the bottom, drawn without depth writes; the depth and alpha-test modes are put back after.
+void GameEffects_DrawLetterBoxes(f32 fHeight) {
     f32 colour[4];
     f32 xy[8];
     f32 uv[8];
@@ -550,8 +591,9 @@ void fn_800DC290(f32 fHeight) {
     RenderState_Flush();
 }
 
-// TW06: GameEffects_FieldOfViewChange (by position). The GameBreaker's field-of-view change: up to
-// 0.349 (20 degrees) over the first 0.8 seconds; 0 when none runs or it is paused.
+// The GameBreaker's field-of-view change, which the camera scripts add (gocamscripts.c): growing to
+// 0.349 radians (20 degrees) over the letterbox's first 0.8 s, for either type; 0 when none is up
+// or the game or the GameBreaker is paused.
 f32 GameEffects_FieldOfViewChange(void) {
     if (!lbl_80202898.bGameBreaker) {
         return 0.0f;
@@ -577,21 +619,25 @@ f32 GameEffects_FieldOfViewChange(void) {
     return 0.0f;
 }
 
-// TW06: GameEffects_DepthOfFieldChange (by position).
-f32 fn_800DC45C(void) {
+// The GameBreaker's depth-of-field change, which the camera scripts add: always 0 in this build.
+f32 GameEffects_DepthOfFieldChange(void) {
     return 0.0f;
 }
 
-// TW06: GameEffects_SimulateBall (by position). A putt always; otherwise once the spin window is done.
-u8 fn_800DC464(int nPlayer) {
+// Whether the camera's landing estimate may simulate the ball ahead
+// (CameraScript_UpdateLandingEstimate asks): always for a putt, otherwise once the spin window is
+// done (GameEffects_SpinWindowDone).
+u8 GameEffects_SimulateBall(int nPlayer) {
     if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
         return 1;
     }
     return lbl_80202898.bSpinWindowDone;
 }
 
-// TW06: GameEffects_SpinWindowDone (by position). The look-ahead copy restarts from the ball.
-void fn_800DC498(int nPlayer) {
+// The spin window is over (event.c, fn_80066BE8): the look-ahead ball restarts as a copy of the
+// ball (player -1), except in a replay while the look-ahead ball is at rest (nState 0); from now on
+// GameEffects_SimulateBall says yes.
+void GameEffects_SpinWindowDone(int nPlayer) {
     Player* p = &gPlayers[nPlayer];
     if (!gSession.bReplay || p->ballBefore.nState != 0) {
         Mem_cpy(&p->ballBefore, &p->ball, sizeof(Ball));
@@ -600,13 +646,16 @@ void fn_800DC498(int nPlayer) {
     lbl_80202898.bSpinWindowDone = 1;
 }
 
-// TW06: GameEffects_IsSlowDownSwingOn (by position). Super slow motion is on; nPlayer is unused.
-u8 fn_800DC514(int nPlayer) {
+// Whether super slow motion is on (the swing camera asks, GolfCamera_ProcessSwingCamera); nPlayer
+// is not read.
+u8 GameEffects_IsSlowDownSwingOn(int nPlayer) {
     return lbl_80202898.bSlowMo;
 }
 
-// Super slow motion on (with its rate) or off, with events 0x35/0x37 on and 0x36/0x38 off (by
-// whether it slows down or speeds up).
+// Super slow motion on at rate fRate (GameEffects_AdjustTimeRate multiplies the time step by it:
+// below 1 slows the game, above 1 speeds it up) or off. Turning it on sends event 0x35 (fRate below
+// 1) or 0x37 once and clears half and double time; turning it off sends 0x36 or 0x38 by the rate it
+// had. The heartbeat and shutter cameras and the swing replay use it.
 void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate) {
     if (bOn) {
         if (!lbl_80202898.bSlowMo) {
@@ -632,8 +681,9 @@ void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate) {
     }
 }
 
-// TW06: GameEffects_UpdateGameEffects (by position). A heartbeat rumble lasts 5 frames.
-void fn_800DC664(int nPlayer) {
+// Each frame (the main loop, fn_8006D27C): a heartbeat rumble stops after 5 frames (vibration 0 on
+// the player's pad).
+void GameEffects_UpdateGameEffects(int nPlayer) {
     int nController = gPlayers[nPlayer].nController;
     if (lbl_80202898.bRumble) {
         if (++lbl_80202898.nRumbleFrames == 5) {
@@ -645,8 +695,10 @@ void fn_800DC664(int nPlayer) {
     }
 }
 
-// TW06: GameEffects_VibrateControllerForHeartbeat (by position). Up to 40 beats.
-void fn_800DC6E8(int nPlayer) {
+// One heartbeat (GameAudio's HeartBeatLoopCallback, on each beat of the heartbeat sound): the
+// player's pad vibrates at full strength for 5 frames (GameEffects_UpdateGameEffects stops it). At
+// most 40 beats; a new GameBreaker starts the count again.
+void GameEffects_VibrateControllerForHeartbeat(int nPlayer) {
     int nController;
     if (lbl_80202898.nHeartbeats < 40) {
         lbl_80202898.nHeartbeats++;
@@ -661,9 +713,10 @@ void fn_800DC6E8(int nPlayer) {
     }
 }
 
-// TW06: GameEffects_SkipOtherCommentary (by position). While a GameBreaker is up: always for a
-// predicted one; while it closes, if the shot "did it"; otherwise once it is fully open.
-u8 fn_800DC784(void) {
+// Whether other commentary is skipped for the GameBreaker (SitDevTrigger.c asks): while a predicted
+// one is up; a scripted one once its letterbox is fully open (0.8 s), and while it closes only if
+// the shot did it (GameEffects_ScriptedGBDidIt).
+u8 GameEffects_SkipOtherCommentary(void) {
     if (!lbl_80202898.bGameBreaker) {
         return 0;
     }
@@ -671,16 +724,18 @@ u8 fn_800DC784(void) {
         return 1;
     }
     if (lbl_80202898.bClosing) {
-        return fn_800DC818(&gPlayers[lbl_80202898.nPlayer].ball, lbl_80202898.nPlayer, 0);
+        return GameEffects_ScriptedGBDidIt(&gPlayers[lbl_80202898.nPlayer].ball, lbl_80202898.nPlayer, 0);
     }
     return lbl_80202898.fGBTime >= 0.8f;
 }
 
-// TW06: GameEffects_ScriptedGBDidIt (by position). Whether the shot earned its GameBreaker:
-// holed within the stroke limit, on the green of a par 5 in two (with uFlags bit 0x4000), or one of
-// two record checks (Earnings_CheckShotAwards, HighScoreRecords_GetEndOfShotRecord: a drive record;
-// without bNext and with neither, a big message waiting, fn_800E5344).
-u8 fn_800DC818(Ball* pBall, int nPlayer, u8 bNext) {
+// Whether the shot earned its scripted GameBreaker, for pBall where it ended (bNext 0) or where it
+// is predicted to end (bNext 1, the look-ahead ball): in the cup within the stroke limit
+// (GM_IsShotOverLimit), on the green of a par 5 in two when the GameBreaker was started for that
+// (reason 14, uFlags bit 0x4000), a trophy-ball award (Earnings_CheckShotAwards) or a record
+// (HighScoreRecords_GetEndOfShotRecord); after the shot, with neither of those two, also a big
+// message waiting to be shown (fn_800E5344).
+u8 GameEffects_ScriptedGBDidIt(Ball* pBall, int nPlayer, u8 bNext) {
     u8  bEagle;
     int a;
     int b;
@@ -712,8 +767,10 @@ u8 fn_800DC818(Ball* pBall, int nPlayer, u8 bNext) {
     return 0;
 }
 
-// TW06: GameEffects_Pause (by position). Pauses or resumes a GameBreaker, with its sound events.
-void fn_800DC9D4(int a) {
+// Pauses or resumes a GameBreaker that is up (the pause menu, the mid-hole fly-by, GameMessages.c):
+// bPaused toggles, with the end event as it pauses (0x3E scripted, 0x40 predicted) and the start
+// event as it resumes (0x3D, 0x3F). The argument is not read (TW07's is bool pauseOn).
+void GameEffects_Pause(int a) {
     if (lbl_80202898.bGameBreaker) {
         if (lbl_80202898.bPaused) {
             lbl_80202898.bPaused = 0;
@@ -733,7 +790,9 @@ void fn_800DC9D4(int a) {
     }
 }
 
-// The letterbox grows to 15% of the screen over its first 0.8 seconds.
+// The letterbox's height as a fraction of the screen: 0 with no GameBreaker, else growing to 0.15
+// over its first 0.8 s (and shrinking as it closes). The boost meter rises with it
+// (UI_Obj_RenderBoostUI).
 f32 GameEffects_GetLetterboxHeight(void) {
     if (lbl_80202898.bGameBreaker) {
         if (lbl_80202898.fGBTime < 0.8f) {

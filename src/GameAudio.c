@@ -36,7 +36,7 @@ void fn_8010D3D8(int nPlayer);
 u8   fn_8006BEA4(void);                    // emotion.c: a scripted GameBreaker's letterbox is up
 void Aud_EmiSetTrackAttenuation(u8 nId, u8 nTrack, f32 fVolume);
 
-void fn_800DC6E8(int nPlayer);
+void GameEffects_VibrateControllerForHeartbeat(int nPlayer);
 u8   fn_8006BAD8(int nPlayer, s32* pOut);
 f32  fn_8006C630(void);
 // hlaudemitter.c: an emitter instance for sound nSound, in emitter nKind's group (-1: none), a its
@@ -321,10 +321,11 @@ void FirstFrameInit(void) {
 
 // The GameBreaker heartbeat's emitter callback (Gaud_InitHole hands it to Aud_EmiAdd): each report
 // of track 2, the heartbeat, rumbles the controller of view 0's player once (GameEffects.c
-// fn_800DC6E8, up to 40 beats). Gaud_InitGameBreaker calls it for the first beat.
+// GameEffects_VibrateControllerForHeartbeat, up to 40 beats). Gaud_InitGameBreaker calls it for the
+// first beat.
 void HeartBeatLoopCallback(u8 nId, u8 nTrack, s32 n) {
     if (nTrack == 2) {
-        fn_800DC6E8(ViewController_GetActivePlayerNumber(0));
+        GameEffects_VibrateControllerForHeartbeat(ViewController_GetActivePlayerNumber(0));
     }
 }
 

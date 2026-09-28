@@ -229,7 +229,7 @@ void fn_8006B0B8(int nPlayer) {
     f32 vToTarget[3];
     f32 fDist;
 
-    if ((u8)fn_800DB86C(nPlayer)) {     // fake match: the (u8), the caller tests only the low byte
+    if ((u8)GameEffects_IsScriptedGameBreaker(nPlayer)) {     // fake match: the (u8), the caller tests only the low byte
         lbl_801D5F78[nPlayer].n0 = 2;
         lbl_801D5F78[nPlayer].n4 = 2;
         return;
@@ -292,7 +292,7 @@ void fn_8006B250(int nPlayer) {
 
 // The shot's outcome from where the ball ended (bBefore: from the look-ahead ball, and only the
 // kept copy nC, n10, n14 is set): out of bounds or the stroke limit 4, a GameBreaker 2 (a
-// scripted one only when fn_800DC818 passes it), anything else 5.
+// scripted one only when GameEffects_ScriptedGBDidIt passes it), anything else 5.
 void fn_8006B2C4(int nPlayer, u8 bBefore) {
     Ball* pBall;
 
@@ -340,7 +340,7 @@ void fn_8006B2C4(int nPlayer, u8 bBefore) {
         lbl_801D5F78[nPlayer].n14 = 4;
         return;
     }
-    if (fn_8004560C() && (!fn_8006BEA4() || fn_800DC818(pBall, nPlayer, bBefore))) {
+    if (fn_8004560C() && (!fn_8006BEA4() || GameEffects_ScriptedGBDidIt(pBall, nPlayer, bBefore))) {
         if (bBefore) {
             lbl_801D5F78[nPlayer].n10 = 3;
             lbl_801D5F78[nPlayer].nC = 0;

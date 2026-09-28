@@ -248,10 +248,10 @@ void BreakLine_InitModule(void);
 void fn_800C8108(void);
 void AnimStream_Update(void);
 u8   fn_800D3004(void);
-void fn_800DAE44(void);
-f32  fn_800DAF98(f32 fFrameTime);
-void fn_800DBF34(void);
-void fn_800DC664(int nPlayer);
+void GameEffects_InitGameEffectSettings(void);
+f32  GameEffects_AdjustTimeRate(f32 fFrameTime);
+void GameEffects_RenderGameBreakerEffects(void);
+void GameEffects_UpdateGameEffects(int nPlayer);
 void GM_vInitModuleONCE(void);
 void GM_vCloseModuleONCE(void);
 void GM_InitModule_PreDataStream(void);
@@ -665,7 +665,7 @@ void GO_vInitIG(void) {
     fn_8006DC20(1.0f);
     SW_vInitModule();
     REPLAY_InitModule();
-    fn_800DAE44();
+    GameEffects_InitGameEffectSettings();
     PsBallFx_InitModule();
     fn_8011E170();
     TI_vResetCounter(1);
@@ -981,8 +981,8 @@ void fn_8006D27C(void) {
     }
     fn_8008F648(1);
     UFont_DrawQueue();
-    fn_800DC664(ViewController_GetActivePlayerNumber(0));
-    fn_800DBF34();
+    GameEffects_UpdateGameEffects(ViewController_GetActivePlayerNumber(0));
+    GameEffects_RenderGameBreakerEffects();
     fn_800389C0();
     fn_8009069C();
     fn_800382E0();
@@ -1068,7 +1068,7 @@ void fn_8006D8E8(void) {
             GM_CheckControllerPulled();
         }
         fn_80090628();
-        gSession.fFrameTime = fn_800DAF98(gSession.fFrameTime);
+        gSession.fFrameTime = GameEffects_AdjustTimeRate(gSession.fFrameTime);
         if (gSession.nGameType != 1 && GolfCamera_IsFreezeTimeActive()) {
             gSession.fFrameTime = 0.0f;
         }

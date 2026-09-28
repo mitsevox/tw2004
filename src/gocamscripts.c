@@ -21,7 +21,7 @@ void CameraScript_OffsetLookVector(f32* pPos, f32* pTarget, f32 fUp, f32 fSide);
 void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
 void fn_80038054(u8 a, int n, f32 f1, f32 f2);
 void fn_800457B8(int nPlayer, f32 f);
-f32  fn_800DC45C(f32 f);
+f32  GameEffects_DepthOfFieldChange(f32 f);
 u8   fn_80044E74(CamShot* pShot);
 void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pSub, f32* pPrev,
                  f32 fTime);
@@ -62,7 +62,7 @@ u8   Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 
                                          u8 bSlope, f32 fMaxSlope);   // GoTerrainCollision.c
 void CamScript_PickArcDirection(CamScript* pScript, f32* pSub, int nPlayer, f32* pPrev, f32 fTime);
 void Quat_RotateVector(f32* pTurn, f32* pVec, f32* pOut);     // the vector turned by it
-u8   fn_800DC464(int nPlayer);          // GameEffects.c: the ball is simulated from its position
+u8   GameEffects_SimulateBall(int nPlayer);          // GameEffects.c: the ball is simulated from its position
 u8   Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                                  SurfaceType** ppSurface, TerObject** ppObj);
 
@@ -158,7 +158,7 @@ void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, 
             fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), fFov);
         }
         f88 = pScript->pShot->f88;
-        fn_800457B8(nPlayer, f88 + fn_800DC45C(f88));
+        fn_800457B8(nPlayer, f88 + GameEffects_DepthOfFieldChange(f88));
         f8C = pScript->pShot->f8C;
         f90 = pScript->pShot->f90;
         if (f8C > 0.0f || f90 > 0.0f) {
@@ -653,7 +653,7 @@ void fn_8003F518(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
         fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), f);
     }
     f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
-    f += fn_800DC45C(f);
+    f += GameEffects_DepthOfFieldChange(f);
     fn_800457B8(nPlayer, f);
     f = fT * (pNext->f8C - pShot->f8C) + pShot->f8C;
     f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
@@ -716,7 +716,7 @@ void fn_8003F7EC(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
         fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), f);
     }
     f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
-    f += fn_800DC45C(f);
+    f += GameEffects_DepthOfFieldChange(f);
     fn_800457B8(nPlayer, f);
     f = fT * (pNext->f8C - pShot->f8C) + pShot->f8C;
     f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
@@ -767,7 +767,7 @@ void fn_8003FAA0(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
         fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), f);
     }
     f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
-    f += fn_800DC45C(f);
+    f += GameEffects_DepthOfFieldChange(f);
     fn_800457B8(nPlayer, f);
     f = fT * (pNext->f8C - pShot->f8C) + pShot->f8C;
     f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
@@ -846,7 +846,7 @@ void fn_8003FD54(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
         fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), f);
     }
     f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
-    f += fn_800DC45C(f);
+    f += GameEffects_DepthOfFieldChange(f);
     fn_800457B8(nPlayer, f);
     f = fT * (pNext->f8C - pShot->f8C) + pShot->f8C;
     f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
@@ -904,7 +904,7 @@ void CamScript_LerpSwingToBallFlightCameras(int nPlayer, f32* pCam, f32* pSub, C
         fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), f);
     }
     f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
-    f += fn_800DC45C(f);
+    f += GameEffects_DepthOfFieldChange(f);
     fn_800457B8(nPlayer, f);
     f = fT * (pNext->f8C - pShot->f8C) + pShot->f8C;
     f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
@@ -976,7 +976,7 @@ void CamScript_SplineCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScri
         fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), fFov);
     }
     f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
-    f += fn_800DC45C(f);
+    f += GameEffects_DepthOfFieldChange(f);
     fn_800457B8(nPlayer, f);
     f = fT * (pNext->f8C - pShot->f8C) + pShot->f8C;
     f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
@@ -1020,7 +1020,7 @@ void CamScript_ArcCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript,
         fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), f);
     }
     f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
-    f += fn_800DC45C(f);
+    f += GameEffects_DepthOfFieldChange(f);
     fn_800457B8(nPlayer, f);
     f = fT * (pNext->f8C - pShot->f8C) + pShot->f8C;
     f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
@@ -1073,7 +1073,7 @@ void CamScript_CircleCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScri
         fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), f);
     }
     f = fShare * (pNext->f88 - pShot->f88) + pShot->f88;
-    f += fn_800DC45C(f);
+    f += GameEffects_DepthOfFieldChange(f);
     fn_800457B8(nPlayer, f);
     f = fShare * (pNext->f8C - pShot->f8C) + pShot->f8C;
     f90 = fShare * (pNext->f90 - pShot->f90) + pShot->f90;
@@ -1734,7 +1734,7 @@ void CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer) {
     }
     if (gSession.nSplitScreen != 0) {
         pBall = &gPlayers[nPlayer].ball;
-    } else if (fn_800DC464(nPlayer)) {
+    } else if (GameEffects_SimulateBall(nPlayer)) {
         pBall = &gPlayers[nPlayer].ballBefore;
     } else {
         pBall = &gPlayers[nPlayer].ball;

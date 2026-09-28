@@ -58,7 +58,7 @@ u8 fn_800BCE70(SitDevAction* pAction, u8 nEvent) {
     nLeft = fn_800BB248(pAction->aList, nCount);
     nSound = fn_800BB334(pAction->aList, nCount, nLeft, Misc_RandFunc(1) % nLeft);
     bNot30 = nEvent != 30;
-    if (!fn_800DC784()) {
+    if (!GameEffects_SkipOtherCommentary()) {
         fn_800BD83C(nSound, bNot30);
         lbl_802811B8->abPlayed[pAction->nKind] = 1;
         return 1;
@@ -180,14 +180,14 @@ void fn_800BD580(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
     case 1:
         if (gSession.options.a0[4]) {
             bNot30 = nEvent != 30;
-            if (!fn_800DC784()) {
+            if (!GameEffects_SkipOtherCommentary()) {
                 fn_800BD83C((u16)pDo->n4, bNot30);
             }
             lbl_802811B8->pE8 = pDo;
         }
         break;
     case 11:
-        if (gSession.options.a0[4] && !fn_800DC784()) {
+        if (gSession.options.a0[4] && !GameEffects_SkipOtherCommentary()) {
             u16 uSound = pDo->n4;
             nArg = 2;
             if (nPlayer == 0) {
@@ -202,7 +202,7 @@ void fn_800BD580(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
         }
         break;
     case 7:
-        if (fn_800DC784()) {
+        if (GameEffects_SkipOtherCommentary()) {
             fn_800BD7D0(pDo->n4);
         } else {
             Gaud_InitCrowdReactionSound(pDo->n4, nEvent != 5);
@@ -211,9 +211,9 @@ void fn_800BD580(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
     case 4:
         if (fn_8002E8B4(nPlayer)) {
             if (pDo->n4 == 0) {
-                fn_800DBA50(nPlayer);
+                GameEffects_InFlightGameBreakerTrigger(nPlayer);
             } else {
-                fn_800DB30C(nPlayer, pDo->n4);
+                GameEffects_ScriptedGameBreakerTrigger(nPlayer, pDo->n4);
             }
         }
         break;
@@ -238,8 +238,8 @@ void fn_800BD74C(void) {
 
 // ---- sounds and music ----------------------------------------------------------------------
 
-// Hand GameEffects a commentary line to play later (u48; fn_800DBDA8 plays it as the GameBreaker
-// ends), unless one is waiting already; not in mode 11.
+// Hand GameEffects a commentary line to play later (u48; GameEffects_EndGameBreaker plays it as the
+// GameBreaker ends), unless one is waiting already; not in mode 11.
 void fn_800BD77C(int nSound) {
     if (Game_GetMode() != 11 && !lbl_80202898.b47) {
         lbl_80202898.u48 = nSound;
@@ -247,7 +247,7 @@ void fn_800BD77C(int nSound) {
     }
 }
 
-// Hand GameEffects a music to play later (n4F; fn_800DBDA8 plays it as the GameBreaker ends).
+// Hand GameEffects a music to play later (n4F; GameEffects_EndGameBreaker plays it as the GameBreaker ends).
 void fn_800BD7D0(u8 nMusic) {
     lbl_80202898.b4E = 1;
     lbl_80202898.n4F = nMusic;

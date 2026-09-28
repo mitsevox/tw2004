@@ -1586,7 +1586,7 @@ void GolfCamera_ProcessSwingCamera(View* pView, int nPlayer) {
         || pView->script.nBC == 10) {
         pView->script.pNextShot = NULL;
     }
-    if (fn_800DC514(nPlayer) && gSession.nPaused == 0) {
+    if (GameEffects_IsSlowDownSwingOn(nPlayer) && gSession.nPaused == 0) {
         fTime = FRAME_TIME;
     }
     CamScript_RunScript(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, fTime);

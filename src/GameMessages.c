@@ -129,7 +129,7 @@ void fn_800E5240(int i) {
                 TI_vStartCounter(1);
             }
             lbl_802822DF = 0;
-            fn_800DC9D4(0);
+            GameEffects_Pause(0);
             fn_8009EF98();
             gSession.nPaused = 0;
             return;

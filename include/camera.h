@@ -70,7 +70,7 @@ typedef struct CamShot {
     f32  f7C;                   // 0x7C
     f32  f80;                   // 0x80
     f32  f84;                   // 0x84
-    f32  f88;                   // 0x88  CamScript_RunScript hands it (plus fn_800DC45C of it) to fn_800457B8
+    f32  f88;                   // 0x88  CamScript_RunScript hands it (plus GameEffects_DepthOfFieldChange of it) to fn_800457B8
     f32  f8C;                   // 0x8C  } CamScript_RunScript passes both to fn_80038054 (slow motion) when
     f32  f90;                   // 0x90  } either is above 0
     f32  f94;                   // 0x94

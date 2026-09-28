@@ -177,8 +177,8 @@ s8 GOLFERSTATE_GetPreviousState(int nPlayer) {
 }
 
 // Whether the golfer states are frozen: always 0 in this build (a stripped switch).
-// GOLFERSTATE_Update runs the states only when it is 0, and the GameEffects time step (fn_800DAF98)
-// stops time while it is set.
+// GOLFERSTATE_Update runs the states only when it is 0, and the GameEffects time step
+// (GameEffects_AdjustTimeRate) stops time while it is set.
 u8 GOLFERSTATE_IsFrozen(void) {
     return 0;
 }

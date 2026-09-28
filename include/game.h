@@ -321,22 +321,22 @@ LAYOUT_ASSERT(GameEffects, 0x58);
 
 extern GameEffects lbl_80202898;        // 0x80202898
 
-int  fn_800DB86C(int nPlayer);          // the putt about to be played is a big one (GameEffects.c)
-u8   fn_800DC818(Ball* pBall, int nPlayer, u8 bNext);
-u8   fn_800DC784(void);                 // TW06: GameEffects_SkipOtherCommentary
-void fn_800DB30C(int nPlayer, int nReason);
-void fn_800DBA50(int nPlayer);
-GameEffects* fn_800DAF74(void);
+int  GameEffects_IsScriptedGameBreaker(int nPlayer);          // the putt about to be played is a big one (GameEffects.c)
+u8   GameEffects_ScriptedGBDidIt(Ball* pBall, int nPlayer, u8 bNext);
+u8   GameEffects_SkipOtherCommentary(void);                 // TW06: GameEffects_SkipOtherCommentary
+void GameEffects_ScriptedGameBreakerTrigger(int nPlayer, int nReason);
+void GameEffects_InFlightGameBreakerTrigger(int nPlayer);
+GameEffects* GameEffects_ResetGameEffectTimeSettings(void);
 void GameEffects_ResetGameEffectSettings(void);
 f32  GameEffects_GetLetterboxHeight(void);
 int  GameEffects_BallUpdatesThisFrame(int nPlayer);   // the ball's physics steps this frame
-void fn_800DB4E8(int nPlayer);
-void fn_800DB714(int nPlayer);
-void fn_800DBDA8(int nPlayer);
+void GameEffects_TargetGameBreakerTrigger(int nPlayer);
+void GameEffects_ScriptedGameBreakerBallHitTrigger(int nPlayer);
+void GameEffects_EndGameBreaker(int nPlayer);
 void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate);
 f32  GameEffects_FieldOfViewChange(void);                 // the GameBreaker's field-of-view change
-u8   fn_800DC514(int nPlayer);         // super slow motion is on (nPlayer unused)
-void fn_800DC9D4(int a);                // pause or resume a GameBreaker
+u8   GameEffects_IsSlowDownSwingOn(int nPlayer);         // super slow motion is on (nPlayer unused)
+void GameEffects_Pause(int a);                // pause or resume a GameBreaker
 u8   fn_8003DCAC(void);                 // GoDynamicCam.c: the letterbox is up (predicted, or b19)
 
 // GameManager.c
