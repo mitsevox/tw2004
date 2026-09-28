@@ -50,7 +50,7 @@ void Gaud_ExitSpecialShot(u8 nPlayer);
 void AnimStream_AssignSlots(void);
 void GameEffects_SpinWindowDone(int nPlayer);
 void GUI_QueueTip(int n);
-void fn_8010D3B8(int nPlayer);
+void GameMode26_NoteSplitScreenShot(int nPlayer);
 void AI_SimAbort(void);
 void AI_AimAtPin(int nPlayer);
 void fn_80067220(int nPlayer);
@@ -138,7 +138,7 @@ void fn_80065DB8(int nPlayer, int nEvent, void* pData, int nArg) {
         fn_800A31E0(pData, nPlayer);
         fn_800BB1A8(&gPlayers[nPlayer].ball);
         SitDev_QueueEvent(nPlayer, 2, 5);
-        fn_8010D3B8(nPlayer);
+        GameMode26_NoteSplitScreenShot(nPlayer);
     }
 }
 

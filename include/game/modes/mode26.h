@@ -7,14 +7,14 @@
 #include "game_types.h"
 #include "platform.h"
 
-extern s32 gGameMode26TargetScore;        // the score that wins (fn_8010D334 sets it)
+extern s32 gGameMode26TargetScore;        // the score that wins (GameMode26_SetTargetScore sets it)
 extern s32 gGameMode26Winner;        // the player who reached it (5 = nobody yet)
 extern s32 gGameMode26LongestPlayer;        // the player with the longest scoring shot (5 = nobody yet)
 extern s32 gGameMode26WinnerCountdown;        // counts down every frame once there is a winner, from 120
-extern s32 gGameMode26LengthCheckFrames;        // frames to the next shot-length check (fn_8010C764), from 15
+extern s32 gGameMode26LengthCheckFrames;        // frames to the next shot-length check (GameMode26_UpdateFrame), from 15
 extern s32 gGameMode26LastLength[2];     // per player: the shot length at the last check
-extern s32 gGameMode26LengthSoundOn[2];     // per player: the track fn_8010C764 starts is playing
-extern u8  gGameMode26IntroSaid;        // set once fn_8010C764 has shown the mode's first message
+extern s32 gGameMode26LengthSoundOn[2];     // per player: the track GameMode26_UpdateFrame starts is playing
+extern u8  gGameMode26IntroSaid;        // set once GameMode26_UpdateFrame has shown the mode's first message
 extern f32 gGameMode26LongestLength;        // the longest scoring shot's length
 extern u8  gGameMode26Reached400[5];     // } per player: the track for reaching 400, 800 and 1200 points
 extern u8  gGameMode26Reached800[5];     // } has played (400, 800, 1200 in this order)

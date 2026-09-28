@@ -292,8 +292,8 @@ They will be sorted into the sections below.
 - **[verified] Set every loop cursor and end pointer as plain statements at the head of the loop**, in the
   original's order; an end pointer can double as the backward cursor (hlaudvoice fn_800AC330 78 -> 100).
 - **[verified] EA's message-list macro is `aMsgs[n] = x; n++;`**, not `aMsgs[n++] = x` (GameMode26
-  fn_8010CA2C, GameMode22 GameMode22_ScoreShot 91.4 -> 94.1). `PLAYER(i)->` instead of `gPlayers[i].` fixed both
-  twins' loops (fn_8010D278, GameMode22_ClearPlayerStats, about 73 -> 100).
+  GameMode26_ScoreShot, GameMode22 GameMode22_ScoreShot 91.4 -> 94.1). `PLAYER(i)->` instead of `gPlayers[i].` fixed both
+  twins' loops (GameMode26_ClearPlayerStats, GameMode22_ClearPlayerStats, about 73 -> 100).
 - **[verified] `(u32)` of a float held in a local calls `__cvt_fp2unsigned`**; the same cast of a literal is
   folded (DynChain fn_80116304 75.5 -> 95.4).
 - **[verified] A 64-bit id packed from u16s**: `u <<= 16; u |= p[i];` gives `slwi; or`
@@ -455,7 +455,7 @@ They will be sorted into the sections below.
   padding before it goes missing (OSThread: f64 array for 8-byte alignment).
 - **[verified] Some register rotations need a type change AND a declaration move together;** each alone
   scores no better, so one-change sweeps miss them. Sweep the pair (type x declaration order): GameMode26
-  fn_8010CA2C 39 diffs -> 0 (parameter as `PlayerNumber_t`, nLead after nLength), GoDynObj fn_8004731C
+  GameMode26_ScoreShot 39 diffs -> 0 (parameter as `PlayerNumber_t`, nLead after nLength), GoDynObj fn_8004731C
   38 -> 0 (`s32 i`, pLogoA before pLogoB).
 - **[verified] A list walked with a signed index gets folded into one walking pointer; EA's code keeps the
   list start and a byte offset apart.** The cast in the index, `list[(u32)i]`, brings EA's form back;

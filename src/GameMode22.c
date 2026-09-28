@@ -722,20 +722,20 @@ void GameMode22_ScoreShot(int nPlayer) {
         nMsgs = 0;
         if (nPlayer > 1) {
             if (nPlayer == gGameMode22.n8) {
-                fn_8010D428(2, 0);
+                GameMode26_StartComment(2, 0);
             } else {
-                fn_8010D428(1, 0);
+                GameMode26_StartComment(1, 0);
             }
         } else if (gGameMode22.n8 == 0) {
-            fn_8010D428(3, 0);
+            GameMode26_StartComment(3, 0);
         } else if (gGameMode22.n8 == 1) {
-            fn_8010D428(4, 0);
+            GameMode26_StartComment(4, 0);
         } else {
-            fn_8010D428(1, 0);
+            GameMode26_StartComment(1, 0);
         }
     }
     if (nMsgs > 0 && gGameMode22.n8 == 5) {
-        fn_8010D428(aMsgs[Misc_RandFunc(1) % nMsgs], 0);
+        GameMode26_StartComment(aMsgs[Misc_RandFunc(1) % nMsgs], 0);
     }
 }
 

@@ -32,7 +32,7 @@ void fn_800573E4(void);
 void fn_80091EE4(void);
 void fn_8007734C(void);
 void Gaud_StartFEMusic(int a);
-u8*  fn_8010C718(void);                     // CharSliders.c
+u8*  GameMode26_StartEvent(void);                     // CharSliders.c
 void fn_80091D84(void);
 void fn_80091E1C(void);
 void AI_TargetsClear(void);
@@ -113,7 +113,7 @@ void fn_800083A4(void) {
             if (gSession.nC == 0 && gSession.nGameType != 13) {
                 FE_StreamStopAllStreaming();
                 if (gSession.uFlags & 0x4000) {
-                    fn_8010C718();
+                    GameMode26_StartEvent();
                 }
                 fn_8000BAE0();
                 fn_80091D84();

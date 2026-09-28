@@ -45,7 +45,7 @@ void GM_SetSplitScreenForMode(void);                 // GameRound.c
 void GM_BuildRandom18(void);                 // GameRound.c: builds the random mixed round
 void Lessons_StartFromMenu(void);                 // GameMode11.c
 void GameModeDriverPGATour_PrepareForTeeOff(void);                 // GameModeDriverPGATour.c
-u8*  fn_8010C718(void);                 // CharSliders.c
+u8*  GameMode26_StartEvent(void);                 // CharSliders.c
 void GameMode22_StartEvent(void);                 // GameMode22.c
 s32  Gba_GetState(void);                 // gbacable.c
 void fn_8012409C(void);                 // gbacable.c
@@ -63,7 +63,7 @@ char* PlayNow_GetGroupDescription(int nId);             // GameMode5.c
 void PlayNow_GetRewards(int i, s32* pA, s32* pB, s32* pC);     // GameMode5.c
 int  GameMode4_GetNumEventsWon(void);                 // GameMode4.c
 void fn_80102308(s32 n);                // GameMode4.c
-void fn_8010D334(s32 v);                // CharSliders.c
+void GameMode26_SetTargetScore(s32 v);                // CharSliders.c
 void FE_SetProfileLeftHanded(int nSlot, int n);
 s32  MC_LoadOptions(MCCardPos* pPos);      // MC.c: load the save from the card
 s32  MC_SaveOptions(MCCardPos* pPos);      // } MC.c, in lbl_8018C7D8 (sets 0, 2, 1, 1)
@@ -4897,7 +4897,7 @@ void fn_80083A4C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80083BA4(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8010D334(pArgs[0].i);
+    GameMode26_SetTargetScore(pArgs[0].i);
 }
 
 void fn_80083BC8(MsgArg* pArgs, MsgArg* pResult) {
@@ -4940,7 +4940,7 @@ void fn_80083BFC(MsgArg* pArgs, MsgArg* pResult) {
     } else if (Game_GetMode() == 23) {
         GameModeDriverPGATour_PrepareForTeeOff();
     } else if (Game_GetMode() == 26) {
-        fn_8010C718();
+        GameMode26_StartEvent();
     } else if (Game_GetMode() == 22) {
         GameMode22_StartEvent();
     } else if (Game_GetMode() == 24) {

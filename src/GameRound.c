@@ -44,7 +44,7 @@ void  GM_DefaultSetTimeLeft(int nPlayer, int nTime);
 void  GM_DefaultBonusCollected(int nPlayer, int nId);
 s32   GM_DefaultTargetState(int a, int nTarget);
 void  GameModeDriverPGATour_Init(void);
-void  fn_8010C4A0(void);
+void  GameMode26_Init(void);
 void  GameMode22_Init(void);
 
 u8    GM_GetNeedToBuildPlayoffHoleList(void);
@@ -268,7 +268,7 @@ void GM_SetModeType(int nMode) {
         GameModeBattle_Init();
         break;
     case 26:
-        fn_8010C4A0();
+        GameMode26_Init();
         break;
     case 22:
         GameMode22_Init();

@@ -116,8 +116,8 @@ void GUI_Init(void) {
     GUI_SendMessage31();
 }
 
-u8    fn_8010D364(void);
-u8    fn_8010D390(void);
+u8    GameMode26_IsActive(void);
+u8    GameMode26_IsShowingWinner(void);
 u8    GameMode22_IsActive(void);
 u8    GameMode22_IsShowingWinner(void);
 
@@ -368,7 +368,7 @@ u8 GUI_IsPostShotUIAnimating(int nPlayer) {
     if (lbl_802822DB) {
         return 1;
     }
-    if (fn_8010D364() && fn_8010D390()) {
+    if (GameMode26_IsActive() && GameMode26_IsShowingWinner()) {
         return 1;
     }
     if (GameMode22_IsActive() && GameMode22_IsShowingWinner()) {

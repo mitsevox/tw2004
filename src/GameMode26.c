@@ -1,7 +1,7 @@
 // GameMode26.c (our name): game mode 26, a two-player long-drive contest and GameMode22.c's near
 // twin: each scoring shot earns its length in points, the first player to the target score
-// (fn_8010D334) wins. GameRound.c starts it with fn_8010C4A0 (its case 26), which fills gpGame's
-// callbacks with this file's hooks the way GameMode22.c's GameMode22_Init does; fn_8010D364 tests
+// (GameMode26_SetTargetScore) wins. GameRound.c starts it with GameMode26_Init (its case 26), which
+// fills gpGame's callbacks with this file's hooks the way GameMode22.c's GameMode22_Init does; GameMode26_IsActive tests
 // Game_GetMode() == 26. The file ends where CharSliders.c begins (CharSlider_Free, the slider code
 // char.c calls).
 
@@ -24,49 +24,53 @@ u8  gGameMode26Reached1200[5];
 u8  gGameMode26Reached800[5];
 u8  gGameMode26Reached400[5];
 f32 gGameMode26LongestLength;
-u8 gGameMode26SplitScreenShot;                        // set when the session is split screen (fn_8010D3B8)
+u8 gGameMode26SplitScreenShot;                        // set when the session is split screen (GameMode26_NoteSplitScreenShot)
 u8  gGameMode26IntroSaid;
 
-void fn_8010C714(void);
-void fn_8010C73C(void);
-void fn_8010C740(void);
-void fn_8010C764(void);
-void fn_8010C8B8(int nPlayer);
-u8   fn_8010C8D8(u8 bCheck);
-s32  fn_8010C8E0(int nPlayer);
-u8   fn_8010C8E8(int nPlayer, u8 bCheck);
-u8   fn_8010C934(u8 bCheck);
-void fn_8010C958(int nPlayer);
-void fn_8010C978(int nPlayer);
-s32  fn_8010C9D4(int nLie);
-void fn_8010CA2C(PlayerNumber_t nPlayer);
-void fn_8010D230(void);
-void fn_8010D250(void);
-void fn_8010D278(void);
-void fn_8010D32C(void);
-void fn_8010D330(void);
-u8   fn_8010D33C(s32* pnWinner);
+void GameMode26_Shutdown(void);
+void GameMode26_SetupNextGolfer(void);
+void GameMode26_EndGame(void);
+void GameMode26_UpdateFrame(void);
+void GameMode26_StartSwing(int nPlayer);
+u8   GameMode26_GoToPlayoff(u8 bCheck);
+s32  GameMode26_GetHonors(int nPlayer);
+u8   GameMode26_HoleFinished(int nPlayer, u8 bCheck);
+u8   GameMode26_GameFinished(u8 bCheck);
+void GameMode26_BallOutOfBounds(int nPlayer);
+void GameMode26_EndGolferTurn(int nPlayer);
+s32  GameMode26_GetLieGroup(int nLie);
+void GameMode26_ScoreShot(PlayerNumber_t nPlayer);
+void GameMode26_HoleStart(void);
+void GameMode26_RestartHole(void);
+void GameMode26_ClearPlayerStats(void);
+void GameMode26_AfterClearStats(void);
+void GameMode26_PreSwing(void);
+u8   GameMode26_GetWinner(s32* pnWinner);
 
-// The mode's setup: its callbacks, its rules (no gimmes, no mulligans, two players) and its
-// state reset.
-void fn_8010C4A0(void) {
+// Game mode 26's setup (GM_SetModeType): its callbacks; no gimmes, mulligans, stroke limit,
+// GameBreakers (b285), flight-camera toggles or in-flight replays (b286, b287), yardage or bumped
+// obstructions; two players (Session_SetNumPlayers), split screen as chosen (lbl_8028227C;
+// GM_SetSplitScreenForMode turns it on for this mode). No longest drive yet, the 120-frame winner
+// countdown and the intro comment reset, and the per-player score sounds (400 / 800 / 1200)
+// cleared. The winner is not reset here (GameMode26_StartEvent, GameMode26_RestartHole).
+void GameMode26_Init(void) {
     s32 i;
 
-    gpGame->pfnInit = fn_8010C4A0;
-    gpGame->pfnShutdown = fn_8010C714;
-    gpGame->pfnSetupNextGolfer = fn_8010C73C;
-    gpGame->pfnGetHonors = fn_8010C8E0;
-    gpGame->pfn250 = fn_8010C958;
-    gpGame->pfnHoleFinished = fn_8010C8E8;
-    gpGame->pfnGameFinished = fn_8010C934;
-    gpGame->pfnGoToPlayoff = fn_8010C8D8;
-    gpGame->pfnEndGolferTurn = fn_8010C978;
-    gpGame->pfnEndGame = fn_8010C740;
-    gpGame->pfn220 = fn_8010C764;
-    gpGame->pfn20C = fn_8010C8B8;
-    gpGame->pfn244 = (void (*)(int))fn_8010CA2C;    // port: its parameter is PlayerNumber_t, pfn244's int
-    gpGame->pfn1E4 = fn_8010D230;
-    gpGame->pfn224 = fn_8010D250;
+    gpGame->pfnInit = GameMode26_Init;
+    gpGame->pfnShutdown = GameMode26_Shutdown;
+    gpGame->pfnSetupNextGolfer = GameMode26_SetupNextGolfer;
+    gpGame->pfnGetHonors = GameMode26_GetHonors;
+    gpGame->pfn250 = GameMode26_BallOutOfBounds;
+    gpGame->pfnHoleFinished = GameMode26_HoleFinished;
+    gpGame->pfnGameFinished = GameMode26_GameFinished;
+    gpGame->pfnGoToPlayoff = GameMode26_GoToPlayoff;
+    gpGame->pfnEndGolferTurn = GameMode26_EndGolferTurn;
+    gpGame->pfnEndGame = GameMode26_EndGame;
+    gpGame->pfn220 = GameMode26_UpdateFrame;
+    gpGame->pfn20C = GameMode26_StartSwing;
+    gpGame->pfn244 = (void (*)(int))GameMode26_ScoreShot;    // port: its parameter is PlayerNumber_t, pfn244's int
+    gpGame->pfn1E4 = GameMode26_HoleStart;
+    gpGame->pfn224 = GameMode26_RestartHole;
     gpGame->bGimmesAllowed = 0;
     gpGame->b279 = 1;
     gpGame->b27F = 0;
@@ -104,28 +108,37 @@ void fn_8010C4A0(void) {
     }
 }
 
-void fn_8010C714(void) {
+// The mode's pfnShutdown: empty.
+void GameMode26_Shutdown(void) {
 }
 
-// Both players on the first tee set, the option n20 off and no winner.
-void fn_8010C718(void) {
+// Starts a mode-26 event: from the menus (FE_MessageTable.c fn_80083BFC, as GameMode22_StartEvent
+// for mode 22) and, with session flag 0x4000, from GoEntry.c as the front end starts again. Both
+// players on tee set 0, options.n20 off, and no winner (gGameMode26Winner 5).
+void GameMode26_StartEvent(void) {
     gSession.nTeeSet[0] = 0;
     gSession.nTeeSet[1] = 0;
     gSession.options.n20 = 0;
     gGameMode26Winner = 5;
 }
 
-void fn_8010C73C(void) {
+// The mode's pfnSetupNextGolfer: empty in this build (GameMode22's calls stroke play's).
+void GameMode26_SetupNextGolfer(void) {
 }
 
-void fn_8010C740(void) {
+// The game is over (pfnEndGame): the EA SPORTS Bio counts a won game (EASBio_SetCurrentGameWon). No
+// money is paid.
+void GameMode26_EndGame(void) {
     EASBio_SetCurrentGameWon(1);
 }
 
-// The mode's frame: every 16 frames each player's current shot length sent as message 0x4D (a
-// track plays, panned to the player's side, while it is a new nonzero length), the countdown once
-// there is a winner, and the mode's first message once.
-void fn_8010C764(void) {
+// Each frame (pfn220). Every 16 frames, for both players: the shot length (fn_800D0550) sent as
+// message 0x4D with the player; while it is nonzero and still changing a long-drive UI sound plays
+// (script 0, track 1; started once per player; EA also passes a loop flag and the player's side,
+// which Gaud_LongDriveUi_Play ignores), and it stops once the length stops changing. Once somebody
+// has won (gGameMode26Winner not 5) the winner countdown runs down. On the first frame the mode's
+// intro comment (line 0) is said.
+void GameMode26_UpdateFrame(void) {
     s32 i;
     s32 nLength;
 
@@ -152,52 +165,60 @@ void fn_8010C764(void) {
         gGameMode26WinnerCountdown--;
     }
     if (!gGameMode26IntroSaid) {
-        fn_8010D428(0, 0);
+        GameMode26_StartComment(0, 0);
         gGameMode26IntroSaid = 1;
     }
 }
 
-void fn_8010C8B8(int nPlayer) {
-    fn_8010D330();
+// As a swing begins (pfn20C): GameMode26_PreSwing (empty). nPlayer is not read.
+void GameMode26_StartSwing(int nPlayer) {
+    GameMode26_PreSwing();
 }
 
-u8 fn_8010C8D8(u8 bCheck) {
+// The mode's pfnGoToPlayoff: never a playoff (0).
+u8 GameMode26_GoToPlayoff(u8 bCheck) {
     return 0;
 }
 
-// Always 5: no player has the honor.
-s32 fn_8010C8E0(int nPlayer) {
+// Who plays next (pfnGetHonors): always 5, nobody; the mode never hands the turn to a player.
+// nPlayer is not read.
+s32 GameMode26_GetHonors(int nPlayer) {
     return 5;
 }
 
-// The hole is over once the game is and the countdown has run out.
-u8 fn_8010C8E8(int nPlayer, u8 bCheck) {
+// The hole is over (pfnHoleFinished) once somebody has won (GameMode26_GameFinished) and the
+// 120-frame winner countdown (gGameMode26WinnerCountdown) has run out. nPlayer is not read.
+u8 GameMode26_HoleFinished(int nPlayer, u8 bCheck) {
     s32 bRet = 0;
 
-    if (fn_8010C934(bCheck) && gGameMode26WinnerCountdown < 0) {
+    if (GameMode26_GameFinished(bCheck) && gGameMode26WinnerCountdown < 0) {
         bRet = 1;
     }
     return bRet;
 }
 
-// The game is over once somebody has won.
-u8 fn_8010C934(u8 bCheck) {
-    return fn_8010D33C(NULL);
+// The game is over (pfnGameFinished) once somebody has reached the target score
+// (GameMode26_GetWinner). bCheck is not read.
+u8 GameMode26_GameFinished(u8 bCheck) {
+    return GameMode26_GetWinner(NULL);
 }
 
-// The ball went out of bounds: scored as a shot.
-void fn_8010C958(int nPlayer) {
-    fn_8010CA2C(nPlayer);
+// The ball went out of bounds (pfn250): the drive is scored like any other (GameMode26_ScoreShot).
+void GameMode26_BallOutOfBounds(int nPlayer) {
+    GameMode26_ScoreShot(nPlayer);
 }
 
-// A fresh ball for the player on the tee set the session gives it.
-void fn_8010C978(int nPlayer) {
+// End of a golfer's turn (pfnEndGolferTurn): the ball goes back on the player's tee (his tee set)
+// for the next drive.
+void GameMode26_EndGolferTurn(int nPlayer) {
     Physics_InitBall(&gPlayers[nPlayer].ball,
                 &gPlayers[nPlayer].ball.pCourse->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
 }
 
-// The group a lie falls in for scoring (fn_8010CA2C).
-s32 fn_8010C9D4(int nLie) {
+// The contest's scoring group of lie nLie, as GameMode22_GetLieGroup: 0 the tee; 1 the fairways and
+// the fringe (and any lie not listed: cart path, water, out of bounds); 2 the roughs, ice, snow and
+// misc; 3 the sands; 4 the green; 5 in the cup.
+s32 GameMode26_GetLieGroup(int nLie) {
     switch (nLie) {
     case 0:
         return 0;
@@ -231,10 +252,19 @@ s32 fn_8010C9D4(int nLie) {
         nMsgs++;                            \
     }
 
-// A shot is over: score it by where the ball ended up, keep the players' shot statistics, play
-// the tracks for new records and point totals, and say one of the collected messages. The first
-// player to gGameMode26TargetScore points wins.
-void fn_8010CA2C(PlayerNumber_t nPlayer) {
+// A drive is over (pfn244; GameMode26_BallOutOfBounds for one out of bounds); nothing once somebody
+// has won. Scored as in GameMode22_ScoreShot: surface 0x9B kind 1, the length plus 20%; surface
+// 0x2F or 0x68 kind 4, -100 (with a sound); bLowIQPenalty set kind 5, -100; else by
+// GameMode26_GetLieGroup: the tee or the rough kind 2, 0 points; the fairway, green or cup kind 0,
+// the length; sand kind 3, -50. Kinds 0 and 1 are fair drives: counted (nEA4), their total (nEC4)
+// and average (nEC0) kept, and 400 or more earns 100 more; every drive counts (nEA0) and each kind
+// has its own count. The score (nEBC) never drops below 0 and goes to the scoreboard (message
+// 0x42); sounds the first time it reaches 400, 800 and 1200. The player's longest fair drive (nEA8)
+// and where it lay (vEAC) are kept, with message 0x4C when it beats the other player's. The first
+// to gGameMode26TargetScore points wins (gGameMode26Winner) with one of four winning lines;
+// otherwise one line is said at random from those the drive earned (a new longest drive, a long
+// one, a bad one, taking the lead).
+void GameMode26_ScoreShot(PlayerNumber_t nPlayer) {
     s32 nKind;
     Player* pPlayer = &gPlayers[nPlayer];
     u8 bCounts = 0;
@@ -246,7 +276,7 @@ void fn_8010CA2C(PlayerNumber_t nPlayer) {
     s32 nPick;
     u16 aMsgs[20];
 
-    if (fn_8010D33C(NULL)) {
+    if (GameMode26_GetWinner(NULL)) {
         return;
     }
     nLead = gPlayers[nPlayer].nEBC - gPlayers[nPlayer == 0].nEBC;
@@ -265,7 +295,7 @@ void fn_8010CA2C(PlayerNumber_t nPlayer) {
             nKind = 5;
             break;
         }
-        switch (fn_8010C9D4(pPlayer->ball.nLie)) {
+        switch (GameMode26_GetLieGroup(pPlayer->ball.nLie)) {
         case 0:
         case 2:
             nKind = 2;
@@ -417,31 +447,37 @@ void fn_8010CA2C(PlayerNumber_t nPlayer) {
         nMsgs = 0;
         nPick = Misc_RandFunc(1) % 3;
         if (nPick == 0) {
-            fn_8010D428(1, 0);
+            GameMode26_StartComment(1, 0);
         } else if (nPick == 1) {
-            fn_8010D428(2, 0);
+            GameMode26_StartComment(2, 0);
         } else if (nPlayer == 0) {
-            fn_8010D428(3, 0);
+            GameMode26_StartComment(3, 0);
         } else {
-            fn_8010D428(4, 0);
+            GameMode26_StartComment(4, 0);
         }
     }
     if (nMsgs > 0 && gGameMode26Winner == 5) {
-        fn_8010D428(aMsgs[Misc_RandFunc(1) % nMsgs], 0);
+        GameMode26_StartComment(aMsgs[Misc_RandFunc(1) % nMsgs], 0);
     }
 }
 
-void fn_8010D230(void) {
-    fn_8010D278();
+// The hole starts (pfn1E4): every player's contest values cleared (GameMode26_ClearPlayerStats).
+void GameMode26_HoleStart(void) {
+    GameMode26_ClearPlayerStats();
 }
 
-void fn_8010D250(void) {
-    fn_8010D278();
+// The hole restarts (pfn224): every player's contest values cleared, and no winner
+// (gGameMode26Winner 5).
+void GameMode26_RestartHole(void) {
+    GameMode26_ClearPlayerStats();
     gGameMode26Winner = 5;
 }
 
-// Every player's mode values cleared (and message 0x42 sent for each).
-void fn_8010D278(void) {
+// Every player's contest values cleared: drives, fair drives, longest drive, score (nEBC), average,
+// total and the counts per kind (0xEA0..0xEDC; vEAC stays), each score sent to the scoreboard
+// (message 0x42); then GameMode26_AfterClearStats (empty). Unlike GameMode22_ClearPlayerStats it
+// leaves the current player (lbl_80282278) as it is.
+void GameMode26_ClearPlayerStats(void) {
     s32 i;
 
     for (i = 0; i < 5; i++) {
@@ -459,48 +495,57 @@ void fn_8010D278(void) {
         PLAYER(i)->nEDC = 0;
         GUI_UpdateLongDriveScore(i, PLAYER(i)->nEBC, 0, 0, 0, 0, 0, 0.0f);
     }
-    fn_8010D32C();
+    GameMode26_AfterClearStats();
 }
 
-void fn_8010D32C(void) {
+// Empty in this build; GameMode26_ClearPlayerStats calls it last.
+void GameMode26_AfterClearStats(void) {
 }
 
-void fn_8010D330(void) {
+// Empty in this build; GameMode26_StartSwing calls it.
+void GameMode26_PreSwing(void) {
 }
 
-void fn_8010D334(s32 v) {
+// The score that wins (gGameMode26TargetScore, 10000 until set), from the menu (FE_MessageTable.c
+// fn_80083BA4).
+void GameMode26_SetTargetScore(s32 v) {
     gGameMode26TargetScore = v;
 }
 
-// Whether somebody has won, and who (5 = nobody).
-u8 fn_8010D33C(s32* pnWinner) {
+// Whether somebody has won (gGameMode26Winner not 5); the winner (5 none) into *pnWinner when
+// pnWinner is not NULL.
+u8 GameMode26_GetWinner(s32* pnWinner) {
     if (pnWinner != NULL) {
         *pnWinner = gGameMode26Winner;
     }
     return gGameMode26Winner != 5;
 }
 
-u8 fn_8010D364(void) {
+// Whether game mode 26 is being played (GUI_IsPostShotUIAnimating asks).
+u8 GameMode26_IsActive(void) {
     return Game_GetMode() == 26;
 }
 
-// The countdown is running: somebody has won and it has not run out.
-u8 fn_8010D390(void) {
+// Whether somebody has won and the 120-frame winner countdown (gGameMode26WinnerCountdown) is still
+// running; the post-shot UI keeps animating meanwhile (GUI_IsPostShotUIAnimating).
+u8 GameMode26_IsShowingWinner(void) {
     if (gGameMode26Winner != 5 && gGameMode26WinnerCountdown > 0) {
         return 1;
     }
     return 0;
 }
 
-void fn_8010D3B8(void) {
+// Called by event.c's handler of event 10 (fn_80065DB8, nArg 1) in every mode: in split screen it
+// sets gGameMode26SplitScreenShot, which nothing in the binary reads. nPlayer is not read.
+void GameMode26_NoteSplitScreenShot(void) {
     if (gSession.nSplitScreen) {
         gGameMode26SplitScreenShot = 1;
     }
 }
 
-// A track (Gaud_LongDriveUi_Play kind 1, track 0) when the player's ball is on surface 155 (GameAudio.c
-// calls it when the ball hits a surface).
-void fn_8010D3D8(int nPlayer) {
+// A ball bounce in the long-drive modes (Gaud_BallBounce, modes 22 and 26): on surface 155 (0x9B,
+// where a drive scores 20% more) a long-drive sound plays (script 1, stepped to 0).
+void GameMode26_BallBounceSound(int nPlayer) {
     Player* pPlayer = &gPlayers[nPlayer];
 
     if (pPlayer->ball.nSurface == 155) {
@@ -509,6 +554,8 @@ void fn_8010D3D8(int nPlayer) {
     }
 }
 
-void fn_8010D428(s32 p0, s32 p1) {
+// Plays line nLine of commentary playlist 8, the long-drive contests' lines (Gaud_StartComment; a
+// is passed on, 0 from every caller). GameMode22_ScoreShot uses it too.
+void GameMode26_StartComment(s32 p0, s32 p1) {
     Gaud_StartComment(8, p0, p1);
 }

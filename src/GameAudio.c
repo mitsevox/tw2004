@@ -32,7 +32,7 @@ void Aud_EmiSet3DPos(u8 nId, f32* pPos, f32* pLast, u8 b);
 void Aud_EmiSetTrackPitchFactor(u8 nId, u8 nTrack, f32 fPitch);
 void Aud_EmiAliasSet3DPos(s16 nKind, f32* pPos, f32* pLast, u8 b);
 
-void fn_8010D3D8(int nPlayer);
+void GameMode26_BallBounceSound(int nPlayer);
 u8   fn_8006BEA4(void);                    // emotion.c: a scripted GameBreaker's letterbox is up
 void Aud_EmiSetTrackAttenuation(u8 nId, u8 nTrack, f32 fVolume);
 
@@ -1140,7 +1140,7 @@ void Gaud_SwingBallHit(u8 nPlayer) {
 // (its nSoundId, a step of the ball emitter), louder the faster the ball ((0.03 x speed) squared,
 // at most 1; surface sound 4 always 1), none when too soft (0.1) or within 0.2 s of the last one.
 // On course 7's hole index 2 a surface with a swing sound plays that instead, under emitter 4, at
-// up to twice the volume. In the long-drive modes (22, 26) GameMode26.c's fn_8010D3D8 is told.
+// up to twice the volume. In the long-drive modes (22, 26) GameMode26.c's GameMode26_BallBounceSound is told.
 // Always ends the top-of-arc build-up.
 void Gaud_BallBounce(u8 nPlayer) {
     Player* pPlayer;
@@ -1189,7 +1189,7 @@ void Gaud_BallBounce(u8 nPlayer) {
                 Aud_EmiSetTrackAttenuation(nId, 0, fVolume);
             }
             if (Game_GetMode() == 26 || Game_GetMode() == 22) {
-                fn_8010D3D8(nPlayer);
+                GameMode26_BallBounceSound(nPlayer);
             }
         }
     }
