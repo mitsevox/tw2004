@@ -11,17 +11,17 @@
 #include "engine.h"
 
 // Written in reverse address order (CodeWarrior lays out .sbss last-defined-first).
-s32* lbl_80281BD4;                      // the span table: addresses, a free span from [i] to [i + 1]
+s32* gStaticMemSpans;                      // the span table: addresses, a free span from [i] to [i + 1]
                                         // for each odd i; [0] and the last one bound the heap
-s32  lbl_80281BD0;                      // the table's last index
-s32  lbl_80281BCC;                      // the cursor: where the next low-end search starts
-s32  lbl_80281BC8;                      // the table's capacity, less one
+s32  gStaticMemLast;                      // the table's last index
+s32  gStaticMemCursor;                      // the cursor: where the next low-end search starts
+s32  gStaticMemTableMax;                      // the table's capacity, less one
 s32  lbl_80281BC4;
-u8*  lbl_80281BC0;                      // the heap's memory
-s32  lbl_80281BBC;                      // the heap's size
-s32  lbl_80281BB8;
-s32  lbl_80281BB4;                      // bytes taken since StaticMem_ResetCount, while counting is on
-u8   lbl_80281BB0;                      // count the bytes taken (StaticMem_StartCount / StaticMem_StopCount)
+u8*  gStaticMemHeap;                      // the heap's memory
+s32  gStaticMemHeapSize;                      // the heap's size
+s32  gStaticMemMode;
+s32  gStaticMemCount;                      // bytes taken since StaticMem_ResetCount, while counting is on
+u8   gStaticMemCounting;                      // count the bytes taken (StaticMem_StartCount / StaticMem_StopCount)
 
 int printf(const char* pFmt, ...);          // MSL
 int  StaticMem_FindFitUp(int nSize);
@@ -31,14 +31,14 @@ int  StaticMem_FindEntry(s32 nAddr);
 
 // Gives the heap and its table back to the system.
 void StaticMem_Shutdown(void) {
-    if (lbl_80281BC0 != NULL) {
-        fn_8009527C(lbl_80281BC0);
+    if (gStaticMemHeap != NULL) {
+        fn_8009527C(gStaticMemHeap);
     }
-    if (lbl_80281BD4 != NULL) {
-        fn_8009527C(lbl_80281BD4);
+    if (gStaticMemSpans != NULL) {
+        fn_8009527C(gStaticMemSpans);
     }
-    lbl_80281BC0 = NULL;
-    lbl_80281BD4 = NULL;
+    gStaticMemHeap = NULL;
+    gStaticMemSpans = NULL;
 }
 
 // Empty in this build; main calls it first, before the start-up list fn_80005520. Left unnamed: an
@@ -57,18 +57,18 @@ void fn_800097C8(void) {
 // printed size is a fixed number (144,888), not the heap's. StaticMem_Reset then makes the heap one
 // free span.
 void StaticMem_Init(void) {
-    lbl_80281BC0 = NULL;
-    lbl_80281BD4 = NULL;
-    lbl_80281BC8 = 0x403;
+    gStaticMemHeap = NULL;
+    gStaticMemSpans = NULL;
+    gStaticMemTableMax = 0x403;
     lbl_80281BC4 = 0x302;
-    lbl_80281BD4 = fn_800951A0((lbl_80281BC8 + 1) * sizeof(s32), 16, 1);
+    gStaticMemSpans = fn_800951A0((gStaticMemTableMax + 1) * sizeof(s32), 16, 1);
     printf("StaticMemory: %d\n", 0x235F8);
-    lbl_80281BBC = (0x14C7FC3 - ((lbl_80281BC8 + 1) * sizeof(s32) + 0x1AD400)) & ~3;
-    lbl_80281BC0 = fn_800951A0(lbl_80281BBC, 16, 1);
-    if (lbl_80281BC0 == NULL) {     // fake match: the loop's own test, first on the returned value
-        while (lbl_80281BC0 == NULL) {
-            lbl_80281BBC -= 0x1000;
-            lbl_80281BC0 = fn_800951A0(lbl_80281BBC, 16, 1);
+    gStaticMemHeapSize = (0x14C7FC3 - ((gStaticMemTableMax + 1) * sizeof(s32) + 0x1AD400)) & ~3;
+    gStaticMemHeap = fn_800951A0(gStaticMemHeapSize, 16, 1);
+    if (gStaticMemHeap == NULL) {     // fake match: the loop's own test, first on the returned value
+        while (gStaticMemHeap == NULL) {
+            gStaticMemHeapSize -= 0x1000;
+            gStaticMemHeap = fn_800951A0(gStaticMemHeapSize, 16, 1);
         }
     }
 }
@@ -80,17 +80,17 @@ void StaticMem_Init(void) {
 void StaticMem_Reset(void) {
     s32 nSize;
 
-    nSize = lbl_80281BBC;
-    Mem_set(lbl_80281BC0, 0x77, nSize);
+    nSize = gStaticMemHeapSize;
+    Mem_set(gStaticMemHeap, 0x77, nSize);
     // port: addresses stored as integers (see the top of the file).
-    lbl_80281BD4[0] = (s32)lbl_80281BC0;
+    gStaticMemSpans[0] = (s32)gStaticMemHeap;
     // port: as above.
-    lbl_80281BD4[1] = (s32)lbl_80281BC0;
+    gStaticMemSpans[1] = (s32)gStaticMemHeap;
     // port: as above.
-    lbl_80281BD4[2] = (s32)(lbl_80281BC0 + nSize);
-    lbl_80281BD4[3] = lbl_80281BD4[2];
-    lbl_80281BD0 = 3;
-    lbl_80281BCC = 1;
+    gStaticMemSpans[2] = (s32)(gStaticMemHeap + nSize);
+    gStaticMemSpans[3] = gStaticMemSpans[2];
+    gStaticMemLast = 3;
+    gStaticMemCursor = 1;
 }
 
 // Empty in this build; runs last in the once-only set-up fn_8006C720 and in the per-mode shut-down
@@ -105,14 +105,14 @@ int StaticMem_FindFitUp(int nSize) {
     s32* pSpan;
     int i;
 
-    pSpan = &lbl_80281BD4[lbl_80281BCC];
-    for (i = lbl_80281BCC; i < lbl_80281BD0; pSpan += 2, i += 2) {
+    pSpan = &gStaticMemSpans[gStaticMemCursor];
+    for (i = gStaticMemCursor; i < gStaticMemLast; pSpan += 2, i += 2) {
         if (pSpan[1] - pSpan[0] >= nSize) {
             return i;
         }
     }
-    pSpan = &lbl_80281BD4[1];
-    for (i = 1; i < lbl_80281BCC; pSpan += 2, i += 2) {
+    pSpan = &gStaticMemSpans[1];
+    for (i = 1; i < gStaticMemCursor; pSpan += 2, i += 2) {
         if (pSpan[1] - pSpan[0] >= nSize) {
             return i;
         }
@@ -127,14 +127,14 @@ int StaticMem_FindFitDown(int nSize) {
     s32* pSpan;
     int i;
 
-    pSpan = &lbl_80281BD4[lbl_80281BCC - 2];
-    for (i = lbl_80281BCC - 2; i > 0; pSpan -= 2, i -= 2) {
+    pSpan = &gStaticMemSpans[gStaticMemCursor - 2];
+    for (i = gStaticMemCursor - 2; i > 0; pSpan -= 2, i -= 2) {
         if (pSpan[1] - pSpan[0] >= nSize) {
             return i;
         }
     }
-    pSpan = &lbl_80281BD4[lbl_80281BD0 - 2];
-    for (i = lbl_80281BD0 - 2; i >= lbl_80281BCC; pSpan -= 2, i -= 2) {
+    pSpan = &gStaticMemSpans[gStaticMemLast - 2];
+    for (i = gStaticMemLast - 2; i >= gStaticMemCursor; pSpan -= 2, i -= 2) {
         if (pSpan[1] - pSpan[0] >= nSize) {
             return i;
         }
@@ -154,8 +154,8 @@ int StaticMem_FindBestFit(int nSize) {
 
     nBestSpan = 0x40000000;
     nBest = -1;
-    pSpan = &lbl_80281BD4[lbl_80281BCC - 2];
-    for (i = lbl_80281BCC - 2; i > 0; pSpan -= 2, i -= 2) {
+    pSpan = &gStaticMemSpans[gStaticMemCursor - 2];
+    for (i = gStaticMemCursor - 2; i > 0; pSpan -= 2, i -= 2) {
         nSpan = pSpan[1] - pSpan[0];
         if (nSpan == nSize) {
             return i;
@@ -165,8 +165,8 @@ int StaticMem_FindBestFit(int nSize) {
             nBestSpan = nSpan;
         }
     }
-    pSpan = &lbl_80281BD4[lbl_80281BD0 - 2];
-    for (i = lbl_80281BD0 - 2; i >= lbl_80281BCC; pSpan -= 2, i -= 2) {
+    pSpan = &gStaticMemSpans[gStaticMemLast - 2];
+    for (i = gStaticMemLast - 2; i >= gStaticMemCursor; pSpan -= 2, i -= 2) {
         nSpan = pSpan[1] - pSpan[0];
         if (nSpan == nSize) {
             return i;
@@ -228,10 +228,10 @@ void* StaticMem_Alloc(int nSize, int nMode, int nAlign, const char* pFile, int n
                 bRetry = 0;
                 continue;
             }
-            lbl_80281BCC = i;
+            gStaticMemCursor = i;
             {
                 // fake match: the block address in its own local, copied to nBlock after the header
-                s32 nAddr = lbl_80281BD4[i] + 8;
+                s32 nAddr = gStaticMemSpans[i] + 8;
 
                 nMisalign = nAddr & (nAlign - 1);
                 if (nMisalign != 0) {
@@ -240,16 +240,16 @@ void* StaticMem_Alloc(int nSize, int nMode, int nAlign, const char* pFile, int n
                 // port: as above.
                 ((s32*)nAddr)[-1] = nSize;
                 // port: as above.
-                ((s32*)nAddr)[-2] = lbl_80281BD4[i];
+                ((s32*)nAddr)[-2] = gStaticMemSpans[i];
                 nBlock = nAddr;
             }
             // port: as above.
             Mem_set((void*)nBlock, 0x33, nWanted);
-            lbl_80281BD4[i] += nSize;
-            pSpan = &lbl_80281BD4[i];
-            if (pSpan[0] == pSpan[1] && lbl_80281BD0 > 3) {
-                Mem_cpy(pSpan, pSpan + 2, (lbl_80281BD0 - i - 1) * sizeof(s32));
-                lbl_80281BD0 -= 2;
+            gStaticMemSpans[i] += nSize;
+            pSpan = &gStaticMemSpans[i];
+            if (pSpan[0] == pSpan[1] && gStaticMemLast > 3) {
+                Mem_cpy(pSpan, pSpan + 2, (gStaticMemLast - i - 1) * sizeof(s32));
+                gStaticMemLast -= 2;
             }
             break;
         case 1:
@@ -269,8 +269,8 @@ void* StaticMem_Alloc(int nSize, int nMode, int nAlign, const char* pFile, int n
                 bRetry = 0;
                 continue;
             }
-            lbl_80281BD4[i + 1] -= nSize;
-            nBlock = lbl_80281BD4[i + 1] + 8;
+            gStaticMemSpans[i + 1] -= nSize;
+            nBlock = gStaticMemSpans[i + 1] + 8;
             nMisalign = nBlock & (nAlign - 1);
             if (nMisalign != 0) {
                 nBlock += nAlign - nMisalign;
@@ -278,23 +278,23 @@ void* StaticMem_Alloc(int nSize, int nMode, int nAlign, const char* pFile, int n
             // port: as above.
             ((s32*)nBlock)[-1] = nSize;
             // port: as above.
-            ((s32*)nBlock)[-2] = lbl_80281BD4[i + 1];
+            ((s32*)nBlock)[-2] = gStaticMemSpans[i + 1];
             // port: as above.
             Mem_set((void*)nBlock, 0x55, nWanted);
-            pSpan = &lbl_80281BD4[i];
-            if (pSpan[0] == pSpan[1] && lbl_80281BD0 > 3) {
-                Mem_cpy(pSpan, pSpan + 2, (lbl_80281BD0 - i - 1) * sizeof(s32));
-                lbl_80281BD0 -= 2;
-                if (lbl_80281BCC >= i + 2) {
-                    lbl_80281BCC -= 2;
+            pSpan = &gStaticMemSpans[i];
+            if (pSpan[0] == pSpan[1] && gStaticMemLast > 3) {
+                Mem_cpy(pSpan, pSpan + 2, (gStaticMemLast - i - 1) * sizeof(s32));
+                gStaticMemLast -= 2;
+                if (gStaticMemCursor >= i + 2) {
+                    gStaticMemCursor -= 2;
                 }
             }
             break;
         }
         break;
     }
-    if (lbl_80281BB0) {
-        lbl_80281BB4 += nSize;
+    if (gStaticMemCounting) {
+        gStaticMemCount += nSize;
     }
     // port: as above.
     return (void*)nBlock;
@@ -309,16 +309,16 @@ int StaticMem_FindEntry(s32 nAddr) {
     int nMid;
 
     nLo = 0;
-    nHi = lbl_80281BD0 - 1;
+    nHi = gStaticMemLast - 1;
     while (nHi - nLo > 1) {
         nMid = (nLo + nHi) / 2;
-        if (lbl_80281BD4[nMid] > nAddr) {
+        if (gStaticMemSpans[nMid] > nAddr) {
             nHi = nMid;
         } else {
             nLo = nMid;
         }
     }
-    if (lbl_80281BD4[nHi] <= nAddr) {
+    if (gStaticMemSpans[nHi] <= nAddr) {
         return nHi;
     }
     return nLo;
@@ -334,60 +334,60 @@ void StaticMem_Free(void* p) {
     s32* pSpan;
 
     // port: addresses compared as integers (see the top of the file).
-    if ((s32)p >= lbl_80281BD4[0] && (s32)p < lbl_80281BD4[lbl_80281BD0]) {
+    if ((s32)p >= gStaticMemSpans[0] && (s32)p < gStaticMemSpans[gStaticMemLast]) {
         nStart = ((s32*)p)[-2];
         nSize = ((s32*)p)[-1];
         nEnd = nStart + nSize;
         i = StaticMem_FindEntry(nStart);
         // port: as above.
         Mem_set((void*)nStart, 0x11, nEnd - nStart);
-        if (lbl_80281BB0) {
-            lbl_80281BB4 -= nSize;
+        if (gStaticMemCounting) {
+            gStaticMemCount -= nSize;
         }
-        pSpan = &lbl_80281BD4[i];
+        pSpan = &gStaticMemSpans[i];
         if (nStart == pSpan[0]) {
             if (nEnd == pSpan[1]) {
                 // it fills the gap between two spans: they become one
-                if (i != 0 && i != lbl_80281BD0 - 1) {
-                    Mem_cpy(pSpan, pSpan + 2, (lbl_80281BD0 - i - 1) * sizeof(s32));
-                    lbl_80281BD0 -= 2;
-                    if (lbl_80281BCC >= i) {
-                        lbl_80281BCC -= 2;
+                if (i != 0 && i != gStaticMemLast - 1) {
+                    Mem_cpy(pSpan, pSpan + 2, (gStaticMemLast - i - 1) * sizeof(s32));
+                    gStaticMemLast -= 2;
+                    if (gStaticMemCursor >= i) {
+                        gStaticMemCursor -= 2;
                     }
                 } else if (i == 0) {
-                    lbl_80281BD4[1] = nStart;
+                    gStaticMemSpans[1] = nStart;
                 } else {
                     pSpan[0] = nEnd;
                 }
             } else if (i > 0) {
                 pSpan[0] = nEnd;
             } else {
-                Mem_move(&lbl_80281BD4[3], &lbl_80281BD4[1], lbl_80281BD0 * sizeof(s32));
-                lbl_80281BD4[1] = nStart;
-                lbl_80281BD4[2] = nEnd;
-                lbl_80281BD0 += 2;
-                lbl_80281BCC += 2;
+                Mem_move(&gStaticMemSpans[3], &gStaticMemSpans[1], gStaticMemLast * sizeof(s32));
+                gStaticMemSpans[1] = nStart;
+                gStaticMemSpans[2] = nEnd;
+                gStaticMemLast += 2;
+                gStaticMemCursor += 2;
             }
         } else {
             s32* pEnd = pSpan + 1;
 
             if (nEnd == pSpan[1]) {
-                if (i + 1 < lbl_80281BD0) {
+                if (i + 1 < gStaticMemLast) {
                     *pEnd = nStart;
                 } else {
-                    lbl_80281BD4[lbl_80281BD0 + 2] = lbl_80281BD4[lbl_80281BD0];
-                    lbl_80281BD4[lbl_80281BD0] = nStart;
-                    lbl_80281BD4[lbl_80281BD0 + 1] = nEnd;
-                    lbl_80281BD0 += 2;
+                    gStaticMemSpans[gStaticMemLast + 2] = gStaticMemSpans[gStaticMemLast];
+                    gStaticMemSpans[gStaticMemLast] = nStart;
+                    gStaticMemSpans[gStaticMemLast + 1] = nEnd;
+                    gStaticMemLast += 2;
                 }
             } else {
-                Mem_move(pSpan + 3, pEnd, (lbl_80281BD0 - i) * sizeof(s32));
-                lbl_80281BD0 += 2;
-                if (lbl_80281BCC > i) {
-                    lbl_80281BCC += 2;
+                Mem_move(pSpan + 3, pEnd, (gStaticMemLast - i) * sizeof(s32));
+                gStaticMemLast += 2;
+                if (gStaticMemCursor > i) {
+                    gStaticMemCursor += 2;
                 }
-                lbl_80281BD4[i + 1] = nStart;
-                lbl_80281BD4[i + 2] = nEnd;
+                gStaticMemSpans[i + 1] = nStart;
+                gStaticMemSpans[i + 2] = nEnd;
             }
         }
     } else {
@@ -399,30 +399,30 @@ void StaticMem_Free(void* p) {
 // allocator TibExtMemAlloc uses. It starts at 0; EASBio_InitOnce sets 0 while the library starts,
 // then 2.
 void StaticMem_SetMode(s32 n) {
-    lbl_80281BB8 = n;
+    gStaticMemMode = n;
 }
 
 // The mode set by StaticMem_SetMode.
 s32 StaticMem_GetMode(void) {
-    return lbl_80281BB8;
+    return gStaticMemMode;
 }
 
 // Starts a new count of the bytes taken.
 void StaticMem_ResetCount(void) {
-    lbl_80281BB4 = 0;
+    gStaticMemCount = 0;
 }
 
 void StaticMem_StartCount(void) {
-    lbl_80281BB0 = 1;
+    gStaticMemCounting = 1;
 }
 
 void StaticMem_StopCount(void) {
-    lbl_80281BB0 = 0;
+    gStaticMemCounting = 0;
 }
 
 // The bytes taken while counting was on since StaticMem_ResetCount: the padded sizes
 // StaticMem_Alloc gave out (a system-heap block counts its size) less the sizes StaticMem_Free took
 // back from this heap (a system-heap block is not taken off).
 s32 StaticMem_GetCount(void) {
-    return lbl_80281BB4;
+    return gStaticMemCount;
 }
