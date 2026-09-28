@@ -1,6 +1,12 @@
-// GameModeDriverPGATour.c (TW06's GameModeDriverPGATour): game mode 23, a PGA Tour season of 31
-// tournaments (gPgaData, loaded from the 'PGA' stream objects), with the player's results kept in
-// the save profile (TourSeason): "Did Not Play", "Cut" or a finishing place.
+// GameModeDriverPGATour.c (TW06's GameModeDriverPGATour; TW07 GameModeDriver_PGATour.cpp): game
+// mode 23, the PGA TOUR career. Ten seasons (2004-2013) of up to 31 tournaments; the tour data
+// (gPgaData) comes from the 'PGAc' (tournaments), 'PGAt' (their formats), 'PGAp' (sponsorship
+// offers) and 'PGAn' (names) stream objects. The player plays a tournament's rounds one by one
+// against a simulated field (PGATourSimulation.c), with a cut after the second round and a playoff
+// on a tie for the lead; the calendar (GameModeDriver.c) can skip ahead, simulating the tournaments
+// in between. The season is kept in save profile 0 (TourSeason): the current tournament and round,
+// each tournament's champion and the player's result ("Did Not Play", "Cut" or a place). The
+// prize bracket grows with the tournaments won.
 
 #include "golfer.h"
 #include "game.h"
@@ -11,17 +17,23 @@
 
 // PGA TOUR driver state; only this file uses it. The uninitialised ones are defined last address
 // first: the compiler lays out a file's .bss and .sbss last definition first.
-s32 gPgaSavedOptionsC = 4;           // the options' nC from before the tour (fn_800EE02C puts it back)
-s32 gPgaSavedOptions18 = 1;           // the options' n18 from before a tour round (fn_800EE0A0 keeps it)
+s32 gPgaSavedOptionsC = 4;      // the options' nC from before a tour round (fn_800EE02C puts it
+                                //   back)
+s32 gPgaSavedOptions18 = 1;     // the options' n18 from before a tour round (fn_800EE0A0 keeps it;
+                                //   nothing puts it back)
 
-PgaData gPgaData;
-Pga80205F30 gPgaWinInfo;
-PgaStatCounts gPgaRoundStats;
+PgaData gPgaData;               // the tour data, from the 'PGA' stream objects
+Pga80205F30 gPgaWinInfo;        // the player's prize in the tournament just played: set when it is
+                                //   paid (fn_800EF094), shown on the result screen.
+                                //   TW07: PgaTour_WinInfo (GetWinInfo)
+PgaStatCounts gPgaRoundStats;   // the current round's statistics (see pgatour.h)
 
-s32 gPgaPlayoffHole;               // the playoff hole index: set to 16, each playoff moves it on
+s32 gPgaPlayoffHole;            // the playoff hole index: set to 16, each playoff moves it on
                                 //   (17, 15, 16, 17, ...; GameModeDriverPGATour_GoToPlayoff)
-u8  gbPgaTourRoundActive;               // 1 while the tour runs
-s32 gPgaSavedWind;               // the options' nWind from before the tour (fn_800EE02C puts it back)
+u8  gbPgaTourRoundActive;       // 1 from a tour round's start until the mode shuts down
+                                //   (read through fn_800EE470)
+s32 gPgaSavedWind;              // the options' nWind from before a tour round (fn_800EE02C puts
+                                //   it back)
 
 // Not in a C unit yet
 void fn_800907AC(s32 nMoney, char* pDst);               // money as text

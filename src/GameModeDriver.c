@@ -194,8 +194,9 @@ char* (*gCalendarGetEventName[3])(u16 nDate) = {
 };
 // port: the PGA TOUR and real-time drivers return their own event types through this void* entry
 void* (*gCalendarGetEventInfoByDate[3])(u16 nDate) = {
-    Online_GetEventInfoByDate, (void* (*)(u16))GM_PgaTourMode_GetEventInfoByDate, (
-            void* (*)(u16))GM_RealtimeMode_GetEventInfoByDate
+    Online_GetEventInfoByDate,
+    (void* (*)(u16))GM_PgaTourMode_GetEventInfoByDate,
+    (void* (*)(u16))GM_RealtimeMode_GetEventInfoByDate
 };
 void (*gCalendarPlay[3])(void) = { Online_Play, PGATour_Play, RealTime_Play };
 u8 (*gCalendarIsSimulationNecessary[3])(void) = {
