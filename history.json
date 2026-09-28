@@ -44229,5 +44229,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "d857e5f",
+"sha": "d857e5ffd716832fa8a161f9577b4014468ca62c",
+"time": 1790556445,
+"subject": "comments: rd1's hand edits (StaticMemory / LLMem_Gc / VecMath file headers after TW07 LLMem_PS3.c and LLMath_PS3.c, the heap's globals block, rewrapped prototypes)",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
