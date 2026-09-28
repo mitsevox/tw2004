@@ -1021,7 +1021,7 @@ extern s32         gWalkKey;
 extern s16*        gBuildGroupNode;        // the group, style and club node being built
 extern s16*        gBuildStyleNode;
 extern s16*        gBuildClubNode;
-extern u32         gLentBankAram[2];     // ARAM copy of each scratch area
+extern u32         gLentBankAram[2];     // ARAM copy of each lent bank area
 extern u32         gLentBankAramSizes[2];     // its size
 extern char (*gLastReactionClips)[2][8][6][16];   // the last clip name played: [player][reaction kind][style][club]
 extern u32         lbl_80281D18;

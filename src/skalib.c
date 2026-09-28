@@ -1,7 +1,14 @@
-// skalib.c (EA's name, from its asserts): the skeletal animation library. Loads the animation
-// libraries (SAL) and clip banks (BNK) of the three animation slots, merges a slot's overlay
-// libraries into it within the round's clip budget (clips kept in ARAM), and picks the clip a
-// golfer plays for an animation group, style, club class and key. The types are in character.h.
+// skalib.c (EA's name, from its asserts; TW07 golf/animation/skalib.c, whose SKALIB_InitModule /
+// SKALIB_CloseModule start and stop this module): the golfers' animation library. It loads the
+// animation libraries ('SAL ') and clip banks ('BNK ') of the three animation slots (slot 0's sac
+// file is malesac, slot 1's femsac), and each golfer's own overlay library (from its 'CHR ' object
+// and 'SAC ' file). Before the round and between holes it plans each slot's clip bank within the
+// round's memory budget: the slot's library and its overlays are merged (same-named clips shared),
+// cut down to fit, and the clips still used copied into the bank, their frame data kept in ARAM
+// (AnimLib_PlanBank, AnimLib_MergeOverlay). It applies the created golfers' custom animations,
+// picks the clip a golfer plays for an animation group, style, club class and key (AnimLib_Find,
+// AnimLib_Pick), parks the bank files in ARAM (the front end brings them back per character), and
+// lends bank memory to the memory card code for its save images. The types are in character.h.
 
 #include "golfer.h"
 #include "game.h"
@@ -15,8 +22,7 @@ void  SKA_SwapClip(void* pClip);                        // swaps a clip in place
 void  SKA_PatchMemory(struct Clip* pClip, u32 uAram);
 void  AnimLib_ApplyCustomAnims(struct LibOverlay* pOv, int nSlot, s32 n);
 void  AnimLib_SetLeafClipsByName(LibOverlay* pOv, int nSlot, int nGroup, int nClub, int nStyle, int nKey,
-                                 char* pNames,
-                  int nNames);
+                                 char* pNames, int nNames);
 u32   Skalib_NextSlot(void);
 void  Skalib_SetBudgets(void);
 u32   AnimLib_PlanBank(u32 nSlot);
@@ -106,7 +112,8 @@ void SKALIB_InitModule(void) {
     if (gSession.nGameType == 3 || gSession.nGameType == 10) {
         lbl_80281D18 = 0;
     }
-    gLastReactionClips = StaticMem_Alloc(4 * sizeof(*gLastReactionClips), 2, 0, "skalib.c", 508);   // four players
+    // four players
+    gLastReactionClips = StaticMem_Alloc(4 * sizeof(*gLastReactionClips), 2, 0, "skalib.c", 508);
     Mem_set(gLastReactionClips, 0, 4 * sizeof(*gLastReactionClips));
     gSKAAram8BitFrame = gSkaFrame2Space;
     gSKAAram8BitFrame = (u8*)((((uptr)gSKAAram8BitFrame >> 5) + 1) << 5);
@@ -450,7 +457,8 @@ void Skalib_SetBudgets(void) {
             nSize1 += pSlot1->overlays[i].pWork->n140;
         }
         gSlot0BankShare = (f32)nSize0 / (f32)(nSize0 + nSize1);
-        gSlot0BankShare = (gSlot0BankShare < 0.44f) ? 0.44f : ((gSlot0BankShare > 0.56f) ? 0.56f : gSlot0BankShare);
+        gSlot0BankShare = (gSlot0BankShare
+                           < 0.44f) ? 0.44f : ((gSlot0BankShare > 0.56f) ? 0.56f : gSlot0BankShare);
     }
 }
 
@@ -531,9 +539,9 @@ f32 Skalib_Random(void) {
     return Misc_RandFuncf(1);
 }
 
-// A clip that can still be marked for dropping: not moved (2, 0x10), not marked already (1), and
-// used by between 1 and nMaxUsers leaves.
-#define SKA_KEEPABLE(pRec, pCtx) \
+// A clip that can still be flagged for dropping: not merged into another record (2, 0x10), not
+// flagged already (1), and used by between 1 and nMaxUsers leaves.
+#define SKA_MARKABLE(pRec, pCtx) \
     (!((pRec)->n12 & 2) && !((pRec)->n12 & 0x10) && !((pRec)->n12 & 1) && (pRec)->n10 > 0 && \
      (pRec)->n10 <= (pCtx)->nMaxUsers)
 
@@ -573,14 +581,14 @@ int AnimLib_MarkDropRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLea
                 nStart = Misc_RandFunc(1) % pLeaf->nCount;
                 for (j = nStart; j < pLeaf->nCount; j++) {
                     pRec = &pLib->pRecords[pIdx[j]];
-                    if (SKA_KEEPABLE(pRec, pCtx)) {
+                    if (SKA_MARKABLE(pRec, pCtx)) {
                         // fake match: skips the other search (breaks and a test: 169 differ, not 0)
                         goto found;
                     }
                 }
                 for (j = nStart; j >= 0; j--) {
                     pRec = &pLib->pRecords[pIdx[j]];
-                    if (SKA_KEEPABLE(pRec, pCtx)) {
+                    if (SKA_MARKABLE(pRec, pCtx)) {
                         // fake match: skips the other search (breaks and a test: 169 differ, not 0)
                         goto found;
                     }
@@ -666,7 +674,7 @@ int AnimLib_MarkDropHighestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLe
                 pBest = NULL;
                 for (j = 0; j < pLeaf->nCount; j++) {
                     pRec = &pLib->pRecords[pIdx[j]];
-                    if (SKA_KEEPABLE(pRec, pCtx)) {
+                    if (SKA_MARKABLE(pRec, pCtx)) {
                         if (pBest == NULL || pRec->n18 > pBest->n18) {
                             pBest = pRec;
                         }
@@ -1324,9 +1332,9 @@ done:
     return nRet;
 }
 
-// The scratch area for slot n, uSize bytes: while only one of the first two slots has a bank,
-// it is carved out of that bank; otherwise it is the slot's own bank.
-static inline u8* Skalib_Scratch(int n, u32 uSize) {
+// The clip bank memory lent as save image n, uSize bytes: while only one of the first two slots has
+// a bank, it is carved out of that bank; otherwise it is slot n's own bank.
+static inline u8* Skalib_LentMemory(int n, u32 uSize) {
     if (gClipBanks[0] != NULL && gClipBanks[1] == NULL) return (u8*)gClipBanks[0] + n * uSize;
     if (gClipBanks[0] == NULL && gClipBanks[1] != NULL) return (u8*)gClipBanks[1] + n * uSize;
     return (u8*)gClipBanks[n];
@@ -1358,7 +1366,8 @@ u8* Skalib_LendBankMemory(int n) {
 // the image is parked in ARAM): the bank's clip data is copied back from ARAM and the ARAM freed.
 void Skalib_ReclaimBankMemory(int n) {
     u32 uSize = fn_8009EF90();
-    GoARAM_WaitTransfer(GoARAM_CopyFromAram(Skalib_Scratch(n, uSize), gLentBankAram[n], gLentBankAramSizes[n]));
+    GoARAM_WaitTransfer(GoARAM_CopyFromAram(Skalib_LentMemory(n, uSize), gLentBankAram[n],
+                                            gLentBankAramSizes[n]));
     if (gLentBankAram[n] != 0) {
         GoARAM_Free(gLentBankAram[n]);
         gLentBankAram[n] = 0;
@@ -2124,8 +2133,7 @@ ClipBank* ClipBank_Load(u8* pFile, u32 uAlign) {
     }
     pBank = (ClipBank*)(pData + uPad);
     // port: a clip bank ('BNK '), little-endian on disc; a little-endian port does not swap here; the bank
-    //       is then used in place
-    // port: (ClipBank over the bytes, its clip offsets turned into 32-bit pointers)
+    //       is then used in place (ClipBank over the bytes, its clip offsets turned into 32-bit pointers)
     ClipBank_SwapHeader(pData + uPad);
     pBank->pFile   = NULL;
     // The clip offsets are found from the file's start, not the aligned bank: this is only right for a
@@ -2227,7 +2235,8 @@ void ClipBank_Stash(int nSlot) {
         if (gClipBankAram[nSlot] == 0) {
             gClipBankAram[nSlot] = GoARAM_Alloc(gClipBankAramSizes[nSlot]);
         }
-        GoARAM_WaitTransfer(GoARAM_CopyToAram(gClipBankFiles[nSlot], gClipBankAram[nSlot], gClipBankAramSizes[nSlot]));
+        GoARAM_WaitTransfer(GoARAM_CopyToAram(gClipBankFiles[nSlot], gClipBankAram[nSlot],
+                                              gClipBankAramSizes[nSlot]));
         if (gClipBankFiles[nSlot] != gClipBankRestoreFile) {
             StaticMem_Free(gClipBankFiles[nSlot]);
         }
@@ -2244,7 +2253,8 @@ void ClipBank_Stash(int nSlot) {
 void ClipBank_Restore(int nSlot) {
     if (gClipBankFiles[nSlot] == NULL) {
         gClipBankFiles[nSlot] = gClipBankRestoreFile;
-        GoARAM_WaitTransfer(GoARAM_CopyFromAram(gClipBankFiles[nSlot], gClipBankAram[nSlot], gClipBankAramSizes[nSlot]));
+        GoARAM_WaitTransfer(GoARAM_CopyFromAram(gClipBankFiles[nSlot], gClipBankAram[nSlot],
+                                                gClipBankAramSizes[nSlot]));
         gClipBankFiles[nSlot]->pData = (u8*)gClipBankFiles[nSlot] + 0x80;
         ClipBank_Install(gClipBankFiles[nSlot]);
     }

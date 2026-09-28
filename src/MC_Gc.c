@@ -1046,7 +1046,7 @@ u32 fn_8009EF90(void) {
 }
 
 // Park the save file images: copy the first to ARAM, then give the memory back. In game type 6
-// the images are skalib's two scratch areas, which get their own contents back from ARAM.
+// the images are skalib's two lent clip bank areas, which get their own contents back from ARAM.
 void fn_8009EF98(void) {
     if (lbl_80281FE8 != NULL) {
         lbl_80281FC0 = MC_BUFFER_SIZE + 0x20;
@@ -1067,7 +1067,7 @@ void fn_8009EF98(void) {
     }
 }
 
-// Bring the save file images back: take the memory (skalib's scratch areas in game type 6, whose
+// Bring the save file images back: take the memory (skalib's lent clip bank areas in game type 6, whose
 // contents go to ARAM meanwhile) and copy the first image back from ARAM.
 void fn_8009F02C(void) {
     if (lbl_80281FE8 == NULL) {
