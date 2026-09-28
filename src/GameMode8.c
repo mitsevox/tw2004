@@ -487,7 +487,7 @@ void fn_800FA608(int nPlayer) {
     gPlayers[nPlayer].nC54 = 74;
     gPlayers[nPlayer].nC3C |= 2;
     fn_800FE02C();
-    fn_800F80D4(3);
+    GameModeSkillZoneTimed_SetHudClock(3);
     if (gPlayers[nPlayer].nC58 == 2) {
         GUI_ShowTogglePlayer1UI(1);
     } else {
@@ -511,7 +511,7 @@ void fn_800FA844(int nPlayer) {
         if (gPlayers[nPlayer].nC3C & 2) {
             if (nPlayer == 0) {
                 fn_800FE0D8();
-                fn_800F80D4(2);
+                GameModeSkillZoneTimed_SetHudClock(2);
                 fn_800FE164(0x26, 2);
                 EVENT_Trigger(nPlayer, 0x45, 0, 0);
             }
@@ -1049,7 +1049,7 @@ void fn_800FBD2C(int nPlayer) {
                     gPlayers[nPlayer].nC3C |= 0x100000;
                 }
             } else {
-                fn_800F80D4(0);
+                GameModeSkillZoneTimed_SetHudClock(0);
                 PlayNow_SendMessage18(nPlayer);
                 GOLFERSTATE_Switch(13, nPlayer);
                 if (lbl_802823C9) {
@@ -1610,7 +1610,7 @@ void fn_800FDADC(void) {
          (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 10)) {
         gPlayers[nPlayer].ball.nLie = LIE_INCUP_e;
         gPlayers[nPlayer].nC3C |= 0x4000000;
-        fn_800F80D4(0);
+        GameModeSkillZoneTimed_SetHudClock(0);
         PlayNow_SendMessage18(nPlayer);
         GOLFERSTATE_Switch(13, nPlayer);
     }

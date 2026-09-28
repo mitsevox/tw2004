@@ -965,7 +965,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   lowest free register; a variable that is modified in place keeps its own register; a value
   used once gets folded into the instruction that uses it. A single wrong register with all else
   right can be extremely hard to fix and may need a different way of expressing the same logic.
-- **[verified] A `long` loop counter can fix the register order.** `fn_800F6ED4` (GameMode13)
+- **[verified] A `long` loop counter can fix the register order.** `GameModeSkillZoneTimed_CheckShotAwards` (GameMode13)
   stayed at the same score with every declaration order; the permuter found the fix: the inner
   counter declared `long j` instead of `int j`. Try `long`/`s32` on counters when register
   numbers are off and reordering does nothing.
@@ -1164,7 +1164,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   Stableford's `fn_800FE8A8`, `int nPar` had `nPar + 2` hoisted into its own saved register before
   the player loop (one saved register more than the original); `s32 nPar` keeps the `addi` in the
   loop body. All 8 `int`/`s32` combinations of the other locals with `s32 nPar` are exact, all 7
-  with `int nPar` stay at 75.4%. The `long j` counter in GameMode13 `fn_800F6ED4` is the same rule.
+  with `int nPar` stay at 75.4%. The `long j` counter in GameMode13 `GameModeSkillZoneTimed_CheckShotAwards` is the same rule.
 - **[verified] What else forces an in-place `+= const`:** the post-add value flowing into a phi
   with another definition of the same variable - a loop that decrements it, or a redefinition in
   one branch plus a use after the join. Even a *dead* decrement inside a later loop does it (the

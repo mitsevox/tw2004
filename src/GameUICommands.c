@@ -327,7 +327,7 @@ s32   fn_800F3654(s32 p0);
 s32   fn_800F3668(int n);
 s8    fn_800F4878(void);
 s32   fn_800F4B00(void);
-void  fn_800F7DA4(void);
+void  GameModeSkillZoneTimed_TenSecWarning(void);
 s32   GameModeSkins_CurrentHoleNumberSkins(void);
 s32   fn_800FA4B8(int nPlayer);
 s32   fn_800FD704(int nPlayer, int nHole, s32* pWon);
@@ -971,7 +971,7 @@ void fn_800869A4(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = gPlayers[pArgs[0].i].nDE0;
         return;
     case 13:
-        fn_800F7DA4();
+        GameModeSkillZoneTimed_TenSecWarning();
         pResult->i = 0;
         return;
     case 14:

@@ -131,7 +131,7 @@ int GameModeSkillZoneBase_GetGreenTargetted(int nPlayer) {
 // GameModeSkillZoneTimed_TimerOut; the other target modes have no timer.
 void GameModeSkillZoneBase_TimerOut(void) {
     if (Game_GetMode() == 0xD) {
-        fn_800F7DE8();
+        GameModeSkillZoneTimed_TimerOut();
     }
 }
 
@@ -295,7 +295,7 @@ u8 GameModeSkillZoneBase_FirstShot(int nPlayer) {
 // 13, 14, 16 or 17 (which ignore the player), else 0.
 s32 GameModeSkillZoneBase_GetShotEarned(s32 arg0) {
     if (Game_GetMode() == 0xD) {
-        return fn_800F7D94(arg0);
+        return GameModeSkillZoneTimed_GetShotEarned(arg0);
     }
     if (Game_GetMode() == 0xE) {
         return fn_800F37F8(arg0);
@@ -313,7 +313,7 @@ s32 GameModeSkillZoneBase_GetShotEarned(s32 arg0) {
 // else 0.
 s32 GameModeSkillZoneBase_GetTimeEarned(s32 arg0) {
     if (Game_GetMode() == 0xD) {
-        return fn_800F7D9C(arg0);
+        return GameModeSkillZoneTimed_GetTimeEarned(arg0);
     }
     return 0;
 }
@@ -322,7 +322,7 @@ s32 GameModeSkillZoneBase_GetTimeEarned(s32 arg0) {
 // 0.
 s32 GameModeSkillZoneBase_GetDriveMultiplier(s32 arg0) {
     if (Game_GetMode() == 0xD) {
-        return fn_800F80A0(arg0);
+        return GameModeSkillZoneTimed_GetDriveMultiplier(arg0);
     }
     if (Game_GetMode() == 0x10) {
         return fn_800F59D4(arg0);

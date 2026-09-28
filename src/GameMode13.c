@@ -19,53 +19,56 @@ s32 lbl_802823B0;
 
 void  Gaud_StartShotClock(void);
 
-void  fn_800F6CC4(void);
-void  fn_800F6CE0(void);
-u8    fn_800F6D0C(u8 bCheck);
-s32   fn_800F6D14(int nPlayer);
-void  fn_800F6DFC(int nPlayer);
-void  fn_800F6ED4(int nPlayer);
-void  fn_800F7A4C(s32 nSurface, s32* pPoints, s32* pTime, s32* pBalls);
-void  fn_800F7B44(void);
-void  fn_800F7C00(void);
-void  fn_800F7C24(int nPlayer);
-void  fn_800F7CA0(void);
-void  fn_800F7CD4(void);
-void  fn_800F7D4C(int nPlayer);
-u8    fn_800F7D8C(u8 bCheck);
-void  fn_800F7DA4(void);
-void  fn_800F7ED8(int nPlayer);
-void  fn_800F7EF8(int nPlayer);
-void  fn_800F7F1C(int nPlayer, int nTime);
-u8    fn_800F7F70(int nPlayer, u8 bCheck);
-void  fn_800F7FF4(int nPlayer, int nId);
-s32   fn_800F8068(int nPlayer, int i);
-void  fn_800F80A8(void);
+void  GameModeSkillZoneTimed_Shutdown(void);
+void  GameModeSkillZoneTimed_StartGamePreData(void);
+u8    GameModeSkillZoneTimed_GoToPlayoff(u8 bCheck);
+s32   GameModeSkillZoneTimed_GetHonors(int nPlayer);
+void  GameModeSkillZoneTimed_EndGolferTurn(int nPlayer);
+void  GameModeSkillZoneTimed_CheckShotAwards(int nPlayer);
+void  GameModeSkillZoneTimed_GetIDScore(s32 nSurface, s32* pPoints, s32* pTime, s32* pBalls);
+void  GameModeSkillZoneTimed_SetupNextGolfer(void);
+void  GameModeSkillZoneTimed_LoadHole(void);
+void  GameModeSkillZoneTimed_InitialFlyByDone(int nPlayer);
+void  GameModeSkillZoneTimed_RestartHole(void);
+void  GameModeSkillZoneTimed_ClearPerHoleData(void);
+void  GameModeSkillZoneTimed_UpdateSwingUI(int nPlayer);
+u8    GameModeSkillZoneTimed_GameFinished(u8 bCheck);
+void  GameModeSkillZoneTimed_TenSecWarning(void);
+void  GameModeSkillZoneTimed_BallOOB(int nPlayer);
+void  GameModeSkillZoneTimed_Mulligan(int nPlayer);
+void  GameModeSkillZoneTimed_SetTimer(int nPlayer, int nTime);
+u8    GameModeSkillZoneTimed_HoleFinished(int nPlayer, u8 bCheck);
+void  GameModeSkillZoneTimed_CollisionActor(int nPlayer, int nId);
+s32   GameModeSkillZoneTimed_GreenType(int nPlayer, int i);
+void  GameModeSkillZoneTimed_EndGame(void);
 
-// Mode 13 starts: one view, no wind, no gimmes, any number of mulligans.
-void fn_800F6A60(void) {
-    gpGame->pfnInit = fn_800F6A60;
-    gpGame->pfnShutdown = fn_800F6CC4;
-    gpGame->pfnSetupNextGolfer = fn_800F7B44;
-    gpGame->pfnGetHonors = fn_800F6D14;
-    gpGame->pfnHoleFinished = fn_800F7F70;
-    gpGame->pfnGameFinished = fn_800F7D8C;
-    gpGame->pfnGoToPlayoff = fn_800F6D0C;
-    gpGame->pfnEndGolferTurn = fn_800F6DFC;
-    gpGame->pfn244 = fn_800F6ED4;
-    gpGame->pfn1E4 = fn_800F7C00;
-    gpGame->pfn228 = fn_800F7D4C;
-    gpGame->pfn24C = fn_800F7C24;
-    gpGame->pfn224 = fn_800F7CA0;
-    gpGame->pfn1EC = fn_800F6CE0;
-    gpGame->pfn250 = fn_800F7ED8;
-    gpGame->pfn254 = fn_800F7EF8;
+// Game mode 13's setup (pfnInit, from GM_SetModeType): its hooks (the target list ones from
+// GameTargets.c), one view, no wind, no gimmes, any number of mulligans (nMulligans 1), b28D set
+// (the re-plan button picks the next target), the current hole 0, pin set 0 and the target list
+// emptied (the hole's targets fill it as they load).
+void GameModeSkillZoneTimed_Init(void) {
+    gpGame->pfnInit = GameModeSkillZoneTimed_Init;
+    gpGame->pfnShutdown = GameModeSkillZoneTimed_Shutdown;
+    gpGame->pfnSetupNextGolfer = GameModeSkillZoneTimed_SetupNextGolfer;
+    gpGame->pfnGetHonors = GameModeSkillZoneTimed_GetHonors;
+    gpGame->pfnHoleFinished = GameModeSkillZoneTimed_HoleFinished;
+    gpGame->pfnGameFinished = GameModeSkillZoneTimed_GameFinished;
+    gpGame->pfnGoToPlayoff = GameModeSkillZoneTimed_GoToPlayoff;
+    gpGame->pfnEndGolferTurn = GameModeSkillZoneTimed_EndGolferTurn;
+    gpGame->pfn244 = GameModeSkillZoneTimed_CheckShotAwards;
+    gpGame->pfn1E4 = GameModeSkillZoneTimed_LoadHole;
+    gpGame->pfn228 = GameModeSkillZoneTimed_UpdateSwingUI;
+    gpGame->pfn24C = GameModeSkillZoneTimed_InitialFlyByDone;
+    gpGame->pfn224 = GameModeSkillZoneTimed_RestartHole;
+    gpGame->pfn1EC = GameModeSkillZoneTimed_StartGamePreData;
+    gpGame->pfn250 = GameModeSkillZoneTimed_BallOOB;
+    gpGame->pfn254 = GameModeSkillZoneTimed_Mulligan;
     gpGame->pfn264 = GameModeSkillZoneBase_PickPrevTarget;
     gpGame->pfn258 = GameModeSkillZoneBase_PickTarget;
-    gpGame->pfn25C = fn_800F7F1C;
-    gpGame->pfn268 = fn_800F7FF4;
-    gpGame->pfn26C = fn_800F8068;
-    gpGame->pfnEndGame = fn_800F80A8;
+    gpGame->pfn25C = GameModeSkillZoneTimed_SetTimer;
+    gpGame->pfn268 = GameModeSkillZoneTimed_CollisionActor;
+    gpGame->pfn26C = GameModeSkillZoneTimed_GreenType;
+    gpGame->pfnEndGame = GameModeSkillZoneTimed_EndGame;
     gpGame->b276 = 0;
     gpGame->bGimmesAllowed = 0;
     gpGame->b280 = 0;
@@ -95,24 +98,30 @@ void fn_800F6A60(void) {
     gSession.nPinSet = 0;
 }
 
-void fn_800F6CC4(void) {
+// Puts back the two options StartGamePreData changed for the game: options.nC and the wind.
+void GameModeSkillZoneTimed_Shutdown(void) {
     gSession.options.nC = lbl_802816A8;
     gSession.options.nWind = lbl_802823B0;
 }
 
-void fn_800F6CE0(void) {
+// As a round starts (pfn1EC, GM_InitModule_PreDataStream): saves options.nC and the wind setting
+// (Shutdown puts them back) and sets them to 4 and 0, no wind.
+void GameModeSkillZoneTimed_StartGamePreData(void) {
     lbl_802816A8 = gSession.options.nC;
     lbl_802823B0 = gSession.options.nWind;
     gSession.options.nC = 4;
     gSession.options.nWind = 0;
 }
 
-u8 fn_800F6D0C(u8 bCheck) {
+// Never a playoff: returns 0.
+u8 GameModeSkillZoneTimed_GoToPlayoff(u8 bCheck) {
     return 0;
 }
 
-// Who plays next: player 0 first, then the players with time left, in turn.
-s32 fn_800F6D14(int nPlayer) {
+// Who plays next (pfnGetHonors): player 0 while nobody has a stroke on the hole; after that the
+// next player in turn after the current golfer (lbl_80282278) who is not nPlayer and still has time
+// (n290); 5 when there is none.
+s32 GameModeSkillZoneTimed_GetHonors(int nPlayer) {
     int i;
     int n;
     u8 bFirst = 1;
@@ -137,8 +146,11 @@ s32 fn_800F6D14(int nPlayer) {
     return 5;
 }
 
-// End of a golfer's turn: message 18, the ball goes back to the tee; count the shots.
-void fn_800F6DFC(int nPlayer) {
+// End of a golfer's turn (pfnEndGolferTurn): message 18 (PlayNow_SendMessage18); the ball goes back
+// on the player's tee (with in-flight replays on, gReplayData.bF10, the replay's saved ball is
+// copied back instead); the shots taken (nDC0) are counted, and aDC4[0] when the shot had a
+// multiplier.
+void GameModeSkillZoneTimed_EndGolferTurn(int nPlayer) {
     PlayNow_SendMessage18(nPlayer);
     if (gReplayData.bF10) {
         Mem_cpy(&gPlayers[nPlayer].ball, &gReplayData.player.ball, sizeof(Ball));
@@ -152,8 +164,22 @@ void fn_800F6DFC(int nPlayer) {
     }
 }
 
-// The ball stopped: points and time for the target, less for a target hit before.
-void fn_800F6ED4(int nPlayer) {
+// Scores a shot once the ball stops (pfn244 from GM_Earnings_PayShotGoals; BallOOB too). The
+// landing surface's gEarningsTable.aMini row gives points and seconds (GetIDScore). On a target
+// short of the drive line (GameModeSkillZoneBase_IsLongDrive): a first hit pays 100 plus its
+// points, times the shot multiplier (nDBC) and the hole's target factor (ScaleTargetPoints), and
+// adds its seconds plus 5; the last target not yet hit pays the all-targets prize instead, with no
+// time. A target hit before pays its points and seconds scaled by 0.75 per earlier hit; after 4
+// hits it pays nothing (Gaud_TargetClosedOut). A target surface past the drive line is a drive: a
+// new longest one (nDDC) pays as a surface, any other nothing. Those points are multiplied by nDBC,
+// the scale, the target factor (targets only) and the bonus multiplier (lbl_802823B4), then the
+// earnings modifiers; a loss never takes the winnings (nDD8) below 0. Added seconds go to the HUD
+// clock as the player's new total (n290 plus seconds * 60 frames; n290 itself is set through
+// SetTimer, from the UI) and are summed in aDC4[4]; the ticking stops when the clock climbs past 10
+// seconds and starts when time added to an empty one is 10 seconds or less. If time ran out in
+// flight (bE9D), time earned saves the player, else comment 0x14. Target streaks (nE90, best nE8C),
+// bullseyes (nDE0) and target hits (aDC4[3]) are counted.
+void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
     s32 nBalls;
     s32 nSurface;
     int nTarget;
@@ -169,7 +195,7 @@ void fn_800F6ED4(int nPlayer) {
     s32 nHits;
     nMsg = -1;
     nSurface = gPlayers[nPlayer].ball.nSurface;
-    fn_800F7A4C(nSurface, &lbl_802823BC, &lbl_802823B8, &nBalls);
+    GameModeSkillZoneTimed_GetIDScore(nSurface, &lbl_802823BC, &lbl_802823B8, &nBalls);
     fScale = 1.0f;
     nAdded = 0;
     bTime = lbl_802823B8 != 0;
@@ -220,7 +246,8 @@ void fn_800F6ED4(int nPlayer) {
                 lbl_802823B8 += 5;
                 gPlayers[nPlayer].aDC4[4] += lbl_802823B8 * 60;
                 PlayNow_SendMessage18(nPlayer);
-                fn_800F80D4(gPlayers[nPlayer].n290[Game_CurHoleIndex()] + lbl_802823B8 * 60);
+                GameModeSkillZoneTimed_SetHudClock(gPlayers[nPlayer].n290[Game_CurHoleIndex()] + lbl_802823B8
+                                                   * 60);
                 nAdded = lbl_802823B8;
                 GameMsg_Send5Ints(0x33, lbl_802823BC, 0, 0, 0xC9, 1);
                 fn_800E53F0(0x34, lbl_802823B8 * 60, 0, 0);
@@ -317,7 +344,7 @@ void fn_800F6ED4(int nPlayer) {
         lbl_802823B8 = lbl_802823B8 * fScale;
         gPlayers[nPlayer].aDC4[4] += lbl_802823B8 * 60;
         PlayNow_SendMessage18(nPlayer);
-        fn_800F80D4(gPlayers[nPlayer].n290[Game_CurHoleIndex()] + lbl_802823B8 * 60);
+        GameModeSkillZoneTimed_SetHudClock(gPlayers[nPlayer].n290[Game_CurHoleIndex()] + lbl_802823B8 * 60);
         nAdded = lbl_802823B8;
         if (!gSession.bReplay) {
             fn_800E53F0(0x34, lbl_802823B8 * 60, 0, 0);
@@ -409,8 +436,10 @@ void fn_800F6ED4(int nPlayer) {
     GameModeSkillZoneBase_PostShotAwards2(nPlayer);
 }
 
-// The points, seconds and balls for landing on a surface.
-void fn_800F7A4C(s32 nSurface, s32* pPoints, s32* pTime, s32* pBalls) {
+// The points (n4), seconds (n14) and fourth value (n18; mode 13 does not use it) of the
+// gEarningsTable.aMini row for surface nSurface; all 0 when there is none (the last matching of the
+// 20 rows wins).
+void GameModeSkillZoneTimed_GetIDScore(s32 nSurface, s32* pPoints, s32* pTime, s32* pBalls) {
     int i;
     *pPoints = 0;
     *pTime = 0;
@@ -424,16 +453,19 @@ void fn_800F7A4C(s32 nSurface, s32* pPoints, s32* pTime, s32* pBalls) {
     }
 }
 
-// Next golfer: maybe a multiplier, the clock shows the time left, and a player who has not shot
-// aims at their target; the bonus multiplier goes back to 1.
-void fn_800F7B44(void) {
+// Before each shot (pfnSetupNextGolfer): per-shot data cleared (ClearPerShotData) and stroke play's
+// golfer order (GameModeStroke_SetupNextGolfer); then for the golfer about to play (GS_PRE_SHOT) a
+// chance of a shot multiplier (SetupBonusBall), their time on the HUD clock and, before their first
+// shot, their target set up (SetCup_AlignGolfer). The bonus multiplier (lbl_802823B4) goes back to
+// 1.
+void GameModeSkillZoneTimed_SetupNextGolfer(void) {
     int i;
     GameModeSkillZoneBase_ClearPerShotData();
     GameModeStroke_SetupNextGolfer();
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if ((s8)GOLFERSTATE_GetCurrentState(i) == 1) {
             GameModeSkillZoneBase_SetupBonusBall(i);
-            fn_800F80D4(PLAYER(i)->n290[Game_CurHoleIndex()]);
+            GameModeSkillZoneTimed_SetHudClock(PLAYER(i)->n290[Game_CurHoleIndex()]);
             if (PLAYER(i)->nDC0 == 0) {
                 GameModeSkillZoneBase_SetCup_AlignGolfer(i, (s8)PLAYER(i)->nTarget);
             }
@@ -442,28 +474,36 @@ void fn_800F7B44(void) {
     lbl_802823B4 = 1;
 }
 
-void fn_800F7C00(void) {
+// Hole start (pfn1E4): the targets sorted nearest the tee first (SortCupsByDistanceFromTee), then
+// ClearPerHoleData.
+void GameModeSkillZoneTimed_LoadHole(void) {
     GameModeSkillZoneBase_SortCupsByDistanceFromTee();
-    fn_800F7CD4();
+    GameModeSkillZoneTimed_ClearPerHoleData();
 }
 
-// The clock is reset to 90 seconds for everyone.
-void fn_800F7C24(int nPlayer) {
+// After the hole flyover (pfn24C): the HUD clock and all five players' time for the hole are set to
+// 90 seconds (5400 frames).
+void GameModeSkillZoneTimed_InitialFlyByDone(int nPlayer) {
     int i;
-    fn_800F80D4(5400);
+    GameModeSkillZoneTimed_SetHudClock(5400);
     for (i = 0; i < 5; i++) {
         PLAYER(i)->n290[Game_CurHoleIndex()] = 5400;
     }
 }
 
-void fn_800F7CA0(void) {
-    fn_800F7CD4();
+// The hole restarts (pfn224, GM_RestartHole): the per-hole data cleared with everyone's time back
+// to 90 seconds (ClearPerHoleData), player 0's default aim, the HUD clock hidden (-1) and the
+// ticking stopped.
+void GameModeSkillZoneTimed_RestartHole(void) {
+    GameModeSkillZoneTimed_ClearPerHoleData();
     AI_DefaultTarget(0);
-    fn_800F80D4(-1);
+    GameModeSkillZoneTimed_SetHudClock(-1);
     Gaud_StopShotClock();
 }
 
-void fn_800F7CD4(void) {
+// The shared per-hole clear (GameModeSkillZoneBase_ClearPerHoleData), then all five players' time
+// for the hole set to 90 seconds (5400 frames).
+void GameModeSkillZoneTimed_ClearPerHoleData(void) {
     int i;
     GameModeSkillZoneBase_ClearPerHoleData();
     for (i = 0; i < 5; i++) {
@@ -471,25 +511,34 @@ void fn_800F7CD4(void) {
     }
 }
 
-void fn_800F7D4C(int nPlayer) {
+// Every frame of the swing state (pfn228): once the swing has begun (SwingData.nState not
+// SW_IDLE_SWING), UI message 0x36 (no value) is sent.
+void GameModeSkillZoneTimed_UpdateSwingUI(int nPlayer) {
     if (gPlayers[nPlayer].swing.nState != 0) {
         fn_800E58B4(0x36);
     }
 }
 
-u8 fn_800F7D8C(u8 bCheck) {
+// The game is over once its one hole is: always 1.
+u8 GameModeSkillZoneTimed_GameFinished(u8 bCheck) {
     return 1;
 }
 
-s32 fn_800F7D94(s32 a) {
+// The points the last shot earned (lbl_802823BC); a is not used
+// (GameModeSkillZoneBase_GetShotEarned passes the player).
+s32 GameModeSkillZoneTimed_GetShotEarned(s32 a) {
     return lbl_802823BC;
 }
 
-s32 fn_800F7D9C(s32 a) {
+// The seconds the last shot added (lbl_802823B8); a is not used
+// (GameModeSkillZoneBase_GetTimeEarned passes the player).
+s32 GameModeSkillZoneTimed_GetTimeEarned(s32 a) {
     return lbl_802823B8;
 }
 
-void fn_800F7DA4(void) {
+// Ten seconds left (a UI command, GameUICommands.c case 13): the clock starts ticking
+// (Gaud_StartShotClock) and comment 0x15 or 0x25 plays, at random.
+void GameModeSkillZoneTimed_TenSecWarning(void) {
     Gaud_StartShotClock();
     if (!(Misc_RandFunc(0) & 1)) {
         GameModeSkillZoneBase_StartComment(0x15);
@@ -498,8 +547,12 @@ void fn_800F7DA4(void) {
     GameModeSkillZoneBase_StartComment(0x25);
 }
 
-// The time ran out: a shot not yet taken ends the player's game; one in flight finishes first.
-void fn_800F7DE8(void) {
+// The current golfer's time ran out (through GameModeSkillZoneBase_TimerOut): the ticking stops. If
+// the ball is not yet in play (GS_PRE_SHOT to GS_ELEVATOR, or GS_SWING) the golfer's game ends: the
+// lie set to in the hole (12), nC3C bit 26, the HUD clock 0, message 18, GS_IN_THE_HOLE and comment
+// 0x14. With the shot under way bE9D is set instead, and CheckShotAwards decides once the ball
+// stops.
+void GameModeSkillZoneTimed_TimerOut(void) {
     Gaud_StopShotClock();
     if ((s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 1 ||
         (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 2 ||
@@ -508,7 +561,7 @@ void fn_800F7DE8(void) {
         (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 10) {
         gPlayers[lbl_80282278].ball.nLie = 12;
         gPlayers[lbl_80282278].nC3C |= 0x04000000;
-        fn_800F80D4(0);
+        GameModeSkillZoneTimed_SetHudClock(0);
         PlayNow_SendMessage18(lbl_80282278);
         GOLFERSTATE_Switch(13, lbl_80282278);
         GameModeSkillZoneBase_StartComment(0x14);
@@ -517,22 +570,26 @@ void fn_800F7DE8(void) {
     gPlayers[lbl_80282278].bE9D = 1;
 }
 
-void fn_800F7ED8(int nPlayer) {
-    fn_800F6ED4(nPlayer);
+// The ball went out of bounds (pfn250): the shot is scored as usual (CheckShotAwards).
+void GameModeSkillZoneTimed_BallOOB(int nPlayer) {
+    GameModeSkillZoneTimed_CheckShotAwards(nPlayer);
 }
 
-// A mulligan: the multiplier and the streak are lost.
-void fn_800F7EF8(int nPlayer) {
+// A mulligan was taken (pfn254): the shot's multiplier (nDBC) goes back to 1 and the target streak
+// (nE90) to 0.
+void GameModeSkillZoneTimed_Mulligan(int nPlayer) {
     gPlayers[nPlayer].nDBC = 1;
     gPlayers[nPlayer].nE90 = 0;
 }
 
-void fn_800F7F1C(int nPlayer, int nTime) {
+// Sets the player's time left on the current hole (n290), in frames (pfn25C, from a UI command).
+void GameModeSkillZoneTimed_SetTimer(int nPlayer, int nTime) {
     gPlayers[nPlayer].n290[Game_CurHoleIndex()] = nTime;
 }
 
-// The game is over when everyone's time is up.
-u8 fn_800F7F70(int nPlayer, u8 bCheck) {
+// The hole (and so the game) is over once every player's time (n290) is 0; nPlayer and bCheck are
+// not used.
+u8 GameModeSkillZoneTimed_HoleFinished(int nPlayer, u8 bCheck) {
     int i;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (PLAYER(i)->n290[Game_CurHoleIndex()] != 0) {
@@ -542,30 +599,40 @@ u8 fn_800F7F70(int nPlayer, u8 bCheck) {
     return 1;
 }
 
-// A bonus was collected: the multiplier goes up.
-void fn_800F7FF4(int nPlayer, int nId) {
+// The ball hit a bonus object (pfn268, with its id, Ball.n140): the bullseye ball effect plays and
+// the bonus multiplier (lbl_802823B4) goes up by 2 plus the object's index
+// (GameModeSkillZoneBase_GetBonusIndex), so by 2 to 6.
+void GameModeSkillZoneTimed_CollisionActor(int nPlayer, int nId) {
     s32 n = GameModeSkillZoneBase_GetBonusIndex(nId);
     fn_800A30E4(8, &gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
     lbl_802823B4 += n + 2;
 }
 
-// A target's marker model kind (GoDynObj): 1 once it has paid out 4 times, else 0.
-s32 fn_800F8068(int nPlayer, int i) {
+// Which marker model target i shows for the player (pfn26C, GoDynObj.c): 1 once they have hit it 4
+// times (closed out, it pays no more), else 0.
+s32 GameModeSkillZoneTimed_GreenType(int nPlayer, int i) {
     if (gPlayers[nPlayer].nDE4[i] > 3) {
         return 1;
     }
     return 0;
 }
 
-s32 fn_800F80A0(s32 a) {
+// The bonus multiplier (lbl_802823B4); a is not used (GameModeSkillZoneBase_GetDriveMultiplier
+// passes the player).
+s32 GameModeSkillZoneTimed_GetDriveMultiplier(s32 a) {
     return lbl_802823B4;
 }
 
-void fn_800F80A8(void) {
+// End of the game (pfnEndGame): the game counts as won in the bio (EASBio_SetCurrentGameWon) and
+// the full-screen UI is switched off.
+void GameModeSkillZoneTimed_EndGame(void) {
     EASBio_SetCurrentGameWon(1);
     GUI_ShowToggleFullScreenUI(0);
 }
 
-void fn_800F80D4(s32 p0) {
+// Sends UI message 17, the HUD clock, with a value: mode 13 passes the player's time left in frames
+// (0 when it ran out, -1 when the hole restarts); speed golf (GameMode8.c) sends 3 as its countdown
+// starts, 2 at the go and 0 at the end.
+void GameModeSkillZoneTimed_SetHudClock(s32 p0) {
     GameMsg_SendInt(17, p0);
 }

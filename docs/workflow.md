@@ -192,7 +192,7 @@ with the registers held fixed; confirm a hit with a build. The docstring has the
 addresses and its assumptions (fn_800949D0 closed from its lead).
 
 **The permuter** searches random rewrites for you. It is slow (minutes to hours) but has solved
-functions nothing else did (`fn_800F6ED4`: the loop counter had to be `long`).
+functions nothing else did (`GameModeSkillZoneTimed_CheckShotAwards`: the loop counter had to be `long`).
 
 ```
 python tools/match/permute.py <Unit> <fn> --minutes 20 -j 4

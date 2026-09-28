@@ -232,7 +232,7 @@ void GM_SetModeType(int nMode) {
         GameMode12_Init();
         break;
     case 13:
-        fn_800F6A60();
+        GameModeSkillZoneTimed_Init();
         break;
     case 14:
         fn_800F2984();
