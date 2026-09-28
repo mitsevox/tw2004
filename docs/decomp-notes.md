@@ -262,7 +262,7 @@ They will be sorted into the sections below.
 - **[verified] Keep a call result in a named local when it is an index, a compare operand or an argument
   inside an iterator loop.** It sets the `mulli`/`add` order (GoDynObj fn_80045FC8, also for `Rand % n`
   in GoStaticCam fn_80064F7C) and the `cmplw` operand order (char Character_GolferStreamCallbackIG; swapping the operands does
-  not help), and it matches inside iterator loops (hwsBurn fn_80110C88). A `u8` flag argument computed
+  not help), and it matches inside iterator loops (hwsBurn HwsBurn_MarkOption). A `u8` flag argument computed
   before intervening float tests also goes in a local first (animblender SKABlender_BlendLinear 65.6 -> 98.2).
 - **[verified] A `switch` inside a loop lays out its case bodies in source order**, not case-value order
   (GoStaticCam fn_800659F4).
@@ -344,7 +344,7 @@ They will be sorted into the sections below.
 - **[verified] Zeroing: a variable that already held a value gets its zero by `mr` from another zeroed
   register; a variable set for the first time gets its own `li r,0`.** So when the original has two `li`s
   and ours `li; mr`, give the second zero a fresh variable (a new loop counter), and the reverse for one
-  `li; mr` (Earnings fn_800D7DA0, hwsBurn fn_80111850, GameMode5 fn_800EAF7C, GameHoleContests
+  `li; mr` (Earnings fn_800D7DA0, hwsBurn HwsBurn_BuildDesc, GameMode5 fn_800EAF7C, GameHoleContests
   fn_800D9F34; `a = b = 0`, types and statement order make no difference). A search written as an
   inline helper hands its index back by `mr`; the same loop written in the caller gets `li` (UISEvent
   fn_80165D2C, fn_80165D90).
@@ -356,7 +356,7 @@ They will be sorted into the sections below.
   first (Controller_Gc Input_vUpdate: `case -2: case -3: break;`).
 - **[verified] Return a local instead of an expression** so the register restores come before the last
   arithmetic (LLDynTex fn_8010B6AC 90 -> 100); round up through a local written back
-  (`n = a + *p; n = (n - 1) & ~(a - 1); *p = n;`, hwsBurn fn_80110E98); a round-up division only matches
+  (`n = a + *p; n = (n - 1) & ~(a - 1); *p = n;`, hwsBurn HwsBurn_CopyAligned); a round-up division only matches
   as `(size - 1 + n) / size` (MC_Gc MC_MountCard).
 - **[verified] `static const` locals for constant struct arguments** load just before each call where
   initialised locals load at entry; pass a global struct field by value directly, not through a local
@@ -471,7 +471,7 @@ They will be sorted into the sections below.
   CodeWarrior's instructions and registers (hlaudtrackseq fn_800AA744, fn_800AAAA4: 2 diffs -> 0
   each; the permuter found `& 0xFFu` and `(unsigned int)`, which also work). Label it `// fake match:`.
 - **[verified] An identity read inside a declaration's initializer** (`int n = fn_X_Read(p->n38);`)
-  fixes a register order that the same read as a statement does not (hwsBurn fn_80110FB4: 5 diffs ->
+  fixes a register order that the same read as a statement does not (hwsBurn HwsBurn_CopyEntries: 5 diffs ->
   0; leversweep's statement-level levers stopped at 5). Label it `// fake match:`.
 - Other compiler versions (GC 2.0, 2.0p1, 2.6, 2.7, 1.3.2) gave output identical to 2.5 on 18 near-miss
   functions tried today: not a lever for these.
@@ -838,7 +838,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 
 - **[verified] The allocator's levels**: a variable with more than 28 remaining neighbours cannot be
   placed on the first level and jumps to the top (takes r31). One temp more or fewer is the lever.
-  hwsBurn fn_8011172C (`nAlign + *pOffset` makes a temp: pBurn 29 neighbours, r31 not r25);
+  hwsBurn HwsBurn_CopySetOptions (`nAlign + *pOffset` makes a temp: pBurn 29 neighbours, r31 not r25);
   hlaudmovie fn_800A8AD4 (a use of pBlock in one more branch gave it the 29th: exact).
 - **[verified] The frontend numbers its temps above every declared local**, so a local EA orders
   above a frontend temp cannot get there by declaration order; writing the expression at each use

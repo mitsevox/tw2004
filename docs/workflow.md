@@ -153,7 +153,7 @@ allocator): variables are listed highest priority first and each takes the lowes
 a variable with more than 28 neighbours cannot be placed on the first "level" and jumps to the top
 of the list (it takes r31). Compare EA's registers with the list, find the first variable that
 differs, then change what gives it or its neighbours one temp more or fewer (`backend-00-initial-code`
-shows every temp). Example, hwsBurn fn_8011172C: with `nAlign + *pOffset` the frontend loads
+shows every temp). Example, hwsBurn HwsBurn_CopySetOptions: with `nAlign + *pOffset` the frontend loads
 `*pOffset` into its own temp, pBurn gets 29 neighbours and takes r31 instead of EA's r25.
 
 Setup, once per machine (Linux or macOS; needs gdb, cmake, Rust), both clones next to the repo

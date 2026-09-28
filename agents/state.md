@@ -110,7 +110,7 @@ Unit count: 259 (the weather split replaced two sweep units: 258; the HLAudMaste
 1. **mwcc-debugger** (recommended by #match-help's Mrkol: "regswaps are solvable, use
    mwcc-debugger"): installed 2026-09-26 in the cloud (`tools/match/mwccdbg.py`, docs/workflow.md).
    Next: point it at the register-only near misses (24 functions at 99%+). First read: hwsBurn
-   fn_8011172C (EA's `add r3,r6,r3` form gives pBurn 29 neighbours: find the form with one temp fewer).
+   HwsBurn_CopySetOptions (EA's `add r3,r6,r3` form gives pBurn 29 neighbours: find the form with one temp fewer).
 2. **Dead-assert lane** (1-2 lanes to start): EA's compiled-away asserts/debug code still change
    register choice (a variable used in a dead `if (!p) { if (DEBUG) {...} }` counts as used more)
    and stack size (dead buffers). TW07's PS3 debug build keeps EA's asserts: map where EA asserted
@@ -145,7 +145,7 @@ float registers (lead, not kept).
 **Biggest blockers** by link gain per function: Golfer AI_ChooseTarget (98.53%, registers only:
 agents/tried/AI_ChooseTarget.md), Ball Physics_HandleCollision, Earnings x2, startUp fn_800B0748,
 gocamscripts x2, skalib (52 KB data, 5 left), rcmp fn_800B769C/fn_800B8618. One function from
-linking: SunFlr_Gc (fn_8009A708), uiProcessInterface (fn_8008F820), hwsBurn (fn_8011172C, 1
+linking: SunFlr_Gc (fn_8009A708), uiProcessInterface (fn_8008F820), hwsBurn (HwsBurn_CopySetOptions, 1
 instruction). Every attempt is in agents/tried/<fn>.md; new rules in docs/decomp-notes.md.
 
 Follow-ups (audit, not matching lanes): Swing.c's and goballfx.c's file headers still describe code

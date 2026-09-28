@@ -91,7 +91,7 @@ typedef struct SkinMesh {
 } SkinMesh;
 LAYOUT_ASSERT(SkinMesh, 0x10);
 
-// A pair of bytes of a SkinDesc28 (fn_80110A38 and fn_80113910 add up the n1s).
+// A pair of bytes of a SkinDesc28 (HwsBurn_MarkEntry and fn_80113910 add up the n1s).
 typedef struct SkinDesc28Pair {
     s8   n0;                    // 0x0
     s8   n1;                    // 0x1
@@ -101,7 +101,7 @@ typedef struct SkinDesc28 {
     s32  n0;                    // 0x00  pairs in a8 (fn_80113910 reads n0 of them, not only four)
     u8   unk4[4];
     SkinDesc28Pair a8[4];       // 0x08
-    void* p10;                  // 0x10  } a block hwsBurn.c copies (fn_80111384)
+    void* p10;                  // 0x10  } a block hwsBurn.c copies (HwsBurn_CopyDesc28)
     s32  n14;                   // 0x14  } and its size
 } SkinDesc28;
 LAYOUT_ASSERT(SkinDesc28, 0x18);
@@ -167,7 +167,7 @@ LAYOUT_ASSERT(SkinDesc18, 0x1C);
 typedef struct SkinDesc {
     s32  nVersion;            // 0x000  8
     s32  n04;                   // 0x004
-    s32  n08;                   // 0x008  a burnt one's size, in bytes (fn_80111850)
+    s32  n08;                   // 0x008  a burnt one's size, in bytes (HwsBurn_BuildDesc)
     u32  uFlags;                // 0x00C  bit 1: its offsets are pointers now
     s32  n10;                   // 0x010  entries in p14 and p18
     SkinDesc14* p14;            // 0x014
@@ -176,13 +176,13 @@ typedef struct SkinDesc {
     s32* p20;                   // 0x020
     s32  n24;                   // 0x024  entries in p28
     SkinDesc28* p28;            // 0x028
-    s32  n2C;                   // 0x02C  bits an HwsBurn keeps (fn_801104AC)
+    s32  n2C;                   // 0x02C  bits an HwsBurn keeps (HwsBurn_Create)
     s32  n30;                   // 0x030  entries in p34
     SkinMesh* p34;              // 0x034
     s32  n38;                   // 0x038  entries in p3C
     s32* p3C;                   // 0x03C  SkinDesc.p34 entries, -1 none (SkinMorph_EntryNeedsBlend)
     s32  n40;                   // 0x040  entries in p44; an HwsBurn keeps a bit per entry
-                                //        (fn_801104AC)
+                                //        (HwsBurn_Create)
     SkinDesc44* p44;            // 0x044
     s32  nParts;                // 0x048
     SkinPartDef* pParts;        // 0x04C
@@ -198,7 +198,7 @@ typedef struct SkinDesc {
     SkinDesc74* p74;            // 0x074
     s32  n78;                   // 0x078  entries in p7C
     SkinDesc7C* p7C;            // 0x07C
-    s32  n80;                   // 0x080  entries in p84 (fn_80111850 clears both)
+    s32  n80;                   // 0x080  entries in p84 (HwsBurn_BuildDesc clears both)
     u64* p84;                   // 0x084  name codes
     s32  n88;                   // 0x088  entries in p8C
     SkinDesc8C* p8C;            // 0x08C
@@ -510,39 +510,39 @@ typedef struct SkinDescIter {
     SkinMeshIter sub;           // 0x20  } (fn_80113A9C's kind does not use them)
 } SkinDescIter;
 
-// hwsBurn.c's state for one SkinDesc (our name; fn_801104AC makes it, fn_801108B0 frees it). The
+// hwsBurn.c's state for one SkinDesc (our name; HwsBurn_Create makes it, HwsBurn_Destroy frees it). The
 // bit arrays hold one bit per entry of the count before them.
 typedef struct HwsBurn {
     SkinDesc* pDesc;            // 0x00
-    HwsOverrideTable* pOverride;    // 0x04  meshes used instead of the description's (fn_80110A1C)
+    HwsOverrideTable* pOverride;    // 0x04  meshes used instead of the description's (HwsBurn_SetOverrideTable)
     s32  nParts;                // 0x08  pDesc->nParts
-    s32* aVariant;              // 0x0C  per part: its variant, -1 all (fn_801109FC)
-    s32* aOption;               // 0x10  per part: its option, -1 all (fn_80110A0C)
+    s32* aVariant;              // 0x0C  per part: its variant, -1 all (HwsBurn_SetPartVariant)
+    s32* aOption;               // 0x10  per part: its option, -1 all (HwsBurn_SetPartOption)
     u8   unk14[4];
     s32  n18;                   // 0x18  SkinMorph_GetNumTargets(pDesc)
-    s32* a1C;                   // 0x1C  n18 flags (fn_80110A24)
+    s32* a1C;                   // 0x1C  n18 flags (HwsBurn_DropMorphTarget)
     s32  n20;                   // 0x20  pDesc->n2C
-    s32  n24;                   // 0x24  the bits of p28 set (fn_80111124)
+    s32  n24;                   // 0x24  the bits of p28 set (HwsBurn_ListMeshes)
     u32* p28;                   // 0x28  n20 bits
     s32* a2C;                   // 0x2C  } n20 each
     s32* a30;                   // 0x30  }
     s32  n34;                   // 0x34  pDesc->n40
-    s32  n38;                   // 0x38  the bits of p40 set (fn_80110F2C)
+    s32  n38;                   // 0x38  the bits of p40 set (HwsBurn_ListEntries)
     u32* p3C;                   // 0x3C  } n34 bits
     u32* p40;                   // 0x40  }
     s32* a44;                   // 0x44  the n38 set bits of p40, in order
     s32* a48;                   // 0x48  per bit of p40: its place in a44
     s32  n4C;                   // 0x4C  pDesc->n38
-    s32  n50;                   // 0x50  the bits of p54 set (fn_80111424)
+    s32  n50;                   // 0x50  the bits of p54 set (HwsBurn_ListMeshRefs)
     u32* p54;                   // 0x54  n4C bits
     s32* a58;                   // 0x58  the n50 set bits of p54, in order
     s32* a5C;                   // 0x5C  per bit of p54: its place in a58
     s32  n60;                   // 0x60  pDesc->n10
-    SkinDesc14* a64;            // 0x64  a copy of pDesc->p14 (fn_801115C4)
+    SkinDesc14* a64;            // 0x64  a copy of pDesc->p14 (HwsBurn_PrepareMaterials)
     void (*pfn68)(Skin* pSkin, SkinDesc14* pEntry); // 0x68  } called on each a64 entry with
-    Skin* pSkin;                // 0x6C  } pSkin (fn_801109F0; SkinBurn SkinBurn_BurnSkin)
+    Skin* pSkin;                // 0x6C  } pSkin (HwsBurn_SetMaterialCallback; SkinBurn SkinBurn_BurnSkin)
     s32  n70;                   // 0x70  pDesc->n88
-    s32  n74;                   // 0x74  the bits of p78 set (fn_80111658)
+    s32  n74;                   // 0x74  the bits of p78 set (HwsBurn_ListSetOptions)
     u32* p78;                   // 0x78  n70 bits: the SkinDesc.p8C entries a64 uses
     s32* a7C;                   // 0x7C  the n74 set bits of p78, in order
     s32* a80;                   // 0x80  per bit of p78: its place in a7C
@@ -707,16 +707,16 @@ HwsOverrideTable* fn_80112A34(SkinDesc* pDesc, s32 nMeshes);
 void  fn_80112A58(HwsOverrideTable* pTable);
 void* fn_80112A80(HwsMemBlock* pBlock, HwsOverrideTable* pTable, int i, u8 bKeep);
 
-// hwsBurn.c: pfn is called with pSkin on each SkinDesc.p14 entry the burn copies; fn_80111EB0
+// hwsBurn.c: pfn is called with pSkin on each SkinDesc.p14 entry the burn copies; HwsBurn_Burn
 // makes the burnt skin's description.
-HwsBurn* fn_801104AC(SkinDesc* pDesc);
-void  fn_801108B0(HwsBurn* pBurn);
-void  fn_801109F0(HwsBurn* pBurn, void (*pfn)(Skin* pSkin, SkinDesc14* pEntry), Skin* pSkin);
-void  fn_801109FC(HwsBurn* pBurn, int nPart, s32 nVariant);
-void  fn_80110A0C(HwsBurn* pBurn, int nPart, s32 nOption);
-void  fn_80110A1C(HwsBurn* pBurn, HwsOverrideTable* pOverride);
-void  fn_80110A24(HwsBurn* pBurn, int n);
-SkinDesc* fn_80111EB0(HwsBurn* pBurn);
+HwsBurn* HwsBurn_Create(SkinDesc* pDesc);
+void  HwsBurn_Destroy(HwsBurn* pBurn);
+void  HwsBurn_SetMaterialCallback(HwsBurn* pBurn, void (*pfn)(Skin* pSkin, SkinDesc14* pEntry), Skin* pSkin);
+void  HwsBurn_SetPartVariant(HwsBurn* pBurn, int nPart, s32 nVariant);
+void  HwsBurn_SetPartOption(HwsBurn* pBurn, int nPart, s32 nOption);
+void  HwsBurn_SetOverrideTable(HwsBurn* pBurn, HwsOverrideTable* pOverride);
+void  HwsBurn_DropMorphTarget(HwsBurn* pBurn, int n);
+SkinDesc* HwsBurn_Burn(HwsBurn* pBurn);
 
 // SkinBurn.c: burns a skin (aParts and aList each end with -1).
 void  SkinBurn_BurnSkin(Skin* pSkin, s32* aParts, s32* aList);

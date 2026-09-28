@@ -91,8 +91,8 @@ dispatch only (never on push); one job at a time (concurrency group `pc-runner`)
 PC is off; fork pull requests need approval to run workflows.
 
 ```
-gh workflow run pc-job.yml -f tool=permute -f unit=hwsBurn -f fn=fn_8011172C -f minutes=360 -f jobs=18
-gh workflow run pc-job.yml -f tool=leversweep -f unit=hwsBurn -f fn=fn_8011172C -f minutes=6
+gh workflow run pc-job.yml -f tool=permute -f unit=hwsBurn -f fn=HwsBurn_CopySetOptions -f minutes=360 -f jobs=18
+gh workflow run pc-job.yml -f tool=leversweep -f unit=hwsBurn -f fn=HwsBurn_CopySetOptions -f minutes=6
 gh workflow run pc-job.yml -f tool=leversweep                  # --from-report: every near-miss
 gh workflow run pc-job.yml ... -f ref=my-branch                # build from a pushed branch
 gh workflow run pc-job.yml -f tool=declsearch -f targets=Unit:fn,Unit:fn -f minutes=240

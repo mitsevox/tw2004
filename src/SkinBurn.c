@@ -327,17 +327,17 @@ void SkinBurn_BurnSkin(Skin* pSkin, s32* aParts, s32* aList) {
 
     if (pSkin->pModel == NULL || pSkin->pModel->pDesc == NULL) return;
 
-    pBurn = fn_801104AC(pSkin->pModel->pDesc);
-    fn_801109F0(pBurn, SkinBurn_BakeMaterialEntry, pSkin);
+    pBurn = HwsBurn_Create(pSkin->pModel->pDesc);
+    HwsBurn_SetMaterialCallback(pBurn, SkinBurn_BakeMaterialEntry, pSkin);
     nCount = SkinPart_GetNumParts(pSkin);
     for (i = 0; i < nCount; i++) {
         for (j = 0; aParts[j] >= 0; j++) {
             if (i == aParts[j]) break;
         }
         if (aParts[j] < 0) {
-            fn_801109FC(pBurn, i, SkinPart_GetPartVariant(pSkin, i, 0));
+            HwsBurn_SetPartVariant(pBurn, i, SkinPart_GetPartVariant(pSkin, i, 0));
         }
-        fn_80110A0C(pBurn, i, SkinPart_GetPartOption(pSkin, i, 0));
+        HwsBurn_SetPartOption(pBurn, i, SkinPart_GetPartOption(pSkin, i, 0));
     }
 
     nCount = SkinMorph_GetNumTargets(pSkin->pModel->pDesc);
@@ -346,20 +346,20 @@ void SkinBurn_BurnSkin(Skin* pSkin, s32* aParts, s32* aList) {
             if (i == aList[j]) break;
         }
         if (aList[j] < 0) {
-            fn_80110A24(pBurn, i);
+            HwsBurn_DropMorphTarget(pBurn, i);
         } else {
             SkinMorph_SetTargetWeight(pSkin, i, 0.0f);
         }
     }
 
     SkinMorph_CreateBlended(pSkin, &pBlock, &pTable);
-    fn_80110A1C(pBurn, pTable);
-    pDesc = fn_80111EB0(pBurn);
+    HwsBurn_SetOverrideTable(pBurn, pTable);
+    pDesc = HwsBurn_Burn(pBurn);
     pOld = pSkin->pModel->pDesc;
     pSkin->pModel->pDesc = pDesc;
     StaticMem_Free(pOld);
     SkinBurn_BurnModel(pSkin, pBurn);
-    fn_801108B0(pBurn);
+    HwsBurn_Destroy(pBurn);
     SkinMorph_FreeBlended(pSkin, pBlock, pTable);
     if (pSkin->a10A0[0] != NULL) {
         pSkin->a10A0[0]->pDesc = pDesc;
