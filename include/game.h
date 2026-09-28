@@ -694,16 +694,16 @@ void fn_800F9824(void);
 void fn_800F9844(void);
 
 // GameMode8.c (modes 6, 7 and 8 share it)
-extern u8  lbl_802823C9;
-extern s32 lbl_802823D0;                // the next entry of the event log lbl_802120F8 (0..99)
+extern u8  gSpeedGolfFirstHoleTips;
+extern s32 gSpeedGolfEventLogCount;                // the next entry of the event log gSpeedGolfEventLog (0..99)
 
 // One entry of the event log: the last 100 events (GameMode8.c writes it, a menu command reads it).
 typedef struct SGLog {
     s32 nEvent;
     s32 nPlayer;
 } SGLog;
-extern SGLog lbl_802120F8[100];
-extern s32 lbl_802823D4;
+extern SGLog gSpeedGolfEventLog[100];
+extern s32 gSpeedGolfUnused;
 void fn_800F9A58(void);
 void fn_800F9AB0(void);
 void fn_800F9B34(void);

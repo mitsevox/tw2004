@@ -43,9 +43,9 @@ void fn_800F9610(void) {
     gpGame->nC = 2;
     gpGame->nDC = 0;
     gpGame->n4 = 0;
-    lbl_802823D4 = 0;
+    gSpeedGolfUnused = 0;
     gSession.nSplitScreen = lbl_8028227C;
-    lbl_802823D0 = 0;
+    gSpeedGolfEventLogCount = 0;
     Session_SetNumPlayers(2);
 }
 
@@ -54,6 +54,6 @@ void fn_800F9824(void) {
 }
 
 void fn_800F9844(void) {
-    lbl_802823C9 = 1;
+    gSpeedGolfFirstHoleTips = 1;
     fn_800F9AB0();
 }

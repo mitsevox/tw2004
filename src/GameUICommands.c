@@ -2055,13 +2055,13 @@ void fn_800894E8(MsgArg* pArgs, MsgArg* pResult) {
     }
     *(s32*)pArgs[1].p = 0;
     *(s32*)pArgs[2].p = lbl_80281EDC;
-    if (pArgs[0].i < 0 || pArgs[0].i >= lbl_802823D0) {
+    if (pArgs[0].i < 0 || pArgs[0].i >= gSpeedGolfEventLogCount) {
         *(s32*)pArgs[1].p = 0;
         *(s32*)pArgs[2].p = -1;
         return;
     }
-    *(s32*)pArgs[1].p = lbl_802120F8[pArgs[0].i].nPlayer;
-    *(s32*)pArgs[2].p = lbl_802120F8[pArgs[0].i].nEvent;
+    *(s32*)pArgs[1].p = gSpeedGolfEventLog[pArgs[0].i].nPlayer;
+    *(s32*)pArgs[2].p = gSpeedGolfEventLog[pArgs[0].i].nEvent;
 }
 
 void fn_80089584(MsgArg* pArgs, MsgArg* pResult) {
