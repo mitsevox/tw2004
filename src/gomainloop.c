@@ -287,7 +287,7 @@ void fn_80124C10(void);
 void AI_TargetsInit(void);
 void BreakLine_Update(int nView);
 void FE_movieFade(void);
-void fn_800DFC18(void);
+void GM_CheckControllerPulled(void);
 void GM_Update(void);
 void GR_vInit(void);
 void Luck_InitIG(void);
@@ -1063,7 +1063,7 @@ void fn_8006D8E8(void) {
         TI_sReadCounter(0);
         Input_vUpdate();
         if (gSession.nGameType == 6) {
-            fn_800DFC18();
+            GM_CheckControllerPulled();
         }
         fn_80090628();
         gSession.fFrameTime = fn_800DAF98(gSession.fFrameTime);

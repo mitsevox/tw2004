@@ -648,7 +648,7 @@ u8 fn_800FAD54(int nPlayer) {
             pSurf = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].ball.pCourse,
                                                    gPlayers[nPlayer].ball.vPos);
             if (pSurf != NULL && pSurf->nClass == 7) {
-                fn_800DEB5C(nPlayer);
+                GM_ReplaceLateralHazardBall(nPlayer);
                 gPlayers[nPlayer].nC3C &= ~1;
             } else {
                 gPlayers[nPlayer].nC3C &= ~1;
@@ -674,7 +674,7 @@ u8 fn_800FAD54(int nPlayer) {
             } else {
                 GM_TradeEventPoints(nPlayer, 5);
             }
-            fn_800DEB5C(nPlayer);
+            GM_ReplaceLateralHazardBall(nPlayer);
             gPlayers[nPlayer].nC3C &= ~1;
             gPlayers[nPlayer].nC3C |= 0x800;
         } else {
@@ -1719,7 +1719,7 @@ u8 fn_800FDF58(int nPlayer) {
     return 0;
 }
 
-// The mode's pfn234, which fn_800DFC18 asks (TW06's CheckControllerPulled, by
+// The mode's pfn234, which GM_CheckControllerPulled asks (TW06's CheckControllerPulled, by
 // position): during the countdown (nC3C bit 1) once it is below 71; otherwise when player 0's
 // view is not on camera 1, 2 or 4 (fn_80063C90).
 u8 fn_800FDF60(void) {

@@ -13,7 +13,7 @@
 
 void  fn_800D33F0(void);
 void  fn_800D8D38(int nPlayer);
-u8    fn_800E0A90(int nPlayer);
+u8    GM_IsRoundForcedOver(int nPlayer);
 void  fn_800D439C(int nPlayer, int a);
 void  fn_800D9834(int nPlayer);
 void  GM_PgaTourSim_SetUserEntrantHoleStrokes(int nPlayer, int nStrokes);
@@ -35,8 +35,8 @@ void  REPLAY_Restore(int nPlayer);
 
 u8    GM_bIsZoomButtonPressed(int nPlayer);
 u8    GM_bIsElevatorCamButtonPressed(int nPlayer);
-u8    fn_800E012C(int nPlayer);
-u8    fn_800DFF0C(int nPlayer);
+u8    GM_bIsAltSwingButtonPressed(int nPlayer);
+u8    GM_bIsMidholeFlybyButtonPressed(int nPlayer);
 
 u8    fn_800BB1F8(int nPlayer);
 
@@ -228,7 +228,7 @@ void GM_EndOfGolferTurn(int nPlayer) {
     Character_Sleep(gPlayers[nPlayer].pChar);
     EVENT_Trigger(nPlayer, 4, 0, -1);
     GUI_HideAllHelpTips();
-    if (gpGame->pfnHoleFinished(nPlayer, 0) || fn_800E0A90(nPlayer)) {
+    if (gpGame->pfnHoleFinished(nPlayer, 0) || GM_IsRoundForcedOver(nPlayer)) {
         GM_EndOfGolferTurn_HoleFinished(nPlayer);
         return;
     }
@@ -261,13 +261,13 @@ void GM_EndOfGolferTurn_HoleFinished(int nPlayer) {
     int i;
     EVENT_Trigger(nPlayer, 1, 0, -1);
     gpGame->pfnEndHole();
-    if (GM_CurrentlyOnLastHole() && !gpGame->bD4 && !fn_800E0A90(nPlayer)) {
+    if (GM_CurrentlyOnLastHole() && !gpGame->bD4 && !GM_IsRoundForcedOver(nPlayer)) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
             fn_800D439C(i, 0);
             fn_800D9834(i);
         }
     }
-    if (gpGame->pfnGameFinished(0) || fn_800E0A90(nPlayer)) {
+    if (gpGame->pfnGameFinished(0) || GM_IsRoundForcedOver(nPlayer)) {
         GM_EndOfGolferTurn_GameFinished(nPlayer);
         return;
     }
@@ -512,10 +512,10 @@ void GM_BumpBallForObstructions(int nPlayer) {
 void GM_PlayerTookShot(int nPlayer) {
     u8   bOut;
     if (GM_CanPlayerTakeMulligan(nPlayer) && !(gPlayers[nPlayer].uFlags & 8)) {
-        fn_800E0AC4(1);
+        GUI_ToggleMulligan(1);
     }
     if (!Player_IsCPU(nPlayer) && gSession.nSplitScreen == 0 && gpGame->b287 && gReplayData.bF10) {
-        fn_800E0A98(1);
+        GUI_ToggleReplay(1);
     }
     GM_PlayerAddStroke(nPlayer);
     bOut = GM_CheckForBallOOB(nPlayer);
@@ -579,10 +579,13 @@ void GM_PlayerTookShot(int nPlayer) {
     fn_800D9350(nPlayer);
 }
 
-// Taking a mulligan. Not allowed when mulligans are off, the hole was conceded, or fn_800E53B8
-// says no; in mulligan mode 2 each player gets one (bMulliganUsed), mode 1 allows any number. Then
-// the HUD and effects are reset, the mode is told, the golfer goes back to the Swing state, and the
-// view's flag comes out unless another player on that view is still off the green.
+// Takes a mulligan; 1 when taken. Refused when the mode has no mulligans, the golfer has conceded,
+// or the UI flag fn_800E53B8 reads is set; under the one-per-nine rule (2) a player who has used
+// theirs is refused, else it is marked used (bMulliganUsed). Then the crowd and commentary stop,
+// the ball and player go back to before the shot (REPLAY_Restore), the mulligan flags (bC2E, bC2F)
+// are set, the mode is told (pfn254), a playing replay stops, the camera and the golfer's animation
+// are reset, the golfer goes back to the Swing state with the HUD on, and the flag is taken out on
+// the view unless another player on that view (not cut) still lies off the green.
 u8 GM_PlayerTakeMulligan(int nPlayer) {
     int i;
     if (Game_GetMulliganRule() == 0) {
@@ -627,10 +630,10 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     return 1;
 }
 
-// Whether to play the pre-shot animation.
-// The mode's setting 0x290: 0 never, 1 always; otherwise always off the tee, never with clubs 0-8
-// (the drivers and woods) from elsewhere, never with an obstruction nearby, else 85% of the time.
-// On course 18, hole 10, not within 40 yards of the tee.
+// Whether the golfer plays his pre-shot animation. With session flags 0x4000 and 0x8000 both set,
+// only off the tee. The mode's setting n290: 0 never; on course 18's 10th hole never within 40
+// yards of the tee; 1 always; otherwise always off the tee, never from elsewhere with a driver or
+// wood (clubs 0-8), never with an object or hazard nearby, else 85% of the time.
 int GM_DoPreshotAnimation(int nPlayer) {
     f32 v[4];
     if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
@@ -662,13 +665,16 @@ int GM_DoPreshotAnimation(int nPlayer) {
     return (Misc_RandFunc(1) % 100) < 85;
 }
 
-// TW06: GM_ShowPostShotAnimation. Whether the golfer plays a reaction after the shot. Never when
-// GM_IsValidPostShotGameType says no, on course 18's 10th within 40 yards of the tee, for character
-// group 11 on start surface 45, or when the golfer stands out of bounds, on a surface without u34 bit 0, in
-// water (class 7/16), or on a slope steeper than 0.1 with the ball 0.2 above. After the debug,
-// plan-ready, fn_8004560C, animation 9 and uFlags bit 0 cases, by how the shot turned out (0..4):
-// after a putt 80%, always, always, 70%, 90%, else 50%; after other shots 35%, always, always,
-// 70%, 90%, else 50%.
+// Whether the golfer plays a reaction after the shot. Never when GM_IsValidPostShotGameType says
+// no, on course 18's 10th within 40 yards of the tee, or for character group 11 when the ball
+// started on surface 45. Where the animation would leave the golfer: never with no ground there,
+// out of bounds, on a surface without u34 bit 0, in water (class 7/16), or on a slope steeper than
+// 0.1 with the ground more than 0.2 below the ball. With session flags 0x4000 and 0x8000 both set:
+// only when holed, from surface 16, or for outcomes 1 and 2. Then: with bPlanReady only for outcome
+// 2; always when fn_8004560C says so or animation 9 is playing; with a scripted reaction (uFlags
+// bit 0) when the character has one (p1790). Otherwise by the outcome (fn_8006AA9C, 0..4): after a
+// putt 80%, always, always, 70%, 90%, else 50%; after other shots 35%, always, always, 70%, 90%,
+// else 50%.
 int GM_ShowPostShotAnimation(int nPlayer) {
     f32          vPos[4];
     f32          vNormA[4];
@@ -778,8 +784,8 @@ int GM_ShowPostShotAnimation(int nPlayer) {
     }
 }
 
-// TW06: GM_ShowPostShotCrowdFlyby (by position). The crowd animation's countdown at least 5
-// (fn_800336E4) and its delayed-start percentage at least 0.5 (fn_800336F4).
+// Whether the post-shot camera cuts to the crowd flyby: the crowd animation's countdown is at least
+// 5 and its delayed-start percentage at least 0.5.
 u8 GM_ShowPostShotCrowdFlyby(void) {
     if (fn_800336E4() >= 5.0f && fn_800336F4() >= 0.5f) {
         return 1;
@@ -787,14 +793,18 @@ u8 GM_ShowPostShotCrowdFlyby(void) {
     return 0;
 }
 
-// TW06: GM_FlyByMode_Init. The player the mode picks starts the hole flyover.
+// Starts the hole's flyover: the mode's first player (GetHonors with 5, nobody before) is pushed
+// into the flyover state (GS_INITIAL_FLY_BY) and becomes the active player of their view.
 void GM_FlyByMode_Init(void) {
     int n = gpGame->pfnGetHonors(5);
     GOLFERSTATE_Push(GS_INITIAL_FLY_BY, n);
     ViewController_SetActivePlayerNumber(gPlayers[n].nView[0], n);
 }
 
-// TW06: GM_Update.
+// Every frame of a round (game type 6): the mode's pfn220; then queued UI messages are shown when
+// one is waiting or the pause menu is open with flag fn_800E5110 set, else, when the mode says so
+// (b27E) and no scorecard is up, the next golfer is set up once everyone waits
+// (GM_SetupGolfer_IfAllWaiting). The frame count is kept in n12C.
 void GM_Update(void) {
     if (gSession.nGameType == 6) {
         gpGame->pfn220();
@@ -807,8 +817,10 @@ void GM_Update(void) {
     }
 }
 
-// TW06: GM_RestartHole. Every player back to the hole's start, the mode told, the flyover again
-// if the mode has one, effects reset.
+// Restarts the current hole, when the mode allows it (b279): all five players' records of the hole
+// cleared, the balls to the tee, the mode's pfn224, the flyover again when the mode has one (b27F),
+// the frame count in n12C, the HUD re-initialised, effects and cameras reset, each golfer's
+// animation and green morph reset, and message helper fn_800E5714(2).
 void GM_RestartHole(void) {
     int i;
     if (gpGame->b279) {
@@ -833,14 +845,15 @@ void GM_RestartHole(void) {
     }
 }
 
-// TW06: GM_GetGolferDistanceToPin.
+// The player's ball's distance from the pin (fn_800D0478's).
 f32 GM_GetGolferDistanceToPin(int nPlayer) {
     return fn_800D0478(nPlayer);
 }
 
-// TW06: GM_ReplaceOOBBall. A ball flagged at 0x30E, or in bounds (Ter_PointInOOBNetwork) after a
-// shot with no penalty, is dropped at a legal point nearby when there is one; otherwise (out of
-// bounds, or after a penalty) it goes back where it was before the shot.
+// A ball that must be dropped (b30E), or one in bounds (Ter_PointInOOBNetwork) after a shot with no
+// penalty, is dropped at a legal point nearby when there is one. Otherwise (out of bounds, or after
+// a penalty) it goes back where it was before the shot (vPreShot) and, when vA44 matches vBall in x
+// and z, is set up there again (Physics_InitBall).
 void GM_ReplaceOOBBall(int nPlayer) {
     f32   v[4];
     f32*  pPre;
@@ -860,8 +873,11 @@ void GM_ReplaceOOBBall(int nPlayer) {
     }
 }
 
-// The same drop without the out-of-bounds test.
-void fn_800DEB5C(int nPlayer) {
+// A ball in a lateral water hazard (GameMode8 calls it when the penalty was water, surface class
+// 7): dropped at a legal point nearby when there is one, otherwise put back where it was before the
+// shot and, when vA44 matches vBall in x and z, set up there again. GM_ReplaceOOBBall without its
+// in-bounds test.
+void GM_ReplaceLateralHazardBall(int nPlayer) {
     f32   v[4];
     f32*  pPre;
     Ball* pBall;
@@ -878,9 +894,10 @@ void fn_800DEB5C(int nPlayer) {
     }
 }
 
-// TW06: GM_GolferConcede_Hole. The player picks up: lie "holed", 999 strokes and putts. If that
-// leaves one golfer on the hole (outside mode 18), everyone else is finished too - in match play
-// the opponent wins the hole without putting out. Then the Conceded state.
+// The player concedes the hole: HUD off, lie holed, 999 strokes and putts, the ball stopped.
+// Outside mode 18, when that leaves exactly one golfer on the hole, every other player is marked
+// holed too (the last one finishes without putting out). Then the message helpers, the post-shot
+// display request and the Conceded state.
 void GM_GolferConcede_Hole(int nPlayer) {
     Player* p;
     int     i;
@@ -915,9 +932,10 @@ void GM_GolferConcede_Hole(int nPlayer) {
     GOLFERSTATE_Switch(GS_CONCEDED, nPlayer);
 }
 
-// TW06: GM_MovePlayerToBall. The player's position becomes the ball's, the pre-shot position is
-// saved, and the height is set from the ground under it: the upper surface unless there is none
-// or it is more than a quarter yard above, then the lower one, else the height is kept.
+// The player walks to the ball: its position (vBall) becomes the ball's, the pre-shot position
+// (vPreShot) is saved, and the height comes from the ground there: the upper surface unless there
+// is none or it is more than 0.25 above the ball, then the lower one, and when neither exists the
+// height is kept.
 void GM_MovePlayerToBall(int nPlayer) {
     f32         fLow;
     f32         fHigh;
@@ -939,11 +957,12 @@ void GM_MovePlayerToBall(int nPlayer) {
     }
 }
 
-// TW06: GM_CheckForShotChanges. A human's buttons while setting up: buttons 9, 10 and 30 (events
-// 0xD-0xF; not in modes 22 and 26), then the aiming cameras - zoom, elevator - or the mode's
-// re-plan button 47 (a fresh default target and shot), the next camera shot, or the mid-hole
-// flyover (unless cameras are skipped). Held buttons 11-14 fire events 0x12-0x15; any of it
-// updates the golfer's emotion.
+// A human's buttons while setting up a shot. Outside the green morph: buttons 9, 10 and 30 fire
+// events 0xD-0xF and show the HUD (in modes 22 and 26 they end the check); then the zoom camera,
+// the elevator camera (modes without b28D) or, with b28D, the re-plan button 47 when the mode
+// allows it (pfn258: a fresh default target and shot), the next alternate swing camera, or the
+// mid-hole flyover (unless cameras are skipped). Held buttons 11-14 fire events 0x12-0x15; any of
+// that, or the target's momentum moving, updates the golfer's emotion.
 void GM_CheckForShotChanges(int nPlayer) {
     u8 bChanged = 0;
     if (Player_IsCPU(nPlayer)) {
@@ -985,10 +1004,10 @@ void GM_CheckForShotChanges(int nPlayer) {
                 fn_80062C38();
                 GUI_ToggleUI(nPlayer, 1);
             }
-        } else if (!gpGame->b28D && fn_800E012C(nPlayer)) {
+        } else if (!gpGame->b28D && GM_bIsAltSwingButtonPressed(nPlayer)) {
             GolfCamera_vSwitchToNextAlternateSwingCamera(
                     ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), nPlayer);
-        } else if (fn_800DFF0C(nPlayer)) {
+        } else if (GM_bIsMidholeFlybyButtonPressed(nPlayer)) {
             if (gSession.options.bSkipCameras) return;
             if (fn_8008AC40()) return;
             GOLFERSTATE_Push(GS_MID_HOLE_FLY_BY, nPlayer);
@@ -1016,11 +1035,14 @@ void GM_CheckForShotChanges(int nPlayer) {
     }
 }
 
-// TW06: GM_DoPostShotInHoleUI. Every frame after a holed ball, until the golfer's turn ends: with
-// uFlags 8 the turn ends once the view is on camera 4. With no message holding the player, camera
-// 4 ends the turn and other cameras (not 1/2) are moved on; with one, a human may take a mulligan
-// (button 25), watch the replay (button 24, if one was recorded, the mode allows it and the hole
-// was not conceded) or continue (button 0); a CPU continues on any pad's button 0.
+// Every frame after a holed ball (and a conceded one) until the turn ends. With uFlags bit 3 the
+// turn ends once the view has faded out (colour fade held, state 4). While a UI message is queued
+// nothing else happens. With no post-shot display holding the player: faded out ends the turn; not
+// fading starts a fade to half black. While one holds, a human (fn_8002E8B4) on one screen may take
+// a mulligan (button 25; not in a saved replay or with uFlags bit 3) or watch the replay (button
+// 24, when one was recorded, the mode allows it, the hole was not conceded and the UI flag
+// fn_800E53B8 reads is clear), and button 0 moves the display on (in split screen too); for a CPU,
+// button 0 on any pad does.
 void GM_DoPostShotInHoleUI(int nPlayer) {
     View* pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
     f32   vOffset[4] = {0.0f, 0.0f, 0.0f, 0.5f};
@@ -1079,11 +1101,13 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
     }
 }
 
-// TW06: GM_ChooseRemoveBallState (by position). Whether the golfer takes the ball out of the cup
-// with the special animation: never in the special session mode, when GM_IsValidPostShotGameType says no, or
-// after a picked-up ball. A shot of kind 2 first asks the mode (with the stroke taken back). Then
-// yes if 0xC2B is set; no during animation 9, beyond 5 yards (0xA64), or off the green; a scripted
-// answer in uFlags bits 0/1; otherwise 10% of the time two or more under par, else 25%.
+// Whether the golfer takes the ball out of the cup with the special animation. Never with session
+// flags 0x4000 and 0x8000 both set, when GM_IsValidPostShotGameType says no, or for a ball picked
+// up at the stroke limit (bC2D). For outcome 2 the mode is asked first (pfn1FC, with the stroke
+// taken back); when it says no, only a solved tap-in (bPlanReady) goes on (yes, after fn_8006AAB4
+// records the shot again). Then yes with bPlanReady; no while animation 9 plays, beyond 5 (fA64) or
+// when the ball did not start on the green; a scripted answer in uFlags bit 1 (with bit 0);
+// otherwise one time in 10 two or more under par, else one in 4.
 int GM_ChooseRemoveBallState(int nPlayer) {
     if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
         return 0;
@@ -1132,13 +1156,14 @@ int GM_ChooseRemoveBallState(int nPlayer) {
     return 0;
 }
 
-// TW06: GM_SimulateBallMovement. Each frame of a shot: the ball's physics steps for this frame
-// (none while the view holds it), then the look-ahead copy (ballBefore) is run on ahead within a
-// time budget of 0.83 ms minus what the real ball took, until it comes to rest (event 0x3C). Then
-// the golfer's reaction can start early: for a shot of kind 8 or 9 with the ball now 2 to 5.5
-// yards out (close to the nearest it got), a look-ahead holed at par or better starts it half the
-// time, and a look-ahead miss that came within 0.2 of the hole always does (animation 9). A
-// scripted reaction (uFlags bit 0) plays when the ball passes the saved distance instead.
+// Each frame of a shot: the ball's physics steps for this frame (GameEffects_BallUpdatesThisFrame;
+// none when the mode has n294 and the ball is behind the camera), then on one screen the look-ahead
+// copy (ballBefore) runs on within a budget of 0.83 ms minus what the real ball took, until it
+// comes to rest (event 0x3C and its outcome recorded). Then, when fn_800BB1F8 allows and the mode
+// has post-shot reactions: a scripted reaction (uFlags bit 0) starts animation 9 once the ball
+// passes the saved distance (fEEC, with bit 2); otherwise, for outcomes 8 and 9, once per shot when
+// the ball is 2 to 5.5 from the pin and near the closest it got, a look-ahead holed at par or
+// better starts it half the time and a look-ahead miss that came within 0.2 always does.
 void GM_SimulateBallMovement(int nPlayer) {
     int nSteps = 0;
     u64 t0;
@@ -1227,9 +1252,11 @@ void GM_SimulateBallMovement(int nPlayer) {
     }
 }
 
-// TW06: GM_CheckControllerPulled (by position). When the mode's pfn234 says yes and player
-// 0's view is not in colour fade state 1, 2 or 4, calls fn_800E5228 (an empty function).
-void fn_800DFC18(void) {
+// Every frame of a round (gomainloop): when the mode's pfn234 allows it (by default always; speed
+// golf only late in the countdown or while player 0's view is not fading) and player 0's view is
+// not fading, calls fn_800E5228, an empty function beside the pause requests of GameMessages.c: the
+// controller-pulled check is stubbed out in this build.
+void GM_CheckControllerPulled(void) {
     if (gpGame->pfn234()) {
         if (!fn_80063C90(ViewController_GetCameraControl(gPlayers[0].nView[0]))) {
             fn_800E5228();
@@ -1237,8 +1264,8 @@ void fn_800DFC18(void) {
     }
 }
 
-// TW06: GM_SetupCustomHoleSelection. Loads a saved custom round (slot nSaveSlot, record
-// nSaveCourse) into the round's hole list.
+// Loads a saved custom round into the round's hole list: the hole and course of each of the 18
+// holes from save profile nSaveSlot, custom round nSaveCourse.
 void GM_SetupCustomHoleSelection(void) {
     int       i;
     SaveProfile* pSave;
@@ -1249,9 +1276,10 @@ void GM_SetupCustomHoleSelection(void) {
     }
 }
 
-// Button 8 tapped: released after 2 to 5 frames of holding (the count is kept by GM_bIsZoomButtonPressed).
-// A tap asks for the mid-hole flyover (when the mode has one, 0x280); a hold is the zoom camera.
-u8 fn_800DFF0C(int nPlayer) {
+// Whether button 8 was tapped: released after 2 to 5 frames of holding (the count is kept by
+// GM_bIsZoomButtonPressed), which asks for the mid-hole flyover; only when the mode has one (b280).
+// A tap resets the count.
+u8 GM_bIsMidholeFlybyButtonPressed(int nPlayer) {
     if (!gpGame->b280) {
         return 0;
     }
@@ -1270,8 +1298,9 @@ u8 fn_800DFF0C(int nPlayer) {
     return 0;
 }
 
-// TW06: GM_bIsZoomButtonPressed. Button 8 held: counts frames (FRAME_RATE a second) and says yes
-// once it has been held for 6.
+// Whether button 8 has been held for the zoom camera: a press starts the player's count (n144),
+// each frame it stays held adds the frames that passed (FRAME_RATE a second, rounded), and at 6 the
+// count resets and the answer is yes.
 u8 GM_bIsZoomButtonPressed(int nPlayer) {
     if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(8, 0))
         && gpGame->n144[nPlayer] == 0) {
@@ -1290,8 +1319,10 @@ u8 GM_bIsZoomButtonPressed(int nPlayer) {
     return 0;
 }
 
-// Button 47 tapped (2 to 19 frames): the next camera shot.
-u8 fn_800E012C(int nPlayer) {
+// Whether button 47 was tapped: released after 2 to 19 frames of holding (the count n158 is kept by
+// GM_bIsElevatorCamButtonPressed), which switches to the next alternate swing camera. A tap resets
+// the count.
+u8 GM_bIsAltSwingButtonPressed(int nPlayer) {
     if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x2F, 0)) ||
         (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x2F, 1))) {
         return 0;
@@ -1307,7 +1338,8 @@ u8 fn_800E012C(int nPlayer) {
     return 0;
 }
 
-// TW06: GM_bIsElevatorCamButtonPressed. Button 47 held for 20 frames.
+// Whether button 47 has been held for the elevator camera: counted as in GM_bIsZoomButtonPressed
+// (in n158), yes at 20 frames.
 u8 GM_bIsElevatorCamButtonPressed(int nPlayer) {
     if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x2F, 0))
         && gpGame->n158[nPlayer] == 0) {
@@ -1333,6 +1365,11 @@ u8 GM_bIsElevatorCamButtonPressed(int nPlayer) {
 // likely a macro written for a record of several fields, all of which are the one value here.
 #define RECORD_AT_LEAST(a, b) ((a) >= (b) && (a) >= (b) && (a) >= (b))
 
+// How many all-time records the profile's golfer holds, matched by name: in the first table
+// (gSession.recA, 8 records of 5 places) a place with the record's own value; in the other two
+// (recB, 3 blocks of 3 records; recC, 5 blocks of 2 records; 5 places each) a place whose value is
+// at least the record of any of the first three blocks. Each record counts once.
+// GM_GetBonusProgress gives half a point for each.
 int GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile) {
     int n = 0;
     int j, i, k, b;
@@ -1429,8 +1466,9 @@ f32 GM_GetGameProgress(SaveProfile* pProfile) {
     return f + GM_GetBonusProgress(pProfile);
 }
 
-// TW06: GM_GetBonusProgress (by position). A point for each real-time event won; half a point for
-// awards 23..38, each of the 16 a1C0 awards won and each all-time record held.
+// The bonus part of the profile's completion score (GM_GetGameProgress adds it): a point for each
+// real-time event won; half a point for each of awards 23..38 won, each of the 16 a1C0 awards won
+// and each all-time record held.
 f32 GM_GetBonusProgress(SaveProfile* pProfile) {
     f32 f = 0.0f;
     int i;
@@ -1464,14 +1502,19 @@ void GM_SetNeedToBuildPlayoffHoleList(u8 v) {
     gpGame->b135 = v;
 }
 
-u8 fn_800E0A90(int nPlayer) {
+// Always 0 in this build. When set, GM_EndOfGolferTurn treats the hole as finished and
+// GM_EndOfGolferTurn_HoleFinished skips the last-hole payouts and ends the game, whatever the mode
+// says.
+u8 GM_IsRoundForcedOver(int nPlayer) {
     return 0;
 }
 
-void fn_800E0A98(int a) {
+// Shows (1) or hides (0) the HUD's replay prompt: UI message 46 with the flag.
+void GUI_ToggleReplay(int a) {
     GameMsg_SendInt(46, (u8)a);
 }
 
-void fn_800E0AC4(int a) {
+// Shows (1) or hides (0) the HUD's mulligan prompt: UI message 29 with the flag.
+void GUI_ToggleMulligan(int a) {
     GameMsg_SendInt(29, (u8)a);
 }

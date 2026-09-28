@@ -361,15 +361,15 @@ int  GM_ShowPostShotAnimation(int nPlayer);
 u8   GM_ShowPostShotCrowdFlyby(void);
 void GM_FlyByMode_Init(void);
 void GM_ReplaceOOBBall(int nPlayer);
-void fn_800DEB5C(int nPlayer);
+void GM_ReplaceLateralHazardBall(int nPlayer);
 void GM_MovePlayerToBall(int nPlayer);
 void GM_CheckForShotChanges(int nPlayer);
 void GM_DoPostShotInHoleUI(int nPlayer);
 int  GM_ChooseRemoveBallState(int nPlayer);
 void GM_SimulateBallMovement(int nPlayer);
 void GM_SetNeedToBuildPlayoffHoleList(u8 b);
-void fn_800E0A98(int a);
-void fn_800E0AC4(int a);
+void GUI_ToggleReplay(int a);
+void GUI_ToggleMulligan(int a);
 
 // GameRound.c
 void GM_Vec4Sub(f32* pA, f32* pB, f32* pOut);

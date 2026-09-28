@@ -348,8 +348,8 @@ void GUI_AdvancePostShotUI(int nPlayer) {
 // Hides the HUD's button prompts: mulligan (message 29), replay (46) and tap-in (47); TW07 inlines
 // GUI_ToggleMulligan, GUI_ToggleReplay and GUI_ToggleTapin here.
 void GUI_HideAllHelpTips(void) {
-    fn_800E0AC4(0);
-    fn_800E0A98(0);
+    GUI_ToggleMulligan(0);
+    GUI_ToggleReplay(0);
     fn_800E5474(0);
 }
 
