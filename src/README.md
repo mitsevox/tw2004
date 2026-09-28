@@ -56,7 +56,8 @@ see [Game modes](#game-modes).
 
 In the file tables, **Name** says where the file name comes from (the file's header comment has the
 details): **EA** EA's own name in this binary (an assert or file string); **T6** / **T7** EA's file
-name in Tiger Woods 2006 / 2007, whose functions match these; **M03** Madden NFL 2003's debug
+name in Tiger Woods 2006 / 2007, whose functions match these; **T03** / **T05** a source path in
+Tiger Woods 2003 / 2005 (EA's file string there); **M03** Madden NFL 2003's debug
 symbols; **ours** a name we chose for what the file does; **ph** a placeholder named after its
 address (`CodeXXXXXXXX.c`, `unsorted/*`), its original file unknown.
 Files are listed in link order (address order) within each group.
@@ -278,7 +279,7 @@ ball placement, and the golfer state engine that steps each player through a sho
 | target.c | T6 | the aim marker, aim-point and ball-placement controls, where a ball may be dropped |
 | emotion.c | T6 | the golfers' emotions after a shot, picking the reaction they play |
 | Replay.c | EA | shot replay / take-back: saves player and conditions before a shot |
-| CaddieTips.c | ours | tips shown as a swing starts |
+| CaddieTips.c | T7 | tips shown as a swing starts |
 
 ### Characters
 
@@ -321,7 +322,7 @@ these files and the game modes sit together (0x800D9E14-0x80102AC8).
 | HoleScore.c | ours (TW06 `analysisutilities.c`, medium) | per-player round analysis: distances, lie, streaks by score |
 | GameHoleContests.c | ours | longest drive, closest to the pin, hole-in-one contests |
 | GameEffects.c | T6 | slow motion, the GameBreaker, heartbeat rumble, time rate |
-| GameMode.c | ours (TW06 `GM_*` order) | turns, strokes, mulligans, post-shot reaction, walking to the ball (`GM_*`) |
+| GameMode.c | T7 | turns, strokes, mulligans, post-shot reaction, walking to the ball (`GM_*`) |
 | GameRound.c | ours | the round set-up: a game mode's callbacks, holes, stroke limit, mixed-course rounds |
 | GameUI.c | ours | the in-round display flow: HUD messages, end-of-hole and end-of-round screens |
 | GameMessages.c | ours | the game's messages to the front end (a message id plus values) |
@@ -336,21 +337,21 @@ number (`gpGame->nMode`); several reuse another mode's callbacks.
 |---|---|---|---|
 | 0 | GameModeStroke.c | T6 | stroke play (modes 9, 12..17, 22, 23 reuse some of its callbacks) |
 | 1 | GameModeMatch.c | T6 | match play with sudden-death playoff |
-| 2 | GameMode_Skins.c | ours | skins |
-| 4 | LadderedMode.c | ours | the 25-event ladder's matches |
-| 5 | PlayNowMode.c | ours | 83 challenges (`'PLY '`); also run by mode 24 |
+| 2 | GameMode_Skins.c | T6/T7 | skins |
+| 4 | LadderedMode.c | T05 | the 25-event ladder's matches |
+| 5 | PlayNowMode.c | T03/T05 | the Play Now challenges: 83 (`'PLY '`); also run by mode 24 |
 | 6, 7 | GameMode6.c, GameMode7.c | ours | two-player modes on GameMode8.c's code |
 | 8 | GameMode8.c | ours | speed golf (time plus 3 per stroke) |
-| 9 | GameMode_Practice.c | ours | one player, no opponent; probably TW06's practice mode *(unverified)* |
+| 9 | GameMode_Practice.c | T7 | practice: chosen holes, the ball placed by hand before every shot |
 | 10 | GameModeReplay.c | T6 | replaying a saved shot; the target games' target list |
 | 11 | GameMode11.c | ours | the lessons |
 | 12 | GameMode12.c | ours | stroke play with points for special surfaces |
-| 13..17 | GameMode_SkillZoneBase.c | ours | the code the target games share |
-| 13 | GameMode_SkillZoneTimed.c | ours | the timed target game |
-| 14 | GameMode_SkillZoneCapture.c | ours | a two-player target game (claim 5 targets) |
-| 15 | GameMode_SkillZoneHorse.c | ours | HORSE on the targets |
-| 16 | GameMode_SkillZoneTarget.c | ours | 20 balls at the targets in any order |
-| 17 | GameMode_SkillZoneTargetToTarget.c | ours | the targets in order with 5 balls |
+| 13..17 | GameMode_SkillZoneBase.c | T7 | the code the target games share |
+| 13 | GameMode_SkillZoneTimed.c | T7 | the timed target game |
+| 14 | GameMode_SkillZoneCapture.c | T7 | a two-player target game (claim 5 targets) |
+| 15 | GameMode_SkillZoneHorse.c | T7 | HORSE on the targets |
+| 16 | GameMode_SkillZoneTarget.c | T7 | 20 balls at the targets in any order |
+| 17 | GameMode_SkillZoneTargetToTarget.c | T7 | the targets in order with 5 balls |
 | 18 | GameModeStableford.c | T6 | modified Stableford |
 | 19 | GameModeBestBall.c | T6 | two-against-two best ball stroke play |
 | 20 | GameModeFourBall.c | T6 | two-against-two best ball match play |
@@ -375,10 +376,10 @@ calendar with its real-time events, the ladder map, and the money and goals in t
 | Calendar.c | ours | dates for the tour season: day numbers, weekdays, today's date, date strings |
 | Earnings.c | EA (TW2003 source tree) | money and goals: prize table (`'ERN '`), payouts and multipliers, unlock goals, saved replays |
 | CalendarScreen.c | ours | the career calendar screen's callbacks |
-| FE_Calendar.c | ours | the calendar's per-mode driver tables and the month grid |
+| FE_Calendar.c | T7 | the calendar's per-mode driver tables and the month grid |
 | PGATourSimulation.c | T6 | the tour field, entrant scores, season statistics and rankings |
 | fe_stats.c | T6 | the PGA TOUR statistics screen |
-| FE_CalendarPopups.c | ours | the panel of a calendar day's event details |
+| FE_CalendarPopups.c | T7 | the panel of a calendar day's event details |
 | GameMode4Menu.c | ours | the ladder map screen's messages |
 | LadderMap.c | ours | the ladder map's rules: regions, nodes, cursor moves |
 
@@ -394,7 +395,7 @@ lines, sounds and music. The SitDev files sit together at 0x800BB0A8-0x800BD894.
 | File | Name | What it is |
 |---|---|---|
 | event.c | T6 | the game's event handlers (`EVENT_Trigger`) |
-| Code80067710.c | ph | the event queue the situation scripts react to |
+| SitDev.c | T7 | the commentary scripts' state block, their loaders, and the event queue they react to |
 | SitDevMisc.c | T6/T7 | the ball watcher's state, value draws, mode bits *(file has no header description)* |
 | SitDevFile.c | EA | the ball watcher, loading the scripts, running their actions |
 | SitDevCommentaryZones.c | T6/T7 | the hole's commentary zones and the zone test |

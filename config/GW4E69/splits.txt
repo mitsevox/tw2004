@@ -453,15 +453,15 @@ GoStaticCam.c:
 	.sdata2     start:0x80283728 end:0x80283748
 
 event.c:
-	.text       start:0x80065B44 end:0x80067710
+	.text       start:0x80065B44 end:0x80067608
 	.data       start:0x80188628 end:0x80188778
-	.bss        start:0x801D5AB0 end:0x801D5BF0
-	.sdata      start:0x802811B8 end:0x802811C0
 	.sbss       start:0x80281E20 end:0x80281E28
 	.sdata2     start:0x80283748 end:0x80283770
 
-Code80067710.c:
-	.text       start:0x80067710 end:0x80067B80
+SitDev.c:
+	.text       start:0x80067608 end:0x80067B80
+	.bss        start:0x801D5AB0 end:0x801D5BF0
+	.sdata      start:0x802811B8 end:0x802811C0
 	.sbss       start:0x80281E28 end:0x80281E30
 	.sdata2     start:0x80283770 end:0x80283778
 

@@ -5,17 +5,14 @@
 // plays audio, tells the lessons (Lessons_OnEvent can block an event) and mostly passes the moment
 // on to the commentary scripts (SitDev_QueueEvent). The handler names are TW06's EVENTID_e and
 // TW07's event.c: the numbers match TW06's up to 59 and are one lower from 60 on (TW06 added one of
-// SpecialSwingEnded / SpecialSwingDone). The file ends with SitDev.c's first five functions
-// (SitDev_vInitModule .. SitDev_vUnregisterStreamClients, TW07's order) and SitDev's state block;
-// Code80067710.c goes on with the rest of SitDev.c.
+// SpecialSwingEnded / SpecialSwingDone). SitDev.c follows it in the link order (its first five
+// functions sat at this file's end until 2026-09-28's split).
 
 #include "game.h"
 #include "terrain.h"
 #include "sitdev.h"
 #include "core/easb.h"
 
-SitDevData gSitDevData;                     // the commentary scripts' state (SitDev.c's)
-SitDevData* gpSitDevData = &gSitDevData;    // every SitDev file reaches it through this
 u32 gEventIdleSeconds;                      // seconds counted by EVENT_Idle (event 26) this round
 
 void Character_InitNewClubAndShotType(int nPlayer);
@@ -1020,45 +1017,4 @@ int GameEffects_GetCurrentTriggerType(void) {
         }
     }
     return 0;
-}
-
-// Round start (GO_vInitIG): clears the commentary scripts' state block (SitDevData: no line played,
-// no events queued), registers the loader for a hole's commentary zones (course chunk 5,
-// fn_800BB6DC) and stops watching any ball (fn_800BB0C8).
-void SitDev_vInitModule(void) {
-    Mem_set(gpSitDevData, 0, sizeof(SitDevData));
-    gpSitDevData->pE8 = NULL;
-    gpSitDevData->n13C = 0;
-    Course_RegisterLoader(5, fn_800BB6DC);
-    fn_800BB0C8();
-}
-
-// Round end (fn_8006CDC4): frees the commentary scripts' buffers (SitDevData pD0 when set, pCC,
-// pD4) and forgets the loaded scripts (lbl_80282208).
-void SitDev_vCloseModule(void) {
-    if (gpSitDevData->pD0 != NULL) {
-        StaticMem_Free(gpSitDevData->pD0);
-    }
-    StaticMem_Free(gpSitDevData->pCC);
-    StaticMem_Free(gpSitDevData->pD4);
-    lbl_80282208 = NULL;
-}
-
-// Before a hole loads (fn_8006F4F0): no commentary zones yet (the count fn_800BB6DC adds to).
-void SitDev_vInitBeforeHole(void) {
-    lbl_80282210 = 0;
-}
-
-// Registers SitDev_LoadScripts as the loader of the hole stream's 'sscr' chunks (the commentary
-// scripts); streammanagerhole.c calls it.
-void SitDev_vRegisterStreamClients(void) {
-    // port: SitDevFile.c defines the handler with the object's first word (the scripts) as its
-    //       parameter; UStream calls it with the object. Same address on the GameCube.
-    Stream_RegisterLoadChunkCallback('sscr', (void (*)(UStreamObject*))SitDev_LoadScripts);
-}
-
-// Unregisters the loader of the hole stream's 'sscr' chunks that SitDev_vRegisterStreamClients set
-// up; streammanagerhole.c calls it.
-void SitDev_vUnregisterStreamClients(void) {
-    Stream_UnregisterLoadChunkCallback('sscr');
 }

@@ -1174,7 +1174,7 @@ config.libs = [
             Object(Matching, "Controller_Gc.c"),
             Object(Matching, "unsorted/sweep_800136F4.c"),
             Object(Matching, "event.c"),
-            Object(Matching, "Code80067710.c"),
+            Object(Matching, "SitDev.c"),
             Object(Matching, "unsorted/sweep_8009554C.c"),
             Object(Matching, "Code80095564.c"),
             Object(Matching, "unsorted/sweep_8009B314.c"),

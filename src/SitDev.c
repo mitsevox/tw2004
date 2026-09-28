@@ -1,13 +1,21 @@
-// Code80067710.c (our name; a file of its own by its constants, name unknown): the queue of events
-// the situation scripts (SitDevFile.c) react to. event.c's handlers queue each moment of a shot
-// (SitDev_QueueEvent); SitDev_ProcessEventQueue runs every script whose event came up, then empties the
-// queue.
+// SitDev.c (EA's name: TW07's Golf\SitDev\SitDev.c has these functions in this order): the core
+// of the commentary scripts ("situation development"). The state block every SitDev file reaches
+// through gpSitDevData, set up at round start and freed at round end, the loaders of a hole's
+// commentary zones and scripts, and the queue of events the situation scripts (SitDevFile.c) react
+// to: event.c's handlers queue each moment of a shot (SitDev_QueueEvent), and
+// SitDev_ProcessEventQueue runs every script whose event came up, then empties the queue.
 
 #include "game_types.h"
 #include "engine.h"
 #include "golfer.h"
 #include "game.h"
 #include "sitdev.h"
+#include "terrain.h"
+#include "core/easb.h"
+
+SitDevData gSitDevData;                     // the commentary scripts' state (SitDev.c's)
+SitDevData* gpSitDevData = &gSitDevData;    // every SitDev file reaches it through this
+
 
 void SitDev_SetupStateVector(int nPlayer, u8 nEvent);
 void fn_800BB0DC(void);
@@ -20,6 +28,47 @@ void fn_80067B5C(f32* pA, f32* pB, f32* pOut);
 u8 lbl_80281E2A;    // event 26 has been queued since the last event 2 or 3
 u8 lbl_80281E29;
 u8 lbl_80281E28;
+
+// Round start (GO_vInitIG): clears the commentary scripts' state block (SitDevData: no line played,
+// no events queued), registers the loader for a hole's commentary zones (course chunk 5,
+// fn_800BB6DC) and stops watching any ball (fn_800BB0C8).
+void SitDev_vInitModule(void) {
+    Mem_set(gpSitDevData, 0, sizeof(SitDevData));
+    gpSitDevData->pE8 = NULL;
+    gpSitDevData->n13C = 0;
+    Course_RegisterLoader(5, fn_800BB6DC);
+    fn_800BB0C8();
+}
+
+// Round end (fn_8006CDC4): frees the commentary scripts' buffers (SitDevData pD0 when set, pCC,
+// pD4) and forgets the loaded scripts (lbl_80282208).
+void SitDev_vCloseModule(void) {
+    if (gpSitDevData->pD0 != NULL) {
+        StaticMem_Free(gpSitDevData->pD0);
+    }
+    StaticMem_Free(gpSitDevData->pCC);
+    StaticMem_Free(gpSitDevData->pD4);
+    lbl_80282208 = NULL;
+}
+
+// Before a hole loads (fn_8006F4F0): no commentary zones yet (the count fn_800BB6DC adds to).
+void SitDev_vInitBeforeHole(void) {
+    lbl_80282210 = 0;
+}
+
+// Registers SitDev_LoadScripts as the loader of the hole stream's 'sscr' chunks (the commentary
+// scripts); streammanagerhole.c calls it.
+void SitDev_vRegisterStreamClients(void) {
+    // port: SitDevFile.c defines the handler with the object's first word (the scripts) as its
+    //       parameter; UStream calls it with the object. Same address on the GameCube.
+    Stream_RegisterLoadChunkCallback('sscr', (void (*)(UStreamObject*))SitDev_LoadScripts);
+}
+
+// Unregisters the loader of the hole stream's 'sscr' chunks that SitDev_vRegisterStreamClients set
+// up; streammanagerhole.c calls it.
+void SitDev_vUnregisterStreamClients(void) {
+    Stream_UnregisterLoadChunkCallback('sscr');
+}
 
 // Queue event nEvent for nPlayer (0xFF: player 0; below 0: nobody).
 void SitDev_QueueEvent(int nPlayer, int a, u8 nEvent) {
