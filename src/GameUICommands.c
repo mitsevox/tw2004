@@ -348,8 +348,8 @@ void  Lessons_StopWaiting(void);
 void  Lessons_RestartLesson(void);
 void  Lessons_ChooseQuit(void);
 void  Lessons_ChooseContinue(void);
-s32   fn_80126FA0(void);
-s32   fn_80127098(s32 n);
+s32   GameMode22_GetVariant(void);
+s32   GameMode22_GetHoleRecordIndex(s32 n);
 
 // Run command nCmd.
 void fn_800850E4(int nCmd, MsgArg* pArgs, MsgArg* pResult) {
@@ -1799,14 +1799,14 @@ void fn_8008886C(MsgArg* pArgs, MsgArg* pResult) {
         sprintf(((MsgString*)pArgs[3].p)->pStr, "%s", gSession.recB[Game_GetCurHoleNum()][2][pArgs[2].i].szName);
         return;
     }
-    if (Game_GetMode() == 22 && fn_80126FA0() == 0) {
+    if (Game_GetMode() == 22 && GameMode22_GetVariant() == 0) {
         sprintf(((MsgString*)pArgs[3].p)->pStr, "%s",
-                gSession.recC[fn_80127098(Game_GetCurHoleNum())][0][pArgs[2].i].szName);
+                gSession.recC[GameMode22_GetHoleRecordIndex(Game_GetCurHoleNum())][0][pArgs[2].i].szName);
         return;
     }
-    if (Game_GetMode() == 22 && fn_80126FA0() == 1) {
+    if (Game_GetMode() == 22 && GameMode22_GetVariant() == 1) {
         sprintf(((MsgString*)pArgs[3].p)->pStr, "%s",
-                gSession.recC[fn_80127098(Game_GetCurHoleNum())][1][pArgs[2].i].szName);
+                gSession.recC[GameMode22_GetHoleRecordIndex(Game_GetCurHoleNum())][1][pArgs[2].i].szName);
         return;
     }
     sprintf(((MsgString*)pArgs[3].p)->pStr, "%s",
@@ -1835,12 +1835,12 @@ void fn_80088AD4(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = gSession.recB[Game_GetCurHoleNum()][2][pArgs[2].i].nValue;
         return;
     }
-    if (Game_GetMode() == 22 && fn_80126FA0() == 0) {
-        pResult->i = gSession.recC[fn_80127098(Game_GetCurHoleNum())][0][pArgs[2].i].nValue;
+    if (Game_GetMode() == 22 && GameMode22_GetVariant() == 0) {
+        pResult->i = gSession.recC[GameMode22_GetHoleRecordIndex(Game_GetCurHoleNum())][0][pArgs[2].i].nValue;
         return;
     }
-    if (Game_GetMode() == 22 && fn_80126FA0() == 1) {
-        pResult->i = gSession.recC[fn_80127098(Game_GetCurHoleNum())][1][pArgs[2].i].nValue;
+    if (Game_GetMode() == 22 && GameMode22_GetVariant() == 1) {
+        pResult->i = gSession.recC[GameMode22_GetHoleRecordIndex(Game_GetCurHoleNum())][1][pArgs[2].i].nValue;
         return;
     }
     pResult->i = gSession.aCourseRecord[Game_GetCourse()].aRecord[pArgs[1].i][pArgs[2].i].nValue;

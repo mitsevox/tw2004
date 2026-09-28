@@ -118,8 +118,8 @@ void GUI_Init(void) {
 
 u8    fn_8010D364(void);
 u8    fn_8010D390(void);
-u8    fn_80126FD8(void);
-u8    fn_80127004(void);
+u8    GameMode22_IsActive(void);
+u8    GameMode22_IsShowingWinner(void);
 
 #define UI_PUSH(q, n)       \
     {                       \
@@ -371,7 +371,7 @@ u8 GUI_IsPostShotUIAnimating(int nPlayer) {
     if (fn_8010D364() && fn_8010D390()) {
         return 1;
     }
-    if (fn_80126FD8() && fn_80127004()) {
+    if (GameMode22_IsActive() && GameMode22_IsShowingWinner()) {
         return 1;
     }
     if (gSession.nSplitScreen) {

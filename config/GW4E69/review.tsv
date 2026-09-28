@@ -1809,3 +1809,13 @@ address	name	comment	by	date
 80126E68	GameMode22_HoleStart	add	rl6 (replayed by orchestrator)	2026-09-28
 80126E88	GameMode22_RestartHole	add	rl6 (replayed by orchestrator)	2026-09-28
 80126EC0	GameMode22_ClearPlayerStats	rewrite	rl6 (replayed by orchestrator)	2026-09-28
+80126F7C	GameMode22_AfterClearStats	add	rl6 (replayed by orchestrator)	2026-09-28
+80126F80	GameMode22_PreSwing	add	rl6 (replayed by orchestrator)	2026-09-28
+80126F84	GameMode22_SetNumDrives	add	rl6 (replayed by orchestrator)	2026-09-28
+80126F94	GameMode22_SetVariant	add	rl6 (replayed by orchestrator)	2026-09-28
+80126FA0	GameMode22_GetVariant	add	rl6 (replayed by orchestrator)	2026-09-28
+80126FB0	GameMode22_GetWinner	rewrite	rl6 (replayed by orchestrator)	2026-09-28
+80126FD8	GameMode22_IsActive	add	rl6 (replayed by orchestrator)	2026-09-28
+80127004	GameMode22_IsShowingWinner	add	rl6 (replayed by orchestrator)	2026-09-28
+80127034	GameMode22_ShowDrivesLeft	rewrite	rl6 (replayed by orchestrator)	2026-09-28
+80127098	GameMode22_GetHoleRecordIndex	add	rl6 (replayed by orchestrator)	2026-09-28

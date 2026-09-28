@@ -52,8 +52,8 @@ void fn_8012409C(void);                 // gbacable.c
 void fn_801240A8(void);                 // gbacable.c
 s32  fn_801255C4(s32* pPos);            // EASportsBio.c
 u8   PasswordManager_TestPassword(char* szCode);  // PasswordManager.c
-void fn_80126F84(s32 n);                // GameMode22.c: sets lbl_80195498.n4
-void fn_80126F94(s32 n);                // GameMode22.c: sets lbl_80195498.n0
+void GameMode22_SetNumDrives(s32 n);                // GameMode22.c: sets lbl_80195498.n4
+void GameMode22_SetVariant(s32 n);                // GameMode22.c: sets lbl_80195498.n0
 void GM_SetupCustomHoleSelection(void); // GameManager.c
 int  GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile);  // GameManager.c
 void PlayNow_SelectGroup(int nId);              // GameMode5.c
@@ -5412,7 +5412,7 @@ void fn_80084AA8(MsgArg* pArgs, MsgArg* pResult) {
         GM_SetModeType(nMode);
         GM_SetSplitScreenForMode();
         if (nMode == 22) {
-            fn_80126F94(n);
+            GameMode22_SetVariant(n);
         }
         return;
     case 1:
@@ -5428,7 +5428,7 @@ void fn_80084AA8(MsgArg* pArgs, MsgArg* pResult) {
             n = 15;
             break;
         }
-        fn_80126F84(n);
+        GameMode22_SetNumDrives(n);
         break;
     }
 }

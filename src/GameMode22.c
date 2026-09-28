@@ -23,7 +23,7 @@ void GameMode22_StartSwing(int nPlayer);
 s32 GameMode22_GoToPlayoff(void);
 u8   GameMode22_HoleFinished(int nPlayer, int n);
 void GameMode22_ScoreShot(int nPlayer);
-u8   fn_80126FB0(s32* pn8);
+u8   GameMode22_GetWinner(s32* pn8);
 u8   GameMode22_GameFinished(int n);
 void GameMode22_BallOutOfBounds(int nPlayer);
 void GameMode22_EndGolferTurn(int nPlayer);
@@ -34,15 +34,15 @@ void GameMode22_StartEvent(void);
 void GameMode22_ClearPlayerStats(void);
 void GameMode22_HoleStart(void);
 void GameMode22_RestartHole(void);
-void fn_80126F7C(void);
-void fn_80126F80(void);
-void fn_80126F84(s32 p0);
-void fn_80126F94(s32 n);
-s32 fn_80126FA0(void);
-s32 fn_80126FD8(void);
-u8   fn_80127004(void);
-void fn_80127034(int nPlayer);
-s32 fn_80127098(s32 arg0);
+void GameMode22_AfterClearStats(void);
+void GameMode22_PreSwing(void);
+void GameMode22_SetNumDrives(s32 p0);
+void GameMode22_SetVariant(s32 n);
+s32 GameMode22_GetVariant(void);
+s32 GameMode22_IsActive(void);
+u8   GameMode22_IsShowingWinner(void);
+void GameMode22_ShowDrivesLeft(int nPlayer);
+s32 GameMode22_GetHoleRecordIndex(s32 arg0);
 
 char* lbl_8019543C[4] = {
     "Rookie of the Year",
@@ -302,7 +302,7 @@ void GameMode22_SetupNextGolfer(void) {
 void GameMode22_EndGame(void) {
     s32 nPlayer;
 
-    fn_80126FB0(&nPlayer);
+    GameMode22_GetWinner(&nPlayer);
     GM_Earnings_AwardMoney(nPlayer, 5000, NULL);
 }
 
@@ -323,7 +323,7 @@ void GameMode22_UpdateFrame(void) {
             fn_800E5D40(2);
             break;
         }
-        fn_80127034(lbl_80282278);
+        GameMode22_ShowDrivesLeft(lbl_80282278);
         lbl_80282580 = 0;
     }
     if (lbl_802819A0-- <= 0) {
@@ -351,8 +351,8 @@ void GameMode22_UpdateFrame(void) {
 // As a swing begins (pfn20C): GameMode22_PreSwing (empty), the drives-left text, and message 0x42
 // for scoreboard slot 0 with nPlayer's score (nEBC).
 void GameMode22_StartSwing(int nPlayer) {
-    fn_80126F80();
-    fn_80127034(nPlayer);
+    GameMode22_PreSwing();
+    GameMode22_ShowDrivesLeft(nPlayer);
     fn_800E5CA4(0, gPlayers[nPlayer].nEBC, 0, 0, 0, 0, 0, 0.0f);
 }
 
@@ -403,7 +403,7 @@ u8 GameMode22_HoleFinished(int nPlayer, int n) {
 // The game is over (pfnGameFinished) once a winner is decided (bC, GameMode22_GetWinner). n is not
 // read.
 u8 GameMode22_GameFinished(int n) {
-    return fn_80126FB0(NULL);
+    return GameMode22_GetWinner(NULL);
 }
 
 // The ball went out of bounds (pfn250): the drive is scored like any other (GameMode22_ScoreShot).
@@ -762,56 +762,69 @@ void GameMode22_ClearPlayerStats(void) {
         fn_800E5CA4(i, PLAYER(i)->nEBC, 0, 0, 0, 0, 0, 0.0f);
     }
     lbl_80282278 = 5;
-    fn_80126F7C();
+    GameMode22_AfterClearStats();
 }
 
-void fn_80126F7C(void) {
+// Empty in this build; GameMode22_ClearPlayerStats calls it last.
+void GameMode22_AfterClearStats(void) {
 }
 
-void fn_80126F80(void) {
+// Empty in this build; GameMode22_StartSwing calls it first.
+void GameMode22_PreSwing(void) {
 }
 
-void fn_80126F84(s32 p0) {
+// How many drives each player gets (n4), from the menu (FE_MessageTable.c fn_80084AA8: 5, 10 or
+// 15).
+void GameMode22_SetNumDrives(s32 p0) {
     lbl_80195498.n4 = p0;
 }
 
-void fn_80126F94(s32 n) {
+// The contest's variant (n0), from the menu (FE_MessageTable.c fn_80084AA8): 0 every drive's points
+// add up, 1 only the best fair drive counts.
+void GameMode22_SetVariant(s32 n) {
     lbl_80195498.n0 = n;
 }
 
-s32 fn_80126FA0(void) {
+// The contest's variant (n0): 0 the drives' points add up, 1 the best drive. The long-drive records
+// are kept per variant (Earnings.c, GameUICommands.c).
+s32 GameMode22_GetVariant(void) {
     return lbl_80195498.n0;
 }
 
-// n8 (when pn8 is not NULL) and bC.
-u8 fn_80126FB0(s32* pn8) {
+// Whether a winner is decided (bC); the winner (n8, 5 none) into *pn8 when pn8 is not NULL.
+u8 GameMode22_GetWinner(s32* pn8) {
     if (pn8 != NULL) {
         *pn8 = lbl_80195498.n8;
     }
     return lbl_80195498.bC;
 }
 
-s32 fn_80126FD8(void) {
+// Whether game mode 22 is being played (GUI_IsPostShotUIAnimating asks).
+s32 GameMode22_IsActive(void) {
     s32 t0;
     t0 = Game_GetMode();
     return (((u32)__cntlzw((22 - t0)) >> 5) & 0xFF);
 }
 
-u8 fn_80127004(void) {
+// Whether a winner is decided and the 120-frame winner countdown (n18) is still running; the
+// post-shot UI keeps animating meanwhile (GUI_IsPostShotUIAnimating).
+u8 GameMode22_IsShowingWinner(void) {
     if (lbl_80195498.n8 != 5 && lbl_80195498.n18 > 0) {
         return 1;
     }
     return 0;
 }
 
-// Shows n4 less the current player's nEA0 as a message (nPlayer is not read; every caller passes
-// one).
-void fn_80127034(int nPlayer) {
+// The current player's drives left (n4 less his nEA0), as text in message 90 (fn_800E5D68). nPlayer
+// is not read: every caller passes one.
+void GameMode22_ShowDrivesLeft(int nPlayer) {
     sprintf(lbl_80195488, "%d", lbl_80195498.n4 - gPlayers[lbl_80282278].nEA0);
     fn_800E5D68(lbl_80195488);
 }
 
-s32 fn_80127098(s32 arg0) {
+// The long-drive record slot (Session.recC's first index) of hole number nHole: holes 6, 7, 5, 3
+// and 4 are slots 0 to 4; any other hole slot 0.
+s32 GameMode22_GetHoleRecordIndex(s32 arg0) {
     switch (arg0) {
     case 6:
         return 0;

@@ -104,8 +104,8 @@ int   fn_800D3208(void);                                // CourseData.c
 u8    GM_Earnings_CheckEagleEveryPar5(int nPlayer, u8 bPreview);
 u8    GM_Earnings_CheckWinAllTournaments(int nPlayer, u8 bPreview);
 u8    GM_Earnings_CheckFirstTournamentWin(int nPlayer, u8 bPreview);
-s32   fn_80126FA0(void);                                // GameMode22.c
-s32   fn_80127098(s32 n);
+s32   GameMode22_GetVariant(void);                                // GameMode22.c
+s32   GameMode22_GetHoleRecordIndex(s32 n);
 
 int   GM_Earnings_CheckUnlockCourses(int nProfile, u8 bMessage);
 int   GM_Earnings_CapRating(int nRating);
@@ -2079,7 +2079,7 @@ s32 HighScoreRecords_GetSkillZoneRecordType(s32 n) {
 }
 
 // The long-drive record table (recC's second index) of the long-drive contest's setting n
-// (GameMode22 fn_80126FA0): 0 and 1 as they are, anything else 2 (none).
+// (GameMode22 GameMode22_GetVariant): 0 and 1 as they are, anything else 2 (none).
 s32 Earnings_GetLongDriveRecordType(s32 n) {
     switch (n) {
     case 0:
@@ -2194,14 +2194,14 @@ int HighScoreRecords_CheckRecord(int nKind, int nValue, int bSave, const char* s
             }
         }
     } else {
-        n = Earnings_GetLongDriveRecordType(fn_80126FA0());
+        n = Earnings_GetLongDriveRecordType(GameMode22_GetVariant());
         if (n != 2) {
-            pLast = &gSession.recC[fn_80127098(Game_GetCurHoleNum())][n][4];
+            pLast = &gSession.recC[GameMode22_GetHoleRecordIndex(Game_GetCurHoleNum())][n][4];
             if (HighScoreRecords_IsEqualOrBetter(nKind, nValue, pLast->nValue)) {
                 nResult = 1;
                 nPos = 4;
                 for (j = 3; j >= 0; j--) {
-                    pRec = &gSession.recC[fn_80127098(Game_GetCurHoleNum())][n][j];
+                    pRec = &gSession.recC[GameMode22_GetHoleRecordIndex(Game_GetCurHoleNum())][n][j];
                     if (HighScoreRecords_IsEqualOrBetter(nKind, nValue, pRec->nValue)) {
                         nPos = j;
                     }
@@ -2211,12 +2211,12 @@ int HighScoreRecords_CheckRecord(int nKind, int nValue, int bSave, const char* s
                 }
                 if ((u8)bSave) {
                     for (j = 4; j > nPos; j--) {
-                        pFrom = &gSession.recC[fn_80127098(Game_GetCurHoleNum())][n][j - 1];
-                        pTo = &gSession.recC[fn_80127098(Game_GetCurHoleNum())][n][j];
+                        pFrom = &gSession.recC[GameMode22_GetHoleRecordIndex(Game_GetCurHoleNum())][n][j - 1];
+                        pTo = &gSession.recC[GameMode22_GetHoleRecordIndex(Game_GetCurHoleNum())][n][j];
                         pTo->nValue = pFrom->nValue;
                         sprintf(pTo->szName, pFrom->szName);
                     }
-                    pTo = &gSession.recC[fn_80127098(Game_GetCurHoleNum())][n][nPos];
+                    pTo = &gSession.recC[GameMode22_GetHoleRecordIndex(Game_GetCurHoleNum())][n][nPos];
                     pTo->nValue = nValue;
                     sprintf(pTo->szName, szName);
                 }
