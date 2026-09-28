@@ -1,12 +1,21 @@
-// SkinMorph.c (EA's name, from its asserts).
+// SkinMorph.c (EA's name, from its asserts; TW07's golf/animation/SkinMorph.c keeps
+// SkinMorph_SetTargetWeight, SkinMorph_Destroy and SkinMorph_UpdateAllTargets): the morph targets
+// of a skin, such as the golfer's body shape the character sliders set (CharSliders.c). A target
+// moves some vertices of some of the skin's meshes by offsets; the skin keeps a weight per target
+// (Skin.pMorph, SkinMorphState) and, per view, a bit per target whose weight changed. Each frame
+// SkinMorph_Update blends a view's changed targets into that view's copies of the morphed meshes
+// (hwsOverride_Gc.c's override table and memory block), in a work area of 16.16 fixed-point
+// vertices. SkinBurn.c blends them in for good (SkinMorph_CreateBlended).
 
 #include "game_types.h"
 #include "platform.h"
 #include "engine.h"
 #include "charstate.h"
 
-SkinMorphWork gSkinMorphWork;
-SkinMorphWork* gpSkinMorphWork = &gSkinMorphWork;
+s32  SkinMorph_GetBlendSize(Skin* pSkin);
+
+SkinMorphWork gSkinMorphWork;                        // the one morph work area
+SkinMorphWork* gpSkinMorphWork = &gSkinMorphWork;   // what SkinMorph_GetWork hands out
 
 // Unpacks nVerts vertices into the work area in 16.16 fixed point: positions (four s16 each: x, y,
 // z and the vertex's matrix bit, SkinMeshBit.nBit) and normals (four s8 each).
@@ -28,8 +37,6 @@ void SkinMorph_UnpackVerts(SkinMorphWork* pWork, s16* pPos, s8* pNrm, u32 nVerts
         pVert++;
     }
 }
-
-s32  SkinMorph_GetBlendSize(Skin* pSkin);
 
 // Packs the work area's nVerts vertices back out of 16.16 fixed point, in the layout
 // SkinMorph_UnpackVerts reads: positions as four s16 each, normals as four s8 each.
@@ -123,8 +130,8 @@ void SkinMorph_AddCurrentTarget(SkinMorphWork* pWork, s32 nVerts, f32 fWeight) {
     SkinMorph_AddTarget(pWork, pWork->p10020, nVerts, (s32)(65536.0f * fWeight + 0.5f));
 }
 
-// The morph work area (there is one, gpSkinMorphWork), with its description and weights cleared: the
-// caller sets them, the override table and the memory block before blending.
+// The morph work area (there is one, gpSkinMorphWork), with its description and weights cleared:
+// the caller sets them, the override table and the memory block before blending.
 SkinMorphWork* SkinMorph_GetWork(void) {
     SkinMorphWork* pWork = gpSkinMorphWork;
 
@@ -193,12 +200,12 @@ s32 SkinMorph_PickTargets(SkinMorphWork* pWork, SkinDesc44* pEntry, int nSet) {
     return nPicked;
 }
 
-// Blends the morph targets of entry n (SkinDesc.p44; one with morph targets, u24 & 2) into its
-// morphed meshes. Each of its meshes with flags 0x100000 and 0x10 gets its override memory (the
-// work area's table and block; kept from before) filled with its own vertices plus every picked
-// target (SkinMorph_PickTargets) times its weight, or a plain copy of them when no target has a
-// weight.
-void SkinMorph_BlendEntry(SkinMorphWork* pWork, int n) {
+// Blends the morph targets of entry nEntry (SkinDesc.p44; one with morph targets, u24 & 2) into
+// its morphed meshes. Each of its meshes with flags 0x100000 and 0x10 gets its override memory
+// (the work area's table and block; kept from before) filled with its own vertices plus every
+// picked target (SkinMorph_PickTargets) times its weight, or a plain copy of them when no target
+// has a weight.
+void SkinMorph_BlendEntry(SkinMorphWork* pWork, int nEntry) {
     SkinDesc* pDesc = pWork->pDesc;
     SkinIterArgs args;
     u8 aBuf[0x20];      // the iterator's buffer; its size is not known
@@ -212,15 +219,15 @@ void SkinMorph_BlendEntry(SkinMorphWork* pWork, int n) {
     s32 nVerts;
     s32 nNext;
 
-    if (pDesc == NULL || n < 0 || n >= pDesc->n40) {
+    if (pDesc == NULL || nEntry < 0 || nEntry >= pDesc->n40) {
         return;
     }
-    pEntry = &pDesc->p44[n];
+    pEntry = &pDesc->p44[nEntry];
     if (!(pEntry->u24 & 2)) {
         return;
     }
     args.pDesc = pDesc;
-    args.nEntry = n;
+    args.nEntry = nEntry;
     pIter = fn_80113910(aBuf, &args);
     nSet = 0;
     while (SkinIter_IsValid(pIter)) {
@@ -272,12 +279,12 @@ s32 SkinMorph_GetNumTargets(SkinDesc* pDesc) {
     return nMax;
 }
 
-// Whether entry n (SkinDesc.p44) needs blending for view nView: it has morph targets, and one that
-// changed since that view last blended moves at least one vertex.
-u8 SkinMorph_EntryNeedsBlend(Skin* pSkin, int nView, int n) {
+// Whether entry nEntry (SkinDesc.p44) needs blending for view nView: it has morph targets, and one
+// that changed since that view last blended moves at least one vertex.
+u8 SkinMorph_EntryNeedsBlend(Skin* pSkin, int nView, int nEntry) {
     SkinDesc* pDesc;
     SkinDesc44* pEntry;
-    SkinMorphState* pMorph;
+    SkinMorphState* pMorphState;
     s32 i;
     s32 nFirst;
     s32 nCount;
@@ -285,16 +292,16 @@ u8 SkinMorph_EntryNeedsBlend(Skin* pSkin, int nView, int n) {
     s32 j;
     s32 nMesh;
 
-    pMorph = pSkin->pMorph;
+    pMorphState = pSkin->pMorph;
     pDesc = pSkin->pModel->pDesc;
-    pEntry = &pDesc->p44[n];
+    pEntry = &pDesc->p44[nEntry];
     if (!(pEntry->u24 & 2)) {
         return 0;
     }
     nFirst = pEntry->n18;
     nCount = pEntry->n14;
     for (i = 0; i < nCount; i++) {
-        if (BitArray_TestBit(pMorph->aChanged[nView], nFirst + i)) {
+        if (BitArray_TestBit(pMorphState->aChanged[nView], nFirst + i)) {
             pTarget = &pDesc->p44[pEntry->n10 + i];
             for (j = 0; j < pTarget->n8; j++) {
                 nMesh = pDesc->p3C[pTarget->n0 + j];
@@ -313,7 +320,7 @@ u8 SkinMorph_EntryNeedsBlend(Skin* pSkin, int nView, int n) {
 // Gives the skin its morph state (Skin.pMorph) when its description has morph targets: every weight
 // 0 and no target changed. SKN_Create calls it.
 void SkinMorph_Create(Skin* pSkin) {
-    SkinMorphState* pMorph;
+    SkinMorphState* pMorphState;
     s32 nMorphs;
     s32 nBytes;
 
@@ -324,31 +331,31 @@ void SkinMorph_Create(Skin* pSkin) {
     if (nMorphs == 0) {
         return;
     }
-    pMorph = StaticMem_Alloc(sizeof(SkinMorphState), 2, 16, "SkinMorph.c", 91);
-    memset(pMorph, 0, sizeof(SkinMorphState));
-    pMorph->nMorphs = nMorphs;
+    pMorphState = StaticMem_Alloc(sizeof(SkinMorphState), 2, 16, "SkinMorph.c", 91);
+    memset(pMorphState, 0, sizeof(SkinMorphState));
+    pMorphState->nMorphs = nMorphs;
     nBytes = (nMorphs + 31) / 32 * sizeof(u32);
-    pMorph->aChanged[0] = StaticMem_Alloc(nBytes, 2, 16, "SkinMorph.c", 95);
-    pMorph->aChanged[1] = StaticMem_Alloc(nBytes, 2, 16, "SkinMorph.c", 96);
-    BitArray_ClearArray(pMorph->aChanged[0], nMorphs);
-    BitArray_ClearArray(pMorph->aChanged[1], nMorphs);
-    pMorph->afWeights = StaticMem_Alloc(nMorphs * sizeof(f32), 2, 16, "SkinMorph.c", 100);
-    memset(pMorph->afWeights, 0, nMorphs * sizeof(f32));
-    pSkin->pMorph = pMorph;
+    pMorphState->aChanged[0] = StaticMem_Alloc(nBytes, 2, 16, "SkinMorph.c", 95);
+    pMorphState->aChanged[1] = StaticMem_Alloc(nBytes, 2, 16, "SkinMorph.c", 96);
+    BitArray_ClearArray(pMorphState->aChanged[0], nMorphs);
+    BitArray_ClearArray(pMorphState->aChanged[1], nMorphs);
+    pMorphState->afWeights = StaticMem_Alloc(nMorphs * sizeof(f32), 2, 16, "SkinMorph.c", 100);
+    memset(pMorphState->afWeights, 0, nMorphs * sizeof(f32));
+    pSkin->pMorph = pMorphState;
 }
 
 // Sets a morph target's weight. A new value marks the target changed for both views, so
 // SkinMorph_Update blends it again; out of range, or no morph state: nothing.
 void SkinMorph_SetTargetWeight(Skin* pSkin, int nMorph, f32 fWeight) {
-    SkinMorphState* pMorph = pSkin->pMorph;
+    SkinMorphState* pMorphState = pSkin->pMorph;
 
-    if (pMorph == NULL || nMorph < 0 || nMorph >= pMorph->nMorphs) {
+    if (pMorphState == NULL || nMorph < 0 || nMorph >= pMorphState->nMorphs) {
         return;
     }
-    if (fWeight != pMorph->afWeights[nMorph]) {
-        pMorph->afWeights[nMorph] = fWeight;
-        BitArray_SetBit(pMorph->aChanged[0], nMorph);
-        BitArray_SetBit(pMorph->aChanged[1], nMorph);
+    if (fWeight != pMorphState->afWeights[nMorph]) {
+        pMorphState->afWeights[nMorph] = fWeight;
+        BitArray_SetBit(pMorphState->aChanged[0], nMorph);
+        BitArray_SetBit(pMorphState->aChanged[1], nMorph);
     }
 }
 
@@ -380,8 +387,7 @@ void SkinMorph_Update(Skin* pSkin, int nView) {
 
 // Blends every morph target, at its current weight, into a new override table and memory block for
 // the skin's morphed meshes (StaticMem mode 1), and gives both: NULL and NULL without a morph state
-// or morphed meshes. SkinBurn.c (SkinBurn_BurnSkin) burns them into the skin; SkinMorph_FreeBlended frees
-// them.
+// or morphed meshes. SkinBurn_BurnSkin burns them into the skin; SkinMorph_FreeBlended frees them.
 void SkinMorph_CreateBlended(Skin* pSkin, HwsMemBlock** ppBlock, HwsOverrideTable** ppTable) {
     HwsMemBlock* pBlock;
     HwsOverrideTable* pTable;

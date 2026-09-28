@@ -1,11 +1,16 @@
-// SkinBurn.c (EA's name, from its asserts): "burns" a skin: drops the unused parts of a skin's data,
-// renumbers what is left and packs it into one allocation.
+// SkinBurn.c (EA's name, from its asserts; TW06 has a golf/animation/skinburn.c too): "burns" the
+// golfer's body skin once a look is chosen (SkinPart_BurnBodySkin, SkinBurn_BurnSkin). hwsBurn.c
+// builds a description holding only the chosen variants and options, with the dropped morph
+// targets blended in at their weights (SkinMorph_CreateBlended); this file then drops what the
+// skin's model no longer uses, renumbers what is left and packs it into one allocation. The first
+// function, the start-up check for the disc's signature file, has nothing to do with skins.
 #include "game_types.h"
 #include "platform.h"
 #include "engine.h"
 #include "charstate.h"
 
-s32* gBurnNewMtxBits;
+s32* gBurnNewMtxBits;   // while SkinBurn_DropUnusedMatrices runs: per old Skin.aMtxBits bit, its
+                        // new number (-1 dropped); SkinBurn_RenumberMeshBits reads it
 
 s32   SkinBurn_GetAlignedSize(const void* p, s32 nCount, s32 nSize, s32 nAlign);
 void* SkinBurn_CopyAligned(u8* pBase, s32* pOffset, const void* pSrc, s32 nSize, s32 nAlign);
@@ -23,8 +28,8 @@ void SkinBurn_CheckSignatureFile(void) {
     sprintf(szPath, "%sSignat.sig", gSignatureDir);
     hFile = fn_800060E0(szPath);
     if (hFile < 0) {
-        // EA: stops the game on purpose with a write to address 0 (undefined in C; a port should
-        // abort here instead)
+        // port: EA stops the game on purpose with a write to address 0 (undefined in C); a port
+        //       should abort here instead
         *(volatile s32*)0 = 0;
     }
     fn_8000633C(hFile);
@@ -98,10 +103,10 @@ void SkinBurn_RenumberOptionBits(Skin* pSkin, s32 n) {
 // Drops the blended matrices no option uses (SkinModel.p54, one per bit of Skin.aMtxBits). It keeps
 // the first SkinModel.n14 and those SkinPart_MarkAllOptions marks (marked into a scratch bit array
 // put in place of Skin.aMtxBits), packs their p54 entries to the front, numbered 0, 1, 2..., and
-// renumbers the bits of every option's meshes to match (gBurnNewMtxBits: each old bit's new number, -1
-// dropped). Then each SkinModel.p44 entry's list (p4) is cut to the kept count at most and numbered
-// 0, 1, 2..., and the SkinDesc.p34 mesh of the same index gets that count (n8) and a size of 64
-// bytes each. SkinModel.n50 becomes the count kept.
+// renumbers the bits of every option's meshes to match (gBurnNewMtxBits: each old bit's new
+// number, -1 dropped). Then each SkinModel.p44 entry's list (p4) is cut to the kept count at most
+// and numbered 0, 1, 2..., and the SkinDesc.p34 mesh of the same index gets that count (n8) and a
+// size of 64 bytes each. SkinModel.n50 becomes the count kept.
 void SkinBurn_DropUnusedMatrices(Skin* pSkin) {
     SkinModel* pModel;
     u32* aBits;

@@ -104,7 +104,7 @@ void FE_vFreeUnusedCharacters(void);
 u8   FE_IsGolferInOtherSlot(int nGolfer, CrAPGolfer* pGolfer);
 void FE_vLoadNextCrAPAnim(u8 bNoBlend);
 Clip* FE_CrapGetIdleAnim(void);
-void FE_ZoomCrAPModel(u8 b);
+void FE_ZoomCrAPModel(u8 bZoom);
 void fn_8008EA44(u8 b);
 void fn_8008EBB4(void);
 void fn_8008EBE4(void);
@@ -584,9 +584,9 @@ void FE_SetupCamera(void) {
 // Each front-end frame, before FE_SetupCamera and the render passes: fade the golfer display (f14C,
 // 0..0.5) in and out with his animation; on screen kind 3 (create-a-player) run its queued
 // animation (n1C0), and let the pad turn him (FE_RotateCrAPModel) and zoom (FE_ZoomCrAPModel); set
-// him up again for a new screen kind (FE_SetupCharState) and place him (lbl_80189A30; in the club close-up
-// raised by his club's offset); turn to the next golfer when his animation ends (b91); give a
-// golfer shown afresh his ball logo and textures; then animate, pose and light him.
+// him up again for a new screen kind (FE_SetupCharState) and place him (lbl_80189A30; in the club
+// close-up raised by his club's offset); turn to the next golfer when his animation ends (b91);
+// give a golfer shown afresh his ball logo and textures; then animate, pose and light him.
 void FE_vUpdateGolferAll(void) {
     f32 vSaved[4];
     LightParams params;
@@ -1196,54 +1196,54 @@ void FE_SetupCharState(void) {
 // (0x52, when the character's bit 0x4000 is set) and the ball bone (0x54, when he holds the ball:
 // Character_IsHoldingBall) with it, keeping their offsets from the waist.
 void FE_CharPositionOverwrite(void) {
-    f32 v52[4];
-    f32 v54[4];
+    f32 vClubPos[4];
+    f32 vBallPos[4];
     CharModel* pModel;
-    Bone* pBone1;
-    Bone* pBone52;
-    Bone* pBone54;
-    u8 bBall;
+    Bone* pWaistBone;
+    Bone* pClubBone;
+    Bone* pBallBone;
+    u8 bBallExists;
 
     pModel = lbl_80281EE0->pB4->pChar->pModel;
-    pBone1 = &pModel->pBones[CharModel_GetBoneIndex(pModel, 1)];
-    pBone52 = &pModel->pBones[CharModel_GetBoneIndex(pModel, 0x52)];
+    pWaistBone = &pModel->pBones[CharModel_GetBoneIndex(pModel, 1)];
+    pClubBone = &pModel->pBones[CharModel_GetBoneIndex(pModel, 0x52)];
     CharModel_GetBoneIndex(pModel, 0x54);              // EA looks bone 0x54 up here without using it
-    bBall = Character_IsHoldingBall(lbl_80281EE0->pB4->pChar);
+    bBallExists = Character_IsHoldingBall(lbl_80281EE0->pB4->pChar);
     if (lbl_80281EE0->b85 == 0) {
         return;
     }
-    if (bBall) {
-        pBone54 = &pModel->pBones[CharModel_GetBoneIndex(pModel, 0x54)];
+    if (bBallExists) {
+        pBallBone = &pModel->pBones[CharModel_GetBoneIndex(pModel, 0x54)];
     }
     if (lbl_80281EE0->pB4->pChar->u10 & 0x4000) {
-        fn_8008EC0C(pBone52->v1C, pBone1->v1C, v52);
+        fn_8008EC0C(pClubBone->v1C, pWaistBone->v1C, vClubPos);
     }
-    if (bBall) {
-        fn_8008EC0C(pBone54->v1C, pBone1->v1C, v54);
+    if (bBallExists) {
+        fn_8008EC0C(pBallBone->v1C, pWaistBone->v1C, vBallPos);
     }
     // EA's code subtracts each value from itself, which zeroes it.
     if (lbl_80281EE0->pB4->pChar->u10 & 0x4000) {
-        pBone52->v1C[0] -= pBone52->v1C[0];
-        pBone52->v1C[2] -= pBone52->v1C[2];
-        pBone52->v1C[3] -= pBone52->v1C[3];
+        pClubBone->v1C[0] -= pClubBone->v1C[0];
+        pClubBone->v1C[2] -= pClubBone->v1C[2];
+        pClubBone->v1C[3] -= pClubBone->v1C[3];
     }
-    if (bBall) {
-        pBone54->v1C[0] -= pBone54->v1C[0];
-        pBone54->v1C[2] -= pBone54->v1C[2];
-        pBone54->v1C[3] -= pBone54->v1C[3];
+    if (bBallExists) {
+        pBallBone->v1C[0] -= pBallBone->v1C[0];
+        pBallBone->v1C[2] -= pBallBone->v1C[2];
+        pBallBone->v1C[3] -= pBallBone->v1C[3];
     }
-    pBone1->v1C[0] -= pBone1->v1C[0];
-    pBone1->v1C[2] -= pBone1->v1C[2];
-    pBone1->v1C[3] -= pBone1->v1C[3];
+    pWaistBone->v1C[0] -= pWaistBone->v1C[0];
+    pWaistBone->v1C[2] -= pWaistBone->v1C[2];
+    pWaistBone->v1C[3] -= pWaistBone->v1C[3];
     if (lbl_80281EE0->pB4->pChar->u10 & 0x4000) {
-        pBone52->v1C[0] += v52[0];
-        pBone52->v1C[2] += v52[2];
-        pBone52->v1C[3] += v52[3];
+        pClubBone->v1C[0] += vClubPos[0];
+        pClubBone->v1C[2] += vClubPos[2];
+        pClubBone->v1C[3] += vClubPos[3];
     }
-    if (bBall) {
-        pBone54->v1C[0] += v54[0];
-        pBone54->v1C[2] += v54[2];
-        pBone54->v1C[3] += v54[3];
+    if (bBallExists) {
+        pBallBone->v1C[0] += vBallPos[0];
+        pBallBone->v1C[2] += vBallPos[2];
+        pBallBone->v1C[3] += vBallPos[3];
     }
 }
 
@@ -1273,11 +1273,11 @@ void FE_lite_vRegisterStreamClients(void) {
 // A 'LITE' object: copy its lights (little-endian) into lbl_80281EE4, swapping each value's
 // bytes, and make them light set 0's.
 void FE_lite_vStreamCallback(UStreamObject* pObject) {
-    SwapField aHeader[] = {
+    SwapField aLightHeaderDef[] = {
         { 4, 4 },                                           // nLights
         { 12, 4 },
     };
-    SwapField aLight[] = {
+    SwapField aLightElemDef[] = {
         { 1, 1 },                                           // nType
         { 15, 1 },
         { 16, 4 },                                          // vColor
@@ -1289,8 +1289,10 @@ void FE_lite_vStreamCallback(UStreamObject* pObject) {
     lbl_80281EE4 = StaticMem_Alloc(pObject->uSize, 2, 16, "FEgolferanim.c", 3143);
     pSrc = pObject->pData;
     pDst = lbl_80281EE4;
-    ByteSwap_Records(&pSrc, &pDst, aHeader, sizeof(aHeader) / sizeof(aHeader[0]), 1);
-    ByteSwap_Records(&pSrc, &pDst, aLight, sizeof(aLight) / sizeof(aLight[0]), lbl_80281EE4->nLights);
+    ByteSwap_Records(&pSrc, &pDst,
+                     aLightHeaderDef, sizeof(aLightHeaderDef) / sizeof(aLightHeaderDef[0]), 1);
+    ByteSwap_Records(&pSrc, &pDst,
+                     aLightElemDef, sizeof(aLightElemDef) / sizeof(aLightElemDef[0]), lbl_80281EE4->nLights);
     LF_vSetCurrentLightFogEnvironment(0);
     fn_800935CC(lbl_80281EE4);
     fn_8003534C();
@@ -1503,10 +1505,10 @@ void FE_ResetCrAPZoom(void) {
 
 // Zoom the CrAP camera in (bZoom) or out: on a change, b1DC follows it and the camera is switched,
 // blending.
-void FE_ZoomCrAPModel(u8 b) {
+void FE_ZoomCrAPModel(u8 bZoom) {
     View* pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
 
-    if (b) {
+    if (bZoom) {
         if (lbl_80281EE0->b1DC != 1) {
             lbl_80281EE0->b1DC = 1;
             GolfCamera_SwitchCrAPCamera(pView, NULL, lbl_80281EE0->n4, 1, lbl_80281EE0->b1DC, 1);
