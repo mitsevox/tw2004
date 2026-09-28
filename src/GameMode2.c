@@ -14,7 +14,7 @@ void  GameMode4_WinEvent(void);
 s32 gSkinsCarryOver;                    // the money carried over
 s32 gSkinsNumCarryOver;                    // skins carried over
 
-void fn_800F81EC(void);
+void GameModeSkins_StartGamePreData(void);
 void GameModeSkins_SetupNextGolfer(void);
 s32  GameModeSkins_GetHonors(int nPlayer);
 u8   GameModeSkins_HoleFinished(int nPlayer, u8 bCheck);
@@ -24,7 +24,8 @@ void GameModeSkins_EndHole(void);
 void GameModeSkins_EndGame(void);
 s32  GameModeSkins_CurrentHoleNumberSkins(void);
 
-// Mode 2 starts: CPUs may concede, no mulligans, nothing carried over.
+// Mode 2's setup (GM_SetModeType): this file's callbacks, b274 cleared, CPU players may concede, no
+// mulligans, no split screen, and nothing carried over.
 void GameModeSkins_Init(void) {
     gpGame->pfnInit = GameModeSkins_Init;
     gpGame->pfnSetupNextGolfer = GameModeSkins_SetupNextGolfer;
@@ -33,7 +34,7 @@ void GameModeSkins_Init(void) {
     gpGame->pfnGameFinished = GameModeSkins_GameFinished;
     gpGame->pfnGoToPlayoff = GameModeSkins_GoToPlayoff;
     gpGame->pfnEndHole = GameModeSkins_EndHole;
-    gpGame->pfnStartGamePreData = fn_800F81EC;
+    gpGame->pfnStartGamePreData = GameModeSkins_StartGamePreData;
     gpGame->pfnEndGame = GameModeSkins_EndGame;
     gpGame->b274 = 0;
     gpGame->bAIConcedes = 1;
@@ -47,12 +48,15 @@ void GameModeSkins_Init(void) {
     gSession.nSplitScreen = 0;
 }
 
-void fn_800F81EC(void) {
+// Mode 2's round start (pfnStartGamePreData): nothing is carried over (money or skins).
+void GameModeSkins_StartGamePreData(void) {
     gSkinsCarryOver = 0;
     gSkinsNumCarryOver = 0;
 }
 
-// When everyone waits: the player GetHonors picks goes to pre-shot, the others wait.
+// Mode 2's next turn (pfnSetupNextGolfer, once every golfer waits): the player pfnGetHonors(5)
+// picks becomes the player whose turn it is (lbl_80282278) and goes to the pre-shot state (1);
+// every other player waits (19).
 void GameModeSkins_SetupNextGolfer(void) {
     int i;
     lbl_80282278 = gpGame->pfnGetHonors(5);
@@ -65,9 +69,10 @@ void GameModeSkins_SetupNextGolfer(void) {
     }
 }
 
-// Only players who can still win the hole (fewer strokes than the
-// best holed score) play. On the tee: a player who won a skin (latest hole first), then anyone;
-// otherwise the player farthest from the pin (off the green first).
+// Who plays after nPlayer in Skins (pfnGetHonors; 5 = nobody, and nPlayer 5 leaves nobody out).
+// Only a player who can still win the hole (fewer strokes than the best holed score) is picked. On
+// the tee: a player who won a skin (n22C), latest hole first, then anyone on the tee; otherwise the
+// player farthest from the pin, off the green first.
 s32 GameModeSkins_GetHonors(int nPlayer) {
     int i;
     int h;
@@ -147,8 +152,9 @@ s32 GameModeSkins_GetHonors(int nPlayer) {
     return nBest;
 }
 
-// The hole is over when nobody still playing can tie the best holed score (with a tie for the
-// lead: beat it); not before someone has holed out.
+// Mode 2's hole-over test (pfnHoleFinished): not before someone has holed out; then the hole is
+// over once nobody still playing can tie the best holed score or, when two holed players share it,
+// beat it. nPlayer and bCheck are not read.
 u8 GameModeSkins_HoleFinished(int nPlayer, u8 bCheck) {
     int i;
     int nBest = 5;
@@ -187,8 +193,11 @@ u8 GameModeSkins_HoleFinished(int nPlayer, u8 bCheck) {
     return 1;
 }
 
-// In the playoff, a hole won ends it; otherwise play on to a
-// new random hole.
+// Mode 2's game-over test (pfnGameFinished). In the playoff the game is over once no skin is
+// carried over; otherwise, unless bCheck only asks, a new random hole (not the current one) becomes
+// the only one selected, every player's scores are cleared and the tie message is queued. Outside
+// the playoff the game is over after the last selected hole unless GameModeSkins_GoToPlayoff starts
+// a playoff.
 u8 GameModeSkins_GameFinished(u8 bCheck) {
     int nLeft;
     int h;
@@ -239,7 +248,10 @@ u8 GameModeSkins_GameFinished(u8 bCheck) {
     return 0;
 }
 
-// After the last hole, a skin still carried over goes to a playoff.
+// Starts the Skins playoff after the last selected hole when nobody won that hole's skin (it was
+// carried over); bCheck 1 only asks. The playoff notes whether the round was all 18 holes, plays
+// one random hole (not the current one) at a time, clears every player's scores and queues the tie
+// message. Returns 1 when there is a playoff.
 u8 GameModeSkins_GoToPlayoff(u8 bCheck) {
     int h;
     int i;
@@ -294,8 +306,11 @@ u8 GameModeSkins_GoToPlayoff(u8 bCheck) {
     return 1;
 }
 
-// A clear winner takes the skin and everything carried over; a tie
-// carries it over.
+// Mode 2's end of hole (pfnEndHole). The lowest holed score alone wins the skin: the hole's value
+// with everything carried over (GameModeSkins_CurrentHoleValue) in its n22C and its n274 total, the
+// hole marked won and the skins at stake added to its nHolesWon; the carry-over starts again. A tie
+// carries the skin over (outside the playoff the hole's value at the players' best earnings rating,
+// and one more skin).
 void GameModeSkins_EndHole(void) {
     int i;
     int nBest = 5;
@@ -330,7 +345,11 @@ void GameModeSkins_EndHole(void) {
     }
 }
 
-// Humans with a profile are paid their skins.
+// Mode 2's end of game (pfnEndGame), outside a Play Now challenge unless it is a ladder event: each
+// human player with an active profile is paid their skins money (n274), booked in money.n18, with a
+// message (0x6C) when it is not 0; the first such winner counts a game won for the EA Sports Bio.
+// In a ladder event, player 0 with more skins money than every other player wins it
+// (GameMode4_WinSkinsEvent).
 void GameModeSkins_EndGame(void) {
     int i;
     int nProfile;
@@ -371,8 +390,10 @@ void GameModeSkins_EndGame(void) {
     }
 }
 
-// The skin on this hole: what is carried over plus this hole's value (the next selected hole's in
-// some cases).
+// The money the current skin is worth: what is carried over plus the hole's value at the players'
+// best earnings rating (GM_Earnings_GetSkinsHoleValue, GM_GetHighestRatedGolfer). While the
+// scorecard is up the next selected hole's value is used; in the playoff only the carry-over
+// counts.
 s32 GameModeSkins_CurrentHoleValue(void) {
     int h;
     if (gpGame->bInPlayoff) {
@@ -397,8 +418,9 @@ s32 GameModeSkins_CurrentHoleNumberSkins(void) {
     return gSkinsNumCarryOver + 1;
 }
 
-// The first selected hole.
-s32 fn_800F9328(void) {
+// The round's first selected hole, or -1 when none is selected. Only speed golf (GameMode8.c, which
+// follows these three functions) calls it.
+s32 SpeedGolf_GetFirstSelectedHole(void) {
     int h;
     for (h = 0; h < 18; h++) {
         if (gpGame->bHoleSelected[h]) {
@@ -408,8 +430,9 @@ s32 fn_800F9328(void) {
     return -1;
 }
 
-// The next selected hole after h.
-s32 fn_800F93D8(int h) {
+// The first selected hole after hole h, or -1 (GM_GetNextSelectedHole does the same from the
+// current hole).
+s32 SpeedGolf_GetNextSelectedHole(int h) {
     for (h = h + 1; h < 18; h++) {
         if (gpGame->bHoleSelected[h]) {
             return h;
@@ -418,8 +441,8 @@ s32 fn_800F93D8(int h) {
     return -1;
 }
 
-// The selected hole before h.
-s32 fn_800F9414(int h) {
+// The last selected hole before hole h, or -1.
+s32 SpeedGolf_GetPrevSelectedHole(int h) {
     for (h = h - 1; h >= 0; h--) {
         if (gpGame->bHoleSelected[h]) {
             return h;

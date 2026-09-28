@@ -8,9 +8,10 @@
 // Split from GameModeReplay.c (mode 10) because the two halves each have their own copy of the
 // int-to-float constant; the bytes cannot prove the exact split point. TW07's source order puts
 // GetCupCount, GetCupPosition and AddCup right before SortCupsByDistanceFromTee, and
-// GameModeReplay.c ends with three functions that do exactly that (fn_800F1960, fn_800F196C,
-// fn_800F199C, the last the only user of the 1.0f at .sdata2 0x80284698, which could as well open
-// this file's .sdata2): the file probably starts there.
+// GameModeReplay.c ends with three functions that do exactly that
+// (GameModeSkillZoneBase_GetCupCount, GameModeSkillZoneBase_GetCupPosition,
+// GameModeSkillZoneBase_AddCup, the last the only user of the 1.0f at .sdata2 0x80284698, which
+// could as well open this file's .sdata2): the file probably starts there.
 
 #include "golfer.h"
 #include "ball.h"

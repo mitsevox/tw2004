@@ -16,7 +16,7 @@
 #include "unsorted/cull.h"
 
 void  Character_SetOrientationVec(Character* pChar, f32* pDir, f32 f);
-void  fn_800F199C(f32 x, f32 y, f32 z);
+void  GameModeSkillZoneBase_AddCup(f32 x, f32 y, f32 z);
 f32   fn_8001414C(u8* p);
 f32   Math_Tan(f32 x);           // tan
 void  fn_80030894(void);
@@ -2033,15 +2033,15 @@ void fn_80034720(UStreamObject* pObject) {
     StaticMem_Free(pObject);
 }
 
-// A pin position arrived (UKernel.c hands it on). With GM_Currently_SkillZoneMode set it goes to fn_800F199C;
-// otherwise a pin the course already has (w not 0) is copied into the chunk, and a missing one is
-// taken from it.
+// A pin position arrived (UKernel.c hands it on). With GM_Currently_SkillZoneMode set it goes to
+// GameModeSkillZoneBase_AddCup; otherwise a pin the course already has (w not 0) is copied into the
+// chunk, and a missing one is taken from it.
 u8 fn_800347B4(UStreamObject* pObject) {
     TerPosData* pPin = (TerPosData*)pObject->pData;
 
     if (lbl_801D3CB0.pCourse != NULL) {
         if (GM_Currently_SkillZoneMode()) {
-            fn_800F199C(pPin->vPos[0], pPin->vPos[1], pPin->vPos[2]);
+            GameModeSkillZoneBase_AddCup(pPin->vPos[0], pPin->vPos[1], pPin->vPos[2]);
         } else if (0.0f != lbl_801D3CB0.pCourse->pin[pPin->nIndex].w) {
             pPin->vPos[0] = lbl_801D3CB0.pCourse->pin[pPin->nIndex].x;
             pPin->vPos[1] = lbl_801D3CB0.pCourse->pin[pPin->nIndex].y;

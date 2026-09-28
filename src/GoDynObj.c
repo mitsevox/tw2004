@@ -50,8 +50,8 @@ void fn_80045FC8(UStreamObject* pObject);   // the 'BALL' stream handler
 void fn_80046FDC(s32 nView);
 void fn_800470B0(s32 nView);
 void fn_80047208(u8* aState);
-int  fn_800F1960(void);                 // GameModeReplay.c: how many targets the target games have
-void fn_800F196C(int i, f32* pOut);     // GameModeReplay.c: target i's position
+int  GameModeSkillZoneBase_GetCupCount(void);                 // GameModeReplay.c: how many targets the target games have
+void GameModeSkillZoneBase_GetCupPosition(int i, f32* pOut);     // GameModeReplay.c: target i's position
 void fn_80093DB8(Ball* pBall, int nPlayer);    // GoObjShadow.c
 void BFX_vRender(Ball* pBall, int nPlayer);    // GoObjShadow.c
 void fn_80048584(UObject* pObj, s8 nLod);
@@ -509,8 +509,8 @@ void fn_80046FDC(s32 nView) {
     int i;
     int nKind;
 
-    for (i = 0; i < fn_800F1960(); i++) {
-        fn_800F196C(i, vPos);
+    for (i = 0; i < GameModeSkillZoneBase_GetCupCount(); i++) {
+        GameModeSkillZoneBase_GetCupPosition(i, vPos);
         nKind = gpGame->pfnGreenType(ViewController_GetActivePlayerNumber(nView), i);
         if (lbl_80281DA0->apTeo10006[nKind] != NULL) {
             fn_80048584(lbl_80281DA0->apTeo10006[nKind], 0);
@@ -530,8 +530,8 @@ void fn_800470B0(s32 nView) {
     DS_vSetAlphaTestMode(0, 6, 0x80);
     DS_vEnableZBufferUpdate(0);
     RenderState_Flush();
-    for (i = 0; i < fn_800F1960(); i++) {
-        fn_800F196C(i, vPos);
+    for (i = 0; i < GameModeSkillZoneBase_GetCupCount(); i++) {
+        GameModeSkillZoneBase_GetCupPosition(i, vPos);
         switch (gpGame->pfnGreenType(ViewController_GetActivePlayerNumber(nView), i)) {
         case 0:
             nModel = 0;

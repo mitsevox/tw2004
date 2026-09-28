@@ -687,9 +687,9 @@ void GameModeSkillZoneHorse_ShotClockOut(void);                 // GameMode15.c
 void GameModeSkillZoneTimed_TimerOut(void);                 // GameMode13.c
 void GameModeSkillZoneTimed_SetHudClock(s32 a);                // GameMode13.c
 s32  GameModeSkins_CurrentHoleValue(void);                 // GameMode2.c: the skin on this hole
-s32  fn_800F9328(void);                 // GameMode2.c: the first selected hole (-1: none)
-s32  fn_800F93D8(int h);                // the next selected hole after h (-1: none)
-s32  fn_800F9414(int h);                // the selected hole before h (-1: none)
+s32  SpeedGolf_GetFirstSelectedHole(void);                 // GameMode2.c: the first selected hole (-1: none)
+s32  SpeedGolf_GetNextSelectedHole(int h);                // the next selected hole after h (-1: none)
+s32  SpeedGolf_GetPrevSelectedHole(int h);                // the selected hole before h (-1: none)
 
 // GameMode7.c
 void SpeedGolf_LoadHole(void);

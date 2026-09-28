@@ -1572,17 +1572,19 @@ void SpeedGolf_HoleOverInit(int nPlayer) {
     if (Game_GetMode() == 7) {
         gPlayers[nPlayer].nC3C |= 0x2000000;
         gPlayers[nPlayer].nC54 = 239;
-        if (nHole != fn_800F9328()) {
-            for (h = fn_800F9328(); h != -1; h = fn_800F93D8(h)) {
-                if (h == fn_800F9328()) {
+        if (nHole != SpeedGolf_GetFirstSelectedHole()) {
+            for (h = SpeedGolf_GetFirstSelectedHole(); h != -1; h = SpeedGolf_GetNextSelectedHole(h)) {
+                if (h == SpeedGolf_GetFirstSelectedHole()) {
                     nMine = gPlayers[nPlayer].nC6C[h] - 3000;
                     nTheirs = gPlayers[nOther].nC6C[h] - 3000;
                 } else if (h == nHole) {
-                    nMine = gPlayers[nPlayer].nC44 - gPlayers[nPlayer].nC6C[fn_800F9414(h)];
-                    nTheirs = gPlayers[nOther].nC44 - gPlayers[nOther].nC6C[fn_800F9414(h)];
+                    nMine = gPlayers[nPlayer].nC44 - gPlayers[nPlayer].nC6C[SpeedGolf_GetPrevSelectedHole(h)];
+                    nTheirs = gPlayers[nOther].nC44 - gPlayers[nOther].nC6C[SpeedGolf_GetPrevSelectedHole(h)];
                 } else {
-                    nMine = gPlayers[nPlayer].nC6C[h] - gPlayers[nPlayer].nC6C[fn_800F9414(h)];
-                    nTheirs = gPlayers[nOther].nC6C[h] - gPlayers[nOther].nC6C[fn_800F9414(h)];
+                    nMine = gPlayers[nPlayer].nC6C[h]
+                            - gPlayers[nPlayer].nC6C[SpeedGolf_GetPrevSelectedHole(h)];
+                    nTheirs = gPlayers[nOther].nC6C[h]
+                            - gPlayers[nOther].nC6C[SpeedGolf_GetPrevSelectedHole(h)];
                 }
                 if (nMine > nTheirs) {
                     aResult[h] = 1;
@@ -1593,7 +1595,7 @@ void SpeedGolf_HoleOverInit(int nPlayer) {
                 }
             }
             nWon = 0;
-            for (h = nHole; h != -1; h = fn_800F9414(h)) {
+            for (h = nHole; h != -1; h = SpeedGolf_GetPrevSelectedHole(h)) {
                 if (aResult[h] != 1) break;
                 nWon++;
             }
@@ -1604,7 +1606,8 @@ void SpeedGolf_HoleOverInit(int nPlayer) {
             } else if (nWon == 1) {
                 if (nHole != 0) {
                     nLost = 0;
-                    for (h = fn_800F9414(nHole); h != -1; h = fn_800F9414(h)) {
+                    for (h = SpeedGolf_GetPrevSelectedHole(nHole); h
+                         != -1; h = SpeedGolf_GetPrevSelectedHole(h)) {
                         if (aResult[h] != 2) break;
                         nLost++;
                     }
@@ -1692,16 +1695,17 @@ s32 SpeedGolf_GetHoleScore(int nPlayer, int nHole, s32* pWon) {
         *pWon = 0;
         return gPlayers[nPlayer].nC6C[nHole];
     } else if (gpGame->bHoleSelected[nHole]) {
-        if (nHole == fn_800F9328()) {
+        if (nHole == SpeedGolf_GetFirstSelectedHole()) {
             if (nCur == nHole) {
                 nGain = gPlayers[nPlayer].nC44 - 3000;
             } else {
                 nGain = gPlayers[nPlayer].nC6C[nHole] - 3000;
             }
         } else if (nHole == nCur) {
-            nGain = gPlayers[nPlayer].nC44 - gPlayers[nPlayer].nC6C[fn_800F9414(nHole)];
+            nGain = gPlayers[nPlayer].nC44 - gPlayers[nPlayer].nC6C[SpeedGolf_GetPrevSelectedHole(nHole)];
         } else {
-            nGain = gPlayers[nPlayer].nC6C[nHole] - gPlayers[nPlayer].nC6C[fn_800F9414(nHole)];
+            nGain = gPlayers[nPlayer].nC6C[nHole]
+                    - gPlayers[nPlayer].nC6C[SpeedGolf_GetPrevSelectedHole(nHole)];
         }
         if (nGain > 0) {
             *pWon = 1;

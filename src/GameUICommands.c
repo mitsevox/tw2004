@@ -318,7 +318,7 @@ void  GameModePractice_FinishHole(void);
 PgaTour_WinInfo* GameModeDriverPGATour_GetWinInfo(void);
 s32   GameModeDriverPGATour_DisplayEndOfHoleMessage(char* pDst);
 s32   GM_RealtimeMode_GetSelectedEvent(s32* pRound);
-int   fn_800F1960(void);
+int   GameModeSkillZoneBase_GetCupCount(void);
 void  GameModeSkillZoneBase_TimerOut(void);
 void  GameModeSkillZoneBase_ShotClockOut(void);
 s32   GameModeSkillZoneBase_GetShotEarned(s32 nPlayer);
@@ -975,9 +975,9 @@ void GM_vGetSpeedGolfTotalTimeScore(MsgArg* pArgs, MsgArg* pResult) {
 
 // Message 116: one of the special modes' values for player pArgs[0], picked by pArgs[1]: 1..4
 // GameMode12's hole points, round points, shot multiplier and bonus meter; 9 and 13..19, 21, 26 the
-// target games' (13 also sounds the ten-second warning and answers 0); 27 fn_800F1960; the rest
-// Player fields (nDD8, aDC4, nDC0, nDDC, nDE0, nE88, nE8C, nE94; 25 is aDC4[1] + 5). Any other
-// pArgs[1] leaves the answer as it was.
+// target games' (13 also sounds the ten-second warning and answers 0); 27
+// GameModeSkillZoneBase_GetCupCount; the rest Player fields (nDD8, aDC4, nDC0, nDDC, nDE0, nE88,
+// nE8C, nE94; 25 is aDC4[1] + 5). Any other pArgs[1] leaves the answer as it was.
 void GM_vGetModeValue(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[1].i) {
     case 0:
@@ -1063,7 +1063,7 @@ void GM_vGetModeValue(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = GameModeSkillZoneHorse_GetLastShotExceeded();
         return;
     case 27:
-        pResult->i = fn_800F1960();
+        pResult->i = GameModeSkillZoneBase_GetCupCount();
         return;
     }
 }

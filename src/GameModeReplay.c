@@ -15,14 +15,16 @@ void GameModeReplay_LoadHole(void);
 void GameModeReplay_RestartHole(void);
 void GameModeReplay_StartGamePreData(void);
 void GameModeReplay_SetupNextGolfer(void);
-void fn_800F18C8(void);
+void GameModeReplay_RestoreWeather(void);
 u8   GameModeReplay_HoleFinished(int nPlayer, u8 bCheck);
 u8   GameModeReplay_GameFinished(u8 bCheck);
 void GameModeReplay_EndGame(void);
 
 f32 gSkillZoneCups[40][4];
 
-// Mode 10 starts: one player, no mulligans, no split screen; hole 0 of the round is made current.
+// Mode 10's setup (GM_SetModeType): this file's callbacks; the flags b273, b276 (re-plan as the
+// swing begins), b27B, b27C, b27D, b27F, b280 (the mid-hole flyover) and b281 (tutorial tips)
+// cleared; one player, no mulligans, no split screen, and hole 0 of the round made current.
 void GameModeReplay_Init(void) {
     gpGame->pfnInit = GameModeReplay_Init;
     gpGame->pfnSetupNextGolfer = GameModeReplay_SetupNextGolfer;
@@ -50,7 +52,9 @@ void GameModeReplay_Init(void) {
     gSession.nNumPlayers = 1;
 }
 
-// The saved wind and conditions.
+// Mode 10's hole start (pfnLoadHole): the saved wind (direction and speed) and the saved course
+// settings nF1A, nF1C (the fairway setting) and nF1E go back in (fn_80055C40, fn_80055CAC,
+// fn_80055CD0).
 void GameModeReplay_LoadHole(void) {
     Wind_Set(gReplayData.nWindDir, gReplayData.nWindSpeed);
     fn_80055C40(gReplayData.nF1A);
@@ -58,8 +62,10 @@ void GameModeReplay_LoadHole(void) {
     fn_80055CD0(gReplayData.nF1E);
 }
 
+// Mode 10's hole restart (pfnRestartHole): the saved weather is forced again
+// (GameModeReplay_RestoreWeather).
 void GameModeReplay_RestartHole(void) {
-    fn_800F18C8();
+    GameModeReplay_RestoreWeather();
 }
 
 // Sets the session's pin set from the replay and returns it (an inline in EA's source).
@@ -67,7 +73,10 @@ static inline s8 Replay_SetPinSet(void) {
     return gSession.nPinSet = gReplayData.nPinSet;
 }
 
-// The saved course, hole, pins and tees.
+// Mode 10's round start (pfnStartGamePreData): every hole's pin set and the session's from the
+// replay; the saved course with the saved hole as the only one selected; one player; the replay
+// flag (gSession.bReplay) set; the saved weather option (nF12), with its amount (nF14 / 100) forced
+// for option 3; player 0's tee set.
 void GameModeReplay_StartGamePreData(void) {
     int i;
     for (i = 0; i < 18; i++) {
@@ -88,8 +97,12 @@ void GameModeReplay_StartGamePreData(void) {
     Replay_SetPinSet();
 }
 
-// Put player 0 back as they were before the shot, then
-// start it.
+// Mode 10's next turn (pfnSetupNextGolfer): player 0 is put back as they were before the saved shot
+// (golfer data, attribute changes, score, shot and swing blocks, flags, aim points, this hole's
+// strokes, the ball, dropped again where it lay) with the saved club and shot type. The shot is
+// then saved again (REPLAY_Save with the replay flag off, so it saves), the saved timing values,
+// seed, wind and weather put back over what that save wrote, the random seed set from it, and
+// player 0 switched to the pre-shot state (1).
 void GameModeReplay_SetupNextGolfer(void) {
     Ball ball;
     f32 fF08;
@@ -152,20 +165,25 @@ void GameModeReplay_SetupNextGolfer(void) {
     GOLFERSTATE_Switch(1, 0);
 }
 
-void fn_800F18C8(void) {
+// For a replay whose weather option (nF12) is 1, 2 or 3, forces its saved weather amount (nF14 /
+// 100) again (PlayNow_ForceWeather).
+void GameModeReplay_RestoreWeather(void) {
     if (gReplayData.nF12 == 1 || gReplayData.nF12 == 2 || gReplayData.nF12 == 3) {
         PlayNow_ForceWeather(gReplayData.nF14 / 100.0f);
     }
 }
 
+// Mode 10's hole-over test (pfnHoleFinished): always 1.
 u8 GameModeReplay_HoleFinished(int nPlayer, u8 bCheck) {
     return 1;
 }
 
+// Mode 10's game-over test (pfnGameFinished): always 1.
 u8 GameModeReplay_GameFinished(u8 bCheck) {
     return 1;
 }
 
+// Mode 10's end of game (pfnEndGame): the game loop ends (gSession.bEndLoop).
 void GameModeReplay_EndGame(void) {
     gSession.bEndLoop = 1;
 }
@@ -178,16 +196,22 @@ void GameModeReplay_EndGame(void) {
 const f32 lbl_80284694 = 0.0f;
 #pragma force_active reset
 
-// The target games' target list.
-int fn_800F1960(void) {
+// How many targets the target games' list holds (gSkillZoneNumCups). With the next two functions it
+// belongs to GameTargets.c's EA file (TW07 GameMode_SkillZoneBase.cpp) though it sits in this one.
+int GameModeSkillZoneBase_GetCupCount(void) {
     return gSkillZoneNumCups;
 }
 
-void fn_800F196C(int i, f32* pOut) {
+// Copies target i's position (x, y, z and w = 1, four floats) from the target games' list
+// (gSkillZoneCups) to pOut.
+void GameModeSkillZoneBase_GetCupPosition(int i, f32* pOut) {
     LLMath_CopyVec(gSkillZoneCups[i], pOut);
 }
 
-void fn_800F199C(f32 x, f32 y, f32 z) {
+// Adds a target at (x, y, z) (w = 1) to the end of the target games' list and counts it. In a
+// target game (GM_Currently_SkillZoneMode) each pin position the course stream brings (fn_800347B4,
+// GoTerrain.c) becomes a target. Nothing checks the list's 40 entries.
+void GameModeSkillZoneBase_AddCup(f32 x, f32 y, f32 z) {
     gSkillZoneCups[gSkillZoneNumCups][0] = x;
     gSkillZoneCups[gSkillZoneNumCups][1] = y;
     gSkillZoneCups[gSkillZoneNumCups][2] = z;
