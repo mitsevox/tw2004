@@ -33,7 +33,7 @@ void fn_80090D28(FEQuad* pQuad);
 void fn_800912F4(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale, f32* pAdd);
 void fn_800913EC(s16 nTable, s16 nEntry);
 void fn_80091460(s16 nTable, s16 nEntry);
-f32* fn_80093268(void);             // uiTransform.c
+f32* UITransform_GetViewParams(void);             // uiTransform.c
 void fn_8009222C(f32* pOut, LLPict* pPict);
 void fn_80091708(void);
 void fn_80006EDC();
@@ -106,11 +106,11 @@ void fn_80090D28(FEQuad* pQuad) {
     u8 bTint;
     int i;
 
-    fDist = fn_80093268()[2];
+    fDist = UITransform_GetViewParams()[2];
     fZ = fn_80092210();
-    pMtx = fn_80093274();
-    pColour = fn_80093274();
-    pAdd = fn_80093274();
+    pMtx = UITransform_GetCurrent();
+    pColour = UITransform_GetCurrent();
+    pAdd = UITransform_GetCurrent();
     lbl_80281F28 = &UISGetColorMultipler()->r;
     lbl_80281F2C = &UISGetColorAdditive()->r;
     bTint = 1;

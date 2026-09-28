@@ -61,7 +61,7 @@ void fn_800922A8(UIText* pText) {
 
     uFlags = 0;
     szText = ((MsgString*)((u8*)pText + pText->nText))->pStr;
-    t = *fn_80093274();
+    t = *UITransform_GetCurrent();
     lbl_80281F30 = UISGetColorMultipler();
     lbl_80281F34 = UISGetColorAdditive();
     t.m[3][0] = 512.0f * (t.m[3][0] / 512.0f);

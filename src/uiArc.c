@@ -16,7 +16,7 @@ void fn_80091460(s16 n2, s16 n0, s16 n8, s32 a, s32 b);
 void fn_800912F4(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale, f32* pAdd);
 void fn_8009222C(f32* pOut, LLPict* pPict);
 f32  fn_80092210(void);
-f32* fn_80093268(void);                 // uiTransform.c
+f32* UITransform_GetViewParams(void);                 // uiTransform.c
 void fn_800760D8(LLPict* pPict);        // LLVideo.c
 
 // The tint of the last draw (as fe_movies.c's lbl_80281F28/lbl_80281F2C); nothing here reads it.
@@ -97,11 +97,11 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     int i;
     int j;
 
-    fDist = fn_80093268()[2];
+    fDist = UITransform_GetViewParams()[2];
     fZ = fn_80092210();
-    pMtx = fn_80093274();
-    pColour = fn_80093274();
-    pAdd = fn_80093274();
+    pMtx = UITransform_GetCurrent();
+    pColour = UITransform_GetCurrent();
+    pAdd = UITransform_GetCurrent();
     lbl_80282458 = &UISGetColorMultipler()->r;
     lbl_8028245C = &UISGetColorAdditive()->r;
     if (pArc->n2 != -1) {

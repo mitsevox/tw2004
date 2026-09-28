@@ -3505,3 +3505,17 @@ address	name	comment	by	date
 800908CC	UI_BlankProcess5	add	rq3 (replayed by orchestrator)	2026-09-28
 800908D0	UI_BlankProcess6	add	rq3 (replayed by orchestrator)	2026-09-28
 800908D4	UI_SetTextLineSpacing	add	rq3 (replayed by orchestrator)	2026-09-28
+80090904	UI_FindTexture	rewrite	rq3 (replayed by orchestrator)	2026-09-28
+80092CE8	UITransform_Translate	add	rq3 (replayed by orchestrator)	2026-09-28
+80092D68	UITransform_Scale	add	rq3 (replayed by orchestrator)	2026-09-28
+80092DE8	UITransform_RotateX	add	rq3 (replayed by orchestrator)	2026-09-28
+80092E74	UITransform_RotateY	add	rq3 (replayed by orchestrator)	2026-09-28
+80092F00	UITransform_RotateZ	add	rq3 (replayed by orchestrator)	2026-09-28
+80092F8C	UITransform_Apply	rewrite	rq3 (replayed by orchestrator)	2026-09-28
+80093268	UITransform_GetViewParams	add	rq3 (replayed by orchestrator)	2026-09-28
+80093274	UITransform_GetCurrent	add	rq3 (replayed by orchestrator)	2026-09-28
+80093280	UITransform_HandleOp	rewrite	rq3 (replayed by orchestrator)	2026-09-28
+8009349C	UITransform_Init	rewrite	rq3 (replayed by orchestrator)	2026-09-28
+800934F8	UITransform_Shutdown	add	rq3 (replayed by orchestrator)	2026-09-28
+800905A8	UI_vInitModule	rewrite	rq3 (replayed by orchestrator)	2026-09-28
+80090664	UI_vCloseModule	rewrite	rq3 (replayed by orchestrator)	2026-09-28

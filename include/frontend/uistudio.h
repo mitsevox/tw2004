@@ -241,7 +241,7 @@ typedef void UISMessageFncT(s32 nCmd, s32 n1, s32 n2, s32 n3, s32 n4, s32 n5);  
 // Returns the screen's UI file, still unfixed (the game's UI_ResLoad, which ignores the group).
 typedef void* UISResLoadFncT(u16 uGroup, u16 uScreen);
 typedef void UISResUnloadFncT(u16 uGroup, u16 uScreen, void* pData);
-typedef void UISTransformFncT(int nOp, void* pDesc);            // the game's fn_80093280
+typedef void UISTransformFncT(int nOp, void* pDesc);            // the game's UITransform_HandleOp
 // Never set by TW2004; STABS keep no parameter list.
 typedef UISVectorT UISLocalizeFncT();
 typedef void UISScreenActivatedFncT(u16 uGroup, u16 uScreen);

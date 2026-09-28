@@ -32,12 +32,12 @@ s8 gSavedCrAPHidden = -1;
 
 void UI_SetControllerEnabled(s32 p0, s32 p1);
 s32 fn_80092BC4();
-s32 fn_800934F8();
+s32 UITransform_Shutdown();
 s32 fn_800BA038();
 void UI_CloseInterface(FrontEnd* pFE);
 void UI_vCloseModule(void);
 void UI_ResolveFileEntries(FrontEnd* pFE);
-TexEntry* fn_80090904(TexBank* pBank, u64 uHash);
+TexEntry* UI_FindTexture(TexBank* pBank, u64 uHash);
 void GameMsg_SendPendingMenus(void);         // GameMessages.c
 void GameMsg_SendPending(void);         // GameMessages.c
 void GameMsg_ClearPending(void);         // GameMessages.c
@@ -424,7 +424,7 @@ void UI_ResolveFileEntries(FrontEnd* pFE) {
                     uHash = fn_8000BEE4(szName);
                     nBank = UI_GetTextureBankIndex(szName);
                     if (nBank != -1) {
-                        pEntry->p4 = fn_80090904(gpFrontEnd->p8->ap4[nBank], uHash);
+                        pEntry->p4 = UI_FindTexture(gpFrontEnd->p8->ap4[nBank], uHash);
                     }
                 }
             } else if (pEntry->u0 == 2 && pFE->pC != NULL) {
@@ -475,7 +475,7 @@ FrontEnd* UI_OpenInterface(char* szSet) {
     gpFrontEnd->p8 = fn_8008F0F0(szSet);
     gpFrontEnd->pC = fn_8008F15C(szSet);
     gpFrontEnd->p10 = fn_8008F18C(szSet);
-    fn_8009349C();
+    UITransform_Init();
     gUIState.a2C[0] = 0;
     gUIState.a2C[1] = 0;
     gUIState.a2C[2] = 0;
@@ -500,7 +500,7 @@ FrontEnd* UI_OpenInterface(char* szSet) {
     UISRegisterPluginFnc(gpFrontEnd->pHandler, 7, (UISPluginFncT*)fn_800929E4);
     UISRegisterPluginFnc(gpFrontEnd->pHandler, 8, (UISPluginFncT*)fn_80103684);
     UISRegisterResourceFncs(gpFrontEnd->pHandler, UI_ResLoad, UI_ResUnload);
-    UISRegisterTransformFncs(gpFrontEnd->pHandler, (UISTransformFncT*)fn_80093280);
+    UISRegisterTransformFncs(gpFrontEnd->pHandler, (UISTransformFncT*)UITransform_HandleOp);
     UISRegisterMessageFnc(gpFrontEnd->pHandler, UI_RunGameMessage);
     // fake match: the original compares the count signed here (cmpw), unsigned in UI_ResLoad
     for (i = 0; i < (s32)gpFrontEnd->pFile->p4->nCount; i++) {
@@ -559,10 +559,10 @@ void UI_CloseInterface(FrontEnd* pFE) {
     gpFrontEnd = NULL;
 }
 
-// Start the UI module (GO_vInitFE, GO_vInitIG, start-up's gomainloop fn_8006CEFC): text additive
-// mode on (fn_80092BA0), nothing loaded (fn_8008EC30), the controller state cleared with all four
-// controllers enabled, the EA Trax display reset (fn_800B9FF0) and the pending UI messages dropped
-// (GameMsg_ClearPending).
+// Start the UI module (GO_vInitFE, GO_vInitIG, start-up's gomainloop fn_8006CEFC): the font add
+// mode set to 1 (fn_80092BA0), nothing loaded (fn_8008EC30), the controller state cleared with all
+// four controllers enabled, the EA Trax display reset (fn_800B9FF0) and the pending UI messages
+// dropped (GameMsg_ClearPending).
 void UI_vInitModule(void) {
     s32 i;
 
@@ -594,13 +594,13 @@ void UI_SendPendingMessages(void) {
 }
 
 // End the UI module (gomainloop's shut-down steps for the menus, a round and start-up): shut the UI
-// down if it is still open (UI_CloseInterface), free the transform stack (fn_800934F8), turn text
-// additive mode off (fn_80092BC4) and free the EA Trax logo (fn_800BA038).
+// down if it is still open (UI_CloseInterface), free the transform stack (UITransform_Shutdown),
+// set the font add mode back to 0 (fn_80092BC4) and free the EA Trax logo (fn_800BA038).
 void UI_vCloseModule(void) {
     if (gpFrontEnd != NULL) {
         UI_CloseInterface(gpFrontEnd);
     }
-    fn_800934F8();
+    UITransform_Shutdown();
     fn_80092BC4();
     fn_800BA038();
 }
@@ -729,8 +729,10 @@ void UI_SetTextLineSpacing(f32 x0) {
     pCtx->fB4 = x0;
 }
 
-// The texture in pBank whose name hashes to uHash.
-TexEntry* fn_80090904(TexBank* pBank, u64 uHash) {
+// The texture in pBank whose name hashes to uHash. A name not in the bank gives index 0x80000000,
+// which fn_800107E4's 32-bit multiply by the entry size wraps to the bank's first texture.
+// port: on 64 bits that index points far outside the bank.
+TexEntry* UI_FindTexture(TexBank* pBank, u64 uHash) {
     int nTex = fn_8001005C(pBank, uHash);
 
     return fn_800107E4(pBank, nTex);

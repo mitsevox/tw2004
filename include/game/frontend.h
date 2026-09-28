@@ -240,14 +240,14 @@ typedef struct UITransform {
 } UITransform;
 LAYOUT_ASSERT(UITransform, 0x7C);
 
-// The stack itself: fn_8009349C allocates it (0x3E4 bytes: eight levels), fn_800934F8 frees it.
+// The stack itself: UITransform_Init allocates it (0x3E4 bytes: eight levels), UITransform_Shutdown frees it.
 typedef struct UITransformStack {
     s32         nTop;           // 0x0  the current level
     UITransform aLevel[8];      // 0x4
 } UITransformStack;
 LAYOUT_ASSERT(UITransformStack, 0x3E4);
 
-// A UI element's transform, as pushed onto the stack (fn_80093280, op 1): moved, then rotated and
+// A UI element's transform, as pushed onto the stack (UITransform_HandleOp, op 1): moved, then rotated and
 // scaled about a pivot.
 typedef struct UITransformDesc {
     f32      vMove[3];          // 0x00
@@ -259,9 +259,9 @@ typedef struct UITransformDesc {
     f32      f44[4];            // 0x44  divided by 511 when pushed
 } UITransformDesc;
 
-UITransform* fn_80093274(void);         // the current level (uiTransform.c)
-void fn_80093280(int nOp, UITransformDesc* p);  // uiTransform.c: the studio's transform callback
-void fn_8009349C(void);                         // uiTransform.c: allocate the stack
+UITransform* UITransform_GetCurrent(void);         // the current level (uiTransform.c)
+void UITransform_HandleOp(int nOp, UITransformDesc* p);  // uiTransform.c: the studio's transform callback
+void UITransform_Init(void);                         // uiTransform.c: allocate the stack
 
 // The studio's message handlers the front end registers (uiProcessInterface.c UI_OpenInterface).
 void fn_800929E4(UIText* pText, int nMsg, s32 n, MsgArg* pArgs, MsgArg* pResult);  // uiText.c

@@ -327,7 +327,7 @@ They will be sorted into the sections below.
 - **[verified] A field reloaded at every use of a small formula** means EA used a macro, not an inline
   (GoAnimalActors ANIMAL_WAVE 94.4 -> 98.3).
 - **[verified] Keep call results in named locals** before passing them on (uiProcessInterface
-  fn_80090904 93 -> 100), before using them as a base pointer (DynamicCam_GetLocation), and put a loop
+  UI_FindTexture 93 -> 100), before using them as a base pointer (DynamicCam_GetLocation), and put a loop
   bound read through a pointer in a local to get the ctr loop (uiProcessInterface UI_FindColorTable 58 -> 97).
 - **[verified] `&a[i]` indexing matches where hand-walked pointers don't** (fe_movies fn_80090D28,
   ActAnimal_SetWorldMatrix, SitDevFile fn_800BCF84 74.7 -> 98.8).
