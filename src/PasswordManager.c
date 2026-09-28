@@ -40,10 +40,10 @@ u8 PasswordManager_IsSponsorshipPasswordEntered(int n) {
 // Tests a code typed in the menus (menu message GM_vTestPassword); if it is a cheat, sets what it
 // unlocks, which holds for every profile (lbl_80281DF4), and returns 1 (0: not a cheat).
 // THEKITCHENSINK unlocks every golfer, course and reward and TOUR card level 1 (and clears
-// gFEState.b18); ALLTHETRACKS the courses and rewards; CANYOUPICKONE the golfers; fourteen codes
-// one golfer each; SHERWOOD TARGET sets cheat bit 6. The 16 codes of gSponsorPasswords set their
-// sponsor's bit (gSponsorPasswordBits), and "A".."E" cheat bits 1..5 (gPasswordEnteredBits).
-// ALLOFITSFREE is tested but does nothing.
+// gFEState.bTourCardWithheld); ALLTHETRACKS the courses and rewards; CANYOUPICKONE the golfers;
+// fourteen codes one golfer each; SHERWOOD TARGET sets cheat bit 6. The 16 codes of
+// gSponsorPasswords set their sponsor's bit (gSponsorPasswordBits), and "A".."E" cheat bits 1..5
+// (gPasswordEnteredBits). ALLOFITSFREE is tested but does nothing.
 u8 PasswordManager_TestPassword(char* szCode) {
     s32 aBit[5] = {1, 2, 3, 4, 5};
     char aszCode[5][32] = {"A", "B", "C", "D", "E"};
@@ -62,7 +62,7 @@ u8 PasswordManager_TestPassword(char* szCode) {
             lbl_80281DF4->aRewardUnlocked[i] = 1;
         }
         lbl_80281DF4->nTourCardLevel = 1;
-        gFEState.b18 = 0;
+        gFEState.bTourCardWithheld = 0;
         return 1;
     }
     if (strcmp(szCode, "ALLTHETRACKS") == 0) {
@@ -275,7 +275,7 @@ void SaveProfile_SetupDummy(void) {
 // Sets a save profile up as a new one: cleared and not active; named "User <n>" after the slot the
 // menus work on in game type 3 ("NoName" otherwise); the starting golfers (gStartUnlockedGolfers)
 // and courses (all but gStartLockedCourses) unlocked, reward 0 only; 25000 in cash plus
-// gFEState.n1C (plus the first sponsor's start cash when one is signed; a billion with cheat bit
+// gFEState.nMCRewardMoney (plus the first sponsor's start cash when one is signed; a billion with cheat bit
 // 0); no stats, awards, medals (aMedal 3) or TOUR card; three empty saved rounds, the default
 // created golfer (SaveProfile_InitCreatedGolfer), no PGA TOUR seasons, the Create-A-Player defaults
 // (FE_CrAP_InitCrAPInfo) and the first sponsor (lbl_80281DF0) signed when there is one.
@@ -322,7 +322,7 @@ void SaveProfile_InitNew(SaveProfile* pProfile) {
     if (PasswordManager_IsPasswordEntered(0)) {
         pProfile->nCurrentCash = 1000000000;
     } else {
-        pProfile->nCurrentCash = gFEState.n1C + 25000;
+        pProfile->nCurrentCash = gFEState.nMCRewardMoney + 25000;
         if (lbl_80281DF0.bSigned) {
             pProfile->nCurrentCash += GameModeDriverPGATour_GetSponsorshipStartCash(0);
         }
@@ -385,7 +385,7 @@ void SaveProfile_InitNew(SaveProfile* pProfile) {
     pProfile->nTourCardLevel = 0;
 
     for (i = 0; i < NUM_SAVED_ROUNDS; i++) {
-        pProfile->aSavedRound[i].n0 = 0;
+        pProfile->aSavedRound[i].bInUse = 0;
         pProfile->aSavedRound[i].n15 = 1;
         for (j = 0; j < 18; j++) {
             pProfile->aSavedRound[i].nHoleNum[j] = -1;
@@ -396,7 +396,7 @@ void SaveProfile_InitNew(SaveProfile* pProfile) {
     SaveProfile_InitCreatedGolfer(pProfile);
     pProfile->unk54C0[0] = 0;
     pProfile->unk54C0[1] = 0;
-    pProfile->n54C2 = 0;
+    pProfile->nGolferGlove = 0;
     for (i = 0; i < 6; i++) {
         SKA_PackName(&pProfile->aGolferNames[i], "");
     }

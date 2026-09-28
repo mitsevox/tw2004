@@ -121,11 +121,11 @@ void GameMode26_Shutdown(void) {
 
 // Starts a mode-26 event: from the menus (FE_MessageTable.c GM_vStartEventCheckDisc, as GameMode22_StartEvent
 // for mode 22) and, with session flag 0x4000, from GoEntry.c as the front end starts again. Both
-// players on tee set 0, options.n20 off, and no winner (gGameMode26Winner 5).
+// players on tee set 0, options.nFairwaySpeed off, and no winner (gGameMode26Winner 5).
 void GameMode26_StartEvent(void) {
     gSession.nTeeSet[0] = 0;
     gSession.nTeeSet[1] = 0;
-    gSession.options.n20 = 0;
+    gSession.options.nFairwaySpeed = 0;
     gGameMode26Winner = 5;
 }
 

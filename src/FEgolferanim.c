@@ -81,8 +81,8 @@ GxTexture gFEScreenCopyTex;
 FEGolferMachine gFEStreamStateMgr;  // the loader's state machine (FE_StreamInitStateMgr)
 
 s32 gFEOffscreenBufferRender = 1;   // draw the golfer through gFEScreenCopyTex (FE_SetOffscreenBufferRender)
-f32 gFEDimAlphaMax = 0.17f;         // while b83 is set: the most the display's alpha fAlpha may be
-f32 lbl_80281338 = 0.1f;            // while b83 is set: f140, f144 and f148 (written only)
+f32 gFEDimAlphaMax = 0.17f;         // while bDimmed is set: the most the display's alpha fAlpha may be
+f32 lbl_80281338 = 0.1f;            // while bDimmed is set: f140, f144 and f148 (written only)
 u8  gFEGolferEnabled = 1;           // never cleared; 0 would stop animating and drawing the golfer
 s32 gFELastDrawnGolfer = -1;        // } the golfer and profile slot last drawn (FE_RenderGolfer); -1 after
 s32 gFELastDrawnSlot = -1;          // } a load, so he is given his ball and textures again
@@ -182,7 +182,7 @@ void FE_CharMgrInit(void) {
     gpCrAPState->b89 = 0;
     gpCrAPState->b84 = 1;
     gpCrAPState->b82 = 0;
-    gpCrAPState->b83 = 0;
+    gpCrAPState->bDimmed = 0;
     gpCrAPState->fAlpha = 0.5f;
     gpCrAPState->nBC = 0;
     gpCrAPState->b87 = 0;
@@ -758,7 +758,7 @@ void FE_vUpdateGolferAll(void) {
     }
     gpCrAPState->fAlpha = (gpCrAPState->fAlpha < 0.0f) ? 0.0f
                        : (gpCrAPState->fAlpha > 0.5f) ? 0.5f : gpCrAPState->fAlpha;
-    if (gpCrAPState->b83) {
+    if (gpCrAPState->bDimmed) {
         if (gpCrAPState->fAlpha > gFEDimAlphaMax) {
             gpCrAPState->fAlpha = gFEDimAlphaMax;
         }
@@ -902,10 +902,10 @@ void FE_vUpdateGolferAll(void) {
         }
         LF_vSetCurrentLightFogEnvironment(0);
         if (gpCrAPState->pB4->pChar->p44 != NULL) {
-            // Screen kind 1 with b83 set lights him with all-zero settings; otherwise with his
+            // Screen kind 1 with bDimmed set lights him with all-zero settings; otherwise with his
             // own, which sit in p44's entry 21 (port: read as LightParams, both 0x30 bytes).
             pLight = (LightParams*)&gpCrAPState->pB4->pChar->p44[21];
-            if (gpCrAPState->nScreenKind == 1 && gpCrAPState->b83) {
+            if (gpCrAPState->nScreenKind == 1 && gpCrAPState->bDimmed) {
                 Mem_set(&params, 0, sizeof(params));
                 fn_80093854(&params);
             } else {
@@ -1135,7 +1135,7 @@ void FE_SetupCharState(void) {
         gpCrAPState->b85 = 1;
         gpCrAPState->b91 = 1;
         gpCrAPState->b84 = 1;
-        gpCrAPState->b83 = 0;
+        gpCrAPState->bDimmed = 0;
         break;
     case 1:
     case 4:
@@ -1206,7 +1206,7 @@ void FE_SetupCharState(void) {
         gpCrAPState->b85 = 0;
         gpCrAPState->b91 = 0;
         gpCrAPState->b84 = 0;
-        gpCrAPState->b83 = 0;
+        gpCrAPState->bDimmed = 0;
         break;
     }
     gpCrAPState->fAlpha = 0.0f;

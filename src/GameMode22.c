@@ -282,9 +282,9 @@ void GameMode22_Unused1F0(void) {
 }
 
 // Starts a long-drive event from the menus (FE_MessageTable.c GM_vStartEventCheckDisc, as
-// GameModeDriverRTE_StartEvent does for mode 24): every player on tee set 0, options.n20 off, no
-// winner (nWinner 5, bDecided 0), no longest drive yet (fLongestDrive 0, nLongestDriver 5), and the
-// 120-frame winner countdown (nWinnerFrames) reset.
+// GameModeDriverRTE_StartEvent does for mode 24): every player on tee set 0, options.nFairwaySpeed
+// off, no winner (nWinner 5, bDecided 0), no longest drive yet (fLongestDrive 0, nLongestDriver 5),
+// and the 120-frame winner countdown (nWinnerFrames) reset.
 void GameMode22_StartEvent(void) {
     s32 i;
 
@@ -292,7 +292,7 @@ void GameMode22_StartEvent(void) {
     while (i < gSession.nNumPlayers) {
         gSession.nTeeSet[i++] = 0;
     }
-    gSession.options.n20 = 0;
+    gSession.options.nFairwaySpeed = 0;
     gGameMode22.nWinner = 5;
     gGameMode22.bDecided = 0;
     gGameMode22.fLongestDrive = 0.0f;

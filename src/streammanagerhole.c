@@ -291,23 +291,24 @@ void fn_800146C4(void) {
 
 // ---- end of sweep code ----
 
-// Stream list 1 (the front end's files), with the loading screen unless the front end's b0F is set.
+// Stream list 1 (the front end's files), with the loading screen unless the front end's bFirstTime
+// is set.
 void fn_80014718(void) {
-    if (gFEState.b0F == 0) {
+    if (gFEState.bFirstTime == 0) {
         UI_LoadLoadingBarTexture();
         UI_InitLoadingBar();
     }
     fn_80015134();
     do {
-        if (gFEState.b0F == 0) {
+        if (gFEState.bFirstTime == 0) {
             UI_DrawLoadingScreenAndProgressBar(0);
         }
     } while (UStream_Update() != 0);
-    if (gFEState.b0F == 0) {
+    if (gFEState.bFirstTime == 0) {
         UI_DrawLoadingScreenAndProgressBar(1);
     }
     fn_8001510C();
-    if (gFEState.b0F == 0) {
+    if (gFEState.bFirstTime == 0) {
         UI_FreeLoadingPicture();
     }
 }

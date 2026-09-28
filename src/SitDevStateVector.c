@@ -155,9 +155,9 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         SitDev_SetStateValue(pValues, 31, fn_800D0AF4(), pSetBits);
         SitDev_SetStateValue(pValues, 65, Game_CurrentPinSet(), pSetBits);
         SitDev_SetStateValue(pValues, 85, 0, pSetBits);
-        SitDev_SetStateValue(pValues, 88, gSession.options.n20, pSetBits);
-        SitDev_SetStateValue(pValues, 89, gSession.options.n18, pSetBits);
-        SitDev_SetStateValue(pValues, 90, gSession.options.n1C, pSetBits);
+        SitDev_SetStateValue(pValues, 88, gSession.options.nFairwaySpeed, pSetBits);
+        SitDev_SetStateValue(pValues, 89, gSession.options.nGreenSpeed, pSetBits);
+        SitDev_SetStateValue(pValues, 90, gSession.options.nRough, pSetBits);
         SitDev_SetStateValue(pValues, 91, gSession.nTeeSet[nPlayer], pSetBits);
         SitDev_SetStateValue(pValues, 92, gSession.options.nWind, pSetBits);
     case 2:

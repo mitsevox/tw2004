@@ -28,7 +28,8 @@ typedef struct Tournament {
 typedef struct TourRound {
     s32  nCourse;               // 0x0
     s32  nPinSet;               // 0x4  1-based: the pin position every hole uses (Session.nPinSet)
-    s32  n8;                    // 0x8  -> GameOptions.n18 (GameModeDriverPGATour_SetTournament)
+    s32  nGreenSpeed;           // 0x8  replaces GameOptions.nGreenSpeed for the round
+                                //      (GameModeDriverPGATour_SetTournament)
 } TourRound;
 
 // A tournament's format (0x54 bytes). TW06: Tournament_events_t, which starts with nRounds too.

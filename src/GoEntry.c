@@ -104,10 +104,10 @@ void fn_800083A4(void) {
             break;
         case 3:
             UI_OnFrontEndStart();
-            if (gFEState.b0F) {
+            if (gFEState.bFirstTime) {
                 FE_PlayIntroMovies();
             }
-            Gaud_StartFEMusic(gFEState.b0F);
+            Gaud_StartFEMusic(gFEState.bFirstTime);
             UI_OpenInterface("frontend");
             fn_8006D8E8();
             if (gSession.nC == 0 && gSession.nGameType != 13) {

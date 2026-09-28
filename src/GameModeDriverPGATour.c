@@ -33,8 +33,7 @@ u8  gbPgaTourRoundActive;       // 1 from a tour round's start until the mode sh
                                 //   (read through GM_Currently_PgaTourMode)
 s32 gPgaSavedWind;              // the options' nWind from before a tour round (Shutdown puts it back)
 
-// Not in a C unit yet
-void UI_GetMoneyString(s32 nMoney, char* pDst);               // money as text
+void UI_GetMoneyString(s32 nMoney, char* pDst);     // uiProcessInterface.c: money as text
 
 void GameModeDriverPGATour_LoadPGAcFromStream(UStreamObject* pObject);
 void GameModeDriverPGATour_LoadPGAtFromStream(UStreamObject* pObject);
@@ -152,8 +151,8 @@ void GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream(UStreamObject* 
 
 // pfnShutdown, as the mode ends: gpGame's nC and n10 go back to 1, the options' nWeather and nWind
 // that PrepareForTeeOff replaced come back, and the tour-round flag (GM_Currently_PgaTourMode) is
-// cleared. options.n18, which SetTournament replaced (keeping the old value in gPgaSavedOptions18),
-// is not put back (see the EA bug there).
+// cleared. options.nGreenSpeed, which SetTournament replaced (keeping the old value in
+// gPgaSavedOptions18), is not put back (see the EA bug there).
 void GameModeDriverPGATour_Shutdown(void) {
     gpGame->nC = 1;
     gpGame->n10 = 1;
@@ -171,9 +170,10 @@ void GameModeDriverPGATour_StartGamePreData(void) {
 
 // Sets up tournament format i (an index into gPgaData.aTourEvent) for the current round: all five
 // players play its tee set, the course is the round's course (round gpGame->nDC), every hole uses
-// the round's pin position (profile 0's tour.nRound), and the round's n8 replaces options.n18, the
-// green speed (the old value kept in gPgaSavedOptions18, never read back), and is applied
-// (fn_80055C40). The tee set is written back to the format unchanged; the original has that store.
+// the round's pin position (profile 0's tour.nRound), and the round's nGreenSpeed replaces
+// options.nGreenSpeed, the green speed (the old value kept in gPgaSavedOptions18, never read back),
+// and is applied (fn_80055C40). The tee set is written back to the format unchanged; the original
+// has that store.
 void GameModeDriverPGATour_SetTournament(s32 i) {
     PlayerNumber_t nPlayer = PLR_1_e;
     TourEvent* pEvent = &gPgaData.aTourEvent[i];
@@ -193,9 +193,10 @@ void GameModeDriverPGATour_SetTournament(s32 i) {
     // EA bug: the player's green speed option is kept here but nothing puts it back
     // (GameModeDriverPGATour_Shutdown restores only nWeather and nWind), so after a tour round the
     // option holds the tournament's green speed instead of the one the player chose
-    gPgaSavedOptions18 = gSession.options.n18;
-    gSession.options.n18 = (u8)gPgaData.aTourEvent[i].aRound[gpSaveData[nPlayer].tour.nRound].n8;
-    fn_80055C40(gSession.options.n18);
+    gPgaSavedOptions18 = gSession.options.nGreenSpeed;
+    gSession.options.nGreenSpeed =
+        (u8)gPgaData.aTourEvent[i].aRound[gpSaveData[nPlayer].tour.nRound].nGreenSpeed;
+    fn_80055C40(gSession.options.nGreenSpeed);
 }
 
 // A round of the current tournament is about to start (front-end message GM_vStartEventCheckDisc).

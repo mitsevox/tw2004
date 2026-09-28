@@ -505,7 +505,7 @@ void StartBackgroundMusic(void) {
         // fake match: the original keeps an empty 19-step loop here; a count nothing reads
         // reproduces it (what EA's loop did is lost)
         for (i = 0; i < 19; i++) {
-            if (gSession.options.rows[lbl_8028142C][i]) {
+            if (gSession.options.abTrackOn[lbl_8028142C][i]) {
                 nCount++;
             }
         }
@@ -513,7 +513,7 @@ void StartBackgroundMusic(void) {
             if (++lbl_8028142D >= 19) {
                 lbl_8028142D = 0;
             }
-            if (gSession.options.rows[lbl_8028142C][lbl_8028142D]) {
+            if (gSession.options.abTrackOn[lbl_8028142C][lbl_8028142D]) {
                 Gaud_StartMusic(13, lbl_8028142D);
                 return;
             }
@@ -1870,8 +1870,8 @@ u8 Gaud_GetMusicStatus(void) {
 }
 
 // Starts the front end's music again: re-picks the stream (Gaud_SetStreamingContext). Callers pass
-// a flag (TW07: bool firstTime; GoEntry.c the menus' b0F, FE_Manager.c 0 after a movie) that this
-// definition does not take.
+// a flag (TW07: bool firstTime; GoEntry.c the menus' bFirstTime, FE_Manager.c 0 after a movie) that
+// this definition does not take.
 void Gaud_StartFEMusic(void) {
     Gaud_SetStreamingContext();
 }

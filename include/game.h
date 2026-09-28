@@ -28,7 +28,8 @@ typedef struct ReplayBuffer {
     SaveRecords records;        // 0x10600  the session's record tables
     s32  aQueueCount[12];       // 0x1522C  the UI queues' counts, lbl_802822B8 down to lbl_80282288
                                 //          (GameUI.c; lbl_802822A4 is not kept)
-    u8   b1525C;                // 0x1525C  set by REPLAY_RecordStart, cleared by REPLAY_RecordStop (not in a replay)
+    u8   b1525C;                // 0x1525C  set by REPLAY_RecordStart, cleared by REPLAY_RecordStop
+                                //          (not in a replay)
     u8   unk1525D[3];
 } ReplayBuffer;
 LAYOUT_ASSERT(ReplayBuffer, 0x15260);
@@ -236,8 +237,8 @@ s32  CalDate_GetDayOfWeek(u16* pDate);                   // its day of the week,
 s32  DaysInMonth(u32 nMonth, u32 nYear);        // the days in a month (compared unsigned: cmplwi)
 void CalDate_GetPrevMonth(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month before
 void CalDate_GetNextMonth(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month after
-void CalDate_ToString(u16 nDate, char* szOut);       // a date as text
-void CalDate_ToStringMD(u16 nDate, char* szOut);       // a date as month/day
+void CalDate_ToString(u16 nDate, char* pBuf);       // a date as text
+void CalDate_ToStringMD(u16 nDate, char* pBuf);       // a date as month/day
 s32  CalDate_GetDay(u16 nDate);            // Calendar.c
 u32  CalDate_GetMonth(u16 nDate);            // Calendar.c (unsigned: callers compare it with cmplw)
 u16  CalDate_GetToday(void);                 // today's date
@@ -249,11 +250,13 @@ void GM_Earnings_AwardMoney(int nPlayer, int nMoney, CourseMoneyTracking* pMoney
 int  GM_Earnings_GetStrokeWinnings(int nWinner, int nLoser, int nMargin, int* pPrize);
 int  GM_Earnings_GetStrokeWinningsTeam(int nWinner, int nLoser, int nMargin, int* pPrize);
 int  GM_Earnings_RateGolfer(int nPlayer);          // the player's earnings rating, 0..25
-s32  GM_Earnings_ComputeBonusModifiers(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseMoneyTracking* pMoney);
+s32  GM_Earnings_ComputeBonusModifiers(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole,
+                                       CourseMoneyTracking* pMoney);
 int  GM_Earnings_ComputeTOURCardModifiers(int nReward, int nPlayer, CourseMoneyTracking* pMoney);
 s32  Earnings_CheckShotAwards(int nPlayer, Ball* pBall, u8 b);   // one of GameEffects' GameBreaker checks
-s32  Earnings_CheckPuttAwards(int nPlayer, Ball* pBall, u8 b);   // the same through GM_Earnings_CheckPuttGoals (pBall unused)
-u8   HighScoreRecords_CheckRecordGameSetting(int nKind);            // Earnings.c: whether records of a kind count now
+s32  Earnings_CheckPuttAwards(int nPlayer, Ball* pBall, u8 b);   // the same through
+                                                                 // GM_Earnings_CheckPuttGoals (pBall unused)
+u8   HighScoreRecords_CheckRecordGameSetting(int nKind);    // Earnings.c: whether records of a kind count now
 void GM_Earnings_CheckShotGoals(int nPlayer, Ball* pBall, u8 bPreview);   // Earnings.c: the shot's check
 void GM_Earnings_CheckPuttGoals(int nPlayer, u8 bPreview);                // the putt's
 void GM_Earnings_CheckHoleGoals(int nPlayer, u8 bPreview, u8 bRoundOver); // the hole's
@@ -263,9 +266,11 @@ s32  Earnings_GetShotAwardId(s32 i);                // gShotAwards[i]
 s32  Earnings_GetPuttAwardId(s32 i);                // gPuttAwards[i]
 s32  Earnings_GetHoleAwardId(s32 i);                // gHoleAwards[i]
 int  HighScoreRecords_GetEndOfShotRecord(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll);
-int  HighScoreRecords_GetEndOfHoleRecord(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll);   // the putt record check
+// The putt record check.
+int  HighScoreRecords_GetEndOfHoleRecord(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll);
 s32  GM_GetScoringType(void);                 // GameUICommands.c
-s32  GM_GetNumHolesRemainingInRound(void);                 // GameUICommands.c: the round's holes left, the current one included
+s32  GM_GetNumHolesRemainingInRound(void);                 // GameUICommands.c: the round's holes left, the
+                                                           // current one included
 
 // GameHoleContests.c: the longest-drive, closest-to-the-pin and hole-in-one contests
 u8   HoleContest_IsLongestDriveHole(void);                 // the longest drive is played on this hole
@@ -325,7 +330,8 @@ LAYOUT_ASSERT(GameEffects, 0x58);
 
 extern GameEffects gGameEffects;        // 0x80202898
 
-int  GameEffects_IsScriptedGameBreaker(int nPlayer);          // the putt about to be played is a big one (GameEffects.c)
+int  GameEffects_IsScriptedGameBreaker(int nPlayer);          // the putt about to be played is a big one
+                                                              // (GameEffects.c)
 u8   GameEffects_ScriptedGBDidIt(Ball* pBall, int nPlayer, u8 bNext);
 u8   GameEffects_SkipOtherCommentary(void);                 // TW06: GameEffects_SkipOtherCommentary
 void GameEffects_ScriptedGameBreakerTrigger(int nPlayer, int nReason);
@@ -371,7 +377,7 @@ void GM_CheckForShotChanges(int nPlayer);
 void GM_DoPostShotInHoleUI(int nPlayer);
 int  GM_ChooseRemoveBallState(int nPlayer);
 void GM_SimulateBallMovement(int nPlayer);
-void GM_SetNeedToBuildPlayoffHoleList(u8 b);
+void GM_SetNeedToBuildPlayoffHoleList(u8 v);
 void GUI_ToggleReplay(int a);
 void GUI_ToggleMulligan(int a);
 
@@ -393,7 +399,8 @@ int  GM_GetPlayerRoundStrokes(int nPlayer);          // the player's total strok
 int  GM_GetGolferRelativeCumulativeScore(int nPlayer, u8 bCurrent);
 u8   GM_FullRoundOfGolf(void);                 // whether the round plays every hole
 u8   GM_CurrentlyOnLastHole(void);                 // no selected hole is left after the current one
-int  GM_ConvertCourseAndHoleToPar5EagleIndex(int a, int b);         // a course and hole to its marked-hole index, or -1
+int  GM_ConvertCourseAndHoleToPar5EagleIndex(int nCourse, int nHole);         // a course and hole to its
+                                                                              // marked-hole index, or -1
 u8   GM_IsShotOverLimit(int nPlayer, int nStrokes);
 u8   GM_CanPlayerTakeMulligan(int nPlayer);
 void GM_ClearMulliganCounters(void);
@@ -509,40 +516,43 @@ extern u8  lbl_802822DC[3];
 extern u8  lbl_802822DF;
 
 // GameMessages.c
-void GUI_ShowChallengeIntro(int a);
-void GUI_ShowRealtimeEventIntro(int a);
-void GUI_ShowHoleContestIntro(int a);
+void GUI_ShowChallengeIntro(int nGroup);
+void GUI_ShowRealtimeEventIntro(int nGroup);
+void GUI_ShowHoleContestIntro(int nContest);
 u8   GUI_IsCaddieTipWindowOpen(void);
 u8   GUI_IsEndGameUiShowing(void);
 void GUI_DetectControllerPull(void);
 u8   GUI_AreTrophysOrRecordsQueued(void);
 u8   GUI_IsAwardUIAnimating(void);
-void GameMsg_Send3Ints(int nMsg, int a, int b, int c);      // send a message with three ints
+void GameMsg_Send3Ints(int nMsg, int nA, int nB, int nC);      // send a message with three ints
 void GUI_UpdateUIData6(void);
 void GUI_UpdateUIData4(void);
-void GUI_ToggleTapin(int a);
-void GUI_ShowLadderMessage(int a, int b, int c);
-void GUI_ShowEventWonMessage(int a, int b, int c);
-void GUI_ShowQueue9Message(int a, int b, int c);
-void GUI_ShowQueue8Message(int a, int b, int c);
-void GUI_ShowMedalMessage(int a, int b, int c);
-void GUI_ShowTourAwardMessage(int a, int b, int c);
-void GUI_ShowGolferUnlockMessage(int a, int b, int c);
-void GUI_ShowUnlockMessage(int a, int b, int c);
-void GUI_ShowRecordMessage(int a, int b, int c);
-void GUI_ShowTrophyMessage(int a, int b, int c);
-void GUI_ShowPrizeMessage(int a, int b, int c);
-void GameMsg_SetPending(int a);
-void GameMsg_SetPendingValue(int a);
+void GUI_ToggleTapin(int bShow);
+void GUI_ShowLadderMessage(int nA, int nB, int nC);
+void GUI_ShowEventWonMessage(int nA, int nB, int nC);
+void GUI_ShowQueue9Message(int nA, int nB, int nC);
+void GUI_ShowQueue8Message(int nA, int nB, int nC);
+void GUI_ShowMedalMessage(int nA, int nB, int nC);
+void GUI_ShowTourAwardMessage(int nA, int nB, int nC);
+void GUI_ShowGolferUnlockMessage(int nA, int nB, int nC);
+void GUI_ShowUnlockMessage(int nA, int nB, int nC);
+void GUI_ShowRecordMessage(int nA, int nB, int nC);
+void GUI_ShowTrophyMessage(int nA, int nB, int nC);
+void GUI_ShowPrizeMessage(int nA, int nB, int nC);
+void GameMsg_SetPending(int nBits);
+void GameMsg_SetPendingValue(int nValue);
 void GameMsg_Send(int nMsg);             // send a message with no values
 void GameMsg_Send1(int nMsg, u32 uFloats, void* pA);    // one value; uFloats bit 0: a float
 void GameMsg_Send2(int nMsg, u32 uFloats, void* pA, void* pB);
-void GameMsg_Send3(int nMsg, u32 uFloats, void* pA, void* pB, void* pC);   // three values; uFloats bit n: a float
+void GameMsg_Send3(int nMsg, u32 uFloats, void* pA, void* pB, void* pC);   // three values; uFloats bit n: a
+                                                                           // float
 void GameMsg_Send5(int nMsg, u32 uFloats, void* pA, void* pB, void* pC, void* pD, void* pE);   // five values
 void GameMsg_SendString(int nMsg, char* pStr);  // send a message with a string
 u8   GUI_IsFadingToBlack(void);
-void GUI_UpdateLongDriveScore(int a, int b, int c, int d, int e, int g, int h, f32 f);    // message 0x42
-void GUI_SendLongDriveVariant(int n);                // message 89 with a value
+// Message 0x42.
+void GUI_UpdateLongDriveScore(int nPlayer, int nScore, int nLength, int nKind, int nValue5, int nValue7,
+                              int nPoints, f32 fValue6);
+void GUI_SendLongDriveVariant(int nVariant);                // message 89 with a value
 void GUI_SendLongDriveText(char* pStr);           // message 90 with a string
 void GUI_ClearShownTips(void);
 
@@ -652,18 +662,18 @@ s32  GetCellIndexFromDate(u16 nDate);
 // GameMode_SkillZoneBase.c: what the target games (modes 13..17) share
 extern f32 gSkillZoneCups[40][4];         // the target list: gSkillZoneNumCups points (w = 1)
 extern s8  gSkillZoneNumCups;                // the number of targets (GameModeReplay.c)
-void GameModeSkillZoneBase_SortCupsByDistanceFromTee(void);                 // sort the targets by distance from the tee
+void GameModeSkillZoneBase_SortCupsByDistanceFromTee(void);       // sort the targets by distance from the tee
 void GameModeSkillZoneBase_SetCup(int nPlayer, s8 n);
 void GameModeSkillZoneBase_SetCup_AlignGolfer(int nPlayer, s8 n);
 u8   GameModeSkillZoneBase_PickPrevTarget(int nPlayer);          // previous target
 u8   GameModeSkillZoneBase_PickTarget(int nPlayer);          // next target
 s8   GameModeSkillZoneBase_GetGreenIndexHit(int nPlayer);          // the target nearest the ball
-int  GameModeSkillZoneBase_GetGreenTargetted(int nPlayer);          // the target nearest the player's aim point
+int  GameModeSkillZoneBase_GetGreenTargetted(int nPlayer);        // the target nearest the player's aim point
 s32  GameModeSkillZoneBase_GetBullsEyeColor(s32 nSurface);
 void GameModeSkillZoneBase_ClearPerHoleData(void);                 // every player's target-game state cleared
 void GameModeSkillZoneBase_ClearPerShotData(void);
 s32  GameModeSkillZoneBase_CountGreensHit(int nPlayer);          // how many targets the player has hit
-void GameModeSkillZoneBase_SetupBonusBall(int nPlayer);          // after a shot, maybe a multiplier for the next one
+void GameModeSkillZoneBase_SetupBonusBall(int nPlayer);   // after a shot, maybe a multiplier for the next one
 s32  GameModeSkillZoneBase_GetHitAllTargetsBonus(void);                 // the target game's prize
 void GameModeSkillZoneBase_StartComment(s32 nMsg);
 void GameModeSkillZoneBase_PostShotAwards1(int nPlayer);
@@ -692,7 +702,7 @@ void GameModeSkillZoneHorse_ShotClockOut(void);                      // GameMode
 void GameModeSkillZoneTimed_TimerOut(void);                          // GameMode_SkillZoneTimed.c
 void GameModeSkillZoneTimed_SetHudClock(s32 nTime);                  // GameMode_SkillZoneTimed.c
 s32  GameModeSkins_CurrentHoleValue(void);                 // GameMode_Skins.c: the skin on this hole
-s32  SpeedGolf_GetFirstSelectedHole(void);                 // GameMode_Skins.c: the first selected hole (-1: none)
+s32  SpeedGolf_GetFirstSelectedHole(void);             // GameMode_Skins.c: the first selected hole (-1: none)
 s32  SpeedGolf_GetNextSelectedHole(int h);                // the next selected hole after h (-1: none)
 s32  SpeedGolf_GetPrevSelectedHole(int h);                // the selected hole before h (-1: none)
 
@@ -702,7 +712,7 @@ void SpeedGolf_StartGamePreData(void);
 
 // GameMode8.c (modes 6, 7 and 8 share it)
 extern u8  gSpeedGolfFirstHoleTips;
-extern s32 gSpeedGolfEventLogCount;                // the next entry of the event log gSpeedGolfEventLog (0..99)
+extern s32 gSpeedGolfEventLogCount;              // the next entry of the event log gSpeedGolfEventLog (0..99)
 
 // One entry of the event log: the last 100 events (GameMode8.c writes it, a menu command reads it).
 typedef struct SGLog {
@@ -727,7 +737,7 @@ void SpeedGolfPoints_EndHole(void);
 void SpeedGolf_EndGame(void);
 void SpeedGolf_StartHole(void);
 void SpeedGolfPoints_ClearStartFlags(int nPlayer);
-void SpeedGolf_SetHoleTime(int nPlayer, int a);
+void SpeedGolf_SetHoleTime(int nPlayer, int nFrames);
 void SpeedGolf_Update(void);
 u8   SpeedGolf_RenderBallTarget(int nPlayer);
 u8   SpeedGolf_CheckControllerPulled(void);

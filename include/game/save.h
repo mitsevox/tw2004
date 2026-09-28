@@ -132,8 +132,8 @@ LAYOUT_ASSERT(TourSeason, 0x4E9C);
 // A saved custom round (0x70 bytes): 18 holes, each a hole number and the course it is from.
 // A new profile has three, emptied by the profile setup at 0x80057C88.
 typedef struct SavedRound {
-    u8   n0;                    // 0x00  cleared by the setup; set by a menu message (GM_vSetSavedRoundInUse);
-                                //       read unsigned (FE_MessageTable.c GM_vIsCustomRoundUsed)
+    u8   bInUse;                // 0x00  the custom round is in use (GM_vSetSavedRoundInUse,
+                                //       GM_vIsCustomRoundUsed); cleared by the setup
     char szName[0x14];          // 0x01  the round's name, shown as its course (GameUICommands.c)
     s8   n15;                   // 0x15  set to 1 by the setup; menu messages set and read it
                                 //       (read signed: GM_vGetCustomRoundN15)
@@ -307,7 +307,9 @@ typedef struct SaveProfile {
     Award aRTEAward[75];        // 0x0020C  per real-time event id. TW06: rteEventAwardInfo
     Award aLadderAward[25];     // 0x00338  per ladder event (LadderedMode.c); UserInfo_GetNumLadderEventsWon's earnings
                                 //          rating counts the won ones
-    Award aAward[39];           // 0x0039C
+    Award aAward[39];           // 0x0039C  the trophy balls (GM_Earnings_AwardTrophyBall): 0..22
+                                //          count in GM_GetGameProgress, 23..38 (the PGA TOUR and
+                                //          career awards) in GM_GetBonusProgress
     Replay aReplay[5];          // 0x00438  a Replay each, saved with awards 0, 6, 9, 3 and 13
     s32  nTourCardLevel;        // 0x05000  0..6: level 1 comes from the lessons (GameMode11), the rest
                                 //          from GM_Earnings_PayRoundGoals; it scales payouts
@@ -332,8 +334,8 @@ typedef struct SaveProfile {
                                 //          from FIRST_CREATED_GOLFER on are read here)
     u8   unk54C0[0x54C2 - 0x54C0];
     // The created golfer kept in this slot (golfer FIRST_CREATED_GOLFER + the slot), copied into
-    // the session's PlayerProfile by Golfer.c.
-    s8   n54C2;                 // 0x054C2  -> PlayerProfile.unk2
+    // the session's PlayerProfile by Session_SetupProfiles (Code8002EE1C.c).
+    s8   nGolferGlove;          // 0x054C2  -> PlayerProfile.nGlove (front-end messages 264, 265)
     u8   unk54C3[5];
     u64  aGolferNames[6];       // 0x054C8  -> PlayerProfile.aNames
     s8   nGolferOutfit;         // 0x054F8  -> PlayerProfile.nOutfit; FE_CrAP_TryBallSwappingAsset

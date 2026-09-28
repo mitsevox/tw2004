@@ -537,8 +537,8 @@ void fn_8002EBA4(u8* pObj, u8 nValue) {
     }
 }
 
-// The default game options. With session flag 0x4000 every row flag is cleared but four
-// (rows[0][13], [0][15], [0][17] and [1][0]) and fn_8002EBA4 gets 0 instead of 1.
+// The default game options. With session flag 0x4000 every EA Trax track is switched off but four
+// (abTrackOn[0][13], [0][15], [0][17] and [1][0]) and fn_8002EBA4 gets 0 instead of 1.
 void Options_SetDefaults(GameOptions* pOpt) {
     int i, j;
     pOpt->a0[0]  = 4;
@@ -553,8 +553,8 @@ void Options_SetDefaults(GameOptions* pOpt) {
     pOpt->nWeather = 2;
     pOpt->nWind    = 0;
     pOpt->n14      = 0;
-    pOpt->n18      = 1;
-    pOpt->n1C      = 1;
+    pOpt->nGreenSpeed = 1;
+    pOpt->nRough   = 1;
     for (i = 0; i < 8; i++) {
         pOpt->a24[i] = 1;
     }
@@ -564,7 +564,7 @@ void Options_SetDefaults(GameOptions* pOpt) {
     pOpt->n80 = 1;
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 19; j++) {
-            pOpt->rows[i][j] = 1;
+            pOpt->abTrackOn[i][j] = 1;
         }
     }
     pOpt->abRowOn[0] = 1;
@@ -576,16 +576,16 @@ void Options_SetDefaults(GameOptions* pOpt) {
     if (gSession.uFlags & 0x4000) {
         for (i = 0; i < 4; i++) {
             for (j = 0; j < 19; j++) {
-                pOpt->rows[i][j] = 0;
+                pOpt->abTrackOn[i][j] = 0;
             }
         }
         pOpt->abRowOn[0]  = 1;
-        pOpt->rows[0][13] = 1;
-        pOpt->rows[0][15] = 1;
-        pOpt->rows[0][17] = 1;
-        pOpt->rows[1][0]  = 1;
+        pOpt->abTrackOn[0][13] = 1;
+        pOpt->abTrackOn[0][15] = 1;
+        pOpt->abTrackOn[0][17] = 1;
+        pOpt->abTrackOn[1][0]  = 1;
         fn_8002EBA4((u8*)pOpt, 0);
     }
-    fn_80055C40(pOpt->n18);
-    fn_80055CD0(pOpt->n1C);
+    fn_80055C40(pOpt->nGreenSpeed);
+    fn_80055CD0(pOpt->nRough);
 }

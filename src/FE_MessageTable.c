@@ -1394,10 +1394,10 @@ void GM_vSetupPlayers(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 9: the menus start the demo (gSession.bDemo) in game mode pArgs[0]:
-// gFEState.b11 set, the mode set up (GM_SetModeType), the fade to black started and the front
+// gFEState.bDemoStarting set, the mode set up (GM_SetModeType), the fade to black started and the front
 // end's audio stopped (Gaud_ExitFE).
 void GM_vStartDemo(MsgArg* pArgs, MsgArg* pResult) {
-    gFEState.b11 = 1;
+    gFEState.bDemoStarting = 1;
     GM_SetModeType((u8)pArgs[0].i);
     gSession.bDemo = 1;
     gUIState.bFadeToBlack = 1;
@@ -1498,11 +1498,11 @@ void GM_vGetDemoSetupFlag(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 20: player pArgs[0] plays golfer pArgs[1] (Session_SetGolfer). In Play Now
-// (game mode 5) it first sets gpFEProfile->b11703, which keeps FE_vExitUI from giving player 0
+// (game mode 5) it first sets gpFEProfile->bGolferPicked, which keeps FE_vExitUI from giving player 0
 // the created golfer.
 void GM_vSetPlayerGolfer(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 5) {
-        gpFEProfile->b11703 = 1;
+        gpFEProfile->bGolferPicked = 1;
     }
     Session_SetGolfer(pArgs[1].i, pArgs[0].i);
 }
@@ -1513,7 +1513,7 @@ void GM_vGetNumPlayers(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 22: player pArgs[0] uses controller pArgs[1]. -1 and 9 give 9 (CONTROLLER_CPU);
-// a real controller is also marked in gUIState.a2C.
+// a real controller is also marked in gUIState.abAssigned.
 void GM_vSetPlayerController(MsgArg* pArgs, MsgArg* pResult) {
     s32 nController;
 
@@ -1523,7 +1523,7 @@ void GM_vSetPlayerController(MsgArg* pArgs, MsgArg* pResult) {
         return;
     }
     gSession.nController[pArgs[0].i] = nController;
-    gUIState.a2C[pArgs[1].i] = 1;
+    gUIState.abAssigned[pArgs[1].i] = 1;
 }
 
 // Front-end message 23: the golfer player pArgs[0] plays.
@@ -2173,19 +2173,19 @@ void GM_vFEMessage312_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 303: while pArgs[0] is nonzero every golfer counts as unlocked
-// (gpFEProfile->b11702, which GM_vIsGolferUnlocked tests; FE_Manager.c clears it).
+// (gpFEProfile->bAllGolfersPickable, which GM_vIsGolferUnlocked tests; FE_Manager.c clears it).
 void GM_vSetAllGolfersPickable(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i != 0) {
-        gpFEProfile->b11702 = 1;
+        gpFEProfile->bAllGolfersPickable = 1;
     } else {
-        gpFEProfile->b11702 = 0;
+        gpFEProfile->bAllGolfersPickable = 0;
     }
 }
 
-// Front-end message 313: 1 while every golfer counts as unlocked (gpFEProfile->b11702, set by
+// Front-end message 313: 1 while every golfer counts as unlocked (gpFEProfile->bAllGolfersPickable, set by
 // GM_vSetAllGolfersPickable), else 0.
 void GM_vGetAllGolfersPickable(MsgArg* pArgs, MsgArg* pResult) {
-    if (gpFEProfile->b11702 != 0) {
+    if (gpFEProfile->bAllGolfersPickable != 0) {
         pResult->i = 1;
     } else {
         pResult->i = 0;
@@ -2263,14 +2263,14 @@ void GM_vFEMessage77_Empty(MsgArg* pArgs, MsgArg* pResult) {
 // Front-end message 78: whether golfer pArgs[1] can be picked: 1 when it is unlocked (in any of the
 // five save profiles, loaded or not, or by a cheat code in lbl_80281DF4) or is a created golfer
 // (FIRST_CREATED_GOLFER on), 0 when it is locked, -1 when its gGolferTable record's bAvailable is
-// -1 (not in the game); always 1 while GM_vSetAllGolfersPickable's flag (gpFEProfile->b11702) is
+// -1 (not in the game); always 1 while GM_vSetAllGolfersPickable's flag (gpFEProfile->bAllGolfersPickable) is
 // set. pArgs[0] is not read. It also sets fe_movies.c's gFELockedGolferShade to 0 (answer not 0) or 0.2
 // (locked); no code reads that value. For a created golfer (30..33) the unlock tests read past
 // aGolferUnlocked[30]; the answer is already 1 then.
 void GM_vIsGolferUnlocked(MsgArg* pArgs, MsgArg* pResult) {
     int i;
 
-    if (gpFEProfile->b11702 != 0) {
+    if (gpFEProfile->bAllGolfersPickable != 0) {
         pResult->i = 1;
     } else if ((s8)gGolferTable[pArgs[1].i].bAvailable != -1) {
         pResult->i = 0;
@@ -2387,7 +2387,7 @@ void GM_vQueueMovieKind2(MsgArg* pArgs, MsgArg* pResult) {
 
 // Front-end message 86: shows golfer pArgs[0] (FE_setupStreaming, with pArgs[1] and pArgs[2] as its
 // other two golfers), then picks a shirt for the player of the profile slot being worked on
-// (gpFEProfile->nSlot), unless it is slot 0: of the four shirts (PlayerProfile.n0, 0..3;
+// (gpFEProfile->nSlot), unless it is slot 0: of the four shirts (PlayerProfile.nShirt, 0..3;
 // Character_SetClubsAndClothes dresses "shirt<n>"), the first that no player 0..nSlot (itself
 // included) whose golfer has the same model wears. Then Session_SetupProfiles. Nothing changes when
 // all four are taken.
@@ -2404,12 +2404,12 @@ void GM_vCharStream(MsgArg* pArgs, MsgArg* pResult) {
         pMine = FE_spGetGolfer(gSession.nGolfer[gpFEProfile->nSlot]);
         pOther = FE_spGetGolfer(gSession.nGolfer[i]);
         if (pMine->nModelID == pOther->nModelID) {
-            abFree[gSession.aProfile[i].n0] = 0;
+            abFree[gSession.aProfile[i].nShirt] = 0;
         }
     }
     for (n = 0; n < 4; n++) {
         if (abFree[n] && gpFEProfile->nSlot > 0) {
-            gSession.aProfile[gpFEProfile->nSlot].n0 = n;
+            gSession.aProfile[gpFEProfile->nSlot].nShirt = n;
             break;
         }
     }
@@ -2478,26 +2478,26 @@ void GM_vIsProfileActive(MsgArg* pArgs, MsgArg* pResult) {
 void GM_vFEMessage94_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Front-end message 95: how many controllers are plugged in (gUIState.n38, counted every menu
+// Front-end message 95: how many controllers are plugged in (gUIState.nNumPluggedIn, counted every menu
 // update by uiProcessInterface.c).
 void GM_vGetNumControllersPluggedIn(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = gUIState.n38;
+    pResult->i = gUIState.nNumPluggedIn;
 }
 
-// Front-end message 96: whether controller pArgs[0] has been given to a player (gUIState.a2C,
+// Front-end message 96: whether controller pArgs[0] has been given to a player (gUIState.abAssigned,
 // set by GM_vSetPlayerController, cleared by GM_vClearControllerAssigned and when the menus start).
 void GM_vIsControllerAssigned(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = gUIState.a2C[pArgs[0].i];
+    pResult->i = gUIState.abAssigned[pArgs[0].i];
 }
 
 // Front-end message 97: clears the mark that controller pArgs[0] (0..3; others are ignored) has
-// been given to a player (gUIState.a2C).
+// been given to a player (gUIState.abAssigned).
 void GM_vClearControllerAssigned(MsgArg* pArgs, MsgArg* pResult) {
     s32 n;
 
     n = pArgs[0].i;
     if (n < 4) {
-        gUIState.a2C[n] = 0;
+        gUIState.abAssigned[n] = 0;
     }
 }
 
@@ -2628,9 +2628,9 @@ void GM_vGetProfileDoubleBogeys(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 118: gives the player of the profile slot being worked on (gpFEProfile->nSlot)
-// the next shirt (PlayerProfile.n0, 0..3, wrapping) that no player 0..nSlot (itself included) whose
-// golfer has the same model wears, as GM_vCharStream does; it stops where it started when all four
-// are taken. Then the golfer shown is dressed again (Character_RequestClothesUpdateFE).
+// the next shirt (PlayerProfile.nShirt, 0..3, wrapping) that no player 0..nSlot (itself included)
+// whose golfer has the same model wears, as GM_vCharStream does; it stops where it started when all
+// four are taken. Then the golfer shown is dressed again (Character_RequestClothesUpdateFE).
 void GM_vNextShirt(MsgArg* pArgs, MsgArg* pResult) {
     u8 abFree[4] = {1, 1, 1, 1};
     int i;
@@ -2642,20 +2642,20 @@ void GM_vNextShirt(MsgArg* pArgs, MsgArg* pResult) {
         pMine = FE_spGetGolfer(gSession.nGolfer[gpFEProfile->nSlot]);
         pOther = FE_spGetGolfer(gSession.nGolfer[i]);
         if (pMine->nModelID == pOther->nModelID) {
-            abFree[gSession.aProfile[i].n0] = 0;
+            abFree[gSession.aProfile[i].nShirt] = 0;
         }
     }
-    nStart = gSession.aProfile[gpFEProfile->nSlot].n0;
-    gSession.aProfile[gpFEProfile->nSlot].n0++;
-    if (gSession.aProfile[gpFEProfile->nSlot].n0 > 3) {
-        gSession.aProfile[gpFEProfile->nSlot].n0 = 0;
+    nStart = gSession.aProfile[gpFEProfile->nSlot].nShirt;
+    gSession.aProfile[gpFEProfile->nSlot].nShirt++;
+    if (gSession.aProfile[gpFEProfile->nSlot].nShirt > 3) {
+        gSession.aProfile[gpFEProfile->nSlot].nShirt = 0;
     }
-    while (!abFree[gSession.aProfile[gpFEProfile->nSlot].n0]) {
-        gSession.aProfile[gpFEProfile->nSlot].n0++;
-        if (gSession.aProfile[gpFEProfile->nSlot].n0 > 3) {
-            gSession.aProfile[gpFEProfile->nSlot].n0 = 0;
+    while (!abFree[gSession.aProfile[gpFEProfile->nSlot].nShirt]) {
+        gSession.aProfile[gpFEProfile->nSlot].nShirt++;
+        if (gSession.aProfile[gpFEProfile->nSlot].nShirt > 3) {
+            gSession.aProfile[gpFEProfile->nSlot].nShirt = 0;
         }
-        if (gSession.aProfile[gpFEProfile->nSlot].n0 == nStart) break;
+        if (gSession.aProfile[gpFEProfile->nSlot].nShirt == nStart) break;
     }
     Character_RequestClothesUpdateFE(gpCrAPState->pB4->nIndex);
 }
@@ -2843,7 +2843,7 @@ void GM_vGetBirdiesRecord(MsgArg* pArgs, MsgArg* pResult) {
 // Front-end message 138: loads replay pArgs[2] from the memory card in port pArgs[0], slot pArgs[1]
 // (MC_LoadReplay into gReplayData); answers 1 when it loaded, else 0. Then player 0 plays slot 0's
 // created golfer (FIRST_CREATED_GOLFER) when that slot has a profile loaded, else the replay's
-// golfer (golfer 0 when that was a created one), the replay's course is set, and gpFEProfile->b0
+// golfer (golfer 0 when that was a created one), the replay's course is set, and gpFEProfile->bAwardReplay
 // is cleared (a card replay, not a profile's award replay: GM_vShowAwardReplay).
 void GM_vMCLoadReplay(MsgArg* pArgs, MsgArg* pResult) {
     MCCardPos pos;
@@ -2861,7 +2861,7 @@ void GM_vMCLoadReplay(MsgArg* pArgs, MsgArg* pResult) {
             Session_SetGolfer(gReplayData.player.golfer.nIndex, 0);
         }
         GM_SetCurrentCourse(gReplayData.nCourse);
-        gpFEProfile->b0 = 0;
+        gpFEProfile->bAwardReplay = 0;
     }
 }
 
@@ -2944,17 +2944,17 @@ void GM_vIsProfileLoaded(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gFEState.aLoaded[pArgs[0].i];
 }
 
-// Front-end message 149: gFEState.b0F, set by the front end's setup (FE_vOpenONCE): while it is
+// Front-end message 149: gFEState.bFirstTime, set by the front end's setup (FE_vOpenONCE): while it is
 // set, entering the menus plays the intro movie (GoEntry.c, which also passes it to
 // Gaud_StartFEMusic, TW07's firstTime) and the front end's files load without the loading screen
 // (fn_80014718).
 void GM_vGetFirstTimeInFE(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = gFEState.b0F;
+    pResult->i = gFEState.bFirstTime;
 }
 
-// Front-end message 150: sets gFEState.b0F (GM_vGetFirstTimeInFE) to pArgs[0].
+// Front-end message 150: sets gFEState.bFirstTime (GM_vGetFirstTimeInFE) to pArgs[0].
 void GM_vSetFirstTimeInFE(MsgArg* pArgs, MsgArg* pResult) {
-    gFEState.b0F = pArgs[0].i;
+    gFEState.bFirstTime = pArgs[0].i;
 }
 
 // Front-end message 151: answers 60 in the demo set-up (session flag 0x4000), else 30. Nothing in
@@ -2967,11 +2967,11 @@ void GM_vFEMessage151_Return30Or60(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 30;
 }
 
-// Front-end message 152: sets the menu golfer's b83 (gpCrAPState) to pArgs[0]: while it is set
+// Front-end message 152: sets the menu golfer's bDimmed (gpCrAPState) to pArgs[0]: while it is set
 // FEgolferanim.c dims him (his alpha at most gFEDimAlphaMax; on screen kind 1 all-zero lighting).
 // FEgolferanim.c also clears it.
 void GM_vSetGolferDimmed(MsgArg* pArgs, MsgArg* pResult) {
-    gpCrAPState->b83 = pArgs[0].i;
+    gpCrAPState->bDimmed = pArgs[0].i;
 }
 
 // Front-end message 153: tests the code typed in, the first pArgs[1] characters of the string
@@ -2992,10 +2992,10 @@ void GM_vFEMessage154_Empty(MsgArg* pArgs, MsgArg* pResult) {
 void GM_vFEMessage155_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Front-end message 156: gFEState.b11, set when the menus start the demo (GM_vStartDemo) and
+// Front-end message 156: gFEState.bDemoStarting, set when the menus start the demo (GM_vStartDemo) and
 // cleared when they start a game (FE_vExitUI) or the front end is set up (FE_vOpenONCE).
 void GM_vGetDemoStarting(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = gFEState.b11;
+    pResult->i = gFEState.bDemoStarting;
 }
 
 // Front-end message 157: how many replays the save on the memory card in port pArgs[0], slot
@@ -3189,14 +3189,14 @@ void GM_vSetEditedGolferModelID(MsgArg* pArgs, MsgArg* pResult) {
 // Front-end message 167: copies the profile being worked on (gpFEProfile) into save slot pArgs[0],
 // marks it active and the slot loaded, and backs the slot up (FE_BackupProfileClaimRow); in the demo set-up
 // (session flag 0x4000) only into a slot with no profile loaded. A profile without a TOUR card
-// (level 0) gets level 1 unless gFEState.b18 is set (front-end message 188 sets it).
+// (level 0) gets level 1 unless gFEState.bTourCardWithheld is set (front-end message 188 sets it).
 void GM_vStoreProfileInSlot(MsgArg* pArgs, MsgArg* pResult) {
     s32 nSlot = pArgs[0].i;
 
     if (!(gSession.uFlags & 0x4000) || gFEState.aLoaded[nSlot] == 0) {
         Mem_cpy(&gpSaveData[nSlot], &gpFEProfile->profile, sizeof(SaveProfile));
         gpSaveData[nSlot].bActive = 1;
-        if (gpSaveData[nSlot].nTourCardLevel == 0 && gFEState.b18 == 0) {
+        if (gpSaveData[nSlot].nTourCardLevel == 0 && gFEState.bTourCardWithheld == 0) {
             gpSaveData[nSlot].nTourCardLevel = 1;
         }
         gFEState.aLoaded[nSlot] = 1;
@@ -3458,7 +3458,7 @@ void GM_vGetTourCardLevel(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 180: plays the replay save profile pArgs[0] kept with trophy ball pArgs[1]
-// (aReplay[0..4] for awards 0, 6, 9, 3 and 13; another award only sets the flags): gpFEProfile->b0
+// (aReplay[0..4] for awards 0, 6, 9, 3 and 13; another award only sets the flags): gpFEProfile->bAwardReplay
 // is set (FE_vExitUI then records game mode 27 for the menus) and n1061C keeps the award;
 // FE_PlayTrophyBallHighlight copies the replay into gReplayData and sets up game mode 10 with its golfer and
 // course. SaveProfile.aReplay is Replay[5]: copying the struct member gives the original's copy
@@ -3470,7 +3470,7 @@ void GM_vShowAwardReplay(MsgArg* pArgs, MsgArg* pResult) {
     Replay replay3;
     Replay replay13;
 
-    gpFEProfile->b0 = 1;
+    gpFEProfile->bAwardReplay = 1;
     gpFEProfile->n1061C = pArgs[1].i;
     switch (pArgs[1].i) {
     case 0:
@@ -3499,7 +3499,7 @@ void GM_vShowAwardReplay(MsgArg* pArgs, MsgArg* pResult) {
 // Front-end message 181: saves part of the profile being worked on (gpFEProfile) into save slot
 // pArgs[0]: its name, its created golfer (createdGolfer and bytes 0x54C0..0x5500) and its looks,
 // dates, assets and unlock bits (0x5500 up to tour); the slot keeps its own stats, awards and
-// money. A slot with no profile loaded gets its money plus gFEState.n1C plus 25,000. The slot
+// money. A slot with no profile loaded gets its money plus gFEState.nMCRewardMoney plus 25,000. The slot
 // is marked active and loaded and backed up (FE_BackupProfileClaimRow), gets TOUR card level 1 if
 // it has none, and its PGA TOUR seasons are cleared (GM_PgaTourSim_ClearAllSeasons). Its saved
 // replays' golfer and the all-time records held under its old name take the new name; the course
@@ -3523,7 +3523,7 @@ void GM_vSaveCreatedPlayerToSlot(MsgArg* pArgs, MsgArg* pResult) {
     memcpy(gpSaveData[nSlot].unk54C0, gpFEProfile->profile.unk54C0, 0x5500 - 0x54C0);
     memcpy(&gpSaveData[nSlot].choices, &gpFEProfile->profile.choices, 0xB634 - 0x5500);
     if (!gFEState.aLoaded[nSlot]) {
-        nMoney = gFEState.n1C + nMoney;
+        nMoney = gFEState.nMCRewardMoney + nMoney;
         gpSaveData[nSlot].nCurrentCash = nMoney + 25000;
     }
     gpSaveData[nSlot].bActive = 1;
@@ -3611,19 +3611,19 @@ void GM_vFEFormatWithCommas(MsgArg* pArgs, MsgArg* pResult) {
     UI_GetMoneyString(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }
 
-// Front-end message 187: gFEState.b18: set by the front end's setup (FE_vOpenONCE), cleared by
+// Front-end message 187: gFEState.bTourCardWithheld: set by the front end's setup (FE_vOpenONCE), cleared by
 // the "THEKITCHENSINK" cheat code and by front-end message 188. While it is clear, a profile stored
 // without a TOUR card gets level 1 (GM_vStoreProfileInSlot).
 void GM_vGetTourCardWithheld(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = gFEState.b18;
+    pResult->i = gFEState.bTourCardWithheld;
 }
 
-// Front-end message 188: sets gFEState.b18 (GM_vGetTourCardWithheld) to pArgs[0]; clearing it
+// Front-end message 188: sets gFEState.bTourCardWithheld (GM_vGetTourCardWithheld) to pArgs[0]; clearing it
 // gives save profile 0 TOUR card level 1 when it has none, and its backup (p658[0]) too when that
 // has none.
 void GM_vSetTourCardWithheld(MsgArg* pArgs, MsgArg* pResult) {
-    gFEState.b18 = pArgs[0].i;
-    if (gFEState.b18 == 0 && gpSaveData[0].nTourCardLevel == 0) {
+    gFEState.bTourCardWithheld = pArgs[0].i;
+    if (gFEState.bTourCardWithheld == 0 && gpSaveData[0].nTourCardLevel == 0) {
         if (gFEState.p658[0].nTourCardLevel < 1) {
             gFEState.p658[0].nTourCardLevel = 1;
         }
@@ -3651,7 +3651,7 @@ void GM_vGetCoursePrice(MsgArg* pArgs, MsgArg* pResult) {
 
 // Front-end message 192: names the profile being worked on (gpFEProfile) "USER<n>", n being slot
 // pArgs[0] + 1 (SaveProfile_SetName: its name and its created golfer's last name), and stores it in that
-// save slot: when the slot has no profile loaded, gFEState.n1C plus 25,000 is first added to
+// save slot: when the slot has no profile loaded, gFEState.nMCRewardMoney plus 25,000 is first added to
 // its money; it is marked active, gets TOUR card level 1 if it has none, the slot is marked loaded
 // and backed up (FE_BackupProfileClaimRow).
 void GM_vSaveProfileWithDefaultName(MsgArg* pArgs, MsgArg* pResult) {
@@ -3661,7 +3661,7 @@ void GM_vSaveProfileWithDefaultName(MsgArg* pArgs, MsgArg* pResult) {
     sprintf(szName, "USER%d", nSlot + 1);
     SaveProfile_SetName(&gpFEProfile->profile, szName);
     if (gFEState.aLoaded[nSlot] == 0) {
-        gpFEProfile->profile.nCurrentCash += gFEState.n1C + 25000;
+        gpFEProfile->profile.nCurrentCash += gFEState.nMCRewardMoney + 25000;
     }
     gpFEProfile->profile.bActive = 1;
     if (gpFEProfile->profile.nTourCardLevel == 0) {
@@ -3673,17 +3673,18 @@ void GM_vSaveProfileWithDefaultName(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 193: the par of hole pArgs[1] (0-based) of course pArgs[0] (fn_800D2ABC). Below
-// 0 it is the saved round being edited (save slot gpFEProfile->n3, round n4: that entry's course
-// and hole); 22 and 24..29 are built rounds, whose holes come from other courses (fn_800D3118,
-// fn_800D315C).
+// 0 it is the saved round being edited (save slot gpFEProfile->nCustomRoundSlot, round
+// gpFEProfile->nCustomRound: that entry's course and hole); 22 and 24..29 are built rounds, whose
+// holes come from other courses (fn_800D3118, fn_800D315C).
 void GM_vGetHolePar(MsgArg* pArgs, MsgArg* pResult) {
     int nCourse;
     int nCourseArg = pArgs[0].i;
 
     if (nCourseArg <= -1) {
-        nCourse = gpSaveData[gpFEProfile->n3].aSavedRound[gpFEProfile->n4].nCourse[pArgs[1].i];
-        pResult->i = fn_800D2ABC(
-            nCourse, gpSaveData[gpFEProfile->n3].aSavedRound[gpFEProfile->n4].nHoleNum[pArgs[1].i]);
+        nCourse = gpSaveData[gpFEProfile->nCustomRoundSlot]
+            .aSavedRound[gpFEProfile->nCustomRound].nCourse[pArgs[1].i];
+        pResult->i = fn_800D2ABC(nCourse, gpSaveData[gpFEProfile->nCustomRoundSlot]
+            .aSavedRound[gpFEProfile->nCustomRound].nHoleNum[pArgs[1].i]);
         return;
     }
     if (nCourseArg == 22) {
@@ -3774,7 +3775,7 @@ void GM_vMCCheckCard(MsgArg* pArgs, MsgArg* pResult) {
 // created golfer, one of the 16 golfers of gStartUnlockedGolfers or unlocked by a cheat code (lbl_80281DF4),
 // 0 when locked. gFELockedGolferShade is set to 0.2 for a locked golfer, else 0. Message 78 makes the same
 // test with the save profiles' unlocks instead of the list (and answers 1 for any golfer while
-// gpFEProfile->b11702 is set).
+// gpFEProfile->bAllGolfersPickable is set).
 void GM_vIsGolferUnlockedByDefault(MsgArg* pArgs, MsgArg* pResult) {
     int i;
 
@@ -3884,11 +3885,11 @@ void GM_vFEMessage209_Return0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 210: 1 when save slot pArgs[0] holds a profile (bActive) whose custom round
-// pArgs[1] (0..2) is in use (SavedRound.n0), else 0.
+// pArgs[1] (0..2) is in use (SavedRound.bInUse), else 0.
 void GM_vIsCustomRoundUsed(MsgArg* pArgs, MsgArg* pResult) {
     int b = 0;
 
-    if (gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].n0 != 0 && gpSaveData[pArgs[0].i].bActive != 0) {
+    if (gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].bInUse != 0 && gpSaveData[pArgs[0].i].bActive != 0) {
         b = 1;
     }
     pResult->i = b;
@@ -3919,13 +3920,13 @@ void GM_vSetCustomRoundName(MsgArg* pArgs, MsgArg* pResult) {
 
 // Front-end message 213: entry pArgs[2] (0..17) of save slot pArgs[0]'s custom round pArgs[1] is
 // hole number pArgs[4] of course pArgs[3]. A course of -1 instead marks the whole round unused
-// (SavedRound.n0 cleared) and leaves the entry's course as it was; the hole number is stored either
-// way. GM_vGetCustomRoundHole reads an entry back.
+// (SavedRound.bInUse cleared) and leaves the entry's course as it was; the hole number is stored
+// either way. GM_vGetCustomRoundHole reads an entry back.
 void GM_vSetCustomRoundHole(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[3].i != -1) {
         gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].nCourse[pArgs[2].i] = pArgs[3].i;
     } else {
-        gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].n0 = 0;
+        gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].bInUse = 0;
     }
     gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].nHoleNum[pArgs[2].i] = pArgs[4].i;
 }
@@ -3982,16 +3983,16 @@ void GM_vGetCustomRoundN15(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].n15;
 }
 
-// Front-end message 223: which custom round (0..2) of save slot gpFEProfile->n3 the menus are
-// working on (gpFEProfile->n4; message 193 reads that round's pars). Message 224 sets it.
+// Front-end message 223: which custom round (0..2) of save slot gpFEProfile->nCustomRoundSlot the menus are
+// working on (gpFEProfile->nCustomRound; message 193 reads that round's pars). Message 224 sets it.
 void GM_vGetCustomRoundIndex(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = gpFEProfile->n4;
+    pResult->i = gpFEProfile->nCustomRound;
 }
 
 // Front-end message 224: the menus now work on custom round pArgs[0] (0..2) of save slot
-// gpFEProfile->n3 (gpFEProfile->n4; GM_vGetCustomRoundIndex reads it).
+// gpFEProfile->nCustomRoundSlot (gpFEProfile->nCustomRound; GM_vGetCustomRoundIndex reads it).
 void GM_vSetCustomRoundIndex(MsgArg* pArgs, MsgArg* pResult) {
-    gpFEProfile->n4 = pArgs[0].i;
+    gpFEProfile->nCustomRound = pArgs[0].i;
 }
 
 // Front-end message 225: byte n5 of the menus' working profile (gpFEProfile), read signed; message
@@ -4089,40 +4090,40 @@ void GM_vSetOptionN14(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Front-end message 232: the green speed option (options.n18) from the menu's choice pArgs[0]: 1,
-// 2, 3 give 0, 1, 2 (another choice keeps the old value), then applied at once (fn_80055C40 sets
-// gGreenSpeedSetting, which the ball's roll reads). Message 244 reads it back.
+// Front-end message 232: the green speed option (options.nGreenSpeed) from the menu's choice
+// pArgs[0]: 1, 2, 3 give 0, 1, 2 (another choice keeps the old value), then applied at once
+// (fn_80055C40 sets gGreenSpeedSetting, which the ball's roll reads). Message 244 reads it back.
 void GM_vSetGreenSpeedOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
-        gSession.options.n18 = 0;
+        gSession.options.nGreenSpeed = 0;
         break;
     case 2:
-        gSession.options.n18 = 1;
+        gSession.options.nGreenSpeed = 1;
         break;
     case 3:
-        gSession.options.n18 = 2;
+        gSession.options.nGreenSpeed = 2;
         break;
     }
-    fn_80055C40(gSession.options.n18);
+    fn_80055C40(gSession.options.nGreenSpeed);
 }
 
-// Front-end message 375: the fairway speed option (options.n20) from the menu's choice pArgs[0]: 1,
-// 2, 3 give 0, 1, 2 (another choice keeps the old value), then applied at once (fn_80055CAC sets
-// gFairwaySetting, which the ball's roll reads). Message 374 reads it back.
+// Front-end message 375: the fairway speed option (options.nFairwaySpeed) from the menu's choice
+// pArgs[0]: 1, 2, 3 give 0, 1, 2 (another choice keeps the old value), then applied at once
+// (fn_80055CAC sets gFairwaySetting, which the ball's roll reads). Message 374 reads it back.
 void GM_vSetFairwaySpeedOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
-        gSession.options.n20 = 0;
+        gSession.options.nFairwaySpeed = 0;
         break;
     case 2:
-        gSession.options.n20 = 1;
+        gSession.options.nFairwaySpeed = 1;
         break;
     case 3:
-        gSession.options.n20 = 2;
+        gSession.options.nFairwaySpeed = 2;
         break;
     }
-    fn_80055CAC(gSession.options.n20);
+    fn_80055CAC(gSession.options.nFairwaySpeed);
 }
 
 // Front-end message 600: the green grid option (options.bPuttingGrid: the grid on the green shows
@@ -4321,10 +4322,10 @@ void GM_vGetOptionN14(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Front-end message 244: the green speed option (options.n18) as the menu's choice: 0, 1, 2 answer
-// 1, 2, 3 (another value leaves pResult alone). GM_vSetGreenSpeedOption sets it.
+// Front-end message 244: the green speed option (options.nGreenSpeed) as the menu's choice: 0, 1, 2
+// answer 1, 2, 3 (another value leaves pResult alone). GM_vSetGreenSpeedOption sets it.
 void GM_vGetGreenSpeedOption(MsgArg* pArgs, MsgArg* pResult) {
-    switch (gSession.options.n18) {
+    switch (gSession.options.nGreenSpeed) {
     case 0:
         pResult->i = 1;
         return;
@@ -4337,10 +4338,10 @@ void GM_vGetGreenSpeedOption(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Front-end message 374: the fairway speed option (options.n20) as the menu's choice: 0, 1, 2
-// answer 1, 2, 3 (another value leaves pResult alone). GM_vSetFairwaySpeedOption sets it.
+// Front-end message 374: the fairway speed option (options.nFairwaySpeed) as the menu's choice: 0,
+// 1, 2 answer 1, 2, 3 (another value leaves pResult alone). GM_vSetFairwaySpeedOption sets it.
 void GM_vGetFairwaySpeedOption(MsgArg* pArgs, MsgArg* pResult) {
-    switch (gSession.options.n20) {
+    switch (gSession.options.nFairwaySpeed) {
     case 0:
         pResult->i = 1;
         return;
@@ -4587,28 +4588,28 @@ void GM_vBackupProfileClaimRow(MsgArg* pArgs, MsgArg* pResult) {
     FE_BackupProfileClaimRow(pArgs[0].i);
 }
 
-// Front-end message 261: the rough option (options.n1C) from the menu's choice pArgs[0]: 1, 2, 3
+// Front-end message 261: the rough option (options.nRough) from the menu's choice pArgs[0]: 1, 2, 3
 // give 0, 1, 2 (another choice keeps the old value), then applied at once (fn_80055CD0 sets
 // gRoughSetting, which the ball's roll reads). Message 262 reads it back.
 void GM_vSetRoughOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
-        gSession.options.n1C = 0;
+        gSession.options.nRough = 0;
         break;
     case 2:
-        gSession.options.n1C = 1;
+        gSession.options.nRough = 1;
         break;
     case 3:
-        gSession.options.n1C = 2;
+        gSession.options.nRough = 2;
         break;
     }
-    fn_80055CD0(gSession.options.n1C);
+    fn_80055CD0(gSession.options.nRough);
 }
 
-// Front-end message 262: the rough option (options.n1C) as the menu's choice: 0, 1, 2 answer 1, 2,
-// 3 (another value leaves pResult alone). GM_vSetRoughOption sets it.
+// Front-end message 262: the rough option (options.nRough) as the menu's choice: 0, 1, 2 answer 1,
+// 2, 3 (another value leaves pResult alone). GM_vSetRoughOption sets it.
 void GM_vGetRoughOption(MsgArg* pArgs, MsgArg* pResult) {
-    switch (gSession.options.n1C) {
+    switch (gSession.options.nRough) {
     case 0:
         pResult->i = 1;
         return;
@@ -4626,26 +4627,27 @@ void GM_vFEMessage263_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 264: save slot pArgs[0]'s created golfer's ball type (nGolferBallType) from
-// pArgs[4] and its glove variant (n54C2, which the session's PlayerProfile.n2 gets) from pArgs[5];
-// a value below 0 keeps the old one. pArgs[1..3] are not read. Message 265 reads them back.
+// pArgs[4] and its glove variant (nGolferGlove, which the session's PlayerProfile.nGlove gets) from
+// pArgs[5]; a value below 0 keeps the old one. pArgs[1..3] are not read. Message 265 reads them
+// back.
 void GM_vSetCreatedGolferBallAndGlove(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[4].i >= 0) {
         gpSaveData[pArgs[0].i].nGolferBallType = pArgs[4].i;
     }
     if (pArgs[5].i >= 0) {
-        gpSaveData[pArgs[0].i].n54C2 = pArgs[5].i;
+        gpSaveData[pArgs[0].i].nGolferGlove = pArgs[5].i;
     }
 }
 
 // Front-end message 265: save slot pArgs[0]'s created golfer's ball type (nGolferBallType) and
-// glove variant (n54C2), read signed, into the words pArgs[4] and pArgs[5] point at; the words
-// pArgs[1..3] point at get 0. GM_vSetCreatedGolferBallAndGlove sets them.
+// glove variant (nGolferGlove), read signed, into the words pArgs[4] and pArgs[5] point at; the
+// words pArgs[1..3] point at get 0. GM_vSetCreatedGolferBallAndGlove sets them.
 void GM_vGetCreatedGolferBallAndGlove(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[1].p = 0;
     *(s32*)pArgs[2].p = 0;
     *(s32*)pArgs[3].p = 0;
     *(s32*)pArgs[4].p = (s8)gpSaveData[pArgs[0].i].nGolferBallType;
-    *(s32*)pArgs[5].p = (s8)gpSaveData[pArgs[0].i].n54C2;
+    *(s32*)pArgs[5].p = (s8)gpSaveData[pArgs[0].i].nGolferGlove;
 }
 
 // Front-end message 266: save slot pArgs[0]'s created golfer's level (1..4) in each attribute
@@ -4855,14 +4857,14 @@ void GM_vMCGetEASaveName(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 277: the money the memory card rewards (TW07: GM_vSetMCRewardMoney(money,
-// oldUserLoaded)). pArgs[0] is kept in gFEState.n1C, which a new profile gets on top of its
+// oldUserLoaded)). pArgs[0] is kept in gFEState.nMCRewardMoney, which a new profile gets on top of its
 // 25000 start; when pArgs[1] is set (a profile is already loaded) it is also added now to player
 // slot 0's money to spend (nCurrentCash).
 void GM_vSetMCRewardMoney(MsgArg* pArgs, MsgArg* pResult) {
     s32 nAmount;
 
     nAmount = pArgs[0].i;
-    gFEState.n1C = nAmount;
+    gFEState.nMCRewardMoney = nAmount;
     if (pArgs[1].i != 0) {
         gpSaveData->nCurrentCash += nAmount;
     }
@@ -5046,24 +5048,25 @@ void GM_vFEGetStringLength(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 310: switches EA Trax track pArgs[1] (0..18) on or off (pArgs[2]) in music row
-// pArgs[0] (gSession.options.rows; StartBackgroundMusic plays the row's tracks that are on).
+// pArgs[0] (gSession.options.abTrackOn; StartBackgroundMusic plays the row's tracks that are on).
 void GM_vSetEATraxTrack(MsgArg* pArgs, MsgArg* pResult) {
-    gSession.options.rows[pArgs[0].i][pArgs[1].i] = pArgs[2].i;
+    gSession.options.abTrackOn[pArgs[0].i][pArgs[1].i] = pArgs[2].i;
 }
 
 // Front-end message 311: whether EA Trax track pArgs[1] is on in music row pArgs[0]
-// (gSession.options.rows), and the track's two lines of text: the strings pArgs[2] and pArgs[3] are
-// pointed at its sz0 and its song name (Trax.c's gEATraxSongs).
+// (gSession.options.abTrackOn), and the track's two lines of text: the strings pArgs[2] and
+// pArgs[3] are pointed at its sz0 and its song name (Trax.c's gEATraxSongs).
 void GM_vGetEATraxTrack(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = gSession.options.rows[pArgs[0].i][pArgs[1].i];
+    pResult->i = gSession.options.abTrackOn[pArgs[0].i][pArgs[1].i];
     ((MsgString*)pArgs[2].p)->pStr = gEATraxSongs[pArgs[1].i].sz0;
     ((MsgString*)pArgs[3].p)->pStr = gEATraxSongs[pArgs[1].i].szSong;
 }
 
 // Front-end message 315: picks player slot pArgs[0] as the one whose saved custom round the menus
-// edit (gpFEProfile->n3; n4 is the round), as the hole-par message GM_vGetHolePar reads it.
+// edit (gpFEProfile->nCustomRoundSlot; the round is gpFEProfile->nCustomRound), as the hole-par
+// message GM_vGetHolePar reads it.
 void GM_vSetCustomRoundSlot(MsgArg* pArgs, MsgArg* pResult) {
-    gpFEProfile->n3 = pArgs[0].i;
+    gpFEProfile->nCustomRoundSlot = pArgs[0].i;
 }
 
 // Front-end message 316: the game's title, "TIGER WOODS PGA TOUR(R) 2004": the string pArgs[0] is
@@ -5179,8 +5182,8 @@ void GM_vIsCourseChoiceUnlocked(MsgArg* pArgs, MsgArg* pResult) {
 // PlayNowMode's list), the most a single opponent's skins are worth over the holes played
 // (GameMode4_GetCurrentEventHoles: 1 all 18, 2 the front nine, 3 the back nine; each hole's skin
 // from gEarningsTable.aSkins at the opponent's money rating). Then each opponent playing the same
-// golfer model as the player's own golfer gets the look after the player's (gSession.aProfile[].n0,
-// 0..3, wrapping).
+// golfer model as the player's own golfer gets the look after the player's
+// (gSession.aProfile[].nShirt, 0..3, wrapping).
 void GM_vGetLadderEventMaxSkins(MsgArg* pArgs, MsgArg* pResult) {
     int  nChallenge = GameMode4_GetCurrentEvent() - 1;
     s32  nOpponents = PlayNow_GetNumOpponents(nChallenge);
@@ -5230,11 +5233,11 @@ void GM_vGetLadderEventMaxSkins(MsgArg* pArgs, MsgArg* pResult) {
     for (i = 0; i < nOpponents; i++) {
         pOther = FE_spGetGolfer(PlayNow_GetOpponent(nChallenge, i));
         if (pRecord->nModelID == pOther->nModelID) {
-            nLook = gSession.aProfile[gpFEProfile->nSlot].n0 + 1;
+            nLook = gSession.aProfile[gpFEProfile->nSlot].nShirt + 1;
             if (nLook == 4) {
                 nLook = 0;
             }
-            gSession.aProfile[i + 1].n0 = nLook;
+            gSession.aProfile[i + 1].nShirt = nLook;
         }
     }
 }
@@ -5380,13 +5383,13 @@ void GM_vClearSavedRound(MsgArg* pArgs, MsgArg* pResult) {
         gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].nHoleNum[i] = -1;
         gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].nCourse[i] = 0;
     }
-    gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].n0 = 0;
+    gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].bInUse = 0;
 }
 
 // Front-end message 343: sets whether profile pArgs[0]'s saved custom round pArgs[1] is in use
-// (SavedRound.n0 = pArgs[2]).
+// (SavedRound.bInUse = pArgs[2]).
 void GM_vSetSavedRoundInUse(MsgArg* pArgs, MsgArg* pResult) {
-    gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].n0 = pArgs[2].i;
+    gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].bInUse = pArgs[2].i;
 }
 
 // Front-end message 344: always answers 150 in this build.
@@ -5575,14 +5578,14 @@ void GM_vSwapDisc(MsgArg* pArgs, MsgArg* pResult) {
 // challenge (5), the PGA TOUR tee-off (23), the long-drive race (26), the long-drive contest (22)
 // or the real-time event (24). In modes 11 and 5 player 0 first gets golfer 0, or, with profile 0
 // loaded, row 0 of p658 (gFEState.aBackup[0]) and the created golfer (FIRST_CREATED_GOLFER; not
-// when the working profile's b11703 is set). Answers whether the course is on the disc in the drive
-// (fn_80110180, its hole-file check turned on while it runs).
+// when the working profile's bGolferPicked is set). Answers whether the course is on the disc in
+// the drive (fn_80110180, its hole-file check turned on while it runs).
 void GM_vStartEventCheckDisc(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 11) {
         if (Game_GetMode() == 5 || Game_GetMode() == 11) {
             if (gpSaveData[0].bActive) {
                 gFEState.aBackup[0] = 0;
-                if (gpFEProfile->b11703 == 0) {
+                if (gpFEProfile->bGolferPicked == 0) {
                     Session_SetGolfer(FIRST_CREATED_GOLFER, 0);
                 }
             } else {
@@ -5595,7 +5598,7 @@ void GM_vStartEventCheckDisc(MsgArg* pArgs, MsgArg* pResult) {
         if (Game_GetMode() == 5 || Game_GetMode() == 11) {
             if (gpSaveData[0].bActive) {
                 gFEState.aBackup[0] = 0;
-                if (gpFEProfile->b11703 == 0) {
+                if (gpFEProfile->bGolferPicked == 0) {
                     Session_SetGolfer(FIRST_CREATED_GOLFER, 0);
                 }
             } else {
@@ -5850,19 +5853,19 @@ void GM_vEASBioShowProductDetails(MsgArg* pArgs, MsgArg* pResult) {
 
 // Front-end message 627: loads the EA Sports Bio from the card: opens it (fn_80125354, which marks
 // the Bio loaded and notes its level) and closes it again (fn_801253F0). 1 when both succeed, else
-// 0; the working profile's n11704 keeps the error. pArgs[0], pArgs[1] (the card) are handed on but
-// not used.
+// 0; the working profile's nEASBioError keeps the error. pArgs[0], pArgs[1] (the card) are handed
+// on but not used.
 void GM_vEASBioLoad(MsgArg* pArgs, MsgArg* pResult) {
     s32 nError;
 
     nError = fn_80125354(pArgs[0].i, pArgs[1].i);
-    gpFEProfile->n11704 = nError;
+    gpFEProfile->nEASBioError = nError;
     if (nError != 0) {
         pResult->i = 0;
         return;
     }
     nError = fn_801253F0(pArgs[0].i, pArgs[1].i);
-    gpFEProfile->n11704 = nError;
+    gpFEProfile->nEASBioError = nError;
     pResult->i = nError == 0;
 }
 
@@ -5871,7 +5874,7 @@ void GM_vEASBioLoad(MsgArg* pArgs, MsgArg* pResult) {
 // which most library errors become), a new Bio file is made (fn_801252D0), after deleting the old
 // one (fn_80125280) when the error was -43 (EASB_ERROR_WRONG_FILE) or -44
 // (EASB_ERROR_CANNOT_REOPEN); then the record is written (fn_801251EC). The answer is 1, or the
-// first error; the working profile's n11704 keeps the error.
+// first error; the working profile's nEASBioError keeps the error.
 void GM_vEASBioSave(MsgArg* pArgs, MsgArg* pResult) {
     s32 aPos[2];
     s32 nError;
@@ -5882,23 +5885,23 @@ void GM_vEASBioSave(MsgArg* pArgs, MsgArg* pResult) {
     if (nError != 0 && nError != -18) {
         if (nError == -43 || nError == -44) {
             nError = fn_80125280(pArgs[0].i, pArgs[1].i);
-            gpFEProfile->n11704 = nError;
+            gpFEProfile->nEASBioError = nError;
             if (nError != 0) {
                 pResult->i = (nError != 0) ? nError : 1;
                 return;
             }
         }
         nError = fn_801252D0(pArgs[0].i, pArgs[1].i);
-        gpFEProfile->n11704 = nError;
+        gpFEProfile->nEASBioError = nError;
         if (nError != 0) {
             pResult->i = (nError != 0) ? nError : 1;
-            gpFEProfile->n11704 = nError;
+            gpFEProfile->nEASBioError = nError;
             return;
         }
     }
     nError = fn_801251EC(aPos);
     pResult->i = (nError != 0) ? nError : 1;
-    gpFEProfile->n11704 = nError;
+    gpFEProfile->nEASBioError = nError;
 }
 
 // Front-end message 643: whether an EA Sports Bio file is on the card in port pArgs[0], slot
@@ -5923,12 +5926,13 @@ void GM_vEASBioMemoryRequired(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 645: loads the EA Sports Bio's game records (fn_80125434: opened, every PROD
-// record read, closed). 1 when it succeeds, else 0; the working profile's n11704 keeps the error.
+// record read, closed). 1 when it succeeds, else 0; the working profile's nEASBioError keeps the
+// error.
 void GM_vEASBioLoadProducts(MsgArg* pArgs, MsgArg* pResult) {
     s32 nError;
 
     nError = fn_80125434(pArgs[0].i, pArgs[1].i);
-    gpFEProfile->n11704 = nError;
+    gpFEProfile->nEASBioError = nError;
     if (nError != 0) {
         pResult->i = 0;
         return;
@@ -5976,12 +5980,13 @@ void GM_vEASBioIsBadData(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 650: deletes the EA Sports Bio file from the card (fn_80125280; the Bio is then
-// no longer loaded). 1 when it succeeds, else 0; the working profile's n11704 keeps the error.
+// no longer loaded). 1 when it succeeds, else 0; the working profile's nEASBioError keeps the
+// error.
 void GM_vEASBioDelete(MsgArg* pArgs, MsgArg* pResult) {
     s32 nError;
 
     nError = fn_80125280(pArgs[0].i, pArgs[1].i);
-    gpFEProfile->n11704 = nError;
+    gpFEProfile->nEASBioError = nError;
     pResult->i = nError == 0;
 }
 
@@ -6228,7 +6233,7 @@ void GM_vControlMusic(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 0:
         gSession.options.abRowOn[0] = 1;
-        gSession.options.rows[0][pArgs[1].i] = 1;
+        gSession.options.abTrackOn[0][pArgs[1].i] = 1;
         Gaud_StopMusic();
         Gaud_SetStreamingContext();
         Gaud_StartMusic(13, pArgs[1].i);
@@ -6301,10 +6306,10 @@ void GM_vShortenString32(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Front-end message 751: the last EA Sports Bio error (the working profile's n11704, kept by
+// Front-end message 751: the last EA Sports Bio error (the working profile's nEASBioError, kept by
 // GM_vEASBioLoad, GM_vEASBioSave, GM_vEASBioLoadProducts and GM_vEASBioDelete; 0 none).
 void GM_vEASBioGetLastError(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = gpFEProfile->n11704;
+    pResult->i = gpFEProfile->nEASBioError;
 }
 
 // Front-end message 759: opens the EA Sports Bio on the card and closes it again (fn_80125194);

@@ -16,7 +16,8 @@
 typedef struct FEMovie {
     s32 nKind;                  // 0x000  FE_MOVIE_CREDITS or FE_MOVIE_BIO
     u8  unk4[0x104 - 0x4];
-    s32 nBio;                   // 0x104  FE_MOVIE_BIO: which one, from 0 ("bio01")
+    s32 nBio;                   // 0x104  FE_MOVIE_BIO: which one, from 0 ("bio01"); nothing in
+                                //        this build writes it (GM_vQueueMovie): always bio01
 } FEMovie;
 LAYOUT_ASSERT(FEMovie, 0x108);
 
@@ -30,15 +31,21 @@ typedef struct FEState {
     u8  aCPU[5];                // 0x005  per player slot: a CPU player (FE_vExitUI gives it
                                 //        CONTROLLER_CPU and no profile)
     s8  aBackup[5];             // 0x00A  per player slot: its row in p658 (-1: none)
-    u8  b0F;                    // 0x00F  set by FE_vOpenONCE
+    u8  bFirstTime;             // 0x00F  the menus' first start (TW07 firstTime): the intro movie
+                                //        plays and the front end loads without the loading
+                                //        screen; set by FE_vOpenONCE and front-end message 150
     u8  b10;                    // 0x010  set by FE_vOpenONCE
-    u8  b11;                    // 0x011  cleared by FE_vExitUI
+    u8  bDemoStarting;          // 0x011  the menus start the demo (GM_vStartDemo); cleared as a
+                                //        game starts (FE_vExitUI)
     u8  unk12[2];
     s32 nMode;                  // 0x014  the game mode the menus start in (FE_vExitUI): the
                                 //        session's, or 4, 23, 27 or 28
-    u8  b18;                    // 0x018  set by FE_vOpenONCE; cleared by the "THEKITCHENSINK" cheat code
+    u8  bTourCardWithheld;      // 0x018  while clear a profile stored without a TOUR card gets
+                                //        level 1 (GM_vStoreProfileInSlot); set by FE_vOpenONCE,
+                                //        cleared by the "THEKITCHENSINK" cheat code
     u8  unk19[3];
-    s32 n1C;                    // 0x01C  cleared by FE_vOpenONCE
+    s32 nMCRewardMoney;         // 0x01C  the memory card's reward money (GM_vSetMCRewardMoney); a
+                                //        new profile gets it on top of its 25,000
     s32 nMovieNext;             // 0x020  } the movie queue: the next to play, and where the next
     s32 nMovieFree;             // 0x024  } one is added (equal when it is empty)
     FEMovie aMovies[FE_NUM_MOVIES];     // 0x028
@@ -52,8 +59,7 @@ extern FEState gFEState;
 
 // GM_vIsGolferUnlocked and GM_vIsGolferUnlockedByDefault set it to 0.2 for a locked golfer, else 0
 // (also for one that is not available).
-extern f32 gFELockedGolferShade;        // .sdata 0x80281374 = 0.25f: past FE_MessageTable's .sdata, in a
-                                // later file's (not placed yet)
+extern f32 gFELockedGolferShade;        // fe_movies.c's (= 0.25f); nothing in this build reads it
 
 // The front end's screen state (gUIState, 0x4C bytes). Only what the cleaned code reads.
 typedef struct FEScreen {
@@ -66,10 +72,12 @@ typedef struct FEScreen {
     u32 a18[4];                 // 0x18  per controller: frames the same buttons have been held,
                                 //       restarted past 8; cleared by UI_vInitModule
     u8  a28[4];                 // 0x28  per controller: a1 as of the last frame
-    u8  a2C[4];                 // 0x2C  read and cleared by menu messages
+    u8  abAssigned[4];          // 0x2C  per controller: given to a player (GM_vSetPlayerController;
+                                //       GM_vIsControllerAssigned reads it)
     u8  a30[4];                 // 0x30  set to 1 by UI_vInitModule; UI_SetControllerEnabled sets one
-    s32 n34;                    // 0x34  cleared by UI_vInitModule
-    s32 n38;                    // 0x38  a menu message reads it (GM_vGetNumControllersPluggedIn)
+    s32 nFramesNoPad;           // 0x34  frames with no controller plugged in (fn_8008F820)
+    s32 nNumPluggedIn;          // 0x38  controllers plugged in, counted every frame (fn_8008F820;
+                                //       GM_vGetNumControllersPluggedIn)
     s32 n3C;                    // 0x3C  the UI file table holding the movie entries (UI_ResolveFileEntries)
     u8  b40;                    // 0x40  cleared by UI_vInitModule
     u8  unk41[0x44 - 0x41];
@@ -170,12 +178,14 @@ extern u32 gUITxf2BankMarkOnExit[FE_NUM_801D8890];
 // The profile being worked on in the menus (gpFEProfile points to it; 0x11708 bytes, allocated
 // and cleared by FE_InitManager).
 typedef struct FEProfile {
-    u8  b0;                     // 0x00000  with game mode 10, the menus start in mode 27
+    u8  bAwardReplay;           // 0x00000  the replay played is a trophy ball's
+                                //          (GM_vShowAwardReplay); with game mode 10 the menus then
+                                //          start in mode 27
     s8  n1;                     // 0x00001  -1 when it is set up
     s8  nSlot;                  // 0x00002  the player slot whose profile it is
-    s8  n3;                     // 0x00003  } set and read by menu messages (FE_MessageTable.c)
-    s8  n4;                     // 0x00004  }
-    s8  n5;                     // 0x00005  }
+    s8  nCustomRoundSlot;       // 0x00003  the save slot whose custom round the menus edit
+    s8  nCustomRound;           // 0x00004  that custom round (0..2; GM_vGetHolePar reads its holes)
+    s8  n5;                     // 0x00005  only set and read by menu messages (GM_vSetFEProfileN5)
     u8  unk6[0x10 - 0x6];
     SaveProfile profile;        // 0x00010  a working copy
     u8  unk10610[0x1061C - 0x10610];
@@ -197,9 +207,10 @@ typedef struct FEProfile {
     u64 uRectHash;              // 0x106D8  the hash of "__LogoRect"
     LogoRecord logoCopy;        // 0x106E0  the logo being made, copied into the profile's logo
                                 //          FE_LogoDesign_GetCurrentLogoNumber when kept (GM_vSaveLogo)
-    u8  b11702;                 // 0x11702
-    u8  b11703;                 // 0x11703
-    s32 n11704;                 // 0x11704
+    u8  bAllGolfersPickable;    // 0x11702  every golfer counts as unlocked (GM_vSetAllGolfersPickable)
+    u8  bGolferPicked;          // 0x11703  Play Now: player 0 keeps the golfer picked
+                                //          (GM_vSetPlayerGolfer), not the created one
+    s32 nEASBioError;           // 0x11704  the last EA Sports Bio error (GM_vEASBioGetLastError)
 } FEProfile;
 LAYOUT_ASSERT(FEProfile, 0x11708);
 
@@ -383,8 +394,8 @@ u8   FE_IsValidCurrentGender(s8 n);                            // an asset of th
 // The asset in the first slot of aAF80 whose asset is of the part (-1: none)
 int  FE_CrAP_GetFirstEquippedIndexForCategory(s16 nPart);
 u8   FE_CrAP_GetColorNameFromID(int nOffset, char* pDst);      // copy a 'CR_S' name ("" for "NONE")
-// Count a part's offered assets: locked, with each bit set, and all
-void FE_CrAP_GetCategoryInfo(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s32* pAll);
+// Count a part's assets offered for the current gender: locked, owned, new and all
+void FE_CrAP_GetCategoryInfo(s16 nPart, s32* pLocked, s32* pOwned, s32* pNew, s32* pAll);
 u8   FE_CrAP_IsAssetRemovable(int nAsset);
 s16  FE_CrAP_GetCategoryFromAssetID(int nAsset);               // the part an asset is a choice for
 int  FE_CrAP_GetLevelFromAssetID(int nAsset);                  // an asset's nLevel
@@ -480,7 +491,7 @@ void FE_CrAP_RandomizeAll(SaveProfile* pProfile);
 int  FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(SaveProfile* pProfile, s16 nPart, int nChance);    // a random b and choice of
                                         // part nPart; returns the choice (FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem)
 int  FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem(SaveProfile* pProfile, s16 nPart, int b, int nChance);
-u8   FE_bIsLicensedGolfer(int nGolfer);          // a yes/no list over golfers 0..28 (Golfer.c asks it)
+u8   FE_bIsLicensedGolfer(int n);                // 16 of golfers 0..28: ball type 0 (Session_SetupProfiles)
 void FE_SetupSaleInfo(void);                 // pick the day's random assets (FE_CrAP_UpdateSaleInfo)
 FEMovie* FE_movieGetFreeEntry(void);             // the next free place in the movie queue
 void FE_BackupAllProfiles(void);

@@ -38,11 +38,11 @@ void DEMO_Start(void) {
     gSession.nController[0] = 9;
     gSession.nGolfer[0] = lbl_80183AB8[lbl_80281F90];
     gSession.nTeeSet[0] = 2;
-    gSession.aProfile[0].n0 = 0;
+    gSession.aProfile[0].nShirt = 0;
     gSession.nController[1] = 9;
     gSession.nGolfer[1] = lbl_80183AC8[lbl_80281F90];
     gSession.nTeeSet[1] = 2;
-    gSession.aProfile[0].n0 = 0;
+    gSession.aProfile[0].nShirt = 0;
     gSession.options.nWeather = 0;
     GM_SetCurrentCourse(lbl_80183A98[lbl_80281F90]);
     GM_SelectHoleSet(0);
@@ -59,7 +59,7 @@ void DEMO_Start(void) {
         gSession.nNumPlayers = 1;
         gSession.nController[0] = 9;
         gSession.nTeeSet[0] = 2;
-        gSession.aProfile[0].n0 = 0;
+        gSession.aProfile[0].nShirt = 0;
         switch (lbl_80281F90) {
         case 0:
         case 1:

@@ -107,12 +107,12 @@ void FE_vOpenONCE(void) {
         gFEState.aCPU[i] = 0;
         gFEState.aBackup[i] = -1;
     }
-    gFEState.b0F = 1;
+    gFEState.bFirstTime = 1;
     gFEState.b10 = 1;
     gFEState.nMode = -1;
-    gFEState.b11 = 0;
-    gFEState.b18 = 1;
-    gFEState.n1C = 0;
+    gFEState.bDemoStarting = 0;
+    gFEState.bTourCardWithheld = 1;
+    gFEState.nMCRewardMoney = 0;
     gFEState.nMovieNext = 0;
     gFEState.nMovieFree = 0;
     gFEState.p658 = NULL;
@@ -344,9 +344,9 @@ void FE_InitManager(void) {
     gUILoadingScreen.p30 = NULL;
     gpFEProfile->uSquareHash = fn_8000BEE4("__LogoSquare");
     gpFEProfile->uRectHash = fn_8000BEE4("__LogoRect");
-    gpFEProfile->b11702 = 0;
-    gpFEProfile->b11703 = 0;
-    gpFEProfile->n11704 = 0;
+    gpFEProfile->bAllGolfersPickable = 0;
+    gpFEProfile->bGolferPicked = 0;
+    gpFEProfile->nEASBioError = 0;
 }
 
 // Closes the manager (FE_vCloseModule). First every player on a created golfer gets its save slot's
@@ -1324,11 +1324,11 @@ void FE_CrAP_EquipDefaults(void) {
 
 // Leaves the menus for a game (menu message GM_vSetupPlayers). In game modes 5 and 11, when slot 0
 // holds a profile its backup row becomes row 0 and player 0 plays the created golfer (unless
-// gpFEProfile->b11703 is set); else player 0 plays golfer 0. Each player slot is a CPU player (no
+// gpFEProfile->bGolferPicked is set); else player 0 plays golfer 0. Each player slot is a CPU player (no
 // profile, no bag), a loaded profile (a created golfer brings its own bag), a CPU controller (no
 // profile) or a table golfer with its bag (its save slot still marked active); slots past the
 // players have no profile. Then the menus' return mode (gFEState.nMode): the game mode, or 4 (a
-// ladder event), 23 (PGA TOUR), 27 (mode 10 with gpFEProfile->b0 set) or 28 (lessons with a TOUR
+// ladder event), 23 (PGA TOUR), 27 (mode 10 with gpFEProfile->bAwardReplay set) or 28 (lessons with a TOUR
 // card). Last: b11 cleared, the fade to black started, the demo off, and the front end's audio and
 // ladder closed (Gaud_ExitFE, GameMode4_ExitFE).
 void FE_vExitUI(void) {
@@ -1336,7 +1336,7 @@ void FE_vExitUI(void) {
     if (Game_GetMode() == 5 || Game_GetMode() == 11) {
         if (gpSaveData[0].bActive) {
             gFEState.aBackup[0] = 0;
-            if (!gpFEProfile->b11703) {
+            if (!gpFEProfile->bGolferPicked) {
                 Session_SetGolfer(FIRST_CREATED_GOLFER, 0);
             }
         } else {
@@ -1370,13 +1370,13 @@ void FE_vExitUI(void) {
     if (GM_Currently_PgaTourMode()) {
         gFEState.nMode = 23;
     }
-    if (gpFEProfile->b0 && Game_GetMode() == 10) {
+    if (gpFEProfile->bAwardReplay && Game_GetMode() == 10) {
         gFEState.nMode = 27;
     }
     if (gFEState.nMode == 11 && gpSaveData[gpFEProfile->nSlot].nTourCardLevel > 0) {
         gFEState.nMode = 28;
     }
-    gFEState.b11 = 0;
+    gFEState.bDemoStarting = 0;
     gUIState.bFadeToBlack = 1;
     gSession.bDemo = 0;
     Gaud_ExitFE();

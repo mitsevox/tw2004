@@ -217,7 +217,7 @@ void UI_SetControllerEnabled(s32 n, s32 b) {
 // (4 to 8, not paused) nothing is read while any player's view has a script fade running or held
 // (script.nFade 1 to 4) with a camera other than 0x15. Each plugged-in controller's buttons (the
 // stick's directions folded into the D-pad bits) are compared with last frame's: a button held 9
-// frames counts as pressed again. gUIState.n38 counts the controllers plugged in, n34 the frames
+// frames counts as pressed again. gUIState.nNumPluggedIn counts the controllers plugged in, n34 the frames
 // with none. In the menus, the two-player modes 7 (speed golf on points) and 26 (the long-drive
 // race) with fewer than two controllers (mode 7: and no CPU player in slot 0 or 1) send hint 0x34,
 // block the buttons (b40) and hide the menu golfer (b49), putting gpCrAPState->bHidden aside in
@@ -257,11 +257,11 @@ void UI_ReadControllers(void) {
             }
         }
     }
-    // fake match: n38 is cleared through pPressed and pButtons (the same single store). This
-    // first use makes the frontend give their array uses below temps numbered after the input
+    // fake match: nNumPluggedIn is cleared through pPressed and pButtons (the same single store).
+    // This first use makes the frontend give their array uses below temps numbered after the input
     // loop counter's (EA's r22/r23/r24), which the late loop's indexing then shares; the void*
     // copy keeps pButtons's use from being propagated away.
-    pPressed = (u32*)&gUIState.n38;
+    pPressed = (u32*)&gUIState.nNumPluggedIn;
     pButtons = (u32*)(void*)pPressed;
     *pButtons = 0;
     Mem_set(aArgs, 0, sizeof(aArgs));
@@ -270,8 +270,8 @@ void UI_ReadControllers(void) {
     for (i = 0; i < 4; i++) {
         if (Input_bDoesPadExist(i)) {
             gUIState.a1[i] = 1;
-            gUIState.n34 = 0;
-            gUIState.n38++;
+            gUIState.nFramesNoPad = 0;
+            gUIState.nNumPluggedIn++;
         } else {
             gUIState.a1[i] = 0;
         }
@@ -301,11 +301,11 @@ void UI_ReadControllers(void) {
         }
         gUIState.a28[i] = gUIState.a1[i];
     }
-    if (gUIState.n38 == 0) {
-        gUIState.n34++;
+    if (gUIState.nNumPluggedIn == 0) {
+        gUIState.nFramesNoPad++;
     }
-    if (gUIState.n38 > 0 && gSession.nGameType == 3 &&
-        ((Game_GetMode() != 7 && Game_GetMode() != 0x1A) || gUIState.n38 >= 2 ||
+    if (gUIState.nNumPluggedIn > 0 && gSession.nGameType == 3 &&
+        ((Game_GetMode() != 7 && Game_GetMode() != 0x1A) || gUIState.nNumPluggedIn >= 2 ||
          gFEState.aCPU[0] || gFEState.aCPU[1])) {
         if (gSavedCrAPHidden != -1) {
             gpCrAPState->bHidden = gSavedCrAPHidden;
@@ -317,7 +317,7 @@ void UI_ReadControllers(void) {
     }
     if (((Game_GetMode() == 7 && !gFEState.aCPU[0] && !gFEState.aCPU[1]) ||
          Game_GetMode() == 0x1A) &&
-        gUIState.n38 < 2 && gSession.nGameType == 3) {
+        gUIState.nNumPluggedIn < 2 && gSession.nGameType == 3) {
         if (gSavedCrAPHidden == -1) {
             gSavedCrAPHidden = gpCrAPState->bHidden;
         }
@@ -487,10 +487,10 @@ FrontEnd* UI_OpenInterface(char* szSet) {
     gpFrontEnd->pC = UI_GetPictureList(szSet);
     gpFrontEnd->p10 = UI_GetFonts(szSet);
     UITransform_Init();
-    gUIState.a2C[0] = 0;
-    gUIState.a2C[1] = 0;
-    gUIState.a2C[2] = 0;
-    gUIState.a2C[3] = 0;
+    gUIState.abAssigned[0] = 0;
+    gUIState.abAssigned[1] = 0;
+    gUIState.abAssigned[2] = 0;
+    gUIState.abAssigned[3] = 0;
     gUIState.bFadeToBlack = 0;
     gUIState.fFade = 0.0f;
     gUIDelayedHint.n4 = 0;
@@ -580,13 +580,13 @@ void UI_vInitModule(void) {
 
     UIText_SetFontDrawAtOnce();
     UI_ResetLoadedFiles();
-    gUIState.n34 = 0;
-    gUIState.n38 = 0;
+    gUIState.nFramesNoPad = 0;
+    gUIState.nNumPluggedIn = 0;
     gUIState.b49 = 0;
     gUIState.b40 = 0;
     for (i = 0; i < 4; i++) {
         gUIState.a18[i] = 0;
-        gUIState.a2C[i] = 0;
+        gUIState.abAssigned[i] = 0;
         gUIState.a30[i] = 1;
     }
     gUIState.b48 = 0;

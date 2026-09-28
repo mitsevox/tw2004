@@ -2464,8 +2464,8 @@ void fn_80055C24(int n) {
     gTurfSpeed = n;
 }
 
-// Course setting from options +0x18 (0..2, else 0); courses 6 and 15 take it one lower, not
-// below 1.
+// The green speed setting (options.nGreenSpeed, 0..2, else 0); courses 6 and 15 take it one lower,
+// not below 1.
 void fn_80055C40(int n) {
     if (n < 0 || n >= 3) {
         n = 0;
@@ -2485,7 +2485,7 @@ int fn_80055CA4(void) {
     return gGreenSpeedSetting;
 }
 
-// Course setting (0..2, else 0).
+// The fairway speed setting (options.nFairwaySpeed, 0..2, else 0).
 void fn_80055CAC(int n) {
     if (n < 0 || n >= 3) {
         n = 0;
@@ -2497,7 +2497,7 @@ int fn_80055CC8(void) {
     return gFairwaySetting;
 }
 
-// Course setting from options +0x1C (0..2, else 1); courses 6 and 15 take it one higher, not
+// The rough setting (options.nRough, 0..2, else 1); courses 6 and 15 take it one higher, not
 // above 2.
 void fn_80055CD0(int n) {
     if (n < 0 || n >= 3) {

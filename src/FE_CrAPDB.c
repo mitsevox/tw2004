@@ -1882,22 +1882,22 @@ void FE_CrAP_GetSponsorName(s16 n, char* pDst) {
 // Count a part's assets offered for the current gender: the locked ones (FE_CrAP_IsItemLocked), the owned
 // ones (aAssetOwned), those with their aAssetNew bit set (TW07 counts new ones here) and all of
 // them.
-void FE_CrAP_GetCategoryInfo(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s32* pAll) {
+void FE_CrAP_GetCategoryInfo(s16 nPart, s32* pLocked, s32* pOwned, s32* pNew, s32* pAll) {
     int i;
     SaveProfile* pProfile = FE_GetCurrentProfile();
 
     *pLocked = 0;
-    *pB1CC = 0;
-    *pB344 = 0;
+    *pOwned = 0;
+    *pNew = 0;
     *pAll = 0;
     for (i = 0; i < lbl_80282460->nAssets; i++) {
         if (nPart == lbl_80282460->pAssets[i].nPart
             && FE_IsValidCurrentGender(lbl_80282460->pAssets[i].nGender)) {
             if (BitArray_TestBit(pProfile->aAssetOwned, i)) {
-                *pB1CC += 1;
+                *pOwned += 1;
             }
             if (BitArray_TestBit(pProfile->aAssetNew, i)) {
-                *pB344 += 1;
+                *pNew += 1;
             }
             if (FE_CrAP_IsItemLocked(i, pProfile)) {
                 *pLocked += 1;

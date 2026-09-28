@@ -200,9 +200,9 @@ void  fn_8010A668(void* p);
 void  fn_80008380(void);
 void  fn_800106AC(int n);               // LLTexGrp.c
 void  fn_800106B8(u8 b);                // LLTexGrp.c
-void  UI_ParkFileInAram(void);                // uiLoadFile.c: park the UI file's data in ARAM
-void* UI_GetFileBuffer(void);                // uiLoadFile.c: the UI file's buffer
-void  UI_RestoreFileFromAram(void);                // uiLoadFile.c: bring the UI file's data back
+void  UI_ParkFileInAram(void);         // uiLoadFile.c: park the UI file's data in ARAM
+void* UI_GetFileBuffer(void);          // uiLoadFile.c: the UI file's buffer
+void  UI_RestoreFileFromAram(void);    // uiLoadFile.c: bring the UI file's data back
 void  fn_801141F8(struct DynChain* pChain, CharModel* pModel);                         // DynChain.c
 void  fn_80035600(void);                // GoTerrain.c
 void  fn_80035604(void);                // GoTerrain.c
@@ -2965,14 +2965,14 @@ void Character_SetClubsAndClothes(Character* pChar, int nSlot) {
     }
     if (!Character_IsCrAPGolfer(nSlot)) {
         sprintf(szName, "%s", "shirt");
-        if (gSession.aProfile[nSlot].n0 > 0) {
-            sprintf(szName, "%s%d", szName, gSession.aProfile[nSlot].n0);
+        if (gSession.aProfile[nSlot].nShirt > 0) {
+            sprintf(szName, "%s%d", szName, gSession.aProfile[nSlot].nShirt);
         }
         SkinPart_ChooseBodySetByName(pChar, "shirt", szName, NULL);
     }
     sprintf(szName, "%s", "glove");
-    if (gSession.aProfile[nSlot].n2 > 0) {
-        sprintf(szName, "%s%d", szName, gSession.aProfile[nSlot].n2);
+    if (gSession.aProfile[nSlot].nGlove > 0) {
+        sprintf(szName, "%s%d", szName, gSession.aProfile[nSlot].nGlove);
     }
     SkinPart_ChooseBodySetByName(pChar, "glove", szName, NULL);
 }

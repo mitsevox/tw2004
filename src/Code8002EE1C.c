@@ -59,9 +59,9 @@ void Session_Init(void) {
         gSession.nGolfer[i]     = 0;
         gSession.nTeeSet[i]     = 2;
         gSession.uBag[i]        = 0;
-        gSession.aProfile[i].n0 = 0;
+        gSession.aProfile[i].nShirt = 0;
         gSession.aProfile[i].n1 = 0;
-        gSession.aProfile[i].n2 = 0;
+        gSession.aProfile[i].nGlove = 0;
         for (j = 0; j < 6; j++) {
             SKA_PackName(&gSession.aProfile[i].aNames[j], gszEmpty);
         }
@@ -93,18 +93,18 @@ void Session_SetupProfiles(void) {
             for (j = 0; j < 6; j++) {
                 gSession.aProfile[i].aNames[j] = gpSaveData[nGolfer - FIRST_CREATED_GOLFER].aGolferNames[j];
             }
-            gSession.aProfile[i].n2        = gpSaveData[nGolfer - FIRST_CREATED_GOLFER].n54C2;
+            gSession.aProfile[i].nGlove    = gpSaveData[nGolfer - FIRST_CREATED_GOLFER].nGolferGlove;
             gSession.aProfile[i].nBallType = gpSaveData[nGolfer - FIRST_CREATED_GOLFER].nGolferBallType;
             gSession.aProfile[i].nOutfit   = gpSaveData[nGolfer - FIRST_CREATED_GOLFER].nGolferOutfit;
         } else if (nGolfer == 0 || nGolfer == 1) {
             SKA_PackName(&gSession.aProfile[i].aNames[0], lbl_80187650[2]);
-            gSession.aProfile[i].n2        = 0;
+            gSession.aProfile[i].nGlove    = 0;
             gSession.aProfile[i].nBallType = 0;
         } else if (FE_bIsLicensedGolfer(nGolfer)) {
-            gSession.aProfile[i].n2        = 0;
+            gSession.aProfile[i].nGlove    = 0;
             gSession.aProfile[i].nBallType = 0;
         } else {
-            gSession.aProfile[i].n2 = 0;
+            gSession.aProfile[i].nGlove = 0;
             gSession.aProfile[i].nBallType = (nSpin >= 100) ? 3 : ((nSpin >= 75) ? 2 : (nSpin >= 50));
         }
     }

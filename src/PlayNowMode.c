@@ -245,10 +245,10 @@ void PlayNow_StartChallenge(void) {
         gSession.nTeeSet[1] = gChallengeList[gCurChallenge].nTeeSet;
         gNumPlayersSetUp = 2;
         if (gSession.nGolfer[0] == gSession.nGolfer[1] &&
-            gSession.aProfile[0].n0 == gSession.aProfile[1].n0) {
-            gSession.aProfile[1].n0++;
-            if (gSession.aProfile[1].n0 >= 4) {
-                gSession.aProfile[1].n0 = 0;
+            gSession.aProfile[0].nShirt == gSession.aProfile[1].nShirt) {
+            gSession.aProfile[1].nShirt++;
+            if (gSession.aProfile[1].nShirt >= 4) {
+                gSession.aProfile[1].nShirt = 0;
             }
         }
     }
@@ -258,10 +258,10 @@ void PlayNow_StartChallenge(void) {
         gSession.nTeeSet[2] = gChallengeList[gCurChallenge].nTeeSet;
         gNumPlayersSetUp = 3;
         if (gSession.nGolfer[0] == gSession.nGolfer[2] &&
-            gSession.aProfile[0].n0 == gSession.aProfile[2].n0) {
-            gSession.aProfile[2].n0++;
-            if (gSession.aProfile[2].n0 >= 4) {
-                gSession.aProfile[2].n0 = 0;
+            gSession.aProfile[0].nShirt == gSession.aProfile[2].nShirt) {
+            gSession.aProfile[2].nShirt++;
+            if (gSession.aProfile[2].nShirt >= 4) {
+                gSession.aProfile[2].nShirt = 0;
             }
         }
     }
@@ -271,10 +271,10 @@ void PlayNow_StartChallenge(void) {
         gSession.nTeeSet[3] = gChallengeList[gCurChallenge].nTeeSet;
         gNumPlayersSetUp = 4;
         if (gSession.nGolfer[0] == gSession.nGolfer[3] &&
-            gSession.aProfile[0].n0 == gSession.aProfile[3].n0) {
-            gSession.aProfile[3].n0++;
-            if (gSession.aProfile[3].n0 >= 4) {
-                gSession.aProfile[3].n0 = 0;
+            gSession.aProfile[0].nShirt == gSession.aProfile[3].nShirt) {
+            gSession.aProfile[3].nShirt++;
+            if (gSession.aProfile[3].nShirt >= 4) {
+                gSession.aProfile[3].nShirt = 0;
             }
         }
     }

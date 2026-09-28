@@ -85,7 +85,8 @@ typedef struct GolferRecord {
     char szNick[32];            // 0x042
     s8   nOutfit;               // 0x062  the outfit (copied to PlayerProfile.nOutfit). TW06 has ballID here;
                                 //        FEgolferanim.c passes it to fn_800484E0 as a ball index
-    s8   nEarningsRating;       // 0x063  0..25, what beating this golfer pays (Earnings.c). TW06: earningsRating
+    s8   nEarningsRating;       // 0x063  0..25, what beating this golfer pays (Earnings.c). TW06:
+                                //        earningsRating
     u8   unk64[4];              // 0x064  TW06 has trajectory[3], characteristic, severity, chance here
     s8   attr[NUM_ATTRS];       // 0x068  block A. TW06: baseStats
     s8   attrAlt[NUM_ATTRS];    // 0x074  block B: used for CPU pros in game mode 4. TW06: crapStats
@@ -171,9 +172,11 @@ typedef struct SwingData {
     f32  fMishitAngle;          // 0x03C  (0x410) the stick's miss after forgiveness, added to the aim
     f32  fShotPower;            // 0x040  (0x414) SW_vCalculateShotPower's result
     f32  fHookSlice;            // 0x044  (0x418) copy of the face vector's x (vLaunchA[0])
-    f32  fNonPowerShotPower;    // 0x048  (0x41C) boosted power minus the error. TW06: fNonPowerAttribAffectedShotPower
+    f32  fNonPowerShotPower;    // 0x048  (0x41C) boosted power minus the error. TW06:
+                                //        fNonPowerAttribAffectedShotPower
     f32  fControllerSliceAngle; // 0x04C  (0x420) the backswing's sideways angle, radians (0 on a putt)
-    struct { f32 vClubPos[4]; f32 vHandPos[4]; } prevClub[25];  // 0x050  (0x424) the club's last 25 positions, newest first (the trail)
+    struct { f32 vClubPos[4]; f32 vHandPos[4]; } prevClub[25];  // 0x050  (0x424) the club's last 25
+                                                                //        positions, newest first (the trail)
     s32  nNumInBlurQueue;       // 0x370  (0x744) trail points in use, up to 25
     u8   bUIInit;               // 0x374  unused here
     u8   bDrawBoostUI;          // 0x375  (0x749) set by SW_vSetDisplayBoostUI
@@ -205,7 +208,8 @@ typedef struct SwingData {
     f32  fAlpha;                // 0x490
     s32  nPowerBoost;           // 0x494  (0x868) power boost level pressed, 0..8
     f32  fPowerBoostDieTime;    // 0x498  1/12 s once the stick backs down; at 0 the boost is lost
-    u8   unk49C[0x604 - 0x49C]; // 0x49C  TW06: the swing-boost list (bSwingBoostsOn .. iCurBoostNum), same size
+    u8   unk49C[0x604 - 0x49C]; // 0x49C  TW06: the swing-boost list (bSwingBoostsOn ..
+                                //        iCurBoostNum), same size
     f32  fTimeSinceContact;     // 0x604
     f32  fSpinAmount;           // 0x608  unused here
     u8   bSpun;                 // 0x60C
@@ -217,7 +221,8 @@ typedef struct SwingData {
     f32  fForwardSpin;          // 0x61C  (0x9F0) } the spin asked for: a human's from the spin
     f32  fSideSpin;             // 0x620  (0x9F4) }   stick (y, sign flipped, and x), a CPU's from
                                 //                    its distance and aim errors (ai_brain.c)
-    u8   bCanSpin;              // 0x624  (0x9F8) a human struck the ball (not in a replay): spin input is live
+    u8   bCanSpin;              // 0x624  (0x9F8) a human struck the ball (not in a replay): spin
+                                //        input is live
     u8   unk625[3];
     f32  fTargetTurnAngle;      // 0x628
     f32  fCurrentTurnAngle;     // 0x62C
@@ -262,7 +267,8 @@ typedef struct Player {
     // exactly. Only strokes and matchwins are confirmed by our code so far.
     s32  nStrokes[18];          // 0x154  strokes taken per hole
     s32  nPutts[18];            // 0x19C  putts per hole (GM_PlayerAddStroke). TW06: putts
-    s32  nModePoints[18];       // 0x1E4  per hole, the mode's points (match play: 1 = hole won). TW06: modepoints
+    s32  nModePoints[18];       // 0x1E4  per hole, the mode's points (match play: 1 = hole won).
+                                //        TW06: modepoints
     s32  nSkinsWon[18];         // 0x22C  skins: the money won per hole (GameModeSkins_ScoreHole).
                                 //        TW06: skinwin
     s32  nSkinsTotal;           // 0x274  skins: their sum, paid at the end. TW06: skinwins
@@ -290,29 +296,36 @@ typedef struct Player {
                                 //        (GM_RecordBonusShotStats), cleared by GM_ClearHoleBonusStats;
                                 //        the tour's bunker stats
     u8   b311;                  // 0x311  set after a shot with b30E (GM_RecordBonusShotStats)
-    u8   b312;                  // 0x312  set when a shot finished on the green or in the hole (GM_RecordBonusShotStats)
+    u8   b312;                  // 0x312  set when a shot finished on the green or in the hole
+                                //        (GM_RecordBonusShotStats)
     u8   unk313;
     CourseMoneyTracking money;  // 0x314  the round's money by kind (GM_Earnings_AwardMoney)
     // Shot block, TW06 AIshot_t (which has 6 preferred clubs where we have 8).
     s32  nClub;                 // 0x354  TW06: club
-    s32  nClubPerKind[8];       // 0x358  the club Shot_Prepare would pick for each shot kind. TW06: preferredClub
+    s32  nClubPerKind[8];       // 0x358  the club Shot_Prepare would pick for each shot kind. TW06:
+                                //        preferredClub
     f32  fAim;                  // 0x378  aim angle, radians. TW06: direction
     f32  fPower;                // 0x37C  0..1 (up to 1.5). TW06: strength
     s32  nShotKind;             // 0x380  SHOT_TYPE_ (physics.h): 0 putt, 1 drive, 2 chip, 3 pitch,
                                 //        4 punch, 5 flop. TW06: type (ShotType_t)
-    s32  nTrajectory;           // 0x384  from Shot_Trajectory: 0 low, 1 normal, 2 high. TW06 has a float stance here
-    f32  vLaunchA[4];           // 0x388  launch parameter blocks handed to Physics_ShotImpact. TW06: clubDirection (the face)
+    s32  nTrajectory;           // 0x384  from Shot_Trajectory: 0 low, 1 normal, 2 high. TW06 has a
+                                //        float stance here
+    f32  vLaunchA[4];           // 0x388  launch parameter blocks handed to Physics_ShotImpact.
+                                //        TW06: clubDirection (the face)
     f32  vLaunchB[4];           // 0x398  TW06: strokeDirection (the swing path, which carries the shape)
-    s32  nShotShape;            // 0x3A8  SHAPE_*: what the aim point (or a lesson) asks the CPU to play. TW06: shape
+    s32  nShotShape;            // 0x3A8  SHAPE_*: what the aim point (or a lesson) asks the CPU to
+                                //        play. TW06: shape
     u8   bPerfect;              // 0x3AC  no error / no forgiveness when set. TW06: perfect
     u8   unk3AD[3];
     s32  nShotKind2;            // 0x3B0
     f32  vBall[4];              // 0x3B4
-    f32  vPreShot[4];           // 0x3C4  where the ball lay before the shot (GM_BumpBallForObstructions drops it
-                                //        back here). TW06: PreShotBallPos
+    f32  vPreShot[4];           // 0x3C4  where the ball lay before the shot
+                                //        (GM_BumpBallForObstructions drops it back here). TW06:
+                                //        PreShotBallPos
     SwingData swing;            // 0x3D4  the swing meter's state for this player
     s32  nController;           // 0xA08  CONTROLLER_CPU for the AI. TW06: Controller (PlayerCtrl_t, 9 = AI)
-    s32  nView[2];              // 0xA0C  the views (ViewController) the player uses. TW06: viewControllerID[2]
+    s32  nView[2];              // 0xA0C  the views (ViewController) the player uses. TW06:
+                                //        viewControllerID[2]
     f32  vTarget[4];            // 0xA14
     f32  vTargetCopy[4];        // 0xA24  copy of the planned target. Probably TW06's originalTargetPos
     f32  vTarget2[4];           // 0xA34  copy of the chosen aim point
@@ -322,7 +335,8 @@ typedef struct Player {
     f32  fA5C;                  // 0xA5C  } placing the ball (state 22): how fast the spot moves along x and
     f32  fA60;                  // 0xA60  } z, -1..1, built up while the stick is held (target.c)
     f32  fA64;                 // 0xA64  a distance, set when a swing state 16 begins
-    s32  nSurface;              // 0xA68  surface type under the target, -1 none, 16 water. TW06: targetedSurfaceID
+    s32  nSurface;              // 0xA68  surface type under the target, -1 none, 16 water. TW06:
+                                //        targetedSurfaceID
     f32  vPlacement[4];         // 0xA6C  where the ball may be placed (swing state 22)
     // The ball placement point (swing state 22; speed golf's runner): stick inputs, -1..1, eased
     // back to 0 by 0.05 a frame (PlaceBall_UpdateMomentums, target.c), and its heading.
@@ -338,8 +352,10 @@ typedef struct Player {
     Character* pChar;           // 0xC18  the golfer on screen
     f32  fThinkTime;            // 0xC1C  seconds a CPU has spent in state 2
     f32  fC20;                  // 0xC20
-    s32  nC24;                  // 0xC24  added to PgaStatCounts.nDriveDistance at the end of a hole (GameModeDriverPGATour_EndHole)
-    u8   bMulliganUsed;         // 0xC28  the one mulligan of a one-per-player mode is used (GM_PlayerTakeMulligan)
+    s32  nC24;                  // 0xC24  added to PgaStatCounts.nDriveDistance at the end of a hole
+                                //        (GameModeDriverPGATour_EndHole)
+    u8   bMulliganUsed;         // 0xC28  the one mulligan of a one-per-player mode is used
+                                //        (GM_PlayerTakeMulligan)
     u8   bPenaltyShot;          // 0xC29  the last shot cost a penalty stroke (GM_CheckForBallOOB;
                                 //        cleared at the next hit); quarters a CPU's overconfidence
     s8   nOBCount;              // 0xC2A  penalty strokes in a row: a CPU gets 25 attribute points
@@ -433,9 +449,10 @@ typedef struct Player {
     u32  uFlags;                // 0xEE8  0x1 a scripted reaction, 0x2 set as the ball is taken out
                                 //        of the hole (GS_FADE_TO_REMOVE_BALL), 0x4 the early
                                 //        reaction has played, 0x8 a tap-in (STATEFUNC_TapInInit)
-    f32  fEEC;                  // 0xEEC  distance to the pin when the early reaction started (GM_SimulateBallMovement)
-    u32  uFlagsEF0;             // 0xEF0  0x1: the ball can be placed at vPlacement (PlaceBall_ResetMomentums);
-                                //        0x2: target is over water
+    f32  fEEC;                  // 0xEEC  distance to the pin when the early reaction started
+                                //        (GM_SimulateBallMovement)
+    u32  uFlagsEF0;             // 0xEF0  0x1: the ball can be placed at vPlacement
+                                //        (PlaceBall_ResetMomentums); 0x2: target is over water
     u8   unkEF4[0xEF8 - 0xEF4];
 } Player;
 LAYOUT_ASSERT(Player, 0xEF8);
@@ -451,27 +468,38 @@ typedef struct RecordEntry {
 typedef struct GameOptions {
     s8   a0[5];                 // 0x00  levels 0..5 from the menus (the mixer gets 0.2 x level):
                                 //       [0] effects (Gaud_SetSfxLevel), [1] music
-                                //       (Gaud_SetMusicLevel), [2] a menu level (FE_MessageTable.c
-                                //       GM_vSetOptionLevel2), [4] commentary (Gaud_SetCommentLevel; 4 while
-                                //       the lessons run)
+                                //       (Gaud_SetMusicLevel), [2] a level no mixer gets: only the
+                                //       menus set and read it (GM_vSetOptionLevel2), [3] 1, never
+                                //       changed, [4] commentary (Gaud_SetCommentLevel; 4 while the
+                                //       lessons run)
     u8   bGimmes;               // 0x05  (gSession + 0xE7D) the Gimmes option, default on
     u8   bSkipCameras;          // 0x06  (gSession + 0xE7E) camera states end at once (inferred)
-    u8   a7[5];                 // 0x07  [1] and [2] default to 1
+    u8   a7[5];                 // 0x07  [0] vibration, set on every controller whenever the
+                                //       options are set or loaded; [1] and [2] on/off options
+                                //       (default on) only the menus set and read ([1] also the
+                                //       round's menu)
     s32  nWeather;              // 0x0C  the weather option (fn_8006F650 picks each hole's weather
                                 //       by it): 0 and 4 clear (weather bit 0), 1 a random pick per
                                 //       hole, 2 a pick kept for several holes, 3 weather bit 1; the
                                 //       menu sets 0, 2 or 3, several modes 4 while they run
     s32  nWind;                 // 0x10  0..3 calm..gusty, 4+ none
-    s32  n14;                   // 0x14
-    s32  n18;                   // 0x18  -> fn_80055C40
-    s32  n1C;                   // 0x1C  -> fn_80055CD0
-    s32  n20;                   // 0x20  0..2 -> fn_80055CAC (FE_MessageTable.c GM_vSetFairwaySpeedOption)
-    u8   a24[8];               // 0x24  eight on/off options, default on; [7] (0xEA3) the swing trail
+    s32  n14;                   // 0x14  0..2; only the menus set and read it (messages 231, 243)
+    s32  nGreenSpeed;           // 0x18  0..2 (default 1), applied by fn_80055C40 (gGreenSpeedSetting)
+    s32  nRough;                // 0x1C  0..2 (default 1), applied by fn_80055CD0 (gRoughSetting)
+    s32  nFairwaySpeed;         // 0x20  0..2, applied by fn_80055CAC (gFairwaySetting); the defaults
+                                //       leave it alone
+    u8   a24[8];                // 0x24  on/off options, default on: [0] caddie tips (CaddieTips.c),
+                                //       [1] the putting tip, [2] the putt's break line
+                                //       (GoBreakLine.c), [3] and [5] only the menus read, [4] only
+                                //       the menus and the round's menu, [6] while off with wind
+                                //       on, the golfer on the tee plays clip group 16 (CharAnim.c),
+                                //       [7] (0xEA3) the swing trail (Swing.c)
     u8   bBoostEnabled;         // 0x2C  (gSession + 0xEA4)
     u8   bSpinEnabled;          // 0x2D  (gSession + 0xEA5)
-    u8   rows[4][19];           // 0x2E  four rows of 19 flags
-    u8   abRowOn[4];            // 0x7A  per row of rows: that music row is on (Gaud_SetStreamingContext picks the
-                                //       row by game mode)
+    u8   abTrackOn[4][19];      // 0x2E  per music row, per EA Trax track: it is played
+                                //       (StartBackgroundMusic; front-end messages 310, 311)
+    u8   abRowOn[4];            // 0x7A  per music row: it is on (Gaud_SetStreamingContext picks
+                                //       the row by game mode)
     u8   b7E;                  // 0x7E
     u8   unk7F;
     s32  n80;                   // 0x80
@@ -482,10 +510,12 @@ LAYOUT_ASSERT(GameOptions, 0x88);
 
 // A player's profile block (Session.aProfile, 0x40 bytes each).
 typedef struct PlayerProfile {
-    s8   n0;                    // 0x00  0..3; bumped for a CPU opponent playing the same golfer (GameMode5)
+    s8   nShirt;                // 0x00  0..3: the shirt worn, "shirt<n>" (none for 0;
+                                //       Character_SetClubsAndClothes); stepped on for another
+                                //       player on the same golfer (GameMode5, the menus)
     u8   n1;                    // 0x01  cleared by Session_Init and the golfer setup
-    s8   n2;                    // 0x02  a created golfer's byte 0x54C2 of its save slot, else 0; the
-                                //       glove variant's number (Character_SetClubsAndClothes, read signed)
+    s8   nGlove;                // 0x02  the glove worn, "glove<n>" (none for 0 or less): a created
+                                //       golfer's SaveProfile.nGolferGlove, else 0
     u8   unk3[5];
     u64  aNames[6];             // 0x08  names, each packed into 64 bits (SKA_PackName)
     u8   nOutfit;               // 0x38  the golfer record's nOutfit, or the created golfer's
@@ -519,7 +549,8 @@ typedef struct Session {
                                 //        wins or end-of-game scorecard
     u8   unk9[3];
     s32  nC;                    // 0x00C
-    u8   nSplitScreen;          // 0x010  0 single view, else split screen (2 = side by side); no luck, no caddie
+    u8   nSplitScreen;          // 0x010  0 single view, else split screen (2 = side by side); no
+                                //        luck, no caddie
     u8   b11;                   // 0x011  cleared by Session_Init
     u8   bEndLoop;              // 0x012  ends the main loop of a round (game type 6) or the
                                 //        start-up (1): fn_8006D01C (gomainloop.c) checks and clears
@@ -571,7 +602,8 @@ typedef struct GameState {
     s32  nMode;                 // 0x000
     s32  nScoringType;          // 0x004  0 strokes, 1 holes won (match play), 2 skins, 3 Stableford
                                 //        (set by each mode's init; GM_GetScoringType)
-    s32  nMulligans;            // 0x008  0 none, 1 any number, 2 one per player per nine (GM_PlayerTakeMulligan)
+    s32  nMulligans;            // 0x008  0 none, 1 any number, 2 one per player per nine
+                                //        (GM_PlayerTakeMulligan)
     s32  nC;                    // 0x00C  4 in the team modes
     s32  n10;                   // 0x010  4 in the team modes
     s32  nCurCourse;            // 0x014  the course of the current hole
@@ -769,7 +801,8 @@ extern TexBank*     lbl_80281E34;       // } the "shadow" texture
 extern TexEntry*    lbl_80281E38;       // }
 extern TexBank*     lbl_80281E3C;       // } the "tball" texture (the aim marker)
 extern TexEntry*    lbl_80281E40;       // }
-extern f32          lbl_801887CC[4];    // RGBA: the placement text where the ball can go (PlaceBall_RenderBallTarget)
+extern f32          lbl_801887CC[4];    // RGBA: the placement text where the ball can go
+                                        // (PlaceBall_RenderBallTarget)
 extern f32          lbl_801887DC[4];    // RGBA: the placement text where it can't
 extern f32          lbl_801887EC[4];    // RGBA: the placement marker
 
@@ -820,7 +853,7 @@ int  Lessons_GetClub(int nPlayer);          // club override, 26 = none
 int  Game_GetCurHoleNum(void);
 u8   Lessons_AllowCPUSpin(void);
 f32  SW_GetSpinScale(int nSpin);         // how much spin SPIN allows: 0.15 at 0 .. 1.0 at 110 (Swing.c)
-f32  SW_vGetNonPowerAttributeAffectedShotPower(int nPlayer);          // the swing's fNonPowerShotPower (Swing.c)
+f32  SW_vGetNonPowerAttributeAffectedShotPower(int nPlayer);       // the swing's fNonPowerShotPower (Swing.c)
 void SW_KillVibration(int nPlayer);      // stops the pad rumble (Swing.c)
 void SW_vClearBoosts(int nPlayer);  // Swing.c
 
