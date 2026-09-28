@@ -275,7 +275,7 @@ typedef struct SkinMorphState {
                                 //      SkinMorph_UpdateAllTargets sets every bit, SkinMorph_Update clears one
 } SkinMorphState;
 
-// SkinMorph.c's work area (lbl_80281880; our name): blends a mesh's morph targets into one of two
+// SkinMorph.c's work area (gpSkinMorphWork; our name): blends a mesh's morph targets into one of two
 // vertex buffers. Only what the code reads.
 typedef struct SkinMorphVert {
     s32  aPos[4];               // 0x00  16.16 fixed point
@@ -299,7 +299,7 @@ typedef struct SkinMorphWork {
     struct HwsOverrideTable* pTable;    // 0x10238  (SkinMorph_SetWorkOverrideTable)
 } SkinMorphWork;
 
-extern SkinMorphWork* lbl_80281880;
+extern SkinMorphWork* gpSkinMorphWork;
 
 // A skin (Skin.c): a character's body or one of its attachments; only what the code reads.
 typedef struct Skin {
@@ -720,7 +720,7 @@ SkinDesc* fn_80111EB0(HwsBurn* pBurn);
 
 // SkinBurn.c: burns a skin (aParts and aList each end with -1).
 void  SkinBurn_BurnSkin(Skin* pSkin, s32* aParts, s32* aList);
-extern s32* lbl_802825A8;               // the new number of each mesh bit (SkinBurn_RenumberMeshBits)
+extern s32* gBurnNewMtxBits;               // the new number of each mesh bit (SkinBurn_RenumberMeshBits)
 
 // Bit n of a bit array of 32-bit words: test, set, clear.
 void  BitArray_FillArray(u32* aBits, u32 nBits);  // sets every bit of a bit array

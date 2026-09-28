@@ -5,8 +5,8 @@
 #include "engine.h"
 #include "charstate.h"
 
-SkinMorphWork lbl_80250080;
-SkinMorphWork* lbl_80281880 = &lbl_80250080;
+SkinMorphWork gSkinMorphWork;
+SkinMorphWork* gpSkinMorphWork = &gSkinMorphWork;
 
 // Unpacks nVerts vertices into the work area in 16.16 fixed point: positions (four s16 each: x, y,
 // z and the vertex's matrix bit, SkinMeshBit.nBit) and normals (four s8 each).
@@ -123,10 +123,10 @@ void SkinMorph_AddCurrentTarget(SkinMorphWork* pWork, s32 nVerts, f32 fWeight) {
     SkinMorph_AddTarget(pWork, pWork->p10020, nVerts, (s32)(65536.0f * fWeight + 0.5f));
 }
 
-// The morph work area (there is one, lbl_80281880), with its description and weights cleared: the
+// The morph work area (there is one, gpSkinMorphWork), with its description and weights cleared: the
 // caller sets them, the override table and the memory block before blending.
 SkinMorphWork* SkinMorph_GetWork(void) {
-    SkinMorphWork* pWork = lbl_80281880;
+    SkinMorphWork* pWork = gpSkinMorphWork;
 
     pWork->pDesc = NULL;
     pWork->afWeights = NULL;
