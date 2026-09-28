@@ -5053,7 +5053,7 @@ void GM_vGetEATraxTrack(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 315: picks player slot pArgs[0] as the one whose saved custom round the menus
-// edit (lbl_80281ED4->n3; n4 is the round), as the hole-par message fn_80080054 reads it.
+// edit (lbl_80281ED4->n3; n4 is the round), as the hole-par message GM_vGetHolePar reads it.
 void GM_vSetCustomRoundSlot(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->n3 = pArgs[0].i;
 }
