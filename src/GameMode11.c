@@ -241,7 +241,7 @@ u8 Lessons_IsRunning(void) {
     return Game_GetMode() == 11;
 }
 
-// The front end ends the current wait (UI command fn_800874F0), in mode 11 only: a step waiting for
+// The front end ends the current wait (UI command GM_vLessonStopWaiting), in mode 11 only: a step waiting for
 // the coach's line goes on to gLessonNextStep (the line plays on); so does a wait flagged in
 // gLessonSkipPending, which nothing sets.
 void Lessons_StopWaiting(void) {

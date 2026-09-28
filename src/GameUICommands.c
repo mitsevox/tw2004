@@ -69,31 +69,31 @@ void GM_vGetLieModifier(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetRelativeScore(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetRoundScore(MsgArg* pArgs, MsgArg* pResult);
 void GM_vLeaderboard_LastName(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008709C(MsgArg* pArgs, MsgArg* pResult);
-void fn_800870E4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087130(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008719C(MsgArg* pArgs, MsgArg* pResult);
-void fn_800871E4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087238(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087270(MsgArg* pArgs, MsgArg* pResult);
-void fn_800872AC(MsgArg* pArgs, MsgArg* pResult);
-void fn_800872F8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087338(MsgArg* pArgs, MsgArg* pResult);
-void fn_800873D4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087420(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087460(MsgArg* pArgs, MsgArg* pResult);
-void fn_800874C8(MsgArg* pArgs, MsgArg* pResult);
-void fn_800874F0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087510(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087548(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087574(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008759C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087628(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087658(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087684(MsgArg* pArgs, MsgArg* pResult);
-void fn_800876CC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087700(MsgArg* pArgs, MsgArg* pResult);
-void fn_80087734(MsgArg* pArgs, MsgArg* pResult);
+void GM_vLeaderboard_Position(MsgArg* pArgs, MsgArg* pResult);
+void GM_vLeaderboard_Tied(MsgArg* pArgs, MsgArg* pResult);
+void GM_vLeaderboard_Score(MsgArg* pArgs, MsgArg* pResult);
+void GM_vLeaderboard_Hole(MsgArg* pArgs, MsgArg* pResult);
+void GM_vLeaderboard_RoundScore(MsgArg* pArgs, MsgArg* pResult);
+void GM_vLeaderboard_PlayerPosition(MsgArg* pArgs, MsgArg* pResult);
+void GM_vLeaderboard_PlayerTied(MsgArg* pArgs, MsgArg* pResult);
+void GM_vLeaderboard_Entries(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetSpeedGolfHoleScore(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetGolfersUserName(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsGolferCPU(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPuttHelp(MsgArg* pArgs, MsgArg* pResult);
+void GM_vLeaderboard_Winnings(MsgArg* pArgs, MsgArg* pResult);
+void GM_vLeaderboard_PlayerWinnings(MsgArg* pArgs, MsgArg* pResult);
+void GM_vLessonStopWaiting(MsgArg* pArgs, MsgArg* pResult);
+void GM_vReturnTimer(MsgArg* pArgs, MsgArg* pResult);
+void GM_vQuickScorecard(MsgArg* pArgs, MsgArg* pResult);
+void GM_vControllerReconnected(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetSlotUserName(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetNumHolesSelected(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetDemoMode(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsPlayNowChallenge(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsPlayNowSpeedGolf(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayNowMedalMark(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayNowScoreToTarget(MsgArg* pArgs, MsgArg* pResult);
 void fn_80087764(MsgArg* pArgs, MsgArg* pResult);
 void fn_80087790(MsgArg* pArgs, MsgArg* pResult);
 void fn_800877CC(MsgArg* pArgs, MsgArg* pResult);
@@ -408,31 +408,31 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[41] = GM_vGetRelativeScore;
     gIGMessageHandlers[42] = GM_vGetRoundScore;
     gIGMessageHandlers[43] = GM_vLeaderboard_LastName;
-    gIGMessageHandlers[44] = fn_8008709C;
-    gIGMessageHandlers[45] = fn_800870E4;
-    gIGMessageHandlers[46] = fn_80087130;
-    gIGMessageHandlers[47] = fn_8008719C;
-    gIGMessageHandlers[48] = fn_800871E4;
-    gIGMessageHandlers[49] = fn_80087238;
-    gIGMessageHandlers[50] = fn_80087270;
-    gIGMessageHandlers[51] = fn_800872AC;
-    gIGMessageHandlers[52] = fn_800872F8;
-    gIGMessageHandlers[53] = fn_80087338;
-    gIGMessageHandlers[54] = fn_800873D4;
-    gIGMessageHandlers[55] = fn_80087420;
-    gIGMessageHandlers[56] = fn_80087460;
-    gIGMessageHandlers[57] = fn_800874C8;
-    gIGMessageHandlers[58] = fn_800874F0;
-    gIGMessageHandlers[59] = fn_80087510;
-    gIGMessageHandlers[60] = fn_80087548;
-    gIGMessageHandlers[61] = fn_80087574;
-    gIGMessageHandlers[62] = fn_8008759C;
-    gIGMessageHandlers[63] = fn_80087628;
-    gIGMessageHandlers[64] = fn_80087658;
-    gIGMessageHandlers[65] = fn_80087684;
-    gIGMessageHandlers[66] = fn_800876CC;
-    gIGMessageHandlers[67] = fn_80087700;
-    gIGMessageHandlers[68] = fn_80087734;
+    gIGMessageHandlers[44] = GM_vLeaderboard_Position;
+    gIGMessageHandlers[45] = GM_vLeaderboard_Tied;
+    gIGMessageHandlers[46] = GM_vLeaderboard_Score;
+    gIGMessageHandlers[47] = GM_vLeaderboard_Hole;
+    gIGMessageHandlers[48] = GM_vLeaderboard_RoundScore;
+    gIGMessageHandlers[49] = GM_vLeaderboard_PlayerPosition;
+    gIGMessageHandlers[50] = GM_vLeaderboard_PlayerTied;
+    gIGMessageHandlers[51] = GM_vLeaderboard_Entries;
+    gIGMessageHandlers[52] = GM_vGetSpeedGolfHoleScore;
+    gIGMessageHandlers[53] = GM_vGetGolfersUserName;
+    gIGMessageHandlers[54] = GM_vIsGolferCPU;
+    gIGMessageHandlers[55] = GM_vGetPuttHelp;
+    gIGMessageHandlers[56] = GM_vLeaderboard_Winnings;
+    gIGMessageHandlers[57] = GM_vLeaderboard_PlayerWinnings;
+    gIGMessageHandlers[58] = GM_vLessonStopWaiting;
+    gIGMessageHandlers[59] = GM_vReturnTimer;
+    gIGMessageHandlers[60] = GM_vQuickScorecard;
+    gIGMessageHandlers[61] = GM_vControllerReconnected;
+    gIGMessageHandlers[62] = GM_vGetSlotUserName;
+    gIGMessageHandlers[63] = GM_vGetNumHolesSelected;
+    gIGMessageHandlers[64] = GM_vGetDemoMode;
+    gIGMessageHandlers[65] = GM_vIsPlayNowChallenge;
+    gIGMessageHandlers[66] = GM_vIsPlayNowSpeedGolf;
+    gIGMessageHandlers[67] = GM_vGetPlayNowMedalMark;
+    gIGMessageHandlers[68] = GM_vGetPlayNowScoreToTarget;
     gIGMessageHandlers[69] = fn_80087764;
     gIGMessageHandlers[70] = fn_80087790;
     gIGMessageHandlers[71] = fn_800877CC;
@@ -1152,47 +1152,52 @@ void GM_vLeaderboard_LastName(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[1].p)->pStr, fn_80118E30(0, nGolfer));
 }
 
-// The rank of the golfer on a row.
-void fn_8008709C(MsgArg* pArgs, MsgArg* pResult) {
+// Message 44: the place of the golfer on leaderboard row pArgs[0].
+void GM_vLeaderboard_Position(MsgArg* pArgs, MsgArg* pResult) {
     s32 nEntrant = GM_PgaTourSim_GetEntrantIDFromScoreRow(0, pArgs[0].i);
 
     pResult->i = GM_PgaTourSim_GetScoreRankFromEntrantID(0, nEntrant);
 }
 
-void fn_800870E4(MsgArg* pArgs, MsgArg* pResult) {
+// Message 45: whether the golfer on leaderboard row pArgs[0] shares his place (fn_80119808).
+void GM_vLeaderboard_Tied(MsgArg* pArgs, MsgArg* pResult) {
     s32 nEntrant = GM_PgaTourSim_GetEntrantIDFromScoreRow(0, pArgs[0].i);
 
     pResult->i = fn_80119808(0, nEntrant);
 }
 
-// The score to par of the golfer on a row, over the holes before its current one.
-void fn_80087130(MsgArg* pArgs, MsgArg* pResult) {
+// Message 46: the score to par of the golfer on leaderboard row pArgs[0]
+// (GM_PgaTourSim_GetRelativeScoreFromEntrantID, its flag set for every entrant but the user).
+void GM_vLeaderboard_Score(MsgArg* pArgs, MsgArg* pResult) {
     int nEntrant = GM_PgaTourSim_GetEntrantIDFromScoreRow(0, pArgs[0].i);
 
     pResult->i = GM_PgaTourSim_GetRelativeScoreFromEntrantID(0, nEntrant, !GM_PgaTourSim_IsEntrantUser(0, nEntrant));
 }
 
-// The hole the golfer on a row is on.
-void fn_8008719C(MsgArg* pArgs, MsgArg* pResult) {
+// Message 47: the hole the golfer on leaderboard row pArgs[0] is on.
+void GM_vLeaderboard_Hole(MsgArg* pArgs, MsgArg* pResult) {
     s32 nEntrant = GM_PgaTourSim_GetEntrantIDFromScoreRow(0, pArgs[0].i);
 
     pResult->i = GM_PgaTourSim_GetCurrentHoleFromEntrantID(0, nEntrant);
 }
 
-// The golfer on a row's score in round pArgs[1].
-void fn_800871E4(MsgArg* pArgs, MsgArg* pResult) {
+// Message 48: the score of the golfer on leaderboard row pArgs[0] in round pArgs[1].
+void GM_vLeaderboard_RoundScore(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_PgaTourSim_GetRoundScoreFromEntrantID(0, GM_PgaTourSim_GetEntrantIDFromScoreRow(0, pArgs[0].i), pArgs[1].i);
 }
 
-void fn_80087238(MsgArg* pArgs, MsgArg* pResult) {
+// Message 49: the player's place on the PGA TOUR leaderboard (entrant 0).
+void GM_vLeaderboard_PlayerPosition(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_PgaTourSim_GetScoreRankFromEntrantID(0, 0);
 }
 
-void fn_80087270(MsgArg* pArgs, MsgArg* pResult) {
+// Message 50: whether the player (entrant 0) shares his place on the leaderboard (fn_80119808).
+void GM_vLeaderboard_PlayerTied(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_80119808(0, 0);
 }
 
-void fn_800872AC(MsgArg* pArgs, MsgArg* pResult) {
+// Message 51: how many entrants the PGA TOUR leaderboard has; 0 outside the PGA TOUR.
+void GM_vLeaderboard_Entries(MsgArg* pArgs, MsgArg* pResult) {
     if (GM_Currently_PgaTourMode()) {
         pResult->i = GM_PgaTourSim_GetNumEntrants(0);
         return;
@@ -1200,12 +1205,15 @@ void fn_800872AC(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_800872F8(MsgArg* pArgs, MsgArg* pResult) {
+// Message 52: SpeedGolf_GetHoleScore for player pArgs[0] and hole pArgs[1]; pArgs[2] points to
+// where whether he won points on it goes.
+void GM_vGetSpeedGolfHoleScore(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = SpeedGolf_GetHoleScore(pArgs[0].i, pArgs[1].i, (s32*)pArgs[2].p);
 }
 
-// The name of a player's save profile, or "User <n>" when none is loaded.
-void fn_80087338(MsgArg* pArgs, MsgArg* pResult) {
+// Message 53: the name of player pArgs[0]'s save profile into the string pArgs[1], or "User <n>"
+// when none is loaded in his slot.
+void GM_vGetGolfersUserName(MsgArg* pArgs, MsgArg* pResult) {
     int nSlot = gPlayers[pArgs[0].i].nIndex;
     char szName[32];
 
@@ -1217,8 +1225,8 @@ void fn_80087338(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[1].p)->pStr, gpSaveData[nSlot].szName);
 }
 
-// Whether a player is a CPU.
-void fn_800873D4(MsgArg* pArgs, MsgArg* pResult) {
+// Message 54: whether player pArgs[0] is a CPU (1 or 0).
+void GM_vIsGolferCPU(MsgArg* pArgs, MsgArg* pResult) {
     if (Player_IsCPU(pArgs[0].i)) {
         pResult->i = 1;
         return;
@@ -1226,7 +1234,9 @@ void fn_800873D4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_80087420(MsgArg* pArgs, MsgArg* pResult) {
+// Message 55: the caddie's putt read for player pArgs[0]'s view (fn_800C9038): how far past or
+// short, and how far to the side, into the floats pArgs[1] and pArgs[2] point to.
+void GM_vGetPuttHelp(MsgArg* pArgs, MsgArg* pResult) {
     // port: the studio passes the addresses of the two answers as 32-bit words
     fn_800C9038(gPlayers[pArgs[0].i].nView[0], (f32*)pArgs[1].i, (f32*)pArgs[2].i);
 }
@@ -1237,31 +1247,35 @@ static inline PgaEntrantMC* Tour_EntrantMC(PlayerNumber_t nPlayer, int nEntrant)
     return &gpSaveData[nPlayer].tour.field.aEntrant[nEntrant];
 }
 
-// The n18 of the PGA TOUR entrant on leaderboard row pArgs[0], in profile 0.
-void fn_80087460(MsgArg* pArgs, MsgArg* pResult) {
+// Message 56: the winnings (PgaEntrantMC.n18, profile 0) of the PGA TOUR entrant on leaderboard row
+// pArgs[0].
+void GM_vLeaderboard_Winnings(MsgArg* pArgs, MsgArg* pResult) {
     PlayerNumber_t nPlayer = PLR_1_e;
 
     pResult->i = Tour_EntrantMC(nPlayer, GM_PgaTourSim_GetEntrantIDFromScoreRow(0, pArgs[0].i))->n18;
 }
 
-void fn_800874C8(MsgArg* pArgs, MsgArg* pResult) {
+// Message 57: the winnings of the player (entrant 0) in save profile pArgs[0].
+void GM_vLeaderboard_PlayerWinnings(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = &gpSaveData[pArgs[0].i];
 
     pResult->i = pProfile->tour.field.aEntrant[0].n18;
 }
 
-void fn_800874F0(MsgArg* pArgs, MsgArg* pResult) {
+// Message 58: in lesson mode, the lesson stops waiting and goes on (Lessons_StopWaiting).
+void GM_vLessonStopWaiting(MsgArg* pArgs, MsgArg* pResult) {
     Lessons_StopWaiting();
 }
 
-// Call the mode's pfnSetTimer with a player and a time (modes 6, 7, 8 and 13 store it for the
-// hole).
-void fn_80087510(MsgArg* pArgs, MsgArg* pResult) {
+// Message 59: call the mode's pfnSetTimer with player pArgs[0] and time pArgs[1] (modes 6, 7, 8 and
+// 13 store it for the hole).
+void GM_vReturnTimer(MsgArg* pArgs, MsgArg* pResult) {
     gpGame->pfnSetTimer(pArgs[0].i, pArgs[1].i);
 }
 
-// Whether gSession.bDemo is set (with it, among other things, no GameBreaker starts).
-void fn_80087548(MsgArg* pArgs, MsgArg* pResult) {
+// Message 60: whether gSession.bDemo is set (1 or 0); EA's name says the quick scorecard, which in
+// this build is the demo flag.
+void GM_vQuickScorecard(MsgArg* pArgs, MsgArg* pResult) {
     if (gSession.bDemo != 0) {
         pResult->i = 1;
         return;
@@ -1269,13 +1283,16 @@ void fn_80087548(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_80087574(MsgArg* pArgs, MsgArg* pResult) {
+// Message 61: controller pArgs[0] is present again: the pulled-controller pause is lifted
+// (GUI_OnControllerPresent) and, in lesson mode, the lesson restarts.
+void GM_vControllerReconnected(MsgArg* pArgs, MsgArg* pResult) {
     GUI_OnControllerPresent(pArgs[0].i);
     Lessons_RestartLesson();
 }
 
-// The name of a save profile slot, or "User <n>" when none is loaded.
-void fn_8008759C(MsgArg* pArgs, MsgArg* pResult) {
+// Message 62: the name of save profile slot pArgs[0] into the string pArgs[1], or "User <n>" when
+// none is loaded there.
+void GM_vGetSlotUserName(MsgArg* pArgs, MsgArg* pResult) {
     int nSlot = pArgs[0].i;
     char szName[32];
 
@@ -1287,13 +1304,13 @@ void fn_8008759C(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[1].p)->pStr, gpSaveData[nSlot].szName);
 }
 
-// How many holes the round plays.
-void fn_80087628(MsgArg* pArgs, MsgArg* pResult) {
+// Message 63: how many holes the round plays (fn_8008AB4C).
+void GM_vGetNumHolesSelected(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_8008AB4C();
 }
 
-// The same question as fn_80087548, under a second command.
-void fn_80087658(MsgArg* pArgs, MsgArg* pResult) {
+// Message 64: whether gSession.bDemo is set (1 or 0): the demo is running.
+void GM_vGetDemoMode(MsgArg* pArgs, MsgArg* pResult) {
     if (gSession.bDemo != 0) {
         pResult->i = 1;
         return;
@@ -1301,7 +1318,8 @@ void fn_80087658(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_80087684(MsgArg* pArgs, MsgArg* pResult) {
+// Message 65: whether a PlayNow challenge (GameMode5) is being played (1 or 0).
+void GM_vIsPlayNowChallenge(MsgArg* pArgs, MsgArg* pResult) {
     if (PlayNow_IsChallengeRunning()) {
         pResult->i = 1;
         return;
@@ -1309,15 +1327,18 @@ void fn_80087684(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_800876CC(MsgArg* pArgs, MsgArg* pResult) {
+// Message 66: whether the game mode is speed golf (PlayNow_IsSpeedGolf).
+void GM_vIsPlayNowSpeedGolf(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = PlayNow_IsSpeedGolf();
 }
 
-void fn_80087700(MsgArg* pArgs, MsgArg* pResult) {
+// Message 67: the mark for medal pArgs[0] of the PlayNow challenge (PlayNow_GetMedalMark).
+void GM_vGetPlayNowMedalMark(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = PlayNow_GetMedalMark(pArgs[0].i);
 }
 
-void fn_80087734(MsgArg* pArgs, MsgArg* pResult) {
+// Message 68: the PlayNow challenge score against its target (PlayNow_GetScoreToTarget).
+void GM_vGetPlayNowScoreToTarget(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = PlayNow_GetScoreToTarget();
 }
 
