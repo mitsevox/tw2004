@@ -483,7 +483,7 @@ void AI_ApplyError(int nPlayer) {
         p->fPower = AI_PowerForTarget(nPlayer);
 
         // Spin in proportion to the error, scaled by the SPIN attribute. (Both clamps store +1.)
-        if ((s8)nSpin != 0 && fn_80101DF4()) {
+        if ((s8)nSpin != 0 && Lessons_AllowCPUSpin()) {
             f32 fScale = SW_GetSpinScale(nSpin);
             p->swing.fForwardSpin  = fDistErr / fDist1;
             p->swing.fForwardSpin *= fScale;

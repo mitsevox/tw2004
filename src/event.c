@@ -1,7 +1,7 @@
 // event.c (TW06's golf/eventmanager/event.c): the game's event handlers. EVENT_Trigger calls the
 // handler for an event number from the file's table (lbl_80188628): stepping through the clubs and
 // shot kinds, the camera and commentary for each moment of a shot, and the lessons' checks
-// (fn_80101AA8 can block an event). Most handlers pass the moment on to SitDev_QueueEvent.
+// (Lessons_OnEvent can block an event). Most handlers pass the moment on to SitDev_QueueEvent.
 
 #include "game.h"
 #include "terrain.h"
@@ -66,7 +66,7 @@ void fn_80065B44(void) {
 }
 
 void fn_80065B50(int nPlayer, int nEvent, void* pData, int nArg) {
-    if (!fn_80101AA8(nPlayer, 41)) {
+    if (!Lessons_OnEvent(nPlayer, 41)) {
         SitDev_QueueEvent(nPlayer, 2, 26);
     }
 }
@@ -75,13 +75,13 @@ void fn_80065B98(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 void fn_80065B9C(int nPlayer, int nEvent, void* pData, int nArg) {
-    if (!fn_80101AA8(nPlayer, 0)) {
+    if (!Lessons_OnEvent(nPlayer, 0)) {
         SitDev_QueueEvent(nPlayer, 2, 1);
     }
 }
 
 void fn_80065BE4(int nPlayer, int nEvent, void* pData, int nArg) {
-    if (!fn_80101AA8(nPlayer, 1)) {
+    if (!Lessons_OnEvent(nPlayer, 1)) {
         SitDev_QueueEvent(nPlayer, 2, 12);
     }
     Gaud_EndHole();
@@ -97,24 +97,24 @@ void fn_80065C30(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 void fn_80065C6C(int nPlayer, int nEvent, void* pData, int nArg) {
-    if (!fn_80101AA8(nPlayer, 3)) {
+    if (!Lessons_OnEvent(nPlayer, 3)) {
         SitDev_QueueEvent(nPlayer, 2, 2);
     }
     AnimStream_AssignSlots();
 }
 
 void fn_80065CB8(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_80101AA8(nPlayer, 4);
+    Lessons_OnEvent(nPlayer, 4);
 }
 
 void fn_80065CDC(int nPlayer, int nEvent, void* pData, int nArg) {
-    if (!fn_80101AA8(nPlayer, 6)) {
+    if (!Lessons_OnEvent(nPlayer, 6)) {
         SitDev_QueueEvent(nPlayer, 7, 3);
     }
 }
 
 void fn_80065D24(int nPlayer, int nEvent, void* pData, int nArg) {
-    if (!fn_80101AA8(nPlayer, 7)) {
+    if (!Lessons_OnEvent(nPlayer, 7)) {
         SitDev_QueueEvent(nPlayer, 2, 25);
     }
 }
@@ -123,7 +123,7 @@ void fn_80065D6C(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 void fn_80065D70(int nPlayer, int nEvent, void* pData, int nArg) {
-    if (!fn_80101AA8(nPlayer, 21)) {
+    if (!Lessons_OnEvent(nPlayer, 21)) {
         SitDev_QueueEvent(nPlayer, 2, 4);
     }
 }
@@ -134,7 +134,7 @@ void fn_80065DB8(int nPlayer, int nEvent, void* pData, int nArg) {
             fn_8009A16C();
         }
         gpGame->pfn260(nPlayer);
-        fn_80101AA8(nPlayer, 10);
+        Lessons_OnEvent(nPlayer, 10);
         fn_800A31E0(pData, nPlayer);
         fn_800BB1A8(&gPlayers[nPlayer].ball);
         SitDev_QueueEvent(nPlayer, 2, 5);
@@ -156,7 +156,7 @@ void fn_80065E9C(int nPlayer, int nEvent, void* pData, int nArg) {
     int nTries;
     u8 bOk;
 
-    if (fn_80101AA8(nPlayer, 13) || Game_GetMode() == 22 || Game_GetMode() == 26) return;
+    if (Lessons_OnEvent(nPlayer, 13) || Game_GetMode() == 22 || Game_GetMode() == 26) return;
     nOldClub = gPlayers[nPlayer].nClub;
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) return;
     nTries = 0;
@@ -199,7 +199,7 @@ void fn_80066058(int nPlayer, int nEvent, void* pData, int nArg) {
     int nTries;
     u8 bOk;
 
-    if (fn_80101AA8(nPlayer, 13) || Game_GetMode() == 22 || Game_GetMode() == 26) return;
+    if (Lessons_OnEvent(nPlayer, 13) || Game_GetMode() == 22 || Game_GetMode() == 26) return;
     nOldClub = gPlayers[nPlayer].nClub;
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) return;
     nTries = 0;
@@ -238,7 +238,7 @@ void fn_80066058(int nPlayer, int nEvent, void* pData, int nArg) {
 
 // Event 15: the next shot kind (fn_80067220).
 void fn_80066214(int nPlayer, int nEvent, void* pData, int nArg) {
-    if (fn_80101AA8(nPlayer, 15) || Game_GetMode() == 26 || Game_GetMode() == 22) return;
+    if (Lessons_OnEvent(nPlayer, 15) || Game_GetMode() == 26 || Game_GetMode() == 22) return;
     fn_80067220(nPlayer);
     if (gSession.nSplitScreen) {
         fn_80062CB0(gPlayers[nPlayer].nC58, 1);
@@ -247,7 +247,7 @@ void fn_80066214(int nPlayer, int nEvent, void* pData, int nArg) {
 
 // Events 16 and 17: a higher or lower trajectory.
 void fn_800662A0(int nPlayer, int nEvent, void* pData, int nArg) {
-    if (!fn_80101AA8(nPlayer, 16)) {
+    if (!Lessons_OnEvent(nPlayer, 16)) {
         if (gPlayers[nPlayer].nTrajectory != 2) {
             gPlayers[nPlayer].nTrajectory++;
             gPlayers[nPlayer].fPower = AI_PowerForTarget(nPlayer);
@@ -257,7 +257,7 @@ void fn_800662A0(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 void fn_80066324(int nPlayer, int nEvent, void* pData, int nArg) {
-    if (!fn_80101AA8(nPlayer, 17)) {
+    if (!Lessons_OnEvent(nPlayer, 17)) {
         if (gPlayers[nPlayer].nTrajectory != 0) {
             gPlayers[nPlayer].nTrajectory--;
             gPlayers[nPlayer].fPower = AI_PowerForTarget(nPlayer);
@@ -267,27 +267,27 @@ void fn_80066324(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 void fn_800663A8(int nPlayer, int nEvent, void* pData, int nArg) {
-    if (!fn_80101AA8(nPlayer, 19)) {
+    if (!Lessons_OnEvent(nPlayer, 19)) {
         fn_80069104(nPlayer);
         fn_8009B970(gPlayers[nPlayer].nView[0]);
     }
 }
 
 void fn_80066400(int nPlayer, int nEvent, void* pData, int nArg) {
-    if (!fn_80101AA8(nPlayer, 18)) {
+    if (!Lessons_OnEvent(nPlayer, 18)) {
         fn_800690C0(nPlayer);
         fn_8009B970(gPlayers[nPlayer].nView[0]);
     }
 }
 
 void fn_80066458(int nPlayer, int nEvent, void* pData, int nArg) {
-    if (!fn_80101AA8(nPlayer, 20)) {
+    if (!Lessons_OnEvent(nPlayer, 20)) {
         fn_80069148(nPlayer);
     }
 }
 
 void fn_80066498(int nPlayer, int nEvent, void* pData, int nArg) {
-    if (!fn_80101AA8(nPlayer, 21)) {
+    if (!Lessons_OnEvent(nPlayer, 21)) {
         fn_800691B0(nPlayer);
     }
 }
@@ -319,7 +319,7 @@ void fn_80066558(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 void fn_800665D4(int nPlayer, int nEvent, void* pData, int nArg) {
-    if (nArg == 1 && !fn_80101AA8(nPlayer, 28)) {
+    if (nArg == 1 && !Lessons_OnEvent(nPlayer, 28)) {
         fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 1, nPlayer);
         fn_8006ACF8(nPlayer, 3);
         fn_80095744(gPlayers[nPlayer].pChar, 13);
@@ -333,7 +333,7 @@ void fn_80066664(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         fSpinY = 0.0f;
         fSpinX = 0.0f;
-        if (!fn_80101AA8(nPlayer, 29)) {
+        if (!Lessons_OnEvent(nPlayer, 29)) {
             SitDev_QueueEvent(nPlayer, 2, 28);
         }
         fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 3, nPlayer);
@@ -368,7 +368,7 @@ void fn_800667C0(int nPlayer, int nEvent, void* pData, int nArg) {
 void fn_80066828(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         Gaud_BallStopped(nPlayer);
-        if (!fn_80101AA8(nPlayer, 32)) {
+        if (!Lessons_OnEvent(nPlayer, 32)) {
             SitDev_QueueEvent(nPlayer, 2, 8);
         }
         if (Player_IsController8(nPlayer)) {
@@ -389,7 +389,7 @@ void fn_800668A8(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 void fn_80066920(int nPlayer, int nEvent, void* pData, int nArg) {
-    if (nArg == 1 && !fn_80101AA8(nPlayer, 34)) {
+    if (nArg == 1 && !Lessons_OnEvent(nPlayer, 34)) {
         fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 6, nPlayer);
         SitDev_QueueEvent(nPlayer, 2, 8);
     }
@@ -484,12 +484,12 @@ void fn_80066C08(int nPlayer, int nEvent, void* pData, int nArg) {
 
 void fn_80066C2C(int nPlayer, int nEvent, void* pData, int nArg) {
     Gaud_Spina(nPlayer);
-    if (fn_80101AA8(nPlayer, 46)) return;   // the result is tested (clrlwi.) with nothing after it
+    if (Lessons_OnEvent(nPlayer, 46)) return;   // the result is tested (clrlwi.) with nothing after it
 }
 
 void fn_80066C6C(int nPlayer, int nEvent, void* pData, int nArg) {
     Gaud_Tappa(nPlayer);
-    if (fn_80101AA8(nPlayer, 45)) return;   // as in fn_80066C2C
+    if (Lessons_OnEvent(nPlayer, 45)) return;   // as in fn_80066C2C
 }
 
 void fn_80066CAC(int nPlayer, int nEvent, void* pData, int nArg) {
@@ -609,7 +609,7 @@ void fn_80067004(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 void fn_8006702C(int nPlayer, int nEvent, void* pData, int nArg) {
-    if (!fn_80101AA8(nPlayer, 75)) {
+    if (!Lessons_OnEvent(nPlayer, 75)) {
         SitDev_QueueEvent(nPlayer, 2, 31);
     }
 }

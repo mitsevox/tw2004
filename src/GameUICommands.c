@@ -346,8 +346,8 @@ s32   fn_800FF620(int nPlayer, int i);
 void  fn_800FF634(int nPlayer);
 void  Lessons_StopWaiting(void);
 void  Lessons_RestartLesson(void);
-void  fn_80101CFC(void);
-void  fn_80101D24(void);
+void  Lessons_ChooseQuit(void);
+void  Lessons_ChooseContinue(void);
 s32   fn_80126FA0(void);
 s32   fn_80127098(s32 n);
 
@@ -1572,11 +1572,11 @@ void fn_80088160(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_800881A8(MsgArg* pArgs, MsgArg* pResult) {
-    fn_80101CFC();
+    Lessons_ChooseQuit();
 }
 
 void fn_800881C8(MsgArg* pArgs, MsgArg* pResult) {
-    fn_80101D24();
+    Lessons_ChooseContinue();
 }
 
 // Who controls the player (CONTROLLER_CPU for the AI).

@@ -734,7 +734,7 @@ s32  fn_800D2C68(int nTee);             // CourseData.c: the current hole's valu
 int  Lessons_GetShotKind(void);                 // shot kind override, 8 = none
 int  Lessons_GetClub(int nPlayer);          // club override, 26 = none
 int  Game_GetCurHoleNum(void);
-u8   fn_80101DF4(void);
+u8   Lessons_AllowCPUSpin(void);
 f32  SW_GetSpinScale(int nSpin);         // how much spin SPIN allows: 0.15 at 0 .. 1.0 at 110 (Swing.c)
 f32  SW_vGetNonPowerAttributeAffectedShotPower(int nPlayer);          // the swing's fNonPowerShotPower (Swing.c)
 void SW_KillVibration(int nPlayer);      // stops the pad rumble (Swing.c)

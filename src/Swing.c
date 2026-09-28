@@ -313,11 +313,11 @@ u8 lbl_80281194[8] = {0x80, 0x80, 0x80, 0x80};    // a neutral pad: both sticks 
 
 // The sticks of pad nController as bytes 0..255 (Input_sGetStickInfo: [0] and [1] the C stick's x
 // and y, [2] and [3] the main stick's; y grows as the stick is pulled back), or a neutral pad (both
-// sticks centred at 128) when there is none or fn_80100C00() says so (it always returns 0 in this
+// sticks centred at 128) when there is none or Lessons_UseNeutralPad() says so (it always returns 0 in this
 // build). nPlayer is unused.
 u8* SW_vGetStickInfo(int nPlayer, int nController) {
     u8* pPad = Input_sGetStickInfo(nController);
-    if (pPad == NULL || fn_80100C00()) {
+    if (pPad == NULL || Lessons_UseNeutralPad()) {
         return lbl_80281194;
     }
     return pPad;

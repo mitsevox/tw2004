@@ -43,7 +43,7 @@ int  GM_GetGolferMoneyRating(int nGolfer);          // Earnings.c: the golfer's 
 int  GM_GetMinPlayersForMode(int nMode);            // GameRound.c
 void GM_SetSplitScreenForMode(void);                 // GameRound.c
 void GM_BuildRandom18(void);                 // GameRound.c: builds the random mixed round
-void fn_80101EE8(void);                 // GameMode11.c
+void Lessons_StartFromMenu(void);                 // GameMode11.c
 void GameModeDriverPGATour_PrepareForTeeOff(void);                 // GameModeDriverPGATour.c
 u8*  fn_8010C718(void);                 // CharSliders.c
 void fn_801260C0(void);                 // GameMode22.c
@@ -4922,7 +4922,7 @@ void fn_80083BFC(MsgArg* pArgs, MsgArg* pResult) {
                 Session_SetGolfer(0, 0);
             }
         }
-        fn_80101EE8();
+        Lessons_StartFromMenu();
         fn_80110178(1);
     } else if (Game_GetMode() == 5) {
         if (Game_GetMode() == 5 || Game_GetMode() == 11) {

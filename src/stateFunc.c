@@ -1194,7 +1194,7 @@ void STATEFUNC_SimulateInit(int nPlayer) {
         Mem_cpy(&p->ballBefore, &p->ball, sizeof(Ball));
     }
     p->ballBefore.nPlayer = -1;
-    if (fn_80095780(gPlayers[nPlayer].pChar) != 11 && fn_80101738() && !fn_800C6CB0()) {
+    if (fn_80095780(gPlayers[nPlayer].pChar) != 11 && Lessons_AllowFlightCamera() && !fn_800C6CB0()) {
         nView = gPlayers[nPlayer].nView[0];
         CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 0xE, nPlayer, nView);
     }

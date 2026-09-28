@@ -1214,7 +1214,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   first parameter, and its callers pass a `u8` without `clrlwi` (Swing `fn_80045494/5558`).
 - **[verified] `fn(15, (u8)a, b)` and `fn(15, a & 0xFF, b)` differ for an int parameter `a`.**
   The original's `mr r0, r3; clrlwi r4, r0, 24` comes from `a & 0xFF` (or a `u8` parameter passed
-  on); `(u8)a` gives `clrlwi r4, r3, 24` (GameMode11 `fn_80101F40`, 57.9% -> 100).
+  on); `(u8)a` gives `clrlwi r4, r3, 24` (GameMode11 `Lessons_ShowSwingHint`, 57.9% -> 100).
 - **[verified] A redeclaration with different parameter types is an error.** `void f(int, s32*);
   void f(int, int);` (also int vs s8, int vs long) gives "identifier redeclared", so a file that
   includes the header cannot declare its own variant; cast at the call site instead.
@@ -1256,7 +1256,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] `return !(x == -1);` and `return x != -1;` end in a different instruction order**
   (GameMode11 `Lessons_PlayLine`, 93.9% -> 100).
 - **[verified] A two-value choice `h = (n == 2) ? 6 : 7` compiles branch-free (`subi/nor/srawi`);**
-  the original's `li 7; bne; li 6` is `h = 7; if (n == 2) h = 6;` (GameMode11 `fn_80100C08`).
+  the original's `li 7; bne; li 6` is `h = 7; if (n == 2) h = 6;` (GameMode11 `Lessons_Update`).
 - **[verified] A boolean chain assigned to an `int` keeps the original's register order where
   `if (...) b = 1;` does not**: `bDown = (A || B) && (C || D) && (E || F);` (GameMode8
   `fn_800FCC38`, 98.9% -> 100).
@@ -1357,7 +1357,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   numbers there (10 -> 4 differing) but made two neighbouring functions worse: decide per function.
 
 - **[verified] An inline helper that reads a global itself, rather than being passed it,
-  changes register choice** (GameMode11 `fn_80100C08`'s hint helper).
+  changes register choice** (GameMode11 `Lessons_Update`'s hint helper).
 - **[verified] An inline helper that takes a value by pointer changes register choice.** The
   GetHonors sort append matched only as `static inline void AddIfScore(s32* aList, int* pnCount,
   ...) { if (...) { aList[*pnCount] = nPlayer; (*pnCount)++; } }` (Stableford `fn_800FE3FC`,

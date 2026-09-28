@@ -746,12 +746,12 @@ extern s32 gLessonNum;                // the current lesson, 1..12
 u8   Lessons_IsRunning(void);                 // in a lesson (mode 11)
 int  Lessons_GetShape(int nPlayer); // the lesson's shape in mode 11, else 7 (none); nPlayer unused
 u8   Lessons_IsShortBackswingLesson(void);                 // lesson 5 of mode 11
-u8   fn_80100C00(void);
-u8   fn_80101738(void);
-u8   fn_80101AA8(int nPlayer, int nEvent);  // an event (event.c's numbers) in a lesson; nonzero blocks it
-u8   fn_80101D4C(int nPlayer);          // a CPU in game mode 11 is always lucky
-u8   fn_80101E34(char* szName);         // one of the lessons' animations
-void fn_80101EDC(void);
+u8   Lessons_UseNeutralPad(void);
+u8   Lessons_AllowFlightCamera(void);
+u8   Lessons_OnEvent(int nPlayer, int nEvent);  // an event (event.c's numbers) in a lesson; nonzero blocks it
+u8   Lessons_IsLucky(int nPlayer);          // a CPU in game mode 11 is always lucky
+u8   Lessons_IsLessonAnim(char* szName);         // one of the lessons' animations
+void Lessons_PauseMenuClosed(void);
 
 u8   fn_801025F4(void);
 
