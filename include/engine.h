@@ -12,19 +12,19 @@
 
 // ---- memory and strings ----------------------------------------------------------------------
 
-void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen);    // returns pDst
-void* Mem_move(void* pDst, const void* pSrc, u32 uLen); // a copy the ranges may overlap in
-void* Mem_set(void* pDst, int nValue, u32 uLen);      // memset; returns pDst
-int   Mem_compare(const void* pA, const void* pB, u32 uLen);   // memcmp
+void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen);          // memcpy; returns pDst
+void* Mem_move(void* pDst, const void* pSrc, u32 uLen);         // memmove: the ranges may overlap
+void* Mem_set(void* pDst, int nValue, u32 uLen);                // memset; returns pDst
+int   Mem_compare(const void* pA, const void* pB, u32 uLen);    // memcmp
 // Allocates (StaticMemory.c): nMode picks the system heap or a part of the static heap (see there).
 void* StaticMem_Alloc(int nSize, int nMode, int nAlign, const char* pFile, int nLine);
-void  StaticMem_Free(void* p);             // free
-void  StaticMem_SetMode(s32 v);               // } a value TibExtMemAlloc passes on as StaticMem_Alloc's nMode
-s32   StaticMem_GetMode(void);                // } (EASportsBio.c sets 0 while the Bio starts, then 2)
-void  StaticMem_ResetCount(void);                // start a new count of the bytes taken
-void  StaticMem_StartCount(void);                // } counting on / off
+void  StaticMem_Free(void* p);                  // free
+void  StaticMem_SetMode(s32 n);                 // } the StaticMem_Alloc mode TibExtMemAlloc uses
+s32   StaticMem_GetMode(void);                  // } (EASportsBio.c: 0 while the Bio starts, then 2)
+void  StaticMem_ResetCount(void);               // start a new count of the bytes taken
+void  StaticMem_StartCount(void);               // } counting on / off
 void  StaticMem_StopCount(void);                // }
-s32   StaticMem_GetCount(void);                // the bytes taken since StaticMem_ResetCount
+s32   StaticMem_GetCount(void);                 // the bytes taken since StaticMem_ResetCount
 // The main-memory heap (GoShaderObject_Particle_Gc.c): fn_80095108 makes it from the arena.
 // fn_800951A0 returns a block aligned to nAlign (0: 16) that remembers the heap block and its
 // own padding just before and after it (every caller passes 1 as n, which it does not read).
@@ -142,7 +142,8 @@ void Vec_Copy(const f32* pSrc, f32* pDst);   // 0x8000AD10 (const: see Vec3Copy)
 f32  atan2f(f32 y, f32 x);         // atan2f
 f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platform.h) rounded to a float
 f32  logf(f32 x);                // natural logarithm
-void mat44flt_ExtractEulerAngles(f32 (*pMtx)[4], f32* pA, f32* pB, f32* pC);   // a rotation matrix's three angles
+// A rotation matrix's yaw (about z), pitch (about y) and roll (about x), radians (UMemPool.c).
+void mat44flt_ExtractEulerAngles(f32 (*pMtx)[4], f32* pYaw, f32* pPitch, f32* pRoll);
 void fn_8000AF20(void);                 // make the log2 table (gLog2Table)
 void fn_8000AF58(void);                 // free the log2 table
 double acos(double x);                  // 0x8015F784 (MSL)
@@ -159,7 +160,8 @@ void Misc_CloseModule(void);                 // drop the kept normal value (Misc
 f32  Misc_RandFuncf(int nStream);           // 0x8000B428  [0, 1)
 void Quat_Slerp(f32* pA, f32* pB, f32 fT);   // quaternion slerp from a to b by fT, into b
 void Quat_Multiply(f32* pA, f32* pB, f32* pOut); // quaternion product a x b (Quaternion.c)
-void Quat_EulerAngles(f32 fA, f32 fB, f32 fC, f32* pOut);   // the quaternion of three (negated) angles
+// The quaternion yaw x pitch x roll (about z, y and x; radians, each negated first).
+void Quat_EulerAngles(f32 fYaw, f32 fPitch, f32 fRoll, f32* pOut);
 void Quat_BuildFromVector(f32* pRot, f32* pOut); // a rotation vector (axis * angle) as a quaternion
 void Legacy_Quat_BuildFromYaw(f32 fAngle, f32* pOut); // the quaternion of a rotation by -fAngle about z
 void Legacy_Quat_BuildFromPitch(f32 fAngle, f32* pOut); // the quaternion of a rotation by -fAngle about y
@@ -173,7 +175,7 @@ void Vec_Scale(f32 f, f32* pIn, f32* pOut);   // scale a vector (four floats)
 void fn_8000AE6C(f32* pA, f32* pB, f32 fScale, f32* pOut);   // out = a + fScale x b (four floats)
 double pow(double x, double y);         // 0x8015F824 (MSL)
 f32  powf(f32 x, f32 y);                // 0x8002C8D0 (Golfer.c): pow rounded to a float
-f32  LLMath_SquareDistanceBetween3(f32* pA, f32* pB);     // squared distance
+f32  LLMath_SquareDistanceBetween3(f32* pA, f32* pB);   // three-float squared distance
 void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
 
 // ---- textures --------------------------------------------------------------------------------
@@ -544,7 +546,8 @@ extern RenderState gRenderState;
 void RenderState_Apply(void);                 // hand GX the groups of gRenderState that changed
 
 // A pool of 20 blocks of 0x1000 bytes (our names; gBufferPool, 0x14080 bytes, reached through
-// the pointer gpBufferPool). BufferPool_FreeAll frees them all; BufferPool_GetFreeBlock moves nNext past the used ones.
+// the pointer gpBufferPool). BufferPool_FreeAll frees them all; BufferPool_GetFreeBlock moves
+// nNext past the used ones.
 typedef struct BufferPoolBlock {
     u8   unk0[0x1000];
     u32  u1000;                 // 0x1000  nonzero: in use (UObject3D.c: the size of the display
@@ -758,7 +761,8 @@ struct ShaderObject {
 };
 LAYOUT_ASSERT(ShaderObject, 0x28);
 
-void fn_80036100(ShaderObject* pObj, const void* pData, int n);    // Skin.c: hands it data through its fill hook
+// Skin.c: hands a shader object data through its fill hook.
+void fn_80036100(ShaderObject* pObj, const void* pData, int n);
 
 struct UObjMeshPart;
 struct UObjArraySet;
@@ -1065,7 +1069,8 @@ LAYOUT_ASSERT(UStreamObject, 0x34);
 
 int  Stream_RegisterLoadChunkCallback(int nType, void (*pfnHandler)(UStreamObject*));
 int  Stream_UnregisterLoadChunkCallback(int nType);
-u32  Stream_StreamLoadFixedSize(UStreamObject* pObject, u32 uMax, void* pDst);   // copy the data out, free the object
+// Copies the object's data out and frees the object.
+u32  Stream_StreamLoadFixedSize(UStreamObject* pObject, u32 uMax, void* pDst);
 u32  fn_8000E81C(UStreamObject* pObject, void** ppData);          // the data and its size
 
 // The list of kept stream objects (ObjList.c). Objects are added at the head or the tail
@@ -1411,7 +1416,8 @@ typedef struct FadeNode {
 
 extern FadeNode* lbl_80281FA0;
 
-void Character_AlignShotWithTarget(int nPlayer, u8 a, u8 b);  // char.c: sets bits of the player's character's u10
+// char.c: sets bits of the player's character's u10.
+void Character_AlignShotWithTarget(int nPlayer, u8 a, u8 b);
 void fn_8001D8DC(int nPlayer);
 void Vec3_Scale(f32 f, f32* pIn, f32* pOut);   // scale a vector (paired singles)
 
@@ -1456,11 +1462,12 @@ void Gaud_StopComment(void);
 void Gaud_SetSfxLevel(f32 f);                // } the options menu passes them 0.2 x options.a0[0], a0[4]
 void Gaud_SetCommentLevel(f32 f);                // } and a0[1] (FE_MessageTable.c, GameUICommands.c)
 void Gaud_SetMusicLevel(f32 f);                // }
-void LLMath_Normalize(f32* pSrc, f32* pDst);
-void LLMath_Normalize3(f32* pSrc, f32* pDst);   // normalise
+void LLMath_Normalize(f32* pSrc, f32* pDst);    // VecMath.c: normalise four floats
+void LLMath_Normalize3(f32* pSrc, f32* pDst);   // normalise three floats (pDst[3] not written)
 void fn_800B5918(const f32* pSrc, f32* pDst);   // GoShaderObject_Rain_Gc.c: copy three floats
-f32  LLMath_NormalizeReturnLength3(f32* pSrc, f32* pDst);   // VecMath.c: normalises pSrc into pDst, gives its length
-f32  LLMath_DistanceBetween3(f32* pA, f32* pB);
+// Normalises three floats and returns the length (0: a near-zero vector, copied as it is).
+f32  LLMath_NormalizeReturnLength3(f32* pSrc, f32* pDst);
+f32  LLMath_DistanceBetween3(f32* pA, f32* pB);  // three-float distance
 void fn_800BD83C(int nSound, int a);      // SitDevFile.c: Gaud_StartComment(0, nSound, a)
 void BreakLine_Reset(int nView);
 // The EA Sports Bio, game side (EASportsBio.c; TW06's names)
