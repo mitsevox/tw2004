@@ -1,7 +1,18 @@
-// FE_Manager.c (EA's name, from its asserts; also in EA's 2002 source tree): the front end's
-// manager: its set-up and shut-down, the movies (the intro, and the credits and the golfers' bios
-// the menus queue), the profile being worked on and its backups (moved out to ARAM and back), the
-// created golfer and its Create-A-Player picks and unlocks.
+// FE_Manager.c (EA's name, from its StaticMem_Alloc file names): the front end's manager. TW07
+// spreads the same functions over FE_Manager.c, FE_Movies.c, FE_UserMgr.c and FE_CrAPUtils.c; here
+// they come in this order:
+//  - start-up (FE_vOpenONCE) and the golfers' bios from the stream (FE_CharBios_*);
+//  - FE_Movies.c's part: movie paths, the movie queue the menus fill and FE_movieFade plays after a
+//    fade to black, the intro movie, a trophy ball's replay;
+//  - the module's start and shut-down (FE_vInitModule / FE_vCloseModule, FE_InitManager /
+//    FE_CloseManager, which copies the created golfers into the golfer table);
+//  - the profile backups the menus keep (FE_BackupProfile...), then FE_UserMgr.c's getters
+//    (FE_spGetGolfer, FE_GetCurrentProfile, FE_GetCurrUserID) and FE_bIsLicensedGolfer;
+//  - FE_CrAPUtils.c's part: Create-A-Player's daily sale, the item lock check
+//    (FE_CrAP_IsItemLocked; FE_DateToInt / FE_IntToDate sit among them), the equipment tiers, the
+//    random created golfer and its default choices;
+//  - FE_vExitUI, which sets the players up when the menus start a game, and the profile backups'
+//    moves out to ARAM and back while a game runs.
 
 #include "engine.h"
 #include "ustream.h"
@@ -34,7 +45,7 @@ void fn_8009170C(void);
 
 // This file, in address order.
 void FE_vOpenONCE(void);
-void FE_CharBios_FreeStreamMemory(void);                 // frees gpFEBios
+void FE_CharBios_FreeStreamMemory(void);
 void FE_Manager_FreeStreamMemory(void);
 void FE_CharBios_RegisterStreamClients(void);
 void FE_Manager_RegisterStreamClients(void);
@@ -62,15 +73,19 @@ u8   FE_CrAP_IsCrazyFaceHairColor(CrAPAsset* pAsset);
 void FE_CrAP_EquipDefaults(void);
 void FE_MoveBackupsToARAM(void);
 void FE_RestoreBackupsFromARAM(void);
-u8   FE_IsHiddenAttribute(int nAttr);            // a hidden attribute: ATTR_AGGRESSION, ATTR_IQ, ATTR_SPEED
+u8   FE_IsHiddenAttribute(int nAttr);
 
 // This file's globals (fe.h), each section in reverse address order as the compiler lays it out.
-FEState gFEState;
-FEProfile* gpFEProfile;
-u32 gFEBackupAramAddr;
-u32 gFEBackupSize;
-FEBio* gpFEBios;
+FEState gFEState;               // the front end's state: player slots, backup rows, the movie queue
+FEProfile* gpFEProfile;         // the profile the menus work on (FE_InitManager .. FE_CloseManager)
+u32 gFEBackupAramAddr;          // the profile backups' ARAM address while they are there (0: not)
+u32 gFEBackupSize;              // the profile backups' size in bytes (FE_BACKUP_SIZE)
+FEBio* gpFEBios;                // the golfers' bios, copied from the 'BIO ' stream object
 
+// A new profile's unlocks (SaveProfile_InitNew, PasswordManager_SetDefaults): golfers 0..29 are
+// gStartUnlockedGolfers and gStartLockedGolfers (the ones the single-golfer cheat codes unlock);
+// every course is unlocked but gStartLockedCourses. GM_GetGameProgress counts the locked ones since
+// unlocked.
 s32 gStartLockedCourses[6] = {3, 9, 12, 17, 18, 4};
 s32 gStartUnlockedGolfers[16] = {0, 18, 21, 3, 5, 7, 11, 23, 10, 13, 14, 28, 22, 24, 4, 12};
 s32 gStartLockedGolfers[14] = {9, 16, 6, 26, 29, 2, 8, 15, 17, 19, 20, 25, 27, 1};
@@ -336,9 +351,9 @@ void FE_InitManager(void) {
 
 // Closes the manager (FE_vCloseModule). First every player on a created golfer gets its save slot's
 // created golfer (gpSaveData[i].createdGolfer) copied over its golfer-table entry, keeping the
-// table's hidden attributes (FE_IsHiddenAttribute: aggression, IQ, speed) in both attribute blocks; TW07 has
-// this part as FE_TransferUserStatsToGolferStats. Then the bios (FE_CharBios_FreeStreamMemory) and
-// the menus' profile (gpFEProfile) are freed.
+// table's hidden attributes (FE_IsHiddenAttribute: aggression, IQ, speed) in both attribute
+// blocks; TW07 has this part as FE_TransferUserStatsToGolferStats. Then the bios
+// (FE_CharBios_FreeStreamMemory) and the menus' profile (gpFEProfile) are freed.
 void FE_CloseManager(void) {
     int i;
     int j;
@@ -591,15 +606,19 @@ void FE_CrAP_UpdateSaleInfo(int a, int b) {
 // Whether Create-A-Player asset nAsset is still locked for profile pProfile: never with bit 0x4000
 // of the session's flags or cheat bit 0 (PasswordManager_IsPasswordEntered(0)). The asset gives a
 // lock kind (FE_CrAP_GetPartGMLockIDByAssetNum) and a value n (FE_CrAP_GetPartGMLockValByAssetNum).
-// Unlocked by kind: 0 bit n of aAssetOwned (bought); 2 bit 1 of a10548 (fn_80058304); 6 cheat bit n
-// + 1 (codes "A".."E"); 7 award aC8[n] won; 8 n of those 31 won; 9 PGA TOUR season n reached; 10
-// sponsor n's code entered (PasswordManager_IsSponsorshipPasswordEntered) or sponsor n signed; 11 n
-// sponsors signed; 12 an EA Sports Bio of level n or more; 14 ladder award n; 15 n of the 25; 16
-// game progress n (GM_GetGameProgress); 17 real-time event award n; 18 n of the 75; 19 the best medal (0) in
-// challenge group n; 20 n challenge groups counted (EA bug there); 21 award n; 22 n of the first 23
-// awards; 23 award 23 + n (a bonus trophy ball); 24 n bonus trophy balls, but the count never runs
-// (EA bug there); 25 a1C0[12 + n]; 26 n of a1C0[12..15]; 27 TOUR card level n. Kinds 3 and 13 are
-// always locked; -1, 4, 28 and the rest never.
+// Unlocked by kind:
+//   0 bit n of aAssetOwned (bought)       2 bit 1 of a10548 (fn_80058304)
+//   6 cheat bit n + 1 (codes "A".."E")    7 award aC8[n] won; 8 n of those 31 won
+//   9 PGA TOUR season n reached           10 sponsor n's code entered
+//                                            (PasswordManager_IsSponsorshipPasswordEntered) or signed
+//   11 n sponsors signed                  12 an EA Sports Bio of level n or more
+//   14 ladder award n; 15 n of the 25     16 game progress n (GM_GetGameProgress)
+//   17 real-time event award n; 18 n of the 75
+//   19 the best medal (0) in challenge group n; 20 n challenge groups counted (EA bug there)
+//   21 award n; 22 n of the first 23      23 award 23 + n (a bonus trophy ball)
+//   24 n bonus trophy balls, but the count never runs (EA bug there)
+//   25 a1C0[12 + n]; 26 n of a1C0[12..15] 27 TOUR card level n
+// Kinds 3 and 13 are always locked; -1, 4, 28 and the rest never.
 u8 FE_CrAP_IsItemLocked(s32 nAsset, SaveProfile* pProfile) {
     int aBits[5] = {1, 2, 3, 4, 5};
     int nCount = 0;
@@ -719,6 +738,10 @@ u8 FE_CrAP_IsItemLocked(s32 nAsset, SaveProfile* pProfile) {
         if (pProfile->nTourCardLevel >= 1) {
             nCount = 1;
         }
+        // EA bug: counts the groups whose aMedal is not 0, the best medal. aMedal is 3 for no medal
+        // (SaveProfile_InitNew sets all 29 to 3), so a new profile already counts 29 and unlocks
+        // every item of this kind with n up to 29, and each best medal won lowers the count. The
+        // menus' count of groups with a medal (FE_MessageTable.c message 175) tests aMedal != 3.
         for (i = 0; i < 29; i++) {
             if (pProfile->aMedal[i]) {
                 nCount++;
@@ -748,7 +771,9 @@ u8 FE_CrAP_IsItemLocked(s32 nAsset, SaveProfile* pProfile) {
         break;
     case 24:
         bLocked = 1;
-        for (i = 23; i < 16; i++) {         // EA bug: never runs (awards 23..38 were meant?)
+        // EA bug: i starts at 23 and runs while i < 16, so nothing is counted and only n <= 0
+        // unlocks; kind 23 reads bonus trophy ball n as aAward[23 + n] (awards 23..38).
+        for (i = 23; i < 16; i++) {
             if (pProfile->aAward[i].bWon) {
                 nCount++;
             }
@@ -788,20 +813,20 @@ u8 FE_CrAP_IsItemLocked(s32 nAsset, SaveProfile* pProfile) {
 }
 
 // Packs a date into one number: day * 1000000 + month * 10000 + year (FE_IntToDate unpacks it).
-int FE_DateToInt(int a, int b, int c) {
-    int n = c;
-    n += a * 10000;
-    n += b * 1000000;
-    return n;
+int FE_DateToInt(int nMonth, int nDay, int nYear) {
+    int nDate = nYear;
+    nDate += nMonth * 10000;
+    nDate += nDay * 1000000;
+    return nDate;
 }
 
-// Unpacks a date FE_DateToInt packed into its month (*pA), day (*pB) and year (*pC).
-void FE_IntToDate(int n, int* pA, int* pB, int* pC) {
-    *pB = n / 1000000;
-    n -= *pB * 1000000;
-    *pA = n / 10000;
-    n -= *pA * 10000;
-    *pC = n;
+// Unpacks a date FE_DateToInt packed into its month, day and year.
+void FE_IntToDate(int nDate, int* pMonth, int* pDay, int* pYear) {
+    *pDay = nDate / 1000000;
+    nDate -= *pDay * 1000000;
+    *pMonth = nDate / 10000;
+    nDate -= *pMonth * 10000;
+    *pYear = nDate;
 }
 
 // Notes which Create-A-Player assets are locked for pProfile, one bit each in aAssetLocked
@@ -1206,7 +1231,8 @@ void FE_CrAP_RandomizeAll(SaveProfile* pProfile) {
 }
 
 // Part nPart at a random subcategory (FE_CrAP_GetNumberOfSubcategoryIndicesForCategory; 0 when it
-// has none), then a random choice in it (fn_800797E0 with the same nChance), which is returned.
+// has none), then a random choice in it (FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem with the
+// same nChance), which is returned.
 int FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(SaveProfile* pProfile, s16 nPart, int nChance) {
     int nCount = FE_CrAP_GetNumberOfSubcategoryIndicesForCategory(nPart);
     int nPick;

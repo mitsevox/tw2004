@@ -1429,8 +1429,8 @@ int GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile) {
 // TW06: GM_GetGameProgress (by position). The profile's completion score: a point for each ladder
 // event and each PGA TOUR tournament won; half a point for a TOUR card, for each challenge group
 // with a medal, each of the first 23 awards, each of the 75 par-5 holes eagled (fn_800588F4), and
-// 14 golfers and 6 courses unlocked (the lists gStartLockedGolfers, gStartLockedCourses); plus the bonus progress
-// below.
+// 14 golfers and 6 courses unlocked (the lists gStartLockedGolfers, gStartLockedCourses); plus the
+// bonus progress below.
 f32 GM_GetGameProgress(SaveProfile* pProfile) {
     f32 f = 0.0f;
     int i;

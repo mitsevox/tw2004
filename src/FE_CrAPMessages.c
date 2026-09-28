@@ -1237,7 +1237,8 @@ void GM_vGetNumCrAPSaleItemsOwned(MsgArg* pArgs, MsgArg* pResult) {
 // (FE_CrAP_RandomizeCrAPCategoryInOneSubcategory): always for hair (3) and parts 11, 14, 15, 16 and
 // 21, and for parts 4 and 22 (left alone 80% of the time) and 5 and 6 (left alone 90%). Part 15
 // takes part 14's choice 95% of the time, part 9 is one of choices 0..2 (75%), 6 (10%), 4 (10%) or
-// 8 (5%), and part 10 gets a desirable choice 95% of the time (FE_CrAP_RandomizeCategoryWithUndesirableTest). The equipment tiers are not worked out again.
+// 8 (5%), and part 10 gets a desirable choice 95% of the time
+// (FE_CrAP_RandomizeCategoryWithUndesirableTest). The equipment tiers are not worked out again.
 void GM_vRandomizeCrAPBody(MsgArg* pArgs, MsgArg* pResult) {
     int nRoll = Misc_RandFunc(0) % 100;
     int nChoice;

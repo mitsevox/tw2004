@@ -1,7 +1,9 @@
-// PasswordManager.c (TW06's golf/earnings/passwordmanager.cpp; our spelling): the cheat codes
-// typed in the options menu (PasswordManager_TestPassword) and the unlocks they set, which hold for
-// every profile (lbl_80281DF4, and the bit arrays gPasswordEnteredBits and gSponsorPasswordBits); and the setup of
-// a new save profile.
+// PasswordManager.c (TW06's and TW07's golf/earnings/passwordmanager.cpp, a C++ class there; our
+// spelling): the cheat codes typed in the menus (PasswordManager_TestPassword) and the unlocks they
+// set, which hold for every profile (lbl_80281DF4, and the bit arrays gPasswordEnteredBits and
+// gSponsorPasswordBits): IsPasswordEntered, IsSponsorshipPasswordEntered, TestPassword and
+// SetDefaults, which TW07's class also has (TestPassword last there). Then, with no TW07
+// counterpart in this file, the set-up of a new save profile (SaveProfile_*).
 
 #include "game/save.h"
 #include "frontend/fe.h"
@@ -9,13 +11,15 @@
 #include "game/modes/pgatour.h"
 #include "game/modes/pgatoursim.h"
 
-u32 gPasswordEnteredBits[8];
-u32 gSponsorPasswordBits[16];
+u32 gPasswordEnteredBits[8];    // the cheats entered, one bit each (bits 0..6 used)
+u32 gSponsorPasswordBits[16];   // the sponsors whose code was entered, bit n for sponsor n (0..15)
 
 void SaveProfile_InitNew(SaveProfile* pProfile);
 void SaveProfile_InitCreatedGolfer(SaveProfile* pProfile);
 
-// The codes that set a bit of gSponsorPasswordBits, one each (some bits have two codes).
+// Sponsor n's code sets bit n of gSponsorPasswordBits. "lsfkajfd" (3, 4, 8) and "CXCbr883" (12, 14)
+// are listed more than once, and TestPassword stops at the first match, so bits 4, 8 and 14 have no
+// code that sets them.
 char* gSponsorPasswords[16] = {
     "91treSTR", "cgTR78qw", "CL45etUB", "lsfkajfd", "lsfkajfd", "FDGH597i", "YJHk342B", "Uit45TW6",
     "lsfkajfd", "kjnMR3qv", "R453DrTe", "BRi3498Z", "CXCbr883", "cDsa2fgY", "CXCbr883", "TS345329",
