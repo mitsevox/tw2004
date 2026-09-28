@@ -12,6 +12,10 @@ own files in its pass; the rest come here.
 | GameModeDriverPGATour.c GameModeDriverPGATour_SetTournament | the player's green speed option (options.n18) is saved but never put back after a tour round | 22cb76c (ro6) |
 | EventInfo.c FE_GetDateTimeIfClockEarly | `nYear < 2003 && nMonth < 10` is no date cutoff (Oct-Dec of an earlier year is not "early") | 22cb76c (ro6) |
 | GameAnalysis.c GameAnalysis_GetTipStat | fairway percentage divides by all holes, par 3s too | 22cb76c (ro6) |
+| PGATourSimulation.c GM_PgaTourSim_CheckEndOfTournamentAward | the major-win count skips the bUser test: a major won by the pro in slot 0 of a skipped tournament counts as the player's (award 36) | round 15 (ro2) |
+| PGATourSimulation.c GM_PgaTourSim_DistributeWinnings | no new place starts after row 70: entrants below it who made the cut share the last paid place's prize | round 15 (ro3) |
+| PGATourSimulation.c CalcParBreakers | nBirdies already includes eagles and the formula adds nEagles again | round 15 (ro3) |
+| FE_MessageTable.c GM_vMCLoadUser (menu message 35) | answers 1 or an error, never 0: the slot is backed up and marked loaded when the load failed | round 15 (ro5) |
 
 ## Open: behaviour proven possible, needs data or intent to settle
 | Where | What | What settles it |
@@ -31,6 +35,12 @@ own files in its pass; the rest come here.
 | GameMode17.c HoleFinished | checks only player 0's targets | whether the front end can start mode 17 with 2+ players |
 | GameMode6.c | no first-hole tips, no restart hook, stroke limit on (modes 7 / 8 differ) | intent only |
 | GameUICommands.c GM_vGetOption / GM_vSetOption | option numbers differ past 4; set 5 stores the music level without the volume | the disc's UI script (which numbers the in-round menu sends) |
+| PGATourSimulation.c SimTournamentWinner / CheckEndOfTournamentAward | bFirst is set before the playoff winner: a player tied first who loses the playoff may still get nWinStreak++ / nMajorWins++ | trace a real playoff (AdvancePlayer moves entrant 0 back to the playoff hole first) |
+| PGATourSimulation.c CalculateCutRow | with no row below 70th it returns the last row, so one entrant is cut anyway | needs a 30-way tie at the cut; intent only |
+| FE_CrAPMessages.c GM_vGetNumCrAPSaleItemsOwned / GM_vIsCrAPItemOnSale | empty sale slots stay -1 (fn_80077C1C): owned bit (u32)-1 read ~512 MB past aB1CC; "on sale" for a choice that does not exist | the disc's 'CR_A' data: any sale category with fewer than 5 eligible assets |
+| FE_CrAPMessages.c GM_vIsCrAPAnimInGolferLib | reads pB4->pChar->pLib with no NULL test on pChar | whether the menu golfer can be unloaded when the message comes |
+| FE_CrAPMessages.c GM_vIsCrAPItemEquipped | 16-byte variant-name buffer where the same call elsewhere uses 64 | the longest variant name in the data |
+| GameModeFourBall.c EndGame | adds nMoney to money.n14 where GameModeMatch adds nPrize | intent only |
 
 ## Dropped (checked: harmless or not a bug)
 AnimStream_AssignSlots / StartRead (streaming is never on: AnimStream_Init clears bOn);

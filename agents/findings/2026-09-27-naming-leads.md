@@ -474,3 +474,29 @@ Possible EA bugs, unlabelled: GameModeStableford_EndGame uses stroke play's priz
 points pays); GM_vGetOption / GM_vSetOption number options differently past 4 and set 5 stores the music
 level without the volume; gSpeedGolfLogCycle written then always overwritten. Possible unlabelled fakes:
 GameModeMatch.c PLAYER_AT next to PLAYER, gPlayers[(u32)i] in GetTeeHonors / GetHonors.
+
+## Round 15 (ro1-ro6) leftovers
+EA bugs: now tracked in agents/findings/2026-09-28-ea-bug-register.md (ro6 settled rounds 6-14; this
+round's labels and open items are there). EA file names: FE_CrAPMessages.c = TW06 / TW07
+FE_CrAPMessages.c; Calendar.c = TW07 Calendar.c / TW06 calendar.c; fe_stats.c = TW07 FE_Stats.c;
+FE_MessageTable.c's handlers = TW07 APT_FE_GameMessages.c (different order: pairing by order fails).
+Header lane done (ro1): Player placement momentum (fMomentumTurn / X / Z, fPlaceHeading), speed golf
+nSGFlags / nSGPoints / nSGHoleScore / nUISlot / fDriveLength / nRunStartLie, long-drive nDrivesTaken ..
+nPenaltyDrives, skins nSkinsWon / nSkinsTotal, CareerCalendar.nPopupType, 21 game.h prototypes,
+GameMode22_IsActive in EA form (same bytes, no __cntlzw), fUITimeFactor, nLieAngle, bCaddieTipsOff.
+Still open: ladder.h, mode26.h, earnings.h, challenge.h, rte.h; camera.h script.nCamera; fe.h FE_CrAP n4;
+GoEntry.c GameMode26_StartEvent; PgaEntrantMC n18 nWinnings; PgaStatCounts n44 nMonthWinnings; PgaPro f50
+historical score rank; course hole n04 rating; gpGame n4 scoring type, b136 custom course, b137..b139;
+gReplayData nF12 / nF14 weather; pgatoursim.h prototype "TW06:" tags are TW07 names; save.h aB1CC owned /
+aB344 newly unlocked / aB4BC marked new, SkinChoices.n5A7A gender, LogoRecord.b1020 kept; fe.h
+FEProfile aKind / aPart / aChoice = the day's sale items (part / list entry / choice; categories -1 / -2
+/ -3), b10640 logo editor works on logo106E0; GameModeReplay.c comments say b30C; src/README.md:50
+example pfn20C; event.c Event 22 / 23 comments call fMomentumX the turn (it moves sideways; fMomentumTurn
+turns). ~400 other prototype / definition mismatches: /home/user/scratch/tw/agents/ro1/protodiff.py
+(output protodiff_after.txt; 108 in include/, 150 differ in type): a later tool / lane item.
+Names for other files: MC.c MC_MemoryRequiredForOptions, fn_800A270C, fn_800A2740 declared void but their
+value is used through r3 (EA wrote return ...: same bytes); FE_Manager.c fn_80079AD4's comment says player
+1, code uses player 0; Code8002DB80.c Player_IsHoledNotState23 = in the cup and not GS_CONCEDED.
+Style questions for the owner: stub handlers named for their slot (GM_vCrAPMessage404_Empty,
+GM_vMessage25_Returns1, GM_vCommand133_Returns7, IG_vNoOp147): consistent across lanes? PGATourSimulation.c
+explicit_zero_data moved file-wide (was around one global): fake-match inventory item.
