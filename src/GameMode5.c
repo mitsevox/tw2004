@@ -458,9 +458,9 @@ u8 fn_800EBD60(u8 bCheck) {
                     return 0;
                 }
                 lbl_802822F4 = i;
-                if (fn_800F0818()) {
+                if (GM_Currently_RealtimeMode()) {
                     GM_SetModeType(24);
-                    fn_800F07C8();
+                    GameModeDriverRTE_StartNextChallenge();
                 } else {
                     GM_SetModeType(5);
                     fn_800EAF7C();
@@ -569,7 +569,7 @@ void fn_800EC1E0(void) {
     int nProfile;
     int nMoney;
     lbl_80282328();
-    if (!fn_800F0818()) {
+    if (!GM_Currently_RealtimeMode()) {
         nMedal = fn_800EC558();
         if (!fn_801025F4() && nMedal != 3) {
             if (nMedal < gpSaveData[gPlayers[0].nIndex].aMedal[fn_800EAC7C()]) {
@@ -1134,7 +1134,7 @@ void fn_800ED554(void) {
     gpGame->pfn224();
     fn_800E5714(2);
     GM_ClearDataForNewGame();
-    if (fn_800F0818()) {
+    if (GM_Currently_RealtimeMode()) {
         GameModeDriverRTE_StartEvent();
     } else {
         fn_800EAF7C();

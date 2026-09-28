@@ -552,7 +552,7 @@ void GameModeFourBall_Init(void);                 // mode 20 (GameModeFourBall.c
 void GameModeMatch_Init(void);                 // mode 1 (GameModeMatch.c)
 void fn_800EACD8(void);                 // mode 5
 void fn_800ED738(void);                 // mode 9
-void fn_800F0448(void);                 // mode 24
+void GameModeDriverRTE_Init(void);                 // mode 24
 void GameModeReplay_Init(void);                 // mode 10
 void fn_800F2984(void);                 // mode 14
 void fn_800F39F4(void);                 // mode 15
@@ -600,8 +600,8 @@ void fn_800EDAE0(int nPlayer);          // GameMode9.c
 void fn_800EDE78(void);                 // GameModeDriverPGATour.c
 u8   fn_800EE470(void);                 // GameModeDriverPGATour.c
 void GameModeDriverRTE_StartEvent(void);                 // GameModeDriverRTE.c
-void fn_800F07C8(void);                 // GameModeDriverRTE.c
-u8   fn_800F0818(void);                 // GameModeDriverRTE.c
+void GameModeDriverRTE_StartNextChallenge(void);                 // GameModeDriverRTE.c
+u8   GM_Currently_RealtimeMode(void);                 // GameModeDriverRTE.c
 
 // GameModeDriver.c: the career calendar. Its functions come in tables of three, indexed by
 // CareerCalendar.nDriver: no career, the PGA TOUR season (GameModeDriverPGATour.c), the real-time

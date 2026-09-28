@@ -262,7 +262,7 @@ void GM_SetModeType(int nMode) {
         GameModeDriverPGATour_Init();
         break;
     case 24:
-        fn_800F0448();
+        GameModeDriverRTE_Init();
         break;
     case 25:
         GameModeBattle_Init();

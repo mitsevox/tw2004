@@ -10,8 +10,8 @@
 
 // This file's globals, defined last address first (an object's .bss is laid out in reverse).
 s32 lbl_80281680 = 4;                       // gSession.options.nC saved while an event runs
-void (*lbl_8028235C)(void);                 // mode 5's pfnShutdown, called from ours (fn_800F0678)
-void (*lbl_80282358)(void);                 // mode 5's pfnEndGame, called from ours (fn_800F0BBC)
+void (*lbl_8028235C)(void);                 // mode 5's pfnShutdown, called from ours (GameModeDriverRTE_Shutdown)
+void (*lbl_80282358)(void);                 // mode 5's pfnEndGame, called from ours (GameModeDriverRTE_EndGame)
 s32 lbl_80282354;                           // the event's round
 s32 lbl_80282350;                           // the event (gRTEs.aEvent index)
 u8  lbl_8028234C;                           // 1 while an event runs
@@ -21,28 +21,32 @@ RTEData gRTEs;
 void GameModeDriverRTE_UnregisterStreamClients(void);
 void GameModeDriverRTE_Locale_LoadRTEcFromStream(UStreamObject* pObject);
 void GameModeDriverRTE_LoadRTEsFromStream(UStreamObject* pObject);
-s32 fn_800F0E18(s32 i);
+s32 GameModeDriverRTE_GetEventDays(s32 i);
 s32 fn_800F0E20(s32* pRound);
 void fn_800F0E30(s32 nId, s32 nRound);
 
 void  GameModeDriverRTE_Locale_LoadRTEnFromStream(UStreamObject* pObject);
-void  fn_800F0678(void);
-void  fn_800F0BBC(void);
-s32   fn_800F0820(void);
-u8    fn_800F0DB8(s32 nMonth, s32 nDay, s32 nYear, s32* pId, s32* pRound);
+void  GameModeDriverRTE_Shutdown(void);
+void  GameModeDriverRTE_EndGame(void);
+s32   GM_RealtimeMode_GetNEventsWon(void);
+u8    GameModeDriverRTE_GetEventByDateMDY(s32 nMonth, s32 nDay, s32 nYear, s32* pId, s32* pRound);
 s32   fn_800F0F54(void);
 
-// Mode 24 starts: match-play callbacks (GameModeMatch) around the event's own start and end.
-void fn_800F0448(void) {
-    gpGame->pfnInit = fn_800F0448;
-    gpGame->pfnShutdown = fn_800F0678;
+// Game mode 24 (real-time events; TW06 GM_Realtime_mode) starts, from GameRound's mode switch:
+// match play's golfer order, honors, hole, game-over and playoff rules (GameModeMatch) with this
+// file's GameModeDriverRTE_Shutdown and GameModeDriverRTE_EndGame; no mulligans, nC and n10 1, nDC
+// 0, single view. The event itself is played later as a mode 5 challenge
+// (GameModeDriverRTE_StartEvent).
+void GameModeDriverRTE_Init(void) {
+    gpGame->pfnInit = GameModeDriverRTE_Init;
+    gpGame->pfnShutdown = GameModeDriverRTE_Shutdown;
     gpGame->pfnSetupNextGolfer = fn_800E9F14;
     gpGame->pfnGetHonors = GameModeMatch_GetHonors;
     gpGame->pfnHoleFinished = GameModeMatch_HoleFinished;
     gpGame->pfnGameFinished = GameModeMatch_GameFinished;
     gpGame->pfnGoToPlayoff = GameModeMatch_GoToPlayoff;
     gpGame->pfnEndHole = GameModeMatch_EndHole;
-    gpGame->pfnEndGame = fn_800F0BBC;
+    gpGame->pfnEndGame = GameModeDriverRTE_EndGame;
     gpGame->n4 = 1;
     gpGame->nMulligans = 0;
     gpGame->nC = 1;
@@ -63,6 +67,7 @@ void GameModeDriverRTE_UnregisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('RTEn');
 }
 
+// The 'RTEc' stream object: the 118 calendar entries, copied into gRTEs.aEvent.
 void GameModeDriverRTE_Locale_LoadRTEcFromStream(UStreamObject* pObject) {
     // port: the 'RTEc' object is copied straight into gRTEs.aEvent (RTEvent[118]); it is big-endian
     //       on disc, so a little-endian port converts it field by field here
@@ -70,6 +75,8 @@ void GameModeDriverRTE_Locale_LoadRTEcFromStream(UStreamObject* pObject) {
     Stream_StreamLoadFixedSize(pObject, sizeof(gRTEs.aEvent), gRTEs.aEvent);
 }
 
+// The 'RTEs' stream object: the events' 111 challenges (TW06 scenarios), copied into
+// gRTEs.aChallenge.
 void GameModeDriverRTE_LoadRTEsFromStream(UStreamObject* pObject) {
     // port: the 'RTEs' object is copied straight into gRTEs.aChallenge (Challenge[111]); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
@@ -77,7 +84,9 @@ void GameModeDriverRTE_LoadRTEsFromStream(UStreamObject* pObject) {
     Stream_StreamLoadFixedSize(pObject, sizeof(gRTEs.aChallenge), gRTEs.aChallenge);
 }
 
-// The 'RTEn' object: the names block is copied out.
+// The 'RTEn' stream object: the events' names and descriptions (the string table RTEvent.nName and
+// nDesc index), copied into a new 16-byte aligned block at gRTEs.pNames; the stream's copy is
+// freed. An empty object leaves pNames as it was.
 void GameModeDriverRTE_Locale_LoadRTEnFromStream(UStreamObject* pObject) {
     void* pData;
     u32 nSize = fn_8000E81C(pObject, &pData);
@@ -88,8 +97,11 @@ void GameModeDriverRTE_Locale_LoadRTEnFromStream(UStreamObject* pObject) {
     }
 }
 
-// The mode ends: the challenge's cleanup, and the options it changed come back.
-void fn_800F0678(void) {
+// Mode 24's shutdown (also wrapped around mode 5's while an event's challenge runs): mode 5's own
+// shutdown when one was saved, gpGame nC and n10 back to 1, the options nC and wind that
+// GameModeDriverRTE_StartEvent changed put back, and the event is no longer running
+// (GM_Currently_RealtimeMode).
+void GameModeDriverRTE_Shutdown(void) {
     if (lbl_8028235C) {
         lbl_8028235C();
     }
@@ -100,8 +112,12 @@ void fn_800F0678(void) {
     lbl_8028234C = 0;
 }
 
-// Starts today's event: the options are saved (wind off) and, if the event is on and has a
-// challenge, it runs in mode 5 with this file's shutdown and end-game wrapped around mode 5's.
+// Starts the selected event (GM_RealtimeMode_SelectEvent): the options nC and wind are saved and
+// set to 4 and 0 (calm), and the event counts as running. If the entry is not switched off (bOff)
+// and has a challenge, one player plays it in mode 5: the RTE challenge table (gRTEs.aChallenge)
+// goes in, challenge nChallenge - 1 is selected and started, and mode 5's shutdown and end game are
+// saved and replaced by GameModeDriverRTE_Shutdown and GameModeDriverRTE_EndGame. Called from the
+// menu (FE_MessageTable.c) and on a restart (GameMode5).
 void GameModeDriverRTE_StartEvent(void) {
     lbl_80281680 = gSession.options.nC;
     lbl_80282348 = gSession.options.nWind;
@@ -117,27 +133,32 @@ void GameModeDriverRTE_StartEvent(void) {
             fn_800EAF7C();
             lbl_8028235C = gpGame->pfnShutdown;
             lbl_80282358 = gpGame->pfnEndGame;
-            gpGame->pfnShutdown = fn_800F0678;
-            gpGame->pfnEndGame = fn_800F0BBC;
+            gpGame->pfnShutdown = GameModeDriverRTE_Shutdown;
+            gpGame->pfnEndGame = GameModeDriverRTE_EndGame;
         }
     }
 }
 
-// The next challenge of the event starts.
-void fn_800F07C8(void) {
+// The next challenge of the event's group starts (GameMode5, after the previous one, in mode 24):
+// mode 5's challenge start, then its shutdown and end game are saved and replaced by
+// GameModeDriverRTE_Shutdown and GameModeDriverRTE_EndGame, as GameModeDriverRTE_StartEvent does.
+void GameModeDriverRTE_StartNextChallenge(void) {
     fn_800EAF7C();
     lbl_8028235C = gpGame->pfnShutdown;
     lbl_80282358 = gpGame->pfnEndGame;
-    gpGame->pfnShutdown = fn_800F0678;
-    gpGame->pfnEndGame = fn_800F0BBC;
+    gpGame->pfnShutdown = GameModeDriverRTE_Shutdown;
+    gpGame->pfnEndGame = GameModeDriverRTE_EndGame;
 }
 
-u8 fn_800F0818(void) {
+// 1 while a real-time event is being played (from GameModeDriverRTE_StartEvent to
+// GameModeDriverRTE_Shutdown).
+u8 GM_Currently_RealtimeMode(void) {
     return lbl_8028234C;
 }
 
-// How many events profile 0 has won.
-s32 fn_800F0820(void) {
+// How many of the 75 real-time event awards profile 0 has won (SaveProfile.aRTEAward); 0 before the
+// first win (GameModeDriverRTE_QueueWinMessages).
+s32 GM_RealtimeMode_GetNEventsWon(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
     SaveProfile* p = &gpSaveData[nPlayer];
     s32 n = 0;
@@ -150,12 +171,14 @@ s32 fn_800F0820(void) {
     return n;
 }
 
-// The messages after an event win (before its award is marked won): 0 for the first win, one for
-// some events, and one of four at random when neither applies.
-void fn_800F08A8(void) {
+// The HUD messages after an event is won (GUI_QueueMessage queue 10), queued before its award is
+// marked won: message 0 for the player's first win (no award won yet); a message of its own for
+// some events (by the selected event's index: 0xD..0x19, or 5); when neither applies, one of 2, 3,
+// 4 or 7 at random.
+void GameModeDriverRTE_QueueWinMessages(void) {
     u8 bFirst = 0;
     u8 bSaid;
-    if (!fn_800F0820()) {
+    if (!GM_RealtimeMode_GetNEventsWon()) {
         GUI_QueueMessage(10, 0, 0, 0);
         bFirst = 1;
     }
@@ -229,15 +252,19 @@ void fn_800F08A8(void) {
     }
 }
 
-// The event is over: with a medal, its reward, the messages, and the event's flag in the profile.
-void fn_800F0BBC(void) {
+// The event's end of game: mode 5's own end game first (called unchecked: it is saved by
+// GameModeDriverRTE_StartEvent), then with any medal (fn_800EC558 below 3) player 0 is paid the
+// challenge's best-medal reward (GameModeDriverRTE_GetPurse's amount, whatever the medal), the
+// money message (queue 0, 0x6F) and GameModeDriverRTE_QueueWinMessages go up, and profile 0's award
+// for the event is marked won with today's date (fn_800D7770).
+void GameModeDriverRTE_EndGame(void) {
     s32 nReward;
     lbl_80282358();
     if (fn_800EC558() != 3) {
         nReward = gRTEs.aChallenge[gRTEs.aEvent[lbl_80282350].nChallenge - 1].aMedal[0].nReward;
         GM_Earnings_AwardMoney(0, nReward, 0);
         GUI_QueueMessage(0, 0x6F, nReward, 0);
-        fn_800F08A8();
+        GameModeDriverRTE_QueueWinMessages();
         fn_800D7770(0, &gpSaveData->aRTEAward[gRTEs.aEvent[lbl_80282350].nId]);
     }
 }
@@ -257,7 +284,9 @@ void GameModeDriverRTE_GetCurrentDate(s32* pMonth, s32* pDay, s32* pYear) {
     *pYear = nYear;
 }
 
-// The event held on a date (and which of its days).
+// Finds the event held on day number nDate (CalDate): the first entry whose start date for that
+// year is set and within GameModeDriverRTE_GetEventDays of it. Found: *pId is its index in
+// gRTEs.aEvent, *pRound its day (1-based), and 1 is returned; else -1, 0 and 0.
 u8 GameModeDriverRTE_GetEventByDate(u16 nDate, s32* pId, s32* pRound) {
     s32 nMonth;
     s32 nDay;
@@ -274,7 +303,7 @@ u8 GameModeDriverRTE_GetEventByDate(u16 nDate, s32* pId, s32* pRound) {
     for (i = 0; i < 118; i++) {
         if (gRTEs.aEvent[i].aDate[nSeason] != 0) {
             d = nDate - gRTEs.aEvent[i].aDate[nSeason];
-            if (d >= 0 && d < fn_800F0E18(i)) {
+            if (d >= 0 && d < GameModeDriverRTE_GetEventDays(i)) {
                 *pId = i;
                 bFound = 1;
                 *pRound = d + 1;
@@ -289,14 +318,15 @@ u8 GameModeDriverRTE_GetEventByDate(u16 nDate, s32* pId, s32* pRound) {
     return bFound;
 }
 
-u8 fn_800F0DB8(s32 nMonth, s32 nDay, s32 nYear, s32* pId, s32* pRound) {
+// GameModeDriverRTE_GetEventByDate for a month, day and year.
+u8 GameModeDriverRTE_GetEventByDateMDY(s32 nMonth, s32 nDay, s32 nYear, s32* pId, s32* pRound) {
     u16 nDate;
     CalDate_SetMDY(&nDate, nMonth, nDay, nYear);
     return GameModeDriverRTE_GetEventByDate(nDate, pId, pRound);
 }
 
 // How many days event i lasts: always one.
-s32 fn_800F0E18(s32 i) {
+s32 GameModeDriverRTE_GetEventDays(s32 i) {
     return 1;
 }
 
@@ -320,7 +350,7 @@ s32 fn_800F0E3C(void) {
     s32 nId;
     s32 nRound;
     GameModeDriverRTE_GetCurrentDate(&nMonth, &nDay, &nYear);
-    if (fn_800F0DB8(nMonth, nDay, nYear, &nId, &nRound)) {
+    if (GameModeDriverRTE_GetEventByDateMDY(nMonth, nDay, nYear, &nId, &nRound)) {
         fn_800F0E30(nId, nRound);
         return 1;
     }

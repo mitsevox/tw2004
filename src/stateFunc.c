@@ -534,7 +534,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
         }
     }
     if (gPlayers[nPlayer].bC2E == 0 && !Player_IsCPU(nPlayer) && GM5_IsChallengeRunning() && fn_800ED540()) {
-        if (fn_800F0818()) {
+        if (GM_Currently_RealtimeMode()) {
             fn_800E502C(fn_800EAC7C());
         } else {
             fn_800E4FFC(fn_800EAC7C());

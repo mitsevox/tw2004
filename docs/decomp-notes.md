@@ -1131,7 +1131,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] An enum-typed local holding 0 is not folded into an index multiply.** EA's
   `PlayerNumber_t nPlayer = PLR_1_e; gpSaveData[nPlayer]` gives `li rX, 0; mullw`; a literal 0,
   any integer local, a const global, an inline helper and `(Enum)0` all fold the multiply away
-  (GameMode24 `fn_800F0820`, 82.9% -> 100; 12 times in GameMode23). EA style, no fake-match
+  (GameMode24 `GM_RealtimeMode_GetNEventsWon`, 82.9% -> 100; 12 times in GameMode23). EA style, no fake-match
   comment; the type is TW06's.
 - **[verified] Two neighbouring words handled with 64-bit operations are one `u64`.** When the
   code ORs, ANDs and tests two adjacent words together (`and`/`xor`/`or.` on both halves, an AND
