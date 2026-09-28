@@ -309,7 +309,7 @@ s32 GameModeSkillZoneBase_GetShotEarned(s32 nPlayer) {
         return GameModeSkillZoneCapture_GetShotEarned(nPlayer);
     }
     if (Game_GetMode() == 0x10) {
-        return fn_800F59CC(nPlayer);
+        return GameModeSkillZoneTarget_GetShotEarned(nPlayer);
     }
     if (Game_GetMode() == 0x11) {
         return fn_800F6A00(nPlayer);
@@ -333,7 +333,7 @@ s32 GameModeSkillZoneBase_GetDriveMultiplier(s32 nPlayer) {
         return GameModeSkillZoneTimed_GetDriveMultiplier(nPlayer);
     }
     if (Game_GetMode() == 0x10) {
-        return fn_800F59D4(nPlayer);
+        return GameModeSkillZoneTarget_GetDriveMultiplier(nPlayer);
     }
     return 0;
 }

@@ -914,7 +914,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] `while (i < N) a[i++] = v;` and `for` unroll differently.** Clearing an 18-entry
   array (GameMode2 `fn_800F8B08`), the `while (h < 18)` form unrolls by 9 and the `for` form by
   6; count the stores per iteration to tell which one EA wrote. Likewise a five-player reset in GameMode16
-  `fn_800F57C8` matched only as `i = 0; while (i < 5) gPlayers[i++].nDC0 = 20;`, not as a `for`
+  `GameModeSkillZoneTarget_ClearPerHoleData` matched only as `i = 0; while (i < 5) gPlayers[i++].nDC0 = 20;`, not as a `for`
   or a pointer walk.
 
 ### Registers, declaration order and the stack

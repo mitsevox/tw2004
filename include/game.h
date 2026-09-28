@@ -556,7 +556,7 @@ void GameModeDriverRTE_Init(void);                 // mode 24
 void GameModeReplay_Init(void);                 // mode 10
 void GameModeSkillZoneCapture_Init(void);                 // mode 14
 void GameModeSkillZoneHorse_Init(void);                 // mode 15
-void fn_800F4B40(void);                 // mode 16
+void GameModeSkillZoneTarget_Init(void);                 // mode 16
 void fn_800F5AAC(void);                 // mode 17
 void GameModeSkillZoneTimed_Init(void);                 // mode 13
 void GameModeSkins_Init(void);                 // mode 2
@@ -670,8 +670,8 @@ void GameModeSkillZoneBase_PlayComment(s32 nMsg, s32 a);
 // argument on; the getters ignore it (not GameModeSkillZoneCapture_GetTotalTargetsHit: it is called directly, per player).
 int  GameModeSkillZoneCapture_GetTotalTargetsHit(int nPlayer);          // GameMode14.c
 s32  GameModeSkillZoneCapture_GetShotEarned(s32 a);                // GameMode14.c
-s32  fn_800F59CC(s32 a);                // GameMode16.c
-s32  fn_800F59D4(s32 a);                // GameMode16.c
+s32  GameModeSkillZoneTarget_GetShotEarned(s32 a);                // GameMode16.c
+s32  GameModeSkillZoneTarget_GetDriveMultiplier(s32 a);                // GameMode16.c
 s32  fn_800F6A00(s32 a);                // GameMode17.c
 s32  fn_800F6A34(s32 a);                // GameMode17.c
 s32  GameModeSkillZoneTimed_GetShotEarned(s32 a);                // GameMode13.c

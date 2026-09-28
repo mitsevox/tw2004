@@ -241,7 +241,7 @@ void GM_SetModeType(int nMode) {
         GameModeSkillZoneHorse_Init();
         break;
     case 16:
-        fn_800F4B40();
+        GameModeSkillZoneTarget_Init();
         break;
     case 17:
         fn_800F5AAC();
