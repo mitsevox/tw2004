@@ -560,8 +560,8 @@ void GameModeSkillZoneTarget_Init(void);                 // mode 16
 void GameModeSkillZoneTargetToTarget_Init(void);                 // mode 17
 void GameModeSkillZoneTimed_Init(void);                 // mode 13
 void GameModeSkins_Init(void);                 // mode 2
-void fn_800F944C(void);                 // mode 6
-void fn_800F9610(void);                 // mode 7
+void SpeedGolfMatch_Init(void);                 // mode 6
+void SpeedGolfPoints_Init(void);                 // mode 7
 void SpeedGolf_Init(void);                 // mode 8
 void GameModeStableford_Init(void);                 // mode 18 (GameModeStableford.c)
 void GameMode12_Init(void);                 // mode 12 (GameMode12.c)
@@ -690,8 +690,8 @@ s32  fn_800F93D8(int h);                // the next selected hole after h (-1: n
 s32  fn_800F9414(int h);                // the selected hole before h (-1: none)
 
 // GameMode7.c
-void fn_800F9824(void);
-void fn_800F9844(void);
+void SpeedGolf_LoadHole(void);
+void SpeedGolf_StartGamePreData(void);
 
 // GameMode8.c (modes 6, 7 and 8 share it)
 extern u8  gSpeedGolfFirstHoleTips;

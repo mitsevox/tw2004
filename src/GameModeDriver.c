@@ -22,13 +22,13 @@
 
 // The rows of the day-details popups (EventInfo.c): PGA TOUR in progress, results, upcoming,
 // before it starts; real-time today's event, results, upcoming.
-void fn_8011D280(int nRow, char* szTitle, char* szText);
-void fn_8011D4DC(int nRow, char* szTitle, char* szText);
-void fn_8011D658(int nRow, char* szTitle, char* szText);
-void fn_8011D858(int nRow, char* szTitle, char* szText);
-void fn_8011D878(int nRow, char* szTitle, char* szText);
-void fn_8011DA44(int nRow, char* szTitle, char* szText);
-void fn_8011DC30(int nRow, char* szTitle, char* szText);
+void PGATourPopup_GetRow_EventInProgress(int nRow, char* szTitle, char* szText);
+void PGATourPopup_GetRow_EventResults(int nRow, char* szTitle, char* szText);
+void PGATourPopup_GetRow_EventUpcoming(int nRow, char* szTitle, char* szText);
+void PGATourPopup_GetRow_EventNextEvent(int nRow, char* szTitle, char* szText);
+void RealtimePopup_GetRow_TodaysEvent(int nRow, char* szTitle, char* szText);
+void RealtimePopup_GetRow_EventResults(int nRow, char* szTitle, char* szText);
+void RealtimePopup_GetRow_EventUpcoming(int nRow, char* szTitle, char* szText);
 
 void GetRankText(int nRank, char* sz);
 void Calendar_GetEventNameLine(u16 nDate, char* sz);
@@ -362,8 +362,9 @@ s32 PGATour_GetPopupType(u16 nDate) {
 
 // A row of the PGA TOUR calendar's day-details popup (row 0, "Event:", is the calendar screen's):
 // row 1 blank, row 2 "Dates:" and the selected day's tournament's first and last days ("<start> -
-// <end>"); the other rows come from the popup CalendarState.n1C names (0 in progress fn_8011D280, 1
-// results fn_8011D4DC, 2 upcoming fn_8011D658, 3 before it starts fn_8011D858).
+// <end>"); the other rows come from the popup CalendarState.n1C names (0 in progress
+// PGATourPopup_GetRow_EventInProgress, 1 results PGATourPopup_GetRow_EventResults, 2 upcoming
+// PGATourPopup_GetRow_EventUpcoming, 3 before it starts PGATourPopup_GetRow_EventNextEvent).
 void PGATour_GetPopupRow(int nRow, char* szTitle, char* szText) {
     s32 nId;
     s32 nRound;
@@ -389,16 +390,16 @@ void PGATour_GetPopupRow(int nRow, char* szTitle, char* szText) {
     default:
         switch (CalendarState.n1C) {
         case 0:
-            fn_8011D280(nRow, szTitle, szText);
+            PGATourPopup_GetRow_EventInProgress(nRow, szTitle, szText);
             return;
         case 1:
-            fn_8011D4DC(nRow, szTitle, szText);
+            PGATourPopup_GetRow_EventResults(nRow, szTitle, szText);
             return;
         case 2:
-            fn_8011D658(nRow, szTitle, szText);
+            PGATourPopup_GetRow_EventUpcoming(nRow, szTitle, szText);
             return;
         case 3:
-            fn_8011D858(nRow, szTitle, szText);
+            PGATourPopup_GetRow_EventNextEvent(nRow, szTitle, szText);
             return;
         }
         break;
@@ -548,8 +549,8 @@ s32 RealTime_GetPopupType(u16 nDate) {
 
 // A row of the real-time events calendar's day-details popup (row 0, "Event:", is the calendar
 // screen's): row 1 "Date:" and the selected day, row 2 blank; the other rows come from the popup
-// CalendarState.n1C names (4 today's event fn_8011D878, 5 results fn_8011DA44, 6 upcoming
-// fn_8011DC30).
+// CalendarState.n1C names (4 today's event RealtimePopup_GetRow_TodaysEvent, 5 results
+// RealtimePopup_GetRow_EventResults, 6 upcoming RealtimePopup_GetRow_EventUpcoming).
 void RealTime_GetPopupRow(int nRow, char* szTitle, char* szText) {
     char szDate[12];
 
@@ -566,13 +567,13 @@ void RealTime_GetPopupRow(int nRow, char* szTitle, char* szText) {
     default:
         switch (CalendarState.n1C) {
         case 4:
-            fn_8011D878(nRow, szTitle, szText);
+            RealtimePopup_GetRow_TodaysEvent(nRow, szTitle, szText);
             return;
         case 5:
-            fn_8011DA44(nRow, szTitle, szText);
+            RealtimePopup_GetRow_EventResults(nRow, szTitle, szText);
             return;
         case 6:
-            fn_8011DC30(nRow, szTitle, szText);
+            RealtimePopup_GetRow_EventUpcoming(nRow, szTitle, szText);
             return;
         }
         break;

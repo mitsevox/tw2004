@@ -208,10 +208,10 @@ void GM_SetModeType(int nMode) {
         GameMode4_Init();
         break;
     case 6:
-        fn_800F944C();
+        SpeedGolfMatch_Init();
         break;
     case 7:
-        fn_800F9610();
+        SpeedGolfPoints_Init();
         break;
     case 8:
         SpeedGolf_Init();

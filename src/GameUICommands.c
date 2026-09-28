@@ -298,8 +298,8 @@ void  GUI_StartAwardUI(void);
 void  GUI_MuteForScoreCard(void);
 void  GUI_SetUnreadFlag(u8 b);
 void  GUI_QueueTip(int n);
-int   fn_800E5E54(void);
-f32   fn_800E6578(int nPlayer, u32 nStat);
+int   GameAnalysis_PickTip(void);
+f32   GameAnalysis_GetTipStat(int nPlayer, u32 nStat);
 s32   fn_800E8114(int nPlayer);
 int   GM_BestBallMode_GetTeamRelativeScore(int nPlayer, u8 bCurrent);
 u8    PlayNow_IsSpeedGolf(void);
@@ -1267,9 +1267,9 @@ void fn_80087734(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = PlayNow_GetScoreToTarget();
 }
 
-// Show the tip fn_800E5E54 picks (14: none).
+// Show the tip GameAnalysis_PickTip picks (14: none).
 void fn_80087764(MsgArg* pArgs, MsgArg* pResult) {
-    int nTip = fn_800E5E54();
+    int nTip = GameAnalysis_PickTip();
 
     if (nTip != 14) {
         GUI_QueueTip(nTip);
@@ -1277,7 +1277,7 @@ void fn_80087764(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80087790(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->f = fn_800E6578(pArgs[0].i, pArgs[1].i);
+    pResult->f = GameAnalysis_GetTipStat(pArgs[0].i, pArgs[1].i);
 }
 
 // One of the game options, picked by pArgs[0].

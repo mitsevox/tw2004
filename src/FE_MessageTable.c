@@ -74,7 +74,7 @@ void Gaud_ExitFE(void);
 void Gaud_PlayUISound(int n);
 void fn_8010F2FC(MsgArg* pArgs, MsgArg* pResult);
 void fn_8010F3A4(MsgArg* pArgs, MsgArg* pResult);
-void fn_8011DF90(MsgArg* pArgs, MsgArg* pResult);
+void TrophyRoom_GetRTEAwardStatus(MsgArg* pArgs, MsgArg* pResult);
 void fn_80123FF8(void);
 void Gba_SetState(s32 v);
 s32  fn_8012411C(void);
@@ -225,8 +225,8 @@ void UIStatsRankings_SetActiveStat(MsgArg* pArgs, MsgArg* pResult);
 void UIStatsRankings_GetIndStatsRow(MsgArg* pArgs, MsgArg* pResult);
 void fn_8011D268(MsgArg* pArgs, MsgArg* pResult);
 void fn_8011D274(MsgArg* pArgs, MsgArg* pResult);
-void fn_8011DDFC(MsgArg* pArgs, MsgArg* pResult);
-void fn_8011DEF0(MsgArg* pArgs, MsgArg* pResult);
+void FE_GetNextRealtimeEventInfo(MsgArg* pArgs, MsgArg* pResult);
+void FE_GetDateTimeIfClockEarly(MsgArg* pArgs, MsgArg* pResult);
 void LadderMenu_SetNodePos(MsgArg* pArgs, MsgArg* pResult);
 void LadderMenu_GetNodePos(MsgArg* pArgs, MsgArg* pResult);
 void LadderMenu_GetEventText(MsgArg* pArgs, MsgArg* pResult);
@@ -1192,8 +1192,8 @@ void fn_80079EA8(void) {
     lbl_801D77A8[583] = fn_80109618;
     lbl_801D77A8[584] = fn_80109650;
     lbl_801D77A8[518] = fn_80083BA4;
-    lbl_801D77A8[536] = fn_8011DDFC;
-    lbl_801D77A8[544] = fn_8011DEF0;
+    lbl_801D77A8[536] = FE_GetNextRealtimeEventInfo;
+    lbl_801D77A8[544] = FE_GetDateTimeIfClockEarly;
     lbl_801D77A8[543] = fn_80109514;
     lbl_801D77A8[587] = fn_8010969C;
     lbl_801D77A8[588] = fn_80109700;
@@ -5443,7 +5443,7 @@ void fn_80084B88(MsgArg* pArgs, MsgArg* pResult) {
         fn_8010F3A4(pArgs, pResult);
         return;
     case 3:
-        fn_8011DF90(pArgs, pResult);
+        TrophyRoom_GetRTEAwardStatus(pArgs, pResult);
         return;
     case 2:
         return;

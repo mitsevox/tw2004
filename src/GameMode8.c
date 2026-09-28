@@ -146,7 +146,7 @@ void  SpeedGolf_StartComment(s32 nLine, s32 a);
 void SpeedGolf_Init(void) {
     gpGame->pfnInit = SpeedGolf_Init;
     gpGame->pfnShutdown = SpeedGolf_Shutdown;
-    gpGame->pfn1EC = fn_800F9844;
+    gpGame->pfn1EC = SpeedGolf_StartGamePreData;
     gpGame->pfnSetupNextGolfer = SpeedGolf_SetupNextGolfer;
     gpGame->pfnGetHonors = SpeedGolf_GetHonors;
     gpGame->pfnHoleFinished = SpeedGolf_HoleFinished;
@@ -154,7 +154,7 @@ void SpeedGolf_Init(void) {
     gpGame->pfnGoToPlayoff = SpeedGolf_GoToPlayoff;
     gpGame->pfnEndHole = SpeedGolf_EndHole;
     gpGame->pfnEndGame = SpeedGolf_EndGame;
-    gpGame->pfn1E4 = fn_800F9824;
+    gpGame->pfn1E4 = SpeedGolf_LoadHole;
     gpGame->pfn220 = SpeedGolf_Update;
     gpGame->pfn230 = SpeedGolf_RenderBallTarget;
     gpGame->pfn234 = SpeedGolf_CheckControllerPulled;
@@ -201,8 +201,8 @@ void SpeedGolf_Shutdown(void) {
 }
 
 // Speed golf's golfer states go in as a round starts (mode 6's pfn1EC; modes 7 and 8 through
-// GameMode7.c's fn_800F9844): states 12 and 24 the shot and the run to the ball (SpeedGolf_Run*),
-// 25 the countdown before a hole (SpeedGolf_Countdown*), 26 the end of the player's hole
+// GameMode7.c's SpeedGolf_StartGamePreData): states 12 and 24 the shot and the run to the ball
+// (SpeedGolf_Run*), 25 the countdown before a hole (SpeedGolf_Countdown*), 26 the end of the player's hole
 // (SpeedGolf_HoleOver*). SpeedGolf_Shutdown puts the normal ones back.
 void SpeedGolf_SetGolferStates(void) {
     sGolferStateEngineTable[12].pfnEnter = SpeedGolf_RunInit;
@@ -514,7 +514,7 @@ void SpeedGolf_ResetRunDelay(int nPlayer) {
     gPlayers[nPlayer].nC38 = 59;
 }
 
-// A hole starts (through GameMode7.c's fn_800F9824, the pfn1E4 of modes 6, 7 and 8): every player's
+// A hole starts (through GameMode7.c's SpeedGolf_LoadHole, the pfn1E4 of modes 6, 7 and 8): every player's
 // speed golf flags (nC3C) and event flags (uC48) are cleared, the golfer is turned to the target
 // (animation 1, emotion updated) and goes to state 25, the countdown.
 void SpeedGolf_StartHole(void) {

@@ -605,7 +605,7 @@ void GUI_ClearShownTips(void) {
 }
 
 // Flags tip nTip to be shown on the UI's next update (pending bit 0x20: message 0x21 with nTip).
-// Below 15 a statistic tip (fn_800E5E54's pick, through the menu's tip command): dropped during a
+// Below 15 a statistic tip (GameAnalysis_PickTip's pick, through the menu's tip command): dropped during a
 // playoff (gpGame->bD4), else marked shown (tip 12 excepted) so it is not picked again this hole. 15
 // and up, a GameBreaker's tip (event.c: 15 plus the lowest effect bit set): always flagged.
 void GUI_QueueTip(int nTip) {
