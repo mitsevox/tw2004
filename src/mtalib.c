@@ -22,11 +22,11 @@ char* lbl_80187278[90] = {
     "tail5", "tail6", "rboob", "lboob", NULL,
 };
 
-void fn_8001F6D8(MalBank* pBank);
+void MtaLib_FreeBank(MalBank* pBank);
 
 // The entry's values at the two frames around fTime (clamped to its last frame) into *pfA and *pfB;
 // returns how far fTime is from the first frame to the second (0 when clamped).
-f32 fn_8001F32C(MtaEntry* pEntry, f32* pfA, f32* pfB, f32 fTime) {
+f32 MtaLib_GetEntryFrames(MtaEntry* pEntry, f32* pfA, f32* pfB, f32 fTime) {
     f32 fFrame;
     int nLast;
     int nA;
@@ -62,20 +62,22 @@ f32 fn_8001F32C(MtaEntry* pEntry, f32* pfA, f32* pfB, f32 fTime) {
 }
 
 // Sets morph nMorph's weight in pBlock from the entry at fTime and marks the morph set.
-void fn_8001F42C(MtaEntry* pEntry, SkelPoseBlock* pBlock, int nMorph, SkelPose1* pPose, f32 fTime,
+void MtaLib_ApplyEntry(MtaEntry* pEntry, SkelPoseBlock* pBlock, int nMorph, SkelPose1* pPose, f32 fTime,
                  f32 fWeight) {
     f32 fA;
     f32 fB;
     f32 fT;
 
-    // pPose and fWeight are unused: fn_8001F494 passes them
-    fT = fn_8001F32C(pEntry, &fA, &fB, fTime);
+    // pPose and fWeight are unused: MtaLib_ApplyToPose passes them
+    fT = MtaLib_GetEntryFrames(pEntry, &fA, &fB, fTime);
     pBlock->af8[nMorph] = fT * (fB - fA) + fA;
     BitArray_SetBit(pBlock->aBits, nMorph);
 }
 
-// Sets every morph weight the library drives in pPose from its tracks at fTime.
-int fn_8001F494(void* pUnused, MtaLib* pLib, SkelPose1* pPose, f32 fTime) {
+// Sets every morph weight the library pLib drives in pPose at fTime: each entry with a morph
+// (nMorph >= 0) sets that morph's weight in its record's block of pPose. SKABlender_Update calls it
+// for a format 1 channel; returns 0.
+int MtaLib_ApplyToPose(void* pUnused, MtaLib* pLib, SkelPose1* pPose, f32 fTime) {
     int i;
     int j;
     MtaRecord* pRecord;
@@ -87,20 +89,22 @@ int fn_8001F494(void* pUnused, MtaLib* pLib, SkelPose1* pPose, f32 fTime) {
         pBlock = &pPose->aBlocks[pRecord->nBlock];
         for (j = 0; j < pRecord->nEntries; j++) {
             if (pRecord->pEntries[j].nMorph >= 0) {
-                fn_8001F42C(&pRecord->pEntries[j], pBlock, pRecord->pEntries[j].nMorph, pPose, fTime, 1.0f);
+                MtaLib_ApplyEntry(&pRecord->pEntries[j], pBlock, pRecord->pEntries[j].nMorph, pPose, fTime,
+                                  1.0f);
             }
         }
     }
     return 0;
 }
 
-void fn_8001F558(void* pItem) {
+void MtaLib_Free(void* pItem) {
     StaticMem_Free(pItem);
 }
 
-// Links a library that is already in the machine's byte order (MtaLib_SwapAndLink without the swap): the
-// records after the header, each record's entries after those, then each entry's data.
-void fn_8001F578(MtaLib* pLib) {
+// Links a library that is already in the machine's byte order (MtaLib_SwapAndLink without the
+// swap): the records after the header, each record's entries after those, then each entry's data
+// (4-byte aligned). ska_shared.c does this for a clip's own library (Clip.pF4).
+void MtaLib_Link(MtaLib* pLib) {
     int i;
     int nPad;
     MtaRecord* pRecord;
@@ -130,34 +134,36 @@ void fn_8001F578(MtaLib* pLib) {
     }
 }
 
-void fn_8001F64C(void) {
+// Starts with no banks: both slots empty, no bytes allocated, lbl_801B9668 an empty string.
+void MtaLib_InitModule(void) {
     lbl_80281CB4[0] = NULL;
     lbl_80281CB4[1] = NULL;
     lbl_801B9668[0] = 0;
     lbl_80281CB0 = 0;
 }
 
-// Frees both banks.
-void fn_8001F66C(void) {
+// Frees both banks and clears the byte count.
+void MtaLib_CloseModule(void) {
     int i;
 
     for (i = 0; i < 2; i++) {
         if (lbl_80281CB4[i] != NULL) {
-            fn_8001F6D8(lbl_80281CB4[i]);
+            MtaLib_FreeBank(lbl_80281CB4[i]);
             lbl_80281CB4[i] = NULL;
         }
     }
     lbl_80281CB0 = 0;
 }
 
-void fn_8001F6D8(MalBank* pBank) {
+// Frees a bank: the libraries of its three groups, each group's item array, then the bank.
+void MtaLib_FreeBank(MalBank* pBank) {
     int i;
     int j;
 
     for (i = 0; i < 3; i++) {
         if (pBank->aGroup[i].nNum != 0) {
             for (j = 0; j < pBank->aGroup[i].nNum; j++) {
-                fn_8001F558(pBank->aGroup[i].apItem[j]);
+                MtaLib_Free(pBank->aGroup[i].apItem[j]);
             }
             StaticMem_Free(pBank->aGroup[i].apItem);
         }
@@ -165,13 +171,15 @@ void fn_8001F6D8(MalBank* pBank) {
     StaticMem_Free(pBank);
 }
 
+// The bank of slot nBank, NULL outside slots 0 and 1.
 // EA bug: nBank is only range-checked; bank 0 is returned either way.
-MalBank* fn_8001F760(int nBank) {
+MalBank* MtaLib_GetBank(int nBank) {
     if (nBank < 0 || nBank >= 2) return NULL;
     return lbl_80281CB4[0];
 }
 
-void** fn_8001F780(MalBank* pBank, int nGroup, int* pnNum, int n) {
+// The libraries of the bank's group nGroup; *pnNum gets how many. n is not used.
+void** MtaLib_GetGroup(MalBank* pBank, int nGroup, int* pnNum, int n) {
     MalGroup* pGroup;
 
     pGroup = &pBank->aGroup[nGroup];
@@ -179,12 +187,13 @@ void** fn_8001F780(MalBank* pBank, int nGroup, int* pnNum, int n) {
     return pGroup->apItem;
 }
 
-// A random item of the group, or NULL if it is empty.
-void* fn_8001F79C(MalBank* pBank, int nGroup, int n) {
+// A random library of the bank's group nGroup, or NULL when the group is empty. n is passed on to
+// MtaLib_GetGroup, which does not use it.
+void* MtaLib_GetRandom(MalBank* pBank, int nGroup, int n) {
     int nNum;
     void** apItem;
 
-    apItem = fn_8001F780(pBank, nGroup, &nNum, n);
+    apItem = MtaLib_GetGroup(pBank, nGroup, &nNum, n);
     if (nNum != 0) {
         return apItem[Misc_RandFunc(1) % nNum];
     }
@@ -194,7 +203,7 @@ void* fn_8001F79C(MalBank* pBank, int nGroup, int n) {
 // Builds a bank from a 'MAL ' object's data (little-endian): its group count, then per group its
 // index, its item count and its items, each a library (MtaLib) starting on a 16-byte boundary.
 // Each library is copied out, byte-swapped and linked.
-MalBank* fn_8001F804(u8* pData) {
+MalBank* MtaLib_LoadBank(u8* pData) {
     SwapField aHeader[10] = {
         { 16, 1 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 2, 2 }, { 6, -1 },
         { 4, 4 },
@@ -246,20 +255,20 @@ MalBank* fn_8001F804(u8* pData) {
 }
 
 // The 'MAL ' stream handler: the object's id is the bank slot; a slot already filled is kept.
-void fn_8001FA3C(UStreamObject* pObject) {
+void MtaLib_OnLoaded(UStreamObject* pObject) {
     u32 uSlot;
 
     uSlot = pObject->uId;
     if (uSlot < 2 && lbl_80281CB4[uSlot] == NULL) {
-        lbl_80281CB4[uSlot] = fn_8001F804(pObject->pData);
+        lbl_80281CB4[uSlot] = MtaLib_LoadBank(pObject->pData);
     }
     StaticMem_Free(pObject);
 }
 
-void fn_8001FAA8(void) {
-    Stream_RegisterLoadChunkCallback('MAL ', fn_8001FA3C);
+void MtaLib_Register(void) {
+    Stream_RegisterLoadChunkCallback('MAL ', MtaLib_OnLoaded);
 }
 
-void fn_8001FAD8(void) {
+void MtaLib_Unregister(void) {
     Stream_UnregisterLoadChunkCallback('MAL ');
 }

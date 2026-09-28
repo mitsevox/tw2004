@@ -49,8 +49,8 @@ void Character_RegisterGolferStreamClientIG();
 void Character_UnregisterGolferStreamClient();
 void SkeletalObject_RegisterStreamClient();
 void SkeletalObject_UnregisterStreamClient();
-void fn_8001FAA8();
-void fn_8001FAD8();
+void MtaLib_Register();
+void MtaLib_Unregister();
 void fn_80039454();
 void fn_800394AC();
 void fn_80046130();
@@ -221,7 +221,7 @@ void fn_80014594(void) {
     fn_80046130();
     Character_RegisterClubStreamClientIG();
     Skalib_Register();
-    fn_8001FAA8();
+    MtaLib_Register();
     Character_RegisterGolferStreamClientIG();
     SkeletalObject_RegisterStreamClient();
     MC_RegisterStreamClients();
@@ -236,7 +236,7 @@ void fn_800145E0(void) {
     fn_80046174();
     Character_UnregisterClubStreamClient();
     Skalib_Unregister();
-    fn_8001FAD8();
+    MtaLib_Unregister();
     Character_UnregisterGolferStreamClient();
     SkeletalObject_UnregisterStreamClient();
     MC_UnRegisterStreamClients();
@@ -257,7 +257,7 @@ void fn_80014668(void) {
     fn_80010284();
     Character_RegisterClubStreamClientFE();
     Skalib_Register();
-    fn_8001FAA8();
+    MtaLib_Register();
     fn_8008EC68();
     fn_800394F0();
     FE_lite_vRegisterStreamClients();
@@ -276,7 +276,7 @@ void fn_800146C4(void) {
     fn_800102B4();
     Character_UnregisterClubStreamClient();
     Skalib_Unregister();
-    fn_8001FAD8();
+    MtaLib_Unregister();
     fn_8008ED28();
     fn_80039520();
     fn_8000BA14();

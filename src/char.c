@@ -283,10 +283,10 @@ void* Character_GetRandomMtaLib(Character* pChar, int nGroup, int n) {
     int nNum = 0;
     MalBank* pBank;
 
-    if ((pBank = fn_8001F760(pChar->nSlot)) != NULL) {
-        // port: EA passes fn_8001F780's arguments (with the count's address) to fn_8001F79C, which
+    if ((pBank = MtaLib_GetBank(pChar->nSlot)) != NULL) {
+        // port: EA passes MtaLib_GetGroup's arguments (with the count's address) to MtaLib_GetRandom, which
         //       takes three: the count's address arrives as its unused n, and n is ignored
-        pItem = ((void* (*)(MalBank*, int, int*, int))fn_8001F79C)(pBank, nGroup, &nNum, n);
+        pItem = ((void* (*)(MalBank*, int, int*, int))MtaLib_GetRandom)(pBank, nGroup, &nNum, n);
     }
     return pItem;
 }
@@ -2443,7 +2443,7 @@ void Legacy_Character_InitModule(void) {
     int i;
 
     Skalib_Init();
-    fn_8001F64C();
+    MtaLib_InitModule();
     SKEL_InitModule();
     AnimBlender_InitModule();
     for (i = 0; i < 2; i++) {
@@ -2481,7 +2481,7 @@ void Legacy_Character_CloseModule(void) {
     }
     gNumCharacters = 0;
     Skalib_Shutdown();
-    fn_8001F66C();
+    MtaLib_CloseModule();
     SKEL_CloseModule();
     AnimBlender_CloseModule();
 }

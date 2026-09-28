@@ -351,11 +351,11 @@ typedef struct SKABlendNode SKABlendNode;
 
 void Skalib_Init(void);                 // skalib.c
 void Skalib_Shutdown(void);             // skalib.c
-void fn_8001F64C(void);                 // mtalib.c
+void MtaLib_InitModule(void);                 // mtalib.c
 void AnimBlender_InitModule(void);                 // animblender.c
 void AnimLib_Free(AnimLib* pLib);       // skalib.c
 void ClipBank_Release(int nSlot);       // skalib.c
-void fn_8001F66C(void);                 // mtalib.c
+void MtaLib_CloseModule(void);                 // mtalib.c
 void AnimBlender_CloseModule(void);                 // animblender.c
 
 // animblender.c's pools (AnimBlender_InitModule creates them, AnimBlender_CloseModule destroys them): blend tree nodes by
@@ -388,7 +388,7 @@ void SKABlender_Update(struct Character* pChar, SKABlendNode* pNode, CharModel* 
 // ska_shared.c: pose pPose from pClip at fTime (aBits, if not NULL, gets the bones it sets).
 void fn_8001FCF4(struct Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32 fTime);
 // mtalib.c (pUnused is not read)
-int  fn_8001F494(void* pUnused, struct MtaLib* pLib, SkelPose1* pPose, f32 fTime);
+int  MtaLib_ApplyToPose(void* pUnused, struct MtaLib* pLib, SkelPose1* pPose, f32 fTime);
 // animblender.c: make pNode a blend node that mixes its children with pfnBlend at fWeight.
 void SKABlender_SetBlender(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 fWeight);
 f32  SKABlender_GetEndTime(SKABlendNode* pNode);  // animblender.c: the latest end time under pNode
@@ -1071,7 +1071,7 @@ typedef struct MalGroup {
 } MalGroup;
 
 // A bank loaded from a 'MAL ' stream object (0x1C bytes): up to three groups of items, one picked
-// at random by fn_8001F79C.
+// at random by MtaLib_GetRandom.
 typedef struct MalBank {
     int      nNumGroups;        // 0x00
     MalGroup aGroup[3];         // 0x04
@@ -1081,7 +1081,7 @@ LAYOUT_ASSERT(MalBank, 0x1C);
 // An animation library as MtaLib_SwapAndLink byte-swaps and links it in place (MtaLib, MtaRecord and
 // MtaEntry are our names): a 0x34-byte header, its records, each record's entries, then each
 // entry's data (4-byte aligned). An entry is a track of one value per frame, a byte each: frame
-// byte b gives fLo + (fHi - fLo) * b / 256 (fn_8001F32C).
+// byte b gives fLo + (fHi - fLo) * b / 256 (MtaLib_GetEntryFrames).
 typedef struct MtaEntry {
     u8     unk00[0x20];
     s32    nMorph;              // 0x20  the morph whose weight it drives (SkelPoseBlock.af8); < 0: none
@@ -1106,7 +1106,7 @@ LAYOUT_ASSERT(MtaRecord, 0x2C);
 
 typedef struct MtaLib {
     u8     unk00[0x14];
-    s32    nBytes;              // 0x14  the library's size (fn_8001F804 allocates it)
+    s32    nBytes;              // 0x14  the library's size (MtaLib_LoadBank allocates it)
     u8     unk18[4];
     f32    f1C;                 // 0x1C  its end time (CharacterState_AddMorphBlendData plays it up to this)
     s32    nRecords;            // 0x20
@@ -1116,9 +1116,9 @@ typedef struct MtaLib {
 LAYOUT_ASSERT(MtaLib, 0x34);
 
 MtaLib* MtaLib_SwapAndLink(MtaLib* pLib, s32* pnSize);    // char.c: swap and link a library; *pnSize: its bytes
-void    fn_8001F578(MtaLib* pLib);                  // mtalib.c: link a library already in our byte order
+void    MtaLib_Link(MtaLib* pLib);                  // mtalib.c: link a library already in our byte order
 
-MalBank* fn_8001F760(int nBank);
-void*    fn_8001F79C(MalBank* pBank, int nGroup, int n);
+MalBank* MtaLib_GetBank(int nBank);
+void*    MtaLib_GetRandom(MalBank* pBank, int nGroup, int n);
 
 #endif

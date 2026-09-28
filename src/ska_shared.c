@@ -660,7 +660,7 @@ Clip* fn_80020F60(Clip* pClip, u32 uAram) {
     pClip->pC8 = pClip->pC4;
     fn_800206C8(pClip, uAram);
     if (pClip->n64 != 0) {
-        fn_8001F578((MtaLib*)pClip->pF4);
+        MtaLib_Link((MtaLib*)pClip->pF4);
     }
     return pClip;
 }

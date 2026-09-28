@@ -9,7 +9,7 @@
 #include "golfer.h"
 
 f32  SKA_GetTagTime(Clip* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
-void fn_8001F558(void* pItem);          // mtalib.c
+void MtaLib_Free(void* pItem);          // mtalib.c
 void fn_800977CC(void* p);
 // Skeleton.c
 void SKEL_BlendPoses(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pOut, f32 fT);
@@ -166,7 +166,7 @@ void SKABlendData_Shutdown(SKABlendNode** ppNode, u8 bFreeSources) {
             }
         } else if ((*ppNode)->nFormat == 1) {
             if (bFreeSources) {
-                fn_8001F558((*ppNode)->u.src.pSrc);
+                MtaLib_Free((*ppNode)->u.src.pSrc);
             }
         }
     }
@@ -415,7 +415,7 @@ void SKABlender_Update(Character* pChar, SKABlendNode* pNode, CharModel* pModel,
                         fn_8001FCF4(pChar, pChild->u.src.pSrc, pChild->pPose, 0, fClip);
                     }
                 } else if (pChild->nFormat == 1) {
-                    fn_8001F494(pChar, pChild->u.src.pSrc, (SkelPose1*)pChild->pPose, fClip);
+                    MtaLib_ApplyToPose(pChar, pChild->u.src.pSrc, (SkelPose1*)pChild->pPose, fClip);
                 }
             }
         }
