@@ -333,9 +333,10 @@ void fn_800F3EBC(int nPlayer) {
     }
 }
 
-// Next golfer: gHorseShotClockOut clears, and a golfer ready to play (state 1) gets fn_800F39CC(900).
-// When the turn comes back to the leader, the lead is lost. While there is a leader the golfer
-// aims at the leader's target; otherwise, on his first shot, at his own.
+// Next golfer: gHorseShotClockOut clears, and a golfer ready to play (state 1) gets
+// GameModeSkillZoneCapture_SetShotClock(900). When the turn comes back to the leader, the lead is
+// lost. While there is a leader the golfer aims at the leader's target; otherwise, on his first
+// shot, at his own.
 void fn_800F4584(void) {
     int i;
     gHorseShotClockOut = 0;
@@ -343,7 +344,7 @@ void fn_800F4584(void) {
     GameModeStroke_SetupNextGolfer();
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if ((s8)GOLFERSTATE_GetCurrentState(i) == 1) {
-            fn_800F39CC(900);
+            GameModeSkillZoneCapture_SetShotClock(900);
             if (gHorseLeader == i) {
                 gHorseLeader = 5;
                 if (!(Misc_RandFunc(0) & 1)) {
@@ -433,7 +434,7 @@ s8 fn_800F4878(void) {
 }
 
 void fn_800F4894(int nPlayer) {
-    fn_800F39CC(-1);
+    GameModeSkillZoneCapture_SetShotClock(-1);
     Gaud_StopShotClock();
     gHorseLastShotExceeded = 0;
 }

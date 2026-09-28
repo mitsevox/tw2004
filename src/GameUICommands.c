@@ -320,11 +320,11 @@ s32   GameModeSkillZoneBase_GetShotEarned(s32 nPlayer);
 s32   GameModeSkillZoneBase_GetTimeEarned(s32 nPlayer);
 s32   GameModeSkillZoneBase_GetDriveMultiplier(s32 nPlayer);
 s32   GameModeSkillZoneBase_GetExtraBallsEarned(s32 nPlayer);
-s32   fn_800F3490(int nPlayer);
-s32   fn_800F34F0(int nPlayer);
-s32   fn_800F363C(int i);
-s32   fn_800F3654(s32 p0);
-s32   fn_800F3668(int n);
+s32   GameModeSkillZoneCapture_GetTargettedRingOwner(int nPlayer);
+s32   GameModeSkillZoneCapture_GetTargettedCapturedRing(int nPlayer);
+s32   GameModeSkillZoneCapture_GetRingOwnerFromIndex(int i);
+s32   GameModeSkillZoneCapture_GetCapturedRingFromIndex(s32 p0);
+s32   GameModeSkillZoneCapture_GetMadeMoneyFromIndex(int n);
 s8    fn_800F4878(void);
 s32   fn_800F4B00(void);
 void  GameModeSkillZoneTimed_TenSecWarning(void);
@@ -975,22 +975,22 @@ void fn_800869A4(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = 0;
         return;
     case 14:
-        pResult->i = fn_800F3490(pArgs[0].i);
+        pResult->i = GameModeSkillZoneCapture_GetTargettedRingOwner(pArgs[0].i);
         return;
     case 15:
-        pResult->i = fn_800F34F0(pArgs[0].i);
+        pResult->i = GameModeSkillZoneCapture_GetTargettedCapturedRing(pArgs[0].i);
         return;
     case 16:
-        pResult->i = fn_800F354C(pArgs[0].i);
+        pResult->i = GameModeSkillZoneCapture_GetTotalTargetsHit(pArgs[0].i);
         return;
     case 17:
-        pResult->i = fn_800F363C(pArgs[0].i);
+        pResult->i = GameModeSkillZoneCapture_GetRingOwnerFromIndex(pArgs[0].i);
         return;
     case 18:
-        pResult->i = fn_800F3654(pArgs[0].i);
+        pResult->i = GameModeSkillZoneCapture_GetCapturedRingFromIndex(pArgs[0].i);
         return;
     case 19:
-        pResult->i = fn_800F3668(pArgs[0].i);
+        pResult->i = GameModeSkillZoneCapture_GetMadeMoneyFromIndex(pArgs[0].i);
         return;
     case 20:
         pResult->i = gPlayers[pArgs[0].i].nE88;

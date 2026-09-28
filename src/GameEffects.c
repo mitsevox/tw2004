@@ -228,8 +228,8 @@ void GameEffects_ScriptedGameBreakerTrigger(int nPlayer, int nReason) {
 
 // As a swing starts (STATEFUNC_SwingInit), the target games' scripted GameBreakers, on course 7
 // only, for any player (not in a replay or split screen, not with gSession.a8[0] set, not while one
-// is up): mode 14 when the player holds 4 targets (fn_800F354C; reason 17), mode 15 when every
-// other player is out (nE88 5 or more; reason 22), mode 17 with 39 targets hit
+// is up): mode 14 when the player holds 4 targets (GameModeSkillZoneCapture_GetTotalTargetsHit;
+// reason 17), mode 15 when every other player is out (nE88 5 or more; reason 22), mode 17 with 39 targets hit
 // (GameModeSkillZoneBase_CountGreensHit; reason 23), mode 16 with 39 hit and the aimed-at target
 // not yet hit (reason 23). It starts as GameEffects_ScriptedGameBreakerTrigger does (event 0x3D).
 void GameEffects_TargetGameBreakerTrigger(int nPlayer) {
@@ -246,7 +246,7 @@ void GameEffects_TargetGameBreakerTrigger(int nPlayer) {
         }
         if (gGameEffects.bGameBreaker != 1) {
             if (Game_GetMode() == 14) {
-                if (fn_800F354C(nPlayer) == 4) {
+                if (GameModeSkillZoneCapture_GetTotalTargetsHit(nPlayer) == 4) {
                     bStart = 1;
                     nReason = 17;
                 }

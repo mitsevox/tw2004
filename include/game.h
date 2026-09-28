@@ -554,7 +554,7 @@ void PlayNow_Init(void);                 // mode 5
 void fn_800ED738(void);                 // mode 9
 void GameModeDriverRTE_Init(void);                 // mode 24
 void GameModeReplay_Init(void);                 // mode 10
-void fn_800F2984(void);                 // mode 14
+void GameModeSkillZoneCapture_Init(void);                 // mode 14
 void fn_800F39F4(void);                 // mode 15
 void fn_800F4B40(void);                 // mode 16
 void fn_800F5AAC(void);                 // mode 17
@@ -667,9 +667,9 @@ u8   GameModeSkillZoneBase_IsLongDrive(int nPlayer, f32 f);   // whether f is fa
 s32  GameModeSkillZoneBase_GetBonusIndex(s32 n);
 void GameModeSkillZoneBase_PlayComment(s32 nMsg, s32 a);
 // The modes' own getters behind the dispatchers GameModeSkillZoneBase_GetShotEarned..GameModeSkillZoneBase_GetExtraBallsEarned, which pass their
-// argument on; the getters ignore it (not fn_800F354C: it is called directly, per player).
-int  fn_800F354C(int nPlayer);          // GameMode14.c
-s32  fn_800F37F8(s32 a);                // GameMode14.c
+// argument on; the getters ignore it (not GameModeSkillZoneCapture_GetTotalTargetsHit: it is called directly, per player).
+int  GameModeSkillZoneCapture_GetTotalTargetsHit(int nPlayer);          // GameMode14.c
+s32  GameModeSkillZoneCapture_GetShotEarned(s32 a);                // GameMode14.c
 s32  fn_800F59CC(s32 a);                // GameMode16.c
 s32  fn_800F59D4(s32 a);                // GameMode16.c
 s32  fn_800F6A00(s32 a);                // GameMode17.c
@@ -678,9 +678,9 @@ s32  GameModeSkillZoneTimed_GetShotEarned(s32 a);                // GameMode13.c
 s32  GameModeSkillZoneTimed_GetTimeEarned(s32 a);                // GameMode13.c
 s32  GameModeSkillZoneTimed_GetDriveMultiplier(s32 a);                // GameMode13.c
 
-void fn_800F3828(void);                 // GameMode14.c
+void GameModeSkillZoneCapture_ShotClockOut(void);                 // GameMode14.c
 void GameMsg_Send5Ints(int nMsg, s32 a, s32 b, s32 c, s32 d, s32 e);    // GameMode14.c
-void fn_800F39CC(s32 a);                // GameMode14.c
+void GameModeSkillZoneCapture_SetShotClock(s32 a);                // GameMode14.c
 void fn_800F48C4(void);                 // GameMode15.c
 void GameModeSkillZoneTimed_TimerOut(void);                 // GameMode13.c
 void GameModeSkillZoneTimed_SetHudClock(s32 a);                // GameMode13.c

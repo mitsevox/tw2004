@@ -20,52 +20,55 @@ Claim gCaptureClaims[40];
 
 s32 gCaptureSavedOptionsC = 4;                    // the options saved while the game runs
 s32 gCaptureShotPoints;                    // the points of the last claim
-u8  gCaptureShotClockOut;                    // set by fn_800F3828: the shot then claims nothing
+u8  gCaptureShotClockOut;                    // set by GameModeSkillZoneCapture_ShotClockOut: the shot then claims nothing
 s32 gCaptureFirstGolfer;                    // who starts: 0 or 1, at random
 s32 gCaptureSavedWind;
 s32 gCaptureRingPoints[6] = {500, 400, 300, 200, 100, 0};                  // points per rank
 
-void  fn_800F2BBC(void);
-void  fn_800F2BD8(void);
-u8    fn_800F2C2C(u8 bCheck);
-s32   fn_800F2C34(int nPlayer);
-void  fn_800F2D4C(int nPlayer);
-void  fn_800F2E08(int nPlayer);
-void  fn_800F31E0(void);
-void  fn_800F330C(void);
-void  fn_800F3330(void);
-void  fn_800F3358(void);
-void  fn_800F33D0(int nPlayer);
-u8    fn_800F3410(u8 bCheck);
-void  fn_800F3418(int nPlayer);
-u8    fn_800F3438(int nPlayer, u8 bCheck);
-s32   fn_800F3668(int n);
-void  fn_800F36A4(void);
-void  fn_800F3800(int nPlayer);
-void  fn_800F3860(void);
-s32   fn_800F392C(int a, int i);
+void  GameModeSkillZoneCapture_Shutdown(void);
+void  GameModeSkillZoneCapture_StartGamePreData(void);
+u8    GameModeSkillZoneCapture_GoToPlayoff(u8 bCheck);
+s32   GameModeSkillZoneCapture_GetHonors(int nPlayer);
+void  GameModeSkillZoneCapture_EndGolferTurn(int nPlayer);
+void  GameModeSkillZoneCapture_CheckShotAwards(int nPlayer);
+void  GameModeSkillZoneCapture_SetupNextGolfer(void);
+void  GameModeSkillZoneCapture_LoadHole(void);
+void  GameModeSkillZoneCapture_RestartHole(void);
+void  GameModeSkillZoneCapture_ClearPerHoleData(void);
+void  GameModeSkillZoneCapture_UpdateSwingUI(int nPlayer);
+u8    GameModeSkillZoneCapture_GameFinished(u8 bCheck);
+void  GameModeSkillZoneCapture_BallOOB(int nPlayer);
+u8    GameModeSkillZoneCapture_HoleFinished(int nPlayer, u8 bCheck);
+s32   GameModeSkillZoneCapture_GetMadeMoneyFromIndex(int n);
+void  GameModeSkillZoneCapture_ComputePlayerScore(void);
+void  GameModeSkillZoneCapture_HitBall(int nPlayer);
+void  GameModeSkillZoneCapture_EndGame(void);
+s32   GameModeSkillZoneCapture_GreenType(int a, int i);
 
-// Mode 14 starts: two players, no wind, no gimmes, no mulligans.
-void fn_800F2984(void) {
-    gpGame->pfnInit = fn_800F2984;
-    gpGame->pfnShutdown = fn_800F2BBC;
-    gpGame->pfnSetupNextGolfer = fn_800F31E0;
-    gpGame->pfnGetHonors = fn_800F2C34;
-    gpGame->pfnHoleFinished = fn_800F3438;
-    gpGame->pfnGameFinished = fn_800F3410;
-    gpGame->pfnGoToPlayoff = fn_800F2C2C;
-    gpGame->pfnEndGolferTurn = fn_800F2D4C;
-    gpGame->pfn244 = fn_800F2E08;
-    gpGame->pfn1E4 = fn_800F330C;
-    gpGame->pfn228 = fn_800F33D0;
-    gpGame->pfn224 = fn_800F3330;
-    gpGame->pfn1EC = fn_800F2BD8;
-    gpGame->pfn250 = fn_800F3418;
+// Game mode 14's setup (pfnInit, from GM_SetModeType): its hooks (the target-list ones from
+// GameTargets.c), nC and n10 2 (two players, as GameModeBattle sets them), no wind, no gimmes, no
+// mulligans, b28D set (the re-plan button picks the next target), the current hole 0, pin set 0 and
+// the target list emptied (the hole's targets fill it as they load).
+void GameModeSkillZoneCapture_Init(void) {
+    gpGame->pfnInit = GameModeSkillZoneCapture_Init;
+    gpGame->pfnShutdown = GameModeSkillZoneCapture_Shutdown;
+    gpGame->pfnSetupNextGolfer = GameModeSkillZoneCapture_SetupNextGolfer;
+    gpGame->pfnGetHonors = GameModeSkillZoneCapture_GetHonors;
+    gpGame->pfnHoleFinished = GameModeSkillZoneCapture_HoleFinished;
+    gpGame->pfnGameFinished = GameModeSkillZoneCapture_GameFinished;
+    gpGame->pfnGoToPlayoff = GameModeSkillZoneCapture_GoToPlayoff;
+    gpGame->pfnEndGolferTurn = GameModeSkillZoneCapture_EndGolferTurn;
+    gpGame->pfn244 = GameModeSkillZoneCapture_CheckShotAwards;
+    gpGame->pfn1E4 = GameModeSkillZoneCapture_LoadHole;
+    gpGame->pfn228 = GameModeSkillZoneCapture_UpdateSwingUI;
+    gpGame->pfn224 = GameModeSkillZoneCapture_RestartHole;
+    gpGame->pfn1EC = GameModeSkillZoneCapture_StartGamePreData;
+    gpGame->pfn250 = GameModeSkillZoneCapture_BallOOB;
     gpGame->pfn264 = GameModeSkillZoneBase_PickPrevTarget;
     gpGame->pfn258 = GameModeSkillZoneBase_PickTarget;
-    gpGame->pfn260 = fn_800F3800;
-    gpGame->pfnEndGame = fn_800F3860;
-    gpGame->pfn26C = fn_800F392C;
+    gpGame->pfn260 = GameModeSkillZoneCapture_HitBall;
+    gpGame->pfnEndGame = GameModeSkillZoneCapture_EndGame;
+    gpGame->pfn26C = GameModeSkillZoneCapture_GreenType;
     gpGame->b276 = 0;
     gpGame->bGimmesAllowed = 0;
     gpGame->b280 = 0;
@@ -95,14 +98,16 @@ void fn_800F2984(void) {
     gSession.nPinSet = 0;
 }
 
-// The mode ends: the saved options go back.
-void fn_800F2BBC(void) {
+// Puts back the two options StartGamePreData changed for the game: options.nC and the wind.
+void GameModeSkillZoneCapture_Shutdown(void) {
     gSession.options.nC = gCaptureSavedOptionsC;
     gSession.options.nWind = gCaptureSavedWind;
 }
 
-// Round setup: options saved and replaced, and a random first player.
-void fn_800F2BD8(void) {
+// As a round starts (pfn1EC, GM_InitModule_PreDataStream): saves options.nC and the wind setting
+// (Shutdown puts them back), sets them to 4 and 0 (no wind), and picks the first golfer, player 0
+// or 1 at random (gCaptureFirstGolfer).
+void GameModeSkillZoneCapture_StartGamePreData(void) {
     gCaptureSavedOptionsC = gSession.options.nC;
     gCaptureSavedWind = gSession.options.nWind;
     gSession.options.nC = 4;
@@ -110,12 +115,14 @@ void fn_800F2BD8(void) {
     gCaptureFirstGolfer = Misc_RandFunc(0) & 1;
 }
 
-u8 fn_800F2C2C(u8 bCheck) {
+u8 GameModeSkillZoneCapture_GoToPlayoff(u8 bCheck) {
     return 0;
 }
 
-// Who plays next: the random starter before anyone has hit, then the players in turn.
-s32 fn_800F2C34(int nPlayer) {
+// Who plays next (pfnGetHonors): the random first golfer (gCaptureFirstGolfer) while nobody has a
+// stroke on the hole; after that the next player in turn after the current golfer (lbl_80282278)
+// who is not nPlayer; 5 when there is none.
+s32 GameModeSkillZoneCapture_GetHonors(int nPlayer) {
     int i;
     int n;
     u8 bFirst = 1;
@@ -140,8 +147,10 @@ s32 fn_800F2C34(int nPlayer) {
     return 5;
 }
 
-// End of a golfer's turn: the ball goes back to the tee (or to the replay's ball).
-void fn_800F2D4C(int nPlayer) {
+// End of a golfer's turn (pfnEndGolferTurn): the ball goes back on the player's tee (with in-flight
+// replays on, gReplayData.bF10, the replay's saved ball is copied back instead) and the shots taken
+// (nDC0) are counted.
+void GameModeSkillZoneCapture_EndGolferTurn(int nPlayer) {
     if (gReplayData.bF10) {
         Mem_cpy(&gPlayers[nPlayer].ball, &gReplayData.player.ball, sizeof(Ball));
     } else {
@@ -151,8 +160,19 @@ void fn_800F2D4C(int nPlayer) {
     gPlayers[nPlayer].nDC0++;
 }
 
-// The ball stopped: on a target, maybe claim it.
-void fn_800F2E08(int nPlayer) {
+// Scores a shot once the ball stops (pfn244 from GM_Earnings_PayShotGoals; BallOOB too). After a
+// shot-clock timeout (gCaptureShotClockOut) it only shows text 0xD1 and comment 0x14. A landing on
+// a target short of the drive line (GameModeSkillZoneBase_IsLongDrive) is in one of its rings (0
+// the bullseye .. 4). A target claimed with a bullseye is locked (text 0xCD, Gaud_TargetClosedOut);
+// a ring no closer than the target's claim, whoever holds it, claims nothing (text 0xCC). A closer
+// ring claims the target for nPlayer: taking it from the other player counts a steal (nE94, text
+// 0xD4), a bullseye counts in nDE0 (text 0xD2, or 0xD5 when stolen). The claim's surface is logged
+// (aCD4[nCD0++], nD70 per hole); its points (GetMadeMoneyFromIndex, the hole's target factor, the
+// earnings modifiers) go to gCaptureShotPoints and everyone's totals are recomputed
+// (ComputePlayerScore). Outside replays the points float up at the surface (message 0x33; text 0xD3
+// for a plain claim) and the ring or bullseye sound plays, with the bullseye and shot-multiplier
+// (nDBC) ball effects. A comment fits each case.
+void GameModeSkillZoneCapture_CheckShotAwards(int nPlayer) {
     s32 nSurface;
     int nTarget;
     s32 nRank;
@@ -221,11 +241,11 @@ void fn_800F2E08(int nPlayer) {
                 gPlayers[nPlayer].aCD4[gPlayers[nPlayer].nCD0] = nSurface;
                 gPlayers[nPlayer].nCD0++;
                 gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
-                gCaptureShotPoints = fn_800F3668(nTarget);
+                gCaptureShotPoints = GameModeSkillZoneCapture_GetMadeMoneyFromIndex(nTarget);
                 gCaptureShotPoints = GameModeSkillZoneBase_ScaleTargetPoints(gCaptureShotPoints, nTarget);
                 gCaptureShotPoints = GM_Earnings_ComputeBonusModifiers(gCaptureShotPoints, nPlayer, 1, 1, 1, 0);
                 gCaptureShotPoints = GM_Earnings_ComputeTOURCardModifiers(gCaptureShotPoints, nPlayer, 0);
-                fn_800F36A4();
+                GameModeSkillZoneCapture_ComputePlayerScore();
                 if (nText != 0) {
                     GameMsg_Send5Ints(0x33, gCaptureShotPoints, 0, 0, nText, 1);
                 }
@@ -259,10 +279,13 @@ void fn_800F2E08(int nPlayer) {
     }
 }
 
-// Next golfer: gCaptureShotClockOut and the players' per-shot state
-// (GameModeSkillZoneBase_ClearPerShotData) clear, and a golfer ready to play (state 1) gets
-// fn_800F39CC(900). A player 3 or more targets behind gets a comment.
-void fn_800F31E0(void) {
+// Before each shot (pfnSetupNextGolfer): the shot-clock timeout flag (gCaptureShotClockOut) and the
+// per-shot data clear (ClearPerShotData) and stroke play's golfer order runs
+// (GameModeStroke_SetupNextGolfer). The golfer about to play (GS_PRE_SHOT) gets a 900 shot clock
+// (GameModeSkillZoneCapture_SetShotClock) and, before their first shot, their target set up
+// (SetCup_AlignGolfer); if they hold 3 or more targets fewer than the other player, a comment
+// (0x4A/0x4C for player 0, 0x4B/0x4D for player 1) plays.
+void GameModeSkillZoneCapture_SetupNextGolfer(void) {
     int i;
     s32 n0;
     s32 n1;
@@ -270,11 +293,11 @@ void fn_800F31E0(void) {
     gCaptureShotClockOut = 0;
     GameModeSkillZoneBase_ClearPerShotData();
     GameModeStroke_SetupNextGolfer();
-    n0 = fn_800F354C(0);
-    n1 = fn_800F354C(1);
+    n0 = GameModeSkillZoneCapture_GetTotalTargetsHit(0);
+    n1 = GameModeSkillZoneCapture_GetTotalTargetsHit(1);
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if ((s8)GOLFERSTATE_GetCurrentState(i) == 1) {
-            fn_800F39CC(900);
+            GameModeSkillZoneCapture_SetShotClock(900);
             if (PLAYER(i)->nDC0 == 0) {
                 GameModeSkillZoneBase_SetCup_AlignGolfer(i, (s8)PLAYER(i)->nTarget);
             }
@@ -298,18 +321,23 @@ void fn_800F31E0(void) {
     }
 }
 
-void fn_800F330C(void) {
+// Hole start (pfn1E4): the targets sorted nearest the tee first (SortCupsByDistanceFromTee), then
+// ClearPerHoleData.
+void GameModeSkillZoneCapture_LoadHole(void) {
     GameModeSkillZoneBase_SortCupsByDistanceFromTee();
-    fn_800F3358();
+    GameModeSkillZoneCapture_ClearPerHoleData();
 }
 
-void fn_800F3330(void) {
-    fn_800F3358();
+// The hole restarts (pfn224, GM_RestartHole): every claim cleared (ClearPerHoleData) and player 0
+// given the default aim.
+void GameModeSkillZoneCapture_RestartHole(void) {
+    GameModeSkillZoneCapture_ClearPerHoleData();
     AI_DefaultTarget(0);
 }
 
-// Every target unclaimed.
-void fn_800F3358(void) {
+// The shared per-hole clear (GameModeSkillZoneBase_ClearPerHoleData), then all 40 targets unclaimed
+// (gCaptureClaims: ring and holder 5).
+void GameModeSkillZoneCapture_ClearPerHoleData(void) {
     int i;
     GameModeSkillZoneBase_ClearPerHoleData();
     for (i = 0; i < 40; i++) {
@@ -318,25 +346,30 @@ void fn_800F3358(void) {
     }
 }
 
-void fn_800F33D0(int nPlayer) {
+// Every frame of the swing state (pfn228): once the swing has begun (SwingData.nState not
+// SW_IDLE_SWING), UI message 0x36 (no value) is sent.
+void GameModeSkillZoneCapture_UpdateSwingUI(int nPlayer) {
     if (gPlayers[nPlayer].swing.nState != 0) {
         GameMsg_Send(0x36);
     }
 }
 
-u8 fn_800F3410(u8 bCheck) {
+// The game is over once its one hole is: always 1.
+u8 GameModeSkillZoneCapture_GameFinished(u8 bCheck) {
     return 1;
 }
 
-void fn_800F3418(int nPlayer) {
-    fn_800F2E08(nPlayer);
+// The ball went out of bounds (pfn250): the shot is scored as usual (CheckShotAwards).
+void GameModeSkillZoneCapture_BallOOB(int nPlayer) {
+    GameModeSkillZoneCapture_CheckShotAwards(nPlayer);
 }
 
-// The game is over when someone holds 5 targets.
-u8 fn_800F3438(int nPlayer, u8 bCheck) {
+// The hole (and so the game) is over once a player holds 5 targets (GetTotalTargetsHit); nPlayer
+// and bCheck are not used.
+u8 GameModeSkillZoneCapture_HoleFinished(int nPlayer, u8 bCheck) {
     int i;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (fn_800F354C(i) >= 5) {
+        if (GameModeSkillZoneCapture_GetTotalTargetsHit(i) >= 5) {
             return 1;
         }
     }
@@ -347,23 +380,27 @@ static inline int CurrentTarget(int nPlayer) {
     return GameModeSkillZoneBase_GetGreenTargetted(nPlayer);
 }
 
-// Who holds the target the player is aiming at (-1: not aiming at one).
-s32 fn_800F3490(int nPlayer) {
+// Who holds the target the player is aiming at, for the HUD (UI command 14): 0 or 1, 5 nobody; -1
+// when the aim point (Player.nSurface) is not on a target.
+s32 GameModeSkillZoneCapture_GetTargettedRingOwner(int nPlayer) {
     if (gPlayers[nPlayer].nSurface < 0x85 || gPlayers[nPlayer].nSurface > 0x90) {
         return -1;
     }
     return gCaptureClaims[CurrentTarget(nPlayer)].nOwner;
 }
 
-s32 fn_800F34F0(int nPlayer) {
+// The ring the target the player is aiming at was claimed with, for the HUD (UI command 15): 0 the
+// bullseye .. 4, 5 unclaimed; -1 when the aim point (Player.nSurface) is not on a target.
+s32 GameModeSkillZoneCapture_GetTargettedCapturedRing(int nPlayer) {
     if (gPlayers[nPlayer].nSurface < 0x85 || gPlayers[nPlayer].nSurface > 0x90) {
         return -1;
     }
     return gCaptureClaims[GameModeSkillZoneBase_GetGreenTargetted(nPlayer)].nRank;
 }
 
-// How many targets the player holds.
-int fn_800F354C(int nPlayer) {
+// How many of the 40 targets the player holds (gCaptureClaims). 5 wins; GameEffects starts the
+// GameBreaker camera at 4.
+int GameModeSkillZoneCapture_GetTotalTargetsHit(int nPlayer) {
     s32 n = 0;
     int i;
     for (i = 0; i < 40; i++) {
@@ -374,24 +411,31 @@ int fn_800F354C(int nPlayer) {
     return n;
 }
 
-s32 fn_800F363C(int i) {
+// Who holds target i, for the HUD (UI command 17): 0 or 1, 5 nobody.
+s32 GameModeSkillZoneCapture_GetRingOwnerFromIndex(int i) {
     return gCaptureClaims[i].nOwner;
 }
 
-s32 fn_800F3654(s32 p0) {
+// The ring target i was claimed with, for the HUD (UI command 18): 0 the bullseye .. 4, 5
+// unclaimed.
+s32 GameModeSkillZoneCapture_GetCapturedRingFromIndex(s32 p0) {
     return gCaptureClaims[p0].nRank;
 }
 
-// A claimed target's points.
-s32 fn_800F3668(int n) {
+// A target's points by the ring it was claimed with (gCaptureRingPoints: 500 for the bullseye down
+// to 100 for ring 4); 0 when nobody holds it. Before the hole's target factor and the earnings
+// modifiers.
+s32 GameModeSkillZoneCapture_GetMadeMoneyFromIndex(int n) {
     if (gCaptureClaims[n].nOwner != 5) {
         return gCaptureRingPoints[gCaptureClaims[n].nRank];
     }
     return 0;
 }
 
-// Each player's points: the sum over the targets they hold.
-void fn_800F36A4(void) {
+// Every player's winnings (nDD8) recomputed: the sum over the targets they hold of the claim's
+// points (GetMadeMoneyFromIndex), times the hole's target factor (ScaleTargetPoints), with the
+// earnings bonus and TOUR card modifiers.
+void GameModeSkillZoneCapture_ComputePlayerScore(void) {
     int i;
     s32 n;
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -399,7 +443,7 @@ void fn_800F36A4(void) {
     }
     for (i = 0; i < 40; i++) {
         if (gCaptureClaims[i].nOwner != 5) {
-            n = fn_800F3668(i);
+            n = GameModeSkillZoneCapture_GetMadeMoneyFromIndex(i);
             n = GameModeSkillZoneBase_ScaleTargetPoints(n, i);
             n = GM_Earnings_ComputeBonusModifiers(n, gCaptureClaims[i].nOwner, 1, 1, 1, 0);
             n = GM_Earnings_ComputeTOURCardModifiers(n, gCaptureClaims[i].nOwner, 0);
@@ -408,32 +452,37 @@ void fn_800F36A4(void) {
     }
 }
 
-s32 fn_800F37F8(s32 a) {
+// The points of the last claim (gCaptureShotPoints), whoever nPlayer is.
+s32 GameModeSkillZoneCapture_GetShotEarned(s32 a) {
     return gCaptureShotPoints;
 }
 
-void fn_800F3800(int nPlayer) {
-    fn_800F39CC(-1);
+// The ball was hit (pfn260): the shot clock is switched off (-1) and its ticking stopped.
+void GameModeSkillZoneCapture_HitBall(int nPlayer) {
+    GameModeSkillZoneCapture_SetShotClock(-1);
     Gaud_StopShotClock();
 }
 
-// The current golfer goes to state 12 and gCaptureShotClockOut is set, so the shot claims nothing and
-// shows text 0xD1 (through GameModeSkillZoneBase_ShotClockOut, from a UI command).
-void fn_800F3828(void) {
+// The shot clock ran out (GameModeSkillZoneBase_ShotClockOut, from a UI command): the current
+// golfer goes to GS_SIMULATE, the toggle UI hides, the ticking stops and gCaptureShotClockOut is
+// set, so CheckShotAwards claims nothing and shows text 0xD1.
+void GameModeSkillZoneCapture_ShotClockOut(void) {
     GOLFERSTATE_Switch(12, lbl_80282278);   // GS_SIMULATE
     GUI_HideAllToggleUI();
     Gaud_StopShotClock();
     gCaptureShotClockOut = 1;
 }
 
-// Game finished: the winner is paid their points; a loser with no targets gets a comment.
-void fn_800F3860(void) {
+// End of the game (pfnEndGame): the player holding 5 targets wins (EASBio_SetCurrentGameWon) and is
+// paid their winnings (nDD8, GM_Earnings_AwardMoney); a player with fewer loses theirs (nDD8 0),
+// and comment 0x48 plays if one ends with none.
+void GameModeSkillZoneCapture_EndGame(void) {
     int i;
     s32 nMsg = -1;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (fn_800F354C(i) < 5) {
+        if (GameModeSkillZoneCapture_GetTotalTargetsHit(i) < 5) {
             PLAYER(i)->nDD8 = 0;
-            if (fn_800F354C(i) == 0) {
+            if (GameModeSkillZoneCapture_GetTotalTargetsHit(i) == 0) {
                 nMsg = 0x48;
             }
         } else {
@@ -446,9 +495,9 @@ void fn_800F3860(void) {
     }
 }
 
-// A target's state (GoDynObj picks the model drawn at it by this): 1 claimed at rank 0, 2 player
-// 0's, 3 player 1's, 0 free.
-s32 fn_800F392C(int a, int i) {
+// Which marker model target nTarget shows (pfn26C, GoDynObj.c): 1 once claimed with a bullseye
+// (locked), 2 player 0's, 3 player 1's, 0 free; nPlayer is not used.
+s32 GameModeSkillZoneCapture_GreenType(int a, int i) {
     if (gCaptureClaims[i].nRank == 0) {
         return 1;
     }
@@ -463,6 +512,9 @@ void GameMsg_Send5Ints(int nMsg, s32 a, s32 b, s32 c, s32 d, s32 e) {
     GameMsg_Send5(nMsg, 0, &a, &b, &c, &d, &e);
 }
 
-void fn_800F39CC(s32 p0) {
+// Sends UI message 55, the HUD shot clock, with a value: modes 14 and 15 pass 900 as a golfer's
+// turn starts and -1 (off) when the ball is hit. Its running out comes back as a UI command
+// (GameModeSkillZoneBase_ShotClockOut).
+void GameModeSkillZoneCapture_SetShotClock(s32 p0) {
     GameMsg_SendInt(55, p0);
 }

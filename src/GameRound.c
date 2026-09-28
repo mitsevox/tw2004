@@ -235,7 +235,7 @@ void GM_SetModeType(int nMode) {
         GameModeSkillZoneTimed_Init();
         break;
     case 14:
-        fn_800F2984();
+        GameModeSkillZoneCapture_Init();
         break;
     case 15:
         fn_800F39F4();

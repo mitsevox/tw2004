@@ -143,10 +143,10 @@ void GameModeSkillZoneBase_TimerOut(void) {
 }
 
 // The shot clock ran out (UI command fn_80088804, in a target mode): modes 14 and 15 forfeit the
-// shot (fn_800F3828, fn_800F48C4); the other target modes do nothing.
+// shot (GameModeSkillZoneCapture_ShotClockOut, fn_800F48C4); the other target modes do nothing.
 void GameModeSkillZoneBase_ShotClockOut(void) {
     if (Game_GetMode() == 0xE) {
-        fn_800F3828();
+        GameModeSkillZoneCapture_ShotClockOut();
     }
     if (Game_GetMode() == 0xF) {
         fn_800F48C4();
@@ -305,7 +305,7 @@ s32 GameModeSkillZoneBase_GetShotEarned(s32 nPlayer) {
         return GameModeSkillZoneTimed_GetShotEarned(nPlayer);
     }
     if (Game_GetMode() == 0xE) {
-        return fn_800F37F8(nPlayer);
+        return GameModeSkillZoneCapture_GetShotEarned(nPlayer);
     }
     if (Game_GetMode() == 0x10) {
         return fn_800F59CC(nPlayer);
