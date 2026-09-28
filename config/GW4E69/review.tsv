@@ -1054,3 +1054,19 @@ address	name	comment	by	date
 8001FAA8	MtaLib_Register	none	rh3 (replayed by orchestrator)	2026-09-28
 8001FAD8	MtaLib_Unregister	none	rh3 (replayed by orchestrator)	2026-09-28
 8008E420	FE_HasGolferCharacter	add	orchestrator	2026-09-28
+800D1698	CTIP_CheckGeneralWindTrigger	rewrite	ri4 (replayed by orchestrator)	2026-09-28
+800D16F0	CTIP_CheckIntoWindTrigger	rewrite	ri4 (replayed by orchestrator)	2026-09-28
+800D17E4	CTIP_CheckWithWindTrigger	rewrite	ri4 (replayed by orchestrator)	2026-09-28
+800D18D8	CTIP_CheckPenaltyLieTrigger	rewrite	ri4 (replayed by orchestrator)	2026-09-28
+800D19F8	CTIP_CheckRoughLieTrigger	rewrite	ri4 (replayed by orchestrator)	2026-09-28
+800D1A34	CTIP_CheckSandLieTrigger	rewrite	ri4 (replayed by orchestrator)	2026-09-28
+800D1A70	CTIP_CheckDownhillLieTrigger	rewrite	ri4 (replayed by orchestrator)	2026-09-28
+800D1AA8	CTIP_CheckUphillLieTrigger	rewrite	ri4 (replayed by orchestrator)	2026-09-28
+800D1AE0	CTIP_CheckWeatherTrigger	rewrite	ri4 (replayed by orchestrator)	2026-09-28
+800D1B10	CTIP_LongDistanceTeeShotTrigger	rewrite	ri4 (replayed by orchestrator)	2026-09-28
+800D1BA4	CTIP_MediumDistanceTeeShotTrigger	rewrite	ri4 (replayed by orchestrator)	2026-09-28
+800D1C38	CTIP_SpinnaShotTrigger	rewrite	ri4 (replayed by orchestrator)	2026-09-28
+800D1C9C	CTIP_TeeSpinnaShotTrigger	rewrite	ri4 (replayed by orchestrator)	2026-09-28
+800D1D30	CTIP_CheckDisabledTrigger	rewrite	ri4 (replayed by orchestrator)	2026-09-28
+800D1D38	CTIP_FlopShotTrigger	rewrite	ri4 (replayed by orchestrator)	2026-09-28
+800D1DAC	CTIP_ShowCaddieTip	rewrite	ri4 (replayed by orchestrator)	2026-09-28

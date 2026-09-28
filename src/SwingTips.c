@@ -1,4 +1,4 @@
-// SwingTips.c (our name): the tips shown as a swing starts (fn_800D1DAC, from
+// SwingTips.c (our name): the tips shown as a swing starts (CTIP_ShowCaddieTip, from
 // STATEFUNC_SwingInit). Each test (wind, lie, slope, the golfer's attributes, par and score) picks
 // a tip; the first time a save profile meets one it gets the full tip (and a flag in the save),
 // later a short random one (the flags are SaveProfile.aTipSeen).
@@ -6,32 +6,34 @@
 #include "game.h"
 #include "game/save.h"
 
-u8 fn_800D1698(int nPlayer);
-u8 fn_800D16F0(int nPlayer);
-u8 fn_800D17E4(int nPlayer);
-u8 fn_800D18D8(int nPlayer);
-u8 fn_800D19F8(int nPlayer);
-u8 fn_800D1A34(int nPlayer);
-u8 fn_800D1A70(int nPlayer);
-u8 fn_800D1AA8(int nPlayer);
-u8 fn_800D1AE0(void);
-u8 fn_800D1B10(int nPlayer);
-u8 fn_800D1BA4(int nPlayer);
-u8 fn_800D1C38(int nPlayer);
-u8 fn_800D1C9C(int nPlayer);
-u8 fn_800D1D30(void);
-u8 fn_800D1D38(int nPlayer);
+u8 CTIP_CheckGeneralWindTrigger(int nPlayer);
+u8 CTIP_CheckIntoWindTrigger(int nPlayer);
+u8 CTIP_CheckWithWindTrigger(int nPlayer);
+u8 CTIP_CheckPenaltyLieTrigger(int nPlayer);
+u8 CTIP_CheckRoughLieTrigger(int nPlayer);
+u8 CTIP_CheckSandLieTrigger(int nPlayer);
+u8 CTIP_CheckDownhillLieTrigger(int nPlayer);
+u8 CTIP_CheckUphillLieTrigger(int nPlayer);
+u8 CTIP_CheckWeatherTrigger(void);
+u8 CTIP_LongDistanceTeeShotTrigger(int nPlayer);
+u8 CTIP_MediumDistanceTeeShotTrigger(int nPlayer);
+u8 CTIP_SpinnaShotTrigger(int nPlayer);
+u8 CTIP_TeeSpinnaShotTrigger(int nPlayer);
+u8 CTIP_CheckDisabledTrigger(void);
+u8 CTIP_FlopShotTrigger(int nPlayer);
 void GUI_ShowSwingTip(u8 nKind, int nTip);   // GameUI.c: show a tip (1 full, 2 short)
 
-// A tip test: a shot other than a putt, with the wind's speed over 6.
-u8 fn_800D1698(int nPlayer) {
+// The general wind tip's test (tip 0, two short versions): true for any shot but a putt when the
+// wind's speed (Wind_Get) is over 6.
+u8 CTIP_CheckGeneralWindTrigger(int nPlayer) {
     if (gPlayers[nPlayer].nShotKind == 0) return 0;
     return Wind_Get(NULL) > 6.0f;
 }
 
-// A tip test: a shot other than a putt, in a wind over 6 whose vector (Wind_Get) lies 135 to 225
-// degrees off the aim (the angle measured like the aim's, from +z).
-u8 fn_800D16F0(int nPlayer) {
+// The into-the-wind tip's test (tip 2, four short versions): a shot other than a putt, in a wind
+// over 6 whose vector (Wind_Get) lies 135 to 225 degrees off the aim (the angle measured like the
+// aim's, from +z).
+u8 CTIP_CheckIntoWindTrigger(int nPlayer) {
     f32 fAim;
     f32 fAngle;
     f32 vWind[4];
@@ -55,8 +57,9 @@ u8 fn_800D16F0(int nPlayer) {
     return 0;
 }
 
-// A tip test: as fn_800D16F0, with the wind's vector -45 to 45 degrees off the aim.
-u8 fn_800D17E4(int nPlayer) {
+// The downwind tip's test (tip 6, two short versions): as CTIP_CheckIntoWindTrigger, with the
+// wind's vector -45 to 45 degrees off the aim (in effect 0 to 45: see the EA bug below).
+u8 CTIP_CheckWithWindTrigger(int nPlayer) {
     f32 fAim;
     f32 fAngle;
     f32 vWind[4];
@@ -81,9 +84,11 @@ u8 fn_800D17E4(int nPlayer) {
     return 0;
 }
 
-// A tip test: a poor lie. The lie's quality comes from the surface under the ball, the ball's
-// f70 and the golfer's recovery; under 75 fires.
-u8 fn_800D18D8(int nPlayer) {
+// The penalty lie tip's test (tip 8, three short versions): the lie keeps too little of the shot's
+// power. The share the surface under the ball keeps (SurfaceType.f00, plus the ball's f70 times the
+// golfer's recovery / 100), in percent, plus the lie's random spread (SurfaceType.f04 times 100
+// less the recovery) is under 75.
+u8 CTIP_CheckPenaltyLieTrigger(int nPlayer) {
     f32 fQuality;
     f32 fSpread;
 
@@ -96,8 +101,9 @@ u8 fn_800D18D8(int nPlayer) {
     return fQuality + fSpread < 75.0f;
 }
 
-// A tip test: the ball lies in lie 3, 4 or 5.
-u8 fn_800D19F8(int nPlayer) {
+// The rough lie tip's test (tip 11, two short versions): the ball lies in the rough (lie 3, 4 or 5:
+// LIE_ROUGH_HIGH_e to LIE_THICK_ROUGH_e).
+u8 CTIP_CheckRoughLieTrigger(int nPlayer) {
     if (gPlayers[nPlayer].ball.nLie == 3 || gPlayers[nPlayer].ball.nLie == 4 ||
         gPlayers[nPlayer].ball.nLie == 5) {
         return 1;
@@ -105,8 +111,9 @@ u8 fn_800D19F8(int nPlayer) {
     return 0;
 }
 
-// A tip test: the ball lies in lie 6, 7 or 8.
-u8 fn_800D1A34(int nPlayer) {
+// The sand lie tip's test (tip 13, two short versions): the ball lies in sand (lie 6, 7 or 8:
+// LIE_SAND_HIGH_e to LIE_SAND_DEEP_e).
+u8 CTIP_CheckSandLieTrigger(int nPlayer) {
     if (gPlayers[nPlayer].ball.nLie == 6 || gPlayers[nPlayer].ball.nLie == 7 ||
         gPlayers[nPlayer].ball.nLie == 8) {
         return 1;
@@ -114,23 +121,28 @@ u8 fn_800D1A34(int nPlayer) {
     return 0;
 }
 
-// A tip test: the target is more than 17 feet below the ball.
-u8 fn_800D1A70(int nPlayer) {
+// The downhill tip's test (tip 15, two short versions): the target is more than 17 feet below the
+// ball (world units are yards).
+u8 CTIP_CheckDownhillLieTrigger(int nPlayer) {
     return 3.0f * (gPlayers[nPlayer].vTargetCopy[1] - gPlayers[nPlayer].vBall[1]) < -17.0f;
 }
 
-// A tip test: the target is more than 17 feet above the ball.
-u8 fn_800D1AA8(int nPlayer) {
+// The uphill tip's test (tip 17, two short versions): the target is more than 17 feet above the
+// ball.
+u8 CTIP_CheckUphillLieTrigger(int nPlayer) {
     return 3.0f * (gPlayers[nPlayer].vTargetCopy[1] - gPlayers[nPlayer].vBall[1]) > 17.0f;
 }
 
-// A tip test: lbl_802811F0's flag 0x2 is set.
-u8 fn_800D1AE0(void) {
+// The weather tip's test (tip 19, three short versions): the hole's weather has flag 0x2
+// (lbl_802811F0; fn_8006F650 rolls it per course, and fn_8006FB10 then starts particle effects 0 to
+// 2 at a strength and sets the turf speed). Takes no player, though CTIP_ShowCaddieTip passes one.
+u8 CTIP_CheckWeatherTrigger(void) {
     return fn_80035574() != 0;
 }
 
-// A tip test: the player's first shot on a par 5 of 500 or more (the hole's value for the tee).
-u8 fn_800D1B10(int nPlayer) {
+// The long tee shot tip's test (tip 22, three short versions): the player's first shot on a par 5
+// of 500 yards or more (the hole's length from the player's tees).
+u8 CTIP_LongDistanceTeeShotTrigger(int nPlayer) {
     s32 nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     int nPar = Course_GetCurHolePar();
     s32 nLength = fn_800D2C68(gSession.nTeeSet[nPlayer]);
@@ -140,8 +152,9 @@ u8 fn_800D1B10(int nPlayer) {
     return 0;
 }
 
-// A tip test: the player's first shot on a par 4 of 325 or less.
-u8 fn_800D1BA4(int nPlayer) {
+// The medium tee shot tip's test (tip 25, one short version): the player's first shot on a par 4 of
+// 325 yards or less.
+u8 CTIP_MediumDistanceTeeShotTrigger(int nPlayer) {
     s32 nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     int nPar = Course_GetCurHolePar();
     s32 nLength = fn_800D2C68(gSession.nTeeSet[nPlayer]);
@@ -151,15 +164,16 @@ u8 fn_800D1BA4(int nPlayer) {
     return 0;
 }
 
-// A tip test: the club reaches past the pin (the longest the player can hit it is more than the
-// ball's distance from the pin).
-u8 fn_800D1C38(int nPlayer) {
+// The spin shot tip's test (tip 26, two short versions): the club can hit the ball farther
+// (AI_MaxDistance for the shot and club) than the ball lies from the pin.
+u8 CTIP_SpinnaShotTrigger(int nPlayer) {
     f32 fMax = AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
     return fMax > fn_800D0478(nPlayer);
 }
 
-// A tip test: the player's first shot on a par 4 of 425 or more.
-u8 fn_800D1C9C(int nPlayer) {
+// The tee spin shot tip's test (tip 28, one short version): the player's first shot on a par 4 of
+// 425 yards or more.
+u8 CTIP_TeeSpinnaShotTrigger(int nPlayer) {
     s32 nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     int nPar = Course_GetCurHolePar();
     s32 nLength = fn_800D2C68(gSession.nTeeSet[nPlayer]);
@@ -169,13 +183,15 @@ u8 fn_800D1C9C(int nPlayer) {
     return 0;
 }
 
-// A tip test that never fires.
-u8 fn_800D1D30(void) {
+// Tip 29's test: always false in this build, so tip 29 is never shown. Takes no player, though
+// CTIP_ShowCaddieTip passes one.
+u8 CTIP_CheckDisabledTrigger(void) {
     return 0;
 }
 
-// A tip test: a target 25 to 33 away, no more than 3 feet above or below the ball.
-u8 fn_800D1D38(int nPlayer) {
+// The flop shot tip's test (tip 30, two short versions): the target is 25 to 33 yards away
+// (fDistance) and no more than 3 feet above or below the ball.
+u8 CTIP_FlopShotTrigger(int nPlayer) {
     f32 fRise = 3.0f * (gPlayers[nPlayer].vTarget[1] - gPlayers[nPlayer].vBall[1]);
     if (gPlayers[nPlayer].fDistance >= 25.0f && gPlayers[nPlayer].fDistance <= 33.0f && fRise >= -3.0f &&
         fRise <= 3.0f) {
@@ -190,10 +206,13 @@ static inline u32 SwingTips_Pick(u32 nCount) {
     return Misc_RandFunc(0) % nCount;
 }
 
-// The tips as a swing starts, when the tips option is on and the player has a save profile (and
-// no controller in use is unplugged). Each test that passes shows its tip: the full one the
-// first time for this profile (unless b522F is set), else a random short one.
-void fn_800D1DAC(int nPlayer) {
+// The caddie tips as a swing starts (STATEFUNC_SwingInit): only when the tips option is on (options
+// a24[0]), session flag 0x4000 is clear, the shot is not a putt, the player's save profile is
+// active and every controller in use is plugged in. Each test that passes shows its tip: the full
+// tip the first time for this profile (unless b522F is set; the profile's aTipSeen flag is then
+// set), else a random one of its short versions. After a full tip the round's UI is hidden
+// (GUI_ToggleUI) and fn_80062C80 is called with the player's nC58.
+void CTIP_ShowCaddieTip(int nPlayer) {
     u8 bFull;
     u8 bUnplugged;
     int nChan;
@@ -225,7 +244,7 @@ void fn_800D1DAC(int nPlayer) {
     if (bUnplugged) {
         return;
     }
-    if (fn_800D1698(nPlayer)) {
+    if (CTIP_CheckGeneralWindTrigger(nPlayer)) {
         if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[0]) {
             GUI_ShowSwingTip(1, 0);
             bFull = 1;
@@ -234,7 +253,7 @@ void fn_800D1DAC(int nPlayer) {
             GUI_ShowSwingTip(2, SwingTips_Pick(2) + 0);
         }
     }
-    if (fn_800D16F0(nPlayer)) {
+    if (CTIP_CheckIntoWindTrigger(nPlayer)) {
         if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[1]) {
             GUI_ShowSwingTip(1, 2);
             bFull = 1;
@@ -243,7 +262,7 @@ void fn_800D1DAC(int nPlayer) {
             GUI_ShowSwingTip(2, SwingTips_Pick(4) + 2);
         }
     }
-    if (fn_800D17E4(nPlayer)) {
+    if (CTIP_CheckWithWindTrigger(nPlayer)) {
         if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[2]) {
             GUI_ShowSwingTip(1, 6);
             bFull = 1;
@@ -252,7 +271,7 @@ void fn_800D1DAC(int nPlayer) {
             GUI_ShowSwingTip(2, SwingTips_Pick(2) + 6);
         }
     }
-    if (fn_800D18D8(nPlayer)) {
+    if (CTIP_CheckPenaltyLieTrigger(nPlayer)) {
         if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[3]) {
             GUI_ShowSwingTip(1, 8);
             bFull = 1;
@@ -261,7 +280,7 @@ void fn_800D1DAC(int nPlayer) {
             GUI_ShowSwingTip(2, SwingTips_Pick(3) + 8);
         }
     }
-    if (fn_800D19F8(nPlayer)) {
+    if (CTIP_CheckRoughLieTrigger(nPlayer)) {
         if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[4]) {
             GUI_ShowSwingTip(1, 11);
             bFull = 1;
@@ -270,7 +289,7 @@ void fn_800D1DAC(int nPlayer) {
             GUI_ShowSwingTip(2, SwingTips_Pick(2) + 11);
         }
     }
-    if (fn_800D1A34(nPlayer)) {
+    if (CTIP_CheckSandLieTrigger(nPlayer)) {
         if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[5]) {
             GUI_ShowSwingTip(1, 13);
             bFull = 1;
@@ -279,7 +298,7 @@ void fn_800D1DAC(int nPlayer) {
             GUI_ShowSwingTip(2, SwingTips_Pick(2) + 13);
         }
     }
-    if (fn_800D1A70(nPlayer)) {
+    if (CTIP_CheckDownhillLieTrigger(nPlayer)) {
         if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[6]) {
             GUI_ShowSwingTip(1, 15);
             bFull = 1;
@@ -288,7 +307,7 @@ void fn_800D1DAC(int nPlayer) {
             GUI_ShowSwingTip(2, SwingTips_Pick(2) + 15);
         }
     }
-    if (fn_800D1AA8(nPlayer)) {
+    if (CTIP_CheckUphillLieTrigger(nPlayer)) {
         if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[7]) {
             GUI_ShowSwingTip(1, 17);
             bFull = 1;
@@ -297,7 +316,7 @@ void fn_800D1DAC(int nPlayer) {
             GUI_ShowSwingTip(2, SwingTips_Pick(2) + 17);
         }
     }
-    if (((u8 (*)(int))fn_800D1AE0)(nPlayer)) {   // port: EA passes an argument fn_800D1AE0 ignores
+    if (((u8 (*)(int))CTIP_CheckWeatherTrigger)(nPlayer)) {   // port: EA passes an argument CTIP_CheckWeatherTrigger ignores
         if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[8]) {
             GUI_ShowSwingTip(1, 19);
             bFull = 1;
@@ -306,7 +325,7 @@ void fn_800D1DAC(int nPlayer) {
             GUI_ShowSwingTip(2, SwingTips_Pick(3) + 19);
         }
     }
-    if (fn_800D1B10(nPlayer)) {
+    if (CTIP_LongDistanceTeeShotTrigger(nPlayer)) {
         if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[9]) {
             GUI_ShowSwingTip(1, 22);
             bFull = 1;
@@ -315,7 +334,7 @@ void fn_800D1DAC(int nPlayer) {
             GUI_ShowSwingTip(2, SwingTips_Pick(3) + 22);
         }
     }
-    if (fn_800D1BA4(nPlayer)) {
+    if (CTIP_MediumDistanceTeeShotTrigger(nPlayer)) {
         if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[10]) {
             GUI_ShowSwingTip(1, 25);
             bFull = 1;
@@ -324,7 +343,7 @@ void fn_800D1DAC(int nPlayer) {
             GUI_ShowSwingTip(2, SwingTips_Pick(1) + 25);
         }
     }
-    if (fn_800D1C38(nPlayer)) {
+    if (CTIP_SpinnaShotTrigger(nPlayer)) {
         if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[11]) {
             GUI_ShowSwingTip(1, 26);
             bFull = 1;
@@ -333,7 +352,7 @@ void fn_800D1DAC(int nPlayer) {
             GUI_ShowSwingTip(2, SwingTips_Pick(2) + 26);
         }
     }
-    if (fn_800D1C9C(nPlayer)) {
+    if (CTIP_TeeSpinnaShotTrigger(nPlayer)) {
         if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[12]) {
             GUI_ShowSwingTip(1, 28);
             bFull = 1;
@@ -342,7 +361,7 @@ void fn_800D1DAC(int nPlayer) {
             GUI_ShowSwingTip(2, SwingTips_Pick(1) + 28);
         }
     }
-    if (((u8 (*)(int))fn_800D1D30)(nPlayer)) {   // port: EA passes an argument fn_800D1D30 ignores
+    if (((u8 (*)(int))CTIP_CheckDisabledTrigger)(nPlayer)) {   // port: EA passes an argument CTIP_CheckDisabledTrigger ignores
         if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[13]) {
             GUI_ShowSwingTip(1, 29);
             bFull = 1;
@@ -351,7 +370,7 @@ void fn_800D1DAC(int nPlayer) {
             GUI_ShowSwingTip(2, SwingTips_Pick(1) + 29);
         }
     }
-    if (fn_800D1D38(nPlayer)) {
+    if (CTIP_FlopShotTrigger(nPlayer)) {
         if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[14]) {
             GUI_ShowSwingTip(1, 30);
             bFull = 1;

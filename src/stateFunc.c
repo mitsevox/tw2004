@@ -53,7 +53,7 @@ void  fn_800A3DF4(int nPlayer);
 void  fn_80062DDC(f32* pA, f32* pB, f32* pOut);  // a - b
 void  fn_8006BB5C(int nPlayer);
 void  Gaud_InitSwing(u8 nPlayer);
-void  fn_800D1DAC(int nPlayer);
+void  CTIP_ShowCaddieTip(int nPlayer);
 void  fn_80062B68(int nPlayer);
 void  fn_80062B6C(int nPlayer);
 void  fn_80062DB8(View* pView, int a);
@@ -482,7 +482,7 @@ void STATEFUNC_ShotSetupExit(int nPlayer) {
 
 // State 10 begins: the swing. The address animation (5) with the club and shot kind set on the
 // character; the swing reset unless the shot setup did it (unk630); camera 12; first-time tips for
-// a human (fn_800E505C 0/1/2 or fn_800D1DAC, with gpGame+0x281); the caddie starts; on the tee the
+// a human (fn_800E505C 0/1/2 or CTIP_ShowCaddieTip, with gpGame+0x281); the caddie starts; on the tee the
 // tee goes in and every player's ball markers are set; the shot flags are cleared; event 7.
 void STATEFUNC_SwingInit(int nPlayer) {
     View* pV    = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
@@ -529,7 +529,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
             GUI_ToggleUI(nPlayer, 0);
             fn_80062C80(gPlayers[nPlayer].nC58, 0);
         } else {
-            fn_800D1DAC(nPlayer);
+            CTIP_ShowCaddieTip(nPlayer);
         }
     }
     if (gPlayers[nPlayer].bC2E == 0 && !Player_IsCPU(nPlayer) && GM5_IsChallengeRunning() && fn_800ED540()) {

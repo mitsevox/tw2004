@@ -295,9 +295,9 @@ typedef struct SaveProfile {
     u8   unk51E0[4];
     u16  aMedalDate[29];        // 0x051E4  the day each was earned (CalDate_GetToday)
     u8   unk521E[0x5220 - 0x521E];
-    u8   aTipSeen[15];          // 0x05220  per swing tip test: its full tip was shown (fn_800D1DAC)
+    u8   aTipSeen[15];          // 0x05220  per swing tip test: its full tip was shown (CTIP_ShowCaddieTip)
     u8   b522F;                 // 0x0522F  set by a menu command during a round (GameUICommands.c);
-                                //          when set, fn_800D1DAC only shows short tips
+                                //          when set, CTIP_ShowCaddieTip only shows short tips
     SavedRound aSavedRound[NUM_SAVED_ROUNDS];   // 0x05230
     GolferRecord createdGolfer; // 0x05380  the created golfer's record (fn_80077A80: golfers
                                 //          from FIRST_CREATED_GOLFER on are read here)

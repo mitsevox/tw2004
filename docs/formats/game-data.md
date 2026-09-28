@@ -128,7 +128,7 @@ field_A08 is 9 (both still to be named). It is flatter than block A (Goosen 71 a
              fn_8005C5EC RECOV PUTT APPR DRVACC STRIKING x4; fn_8005C960 PUTT APPR RECOV STRIKING
     fn_80086C78, fn_80086E5C  RECOVERY                   (FE_Manager.c region)
     FE_GolferAttributes       the nine visible ones      (the attribute screen)
-    fn_800D18D8  RECOVERY x2;  fn_800FBB30, fn_800FBD2C  SPEED   (SkinPart.c region: animation?)
+    CTIP_CheckPenaltyLieTrigger  RECOVERY x2;  fn_800FBB30, fn_800FBD2C  SPEED   (SkinPart.c region: animation?)
 
 AGGRESSION and IQ are never read by the swing code; their only readers are the
 `0x8002AA74`/`0x8002C2DC` pair, which also sample every shot-relevant attribute twice in both
