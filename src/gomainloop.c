@@ -66,17 +66,17 @@ void ViewController_Delete(int nView);
 void ViewController_Update(int nView);
 void CharacterTex_TextureLoader(void);
 void Character_PostInit(void);
-void fn_8001B878(Character* pChar, int nPlayer);
-void fn_8001BA74(void);
-void fn_8001BBD8(int n);
-void fn_8001BC8C(f32 fFrameTime);
-void fn_8001C254(void);
-void fn_8001C2B4(void);
-void fn_8001C304(void);
-void fn_8001C350(void);
-void fn_8001C37C(void);
-void fn_8001C468(void);
-void fn_8001C518(void);
+void Character_ClipTest(Character* pChar, int nPlayer);
+void Character_PreRenderAll(void);
+void Character_RenderAll(int n);
+void Character_UpdateAll(f32 fFrameTime);
+void Character_InitIG(void);
+void Character_CloseIG(void);
+void Character_InitFE(void);
+void Character_CloseFE(void);
+void Legacy_Character_InitModule(void);
+void Legacy_Character_CloseModule(void);
+void Character_FreeFEGolfers(void);
 void fn_8001D290(void);
 void fn_8001D384(void);
 void fn_8001D63C(void);
@@ -448,7 +448,7 @@ void fn_8006C7A8(void) {
     fn_800136F4();
     fn_800103C0();
     TI_vInitModule();
-    fn_8001C37C();
+    Legacy_Character_InitModule();
     fn_8002F180();
     uSeed = Misc_CreateRandomSeed();
     gSession.nSeed = uSeed;
@@ -479,7 +479,7 @@ void fn_8006C854(void) {
     fn_800486F0();
     fn_80055F18();
     Misc_CloseModule();
-    fn_8001C468();
+    Legacy_Character_CloseModule();
     TI_vCloseModule();
     fn_8001049C();
     fn_80013718();
@@ -554,7 +554,7 @@ void GO_vInitFE(void) {
     fn_80124B54();
     fn_800773F8();
     fn_80014668();
-    fn_8001C304();
+    Character_InitFE();
     fn_800B9A88();
     fn_80014718();
     fn_800146C4();
@@ -583,8 +583,8 @@ void fn_8006CB2C(void) {
     fn_80062E20();
     DynamicCam_DeInit();
     fn_80097E98();
-    fn_8001C350();
-    fn_8001C518();
+    Character_CloseFE();
+    Character_FreeFEGolfers();
     Players_Reset();
     TI_sStopCounter(2);
     FE_CrAP_CloseModule();
@@ -612,7 +612,7 @@ void GO_vInitIG(void) {
     fn_800B251C_ShadowInit(0);
     fn_800905A8();
     Session_SetupProfiles();
-    fn_8001C254();
+    Character_InitIG();
     fn_80055D54();
     lbl_80281E60 = CA_spCreateCamera();
     lbl_80281E5C = FB_spCreateFrameBuffer();
@@ -720,7 +720,7 @@ void fn_8006CDC4(void) {
     REPLAY_CloseModule();
     fn_80058DB4();
     fn_80090664();
-    fn_8001C2B4();
+    Character_CloseIG();
     fn_8001058C();
     fn_80048E7C();
     fn_800B352C();
@@ -851,7 +851,7 @@ void fn_8006D27C(void) {
         gSession.b11 = 0;
     }
     fn_80093AD4();
-    fn_8001BC8C(gSession.fFrameTime);
+    Character_UpdateAll(gSession.fFrameTime);
     fn_80033744();
     fn_800467B4();
     fn_80099344(gSession.fFrameTime);
@@ -896,18 +896,18 @@ void fn_8006D27C(void) {
             gPlayers[ViewController_GetActivePlayerNumber(nView)].pChar->u10 |= 1;
         }
         for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
-            fn_8001B878(gPlayers[nPlayer].pChar, nPlayer);
+            Character_ClipTest(gPlayers[nPlayer].pChar, nPlayer);
         }
         fn_8001D384();
         if (nView < 2) {
             fn_8005A478(ViewController_GetActivePlayerNumber(nView));
         }
         fn_8006DEA8();
-        fn_8001BA74();
+        Character_PreRenderAll();
         fn_80035E98(nView);
         if (!gSession.b11 && nView < 2) {
             for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
-                fn_8001B878(gPlayers[nPlayer].pChar, nPlayer);
+                Character_ClipTest(gPlayers[nPlayer].pChar, nPlayer);
                 if (fn_8001EE88(gPlayers[nPlayer].pChar) != 2 && nPlayer != fn_80063758()
                     && !(gPlayers[nPlayer].pChar->u10 & 0x40) && !(gPlayers[nPlayer].pChar->u10 & 1)) {
                     fn_800B28D4(gPlayers[nPlayer].pChar, 0, 0);
@@ -915,13 +915,13 @@ void fn_8006D27C(void) {
             }
         }
         if (nView >= 2) {
-            fn_8001BBD8(4);
+            Character_RenderAll(4);
         } else {
-            fn_8001BBD8(0);
+            Character_RenderAll(0);
         }
         if (!gSession.b11 && nView < 2) {
             for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
-                fn_8001B878(gPlayers[nPlayer].pChar, nPlayer);
+                Character_ClipTest(gPlayers[nPlayer].pChar, nPlayer);
                 if (fn_8001EE88(gPlayers[nPlayer].pChar) != 2 && nPlayer != fn_80063758()
                     && !(gPlayers[nPlayer].pChar->u10 & 0x40) && !(gPlayers[nPlayer].pChar->u10 & 1)) {
                     fn_800B2FB0(gPlayers[nPlayer].pChar, 0, 0);

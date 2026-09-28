@@ -45,7 +45,7 @@ void fn_80112D20(void);
 void fn_8009A16C(void);
 void fn_80112DA0(void);
 void Gaud_ExitHole(void);
-void fn_8001C2E4(void);
+void Character_ExitHole(void);
 void fn_8006F568(void);
 void Luck_TightenOdds(void);
 void fn_8009554C(void);
@@ -160,7 +160,7 @@ void fn_800083A4(void) {
         case 7:
             fn_80112DA0();
             Gaud_ExitHole();
-            fn_8001C2E4();
+            Character_ExitHole();
             fn_8006F568();
             Luck_TightenOdds();
             if (fn_80008820() && gSession.nC == 0) {

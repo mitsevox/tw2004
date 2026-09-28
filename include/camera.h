@@ -604,7 +604,7 @@ LAYOUT_ASSERT(CrAPState, 0x1E0);
 
 extern CrAPState* lbl_80281EE0;
 extern struct Character* lbl_80281EE8[CRAP_NUM_GOLFERS];   // per golfer slot: the character it starts
-                                        // with (none); char.c's fn_8001C518 frees them
+                                        // with (none); char.c's Character_FreeFEGolfers frees them
 
 // ---- the views ------------------------------------------------------------------------------
 

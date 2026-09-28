@@ -579,7 +579,7 @@ typedef struct CharSkinSet {
     Skin* apSkins[6];           // 0x24  per club class: its skin (SkinPart.c picks its parts and sets)
     f32  a3C[6][4];             // 0x3C  per club class: a point on the club, through bone 0x52's matrix
                                 //       (Character_UpdateTestPoints: aPoints[4])
-    CharSkinRef* a9C[6];        // 0x9C  freed with CharSkinRef_Free (fn_8001B58C)
+    CharSkinRef* a9C[6];        // 0x9C  freed with CharSkinRef_Free (Character_FreeClubSkinSets)
 } CharSkinSet;
 
 // A pool of seven entries characters take (CharacterTex_TakePoolEntries) and give back (CharacterTex_ReleasePoolEntries).
@@ -598,13 +598,13 @@ LAYOUT_ASSERT(CharPool, 0x3C);
 extern f32        lbl_801B95C8[4];      // } the two ground normals Character_GetTerrainHeightAndNormal
 extern f32        lbl_801B95D8[4];      // } reads (the pNormalHigh / pNormalLow of Ter_GetEnclosingGroundData)
 extern CharPool   lbl_801B95E8;
-extern Character* lbl_801B9624[5];     // the characters made so far (fn_8001C21C)
+extern Character* lbl_801B9624[5];     // the characters made so far (Character_Add)
 extern s32        lbl_80281CA8;         // how many
 extern s32        lbl_80281CAC;         // the player fn_8001D8DC last marked (-1 at start)
 extern s32        lbl_80187164[8];      // the clip key for each shot kind (Character_SelectGameShotType)
-extern s32        lbl_80280E20;         // set to 6 (4 in split screen) by fn_8001C254, 3 by fn_8001C304
+extern s32        lbl_80280E20;         // set to 6 (4 in split screen) by Character_InitIG, 3 by Character_InitFE
 extern CharSkinSet* lbl_80280E24[2];   // what Character_CreateClubSkinSet makes of the 'CLB ' object: one, or one per
-                                        // view in split screen (Character.p16D8; fn_8001B58C frees them)
+                                        // view in split screen (Character.p16D8; Character_FreeClubSkinSets frees them)
 
 void  fn_80037CD8(Skin* pSkin);         // Skin.c: frees a skin
 s32   fn_80037708(Skin* pSkin);         // Skin.c: frees what loading it allocated

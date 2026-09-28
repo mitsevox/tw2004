@@ -89,10 +89,10 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 n, CharModelDefs* pDefs, int b);   // 
 void  fn_80037AB8(Skin* pSkin, CharModel* pModel, int nBone, int nId);   // Skin.c
 void  SkinPart_BurnBodySkin(Character* pChar);                // SkinPart.c
 void* CharSlider_CreateDefinitionsFromMem(u8** ppData);
-void  fn_8001B58C(CharSkinSet* pSet);
-void  fn_8001B878(Character* pChar, int nPlayer);
+void  Character_FreeClubSkinSets(CharSkinSet* pSet);
+void  Character_ClipTest(Character* pChar, int nPlayer);
 f32 (*fn_8001EE64(Character* pChar))[4];                        // bone 1's matrix
-Character* fn_8001C21C(Character* pChar);
+Character* Character_Add(Character* pChar);
 void  Character_UpdateAnimation(Character* pChar, int a, f32 f);
 void  Character_UpdateTestPoints(Character* pChar);
 void  Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals);
@@ -118,7 +118,7 @@ void  Character_KeepClubOutOfGround(Character* pChar);
 void  Character_IKLegsToGround(Character* pChar, u8 bRightLeg, u8 bLeftLeg);
 void  Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, int nHip, int nKnee,
                               int nAnkle, int nToe, int nAnklePoint, int nToePoint);
-void  fn_8001B644(Character* pChar);
+void  Character_CalculateClipPoints(Character* pChar);
 void  Character_SetupForShot(Character* pChar);
 void  fn_80021978(u8 v);                                        // ska_shared.c
 void  fn_8002787C(CharModel* pModel);                           // Skeleton.c
@@ -128,7 +128,7 @@ void  fn_80037C48(Skin* pSkin, SkelPose* pPose);                // Skin.c
 void  fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);                  // CharAnim.c
 void  fn_80096F0C(Character* pChar);                            // CharAnim.c
 void  Quat_QuatToMatrix(f32* pQ, f32 (*m)[4]);                        // Quaternion.c: a rotation matrix
-int   fn_8001BD18(Character* pChar, Clip* pClip);
+int   Character_UpdateClubAttachment(Character* pChar, Clip* pClip);
 void  Quat_Invert(f32* pQ, f32* pOut);                          // Quaternion.c
 void  Quat_RotateVector(f32* pQ, f32* pIn, f32* pOut);                // Quaternion.c: a vector turned by pQ
 void  fn_800280E8(Character* pChar, f32* pPos, int bPlace);     // Skeleton.c
@@ -633,7 +633,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
         Character_KeepClubOutOfGround(pChar);
     }
     pChar->n1698 = 0;
-    fn_8001B644(pChar);
+    Character_CalculateClipPoints(pChar);
     if (Character_IsGolfer(pChar)) {
         fn_80029948(pChar->pModel, pChar->pModel->pF0, fTime);
         fn_80029948(pChar->pModel, pChar->pModel->pF4, fTime);
@@ -2021,8 +2021,8 @@ CharSkinSet* Character_CreateClubSkinSet(u8* pData) {
 }
 
 // Frees the club skin sets (lbl_80280E24): each one's skins and a9C blocks, then the set. pSet is
-// not used: fn_8001C468 passes the set it found, but both are freed here.
-void fn_8001B58C(CharSkinSet* pSet) {
+// not used: Legacy_Character_CloseModule passes the set it found, but both are freed here.
+void Character_FreeClubSkinSets(CharSkinSet* pSet) {
     int j;
     int i;
 
@@ -2045,8 +2045,10 @@ void fn_8001B58C(CharSkinSet* pSet) {
 #define MIN(a, b) ((a) <= (b) ? (a) : (b))
 #define MAX(a, b) ((a) <= (b) ? (b) : (a))
 
-// The character's bounding box and sphere, from its bones' positions (bone 1 on).
-void fn_8001B644(Character* pChar) {
+// The character's bounding box (vMin / vMax: its bones from bone 1 on, grown by 0.33 each way) and
+// the sphere around it that Character_ClipTest tests (v1668 its centre, f1674 half its diagonal).
+// Nothing for a model of fewer than two bones.
+void Character_CalculateClipPoints(Character* pChar) {
     f32 vCentre[4];
     f32 vDiff[4];
     int i;
@@ -2079,10 +2081,14 @@ void fn_8001B644(Character* pChar) {
     pChar->f1674 = (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff)) / 2.0f;
 }
 
-// How the camera sees the character: n1654 and n1658 are fn_80007D74's answers for its bounding
-// sphere and for a 3-unit one (2 when it is not the view's player or is too far away), f14 the
-// nearest it has been, f1664 1 up close fading to 0 between 6 and 15 units deep.
-void fn_8001B878(Character* pChar, int nPlayer) {
+// Tests the character against the current camera. Only for the active player of the current view
+// (nPlayer 1000: any character); for another player both answers are 2 (out of view). n1654 is
+// fn_80007D74's answer for its bounding sphere (v1668, f1674; 2 = out of view) and n1658 the same
+// for a 3-unit sphere (its shadow); each is 2 as well past its distance along the lens
+// (fn_8001ED44, fn_8001EE00; halved in split screen). f14 keeps the nearest bone 1 has been to the
+// camera; f1664 is 1 up close, fading to 0 between 6 and 15 units deep (scaled by the lens's field
+// of view).
+void Character_ClipTest(Character* pChar, int nPlayer) {
     f32 (*pMtx)[4];
     f32 fDepth;
     f32 fDist;
@@ -2130,11 +2136,12 @@ void fn_8001B878(Character* pChar, int nPlayer) {
     }
 }
 
-// For every character made: bit 0x1000 of u10 cleared; with bit 2, bit 1 follows whether the
-// flagstick is out on the current view. Then fn_80035B40 for every character that is not in state
-// 2 (fn_8001EE90) or whose n1658 is not 2, is not the camera's player (fn_800636EC), has none of bits
-// 0x1000, 0x40 and 1 of u10 set, and has n1698 0.
-void fn_8001BA74(void) {
+// Each frame before drawing: every character loses bit 0x1000 of u10, and one with bit 2 (the
+// flagstick, GoDynObj.c) gets bit 1 (hidden) while the current view has the flag out. Then every
+// character whose body or shadow is in view (n1654 or n1658 not 2), that is not the player
+// fn_800636EC names, has none of bits 0x1000, 0x40 and 1 of u10 and is not posed yet (n1698 0) gets
+// its skins posed on its model (fn_80035B40).
+void Character_PreRenderAll(void) {
     int i;
     int nPlayer;
     u8 bDo;
@@ -2163,10 +2170,10 @@ void fn_8001BA74(void) {
     }
 }
 
-// With characters made: fn_80035604, then fn_800358E0 for every character that is not in state 2
-// (fn_8001EE90), not the camera's player (fn_800636EC), has neither bit 0x40 nor 1 of u10 set and,
-// when uFlags has bit 4, passes Character_IsGolfer.
-void fn_8001BBD8(u32 uFlags) {
+// Draws every character (fn_800358E0 with uFlags) that is in view (n1654 not 2), is not the player
+// fn_800636EC names, is neither hidden (bit 1 of u10) nor without its textures (bit 0x40), and,
+// when uFlags has bit 4, is a golfer. fn_80035604 first; nothing when no character is made.
+void Character_RenderAll(u32 uFlags) {
     int i;
     int nPlayer;
 
@@ -2184,7 +2191,7 @@ void fn_8001BBD8(u32 uFlags) {
 }
 
 // Advances every character's animation by fTime, except in game type 6 while GUI_IsPauseMenuOpen holds.
-void fn_8001BC8C(f32 fTime) {
+void Character_UpdateAll(f32 fTime) {
     int i;
 
     if (gSession.nGameType != 6 || !GUI_IsPauseMenuOpen()) {
@@ -2194,10 +2201,12 @@ void fn_8001BC8C(f32 fTime) {
     }
 }
 
-// With a clip of flag 0x10 the grip bone goes back to its parent; otherwise it is cut loose
-// (parent 0) and its rotation and offset from the root are kept in q16AC and v16BC (mirrored
-// while bEE is set). 1 when the state changed, 0 when it already was that way.
-int fn_8001BD18(Character* pChar, Clip* pClip) {
+// Hangs the club from the hand or from the root, as the clip says. With clip flag 0x10 the club
+// bone (nGripBone, bone 0x52) goes back to its parent, the right wrist (n16A8); otherwise it is
+// parented to the root (bit 0x4000 of u10) and its rotation and offset from the root are kept in
+// q16AC and v16BC (for a left-hander turned half round and mirrored in z). Returns 1 when the
+// attachment changed, 0 when it already was that way.
+int Character_UpdateClubAttachment(Character* pChar, Clip* pClip) {
     CharModel* pModel;
     f32 qRoot[4];
     f32 vOffset[4];
@@ -2233,8 +2242,11 @@ int fn_8001BD18(Character* pChar, Clip* pClip) {
     return 0;
 }
 
-// Plays pClip on the character. With bNoBlend the blend tree and the animation player start
-// over; otherwise the clip is blended in over its first f18 seconds from the current time.
+// Plays pClip on the character (nothing for NULL); a golfer's club first follows the clip
+// (Character_UpdateClubAttachment). With bNoBlend the blend tree and the animation player start
+// over; otherwise the clip is blended in over its first f18 seconds from the current time plus
+// fTime. Its SKA tags then start at the blend's start, and the clip's pF4 animation plays too
+// (fn_8009622C).
 void Character_PlayClip(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) {
     f32 aBlend[6];
     SKABlendNode* pNode;
@@ -2249,7 +2261,7 @@ void Character_PlayClip(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) 
         return;
     }
     if (Character_IsGolfer(pChar)) {
-        fn_8001BD18(pChar, pClip);
+        Character_UpdateClubAttachment(pChar, pClip);
     }
     pChar->p178C = NULL;
     if (bNoBlend) {
@@ -2295,7 +2307,7 @@ void Character_PlayClip(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) 
 
 // Frees a character: its texture bank slot, both blend trees, its skin, library, model, buffers
 // and the rest; in game type 3 its slot's clip bank is released too.
-void fn_8001C0E0(Character* pChar) {
+void Character_Free(Character* pChar) {
     SKABlendNode* pNode;
     int i;
     int nSlot;
@@ -2340,7 +2352,7 @@ void fn_8001C0E0(Character* pChar) {
 }
 
 // Add a character to the table of characters (up to five); NULL when it is full.
-Character* fn_8001C21C(Character* pChar) {
+Character* Character_Add(Character* pChar) {
     if (lbl_80281CA8 >= 5) {
         return NULL;
     }
@@ -2350,7 +2362,10 @@ Character* fn_8001C21C(Character* pChar) {
     return pChar;
 }
 
-void fn_8001C254(void) {
+// Starts the characters for a round (GO_vInitIG): the dynamic texture pool, IK on, blend trees of
+// up to six clips (four in split screen, lbl_80280E20), the animation stream, the skin parts (every
+// copy changed together) and the skin meshes of each view (fn_80035C58).
+void Character_InitIG(void) {
     int n;
     fn_8009555C();
     CharacterTex_Init();
@@ -2366,7 +2381,9 @@ void fn_8001C254(void) {
     fn_80035C58();
 }
 
-void fn_8001C2B4(void) {
+// Shuts down what Character_InitIG started: the skin meshes, the skin parts, the animation stream
+// and the dynamic texture pool.
+void Character_CloseIG(void) {
     fn_80035CC0();
     SkinPart_Shutdown();
     fn_800C9764();
@@ -2374,11 +2391,16 @@ void fn_8001C2B4(void) {
     CharacterTex_Close();
 }
 
-void fn_8001C2E4(void) {
+// The characters' step at the end of each hole (fn_80095564: outside split screen, every player's
+// skin frees what loading it allocated).
+void Character_ExitHole(void) {
     fn_80095564();
 }
 
-void fn_8001C304(void) {
+// Starts the characters for the front end (GO_vInitFE): the dynamic texture pool, IK off, blend
+// trees of up to three clips (lbl_80280E20), the skin parts (each copy changed on its own) and the
+// skinned-vertex buffer (fn_80112C64).
+void Character_InitFE(void) {
     CharacterTex_Init();
     SKEL_EnableIK(0);
     lbl_80280E20 = 3;
@@ -2388,7 +2410,9 @@ void fn_8001C304(void) {
     fn_80112C64(1);
 }
 
-void fn_8001C350(void) {
+// Shuts down what Character_InitFE started: the dynamic texture pool and the skin parts go, and
+// fn_80036464 and fn_80112CEC free their buffers.
+void Character_CloseFE(void) {
     CharacterTex_Close();
     SkinPart_Shutdown();
     fn_80036464();
@@ -2397,12 +2421,13 @@ void fn_8001C350(void) {
 
 ViewSlot gViewSlots[5] = { 0 };
 
-// Starts the character system (called once from the main loop): the animation libraries up, no
-// club skin sets, the club names read as 64-bit ids, no characters in the menu or player slots,
-// and no player marked.
+// Starts the character module (fn_8006C7A8, when the front end or a round starts): the animation
+// libraries, the 'MAL ' banks and the skeleton module up, the blend tree pools made, no club skin
+// sets, the club names read as 64-bit ids, no characters in the front end's or the players' slots,
+// and no player marked (lbl_80281CAC).
 // port: the names are read as big-endian 64-bit words from their strings (FEgolferanim compares
-//       them with ids read the same way)
-void fn_8001C37C(void) {
+// them with ids read the same way)
+void Legacy_Character_InitModule(void) {
     int i;
 
     Skalib_Init();
@@ -2426,18 +2451,20 @@ void fn_8001C37C(void) {
     lbl_80281CAC = -1;
 }
 
-// Frees the club skin sets and every character made, then shuts down the animation libraries.
-void fn_8001C468(void) {
+// Shuts the character module down (fn_8006C854): frees the club skin sets and every character made,
+// then shuts down the animation libraries, the 'MAL ' banks, the skeleton module and the blend tree
+// pools.
+void Legacy_Character_CloseModule(void) {
     int i;
 
     for (i = 0; i < 2; i++) {
         if (lbl_80280E24[i] != NULL) {
-            fn_8001B58C(lbl_80280E24[i]);
+            Character_FreeClubSkinSets(lbl_80280E24[i]);
         }
         lbl_80280E24[i] = NULL;
     }
     for (i = 0; i < lbl_80281CA8; i++) {
-        fn_8001C0E0(lbl_801B9624[i]);
+        Character_Free(lbl_801B9624[i]);
         lbl_801B9624[i] = NULL;
     }
     lbl_80281CA8 = 0;
@@ -2447,12 +2474,13 @@ void fn_8001C468(void) {
     fn_80071B94();
 }
 
-// Frees every character of the menu's golfer slots (lbl_80281EE8).
-void fn_8001C518(void) {
+// Frees the front end's golfer characters (lbl_80281EE8, one per CrAP golfer slot) and clears the
+// slots. FEgolferanim.c only ever sets them to NULL, so there is nothing to free in practice.
+void Character_FreeFEGolfers(void) {
     int i;
 
     for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
-        fn_8001C0E0(lbl_80281EE8[i]);
+        Character_Free(lbl_80281EE8[i]);
         lbl_80281EE8[i] = NULL;
     }
 }
@@ -2462,8 +2490,9 @@ int Character_GetGolferModelID(int nPlayer) {
     return gGolferTable[gSession.nGolfer[nPlayer]].nModelID;
 }
 
-// The player's golfer is one of records 30 to 33.
-int fn_8001C584(int nPlayer) {
+// Whether the player's golfer is a created one (golfer table slots 30 to 33, FIRST_CREATED_GOLFER
+// on).
+int Character_IsCrAPGolfer(int nPlayer) {
     int b = 0;
     if (gSession.nGolfer[nPlayer] >= 30 && gSession.nGolfer[nPlayer] <= 33) {
         b = 1;
@@ -2632,7 +2661,7 @@ void Character_SetupForShot(Character* pChar) {
                 fn_8001FCF4(pChar, pClip, &pSkel->pose, 0, 0.0f);
             }
         }
-        fn_8001BD18(pChar, pSkel->pClip);
+        Character_UpdateClubAttachment(pChar, pSkel->pClip);
         LLMath_Scale(-lbl_80187184[pChar->nClubClass][0], pChar->pModel->pMatrices[0][0], vOffsetX);
         LLMath_Scale(-lbl_80187184[pChar->nClubClass][2], pChar->pModel->pMatrices[0][2], vOffsetZ);
         if (pChar->pModel->bEE) {
@@ -2670,7 +2699,7 @@ void Character_SetupForShot(Character* pChar) {
             SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 0.0f);
         }
         if (pOldClip != NULL) {
-            fn_8001BD18(pChar, pOldClip);
+            Character_UpdateClubAttachment(pChar, pOldClip);
         }
     }
     if (pChar->pModel->pSkel != NULL) {
@@ -2730,8 +2759,8 @@ void fn_8001CE5C(UStreamObject* pObject) {
         if (nGolferModel == uModel && gViewSlots[i].pChar == NULL) {
             fn_800106AC(i);
             nSet = gSession.nSplitScreen ? i : 0;
-            gViewSlots[i].pChar = fn_8001C21C(Character_CreateFromMem(pObject->pData, 0, nSet, uModel,
-                                                          fn_8001C584(i), &gpSaveData[i].choices));
+            gViewSlots[i].pChar = Character_Add(Character_CreateFromMem(pObject->pData, 0, nSet, uModel,
+                                                          Character_IsCrAPGolfer(i), &gpSaveData[i].choices));
             if (gViewSlots[i].pChar->pSkin != NULL && Character_IsGolfer(gViewSlots[i].pChar)) {
                 Character_SetClubsAndClothes(gViewSlots[i].pChar, i);
             }
@@ -2840,12 +2869,12 @@ Character* fn_8001D324(int nId) {
     return NULL;
 }
 
-// Run fn_8001B878 on every character with no player (the 'SKLO' ones).
+// Run Character_ClipTest on every character with no player (the 'SKLO' ones).
 void fn_8001D384(void) {
     int i;
     for (i = 0; i < lbl_80281CA8; i++) {
         if (lbl_801B9624[i]->nPlayer == 1000) {
-            fn_8001B878(lbl_801B9624[i], 1000);
+            Character_ClipTest(lbl_801B9624[i], 1000);
         }
     }
 }
@@ -2855,7 +2884,7 @@ void fn_8001D384(void) {
 // port: the skeleton is little-endian on disc and Character_CreateFromMem swaps it (BYTESWAP_SWAPDATA): a
 //       little-endian port does not swap there.
 void fn_8001D3EC(UStreamObject* pObject) {
-    Character* pChar = fn_8001C21C(Character_CreateFromMem(pObject->pData, 0, 0, pObject->uId, 0, NULL));
+    Character* pChar = Character_Add(Character_CreateFromMem(pObject->pData, 0, 0, pObject->uId, 0, NULL));
     pChar->nPlayer = 1000;
     pChar->uId     = pObject->uId;
     StaticMem_Free(pObject);
@@ -2870,8 +2899,8 @@ void fn_8001D47C(void) {
 }
 
 // Dresses the character of player slot nSlot: its club skins (in game type 3 golfers 7 and 29 get
-// the profile's created golfer's look; otherwise its own look when fn_8001C584 says so), then the
-// "shirt" set (only when fn_8001C584 says no) and the "glove" set, as "shirt<n>" / "glove<n>" with
+// the profile's created golfer's look; otherwise its own look when Character_IsCrAPGolfer says so), then the
+// "shirt" set (only when Character_IsCrAPGolfer says no) and the "glove" set, as "shirt<n>" / "glove<n>" with
 // n from the slot's profile (no number when it is 0 or less).
 void Character_SetClubsAndClothes(Character* pChar, int nSlot) {
     char szName[32];            // the size is not known
@@ -2882,12 +2911,12 @@ void Character_SetClubsAndClothes(Character* pChar, int nSlot) {
         } else {
             Character_SetClubStatesForCharacter(pChar, nSlot, NULL);
         }
-    } else if (fn_8001C584(nSlot)) {
+    } else if (Character_IsCrAPGolfer(nSlot)) {
         Character_SetClubStatesForCharacter(pChar, nSlot, pChar->pChoices);
     } else {
         Character_SetClubStatesForCharacter(pChar, nSlot, NULL);
     }
-    if (!fn_8001C584(nSlot)) {
+    if (!Character_IsCrAPGolfer(nSlot)) {
         sprintf(szName, "%s", "shirt");
         if (gSession.aProfile[nSlot].n0 > 0) {
             sprintf(szName, "%s%d", szName, gSession.aProfile[nSlot].n0);

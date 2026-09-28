@@ -1272,7 +1272,7 @@ void fn_8008DC10(void) {
             && (fn_8008B990() == 1 || &lbl_80281EE0->aGolfer[0] != lbl_80281EE0->pB8)) {
             if (lbl_80281EE0->aGolfer[0].pChar != NULL) {
                 fn_80008380();
-                fn_8001C0E0(lbl_80281EE0->aGolfer[0].pChar);
+                Character_Free(lbl_80281EE0->aGolfer[0].pChar);
             }
             lbl_80281EE0->aGolfer[0].b18 = 0;
             lbl_80281EE0->aGolfer[0].b19 = 0;

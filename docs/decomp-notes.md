@@ -304,8 +304,8 @@ They will be sorted into the sections below.
   post-increment in the `switch` (ShaderObjectsData fn_80074BE0, fn_80074CF4).
 - **[verified] A divide EA kept (`fdivs` by 1.0)** was a local set to 1.0f (FEgolferanim).
 - **[verified] Divide by a power of two, not multiply by the reciprocal**: `/ 2.0f` gives `fmuls` with the
-  dividend first (char fn_8001B644). A stack vector can need `[4]` though only 3 are used, for the
-  offsets after it (char fn_8001B878).
+  dividend first (char Character_CalculateClipPoints). A stack vector can need `[4]` though only 3 are used, for the
+  offsets after it (char Character_ClipTest).
 - **[verified] A counted skip loop written counting down** gives CW's ctr loop with no index register
   (Grass_Gc Static_Render 92.5 -> 96.5).
 - **[verified] Float tests: `if (f)` / `!f` put the value first in `fcmpu`**; `f != 0.0f` and `0.0f != f`
@@ -317,7 +317,7 @@ They will be sorted into the sections below.
   branch straight out (GoCamCont fn_80063920); a `blt` to a return block placed after the fall-through
   code is a `goto` to a label after that code (char GetTerrainHeightAndNormal); a duplicated tail is
   written twice (`if (n < 30) { if (x) return 1; return t; } return t;`, fe_craputils fn_8005832C).
-- **[verified] `b = b != 0;`** before a test reproduces `clrlwi; neg; or; srwi.` (char fn_8001BA74).
+- **[verified] `b = b != 0;`** before a test reproduces `clrlwi; neg; or; srwi.` (char Character_PreRenderAll).
 - **[verified] Two calls multiplied: the right-hand one runs first** (`f(a) * f(b)`; Skeleton fn_80026D18,
   GoRenderCtx RenderState_SetViewport). `f = call(); f *= c;` puts the call result first in `fmuls`; `call() * c` puts
   the constant first (GoCamCont fn_80063F08, TexAnimManager fn_80076C20).

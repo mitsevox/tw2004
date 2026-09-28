@@ -22,7 +22,7 @@ int   CharacterState_UpdateGameEmotionState(Character* pChar);
 f32   fn_800971B8(Character* pChar);
 u8    Character_IsGolfer(Character* pChar);                        // char.c
 void  Character_PlaceFeetOnGround(Character* pChar);        // char.c
-int   fn_8001BD18(Character* pChar, Clip* pClip);           // char.c
+int   Character_UpdateClubAttachment(Character* pChar, Clip* pClip);           // char.c
 void  Character_InitSKATags(Character* pChar, Clip* pBlend, f32 fStart);   // char.c
 void  fn_801141F8(struct DynChain* pChain, CharModel* pModel);   // DynChain.c
 char* fn_801008A8(void);                                    // GameMode11.c
@@ -191,7 +191,7 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
         }
     }
     if (Character_IsGolfer(pChar)) {
-        fn_8001BD18(pChar, pClip);
+        Character_UpdateClubAttachment(pChar, pClip);
     }
     if (bReset) {
         pChar->fAnimTime = 0.0f;

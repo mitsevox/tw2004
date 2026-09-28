@@ -458,7 +458,7 @@ LAYOUT_ASSERT(ClipEvent, 0x10);
 
 // One of a character's four data buffers (Character.buffers): pBuf holds three runs of 16-byte
 // entries, p0C..p18 mark where they start and end, their counts read from p04's +0x60, +0x58 and
-// +0x5C (the code at 0x8001FE50 fills them; fn_8001DB98 empties them, fn_8001C0E0 frees pBuf).
+// +0x5C (the code at 0x8001FE50 fills them; fn_8001DB98 empties them, Character_Free frees pBuf).
 typedef struct CharBuffer {
     s32   n00;                  // 0x00  -1 when empty
     void* p04;                  // 0x04  what the buffer was filled for
@@ -535,7 +535,7 @@ extern f32 lbl_80187184[6][3];
 // Anim_SetTime and SKATime_UnPause take the address of its animation player at 0x164, whose fields
 // from 0x168 on are named here directly.
 typedef struct Character {
-    s32   nIndex;               // 0x000  its entry in lbl_801B9624 (fn_8001C21C)
+    s32   nIndex;               // 0x000  its entry in lbl_801B9624 (Character_Add)
     s32   nPlayer;              // 0x004  the player it belongs to (Player_SetGolfer); 1000 for the
                                 //        characters fn_8001D324 finds by id
     u32   uId;                  // 0x008  the id of the 'SKLO' object it was built from (fn_8001D3EC);
@@ -561,7 +561,7 @@ typedef struct Character {
     CharModel* pModel;          // 0x038
     struct Skin* pSkin;         // 0x03C  its body's skin (Skin.c), the first of apSkins
     s32   n40;                  // 0x040  how many entries p44 holds (Character_CreateFromMem)
-    struct CharEntry44* p44;    // 0x044  } freed with the character (fn_8001C0E0)
+    struct CharEntry44* p44;    // 0x044  } freed with the character (Character_Free)
     s32   n48;                  // 0x048  a texture bank slot (LLTexGrp.c), freed with it when >= 0
     u8*   p4C;                  // 0x04C  where its CHR object's data ends (Character_CreateFromMem)
     TexBank* p50;               // 0x050  its texture bank, bank78 (Character_LoadTextures); LLDynTex.c is given
@@ -628,10 +628,10 @@ typedef struct Character {
     s32   n1658;                // 0x1658
     f32   f165C;                // 0x165C  } scaled by the view's lens (fn_8001EE00, fn_8001ED44)
     f32   f1660;                // 0x1660  }
-    f32   f1664;                // 0x1664  } fn_8001B878: 1 near the camera, fading to 0 from 6 to 15
+    f32   f1664;                // 0x1664  } Character_ClipTest: 1 near the camera, fading to 0 from 6 to 15
     f32   v1668[3];             // 0x1668  } its bounding sphere, tested against the camera
-    f32   f1674;                // 0x1674  } (fn_8001B878)
-    f32   vMin[4];              // 0x1678  } the box around its bones (fn_8001B644), grown by 0.33;
+    f32   f1674;                // 0x1674  } (Character_ClipTest)
+    f32   vMin[4];              // 0x1678  } the box around its bones (Character_CalculateClipPoints), grown by 0.33;
     f32   vMax[3];              // 0x1688  } v1668 and f1674 are its centre and half its diagonal
     u8    unk1694[0x1698 - 0x1694];
     s32   n1698;                // 0x1698
@@ -640,7 +640,7 @@ typedef struct Character {
     s32   nGripBone;            // 0x16A4  bone 0x52's index: the grip (the trail's other end)
     s32   n16A8;                // 0x16A8  CharModel_GetBoneIndexMapped's answer for bone 0x15
     f32   q16AC[4];             // 0x16AC  } the grip bone's rotation and offset from the root while
-    f32   v16BC[4];             // 0x16BC  } flag 0x4000 holds it (fn_8001BD18)
+    f32   v16BC[4];             // 0x16BC  } flag 0x4000 holds it (Character_UpdateClubAttachment)
     s32   nClub;                // 0x16CC  the club (Character_SelectGameClub)
     s32   nShotKind;            // 0x16D0  the player's shot kind (Character_SelectGameShotType)
     s32   n16D4;              // 0x16D4  the key for clip lookups (Char_SetClip)
@@ -684,7 +684,7 @@ typedef struct ViewSlot {
 extern ViewSlot gViewSlots[5];          // 0x80187124  per player
 
 // Club names as 64-bit ids ("IGdriver", [1] unset, "IGputter", "IGiron3", "IGiron7", "IGwedge"),
-// set by fn_8001C37C; FEgolferanim compares ids against them.
+// set by Legacy_Character_InitModule; FEgolferanim compares ids against them.
 extern u64 lbl_801B9638[6];
 
 extern f32 lbl_80189A30[4];             // (0, 0, 0, 0): where fn_8001D020 places the menu's golfer
@@ -769,7 +769,7 @@ void  fn_800CA9DC(int nSlot);
 void  Character_InitBoneState(Character* pChar, SkelPose* pPose);   // a blend node's pose from the body skin
 void  Character_InitBoneStateBits(Character* pChar, SkelPose* pPose);   // only its bit arrays
 void  Character_SetSkeleton(Character* pChar, CharModel* pModel);
-void  fn_8001C0E0(Character* pChar);    // frees the character
+void  Character_Free(Character* pChar);    // frees the character
 void  Character_SelectClub(Character* pChar, int n);
 void  fn_8001D238(void);
 void  Character_SetClubsAndClothes(Character* pChar, int nSlot);   // dresses the character (its skins and clubs)
