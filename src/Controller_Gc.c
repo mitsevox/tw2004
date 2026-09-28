@@ -1,6 +1,10 @@
-// Controller_Gc.c (our name): the four GameCube controllers. Each frame it reads the pads into
-// Controllers (buttons held and pressed this frame, sticks and triggers rescaled to 0-255), resets
-// pads that stopped answering, and runs the rumble motor, which stops by itself after 60 frames.
+// Controller_Gc.c (our name): the four GameCube controllers, EA's platform input layer. TW07's
+// legacy/ll/llinput_rw.c (its RenderWare version) has the same functions in nearly the same order,
+// Input_iGetPadType to Input_sGetStickInfo, and the names used here come from it; the
+// platform-neutral half, TW07's LLInput.c, follows at 0x800142A4 in GoRenderCtx_Gc.c. Each frame
+// Input_vUpdate reads the pads into gControllers (buttons held and pressed this frame, sticks and
+// triggers rescaled to 0-255), resets pads that stopped answering, and stops a rumble after 60
+// frames.
 
 #include "engine.h"
 #include "pad.h"
@@ -11,7 +15,7 @@ int  Input_ScaleStickAxis(int nValue, int nDeadZone, int nMax);
 int  Input_ScaleTrigger(int nValue, int nDeadZone, int nMax);
 void Input_ScaleAnalog(PadStatus* pStatus, PadAnalog* pAnalog);
 
-Controllers gControllers;
+Controllers gControllers;   // the four pads: what Input_vUpdate read, and their rumble state
 
 // Starts the pad library and clears the four pads' state: D-pad emulation off, rumble switched on
 // and allowed on every pad. Returns 0. Called once, by the start-up list fn_80005520.

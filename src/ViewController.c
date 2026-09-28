@@ -4,8 +4,8 @@
 // camera: lens, viewport, frame buffer) and the view's camera controller (View), and follows one
 // player. These functions set a view up and shut it down, hand out its parts, and each frame run
 // its camera controller and aim the render context's lens from it. After them come helpers TW07
-// has as header inlines (GoViewport.h, GoCamera.h), out of line here, and small camera-controller
-// getters.
+// has as header inlines (GoViewport.h, GoCamera.h), out of line here, and the camera-controller
+// getters of TW07's GoCamCont.h (CameraController_GetCameraViewScale to GetCameraOrigin).
 
 #include "unsorted/cull.h"
 
@@ -23,8 +23,8 @@ void  Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* p
 void  Camera_SetCameraYawPitchRollAndPosition(CamLens* pLens, f32* pPos, f32* pAngles);
 void  fn_80013D68(void* pCamera);
 void  VM_vUpdateInternalViewportRectData(f32* pRect);
-void  mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC);  // UMemPool.c: yaw, pitch, roll
-void  LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);          // UMemPool.c: inverts a rotation+translation
+void  mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fYaw, f32 fPitch, f32 fRoll);   // UMemPool.c
+void  LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: rotation+translation inverse
 void  CA_vSetDefaultScalingVectors(CamLens* pLens);
 
 ViewController* ViewController_GetDataPtr(int nView);
@@ -115,18 +115,20 @@ void ViewController_Update(int nView) {
     if (pCameraController->nCurCamera == 2) {
         CA_vSetLookAtSide(Camera_GetLens(pRenderContext),
                           CameraController_GetCameraOrigin(pCameraController),
-                          CameraController_GetCameraLookPoint(pCameraController), pCameraController->v20);
+                          CameraController_GetCameraLookPoint(pCameraController),
+                          pCameraController->v20);
     } else if (CameraController_IsFlybyDone(pCameraController)) {
         if (pCameraController->nCurCamera == 4) {
             Camera_SetCameraPositionAndTargetWithOffsetAndScale(
                 Camera_GetLens(pRenderContext), CameraController_GetCameraOrigin(pCameraController),
-                CameraController_GetCameraLookPoint(pCameraController), CameraController_GetCameraViewOffset(
-                        pCameraController),
+                CameraController_GetCameraLookPoint(pCameraController),
+                CameraController_GetCameraViewOffset(pCameraController),
                 CameraController_GetCameraViewScale(pCameraController));
         } else {
             CA_vSetLookAtSide(Camera_GetLens(pRenderContext),
                               CameraController_GetCameraOrigin(pCameraController),
-                              CameraController_GetCameraLookPoint(pCameraController), pCameraController->v20);
+                              CameraController_GetCameraLookPoint(pCameraController),
+                              pCameraController->v20);
         }
     } else {
         Camera_SetCameraYawPitchRollAndPosition(Camera_GetLens(pRenderContext),

@@ -21,7 +21,7 @@ void Quat_Invert(f32* pQ, f32* pOut);                   // Quaternion.c
 void fn_8001FBA4(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two points by fT
 void fn_8001FB00(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two rotations by fT
 void LLMath_mat44fltMultiply(f32 mtx[4][4], Vec4* src, Vec4* dst);  // VecMath.c: a point through a matrix
-void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);       // UMemPool.c: inverts a rotation+translation
+void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: rotation+translation inverse
 void Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ);                 // Quaternion.c: a rotation matrix's quaternion
 void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals);   // char.c
 void Character_PlaceFeetOnGround(Character* pChar);                     // char.c

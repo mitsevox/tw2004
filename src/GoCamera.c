@@ -5,7 +5,7 @@
 #include "camera.h"
 
 void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: copy a 4x4 matrix
-void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: inverts a rotation+translation
+void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: rotation+translation inverse
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                     // identity
 void CA_vSetDefaultScalingVectors(CamLens* pLens);
 f32  Math_Tan(f32 x);                              // tan, as a float

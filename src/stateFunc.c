@@ -1806,8 +1806,8 @@ void STATEFUNC_InitialFlyByUpdate(int nPlayer) {
     if (gSession.a8[0] == 0 || !Controller_AnyPadHasButtons(0)) {
         if (gSession.options.bSkipCameras) {
             bDone = 1;
-        } else if (
-                CameraController_IsFlybyDone(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]))) {
+        } else if (CameraController_IsFlybyDone(
+                       ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]))) {
             bDone = 1;
         } else if (!fn_80100294()) {
             if (Controller_AnyPadHasButtons(Controller_GetButtonMask(0, 0)) || fn_80062B90()) {

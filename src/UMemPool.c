@@ -6,12 +6,15 @@
 // In address order:
 // - matrices (row vectors, translation in row 3): copies, Euler angles to and from a matrix,
 //   transposes, inverses and the projection matrices the render context builds;
-// - 4-float vector helpers (LLMath_CopyVec, Vec_Swap, paired-single negate, scale, multiply and
+// - 4-float vector helpers (copy, swap, and the paired-single negate, scale, multiply and
 //   add-scaled), atan2f, fabsf, fabs and logf;
 // - the log2 lookup table (1024 entries) and its init and close (possibly UMath.c's module
 //   functions: TW07's UMath.c has four near-empty MF_v* init/close functions);
 // - the pools of fixed-size nodes carved from one allocation (the file streamer keeps its object
-//   nodes in one): CreateMemPool, DeleteMemPool, AllocPoolMem, ReturnPoolMem.
+//   nodes in one): CreateMemPool, DeleteMemPool, AllocPoolMem, ReturnPoolMem (TW07's UMemPool.c
+//   has the same four, the first as CreateMemPoolFunc).
+// The LLMath_ helpers (copies, identity, transposes, the rigid inverse, the vector helpers) carry
+// EA's names from TW07's legacy/ll/ps3 LLMath_PS3.h and LLMath_PS3.c, where most are inlines.
 
 #include "engine.h"
 
