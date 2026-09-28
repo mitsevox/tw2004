@@ -1053,3 +1053,4 @@ address	name	comment	by	date
 8001FA3C	MtaLib_OnLoaded	keep	rh3 (replayed by orchestrator)	2026-09-28
 8001FAA8	MtaLib_Register	none	rh3 (replayed by orchestrator)	2026-09-28
 8001FAD8	MtaLib_Unregister	none	rh3 (replayed by orchestrator)	2026-09-28
+8008E420	FE_HasGolferCharacter	add	orchestrator	2026-09-28

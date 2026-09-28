@@ -1583,6 +1583,8 @@ void FE_SetCrAPCameraIdleState(int nState) {
     gpCrAPState->n4 = nState;
 }
 
+// 1 when the menu has a golfer slot (gpCrAPState->pB4) and that slot has its character made; 0
+// otherwise.
 int FE_HasGolferCharacter(void) {
     if (gpCrAPState->pB4 != NULL && gpCrAPState->pB4->pChar != NULL) {
         return 1;
