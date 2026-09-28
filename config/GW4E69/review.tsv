@@ -1934,3 +1934,9 @@ address	name	comment	by	date
 800FE02C	SpeedGolf_ShowReady	add	rl3 (replayed by orchestrator)	2026-09-28
 800FE054	SpeedGolf_ShowStopBallPrompt	add	rl3 (replayed by orchestrator)	2026-09-28
 800FE080	SpeedGolf_ShowRunTip	add	rl3 (replayed by orchestrator)	2026-09-28
+800FE0AC	SpeedGolf_ShowBallDirection	add	rl3 (replayed by orchestrator)	2026-09-28
+800FE0D8	SpeedGolf_ShowGo	add	rl3 (replayed by orchestrator)	2026-09-28
+800FE100	SpeedGolf_ShowEvent	add	rl3 (replayed by orchestrator)	2026-09-28
+800FE138	SpeedGolf_ShowPointsGain	add	rl3 (replayed by orchestrator)	2026-09-28
+800FE164	SpeedGolf_StartComment	add	rl3 (replayed by orchestrator)	2026-09-28
+800FE190	SpeedGolf_Vec4Sub	keep	rl3 (replayed by orchestrator)	2026-09-28
