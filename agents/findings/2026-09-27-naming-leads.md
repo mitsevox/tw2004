@@ -335,3 +335,60 @@ Earnings goal checks index gpSaveData by player number; possible double hole-goa
 hole. docs/decomp-notes.md "Earnings fn_800D6A70" stale. Tools: wraplong splits casts `(\n void* (*)(u16))`
 and does not wrap trailing field comments; name.py writes column-8 comments after renaming, so a comment
 must already use the batch's new names.
+
+## Round 12 (rl1-rl6) leftovers
+Owner decisions (2026-09-28): rename misfiled files to EA's names (GameModeDriver -> FE_Calendar,
+GameManager -> GameMode, SwingTips -> CaddieTips, GameMode5 -> PlayNowMode, GameTargets ->
+GameMode_SkillZoneBase, GameMode13 -> GameMode_SkillZoneTimed, GameMessages -> gameui_istudio if
+proven); AnimPlayer -> TSKATime: yes; CharPool a[6]: a lane proves the Character* layout and fixes it
+if main.dol stays OK; SkinDesc8C.aRecolor stays u8 with its comment (done by rl1).
+Header lane done (rl1): CrAPState all fields, charstate.h skin fields, pgatour.h (bIsAMajor,
+nTextureID, aPrize comment, aFieldLowScore, PgaSponsorship, PgaTour_WinInfo). Still open from the
+Round 10/11 round-flow lists: save.h n4E98 / n4E94 / a1054C / line 38 / UserInfo stats / a104D0 / n113;
+golfer.h GameState bD4 (playoff: GameModeDriverPGATour.c:708 sets it) / nD8, hooks pfn1E4 / 1EC / 1F0 /
+1F8 / 208 / 234, Player n2DC / n2E0 / b2E4 / b2F6 / b310 / bC2D-bC2F / nLevel / bLowIQPenalty (mode 22
+scores it -100), uFlags 0x8 tap-in, nStickUsed backwards, options.nC weather, Session a8[0] / b12;
+game.h GameEffects b10 DoubleTime / b11 HalfTime (rl6 confirms; b9 + fC = timed double speed, TW07
+SpeedyTimeStart), Session.uFlags 0x4000, CareerCalendar, gCalendarFillCell, record-check params,
+TournamentPayout params, PlayNow_ params, GM_Earnings_PayRoundGoals (int, u8); earnings.h; challenge.h;
+rte.h RTEvent.n14; camera.h script.nCamera; fe.h FE_CrAP n4; event.c fSpinY / fSpinX locals;
+GM_PgaTourSim_DistributeWinnings third param = first prize; docs/format-byteorder.md aTriple.
+New header items (round 12 lanes):
+- golfer.h: pfnSetupNextGolfer (0x1D0) = the next turn, not "the hole starts" (GM_SetupGolfer_IfAllWaiting);
+  pfn1EC before the round, pfn23C ball landed (events 35..38), pfn240 ball touched a surface (PsBallFx,
+  returns a hit-effect id), pfn244 a shot is over in bounds (GM_Earnings_PayShotGoals; pfn250 = OOB);
+  in the target modes pfn258 / pfn264 = TW07 PickTarget / PickPrevTarget, pfn26C = GreenType (GoDynObj);
+  b285 = the mode allows GameBreakers; p130 current pin position; fC50 drive length from vA44; nC3C
+  speed golf flag bits; nC44 mode 7 points; nC58 HUD slot (2/3 in speed golf); nC6C per-hole score
+  (mode 8 seconds + 3/stroke, mode 7 points); nC40 written only; fA80 / fA84 placement cursor push;
+  nCD0 / aCD4 surfaces scored this shot (cleared per shot, not per game); nD28 points per hole; nD70
+  scoring landings per hole; nDB8 shot points; nDD8 also target-game winnings; nDDC longest drive;
+  nDE0 bullseyes; nDE4 per-target hit count; nE8C / nE90 best / current target streak; nEA0..nEDC mode
+  22 (drives taken, fair drives, longest fair, score, average, total length, counts per kind);
+  Session.nPaused 2 = until every pulled controller is back.
+- Options b84 = putting grid (lessons 7..9 switch it on); options a0[4] = commentary level 0..5.
+- game.h lbl_80202B88 = per-controller "pulled out" marks; target-game prototypes' trailing comments
+  stale / misaligned (~649-686) and params n, i, f, a; GameMessages prototypes a, b, c;
+  GameMode22_IsActive u8 in GameUI.c vs s32 definition.
+- mode22.h: n0 variant, n4 drives per player, n8 winner (5 none), bC decided, f10 longest drive, n14 its
+  player, n18 winner countdown. fe.h FEScreen.b0 = fade-to-black flag (not "set by fn_80079AD4").
+- GameEffects u48 / u4C = negative / positive post-GameBreaker commentary (weak); n4F crowd reaction
+  level (SitDevTrigger.c fn_800BD7D0 says "music": wrong). gocamscripts.c fn_80045494 = SetHalfTime,
+  fn_80045558 = SetDoubleTime (TW07 RenderPredictedGB).
+Stale comments in finished files: GameRound.c GUI_SendMessage31 ("last pulled controller is back");
+GameUI.c GUI_PauseMenuClosed ("unless the fade to black is running"); target.c local prototypes of
+GUI_MoveTargetInfo / GUI_UpdateTargetInfo (a, b, c, d) and its fTilt / fStep = rise in feet / inches;
+docs/decomp-notes.md calls the target functions "GameMode10".
+Names for other files: GameUICommands fn_800872F8 = GM_vGetSpeedGolfHoleScore, fn_8008828C =
+GM_vGetSpeedGolfWinner, fn_80088208 = GM_vTimerOut, fn_800882C0 = GM_vFullRound (TW07
+APT_IG_GameMessages.c order). GameModeReplay.c's last three (fn_800F1960 / 196C / 199C) = TW07
+SkillZoneBase GetCupCount / GetCupPosition / AddCup: GameTargets.c probably starts at 0x800F1960
+(misfiled-units item); pairing B row "fn_800F1960 = GameModeReplay_GetName" is wrong.
+Possible EA bugs, unlabelled: Lessons_GetShape / GetClub / GetShotKind index gLessons[gLessonNum - 1]
+(one past at lesson 12, -1 at 0; call timing unchecked); Lessons_StartGamePreData overrides the
+chosen golfer; SkillZoneBase_ScaleTargetPoints reads past its 13 / 15-entry tables with more targets;
+SetupBonusBall case 4 never set; mode 8's pace always falls at the slow rate (nCB8 counts only in mode
+7); speed golf state 24 never set; GameEffects TargetGameBreakerTrigger tests mode 16 twice;
+GameMsg_SendPending bit 1 numbers players from 0 (GUI_StartPostShotUI from 1); gGameMsgPendingValue
+shared by three messages. Tools: the refs-only refresh can leave comment lines past 110 that one
+wraplong pass cascades; run wraplong until lint is clean (12 passes used this round).
