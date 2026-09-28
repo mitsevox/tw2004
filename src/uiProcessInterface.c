@@ -111,7 +111,7 @@ void fn_8008F568(s32 nCmd, s32 unused1, s32 unused2, s32 unused3, s32 a, s32 b) 
     if (gSession.nGameType == 3) {
         fn_80079E6C(nCmd, (MsgArg*)a, (MsgArg*)b);
     } else if (gSession.nGameType >= 4 && gSession.nGameType <= 8) {
-        fn_800850E4(nCmd, (MsgArg*)a, (MsgArg*)b);
+        IG_RunGameMessage(nCmd, (MsgArg*)a, (MsgArg*)b);
     }
 }
 

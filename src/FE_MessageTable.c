@@ -3,7 +3,7 @@
 // 770 slots with handlers and fn_80079E6C calls the one for a message's number with its arguments
 // and results. The handlers read and set what the menus show: golfer names, the session's setup,
 // the save profile's stats and records, the Create-A-Player choices. TW06 has GetGolferName in
-// apt_fe_gamemessages.c. Rounds have their own table (fn_800850E4).
+// apt_fe_gamemessages.c. Rounds have their own table (IG_RunGameMessage).
 
 #include "game.h"
 #include "camera.h"

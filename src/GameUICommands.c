@@ -1,6 +1,6 @@
 // GameUICommands.c (our name): the commands the menu UI can send while a round is on (session game
-// types 4 to 8; uiProcessInterface.c's fn_8008F568 routes them here). fn_80085120 fills a table of
-// 214 slots with 212 command functions (0 and 119 stay NULL) and fn_800850E4 runs one: most
+// types 4 to 8; uiProcessInterface.c's fn_8008F568 routes them here). IG_InitGameMessages fills a table of
+// 214 slots with 212 command functions (0 and 119 stay NULL) and IG_RunGameMessage runs one: most
 // answer a question about the round (a player's state, the score, the wind, Battle mode's clubs,
 // the PGA Tour event) or act on it.
 
@@ -20,30 +20,30 @@ MsgHandler gIGMessageHandlers[UI_NUM_ROUND_COMMANDS];
 s32 gSpeedGolfLogCycle;               // counts -1..10, one step per fn_800894E8
 u8  gAlternateGolferUp;               // which player the alternating question answers next (mode 26)
 
-// The round's commands, in address order (the table's order is fn_80085120's).
-void fn_80085C78(MsgArg* pArgs, MsgArg* pResult);
-void fn_80085D04(MsgArg* pArgs, MsgArg* pResult);
-void fn_80085E20(MsgArg* pArgs, MsgArg* pResult);
-void fn_80085F5C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80085FDC(MsgArg* pArgs, MsgArg* pResult);
-void fn_800860C8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008618C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086208(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086238(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008628C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086300(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008633C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086378(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086384(MsgArg* pArgs, MsgArg* pResult);
-void fn_800863A8(MsgArg* pArgs, MsgArg* pResult);
-void fn_800863CC(MsgArg* pArgs, MsgArg* pResult);
-void fn_800863EC(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008640C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008642C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80086460(MsgArg* pArgs, MsgArg* pResult);
-void fn_800864A0(MsgArg* pArgs, MsgArg* pResult);
-void fn_800864D8(MsgArg* pArgs, MsgArg* pResult);
-void fn_800864F8(MsgArg* pArgs, MsgArg* pResult);
+// The round's commands, in address order (the table's order is IG_InitGameMessages's).
+void GM_vGetRoundUIKind(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerName(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerShortName(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerFirstName(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerHoleScore(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerHolePoints(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetCourseIndex(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetCurrentHoleIndex(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetCurrentGolferIndex(MsgArg* pArgs, MsgArg* pResult);
+void GM_vExitGame(MsgArg* pArgs, MsgArg* pResult);
+void GM_vClosePauseMenu(MsgArg* pArgs, MsgArg* pResult);
+void GM_vPauseGame(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetNumberGolfersPlaying(MsgArg* pArgs, MsgArg* pResult);
+void GM_vPostShotUIFinished(MsgArg* pArgs, MsgArg* pResult);
+void GM_vPostShotUIStart(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerClubIndex(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerShotTypeIndex(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerStanceIndex(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerTargetDistance(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetClubDistance(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerCurrentLie(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerCurrentLieAngle(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerWindDirection(MsgArg* pArgs, MsgArg* pResult);
 void fn_800865A0(MsgArg* pArgs, MsgArg* pResult);
 void fn_800865E0(MsgArg* pArgs, MsgArg* pResult);
 void fn_80086610(MsgArg* pArgs, MsgArg* pResult);
@@ -234,7 +234,7 @@ void fn_8008AAB8(MsgArg* pArgs, MsgArg* pResult);
 void fn_8008AB04(MsgArg* pArgs, MsgArg* pResult);
 
 // This file's helpers.
-u8   fn_80085BC0(int nController);
+u8   IG_IsControllerInPlay(int nController);
 void fn_8008AC3C(int a, int b);
 u8   fn_8008AC40(void);
 void fn_8008AC48(int nPlayer, char* sz);
@@ -351,38 +351,40 @@ void  Lessons_ChooseContinue(void);
 s32   GameMode22_GetVariant(void);
 s32   GameMode22_GetHoleRecordIndex(s32 n);
 
-// Run command nCmd.
-void fn_800850E4(int nCmd, MsgArg* pArgs, MsgArg* pResult) {
+// Run in-game UI message nCmd: the handler in gIGMessageHandlers[nCmd] gets the message's values
+// (pArgs) and its answer (pResult). The slot is not checked: 0 and 119 are NULL.
+void IG_RunGameMessage(int nCmd, MsgArg* pArgs, MsgArg* pResult) {
     gIGMessageHandlers[nCmd](pArgs, pResult);
 }
 
-// Fill the command table.
-void fn_80085120(void) {
+// Fill gIGMessageHandlers, the in-game UI messages by number (called from GO_vInitIG): every slot
+// NULL, then 212 handlers; slots 0 and 119 stay NULL.
+void IG_InitGameMessages(void) {
     int i;
 
     for (i = 0; i < UI_NUM_ROUND_COMMANDS; i++) {
         gIGMessageHandlers[i] = NULL;
     }
-    gIGMessageHandlers[1] = fn_80085C78;
-    gIGMessageHandlers[2] = fn_80085D04;
-    gIGMessageHandlers[3] = fn_80085FDC;
-    gIGMessageHandlers[4] = fn_8008618C;
-    gIGMessageHandlers[5] = fn_80086208;
-    gIGMessageHandlers[6] = fn_80086238;
-    gIGMessageHandlers[7] = fn_8008628C;
-    gIGMessageHandlers[8] = fn_80086300;
-    gIGMessageHandlers[9] = fn_8008633C;
-    gIGMessageHandlers[10] = fn_80086378;
-    gIGMessageHandlers[11] = fn_80086384;
-    gIGMessageHandlers[12] = fn_800863A8;
-    gIGMessageHandlers[13] = fn_800863CC;
-    gIGMessageHandlers[14] = fn_800863EC;
-    gIGMessageHandlers[15] = fn_8008640C;
-    gIGMessageHandlers[16] = fn_8008642C;
-    gIGMessageHandlers[17] = fn_80086460;
-    gIGMessageHandlers[18] = fn_800864A0;
-    gIGMessageHandlers[19] = fn_800864D8;
-    gIGMessageHandlers[20] = fn_800864F8;
+    gIGMessageHandlers[1] = GM_vGetRoundUIKind;
+    gIGMessageHandlers[2] = GM_vGetPlayerName;
+    gIGMessageHandlers[3] = GM_vGetPlayerHoleScore;
+    gIGMessageHandlers[4] = GM_vGetCourseIndex;
+    gIGMessageHandlers[5] = GM_vGetCurrentHoleIndex;
+    gIGMessageHandlers[6] = GM_vGetCurrentGolferIndex;
+    gIGMessageHandlers[7] = GM_vExitGame;
+    gIGMessageHandlers[8] = GM_vClosePauseMenu;
+    gIGMessageHandlers[9] = GM_vPauseGame;
+    gIGMessageHandlers[10] = GM_vGetNumberGolfersPlaying;
+    gIGMessageHandlers[11] = GM_vPostShotUIFinished;
+    gIGMessageHandlers[12] = GM_vPostShotUIStart;
+    gIGMessageHandlers[13] = GM_vGetPlayerClubIndex;
+    gIGMessageHandlers[14] = GM_vGetPlayerShotTypeIndex;
+    gIGMessageHandlers[15] = GM_vGetPlayerStanceIndex;
+    gIGMessageHandlers[16] = GM_vGetPlayerTargetDistance;
+    gIGMessageHandlers[17] = GM_vGetClubDistance;
+    gIGMessageHandlers[18] = GM_vGetPlayerCurrentLie;
+    gIGMessageHandlers[19] = GM_vGetPlayerCurrentLieAngle;
+    gIGMessageHandlers[20] = GM_vGetPlayerWindDirection;
     gIGMessageHandlers[21] = fn_800865A0;
     gIGMessageHandlers[22] = fn_800865E0;
     gIGMessageHandlers[23] = fn_80086610;
@@ -513,7 +515,7 @@ void fn_80085120(void) {
     gIGMessageHandlers[149] = fn_80089B78;
     gIGMessageHandlers[150] = fn_80089B8C;
     gIGMessageHandlers[151] = fn_80089BBC;
-    gIGMessageHandlers[152] = fn_80085E20;
+    gIGMessageHandlers[152] = GM_vGetPlayerShortName;
     gIGMessageHandlers[153] = fn_80089BD0;
     gIGMessageHandlers[154] = fn_80089BD4;
     gIGMessageHandlers[155] = fn_80089BE0;
@@ -535,7 +537,7 @@ void fn_80085120(void) {
     gIGMessageHandlers[171] = fn_8008879C;
     gIGMessageHandlers[172] = fn_80089E60;
     gIGMessageHandlers[173] = fn_80089E64;
-    gIGMessageHandlers[174] = fn_80085F5C;
+    gIGMessageHandlers[174] = GM_vGetPlayerFirstName;
     gIGMessageHandlers[175] = fn_80089E98;
     gIGMessageHandlers[176] = fn_80089E9C;
     gIGMessageHandlers[177] = fn_80089ED0;
@@ -544,7 +546,7 @@ void fn_80085120(void) {
     gIGMessageHandlers[179] = fn_8008A010;
     gIGMessageHandlers[181] = fn_8008A0CC;
     gIGMessageHandlers[197] = fn_8008A128;
-    gIGMessageHandlers[182] = fn_800860C8;
+    gIGMessageHandlers[182] = GM_vGetPlayerHolePoints;
     gIGMessageHandlers[184] = fn_8008A188;
     gIGMessageHandlers[185] = fn_8008A1C8;
     gIGMessageHandlers[183] = fn_8008A184;
@@ -577,9 +579,10 @@ void fn_80085120(void) {
     gIGMessageHandlers[213] = fn_8008AB04;
 }
 
-// Whether a player with this controller may use the menu now: always outside game type 6; in it,
-// a player of that controller (or a CPU) who is still playing (or any, in mode 7).
-u8 fn_80085BC0(int nController) {
+// Whether controller nController has a player in play: always 1 outside session game type 6; in it,
+// 1 when some player on that controller, or any CPU player, is not waiting (GS_WAIT; in mode 7 his
+// state does not matter).
+u8 IG_IsControllerInPlay(int nController) {
     int i;
 
     if (gSession.nGameType != 6) {
@@ -594,8 +597,9 @@ u8 fn_80085BC0(int nController) {
     return 0;
 }
 
-// A number for the menus: 3 in mode 8, 2 in modes 6 and 7, 1 in split screen, else 0.
-void fn_80085C78(MsgArg* pArgs, MsgArg* pResult) {
+// Message 1: which kind of round the menus are in: 3 speed golf (mode 8), 2 the two-player
+// speed-golf modes (6, 7), 1 split screen, else 0.
+void GM_vGetRoundUIKind(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 8) {
         pResult->i = 3;
         return;
@@ -611,9 +615,10 @@ void fn_80085C78(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// The name a player is shown by: a created golfer's last name, else the golfer's nickname when he
-// has one ("NA" = none), else his last name (Cedric the Entertainer is shown as "CEDRIC").
-void fn_80085D04(MsgArg* pArgs, MsgArg* pResult) {
+// Message 2: the name player pArgs[0] is shown by, into the string pArgs[1]: a created golfer's
+// last name, else the golfer's nickname when he has one ("NA" = none), else his last name (Cedric
+// the Entertainer is shown as "CEDRIC").
+void GM_vGetPlayerName(MsgArg* pArgs, MsgArg* pResult) {
     int nGolfer = gSession.nGolfer[pArgs[0].i];
 
     if (nGolfer >= FIRST_CREATED_GOLFER) {
@@ -631,8 +636,9 @@ void fn_80085D04(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[1].p)->pStr, gPlayers[pArgs[0].i].golfer.szLast);
 }
 
-// The same without the "CEDRIC" case; a last name longer than 10 letters is cut to its first four.
-void fn_80085E20(MsgArg* pArgs, MsgArg* pResult) {
+// Message 152: GM_vGetPlayerName without the "CEDRIC" case; a last name longer than 10 letters is
+// cut to its first four.
+void GM_vGetPlayerShortName(MsgArg* pArgs, MsgArg* pResult) {
     int nGolfer = gSession.nGolfer[pArgs[0].i];
     char szName[32];
 
@@ -653,8 +659,9 @@ void fn_80085E20(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[1].p)->pStr, gPlayers[pArgs[0].i].golfer.szLast);
 }
 
-// A player's first name.
-void fn_80085F5C(MsgArg* pArgs, MsgArg* pResult) {
+// Message 174: player pArgs[0]'s first name (a created golfer's from the golfer table) into the
+// string pArgs[1].
+void GM_vGetPlayerFirstName(MsgArg* pArgs, MsgArg* pResult) {
     int nGolfer = gSession.nGolfer[pArgs[0].i];
 
     if (nGolfer >= FIRST_CREATED_GOLFER) {
@@ -664,8 +671,9 @@ void fn_80085F5C(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[1].p)->pStr, gPlayers[pArgs[0].i].golfer.szFirst);
 }
 
-// A player's strokes on a hole; "hole" 18 is the front nine, 19 the back nine, 20 the round.
-void fn_80085FDC(MsgArg* pArgs, MsgArg* pResult) {
+// Message 3: player pArgs[0]'s strokes on hole pArgs[1] (0..17); "hole" 18 is the front nine, 19
+// the back nine, 20 the round. In best ball (mode 19) a hole is the team's score.
+void GM_vGetPlayerHoleScore(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[1].i == 18) {
         pResult->i = GM_GetPlayerRoundScoreThroughHole(pArgs[0].i, 9);
     } else if (pArgs[1].i == 19) {
@@ -679,8 +687,9 @@ void fn_80085FDC(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// The same, but a hole's own value is the mode's points (the 18/19/20 totals are as above).
-void fn_800860C8(MsgArg* pArgs, MsgArg* pResult) {
+// Message 182: the same as GM_vGetPlayerHoleScore, but a single hole answers the mode's points on
+// it (nModePoints); the 18/19/20 totals are still strokes.
+void GM_vGetPlayerHolePoints(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[1].i == 18) {
         pResult->i = GM_GetPlayerRoundScoreThroughHole(pArgs[0].i, 9);
     } else if (pArgs[1].i == 19) {
@@ -692,8 +701,9 @@ void fn_800860C8(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// The course: -1 for the made-up rounds (b137..b139), -2 for a custom round.
-void fn_8008618C(MsgArg* pArgs, MsgArg* pResult) {
+// Message 4: the round's course (Game_GetCourse); -1 when any of gpGame->b137..b139 is set (TW07
+// tests compilation and random courses here), -2 for a custom course (b136).
+void GM_vGetCourseIndex(MsgArg* pArgs, MsgArg* pResult) {
     if (gpGame->b137 != 0 || gpGame->b138 != 0 || gpGame->b139 != 0) {
         pResult->i = -1;
         return;
@@ -705,13 +715,14 @@ void fn_8008618C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = Game_GetCourse();
 }
 
-// The current hole, 0..17 in the round.
-void fn_80086208(MsgArg* pArgs, MsgArg* pResult) {
+// Message 5: the current hole, 0..17 in the round (Game_CurHoleIndex).
+void GM_vGetCurrentHoleIndex(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = Game_CurHoleIndex();
 }
 
-// The player whose turn it is; mode 26 alternates between 0 and 1 each time it is asked.
-void fn_80086238(MsgArg* pArgs, MsgArg* pResult) {
+// Message 6: the player whose turn it is (lbl_80282278); in mode 26 (two-player long drive) the
+// answer alternates 0, 1, 0... each time it is asked (gAlternateGolferUp).
+void GM_vGetCurrentGolferIndex(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 26) {
         pResult->i = gAlternateGolferUp;
         gAlternateGolferUp = 1 - gAlternateGolferUp;
@@ -720,7 +731,11 @@ void fn_80086238(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80282278;
 }
 
-void fn_8008628C(MsgArg* pArgs, MsgArg* pResult) {
+// Message 7: leave the round: in mode 9 the end of the game is set pending
+// (GUI_SetEndOfGamePending), in any other the fade to black starts (lbl_801D87C0.bFadeToBlack); in
+// the PGA TOUR (mode 23) fn_80117DE8(0, 1). The online branch (fn_8008AC40, always 0 in this build)
+// never runs.
+void GM_vExitGame(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 9) {
         GUI_SetEndOfGamePending();
     } else {
@@ -735,7 +750,10 @@ void fn_8008628C(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80086300(MsgArg* pArgs, MsgArg* pResult) {
+// Message 8: the pause menu closes (GUI_PauseMenuClosed); unless the round is fading to black to
+// end, the lesson restarts (Lessons_RestartLesson, lesson mode only); when it is, a hole load asked
+// for is cancelled (fn_8006F4E0).
+void GM_vClosePauseMenu(MsgArg* pArgs, MsgArg* pResult) {
     GUI_PauseMenuClosed();
     if (lbl_801D87C0.bFadeToBlack == 0) {
         Lessons_RestartLesson();
@@ -744,52 +762,58 @@ void fn_80086300(MsgArg* pArgs, MsgArg* pResult) {
     fn_8006F4E0();
 }
 
-// Pause the game.
-void fn_8008633C(MsgArg* pArgs, MsgArg* pResult) {
+// Message 9: pause: notes whether the scorecard was down (lbl_80281F18), pauses the sound and opens
+// the pause menu.
+void GM_vPauseGame(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281F18 = GUI_ScoreCardUp() == 0;
     Gaud_Pause(1);
     GUI_OpenPauseMenu();
 }
 
-void fn_80086378(MsgArg* pArgs, MsgArg* pResult) {
+// Message 10: how many golfers play the round (gNumPlayersSetUp).
+void GM_vGetNumberGolfersPlaying(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gNumPlayersSetUp;
 }
 
-void fn_80086384(MsgArg* pArgs, MsgArg* pResult) {
+// Message 11: GUI_PostShotUIFinished for player pArgs[0].
+void GM_vPostShotUIFinished(MsgArg* pArgs, MsgArg* pResult) {
     GUI_PostShotUIFinished(pArgs[0].i);
 }
 
-void fn_800863A8(MsgArg* pArgs, MsgArg* pResult) {
+// Message 12: GUI_PostShotUIStart for player pArgs[0].
+void GM_vPostShotUIStart(MsgArg* pArgs, MsgArg* pResult) {
     GUI_PostShotUIStart(pArgs[0].i);
 }
 
-// The player's club.
-void fn_800863CC(MsgArg* pArgs, MsgArg* pResult) {
+// Message 13: player pArgs[0]'s club (Player.nClub).
+void GM_vGetPlayerClubIndex(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gPlayers[pArgs[0].i].nClub;
 }
 
-// The player's kind of shot.
-void fn_800863EC(MsgArg* pArgs, MsgArg* pResult) {
+// Message 14: player pArgs[0]'s kind of shot (Player.nShotKind).
+void GM_vGetPlayerShotTypeIndex(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gPlayers[pArgs[0].i].nShotKind;
 }
 
-// The player's trajectory (low, normal, high).
-void fn_8008640C(MsgArg* pArgs, MsgArg* pResult) {
+// Message 15: player pArgs[0]'s stance, as EA calls it: Player.nTrajectory (0 low, 1 normal, 2
+// high).
+void GM_vGetPlayerStanceIndex(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gPlayers[pArgs[0].i].nTrajectory;
 }
 
-// The player's distance to the pin.
-void fn_8008642C(MsgArg* pArgs, MsgArg* pResult) {
+// Message 16: player pArgs[0]'s distance to the pin (GM_GetGolferDistanceToPin), as a float.
+void GM_vGetPlayerTargetDistance(MsgArg* pArgs, MsgArg* pResult) {
     pResult->f = GM_GetGolferDistanceToPin(pArgs[0].i);
 }
 
-// How far a club reaches for a kind of shot.
-void fn_80086460(MsgArg* pArgs, MsgArg* pResult) {
+// Message 17: how far player pArgs[0] can hit club pArgs[2] for kind of shot pArgs[1]
+// (AI_MaxDistance), as a float.
+void GM_vGetClubDistance(MsgArg* pArgs, MsgArg* pResult) {
     pResult->f = AI_MaxDistance(pArgs[0].i, pArgs[1].i, pArgs[2].i);
 }
 
-// The ball's lie, or 99 when it is on surface 151.
-void fn_800864A0(MsgArg* pArgs, MsgArg* pResult) {
+// Message 18: the lie of player pArgs[0]'s ball (ball.nLie), or 99 when the ball is on surface 151.
+void GM_vGetPlayerCurrentLie(MsgArg* pArgs, MsgArg* pResult) {
     if (gPlayers[pArgs[0].i].ball.nSurface == 151) {
         pResult->i = 99;
         return;
@@ -797,18 +821,20 @@ void fn_800864A0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gPlayers[pArgs[0].i].ball.nLie;
 }
 
-void fn_800864D8(MsgArg* pArgs, MsgArg* pResult) {
+// Message 19: the lie angle of player pArgs[0]'s ball (ball.n6C).
+void GM_vGetPlayerCurrentLieAngle(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gPlayers[pArgs[0].i].ball.n6C;
 }
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
-// 1.0f (0x80283B10), before the 2 pi fn_800864F8 uses first; its body is unknown.
+// 1.0f (0x80283B10), before the 2 pi GM_vGetPlayerWindDirection uses first; its body is unknown.
 static f32 GameUICommands_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// The wind's direction against the player's aim: 0..8, eighths of a turn.
-void fn_800864F8(MsgArg* pArgs, MsgArg* pResult) {
+// Message 20: the wind's direction against player pArgs[0]'s aim, as a float 0..8 (eighths of a
+// turn).
+void GM_vGetPlayerWindDirection(MsgArg* pArgs, MsgArg* pResult) {
     f32 fAim = gPlayers[pArgs[0].i].fAim;
     f32 vWind[3];
     f32 fAngle;
@@ -1673,7 +1699,7 @@ void fn_800884F0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80088538(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_80085BC0(pArgs[0].i);
+    pResult->i = IG_IsControllerInPlay(pArgs[0].i);
 }
 
 void fn_80088570(MsgArg* pArgs, MsgArg* pResult) {
@@ -2456,7 +2482,7 @@ void fn_8008A010(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8008A0CC(MsgArg* pArgs, MsgArg* pResult) {
-    fn_80086300(NULL, NULL);
+    GM_vClosePauseMenu(NULL, NULL);
     fn_80110178(1);
     pResult->i = fn_80110180();
     fn_80110178(0);
@@ -2755,7 +2781,7 @@ void fn_8008A9A0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// The same as fn_80085FDC, without mode 19's count.
+// The same as GM_vGetPlayerHoleScore, without mode 19's count.
 void fn_8008A9E8(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[1].i == 18) {
         pResult->i = GM_GetPlayerRoundScoreThroughHole(pArgs[0].i, 9);

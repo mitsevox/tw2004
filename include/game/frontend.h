@@ -194,13 +194,13 @@ typedef struct UIText {
 // The menu UI's commands go to one of these, by the session's game type (uiProcessInterface.c's
 // fn_8008F568): each runs the handler for message nMsg of its table.
 void fn_80079E6C(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // the menus (FE_MessageTable.c)
-void fn_800850E4(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // a round (GameUICommands.c)
+void IG_RunGameMessage(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // a round (GameUICommands.c)
 void fn_800B1D3C(int nCmd, MsgArg* pArgs, MsgArg* pResult);    // start-up (startUp.c)
 
 extern MsgHandler lbl_801F5DA8[30];     // start-up's handlers (fn_800B1D78 fills 0..22)
 void fn_80083D88(MsgArg* pArgs, MsgArg* pResult);  // FE_MessageTable.c; start-up's command 22 too
 
-// The round's handlers (GameUICommands.c): fn_80085120 fills the table. Entries 0 and 119 stay
+// The round's handlers (GameUICommands.c): IG_InitGameMessages fills the table. Entries 0 and 119 stay
 // empty.
 #define UI_NUM_ROUND_COMMANDS 214
 extern MsgHandler gIGMessageHandlers[UI_NUM_ROUND_COMMANDS];
@@ -214,7 +214,7 @@ void fn_80082E10(MsgArg* pArgs, MsgArg* pResult);
 void fn_800834A8(MsgArg* pArgs, MsgArg* pResult);
 void fn_800834E8(MsgArg* pArgs, MsgArg* pResult);
 
-extern u8 lbl_80281F18;         // set by the pause handler (GameUICommands.c fn_8008633C)
+extern u8 lbl_80281F18;         // set by the pause handler (GameUICommands.c GM_vPauseGame)
 extern u8 lbl_80281F19;         // (uiProcessInterface.c) FEgolferanim.c's FE_IsGolferRenderAllowed tests it
 
 // Four floats a UI element passes down its transform stack, copied as one struct; fe_movies.c's

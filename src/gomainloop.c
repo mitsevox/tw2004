@@ -174,7 +174,7 @@ void VM_vCloseModule(void);
 void fn_80076E48(void);
 void fn_800773F8(void);
 void fn_80077428(void);
-void fn_80085120(void);
+void IG_InitGameMessages(void);
 void FE_CharMgrClose(void);
 void FE_StreamUpdateState(void);
 void FE_SetupCamera(void);
@@ -624,7 +624,7 @@ void GO_vInitIG(void) {
     Aud_InitSession(1, 0, (gSession.nSplitScreen != 0) + 1, 0);
     fn_8006F608();
     fn_80014594();
-    fn_80085120();
+    IG_InitGameMessages();
     fn_8005D3A8(1);
     GM_InitModule_PreDataStream();
     SitDev_vInitModule();
