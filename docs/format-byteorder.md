@@ -74,7 +74,7 @@ Objects delivered by UStream
 | `TRAX`, `TRXT` | fn_800BA118, fn_800BA15C | sweep | none seen | asm |
 | `CRI `, `CMPS` | fn_800D2A64, fn_800D2A90 | sweep | none seen | asm |
 | `ERN ` | EarningsInfo_LoadERNFromStream | Earnings.c | none seen | yes: copied over the prize table `lbl_80200538` (`EarningsTable`, include/game/earnings.h); a `port:` note in the handler marks where a port converts it |
-| `PLY ` | PlayNow_LoadPLYFromStream | GameMode5.c | none seen | yes: copied over `lbl_80203554` (`Challenge[83]`, include/game/modes/challenge.h); `port:` note in the handler |
+| `PLY ` | PlayNow_LoadPLYFromStream | GameMode5.c | none seen | yes: copied over `gPlayNowChallenges` (`Challenge[83]`, include/game/modes/challenge.h); `port:` note in the handler |
 | `PLYs` | PlayNow_LoadPLYsFromStream | GameMode5.c | none seen | bytes: a string block, copied |
 | `PGAc`, `PGAt`, `PGAp` | fn_800EDF34, fn_800EDF60, fn_800EDF90 | GameModeDriverPGATour.c | none seen | yes: copied over `gPgaData.aTournament`, `.aTourEvent`, `.aTriple` (`Tournament`, `TourEvent`, `PgaTriple`, include/game/modes/pgatour.h); a `port:` note in each handler |
 | `PGAn` | fn_800EDFC0 | GameModeDriverPGATour.c | none seen | bytes: names, copied |

@@ -1,5 +1,14 @@
-// GameMode5.c (our name): game mode 5, a list of 83 challenges (gPlayNowChallenges, loaded from the
-// 'PLY ' stream object), each an entry of 0x80 bytes.
+// GameMode5.c (our name; EA's file is probably TW2003's Golf\GameMode\PlayNowMode.c): game mode 5,
+// the Play Now challenges. Its data is the 'PLY ' stream object, EA's DATA\PLAYNOW_GC.BIN: 83
+// challenges of 0x80 bytes (Challenge, include/game/modes/challenge.h), with their names and
+// descriptions in 'PLYs' (PLAYNOW.STR) and their ball spots in the course's objects. The challenges
+// come in 29 groups, one per entry of the Play Now menu ("Lucky 7", "2 Down Comeback"); a group is
+// played as one or more challenges in a row, each a round set up in another game mode (stroke,
+// match, skins, speed golf, a target game) with a target score, and it earns one of three medals,
+// the best kept per group in the save profile, with money and trophy balls. Mode 5 runs the played
+// mode with its own callbacks wrapped around that mode's. The ladder (GameMode4.c) plays some of
+// these challenges as events, and the real-time events (mode 24, GameModeDriverRTE.c) play their
+// own list of 111 through this code.
 
 #include "golfer.h"
 #include "ball.h"
@@ -9,33 +18,35 @@
 #include "game/modes/challenge.h"
 #include "game/earnings.h"
 
-s32 gPlayNowSavedOptionC = 4;
-Challenge* gChallengeList = gPlayNowChallenges;
-s32 gNumChallenges = 83;
+s32 gPlayNowSavedOptionC = 4;           // gSession.options.nC saved while a challenge runs
+Challenge* gChallengeList = gPlayNowChallenges; // the list being played (mode 24 swaps in its own)
+s32 gNumChallenges = 83;                // its length
 
-Challenge  gPlayNowChallenges[83];
-ChallengeSpot gPlayNowBallSpots[83];
+Challenge  gPlayNowChallenges[83];      // mode 5's own challenges ('PLY ')
+ChallengeSpot gPlayNowBallSpots[83];    // where each places the ball (course objects of type 10)
 
-void (*gPlayNowModeShutdown)(void);
-void (*gPlayNowModeEndGame)(void);
-void (*gPlayNowModeHoleStart)(void);
-u8  (*gPlayNowModeGameFinished)(u8 bCheck);        // the mode's own GameFinished
-u8 (*gPlayNowModeHoleFinished)(int nPlayer, u8 bCheck);   // and HoleFinished
-void (*gPlayNowModeHoleOver)(int nPlayer);
-u8 gPlayNowIntroPending;
-char* gPlayNowText;                  // the challenge text block
-s32 gPlayNowGroupStrokes;
-s32 gPlayNowGroupPar;
-s32 gPlayNowGroupHoles;
-s32 gPlayNowGroupTime;
-u8 gPlayNowRestarting;
-u8 gPlayNowCalendarFlag;
-u8 gPlayNowChallengeRunning;
-s32 gPlayNowSelectedChallenge;
-s32 gCurChallenge;
-s32 gPlayNowSavedWind;
+// The played mode's own callbacks, kept by PlayNow_StartChallenge while mode 5's stand in for them.
+void (*gPlayNowModeShutdown)(void);                             // pfnShutdown (called once)
+void (*gPlayNowModeEndGame)(void);                              // pfnEndGame
+void (*gPlayNowModeHoleStart)(void);                            // pfn1E4
+u8  (*gPlayNowModeGameFinished)(u8 bCheck);                     // pfnGameFinished
+u8 (*gPlayNowModeHoleFinished)(int nPlayer, u8 bCheck);         // pfnHoleFinished
+void (*gPlayNowModeHoleOver)(int nPlayer);                      // pfn210
+u8 gPlayNowIntroPending;                // the group's intro message is still to be shown
+char* gPlayNowText;                     // the 'PLYs' text block (group names and descriptions)
+// The group's totals over the challenges played so far (PlayNow_GetMedal judges them).
+s32 gPlayNowGroupStrokes;               // strokes
+s32 gPlayNowGroupPar;                   // par of the holes played
+s32 gPlayNowGroupHoles;                 // holes played
+s32 gPlayNowGroupTime;                  // Player.n290 summed: speed golf's hole times
+u8 gPlayNowRestarting;                  // a restart is pending (PlayNow_Restart .. PlayNow_HoleOver)
+u8 gPlayNowCalendarFlag;                // set by the calendar screen (PlayNow_GetCalendarFlag)
+u8 gPlayNowChallengeRunning;            // PlayNow_IsChallengeRunning
+s32 gPlayNowSelectedChallenge;          // the challenge a restart goes back to
+s32 gCurChallenge;                      // the current challenge, an index into gChallengeList
+s32 gPlayNowSavedWind;                  // gSession.options.nWind saved while a challenge runs
 
-void PlayNow_SelectGroup(int nId);
+void PlayNow_SelectGroup(int nGroup);
 s32 PlayNow_GetNumGroups(void);
 void PlayNow_UnregisterStreamClients(void);
 void PlayNow_LoadPLYFromStream(UStreamObject* pObject);
@@ -48,9 +59,9 @@ void  PlayNow_HoleStart(void);
 void  PlayNow_EndGame(void);
 void  PlayNow_HoleOver(int nPlayer);
 void  PlayNow_LoadPLYsFromStream(UStreamObject* pObject);
-int   PlayNow_GetGroupTarget(int i);
-void  PlayNow_QueueMedalMessage(int n);
-u8    PlayNow_HasAllMedals(int n);
+int   PlayNow_GetGroupTarget(int iUnused);
+void  PlayNow_QueueMedalMessage(int nMedal);
+u8    PlayNow_HasAllMedals(int nProfile);
 u8    PlayNow_GameFinished(u8 bCheck);
 int   PlayNow_CountGroupChallenges(int nGroup);
 u8 PlayNow_IsSpeedGolf(void);
@@ -100,12 +111,12 @@ void PlayNow_DeInit(void) {
 void PlayNow_LoadBallSpot(void* pObj) {
     // port: the course object is big-endian and read in place through ChallengeSpotRecord; a
     //       little-endian port converts v[] (three floats) here
-    ChallengeSpotRecord* d = *(ChallengeSpotRecord**)pObj;
-    int i = d->nChallenge - 1;
+    ChallengeSpotRecord* pRecord = *(ChallengeSpotRecord**)pObj;
+    int i = pRecord->nChallenge - 1;
     if (i < 83) {
-        gPlayNowBallSpots[i].f0 = d->v[0];
-        gPlayNowBallSpots[i].f4 = d->v[1];
-        gPlayNowBallSpots[i].f8 = d->v[2];
+        gPlayNowBallSpots[i].f0 = pRecord->v[0];
+        gPlayNowBallSpots[i].f4 = pRecord->v[1];
+        gPlayNowBallSpots[i].f8 = pRecord->v[2];
     }
     StaticMem_Free(pObj);
 }
@@ -113,17 +124,17 @@ void PlayNow_LoadBallSpot(void* pObj) {
 // Selects challenge nChallenge (a 0-based index into gChallengeList) as the current one and as the
 // one a restart goes back to (PlayNow_Restart). The menu (FE_MessageTable.c), the ladder
 // (GameMode4_StartEvent) and the real-time events (GameModeDriverRTE_StartEvent) call it.
-void PlayNow_SelectChallenge(s32 p0) {
-    gCurChallenge = p0;
-    gPlayNowSelectedChallenge = p0;
+void PlayNow_SelectChallenge(s32 nChallenge) {
+    gCurChallenge = nChallenge;
+    gPlayNowSelectedChallenge = nChallenge;
 }
 
 // Selects the first challenge of group nGroup (challenge 0 when no challenge has that group) as
 // current and as the restart point, as PlayNow_SelectChallenge does. A group is one entry of the
 // Play Now menu, played as one or more challenges in a row; the menu's FE message passes its
 // 1-based choice minus one.
-void PlayNow_SelectGroup(int nId) {
-    int i = fn_800EAC94(nId);
+void PlayNow_SelectGroup(int nGroup) {
+    int i = fn_800EAC94(nGroup);
     gCurChallenge = i;
     gPlayNowSelectedChallenge = i;
 }
@@ -601,8 +612,8 @@ s32 gPlayNowMedalMessages[3][3] = {
 
 // Queues a message for medal nMedal (0 best .. 2): one of its three ids in gPlayNowMedalMessages,
 // picked at random, as GUI message kind 7.
-void PlayNow_QueueMedalMessage(int n) {
-    s32 nMsg = gPlayNowMedalMessages[n][Misc_RandFunc(0) % 3];
+void PlayNow_QueueMedalMessage(int nMedal) {
+    s32 nMsg = gPlayNowMedalMessages[nMedal][Misc_RandFunc(0) % 3];
     GUI_QueueMessage(7, nMsg, 0, 0);
 }
 
@@ -676,8 +687,8 @@ void PlayNow_EndGame(void) {
 
 // Whether profile nProfile has a medal in every one of the 29 challenge groups (no aMedal is 3) and
 // a TOUR card (level 1 or more).
-u8 PlayNow_HasAllMedals(int n) {
-    SaveProfile* p = &gpSaveData[n];
+u8 PlayNow_HasAllMedals(int nProfile) {
+    SaveProfile* p = &gpSaveData[nProfile];
     int i;
     if (p->nTourCardLevel < 1) {
         return 0;
@@ -692,9 +703,9 @@ u8 PlayNow_HasAllMedals(int n) {
 
 // Plays challenges from another list of nCount: mode 24 passes its 111 (gRTEs.aChallenge);
 // PlayNow_Init puts the mode's own 83 back.
-void PlayNow_SetChallengeList(Challenge* p0, s32 p1) {
-    gChallengeList = p0;
-    gNumChallenges = p1;
+void PlayNow_SetChallengeList(Challenge* pList, s32 nCount) {
+    gChallengeList = pList;
+    gNumChallenges = nCount;
 }
 
 // Whether one of the mode's challenges is being played (set when it starts, cleared when it ends).
@@ -718,7 +729,7 @@ int PlayNow_GetMedal(void) {
     int nRule;
     int nMark;
     int nStrokes;
-    int nPen;
+    int nTime;
     int nSum;
     int nPar;
     int nHoles;
@@ -745,7 +756,7 @@ int PlayNow_GetMedal(void) {
             nStrokes = gPlayNowGroupStrokes;
             nPar = gPlayNowGroupPar;
             nHoles = gPlayNowGroupHoles;
-            nPen = gPlayNowGroupTime;
+            nTime = gPlayNowGroupTime;
             switch (nRule) {
             case 1:
                 if (nStrokes + gChallengeList[gCurChallenge].nTargetBase <= nMark) {
@@ -773,7 +784,7 @@ int PlayNow_GetMedal(void) {
                 }
                 break;
             case 6:
-                if (nPen < nMark) {
+                if (nTime < nMark) {
                     return m;
                 }
                 break;
@@ -862,9 +873,9 @@ int PlayNow_GetMedal(void) {
                 }
                 break;
             case 6:
-                // EA bug: nPen is only set when the round's totals are scored (nScoring 0), so
+                // EA bug: nTime is only set when the round's totals are scored (nScoring 0), so
                 // this compares whatever the register holds.
-                if (nPen < nMark) {
+                if (nTime < nMark) {
                     return m;
                 }
                 break;
@@ -1092,13 +1103,14 @@ int PlayNow_GetChallengeTarget(int i) {
     return nTarget;
 }
 
-// Group nGroup's name: the text at its first challenge's n0 in the 'PLYs' block. Always read from
-// the mode's own 83 challenges (gPlayNowChallenges), whichever list is being played; the menu and
-// the in-round screens show it (a real-time event shows GameModeDriverRTE_GetName instead).
-char* PlayNow_GetGroupName(int nId) {
-    int i = fn_800EAC94(nId);
+// Group nGroup's name: the text at its first challenge's n0 in the 'PLYs' block. The first
+// challenge is looked up in the list being played (fn_800EAC94), but its n0 is read from the mode's
+// own 83 (gPlayNowChallenges); the menu and the in-round screens show it (a real-time event shows
+// GameModeDriverRTE_GetName instead).
+char* PlayNow_GetGroupName(int nGroup) {
+    int i = fn_800EAC94(nGroup);
     // EA bug: fn_800EAC94 returns 0, never -1, for a group it does not find, so this test never
-    // passes and an unknown id gets challenge 0's line.
+    // passes and an unknown group gets challenge 0's line.
     if (i == -1) {
         return 0;
     }
@@ -1107,8 +1119,8 @@ char* PlayNow_GetGroupName(int nId) {
 
 // Group nGroup's description: the text at its first challenge's n4 in the 'PLYs' block, as
 // PlayNow_GetGroupName reads the name.
-char* PlayNow_GetGroupDescription(int nId) {
-    int i = fn_800EAC94(nId);
+char* PlayNow_GetGroupDescription(int nGroup) {
+    int i = fn_800EAC94(nGroup);
     // EA bug: never -1, as above.
     if (i == -1) {
         return 0;
@@ -1254,10 +1266,10 @@ void PlayNow_HoleOver(int nPlayer) {
 
 // Challenge i's three medal rewards, the lowest medal's (aMedal[2]) first and the best's
 // (aMedal[0]) last.
-void PlayNow_GetRewards(int i, s32* pA, s32* pB, s32* pC) {
-    *pA = gChallengeList[i].aMedal[2].nReward;
-    *pB = gChallengeList[i].aMedal[1].nReward;
-    *pC = gChallengeList[i].aMedal[0].nReward;
+void PlayNow_GetRewards(int i, s32* pThird, s32* pSecond, s32* pBest) {
+    *pThird = gChallengeList[i].aMedal[2].nReward;
+    *pSecond = gChallengeList[i].aMedal[1].nReward;
+    *pBest = gChallengeList[i].aMedal[0].nReward;
 }
 
 s32 PlayNow_GetNumOpponents(int i) {
@@ -1277,8 +1289,8 @@ s32 PlayNow_GetOpponent(int i, int k) {
 
 // Sets the flag the calendar screen controls (FE message 694, CalendarScreen.c; see
 // PlayNow_GetCalendarFlag for what it changes).
-void PlayNow_SetCalendarFlag(u8 v) {
-    gPlayNowCalendarFlag = v;
+void PlayNow_SetCalendarFlag(u8 bOn) {
+    gPlayNowCalendarFlag = bOn;
 }
 
 // The flag the calendar screen sets (PlayNow_SetCalendarFlag; FE message 695 reads it). While it is
@@ -1294,13 +1306,13 @@ u8 PlayNow_GetCalendarFlag(void) {
 // fAmount (kept to 0.1..1 when applied), the effect the game option nC 3 picks with a random
 // amount. A challenge with b4D passes its f54 (PlayNow_ApplyChallengeSetup); a replay passes its
 // saved amount (GameModeReplay.c).
-void PlayNow_ForceWeather(f32 x0) {
+void PlayNow_ForceWeather(f32 fAmount) {
     lbl_802811F0->b1C = 1;
-    lbl_802811F0->f18 = x0;
+    lbl_802811F0->f18 = fAmount;
 }
 
 // Sends game message 18 with player nPlayer. The timed modes send it when a player's turn or time
 // ends (GameMode8.c, GameMode13.c), and PlayNow_OnPause when a speed golf challenge is paused.
-void PlayNow_SendMessage18(s32 p0) {
-    GameMsg_SendInt(18, p0);
+void PlayNow_SendMessage18(s32 nPlayer) {
+    GameMsg_SendInt(18, nPlayer);
 }
