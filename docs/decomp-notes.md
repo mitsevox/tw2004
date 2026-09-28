@@ -158,7 +158,7 @@ They will be sorted into the sections below.
 
 - **[verified] A `u8` result that the caller stores without `clrlwi` means the callee returns `int`/`s32`.**
   CodeWarrior masks a `u8` return at the call site. The reverse also holds: an `int` local returned from a
-  `u8` function gives `clrlwi r3` at the return (`u8 b` there gives `mr r3`). FE_MessageTable fn_800846D4
+  `u8` function gives `clrlwi r3` at the return (`u8 b` there gives `mr r3`). FE_MessageTable GM_vEASBioGetLevel
   (91.25 -> 100 with an `s32` callee), GameMode4Menu LadderMap_IsRegionFinalNode (92.5 -> 100 with `int b`),
   GameModeDriver IsAMonthAhead and 5 others.
 - **[verified] Front-end `MsgArg` handlers read every argument into locals before the first store.**

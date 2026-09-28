@@ -668,36 +668,36 @@ void GM_vGbaIsLinkFailed(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGbaResumeLink(MsgArg* pArgs, MsgArg* pResult);
 void GM_vEASBioListProducts(MsgArg* pArgs, MsgArg* pResult);
 void GM_vEASBioListAccomplishments(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084288(MsgArg* pArgs, MsgArg* pResult);
-void fn_800842AC(MsgArg* pArgs, MsgArg* pResult);
-void fn_800842D0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084354(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084458(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008449C(MsgArg* pArgs, MsgArg* pResult);
-void fn_800844E0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084544(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084578(MsgArg* pArgs, MsgArg* pResult);
-void fn_800845D4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084614(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084678(MsgArg* pArgs, MsgArg* pResult);
-void fn_800846C8(MsgArg* pArgs, MsgArg* pResult);
-void fn_800846D4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084704(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084750(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084754(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008478C(MsgArg* pArgs, MsgArg* pResult);
-void fn_800847BC(MsgArg* pArgs, MsgArg* pResult);
-void fn_800847E0(MsgArg* pArgs, MsgArg* pResult);
-void fn_800848E4(MsgArg* pArgs, MsgArg* pResult);
-void fn_800848E8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084918(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084940(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084984(MsgArg* pArgs, MsgArg* pResult);
-void fn_800849C8(MsgArg* pArgs, MsgArg* pResult);
-void fn_800849F8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084AA8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084B88(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084BE4(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioShowSummary(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioShowProductDetails(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioLoad(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioSave(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioIsOnCard(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioMemoryRequired(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioLoadProducts(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioIsLoaded(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioIsNotWrongFile(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioIsReplacingOldest(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioIsBadData(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioDelete(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage655_Return0(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioGetLevel(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioCheckReward(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage667_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioUnloadProducts(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioGetLevelProgress(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCSetCurrentFileType(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCCallActionFn(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage675_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vPlayNowGetNumGroups(MsgArg* pArgs, MsgArg* pResult);
+void GM_vPlayNowSelectGroup(MsgArg* pArgs, MsgArg* pResult);
+void GM_vPlayNowGetGroupName(MsgArg* pArgs, MsgArg* pResult);
+void GM_vPlayNowGetGroupDescription(MsgArg* pArgs, MsgArg* pResult);
+void GM_vPlayNowGetGroupMedal(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetCourseFindDisc(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetLongDriveOptions(MsgArg* pArgs, MsgArg* pResult);
+void GM_vTrophyRoomGetStatus(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage715_Empty(MsgArg* pArgs, MsgArg* pResult);
 void fn_80084BE8(MsgArg* pArgs, MsgArg* pResult);
 void fn_80084C88(MsgArg* pArgs, MsgArg* pResult);
 void fn_80084CFC(MsgArg* pArgs, MsgArg* pResult);
@@ -1250,58 +1250,58 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[613] = TrophyRoom_GetPlaceholderText;
     gFEMessageHandlers[614] = GM_vEASBioListProducts;
     gFEMessageHandlers[615] = GM_vEASBioListAccomplishments;
-    gFEMessageHandlers[616] = fn_80084288;
-    gFEMessageHandlers[617] = fn_800842AC;
+    gFEMessageHandlers[616] = GM_vEASBioShowSummary;
+    gFEMessageHandlers[617] = GM_vEASBioShowProductDetails;
     gFEMessageHandlers[620] = GM_vGetPar5EagleDate;
     gFEMessageHandlers[621] = GM_vIsProfileLogoMade;
     gFEMessageHandlers[622] = GM_vSaveLogo;
-    gFEMessageHandlers[627] = fn_800842D0;
-    gFEMessageHandlers[628] = fn_80084354;
+    gFEMessageHandlers[627] = GM_vEASBioLoad;
+    gFEMessageHandlers[628] = GM_vEASBioSave;
     gFEMessageHandlers[632] = GM_vMCHasSLUS20572Save;
     gFEMessageHandlers[637] = TrophyRoom_GetIndexMod4;
     gFEMessageHandlers[638] = TrophyRoom_GetMedalDate;
     gFEMessageHandlers[640] = TrophyRoom_GetLadderAward;
     gFEMessageHandlers[641] = TrophyRoom_GetLadderEventCourse;
-    gFEMessageHandlers[643] = fn_80084458;
-    gFEMessageHandlers[644] = fn_8008449C;
-    gFEMessageHandlers[645] = fn_800844E0;
-    gFEMessageHandlers[646] = fn_80084544;
-    gFEMessageHandlers[647] = fn_80084578;
-    gFEMessageHandlers[648] = fn_800845D4;
-    gFEMessageHandlers[649] = fn_80084614;
-    gFEMessageHandlers[650] = fn_80084678;
-    gFEMessageHandlers[655] = fn_800846C8;
+    gFEMessageHandlers[643] = GM_vEASBioIsOnCard;
+    gFEMessageHandlers[644] = GM_vEASBioMemoryRequired;
+    gFEMessageHandlers[645] = GM_vEASBioLoadProducts;
+    gFEMessageHandlers[646] = GM_vEASBioIsLoaded;
+    gFEMessageHandlers[647] = GM_vEASBioIsNotWrongFile;
+    gFEMessageHandlers[648] = GM_vEASBioIsReplacingOldest;
+    gFEMessageHandlers[649] = GM_vEASBioIsBadData;
+    gFEMessageHandlers[650] = GM_vEASBioDelete;
+    gFEMessageHandlers[655] = GM_vFEMessage655_Return0;
     gFEMessageHandlers[657] = GM_vSetCrAPTriggerAnims;
-    gFEMessageHandlers[658] = fn_80084704;
+    gFEMessageHandlers[658] = GM_vEASBioCheckReward;
     gFEMessageHandlers[663] = GM_vRestartCrAPAnim;
     gFEMessageHandlers[664] = GM_vSetCrAPRenderStateForSubcategory;
     gFEMessageHandlers[665] = GM_vSetCrAPClub;
-    gFEMessageHandlers[666] = fn_8008478C;
-    gFEMessageHandlers[667] = fn_80084750;
-    gFEMessageHandlers[668] = fn_80084754;
-    gFEMessageHandlers[671] = fn_800847BC;
-    gFEMessageHandlers[672] = fn_800847E0;
+    gFEMessageHandlers[666] = GM_vEASBioGetLevelProgress;
+    gFEMessageHandlers[667] = GM_vFEMessage667_Empty;
+    gFEMessageHandlers[668] = GM_vEASBioUnloadProducts;
+    gFEMessageHandlers[671] = GM_vMCSetCurrentFileType;
+    gFEMessageHandlers[672] = GM_vMCCallActionFn;
     gFEMessageHandlers[670] = TrophyRoom_GetRTEAwardIcon;
     gFEMessageHandlers[674] = TrophyRoom_GetAwardEarnedText;
-    gFEMessageHandlers[675] = fn_800848E4;
-    gFEMessageHandlers[678] = fn_800848E8;
-    gFEMessageHandlers[679] = fn_80084918;
-    gFEMessageHandlers[680] = fn_80084940;
-    gFEMessageHandlers[681] = fn_80084984;
-    gFEMessageHandlers[682] = fn_800849C8;
+    gFEMessageHandlers[675] = GM_vFEMessage675_Empty;
+    gFEMessageHandlers[678] = GM_vPlayNowGetNumGroups;
+    gFEMessageHandlers[679] = GM_vPlayNowSelectGroup;
+    gFEMessageHandlers[680] = GM_vPlayNowGetGroupName;
+    gFEMessageHandlers[681] = GM_vPlayNowGetGroupDescription;
+    gFEMessageHandlers[682] = GM_vPlayNowGetGroupMedal;
     gFEMessageHandlers[683] = PGASponsor_GetItemBonus;
-    gFEMessageHandlers[684] = fn_800849F8;
+    gFEMessageHandlers[684] = GM_vSetCourseFindDisc;
     gFEMessageHandlers[685] = GM_vClearGolferCache;
-    gFEMessageHandlers[688] = fn_800846D4;
+    gFEMessageHandlers[688] = GM_vEASBioGetLevel;
     gFEMessageHandlers[689] = GM_vRandomizeCrAPGolfer;
     gFEMessageHandlers[690] = GM_vRandomizeCrAPOutfit;
     gFEMessageHandlers[686] = GM_vMCIsWrongDevice;
     gFEMessageHandlers[691] = LadderMenu_GetNodeState;
-    gFEMessageHandlers[692] = fn_80084AA8;
+    gFEMessageHandlers[692] = GM_vSetLongDriveOptions;
     gFEMessageHandlers[693] = Calendar_IsSherwoodTargetEntered;
     gFEMessageHandlers[694] = Calendar_SetPlayNowFlag;
     gFEMessageHandlers[695] = Calendar_GetPlayNowFlag;
-    gFEMessageHandlers[696] = fn_80084B88;
+    gFEMessageHandlers[696] = GM_vTrophyRoomGetStatus;
     gFEMessageHandlers[697] = PGASponsor_PickStartingSponsor;
     gFEMessageHandlers[698] = PGASponsor_CollectItems;
     gFEMessageHandlers[699] = PGASponsor_GetItem;
@@ -1313,7 +1313,7 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[712] = GM_vGetCrAPCategoryCounts;
     gFEMessageHandlers[713] = GM_vGetNumCrAPSaleItemsOwned;
     gFEMessageHandlers[714] = GM_vRandomizeCrAPBody;
-    gFEMessageHandlers[715] = fn_80084BE4;
+    gFEMessageHandlers[715] = GM_vFEMessage715_Empty;
     gFEMessageHandlers[718] = PGATourMsg_CheckAdvanceTournament;
     gFEMessageHandlers[720] = LadderMenu_GetEventName;
     gFEMessageHandlers[721] = GM_vGetPuttingTipOption;
@@ -5825,15 +5825,25 @@ void GM_vEASBioListAccomplishments(MsgArg* pArgs, MsgArg* pResult) {
     fn_80125648(pArgs[0].i, pArgs[1].i, pArgs[2].i);
 }
 
-void fn_80084288(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 616: while pArgs[0] is set, fn_80124C10 sends the menus the EA Sports Bio's
+// summary (its level, the number of games, the time played; hint 0xB1) every 16 frames
+// (fn_8012566C).
+void GM_vEASBioShowSummary(MsgArg* pArgs, MsgArg* pResult) {
     fn_8012566C(pArgs[0].i);
 }
 
-void fn_800842AC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 617: while pArgs[0] is set, fn_80124C10 sends the menus the details of the game
+// GM_vEASBioListProducts picked (its name, time played, last played date, games played and the
+// share won, level; hints 0xB3, 0xBF, 0xB2) every 16 frames (fn_80125680).
+void GM_vEASBioShowProductDetails(MsgArg* pArgs, MsgArg* pResult) {
     fn_80125680(pArgs[0].i);
 }
 
-void fn_800842D0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 627: loads the EA Sports Bio from the card: opens it (fn_80125354, which marks
+// the Bio loaded and notes its level) and closes it again (fn_801253F0). 1 when both succeed, else
+// 0; the working profile's n11704 keeps the error. pArgs[0], pArgs[1] (the card) are handed on but
+// not used.
+void GM_vEASBioLoad(MsgArg* pArgs, MsgArg* pResult) {
     s32 nError;
 
     nError = fn_80125354(pArgs[0].i, pArgs[1].i);
@@ -5847,10 +5857,13 @@ void fn_800842D0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = nError == 0;
 }
 
-// The EA Sports Bio requests for the card in slot pArgs[0], pArgs[1]: unless fn_80125194 answers 0
-// or -18, fn_80125280 first (only for -43 and -44), then fn_801252D0; the first error ends it,
-// else fn_801251EC runs. The answer is 1, or the error; the profile's n11704 keeps it too.
-void fn_80084354(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 628: saves this game's record into the EA Sports Bio on the card. The Bio is
+// opened and closed first (fn_80125194): when that fails with anything but -18 (MC_ERR_BADDATA,
+// which most library errors become), a new Bio file is made (fn_801252D0), after deleting the old
+// one (fn_80125280) when the error was -43 (EASB_ERROR_WRONG_FILE) or -44
+// (EASB_ERROR_CANNOT_REOPEN); then the record is written (fn_801251EC). The answer is 1, or the
+// first error; the working profile's n11704 keeps the error.
+void GM_vEASBioSave(MsgArg* pArgs, MsgArg* pResult) {
     s32 aPos[2];
     s32 nError;
 
@@ -5879,9 +5892,10 @@ void fn_80084354(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->n11704 = nError;
 }
 
-// For the card in port pArgs[0], slot pArgs[1]: TRUE when the EA Sports Bio on it opened, or
-// failed with -18 (fn_80125118).
-void fn_80084458(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 643: whether an EA Sports Bio file is on the card in port pArgs[0], slot
+// pArgs[1] (fn_80125118): TRUE when it opens (it is closed again) or fails to with -18
+// (MC_ERR_BADDATA, a Bio that cannot be read).
+void GM_vEASBioIsOnCard(MsgArg* pArgs, MsgArg* pResult) {
     s32 aPos[2];
 
     aPos[0] = pArgs[0].i;
@@ -5889,8 +5903,9 @@ void fn_80084458(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_80125118(aPos);
 }
 
-// For the card in slot pArgs[0], pArgs[1]: fn_801255C4's answer.
-void fn_8008449C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 644: the space the EA Sports Bio needs on the card in port pArgs[0], slot
+// pArgs[1] (fn_801255C4: MC_BlocksNeededForSave for save kind 3).
+void GM_vEASBioMemoryRequired(MsgArg* pArgs, MsgArg* pResult) {
     s32 aPos[2];
 
     aPos[0] = pArgs[0].i;
@@ -5898,7 +5913,9 @@ void fn_8008449C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_801255C4(aPos);
 }
 
-void fn_800844E0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 645: loads the EA Sports Bio's game records (fn_80125434: opened, every PROD
+// record read, closed). 1 when it succeeds, else 0; the working profile's n11704 keeps the error.
+void GM_vEASBioLoadProducts(MsgArg* pArgs, MsgArg* pResult) {
     s32 nError;
 
     nError = fn_80125434(pArgs[0].i, pArgs[1].i);
@@ -5910,12 +5927,14 @@ void fn_800844E0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = nError == 0;
 }
 
-void fn_80084544(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vEASBioIsLoaded(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = EASBio_IsBioLoaded();
 }
 
-// 0 when card slot 0, 0 answers fn_80125354 with error -43 (then fn_801253F0 runs anyway), else 1.
-void fn_80084578(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 647: opens the EA Sports Bio on the card (fn_80125354): 0 when that fails with
+// -43 (EASB_ERROR_WRONG_FILE: the tag-file library's error 9), else 1. The Bio is closed afterwards
+// (fn_801253F0) even when the open failed.
+void GM_vEASBioIsNotWrongFile(MsgArg* pArgs, MsgArg* pResult) {
     if (fn_80125354(0, 0) == -43) {
         pResult->i = 0;
     } else {
@@ -5924,12 +5943,17 @@ void fn_80084578(MsgArg* pArgs, MsgArg* pResult) {
     fn_801253F0(0, 0);
 }
 
-void fn_800845D4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 648: 1 when the EA Sports Bio had no record of this game and no empty one, so
+// this game takes the slot of the oldest game (fn_80125528: EASBStorage.n94 is 1). pArgs[0],
+// pArgs[1] are handed on but not used.
+void GM_vEASBioIsReplacingOldest(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_80125528(pArgs[0].i, pArgs[1].i);
 }
 
-// 1 when fn_80125354 answers error -18 for card slot 0, 0; fn_801253F0 follows when it succeeds.
-void fn_80084614(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 649: 1 when opening the EA Sports Bio on the card fails with -18
+// (MC_ERR_BADDATA: most library errors, a corrupt file among them), else 0. When it opens, it is
+// closed again (fn_801253F0).
+void GM_vEASBioIsBadData(MsgArg* pArgs, MsgArg* pResult) {
     s32 nError = fn_80125354(0, 0);
 
     if (nError == -18) {
@@ -5942,7 +5966,9 @@ void fn_80084614(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80084678(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 650: deletes the EA Sports Bio file from the card (fn_80125280; the Bio is then
+// no longer loaded). 1 when it succeeds, else 0; the working profile's n11704 keeps the error.
+void GM_vEASBioDelete(MsgArg* pArgs, MsgArg* pResult) {
     s32 nError;
 
     nError = fn_80125280(pArgs[0].i, pArgs[1].i);
@@ -5950,19 +5976,24 @@ void fn_80084678(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = nError == 0;
 }
 
-void fn_800846C8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 655: answers 0.
+void GM_vFEMessage655_Return0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_800846D4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 688: the EA Sports Bio's level (fn_80125928; 0 when no Bio is loaded) into the
+// word pArgs[0] points at.
+void GM_vEASBioGetLevel(MsgArg* pArgs, MsgArg* pResult) {
     s32* pN;
 
     pN = pArgs[0].p;
     *pN = fn_80125928();
 }
 
-// Whether an EA Sports Bio reward is waiting (fn_801256B8); its message is set up either way.
-void fn_80084704(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 658: whether an EA Sports Bio reward is waiting (fn_801256B8: a new
+// accomplishment, a level-up, or a level-up that unlocked something); it becomes the current reward
+// message either way (EASBio_eReward_None when there is none).
+void GM_vEASBioCheckReward(MsgArg* pArgs, MsgArg* pResult) {
     EASBio_eReward eReward = fn_801256B8();
 
     if (eReward != -1) {
@@ -5973,26 +6004,37 @@ void fn_80084704(MsgArg* pArgs, MsgArg* pResult) {
     EASBio_SetCurrentRewardMessage(eReward);
 }
 
-void fn_80084750(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 667: empty in this build.
+void GM_vFEMessage667_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80084754(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 668: frees the EA Sports Bio's loaded game records (fn_801254EC). The answer is
+// then replaced by fn_801254B8's, which is always -18 (pictures are not supported on this
+// platform).
+void GM_vEASBioUnloadProducts(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_801254EC();
     pResult->i = fn_801254B8();
 }
 
-void fn_8008478C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 666: the EA Sports Bio's progress to its next level as a percentage
+// (fn_80124BDC), as a float.
+void GM_vEASBioGetLevelProgress(MsgArg* pArgs, MsgArg* pResult) {
     pResult->f = fn_80124BDC();
 }
 
-void fn_800847BC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 671: the memory-card screens' save kind is pArgs[0] (MC_SetCurrentFileType: 0
+// the options, 1 a profile, 2 a replay, 3 the EA Sports Bio).
+void GM_vMCSetCurrentFileType(MsgArg* pArgs, MsgArg* pResult) {
     fn_80084FF0(pArgs[0].i);
 }
 
-// Runs memory-card operation pArgs[0] of the picked set on the card pArgs[1], pArgs[2]. Each
-// operation takes its own payload (core/memcard.h): ops 0 and 1 answer whether they succeeded
-// (0 is success), ops 2..4 answer their result.
-void fn_800847E0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 672: runs memory-card operation pArgs[0] of the save kind MC_SetCurrentFileType
+// picked, on the card in port pArgs[1], slot pArgs[2], each given its own payload (core/memcard.h):
+// 0 save and 1 load answer 1 when they succeed, else 0; 2 the files on the card (a count, or
+// whether the file is there), 3 whether the file there is bad data and 4 the space it needs answer
+// the operation's own result. Operations 0, 1 and 3 also get pArgs[3] (MCCardPos.n8), 1 and 4 the
+// name in string pArgs[4].
+void GM_vMCCallActionFn(MsgArg* pArgs, MsgArg* pResult) {
     MCCardPos    pos0;
     MCCardPosStr posStr;
     MCCardPos    pos3;
@@ -6038,33 +6080,45 @@ void fn_800847E0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_800848E4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 675: empty in this build.
+void GM_vFEMessage675_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800848E8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 678: the number of Play Now challenge groups (PlayNow_GetNumGroups).
+void GM_vPlayNowGetNumGroups(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = PlayNow_GetNumGroups();
 }
 
-void fn_80084918(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 679: picks Play Now challenge group pArgs[0], counted from 1
+// (PlayNow_SelectGroup).
+void GM_vPlayNowSelectGroup(MsgArg* pArgs, MsgArg* pResult) {
     PlayNow_SelectGroup(pArgs[0].i - 1);
 }
 
-void fn_80084940(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 680: the name of Play Now challenge group pArgs[1], counted from 1, into the
+// string pArgs[0].
+void GM_vPlayNowGetGroupName(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[0].p)->pStr, PlayNow_GetGroupName(pArgs[1].i - 1));
 }
 
-void fn_80084984(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 681: the description of Play Now challenge group pArgs[1], counted from 1, into
+// the string pArgs[0].
+void GM_vPlayNowGetGroupDescription(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[0].p)->pStr, PlayNow_GetGroupDescription(pArgs[1].i - 1));
 }
 
-// A challenge group's best medal, the group counted from 1.
-void fn_800849C8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 682: profile pArgs[0]'s best medal in Play Now challenge group pArgs[1],
+// counted from 1 (SaveProfile.aMedal: 0 the best, 3 none).
+void GM_vPlayNowGetGroupMedal(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].aMedal[pArgs[1].i - 1];
 }
 
-// Set up course pArgs[0] (10000: the mixed round, built once) and answer fn_80110180, inverted
-// when fn_8011027C says so.
-void fn_800849F8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 684: the round's course is pArgs[0] (GM_SetCurrentCourse and its first selected
+// hole), or 10000 for the random mixed round (built by GM_BuildRandom18 only the first time in a
+// row; gpGame->b137 remembers it). Answers which disc the course is on: whether it is on the disc
+// in the drive (fn_80110180), inverted when disc 2 is in the drive (fn_8011027C), so 1 for disc 1
+// and 0 for disc 2.
+void GM_vSetCourseFindDisc(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 10000) {
         if (gpGame->b137 == 0) {
             gpGame->b137 = 1;
@@ -6085,9 +6139,12 @@ void fn_800849F8(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// pArgs[0] 0: set up game mode 26, or mode 22 in variant 0 or 1 (pArgs[1] 1, 2). 1: game mode
-// 22's n4 is 5, 10 or 15 (pArgs[1] 0, 1, 2).
-void fn_80084AA8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 692, the long-drive menu. pArgs[0] 0 picks the game by pArgs[1]: 0 (or anything
+// else) the two-player race (game mode 26), 1 the contest (mode 22) where every drive's points add
+// up, 2 the contest where only the best drive counts (GameMode22_SetVariant); the mode is set up
+// and split screen set for it. pArgs[0] 1 sets the contest's drives per player by pArgs[1]: 5 (0 or
+// anything else), 10 (1) or 15 (2).
+void GM_vSetLongDriveOptions(MsgArg* pArgs, MsgArg* pResult) {
     s32 nMode;
     s32 n;
 
@@ -6132,8 +6189,10 @@ void fn_80084AA8(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Passes the message on to one of three handlers, by pArgs[0].
-void fn_80084B88(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 696: a trophy room status question, passed on whole by pArgs[0]: 0 a tour win
+// (TrophyRoom_GetTourWinStatus), 1 a player of the month award (TrophyRoom_GetPlayerOfMonthStatus),
+// 3 a real-time event award (TrophyRoom_GetRTEAwardStatus); 2 is not answered.
+void GM_vTrophyRoomGetStatus(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 0:
         TrophyRoom_GetTourWinStatus(pArgs, pResult);
@@ -6149,7 +6208,8 @@ void fn_80084B88(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80084BE4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 715: empty in this build.
+void GM_vFEMessage715_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Music commands: 0 turns music row 0 and its track pArgs[1] on and plays the track, 1 calls

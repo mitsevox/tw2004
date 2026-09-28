@@ -790,14 +790,14 @@ void GameMode22_AfterClearStats(void) {
 void GameMode22_PreSwing(void) {
 }
 
-// How many drives each player gets (nDrives), from the menu (FE_MessageTable.c fn_80084AA8: 5, 10
+// How many drives each player gets (nDrives), from the menu (FE_MessageTable.c GM_vSetLongDriveOptions: 5, 10
 // or 15).
 void GameMode22_SetNumDrives(s32 nDrives) {
     gGameMode22.nDrives = nDrives;
 }
 
-// The contest's variant (nVariant), from the menu (FE_MessageTable.c fn_80084AA8): 0 every drive's
-// points add up, 1 only the best fair drive counts.
+// The contest's variant (nVariant), from the menu (FE_MessageTable.c GM_vSetLongDriveOptions): 0
+// every drive's points add up, 1 only the best fair drive counts.
 void GameMode22_SetVariant(s32 nVariant) {
     gGameMode22.nVariant = nVariant;
 }

@@ -442,7 +442,7 @@ void FE_GetDateTimeIfClockEarly(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// FE message 696 with pArgs[0] 3 (fn_80084B88 passes it on): real-time event award pArgs[2]. Its
+// FE message 696 with pArgs[0] 3 (GM_vTrophyRoomGetStatus passes it on): real-time event award pArgs[2]. Its
 // name goes into the string pArgs[4] (GM_RealtimeMode_GetNameByTrophyGroup), its icon into the int
 // pArgs[5] points to (GM_RealtimeMode_GetIconIDByTrophyGroup) and the day the current profile won
 // it into the string pArgs[3] (empty when not won). pArgs[1], the player slot for the other awards,

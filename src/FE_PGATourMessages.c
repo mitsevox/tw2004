@@ -450,7 +450,7 @@ void PGASponsor_GetName(MsgArg* pArgs, MsgArg* pResult) {
     FE_CrAP_GetSponsorName(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }
 
-// Trophy room, kind 0 of fn_80084B88's award messages: tournament pArgs[2] of profile slot
+// Trophy room, kind 0 of GM_vTrophyRoomGetStatus's award messages: tournament pArgs[2] of profile slot
 // pArgs[1]: its name into the text pArgs[4], its icon (GameModeDriverPGATour_GetTextureID) into
 // *pArgs[5] and, when the profile has won it (aC8[].award), the day won (month/day/year) into the
 // text pArgs[3], else an empty text. Gives whether it was won.
@@ -473,10 +473,10 @@ void TrophyRoom_GetTourWinStatus(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = bWon;
 }
 
-// Trophy room, kind 1 of fn_80084B88's award messages: Player of the Month award pArgs[2] (a month,
-// SaveProfile.a1C0) of profile slot pArgs[1]: "Player of the Month" into the text pArgs[4], icon 0
-// into *pArgs[5] and, when won, the day won into the text pArgs[3] (else empty). Gives whether it
-// was won.
+// Trophy room, kind 1 of GM_vTrophyRoomGetStatus's award messages: Player of the Month award
+// pArgs[2] (a month, SaveProfile.a1C0) of profile slot pArgs[1]: "Player of the Month" into the
+// text pArgs[4], icon 0 into *pArgs[5] and, when won, the day won into the text pArgs[3] (else
+// empty). Gives whether it was won.
 void TrophyRoom_GetPlayerOfMonthStatus(MsgArg* pArgs, MsgArg* pResult) {
     int nPlayer = pArgs[1].i;
     s32 n = pArgs[2].i;

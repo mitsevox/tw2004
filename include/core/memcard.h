@@ -102,7 +102,7 @@ LAYOUT_ASSERT(MCOpSet, 0x14);
 
 extern MCOpSet lbl_8018C7D8[4];
 
-// The operations do not all take the same payload: the menus' message fn_800847E0 builds op 0
+// The operations do not all take the same payload: the menus' message GM_vMCCallActionFn builds op 0
 // and 3 an MCCardPos, op 1 an MCCardPosStr, op 2 the card alone and op 4 the card and a name.
 // So fn_80084FB4 and its neighbours take the payload as a void*.
 typedef struct MCOpCard {       // op 2's payload (8 bytes)
