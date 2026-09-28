@@ -176,10 +176,10 @@ void fn_800773F8(void);
 void fn_80077428(void);
 void fn_80085120(void);
 void FE_CharMgrClose(void);
-void fn_8008B864(void);
-void fn_8008B9A0(void);
-void fn_8008C844(void);
-void fn_8008C8C4(void);
+void FE_StreamUpdateState(void);
+void FE_SetupCamera(void);
+void FE_vRenderGolferAllPhase1(void);
+void FE_vRenderGolferAllPhase2(void);
 void fn_8008DC10(void);
 u8   fn_8008EB10(void);
 u8   fn_8008F39C(void);
@@ -300,7 +300,7 @@ void fn_800B251C_ShadowInit(int n);
 void UI_Obj_InitModule(void);
 void UStream_CloseAll(void);
 void UStream_Init(void);
-void sFE_AdjustAndSetGolferPosition(void);
+void FE_vUpdateGolferAll(void);
 
 f32  fn_8006C630(void);
 void fn_8006C63C(void);
@@ -1008,20 +1008,20 @@ void fn_8006D838(void) {
     fn_8006E028();
     fn_8006DFA8();
     fn_800A2BA8();
-    fn_8008B864();
+    FE_StreamUpdateState();
     if (ViewController_IsActive(0)) {
         fn_8006C8EC(0);
         b = fn_8008EB10();
         if (b) {
-            sFE_AdjustAndSetGolferPosition();
-            fn_8008B9A0();
-            fn_8008C844();
+            FE_vUpdateGolferAll();
+            FE_SetupCamera();
+            FE_vRenderGolferAllPhase1();
         }
         if (lbl_80281E50) {
             fn_8008F648(1);
         }
         if (b) {
-            fn_8008C8C4();
+            FE_vRenderGolferAllPhase2();
         }
     }
     UFont_DrawQueue();

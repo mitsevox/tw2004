@@ -25,7 +25,7 @@ s32 lbl_801899E0[4][5] = {
     { 1, 27, 4, 15, 25 },
 };
 
-// Where the golfer is placed (sFE_AdjustAndSetGolferPosition).
+// Where the golfer is placed (FE_vUpdateGolferAll).
 f32 lbl_80189A30[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 // Per screen kind: two vectors copied into CrAPState.v120 and v130 (all three are the same).
@@ -73,9 +73,9 @@ s32 lbl_80281330 = 1;           // draw the golfer into the menu's texture (fn_8
 f32 lbl_80281334 = 0.17f;       // with b83: the most f14C may be
 f32 lbl_80281338 = 0.1f;        // with b83: f140, f144 and f148
 u8  lbl_8028133C = 1;
-s32 lbl_80281340 = -1;          // } the golfer and profile slot last drawn (fn_8008CE88)
+s32 lbl_80281340 = -1;          // } the golfer and profile slot last drawn (FE_RenderGolfer)
 s32 lbl_80281344 = -1;          // }
-f32 lbl_80281348 = 0.918f;      // the share of the 448-line frame fn_8008CE88 sets for screen kind 3
+f32 lbl_80281348 = 0.918f;      // the share of the 448-line frame FE_RenderGolfer sets for screen kind 3
 
 Character* lbl_80281EE8[CRAP_NUM_GOLFERS];
 CourseLights* lbl_80281EE4;     // the lights of the golfer display ('LITE' stream object)
@@ -85,17 +85,17 @@ void FE_CharMgrClose(void);
 void FE_StreamInterruptState(void);
 void FE_StreamSetNextState(int nNext);
 void FE_StreamInitStateMgr(void);
-void fn_8008B7D0(int nState);
-void fn_8008B820(void);
-void fn_8008B850(void);
-void fn_8008B864(void);
+void FE_StreamWaitForState(int nState);
+void FE_StreamStopForClose(void);
+void FE_StreamPopState(void);
+void FE_StreamUpdateState(void);
 void fn_8008C938(void);
-void fn_8008C93C(void);
-void fn_8008CA88(void);
-void fn_8008CC30(void);
-void fn_8008CE2C(void);
-void fn_8008CE88(u8 bFull);
-void fn_8008D058(void);
+void FE_ClearGolferFrame(void);
+void FE_DrawGolferTexture(void);
+void FE_DrawGolferAlphaMask(void);
+void FE_CopyGolferToTexture(void);
+void FE_RenderGolfer(u8 bFull);
+void FE_SetupCharState(void);
 void fn_8008D6CC(void);
 void fn_8008E0B0(f32 fTurn);
 void fn_8008D9DC(UStreamObject* pObject);
@@ -221,9 +221,9 @@ void FE_CharMgrInit(void) {
     lbl_80281EE0->n74 = 0;
 }
 
-// Stop the loader (fn_8008B820), free every golfer slot's character, and free the state.
+// Stop the loader (FE_StreamStopForClose), free every golfer slot's character, and free the state.
 void FE_CharMgrClose(void) {
-    fn_8008B820();
+    FE_StreamStopForClose();
     fn_8008DBE8();
     fn_8008DC10();
     StaticMem_Free(lbl_80281EE0);
@@ -309,7 +309,7 @@ void FE_StreamFunc_IdleUpdate(void) {
     CrAPGolfer* pGolfer;
 
     if (lbl_801D8708.bAbort) {
-        fn_8008B850();
+        FE_StreamPopState();
         return;
     }
     if (lbl_80281EE0->b8A == 1) return;
@@ -327,7 +327,7 @@ void FE_StreamFunc_IdleUpdate(void) {
             return;
         }
         if (FE_StreamManageCRaPMemory()) {
-            fn_8008B850();
+            FE_StreamPopState();
         }
     } else if (pGolfer->pNext->b18 == 0 && pGolfer->pNext->nC != -1) {
         if (fn_8008DCF0(pGolfer->pNext->nC, pGolfer->pNext)) return;
@@ -338,7 +338,7 @@ void FE_StreamFunc_IdleUpdate(void) {
             return;
         }
         if (FE_StreamManageCRaPMemory()) {
-            fn_8008B850();
+            FE_StreamPopState();
         }
     } else if (pGolfer->pPrev->b18 == 0 && pGolfer->pPrev->nC != -1) {
         if (fn_8008DCF0(pGolfer->pPrev->nC, pGolfer->pPrev)) return;
@@ -349,7 +349,7 @@ void FE_StreamFunc_IdleUpdate(void) {
             return;
         }
         if (FE_StreamManageCRaPMemory()) {
-            fn_8008B850();
+            FE_StreamPopState();
         }
     }
 }
@@ -380,7 +380,7 @@ void FE_StreamFunc_SkinUpdate(void) {
         if (lbl_801D8708.bAbort) {
             lbl_80281EE0->pB8->b18 = 0;
         }
-        fn_8008B850();
+        FE_StreamPopState();
     }
 }
 
@@ -424,7 +424,7 @@ void FE_StreamFunc_TexturesUpdate(void) {
             lbl_80281EE0->pB8->n1C = -1;
         }
         lbl_80281EE0->n8C = -1;
-        fn_8008B850();
+        FE_StreamPopState();
     }
 }
 
@@ -454,7 +454,7 @@ void FE_StreamFunc_SwapTexturesUpdate(void) {
         if (lbl_801D8708.bAbort) {
             lbl_80281EE0->pB4->b18 = 0;
         }
-        fn_8008B850();
+        FE_StreamPopState();
     }
 }
 
@@ -481,7 +481,7 @@ void FE_StreamSetNextState(int nNext) {
 void FE_StreamStopAllStreaming(void) {
     FE_StreamSetNextState(1);
     FE_StreamInterruptState();
-    fn_8008B7D0(1);
+    FE_StreamWaitForState(1);
 }
 
 // Start the loader's state machine in its idle state (1), not paused.
@@ -494,28 +494,32 @@ void FE_StreamInitStateMgr(void) {
     lbl_801D8708.bPaused = 0;
 }
 
-// Run the machine until it reaches nState.
-void fn_8008B7D0(int nState) {
+// Run the golfer loader's state machine until it reaches state nState (a busy wait; fn_80007254,
+// called each turn, is empty).
+void FE_StreamWaitForState(int nState) {
     while (lbl_801D8708.nState != nState) {
-        fn_8008B864();
+        FE_StreamUpdateState();
         fn_80007254();
     }
 }
 
-void fn_8008B820(void) {
+// The same as FE_StreamStopAllStreaming (interrupt the loader and wait until it is idle), in a copy
+// of its own that only FE_CharMgrClose calls.
+void FE_StreamStopForClose(void) {
     FE_StreamSetNextState(1);
     FE_StreamInterruptState();
-    fn_8008B7D0(1);
+    FE_StreamWaitForState(1);
 }
 
-// The running state is finished.
-void fn_8008B850(void) {
+// Mark the loader's running state finished: FE_StreamUpdateState leaves it for the next one.
+void FE_StreamPopState(void) {
     lbl_801D8708.bDone = 1;
 }
 
-// Run the state machine once: enter the state, update it, and when it is finished leave it for
-// the next one.
-void fn_8008B864(void) {
+// Run the golfer loader's state machine once (each front-end frame, gomainloop): enter the running
+// state, update it, and when it is finished (FE_StreamPopState) leave it for the next one. Nothing
+// runs while it is paused or in state 0.
+void FE_StreamUpdateState(void) {
     // port: EA passes an argument the state handlers (lbl_80189AA0) ignore
     if (lbl_801D8708.bPaused == 0 && lbl_801D8708.nState != 0) {
         if (lbl_801D8708.bEnter) {
@@ -534,19 +538,24 @@ void fn_8008B864(void) {
     }
 }
 
-// Pause the machine (or not); returns the old setting.
-u8 fn_8008B978(u8 bPaused) {
+// Pause the golfer loader (or let it run on); returns the old setting. DiscCheck.c pauses it.
+u8 FE_PauseFECharStreaming(u8 bPaused) {
     u8 bOld = lbl_801D8708.bPaused;
 
     lbl_801D8708.bPaused = bPaused;
     return bOld;
 }
 
-int fn_8008B990(void) {
+// The loader's running state: 1 idle, 2 skin (streaming), 3 textures, 4 texture swap (0: stopped).
+int FE_StreamGetCurrentState(void) {
     return lbl_801D8708.nState;
 }
 
-void fn_8008B9A0(void) {
+// Each front-end frame, after FE_vUpdateGolferAll: update the current view and take its camera into
+// the golfer display: an identity matrix in mC0, the camera's position and look point (View v0,
+// v10) in v100 and v110, and the screen kind's (n0) pair of vectors (lbl_80189A40, 60, 80) in v120
+// and v130.
+void FE_SetupCamera(void) {
     View* pView;
 
     pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
@@ -572,10 +581,13 @@ void fn_8008B9A0(void) {
     }
 }
 
-// Each frame: fade the golfer display (f14C, 0..0.5) with his animation, run screen kind 3's
-// queued animation (n1C0), place him, turn to the next golfer when his animation ends (b91), and
-// animate and light him.
-void sFE_AdjustAndSetGolferPosition(void) {
+// Each front-end frame, before FE_SetupCamera and the render passes: fade the golfer display (f14C,
+// 0..0.5) in and out with his animation; on screen kind 3 (create-a-player) run its queued
+// animation (n1C0), and let the pad turn him (fn_8008E0B0) and zoom (fn_8008E254); set him up again
+// for a new screen kind (FE_SetupCharState) and place him (lbl_80189A30; in the club close-up
+// raised by his club's offset); turn to the next golfer when his animation ends (b91); give a
+// golfer shown afresh his ball logo and textures; then animate, pose and light him.
+void FE_vUpdateGolferAll(void) {
     f32 vSaved[4];
     LightParams params;
     LightParams* pLight;
@@ -786,7 +798,7 @@ void sFE_AdjustAndSetGolferPosition(void) {
     }
     if (lbl_80281EE0->pB4->b18 && lbl_80281EE0->b86 == 0) {
         if (lbl_80281EE0->pB4->n1C != lbl_80281EE0->n0) {
-            fn_8008D058();
+            FE_SetupCharState();
         }
         if (lbl_80281EE0->n8 == 1) {
             // Raise him by his club class's amount while he is placed, then put the spot back.
@@ -820,7 +832,7 @@ void sFE_AdjustAndSetGolferPosition(void) {
             if (lbl_80281EE0->n0 == 0 || lbl_80281EE0->n0 == 2) {
                 gSession.nGolfer[0] = lbl_80281EE0->pB4->nC;
             }
-        } else if (fn_8008B990() != 1) {
+        } else if (FE_StreamGetCurrentState() != 1) {
             lbl_80281EE0->pB4 = lbl_80281EE0->pB8;
             lbl_80281EE0->pB4->b18 = 0;
         }
@@ -888,38 +900,47 @@ void sFE_AdjustAndSetGolferPosition(void) {
     fn_80035308();
 }
 
-// Draw the golfer into the menu's texture, when he is shown and lbl_80281330 allows it.
-void fn_8008C844(void) {
+// The golfer's first render pass, before the menu is drawn, when he is shown (b18, not hidden by
+// b86) and drawn off screen (lbl_80281330): clear the frame (FE_ClearGolferFrame), draw him and the
+// ball he holds, set the frame's alpha (FE_DrawGolferAlphaMask), copy him into the screen-copy
+// texture (FE_CopyGolferToTexture) and clear the frame again. b18C notes that this pass drew him.
+void FE_vRenderGolferAllPhase1(void) {
     if (lbl_80281EE0->pB4->b18 && lbl_80281EE0->b86 == 0 && lbl_80281EE0->b88 == 0 && lbl_80281330 != 0) {
         lbl_80281EE0->b18C = 1;
         fn_8008C938();
-        fn_8008C93C();
-        fn_8008CE88(0);
+        FE_ClearGolferFrame();
+        FE_RenderGolfer(0);
         fn_800B9CF0(0);
-        fn_8008CC30();
-        fn_8008CE2C();
-        fn_8008C93C();
+        FE_DrawGolferAlphaMask();
+        FE_CopyGolferToTexture();
+        FE_ClearGolferFrame();
     }
 }
 
-void fn_8008C8C4(void) {
+// The golfer's second render pass, after the menu is drawn: lay his copy from
+// FE_vRenderGolferAllPhase1 over the menu (FE_DrawGolferTexture) or, when he is not drawn off
+// screen (lbl_80281330), draw him and his ball straight into the frame.
+void FE_vRenderGolferAllPhase2(void) {
     if (lbl_80281EE0->pB4->b18 && lbl_80281EE0->b86 == 0 && lbl_80281EE0->b88 == 0) {
         if (lbl_80281330 != 0) {
-            fn_8008CA88();
+            FE_DrawGolferTexture();
             return;
         }
         lbl_80281EE0->b18C = 0;
-        fn_8008CE88(0);
+        FE_RenderGolfer(0);
         fn_800B9CF0(0);
     }
 }
 
+// Empty; FE_vRenderGolferAllPhase1 calls it first. Nothing says what it was for, so it keeps its
+// address name.
 void fn_8008C938(void) {
 }
 
-// Draw a quad in colour (0, 0, 0, 0) in a 512 x 448 frame set up for it, then set the frame up
-// again the usual way (mode 8, as gomainloop.c does).
-void fn_8008C93C(void) {
+// Clear the 512 x 448 frame to transparent black: a full-frame quad of (0, 0, 0, 0) with colour and
+// alpha written and the depth test always passing (and writing). Then the frame is set up again the
+// usual way (colour writes only, as gomainloop.c does).
+void FE_ClearGolferFrame(void) {
     f32 xy[8] = { 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
     f32 colour[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
@@ -940,8 +961,9 @@ void fn_8008C93C(void) {
     RenderState_Flush();
 }
 
-// Draw the screen-copy texture (lbl_801D8714) as a quad in grey, its alpha lbl_80281EE0->f14C.
-void fn_8008CA88(void) {
+// Draw the golfer's screen copy (lbl_801D8714) over the menu as a textured quad, grey with alpha
+// f14C (the display's fade, 0..0.5).
+void FE_DrawGolferTexture(void) {
     f32 xy[8] = { 0.25f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
     f32 colour[4] = { 0.5f, 0.5f, 0.5f, 0.5f };
     f32 uv[8] = { 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
@@ -964,9 +986,11 @@ void fn_8008CA88(void) {
     RenderState_Flush();
 }
 
-// Draw two quads, the first in black at half alpha, the second in (0, 0, 0, 0), then set the
-// frame up again the usual way.
-void fn_8008CC30(void) {
+// Set the frame's alpha before the golfer is copied to his texture (FE_vRenderGolferAllPhase1):
+// with only alpha written, draw a quad of black at half alpha with the depth test off, then a
+// full-frame one of (0, 0, 0, 0) tested against the depth he left (compare 3). Then the frame is
+// set up again the usual way.
+void FE_DrawGolferAlphaMask(void) {
     f32 xy2[8] = { 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
     f32 xy1[8] = { 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
     f32 colour1[4] = { 0.0f, 0.0f, 0.0f, 0.5f };
@@ -996,7 +1020,7 @@ void fn_8008CC30(void) {
 }
 
 // Copy the frame buffer's golfer (from (128, 0), 384 x 448) into the screen-copy texture.
-void fn_8008CE2C(void) {
+void FE_CopyGolferToTexture(void) {
     GXPixModeSync();
     GXSetTexCopySrc(128, 0, 384, 448);
     GXSetTexCopyDst(384, 448, 6, 0);           // RGBA8, no mipmap
@@ -1005,9 +1029,11 @@ void fn_8008CE2C(void) {
     GXInvalidateTexAll();
 }
 
-// Draw the golfer shown (bFull: in a 384 x 528 frame instead of the usual 512 x 448), then note
-// which golfer and profile slot were drawn.
-void fn_8008CE88(u8 bFull) {
+// Draw the golfer shown (loaded, b18, and not hidden, b86) with the display's camera (mC0): his
+// body, or only his club in the club close-up (n8 1); on screen kind 3 the scissor keeps the top
+// lbl_80281348 of the frame. bFull: into a 384 x 528 surface instead of the 512 x 448 frame (both
+// passes pass 0). Then note which golfer and profile slot were drawn (lbl_80281340, lbl_80281344).
+void FE_RenderGolfer(u8 bFull) {
     if (lbl_8028133C == 0) {
         return;
     }
@@ -1049,9 +1075,13 @@ void fn_8008CE88(u8 bFull) {
     }
 }
 
-// Set the golfer shown up for the screen kind (n0): his clip, the kind of clip it is (its place
-// in gClubBoneIds, 0 when it is not there) and his facing.
-void fn_8008D058(void) {
+// Set the golfer shown up for the screen kind (n0; n1C notes the kind he was set up for): facing
+// front, and on kinds 0, 1, 2 and 4 his morph state reset, a club selected (5 or 3), his first clip
+// (Char_SetClip 0) played and the club switched to the one that clip holds (its u90 in
+// gClubBoneIds; 0 if none); kinds 1 and 4 take the profile's handedness (fn_8008EA44). Kind 3
+// (create-a-player) clears its queued animation and close-up state and starts his idle animation
+// (fn_8008DD50). The display then fades in from 0 (f14C).
+void FE_SetupCharState(void) {
     Clip* pClip;
     int i;
 
@@ -1297,15 +1327,15 @@ void fn_8008DBE8(void) {
 
 // Once the loader is idle: finish a stop (b8A), or free a golfer slot's character (b19).
 void fn_8008DC10(void) {
-    if (fn_8008B990() == 1) {
-        if (lbl_80281EE0->b8A && fn_8008B990() == 1) {
+    if (FE_StreamGetCurrentState() == 1) {
+        if (lbl_80281EE0->b8A && FE_StreamGetCurrentState() == 1) {
             fn_8008DBE8();
             lbl_80281EE0->b8A = 0;
             return;
         }
         if (lbl_80281EE0->aGolfer[0].b19
             && (lbl_80281EE0->pB4->b18 == 0 || &lbl_80281EE0->aGolfer[0] != lbl_80281EE0->pB4)
-            && (fn_8008B990() == 1 || &lbl_80281EE0->aGolfer[0] != lbl_80281EE0->pB8)) {
+            && (FE_StreamGetCurrentState() == 1 || &lbl_80281EE0->aGolfer[0] != lbl_80281EE0->pB8)) {
             if (lbl_80281EE0->aGolfer[0].pChar != NULL) {
                 fn_80008380();
                 Character_Free(lbl_80281EE0->aGolfer[0].pChar);

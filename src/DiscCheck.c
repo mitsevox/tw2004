@@ -123,7 +123,7 @@ void fn_801102AC(void) {
 
     if (gSession.nGameType == 3) {
         FE_StreamStopAllStreaming();
-        fn_8008B978(1);
+        FE_PauseFECharStreaming(1);
         lbl_802824D8 = 1;
         return;
     }

@@ -108,7 +108,7 @@ Functions still unnamed or named from TW06:
 | `80078840` | `FE_CrAP_IsAssetUndesirable` | `FE_CrAP_IsAssetUndesirable` | strong | Xbox anchor(10) |
 | `80078C94` | `FE_CrAP_IsCrazyHat` | `FE_CrAP_IsCrazyHat` | strong | Xbox anchor(2) |
 | `8007BE28` | `GetGolferName` | `GetGolferName` | strong | both builds: Xbox anchor(1), PS2 xbox:anchor(1) |
-| `8008BAB4` | `sFE_AdjustAndSetGolferPosition` | `sFE_AdjustAndSetGolferPosition` | strong | Xbox anchor(4) |
+| `8008BAB4` | `FE_vUpdateGolferAll` | `sFE_AdjustAndSetGolferPosition` | strong | Xbox anchor(4) |
 | `80093A80` | `BFX_vInit` | `BFX_vInit` | strong | both builds: Xbox anchor(1), PS2 xbox:anchor(1) |
 | `80095B4C` | `CharacterState_AddSKABlendData` | `CharacterState_AddSKABlendData` | strong | both builds: Xbox anchor(1), PS2 xbox:anchor(1) |
 | `80096690` | `CharacterState_UpdateSKAState` | `CharacterState_UpdateSKAState` | strong | both builds: Xbox nbr2(r2,4), PS2 xbox:nbr2(r2,4) |

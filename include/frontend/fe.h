@@ -227,7 +227,7 @@ extern u32 lbl_80281ED0;                // their ARAM address while they are the
 
 // ---- the golfers animated on menu screens (FEgolferanim.c) -----------------------------------
 
-// A state of the golfer loader (lbl_80189AA0): run by fn_8008B864.
+// A state of the golfer loader (lbl_80189AA0): run by FE_StreamUpdateState.
 typedef struct FEGolferState {
     void (*pfnEnter)(void);     // 0x00
     void (*pfnUpdate)(void);    // 0x04  every frame
@@ -479,8 +479,8 @@ extern s32 lbl_80281FFC;                // set by fn_80084FF0: the lbl_8018C7D8 
 
 void FE_setupStreaming(int nGolfer, int a, int b);    // show golfer nGolfer
 void FE_StreamStopAllStreaming(void);
-u8   fn_8008B978(u8 bPaused);           // pause the menus' state machine (or not); the old setting
-int  fn_8008B990(void);
+u8   FE_PauseFECharStreaming(u8 bPaused);           // pause the menus' state machine (or not); the old setting
+int  FE_StreamGetCurrentState(void);
 void fn_8008DAEC(void);
 void fn_8008E244(void);
 void fn_8008E2F8(u8 bTarget, f32 fAngle);

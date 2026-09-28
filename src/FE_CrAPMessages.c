@@ -868,7 +868,7 @@ void fn_8010948C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_801094C0(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_8008B990() == 1;
+    pResult->i = FE_StreamGetCurrentState() == 1;
 }
 
 void fn_801094FC(MsgArg* pArgs, MsgArg* pResult) {

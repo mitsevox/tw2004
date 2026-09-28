@@ -17,7 +17,7 @@ void fn_80037FB4(u8 a, f32* pColor);    // a full-screen colour (GoPostFx.c)
 void fn_80010284(void);
 void FE_StreamInterruptState(void);
 void FE_StreamSetNextState(int a);
-void fn_8008B7D0(int a);
+void FE_StreamWaitForState(int a);
 void fn_8008D8CC(void);
 void fn_8008DBE8(void);
 void fn_80092198(void);
@@ -224,7 +224,7 @@ void FE_movieFade(void) {
 void fn_800772E0(void) {
     FE_StreamSetNextState(1);
     FE_StreamInterruptState();
-    fn_8008B7D0(1);
+    FE_StreamWaitForState(1);
     fn_8008DAEC();
     fn_8008DBE8();
     fn_80092198();

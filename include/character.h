@@ -309,7 +309,7 @@ typedef struct Clip {
     f32    v80[3];              // 0x80  a point Character_GetEndOfAnimationPosition puts through bone 0's matrix
     s16    n8C;                 // 0x8C  halfwords per frame, first stream
     s16    n8E;                 // 0x8E  bytes per frame, second stream
-    u64    u90;                 // 0x90  looked up in gClubBoneIds (FEgolferanim.c fn_8008D058)
+    u64    u90;                 // 0x90  looked up in gClubBoneIds (FEgolferanim.c FE_SetupCharState)
     u8     unk98[8];
     char   name[0x20];          // 0xA0  (fn_8002091C swaps 0xA0 and 0xB0 as 16 bytes each, then words)
     void*  pC0;                 // 0xC0  where the clip was loaded: itself (fn_80020F60), or the start

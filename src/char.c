@@ -2986,7 +2986,7 @@ void Character_UpdateClothesFE(void) {
 
     for (i = 0; i < 5; i++) {
         if (gSession.aD2D[i] && lbl_80281EE0->pB4 != NULL && lbl_80281EE0->pB4->b18 &&
-            fn_8008B990() != 4 && fn_8008E924()) {
+            FE_StreamGetCurrentState() != 4 && fn_8008E924()) {
             gSession.aD2D[i] = 0;
             FE_StreamInterruptState();
             FE_StreamSetNextState(4);
