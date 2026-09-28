@@ -10,7 +10,7 @@ u8   GameModeFourBall_TeamDone(int nTeam);
 u8   GameModeFourBall_TeamConceded(int nTeam);
 int  GameModeFourBall_TeamBestPossibleScore(int nTeam);
 int  GameModeFourBall_TeamMatchWins(int nTeam);
-void fn_800E90FC(void);
+void GameModeFourBall_SetupNextGolfer(void);
 s32  GameModeFourBall_GetHonors(int nPlayer);
 int  GameModeFourBall_GetPlayerTeam(int nPlayer);
 u8   GameModeFourBall_HoleFinished(int nPlayer, u8 bCheck);
@@ -19,10 +19,12 @@ u8   GameModeFourBall_GoToPlayoff(u8 bCheck);
 void GameModeFourBall_EndHole(void);
 void GameModeFourBall_EndGame(void);
 
-// The CPU may concede; no mulligans, and split screen is turned off.
+// Game mode 20's setup (GM_SetModeType): this file's callbacks; CPU players may concede
+// (bAIConcedes), n4 1, no mulligans, nC and n10 4 as in the other team modes, nDC 0 and split
+// screen off. Unlike GameModeBestBall_Init it does not reset the current hole.
 void GameModeFourBall_Init(void) {
     gpGame->pfnInit = GameModeFourBall_Init;
-    gpGame->pfnSetupNextGolfer = fn_800E90FC;
+    gpGame->pfnSetupNextGolfer = GameModeFourBall_SetupNextGolfer;
     gpGame->pfnGetHonors = GameModeFourBall_GetHonors;
     gpGame->pfnHoleFinished = GameModeFourBall_HoleFinished;
     gpGame->pfnGameFinished = GameModeFourBall_GameFinished;
@@ -38,8 +40,9 @@ void GameModeFourBall_Init(void) {
     gSession.nSplitScreen = 0;
 }
 
-// A partner has holed out and the other can no longer beat that
-// score.
+// Whether team nTeam (0: players 0 and 1; 1: players 2 and 3) is done on the current hole: one
+// partner has holed out in no more strokes than the other has so far plus one, so the other can no
+// longer beat it. The same body as GameModeBestBall_TeamDone.
 u8 GameModeFourBall_TeamDone(int nTeam) {
     int nHole = Game_CurHoleIndex();
     int a;
@@ -61,7 +64,8 @@ u8 GameModeFourBall_TeamDone(int nTeam) {
     return bDone;
 }
 
-// Both partners picked up.
+// Whether team nTeam has conceded the current hole: both partners' balls are in the cup
+// (Player_IsHoled) with the golfer state GS_CONCEDED (Player_IsHoledNotState23 false).
 u8 GameModeFourBall_TeamConceded(int nTeam) {
     int nHole = Game_CurHoleIndex();
     int bConceded;
@@ -104,8 +108,9 @@ static inline const int FourBall_TeamSecond(int nTeam) {
     return b;
 }
 
-// The team's best score on this hole if a partner
-// holes the next shot (at most 9), or its score once holed.
+// The best score team nTeam can still make on the current hole, at most 9: the lower of each
+// partner's strokes so far plus one (holing the next shot) and a holed partner's strokes.
+// GameModeFourBall_HoleFinished and GameModeFourBall_EndHole compare the two teams' with it.
 int GameModeFourBall_TeamBestPossibleScore(int nTeam) {
     int nHole = Game_CurHoleIndex();
     int a;
@@ -129,7 +134,8 @@ int GameModeFourBall_TeamBestPossibleScore(int nTeam) {
     return nBest;
 }
 
-// Kept on the team's first player.
+// Holes won by team nTeam: nHolesWon of its first player (0 or 2), where GameModeFourBall_EndHole
+// books them. The current hole index is read and not used (TW07's has a currHole local too).
 int GameModeFourBall_TeamMatchWins(int nTeam) {
     int nHole = Game_CurHoleIndex();
     int a;
@@ -140,8 +146,10 @@ int GameModeFourBall_TeamMatchWins(int nTeam) {
     return gPlayers[a].nHolesWon;
 }
 
-// The golfer pfnGetHonors picks (nobody excluded) gets ready to play; the others wait.
-void fn_800E90FC(void) {
+// The next shot (pfnSetupNextGolfer): the golfer the mode's honors pick (pfnGetHonors(5), nobody
+// left out) becomes the player whose turn it is (lbl_80282278) and gets ready (GS_PRE_SHOT); the
+// others wait (GS_WAIT). GameModeBestBall_SetupNextGolfer without its split-screen path.
+void GameModeFourBall_SetupNextGolfer(void) {
     int i;
     lbl_80282278 = gpGame->pfnGetHonors(5);
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -153,9 +161,13 @@ void fn_800E90FC(void) {
     }
 }
 
-// On the tee the team that won the last decided hole, and within that team only the better
-// score of the pair; otherwise the player farthest from the pin (off the green first) whose team
-// is still playing.
+// Who plays next after nPlayer (pfnGetHonors; 5 = nobody). On the tee: the team that won the last
+// decided hole (nModePoints on player 0 or 2; a halved hole keeps the order) goes first, and within
+// that team the player with fewer strokes on the last selected hole (a tie keeps their order; the
+// other pair is not reordered); the first in that order who is not nPlayer, is on the tee and whose
+// team is not done (GameModeFourBall_TeamDone). Otherwise the player farthest from the pin among
+// those off the green, then among all, leaving out nPlayer, holed-out players and done teams; 5
+// when that is nPlayer.
 s32 GameModeFourBall_GetHonors(int nPlayer) {
     s32 aOrder[4] = {0, 1, 2, 3};  // the tee order before anyone has won a hole
     s32* pOrder;        // fake match: the within-team compare reads aOrder through a pointer
@@ -244,12 +256,16 @@ s32 GameModeFourBall_GetHonors(int nPlayer) {
     return nBest;
 }
 
+// The team of player nPlayer: 0 for players 0 and 1, 1 for 2 and 3.
 int GameModeFourBall_GetPlayerTeam(int nPlayer) {
     return nPlayer / 2;
 }
 
-// Both teams done or one conceded; or one team done and the
-// other can no longer beat it (or only tie, when dormie).
+// Whether the hole is over (pfnHoleFinished; bCheck is not read): both teams done or either
+// conceded; or one team done and the other can no longer beat its best possible score, or can at
+// best tie it while the done team is dormie (ahead by as many holes as are left, this one
+// included). While lbl_80282240 is set, a done team's own player (nPlayer) does not end it these
+// last two ways.
 u8 GameModeFourBall_HoleFinished(int nPlayer, u8 bCheck) {
     int nLeft;
     int h;
@@ -311,9 +327,11 @@ u8 GameModeFourBall_HoleFinished(int nPlayer, u8 bCheck) {
         P(i)->n308 = 0;                             \
     }
 
-// In a playoff: over once a team is ahead; otherwise (unless
-// only checking) the next playoff hole starts. In the round: over when no holes are left and no
-// playoff starts, or when a team leads by more than the holes left.
+// The match is over (pfnGameFinished). In the playoff: once the teams have won different numbers of
+// holes; otherwise, unless bCheck only asks, the next playoff hole is counted and picked
+// (GM_Pick_PlayOffHole), every player's round is cleared and the tie message queued. Outside it:
+// after the last selected hole, over unless GameModeFourBall_GoToPlayoff starts a playoff; before
+// it, over once a team leads by more holes than are left.
 u8 GameModeFourBall_GameFinished(u8 bCheck) {
     int nLeft;
     int h;
@@ -346,8 +364,11 @@ u8 GameModeFourBall_GameFinished(u8 bCheck) {
     return 0;
 }
 
-// After the last hole with the match tied: a playoff starts
-// (bPlayoffFullRound when the round played all 18 holes).
+// Starts the sudden-death playoff after the last selected hole when both teams have won as many
+// holes; bCheck 1 only asks. The playoff notes whether the round was all 18 holes
+// (bPlayoffFullRound), GM_Pick_PlayOffHole picks the hole, every player's round is cleared,
+// bInPlayoff is set, the playoff hole counted and the tie message queued. Returns 1 when there is
+// (or, asked, would be) a playoff.
 u8 GameModeFourBall_GoToPlayoff(u8 bCheck) {
     int h;
     int i;
@@ -376,8 +397,10 @@ u8 GameModeFourBall_GoToPlayoff(u8 bCheck) {
     return 0;
 }
 
-// The hole goes to the other team when a team conceded, or to a
-// team that holed out and cannot be caught (the point goes on players 0 and 2).
+// The hole is over (pfnEndHole): when a team conceded the other wins it (team 0's concession
+// checked first); else a done team whose best possible score the other cannot match wins it. The
+// winner gets nModePoints 1 on the hole and one more nHolesWon, both on its first player (0 or 2);
+// a halved hole changes nothing.
 void GameModeFourBall_EndHole(void) {
     int nWinner = -1;
     int nHole = Game_CurHoleIndex();
@@ -404,8 +427,12 @@ void GameModeFourBall_EndHole(void) {
     }
 }
 
-// The winning team's human players with a profile get the prize
-// money (by the margin).
+// The match is over (pfnEndGame): after a full round (GM_FullRoundOfGolf) outside a Play Now
+// challenge, the team with more holes won (team 1 when level) wins by the difference. When the
+// winners are all human, the team winnings (GM_Earnings_GetStrokeWinningsTeam: nonzero only against
+// an all-CPU team and without mulligans) go to each of them with an active profile: the prize
+// message (0x6B, with the average base prize) queued, the money paid (GM_Earnings_AwardMoney) and
+// added to money.n14. Unlike GameModeMatch_EndGame no EA SPORTS Bio win is counted.
 void GameModeFourBall_EndGame(void) {
     int nPrize;
     Player* p;

@@ -2834,3 +2834,16 @@ address	name	comment	by	date
 8010A3C4	GM_vCrAPMessage741_Empty	add	ro4 (replayed by orchestrator)	2026-09-28
 8010A3C8	GM_vIsLeapYear	add	ro4 (replayed by orchestrator)	2026-09-28
 8010A400	GM_vIsCrAPItemRemovable	add	ro4 (replayed by orchestrator)	2026-09-28
+800E8D58	GameModeFourBall_Init	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800E8E24	GameModeFourBall_TeamDone	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800E8F20	GameModeFourBall_TeamConceded	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800E8FC8	GameModeFourBall_TeamBestPossibleScore	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800E90AC	GameModeFourBall_TeamMatchWins	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800E90FC	GameModeFourBall_SetupNextGolfer	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800E9178	GameModeFourBall_GetHonors	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800E947C	GameModeFourBall_GetPlayerTeam	add	ro5 (replayed by orchestrator)	2026-09-28
+800E948C	GameModeFourBall_HoleFinished	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800E96B8	GameModeFourBall_GameFinished	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800E98F0	GameModeFourBall_GoToPlayoff	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800E9BBC	GameModeFourBall_EndHole	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800E9CF4	GameModeFourBall_EndGame	rewrite	ro5 (replayed by orchestrator)	2026-09-28
