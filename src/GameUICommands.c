@@ -211,32 +211,32 @@ void IG_vResumeCheckDisc(MsgArg* pArgs, MsgArg* pResult);
 void IG_vNoOp183(MsgArg* pArgs, MsgArg* pResult);
 void IG_vGetChallengeName(MsgArg* pArgs, MsgArg* pResult);
 void IG_vGetChallengeDescription(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A208(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A20C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A240(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A294(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A2E0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A468(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A4A8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A690(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A758(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A788(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A7C8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A7D4(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A800(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A804(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A838(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A86C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A870(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A8B8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A8E8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A914(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A964(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A9A0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A9E8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008AAAC(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008AAB8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008AB04(MsgArg* pArgs, MsgArg* pResult);
+void IG_vAcceptOnlineInput(MsgArg* pArgs, MsgArg* pResult);
+void IG_vBattle_GetNumClubsStart(MsgArg* pArgs, MsgArg* pResult);
+void IG_vBattle_GetClubAddable(MsgArg* pArgs, MsgArg* pResult);
+void IG_v_PGATourWin(MsgArg* pArgs, MsgArg* pResult);
+void IG_v_PGATour_GetCheckInfo(MsgArg* pArgs, MsgArg* pResult);
+void IG_vPgaTour_GetCurrEventName(MsgArg* pArgs, MsgArg* pResult);
+void IG_vPlayShotScoreAnimSound(MsgArg* pArgs, MsgArg* pResult);
+void IG_vPlayIngGameCommentaryRewardSound(MsgArg* pArgs, MsgArg* pResult);
+void IG_vRewardCommentaryIsPlaying(MsgArg* pArgs, MsgArg* pResult);
+void IG_vGetStringSize(MsgArg* pArgs, MsgArg* pResult);
+void IG_vGetLocalUserIndex(MsgArg* pArgs, MsgArg* pResult);
+void IG_vShow_Putting_Tip(MsgArg* pArgs, MsgArg* pResult);
+void IG_vShotClockAction(MsgArg* pArgs, MsgArg* pResult);
+void IG_vNumRemovableClubsLeft(MsgArg* pArgs, MsgArg* pResult);
+void IG_vIsGameBreakerOn(MsgArg* pArgs, MsgArg* pResult);
+void IG_vOnline_CheckPause(MsgArg* pArgs, MsgArg* pResult);
+void IG_vBattleGolf_ShowClubUI(MsgArg* pArgs, MsgArg* pResult);
+void IG_vBattleGolf_GetHoleWinner(MsgArg* pArgs, MsgArg* pResult);
+void IG_IsGamePaused(MsgArg* pArgs, MsgArg* pResult);
+void IG_vPGATour_EndofHole_message(MsgArg* pArgs, MsgArg* pResult);
+void IG_vKeypopEnabled(MsgArg* pArgs, MsgArg* pResult);
+void IG_vGetRealTimeMode(MsgArg* pArgs, MsgArg* pResult);
+void IG_vGetCurrentPlayerNumberStrokes(MsgArg* pArgs, MsgArg* pResult);
+void IG_vGetDisqualifiedGolfer(MsgArg* pArgs, MsgArg* pResult);
+void IG_vLeaderboard_WasCut(MsgArg* pArgs, MsgArg* pResult);
+void IG_vLeaderboard_PlayerWasCut(MsgArg* pArgs, MsgArg* pResult);
 
 // This file's helpers.
 u8   IG_IsControllerInPlay(int nController);
@@ -555,33 +555,33 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[184] = IG_vGetChallengeName;
     gIGMessageHandlers[185] = IG_vGetChallengeDescription;
     gIGMessageHandlers[183] = IG_vNoOp183;
-    gIGMessageHandlers[186] = fn_8008A208;
-    gIGMessageHandlers[187] = fn_8008A20C;
-    gIGMessageHandlers[188] = fn_8008A240;
-    gIGMessageHandlers[189] = fn_8008A294;
-    gIGMessageHandlers[190] = fn_8008A2E0;
-    gIGMessageHandlers[191] = fn_8008A468;
-    gIGMessageHandlers[192] = fn_8008A4A8;
-    gIGMessageHandlers[193] = fn_8008A690;
-    gIGMessageHandlers[194] = fn_8008A758;
+    gIGMessageHandlers[186] = IG_vAcceptOnlineInput;
+    gIGMessageHandlers[187] = IG_vBattle_GetNumClubsStart;
+    gIGMessageHandlers[188] = IG_vBattle_GetClubAddable;
+    gIGMessageHandlers[189] = IG_v_PGATourWin;
+    gIGMessageHandlers[190] = IG_v_PGATour_GetCheckInfo;
+    gIGMessageHandlers[191] = IG_vPgaTour_GetCurrEventName;
+    gIGMessageHandlers[192] = IG_vPlayShotScoreAnimSound;
+    gIGMessageHandlers[193] = IG_vPlayIngGameCommentaryRewardSound;
+    gIGMessageHandlers[194] = IG_vRewardCommentaryIsPlaying;
     gIGMessageHandlers[195] = IG_vReturnZero195;
-    gIGMessageHandlers[196] = fn_8008A788;
-    gIGMessageHandlers[198] = fn_8008A7C8;
-    gIGMessageHandlers[199] = fn_8008A7D4;
-    gIGMessageHandlers[200] = fn_8008A800;
-    gIGMessageHandlers[201] = fn_8008A804;
-    gIGMessageHandlers[202] = fn_8008A838;
-    gIGMessageHandlers[203] = fn_8008A86C;
-    gIGMessageHandlers[204] = fn_8008A870;
-    gIGMessageHandlers[205] = fn_8008A8B8;
-    gIGMessageHandlers[206] = fn_8008A8E8;
-    gIGMessageHandlers[207] = fn_8008A914;
-    gIGMessageHandlers[208] = fn_8008A964;
-    gIGMessageHandlers[209] = fn_8008A9A0;
-    gIGMessageHandlers[210] = fn_8008A9E8;
-    gIGMessageHandlers[211] = fn_8008AAAC;
-    gIGMessageHandlers[212] = fn_8008AAB8;
-    gIGMessageHandlers[213] = fn_8008AB04;
+    gIGMessageHandlers[196] = IG_vGetStringSize;
+    gIGMessageHandlers[198] = IG_vGetLocalUserIndex;
+    gIGMessageHandlers[199] = IG_vShow_Putting_Tip;
+    gIGMessageHandlers[200] = IG_vShotClockAction;
+    gIGMessageHandlers[201] = IG_vNumRemovableClubsLeft;
+    gIGMessageHandlers[202] = IG_vIsGameBreakerOn;
+    gIGMessageHandlers[203] = IG_vOnline_CheckPause;
+    gIGMessageHandlers[204] = IG_vBattleGolf_ShowClubUI;
+    gIGMessageHandlers[205] = IG_vBattleGolf_GetHoleWinner;
+    gIGMessageHandlers[206] = IG_IsGamePaused;
+    gIGMessageHandlers[207] = IG_vPGATour_EndofHole_message;
+    gIGMessageHandlers[208] = IG_vKeypopEnabled;
+    gIGMessageHandlers[209] = IG_vGetRealTimeMode;
+    gIGMessageHandlers[210] = IG_vGetCurrentPlayerNumberStrokes;
+    gIGMessageHandlers[211] = IG_vGetDisqualifiedGolfer;
+    gIGMessageHandlers[212] = IG_vLeaderboard_WasCut;
+    gIGMessageHandlers[213] = IG_vLeaderboard_PlayerWasCut;
 }
 
 // Whether controller nController has a player in play: always 1 outside session game type 6; in it,
@@ -2735,15 +2735,19 @@ void IG_vGetChallengeDescription(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[0].p)->pStr, PlayNow_GetGroupDescription(pArgs[1].i));
 }
 
-void fn_8008A208(MsgArg* pArgs, MsgArg* pResult) {
+// Command 186: takes an online player's menu input; empty in this build, which has no online play.
+void IG_vAcceptOnlineInput(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8008A20C(MsgArg* pArgs, MsgArg* pResult) {
+// Command 187, Battle mode: how many clubs player pArgs[0] started with (fn_800E8114: the count
+// GameModeBattle_SaveClubSetup kept).
+void IG_vBattle_GetNumClubsStart(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_800E8114(pArgs[0].i);
 }
 
-// Battle mode: whether a player may take a club.
-void fn_8008A240(MsgArg* pArgs, MsgArg* pResult) {
+// Command 188, Battle mode: whether player pArgs[0] may take club pArgs[1]: one he started with and
+// no longer has (GameModeBattle_CanAddClub).
+void IG_vBattle_GetClubAddable(MsgArg* pArgs, MsgArg* pResult) {
     // the caller tests only the low byte of the result
     if ((u8)GameModeBattle_CanAddClub(pArgs[0].i, pArgs[1].i) != 0) {
         pResult->i = 1;
@@ -2752,7 +2756,9 @@ void fn_8008A240(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_8008A294(MsgArg* pArgs, MsgArg* pResult) {
+// Command 189: whether the player was paid in the PGA TOUR event just finished
+// (GameModeDriverPGATour_GetWinInfo's bPlaced).
+void IG_v_PGATourWin(MsgArg* pArgs, MsgArg* pResult) {
     if (GameModeDriverPGATour_GetWinInfo()->bPlaced != 0) {
         pResult->i = 1;
         return;
@@ -2760,9 +2766,10 @@ void fn_8008A294(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// The PGA TOUR result screen: the player's name, the money won ("$1,234"), the tournament's name
-// and end date, and the place ("1st place").
-void fn_8008A2E0(MsgArg* pArgs, MsgArg* pResult) {
+// Command 190: the text of the PGA TOUR prize cheque, into the five string arguments: the player's
+// name, the money won ("$" and the amount with commas), the event's name, its end date
+// (CalDate_ToString), and the place with its ordinal suffix ("22nd place").
+void IG_v_PGATour_GetCheckInfo(MsgArg* pArgs, MsgArg* pResult) {
     PgaTour_WinInfo* pTour = GameModeDriverPGATour_GetWinInfo();
     int nPlace;
 
@@ -2790,14 +2797,17 @@ void fn_8008A2E0(MsgArg* pArgs, MsgArg* pResult) {
     strcat(((MsgString*)pArgs[4].p)->pStr, " place");
 }
 
-// The current PGA TOUR event's name.
-void fn_8008A468(MsgArg* pArgs, MsgArg* pResult) {
+// Command 191: the current PGA TOUR event's name, copied into string pArgs[0].
+void IG_vPgaTour_GetCurrEventName(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[0].p)->pStr,
            GameModeDriverPGATour_GetName(GameModeDriverPGATour_GetCurrentEventID()));
 }
 
-// Pass on to Gaud_PlayTextDitty a number for pArgs[0] and pArgs[1] (0 or 2); nothing in modes 22 and 26.
-void fn_8008A4A8(MsgArg* pArgs, MsgArg* pResult) {
+// Command 192: plays the text ditty (Gaud_PlayTextDitty) of a score animation: pArgs[0] the
+// animation's kind (0, 2..13; others none), pArgs[1] 0 for the first ditty of its pair (2, 8, 12,
+// 6, 2, 2, 2, 0, 4, 4, 4, 4, 10) or 2 for the second (one more); 1 plays none. Nothing in modes 22
+// and 26.
+void IG_vPlayShotScoreAnimSound(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 26 || Game_GetMode() == 22) return;
     switch (pArgs[1].i) {
     case 0:
@@ -2891,8 +2901,10 @@ void fn_8008A4A8(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Play sound pArgs[1] of kind pArgs[0]. The sound numbers are 16-bit.
-void fn_8008A690(MsgArg* pArgs, MsgArg* pResult) {
+// Command 193: plays reward commentary line pArgs[1] (16-bit) from the playlist kind pArgs[0]
+// picks: kinds 1 and 2 playlist 14, 6 playlist 18, 7 20, 8 15, 9 16, 10 17, 11 19; other kinds play
+// nothing.
+void IG_vPlayIngGameCommentaryRewardSound(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
     case 2:
@@ -2919,19 +2931,24 @@ void fn_8008A690(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_8008A758(MsgArg* pArgs, MsgArg* pResult) {
+// Command 194: whether the reward commentary is still playing (Gaud_RewardCommentaryIsPlaying).
+void IG_vRewardCommentaryIsPlaying(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = Gaud_RewardCommentaryIsPlaying();
 }
 
-void fn_8008A788(MsgArg* pArgs, MsgArg* pResult) {
+// Command 196: the width of string pArgs[0] (UFont.c fn_80012C30) times 512, as a float.
+void IG_vGetStringSize(MsgArg* pArgs, MsgArg* pResult) {
     pResult->f = 512.0f * fn_80012C30(((MsgString*)pArgs[0].p)->pStr);
 }
 
-void fn_8008A7C8(MsgArg* pArgs, MsgArg* pResult) {
+// Command 198: the local user's player index: always 0 in this build.
+void IG_vGetLocalUserIndex(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_8008A7D4(MsgArg* pArgs, MsgArg* pResult) {
+// Command 199: whether the putting tip is shown: on/off game option a24[1], which the menus set
+// (FE_MessageTable.c fn_800812F0).
+void IG_vShow_Putting_Tip(MsgArg* pArgs, MsgArg* pResult) {
     if (gSession.options.a24[1] != 0) {
         pResult->i = 1;
         return;
@@ -2939,23 +2956,28 @@ void fn_8008A7D4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_8008A800(MsgArg* pArgs, MsgArg* pResult) {
+// Command 200: the shot clock's action; empty in this build.
+void IG_vShotClockAction(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Battle mode: how many clubs a player may still take out.
-void fn_8008A804(MsgArg* pArgs, MsgArg* pResult) {
+// Command 201, Battle mode: how many clubs player pArgs[0] may still take out
+// (GameModeBattle_NumRemovableClubsLeft).
+void IG_vNumRemovableClubsLeft(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GameModeBattle_NumRemovableClubsLeft(pArgs[0].i);
 }
 
-void fn_8008A838(MsgArg* pArgs, MsgArg* pResult) {
+// Command 202: whether a GameBreaker is on: the GameBreaker letterbox is up (fn_8003DCAC).
+void IG_vIsGameBreakerOn(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_8003DCAC();
 }
 
-void fn_8008A86C(MsgArg* pArgs, MsgArg* pResult) {
+// Command 203: an online game's pause check; empty in this build, which has no online play.
+void IG_vOnline_CheckPause(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Battle mode: whether a club is to be taken: the last hole had a winner and the game goes on.
-void fn_8008A870(MsgArg* pArgs, MsgArg* pResult) {
+// Command 204, Battle mode: whether the club screen shows: a club is to be taken after the last
+// hole (GameModeBattle_ShowEndOfHole_ClubAddRemove_UI).
+void IG_vBattleGolf_ShowClubUI(MsgArg* pArgs, MsgArg* pResult) {
     if (GameModeBattle_ShowEndOfHole_ClubAddRemove_UI() != 0) {
         pResult->i = 1;
         return;
@@ -2963,13 +2985,14 @@ void fn_8008A870(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// Battle mode: the winner.
-void fn_8008A8B8(MsgArg* pArgs, MsgArg* pResult) {
+// Command 205, Battle mode: the winner of the last hole (GameModeBattle_GetWinner; 5 nobody).
+void IG_vBattleGolf_GetHoleWinner(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GameModeBattle_GetWinner();
 }
 
-// Whether the game is paused.
-void fn_8008A8E8(MsgArg* pArgs, MsgArg* pResult) {
+// Command 206: whether the game is paused (gSession.nPaused: the pause menu, or a pulled
+// controller).
+void IG_IsGamePaused(MsgArg* pArgs, MsgArg* pResult) {
     if (gSession.nPaused != 0) {
         pResult->i = 1;
         return;
@@ -2977,7 +3000,10 @@ void fn_8008A8E8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_8008A914(MsgArg* pArgs, MsgArg* pResult) {
+// Command 207: the PGA TOUR message after the player's hole (whether he made the cut, or the
+// playoff score to beat), into string pArgs[0] by GameModeDriverPGATour_DisplayEndOfHoleMessage; 1
+// when there is one.
+void IG_vPGATour_EndofHole_message(MsgArg* pArgs, MsgArg* pResult) {
     if ((u8)GameModeDriverPGATour_DisplayEndOfHoleMessage(((MsgString*)pArgs[0].p)->pStr) != 0) {
         pResult->i = 1;
         return;
@@ -2985,7 +3011,9 @@ void fn_8008A914(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_8008A964(MsgArg* pArgs, MsgArg* pResult) {
+// Command 208: sets (pArgs[0] nonzero) or clears the HUD flag GUI_SetUnreadFlag keeps; nothing in
+// this build reads it.
+void IG_vKeypopEnabled(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 0) {
         GUI_SetUnreadFlag(0);
         return;
@@ -2993,8 +3021,8 @@ void fn_8008A964(MsgArg* pArgs, MsgArg* pResult) {
     GUI_SetUnreadFlag(1);
 }
 
-// Whether a real-time event is being played.
-void fn_8008A9A0(MsgArg* pArgs, MsgArg* pResult) {
+// Command 209: whether a real-time event is being played (GM_Currently_RealtimeMode).
+void IG_vGetRealTimeMode(MsgArg* pArgs, MsgArg* pResult) {
     if (GM_Currently_RealtimeMode() != 0) {
         pResult->i = 1;
         return;
@@ -3002,8 +3030,10 @@ void fn_8008A9A0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// The same as GM_vGetPlayerHoleScore, without mode 19's count.
-void fn_8008A9E8(MsgArg* pArgs, MsgArg* pResult) {
+// Command 210: player pArgs[0]'s strokes on hole pArgs[1] (0..17), or for pArgs[1] 18 the front
+// nine's score (GM_GetPlayerRoundScoreThroughHole to 9), 19 the back nine's (the round less the
+// front nine), 20 the round's (GM_GetPlayerRoundScore).
+void IG_vGetCurrentPlayerNumberStrokes(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[1].i == 18) {
         pResult->i = GM_GetPlayerRoundScoreThroughHole(pArgs[0].i, 9);
     } else if (pArgs[1].i == 19) {
@@ -3015,18 +3045,22 @@ void fn_8008A9E8(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_8008AAAC(MsgArg* pArgs, MsgArg* pResult) {
+// Command 211: the disqualified golfer: always -1 (none) in this build.
+void IG_vGetDisqualifiedGolfer(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = -1;
 }
 
-// Whether the golfer on a leaderboard row missed the cut.
-void fn_8008AAB8(MsgArg* pArgs, MsgArg* pResult) {
+// Command 212: whether the golfer on row pArgs[0] of player 0's PGA TOUR leaderboard missed the cut
+// (GM_PgaTourSim_GetEntrantIDFromScoreRow, GM_PgaTourSim_GetWasCutFromEntrantID).
+void IG_vLeaderboard_WasCut(MsgArg* pArgs, MsgArg* pResult) {
     s32 nEntrant = GM_PgaTourSim_GetEntrantIDFromScoreRow(0, pArgs[0].i);
 
     pResult->i = GM_PgaTourSim_GetWasCutFromEntrantID(0, nEntrant);
 }
 
-void fn_8008AB04(MsgArg* pArgs, MsgArg* pResult) {
+// Command 213: whether player pArgs[0] missed the cut in the PGA TOUR event
+// (GM_PgaTourSim_GetWasCutFromEntrantID of entrant 0, the player's own entry).
+void IG_vLeaderboard_PlayerWasCut(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_PgaTourSim_GetWasCutFromEntrantID(pArgs[0].i, 0);
 }
 
