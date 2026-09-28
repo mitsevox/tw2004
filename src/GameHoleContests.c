@@ -418,13 +418,13 @@ s32 HoleContest_GetPlaceDistance(int nPlace) {
 }
 
 // Whether a hole contest was won this round (a winner ranked, or the hole in one made); FE message
-// fn_80089590 case 0 asks.
+// GM_vGetHoleContestWon case 0 asks.
 u8 HoleContest_IsWonThisRound(void) {
     return gHoleContestWon;
 }
 
 // Whether a hole contest has been won since the game started: gHoleContestEverWon is set with
-// gHoleContestWon and never cleared (FE message fn_80089590 case 1).
+// gHoleContestWon and never cleared (FE message GM_vGetHoleContestWon case 1).
 s32 HoleContest_WasEverWon(void) {
     return gHoleContestEverWon;
 }

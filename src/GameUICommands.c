@@ -21,7 +21,7 @@
 MsgHandler gIGMessageHandlers[UI_NUM_ROUND_COMMANDS];
 
 // in reverse address order: CodeWarrior lays .sbss out last-defined-first
-s32 gSpeedGolfLogCycle;         // -1..10, one step per fn_800894E8 call; the event answer it writes
+s32 gSpeedGolfLogCycle;         // -1..10, one step per GM_vGetSpeedGolfLogEntry call; the event answer it writes
                                 // is always overwritten after
 u8  gAlternateGolferUp;         // mode 26: the player the next golfer-up question answers (0 / 1)
 
@@ -159,22 +159,22 @@ void GM_vGetRecordScore(MsgArg* pArgs, MsgArg* pResult);
 void GM_vFormatWithCommas(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetWrapupData(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetRecordHolderName(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089414(MsgArg* pArgs, MsgArg* pResult);
-void fn_800894B4(MsgArg* pArgs, MsgArg* pResult);
-void fn_800894E8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089584(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089590(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089600(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089648(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008967C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089688(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008968C(MsgArg* pArgs, MsgArg* pResult);
-void fn_800896A8(MsgArg* pArgs, MsgArg* pResult);
-void fn_800896B4(MsgArg* pArgs, MsgArg* pResult);
-void fn_800896D0(MsgArg* pArgs, MsgArg* pResult);
-void fn_800896F0(MsgArg* pArgs, MsgArg* pResult);
-void fn_800897F0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089A50(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetRecordValue(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetYardsToPin(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetSpeedGolfLogEntry(MsgArg* pArgs, MsgArg* pResult);
+void GM_vCommand133_Returns7(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetHoleContestWon(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsLadderEvent(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetRandInt(MsgArg* pArgs, MsgArg* pResult);
+void GM_vCommand137_Returns0(MsgArg* pArgs, MsgArg* pResult);
+void GM_vCommand138_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vCommand139_Returns2And1(MsgArg* pArgs, MsgArg* pResult);
+void GM_vCommand140_Returns2(MsgArg* pArgs, MsgArg* pResult);
+void GM_vCommand141_EchoArg(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetLetter(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_MCGetCardErrors(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetCourseHoleName(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetMessageQueHeld(MsgArg* pArgs, MsgArg* pResult);
 void fn_80089A8C(MsgArg* pArgs, MsgArg* pResult);
 void fn_80089AD0(MsgArg* pArgs, MsgArg* pResult);
 void fn_80089AD4(MsgArg* pArgs, MsgArg* pResult);
@@ -497,23 +497,23 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[126] = GM_vFormatWithCommas;
     gIGMessageHandlers[127] = GM_vGetWrapupData;
     gIGMessageHandlers[128] = GM_vGetRecordHolderName;
-    gIGMessageHandlers[129] = fn_80089414;
-    gIGMessageHandlers[130] = fn_800894B4;
+    gIGMessageHandlers[129] = GM_vGetRecordValue;
+    gIGMessageHandlers[130] = GM_vGetYardsToPin;
     gIGMessageHandlers[131] = GM_vNoOp;
-    gIGMessageHandlers[132] = fn_800894E8;
-    gIGMessageHandlers[133] = fn_80089584;
-    gIGMessageHandlers[134] = fn_80089590;
-    gIGMessageHandlers[135] = fn_80089600;
-    gIGMessageHandlers[136] = fn_80089648;
-    gIGMessageHandlers[137] = fn_8008967C;
-    gIGMessageHandlers[138] = fn_80089688;
-    gIGMessageHandlers[139] = fn_8008968C;
-    gIGMessageHandlers[140] = fn_800896A8;
-    gIGMessageHandlers[141] = fn_800896B4;
-    gIGMessageHandlers[142] = fn_800896D0;
-    gIGMessageHandlers[143] = fn_800896F0;
-    gIGMessageHandlers[144] = fn_800897F0;
-    gIGMessageHandlers[145] = fn_80089A50;
+    gIGMessageHandlers[132] = GM_vGetSpeedGolfLogEntry;
+    gIGMessageHandlers[133] = GM_vCommand133_Returns7;
+    gIGMessageHandlers[134] = GM_vGetHoleContestWon;
+    gIGMessageHandlers[135] = GM_vIsLadderEvent;
+    gIGMessageHandlers[136] = GM_vGetRandInt;
+    gIGMessageHandlers[137] = GM_vCommand137_Returns0;
+    gIGMessageHandlers[138] = GM_vCommand138_Empty;
+    gIGMessageHandlers[139] = GM_vCommand139_Returns2And1;
+    gIGMessageHandlers[140] = GM_vCommand140_Returns2;
+    gIGMessageHandlers[141] = GM_vCommand141_EchoArg;
+    gIGMessageHandlers[142] = GM_vGetLetter;
+    gIGMessageHandlers[143] = GM_vIG_MCGetCardErrors;
+    gIGMessageHandlers[144] = GM_vGetCourseHoleName;
+    gIGMessageHandlers[145] = GM_vSetMessageQueHeld;
     gIGMessageHandlers[146] = fn_80089A8C;
     gIGMessageHandlers[147] = fn_80089AD0;
     gIGMessageHandlers[148] = fn_80089AD4;
@@ -2022,9 +2022,9 @@ void GM_vFormatWithCommas(MsgArg* pArgs, MsgArg* pResult) {
 // money.n38, 7 money.n3C, 8..15 money.n0 to n1C (8 the payout, 9 a tournament's prize, 10 bonuses,
 // 11 a ladder prize, 12 to 15 money.n10 to n1C, the match, skins and speed golf money); 16 his
 // profile's money less this payout; 100 the course multiplier less 1; 101 the hole's pin set; 102
-// the tee set's rank (tee sets 0..3 give 2, 1, 0, 1); 103 the TOUR card percentage for his card
-// level; 104 that level, 1..6 (0 counts as 1); 200 2 when any of money.n4 to n1C is set, else 1.
-// 16, 103 and 104 answer 0 without a profile in use.
+// the tee multiplier's row (EARN_MULT_TEE's 2 - tee set; tee set 3 as 1); 103 the TOUR card
+// percentage for his card level; 104 that level, 1..6 (0 counts as 1); 200 2 when any of money.n4
+// to n1C is set, else 1. 16, 103 and 104 answer 0 without a profile in use.
 void GM_vGetWrapupData(MsgArg* pArgs, MsgArg* pResult) {
     int nMult;
 
@@ -2207,7 +2207,7 @@ void GM_vGetRecordHolderName(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // A record's value: pArgs[0] 0 is the all-time records, else the course's.
-void fn_80089414(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vGetRecordValue(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 0) {
         pResult->i = gSession.recA[pArgs[1].i][pArgs[2].i].nValue;
         return;
@@ -2215,13 +2215,15 @@ void fn_80089414(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gSession.aCourseRecord[Game_GetCourse()].aRecord[pArgs[1].i][pArgs[2].i].nValue;
 }
 
-// The ball's distance from the pin.
-void fn_800894B4(MsgArg* pArgs, MsgArg* pResult) {
+// The distance from player pArgs[0]'s ball to the pin, a float (command 130; fn_800D0478).
+void GM_vGetYardsToPin(MsgArg* pArgs, MsgArg* pResult) {
     pResult->f = fn_800D0478(pArgs[0].i);
 }
 
-// Entry pArgs[0] of the speed-golf event log, into pArgs[1] (the player) and pArgs[2] (the event).
-void fn_800894E8(MsgArg* pArgs, MsgArg* pResult) {
+// Entry pArgs[0] of speed golf's event log: its player into *pArgs[1] and its event into *pArgs[2];
+// outside the log (0 to gSpeedGolfEventLogCount - 1) 0 and -1 (command 132). Each call also steps
+// lbl_80281EDC through -1..10; the value it writes into *pArgs[2] first is always overwritten.
+void GM_vGetSpeedGolfLogEntry(MsgArg* pArgs, MsgArg* pResult) {
     gSpeedGolfLogCycle++;
     if (gSpeedGolfLogCycle > 10) {
         gSpeedGolfLogCycle = -1;
@@ -2237,11 +2239,15 @@ void fn_800894E8(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[2].p = gSpeedGolfEventLog[pArgs[0].i].nEvent;
 }
 
-void fn_80089584(MsgArg* pArgs, MsgArg* pResult) {
+// The UI's command 133: always answers 7 in this build.
+void GM_vCommand133_Returns7(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 7;
 }
 
-void fn_80089590(MsgArg* pArgs, MsgArg* pResult) {
+// Whether a hole contest was won, picked by pArgs[0] (command 134): 0 this round
+// (HoleContest_IsWonThisRound), 1 at any time since the game started (HoleContest_WasEverWon).
+// Another pArgs[0] leaves *pResult alone.
+void GM_vGetHoleContestWon(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 0:
         if (HoleContest_IsWonThisRound()) {
@@ -2256,7 +2262,8 @@ void fn_80089590(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80089600(MsgArg* pArgs, MsgArg* pResult) {
+// Whether a ladder event is being played (command 135; fn_801025F4).
+void GM_vIsLadderEvent(MsgArg* pArgs, MsgArg* pResult) {
     if (fn_801025F4()) {
         pResult->i = 1;
         return;
@@ -2264,38 +2271,47 @@ void fn_80089600(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_80089648(MsgArg* pArgs, MsgArg* pResult) {
+// A random number from stream 1 of Misc_RandFunc (command 136).
+void GM_vGetRandInt(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = Misc_RandFunc(1);
 }
 
-void fn_8008967C(MsgArg* pArgs, MsgArg* pResult) {
+// The UI's command 137: always answers 0 in this build.
+void GM_vCommand137_Returns0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_80089688(MsgArg* pArgs, MsgArg* pResult) {
+// Empty in this build: the UI's command 138.
+void GM_vCommand138_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8008968C(MsgArg* pArgs, MsgArg* pResult) {
+// The UI's command 139: always writes 2 into *pArgs[0] and 1 into *pArgs[1] in this build.
+void GM_vCommand139_Returns2And1(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[0].p = 2;
     *(s32*)pArgs[1].p = 1;
 }
 
-void fn_800896A8(MsgArg* pArgs, MsgArg* pResult) {
+// The UI's command 140: always answers 2 in this build.
+void GM_vCommand140_Returns2(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 2;
 }
 
-void fn_800896B4(MsgArg* pArgs, MsgArg* pResult) {
+// The UI's command 141: writes pArgs[0] into *pArgs[1] and 0 into *pArgs[2] (the menus' fn_80082980
+// does the same).
+void GM_vCommand141_EchoArg(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[1].p = pArgs[0].i;
     *(s32*)pArgs[2].p = 0;
 }
 
-void fn_800896D0(MsgArg* pArgs, MsgArg* pResult) {
+// The letter for number pArgs[0], 0 is "A", into pArgs[2] (command 142; the menus' fn_8008299C, run
+// with the same arguments).
+void GM_vGetLetter(MsgArg* pArgs, MsgArg* pResult) {
     fn_8008299C(pArgs, pResult);
 }
 
 // The card in port pArgs[0], slot pArgs[1]: into pArgs[2..6] whether its sectors are not 8 KB, and
 // its encoding, wrong-device, I/O-error and broken flags.
-void fn_800896F0(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIG_MCGetCardErrors(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState card;
 
     MC_GetMC(&card, pArgs[0].i, pArgs[1].i);
@@ -2326,9 +2342,11 @@ void fn_800896F0(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[6].p = 0;
 }
 
-// The course's name, or the round's: a custom round's saved name, "Random 18", "Dream 18" or a
-// region's courses.
-void fn_800897F0(MsgArg* pArgs, MsgArg* pResult) {
+// The name of the round's course into pArgs[1] (command 144): a custom round's saved name, "Random
+// 18", "Dream 18" or a regional round's region, else the course's name, with "Sherwood CC" for
+// course 7 (the skills course) and for hole indexes 15 and up. With the demo set-up
+// (gSession.uFlags 0x4000) a custom round shows the course's name instead.
+void GM_vGetCourseHoleName(MsgArg* pArgs, MsgArg* pResult) {
     if ((gSession.uFlags & 0x4000) && gpGame->b136 != 0) {
         if (gpGame->nCurCourse == 7 || Game_CurHoleIndex() >= 15) {
             strcpy(((MsgString*)pArgs[1].p)->pStr, "Sherwood CC");
@@ -2383,7 +2401,9 @@ void fn_800897F0(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[1].p)->pStr, lbl_80191990[gpGame->nCurCourse]);
 }
 
-void fn_80089A50(MsgArg* pArgs, MsgArg* pResult) {
+// The UI holds the HUD's message queue (pArgs[0] nonzero) or lets it go (command 145;
+// GUI_SetMessageQueHeld: while held, no HUD message shows).
+void GM_vSetMessageQueHeld(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i != 0) {
         GUI_SetMessageQueHeld(1);
         return;
