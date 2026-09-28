@@ -1,9 +1,15 @@
-// GameMode26.c (our name): game mode 26, a two-player long-drive contest and GameMode22.c's near
-// twin: each scoring shot earns its length in points, the first player to the target score
-// (GameMode26_SetTargetScore) wins. GameRound.c starts it with GameMode26_Init (its case 26), which
-// fills gpGame's callbacks with this file's hooks the way GameMode22.c's GameMode22_Init does; GameMode26_IsActive tests
-// Game_GetMode() == 26. The file ends where CharSliders.c begins (CharSlider_Free, the slider code
-// char.c calls).
+// GameMode26.c (our name; no EA name found): game mode 26, a two-player long-drive race and the
+// near twin of GameMode22.c's contest. Always split screen (GM_SetSplitScreenForMode), with both
+// players' shot lengths shown and nobody holding the honor (GameMode26_GetHonors). Every drive is
+// scored the way GameMode22_ScoreShot scores it (a fair drive's length, 20% more on surface 0x9B,
+// 100 more from 400 up; nothing in the rough; less for sand, surfaces 0x2F and 0x68 and the low-IQ
+// penalty) and the points add up; the first player to the target score (GameMode26_SetTargetScore
+// from the menu, 10000 until set) wins, and the hole ends when the 120-frame winner countdown runs
+// out. GM_SetModeType sets it up with GameMode26_Init, the menus start it with
+// GameMode26_StartEvent. There is no prize: the win goes to the EA SPORTS Bio. The file also holds
+// GameMode26_StartComment (the long-drive commentary that GameMode22.c uses too) and
+// GameMode26_BallBounceSound (Gaud_BallBounce, both modes). The file ends where CharSliders.c
+// begins (CharSlider_Free, the slider code char.c calls).
 
 #include "engine.h"
 #include "golfer.h"
@@ -24,7 +30,7 @@ u8  gGameMode26Reached1200[5];
 u8  gGameMode26Reached800[5];
 u8  gGameMode26Reached400[5];
 f32 gGameMode26LongestLength;
-u8 gGameMode26SplitScreenShot;                        // set when the session is split screen (GameMode26_NoteSplitScreenShot)
+u8 gGameMode26SplitScreenShot;      // set when the session is split screen (GameMode26_NoteSplitScreenShot)
 u8  gGameMode26IntroSaid;
 
 void GameMode26_Shutdown(void);
@@ -68,7 +74,8 @@ void GameMode26_Init(void) {
     gpGame->pfnEndGame = GameMode26_EndGame;
     gpGame->pfn220 = GameMode26_UpdateFrame;
     gpGame->pfn20C = GameMode26_StartSwing;
-    gpGame->pfn244 = (void (*)(int))GameMode26_ScoreShot;    // port: its parameter is PlayerNumber_t, pfn244's int
+    // port: its parameter is PlayerNumber_t, pfn244's int
+    gpGame->pfn244 = (void (*)(int))GameMode26_ScoreShot;
     gpGame->pfn1E4 = GameMode26_HoleStart;
     gpGame->pfn224 = GameMode26_RestartHole;
     gpGame->bGimmesAllowed = 0;
@@ -508,8 +515,8 @@ void GameMode26_PreSwing(void) {
 
 // The score that wins (gGameMode26TargetScore, 10000 until set), from the menu (FE_MessageTable.c
 // fn_80083BA4).
-void GameMode26_SetTargetScore(s32 v) {
-    gGameMode26TargetScore = v;
+void GameMode26_SetTargetScore(s32 nScore) {
+    gGameMode26TargetScore = nScore;
 }
 
 // Whether somebody has won (gGameMode26Winner not 5); the winner (5 none) into *pnWinner when
@@ -537,7 +544,7 @@ u8 GameMode26_IsShowingWinner(void) {
 
 // Called by event.c's handler of event 10 (fn_80065DB8, nArg 1) in every mode: in split screen it
 // sets gGameMode26SplitScreenShot, which nothing in the binary reads. nPlayer is not read.
-void GameMode26_NoteSplitScreenShot(void) {
+void GameMode26_NoteSplitScreenShot(int nPlayer) {
     if (gSession.nSplitScreen) {
         gGameMode26SplitScreenShot = 1;
     }
@@ -556,6 +563,6 @@ void GameMode26_BallBounceSound(int nPlayer) {
 
 // Plays line nLine of commentary playlist 8, the long-drive contests' lines (Gaud_StartComment; a
 // is passed on, 0 from every caller). GameMode22_ScoreShot uses it too.
-void GameMode26_StartComment(s32 p0, s32 p1) {
-    Gaud_StartComment(8, p0, p1);
+void GameMode26_StartComment(s32 nLine, s32 a) {
+    Gaud_StartComment(8, nLine, a);
 }

@@ -1,5 +1,11 @@
-// GameModeBestBall.c (TW06's GameModeBestBall): game mode 19, two-against-two stroke play where each
-// team counts its better ball on every hole. Team 0 is players 0 and 1, team 1 players 2 and 3.
+// GameModeBestBall.c (TW06's class GameModeBestBall, gamemode_bestball.cpp; TW07's
+// GameMode_BestBall.cpp): game mode 19, two-against-two stroke play where each team counts its
+// better ball on every hole. Team 0 is players 0 and 1, team 1 players 2 and 3. The mode's callbacks
+// in TW06's method order (Init, TeamDone, GetPartner, SetupNextGolfer, GetHonors, ...), then the
+// team scores the scorecard and the round total use (GM_BestBallMode_GetTeamHoleScore,
+// GM_BestBallMode_GetTeamRelativeScore). At the end of each hole the ball that does not count gets 9
+// strokes (GameModeBestBall_EndHole); a human team that beats an all-CPU team over a full round is
+// paid from the CPU golfers' stroke prizes (GameModeBestBall_EndGame).
 
 #include "golfer.h"
 #include "ball.h"

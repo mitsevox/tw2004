@@ -1,29 +1,39 @@
-// GameHoleContests.c (our name): the hole contests of a multiplayer round in game mode 0 (stroke
-// play), 1 or 2. At the start of the round up to three holes are drawn: a par 4 or 5 for the
-// longest drive (gHoleContestLongestDriveHole), a par 3 for closest to the pin (gHoleContestClosestToPinHole) and, one round in
-// five, another par 3 with a $100,000 prize for a hole in one (gHoleContestHoleInOneHole). Each player's result
-// on the contest hole is kept by player (gHoleContestPlayerResult distances), ranked into a result table
-// (gHoleContestPlaceName names, gHoleContestPlaceDistance distances), and the winner (gHoleContestWinner) is paid $2,500.
+// GameHoleContests.c (our name; no EA file or names found in TW06, TW07, TW2003 or TW2005): the
+// hole contests of a multiplayer full round in game mode 0 (stroke play), 1 (match play) or 2
+// (skins), without mulligans, a Play Now challenge or the calendar flag
+// (HoleContest_RoundHasContests). On the round's first hole up to three holes are drawn
+// (HoleContest_DrawHoles): a par 4 or 5 for the longest drive (gHoleContestLongestDriveHole), a par
+// 3 for closest to the pin (gHoleContestClosestToPinHole) and, one round in five, another par 3
+// with a $100,000 prize for a hole in one (gHoleContestHoleInOneHole). A human's tee shot on a
+// contest hole opens the contest's intro (STATEFUNC_SwingInit, GUI_ShowHoleContestIntro). Each
+// player's first stroke on the hole is entered by player (gHoleContestPlayerResult: the drive's
+// length, or the distance from the pin in feet) and ranked into a result table the UI shows
+// (gHoleContestPlaceName, gHoleContestPlaceDistance). Once every player has teed off the contest
+// is decided and the winner (gHoleContestWinner) is paid $2,500 (HoleContest_PayWinner). The
+// game-flow calls come from GameManager.c (GM_InitForHole, GM_PlayerTookShot).
 
 #include "golfer.h"
 #include "game.h"
 #include "game/save.h"
 #include "frontend/fe.h"
 
-s32  gHoleContestLongestDriveHole = -1;         // the longest-drive hole, -1 none
-s32  gHoleContestClosestToPinHole = -1;         // the closest-to-the-pin hole, -1 none
-s32  gHoleContestHoleInOneHole = -1;         // the hole-in-one prize hole, -1 none
+s32  gHoleContestLongestDriveHole = -1;     // the longest-drive hole (round index), -1 none
+s32  gHoleContestClosestToPinHole = -1;     // the closest-to-the-pin hole, -1 none
+s32  gHoleContestHoleInOneHole = -1;        // the hole-in-one prize hole, -1 none
 // .bss/.sbss: defined in reverse address order (CodeWarrior lays them out last-defined-first).
-f32  gHoleContestPlayerResult[5];           // per player: the drive's length or the distance from the pin
-s32  gHoleContestPlaceDistance[5];           // by place: the distance, -1 no result
-char gHoleContestPlaceName[5][14];       // by place: the name shown with the result
-s32  gHoleContestEverWon;
-s32  gHoleContestWinner;              // the contest's winner, 5 = nobody
-u8   gHoleContestDecided;              // the contest on this hole is decided
-u8   gHoleContestWon;              // a contest has a winner (HoleContest_RankResults), or the hole in one was made
+f32  gHoleContestPlayerResult[5];   // per player: the drive's length or the distance from the pin in
+                                    // feet (0 holed), -1.0 no result
+s32  gHoleContestPlaceDistance[5];  // by place: the result, -1 no result
+char gHoleContestPlaceName[5][14];  // by place: the name shown with the result
+s32  gHoleContestEverWon;           // set with gHoleContestWon and never cleared
+s32  gHoleContestWinner;            // the contest's winner (the first place), 5 = nobody
+u8   gHoleContestDecided;           // the contest on this hole is decided (HoleContest_PayWinner)
+u8   gHoleContestWon;               // a contest has a winner this round (HoleContest_RankResults), or
+                                    // the hole in one was made
 
 u8   fn_800D304C(int nHole);    // a flag of the hole's course data (byte 0x35): the drive can count
-u8   fn_800D0D54(int nPlayer);  // the ball lies on a fairway, the green or in the cup
+u8   fn_800D0D54(int nPlayer);  // the shot started on fairway-class ground and ended on the fairway,
+                                // the green or in the cup (HoleScore.c)
 
 u8   HoleContest_RoundHasContests(void);
 void HoleContest_DrawHoles(void);
@@ -75,7 +85,8 @@ void HoleContest_DrawHoles(void) {
     }
     if (bFound) {
         gHoleContestLongestDriveHole = Misc_RandFunc(0) % 18;
-        while (Course_GetHolePar(gHoleContestLongestDriveHole) == 3 || !fn_800D304C(gHoleContestLongestDriveHole)) {
+        while (Course_GetHolePar(gHoleContestLongestDriveHole) == 3
+               || !fn_800D304C(gHoleContestLongestDriveHole)) {
             gHoleContestLongestDriveHole = Misc_RandFunc(0) % 18;
         }
     } else {
@@ -106,7 +117,8 @@ void HoleContest_DrawHoles(void) {
         }
         if (bFound) {
             gHoleContestHoleInOneHole = Misc_RandFunc(0) % 18;
-            while (Course_GetHolePar(gHoleContestHoleInOneHole) > 3 || gHoleContestHoleInOneHole == gHoleContestClosestToPinHole) {
+            while (Course_GetHolePar(gHoleContestHoleInOneHole) > 3 || gHoleContestHoleInOneHole
+                   == gHoleContestClosestToPinHole) {
                 gHoleContestHoleInOneHole = Misc_RandFunc(0) % 18;
             }
         } else {
@@ -277,7 +289,8 @@ void HoleContest_RankResults(void) {
             fBest = 0.0f;
             nBest = 5;
             for (i = 0; i < gNumPlayersSetUp; i++) {
-                if (aRank[(u32)i] == -1 && gHoleContestPlayerResult[(u32)i] != -1.0f && gHoleContestPlayerResult[(u32)i] > fBest) {
+                if (aRank[(u32)i] == -1 && gHoleContestPlayerResult[(u32)i] != -1.0f
+                    && gHoleContestPlayerResult[(u32)i] > fBest) {
                     nBest = i;
                     fBest = gHoleContestPlayerResult[(u32)i];
                 }
@@ -334,7 +347,8 @@ void HoleContest_RankResults(void) {
             fBest = 9999.0f;
             nBest = 5;
             for (i = 0; i < gNumPlayersSetUp; i++) {
-                if (aRank[(u32)i] == -1 && gHoleContestPlayerResult[(u32)i] != -1.0f && gHoleContestPlayerResult[(u32)i] < fBest) {
+                if (aRank[(u32)i] == -1 && gHoleContestPlayerResult[(u32)i] != -1.0f
+                    && gHoleContestPlayerResult[(u32)i] < fBest) {
                     nBest = i;
                     fBest = gHoleContestPlayerResult[(u32)i];
                 }
@@ -393,14 +407,14 @@ void HoleContest_RankResults(void) {
 
 // The name at place nPlace (0-based) of the contest's result table, for the UI's record list
 // (GameUICommands.c fn_8008886C, record kind 3).
-char* HoleContest_GetPlaceName(int nPlayer) {
-    return gHoleContestPlaceName[nPlayer];
+char* HoleContest_GetPlaceName(int nPlace) {
+    return gHoleContestPlaceName[nPlace];
 }
 
 // The result at place nPlace (0-based) of the contest's result table: the drive's length or the
 // distance from the pin in feet, -1 none (GameUICommands.c fn_80088AD4, record kind 3).
-s32 HoleContest_GetPlaceDistance(int nPlayer) {
-    return gHoleContestPlaceDistance[nPlayer];
+s32 HoleContest_GetPlaceDistance(int nPlace) {
+    return gHoleContestPlaceDistance[nPlace];
 }
 
 // Whether a hole contest was won this round (a winner ranked, or the hole in one made); FE message
@@ -434,7 +448,8 @@ void HoleContest_PayWinner(void) {
 // (bPlanReady clear), 2 within a foot of the pin, else 0 (FE message fn_80089B8C).
 s32 HoleContest_GetWinnerShotKind(void) {
     if (gHoleContestWon) {
-        if (gPlayers[gHoleContestWinner].ball.nLie == LIE_INCUP_e && gPlayers[gHoleContestWinner].bPlanReady == 0) {
+        if (gPlayers[gHoleContestWinner].ball.nLie == LIE_INCUP_e &&
+            gPlayers[gHoleContestWinner].bPlanReady == 0) {
             return 1;
         }
         // fake match: the original loads gHoleContestWinner again for the call; the volatile read does that
