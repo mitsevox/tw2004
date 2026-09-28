@@ -23,9 +23,10 @@ Progress log: config/GW4E69/readability_progress.tsv (`hotnames.py --units --log
 per-file work lists: `hotnames.py --unit X --todo`. CHECKPOINT (2026-09-28 ~13:20 UTC): round 11 (6 lanes) landed and logged (1604 functions reviewed = 24.2%, 41 files through the pass). Golfer headers pass 3 done; the rest (CrAPState, charstate.h) is listed in naming-leads.md "Round 11". Nothing running. NEXT: round 12 (6 lanes): round flow / game modes: GameMessages (55), GameMode8 (66), GameMode11 (40), GameMode22 (40), GameTargets (27), GameMode14 (29), GameMode13 (28), GameEffects (27) ..., plus a header lane (golfer leftovers + round-flow items). Prompts state only sourced facts (agents/README.md). Hand edits: `tools/agents/merge_lane.sh <lane> [globals.tsv...]` with BASE=<the lane's last name.py commit>; merge_pick.py resolves conflicts per side. Round procedure (orchestrator): new_agent.py <lane>; prompt = plan-readability.md + brief.md +
 roles/naming.md, files + `hotnames.py --unit X --todo` cap ~40, deliver batch files + hand-edit list,
 never git reset; on return: replay batches with name.py in order (`--by "<lane> (replayed by
-orchestrator)"`), rename.py for globals, then hand edits by `git checkout agent/<lane> -- <files>` +
-`rename.py name_sources.tsv --refs-only` + read `git diff HEAD` for anything reverted (re-run the header
-lane's saved scripts if its renames got undone), build + lint, commit, push; after the round
+orchestrator)"`), rename.py for globals, then hand edits by `BASE=<lane's last name.py commit> tools/agents/merge_lane.sh <lane> [globals.tsv...]`
+(3-way, names normalized; conflicts: read them, `tools/agents/merge_pick.py <conflict> <dest> <o|t...>`),
+then `rename.py name_sources.tsv --refs-only` + wraplong + read `git diff HEAD`; the header lane's saved
+scripts run LAST on main; build + lint, commit, push; after the round
 `hotnames.py --units --log`, commit the log row, append leads to naming-leads.md, report numbers.
 PHASE: readability. Plan and feedback loop: agents/plan-readability.md (one complete pass per file,
 areas in order, measure with `hotnames.py --units`: named / commented / reviewed / done).
