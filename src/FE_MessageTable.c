@@ -592,32 +592,32 @@ void GM_vGetChallengeRewards(MsgArg* pArgs, MsgArg* pResult);
 void GM_vFEGetStringLength(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetEATraxTrack(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetEATraxTrack(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082D98(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082DA8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082E5C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082F68(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083068(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008311C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083354(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083358(MsgArg* pArgs, MsgArg* pResult);
-void fn_800833A4(MsgArg* pArgs, MsgArg* pResult);
-void fn_800833C4(MsgArg* pArgs, MsgArg* pResult);
-void fn_800833D0(MsgArg* pArgs, MsgArg* pResult);
-void fn_800833F4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083414(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083430(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083480(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083494(MsgArg* pArgs, MsgArg* pResult);
-void fn_800834DC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083550(MsgArg* pArgs, MsgArg* pResult);
-void fn_800835B8(MsgArg* pArgs, MsgArg* pResult);
-void fn_800835BC(MsgArg* pArgs, MsgArg* pResult);
-void fn_800835C8(MsgArg* pArgs, MsgArg* pResult);
-void fn_800835D4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083658(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083860(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083890(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008389C(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetCustomRoundSlot(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetGameName(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetEATraxOptions(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetEATraxOptions(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsCourseChoiceUnlocked(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetLadderEventMaxSkins(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage324_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vQueueMovie(MsgArg* pArgs, MsgArg* pResult);
+void GM_vStopMusic(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage328_Return0(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetPlayerCreatedGolfer(MsgArg* pArgs, MsgArg* pResult);
+void GM_vClearBackupRows(MsgArg* pArgs, MsgArg* pResult);
+void GM_vClearBackupRow(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsWaveBird(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetFEStateB10(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetFEStateB10(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage336_Return0(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCGetEASBSaveNeeds(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage338_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage339_Return0(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage340_Return0(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetPlayerBag(MsgArg* pArgs, MsgArg* pResult);
+void GM_vClearSavedRound(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetSavedRoundInUse(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage344_Return150(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage345_Empty(MsgArg* pArgs, MsgArg* pResult);
 void fn_800838A0(MsgArg* pArgs, MsgArg* pResult);
 void fn_800838A4(MsgArg* pArgs, MsgArg* pResult);
 void fn_800838A8(MsgArg* pArgs, MsgArg* pResult);
@@ -1045,38 +1045,38 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[312] = GM_vFEMessage312_Empty;
     gFEMessageHandlers[313] = GM_vGetAllGolfersPickable;
     gFEMessageHandlers[314] = GM_vFEMessage314_Empty;
-    gFEMessageHandlers[315] = fn_80082D98;
-    gFEMessageHandlers[316] = fn_80082DA8;
-    gFEMessageHandlers[317] = fn_80082DBC;
-    gFEMessageHandlers[318] = fn_80082E10;
-    gFEMessageHandlers[319] = fn_80082E5C;
-    gFEMessageHandlers[320] = fn_80082F68;
-    gFEMessageHandlers[321] = fn_80083068;
+    gFEMessageHandlers[315] = GM_vSetCustomRoundSlot;
+    gFEMessageHandlers[316] = GM_vGetGameName;
+    gFEMessageHandlers[317] = GM_vMCIsSaveCorrupt;
+    gFEMessageHandlers[318] = GM_vMCDeleteSave;
+    gFEMessageHandlers[319] = GM_vGetEATraxOptions;
+    gFEMessageHandlers[320] = GM_vSetEATraxOptions;
+    gFEMessageHandlers[321] = GM_vIsCourseChoiceUnlocked;
     gFEMessageHandlers[322] = GM_vFEMessage322_Empty;
-    gFEMessageHandlers[323] = fn_8008311C;
-    gFEMessageHandlers[324] = fn_80083354;
+    gFEMessageHandlers[323] = GM_vGetLadderEventMaxSkins;
+    gFEMessageHandlers[324] = GM_vFEMessage324_Empty;
     gFEMessageHandlers[325] = GM_vFEMessage325_Empty;
     gFEMessageHandlers[326] = GM_vFEMessage326_Empty;
-    gFEMessageHandlers[327] = fn_80083358;
-    gFEMessageHandlers[328] = fn_800833C4;
-    gFEMessageHandlers[329] = fn_800833D0;
-    gFEMessageHandlers[330] = fn_800833F4;
-    gFEMessageHandlers[331] = fn_80083414;
-    gFEMessageHandlers[332] = fn_80083430;
-    gFEMessageHandlers[333] = fn_80083480;
-    gFEMessageHandlers[334] = fn_80083494;
-    gFEMessageHandlers[335] = fn_800834A8;
-    gFEMessageHandlers[336] = fn_800834DC;
-    gFEMessageHandlers[337] = fn_800834E8;
-    gFEMessageHandlers[766] = fn_80083550;
-    gFEMessageHandlers[338] = fn_800835B8;
-    gFEMessageHandlers[339] = fn_800835BC;
-    gFEMessageHandlers[340] = fn_800835C8;
-    gFEMessageHandlers[341] = fn_800835D4;
-    gFEMessageHandlers[342] = fn_80083658;
-    gFEMessageHandlers[343] = fn_80083860;
-    gFEMessageHandlers[344] = fn_80083890;
-    gFEMessageHandlers[345] = fn_8008389C;
+    gFEMessageHandlers[327] = GM_vQueueMovie;
+    gFEMessageHandlers[328] = GM_vFEMessage328_Return0;
+    gFEMessageHandlers[329] = GM_vSetPlayerCreatedGolfer;
+    gFEMessageHandlers[330] = GM_vClearBackupRows;
+    gFEMessageHandlers[331] = GM_vClearBackupRow;
+    gFEMessageHandlers[332] = GM_vIsWaveBird;
+    gFEMessageHandlers[333] = GM_vGetFEStateB10;
+    gFEMessageHandlers[334] = GM_vSetFEStateB10;
+    gFEMessageHandlers[335] = GM_vMCHadIOError;
+    gFEMessageHandlers[336] = GM_vFEMessage336_Return0;
+    gFEMessageHandlers[337] = GM_vMCGetSaveNeeds;
+    gFEMessageHandlers[766] = GM_vMCGetEASBSaveNeeds;
+    gFEMessageHandlers[338] = GM_vFEMessage338_Empty;
+    gFEMessageHandlers[339] = GM_vFEMessage339_Return0;
+    gFEMessageHandlers[340] = GM_vFEMessage340_Return0;
+    gFEMessageHandlers[341] = GM_vSetPlayerBag;
+    gFEMessageHandlers[342] = GM_vClearSavedRound;
+    gFEMessageHandlers[343] = GM_vSetSavedRoundInUse;
+    gFEMessageHandlers[344] = GM_vFEMessage344_Return150;
+    gFEMessageHandlers[345] = GM_vFEMessage345_Empty;
     gFEMessageHandlers[346] = fn_800838A0;
     gFEMessageHandlers[347] = fn_800838A4;
     gFEMessageHandlers[348] = fn_800838A8;
@@ -1307,7 +1307,7 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[699] = PGASponsor_GetItem;
     gFEMessageHandlers[700] = PGASponsor_GetName;
     gFEMessageHandlers[701] = PGATourWins_GetDetails;
-    gFEMessageHandlers[704] = fn_800833A4;
+    gFEMessageHandlers[704] = GM_vStopMusic;
     gFEMessageHandlers[708] = Calendar_GetRTEDescription;
     gFEMessageHandlers[711] = GM_vSellCrAPItem;
     gFEMessageHandlers[712] = GM_vGetCrAPCategoryCounts;
@@ -5052,16 +5052,22 @@ void GM_vGetEATraxTrack(MsgArg* pArgs, MsgArg* pResult) {
     ((MsgString*)pArgs[3].p)->pStr = lbl_801F846C[pArgs[1].i].szSong;
 }
 
-void fn_80082D98(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 315: picks player slot pArgs[0] as the one whose saved custom round the menus
+// edit (lbl_80281ED4->n3; n4 is the round), as the hole-par message fn_80080054 reads it.
+void GM_vSetCustomRoundSlot(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->n3 = pArgs[0].i;
 }
 
-// The game's title.
-void fn_80082DA8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 316: the game's title, "TIGER WOODS PGA TOUR(R) 2004": the string pArgs[0] is
+// pointed at it (the round's GM_vIG_GetGameName is the same).
+void GM_vGetGameName(MsgArg* pArgs, MsgArg* pResult) {
     ((MsgString*)pArgs[0].p)->pStr = "TIGER WOODS PGA TOUR\xAE 2004";
 }
 
-void fn_80082DBC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 317: 1 when the save on the card in port pArgs[0], slot pArgs[1] is bad data
+// (fn_8009EE28 loads and checks the save file and its backup: MC_ERR_BADDATA), else 0, also when
+// there is no card or no save. The round's GM_vIG_MCIsSaveCorrupt runs it.
+void GM_vMCIsSaveCorrupt(MsgArg* pArgs, MsgArg* pResult) {
     if (fn_8009EE28(pArgs[0].i, pArgs[1].i) == MC_ERR_BADDATA) {
         pResult->i = 1;
     } else {
@@ -5069,7 +5075,10 @@ void fn_80082DBC(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80082E10(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 318: deletes the game's save from the card in port pArgs[0], slot pArgs[1]
+// (MC_DeleteSaveGame). Answers 1 once it is gone, else MC_DeleteSaveGame's error. The round's
+// GM_vIG_MCDeleteSave runs it.
+void GM_vMCDeleteSave(MsgArg* pArgs, MsgArg* pResult) {
     s32 nError;
     s32 n;
 
@@ -5081,8 +5090,10 @@ void fn_80082E10(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = n;
 }
 
-// The four music rows' switches and option b7E as the menus' choices (1 on, 2 off), and n80.
-void fn_80082E5C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 319: the music options as the menus' choices: each of the four music rows'
+// switches (gSession.options.abRowOn) into *pArgs[0..3] as 1 on or 2 off, option b7E the same way
+// into *pArgs[4], and option n80 into *pArgs[5].
+void GM_vGetEATraxOptions(MsgArg* pArgs, MsgArg* pResult) {
     int i;
 
     for (i = 0; i < 4; i++) {
@@ -5099,9 +5110,11 @@ void fn_80082E5C(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[5].p = gSession.options.n80;
 }
 
-// Set the four music rows' switches and option b7E from the menus' choices (1 on, 2 off) and n80,
-// then apply them.
-void fn_80082F68(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 320: sets the music options from the menus' choices: the four music rows'
+// switches (gSession.options.abRowOn) from pArgs[0..3] (1 on, 2 off; any other value leaves the row
+// as it is), option b7E from pArgs[4] (1 on) and option n80 from pArgs[5]; then the music is picked
+// again (Gaud_SetStreamingContext).
+void GM_vSetEATraxOptions(MsgArg* pArgs, MsgArg* pResult) {
     int i;
 
     for (i = 0; i < 4; i++) {
@@ -5119,9 +5132,11 @@ void fn_80082F68(MsgArg* pArgs, MsgArg* pResult) {
     Gaud_SetStreamingContext();
 }
 
-// Whether choice pArgs[0] is available: 1 always, 2 and 3 once a loaded profile or a cheat code
-// has unlocked course 21 or 22.
-void fn_80083068(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 321: whether choice pArgs[0] can be picked: 1 always; 2 once a loaded profile
+// or a cheat code (lbl_80281DF4) has course unlock 21, 3 the same for course unlock 22
+// (GM_Earnings_CheckUnlockCourses buys them with prices 23 and 21; the "ALLTHETRACKS" code sets
+// both); any other choice 0.
+void GM_vIsCourseChoiceUnlocked(MsgArg* pArgs, MsgArg* pResult) {
     s32 nChoice = pArgs[0].i;
     int b = 0;
     int i;
@@ -5152,10 +5167,13 @@ void fn_80083068(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = b;
 }
 
-// For the current ladder event's challenge: the most a single opponent's skins are worth over the
-// holes played (the front nine, the back nine or both; each hole's skin at the opponent's rating),
-// and each opponent playing the player's own golfer gets the next of its four looks.
-void fn_8008311C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 323: for the current ladder event (GameMode4_GetCurrentEvent, its challenge in
+// PlayNowMode's list), the most a single opponent's skins are worth over the holes played
+// (GameMode4_GetCurrentEventHoles: 1 all 18, 2 the front nine, 3 the back nine; each hole's skin
+// from gEarningsTable.aSkins at the opponent's money rating). Then each opponent playing the same
+// golfer model as the player's own golfer gets the look after the player's (gSession.aProfile[].n0,
+// 0..3, wrapping).
+void GM_vGetLadderEventMaxSkins(MsgArg* pArgs, MsgArg* pResult) {
     int  nChallenge = GameMode4_GetCurrentEvent() - 1;
     s32  nOpponents = PlayNow_GetNumOpponents(nChallenge);
     s32  nMax = 0;
@@ -5213,12 +5231,15 @@ void fn_8008311C(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80083354(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 324: empty in this build.
+void GM_vFEMessage324_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Queue a bio movie (which bio is not set here: nBio keeps what the queue entry held), or the
-// credits for pArgs[0] -1; then Gaud_StopMusic.
-void fn_80083358(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 327: queues a movie (fn_800770FC; FE_movieFade fades to black and plays it):
+// the credits when pArgs[0] is -1, else a bio movie; the music stops (Gaud_StopMusic). pArgs[0] is
+// not stored as the bio's number: nothing in this build writes FEMovie.nBio, so a bio movie always
+// plays bios/bio01.
+void GM_vQueueMovie(MsgArg* pArgs, MsgArg* pResult) {
     FEMovie* pMovie;
 
     pMovie = fn_800770FC();
@@ -5229,35 +5250,42 @@ void fn_80083358(MsgArg* pArgs, MsgArg* pResult) {
     Gaud_StopMusic();
 }
 
-void fn_800833A4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 704: stops the music (Gaud_StopMusic).
+void GM_vStopMusic(MsgArg* pArgs, MsgArg* pResult) {
     Gaud_StopMusic();
 }
 
-void fn_800833C4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 328: always answers 0 in this build.
+void GM_vFEMessage328_Return0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_800833D0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 329: player pArgs[0] plays the created golfer of the same slot (its
+// gSession.nGolfer becomes FIRST_CREATED_GOLFER, 30, plus the player's number).
+void GM_vSetPlayerCreatedGolfer(MsgArg* pArgs, MsgArg* pResult) {
     s32 n;
 
     n = pArgs[0].i;
     gSession.nGolfer[n] = (u8)(n + 30);
 }
 
-// No player slot has a backup row.
-void fn_800833F4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 330: player slots 0..3 lose their backup rows (lbl_801D7148.aBackup -1; slot
+// 4's is left).
+void GM_vClearBackupRows(MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D7148.aBackup[0] = -1;
     lbl_801D7148.aBackup[1] = -1;
     lbl_801D7148.aBackup[2] = -1;
     lbl_801D7148.aBackup[3] = -1;
 }
 
-void fn_80083414(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 331: player slot pArgs[0] loses its backup row (lbl_801D7148.aBackup -1).
+void GM_vClearBackupRow(MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D7148.aBackup[pArgs[0].i] = -1;
 }
 
-// The pad in port pArgs[0] is a WaveBird (its SI device type).
-void fn_80083430(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 332: 1 when the controller in port pArgs[0] is a WaveBird (Input_iGetPadType
+// 0x8B100000), else 0.
+void GM_vIsWaveBird(MsgArg* pArgs, MsgArg* pResult) {
     if (Input_iGetPadType(pArgs[0].i) == 0x8B100000) {
         pResult->i = 1;
     } else {
@@ -5265,51 +5293,66 @@ void fn_80083430(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80083480(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 333: the front end's flag lbl_801D7148.b10 (1 after the front end's set-up,
+// fn_80076E48; slot 334 sets it; nothing else reads it).
+void GM_vGetFEStateB10(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_801D7148.b10;
 }
 
-void fn_80083494(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 334: sets the front end's flag lbl_801D7148.b10 (read by slot 333).
+void GM_vSetFEStateB10(MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D7148.b10 = pArgs[0].i;
 }
 
-void fn_800834A8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 335, also the round's command 164: whether the card in port pArgs[0] has had an
+// I/O error (fn_8009F728: lbl_80281FD0, set on CARD_RESULT_IOERROR).
+void GM_vMCHadIOError(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_8009F728(pArgs[0].i);
 }
 
-void fn_800834DC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 336: always answers 0 in this build.
+void GM_vFEMessage336_Return0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// For the card in slot pArgs[0], pArgs[1]: fn_8009D3DC's answer, and MC_BlocksNeededForSave's with kind 0.
-void fn_800834E8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 337: for the card in port pArgs[0], slot pArgs[1] (connected for the look), the
+// new files a save of the game needs (fn_8009D3DC: 1 when the save file or its backup is not on the
+// card yet) into *pArgs[2], and the blocks it needs (MC_BlocksNeededForSave, kind 0: 40 when the
+// file is not there yet) into *pArgs[3]. The round's GM_vIG_MCGetSaveNeeds runs it.
+void GM_vMCGetSaveNeeds(MsgArg* pArgs, MsgArg* pResult) {
     MC_ConnectCard(pArgs[0].i, pArgs[1].i);
     *(s32*)pArgs[2].p = fn_8009D3DC(pArgs[0].i, pArgs[1].i);
     *(s32*)pArgs[3].p = MC_BlocksNeededForSave(pArgs[0].i, pArgs[1].i, 0, 0);
     MC_Disconnect();
 }
 
-// The same for an EA Sports Bio save: the new files it needs, and MC_BlocksNeededForSave's with kind 3.
-void fn_80083550(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 766: GM_vMCGetSaveNeeds for the EA Sports Bio: the new files its save needs
+// (fn_8009D50C: 1 when there is no "EASB" file on the card yet) into *pArgs[2], and its blocks
+// (MC_BlocksNeededForSave kind 3) into *pArgs[3].
+void GM_vMCGetEASBSaveNeeds(MsgArg* pArgs, MsgArg* pResult) {
     MC_ConnectCard(pArgs[0].i, pArgs[1].i);
     *(s32*)pArgs[2].p = fn_8009D50C(pArgs[0].i, pArgs[1].i);
     *(s32*)pArgs[3].p = MC_BlocksNeededForSave(pArgs[0].i, pArgs[1].i, 0, 3);
     MC_Disconnect();
 }
 
-void fn_800835B8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 338: empty in this build.
+void GM_vFEMessage338_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_800835BC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 339: always answers 0 in this build.
+void GM_vFEMessage339_Return0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_800835C8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 340: always answers 0 in this build.
+void GM_vFEMessage340_Return0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// Give player pArgs[0] their golfer's bag: a created golfer's own, else the default bag.
-void fn_800835D4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 341: gives player pArgs[0] its golfer's clubs (gSession.uBag, a bit per club):
+// a created golfer's own bag (GolferRecord.uBagMask), any other golfer the default bag 0x02A7FC44.
+void GM_vSetPlayerBag(MsgArg* pArgs, MsgArg* pResult) {
     s32 nPlayer = pArgs[0].i;
     GolferRecord* pRecord = fn_80077A80(gSession.nGolfer[nPlayer]);
 
@@ -5320,8 +5363,9 @@ void fn_800835D4(MsgArg* pArgs, MsgArg* pResult) {
     gSession.uBag[nPlayer] = pRecord->uBagMask;
 }
 
-// Empties profile pArgs[0]'s saved round pArgs[1]: no holes, and n0 cleared.
-void fn_80083658(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 342: empties profile pArgs[0]'s saved custom round pArgs[1]: every hole none
+// (nHoleNum -1, nCourse 0), and the round no longer in use (n0 0).
+void GM_vClearSavedRound(MsgArg* pArgs, MsgArg* pResult) {
     int i;
 
     for (i = 0; i < 18; i++) {
@@ -5331,15 +5375,19 @@ void fn_80083658(MsgArg* pArgs, MsgArg* pResult) {
     gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].n0 = 0;
 }
 
-void fn_80083860(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 343: sets whether profile pArgs[0]'s saved custom round pArgs[1] is in use
+// (SavedRound.n0 = pArgs[2]).
+void GM_vSetSavedRoundInUse(MsgArg* pArgs, MsgArg* pResult) {
     gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].n0 = pArgs[2].i;
 }
 
-void fn_80083890(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 344: always answers 150 in this build.
+void GM_vFEMessage344_Return150(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 150;
 }
 
-void fn_8008389C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 345: empty in this build.
+void GM_vFEMessage345_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_800838A0(MsgArg* pArgs, MsgArg* pResult) {

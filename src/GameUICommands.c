@@ -532,7 +532,7 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[161] = GM_vGetPlayerCut;
     gIGMessageHandlers[162] = GM_vRewardDisplayStarting;
     gIGMessageHandlers[163] = IG_vMuteForScoreCard;
-    gIGMessageHandlers[164] = fn_800834A8;
+    gIGMessageHandlers[164] = GM_vMCHadIOError;
     gIGMessageHandlers[165] = GM_vGetPlayerBackSwing;
     gIGMessageHandlers[166] = GM_vIG_MCGetSaveNeeds;
     gIGMessageHandlers[167] = GM_vIG_OnlineSendChat;
@@ -2459,7 +2459,7 @@ void IG_vHoleContest_GetWinnerShotKind(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Command 151: the game's title, "TIGER WOODS PGA TOUR(R) 2004", pointed to by the string argument
-// (as the front end's fn_80082DA8).
+// (as the front end's GM_vGetGameName).
 void GM_vIG_GetGameName(MsgArg* pArgs, MsgArg* pResult) {
     ((MsgString*)pArgs[0].p)->pStr = "TIGER WOODS PGA TOUR\xAE 2004";
 }
@@ -2474,15 +2474,15 @@ void GM_vIsOnlineEvent(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Command 155: whether the save file on the card in port pArgs[0], slot pArgs[1] is bad data (the
-// front end's command fn_80082DBC).
+// front end's command GM_vMCIsSaveCorrupt).
 void GM_vIG_MCIsSaveCorrupt(MsgArg* pArgs, MsgArg* pResult) {
-    fn_80082DBC(pArgs, pResult);
+    GM_vMCIsSaveCorrupt(pArgs, pResult);
 }
 
 // Command 156: deletes the game's save from the card in port pArgs[0], slot pArgs[1] (the front
-// end's command fn_80082E10): the result is MC_DeleteSaveGame's error, or 1 once it is gone.
+// end's command GM_vMCDeleteSave): the result is MC_DeleteSaveGame's error, or 1 once it is gone.
 void GM_vIG_MCDeleteSave(MsgArg* pArgs, MsgArg* pResult) {
-    fn_80082E10(pArgs, pResult);
+    GM_vMCDeleteSave(pArgs, pResult);
 }
 
 // Command 157: sets the UI's time factor gGameEffects.fUITimeFactor to the float pArgs[0]; a
@@ -2540,9 +2540,9 @@ void IG_vMuteForScoreCard(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Command 166: for the card in port pArgs[0], slot pArgs[1], the new files and the blocks a game
-// save needs, into *pArgs[2] and *pArgs[3] (the front end's command fn_800834E8).
+// save needs, into *pArgs[2] and *pArgs[3] (the front end's command GM_vMCGetSaveNeeds).
 void GM_vIG_MCGetSaveNeeds(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800834E8(pArgs, pResult);
+    GM_vMCGetSaveNeeds(pArgs, pResult);
 }
 
 // Command 167: sends chat text pArgs[0] from the player whose turn it is (OnlineGolf_SendChatData,

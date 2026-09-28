@@ -130,7 +130,7 @@ LAYOUT_ASSERT(TourSeason, 0x4E9C);
 // A saved custom round (0x70 bytes): 18 holes, each a hole number and the course it is from.
 // A new profile has three, emptied by the profile setup at 0x80057C88.
 typedef struct SavedRound {
-    u8   n0;                    // 0x00  cleared by the setup; set by a menu message (fn_80083860);
+    u8   n0;                    // 0x00  cleared by the setup; set by a menu message (GM_vSetSavedRoundInUse);
                                 //       read unsigned (FE_MessageTable.c GM_vIsCustomRoundUsed)
     char szName[0x14];          // 0x01  the round's name, shown as its course (GameUICommands.c)
     s8   n15;                   // 0x15  set to 1 by the setup; menu messages set and read it

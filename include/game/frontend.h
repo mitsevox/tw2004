@@ -209,10 +209,10 @@ extern MsgHandler gIGMessageHandlers[UI_NUM_ROUND_COMMANDS];
 // pass on to.
 void GM_vMCGetNumReplays(MsgArg* pArgs, MsgArg* pResult);
 void GM_vFEGetLetter(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082DBC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80082E10(MsgArg* pArgs, MsgArg* pResult);
-void fn_800834A8(MsgArg* pArgs, MsgArg* pResult);
-void fn_800834E8(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCIsSaveCorrupt(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCDeleteSave(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCHadIOError(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCGetSaveNeeds(MsgArg* pArgs, MsgArg* pResult);
 
 extern u8 lbl_80281F18;         // set by the pause handler (GameUICommands.c GM_vPauseGame)
 extern u8 lbl_80281F19;         // (uiProcessInterface.c) FEgolferanim.c's FE_IsGolferRenderAllowed tests it
