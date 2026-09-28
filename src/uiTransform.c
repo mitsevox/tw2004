@@ -1,14 +1,16 @@
-// uiTransform.c (EA's name, from its asserts; also in EA's 2002 source tree): the menu UI's
-// transform stack (gpUITransformStack). Pushing a UI element multiplies its move, rotation and scale
-// into a copy of the current level; the current level is also kept in gUICurTransform.
+// uiTransform.c (EA's name, from its asserts; also in EA's 2002 source tree; not in TW06's or
+// TW07's file lists, whose UI runs on Apt): the UI's transform stack (gpUITransformStack), which
+// the UI Studio library drives through its transform callback (UITransform_HandleOp). Pushing a UI
+// element multiplies its move, rotation and scale into a copy of the current level; the current
+// level is also kept in gUICurTransform for the UI's own drawing (fe_movies.c, uiText.c, uiArc.c).
 
 #include "golfer.h"
 #include "game/frontend.h"
 
 // The file's globals, defined last-address-first (the compiler lays .bss out in reverse).
-UITransform       gUICurTransform;         // a copy of the current level
-f32               gUIViewParams[3];      // the UI view: field of view, tan of half of it, distance
-UITransformStack* gpUITransformStack;         // the stack (UITransform_Init)
+UITransform       gUICurTransform;      // a copy of the current level
+f32               gUIViewParams[3];     // the UI view: field of view, tan of half of it, distance
+UITransformStack* gpUITransformStack;   // the stack (UITransform_Init)
 
 f32  Math_Tan(f32 x);                // tan
 
@@ -19,7 +21,6 @@ void LLMath_mat44fltMultiplyList33(f32 a[4][4], f32 b[4][4], f32 out[4][4], int 
 void LLMath_CopyMat44(f32 src[4][4], f32 dst[4][4]);                         // copy 4 rows
 void LLMath_CopyMat34(f32 src[4][4], f32 dst[4][4]);                         // copy 3 rows
 
-// Multiply a translation, a scale or a rotation (radians, about x, y or z) into a level's matrix.
 void UITransform_Translate(UITransform* p, f32 x, f32 y, f32 z);
 void UITransform_Scale(UITransform* p, f32 x, f32 y, f32 z);
 void UITransform_RotateX(UITransform* p, f32 fAngle);
@@ -127,7 +128,7 @@ void UITransform_Apply(UITransformDesc* p) {
     UITransform_Translate(&gpUITransformStack->aLevel[gpUITransformStack->nTop], p->vMove[0], p->vMove[1],
                           p->vMove[2]);
     UITransform_Translate(&gpUITransformStack->aLevel[gpUITransformStack->nTop], p->vPivot[0], p->vPivot[1],
-                          p->vPivot[2]);
+                p->vPivot[2]);
     gpUITransformStack->aLevel[gpUITransformStack->nTop].f74 += p->vMove[0];
     gpUITransformStack->aLevel[gpUITransformStack->nTop].f78 += p->vMove[1];
     gpUITransformStack->aLevel[gpUITransformStack->nTop].f64 += p->vPivot[0];
@@ -139,9 +140,9 @@ void UITransform_Apply(UITransformDesc* p) {
     gpUITransformStack->aLevel[gpUITransformStack->nTop].f6C *= p->vScale[0];
     gpUITransformStack->aLevel[gpUITransformStack->nTop].f70 *= p->vScale[1];
     UITransform_Scale(&gpUITransformStack->aLevel[gpUITransformStack->nTop], p->vScale[0], p->vScale[1],
-                      p->vScale[2]);
-    UITransform_Translate(&gpUITransformStack->aLevel[gpUITransformStack->nTop], -p->vPivot[0],
-                          -p->vPivot[1], -p->vPivot[2]);
+                p->vScale[2]);
+    UITransform_Translate(&gpUITransformStack->aLevel[gpUITransformStack->nTop], -p->vPivot[0], -p->vPivot[1],
+                -p->vPivot[2]);
     gpUITransformStack->aLevel[gpUITransformStack->nTop].w40 = p->w34;
     gpUITransformStack->aLevel[gpUITransformStack->nTop].f50[0] = p->f44[0] / 511.0f;
     gpUITransformStack->aLevel[gpUITransformStack->nTop].f50[1] = p->f44[1] / 511.0f;
@@ -183,7 +184,8 @@ void UITransform_HandleOp(int nOp, UITransformDesc* p) {
         gUIViewParams[2] = 256.0f * (1.0f / gUIViewParams[1]);
         break;
     case 1:
-        gpUITransformStack->aLevel[gpUITransformStack->nTop + 1] = gpUITransformStack->aLevel[gpUITransformStack->nTop];
+        gpUITransformStack->aLevel[gpUITransformStack->nTop + 1]
+                = gpUITransformStack->aLevel[gpUITransformStack->nTop];
         gpUITransformStack->nTop++;
         UITransform_Apply(p);
         gUICurTransform = gpUITransformStack->aLevel[gpUITransformStack->nTop];

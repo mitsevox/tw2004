@@ -1,7 +1,10 @@
-// uiLoadFile.c (EA's name, from its asserts; also in EA's 2002 source tree): loads the menu UI's
-// files. Registers the stream handlers for the UI's data, keeps the loaded file's data (and can
-// park it in ARAM while char.c borrows its buffer to load a menu golfer), and frees what was
-// loaded.
+// uiLoadFile.c (EA's name, from its asserts; also in EA's 2002 source tree; TW07 keeps it in
+// ui_core/istudio_runtime with UI_RegisterStreamClients and UI_TestTextureGroupChkRef): loads the
+// UI's files for uiProcessInterface.c. Registers the stream handlers for the UI's objects ('DATS'
+// the UI file, 'TXFS' texture banks, 'FONS' fonts, 'GRPS'/'MPCS' the picture list), keeps what
+// they load for UI_OpenInterface and frees it again. The menus' picture list lives in ARAM between
+// uses (UI_RestoreMenuPictures, UI_FreeMenuPictures), and the UI file can be parked there while
+// char.c borrows its buffer to load a menu golfer (UI_ParkFileInAram, UI_RestoreFileFromAram).
 
 #include "game.h"
 #include "frontend/fe.h"
@@ -9,19 +12,19 @@
 #include "game/frontend.h"
 
 // .sbss: defined in reverse address order (CodeWarrior lays them out last-defined-first).
-char* gUIInterfaceName;             // the name of the UI set: "frontend", "ingame" or "startup"
-void* gpUIFileData;             // the UI file's data, copied out of its stream object (UI_StreamLoadFile)
-u32*  gpUIFonts;             // the 'FONS' data: a count, then that many UIFont offsets, turned
+char* gUIInterfaceName;         // the name of the UI set: "frontend", "ingame" or "startup"
+void* gpUIFileData;             // the UI file's data, copied out of its stream object
+u32*  gpUIFonts;                // the 'FONS' data: a count, then that many UIFont offsets, turned
                                 // into pointers the same way
-UINamedList* gpUIPictureList;      // the 'GRPS'/'MPCS' data: a count, then that many offsets that
+UINamedList* gpUIPictureList;   // the 'GRPS'/'MPCS' data: a count, then that many offsets that
                                 // UI_RelocatePictureList turns into pointers
-u8    gbUIFileInAram;             // it is in ARAM (UI_ParkFileInAram), not in main memory
-u32   gUIFileAramSize;             // the next multiple of 32 above its size
-u32   gUIFileAram;             // the UI file's ARAM address while it is parked there
-u32   gUIPicturesAramSize;             // the next multiple of 32 above its size
-u32   gUIPicturesAram;             // the menus' 'GRPS'/'MPCS' data's ARAM address
+u8    gbUIFileInAram;           // it is in ARAM (UI_ParkFileInAram), not in main memory
+u32   gUIFileAramSize;          // the next multiple of 32 above its size
+u32   gUIFileAram;              // the UI file's ARAM address (kept after it is freed)
+u32   gUIPicturesAramSize;      // the next multiple of 32 above its size
+u32   gUIPicturesAram;          // the menus' 'GRPS'/'MPCS' data's ARAM address
 
-UILoaded gUITextureBanks;
+UILoaded gUITextureBanks;       // the texture banks the 'TXFS' handler keeps (UI_StreamLoadTextures)
 
 void UI_UnregisterStreamClients(void);
 void UI_StreamLoadFile(UStreamObject* pObject);
@@ -30,9 +33,9 @@ void UI_StreamLoadPictures(UStreamObject* pObject);
 void UI_RelocatePictureList(UINamedList* pList);
 void UI_StreamLoadFonts(UStreamObject* pObject);
 u8 UI_TestTextureGroupChkRef(int nKind);
-void UI_RefreshFileEntries(void);                                 // uiProcessInterface.c
-void fn_80010028(void* pBank);                          // LLTex.c: free a texture bank
-int  UFont_FindFreeSlot(void);                                 // UFont.c: a free font slot
+void UI_RefreshFileEntries(void);                          // uiProcessInterface.c
+void fn_80010028(TexBank* pBank);                          // LLTex.c: free a texture bank
+int  UFont_FindFreeSlot(void);                             // UFont.c: a free font slot
 void UFont_LoadFont(int nSlot, void* pFont, int n);        // UFont.c: load a font into a slot
 void UFont_FreeFont(int nSlot);                            // UFont.c: free a font slot
 
@@ -111,8 +114,9 @@ void UI_StreamLoadTextures(UStreamObject* pObject) {
     StaticMem_Free(pObject);
 }
 
-// .sdata order: defined here, after UI_RegisterStreamClients's "ingame" and "startup", as in the original.
-u8    gbUIPicturesToAram = 1;         // the menus' 'GRPS'/'MPCS' data has not been copied to ARAM yet
+// .sdata order: defined here, after UI_RegisterStreamClients's "ingame" and "startup", as in the
+// original.
+u8    gbUIPicturesToAram = 1;   // the menus' 'GRPS'/'MPCS' data has not been copied to ARAM yet
 
 // 'GRPS' and 'MPCS' handler: the picture list. In the menus ("frontend") the first copy that comes
 // in is also copied to ARAM (its ARAM space allocated once, the first time) and kept; later copies

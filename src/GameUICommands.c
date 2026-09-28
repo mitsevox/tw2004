@@ -768,8 +768,8 @@ void GM_vClosePauseMenu(MsgArg* pArgs, MsgArg* pResult) {
     fn_8006F4E0();
 }
 
-// Message 9: pause: notes whether the scorecard was down (gbPausedWithoutScoreCard), pauses the sound and opens
-// the pause menu.
+// Message 9: pause: notes whether the scorecard was down (gbPausedWithoutScoreCard), pauses the
+// sound and opens the pause menu.
 void GM_vPauseGame(MsgArg* pArgs, MsgArg* pResult) {
     gbPausedWithoutScoreCard = GUI_ScoreCardUp() == 0;
     Gaud_Pause(1);

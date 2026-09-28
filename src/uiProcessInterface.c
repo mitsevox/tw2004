@@ -1,7 +1,13 @@
-// uiProcessInterface.c (EA's name, from its asserts; also in EA's 2002 source tree): runs the
-// UI (start-up, the menus and a round's screens). Prepares the loaded UI file, reads the
-// controllers for it, passes the UI's commands to whichever part of the game is running, fades
-// the screen out, and formats numbers for it.
+// uiProcessInterface.c (EA's name, from its asserts; also in EA's 2002 source tree; TW07's
+// successor is ui_core's uiAptProcessInterface.c, which keeps UI_OpenInterface, UI_vInitModule,
+// UI_vCloseModule, UI_ExitFade and UI_GetMoneyString): runs the UI of start-up, the menus and a
+// round on EA's UI Studio library. It opens a UI set (UI_OpenInterface: the loaded UI file made
+// ready, the studio set up with the game's callbacks), runs and draws it each frame
+// (UI_UpdateInterface, UI_DrawInterface), reads the controllers for it (UI_ReadControllers), passes
+// its commands to the part of the game that is running (UI_RunGameMessage: start-up's handlers,
+// FE_RunGameMessage in the menus, IG_RunGameMessage in a round), fades the screen out when it is
+// left (UI_ExitFade) and closes it (UI_CloseInterface). Also the comma formatting of amounts
+// (UI_GetMoneyString).
 
 #include "golfer.h"
 #include "game.h"
@@ -11,29 +17,32 @@
 #include "frontend/uistudio.h"
 
 // Defined here (declared in game/frontend.h); .sbss in reverse address order.
-FrontEnd* gpFrontEnd;
-u8 gbUIClosed;
-u8 gbUIRunning;                // set: UI_UpdateInterface passes events to the UI
-u8 gbUICloseRequested;
-u8 gbPausedWithoutScoreCard;
+FrontEnd* gpFrontEnd;           // the open UI (UI_OpenInterface), NULL when none
+u8 gbUIClosed;                  // the UI has shut down after its exit fade (UI_IsClosed)
+u8 gbUIRunning;                 // the UI is open: UI_UpdateInterface and UI_DrawInterface run it
+u8 gbUICloseRequested;          // the exit fade is black: UI_UpdateInterface closes the UI
+u8 gbPausedWithoutScoreCard;    // GameUICommands.c GM_vPauseGame: the scorecard was not up; not read
 
 // .bss, reverse address order (declared in frontend/fe.h)
-FE801D880C gUIDelayedHint;
-FEScreen gUIState;
+FE801D880C gUIDelayedHint;      // a value a message hands back to the UI as a hint 3 frames later
+FEScreen gUIState;              // the UI's controller input, exit fade and movie entries' table
 
+// Per controller: frames Controller_GetButtonMask(0x20, 1)'s button has been held in play; past 10
+// UI_ReadControllers sends GUI_SendButtonHeld.
 s32 gUIButtonHeldFrames[8] = {0};
+// The UI event each controller button sends when pressed (UI_ReadControllers).
 UIButtonEvent gUIButtonEvents[UI_NUM_BUTTON_EVENTS] = {
     {0x1000, 0x0}, {0x800, 0x6}, {0x100, 0x7}, {0x8, 0x2},
     {0x4, 0x3},    {0x1, 0x4},   {0x2, 0x5},   {0x200, 0x8},
     {0x400, 0x9},  {0x40, 0xA},  {0x10, 0xC},  {0x0, 0xE},
     {0x20, 0xB},   {0x10, 0xD},  {0x0, 0xF},   {0x0, 0x1},
 };
-s8 gSavedCrAPHidden = -1;
+s8 gSavedCrAPHidden = -1;      // gpCrAPState->bHidden put aside while hint 0x34 is up (-1: none)
 
-void UI_SetControllerEnabled(s32 p0, s32 p1);
-s32 fn_80092BC4();
-s32 UITransform_Shutdown();
-s32 fn_800BA038();
+void UI_SetControllerEnabled(s32 n, s32 b);
+void fn_80092BC4(void);         // uiText.c
+void UITransform_Shutdown(void);
+void fn_800BA038(void);         // Trax.c
 void UI_CloseInterface(FrontEnd* pFE);
 void UI_vCloseModule(void);
 void UI_ResolveFileEntries(FrontEnd* pFE);
@@ -46,14 +55,16 @@ void UI_ResetLoadedFiles(void);         // uiLoadFile.c
 void fn_800B9FF0(void);
 void fn_80037FB4(u8 a, f32* pColor);    // a full-screen colour (GoPostFx.c)
 void DEMO_Start(void);                 // BootCourse.c
-void FE_PlayPGATourMovie(void);                 // FE_Manager.c
-void FE_PlayRTEMovie(void);                 // FE_Manager.c
-void FE_PlayLadderMovie(void);                 // FE_Manager.c
+void FE_PlayPGATourMovie(void);         // FE_Manager.c
+void FE_PlayRTEMovie(void);             // FE_Manager.c
+void FE_PlayLadderMovie(void);          // FE_Manager.c
 void fn_80016B6C(f32 x, f32 y);
 void FO_vSetCurrentAddMode(s32 nMode);
 void fn_80012C54_SetWordWrap(s32 v);
 void UFont_ResetContext(void);
-void UI_SetTextLineSpacing(f32 x0);
+void UI_SetTextLineSpacing(f32 fSpacing);
+int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
+TexEntry* fn_800107E4(TexBank* pBank, int nTex);  // LLTexGrp.c
 void UI_ReportUISError(s32 nLevel, const char* szFile, s32 nLine, const char* szMsg);
 void UI_ScreenDrawDebug(u16 uGroup, u16 uScreen, s32 n);
 void UI_BlankProcess1(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
@@ -102,7 +113,7 @@ void UI_RelocateFile(FrontEnd* pFE) {
     UI_RelocateOffsets((u32*)fn_8008F488_Read(pFE->pFile->p8->apTables), uBase, 1, pFE->pFile->p8->nCount);
     for (i = 0; i < pFE->pFile->p8->nCount; i++) {
         UI_RelocateOffsets((u32*)pFE->pFile->p8->apTables[i]->apEntries, uBase, 1,
-                    pFE->pFile->p8->apTables[i]->nCount);
+                           pFE->pFile->p8->apTables[i]->nCount);
     }
 }
 
@@ -111,15 +122,15 @@ void UI_RelocateFile(FrontEnd* pFE) {
 // through startUp.c's handlers (fn_800B1D3C), the menus (3) through FE_RunGameMessage, a round (4
 // to 8) through IG_RunGameMessage; other game types drop it. The group, screen and argument count
 // are not used.
-void UI_RunGameMessage(s32 nCmd, s32 unused1, s32 unused2, s32 unused3, s32 a, s32 b) {
+void UI_RunGameMessage(s32 nCmd, s32 nGroup, s32 nScreen, s32 nParams, s32 nArgsAddr, s32 nResultAddr) {
     // port: the studio passes the addresses of the command's values and answer as 32-bit words
     if (gSession.nGameType == 1) {
-        fn_800B1D3C(nCmd, (MsgArg*)a, (MsgArg*)b);
+        fn_800B1D3C(nCmd, (MsgArg*)nArgsAddr, (MsgArg*)nResultAddr);
     }
     if (gSession.nGameType == 3) {
-        FE_RunGameMessage(nCmd, (MsgArg*)a, (MsgArg*)b);
+        FE_RunGameMessage(nCmd, (MsgArg*)nArgsAddr, (MsgArg*)nResultAddr);
     } else if (gSession.nGameType >= 4 && gSession.nGameType <= 8) {
-        IG_RunGameMessage(nCmd, (MsgArg*)a, (MsgArg*)b);
+        IG_RunGameMessage(nCmd, (MsgArg*)nArgsAddr, (MsgArg*)nResultAddr);
     }
 }
 
@@ -716,18 +727,13 @@ void UI_BlankProcess5(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 void UI_BlankProcess6(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
-int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
-TexEntry* fn_800107E4(TexBank* pBank, int nTex);  // LLTexGrp.c
-
 // Set the current text context's line spacing (UFontContext.fB4): word-wrapped lines are fB4 times
 // the font's height apart (LLFont.c fn_80011D0C); 1 is normal, UI_DrawInterface draws the UI at
 // 0.85.
-void UI_SetTextLineSpacing(f32 x0) {
+void UI_SetTextLineSpacing(f32 fSpacing) {
     UFontContext* pCtx;
     pCtx = FO_spGetCurrentPacket();
-    pCtx->fB4 = x0;
+    pCtx->fB4 = fSpacing;
 }
 
 // The texture in pBank whose name hashes to uHash. A name not in the bank gives index 0x80000000,
@@ -738,5 +744,3 @@ TexEntry* UI_FindTexture(TexBank* pBank, u64 uHash) {
 
     return fn_800107E4(pBank, nTex);
 }
-
-// ---- end of sweep code ----

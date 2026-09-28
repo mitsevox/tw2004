@@ -1890,8 +1890,8 @@ int FE_GetLastCrAPCategory(void) {
 u8 FE_IsGolferRenderAllowed(void) {
     u8 bResult = 0;
 
-    if (gpCrAPState->pB4->bLoaded && gpCrAPState->bHidden == 0 && gpCrAPState->b88 == 0 && gbUICloseRequested == 0
-        && gUIState.bFadeToBlack == 0 && gUIState.b49 == 0) {
+    if (gpCrAPState->pB4->bLoaded && gpCrAPState->bHidden == 0 && gpCrAPState->b88 == 0
+        && gbUICloseRequested == 0 && gUIState.bFadeToBlack == 0 && gUIState.b49 == 0) {
         bResult = 1;
     }
     return bResult;
