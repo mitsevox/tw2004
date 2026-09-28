@@ -44613,5 +44613,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "084e489",
+"sha": "084e489c16d1adff31347e9009519f3d0b18d32b",
+"time": 1790601906,
+"subject": "state: round procedure uses merge_lane.sh / merge_pick.py (pre-compact)",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
