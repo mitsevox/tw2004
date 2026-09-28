@@ -1084,7 +1084,7 @@ void fn_80109BA4(MsgArg* pArgs, MsgArg* pResult) {
 // equipment tiers again (fn_8007873C).
 void fn_80109CBC(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
-    View* pView = ViewController_GetCameraController(fn_80016D10());
+    View* pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
     Gaud_PlayUISound((Misc_RandFunc(0) & 7) + 11);
     fn_8008E244();
     fn_8008E364(0);
@@ -1097,7 +1097,7 @@ void fn_80109CBC(MsgArg* pArgs, MsgArg* pResult) {
 // The CrAP camera to the "Crap Face" shot; then fn_80078E34 dresses the created golfer at random.
 void fn_80109D5C(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
-    View* pView = ViewController_GetCameraController(fn_80016D10());
+    View* pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
     fn_8008E244();
     fn_8008E364(1);
     GolfCamera_SwitchCrAPCamera(pView, "Crap Face", lbl_80281EE0->n4, 0, 0, 0);

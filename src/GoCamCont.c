@@ -13,7 +13,7 @@ u8   fn_800637C4(int nPlayer, int nView);
 void fn_800642A4(View* pView, f32 fF0, f32 fF4);
 void fn_80064478(f32* pA, f32* pB, f32* pOut);
 void Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);      // Quaternion.c: a vector turned by it
-void fn_80016CD8(int nView);                            // ViewController.c: sets the current view
+void ViewController_SetCurrentViewController(int nView);                            // ViewController.c: sets the current view
 void fn_80045824(int n);                                // DepthField.c: turns depth-of-field layer n off
 void Gaud_CameraShake(u8 nPlayer, u8 bLimit);                // GameAudio.c
 f32  fn_8005CC18(f32* pV);                              // Swing.c
@@ -217,8 +217,8 @@ void CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int n
     if (pView->nCurCamera == nCamera) {
         return;
     }
-    nPrevView = fn_80016D10();
-    fn_80016CD8(nView);
+    nPrevView = ViewController_GetCurrentViewControllerID();
+    ViewController_SetCurrentViewController(nView);
     switch (nCamera) {
     case 10:
         fn_800C0880(pView, nPlayer);
@@ -298,7 +298,7 @@ void CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int n
     }
     pView->nCurCamera = nCamera;
     fn_80045824(nPlayer);
-    fn_80016CD8(nPrevView);
+    ViewController_SetCurrentViewController(nPrevView);
 }
 
 // Starts the player's shot of kind nKind on the view and runs its script from the start.
@@ -343,7 +343,7 @@ u8 fn_80063608(int nPlayer, f32* pPos, f32 fMargin) {
     f32 fY;
     f32 fZ;
 
-    if (fn_8006434C(ViewController_GetCamera(gPlayers[nPlayer].nView[0]), pPos, &fX, &fY, &fZ)) {
+    if (fn_8006434C(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]), pPos, &fX, &fY, &fZ)) {
         if (fX < 1.0f - fMargin && fX > fMargin && fY < 1.0f - fMargin && fY > fMargin) {
             return 1;
         }
@@ -358,7 +358,7 @@ u8 fn_800636B4(int nPlayer) {
 
 // The first player for whom fn_800637C4 holds on the current view; -2 if none.
 int fn_800636EC(void) {
-    int nView = fn_80016D10();
+    int nView = ViewController_GetCurrentViewControllerID();
     int i = 0;
 
     while (i < gNumPlayersSetUp) {
@@ -372,7 +372,7 @@ int fn_800636EC(void) {
 
 // The same as fn_800636EC.
 int fn_80063758(void) {
-    int nView = fn_80016D10();
+    int nView = ViewController_GetCurrentViewControllerID();
     int i = 0;
 
     while (i < gNumPlayersSetUp) {
@@ -384,13 +384,13 @@ int fn_80063758(void) {
     return -2;
 }
 
-// View nView is the player's first view and ViewController_GetPlayer gives it to the player, and its shots pass
-// the tests below (camera 4 when it has no shot).
+// View nView is the player's first view and ViewController_GetActivePlayerNumber gives it to the
+// player, and its shots pass the tests below (camera 4 when it has no shot).
 u8 fn_800637C4(int nPlayer, int nView) {
     View* pView;
 
-    if (gPlayers[nPlayer].nView[0] == nView && ViewController_GetPlayer(nView) == nPlayer) {
-        pView = ViewController_GetCameraController(gPlayers[nPlayer].nView[0]);
+    if (gPlayers[nPlayer].nView[0] == nView && ViewController_GetActivePlayerNumber(nView) == nPlayer) {
+        pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
         if (pView->script.pShot != NULL) {
             if ((pView->nCurCamera == 15 || pView->nCurCamera == 16) && fn_800C72DC(pView)) {
                 return 1;
@@ -422,8 +422,8 @@ void fn_800638B8(View* pView, int nPlayer) {
 // toward the object, not too fast, while looking toward it goes back on the fairway. Directions
 // are taken flat.
 void fn_80063920(int nView, f32* pBounds) {
-    View* pView = ViewController_GetCameraController(nView);
-    int nPlayer = ViewController_GetPlayer(nView);
+    View* pView = ViewController_GetCameraControl(nView);
+    int nPlayer = ViewController_GetActivePlayerNumber(nView);
     f32 vObj[4];
     f32 vToObj[4];
     f32 vLook[4];

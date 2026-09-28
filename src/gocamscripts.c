@@ -153,9 +153,9 @@ void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, 
         }
         fFov += GameEffects_FieldOfViewChange();
         if (fn_80044E74(pScript->pShot)) {
-            fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[1])), fFov);
+            fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[1])), fFov);
         } else {
-            fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])), fFov);
+            fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), fFov);
         }
         f88 = pScript->pShot->f88;
         fn_800457B8(nPlayer, f88 + fn_800DC45C(f88));
@@ -302,9 +302,9 @@ void CamScript_RunFEScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript
         }
         fFov += GameEffects_FieldOfViewChange();
         if (fn_80044E74(pScript->pShot)) {
-            fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[1])), fFov);
+            fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[1])), fFov);
         } else {
-            fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])), fFov);
+            fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), fFov);
         }
         pScript->fA8 = pScript->pShot->f9C;
     } else {
@@ -395,7 +395,7 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScr
             fShare = 1.0f;
         }
         StaticCam_GetFlybyInformation(pScript, pScript->pShot->nA4, pCam, pSub, &fFov, nPlayer, fn_800C7A9C(pPath, fShare));
-        fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])), fFov);
+        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), fFov);
         if (pScript->nCamera != 0) {
             fn_8003F2E0(pScript, fTime);
         }
@@ -431,7 +431,7 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScr
         Vec3Copy(pScript->v0, pCam);
         CamScript_GetLookAtPoint(pScript->pShot, nPlayer, pSub, pCam, pScript, vPrev, fTime);
         fFov = pScript->pShot->f78;
-        fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])), fFov);
+        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), fFov);
     } else {
         CamScript_SplineCameras(nPlayer, pCam, pSub, pScript, vPrev, fTime);
     }
@@ -580,7 +580,7 @@ void fn_8003F2E0(CamScript* pScript, f32 fTime) {
     case 1:
         v[3] = pScript->v40[3] * (pScript->f90 / pScript->f94);
         v[3] = v[3] < 0.0f ? 0.0f : (v[3] > pScript->v40[3] ? pScript->v40[3] : v[3]);
-        fn_80038010(1, fn_80016D10(), v);
+        fn_80038010(1, ViewController_GetCurrentViewControllerID(), v);
         break;
     case 2:
         {
@@ -594,20 +594,20 @@ void fn_8003F2E0(CamScript* pScript, f32 fTime) {
             v[3] = f;
         }
         v[3] = v[3] < 0.0f ? 0.0f : (v[3] > pScript->v40[3] ? pScript->v40[3] : v[3]);
-        fn_80038010(1, fn_80016D10(), v);
+        fn_80038010(1, ViewController_GetCurrentViewControllerID(), v);
         break;
     case 3:
         v[3] = pScript->v40[3];
         v[3] = v[3] < 0.0f ? 0.0f : (v[3] > pScript->v40[3] ? pScript->v40[3] : v[3]);
-        fn_80038010(1, fn_80016D10(), v);
+        fn_80038010(1, ViewController_GetCurrentViewControllerID(), v);
         break;
     case 4:
-        fn_800386F0(fn_80016D10(), v);
+        fn_800386F0(ViewController_GetCurrentViewControllerID(), v);
         {
             f32 f = v[3];
             v[3] = f < 0.0f ? 0.0f : (f > pScript->v40[3] ? pScript->v40[3] : f);
         }
-        fn_80038010(1, fn_80016D10(), v);
+        fn_80038010(1, ViewController_GetCurrentViewControllerID(), v);
         break;
     case 5:
         break;
@@ -648,9 +648,9 @@ void fn_8003F518(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
     f += GameEffects_FieldOfViewChange();
     if (fn_80044E74(pScript->pShot)) {
-        fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[1])), f);
+        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[1])), f);
     } else {
-        fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])), f);
+        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), f);
     }
     f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
     f += fn_800DC45C(f);
@@ -711,9 +711,9 @@ void fn_8003F7EC(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
     f += GameEffects_FieldOfViewChange();
     if (fn_80044E74(pScript->pShot)) {
-        fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[1])), f);
+        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[1])), f);
     } else {
-        fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])), f);
+        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), f);
     }
     f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
     f += fn_800DC45C(f);
@@ -762,9 +762,9 @@ void fn_8003FAA0(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
     f += GameEffects_FieldOfViewChange();
     if (fn_80044E74(pScript->pShot)) {
-        fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[1])), f);
+        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[1])), f);
     } else {
-        fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])), f);
+        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), f);
     }
     f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
     f += fn_800DC45C(f);
@@ -841,9 +841,9 @@ void fn_8003FD54(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
     f += GameEffects_FieldOfViewChange();
     if (fn_80044E74(pScript->pShot)) {
-        fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[1])), f);
+        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[1])), f);
     } else {
-        fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])), f);
+        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), f);
     }
     f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
     f += fn_800DC45C(f);
@@ -899,9 +899,9 @@ void CamScript_LerpSwingToBallFlightCameras(int nPlayer, f32* pCam, f32* pSub, C
     f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
     f += GameEffects_FieldOfViewChange();
     if (fn_80044E74(pScript->pShot)) {
-        fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[1])), f);
+        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[1])), f);
     } else {
-        fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])), f);
+        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), f);
     }
     f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
     f += fn_800DC45C(f);
@@ -971,9 +971,9 @@ void CamScript_SplineCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScri
                 pShot->f78, pNext->f78, fT);
     fFov += GameEffects_FieldOfViewChange();
     if (fn_80044E74(pScript->pShot)) {
-        fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[1])), fFov);
+        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[1])), fFov);
     } else {
-        fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])), fFov);
+        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), fFov);
     }
     f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
     f += fn_800DC45C(f);
@@ -1015,9 +1015,9 @@ void CamScript_ArcCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript,
     f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
     f += GameEffects_FieldOfViewChange();
     if (fn_80044E74(pScript->pShot)) {
-        fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[1])), f);
+        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[1])), f);
     } else {
-        fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])), f);
+        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), f);
     }
     f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
     f += fn_800DC45C(f);
@@ -1068,9 +1068,9 @@ void CamScript_CircleCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScri
     f = fShare * (pNext->f78 - pShot->f78) + pShot->f78;
     f += GameEffects_FieldOfViewChange();
     if (fn_80044E74(pScript->pShot)) {
-        fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[1])), f);
+        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[1])), f);
     } else {
-        fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])), f);
+        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), f);
     }
     f = fShare * (pNext->f88 - pShot->f88) + pShot->f88;
     f += fn_800DC45C(f);
@@ -1421,7 +1421,7 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
         Vec3_Sub(vGoal, pCam, vDir);
         fMin = lbl_80281F78->fF0;
         fB = 1.0f / Camera_GetLensFovScale(
-                        Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
+                        Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])));
         fMin *= fB;
         fMin *= -vDir[1];
         vDir[1] = 0.0f;
@@ -1665,10 +1665,16 @@ void CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPl
     pShot->bAA = 1;
     if (bView1) {
         pShot->f78
-                = CA_fGetCameraFieldOfView(Camera_GetLens(fn_80016CFC(gPlayers[nPlayer].nView[1])->pCamera));
+                = CA_fGetCameraFieldOfView(
+                        Camera_GetLens(
+                                ViewController_GetIndexedViewController(
+                                        gPlayers[nPlayer].nView[1])->pCamera));
     } else {
         pShot->f78
-                = CA_fGetCameraFieldOfView(Camera_GetLens(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera));
+                = CA_fGetCameraFieldOfView(
+                        Camera_GetLens(
+                                ViewController_GetIndexedViewController(
+                                        gPlayers[nPlayer].nView[0])->pCamera));
         pShot->f78 -= GameEffects_FieldOfViewChange();
     }
     pShot->f7C = pShot->f78;
@@ -2178,7 +2184,7 @@ u8 CamScript_CheckObstructedCamera(f32* pCam, int nPlayer) {
 
     if (pCourse == NULL) return 0;
     bBlocked = Ter_CheckObjectAndHazardObstruction(pCam, 0.0f, 1, 0, 0.0f, 0, 0.0f);
-    if (!bBlocked && !fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut) {
+    if (!bBlocked && !ViewController_GetIndexedViewController(gPlayers[nPlayer].nView[0])->bFlagOut) {
         Vec3_Sub(pCam, &pCourse->pin[nPin].x, vDiff);
         vDiff[1] = 0.0f;
         fDist = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
@@ -2383,7 +2389,7 @@ void CamScript_CheckFlagCollision(CamScript* pScript, f32* pCam, f32* pSub, int 
 
     if (pCourse == NULL) return;
     if (pScript->bCF) return;
-    if (fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut) return;
+    if (ViewController_GetIndexedViewController(gPlayers[nPlayer].nView[0])->bFlagOut) return;
     Vec3_Sub(pCam, &pCourse->pin[nPin].x, vDiff);
     vDiff[1] = 0.0f;
     fDist = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
@@ -2430,7 +2436,7 @@ void CamScript_PutBackOnFairway(CamScript* pScript, f32* pCam, f32* pSub, int nP
     CameraScript_InterpToNewScript(pScript, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 25, 0.0f);
     CamScript_GetLookAtPoint(pScript->pShot, nPlayer, pSub, pCam, pScript, pPrev, 0.0f);
     fFov = pScript->pShot->f78 + GameEffects_FieldOfViewChange();
-    fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])), fFov);
+    fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), fFov);
     pScript->bCF = 1;
     pScript->fCamTime = 0.001f;
 }

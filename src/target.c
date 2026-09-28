@@ -145,14 +145,14 @@ void TARGET_RenderBallTarget(int nPlayer) {
     int   i;
     u8    bOnScreen;
 
-    pCamera = ViewController_GetCamera(gPlayers[nPlayer].nView[0]);
+    pCamera = ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]);
     aMarkerQuad[0][0] = 2.0f * lbl_801D5BF0[nPlayer].f24;
     aMarkerQuad[0][1] = 2.0f * lbl_801D5BF0[nPlayer].f24
-            / ViewController_GetCameraController(gPlayers[nPlayer].nView[0])->f54;
+            / ViewController_GetCameraControl(gPlayers[nPlayer].nView[0])->f54;
     aMarkerQuad[0][2] = -lbl_801D5BF0[nPlayer].f24;
     aMarkerQuad[1][0] = 2.0f * lbl_801D5BF0[nPlayer].f24;
     aMarkerQuad[1][1] = 2.0f * lbl_801D5BF0[nPlayer].f24
-            / ViewController_GetCameraController(gPlayers[nPlayer].nView[0])->f54;
+            / ViewController_GetCameraControl(gPlayers[nPlayer].nView[0])->f54;
     aMarkerQuad[1][2] = lbl_801D5BF0[nPlayer].f24;
     aMarkerQuad[2][0] = 0.0f;
     aMarkerQuad[2][1] = 0.0f;
@@ -182,7 +182,7 @@ void TARGET_RenderBallTarget(int nPlayer) {
         aShadowQuad[3][1] -= 1.0f / 9.0f;
     }
 
-    pView = ViewController_GetCameraController(gPlayers[nPlayer].nView[0]);
+    pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
     pCamPos = CameraController_GetPosition(pView);
     pLook = CameraController_GetTarget(pView);
     fCamDist = Vec_Distance(pCamPos, vPos);
@@ -406,7 +406,8 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
     bInRange = 0;
     bMoved = 0;
     Vec3Copy(gPlayers[nPlayer].vTarget, vSaved);
-    fZoom = Camera_GetLensFovScale(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
+    fZoom = Camera_GetLensFovScale(
+            Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])));
 
     // the turn eases off towards 0
     if (gPlayers[nPlayer].fA5C < 0.0f) {
@@ -426,7 +427,7 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
         if (gPlayers[nPlayer].nShotKind == 0) {
             fTurn = PI / 360.0f * gPlayers[nPlayer].fA5C;
         }
-        fn_8006A964(ViewController_GetCameraController(gPlayers[nPlayer].nView[0])->v0,
+        fn_8006A964(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0])->v0,
                     gPlayers[nPlayer].vBall, vToCamera);
         vToCamera[1] = 0.0f;
         fCameraDist = 0.05f * (f32)Math_Sqrt(Vec3_LengthSqClamped(vToCamera));
@@ -938,7 +939,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     u8    bBall;
 
     bBall = 0;
-    pCamera = ViewController_GetCamera(gPlayers[nPlayer].nView[0]);
+    pCamera = ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]);
     aMarkerQuad[0][0] = 0.0f;
     aMarkerQuad[0][1] = lbl_801D5BF0[nPlayer].f24;
     aMarkerQuad[0][2] = -lbl_801D5BF0[nPlayer].f24;
@@ -986,7 +987,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     bInBounds = Ter_PointInOOBNetwork(vPos);
 
     // the marker faces the camera: turned about y by the camera's heading
-    pView = ViewController_GetCameraController(gPlayers[nPlayer].nView[0]);
+    pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
     pCamPos = CameraController_GetPosition(pView);
     pLook = CameraController_GetTarget(pView);
     Vec_Distance(pCamPos, vPos);

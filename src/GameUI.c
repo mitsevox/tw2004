@@ -656,8 +656,8 @@ void GUI_EndOfGameScorecard(u8 bHuman) {
         GameEffects_ResetGameEffectSettings();
         if ((Game_GetMode() == 26 || Game_GetMode() == 22) && gSession.nSplitScreen) {
             f32 v[4] = {0.0f, 0.0f, 0.0f, 1.0f};
-            CameraController_FadeIn(ViewController_GetCameraController(gPlayers[0].nView[0]), 0.0f, v);
-            CameraController_FadeIn(ViewController_GetCameraController(gPlayers[1].nView[0]), 0.0f, v);
+            CameraController_FadeIn(ViewController_GetCameraControl(gPlayers[0].nView[0]), 0.0f, v);
+            CameraController_FadeIn(ViewController_GetCameraControl(gPlayers[1].nView[0]), 0.0f, v);
         }
         if (bHuman) {
             GameMsg_Send2Ints(0xE, 2, 1);

@@ -184,10 +184,10 @@ void fn_800F3EBC(int nPlayer) {
                     gPlayers[nPlayer].nDD8 = 0;
                 }
                 if (!gSession.bReplay) {
-                    fn_8006434C(ViewController_GetCamera(gPlayers[nPlayer].nView[0]),
+                    fn_8006434C(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]),
                                 gPlayers[nPlayer].ball.vPrev, &x, &y,
                                 0);
-                    fn_8006A8D4(ViewController_GetCamera(gPlayers[nPlayer].nView[0]), &x, &y);
+                    fn_8006A8D4(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]), &x, &y);
                     GameMsg_Send5Ints(0x33, lbl_80282380, 512.0f * x, 448.0f * y, nSurface, 1);
                 }
             }

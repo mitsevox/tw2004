@@ -386,7 +386,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
     fTarget = fShare * lbl_80281E18->afPathLength[nPath];
     StaticCam_SetupFlybyCameraPointers(pShot, &pPrev, &pNext, &pAfter);
     Vec_Copy(pCam, vLast);
-    *pFov = CA_fGetCameraFieldOfView(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
+    *pFov = CA_fGetCameraFieldOfView(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])));
     if (0.0f == fTarget) {
         fn_800C7480(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20, pPrev->v30, pShot->v30, pNext->v30,
                     pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);

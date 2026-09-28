@@ -605,13 +605,13 @@ void fn_800A3A84(void) {
 
     pEmitter = lbl_80281408->ap74[0];
     if (pEmitter != NULL && (pEmitter->params.u58 & 0x20000)) {
-        Vec_Copy(gPlayers[ViewController_GetPlayer(0)].ball.vPos, pEmitter->params.v80);
-        Vec_Copy(gPlayers[ViewController_GetPlayer(0)].ball.vPos, lbl_80281408->ap74[0]->mtx[3]);
+        Vec_Copy(gPlayers[ViewController_GetActivePlayerNumber(0)].ball.vPos, pEmitter->params.v80);
+        Vec_Copy(gPlayers[ViewController_GetActivePlayerNumber(0)].ball.vPos, lbl_80281408->ap74[0]->mtx[3]);
     }
     pEmitter = lbl_80281408->ap74[1];
     if (pEmitter != NULL && (pEmitter->params.u58 & 0x20000)) {
-        Vec_Copy(gPlayers[ViewController_GetPlayer(1)].ball.vPos, pEmitter->params.v80);
-        Vec_Copy(gPlayers[ViewController_GetPlayer(1)].ball.vPos, lbl_80281408->ap74[1]->mtx[3]);
+        Vec_Copy(gPlayers[ViewController_GetActivePlayerNumber(1)].ball.vPos, pEmitter->params.v80);
+        Vec_Copy(gPlayers[ViewController_GetActivePlayerNumber(1)].ball.vPos, lbl_80281408->ap74[1]->mtx[3]);
     }
     RenderState_SetDrawFlags(0x70);
     RC_UpdateCurrentScreenMatrices();

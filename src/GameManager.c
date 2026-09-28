@@ -153,8 +153,8 @@ int GM_GotoNextSelectedHole(void) {
 // per-hole state, and a set of per-player flags cleared.
 void GM_InitForHole(void) {
     int i;
-    fn_800170C4(2, 0);
-    fn_800170C4(3, 0);
+    ViewController_TurnOnViewController(2, 0);
+    ViewController_TurnOnViewController(3, 0);
     GM_InitBallsToTee();
     Wind_Generate();
     gpGame->pfn1E4();
@@ -260,7 +260,7 @@ void GM_EndOfGolferTurn_GameFinished(int nPlayer) {
         }
         GOLFERSTATE_Set(GS_WAIT, nPlayer);
         nView = gPlayers[nPlayer].nView[0];
-        CameraController_SetCameraMode(ViewController_GetCameraController(nView), 0x11, nPlayer, nView);
+        CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 0x11, nPlayer, nView);
         return;
     }
     gSession.b12 = 1;
@@ -279,7 +279,7 @@ void GM_HoleFinished_GameNotFinished(int nPlayer) {
     }
     GOLFERSTATE_Set(GS_WAIT, nPlayer);
     nView = gPlayers[nPlayer].nView[0];
-    CameraController_SetCameraMode(ViewController_GetCameraController(nView), 0x11, nPlayer, nView);
+    CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 0x11, nPlayer, nView);
     GUI_HideAllToggleUI();
 }
 
@@ -377,10 +377,10 @@ u8 GM_CheckForBallOOB(int nPlayer) {
             } else {
                 GUI_StartPostShotUI(2, nPlayer, 0.0f);
             }
-            fn_80063CF0(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]), 6, nPlayer);
+            fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 6, nPlayer);
             return 1;
         }
-        fn_80063CF0(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]), 6, nPlayer);
+        fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 6, nPlayer);
         return 0;
     }
     gPlayers[nPlayer].nLevel = 0;
@@ -553,17 +553,17 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     if (gSession.bReplay) {
         REPLAY_Stop();
     }
-    fn_800C70F8(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]), 1);
+    fn_800C70F8(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 1);
     fn_800957D8(gPlayers[nPlayer].pChar);
     fn_800957FC(gPlayers[nPlayer].pChar, 1);
     GOLFERSTATE_Switch(GS_SWING, nPlayer);
     GUI_ToggleUI(nPlayer, 1);
-    fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut = 1;
+    ViewController_GetIndexedViewController(gPlayers[nPlayer].nView[0])->bFlagOut = 1;
     for (i = 0; i < gSession.nNumPlayers; i++) {
         if (gPlayers[i].bPlayerCut == 0 && gPlayers[i].nView[0] == gPlayers[nPlayer].nView[0] &&
             gPlayers[i].ball.nLie != 10 && gPlayers[i].ball.nLie != LIE_GREEN_e &&
             gPlayers[i].ball.nLie != LIE_INCUP_e) {
-            fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut = 0;
+            ViewController_GetIndexedViewController(gPlayers[nPlayer].nView[0])->bFlagOut = 0;
         }
     }
     return 1;
@@ -733,7 +733,7 @@ u8 GM_ShowPostShotCrowdFlyby(void) {
 void GM_FlyByMode_Init(void) {
     int n = gpGame->pfnGetHonors(5);
     GOLFERSTATE_Push(GS_INITIAL_FLY_BY, n);
-    fn_8001704C(gPlayers[n].nView[0], n);
+    ViewController_SetActivePlayerNumber(gPlayers[n].nView[0], n);
 }
 
 // TW06: GM_Update.
@@ -928,7 +928,8 @@ void GM_CheckForShotChanges(int nPlayer) {
                 GUI_ToggleUI(nPlayer, 1);
             }
         } else if (!gpGame->b28D && fn_800E012C(nPlayer)) {
-            GolfCamera_vSwitchToNextAlternateSwingCamera(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]), nPlayer);
+            GolfCamera_vSwitchToNextAlternateSwingCamera(
+                    ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), nPlayer);
         } else if (fn_800DFF0C(nPlayer)) {
             if (gSession.options.bSkipCameras) return;
             if (fn_8008AC40()) return;
@@ -963,7 +964,7 @@ void GM_CheckForShotChanges(int nPlayer) {
 // (button 25), watch the replay (button 24, if one was recorded, the mode allows it and the hole
 // was not conceded) or continue (button 0); a CPU continues on any pad's button 0.
 void GM_DoPostShotInHoleUI(int nPlayer) {
-    View* pView = ViewController_GetCameraController(gPlayers[nPlayer].nView[0]);
+    View* pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
     f32   vOffset[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     if ((gPlayers[nPlayer].uFlags & 8) && fn_80063C7C(pView)) {
         GM_EndOfGolferTurn(nPlayer);
@@ -1095,7 +1096,7 @@ void GM_SimulateBallMovement(int nPlayer) {
     t0 = TI_sReadCounter(0);
     nUpdates = GameEffects_BallUpdatesThisFrame(nPlayer);
     if (gpGame->n294 != 0
-        && fn_800C71A4(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]), nPlayer)) {
+        && fn_800C71A4(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), nPlayer)) {
         nUpdates = 0;
     }
     for (i = 0; i < nUpdates; i++) {
@@ -1172,7 +1173,7 @@ void GM_SimulateBallMovement(int nPlayer) {
 // 0's view is not in colour fade state 1, 2 or 4, calls fn_800E5228 (an empty function).
 void fn_800DFC18(void) {
     if (gpGame->pfn234()) {
-        if (!fn_80063C90(ViewController_GetCameraController(gPlayers[0].nView[0]))) {
+        if (!fn_80063C90(ViewController_GetCameraControl(gPlayers[0].nView[0]))) {
             fn_800E5228();
         }
     }

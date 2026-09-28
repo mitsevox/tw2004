@@ -87,7 +87,7 @@ void fn_8009A3F4(s32 nView) {
     int nHeight;
 
     pView = &lbl_802813B8->aView[nView];
-    pCamera = ViewController_GetCamera(nView);
+    pCamera = ViewController_GetRenderContext(nView);
 
     // The sun on the screen, kept within +-500000.
     v[0] = pView->f98;

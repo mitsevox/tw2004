@@ -2017,7 +2017,8 @@ void fn_8001B878(Character* pChar, int nPlayer) {
     f32 vDir[4];
 
     pMtx = fn_8001EE64(pChar);
-    if (nPlayer != 1000 && nPlayer != ViewController_GetPlayer(fn_80016D10())) {
+    if (nPlayer != 1000 && nPlayer
+        != ViewController_GetActivePlayerNumber(ViewController_GetCurrentViewControllerID())) {
         pChar->n1654 = pChar->n1658 = 2;
         return;
     }
@@ -2070,7 +2071,7 @@ void fn_8001BA74(void) {
         nPlayer = fn_800636EC();
         lbl_801B9624[i]->u10 &= ~0x1000;
         if (lbl_801B9624[i]->u10 & 2) {
-            if (fn_80016CF4()->bFlagOut) {
+            if (ViewController_GetCurrentViewController()->bFlagOut) {
                 lbl_801B9624[i]->u10 |= 1;
             } else {
                 lbl_801B9624[i]->u10 &= ~1;

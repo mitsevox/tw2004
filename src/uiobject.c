@@ -173,7 +173,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
     int i;
     int j;
 
-    nPlayer = ViewController_GetPlayer(nObj);
+    nPlayer = ViewController_GetActivePlayerNumber(nObj);
     // the object rises with the GameBreaker letterbox
     if (lbl_80202898.bGameBreaker == 0) {
         fY = -0.23f;

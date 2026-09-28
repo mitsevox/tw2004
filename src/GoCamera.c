@@ -7,7 +7,7 @@
 void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: copy a 4x4 matrix
 void Mtx_InvertRigid(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: inverts a rotation+translation
 void Mtx_Identity(f32 (*pMtx)[4]);                     // identity
-void fn_8001728C(CamLens* pLens);
+void CA_vSetDefaultScalingVectors(CamLens* pLens);
 f32  Math_Tan(f32 x);                              // tan, as a float
 void fn_800354B4(u8* p, f32 v);                       // GoTerrain.c: sets the lens's far clip, fAC
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
@@ -47,7 +47,7 @@ static void GoCamera_StrippedFn(CamLens* pLens) {
 void CA_vSetLookAt(CamLens* pLens, f32* pPos, f32* pTarget) {
     f32 vDir[4];
 
-    fn_8001728C(pLens);
+    CA_vSetDefaultScalingVectors(pLens);
     pLens->m4[3][0] = pPos[0];
     pLens->m4[3][1] = pPos[1];
     pLens->m4[3][2] = pPos[2];
@@ -72,7 +72,7 @@ void CA_vSetLookAt(CamLens* pLens, f32* pPos, f32* pTarget) {
 void CA_vSetLookAtSide(CamLens* pLens, f32* pPos, f32* pTarget, f32* pSide) {
     f32 vDir[4];
 
-    fn_8001728C(pLens);
+    CA_vSetDefaultScalingVectors(pLens);
     pLens->m4[3][0] = pPos[0];
     pLens->m4[3][1] = pPos[1];
     pLens->m4[3][2] = pPos[2];
@@ -181,7 +181,7 @@ void CA_vSetMatrix(CamLens* pLens, f32 (*pMtx)[4]) {
         Mtx_Copy(pMtx, pLens->m4);
         Mtx_InvertRigid(pMtx, pLens->m44);
     }
-    fn_8001728C(pLens);
+    CA_vSetDefaultScalingVectors(pLens);
 }
 
 void fn_800769C0(CamLens* pLens, f32 fA8, f32 fAC) {

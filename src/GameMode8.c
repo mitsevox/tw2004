@@ -474,16 +474,16 @@ void fn_800FA608(int nPlayer) {
     GM_MovePlayerToBall(nPlayer);
     Shot_Plan(nPlayer, 1);
     for (i = 0; i < 2; i++) {
-        fn_8001704C(gPlayers[nPlayer].nView[i], nPlayer);
+        ViewController_SetActivePlayerNumber(gPlayers[nPlayer].nView[i], nPlayer);
     }
     fn_8001D8DC(nPlayer);
     Character_AlignShotWithTarget(nPlayer, 1, 1);
     fn_800957D8(gPlayers[nPlayer].pChar);
     fn_80095744(gPlayers[nPlayer].pChar, 5);
     Emotion_UpdatePlayerEmotion(nPlayer);
-    fn_80062F1C(ViewController_GetCameraController(gPlayers[nPlayer].nView[0]));
+    fn_80062F1C(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]));
     i = gPlayers[nPlayer].nView[0];
-    CameraController_SetCameraMode(ViewController_GetCameraController(i), 12, nPlayer, i);
+    CameraController_SetCameraMode(ViewController_GetCameraControl(i), 12, nPlayer, i);
     gPlayers[nPlayer].nC54 = 74;
     gPlayers[nPlayer].nC3C |= 2;
     fn_800FE02C();
@@ -1169,7 +1169,7 @@ void fn_800FBD2C(int nPlayer) {
         PlaceBall_Set(nPlayer, vStart);
         PlaceBall_SetupTarget(nPlayer);
         n = gPlayers[nPlayer].nView[0];
-        CameraController_SetCameraMode(ViewController_GetCameraController(n), 9, nPlayer, n);
+        CameraController_SetCameraMode(ViewController_GetCameraControl(n), 9, nPlayer, n);
         gPlayers[nPlayer].nC3C |= 1;
         fn_80062C80(gPlayers[nPlayer].nC58, 0);
         gPlayers[nPlayer].fCB4 = lbl_802816B8;
@@ -1230,7 +1230,10 @@ void fn_800FBD2C(int nPlayer) {
         fToPlace = Math_Sqrt(vDir[0] * vDir[0] + vDir[2] * vDir[2]);
         // the distance to the view's camera lens position, if that is nearer; the second square
         // root is written twice, as a MIN() macro would expand
-        fn_800FE190(pBall->vPos, Camera_GetLens(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera)->m4[3],
+        fn_800FE190(pBall->vPos,
+                    Camera_GetLens(
+                            ViewController_GetIndexedViewController(
+                                    gPlayers[nPlayer].nView[0])->pCamera)->m4[3],
                     vDir);
         fDist = (fToPlace <= (f32)Math_Sqrt(vDir[0] * vDir[0] + vDir[2] * vDir[2]))
 
@@ -1273,7 +1276,7 @@ void fn_800FBD2C(int nPlayer) {
 // States 12 and 24, exit: camera 25.
 void fn_800FCBDC(int nPlayer) {
     int nView = gPlayers[nPlayer].nView[0];
-    CameraController_SetCameraMode(ViewController_GetCameraController(nView), 25, nPlayer, nView);
+    CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 25, nPlayer, nView);
 }
 
 // 1 when the player's pad has buttons 0x1000, 0x400 and 0x800 (Start, X and Y on a GameCube pad)
@@ -1723,7 +1726,7 @@ u8 fn_800FDF60(void) {
         if (gPlayers[0].nC54 < 71) {
             return 1;
         }
-    } else if (!fn_80063C90(ViewController_GetCameraController(gPlayers[0].nView[0]))) {
+    } else if (!fn_80063C90(ViewController_GetCameraControl(gPlayers[0].nView[0]))) {
         return 1;
     }
     return 0;

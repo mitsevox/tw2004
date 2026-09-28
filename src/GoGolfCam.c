@@ -309,14 +309,14 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
             fAmount = 0.0f;
         }
         if (gSession.nPaused == 0) {
-            fn_80038054(1, fn_80016D10(), 0.0f, fAmount);
+            fn_80038054(1, ViewController_GetCurrentViewControllerID(), 0.0f, fAmount);
         }
         pView->script.f108 = 1.0f - fDist / fTotal;
     } else if (pView->script.f108 >= 0.0f) {
         EVENT_Trigger(nPlayer, 0x31, NULL, -1);
         pView->script.f108 = 1.0f;
     } else if (gSession.nPaused == 0) {
-        fn_80038054(1, fn_80016D10(), 0.0f, lbl_80281F78->f20);
+        fn_80038054(1, ViewController_GetCurrentViewControllerID(), 0.0f, lbl_80281F78->f20);
     }
     if (pCourse != NULL) {
         Ter_GetEnclosingGroundHeight(pCourse, vTarget, &fLow, &fHigh);
@@ -370,7 +370,7 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
         fFlatDist = 1.0f + lbl_80281F78->f4;
         fFlatDist *= 1.0f
                 / Camera_GetLensFovScale(
-                    Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
+                    Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])));
     } else {
         fFlatDist = 10000.0f;
     }
@@ -473,7 +473,8 @@ void GolfCamera_InitGreenZoomToAimCamera(View* pView, int nPlayer) {
             fn_800C73B8(pCam, vDir, pSub);
         }
         EVENT_Trigger(nPlayer, 0x30, NULL, -1);
-        Vec3Copy(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0]))->m4[0], pView->v20);
+        Vec3Copy(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]))->m4[0],
+                 pView->v20);
     }
 }
 
@@ -531,7 +532,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
             fTotal = f;
         }
         fHeight = lbl_80281F78->f44;
-        pLens = Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0]));
+        pLens = Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]));
         fHeight *= 1.0f / Camera_GetLensFovScale(pLens);
         // high enough to see the pin (up to 20 from the target) through the lens
         nPinSet = Game_CurrentPinSet();
@@ -605,7 +606,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
                 fSlow = 0.0f;
             }
             if (gSession.nPaused == 0) {
-                fn_80038054(1, fn_80016D10(), 0.0f, fSlow);
+                fn_80038054(1, ViewController_GetCurrentViewControllerID(), 0.0f, fSlow);
             }
             if (bArrived) {
                 EVENT_Trigger(nPlayer, 0x31, NULL, -1);
@@ -692,7 +693,7 @@ void fn_800BF094(View* pView, int nPlayer) {
 void fn_800BF110(View* pView, int nPlayer) {
     CameraController_GetPosition(pView);
     CameraController_GetTarget(pView);
-    fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])), DEG(60.0f));
+    fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), DEG(60.0f));
     pView->script.n110 = 0;
     pView->p74 = NULL;
     pView->script.pShot = NULL;
@@ -837,7 +838,7 @@ void GolfCamera_ProcessPlaceBallCamera(View* pView, int nPlayer) {
 void fn_800BF5E4(View* pView, int nPlayer) {
     CameraController_GetPosition(pView);
     CameraController_GetTarget(pView);
-    fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])), DEG(60.0f));
+    fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), DEG(60.0f));
     pView->script.n110 = 0;
     pView->script.pShot = NULL;
     pView->p74 = NULL;
@@ -1029,7 +1030,7 @@ void fn_800BFC80(View* pView, int nPlayer) {
         pView->shot19C.f68 = gPlayers[nPlayer].ball.vPos[1];
         pView->script.pShot = NULL;
         pView->script.pNextShot = NULL;
-        fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])), DEG(30.0f));
+        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), DEG(30.0f));
     }
 }
 
@@ -1152,7 +1153,7 @@ void fn_800C0364(View* pView, int nPlayer) {
         Vec3Copy(&pCourse->pin[nPinSet].x, pSub);
         pView->script.pShot = NULL;
         pView->script.pNextShot = NULL;
-        fn_80045470(Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])), DEG(30.0f));
+        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), DEG(30.0f));
         pView->script.fCamTime = 0.0f;
     }
 }
@@ -1634,7 +1635,7 @@ void GolfCamera_ProcessReplaySwingCamera(View* pView, int nPlayer) {
     Vec_Copy(lbl_80281F78->v68, v);
     if (!GolfCamera_IsSlowMoSwingCamActive() && pView->script.fCamTime < lbl_80281F78->f78) {
         v[3] *= 1.0f - pView->script.fCamTime / lbl_80281F78->f78;
-        fn_80038010(1, fn_80016D10(), v);
+        fn_80038010(1, ViewController_GetCurrentViewControllerID(), v);
     }
     pShot = pView->script.pShot;
     nNextKind = pView->script.nBC;
@@ -1671,7 +1672,7 @@ void fn_800C16C4(View* pView, int nPlayer) {
     nView = gPlayers[nPlayer].nView[0];
     if (fn_800B36F4(pView, nPlayer, gSession.fFrameTime)) {
         fn_800C1790(pView, nPlayer);
-        CameraController_SetCameraMode(ViewController_GetCameraController(nView), 14, nPlayer, nView);
+        CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 14, nPlayer, nView);
         GolfCamera_ProcessBallFlightCamera(pView, nPlayer);
     } else {
         CamScript_RunScript(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
@@ -1682,7 +1683,8 @@ void fn_800C16C4(View* pView, int nPlayer) {
 void fn_800C1790(View* pView, int nPlayer) {
     int nView = gPlayers[nPlayer].nView[0];
     if (lbl_80282220->b56) {
-        fn_800171D8(RC_spGetRenderCtxViewport(ViewController_GetCamera(nView)), 0.0f, 0.0f, 1.0f, 1.0f);
+        VM_vSetViewportRect(RC_spGetRenderCtxViewport(ViewController_GetRenderContext(nView)), 0.0f, 0.0f,
+                            1.0f, 1.0f);
         RC_UpdateCurrentScreenMatrices();
         RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
         RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
@@ -1984,7 +1986,7 @@ void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
     nB = 0x19;
     pShot = NULL;
     f3 = 0.0f;
-    RC_spGetRenderCtxViewport(ViewController_GetCamera(gPlayers[nPlayer].nView[0]));
+    RC_spGetRenderCtxViewport(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]));
     Vec3Copy(pCam, vOld);
     fn_800638B8(pView, nPlayer);
     if (fn_800C6D28()) {
@@ -2120,7 +2122,7 @@ void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
     }
     CamScript_RunScript(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, fTime);
     if (fn_800C6D28() && gSession.nPaused == 0) {
-        fn_80038054(1, fn_80016D10(), 0.0f, lbl_80281F78->f64);
+        fn_80038054(1, ViewController_GetCurrentViewControllerID(), 0.0f, lbl_80281F78->f64);
     }
 }
 
@@ -2326,7 +2328,7 @@ void GolfCamera_InitTutorialWaitCamera(View* pView, int nPlayer) {
     if (fn_80063C7C(pView)) {
         CameraController_FadeIn(pView, lbl_80281F78->f170, v);
     }
-    fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut = 0;
+    ViewController_GetIndexedViewController(gPlayers[nPlayer].nView[0])->bFlagOut = 0;
     strcpy(lbl_80282220->shot6C.szName, szName);
     lbl_80282220->shot6C.p40 = &lbl_80282220->shot6C;
     lbl_80282220->shot6C.f60 = 15.0f;
@@ -2613,7 +2615,7 @@ u8 fn_800C3FC0(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam) {
         fBack = lbl_80281F78->f38;
     }
     fBack *= 1.0f / Camera_GetLensFovScale(
-                        Camera_GetLens(ViewController_GetCamera(gPlayers[nPlayer].nView[0])));
+                        Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])));
     if (fBack + lbl_80281F78->fC > fDist && gPlayers[nPlayer].nShotKind != 0) {
         if (fBack > fDist) {
             fBack = lbl_80281F78->f10 * fDist;
@@ -3027,7 +3029,9 @@ void fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
     lbl_80282220->shot6C.f6C = 20.0f;
     fChange = GameEffects_FieldOfViewChange();
     lbl_80282220->shot6C.f78 =
-        CA_fGetCameraFieldOfView(Camera_GetLens(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera)) - fChange;
+        CA_fGetCameraFieldOfView(
+                Camera_GetLens(ViewController_GetIndexedViewController(gPlayers[nPlayer].nView[0])->pCamera))
+                        - fChange;
     lbl_80282220->shot6C.f7C = lbl_80282220->shot6C.f78;
     lbl_80282220->shot6C.f80 = 0.0f;
     lbl_80282220->shot6C.f4C = 1.0f;
@@ -3137,7 +3141,7 @@ f32 fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer) {
     f32 fTime = 0.0f;
     CamShot* pShot;
     if (gSession.nPaused == 0) {
-        fn_80038054(1, fn_80016D10(), 0.0f, lbl_80281F78->f64);
+        fn_80038054(1, ViewController_GetCurrentViewControllerID(), 0.0f, lbl_80281F78->f64);
     }
     if (pView->script.pNextShot == NULL) {
         lbl_80282220->b54 = 0;
@@ -3231,7 +3235,9 @@ void fn_800C56B4(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
     lbl_80282220->shot12C.f6C = 20.0f;
     fChange = GameEffects_FieldOfViewChange();
     lbl_80281F78->f80
-            = CA_fGetCameraFieldOfView(Camera_GetLens(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera))
+            = CA_fGetCameraFieldOfView(
+                    Camera_GetLens(
+                            ViewController_GetIndexedViewController(gPlayers[nPlayer].nView[0])->pCamera))
             - fChange;
     lbl_80282220->shot12C.f78 = lbl_80281F78->f80;
     lbl_80282220->shot12C.f7C = lbl_80282220->shot12C.f78;
@@ -3247,7 +3253,7 @@ void fn_800C56B4(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
     lbl_80282220->shot12C.bAD = 3;
     lbl_80282220->shot12C.p44 = pView->script.pShot;
     pTune = lbl_80281F78;
-    fn_80038054(1, fn_80016D10(), pTune->f8C, pTune->f88);
+    fn_80038054(1, ViewController_GetCurrentViewControllerID(), pTune->f8C, pTune->f88);
     pView->script.pShot = &lbl_80282220->shot6C;
     pView->script.pNextShot = &lbl_80282220->shot12C;
     pView->script.f8C = lbl_80281F78->f84;
@@ -3275,7 +3281,7 @@ f32 fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer) {
     f32 f;
     if (gSession.nPaused == 0) {
         pTune = lbl_80281F78;
-        fn_80038054(1, fn_80016D10(), pTune->f8C, pTune->f88);
+        fn_80038054(1, ViewController_GetCurrentViewControllerID(), pTune->f8C, pTune->f88);
     }
     if (pView->script.pNextShot == NULL && pView->script.fCamTime > 0.05f) {
         lbl_80282220->b58 = 0;

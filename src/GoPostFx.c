@@ -226,7 +226,7 @@ void fn_80038314(void) {
     int i;
 
     for (i = 0; i < 4; i++) {
-        if (lbl_801D5020[i].b0 && fn_800170A0(i)) {
+        if (lbl_801D5020[i].b0 && ViewController_IsActive(i)) {
             fn_80038A90(lbl_801D5020[i].aColour, lbl_801D5020[i].fX, lbl_801D5020[i].fY,
                         lbl_801D5020[i].b1, i, lbl_80281B88 & 1);
             lbl_801D5020[i].b0 = 0;
@@ -239,7 +239,7 @@ void fn_800383A8(void) {
     int i;
 
     for (i = 0; i < 4; i++) {
-        if (lbl_801D5090[i].b0 && fn_800170A0(i)) {
+        if (lbl_801D5090[i].b0 && ViewController_IsActive(i)) {
             fn_80038724(lbl_80281B88 & 1, i, lbl_801D5090[i].f8, lbl_801D5090[i].f4);
             lbl_801D5090[i].b0 = 0;
         }
@@ -272,9 +272,9 @@ void fn_80038438(void) {
     fW = pRect[2];
     fH = pRect[3];
     for (i = 0; i < 4; i++) {
-        if (lbl_801D50C0[i].b0 && fn_800170A0(i)) {
-            pViewRect = RC_spGetRenderCtxViewport(ViewController_GetCamera(i));
-            fn_800171D8(pRect, pViewRect[0], pViewRect[1], pViewRect[2], pViewRect[3]);
+        if (lbl_801D50C0[i].b0 && ViewController_IsActive(i)) {
+            pViewRect = RC_spGetRenderCtxViewport(ViewController_GetRenderContext(i));
+            VM_vSetViewportRect(pRect, pViewRect[0], pViewRect[1], pViewRect[2], pViewRect[3]);
             RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
             RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
             RenderState_SetViewport(RC_spGetCurrentRenderCtx());
@@ -286,7 +286,7 @@ void fn_80038438(void) {
             lbl_801D50C0[i].b0 = 0;
         }
     }
-    fn_800171D8(pRect, fX, fY, fW, fH);
+    VM_vSetViewportRect(pRect, fX, fY, fW, fH);
     RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
     RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
     RenderState_SetViewport(RC_spGetCurrentRenderCtx());
@@ -338,7 +338,7 @@ void fn_80038724(int nField, int nView, f32 fAlpha, f32 fShake) {
     f32 fDX;
     f32 fDY;
 
-    pRect = ((RenderCamera*)ViewController_GetCamera(nView))->pRect;
+    pRect = ((RenderCamera*)ViewController_GetRenderContext(nView))->pRect;
     fX = pRect[0];
     fY = pRect[1];
     fRight = pRect[0] + pRect[2];
@@ -396,7 +396,7 @@ void fn_800389C0(void) {
 
     for (i = 0; i < 4; i++) {
         if (lbl_801D5090[i].b0) {
-            fn_80038A6C(lbl_80281B88 & 1, ViewController_GetCamera(i));
+            fn_80038A6C(lbl_80281B88 & 1, ViewController_GetRenderContext(i));
         }
     }
 }
@@ -430,7 +430,7 @@ void fn_80038A90(f32* pColour, f32 fCX, f32 fCY, u8 bCopy, int nView, int nField
     f32 fDYSq;
     f32 fAlpha;
 
-    pCamera = ViewController_GetCamera(nView);
+    pCamera = ViewController_GetRenderContext(nView);
     pRect = pCamera->pRect;
     if (bCopy) {
         fn_800390CC(nField, pCamera);

@@ -879,8 +879,8 @@ void fn_80086738(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = 1;
         return;
     }
-    bView6E44 = fn_800C6E44(ViewController_GetCameraController(gPlayers[pArgs[0].i].nView[0]));
-    bView708C = fn_800C708C(ViewController_GetCameraController(gPlayers[pArgs[0].i].nView[0]));
+    bView6E44 = fn_800C6E44(ViewController_GetCameraControl(gPlayers[pArgs[0].i].nView[0]));
+    bView708C = fn_800C708C(ViewController_GetCameraControl(gPlayers[pArgs[0].i].nView[0]));
     bCharFlag = fn_80062C1C(gPlayers[pArgs[0].i].pChar);
     bOtherN20 = gPlayers[pArgs[0].i].pChar->n20 != 9 && gPlayers[pArgs[0].i].pChar->n20 != 11 &&
                 gPlayers[pArgs[0].i].pChar->n20 != 12;
@@ -2409,7 +2409,7 @@ void fn_80089F24(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80089F6C(MsgArg* pArgs, MsgArg* pResult) {
-    View* pView = ViewController_GetCameraController(gPlayers[0].nView[0]);
+    View* pView = ViewController_GetCameraControl(gPlayers[0].nView[0]);
     f32 vZero[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 
     pResult->i = 0;

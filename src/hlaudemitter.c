@@ -294,8 +294,9 @@ void Aud_EmiSet3DPos(u8 nId, f32* pPos, f32* pLast, u8 nView) {
     pInst = Aud_CheckEmitterInstance(nId);
     if (pInst != NULL) {
         for (i = 0; i < 2; i++) {
-            if ((gSession.nGameType == 3 || fn_800170A0(i)) && ViewController_GetCamera(i) != NULL) {
-                pLens = ((Camera*)ViewController_GetCamera(i))->unk10;
+            if ((gSession.nGameType == 3 || ViewController_IsActive(i)) && ViewController_GetRenderContext(i)
+                != NULL) {
+                pLens = ((Camera*)ViewController_GetRenderContext(i))->unk10;
                 if (pPos == NULL) {
                     pPos = pInst->vPos;
                 }

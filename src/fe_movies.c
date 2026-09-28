@@ -24,7 +24,7 @@ void fn_80008380(void);
 void fn_80092250(f32* pA, f32* pB, f32* pOut);
 void fn_80092080(LLPict* pPict, f32 fAlpha);    // draws the picture at that alpha
 void fn_80091FC0(LLPict* pPict, int nFrames, f32 fStep);
-s32  fn_800171B0(void);                 // ViewController.c
+s32  RC_GetCurrentFrameBuffer(void);                 // ViewController.c
 void fn_800760D8(LLPict* pPict);        // LLVideo.c
 void fn_800760F4(f32* pUV, LLPict* pPict);  // LLVideo.c
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
@@ -633,7 +633,7 @@ void fn_80092080(LLPict* pPict, f32 fAlpha) {
     RenderState_SetDrawFlags(0x50);
     DS_vSetAlphaTestMode(0, 6, 0x80);
     DS_vSetZBufferMode(7);
-    nOld = fn_800171B0();
+    nOld = RC_GetCurrentFrameBuffer();
     FB_vSetFrameBuffer(&frameBuf, 0.0f, 0.0f, 512.0f, 448.0f, 1.0f, 1.0f);
     // port: the render slot is typed s32 but holds a pointer
     fn_80092274((s32)&frameBuf);

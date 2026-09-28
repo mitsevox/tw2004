@@ -20,7 +20,7 @@ void fn_8009A344(s32 nView, SunFlrView* pView);
 void fn_8009A3F4(s32 nView);
 f32  fn_8009A754(s32 nView, SunFlrView* pView);
 
-s32  fn_800171B0(void);                 // ViewController.c
+s32  RC_GetCurrentFrameBuffer(void);                 // ViewController.c
 void fn_8009A250(void);                 // SunFlr_Gc.c
 void fn_8009B314(u8 v);
 void fn_80035584(s32 v);                // GoTerrain.c
@@ -182,9 +182,10 @@ void SF_vUpdateSunFlare(s32 nView) {
     SunFlrView* pView;
 
     pRect = fn_8003526C();
-    nCtx = fn_800171B0();
+    nCtx = RC_GetCurrentFrameBuffer();
     Camera_GetCurrentLens();
-    // port: fn_800171B0 is typed s32 in ViewController.c, but its value is a render context pointer
+    // port: RC_GetCurrentFrameBuffer is typed s32 in ViewController.c, but its value is a render
+    // context pointer
     fn_8001416C((GoFrameBuf*)nCtx);
     VM_fGetViewportWidth(pRect);
     fn_8001415C((GoFrameBuf*)nCtx);
@@ -193,7 +194,7 @@ void SF_vUpdateSunFlare(s32 nView) {
     if (pState->b1BF0) {
         pView = &pState->aView[nView];
         pView->bA4
-                = fn_8006434C(ViewController_GetCamera(nView), pState->v4, &pView->f98, &pView->f9C,
+                = fn_8006434C(ViewController_GetRenderContext(nView), pState->v4, &pView->f98, &pView->f9C,
                               &pView->fA0);
         pView->af90[1 - (lbl_80281B88 & 1)] = fn_8009A754(nView, pView);
         fn_8009A3F4(nView);

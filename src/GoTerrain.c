@@ -340,15 +340,15 @@ void fn_80030A40(void* pHoleData, int nView) {
             lbl_801D3CB0.fXZDistanceToClosestBallSquared = fDist;
         }
     }
-    fn_8003546C(gPlayers[ViewController_GetPlayer(lbl_801D3CB0.iCurrentViewContext)].vBall,
+    fn_8003546C(gPlayers[ViewController_GetActivePlayerNumber(lbl_801D3CB0.iCurrentViewContext)].vBall,
                 &Ter_GetTGD()->pin[Game_CurrentPinSet()].x, vToPin);
     vToPin[1] = 0.0f;
     lbl_801D3CB0.fGolferDistanceToCup = Math_Sqrt(Vec3_LengthSqClamped(vToPin));
     fTan = Math_Tan(0.5f * pLens->fFov);
     fWideTan = Math_Tan(0.5f * (0.75f * pLens->fFov * fn_8001414C((u8*)fn_8003526C())));
     lbl_801D3CB0.fCameraMinHalfFieldOfViewTan =
-        (fTan <= fWideTan / ViewController_GetCameraController(nView)->f54) ? fTan : fWideTan
-                / ViewController_GetCameraController(nView)->f54;
+        (fTan <= fWideTan / ViewController_GetCameraControl(nView)->f54) ? fTan : fWideTan
+                / ViewController_GetCameraControl(nView)->f54;
     RenderState_Flush();
     if (!lbl_801D3CB0.bObjectTestMode) {
         fn_80033F94(pHoleData, 0);
@@ -441,7 +441,8 @@ void fn_80030CC8(void* pHoleData) {
                     fDist = 0.0f;
                 }
                 eClipMethod = fn_80007B2C(pMesh, pCamera, fDist, lbl_801D3CB0.fCameraMinHalfFieldOfViewTan,
-                                          ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext)->f54);
+                                          ViewController_GetCameraControl(
+                                                  lbl_801D3CB0.iCurrentViewContext)->f54);
                 if (eClipMethod != 3) {
                     pPatch = &lbl_801D3CB0.pPatchList[lbl_801D3CB0.iTotalPatches++];
                     fn_80031084(pMesh, eClipMethod, iRenderPass, pPatch, fDist);
@@ -583,7 +584,8 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
                 bHide = 1;
             } else if ((Ter_GetMeshFlags(pLOD0, 3) & 4) || (Ter_GetMeshFlags(pLOD0, 3) & 0x10)
                        || (Ter_GetMeshFlags(pLOD0, 3) & 0x20)) {
-                pBall = gPlayers[ViewController_GetPlayer(lbl_801D3CB0.iCurrentViewContext)].vBall;
+                pBall = gPlayers[ViewController_GetActivePlayerNumber(
+                        lbl_801D3CB0.iCurrentViewContext)].vBall;
                 pPin = &Ter_GetTGD()->pin[Game_CurrentPinSet()].x;
                 fn_8003546C(pBounds, pBall, v28);
                 v28[1] = 0.0f;
@@ -603,7 +605,7 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
                 if (fObjectToPin < 0.0f) {
                     fObjectToPin = 0.0f;
                 }
-                if (!fn_800172C4(ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext))) {
+                if (!fn_800172C4(ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext))) {
                     bHide = 1;
                 } else if (fBallToObject > lbl_801D3CB0.fCrowdHalfMaxDistanceFromGolfer) {
                     bHide = 1;
@@ -614,16 +616,20 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
                            && fObjectToPin <= fPinToBall && (nLast - i) % 2 != 0) {
                     bHide = 1;
                 } else if (((Ter_GetMeshFlags(pLOD0, 1) & 1)
-                            && gSession.nTeeSet[ViewController_GetPlayer(lbl_801D3CB0.iCurrentViewContext)]
+                            && gSession.nTeeSet[ViewController_GetActivePlayerNumber(
+                                    lbl_801D3CB0.iCurrentViewContext)]
                                     != 0)
                            || ((Ter_GetMeshFlags(pLOD0, 1) & 2)
-                               && gSession.nTeeSet[ViewController_GetPlayer(lbl_801D3CB0.iCurrentViewContext)] != 1)
+                               && gSession.nTeeSet[ViewController_GetActivePlayerNumber(
+                                       lbl_801D3CB0.iCurrentViewContext)] != 1)
                            || ((Ter_GetMeshFlags(pLOD0, 1) & 4)
-                               && gSession.nTeeSet[ViewController_GetPlayer(lbl_801D3CB0.iCurrentViewContext)] != 2)) {
+                               && gSession.nTeeSet[ViewController_GetActivePlayerNumber(
+                                       lbl_801D3CB0.iCurrentViewContext)] != 2)) {
                     bHide = 1;
                 } else if (((Ter_GetMeshFlags(pLOD0, 1) & 1) || (Ter_GetMeshFlags(pLOD0, 1) & 2)
                             || (Ter_GetMeshFlags(pLOD0, 1) & 4))
-                           && gPlayers[ViewController_GetPlayer(lbl_801D3CB0.iCurrentViewContext)].ball.nLie
+                           && gPlayers[ViewController_GetActivePlayerNumber(
+                                   lbl_801D3CB0.iCurrentViewContext)].ball.nLie
                                    != 0) {
                     bHide = 1;
                 }
@@ -633,7 +639,7 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
             } else if (pPatch->eClipMethod == 2) {
                 eClipMethod = 2;
             } else {
-                pView = ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext);
+                pView = ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext);
                 eClipMethod = fn_80007B2C(pLOD0, RC_spGetCurrentRenderCtx(), Math_Sqrt(fDistanceSquared),
                                           lbl_801D3CB0.fCameraMinHalfFieldOfViewTan, pView->f54);
             }
@@ -761,7 +767,7 @@ void fn_80031AB4(void) {
                 for (nLOD = 0; nLOD < nLast; nLOD++) {
                     if (fDistanceSquared <= pPlanes[nLOD].fEnd * pPlanes[nLOD].fEnd) break;
                 }
-                if (!fn_800172C4(ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext))) {
+                if (!fn_800172C4(ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext))) {
                     uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
                     if (!(uFlags & 4) && !(uFlags & 0x10) && !(uFlags & 0x20) && fn_80031E40() && nLOD == 0) {
                         nLOD = 1;
@@ -782,7 +788,7 @@ void fn_80031AB4(void) {
         for (nLOD = 0; nLOD < nLast; nLOD++) {
             if (fDistanceSquared <= pPlanes[nLOD].fEnd * pPlanes[nLOD].fEnd) break;
         }
-        if (!fn_800172C4(ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext))) {
+        if (!fn_800172C4(ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext))) {
             uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
             if (!(uFlags & 4) && !(uFlags & 0x10) && !(uFlags & 0x20) && fn_80031E40() && nLOD == 0) {
                 nLOD = 1;
@@ -862,7 +868,7 @@ void fn_80031E58(void) {
             uFlags2 &= ~0x80;
             uFlags0 &= ~0x40;
         }
-        if (!fn_800172C4(ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext))) {
+        if (!fn_800172C4(ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext))) {
             uFlags0 &= ~0x20;
         }
         uCrowd = uFlags0 & 0x20;
@@ -1237,7 +1243,7 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
         nMesh |= 0x10;
     }
     if (n20 & 0x80) {
-        if (!fn_800172C4(ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext))
+        if (!fn_800172C4(ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext))
             && (Ter_GetMeshFlags(pGround, 0) & 0x80)) {
             return;
         }
@@ -1832,7 +1838,7 @@ void fn_80033F94(void* pHoleData, u32 nList) {
                 }
                 uFlags = Ter_GetMeshFlags(pMesh, 2);
                 if (!gSession.nSplitScreen || !(uFlags & 8)) {
-                    pView = ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext);
+                    pView = ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext);
                     nClip = fn_80007B2C(pMesh, RC_spGetCurrentRenderCtx(), 0.0f,
                                         lbl_801D3CB0.fCameraMinHalfFieldOfViewTan,
                                         pView->f54);
@@ -2143,8 +2149,8 @@ void fn_80034AE4(void) {
     fTan = Math_Tan(0.5f * pLens->fFov);
     fWideTan = Math_Tan(0.5f * (0.75f * pLens->fFov * fn_8001414C((u8*)fn_8003526C())));
     lbl_801D3CB0.fCameraMinHalfFieldOfViewTan =
-        (fTan <= fWideTan / ViewController_GetCameraController(0)->f54) ? fTan : fWideTan
-                / ViewController_GetCameraController(0)->f54;
+        (fTan <= fWideTan / ViewController_GetCameraControl(0)->f54) ? fTan : fWideTan
+                / ViewController_GetCameraControl(0)->f54;
     RenderState_Flush();
     fn_80034F28(pHoleData);
     fn_80034CAC(0);
@@ -2260,7 +2266,7 @@ void fn_80034F28(void* pUnused) {
             if (fDist < 0.0f) {
                 fDist = 0.0f;
             }
-            pView = ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext);
+            pView = ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext);
             nClip = fn_80007B2C(fn_8003556C(pPatch->pGround), pCamera, fDist,
                                 lbl_801D3CB0.fCameraMinHalfFieldOfViewTan, pView->f54);
             if (nClip != 3) {

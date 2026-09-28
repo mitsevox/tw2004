@@ -315,7 +315,7 @@ void fn_8011E9D8(void) {
     lbl_80281900->pFrameBuf = FB_spCreateFrameBuffer();
     lbl_80281900->pRect = VM_spCreateViewport();
     FB_vSetFrameBuffer(lbl_80281900->pFrameBuf, 0.0f, 0.0f, 256.0f, 256.0f, 1.0f, 1.0f);
-    fn_800171D8(lbl_80281900->pRect, 0.0f, 0.0f, 1.0f, 1.0f);
+    VM_vSetViewportRect(lbl_80281900->pRect, 0.0f, 0.0f, 1.0f, 1.0f);
     fn_800B3438(lbl_80281900->pRect, 1.0f, 1.0f);
     CA_vInitCamera(lbl_80281900->pLens);
     fn_80076A0C_SetType(lbl_80281900->pLens, 1);
@@ -722,7 +722,7 @@ void fn_8011F7F8(void) {
             pSphere->y = 0.5f * (lbl_80281900->f3B8 + (pTile->f4 + pTile->f8));
             pSphere->z = 1.25f + (2.5f * (f32)nZ + (f32)lbl_80281900->n16);
             nCull = fn_80007CE8((RenderObj*)&lbl_80260360, RC_spGetCurrentRenderCtx(),
-                                0, ViewController_GetCameraController(lbl_801D3CB0.iCurrentViewContext)->f54);
+                                0, ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext)->f54);
             if (nCull == 2) {
                 continue;
             }

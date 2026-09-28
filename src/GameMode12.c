@@ -91,9 +91,10 @@ void fn_800FEC80(int nPlayer) {
         fn_800FEF00(lbl_802823DC, &nPoints, &nMeter, &nMult);
         nHits = fn_800FEFF8(nPlayer, lbl_802823DC);
         if (!SurfaceUsedUp(&nPoints, nHits)) {
-            fn_8006434C(ViewController_GetCamera(gPlayers[nPlayer].nView[0]), gPlayers[nPlayer].ball.vPrev,
+            fn_8006434C(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]),
+                        gPlayers[nPlayer].ball.vPrev,
                         &x, &y, 0);
-            fn_8006A8D4(ViewController_GetCamera(gPlayers[nPlayer].nView[0]), &x, &y);
+            fn_8006A8D4(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]), &x, &y);
             if (nMult > gPlayers[nPlayer].nDBC) {
                 gPlayers[nPlayer].nDBC = nMult;
                 fn_800E53F0(0x35, nMult, 512.0f * x, 448.0f * y);

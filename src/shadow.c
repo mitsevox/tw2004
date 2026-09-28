@@ -30,7 +30,7 @@ void RC_vSetCurrentRenderCtx(void* pCamera);        // makes it the current rend
 void Mtx_Identity(f32 (*pMtx)[4]);       // identity
 void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: copy a 4x4 matrix
 void Mtx_InvertRigid(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: inverts a rotation+translation
-void fn_8001728C(CamLens* pLens);
+void CA_vSetDefaultScalingVectors(CamLens* pLens);
 f32  Math_Tan(f32 x);                // tan, as a float
 void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
@@ -142,7 +142,7 @@ void fn_800B251C_ShadowInit(u8 bHigh) {
     p->pRect = VM_spCreateViewport();
     p->pFrameBuf = FB_spCreateFrameBuffer();
     FB_vSetFrameBuffer(p->pFrameBuf, 0.0f, 0.0f, 256.0f, 256.0f, 1.0f, 1.0f);
-    fn_800171D8(p->pRect, 0.0f, 0.0f, 1.0f, 1.0f);
+    VM_vSetViewportRect(p->pRect, 0.0f, 0.0f, 1.0f, 1.0f);
     fn_800B3438(p->pRect, 1.0f, 1.0f);
     p->pCamera = RC_spCreateRenderCtx(p->pLens, p->pFrameBuf, p->pRect);
     fn_800B24D0(256, 256);
@@ -626,5 +626,5 @@ void fn_800B3484(CamLens* pLens, f32 (*pMtx)[4]) {
         Mtx_Copy(pMtx, pLens->m44);
         Mtx_InvertRigid(pMtx, pLens->m4);
     }
-    fn_8001728C(pLens);
+    CA_vSetDefaultScalingVectors(pLens);
 }

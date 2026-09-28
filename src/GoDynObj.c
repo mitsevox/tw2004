@@ -401,7 +401,7 @@ void fn_80046B8C(int nView) {
     RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
     if (gSession.nSplitScreen == 0) {
         fn_80047290();
-        if ((s8)GOLFERSTATE_GetCurrentState(ViewController_GetPlayer(nView)) != 9) {
+        if ((s8)GOLFERSTATE_GetCurrentState(ViewController_GetActivePlayerNumber(nView)) != 9) {
             fn_80047208(aState);
         }
     }
@@ -511,7 +511,7 @@ void fn_80046FDC(s32 nView) {
 
     for (i = 0; i < fn_800F1960(); i++) {
         fn_800F196C(i, vPos);
-        nKind = gpGame->pfn26C(ViewController_GetPlayer(nView), i);
+        nKind = gpGame->pfn26C(ViewController_GetActivePlayerNumber(nView), i);
         if (lbl_80281DA0->apTeo10006[nKind] != NULL) {
             fn_80048584(lbl_80281DA0->apTeo10006[nKind], 0);
             Mtx_Identity(lbl_80281DA0->apTeo10006[nKind]->m80);
@@ -532,7 +532,7 @@ void fn_800470B0(s32 nView) {
     RenderState_Flush();
     for (i = 0; i < fn_800F1960(); i++) {
         fn_800F196C(i, vPos);
-        switch (gpGame->pfn26C(ViewController_GetPlayer(nView), i)) {
+        switch (gpGame->pfn26C(ViewController_GetActivePlayerNumber(nView), i)) {
         case 0:
             nModel = 0;
             break;
@@ -672,16 +672,16 @@ void fn_8004731C(u8* pState) {
             Mtx_Identity(pLogoB->m40);
         }
         pBall->m40[0][0] = lbl_80281128;
-        pBall->m40[1][1] = lbl_80281128 / ViewController_GetCameraController(gPlayers[i].nView[0])->f54;
+        pBall->m40[1][1] = lbl_80281128 / ViewController_GetCameraControl(gPlayers[i].nView[0])->f54;
         pBall->m40[2][2] = lbl_80281128;
         if (pLogoA != NULL) {
             pLogoA->m40[0][0] = lbl_80281128;
-            pLogoA->m40[1][1] = lbl_80281128 / ViewController_GetCameraController(gPlayers[i].nView[0])->f54;
+            pLogoA->m40[1][1] = lbl_80281128 / ViewController_GetCameraControl(gPlayers[i].nView[0])->f54;
             pLogoA->m40[2][2] = lbl_80281128;
         }
         if (pLogoB != NULL) {
             pLogoB->m40[0][0] = lbl_80281128;
-            pLogoB->m40[1][1] = lbl_80281128 / ViewController_GetCameraController(gPlayers[i].nView[0])->f54;
+            pLogoB->m40[1][1] = lbl_80281128 / ViewController_GetCameraControl(gPlayers[i].nView[0])->f54;
             pLogoB->m40[2][2] = lbl_80281128;
         }
         Vec_Copy(gPlayers[i].ball.vPos, pBall->m80[3]);

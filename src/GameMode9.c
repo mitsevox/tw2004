@@ -128,7 +128,7 @@ void fn_800EDA34(int nPlayer) {
 void fn_800EDA74(void) {
     f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     GOLFERSTATE_Set(GS_PLACE_BALL, 0);
-    CameraController_FadeIn(ViewController_GetCameraController(gPlayers[0].nView[0]), 0.5f, v);
+    CameraController_FadeIn(ViewController_GetCameraControl(gPlayers[0].nView[0]), 0.5f, v);
 }
 
 // The pad's sticks (beyond the 96..160 dead zone) scaled to -1..1 into the player's fA7C..fA84.

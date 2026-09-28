@@ -324,7 +324,7 @@ void FirstFrameInit(void) {
 // fn_800DC6E8, up to 40 beats). Gaud_InitGameBreaker calls it for the first beat.
 void HeartBeatLoopCallback(u8 nId, u8 nTrack, s32 n) {
     if (nTrack == 2) {
-        fn_800DC6E8(ViewController_GetPlayer(0));
+        fn_800DC6E8(ViewController_GetActivePlayerNumber(0));
     }
 }
 
@@ -960,7 +960,7 @@ void Gaud_InitSwing(u8 nPlayer) {
     Gaud_ExitSpecialShot(nPlayer);
     Aud_EmiSetAllTrackStatus(pView->n2, 0);
     Aud_EmiSetAllTrackStatus(pView->n3, 0);
-    if (fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut) {
+    if (ViewController_GetIndexedViewController(gPlayers[nPlayer].nView[0])->bFlagOut) {
         Aud_EmiDel(lbl_80281420);
         lbl_80281420 = 0xFF;
     }
@@ -1057,7 +1057,7 @@ void Gaud_SwingBallHit(u8 nPlayer) {
     nIdSwing = pView->n0;
     nIdA = pView->n2;
     nIdB = pView->n3;
-    nKind = fn_800C7138(ViewController_GetCameraController(pPlayer->nView[0]));
+    nKind = fn_800C7138(ViewController_GetCameraControl(pPlayer->nView[0]));
     bRestore = 1;
     nMode = Game_GetMode();
     if (fn_8006BEA4()) {
@@ -1467,7 +1467,7 @@ void Gaud_InitSpecialShot(u8 nPlayer) {
     u8 n;
 
     pView = &lbl_801F1790[0];
-    nKind = fn_800C7138(ViewController_GetCameraController(0));
+    nKind = fn_800C7138(ViewController_GetCameraControl(0));
     bPlay = 1;
     n = 0;
     if (Game_GetMode() < 6 || Game_GetMode() > 8) {
@@ -1543,7 +1543,7 @@ void Gaud_UpdtSpecialShot(u8 nPlayer, u8 n) {
     GameAudioView* pView;
 
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
-    switch (fn_800C7138(ViewController_GetCameraController(0))) {
+    switch (fn_800C7138(ViewController_GetCameraControl(0))) {
     case 4:
         n += 4;
         // fall through
@@ -1565,7 +1565,7 @@ void Gaud_ExitSpecialShot(u8 nPlayer) {
     int nKind;
 
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
-    nKind = fn_800C7138(ViewController_GetCameraController(0));
+    nKind = fn_800C7138(ViewController_GetCameraControl(0));
     if (Game_GetMode() < 6 || Game_GetMode() > 8) {
         Aud_Mute(0, 0);
         Aud_EmiSetTrackStatus(pView->n2, 1, 0);

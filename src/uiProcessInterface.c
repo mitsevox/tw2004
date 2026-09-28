@@ -219,7 +219,7 @@ void fn_8008F820(void) {
     }
     if (gSession.nGameType >= 4 && gSession.nGameType <= 8 && gSession.nPaused == 0) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
-            pView = ViewController_GetCameraController(gPlayers[i].nView[0]);
+            pView = ViewController_GetCameraControl(gPlayers[i].nView[0]);
             if ((fn_80063C90(pView) || pView->script.nCamera == 3) && pView->nCurCamera != 0x15) {
                 return;
             }

@@ -538,12 +538,12 @@ void fn_80100C08(void) {
             if (lbl_80282424 == 13) {
                 lbl_80282428 = 18;
                 lbl_80282424 = 13;
-                CameraController_FadeOut(ViewController_GetCameraController(gPlayers[0].nView[0]), 0.25f, v);
+                CameraController_FadeOut(ViewController_GetCameraControl(gPlayers[0].nView[0]), 0.25f, v);
             }
         }
         break;
     case 18:
-        if (fn_80063C7C(ViewController_GetCameraController(gPlayers[0].nView[0]))) {
+        if (fn_80063C7C(ViewController_GetCameraControl(gPlayers[0].nView[0]))) {
             lbl_80282428 = lbl_80282424;
         }
         break;
@@ -817,9 +817,9 @@ void fn_80100C08(void) {
         }
         // falls through
     case 19:
-        if (fn_80063C7C(ViewController_GetCameraController(gPlayers[0].nView[0]))) {
+        if (fn_80063C7C(ViewController_GetCameraControl(gPlayers[0].nView[0]))) {
             nView = gPlayers[0].nView[0];
-            CameraController_SetCameraMode(ViewController_GetCameraController(nView), 18, 0, nView);
+            CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 18, 0, nView);
             if (lbl_802823FC == 12) {
                 lbl_80282424 = 13;
                 lbl_80282428 = 1;

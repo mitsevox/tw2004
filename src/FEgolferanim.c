@@ -113,7 +113,7 @@ void Mtx_Identity(f32 (*m)[4]);          // identity matrix
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
-void fn_80016E90(int nView);
+void ViewController_Update(int nView);
 void RC_UpdateCurrentScreenMatrices(void);
 void fn_80035754(Character* pChar);
 void fn_80035810(Character* pChar);
@@ -511,8 +511,8 @@ int fn_8008B990(void) {
 void fn_8008B9A0(void) {
     View* pView;
 
-    pView = ViewController_GetCameraController(fn_80016D10());
-    fn_80016E90(fn_80016D10());
+    pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
+    ViewController_Update(ViewController_GetCurrentViewControllerID());
     Mtx_Identity(lbl_80281EE0->mC0);
     Vec_Copy(pView->v0, lbl_80281EE0->v100);
     Vec_Copy(pView->v10, lbl_80281EE0->v110);
@@ -554,7 +554,7 @@ void sFE_AdjustAndSetGolferPosition(void) {
     int i;
 
     fBlend = 1.0f;
-    pView = ViewController_GetCameraController(fn_80016D10());
+    pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
     fn_8008F24C();
     fn_800364A0();
     for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
@@ -1298,7 +1298,7 @@ void fn_8008DD50(u8 bNoBlend) {
     View* pView;
     Clip* pClip;
 
-    pView = ViewController_GetCameraController(fn_80016D10());
+    pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
     if (lbl_80281EE0->pB4 == NULL || lbl_80281EE0->pB4->pChar == NULL) return;
     if (lbl_80281EE0->n8 != 0) {
         if (lbl_80281EE0->n8 == 1) {
@@ -1408,7 +1408,7 @@ void fn_8008E244(void) {
 }
 
 void fn_8008E254(u8 b) {
-    View* pView = ViewController_GetCameraController(fn_80016D10());
+    View* pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
 
     if (b) {
         if (lbl_80281EE0->b1DC != 1) {
@@ -1479,7 +1479,7 @@ u8 fn_8008E468(char* szAnim, char* szShot, u8 bNoBlend) {
     View* pView;
     Clip* pClip;
 
-    pView = ViewController_GetCameraController(fn_80016D10());
+    pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
     if (!FE_CrAP_GetTriggerAnims()) {
         return 0;
     }

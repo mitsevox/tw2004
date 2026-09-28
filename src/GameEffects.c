@@ -264,7 +264,7 @@ void fn_800DB714(int nPlayer) {
         fDist *= SW_vGetShotPower(nPlayer);
         fn_80045494(0, nPlayer);
         fn_80045558(0, nPlayer);
-        pView = ViewController_GetCameraController(gPlayers[nPlayer].nView[0]);
+        pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
         pView->p74 = fn_8003BDBC(nPlayer, nLie, 3, 0xC, 1, fDist);
         lbl_80202898.b19 = 1;
         if (lbl_80202898.f24 > 0.8f) {
@@ -374,7 +374,7 @@ void fn_800DBA50(int nPlayer) {
             lbl_80202898.nHeartbeats = 0;
             fn_80045494(0, nPlayer);
             fn_80045558(0, nPlayer);
-            pView = ViewController_GetCameraController(gPlayers[nPlayer].nView[0]);
+            pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
             pSeq = fn_8003BDBC(nPlayer, nLie, nClass, 0xB, 1, fDist);
             pShot = DynamicCam_ChooseScriptInSequence(pSeq, 0, &nKind, &fTime, &f2, &nB, &f3, nPlayer);
             if (pShot != NULL && pView->script.pShot != pShot && pView->script.pNextShot != pShot &&

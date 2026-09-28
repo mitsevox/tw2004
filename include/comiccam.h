@@ -12,7 +12,7 @@ typedef struct ComicPanel {
     f32  f4;                    // 0x04
     s32  nNext;                 // 0x08  the panel shown after this one, -1 for the last
     f32  fTop;                  // 0x0C  } where it sits on screen, in fractions of the screen
-    f32  fLeft;                 // 0x10  }   (fn_800B3F4C hands them to fn_800171D8 as x, y, w, h)
+    f32  fLeft;                 // 0x10  }   (fn_800B3F4C hands them to VM_vSetViewportRect as x, y, w, h)
     f32  fWidth;                // 0x14  }
     f32  fHeight;               // 0x18  }
     f32  f1C;                   // 0x1C

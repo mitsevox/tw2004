@@ -57,7 +57,7 @@ void fn_80013200(int nPad, u8 nValue);
                                     // or 25 (the putter)
 
 
-void  fn_80016D18(int nView, f32 x, f32 y, f32 w, f32 h);       // open it (screen fractions)
+void  ViewController_Init(int nView, f32 x, f32 y, f32 w, f32 h);       // open it (screen fractions)
 
 void Caddie_Start(int nPlayer) {
     if ((!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e) ||
@@ -292,40 +292,40 @@ void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int b
     p->bMulliganUsed = 0;
     if (gSession.nSplitScreen) {
         if (bRightSide == 0) {
-            if (!fn_800170A0(0)) {
-                fn_80016D18(0, 0.0f, 0.0f, 0.5f, 1.0f);
+            if (!ViewController_IsActive(0)) {
+                ViewController_Init(0, 0.0f, 0.0f, 0.5f, 1.0f);
             }
             p->nView[0] = 0;
             p->nView[1] = 0;
-            fn_8001704C(p->nView[0], nPlayer);
-            fn_8001704C(p->nView[1], nPlayer);
+            ViewController_SetActivePlayerNumber(p->nView[0], nPlayer);
+            ViewController_SetActivePlayerNumber(p->nView[1], nPlayer);
         } else if (bRightSide == 1) {
-            if (!fn_800170A0(1)) {
-                fn_80016D18(1, 0.5f, 0.0f, 0.5f, 1.0f);
+            if (!ViewController_IsActive(1)) {
+                ViewController_Init(1, 0.5f, 0.0f, 0.5f, 1.0f);
             }
             p->nView[0] = 1;
             p->nView[1] = 1;
-            fn_8001704C(p->nView[0], nPlayer);
-            fn_8001704C(p->nView[1], nPlayer);
+            ViewController_SetActivePlayerNumber(p->nView[0], nPlayer);
+            ViewController_SetActivePlayerNumber(p->nView[1], nPlayer);
         }
     } else {
-        if (!fn_800170A0(0)) {
-            fn_80016D18(0, 0.0f, 0.0f, 1.0f, 1.0f);
+        if (!ViewController_IsActive(0)) {
+            ViewController_Init(0, 0.0f, 0.0f, 1.0f, 1.0f);
         }
         p->nView[0] = 0;
-        fn_8001704C(p->nView[0], nPlayer);
+        ViewController_SetActivePlayerNumber(p->nView[0], nPlayer);
         if (gSession.nGameType == 4) {
             int nView;
-            if (!fn_800170A0(2)) {
-                fn_80016D18(2, 0.0f, 0.0f, 1.0f, 1.0f);
+            if (!ViewController_IsActive(2)) {
+                ViewController_Init(2, 0.0f, 0.0f, 1.0f, 1.0f);
             }
             p->nView[1] = 2;
-            fn_8001704C(p->nView[1], nPlayer);
+            ViewController_SetActivePlayerNumber(p->nView[1], nPlayer);
             nView = p->nView[1];
-            CameraController_SetCameraMode(ViewController_GetCameraController(nView), 0x19, nPlayer, nView);
+            CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 0x19, nPlayer, nView);
         } else {
             p->nView[1] = 0;
-            fn_8001704C(p->nView[1], nPlayer);
+            ViewController_SetActivePlayerNumber(p->nView[1], nPlayer);
         }
     }
     p->pChar = gViewSlots[nPlayer].pChar;

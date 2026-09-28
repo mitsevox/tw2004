@@ -86,7 +86,7 @@ void fn_800C830C(void) {
 // pin (EA's test; distances in yards). A view's first call after the line is set up only clears
 // its abSkip.
 void BreakLine_Update(int nView) {
-    int nPlayer = ViewController_GetPlayer(nView);
+    int nPlayer = ViewController_GetActivePlayerNumber(nView);
     f32 fDist;
 
     fDist = Vec_Distance(lbl_80282228->vPin, gPlayers[nPlayer].vTarget);
@@ -107,7 +107,7 @@ void BreakLine_Update(int nView) {
 // at the end, and trigger events 0x28 / 0x29 when it stops or starts to move away from the pin.
 void BreakLine_Render(int nView) {
     f32 vAxis[4] = {0.0f, 0.0f, 1.0f, 0.0f};
-    int nPlayer = ViewController_GetPlayer(nView);
+    int nPlayer = ViewController_GetActivePlayerNumber(nView);
     TrailMeshDescEx desc;
     s16 aIndex[BREAKLINE_VERTS];        // the frame fits at least this many; the size is not known
     s32 nFrame;
@@ -245,7 +245,7 @@ void fn_800C8C3C(int nView, f32* pOut) {
 
 // fake match: EA reads the player through an inline; written in place, pPlayer is allocated r29, not r31
 static inline Player* fn_800C8C70_Read(int nView) {
-    return &gPlayers[ViewController_GetPlayer(nView)];
+    return &gPlayers[ViewController_GetActivePlayerNumber(nView)];
 }
 
 // Starts view nView's line when its player stands over a putt within 75 of the hole: lays out the
@@ -306,7 +306,7 @@ void BreakLine_Reset(int nView) {
 // the side). 0, 0 in split screen or when the points coincide; -999 when there is no tip, 999
 // when the caddie gave up.
 void fn_800C9038(int nView, f32* pLong, f32* pSide) {
-    int nPlayer = ViewController_GetPlayer(nView);
+    int nPlayer = ViewController_GetActivePlayerNumber(nView);
     int nPin = Game_CurrentPinSet();
     CourseInfo* pCourse = Ter_GetTGD();
     s8 nTip;

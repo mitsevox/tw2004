@@ -1337,7 +1337,7 @@ u8 Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* p
     f32 fT;
 
     if (nPlayer < 0) return 0;
-    if (fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut) return 0;
+    if (ViewController_GetIndexedViewController(gPlayers[nPlayer].nView[0])->bFlagOut) return 0;
     // the line relative to the pin
     vFrom[0] = pFrom[0] - pCourse->pin[Game_CurrentPinSet()].x;
     vFrom[1] = pFrom[1] - pCourse->pin[Game_CurrentPinSet()].y;

@@ -103,7 +103,8 @@ void fn_8009B898(void) {
 // Lays the view's grid out for its player's target: with the putter it runs from beyond the pin
 // back past the ball (at most 8 or 16 rows), otherwise it is a square of nCols x nCols points.
 void fn_8009B970(int nView) {
-    // fake match: an s32 (long) copy of nView, kept in its own register, for the ViewController_GetPlayer calls
+    // fake match: an s32 (long) copy of nView, kept in its own register, for the
+    // ViewController_GetActivePlayerNumber calls
     s32 nViewCopy;
     f32 vPin[4];
     f32 fNegZ;
@@ -113,20 +114,20 @@ void fn_8009B970(int nView) {
     f32 fDist;
     f32 fLen;
     nViewCopy = nView;
-    if (!fn_8009BD24(ViewController_GetPlayer(nViewCopy))) {
+    if (!fn_8009BD24(ViewController_GetActivePlayerNumber(nViewCopy))) {
         return;
     }
-    Vec_Copy(PLAYER(ViewController_GetPlayer(nViewCopy))->vTarget, lbl_802813C0->aTarget[nView]);
+    Vec_Copy(PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->vTarget, lbl_802813C0->aTarget[nView]);
     lbl_802813C0->anDone[nView] = 0;
-    fn_8009CB78(PLAYER(ViewController_GetPlayer(nViewCopy))->vTarget,
-                PLAYER(ViewController_GetPlayer(nViewCopy))->ball.vPos,
+    fn_8009CB78(PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->vTarget,
+                PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->ball.vPos,
                 lbl_802813C0->aDir[nView]);
     lbl_802813C0->aDir[nView][1] = 0.0f;
     fDist = (f32)Math_Sqrt(Vec3_LengthSqClamped(lbl_802813C0->aDir[nView]));
     Vec_NormalizeTo(lbl_802813C0->aDir[nView], lbl_802813C0->aDir[nView]);
-    if (PLAYER(ViewController_GetPlayer(nViewCopy))->nClub == CLUB_PUTTER_e) {
+    if (PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->nClub == CLUB_PUTTER_e) {
         fn_8009CB78(&Ter_GetTGD()->pin[Game_CurrentPinSet()].x,
-                    PLAYER(ViewController_GetPlayer(nViewCopy))->ball.vPos,
+                    PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->ball.vPos,
                     vPin);
         vPin[1] = 0.0f;
         fLen = 2.0f + (f32)Math_Sqrt(Vec3_LengthSqClamped(vPin));
@@ -148,9 +149,11 @@ void fn_8009B970(int nView) {
     fDirX = lbl_802813C0->aDir[nView][0];
     fNegZ = -lbl_802813C0->aDir[nView][2];
     lbl_802813C0->aCorner[nView][0] = fAcross * fNegZ
-        + (PLAYER(ViewController_GetPlayer(nViewCopy))->vTarget[0] - fAlong * lbl_802813C0->aDir[nView][0]);
+        + (PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->vTarget[0] - fAlong
+           * lbl_802813C0->aDir[nView][0]);
     lbl_802813C0->aCorner[nView][2] = fAcross * fDirX
-        + (PLAYER(ViewController_GetPlayer(nViewCopy))->vTarget[2] - fAlong * lbl_802813C0->aDir[nView][2]);
+        + (PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->vTarget[2] - fAlong
+           * lbl_802813C0->aDir[nView][2]);
 }
 
 // Whether the grid shows for the player: never with GM_Currently_SkillZoneMode; with the putter when
@@ -187,7 +190,8 @@ void fn_8009BE08(int nView) {
     int nRow;
     int nCol;
     CourseInfo* pCourse = Ter_GetTGD();
-    // fake match: an s32 (long) copy of nView, kept in its own register, for the ViewController_GetPlayer calls
+    // fake match: an s32 (long) copy of nView, kept in its own register, for the
+    // ViewController_GetActivePlayerNumber calls
     s32 nViewCopy;
     f32 vPoint[4];
     f32 vNormal[4];
@@ -198,12 +202,14 @@ void fn_8009BE08(int nView) {
     f32 fDirX;
     f32 fDirZ;
     nViewCopy = nView;
-    if (!fn_8009BD24(ViewController_GetPlayer(nViewCopy))) {
+    if (!fn_8009BD24(ViewController_GetActivePlayerNumber(nViewCopy))) {
         return;
     }
-    if (lbl_802813C0->aTarget[nView][0] != PLAYER(ViewController_GetPlayer(nViewCopy))->vTarget[0]
-        || lbl_802813C0->aTarget[nView][1] != PLAYER(ViewController_GetPlayer(nViewCopy))->vTarget[1]
-        || lbl_802813C0->aTarget[nView][2] != PLAYER(ViewController_GetPlayer(nViewCopy))->vTarget[2]) {
+    if (lbl_802813C0->aTarget[nView][0] != PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->vTarget[0]
+        || lbl_802813C0->aTarget[nView][1]
+                != PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->vTarget[1]
+        || lbl_802813C0->aTarget[nView][2]
+                != PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->vTarget[2]) {
         fn_8009B970(nView);
     }
     fDirX = lbl_802813C0->aDir[nView][0];
@@ -215,7 +221,7 @@ void fn_8009BE08(int nView) {
         fAcross = nCol * lbl_802813C0->fCellW;
         fAlong = nRow * lbl_802813C0->fCellD;
         vPoint[0] = fAcross * fDirZ + (fAlong * fDirX + lbl_802813C0->aCorner[nView][0]);
-        vPoint[1] = 2.0f + PLAYER(ViewController_GetPlayer(nViewCopy))->vTarget[1];
+        vPoint[1] = 2.0f + PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->vTarget[1];
         vPoint[2] = (fAlong * fDirZ + lbl_802813C0->aCorner[nView][2]) - fAcross * fDirX;
         vPoint[3] = 1.0f;
         lbl_802813C0->apHeight[nView][n] =
@@ -361,7 +367,8 @@ void GR_BuildGridRenderData(s32 nView) {
                     (k == nEdge) ? 0 : (u8)lbl_802813C0->anColor[3];
                 if (k == 0 && lbl_802813C0->nVerts > 0) {
                     fU = (u32)pSession->nFrameCount * lbl_802813C0->f100 * (fPrev - fHeight);
-                    if ((s8)GOLFERSTATE_GetCurrentState(ViewController_GetPlayer(nView)) == GS_ZOOM) {
+                    if ((s8)GOLFERSTATE_GetCurrentState(ViewController_GetActivePlayerNumber(nView))
+                        == GS_ZOOM) {
                         fV = 0.75f;
                         fGap = 0.0625f;
                     } else {
@@ -406,7 +413,8 @@ void GR_BuildGridRenderData(s32 nView) {
 // Draws the view's grid once every point has been sampled: only for a human player standing over
 // the ball (set-up, aiming and green cameras, or the swing before it starts).
 void fn_8009C914(int nView) {
-    // fake match: an s32 (long) copy of nView, kept in its own register, for the ViewController_GetPlayer calls
+    // fake match: an s32 (long) copy of nView, kept in its own register, for the
+    // ViewController_GetActivePlayerNumber calls
     s32 nViewCopy;
     TrailDraw draw;
     TrailMeshDesc desc;
@@ -415,10 +423,10 @@ void fn_8009C914(int nView) {
     int nPlayer;
     int nState;
     nViewCopy = nView;
-    if (!fn_8009BD24(ViewController_GetPlayer(nView))) {
+    if (!fn_8009BD24(ViewController_GetActivePlayerNumber(nView))) {
         return;
     }
-    nPlayer = ViewController_GetPlayer(nViewCopy);
+    nPlayer = ViewController_GetActivePlayerNumber(nViewCopy);
     nState = GOLFERSTATE_GetCurrentState(nPlayer);
     if ((s8)nState == GS_WAIT) {
         return;

@@ -163,7 +163,7 @@ typedef struct Ter_TerrainRendererMgr {
     f32          fDefaultObjectMipmapBias[3];   // 0x1140  a row of lbl_801876D8 (fn_80034648)
     u8           bObjectTestMode;               // 0x114C
     u8           unk114D[3];
-    s32          iCurrentViewContext;           // 0x1150  a view number (ViewController_GetCameraController)
+    s32          iCurrentViewContext;           // 0x1150  a view number (ViewController_GetCameraControl)
     s32          iLowLODListOffset;             // 0x1154  -1 once unloaded
     f32          fTreeOverdrive;                // 0x1158
     f32          fTreeMinPeriod;                // 0x115C

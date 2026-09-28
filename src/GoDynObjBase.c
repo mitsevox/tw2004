@@ -86,7 +86,8 @@ int fn_80049820(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
         return 0;
     case 3:
         // flag 0x200: not while the flagstick is out
-        if (pObj->obj.pModel != NULL &&(!(pObj->uFlags & 0x200) || !fn_80016CF4()->bFlagOut)) {
+        if (pObj->obj.pModel
+            != NULL &&(!(pObj->uFlags & 0x200) || !ViewController_GetCurrentViewController()->bFlagOut)) {
             if (pObj->uFlags & 0x400) {
                 DS_vEnableZBufferUpdate(0);
             }
