@@ -1,24 +1,29 @@
-// CharSliders.c (EA's name, from its asserts; TW06): the character's body sliders: reading their
-// definitions (CharSlider_CreateDefinitionsFromMem), freeing them, and blending a model's bones
-// and a skin's morph targets by the slider values (CharSlider_UpdateCharacterBasedOnSliderValues). The file starts at CharSlider_Free
-// (before it is GameMode26.c) and ends at fn_8010E58C, where FE_PGATourMessages.c's leaderboard
-// messages begin.
+// CharSliders.c (EA's name: the file string of its StaticMem_Alloc calls; TW07 has it as
+// golf/animation/CharSliders.c, with CharSlider_Free in CharSliders_shared.c): a character's body
+// and face sliders, the created golfer's settings. CharSlider_CreateDefinitionsFromMem reads a
+// character's slider definitions from its file data and CharSlider_Free frees them;
+// CharSlider_UpdateCharacterBasedOnSliderValues takes the slider values (signed percentages),
+// lets the sliders limit and move each other, then scales the model's bones and weights the skin's
+// morph targets by them. The unit runs from CharSlider_Free (after GameMode26.c) to
+// CharSlider_UpdateCharacterBasedOnSliderValues; FE_PGATourMessages.c follows at 0x8010E58C.
 
 #include "engine.h"
 #include "character.h"
 #include "charstate.h"
 #include "golfer.h"
 
-// The byte-swap layouts of the records CharSlider_CreateDefinitionsFromMem reads.
-SwapField gCharSliderBoneSwap[5] = { { 8, -8 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };   // CharSliderBone
-SwapField gCharSliderBoneRangeSwap[4] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };   // CharSliderRange of bones
-SwapField gCharSliderMorphSwap[3] = { { 8, 8 }, { 4, 4 }, { 4, 4 } };             // CharSliderMorph
-SwapField gCharSliderMorphRangeSwap[4] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };   // CharSliderRange of morph targets
-SwapField gCharSliderLinkSwap[6] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };  // CharSliderLink
-SwapField gCharSliderLimitSwap[2] = { { 4, 4 }, { 4, 4 } };                         // CharSliderLimit
+// The byte-swap layouts of the records CharSlider_CreateDefinitionsFromMem reads, one per record
+// type (each named after its record; gCharSliderMorphIdSwap: one u64 morph target id). A bone's id
+// is copied as it is (-8: not swapped), a morph target's is swapped as a 64-bit value.
+SwapField gCharSliderBoneSwap[5] = { { 8, -8 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };
+SwapField gCharSliderBoneRangeSwap[4] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };
+SwapField gCharSliderMorphSwap[3] = { { 8, 8 }, { 4, 4 }, { 4, 4 } };
+SwapField gCharSliderMorphRangeSwap[4] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };
+SwapField gCharSliderLinkSwap[6] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };
+SwapField gCharSliderLimitSwap[2] = { { 4, 4 }, { 4, 4 } };
 SwapField gCharSliderDefSwap[10] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
-                               { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };   // CharSliderDef
-SwapField gCharSliderMorphIdSwap[1] = { { 8, 8 } };                                   // a morph target id (u64)
+                                     { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };
+SwapField gCharSliderMorphIdSwap[1] = { { 8, 8 } };
 
 // Free a slider-definition set made by CharSlider_CreateDefinitionsFromMem, with every table it
 // owns (Character_Free); NULL is ignored.
@@ -61,10 +66,10 @@ void CharSlider_Free(CharSliderDefs* pDefs) {
 }
 
 // Read a character's slider definitions from its file data at *ppData (Character_CreateFromMem):
-// the slider and morph target counts, then the sliders, each one's links, limits, bone ranges and
-// their bones, morph ranges and their morph targets, and the morph target ids, each byte-swapped by
-// its layout into memory from StaticMem_Alloc; *ppData is left after them. NULL when there are no
-// sliders.
+// the slider and morph target counts and 8 bytes skipped, then the sliders, each one's links,
+// limits, bone ranges and their bones, morph ranges and their morph targets, and the morph target
+// ids, each byte-swapped by its layout into memory from StaticMem_Alloc; *ppData is left after
+// them. NULL when there are no sliders.
 CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
     void* pDst;
     s32 nSliders;
@@ -401,8 +406,9 @@ void CharSlider_SetBoneModifiers(CharSliderDefs* pDefs, CharModel* pModel) {
             if (pRange->fStart <= pValue->fValue && pRange->fEnd > pValue->fValue) {
                 for (k = 0; k < pRange->nItems; k++) {
                     pBone = &pRange->items.pBones[k];
-                    fScale = CharSlider_CalculateActualModAmount(pRange->fStart, pRange->fEnd, pValue->fValue,
-                                         pBone->fFrom, pBone->fTo);
+                    fScale = CharSlider_CalculateActualModAmount(pRange->fStart, pRange->fEnd,
+                                                                 pValue->fValue, pBone->fFrom,
+                                                                 pBone->fTo);
                     nBone = SKEL_GetBoneIDFromNameID(pModel, pBone->uId);
                     if (nBone >= 0) {
                         SKEL_ScaleBone(pModel, nBone, pBone->uAxes, fScale);
@@ -442,8 +448,8 @@ void CharSlider_SetMorphTargets(CharSliderDefs* pDefs, Skin* pSkin, SKABlendNode
                 for (k = 0; k < pRange->nItems; k++) {
                     pMorph = &pRange->items.pMorphs[k];
                     fWeight = CharSlider_CalculateActualModAmount(pRange->fStart, pRange->fEnd,
-                            pValue->fValue,
-                                          pMorph->fFrom, pMorph->fTo);
+                                                                  pValue->fValue, pMorph->fFrom,
+                                                                  pMorph->fTo);
                     for (m = 0; m < pDefs->nMorphs; m++) {
                         if (pMorph->uId == pDefs->aMorphIds[m]) {
                             SkinMorph_SetTargetWeight(pSkin, m, fWeight);
@@ -462,8 +468,9 @@ void CharSlider_SetMorphTargets(CharSliderDefs* pDefs, Skin* pSkin, SKABlendNode
 // a character's model and skin: bone scales reset, sliders reset, set from aValues, paired sliders
 // limited, links applied, values clamped, then the bones scaled and the morph targets weighted.
 // Nothing unless pDefs, pModel, pSkin and aValues are all set.
-void CharSlider_UpdateCharacterBasedOnSliderValues(CharSliderDefs* pDefs, CharModel* pModel, Skin* pSkin, int nSliders, u8* aValues,
-                 SKABlendNode* pNode) {
+void CharSlider_UpdateCharacterBasedOnSliderValues(CharSliderDefs* pDefs, CharModel* pModel,
+                                                   Skin* pSkin, int nSliders, u8* aValues,
+                                                   SKABlendNode* pNode) {
     if (pModel == NULL || pSkin == NULL || aValues == NULL || pDefs == NULL) {
         return;
     }

@@ -114,13 +114,13 @@ void  SW_vUIBlurReset(int nPlayer);
 void  SD_FreeShaderObject(void* p);
 void  SW_vUIInit(int nPlayer);
 void  SD_InitShaderObject(void* p, int a, s32* pDesc);
-void  SW_vSetDisplayBoostUI(int nPlayer, int a);
+void  SW_vSetDisplayBoostUI(int nPlayer, int bDisplay);
 void  fn_800AE3C4(int nPlayer);
-u8*   SW_vGetStickInfo(int nPlayer, int nController);   // the pad's state: [1] main stick y, [3] C-stick y
-int   SW_vGetStickX(int nPlayer, u8* pPad);       // 0x80058F04  main or C-stick by nStickUsed
-int   SW_vGetStickY(int nPlayer, u8* pPad);       // 0x80058F30
-f32   SW_vGetControllerTopOfSwing(SwingData* pSw);             // 0x80058E98  fTimeSwingTop - 0.0076
-f32   SW_vGetControllerStartOfSwing(SwingData* pSw);           // 0x80058EA8  fTimeSwingStart + 0.0076
+u8*   SW_vGetStickInfo(int nPlayer, int nController);   // [0]/[1] C stick x/y, [2]/[3] main stick
+int   SW_vGetStickX(int nPlayer, u8* pPad);             // main or C stick by nStickUsed
+int   SW_vGetStickY(int nPlayer, u8* pPad);
+f32   SW_vGetControllerTopOfSwing(SwingData* pSw);      // fTimeSwingTop - 0.0076
+f32   SW_vGetControllerStartOfSwing(SwingData* pSw);    // fTimeSwingStart + 0.0076
 int   SKA_SampleBlendClip(Clip* pBlend, f32* pOut, f32 fTime);   // samples pBlend->pD8 at fTime
 void  Character_UpdateAnimation(Character* pObj, int a, f32 f);
 void  SW_vSetSwingStrength(int nPlayer);
@@ -193,8 +193,8 @@ f32 lbl_8018830C[8][4] = {
 };
 
 u8 (*gSwingPhaseFns[7])(int nPlayer) = {
-    SW_vStateIdleSwing, SW_vStateBackSwing, SW_vStateBackSwingFigit, SW_vStateDownSwing,
-    SW_vStateThroughSwing,       SW_vStatePostSwing, SW_vStateCancelSwing,
+    SW_vStateIdleSwing,    SW_vStateBackSwing, SW_vStateBackSwingFigit, SW_vStateDownSwing,
+    SW_vStateThroughSwing, SW_vStatePostSwing, SW_vStateCancelSwing,
 };
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
@@ -204,12 +204,6 @@ static f32 Swing_StrippedFn(f32 x) {
 }
 
 // ---- starting the swing ---------------------------------------------------------------------------
-
-// The swing is under way: phase 1, the animation started, its three marks read, the 25-sample
-// stick history filled with the centre, the spin stick centred.
-// The backswing's top mark, a hair early.
-
-// Free what SW_vInitModule set up: the two trail meshes and the three buffers per view.
 
 // Set the swing module up when the in-game code starts (GO_vInitIG): player 1's base ratings (as
 // floats) and the fixed tuning values into gpSwing, the two club-trail meshes (one per view), the
@@ -404,7 +398,7 @@ u8 SW_vStateIdleSwing(int nPlayer) {
     int     nController = p->nController;
     Character* pChar   = p->pChar;
     u8*     pPad;
-    u8      bMain, bCStick;
+    u8      bCStick, bMain;     // each stick's y pulled back past 160 (pad bytes 1 and 3)
 
     if (Controller_IsCPU(nController) || Game_GetMode() == 10) {
         gPlayers[nPlayer].swing.nState = 1;
@@ -414,16 +408,16 @@ u8 SW_vStateIdleSwing(int nPlayer) {
         return 0;
     }
     pPad    = SW_vGetStickInfo(nPlayer, nController);
-    bMain   = pPad[1] <= 0xFF && pPad[1] > 0xA0;
-    bCStick = pPad[3] <= 0xFF && pPad[3] > 0xA0;
-    if (bMain || bCStick) {
-        if (bCStick) {
-            gPlayers[nPlayer].swing.nCalibrateY      = gPlayers[nPlayer].swing.nRestCY;
-            gPlayers[nPlayer].swing.nCalibrateX      = gPlayers[nPlayer].swing.nRestCX;
+    bCStick = pPad[1] <= 0xFF && pPad[1] > 0xA0;
+    bMain   = pPad[3] <= 0xFF && pPad[3] > 0xA0;
+    if (bCStick || bMain) {
+        if (bMain) {
+            gPlayers[nPlayer].swing.nCalibrateY = gPlayers[nPlayer].swing.nRestCY;
+            gPlayers[nPlayer].swing.nCalibrateX = gPlayers[nPlayer].swing.nRestCX;
             gPlayers[nPlayer].swing.nStickUsed  = 1;
         } else {
-            gPlayers[nPlayer].swing.nCalibrateY      = gPlayers[nPlayer].swing.nRestY;
-            gPlayers[nPlayer].swing.nCalibrateX      = gPlayers[nPlayer].swing.nRestX;
+            gPlayers[nPlayer].swing.nCalibrateY = gPlayers[nPlayer].swing.nRestY;
+            gPlayers[nPlayer].swing.nCalibrateX = gPlayers[nPlayer].swing.nRestX;
             gPlayers[nPlayer].swing.nStickUsed  = 0;
         }
         EVENT_Trigger(nPlayer, 0x2C, 0, 0);
@@ -964,8 +958,8 @@ void SW_vUIUpdateIK(int nPlayer) {
 }
 
 // Show (nonzero) or hide (0) a player's boost display (bDrawBoostUI), which SW_vUIRender2D draws.
-void SW_vSetDisplayBoostUI(int nPlayer, int a) {
-    gPlayers[nPlayer].swing.bDrawBoostUI = a;
+void SW_vSetDisplayBoostUI(int nPlayer, int bDisplay) {
+    gPlayers[nPlayer].swing.bDrawBoostUI = bDisplay;
 }
 
 // Each frame (gomainloop), draw the player's boost display (UI_Obj_RenderBoostUI in the player's
