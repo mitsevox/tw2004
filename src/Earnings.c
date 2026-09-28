@@ -101,9 +101,9 @@ int   fn_800D0E74(int nPlayer);
 int   fn_800D0F04(int nPlayer, int nToPar);
 int   fn_800D1330(int nPlayer);
 int   fn_800D3208(void);                                // CourseData.c
-u8    GM_Earnings_CheckEagleEveryPar5(int nPlayer, u8 bCheck);
-u8    GM_Earnings_CheckWinAllTournaments(int nPlayer, u8 bCheck);
-u8    GM_Earnings_CheckFirstTournamentWin(int nPlayer, u8 bCheck);
+u8    GM_Earnings_CheckEagleEveryPar5(int nPlayer, u8 bPreview);
+u8    GM_Earnings_CheckWinAllTournaments(int nPlayer, u8 bPreview);
+u8    GM_Earnings_CheckFirstTournamentWin(int nPlayer, u8 bPreview);
 s32   fn_80126FA0(void);                                // GameMode22.c
 s32   fn_80127098(s32 n);
 
@@ -1230,7 +1230,7 @@ void GM_Earnings_CheckHoleGoals(int nPlayer, u8 bPreview, u8 bRoundOver) {
 // of items 0..70 and this hole's item is one it does not hold. The strokes are read at
 // Game_GetCurHoleNum (the hole's number on its course), and course 10 (items 27..30) is missing
 // from the table below. TW07: GM_Earnings_CheckEagleEveryPar5.
-u8 GM_Earnings_CheckEagleEveryPar5(int nPlayer, u8 bCheck) {
+u8 GM_Earnings_CheckEagleEveryPar5(int nPlayer, u8 bPreview) {
     int nProfile;
     u8 bAll;
     int i;
@@ -1239,7 +1239,7 @@ u8 GM_Earnings_CheckEagleEveryPar5(int nPlayer, u8 bCheck) {
 
     nProfile = gPlayers[nPlayer].nIndex;
     if (!gpSaveData[nProfile].bActive) return 0;
-    if (!bCheck) {
+    if (!bPreview) {
         bAll = 1;
         for (i = 0; i < 71; i++) {
             if (!fn_800588F4(&gpSaveData[nProfile], 0, i)) {
@@ -1419,7 +1419,7 @@ u8 GM_Earnings_CheckEagleEveryPar5(int nPlayer, u8 bCheck) {
 // Whole-round test 2 of the hole goals: without bPreview, whether the profile has won all 31 PGA
 // TOUR tournaments; with it, whether this is the PGA TOUR (game mode 23) with 30 won and holing
 // this ball would win (fn_800CF450). TW07: GM_Earnings_CheckWinAllTournaments.
-u8 GM_Earnings_CheckWinAllTournaments(int nPlayer, u8 bCheck) {
+u8 GM_Earnings_CheckWinAllTournaments(int nPlayer, u8 bPreview) {
     SaveProfile* pProfile;
     int i;
     int n;
@@ -1429,7 +1429,7 @@ u8 GM_Earnings_CheckWinAllTournaments(int nPlayer, u8 bCheck) {
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return 0;
     pProfile = &gpSaveData[nProfile];
-    if (!bCheck) {
+    if (!bPreview) {
         bAll = 1;
         for (i = 0; i < 31; i++) {
             if (!pProfile->aC8[i].award.bWon) {
@@ -1451,7 +1451,7 @@ u8 GM_Earnings_CheckWinAllTournaments(int nPlayer, u8 bCheck) {
 // Whole-round test 4 of the hole goals: without bPreview, whether the profile has won any PGA TOUR
 // tournament; with it, whether this is the PGA TOUR (game mode 23) and holing this ball would win
 // (fn_800CF450). TW07: GM_Earnings_CheckFirstTournamentWin.
-u8 GM_Earnings_CheckFirstTournamentWin(int nPlayer, u8 bCheck) {
+u8 GM_Earnings_CheckFirstTournamentWin(int nPlayer, u8 bPreview) {
     SaveProfile* pProfile;
     int i;
     u8 bAny;
@@ -1460,7 +1460,7 @@ u8 GM_Earnings_CheckFirstTournamentWin(int nPlayer, u8 bCheck) {
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return 0;
     pProfile = &gpSaveData[nProfile];
-    if (!bCheck) {
+    if (!bPreview) {
         bAny = 0;
         for (i = 0; i < 31; i++) {
             if (pProfile->aC8[i].award.bWon) {
