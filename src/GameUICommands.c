@@ -54,7 +54,7 @@ void GM_vGetScoringMethod(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetElapsedTimeSeconds(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetNumberMatchWins(MsgArg* pArgs, MsgArg* pResult);
 void GM_vRestartCurHole(MsgArg* pArgs, MsgArg* pResult);
-void GM_vNoOp(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIGMessage131_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetGolferUserMoney(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIsPostShotCameraDone(MsgArg* pArgs, MsgArg* pResult);
 void GM_vScorecardGetPar(MsgArg* pArgs, MsgArg* pResult);
@@ -122,7 +122,7 @@ void GM_vCurrentReplayValid(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetNumHolesRemaining(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetPlayerUIZoomedIn(MsgArg* pArgs, MsgArg* pResult);
 void GM_vPracticeNextHole(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCommand92_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIGMessage92_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetPlayerShotSetup(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetPlayerBackSwing(MsgArg* pArgs, MsgArg* pResult);
 void GM_vLessonsQuit(MsgArg* pArgs, MsgArg* pResult);
@@ -134,8 +134,8 @@ void GM_vGetSpeedGolfWinner(MsgArg* pArgs, MsgArg* pResult);
 void GM_vFullRound(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetSpeedGolfPrizeScores(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetChallengeHolesLeft(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCommand103_Empty(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCommand104_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIGMessage103_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIGMessage104_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetEventNameAndText(MsgArg* pArgs, MsgArg* pResult);
 void GM_vPlayUISound(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetSpeedGolfPoints(MsgArg* pArgs, MsgArg* pResult);
@@ -146,13 +146,13 @@ void GM_vIG_MCLookAtCard(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIG_ReplaySpaceNeeded(MsgArg* pArgs, MsgArg* pResult);
 void GM_vPauseMenuClosed(MsgArg* pArgs, MsgArg* pResult);
 void GM_vQuickCheer(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCommand115_Returns0(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIGMessage115_Return0(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetTargetShotInfo(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetTargetHoleStat(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIsDemoSetup(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIsPausedForController(MsgArg* pArgs, MsgArg* pResult);
 void GM_vShotClockOut(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCommand122_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIGMessage122_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetStringLength(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetRecordName(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetRecordScore(MsgArg* pArgs, MsgArg* pResult);
@@ -162,26 +162,26 @@ void GM_vGetRecordHolderName(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetRecordValue(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetYardsToPin(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetSpeedGolfLogEntry(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCommand133_Returns7(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIGMessage133_Return7(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetHoleContestWon(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIsLadderEvent(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetRandInt(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCommand137_Returns0(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCommand138_Empty(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCommand139_Returns2And1(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCommand140_Returns2(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCommand141_EchoArg(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIGMessage137_Return0(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIGMessage138_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIGMessage139_Return2And1(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIGMessage140_Return2(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIGMessage141_ReturnArg(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetLetter(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIG_MCGetCardErrors(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetCourseHoleName(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetMessageQueHeld(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIG_MCFreeFiles(MsgArg* pArgs, MsgArg* pResult);
-void IG_vNoOp147(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIGMessage147_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vAllowConcede(MsgArg* pArgs, MsgArg* pResult);
 void IG_vEndGameLoop(MsgArg* pArgs, MsgArg* pResult);
 void IG_vHoleContest_GetWinnerShotKind(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIG_GetGameName(MsgArg* pArgs, MsgArg* pResult);
-void IG_vNoOp153(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIGMessage153_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIsOnlineEvent(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIG_MCIsSaveCorrupt(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIG_MCDeleteSave(MsgArg* pArgs, MsgArg* pResult);
@@ -195,12 +195,12 @@ void IG_vMuteForScoreCard(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIG_MCGetSaveNeeds(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIG_OnlineSendChat(MsgArg* pArgs, MsgArg* pResult);
 void GM_vOnlineMode(MsgArg* pArgs, MsgArg* pResult);
-void IG_vReturnZero195(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIGMessage195_Return0(MsgArg* pArgs, MsgArg* pResult);
 void IG_vGetLongDriveStat(MsgArg* pArgs, MsgArg* pResult);
-void IG_vNoOp170(MsgArg* pArgs, MsgArg* pResult);
-void IG_vNoOp172(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIGMessage170_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIGMessage172_Empty(MsgArg* pArgs, MsgArg* pResult);
 void IG_vIsDemoSetup(MsgArg* pArgs, MsgArg* pResult);
-void IG_vNoOp175(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIGMessage175_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetNumberClubs(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetClubAvailable(MsgArg* pArgs, MsgArg* pResult);
 void GM_vAddRemoveClub(MsgArg* pArgs, MsgArg* pResult);
@@ -208,7 +208,7 @@ void IG_vSwapDiscReloadHole(MsgArg* pArgs, MsgArg* pResult);
 void IG_vGetDiscDriveStatus(MsgArg* pArgs, MsgArg* pResult);
 void IG_vCloseMenuCheckDisc(MsgArg* pArgs, MsgArg* pResult);
 void IG_vResumeCheckDisc(MsgArg* pArgs, MsgArg* pResult);
-void IG_vNoOp183(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIGMessage183_Empty(MsgArg* pArgs, MsgArg* pResult);
 void IG_vGetChallengeName(MsgArg* pArgs, MsgArg* pResult);
 void IG_vGetChallengeDescription(MsgArg* pArgs, MsgArg* pResult);
 void IG_vAcceptOnlineInput(MsgArg* pArgs, MsgArg* pResult);
@@ -461,7 +461,7 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[89] = GM_vGetNumHolesRemaining;
     gIGMessageHandlers[90] = GM_vGetPlayerUIZoomedIn;
     gIGMessageHandlers[91] = GM_vPracticeNextHole;
-    gIGMessageHandlers[92] = GM_vCommand92_Empty;
+    gIGMessageHandlers[92] = GM_vIGMessage92_Empty;
     gIGMessageHandlers[93] = GM_vGetPlayerShotSetup;
     gIGMessageHandlers[94] = GM_vLessonsQuit;
     gIGMessageHandlers[95] = GM_vLessonsContinue;
@@ -472,8 +472,8 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[100] = GM_vFullRound;
     gIGMessageHandlers[101] = GM_vGetSpeedGolfPrizeScores;
     gIGMessageHandlers[102] = GM_vGetChallengeHolesLeft;
-    gIGMessageHandlers[103] = GM_vCommand103_Empty;
-    gIGMessageHandlers[104] = GM_vCommand104_Empty;
+    gIGMessageHandlers[103] = GM_vIGMessage103_Empty;
+    gIGMessageHandlers[104] = GM_vIGMessage104_Empty;
     gIGMessageHandlers[105] = GM_vGetEventNameAndText;
     gIGMessageHandlers[106] = GM_vPlayUISound;
     gIGMessageHandlers[107] = GM_vGetSpeedGolfPoints;
@@ -484,13 +484,13 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[112] = GM_vIG_ReplaySpaceNeeded;
     gIGMessageHandlers[113] = GM_vPauseMenuClosed;
     gIGMessageHandlers[114] = GM_vQuickCheer;
-    gIGMessageHandlers[115] = GM_vCommand115_Returns0;
+    gIGMessageHandlers[115] = GM_vIGMessage115_Return0;
     gIGMessageHandlers[116] = GM_vGetModeValue;
     gIGMessageHandlers[117] = GM_vGetTargetShotInfo;
     gIGMessageHandlers[118] = GM_vGetTargetHoleStat;
     gIGMessageHandlers[120] = GM_vIsPausedForController;
     gIGMessageHandlers[121] = GM_vShotClockOut;
-    gIGMessageHandlers[122] = GM_vCommand122_Empty;
+    gIGMessageHandlers[122] = GM_vIGMessage122_Empty;
     gIGMessageHandlers[123] = GM_vGetStringLength;
     gIGMessageHandlers[124] = GM_vGetRecordName;
     gIGMessageHandlers[125] = GM_vGetRecordScore;
@@ -499,29 +499,29 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[128] = GM_vGetRecordHolderName;
     gIGMessageHandlers[129] = GM_vGetRecordValue;
     gIGMessageHandlers[130] = GM_vGetYardsToPin;
-    gIGMessageHandlers[131] = GM_vNoOp;
+    gIGMessageHandlers[131] = GM_vIGMessage131_Empty;
     gIGMessageHandlers[132] = GM_vGetSpeedGolfLogEntry;
-    gIGMessageHandlers[133] = GM_vCommand133_Returns7;
+    gIGMessageHandlers[133] = GM_vIGMessage133_Return7;
     gIGMessageHandlers[134] = GM_vGetHoleContestWon;
     gIGMessageHandlers[135] = GM_vIsLadderEvent;
     gIGMessageHandlers[136] = GM_vGetRandInt;
-    gIGMessageHandlers[137] = GM_vCommand137_Returns0;
-    gIGMessageHandlers[138] = GM_vCommand138_Empty;
-    gIGMessageHandlers[139] = GM_vCommand139_Returns2And1;
-    gIGMessageHandlers[140] = GM_vCommand140_Returns2;
-    gIGMessageHandlers[141] = GM_vCommand141_EchoArg;
+    gIGMessageHandlers[137] = GM_vIGMessage137_Return0;
+    gIGMessageHandlers[138] = GM_vIGMessage138_Empty;
+    gIGMessageHandlers[139] = GM_vIGMessage139_Return2And1;
+    gIGMessageHandlers[140] = GM_vIGMessage140_Return2;
+    gIGMessageHandlers[141] = GM_vIGMessage141_ReturnArg;
     gIGMessageHandlers[142] = GM_vGetLetter;
     gIGMessageHandlers[143] = GM_vIG_MCGetCardErrors;
     gIGMessageHandlers[144] = GM_vGetCourseHoleName;
     gIGMessageHandlers[145] = GM_vSetMessageQueHeld;
     gIGMessageHandlers[146] = GM_vIG_MCFreeFiles;
-    gIGMessageHandlers[147] = IG_vNoOp147;
+    gIGMessageHandlers[147] = GM_vIGMessage147_Empty;
     gIGMessageHandlers[148] = GM_vAllowConcede;
     gIGMessageHandlers[149] = IG_vEndGameLoop;
     gIGMessageHandlers[150] = IG_vHoleContest_GetWinnerShotKind;
     gIGMessageHandlers[151] = GM_vIG_GetGameName;
     gIGMessageHandlers[152] = GM_vGetPlayerShortName;
-    gIGMessageHandlers[153] = IG_vNoOp153;
+    gIGMessageHandlers[153] = GM_vIGMessage153_Empty;
     gIGMessageHandlers[154] = GM_vIsOnlineEvent;
     gIGMessageHandlers[155] = GM_vIG_MCIsSaveCorrupt;
     gIGMessageHandlers[156] = GM_vIG_MCDeleteSave;
@@ -538,12 +538,12 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[167] = GM_vIG_OnlineSendChat;
     gIGMessageHandlers[168] = GM_vOnlineMode;
     gIGMessageHandlers[169] = IG_vGetLongDriveStat;
-    gIGMessageHandlers[170] = IG_vNoOp170;
+    gIGMessageHandlers[170] = GM_vIGMessage170_Empty;
     gIGMessageHandlers[171] = GM_vIsDemoSetup;
-    gIGMessageHandlers[172] = IG_vNoOp172;
+    gIGMessageHandlers[172] = GM_vIGMessage172_Empty;
     gIGMessageHandlers[173] = IG_vIsDemoSetup;
     gIGMessageHandlers[174] = GM_vGetPlayerFirstName;
-    gIGMessageHandlers[175] = IG_vNoOp175;
+    gIGMessageHandlers[175] = GM_vIGMessage175_Empty;
     gIGMessageHandlers[176] = GM_vGetNumberClubs;
     gIGMessageHandlers[177] = GM_vGetClubAvailable;
     gIGMessageHandlers[178] = GM_vAddRemoveClub;
@@ -554,7 +554,7 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[182] = GM_vGetPlayerHolePoints;
     gIGMessageHandlers[184] = IG_vGetChallengeName;
     gIGMessageHandlers[185] = IG_vGetChallengeDescription;
-    gIGMessageHandlers[183] = IG_vNoOp183;
+    gIGMessageHandlers[183] = GM_vIGMessage183_Empty;
     gIGMessageHandlers[186] = IG_vAcceptOnlineInput;
     gIGMessageHandlers[187] = IG_vBattle_GetNumClubsStart;
     gIGMessageHandlers[188] = IG_vBattle_GetClubAddable;
@@ -564,7 +564,7 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[192] = IG_vPlayShotScoreAnimSound;
     gIGMessageHandlers[193] = IG_vPlayIngGameCommentaryRewardSound;
     gIGMessageHandlers[194] = IG_vRewardCommentaryIsPlaying;
-    gIGMessageHandlers[195] = IG_vReturnZero195;
+    gIGMessageHandlers[195] = GM_vIGMessage195_Return0;
     gIGMessageHandlers[196] = IG_vGetStringSize;
     gIGMessageHandlers[198] = IG_vGetLocalUserIndex;
     gIGMessageHandlers[199] = IG_vShow_Putting_Tip;
@@ -892,7 +892,7 @@ void GM_vRestartCurHole(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Message 131: empty in this build.
-void GM_vNoOp(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIGMessage131_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Message 26: the money in player pArgs[0]'s save profile (n6C), 0 when the profile is not active.
@@ -1668,7 +1668,7 @@ void GM_vPracticeNextHole(MsgArg* pArgs, MsgArg* pResult) {
 
 // Empty in this build: the UI's command 92, between GM_vPracticeNextHole and
 // GM_vGetPlayerShotSetup.
-void GM_vCommand92_Empty(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIGMessage92_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Whether the player is lining up a shot (states 2 to 4, 8 or 10) and has not started the swing.
@@ -1753,11 +1753,11 @@ void GM_vGetChallengeHolesLeft(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Empty in this build: the UI's command 103.
-void GM_vCommand103_Empty(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIGMessage103_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Empty in this build: the UI's command 104.
-void GM_vCommand104_Empty(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIGMessage104_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // The event being played, its name into pArgs[0] and its description into pArgs[1] (command 105):
@@ -1857,7 +1857,7 @@ void GM_vQuickCheer(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // The UI's command 115: always answers 0 in this build.
-void GM_vCommand115_Returns0(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIGMessage115_Return0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
@@ -1933,7 +1933,7 @@ void GM_vShotClockOut(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Empty in this build: the UI's command 122.
-void GM_vCommand122_Empty(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIGMessage122_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // A string's length.
@@ -2243,7 +2243,7 @@ void GM_vGetSpeedGolfLogEntry(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // The UI's command 133: always answers 7 in this build.
-void GM_vCommand133_Returns7(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIGMessage133_Return7(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 7;
 }
 
@@ -2280,28 +2280,28 @@ void GM_vGetRandInt(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // The UI's command 137: always answers 0 in this build.
-void GM_vCommand137_Returns0(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIGMessage137_Return0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
 // Empty in this build: the UI's command 138.
-void GM_vCommand138_Empty(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIGMessage138_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // The UI's command 139: always writes 2 into *pArgs[0] and 1 into *pArgs[1] in this build.
-void GM_vCommand139_Returns2And1(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIGMessage139_Return2And1(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[0].p = 2;
     *(s32*)pArgs[1].p = 1;
 }
 
 // The UI's command 140: always answers 2 in this build.
-void GM_vCommand140_Returns2(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIGMessage140_Return2(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 2;
 }
 
 // The UI's command 141: writes pArgs[0] into *pArgs[1] and 0 into *pArgs[2] (the menus' fn_80082980
 // does the same).
-void GM_vCommand141_EchoArg(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIGMessage141_ReturnArg(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[1].p = pArgs[0].i;
     *(s32*)pArgs[2].p = 0;
 }
@@ -2424,7 +2424,7 @@ void GM_vIG_MCFreeFiles(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Command 147: does nothing (empty in this build).
-void IG_vNoOp147(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIGMessage147_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Command 148: whether the player whose turn it is may concede: 0 while his post-shot HUD is
@@ -2465,7 +2465,7 @@ void GM_vIG_GetGameName(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Command 153: does nothing (empty in this build).
-void IG_vNoOp153(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIGMessage153_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Command 154: whether the event is played online: always 0 in this build.
@@ -2557,7 +2557,7 @@ void GM_vOnlineMode(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Command 195: always answers 0.
-void IG_vReturnZero195(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIGMessage195_Return0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
@@ -2601,11 +2601,11 @@ void IG_vGetLongDriveStat(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Command 170: does nothing (empty in this build).
-void IG_vNoOp170(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIGMessage170_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Command 172: does nothing (empty in this build).
-void IG_vNoOp172(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIGMessage172_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Command 173: whether gSession.uFlags has both 0x4000 (the demo set-up) and 0x8000.
@@ -2618,7 +2618,7 @@ void IG_vIsDemoSetup(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Command 175: does nothing (empty in this build).
-void IG_vNoOp175(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIGMessage175_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Command 176: how many clubs player pArgs[0] has in the bag.
@@ -2724,7 +2724,7 @@ void IG_vResumeCheckDisc(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Command 183: does nothing (empty in this build).
-void IG_vNoOp183(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vIGMessage183_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Command 184: the name of Play Now challenge group pArgs[1] (PlayNow_GetGroupName), copied into

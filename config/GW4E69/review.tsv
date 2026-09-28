@@ -2921,3 +2921,42 @@ address	name	comment	by	date
 8007C9F8	GM_vMCLoadOptions	add	ro5 (replayed by orchestrator)	2026-09-28
 8007CA4C	GM_vSetOptionFlags1And2	rewrite	ro5 (replayed by orchestrator)	2026-09-28
 8007CACC	GM_vSetCommentaryOption	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+8007BCA0	GM_vFEMessage8_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+8007BD18	GM_vFEMessage10_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+8007BEEC	GM_vFEMessage17_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+8007C248	GM_vFEMessage25_Return1	keep	orchestrator (stub-name standard)	2026-09-28
+8007C488	GM_vFEMessage31_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+8007C790	GM_vFEMessage43_Return1	keep	orchestrator (stub-name standard)	2026-09-28
+8007C7AC	GM_vFEMessage45_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+8007C94C	GM_vFEMessage326_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+80107994	GM_vFEMessage404_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+80107998	GM_vFEMessage405_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+80107BA4	GM_vFEMessage408_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+80107C30	GM_vFEMessage411_Return0	keep	orchestrator (stub-name standard)	2026-09-28
+80109430	GM_vFEMessage534_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+801094FC	GM_vFEMessage539_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+80109DDC	GM_vFEMessage566_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+801098AC	GM_vFEMessage598_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+80109734	GM_vFEMessage609_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+8010A3C4	GM_vFEMessage741_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+80112438	GM_vFEMessage511_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+8010EF80	GM_vFEMessage560_Return25	keep	orchestrator (stub-name standard)	2026-09-28
+800880CC	GM_vIGMessage92_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+80088354	GM_vIGMessage103_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+80088358	GM_vIGMessage104_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+80088654	GM_vIGMessage115_Return0	keep	orchestrator (stub-name standard)	2026-09-28
+80088830	GM_vIGMessage122_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+800866E8	GM_vIGMessage131_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+80089584	GM_vIGMessage133_Return7	keep	orchestrator (stub-name standard)	2026-09-28
+8008967C	GM_vIGMessage137_Return0	keep	orchestrator (stub-name standard)	2026-09-28
+80089688	GM_vIGMessage138_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+8008968C	GM_vIGMessage139_Return2And1	keep	orchestrator (stub-name standard)	2026-09-28
+800896A8	GM_vIGMessage140_Return2	keep	orchestrator (stub-name standard)	2026-09-28
+800896B4	GM_vIGMessage141_ReturnArg	keep	orchestrator (stub-name standard)	2026-09-28
+80089AD0	GM_vIGMessage147_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+80089BD0	GM_vIGMessage153_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+80089E5C	GM_vIGMessage170_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+80089E60	GM_vIGMessage172_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+80089E98	GM_vIGMessage175_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+8008A184	GM_vIGMessage183_Empty	keep	orchestrator (stub-name standard)	2026-09-28
+80089DA4	GM_vIGMessage195_Return0	keep	orchestrator (stub-name standard)	2026-09-28

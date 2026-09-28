@@ -70,11 +70,11 @@ void GM_vGetCrAPItemColor(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 404: does nothing in this build.
-void GM_vCrAPMessage404_Empty(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFEMessage404_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 405: does nothing in this build.
-void GM_vCrAPMessage405_Empty(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFEMessage405_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 406: set slider pArgs[0] (0..25) of the created golfer to pArgs[1]. When the menu
@@ -192,7 +192,7 @@ void GM_vGetCRAPItem(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 408: does nothing in this build.
-void GM_vCrAPMessage408_Empty(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFEMessage408_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 409: slider pArgs[0] of the created golfer (the profile's choices.a9B4, read
@@ -209,7 +209,7 @@ void GM_vGetNumCrAPGeometries(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 411: always answers 0 in this build.
-void GM_vCrAPMessage411_Zero(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFEMessage411_Return0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
@@ -886,7 +886,7 @@ void GM_vGetCrAPItemUnlockText(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 534: does nothing in this build.
-void GM_vCrAPMessage534_Empty(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFEMessage534_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 535: the Create-A-Player camera's idle state (FE_SetCrAPCameraIdleState): 0 the
@@ -912,7 +912,7 @@ void GM_vIsGolferLoaderIdle(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 539: does nothing in this build.
-void GM_vCrAPMessage539_Empty(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFEMessage539_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 542: 1 while the menus work on their own copy of the profile, 0 while on the player
@@ -984,7 +984,7 @@ void GM_vGetLogoShape(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 609: does nothing in this build.
-void GM_vCrAPMessage609_Empty(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFEMessage609_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 657: let the menu golfer's animation and camera calls run (pArgs[0] 1) or do nothing
@@ -1058,7 +1058,7 @@ void GM_vClearGolferCache(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 598: does nothing in this build.
-void GM_vCrAPMessage598_Empty(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFEMessage598_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 689: dress and shape the created golfer at random. The assets in slots 2, 5..8 and
@@ -1184,7 +1184,7 @@ void GM_vRandomizeCrAPLookInFaceShot(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 566: does nothing in this build.
-void GM_vCrAPMessage566_Empty(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFEMessage566_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 711: sell choice pArgs[2] under entry pArgs[1] of part pArgs[0] back: a quarter of
@@ -1338,7 +1338,7 @@ void GM_vRestoreAfterPreview(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 741: does nothing in this build.
-void GM_vCrAPMessage741_Empty(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFEMessage741_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 756: whether year pArgs[0] is a leap year (IsLeapYear; 1900 counts as one).

@@ -157,7 +157,7 @@ void Calendar_GetPopupRow(MsgArg* pArgs, MsgArg* pResult) {
 
 // FE message 511: does nothing (empty in this build). It sits with the calendar screen's messages,
 // between the popup row (497) and play (519).
-void Calendar_DoNothing(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFEMessage511_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // FE message 519: plays the selected day's event through the calendar driver (gCalendarPlay; for

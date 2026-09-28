@@ -324,7 +324,7 @@ s16 gPgaSponsorChoices[11] = { 0, 1, 2, 5, 6, 9, 10, 11, 13, 14, 15 };
 
 // FE message 560: always gives 25. What the menus count with it is not known; its message number
 // follows the placeholder texts' (PGATourMsg_GetTestText, 559).
-void PGATourMsg_Get25(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFEMessage560_Return25(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 25;
 }
 

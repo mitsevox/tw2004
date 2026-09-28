@@ -100,14 +100,14 @@ void fn_80123CBC(s32 a, s32 b);
 void GM_vGetNumCrAPItems(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetCrAPItemValue(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetCrAPItemColor(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCrAPMessage404_Empty(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCrAPMessage405_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage404_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage405_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetCRAPSlider(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetCRAPItem(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCrAPMessage408_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage408_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetCRAPSlider(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetNumCrAPGeometries(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCrAPMessage411_Zero(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage411_Return0(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetCrAPItemInfo(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetCrAPItemAttributes(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetCrAPItemPriceAndLock(MsgArg* pArgs, MsgArg* pResult);
@@ -150,30 +150,30 @@ void GM_vGetGolferAttributeTier(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetCrAPSubcategoryName(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetCrAPColorName(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetCrAPItemUnlockText(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCrAPMessage534_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage534_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetCrAPCameraIdleState(MsgArg* pArgs, MsgArg* pResult);
 void GM_vHasMenuGolfer(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIsMenuGolferReady(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIsGolferLoaderIdle(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCrAPMessage539_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage539_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetUseProfileCopy(MsgArg* pArgs, MsgArg* pResult);
 void GM_vCRAPCreatingLogo(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetLogoPaletteEntry(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetLogoPixel(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetLogoShape(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetLogoShape(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCrAPMessage609_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage609_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetCrAPTriggerAnims(MsgArg* pArgs, MsgArg* pResult);
 void GM_vRestartCrAPAnim(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetCrAPRenderStateForSubcategory(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetCrAPClub(MsgArg* pArgs, MsgArg* pResult);
 void GM_vClearGolferCache(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCrAPMessage598_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage598_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vRandomizeCrAPGolfer(MsgArg* pArgs, MsgArg* pResult);
 void GM_vRandomizeCrAPOutfit(MsgArg* pArgs, MsgArg* pResult);
 void GM_vRandomizeCrAPGolferInIdleShot(MsgArg* pArgs, MsgArg* pResult);
 void GM_vRandomizeCrAPLookInFaceShot(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCrAPMessage566_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage566_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSellCrAPItem(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetCrAPCategoryCounts(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetNumCrAPSaleItemsOwned(MsgArg* pArgs, MsgArg* pResult);
@@ -183,7 +183,7 @@ void GM_vGetEquippedCrAPItemInSubcategory(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIsCrAPAnimInGolferLib(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetCrAPItemSlot(MsgArg* pArgs, MsgArg* pResult);
 void GM_vRestoreAfterPreview(MsgArg* pArgs, MsgArg* pResult);
-void GM_vCrAPMessage741_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage741_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIsLeapYear(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIsCrAPItemRemovable(MsgArg* pArgs, MsgArg* pResult);
 void PGALeaderboard_GetRow(MsgArg* pArgs, MsgArg* pResult);
@@ -195,7 +195,7 @@ void PGATourMsg_IsSeasonOver(MsgArg* pArgs, MsgArg* pResult);
 void PGASeasonWrapUp_GetLine(MsgArg* pArgs, MsgArg* pResult);
 void PGADriver_ShowCalendar_AdvanceSeason(void);       // FE_PGATourMessages.c: message 553
 void PGATourMsg_GetTestText(MsgArg* pArgs, MsgArg* pResult);
-void PGATourMsg_Get25(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage560_Return25(MsgArg* pArgs, MsgArg* pResult);
 void PGASponsor_SignNext(MsgArg* pArgs, MsgArg* pResult);
 void PGASponsor_GetItemBonus(MsgArg* pArgs, MsgArg* pResult);
 void PGASponsor_PickStartingSponsor(MsgArg* pArgs, MsgArg* pResult);
@@ -219,7 +219,7 @@ void Calendar_GetTodayCell(MsgArg* pArgs, MsgArg* pResult);
 void Calendar_SetDriver(MsgArg* pArgs, MsgArg* pResult);
 void Calendar_SelectCell(MsgArg* pArgs, MsgArg* pResult);
 void Calendar_GetPopupRow(MsgArg* pArgs, MsgArg* pResult);
-void Calendar_DoNothing(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage511_Empty(MsgArg* pArgs, MsgArg* pResult);
 void Calendar_Play(MsgArg* pArgs, MsgArg* pResult);
 void Calendar_IsSimulationNecessary(MsgArg* pArgs, MsgArg* pResult);
 void Calendar_GetRTEDescription(MsgArg* pArgs, MsgArg* pResult);
@@ -271,15 +271,15 @@ void GM_vMessage4_GetMinPlayersForMode(MsgArg* pArgs, MsgArg* pResult);
 void GM_vMessage6_GetMinPlayersForMode(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetGameMode(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetNumPlayers(MsgArg* pArgs, MsgArg* pResult);
-void GM_vMessage8_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage8_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vStartDemo(MsgArg* pArgs, MsgArg* pResult);
-void GM_vMessage10_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage10_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetCourse(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSelectSingleHole(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetHoleSet(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetGolferAttribute(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetGolferName(MsgArg* pArgs, MsgArg* pResult);
-void GM_vMessage17_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage17_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vInitCustomRound(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetDemoSetupFlag(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetPlayerGolfer(MsgArg* pArgs, MsgArg* pResult);
@@ -287,14 +287,14 @@ void GM_vGetNumPlayers(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetPlayerController(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetPlayerGolfer(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetGameMode(MsgArg* pArgs, MsgArg* pResult);
-void GM_vMessage25_Returns1(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage25_Return1(MsgArg* pArgs, MsgArg* pResult);
 void GM_vHideCharacter(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetCharState(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetGolferLastName(MsgArg* pArgs, MsgArg* pResult);
 void GM_vMCGetUserName(MsgArg* pArgs, MsgArg* pResult);
 void GM_vMCGetUserNames(MsgArg* pArgs, MsgArg* pResult);
 void GM_vMCIsCardPresent(MsgArg* pArgs, MsgArg* pResult);
-void GM_vMessage31_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage31_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetControllerInputEnabled(MsgArg* pArgs, MsgArg* pResult);
 void GM_vMCConnect(MsgArg* pArgs, MsgArg* pResult);
 void GM_vMCDisconnect(MsgArg* pArgs, MsgArg* pResult);
@@ -306,16 +306,16 @@ void GM_vMCFormatCard(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetTeeSet(MsgArg* pArgs, MsgArg* pResult);
 void GM_vProfileHasCreatedGolfer(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetFirstCreatedGolfer(MsgArg* pArgs, MsgArg* pResult);
-void GM_vMessage43_Returns1(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage43_Return1(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetCreatedGolferIndex(MsgArg* pArgs, MsgArg* pResult);
-void GM_vMessage45_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage45_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIsGolferAvailable(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIsControllerPluggedIn(MsgArg* pArgs, MsgArg* pResult);
 void GM_vMCIsCardFormatted(MsgArg* pArgs, MsgArg* pResult);
 void GM_vMCIsWrongDevice(MsgArg* pArgs, MsgArg* pResult);
 void GM_vMCGetFreeBlocks(MsgArg* pArgs, MsgArg* pResult);
 void GM_vMCOptionsMemoryRequired(MsgArg* pArgs, MsgArg* pResult);
-void GM_vMessage326_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage326_Empty(MsgArg* pArgs, MsgArg* pResult);
 void GM_vMCIsMultitapPluggedIn(MsgArg* pArgs, MsgArg* pResult);
 void GM_vMCfunction(MsgArg* pArgs, MsgArg* pResult);
 void GM_vMCSaveOptions(MsgArg* pArgs, MsgArg* pResult);
@@ -738,15 +738,15 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[5] = GM_vSetGameMode;
     gFEMessageHandlers[6] = GM_vMessage6_GetMinPlayersForMode;
     gFEMessageHandlers[7] = GM_vSetNumPlayers;
-    gFEMessageHandlers[8] = GM_vMessage8_Empty;
+    gFEMessageHandlers[8] = GM_vFEMessage8_Empty;
     gFEMessageHandlers[9] = GM_vStartDemo;
-    gFEMessageHandlers[10] = GM_vMessage10_Empty;
+    gFEMessageHandlers[10] = GM_vFEMessage10_Empty;
     gFEMessageHandlers[12] = GM_vSetCourse;
     gFEMessageHandlers[13] = GM_vSelectSingleHole;
     gFEMessageHandlers[14] = GM_vSetHoleSet;
     gFEMessageHandlers[15] = GM_vGetGolferAttribute;
     gFEMessageHandlers[16] = GM_vGetGolferName;
-    gFEMessageHandlers[17] = GM_vMessage17_Empty;
+    gFEMessageHandlers[17] = GM_vFEMessage17_Empty;
     gFEMessageHandlers[18] = GM_vInitCustomRound;
     gFEMessageHandlers[19] = GM_vGetDemoSetupFlag;
     gFEMessageHandlers[20] = GM_vSetPlayerGolfer;
@@ -754,13 +754,13 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[22] = GM_vSetPlayerController;
     gFEMessageHandlers[23] = GM_vGetPlayerGolfer;
     gFEMessageHandlers[24] = GM_vGetGameMode;
-    gFEMessageHandlers[25] = GM_vMessage25_Returns1;
+    gFEMessageHandlers[25] = GM_vFEMessage25_Return1;
     gFEMessageHandlers[26] = GM_vHideCharacter;
     gFEMessageHandlers[27] = GM_vSetCharState;
     gFEMessageHandlers[28] = GM_vGetGolferLastName;
     gFEMessageHandlers[29] = GM_vMCGetUserName;
     gFEMessageHandlers[30] = GM_vMCIsCardPresent;
-    gFEMessageHandlers[31] = GM_vMessage31_Empty;
+    gFEMessageHandlers[31] = GM_vFEMessage31_Empty;
     gFEMessageHandlers[32] = GM_vSetControllerInputEnabled;
     gFEMessageHandlers[33] = GM_vMCConnect;
     gFEMessageHandlers[34] = GM_vMCDisconnect;
@@ -772,9 +772,9 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[40] = GM_vMCFormatCard;
     gFEMessageHandlers[41] = GM_vSetTeeSet;
     gFEMessageHandlers[42] = GM_vProfileHasCreatedGolfer;
-    gFEMessageHandlers[43] = GM_vMessage43_Returns1;
+    gFEMessageHandlers[43] = GM_vFEMessage43_Return1;
     gFEMessageHandlers[44] = GM_vGetCreatedGolferIndex;
-    gFEMessageHandlers[45] = GM_vMessage45_Empty;
+    gFEMessageHandlers[45] = GM_vFEMessage45_Empty;
     gFEMessageHandlers[46] = LadderMenu_StartEvent;
     gFEMessageHandlers[47] = GM_vIsGolferAvailable;
     gFEMessageHandlers[48] = GM_vIsControllerPluggedIn;
@@ -1056,7 +1056,7 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[323] = fn_8008311C;
     gFEMessageHandlers[324] = fn_80083354;
     gFEMessageHandlers[325] = fn_8007CDF0;
-    gFEMessageHandlers[326] = GM_vMessage326_Empty;
+    gFEMessageHandlers[326] = GM_vFEMessage326_Empty;
     gFEMessageHandlers[327] = fn_80083358;
     gFEMessageHandlers[328] = fn_800833C4;
     gFEMessageHandlers[329] = fn_800833D0;
@@ -1111,14 +1111,14 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[382] = GM_vGetCrAPItemValue;
     gFEMessageHandlers[383] = GM_vGetCrAPItemColor;
     gFEMessageHandlers[399] = fn_80083A4C;
-    gFEMessageHandlers[404] = GM_vCrAPMessage404_Empty;
-    gFEMessageHandlers[405] = GM_vCrAPMessage405_Empty;
+    gFEMessageHandlers[404] = GM_vFEMessage404_Empty;
+    gFEMessageHandlers[405] = GM_vFEMessage405_Empty;
     gFEMessageHandlers[406] = GM_vSetCRAPSlider;
     gFEMessageHandlers[407] = GM_vGetCRAPItem;
-    gFEMessageHandlers[408] = GM_vCrAPMessage408_Empty;
+    gFEMessageHandlers[408] = GM_vFEMessage408_Empty;
     gFEMessageHandlers[409] = GM_vGetCRAPSlider;
     gFEMessageHandlers[410] = GM_vGetNumCrAPGeometries;
-    gFEMessageHandlers[411] = GM_vCrAPMessage411_Zero;
+    gFEMessageHandlers[411] = GM_vFEMessage411_Return0;
     gFEMessageHandlers[412] = GM_vGetCrAPItemInfo;
     gFEMessageHandlers[451] = GM_vGetCrAPItemAttributes;
     gFEMessageHandlers[452] = GM_vGetCrAPItemPriceAndLock;
@@ -1148,17 +1148,17 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[527] = GM_vGetCrAPSubcategoryName;
     gFEMessageHandlers[528] = GM_vGetCrAPColorName;
     gFEMessageHandlers[529] = GM_vGetCrAPItemUnlockText;
-    gFEMessageHandlers[534] = GM_vCrAPMessage534_Empty;
+    gFEMessageHandlers[534] = GM_vFEMessage534_Empty;
     gFEMessageHandlers[535] = GM_vSetCrAPCameraIdleState;
     gFEMessageHandlers[538] = GM_vHasMenuGolfer;
-    gFEMessageHandlers[539] = GM_vCrAPMessage539_Empty;
+    gFEMessageHandlers[539] = GM_vFEMessage539_Empty;
     gFEMessageHandlers[542] = GM_vGetUseProfileCopy;
     gFEMessageHandlers[547] = GM_vRandomizeCrAPGolferInIdleShot;
     gFEMessageHandlers[554] = GM_vRandomizeCrAPLookInFaceShot;
     gFEMessageHandlers[557] = GM_vGetDPadHeld;
     gFEMessageHandlers[562] = GM_vIsMenuGolferReady;
     gFEMessageHandlers[687] = GM_vIsGolferLoaderIdle;
-    gFEMessageHandlers[566] = GM_vCrAPMessage566_Empty;
+    gFEMessageHandlers[566] = GM_vFEMessage566_Empty;
     gFEMessageHandlers[458] = PGALeaderboard_GetRow;
     gFEMessageHandlers[459] = PGALeaderboard_GetNumRows;
     gFEMessageHandlers[466] = PGASchedule_GetRow;
@@ -1169,7 +1169,7 @@ void FE_InitGameMessages(void) {
     // port: EA passes two arguments PGADriver_ShowCalendar_AdvanceSeason ignores (defined (void))
     gFEMessageHandlers[553] = (MsgHandler)PGADriver_ShowCalendar_AdvanceSeason;
     gFEMessageHandlers[559] = PGATourMsg_GetTestText;
-    gFEMessageHandlers[560] = PGATourMsg_Get25;
+    gFEMessageHandlers[560] = GM_vFEMessage560_Return25;
     gFEMessageHandlers[563] = PGASponsor_SignNext;
     gFEMessageHandlers[742] = PGATourMsg_SetStatsDirty;
     gFEMessageHandlers[743] = PGATourMsg_SetScoresDirty;
@@ -1186,7 +1186,7 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[488] = Calendar_SetDriver;
     gFEMessageHandlers[496] = Calendar_SelectCell;
     gFEMessageHandlers[497] = Calendar_GetPopupRow;
-    gFEMessageHandlers[511] = Calendar_DoNothing;
+    gFEMessageHandlers[511] = GM_vFEMessage511_Empty;
     gFEMessageHandlers[519] = Calendar_Play;
     gFEMessageHandlers[549] = Calendar_IsSimulationNecessary;
     gFEMessageHandlers[521] = UIStatsRankings_GetRow;
@@ -1212,7 +1212,7 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[543] = GM_vCRAPCreatingLogo;
     gFEMessageHandlers[587] = GM_vSetLogoShape;
     gFEMessageHandlers[588] = GM_vGetLogoShape;
-    gFEMessageHandlers[598] = GM_vCrAPMessage598_Empty;
+    gFEMessageHandlers[598] = GM_vFEMessage598_Empty;
     gFEMessageHandlers[565] = fn_8007D9E4;
     gFEMessageHandlers[567] = GM_vMCGetUserNames;
     gFEMessageHandlers[568] = FE_Sqrt;
@@ -1232,7 +1232,7 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[605] = TrophyRoom_GetTourTrophy;
     gFEMessageHandlers[606] = TrophyRoom_GetTourTrophyText;
     gFEMessageHandlers[608] = fn_8007F0D0;
-    gFEMessageHandlers[609] = GM_vCrAPMessage609_Empty;
+    gFEMessageHandlers[609] = GM_vFEMessage609_Empty;
     gFEMessageHandlers[610] = fn_8007E128;
     gFEMessageHandlers[611] = fn_80083EBC;
     gFEMessageHandlers[612] = fn_80083F60;
@@ -1328,7 +1328,7 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[737] = fn_80084D6C;
     gFEMessageHandlers[739] = GM_vGetCrAPItemSlot;
     gFEMessageHandlers[740] = GM_vRestoreAfterPreview;
-    gFEMessageHandlers[741] = GM_vCrAPMessage741_Empty;
+    gFEMessageHandlers[741] = GM_vFEMessage741_Empty;
     gFEMessageHandlers[746] = fn_80084DF4;
     gFEMessageHandlers[749] = PGATourMsg_DidUserQuit;
     gFEMessageHandlers[751] = fn_80084E7C;
@@ -1378,7 +1378,7 @@ void GM_vSetNumPlayers(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 8: empty in this build.
-void GM_vMessage8_Empty(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFEMessage8_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 3: sets up the session's players for the game the menus start (fn_80079AD4: CPU
@@ -1399,7 +1399,7 @@ void GM_vStartDemo(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 10: empty in this build.
-void GM_vMessage10_Empty(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFEMessage10_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 12: the round's course is pArgs[0] (GM_SetCurrentCourse).
@@ -1450,7 +1450,7 @@ void GetGolferName(int nGolfer, char* szName) {
 }
 
 // Front-end message 17: empty in this build.
-void GM_vMessage17_Empty(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFEMessage17_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 18: a custom round (gpGame->b136) of four holes: course 8's hole 17, course 5's
@@ -1531,7 +1531,7 @@ void GM_vGetGameMode(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 25: always answers 1 in this build.
-void GM_vMessage25_Returns1(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFEMessage25_Return1(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 1;
 }
 
@@ -1607,7 +1607,7 @@ void GM_vMCIsCardPresent(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 31: empty in this build.
-void GM_vMessage31_Empty(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFEMessage31_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 32: whether controller pArgs[0]'s buttons reach the menu UI (pArgs[1] nonzero:
@@ -1754,7 +1754,7 @@ void GM_vGetFirstCreatedGolfer(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 43: always answers 1 in this build.
-void GM_vMessage43_Returns1(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFEMessage43_Return1(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 1;
 }
 
@@ -1765,7 +1765,7 @@ void GM_vGetCreatedGolferIndex(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 45: empty in this build.
-void GM_vMessage45_Empty(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFEMessage45_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 47: golfer pArgs[0]'s bAvailable (a created golfer's from the current profile,
@@ -1829,7 +1829,7 @@ void GM_vMCOptionsMemoryRequired(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 326: empty in this build.
-void GM_vMessage326_Empty(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFEMessage326_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 52: whether port pArgs[0] has a multitap (MC_IsMultitapPluggedIn).

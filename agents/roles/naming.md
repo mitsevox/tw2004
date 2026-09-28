@@ -47,6 +47,11 @@ your files' named / commented / done counts; report them before and after.
    purpose stays unclear after reading its callers is named for exactly what it does
    (`FE_SetB86FromScreen`-style plain description is better than `fn_`), and the doubt goes in the
    report. name.py refuses a row that keeps a `fn_XXXXXXXX` name.
+   Stub message handlers (owner, 2026-09-28: one pattern): a handler in the menus' table
+   (gFEMessageHandlers) or the round's table (gIGMessageHandlers) whose body is empty, answers a
+   constant or echoes its argument keeps EA's name when TW06 / TW07 give one; otherwise it is
+   `GM_vFEMessage<slot>_Empty` / `GM_vIGMessage<slot>_Empty`, `..._Return<value>` (`Neg1` for -1)
+   or `..._ReturnArg`. Nothing else: no `NoOp`, `DoNothing`, `Command`, `Returns`, `Zero`.
 6. A possible EA bug in your own files is settled in your pass, not just reported (owner,
    2026-09-28: "that's the exact type of workflow where things get lost in translation"). Prove it
    from the code (the values it really gets, every caller). Proven: label it where it happens,
