@@ -3,15 +3,21 @@
 // FE_InitGameMessages fills gFEMessageHandlers, 612 of 770 slots, with this file's handlers and those
 // of the other front-end files (Create-A-Player, the logo editor, the PGA TOUR screens, the
 // calendar, the ladder, the trophy room). This file's handlers set up the game the menus start
-// (mode, players, golfers, controllers, course, holes, tees, weather), work the memory card
-// screens (card state, loading and saving profiles and options), set the options (commentary,
-// sounds) and read the save profiles' stats and records for the menus. The handlers are EA's
-// GM_v... message functions: TW07's UI_Core/frontend/GameMessages/APT_FE_GameMessages.c (TW06's
-// apt_fe_gamemessages.c) has GetGolferName, GM_vGetGolferName, GM_vGetGameMode, GM_vHideCharacter,
-// GM_vSetCharState and GM_vSetCommentaryOption, but in another order and mostly with other
+// (mode, players, golfers, controllers, course, holes, tees, weather, custom rounds), work the
+// memory card screens (card state, loading and saving profiles, options and replays, profile
+// backups), set the options (course conditions, swing and putting aids, commentary, music and
+// sounds, vibration), and read the save profiles' stats and records for the menus; others run the
+// EA Sports Bio, the Game Boy Advance link, the disc swap and the Play Now groups. The handlers are
+// EA's GM_v... message functions: TW07's UI_Core/frontend/GameMessages/APT_FE_GameMessages.c
+// (TW06's apt_fe_gamemessages.c) has GetGolferName, GM_vGetGolferName, GM_vGetGameMode,
+// GM_vHideCharacter, GM_vSetCharState, GM_vSaveGolferModel, GM_vCharStream, GM_vSetMulligan,
+// GM_vSetMCRewardMoney, GM_vTrophyBallsWon, GM_vPar5Eagles and the options' GM_vSet/Get...Option
+// pairs (commentary, tap-ins, green grid, caddie tips, break line, power boost, spin control, swing
+// aid, music volume, sound effects), GM_vSet/GetVibration, and TW07's MC.h the MC_CallActionFn... and
+// MC_SetCurrentFileType helpers at the file's end, but in another order and mostly with other
 // handlers, so most names here are read from the code; a handler that is empty or answers a
-// constant is named after its message number. The round's twin is GameUICommands.c
-// (IG_RunGameMessage).
+// constant is named after its message number (GM_vFEMessage<N>_Empty / _Return<value>). The
+// round's twin is GameUICommands.c (IG_RunGameMessage).
 
 #include "game.h"
 #include "camera.h"
