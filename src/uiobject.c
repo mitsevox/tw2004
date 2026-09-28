@@ -250,7 +250,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
     RenderState_SetBankTexture(lbl_802820BC, lbl_802820C4);
     DS_vSetAlphaTestMode(0, 6, 0x80);
     if (gPlayers[nPlayer].swing.nPowerBoost > 0) {
-        Vec3Copy(lbl_8018830C[gPlayers[nPlayer].swing.nPowerBoost - 1], aColour);
+        Vec3Copy(gBoostLevelColours[gPlayers[nPlayer].swing.nPowerBoost - 1], aColour);
     }
     RenderView_SetColor(aColour);
     RenderState_Flush();
@@ -270,14 +270,14 @@ void UI_Obj_RenderBoostUI(int nObj) {
                 aXYZ[j][3] = 1.0f;
             }
             if (lbl_801F5B78[i] < fFade) {
-                aColour[0] = lbl_8018830C[i][0];
-                aColour[1] = lbl_8018830C[i][1];
-                aColour[2] = lbl_8018830C[i][2];
+                aColour[0] = gBoostLevelColours[i][0];
+                aColour[1] = gBoostLevelColours[i][1];
+                aColour[2] = gBoostLevelColours[i][2];
                 aColour[3] = 1.0f;
             } else {
-                aColour[0] = lbl_8018830C[i][0];
-                aColour[1] = lbl_8018830C[i][1];
-                aColour[2] = lbl_8018830C[i][2];
+                aColour[0] = gBoostLevelColours[i][0];
+                aColour[1] = gBoostLevelColours[i][1];
+                aColour[2] = gBoostLevelColours[i][2];
                 aColour[3] = 1.0f - (lbl_801F5B78[i] - fFade) / (fMax - fFade);
             }
             RenderView_SetColor(aColour);

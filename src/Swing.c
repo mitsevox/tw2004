@@ -53,7 +53,7 @@ typedef struct SwingState {
     u8   unk11C[0x128 - 0x11C];
 } SwingState;
 
-// Rows of gForgivenessTable, in pairs (threshold, scale) unless noted.
+// Rows of gSwingAttributeTable, in pairs (threshold, scale) unless noted.
 enum {
     ROW_DRIVING     = 0,    // driving accuracy: clubs 0-8
     ROW_STRIKING_A  = 2,    // ball striking: clubs 9-12
@@ -74,25 +74,25 @@ enum {
 // between the last two.
 #define TABLE_AT(row, attr)                                                                    \
     ((attr) <= 100                                                                             \
-         ? gForgivenessTable[0][row] + ((f32)(attr) / 100.0f) *                                \
-               (gForgivenessTable[1][row] - gForgivenessTable[0][row])                         \
-         : gForgivenessTable[1][row] + (((f32)(attr) - 100.0f) / 10.0f) *                      \
-               (gForgivenessTable[2][row] - gForgivenessTable[1][row]))
+         ? gSwingAttributeTable[0][row] + ((f32)(attr) / 100.0f) *                                \
+               (gSwingAttributeTable[1][row] - gSwingAttributeTable[0][row])                         \
+         : gSwingAttributeTable[1][row] + (((f32)(attr) - 100.0f) / 10.0f) *                      \
+               (gSwingAttributeTable[2][row] - gSwingAttributeTable[1][row]))
 
 // Two rows at once (threshold and scale), one branch on the attribute.
 #define TABLE_PAIR(rowT, rowS, attr, outT, outS)                                               \
     if ((attr) <= 100) {                                                                       \
         f32 t = (f32)(attr) / 100.0f;                                                          \
-        outT = gForgivenessTable[0][rowT] +                                                    \
-               t * (gForgivenessTable[1][rowT] - gForgivenessTable[0][rowT]);                  \
-        outS = gForgivenessTable[0][rowS] +                                                    \
-               t * (gForgivenessTable[1][rowS] - gForgivenessTable[0][rowS]);                  \
+        outT = gSwingAttributeTable[0][rowT] +                                                    \
+               t * (gSwingAttributeTable[1][rowT] - gSwingAttributeTable[0][rowT]);                  \
+        outS = gSwingAttributeTable[0][rowS] +                                                    \
+               t * (gSwingAttributeTable[1][rowS] - gSwingAttributeTable[0][rowS]);                  \
     } else {                                                                                   \
         f32 t = ((f32)(attr) - 100.0f) / 10.0f;                                                \
-        outT = gForgivenessTable[1][rowT] +                                                    \
-               t * (gForgivenessTable[2][rowT] - gForgivenessTable[1][rowT]);                  \
-        outS = gForgivenessTable[1][rowS] +                                                    \
-               t * (gForgivenessTable[2][rowS] - gForgivenessTable[1][rowS]);                  \
+        outT = gSwingAttributeTable[1][rowT] +                                                    \
+               t * (gSwingAttributeTable[2][rowT] - gSwingAttributeTable[1][rowT]);                  \
+        outS = gSwingAttributeTable[1][rowS] +                                                    \
+               t * (gSwingAttributeTable[2][rowS] - gSwingAttributeTable[1][rowS]);                  \
     }
 
 // port: at these calls the original sign-extends Golfer_GetAttribute's result as if it returned s8,
@@ -148,19 +148,19 @@ u8    SW_vStateThroughSwing(int nPlayer);
 u8    SW_vStatePostSwing(int nPlayer);
 u8    SW_vStateCancelSwing(int nPlayer);
 
-SwingState lbl_801D5968;
+SwingState gSwingState;
 
 // 0x80183578  per club, 0..26: how much it can shape
 const s32 gClubCurve[CLUB_MAX_e] = {
     0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 16, 16, 16, 17
 };
 
-SwingState* gpSwing = &lbl_801D5968;               // 0x80281188
+SwingState* gpSwing = &gSwingState;               // 0x80281188
 
 s32 gBoostSteps[8] = {1, 2, 4, 6, 9, 12, 16, 20};  // 0x80188148  power boost per level: 1 2 4 6 9 12 16 20
 
 // 0x80188168  rows: value at attribute 0 / 100 / 110
-f32 gForgivenessTable[3][27] = {
+f32 gSwingAttributeTable[3][27] = {
     {0.1f, 0.85f, 0.125f, 0.825f, 0.13f, 0.8f, 0.135f, 0.775f, 0.1f,
      0.9f, 0.1f, 0.85f, 0.1f, 0.85f, 0.1f, 0.85f, 0.1f, 0.85f,
      0.1f, 0.85f, 0.0f, 1.0f, 3.14f, 0.0f, 0.005f, 135.0f, 0.15f},
@@ -179,9 +179,9 @@ f32 gPuttXScale[8] = {0.03f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f};
 f32 gSwingXScale[8] = {0.03f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f};
 
 // 0x801882EC  backswing rate by shot kind: -, 0.85, 0.5, 0.8
-f32 gSwingRange[8] = {0.0f, 0.85f, 0.5f, 0.8f, 0.0f, 0.0f, 0.0f, 0.0f};
+f32 gBackswingTime[8] = {0.0f, 0.85f, 0.5f, 0.8f, 0.0f, 0.0f, 0.0f, 0.0f};
 
-f32 lbl_8018830C[8][4] = {
+f32 gBoostLevelColours[8][4] = {
     {0.5f, 0.5f, 0.5f, 0.5f},
     {0.5f, 0.5f, 0.5f, 0.5f},
     {0.5f, 0.5f, 0.5f, 0.5f},
@@ -446,7 +446,7 @@ static inline int Swing_DeadZone(int v) {
 // 5 of the lessons mode) and then starts the downswing. A human's stick drives it: the stick's
 // distance from centre, dead-zoned (Swing_DeadZone) and capped at 100, says how far along the
 // backswing the animation should be, and the animation chases that at a rate that grows with the
-// gap (for shot kinds 1-3 scaled by the backswing's length over gSwingRange[kind]), playing
+// gap (for shot kinds 1-3 scaled by the backswing's length over gBackswingTime[kind]), playing
 // backwards when it must back down (character flag 0x40, which also starts the boost's 1/12 s die
 // timer). Within 0.05 of the target it settles into the hold at the top (state 2). Each frame the
 // stick is back, its sample goes into the 25-sample ring and is the top for now, and the power
@@ -529,7 +529,7 @@ u8 SW_vStateBackSwing(int nPlayer) {
             // fake match: written as == 1 || == 2 || == 3, CW merges the first two tests into one
             // range compare; the negated form keeps three compares on the loaded kind
             if (!(nKind != 1 && nKind != 2 && nKind != 3)) {
-                fRange = fRange / gSwingRange[nKind];
+                fRange = fRange / gBackswingTime[nKind];
             } else {
                 fRange = 1.0f;
             }
@@ -1225,7 +1225,7 @@ void SW_vSetSwingStrength(int nPlayer) {
 // distance, a chip (scaled by Physics_EstimateShotPower) or a pitch gets the boost, each at least
 // 0.1. Any other shot takes the boost (all but kinds 5-7 also AI_PowerScale and the tee sweet spot)
 // and then loses power to the mis-hit angle: a scaled part of it below a threshold, all of it above
-// (both from gForgivenessTable by the recovery rating for kinds 5-7 or a ball in the rough, lies
+// (both from gSwingAttributeTable by the recovery rating for kinds 5-7 or a ball in the rough, lies
 // 3-4, or sand, 6-8; else by driving accuracy). The result is kept within 0.05..1.5, except on a
 // tap-in.
 f32 SW_vCalculateShotPower(int nPlayer) {

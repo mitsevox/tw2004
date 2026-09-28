@@ -33,7 +33,7 @@ extern f32        lbl_802820B8; // } the light's colour (red, green, blue: fn_80
 extern f32        lbl_80281470; // }   0.05
 extern f32        lbl_80281474; // }   0.476
 extern f32        lbl_80281478; // 0.19: fn_800AEFE4 hands 255 times it to RenderState_SetConstantAlpha
-extern f32        lbl_8018830C[8][4];   // the rings' colours, one per power boost level
+extern f32        gBoostLevelColours[8][4];   // the rings' colours, one per power boost level
 extern f32        lbl_8018EC10[4];      // the lens's second point (CA_vSetLookAt)
 
 #endif
